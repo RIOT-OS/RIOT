@@ -100,6 +100,9 @@ typedef struct {
 /**
  * @brief Timer configuration options
  */
+#define TIM_FLAG_RESET_ON_SET (0U)
+#define TIM_FLAG_RESET_ON_MATCH (0U)
+
 typedef struct {
     uint32_t period_us;
 } timer_channel_conf_t;

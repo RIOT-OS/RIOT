@@ -32,7 +32,7 @@ extern "C" {
 
 #define UART_NUMOF (2U)
 #define TIMER_NUMOF (1U)
-#define TIMER_CHANNEL_NUMOF (4U)
+#define TIMER_CHANNEL_NUMOF (4)
 
 #define STDIO_UART_DEV (UART_DEV(0))
 #define STDIO_UART_BAUDRATE (115200U)

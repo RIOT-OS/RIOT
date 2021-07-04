@@ -12,7 +12,7 @@
  * @{
  *
  * @file timer.c
- * @brief CPU specific low-level timer driver implementation for RP2040
+ * @brief CPU specific low-level timer driver implementation
  *
  * @author Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  *
@@ -62,10 +62,11 @@ static uint32_t read_time(void) {
     return l;
 }
 
-static void isr_timer(int index) {
-    timer_hw->intr |= (1 << index);
+static void isr_timer(int ch) {
+    // Clear interrupt.
+    timer_hw->intr |= (1 << ch);
 
-    timer_isr_ctx[index].cb(timer_isr_ctx[index].arg, index);
+    timer_isr_ctx[0].cb(timer_isr_ctx[0].arg, ch);
 
     #ifdef TIM_FLAG_RESET_ON_MATCH
         #if TIM_FLAG_RESET_ON_MATCH
@@ -73,9 +74,10 @@ static void isr_timer(int index) {
         #endif
     #endif
 
-    if (timer_config[index].channel[index].period_us > 0) {
-        timer_hw->alarm[index] =
-            read_time() + timer_config[index].channel[index].period_us;
+    // Handle periodic timer.
+    if (timer_config[0].channel[ch].period_us > 0) {
+        timer_hw->alarm[ch] =
+            read_time() + timer_config[0].channel[ch].period_us;
     }
 }
 
@@ -91,6 +93,7 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg) {
         return -1;
     }
 
+    // Cortex-M0+ NVIC registers.
     io_rw_32 *ppb_nvic_iser =
         (io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET);
 
@@ -103,7 +106,13 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg) {
 
     while (!(resets_hw->reset_done & RESETS_RESET_DONE_TIMER_BITS)) {}
 
-    // Enable timer CPU interrupts, clear any pending interrupts before enabling.
+    // Enable timer interrupts.
+    timer_hw->inte |= (1 << 0);
+    timer_hw->inte |= (1 << 1);
+    timer_hw->inte |= (1 << 2);
+    timer_hw->inte |= (1 << 3);
+
+    // Enable CPU timer interrupts, clear any pending interrupts before enabling.
     *ppb_nvic_icpr |= (1 << 0);
     *ppb_nvic_icpr |= (1 << 1);
     *ppb_nvic_icpr |= (1 << 2);
@@ -123,21 +132,22 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg) {
 }
 
 int timer_set(tim_t dev, int channel, unsigned int timeout) {
-    if (dev >= TIMER_NUMOF) {
+    if ((dev >= TIMER_NUMOF) || (channel >= TIMER_CHANNEL_NUMOF)) {
         return -1;
     }
 
     timer_config[dev].channel[channel].period_us = 0;
     timer_hw->alarm[channel] = read_time() + timeout;
-    timer_hw->inte |= (1 << channel);
 
     return 0;
 }
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value) {
-    if (dev >= TIMER_NUMOF) {
+    if ((dev >= TIMER_NUMOF) || (channel >= TIMER_CHANNEL_NUMOF)) {
         return -1;
     }
+
+    timer_stop(0);
 
     timer_config[0].channel[channel].period_us = 0;
 
@@ -145,15 +155,19 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value) {
 
     timer_hw->alarm[channel] = value;
 
+    timer_start(0);
+
     return 0;
 }
 
 int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags) {
     (void)flags;
 
-    if (dev >= TIMER_NUMOF) {
+    if ((dev >= TIMER_NUMOF) || (channel >= TIMER_CHANNEL_NUMOF)) {
         return -1;
     }
+
+    timer_stop(0);
 
     #ifdef TIM_FLAG_RESET_ON_SET
         #if TIM_FLAG_RESET_ON_SET
@@ -165,19 +179,19 @@ int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags
 
     timer_hw->alarm[channel] = value;
 
+    timer_start(0);
+
     return 0;
 }
 
 int timer_clear(tim_t dev, int channel) {
-    if (dev >= TIMER_NUMOF) {
+    if ((dev >= TIMER_NUMOF) || (channel >= TIMER_CHANNEL_NUMOF)) {
         return -1;
     }
 
     timer_hw->alarm[channel] = 0;
 
     timer_config[dev].channel[channel].period_us = 0;
-
-    timer_hw->inte &= ~(1 << channel);
 
     return 0;
 }
@@ -187,7 +201,7 @@ unsigned int timer_read(tim_t dev) {
         return -1;
     }
 
-    return (unsigned int) read_time();
+    return (unsigned int)read_time();
 }
 
 void timer_start(tim_t dev) {
@@ -197,9 +211,7 @@ void timer_start(tim_t dev) {
         return;
     }
 
-    resets_hw->reset &= ~(RESETS_RESET_TIMER_BITS);
-
-    while (!(resets_hw->reset_done & RESETS_RESET_DONE_TIMER_BITS)) {}
+    timer_hw->pause &= ~(TIMER_PAUSE_BITS);
 
     timer_config[dev].is_running = true;
 }
@@ -211,7 +223,7 @@ void timer_stop(tim_t dev) {
         return;
     }
 
-    resets_hw->reset |= RESETS_RESET_TIMER_BITS;
+    timer_hw->pause |= TIMER_PAUSE_BITS;
 
     timer_config[dev].is_running = false;
 }
