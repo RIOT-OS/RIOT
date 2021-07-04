@@ -21,6 +21,7 @@
 #define PERIPH_CONF_H
 
 #include "cpu.h"
+#include "macros/units.h"
 #include "periph_cpu.h"
 
 #ifdef __cplusplus
@@ -28,10 +29,17 @@ extern "C" {
 #endif
 
 /**
+ * @name    Clock configurations
+ * @{
+ */
+/**
  * @brief   The peripheral clock is required for the UART Baud rate calculation
  *          It is configured by the 'config' registers (see pic32_config_settings.c)
  */
-#define PERIPHERAL_CLOCK (100000000)  /* Hz */
+#define PERIPHERAL_CLOCK    MHZ(100)
+
+#define CLOCK_CORECLOCK     MHZ(200)
+/** @} */
 
 /**
  * @name    Timer definitions
