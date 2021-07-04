@@ -10,8 +10,8 @@
  * @addtogroup cpu_rp2040
  * @{
  *
- * @file
- * @brief Sections definitions for the Raspberry Pi RP2040 MCU
+ * @file rp2040.ld
+ * @brief Linker script
  *
  * @author Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  *

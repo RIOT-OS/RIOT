@@ -102,8 +102,8 @@ typedef enum {
  * @brief UART configuration options
  */
 typedef struct {
-    gpio_t rx_pin;
     gpio_t tx_pin;
+    gpio_t rx_pin;
     uart_hw_t *dev;
     uart_parity_t parity;
     uart_stop_bits_t stop_bits;

@@ -30,9 +30,9 @@ extern "C" {
 
 #define CLK_XTAL_HZ (12000000UL)
 
-#define NUM_UART (2U)
-#define NUM_TIMER (1U)
-#define NUM_TIMER_CHANNEL (4U)
+#define UART_NUMOF (2U)
+#define TIMER_NUMOF (1U)
+#define TIMER_CHANNEL_NUMOF (4U)
 
 #define STDIO_UART_DEV (UART_DEV(0))
 #define STDIO_UART_BAUDRATE (115200U)
@@ -43,16 +43,16 @@ static const uart_conf_t uart_config[] = {
         .parity = UART_PARITY_NONE,
         .stop_bits = UART_STOP_BITS_1,
         .data_bits = UART_DATA_BITS_8,
-        .rx_pin = GPIO_PIN(GPIO_BANK_USER, 1),
         .tx_pin = GPIO_PIN(GPIO_BANK_USER, 0),
+        .rx_pin = GPIO_PIN(GPIO_BANK_USER, 1),
     },
     {
         .dev = uart1_hw,
         .parity = UART_PARITY_NONE,
         .stop_bits = UART_STOP_BITS_1,
         .data_bits = UART_DATA_BITS_8,
-        .rx_pin = GPIO_PIN(GPIO_BANK_USER, 5),
         .tx_pin = GPIO_PIN(GPIO_BANK_USER, 4),
+        .rx_pin = GPIO_PIN(GPIO_BANK_USER, 5),
     }
 };
 

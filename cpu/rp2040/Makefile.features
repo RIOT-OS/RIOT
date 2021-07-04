@@ -1,5 +1,5 @@
-CPU_CORE = cortex-m0plus
 CPU_FAM = rp2040
+CPU_CORE = cortex-m0plus
 
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_uart
