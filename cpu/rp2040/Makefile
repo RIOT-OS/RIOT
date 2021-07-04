@@ -1,8 +1,8 @@
 MODULE = cpu
 
-# add a list of subdirectories, that should also be build
+# List of additional subdirectories to build.
 DIRS += periph
-DIRS += include/vendor/boot_stage2
 DIRS += $(RIOTCPU)/cortexm_common
+DIRS += include/vendor/boot_stage2
 
 include $(RIOTBASE)/Makefile.base
