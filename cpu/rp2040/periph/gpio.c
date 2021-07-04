@@ -26,22 +26,6 @@
 #include "periph_conf.h"
 #include "periph/gpio.h"
 
-static bool is_gpio_pin_sio(gpio_t pin);
-
-static bool is_gpio_pin_sio(gpio_t pin) {
-    uint32_t io_pin;
-    uint32_t funcsel_pin;
-
-    assert((pin >> 16) == GPIO_BANK_USER);
-
-    io_pin = (pin & 0x0000ffff);
-
-    funcsel_pin =
-        (iobank0_hw->io[io_pin].ctrl & IO_BANK0_GPIO1_CTRL_FUNCSEL_BITS);
-
-    return (funcsel_pin == IO_BANK0_GPIO0_CTRL_FUNCSEL_VALUE_SIO_0);
-}
-
 int gpio_init(gpio_t pin, gpio_mode_t mode) {
     uint32_t io_pin;
 
@@ -49,11 +33,11 @@ int gpio_init(gpio_t pin, gpio_mode_t mode) {
 
     io_pin = (pin & 0x0000ffff);
 
+    // Bring IO and pads out pf reset.
     resets_hw->reset &= ~(RESETS_RESET_IO_BANK0_BITS);
     resets_hw->reset &= ~(RESETS_RESET_PADS_BANK0_BITS);
 
     while (!(resets_hw->reset_done & RESETS_RESET_DONE_IO_BANK0_BITS)) {}
-
     while (!(resets_hw->reset_done & RESETS_RESET_DONE_PADS_BANK0_BITS)) {}
 
     // Set pin function to SIO.
@@ -111,19 +95,22 @@ int gpio_read(gpio_t pin) {
     uint32_t io_pin;
     uint32_t pad_read = 0;
 
-    assert(is_gpio_pin_sio(pin));
-
     assert((pin >> 16) == GPIO_BANK_USER);
 
     io_pin = (pin & 0x0000ffff);
 
+    assert(
+        (iobank0_hw->io[io_pin].ctrl & IO_BANK0_GPIO0_CTRL_FUNCSEL_BITS) ==
+        IO_BANK0_GPIO0_CTRL_FUNCSEL_VALUE_SIO_0
+    );
+
     if (!(padsbank0_hw->io[io_pin] & PADS_BANK0_GPIO0_OD_BITS)) {
         pad_read =
-            (iobank0_hw->io[io_pin].status & IO_BANK0_GPIO1_STATUS_OUTTOPAD_BITS);
+            (iobank0_hw->io[io_pin].status & IO_BANK0_GPIO0_STATUS_OUTTOPAD_BITS);
     }
     else if ((padsbank0_hw->io[io_pin] & PADS_BANK0_GPIO0_IE_BITS)) {
         pad_read =
-            (iobank0_hw->io[io_pin].status & IO_BANK0_GPIO1_STATUS_INFROMPAD_BITS);
+            (iobank0_hw->io[io_pin].status & IO_BANK0_GPIO0_STATUS_INFROMPAD_BITS);
     }
 
     if (pad_read) {
@@ -137,11 +124,16 @@ int gpio_read(gpio_t pin) {
 void gpio_set(gpio_t pin) {
     uint32_t io_pin;
 
-    assert(is_gpio_pin_sio(pin));
-
     assert((pin >> 16) == GPIO_BANK_USER);
 
     io_pin = (pin & 0x0000ffff);
+
+    assert(
+        (iobank0_hw->io[io_pin].ctrl & IO_BANK0_GPIO0_CTRL_FUNCSEL_BITS) ==
+        IO_BANK0_GPIO0_CTRL_FUNCSEL_VALUE_SIO_0
+    );
+
+    assert(!(padsbank0_hw->io[io_pin] & PADS_BANK0_GPIO0_OD_BITS));
 
     iobank0_hw->io[io_pin].ctrl &=
         ~(IO_BANK0_GPIO0_CTRL_OUTOVER_BITS);
@@ -152,11 +144,16 @@ void gpio_set(gpio_t pin) {
 void gpio_clear(gpio_t pin) {
     uint32_t io_pin;
 
-    assert(is_gpio_pin_sio(pin));
-
     assert((pin >> 16) == GPIO_BANK_USER);
 
     io_pin = (pin & 0x0000ffff);
+
+    assert(
+        (iobank0_hw->io[io_pin].ctrl & IO_BANK0_GPIO0_CTRL_FUNCSEL_BITS) ==
+        IO_BANK0_GPIO0_CTRL_FUNCSEL_VALUE_SIO_0
+    );
+
+    assert(!(padsbank0_hw->io[io_pin] & PADS_BANK0_GPIO0_OD_BITS));
 
     iobank0_hw->io[io_pin].ctrl &=
         ~(IO_BANK0_GPIO0_CTRL_OUTOVER_BITS);
@@ -168,16 +165,19 @@ void gpio_toggle(gpio_t pin) {
     uint32_t io_pin;
     uint32_t pad_read = 0;
 
-    assert(is_gpio_pin_sio(pin));
-
     assert((pin >> 16) == GPIO_BANK_USER);
 
     io_pin = (pin & 0x0000ffff);
 
-    if (!(padsbank0_hw->io[io_pin] & PADS_BANK0_GPIO0_OD_BITS)) {
-        pad_read =
-            (iobank0_hw->io[io_pin].status & IO_BANK0_GPIO1_STATUS_OUTTOPAD_BITS);
-    }
+    assert(
+        (iobank0_hw->io[io_pin].ctrl & IO_BANK0_GPIO0_CTRL_FUNCSEL_BITS) ==
+        IO_BANK0_GPIO0_CTRL_FUNCSEL_VALUE_SIO_0
+    );
+
+    assert(!(padsbank0_hw->io[io_pin] & PADS_BANK0_GPIO0_OD_BITS));
+
+    pad_read =
+        (iobank0_hw->io[io_pin].status & IO_BANK0_GPIO0_STATUS_OUTTOPAD_BITS);
 
     if (pad_read) {
         gpio_clear(pin);
@@ -190,18 +190,21 @@ void gpio_toggle(gpio_t pin) {
 void gpio_write(gpio_t pin, int value) {
     uint32_t io_pin;
 
-    assert(is_gpio_pin_sio(pin));
-
     assert((pin >> 16) == GPIO_BANK_USER);
 
     io_pin = (pin & 0x0000ffff);
 
-    if (!(padsbank0_hw->io[io_pin] & PADS_BANK0_GPIO0_OD_BITS)) {
-        if (value == 0) {
-            gpio_clear(pin);
-        }
-        else {
-            gpio_set(pin);
-        }
+    assert(
+        (iobank0_hw->io[io_pin].ctrl & IO_BANK0_GPIO0_CTRL_FUNCSEL_BITS) ==
+        IO_BANK0_GPIO0_CTRL_FUNCSEL_VALUE_SIO_0
+    );
+
+    assert(!(padsbank0_hw->io[io_pin] & PADS_BANK0_GPIO0_OD_BITS));
+
+    if (value == 0) {
+        gpio_clear(pin);
+    }
+    else {
+        gpio_set(pin);
     }
 }

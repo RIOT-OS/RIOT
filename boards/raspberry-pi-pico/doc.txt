@@ -1,18 +1,36 @@
 /**
- * @defgroup    boards_raspberry-pi-pico Raspberry Pi Pico
- * @ingroup     boards
- * @brief       Support for the Raspberry Pi Pico board.
- *
- * ### General information
- *
- * Some general information about the board
- *
- * ### Pinout
- *
- * A detailed description of the board pinout (if available)
- *
- * ### Flash the board
- *
- * Some notes about how to flash the board
- *
- */
+@defgroup    boards_raspberry-pi-pico Raspberry Pi Pico
+@ingroup     boards
+@brief       Support for the Raspberry Pi Pico board.
+
+## Introduction
+
+Raspberry Pi Pico is a microcontroller board based on the Raspberry Pi RP2040 microcontroller chip.
+
+## Documentation
+
+- Raspberry Pi Pico Datasheet [here.](https://datasheets.raspberrypi.org/pico/pico-datasheet.pdf)
+- Raspberry Pi RP2040 Datasheet [here.](https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf)
+
+## Implementation Status
+
+TODO
+
+## Flash the Board
+
+To flash the board you must have the **Picotool** available in your system (also added to $PATH).
+For Picotool source and documentation check [here.](https://github.com/raspberrypi/picotool)
+
+Additionally, to be able to flash the board using Picotool and without root privileges, add the
+following udev rule:
+
+```ATTR{idVendor}=="2e8a", ATTRS{idProduct}=="0003", MODE="660", GROUP="plugdev", TAG+="uaccess"```
+
+to, */etc/udev/rules.d/80-pico.rules*
+
+Now, to flash the board, hold the *BOOTSEL* button on the board while powering the board.
+
+After that the following command should work:
+
+```make BOARD=raspberry-pi-pico flash```
+*/

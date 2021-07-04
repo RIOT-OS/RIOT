@@ -1,8 +1,4 @@
 CPU_FAM = rp2040
 CPU_CORE = cortex-m0plus
 
-FEATURES_PROVIDED += periph_gpio
-FEATURES_PROVIDED += periph_uart
-FEATURES_PROVIDED += periph_timer
-
 include $(RIOTCPU)/cortexm_common/Makefile.features

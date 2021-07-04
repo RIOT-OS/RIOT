@@ -12,7 +12,7 @@
  * @{
  *
  * @file uart.c
- * @brief Implementation of the low-level UART driver for the rp2040
+ * @brief CPU specific low-level UART driver
  *
  * @author Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  *
@@ -33,17 +33,12 @@ static void isr_uart(uart_t dev);
 
 static void isr_uart(uart_t dev) {
     uint8_t data =
-        (uint8_t)(uart_config[UART_DEV(0)].dev->dr & UART_UARTDR_DATA_BITS);
+        (uint8_t)(uart_config[dev].dev->dr & UART_UARTDR_DATA_BITS);
 
     uart_isr_ctx[dev].rx_cb(uart_isr_ctx[dev].arg, data);
 }
 
-int uart_init(
-    uart_t uart,
-    uint32_t baudrate,
-    uart_rx_cb_t rx_cb,
-    void *arg
-) {
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg) {
     uint32_t rx_pin;
     uint32_t tx_pin;
 
@@ -51,18 +46,29 @@ int uart_init(
     uint32_t baudrate_f;
     uint32_t baudrate_div;
 
-    io_rw_32 *ppb_nvic_iser;
-    io_rw_32 *ppb_nvic_icpr;
+    // Cortex-M0+ NVIC registers.
+    io_rw_32 *ppb_nvic_icpr =
+        (io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET);
 
-    assert(uart < UART_NUMOF);
+    io_rw_32 *ppb_nvic_iser =
+        (io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET);
+
+    uart_isr_ctx[uart].arg = arg;
+    uart_isr_ctx[uart].rx_cb = rx_cb;
+
+    if (uart >= UART_NUMOF) {
+        return UART_NODEV;
+    }
 
     if (uart == UART_DEV(0)) {
+        // Reset the UART hardware.
         resets_hw->reset |= RESETS_RESET_UART0_BITS;
         resets_hw->reset &= ~(RESETS_RESET_UART0_BITS);
 
         while (!(resets_hw->reset_done & RESETS_RESET_DONE_UART0_BITS)) {}
     }
     else if (uart == UART_DEV(1)) {
+        // Reset the UART hardware.
         resets_hw->reset |= RESETS_RESET_UART1_BITS;
         resets_hw->reset &= ~(RESETS_RESET_UART1_BITS);
 
@@ -72,29 +78,21 @@ int uart_init(
         return UART_NODEV;
     }
 
-    ppb_nvic_iser =
-        (io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET);
-
-    ppb_nvic_icpr =
-        (io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET);
-
     tx_pin = (uart_config[uart].tx_pin & 0x0000ffff);
     rx_pin = (uart_config[uart].rx_pin & 0x0000ffff);
 
-    // Reset IO pad and bank.
+    // Reset IO and pads.
     resets_hw->reset |= RESETS_RESET_IO_BANK0_BITS;
     resets_hw->reset &= ~(RESETS_RESET_IO_BANK0_BITS);
-
-    while (!(resets_hw->reset_done & RESETS_RESET_DONE_IO_BANK0_BITS)) {}
-
     resets_hw->reset |= RESETS_RESET_PADS_BANK0_BITS;
     resets_hw->reset &= ~(RESETS_RESET_PADS_BANK0_BITS);
 
+    while (!(resets_hw->reset_done & RESETS_RESET_DONE_IO_BANK0_BITS)) {}
     while (!(resets_hw->reset_done & RESETS_RESET_DONE_PADS_BANK0_BITS)) {}
 
     /*
-     * Enable both input and output at the pads to
-     * the UART peripheral can configure accordingly.
+     * Enable both input and output at the pad so
+     * that the UART peripheral can configure as required.
      */
     padsbank0_hw->io[tx_pin] &= ~(PADS_BANK0_GPIO0_OD_BITS);
     padsbank0_hw->io[tx_pin] |= PADS_BANK0_GPIO0_IE_BITS;
@@ -131,10 +129,13 @@ int uart_init(
     uart_config[uart].dev->fbrd = baudrate_f;
 
     // UART format configuration.
+
+    // Data length.
     uart_config[uart].dev->lcr_h &= ~(UART_UARTLCR_H_WLEN_BITS);
     uart_config[uart].dev->lcr_h |=
         ((uart_config[uart].data_bits - 5) << UART_UARTLCR_H_WLEN_LSB);
 
+    // Stop bits.
     if(uart_config[uart].stop_bits == UART_STOP_BITS_1) {
         uart_config[uart].dev->lcr_h &= ~(UART_UARTLCR_H_STP2_BITS);
     }
@@ -142,6 +143,7 @@ int uart_init(
         uart_config[uart].dev->lcr_h |= UART_UARTLCR_H_STP2_BITS;
     }
 
+    // Parity.
     if(uart_config[uart].parity == UART_PARITY_NONE) {
         uart_config[uart].dev->lcr_h &= ~(UART_UARTLCR_H_PEN_BITS);
     }
@@ -157,11 +159,10 @@ int uart_init(
     // Disable FIFO, operate in character mode.
     uart_config[uart].dev->lcr_h &= ~(UART_UARTLCR_H_FEN_BITS);
 
-    // Setup interrupt driven RX only if receive callback is provided.
-    if (rx_cb) {
-        uart_isr_ctx[uart].arg = arg;
-        uart_isr_ctx[uart].rx_cb = rx_cb;
 
+    // Setup interrupt driven RX only if receive callback is provided.
+
+    if (rx_cb != NULL) {
         // Enable corresponding CPU interrupts.
         if (uart == UART_DEV(0)) {
             *ppb_nvic_icpr |= (1 << 20);
@@ -175,6 +176,20 @@ int uart_init(
         // Enable RX interrupt.
         uart_config[uart].dev->imsc |= UART_UARTIMSC_RXIM_BITS;
     }
+    else {
+        // Disable corresponding CPU interrupts.
+        if (uart == UART_DEV(0)) {
+            *ppb_nvic_icpr &= ~(1 << 20);
+            *ppb_nvic_iser &= ~(1 << 20);
+        }
+        else if (uart == UART_DEV(1)) {
+            *ppb_nvic_icpr &= ~(1 << 21);
+            *ppb_nvic_iser &= ~(1 << 21);
+        }
+
+        // Disable RX interrupt.
+        uart_config[uart].dev->imsc &= ~(UART_UARTIMSC_RXIM_BITS);
+    }
 
     // Start UART operation.
     uart_config[uart].dev->cr |=
@@ -183,14 +198,12 @@ int uart_init(
     return UART_OK;
 }
 
-int uart_mode(
-    uart_t uart,
-    uart_data_bits_t data_bits,
-    uart_parity_t parity,
-    uart_stop_bits_t stop_bits
-) {
-    assert(uart < UART_NUMOF);
+int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity, uart_stop_bits_t stop_bits) {
+    if(uart >= UART_NUMOF) {
+        return UART_NOMODE;
+    }
 
+    // Data length.
     if (((data_bits - 5) < 0) || ((data_bits - 5) > 3)) {
         return UART_NOMODE;
     }
@@ -199,6 +212,7 @@ int uart_mode(
     uart_config[uart].dev->lcr_h |=
         ((data_bits - 5) << UART_UARTLCR_H_WLEN_LSB);
 
+    // Stop bits.
     if(stop_bits == UART_STOP_BITS_1) {
         uart_config[uart].dev->lcr_h &= ~(UART_UARTLCR_H_STP2_BITS);
     }
@@ -209,6 +223,7 @@ int uart_mode(
         return UART_NOMODE;
     }
 
+    // Parity.
     if(parity == UART_PARITY_NONE) {
         uart_config[uart].dev->lcr_h &= ~(UART_UARTLCR_H_PEN_BITS);
     }
@@ -246,33 +261,31 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 void uart_poweron(uart_t uart) {
     assert(uart < UART_NUMOF);
 
-    resets_hw->reset &= ~(RESETS_RESET_UART0_BITS);
-
-    while (!(resets_hw->reset_done & RESETS_RESET_DONE_UART0_BITS)) {}
+    uart_config[uart].dev->cr |= UART_UARTCR_UARTEN_BITS;
 }
 
 void uart_poweroff(uart_t uart) {
     assert(uart < UART_NUMOF);
 
-    resets_hw->reset |= RESETS_RESET_UART0_BITS;
+    uart_config[uart].dev->cr &= ~(UART_UARTCR_UARTEN_BITS);
 }
 
 // Interrupt handlers.
 
 void isr_uart0(void) {
-    isr_uart(UART_DEV(0));
-
     // Clear RX interrupt.
     uart_config[UART_DEV(0)].dev->icr &= ~(UART_UARTICR_RXIC_BITS);
+
+    isr_uart(UART_DEV(0));
 
     cortexm_isr_end();
 }
 
 void isr_uart1(void) {
-    isr_uart(UART_DEV(1));
-
     // Clear RX interrupt.
     uart_config[UART_DEV(1)].dev->icr &= ~(UART_UARTICR_RXIC_BITS);
+
+    isr_uart(UART_DEV(1));
 
     cortexm_isr_end();
 }

@@ -23,6 +23,8 @@
 
 #include "cpu.h"
 
+// Includes from Raspberry Pi Pico SDK.
+
 #include "hardware/regs/uart.h"
 #include "hardware/regs/xosc.h"
 #include "hardware/regs/timer.h"
@@ -48,8 +50,6 @@
 extern "C" {
 #endif
 
-#define PERIPH_TIMER_PROVIDES_SET
-
 /**
  * @brief GPIO configuration options
  */
@@ -68,7 +68,6 @@ enum {
  */
 #define HAVE_UART_PARITY_T
 typedef enum {
-
    UART_PARITY_ODD,
    UART_PARITY_EVEN,
    UART_PARITY_NONE,
@@ -100,6 +99,8 @@ typedef struct {
 /**
  * @brief Timer configuration options
  */
+#define PERIPH_TIMER_PROVIDES_SET
+
 #define TIM_FLAG_RESET_ON_SET (0U)
 #define TIM_FLAG_RESET_ON_MATCH (0U)
 
@@ -112,6 +113,9 @@ typedef struct {
     timer_channel_conf_t channel[4];
 } timer_conf_t;
 
+/**
+ * @brief CPU clock options
+ */
 uint32_t get_clk_khz(unsigned int clk_src_idx);
 
 #ifdef __cplusplus

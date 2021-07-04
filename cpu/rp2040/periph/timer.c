@@ -12,7 +12,7 @@
  * @{
  *
  * @file timer.c
- * @brief CPU specific low-level timer driver implementation
+ * @brief CPU specific low-level timer driver
  *
  * @author Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  *
@@ -56,6 +56,10 @@ static uint32_t read_time(void) {
     uint32_t l;
     uint32_t h __attribute__((unused));
 
+    /*
+     * The sequence of reading the lower word first
+     * and then the higher word must be maintained.
+     */
     l = timer_hw->timelr;
     h = timer_hw->timehr;
 
@@ -63,9 +67,6 @@ static uint32_t read_time(void) {
 }
 
 static void isr_timer(int ch) {
-    // Clear interrupt.
-    timer_hw->intr |= (1 << ch);
-
     timer_isr_ctx[0].cb(timer_isr_ctx[0].arg, ch);
 
     #ifdef TIM_FLAG_RESET_ON_MATCH
@@ -94,13 +95,13 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg) {
     }
 
     // Cortex-M0+ NVIC registers.
-    io_rw_32 *ppb_nvic_iser =
-        (io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET);
-
     io_rw_32 *ppb_nvic_icpr =
         (io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET);
 
-    // Reset of timer hardware.
+    io_rw_32 *ppb_nvic_iser =
+        (io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET);
+
+    // Reset the timer hardware.
     resets_hw->reset |= RESETS_RESET_TIMER_BITS;
     resets_hw->reset &= ~RESETS_RESET_TIMER_BITS;
 
@@ -123,10 +124,10 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg) {
     *ppb_nvic_iser |= (1 << 2);
     *ppb_nvic_iser |= (1 << 3);
 
-    timer_config[dev].is_running = true;
-
     timer_isr_ctx[dev].cb = cb;
     timer_isr_ctx[dev].arg = arg;
+
+    timer_start(dev);
 
     return 0;
 }
@@ -136,7 +137,9 @@ int timer_set(tim_t dev, int channel, unsigned int timeout) {
         return -1;
     }
 
+    // Clear periodic timer config.
     timer_config[dev].channel[channel].period_us = 0;
+
     timer_hw->alarm[channel] = read_time() + timeout;
 
     return 0;
@@ -149,6 +152,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value) {
 
     timer_stop(0);
 
+    // Clear periodic timer config.
     timer_config[0].channel[channel].period_us = 0;
 
     timer_reset_counter();
@@ -191,6 +195,7 @@ int timer_clear(tim_t dev, int channel) {
 
     timer_hw->alarm[channel] = 0;
 
+    // Clear periodic timer config.
     timer_config[dev].channel[channel].period_us = 0;
 
     return 0;
@@ -231,24 +236,36 @@ void timer_stop(tim_t dev) {
 // The interrupt handlers.
 
 void isr_timer_0(void) {
+    // Clear interrupt of the channel.
+    timer_hw->intr |= (1 << 0);
+
     isr_timer(0);
 
     cortexm_isr_end();
 }
 
 void isr_timer_1(void) {
+    // Clear interrupt of the channel.
+    timer_hw->intr |= (1 << 1);
+
     isr_timer(1);
 
     cortexm_isr_end();
 }
 
 void isr_timer_2(void) {
+    // Clear interrupt of the channel.
+    timer_hw->intr |= (1 << 2);
+
     isr_timer(2);
 
     cortexm_isr_end();
 }
 
 void isr_timer_3(void) {
+    // Clear interrupt of the channel.
+    timer_hw->intr |= (1 << 3);
+
     isr_timer(3);
 
     cortexm_isr_end();

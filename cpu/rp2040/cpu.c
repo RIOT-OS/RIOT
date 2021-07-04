@@ -64,6 +64,7 @@ uint32_t get_clk_khz(unsigned int clk_src_idx) {
     // Wait for any previous count to finish.
     while (!(clocks_hw->fc0.status & CLOCKS_FC0_STATUS_DONE_BITS)) {}
 
+    // Initiate count.
     clocks_hw->fc0.src = clk_src_idx;
 
     // Wait till the count has finished.
@@ -82,6 +83,8 @@ uint32_t get_clk_khz(unsigned int clk_src_idx) {
  */
 void cpu_init(void) {
     cortexm_init();
+
     clock_init();
+
     stdio_init();
 }

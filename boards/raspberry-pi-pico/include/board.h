@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Ishraq Ibne Ashraf
+ * Copyright (C) 2021 Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,8 +10,8 @@
  * @ingroup boards_raspberry-pi-pico
  * @{
  *
- * @file
- * @brief Board specific definitions of Raspberry Pi Pico
+ * @file board.h
+ * @brief Board specific definitions
  *
  * @author Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  */
@@ -27,6 +27,7 @@
 extern "C" {
 #endif
 
+// On-board green LED.
 #define LED0_PIN GPIO_PIN(GPIO_BANK_USER, 25)
 
 /**

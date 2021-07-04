@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Ishraq Ibne Ashraf
+ * Copyright (C) 2021 Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,8 +10,8 @@
  * @ingroup boards_raspberry-pi-pico
  * @{
  *
- * @file
- * @brief Configuration of CPU peripherals of Raspberry Pi Pico
+ * @file periph_conf.h
+ * @brief Configuration of CPU peripherals
  *
  * @author Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  */
@@ -30,10 +30,10 @@ extern "C" {
 
 #define CLK_XTAL_HZ (12000000UL)
 
-#define UART_NUMOF (2U)
 #define TIMER_NUMOF (1U)
 #define TIMER_CHANNEL_NUMOF (4)
 
+#define UART_NUMOF (2U)
 #define STDIO_UART_DEV (UART_DEV(0))
 #define STDIO_UART_BAUDRATE (115200U)
 
