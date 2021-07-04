@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2021 Ishraq Ibne Ashraf
- *
+ * Copyright (C) 2021 Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -26,7 +25,6 @@ void dummy_handler(void) {
     dummy_handler_default();
 }
 
-// RP2040 specific interrupt vectors.
 WEAK_DEFAULT void isr_timer_0(void);
 WEAK_DEFAULT void isr_timer_1(void);
 WEAK_DEFAULT void isr_timer_2(void);
@@ -54,32 +52,37 @@ WEAK_DEFAULT void isr_i2c0(void);
 WEAK_DEFAULT void isr_i2c1(void);
 WEAK_DEFAULT void isr_rtc(void);
 
-// CPU specific interrupt vector table.
+/*
+ * CPU specific interrupt vector table.
+ *
+ * This IRQ vector table is placed right
+ * next to the ARM system IRQ vector table.
+ */
 ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
-    isr_timer_0, /* 0 TIMER_0_IRQn */
-    isr_timer_1, /* 1 TIMER_1_IRQn */
-    isr_timer_2, /* 2 TIMER_2_IRQn */
-    isr_timer_3, /* 3 TIMER_3_IRQn */
-    isr_pwm_wrap, /* 4 PWM_WRAP_IRQn */
-    isr_usbctrl, /* 5 USBCTRL_IRQn */
-    isr_xip, /* 6 XIP_IRQn */
-    isr_pio0_0, /* 7 PIO0_0_IRQn */
-    isr_pio0_1, /* 8 PIO0_1_IRQn Meter */
-    isr_pio1_0, /* 9 PIO1_0_IRQn */
-    isr_pio1_1, /* 10 PIO1_1_IRQn */
-    isr_dma_0, /* 11 DMA_0_IRQn*/
-    isr_dma_1, /*  12 DMA_1_IRQn */
-    isr_io_bank0, /* 13 IO_BANK0_IRQn */
-    isr_io_qspi, /* 14 IO_QSPI_IRQn*/
-    isr_sio_proc0, /* 15 SIO_PROC0_IRQn */
-    isr_sio_proc1, /* 16 SIO_PROC1_IRQn */
-    isr_clocks, /* 17 CLOCKS_IRQn */
-    isr_spi0, /* 18 SPI0_IRQn */
-    isr_spi1, /* 19 SPI1_IRQn */
-    isr_uart0, /* 20 UART0_IRQn */
-    isr_uart1, /* 21 UART1_IRQn */
-    isr_adc0_fifo, /* 22 ADC0_FIFO_IRQn*/
-    isr_i2c0, /* 23 I2C0_IRQn */
-    isr_i2c1, /* 24 I2C1_IRQn */
-    isr_rtc, /* 25 RTC_IRQn */
+    [0] = isr_timer_0,
+    [1] = isr_timer_1,
+    [2] = isr_timer_2,
+    [3] = isr_timer_3,
+    [4] = isr_pwm_wrap,
+    [5] = isr_usbctrl,
+    [6] = isr_xip,
+    [7] = isr_pio0_0,
+    [8] = isr_pio0_1,
+    [9] = isr_pio1_0,
+    [10] = isr_pio1_1,
+    [11] = isr_dma_0,
+    [12] = isr_dma_1,
+    [13] = isr_io_bank0,
+    [14] = isr_io_qspi,
+    [15] = isr_sio_proc0,
+    [16] = isr_sio_proc1,
+    [17] = isr_clocks,
+    [18] = isr_spi0,
+    [19] = isr_spi1,
+    [20] = isr_uart0,
+    [21] = isr_uart1,
+    [22] = isr_adc0_fifo,
+    [23] = isr_i2c0,
+    [24] = isr_i2c1,
+    [25] = isr_rtc,
 };
