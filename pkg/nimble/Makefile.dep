@@ -11,7 +11,20 @@ USEMODULE += nimble_riot_contrib
 
 # RIOT port
 USEMODULE += nimble_porting_nimble
-USEMODULE += nimble_npl_riot
+
+# NOTE: this dependency depends on inclusion order, for it to work properly
+# mynewt-core should be selected as nimble backend as early as possible,
+# i.e. at the application level.
+ifneq (,$(filter mynewt-core,$(USEPKG)))
+  USEMODULE += mynewt-core_os
+  USEMODULE += mynewt-core_util
+  USEMODULE += mynewt-core_nrf5x_hal
+else
+  # uwb-% requires mynewt-core so is incompatible with nimble_npl_riot
+  ifeq (,$(filter uwb%,$(USEPKG)))
+    USEMODULE += nimble_npl_riot
+  endif
+endif
 
 # if nothing else is specified, we build the host and controller
 ifeq (,$(filter nimble_host nimble_controller,$(USEMODULE)))
