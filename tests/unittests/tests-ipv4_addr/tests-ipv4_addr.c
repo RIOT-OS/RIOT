@@ -54,7 +54,7 @@ static void test_ipv4_addr_to_str__addr_NULL(void)
 
 static void test_ipv4_addr_to_str__result_NULL(void)
 {
-    ipv4_addr_t a;
+    ipv4_addr_t a = {0};
 
     TEST_ASSERT_NULL(ipv4_addr_to_str(NULL, &a, IPV4_ADDR_MAX_STR_LEN));
 }
