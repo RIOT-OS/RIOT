@@ -48,11 +48,11 @@ static timer_conf_t timer_config[] = {
     }
 };
 
-static uint32_t read_time(void);
+static uint32_t get_time(void);
 static void isr_timer(int index);
 static void timer_reset_counter(void);
 
-static uint32_t read_time(void) {
+static uint32_t get_time(void) {
     uint32_t l;
     uint32_t h __attribute__((unused));
 
@@ -78,7 +78,7 @@ static void isr_timer(int ch) {
     // Handle periodic timer.
     if (timer_config[0].channel[ch].period_us > 0) {
         timer_hw->alarm[ch] =
-            read_time() + timer_config[0].channel[ch].period_us;
+            get_time() + timer_config[0].channel[ch].period_us;
     }
 }
 
@@ -140,7 +140,7 @@ int timer_set(tim_t dev, int channel, unsigned int timeout) {
     // Clear periodic timer config.
     timer_config[dev].channel[channel].period_us = 0;
 
-    timer_hw->alarm[channel] = read_time() + timeout;
+    timer_hw->alarm[channel] = get_time() + timeout;
 
     return 0;
 }
@@ -150,7 +150,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value) {
         return -1;
     }
 
-    timer_stop(0);
+    timer_stop(dev);
 
     // Clear periodic timer config.
     timer_config[0].channel[channel].period_us = 0;
@@ -159,7 +159,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value) {
 
     timer_hw->alarm[channel] = value;
 
-    timer_start(0);
+    timer_start(dev);
 
     return 0;
 }
@@ -171,7 +171,7 @@ int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags
         return -1;
     }
 
-    timer_stop(0);
+    timer_stop(dev);
 
     #ifdef TIM_FLAG_RESET_ON_SET
         #if TIM_FLAG_RESET_ON_SET
@@ -181,9 +181,9 @@ int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags
 
     timer_config[dev].channel[channel].period_us = value;
 
-    timer_hw->alarm[channel] = value;
+    timer_hw->alarm[channel] = get_time() + value;
 
-    timer_start(0);
+    timer_start(dev);
 
     return 0;
 }
@@ -206,7 +206,7 @@ unsigned int timer_read(tim_t dev) {
         return -1;
     }
 
-    return (unsigned int)read_time();
+    return (unsigned int)get_time();
 }
 
 void timer_start(tim_t dev) {
