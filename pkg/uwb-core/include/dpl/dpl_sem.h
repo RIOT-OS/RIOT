@@ -22,10 +22,7 @@
 
 #include <stdint.h>
 
-#include "dpl_types.h"
-#include "dpl_error.h"
-
-#include "sema.h"
+#include "os/os_sem.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,7 +32,7 @@ extern "C" {
  * @brief dpl semaphore wrapper
  */
 struct dpl_sem {
-    sema_t sema;    /**< the semaphore */
+    struct os_sem sem;      /**< the semaphore */
 };
 
 /**
@@ -48,7 +45,10 @@ struct dpl_sem {
  *      DPL_INVALID_PARM     Semaphore passed in was NULL.
  *      DPL_OK               no error.
  */
-dpl_error_t dpl_sem_init(struct dpl_sem *sem, uint16_t tokens);
+static inline dpl_error_t dpl_sem_init(struct dpl_sem *sem, uint16_t tokens)
+{
+    return (dpl_error_t) os_sem_init(&sem->sem, tokens);
+}
 
 /**
  * @brief Pend (wait) for a semaphore.
@@ -64,7 +64,10 @@ dpl_error_t dpl_sem_init(struct dpl_sem *sem, uint16_t tokens);
  *      DPL_TIMEOUT          semaphore was owned by another task and timeout=0
  *      DPL_OK               no error
  */
-dpl_error_t dpl_sem_pend(struct dpl_sem *sem, dpl_time_t timeout);
+static inline dpl_error_t dpl_sem_pend(struct dpl_sem *sem, dpl_time_t timeout)
+{
+    return (dpl_error_t) os_sem_pend(&sem->sem, timeout);
+}
 
 /**
  * @brief Release a semaphore.
@@ -75,12 +78,18 @@ dpl_error_t dpl_sem_pend(struct dpl_sem *sem, dpl_time_t timeout);
  *      DPL_INVALID_PARM    semaphore passed in was NULL.
  *      DPL_OK              no error
  */
-dpl_error_t dpl_sem_release(struct dpl_sem *sem);
+static inline dpl_error_t dpl_sem_release(struct dpl_sem *sem)
+{
+    return (dpl_error_t) os_sem_release(&sem->sem);
+}
 
 /**
  * @brief Get current semaphore's count
  */
-uint16_t dpl_sem_get_count(struct dpl_sem *sem);
+static inline int16_t dpl_sem_get_count(struct dpl_sem *sem)
+{
+    return os_sem_get_count(&sem->sem);
+}
 
 #ifdef __cplusplus
 }

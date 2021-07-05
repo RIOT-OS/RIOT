@@ -18,8 +18,8 @@
  * @}
  */
 
-#ifndef SYSCFG_SYSCFG_TWR_DS_H
-#define SYSCFG_SYSCFG_TWR_DS_H
+#ifndef DPL_SYSCFG_SYSCFG_TWR_DS_H
+#define DPL_SYSCFG_SYSCFG_TWR_DS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,4 +50,4 @@ extern "C" {
 }
 #endif
 
-#endif /* SYSCFG_SYSCFG_TWR_DS_H */
+#endif /* DPL_SYSCFG_SYSCFG_TWR_DS_H */

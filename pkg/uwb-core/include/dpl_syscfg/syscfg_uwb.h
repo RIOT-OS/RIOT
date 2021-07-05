@@ -18,8 +18,8 @@
  * @}
  */
 
-#ifndef SYSCFG_SYSCFG_UWB_H
-#define SYSCFG_SYSCFG_UWB_H
+#ifndef DPL_SYSCFG_SYSCFG_UWB_H
+#define DPL_SYSCFG_SYSCFG_UWB_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,7 +50,7 @@ extern "C" {
  * @brief Enable init messages showing each package has been initialised
  */
 #ifndef MYNEWT_VAL_UWB_PKG_INIT_LOG
-#define MYNEWT_VAL_UWB_PKG_INIT_LOG (1)
+#define MYNEWT_VAL_UWB_PKG_INIT_LOG (0)
 #endif
 
 /**
@@ -141,4 +141,4 @@ extern "C" {
 }
 #endif
 
-#endif /* SYSCFG_SYSCFG_UWB_H */
+#endif /* DPL_SYSCFG_SYSCFG_UWB_H */

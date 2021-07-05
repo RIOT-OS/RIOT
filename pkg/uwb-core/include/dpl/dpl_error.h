@@ -24,29 +24,31 @@
 extern "C" {
 #endif
 
+#include "os/os_error.h"
+
 /**
  * @brief DPL error types
  */
 enum dpl_error {
-    DPL_OK = 0,
-    DPL_ENOMEM = 1,
-    DPL_EINVAL = 2,
-    DPL_INVALID_PARAM = 3,
-    DPL_MEM_NOT_ALIGNED = 4,
-    DPL_BAD_MUTEX = 5,
-    DPL_TIMEOUT = 6,
-    DPL_ERR_IN_ISR = 7,
-    DPL_ERR_PRIV = 8,
-    DPL_OS_NOT_STARTED = 9,
-    DPL_ENOENT = 10,
-    DPL_EBUSY = 11,
-    DPL_ERROR = 12,
+    DPL_OK  = OS_OK,
+    DPL_ENOMEM = OS_ENOMEM,
+    DPL_EINVAL = OS_EINVAL,
+    DPL_INVALID_PARAM = OS_INVALID_PARM,
+    DPL_MEM_NOT_ALIGNED = OS_MEM_NOT_ALIGNED,
+    DPL_BAD_MUTEX = OS_BAD_MUTEX,
+    DPL_TIMEOUT = OS_TIMEOUT,
+    DPL_ERR_IN_ISR = OS_ERR_IN_ISR,
+    DPL_ERR_PRIV = OS_ERR_PRIV,
+    DPL_OS_NOT_STARTED = OS_NOT_STARTED,
+    DPL_ENOENT = OS_ENOENT,
+    DPL_EBUSY = OS_EBUSY,
+    DPL_ERROR = OS_ERROR ,
 };
 
 /**
- * @brief   dep error type
+ * @brief dpl error type
  */
-typedef enum dpl_error dpl_error_t;
+typedef os_error_t dpl_error_t;
 
 #ifdef __cplusplus
 }

@@ -18,8 +18,8 @@
  * @}
  */
 
-#ifndef SYSCFG_SYSCFG_UWB_RNG_H
-#define SYSCFG_SYSCFG_UWB_RNG_H
+#ifndef DPL_SYSCFG_SYSCFG_UWB_RNG_H
+#define DPL_SYSCFG_SYSCFG_UWB_RNG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,4 +64,4 @@ extern "C" {
 }
 #endif
 
-#endif /* SYSCFG_SYSCFG_UWB_RNG_H */
+#endif /* DPL_SYSCFG_SYSCFG_UWB_RNG_H */

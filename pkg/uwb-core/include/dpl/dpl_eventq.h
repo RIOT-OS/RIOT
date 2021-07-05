@@ -22,8 +22,8 @@
 
 #include <dpl/dpl_types.h>
 
+#include "os/os_eventq.h"
 #include "uwb_core.h"
-#include "event/callback.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,18 +32,15 @@ extern "C" {
 /**
  * @brief dpl event wrapper
  */
-struct dpl_event
-{
-    event_callback_t e; /**< the event callback */
-    void *arg;          /**< the event argument */
+struct dpl_event {
+    struct os_event ev;     /**< the envent */
 };
 
 /**
  * @brief dpl event queue wrapper
  */
-struct dpl_eventq
-{
-    event_queue_t q;    /**< the event queue */
+struct dpl_eventq {
+    struct os_eventq evq;   /**< the event queue */
 };
 
 /**
@@ -61,13 +58,7 @@ typedef void dpl_event_fn(struct dpl_event *ev);
 static inline void dpl_event_init(struct dpl_event *ev, dpl_event_fn * fn,
                                  void *arg)
 {
-    /*
-     * Need to clear list_node manually since init function below does not do
-     * this.
-     */
-    ev->e.super.list_node.next = NULL;
-    event_callback_init(&ev->e, (void(*)(void *))fn, ev);
-    ev->arg = arg;
+    os_event_init(&ev->ev, (os_event_fn*) fn, arg);
 }
 
 /**
@@ -79,7 +70,7 @@ static inline void dpl_event_init(struct dpl_event *ev, dpl_event_fn * fn,
  */
 static inline bool dpl_event_is_queued(struct dpl_event *ev)
 {
-    return (ev->e.super.list_node.next != NULL);
+    return os_event_is_queued(&ev->ev);
 }
 
 /**
@@ -89,7 +80,7 @@ static inline bool dpl_event_is_queued(struct dpl_event *ev)
  */
 static inline void *dpl_event_get_arg(struct dpl_event *ev)
 {
-    return ev->arg;
+    return os_event_get_arg(&ev->ev);
 }
 
 /**
@@ -100,7 +91,7 @@ static inline void *dpl_event_get_arg(struct dpl_event *ev)
  */
 static inline void dpl_event_set_arg(struct dpl_event *ev, void *arg)
 {
-    ev->arg = arg;
+    os_event_set_arg(&ev->ev, arg);
 }
 
 /**
@@ -110,7 +101,7 @@ static inline void dpl_event_set_arg(struct dpl_event *ev, void *arg)
  */
 static inline void dpl_event_run(struct dpl_event *ev)
 {
-    ev->e.super.handler(&ev->e.super);
+   os_event_run(&ev->ev);
 }
 
 /**
@@ -120,7 +111,7 @@ static inline void dpl_event_run(struct dpl_event *ev)
  */
 static inline void dpl_eventq_init(struct dpl_eventq *evq)
 {
-    event_queue_init_detached(&evq->q);
+    os_eventq_init(&evq->evq);
 }
 
 /**
@@ -130,7 +121,7 @@ static inline void dpl_eventq_init(struct dpl_eventq *evq)
  */
 static inline int dpl_eventq_inited(struct dpl_eventq *evq)
 {
-    return evq->q.waiter != NULL;
+    return os_eventq_inited(&evq->evq);
 }
 
 /**
@@ -155,11 +146,7 @@ static inline void dpl_eventq_deinit(struct dpl_eventq *evq)
  */
 static inline struct dpl_event * dpl_eventq_get(struct dpl_eventq *evq)
 {
-    if (evq->q.waiter == NULL) {
-        event_queue_claim(&evq->q);
-    }
-
-    return (struct dpl_event *) event_wait(&evq->q);
+    return (struct dpl_event *) os_eventq_get(&evq->evq, DPL_WAIT_FOREVER);
 }
 
 /**
@@ -169,11 +156,7 @@ static inline struct dpl_event * dpl_eventq_get(struct dpl_eventq *evq)
  */
 static inline struct dpl_event * dpl_eventq_get_no_wait(struct dpl_eventq *evq)
 {
-    if (evq->q.waiter == NULL) {
-        event_queue_claim(&evq->q);
-    }
-
-    return (struct dpl_event *) event_get(&evq->q);
+    return (struct dpl_event *) os_eventq_get_no_wait(&evq->evq);
 }
 
 /**
@@ -184,7 +167,7 @@ static inline struct dpl_event * dpl_eventq_get_no_wait(struct dpl_eventq *evq)
  */
 static inline void dpl_eventq_put(struct dpl_eventq *evq, struct dpl_event *ev)
 {
-    event_post(&evq->q, &ev->e.super);
+    os_eventq_put(&evq->evq, &ev->ev);
 }
 
 /**
@@ -195,7 +178,7 @@ static inline void dpl_eventq_put(struct dpl_eventq *evq, struct dpl_event *ev)
  */
 static inline void dpl_eventq_remove(struct dpl_eventq *evq, struct dpl_event *ev)
 {
-    event_cancel(&evq->q, &ev->e.super);
+    os_eventq_remove(&evq->evq, &ev->ev);
 }
 
 /**
@@ -205,8 +188,7 @@ static inline void dpl_eventq_remove(struct dpl_eventq *evq, struct dpl_event *e
  */
 static inline void dpl_eventq_run(struct dpl_eventq *evq)
 {
-    struct dpl_event *ev = dpl_eventq_get(evq);
-    dpl_event_run(ev);
+    os_eventq_run(&evq->evq);
 }
 
 /**
@@ -218,7 +200,7 @@ static inline void dpl_eventq_run(struct dpl_eventq *evq)
  */
 static inline bool dpl_eventq_is_empty(struct dpl_eventq *evq)
 {
-    return clist_count(&(evq->q.event_list)) == 0;
+    return os_eventq_is_empty(&evq->evq);
 }
 
 /**
@@ -231,7 +213,7 @@ static inline bool dpl_eventq_is_empty(struct dpl_eventq *evq)
  */
 static inline struct dpl_eventq * dpl_eventq_dflt_get(void)
 {
-    return (struct dpl_eventq*) uwb_core_get_eventq();
+    return (struct dpl_eventq *) uwb_core_get_eventq();
 }
 
 #ifdef __cplusplus

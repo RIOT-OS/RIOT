@@ -20,16 +20,11 @@
 #ifndef DPL_DPL_TIME_H
 #define DPL_DPL_TIME_H
 
-#include "xtimer.h"
+#include "os/os_time.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief DPL ticks per seconds
- */
-#define DPL_TICKS_PER_SEC (XTIMER_HZ)
 
 /**
  * @brief Returns the low 32 bits of cputime.
@@ -38,7 +33,7 @@ extern "C" {
  */
 static inline dpl_time_t dpl_time_get(void)
 {
-    return xtimer_now().ticks32;
+    return os_time_get();
 }
 
 /**
@@ -51,8 +46,7 @@ static inline dpl_time_t dpl_time_get(void)
  */
 static inline dpl_error_t dpl_time_ms_to_ticks(uint32_t ms, dpl_time_t *out_ticks)
 {
-    *out_ticks = xtimer_ticks_from_usec(ms * US_PER_MS).ticks32;
-    return DPL_OK;
+    return (dpl_error_t) os_time_ms_to_ticks(ms, out_ticks);
 }
 
 /**
@@ -65,9 +59,7 @@ static inline dpl_error_t dpl_time_ms_to_ticks(uint32_t ms, dpl_time_t *out_tick
  */
 static inline dpl_error_t  dpl_time_ticks_to_ms(dpl_time_t ticks, uint32_t *out_ms)
 {
-    xtimer_ticks32_t val = {.ticks32 = ticks};
-    *out_ms = xtimer_usec_from_ticks(val) * US_PER_MS;
-    return DPL_OK;
+    return (dpl_error_t) os_time_ticks_to_ms(ticks, out_ms);
 }
 
 /**
@@ -79,7 +71,7 @@ static inline dpl_error_t  dpl_time_ticks_to_ms(dpl_time_t ticks, uint32_t *out_
  */
 static inline dpl_time_t dpl_time_ms_to_ticks32(uint32_t ms)
 {
-    return xtimer_ticks_from_usec(ms * US_PER_MS).ticks32;
+    return os_time_ms_to_ticks32(ms);
 }
 
 /**
@@ -91,8 +83,7 @@ static inline dpl_time_t dpl_time_ms_to_ticks32(uint32_t ms)
  */
 static inline dpl_time_t dpl_time_ticks_to_ms32(dpl_time_t ticks)
 {
-    xtimer_ticks32_t val = {.ticks32 = ticks};
-    return xtimer_usec_from_ticks(val) * US_PER_MS;
+    return os_time_ticks_to_ms32(ticks);
 }
 
 /**
@@ -102,8 +93,7 @@ static inline dpl_time_t dpl_time_ticks_to_ms32(dpl_time_t ticks)
  */
 static inline void dpl_time_delay(dpl_time_t ticks)
 {
-    xtimer_ticks32_t val = {.ticks32 = ticks};
-    xtimer_tsleep32((xtimer_ticks32_t) val);
+    return os_time_delay(ticks);
 }
 
 #ifdef __cplusplus

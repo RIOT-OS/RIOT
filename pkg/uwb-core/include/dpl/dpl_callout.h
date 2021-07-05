@@ -23,23 +23,17 @@
 #ifndef DPL_DPL_CALLOUT_H
 #define DPL_DPL_CALLOUT_H
 
-#include "xtimer.h"
-
-#include "dpl/dpl_types.h"
-#include "dpl/dpl_eventq.h"
-#include "dpl/dpl_error.h"
+#include "os/os_callout.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief   callout structure
+ * @brief dpl callout wrapper
  */
 struct dpl_callout {
-    xtimer_t timer;         /**< timer */
-    struct dpl_event c_e;   /**< callout event */
-    struct dpl_eventq *c_q; /**< callout event queue */
+    struct os_callout co;   /**< the callout */
 };
 
 /**
@@ -56,8 +50,11 @@ struct dpl_callout {
  * @param[in]   e_cb    callback function
  * @param[in]   e_arg   callback function argument
  */
-void dpl_callout_init(struct dpl_callout *c, struct dpl_eventq *q,
-                      dpl_event_fn *e_cb, void *e_arg);
+static inline void dpl_callout_init(struct dpl_callout *c, struct dpl_eventq *q,
+                      dpl_event_fn *e_cb, void *e_arg)
+{
+    os_callout_init(&c->co, &q->evq, (os_event_fn *) e_cb, e_arg);
+}
 
 /**
  * @brief   Reset the callout to fire off in 'ticks' ticks.
@@ -67,14 +64,20 @@ void dpl_callout_init(struct dpl_callout *c, struct dpl_eventq *q,
  *
  * @return 0 on success, non-zero on failure
  */
-dpl_error_t dpl_callout_reset(struct dpl_callout *c, dpl_time_t ticks);
+static inline dpl_error_t dpl_callout_reset(struct dpl_callout *c, dpl_time_t ticks)
+{
+    return (dpl_error_t) os_callout_reset(&c->co, ticks);
+}
 
 /**
  * @brief   Stops the callout from firing.
  *
  * @param[in]   c   the callout to stop
  */
-void dpl_callout_stop(struct dpl_callout *c);
+static inline void dpl_callout_stop(struct dpl_callout *c)
+{
+    os_callout_stop(&c->co);
+}
 
 #ifdef __cplusplus
 }

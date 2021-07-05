@@ -24,10 +24,7 @@
 extern "C" {
 #endif
 
-#include <stdint.h>
-
-#include "xtimer.h"
-#include "hal/hal_timer.h"
+#include "os/os_cputime.h"
 
 /**
  * Returns the low 32 bits of cputime.
@@ -36,7 +33,7 @@ extern "C" {
  */
 static inline uint32_t dpl_cputime_get32(void)
 {
-    return xtimer_now().ticks32;
+    return os_cputime_get32();
 }
 
 /**
@@ -48,7 +45,7 @@ static inline uint32_t dpl_cputime_get32(void)
  */
 static inline uint32_t dpl_cputime_usecs_to_ticks(uint32_t usecs)
 {
-    return xtimer_ticks_from_usec(usecs).ticks32;
+    return os_cputime_usecs_to_ticks(usecs);
 }
 
 /**
@@ -60,8 +57,7 @@ static inline uint32_t dpl_cputime_usecs_to_ticks(uint32_t usecs)
  */
 static inline uint32_t dpl_cputime_ticks_to_usecs(uint32_t ticks)
 {
-    xtimer_ticks32_t val = {.ticks32 = ticks};
-    return xtimer_usec_from_ticks(val);
+    return os_cputime_ticks_to_usecs(ticks);
 }
 
 /**
@@ -71,8 +67,7 @@ static inline uint32_t dpl_cputime_ticks_to_usecs(uint32_t ticks)
  */
 static inline void dpl_cputime_delay_ticks(uint32_t ticks)
 {
-    xtimer_ticks32_t val = {.ticks32 = ticks};
-    xtimer_tsleep32((xtimer_ticks32_t) val);
+    os_cputime_delay_ticks(ticks);
 }
 
 /**
@@ -82,7 +77,7 @@ static inline void dpl_cputime_delay_ticks(uint32_t ticks)
  */
 static inline void dpl_cputime_delay_usecs(uint32_t usecs)
 {
-    xtimer_usleep(usecs);
+    os_cputime_delay_usecs(usecs);
 }
 
 /**
@@ -95,8 +90,7 @@ static inline void dpl_cputime_delay_usecs(uint32_t usecs)
 static inline void dpl_cputime_timer_init(struct hal_timer *timer, hal_timer_cb fp,
         void *arg)
 {
-    timer->timer.callback = fp;
-    timer->timer.arg = arg;
+    os_cputime_timer_init(timer, fp, arg);
 }
 
 /**
@@ -107,15 +101,14 @@ static inline void dpl_cputime_timer_init(struct hal_timer *timer, hal_timer_cb 
  *
  * @param timer     Pointer to timer to start. Cannot be NULL.
  * @param cputime   The cputime at which the timer should expire.
- *
+ *time
  * @return int 0 on success; EINVAL if timer already started or timer struct
  *         invalid
  *
  */
 static inline int dpl_cputime_timer_start(struct hal_timer *timer, uint32_t cputime)
 {
-    xtimer_set(&timer->timer, xtimer_now_usec() + cputime);
-    return 0;
+    return os_cputime_timer_start(timer, cputime);
 }
 
 /**
@@ -132,13 +125,7 @@ static inline int dpl_cputime_timer_start(struct hal_timer *timer, uint32_t cput
  */
 static inline int dpl_cputime_timer_relative(struct hal_timer *timer, uint32_t usecs)
 {
-    uint32_t now = xtimer_now_usec();
-    if (now > usecs) {
-        xtimer_set(&timer->timer, now);
-    } else {
-        xtimer_set(&timer->timer, 0);
-    }
-    return 0;
+    return os_cputime_timer_relative(timer, usecs);
 }
 
 /**
@@ -152,7 +139,7 @@ static inline int dpl_cputime_timer_relative(struct hal_timer *timer, uint32_t u
  */
 static inline void dpl_cputime_timer_stop(struct hal_timer *timer)
 {
-    xtimer_remove(&timer->timer);
+    os_cputime_timer_stop(timer);
 }
 
 #ifdef __cplusplus
