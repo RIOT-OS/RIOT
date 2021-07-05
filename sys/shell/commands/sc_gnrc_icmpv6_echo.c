@@ -132,7 +132,7 @@ finish:
     res = _finish(&data);
     gnrc_netreg_unregister(GNRC_NETTYPE_ICMPV6, &data.netreg);
     for (unsigned i = 0;
-         i < cib_avail(&thread_get_active()->msg_queue);
+         i < (unsigned)msg_avail();
          i++) {
         msg_t msg;
 
