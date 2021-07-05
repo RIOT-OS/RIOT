@@ -36,12 +36,14 @@ static void clock_init(void) {
     xosc_hw->ctrl |= (XOSC_CTRL_ENABLE_VALUE_ENABLE << XOSC_CTRL_ENABLE_LSB);
 
     // Wait till the clock is stable.
-    while(!(xosc_hw->status & XOSC_STATUS_STABLE_BITS)) {}
+    while (!(xosc_hw->status & XOSC_STATUS_STABLE_BITS)) {}
 
     clocks_hw->clk[clk_ref].ctrl |= CLOCKS_CLK_REF_CTRL_SRC_VALUE_XOSC_CLKSRC;
 
     // Wait till clock source is activated.
-    while (!(clocks_hw->clk[clk_ref].selected & (1 << CLOCKS_CLK_REF_CTRL_SRC_VALUE_XOSC_CLKSRC))) {}
+    while (
+        !(clocks_hw->clk[clk_ref].selected & (1 << CLOCKS_CLK_REF_CTRL_SRC_VALUE_XOSC_CLKSRC))
+    ) {}
 
     // Enable peripheral clock.
     clocks_hw->clk[clk_peri].ctrl |= CLOCKS_CLK_PERI_CTRL_ENABLE_BITS;

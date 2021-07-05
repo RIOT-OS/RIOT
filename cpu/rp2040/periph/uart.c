@@ -136,7 +136,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg) {
         ((uart_config[uart].data_bits - 5) << UART_UARTLCR_H_WLEN_LSB);
 
     // Stop bits.
-    if(uart_config[uart].stop_bits == UART_STOP_BITS_1) {
+    if (uart_config[uart].stop_bits == UART_STOP_BITS_1) {
         uart_config[uart].dev->lcr_h &= ~(UART_UARTLCR_H_STP2_BITS);
     }
     else if (uart_config[uart].stop_bits == UART_STOP_BITS_2) {
@@ -144,7 +144,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg) {
     }
 
     // Parity.
-    if(uart_config[uart].parity == UART_PARITY_NONE) {
+    if (uart_config[uart].parity == UART_PARITY_NONE) {
         uart_config[uart].dev->lcr_h &= ~(UART_UARTLCR_H_PEN_BITS);
     }
     else if (uart_config[uart].parity == UART_PARITY_ODD) {
@@ -158,7 +158,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg) {
 
     // Disable FIFO, operate in character mode.
     uart_config[uart].dev->lcr_h &= ~(UART_UARTLCR_H_FEN_BITS);
-
 
     // Setup interrupt driven RX only if receive callback is provided.
 
@@ -198,8 +197,13 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg) {
     return UART_OK;
 }
 
-int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity, uart_stop_bits_t stop_bits) {
-    if(uart >= UART_NUMOF) {
+int uart_mode(
+    uart_t uart,
+    uart_data_bits_t data_bits,
+    uart_parity_t parity,
+    uart_stop_bits_t stop_bits
+) {
+    if (uart >= UART_NUMOF) {
         return UART_NOMODE;
     }
 
@@ -213,7 +217,7 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity, uar
         ((data_bits - 5) << UART_UARTLCR_H_WLEN_LSB);
 
     // Stop bits.
-    if(stop_bits == UART_STOP_BITS_1) {
+    if (stop_bits == UART_STOP_BITS_1) {
         uart_config[uart].dev->lcr_h &= ~(UART_UARTLCR_H_STP2_BITS);
     }
     else if (stop_bits == UART_STOP_BITS_2) {
@@ -224,7 +228,7 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity, uar
     }
 
     // Parity.
-    if(parity == UART_PARITY_NONE) {
+    if (parity == UART_PARITY_NONE) {
         uart_config[uart].dev->lcr_h &= ~(UART_UARTLCR_H_PEN_BITS);
     }
     else if (parity == UART_PARITY_ODD) {
@@ -248,10 +252,10 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
     size_t wrote = 0;
 
-    while(wrote < len) {
+    while (wrote < len) {
         uart_config[uart].dev->dr = *data;
 
-        while((uart_config[uart].dev->fr & UART_UARTFR_BUSY_BITS)) {}
+        while ((uart_config[uart].dev->fr & UART_UARTFR_BUSY_BITS)) {}
 
         data++;
         wrote++;

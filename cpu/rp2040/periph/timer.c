@@ -53,17 +53,17 @@ static void isr_timer(int index);
 static void timer_reset_counter(void);
 
 static uint32_t get_time(void) {
-    uint32_t l;
-    uint32_t h __attribute__((unused));
+    uint32_t low;
+    uint32_t high __attribute__((unused));
 
     /*
      * The sequence of reading the lower word first
      * and then the higher word must be maintained.
      */
-    l = timer_hw->timelr;
-    h = timer_hw->timehr;
+    low = timer_hw->timelr;
+    high = timer_hw->timehr;
 
-    return l;
+    return low;
 }
 
 static void isr_timer(int ch) {
