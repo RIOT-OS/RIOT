@@ -19,6 +19,7 @@
  */
 
 #include <stdint.h>
+#include "cib.h"
 #include "net/l2util.h"
 #include "mutex.h"
 
