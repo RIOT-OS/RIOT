@@ -37,8 +37,8 @@ extern "C" {
 /**
  * @brief Range request period
  */
-#ifndef RANGE_REQUEST_T_US
-#define RANGE_REQUEST_T_US      (40 * US_PER_MS)
+#ifndef RANGE_REQUEST_T_MS
+#define RANGE_REQUEST_T_MS      (40)
 #endif
 
 /**
