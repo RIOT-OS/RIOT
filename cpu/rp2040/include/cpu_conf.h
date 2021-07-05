@@ -7,6 +7,8 @@
  */
 
 /**
+ * @defgroup cpu_rp2040 Raspberry Pi RP2040 MCU
+ * @ingroup cpu
  * @ingroup cpu_rp2040
  * @{
  *
