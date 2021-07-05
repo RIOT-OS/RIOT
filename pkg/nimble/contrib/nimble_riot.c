@@ -52,6 +52,11 @@
 #endif
 #include "controller/ble_ll.h"
 
+#ifdef MODULE_NIMBLE_RPBLE
+#include "nimble_rpble.h"
+#include "nimble_rpble_params.h"
+#endif
+
 static char _stack_controller[NIMBLE_CONTROLLER_STACKSIZE];
 #endif
 
@@ -159,5 +164,10 @@ void nimble_riot_init(void)
 #ifdef MODULE_NIMBLE_AUTOADV
     extern void nimble_autoadv_init(void);
     nimble_autoadv_init();
+#endif
+
+#ifdef MODULE_NIMBLE_RPBLE
+    res = nimble_rpble_init(&nimble_rpble_params);
+    assert(res == 0);
 #endif
 }
