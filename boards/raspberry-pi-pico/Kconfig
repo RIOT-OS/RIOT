@@ -1,0 +1,17 @@
+# Copyright (c) 2021 Ishraq Ibne Ashraf
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "raspberry-pi-pico" if BOARD_RASPBERRY_PI_PICO
+
+config BOARD_RASPBERRY_PI_PICO
+    bool
+    default y
+    select RP2040
+
+    # Put defined MCU peripherals here (in alphabetical order)
+
+    # Put other features for this board (in alphabetical order)

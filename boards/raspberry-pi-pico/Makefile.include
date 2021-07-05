@@ -1,0 +1,14 @@
+PROGRAMMER ?= picotool
+PROGRAMMERS_SUPPORTED += picotool
+
+ifeq (picotool,$(PROGRAMMER))
+	FLASHER = picotool
+	FLASHFILE ?= $(ELFFILE)
+	FFLAGS = load -v -x $(FLASHFILE)
+endif
+
+# For Raspberry Pi Pico the ROM (Flash) is part
+# of the board and not embedded in the RP2040 chip.
+
+ROM_LEN = 0x200000
+ROM_START_ADDR = 0x10000000

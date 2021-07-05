@@ -1,0 +1,8 @@
+CPU = rp2040
+CPU_MODEL = rp2040
+
+# Provided MCU peripherals (in alphabetical order).
+
+FEATURES_PROVIDED += periph_gpio
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
