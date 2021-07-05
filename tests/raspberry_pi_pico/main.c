@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup examples
+ * @ingroup tests
  * @{
  * @file
  * @brief RaspberryPi Pico test application
@@ -17,27 +17,27 @@
  */
 
 #include <stdio.h>
+#include <stdint.h>
 
 #include "board.h"
 #include "periph/gpio.h"
 #include "periph/timer.h"
 
-void tcb(void *arg, int channel) {
-    (void)(arg);
-    (void)(channel);
+void cb_timer(void *arg, int channel) {
 
-    //gpio_toggle(LED0_PIN);
-    if (gpio_read(LED0_PIN)) {
-        gpio_write(LED0_PIN, 0);
-    }
-    else {
-        gpio_write(LED0_PIN, 1);
-    }
+    printf(
+        "cb_timer(), CH: %d, arg: %ld\n",
+        channel,
+        *((uint32_t*)arg)
+    );
+
+    gpio_toggle(LED0_PIN);
+
+    *((uint32_t*)arg) = *((uint32_t*)arg) + 1;
 }
 
 int main(void) {
-    timer_init(TIMER_DEV(0), 0, tcb, NULL);
-    timer_set(TIMER_DEV(0), 0, 50000);
+    volatile uint32_t go_ahead = 0;
 
     printf(
         "\n[+] Initialising board LED on GPIO = %ld\n",
@@ -46,26 +46,34 @@ int main(void) {
 
     gpio_init(LED0_PIN, GPIO_OUT);
 
-    printf(
-        "\n[+] Turning on board LED on GPIO = %ld\n",
-        LED0_PIN
-    );
+    printf("\n[+] Initialising timer\n");
 
-    gpio_set(LED0_PIN);
+    timer_init(TIMER_DEV(0), 0, cb_timer, (void*)&go_ahead);
 
-    printf(
-        "[+] Turning off board LED on GPIO = %ld\n",
-        LED0_PIN
-    );
+    timer_stop(TIMER_DEV(0));
 
-    gpio_clear(LED0_PIN);
+    timer_clear(TIMER_DEV(0), 0);
+    timer_clear(TIMER_DEV(0), 1);
+    timer_clear(TIMER_DEV(0), 2);
+    timer_clear(TIMER_DEV(0), 3);
 
-    printf(
-        "[+] Turning on board LED on GPIO = %ld\n",
-        LED0_PIN
-    );
+    timer_set(TIMER_DEV(0), 0, 1000000);
+    timer_set(TIMER_DEV(0), 1, 4000000);
+    timer_set(TIMER_DEV(0), 2, 8000000);
+    timer_set(TIMER_DEV(0), 3, 16000000);
 
-    gpio_set(LED0_PIN);
+    printf("\n[+] Start relative...\n");
+
+    timer_start(TIMER_DEV(0));
+
+    while(go_ahead != 4) {}
+
+    printf("\n[+] Start blinky blink...\n");
+
+    timer_set_periodic(TIMER_DEV(0), 0, 2000000, 0);
+    timer_set_periodic(TIMER_DEV(0), 1, 100000, 0);
+    timer_set_periodic(TIMER_DEV(0), 2, 200000, 0);
+    timer_set_periodic(TIMER_DEV(0), 3, 300000, 0);
 
     while(1) {}
 
