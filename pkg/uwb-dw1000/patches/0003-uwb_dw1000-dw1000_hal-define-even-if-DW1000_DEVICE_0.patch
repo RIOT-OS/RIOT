@@ -1,4 +1,4 @@
-From ed15486f7890a3ffb0426c153cefb951d822e93e Mon Sep 17 00:00:00 2001
+From d6bc7b9e752f3d4418b1ef4e3468e8b2077a7ed1 Mon Sep 17 00:00:00 2001
 From: Francisco Molina <femolina@uc.cl>
 Date: Fri, 14 Aug 2020 13:56:25 +0200
 Subject: [PATCH 3/5] uwb_dw1000/dw1000_hal: define even if DW1000_DEVICE_0 is
@@ -13,7 +13,7 @@ The rest of the api should still be defined
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c b/hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c
-index b85e32a..90ccd6c 100644
+index b195c23..9268193 100644
 --- a/hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c
 +++ b/hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c
 @@ -262,6 +262,8 @@ hal_dw1000_inst(uint8_t idx)
