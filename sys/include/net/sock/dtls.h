@@ -702,6 +702,11 @@ int sock_dtls_session_init(sock_dtls_t *sock, const sock_udp_ep_t *ep,
  *
  * @param[in] sock      @ref sock_dtls_t, which the session is created on
  * @param[in] remote    Remote session to destroy
+ *
+ * @note For tinyDTLS this function destroys the session object right after notifying the remote
+ *       peer about the closing. This is an interim solution, preventing endlessly blocked session
+ *       slots, but allows as a consequence truncation attacks.
+ *       More details in the [issue](https://github.com/eclipse/tinydtls/issues/95).
  */
 void sock_dtls_session_destroy(sock_dtls_t *sock, sock_dtls_session_t *remote);
 
