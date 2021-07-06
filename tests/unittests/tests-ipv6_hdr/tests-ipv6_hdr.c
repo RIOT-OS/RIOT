@@ -41,7 +41,7 @@
 
 static void test_ipv6_hdr_set_version(void)
 {
-    uint8_t val[] = { TEST_UINT8 };
+    uint8_t val[sizeof(ipv6_hdr_t)] = { TEST_UINT8 };
 
     ipv6_hdr_set_version((ipv6_hdr_t *)val);
 
@@ -58,7 +58,7 @@ static void test_ipv6_hdr_set_version(void)
 
 static void test_ipv6_hdr_get_version(void)
 {
-    uint8_t val[] = { TEST_UINT8 };
+    uint8_t val[sizeof(ipv6_hdr_t)] = { TEST_UINT8 };
 
     /*
      * Header format:
@@ -79,7 +79,7 @@ static void test_ipv6_hdr_is_ipv6_hdr__false(void)
      * |  6 |
      * +----+----
      */
-    uint8_t val[] = { 0 };
+    uint8_t val[sizeof(ipv6_hdr_t)] = { 0 };
 
     TEST_ASSERT(!ipv6_hdr_is((ipv6_hdr_t *)val));
 }
@@ -93,14 +93,14 @@ static void test_ipv6_hdr_is_ipv6_hdr__true(void)
      * |  6 |
      * +----+----
      */
-    uint8_t val[] = { 0x60 | (TEST_UINT8 & 0x0f) };
+    uint8_t val[sizeof(ipv6_hdr_t)] = { 0x60 | (TEST_UINT8 & 0x0f) };
 
     TEST_ASSERT(ipv6_hdr_is((ipv6_hdr_t *)val));
 }
 
 static void test_ipv6_hdr_set_tc(void)
 {
-    uint8_t val[] = { TEST_UINT8, 0 };
+    uint8_t val[sizeof(ipv6_hdr_t)] = { TEST_UINT8, 0 };
 
     ipv6_hdr_set_tc((ipv6_hdr_t *)val, OTHER_BYTE);
 
@@ -117,7 +117,7 @@ static void test_ipv6_hdr_set_tc(void)
 
 static void test_ipv6_hdr_set_tc_ecn(void)
 {
-    uint8_t val[] = { TEST_UINT8 };
+    uint8_t val[sizeof(ipv6_hdr_t)] = { TEST_UINT8 };
 
     ipv6_hdr_set_tc_ecn((ipv6_hdr_t *)val, OTHER_BYTE);
 
@@ -138,7 +138,7 @@ static void test_ipv6_hdr_set_tc_ecn(void)
 
 static void test_ipv6_hdr_set_tc_dscp(void)
 {
-    uint8_t val[] = { TEST_UINT8, 0 };
+    uint8_t val[sizeof(ipv6_hdr_t)] = { TEST_UINT8, 0 };
 
     ipv6_hdr_set_tc_dscp((ipv6_hdr_t *)val, OTHER_BYTE);
 
@@ -160,7 +160,7 @@ static void test_ipv6_hdr_set_tc_dscp(void)
 
 static void test_ipv6_hdr_get_tc(void)
 {
-    uint8_t val[] = { TEST_UINT8, OTHER_BYTE };
+    uint8_t val[sizeof(ipv6_hdr_t)] = { TEST_UINT8, OTHER_BYTE };
 
     /*
      * Header format:
@@ -175,7 +175,7 @@ static void test_ipv6_hdr_get_tc(void)
 
 static void test_ipv6_hdr_get_tc_ecn(void)
 {
-    uint8_t val[] = { TEST_UINT8 };
+    uint8_t val[sizeof(ipv6_hdr_t)] = { TEST_UINT8 };
 
     /*
      * Header format:
@@ -194,7 +194,7 @@ static void test_ipv6_hdr_get_tc_ecn(void)
 
 static void test_ipv6_hdr_get_tc_dscp(void)
 {
-    uint8_t val[] = { TEST_UINT8, OTHER_BYTE };
+    uint8_t val[sizeof(ipv6_hdr_t)] = { TEST_UINT8, OTHER_BYTE };
 
     /*
      * Header format:
@@ -214,7 +214,7 @@ static void test_ipv6_hdr_get_tc_dscp(void)
 
 static void test_ipv6_hdr_set_fl(void)
 {
-    uint8_t val[] = { 0, TEST_UINT8, 0, 0 };
+    uint8_t val[sizeof(ipv6_hdr_t)] = { 0, TEST_UINT8, 0, 0 };
 
     ipv6_hdr_set_fl((ipv6_hdr_t *)val, TEST_UINT32);
 
@@ -235,7 +235,7 @@ static void test_ipv6_hdr_set_fl(void)
 
 static void test_ipv6_hdr_get_fl(void)
 {
-    uint8_t val[] = { TEST_UINT8, OTHER_BYTE, 0, 0 };
+    uint8_t val[sizeof(ipv6_hdr_t)] = { TEST_UINT8, OTHER_BYTE, 0, 0 };
 
     /*
      * Header format:
