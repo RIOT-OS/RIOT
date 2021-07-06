@@ -51,22 +51,23 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         return -ENOTSUP;
     }
 
-    uint8_t size = iolist_size(iolist);
-
-    /* Ignore send if packet size is 0 */
-    if (!size) {
-        return 0;
-    }
-
-    DEBUG("[sx126x] netdev: sending packet now (size: %d).\n", size);
+    size_t pos = 0;
     /* Write payload buffer */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         if (iol->iol_len > 0) {
-            sx126x_set_lora_payload_length(dev, iol->iol_len);
-            sx126x_write_buffer(dev, 0, iol->iol_base, iol->iol_len);
+            sx126x_write_buffer(dev, pos, iol->iol_base, iol->iol_len);
             DEBUG("[sx126x] netdev: send: wrote data to payload buffer.\n");
+            pos += iol->iol_len;
         }
     }
+
+    /* Ignore send if packet size is 0 */
+    if (!pos) {
+        return 0;
+    }
+
+    DEBUG("[sx126x] netdev: sending packet now (size: %d).\n", pos);
+    sx126x_set_lora_payload_length(dev, pos);
 
     state = NETOPT_STATE_TX;
     netdev->driver->set(netdev, NETOPT_STATE, &state, sizeof(uint8_t));
@@ -107,7 +108,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     sx126x_read_buffer(dev, rx_buffer_status.buffer_start_pointer, buf, size);
 
-    return 0;
+    return size;
 }
 
 static int _init(netdev_t *netdev)
