@@ -32,30 +32,30 @@ static const char *pa_settings[] = {
 static const char *state2s(cc110x_state_t state)
 {
     switch (state) {
-        case CC110X_STATE_IDLE:
-            return "IDLE";
-         case CC110X_STATE_FRAME_READY:
-            return "Frame ready";
-         case CC110X_STATE_OFF:
-            return "Off";
-         case CC110X_STATE_RX_MODE:
-            return "RX mode";
-         case CC110X_STATE_RECEIVING:
-            return "RX mode and currently receiving frame";
-         case CC110X_STATE_TX_MODE:
-            return "TX";
-         case CC110X_STATE_TX_COMPLETING:
-            return "TX completing";
-         case CC110X_STATE_FSTXON:
-            return "Fast TX on";
-         case CC110X_STATE_CALIBRATE:
-            return "Calibrating";
-         case CC110X_STATE_SETTLING:
-            return "Settling";
-         case CC110X_STATE_RXFIFO_OVERFLOW:
-            return "RX FIFO overflow";
-         case CC110X_STATE_TXFIFO_UNDERFLOW:
-            return "TX FIFO underflow";
+    case CC110X_STATE_IDLE:
+        return "IDLE";
+    case CC110X_STATE_FRAME_READY:
+        return "Frame ready";
+    case CC110X_STATE_OFF:
+        return "Off";
+    case CC110X_STATE_RX_MODE:
+        return "RX mode";
+    case CC110X_STATE_RECEIVING:
+        return "RX mode and currently receiving frame";
+    case CC110X_STATE_TX_MODE:
+        return "TX";
+    case CC110X_STATE_TX_COMPLETING:
+        return "TX completing";
+    case CC110X_STATE_FSTXON:
+        return "Fast TX on";
+    case CC110X_STATE_CALIBRATE:
+        return "Calibrating";
+    case CC110X_STATE_SETTLING:
+        return "Settling";
+    case CC110X_STATE_RXFIFO_OVERFLOW:
+        return "RX FIFO overflow";
+    case CC110X_STATE_TXFIFO_UNDERFLOW:
+        return "TX FIFO underflow";
     }
     return "Unknown";
 }
@@ -63,22 +63,22 @@ static const char *state2s(cc110x_state_t state)
 static const char *gdoconf2s(uint8_t conf)
 {
     switch (conf) {
-        case CC110X_GDO_ON_RX_DATA:
-            return "High when frame received or RX FIFO needs draining";
-        case CC110X_GDO_ON_TX_DATA:
-            return "Low when TX FIFO needs refilling";
-        case CC110X_GDO_ON_TRANSMISSION:
-            return "High while frame is incoming / outgoing";
-        case CC110X_GDO_ON_CHANNEL_CLEAR:
-            return "High when channel is clear";
-        case CC110X_GDO_ON_PLL_IN_LOCK:
-            return "High when frequency generator is on and PLL is in lock";
-        case CC110X_GDO_CONSTANT_LOW:
-            return "Constant low";
-        case CC110X_GDO_CONSTANT_HIGH:
-            return "Constant high";
-        case CC110X_GDO0_ANALOG_TEMPERATURE:
-            return "Analog output of the temperature sensor (GDO0 only)";
+    case CC110X_GDO_ON_RX_DATA:
+        return "High when frame received or RX FIFO needs draining";
+    case CC110X_GDO_ON_TX_DATA:
+        return "Low when TX FIFO needs refilling";
+    case CC110X_GDO_ON_TRANSMISSION:
+        return "High while frame is incoming / outgoing";
+    case CC110X_GDO_ON_CHANNEL_CLEAR:
+        return "High when channel is clear";
+    case CC110X_GDO_ON_PLL_IN_LOCK:
+        return "High when frequency generator is on and PLL is in lock";
+    case CC110X_GDO_CONSTANT_LOW:
+        return "Constant low";
+    case CC110X_GDO_CONSTANT_HIGH:
+        return "Constant high";
+    case CC110X_GDO0_ANALOG_TEMPERATURE:
+        return "Analog output of the temperature sensor (GDO0 only)";
     }
 
     return "Unknown";
@@ -106,6 +106,12 @@ static void print_state(cc110x_t *dev)
     /* Get all required data and release device */
     if (cc110x_acquire(dev) != SPI_OK) {
         puts("Failed to acquire CC1100/CC1101 transceiver");
+        return;
+    }
+
+    if (dev->state == CC110X_STATE_OFF) {
+        cc110x_release(dev);
+        puts("Device in SLEEP mode");
         return;
     }
 
@@ -174,34 +180,106 @@ static void print_state(cc110x_t *dev)
 int sc_cc110x(int argc, char **argv)
 {
     switch (argc) {
-        case 1:
-            for (unsigned i = 0; i < CC110X_NUM; i++){
-                printf("CC110x #%u:\n", i);
-                print_state(&_cc110x_devs[i]);
+    case 1:
+        for (unsigned i = 0; i < CC110X_NUM; i++){
+            printf("CC110x #%u:\n", i);
+            print_state(&_cc110x_devs[i]);
+        }
+        break;
+    case 2:
+        if ((!strcmp(argv[1], "-h")) || (!strcmp(argv[1], "--help"))) {
+            printf("Usage: %s [NUM]\n"
+                   "\n"
+                   "Prints the status of the CC1100/CC1101 transceiver "
+                   "identified by NUM, or of\n"
+                   "all available CC110x transceivers if no argument is "
+                   "given\n", argv[0]);
+        }
+        else {
+            unsigned pos = atoi(argv[1]);
+            if (pos >= CC110X_NUM) {
+                puts("No such transceiver");
+                return EXIT_FAILURE;
             }
-            break;
-        case 2:
-            if ((!strcmp(argv[1], "-h")) || (!strcmp(argv[1], "--help"))) {
-                printf("Usage: %s [NUM]\n"
-                       "\n"
-                       "Prints the status of the CC1100/CC1101 transceiver "
-                       "identified by NUM, or of\n"
-                       "all available CC110x transceivers if no argument is "
-                       "given\n", argv[0]);
+            printf("CC110x #%u:\n", pos);
+            print_state(&_cc110x_devs[pos]);
+        }
+        break;
+    default:
+        printf("Usage: %s [NUM]\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+int sc_cc110x_sleep(int argc, char **argv)
+{
+    switch (argc) {
+    case 1:
+        for (unsigned i = 0; i < CC110X_NUM; i++){
+            printf("Putting to sleep CC110x #%u:\n", i);
+            cc110x_sleep(&_cc110x_devs[i]);
+        }
+        break;
+    case 2:
+        if ((!strcmp(argv[1], "-h")) || (!strcmp(argv[1], "--help"))) {
+            printf("Usage: %s [NUM]\n"
+                    "\n"
+                    "Sets into sleep mode the CC1100/CC1101 transceiver "
+                    "identified by NUM, or of\n"
+                    "all available CC110x transceivers if no argument is "
+                    "given\n", argv[0]);
+        }
+        else {
+            unsigned pos = atoi(argv[1]);
+            if (pos >= CC110X_NUM) {
+                puts("No such transceiver");
+                return EXIT_FAILURE;
             }
-            else {
-                unsigned pos = atoi(argv[1]);
-                if (pos >= CC110X_NUM) {
-                    puts("No such transceiver");
-                    return EXIT_FAILURE;
-                }
-                printf("CC110x #%u:\n", pos);
-                print_state(&_cc110x_devs[pos]);
+            printf("Putting to sleep CC110x #%u:\n", pos);
+            cc110x_sleep(&_cc110x_devs[pos]);
+        }
+        break;
+    default:
+        printf("Usage: %s [NUM]\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+int sc_cc110x_wakeup(int argc, char **argv)
+{
+    switch (argc) {
+    case 1:
+        for (unsigned i = 0; i < CC110X_NUM; i++){
+            printf("Waking up CC110x #%u:\n", i);
+            cc110x_wakeup(&_cc110x_devs[i]);
+        }
+        break;
+    case 2:
+        if ((!strcmp(argv[1], "-h")) || (!strcmp(argv[1], "--help"))) {
+            printf("Usage: %s [NUM]\n"
+                    "\n"
+                    "Wakes up the CC1100/CC1101 transceiver "
+                    "identified by NUM, or of\n"
+                    "all available CC110x transceivers if no argument is "
+                    "given\n", argv[0]);
+        }
+        else {
+            unsigned pos = atoi(argv[1]);
+            if (pos >= CC110X_NUM) {
+                puts("No such transceiver");
+                return EXIT_FAILURE;
             }
-            break;
-        default:
-            printf("Usage: %s [NUM]\n", argv[0]);
-            return EXIT_FAILURE;
+            printf("Waking up CC110x #%u:\n", pos);
+            cc110x_wakeup(&_cc110x_devs[pos]);
+        }
+        break;
+    default:
+        printf("Usage: %s [NUM]\n", argv[0]);
+        return EXIT_FAILURE;
     }
 
     return EXIT_SUCCESS;

@@ -35,8 +35,9 @@ extern "C" {
  * @retval  SPI_NOMODE  SPI mode 0 not supported by MCU
  * @retval  SPI_NOCLK   SPI clock given in @ref cc110x_params_t is not supported
  *
- * @pre     @ref cc110x_power_on has be called before calling this function.
- *          (Only needed *once* when the driver initializes.)
+ * @pre     When first acquiring the device either after boot or after having put
+ *          the device to sleep mode, use @ref cc110x_power_on_and_acquire
+ *          instead. Subsequently, this function should be used (it is faster).
  */
 static inline int cc110x_acquire(cc110x_t *dev)
 {
@@ -200,11 +201,13 @@ uint8_t cc110x_status(cc110x_t *dev);
  * of messing with the SPI interface, this driver simply waits for this upper
  * bound, as suggested in the note below Table 22 on page 30 in the data sheet.
  *
+ * @pre     The device was not acquired and in low power mode
+ * @post    The device is in IDLE mode and acquired
+ *
  * @retval  0       Success
  * @retval  -EIO    Couldn't pull the CS pin down (@ref cc110x_params_t::cs)
  */
-int cc110x_power_on(cc110x_t *dev);
-
+int cc110x_power_on_and_acquire(cc110x_t *dev);
 
 #ifdef __cplusplus
 }
