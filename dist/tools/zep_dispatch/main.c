@@ -41,14 +41,16 @@ static void _send_flat(void *ctx, void *buffer, size_t len,
     /* send packet to all other clients */
     bool known_node = false;
     list_node_t *prev = head;
-    for (list_node_t* n = head->next; n; n = n->next) {
+
+    for (list_node_t *n = head->next; n; n = n->next) {
         struct sockaddr_in6 *addr = &container_of(n, zep_client_t, node)->addr;
 
         /* don't echo packet back to sender */
         if (memcmp(src_addr, addr, sizeof(*addr)) == 0) {
             known_node = true;
-        /* remove client if sending fails */
-        } else if (sendto(sock, buffer, len, 0, (struct sockaddr *)addr, sizeof(*addr)) < 0) {
+            /* remove client if sending fails */
+        }
+        else if (sendto(sock, buffer, len, 0, (struct sockaddr *)addr, sizeof(*addr)) < 0) {
             inet_ntop(AF_INET6, &addr->sin6_addr, addr_str, INET6_ADDRSTRLEN);
             printf("removing [%s]:%d\n", addr_str, ntohs(addr->sin6_port));
             prev->next = n->next;
@@ -92,7 +94,7 @@ static void dispatch_loop(int sock, dispatch_cb_t dispatch, void *ctx)
 
         /* receive incoming packet */
         ssize_t bytes_in = recvfrom(sock, buffer, sizeof(buffer), 0,
-                               (struct sockaddr*)&src_addr, &addr_len);
+                                    (struct sockaddr *)&src_addr, &addr_len);
 
         if (bytes_in <= 0 || addr_len != sizeof(src_addr)) {
             continue;
@@ -112,7 +114,8 @@ static void _info_handler(int signal)
 
     if (topology_print(graphviz_file, &topology)) {
         fprintf(stderr, "can't open %s\n", graphviz_file);
-    } else {
+    }
+    else {
         printf("graph written to %s\n", graphviz_file);
     }
 }
@@ -172,7 +175,8 @@ int main(int argc, char **argv)
             return -1;
         }
         topology.flat = false;
-    } else {
+    }
+    else {
         topology.flat = true;
     }
 
@@ -190,6 +194,7 @@ int main(int argc, char **argv)
     struct addrinfo *server_addr;
     int res = getaddrinfo(argv[0], argv[1],
                           &hint, &server_addr);
+
     if (res != 0) {
         perror("getaddrinfo()");
         exit(1);
@@ -197,6 +202,7 @@ int main(int argc, char **argv)
 
     int sock = socket(server_addr->ai_family, server_addr->ai_socktype,
                       server_addr->ai_protocol);
+
     if (sock < 0) {
         perror("socket() failed");
         exit(1);
@@ -211,7 +217,8 @@ int main(int argc, char **argv)
 
     if (topology.flat) {
         dispatch_loop(sock, _send_flat, &topology.nodes);
-    } else {
+    }
+    else {
         dispatch_loop(sock, _send_topology, &topology);
     }
 

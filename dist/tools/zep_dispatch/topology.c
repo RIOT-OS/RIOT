@@ -128,7 +128,8 @@ int topology_print(const char *file, const topology_t *t)
 
     if (strcmp(file, "-") == 0) {
         out = stdout;
-    } else {
+    }
+    else {
         out = fopen(file, "w");
     }
 
@@ -151,9 +152,9 @@ int topology_print(const char *file, const topology_t *t)
     for (list_node_t *edge = t->edges.next; edge; edge = edge->next) {
         struct edge *super = container_of(edge, struct edge, next);
         fprintf(out, "\t%s -> %s [ label = \"%.2f\" ]\n",
-              super->a->name, super->b->name, super->weight_a_b);
+                super->a->name, super->b->name, super->weight_a_b);
         fprintf(out, "\t%s -> %s [ label = \"%.2f\" ]\n",
-              super->b->name, super->a->name, super->weight_b_a);
+                super->b->name, super->a->name, super->weight_b_a);
     }
 
     fprintf(out, "}\n");
@@ -168,11 +169,13 @@ int topology_print(const char *file, const topology_t *t)
 int topology_parse(const char *file, topology_t *out)
 {
     FILE *in;
+
     memset(out, 0, sizeof(*out));
 
     if (strcmp(file, "-") == 0) {
         in = stdin;
-    } else {
+    }
+    else {
         in = fopen(file, "r");
     }
 
@@ -182,6 +185,7 @@ int topology_parse(const char *file, topology_t *out)
 
     char *line = NULL;
     size_t line_len = 0;
+
     while (getline(&line, &line_len, in) > 0) {
         _parse_line(line, &out->nodes, &out->edges);
     }
@@ -211,15 +215,20 @@ void topology_send(const topology_t *t, int sock,
                 return;
             }
             zep_set_lqi(buffer, super->weight_a_b * 0xFF);
-            sendto(sock, buffer, len, 0, (struct sockaddr*)&super->b->addr, sizeof(super->b->addr));
-        } else if ((mac_src_len == super->a->mac_len) &&
-                   (memcmp(super->b->mac, mac_src, mac_src_len) == 0)) {
+            sendto(sock, buffer, len, 0,
+                   (struct sockaddr *)&super->b->addr,
+                   sizeof(super->b->addr));
+        }
+        else if ((mac_src_len == super->a->mac_len) &&
+                 (memcmp(super->b->mac, mac_src, mac_src_len) == 0)) {
             /* packet loss */
             if (random() > super->weight_b_a * RAND_MAX) {
                 return;
             }
             zep_set_lqi(buffer, super->weight_b_a * 0xFF);
-            sendto(sock, buffer, len, 0, (struct sockaddr*)&super->a->addr, sizeof(super->a->addr));
+            sendto(sock, buffer, len, 0,
+                   (struct sockaddr *)&super->a->addr,
+                   sizeof(super->a->addr));
         }
     }
 }
