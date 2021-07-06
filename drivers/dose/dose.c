@@ -449,7 +449,7 @@ collision:
     DEBUG("dose _send(): collision!\n");
     if (--retries < 0) {
         ctx->netdev.event_callback((netdev_t *) ctx, NETDEV_EVENT_TX_MEDIUM_BUSY);
-        return 0;
+        return -EBUSY;
     }
     goto send;
 }
