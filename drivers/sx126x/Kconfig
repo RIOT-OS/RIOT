@@ -1,14 +1,44 @@
 # Copyright (c) 2021 Inria
+# Copyright (c) 2021 HAW Hamburg
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
-#
+
+menu "Driver sx126x"
+    depends on TEST_KCONFIG
 
 config MODULE_SX126X
-    bool "SX126X LoRa Sub-GHz radio"
-    depends on HAS_PERIPH_GPIO_IRQ
-    depends on PACKAGE_DRIVER_SX126X
-    depends on TEST_KCONFIG
-    select MODULE_PERIPH_GPIO_IRQ
+    bool
+    select PACKAGE_DRIVER_SX126X
     select MODULE_IOLIST
+
+if HAS_PERIPH_SPI && HAS_PERIPH_GPIO_IRQ
+
+config MODULE_SX1261
+    bool "SX1261"
+    select MODULE_SX126X
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO_IRQ
+
+config MODULE_SX1262
+    bool "SX1262"
+    select MODULE_SX126X
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO_IRQ
+
+config MODULE_SX1268
+    bool "SX1268"
+    select MODULE_SX126X
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO_IRQ
+
+config MODULE_LLCC68
+    bool "LLCC68"
+    select MODULE_SX126X
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO_IRQ
+
+endif
+
+endmenu

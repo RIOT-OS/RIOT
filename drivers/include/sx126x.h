@@ -33,6 +33,27 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Whether there's only one variant of this driver at compile time or
+ * not.
+ */
+#define SX126X_SINGLE ((            \
+                          IS_USED(MODULE_SX1261) \
+                        + IS_USED(MODULE_SX1262) \
+                        + IS_USED(MODULE_SX1268) \
+                        + IS_USED(MODULE_LLCC68) \
+                        ) == 1)
+
+/**
+ * @brief   Variant of the SX126x driver.
+ */
+typedef enum {
+    SX126X_TYPE_SX1261,
+    SX126X_TYPE_SX1262,
+    SX126X_TYPE_SX1268,
+    SX126X_TYPE_LLCC68,
+} sx126x_type_t;
+
+/**
  * @brief   Device initialization parameters
  */
 typedef struct {
@@ -42,6 +63,7 @@ typedef struct {
     gpio_t busy_pin;                    /**< Busy pin */
     gpio_t dio1_pin;                    /**< Dio1 pin */
     sx126x_reg_mod_t regulator;         /**< Power regulator mode */
+    sx126x_type_t type;                 /**< Variant of sx126x */
 } sx126x_params_t;
 
 /**
