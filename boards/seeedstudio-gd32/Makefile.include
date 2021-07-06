@@ -1,0 +1,6 @@
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyUSB1
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+PROGRAMMER ?= openocd
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST=1

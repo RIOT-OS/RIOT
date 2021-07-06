@@ -26,8 +26,6 @@
 #include "sched.h"
 #include "context_frame.h"
 
-#include "vendor/platform.h"
-
 /**
  * @brief   Noticeable marker marking the beginning of a stack segment
  *

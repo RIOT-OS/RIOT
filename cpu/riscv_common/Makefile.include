@@ -21,6 +21,8 @@ ifneq (,$(ITIM_START_ADDR))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_itim_length=$(ITIM_LEN)
 endif
 
+CFLAGS += -DROM_START_ADDR=$(ROM_START_ADDR)
+
 LINKER_SCRIPT ?= riscv.ld
 
 include $(RIOTMAKE)/arch/riscv.inc.mk
