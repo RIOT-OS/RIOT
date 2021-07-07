@@ -74,6 +74,9 @@ check_not_parsing_features() {
     # These two files contain sanity checks using FEATURES_ so are allowed
     pathspec+=(':!Makefile.include' ':!makefiles/info-global.inc.mk')
 
+    # Feature prechecks require checks on Features so it is allowed
+    pathspec+=(':!makefiles/features_precheck.inc.mk')
+
     git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message 'Modules should not check the content of FEATURES_PROVIDED/REQUIRED/OPTIONAL'
 }

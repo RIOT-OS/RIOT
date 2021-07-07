@@ -395,6 +395,15 @@ include $(RIOTMAKE)/defaultmodules.inc.mk
 # Include Kconfig functionalities
 include $(RIOTMAKE)/kconfig.mk
 
+# Include Board and CPU configuration
+INCLUDES += $(addprefix -I,$(wildcard $(BOARDDIR)/include))
+include $(BOARDDIR)/Makefile.include
+INCLUDES += -I$(RIOTCPU)/$(CPU)/include
+include $(RIOTCPU)/$(CPU)/Makefile.include
+
+# Import all toolchain settings
+include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).inc.mk
+
 # For testing, use TEST_KCONFIG as a switch between Makefile.dep and Kconfig
 ifeq (1,$(TEST_KCONFIG))
   $(info === [ATTENTION] Testing Kconfig dependency modelling ===)
@@ -403,6 +412,10 @@ ifeq (1,$(TEST_KCONFIG))
   KCONFIG_PACKAGES := $(call lowercase,$(patsubst CONFIG_PACKAGE_%,%,$(filter CONFIG_PACKAGE_%,$(.VARIABLES))))
   USEPKG := $(KCONFIG_PACKAGES)
 else
+
+  # precheck if provided features are supported by toolchain
+  include $(RIOTMAKE)/features_precheck.inc.mk
+
   # check if required features are provided and update $(FEATURES_USED)
   include $(RIOTMAKE)/features_check.inc.mk
 
@@ -416,11 +429,6 @@ else
   include $(RIOTMAKE)/dependency_resolution.inc.mk
 endif
 
-# Include Board and CPU configuration
-INCLUDES += $(addprefix -I,$(wildcard $(BOARDDIR)/include))
-include $(BOARDDIR)/Makefile.include
-INCLUDES += -I$(RIOTCPU)/$(CPU)/include
-include $(RIOTCPU)/$(CPU)/Makefile.include
 
 # Include common serial logic to define TERMPROG, TERMFLAGS variables based on
 # the content of RIOT_TERMINAL
@@ -452,8 +460,6 @@ endif
 # Assume GCC/GNU as supported toolchain if CPU's Makefile.include doesn't
 # provide this macro
 TOOLCHAINS_SUPPORTED ?= gnu
-# Import all toolchain settings
-include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).inc.mk
 
 # Append ldscript path after importing CPU and board makefiles to allow
 # overriding the core ldscripts
