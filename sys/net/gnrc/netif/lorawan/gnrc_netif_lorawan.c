@@ -300,9 +300,10 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *payload)
     mlme_request_t mlme_request;
     mlme_confirm_t mlme_confirm;
 
-    gnrc_pktsnip_t *head;
     uint8_t port;
     int res = -EINVAL;
+
+    assert(payload);
 
     if (IS_ACTIVE(CONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR)) {
         gnrc_netif_hdr_t *netif_hdr;
@@ -318,11 +319,10 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *payload)
         }
 
         /* Remove the netif hdr snip and point to the MSDU */
-        head = gnrc_pktbuf_remove_snip(payload, payload);
+        payload = gnrc_pktbuf_remove_snip(payload, payload);
 
     }
     else {
-        head = payload;
         port = netif->lorawan.port;
     }
 
@@ -335,18 +335,18 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *payload)
     mcps_request_t req =
     { .type = netif->lorawan.ack_req ? MCPS_CONFIRMED : MCPS_UNCONFIRMED,
       .data =
-      { .pkt = (iolist_t *)head, .port = port,
+      { .pkt = (iolist_t *)payload, .port = port,
           .dr = netif->lorawan.datarate } };
     mcps_confirm_t conf;
 
     gnrc_lorawan_mcps_request(&netif->lorawan.mac, &req, &conf);
     res = conf.status;
 
-end:
     if (res < 0) {
         gnrc_pktbuf_release_error(payload, res);
     }
 
+end:
     return res;
 }
 
