@@ -60,10 +60,10 @@ static void _lock(void);
 static int _sync(void);
 /* callback for _lookup_raw() request */
 static void _on_lookup(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
-                       const sock_udp_ep_t *remote);
+                       const sock_udp_ep_t *remote, const sock_udp_ep_t *local);
 /* callback for _send_rd_init_req() */
 static void _on_rd_init(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
-                        const sock_udp_ep_t *remote);
+                        const sock_udp_ep_t *remote, const sock_udp_ep_t *local);
 static ssize_t _add_filters_to_lookup(coap_pkt_t *pkt, cord_lc_filter_t *filters);
 static int _send_rd_init_req(coap_pkt_t *pkt, const sock_udp_ep_t *remote,
                              void *buf, size_t maxlen);
@@ -103,9 +103,10 @@ static int _sync(void)
 }
 
 static void _on_lookup(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
-                       const sock_udp_ep_t *remote)
+                       const sock_udp_ep_t *remote, const sock_udp_ep_t *local)
 {
     (void)remote;
+    (void)local;
 
     thread_flags_t flag = FLAG_ERR;
 
@@ -199,9 +200,10 @@ static ssize_t _lookup_raw(const cord_lc_rd_t *rd, unsigned content_format,
 }
 
 static void _on_rd_init(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
-                       const sock_udp_ep_t *remote)
+                       const sock_udp_ep_t *remote, const sock_udp_ep_t *local)
 {
     (void)remote;
+    (void)local;
 
     thread_flags_t flag = FLAG_NORSC;
 

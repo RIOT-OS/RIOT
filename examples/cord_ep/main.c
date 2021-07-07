@@ -50,9 +50,14 @@ static void _on_ep_event(cord_ep_standalone_event_t event)
 
 /* define some dummy CoAP resources */
 static ssize_t _handler_dummy(coap_pkt_t *pdu,
-                              uint8_t *buf, size_t len, void *ctx)
+                              uint8_t *buf, size_t len,
+                              const coap_ep_t *remote,
+                              const coap_ep_t *local,
+                              void *ctx)
 {
     (void)ctx;
+    (void)remote;
+    (void)local;
 
     /* get random data */
     int16_t val = 23;
@@ -64,9 +69,14 @@ static ssize_t _handler_dummy(coap_pkt_t *pdu,
 }
 
 static ssize_t _handler_info(coap_pkt_t *pdu,
-                             uint8_t *buf, size_t len, void *ctx)
+                             uint8_t *buf, size_t len,
+                             const coap_ep_t *remote,
+                             const coap_ep_t *local,
+                             void *ctx)
 {
     (void)ctx;
+    (void)remote;
+    (void)local;
 
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     size_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);

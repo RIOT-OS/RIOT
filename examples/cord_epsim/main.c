@@ -44,14 +44,22 @@ static ssize_t text_resp(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     return resp_len + slen;
 }
 
-static ssize_t handler_info(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx)
+static ssize_t handler_info(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                            const coap_ep_t *remote, const coap_ep_t *local,
+                            void *ctx)
 {
     (void)ctx;
+    (void)remote;
+    (void)local;
     return text_resp(pdu, buf, len, riot_info, COAP_FORMAT_JSON);
 }
 
-static ssize_t handler_text(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx)
+static ssize_t handler_text(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                            const coap_ep_t *remote, const coap_ep_t *local,
+                            void *ctx)
 {
+    (void)remote;
+    (void)local;
     return text_resp(pdu, buf, len, (char *)ctx, COAP_FORMAT_TEXT);
 }
 

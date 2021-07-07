@@ -38,9 +38,10 @@ static uint8_t buf[BUFSIZE];
 static int _state = CORD_EPSIM_ERROR;
 
 static void _req_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
-                         const sock_udp_ep_t *remote)
+                         const sock_udp_ep_t *remote, const sock_udp_ep_t *local)
 {
     (void)remote;
+    (void)local;
     (void)pdu;
     _state = (memo->state == GCOAP_MEMO_RESP) ? CORD_EPSIM_OK : CORD_EPSIM_ERROR;
 }

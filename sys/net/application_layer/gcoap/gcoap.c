@@ -45,12 +45,16 @@
 /* Internal functions */
 static void *_event_loop(void *arg);
 static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg);
-static void _process_coap_pdu(sock_udp_t *sock, sock_udp_ep_t *remote,
+static void _process_coap_pdu(sock_udp_t *sock,
+                              sock_udp_ep_t *remote, sock_udp_ep_t *local,
                               uint8_t *buf, size_t len);
-static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
+static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len,
+                                        const sock_udp_ep_t *remote,
+                                        const sock_udp_ep_t *local,
+                                        void *ctx);
 static void _cease_retransmission(gcoap_request_memo_t *memo);
 static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
-                                                         sock_udp_ep_t *remote);
+                          sock_udp_ep_t *remote, sock_udp_ep_t *local);
 static void _expire_request(gcoap_request_memo_t *memo);
 static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *pdu,
                            const sock_udp_ep_t *remote, bool by_mid);
@@ -69,7 +73,11 @@ static int _request_matcher_default(gcoap_listener_t *listener,
 
 /* Internal variables */
 const coap_resource_t _default_resources[] = {
-    { "/.well-known/core", COAP_GET, _well_known_core_handler, NULL },
+    { "/.well-known/core",
+      COAP_GET,
+      (coap_handler_t)_well_known_core_handler,
+      NULL
+    },
 };
 
 static gcoap_listener_t _default_listener = {
@@ -141,18 +149,21 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
     sock_udp_ep_t remote;
 
     if (type & SOCK_ASYNC_MSG_RECV) {
-        ssize_t res = sock_udp_recv(sock, _listen_buf, sizeof(_listen_buf),
-                                    0, &remote);
+        sock_udp_aux_rx_t aux = { .flags = SOCK_AUX_GET_LOCAL };
+        ssize_t res = sock_udp_recv_aux(sock, _listen_buf, sizeof(_listen_buf),
+                                        0, &remote, &aux);
         if (res <= 0) {
             DEBUG("gcoap: udp recv failure: %d\n", (int)res);
             return;
         }
-        _process_coap_pdu(sock, &remote, _listen_buf, res);
+        sock_udp_ep_t *aux_local = sock_udp_aux_rx_local(&aux);
+        _process_coap_pdu(sock, &remote, aux_local, _listen_buf, res);
     }
 }
 
 /* Processes and evaluates the coap pdu */
-static void _process_coap_pdu(sock_udp_t *sock, sock_udp_ep_t *remote,
+static void _process_coap_pdu(sock_udp_t *sock,
+                              sock_udp_ep_t *remote, sock_udp_ep_t *local,
                               uint8_t *buf, size_t len)
 {
     coap_pkt_t pdu;
@@ -199,10 +210,10 @@ static void _process_coap_pdu(sock_udp_t *sock, sock_udp_ep_t *remote,
         else if (coap_get_type(&pdu) == COAP_TYPE_NON
                 || coap_get_type(&pdu) == COAP_TYPE_CON) {
             size_t pdu_len = _handle_req(&pdu, _listen_buf, sizeof(_listen_buf),
-                                            remote);
+                                         remote, local);
             if (pdu_len > 0) {
                 ssize_t bytes = sock_udp_send(sock, _listen_buf, pdu_len,
-                                                remote);
+                                              remote);
                 if (bytes <= 0) {
                     DEBUG("gcoap: send response failed: %d\n", (int)bytes);
                 }
@@ -231,7 +242,7 @@ static void _process_coap_pdu(sock_udp_t *sock, sock_udp_ep_t *remote,
                 }
                 memo->state = GCOAP_MEMO_RESP;
                 if (memo->resp_handler) {
-                    memo->resp_handler(memo, &pdu, remote);
+                    memo->resp_handler(memo, &pdu, remote, local);
                 }
 
                 if (memo->send_limit >= 0) {        /* if confirmable */
@@ -342,7 +353,7 @@ static void _cease_retransmission(gcoap_request_memo_t *memo) {
  * return length of response pdu, or < 0 if can't handle
  */
 static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
-                                                         sock_udp_ep_t *remote)
+                          sock_udp_ep_t *remote, sock_udp_ep_t *local)
 {
     const coap_resource_t *resource     = NULL;
     gcoap_listener_t *listener          = NULL;
@@ -442,7 +453,8 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         return -1;
     }
 
-    ssize_t pdu_len = resource->handler(pdu, buf, len, resource->context);
+    ssize_t pdu_len = resource->handler(pdu, buf, len,
+                                        remote, local, resource->context);
     if (pdu_len < 0) {
         pdu_len = gcoap_response(pdu, buf, len,
                                  COAP_CODE_INTERNAL_SERVER_ERROR);
@@ -611,7 +623,7 @@ static void _expire_request(gcoap_request_memo_t *memo)
             else {
                 req.hdr = (coap_hdr_t *)memo->msg.data.pdu_buf;
             }
-            memo->resp_handler(memo, &req, NULL);
+            memo->resp_handler(memo, &req, &memo->remote_ep, NULL);
         }
         if (memo->send_limit != GCOAP_SEND_LIMIT_NON) {
             *memo->msg.data.pdu_buf = 0;    /* clear resend buffer */
@@ -628,10 +640,15 @@ static void _expire_request(gcoap_request_memo_t *memo)
  * Handler for /.well-known/core. Lists registered handlers, except for
  * /.well-known/core itself.
  */
-static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len,
+static ssize_t _well_known_core_handler(coap_pkt_t* pdu,
+                                        uint8_t *buf, size_t len,
+                                        const sock_udp_ep_t *remote,
+                                        const sock_udp_ep_t *local,
                                         void *ctx)
 {
     (void)ctx;
+    (void)remote;
+    (void)local;
 
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     coap_opt_add_format(pdu, COAP_FORMAT_LINK);

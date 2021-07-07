@@ -679,7 +679,8 @@ typedef struct gcoap_request_memo gcoap_request_memo_t;
  */
 typedef void (*gcoap_resp_handler_t)(const gcoap_request_memo_t *memo,
                                      coap_pkt_t* pdu,
-                                     const sock_udp_ep_t *remote);
+                                     const sock_udp_ep_t *remote,
+                                     const sock_udp_ep_t *local);
 
 /**
  * @brief  Extends request memo for resending a confirmable request.

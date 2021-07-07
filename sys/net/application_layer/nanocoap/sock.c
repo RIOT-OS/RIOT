@@ -134,7 +134,8 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
     }
 
     while (1) {
-        res = sock_udp_recv(&sock, buf, bufsize, -1, &remote);
+        sock_udp_aux_rx_t aux = { .flags = SOCK_AUX_GET_LOCAL };
+        res = sock_udp_recv_aux(&sock, buf, bufsize, -1, &remote, &aux);
         if (res < 0) {
             DEBUG("error receiving UDP packet %d\n", (int)res);
         }
@@ -144,7 +145,8 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
                 DEBUG("error parsing packet\n");
                 continue;
             }
-            if ((res = coap_handle_req(&pkt, buf, bufsize)) > 0) {
+            sock_udp_ep_t *aux_local = sock_udp_aux_rx_local(&aux);
+            if ((res = coap_handle_req(&pkt, buf, bufsize, &remote, aux_local)) > 0) {
                 sock_udp_send(&sock, buf, res, &remote);
             }
             else {

@@ -26,6 +26,8 @@
 #include "net/gcoap.h"
 #include "od.h"
 #include "fmt.h"
+#include "net/ipv4/addr.h"
+#include "net/ipv6/addr.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -37,14 +39,26 @@ static char proxy_uri[64];
 static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
                             size_t maxlen, coap_link_encoder_ctx_t *context);
 static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
-                          const sock_udp_ep_t *remote);
-static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
-static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
+                          const sock_udp_ep_t *remote, const sock_udp_ep_t *local);
+static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len,
+                              const sock_udp_ep_t *remote, const sock_udp_ep_t *local,
+                              void *ctx);
+static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len,
+                                   const sock_udp_ep_t *remote, const sock_udp_ep_t *local,
+                                   void *ctx);
 
 /* CoAP resources. Must be sorted by path (ASCII order). */
 static const coap_resource_t _resources[] = {
-    { "/cli/stats", COAP_GET | COAP_PUT, _stats_handler, NULL },
-    { "/riot/board", COAP_GET, _riot_board_handler, NULL },
+    { "/cli/stats",
+      COAP_GET | COAP_PUT,
+      (coap_handler_t)_stats_handler,
+      NULL
+    },
+    { "/riot/board",
+      COAP_GET,
+      (coap_handler_t)_riot_board_handler,
+      NULL
+    },
 };
 
 static const char *_link_params[] = {
@@ -69,6 +83,48 @@ static char _last_req_path[_LAST_REQ_PATH_MAX];
 /* Counts requests sent by CLI. */
 static uint16_t req_count = 0;
 
+static ssize_t _ep_fmt(char *buf, size_t size, const sock_udp_ep_t *ep)
+{
+    if (!buf || !size || !ep) {
+        return 0;
+    }
+    size_t l = 0;
+    switch(ep->family) {
+#if IS_USED(MODULE_IPV4_ADDR)
+        case AF_INET:
+            if (size < IPV4_ADDR_MAX_STR_LEN + 6) {
+                /* ip:port */
+                return -ENOBUFS;
+            }
+            ipv4_addr_to_str(buf, (const ipv4_addr_t *)ep->addr.ipv4,
+                            IPV4_ADDR_MAX_STR_LEN);
+            l += strlen(buf);
+        break;
+#endif
+#if IS_USED(MODULE_IPV6_ADDR) && defined(SOCK_HAS_IPV6)
+        case AF_INET6:
+            if (size < IPV6_ADDR_MAX_STR_LEN + 8) {
+                /* [ip]:port */
+                return -ENOBUFS;
+            }
+            buf[0] = '[';
+            ipv6_addr_to_str(buf + 1, (const ipv6_addr_t *)ep->addr.ipv6,
+                            IPV6_ADDR_MAX_STR_LEN);
+            l += strlen(buf);
+            buf[l++] = ']';
+        break;
+#endif
+        default:
+            if (size < 7) {
+                return -ENOBUFS;
+            }
+    }
+    buf[l++] = ':';
+    l += fmt_u16_dec(&buf[l], ep->port);
+    buf[l] = '\0';
+    return l;
+}
+
 /* Adds link format params to resource list */
 static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
                             size_t maxlen, coap_link_encoder_ctx_t *context) {
@@ -91,9 +147,15 @@ static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
  * Response callback.
  */
 static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
-                          const sock_udp_ep_t *remote)
+                          const sock_udp_ep_t *remote, const sock_udp_ep_t *local)
 {
-    (void)remote;       /* not interested in the source currently */
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        char s[IPV6_ADDR_MAX_STR_LEN + 8];
+        printf("gcoap: remote %s\n",
+                _ep_fmt(s, sizeof(s), remote) > 0 ? s : "unknown");
+        printf("gcoap: local %s\n",
+               _ep_fmt(s, sizeof(s), local) > 0 ? s : "unknown");
+    }
 
     if (memo->state == GCOAP_MEMO_TIMEOUT) {
         printf("gcoap: timeout for msg ID %02u\n", coap_get_id(pdu));
@@ -179,9 +241,19 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
  *      allows any two byte value for example purposes. Semantically, the only
  *      valid action is to set the value to 0.
  */
-static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
+static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len,
+                              const sock_udp_ep_t *remote, const sock_udp_ep_t *local,
+                              void *ctx)
 {
     (void)ctx;
+
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        char s[IPV6_ADDR_MAX_STR_LEN + 8];
+        printf("gcoap: remote %s\n",
+                _ep_fmt(s, sizeof(s), remote) > 0 ? s : "unknown");
+        printf("gcoap: local %s\n",
+               _ep_fmt(s, sizeof(s), local) > 0 ? s : "unknown");
+    }
 
     /* read coap method type in packet */
     unsigned method_flag = coap_method2flag(coap_get_code_detail(pdu));
@@ -213,9 +285,20 @@ static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *c
     return 0;
 }
 
-static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx)
+static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                                   const sock_udp_ep_t *remote, const sock_udp_ep_t *local,
+                                   void *ctx)
 {
     (void)ctx;
+
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        char s[IPV6_ADDR_MAX_STR_LEN + 8];
+        printf("gcoap: remote %s\n",
+                _ep_fmt(s, sizeof(s), remote) > 0 ? s : "unknown");
+        printf("gcoap: local %s\n",
+               _ep_fmt(s, sizeof(s), local) > 0 ? s : "unknown");
+    }
+
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     coap_opt_add_format(pdu, COAP_FORMAT_TEXT);
     size_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
