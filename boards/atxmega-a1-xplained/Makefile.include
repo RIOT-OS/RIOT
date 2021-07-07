@@ -1,0 +1,4 @@
+RAM_LEN = 8M
+LDSCRIPT_EXTRA = -Wl,--defsym=__heap_end=0x80FFFF
+
+include $(RIOTBOARD)/common/atxmega/Makefile.include
