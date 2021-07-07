@@ -6,8 +6,16 @@
  */
 
 #include <string.h>
-
 #include "fortuna.h"
+#include "kernel_defines.h"
+#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+#include "atomic_utils.h"
+#if IS_USED(MODULE_ZTIMER_MSEC)
+#include "ztimer.h"
+#else
+#include "xtimer.h"
+#endif
+#endif
 
 /**
  * @brief Helper to increment the 128-bit counter (see section 9.4).
@@ -137,6 +145,15 @@ static int fortuna_pseudo_random_data(fortuna_state_t *state, uint8_t *out,
     return 0;
 }
 
+
+#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+void _reseed_callback(void *arg)
+{
+    fortuna_state_t *state = (fortuna_state_t *) arg;
+    state->reseed = 1;
+}
+#endif
+
 /*
  * Corresponds to section 9.4.1 and 9.5.4.
  */
@@ -149,9 +166,16 @@ int fortuna_init(fortuna_state_t *state)
         sha256_init(&state->pools[i].ctx);
     }
 
-#if FORTUNA_RESEED_INTERVAL
-    /* set last reseed to ensure initial time diff is correct */
-    state->last_reseed = xtimer_now_usec64();
+#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+    /* initialize reseed timer */
+    state->reseed_timer.callback = _reseed_callback;
+    state->reseed_timer.arg = state;
+    atomic_store_u8(&state->reseed, 0);
+#if IS_USED(MODULE_ZTIMER_MSEC)
+    ztimer_set(ZTIMER_MSEC, &state->reseed_timer, FORTUNA_RESEED_INTERVAL_MS);
+#else
+    xtimer_set(&state->reseed_timer, FORTUNA_RESEED_INTERVAL_MS * US_PER_MS);
+#endif
 #endif
 
 #if FORTUNA_LOCK
@@ -174,9 +198,9 @@ int fortuna_random_data(fortuna_state_t *state, uint8_t *out, size_t bytes)
 #endif
 
     /* reseed the generator if needed, before returning data */
-#if FORTUNA_RESEED_INTERVAL
+#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
     if (state->pools[0].len >= FORTUNA_MIN_POOL_SIZE &&
-        (xtimer_now_usec64() - state->last_reseed) > FORTUNA_RESEED_INTERVAL) {
+        atomic_load_u8(&state->reseed)) {
 #else
     if (state->pools[0].len >= FORTUNA_MIN_POOL_SIZE) {
 #endif
@@ -196,8 +220,13 @@ int fortuna_random_data(fortuna_state_t *state, uint8_t *out, size_t bytes)
 
         fortuna_reseed(state, buf, len);
 
-#if FORTUNA_RESEED_INTERVAL
-        state->last_reseed = xtimer_now_usec64();
+#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+        atomic_store_u8(&state->reseed, 0);
+#if IS_USED(MODULE_ZTIMER_MSEC)
+        ztimer_set(ZTIMER_MSEC, &state->reseed_timer, FORTUNA_RESEED_INTERVAL_MS);
+#else
+        xtimer_set(&state->reseed_timer, FORTUNA_RESEED_INTERVAL_MS * US_PER_MS);
+#endif
 #endif
 
 #if FORTUNA_CLEANUP
