@@ -23,6 +23,8 @@
 #include <stdint.h>
 #include <math.h>
 
+#include "os/os_types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,26 +40,26 @@ extern "C" {
  * @name    Macro to wait forever on events and mutexes
  * @{
  */
-#define DPL_TIMEOUT_NEVER   (UINT32_MAX)
-#define DPL_WAIT_FOREVER    (DPL_TIMEOUT_NEVER)
+#define DPL_TIMEOUT_NEVER   (OS_TIMEOUT_NEVER)
+#define DPL_WAIT_FOREVER    (OS_WAIT_FOREVER)
 /** @} */
 
 /**
  * @name    Decawave porting layer (DPL) stack alignment requirement
  * @{
  */
-#define DPL_STACK_ALIGNMENT (4)
+#define DPL_STACK_ALIGNMENT (OS_ALIGNMENT)
 /** @} */
 
 /**
  * @brief dpl time type
  */
-typedef uint32_t dpl_time_t;
+typedef os_time_t dpl_time_t;
 
 /**
  * @brief dpl stack buffer type
  */
-typedef char dpl_stack_t;
+typedef os_stack_t dpl_stack_t;
 
 /**
  * @brief dpl float 32 type

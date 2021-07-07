@@ -1,0 +1,27 @@
+From 395209627ba495309098459173d40d490f680b8b Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Mon, 19 Apr 2021 15:47:49 +0200
+Subject: [PATCH] porting/nimble/src/nimble_port: riot initializes timers
+
+---
+ porting/nimble/src/nimble_port.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/porting/nimble/src/nimble_port.c b/porting/nimble/src/nimble_port.c
+index 484e3799..139179e1 100644
+--- a/porting/nimble/src/nimble_port.c
++++ b/porting/nimble/src/nimble_port.c
+@@ -45,8 +45,10 @@ nimble_port_init(void)
+ 
+ #if NIMBLE_CFG_CONTROLLER
+     ble_hci_ram_init();
++#ifndef MODULE_MYNEWT_CORE
+     hal_timer_init(5, NULL);
+     os_cputime_init(32768);
++#endif
+     ble_ll_init();
+ #endif
+ }
+-- 
+2.28.0
+

@@ -32,7 +32,6 @@
 #include "dpl/dpl_tasks.h"
 #include "dpl/dpl_time.h"
 #include "kernel_defines.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

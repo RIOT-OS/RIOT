@@ -29,7 +29,6 @@
 
 #include "shell_commands.h"
 #include "shell.h"
-#include "xtimer.h"
 
 static struct dpl_callout _rng_req_callout;
 static uint8_t _ranging_enabled_flag;
@@ -46,7 +45,7 @@ static int _range_cli_cmd(int argc, char **argv)
 
     if (!strcmp(argv[1], "start")) {
         printf("Start ranging\n");
-        dpl_callout_reset(&_rng_req_callout, RANGE_REQUEST_T_US);
+        dpl_callout_reset(&_rng_req_callout, RANGE_REQUEST_T_MS);
         _ranging_enabled_flag = 1;
     }
     else if (!strcmp(argv[1], "stop")) {
@@ -150,12 +149,12 @@ static void _slot_complete_cb(struct dpl_event *ev)
 }
 
 /**
- * @brief An event callback to send range request every RANGE_REQUEST_T_US.
+ * @brief An event callback to send range request every RANGE_REQUEST_T_MS.
  * On every request it will switch the used ranging algorithm.
  */
 static void uwb_ev_cb(struct dpl_event *ev)
 {
-    struct uwb_rng_instance *rng = (struct uwb_rng_instance *)ev->arg;
+    struct uwb_rng_instance *rng = (struct uwb_rng_instance *)ev->ev.arg;
     struct uwb_dev *inst = rng->dev_inst;
 
     if (inst->role & UWB_ROLE_ANCHOR) {
@@ -195,7 +194,7 @@ static void uwb_ev_cb(struct dpl_event *ev)
 
     /* reset the callback if ranging is enabled */
     if (_ranging_enabled_flag) {
-        dpl_callout_reset(&_rng_req_callout, RANGE_REQUEST_T_US);
+        dpl_callout_reset(&_rng_req_callout, RANGE_REQUEST_T_MS);
     }
 }
 
@@ -211,7 +210,7 @@ void init_ranging(void)
     _uwb_mac_cbs.inst_ptr = rng;
     uwb_mac_append_interface(udev, &_uwb_mac_cbs);
 
-    uint32_t utime = xtimer_now_usec();
+    uint32_t utime = ztimer_now(ZTIMER_USEC);
 
     printf("{\"utime\": %" PRIu32 ",\"exec\": \"%s\"}\n", utime, __FILE__);
     printf("{\"device_id\"=\"%" PRIx32 "\"", udev->device_id);
@@ -235,7 +234,7 @@ void init_ranging(void)
 
     dpl_callout_init(&_rng_req_callout, dpl_eventq_dflt_get(),
                      uwb_ev_cb, rng);
-    dpl_callout_reset(&_rng_req_callout, RANGE_REQUEST_T_US);
+    dpl_callout_reset(&_rng_req_callout, RANGE_REQUEST_T_MS);
     dpl_event_init(&_slot_event, _slot_complete_cb, rng);
 
     /* Apply config */

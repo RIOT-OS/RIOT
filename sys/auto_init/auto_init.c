@@ -123,6 +123,11 @@ void auto_init(void)
         extern void openwsn_bootstrap(void);
         openwsn_bootstrap();
     }
+    if (IS_USED(MODULE_AUTO_INIT_MYNEWT_CORE)) {
+        LOG_DEBUG("Bootstrapping mynewt-core.\n");
+        extern void mynewt_core_init(void);
+        mynewt_core_init();
+    }
     if (IS_USED(MODULE_AUTO_INIT_UWB_CORE)) {
         LOG_DEBUG("Bootstrapping uwb core.\n");
         extern void uwb_core_init(void);

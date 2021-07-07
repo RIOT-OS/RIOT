@@ -17,12 +17,13 @@
  * @}
  */
 
-#include <stdatomic.h>
-
 #include "thread.h"
 #include "event.h"
 #include "event/callback.h"
 #include "uwb_core.h"
+
+#include "os/os_cputime.h"
+#include "hal/hal_timer.h"
 
 #ifndef UWB_CORE_STACKSIZE
 #define UWB_CORE_STACKSIZE  (THREAD_STACKSIZE_LARGE)
@@ -35,11 +36,10 @@ static char _stack_uwb_core[UWB_CORE_STACKSIZE];
 
 static event_queue_t _queue;
 
-atomic_uint dpl_in_critical = 0;
-
 static void *_uwb_core_thread(void *arg)
 {
     (void)arg;
+
     event_queue_init(&_queue);
     event_loop(&_queue);
     /* never reached */

@@ -3,9 +3,6 @@ USEMODULE += uwb-core_contrib
 
 DEFAULT_MODULE += auto_init_uwb-core
 
-USEMODULE += sema
-USEMODULE += event_callback
-USEMODULE += xtimer
 USEMODULE += fmt
 
 FEATURES_REQUIRED += periph_gpio_irq
@@ -25,12 +22,17 @@ ifneq (,$(filter uwb-core_uwbcfg,$(USEMODULE)))
   USEMODULE += uwb-core_config
 endif
 
+ifneq (,$(filter uwb-core_dpl,$(USEMODULE)))
+  USEPKG += mynewt-core
+  USEMODULE += mynewt-core_os
+  ifneq (,$(filter nrf%,$(CPU)))
+    USEMODULE += mynewt-core_nrf5x_hal
+  endif
+endif
+
 # Some stdlib functions used by the pkg are not in avr-gcc
 FEATURES_BLACKLIST += arch_avr8
 # uwb-core has specific compilation sources when compiling kernel
 # libraries these introduce additional compilation issues that have not
 # been addressed in this port
 FEATURES_BLACKLIST += arch_native
-
-# LLVM ARM shows issues with missing definitions for stdatomic
-TOOLCHAINS_BLACKLIST += llvm

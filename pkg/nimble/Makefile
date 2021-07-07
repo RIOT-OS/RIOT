@@ -30,12 +30,12 @@ SUBMODS := $(filter-out $(IGNORE),$(filter nimble_%,$(USEMODULE)))
 
 all: $(SUBMODS)
 
-# blue code and RIOT port modules
+# glue code and RIOT port modules
 nimble_riot_contrib:
 	$(QQ)"$(MAKE)" -C $(TDIR)/contrib/
 
 nimble_porting_nimble:
-	$(QQ)"$(MAKE)" -C $(PDIR)/porting/nimble/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
+	$(QQ)"$(MAKE)" -C $(PDIR)/porting/nimble/src/ -f $(RIOTPKG)/$(PKG_NAME)/nimble.porting.mk MODULE=$@
 
 nimble_npl_riot:
 	$(QQ)"$(MAKE)" -C $(PDIR)/porting/npl/riot/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@

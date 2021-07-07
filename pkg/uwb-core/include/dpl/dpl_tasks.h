@@ -20,10 +20,7 @@
 #ifndef DPL_DPL_TASKS_H
 #define DPL_DPL_TASKS_H
 
-#include "dpl_types.h"
-
-#include "sched.h"
-#include "thread.h"
+#include "os/os_task.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,13 +30,13 @@ extern "C" {
  * @brief dpl task wrapper
  */
 struct dpl_task {
-    kernel_pid_t pid;   /**< the process id */
+    struct os_task t;   /**< os task */
 };
 
 /**
  * @brief dpl task function
  */
-typedef thread_task_func_t dpl_task_func_t;
+typedef os_task_func_t dpl_task_func_t;
 
 /**
  * @brief Initialize a task.
@@ -60,28 +57,39 @@ typedef thread_task_func_t dpl_task_func_t;
  *
  * @return 0 on success, non-zero on failure.
  */
-int dpl_task_init(struct dpl_task *t, const char *name, dpl_task_func_t func,
+static inline int dpl_task_init(struct dpl_task *t, const char *name, dpl_task_func_t func,
                   void *arg, uint8_t prio, dpl_time_t sanity_itvl,
-                  dpl_stack_t *stack_bottom, uint16_t stack_size);
-
+                  dpl_stack_t *stack_bottom, uint16_t stack_size)
+{
+    return os_task_init(&t->t, name, func, arg, prio, sanity_itvl, stack_bottom, stack_size);
+}
 /**
  * @brief removes specified task
  *
  * NOTE: This interface is currently experimental and not ready for common use
  */
-int dpl_task_remove(struct dpl_task *t);
+static inline int dpl_task_remove(struct dpl_task *t)
+{
+    return os_task_remove(&t->t);
+}
 
 /**
  * @brief Return the number of tasks initialized.
  *
  * @return number of tasks initialized
  */
-uint8_t dpl_task_count(void);
+static inline uint8_t dpl_task_count(void)
+{
+    return os_task_count();
+}
 
 /**
  * @brief   Lets current thread yield.
  */
-void dpl_task_yield(void);
+static inline void dpl_task_yield(void)
+{
+    return os_task_yield();
+}
 
 #ifdef __cplusplus
 }

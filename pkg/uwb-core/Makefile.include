@@ -14,9 +14,7 @@ INCLUDES += -I$(PKGDIRBASE)/uwb-core/hw/drivers/uwb/include/ \
             -I$(RIOTPKG)/uwb-core/include \
             #
 
-DIRS += $(RIOTPKG)/uwb-core/dpl \
-        $(RIOTPKG)/uwb-core/contrib \
-        #
+PSEUDOMODULES += uwb-core_dpl
 
-# A cflag to indicate in pkg code that we are building for RIOT
-CFLAGS += -DRIOT
+DIRS += $(RIOTPKG)/uwb-core/contrib \
+        #

@@ -1,10 +1,11 @@
 PKG_NAME=uwb-dw1000
 PKG_URL=https://github.com/Decawave/uwb-dw1000/
-PKG_VERSION=6eaa85e6d429450d19a6ddeb2de05303016c0dd2
+PKG_VERSION=d44078a96349b7a40e9c2393ea83ca4c2d53ab92
 PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
 
+CFLAGS += -Wno-enum-compare
 CFLAGS += -Wno-address-of-packed-member
 CFLAGS += -Wno-enum-conversion
 CFLAGS += -Wno-maybe-uninitialized

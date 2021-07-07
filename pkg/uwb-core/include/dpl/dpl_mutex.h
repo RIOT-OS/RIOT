@@ -20,10 +20,7 @@
 #ifndef DPL_DPL_MUTEX_H
 #define DPL_DPL_MUTEX_H
 
-#include "dpl_types.h"
-#include "dpl_error.h"
-
-#include "mutex.h"
+#include "os/os_mutex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,7 +30,7 @@ extern "C" {
  * @brief dpl mutex wrapper
  */
 struct dpl_mutex {
-    mutex_t mutex;  /**< the mutex */
+    struct os_mutex mu;     /**< the mutex */
 };
 
 /**
@@ -41,7 +38,10 @@ struct dpl_mutex {
  *
  * @param[out]  mu  pre-allocated mutex structure, must not be NULL.
  */
-dpl_error_t dpl_mutex_init(struct dpl_mutex *mu);
+static inline dpl_error_t dpl_mutex_init(struct dpl_mutex *mu)
+{
+    return (dpl_error_t) os_mutex_init(&mu->mu);
+}
 
 /**
  * @brief Pend (wait) for a mutex.
@@ -55,7 +55,10 @@ dpl_error_t dpl_mutex_init(struct dpl_mutex *mu);
  *      DPL_INVALID_PARM    mutex passed in was NULL
  *      DPL_OK              no error
  */
-dpl_error_t dpl_mutex_pend(struct dpl_mutex *mu, dpl_time_t timeout);
+static inline dpl_error_t dpl_mutex_pend(struct dpl_mutex *mu, dpl_time_t timeout)
+{
+    return (dpl_error_t) os_mutex_pend(&mu->mu, timeout);
+}
 
 /**
  *
@@ -65,7 +68,10 @@ dpl_error_t dpl_mutex_pend(struct dpl_mutex *mu, dpl_time_t timeout);
  *      DPL_INVALID_PARM    mutex was NULL
  *      DPL_OK              no error
  */
-dpl_error_t dpl_mutex_release(struct dpl_mutex *mu);
+static inline dpl_error_t dpl_mutex_release(struct dpl_mutex *mu)
+{
+    return (dpl_error_t) os_mutex_release(&mu->mu);
+}
 
 #ifdef __cplusplus
 }

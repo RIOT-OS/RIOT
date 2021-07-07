@@ -28,6 +28,7 @@ USEMODULE += uwb-core_twr_ds_ext
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
+USEMODULE += ztimer_usec
 
 # Set the device role: 0x0 for tag, 0x4 for an anchor
 DW1000_ROLE ?= 0x00
