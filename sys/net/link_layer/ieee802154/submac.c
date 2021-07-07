@@ -24,10 +24,21 @@
 #include "errno.h"
 #include <assert.h>
 
-#define CSMA_SENDER_BACKOFF_PERIOD_UNIT_MS  (320U)
-#define ACK_TIMEOUT_US                      (864U)
-
 static void _handle_tx_no_ack(ieee802154_submac_t *submac);
+
+static uint32_t _calculate_unit_backoff_period(ieee802154_submac_t *submac)
+{
+    return ieee802154_get_turnaround_time(submac)
+         + ieee802154_get_cca_time(submac);
+}
+
+static uint32_t _calculate_ack_wait_duration(ieee802154_submac_t *submac)
+{
+    return ieee802154_get_unit_backoff_period(submac)
+         + ieee802154_get_turnaround_time(submac)
+         + ieee802154_get_shr_duration(submac)
+         + ieee802154_get_psdu_duration(submac, 6);
+}
 
 static void _tx_end(ieee802154_submac_t *submac, int status,
                     ieee802154_tx_info_t *info)
@@ -56,7 +67,7 @@ static int _perform_csma_ca(ieee802154_submac_t *submac)
         ieee802154_radio_request_set_trx_state(dev, IEEE802154_TRX_STATE_TX_ON);
         /* delay for an adequate random backoff period */
         uint32_t bp = (random_uint32() & submac->backoff_mask) *
-                      CSMA_SENDER_BACKOFF_PERIOD_UNIT_MS;
+                      ieee802154_get_unit_backoff_period(submac);
 
         xtimer_usleep(bp);
 
@@ -218,7 +229,7 @@ static void _handle_tx_success(ieee802154_submac_t *submac,
         ieee802154_radio_set_frame_filter_mode(dev, IEEE802154_FILTER_ACK_ONLY);
 
         /* Handle ACK reception */
-        ieee802154_submac_ack_timer_set(submac, ACK_TIMEOUT_US);
+        ieee802154_submac_ack_timer_set(submac, ieee802154_get_ack_wait_duration(submac));
     }
 }
 
@@ -359,6 +370,10 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
         submac->phy_mode = ieee802154_cap_to_phy_mode(1 << bit);
     }
 
+    /* Calculate aUnitBackoffPeriod and macAckWaitDuration values */
+    submac->unit_backoff_period = _calculate_unit_backoff_period(submac);
+    submac->ack_wait_duration = _calculate_ack_wait_duration(submac);
+
     /* If the radio is still not in TRX_OFF state, spin */
     while (ieee802154_radio_confirm_on(dev) == -EAGAIN) {}
 
@@ -408,6 +423,10 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, uint16_t channel_num,
         submac->channel_num = channel_num;
         submac->channel_page = channel_page;
         submac->tx_pow = tx_pow;
+
+        /* Update values for new PHY configuration */
+        submac->unit_backoff_period = _calculate_unit_backoff_period(submac);
+        submac->ack_wait_duration = _calculate_ack_wait_duration(submac);
     }
     while (ieee802154_radio_confirm_set_trx_state(dev) == -EAGAIN) {}
 

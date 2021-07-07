@@ -346,9 +346,31 @@ int txtsnd(int argc, char **argv)
     return send(addr, res, len);
 }
 
+int constants(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+
+    const ieee802154_submac_t *submac = &netdev_submac.submac;
+
+    printf("Symbol duration: %"PRIu16" us\n",
+           ieee802154_get_symbol_duration(submac));
+    printf("Turn-around time: %"PRIu32" us\n",
+           ieee802154_get_turnaround_time(submac));
+    printf("CCA time: %"PRIu32" us\n",
+           ieee802154_get_cca_time(submac));
+    printf("Unit backoff period: %"PRIu32" us\n",
+           ieee802154_get_unit_backoff_period(submac));
+    printf("ACK wait duration: %"PRIu32" us\n",
+           ieee802154_get_ack_wait_duration(submac));
+
+    return 0;
+}
+
 static const shell_command_t shell_commands[] = {
     { "print_addr", "Print IEEE802.15.4 addresses", print_addr },
     { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
+    { "constants", "Print summary of IEEE 802.15.4 PHY/MAC constants and attributes", constants },
     { NULL, NULL, NULL }
 };
 

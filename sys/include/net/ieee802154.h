@@ -27,6 +27,7 @@
 #include "byteorder.h"
 #include "net/eui64.h"
 #include "kernel_defines.h"
+#include "timex.h"
 
 #ifdef __cplusplus
 extern "C" {
