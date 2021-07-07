@@ -39,6 +39,11 @@ config MODULE_LLCC68
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
 
+config MODULE_SX126X_STM32WL
+    bool "SX126X-STM32WL"
+    select MODULE_SX126X
+    select MODULE_PERIPH_GPIO
+
 endif
 
 endmenu

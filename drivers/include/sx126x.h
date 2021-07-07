@@ -43,7 +43,16 @@ extern "C" {
                         + IS_USED(MODULE_SX1262) \
                         + IS_USED(MODULE_SX1268) \
                         + IS_USED(MODULE_LLCC68) \
+                        + IS_USED(MODULE_SX126X_STM32WL) \
                         ) == 1)
+
+/**
+ * @brief   Used to identify if its a generic SPI module
+ */
+#if (IS_USED(MODULE_SX1261) || IS_USED(MODULE_SX1262) || \
+     IS_USED(MODULE_SX1268) || IS_USED(MODULE_LLCC68))
+#define SX126X_SPI    1
+#endif
 
 /**
  * @brief   Variant of the SX126x driver.
@@ -53,6 +62,7 @@ typedef enum {
     SX126X_TYPE_SX1262,
     SX126X_TYPE_SX1268,
     SX126X_TYPE_LLCC68,
+    SX126X_TYPE_STM32WL,
 } sx126x_type_t;
 
 /**
@@ -78,6 +88,7 @@ typedef struct {
     sx126x_mod_params_lora_t mod_params;    /**< Lora modulation parameters */
     uint32_t channel;                       /**< Current channel frequency (in Hz) */
     uint8_t rx_timeout;                     /**< Rx Timeout in terms of symbols */
+    bool radio_sleep;                       /**< Radio sleep status */
 } sx126x_t;
 
 /**

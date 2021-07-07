@@ -103,6 +103,25 @@ static inline bool sx126x_is_sx1268(sx126x_t *dev)
     }
 }
 
+/**
+ * @brief   Check whether the device model is stm32wl (onboard radio)
+ *
+ * @param[in] dev                      Device descriptor of the driver
+ *
+ * @retval    true if the device is stm32wl
+ * @retval    false otherwise
+ */
+static inline bool sx126x_is_stm32wl(sx126x_t *dev)
+{
+    assert(dev);
+    if (SX126X_SINGLE) {
+        return IS_USED(MODULE_SX126X_STM32WL);
+    }
+    else {
+        return dev->params->type == SX126X_TYPE_STM32WL;
+    }
+}
+
 #ifdef __cplusplus
 }
 #endif

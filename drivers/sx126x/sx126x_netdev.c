@@ -37,6 +37,19 @@
 const uint8_t llcc68_max_sf = LORA_SF11;
 const uint8_t sx126x_max_sf = LORA_SF12;
 
+#if IS_USED(MODULE_SX126X_STM32WL)
+static netdev_t *_dev;
+
+void isr_subghz_radio(void)
+{
+    /* Disable NVIC to avoid ISR conflict in CPU. */
+    NVIC_DisableIRQ(SUBGHZ_Radio_IRQn);
+    NVIC_ClearPendingIRQ(SUBGHZ_Radio_IRQn);
+    netdev_trigger_event_isr(_dev);
+    cortexm_isr_end();
+}
+#endif
+
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     sx126x_t *dev = (sx126x_t *)netdev;
@@ -112,6 +125,11 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 static int _init(netdev_t *netdev)
 {
     sx126x_t *dev = (sx126x_t *)netdev;
+    if (sx126x_is_stm32wl(dev)) {
+#if IS_USED(MODULE_SX126X_STM32WL)
+        _dev = netdev;
+#endif
+    }
 
     /* Launch initialization of driver and device */
     DEBUG("[sx126x] netdev: initializing driver...\n");
@@ -131,6 +149,12 @@ static void _isr(netdev_t *netdev)
     sx126x_irq_mask_t irq_mask;
 
     sx126x_get_and_clear_irq_status(dev, &irq_mask);
+
+    if (sx126x_is_stm32wl(dev)) {
+#if IS_USED(MODULE_SX126X_STM32WL)
+        NVIC_EnableIRQ(SUBGHZ_Radio_IRQn);
+#endif
+    }
 
     if (irq_mask & SX126X_IRQ_TX_DONE) {
         DEBUG("[sx126x] netdev: SX126X_IRQ_TX_DONE\n");
