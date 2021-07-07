@@ -120,6 +120,7 @@ ifneq (,$(filter nimble_netif,$(USEMODULE)))
   # optimize the NimBLE controller for IP traffic
   ifneq (,$(filter nimble_controller,$(USEMODULE)))
     CFLAGS += -DMYNEWT_VAL_BLE_LL_MAX_PKT_SIZE=251
+    CFLAGS += -DMYNEWT_VAL_BLE_LL_CONN_INIT_SLOTS=1
     CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_DATA_LEN_EXT=1
   endif
 endif
