@@ -127,7 +127,10 @@ void SX127XSetRxConfig(RadioModems_t modem, uint32_t bandwidth,
     loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_CHANNEL_HOP_PERIOD, &hopPeriod, sizeof(uint8_t));
     netopt_enable_t iq_inverted = (iqInverted) ? NETOPT_ENABLE : NETOPT_DISABLE;
     loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_IQ_INVERT, &iq_inverted, sizeof(netopt_enable_t));
-    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_RX_SYMBOL_TIMEOUT, &symbTimeout, sizeof(uint16_t));
+    assert(symbTimeout <= UINT8_MAX);
+    uint8_t symbol_timeout = symbTimeout;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_RX_SYMBOL_TIMEOUT,
+                                    &symbol_timeout, sizeof(symbol_timeout));
     netopt_enable_t single_rx = rxContinuous ? NETOPT_DISABLE : NETOPT_ENABLE;
     loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_SINGLE_RECEIVE, &single_rx, sizeof(netopt_enable_t));
 }

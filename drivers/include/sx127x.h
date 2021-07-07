@@ -637,7 +637,7 @@ void sx127x_set_preamble_length(sx127x_t *dev, uint16_t preamble);
  * @param[in] dev                      The sx127x device descriptor
  * @param[in] timeout                  The LoRa symbol timeout
  */
-void sx127x_set_symbol_timeout(sx127x_t *dev, uint16_t timeout);
+void sx127x_set_symbol_timeout(sx127x_t *dev, uint8_t timeout);
 
 /**
  * @brief   Sets the SX127X RX timeout
