@@ -1,4 +1,5 @@
 # Copyright (c) 2021 Inria
+# Copyright (c) 2021 Freie Universitaet Berlin
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
@@ -22,3 +23,11 @@ config HAS_CPU_STM32WL
     bool
     help
         Indicates that the cpu being used belongs to the 'stm32wl' family.
+
+config STM32_WL55JC_SUBGHZ_DEBUG
+     bool "STM32WL->Enable Hardware Debugging"
+     help
+        Enable Hardware debug pins. This would affect onboard peripherals such as SPI
+        as the pins are multiplexed. For more information check Alternate Functions
+        column in Table 19 : STM32WL55/54xx pin definition in STM32WL55/54xx
+        datasheet.
