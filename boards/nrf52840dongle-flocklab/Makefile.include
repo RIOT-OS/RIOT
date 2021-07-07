@@ -1,0 +1,17 @@
+# FlockLab 2 uses jlink to flash the device
+# See: https://gitlab.ethz.ch/tec/public/flocklab/observer/-/blob/master/testmanagement/tg_prog.py#L307
+PROGRAMMER = jlink
+
+include $(RIOTBOARD)/common/nrf52/Makefile.include
+
+# FlockLab expects the nrf52840 to be given a firmware in elf format.
+# This firmware must contain both the bootloader and the application.
+# So we need to convert the bootloader and application (in slot0) in bin format to elf.
+
+.PHONY: flocklab
+
+flocklab: all $(BINDIR_APP).flocklab.elf
+	
+
+$(BINDIR_APP).flocklab.elf: $(RIOTBOOT_COMBINED_BIN)
+	$(Q)$(OBJCOPY) -I binary -O elf32-little $(RIOTBOOT_COMBINED_BIN) $(BINDIR_APP).flocklab.elf
