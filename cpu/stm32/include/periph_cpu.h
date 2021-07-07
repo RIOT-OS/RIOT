@@ -966,6 +966,15 @@ void dma_start(dma_t dma);
 uint16_t dma_suspend(dma_t dma);
 
 /**
+ * @brief   Gets the number of bytes that have yet to be transferred
+ *
+ * @param[in] dma    logical DMA stream
+ *
+ * @return the remaining number of bytes to transfer.
+ */
+uint16_t dma_left(dma_t dma);
+
+/**
  * @brief   Resume a suspended DMA transfer on a stream
  *
  * @param[in] dma         logical DMA stream
@@ -1029,6 +1038,15 @@ void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
  * @param[in]   inc_mem     Increment the memory address after read/write
  */
 void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem);
+
+/**
+ * @brief   Sets the callback which is executed after a DMA transfer is completed.
+ *
+ * @param[in]   dma         Logical DMA stream
+ * @param[in]   callback    Callback to execute during the Transfer Complete interrupt
+ * @param[in]   arg         Argument to pass to the callback
+ */
+void dma_set_transfer_complete_cb(dma_t dma, void (*callback)(void*, dma_t), void* arg);
 
 #endif /* MODULE_PERIPH_DMA */
 
