@@ -22,7 +22,6 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-
 #ifndef NET_ETHERTYPE_H
 #define NET_ETHERTYPE_H
 
@@ -54,7 +53,6 @@ extern "C" {
 /**
  * @}
  */
-
 #define ETHERTYPE_UNKNOWN       (0xffff)    /**< Reserved (no protocol specified) */
 
 #ifdef __cplusplus

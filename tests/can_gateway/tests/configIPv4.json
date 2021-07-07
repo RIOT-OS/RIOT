@@ -1,0 +1,52 @@
+{
+  "Entries": [
+    {
+      "can_id": "1",
+      "dst_port": "41172",
+      "ip_addr": "192.168.1.11",
+      "eth_send": "1",
+      "dst_ifnum": "-1",
+      "src_ifnum": "0"
+    },
+    {
+      "can_id": "2",
+      "dst_port": "41172",
+      "ip_addr": "192.168.1.11",
+      "eth_send": "1",
+      "dst_ifnum": "0",
+      "src_ifnum": "0"
+    },
+    {
+      "can_id": "3",
+      "dst_port": "0",
+      "ip_addr": "0",
+      "eth_send": "0",
+      "dst_ifnum": "0",
+      "src_ifnum": "0"
+    },
+    {
+      "can_id": "4",
+      "dst_port": "41172",
+      "ip_addr": "192.168.1.11",
+      "eth_send": "0",
+      "dst_ifnum": "-1",
+      "src_ifnum": "0"
+    },
+    {
+      "can_id": "5",
+      "dst_port": "0",
+      "ip_addr": "0",
+      "eth_send": "1",
+      "dst_ifnum": "-1",
+      "src_ifnum": "0"
+    },
+    {
+      "can_id": "11345678",
+      "dst_port": "41172",
+      "ip_addr": "192.168.1.11",
+      "eth_send": "1",
+      "dst_ifnum": "-1",
+      "src_ifnum": "0"
+    }
+  ]
+}
