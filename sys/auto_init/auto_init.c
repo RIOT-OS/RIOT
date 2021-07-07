@@ -179,6 +179,11 @@ void auto_init(void)
         extern void auto_init_loramac(void);
         auto_init_loramac();
     }
+    if (IS_USED(MODULE_DSM)) {
+        LOG_DEBUG("Auto init dsm.\n");
+        extern void dsm_init(void);
+        dsm_init();
+    }
 
     /* initialize USB devices */
     if (IS_USED(MODULE_AUTO_INIT_USBUS)) {

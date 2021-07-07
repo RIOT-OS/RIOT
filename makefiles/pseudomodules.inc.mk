@@ -32,6 +32,7 @@ PSEUDOMODULES += event_timeout_ztimer
 PSEUDOMODULES += evtimer_mbox
 PSEUDOMODULES += evtimer_on_ztimer
 PSEUDOMODULES += fmt_%
+PSEUDOMODULES += gcoap_dtls
 PSEUDOMODULES += gnrc_dhcpv6_%
 PSEUDOMODULES += gnrc_dhcpv6_client_mud_url
 PSEUDOMODULES += gnrc_ipv6_default
