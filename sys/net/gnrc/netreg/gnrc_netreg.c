@@ -95,7 +95,9 @@ static gnrc_netreg_entry_t *_netreg_lookup(gnrc_netreg_entry_t *from,
 
     if (from || !_INVALID_TYPE(type)) {
         gnrc_netreg_entry_t *head = (from) ? from->next : netreg[type];
-        LL_SEARCH_SCALAR(head, res, demux_ctx, demux_ctx);
+        if (head) {
+            LL_SEARCH_SCALAR(head, res, demux_ctx, demux_ctx);
+        }
     }
 
     return res;
