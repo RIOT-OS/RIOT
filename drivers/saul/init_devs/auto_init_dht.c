@@ -23,7 +23,11 @@
 #include "log.h"
 #include "saul_reg.h"
 #include "dht_params.h"
+#include "dht_saul.h"
 #include "dht.h"
+#if IS_ACTIVE(MODULE_SAUL_OBSERVER)
+#include "saul_observer.h"
+#endif
 
 /**
  * @brief   Define the number of configured sensors
@@ -33,7 +37,7 @@
 /**
  * @brief   Allocate memory for the device descriptors
  */
-static dht_t dht_devs[DHT_NUM];
+static dht_saul_t dht_devs[DHT_NUM];
 
 /**
  * @brief   Memory for the SAUL registry entries
@@ -45,13 +49,18 @@ static saul_reg_t saul_entries[DHT_NUM * 2];
  */
 #define DHT_INFO_NUM ARRAY_SIZE(dht_saul_info)
 
-/**
- * @name    Import SAUL endpoints
- * @{
- */
-extern const saul_driver_t dht_temp_saul_driver;
-extern const saul_driver_t dht_hum_saul_driver;
-/** @} */
+#if IS_ACTIVE(MODULE_SAUL_OBSERVER) && CONFIG_DHT_POLLING_INTERVAL > 0
+static void _polling_cb(void *arg)
+{
+    saul_reg_t *reg = (saul_reg_t*) arg;
+    dht_saul_t *dht = (dht_saul_t*) reg->dev;
+    /* arg points to the first of two consecutive saul_reg_t: */
+    /* temperature and humidity. Both must be polled. */
+    saul_observer_queue_event(reg);
+    saul_observer_queue_event(reg + 1);
+    ztimer_set(ZTIMER_MSEC, &dht->polling, CONFIG_DHT_POLLING_INTERVAL);
+}
+#endif
 
 void auto_init_dht(void)
 {
@@ -60,7 +69,7 @@ void auto_init_dht(void)
     for (unsigned int i = 0; i < DHT_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing dht #%u\n", i);
 
-        if (dht_init(&dht_devs[i], &dht_params[i]) != DHT_OK) {
+        if (dht_init(&dht_devs[i].sensor, &dht_params[i]) != DHT_OK) {
             LOG_ERROR("[auto_init_saul] error initializing dht #%u\n", i);
             continue;
         }
@@ -73,5 +82,12 @@ void auto_init_dht(void)
         saul_entries[(i * 2) + 1].driver = &dht_hum_saul_driver;
         saul_reg_add(&(saul_entries[(i * 2)]));
         saul_reg_add(&(saul_entries[(i * 2) + 1]));
+
+#if IS_ACTIVE(MODULE_SAUL_OBSERVER) && CONFIG_DHT_POLLING_INTERVAL > 0
+        /* Kick-off polling timer */
+        dht_devs[i].polling.callback = _polling_cb;
+        dht_devs[i].polling.arg = (void*) &saul_entries[(i * 2)];
+        ztimer_set(ZTIMER_MSEC, &dht_devs[i].polling, CONFIG_DHT_POLLING_INTERVAL);
+#endif
     }
 }

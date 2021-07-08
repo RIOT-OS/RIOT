@@ -239,6 +239,18 @@ enum {
 /** @} */
 
 /**
+ * @brief   Flags allow SAUL driver implementations to make indications to saul_reg
+ */
+enum {
+    SAUL_FLAG_QUEUE_EVENT   = 0x0100 /**< A change has been detected during read/write */
+};
+
+/**
+ * @brief   Masks out SAUL_FLAG_*
+ */
+#define SAUL_RET_DIM_MASK        0x00ff /**< Mask for dimension count */
+
+/**
  * @brief   Read a value (a set of values) from a device
  *
  * Simple sensors, as e.g. a temperature sensor, will return exactly one value
@@ -278,12 +290,28 @@ typedef int(*saul_read_t)(const void *dev, phydat_t *res);
 typedef int(*saul_write_t)(const void *dev, phydat_t *data);
 
 /**
+ * @brief   Called if a device state change is suspected
+ *
+ * If interested parties should be notified about a device change, which may
+ * results into a `saul_read_t()` call, return 1.
+ *
+ * @param[in] dev       device descriptor of the target device
+ *
+ * @return  1 if the decive state has changed significantly
+ * @return  0 if nothing has changed
+ */
+typedef int(*saul_check_t)(const void *dev);
+
+/**
  * @brief   Definition of the RIOT actuator/sensor interface
  */
 typedef struct {
     saul_read_t read;       /**< read function pointer */
     saul_write_t write;     /**< write function pointer */
     uint8_t type;           /**< device class the device belongs to */
+#if IS_USED(MODULE_SAUL_OBSERVER)
+    saul_check_t check;     /**< check change function pointer */
+#endif
 } saul_driver_t;
 
 /**

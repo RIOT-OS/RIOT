@@ -29,8 +29,24 @@
 #include "saul.h"
 #include "phydat.h"
 
+#if IS_ACTIVE(MODULE_SAUL_OBSERVER)
+#include "mutex.h"
+#include "clist.h"
+#include "event.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#if IS_ACTIVE(MODULE_SAUL_OBSERVER)
+/**
+ * @brief   SAUL registry item observer list
+ */
+typedef struct {
+    clist_node_t lst;               /**< linked-list of observers */
+    mutex_t mtx;                    /**< mutex protecting observers list */
+} saul_observer_list_t;
 #endif
 
 /**
@@ -41,6 +57,10 @@ typedef struct saul_reg {
     void *dev;                      /**< pointer to the device descriptor */
     const char *name;               /**< string identifier for the device */
     saul_driver_t const *driver;    /**< the devices read callback */
+#if IS_ACTIVE(MODULE_SAUL_OBSERVER)
+    saul_observer_list_t observers; /**< list for observers */
+    event_t event;                  /**< handle for event queue */
+#endif
 } saul_reg_t;
 
 /**
