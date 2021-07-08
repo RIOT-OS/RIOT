@@ -288,8 +288,9 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
     case NETOPT_STATE_RX:
         DEBUG("[sx126x] netdev: set NETOPT_STATE_RX state\n");
         sx126x_cfg_rx_boosted(dev, true);
-        if (dev->rx_timeout != 0) {
-            sx126x_set_rx(dev, dev->rx_timeout);
+        int _timeout = (sx126x_symbol_to_msec(dev, dev->rx_timeout));
+        if (_timeout != 0) {
+            sx126x_set_rx(dev, _timeout);
         }
         else {
             sx126x_set_rx(dev, SX126X_RX_SINGLE_MODE);
@@ -386,10 +387,10 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         sx126x_set_lora_crc(dev, *((const netopt_enable_t *)val) ? true : false);
         return sizeof(netopt_enable_t);
 
-    case NETOPT_RX_TIMEOUT:
-        assert(len <= sizeof(uint32_t));
-        dev->rx_timeout = *(const uint32_t *)val;
-        return sizeof(uint32_t);
+    case NETOPT_RX_SYMBOL_TIMEOUT:
+        assert(len <= sizeof(uint8_t));
+        dev->rx_timeout = *(const uint8_t *)val;
+        return sizeof(uint8_t);
 
     case NETOPT_TX_POWER:
         assert(len <= sizeof(int16_t));
