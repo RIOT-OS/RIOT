@@ -136,12 +136,8 @@ void cc2538_init(void)
     RFCORE_XREG_FIFOPCTRL = CC2538_RF_MAX_DATA_LEN;
 
     /* Set default IRQ */
-    if (!IS_USED(MODULE_CC2538_RF_NETDEV_LEGACY)) {
-        RFCORE_XREG_RFIRQM1 = TXDONE | CSP_STOP | TXACKDONE;
-        RFCORE_XREG_RFIRQM0 = RXPKTDONE | FIFOP | SFD;
-    } else {
-        RFCORE_XREG_RFIRQM0 = RXPKTDONE | FIFOP;
-    }
+    RFCORE_XREG_RFIRQM1 = TXDONE | CSP_STOP | TXACKDONE;
+    RFCORE_XREG_RFIRQM0 = RXPKTDONE | FIFOP | SFD;
 
     /* Enable all RF CORE error interrupts */
     RFCORE_XREG_RFERRM = STROBE_ERR | TXUNDERF | TXOVERF | \
@@ -215,7 +211,6 @@ bool cc2538_on(void)
 
 void cc2538_setup(cc2538_rf_t *dev)
 {
-#if !IS_USED(MODULE_CC2538_RF_NETDEV_LEGACY)
     (void) dev;
 #if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC)
     extern ieee802154_dev_t cc2538_rf_dev;
@@ -223,23 +218,4 @@ void cc2538_setup(cc2538_rf_t *dev)
     netdev_ieee802154_submac_init(&dev->netdev, &cc2538_rf_dev);
 #endif
     cc2538_init();
-#else
-    netdev_t *netdev = (netdev_t *)dev;
-
-    netdev->driver = &cc2538_rf_driver;
-
-    cc2538_init();
-
-    netdev_register(netdev, NETDEV_CC2538, 0);
-
-    cc2538_set_tx_power(CC2538_RF_POWER_DEFAULT);
-    cc2538_set_chan(CC2538_RF_CHANNEL_DEFAULT);
-
-    /* assign default addresses */
-    netdev_ieee802154_setup(&dev->netdev);
-    cc2538_set_addr_long(dev->netdev.long_addr);
-    cc2538_set_addr_short(dev->netdev.short_addr);
-
-    cc2538_on();
-#endif
 }

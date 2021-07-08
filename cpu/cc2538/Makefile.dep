@@ -1,7 +1,5 @@
 ifneq (,$(filter cc2538_rf,$(USEMODULE)))
-  ifneq (,$(filter cc2538_rf_netdev_legacy,$(USEMODULE)))
-    USEMODULE += netdev_ieee802154
-  else ifneq (,$(filter netdev,$(USEMODULE)))
+  ifneq (,$(filter netdev,$(USEMODULE)))
     USEMODULE += netdev_ieee802154_submac
   endif
 endif
