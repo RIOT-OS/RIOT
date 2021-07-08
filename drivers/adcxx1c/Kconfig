@@ -1,4 +1,5 @@
 # Copyright (c) 2020 HAW Hamburg
+#               2021 Freie Universitaet Berlin
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
@@ -38,3 +39,91 @@ config MODULE_ADCXX1C
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_I2C
+
+menuconfig KCONFIG_USEMODULE_ADCXX1C
+    bool "Configure ADCXX1C driver"
+    depends on USEMODULE_ADCXX1C
+    help
+        Configure the ADCXX1C driver using Kconfig.
+
+if KCONFIG_USEMODULE_ADCXX1C
+
+config ADCXX1C_I2C_ADDRESS
+    hex "Default I2C address"
+    range 0x50 0x5A
+    default 0x54
+    help
+        ADCXX1C allows for upto 9 devices on a single bus. The value depends on
+        the state of ADR1 and ADR0 Pins. For more information refer section
+        `I2C Slave (Hardware) Address` in datasheet.
+
+choice
+    bool "Automatic conversion mode (multiplier)"
+    default ADCXX1C_PARAM_CYCLE_DISABLE
+    help
+        The automatic conversion mode configures the ADC to continually perform
+        conversions without receiving "read" instructions from the controller
+        over the I2C interface. If enabled, the sample rate for the conversion
+        is set by the cycle time bits which offers upto 7 modes of operation,
+        i.e. multipliers from x32 to x2048 to the base conversion time
+        (Tconvert).
+
+config ADCXX1C_PARAM_CYCLE_DISABLE
+    bool "Disabled"
+
+config ADCXX1C_PARAM_CYCLE_32
+    bool "x32"
+
+config ADCXX1C_PARAM_CYCLE_64
+    bool "x64"
+
+config ADCXX1C_PARAM_CYCLE_128
+    bool "x128"
+
+config ADCXX1C_PARAM_CYCLE_256
+    bool "x256"
+
+config ADCXX1C_PARAM_CYCLE_512
+    bool "x512"
+
+config ADCXX1C_PARAM_CYCLE_1024
+    bool "x1024"
+
+config ADCXX1C_PARAM_CYCLE_2048
+    bool "x2048"
+
+endchoice
+
+config ADCXX1C_PARAM_LOW_LIMIT
+    int "Low limit for alert"
+    range 0 255 if USEMODULE_ADC081C
+    range 0 1024 if USEMODULE_ADC101C
+    range 0 4096 if USEMODULE_ADC121C
+    default 0
+    help
+        Configure the lower limit threshold used to determine the alert
+        condition.
+
+config ADCXX1C_PARAM_HIGH_LIMIT
+    int "High limit for alert"
+    range 0 255 if USEMODULE_ADC081C
+    range 0 1024 if USEMODULE_ADC101C
+    range 0 4096 if USEMODULE_ADC121C
+    default 0
+    help
+        Configure the higher limit threshold used to determine the alert
+        condition.
+
+config ADCXX1C_PARAM_HYSTERESIS
+    int "Hysteris for alert"
+    range 0 255 if USEMODULE_ADC081C
+    range 0 1024 if USEMODULE_ADC101C
+    range 0 4096 if USEMODULE_ADC121C
+    default 0
+    help
+        Configure the higher limit threshold used to determine the alert
+        condition. After a Vhigh or Vlow alert occurs,the conversion result must
+        move within the Vhigh or Vlow limit by more than this value to clear
+        the alert condition.
+
+endif # KCONFIG_USEMODULE_ADCXX1C
