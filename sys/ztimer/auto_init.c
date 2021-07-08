@@ -60,13 +60,7 @@
 
 /* Step 0: define available ztimer-periphery by activated modules */
 
-/* #if CONFIG_ZTIMER_USEC_TYPE_PERIPH_TIMER
- * replaces #if MODULE_ZTIMER_PERIPH_TIMER
- * the ztimer_periph_timer is always available
- * having an (1) config defined in ztimer/config.h
- */
-
-#if CONFIG_ZTIMER_USEC_TYPE_PERIPH_TIMER
+#if MODULE_ZTIMER_PERIPH_TIMER
 #  define ZTIMER_TIMER      _ztimer_periph_timer
 #  define ZTIMER_TIMER_CLK  _ztimer_periph_timer.super
 #  define ZTIMER_TIMER_FREQ CONFIG_ZTIMER_USEC_BASE_FREQ
@@ -92,8 +86,11 @@
 /* ZTIMER_USEC always uses the basic timer
  * basic timer is available on all boards */
 #if MODULE_ZTIMER_USEC
-#  ifndef INIT_ZTIMER_TIMER
-#    define INIT_ZTIMER_TIMER 1
+#  ifdef ZTIMER_TIMER
+#    define ZTIMER_USEC_TIMER 1
+#    ifndef INIT_ZTIMER_TIMER
+#      define INIT_ZTIMER_TIMER 1
+#    endif
 #  endif
 #endif
 
@@ -109,7 +106,7 @@
 #    if ZTIMER_RTT_FREQ != FREQ_1KHZ
 #      define ZTIMER_MSEC_CONVERT_LOWER_FREQ ZTIMER_RTT_FREQ
 #    endif
-#  else
+#  elif defined(ZTIMER_TIMER)
 #    define ZTIMER_MSEC_TIMER 1
 #    ifndef INIT_ZTIMER_TIMER
 #      define INIT_ZTIMER_TIMER 1
@@ -128,19 +125,17 @@
 #      define INIT_ZTIMER_RTT 1
 #    endif
 #    define ZTIMER_SEC_CONVERT_LOWER_FREQ ZTIMER_RTT_FREQ
-#  else
-#    ifdef ZTIMER_RTC
-#      define ZTIMER_SEC_RTC
-#      ifndef INIT_ZTIMER_RTC
-#        define INIT_ZTIMER_RTC 1
-#      endif
-#    else
-#      define ZTIMER_SEC_TIMER
-#      ifndef INIT_ZTIMER_TIMER
-#        define INIT_ZTIMER_TIMER 1
-#      endif
-#      define ZTIMER_SEC_CONVERT_LOWER_FREQ ZTIMER_TIMER_FREQ
+#  elif defined(ZTIMER_RTC)
+#    define ZTIMER_SEC_RTC
+#    ifndef INIT_ZTIMER_RTC
+#      define INIT_ZTIMER_RTC 1
 #    endif
+#  elif defined(ZTIMER_TIMER)
+#    define ZTIMER_SEC_TIMER
+#    ifndef INIT_ZTIMER_TIMER
+#      define INIT_ZTIMER_TIMER 1
+#    endif
+#    define ZTIMER_SEC_CONVERT_LOWER_FREQ ZTIMER_TIMER_FREQ
 #  endif
 #endif
 
@@ -163,7 +158,7 @@ static ztimer_periph_rtc_t ZTIMER_RTC;
 /* Step 3: setup constants for ztimers and memory for converters */
 
 #if MODULE_ZTIMER_USEC
-#  ifdef ZTIMER_TIMER
+#  ifdef ZTIMER_USEC_TIMER
 ztimer_clock_t *const ZTIMER_USEC_BASE = &ZTIMER_TIMER_CLK;
 #  else
 #    error No suitable ZTIMER_USEC config. Basic timer configuration missing?
@@ -219,7 +214,7 @@ void ztimer_init(void)
 #if INIT_ZTIMER_TIMER
     LOG_DEBUG(
         "ztimer_init(): ZTIMER_TIMER using periph timer %u, freq %lu, width %u\n",
-        CONFIG_ZTIMER_USEC_DEV, CONFIG_ZTIMER_USEC_BASE_FREQ,
+        CONFIG_ZTIMER_USEC_DEV, ZTIMER_TIMER_FREQ,
         CONFIG_ZTIMER_USEC_WIDTH);
     ztimer_periph_timer_init(&ZTIMER_TIMER, CONFIG_ZTIMER_USEC_DEV,
                              ZTIMER_TIMER_FREQ, WIDTH_TO_MAXVAL(CONFIG_ZTIMER_USEC_WIDTH));
