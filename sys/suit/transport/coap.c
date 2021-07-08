@@ -367,6 +367,7 @@ static void _suit_handle_url(const char *url)
         }
 
 #endif
+#ifdef MODULE_SUIT_STORAGE_FLASHWRITE
         if (res == 0) {
             const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(
                 riotboot_slot_other());
@@ -381,6 +382,7 @@ static void _suit_handle_url(const char *url)
                 LOG_INFO("suit_coap: update failed, hdr invalid\n ");
             }
         }
+#endif
     }
     else {
         LOG_INFO("suit_coap: error getting manifest\n");

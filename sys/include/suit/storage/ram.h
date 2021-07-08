@@ -61,6 +61,22 @@ extern "C" {
 #endif
 
 /**
+ * @brief Storage location string separators
+ */
+#ifndef CONFIG_SUIT_STORAGE_RAM_LOCATION_SEPARATOR
+#define CONFIG_SUIT_STORAGE_RAM_LOCATION_SEPARATOR '.'
+#endif
+
+/**
+ * @brief Storage location string prefix
+ *
+ * Must include the leading and trailing separators
+ */
+#ifndef CONFIG_SUIT_STORAGE_RAM_LOCATION_PREFIX
+#define CONFIG_SUIT_STORAGE_RAM_LOCATION_PREFIX  ".ram."
+#endif
+
+/**
  * @brief Single in-memory storage region
  */
 typedef struct {

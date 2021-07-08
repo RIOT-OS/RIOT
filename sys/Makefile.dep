@@ -660,16 +660,6 @@ ifneq (,$(filter suit,$(USEMODULE)))
   ifeq (,$(filter libcose_crypt_%,$(USEMODULE)))
     USEMODULE += libcose_crypt_c25519
   endif
-
-  # tests/suit_manifest has some mock implementations,
-  # only add the non-mock dependencies if not building that test.
-  ifeq (,$(filter suit_transport_mock,$(USEMODULE)))
-    # SUIT depends on riotboot support and some extra riotboot modules
-    FEATURES_REQUIRED += riotboot
-    USEMODULE += riotboot_slot
-    USEMODULE += riotboot_flashwrite
-    USEMODULE += riotboot_flashwrite_verify_sha256
-  endif
 endif
 
 ifneq (,$(filter suit_transport_%, $(USEMODULE)))
@@ -682,6 +672,13 @@ endif
 
 ifneq (,$(filter suit_storage_%, $(USEMODULE)))
   USEMODULE += suit_storage
+endif
+
+ifneq (,$(filter suit_storage_flashwrite, $(USEMODULE)))
+  FEATURES_REQUIRED += riotboot
+  USEMODULE += riotboot_slot
+  USEMODULE += riotboot_flashwrite
+  USEMODULE += riotboot_flashwrite_verify_sha256
 endif
 
 ifneq (,$(filter suit_%,$(USEMODULE)))
