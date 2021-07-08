@@ -27,6 +27,7 @@
 #include "crypto/modes/cbc.h"
 
 #include "uECC.h"
+#include "tiny-asn1.h"
 
 #include "fido2/ctap/ctap_crypto.h"
 #include "fido2/ctap/ctap_status.h"
@@ -234,8 +235,12 @@ int fido2_ctap_crypto_get_sig(uint8_t *hash, size_t hash_size, uint8_t *sig,
 {
     assert(*sig_size >= CTAP_CRYPTO_ES256_DER_MAX_SIZE);
 
-    uint8_t r_raw[CTAP_CRYPTO_KEY_SIZE];
-    uint8_t s_raw[CTAP_CRYPTO_KEY_SIZE];
+    /**
+     * +1 to pad with leading zero to prevent integer from being interpreted as
+     * negative (e.g. MSB of r >= 0x80)
+     */
+    uint8_t r[CTAP_CRYPTO_KEY_SIZE + 1] = { 0 };
+    uint8_t s[CTAP_CRYPTO_KEY_SIZE + 1] = { 0 };
     int ret;
 
     const struct uECC_Curve_t *curve = uECC_secp256r1();
@@ -246,10 +251,10 @@ int fido2_ctap_crypto_get_sig(uint8_t *hash, size_t hash_size, uint8_t *sig,
         return CTAP1_ERR_OTHER;
     }
 
-    memmove(r_raw, sig, sizeof(r_raw));
-    memmove(s_raw, sig + sizeof(r_raw), sizeof(s_raw));
+    memmove(r + 1, sig, CTAP_CRYPTO_KEY_SIZE);
+    memmove(s + 1, sig + CTAP_CRYPTO_KEY_SIZE, CTAP_CRYPTO_KEY_SIZE);
 
-    ret = sig_to_der_format(r_raw, s_raw, sig, sig_size);
+    ret = sig_to_der_format(r, s, sig, sig_size);
 
     if (ret != CTAP2_OK) {
         return ret;
@@ -264,75 +269,51 @@ static int RNG(uint8_t *dest, size_t size)
     return 1;
 }
 
-/* Encode signature in ASN.1 DER format */
 static int sig_to_der_format(uint8_t *r, uint8_t *s, uint8_t *sig,
                              size_t *sig_len)
 {
-    uint8_t offset = 0;
-    uint8_t lead_r = 0;
-    uint8_t lead_s = 0;
+    asn1_tree t;
+    asn1_tree c1;
+    asn1_tree c2;
     uint8_t pad_s, pad_r;
-    uint8_t i;
+    int ret;
 
-    if (*sig_len < CTAP_CRYPTO_ES256_DER_MAX_SIZE) {
-        return CTAP1_ERR_OTHER;
-    }
-
-    /* get leading zeros to save space */
-    for (i = 0; i < CTAP_CRYPTO_KEY_SIZE; i++) {
-        if (r[i] == 0) {
-            lead_r++;
-        }
-        else {
-            break;
-        }
-    }
-
-    for (i = 0; i < CTAP_CRYPTO_KEY_SIZE; i++) {
-        if (s[i] == 0) {
-            lead_s++;
-        }
-        else {
-            break;
-        }
-    }
-
-    /*
-       if number is negative after removing leading zeros,
-       pad with 1 zero byte in order to turn number positive again
+    /**
+     * if MSB >= 0x80, pad with leading zero byte in order to have number
+     * interpreted as positive.
      */
-    pad_r = ((r[lead_r] & 0x80) == 0x80);
-    pad_s = ((s[lead_s] & 0x80) == 0x80);
+    pad_r = ((r[1] & 0x80) == 0x80);
+    pad_s = ((s[1] & 0x80) == 0x80);
 
     memset(sig, 0, *sig_len);
 
-    /* sequence tag number, constructed method */
-    sig[offset++] = 0x30;
+    list_init(&t);
+    list_init(&c1);
+    list_init(&c2);
 
-    /* length octet (number of content octets) */
-    sig[offset++] = 0x44 + pad_r + pad_s - lead_r - lead_s;
+    t.type = ASN1_TYPE_SEQUENCE;
 
-    /* integer tag number */
-    sig[offset++] = 0x02;
-    sig[offset + pad_r] = 0x00;
-    sig[offset++] = 0x20 + pad_r - lead_r;
-    offset += pad_r;
+    c1.type = ASN1_TYPE_INTEGER;
+    c1.length = 0x20 + pad_r;
+    c1.data = pad_r ? r : r + 1;
 
-    memmove(sig + offset, r + lead_r, 32 - lead_r);
+    ret = add_child(&t, &c1);
 
-    offset += 32 - lead_r;
+    if (ret < 0) {
+        return CTAP1_ERR_OTHER;
+    }
 
-    /* integer tag number */
-    sig[offset++] = 0x02;
-    sig[offset] = 0x00;
-    sig[offset++] = 0x20 + pad_s - lead_s;
-    offset += pad_s;
+    c2.type = ASN1_TYPE_INTEGER;
+    c2.length = 0x20 + pad_s;
+    c2.data = pad_s ? s : s + 1;
 
-    memmove(sig + offset, s + lead_s, 32 - lead_s);
+    ret = add_child(&t, &c2);
 
-    offset += 32 - lead_s;
+    if (ret < 0) {
+        return CTAP1_ERR_OTHER;
+    }
 
-    *sig_len = offset;
+    *sig_len = der_encode(&t, sig, *sig_len);
 
     return CTAP2_OK;
 }

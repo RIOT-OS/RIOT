@@ -735,6 +735,7 @@ ifneq (,$(filter fido2_ctap,$(USEMODULE)))
   USEMODULE += periph_flashpage_pagewise
 
   USEMODULE += xtimer
+  USEPKG += tiny-asn1
 
   USEPKG += tinycbor
   INCLUDE += $(RIOTPKG)/tinycbor
