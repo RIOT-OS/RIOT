@@ -40,8 +40,8 @@ def testfunc(child):
 
     # Setup RIOT Node to connect to host systems TCP Server
     child.sendline('gnrc_tcp_tcb_init')
-    child.sendline('gnrc_tcp_open_active [{}]:{} 0'.format(target_addr, str(port)))
-    child.expect_exact('gnrc_tcp_open_active: returns 0')
+    child.sendline('gnrc_tcp_open [{}]:{} 0'.format(target_addr, str(port)))
+    child.expect_exact('gnrc_tcp_open: returns 0')
 
     # Send data from RIOT Node to Linux
     write_data_to_internal_buffer(child, data)

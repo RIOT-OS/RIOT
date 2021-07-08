@@ -30,6 +30,14 @@ in the tests directory.
 7) 07-endpoint_construction.py
     This test ensures the correctness of the endpoint construction.
 
+8) 08-return_codes.py
+    This test tries to trigger all documented return codes from GNRC_TCPs functions.
+
+9) 09-listen_accept_cycle.py
+    This test verifies that connection establishment via listen and accept can be repeated multiple
+    times.
+
+
 Setup
 ==========
 The test requires a tap-device setup. This can be achieved by running 'dist/tools/tapsetup/tapsetup'

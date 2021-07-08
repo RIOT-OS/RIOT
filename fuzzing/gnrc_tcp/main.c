@@ -17,13 +17,17 @@
 #include "net/ipv6/addr.h"
 #include "net/gnrc/pkt.h"
 
+#define TCB_QUEUE_SIZE 1
+#define ACCEPT_TIMEOUT_MS 60000
+
 static uint32_t demux = GNRC_NETREG_DEMUX_CTX_ALL;
 static gnrc_nettype_t ntype = GNRC_NETTYPE_TCP;
+static gnrc_tcp_tcb_queue_t queue = GNRC_TCP_TCB_QUEUE_INIT;
+static gnrc_tcp_tcb_t tcbs[TCB_QUEUE_SIZE];
 
 static void *tcploop(void *arg)
 {
     mutex_t *tcpmtx = arg;
-    gnrc_tcp_tcb_t tcb;
     gnrc_tcp_ep_t ep;
 
     if (gnrc_tcp_ep_from_str(&ep, "[" SERVER_ADDR "]")) {
@@ -31,16 +35,26 @@ static void *tcploop(void *arg)
     }
     ep.port = SERVER_PORT;
 
-    for (;;) {
-        gnrc_tcp_tcb_init(&tcb);
-        mutex_unlock(tcpmtx);
+    for (unsigned i = 0; i < TCB_QUEUE_SIZE; ++i) {
+        gnrc_tcp_tcb_init(&tcbs[i]);
+    }
+    mutex_unlock(tcpmtx);
 
-        int ret = gnrc_tcp_open_passive(&tcb, &ep);
-        if (!ret) {
-            errx(EXIT_FAILURE, "gnrc_tcp_open_passive failed: %d\n", ret);
+    int ret = gnrc_tcp_listen(&queue, tcbs, ARRAY_SIZE(tcbs), &ep);
+    if (ret) {
+        errx(EXIT_FAILURE, "gnrc_tcp_listen failed: %d\n", ret);
+    }
+
+    for (;;) {
+        gnrc_tcp_tcb_t *tcp = NULL;
+        ret = gnrc_tcp_accept(&queue, &tcp, ACCEPT_TIMEOUT_MS);
+        if (ret) {
+            errx(EXIT_FAILURE, "gnrc_tcp_accept failed: %d\n", ret);
         }
     }
 
+    /* Never reached but, for clean programming sake */
+    gnrc_tcp_stop_listen(&queue);
     return NULL;
 }
 
