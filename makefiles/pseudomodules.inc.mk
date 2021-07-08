@@ -110,7 +110,6 @@ PSEUDOMODULES += newlib
 PSEUDOMODULES += newlib_gnu_source
 PSEUDOMODULES += newlib_nano
 PSEUDOMODULES += nrf24l01p_ng_diagnostics
-PSEUDOMODULES += nrf802154_netdev_legacy
 PSEUDOMODULES += openthread
 PSEUDOMODULES += picolibc
 PSEUDOMODULES += picolibc_stdout_buffered
