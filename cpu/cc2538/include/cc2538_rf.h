@@ -29,14 +29,9 @@
 #include "net/ieee802154.h"
 #include "kernel_defines.h"
 
-#if !IS_USED(MODULE_CC2538_RF_NETDEV_LEGACY)
 #include "net/ieee802154/radio.h"
 #if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC)
 #include "net/netdev/ieee802154_submac.h"
-#endif
-#else
-#include "net/netdev.h"
-#include "net/netdev/ieee802154.h"
 #endif
 
 #include "net/netopt.h"
@@ -295,8 +290,6 @@ enum {
 typedef struct {
 #if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC)
     netdev_ieee802154_submac_t netdev;   /**< netdev parent struct */
-#elif IS_USED(MODULE_CC2538_RF_NETDEV_LEGACY)
-    netdev_ieee802154_t netdev;   /**< netdev parent struct */
 #endif
     uint8_t state;                /**< current state of the radio */
 } cc2538_rf_t;
