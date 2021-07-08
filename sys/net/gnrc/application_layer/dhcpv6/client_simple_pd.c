@@ -104,6 +104,24 @@ static void _configure_dhcpv6_client(void)
     }
 }
 
+void dhcpv6_client_conf_done(unsigned iface)
+{
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
+
+    /* inform upstream network about the subnet(s) now managed by this router */
+    if (IS_USED(MODULE_GNRC_IPV6_NIB_RIO)) {
+        gnrc_ipv6_nib_change_rtr_adv_rio_iface(netif, true);
+    }
+}
+
+void dhcpv6_client_conf_prefix_done(unsigned iface)
+{
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
+
+    /* start advertising subnet obtained via DHCPv6 */
+    gnrc_ipv6_nib_change_rtr_adv_iface(netif, true);
+}
+
 /**
  * @brief   The DHCPv6 client thread
  */
