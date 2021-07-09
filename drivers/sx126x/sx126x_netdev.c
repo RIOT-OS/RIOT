@@ -63,6 +63,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     }
 
     size_t pos = 0;
+
     /* Write payload buffer */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         if (iol->iol_len > 0) {
@@ -125,6 +126,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 static int _init(netdev_t *netdev)
 {
     sx126x_t *dev = (sx126x_t *)netdev;
+
     if (sx126x_is_stm32wl(dev)) {
 #if IS_USED(MODULE_SX126X_STM32WL)
         _dev = netdev;

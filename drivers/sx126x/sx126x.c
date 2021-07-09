@@ -87,7 +87,9 @@ static const uint16_t _bw_khz[3] = {
 
 static uint8_t _compute_ldro(sx126x_t *dev)
 {
-    uint32_t symbol_len = (uint32_t)(1 << dev->mod_params.sf) / _bw_khz[dev->mod_params.bw - SX126X_LORA_BW_125];
+    uint32_t symbol_len =
+        (uint32_t)(1 << dev->mod_params.sf) / _bw_khz[dev->mod_params.bw - SX126X_LORA_BW_125];
+
     if (symbol_len >= 16) {
         return 0x01;
     }

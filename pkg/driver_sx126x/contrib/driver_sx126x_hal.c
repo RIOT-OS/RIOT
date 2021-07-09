@@ -46,15 +46,14 @@
 #if IS_USED(MODULE_SX126X_STM32WL)
 static uint8_t sx126x_radio_wait_until_ready(sx126x_t *dev)
 {
-  if (dev->radio_sleep == true)
-  {
-    DEBUG("[sx126x_radio] : Wakeup radio \n");
-    sx126x_hal_wakeup(dev);
-  }
+    if (dev->radio_sleep == true) {
+        DEBUG("[sx126x_radio] : Wakeup radio \n");
+        sx126x_hal_wakeup(dev);
+    }
 
-  /* Wait until Busy/ BusyMS signal goes low */
-  while (((PWR->SR2 & PWR_SR2_RFBUSYMS) && ((PWR->SR2 & PWR_SR2_RFBUSYS))) == 1) {}
-  return 0;
+    /* Wait until Busy/ BusyMS signal goes low */
+    while (((PWR->SR2 & PWR_SR2_RFBUSYMS) && ((PWR->SR2 & PWR_SR2_RFBUSYS))) == 1) {}
+    return 0;
 }
 #endif
 
@@ -157,7 +156,7 @@ sx126x_hal_status_t sx126x_hal_reset(const void *context)
         RCC->CSR &= ~RCC_CSR_RFRST;
         ztimer_sleep(ZTIMER_USEC, 100);
         /* Wait while reset is done */
-        while((RCC->CSR & RCC_CSR_RFRSTF) != 0UL) {}
+        while ((RCC->CSR & RCC_CSR_RFRSTF) != 0UL) {}
 
         /* Asserts the reset signal of the Radio peripheral */
         PWR->SUBGHZSPICR |= PWR_SUBGHZSPICR_NSS;
