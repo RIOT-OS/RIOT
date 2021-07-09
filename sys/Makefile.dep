@@ -262,6 +262,10 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
     USEMODULE += netif
     USEMODULE += ipv6_addr
   endif
+
+  ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
+    USEMODULE += gnrc_netif_cmd_lora
+  endif
 endif
 
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
