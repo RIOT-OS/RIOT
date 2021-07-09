@@ -281,7 +281,7 @@ int _fopts_mlme_link_check_req(lorawan_buffer_t *buf)
 {
     if (buf) {
         assert(buf->index + GNRC_LORAWAN_CID_SIZE <= buf->size);
-        buf->data[buf->index++] = GNRC_LORAWAN_CID_LINK_CHECK_ANS;;
+        buf->data[buf->index++] = GNRC_LORAWAN_CID_LINK_CHECK_ANS;
     }
     return GNRC_LORAWAN_CID_SIZE;
 }
