@@ -62,15 +62,15 @@ void auto_init_kw41zrf(void)
 #if defined(MODULE_GNRC_GOMACH)
         gnrc_netif_gomach_create(&_netif[i], _kw41zrf_stacks[i], KW41ZRF_NETIF_STACKSIZE,
                                  KW41ZRF_NETIF_PRIO, "kw41zrf-gomach",
-                                 (netdev_t *)&kw41zrf_devs[i]);
+                                 &kw41zrf_devs[i].netdev.netdev);
 #elif defined(MODULE_GNRC_LWMAC)
         gnrc_netif_lwmac_create(&_netif[i], _kw41zrf_stacks[i], KW41ZRF_NETIF_STACKSIZE,
                                 KW41ZRF_NETIF_PRIO, "kw41zrf-lwmac",
-                                (netdev_t *)&kw41zrf_devs[i]);
+                                &kw41zrf_devs[i].netdev.netdev);
 #else
         gnrc_netif_ieee802154_create(&_netif[i], _kw41zrf_stacks[i], KW41ZRF_NETIF_STACKSIZE,
                                      KW41ZRF_NETIF_PRIO, "kw41zrf",
-                                     (netdev_t *)&kw41zrf_devs[i]);
+                                     &kw41zrf_devs[i].netdev.netdev);
 #endif
     }
 }

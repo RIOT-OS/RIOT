@@ -112,12 +112,12 @@ nrf24l01p_ng_state_t _state_from_netif(netopt_state_t state)
 
 static void _nrf24l01p_ng_irq_handler(void *_dev)
 {
-    nrf24l01p_ng_t *dev = (nrf24l01p_ng_t *)_dev;
+    nrf24l01p_ng_t *dev = _dev;
     /* Once the IRQ pin has triggered,
        do not congest the thread´s
        message queue with IRQ events */
     gpio_irq_disable(dev->params.pin_irq);
-    netdev_trigger_event_isr((netdev_t *)dev);
+    netdev_trigger_event_isr(&dev->netdev);
 }
 
 static void _isr_max_rt(nrf24l01p_ng_t *dev)
@@ -162,7 +162,7 @@ static void _isr_tx_ds(nrf24l01p_ng_t *dev)
 
 static int _init(netdev_t *netdev)
 {
-    nrf24l01p_ng_t *dev = (nrf24l01p_ng_t *)netdev;
+    nrf24l01p_ng_t *dev = container_of(netdev, nrf24l01p_ng_t, netdev);
     if (dev->params.config.cfg_data_rate >= NRF24L01P_NG_RF_DR_NUM_OF ||
         dev->params.config.cfg_crc == NRF24L01P_NG_CRC_0BYTE ||
         dev->params.config.cfg_channel >= NRF24L01P_NG_NUM_CHANNELS) {
@@ -299,7 +299,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         DEBUG_PUTS("[nrf24l01p_ng] Return upper frame estimation");
         return NRF24L01P_NG_ADDR_WIDTH + NRF24L01P_NG_MAX_PAYLOAD_WIDTH;
     }
-    nrf24l01p_ng_t *dev = (nrf24l01p_ng_t *)netdev;
+    nrf24l01p_ng_t *dev = container_of(netdev, nrf24l01p_ng_t, netdev);
     uint8_t pl_width;
     uint8_t status = nrf24l01p_ng_read_rx_pl_width(dev, &pl_width);
     uint8_t pno = NRF24L01P_NG_VAL_RX_P_NO(status);
@@ -373,7 +373,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         DEBUG_PUTS("[nrf24l01p_ng] No Tx address or no payload");
         return -ENOTSUP;
     }
-    nrf24l01p_ng_t *dev = (nrf24l01p_ng_t *)netdev;
+    nrf24l01p_ng_t *dev = container_of(netdev, nrf24l01p_ng_t, netdev);
     uint8_t pl_width = 0;
     const uint8_t bcast_addr[] = NRF24L01P_NG_BROADCAST_ADDR;
     uint8_t payload[NRF24L01P_NG_MAX_PAYLOAD_WIDTH];
@@ -457,7 +457,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
  */
 static void _isr(netdev_t *netdev)
 {
-    nrf24l01p_ng_t *dev = (nrf24l01p_ng_t *)netdev;
+    nrf24l01p_ng_t *dev = container_of(netdev, nrf24l01p_ng_t, netdev);
 
     nrf24l01p_ng_acquire(dev);
     gpio_irq_enable(dev->params.pin_irq);
@@ -517,7 +517,7 @@ static void _isr(netdev_t *netdev)
  */
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 {
-    nrf24l01p_ng_t *dev = (nrf24l01p_ng_t *)netdev;
+    nrf24l01p_ng_t *dev = container_of(netdev, nrf24l01p_ng_t, netdev);
 
     (void)max_len; /* only used in assert() */
     switch (opt) {
@@ -608,7 +608,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
  */
 static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 {
-    nrf24l01p_ng_t *dev = (nrf24l01p_ng_t *)netdev;
+    nrf24l01p_ng_t *dev = container_of(netdev, nrf24l01p_ng_t, netdev);
 
     switch (opt) {
         case NETOPT_ADDRESS: {

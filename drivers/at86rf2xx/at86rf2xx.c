@@ -283,7 +283,7 @@ size_t at86rf2xx_tx_load(at86rf2xx_t *dev, const uint8_t *data,
 
 void at86rf2xx_tx_exec(at86rf2xx_t *dev)
 {
-    netdev_t *netdev = (netdev_t *)dev;
+    netdev_t *netdev = &dev->netdev.netdev;
 
 #if AT86RF2XX_HAVE_RETRIES
     dev->tx_retries = -1;

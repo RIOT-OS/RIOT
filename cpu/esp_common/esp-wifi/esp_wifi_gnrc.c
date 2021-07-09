@@ -45,7 +45,7 @@ void auto_init_esp_wifi (void)
                                ESP_WIFI_PRIO,
 #endif
                                "netif-esp-wifi",
-                               (netdev_t *)&_esp_wifi_dev);
+                               &_esp_wifi_dev.netdev);
 }
 
 #else /* defined(MODULE_ESP_WIFI) && defined(MODULE_GNRC_NETIF_ETHERNET) */

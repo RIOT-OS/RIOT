@@ -48,7 +48,7 @@ static void _print_info(netdev_t *netdev);
 static void test_init(void)
 {
     const socket_zep_params_t *p = &socket_zep_params[0];
-    netdev_t *netdev = (netdev_t *)(&_dev);
+    netdev_t *netdev = &_dev.netdev.netdev;
 
     printf("Initializing socket ZEP with (local: [%s]:%s, remote: [%s]:%s)\n",
            p->local_addr, p->local_port, p->remote_addr, p->remote_port);
@@ -60,7 +60,7 @@ static void test_init(void)
 
 static void test_send__iolist_NULL(void)
 {
-    netdev_t *netdev = (netdev_t *)(&_dev);
+    netdev_t *netdev = &_dev.netdev.netdev;
 
     puts("Send zero-length packet");
     int res = netdev->driver->send(netdev, NULL);
@@ -77,7 +77,7 @@ static void test_send__iolist_not_NULL(void)
 
     iolist[0].iol_next = &iolist[1];
 
-    netdev_t *netdev = (netdev_t *)(&_dev);
+    netdev_t *netdev = &_dev.netdev.netdev;
 
     puts("Send 'Hello\\0World\\0'");
     int res =  netdev->driver->send(netdev, iolist);
@@ -91,7 +91,7 @@ static void test_recv(void)
 {
     puts("Waiting for an incoming message (use `make test`)");
     while (1) {
-        netdev_t *netdev = (netdev_t *)(&_dev);
+        netdev_t *netdev = &_dev.netdev.netdev;
         msg_t msg;
 
         msg_receive(&msg);

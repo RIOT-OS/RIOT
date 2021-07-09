@@ -31,7 +31,7 @@
 
 void mrf24j40_setup(mrf24j40_t *dev, const mrf24j40_params_t *params, uint8_t index)
 {
-    netdev_t *netdev = (netdev_t *)dev;
+    netdev_t *netdev = &dev->netdev.netdev;
 
     netdev->driver = &mrf24j40_driver;
     /* initialize device descriptor */
@@ -136,8 +136,7 @@ size_t mrf24j40_tx_load(mrf24j40_t *dev, uint8_t *data, size_t len, size_t offse
 
 void mrf24j40_tx_exec(mrf24j40_t *dev)
 {
-    netdev_t *netdev = (netdev_t *)dev;
-
+    netdev_t *netdev = &dev->netdev.netdev;
 
     dev->tx_frame_len = dev->tx_frame_len - IEEE802154_FCS_LEN;
     /* write frame length field in FIFO */

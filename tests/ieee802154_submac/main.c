@@ -65,7 +65,7 @@ extern const netdev_driver_t netdev_submac_driver;
 static void _netdev_isr_handler(event_t *event)
 {
     (void)event;
-    netdev_t *netdev = (netdev_t *)&netdev_submac;
+    netdev_t *netdev = &netdev_submac.dev.netdev;
 
     netdev->driver->isr(netdev);
 }
@@ -207,7 +207,7 @@ static int _init(void)
 {
     ieee802154_hal_test_init_devs();
 
-    netdev_t *dev = (netdev_t *)&netdev_submac;
+    netdev_t *dev = &netdev_submac.dev.netdev;
 
     dev->event_callback = _event_cb;
     netdev_ieee802154_submac_init(&netdev_submac,
@@ -254,7 +254,7 @@ static int send(uint8_t *dst, size_t dst_len,
     iol_hdr.iol_base = mhr;
     iol_hdr.iol_len = mhr_len;
 
-    netdev_t *dev = (netdev_t *)&netdev_submac;
+    netdev_t *dev = &netdev_submac.dev.netdev;
 
     dev->driver->send(dev, &iol_hdr);
     return 0;

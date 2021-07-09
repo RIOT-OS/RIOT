@@ -56,7 +56,7 @@ static void kw2xrf_set_address(kw2xrf_t *dev)
 
 void kw2xrf_setup(kw2xrf_t *dev, const kw2xrf_params_t *params)
 {
-    netdev_t *netdev = (netdev_t *)dev;
+    netdev_t *netdev = &dev->netdev.netdev;
 
     netdev->driver = &kw2xrf_driver;
     /* initialize device descriptor */

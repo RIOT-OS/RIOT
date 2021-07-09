@@ -97,7 +97,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
-    esp_now_netdev_t *esp_now = (esp_now_netdev_t*)dev;
+    esp_now_netdev_t *esp_now = container_of(dev, esp_now_netdev_t, netdev);
 
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
     if (bytes_expected <= 0) {

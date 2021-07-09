@@ -47,8 +47,8 @@
  */
 static void _rx_cb(void *arg, uint8_t c)
 {
-    rn2xx3_t *dev = (rn2xx3_t *)arg;
-    netdev_t *netdev = (netdev_t *)dev;
+    rn2xx3_t *dev = arg;
+    netdev_t *netdev = &dev->netdev;
 
     /* Avoid overflow of module response buffer */
     if (dev->resp_size >= RN2XX3_MAX_BUF) {
@@ -127,7 +127,7 @@ static void _rx_cb(void *arg, uint8_t c)
 static void _sleep_timer_cb(void *arg)
 {
     DEBUG("[rn2xx3] exit sleep\n");
-    rn2xx3_t *dev = (rn2xx3_t *)arg;
+    rn2xx3_t *dev = arg;
     dev->int_state = RN2XX3_INT_STATE_IDLE;
 }
 

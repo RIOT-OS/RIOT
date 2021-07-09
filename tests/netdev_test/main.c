@@ -138,7 +138,7 @@ static int test_receive(void)
                                                         thread_getpid());
     msg_t msg;
 
-    if (_dev.netdev.event_callback == NULL) {
+    if (_dev.netdev.netdev.event_callback == NULL) {
         puts("Device's event_callback not set");
         return 0;
     }
@@ -154,7 +154,7 @@ static int test_receive(void)
     /* register for GNRC_NETTYPE_UNDEF */
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &me);
     /* fire ISR event */
-    netdev_trigger_event_isr((netdev_t *)&_dev.netdev);
+    netdev_trigger_event_isr(&_dev.netdev.netdev);
     /* wait for packet from MAC layer*/
     msg_receive(&msg);
     /* check message */
@@ -261,7 +261,7 @@ int main(void)
     netdev_test_set_get_cb(&_dev, NETOPT_ADDRESS, _dev_get_addr);
     netdev_test_set_set_cb(&_dev, NETOPT_ADDRESS, _dev_set_addr);
     gnrc_netif_ethernet_create(&_netif, _mac_stack, _MAC_STACKSIZE, _MAC_PRIO,
-                                         "netdev_test", (netdev_t *)&_dev);
+                                         "netdev_test", &_dev.netdev.netdev);
     _mac_pid = _netif.pid;
 
     /* test execution */

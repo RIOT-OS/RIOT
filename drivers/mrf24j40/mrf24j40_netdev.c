@@ -39,16 +39,19 @@
 
 static void _irq_handler(void *arg)
 {
-    netdev_t *dev = (netdev_t *) arg;
+    netdev_t *dev = arg;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(dev, netdev_ieee802154_t, netdev);
+    mrf24j40_t *mrf24j40 = container_of(netdev_ieee802154, mrf24j40_t, netdev);
 
     netdev_trigger_event_isr(dev);
 
-    ((mrf24j40_t *)arg)->irq_flag = 1;
+    mrf24j40->irq_flag = 1;
 }
 
 static int _init(netdev_t *netdev)
 {
-    mrf24j40_t *dev = (mrf24j40_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    mrf24j40_t *dev = container_of(netdev_ieee802154, mrf24j40_t, netdev);
 
     /* initialize GPIOs */
     spi_init_cs(dev->params.spi, dev->params.cs_pin);
@@ -66,7 +69,8 @@ static int _init(netdev_t *netdev)
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
-    mrf24j40_t *dev = (mrf24j40_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    mrf24j40_t *dev = container_of(netdev_ieee802154, mrf24j40_t, netdev);
     size_t len = 0;
 
     mrf24j40_tx_prepare(dev);
@@ -104,7 +108,8 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
-    mrf24j40_t *dev = (mrf24j40_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    mrf24j40_t *dev = container_of(netdev_ieee802154, mrf24j40_t, netdev);
     uint8_t phr;
     size_t pkt_len;
     int res = -ENOBUFS;
@@ -161,7 +166,8 @@ static netopt_state_t _get_state(mrf24j40_t *dev)
 
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 {
-    mrf24j40_t *dev = (mrf24j40_t *) netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    mrf24j40_t *dev = container_of(netdev_ieee802154, mrf24j40_t, netdev);
 
     if (netdev == NULL) {
         return -ENODEV;
@@ -330,8 +336,8 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         default:
             /* try netdev settings */
-            res = netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt,
-                                         val, max_len);
+            res = netdev_ieee802154_get(container_of(netdev, netdev_ieee802154_t, netdev),
+                                        opt, val, max_len);
     }
     return res;
 }
@@ -361,7 +367,8 @@ static int _set_state(mrf24j40_t *dev, netopt_state_t state)
 
 static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 {
-    mrf24j40_t *dev = (mrf24j40_t *) netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    mrf24j40_t *dev = container_of(netdev_ieee802154, mrf24j40_t, netdev);
     int res = -ENOTSUP;
 
     if (dev == NULL) {
@@ -513,15 +520,16 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
     }
     /* try netdev building flags */
     if (res == -ENOTSUP) {
-        res = netdev_ieee802154_set((netdev_ieee802154_t *)netdev, opt,
-                                     val, len);
+        res = netdev_ieee802154_set(container_of(netdev, netdev_ieee802154_t, netdev),
+                                    opt, val, len);
     }
     return res;
 }
 
 static void _isr(netdev_t *netdev)
 {
-    mrf24j40_t *dev = (mrf24j40_t *) netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    mrf24j40_t *dev = container_of(netdev_ieee802154, mrf24j40_t, netdev);
     /* update pending bits */
     mrf24j40_update_tasks(dev);
     DEBUG("[mrf24j40] INTERRUPT (pending: %x),\n", dev->pending);

@@ -158,7 +158,7 @@ void _net_init(void)
     netdev_test_set_recv_cb(&netdev, _netdev_recv);
     netdev_test_set_isr_cb(&netdev, _netdev_isr);
     /* netdev needs to be set-up */
-    expect(netdev.netdev.driver);
+    expect(netdev.netdev.netdev.driver);
 #if LWIP_IPV4
     ip4_addr_t local4, mask4, gw4;
     local4.addr = _TEST_ADDR4_LOCAL;
@@ -238,7 +238,7 @@ bool _inject_4packet(uint32_t src, uint32_t dst, uint16_t src_port,
     const uint16_t udp_len = (uint16_t)(sizeof(udp_hdr_t) + data_len);
     (void)netif;
 
-    _get_addr((netdev_t *)&netdev, &eth_hdr->dst, sizeof(eth_hdr->dst));
+    _get_addr(&netdev.netdev.netdev, &eth_hdr->dst, sizeof(eth_hdr->dst));
     eth_hdr->type = byteorder_htons(ETHERTYPE_IPV4);
     IPH_VHL_SET(ip_hdr, 4, 5);
     IPH_TOS_SET(ip_hdr, 0);
@@ -260,7 +260,7 @@ bool _inject_4packet(uint32_t src, uint32_t dst, uint16_t src_port,
     _netdev_buffer_size = sizeof(ethernet_hdr_t) + sizeof(struct ip_hdr) +
                           sizeof(udp_hdr_t) + data_len;
     mutex_unlock(&_netdev_buffer_mutex);
-    netdev_trigger_event_isr((netdev_t *)&netdev);
+    netdev_trigger_event_isr(&netdev.netdev.netdev);
 
     return true;
 #else
@@ -284,7 +284,7 @@ bool _inject_6packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
     uint16_t csum = 0;
     (void)netif;
 
-    _get_addr((netdev_t *)&netdev, &eth_hdr->dst, sizeof(eth_hdr->dst));
+    _get_addr(&netdev.netdev.netdev, &eth_hdr->dst, sizeof(eth_hdr->dst));
     eth_hdr->type = byteorder_htons(ETHERTYPE_IPV6);
     ipv6_hdr_set_version(ipv6_hdr);
     ipv6_hdr->len = byteorder_htons(udp_len);
@@ -309,7 +309,7 @@ bool _inject_6packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
     _netdev_buffer_size = sizeof(ethernet_hdr_t) + sizeof(ipv6_hdr_t) +
                           sizeof(udp_hdr_t) + data_len;
     mutex_unlock(&_netdev_buffer_mutex);
-    netdev_trigger_event_isr((netdev_t *)&netdev);
+    netdev_trigger_event_isr(&netdev.netdev.netdev);
 
     return true;
 #else

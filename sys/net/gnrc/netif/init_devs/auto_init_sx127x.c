@@ -64,12 +64,12 @@ void auto_init_sx127x(void)
 
             gnrc_netif_lorawan_create(&_netif[i], sx127x_stacks[i],
                                       SX127X_STACKSIZE, SX127X_PRIO,
-                                      "sx127x", (netdev_t *)&sx127x_devs[i]);
+                                      "sx127x", &sx127x_devs[i].netdev);
         }
         else {
             gnrc_netif_raw_create(&_netif[i], sx127x_stacks[i],
                                   SX127X_STACKSIZE, SX127X_PRIO,
-                                  "sx127x", (netdev_t *)&sx127x_devs[i]);
+                                  "sx127x", &sx127x_devs[i].netdev);
         }
     }
 }

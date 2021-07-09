@@ -104,7 +104,8 @@ static size_t _prep_vector(socket_zep_t *dev, const iolist_t *iolist,
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
-    socket_zep_t *dev = (socket_zep_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    socket_zep_t *dev = container_of(netdev_ieee802154, socket_zep_t, netdev);
     unsigned n = iolist_count(iolist);
     struct iovec v[n + 2];
     int res;
@@ -179,7 +180,8 @@ static inline bool _dst_not_me(socket_zep_t *dev, const void *buf)
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
-    socket_zep_t *dev = (socket_zep_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    socket_zep_t *dev = container_of(netdev_ieee802154, socket_zep_t, netdev);
     int size = 0;
 
     DEBUG("socket_zep::recv(%p, %p, %u, %p)\n", (void *)netdev, buf,
@@ -263,7 +265,8 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 static void _isr(netdev_t *netdev)
 {
     if (netdev->event_callback) {
-        socket_zep_t *dev = (socket_zep_t *)netdev;
+        netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+        socket_zep_t *dev = container_of(netdev_ieee802154, socket_zep_t, netdev);
 
         DEBUG("socket_zep::isr: firing %u\n", (unsigned)dev->last_event);
         netdev->event_callback(netdev, dev->last_event);
@@ -275,7 +278,7 @@ static void _socket_isr(int fd, void *arg)
 {
     (void)fd;
     (void)arg;
-    netdev_t *netdev = (netdev_t *)arg;
+    netdev_t *netdev = arg;
 
     DEBUG("socket_zep::_socket_isr: %d, %p (netdev == %p)\n",
           fd, arg, (void *)netdev);
@@ -283,7 +286,8 @@ static void _socket_isr(int fd, void *arg)
         return;
     }
     if (netdev->event_callback) {
-        socket_zep_t *dev = (socket_zep_t *)netdev;
+        netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+        socket_zep_t *dev = container_of(netdev_ieee802154, socket_zep_t, netdev);
 
         dev->last_event = NETDEV_EVENT_RX_COMPLETE;
         netdev_trigger_event_isr(netdev);
@@ -292,7 +296,8 @@ static void _socket_isr(int fd, void *arg)
 
 static int _init(netdev_t *netdev)
 {
-    socket_zep_t *dev = (socket_zep_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    socket_zep_t *dev = container_of(netdev_ieee802154, socket_zep_t, netdev);
 
     netdev_ieee802154_reset(&dev->netdev);
 
@@ -305,14 +310,15 @@ static int _init(netdev_t *netdev)
 static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
     assert(netdev != NULL);
-    return netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt, value, max_len);
+    return netdev_ieee802154_get(container_of(netdev, netdev_ieee802154_t, netdev),
+                                 opt, value, max_len);
 }
 
 static int _set(netdev_t *netdev, netopt_t opt, const void *value,
                 size_t value_len)
 {
     assert(netdev != NULL);
-    return netdev_ieee802154_set((netdev_ieee802154_t *)netdev, opt,
+    return netdev_ieee802154_set(container_of(netdev, netdev_ieee802154_t, netdev), opt,
                                   value, value_len);
 }
 

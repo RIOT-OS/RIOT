@@ -63,7 +63,7 @@ void auto_init_atwinc15x0(void)
         gnrc_netif_ethernet_create(&_netif[i], stack[i],
                                    ATWINC15X0_MAC_STACKSIZE,
                                    ATWINC15X0_MAC_PRIO, "atwinc15x0",
-                                   (netdev_t *)&dev[i]);
+                                   &dev[i].netdev);
     }
 }
 

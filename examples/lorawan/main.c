@@ -129,13 +129,13 @@ int main(void)
     /* Initialize the radio driver */
 #if IS_USED(MODULE_SX127X)
     sx127x_setup(&sx127x, &sx127x_params[0], 0);
-    loramac.netdev = (netdev_t *)&sx127x;
+    loramac.netdev = &sx127x.netdev;
     loramac.netdev->driver = &sx127x_driver;
 #endif
 
 #if IS_USED(MODULE_SX126X)
     sx126x_setup(&sx126x, &sx126x_params[0], 0);
-    loramac.netdev = (netdev_t *)&sx126x;
+    loramac.netdev = &sx126x.netdev;
     loramac.netdev->driver = &sx126x_driver;
 #endif
 

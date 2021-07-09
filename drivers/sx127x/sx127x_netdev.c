@@ -48,7 +48,7 @@ void _on_dio3_irq(void *arg);
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     DEBUG("[sx127x] Sending packet now.\n");
-    sx127x_t *dev = (sx127x_t *)netdev;
+    sx127x_t *dev = container_of(netdev, sx127x_t, netdev);
 
     if (sx127x_get_state(dev) == SX127X_RF_TX_RUNNING) {
         DEBUG("[sx127x] Cannot send packet: radio already in transmitting "
@@ -107,7 +107,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
-    sx127x_t *dev = (sx127x_t *)netdev;
+    sx127x_t *dev = container_of(netdev, sx127x_t, netdev);
     volatile uint8_t irq_flags = 0;
     uint8_t size = 0;
 
@@ -205,7 +205,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 static int _init(netdev_t *netdev)
 {
-    sx127x_t *sx127x = (sx127x_t *)netdev;
+    sx127x_t *sx127x = container_of(netdev, sx127x_t, netdev);
 
     sx127x->irq = 0;
     sx127x_radio_settings_t settings;
@@ -234,7 +234,7 @@ static int _init(netdev_t *netdev)
 
 static void _isr(netdev_t *netdev)
 {
-    sx127x_t *dev = (sx127x_t *)netdev;
+    sx127x_t *dev = container_of(netdev, sx127x_t, netdev);
 
     uint8_t interruptReg = sx127x_reg_read(dev, SX127X_REG_LR_IRQFLAGS);
 
@@ -261,7 +261,7 @@ static void _isr(netdev_t *netdev)
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 {
     (void)max_len;   /* unused when compiled without debug, assert empty */
-    sx127x_t *dev = (sx127x_t *)netdev;
+    sx127x_t *dev = container_of(netdev, sx127x_t, netdev);
 
     if (dev == NULL) {
         return -ENODEV;
@@ -360,7 +360,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 {
     (void)len; /* unused when compiled without debug, assert empty */
 
-    sx127x_t *dev = (sx127x_t *)netdev;
+    sx127x_t *dev = container_of(netdev, sx127x_t, netdev);
     int res = -ENOTSUP;
 
     if (dev == NULL) {
@@ -577,8 +577,8 @@ static int _get_state(sx127x_t *dev, void *val)
 
 void _on_dio0_irq(void *arg)
 {
-    sx127x_t *dev = (sx127x_t *)arg;
-    netdev_t *netdev = (netdev_t *)&dev->netdev;
+    sx127x_t *dev = arg;
+    netdev_t *netdev = &dev->netdev;
 
     switch (dev->settings.state) {
     case SX127X_RF_RX_RUNNING:
@@ -612,8 +612,8 @@ void _on_dio0_irq(void *arg)
 void _on_dio1_irq(void *arg)
 {
     /* Get interrupt context */
-    sx127x_t *dev = (sx127x_t *)arg;
-    netdev_t *netdev = (netdev_t *)&dev->netdev;
+    sx127x_t *dev = arg;
+    netdev_t *netdev = &dev->netdev;
 
     switch (dev->settings.state) {
     case SX127X_RF_RX_RUNNING:
@@ -652,8 +652,8 @@ void _on_dio1_irq(void *arg)
 void _on_dio2_irq(void *arg)
 {
     /* Get interrupt context */
-    sx127x_t *dev = (sx127x_t *)arg;
-    netdev_t *netdev = (netdev_t *)dev;
+    sx127x_t *dev = arg;
+    netdev_t *netdev = &dev->netdev;
 
     switch (dev->settings.state) {
     case SX127X_RF_RX_RUNNING:
@@ -705,8 +705,8 @@ void _on_dio2_irq(void *arg)
 void _on_dio3_irq(void *arg)
 {
     /* Get interrupt context */
-    sx127x_t *dev = (sx127x_t *)arg;
-    netdev_t *netdev = (netdev_t *)dev;
+    sx127x_t *dev = arg;
+    netdev_t *netdev = &dev->netdev;
 
     switch (dev->settings.state) {
     case SX127X_RF_CAD:

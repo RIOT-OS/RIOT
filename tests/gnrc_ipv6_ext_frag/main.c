@@ -691,7 +691,7 @@ int main(void)
     int res = gnrc_netif_raw_create(&_netif, mock_netif_stack,
                                     sizeof(mock_netif_stack),
                                     GNRC_NETIF_PRIO, "mock_netif",
-                                    (netdev_t *)&mock_netdev);
+                                    &mock_netdev.netdev.netdev);
     mock_netif = &_netif;
     assert(res == 0);
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);

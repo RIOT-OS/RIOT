@@ -59,7 +59,7 @@ void auto_init_ethos(void)
 
         /* initialize netdev<->gnrc adapter state */
         gnrc_netif_ethernet_create(&_netif[i], _netdev_eth_stack[i], ETHOS_MAC_STACKSIZE,
-                                   ETHOS_MAC_PRIO, "ethos", (netdev_t *)&ethos[i]);
+                                   ETHOS_MAC_PRIO, "ethos", &ethos[i].netdev);
     }
 }
 /** @} */

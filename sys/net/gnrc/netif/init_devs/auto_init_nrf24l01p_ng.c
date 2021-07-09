@@ -77,7 +77,7 @@ void auto_init_nrf24l01p_ng(void)
                                        NRF24L01P_NG_MAC_STACKSIZE,
                                        NRF24L01P_NG_MAC_PRIO,
                                        "nrf24l01p_ng",
-                                       (netdev_t *)&_nrf24l01p_ng_devs[i]);
+                                       &_nrf24l01p_ng_devs[i].netdev);
     }
 }
 

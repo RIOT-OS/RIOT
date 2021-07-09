@@ -156,7 +156,7 @@ static int _nrf24l01p_ng_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     assert(pkt);
     assert(netif->dev);
 
-    netdev_t *netdev = (netdev_t *)netif->dev;
+    netdev_t *netdev = netif->dev;
     gnrc_netif_hdr_t *netif_hdr = (gnrc_netif_hdr_t *)pkt->data;
     if (!netif_hdr) {
         return -EBADMSG;
@@ -190,7 +190,7 @@ static int _nrf24l01p_ng_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     uint8_t src[1 + NRF24L01P_NG_ADDR_WIDTH];
     src[0] = NRF24L01P_NG_ADDR_WIDTH;
     memcpy(src + 1,
-           NRF24L01P_NG_ADDR_P1((nrf24l01p_ng_t *)netdev),
+           NRF24L01P_NG_ADDR_P1(container_of(netdev, nrf24l01p_ng_t, netdev)),
            NRF24L01P_NG_ADDR_WIDTH);
     iolist_t iolist_src_addr = {
         .iol_next = ((iolist_t *)pkt->next),

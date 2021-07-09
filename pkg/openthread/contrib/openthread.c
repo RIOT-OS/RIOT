@@ -76,19 +76,19 @@ void openthread_bootstrap(void)
     /* setup netdev modules */
 #ifdef MODULE_AT86RF2XX
     at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0], 0);
-    netdev_t *netdev = (netdev_t *) &at86rf2xx_dev;
+    netdev_t *netdev = &at86rf2xx_dev.netdev.netdev;
 #endif
 #ifdef MODULE_KW41ZRF
     kw41zrf_setup(&kw41z_dev, 0);
-    netdev_t *netdev = (netdev_t *) &kw41z_dev;
+    netdev_t *netdev = &kw41z_dev.netdev.netdev;
 #endif
 #ifdef MODULE_CC2538_RF
     cc2538_setup(&cc2538_rf_dev);
-    netdev_t *netdev = (netdev_t*) &cc2538_rf_dev;
+    netdev_t *netdev = &cc2538_rf_dev.netdev.dev.netdev;
 #endif
 #ifdef MODULE_NRF802154
     nrf802154_setup(&nrf802154_dev);
-    netdev_t *netdev = (netdev_t*) &nrf802154_dev;
+    netdev_t *netdev = &nrf802154_dev.netdev.dev.netdev;
 #endif
 
     openthread_radio_init(netdev, tx_buf, rx_buf);

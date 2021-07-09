@@ -95,7 +95,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
 
 void *_recv_thread(void *arg)
 {
-    netdev_t *netdev = (netdev_t *)arg;
+    netdev_t *netdev = arg;
 
     static msg_t _msg_queue[SX126X_MSG_QUEUE];
 
@@ -295,7 +295,7 @@ int sx126x_cmd(int argc, char **argv)
         return -1;
     }
 
-    netdev_t *netdev = (netdev_t *)&sx126x;
+    netdev_t *netdev = &sx126x.netdev;
 
     if (!strcmp("get", argv[1])) {
         return sx126x_get_cmd(netdev, argc, argv);
@@ -321,7 +321,7 @@ static const shell_command_t shell_commands[] = {
 int main(void)
 {
     sx126x_setup(&sx126x, &sx126x_params[0], 0);
-    netdev_t *netdev = (netdev_t *)&sx126x;
+    netdev_t *netdev = &sx126x.netdev;
 
     netdev->driver = &sx126x_driver;
 

@@ -180,7 +180,7 @@ void lwip_bootstrap(void)
 #ifdef MODULE_NETDEV_TAP
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         netdev_tap_setup(&netdev_taps[i], &netdev_tap_params[i]);
-        if (netif_add_noaddr(&netif[i], &netdev_taps[i], lwip_netdev_init,
+        if (netif_add_noaddr(&netif[i], &netdev_taps[i].netdev, lwip_netdev_init,
                              tcpip_input) == NULL) {
             DEBUG("Could not add netdev_tap device\n");
             return;
@@ -189,7 +189,7 @@ void lwip_bootstrap(void)
 #elif defined(MODULE_MRF24J40)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         mrf24j40_setup(&mrf24j40_devs[i], &mrf24j40_params[i], i);
-        if (netif_add_noaddr(&netif[i], &mrf24j40_devs[i], lwip_netdev_init,
+        if (netif_add_noaddr(&netif[i], &mrf24j40_devs[i].netdev.netdev, lwip_netdev_init,
                              tcpip_6lowpan_input) == NULL) {
             DEBUG("Could not add mrf24j40 device\n");
             return;
@@ -198,7 +198,7 @@ void lwip_bootstrap(void)
 #elif defined(MODULE_AT86RF2XX)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         at86rf2xx_setup(&at86rf2xx_devs[i], &at86rf2xx_params[i], i);
-        if (netif_add_noaddr(&netif[i], &at86rf2xx_devs[i], lwip_netdev_init,
+        if (netif_add_noaddr(&netif[i], &at86rf2xx_devs[i].netdev.netdev, lwip_netdev_init,
                              tcpip_6lowpan_input) == NULL) {
             DEBUG("Could not add at86rf2xx device\n");
             return;
@@ -207,7 +207,7 @@ void lwip_bootstrap(void)
 #elif defined(MODULE_ATWINC15X0)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         atwinc15x0_setup(&atwinc15x0_devs[i], &atwinc15x0_params[i]);
-        if (netif_add_noaddr(&netif[0], &atwinc15x0_devs[i], lwip_netdev_init,
+        if (netif_add_noaddr(&netif[0], &atwinc15x0_devs[i].netdev, lwip_netdev_init,
                              tcpip_input) == NULL) {
             DEBUG("Could not add atwinc15x0 device\n");
             return;
@@ -216,7 +216,7 @@ void lwip_bootstrap(void)
 #elif defined(MODULE_ENC28J60)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         enc28j60_setup(&enc28j60_devs[i], &enc28j60_params[i], i);
-        if (netif_add_noaddr(&netif[0], &enc28j60_devs[i], lwip_netdev_init,
+        if (netif_add_noaddr(&netif[0], &enc28j60_devs[i].netdev, lwip_netdev_init,
                              tcpip_input) == NULL) {
             DEBUG("Could not add enc28j60 device\n");
             return;
@@ -225,7 +225,7 @@ void lwip_bootstrap(void)
 #elif defined(MODULE_SOCKET_ZEP)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         socket_zep_setup(&socket_zep_devs[i], &socket_zep_params[i], i);
-        if (netif_add_noaddr(&netif[i], &socket_zep_devs[i], lwip_netdev_init,
+        if (netif_add_noaddr(&netif[i], &socket_zep_devs[i].netdev.netdev, lwip_netdev_init,
                              tcpip_6lowpan_input) == NULL) {
             DEBUG("Could not add socket_zep device\n");
             return;
@@ -234,7 +234,7 @@ void lwip_bootstrap(void)
 #elif (IS_USED(MODULE_ESP_ETH) || IS_USED(MODULE_ESP_WIFI))
 #if IS_USED(MODULE_ESP_ETH)
     esp_eth_setup(&_esp_eth_dev);
-    if (netif_add_noaddr(&netif[0], &_esp_eth_dev, lwip_netdev_init,
+    if (netif_add_noaddr(&netif[0], &_esp_eth_dev.netdev, lwip_netdev_init,
                          tcpip_input) == NULL) {
         DEBUG("Could not add esp_eth device\n");
         return;
@@ -242,7 +242,7 @@ void lwip_bootstrap(void)
 #endif
 #if IS_USED(MODULE_ESP_WIFI)
     esp_wifi_setup(&_esp_wifi_dev);
-    if (netif_add_noaddr(&netif[ESP_WIFI_INDEX], &_esp_wifi_dev, lwip_netdev_init,
+    if (netif_add_noaddr(&netif[ESP_WIFI_INDEX], &_esp_wifi_dev.netdev, lwip_netdev_init,
                          tcpip_input) == NULL) {
         DEBUG("Could not add esp_wifi device\n");
         return;
@@ -264,7 +264,7 @@ void lwip_bootstrap(void)
     }
 #elif defined(MODULE_NRF802154)
     nrf802154_setup(&nrf802154_dev);
-    if (netif_add_noaddr(&netif[0], &nrf802154_dev, lwip_netdev_init,
+    if (netif_add_noaddr(&netif[0], &nrf802154_dev.netdev.dev.netdev, lwip_netdev_init,
                          tcpip_6lowpan_input) == NULL) {
         DEBUG("Could not add nrf802154 device\n");
         return;

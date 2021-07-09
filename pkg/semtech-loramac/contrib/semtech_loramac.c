@@ -569,16 +569,18 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
         case NETDEV_EVENT_FHSS_CHANGE_CHANNEL:
             DEBUG("[semtech-loramac] FHSS channel change\n");
             if(semtech_loramac_radio_events.FhssChangeChannel) {
-                semtech_loramac_radio_events.FhssChangeChannel((
-                            (sx127x_t *)dev)->_internal.last_channel);
+                sx127x_t *sx127x = container_of(dev, sx127x_t, netdev);
+                semtech_loramac_radio_events.FhssChangeChannel(
+                            sx127x->_internal.last_channel);
             }
             break;
 
         case NETDEV_EVENT_CAD_DONE:
             DEBUG("[semtech-loramac] test: CAD done\n");
+            sx127x_t *sx127x = container_of(dev, sx127x_t, netdev);
             if(semtech_loramac_radio_events.CadDone) {
-                semtech_loramac_radio_events.CadDone((
-                            (sx127x_t *)dev)->_internal.is_last_cad_success);
+                semtech_loramac_radio_events.CadDone(
+                            sx127x->_internal.is_last_cad_success);
             }
             break;
 #endif

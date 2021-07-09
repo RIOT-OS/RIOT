@@ -56,7 +56,7 @@ const netdev_driver_t cc2420_driver = {
 
 static void _irq_handler(void *arg)
 {
-    netdev_t *dev = (netdev_t *)arg;
+    netdev_t *dev = arg;
 
     netdev_trigger_event_isr(dev);
 }
@@ -96,7 +96,8 @@ static inline int opt_state(void *buf, bool cond)
 
 static int _init(netdev_t *netdev)
 {
-    cc2420_t *dev = (cc2420_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    cc2420_t *dev = container_of(netdev_ieee802154, cc2420_t, netdev);
 
     uint16_t reg;
 
@@ -135,7 +136,7 @@ static int _init(netdev_t *netdev)
         return -1;
     }
 
-    return cc2420_init((cc2420_t *)dev);
+    return cc2420_init(dev);
 }
 
 static void _isr(netdev_t *netdev)
@@ -145,13 +146,15 @@ static void _isr(netdev_t *netdev)
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
-    cc2420_t *dev = (cc2420_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    cc2420_t *dev = container_of(netdev_ieee802154, cc2420_t, netdev);
     return (int)cc2420_send(dev, iolist);
 }
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
-    cc2420_t *dev = (cc2420_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    cc2420_t *dev = container_of(netdev_ieee802154, cc2420_t, netdev);
     return (int)cc2420_rx(dev, buf, len, info);
 }
 
@@ -161,7 +164,8 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
         return -ENODEV;
     }
 
-    cc2420_t *dev = (cc2420_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    cc2420_t *dev = container_of(netdev_ieee802154, cc2420_t, netdev);
 
     int ext = netdev_ieee802154_get(&dev->netdev, opt, val, max_len);
     if (ext > 0) {
@@ -230,7 +234,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t val_len)
         return -ENODEV;
     }
 
-    cc2420_t *dev = (cc2420_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    cc2420_t *dev = container_of(netdev_ieee802154, cc2420_t, netdev);
 
     int ext = netdev_ieee802154_set(&dev->netdev, opt, val, val_len);
 

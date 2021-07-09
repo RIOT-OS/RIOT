@@ -46,7 +46,7 @@ void auto_init_dose(void)
 
         dose_setup(&dose[i], &dose_params[i], i);
         gnrc_netif_ethernet_create(&_netif[i], _netdev_eth_stack[i], DOSE_MAC_STACKSIZE,
-                                   DOSE_MAC_PRIO, "dose", (netdev_t *)&dose[i]);
+                                   DOSE_MAC_PRIO, "dose", &dose[i].netdev);
     }
 }
 /** @} */

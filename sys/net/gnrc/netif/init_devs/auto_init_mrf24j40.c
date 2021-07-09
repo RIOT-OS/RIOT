@@ -51,7 +51,7 @@ void auto_init_mrf24j40(void)
         gnrc_netif_ieee802154_create(&_netif[i], _mrf24j40_stacks[i],
                                      MRF24J40_MAC_STACKSIZE, MRF24J40_MAC_PRIO,
                                      "mrf24j40",
-                                     (netdev_t *)&mrf24j40_devs[i]);
+                                     &mrf24j40_devs[i].netdev.netdev);
     }
 }
 /** @} */

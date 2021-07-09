@@ -93,7 +93,7 @@ int main(void)
     for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
         netopt_enable_t en = NETOPT_ENABLE;
         const at86rf2xx_params_t *p = &at86rf2xx_params[i];
-        netdev_t *dev = (netdev_t *)(&devs[i]);
+        netdev_t *dev = &devs[i].netdev.netdev;
 
         printf("Initializing AT86RF2xx radio at SPI_%d\n", p->spi);
         at86rf2xx_setup(&devs[i], p, i);

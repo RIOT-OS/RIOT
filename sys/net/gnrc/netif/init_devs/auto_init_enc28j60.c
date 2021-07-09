@@ -63,7 +63,7 @@ void auto_init_enc28j60(void)
         enc28j60_setup(&dev[i], &enc28j60_params[i], i);
         gnrc_netif_ethernet_create(&_netif[i], stack[i], ENC28J60_MAC_STACKSIZE,
                                    ENC28J60_MAC_PRIO, "enc28j60",
-                                   (netdev_t *)&dev[i]);
+                                   &dev[i].netdev);
     }
 }
 /** @} */

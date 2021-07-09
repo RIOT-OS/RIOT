@@ -311,7 +311,7 @@ static void _init_mock_netif(void)
                            _get_netdev_addr_long);
     gnrc_netif_ieee802154_create(&_netif, _mock_netif_stack,
                                  THREAD_STACKSIZE_DEFAULT, GNRC_NETIF_PRIO,
-                                 "mock_netif", (netdev_t *)&_mock_dev);
+                                 "mock_netif", &_mock_dev.netdev.netdev);
     _mock_netif = &_netif;
     thread_yield_higher();
 }

@@ -54,7 +54,7 @@ void auto_init_kw2xrf(void)
         kw2xrf_setup(&kw2xrf_devs[i], (kw2xrf_params_t*) p);
         gnrc_netif_ieee802154_create(&_netif[i], _kw2xrf_stacks[i], KW2XRF_MAC_STACKSIZE,
                                      KW2XRF_MAC_PRIO, "kw2xrf",
-                                     (netdev_t *)&kw2xrf_devs[i]);
+                                     &kw2xrf_devs[i].netdev.netdev);
     }
 }
 /** @} */

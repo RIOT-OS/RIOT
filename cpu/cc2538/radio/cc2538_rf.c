@@ -214,7 +214,7 @@ void cc2538_setup(cc2538_rf_t *dev)
     (void) dev;
 #if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC)
     extern ieee802154_dev_t cc2538_rf_dev;
-    netdev_register((netdev_t* )dev, NETDEV_CC2538, 0);
+    netdev_register(&dev->netdev.dev.netdev, NETDEV_CC2538, 0);
     netdev_ieee802154_submac_init(&dev->netdev, &cc2538_rf_dev);
 #endif
     cc2538_init();

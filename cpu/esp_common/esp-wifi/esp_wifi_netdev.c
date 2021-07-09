@@ -562,7 +562,7 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
     }
     _esp_wifi_send_is_in = true;
 
-    esp_wifi_netdev_t* dev = (esp_wifi_netdev_t*)netdev;
+    esp_wifi_netdev_t* dev = container_of(netdev, esp_wifi_netdev_t, netdev);
 
 #ifdef MODULE_ESP_WIFI_AP
     if (_esp_wifi_dev.sta_connected == 0) {
@@ -629,7 +629,7 @@ static int _esp_wifi_recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     assert(netdev != NULL);
 
-    esp_wifi_netdev_t* dev = (esp_wifi_netdev_t*)netdev;
+    esp_wifi_netdev_t* dev = container_of(netdev, esp_wifi_netdev_t, netdev);
     uint16_t size;
 
     critical_enter();
@@ -688,7 +688,7 @@ static int _esp_wifi_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_l
     assert(val != NULL);
 
 #ifndef MODULE_ESP_WIFI_AP
-    esp_wifi_netdev_t* dev = (esp_wifi_netdev_t*)netdev;
+    esp_wifi_netdev_t* dev = container_of(netdev, esp_wifi_netdev_t, netdev);
 #endif /* MODULE_ESP_WIFI_AP */
 
     switch (opt) {
@@ -748,7 +748,7 @@ static void _esp_wifi_isr(netdev_t *netdev)
 
     assert(netdev != NULL);
 
-    esp_wifi_netdev_t *dev = (esp_wifi_netdev_t *) netdev;
+    esp_wifi_netdev_t* dev = container_of(netdev, esp_wifi_netdev_t, netdev);
 
     while (dev->event_recv) {
         dev->event_recv--;

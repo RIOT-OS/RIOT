@@ -141,7 +141,7 @@ static int _esp_eth_init(netdev_t *netdev)
 {
     DEBUG("%s: netdev=%p\n", __func__, netdev);
 
-    esp_eth_netdev_t* dev = (esp_eth_netdev_t*)netdev;
+    esp_eth_netdev_t* dev = container_of(netdev, esp_eth_netdev_t, netdev);
 
     mutex_lock(&dev->dev_lock);
 
@@ -189,7 +189,7 @@ static int _esp_eth_send(netdev_t *netdev, const iolist_t *iolist)
     CHECK_PARAM_RET (netdev != NULL, -ENODEV);
     CHECK_PARAM_RET (iolist != NULL, -EINVAL);
 
-    esp_eth_netdev_t* dev = (esp_eth_netdev_t*)netdev;
+    esp_eth_netdev_t* dev = container_of(netdev, esp_eth_netdev_t, netdev);
 
     if (!_esp_eth_dev.link_up) {
         DEBUG("%s: link is down\n", __func__);
@@ -238,7 +238,7 @@ static int _esp_eth_recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     CHECK_PARAM_RET (netdev != NULL, -ENODEV);
 
-    esp_eth_netdev_t* dev = (esp_eth_netdev_t*)netdev;
+    esp_eth_netdev_t* dev = container_of(netdev, esp_eth_netdev_t, netdev);
 
     mutex_lock(&dev->dev_lock);
 
@@ -282,7 +282,7 @@ static int _esp_eth_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_le
     CHECK_PARAM_RET (netdev != NULL, -ENODEV);
     CHECK_PARAM_RET (val != NULL, -EINVAL);
 
-    esp_eth_netdev_t* dev = (esp_eth_netdev_t*)netdev;
+    esp_eth_netdev_t* dev = container_of(netdev, esp_eth_netdev_t, netdev);
 
     switch (opt) {
         case NETOPT_ADDRESS:
@@ -323,7 +323,7 @@ static void _esp_eth_isr(netdev_t *netdev)
 
     CHECK_PARAM (netdev != NULL);
 
-    esp_eth_netdev_t *dev = (esp_eth_netdev_t *) netdev;
+    esp_eth_netdev_t* dev = container_of(netdev, esp_eth_netdev_t, netdev);
 
     switch (dev->event) {
         case SYSTEM_EVENT_ETH_RX_DONE:

@@ -31,7 +31,7 @@
 
 static void _setup_interface(at86rf215_t *dev, const at86rf215_params_t *params, uint8_t index)
 {
-    netdev_t *netdev = (netdev_t *)dev;
+    netdev_t *netdev = &dev->netdev.netdev;
 
     netdev->driver = &at86rf215_driver;
     dev->params = *params;
@@ -256,7 +256,7 @@ static void _block_while_busy(at86rf215_t *dev)
 
     do {
         if (gpio_read(dev->params.int_pin) || dev->timeout) {
-            at86rf215_driver.isr((netdev_t *) dev);
+            at86rf215_driver.isr(&dev->netdev.netdev);
         }
         /* allow the other interface to process events */
         thread_yield();

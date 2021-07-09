@@ -70,7 +70,7 @@ static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal)
          * if this frame should be processed. By queuing NETDEV_EVENT_ISR,
          * the netif thread will call _isr at some time. */
         SETBIT(ctx->flags, DOSE_FLAG_RECV_BUF_DIRTY);
-        netdev_trigger_event_isr((netdev_t *) ctx);
+        netdev_trigger_event_isr(&ctx->netdev);
     }
 
     if (gpio_is_valid(ctx->sense_pin)) {
@@ -217,7 +217,7 @@ static void state(dose_t *ctx, dose_signal_t signal)
 
 static void _isr_uart(void *arg, uint8_t c)
 {
-    dose_t *dev = (dose_t *) arg;
+    dose_t *dev = arg;
 
     dev->uart_octet = c;
     state(dev, DOSE_SIGNAL_UART);
@@ -225,14 +225,14 @@ static void _isr_uart(void *arg, uint8_t c)
 
 static void _isr_gpio(void *arg)
 {
-    dose_t *dev = (dose_t *) arg;
+    dose_t *dev = arg;
 
     state(dev, DOSE_SIGNAL_GPIO);
 }
 
 static void _isr_xtimer(void *arg)
 {
-    dose_t *dev = (dose_t *) arg;
+    dose_t *dev = arg;
 
     state(dev, DOSE_SIGNAL_XTIMER);
 }
@@ -250,7 +250,7 @@ static void clear_recv_buf(dose_t *ctx)
 
 static void _isr(netdev_t *netdev)
 {
-    dose_t *ctx = (dose_t *) netdev;
+    dose_t *ctx = container_of(netdev, dose_t, netdev);
     unsigned irq_state;
     int dirty, end;
 
@@ -307,12 +307,12 @@ static void _isr(netdev_t *netdev)
 
     /* Finally schedule a _recv method call */
     DEBUG("dose _isr(): NETDEV_EVENT_RX_COMPLETE\n");
-    ctx->netdev.event_callback((netdev_t *) ctx, NETDEV_EVENT_RX_COMPLETE);
+    ctx->netdev.event_callback(&ctx->netdev, NETDEV_EVENT_RX_COMPLETE);
 }
 
 static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
 {
-    dose_t *ctx = (dose_t *) dev;
+    dose_t *ctx = container_of(dev, dose_t, netdev);
 
     (void)info;
 
@@ -390,7 +390,7 @@ static int send_data_octet(dose_t *ctx, uint8_t c)
 
 static int _send(netdev_t *dev, const iolist_t *iolist)
 {
-    dose_t *ctx = (dose_t *) dev;
+    dose_t *ctx = container_of(dev, dose_t, netdev);
     int8_t retries = 3;
     size_t pktlen;
     uint16_t crc;
@@ -438,7 +438,7 @@ send:
     }
 
     /* We probably sent the whole packet?! */
-    ctx->netdev.event_callback((netdev_t *) ctx, NETDEV_EVENT_TX_COMPLETE);
+    dev->event_callback(dev, NETDEV_EVENT_TX_COMPLETE);
 
     /* Get out of the SEND state */
     state(ctx, DOSE_SIGNAL_END);
@@ -448,7 +448,7 @@ send:
 collision:
     DEBUG("dose _send(): collision!\n");
     if (--retries < 0) {
-        ctx->netdev.event_callback((netdev_t *) ctx, NETDEV_EVENT_TX_MEDIUM_BUSY);
+        dev->event_callback(dev, NETDEV_EVENT_TX_MEDIUM_BUSY);
         return -EBUSY;
     }
     goto send;
@@ -456,7 +456,7 @@ collision:
 
 static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
 {
-    dose_t *ctx = (dose_t *) dev;
+    dose_t *ctx = container_of(dev, dose_t, netdev);
 
     switch (opt) {
         case NETOPT_ADDRESS:
@@ -485,7 +485,7 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
 
 static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t len)
 {
-    dose_t *ctx = (dose_t *) dev;
+    dose_t *ctx = container_of(dev, dose_t, netdev);
 
     switch (opt) {
         case NETOPT_ADDRESS:
@@ -514,7 +514,7 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t len)
 
 static int _init(netdev_t *dev)
 {
-    dose_t *ctx = (dose_t *) dev;
+    dose_t *ctx = container_of(dev, dose_t, netdev);
     unsigned irq_state;
 
     /* Set state machine to defaults */

@@ -184,5 +184,5 @@ void gnrc_nrfmin_init(void)
     /* setup the NRFMIN driver */
     nrfmin_setup();
     gnrc_netif_create(&_netif, stack, sizeof(stack), NRFMIN_GNRC_THREAD_PRIO, "nrfmin",
-                      (netdev_t *)&nrfmin_dev, &gnrc_nrfmin_ops);
+                      &nrfmin_dev, &gnrc_nrfmin_ops);
 }

@@ -36,7 +36,7 @@
 int _gnrc_lwmac_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     netdev_t *dev = netif->dev;
-    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
+    netdev_ieee802154_t *state = container_of(dev, netdev_ieee802154_t, netdev);
     gnrc_netif_hdr_t *netif_hdr;
     const uint8_t *src, *dst = NULL;
     int res = 0;

@@ -82,7 +82,7 @@ void _tests_init(void)
                            _get_address);
     int res = gnrc_netif_ethernet_create(&_netif,
            _mock_netif_stack, THREAD_STACKSIZE_DEFAULT, GNRC_NETIF_PRIO,
-            "mockup_eth", &_mock_netdev.netdev
+            "mockup_eth", &_mock_netdev.netdev.netdev
         );
     _mock_netif = &_netif;
     expect(res == 0);
