@@ -38,11 +38,8 @@
  *
  * # (Low-) Power Implications
  *
- * After initialization, the UART peripheral **should** be powered on and
- * active. The UART can later be explicitly put to sleep and woken up by calling
- * the uart_poweron() and uart_poweroff() functions. Once woken up using
- * uart_poweron(), the UART **should** transparently continue it's previously
- * configured operation.
+ * After initialization, the UART peripheral **MUST** be powered on and
+ * active. By calling @ref uart_poweroff the device can be powered off again.
  *
  * While the UART is active, the implementation might need to block certain
  * power states.
@@ -176,6 +173,15 @@ typedef enum {
  *                          set to NULL for TX only mode
  * @param[in] arg           optional context passed to the callback functions
  *
+ * @post    The UART interface is configured, powered on, and active
+ *
+ * @note    The implementation must assume that the UART and the GPIOs used for TXD/RXD are in
+ *          any possible state prior to the call. A full reset of the UART peripheral to bring
+ *          the device in a known state is typically part of the initialization process.
+ * @note    The implementation should keep the TXD pin high during initialization if supported by
+ *          the hardware, so that no garbage is detected at the receiver during initialization.
+ *          Typically configuring the peripheral before routing the GPIOs to it does the trick.
+ *
  * @retval  0               Success
  * @retval  -ENODEV         Invalid UART device
  * @retval  -ENOTSUP        Unsupported symbol rate
@@ -184,41 +190,6 @@ typedef enum {
 int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg);
 
 #if defined(MODULE_PERIPH_UART_RECONFIGURE) || DOXYGEN
-/**
- * @brief   Change the pins of the given UART back to plain GPIO functionality
- *
- * The pin mux of the RX and TX pins of the bus will be changed back to
- * default (GPIO) mode and the UART is powered off.
- * This allows to use the UART pins for another function and return to UART
- * functionality again by calling @ref uart_init_pins
- *
- * If you want the pin to be in a defined state, call @ref gpio_init on it.
- *
- * @note Until this is implemented on all platforms, this requires the
- *       periph_uart_reconfigure feature to be used.
- *
- * @param[in] uart      the device to de-initialize
- */
-void uart_deinit_pins(uart_t uart);
-
-/**
- * @brief   Initialize the used UART pins, i.e. RX and TX
- *
- *
- * After calling uart_init, the pins must be initialized (i.e. uart_init is
- * calling this function internally). In normal cases, this function will not
- * be used. But there are some devices, that use UART bus lines also for other
- * purposes and need the option to dynamically re-configure one or more of the
- * used pins. So they can take control over certain pins and return control back
- * to the UART driver using this function.
- *
- * The pins used are configured in the board's periph_conf.h.
- *
- * @param[in] uart      UART device the pins are configure for
- */
-void uart_init_pins(uart_t uart);
-
-#if DOXYGEN
 /**
  * @brief   Get the RX pin of the given UART.
  *
@@ -243,7 +214,6 @@ gpio_t uart_pin_rx(uart_t uart);
  */
 gpio_t uart_pin_tx(uart_t uart);
 
-#endif /* DOXYGEN */
 #endif /* MODULE_PERIPH_UART_RECONFIGURE */
 
 /**
@@ -276,16 +246,17 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 void uart_write(uart_t uart, const uint8_t *data, size_t len);
 
 /**
- * @brief   Power on the given UART device
- *
- * @param[in] uart          the UART device to power on
- */
-void uart_poweron(uart_t uart);
-
-/**
  * @brief Power off the given UART device
  *
  * @param[in] uart          the UART device to power off
+ *
+ * @post    The UART interface is powered off. After a call to @ref gpio_init the pins
+ *          previously used by the UART peripheral must be usable as ordinary GPIOs.
+ *
+ * @note    If @ref gpio_init disconnects GPIOs from any peripherals they might be
+ *          routed to anyway, the implementation does not need to pay any attention.
+ *          Otherwise, it must disconnect the GPIOs so that they can be used as
+ *          regular GPIOs again.
  */
 void uart_poweroff(uart_t uart);
 
