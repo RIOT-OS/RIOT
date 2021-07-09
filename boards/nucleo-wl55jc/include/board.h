@@ -22,9 +22,26 @@
 
 #include "board_nucleo.h"
 
+/* Required for `nucleo_wl55jc_sx126x_set_rf_mode` */
+#if IS_USED(MODULE_SX126X_STM32WL)
+#include "sx126x.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @name    Sub-GHz radio (LoRa) configuration
+ * @{
+ */
+#define SX126X_PARAM_SPI                    (SPI_DEV(0))
+
+#if IS_USED(MODULE_SX126X_STM32WL)
+extern void nucleo_wl55jc_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mode);
+#define SX126X_PARAM_SET_RF_MODE_CB         nucleo_wl55jc_sx126x_set_rf_mode
+#endif
+/** @} */
 
 /**
  * @name    LED pin definitions and handlers
@@ -52,7 +69,10 @@ extern "C" {
 #define LED2_TOGGLE         (LED0_PORT->ODR  ^= LED2_MASK)
 /** @} */
 
-/* nucleo-wl55jc always use LED0, as there is no dual use of its pin */
+/**
+ * @brief   Nucleo-wl55jc always use LED0, as there is no dual use of its pin
+ * @{
+ */
 #ifndef AUTO_INIT_LED0
 #define AUTO_INIT_LED0
 #endif
@@ -68,6 +88,17 @@ extern "C" {
 #define BTN1_MODE           GPIO_IN_PU
 #define BTN2_PIN            GPIO_PIN(PORT_C, 6)
 #define BTN2_MODE           GPIO_IN_PU
+/** @} */
+
+/**
+ * @name    RF 3-port switch (SP3T) control
+ *
+ * Refer Section 6.6.3 RF Overview in User Manual (UM2592)
+ * @{
+ */
+#define FE_CTRL1            GPIO_PIN(PORT_C, 4)
+#define FE_CTRL2            GPIO_PIN(PORT_C, 5)
+#define FE_CTRL3            GPIO_PIN(PORT_C, 3)
 /** @} */
 
 #ifdef __cplusplus

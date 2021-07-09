@@ -1,4 +1,10 @@
 ifneq (,$(filter stdio_uart,$(USEMODULE)))
   FEATURES_REQUIRED += periph_lpuart
 endif
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  USEMODULE += sx126x_stm32wl
+endif
+ifneq (,$(filter sx126x_stm32wl,$(USEMODULE)))
+  USEMODULE += sx126x_rf_switch
+endif
 include $(RIOTBOARD)/common/nucleo/Makefile.dep

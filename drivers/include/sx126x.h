@@ -35,6 +35,20 @@ extern "C" {
 #endif
 
 /**
+ * * @note Forward declaration of the SX126x device descriptor
+ */
+typedef struct sx126x sx126x_t;
+
+/**
+ * @brief RF switch states
+ */
+typedef enum {
+    SX126X_RF_MODE_RX,
+    SX126X_RF_MODE_TX_LPA,
+    SX126X_RF_MODE_TX_HPA,
+} sx126x_rf_mode_t;
+
+/**
  * @brief   Whether there's only one variant of this driver at compile time or
  * not.
  */
@@ -43,7 +57,16 @@ extern "C" {
                         + IS_USED(MODULE_SX1262) \
                         + IS_USED(MODULE_SX1268) \
                         + IS_USED(MODULE_LLCC68) \
+                        + IS_USED(MODULE_SX126X_STM32WL) \
                         ) == 1)
+
+/**
+ * @brief   Used to identify if its a generic SPI module
+ */
+#if (IS_USED(MODULE_SX1261) || IS_USED(MODULE_SX1262) || \
+     IS_USED(MODULE_SX1268) || IS_USED(MODULE_LLCC68))
+#define SX126X_SPI    1
+#endif
 
 /**
  * @brief   Variant of the SX126x driver.
@@ -53,6 +76,7 @@ typedef enum {
     SX126X_TYPE_SX1262,
     SX126X_TYPE_SX1268,
     SX126X_TYPE_LLCC68,
+    SX126X_TYPE_STM32WL,
 } sx126x_type_t;
 
 /**
@@ -66,19 +90,26 @@ typedef struct {
     gpio_t dio1_pin;                    /**< Dio1 pin */
     sx126x_reg_mod_t regulator;         /**< Power regulator mode */
     sx126x_type_t type;                 /**< Variant of sx126x */
+#if IS_USED(MODULE_SX126X_RF_SWITCH)
+    /**
+     * @ brief  Interface to set RF switch parameters
+     */
+    void(*set_rf_mode)(sx126x_t *dev, sx126x_rf_mode_t rf_mode);
+#endif
 } sx126x_params_t;
 
 /**
  * @brief   Device descriptor for the driver
  */
-typedef struct {
+struct sx126x {
     netdev_t netdev;                        /**< Netdev parent struct */
     sx126x_params_t *params;                /**< Initialization parameters */
     sx126x_pkt_params_lora_t pkt_params;    /**< Lora packet parameters */
     sx126x_mod_params_lora_t mod_params;    /**< Lora modulation parameters */
     uint32_t channel;                       /**< Current channel frequency (in Hz) */
     uint8_t rx_timeout;                     /**< Rx Timeout in terms of symbols */
-} sx126x_t;
+    bool radio_sleep;                       /**< Radio sleep status */
+};
 
 /**
  * @brief   Setup the radio device

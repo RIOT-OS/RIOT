@@ -37,6 +37,7 @@
 #include "stmclk.h"
 #include "periph_cpu.h"
 #include "periph/init.h"
+#include "periph/gpio.h"
 #include "board.h"
 
 #if defined (CPU_FAM_STM32L4) || defined (CPU_FAM_STM32G4) || \
@@ -151,6 +152,52 @@ static void _gpio_init_ain(void)
 }
 #endif
 
+/**
+ * @brief   Initialize HW debug pins for Sub-GHz Radio
+ */
+void _wl55jc_init_subghz_debug_pins(void)
+{
+#if IS_ACTIVE(CONFIG_STM32_WL55JC_SUBGHZ_DEBUG)
+    /* SUBGHZSPI Debug */
+    gpio_init(CPU_STM32WL_SUBGHZSPI_DEBUG_MOSIOUT, GPIO_OUT);
+    gpio_init_af(CPU_STM32WL_SUBGHZSPI_DEBUG_MOSIOUT,
+                 CPU_STM32WL_SUBGHZSPI_DEBUG_MOSIOUT_AF);
+
+    gpio_init(CPU_STM32WL_SUBGHZSPI_DEBUG_MISOOUT, GPIO_OUT);
+    gpio_init_af(CPU_STM32WL_SUBGHZSPI_DEBUG_MISOOUT,
+                 CPU_STM32WL_SUBGHZSPI_DEBUG_MISOOUT_AF);
+
+    gpio_init(CPU_STM32WL_SUBGHZSPI_DEBUG_SCKOUT, GPIO_OUT);
+    gpio_init_af(CPU_STM32WL_SUBGHZSPI_DEBUG_SCKOUT,
+                 CPU_STM32WL_SUBGHZSPI_DEBUG_SCKOUT_AF);
+
+    gpio_init(CPU_STM32WL_SUBGHZSPI_DEBUG_NSSOUT, GPIO_OUT);
+    gpio_init_af(CPU_STM32WL_SUBGHZSPI_DEBUG_NSSOUT,
+                 CPU_STM32WL_SUBGHZSPI_DEBUG_NSSOUT_AF);
+
+    /* Sub-GHz Radio Debug */
+    gpio_init(CPU_STM32WL_SUBGHZ_RF_BUSY, GPIO_OUT);
+    gpio_init_af(CPU_STM32WL_SUBGHZ_RF_BUSY,
+                 CPU_STM32WL_SUBGHZ_RF_BUSY_AF);
+
+    gpio_init(CPU_STM32WL_SUBGHZ_DEBUG_RF_NRESET, GPIO_OUT);
+    gpio_init_af(CPU_STM32WL_SUBGHZ_DEBUG_RF_NRESET,
+                 CPU_STM32WL_SUBGHZ_DEBUG_RF_NRESET_AF);
+
+    gpio_init(CPU_STM32WL_SUBGHZ_DEBUG_RF_SMPSRDY, GPIO_OUT);
+    gpio_init_af(CPU_STM32WL_SUBGHZ_DEBUG_RF_SMPSRDY,
+                 CPU_STM32WL_SUBGHZ_DEBUG_RF_SMPSRDY_AF);
+
+    gpio_init(CPU_STM32WL_SUBGHZ_DEBUG_RF_LDORDY, GPIO_OUT);
+    gpio_init_af(CPU_STM32WL_SUBGHZ_DEBUG_RF_LDORDY,
+                 CPU_STM32WL_SUBGHZ_DEBUG_RF_LDORDY_AF);
+
+    gpio_init(CPU_STM32WL_SUBGHZ_DEBUG_RF_HSE32RDY, GPIO_OUT);
+    gpio_init_af(CPU_STM32WL_SUBGHZ_DEBUG_RF_HSE32RDY,
+                 CPU_STM32WL_SUBGHZ_DEBUG_RF_HSE32RDY_AF);
+#endif
+}
+
 void cpu_init(void)
 {
     /* initialize the Cortex-M core */
@@ -184,4 +231,8 @@ void cpu_init(void)
 
     /* trigger static peripheral initialization */
     periph_init();
+
+    if (IS_ACTIVE(CONFIG_STM32_WL55JC_SUBGHZ_DEBUG)) {
+        _wl55jc_init_subghz_debug_pins();
+    }
 }

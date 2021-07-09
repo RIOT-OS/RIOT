@@ -324,8 +324,10 @@ typedef enum {
     GPIO_AF12,              /**< use alternate function 12 */
     GPIO_AF13,              /**< use alternate function 13 */
     GPIO_AF14,              /**< use alternate function 14 */
-    GPIO_AF15               /**< use alternate function 15 */
+    GPIO_AF15,              /**< use alternate function 15 */
 #endif
+    GPIO_AF_UNDEF           /** an UNDEF value definition, e.g. for register
+                                based spi */
 #endif
 } gpio_af_t;
 
