@@ -784,7 +784,9 @@ void nrf802154_setup(nrf802154_t *dev)
 {
     (void) dev;
 #if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC)
-    netdev_t *netdev = (netdev_t*) dev;
+    netdev_ieee802154_submac_t *netdev_submac = &dev->netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = &netdev_submac->dev;
+    netdev_t *netdev = &netdev_ieee802154->netdev;
     netdev_register(netdev, NETDEV_NRF802154, 0);
     DEBUG("[nrf802154] init submac.\n")
     netdev_ieee802154_submac_init(&dev->netdev, &nrf802154_hal_dev);
