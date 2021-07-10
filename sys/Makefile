@@ -113,6 +113,9 @@ endif
 ifneq (,$(filter netstats_neighbor,$(USEMODULE)))
   DIRS += net/netstats
 endif
+ifneq (,$(filter netutils,$(USEMODULE)))
+  DIRS += net/netutils
+endif
 ifneq (,$(filter sema,$(USEMODULE)))
   DIRS += sema
 endif
