@@ -17,13 +17,14 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  * @}
  */
-
+#include "kernel_defines.h"
 #include "board.h"
 #include "periph/gpio.h"
 #include "mtd_spi_nor.h"
+#include "mtd_at24cxxx.h"
 #include "timex.h"
 
-#ifdef MODULE_MTD
+#if IS_USED(MODULE_MTD)
 /* N25Q256A */
 static const mtd_spi_nor_params_t _same54_nor_params = {
     .opcode = &mtd_spi_nor_opcode_default,
@@ -51,7 +52,7 @@ static mtd_spi_nor_t same54_nor_dev = {
 };
 mtd_dev_t *mtd0 = (mtd_dev_t *)&same54_nor_dev;
 
-#include "mtd_at24cxxx.h"
+#if !IS_USED(MODULE_AUTO_INIT_STORAGE_AT24CXXX)
 #include "at24cxxx_params.h"
 static at24cxxx_t at24cxxx_dev;
 static mtd_at24cxxx_t at24mac_dev = {
@@ -62,6 +63,9 @@ static mtd_at24cxxx_t at24mac_dev = {
     .params = at24cxxx_params,
 };
 mtd_dev_t *mtd1 = (mtd_dev_t *)&at24mac_dev;
+#else
+mtd_dev_t *mtd1;
+#endif /* !IS_USED(MODULE_AUTO_INIT_STORAGE_AT24CXXX) */
 #endif /* MODULE_MTD */
 
 void board_init(void)
@@ -75,4 +79,9 @@ void board_init(void)
 
     /* initialize the CPU */
     cpu_init();
+
+#if IS_USED(MODULE_MTD) && \
+    IS_USED(MODULE_AUTO_INIT_STORAGE_AT24CXXX)
+    mtd1 = (mtd_dev_t *)mtd_at24cxxx_devs();
+#endif
 }
