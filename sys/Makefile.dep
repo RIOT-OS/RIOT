@@ -529,6 +529,7 @@ ifneq (,$(filter gcoap,$(USEMODULE)))
   USEMODULE += sock_util
   USEMODULE += event_callback
   USEMODULE += event_timeout
+  USEMODULE += netutils
   ifneq (,$(filter openwsn%,$(USEMODULE)))
     USEMODULE += openwsn_sock_udp
   endif
