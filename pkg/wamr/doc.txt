@@ -1,0 +1,6 @@
+/**
+ * @defgroup pkg_wamr WebAssembly Micro Runtime
+ * @ingroup  pkg
+ * @brief    Provides WebAssembly support for RIOT
+ * @see      https://github.com/bytecodealliance/wasm-micro-runtime
+ */

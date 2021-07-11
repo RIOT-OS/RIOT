@@ -1,0 +1,12 @@
+IWASM_CORE = $(PKGDIRBASE)/wamr/core
+IWASM_ROOT = $(IWASM_CORE)/iwasm
+SHARED_LIB_ROOT = $(IWASM_CORE)/shared
+
+IWASM_INCLUDES += ${IWASM_ROOT}/include \
+                   ${SHARED_LIB_ROOT}/platform/include \
+                   ${SHARED_LIB_ROOT}/platform/riot \
+
+
+INCLUDES += $(addprefix -I,${IWASM_INCLUDES})
+
+ARCHIVES += $(BINDIR)/libwamr.a
