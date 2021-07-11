@@ -1,4 +1,5 @@
 RIOTBASE=$(shell git rev-parse --show-toplevel)
+
 # Generate list of quoted absolute include paths. Evaluated in riot.doxyfile.
 export STRIP_FROM_INC_PATH_LIST=$(shell \
     git ls-tree -dr --full-tree --name-only HEAD core drivers sys |\
@@ -7,7 +8,29 @@ export STRIP_FROM_INC_PATH_LIST=$(shell \
 
 # use lessc (http://lesscss.org/#using-less) for compiling CSS
 # It can also be installed in ubuntu with the `node-less` package
-LESSC ?= $(shell command -v lessc 2>/dev/null)
+ifeq (,$(LESSC))
+  ifneq (,$(shell command -v lessc 2>/dev/null))
+    LESSC=lessc
+  else ifneq (,$(shell command -v lesscpy 2>/dev/null))
+    LESSC=lesscpy
+  else
+    $(warning Did not find a LESS compiler, so I cannot build the CSS file in case you modified \
+              the LESS file.)
+  endif
+endif
+
+SED=sed
+ifneq (,$(LESSC))
+    UNAME := $(shell uname -s)
+    ifeq ($(UNAME),Darwin)
+        ifneq (,$(shell command -v gsed 2>/dev/null))
+            SED=gsed
+        else
+            $(warning The version of sed that ships with macOS is very old, so you need gnu-sed. \
+                      Please run 'brew install gnu-sed' and run 'make doc' again.)
+       endif
+    endif
+endif
 
 .PHONY: doc
 doc: html
@@ -26,7 +49,7 @@ src/css/riot.css: src/css/riot.less src/css/variables.less
 	@$(LESSC) $< $@
 
 src/css/variables.less: src/config.json
-	@grep "^\s*\"@" $< | sed -e 's/^\s*"//g' -e 's/":\s*"/: /g' \
+	@grep "^\s*\"@" $< | $(SED) -e 's/^\s*"//g' -e 's/":\s*"/: /g' \
 	  -e 's/",\?$$/;/g' -e 's/\\"/"/g' > $@
 endif
 
