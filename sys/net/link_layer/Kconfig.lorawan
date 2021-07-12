@@ -540,8 +540,7 @@ config LORAMAC_DEFAULT_ADR_ACK_LIMIT
     depends on USEMODULE_GNRC_LORAWAN
     default 64
     help
-        Configure the ADR ACK limit. `ADRACKReq` bit (FOpts) is set to 1 once
-        `ADR_ACK_CNT` reaches the configured `CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT`.
+        Defines the ADR ACK counter limit (`ADR_ACK_CNT`).
 
 config LORAMAC_DEFAULT_ADR_ACK_DELAY
     int "ACK delay (ADR)" if LORAMAC_ADVANCED_OPTIONS
