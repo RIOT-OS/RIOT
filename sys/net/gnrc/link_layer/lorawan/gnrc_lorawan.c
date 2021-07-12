@@ -72,6 +72,9 @@ void gnrc_lorawan_set_rx2_dr(gnrc_lorawan_t *mac, uint8_t rx2_dr)
 
 void gnrc_lorawan_set_adr(gnrc_lorawan_t *mac, bool adr)
 {
+    if ((adr == true) && (mac->mlme.adr == false)) {
+        mac->mlme.adr_ack_cnt = 0;
+    }
     mac->mlme.adr = adr;
 }
 

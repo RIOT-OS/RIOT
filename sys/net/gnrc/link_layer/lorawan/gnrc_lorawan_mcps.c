@@ -155,11 +155,8 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
         return;
     }
 
-    /* Check if downlink was received after an uplink that had `ADRACKReq` bit set */
-    if (mac->mlme.adr_ack_cnt >= CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT) {
-        DEBUG("gnrc_lorawan_mcps: ADR_ACK_CNT reset after downlink\n");
-        mac->mlme.adr_ack_cnt = 0;
-    }
+    /* ADR_ACK_CNT reset after downlink */
+    mac->mlme.adr_ack_cnt = 0;
 
     iolist_t *fopts = NULL;
 
