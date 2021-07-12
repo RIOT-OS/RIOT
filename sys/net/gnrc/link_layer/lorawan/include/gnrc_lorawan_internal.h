@@ -258,13 +258,12 @@ int gnrc_lorawan_set_dr(gnrc_lorawan_t *mac, uint8_t datarate);
  * @param[in] payload packet containing payload
  * @param[in] confirmed_data true if confirmed frame
  * @param[in] port MAC port
- * @param[in] adr MAC adr
  *
  * @return full LoRaWAN frame including payload
  * @return NULL if packet buffer is full. `payload` is released
  */
 size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload,
-                                 int confirmed_data, uint8_t port, bool adr);
+                                 int confirmed_data, uint8_t port);
 
 /**
  * @brief pick a random available LoRaWAN channel

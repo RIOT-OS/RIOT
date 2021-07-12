@@ -337,7 +337,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *payload)
     { .type = netif->lorawan.ack_req ? MCPS_CONFIRMED : MCPS_UNCONFIRMED,
       .data =
       { .pkt = (iolist_t *)payload, .port = port,
-          .dr = netif->lorawan.datarate, .adr = netif->lorawan.adr  } };
+          .dr = netif->lorawan.datarate } };
     mcps_confirm_t conf;
 
     gnrc_lorawan_mcps_request(&netif->lorawan.mac, &req, &conf);

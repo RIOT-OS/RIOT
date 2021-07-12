@@ -241,7 +241,7 @@ size_t gnrc_lorawan_build_hdr(uint8_t mtype, le_uint32_t *dev_addr,
 }
 
 size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload,
-                                 int confirmed_data, uint8_t port, bool adr)
+                                 int confirmed_data, uint8_t port)
 {
     lorawan_buffer_t buf = {
         .data = (uint8_t *)mac->mcps.mhdr_mic,
@@ -258,10 +258,10 @@ size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload,
     lw_hdr->addr = mac->dev_addr;
     lw_hdr->fctrl = 0;
 
-    lorawan_hdr_set_adr(lw_hdr,adr);
+    lorawan_hdr_set_adr(lw_hdr,mac->mlme.adr);
 
     /* Set `ADRACKReq` bit and ADR_ACK_CNT */
-    if ((mac->last_dr != 0) && adr) {
+    if ((mac->last_dr != 0) && mac->mlme.adr) {
         mac->mlme.adr_ack_cnt++;
         lorawan_hdr_set_adr_ack_req(lw_hdr,
                                     mac->mlme.adr_ack_cnt >= CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT ?
@@ -452,7 +452,7 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
     int waiting_for_ack = mcps_request->type == MCPS_CONFIRMED;
 
     gnrc_lorawan_build_uplink(mac, pkt, waiting_for_ack,
-                              mcps_request->data.port, mcps_request->data.adr);
+                              mcps_request->data.port);
 
     if (mac->mlme.pending_mlme_opts & GNRC_LORAWAN_MLME_OPTS_LINK_ADR_ANS) {
         mac->mlme.pending_mlme_opts &= ~GNRC_LORAWAN_MLME_OPTS_LINK_ADR_ANS;
@@ -469,7 +469,7 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
 
     DEBUG("LAST DR%d \n",mac->last_dr); //to be removed
 
-    if(!mcps_request->data.adr){
+    if(!mac->mlme.adr){
         mac->last_dr = mcps_request->data.dr;
     }
 
