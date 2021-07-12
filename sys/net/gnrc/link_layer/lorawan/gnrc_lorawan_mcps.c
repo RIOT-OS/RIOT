@@ -260,8 +260,7 @@ size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload,
     /* Set `ADRACKReq` bit and ADR_ACK_CNT */
     if (mac->mlme.adr && mac->last_dr) {
         lorawan_hdr_set_adr_ack_req(lw_hdr,
-                                    mac->mlme.adr_ack_cnt >= CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT ?
-                                    true : false);
+                                    mac->mlme.adr_ack_cnt >= CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT);
     }
 
     lorawan_hdr_set_ack(lw_hdr, mac->mcps.ack_requested);
