@@ -399,11 +399,6 @@ void gnrc_lorawan_event_no_rx(gnrc_lorawan_t *mac)
                 mac->last_dr--;
                 mac->mlme.adr_ack_cnt = CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT;
              }
-             else {
-                /* Reset channel mask */
-                mac->channel_mask = UINT16_MAX >> \
-                                    (16 - GNRC_LORAWAN_DEFAULT_CHANNELS_NUMOF);
-             }
     }
 
     _handle_retransmissions(mac);
