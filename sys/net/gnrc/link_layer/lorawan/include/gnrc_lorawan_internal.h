@@ -145,7 +145,6 @@ typedef struct {
     iolist_t *pkt;          /**< packet of the request */
     uint8_t port;           /**< port of the request */
     uint8_t dr;             /**< datarate of the request */
-    bool adr;               /**< adr bit (FCtrl) status */
 } mcps_data_t;
 
 /**
@@ -167,6 +166,7 @@ typedef struct {
  */
 typedef struct {
     uint8_t activation;     /**< Activation mechanism of the MAC layer */
+    bool adr;               /**< adr bit status */
     int pending_mlme_opts;  /**< holds pending mlme opts */
     uint32_t nid;           /**< current Network ID */
     int32_t backoff_budget; /**< remaining Time On Air budget */
