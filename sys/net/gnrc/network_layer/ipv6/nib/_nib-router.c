@@ -215,6 +215,52 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
     return ext_opts;
 }
 
+/* Sending a RA with ltime = 0 causes the router to be removed from the
+ * default router list, but options are still parsed.
+ * This allows us to add downstream subnets that should be routed through
+ * this router, but the router is not an upstream / default router for
+ * this link. */
+static gnrc_pktsnip_t *_build_final_ext_opts(gnrc_netif_t *netif)
+{
+    gnrc_pktsnip_t *ext_opts = NULL;
+    _nib_offl_entry_t *entry = NULL;
+
+    if (!IS_USED(MODULE_GNRC_IPV6_NIB_RIO) ||
+        !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_LAST_RA)) {
+        return NULL;
+    }
+
+    DEBUG("nib: sending final RA on interface %u\n", netif->pid);
+
+    uint32_t now = evtimer_now_msec();
+    while ((entry = _nib_offl_iter(entry))) {
+
+        unsigned id = netif->pid;
+        if (_nib_onl_get_if(entry->next_hop) == id) {
+            continue;
+        }
+
+        if ((entry->mode & _PL) && (entry->flags & _PFX_ON_LINK)) {
+            DEBUG("nib: adding downstream subnet to RA\n");
+            uint32_t valid_ltime = (entry->valid_until == UINT32_MAX) ? UINT32_MAX :
+                                   ((entry->valid_until - now) / MS_PER_SEC);
+            gnrc_pktsnip_t *snip  = gnrc_ndp_opt_ri_build(&entry->pfx,
+                                                          entry->pfx_len,
+                                                          valid_ltime,
+                                                          NDP_OPT_RI_FLAGS_PRF_NONE,
+                                                          ext_opts);
+            if (snip != NULL) {
+                ext_opts = snip;
+            } else {
+                DEBUG_PUTS("nib: can't add RIO to RA - out of memory");
+                break;
+            }
+        }
+    }
+
+    return ext_opts;
+}
+
 void _set_rtr_adv(gnrc_netif_t *netif)
 {
     DEBUG("nib: set RTR_ADV flag for interface %i\n", netif->pid);
@@ -228,7 +274,9 @@ static void _snd_ra(gnrc_netif_t *netif, const ipv6_addr_t *dst,
 {
     gnrc_pktsnip_t *ext_opts = NULL;
 
-    if (!final) {
+    if (final) {
+        ext_opts = _build_final_ext_opts(netif);
+    } else {
         ext_opts = _build_ext_opts(netif, abr);
     }
 
