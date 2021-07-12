@@ -72,6 +72,8 @@ extern "C" {
 #define GNRC_LORAWAN_MLME_OPTS_LINK_ADR_ANS    (1 << 1) /**< Internal Link ADR Answer flag */
 
 #define GNRC_LORAWAN_CID_SIZE (1U)                      /**< size of Command ID in FOps */
+#define GNRC_LORAWAN_CID_LINK_ADR_ANS_SIZE (2U)         /**< size of Link ADR Answer CID in FOps */
+
 #define GNRC_LORAWAN_CID_LINK_CHECK_ANS (0x02)          /**< Link Check CID */
 #define GNRC_LORAWAN_CID_LINK_ADR_REQ   (0x03)          /**< Link ADR Request CID */
 #define GNRC_LORAWAN_CID_LINK_ADR_ANS   (0x03)          /**< Link ADR Answer CID */

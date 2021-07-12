@@ -338,7 +338,7 @@ int _fopts_mlme_link_adr_ans(lorawan_buffer_t *buf)
         buf->data[buf->index++] = 0x7;
     }
 
-    return GNRC_LORAWAN_CID_SIZE + 1;
+    return GNRC_LORAWAN_CID_LINK_ADR_ANS_SIZE;
 }
 
 void gnrc_lorawan_process_fopts(gnrc_lorawan_t *mac, uint8_t *fopts,
