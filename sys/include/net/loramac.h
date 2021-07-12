@@ -480,8 +480,8 @@ extern "C" {
 /**
  * @brief   Default adaptive datarate ACK limit
  *
- * `ADRACKReq` bit (FOpts) is set to 1 once `ADR_ACK_CNT` reach
- *  @ref CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT
+ * Defines the ADR ACK counter limit (`ADR_ACK_CNT`).
+ *
  */
 #ifndef CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT
 #define CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT    (64U)
