@@ -397,7 +397,6 @@ void gnrc_lorawan_event_no_rx(gnrc_lorawan_t *mac)
              if (mac->last_dr) {
                 DEBUG("gnrc_lorawan_mcps: ADRACKReq: Decrement DR\n");
                 mac->last_dr--;
-                mac->mlme.adr_ack_cnt = CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT;
              }
     }
 
