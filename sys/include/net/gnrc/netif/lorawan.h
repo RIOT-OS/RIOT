@@ -65,7 +65,6 @@ typedef struct {
     uint8_t port;                           /**< LoRaWAN port for the next transmission */
     uint8_t ack_req;                        /**< Request ACK in the next transmission */
     uint8_t otaa;                           /**< whether the next transmission is OTAA or not */
-    bool adr;                               /**< whether ADR is enabled or not */
 } gnrc_netif_lorawan_t;
 
 #ifdef __cplusplus

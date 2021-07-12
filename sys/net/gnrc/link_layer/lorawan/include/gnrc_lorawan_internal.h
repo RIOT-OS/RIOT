@@ -489,6 +489,14 @@ static inline void gnrc_lorawan_mac_release(gnrc_lorawan_t *mac)
 void gnrc_lorawan_set_rx2_dr(gnrc_lorawan_t *mac, uint8_t rx2_dr);
 
 /**
+ * @brief Set the datarate of the second reception window
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ * @param[in] adr set ADR status
+ */
+void gnrc_lorawan_set_adr(gnrc_lorawan_t *mac, bool adr);
+
+/**
  * @brief Trigger the transmission of the Join Request packet.
  *
  * @param[in] mac pointer to the MAC descriptor

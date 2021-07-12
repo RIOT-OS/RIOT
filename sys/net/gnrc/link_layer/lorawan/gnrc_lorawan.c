@@ -70,6 +70,11 @@ void gnrc_lorawan_set_rx2_dr(gnrc_lorawan_t *mac, uint8_t rx2_dr)
                         GNRC_LORAWAN_DL_RX2_DR_MASK;
 }
 
+void gnrc_lorawan_set_adr(gnrc_lorawan_t *mac, bool adr)
+{
+    mac->mlme.adr = adr;
+}
+
 static void _sleep_radio(gnrc_lorawan_t *mac)
 {
     netdev_t *dev = gnrc_lorawan_get_netdev(mac);

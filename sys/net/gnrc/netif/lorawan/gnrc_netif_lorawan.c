@@ -230,7 +230,6 @@ static void _reset(gnrc_netif_t *netif)
 {
     netif->lorawan.otaa = CONFIG_LORAMAC_DEFAULT_JOIN_PROCEDURE ==
                           LORAMAC_JOIN_OTAA ? NETOPT_ENABLE : NETOPT_DISABLE;
-    netif->lorawan.adr = IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_ADR);
     netif->lorawan.datarate = CONFIG_LORAMAC_DEFAULT_DR;
     netif->lorawan.demod_margin = 0;
     netif->lorawan.num_gateways = 0;
@@ -432,8 +431,12 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
     gnrc_netif_acquire(netif);
     switch (opt->opt) {
         case NETOPT_LORAWAN_ADR:
-            assert(opt->data_len == sizeof(netopt_enable_t));
-            netif->lorawan.adr = *((netopt_enable_t *)opt->data);
+            assert(opt->data_len == sizeof(bool));
+            mlme_request.type = MLME_SET;
+            mlme_request.mib.type = MIB_ADR;
+            mlme_request.mib.adr = *((bool *)opt->data);
+            gnrc_lorawan_mlme_request(&netif->lorawan.mac, &mlme_request,
+                                      &mlme_confirm);
             break;
         case NETOPT_LORAWAN_DR:
             assert(opt->data_len == sizeof(uint8_t));

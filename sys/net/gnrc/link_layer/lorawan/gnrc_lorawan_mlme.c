@@ -209,6 +209,10 @@ static void _mlme_set(gnrc_lorawan_t *mac, const mlme_request_t *mlme_request,
             mlme_confirm->status = GNRC_LORAWAN_REQ_STATUS_SUCCESS;
             gnrc_lorawan_set_rx2_dr(mac, mlme_request->mib.rx2_dr);
             break;
+        case MIB_ADR:
+            mlme_confirm->status = GNRC_LORAWAN_REQ_STATUS_SUCCESS;
+            gnrc_lorawan_set_adr(mac, mlme_request->mib.adr);
+            break;
         default:
             break;
     }
