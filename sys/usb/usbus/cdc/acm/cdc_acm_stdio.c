@@ -27,6 +27,10 @@
 #include "log.h"
 #include "isrpipe.h"
 
+#if CONFIG_USBUS_CDC_ACM_STDIO_BLOCKING
+#include "xtimer.h"
+#endif
+
 #include "usb/usbus.h"
 #include "usb/usbus/cdc/acm.h"
 
@@ -75,9 +79,20 @@ static void _cdc_acm_rx_pipe(usbus_cdcacm_device_t *cdcacm,
                              uint8_t *data, size_t len)
 {
     (void)cdcacm;
+
+#if CONFIG_USBUS_CDC_ACM_STDIO_BLOCKING
+    /* shortest possible non-spinning wait */
+    xtimer_ticks32_t delay = { .ticks32 = XTIMER_BACKOFF + 1 };
+    for (size_t i = 0; i < len; i++) {
+        while (isrpipe_write_one(&_cdc_stdio_isrpipe, data[i]) < 0) {
+            xtimer_tsleep32(delay);
+        }
+    }
+#else
     for (size_t i = 0; i < len; i++) {
         isrpipe_write_one(&_cdc_stdio_isrpipe, data[i]);
     }
+#endif
 }
 
 void usb_cdc_acm_stdio_init(usbus_t *usbus)
