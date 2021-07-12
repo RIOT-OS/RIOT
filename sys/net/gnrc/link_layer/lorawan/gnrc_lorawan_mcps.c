@@ -262,7 +262,6 @@ size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload,
 
     /* Set `ADRACKReq` bit and ADR_ACK_CNT */
     if (mac->mlme.adr) {
-        mac->mlme.adr_ack_cnt++;
         lorawan_hdr_set_adr_ack_req(lw_hdr,
                                     mac->mlme.adr_ack_cnt >= CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT ?
                                     true : false);
@@ -304,6 +303,10 @@ static void _end_of_tx(gnrc_lorawan_t *mac, int type, int status)
     mac->mcps.waiting_for_ack = false;
 
     mac->mcps.fcnt++;
+
+    if (mac->mlme.adr) {
+        mac->mlme.adr_ack_cnt++;
+    }
 
     gnrc_lorawan_mac_release(mac);
 
@@ -451,7 +454,6 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
 
     if (mac->mlme.pending_mlme_opts & GNRC_LORAWAN_MLME_OPTS_LINK_ADR_ANS) {
         mac->mlme.pending_mlme_opts &= ~GNRC_LORAWAN_MLME_OPTS_LINK_ADR_ANS;
-        mac->mlme.adr_ack_cnt = 0;
     }
 
     mac->mcps.waiting_for_ack = waiting_for_ack;

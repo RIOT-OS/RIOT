@@ -321,6 +321,9 @@ static void _mlme_link_adr_req(gnrc_lorawan_t *mac, uint8_t *p)
 
     DEBUG("gnrc_lorawan_mlme: Lastdr : %u\n",mac->last_dr); // to be removed
     DEBUG("gnrc_lorawan_mlme: Channel Mask : %u\n",mac->channel_mask); // to be removed
+
+    /* Reset `ADR_ACK_CNT` counter */
+    mac->mlme.adr_ack_cnt = 0;
 }
 
 int _fopts_mlme_link_adr_ans(lorawan_buffer_t *buf)
