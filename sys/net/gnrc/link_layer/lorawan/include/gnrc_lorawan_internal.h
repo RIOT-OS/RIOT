@@ -154,7 +154,6 @@ typedef struct {
 typedef struct {
     uint32_t fcnt;                      /**< uplink framecounter */
     uint32_t fcnt_down;                 /**< downlink frame counter */
-    uint16_t adr_ack_cnt;               /**< ADR ACK counter */
     iolist_t *msdu;                     /**< current MSDU */
     int nb_trials;                      /**< holds the remaining number of retransmissions */
     int ack_requested;                  /**< whether the network server requested an ACK */
@@ -173,6 +172,7 @@ typedef struct {
     int32_t backoff_budget; /**< remaining Time On Air budget */
     uint8_t dev_nonce[2];   /**< Device Nonce */
     uint8_t backoff_state;  /**< state in the backoff state machine */
+    uint16_t adr_ack_cnt;   /**< ADR ACK counter */
 } gnrc_lorawan_mlme_t;
 
 /**
