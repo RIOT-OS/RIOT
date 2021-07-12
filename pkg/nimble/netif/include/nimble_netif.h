@@ -289,6 +289,24 @@ int nimble_netif_update(int handle,
  */
 int nimble_netif_used_chanmap(int handle, uint8_t map[5]);
 
+/**
+ * @brief   Trigger a L2CAP ping procedure for the specified connection
+ *
+ * This is a convenience wrapper around the NimBLE ble_l2cap_ping() function.
+ *
+ * @param[in] handle        connection handle
+ * @param[in] cb            callback triggered when the PING_RSP is received,
+ *                          executed in the NimBLE host thread context
+ * @param[in] data          payload included in the PING_REQ and PING_RSP
+ *                          messages
+ * @param[in] data_len      length of @p data in bytes
+ *
+ * @return  0 on success
+ * @return  <0 on error
+ */
+int nimble_netif_l2cap_ping(int handle, ble_l2cap_ping_fn cb,
+                            const void *data, uint16_t data_len);
+
 #ifdef __cplusplus
 }
 #endif
