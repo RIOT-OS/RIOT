@@ -284,7 +284,7 @@ void lwip_bootstrap(void)
         struct netif *n = NULL;
         NETIF_FOREACH(n) {
             if (netif_is_flag_set(n, NETIF_FLAG_ETHERNET)) {
-                netifapi_dhcp_start(netif);
+                netifapi_dhcp_start(n);
             }
         }
     }
