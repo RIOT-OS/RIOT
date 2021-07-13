@@ -21,11 +21,6 @@
 #include "lwip/netifapi.h"
 #include "netif/lowpan6.h"
 
-#ifdef MODULE_NETDEV_TAP
-#include "netdev_tap.h"
-#include "netdev_tap_params.h"
-#endif
-
 #ifdef MODULE_AT86RF2XX
 #include "at86rf2xx.h"
 #include "at86rf2xx_params.h"
@@ -51,14 +46,6 @@
 #include "socket_zep_params.h"
 #endif
 
-#ifdef MODULE_ESP_ETH
-#include "esp-eth/esp_eth_netdev.h"
-#endif
-
-#ifdef MODULE_ESP_WIFI
-#include "esp-wifi/esp_wifi_netdev.h"
-#endif
-
 #ifdef MODULE_SAM0_ETH
 #include "sam0_eth_netdev.h"
 #endif
@@ -76,11 +63,7 @@
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
-#ifdef MODULE_NETDEV_TAP
-#define LWIP_NETIF_NUMOF        (NETDEV_TAP_MAX)
-#endif
-
-#ifdef MODULE_AT86RF2XX     /* is mutual exclusive with above ifdef */
+#ifdef MODULE_AT86RF2XX
 #define LWIP_NETIF_NUMOF        ARRAY_SIZE(at86rf2xx_params)
 #endif
 
@@ -101,14 +84,6 @@
 #endif
 
 /* is mutual exclusive with above ifdef */
-#if IS_USED(MODULE_ESP_ETH) && IS_USED(MODULE_ESP_WIFI)
-#define LWIP_NETIF_NUMOF        (2)
-#define ESP_WIFI_INDEX          (1)
-#elif IS_USED(MODULE_ESP_ETH) || IS_USED(MODULE_ESP_WIFI)
-#define LWIP_NETIF_NUMOF        (1)
-#define ESP_WIFI_INDEX          (0)
-#endif
-
 #ifdef MODULE_SAM0_ETH
 #define LWIP_NETIF_NUMOF        (1)
 #endif
@@ -123,10 +98,6 @@
 
 #ifdef LWIP_NETIF_NUMOF
 static struct netif netif[LWIP_NETIF_NUMOF];
-#endif
-
-#ifdef MODULE_NETDEV_TAP
-static netdev_tap_t netdev_taps[LWIP_NETIF_NUMOF];
 #endif
 
 #ifdef MODULE_AT86RF2XX
@@ -149,16 +120,6 @@ static mrf24j40_t mrf24j40_devs[LWIP_NETIF_NUMOF];
 static socket_zep_t socket_zep_devs[LWIP_NETIF_NUMOF];
 #endif
 
-#ifdef MODULE_ESP_ETH
-extern esp_eth_netdev_t _esp_eth_dev;
-extern void esp_eth_setup (esp_eth_netdev_t* dev);
-#endif
-
-#ifdef MODULE_ESP_WIFI
-extern esp_wifi_netdev_t _esp_wifi_dev;
-extern void esp_wifi_setup(esp_wifi_netdev_t *dev);
-#endif
-
 #ifdef MODULE_SAM0_ETH
 static netdev_t sam0_eth;
 extern void sam0_eth_setup(netdev_t *netdev);
@@ -173,20 +134,24 @@ extern void stm32_eth_netdev_setup(netdev_t *netdev);
 static nrf802154_t nrf802154_dev;
 #endif
 
+extern void lwip_netif_init_devs(void);
+
+struct netif *lwip_add_ethernet(struct netif *netif, netdev_t *state)
+{
+    struct netif *_if = netif_add_noaddr(netif, state, lwip_netdev_init,
+                                         tcpip_input);
+    if (_if && netif_default == NULL) {
+        netif_set_default(_if);
+    }
+    return _if;
+}
+
 void lwip_bootstrap(void)
 {
+    lwip_netif_init_devs();
     /* TODO: do for every eligible netdev */
 #ifdef LWIP_NETIF_NUMOF
-#ifdef MODULE_NETDEV_TAP
-    for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
-        netdev_tap_setup(&netdev_taps[i], &netdev_tap_params[i]);
-        if (netif_add_noaddr(&netif[i], &netdev_taps[i].netdev, lwip_netdev_init,
-                             tcpip_input) == NULL) {
-            DEBUG("Could not add netdev_tap device\n");
-            return;
-        }
-    }
-#elif defined(MODULE_MRF24J40)
+#ifdef MODULE_MRF24J40
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         mrf24j40_setup(&mrf24j40_devs[i], &mrf24j40_params[i], i);
         if (netif_add_noaddr(&netif[i], &mrf24j40_devs[i].netdev.netdev, lwip_netdev_init,
@@ -231,23 +196,6 @@ void lwip_bootstrap(void)
             return;
         }
     }
-#elif (IS_USED(MODULE_ESP_ETH) || IS_USED(MODULE_ESP_WIFI))
-#if IS_USED(MODULE_ESP_ETH)
-    esp_eth_setup(&_esp_eth_dev);
-    if (netif_add_noaddr(&netif[0], &_esp_eth_dev.netdev, lwip_netdev_init,
-                         tcpip_input) == NULL) {
-        DEBUG("Could not add esp_eth device\n");
-        return;
-    }
-#endif
-#if IS_USED(MODULE_ESP_WIFI)
-    esp_wifi_setup(&_esp_wifi_dev);
-    if (netif_add_noaddr(&netif[ESP_WIFI_INDEX], &_esp_wifi_dev.netdev, lwip_netdev_init,
-                         tcpip_input) == NULL) {
-        DEBUG("Could not add esp_wifi device\n");
-        return;
-    }
-#endif
 #elif defined(MODULE_SAM0_ETH)
     sam0_eth_setup(&sam0_eth);
     if (netif_add_noaddr(&netif[0], &sam0_eth, lwip_netdev_init,
@@ -270,10 +218,6 @@ void lwip_bootstrap(void)
         return;
     }
 #endif
-    if (netif[0].state != NULL) {
-        /* state is set to a netdev_t in the netif_add_noaddr() calls above */
-        netif_set_default(&netif[0]);
-    }
 #endif
     /* also allow for external interface definition */
     tcpip_init(NULL, NULL);
