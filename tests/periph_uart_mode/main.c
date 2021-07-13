@@ -22,7 +22,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "board.h"
 #include "periph/uart.h"
+#include "periph_conf.h"
 #include "stdio_uart.h"
 #include "xtimer.h"
 
@@ -52,6 +54,25 @@
 /* Stores each mode string for printing at the end of the test */
 static char mode_strings[TOTAL_OPTIONS][MODE_STR_LEN];
 
+static void _delay(void)
+{
+    if (IS_USED(MODULE_XTIMER)) {
+        xtimer_usleep(DELAY_US);
+    }
+    else {
+        /*
+         * As fallback for freshly ported boards with no timer drivers written
+         * yet, we just use the CPU to delay execution and assume that roughly
+         * 20 CPU cycles are spend per loop iteration.
+         *
+         * Note that the volatile qualifier disables compiler optimizations for
+         * all accesses to the counter variable. Without volatile, modern
+         * compilers would detect that the loop is only wasting CPU cycles and
+         * optimize it out - but here the wasting of CPU cycles is desired.
+         */
+        for (volatile uint32_t i = 0; i < CLOCK_CORECLOCK / 20; i++) { }
+    }
+}
 
 static void _get_mode(const uart_data_bits_t data_bits,
                       const uart_parity_t parity, const uart_stop_bits_t stop_bits, char* mode_str) {
@@ -153,7 +174,7 @@ int main(void)
                 if (status == UART_OK) {
                     results[ridx] = true;
                     printf("%s\n", mode_strings[ridx]);
-                    xtimer_usleep(DELAY_US);
+                    _delay();
                 }
                 else {
                     results[ridx] = false;
