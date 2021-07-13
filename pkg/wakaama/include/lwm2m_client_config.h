@@ -23,7 +23,6 @@
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
 
-
 #ifndef LWM2M_CLIENT_CONFIG_H
 #define LWM2M_CLIENT_CONFIG_H
 
