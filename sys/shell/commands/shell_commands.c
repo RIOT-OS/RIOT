@@ -277,7 +277,7 @@ const shell_command_t _shell_command_list[] = {
     {"openwsn", "OpenWSN commands", _openwsn_handler},
 #endif
 #ifdef MODULE_LWIP_NETIF
-    {"ifconfig", "List network interfaces", _lwip_netif_config},
+    {"ifconfig", "Configure network interfaces", _lwip_netif_config},
 #endif
 #ifdef MODULE_FIB
     {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},
