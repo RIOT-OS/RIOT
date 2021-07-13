@@ -358,7 +358,6 @@ static void _handle_retransmissions(gnrc_lorawan_t *mac)
     }
     else {
         /* Schedule a retransmission */
-        mac->state = LORAWAN_STATE_RETRANS;
         gnrc_lorawan_set_timer(mac, 1000000 + random_uint32_range(0, 2000000));
     }
 }

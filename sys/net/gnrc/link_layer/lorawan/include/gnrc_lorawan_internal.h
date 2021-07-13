@@ -58,7 +58,6 @@ extern "C" {
 #define LORAWAN_STATE_RX_2 (2)                          /**< MAC state machine in RX2 */
 #define LORAWAN_STATE_TX (3)                            /**< MAC state machine in TX */
 #define LORAWAN_STATE_JOIN (4)                          /**< MAC state machine in Join */
-#define LORAWAN_STATE_RETRANS (5)                       /**< MAC state machine in Retrans */
 
 #define GNRC_LORAWAN_DIR_UPLINK (0U)                    /**< uplink frame direction */
 #define GNRC_LORAWAN_DIR_DOWNLINK (1U)                  /**< downlink frame direction */

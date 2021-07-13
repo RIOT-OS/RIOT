@@ -165,7 +165,7 @@ void gnrc_lorawan_timeout_cb(gnrc_lorawan_t *mac)
         case LORAWAN_STATE_JOIN:
             gnrc_lorawan_trigger_join(mac);
             break;
-        case LORAWAN_STATE_RETRANS:
+        case LORAWAN_STATE_IDLE:
             gnrc_lorawan_event_retrans_timeout(mac);
             break;
         default:
