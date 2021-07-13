@@ -407,13 +407,10 @@ IRAM_ATTR void *__wrap_realloc(void *p, size_t size)
 
 IRAM_ATTR void *__wrap_calloc(size_t nmemb, size_t size)
 {
-    size_t total_size;
-    if (__builtin_mul_overflow(nmemb, size, &total_size)) {
-        return NULL;
-    }
-    void *result = trace_malloc(total_size, 0, TRACE_MALLOC_DEFAULT);
+    size = size * nmemb;
+    void *result = trace_malloc(size, 0, TRACE_MALLOC_DEFAULT);
     if (result != NULL) {
-        memset(result, 0, total_size);
+        memset(result, 0, size);
     }
     return result;
 }
