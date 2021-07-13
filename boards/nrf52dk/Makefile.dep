@@ -1,3 +1,12 @@
 USEMODULE += boards_common_nrf52xxdk
 
 include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.dep
+
+ifeq (,$(filter nrfmin,$(USEMODULE)))
+  ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+    # exclude nordic_softdevice_ble if nimble is used (they are incompatible)
+    ifeq (,$(filter stdio_nimble,$(USEMODULE)))
+      USEPKG += nordic_softdevice_ble
+    endif
+  endif
+endif
