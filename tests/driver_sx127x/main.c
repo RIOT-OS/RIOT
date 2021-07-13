@@ -359,7 +359,7 @@ int rx_timeout_cmd(int argc, char **argv)
     }
 
     netdev_t *netdev = &sx127x.netdev;
-    uint8_t rx_timeout;
+    uint16_t rx_timeout;
 
     if (strstr(argv[1], "set") != NULL) {
         if (argc < 3) {
