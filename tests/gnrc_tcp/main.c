@@ -217,6 +217,10 @@ int gnrc_tcp_accept_cmd(int argc, char **argv)
     int timeout = atol(argv[1]);
     int err = gnrc_tcp_accept(&queue, &tmp, timeout);
     switch (err) {
+        case -EINVAL:
+            printf("%s: returns -EINVAL\n", argv[0]);
+            break;
+
         case -EAGAIN:
             printf("%s: returns -EAGAIN\n", argv[0]);
             break;
@@ -341,6 +345,78 @@ int gnrc_tcp_stop_listen_cmd(int argc, char **argv)
     return 0;
 }
 
+int gnrc_tcp_get_local_cmd(int argc, char **argv)
+{
+    dump_args(argc, argv);
+    gnrc_tcp_ep_t ep;
+
+    int err = gnrc_tcp_get_local(tcb, &ep);
+    switch (err) {
+        case 0:
+            printf("%s: returns 0\n", argv[0]);
+            printf("Endpoint: addr.ipv6=");
+            ipv6_addr_print((ipv6_addr_t *) ep.addr.ipv6);
+            printf(" netif=%u port=%u\n", ep.netif, ep.port);
+            break;
+
+        case -EADDRNOTAVAIL:
+            printf("%s: returns -EADDRNOTAVAIL\n", argv[0]);
+            break;
+
+        default:
+            printf("%s: returns %d\n", argv[0], err);
+    }
+    return 0;
+}
+
+int gnrc_tcp_get_remote_cmd(int argc, char **argv)
+{
+    dump_args(argc, argv);
+    gnrc_tcp_ep_t ep;
+
+    int err = gnrc_tcp_get_remote(tcb, &ep);
+    switch (err) {
+        case 0:
+            printf("%s: returns 0\n", argv[0]);
+            printf("Endpoint: addr.ipv6=");
+            ipv6_addr_print((ipv6_addr_t *) ep.addr.ipv6);
+            printf(" netif=%u port=%u\n", ep.netif, ep.port);
+            break;
+
+        case -ENOTCONN:
+            printf("%s: returns -ENOTCONN\n", argv[0]);
+            break;
+
+        default:
+            printf("%s: returns %d\n", argv[0], err);
+    }
+    return 0;
+}
+
+int gnrc_tcp_queue_get_local_cmd(int argc, char **argv)
+{
+    dump_args(argc, argv);
+    gnrc_tcp_ep_t ep;
+
+    int err = gnrc_tcp_queue_get_local(&queue, &ep);
+    switch (err) {
+        case 0:
+            printf("%s: returns 0\n", argv[0]);
+            printf("Endpoint: addr.ipv6=");
+            ipv6_addr_print((ipv6_addr_t *) ep.addr.ipv6);
+            printf(" netif=%u port=%u\n", ep.netif, ep.port);
+            break;
+
+        case -EADDRNOTAVAIL:
+            printf("%s: returns -EADDRNOTAVAIL\n", argv[0]);
+            break;
+
+        default:
+            printf("%s: returns %d\n", argv[0], err);
+    }
+    return 0;
+}
+
 /* Exporting GNRC TCP Api to for shell usage */
 static const shell_command_t shell_commands[] = {
     { "gnrc_tcp_ep_from_str", "Build endpoint from string",
@@ -363,6 +439,12 @@ static const shell_command_t shell_commands[] = {
       gnrc_tcp_abort_cmd },
     { "gnrc_tcp_stop_listen", "gnrc_tcp: stop listening",
       gnrc_tcp_stop_listen_cmd },
+    { "gnrc_tcp_get_local", "gnrc_tcp: get local",
+      gnrc_tcp_get_local_cmd },
+    { "gnrc_tcp_get_remote", "gnrc_tcp: get remote",
+      gnrc_tcp_get_remote_cmd },
+    { "gnrc_tcp_queue_get_local", "gnrc_tcp: get queue local",
+      gnrc_tcp_queue_get_local_cmd },
     { "buffer_init", "init internal buffer",
       buffer_init_cmd },
     { "buffer_get_max_size", "get max size of internal buffer",

@@ -310,6 +310,8 @@ int gnrc_tcp_init(void)
 void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb)
 {
     TCP_DEBUG_ENTER;
+    assert(tcb != NULL);
+
     memset(tcb, 0, sizeof(gnrc_tcp_tcb_t));
 #ifdef MODULE_GNRC_IPV6
     tcb->address_family = AF_INET6;
@@ -324,6 +326,16 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb)
     TCP_DEBUG_LEAVE;
 }
 
+void gnrc_tcp_tcb_queue_init(gnrc_tcp_tcb_queue_t *queue)
+{
+    TCP_DEBUG_ENTER;
+    assert(queue != NULL);
+
+    mutex_init(&queue->lock);
+    queue->tcbs = NULL;
+    queue->tcbs_len = 0;
+    TCP_DEBUG_LEAVE;
+}
 
 int gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote, uint16_t local_port)
 {
@@ -561,13 +573,18 @@ int gnrc_tcp_accept(gnrc_tcp_tcb_queue_t *queue, gnrc_tcp_tcb_t **tcb,
         ++avail_tcbs;
     }
 
-    /* Return if a connection was found, accept was called as non-blocking or all
-     * TCBs were already accepted.
+    /* Return if a connection was found, queue is not listening, accept was called as non-blocking
+     * or all TCBs were already accepted.
      */
-    if ((*tcb) || (user_timeout_duration_ms == 0) || (avail_tcbs == 0)) {
+    if ((*tcb) || (queue->tcbs == NULL) || (user_timeout_duration_ms == 0) ||
+       (avail_tcbs == 0)) {
         if (*tcb) {
             TCP_DEBUG_INFO("Accepting connection.");
             ret = 0;
+        }
+        else if (queue->tcbs == NULL) {
+            TCP_DEBUG_ERROR("-EINVAL: Queue is not listening.");
+            ret = -EINVAL;
         }
         else if (avail_tcbs == 0) {
             TCP_DEBUG_ERROR("-ENOMEM: All TCBs are currently accepted.");
@@ -931,6 +948,113 @@ void gnrc_tcp_stop_listen(gnrc_tcp_tcb_queue_t *queue)
     queue->tcbs_len = 0;
     mutex_unlock(&(queue->lock));
     TCP_DEBUG_LEAVE;
+}
+
+int gnrc_tcp_get_local(gnrc_tcp_tcb_t *tcb, gnrc_tcp_ep_t *ep)
+{
+    TCP_DEBUG_ENTER;
+    assert(tcb != NULL);
+    assert(ep != NULL);
+
+    int ret = 0;
+
+    /* Lock the TCB for this function call */
+    mutex_lock(&(tcb->function_lock));
+    _gnrc_tcp_fsm_state_t state =_gnrc_tcp_fsm_get_state(tcb);
+
+    /* Check if connection is established */
+    if ((state == FSM_STATE_ESTABLISHED) || (state == FSM_STATE_CLOSE_WAIT)) {
+        /* Construct endpoint from connection parameters */
+        ep->family = tcb->address_family;
+        ep->port = tcb->local_port;
+        ep->netif = tcb->ll_iface;
+#ifdef MODULE_GNRC_IPV6
+        if (ep->family == AF_INET6) {
+            memcpy(ep->addr.ipv6, tcb->local_addr, sizeof(ep->addr.ipv6));
+        }
+#endif
+    } else {
+        TCP_DEBUG_ERROR("-EADDRNOTAVAIL: TCB is not connected.");
+        ret = -EADDRNOTAVAIL;
+    }
+
+    mutex_unlock(&(tcb->function_lock));
+    TCP_DEBUG_LEAVE;
+    return ret;
+}
+
+int gnrc_tcp_get_remote(gnrc_tcp_tcb_t *tcb, gnrc_tcp_ep_t *ep)
+{
+    TCP_DEBUG_ENTER;
+    assert(tcb != NULL);
+    assert(ep != NULL);
+
+    int ret = 0;
+
+    /* Lock the TCB for this function call */
+    mutex_lock(&(tcb->function_lock));
+    _gnrc_tcp_fsm_state_t state =_gnrc_tcp_fsm_get_state(tcb);
+
+    /* Check if connection is established */
+    if ((state == FSM_STATE_ESTABLISHED) || (state == FSM_STATE_CLOSE_WAIT)) {
+        /* Construct endpoint from connection parameters */
+        ep->family = tcb->address_family;
+        ep->port = tcb->peer_port;
+        ep->netif = 0;
+#ifdef MODULE_GNRC_IPV6
+        if (ep->family == AF_INET6) {
+            memcpy(ep->addr.ipv6, tcb->peer_addr, sizeof(ep->addr.ipv6));
+        }
+#endif
+    } else {
+        TCP_DEBUG_ERROR("-ENOTCONN: TCB is not connected.");
+        ret = -ENOTCONN;
+    }
+
+    mutex_unlock(&(tcb->function_lock));
+    TCP_DEBUG_LEAVE;
+    return ret;
+}
+
+int gnrc_tcp_queue_get_local(gnrc_tcp_tcb_queue_t *queue, gnrc_tcp_ep_t *ep)
+{
+    TCP_DEBUG_ENTER;
+    assert(queue != NULL);
+    assert(ep != NULL);
+
+    int ret = 0;
+
+    /* Lock the TCB queue for this function call */
+    mutex_lock(&(queue->lock));
+
+    /* Check if queue has associated TCBs */
+    if (queue->tcbs) {
+        /* There are listening TCBs: Construct ep from first TCB. */
+        gnrc_tcp_tcb_t *tcb = queue->tcbs;
+        mutex_lock(&(tcb->function_lock));
+
+        /* Construct endpoint from tcbs connection parameters */
+        ep->family = tcb->address_family;
+        ep->port = tcb->local_port;
+        ep->netif = 0;
+#ifdef MODULE_GNRC_IPV6
+        if (ep->family == AF_INET6) {
+            if (tcb->status & STATUS_ALLOW_ANY_ADDR) {
+                ipv6_addr_set_unspecified((ipv6_addr_t *) ep->addr.ipv6);
+            } else {
+                memcpy(ep->addr.ipv6, tcb->local_addr, sizeof(ep->addr.ipv6));
+            }
+        }
+#endif
+        mutex_unlock(&(tcb->function_lock));
+    } else {
+        TCP_DEBUG_ERROR("-EADDRNOTAVAIL: queue was never listening.");
+        ret = -EADDRNOTAVAIL;
+    }
+
+    mutex_unlock(&(queue->lock));
+    TCP_DEBUG_LEAVE;
+    return ret;
 }
 
 int gnrc_tcp_calc_csum(const gnrc_pktsnip_t *hdr, const gnrc_pktsnip_t *pseudo_hdr)

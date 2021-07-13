@@ -183,7 +183,7 @@ def test_gnrc_tcp_garbage_packets_ack_instead_of_sym(child):
         riot_srv.close()
 
 
-@Runner(timeout=5, skip=False)
+@Runner(timeout=5)
 def test_gnrc_tcp_garbage_packets_option_parsing(child):
     """ This test verfies that malformed option don't break TCP
         doesn't break GNRC_TCP. See: https://github.com/RIOT-OS/RIOT/issues/12086
@@ -392,6 +392,118 @@ def test_gnrc_tcp_accept_returns_ENOMEM(child):
             # Out of memory accept should return immediately despite a huge timeout.
             child.sendline('gnrc_tcp_accept 100000000')
             child.expect_exact('gnrc_tcp_accept: returns -ENOMEM')
+
+
+@Runner(timeout=0.5)
+def test_gnrc_tcp_accept_returns_EINVAL(child):
+    """ gnrc_tcp_accept must return with -EINVAL
+        if listen was not called before.
+    """
+    child.sendline('gnrc_tcp_accept 0')
+    child.expect_exact('gnrc_tcp_accept: returns -EINVAL')
+
+
+@Runner(timeout=5)
+def test_gnrc_tcp_get_local_returns_0(child):
+    """ This test verifies that get_local returns 0 in a connected state
+        and the used endpoint contains the expected connection parameters
+    """
+    local_port = 30423
+
+    # Setup Host as server
+    with HostTcpServer(generate_port_number()) as host_srv:
+        # Setup Riot as client
+        with RiotTcpClient(child, host_srv, local_port) as riot_cli:
+
+            # Accept connection
+            host_srv.accept()
+
+            # Get and verify local endpoint
+            riot_cli.get_local()
+            child.expect_exact('Endpoint: addr.ipv6={} netif={} port={}'.format(
+                riot_cli.address, riot_cli.interface, riot_cli.port)
+            )
+
+            # Close connection
+            host_srv.close()
+
+
+@Runner(timeout=1)
+def test_gnrc_tcp_get_local_returns_EADDRNOTAVAIL(child):
+    """ This Test verifies that get_local returns -EADDRNOTAVAIL
+        then not connected
+    """
+    child.sendline('gnrc_tcp_get_local')
+    child.expect_exact('gnrc_tcp_get_local: returns -EADDRNOTAVAIL')
+
+
+@Runner(timeout=5)
+def test_gnrc_tcp_get_remote_returns_0(child):
+    """ This test verifies that get_remote returns 0 in a connected state
+        and the used endpoint contains the expected connection parameters
+    """
+    # Setup Host as server
+    with HostTcpServer(generate_port_number()) as host_srv:
+        # Setup Riot as client
+        with RiotTcpClient(child, host_srv) as riot_cli:
+
+            # Accept connection
+            host_srv.accept()
+
+            # Get and verify local endpoint
+            riot_cli.get_remote()
+            child.expect_exact('Endpoint: addr.ipv6={} netif=0 port={}'.format(
+                host_srv.address, host_srv.listen_port)
+            )
+
+            # Close connection
+            host_srv.close()
+
+
+@Runner(timeout=1)
+def test_gnrc_tcp_get_remote_returns_ENOTCONN(child):
+    """ This test verifies that get_remote returns -ENOTCONN
+        then not connected
+    """
+    child.sendline('gnrc_tcp_get_remote')
+    child.expect_exact('gnrc_tcp_get_remote: returns -ENOTCONN')
+
+
+@Runner(timeout=1)
+def test_gnrc_tcp_queue_get_local_returns_0(child):
+    """ This test verifies that queue_get_local returns 0 then put after listen.
+        And the endpoint content is as are as expected.
+    """
+    # Enter listen with accept all address
+    listen_addr = '::'
+    listen_port = generate_port_number()
+    riot_srv = RiotTcpServer(child, listen_port)
+    riot_srv.listen()
+    riot_srv.queue_get_local()
+    child.expect_exact('Endpoint: addr.ipv6=:: netif=0 port={}'.format(
+        listen_port)
+    )
+    riot_srv.stop_listen()
+
+    # Enter listen with specified address
+    listen_addr = 'fe80::4c49:c7ff:fecd:34a3'
+    listen_port = generate_port_number()
+    riot_srv = RiotTcpServer(child, listen_port, listen_addr)
+    riot_srv.listen()
+    riot_srv.queue_get_local()
+    child.expect_exact('Endpoint: addr.ipv6={} netif=0 port={}'.format(
+        listen_addr, listen_port)
+    )
+    riot_srv.stop_listen()
+
+
+@Runner(timeout=1)
+def test_gnrc_tcp_queue_get_local_returns_EADDRNOTAVAIL(child):
+    """ This Test verifies that queue_get_local returns -EADDRNOTAVAIL
+        then not listening
+    """
+    child.sendline('gnrc_tcp_queue_get_local')
+    child.expect_exact('gnrc_tcp_queue_get_local: returns -EADDRNOTAVAIL')
 
 
 @Runner(timeout=10)

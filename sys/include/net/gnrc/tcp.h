@@ -102,6 +102,14 @@ int gnrc_tcp_init(void);
 void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb);
 
 /**
+ * @brief Initialize Transmission Control Block (TCB) queue
+ * @pre @p queue must not be NULL.
+ *
+ * @param[in,out] queue   TCB queue to initialize.
+ */
+void gnrc_tcp_tcb_queue_init(gnrc_tcp_tcb_queue_t *queue);
+
+/**
  * @brief Opens a connection.
  *
  * @pre gnrc_tcp_tcb_init() must have been successfully called.
@@ -168,6 +176,7 @@ int gnrc_tcp_listen(gnrc_tcp_tcb_queue_t *queue, gnrc_tcp_tcb_t *tcbs, size_t tc
  *
  * @return 0 on success.
  * @return -ENOMEM if all connection in @p queue were already accepted.
+ * @return -EINVAL if listen was never called on queue.
  * @return -EAGAIN if @p user_timeout_duration_ms was 0 and no connection is ready to accept.
  * @return -ETIMEDOUT if @p user_timeout_duration_ms was not 0 and no connection
  *                    could be established.
@@ -262,6 +271,48 @@ void gnrc_tcp_abort(gnrc_tcp_tcb_t *tcb);
  * @param[in,out] queue   TCB queue to stop listening
  */
 void gnrc_tcp_stop_listen(gnrc_tcp_tcb_queue_t *queue);
+
+/**
+ * @brief Get the local end point of a connected TCB
+ *
+ * @pre tcb must not be NULL
+ * @pre ep must not be NULL
+ *
+ * @param[in] tcb   TCB holding the connection information.
+ * @param[out] ep   The local end point.
+ *
+ * @return  0 on success.
+ * @return  -EADDRNOTAVAIL, when @p tcb in not in a connected state.
+ */
+int gnrc_tcp_get_local(gnrc_tcp_tcb_t *tcb, gnrc_tcp_ep_t *ep);
+
+/**
+ * @brief Get the remote end point of a connected TCB
+ *
+ * @pre tcb must not be NULL
+ * @pre ep must not be NULL
+ *
+ * @param[in] tcb   TCB holding the connection information.
+ * @param[out] ep   The remote end point.
+ *
+ * @return  0 on success.
+ * @return  -ENOTCONN, when @p tcb in not in a connected state.
+ */
+int gnrc_tcp_get_remote(gnrc_tcp_tcb_t *tcb, gnrc_tcp_ep_t *ep);
+
+/**
+ * @brief Gets the local end point of a TCB queue
+ *
+ * @pre queue must not be NULL
+ * @pre ep must not be NULL
+ *
+ * @param[in] queue   TCB queue to stop listening
+ * @param[out] ep     The local end point.
+ *
+ * @return  0 on success.
+ * @return  -EADDRNOTAVAIL, when @p queue has no local end point.
+ */
+int gnrc_tcp_queue_get_local(gnrc_tcp_tcb_queue_t *queue, gnrc_tcp_ep_t *ep);
 
 /**
  * @brief Calculate and set checksum in TCP header.
