@@ -289,7 +289,7 @@ void* IRAM_ATTR __wrap__calloc_r(struct _reent *r, size_t count, size_t size)
 
 #else /* MODULE_ESP_IDF_HEAP */
 
-void *__wrap_calloc(size_t nmemb, size_t size)
+void* IRAM_ATTR __wrap__calloc_r(struct _reent *r, size_t nmemb, size_t size)
 {
     /* The xtensa support has not yet upstreamed to newlib. Hence, the fixed
      * calloc implementation of newlib >= 4.0.0 is not available to the ESP
@@ -299,7 +299,7 @@ void *__wrap_calloc(size_t nmemb, size_t size)
         return NULL;
     }
 
-    void *res = malloc(total_size);
+    void *res = _malloc_r(r, total_size);
 
     if (res) {
         memset(res, 0, total_size);
