@@ -1,0 +1,4 @@
+CPU_CORE = cortex-m33
+CPU_FAM  = nrf9160
+
+include $(RIOTCPU)/nrf5x_common/Makefile.features

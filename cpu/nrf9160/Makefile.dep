@@ -1,0 +1,4 @@
+USEMODULE += nrf9160_vectors
+
+include $(RIOTCPU)/nrf5x_common/Makefile.dep
+include $(RIOTCPU)/cortexm_common/Makefile.dep
