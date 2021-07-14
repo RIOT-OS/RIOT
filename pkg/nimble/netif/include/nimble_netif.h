@@ -254,6 +254,22 @@ int nimble_netif_accept(const uint8_t *ad, size_t ad_len,
                         const struct ble_gap_adv_params *adv_params);
 
 /**
+ * @brief   Wait for an incoming connection from a specific peer, sending
+ *          directed advertisements (IND_DIR)
+ *
+ * @param[in] addr          BLE address of the target peer
+ * @param[in] timeout_ms    stop advertising after this time (in ms), set to
+ *                          BLE_HS_FOREVER to disable timeout
+ * @param[in] adv_params    advertising (timing) parameters to use
+ *
+ * @return  NIMBLE_NETIF_OK on success
+ * @return  NIMBLE_NETIF_BUSY if already advertising
+ * @return  NIMBLE_NETIF_NOMEM on insufficient connection memory
+ */
+int nimble_netif_accept_direct(const ble_addr_t *addr, uint32_t timeout_ms,
+                               const struct ble_gap_adv_params *adv_params);
+
+/**
  * @brief   Stop accepting incoming connections (stop advertising)
  * *
  * @return  NIMBLE_NETIF_OK on success
