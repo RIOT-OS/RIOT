@@ -21,7 +21,7 @@
  * data, as well as writing data to the UART port, which means transmitting
  * data. The UART device and the corresponding pins need to be mapped in
  * `RIOT/boards/ * /include/periph_conf.h`. Furthermore, you need to select the
- * baudrate for initialization which is typically {9600, 19200, 38400, 57600,
+ * symbol rate for initialization which is typically {9600, 19200, 38400, 57600,
  * 115200} baud. Additionally, you should register a callback function that is
  * executed in interrupt context when data is being received. The driver will
  * then read the received data byte, call the registered callback function and
@@ -38,11 +38,8 @@
  *
  * # (Low-) Power Implications
  *
- * After initialization, the UART peripheral **should** be powered on and
- * active. The UART can later be explicitly put to sleep and woken up by calling
- * the uart_poweron() and uart_poweroff() functions. Once woken up using
- * uart_poweron(), the UART **should** transparently continue it's previously
- * configured operation.
+ * After initialization, the UART peripheral **MUST** be powered on and
+ * active. By calling @ref uart_poweroff the device can be powered off again.
  *
  * While the UART is active, the implementation might need to block certain
  * power states.
@@ -58,9 +55,10 @@
 #ifndef PERIPH_UART_H
 #define PERIPH_UART_H
 
+#include <errno.h>
+#include <limits.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <limits.h>
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
@@ -109,14 +107,16 @@ typedef struct {
 #endif
 
 /**
- * @brief   Possible UART return values
+ * @brief       Possible UART return values
+ *
+ * @deprecated  Use the errno constants directly instead.
  */
 enum {
-    UART_OK         =  0,   /**< everything in order */
-    UART_NODEV      = -1,   /**< invalid UART device given */
-    UART_NOBAUD     = -2,   /**< given baudrate is not applicable */
-    UART_INTERR     = -3,   /**< all other internal errors */
-    UART_NOMODE     = -4    /**< given mode is not applicable */
+    UART_OK         =  0,           /**< everything in order */
+    UART_NODEV      = -ENODEV,      /**< invalid UART device given */
+    UART_NOBAUD     = -ENOTSUP,     /**< given symbol rate is not applicable */
+    UART_NOMODE     = -ENOTSUP,     /**< given mode is not applicable */
+    UART_INTERR     = -EIO,         /**< all other internal errors */
 };
 
 /**
@@ -161,61 +161,35 @@ typedef enum {
  * - 8 data bits
  * - no parity
  * - 1 stop bit
- * - baudrate as given
+ * - symbol rate as given
  *
  * If no callback parameter is given (rx_cb := NULL), the UART will be
  * initialized in TX only mode.
  *
  * @param[in] uart          UART device to initialize
- * @param[in] baudrate      desired baudrate in baud/s
+ * @param[in] baud          desired symbol rate in baud
  * @param[in] rx_cb         receive callback, executed in interrupt context once
  *                          for every byte that is received (RX buffer filled),
  *                          set to NULL for TX only mode
  * @param[in] arg           optional context passed to the callback functions
  *
- * @return                  UART_OK on success
- * @return                  UART_NODEV on invalid UART device
- * @return                  UART_NOBAUD on inapplicable baudrate
- * @return                  UART_INTERR on other errors
+ * @post    The UART interface is configured, powered on, and active
+ *
+ * @note    The implementation must assume that the UART and the GPIOs used for TXD/RXD are in
+ *          any possible state prior to the call. A full reset of the UART peripheral to bring
+ *          the device in a known state is typically part of the initialization process.
+ * @note    The implementation should keep the TXD pin high during initialization if supported by
+ *          the hardware, so that no garbage is detected at the receiver during initialization.
+ *          Typically configuring the peripheral before routing the GPIOs to it does the trick.
+ *
+ * @retval  0               Success
+ * @retval  -ENODEV         Invalid UART device
+ * @retval  -ENOTSUP        Unsupported symbol rate
+ * @retval  <0              On other errors
  */
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg);
+int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg);
 
 #if defined(MODULE_PERIPH_UART_RECONFIGURE) || DOXYGEN
-/**
- * @brief   Change the pins of the given UART back to plain GPIO functionality
- *
- * The pin mux of the RX and TX pins of the bus will be changed back to
- * default (GPIO) mode and the UART is powered off.
- * This allows to use the UART pins for another function and return to UART
- * functionality again by calling @ref uart_init_pins
- *
- * If you want the pin to be in a defined state, call @ref gpio_init on it.
- *
- * @note Until this is implemented on all platforms, this requires the
- *       periph_uart_reconfigure feature to be used.
- *
- * @param[in] uart      the device to de-initialize
- */
-void uart_deinit_pins(uart_t uart);
-
-/**
- * @brief   Initialize the used UART pins, i.e. RX and TX
- *
- *
- * After calling uart_init, the pins must be initialized (i.e. uart_init is
- * calling this function internally). In normal cases, this function will not
- * be used. But there are some devices, that use UART bus lines also for other
- * purposes and need the option to dynamically re-configure one or more of the
- * used pins. So they can take control over certain pins and return control back
- * to the UART driver using this function.
- *
- * The pins used are configured in the board's periph_conf.h.
- *
- * @param[in] uart      UART device the pins are configure for
- */
-void uart_init_pins(uart_t uart);
-
-#if DOXYGEN
 /**
  * @brief   Get the RX pin of the given UART.
  *
@@ -240,7 +214,6 @@ gpio_t uart_pin_rx(uart_t uart);
  */
 gpio_t uart_pin_tx(uart_t uart);
 
-#endif /* DOXYGEN */
 #endif /* MODULE_PERIPH_UART_RECONFIGURE */
 
 /**
@@ -251,8 +224,9 @@ gpio_t uart_pin_tx(uart_t uart);
  * @param[in] parity        parity mode
  * @param[in] stop_bits     number of stop bits in a UART frame
  *
- * @return                  UART_OK on success
- * @return                  UART_NOMODE on other errors
+ * @retval  0               Success
+ * @retval  -ENOTSUP        Given configuration not supported
+ * @retval  <0              Other error
  */
 int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
               uart_stop_bits_t stop_bits);
@@ -272,16 +246,17 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 void uart_write(uart_t uart, const uint8_t *data, size_t len);
 
 /**
- * @brief   Power on the given UART device
- *
- * @param[in] uart          the UART device to power on
- */
-void uart_poweron(uart_t uart);
-
-/**
  * @brief Power off the given UART device
  *
  * @param[in] uart          the UART device to power off
+ *
+ * @post    The UART interface is powered off. After a call to @ref gpio_init the pins
+ *          previously used by the UART peripheral must be usable as ordinary GPIOs.
+ *
+ * @note    If @ref gpio_init disconnects GPIOs from any peripherals they might be
+ *          routed to anyway, the implementation does not need to pay any attention.
+ *          Otherwise, it must disconnect the GPIOs so that they can be used as
+ *          regular GPIOs again.
  */
 void uart_poweroff(uart_t uart);
 
