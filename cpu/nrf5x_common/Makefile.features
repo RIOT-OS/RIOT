@@ -1,18 +1,21 @@
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_cpuid
-FEATURES_PROVIDED += periph_flashpage
-FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
-FEATURES_PROVIDED += periph_hwrng
-FEATURES_PROVIDED += periph_temperature
 FEATURES_PROVIDED += periph_timer_periodic
-FEATURES_PROVIDED += periph_rtt_overflow
 FEATURES_PROVIDED += periph_uart_modecfg
-FEATURES_PROVIDED += periph_wdt periph_wdt_cb
+
+ifneq (nrf9160,$(CPU_MODEL))
+  FEATURES_PROVIDED += periph_flashpage
+  FEATURES_PROVIDED += periph_flashpage_pagewise
+  FEATURES_PROVIDED += periph_hwrng
+  FEATURES_PROVIDED += periph_rtt_overflow
+  FEATURES_PROVIDED += periph_temperature
+  FEATURES_PROVIDED += periph_wdt periph_wdt_cb
 
 # Various other features (if any)
-FEATURES_PROVIDED += ble_nimble
-FEATURES_PROVIDED += radio_nrfble
-FEATURES_PROVIDED += radio_nrfmin
+  FEATURES_PROVIDED += ble_nimble
+  FEATURES_PROVIDED += radio_nrfble
+  FEATURES_PROVIDED += radio_nrfmin
+endif
 
 include $(RIOTCPU)/cortexm_common/Makefile.features

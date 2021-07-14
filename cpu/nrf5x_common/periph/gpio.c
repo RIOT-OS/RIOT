@@ -38,6 +38,16 @@
 #define PORT_BIT            (1 << 5)
 #define PIN_MASK            (0x1f)
 
+/* Compatibility wrapper defines for nRF9160 */
+#ifdef NRF_P0_S
+#define NRF_P0 NRF_P0_S
+#endif
+
+#ifdef NRF_GPIOTE0_S
+#define NRF_GPIOTE NRF_GPIOTE0_S
+#define GPIOTE_IRQn GPIOTE0_IRQn
+#endif
+
 #ifdef MODULE_PERIPH_GPIO_IRQ
 
 #if CPU_FAM_NRF51
