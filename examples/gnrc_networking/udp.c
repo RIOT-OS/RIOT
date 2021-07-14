@@ -89,7 +89,8 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
         if (netif != NULL) {
             gnrc_pktsnip_t *netif_hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
 
-            gnrc_netif_hdr_set_netif(netif_hdr->data, (gnrc_netif_t *)netif);
+            gnrc_netif_hdr_set_netif(netif_hdr->data,
+                                     container_of(netif, gnrc_netif_t, netif));
             ip = gnrc_pkt_prepend(ip, netif_hdr);
         }
         /* send packet */
