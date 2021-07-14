@@ -129,7 +129,7 @@ static void _config_radio(gnrc_lorawan_t *mac, uint32_t channel_freq,
         /* Switch to single listen mode */
         const netopt_enable_t single = true;
         dev->driver->set(dev, NETOPT_SINGLE_RECEIVE, &single, sizeof(single));
-        const uint8_t timeout = CONFIG_GNRC_LORAWAN_MIN_SYMBOLS_TIMEOUT;
+        const uint16_t timeout = CONFIG_GNRC_LORAWAN_MIN_SYMBOLS_TIMEOUT;
         dev->driver->set(dev, NETOPT_RX_SYMBOL_TIMEOUT, &timeout,
                          sizeof(timeout));
     }

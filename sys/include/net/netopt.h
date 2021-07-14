@@ -748,7 +748,7 @@ typedef enum {
     NETOPT_RANDOM,
 
     /**
-     * @brief (uint8_t) Get or set the number of PHY symbols before assuming there's no data
+     * @brief (uint16_t) Get or set the number of PHY symbols before assuming there's no data
      */
     NETOPT_RX_SYMBOL_TIMEOUT,
 
