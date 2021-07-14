@@ -169,6 +169,7 @@ typedef struct {
 typedef struct {
     uint8_t activation;     /**< Activation mechanism of the MAC layer */
     bool adr;               /**< adr bit status */
+    bool adr_ack;           /**< adr ack bit status */
     int pending_mlme_opts;  /**< holds pending mlme opts */
     uint32_t nid;           /**< current Network ID */
     int32_t backoff_budget; /**< remaining Time On Air budget */

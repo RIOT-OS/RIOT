@@ -258,8 +258,7 @@ size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload,
     lorawan_hdr_set_adr(lw_hdr,mac->mlme.adr);
 
     /* Set `ADRACKReq` bit */
-    if (mac->mlme.adr && mac->last_dr && \
-        (mac->mlme.adr_ack_cnt >= CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT)) {
+    if (mac->mlme.adr_ack) {
         lorawan_hdr_set_adr_ack_req(lw_hdr, true);
     }
 
@@ -391,12 +390,13 @@ void gnrc_lorawan_event_no_rx(gnrc_lorawan_t *mac)
         return;
     }
 
-    if (mac->mlme.adr_ack_cnt  > (CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT +
-         CONFIG_LORAMAC_DEFAULT_ADR_ACK_DELAY)) {
-             if (mac->last_dr) {
-                DEBUG("gnrc_lorawan_mcps: ADRACKReq: Decrement DR\n");
-                mac->last_dr--;
-             }
+    if (mac->mlme.adr && (mac->last_dr != 0)) {
+        mac->mlme.adr_ack = mac->mlme.adr_ack_cnt >= CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT;
+        if (mac->mlme.adr_ack && ((mac->mlme.adr_ack - CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT) \
+                                  % CONFIG_LORAMAC_DEFAULT_ADR_ACK_DELAY) == 0) {
+            DEBUG("gnrc_lorawan_mcps: ADRACKReq: Decrement DR\n");
+            mac->last_dr--;
+        }
     }
 
     _handle_retransmissions(mac);
