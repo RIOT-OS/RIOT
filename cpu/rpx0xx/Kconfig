@@ -1,0 +1,35 @@
+# Copyright (C) 2021 Otto-von-Guericke-Universität Magdeburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_FAM_RPX0XX
+    bool
+    select CPU_CORE_CORTEX_M0PLUS
+    select HAS_CPU_RPX0XX
+    select HAS_PERIPH_GPIO
+    select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_UART_MODECFG
+    select HAS_PERIPH_UART_RECONFIGURE
+
+config CPU_FAM
+    default "RPX0XX" if CPU_FAM_RPX0XX
+
+config CPU_MODEL_RP2040
+    bool
+    select CPU_FAM_RPX0XX
+
+config CPU_MODEL
+    default "RP2040" if CPU_MODEL_RP2040
+
+config CPU
+    default "rpx0xx" if CPU_FAM_RPX0XX
+
+config HAS_CPU_RPX0XX
+    bool
+    help
+        Indicates that a RPX0XX CPU (e.g. the RP2040) is used
+
+source "$(RIOTCPU)/cortexm_common/Kconfig"

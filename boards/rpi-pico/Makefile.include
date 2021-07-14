@@ -1,0 +1,2 @@
+CPU_MODEL       := RP2040
+PORT_LINUX      ?= /dev/ttyUSB0
