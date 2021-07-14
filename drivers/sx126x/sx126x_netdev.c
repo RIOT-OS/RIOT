@@ -425,9 +425,9 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         return sizeof(netopt_enable_t);
 
     case NETOPT_RX_SYMBOL_TIMEOUT:
-        assert(len <= sizeof(uint8_t));
-        dev->rx_timeout = *(const uint8_t *)val;
-        return sizeof(uint8_t);
+        assert(len <= sizeof(uint16_t));
+        dev->rx_timeout = *(const uint16_t *)val;
+        return sizeof(uint16_t);
 
     case NETOPT_TX_POWER:
         assert(len <= sizeof(int16_t));
