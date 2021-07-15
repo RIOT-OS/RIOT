@@ -48,7 +48,7 @@ extern "C" {
 #define DHCPV6_CLIENT_BUFLEN        (256)   /**< default length for send and receive buffer */
 
 /**
- * @defgroup net_dhcpv6_conf DHCPv6 client compile configurations
+ * @defgroup net_dhcpv6_conf DHCPv6 compile configurations
  * @ingroup  config
  * @{
  */
