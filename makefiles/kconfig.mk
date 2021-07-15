@@ -70,11 +70,14 @@ $(GENERATED_DIR): $(if $(MAKE_RESTARTS),,$(CLEAN))
 
 # During migration this checks if Kconfig should run. It will run if any of
 # the following is true:
-# - A file with '.config' extension is present in the application directory
-# - A 'Kconfig' file is present in the application directory
 # - A previous configuration file is present (e.g. from a previous call to
 #   menuconfig)
 # - menuconfig is being called
+# - SHOULD_RUN_KCONFIG or TEST_KCONFIG is set
+#
+# By default SHOULD_RUN_KCONFIG is set if any of the following is true:
+# - A file with '.config' extension is present in the application directory
+# - A 'Kconfig' file is present in the application directory
 #
 # NOTE: This assumes that Kconfig will not generate any default configurations
 # just from the Kconfig files outside the application folder (i.e. module
@@ -82,10 +85,19 @@ $(GENERATED_DIR): $(if $(MAKE_RESTARTS),,$(CLEAN))
 # check would not longer be valid, and Kconfig would have to run on every
 # build.
 SHOULD_RUN_KCONFIG ?= $(or $(wildcard $(APPDIR)/*.config), \
-                           $(wildcard $(APPDIR)/Kconfig), \
-                           $(if $(CLEAN),,$(wildcard $(KCONFIG_OUT_CONFIG))))
+                           $(wildcard $(APPDIR)/Kconfig))
 
 ifneq (,$(filter menuconfig, $(MAKECMDGOALS)))
+  SHOULD_RUN_KCONFIG := 1
+endif
+
+ifneq (,$(if $(CLEAN),,$(wildcard $(KCONFIG_OUT_CONFIG))))
+  ifeq (,$(SHOULD_RUN_KCONFIG))
+    WARNING_MSG := Warning! SHOULD_RUN_KCONFIG is not set but a previous \
+                   configuration file was detected (did you run \
+                  `make menuconfig`?). Kconfig will run regardless.
+    $(warning $(WARNING_MSG))
+  endif
   SHOULD_RUN_KCONFIG := 1
 endif
 
