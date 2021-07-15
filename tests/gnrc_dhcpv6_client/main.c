@@ -42,6 +42,7 @@ void *_dhcpv6_client_thread(void *args)
     /* configure client to request prefix delegation of /64 subnet
      * interface netif */
     dhcpv6_client_req_ia_pd(netif->pid, 64U);
+    dhcpv6_client_req_ia_na(netif->pid);
     /* start DHCPv6 client */
     dhcpv6_client_start();
     /* start event loop of DHCPv6 client */

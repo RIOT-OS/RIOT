@@ -60,6 +60,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Maximum number of leases to be stored
+ */
+#ifndef CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX
+#define CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX (1U)
+#endif
+
+/**
  * @brief   MUD URL (must use the https:// scheme)
  * For more info, see the [definitions](@ref net_dhcpv6_mud_url_option) below
  */
@@ -129,6 +136,17 @@ void dhcpv6_client_start(void);
  *                      might not consider this request). Must be <= 128
  */
 void dhcpv6_client_req_ia_pd(unsigned netif, unsigned pfx_len);
+/** @} */
+
+/**
+ * @brief   Configures the client to request non-temporary addresses for a network
+ *          interface from a server
+ * @note    For multi-hop WPAN meshes a DHCPv6 relay (which is not implemented in
+ *          RIOT yet) is required, as DHCPv6 only acts in link scope.
+ *
+ * @param[in] netif     The interface to request non-temporaty addresses for.
+ */
+void dhcpv6_client_req_ia_na(unsigned netif);
 /** @} */
 
 /**

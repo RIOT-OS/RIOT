@@ -102,6 +102,18 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Number of global unicast addresses needed for a
+ *          @ref net_dhcpv6_client "DHCPv6 Client" using IA_NA
+ *
+ * @note    Used for calculation of @ref CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF
+ */
+#ifdef MODULE_GNRC_DHCPV6_CLIENT_IA_NA
+#define GNRC_NETIF_IPV6_DHCPV6_IA_NA_ADDR   (1)
+#else
+#define GNRC_NETIF_IPV6_DHCPV6_IA_NA_ADDR   (0)
+#endif
+
+/**
  * @brief   Maximum number of unicast and anycast addresses per interface
  *
  * @note    If you change this, please make sure that
@@ -111,7 +123,8 @@ extern "C" {
  * Default: 2 (1 link-local + 1 global address)
  */
 #ifndef CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF
-#define CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF    (2)
+#define CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF    (2 + \
+                                               GNRC_NETIF_IPV6_DHCPV6_IA_NA_ADDR)
 #endif
 
 /**
