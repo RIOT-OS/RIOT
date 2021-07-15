@@ -20,7 +20,8 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define GNRC_LORAWAN_DATARATES_NUMOF (6U)
+#define GNRC_LORAWAN_DATARATES_NUMOF        (6U)
+#define GNRC_LORAWAN_TX_POWER_INDEX_MAX     (7U)
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -142,6 +143,15 @@ bool gnrc_lorawan_validate_dr(uint8_t dr)
         return true;
     }
     DEBUG("gnrc_lorawan_region: Invalid DR.\n");
+    return false;
+}
+
+bool gnrc_lorawan_validate_tx_power(uint8_t tx_power)
+{
+    if (tx_power <= GNRC_LORAWAN_TX_POWER_INDEX_MAX) {
+        return true;
+    }
+    DEBUG("gnrc_lorawan_region: Invalid TX Power index\n");
     return false;
 }
 
