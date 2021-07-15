@@ -255,6 +255,17 @@ void gnrc_lorawan_generate_session_keys(const uint8_t *app_nonce,
 int gnrc_lorawan_set_dr(gnrc_lorawan_t *mac, uint8_t datarate);
 
 /**
+ * @brief Set TX power (PHY parameter) for the next transmission
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ * @param[in] tx_pwr desired TX power index
+ *
+ * @return 0 on success
+ * @return -EINVAL if TX power is not available in the current region
+ */
+int gnrc_lorawan_set_tx_power(gnrc_lorawan_t *mac, uint16_t tx_pwr);
+
+/**
  * @brief build uplink frame
  *
  * @param[in] mac pointer to MAC descriptor

@@ -49,6 +49,18 @@ int gnrc_lorawan_set_dr(gnrc_lorawan_t *mac, uint8_t datarate)
     return 0;
 }
 
+int gnrc_lorawan_set_tx_power(gnrc_lorawan_t *mac, uint16_t tx_pwr)
+{
+    netdev_t *dev = gnrc_lorawan_get_netdev(mac);
+
+    if (!gnrc_lorawan_validate_tx_power(tx_pwr)) {
+        return -EINVAL;
+    }
+
+    DEBUG("gnrc_lorawan_region: TX  Power index: %u \n",tx_pwr);
+    return(dev->driver->set(dev, NETOPT_TX_POWER, &tx_pwr, sizeof(tx_pwr)));
+}
+
 #if (IS_ACTIVE(CONFIG_LORAMAC_REGION_EU_868))
 uint8_t gnrc_lorawan_rx1_get_dr_offset(uint8_t dr_up, uint8_t dr_offset)
 {
