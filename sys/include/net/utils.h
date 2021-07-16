@@ -23,7 +23,9 @@
 
 #include <stdint.h>
 #include <stddef.h>
+
 #include "net/ipv6/addr.h"
+#include "net/netif.h"
 
 #ifdef __cplusplus
 extern "C" {

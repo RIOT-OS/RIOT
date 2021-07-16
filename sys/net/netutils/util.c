@@ -17,9 +17,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "net/netif.h"
 #include "net/utils.h"
 #ifdef MODULE_SOCK_DNS
+#include "net/af.h"
 #include "net/sock/dns.h"
 #endif
 
@@ -36,6 +36,10 @@ static bool _netif_get(netif_t **current_netif)
 int netutils_get_ipv6(ipv6_addr_t *addr, netif_t **netif, const char *hostname)
 {
     *netif = NULL;
+
+    if (hostname == NULL) {
+        return -EINVAL;
+    }
 
 #ifdef MODULE_SOCK_DNS
     /* hostname is not an IPv6 address */
@@ -54,6 +58,10 @@ int netutils_get_ipv6(ipv6_addr_t *addr, netif_t **netif, const char *hostname)
     if (iface) {
         *netif = netif_get_by_id(atoi(iface + 1));
         len -= strlen(iface);
+
+        if (*netif == NULL) {
+            return -EINVAL;
+        }
     }
     /* preliminary select the first interface */
     else if (_netif_get(netif)) {
