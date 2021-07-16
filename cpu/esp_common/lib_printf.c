@@ -72,6 +72,9 @@ LIB_PRINTF(net80211, LOG_DEBUG, "net80211")
 LIB_PRINTF(phy, LOG_INFO, "core")
 LIB_PRINTF(pp, LOG_DEBUG, "pp")
 LIB_PRINTF(sc, LOG_DEBUG, "smartconfig")
+/* The ESP8266 SDK uses smartconfig_printf but the ESP32 one uses sc_printf. */
+int smartconfig_printf(const char *format, ...)
+    __attribute__((alias("sc_printf")));
 LIB_PRINTF(ssc, LOG_DEBUG, "ssc")
 LIB_PRINTF(wpa, LOG_DEBUG, "wpa")
 LIB_PRINTF(wpa2, LOG_DEBUG, "wpa")

@@ -318,32 +318,10 @@ the directory with Xtensa GCC binaries:
 export PATH=$HOME/esp/xtensa-esp8266-elf/bin:$PATH
 ```
 
-### <a name="esp8266_installation_of_esp_idf"> Installation of the ESP8266 RTOS SDK</a> &nbsp;[[TOC](#esp8266_toc)]
+### <a name="esp8266_installation_of_esp_idf"> ESP8266 RTOS SDK</a> &nbsp;[[TOC](#esp8266_toc)]
 
-To compile RIOT-OS with the ESP8266 RTOS SDK, a modified version of the SDK is
-required. This modified version can also be downloaded as
-[GIT](https://github.com/gschorcht/RIOT-Xtensa-ESP8266-RTOS-SDK.git) repository.
-
-```
-cd $HOME/esp
-git clone https://github.com/gschorcht/RIOT-Xtensa-ESP8266-RTOS-SDK.git ESP8266_RTOS_SDK
-cd ESP8266_RTOS_SDK/
-git checkout release/v3.1-for-riot-os-v2
-```
-@note
-- Please be sure to checkout the correct branch that was used for the
-RIOT-OS port. Other versions will not work because they do not have the
-necessary changes.
-- Since we only use a few header files and some binary libraries, ESP8266 RTOS
-SDK does not need to be compiled in any way.
-
-To use the installed ESP8266 RTOS SDK, set the environment variable
-`ESP8266_RTOS_SDK_DIR`.
-
-```
-export ESP8266_RTOS_SDK_DIR=$HOME/esp/ESP8266_RTOS_SDK
-```
-
+RIOT-OS uses the ESP8266 RTOS SDK as part of the build. This is downloaded as a
+package at build-time and there is no need to install it separately.
 
 ### <a name="esp8266_installation_of_esptool"> Installation of `esptool.py` (ESP flash programmer tool) </a> &nbsp;[[TOC](#esp8266_toc)]
 
@@ -389,7 +367,6 @@ correctly to
 
 ```
 export PATH=/path/to/esp/xtensa-esp8266-elf/bin:$PATH
-export ESP8266_RTOS_SDK_DIR=/path/to/esp/ESP8266_RTOS_SDK
 ```
 
 ## <a name="esp8266_compile_options"> Compile Options </a> &nbsp;[[TOC](#esp8266_toc)]

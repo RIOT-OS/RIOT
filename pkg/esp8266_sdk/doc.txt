@@ -1,0 +1,6 @@
+/**
+ * @defgroup pkg_esp8266_sdk    Vendor library for the ESP8266 MCU RTOS support
+ * @ingroup  pkg
+ * @brief    Vendor library for the ESP8266 MCU RTOS support by Espressif
+ * @see      https://github.com/espressif/ESP8266_RTOS_SDK
+ */

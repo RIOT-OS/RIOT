@@ -1,0 +1,23 @@
+# Directory with the SDK source checkout. Some modules in the cpu/esp8266 use
+# internal parts of the SDK and for that they need access to the
+# ESP8266_RTOS_SDK_DIR path.
+export ESP8266_RTOS_SDK_DIR = $(PKGDIRBASE)/esp8266_sdk
+
+# Directory where we built the modified libraries and headers.
+ESP8266_SDK_BUILD_DIR ?= $(ESP8266_RTOS_SDK_DIR)/build-libs
+
+INCLUDES += -I$(ESP8266_RTOS_SDK_DIR)/components/
+INCLUDES += -I$(ESP8266_RTOS_SDK_DIR)/components/bootloader_support/include/
+INCLUDES += -I$(ESP8266_RTOS_SDK_DIR)/components/esp8266/include
+INCLUDES += -I$(ESP8266_RTOS_SDK_DIR)/components/esp8266/include/esp8266
+INCLUDES += -I$(ESP8266_RTOS_SDK_DIR)/components/heap/include
+INCLUDES += -I$(ESP8266_RTOS_SDK_DIR)/components/heap/port/esp8266/include
+INCLUDES += -I$(ESP8266_RTOS_SDK_DIR)/components/nvs_flash/include
+INCLUDES += -I$(ESP8266_RTOS_SDK_DIR)/components/spi_flash/include
+INCLUDES += -I$(ESP8266_SDK_BUILD_DIR)
+
+# Modified binary libraries are built here in the Makefile.
+LINKFLAGS += -L$(ESP8266_SDK_BUILD_DIR)
+
+# esp8266_sdk doesn't generate any .a
+PSEUDOMODULES += esp8266_sdk
