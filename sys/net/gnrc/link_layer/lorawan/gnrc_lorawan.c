@@ -58,6 +58,7 @@ static inline void gnrc_lorawan_mcps_reset(gnrc_lorawan_t *mac)
     mac->mcps.waiting_for_ack = false;
     mac->mcps.fcnt = 0;
     mac->mcps.fcnt_down = 0;
+    gnrc_lorawan_set_uncnf_redundancy(mac, CONFIG_LORAMAC_DEFAULT_REDUNDANCY);
 }
 
 void gnrc_lorawan_set_rx2_dr(gnrc_lorawan_t *mac, uint8_t rx2_dr)
@@ -164,8 +165,11 @@ void gnrc_lorawan_timeout_cb(gnrc_lorawan_t *mac)
         case LORAWAN_STATE_JOIN:
             gnrc_lorawan_trigger_join(mac);
             break;
+        case LORAWAN_STATE_IDLE:
+            gnrc_lorawan_event_retrans_timeout(mac);
+            break;
         default:
-            gnrc_lorawan_event_ack_timeout(mac);
+            assert(false);
             break;
     }
 }

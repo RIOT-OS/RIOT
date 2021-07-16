@@ -524,4 +524,16 @@ config LORAMAC_DEFAULT_MIN_RX_SYMBOLS
         system timer. Refer SX1276_settings_for_LoRaWAN_v2p2.pdf
         (AN1200.24) from Semtech for more information.
 
+config LORAMAC_DEFAULT_REDUNDANCY
+    int "Default redundancy for unconfirmed uplinks"
+    depends on USEMODULE_GNRC_LORAWAN
+    default 0
+    range 0 14
+    help
+         This corresponds to the number of unconfirmed
+         uplink retransmissions when using ADR. This
+         configuration does not affect confirmed uplinks.
+         By default, uplinks are sent without retransmissions
+         (this means, the device sends only one uplink packet)
+
 endif # KCONFIG_USEMODULE_LORAWAN
