@@ -26,6 +26,12 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Compatibility wrapper for nRF9160
+ */
+#ifdef NRF_FICR_S
+#define NRF_FICR NRF_FICR_S
+#endif
+/**
  * @name    Power management configuration
  * @{
  */
@@ -35,7 +41,11 @@ extern "C" {
 /**
  * @brief   Starting offset of CPU_ID
  */
+#ifdef FICR_INFO_DEVICEID_DEVICEID_Msk
+#define CPUID_ADDR          (&NRF_FICR->INFO.DEVICEID[0])
+#else
 #define CPUID_ADDR          (&NRF_FICR->DEVICEID[0])
+#endif
 /**
  * @brief   Length of the CPU_ID in octets
  */
@@ -143,6 +153,7 @@ typedef struct {
  * @brief   Override SPI mode values
  * @{
  */
+#ifndef CPU_FAM_NRF9160
 #define HAVE_SPI_MODE_T
 typedef enum {
     SPI_MODE_0 = 0,                                             /**< CPOL=0, CPHA=0 */
@@ -165,6 +176,7 @@ typedef enum {
     SPI_CLK_10MHZ  = SPI_FREQUENCY_FREQUENCY_M8     /**< 10MHz */
 } spi_clk_t;
 /** @} */
+#endif /* ndef CPU_FAM_NRF9160 */
 #endif /* ndef DOXYGEN */
 
 /**

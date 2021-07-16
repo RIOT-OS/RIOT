@@ -1,0 +1,19 @@
+
+ROM_LEN ?= 0x100000
+RAM_LEN ?= 0x40000
+
+ROM_START_ADDR ?= 0x00000000
+RAM_START_ADDR ?= 0x20000000
+
+LINKER_SCRIPT ?= cortexm.ld
+
+FLASHFILE = $(BINFILE)
+
+PROGRAMMER ?= jlink
+# setup the JLINK_DEVICE variable if needed
+ifeq ($(PROGRAMMER),jlink)
+  JLINK_DEVICE = NRF9160_XXAA
+endif
+
+include $(RIOTCPU)/nrf5x_common/Makefile.include
+include $(RIOTMAKE)/arch/cortexm.inc.mk

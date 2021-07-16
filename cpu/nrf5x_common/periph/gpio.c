@@ -38,6 +38,15 @@
 #define PORT_BIT            (1 << 5)
 #define PIN_MASK            (0x1f)
 
+/* Compatibility wrapper defines for nRF9160 */
+#ifdef NRF_P0_S
+#define NRF_P0 NRF_P0_S
+#endif
+
+#ifdef NRF_GPIOTE0_S
+#define NRF_GPIOTE NRF_GPIOTE0_S
+#endif
+
 #ifdef MODULE_PERIPH_GPIO_IRQ
 
 #if CPU_FAM_NRF51
@@ -180,7 +189,11 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     /* configure pin as input */
     gpio_init(pin, mode);
     /* set interrupt priority and enable global GPIOTE interrupt */
+#ifdef CPU_FAM_NRF9160
+    NVIC_EnableIRQ(GPIOTE0_IRQn);
+#else
     NVIC_EnableIRQ(GPIOTE_IRQn);
+#endif
     /* configure the GPIOTE channel: set even mode, pin and active flank */
     NRF_GPIOTE->CONFIG[_pin_index] = (GPIOTE_CONFIG_MODE_Event |
                              (pin_num(pin) << GPIOTE_CONFIG_PSEL_Pos) |
