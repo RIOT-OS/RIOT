@@ -256,6 +256,10 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
     USEMODULE += posix_inet
   endif
 
+  ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
+    USEMODULE += netutils
+  endif
+
   ifneq (,$(filter nimble_netif,$(USEMODULE)))
     USEMODULE += nimble_scanner
     USEMODULE += nimble_scanlist
