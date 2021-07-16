@@ -1,0 +1,2 @@
+pico_simple_hardware_target(flash)
+target_link_libraries(hardware_flash INTERFACE pico_bootrom)

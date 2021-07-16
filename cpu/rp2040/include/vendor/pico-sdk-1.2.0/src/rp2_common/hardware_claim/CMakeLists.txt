@@ -1,0 +1,2 @@
+pico_simple_hardware_target(claim)
+target_link_libraries(hardware_claim INTERFACE hardware_sync)
