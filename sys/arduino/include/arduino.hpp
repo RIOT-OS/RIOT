@@ -25,6 +25,7 @@ extern "C" {
 #include <stdint.h>
 #include "periph/gpio.h"
 #include "arduino_board.h"
+#include "pins_arduino.h"
 }
 
 #include "serialport.hpp"
