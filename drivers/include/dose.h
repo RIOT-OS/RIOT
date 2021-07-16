@@ -31,7 +31,8 @@
  * you could use an IC such as the SN65HVD233.)
  *
  * Basically, UART TX and RX are connected to respective pins of the
- * transceiver. In addition, the RX pin can also be connected to the sense GPIO.
+ * transceiver. In addition, the RX pin can also be connected to the sense GPIO
+ * if the UART does not implement the `periph_uart_rx_start` feature.
  * In this case, the bus allocation can be detected more precisely and
  * collisions are less likely.
  *

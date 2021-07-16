@@ -64,7 +64,7 @@ static void _init_sense(dose_t *ctx, const dose_params_t *params)
 {
 #ifdef MODULE_PERIPH_UART_RX_START
     (void)params;
-    uart_rxs_configure(ctx->uart, _isr_gpio, ctx);
+    uart_rxstart_configure(ctx->uart, _isr_gpio, ctx);
 #else
     ctx->sense_pin = params->sense_pin;
     if (gpio_is_valid(ctx->sense_pin)) {
@@ -77,7 +77,7 @@ static void _init_sense(dose_t *ctx, const dose_params_t *params)
 static inline void _enable_sense(dose_t *ctx)
 {
 #ifdef MODULE_PERIPH_UART_RX_START
-    uart_rxs_enable(ctx->uart);
+    uart_rxstart_enable(ctx->uart);
 #else
     if (gpio_is_valid(ctx->sense_pin)) {
         gpio_irq_enable(ctx->sense_pin);
@@ -88,7 +88,7 @@ static inline void _enable_sense(dose_t *ctx)
 static inline void _disable_sense(dose_t *ctx)
 {
 #ifdef MODULE_PERIPH_UART_RX_START
-    uart_rxs_disable(ctx->uart);
+    uart_rxstart_disable(ctx->uart);
 #else
     if (gpio_is_valid(ctx->sense_pin)) {
         gpio_irq_disable(ctx->sense_pin);
