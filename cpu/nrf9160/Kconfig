@@ -1,0 +1,38 @@
+# Copyright (c) 2021 Mesotic SAS
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_FAM_NRF9160
+    bool
+    select HAS_CPU_NRF9160
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_GPIO
+    select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_TIMER_PERIODIC
+    select HAS_PERIPH_UART_MODECFG
+
+## CPU Models
+config CPU_MODEL_NRF9160
+    bool
+    select CPU_CORE_CORTEX_M33
+    select CPU_FAM_NRF9160
+
+## CPU common symbols
+config CPU_FAM
+    default "nrf9160" if CPU_FAM_NRF9160
+
+config CPU_MODEL
+    default "nrf9160" if CPU_MODEL_NRF9160
+
+config CPU
+    default "nrf9160" if CPU_FAM_NRF9160
+
+## Definition of specific features
+config HAS_CPU_NRF9160
+    bool
+    help
+        Indicates that the current cpu is 'nrf9160'.
+
+source "$(RIOTCPU)/cortexm_common/Kconfig"
