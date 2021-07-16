@@ -58,7 +58,7 @@ int gnrc_lorawan_set_tx_power(gnrc_lorawan_t *mac, uint16_t tx_pwr)
     }
 
     DEBUG("gnrc_lorawan_region: TX  Power index: %u \n",tx_pwr);
-    return(dev->driver->set(dev, NETOPT_TX_POWER, &tx_pwr, sizeof(tx_pwr)));
+    return dev->driver->set(dev, NETOPT_TX_POWER, &tx_pwr, sizeof(tx_pwr));
 }
 
 #if (IS_ACTIVE(CONFIG_LORAMAC_REGION_EU_868))
