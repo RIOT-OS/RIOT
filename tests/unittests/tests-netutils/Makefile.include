@@ -1,0 +1,6 @@
+USEMODULE += netutils
+USEMODULE += netif
+
+# pretend to include sock_dns
+CFLAGS += -DMODULE_SOCK_DNS=1
+CFLAGS += -I$(RIOTBASE)/tests/unittests/tests-netutils
