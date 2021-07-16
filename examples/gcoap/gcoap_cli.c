@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "net/gcoap.h"
+#include "net/utils.h"
 #include "od.h"
 #include "fmt.h"
 
@@ -254,40 +255,17 @@ static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, vo
 }
 
 static bool _parse_endpoint(sock_udp_ep_t *remote,
-                            char *addr_str, char *port_str)
+                            const char *addr_str, const char *port_str)
 {
-    ipv6_addr_t addr;
-    remote->family = AF_INET6;
+    netif_t *netif;
 
-    /* parse for interface */
-    char *iface = ipv6_addr_split_iface(addr_str);
-    if (!iface) {
-        if (gnrc_netif_numof() == 1) {
-            /* assign the single interface found in gnrc_netif_numof() */
-            remote->netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
-        }
-        else {
-            remote->netif = SOCK_ADDR_ANY_NETIF;
-        }
-    }
-    else {
-        int pid = atoi(iface);
-        if (gnrc_netif_get_by_pid(pid) == NULL) {
-            puts("gcoap_cli: interface not valid");
-            return false;
-        }
-        remote->netif = pid;
-    }
-    /* parse destination address */
-    if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
+    /* parse hostname */
+    if (netutils_get_ipv6((ipv6_addr_t *)&remote->addr, &netif, addr_str) < 0) {
         puts("gcoap_cli: unable to parse destination address");
         return false;
     }
-    if ((remote->netif == SOCK_ADDR_ANY_NETIF) && ipv6_addr_is_link_local(&addr)) {
-        puts("gcoap_cli: must specify interface for link local target");
-        return false;
-    }
-    memcpy(&remote->addr.ipv6[0], &addr.u8[0], sizeof(addr.u8));
+    remote->netif = netif ? netif_get_id(netif) : SOCK_ADDR_ANY_NETIF;
+    remote->family = AF_INET6;
 
     /* parse port */
     remote->port = atoi(port_str);
