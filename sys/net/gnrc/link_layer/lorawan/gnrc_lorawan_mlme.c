@@ -290,8 +290,10 @@ int _fopts_mlme_link_check_req(lorawan_buffer_t *buf)
     return GNRC_LORAWAN_CID_SIZE;
 }
 
-static void _mlme_link_check_ans(gnrc_lorawan_t *mac, uint8_t *p)
+static int _mlme_link_check_ans(gnrc_lorawan_t *mac, uint8_t *p, size_t len, uint8_t index)
 {
+    (void) len;
+    (void) index;
     mlme_confirm_t mlme_confirm;
 
     mlme_confirm.link_req.margin = p[1];
@@ -307,24 +309,45 @@ static void _mlme_link_check_ans(gnrc_lorawan_t *mac, uint8_t *p)
     gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
 
     mac->mlme.pending_mlme_opts &= ~GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ;
+
+    return GNRC_LORAWAN_FOPT_LINK_CHECK_ANS_SIZE;
 }
 
-static void _mlme_link_adr_req(gnrc_lorawan_t *mac, uint8_t *p)
+static int _mlme_link_adr_req(gnrc_lorawan_t *mac, uint8_t *p, size_t len, uint8_t index)
 {
-    DEBUG("gnrc_lorawan_mlme: LinkADRReq DataRate_TXPower : DR%u TX%u\n",
-           p[1] >> 4, p[1] & 0x0f);
-    DEBUG("gnrc_lorawan_mlme: LinkADRReq ChMask : %u\n", (p[3] << 8 ) | p[2]);
-    DEBUG("gnrc_lorawan_mlme: LinkADRReq Redundancy : %u\n", p[4]);
+    uint8_t last_adr_pos;
 
-    mac->last_dr = p[1] >> 4;
-    mac->channel_mask = (p[3] << 8 ) | p[2];
-    // mac->mcps.redundancy = p[4];
+    for (; index < len; index += GNRC_LORAWAN_FOPT_LINK_ADR_REQ_SIZE ) {
+        if ( p[index] == GNRC_LORAWAN_CID_LINK_ADR_REQ )
+        {
+            mac->mlme.adr_req_cnt++;
+        }
+    }
+
+    if (mac->mlme.adr_req_recv) {
+        return index;
+    }
+
+    last_adr_pos = index - GNRC_LORAWAN_FOPT_LINK_ADR_REQ_SIZE;
+
+    mac->last_dr = p[last_adr_pos + 1] >> 4;
+    mac->channel_mask = (p[last_adr_pos + 3] << 8 ) | p[last_adr_pos + 2];
+    mac->mcps.redundancy = p[last_adr_pos + 4];
 
     /* Set `LinkADRAns` for next uplink */
     mac->mlme.pending_mlme_opts |=  GNRC_LORAWAN_MLME_OPTS_LINK_ADR_ANS;
 
+    DEBUG("gnrc_lorawan_mlme: LinkADRReq DataRate_TXPower : DR%u TX%u\n",
+           p[last_adr_pos + 1] >> 4, p[last_adr_pos + 1] & 0x0f);
+    DEBUG("gnrc_lorawan_mlme: LinkADRReq ChMask : %u\n", (p[last_adr_pos + 3] << 8 ) \
+                                                          | p[last_adr_pos + 2]);
+    DEBUG("gnrc_lorawan_mlme: LinkADRReq Redundancy : %u\n", p[last_adr_pos + 4]);
+
     DEBUG("gnrc_lorawan_mlme: Lastdr : %u\n",mac->last_dr); // to be removed
     DEBUG("gnrc_lorawan_mlme: Channel Mask : %u\n",mac->channel_mask); // to be removed
+
+    mac->mlme.adr_req_recv = true;
+    return index;
 }
 
 int _fopts_mlme_link_adr_ans(lorawan_buffer_t *buf)
@@ -345,29 +368,30 @@ void gnrc_lorawan_process_fopts(gnrc_lorawan_t *mac, uint8_t *fopts,
         return;
     }
 
+    mac->mlme.adr_req_recv = true;
     uint8_t ret = 0;
 
-    void (*cb)(gnrc_lorawan_t *, uint8_t *p) = NULL;
+    int (*cb)(gnrc_lorawan_t *, uint8_t *p, size_t size, uint8_t index) = NULL;
 
     for (uint8_t pos = 0; pos < size; pos += ret) {
+
         switch (fopts[pos]) {
             case GNRC_LORAWAN_CID_LINK_CHECK_ANS:
-                ret = GNRC_LORAWAN_FOPT_LINK_CHECK_ANS_SIZE;
                 cb = _mlme_link_check_ans;
                 break;
             case GNRC_LORAWAN_CID_LINK_ADR_REQ:
-                ret = GNRC_LORAWAN_FOPT_LINK_ADR_REQ_SIZE;
                 cb = _mlme_link_adr_req;
                 break;
             default:
                 return;
         }
 
+        ret = cb(mac, &fopts[pos], size, pos);
+
         if (pos + ret > size) {
             return;
         }
 
-        cb(mac, &fopts[pos]);
     }
 }
 
