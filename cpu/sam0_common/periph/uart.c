@@ -356,7 +356,34 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 
     return UART_OK;
 }
-#endif
+#endif /* MODULE_PERIPH_UART_MODECFG */
+
+#ifdef MODULE_PERIPH_UART_RX_START
+void uart_rxstart_configure(uart_t uart, uart_rxstart_cb_t cb, void *arg)
+{
+    /* CTRLB is enable-proteced */
+    dev(uart)->CTRLA.bit.ENABLE = 0;
+
+    /* set start of frame detection enable */
+    dev(uart)->CTRLB.reg |= SERCOM_USART_CTRLB_SFDE;
+
+    uart_ctx[uart].rxs_cb  = cb;
+    uart_ctx[uart].rxs_arg = arg;
+
+    /* enable UART again */
+    dev(uart)->CTRLA.bit.ENABLE = 1;
+}
+
+void uart_rxstart_enable(uart_t uart)
+{
+    dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_RXS;
+}
+
+void uart_rxstart_disable(uart_t uart)
+{
+    dev(uart)->INTENCLR.reg = SERCOM_USART_INTENCLR_RXS;
+}
+#endif /* MODULE_PERIPH_UART_RX_START */
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
 static inline void irq_handler_tx(unsigned uartnum)
@@ -377,10 +404,22 @@ static inline void irq_handler_tx(unsigned uartnum)
 static inline void irq_handler(unsigned uartnum)
 {
     uint32_t status = dev(uartnum)->INTFLAG.reg;
+    dev(uartnum)->INTFLAG.reg = status;
 
 #if !defined(UART_HAS_TX_ISR) && defined(MODULE_PERIPH_UART_NONBLOCKING)
     if ((status & SERCOM_USART_INTFLAG_DRE) && dev(uartnum)->INTENSET.bit.DRE) {
         irq_handler_tx(uartnum);
+    }
+#endif
+
+#ifdef MODULE_PERIPH_UART_RX_START
+    if (status & SERCOM_USART_INTFLAG_RXS && dev(uartnum)->INTENSET.bit.RXS) {
+        /* clear receive start flag */
+        dev(uartnum)->INTFLAG.reg = SERCOM_USART_INTFLAG_RXS;
+
+        if (uart_ctx[uartnum].rxs_cb) {
+            uart_ctx[uartnum].rxs_cb(uart_ctx[uartnum].rxs_arg);
+        }
     }
 #endif
 
