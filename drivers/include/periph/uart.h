@@ -103,7 +103,7 @@ typedef void(*uart_rx_cb_t)(void *arg, uint8_t data);
  *
  * @param[in] arg           context to the callback (optional)
  */
-typedef void(*uart_rxs_cb_t)(void *arg);
+typedef void(*uart_rxstart_cb_t)(void *arg);
 
 /**
  * @brief   Interrupt context for a UART device
@@ -113,7 +113,7 @@ typedef struct {
     uart_rx_cb_t rx_cb;     /**< data received interrupt callback */
     void *arg;              /**< argument to data received callback */
 #ifdef MODULE_PERIPH_UART_RX_START
-    uart_rxs_cb_t rxs_cb;   /**< start condition received interrupt callback */
+    uart_rxstart_cb_t rxs_cb;   /**< start condition received interrupt callback */
     void *rxs_arg;          /**< argument to start condition received callback */
 #endif
 } uart_isr_ctx_t;
@@ -267,21 +267,21 @@ gpio_t uart_pin_tx(uart_t uart);
  * @param[in] cb        The function called when a start condition is detected
  * @param[in] arg       Optional function argument
  */
-void uart_rxs_configure(uart_t uart, uart_rxs_cb_t cb, void *arg);
+void uart_rxstart_configure(uart_t uart, uart_rxstart_cb_t cb, void *arg);
 
 /**
  * @brief   Enable the RX start interrupt.
  *
  * @param[in] uart      The device to configure
  */
-void uart_rxs_enable(uart_t uart);
+void uart_rxstart_enable(uart_t uart);
 
 /**
  * @brief   Disable the RX start interrupt.
  *
  * @param[in] uart      The device to configure
  */
-void uart_rxs_disable(uart_t uart);
+void uart_rxstart_disable(uart_t uart);
 #endif /* MODULE_PERIPH_UART_RX_START */
 
 /**
