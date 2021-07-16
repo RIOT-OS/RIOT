@@ -511,6 +511,24 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
             break;
     }
 
+    if ((coap_get_type(pdu) == COAP_TYPE_CON) && 
+        (resource->methods & COAP_SEPARATE_RESPONSE)) {
+        /* prepare empty ack message */
+        uint8_t buf_sep[GCOAP_HEADER_MAXLEN] = { 0 };        
+        memcpy(buf_sep, buf, GCOAP_HEADER_MAXLEN);
+        coap_hdr_t *hdr = (coap_hdr_t *)buf_sep;
+
+        coap_hdr_set_type(hdr, COAP_TYPE_ACK);
+        coap_hdr_set_code(hdr, COAP_CODE_EMPTY);
+        hdr->ver_t_tkl &= 0xf0;
+
+        ssize_t bytes = sock_udp_send(&_sock_udp, buf_sep, 
+                                    sizeof(hdr), remote);
+        if (bytes <= 0) {
+            DEBUG("gcoap: send response failed: %d\n", (int)bytes);
+        }
+    }
+
     if (coap_get_observe(pdu) == COAP_OBS_REGISTER) {
         /* lookup remote+token */
         int empty_slot = _find_obs_memo(&memo, remote, pdu);
