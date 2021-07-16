@@ -414,6 +414,13 @@ static int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             memcpy(opt->data, &tmp, sizeof(uint32_t));
             res = sizeof(uint32_t);
             break;
+        case NETOPT_LORAWAN_ADR:
+            mlme_request.type = MLME_GET;
+            mlme_request.mib.type = MIB_ADR;
+            gnrc_lorawan_mlme_request(&netif->lorawan.mac, &mlme_request,
+                                      &mlme_confirm);
+            *((bool *)opt->data) = mlme_confirm.mib.adr;
+            break;
         default:
             res = netif->dev->driver->get(netif->dev, opt->opt, opt->data,
                                           opt->data_len);

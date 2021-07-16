@@ -455,6 +455,10 @@ static void _print_netopt(netopt_t opt)
             printf("RX2 datarate");
             break;
 
+        case NETOPT_LORAWAN_ADR:
+            printf("ADR");
+            break;
+
         default:
             /* we don't serve these options here */
             break;

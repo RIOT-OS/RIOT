@@ -230,6 +230,10 @@ static void _mlme_get(gnrc_lorawan_t *mac, const mlme_request_t *mlme_request,
             mlme_confirm->status = GNRC_LORAWAN_REQ_STATUS_SUCCESS;
             mlme_confirm->mib.dev_addr = &mac->dev_addr;
             break;
+        case MIB_ADR:
+            mlme_confirm->status = GNRC_LORAWAN_REQ_STATUS_SUCCESS;
+            mlme_confirm->mib.adr = &mac->mlme.adr;
+            break;
         default:
             mlme_confirm->status = -EINVAL;
             break;
