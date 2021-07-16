@@ -69,11 +69,17 @@ extern "C" {
 #define GNRC_LORAWAN_BACKOFF_BUDGET_3   (8700000LL)     /**< budget of time on air every 24 hours */
 
 #define GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ  (1 << 0) /**< Internal Link Check request flag */
+#define GNRC_LORAWAN_MLME_OPTS_LINK_ADR_ANS    (1 << 1) /**< Internal Link ADR Answer flag */
 
 #define GNRC_LORAWAN_CID_SIZE (1U)                      /**< size of Command ID in FOps */
+#define GNRC_LORAWAN_CID_LINK_ADR_ANS_SIZE (2U)         /**< size of Link ADR Answer CID in FOps */
+
 #define GNRC_LORAWAN_CID_LINK_CHECK_ANS (0x02)          /**< Link Check CID */
+#define GNRC_LORAWAN_CID_LINK_ADR_REQ   (0x03)          /**< Link ADR Request CID */
+#define GNRC_LORAWAN_CID_LINK_ADR_ANS   (0x03)          /**< Link ADR Answer CID */
 
 #define GNRC_LORAWAN_FOPT_LINK_CHECK_ANS_SIZE (3U)      /**< size of Link check answer */
+#define GNRC_LORAWAN_FOPT_LINK_ADR_REQ_SIZE   (5U)      /**< size of Link ADR Request (LinkADRReq) */
 
 #define GNRC_LORAWAN_JOIN_DELAY_U32_MASK (0x1FFFFF)     /**< mask for detecting overflow in frame counter */
 
@@ -113,7 +119,7 @@ extern "C" {
 typedef struct {
     uint8_t *data;  /**< pointer to the beginning of the buffer holding data */
     uint8_t size;   /**< size of the buffer */
-    uint8_t index;  /**< current inxed in the buffer */
+    uint8_t index;  /**< current index in the buffer */
 } lorawan_buffer_t;
 
 /**
@@ -153,6 +159,7 @@ typedef struct {
     int nb_trials;                      /**< holds the remaining number of retransmissions */
     int ack_requested;                  /**< whether the network server requested an ACK */
     int waiting_for_ack;                /**< true if the MAC layer is waiting for an ACK */
+    uint8_t redundancy;                 /**< unconfirmed uplink redundancy */
     char mhdr_mic[MHDR_MIC_BUF_SIZE];   /**< internal retransmissions buffer */
 } gnrc_lorawan_mcps_t;
 
@@ -161,11 +168,16 @@ typedef struct {
  */
 typedef struct {
     uint8_t activation;     /**< Activation mechanism of the MAC layer */
+    bool adr;               /**< adr bit status */
+    bool adr_ack;           /**< adr ack bit status */
     int pending_mlme_opts;  /**< holds pending mlme opts */
     uint32_t nid;           /**< current Network ID */
     int32_t backoff_budget; /**< remaining Time On Air budget */
     uint8_t dev_nonce[2];   /**< Device Nonce */
     uint8_t backoff_state;  /**< state in the backoff state machine */
+    uint16_t adr_ack_cnt;   /**< ADR ACK counter */
+    uint8_t adr_req_cnt;    /**< LINK ADR REQ counter */
+    uint8_t adr_flags;      /**< Flags to denote the status of ADR_REQ */
 } gnrc_lorawan_mlme_t;
 
 /**
@@ -234,7 +246,7 @@ void gnrc_lorawan_generate_session_keys(const uint8_t *app_nonce,
                                         uint8_t *appskey);
 
 /**
- * @brief Set datarate for the next transmission
+ * @brief Set PHY parameters from DR for the next transmission
  *
  * @param[in] mac pointer to the MAC descriptor
  * @param[in] datarate desired datarate
@@ -243,6 +255,17 @@ void gnrc_lorawan_generate_session_keys(const uint8_t *app_nonce,
  * @return -EINVAL if datarate is not available in the current region
  */
 int gnrc_lorawan_set_dr(gnrc_lorawan_t *mac, uint8_t datarate);
+
+/**
+ * @brief Set TX power (PHY parameter) for the next transmission
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ * @param[in] tx_pwr desired TX power index
+ *
+ * @return 0 on success
+ * @return -EINVAL if TX power is not available in the current region
+ */
+int gnrc_lorawan_set_tx_power(gnrc_lorawan_t *mac, uint16_t tx_pwr);
 
 /**
  * @brief build uplink frame
@@ -393,11 +416,11 @@ void gnrc_lorawan_mlme_no_rx(gnrc_lorawan_t *mac);
 void gnrc_lorawan_event_no_rx(gnrc_lorawan_t *mac);
 
 /**
- * @brief Mac callback for ACK timeout event
+ * @brief Mac callback for retransmission timeout event
  *
  * @param[in] mac pointer to the MAC descriptor
  */
-void gnrc_lorawan_event_ack_timeout(gnrc_lorawan_t *mac);
+void gnrc_lorawan_event_retrans_timeout(gnrc_lorawan_t *mac);
 
 /**
  * @brief Get the maximum MAC payload (M value) for a given datarate.
@@ -480,6 +503,14 @@ static inline void gnrc_lorawan_mac_release(gnrc_lorawan_t *mac)
  * @param[in] rx2_dr datarate of RX2
  */
 void gnrc_lorawan_set_rx2_dr(gnrc_lorawan_t *mac, uint8_t rx2_dr);
+
+/**
+ * @brief Set the datarate of the second reception window
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ * @param[in] adr set ADR status
+ */
+void gnrc_lorawan_set_adr(gnrc_lorawan_t *mac, bool adr);
 
 /**
  * @brief Trigger the transmission of the Join Request packet.

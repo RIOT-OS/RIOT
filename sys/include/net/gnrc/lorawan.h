@@ -24,6 +24,7 @@
 #define NET_GNRC_LORAWAN_H
 
 #include "gnrc_lorawan_internal.h"
+#include "assert.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,6 +70,7 @@ typedef enum {
     MIB_ACTIVATION_METHOD,      /**< type is activation method */
     MIB_DEV_ADDR,               /**< type is dev addr */
     MIB_RX2_DR,                 /**< type is rx2 DR */
+    MIB_ADR,                    /**< type is ADR */
 } mlme_mib_type_t;
 
 /**
@@ -100,6 +102,7 @@ typedef struct {
         mlme_activation_t activation;   /**< holds activation mechanism */
         void *dev_addr;                 /**< pointer to the dev_addr */
         uint8_t rx2_dr;                 /** datarate of second rx window */
+        bool adr;                       /** Adaptive data rate (ADR) */
     };
 } mlme_mib_t;
 
@@ -319,6 +322,21 @@ void gnrc_lorawan_set_timer(gnrc_lorawan_t *mac, uint32_t us);
  * @param[in] mac pointer to the MAC descriptor
  */
 void gnrc_lorawan_remove_timer(gnrc_lorawan_t *mac);
+
+/**
+ * @brief Set unconfirmed uplink redundancy
+ *
+ * @pre   @p redundancy <= 14
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ * @param[in] redundancy number of unconfirmed uplink retransmissions
+ */
+static inline void gnrc_lorawan_set_uncnf_redundancy(gnrc_lorawan_t *mac,
+                                                     uint8_t redundancy)
+{
+    assert(redundancy <= (0xF - 1));
+    mac->mcps.redundancy = redundancy;
+}
 
 #ifdef __cplusplus
 }

@@ -21,6 +21,7 @@
 #include "debug.h"
 
 #define GNRC_LORAWAN_DATARATES_NUMOF (6U)
+#define GNRC_LORAWAN_TX_POWER_NUMOF  (8U)
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -46,6 +47,18 @@ int gnrc_lorawan_set_dr(gnrc_lorawan_t *mac, uint8_t datarate)
     dev->driver->set(dev, NETOPT_SPREADING_FACTOR, &sf, sizeof(sf));
 
     return 0;
+}
+
+int gnrc_lorawan_set_tx_power(gnrc_lorawan_t *mac, uint16_t tx_pwr)
+{
+    netdev_t *dev = gnrc_lorawan_get_netdev(mac);
+
+    if (!gnrc_lorawan_validate_tx_power(tx_pwr)) {
+        return -EINVAL;
+    }
+
+    DEBUG("gnrc_lorawan_region: TX  Power index: %u \n",tx_pwr);
+    return dev->driver->set(dev, NETOPT_TX_POWER, &tx_pwr, sizeof(tx_pwr));
 }
 
 #if (IS_ACTIVE(CONFIG_LORAMAC_REGION_EU_868))
@@ -142,6 +155,15 @@ bool gnrc_lorawan_validate_dr(uint8_t dr)
         return true;
     }
     DEBUG("gnrc_lorawan_region: Invalid DR.\n");
+    return false;
+}
+
+bool gnrc_lorawan_validate_tx_power(uint16_t tx_power)
+{
+    if (tx_power < GNRC_LORAWAN_TX_POWER_NUMOF) {
+        return true;
+    }
+    DEBUG("gnrc_lorawan_region: Invalid TX Power.\n");
     return false;
 }
 

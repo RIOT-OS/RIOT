@@ -285,6 +285,21 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Default redundancy for unconfirmed uplink
+ *
+ * This corresponds to the number of unconfirmed uplink retransmissions when
+ * using ADR. This configuration does not affect confirmed uplinks.  By
+ * default, uplinks are sent without retransmissions (this means, the device
+ * sends only one uplink packet)
+ *
+ * @note This value MUST NOT be greater than 14, since the LinkADRCommand it's
+ *       already limited by a 4 bit value (therefore, 15 uplink transmissions)
+ */
+#ifndef CONFIG_LORAMAC_DEFAULT_REDUNDANCY
+#define CONFIG_LORAMAC_DEFAULT_REDUNDANCY       (0U)
+#endif
+
+/**
  * @brief   Enable/disable adaptive datarate state
  *
  * If enabled the end node will inform the network server about the status of
@@ -461,25 +476,29 @@ extern "C" {
 #ifndef CONFIG_LORAMAC_DEFAULT_MIN_RX_SYMBOLS
 #define CONFIG_LORAMAC_DEFAULT_MIN_RX_SYMBOLS   (12)
 #endif
+
+/**
+ * @brief   Default adaptive datarate ACK limit
+ *
+ * Defines the ADR ACK counter limit (`ADR_ACK_CNT`).
+ *
+ */
+#ifndef CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT
+#define CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT    (64U)
+#endif
+
+/**
+ * @brief   Default adaptive datarate ACK delay
+ *
+ * ACK delay is the window ,in terms of number of uplink frames, within which
+ * Network Server is expected to send a downlink after `ADRACKReq` bit has
+ * been set by the node.
+ */
+#ifndef CONFIG_LORAMAC_DEFAULT_ADR_ACK_DELAY
+#define CONFIG_LORAMAC_DEFAULT_ADR_ACK_DELAY    (32U)
+#endif
+
 /** @} */
-
-/**
- * @brief   Default adaptive datarate ACK limit (in s)
- *
- * @note This feature is not yet supported.
- */
-#ifndef LORAMAC_DEFAULT_ADR_ACK_LIMIT
-#define LORAMAC_DEFAULT_ADR_ACK_LIMIT           (64U)
-#endif
-
-/**
- * @brief   Default adaptive datarate ACK delay (in s)
- *
- * @note This feature is not yet supported.
- */
-#ifndef LORAMAC_DEFAULT_ADR_ACK_DELAY
-#define LORAMAC_DEFAULT_ADR_ACK_DELAY           (32U)
-#endif
 
 /**
  * @brief   Default adaptive datarate timeout
@@ -535,7 +554,7 @@ extern "C" {
 #define LORAMAC_PORT_MIN                        (1U)
 
 /**
- * @brief   Maximmu port value
+ * @brief   Maximum port value
  */
 #define LORAMAC_PORT_MAX                        (223U)
 

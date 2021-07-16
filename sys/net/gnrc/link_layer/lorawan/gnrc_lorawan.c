@@ -43,6 +43,10 @@ static inline void gnrc_lorawan_mlme_reset(gnrc_lorawan_t *mac)
     mac->mlme.pending_mlme_opts = 0;
     mac->rx_delay = (CONFIG_LORAMAC_DEFAULT_RX1_DELAY / MS_PER_SEC);
     mac->mlme.nid = CONFIG_LORAMAC_DEFAULT_NETID;
+    mac->mlme.adr = IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_ADR) ? true : false;
+    mac->mlme.adr_ack = false;
+    mac->mlme.adr_ack_cnt = 0;
+    mac->mlme.adr_req_cnt = 0;
 }
 
 static inline void gnrc_lorawan_mlme_backoff_init(gnrc_lorawan_t *mac)
@@ -58,6 +62,7 @@ static inline void gnrc_lorawan_mcps_reset(gnrc_lorawan_t *mac)
     mac->mcps.waiting_for_ack = false;
     mac->mcps.fcnt = 0;
     mac->mcps.fcnt_down = 0;
+    gnrc_lorawan_set_uncnf_redundancy(mac, CONFIG_LORAMAC_DEFAULT_REDUNDANCY);
 }
 
 void gnrc_lorawan_set_rx2_dr(gnrc_lorawan_t *mac, uint8_t rx2_dr)
@@ -65,6 +70,14 @@ void gnrc_lorawan_set_rx2_dr(gnrc_lorawan_t *mac, uint8_t rx2_dr)
     mac->dl_settings &= ~GNRC_LORAWAN_DL_RX2_DR_MASK;
     mac->dl_settings |= (rx2_dr << GNRC_LORAWAN_DL_RX2_DR_POS) &
                         GNRC_LORAWAN_DL_RX2_DR_MASK;
+}
+
+void gnrc_lorawan_set_adr(gnrc_lorawan_t *mac, bool adr)
+{
+    if ((adr == true) && (mac->mlme.adr == false)) {
+        mac->mlme.adr_ack_cnt = 0;
+    }
+    mac->mlme.adr = adr;
 }
 
 static void _sleep_radio(gnrc_lorawan_t *mac)
@@ -101,6 +114,7 @@ void gnrc_lorawan_reset(gnrc_lorawan_t *mac)
 
     dev->driver->set(dev, NETOPT_RX_TIMEOUT, &rx_timeout, sizeof(rx_timeout));
 
+    mac->last_dr = CONFIG_LORAMAC_DEFAULT_DR;
     gnrc_lorawan_set_rx2_dr(mac, CONFIG_LORAMAC_DEFAULT_RX2_DR);
 
     mac->toa = 0;
@@ -164,8 +178,11 @@ void gnrc_lorawan_timeout_cb(gnrc_lorawan_t *mac)
         case LORAWAN_STATE_JOIN:
             gnrc_lorawan_trigger_join(mac);
             break;
+        case LORAWAN_STATE_IDLE:
+            gnrc_lorawan_event_retrans_timeout(mac);
+            break;
         default:
-            gnrc_lorawan_event_ack_timeout(mac);
+            assert(false);
             break;
     }
 }
