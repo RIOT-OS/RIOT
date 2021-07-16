@@ -131,8 +131,8 @@ static int _self_test(uart_t dev, unsigned baud)
 
 #ifdef MODULE_PERIPH_UART_RX_START
     /* test RX Start detection if available */
-    uart_rxs_configure(dev, rxs_cb, &ctx[dev].rx_buf);
-    uart_rxs_enable(dev);
+    uart_rxstart_configure(dev, rxs_cb, &ctx[dev].rx_buf);
+    uart_rxstart_enable(dev);
 
     uart_write(dev, (uint8_t*)test_string, sizeof(test_string));
     for (unsigned i = 0; i < sizeof(test_string); ++i) {
@@ -149,7 +149,7 @@ static int _self_test(uart_t dev, unsigned baud)
             return -1;
         }
     }
-    uart_rxs_disable(dev);
+    uart_rxstart_disable(dev);
 #endif
 
     test_mode = false;
