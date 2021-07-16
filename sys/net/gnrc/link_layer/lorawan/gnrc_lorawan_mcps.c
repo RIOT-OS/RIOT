@@ -155,8 +155,9 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
         return;
     }
 
-    /* ADR_ACK_CNT reset after downlink */
+    /* ADR_ACK_CNT and ADR_REQ_CNT reset after downlink */
     mac->mlme.adr_ack_cnt = 0;
+    mac->mlme.adr_req_cnt = 0;
 
     iolist_t *fopts = NULL;
 

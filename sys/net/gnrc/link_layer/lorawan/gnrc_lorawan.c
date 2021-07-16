@@ -46,6 +46,7 @@ static inline void gnrc_lorawan_mlme_reset(gnrc_lorawan_t *mac)
     mac->mlme.adr = IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_ADR) ? true : false;
     mac->mlme.adr_ack = false;
     mac->mlme.adr_ack_cnt = 0;
+    mac->mlme.adr_req_cnt = 0;
 }
 
 static inline void gnrc_lorawan_mlme_backoff_init(gnrc_lorawan_t *mac)

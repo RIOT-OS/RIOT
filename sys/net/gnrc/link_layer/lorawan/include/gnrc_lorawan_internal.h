@@ -176,8 +176,8 @@ typedef struct {
     uint8_t dev_nonce[2];   /**< Device Nonce */
     uint8_t backoff_state;  /**< state in the backoff state machine */
     uint16_t adr_ack_cnt;   /**< ADR ACK counter */
-    uint8_t adr_req_cnt;     /**< LINK ADR REQ counter */
-    bool adr_req_recv;       /**< Check Link ADR Req was received previously */
+    uint8_t adr_req_cnt;    /**< LINK ADR REQ counter */
+    uint8_t adr_flags;      /**< Flags to denote the status of ADR_REQ */
 } gnrc_lorawan_mlme_t;
 
 /**
