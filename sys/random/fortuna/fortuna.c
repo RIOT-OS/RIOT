@@ -67,7 +67,10 @@ static int fortuna_generate_blocks(fortuna_state_t *state, uint8_t *out,
     }
 
     for (size_t i = 0; i < blocks; i++) {
-        aes_encrypt(&cipher, state->gen.counter.bytes, out + (i * 16));
+        res = aes_encrypt(&cipher, state->gen.counter.bytes, out + (i * 16));
+        if (res != 1) {
+            return res;
+        }
         fortuna_increment_counter(state);
     }
 
