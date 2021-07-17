@@ -780,7 +780,9 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     }
     /* stop sending router solicitations
      * see https://tools.ietf.org/html/rfc4861#section-6.3.7 */
-    evtimer_del(&_nib_evtimer, &netif->ipv6.search_rtr.event);
+    if (dr != NULL) {
+        evtimer_del(&_nib_evtimer, &netif->ipv6.search_rtr.event);
+    }
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     if (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_6lbr(netif)) {
         _set_rtr_adv(netif);
