@@ -23,6 +23,11 @@
 #include "thread.h"
 #include "xtimer.h"
 
+#ifdef MODULE_AT86RF215
+#include "at86rf215.h"
+#include "at86rf215_params.h"
+#endif
+
 #ifdef MODULE_AT86RF2XX
 #include "at86rf2xx.h"
 #include "at86rf2xx_params.h"
@@ -55,6 +60,10 @@
 static cc2538_rf_t cc2538_rf_dev;
 #endif
 
+#ifdef MODULE_AT86RF215
+static at86rf215_t at86rf215_dev;
+#endif
+
 #ifdef MODULE_AT86RF2XX
 static at86rf2xx_t at86rf2xx_dev;
 #endif
@@ -74,6 +83,11 @@ static char ot_thread_stack[2 * THREAD_STACKSIZE_MAIN];
 void openthread_bootstrap(void)
 {
     /* setup netdev modules */
+#ifdef MODULE_AT86RF215
+    /* only use sub-GHz interface */
+    at86rf215_setup(&at86rf215_dev, NULL, &at86rf215_params[0], 0);
+    netdev_t *netdev = (netdev_t *) &at86rf215_dev;
+#endif
 #ifdef MODULE_AT86RF2XX
     at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0], 0);
     netdev_t *netdev = &at86rf2xx_dev.netdev.netdev;
