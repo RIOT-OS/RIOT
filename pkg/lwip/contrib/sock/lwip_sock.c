@@ -137,9 +137,13 @@ static bool _addr_on_netif(int family, int netif_num, const ip_addr_t *addr)
                     return ip_2_ip4(&netif->ip_addr)->addr == ip_2_ip4(addr)->addr;
 #endif
 #if LWIP_IPV6
-                case AF_INET6:
+                case AF_INET6: {
+                    LOCK_TCPIP_CORE();
                     /* link-local address is always the 0th */
-                    return (netif_get_ip6_addr_match(netif, ip_2_ip6(addr)) >= 0);
+                    s8_t match = netif_get_ip6_addr_match(netif, ip_2_ip6(addr));
+                    UNLOCK_TCPIP_CORE();
+                    return match >= 0;
+                }
 #endif
                 default:
                     return false;
@@ -445,11 +449,13 @@ uint16_t lwip_sock_bind_addr_to_netif(const ip_addr_t *bind_addr)
 
     if (!ip_addr_isany(bind_addr)) {
         struct netif *netif;
+        LOCK_TCPIP_CORE();
         /* cppcheck-suppress uninitvar ; assigned by macro */
         NETIF_FOREACH(netif) {
             if (IP_IS_V6(bind_addr)) {  /* XXX crappy API yields crappy code */
 #if LWIP_IPV6
                 if (netif_get_ip6_addr_match(netif, ip_2_ip6(bind_addr)) >= 0) {
+                    UNLOCK_TCPIP_CORE();
                     return (int)netif->num + 1;
                 }
 #endif
@@ -457,11 +463,13 @@ uint16_t lwip_sock_bind_addr_to_netif(const ip_addr_t *bind_addr)
             else {
 #if LWIP_IPV4
                 if (netif_ip4_addr(netif)->addr == ip_2_ip4(bind_addr)->addr) {
+                    UNLOCK_TCPIP_CORE();
                     return (int)netif->num + 1;
                 }
 #endif
             }
         }
+        UNLOCK_TCPIP_CORE();
     }
     return SOCK_ADDR_ANY_NETIF;
 }

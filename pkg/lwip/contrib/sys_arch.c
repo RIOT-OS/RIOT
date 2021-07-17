@@ -22,7 +22,9 @@
 #include "lwip/mem.h"
 #include "lwip/opt.h"
 #include "lwip/sys.h"
+#include "lwip/tcpip.h"
 
+#include "irq.h"
 #include "msg.h"
 #include "sema.h"
 #include "thread.h"
@@ -221,5 +223,35 @@ sys_thread_t sys_thread_new(const char *name, lwip_thread_fn thread, void *arg,
     thread_yield_higher();
     return res;
 }
+
+#ifdef DEVELHELP
+static kernel_pid_t lwip_tcpip_thread = KERNEL_PID_UNDEF;
+static kernel_pid_t lwip_lock_thread;
+
+void sys_mark_tcpip_thread(void) {
+    lwip_tcpip_thread = thread_getpid();
+}
+
+void sys_lock_tcpip_core(void) {
+    sys_mutex_lock(&lock_tcpip_core);
+    lwip_lock_thread = thread_getpid();
+}
+void sys_unlock_tcpip_core(void) {
+    lwip_lock_thread = KERNEL_PID_UNDEF;
+    sys_mutex_unlock(&lock_tcpip_core);
+}
+
+bool sys_check_core_locked(void) {
+    /* Don't call from inside isr */
+    if (irq_is_in()) {
+        return false;
+    }
+    if (lwip_tcpip_thread != KERNEL_PID_UNDEF) {
+        /* only call from thread with lock */
+        return lwip_lock_thread == thread_getpid();
+    }
+    return true;
+}
+#endif
 
 /** @} */
