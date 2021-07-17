@@ -23,11 +23,9 @@
 #include <stddef.h>
 #include <inttypes.h>
 #include <assert.h>
-#include "sched.h"
-#include "msg.h"
+#include "thread.h"
 #include "msg_bus.h"
 #include "list.h"
-#include "thread.h"
 #if MODULE_CORE_THREAD_FLAGS
 #include "thread_flags.h"
 #endif
