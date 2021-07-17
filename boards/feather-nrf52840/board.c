@@ -18,7 +18,8 @@
 
 #include "periph/gpio.h"
 
-void board_init(void)
+
+void board_feather_nrf52840_init(void)
 {
     /* initialize the boards LEDs */
     gpio_init(LED0_PIN, GPIO_OUT);
@@ -28,6 +29,11 @@ void board_init(void)
 
     /* initialize the CPU */
     cpu_init();
+}
+
+void __attribute__((weak)) board_init(void)
+{
+    board_feather_nrf52840_init();
 }
 
 /** @} */
