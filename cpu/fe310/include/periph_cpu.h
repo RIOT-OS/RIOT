@@ -167,11 +167,7 @@ typedef struct {
 #define RTT_MIN_FREQUENCY   (1U)                    /* in Hz */
 
 #ifndef RTT_FREQUENCY
-#ifdef MODULE_PERIPH_RTC
-#define RTT_FREQUENCY       (RTT_MIN_FREQUENCY)     /* in Hz */
-#else
 #define RTT_FREQUENCY       (RTT_MAX_FREQUENCY)     /* in Hz */
-#endif
 #endif
 
 /**
