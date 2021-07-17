@@ -1,0 +1,26 @@
+From ea398bfa1e15313860cf170c280932361c256449 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Thu, 25 Feb 2021 11:17:54 +0100
+Subject: [PATCH] replace use of deprecated netopt
+
+Use NETOPT_MAX_PDU_SIZE instead of NETOPT_MAX_PACKET_SIZE
+---
+ netif.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/netif.c b/netif.c
+index 5e24c6d..ed1e973 100644
+--- a/netif.c
++++ b/netif.c
+@@ -55,7 +55,7 @@ void ndn_netif_auto_add(void)
+         gnrc_nettype_t proto;
+ 
+         // get device mtu
+-        if (gnrc_netapi_get(iface, NETOPT_MAX_PACKET_SIZE, 0,
++        if (gnrc_netapi_get(iface, NETOPT_MAX_PDU_SIZE, 0,
+                             &_netif_table[i].mtu,
+                             sizeof(uint16_t)) < 0) {
+             DEBUG("ndn: cannot get device mtu (pid=%"
+-- 
+2.30.1
+
