@@ -24,6 +24,12 @@
 
 #include "em_device.h"
 
+/* avoid namespace conflict */
+#ifdef AES_COUNT
+#define EFM32_AES_COUNT AES_COUNT
+#undef AES_COUNT
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
