@@ -9,6 +9,7 @@ RIOTBASE ?= .
 # 4. sort
 APPLICATION_DIRS := $(sort $(patsubst ./%,%,$(patsubst %/,%,$(dir $(wildcard \
 	$(RIOTBASE)/fuzzing/*/Makefile     \
+	$(RIOTBASE)/boards/*/examples/*/Makefile \
 	$(RIOTBASE)/bootloaders/*/Makefile \
 	$(RIOTBASE)/examples/*/Makefile    \
 	$(RIOTBASE)/tests/*/Makefile       \
