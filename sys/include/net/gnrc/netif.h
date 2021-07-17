@@ -658,6 +658,20 @@ static inline msg_bus_t* gnrc_netif_get_bus(gnrc_netif_t *netif,
 }
 #endif /* MODULE_GNRC_NETIF_BUS */
 
+/**
+ * @brief   Parse an IP address / hostname string.
+ *          If the @ref net_sock_dns module is used, this will
+ *          attempt to resolve hostnames via DNS.
+ *
+ * @param[in]   hostname    IP address string or hostname
+ * @param[out]  addr        IP address of the host
+ * @param[out]  netif       Interface if address is link-local
+ *
+ * @return  0 on success, error otherwise
+ */
+int gnrc_netif_parse_hostname(const char *hostname, ipv6_addr_t *addr,
+                              gnrc_netif_t **netif);
+
 #ifdef __cplusplus
 }
 #endif
