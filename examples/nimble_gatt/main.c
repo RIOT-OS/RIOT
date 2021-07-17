@@ -37,7 +37,7 @@
 #include <string.h>
 
 #include "nimble_riot.h"
-#include "net/bluetil/ad.h"
+#include "nimble_autoadv.h"
 
 #include "host/ble_hs.h"
 #include "host/util/util.h"
@@ -66,8 +66,6 @@ static const ble_uuid128_t gatt_svr_chr_rw_demo_readonly_uuid
         = BLE_UUID128_INIT(0xaa, 0xf4, 0x82, 0xdd, 0x28, 0xa7, 0xac, 0x86, 0x68,
                 0x4d, 0xd5, 0x40, 0x3f, 0x11, 0xdd, 0xcc);
 
-static const char *device_name = "NimBLE on RIOT";
-
 static char rm_demo_write_data[64] = "This characteristic is read- and writeable!";
 
 static int gatt_svr_chr_access_device_info_manufacturer(
@@ -81,8 +79,6 @@ static int gatt_svr_chr_access_device_info_model(
 static int gatt_svr_chr_access_rw_demo(
         uint16_t conn_handle, uint16_t attr_handle,
         struct ble_gatt_access_ctxt *ctxt, void *arg);
-
-static void start_advertise(void);
 
 static char str_answer[STR_ANSWER_BUFFER_SIZE];
 
@@ -132,39 +128,6 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
         0, /* No more services */
     },
 };
-
-static int gap_event_cb(struct ble_gap_event *event, void *arg)
-{
-    (void)arg;
-
-    switch (event->type) {
-        case BLE_GAP_EVENT_CONNECT:
-            if (event->connect.status) {
-                start_advertise();
-            }
-            break;
-
-        case BLE_GAP_EVENT_DISCONNECT:
-            start_advertise();
-            break;
-    }
-
-    return 0;
-}
-
-static void start_advertise(void)
-{
-    struct ble_gap_adv_params advp;
-    int rc;
-
-    memset(&advp, 0, sizeof advp);
-    advp.conn_mode = BLE_GAP_CONN_MODE_UND;
-    advp.disc_mode = BLE_GAP_DISC_MODE_GEN;
-    rc = ble_gap_adv_start(nimble_riot_own_addr_type, NULL, BLE_HS_FOREVER,
-                           &advp, gap_event_cb, NULL);
-    assert(rc == 0);
-    (void)rc;
-}
 
 static int gatt_svr_chr_access_device_info_manufacturer(
         uint16_t conn_handle, uint16_t attr_handle,
@@ -320,19 +283,12 @@ int main(void)
     assert(rc == 0);
 
     /* set the device name */
-    ble_svc_gap_device_name_set(device_name);
+    ble_svc_gap_device_name_set(NIMBLE_AUTOADV_DEVICE_NAME);
     /* reload the GATT server to link our added services */
     ble_gatts_start();
 
-    /* configure and set the advertising data */
-    uint8_t buf[BLE_HS_ADV_MAX_SZ];
-    bluetil_ad_t ad;
-    bluetil_ad_init_with_flags(&ad, buf, sizeof(buf), BLUETIL_AD_FLAGS_DEFAULT);
-    bluetil_ad_add_name(&ad, device_name);
-    ble_gap_adv_set_data(ad.buf, ad.pos);
-
     /* start to advertise this node */
-    start_advertise();
+    nimble_autoadv_start();
 
     return 0;
 }
