@@ -43,6 +43,7 @@ PSEUDOMODULES += gnrc_ipv6_nib_6ln
 PSEUDOMODULES += gnrc_ipv6_nib_6lr
 PSEUDOMODULES += gnrc_ipv6_nib_dns
 PSEUDOMODULES += gnrc_ipv6_nib_router
+PSEUDOMODULES += gnrc_ipv6_nib_subnets
 PSEUDOMODULES += gnrc_netdev_default
 PSEUDOMODULES += gnrc_neterr
 PSEUDOMODULES += gnrc_netapi_callbacks
