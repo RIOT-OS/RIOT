@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 OTA keys S.A.
+ * Copyright (C) 2020 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -57,16 +57,30 @@ extern "C" {
 #ifndef LSM6DSL_PARAM_GYRO_FIFO_DEC
 #define LSM6DSL_PARAM_GYRO_FIFO_DEC  (LSM6DSL_DECIMATION_NO)
 #endif
+#ifndef LSM6DSL_PARAM_ACC_USR_OFS_W
+#define LSM6DSL_PARAM_ACC_USR_OFS_W  (LSM6DSL_ACC_LARGE_SCALE)
+#endif
+/** @brief  Alert gpio pins */
+#ifndef LSM6DSL_PARAM_ALERT_PIN_1
+#define LSM6DSL_PARAM_ALERT_PIN_1  (GPIO_UNDEF)
+#endif
+#ifndef LSM6DSL_PARAM_ALERT_PIN_2
+#define LSM6DSL_PARAM_ALERT_PIN_2  (GPIO_UNDEF)
+#endif
 
 #ifndef LSM6DSL_PARAMS
-#define LSM6DSL_PARAMS               { .i2c             = LSM6DSL_PARAM_I2C,          \
-                                       .addr            = LSM6DSL_PARAM_ADDR,         \
-                                       .acc_odr         = LSM6DSL_PARAM_ACC_ODR,      \
-                                       .gyro_odr        = LSM6DSL_PARAM_GYRO_ODR,     \
-                                       .acc_fs          = LSM6DSL_PARAM_ACC_FS,       \
-                                       .gyro_fs         = LSM6DSL_PARAM_GYRO_FS,      \
-                                       .acc_decimation  = LSM6DSL_PARAM_ACC_FIFO_DEC, \
-                                       .gyro_decimation = LSM6DSL_PARAM_GYRO_FIFO_DEC }
+
+#define LSM6DSL_PARAMS { .i2c             = LSM6DSL_PARAM_I2C,           \
+                         .addr            = LSM6DSL_PARAM_ADDR,          \
+                         .acc_odr         = LSM6DSL_PARAM_ACC_ODR,       \
+                         .gyro_odr        = LSM6DSL_PARAM_GYRO_ODR,      \
+                         .acc_fs          = LSM6DSL_PARAM_ACC_FS,        \
+                         .gyro_fs         = LSM6DSL_PARAM_GYRO_FS,       \
+                         .acc_decimation  = LSM6DSL_PARAM_ACC_FIFO_DEC,  \
+                         .gyro_decimation = LSM6DSL_PARAM_GYRO_FIFO_DEC, \
+                         .acc_usr_ofs_w   = LSM6DSL_PARAM_ACC_USR_OFS_W, \
+                         .alert_pins      = {LSM6DSL_PARAM_ALERT_PIN_1,  \
+                                                LSM6DSL_PARAM_ALERT_PIN_2} }
 #endif
 #ifndef LSM6DSL_SAUL_INFO
 #define LSM6DSL_SAUL_INFO            { .name = "lsm6dsl" }
