@@ -334,6 +334,20 @@ check_no_pkg_source_local() {
         | error_with_message "Don't push PKG_SOURCE_LOCAL definitions upstream"
 }
 
+check_no_riot_config() {
+    local patterns=()
+    local pathspec=()
+
+    patterns+=(-e 'RIOT_CONFIG_.*')
+
+    pathspec+=('Makefile*')
+    pathspec+=('**/Makefile*')
+    pathspec+=('**/*.mk')
+    pathspec+=(':!makefiles/kconfig.mk')
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message "Don't push RIOT_CONFIG_* definitions upstream. Rather define configuration via Kconfig"
+}
+
 error_on_input() {
     ! grep ''
 }
@@ -353,6 +367,7 @@ all_checks() {
     check_no_pseudomodules_in_makefile_dep
     check_no_usemodules_in_makefile_include
     check_no_pkg_source_local
+    check_no_riot_config
 }
 
 main() {

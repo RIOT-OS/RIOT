@@ -86,6 +86,23 @@ be placed in the application's folder. For an example of this you can check
 the [tests/kconfig](https://github.com/RIOT-OS/RIOT/tree/master/tests/kconfig)
 application.
 
+## Configuration via environment variables                {#env-config-kconfig}
+For easy debugging of configuration or testing new modules by compiling them
+into existing applications, one can also use environment variables prefixed by
+`RIOT_CONFIG_`. To achieve the same configuration exemplified in
+@ref configure-using-files, e.g., you could also use
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.sh}
+RIOT_CONFIG_KCONFIG_MODULE_SOCK_UTIL=1 \
+RIOT_CONFIG_SOCK_UTIL_SCHEME_MAXLEN=24 \
+    make
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All the checks that apply for `.config` files also are done with this approach.
+
+Mind that this is only meant to be used during development. In production,
+please set the configuration via `.config` files.
+
 ## A note on the usage of CFLAGS
 When a certain module is being configured via Kconfig the configuration macro
 will not longer be overridable by means of CFLAGS (e.g. set on the

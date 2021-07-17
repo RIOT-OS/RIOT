@@ -42,6 +42,11 @@ endif
 # Default and user overwritten configurations
 KCONFIG_USER_CONFIG = $(APPDIR)/user.config
 
+# This file will contain configuration using the `RIOT_CONFIG_<CONFIG>`
+# environment variables. Used to enforce a rerun of GENCONFIG when environment
+# changes.
+KCONFIG_GENERATED_ENV_CONFIG = $(GENERATED_DIR)/env.config
+
 # This is the output of the generated configuration. It always mirrors the
 # content of KCONFIG_GENERATED_AUTOCONF_HEADER_C, and it is used to load
 # configuration symbols to the build system.
@@ -63,6 +68,7 @@ KCONFIG_OUT_DEP = $(KCONFIG_OUT_CONFIG).d
 MERGE_SOURCES += $(KCONFIG_ADD_CONFIG)
 MERGE_SOURCES += $(wildcard $(KCONFIG_APP_CONFIG))
 MERGE_SOURCES += $(wildcard $(KCONFIG_USER_CONFIG))
+MERGE_SOURCES += $(KCONFIG_GENERATED_ENV_CONFIG)
 
 # Create directory to place generated files
 $(GENERATED_DIR): $(if $(MAKE_RESTARTS),,$(CLEAN))
@@ -153,6 +159,14 @@ $(KCONFIG_GENERATED_DEPENDENCIES): FORCE | $(GENERATED_DIR)
 	$(Q)printf "%s " $(USEMODULE_W_PREFIX) $(USEPKG_W_PREFIX) \
 	  | awk 'BEGIN {RS=" "}{ gsub("-", "_", $$0); \
 	      printf "config %s\n\tbool\n\tdefault y\n", toupper($$0)}' \
+	  | $(LAZYSPONGE) $(LAZYSPONGE_FLAGS) $@
+
+KCONFIG_ENV_CONFIG = $(patsubst RIOT_%,%,$(foreach v,$(filter RIOT_CONFIG_%,$(.VARIABLES)),$(v)=$($(v))))
+
+# Build an intermediate file based on the `RIOT_CONFIG_<CONFIG>` environment
+# variables
+$(KCONFIG_GENERATED_ENV_CONFIG): FORCE | $(GENERATED_DIR)
+	$(Q)printf "%s\n" $(KCONFIG_ENV_CONFIG) \
 	  | $(LAZYSPONGE) $(LAZYSPONGE_FLAGS) $@
 
 # All directories in EXTERNAL_MODULES_PATHS which have a Kconfig file
