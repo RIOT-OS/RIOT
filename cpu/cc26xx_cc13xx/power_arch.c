@@ -154,3 +154,17 @@ void power_clock_disable_uart(uart_t uart)
 
     prcm_commit();
 }
+
+void power_clock_enable_rfc(void)
+{
+    PRCM->RFCCLKG = RFCCLKG_CLK_EN;
+
+    prcm_commit();
+}
+
+void power_clock_disable_rfc(void)
+{
+    PRCM->RFCCLKG &= ~RFCCLKG_CLK_EN;
+
+    prcm_commit();
+}
