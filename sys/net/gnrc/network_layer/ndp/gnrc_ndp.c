@@ -201,6 +201,30 @@ gnrc_pktsnip_t *gnrc_ndp_opt_pi_build(const ipv6_addr_t *prefix,
     return pkt;
 }
 
+gnrc_pktsnip_t *gnrc_ndp_opt_ri_build(const ipv6_addr_t *prefix,
+                                      uint8_t prefix_len,
+                                      uint32_t route_ltime,
+                                      uint8_t flags, gnrc_pktsnip_t *next)
+{
+    assert(prefix != NULL);
+    assert(!ipv6_addr_is_link_local(prefix) && !ipv6_addr_is_multicast(prefix));
+    assert(prefix_len <= 128);
+    gnrc_pktsnip_t *pkt = gnrc_ndp_opt_build(NDP_OPT_RI, sizeof(ndp_opt_ri_t),
+                                             next);
+
+    if (pkt != NULL) {
+        ndp_opt_ri_t *ri_opt = pkt->data;
+
+        ri_opt->prefix_len = prefix_len;
+        ri_opt->flags = (flags & NDP_OPT_PI_FLAGS_MASK);
+        ri_opt->route_ltime = byteorder_htonl(route_ltime);
+        /* Bits beyond prefix_len MUST be 0 */
+        ipv6_addr_set_unspecified(&ri_opt->prefix);
+        ipv6_addr_init_prefix(&ri_opt->prefix, prefix, prefix_len);
+    }
+    return pkt;
+}
+
 gnrc_pktsnip_t *gnrc_ndp_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next)
 {
     gnrc_pktsnip_t *pkt = gnrc_ndp_opt_build(NDP_OPT_MTU,

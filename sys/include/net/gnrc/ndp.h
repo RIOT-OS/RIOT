@@ -232,6 +232,35 @@ gnrc_pktsnip_t *gnrc_ndp_opt_pi_build(const ipv6_addr_t *prefix,
                                       uint8_t prefix_len,
                                       uint32_t valid_ltime, uint32_t pref_ltime,
                                       uint8_t flags, gnrc_pktsnip_t *next);
+/**
+ * @brief   Builds the route information option.
+ *
+ * @pre `prefix != NULL`
+ * @pre `!ipv6_addr_is_link_local(prefix) && !ipv6_addr_is_multicast(prefix)`
+ * @pre `prefix_len <= 128`
+ *
+ * @see [RFC 4191, section 2.3](https://tools.ietf.org/html/rfc4191#section-2.3)
+ *
+ * @note    Should only be used with router advertisemnents. This is not checked
+ *          however, since nodes should silently ignore it in other NDP messages.
+ *
+ * @param[in] prefix        An IPv6 address or a prefix of an IPv6 address.
+ *                          Must not be NULL or be a link-local or
+ *                          multicast address.
+ * @param[in] prefix_len    The length of @p prefix in bits. Must be between
+ *                          0 and 128.
+ * @param[in] route_ltime   Length of time in seconds that @p prefix is valid.
+ *                          UINT32_MAX represents infinity.
+ * @param[in] flags         Flags as defined in net/ndp.h.
+ * @param[in] next          More options in the packet. NULL, if there are none.
+ *
+ * @return  The packet snip list of options, on success
+ * @return  NULL, if packet buffer is full
+ */
+gnrc_pktsnip_t *gnrc_ndp_opt_ri_build(const ipv6_addr_t *prefix,
+                                      uint8_t prefix_len,
+                                      uint32_t route_ltime,
+                                      uint8_t flags, gnrc_pktsnip_t *next);
 
 /**
  * @brief   Builds the MTU option.
