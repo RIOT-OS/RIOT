@@ -1,0 +1,25 @@
+From 25c67a5eaf71c5b3c0675fa61bc25b85d56af1e5 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sun, 20 Oct 2019 11:10:40 +0200
+Subject: [PATCH 1/2] fix unknown memset function
+
+---
+ Adafruit_LIS3DH.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Adafruit_LIS3DH.cpp b/Adafruit_LIS3DH.cpp
+index d6f5a2a..516baf5 100644
+--- a/Adafruit_LIS3DH.cpp
++++ b/Adafruit_LIS3DH.cpp
+@@ -28,6 +28,8 @@
+  *  BSD license, all text above must be included in any redistribution
+  */
+ 
++#include <string.h>
++
+ #include "Arduino.h"
+ 
+ #include <Adafruit_LIS3DH.h>
+-- 
+2.17.1
+

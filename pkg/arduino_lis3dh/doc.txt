@@ -1,0 +1,6 @@
+/**
+ * @defgroup pkg_arduino_lis3dh Arduino Library for LIS3DH sensor
+ * @ingroup  pkg
+ * @brief    Library used for testing the Arduino SPI and I2C (TwoWire) interfaces
+ * @see      https://github.com/adafruit/Adafruit_LIS3DH.git
+ */
