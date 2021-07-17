@@ -492,6 +492,11 @@ typedef struct {
 void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
 
 /**
+ * @brief   CPU provides own pm_off() function
+ */
+#define PROVIDES_PM_LAYERED_OFF
+
+/**
  * @brief   Called before the power management enters a power mode
  *
  * @param[in] deep
