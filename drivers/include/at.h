@@ -65,6 +65,7 @@
 #include "kernel_defines.h"
 
 #include "event.h"
+#include "xtimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -162,6 +163,11 @@ extern "C" {
 #define AT_BUF_SIZE   (1 << CONFIG_AT_BUF_SIZE_EXP)
 #endif
 
+#ifndef AT_URC_FIRST_CHAR
+/** Beginning character of an unsolicited result code */
+#define AT_URC_FIRST_CHAR '+'
+#endif
+
 /**
  * @brief   Unsolicited result code callback
  *
@@ -184,6 +190,10 @@ typedef struct {
 
 /** Shortcut for getting send end of line length */
 #define AT_SEND_EOL_LEN  (sizeof(CONFIG_AT_SEND_EOL) - 1)
+#ifndef AT_CMD_DELAY
+/** Delay to be introduced before starting a new AT command operation */
+#define AT_CMD_DELAY    (20U * US_PER_MS)
+#endif
 
 /**
  * @brief AT device structure
