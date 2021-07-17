@@ -201,7 +201,8 @@ static int send(netdev_t *netdev, const iolist_t *iolist)
     /* get access to the SPI bus for the duration of this function */
     spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
 
-    uint16_t pos = raddr(dev, S0_TX_WR0, S0_TX_WR1);
+    uint16_t tx_wr = raddr(dev, S0_TX_WR0, S0_TX_WR1);
+    uint16_t pos = (tx_wr & S0_MASK) + S0_TX_BASE;
 
     /* the register is only set correctly after the first send pkt, so we need
      * this fix here */
@@ -215,7 +216,7 @@ static int send(netdev_t *netdev, const iolist_t *iolist)
         sum += len;
     }
 
-    waddr(dev, S0_TX_WR0, S0_TX_WR1, pos);
+    waddr(dev, S0_TX_WR0, S0_TX_WR1, tx_wr + sum);
 
     /* trigger the sending process */
     wreg(dev, S0_CR, CR_SEND_MAC);
