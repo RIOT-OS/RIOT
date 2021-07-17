@@ -93,6 +93,14 @@ enum {
 /** @} */
 
 /**
+ * @name    ztimer configuration
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_ADJUST           (16)
+#define CONFIG_ZTIMER_USEC_REQUIRED_PM_MODE (1)
+/** @} */
+
+/**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
