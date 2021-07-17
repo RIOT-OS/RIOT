@@ -27,6 +27,7 @@ $(if $(ROM_LEN),,$(error ROM_LEN is not defined))
 $(if $(RAM_LEN),,$(error RAM_LEN is not defined))
 LINKFLAGS += $(LINKFLAGPREFIX)--defsym=__TEXT_REGION_LENGTH__=$(ROM_LEN)$(if $(ROM_RESERVED),-$(ROM_RESERVED))
 LINKFLAGS += $(LINKFLAGPREFIX)--defsym=__DATA_REGION_LENGTH__=$(RAM_LEN)
+LINKFLAGS += $(LDSCRIPT_EXTRA)
 
 ifeq ($(LTO),1)
   # avr-gcc <4.8.3 has a bug when using LTO which causes a warning to be printed always:

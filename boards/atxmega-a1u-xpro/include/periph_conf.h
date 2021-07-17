@@ -130,6 +130,44 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF         ARRAY_SIZE(spi_config)
 /** @} */
 
+/**
+ * @name EBI configuration
+ *
+ * For more information, see ebi_conf_t structure.
+ *
+ * @{
+ */
+static const ebi_conf_t ebi_config = {
+    .addr_bits              = 18, /* A0-A17 */
+    .flags                  = (EBI_PORT_LPC | EBI_PORT_CS2),
+    .sram_ale               = 0,
+    .lpc_ale                = 2,
+    .sdram                  = { 0 },
+    .cs                     = {    /* Reserved A16      */
+                                { EBI_CS_MODE_DISABLED_gc,
+                                  0,
+                                  EBI_CS_SRWS_0CLK_gc,
+                                  0x0UL,
+                                }, /* Reserved A17      */
+                                { EBI_CS_MODE_DISABLED_gc,
+                                  0,
+                                  EBI_CS_SRWS_0CLK_gc,
+                                  0x0UL,
+                                }, /* CS2 - 256K SRAM   */
+                                { EBI_CS_MODE_LPC_gc,
+                                  EBI_CS_ASPACE_256KB_gc,
+                                  EBI_CS_SRWS_1CLK_gc,
+                                  0x0UL,
+                                }, /* Reserved LCD      */
+                                { EBI_CS_MODE_DISABLED_gc,
+                                  0,
+                                  EBI_CS_SRWS_0CLK_gc,
+                                  0x0UL,
+                                },
+                              },
+};
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

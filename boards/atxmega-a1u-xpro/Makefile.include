@@ -1,4 +1,7 @@
 AVRDUDE_PROGRAMMER = xplainedpro_pdi
 DEBUGPROTO = -X
 
+override RAM_LEN = 65536
+override EXP_RAM = 1
+
 include $(RIOTBOARD)/common/atxmega/Makefile.include

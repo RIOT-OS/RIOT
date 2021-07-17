@@ -8,7 +8,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega1284p \
     atmega328p \
     atmega328p-xplained-mini \
-    atxmega-a1u-xpro \
     atxmega-a3bu-xplained \
     b-l072z-lrwan1 \
     blackpill \

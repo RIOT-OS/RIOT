@@ -15,14 +15,13 @@ config HAS_CPU_CORE_ATXMEGA
 config CPU_COMMON_ATXMEGA
     bool
     select HAS_CPU_CORE_ATXMEGA
-    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_EBI
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
     select HAS_PERIPH_NVM
     select HAS_PERIPH_PM
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_TIMER_PERIODIC
-    select HAS_PERIPH_UART
 
 config CPU_CORE_ATXMEGA_A1
     bool
@@ -76,6 +75,11 @@ source "$(RIOTCPU)/atxmega/Kconfig.XMEGAE"
 ## Declaration of specific features
 config HAS_CPU_ATXMEGA
     bool
+
+config HAS_PERIPH_EBI
+    bool
+    help
+        Indicates that the External Bus Interface is present.
 
 config HAS_PERIPH_NVM
     bool

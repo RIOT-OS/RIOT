@@ -135,4 +135,14 @@ void pm_periph_power_off(void)
     for (i = 0; i <= 7; i++) {
         reg[i] = 0xff;
     }
+
+    /* EBI Must be always enabled when configured */
+#if defined (__AVR_ATxmega64A1__)   || \
+    defined (__AVR_ATxmega64A1U__)  || \
+    defined (__AVR_ATxmega128A1__)  || \
+    defined (__AVR_ATxmega128A1U__)
+    if (ebi_config.addr_bits > 0) {
+        reg[0] &= ~PR_EBI_bm;
+    }
+#endif
 }

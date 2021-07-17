@@ -4,8 +4,14 @@ USEMODULE += atxmega_periph
 # All ATxmega based CPUs provide PM
 USEMODULE += pm_layered
 
-ifeq (,$(filter cpuid,$(USEMODULE)))
-  USEMODULE += periph_nvm
+ifneq (,$(findstring atxmegaa1,$(CPU_MODEL)))
+  FEATURES_REQUIRED += periph_ebi
 endif
+
+FEATURES_OPTIONAL += periph_cpuid
+FEATURES_OPTIONAL += periph_i2c
+FEATURES_REQUIRED += periph_nvm
+FEATURES_OPTIONAL += periph_spi
+FEATURES_OPTIONAL += periph_uart
 
 include $(RIOTCPU)/avr8_common/Makefile.dep
