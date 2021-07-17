@@ -75,7 +75,6 @@ typedef struct {
     gnrc_netif_t *netif;
     uint16_t id;
     uint8_t hoplimit;
-    uint8_t pattern;
 } _ping_data_t;
 
 static void _usage(char *cmdname);
@@ -97,7 +96,6 @@ int _gnrc_icmpv6_ping(int argc, char **argv)
         .timeout = DEFAULT_TIMEOUT_USEC,
         .interval = DEFAULT_INTERVAL_USEC,
         .id = DEFAULT_ID,
-        .pattern = DEFAULT_ID,
     };
     int res;
 
@@ -266,6 +264,44 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
     return res;
 }
 
+static void _fill_payload(uint8_t *buf, size_t len)
+{
+    uint8_t i = 0;
+
+    if (len >= sizeof(uint32_t)) {
+        uint32_t now = xtimer_now_usec();
+        memcpy(buf, &now, sizeof(now));
+        len -= sizeof(now);
+        buf += sizeof(now);
+    }
+
+    while (len--) {
+        *buf++ = i++;
+    }
+}
+
+static bool _check_payload(const void *buf, size_t len,
+                           uint32_t *triptime, size_t *corrupt)
+{
+    uint8_t i = 0;
+    const uint8_t *data = buf;
+
+    if (len >= sizeof(uint32_t)) {
+        *triptime = xtimer_now_usec() - unaligned_get_u32(buf);
+        len  -= sizeof(uint32_t);
+        data += sizeof(uint32_t);
+    }
+
+    while (len--) {
+        if (*data++ != i++) {
+            *corrupt = data - (uint8_t *)buf - 1;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 static void _pinger(_ping_data_t *data)
 {
     gnrc_pktsnip_t *pkt, *tmp;
@@ -305,7 +341,6 @@ static void _pinger(_ping_data_t *data)
         return;
     }
     databuf = (uint8_t *)(pkt->data) + sizeof(icmpv6_echo_t);
-    memset(databuf, data->pattern, data->datalen);
     tmp = gnrc_ipv6_hdr_build(pkt, NULL, &data->host);
     if (tmp == NULL) {
         puts("error: packet buffer full");
@@ -324,10 +359,10 @@ static void _pinger(_ping_data_t *data)
         gnrc_netif_hdr_set_netif(tmp->data, data->netif);
         pkt = gnrc_pkt_prepend(pkt, tmp);
     }
-    if (data->datalen >= sizeof(uint32_t)) {
-        uint32_t now = xtimer_now_usec();
-        memcpy(databuf, &now, sizeof(now));
-    }
+
+    /* add TX timestamp & test data */
+    _fill_payload(databuf, data->datalen);
+
     if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6,
                                    GNRC_NETREG_DEMUX_CTX_ALL,
                                    pkt)) {
@@ -350,12 +385,15 @@ static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6,
 
     /* discard if too short */
     if (icmpv6->size < (data->datalen + sizeof(icmpv6_echo_t))) {
+        printf("ICMPv6 echo response truncated by %zu byte\n",
+               (data->datalen + sizeof(icmpv6_echo_t)) - icmpv6->size);
         return;
     }
     if (icmpv6_hdr->type == ICMPV6_ECHO_REP) {
         char from_str[IPV6_ADDR_MAX_STR_LEN];
         const char *dupmsg = " (DUP!)";
         uint32_t triptime = 0;
+        size_t corrupt_at;
         uint16_t recv_seq;
 
         /* not our ping */
@@ -368,8 +406,13 @@ static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6,
         }
         recv_seq = byteorder_ntohs(icmpv6_hdr->seq);
         ipv6_addr_to_str(&from_str[0], from, sizeof(from_str));
+
+        if (_check_payload(icmpv6_hdr + 1, data->datalen,
+                           &triptime, &corrupt_at)) {
+            printf("ICMPv6 echo response corrupt at offset %zu\n", corrupt_at);
+        }
+
         if (data->datalen >= sizeof(uint32_t)) {
-            triptime = xtimer_now_usec() - unaligned_get_u32(icmpv6_hdr + 1);
             data->tsum += triptime;
             if (triptime < data->tmin) {
                 data->tmin = triptime;

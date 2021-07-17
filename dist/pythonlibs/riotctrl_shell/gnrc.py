@@ -24,7 +24,9 @@ class GNRCICMPv6EchoParser(ShellInteractionParser):
                                   r"icmp_seq=(?P<seq>\d+) ttl=(?P<ttl>\d+)"
                                   r"( rssi=(?P<rssi>-?\d+) dBm)?"
                                   r"( time=(?P<rtt>\d+.\d+) ms)?"
-                                  r"(?P<dup> \(DUP\))?")
+                                  r"(?P<dup> \(DUP\))?"
+                                  r"( response truncated by (?P<truncated>\d+) byte)"
+                                  r"( response corrupt at offset (?P<corrupted>\d+))")
         self.c_stats = re.compile(r"(?P<tx>\d+) packets transmitted, "
                                   r"(?P<rx>\d+) packets received, "
                                   r"((?P<dup>\d+) duplicates, )?"
@@ -48,6 +50,10 @@ class GNRCICMPv6EchoParser(ShellInteractionParser):
             reply["rssi"] = int(reply["rssi"])
         else:
             reply.pop("rssi", None)
+        if reply.get("truncated") is not None:
+            reply["truncated"] = int(reply["truncated"])
+        if reply.get("corrupted") is not None:
+            reply["corrupted"] = int(reply["corrupted"])
         if "replies" in res:
             res["replies"].append(reply)
         else:
