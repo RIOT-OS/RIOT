@@ -14,7 +14,7 @@
  * @brief       Test application for IEEE 802.15.4 Radio HAL
  *
  * @author      José I. Alamos <jose.alamos@haw-hamburg.de>
- *
+ * @author      Lars Kowoll <lars.kowoll@haw-hamburg.de>
  * @}
  */
 
@@ -42,41 +42,83 @@
 #define RADIO_DEFAULT_ID (0U)
 
 static inline void _set_trx_state(int state, bool verbose);
+static int send(uint8_t *dst, size_t dst_len, iolist_t *iol_data, size_t num, size_t time);
+
+static uint16_t received_acks;
+static uint16_t send_packets;
+static uint16_t received_packets;
+
+static uint8_t current_channel;
+static bool ack_request = true;
 
 static uint8_t buffer[127];
 static xtimer_t timer_ack;
 static mutex_t lock;
+static bool send_reply;
 
 static const char *str_states[3]= {"TRX_OFF", "RX", "TX"};
 static eui64_t ext_addr;
 static network_uint16_t short_addr;
 static uint8_t seq;
 
-static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
+static inline void _populate_iolist(iolist_t *iol, void *buf, size_t len, iolist_t *next)
 {
-    if (buffer[0] & IEEE802154_FCF_TYPE_ACK && ((seq-1) == buffer[2])) {
+    iol->iol_base = buf;
+    iol->iol_len = len;
+    iol->iol_next = next;
+}
+
+static inline bool _recv_valid_ack(void)
+{
+    return buffer[0] & IEEE802154_FCF_TYPE_ACK && ((seq-1) == buffer[2]);
+}
+
+static void _handle_packet_riotctrl(size_t size)
+{
+    if (_recv_valid_ack()) {
+        received_acks++;
+    }
+    else {
+        received_packets++;
+        if (send_reply) {
+            uint8_t out[IEEE802154_LONG_ADDRESS_LEN];
+            le_uint16_t tmp;
+            int src_len = ieee802154_get_src(buffer, out, &tmp);
+            size_t mhr_len = ieee802154_get_frame_hdr_len(buffer);
+            assert(mhr_len > 0);
+            iolist_t pkt;
+            /* Reply with echo */
+            _populate_iolist(&pkt, &buffer[mhr_len], size - mhr_len, NULL);
+            send(out, src_len, &pkt, 1, 0);
+        }
+    }
+}
+
+static void _handle_packet(size_t size, uint8_t lqi, int16_t rssi)
+{
+    if (_recv_valid_ack()) {
         printf("Received valid ACK with sqn %i\n", buffer[2]);
     }
     else {
-        puts("Packet received:");
+        printf("Packet received:\n");
         for (unsigned i=0;i<size;i++) {
             printf("%02x ", buffer[i]);
         }
+        printf("\nLQI: %i, RSSI: %i\n\n", (int) lqi, (int) rssi);
     }
-    puts("");
-    printf("LQI: %i, RSSI: %i\n", (int) lqi, (int) rssi);
-    puts("");
 }
 
-static int print_addr(int argc, char **argv)
+static int print_info(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
     uint8_t *_p = (uint8_t*) &ext_addr;
+    printf("Address: ");
     for(int i=0;i<8;i++) {
         printf("%02x", *_p++);
     }
     printf("\n");
+    printf("Channel: %d\n", current_channel);
     return 0;
 }
 
@@ -105,7 +147,9 @@ static xtimer_t timer_ack = {
 void _crc_error_handler(event_t *event)
 {
     (void) event;
-    puts("Packet with invalid CRC received");
+    if (!IS_ACTIVE(RIOTCTRL)) {
+        puts("Packet with invalid CRC received");
+    }
     ieee802154_dev_t* dev = ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID);
     /* switch back to RX_ON state */
     ieee802154_radio_request_set_trx_state(dev, IEEE802154_TRX_STATE_RX_ON);
@@ -129,8 +173,12 @@ void _rx_done_handler(event_t *event)
      */
     int size = ieee802154_radio_read(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), buffer, 127, &info);
     if (size > 0) {
-        /* Print packet while we wait for the state transition */
-        _print_packet(size, info.lqi, info.rssi);
+        if (IS_ACTIVE(RIOTCTRL)) {
+            _handle_packet_riotctrl(size);
+        }
+        else {
+            _handle_packet(size, info.lqi, info.rssi);
+        }
     }
 
     /* Go out of the HAL's FB Lock state after frame reception and trigger a
@@ -162,42 +210,62 @@ static void _hal_radio_cb(ieee802154_dev_t *dev, ieee802154_trx_ev_t status)
     }
 }
 
+static void _handle_tx_status_riotctrl(ieee802154_tx_info_t *tx_info)
+{
+    switch (tx_info->status) {
+        case TX_STATUS_SUCCESS:
+            send_packets++;
+            break;
+        default:
+            break;
+    }
+}
+
+static void _handle_tx_status(ieee802154_tx_info_t *tx_info)
+{
+    switch (tx_info->status) {
+        case TX_STATUS_SUCCESS:
+            printf("Transmission succeeded\n");
+            break;
+        case TX_STATUS_FRAME_PENDING:
+            printf("Transmission succeeded and there's pending data\n");
+            break;
+        case TX_STATUS_MEDIUM_BUSY:
+            printf("Medium busy\n");
+            break;
+        case TX_STATUS_NO_ACK:
+            printf("No ACK\n");
+            break;
+    }
+
+    if (ieee802154_radio_has_frame_retrans_info(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))) {
+        printf("Retransmission attempts: %i\n", tx_info->retrans);
+    }
+
+}
+
 static void _tx_finish_handler(event_t *event)
 {
     ieee802154_tx_info_t tx_info;
 
     (void) event;
     /* The TX_DONE event indicates it's safe to call the confirm counterpart */
-    assert(ieee802154_radio_confirm_transmit(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), &tx_info) >= 0);
+    int res = ieee802154_radio_confirm_transmit(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), &tx_info);
+    assert(res >= 0);
 
-    if (!ieee802154_radio_has_irq_ack_timeout(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID)) && !ieee802154_radio_has_frame_retrans(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))) {
-        /* This is just to show how the MAC layer would handle ACKs... */
-        _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
+    _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
+    if (ack_request
+        && !ieee802154_radio_has_irq_ack_timeout(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))
+        && !ieee802154_radio_has_frame_retrans(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))) {
         xtimer_set(&timer_ack, ACK_TIMEOUT_TIME);
     }
 
-    switch (tx_info.status) {
-        case TX_STATUS_SUCCESS:
-            puts("Transmission succeeded");
-            break;
-        case TX_STATUS_FRAME_PENDING:
-            puts("Transmission succeeded and there's pending data");
-            break;
-        case TX_STATUS_MEDIUM_BUSY:
-            puts("Medium busy");
-            break;
-        case TX_STATUS_NO_ACK:
-            puts("No ACK");
-            break;
+    if (IS_ACTIVE(RIOTCTRL)) {
+        _handle_tx_status_riotctrl(&tx_info);
     }
-
-    puts("");
-
-    if (ieee802154_radio_has_frame_retrans_info(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))) {
-        printf("Retransmission attempts: %i\n", tx_info.retrans);
+    else {
+        _handle_tx_status(&tx_info);
     }
-
-    puts("");
 }
 
 static event_t _tx_finish_ev = {
@@ -206,8 +274,17 @@ static event_t _tx_finish_ev = {
 
 static void _send(iolist_t *pkt)
 {
-    /* Request a state change to RX_ON */
-    ieee802154_radio_request_set_trx_state(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), IEEE802154_TRX_STATE_TX_ON);
+    /* Request a state change to TX_ON */
+    int res;
+    do {
+        res = ieee802154_radio_request_set_trx_state(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), IEEE802154_TRX_STATE_TX_ON);
+    }
+    while(res == -EBUSY);
+
+    if (res < 0) {
+        puts("Couldn't send frame");
+        return;
+    }
 
     /* Write the packet to the radio */
     ieee802154_radio_write(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), pkt);
@@ -216,7 +293,10 @@ static void _send(iolist_t *pkt)
     while(ieee802154_radio_confirm_set_trx_state(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID)) == -EAGAIN);
 
     /* Trigger the transmit and wait for the mutex unlock (TX_DONE event) */
-    ieee802154_radio_set_frame_filter_mode(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), IEEE802154_FILTER_ACK_ONLY);
+    if (ack_request) {
+        ieee802154_radio_set_frame_filter_mode(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), IEEE802154_FILTER_ACK_ONLY);
+    }
+
     ieee802154_radio_request_transmit(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID));
     mutex_lock(&lock);
 
@@ -263,48 +343,6 @@ static int _init(void)
     /* Set the transceiver state to RX_ON in order to receive packets */
     _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
 
-    return 0;
-}
-
-uint8_t payload[] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ornare lacinia mi elementum interdum ligula.";
-
-static int send(uint8_t *dst, size_t dst_len,
-                size_t len)
-{
-    uint8_t flags;
-    uint8_t mhr[IEEE802154_MAX_HDR_LEN];
-    int mhr_len;
-
-    le_uint16_t src_pan, dst_pan;
-    iolist_t iol_data = {
-        .iol_base = payload,
-        .iol_len = len,
-        .iol_next = NULL,
-    };
-
-    flags = IEEE802154_FCF_TYPE_DATA | IEEE802154_FCF_ACK_REQ;
-
-    src_pan = byteorder_btols(byteorder_htons(CONFIG_IEEE802154_DEFAULT_PANID));
-    dst_pan = byteorder_btols(byteorder_htons(CONFIG_IEEE802154_DEFAULT_PANID));
-    uint8_t src_len = IEEE802154_LONG_ADDRESS_LEN;
-    void *src = &ext_addr;
-
-    /* fill MAC header, seq should be set by device */
-    if ((mhr_len = ieee802154_set_frame_hdr(mhr, src, src_len,
-                                        dst, dst_len,
-                                        src_pan, dst_pan,
-                                        flags, seq++)) < 0) {
-        puts("txtsnd: Error preperaring frame");
-        return 1;
-    }
-
-    iolist_t iol_hdr = {
-        .iol_next = &iol_data,
-        .iol_base = mhr,
-        .iol_len = mhr_len,
-    };
-
-    _send(&iol_hdr);
     return 0;
 }
 
@@ -396,7 +434,11 @@ int _cca(int argc, char **argv)
 static inline void _set_trx_state(int state, bool verbose)
 {
     xtimer_ticks32_t a;
-    int res = ieee802154_radio_request_set_trx_state(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), state);
+    int res;
+    do {
+        res = ieee802154_radio_request_set_trx_state(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), state);
+    }
+    while (res == -EBUSY);
     if (verbose) {
         a = xtimer_now();
         if(res != 0) {
@@ -438,26 +480,6 @@ int _test_states(int argc, char **argv)
     _set_trx_state(IEEE802154_TRX_STATE_RX_ON, true);
 
     return 0;
-}
-
-int txtsnd(int argc, char **argv)
-{
-    uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
-    size_t len;
-    size_t res;
-
-    if (argc != 3) {
-        puts("Usage: txtsnd <long_addr> <len>");
-        return 1;
-    }
-
-    res = _parse_addr(addr, sizeof(addr), argv[1]);
-    if (res == 0) {
-        puts("Usage: txtsnd <long_addr> <len>");
-        return 1;
-    }
-    len = atoi(argv[2]);
-    return send(addr, res, len);
 }
 
 static int promisc(int argc, char **argv)
@@ -533,6 +555,7 @@ int config_phy(int argc, char **argv)
     }
     else {
         puts("Success!");
+        current_channel = channel;
     }
 
     _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
@@ -716,16 +739,192 @@ static int _caps_cmd(int argc, char **argv)
     return 0;
 }
 
+uint8_t payload[] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ornare lacinia mi elementum interdum ligula.";
+
+static int send(uint8_t *dst, size_t dst_len, iolist_t *iol_data, size_t num, size_t time)
+{
+    uint8_t flags;
+    uint8_t mhr[IEEE802154_MAX_HDR_LEN];
+    int mhr_len;
+
+    le_uint16_t src_pan, dst_pan;
+
+    flags = IEEE802154_FCF_TYPE_DATA;
+    if (ack_request) {
+        flags |= IEEE802154_FCF_ACK_REQ;
+    }
+
+    src_pan = byteorder_btols(byteorder_htons(CONFIG_IEEE802154_DEFAULT_PANID));
+    dst_pan = byteorder_btols(byteorder_htons(CONFIG_IEEE802154_DEFAULT_PANID));
+    uint8_t src_len = IEEE802154_LONG_ADDRESS_LEN;
+    void *src = &ext_addr;
+
+    received_acks = 0;
+    received_packets = 0;
+    send_packets = 0;
+
+    for(size_t i = 0; i < num; i++) {
+        /* fill MAC header, seq should be set by device */
+        if ((mhr_len = ieee802154_set_frame_hdr(mhr, src, src_len,
+                                            dst, dst_len,
+                                            src_pan, dst_pan,
+                                            flags, seq++)) < 0) {
+            puts("txtsnd: Error preperaring frame");
+            return 1;
+        }
+
+        iolist_t iol_hdr = {
+            .iol_next = iol_data,
+            .iol_base = mhr,
+            .iol_len = mhr_len,
+        };
+        _send(&iol_hdr);
+        xtimer_msleep(time);
+    }
+    return 0;
+}
+
+int txtsnd(int argc, char **argv)
+{
+    uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
+    size_t res;
+    size_t len;
+
+    if (argc != 3 || !(res = _parse_addr(addr, sizeof(addr), argv[1]))) {
+        puts("Usage: txtsnd <long_addr> <len>");
+        return 1;
+    }
+    len = atoi(argv[2]);
+
+    iolist_t pkt;
+    _populate_iolist(&pkt, payload, len, NULL);
+    return send(addr, res, &pkt, 1, 0);
+}
+
+int txtspam(int argc, char **argv) {
+    uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
+    int res;
+    size_t num;
+    size_t time;
+    size_t len;
+
+    if (argc != 5 || !(res = _parse_addr(addr, sizeof(addr), argv[1]))) {
+        puts("Usage: txtspam <long_addr> <len> <number of packets> <time in ms between packets>");
+        return 1;
+    }
+    len = atoi(argv[2]);
+    num = atoi(argv[3]);
+    time = atoi(argv[4]);
+
+    iolist_t payload_iotlist;
+    _populate_iolist(&payload_iotlist, payload, len, NULL);
+    iolist_t channel_iotlist;
+    _populate_iolist(&channel_iotlist, &current_channel, sizeof(current_channel), &payload_iotlist);
+    res = send(addr, res, &channel_iotlist, num, time);
+    ieee802154_dev_t *dev = ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID);
+    puts("-------Summary of the test-------");
+    printf("Send Packets: %d\n", send_packets);
+    if (!(ieee802154_radio_has_frame_retrans(dev)) || ieee802154_radio_has_irq_ack_timeout(dev)) {
+        printf("Acknowledged Packets: %d\n", received_acks);
+        printf("    Percentage: %d%%\n", (received_acks * 100)/num);
+    }
+    printf("Received Packets: %d\n", received_packets);
+    printf("    Percentage: %d%%\n", (received_packets * 100)/num);
+    puts("---------------------------------");
+    return res;
+}
+
+int reply_mode_cmd(int argc, char **argv) {
+    if (argc != 2) {
+        printf("Usage: %s <on|off>", argv[0]);
+        return 1;
+    }
+
+    if (strcmp(argv[1], "on") == 0) {
+        send_reply = true;
+        puts("Success: Packets are now mirrored");
+    }
+    else {
+        send_reply = false;
+        puts("Success: Packets are no longer mirrored");
+    }
+
+    return 0;
+}
+
+int check_last_packet(int argc, char **argv) {
+    if (argc != 3) {
+        puts("Usage: check_last_packet <long_addr> <channel>");
+        return 1;
+    }
+
+    uint8_t channel = atoi(argv[2]);
+    uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
+    uint8_t receive_addr[IEEE802154_LONG_ADDRESS_LEN];
+    _parse_addr(addr, sizeof(addr), argv[1]);
+    bool result =  true;
+    le_uint16_t src_pan;
+    ieee802154_get_src(buffer, receive_addr, &src_pan);
+    if (memcmp(addr, receive_addr, IEEE802154_LONG_ADDRESS_LEN) != 0) {
+        result = false;
+    }
+    if (channel != buffer[ieee802154_get_frame_hdr_len(buffer)]) {
+        puts("Fail channel match");
+        result = false;
+    }
+
+    if (result) {
+        puts("Success");
+    } else {
+        puts("No match");
+    }
+    puts("\n");
+    return 0;
+}
+
+int ack_req_cmd(int argc, char **argv)
+{
+    if (argc != 2) {
+        printf("Usage: %s <on|off>\n", argv[0]);
+        return 1;
+    }
+
+    if (strcmp(argv[1], "on") == 0) {
+        ack_request = true;
+        puts("Successfully enabled ACK Request");
+    }
+    else
+    {
+        ack_request = false;
+        puts("Successfully disabled ACK Request");
+    }
+
+    return 0;
+}
+
 static const shell_command_t shell_commands[] = {
     { "config_phy", "Set channel and TX power", config_phy},
-    { "print_addr", "Print IEEE802.15.4 addresses", print_addr},
-    { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
+    { "get_info", "Print IEEE802.15.4 Information", print_info},
     { "test_states", "Test state changes", _test_states },
     { "cca", "Perform CCA", _cca },
     { "config_cca", "Config CCA parameters", _config_cca_cmd },
     { "promisc", "Set promiscuos mode", promisc },
     { "tx_mode", "Enable CSMA-CA, CCA or direct transmission", txmode_cmd },
     { "caps", "Get a list of caps supported by the device", _caps_cmd },
+    { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
+    { "ack_req", "Enable or disabled ACK Request", ack_req_cmd },
+    { NULL, NULL, NULL }
+};
+
+static const shell_command_t shell_commands_riotctrl[] = {
+    { "config_phy", "Set channel and TX power", config_phy},
+    { "get_info", "Print IEEE802.15.4 Information", print_info},
+    { "test_states", "Test state changes", _test_states },
+    { "tx_mode", "Enable CSMA-CA, CCA or direct transmission", txmode_cmd },
+    { "txtspam", "Send multiple IEEE 802.15.4 packets", txtspam },
+    { "reply", "Enable/Disable mirroring of each packet", reply_mode_cmd },
+    { "check_last_packet", "Checks if the last packet received meets the criteria", check_last_packet },
+    { "ack_req", "Enable or disabled ACK Request", ack_req_cmd },
     { NULL, NULL, NULL }
 };
 
@@ -734,12 +933,16 @@ int main(void)
     mutex_init(&lock);
     mutex_lock(&lock);
     _init();
-
+    current_channel = CONFIG_IEEE802154_DEFAULT_CHANNEL;
     /* start the shell */
     puts("Initialization successful - starting the shell now");
-
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    if (IS_ACTIVE(RIOTCTRL)) {
+        shell_run(shell_commands_riotctrl, line_buf, SHELL_DEFAULT_BUFSIZE);
+    }
+    else {
+        shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    }
 
     return 0;
 }
