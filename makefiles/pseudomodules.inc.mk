@@ -156,7 +156,7 @@ PSEUDOMODULES += sys_bus_%
 PSEUDOMODULES += vdd_lc_filter_%
 PSEUDOMODULES += wakaama_objects_%
 PSEUDOMODULES += wifi_enterprise
-PSEUDOMODULES += xtimer_on_ztimer
+PSEUDOMODULES += xtimer_on_%
 PSEUDOMODULES += zptr
 PSEUDOMODULES += ztimer%
 

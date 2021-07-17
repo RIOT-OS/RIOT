@@ -194,12 +194,17 @@ static const adc_conf_t adc_config[] = {
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
+#ifdef MODULE_XTIMER_ON_RTT
+#define XTIMER_HZ           (32768ul)
+#define XTIMER_WIDTH        16
+#endif
+
 /**
  * @name    RTT configuration
  * @{
  */
 #ifndef RTT_FREQUENCY
-#define RTT_FREQUENCY       (4096)
+#define RTT_FREQUENCY       (32768)
 #endif
 /** @} */
 
