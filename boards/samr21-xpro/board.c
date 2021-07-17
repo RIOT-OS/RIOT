@@ -35,7 +35,7 @@ void board_antenna_config(uint8_t antenna)
     }
 }
 
-void board_init(void)
+void board_samr21_xpro_init(void)
 {
     /* initialize the on-board LED */
     gpio_init(LED0_PIN, GPIO_OUT);
@@ -52,4 +52,9 @@ void board_init(void)
         /* set default antenna switch configuration */
         board_antenna_config(RFCTL_ANTENNA_DEFAULT);
     }
+}
+
+void __attribute__((weak)) board_init(void)
+{
+    board_samr21_xpro_init();
 }
