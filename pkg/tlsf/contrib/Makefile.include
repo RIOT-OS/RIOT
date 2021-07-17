@@ -1,0 +1,1 @@
+UNDEF += $(BINDIR)/tlsf-malloc/tlsf-malloc.o
