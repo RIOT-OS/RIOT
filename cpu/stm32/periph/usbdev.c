@@ -478,6 +478,16 @@ static void _configure_fifo(stm32_usb_otg_fshs_t *usbdev)
     usbdev->fifo_pos = (rx_size + STM32_USB_OTG_FIFO_MIN_WORD_SIZE);
 }
 
+size_t _round_up_to_multiple_of_four(size_t unaligned)
+{
+    size_t misalignment = unaligned & 0x03;
+    if (misalignment) {
+        unaligned += 4 - misalignment;
+    }
+
+    return unaligned;
+}
+
 static usbdev_ep_t *_usbdev_new_ep(usbdev_t *dev, usb_ep_type_t type,
                                    usb_ep_dir_t dir, size_t buf_len)
 {
@@ -512,6 +522,7 @@ static usbdev_ep_t *_usbdev_new_ep(usbdev_t *dev, usb_ep_type_t type,
             ep->dev = dev;
             ep->len = buf_len;
             usbdev->occupied += buf_len;
+            usbdev->occupied = _round_up_to_multiple_of_four(usbdev->occupied);
             if (ep->dir == USB_EP_DIR_IN && ep->num != 0) {
                 _configure_tx_fifo(usbdev, ep->num, ep->len);
             }
@@ -955,7 +966,9 @@ static int _usbdev_ep_ready(usbdev_ep_t *ep, size_t len)
         if (len > 0 && !_uses_dma(conf)) {
             /* The FIFO requires 32 bit word reads/writes */
             size_t words = (len + 3) / 4;
-            uint32_t *ep_buf = (uint32_t *)ep->buf;
+            /* buffer is gets aligned in _usbdev_new_ep(). Use intermediate
+             * cast to uintptr_t to silence -Wcast-align*/
+            uint32_t *ep_buf = (uint32_t *)(uintptr_t)ep->buf;
             __O uint32_t *fifo = _tx_fifo(conf, ep->num);
             for (size_t i = 0; i < words; i++) {
                 fifo[i] = ep_buf[i];
@@ -988,8 +1001,9 @@ static int _usbdev_ep_ready(usbdev_ep_t *ep, size_t len)
 
 static void _copy_rxfifo(stm32_usb_otg_fshs_t *usbdev, uint8_t *buf, size_t len)
 {
-    /* The FIFO requires 32 bit word reads/writes */
-    uint32_t *buf32 = (uint32_t *)buf;
+    /* The FIFO requires 32 bit word reads/writes. This is only called with
+     * usbdev_ep_t::buf, which is aligned to four bytes in _usbdev_new_ep() */
+    uint32_t *buf32 = (uint32_t *)(uintptr_t)buf;
     __I uint32_t *fifo32 = _rx_fifo(usbdev->config);
     size_t count = (len + 3) / 4;
 

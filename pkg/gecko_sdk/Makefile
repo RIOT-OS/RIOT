@@ -13,5 +13,10 @@ ifneq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-int-in-bool-context
 endif
 
+# Disable -Wcast-align for this package, as source contains cast that increase
+# alignment requirements. Let's hope those are false positives and proper
+# alignment is assured.
+CFLAGS += -Wno-cast-align
+
 all:
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/dist

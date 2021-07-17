@@ -100,7 +100,9 @@ void print_sigmasks(void)
             ucontext_t *p;
             printf("%s:\n", sched_threads[i]->name);
             //print_thread_sigmask(sched_threads[i]->sp);
-            p = (ucontext_t *)(sched_threads[i]->stack_start);
+            /* Use intermediate cast to uintptr_t to silence -Wcast-align.
+             * stacks are manually word aligned in thread_static_init() */
+            p = (ucontext_t *)(uintptr_t)(sched_threads[i]->stack_start);
             print_thread_sigmask(p);
             puts("");
         }
@@ -325,7 +327,9 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     native_isr_context.uc_stack.ss_size = sizeof(__isr_stack);
     native_isr_context.uc_stack.ss_flags = 0;
     makecontext(&native_isr_context, native_irq_handler, 0);
-    _native_cur_ctx = (ucontext_t *)thread_get_active()->sp;
+    /* Use intermediate cast to uintptr_t to silence -Wcast-align.
+     * stacks are manually word aligned in thread_stack_init() */
+    _native_cur_ctx = (ucontext_t *)(uintptr_t)thread_get_active()->sp;
 
     DEBUG("\n\n\t\tnative_isr_entry: return to _native_sig_leave_tramp\n\n");
     /* disable interrupts in context */

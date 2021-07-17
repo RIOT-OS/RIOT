@@ -17,6 +17,8 @@ endif
 
 TOOLCHAIN_FILE = $(PKG_SOURCE_DIR)/xcompile-toolchain.cmake
 
+CFLAGS += -Wno-cast-align
+
 all: $(BINDIR)/ccn-lite.a
 
 $(BINDIR)/ccn-lite.a: $(PKG_BUILD_DIR)/lib/libccnl-riot.a

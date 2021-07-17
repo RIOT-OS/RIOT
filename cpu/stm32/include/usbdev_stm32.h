@@ -63,6 +63,10 @@ extern "C" {
 #define STM32_USB_OTG_BUF_SPACE  USBDEV_EP_BUF_SPACE
 #endif
 
+#if (STM32_USB_OTG_BUF_SPACE % 4) != 0
+#error "STM32_USB_OTG_BUF_SPACE needs to be a multiple of 4"
+#endif
+
 /**
  * @brief Number of endpoints available with the OTG FS peripheral
  *        including the control endpoint

@@ -103,12 +103,27 @@ int thread_isr_stack_usage(void)
     return -1;
 }
 
+static inline void *align_stack(void *stack_start, int *stacksize)
+{
+    const size_t alignment = sizeof(uintptr_t);
+    const uintptr_t align_mask = alignment - 1;
+    uintptr_t start = (uintptr_t)stack_start;
+    size_t unalignment = (start & align_mask)
+                         ? (alignment - (start & align_mask)) : 0;
+    start += unalignment;
+    *stacksize -= unalignment;
+    *stacksize &= ~align_mask;
+    return (void *)start;
+}
+
 char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stacksize)
 {
     char *stk;
     ucontext_t *p;
 
-    VALGRIND_STACK_REGISTER(stack_start, (char *) stack_start + stacksize);
+    stack_start = align_stack(stack_start, &stacksize);
+
+    VALGRIND_STACK_REGISTER(stack_start, (char *)stack_start + stacksize);
     VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
                    stack_start, (void*)((int)stack_start + stacksize));
 
@@ -116,7 +131,9 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
 
     stk = stack_start;
 
-    p = (ucontext_t *)(stk + (stacksize - sizeof(ucontext_t)));
+    /* Use intermediate cast to uintptr_t to silence -Wcast-align. The stack
+     * is aligned to word size above. */
+    p = (ucontext_t *)(uintptr_t)(stk + (stacksize - sizeof(ucontext_t)));
     stacksize -= sizeof(ucontext_t);
 
     if (getcontext(p) == -1) {
@@ -147,7 +164,9 @@ void isr_cpu_switch_context_exit(void)
     }
 
     DEBUG("isr_cpu_switch_context_exit: calling setcontext(%" PRIkernel_pid ")\n\n", thread_getpid());
-    ctx = (ucontext_t *)(thread_get_active()->sp);
+    /* Use intermediate cast to uintptr_t to silence -Wcast-align.
+     * stacks are manually word aligned in thread_static_init() */
+    ctx = (ucontext_t *)(uintptr_t)(thread_get_active()->sp);
 
     native_interrupts_enabled = 1;
     _native_mod_ctx_leave_sigh(ctx);
@@ -195,7 +214,9 @@ void isr_thread_yield(void)
     }
 
     sched_run();
-    ucontext_t *ctx = (ucontext_t *)(thread_get_active()->sp);
+    /* Use intermediate cast to uintptr_t to silence -Wcast-align.
+     * stacks are manually word aligned in thread_static_init() */
+    ucontext_t *ctx = (ucontext_t *)(uintptr_t)(thread_get_active()->sp);
     DEBUG("isr_thread_yield: switching to(%" PRIkernel_pid ")\n\n",
           thread_getpid());
 
@@ -212,7 +233,9 @@ void thread_yield_higher(void)
     sched_context_switch_request = 1;
 
     if (_native_in_isr == 0) {
-        ucontext_t *ctx = (ucontext_t *)(thread_get_active()->sp);
+        /* Use intermediate cast to uintptr_t to silence -Wcast-align.
+         * stacks are manually word aligned in thread_static_init() */
+        ucontext_t *ctx = (ucontext_t *)(uintptr_t)(thread_get_active()->sp);
         _native_in_isr = 1;
         if (!native_interrupts_enabled) {
             warnx("thread_yield_higher: interrupts are disabled - this should not be");

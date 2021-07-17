@@ -70,6 +70,9 @@ OPTIONAL_CFLAGS += -Wformat=2
 OPTIONAL_CFLAGS += -Wformat-overflow
 OPTIONAL_CFLAGS += -Wformat-truncation
 
+# Warn about casts that increase alignment requirements
+OPTIONAL_CFLAGS += -Wcast-align
+
 # Warn if a user-supplied include directory does not exist.
 CFLAGS += -Wmissing-include-dirs
 

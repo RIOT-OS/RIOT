@@ -102,10 +102,12 @@ static ssize_t _skip_hostname(const uint8_t *buf, size_t len, uint8_t *bufpos)
     return res + 1;
 }
 
-static int _parse_dns_reply(uint8_t *buf, size_t len, void* addr_out, int family)
+static int _parse_dns_reply(uint16_t *_buf, size_t len, void* addr_out,
+                            int family)
 {
+    uint8_t *buf = (uint8_t *)_buf;
     const uint8_t *buflim = buf + len;
-    sock_dns_hdr_t *hdr = (sock_dns_hdr_t*) buf;
+    sock_dns_hdr_t *hdr = (sock_dns_hdr_t *)_buf;
     uint8_t *bufpos = buf + sizeof(*hdr);
 
     /* skip all queries that are part of the reply */
@@ -171,7 +173,8 @@ static int _parse_dns_reply(uint8_t *buf, size_t len, void* addr_out, int family
 
 int sock_dns_query(const char *domain_name, void *addr_out, int family)
 {
-    static uint8_t dns_buf[SOCK_DNS_BUF_LEN];
+    /* sock_dns_hdr_t has an alignment requirement of 2 bytes */
+    static uint16_t dns_buf[(SOCK_DNS_BUF_LEN + 1) / 2];
 
     if (sock_dns_server.port == 0) {
         return -ECONNREFUSED;
@@ -190,9 +193,9 @@ int sock_dns_query(const char *domain_name, void *addr_out, int family)
 
     uint16_t id = 0; /* random? */
     for (int i = 0; i < SOCK_DNS_RETRIES; i++) {
-        uint8_t *buf = dns_buf;
+        uint8_t *buf = (uint8_t *)dns_buf;
 
-        sock_dns_hdr_t *hdr = (sock_dns_hdr_t*) buf;
+        sock_dns_hdr_t *hdr = (sock_dns_hdr_t *)dns_buf;
         memset(hdr, 0, sizeof(*hdr));
         hdr->id = id;
         hdr->flags = htons(0x0120);
