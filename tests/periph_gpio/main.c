@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014,2017 Freie Universität Berlin
+ * Copyright (C) 2014,2017,2020 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,12 +14,14 @@
  * @brief       Test application for GPIO peripheral drivers
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Bas Stottelaar <basstottelaar@gmail.com>
  *
  * @}
  */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "irq.h"
 #include "shell.h"
@@ -38,18 +40,45 @@ static void cb(void *arg)
 
 static int init_pin(int argc, char **argv, gpio_mode_t mode)
 {
-    int po, pi;
+    int port, pin;
 
     if (argc < 3) {
         printf("usage: %s <port> <pin>\n", argv[0]);
         return 1;
     }
 
-    po = atoi(argv[1]);
-    pi = atoi(argv[2]);
+    port = atoi(argv[1]);
+    pin  = atoi(argv[2]);
 
-    if (gpio_init(GPIO_PIN(po, pi), mode) < 0) {
-        printf("Error to initialize GPIO_PIN(%i, %02i)\n", po, pi);
+    if (gpio_init(GPIO_PIN(port, pin), mode)) {
+        printf("Error to initialize GPIO_PIN(%i, %02i)\n", port, pin);
+        return 1;
+    }
+
+    return 0;
+}
+
+static int init_pin_hl(int argc, char **argv, bool high)
+{
+    int port, pin, res;
+
+    if (argc < 3) {
+        printf("usage: %s <port> <pin>\n", argv[0]);
+        return 1;
+    }
+
+    port = atoi(argv[1]);
+    pin  = atoi(argv[2]);
+
+    if (high) {
+        res = gpio_init_high(GPIO_PIN(port, pin), GPIO_OUT);
+    }
+    else {
+        res = gpio_init_low(GPIO_PIN(port, pin), GPIO_OUT);
+    }
+
+    if (res) {
+        printf("Error to initialize GPIO_PIN(%i, %02i)\n", port, pin);
         return 1;
     }
 
@@ -59,6 +88,16 @@ static int init_pin(int argc, char **argv, gpio_mode_t mode)
 static int init_out(int argc, char **argv)
 {
     return init_pin(argc, argv, GPIO_OUT);
+}
+
+static int init_out_h(int argc, char **argv)
+{
+    return init_pin_hl(argc, argv, true);
+}
+
+static int init_out_l(int argc, char **argv)
+{
+    return init_pin_hl(argc, argv, false);
 }
 
 static int init_in(int argc, char **argv)
@@ -402,6 +441,8 @@ static int bench(int argc, char **argv)
 
 static const shell_command_t shell_commands[] = {
     { "init_out", "init as output (push-pull mode)", init_out },
+    { "init_out_h", "init as output (push-pull mode, high after init)", init_out_h },
+    { "init_out_l", "init as output (push-pull mode, low after init)", init_out_l },
     { "init_in", "init as input w/o pull resistor", init_in },
     { "init_in_pu", "init as input with pull-up", init_in_pu },
     { "init_in_pd", "init as input with pull-down", init_in_pd },

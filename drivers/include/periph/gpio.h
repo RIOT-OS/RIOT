@@ -170,6 +170,28 @@ typedef struct {
  */
 int gpio_init(gpio_t pin, gpio_mode_t mode);
 
+/**
+ * @brief   Initialize the given pin as general purpose output with a low level.
+ *
+ * @param[in] pin       pin to initialize
+ * @param[in] mode      mode of the pin, see @c gpio_mode_t
+ *
+ * @return              0 on success
+ * @return              -1 on error
+ */
+int gpio_init_low(gpio_t pin, gpio_mode_t mode);
+
+/**
+ * @brief   Initialize the given pin as general purpose output with a high level.
+ *
+ * @param[in] pin       pin to initialize
+ * @param[in] mode      mode of the pin, see @c gpio_mode_t
+ *
+ * @return              0 on success
+ * @return              -1 on error
+ */
+int gpio_init_high(gpio_t pin, gpio_mode_t mode);
+
 #if defined(MODULE_PERIPH_GPIO_IRQ) || defined(DOXYGEN)
 /**
  * @brief   Initialize a GPIO pin for external interrupt usage
@@ -222,6 +244,9 @@ void gpio_irq_disable(gpio_t pin);
 /**
  * @brief   Get the current value of the given pin
  *
+ * @pre     The given pin has been configured as Input using
+ *          @see gpio_init, @see gpio_init_high or @see gpio_init_low
+ *
  * @param[in] pin       the pin to read
  *
  * @return              0 when pin is LOW
@@ -232,12 +257,18 @@ int gpio_read(gpio_t pin);
 /**
  * @brief   Set the given pin to HIGH
  *
+ * @pre     The given pin has been configured as Output using
+ *          @see gpio_init, @see gpio_init_high or @see gpio_init_low
+ *
  * @param[in] pin       the pin to set
  */
 void gpio_set(gpio_t pin);
 
 /**
  * @brief   Set the given pin to LOW
+ *
+ * @pre     The given pin has been configured as Output using
+ *          @see gpio_init, @see gpio_init_high or @see gpio_init_low
  *
  * @param[in] pin       the pin to clear
  */
@@ -246,12 +277,18 @@ void gpio_clear(gpio_t pin);
 /**
  * @brief   Toggle the value of the given pin
  *
+ * @pre     The given pin has been configured as Output using
+ *          @see gpio_init, @see gpio_init_high or @see gpio_init_low
+ *
  * @param[in] pin       the pin to toggle
  */
 void gpio_toggle(gpio_t pin);
 
 /**
  * @brief   Set the given pin to the given value
+ *
+ * @pre     The given pin has been configured as Output using
+ *          @see gpio_init, @see gpio_init_high or @see gpio_init_low
  *
  * @param[in] pin       the pin to set
  * @param[in] value     value to set the pin to, 0 for LOW, HIGH otherwise
