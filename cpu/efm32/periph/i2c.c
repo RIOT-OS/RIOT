@@ -21,9 +21,11 @@
 #include <assert.h>
 #include <errno.h>
 
+#include "byteorder.h"
 #include "cpu.h"
 #include "mutex.h"
-#include "byteorder.h"
+#include "pm_layered.h"
+#include "xtimer.h"
 
 #include "periph_conf.h"
 #include "periph/i2c.h"
@@ -33,11 +35,20 @@
 #include "em_i2c.h"
 
 /**
+ * @brief   These power modes will be blocked while an I2C transfer is active
+ */
+#ifndef EFM32_I2C_PM_BLOCKER
+#define EFM32_I2C_PM_BLOCKER 1
+#endif
+
+/**
  * @brief   Large-enough value to have some timeout value for rogue I2C
  *          transfers. Value based on kit driver (shipped with Simplicity
  *          Studio).
  */
-#define I2C_TIMEOUT (300000)
+#ifndef EFM32_I2C_TIMEOUT
+#define EFM32_I2C_TIMEOUT (300 * US_PER_MS)
+#endif
 
 /**
  * @brief   Holds the I2C transfer progress.
@@ -45,39 +56,51 @@
 static volatile I2C_TransferReturn_TypeDef i2c_progress[I2C_NUMOF];
 
 /**
- * @brief   Initialized bus locks (we have a maximum of three devices)
+ * @brief   Holds the I2C bus locks.
  */
 static mutex_t i2c_lock[I2C_NUMOF];
+
+/**
+ * @brief   Holds the PID of the threads in transfer.
+ */
+static mutex_t i2c_transfer_lock[I2C_NUMOF];
+
+/**
+ * @brief   ISR handle for I2C interrupts.
+ */
+static void _isr(i2c_t dev)
+{
+    i2c_progress[dev] = I2C_Transfer(i2c_config[dev].dev);
+
+    /* wake-up transfer thread if not in progress anymore, which indicates that
+       the transfer finished or an error occurred */
+    if (i2c_progress[dev] != i2cTransferInProgress) {
+        mutex_unlock(&i2c_transfer_lock[dev]);
+    }
+
+    cortexm_isr_end();
+}
 
 /**
  * @brief   Start and track an I2C transfer.
  */
 static int _transfer(i2c_t dev, I2C_TransferSeq_TypeDef *transfer)
 {
-    bool busy = true;
-    uint32_t timeout = I2C_TIMEOUT;
+    /* start transfer (using interrupts) and wait for it to complete or
+       timeout */
+    pm_block(EFM32_I2C_PM_BLOCKER);
 
-    /* start the i2c transaction */
     i2c_progress[dev] = I2C_TransferInit(i2c_config[dev].dev, transfer);
 
-    /* the transfer progresses via the interrupt handler */
-    while (busy) {
-        unsigned int cpsr = irq_disable();
+    if (xtimer_mutex_lock_timeout(&i2c_transfer_lock[dev], EFM32_I2C_TIMEOUT)) {
+        I2C_IntDisable(i2c_config[dev].dev,
+                       I2C_IntGetEnabled(i2c_config[dev].dev));
+        pm_unblock(EFM32_I2C_PM_BLOCKER);
 
-        if (i2c_progress[dev] == i2cTransferInProgress && timeout--) {
-            cortexm_sleep_until_event();
-        }
-        else {
-            busy = false;
-        }
-
-        irq_restore(cpsr);
-    }
-
-    /* check for timeout */
-    if (!timeout) {
         return -ETIMEDOUT;
     }
+
+    pm_unblock(EFM32_I2C_PM_BLOCKER);
 
     /* transfer finished, interpret the result */
     switch (i2c_progress[dev]) {
@@ -101,14 +124,15 @@ void i2c_init(i2c_t dev)
 
     /* initialize lock */
     mutex_init(&i2c_lock[dev]);
+    mutex_init(&i2c_transfer_lock[dev]);
 
     /* enable clocks */
     CMU_ClockEnable(cmuClock_HFPER, true);
     CMU_ClockEnable(i2c_config[dev].cmu, true);
 
-    /* configure the pins */
-    gpio_init(i2c_config[dev].scl_pin, GPIO_OD);
-    gpio_init(i2c_config[dev].sda_pin, GPIO_OD);
+    /* configure the pins with pull-up to not drive the lines low */
+    gpio_init(i2c_config[dev].scl_pin, GPIO_OD_PU);
+    gpio_init(i2c_config[dev].sda_pin, GPIO_OD_PU);
 
     /* ensure slave is in a known state, which it may not be after a reset */
     for (int i = 0; i < 9; i++) {
@@ -259,23 +283,20 @@ int i2c_write_regs(i2c_t dev, uint16_t address, uint16_t reg,
 #ifdef I2C_0_ISR
 void I2C_0_ISR(void)
 {
-    i2c_progress[0] = I2C_Transfer(i2c_config[0].dev);
-    cortexm_isr_end();
+    _isr(0);
 }
 #endif
 
 #ifdef I2C_1_ISR
 void I2C_1_ISR(void)
 {
-    i2c_progress[1] = I2C_Transfer(i2c_config[1].dev);
-    cortexm_isr_end();
+    _isr(1);
 }
 #endif
 
 #ifdef I2C_2_ISR
 void I2C_2_ISR(void)
 {
-    i2c_progress[2] = I2C_Transfer(i2c_config[2].dev);
-    cortexm_isr_end();
+    _isr(2);
 }
 #endif

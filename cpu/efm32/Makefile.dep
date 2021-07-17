@@ -1,3 +1,7 @@
+ifneq (,$(filter periph_i2c,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
   USEMODULE += periph_rtc_series$(EFM32_SERIES)
 endif
