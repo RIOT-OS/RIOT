@@ -1127,6 +1127,26 @@ static inline ssize_t coap_opt_add_uri_path(coap_pkt_t *pkt, const char *path)
 }
 
 /**
+ * @brief   Adds one or multiple Uri-Path options in the form '/path' into pkt
+ *
+ * @param[in,out] pkt         Packet being built
+ * @param[in]     path        Resource (sub)path
+ * @param[in]     path_len    length of @p path
+ *
+ * @pre     ((pkt != NULL) && (path != NULL))
+ *
+ * @return        number of bytes written to pkt buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or pkt full
+ */
+static inline ssize_t coap_opt_add_uri_path_with_len(coap_pkt_t *pkt,
+                                                     const char *path,
+                                                     size_t path_len)
+{
+    return coap_opt_add_chars(pkt, COAP_OPT_URI_PATH, path, path_len, '/');
+}
+
+/**
  * @brief   Finalizes options as required and prepares for payload
  *
  * @post pkt.payload advanced to first available byte after options
