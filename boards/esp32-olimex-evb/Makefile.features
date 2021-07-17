@@ -12,7 +12,7 @@ FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_spi
 
 # unique features of the board
-FEATURES_PROVIDED += periph_eth     # Ethernet MAC (EMAC)
+FEATURES_PROVIDED += esp_eth        # Ethernet MAC (EMAC)
 FEATURES_PROVIDED += periph_can     # CAN peripheral interface
 FEATURES_PROVIDED += periph_ir      # IR peripheral interface
 
