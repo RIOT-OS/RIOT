@@ -74,18 +74,25 @@ $(BINDIR_APP)-slot1.hdr: OFFSET=$(SLOT1_IMAGE_OFFSET)
 # Generic target to create a binary files for both slots
 riotboot: $(SLOT_RIOT_BINS)
 
-# riotboot bootloader compile target
-riotboot/flash-bootloader: riotboot/bootloader/flash
+# riotboot required environment variables
 # IOTLAB_NODE is passed so that FLASHFILE is also set in the recursive make call
 # when PROGRAMMER=iotlab
+RIOTBOOT_BOOTLOADER_VARS = \
+    BOARD \
+    EXTERNAL_BOARD_DIRS \
+    DEBUG_ADAPTER_ID \
+    PROGRAMMER \
+    IOTLAB_NODE \
+    #
+RIOTBOOT_BOOTLOADER_ENV_VARS := $(strip $(foreach varname,$(RIOTBOOT_BOOTLOADER_VARS), \
+    $(if $(filter file environment command,$(origin $(varname))), \
+    $(varname)="$($(varname))",)))
+# riotboot bootloader compile target
+riotboot/flash-bootloader: riotboot/bootloader/flash
 # avoid circular dependency against clean
 riotboot/bootloader/%: $$(if $$(filter riotboot/bootloader/clean,$$@),,$$(BUILDDEPS) pkg-prepare)
-	$(Q)/usr/bin/env -i \
-		QUIET=$(QUIET) PATH="$(PATH)"\
-		EXTERNAL_BOARD_DIRS="$(EXTERNAL_BOARD_DIRS)" BOARD=$(BOARD)\
-		DEBUG_ADAPTER_ID=$(DEBUG_ADAPTER_ID) \
-		IOTLAB_NODE=$(IOTLAB_NODE) \
-		PROGRAMMER=$(PROGRAMMER) PROGRAMMER_QUIET=$(PROGRAMMER_QUIET) \
+	/usr/bin/env -i \
+		QUIET=$(QUIET) PATH="$(PATH)" $(RIOTBOOT_BOOTLOADER_ENV_VARS) \
 			$(MAKE) --no-print-directory -C $(RIOTBOOT_DIR) $*
 
 # Generate a binary file from the bootloader which fills all the
