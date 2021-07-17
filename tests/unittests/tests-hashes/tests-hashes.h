@@ -79,7 +79,7 @@ Test *tests_hashes_sha256_hmac_tests(void);
  */
 Test *tests_hashes_sha256_chain_tests(void);
 
-  /**
+/**
  * @brief   Generates tests for hashes/sha3.h
  *
  * @return  embUnit tests if successful, NULL if not.
