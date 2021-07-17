@@ -1,4 +1,4 @@
-From 40012b6fad9772cb38547abff42149b7ce1ca8d1 Mon Sep 17 00:00:00 2001
+From 679179258e4e505d065dd64c9130ee1e3369f0c4 Mon Sep 17 00:00:00 2001
 From: Francisco Molina <femolina@uc.cl>
 Date: Mon, 5 Jul 2021 14:38:12 +0200
 Subject: [PATCH 2/2] porting/npl/riot: add namespaced syscfg symlink

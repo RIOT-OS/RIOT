@@ -105,6 +105,11 @@ void nimble_riot_init(void)
     int res;
     (void)res;
 
+#if !IS_USED(MODULE_MYNEWT_CORE) && IS_ACTIVE(NIMBLE_CFG_CONTROLLER)
+    hal_timer_init(5, NULL);
+    os_cputime_init(32768);
+#endif
+
     /* and finally initialize and run the host */
     thread_create(_stack_host, sizeof(_stack_host),
                   NIMBLE_HOST_PRIO,
