@@ -41,6 +41,15 @@ extern "C" {
 /** 0:mount on first file access, 1 mount in f_mount() call */
 #define FATFS_MOUNT_OPT       (1)
 
+/** FAT filesystem type that a file system should be formatted in by vfs_format() */
+#ifndef CONFIG_FATFS_FORMAT_TYPE
+#if FF_FS_EXFAT
+#define CONFIG_FATFS_FORMAT_TYPE    FM_EXFAT
+#else
+#define CONFIG_FATFS_FORMAT_TYPE    FM_FAT32
+#endif
+#endif
+
 /**
  * @brief Size of path buffer for absolute paths
  *

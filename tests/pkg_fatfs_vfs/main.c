@@ -83,6 +83,13 @@ static void print_test_result(const char *test_name, int ok)
     printf("%s:[%s]\n", test_name, ok ? "OK" : "FAILED");
 }
 
+static void test_format(void)
+{
+#ifdef MODULE_FATFS_VFS_FORMAT
+    print_test_result("test_format__format", vfs_format(&_test_vfs_mount) == 0);
+#endif
+}
+
 static void test_mount(void)
 {
     print_test_result("test_mount__mount", vfs_mount(&_test_vfs_mount) == 0);
@@ -415,6 +422,7 @@ int main(void)
     printf("Tests for FatFs over VFS - test results will be printed "
            "in the format test_name:result\n");
 
+    test_format();
     test_mount();
     test_open();
     test_rw();
