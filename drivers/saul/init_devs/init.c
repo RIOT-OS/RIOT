@@ -119,6 +119,10 @@ void saul_init_devs(void)
         extern void auto_init_hdc1000(void);
         auto_init_hdc1000();
     }
+    if (IS_USED(MODULE_HM3301)) {
+        extern void auto_init_hm3301(void);
+        auto_init_hm3301();
+    }
     if (IS_USED(MODULE_HSC)) {
         extern void auto_init_hsc(void);
         auto_init_hsc();
