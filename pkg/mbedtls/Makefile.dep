@@ -1,0 +1,24 @@
+ifneq (,$(filter mbedtls_entropy,$(USEMODULE)))
+  USEMODULE += mbedtls_contrib
+  USEMODULE += hashes
+
+  # include sources if hardware is available
+  FEATURES_OPTIONAL += periph_hwrng
+  ifneq (,$(filter periph_hwrng,$(FEATURES_USED)))
+    DEFAULT_MODULE += mbedtls_entropy_source_hwrng
+  endif
+
+  FEATURES_OPTIONAL += periph_adc
+  ifneq (,$(filter periph_adc,$(FEATURES_USED)))
+    DEFAULT_MODULE += mbedtls_entropy_source_adc
+  endif
+
+  ifneq (,$(filter mbedtls_entropy_source_adc,$(USEMODULE) $(DEFAULT_MODULE)))
+    USEMODULE += entropy_source_adc_noise
+    ifndef CONFIG_KCONFIG_USEMODULE_ENTROPY_SOURCE_ADC_NOISE
+      # disable conditioning by default, enable health tests
+      CFLAGS += -DCONFIG_ENTROPY_SOURCE_ADC_COND=0
+      CFLAGS += -DCONFIG_ENTROPY_SOURCE_ADC_HEALTH_TEST=1
+    endif
+  endif
+endif
