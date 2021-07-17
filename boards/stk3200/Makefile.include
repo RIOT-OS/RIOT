@@ -3,3 +3,6 @@ JLINK_PRE_FLASH = r
 
 # include board common
 include $(RIOTBOARD)/common/silabs/Makefile.include
+
+# limit the stack size so most tests and examples compile
+CFLAGS += -DCPU_TINY_DEFAULT_STACK=1
