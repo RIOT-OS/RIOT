@@ -1,6 +1,6 @@
 PKG_NAME=tensorflow-lite
 PKG_URL=https://github.com/tensorflow/tensorflow
-PKG_VERSION=1768c8f2fa155d4c6406e8ff7addf374c83de7ad
+PKG_VERSION=d745ff2a48cebf18e847e8b602a744e97e058946
 PKG_LICENSE=Apache2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
