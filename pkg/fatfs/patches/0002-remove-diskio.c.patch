@@ -1,6 +1,6 @@
-From 8b62c5ed1cc74007497baf3a93920bf9ebabf068 Mon Sep 17 00:00:00 2001
+From 743850dca90d01697e5829ec7179ef577dcad2de Mon Sep 17 00:00:00 2001
 From: Benjamin Valentin <benpicco@googlemail.com>
-Date: Sun, 31 Jan 2021 20:00:38 +0100
+Date: Thu, 29 Apr 2021 10:12:49 +0200
 Subject: [PATCH 2/2] remove diskio.c
 
 ---
