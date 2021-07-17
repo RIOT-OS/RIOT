@@ -691,6 +691,8 @@ sock_udp_t *sock_dtls_get_udp_sock(sock_dtls_t *sock);
  * @return -EADDRNOTAVAIL, if the local endpoint of @p sock is not set.
  * @return -EINVAL, if @p remote is invalid or @p sock is not properly
  *         initialized (or closed while sock_udp_recv() blocks).
+ *
+ * @note For tinydtls the netif of @p ep cannot be @ref SOCK_ADDR_ANY_NETIF.
  */
 int sock_dtls_session_init(sock_dtls_t *sock, const sock_udp_ep_t *ep,
                            sock_dtls_session_t *remote);
@@ -961,6 +963,9 @@ ssize_t sock_dtls_send_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
  *                 The send function blocks until the handshake completes or the
  *                 timeout expires. If the handshake was successful the data has
  *                 been sent.
+ *
+ * @note    For tinydtls the netif of the underlying endpoint in @p remote cannot
+ *          be @ref SOCK_ADDR_ANY_NETIF.
  *
  * @return The number of bytes sent on success
  * @return  -ENOTCONN, if `timeout == 0` and no existing session exists with

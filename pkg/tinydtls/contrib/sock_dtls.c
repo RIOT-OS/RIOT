@@ -528,7 +528,7 @@ int sock_dtls_session_init(sock_dtls_t *sock, const sock_udp_ep_t *ep,
     if (!sock->udp_sock || (sock_udp_get_local(sock->udp_sock, &local) < 0)) {
         return -EADDRNOTAVAIL;
     }
-    if (ep->port == 0) {
+    if (ep->port == 0 || ep->netif == 0) {
         return -EINVAL;
     }
     switch (ep->family) {
@@ -596,6 +596,13 @@ ssize_t sock_dtls_send_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
     assert(sock);
     assert(remote);
     assert(data);
+
+    /* tinydtls stores peers in a hashmap (endpoint parameters are hashed).
+     * Peer will not be re-found when a msg is received from that peer since
+     * it does not come from interface 0 */
+    if (remote->dtls_session.ifindex == 0) {
+        return -EINVAL;
+    }
 
     /* check if session exists, if not create session first then send */
     if (!dtls_get_peer(sock->dtls_ctx, &remote->dtls_session)) {
