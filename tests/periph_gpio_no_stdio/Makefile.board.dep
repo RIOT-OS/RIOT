@@ -1,0 +1,5 @@
+# Put board specific dependencies here
+
+ifneq (,$(filter arch_avr8,$(FEATURES_USED)))
+  NO_PULL_DOWN := 1
+endif
