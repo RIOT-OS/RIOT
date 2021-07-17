@@ -28,6 +28,8 @@ extern "C" {
 
 /* Single precision math */
 #define WOLFSSL_SP_MATH
+#define WOLFSSL_SP_MATH_ALL
+#define WOLFSSL_SP_INT_NEGATIVE
 #define WOLFSSL_SP_SMALL
 #define SP_WORD_SIZE 32
 #define WOLFSSL_SP

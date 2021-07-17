@@ -2,7 +2,7 @@ include ../Makefile.tests_common
 
 # This is an optimized stack value based on testing, if you observe
 # a segmentation fault please increase this stack size.
-CFLAGS += -DTHREAD_STACKSIZE_MAIN=2*THREAD_STACKSIZE_LARGE
+CFLAGS += -DTHREAD_STACKSIZE_MAIN=3*THREAD_STACKSIZE_LARGE
 
 USEPKG += wolfssl
 USEMODULE += wolfcrypt wolfcrypt-test wolfcrypt_sha512 \

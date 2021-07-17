@@ -1,0 +1,30 @@
+From e1d686956cb139c43351e0c79210e5fe4b82c3db Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benpicco@googlemail.com>
+Date: Mon, 1 Mar 2021 20:45:27 +0100
+Subject: [PATCH] test.c: remove extra ;
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+error: ISO C does not allow extra ‘;’ outside of a function [-Werror=pedantic]
+   93 | _Pragma("GCC diagnostic ignored \"-Wunused-function\"");
+---
+ wolfcrypt/test/test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wolfcrypt/test/test.c b/wolfcrypt/test/test.c
+index 952628830..c2fc06f8e 100644
+--- a/wolfcrypt/test/test.c
++++ b/wolfcrypt/test/test.c
+@@ -90,7 +90,7 @@
+ #endif
+ 
+ #ifdef __GNUC__
+-_Pragma("GCC diagnostic ignored \"-Wunused-function\"");
++_Pragma("GCC diagnostic ignored \"-Wunused-function\"")
+ #endif
+ 
+ #ifdef USE_FLAT_TEST_H
+-- 
+2.27.0
+
