@@ -63,11 +63,6 @@ extern "C" {
 #define LED1_TOGGLE         gpio_toggle(LED1_PIN)
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

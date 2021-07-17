@@ -29,7 +29,7 @@
 #include "cpu.h"
 #include "periph_cpu.h"
 #include "kernel_init.h"
-#include "board.h"
+#include "board_generic.h"
 #include "mpu.h"
 #include "panic.h"
 #include "sched.h"

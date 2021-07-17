@@ -55,11 +55,6 @@ extern "C" {
 #define LPSXXX_PARAM_ADDR   (0x5c)
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

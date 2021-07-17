@@ -99,11 +99,6 @@
 extern "C" {
 #endif
 
-/**
- * @brief Initialize the board specific hardware
- */
-void board_init(void);
-
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

@@ -46,11 +46,6 @@ extern "C" {
  */
 #define BTN_B1_PIN          GPIO_PIN(PORT_B, 3)
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and stdio
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

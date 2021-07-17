@@ -53,11 +53,6 @@ extern "C" {
 #define LED3_TOGGLE         gpio_toggle(LED3_PIN)
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, include clocks, LEDs and stdio
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

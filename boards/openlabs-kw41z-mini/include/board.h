@@ -85,11 +85,6 @@ extern "C"
 #define PTB3_OUTPUT_OSCERCLK        (0)
 #endif
 
-/**
- * @brief Initialize board-specific hardware, including clock, LEDs, and stdio
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

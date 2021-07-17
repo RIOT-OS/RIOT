@@ -102,11 +102,6 @@ extern "C" {
 #define DISP_POWER_PIN      GPIO_PIN(PA, 10)
 /** @} */
 
-/**
- * @brief   Initialize the board (GPIO, sensors, clocks).
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

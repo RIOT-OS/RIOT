@@ -28,11 +28,6 @@
 extern "C" {
 #endif
 
-/**
- * @brief Initialize board specific hardware
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

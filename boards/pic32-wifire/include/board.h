@@ -80,11 +80,6 @@ extern "C" {
 #define BTN1_MODE           GPIO_IN
 /** @} */
 
-/**
- * @brief   Board level initialization
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

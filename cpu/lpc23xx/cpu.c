@@ -16,6 +16,7 @@
 #include "irq.h"
 #include "VIC.h"
 
+#include "board_generic.h"
 #include "stdio_base.h"
 #include "periph/init.h"
 
@@ -118,8 +119,6 @@ void arm_reset(void)
  */
 void cpu_init(void)
 {
-    extern void board_init(void);
-
     /* configure CPU clock */
     cpu_init_clks();
 

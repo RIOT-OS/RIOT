@@ -180,11 +180,6 @@ extern "C" {
 #define CONFIG_ZTIMER_USEC_WIDTH    (16)
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

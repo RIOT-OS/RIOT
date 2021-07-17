@@ -26,11 +26,6 @@
 extern "C" {
 #endif
 
-/**
- * @brief   Initialize the platform
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

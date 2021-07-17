@@ -80,11 +80,6 @@ extern "C" {
 #define XTIMER_ISR_BACKOFF  (40)
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

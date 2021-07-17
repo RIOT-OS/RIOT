@@ -50,11 +50,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
-/**
  * @brief   Use the 2nd UART for STDIO on this board
  */
 #define STDIO_UART_DEV      UART_DEV(1)

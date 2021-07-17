@@ -97,11 +97,6 @@ extern "C" {
 #define LSM303DLHC_PARAM_MAG_PIN    GPIO_PIN(PORT_E, 2)
 /** @} */
 
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif
