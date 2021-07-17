@@ -42,7 +42,7 @@ void auto_init_ina3221(void)
     for (unsigned i = 0; i < INA3221_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing ina3221 #%u\n", i);
         int status = ina3221_init(&ina3221_devs[i], &ina3221_params[i]);
-        if (status != INA3221_OK) {
+        if (status != 0) {
             LOG_ERROR("[auto_init_saul] error(%d) initializing ina3221 #%u\n",
                       status, i);
             continue;

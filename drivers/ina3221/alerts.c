@@ -23,8 +23,8 @@
 #include "periph/gpio.h"
 #include "ina3221.h"
 
-int _ina3221_enable_alert(ina3221_t *dev, ina3221_alert_t alert,
-                          ina3221_alert_cb_t cb, void *arg)
+int ina3221_enable_alert(ina3221_t *dev, ina3221_alert_t alert,
+                         ina3221_alert_cb_t cb, void *arg)
 {
     if (alert >= INA3221_NUM_ALERTS) {
         return -ERANGE;
@@ -36,15 +36,15 @@ int _ina3221_enable_alert(ina3221_t *dev, ina3221_alert_t alert,
     dev->alert_callback_arguments[alert] = arg;
     int check = gpio_init_int(
         dev->params.upins.apins.alert_pins[alert],
-        (dev->params.gpio_config & (1 << alert)) ? GPIO_IN_PU : GPIO_IN,
+        (dev->params.gpio_config & (1U << alert)) ? GPIO_IN_PU : GPIO_IN,
         GPIO_FALLING,
         cb,
         arg
         );
-    return check ? check : INA3221_OK;
+    return check ? check : 0;
 }
 
-int _ina3221_disable_alert(ina3221_t *dev, ina3221_alert_t alert)
+int ina3221_disable_alert(ina3221_t *dev, ina3221_alert_t alert)
 {
     if (alert >= INA3221_NUM_ALERTS) {
         return -ERANGE;
@@ -53,5 +53,5 @@ int _ina3221_disable_alert(ina3221_t *dev, ina3221_alert_t alert)
         return -ENOTSUP;
     }
     gpio_irq_disable(dev->params.upins.apins.alert_pins[alert]);
-    return INA3221_OK;
+    return 0;
 }

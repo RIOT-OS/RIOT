@@ -24,39 +24,24 @@
 #include <string.h>
 #include "byteorder.h"
 #include "ina3221_internal.h"
-#include "ina3221_params.h"
 #include "ina3221_regs.h"
 #include "ina3221.h"
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-typedef struct {
-    uint8_t chi_reg_shunt;
-    uint8_t chi_reg_bus;
-    uint8_t chi_reg_crit_alert_limit;
-    uint8_t chi_reg_warn_alert_limit;
-} ina3221_channel_info_t;
+/* register addresses differ by 2 */
+#define INA3221_REG_CH_SHUNT_VOLTAGE(i) \
+        (INA3221_REG_CH1_SHUNT_VOLTAGE + (i * 2))
 
-static ina3221_channel_info_t _chi[INA3221_NUM_CH] = {
-    {
-        .chi_reg_shunt = INA3221_REG_CH1_SHUNT_VOLTAGE,
-        .chi_reg_bus = INA3221_REG_CH1_BUS_VOLTAGE,
-        .chi_reg_crit_alert_limit = INA3221_REG_CH1_CRIT_ALERT_LIMIT,
-        .chi_reg_warn_alert_limit = INA3221_REG_CH1_WARN_ALERT_LIMIT
-    },
-    {
-        .chi_reg_shunt = INA3221_REG_CH2_SHUNT_VOLTAGE,
-        .chi_reg_bus = INA3221_REG_CH2_BUS_VOLTAGE,
-        .chi_reg_crit_alert_limit = INA3221_REG_CH2_CRIT_ALERT_LIMIT,
-        .chi_reg_warn_alert_limit = INA3221_REG_CH2_WARN_ALERT_LIMIT
-    },
-    {
-        .chi_reg_shunt = INA3221_REG_CH3_SHUNT_VOLTAGE,
-        .chi_reg_bus = INA3221_REG_CH3_BUS_VOLTAGE,
-        .chi_reg_crit_alert_limit = INA3221_REG_CH3_CRIT_ALERT_LIMIT,
-        .chi_reg_warn_alert_limit = INA3221_REG_CH3_WARN_ALERT_LIMIT
-    }
-};
+#define INA3221_REG_CH_BUS_VOLTAGE(i) \
+        (INA3221_REG_CH1_BUS_VOLTAGE + (i * 2))
+
+#define INA3221_REG_CH_CRIT_ALERT_LIMIT(i) \
+        (INA3221_REG_CH1_CRIT_ALERT_LIMIT + (i * 2))
+
+#define INA3221_REG_CH_WARN_ALERT_LIMIT(i) \
+        (INA3221_REG_CH1_WARN_ALERT_LIMIT + (i * 2))
 
 /**
  * @brief Read register value
@@ -68,13 +53,13 @@ static ina3221_channel_info_t _chi[INA3221_NUM_CH] = {
  * @post        @p out is in host byte order
  *
  * @return      0, on success
- * @return      -INA3221_I2C_ERROR, if i2c bus acquirement failed
+ * @return      -EIO, if i2c bus acquirement failed
  * @return      @see i2c_read_regs
  */
 static int _read_reg(const ina3221_t *dev, uint8_t reg, uint16_t *out)
 {
     if (i2c_acquire(dev->params.i2c)) {
-        return -INA3221_I2C_ERROR;
+        return -EIO;
     }
     int status = i2c_read_regs(dev->params.i2c, dev->params.addr, reg, out,
                                INA3221_REG_LEN, 0);
@@ -96,14 +81,14 @@ static int _read_reg(const ina3221_t *dev, uint8_t reg, uint16_t *out)
  * @pre         @p in must be in host byte order
  *
  * @return      0, on success
- * @return      -INA3221_I2C_ERROR, if i2c bus acquirement failed
+ * @return      -EIO, if i2c bus acquirement failed
  * @return      @see i2c_write_regs
  */
 static int _write_reg(const ina3221_t *dev, uint8_t reg, uint16_t in)
 {
     in = htons(in);
     if (i2c_acquire(dev->params.i2c)) {
-        return -INA3221_I2C_ERROR;
+        return -EIO;
     }
     int status = i2c_write_regs(dev->params.i2c, dev->params.addr, reg, &in,
                                 INA3221_REG_LEN, 0);
@@ -118,7 +103,6 @@ int ina3221_reset(ina3221_t *dev)
 {
     uint16_t config;
     int status = _write_reg(dev, INA3221_REG_CONFIGURATION, INA3221_RESET);
-
     if (status < 0) {
         return status;
     }
@@ -128,18 +112,17 @@ int ina3221_reset(ina3221_t *dev)
         return status;
     }
     if (config != INA3221_DEFCONFIG) {
-        return -INA3221_RESET_FAILED;
+        return -ENODEV;
     }
     dev->params.config = INA3221_DEFCONFIG;
-    return INA3221_OK;
+    return 0;
 }
 
 int ina3221_init(ina3221_t *dev, const ina3221_params_t *params)
 {
     int status;
-
     if (!dev || !params) {
-        return -EINVAL;
+        return -EFAULT;
     }
     dev->params = *params;
     uint16_t id;
@@ -148,34 +131,32 @@ int ina3221_init(ina3221_t *dev, const ina3221_params_t *params)
         return status;
     }
     if (id != INA3221_MANUFACTURER_ID) {
-        return -INA3221_BAD_MANUF_ID;
+        return -ENXIO;
     }
     status = _read_reg(dev, INA3221_REG_DIE_ID, &id);
     if (status < 0) {
         return status;
     }
     if (id != INA3221_DIE_ID) {
-        return -INA3221_BAD_DIE_ID;
+        return -ENXIO;
     }
-    if (ina3221_reset(dev) != INA3221_OK) {
-        return -INA3221_RESET_FAILED;
-    }
-    if (_ina3221_set_config(dev, params->config) != INA3221_OK) {
-        return -INA3221_CONFIG_FAILED;
+    if (ina3221_reset(dev) != 0) {
+        return -ENODEV;
     }
     uint16_t cfg;
-    if (_ina3221_get_config(dev, &cfg) != INA3221_OK || cfg != params->config) {
-        return -INA3221_CONFIG_FAILED;
+    if ((ina3221_set_config(dev, params->config) != 0) ||
+        (ina3221_get_config(dev, &cfg) != 0)) {
+        return -EINVAL;
     }
-#if defined(MODULE_INA3221_ALERTS) || defined(DOXYGEN)
+#if IS_USED(MODULE_INA3221_ALERTS) || defined(DOXYGEN)
     memset(dev->alert_callbacks, 0, sizeof(dev->alert_callbacks));
     memset(dev->alert_callback_arguments, 0,
            sizeof(dev->alert_callback_arguments));
 #endif
-    return INA3221_OK;
+    return 0;
 }
 
-int _ina3221_set_config(ina3221_t *dev, uint16_t cfg)
+int ina3221_set_config(ina3221_t *dev, uint16_t cfg)
 {
     cfg &= ~INA3221_RESET; /* prevent accidental reset */
     int status = _write_reg(dev, INA3221_REG_CONFIGURATION, cfg);
@@ -183,282 +164,219 @@ int _ina3221_set_config(ina3221_t *dev, uint16_t cfg)
         return status;
     }
     dev->params.config = cfg;
-    return INA3221_OK;
+    return 0;
 }
 
-int _ina3221_get_config(const ina3221_t *dev, uint16_t *cfg)
+int ina3221_get_config(const ina3221_t *dev, uint16_t *cfg)
 {
-    *cfg = dev->params.config;
+    int status = _read_reg(dev, INA3221_REG_CONFIGURATION, cfg);
+    if (status < 0) {
+        return status;
+    }
     *cfg &= ~INA3221_RESET; /* clear reset flag */
-    return INA3221_OK;
+    return 0;
 }
 
-int _ina3221_set_enable_channel(ina3221_t *dev, uint16_t ech)
+int ina3221_set_enable_channel(ina3221_t *dev, ina3221_ch_t ch)
 {
     uint16_t cfg;
-    int status = _read_reg(dev, INA3221_REG_CONFIGURATION, &cfg);
-
-    if (status < 0) {
+    int status;
+    if ((status = ina3221_get_config(dev, &cfg)) < 0) {
         return status;
     }
-    cfg &= ~INA3221_ENABLE_CH_MASK;
-    cfg |= (ech & INA3221_ENABLE_CH_MASK);
-    status = _write_reg(dev, INA3221_REG_CONFIGURATION, cfg);
-    if (status < 0) {
+    ina3221_config_set_enabled_channels(&cfg, ch);
+    if ((status = ina3221_set_config(dev, cfg)) < 0) {
         return status;
     }
-    dev->params.config = cfg;
-    return INA3221_OK;
-}
-
-int _ina3221_get_enable_channel(const ina3221_t *dev, uint16_t *ech)
-{
-    *ech = dev->params.config & INA3221_ENABLE_CH_MASK;
-    return ((*ech & INA3221_ENABLE_CH1) ? 1 : 0) +
-           ((*ech & INA3221_ENABLE_CH2) ? 1 : 0) +
-           ((*ech & INA3221_ENABLE_CH3) ? 1 : 0);
+    return 0;
 }
 
 int ina3221_set_num_samples(ina3221_t *dev, ina3221_num_samples_t ns)
 {
     uint16_t cfg;
-    int status = _read_reg(dev, INA3221_REG_CONFIGURATION, &cfg);
-
-    if (status < 0) {
+    int status;
+    if ((status = ina3221_get_config(dev, &cfg)) < 0) {
         return status;
     }
-    cfg &= ~INA3221_NUM_SAMPLES_MASK;
-    cfg |= (ns & INA3221_NUM_SAMPLES_MASK);
-    status = _write_reg(dev, INA3221_REG_CONFIGURATION, cfg);
-    if (status < 0) {
+    ina3221_config_set_num_samples(&cfg, ns);
+    if ((status = ina3221_set_config(dev, cfg)) < 0) {
         return status;
     }
-    dev->params.config = cfg;
-    return INA3221_OK;
-}
-
-int ina3221_get_num_samples(const ina3221_t *dev, ina3221_num_samples_t *ns)
-{
-    *ns = dev->params.config & INA3221_NUM_SAMPLES_MASK;
-    return INA3221_OK;
+    return 0;
 }
 
 int ina3221_set_conv_time_bus_adc(ina3221_t *dev,
                                   ina3221_conv_time_bus_adc_t ctb)
 {
     uint16_t cfg;
-    int status = _read_reg(dev, INA3221_REG_CONFIGURATION, &cfg);
-
-    if (status < 0) {
+    int status;
+    if ((status = ina3221_get_config(dev, &cfg)) < 0) {
         return status;
     }
-    cfg &= ~INA3221_CONV_TIME_BADC_MASK;
-    cfg |= (ctb & INA3221_CONV_TIME_BADC_MASK);
-    status = _write_reg(dev, INA3221_REG_CONFIGURATION, cfg);
-    if (status < 0) {
+    ina3221_config_set_conv_time_bus(&cfg, ctb);
+    if ((status = ina3221_set_config(dev, cfg)) < 0) {
         return status;
     }
-    dev->params.config = cfg;
-    return INA3221_OK;
-}
-
-int ina3221_get_conv_time_bus_adc(const ina3221_t *dev,
-                                  ina3221_conv_time_bus_adc_t *ctb)
-{
-    *ctb = dev->params.config & INA3221_CONV_TIME_BADC_MASK;
-    return INA3221_OK;
+    return 0;
 }
 
 int ina3221_set_conv_time_shunt_adc(ina3221_t *dev,
-                                    ina3221_conv_time_shunt_adc_t ctb)
+                                    ina3221_conv_time_shunt_adc_t cts)
 {
     uint16_t cfg;
-    int status = _read_reg(dev, INA3221_REG_CONFIGURATION, &cfg);
-
-    if (status < 0) {
+    int status;
+    if ((status = ina3221_get_config(dev, &cfg)) < 0) {
         return status;
     }
-    cfg &= ~INA3221_CONV_TIME_SADC_MASK;
-    cfg |= (ctb & INA3221_CONV_TIME_SADC_MASK);
-    status = _write_reg(dev, INA3221_REG_CONFIGURATION, cfg);
-    if (status < 0) {
+    ina3221_config_set_conv_time_shunt(&cfg, cts);
+    if ((status = ina3221_set_config(dev, cfg)) < 0) {
         return status;
     }
-    dev->params.config = cfg;
-    return INA3221_OK;
-}
-
-int ina3221_get_conv_time_shunt_adc(const ina3221_t *dev,
-                                    ina3221_conv_time_shunt_adc_t *ctb)
-{
-    *ctb = dev->params.config & INA3221_CONV_TIME_SADC_MASK;
-    return INA3221_OK;
+    return 0;
 }
 
 int ina3221_set_mode(ina3221_t *dev, ina3221_mode_t mode)
 {
     uint16_t cfg;
-    int status = _read_reg(dev, INA3221_REG_CONFIGURATION, &cfg);
-
-    if (status < 0) {
+    int status;
+    if ((status = ina3221_get_config(dev, &cfg)) < 0) {
         return status;
     }
-    cfg &= ~INA3221_MODE_MASK;
-    cfg |= (mode & INA3221_MODE_MASK);
-    status = _write_reg(dev, INA3221_REG_CONFIGURATION, cfg);
-    if (status < 0) {
+    ina3221_config_set_mode(&cfg, mode);
+    if ((status = ina3221_set_config(dev, cfg)) < 0) {
         return status;
     }
-    dev->params.config = cfg;
-    return INA3221_OK;
+    return 0;
 }
 
-int ina3221_get_mode(const ina3221_t *dev, ina3221_mode_t *mode)
-{
-    *mode = dev->params.config & INA3221_MODE_MASK;
-    return INA3221_OK;
-}
-
-int _ina3221_set_enable_sum_channel(const ina3221_t *dev,
-                                    uint16_t esch)
+int ina3221_set_enable_sum_channel(const ina3221_t *dev, ina3221_ch_t ch)
 {
     uint16_t mask_en;
     int status = _read_reg(dev, INA3221_REG_MASK_ENABLE, &mask_en);
-
     if (status < 0) {
         return status;
     }
     mask_en &= ~INA3221_ENABLE_SUM_CH_MASK;
-    mask_en |= (esch & INA3221_ENABLE_SUM_CH_MASK);
+    mask_en |= ((ch & INA3221_CH1) ? INA3221_ENABLE_SUM_CH1 : 0) |
+               ((ch & INA3221_CH2) ? INA3221_ENABLE_SUM_CH2 : 0) |
+               ((ch & INA3221_CH3) ? INA3221_ENABLE_SUM_CH3 : 0);
     status = _write_reg(dev, INA3221_REG_MASK_ENABLE, mask_en);
     if (status < 0) {
         return status;
     }
-    return INA3221_OK;
+    return 0;
 }
 
-int _ina3221_get_enable_sum_channel(const ina3221_t *dev,
-                                    uint16_t *esch)
+int ina3221_get_enable_sum_channel(const ina3221_t *dev, ina3221_ch_t *ch)
 {
     uint16_t mask_en;
     int status = _read_reg(dev, INA3221_REG_MASK_ENABLE, &mask_en);
-
     if (status < 0) {
         return status;
     }
-    *esch = mask_en & (INA3221_ENABLE_SUM_CH_MASK);
-    return ((*esch & INA3221_ENABLE_SUM_CH1) ? 1 : 0) +
-           ((*esch & INA3221_ENABLE_SUM_CH2) ? 1 : 0) +
-           ((*esch & INA3221_ENABLE_SUM_CH3) ? 1 : 0);
+    *ch = ((mask_en & INA3221_ENABLE_SUM_CH1) ? INA3221_CH1 : 0) |
+          ((mask_en & INA3221_ENABLE_SUM_CH2) ? INA3221_CH2 : 0) |
+          ((mask_en & INA3221_ENABLE_SUM_CH3) ? INA3221_CH3 : 0);
+    return 0;
 }
 
-int ina3221_set_latch(const ina3221_t *dev, ina3221_enable_latch_t latch)
+int ina3221_set_latch(const ina3221_t *dev, bool warn, bool crit)
 {
     uint16_t mask_en;
     int status = _read_reg(dev, INA3221_REG_MASK_ENABLE, &mask_en);
-
     if (status < 0) {
         return status;
     }
     mask_en &= ~INA3221_ENABLE_LATCH_MASK;
-    mask_en |= (latch & INA3221_ENABLE_LATCH_MASK);
+    mask_en |= (warn ? INA3221_ENABLE_WARN_LATCH : 0);
+    mask_en |= (crit ? INA3221_ENABLE_CRIT_LATCH : 0);
     status = _write_reg(dev, INA3221_REG_MASK_ENABLE, mask_en);
     if (status < 0) {
         return status;
     }
-    return INA3221_OK;
+    return 0;
 }
 
-int ina3221_get_latch(const ina3221_t *dev, ina3221_enable_latch_t *latch)
+int ina3221_get_latch(const ina3221_t *dev, bool *warn, bool *crit)
 {
     uint16_t mask_en;
     int status = _read_reg(dev, INA3221_REG_MASK_ENABLE, &mask_en);
-
     if (status < 0) {
         return status;
     }
-    *latch = mask_en & INA3221_ENABLE_LATCH_MASK;
-    return INA3221_OK;
+    *warn = !!(mask_en & INA3221_ENABLE_WARN_LATCH);
+    *crit = !!(mask_en & INA3221_ENABLE_CRIT_LATCH);
+    return 0;
 }
 
-int ina3221_set_crit_alert_limit(const ina3221_t *dev, ina3221_channel_t ch,
-                                 int32_t in_uv)
+ina3221_ch_t ina3221_set_crit_alert_limit(const ina3221_t *dev,
+                                          ina3221_ch_t ch, int32_t in_uv)
 {
     if (in_uv < INA3221_MIN_SHUNT_UV || in_uv > INA3221_MAX_SHUNT_UV) {
-        return -ERANGE;
+        return 0;
     }
     int16_t reg_val = shunt_voltage_uv_to_reg_val(in_uv);
-    int status = INA3221_OK;
-    int i, j;
-    for (i = 0, j = 0; i < INA3221_NUM_CH; i++) {
-        if (ch & (1 << i)) {
-            status = _write_reg(dev, _chi[i].chi_reg_crit_alert_limit, reg_val);
-            if (status < 0) {
-                break;
+    for (int i = 0; i < INA3221_NUM_CH; i++) {
+        if (ch & (1U << i)) {
+            if (_write_reg(dev, INA3221_REG_CH_CRIT_ALERT_LIMIT(i), reg_val)) {
+                ch &= ~(1U << i);
             }
-            j++;
         }
     }
-    return j ? j : status;
+    return ch;
 }
 
-int ina3221_get_crit_alert_limit(const ina3221_t *dev, ina3221_channel_t ch,
-                                 int32_t *out_uv)
+ina3221_ch_t ina3221_get_crit_alert_limit(const ina3221_t *dev, ina3221_ch_t ch,
+                                          int32_t out_uv[INA3221_NUM_CH])
 {
     uint16_t reg_val;
-    int status = INA3221_OK;
-    int i, j;
-
-    for (i = 0, j = 0; i < INA3221_NUM_CH; i++) {
-        if (ch & (1 << i)) {
-            status = _read_reg(dev, _chi[i].chi_reg_crit_alert_limit, &reg_val);
-            if (status < 0) {
-                break;
+    for (int i = 0; i < INA3221_NUM_CH; i++) {
+        out_uv[i] = 0;
+        if (ch & (1U << i)) {
+            if (_read_reg(dev, INA3221_REG_CH_CRIT_ALERT_LIMIT(i), &reg_val)) {
+                ch &= ~(1U << i);
             }
-            out_uv[j++] = reg_val_to_shunt_voltage_uv(reg_val);
+            else {
+                out_uv[i] = reg_val_to_shunt_voltage_uv(reg_val);
+            }
         }
     }
-    return j ? j : status;
+    return ch;
 }
 
-int ina3221_set_warn_alert_limit(const ina3221_t *dev, ina3221_channel_t ch,
-                                 int32_t in_uv)
+ina3221_ch_t ina3221_set_warn_alert_limit(const ina3221_t *dev,
+                                          ina3221_ch_t ch, int32_t in_uv)
 {
     if (in_uv < INA3221_MIN_SHUNT_UV || in_uv > INA3221_MAX_SHUNT_UV) {
-        return -ERANGE;
+        return 0;
     }
     int16_t reg_val = shunt_voltage_uv_to_reg_val(in_uv);
-    int status = INA3221_OK;
-    int i, j;
-    for (i = 0, j = 0; i < INA3221_NUM_CH; i++) {
-        if (ch & (1 << i)) {
-            status = _write_reg(dev, _chi[i].chi_reg_warn_alert_limit, reg_val);
-            if (status < 0) {
-                break;
+    for (int i = 0; i < INA3221_NUM_CH; i++) {
+        if (ch & (1U << i)) {
+            if (_write_reg(dev, INA3221_REG_CH_WARN_ALERT_LIMIT(i), reg_val)) {
+                ch &= ~(1U << i);
             }
-            j++;
         }
     }
-    return j ? j : status;
+    return ch;
 }
 
-int ina3221_get_warn_alert_limit(const ina3221_t *dev, ina3221_channel_t ch,
-                                 int32_t *out_uv)
+ina3221_ch_t ina3221_get_warn_alert_limit(const ina3221_t *dev, ina3221_ch_t ch,
+                                          int32_t out_uv[INA3221_NUM_CH])
 {
     uint16_t reg_val;
-    int status = INA3221_OK;
-    int i, j;
-
-    for (i = 0, j = 0; i < INA3221_NUM_CH; i++) {
-        if (ch & (1 << i)) {
-            status = _read_reg(dev, _chi[i].chi_reg_warn_alert_limit, &reg_val);
-            if (status < 0) {
-                break;
+    for (int i = 0; i < INA3221_NUM_CH; i++) {
+        out_uv[i] = 0;
+        if (ch & (1U << i)) {
+            if (_read_reg(dev, INA3221_REG_CH_WARN_ALERT_LIMIT(i), &reg_val)) {
+                ch &= ~(1U << i);
             }
-            out_uv[j++] = reg_val_to_shunt_voltage_uv(reg_val);
+            else {
+                out_uv[i] = reg_val_to_shunt_voltage_uv(reg_val);
+            }
         }
     }
-    return j ? j : status;
+    return ch;
 }
 
 int ina3221_set_shunt_voltage_sum_alert_limit(const ina3221_t *dev,
@@ -472,7 +390,7 @@ int ina3221_set_shunt_voltage_sum_alert_limit(const ina3221_t *dev,
     if (status < 0) {
         return status;
     }
-    return INA3221_OK;
+    return 0;
 }
 
 int ina3221_get_shunt_voltage_sum_alert_limit(const ina3221_t *dev,
@@ -480,12 +398,11 @@ int ina3221_get_shunt_voltage_sum_alert_limit(const ina3221_t *dev,
 {
     uint16_t reg_val;
     int status = _read_reg(dev, INA3221_REG_SHUNT_VOLTAGE_SUM_LIMIT, &reg_val);
-
     if (status < 0) {
         return status;
     }
     *out_uv = sum_reg_val_to_shunt_voltage_uv(reg_val);
-    return INA3221_OK;
+    return 0;
 }
 
 int ina3221_set_power_valid_upper_limit(const ina3221_t *dev, int32_t in_mv)
@@ -498,19 +415,18 @@ int ina3221_set_power_valid_upper_limit(const ina3221_t *dev, int32_t in_mv)
     if (status < 0) {
         return status;
     }
-    return INA3221_OK;
+    return 0;
 }
 
 int ina3221_get_power_valid_upper_limit(const ina3221_t *dev, int32_t *out_mv)
 {
     uint16_t reg_val;
     int status = _read_reg(dev, INA3221_REG_PV_UPPER_LIMIT, &reg_val);
-
     if (status < 0) {
         return status;
     }
     *out_mv = reg_val_to_bus_voltage_mv(reg_val);
-    return INA3221_OK;
+    return 0;
 }
 
 int ina3221_set_power_valid_lower_limit(const ina3221_t *dev, int32_t in_mv)
@@ -523,31 +439,29 @@ int ina3221_set_power_valid_lower_limit(const ina3221_t *dev, int32_t in_mv)
     if (status < 0) {
         return status;
     }
-    return INA3221_OK;
+    return 0;
 }
 
 int ina3221_get_power_valid_lower_limit(const ina3221_t *dev, int32_t *out_mv)
 {
     uint16_t reg_val;
     int status = _read_reg(dev, INA3221_REG_PV_LOWER_LIMIT, &reg_val);
-
     if (status < 0) {
         return status;
     }
     *out_mv = reg_val_to_bus_voltage_mv(reg_val);
-    return INA3221_OK;
+    return 0;
 }
 
 int ina3221_read_flags(const ina3221_t *dev, uint16_t *flags)
 {
     uint16_t reg_val;
     int status = _read_reg(dev, INA3221_REG_MASK_ENABLE, &reg_val);
-
     if (status < 0) {
         return status;
     }
     *flags = reg_val & INA3221_FLAGS_MASK;
-    return INA3221_OK;
+    return 0;
 }
 
 int ina3221_read_shunt_sum_uv(const ina3221_t *dev, int32_t *out_uv,
@@ -555,132 +469,99 @@ int ina3221_read_shunt_sum_uv(const ina3221_t *dev, int32_t *out_uv,
 {
     uint16_t reg_val;
     int status = _read_reg(dev, INA3221_REG_SHUNT_VOLTAGE_SUM, &reg_val);
-
     if (status < 0) {
         return status;
     }
     *out_uv = sum_reg_val_to_shunt_voltage_uv(reg_val);
     if (flags) {
-        status = _read_reg(dev, INA3221_REG_MASK_ENABLE, flags);
-        if (status < 0) {
-            *flags = 0;
-            DEBUG("ina3221_read_shunt_sum_uv: Reading flags failed\n");
-        }
-        else {
-            *flags &= INA3221_FLAGS_MASK;
-        }
+        *flags = 0;
+        _read_reg(dev, INA3221_REG_MASK_ENABLE, flags);
     }
-    return INA3221_OK;
+    return 0;
 }
 
-int ina3221_read_shunt_uv(const ina3221_t *dev, ina3221_channel_t ch,
-                          int32_t *out_uv, uint16_t *flags)
+ina3221_ch_t ina3221_read_shunt_uv(const ina3221_t *dev,
+                                   int32_t out_uv[INA3221_NUM_CH],
+                                   uint16_t *flags)
 {
     uint16_t reg_val;
-    int status = INA3221_OK;
-    int i, j;
-
-    for (i = 0, j = 0; i < INA3221_NUM_CH; i++) {
-        if (ch & (1 << i)) {
-            status = _read_reg(dev, _chi[i].chi_reg_shunt, &reg_val);
-            if (status < 0) {
-                break;
-            }
-            out_uv[j++] = reg_val_to_shunt_voltage_uv(reg_val);
-        }
-    }
-    if (j && flags) {
-        status = _read_reg(dev, INA3221_REG_MASK_ENABLE, flags);
-        if (status < 0) {
-            *flags = 0;
-            DEBUG("ina3221_read_shunt_uv: Reading flags failed\n");
-        }
-        else {
-            *flags &= INA3221_FLAGS_MASK;
-        }
-    }
-    return j ? j : status;
-}
-
-int ina3221_read_bus_mv(const ina3221_t *dev, ina3221_channel_t ch,
-                        int16_t *out_mv, uint16_t *flags)
-{
-    uint16_t reg_val;
-    int status = INA3221_OK;
-    int i, j = 0;
-
-    for (i = 0; i < INA3221_NUM_CH; i++) {
-        if (ch & (1 << i)) {
-            status = _read_reg(dev, _chi[i].chi_reg_bus, &reg_val);
-            if (status < 0) {
-                break;
-            }
-            out_mv[j++] = reg_val_to_bus_voltage_mv(reg_val);
-        }
-    }
-    if (j && flags) {
-        status = _read_reg(dev, INA3221_REG_MASK_ENABLE, flags);
-        if (status < 0) {
-            *flags = 0;
-            DEBUG("ina3221_read_bus_mv: Reading flags failed\n");
-        }
-        else {
-            *flags &= INA3221_FLAGS_MASK;
-        }
-    }
-    return j ? j : status;
-}
-
-int ina3221_calculate_current_ua(const ina3221_t *dev, ina3221_channel_t ch,
-                                 int32_t *in_uv, int32_t *out_ua)
-{
-    int i, j = 0;
-
-    for (i = 0; i < INA3221_NUM_CH; i++) {
-        if (ch & (1 << i)) {
-            out_ua[j] = in_uv[j] * 1000 / dev->params.rshunt_mohm[i];
-            j++;
-        }
-    }
-    return j;
-}
-
-int ina3221_calculate_power_uw(int16_t *in_mv, int32_t *in_ua, uint8_t num,
-                               int32_t *out_uw)
-{
-    if (num > INA3221_NUM_CH) {
-        return -ERANGE;
-    }
-    int i;
-    for (i = 0; i < num; i++) {
-        /* max 26V bus voltage */
-        /* (2^31)-1 resolution; 2.147483647 Watt in Nanowatt resolutiona */
-        /* 2.147483647 / 26000 = 82595.525 */
-        if (in_ua[i] < (82596 - 500)) {
-            out_uw[i] = (in_ua[i] * in_mv[i] + 500) / 1000;
-        }
-        else {
-            out_uw[i] = (in_ua[i] + 500) / 1000 * in_mv[i];
-        }
-    }
-    return i;
-}
-
-void ina3221_ch_align(ina3221_channel_t ch, const void *in_res, void *out_res,
-                      size_t res_val_size)
-{
-    uint8_t *in = (uint8_t *)in_res;
-    uint8_t tmp_out[INA3221_NUM_CH][res_val_size];
-    int j = 0;
-
+    ina3221_ch_t ch = ina3221_config_get_enabled_channels(dev->params.config);
     for (int i = 0; i < INA3221_NUM_CH; i++) {
-        if (ch & (1 << i)) {
-            memcpy(&tmp_out[i][0], in + j * res_val_size, res_val_size);
-            j++;
-        }
-        else {
-            memset(&tmp_out[i][0], 0, res_val_size);
+        out_uv[i] = 0;
+        if (ch & (1U << i)) {
+            if (_read_reg(dev, INA3221_REG_CH_SHUNT_VOLTAGE(i), &reg_val)) {
+                ch &= ~(1U << i);
+            }
+            else {
+                out_uv[i] = reg_val_to_shunt_voltage_uv(reg_val);
+            }
         }
     }
-    memcpy(out_res, tmp_out, sizeof(tmp_out));
+    if (flags) {
+        *flags = 0;
+        _read_reg(dev, INA3221_REG_MASK_ENABLE, flags);
+    }
+    return ch;
+}
+
+ina3221_ch_t ina3221_read_bus_mv(const ina3221_t *dev,
+                                 int16_t out_mv[INA3221_NUM_CH],
+                                 uint16_t *flags)
+{
+    uint16_t reg_val;
+    ina3221_ch_t ch = ina3221_config_get_enabled_channels(dev->params.config);
+    for (int i = 0; i < INA3221_NUM_CH; i++) {
+        out_mv[i] = 0;
+        if (ch & (1U << i)) {
+            if (_read_reg(dev, INA3221_REG_CH_BUS_VOLTAGE(i), &reg_val)) {
+                ch &= ~(1U << i);
+            }
+            else {
+                out_mv[i] = reg_val_to_bus_voltage_mv(reg_val);
+            }
+        }
+    }
+    if (flags) {
+        *flags = 0;
+        _read_reg(dev, INA3221_REG_MASK_ENABLE, flags);
+    }
+    return ch;
+}
+
+void ina3221_calculate_current_ua(ina3221_ch_t ch,
+                                  const uint16_t in_mohm[INA3221_NUM_CH],
+                                  const int32_t in_uv[INA3221_NUM_CH],
+                                  int32_t out_ua[INA3221_NUM_CH])
+{
+    for (int i = 0; i < INA3221_NUM_CH; i++) {
+        if (ch & (1U << i)) {
+            out_ua[i] = in_uv[i] * 1000 / in_mohm[i];
+        }
+        else {
+            out_ua[i] = 0;
+        }
+    }
+}
+
+void ina3221_calculate_power_uw(ina3221_ch_t ch,
+                                const int16_t in_mv[INA3221_NUM_CH],
+                                const int32_t in_ua[INA3221_NUM_CH],
+                                int32_t out_uw[INA3221_NUM_CH])
+{
+    for (int i = 0; i < INA3221_NUM_CH; i++) {
+        if (ch & (1U << i)) {
+            /* max 26V bus voltage */
+            /* (2^31)-1 resolution; 2.147483647 Watt in Nanowatt resolution */
+            /* 2.147483647 / 26000 = 82595.525 */
+            if (in_ua[i] < (82596 - 500)) {
+                out_uw[i] = (in_ua[i] * in_mv[i] + 500) / 1000;
+            }
+            else {
+                out_uw[i] = (in_ua[i] + 500) / 1000 * in_mv[i];
+            }
+        }
+        else {
+            out_uw[i] = 0;
+        }
+    }
 }

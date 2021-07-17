@@ -80,8 +80,6 @@ static void power_valid_alert(void *arg)
 
 int main(void)
 {
-    xtimer_init();
-
     int status;
     ina3221_t dev;
 
@@ -123,7 +121,7 @@ int main(void)
     }
 
     status = ina3221_init(&dev, &ina3221_params[0]);
-    if (status != INA3221_OK) {
+    if (status != 0) {
         printf("[FAILURE] ina3221_init: %d\n", status);
         return 1;
     }
@@ -136,7 +134,7 @@ int main(void)
     if (status == -ENOTSUP) {
         puts("[WARNING] INA3221_ALERT_WRN not supported");
     }
-    else if (status != INA3221_OK) {
+    else if (status != 0) {
         printf("[FAILURE] ina3221_enable_alert INA3221_ALERT_WRN: %d\n",
                status);
         return 1;
@@ -146,7 +144,7 @@ int main(void)
     if (status == -ENOTSUP) {
         puts("[WARNING] INA3221_ALERT_CRT not supported");
     }
-    else if (status != INA3221_OK) {
+    else if (status != 0) {
         printf("[FAILURE] ina3221_enable_alert INA3221_ALERT_CRT: %d\n",
                status);
         return 1;
@@ -157,7 +155,7 @@ int main(void)
     if (status == -ENOTSUP) {
         puts("[WARNING] INA3221_ALERT_TC not supported");
     }
-    else if (status != INA3221_OK) {
+    else if (status != 0) {
         printf("[FAILURE] ina3221_enable_alert INA3221_ALERT_TC: %d\n", status);
         return 1;
     }
@@ -166,74 +164,47 @@ int main(void)
     if (status == -ENOTSUP) {
         puts("[WARNING] INA3221_ALERT_PV not supported");
     }
-    else if (status != INA3221_OK) {
+    else if (status != 0) {
         printf("[FAILURE] ina3221_enable_alert INA3221_ALERT_PV: %d\n", status);
         return 1;
     }
     puts("[SUCCESS] ina3221_enable_alert");
 #endif
 
-    int32_t shunt_uv[INA3221_NUM_CH] = { 0 };
-    int16_t bus_mv[INA3221_NUM_CH] = { 0 };
-    int32_t sum_shunt_uv = 0;
-    int32_t current_ua[INA3221_NUM_CH] = { 0 };
-    int32_t power_uw[INA3221_NUM_CH] = { 0 };
-    uint16_t flags = 0;
+    int32_t shunt_uv[INA3221_NUM_CH];
+    int16_t bus_mv[INA3221_NUM_CH];
+    int32_t sum_shunt_uv;
+    int32_t current_ua[INA3221_NUM_CH];
+    int32_t power_uw[INA3221_NUM_CH];
+    uint16_t flags;
+    ina3221_ch_t ch = 0;
+    ina3221_get_enable_channel(&dev, &ch);
 
-    status = ina3221_read_shunt_uv(&dev,
-                                   INA3221_CH1 | INA3221_CH2 | INA3221_CH3,
-                                   shunt_uv, &flags);
-    if (status != INA3221_NUM_CH) {
-        printf("[FAILURE] ina3221_read_shunt_uv: %d\n", status);
+    if (ch != ina3221_read_shunt_uv(&dev, shunt_uv, &flags)) {
+        puts("[FAILURE] ina3221_read_shunt_uv");
         return 1;
     }
     else {
         puts("[SUCCESS] ina3221_read_shunt_uv");
     }
 
-    status = ina3221_calculate_current_ua(&dev,
-                                          INA3221_CH1 | INA3221_CH2 | INA3221_CH3, shunt_uv,
-                                          current_ua);
-    if (status != INA3221_NUM_CH) {
-        printf("[FAILURE] ina3221_calculate_current_ua: %d\n", status);
-        return 1;
-    }
-    else {
-        puts("[SUCCESS] ina3221_calculate_current_ua");
-    }
-
-    status = ina3221_read_bus_mv(&dev, INA3221_CH1 | INA3221_CH2 | INA3221_CH3,
-                                 bus_mv, &flags);
-    if (status != INA3221_NUM_CH) {
-        printf("[FAILURE] ina3221_read_bus_mv: %d\n", status);
+    if (ch != ina3221_read_bus_mv(&dev, bus_mv, &flags)) {
+        puts("[FAILURE] ina3221_read_bus_mv");
         return 1;
     }
     else {
         puts("[SUCCESS] ina3221_read_bus_mv");
     }
 
-    status = ina3221_calculate_power_uw(bus_mv, current_ua, status, power_uw);
-    if (status != INA3221_NUM_CH) {
-        printf("[FAILURE] ina3221_calculate_power_uw: %d\n", status);
-        return 1;
-    }
-    else {
-        puts("[SUCCESS] ina3221_calculate_power_uw");
-    }
-
-    status = ina3221_set_enable_sum_channel(&dev, INA3221_CH_ENABLE,
-                                            INA3221_CH_ENABLE,
-                                            INA3221_CH_ENABLE);
-    if (status < 0) {
+    if ((status = ina3221_set_enable_sum_channel(&dev, ch)) != 0) {
         printf("[FAILURE] ina3221_set_enable_sum_channel: %d\n", status);
         return 1;
     }
     else {
-        printf("[SUCCESS] ina3221_set_enable_sum_channel");
+        puts("[SUCCESS] ina3221_set_enable_sum_channel");
     }
 
-    status = ina3221_read_shunt_sum_uv(&dev, &sum_shunt_uv, &flags);
-    if (status != INA3221_OK) {
+    if ((status = ina3221_read_shunt_sum_uv(&dev, &sum_shunt_uv, &flags)) != 0) {
         printf("[FAILURE] ina3221_read_shunt_sum_uv: %d\n", status);
         return 1;
     }
@@ -241,8 +212,7 @@ int main(void)
         puts("[SUCCESS] ina3221_read_shunt_sum_uv");
     }
 
-    status = INA3221_TRIGGER_SHUNT_AND_BUS(&dev);
-    if (status < 0) {
+    if ((status = INA3221_TRIGGER_SHUNT_AND_BUS(&dev)) != 0) {
         printf("[FAILURE] INA3221_TRIGGER_SHUNT_AND_BUS: %d\n", status);
         return 1;
     }
@@ -251,27 +221,20 @@ int main(void)
     }
     flags = 0;
     while (!(flags & INA3221_FLAG_CONV_READY)) {
-        status = ina3221_read_flags(&dev, &flags);
-        if (status < 0) {
+        if ((status = ina3221_read_flags(&dev, &flags)) != 0) {
             printf("[FAILURE] ina3221_read_flags: %d\n", status);
             return 1;
         }
     }
-    status = ina3221_read_shunt_uv(&dev,
-                                   INA3221_CH1 | INA3221_CH2 | INA3221_CH3,
-                                   shunt_uv, &flags);
-    if (status != INA3221_NUM_CH) {
-        printf("[FAILURE] ina3221_read_shunt_uv (triggered): %d\n", status);
+    if (ch != ina3221_read_shunt_uv(&dev, shunt_uv, &flags)) {
+        puts("[FAILURE] ina3221_read_shunt_uv (triggered)");
         return 1;
     }
     else {
         puts("[SUCCESS] ina3221_read_shunt_uv (triggered)");
     }
-
-    status = ina3221_read_bus_mv(&dev, INA3221_CH1 | INA3221_CH2 | INA3221_CH3,
-                                 bus_mv, &flags);
-    if (status != INA3221_NUM_CH) {
-        printf("[FAILURE] ina3221_read_bus_mv (triggered): %d\n", status);
+    if (ch != ina3221_read_bus_mv(&dev, bus_mv, &flags)) {
+        puts("[FAILURE] ina3221_read_bus_mv (triggered)");
         return 1;
     }
     else {
@@ -279,11 +242,9 @@ int main(void)
     }
 
     int32_t crit_alert_lim = CRIT_ALERT_LIM_UV;
-    status = ina3221_set_crit_alert_limit(&dev,
-                                          INA3221_CH1 | INA3221_CH2 | INA3221_CH3,
-                                          crit_alert_lim);
-    if (status != INA3221_NUM_CH) {
-        printf("[FAILURE] ina3221_set_crit_alert_limit: %d\n", status);
+    ina3221_ch_t crit_ch = INA3221_CH1 | INA3221_CH2 | INA3221_CH3;
+    if (crit_ch != ina3221_set_crit_alert_limit(&dev, crit_ch, crit_alert_lim)) {
+        puts("[FAILURE] ina3221_set_crit_alert_limit");
         return 1;
     }
     else {
@@ -291,11 +252,9 @@ int main(void)
     }
 
     int32_t warn_alert_lim = WARN_ALERT_LIM_UV;
-    status = ina3221_set_warn_alert_limit(&dev,
-                                          INA3221_CH1 | INA3221_CH2 | INA3221_CH3,
-                                          warn_alert_lim);
-    if (status != INA3221_NUM_CH) {
-        printf("[FAILURE] ina3221_set_warn_alert_limit: %d\n", status);
+    ina3221_ch_t warn_ch = INA3221_CH1 | INA3221_CH2 | INA3221_CH3;
+    if (warn_ch != ina3221_set_warn_alert_limit(&dev, warn_ch, warn_alert_lim)) {
+        puts("[FAILURE] ina3221_set_warn_alert_limit");
         return 1;
     }
     else {
@@ -303,8 +262,7 @@ int main(void)
     }
 
     int32_t pv_lower_lim = PV_LOWER_LIM_MV;
-    status = ina3221_set_power_valid_lower_limit(&dev, pv_lower_lim);
-    if (status != INA3221_OK) {
+    if ((status = ina3221_set_power_valid_lower_limit(&dev, pv_lower_lim)) != 0) {
         printf("[FAILURE] ina3221_set_power_valid_lower_limit: %d\n", status);
         return 1;
     }
@@ -313,8 +271,7 @@ int main(void)
     }
 
     int32_t pv_upper_lim = PV_UPPER_LIM_MV;
-    status = ina3221_set_power_valid_upper_limit(&dev, pv_upper_lim);
-    if (status != INA3221_OK) {
+    if ((status = ina3221_set_power_valid_upper_limit(&dev, pv_upper_lim)) != 0) {
         printf("[FAILURE] ina3221_set_power_valid_upper_limit: %d\n", status);
         return 1;
     }
@@ -323,27 +280,23 @@ int main(void)
     }
 
     int32_t sum_shunt_alert_lim = SUM_SHUNT_ALERT_LIM_UV;
-    status =
-        ina3221_set_shunt_voltage_sum_alert_limit(&dev, sum_shunt_alert_lim);
-    if (status != INA3221_OK) {
-        printf("[FAILURE] ina3221_set_shunt_voltage_sum_alert_limit: %d\n",
-               status);
+    if ((status = ina3221_set_shunt_voltage_sum_alert_limit(&dev, sum_shunt_alert_lim))
+        != 0) {
+        printf("[FAILURE] ina3221_set_shunt_voltage_sum_alert_limit: %d\n", status);
         return 1;
     }
     else {
         puts("[SUCCESS] ina3221_set_shunt_voltage_sum_alert_limit");
     }
 
-    status = ina3221_set_mode(&dev, INA3221_MODE_CONTINUOUS_SHUNT_BUS);
-    if (status != INA3221_OK) {
+    if ((status = ina3221_set_mode(&dev, INA3221_MODE_CONTINUOUS_SHUNT_BUS)) != 0) {
         printf("[FAILURE] ina3221_set_mode: %d\n", status);
         return 1;
     }
-    char line_buffer[strlen(THEAD) + 1];
-    char col_buffer[strlen(COL) + 1];
+    char line_buffer[sizeof(THEAD)];
+    char col_buffer[sizeof(COL)];
     while (1) {
-        status = ina3221_read_flags(&dev, &flags);
-        if (status != INA3221_OK) {
+        if ((status = ina3221_read_flags(&dev, &flags)) != 0) {
             printf("[FAILURE] ina3221_read_flags: %d\n", status);
             return 1;
         }
@@ -351,33 +304,16 @@ int main(void)
             xtimer_sleep(2);
             continue;
         }
-        status = ina3221_read_shunt_uv(&dev,
-                                       INA3221_CH1 | INA3221_CH2 | INA3221_CH3,
-                                       shunt_uv, NULL);
-        if (status != INA3221_NUM_CH) {
-            printf("[FAILURE] ina3221_read_shunt_uv: %d\n", status);
+        if (ch != ina3221_read_shunt_uv(&dev, shunt_uv, NULL)) {
+            puts("[FAILURE] ina3221_read_shunt_uv");
             return 1;
         }
-        status = ina3221_read_bus_mv(&dev,
-                                     INA3221_CH1 | INA3221_CH2 | INA3221_CH3,
-                                     bus_mv, NULL);
-        if (status != INA3221_NUM_CH) {
-            printf("[FAILURE] ina3221_read_bus_mv: %d\n", status);
+        if (ch != ina3221_read_bus_mv(&dev, bus_mv, NULL)) {
+            puts("[FAILURE] ina3221_read_bus_mv");
             return 1;
         }
-        status = ina3221_calculate_current_ua(&dev,
-                                              INA3221_CH1 | INA3221_CH2 | INA3221_CH3, shunt_uv,
-                                              current_ua);
-        if (status != INA3221_NUM_CH) {
-            printf("[FAILURE] ina3221_calculate_current_ua: %d\n", status);
-            return 1;
-        }
-        status = ina3221_calculate_power_uw(bus_mv, current_ua, INA3221_NUM_CH,
-                                            power_uw);
-        if (status != INA3221_NUM_CH) {
-            printf("[FAILURE] ina3221_calculate_power_uw: %d\n", status);
-            return 1;
-        }
+        ina3221_calculate_current_ua(ch, dev.params.rshunt_mohm, shunt_uv, current_ua);
+        ina3221_calculate_power_uw(ch, bus_mv, current_ua, power_uw);
         puts(THEAD);
         puts(HLINE);
         for (int8_t i = 0; i < INA3221_NUM_CH; i++) {
