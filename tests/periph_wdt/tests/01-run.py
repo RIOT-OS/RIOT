@@ -51,6 +51,7 @@ def get_reset_time(child):
 
 
 def testfunc(child):
+    child.sendline("\n")
     child.expect_exact(">")
     child.sendline("range")
     child.expect(r"lower_bound: (\d+) upper_bound: (\d+)\s*\r\n",
@@ -59,11 +60,13 @@ def testfunc(child):
     wdt_upper_bound = int(child.match.group(2))
 
     for rst_time in reset_times_ms:
+        child.sendline("\n")
         child.expect_exact(">")
         child.sendline("setup 0 {}".format(rst_time))
         if rst_time < wdt_lower_bound or rst_time > wdt_upper_bound:
             child.expect_exact("invalid time, see \"range\"", timeout=1)
         else:
+            child.sendline("\n")
             child.expect_exact(">")
             child.sendline("startloop")
             child.expect(r"start time: (\d+) us", timeout=1)
