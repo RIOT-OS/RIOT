@@ -18,11 +18,6 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 
-# The default size of GCOAP_PDU_BUF_SIZE can be too small for the response
-# from the RD server. Use a larger value if the client drops response packet
-# from RD server.
-CFLAGS += -DCONFIG_GCOAP_PDU_BUF_SIZE=512
-
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
