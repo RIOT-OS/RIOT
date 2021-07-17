@@ -171,6 +171,35 @@ static void test_rtc_year(void)
     }
 }
 
+static void test_rtc_negative(void)
+{
+    struct tm t1 = {
+        .tm_sec  = 50,
+        .tm_min  = 59,
+        .tm_hour = 23,
+        .tm_mday = 31,
+        .tm_mon  = 11,
+        .tm_year = 120,
+        .tm_wday = 4,
+        .tm_yday = 366,
+    };
+
+    struct tm t2 = {
+        .tm_sec  = -10,
+        .tm_min  =  0,
+        .tm_hour =  0,
+        .tm_mday =  1,
+        .tm_mon  =  0,
+        .tm_year =  121,
+        .tm_wday =  5,
+        .tm_yday =  0,
+    };
+
+    mktime(&t1);
+    rtc_tm_normalize(&t2);
+    _test_equal_tm(&t1, &t2);
+}
+
 static void test_rtc_compare(void)
 {
     struct tm t1 = {
@@ -285,6 +314,7 @@ Test *tests_rtc_tests(void)
         new_TestFixture(test_rtc_nyear),
         new_TestFixture(test_rtc_ywrap),
         new_TestFixture(test_rtc_year),
+        new_TestFixture(test_rtc_negative),
         new_TestFixture(test_rtc_compare),
         new_TestFixture(test_rtc_mktime),
         new_TestFixture(test_rtc_localtime),
