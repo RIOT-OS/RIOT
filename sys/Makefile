@@ -23,9 +23,6 @@ endif
 ifneq (,$(filter cord_lc,$(USEMODULE)))
     DIRS += net/application_layer/cord/lc
 endif
-ifneq (,$(filter cpp11-compat,$(USEMODULE)))
-  DIRS += cpp11-compat
-endif
 ifneq (,$(filter credman,$(USEMODULE)))
   DIRS += net/credman
 endif
@@ -43,9 +40,6 @@ ifneq (,$(filter dsm,$(USEMODULE)))
 endif
 ifneq (,$(filter dummy_thread,$(USEMODULE)))
   DIRS += test_utils/dummy_thread
-endif
-ifneq (,$(filter eepreg,$(USEMODULE)))
-  DIRS += eepreg
 endif
 ifneq (,$(filter emcute,$(USEMODULE)))
   DIRS += net/application_layer/emcute
@@ -92,9 +86,6 @@ endif
 ifneq (,$(filter l2util,$(USEMODULE)))
   DIRS += net/link_layer/l2util
 endif
-ifneq (,$(filter log_%,$(USEMODULE)))
-  DIRS += log
-endif
 ifneq (,$(filter nanocoap,$(USEMODULE)))
   DIRS += net/application_layer/nanocoap
 endif
@@ -113,12 +104,6 @@ endif
 ifneq (,$(filter netstats_neighbor,$(USEMODULE)))
   DIRS += net/netstats
 endif
-ifneq (,$(filter sema,$(USEMODULE)))
-  DIRS += sema
-endif
-ifneq (,$(filter sema_inv,$(USEMODULE)))
-  DIRS += sema_inv
-endif
 ifneq (,$(filter sixlowpan,$(USEMODULE)))
   DIRS += net/network_layer/sixlowpan
 endif
@@ -133,9 +118,6 @@ ifneq (,$(filter sock_dns,$(USEMODULE)))
 endif
 ifneq (,$(filter sock_util,$(USEMODULE)))
   DIRS += net/sock
-endif
-ifneq (,$(filter oneway_malloc,$(USEMODULE)))
-  DIRS += oneway-malloc
 endif
 ifneq (,$(filter posix_inet,$(USEMODULE)))
   DIRS += posix/inet
@@ -164,12 +146,6 @@ endif
 ifneq (,$(filter shell_commands,$(USEMODULE)))
   DIRS += shell/commands
 endif
-ifneq (,$(filter suit%,$(USEMODULE)))
-  DIRS += suit
-endif
-ifneq (,$(filter sys_bus,$(USEMODULE)))
-  DIRS += bus
-endif
 ifneq (,$(filter tcp,$(USEMODULE)))
   DIRS += net/transport_layer/tcp
 endif
@@ -191,10 +167,5 @@ endif
 ifneq (,$(filter ztimer_core,$(USEMODULE)))
     DIRS += ztimer
 endif
-ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-  FILTER += xtimer
-endif
-
-DIRS += $(dir $(wildcard $(addsuffix /Makefile, $(filter-out $(FILTER), $(USEMODULE)))))
 
 include $(RIOTBASE)/Makefile.base
