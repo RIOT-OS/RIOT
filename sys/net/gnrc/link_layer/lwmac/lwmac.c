@@ -898,6 +898,9 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 static void _lwmac_msg_handler(gnrc_netif_t *netif, msg_t *msg)
 {
     switch (msg->type) {
+        case NETDEV_MSG_TYPE_EVENT:
+            gnrc_netif_msg_handler_netdev(netif, msg);
+            break;
         /* RTT raised an interrupt */
         case GNRC_LWMAC_EVENT_RTT_TYPE: {
             if (gnrc_lwmac_get_dutycycle_active(netif)) {

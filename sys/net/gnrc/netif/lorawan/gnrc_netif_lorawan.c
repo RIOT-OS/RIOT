@@ -352,9 +352,10 @@ end:
 
 static void _msg_handler(gnrc_netif_t *netif, msg_t *msg)
 {
-    (void)netif;
-    (void)msg;
     switch (msg->type) {
+        case NETDEV_MSG_TYPE_EVENT:
+            gnrc_netif_msg_handler_netdev(netif, msg);
+            break;
         case MSG_TYPE_TIMEOUT:
             gnrc_lorawan_timeout_cb(&netif->lorawan.mac);
             break;
