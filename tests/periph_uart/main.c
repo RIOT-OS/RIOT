@@ -241,7 +241,6 @@ static int cmd_mode(int argc, char **argv)
 static int cmd_send(int argc, char **argv)
 {
     int dev;
-    uint8_t endline = (uint8_t)'\n';
 
     if (argc < 3) {
         printf("usage: %s <dev> <data (string)>\n", argv[0]);
@@ -254,8 +253,8 @@ static int cmd_send(int argc, char **argv)
     }
 
     printf("UART_DEV(%i) TX: %s\n", dev, argv[2]);
-    uart_write(UART_DEV(dev), (uint8_t *)argv[2], strlen(argv[2]));
-    uart_write(UART_DEV(dev), &endline, 1);
+    uart_write_string(UART_DEV(dev), argv[2]);
+    uart_write_byte(UART_DEV(dev), '\n');
     return 0;
 }
 
