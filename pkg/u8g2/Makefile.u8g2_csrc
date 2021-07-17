@@ -1,6 +1,7 @@
 MODULE = u8g2_csrc
 
 CFLAGS += -Wno-overlength-strings
+CFLAGS += -Wno-unused-variable
 
 ifeq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-newline-eof

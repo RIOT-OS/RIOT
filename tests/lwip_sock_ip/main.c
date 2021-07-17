@@ -341,14 +341,14 @@ static void test_sock_ip_recv_buf4__success(void)
                                SOCK_FLAGS_REUSE_EP));
     expect(_inject_4packet(_TEST_ADDR4_REMOTE, _TEST_ADDR4_LOCAL, _TEST_PROTO, "ABCD",
                            sizeof("ABCD"), _TEST_NETIF));
-    assert(sizeof("ABCD") == sock_ip_recv_buf(&_sock, &data, &ctx,
+    expect(sizeof("ABCD") == sock_ip_recv_buf(&_sock, &data, &ctx,
                                               SOCK_NO_TIMEOUT, NULL));
-    assert(data != NULL);
-    assert(ctx != NULL);
-    assert(0 == sock_ip_recv_buf(&_sock, &data, &ctx, SOCK_NO_TIMEOUT, NULL));
-    assert(data == NULL);
-    assert(ctx == NULL);
-    assert(_check_net());
+    expect(data != NULL);
+    expect(ctx != NULL);
+    expect(0 == sock_ip_recv_buf(&_sock, &data, &ctx, SOCK_NO_TIMEOUT, NULL));
+    expect(data == NULL);
+    expect(ctx == NULL);
+    expect(_check_net());
 }
 
 static void test_sock_ip_send4__EAFNOSUPPORT(void)
@@ -908,18 +908,18 @@ static void test_sock_ip_recv_buf6__success(void)
                                          .family = AF_INET6 };
     void *data = NULL, *ctx = NULL;
 
-    assert(0 == sock_ip_create(&_sock, &local, &remote, _TEST_PROTO,
+    expect(0 == sock_ip_create(&_sock, &local, &remote, _TEST_PROTO,
                                SOCK_FLAGS_REUSE_EP));
-    assert(_inject_6packet(&src_addr, &dst_addr, _TEST_PROTO, "ABCD",
+    expect(_inject_6packet(&src_addr, &dst_addr, _TEST_PROTO, "ABCD",
                            sizeof("ABCD"), _TEST_NETIF));
-    assert(sizeof("ABCD") == sock_ip_recv_buf(&_sock, &data, &ctx, SOCK_NO_TIMEOUT,
+    expect(sizeof("ABCD") == sock_ip_recv_buf(&_sock, &data, &ctx, SOCK_NO_TIMEOUT,
                                               NULL));
-    assert(data != NULL);
-    assert(ctx != NULL);
-    assert(0 == sock_ip_recv_buf(&_sock, &data, &ctx, SOCK_NO_TIMEOUT, NULL));
-    assert(data == NULL);
-    assert(ctx == NULL);
-    assert(_check_net());
+    expect(data != NULL);
+    expect(ctx != NULL);
+    expect(0 == sock_ip_recv_buf(&_sock, &data, &ctx, SOCK_NO_TIMEOUT, NULL));
+    expect(data == NULL);
+    expect(ctx == NULL);
+    expect(_check_net());
 }
 
 static void test_sock_ip_send6__EAFNOSUPPORT(void)

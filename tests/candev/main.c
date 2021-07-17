@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "shell.h"
+#include "test_utils/expect.h"
 #include "can/device.h"
 
 #if IS_USED(MODULE_PERIPH_CAN)
@@ -220,7 +221,7 @@ int main(void)
     /* add initialization for other candev drivers here */
 #endif
 
-    assert(candev);
+    expect(candev);
 
     candev->event_callback = _can_event_callback;
     candev->isr_arg = NULL;
