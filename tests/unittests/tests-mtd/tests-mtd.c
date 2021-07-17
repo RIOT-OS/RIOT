@@ -206,19 +206,19 @@ static void test_mtd_write_read(void)
     /* out of bounds write (addr) */
     ret = mtd_write(dev, buf, dev->pages_per_sector * dev->page_size * dev->sector_count,
                     sizeof(buf));
-    TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
+    TEST_ASSERT_EQUAL_INT(0, ret);
 
     /* out of bounds write (addr + count) */
     ret = mtd_write(dev, buf, (dev->pages_per_sector * dev->page_size * dev->sector_count)
                     - (sizeof(buf) / 2), sizeof(buf));
-    TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
+    TEST_ASSERT_EQUAL_INT(0, ret);
 
     /* out of bounds write (more than page size) */
     const size_t page_size = dev->page_size;
     uint8_t buf_page[page_size + 1];
     memset(buf_page, 1, sizeof(buf_page));
     ret = mtd_write(dev, buf_page, 0, sizeof(buf_page));
-    TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
+    TEST_ASSERT_EQUAL_INT(0, ret);
 
     /* Read more than one page */
     ret = mtd_erase(dev, 0, dev->page_size * dev->pages_per_sector);
@@ -235,9 +235,9 @@ static void test_mtd_write_read(void)
 
     /* pages overlap write */
     ret = mtd_write(dev, buf, dev->page_size - (sizeof(buf) / 2), sizeof(buf));
-    TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
+    TEST_ASSERT_EQUAL_INT(0, ret);
     ret = mtd_write(dev, buf_page, 1, sizeof(buf_page) - 1);
-    TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
+    TEST_ASSERT_EQUAL_INT(0, ret);
 }
 
 #ifdef MTD_0

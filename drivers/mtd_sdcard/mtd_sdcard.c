@@ -85,22 +85,6 @@ static int mtd_sdcard_read_page(mtd_dev_t *dev, void *buff, uint32_t page,
     return res * SD_HC_BLOCK_SIZE;
 }
 
-static int mtd_sdcard_write(mtd_dev_t *dev, const void *buff, uint32_t addr,
-                            uint32_t size)
-{
-    DEBUG("mtd_sdcard_write: addr:%" PRIu32 " size:%" PRIu32 "\n", addr, size);
-    mtd_sdcard_t *mtd_sd = (mtd_sdcard_t*)dev;
-    sd_rw_response_t err;
-    sdcard_spi_write_blocks(mtd_sd->sd_card, addr / SD_HC_BLOCK_SIZE,
-                            buff, SD_HC_BLOCK_SIZE,
-                            size / SD_HC_BLOCK_SIZE, &err);
-
-    if (err == SD_RW_OK) {
-        return 0;
-    }
-    return -EIO;
-}
-
 static int mtd_sdcard_write_page(mtd_dev_t *dev, const void *buff, uint32_t page,
                                  uint32_t offset, uint32_t size)
 {
@@ -154,7 +138,6 @@ const mtd_desc_t mtd_sdcard_driver = {
     .init = mtd_sdcard_init,
     .read = mtd_sdcard_read,
     .read_page = mtd_sdcard_read_page,
-    .write = mtd_sdcard_write,
     .write_page = mtd_sdcard_write_page,
     .erase = mtd_sdcard_erase,
     .power = mtd_sdcard_power,

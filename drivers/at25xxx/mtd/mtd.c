@@ -50,13 +50,6 @@ static int mtd_at25xxx_read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t 
     return at25xxx_read(mtd_at25xxx_->at25xxx_eeprom, addr, buff, size);
 }
 
-static int mtd_at25xxx_write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
-{
-    DEBUG("[mtd_at25xxx] write: addr:%" PRIu32 " size:%" PRIu32 "\n", addr, size);
-    mtd_at25xxx_t *mtd_at25xxx_ = (mtd_at25xxx_t*)dev;
-    return at25xxx_write(mtd_at25xxx_->at25xxx_eeprom, addr, buff, size);
-}
-
 static int mtd_at25xxx_write_page(mtd_dev_t *dev, const void *src, uint32_t page, uint32_t offset,
                                   uint32_t size)
 {
@@ -86,7 +79,6 @@ static int mtd_at25xxx_power(mtd_dev_t *dev, enum mtd_power_state power)
 const mtd_desc_t mtd_at25xxx_driver = {
     .init = mtd_at25xxx_init,
     .read = mtd_at25xxx_read,
-    .write = mtd_at25xxx_write,
     .write_page = mtd_at25xxx_write_page,
     .erase = mtd_at25xxx_erase,
     .power = mtd_at25xxx_power,

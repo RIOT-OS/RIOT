@@ -50,12 +50,6 @@ static int _mtd_at24cxxx_read(mtd_dev_t *mtd, void *dest, uint32_t addr,
     return at24cxxx_read(DEV(mtd), addr, dest, size) == AT24CXXX_OK ? 0 : -EIO;
 }
 
-static int _mtd_at24cxxx_write(mtd_dev_t *mtd, const void *src, uint32_t addr,
-                               uint32_t size)
-{
-    return at24cxxx_write(DEV(mtd), addr, src, size) == AT24CXXX_OK ? 0 : -EIO;
-}
-
 static int mtd_at24cxxx_write_page(mtd_dev_t *mtd, const void *src, uint32_t page,
                                    uint32_t offset, uint32_t size)
 {
@@ -77,7 +71,6 @@ static int _mtd_at24cxxx_power(mtd_dev_t *mtd, enum mtd_power_state power)
 const mtd_desc_t mtd_at24cxxx_driver = {
     .init = _mtd_at24cxxx_init,
     .read = _mtd_at24cxxx_read,
-    .write = _mtd_at24cxxx_write,
     .write_page = mtd_at24cxxx_write_page,
     .erase = _mtd_at24cxxx_erase,
     .power = _mtd_at24cxxx_power,
