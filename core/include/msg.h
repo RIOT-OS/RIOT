@@ -168,30 +168,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "core_types.h"
 #include "sched.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief Describes a message object which can be sent between threads.
- *
- * User can set type and one of content.ptr and content.value. (content is a union)
- * The meaning of type and the content fields is totally up to the user,
- * the corresponding fields are never read by the kernel.
- *
- */
-typedef struct {
-    kernel_pid_t sender_pid;    /**< PID of sending thread. Will be filled in
-                                     by msg_send. */
-    uint16_t type;              /**< Type field. */
-    union {
-        void *ptr;              /**< Pointer content field. */
-        uint32_t value;         /**< Value content field. */
-    } content;                  /**< Content of the message. */
-} msg_t;
-
 
 /**
  * @brief Send a message (blocking).

@@ -22,8 +22,9 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "thread.h"
+#include "msg.h"
 #include "mutex.h"
+#include "thread.h"
 
 #ifndef PROBLEM
 #define PROBLEM 12

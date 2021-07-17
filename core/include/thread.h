@@ -119,9 +119,9 @@
 #ifndef THREAD_H
 #define THREAD_H
 
-#include "clist.h"
 #include "cib.h"
-#include "msg.h"
+#include "clist.h"
+#include "core_types.h"
 #include "cpu_conf.h"
 #include "sched.h"
 #include "thread_config.h"
@@ -147,70 +147,6 @@ extern "C" {
 #else
 #define THREAD_MAYBE_INLINE
 #endif /* THREAD_API_INLINED */
-
-#if defined(DEVELHELP) && !defined(CONFIG_THREAD_NAMES)
-/**
- * @brief   This global macro enable storage of thread names to help developers.
- *
- *          To activate it set environment variable `THREAD_NAMES=1`, or use Kconfig.
- *          It is automatically enabled if `DEVELHELP` is.
- */
-#define CONFIG_THREAD_NAMES
-#endif
-
-/**
- * @brief Prototype for a thread entry function
- */
-typedef void *(*thread_task_func_t)(void *arg);
-
-/**
- * @brief @c thread_t holds thread's context data.
- */
-struct _thread {
-    char *sp;                       /**< thread's stack pointer         */
-    thread_status_t status;         /**< thread's status                */
-    uint8_t priority;               /**< thread's priority              */
-
-    kernel_pid_t pid;               /**< thread's process id            */
-
-#if defined(MODULE_CORE_THREAD_FLAGS) || defined(DOXYGEN)
-    thread_flags_t flags;           /**< currently set flags            */
-#endif
-
-    clist_node_t rq_entry;          /**< run queue entry                */
-
-#if defined(MODULE_CORE_MSG) || defined(MODULE_CORE_THREAD_FLAGS) \
-    || defined(MODULE_CORE_MBOX) || defined(DOXYGEN)
-    void *wait_data;                /**< used by msg, mbox and thread
-                                         flags                          */
-#endif
-#if defined(MODULE_CORE_MSG) || defined(DOXYGEN)
-    list_node_t msg_waiters;        /**< threads waiting for their message
-                                         to be delivered to this thread
-                                         (i.e. all blocked sends)       */
-    cib_t msg_queue;                /**< index of this [thread's message queue]
-                                         (thread_t::msg_array), if any  */
-    msg_t *msg_array;               /**< memory holding messages sent
-                                         to this thread's message queue */
-#endif
-#if defined(DEVELHELP) || defined(SCHED_TEST_STACK) \
-    || defined(MODULE_MPU_STACK_GUARD) || defined(DOXYGEN)
-    char *stack_start;              /**< thread's stack start address   */
-#endif
-#if defined(CONFIG_THREAD_NAMES) || defined(DOXYGEN)
-    const char *name;               /**< thread's name                  */
-#endif
-#if defined(DEVELHELP) || defined(DOXYGEN)
-    int stack_size;                 /**< thread's stack size            */
-#endif
-/* enable TLS only when Picolibc is compiled with TLS enabled */
-#ifdef PICOLIBC_TLS
-    void *tls;                      /**< thread local storage ptr */
-#endif
-#ifdef HAVE_THREAD_ARCH_T
-    thread_arch_t arch;             /**< architecture dependent part    */
-#endif
-};
 
 /**
  * @name Optional flags for controlling a threads initial state
@@ -486,7 +422,7 @@ void thread_print_stack(void);
  * @return  `== 0`, if @p thread has no initialized message queue
  * @return  `!= 0`, if @p thread has its message queue initialized
  */
-static inline int thread_has_msg_queue(const volatile struct _thread *thread)
+static inline int thread_has_msg_queue(const volatile thread_t *thread)
 {
 #if defined(MODULE_CORE_MSG) || defined(DOXYGEN)
     return (thread->msg_array != NULL);

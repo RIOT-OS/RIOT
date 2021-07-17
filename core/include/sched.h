@@ -83,9 +83,10 @@
 #include <stddef.h>
 #include <inttypes.h>
 
+#include "clist.h"
+#include "core_types.h"
 #include "kernel_defines.h"
 #include "native_sched.h"
-#include "clist.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -120,11 +121,6 @@ extern "C" {
 #define PRIkernel_pid PRIi16
 
 /**
- * Unique process identifier
- */
-typedef int16_t kernel_pid_t;
-
-/**
  * @brief   Determine if the given pid is valid
  *
  * @param[in]   pid     The pid to check
@@ -135,34 +131,6 @@ static inline int pid_is_valid(kernel_pid_t pid)
 {
     return ((KERNEL_PID_FIRST <= pid) && (pid <= KERNEL_PID_LAST));
 }
-/**
- * @brief forward declaration for thread_t, defined in thread.h
- */
-typedef struct _thread thread_t;
-
-/**
- * @name Thread states supported by RIOT
- *
- *       Keep in sync with OpenOCD src/rtos/riot.c
- * @{
- */
-typedef enum {
-    STATUS_STOPPED,                 /**< has terminated                           */
-    STATUS_ZOMBIE,                  /**< has terminated & keeps thread's thread_t */
-    STATUS_SLEEPING,                /**< sleeping                                 */
-    STATUS_MUTEX_BLOCKED,           /**< waiting for a locked mutex               */
-    STATUS_RECEIVE_BLOCKED,         /**< waiting for a message                    */
-    STATUS_SEND_BLOCKED,            /**< waiting for message to be delivered      */
-    STATUS_REPLY_BLOCKED,           /**< waiting for a message response           */
-    STATUS_FLAG_BLOCKED_ANY,        /**< waiting for any flag from flag_mask      */
-    STATUS_FLAG_BLOCKED_ALL,        /**< waiting for all flags in flag_mask       */
-    STATUS_MBOX_BLOCKED,            /**< waiting for get/put on mbox              */
-    STATUS_COND_BLOCKED,            /**< waiting for a condition variable         */
-    STATUS_RUNNING,                 /**< currently running                        */
-    STATUS_PENDING,                 /**< waiting to be scheduled to run           */
-    STATUS_NUMOF                    /**< number of supported thread states        */
-} thread_status_t;
-/** @} */
 
 /**
  * @name Helpers to work with thread states

@@ -77,7 +77,7 @@ static void check_context_switch_frame_alignment(void)
     /*
      * also check the SP offset in the _frame structure
      */
-    _Static_assert( offsetof(struct _thread, sp) == SP_OFFSET_IN_THREAD,
+    _Static_assert( offsetof(thread_t, sp) == SP_OFFSET_IN_THREAD,
                     "Offset of SP in _thread mismatch");
 
 }

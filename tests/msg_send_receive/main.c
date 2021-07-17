@@ -23,6 +23,7 @@
 #include <stdio.h>
 
 #include "cpu_conf.h"
+#include "msg.h"
 #include "thread.h"
 
 #define THREAD1_STACKSIZE   (THREAD_STACKSIZE_MAIN)

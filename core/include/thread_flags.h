@@ -101,11 +101,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Type definition of thread_flags_t
- */
-typedef uint16_t thread_flags_t;
-
-/**
  * @brief Set thread flags, possibly waking it up
  *
  * @param[in]   thread     thread to work on
