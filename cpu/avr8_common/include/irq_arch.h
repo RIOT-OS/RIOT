@@ -99,8 +99,11 @@ __attribute__((always_inline)) static inline void irq_restore(unsigned int _stat
  */
 __attribute__((always_inline)) static inline int irq_is_in(void)
 {
-    uint8_t state = avr8_get_state();
-    return (state & AVR8_STATE_FLAG_ISR);
+#if !defined(CPU_ATXMEGA)
+    return GPIOR1;
+#else
+    return PMIC.STATUS;
+#endif
 }
 
 #ifdef __cplusplus

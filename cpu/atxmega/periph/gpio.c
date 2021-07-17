@@ -317,11 +317,9 @@ void gpio_write(gpio_t pin, int value)
     }
 }
 
-static inline void irq_handler(uint8_t port_num, uint8_t isr_vct_num)
+static inline void _gpio_isr(uint8_t port_num, uint8_t isr_vct_num)
 {
-    avr8_enter_isr();
-
-    DEBUG("irq_handler port = 0x%02x, vct_num = %d \n", port_num, isr_vct_num);
+    DEBUG("_gpio_isr port = 0x%02x, vct_num = %d \n", port_num, isr_vct_num);
 
     if (isr_vct_num) {
         port_num += PORT_MAX;
@@ -331,216 +329,278 @@ static inline void irq_handler(uint8_t port_num, uint8_t isr_vct_num)
         config_ctx[port_num].cb(config_ctx[port_num].arg);
     }
     else {
-        DEBUG("WARNING! irq_handler without callback\n");
+        DEBUG("WARNING! _gpio_isr without callback\n");
     }
-
-    avr8_exit_isr();
 }
 
 #if defined(PORTA_INT0_vect)
-ISR(PORTA_INT0_vect, ISR_BLOCK)
+ISR(PORTA_INT0_vect, ISR_NAKED)
 {
-    irq_handler(PORT_A, 0);
+    avr8_enter_isr();
+    _gpio_isr(PORT_A, 0);
+    avr8_exit_isr();
 }
 #endif
 #if defined(PORTA_INT1_vect)
-ISR(PORTA_INT1_vect, ISR_BLOCK)
+ISR(PORTA_INT1_vect, ISR_NAKED)
 {
-    irq_handler(PORT_A, 1);
+    avr8_enter_isr();
+    _gpio_isr(PORT_A, 1);
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(PORTB_INT0_vect)
-ISR(PORTB_INT0_vect, ISR_BLOCK)
+ISR(PORTB_INT0_vect, ISR_NAKED)
 {
-    irq_handler(PORT_B, 0);
+    avr8_enter_isr();
+    _gpio_isr(PORT_B, 0);
+    avr8_exit_isr();
 }
 #endif
 #if defined(PORTB_INT1_vect)
-ISR(PORTB_INT1_vect, ISR_BLOCK)
+ISR(PORTB_INT1_vect, ISR_NAKED)
 {
-    irq_handler(PORT_B, 1);
+    avr8_enter_isr();
+    _gpio_isr(PORT_B, 1);
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(PORTC_INT0_vect)
-ISR(PORTC_INT0_vect, ISR_BLOCK)
+ISR(PORTC_INT0_vect, ISR_NAKED)
 {
-    irq_handler(PORT_C, 0);
+    avr8_enter_isr();
+    _gpio_isr(PORT_C, 0);
+    avr8_exit_isr();
 }
 #endif
 #if defined(PORTC_INT1_vect)
-ISR(PORTC_INT1_vect, ISR_BLOCK)
+ISR(PORTC_INT1_vect, ISR_NAKED)
 {
-    irq_handler(PORT_C, 1);
+    avr8_enter_isr();
+    _gpio_isr(PORT_C, 1);
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(PORTD_INT0_vect)
-ISR(PORTD_INT0_vect, ISR_BLOCK)
+ISR(PORTD_INT0_vect, ISR_NAKED)
 {
-    irq_handler(PORT_D, 0);
+    avr8_enter_isr();
+    _gpio_isr(PORT_D, 0);
+    avr8_exit_isr();
 }
 #endif
 #if defined(PORTD_INT1_vect)
-ISR(PORTD_INT1_vect, ISR_BLOCK)
+ISR(PORTD_INT1_vect, ISR_NAKED)
 {
-    irq_handler(PORT_D, 1);
+    avr8_enter_isr();
+    _gpio_isr(PORT_D, 1);
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(PORTE_INT0_vect)
-ISR(PORTE_INT0_vect, ISR_BLOCK)
+ISR(PORTE_INT0_vect, ISR_NAKED)
 {
-    irq_handler(PORT_E, 0);
+    avr8_enter_isr();
+    _gpio_isr(PORT_E, 0);
+    avr8_exit_isr();
 }
 #endif
 #if defined(PORTE_INT1_vect)
-ISR(PORTE_INT1_vect, ISR_BLOCK)
+ISR(PORTE_INT1_vect, ISR_NAKED)
 {
-    irq_handler(PORT_E, 1);
+    avr8_enter_isr();
+    _gpio_isr(PORT_E, 1);
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(PORTF_INT0_vect)
-ISR(PORTF_INT0_vect, ISR_BLOCK)
+ISR(PORTF_INT0_vect, ISR_NAKED)
 {
-    irq_handler(PORT_F, 0);
+    avr8_enter_isr();
+    _gpio_isr(PORT_F, 0);
+    avr8_exit_isr();
 }
 #endif
 #if defined(PORTF_INT1_vect)
-ISR(PORTF_INT1_vect, ISR_BLOCK)
+ISR(PORTF_INT1_vect, ISR_NAKED)
 {
-    irq_handler(PORT_F, 1);
+    avr8_enter_isr();
+    _gpio_isr(PORT_F, 1);
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(PORTG_INT0_vect)
-ISR(PORTG_INT0_vect, ISR_BLOCK)
+ISR(PORTG_INT0_vect, ISR_NAKED)
 {
-    irq_handler(PORT_G, 0);
+    avr8_enter_isr();
+    _gpio_isr(PORT_G, 0);
+    avr8_exit_isr();
 }
 #endif
 #if defined(PORTG_INT1_vect)
-ISR(PORTG_INT1_vect, ISR_BLOCK)
+ISR(PORTG_INT1_vect, ISR_NAKED)
 {
-    irq_handler(PORT_G, 1);
+    avr8_enter_isr();
+    _gpio_isr(PORT_G, 1);
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(PORTH_INT0_vect)
-ISR(PORTH_INT0_vect, ISR_BLOCK)
+ISR(PORTH_INT0_vect, ISR_NAKED)
 {
-    irq_handler(PORT_H, 0);
+    avr8_enter_isr();
+    _gpio_isr(PORT_H, 0);
+    avr8_exit_isr();
 }
 #endif
 #if defined(PORTH_INT1_vect)
-ISR(PORTH_INT1_vect, ISR_BLOCK)
+ISR(PORTH_INT1_vect, ISR_NAKED)
 {
-    irq_handler(PORT_H, 1);
+    avr8_enter_isr();
+    _gpio_isr(PORT_H, 1);
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(PORTJ_INT0_vect)
-ISR(PORTJ_INT0_vect, ISR_BLOCK)
+ISR(PORTJ_INT0_vect, ISR_NAKED)
 {
-    irq_handler(PORT_J, 0);
+    avr8_enter_isr();
+    _gpio_isr(PORT_J, 0);
+    avr8_exit_isr();
 }
 #endif
 #if defined(PORTJ_INT1_vect)
-ISR(PORTJ_INT1_vect, ISR_BLOCK)
+ISR(PORTJ_INT1_vect, ISR_NAKED)
 {
-    irq_handler(PORT_J, 1);
+    avr8_enter_isr();
+    _gpio_isr(PORT_J, 1);
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(PORTK_INT0_vect)
-ISR(PORTK_INT0_vect, ISR_BLOCK)
+ISR(PORTK_INT0_vect, ISR_NAKED)
 {
-    irq_handler(PORT_K, 0);
+    avr8_enter_isr();
+    _gpio_isr(PORT_K, 0);
+    avr8_exit_isr();
 }
 #endif
 #if defined(PORTK_INT1_vect)
-ISR(PORTK_INT1_vect, ISR_BLOCK)
+ISR(PORTK_INT1_vect, ISR_NAKED)
 {
-    irq_handler(PORT_K, 1);
+    avr8_enter_isr();
+    _gpio_isr(PORT_K, 1);
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(PORTL_INT0_vect)
-ISR(PORTL_INT0_vect, ISR_BLOCK)
+ISR(PORTL_INT0_vect, ISR_NAKED)
 {
-    irq_handler(PORT_L, 0);
+    avr8_enter_isr();
+    _gpio_isr(PORT_L, 0);
+    avr8_exit_isr();
 }
 #endif
 #if defined(PORTL_INT1_vect)
-ISR(PORTL_INT1_vect, ISR_BLOCK)
+ISR(PORTL_INT1_vect, ISR_NAKED)
 {
-    irq_handler(PORT_L, 1);
+    avr8_enter_isr();
+    _gpio_isr(PORT_L, 1);
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(PORTM_INT0_vect)
-ISR(PORTM_INT0_vect, ISR_BLOCK)
+ISR(PORTM_INT0_vect, ISR_NAKED)
 {
-    irq_handler(PORT_M, 0);
+    avr8_enter_isr();
+    _gpio_isr(PORT_M, 0);
+    avr8_exit_isr();
 }
 #endif
 #if defined(PORTM_INT1_vect)
-ISR(PORTM_INT1_vect, ISR_BLOCK)
+ISR(PORTM_INT1_vect, ISR_NAKED)
 {
-    irq_handler(PORT_M, 1);
+    avr8_enter_isr();
+    _gpio_isr(PORT_M, 1);
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(PORTN_INT0_vect)
-ISR(PORTN_INT0_vect, ISR_BLOCK)
+ISR(PORTN_INT0_vect, ISR_NAKED)
 {
-    irq_handler(PORT_N, 0);
+    avr8_enter_isr();
+    _gpio_isr(PORT_N, 0);
+    avr8_exit_isr();
 }
 #endif
 #if defined(PORTN_INT1_vect)
-ISR(PORTN_INT1_vect, ISR_BLOCK)
+ISR(PORTN_INT1_vect, ISR_NAKED)
 {
-    irq_handler(PORT_N, 1);
+    avr8_enter_isr();
+    _gpio_isr(PORT_N, 1);
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(PORTP_INT0_vect)
-ISR(PORTP_INT0_vect, ISR_BLOCK)
+ISR(PORTP_INT0_vect, ISR_NAKED)
 {
-    irq_handler(PORT_P, 0);
+    avr8_enter_isr();
+    _gpio_isr(PORT_P, 0);
+    avr8_exit_isr();
 }
 #endif
 #if defined(PORTP_INT1_vect)
-ISR(PORTP_INT1_vect, ISR_BLOCK)
+ISR(PORTP_INT1_vect, ISR_NAKED)
 {
-    irq_handler(PORT_P, 1);
+    avr8_enter_isr();
+    _gpio_isr(PORT_P, 1);
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(PORTQ_INT0_vect)
-ISR(PORTQ_INT0_vect, ISR_BLOCK)
+ISR(PORTQ_INT0_vect, ISR_NAKED)
 {
-    irq_handler(PORT_Q, 0);
+    avr8_enter_isr();
+    _gpio_isr(PORT_Q, 0);
+    avr8_exit_isr();
 }
 #endif
 #if defined(PORTQ_INT1_vect)
-ISR(PORTQ_INT1_vect, ISR_BLOCK)
+ISR(PORTQ_INT1_vect, ISR_NAKED)
 {
-    irq_handler(PORT_Q, 1);
+    avr8_enter_isr();
+    _gpio_isr(PORT_Q, 1);
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(PORTR_INT0_vect)
-ISR(PORTR_INT0_vect, ISR_BLOCK)
+ISR(PORTR_INT0_vect, ISR_NAKED)
 {
-    irq_handler(PORT_R, 0);
+    avr8_enter_isr();
+    _gpio_isr(PORT_R, 0);
+    avr8_exit_isr();
 }
 #endif
 #if defined(PORTR_INT1_vect)
-ISR(PORTR_INT1_vect, ISR_BLOCK)
+ISR(PORTR_INT1_vect, ISR_NAKED)
 {
-    irq_handler(PORT_R, 1);
+    avr8_enter_isr();
+    _gpio_isr(PORT_R, 1);
+    avr8_exit_isr();
 }
 #endif

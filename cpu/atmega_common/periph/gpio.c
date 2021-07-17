@@ -371,16 +371,13 @@ void gpio_irq_disable(gpio_t pin)
 
 static inline void irq_handler(uint8_t int_num)
 {
-    avr8_enter_isr();
     config[int_num].cb(config[int_num].arg);
-    avr8_exit_isr();
 }
 
 #ifdef ENABLE_PCINT
 /* inline function that is used by the PCINT ISR */
 static inline void pcint_handler(uint8_t bank, uint8_t enabled_pcints)
 {
-    avr8_enter_isr();
     /* Find right item */
     uint8_t idx = 0;
 
@@ -409,88 +406,110 @@ static inline void pcint_handler(uint8_t bank, uint8_t enabled_pcints)
         enabled_pcints = enabled_pcints >> 1;
         idx++;
     }
-
-    avr8_exit_isr();
 }
 #ifdef MODULE_ATMEGA_PCINT0
-ISR(PCINT0_vect, ISR_BLOCK)
+ISR(PCINT0_vect, ISR_NAKED)
 {
+    avr8_enter_isr();
     pcint_handler(PCINT0_IDX, PCMSK0);
+    avr8_exit_isr();
 }
 #endif /* MODULE_ATMEGA_PCINT0 */
 
 #ifdef MODULE_ATMEGA_PCINT1
-ISR(PCINT1_vect, ISR_BLOCK)
+ISR(PCINT1_vect, ISR_NAKED)
 {
+    avr8_enter_isr();
     pcint_handler(PCINT1_IDX, PCMSK1);
+    avr8_exit_isr();
 }
 #endif  /* MODULE_ATMEGA_PCINT1 */
 
 #ifdef MODULE_ATMEGA_PCINT2
-ISR(PCINT2_vect, ISR_BLOCK)
+ISR(PCINT2_vect, ISR_NAKED)
 {
+    avr8_enter_isr();
     pcint_handler(PCINT2_IDX, PCMSK2);
+    avr8_exit_isr();
 }
 #endif  /* MODULE_ATMEGA_PCINT2 */
 
 #ifdef MODULE_ATMEGA_PCINT3
-ISR(PCINT3_vect, ISR_BLOCK)
+ISR(PCINT3_vect, ISR_NAKED)
 {
+    avr8_enter_isr();
     pcint_handler(PCINT3_IDX, PCMSK3);
+    avr8_exit_isr();
 }
 #endif  /* MODULE_ATMEGA_PCINT3 */
 
 #endif  /* ENABLE_PCINT */
 
-ISR(INT0_vect, ISR_BLOCK)
+ISR(INT0_vect, ISR_NAKED)
 {
+    avr8_enter_isr();
     irq_handler(0); /**< predefined interrupt pin */
+    avr8_exit_isr();
 }
 
-ISR(INT1_vect, ISR_BLOCK)
+ISR(INT1_vect, ISR_NAKED)
 {
+    avr8_enter_isr();
     irq_handler(1); /**< predefined interrupt pin */
+    avr8_exit_isr();
 }
 
 #if defined(INT2_vect)
-ISR(INT2_vect, ISR_BLOCK)
+ISR(INT2_vect, ISR_NAKED)
 {
+    avr8_enter_isr();
     irq_handler(2); /**< predefined interrupt pin */
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(INT3_vect)
-ISR(INT3_vect, ISR_BLOCK)
+ISR(INT3_vect, ISR_NAKED)
 {
+    avr8_enter_isr();
     irq_handler(3); /**< predefined interrupt pin */
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(INT4_vect)
-ISR(INT4_vect, ISR_BLOCK)
+ISR(INT4_vect, ISR_NAKED)
 {
+    avr8_enter_isr();
     irq_handler(4); /**< predefined interrupt pin */
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(INT5_vect)
-ISR(INT5_vect, ISR_BLOCK)
+ISR(INT5_vect, ISR_NAKED)
 {
+    avr8_enter_isr();
     irq_handler(5); /**< predefined interrupt pin */
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(INT6_vect)
-ISR(INT6_vect, ISR_BLOCK)
+ISR(INT6_vect, ISR_NAKED)
 {
+    avr8_enter_isr();
     irq_handler(6); /**< predefined interrupt pin */
+    avr8_exit_isr();
 }
 #endif
 
 #if defined(INT7_vect)
-ISR(INT7_vect, ISR_BLOCK)
+ISR(INT7_vect, ISR_NAKED)
 {
+    avr8_enter_isr();
     irq_handler(7); /**< predefined interrupt pin */
+    avr8_exit_isr();
 }
 #endif
 

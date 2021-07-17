@@ -34,23 +34,9 @@
 #include "board.h"
 #include "macros/xtstr.h"
 
-#define CHECK_EIND_REG          FLASHEND > 0x1ffff
-
-#if defined(DATAMEM_SIZE)
-#define CHECK_RAMPZ_REG         DATAMEM_SIZE > 0xffff || FLASHEND > 0xffff
-#define CHECK_RAMPDXY_REG       DATAMEM_SIZE > 0xffff
-#else
-#define CHECK_RAMPZ_REG         FLASHEND > 0xffff
-#define CHECK_RAMPDXY_REG       0
-#endif
-
-#if (CHECK_EIND_REG)
-#ifndef __EIND__
-#define __EIND__                0x3C
-#endif
-#endif
-
-static void avr8_context_save(void);
+static void avr8_context_save_header_in_thread(void);
+static void avr8_context_save_header_in_isr(void);
+static void avr8_context_save_body(void);
 static void avr8_context_restore(void);
 static void avr8_enter_thread_mode(void);
 
@@ -269,39 +255,194 @@ void NORETURN avr8_enter_thread_mode(void)
 void thread_yield_higher(void)
 {
     if (irq_is_in() == 0) {
-        avr8_context_save();
+        avr8_context_save_header_in_thread();
+        avr8_context_save_body();
         sched_run();
         avr8_context_restore();
-        __asm__ volatile ("ret");
     }
     else {
         sched_context_switch_request = 1;
     }
 }
 
-void avr8_exit_isr(void)
+/**
+ * @brief Restore remaining thread context
+ *
+ * The tail part is responsible to restore r1, r25 and r24.  Those register
+ * were used to update GPIOR1 and perform tests related to switch context.
+ */
+__attribute__((always_inline))
+static inline void avr8_isr_epilog_tail(void)
 {
-    avr8_state &= ~AVR8_STATE_FLAG_ISR;
-
-    /* Force access to avr8_state to take place */
-    __asm__ volatile ("" : : : "memory");
-
-    if (sched_context_switch_request) {
-        avr8_context_save();
-        sched_run();
-        avr8_context_restore();
-        __asm__ volatile ("reti");
-    }
+    __asm__ volatile (
+        "pop    __zero_reg__           \n\t"
+        "pop    r25                    \n\t"
+        "pop    r24                    \n\t"
+        :
+        :
+        : "memory"
+    );
 }
 
-__attribute__((always_inline)) static inline void avr8_context_save(void)
+/**
+ * @brief Restore thread/IRQ context
+ *
+ * To allow nested interrupts in RIOT-OS multi thread environment, GPIOR1 is
+ * used as IRQ global state.  This means that a context switch may happen
+ * when GPIOR1 have value 0 (no nested condition).  The the pair r24/r25 have
+ * delayed restore at IRQ epilog.  Those are used to update GPIOR1 value and
+ * execute branch condition tests.  All AVR-8 variations require a critical
+ * section when executing GPIOR1 update and branch tests at epilog.  This will
+ * avoid that another IRQ uses an invalid value from GPIOR1 and start a context
+ * switch, which may create an epilog corruption.
+ */
+void avr8_isr_epilog(void)
+{
+    uint8_t isr_sts;
+
+    __asm__ volatile (
+        "pop    r31                        \n\t"
+        "pop    r30                        \n\t"
+        "pop    r27                        \n\t"
+        "pop    r26                        \n\t"
+        "pop    r23                        \n\t"
+        "pop    r22                        \n\t"
+        "pop    r21                        \n\t"
+        "pop    r20                        \n\t"
+        "pop    r19                        \n\t"
+        "pop    r18                        \n\t"
+#if (CHECK_RAMPZ_REG)
+        "pop    __tmp_reg__                \n\t"
+        "out    __RAMPZ__, __tmp_reg__     \n\t"
+#endif
+#if (CHECK_RAMPDXY_REG)
+        "pop    __tmp_reg__                \n\t"
+        "out    __RAMPX__, __tmp_reg__     \n\t"
+        "pop    __tmp_reg__                \n\t"
+        "out    __RAMPD__, __tmp_reg__     \n\t"
+#endif
+        "pop    __tmp_reg__                \n\t"
+        "out    __SREG__, __tmp_reg__      \n\t"
+        "pop    __tmp_reg__                \n\t"
+    /* Force zero_reg to ensure ISR body not changed it, this is be necessary
+     * to test isr_sts value
+     */
+        "eor    __zero_reg__, __zero_reg__ \n\t"
+    /**
+     * Epilog Nested ISR State - critical section
+     *
+     * This critical section may be finished in following situations:
+     * - Last 'pop' instruction in @ref avr8_context_restore;
+     * - Last instructions from current avr8_isr_epilog.
+     * This critical section is necessary to avoid GPIOR1 and Epilog
+     * corruption on all AVR-8 cores.
+     *
+     * Note:
+     * - ATmega may be affected when IRQ is re-enabled on ISR body by the user
+     */
+        "cli                               \n\t"
+        "in     r24, %[state]              \n\t"
+        "subi   r24, 0x01                  \n\t"
+        "out    %[state], r24              \n\t"
+        : [isr_sts] "=r" (isr_sts)
+        : [state] "I" (_SFR_IO_ADDR(GPIOR1))
+        : "memory"
+    );
+
+    /* Branch Tests - critical section.
+     * Note: isr_sts was optimized to avoid a second load and perform fastest
+     * tests for critical tasks.  Do not switch position from isr_sts with
+     * sched_context_switch_request. Care is necessary to test r24 before
+     * reloaded with sched_context_switch_request value.
+     */
+    if (isr_sts == 0 && sched_context_switch_request) {
+        /* A context switch was requested in the body of interrupt:
+         *
+         * GPIOR1 is 0 and sched_context_switch_request is greater than 0
+         *
+         * - Restore remaining context register r24/25
+         * - Start context save using the current critical section at #ref
+         *   avr8_context_save_header_in_isr
+         * -    For ATxmega, IRQ should be re-enabled because reti instruction
+         *      don't do it!  In this case, it should be re-enabled because a
+         *      context switch may occor by @ref thread_yield_higher and
+         *      epilog needs guarantee that IRQ are enabled for that case.
+         *      However, care is required because it can broke the critical
+         *      section.  This will be performed at avr8_context_save_header_in_isr
+         * - Context switch
+         * - At top of stack, the previous context can be found or a another
+         *   one that was just reload from @ref sched_run.
+         */
+        avr8_isr_epilog_tail();
+        avr8_context_save_header_in_isr();
+        avr8_context_save_body();
+        sched_run();
+        avr8_context_restore();
+    }
+    else {
+        /* Don't perform a context switch.  Simple finish context restore
+         * before leave ISR.
+         */
+        avr8_isr_epilog_tail();
+    }
+
+    /* ATxmega always runs with IRQ enabled, let's enabled it!  For ATmega,
+     * reti instruction will do it!
+     */
+    __asm__ volatile (
+#if defined(CPU_ATXMEGA)
+        "sei                               \n\t"
+#endif
+        "reti                              \n\t"
+        : : : "memory"
+    );
+}
+
+/**
+ * @brief Saves context header in thread context
+ *
+ * This saves temporary register and SREG.  Keep SREG with their original
+ * value.  The normal procedure should use this context save header.
+ */
+__attribute__((always_inline))
+static inline void avr8_context_save_header_in_thread(void)
 {
     __asm__ volatile (
         "push __tmp_reg__                        \n\t"
         "in   __tmp_reg__, __SREG__              \n\t"
         "cli                                     \n\t"
-        "push __tmp_reg__                        \n\t"
+        "push __tmp_reg__                        \n\t");
+}
 
+/**
+ * @brief Saves context header in ISR
+ *
+ * This saves temporary register and SREG.  The epilog critical section
+ * disables global IRQ.  This code must re-enabled the context IRQ without
+ * disabling the current critical section.
+ */
+__attribute__((always_inline))
+static inline void avr8_context_save_header_in_isr(void)
+{
+    __asm__ volatile (
+        "push __tmp_reg__                        \n\t"
+        "push r24                                \n\t"
+        "in   r24, __SREG__                      \n\t"
+        "sbr  r24, 0x80                          \n\t"
+        "mov  __tmp_reg__, r24                   \n\t"
+        "pop  r24                                \n\t"
+        "push __tmp_reg__                        \n\t");
+}
+
+/**
+ * @brief Saves context body
+ *
+ * This saves remaining context registers.
+ */
+__attribute__((always_inline))
+static inline void avr8_context_save_body(void)
+{
+    __asm__ volatile (
 #if (CHECK_RAMPZ_REG)
         "in     __tmp_reg__, __RAMPZ__           \n\t"
         "push   __tmp_reg__                      \n\t"
@@ -361,7 +502,8 @@ __attribute__((always_inline)) static inline void avr8_context_save(void)
         "st   x+, __tmp_reg__                    \n\t");
 }
 
-__attribute__((always_inline)) static inline void avr8_context_restore(void)
+__attribute__((always_inline))
+static inline void avr8_context_restore(void)
 {
     __asm__ volatile (
         "lds  r26, sched_active_thread           \n\t"

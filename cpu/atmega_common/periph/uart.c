@@ -173,9 +173,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 #endif
         /* start of TX won't finish until no data in UDRn and transmit shift
            register is empty */
-        unsigned long state = irq_disable();
-        avr8_state |= AVR8_STATE_FLAG_UART_TX(uart);
-        irq_restore(state);
+        avr8_uart_tx_set_pending(uart);
         dev[uart]->DR = data[i];
     }
 }
@@ -194,77 +192,84 @@ void uart_poweroff(uart_t uart)
 
 static inline void _rx_isr_handler(int num)
 {
-    avr8_enter_isr();
-
     isr_ctx[num].rx_cb(isr_ctx[num].arg, dev[num]->DR);
-
-    avr8_exit_isr();
 }
 
 static inline void _tx_isr_handler(int num)
 {
-    avr8_enter_isr();
-
     /* entire frame in the Transmit Shift Register has been shifted out and
        there are no new data currently present in the transmit buffer */
-    avr8_state &= ~AVR8_STATE_FLAG_UART_TX(num);
-
-    avr8_exit_isr();
+    avr8_uart_tx_clear_pending(num);
 }
 
-
 #ifdef UART_0_ISR
-ISR(UART_0_ISR, ISR_BLOCK)
+ISR(UART_0_ISR, ISR_NAKED)
 {
+    avr8_enter_isr();
     _rx_isr_handler(0);
+    avr8_exit_isr();
 }
 #endif /* UART_0_ISR */
 
 #ifdef UART_1_ISR
-ISR(UART_1_ISR, ISR_BLOCK)
+ISR(UART_1_ISR, ISR_NAKED)
 {
+    avr8_enter_isr();
     _rx_isr_handler(1);
+    avr8_exit_isr();
 }
 #endif /* UART_1_ISR */
 
 #ifdef UART_2_ISR
-ISR(UART_2_ISR, ISR_BLOCK)
+ISR(UART_2_ISR, ISR_NAKED)
 {
+    avr8_enter_isr();
     _rx_isr_handler(2);
+    avr8_exit_isr();
 }
 #endif /* UART_2_ISR */
 
 #ifdef UART_3_ISR
-ISR(UART_3_ISR, ISR_BLOCK)
+ISR(UART_3_ISR, ISR_NAKED)
 {
+    avr8_enter_isr();
     _rx_isr_handler(3);
+    avr8_exit_isr();
 }
 #endif /* UART_3_ISR */
 
 #ifdef UART_0_ISR_TX
-ISR(UART_0_ISR_TX, ISR_BLOCK)
+ISR(UART_0_ISR_TX, ISR_NAKED)
 {
+    avr8_enter_isr();
     _tx_isr_handler(0);
+    avr8_exit_isr();
 }
 #endif /* UART_0_ISR_TX */
 
 #ifdef UART_1_ISR_TX
-ISR(UART_1_ISR_TX, ISR_BLOCK)
+ISR(UART_1_ISR_TX, ISR_NAKED)
 {
+    avr8_enter_isr();
     _tx_isr_handler(1);
+    avr8_exit_isr();
 }
 #endif /* UART_1_ISR_TX */
 
 #ifdef UART_2_ISR_TX
-ISR(UART_2_ISR_TX, ISR_BLOCK)
+ISR(UART_2_ISR_TX, ISR_NAKED)
 {
+    avr8_enter_isr();
     _tx_isr_handler(2);
+    avr8_exit_isr();
 }
 #endif /* UART_2_ISR_TX */
 
 #ifdef UART_3_ISR_TX
-ISR(UART_3_ISR_TX, ISR_BLOCK)
+ISR(UART_3_ISR_TX, ISR_NAKED)
 {
+    avr8_enter_isr();
     _tx_isr_handler(3);
+    avr8_exit_isr();
 }
 #endif /* UART_3_ISR_TX */
