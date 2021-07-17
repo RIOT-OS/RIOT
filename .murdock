@@ -423,7 +423,20 @@ get_non_compile_jobs() {
         echo "$0 static_tests"
 }
 
+# this function will be called first when building a pull request.
+pre_checks() {
+    if [ -n "${CI_BASE_BRANCH}" ]; then
+        if git log --pretty=oneline ${CI_BASE_BRANCH}..HEAD -- 2>/dev/null | grep -q -s '[skip]'; then
+            echo "$0 error \"Skipping build: [skip] found in PR commits.\""
+            return 1;
+        fi
+    fi
+    return 0
+}
+
 get_jobs() {
+    pre_checks || return 0
+
     get_non_compile_jobs
     get_compile_jobs
 }
