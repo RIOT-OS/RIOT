@@ -12,6 +12,7 @@ config BOARD_MICROBIT_V2
     default y
     select BOARD_COMMON_NRF52
     select CPU_MODEL_NRF52833XXAA
+    select HAS_PERIPH_DAC
     select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM
     select HAS_PERIPH_SPI

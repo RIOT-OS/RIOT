@@ -7,6 +7,8 @@ BLOBS += hello.raw
 USEMODULE += dac_dds
 USEMODULE += shell
 
+FEATURES_OPTIONAL += board_speaker
+
 LOW_MEMORY_BOARDS := samd10-xmini
 
 # Disable the greeting sample if the board has too little memory

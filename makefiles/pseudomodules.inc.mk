@@ -8,6 +8,7 @@ PSEUDOMODULES += at86rf215_timestamp
 PSEUDOMODULES += atomic_utils
 PSEUDOMODULES += base64url
 PSEUDOMODULES += board_software_reset
+PSEUDOMODULES += board_speaker
 PSEUDOMODULES += bq2429x_int
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm

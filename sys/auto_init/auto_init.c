@@ -73,6 +73,11 @@ void auto_init(void)
         extern void profiling_init(void);
         profiling_init();
     }
+    if (IS_USED(MODULE_PWM_DAC)) {
+        LOG_DEBUG("Auto init PWM DAC.\n");
+        extern void pwm_dac_init_all(void);
+        pwm_dac_init_all();
+    }
     if (IS_USED(MODULE_AUTO_INIT_GNRC_PKTBUF)) {
         LOG_DEBUG("Auto init gnrc_pktbuf.\n");
         extern void gnrc_pktbuf_init(void);

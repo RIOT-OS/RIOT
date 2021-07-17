@@ -42,6 +42,11 @@ config HAS_BACKUP_RAM
     help
         Indicates that Backup RAM is supported.
 
+config HAS_BOARD_SPEAKER
+    bool
+    help
+        Indicates that a power-switchable speaker is present.
+
 config HAS_CPP
     bool
     help

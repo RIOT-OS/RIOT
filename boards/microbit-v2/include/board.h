@@ -21,6 +21,10 @@
 
 #include "board_common.h"
 
+#if IS_USED(MODULE_PWM_DAC)
+#include "pwm_dac_for_board.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
