@@ -65,7 +65,7 @@ static inline void wait_nvm_is_ready(void)
 #endif
 }
 
-static void _unlock(void)
+static unsigned _unlock(void)
 {
     /* remove peripheral access lock for the NVMCTRL peripheral */
 #ifdef REG_PAC_WRCTRL
@@ -73,9 +73,11 @@ static void _unlock(void)
 #else
     PAC1->WPCLR.reg = PAC1_WPROT_DEFAULT_VAL;
 #endif
+
+    return irq_disable();
 }
 
-static void _lock(void)
+static void _lock(unsigned state)
 {
     wait_nvm_is_ready();
 
@@ -90,6 +92,8 @@ static void _lock(void)
 #ifdef CMCC
     CMCC->MAINT0.bit.INVALL = 1;
 #endif
+
+    irq_restore(state);
 }
 
 static void _cmd_clear_page_buffer(void)
@@ -226,7 +230,7 @@ static void _write_page(void* dst, const void *data, size_t len, void (*cmd_writ
     /* word align destination address */
     uint32_t *dst32 = (void*)((uintptr_t)dst & ~0x3);
 
-    _unlock();
+    unsigned state = _unlock();
     _cmd_clear_page_buffer();
 
     /* write the first, unaligned bytes */
@@ -253,7 +257,7 @@ static void _write_page(void* dst, const void *data, size_t len, void (*cmd_writ
     }
 
     cmd_write();
-    _lock();
+    _lock(state);
 }
 
 static void _erase_page(void* page, void (*cmd_erase)(void))
@@ -261,7 +265,7 @@ static void _erase_page(void* page, void (*cmd_erase)(void))
     uintptr_t page_addr = (uintptr_t)page;
 
     /* erase given page (the ADDR register uses 16-bit addresses) */
-    _unlock();
+    unsigned state = _unlock();
 
     /* ADDR drives the hardware (16-bit) address to the NVM when a command is executed using CMDEX.
      * 8-bit addresses must be shifted one bit to the right before writing to this register.
@@ -274,7 +278,7 @@ static void _erase_page(void* page, void (*cmd_erase)(void))
     _NVMCTRL->ADDR.reg = page_addr;
 
     cmd_erase();
-    _lock();
+    _lock(state);
 }
 
 static void _write_row(uint8_t *dst, const void *_data, size_t len, size_t chunk_size,
