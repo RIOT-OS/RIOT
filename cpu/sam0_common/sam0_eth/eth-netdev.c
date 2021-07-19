@@ -40,6 +40,7 @@ extern int sam0_eth_send(const struct iolist *iolist);
 extern int sam0_eth_receive_blocking(char *data, unsigned max_len);
 extern void sam0_eth_set_mac(const eui48_t *mac);
 extern void sam0_eth_get_mac(char *out);
+extern void sam0_clear_rx_buffers(void);
 
 /* SAM0 CPUs only have one GMAC IP, so it is safe to
 statically defines one in this file */
@@ -140,24 +141,29 @@ void sam0_eth_setup(netdev_t* netdev)
     netdev_register(netdev, NETDEV_SAM0_ETH, 0);
 }
 
-/* TODO: rework the whole isr management... */
 void isr_gmac(void)
 {
     uint32_t isr;
-    uint32_t tsr;
     uint32_t rsr;
 
     isr = GMAC->ISR.reg;
-    tsr = GMAC->TSR.reg;
     rsr = GMAC->RSR.reg;
+    (void)isr;
 
+    /* New frame received, signal it to netdev */
     if (rsr & GMAC_RSR_REC) {
         netdev_trigger_event_isr(_sam0_eth_dev.netdev);
     }
-
-    GMAC->TSR.reg = tsr;
+    /* Buffers Not Available, this can occur if there is a heavy traffic
+       on the network. In this case, disable the GMAC reception, flush
+       our internal buffers and re-enable the reception. This will drop
+       a few packets but it allows the GMAC IP to remains functional */
+    if (rsr & GMAC_RSR_BNA) {
+        GMAC->NCR.reg &= ~GMAC_NCR_RXEN;
+        sam0_clear_rx_buffers();
+        GMAC->NCR.reg |= GMAC_NCR_RXEN;
+    }
     GMAC->RSR.reg = rsr;
-    GMAC->ISR.reg = isr;
 
     cortexm_isr_end();
 }

@@ -90,6 +90,19 @@ static uint8_t  rx_idx;
 
 static uint8_t  rx_buf[ETH_RX_BUFFER_COUNT][ETH_RX_BUFFER_SIZE] __attribute__((aligned(GMAC_BUF_ALIGNMENT)));
 static uint8_t  tx_buf[ETH_TX_BUFFER_COUNT][ETH_TX_BUFFER_SIZE] __attribute__((aligned(GMAC_BUF_ALIGNMENT)));
+extern sam0_eth_netdev_t _sam0_eth_dev;
+
+/* Flush our reception buffers and reset reception internal mechanism,
+   this function may be call from ISR context */
+void sam0_clear_rx_buffers(void)
+{
+    for (int i=0; i<ETH_RX_BUFFER_COUNT; i++) {
+        rx_desc[i].address &= ~DESC_RX_ADDR_OWNSHP;
+    }
+    rx_idx = 0;
+    rx_curr = rx_desc;
+    GMAC->RBQB.reg = (uint32_t) rx_desc;
+}
 
 static void _init_desc_buf(void)
 {
@@ -193,13 +206,33 @@ int sam0_eth_send(const struct iolist *iolist)
     return len;
 }
 
-static int _try_receive(char* data, int max_len, int block)
+static int _try_receive(char* data, unsigned max_len, int block)
 {
     (void)block;
     unsigned rxlen = 0;
     uint16_t idx = rx_idx;
-    /* Ensure we are at the beginning of the new frame */
-    while (!(rx_curr->address & DESC_RX_ADDR_OWNSHP) && (rx_curr->status & DESC_RX_STATUS_STA_FRAME)) {}
+    uint8_t tmp = ETH_RX_BUFFER_COUNT;
+
+    /* Check if the current rx descriptor contains the beginning of
+       a new frame, iterates over all our RX buffers if not.
+       If there is no new frame (because we may have flush our RX
+       buffers due to BNA interrupt), return an error to netdev so
+       we can move forward */
+    do {
+        if ((rx_curr->address & DESC_RX_ADDR_OWNSHP)
+            && (rx_curr->status & DESC_RX_STATUS_STA_FRAME)) {
+            break;
+        }
+        else {
+            idx = (idx+1) % ETH_RX_BUFFER_COUNT;
+            rx_curr = &rx_desc[idx];
+            tmp--;
+        }
+    } while (tmp > 0);
+
+    if (tmp == 0) {
+        return -ENOBUFS;
+    }
 
     for (unsigned cpt=0; cpt < ETH_RX_BUFFER_COUNT; cpt++) {
         /* Get the length of the received frame */
@@ -210,6 +243,11 @@ static int _try_receive(char* data, int max_len, int block)
         if (max_len) {
             /* If buffer available, copy data into it */
             if (data)  {
+                /* If provided buffer is smaller than the received frame,
+                drop it as netdev request */
+                if (rxlen + len > max_len) {
+                    return -ENOBUFS;
+                }
                 memcpy(&data[rxlen], rx_buf[idx], len);
             }
             /* Tell the GMAC IP that we don't need this frame anymore  */
@@ -226,16 +264,22 @@ static int _try_receive(char* data, int max_len, int block)
         idx = (idx + 1) % ETH_RX_BUFFER_COUNT;
         rx_curr = &rx_desc[idx];
 
-   }
-   /* restore the previous index if packets were not released */
-   if (!max_len) {
+    }
+    /* restore the previous index if packets were not released */
+    if (!max_len) {
        rx_curr = &rx_desc[rx_idx];
-   }
+    }
     /* Point to the next buffer as GMAC IP will likely used it
        to store the next frame */
-   else {
+    else {
        rx_idx = (idx+1) % ETH_RX_BUFFER_COUNT;
        rx_curr = &rx_desc[rx_idx];
+    }
+
+    /* If provided buffer is smaller than the received frame,
+       drop it as netdev request */
+    if (data != NULL && rxlen > max_len) {
+       return -ENOBUFS;
    }
 
     return rxlen;
