@@ -49,6 +49,8 @@
 #define EXTI_REG_FTSR       (EXTI->FTSR1)
 #define EXTI_REG_PR         (EXTI->PR1)
 #define EXTI_REG_IMR        (EXTI->IMR1)
+#elif defined(CPU_FAM_STM32L5)
+#define EXTI_REG_IMR        (EXTI->IMR1)
 #else
 #define EXTI_REG_RTSR       (EXTI->RTSR)
 #define EXTI_REG_FTSR       (EXTI->FTSR)
@@ -65,12 +67,20 @@
 #define RTC_ISR_INITF       RTC_ICSR_INITF
 #define RTC_ISR_ALRAWF      RTC_ICSR_ALRAWF
 #define RTC_ISR_ALRAF       RTC_SR_ALRAF
+#elif defined(CPU_FAM_STM32L5)
+#define RTC_REG_ISR         RTC->ICSR
+#define RTC_REG_SR          RTC->SR
+#define RTC_REG_SCR         RTC->SCR
+#define RTC_ISR_RSF         RTC_ICSR_RSF
+#define RTC_ISR_INIT        RTC_ICSR_INIT
+#define RTC_ISR_INITF       RTC_ICSR_INITF
 #else
 #define RTC_REG_ISR         RTC->ISR
 #endif
 
 /* interrupt line name mapping */
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0)
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
+    defined(CPU_FAM_STM32L5)
 #define IRQN                (RTC_IRQn)
 #define ISR_NAME            isr_rtc
 #else
@@ -84,6 +94,8 @@
 #define EXTI_FTSR_BIT       (EXTI_FTSR1_FT18)
 #define EXTI_RTSR_BIT       (EXTI_RTSR1_RT18)
 #define EXTI_PR_BIT         (EXTI_PR1_PIF18)
+#elif defined(CPU_FAM_STM32L5)
+#define EXTI_IMR_BIT        (EXTI_IMR1_IM17)
 #elif defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4)
 #define EXTI_IMR_BIT        (EXTI_IMR1_IM17)
 #define EXTI_FTSR_BIT       (EXTI_FTSR1_FT17)
@@ -240,6 +252,9 @@ void rtc_init(void)
 
     /* select input clock and enable the RTC */
     stmclk_dbp_unlock();
+    #if defined(CPU_FAM_STM32L5)
+    periph_clk_en(APB1, RCC_APB1ENR1_RTCAPBEN);
+    #endif
     EN_REG &= ~(CLKSEL_MASK);
 #if IS_ACTIVE(CONFIG_BOARD_HAS_LSE)
     EN_REG |= (CLKSEL_LSE | EN_BIT);
@@ -257,10 +272,12 @@ void rtc_init(void)
 
     /* configure the EXTI channel, as RTC interrupts are routed through it.
      * Needs to be configured to trigger on rising edges. */
+    EXTI_REG_IMR  |= EXTI_IMR_BIT;
+#if !defined(CPU_FAM_STM32L5)
     EXTI_REG_FTSR &= ~(EXTI_FTSR_BIT);
     EXTI_REG_RTSR |= EXTI_RTSR_BIT;
-    EXTI_REG_IMR  |= EXTI_IMR_BIT;
     EXTI_REG_PR   = EXTI_PR_BIT;
+#endif
     /* enable global RTC interrupt */
     NVIC_EnableIRQ(IRQN);
 }
@@ -320,7 +337,11 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
                    val2bcd(time->tm_sec,  RTC_ALRMAR_SU_Pos, ALRM_S_MASK));
 
     /* Enable Alarm A */
+#if !defined(CPU_FAM_STM32L5)
     RTC_REG_ISR &= ~(RTC_ISR_ALRAF);
+#else
+    RTC_REG_SCR = RTC_SCR_CALRAF;
+#endif
     RTC->CR |= (RTC_CR_ALRAE | RTC_CR_ALRAIE);
 
     rtc_lock();
@@ -348,7 +369,12 @@ void rtc_clear_alarm(void)
     rtc_unlock();
 
     RTC->CR &= ~(RTC_CR_ALRAE | RTC_CR_ALRAIE);
+
+#if !defined(CPU_FAM_STM32L5)
     while (!(RTC_REG_ISR & RTC_ISR_ALRAWF)) {}
+#else
+    RTC_REG_SCR = RTC_SCR_CALRAF;
+#endif
 
     isr_ctx.cb = NULL;
     isr_ctx.arg = NULL;
@@ -372,6 +398,7 @@ void rtc_poweroff(void)
 
 void ISR_NAME(void)
 {
+#if !defined(CPU_FAM_STM32L5)
     if (RTC_REG_ISR & RTC_ISR_ALRAF) {
         if (isr_ctx.cb != NULL) {
             isr_ctx.cb(isr_ctx.arg);
@@ -379,5 +406,17 @@ void ISR_NAME(void)
         RTC_REG_ISR &= ~RTC_ISR_ALRAF;
     }
     EXTI_REG_PR = EXTI_PR_BIT; /* only clear the associated bit */
+#else
+    if (RTC_REG_SR & RTC_SR_ALRAF) {
+        if (isr_ctx.cb != NULL) {
+            isr_ctx.cb(isr_ctx.arg);
+        }
+        /* RTC registers are write access protected, DBP bit must be set to enable access */
+        stmclk_dbp_unlock();
+        RTC_REG_SCR = RTC_SCR_CALRAF;
+        /* Lock to avoid parasitic write access */
+        stmclk_dbp_lock();
+    }
+#endif
     cortexm_isr_end();
 }
