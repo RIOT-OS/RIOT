@@ -186,9 +186,9 @@ uint32_t dhcpv6_client_prefix_valid_until(unsigned netif,
 /**
  * @brief   Length for the send buffer if a MUD URL is included in the DHCP client's packets
  *
- * @note    Only (re)defined by the `gnrc_dhcpv6_client_mud_url` pseudo-module.
+ * @note    Only (re)defined by the `dhcpv6_client_mud_url` pseudo-module.
  */
-#if defined(MODULE_GNRC_DHCPV6_CLIENT_MUD_URL) || defined(DOXYGEN)
+#if defined(MODULE_DHCPV6_CLIENT_MUD_URL) || defined(DOXYGEN)
 #define DHCPV6_CLIENT_SEND_BUFLEN        (DHCPV6_CLIENT_BUFLEN + 256)
 #else
 #define DHCPV6_CLIENT_SEND_BUFLEN        (DHCPV6_CLIENT_BUFLEN)
