@@ -25,7 +25,7 @@
 #include "net/gnrc/dhcpv6/client/simple_pd.h"
 
 #if IS_USED(MODULE_AUTO_INIT_DHCPV6_CLIENT)
-#error "Module `gnrc_dhcpv6_client_6lbr` is mutually exclusive to \
+#error "Module `gnrc_dhcpv6_client_simple_pd` is mutually exclusive to \
 `auto_init_dhcpv6_client`"
 #endif
 
@@ -116,7 +116,7 @@ static void _configure_dhcpv6_client(void)
 /**
  * @brief   The DHCPv6 client thread
  */
-static void *_dhcpv6_cl_6lbr_thread(void *args)
+static void *_dhcpv6_cl_simple_pd_thread(void *args)
 {
     event_queue_t event_queue;
     gnrc_netif_t *upstream_netif = _find_upstream_netif();
@@ -146,7 +146,7 @@ void gnrc_dhcpv6_client_simple_pd_init(void)
     thread_create(_stack, DHCPV6_CLIENT_STACK_SIZE,
                   DHCPV6_CLIENT_PRIORITY,
                   THREAD_CREATE_STACKTEST,
-                  _dhcpv6_cl_6lbr_thread, NULL, "dhcpv6-client");
+                  _dhcpv6_cl_simple_pd_thread, NULL, "dhcpv6-client");
 }
 
 /** @} */
