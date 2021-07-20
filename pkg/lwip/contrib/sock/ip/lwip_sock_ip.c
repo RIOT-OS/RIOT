@@ -101,12 +101,15 @@ static uint16_t _ip6_addr_to_netif(const ip6_addr_p_t *_addr)
     ip6_addr_copy_from_packed(addr, *_addr);
     if (!ip6_addr_isany_val(addr)) {
         struct netif *netif;
+        LOCK_TCPIP_CORE();
         /* cppcheck-suppress uninitvar ; assigned by macro */
         NETIF_FOREACH(netif) {
             if (netif_get_ip6_addr_match(netif, &addr) >= 0) {
+                UNLOCK_TCPIP_CORE();
                 return (int)netif->num + 1;
             }
         }
+        UNLOCK_TCPIP_CORE();
     }
     return SOCK_ADDR_ANY_NETIF;
 }
