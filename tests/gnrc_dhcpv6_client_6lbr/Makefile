@@ -4,8 +4,8 @@ include $(CURDIR)/../Makefile.tests_common
 export TAP ?= tap0
 
 USEMODULE += auto_init_gnrc_netif
+USEMODULE += dhcpv6_client_mud_url
 USEMODULE += gnrc_dhcpv6_client_6lbr
-USEMODULE += gnrc_dhcpv6_client_mud_url
 USEMODULE += gnrc_netdev_default
 USEMODULE += gnrc_pktdump
 USEMODULE += gnrc_sixlowpan_border_router_default

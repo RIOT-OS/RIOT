@@ -129,7 +129,7 @@ static void *_thread(void *args)
 void dhcpv6_client_init(event_queue_t *eq, uint16_t netif)
 {
     assert(eq->waiter != NULL);
-    if (IS_USED(MODULE_GNRC_DHCPV6_CLIENT_MUD_URL)) {
+    if (IS_USED(MODULE_DHCPV6_CLIENT_MUD_URL)) {
         assert(strlen(mud_url) <= MAX_MUD_URL_LENGTH);
         assert(strncmp(mud_url, "https://", 8) == 0);
     }
@@ -256,7 +256,7 @@ static inline size_t _compose_elapsed_time_opt(dhcpv6_opt_elapsed_time_t *time)
 static inline size_t _compose_mud_url_opt(dhcpv6_opt_mud_url_t *mud_url_opt,
                                           size_t len_max)
 {
-    if (!IS_USED(MODULE_GNRC_DHCPV6_CLIENT_MUD_URL)) {
+    if (!IS_USED(MODULE_DHCPV6_CLIENT_MUD_URL)) {
         return 0;
     }
     uint16_t len = strlen(mud_url);
