@@ -17,6 +17,7 @@
 #include <stdbool.h>
 
 #include "event.h"
+#include "log.h"
 #include "kernel_defines.h"
 #include "net/dhcpv6/client.h"
 #include "net/dhcpv6.h"
@@ -155,7 +156,13 @@ void dhcpv6_client_req_ia_pd(unsigned netif, unsigned pfx_len)
 {
     pfx_lease_t *lease = NULL;
 
+    assert(IS_USED(MODULE_DHCPV6_CLIENT_IA_PD));
     assert(pfx_len <= 128);
+    if (!IS_USED(MODULE_DHCPV6_CLIENT_IA_PD)) {
+        LOG_WARNING("DHCPv6 client: Unable to request IA_PD as module "
+                    "`dhcpv6_client_ia_pd` is not used\n");
+        return;
+    }
     for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX; i++) {
         if (pfx_leases[i].parent.ia_id.id == 0) {
             lease = &pfx_leases[i];
@@ -300,6 +307,10 @@ static inline size_t _compose_ia_pd_opt(dhcpv6_opt_ia_pd_t *ia_pd,
 
 static inline size_t _add_ia_pd_from_config(uint8_t *buf, size_t len_max)
 {
+    if (!IS_USED(MODULE_DHCPV6_CLIENT_IA_PD)) {
+        return 0;
+    }
+
     size_t msg_len = 0;
 
     for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX; i++) {
@@ -445,7 +456,9 @@ static int _preparse_advertise(uint8_t *adv, size_t len, uint8_t **buf)
                 status = (dhcpv6_opt_status_t *)opt;
                 break;
             case DHCPV6_OPT_IA_PD:
-                ia_pd = (dhcpv6_opt_ia_pd_t *)opt;
+                if (IS_USED(MODULE_DHCPV6_CLIENT_IA_PD)) {
+                    ia_pd = (dhcpv6_opt_ia_pd_t *)opt;
+                }
                 break;
             case DHCPV6_OPT_PREF:
                 pref = (dhcpv6_opt_pref_t *)opt;
@@ -454,7 +467,8 @@ static int _preparse_advertise(uint8_t *adv, size_t len, uint8_t **buf)
                 break;
         }
     }
-    if ((cid == NULL) || (sid == NULL) || (ia_pd == NULL)) {
+    if ((cid == NULL) || (sid == NULL) ||
+        (IS_USED(MODULE_DHCPV6_CLIENT_IA_PD) && (ia_pd == NULL))) {
         DEBUG("DHCPv6 client: ADVERTISE does not contain either server ID, "
               "client ID or IA_PD option\n");
         return -1;
@@ -524,7 +538,10 @@ static void _parse_advertise(uint8_t *adv, size_t len)
          len > 0; len -= _opt_len(opt), opt = _opt_next(opt)) {
         switch (byteorder_ntohs(opt->type)) {
             case DHCPV6_OPT_IA_PD:
-                for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX; i++) {
+                for (unsigned i = 0;
+                     IS_USED(MODULE_DHCPV6_CLIENT_IA_PD) &&
+                     (i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX);
+                     i++) {
                     dhcpv6_opt_ia_pd_t *ia_pd = (dhcpv6_opt_ia_pd_t *)opt;
                     unsigned pd_t1, pd_t2;
                     uint32_t ia_id = byteorder_ntohl(ia_pd->ia_id);
@@ -609,7 +626,9 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                 status = (dhcpv6_opt_status_t *)opt;
                 break;
             case DHCPV6_OPT_IA_PD:
-                ia_pd = (dhcpv6_opt_ia_pd_t *)opt;
+                if (IS_USED(MODULE_DHCPV6_CLIENT_IA_PD)) {
+                    ia_pd = (dhcpv6_opt_ia_pd_t *)opt;
+                }
                 break;
             case DHCPV6_OPT_SMR:
                 smr = (dhcpv6_opt_smr_t *)opt;
@@ -618,7 +637,8 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                 break;
         }
     }
-    if ((cid == NULL) || (sid == NULL) || (ia_pd == NULL)) {
+    if ((cid == NULL) || (sid == NULL) ||
+        (IS_USED(MODULE_DHCPV6_CLIENT_IA_PD) && (ia_pd == NULL))) {
         DEBUG("DHCPv6 client: ADVERTISE does not contain either server ID, "
               "client ID or IA_PD option\n");
         return false;
@@ -643,7 +663,10 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                 break;
 #endif  /* IS_USED(MODULE_DHCPV6_CLIENT_DNS) */
             case DHCPV6_OPT_IA_PD:
-                for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX; i++) {
+                for (unsigned i = 0;
+                     IS_USED(MODULE_DHCPV6_CLIENT_IA_PD) &&
+                     (i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX);
+                     i++) {
                     dhcpv6_opt_iapfx_t *iapfx = NULL;
                     pfx_lease_t *lease = &pfx_leases[i];
                     ia_pd = (dhcpv6_opt_ia_pd_t *)opt;
@@ -818,7 +841,10 @@ static void _request_renew_rebind(uint8_t type)
             irt = DHCPV6_REB_TIMEOUT;
             mrt = DHCPV6_REB_MAX_RT;
             /* calculate MRD from prefix leases */
-            for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX; i++) {
+            for (unsigned i = 0;
+                 IS_USED(MODULE_DHCPV6_CLIENT_IA_PD) &&
+                 (i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX);
+                 i++) {
                 const pfx_lease_t *lease = &pfx_leases[i];
                 uint32_t valid_until = dhcpv6_client_prefix_valid_until(
                         lease->parent.ia_id.info.netif,
