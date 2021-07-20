@@ -322,7 +322,7 @@ static inline size_t _add_ia_pd_from_config(uint8_t *buf, size_t len_max)
 static inline int32_t get_rand_us_factor(void)
 {
     int32_t res = ((int32_t)random_uint32_range(0, 200 * US_PER_MS));
-    res -= 100 * US_PER_SEC;
+    res -= 100 * US_PER_MS;
     return res;
 }
 
