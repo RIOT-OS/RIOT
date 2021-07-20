@@ -79,8 +79,13 @@ the Raspberry Pi Pico showing up as CMSIS-DAP debugger. Afterwards run:
 make BOARD=rpi-pico flash
 ```
 
-***Beware:*** The `rpi-pico` virtual debugger is not persistent and needs to be "flashed" into RAM
-again after each cold boot.
+@warning    The `rpi-pico` virtual debugger is not persistent and needs to be "flashed" into RAM
+            again after each cold boot.
+
+@note       As of July 2021, the latest stable release of OpenOCD does not yet support the RP2040
+            MCU. Instead, compile the current `master` branch from the upstream OpenOCD source.
+            The OpenOCD fork of the Raspberry Pi foundation is incompatible with OpenOCD
+            configuration provided, so please stick with upstream OpenOCD.
 
 ### Flashing the Board Using the Bootloader
 
