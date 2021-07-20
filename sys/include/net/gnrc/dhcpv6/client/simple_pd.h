@@ -7,14 +7,15 @@
  */
 
 /**
- * @defgroup    net_dhcpv6_client_6lbr  DHCPv6 client for simple prefix
- *              delegation
+ * @defgroup    net_dhcpv6_client_simple_pd     DHCPv6 client for simple prefix
+ *                                              delegation
  * @ingroup     net_dhcpv6_client
- * @brief       DHCPv6 client bootstrapping for routers & 6LoWPAN border routers
+ * @brief       DHCPv6 client bootstrapping for prefix deligation with routers &
+ *              6LoWPAN border routers
  * @{
  *
  * @file
- * @brief   DHCPv6 client on 6LoWPAN border router definitions
+ * @brief   DHCPv6 client for simple prefix delegation definitions
  *
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
