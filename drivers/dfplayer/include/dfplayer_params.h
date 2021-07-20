@@ -44,6 +44,9 @@ extern "C" {
 #endif
 
 #ifndef DFPLAYER_PARAMS
+/**
+ * @brief   Default initialization parameters of the DFPlayer Mini driver
+ */
 #define DFPLAYER_PARAMS         {\
                                     .uart       = DFPLAYER_PARAM_UART, \
                                     .busy_pin   = DFPLAYER_PARAM_BUSY_PIN, \

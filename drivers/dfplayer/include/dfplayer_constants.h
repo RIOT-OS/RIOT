@@ -29,6 +29,7 @@ extern "C" {
 
 /**
  * @name    Constants used in frames send to the DFPlayer Mini
+ * @{
  */
 #define DFPLAYER_START              (0x7e)  /**< Start symbol */
 #define DFPLAYER_VERSION            (0xff)  /**< Value to use in version field */
@@ -40,6 +41,7 @@ extern "C" {
 
 /**
  * @name    UART settings of the DFPlayer Mini
+ * @{
  */
 #define DFPLAYER_BAUD               (9600)              /**< Symbol rate of the DFPlayer mini */
 #define DFPLAYER_DATA_BITS          (UART_DATA_BITS_8)  /**< The DFPlayer uses 8 data bits */
@@ -49,6 +51,7 @@ extern "C" {
 
 /**
  * @name    Commands supported by the DFPlayer Mini
+ * @{
  */
 #define DFPLAYER_CMD_NEXT           (0x01)  /**< Start playing the next song */
 #define DFPLAYER_CMD_PREV           (0x02)  /**< Start playing the next song */
@@ -84,6 +87,7 @@ extern "C" {
 
 /**
  * @name    Classes of messages received from the DFPlayer
+ * @{
  */
 #define DFPLAYER_CLASS_MASK         (0xf0)  /**< Use this mask to get the class from a response code */
 #define DFPLAYER_CLASS_NOTIFY       (0x30)  /**< Message is an event notification (unrelated to any command) */
@@ -92,6 +96,7 @@ extern "C" {
 
 /**
  * @name    Notification codes send by the DFPlayer Mini
+ * @{
  */
 #define DFPLAYER_NOTIFY_INSERT      (0x3a)  /**< A USB storage device or an SD card was inserted */
 #define DFPLAYER_NOTIFY_EJECT       (0x3b)  /**< A USB storage device or an SD card was ejected */
@@ -110,6 +115,7 @@ extern "C" {
 
 /**
  * @name    Bitmasks identifying the playback sources in the ready notification
+ * @{
  */
 #define DFPLAYER_MASK_USB           (0x01)  /**< USB stick is connected */
 #define DFPLAYER_MASK_SDCARD        (0x02)  /**< SD-Card is connected */
@@ -119,6 +125,7 @@ extern "C" {
 
 /**
  * @name    Response codes codes send by the DFPlayer Mini
+ * @{
  */
 #define DFPLAYER_RESPONSE_ERROR     (0x40)  /**< While processing the most recent command an error occurred */
 #define DFPLAYER_RESPONSE_OK        (0x41)  /**< Last command succeeded */
@@ -128,6 +135,7 @@ extern "C" {
 
 /**
  * @name    Error codes send as parameter of error messages
+ * @{
  */
 #define DFPLAYER_ERROR_BUSY         (0x00)  /**< Module is busy */
 #define DFPLAYER_ERROR_FRAME        (0x01)  /**< Received incomplete frame */
@@ -144,6 +152,7 @@ extern "C" {
 
 /**
  * @name    Device identifiers in insert/eject notifications
+ * @{
  */
 #define DFPLAYER_DEVICE_USB         (0x01)  /**< A USB storage device was inserted/ejected */
 #define DFPLAYER_DEVICE_SDCARD      (0x02)  /**< An SD card was inserted/ejected */
@@ -153,6 +162,8 @@ extern "C" {
  * @name    Status bitmasks
  *
  * These values have been obtained by reverse engineering.
+ *
+ * @{
  */
 #define DFPLAYER_STATUS_PLAYING     (0x01)  /**< The DFPlayer is currently playing a song */
 #define DFPLAYER_STATUS_PAUSE       (0x02)  /**< The DFPlayer is paused */
@@ -160,6 +171,7 @@ extern "C" {
 
 /**
  * @name    Flags to store info about the driver state
+ * @{
  */
 /**
  * @brief   The next command will be affected by the no-ACK bug
@@ -185,5 +197,9 @@ extern "C" {
 #define DFPLAYER_MAX_ADVERT_FILE    (9999)  /**< Highest supported file number in the `"ADVERT"` folder */
 #define DFPLAYER_LOWEST_QUERY       (0x40)  /**< Query commands are 0x40 or higher */
 
+
+#ifdef __cplusplus
+}
+#endif
 #endif /* DFPLAYER_CONSTANTS_H */
 /** @} */
