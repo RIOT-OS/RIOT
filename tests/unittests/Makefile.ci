@@ -46,6 +46,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     im880b \
     limifrog-v1 \
     lobaro-lorabox \
+    lora-e5-dev \
     lsn50 \
     maple-mini \
     mcb2388 \

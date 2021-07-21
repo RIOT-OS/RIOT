@@ -1,0 +1,64 @@
+/**
+ * @defgroup    boards_lora-e5-dev LoRa-E5 Development Board - STM32WLE5JC
+ * @ingroup     boards
+ * @brief       Support for the LoRa-E5 Development Board - STM32WLE5JC board.
+ *
+ *
+ *  ### MCU
+ *
+ * | MCU        |   STM32WL5EJC                                             |
+ * |:---------- |:--------------------------------------------------------- |
+ * | Family     | ARM Cortex-M4                                             |
+ * | Vendor     | ST Microelectronics                                       |
+ * | RAM        | 64KiB                                                     |
+ * | Flash      | 256KiB                                                    |
+ * | Frequency  | up to 48MHz                                               |
+ * | FPU        | no                                                        |
+ * | Vcc        | 1.8 V - 3.6V                                              |
+ * | Datasheet  | [Datasheet](https://files.seeedstudio.com/products/317990687/res/STM32WLE5JC%20Datasheet.pdf) |
+ * | Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/rm0461-stm32wlex-advanced-armbased-32bit-mcus-with-subghz-radio-solution-stmicroelectronics.pdf) |
+ * | Board Manual   | [Board Manual](https://www.st.com/resource/en/data_brief/nucleo-wl55jc.pdf) |
+ * | Board Schematic | [Board Schematic](https://files.seeedstudio.com/products/113990934/LoRa-E5%20Dev%20Board%20v1.0.pdf) |
+ * | LoRa-E5 STM32WL5EJC Module wiki | https://wiki.seeedstudio.com/LoRa-E5_STM32WLE5JC_Module/#2-develop-with-stm32cube-mcu-package |
+ *
+ *
+ * ### Pinout
+ *
+ * ![lora-e5-dev](https://files.seeedstudio.com/wiki/LoRa-E5_Development_Kit/hardware%20overview/4071615359366_.pic_hd.jpg)
+ *
+ * ### User Interface
+ *
+ * 3 Buttons:
+ *
+ * | NAME   | BOOT     | D0        | RESET |
+ * |:------ |:---------|:--------- |:----- |
+ * | Pin    | PA0 (IN) | PB13 (IN) | NRST  |
+ *
+ * 1 LED:
+ *
+ * | NAME   | D5    |
+ * | -----  | ----- |
+ * | Color  | red   |
+ * | Pin    | PB5   |
+ *
+ * ### Flash the board
+ *
+ * The BOARD comes pre-flashed with a Factory AT Firmware with RDP (Read Protection)
+ * level 1, this needs to be removed to enable subsequent flashing. The easiest
+ * way is with STM32CubeProgramer as described in [seedstudio wiki](https://wiki.seeedstudio.com/LoRa-E5_STM32WLE5JC_Module/#2-develop-with-stm32cube-mcu-package).
+ *
+ * Once read protection is removed subsequent flashing can be performed with and
+ * attached ST-LINK on the SWD pins (do not connect RST but only GND, SWCLK and SWDIO).
+ *
+ * ```
+ * BOARD=lora-e5-dev make flash
+ * ```
+ *
+ * The default used programmer is OpenOCD.
+ *
+ * ### Serial connection
+ *
+ * The default serial connection is through the USB-C port mapping to PB7 (RX) and
+ * PB6 (TX) UART pins (a second UART and an LPUART interface is also exposed).
+ *
+ */

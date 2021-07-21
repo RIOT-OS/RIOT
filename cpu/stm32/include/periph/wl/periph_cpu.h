@@ -119,7 +119,7 @@ extern "C" {
  * @brief Set this to 1 to enable hardware debugging.
  */
 #ifdef DOXYGEN
-#define CONFIG_STM32_WL55JC_SUBGHZ_DEBUG
+#define CONFIG_STM32_WLX5XX_SUBGHZ_DEBUG
 #endif
 /** @} */
 

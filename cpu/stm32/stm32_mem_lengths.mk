@@ -274,7 +274,17 @@ else ifeq ($(STM32_TYPE), W)
       endif
     endif
   else ifeq ($(STM32_FAMILY), L)
-    RAM_LEN = 64K
+    ifeq ($(STM32_MODEL), L55)
+      RAM_LEN = 64K
+    else ifneq (, $(filter LE5 LE4, $(STM32_MODEL)))
+      ifeq ($(STM32_ROMSIZE), 8)
+        RAM_LEN = 20K
+      else ifeq ($(STM32_ROMSIZE), B)
+        RAM_LEN = 48K
+      else
+        RAM_LEN = 64K
+      endif
+    endif
   endif
 else ifeq ($(STM32_TYPE), MP)
   ifeq ($(STM32_FAMILY), 1)
@@ -350,7 +360,11 @@ else ifeq ($(STM32_PINCOUNT), H)
 else ifeq ($(STM32_PINCOUNT), I)
   STM32_PIN = 176
 else ifeq ($(STM32_PINCOUNT), J)
-  STM32_PIN = 72
+  ifeq ($(STM32_TYPE), W)
+    STM32_PIN = 73
+  else
+    STM32_PIN = 72
+  endif
 else ifeq ($(STM32_PINCOUNT), K)
   STM32_PIN = 32
 else ifeq ($(STM32_PINCOUNT), M)

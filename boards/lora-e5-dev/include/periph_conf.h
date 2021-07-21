@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Freie Universität Berlin
+ * Copyright (C) 2021 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,14 +7,13 @@
  */
 
 /**
- * @ingroup     boards_nucleo-wl55jc
+ * @ingroup     boards_lora-e5-dev
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo-wl55jc board
+ * @brief       Peripheral MCU configuration for the LoRa-E5 Development Board
  *
- * @author      Akshai M <akshai.m@fu-berlin.de>
- * @author      Hauke Petersen <devel@haukepetersen.de>
+ * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  *
  */
 
@@ -47,19 +46,7 @@ extern "C" {
  * @{
  */
 static const uart_conf_t uart_config[] = {
-    {
-        .dev        = LPUART1,
-        .rcc_mask   = RCC_APB1ENR2_LPUART1EN,
-        .rx_pin     = GPIO_PIN(PORT_A, 3),
-        .tx_pin     = GPIO_PIN(PORT_A, 2),
-        .rx_af      = GPIO_AF8,
-        .tx_af      = GPIO_AF8,
-        .bus        = APB12,
-        .irqn       = LPUART1_IRQn,
-        .type       = STM32_LPUART,
-        .clk_src    = 0, /* Use APB clock */
-    },
-    {
+   {
         .dev        = USART1,
         .rcc_mask   = RCC_APB2ENR_USART1EN,
         .rx_pin     = GPIO_PIN(PORT_B, 7),
@@ -71,14 +58,38 @@ static const uart_conf_t uart_config[] = {
         .type       = STM32_USART,
         .clk_src    = 0, /* Use APB clock */
     },
+    {
+        .dev        = USART2,
+        .rcc_mask   = RCC_APB1ENR1_USART2EN,
+        .rx_pin     = GPIO_PIN(PORT_A, 3),
+        .tx_pin     = GPIO_PIN(PORT_A, 2),
+        .rx_af      = GPIO_AF7,
+        .tx_af      = GPIO_AF7,
+        .bus        = APB1,
+        .irqn       = USART2_IRQn,
+        .type       = STM32_USART,
+        .clk_src    = 0, /* Use APB clock */
+    },
+    {
+        .dev        = LPUART1,
+        .rcc_mask   = RCC_APB1ENR2_LPUART1EN,
+        .rx_pin     = GPIO_PIN(PORT_C, 1),
+        .tx_pin     = GPIO_PIN(PORT_C, 0),
+        .rx_af      = GPIO_AF8,
+        .tx_af      = GPIO_AF8,
+        .bus        = APB12,
+        .irqn       = LPUART1_IRQn,
+        .type       = STM32_LPUART,
+        .clk_src    = 0, /* Use APB clock */
+    },
 };
 
-#define UART_0_ISR          (isr_lpuart1)
-#define UART_1_ISR          (isr_usart1)
+#define UART_0_ISR          isr_usart1
+#define UART_1_ISR          isr_usart2
+#define UART_2_ISR          isr_lpuart1
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
-
 /**
  * @name    SPI configuration
  * @{
@@ -98,19 +109,19 @@ static const spi_conf_t spi_config[] = {
         .apbbus   = APB3,
     },
 /* SUBGHZ DEBUG PINS use the SPI1 pins */
-#if !IS_ACTIVE(CONFIG_STM32_WLX5XX_SUBGHZ_DEBUG)
+#if !IS_ACTIVE(CONFIG_STM32_WLX5XX)
     {
-        .dev      = SPI1,
-        .mosi_pin = GPIO_PIN(PORT_A, 7),
-        .miso_pin = GPIO_PIN(PORT_A, 6),
-        .sclk_pin = GPIO_PIN(PORT_A, 5),
+        .dev      = SPI2,
+        .mosi_pin = GPIO_PIN(PORT_A, 10),
+        .miso_pin = GPIO_PIN(PORT_B, 14),
+        .sclk_pin = GPIO_PIN(PORT_B, 13),
         .cs_pin   = GPIO_UNDEF,
         .mosi_af  = GPIO_AF5,
         .miso_af  = GPIO_AF5,
         .sclk_af  = GPIO_AF5,
         .cs_af    = GPIO_AF5,
-        .rccmask  = RCC_APB2ENR_SPI1EN,
-        .apbbus   = APB2,
+        .rccmask  = RCC_APB1ENR1_SPI2EN,
+        .apbbus   = APB1,
     }
 #endif
 };
@@ -126,8 +137,8 @@ static const i2c_conf_t i2c_config[] = {
     {
         .dev            = I2C2,
         .speed          = I2C_SPEED_NORMAL,
-        .scl_pin        = GPIO_PIN(PORT_A, 12),
-        .sda_pin        = GPIO_PIN(PORT_A, 11),
+        .scl_pin        = GPIO_PIN(PORT_B, 15),
+        .sda_pin        = GPIO_PIN(PORT_A, 15),
         .scl_af         = GPIO_AF4,
         .sda_af         = GPIO_AF4,
         .bus            = APB1,
