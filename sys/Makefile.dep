@@ -667,6 +667,15 @@ ifneq (,$(filter gcoap,$(USEMODULE)))
   USEMODULE += random
 endif
 
+ifneq (,$(filter gcoap_dns,$(USEMODULE)))
+  USEMODULE += dns_msg
+  USEMODULE += gcoap
+  USEMODULE += ipv4_addr
+  USEMODULE += ipv6_addr
+  USEMODULE += uri_parser
+  USEMODULE += sock_util
+endif
+
 ifneq (,$(filter luid,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_cpuid
 endif

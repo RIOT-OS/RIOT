@@ -67,6 +67,10 @@ PSEUDOMODULES += fmt_%
 PSEUDOMODULES += gcoap_forward_proxy
 PSEUDOMODULES += gcoap_fileserver
 PSEUDOMODULES += gcoap_dtls
+## Enable @ref net_gcoap_dns
+PSEUDOMODULES += gcoap_dns
+## Enable the @ref gcoap_dns_server_proxy_set function
+PSEUDOMODULES += gcoap_dns_proxied
 PSEUDOMODULES += fido2_tests
 PSEUDOMODULES += gnrc_dhcpv6_%
 PSEUDOMODULES += gnrc_ipv6_auto_subnets_auto_init

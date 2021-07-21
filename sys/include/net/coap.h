@@ -154,6 +154,7 @@ extern "C" {
 #define COAP_FORMAT_SENSML_EXI              (115)
 #define COAP_FORMAT_SENML_XML               (310)
 #define COAP_FORMAT_SENSML_XML              (311)
+#define COAP_FORMAT_DNS_MESSAGE           (65053)       /**< NON STANDARD! */
 /** @} */
 
 /**
