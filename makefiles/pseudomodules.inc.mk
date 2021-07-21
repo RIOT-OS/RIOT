@@ -25,6 +25,7 @@ PSEUDOMODULES += dbgpin
 PSEUDOMODULES += devfs_%
 PSEUDOMODULES += dhcpv6_%
 PSEUDOMODULES += dhcpv6_client_dns
+PSEUDOMODULES += dhcpv6_client_ia_pd
 PSEUDOMODULES += dhcpv6_client_mud_url
 PSEUDOMODULES += ecc_%
 PSEUDOMODULES += event_%

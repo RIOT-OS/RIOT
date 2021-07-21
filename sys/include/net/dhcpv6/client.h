@@ -122,7 +122,12 @@ void dhcpv6_client_start(void);
  * @brief   Configures the client to request prefix delegation for a network
  *          interface from a server
  *
+ * @pre Module `dhcpv6_client_ia_pd` is compiled in.
  * @pre `pfx_len <= 128`
+ *
+ * Without module `dhcpv6_client_ia_pd` and `NDEBUG` set this function is a NOP.
+ * Without module `dhcpv6_client_ia_pd` and `NDEBUG` unset this function will
+ * abort the running code on a failed assertion.
  *
  * @param[in] netif     The interface to request the prefix delegation for.
  * @param[in] pfx_len   The desired length of the prefix (note that the server

@@ -8,6 +8,7 @@ RIOTBASE ?= $(CURDIR)/../..
 # boards don't support ethos
 BOARD_BLACKLIST += mips-malta pic32-wifire pic32-clicker ruuvitag thingy52
 
+USEMODULE += dhcpv6_client_ia_pd
 USEMODULE += gnrc_dhcpv6_client
 USEMODULE += gnrc_ipv6_default
 USEMODULE += xtimer
