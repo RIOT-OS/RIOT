@@ -60,7 +60,9 @@ void event_timeout_set(event_timeout_t *event_timeout, uint32_t timeout)
 void event_timeout_clear(event_timeout_t *event_timeout)
 {
 #if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
-    ztimer_remove(event_timeout->clock, &event_timeout->timer);
+    if (event_timeout->clock) {
+        ztimer_remove(event_timeout->clock, &event_timeout->timer);
+    }
 #else
     xtimer_remove(&event_timeout->timer);
 #endif
