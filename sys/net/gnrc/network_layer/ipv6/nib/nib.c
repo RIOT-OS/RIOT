@@ -215,12 +215,12 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
     gnrc_netif_acquire(netif);
     _nib_acquire();
     do {    /* XXX: hidden goto ;-) */
-        _nib_onl_entry_t *node = _nib_onl_get(dst,
-                                              (netif == NULL) ? 0 : netif->pid);
+        _nib_onl_entry_t *node = _nib_onl_nc_get(dst,
+                                                 (netif == NULL) ? 0 : netif->pid);
         /* consider neighbor cache entries first */
         unsigned iface = (node == NULL) ? 0 : _nib_onl_get_if(node);
 
-        if ((node != NULL) && (node->mode & _NC)) || _on_link(dst, &iface)) {
+        if ((node != NULL) || _on_link(dst, &iface)) {
             DEBUG("nib: %s is %s, start address resolution\n",
                   ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)),
                   node ? "in NC" : "on-link");
@@ -231,7 +231,7 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
                 netif = _acquire_new_iface(iface);
                 /* get node from proper interface */
                 if (netif != NULL) {
-                    node = _nib_onl_get(dst, netif->pid);
+                    node = _nib_onl_nc_get(dst, netif->pid);
                 }
             }
             if ((netif == NULL) ||
@@ -287,8 +287,8 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
                 /* get actual netif */
                 netif = _acquire_new_iface(route.iface);
             }
-            node = _nib_onl_get(&route.next_hop,
-                                (netif != NULL) ? netif->pid : 0);
+            node = _nib_onl_nc_get(&route.next_hop,
+                                   (netif != NULL) ? netif->pid : 0);
             if (_resolve_addr(&route.next_hop, netif, pkt, nce, node)) {
                 _call_route_info_cb(netif,
                                     GNRC_IPV6_NIB_ROUTE_INFO_TYPE_RN,
@@ -533,7 +533,7 @@ static void _handle_rtr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                     break;
             }
         }
-        nce = _nib_onl_get(&ipv6->src, netif->pid);
+        nce = _nib_onl_nc_get(&ipv6->src, netif->pid);
     }
     if (!gnrc_netif_is_6ln(netif)) {
         uint32_t next_ra_delay = random_uint32_range(0, NDP_MAX_RA_DELAY);
@@ -824,8 +824,8 @@ static void _send_delayed_nbr_adv(const gnrc_netif_t *netif,
     _nib_onl_entry_t *nce;
     uint8_t reply_flags = NDP_NBR_ADV_FLAGS_S;
 
-    nce = _nib_onl_get(tgt, netif->pid);
-    if ((nce == NULL) || !(nce->mode & _NC)) {
+    nce = _nib_onl_nc_get(tgt, netif->pid);
+    if (nce == NULL) {
         /* usually this should be the case, but when NCE is full, just
          * ignore the sending. Other nodes in this anycast group are
          * then preferred */
@@ -1116,8 +1116,7 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         gnrc_netif_release(tgt_netif);
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_SLAAC */
-    if (((nce = _nib_onl_get(&nbr_adv->tgt, netif->pid)) != NULL) &&
-        (nce->mode & _NC)) {
+    if ((nce = _nib_onl_nc_get(&nbr_adv->tgt, netif->pid)) != NULL) {
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
         bool tl2ao_avail = false;
 #endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
@@ -1200,7 +1199,7 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
         return true;
     }
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
-    if ((entry != NULL) && (entry->mode & _NC) && _is_reachable(entry)) {
+    if ((entry != NULL) && _is_reachable(entry)) {
         if (_get_nud_state(entry) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE) {
             _set_nud_state(netif, entry, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_DELAY);
             _evtimer_add(entry, GNRC_IPV6_NIB_DELAY_TIMEOUT,
@@ -1228,7 +1227,7 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
 
         DEBUG("nib: resolve address %s by probing neighbors\n",
               ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
-        if ((entry == NULL) || !(entry->mode & _NC)) {
+        if (entry == NULL) {
             entry = _nib_nc_add(dst, (netif != NULL) ? netif->pid : 0,
                                 GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE);
             if (entry == NULL) {

@@ -93,7 +93,7 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                    const icmpv6_hdr_t *icmpv6, const ndp_opt_t *sl2ao)
 {
     assert(netif != NULL);
-    _nib_onl_entry_t *nce = _nib_onl_get(&ipv6->src, netif->pid);
+    _nib_onl_entry_t *nce = _nib_onl_nc_get(&ipv6->src, netif->pid);
     int l2addr_len;
 
     l2addr_len = gnrc_netif_ndp_addr_len_from_l2ao(netif, sl2ao);
@@ -102,7 +102,7 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         return;
     }
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
-    if ((nce != NULL) && (nce->mode & _NC) &&
+    if ((nce != NULL) &&
         ((nce->l2addr_len != l2addr_len) ||
          (memcmp(nce->l2addr, sl2ao + 1, nce->l2addr_len) != 0)) &&
         /* a 6LR MUST NOT modify an existing NCE based on an SL2AO in an RS
@@ -113,7 +113,7 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         _set_nud_state(netif, nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
-    if ((nce == NULL) || !(nce->mode & _NC)) {
+    if (nce == NULL) {
         DEBUG("nib: Creating NCE for (ipv6 = %s, iface = %u, nud_state = STALE)\n",
               ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)),
               netif->pid);
