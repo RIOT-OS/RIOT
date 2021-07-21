@@ -38,6 +38,9 @@ endif
 ifneq (,$(filter dhcpv6,$(USEMODULE)))
   DIRS += net/application_layer/dhcpv6
 endif
+ifneq (,$(filter dns,$(USEMODULE)))
+  DIRS += net/application_layer/dns
+endif
 ifneq (,$(filter dsm,$(USEMODULE)))
   DIRS += net/dsm
 endif

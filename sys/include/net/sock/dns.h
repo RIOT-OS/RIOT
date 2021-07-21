@@ -27,6 +27,8 @@
 #include <stdint.h>
 #include <unistd.h>
 
+#include "net/dns/msg.h"
+
 #include "net/sock/udp.h"
 
 #ifdef __cplusplus
@@ -34,31 +36,13 @@ extern "C" {
 #endif
 
 /**
- * @brief DNS internal structure
- */
-typedef struct {
-    uint16_t id;        /**< read           */
-    uint16_t flags;     /**< DNS            */
-    uint16_t qdcount;   /**< RFC            */
-    uint16_t ancount;   /**< for            */
-    uint16_t nscount;   /**< detailed       */
-    uint16_t arcount;   /**< explanations   */
-    uint8_t payload[];  /**< !!             */
-} sock_dns_hdr_t;
-
-/**
  * @name DNS defines
  * @{
  */
-#define DNS_TYPE_A              (1)
-#define DNS_TYPE_AAAA           (28)
-#define DNS_CLASS_IN            (1)
-
 #define SOCK_DNS_PORT           (53)
 #define SOCK_DNS_RETRIES        (2)
 
-#define SOCK_DNS_BUF_LEN        (128)       /* we're in embedded context. */
-#define SOCK_DNS_MAX_NAME_LEN   (SOCK_DNS_BUF_LEN - sizeof(sock_dns_hdr_t) - 4)
+#define SOCK_DNS_MAX_NAME_LEN   (CONFIG_DNS_MSG_LEN - sizeof(dns_hdr_t) - 4)
 /** @} */
 
 /**

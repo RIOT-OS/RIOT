@@ -25,6 +25,15 @@ extern "C" {
 #endif
 
 /**
+ * @name DNS defines
+ * @{
+ */
+#define DNS_TYPE_A              (1)
+#define DNS_TYPE_AAAA           (28)
+#define DNS_CLASS_IN            (1)
+/** @} */
+
+/**
  * @name    Field lengths
  * @{
  */
