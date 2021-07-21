@@ -14,7 +14,7 @@ At startup, the DFU mode is entered when either
 
 - the first button was pressed when the board started (configurable at board level using @ref BTN_BOOTLOADER_PIN), or
 
-- the last running firmware asked the bootloader to go to DFU mode by using a magic number (see @ref RIOTBOOT_DFU_ADDR).
+- the last running firmware asked the bootloader to go to DFU mode by using a magic number (see @ref RIOTBOOT_MAGIC_ADDR).
 
 # Prerequisites
 

@@ -71,3 +71,7 @@ jobs:
       uses: aabadie/riot-action@v1
       with:
         cmd: make -C dist/tools/lpc2k_pgm
+    - name: Build riotboot_serial tool
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/riotboot_serial
