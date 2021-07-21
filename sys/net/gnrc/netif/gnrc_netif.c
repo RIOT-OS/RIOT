@@ -1015,6 +1015,10 @@ static int _create_candidate_set(const gnrc_netif_t *netif,
 {
     int res = -1;
 
+    if (ipv6_addr_is_link_local(dst)) {
+        ll_only = true;
+    }
+
     DEBUG("gathering source address candidates\n");
     /* currently this implementation supports only addresses as source address
      * candidates assigned to this interface. Thus we assume all addresses to be
