@@ -25,8 +25,12 @@
 #include "net/sock/udp.h"
 #include "random.h"
 #include "timex.h"
+#if IS_USED(MODULE_ZTIMER)
+#include "ztimer.h"
+#else
 #include "xtimer.h"
 #include "xtimer/implementation.h"
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -209,12 +213,20 @@ static inline bool _is_tid(dhcpv6_msg_t *msg)
 
 static inline uint32_t _now_cs(void)
 {
+#if IS_USED(MODULE_ZTIMER)
+    return (uint32_t)(ztimer_now(ZTIMER_MSEC) / MS_PER_CS);
+#else
     return (uint32_t)(xtimer_now_usec64() / US_PER_CS);
+#endif
 }
 
 static inline uint32_t _now_sec(void)
 {
+#if IS_USED(MODULE_ZTIMER)
+    return (uint32_t)ztimer_now(ZTIMER_SEC);
+#else
     return (uint32_t)(xtimer_now_usec64() / US_PER_SEC);
+#endif
 }
 
 static inline uint16_t _compose_cid_opt(dhcpv6_opt_duid_t *cid)
@@ -926,16 +938,26 @@ static void _rebind(event_t *event)
 static void _set_event_timeout_ms(event_timeout_t *timeout, event_t *event,
                                   uint32_t delay_ms)
 {
+#if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
+    event_timeout_ztimer_init(timeout, ZTIMER_MSEC, event_queue, event);
+    event_timeout_set(timeout, delay_ms);
+#else
     event_timeout_init(timeout, event_queue, event);
     event_timeout_set(timeout, delay_ms * US_PER_MS);
+#endif
 }
 
 static void _set_event_timeout_sec(event_timeout_t *timeout, event_t *event,
                                    uint32_t delay_sec)
 {
+#if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
+    event_timeout_ztimer_init(timeout, ZTIMER_SEC, event_queue, event);
+    event_timeout_set(timeout, delay_sec);
+#else
     event_timeout_init(timeout, event_queue, event);
     /* use xtimer_set64 instead of event_timeout_set to prevent overflows */
     xtimer_set64(&timeout->timer, ((uint64_t)delay_sec) * US_PER_SEC);
+#endif
 }
 
 static void _clear_event_timeout(event_timeout_t *timeout)
