@@ -17,6 +17,7 @@
 #include <stdbool.h>
 
 #include "event.h"
+#include "event/timeout.h"
 #include "log.h"
 #include "kernel_defines.h"
 #include "net/dhcpv6/client.h"
@@ -72,7 +73,7 @@ static uint8_t best_adv[DHCPV6_CLIENT_BUFLEN];
 static uint8_t duid[DHCPV6_CLIENT_DUID_LEN];
 static pfx_lease_t pfx_leases[CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX];
 static server_t server;
-static xtimer_t timer, rebind_timer;
+static event_timeout_t solicit_renew_timeout, rebind_timeout;
 static event_queue_t *event_queue;
 static sock_udp_t sock;
 static sock_udp_ep_t local = { .family = AF_INET6, .port = DHCPV6_CLIENT_PORT };

@@ -99,8 +99,8 @@ endif
 
 ifneq (,$(filter dhcpv6_client,$(USEMODULE)))
   USEMODULE += event
+  USEMODULE += event_timeout
   USEMODULE += random
-  USEMODULE += xtimer
   ifneq (,$(filter sock_dns,$(USEMODULE)))
     USEMODULE += dhcpv6_client_dns
   endif
