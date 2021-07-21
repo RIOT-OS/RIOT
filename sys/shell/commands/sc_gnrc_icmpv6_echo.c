@@ -37,11 +37,9 @@
 #ifdef MODULE_GNRC_IPV6_NIB
 #include "net/gnrc/ipv6/nib/nc.h"
 #endif
-#ifdef MODULE_SOCK_DNS
-#include "net/sock/dns.h"
-#endif
 #include "net/icmpv6.h"
 #include "net/ipv6.h"
+#include "net/utils.h"
 #include "timex.h"
 #include "unaligned.h"
 #include "utlist.h"
@@ -167,16 +165,6 @@ static void _usage(char *cmdname)
               "of any responses, otherwise wait for two RTTs");
 }
 
-/* get the next netif, returns true if there are more */
-static bool _netif_get(gnrc_netif_t **current_netif)
-{
-    gnrc_netif_t *netif = *current_netif;
-    netif = gnrc_netif_iter(netif);
-
-    *current_netif = netif;
-    return !gnrc_netif_highlander() && gnrc_netif_iter(netif);
-}
-
 static int _configure(int argc, char **argv, _ping_data_t *data)
 {
     char *cmdname = argv[0];
@@ -188,27 +176,11 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
         if (arg[0] != '-') {
 
             data->hostname = arg;
-#ifdef MODULE_SOCK_DNS
-            if (strchr(data->hostname, ':') == NULL &&
-                sock_dns_query(data->hostname, &data->host, AF_INET6) > 0) {
-                res = 0;
-                continue;
-            }
-#endif
-            char *iface = ipv6_addr_split_iface(data->hostname);
-            if (iface) {
-                data->netif = gnrc_netif_get_by_pid(atoi(iface));
-            }
-            /* preliminary select the first interface */
-            else if (_netif_get(&data->netif)) {
-                /* don't take it if there is more than one interface */
-                data->netif = NULL;
-            }
 
-            if (ipv6_addr_from_str(&data->host, data->hostname) == NULL) {
+            res = netutils_get_ipv6(&data->host, (netif_t **)&data->netif, arg);
+            if (res) {
                 break;
             }
-            res = 0;
         }
         else {
             switch (arg[1]) {

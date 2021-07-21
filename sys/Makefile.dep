@@ -185,6 +185,10 @@ ifneq (,$(filter od_string,$(USEMODULE)))
   USEMODULE += od
 endif
 
+ifneq (,$(filter netutils,$(USEMODULE)))
+  USEMODULE += ipv6_addr
+endif
+
 ifneq (,$(filter newlib_gnu_source,$(USEMODULE)))
   FEATURES_REQUIRED += newlib
 endif
@@ -250,6 +254,10 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
 
   ifneq (,$(filter fib,$(USEMODULE)))
     USEMODULE += posix_inet
+  endif
+
+  ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
+    USEMODULE += netutils
   endif
 
   ifneq (,$(filter nimble_netif,$(USEMODULE)))
