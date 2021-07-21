@@ -108,6 +108,7 @@ int main(void)
     puts("waiting for periodic callback to be triggered 4 times");
     mutex_lock(&lock);
     puts("posting timed callback with timeout 0.5sec, clear right after");
+    event_timeout_clear(&event_timeout_cleared);
     event_timeout_ztimer_init(&event_timeout_cleared, ZTIMER_USEC,
                               EVENT_PRIO_MEDIUM, &event_never.super);
     event_timeout_set(&event_timeout_cleared, EVENT_TIMEOUT_TIME / 2);
