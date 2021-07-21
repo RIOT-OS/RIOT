@@ -78,6 +78,7 @@ static const uart_conf_t uart_config[] = {
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
+
 /**
  * @name    SPI configuration
  * @{
@@ -95,10 +96,10 @@ static const spi_conf_t spi_config[] = {
         .cs_af    = GPIO_AF_UNDEF,
         .rccmask  = RCC_APB3ENR_SUBGHZSPIEN,
         .apbbus   = APB3,
-    }
+    },
 /* SUBGHZ DEBUG PINS use the SPI1 pins */
-#if !IS_ACTIVE(CONFIG_STM32_WL55JC_SUBGHZ_DEBUG)
-    ,{
+#if !IS_ACTIVE(CONFIG_STM32_WLX5XX_SUBGHZ_DEBUG)
+    {
         .dev      = SPI1,
         .mosi_pin = GPIO_PIN(PORT_A, 7),
         .miso_pin = GPIO_PIN(PORT_A, 6),
