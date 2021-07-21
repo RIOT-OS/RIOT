@@ -33,7 +33,8 @@ void flashpage_read(unsigned page, void *data)
 {
     assert(page < FLASHPAGE_NUMOF);
 
-#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
+#if defined(CPU_FAM_STM32WB) || (defined(CPU_FAM_STM32WL) && \
+                                 !defined(CPU_LINE_STM32WLE5xx))
     assert(page < (FLASH->SFR & FLASH_SFR_SFSA));
 #endif
 
@@ -44,7 +45,8 @@ int flashpage_verify(unsigned page, const void *data)
 {
     assert(page < (int)FLASHPAGE_NUMOF);
 
-#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
+#if defined(CPU_FAM_STM32WB) || (defined(CPU_FAM_STM32WL) && \
+                                 !defined(CPU_LINE_STM32WLE5xx))
     assert(page < (int)(FLASH->SFR & FLASH_SFR_SFSA));
 #endif
 
