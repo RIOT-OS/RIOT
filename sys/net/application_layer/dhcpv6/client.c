@@ -95,9 +95,9 @@ static void _renew(event_t *event);
 static void _rebind(event_t *event);
 
 static void _set_timer(xtimer_t *timer, xtimer_callback_t cb,
-                       uint32_t delay_us);
+                       uint32_t delay_ms);
 static void _set_timer64(xtimer_t *timer, xtimer_callback_t cb,
-                         uint64_t delay_us);
+                         uint64_t delay_ms);
 static void _clear_timer(xtimer_t *timer);
 
 static event_t solicit_servers = { .handler = _solicit_servers };
@@ -150,7 +150,7 @@ void dhcpv6_client_start(void)
     duid_len = dhcpv6_client_get_duid_l2(local.netif,
                                          (dhcpv6_duid_l2_t *)&duid);
     if (duid_len > 0) {
-        uint32_t delay = random_uint32_range(0, DHCPV6_SOL_MAX_DELAY * US_PER_SEC);
+        uint32_t delay = random_uint32_range(0, DHCPV6_SOL_MAX_DELAY * MS_PER_SEC);
 
         sock_udp_create(&sock, &local, NULL, 0);
         _set_timer(&timer, _post_solicit_servers, delay);
@@ -340,36 +340,36 @@ static inline size_t _add_ia_pd_from_config(uint8_t *buf, size_t len_max)
     return msg_len;
 }
 
-static inline int32_t get_rand_us_factor(void)
+static inline int32_t get_rand_ms_factor(void)
 {
-    int32_t res = ((int32_t)random_uint32_range(0, 200 * US_PER_MS));
-    res -= 100 * US_PER_SEC;
+    int32_t res = ((int32_t)random_uint32_range(0, 200));
+    res -= 100;
     return res;
 }
 
-static inline uint32_t _irt_us(uint16_t irt, bool greater_irt)
+static inline uint32_t _irt_ms(uint16_t irt, bool greater_irt)
 {
-    uint32_t irt_us = (irt * US_PER_SEC);
-    int32_t factor = get_rand_us_factor();
+    uint32_t irt_ms = (irt * MS_PER_SEC);
+    int32_t factor = get_rand_ms_factor();
 
     if (greater_irt && (factor < 0)) {
         factor = -factor;
     }
-    irt_us += (factor * irt_us) / US_PER_SEC;
-    return irt_us;
+    irt_ms += (factor * irt_ms) / MS_PER_SEC;
+    return irt_ms;
 }
 
-static inline uint32_t _sub_rt_us(uint32_t rt_prev_us, uint16_t mrt)
+static inline uint32_t _sub_rt_ms(uint32_t rt_prev_ms, uint16_t mrt)
 {
-    uint32_t sub_rt_us = (2 * rt_prev_us) +
-                         ((get_rand_us_factor() * rt_prev_us) / US_PER_SEC);
+    uint32_t sub_rt_ms = (2 * rt_prev_ms) +
+                         ((get_rand_ms_factor() * rt_prev_ms) / MS_PER_SEC);
 
-    if (sub_rt_us > (mrt * US_PER_SEC)) {
-        uint32_t mrt_us = mrt * US_PER_SEC;
+    if (sub_rt_ms > (mrt * MS_PER_SEC)) {
+        uint32_t mrt_ms = mrt * MS_PER_SEC;
 
-        sub_rt_us = mrt_us + ((get_rand_us_factor() * mrt_us) / US_PER_SEC);
+        sub_rt_ms = mrt_ms + ((get_rand_ms_factor() * mrt_ms) / MS_PER_SEC);
     }
-    return sub_rt_us;
+    return sub_rt_ms;
 }
 
 static inline size_t _opt_len(dhcpv6_opt_t *opt)
@@ -504,25 +504,25 @@ static int _preparse_advertise(uint8_t *adv, size_t len, uint8_t **buf)
 static void _schedule_t2(void)
 {
     if (t2 < UINT32_MAX) {
-        uint64_t t2_usec = t2 * US_PER_SEC;
+        uint64_t t2_msec = t2 * MS_PER_SEC;
 
         rebind_time = _now_sec() + t2;
         _clear_timer(&rebind_timer);
         DEBUG("DHCPv6 client: scheduling REBIND in %lu sec\n",
               (unsigned long)t2);
-        _set_timer64(&rebind_timer, _post_rebind, t2_usec);
+        _set_timer64(&rebind_timer, _post_rebind, t2_msec);
     }
 }
 
 static void _schedule_t1_t2(void)
 {
     if (server.t1 < UINT32_MAX) {
-        uint64_t t1_usec = server.t1 * US_PER_SEC;
+        uint64_t t1_msec = server.t1 * MS_PER_SEC;
 
         _clear_timer(&timer);
         DEBUG("DHCPv6 client: scheduling RENEW in %lu sec\n",
               (unsigned long)server.t1);
-        _set_timer64(&timer, _post_renew, t1_usec);
+        _set_timer64(&timer, _post_renew, t1_msec);
     }
     _schedule_t2();
 }
@@ -534,7 +534,7 @@ static void _parse_advertise(uint8_t *adv, size_t len)
     /* might not have been executed when not received in first retransmission
      * window => redo even if already done */
     if (_preparse_advertise(adv, len, NULL) < 0) {
-        uint32_t delay = _irt_us(DHCPV6_SOL_TIMEOUT, true);
+        uint32_t delay = _irt_ms(DHCPV6_SOL_TIMEOUT, true);
         /* SOLICIT new server */
         _set_timer(&timer, _post_solicit_servers, delay);
         return;
@@ -758,7 +758,7 @@ static void _solicit_servers(event_t *event)
     dhcpv6_msg_t *msg = (dhcpv6_msg_t *)&send_buf[0];
     dhcpv6_opt_elapsed_time_t *time;
     uint8_t *buf = NULL;
-    uint32_t retrans_timeout = _irt_us(DHCPV6_SOL_TIMEOUT, true);
+    uint32_t retrans_timeout = _irt_ms(DHCPV6_SOL_TIMEOUT, true);
     size_t msg_len = sizeof(dhcpv6_msg_t);
     int res, best_res = 0;
     bool first_rt = true;
@@ -780,20 +780,20 @@ static void _solicit_servers(event_t *event)
     res = sock_udp_send(&sock, send_buf, msg_len, &remote);
     assert(res > 0);    /* something went terribly wrong */
     while (((res = sock_udp_recv(&sock, recv_buf, sizeof(recv_buf),
-                                 retrans_timeout, NULL)) <= 0) ||
+                                 retrans_timeout * US_PER_MS, NULL)) <= 0) ||
            (first_rt && (res > 0)) ||
            ((res > 0) && (recv_buf[0] != DHCPV6_ADVERTISE))) {
         if (first_rt && (res > 0) && (recv_buf[0] == DHCPV6_ADVERTISE)) {
             int parse_res;
 
             DEBUG("DHCPv6 client: initial transmission, collect best advertise\n");
-            retrans_timeout -= (_get_elapsed_time() * US_PER_CS);
+            retrans_timeout -= (_get_elapsed_time() * MS_PER_CS);
             parse_res = _preparse_advertise(recv_buf, res, &buf);
             if (buf != NULL) {
                 best_res = res;
             }
             if ((parse_res == UINT8_MAX) ||
-                (retrans_timeout > (DHCPV6_SOL_MAX_RT * US_PER_SEC))) {
+                (retrans_timeout > (DHCPV6_SOL_MAX_RT * MS_PER_SEC))) {
                 /* retrans_timeout underflowed => don't retry to receive */
                 break;
             }
@@ -801,7 +801,7 @@ static void _solicit_servers(event_t *event)
         else if (buf == NULL) {
             DEBUG("DHCPv6 client: resend SOLICIT\n");
             first_rt = false;
-            retrans_timeout = _sub_rt_us(retrans_timeout, DHCPV6_SOL_MAX_RT);
+            retrans_timeout = _sub_rt_ms(retrans_timeout, DHCPV6_SOL_MAX_RT);
             _compose_elapsed_time_opt(time);
             res = sock_udp_send(&sock, send_buf, msg_len, &remote);
             assert(res > 0);    /* something went terribly wrong */
@@ -872,7 +872,7 @@ static void _request_renew_rebind(uint8_t type)
         default:
             return;
     }
-    retrans_timeout = _irt_us(irt, false);
+    retrans_timeout = _irt_ms(irt, false);
     _generate_tid();
     msg->type = type;
     _set_tid(msg->tid);
@@ -891,12 +891,12 @@ static void _request_renew_rebind(uint8_t type)
     _flush_stale_replies(&sock);
     while (sock_udp_send(&sock, send_buf, msg_len, &remote) <= 0) {}
     while (((res = sock_udp_recv(&sock, recv_buf, sizeof(recv_buf),
-                                 retrans_timeout, NULL)) <= 0) ||
+                                 retrans_timeout * US_PER_MS, NULL)) <= 0) ||
            ((res > 0) && (recv_buf[0] != DHCPV6_REPLY))) {
         if ((mrd > 0) && (_get_elapsed_time() > (mrd * CS_PER_SEC))) {
             break;
         }
-        retrans_timeout = _sub_rt_us(retrans_timeout, mrt);
+        retrans_timeout = _sub_rt_ms(retrans_timeout, mrt);
         if ((mrc > 0) && (++retrans) >= mrc) {
             break;
         }
@@ -939,17 +939,17 @@ static void _rebind(event_t *event)
 }
 
 static void _set_timer(xtimer_t *timer, xtimer_callback_t cb,
-                       uint32_t delay_us)
+                       uint32_t delay_ms)
 {
     timer->callback = cb;
-    xtimer_set(timer, delay_us);
+    xtimer_set(timer, delay_ms * US_PER_MS);
 }
 
 static void _set_timer64(xtimer_t *timer, xtimer_callback_t cb,
-                         uint64_t delay_us)
+                         uint64_t delay_ms)
 {
     timer->callback = cb;
-    xtimer_set64(timer, delay_us);
+    xtimer_set64(timer, delay_ms * US_PER_MS);
 }
 
 static void _clear_timer(xtimer_t *timer)
