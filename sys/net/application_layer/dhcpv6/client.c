@@ -94,10 +94,10 @@ static void _request(event_t *event);
 static void _renew(event_t *event);
 static void _rebind(event_t *event);
 
-static void _set_timer(xtimer_t *timer, xtimer_callback_t cb,
-                       uint32_t delay_ms);
-static void _set_timer64(xtimer_t *timer, xtimer_callback_t cb,
-                         uint64_t delay_ms);
+static void _set_timer_ms(xtimer_t *timer, xtimer_callback_t cb,
+                          uint32_t delay_ms);
+static void _set_timer_sec(xtimer_t *timer, xtimer_callback_t cb,
+                           uint32_t delay_sec);
 static void _clear_timer(xtimer_t *timer);
 
 static event_t solicit_servers = { .handler = _solicit_servers };
@@ -153,7 +153,7 @@ void dhcpv6_client_start(void)
         uint32_t delay = random_uint32_range(0, DHCPV6_SOL_MAX_DELAY * MS_PER_SEC);
 
         sock_udp_create(&sock, &local, NULL, 0);
-        _set_timer(&timer, _post_solicit_servers, delay);
+        _set_timer_ms(&timer, _post_solicit_servers, delay);
     }
 }
 
@@ -504,25 +504,21 @@ static int _preparse_advertise(uint8_t *adv, size_t len, uint8_t **buf)
 static void _schedule_t2(void)
 {
     if (t2 < UINT32_MAX) {
-        uint64_t t2_msec = t2 * MS_PER_SEC;
-
         rebind_time = _now_sec() + t2;
         _clear_timer(&rebind_timer);
         DEBUG("DHCPv6 client: scheduling REBIND in %lu sec\n",
               (unsigned long)t2);
-        _set_timer64(&rebind_timer, _post_rebind, t2_msec);
+        _set_timer_sec(&rebind_timer, _post_rebind, t2);
     }
 }
 
 static void _schedule_t1_t2(void)
 {
     if (server.t1 < UINT32_MAX) {
-        uint64_t t1_msec = server.t1 * MS_PER_SEC;
-
         _clear_timer(&timer);
         DEBUG("DHCPv6 client: scheduling RENEW in %lu sec\n",
               (unsigned long)server.t1);
-        _set_timer64(&timer, _post_renew, t1_msec);
+        _set_timer_sec(&timer, _post_renew, server.t1);
     }
     _schedule_t2();
 }
@@ -536,7 +532,7 @@ static void _parse_advertise(uint8_t *adv, size_t len)
     if (_preparse_advertise(adv, len, NULL) < 0) {
         uint32_t delay = _irt_ms(DHCPV6_SOL_TIMEOUT, true);
         /* SOLICIT new server */
-        _set_timer(&timer, _post_solicit_servers, delay);
+        _set_timer_ms(&timer, _post_solicit_servers, delay);
         return;
     }
     DEBUG("DHCPv6 client: scheduling REQUEST\n");
@@ -938,18 +934,18 @@ static void _rebind(event_t *event)
     _request_renew_rebind(DHCPV6_REBIND);
 }
 
-static void _set_timer(xtimer_t *timer, xtimer_callback_t cb,
-                       uint32_t delay_ms)
+static void _set_timer_ms(xtimer_t *timer, xtimer_callback_t cb,
+                          uint32_t delay_ms)
 {
     timer->callback = cb;
     xtimer_set(timer, delay_ms * US_PER_MS);
 }
 
-static void _set_timer64(xtimer_t *timer, xtimer_callback_t cb,
-                         uint64_t delay_ms)
+static void _set_timer_sec(xtimer_t *timer, xtimer_callback_t cb,
+                           uint32_t delay_sec)
 {
     timer->callback = cb;
-    xtimer_set64(timer, delay_ms * US_PER_MS);
+    xtimer_set64(timer, ((uint64_t)delay_sec) * US_PER_SEC);
 }
 
 static void _clear_timer(xtimer_t *timer)
