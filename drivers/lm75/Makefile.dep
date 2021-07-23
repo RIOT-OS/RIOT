@@ -1,0 +1,3 @@
+FEATURES_REQUIRED += periph_gpio periph_gpio_irq
+FEATURES_REQUIRED += periph_i2c
+USEMODULE += xtimer

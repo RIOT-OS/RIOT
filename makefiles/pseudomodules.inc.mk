@@ -232,6 +232,10 @@ PSEUDOMODULES += mpu9250
 PSEUDOMODULES += ina219
 PSEUDOMODULES += ina220
 
+# include vairants of lm75 drivers as pseudo modules
+PSEUDOMODULES += lm75a
+PSEUDOMODULES += tmp1075
+
 # include variants of mrf24j40 drivers as pseudo modules
 PSEUDOMODULES += mrf24j40m%
 
