@@ -25,6 +25,7 @@
 #include "net/gnrc/rpl.h"
 #include "net/sock.h"
 #include "timex.h"
+#include "evtimer.h"
 
 #include "net/dhcpv6/client.h"
 
@@ -183,13 +184,14 @@ uint32_t dhcpv6_client_prefix_valid_until(unsigned netif,
     gnrc_ipv6_nib_pl_t ple;
     void *state = NULL;
     uint32_t max_valid = 0;
+    uint32_t now = evtimer_now_msec();
 
     while (gnrc_ipv6_nib_pl_iter(netif, &state, &ple)) {
         if ((ple.pfx_len == pfx_len) &&
-            ((ple.valid_until / MS_PER_SEC) > max_valid) &&
+            (((ple.valid_until - now) / MS_PER_SEC) > max_valid) &&
             (ipv6_addr_match_prefix(&ple.pfx,
                                     pfx) >= ple.pfx_len)) {
-            max_valid = ple.valid_until / MS_PER_SEC;
+            max_valid = (ple.valid_until - now) / MS_PER_SEC;
         }
     }
     return max_valid;
