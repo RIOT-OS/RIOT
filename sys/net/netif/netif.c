@@ -56,7 +56,7 @@ __attribute__((weak)) int16_t netif_get_id(const netif_t *netif)
     return -1;
 }
 
-netif_t *netif_get_by_name(const char *name)
+__attribute__((weak)) netif_t *netif_get_by_name(const char *name)
 {
     assert(name);
     list_node_t *node = netif_list.next;

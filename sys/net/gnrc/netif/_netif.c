@@ -44,6 +44,11 @@ netif_t *netif_get_by_id(int16_t id)
     return &gnrc_netif_get_by_pid((kernel_pid_t)id)->netif;
 }
 
+netif_t *netif_get_by_name(const char *name)
+{
+    return &gnrc_netif_get_by_pid((kernel_pid_t)atoi(name))->netif;
+}
+
 int netif_get_opt(netif_t *netif, netopt_t opt, uint16_t context,
                   void *value, size_t max_len)
 {
