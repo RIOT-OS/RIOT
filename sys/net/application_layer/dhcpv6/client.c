@@ -839,7 +839,7 @@ static void _request_renew_rebind(uint8_t type)
         case DHCPV6_RENEW:
             irt = DHCPV6_REN_TIMEOUT;
             mrt = DHCPV6_REN_MAX_RT;
-            mrd = rebind_time - t2;
+            mrd = rebind_time - _now_sec();
             break;
         case DHCPV6_REBIND: {
             irt = DHCPV6_REB_TIMEOUT;
@@ -858,7 +858,7 @@ static void _request_renew_rebind(uint8_t type)
                     mrd = valid_until;
                 }
             }
-            if (mrd > 0) {
+            if (mrd == 0) {
                 /* all leases already expired, don't try to rebind and
                  * solicit immediately */
                 _post_solicit_servers();
