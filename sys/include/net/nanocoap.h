@@ -971,6 +971,24 @@ static inline ssize_t coap_opt_add_block2_control(coap_pkt_t *pkt, coap_block1_t
 }
 
 /**
+ * @brief   Append an Accept option to the pkt buffer
+ *
+ * @post pkt.payload advanced to first byte after option
+ * @post pkt.payload_len reduced by option length
+ *
+ * @param[in,out] pkt         pkt referencing target buffer
+ * @param[in]     format      COAP_FORMAT_xxx to accept
+ *
+ * @return        number of bytes written to buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or insufficient buffer space
+ */
+static inline ssize_t coap_opt_add_accept(coap_pkt_t *pkt, uint16_t format)
+{
+    return coap_opt_add_uint(pkt, COAP_OPT_ACCEPT, format);
+}
+
+/**
  * @brief   Append a Content-Format option to the pkt buffer
  *
  * @post pkt.payload advanced to first byte after option
