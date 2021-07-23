@@ -108,8 +108,11 @@ void dhcpv6_client_init(event_queue_t *event_queue, uint16_t netif);
 /**
  * @brief   Let the server start listening
  *
+ * @pre @ref dhcpv6_client_init() was called (i.e. the internal event queue of
+ *      he client was set).
+ *
  * This needs to be called *after* all desired [configuration functions]
- * (@ref net_dhcpv6_client_conf) where called.
+ * (@ref net_dhcpv6_client_conf) and @ref dhcpv6_client_init() were called.
  */
 void dhcpv6_client_start(void);
 

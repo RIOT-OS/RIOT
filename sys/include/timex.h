@@ -59,6 +59,11 @@ extern "C" {
 #define US_PER_CS  (10000U)
 
 /**
+ * @brief The number of milliseconds per centisecond
+ */
+#define MS_PER_CS  (10U)
+
+/**
  * @brief The number of nanoseconds per microsecond
  */
 #define NS_PER_US           (1000LU)
