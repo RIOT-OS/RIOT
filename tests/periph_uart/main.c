@@ -151,6 +151,14 @@ static int _self_test(uart_t dev, unsigned baud)
     }
     uart_rxstart_irq_disable(dev);
 #endif
+#ifdef MODULE_PERIPH_UART_COLLISION
+    uart_collision_detect_enable(dev);
+    uart_write(dev, (uint8_t*)test_string, sizeof(test_string));
+    if (uart_collision_detected(dev)) {
+        printf("collision detected\n");
+    }
+    uart_collision_detect_disable(dev);
+#endif
 
     test_mode = false;
     return 0;
