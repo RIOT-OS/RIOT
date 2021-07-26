@@ -16,6 +16,7 @@ config CPU_FAM_SAMD10
     bool
     select CPU_COMMON_SAMD21
     select HAS_PERIPH_DMA
+    select HAS_PERIPH_UART_COLLISION
 
 config CPU_FAM_SAMD20
     bool
@@ -25,11 +26,13 @@ config CPU_FAM_SAMD21
     bool
     select CPU_COMMON_SAMD21
     select HAS_PERIPH_DMA
+    select HAS_PERIPH_UART_COLLISION
 
 config CPU_FAM_SAMR21
     bool
     select CPU_COMMON_SAMD21
     select HAS_PERIPH_DMA
+    select HAS_PERIPH_UART_COLLISION
 
 ## Definition of specific features
 config HAS_CPU_SAMD21

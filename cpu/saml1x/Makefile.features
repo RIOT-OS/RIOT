@@ -5,5 +5,6 @@ CPU_CORE = cortex-m23
 
 FEATURES_PROVIDED += periph_hwrng
 FEATURES_PROVIDED += periph_gpio_fast_read
+FEATURES_PROVIDED += periph_uart_collision
 
 include $(RIOTCPU)/sam0_common/Makefile.features
