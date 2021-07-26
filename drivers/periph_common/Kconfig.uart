@@ -28,6 +28,10 @@ config MODULE_PERIPH_LPUART
     bool "Enable Low Power UART (LPUART)"
     depends on HAS_PERIPH_LPUART
 
+config MODULE_PERIPH_UART_COLLISION
+    bool "Enable UART collision detection"
+    depends on HAS_PERIPH_UART_COLLISION
+
 config MODULE_PERIPH_UART_NONBLOCKING
     bool "Non-blocking support"
     depends on HAS_PERIPH_UART_NONBLOCKING

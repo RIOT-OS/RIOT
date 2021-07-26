@@ -296,6 +296,48 @@ void uart_rxstart_irq_enable(uart_t uart);
 void uart_rxstart_irq_disable(uart_t uart);
 #endif /* MODULE_PERIPH_UART_RXSTART_IRQ */
 
+#if defined(MODULE_PERIPH_UART_COLLISION) || DOXYGEN
+/**
+ * @brief   Enables collision detection check of the UART.
+ *          This assumes the UART is connected to a bus where RX and TX are
+ *          connected. After each sent byte it is checked whether the same
+ *          byte could be received.
+ *
+ *          This disables the RX interrupt.
+ *
+ * @note    You have to add the module `periph_uart_rxstart_irq` to your project
+ *          to enable this function
+ *
+ * @param[in] uart      The device to configure
+ */
+void uart_collision_detect_enable(uart_t uart);
+/**
+ * @brief   Disables collision detection check of the UART.
+ *
+ *          If an RX interrupt was configured before, it is enabled again.
+ *
+ * @note    You have to add the module `periph_uart_rxstart_irq` to your project
+ *          to enable this function
+ *
+ * @param[in] uart      The device to configure
+ */
+void uart_collision_detect_disable(uart_t uart);
+
+/**
+ * @brief   Disables collision detection check of the UART.
+ *
+ *          If an RX interrupt was configured before, it is enabled again.
+ *
+ * @note    You have to add the module `periph_uart_rxstart_irq` to your project
+ *          to enable this function
+ *
+ * @param[in] uart      The device to probe
+ *
+ * @return              true if a collision occurred during the last transder
+ */
+bool uart_collision_detected(uart_t uart);
+#endif /* MODULE_PERIPH_UART_COLLISION */
+
 /**
  * @brief   Setup parity, data and stop bits for a given UART device
  *
