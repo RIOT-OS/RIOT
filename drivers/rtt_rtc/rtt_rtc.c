@@ -138,16 +138,17 @@ int rtc_set_time(struct tm *time)
 
 int rtc_get_time_ms(struct tm *time, uint16_t *ms)
 {
-    uint32_t prev = rtc_now;
+    uint32_t tmp, prev = rtc_now;
 
     /* repeat calculation if an alarm triggered in between */
     do {
         uint32_t now = rtt_get_counter();
-        uint32_t tmp = _rtc_now(now);
+        tmp = _rtc_now(now);
 
-        rtc_localtime(tmp, time);
-        *ms = (SUBSECONDS(now) * MS_PER_SEC) / RTT_SECOND;
+        *ms = (SUBSECONDS(now - last_alarm) * MS_PER_SEC) / RTT_SECOND;
     } while (prev != rtc_now);
+
+    rtc_localtime(tmp, time);
 
     return 0;
 }
