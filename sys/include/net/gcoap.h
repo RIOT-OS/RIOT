@@ -751,36 +751,6 @@ typedef struct {
 } gcoap_resend_t;
 
 /**
- * @brief   Memo to handle a response for a request
- */
-struct gcoap_request_memo {
-    unsigned state;                     /**< State of this memo, a GCOAP_MEMO... */
-    int send_limit;                     /**< Remaining resends, 0 if none;
-                                             GCOAP_SEND_LIMIT_NON if non-confirmable */
-    union {
-        uint8_t hdr_buf[GCOAP_HEADER_MAXLEN];
-                                        /**< Copy of PDU header, if no resends */
-        gcoap_resend_t data;            /**< Endpoint and PDU buffer, for resend */
-    } msg;                              /**< Request message data; if confirmable,
-                                             supports resending message */
-    sock_udp_ep_t remote_ep;            /**< Remote endpoint */
-    gcoap_resp_handler_t resp_handler;  /**< Callback for the response */
-    void *context;                      /**< ptr to user defined context data */
-    event_timeout_t resp_evt_tmout;     /**< Limits wait for response */
-    event_callback_t resp_tmout_cb;     /**< Callback for response timeout */
-};
-
-/**
- * @brief   Memo for Observe registration and notifications
- */
-typedef struct {
-    sock_udp_ep_t *observer;            /**< Client endpoint; unused if null */
-    const coap_resource_t *resource;    /**< Entity being observed */
-    uint8_t token[GCOAP_TOKENLEN_MAX];  /**< Client token for notifications */
-    unsigned token_len;                 /**< Actual length of token attribute */
-} gcoap_observe_memo_t;
-
-/**
  * @brief   Coap socket types
  */
 typedef enum {
@@ -806,6 +776,38 @@ typedef struct {
                                                  functions. */
 #endif
 } gcoap_socket_t;
+
+/**
+ * @brief   Memo to handle a response for a request
+ */
+struct gcoap_request_memo {
+    unsigned state;                     /**< State of this memo, a GCOAP_MEMO... */
+    int send_limit;                     /**< Remaining resends, 0 if none;
+                                             GCOAP_SEND_LIMIT_NON if non-confirmable */
+    union {
+        uint8_t hdr_buf[GCOAP_HEADER_MAXLEN];
+                                        /**< Copy of PDU header, if no resends */
+        gcoap_resend_t data;            /**< Endpoint and PDU buffer, for resend */
+    } msg;                              /**< Request message data; if confirmable,
+                                             supports resending message */
+    sock_udp_ep_t remote_ep;            /**< Remote endpoint */
+    gcoap_resp_handler_t resp_handler;  /**< Callback for the response */
+    void *context;                      /**< ptr to user defined context data */
+    event_timeout_t resp_evt_tmout;     /**< Limits wait for response */
+    event_callback_t resp_tmout_cb;     /**< Callback for response timeout */
+    gcoap_socket_t socket;              /**< Transport type to remote endpoint */
+};
+
+/**
+ * @brief   Memo for Observe registration and notifications
+ */
+typedef struct {
+    sock_udp_ep_t *observer;            /**< Client endpoint; unused if null */
+    const coap_resource_t *resource;    /**< Entity being observed */
+    uint8_t token[GCOAP_TOKENLEN_MAX];  /**< Client token for notifications */
+    unsigned token_len;                 /**< Actual length of token attribute */
+    gcoap_socket_t socket;              /**< Transport type to observer */
+} gcoap_observe_memo_t;
 
 /**
  * @brief   Initializes the gcoap thread and device
@@ -907,19 +909,52 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 /**
  * @brief   Sends a buffer containing a CoAP request to the provided endpoint
  *
+ * @deprecated Will be an alias for @ref gcoap_req_send after the 2022.01
+ *             release. Will be removed after the 2022.04 release.
+ *
+ * @param[in] buf           Buffer containing the PDU
+ * @param[in] len           Length of the buffer
+ * @param[in] remote        Destination for the packet
+ * @param[in] resp_handler  Callback when response received, may be NULL
+ * @param[in] context       User defined context passed to the response handler
+ * @param[in] tl_type       The transport type to use for send. When
+ *                          GCOAP_SOCKET_TYPE_UNDEF is selected, the highest
+ *                          available (by value) will be selected.
+ *
+ * @return  length of the packet
+ * @return -ENOTCONN, if DTLS was used and session establishment failed
+ * @return -EINVAL, if @p tl_type is is not supported
+ * @return  0 if cannot send
+ */
+ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
+                          const sock_udp_ep_t *remote,
+                          gcoap_resp_handler_t resp_handler, void *context,
+                          gcoap_socket_type_t tl_type);
+
+/**
+ * @brief   Sends a buffer containing a CoAP request to the provided endpoint
+ *
  * @param[in] buf           Buffer containing the PDU
  * @param[in] len           Length of the buffer
  * @param[in] remote        Destination for the packet
  * @param[in] resp_handler  Callback when response received, may be NULL
  * @param[in] context       User defined context passed to the response handler
  *
+ * @note The highest supported (by value) coap_socket_type_t will be selected
+ *       as transport type.
+ *
  * @return  length of the packet
  * @return -ENOTCONN, if DTLS was used and session establishment failed
  * @return  0 if cannot send
  */
-ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
-                       const sock_udp_ep_t *remote,
-                       gcoap_resp_handler_t resp_handler, void *context);
+static inline ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
+                                     const sock_udp_ep_t *remote,
+                                     gcoap_resp_handler_t resp_handler,
+                                     void *context)
+{
+    return gcoap_req_send_tl(buf, len, remote, resp_handler, context,
+                             GCOAP_SOCKET_TYPE_UNDEF);
+}
 
 /**
  * @brief   Initializes a CoAP response packet on a buffer
