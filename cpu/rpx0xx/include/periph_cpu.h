@@ -235,7 +235,7 @@ extern "C" {
  * @note    The RPX0XX MCU family only has a single GPIO port. Still the API requires a
  *          port parameter, which is currently ignored.
  */
-#define GPIO_PIN(port, pin)     (pin)
+#define GPIO_PIN(port, pin)     ((((port) & 0)) | (pin))
 
 /**
  * @brief   Overwrite the default gpio_t type definition
