@@ -782,16 +782,16 @@ typedef struct {
  * @brief   Coap socket types
  */
 typedef enum {
-    COAP_SOCKET_TYPE_UNDEF = 0,
-    COAP_SOCKET_TYPE_UDP,
-    COAP_SOCKET_TYPE_DTLS
-} coap_socket_type_t;
+    GCOAP_SOCKET_TYPE_UNDEF = 0,
+    GCOAP_SOCKET_TYPE_UDP,
+    GCOAP_SOCKET_TYPE_DTLS
+} gcoap_socket_type_t;
 
 /**
  * @brief   Coap socket to handle multiple transport types
  */
 typedef struct {
-    coap_socket_type_t type;                /**< Type of stored socket */
+    gcoap_socket_type_t type;                /**< Type of stored socket */
     union {
         sock_udp_t *udp;
 #if IS_USED(MODULE_GCOAP_DTLS) || defined(DOXYGEN)
@@ -803,7 +803,7 @@ typedef struct {
                                                  Used for exchanging a session between
                                                  functions. */
 #endif
-} coap_socket_t;
+} gcoap_socket_t;
 
 /**
  * @brief   Initializes the gcoap thread and device
