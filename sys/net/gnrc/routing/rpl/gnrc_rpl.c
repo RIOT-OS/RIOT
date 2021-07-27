@@ -419,6 +419,18 @@ uint8_t gnrc_rpl_gen_instance_id(bool local)
     return instance_id;
 }
 
+void gnrc_rpl_configure_root(gnrc_netif_t *netif, const ipv6_addr_t *dodag_id)
+{
+    gnrc_rpl_init(netif->pid);
+    gnrc_rpl_instance_t *inst = gnrc_rpl_instance_get(
+            CONFIG_GNRC_RPL_DEFAULT_INSTANCE
+        );
+    if (inst) {
+        gnrc_rpl_instance_remove(inst);
+    }
+    gnrc_rpl_root_init(CONFIG_GNRC_RPL_DEFAULT_INSTANCE, dodag_id, false, false);
+}
+
 /**
  * @}
  */

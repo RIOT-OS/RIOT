@@ -736,6 +736,18 @@ static inline void gnrc_rpl_config_pio(gnrc_rpl_dodag_t *dodag, bool status)
     }
 }
 
+#if IS_USED(MODULE_GNRC_RPL) || DOXYGEN
+/**
+ * @brief Convenience function to start a RPL root using the default configuration.
+ *
+ * @param[in] netif             Network interface to use as RPL root
+ * @param[in] dodag_id          Id of the DODAG
+ */
+void gnrc_rpl_configure_root(gnrc_netif_t *netif, const ipv6_addr_t *dodag_id);
+#else
+#define gnrc_rpl_configure_root(netif, dodag_id)  ((void)netif)
+#endif
+
 #ifdef __cplusplus
 }
 #endif
