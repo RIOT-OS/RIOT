@@ -36,7 +36,7 @@ static mutex_t _mutex = MUTEX_INIT_LOCKED;
 
 static uint32_t _times[N];
 static int _count;
-#define CLOCKS { ZTIMER_MSEC, ZTIMER_USEC }
+#define ZTIMER_CLOCKS { ZTIMER_MSEC, ZTIMER_USEC }
 static const char *_names[] = { "ZTIMER_MSEC", "ZTIMER_USEC" };
 static uint32_t _intervals[] = { 100, 10000 };
 static uint32_t _max_offsets[] = { 2, 100 };
@@ -64,7 +64,7 @@ static int callback(void *arg)
 int main(void)
 {
     ztimer_periodic_t t;
-    ztimer_clock_t * const clocks[] = CLOCKS;
+    ztimer_clock_t * const clocks[] = ZTIMER_CLOCKS;
     int failed = 0;
 
     for (size_t j = 0; j < ARRAY_SIZE(clocks); j++) {
