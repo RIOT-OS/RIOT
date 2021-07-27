@@ -416,7 +416,8 @@ static inline volatile uint32_t * gpio_pad_register(uint8_t pin)
  */
 static inline void gpio_set_pad_config(uint8_t pin, gpio_pad_ctrl_t config)
 {
-    *(volatile gpio_pad_ctrl_t*)gpio_pad_register(pin) = config;
+    uint32_t *c = (uint32_t *)&config;
+    *gpio_pad_register(pin) = *c;
 }
 
 /**
@@ -433,7 +434,8 @@ static inline volatile uint32_t * gpio_io_register(uint8_t pin)
  */
 static inline void gpio_set_io_config(uint8_t pin, gpio_io_ctrl_t config)
 {
-    *(volatile gpio_io_ctrl_t*)gpio_io_register(pin) = config;
+    uint32_t *c = (uint32_t *)&config;
+    *gpio_io_register(pin) = *c;
 }
 
 /**
