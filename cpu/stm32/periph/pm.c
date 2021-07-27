@@ -84,6 +84,26 @@
 #endif
 #endif
 
+#ifndef PM_SHUTDOWN_CONFIG
+/**
+ * @brief Define config flags for shutdown mode
+ *
+ * Available values can be found in reference manual, PWR section, register CR.
+ */
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32G4)
+#define PM_SHUTDOWN_CONFIG (PWR_CR1_LPMS_SHUTDOWN)
+#endif
+#endif
+
+/**
+ * @brief Define config mask for clearing any set power config flags.
+ */
+#if PM_NUM_MODES == 3
+#define PM_CONFIG_MASK (PM_STOP_CONFIG | PM_STANDBY_CONFIG | PM_SHUTDOWN_CONFIG)
+#else
+#define PM_CONFIG_MASK (PM_STOP_CONFIG | PM_STANDBY_CONFIG)
+#endif
+
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WL)
@@ -112,7 +132,7 @@ void pm_set(unsigned mode)
     switch (mode) {
 #if !defined(CPU_FAM_STM32MP1)
         case STM32_PM_STANDBY:
-            PWR_CR_REG &= ~(PM_STOP_CONFIG | PM_STANDBY_CONFIG);
+            PWR_CR_REG &= ~PM_CONFIG_MASK;
             PWR_CR_REG |= PM_STANDBY_CONFIG;
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5) || \
@@ -135,11 +155,19 @@ void pm_set(unsigned mode)
             break;
 #endif
         case STM32_PM_STOP:
-            PWR_CR_REG &= ~(PM_STOP_CONFIG | PM_STANDBY_CONFIG);
+            PWR_CR_REG &= ~PM_CONFIG_MASK;
             PWR_CR_REG |= PM_STOP_CONFIG;
             /* Set SLEEPDEEP bit of system control block */
             deep = 1;
             break;
+#ifdef STM32_PM_SHUTDOWN
+        case STM32_PM_SHUTDOWN:
+            PWR_CR_REG &= ~PM_CONFIG_MASK;
+            PWR_CR_REG |= PM_SHUTDOWN_CONFIG;
+            /* Set SLEEPDEEP bit of system control block */
+            deep = 1;
+            break;
+#endif
         default:
             deep = 0;
             break;
