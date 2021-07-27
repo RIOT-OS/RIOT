@@ -32,6 +32,9 @@ extern "C" {
  */
 #define STM32_BOOTLOADER_ADDR   (0x1FFF0000)
 
+#define PM_NUM_MODES          (3U)
+#define STM32_PM_SHUTDOWN     (2U)
+
 #endif /* ndef DOXYGEN */
 
 #ifdef __cplusplus

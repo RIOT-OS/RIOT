@@ -128,10 +128,12 @@ extern "C" {
  * @name    PM definitions
  * @{
  */
+#ifndef PM_NUM_MODES
 /**
  * @brief   Number of usable low power modes
  */
 #define PM_NUM_MODES    (2U)
+#endif
 
 /**
  * @name    Power modes

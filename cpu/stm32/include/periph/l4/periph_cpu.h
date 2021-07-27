@@ -63,6 +63,10 @@ typedef enum {
     ADC_RES_16BIT = (0x2)             /**< not applicable */
 } adc_res_t;
 /** @} */
+
+#define PM_NUM_MODES          (3U)
+#define STM32_PM_SHUTDOWN     (2U)
+
 #endif /* ndef DOXYGEN */
 
 #ifdef __cplusplus
