@@ -333,6 +333,11 @@ config HAS_PERIPH_UART_RECONFIGURE
     help
         Indicates that the UART pins can be re-configured as GPIOs.
 
+config HAS_PERIPH_UART_RXSTART_IRQ
+    bool
+    help
+        Indicates that the UART has an Interrupt for Start Condition detected.
+
 config HAS_PERIPH_USBDEV
     bool
     help

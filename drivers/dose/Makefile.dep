@@ -1,5 +1,6 @@
 FEATURES_REQUIRED += periph_gpio_irq
 FEATURES_REQUIRED += periph_uart
+FEATURES_OPTIONAL += periph_uart_rxstart_irq
 
 USEMODULE += eui_provider
 USEMODULE += iolist

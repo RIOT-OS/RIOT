@@ -40,9 +40,14 @@ extern "C" {
 #endif
 
 #ifndef DOSE_PARAMS
+#ifdef MODULE_PERIPH_UART_RXSTART_IRQ
+#define DOSE_PARAMS             { .uart = DOSE_PARAM_UART,         \
+                                  .baudrate = DOSE_PARAM_BAUDRATE }
+#else
 #define DOSE_PARAMS             { .uart = DOSE_PARAM_UART,         \
                                   .baudrate = DOSE_PARAM_BAUDRATE, \
                                   .sense_pin = DOSE_PARAM_SENSE_PIN }
+#endif
 #endif
 /**@}*/
 

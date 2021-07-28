@@ -100,12 +100,23 @@ typedef unsigned int uart_t;
 typedef void(*uart_rx_cb_t)(void *arg, uint8_t data);
 
 /**
+ * @brief   Signature for receive start condition interrupt callback
+ *
+ * @param[in] arg           context to the callback (optional)
+ */
+typedef void(*uart_rxstart_cb_t)(void *arg);
+
+/**
  * @brief   Interrupt context for a UART device
  */
 #ifndef HAVE_UART_ISR_CTX_T
 typedef struct {
     uart_rx_cb_t rx_cb;     /**< data received interrupt callback */
-    void *arg;              /**< argument to both callback routines */
+    void *arg;              /**< argument to data received callback */
+#ifdef MODULE_PERIPH_UART_RXSTART_IRQ
+    uart_rxstart_cb_t rxs_cb;   /**< start condition received interrupt callback */
+    void *rxs_arg;          /**< argument to start condition received callback */
+#endif
 } uart_isr_ctx_t;
 #endif
 
@@ -245,6 +256,45 @@ gpio_t uart_pin_tx(uart_t uart);
 
 #endif /* DOXYGEN */
 #endif /* MODULE_PERIPH_UART_RECONFIGURE */
+
+#if defined(MODULE_PERIPH_UART_RXSTART_IRQ) || DOXYGEN
+
+/**
+ * @brief   Configure the function that will be called when a start condition
+ *          is detected.
+ *
+ *          This will not enable / disable the generation of the RX start
+ *          interrupt.
+ *
+ * @note    You have to add the module `periph_uart_rxstart_irq` to your project
+ *          to enable this function
+ *
+ * @param[in] uart      The device to configure
+ * @param[in] cb        The function called when a start condition is detected
+ * @param[in] arg       Optional function argument
+ */
+void uart_rxstart_irq_configure(uart_t uart, uart_rxstart_cb_t cb, void *arg);
+
+/**
+ * @brief   Enable the RX start interrupt.
+ *
+ * @note    You have to add the module `periph_uart_rxstart_irq` to your project
+ *          to enable this function
+ *
+ * @param[in] uart      The device to configure
+ */
+void uart_rxstart_irq_enable(uart_t uart);
+
+/**
+ * @brief   Disable the RX start interrupt.
+ *
+ * @note    You have to add the module `periph_uart_rxstart_irq` to your project
+ *          to enable this function
+ *
+ * @param[in] uart      The device to configure
+ */
+void uart_rxstart_irq_disable(uart_t uart);
+#endif /* MODULE_PERIPH_UART_RXSTART_IRQ */
 
 /**
  * @brief   Setup parity, data and stop bits for a given UART device

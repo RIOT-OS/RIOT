@@ -10,4 +10,5 @@ config APPLICATION
     default y
     imply MODULE_PERIPH_UART_MODECFG
     imply MODULE_PERIPH_LPUART
+    imply MODULE_PERIPH_UART_RXSTART_IRQ
     depends on TEST_KCONFIG

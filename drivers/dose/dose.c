@@ -60,6 +60,42 @@ static uint16_t crc16_update(uint16_t crc, uint8_t octet)
     return crc;
 }
 
+static void _init_sense(dose_t *ctx, const dose_params_t *params)
+{
+#ifdef MODULE_PERIPH_UART_RXSTART_IRQ
+    (void)params;
+    uart_rxstart_irq_configure(ctx->uart, _isr_gpio, ctx);
+#else
+    ctx->sense_pin = params->sense_pin;
+    if (gpio_is_valid(ctx->sense_pin)) {
+        gpio_init_int(ctx->sense_pin, GPIO_IN, GPIO_FALLING, _isr_gpio, ctx);
+        gpio_irq_disable(ctx->sense_pin);
+    }
+#endif
+}
+
+static inline void _enable_sense(dose_t *ctx)
+{
+#ifdef MODULE_PERIPH_UART_RXSTART_IRQ
+    uart_rxstart_irq_enable(ctx->uart);
+#else
+    if (gpio_is_valid(ctx->sense_pin)) {
+        gpio_irq_enable(ctx->sense_pin);
+    }
+#endif
+}
+
+static inline void _disable_sense(dose_t *ctx)
+{
+#ifdef MODULE_PERIPH_UART_RXSTART_IRQ
+    uart_rxstart_irq_disable(ctx->uart);
+#else
+    if (gpio_is_valid(ctx->sense_pin)) {
+        gpio_irq_disable(ctx->sense_pin);
+    }
+#endif
+}
+
 static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal)
 {
     uint32_t backoff;
@@ -73,10 +109,8 @@ static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal)
         netdev_trigger_event_isr(&ctx->netdev);
     }
 
-    if (gpio_is_valid(ctx->sense_pin)) {
-        /* Enable GPIO interrupt for start bit sensing */
-        gpio_irq_enable(ctx->sense_pin);
-    }
+    /* Enable interrupt for start bit sensing */
+    _enable_sense(ctx);
 
     /* The timeout will bring us back into IDLE state by a random time.
      * If we entered this state from RECV state, the random time lays
@@ -107,10 +141,10 @@ static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal)
 {
     dose_signal_t rc = DOSE_SIGNAL_NONE;
 
-    if (ctx->state != DOSE_STATE_RECV && gpio_is_valid(ctx->sense_pin)) {
+    if (ctx->state != DOSE_STATE_RECV) {
         /* We freshly entered this state. Thus, no start bit sensing is required
-         * anymore. Disable GPIO IRQs during the transmission. */
-        gpio_irq_disable(ctx->sense_pin);
+         * anymore. Disable RX Start IRQs during the transmission. */
+        _disable_sense(ctx);
     }
 
     if (signal == DOSE_SIGNAL_UART) {
@@ -149,9 +183,9 @@ static dose_signal_t state_transit_send(dose_t *ctx, dose_signal_t signal)
 {
     (void) signal;
 
-    if (ctx->state != DOSE_STATE_SEND && gpio_is_valid(ctx->sense_pin)) {
-        /* Disable GPIO IRQs during the transmission. */
-        gpio_irq_disable(ctx->sense_pin);
+    if (ctx->state != DOSE_STATE_SEND) {
+        /* Disable RX Start IRQs during the transmission. */
+        _disable_sense(ctx);
     }
 
     /* Don't trace any END octets ... the timeout or the END signal
@@ -550,11 +584,7 @@ void dose_setup(dose_t *ctx, const dose_params_t *params, uint8_t index)
     ctx->uart = params->uart;
     uart_init(ctx->uart, params->baudrate, _isr_uart, (void *) ctx);
 
-    ctx->sense_pin = params->sense_pin;
-    if (gpio_is_valid(ctx->sense_pin)) {
-        gpio_init_int(ctx->sense_pin, GPIO_IN, GPIO_FALLING, _isr_gpio, (void *) ctx);
-        gpio_irq_disable(ctx->sense_pin);
-    }
+    _init_sense(ctx, params);
 
     netdev_register(&ctx->netdev, NETDEV_DOSE, index);
 

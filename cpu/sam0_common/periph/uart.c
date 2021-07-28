@@ -356,7 +356,38 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 
     return UART_OK;
 }
-#endif
+#endif /* MODULE_PERIPH_UART_MODECFG */
+
+#ifdef MODULE_PERIPH_UART_RXSTART_IRQ
+void uart_rxstart_irq_configure(uart_t uart, uart_rxstart_cb_t cb, void *arg)
+{
+    /* CTRLB is enable-proteced */
+    dev(uart)->CTRLA.bit.ENABLE = 0;
+
+    /* set start of frame detection enable */
+    dev(uart)->CTRLB.reg |= SERCOM_USART_CTRLB_SFDE;
+
+    uart_ctx[uart].rxs_cb  = cb;
+    uart_ctx[uart].rxs_arg = arg;
+
+    /* enable UART again */
+    dev(uart)->CTRLA.bit.ENABLE = 1;
+}
+
+void uart_rxstart_irq_enable(uart_t uart)
+{
+    /* clear stale interrupt flag */
+    dev(uart)->INTFLAG.reg  = SERCOM_USART_INTFLAG_RXS;
+
+    /* enable interrupt */
+    dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_RXS;
+}
+
+void uart_rxstart_irq_disable(uart_t uart)
+{
+    dev(uart)->INTENCLR.reg = SERCOM_USART_INTENCLR_RXS;
+}
+#endif /* MODULE_PERIPH_UART_RXSTART_IRQ */
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
 static inline void irq_handler_tx(unsigned uartnum)
@@ -377,10 +408,18 @@ static inline void irq_handler_tx(unsigned uartnum)
 static inline void irq_handler(unsigned uartnum)
 {
     uint32_t status = dev(uartnum)->INTFLAG.reg;
+    /* TXC is used by uart_write() */
+    dev(uartnum)->INTFLAG.reg = status & ~SERCOM_USART_INTFLAG_TXC;
 
 #if !defined(UART_HAS_TX_ISR) && defined(MODULE_PERIPH_UART_NONBLOCKING)
     if ((status & SERCOM_USART_INTFLAG_DRE) && dev(uartnum)->INTENSET.bit.DRE) {
         irq_handler_tx(uartnum);
+    }
+#endif
+
+#ifdef MODULE_PERIPH_UART_RXSTART_IRQ
+    if (status & SERCOM_USART_INTFLAG_RXS && dev(uartnum)->INTENSET.bit.RXS) {
+        uart_ctx[uartnum].rxs_cb(uart_ctx[uartnum].rxs_arg);
     }
 #endif
 
@@ -389,12 +428,6 @@ static inline void irq_handler(unsigned uartnum)
         uart_ctx[uartnum].rx_cb(uart_ctx[uartnum].arg,
                                 (uint8_t)(dev(uartnum)->DATA.reg));
     }
-#ifdef SERCOM_USART_INTFLAG_ERROR
-    else if (status & SERCOM_USART_INTFLAG_ERROR) {
-        /* clear error flag */
-        dev(uartnum)->INTFLAG.reg = SERCOM_USART_INTFLAG_ERROR;
-    }
-#endif
 
     cortexm_isr_end();
 }
