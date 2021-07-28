@@ -705,12 +705,52 @@ typedef int (*gcoap_request_matcher_t)(gcoap_listener_t *listener,
                                        coap_pkt_t *pdu);
 
 /**
+ * @brief   CoAP socket types
+ *
+ * May be used as flags for @ref gcoap_listener_t, but must be used numerically
+ * with @ref gcoap_req_send_tl().
+ */
+typedef enum {
+    GCOAP_SOCKET_TYPE_UNDEF = 0x0,      /**< undefined */
+    GCOAP_SOCKET_TYPE_UDP = 0x1,        /**< Unencrypted UDP transport */
+    GCOAP_SOCKET_TYPE_DTLS = 0x2,       /**< DTLS-over-UDP transport */
+} gcoap_socket_type_t;
+
+/**
+ * @brief   CoAP socket to handle multiple transport types
+ */
+typedef struct {
+    gcoap_socket_type_t type;                /**< Type of stored socket */
+    union {
+        sock_udp_t *udp;
+#if IS_USED(MODULE_GCOAP_DTLS) || defined(DOXYGEN)
+        sock_dtls_t *dtls;
+#endif
+    } socket;                               /**< Stored socket */
+#if IS_USED(MODULE_GCOAP_DTLS) || defined(DOXYGEN)
+    sock_dtls_session_t ctx_dtls_session;   /**< Session object for the stored socket.
+                                                 Used for exchanging a session between
+                                                 functions. */
+#endif
+} gcoap_socket_t;
+
+/**
  * @brief   A modular collection of resources for a server
  */
 struct gcoap_listener {
     const coap_resource_t *resources;   /**< First element in the array of
                                          *   resources; must order alphabetically */
     size_t resources_len;               /**< Length of array */
+    /**
+     * @brief   Transport type for the listener
+     *
+     * Any transport supported by the implementation can be set as a flag.
+     * If @ref GCOAP_SOCKET_TYPE_UNDEF is set, the listener listens on all
+     * supported transports. If non of the transports beyond UDP are compiled in
+     * (i.e. no usage of modules `gcoap_dtls`, ...) this will be ignored and
+     * @ref GCOAP_SOCKET_TYPE_UDP assumed.
+     */
+    gcoap_socket_type_t tl_type;
     gcoap_link_encoder_t link_encoder;  /**< Writes a link for a resource */
     struct gcoap_listener *next;        /**< Next listener in list */
 
@@ -749,33 +789,6 @@ typedef struct {
     uint8_t *pdu_buf;                   /**< Buffer containing the PDU */
     size_t pdu_len;                     /**< Length of pdu_buf */
 } gcoap_resend_t;
-
-/**
- * @brief   Coap socket types
- */
-typedef enum {
-    GCOAP_SOCKET_TYPE_UNDEF = 0,
-    GCOAP_SOCKET_TYPE_UDP,
-    GCOAP_SOCKET_TYPE_DTLS
-} gcoap_socket_type_t;
-
-/**
- * @brief   Coap socket to handle multiple transport types
- */
-typedef struct {
-    gcoap_socket_type_t type;                /**< Type of stored socket */
-    union {
-        sock_udp_t *udp;
-#if IS_USED(MODULE_GCOAP_DTLS) || defined(DOXYGEN)
-        sock_dtls_t *dtls;
-#endif
-    } socket;                               /**< Stored socket */
-#if IS_USED(MODULE_GCOAP_DTLS) || defined(DOXYGEN)
-    sock_dtls_session_t ctx_dtls_session;   /**< Session object for the stored socket.
-                                                 Used for exchanging a session between
-                                                 functions. */
-#endif
-} gcoap_socket_t;
 
 /**
  * @brief   Memo to handle a response for a request
@@ -918,8 +931,9 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  * @param[in] resp_handler  Callback when response received, may be NULL
  * @param[in] context       User defined context passed to the response handler
  * @param[in] tl_type       The transport type to use for send. When
- *                          GCOAP_SOCKET_TYPE_UNDEF is selected, the highest
- *                          available (by value) will be selected.
+ *                          @ref GCOAP_SOCKET_TYPE_UNDEF is selected, the highest
+ *                          available (by value) will be selected. Only single
+ *                          types are allowed, not a combination of them.
  *
  * @return  length of the packet
  * @return -ENOTCONN, if DTLS was used and session establishment failed
@@ -940,7 +954,7 @@ ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
  * @param[in] resp_handler  Callback when response received, may be NULL
  * @param[in] context       User defined context passed to the response handler
  *
- * @note The highest supported (by value) coap_socket_type_t will be selected
+ * @note The highest supported (by value) gcoap_socket_type_t will be selected
  *       as transport type.
  *
  * @return  length of the packet
@@ -1037,6 +1051,35 @@ uint8_t gcoap_op_state(void);
  * @brief   Get the resource list, currently only `CoRE Link Format`
  *          (COAP_FORMAT_LINK) supported
  *
+ * @deprecated Will be an alias for @ref gcoap_get_resource_list after the
+ *             2022.01 release. Will be removed after the 2022.04 release.
+ *
+ * If @p buf := NULL, nothing will be written but the size of the resulting
+ * resource list is computed and returned.
+ *
+ * @param[out] buf      output buffer to write resource list into, my be NULL
+ * @param[in]  maxlen   length of @p buf, ignored if @p buf is NULL
+ * @param[in]  cf       content format to use for the resource list, currently
+ *                      only COAP_FORMAT_LINK supported
+ * @param[in]  tl_type  Transport type to get the list for.
+ *                      @ref GCOAP_SOCKET_TYPE_UNDEF for all transport types.
+ *                      If non of the transports beyond UDP are compiled in
+ *                      (i.e. usage of modules no `gcoap_dtls`, ...) this will
+ *                      be ignored and @ref GCOAP_SOCKET_TYPE_UDP assumed.
+ *
+ * @todo    add support for `JSON CoRE Link Format`
+ * @todo    add support for 'CBOR CoRE Link Format`
+ *
+ * @return  the number of bytes written to @p buf
+ * @return  -1 on error
+ */
+int gcoap_get_resource_list_tl(void *buf, size_t maxlen, uint8_t cf,
+                               gcoap_socket_type_t tl_type);
+
+/**
+ * @brief   Get the resource list for all transports,
+ *          currently only `CoRE Link Format` (COAP_FORMAT_LINK) supported
+ *
  * If @p buf := NULL, nothing will be written but the size of the resulting
  * resource list is computed and returned.
  *
@@ -1051,7 +1094,10 @@ uint8_t gcoap_op_state(void);
  * @return  the number of bytes written to @p buf
  * @return  -1 on error
  */
-int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf);
+static inline int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
+{
+    return gcoap_get_resource_list_tl(buf, maxlen, cf, GCOAP_SOCKET_TYPE_UNDEF);
+}
 
 /**
  * @brief   Writes a resource in CoRE Link Format to a provided buffer.

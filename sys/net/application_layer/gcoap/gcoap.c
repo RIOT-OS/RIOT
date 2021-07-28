@@ -66,7 +66,8 @@ static size_t _handle_req(gcoap_socket_t *sock, coap_pkt_t *pdu, uint8_t *buf,
 static void _expire_request(gcoap_request_memo_t *memo);
 static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *pdu,
                            const sock_udp_ep_t *remote, bool by_mid);
-static int _find_resource(coap_pkt_t *pdu,
+static int _find_resource(gcoap_socket_type_t tl_type,
+                          coap_pkt_t *pdu,
                           const coap_resource_t **resource_ptr,
                           gcoap_listener_t **listener_ptr);
 static int _find_observer(sock_udp_ep_t **observer, sock_udp_ep_t *remote);
@@ -92,6 +93,7 @@ const coap_resource_t _default_resources[] = {
 static gcoap_listener_t _default_listener = {
     &_default_resources[0],
     ARRAY_SIZE(_default_resources),
+    GCOAP_SOCKET_TYPE_UNDEF,
     NULL,
     NULL,
     _request_matcher_default
@@ -130,7 +132,7 @@ static sock_udp_t _sock_udp;
 #if IS_USED(MODULE_GCOAP_DTLS)
 /* DTLS variables and definitions */
 #define SOCK_DTLS_CLIENT_TAG (2)
-
+static sock_udp_t _sock_dtls_base;
 static sock_dtls_t _sock_dtls;
 static kernel_pid_t _auth_waiting_thread;
 
@@ -147,11 +149,7 @@ static void *_event_loop(void *arg)
     memset(&local, 0, sizeof(sock_udp_ep_t));
     local.family = AF_INET6;
     local.netif  = SOCK_ADDR_ANY_NETIF;
-    if (IS_USED(MODULE_GCOAP_DTLS)) {
-        local.port = CONFIG_GCOAPS_PORT;
-    } else {
-        local.port = CONFIG_GCOAP_PORT;
-    }
+    local.port = CONFIG_GCOAP_PORT;
     int res = sock_udp_create(&_sock_udp, &local, NULL, 0);
     if (res < 0) {
         DEBUG("gcoap: cannot create sock: %d\n", res);
@@ -159,20 +157,25 @@ static void *_event_loop(void *arg)
     }
 
     event_queue_init(&_queue);
+    sock_udp_event_init(&_sock_udp, &_queue, _on_sock_udp_evt, NULL);
+
     if (IS_USED(MODULE_GCOAP_DTLS)) {
 #if IS_USED(MODULE_GCOAP_DTLS)
-        if (sock_dtls_create(&_sock_dtls, &_sock_udp,
+        local.port = CONFIG_GCOAPS_PORT;
+        if (sock_udp_create(&_sock_dtls_base, &local, NULL, 0)) {
+            DEBUG("gcoap: error creating DTLS transport sock\n");
+            return 0;
+        }
+        if (sock_dtls_create(&_sock_dtls, &_sock_dtls_base,
                             CREDMAN_TAG_EMPTY,
                             SOCK_DTLS_1_2, SOCK_DTLS_SERVER) < 0) {
-            DEBUG("gcoap: error creating DTLS sock");
-            sock_udp_close(&_sock_udp);
+            DEBUG("gcoap: error creating DTLS sock\n");
+            sock_udp_close(&_sock_dtls_base);
             return 0;
         }
         sock_dtls_event_init(&_sock_dtls, &_queue, _on_sock_dtls_evt,
                             NULL);
 #endif
-    } else {
-        sock_udp_event_init(&_sock_udp, &_queue, _on_sock_udp_evt, NULL);
     }
 
     event_loop(&_queue);
@@ -537,7 +540,7 @@ static size_t _handle_req(gcoap_socket_t *sock, coap_pkt_t *pdu, uint8_t *buf,
     gcoap_observe_memo_t *memo          = NULL;
     gcoap_observe_memo_t *resource_memo = NULL;
 
-    switch (_find_resource(pdu, &resource, &listener)) {
+    switch (_find_resource(sock->type, pdu, &resource, &listener)) {
         case GCOAP_RESOURCE_WRONG_METHOD:
             return gcoap_response(pdu, buf, len, COAP_CODE_METHOD_NOT_ALLOWED);
         case GCOAP_RESOURCE_NO_PATH:
@@ -631,6 +634,7 @@ static size_t _handle_req(gcoap_socket_t *sock, coap_pkt_t *pdu, uint8_t *buf,
         return -1;
     }
 
+    pdu->tl_type = (uint32_t)sock->type;
     ssize_t pdu_len = resource->handler(pdu, buf, len, resource->context);
     if (pdu_len < 0) {
         pdu_len = gcoap_response(pdu, buf, len,
@@ -689,6 +693,7 @@ static int _request_matcher_default(gcoap_listener_t *listener,
 /*
  * Searches listener registrations for the resource matching the path in a PDU.
  *
+ * param[in]  tl_type -- transport the request for the resource came over.
  * param[in]  pdu -- the PDU to check the resource for
  * param[out] resource_ptr -- found resource
  * param[out] listener_ptr -- listener for found resource
@@ -697,7 +702,8 @@ static int _request_matcher_default(gcoap_listener_t *listener,
  *        code didn't match and `GCOAP_RESOURCE_NO_PATH` if no matching
  *        resource was found.
  */
-static int _find_resource(coap_pkt_t *pdu,
+static int _find_resource(gcoap_socket_type_t tl_type,
+                          coap_pkt_t *pdu,
                           const coap_resource_t **resource_ptr,
                           gcoap_listener_t **listener_ptr)
 {
@@ -708,8 +714,17 @@ static int _find_resource(coap_pkt_t *pdu,
 
     while (listener) {
         const coap_resource_t *resource;
-        int res = listener->request_matcher(listener, &resource, pdu);
+        int res;
 
+        /* only makes sense to check if non-UDP transports are supported,
+         * so check if module is used first. */
+        if (IS_USED(MODULE_GCOAP_DTLS) &&
+            (listener->tl_type != GCOAP_SOCKET_TYPE_UNDEF) &&
+            !(listener->tl_type & tl_type)) {
+            listener = listener->next;
+            continue;
+        }
+        res = listener->request_matcher(listener, &resource, pdu);
         /* check next resource on mismatch */
         if (res == GCOAP_RESOURCE_NO_PATH) {
             listener = listener->next;
@@ -826,8 +841,9 @@ static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t le
     coap_opt_add_format(pdu, COAP_FORMAT_LINK);
     ssize_t plen = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
 
-    plen += gcoap_get_resource_list(pdu->payload, (size_t)pdu->payload_len,
-                                    COAP_FORMAT_LINK);
+    plen += gcoap_get_resource_list_tl(pdu->payload, (size_t)pdu->payload_len,
+                                       COAP_FORMAT_LINK,
+                                       (gcoap_socket_type_t)pdu->tl_type);
     return plen;
 }
 
@@ -1332,7 +1348,8 @@ uint8_t gcoap_op_state(void)
     return count;
 }
 
-int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
+int gcoap_get_resource_list_tl(void *buf, size_t maxlen, uint8_t cf,
+                               gcoap_socket_type_t tl_type)
 {
     assert(cf == COAP_FORMAT_LINK);
 
@@ -1349,6 +1366,15 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
     /* write payload */
     for (; listener != NULL; listener = listener->next) {
         if (!listener->link_encoder) {
+            continue;
+        }
+        /* only makes sense to check if non-UDP transports are supported,
+         * so check if module is used first. */
+        if (IS_USED(MODULE_GCOAP_DTLS) &&
+            (tl_type != GCOAP_SOCKET_TYPE_UNDEF) &&
+            (listener->tl_type != GCOAP_SOCKET_TYPE_UNDEF) &&
+            ((listener->tl_type & GCOAP_SOCKET_TYPE_UDP) != (tl_type & GCOAP_SOCKET_TYPE_UDP)) &&
+            ((listener->tl_type & GCOAP_SOCKET_TYPE_DTLS) != (tl_type & GCOAP_SOCKET_TYPE_DTLS))) {
             continue;
         }
         ctx.link_pos = 0;
