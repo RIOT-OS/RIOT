@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     drivers_periph_rtc
+ * @ingroup     drivers_rtt_rtc
  * @{
  *
  * @file
@@ -26,9 +26,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "irq.h"
 #include "periph/rtc.h"
 #include "periph/rtt.h"
 #include "timex.h"
+#include "rtt_rtc.h"
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
@@ -137,31 +139,31 @@ int rtc_set_time(struct tm *time)
 
 int rtc_get_time_ms(struct tm *time, uint16_t *ms)
 {
-    uint32_t prev = rtc_now;
+    uint32_t now, tmp;
+    unsigned state = irq_disable();
 
-    /* repeat calculation if an alarm triggered in between */
-    do {
-        uint32_t now = rtt_get_counter();
-        uint32_t tmp = _rtc_now(now);
+    now  = rtt_get_counter();
+    tmp  = _rtc_now(now);
 
-        rtc_localtime(tmp, time);
-        *ms = (SUBSECONDS(now) * MS_PER_SEC) / RTT_SECOND;
-    } while (prev != rtc_now);
+    *ms = (SUBSECONDS(now - last_alarm) * MS_PER_SEC)
+        / RTT_SECOND;
+
+    irq_restore(state);
+    rtc_localtime(tmp, time);
 
     return 0;
 }
 
 int rtc_get_time(struct tm *time)
 {
-    uint32_t prev = rtc_now;
+    uint32_t now, tmp;
+    unsigned state = irq_disable();
 
-    /* repeat calculation if an alarm triggered in between */
-    do {
-        uint32_t now = rtt_get_counter();
-        uint32_t tmp = _rtc_now(now);
+    now  = rtt_get_counter();
+    tmp  = _rtc_now(now);
 
-        rtc_localtime(tmp, time);
-    } while (prev != rtc_now);
+    irq_restore(state);
+    rtc_localtime(tmp, time);
 
     return 0;
 }
@@ -184,6 +186,7 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     alarm_cb_arg = arg;
     alarm_cb     = cb;
 
+    /* RTT interrupt is disabled here */
     rtc_now      = _rtc_now(now);
     _update_alarm(now);
 
@@ -203,4 +206,28 @@ void rtc_poweron(void)
 void rtc_poweroff(void)
 {
     rtt_poweroff();
+}
+
+void rtt_rtc_settimeofday(uint32_t s, uint32_t us)
+{
+    /* disable alarm to prevent race condition */
+    rtt_clear_alarm();
+    uint32_t now = ((uint64_t)us * RTT_SECOND) / US_PER_SEC;
+    rtc_now      = s;
+    rtt_set_counter(now);
+    /* calculate next wake-up period */
+    _update_alarm(0);
+}
+
+void rtt_rtc_gettimeofday(uint32_t *s, uint32_t *us)
+{
+    uint32_t now;
+    unsigned state = irq_disable();
+
+    now  = rtt_get_counter();
+    *s   = _rtc_now(now);
+    *us  = ((uint64_t)SUBSECONDS(now - last_alarm) * US_PER_SEC)
+         / RTT_SECOND;
+
+    irq_restore(state);
 }
