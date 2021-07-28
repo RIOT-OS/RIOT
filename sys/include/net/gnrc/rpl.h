@@ -583,7 +583,7 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid);
  * @return  Pointer to the new RPL Instance, on success.
  * @return  NULL, otherwise.
  */
-gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_id,
+gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, const ipv6_addr_t *dodag_id,
                                         bool gen_inst_id, bool local_inst_id);
 
 /**
@@ -695,7 +695,7 @@ void gnrc_rpl_long_delay_dao(gnrc_rpl_dodag_t *dodag);
  * @return  Pointer to the new RPL instance, on success.
  * @return  NULL, otherwise.
  */
-gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_t *dodag_id,
+gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, const ipv6_addr_t *dodag_id,
                                                  uint8_t mop);
 
 /**

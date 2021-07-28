@@ -128,7 +128,7 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
     return gnrc_rpl_pid;
 }
 
-gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_id,
+gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, const ipv6_addr_t *dodag_id,
                                         bool gen_inst_id, bool local_inst_id)
 {
     if (gen_inst_id) {
