@@ -128,7 +128,7 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
     return gnrc_rpl_pid;
 }
 
-gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_id,
+gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, const ipv6_addr_t *dodag_id,
                                         bool gen_inst_id, bool local_inst_id)
 {
     if (gen_inst_id) {
@@ -417,6 +417,18 @@ uint8_t gnrc_rpl_gen_instance_id(bool local)
     instance_id = ((_instance_id++) & GNRC_RPL_GLOBAL_INSTANCE_MASK);
     mutex_unlock(&_inst_id_mutex);
     return instance_id;
+}
+
+void gnrc_rpl_configure_root(gnrc_netif_t *netif, const ipv6_addr_t *dodag_id)
+{
+    gnrc_rpl_init(netif->pid);
+    gnrc_rpl_instance_t *inst = gnrc_rpl_instance_get(
+            CONFIG_GNRC_RPL_DEFAULT_INSTANCE
+        );
+    if (inst) {
+        gnrc_rpl_instance_remove(inst);
+    }
+    gnrc_rpl_root_init(CONFIG_GNRC_RPL_DEFAULT_INSTANCE, dodag_id, false, false);
 }
 
 /**

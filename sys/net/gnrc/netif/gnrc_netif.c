@@ -32,6 +32,7 @@
 #if IS_USED(MODULE_GNRC_NETIF_PKTQ)
 #include "net/gnrc/netif/pktq.h"
 #endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
+#include "net/gnrc/sixlowpan/ctx.h"
 #if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
 #include "net/gnrc/sixlowpan/frag/sfr.h"
 #endif /* IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
@@ -1234,6 +1235,68 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
                                                   sizeof(addr_str)));
         return &netif->ipv6.addrs[idx];
     }
+}
+
+int gnrc_netif_ipv6_add_prefix(gnrc_netif_t *netif,
+                               const ipv6_addr_t *pfx, uint8_t pfx_len,
+                               uint32_t valid, uint32_t pref)
+{
+    int res;
+    eui64_t iid;
+    ipv6_addr_t addr;
+
+    assert(netif != NULL);
+    DEBUG("gnrc_netif: (re-)configure prefix %s/%d\n",
+          ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)), pfx_len);
+    if (gnrc_netapi_get(netif->pid, NETOPT_IPV6_IID, 0, &iid,
+                        sizeof(eui64_t)) >= 0) {
+        ipv6_addr_set_aiid(&addr, iid.uint8);
+    }
+    else {
+        LOG_WARNING("gnrc_netif: cannot get IID of netif %u\n", netif->pid);
+        return -ENODEV;
+    }
+    ipv6_addr_init_prefix(&addr, pfx, pfx_len);
+
+    /* add address as valid */
+    res = gnrc_netif_ipv6_addr_add_internal(netif, &addr, pfx_len,
+                                           GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
+    if (res < 0) {
+        goto out;
+    }
+
+    /* update lifetime */
+    if (valid < UINT32_MAX) { /* UINT32_MAX means infinite lifetime */
+        /* the valid lifetime is given in seconds, but the NIB's timers work
+         * in microseconds, so we have to scale down to the smallest
+         * possible value (UINT32_MAX - 1). */
+        valid = (valid > (UINT32_MAX / MS_PER_SEC))
+              ? (UINT32_MAX - 1) : valid * MS_PER_SEC;
+    }
+    if (pref < UINT32_MAX) { /* UINT32_MAX means infinite lifetime */
+        /* same treatment for pref */
+        pref = (pref > (UINT32_MAX / MS_PER_SEC))
+             ? (UINT32_MAX - 1) : pref * MS_PER_SEC;
+    }
+    gnrc_ipv6_nib_pl_set(netif->pid, pfx, pfx_len, valid, pref);
+
+    /* configure 6LoWPAN specific options */
+    if (IS_USED(MODULE_GNRC_IPV6_NIB) &&
+        IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) &&
+        IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C) &&
+        gnrc_netif_is_6ln(netif)) {
+
+        /* configure compression context */
+        if (gnrc_sixlowpan_ctx_update_6ctx(pfx, pfx_len, valid)) {
+            DEBUG("gnrc_netif: add compression context for prefix %s/%u\n",
+                   ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)), pfx_len);
+        }
+
+        (void)gnrc_ipv6_nib_abr_add(&addr);
+    }
+
+out:
+    return res;
 }
 #endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
 

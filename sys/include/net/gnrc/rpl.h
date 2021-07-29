@@ -583,7 +583,7 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid);
  * @return  Pointer to the new RPL Instance, on success.
  * @return  NULL, otherwise.
  */
-gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_id,
+gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, const ipv6_addr_t *dodag_id,
                                         bool gen_inst_id, bool local_inst_id);
 
 /**
@@ -695,7 +695,7 @@ void gnrc_rpl_long_delay_dao(gnrc_rpl_dodag_t *dodag);
  * @return  Pointer to the new RPL instance, on success.
  * @return  NULL, otherwise.
  */
-gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_t *dodag_id,
+gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, const ipv6_addr_t *dodag_id,
                                                  uint8_t mop);
 
 /**
@@ -735,6 +735,18 @@ static inline void gnrc_rpl_config_pio(gnrc_rpl_dodag_t *dodag, bool status)
                           (status << GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO_SHIFT);
     }
 }
+
+#if IS_USED(MODULE_GNRC_RPL) || DOXYGEN
+/**
+ * @brief Convenience function to start a RPL root using the default configuration.
+ *
+ * @param[in] netif             Network interface to use as RPL root
+ * @param[in] dodag_id          Id of the DODAG
+ */
+void gnrc_rpl_configure_root(gnrc_netif_t *netif, const ipv6_addr_t *dodag_id);
+#else
+#define gnrc_rpl_configure_root(netif, dodag_id)  ((void)netif)
+#endif
 
 #ifdef __cplusplus
 }
