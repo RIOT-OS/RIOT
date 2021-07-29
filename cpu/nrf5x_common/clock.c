@@ -31,6 +31,15 @@
 #error "Clock init: CLOCK_LFCLK is not defined by your board!"
 #endif
 
+/* Add compatibility wrapper defines for nRF9160 */
+#ifdef NRF_CLOCK_S
+#define NRF_CLOCK NRF_CLOCK_S
+#endif
+
+#ifdef CLOCK_LFCLKSRC_SRC_LFRC
+#define CLOCK_LFCLKSRC_SRC_RC CLOCK_LFCLKSRC_SRC_LFRC
+#endif
+
 static unsigned _hfxo_requests = 0;
 
 void clock_init_hf(void)
@@ -89,6 +98,8 @@ void clock_start_lf(void)
     NRF_CLOCK->LFCLKSRC = (CLOCK_LFCLKSRC_SRC_Xtal);
 #elif (CLOCK_LFCLK == 2)
     NRF_CLOCK->LFCLKSRC = (CLOCK_LFCLKSRC_SRC_Synth);
+#elif (CLOCK_LFCLK == 3)
+    NRF_CLOCK->LFCLKSRC = (CLOCK_LFCLKSRC_SRC_LFXO);
 #else
 #error "LFCLK init: CLOCK_LFCLK has invalid value"
 #endif
