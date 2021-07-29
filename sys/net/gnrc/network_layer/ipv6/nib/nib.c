@@ -778,6 +778,12 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                 break;
         }
     }
+
+    /* we still don't have a default router */
+    if (dr == NULL) {
+        return;
+    }
+
     /* stop sending router solicitations
      * see https://tools.ietf.org/html/rfc4861#section-6.3.7 */
     evtimer_del(&_nib_evtimer, &netif->ipv6.search_rtr.event);
