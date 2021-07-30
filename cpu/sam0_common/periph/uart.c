@@ -38,7 +38,12 @@
 
 /* default to fractional baud rate calculation */
 #if !defined(CONFIG_SAM0_UART_BAUD_FRAC) && defined(SERCOM_USART_BAUD_FRAC_BAUD)
+/* SAML21 has no fractional baud rate on SERCOM5 */
+#if defined(CPU_SAML21)
+#define CONFIG_SAM0_UART_BAUD_FRAC  0
+#else
 #define CONFIG_SAM0_UART_BAUD_FRAC  1
+#endif
 #endif
 
 /* SAMD20 defines no generic macro */
