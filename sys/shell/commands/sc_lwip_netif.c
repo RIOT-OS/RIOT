@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include "lwip/netif.h"
 #include "lwip/netifapi.h"
+#include "lwip/prot/dhcp.h"
 #include "net/netdev.h"
 #include "net/netopt.h"
 
@@ -68,6 +69,19 @@ static void _netif_list(struct netif *netif) {
     ip_addr_debug_print(LWIP_DBG_ON, netif_ip_netmask4(netif));
     printf(" gw: ");
     ip_addr_debug_print(LWIP_DBG_ON, netif_ip_gw4(netif));
+    if (netif_is_flag_set(netif, NETIF_FLAG_ETHERNET)) {
+        printf(" dhcp: ");
+        if (dhcp_supplied_address(netif)) {
+            printf("bound");
+        } else {
+            struct dhcp *dhcp = netif_dhcp_data(netif);
+            if (dhcp && dhcp->state > DHCP_STATE_OFF) {
+                printf("active");
+            } else {
+                printf("off");
+            }
+        }
+    }
     printf("\n");
 #endif
 
