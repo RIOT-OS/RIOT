@@ -443,6 +443,6 @@ int lwm2m_set_objlink_by_path(lwm2m_client_data_t *client_data, const char *path
 {
 
     _objlink_t link = { .object_id = &object_id_in, .instance_id = &instance_id_in };
-    return _get_resource_data_by_path(client_data, path, path_len, LWM2M_TYPE_OBJECT_LINK, &link,
+    return _set_resource_data_by_path(client_data, path, path_len, LWM2M_TYPE_OBJECT_LINK, &link,
                                       sizeof(_objlink_t));
 }
