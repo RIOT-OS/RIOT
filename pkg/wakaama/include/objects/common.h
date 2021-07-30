@@ -48,10 +48,10 @@ static inline lwm2m_object_t *lwm2m_get_object_by_id(lwm2m_client_data_t *client
  *
  * @pre `(client_data != NULL) && (uri != NULL) && (out != NULL)`
  *
- * @param[in]  client_data       Pointer to the LwM2M client data.
- * @param[in]  uri               Initialized URI structure specifying the resource to get.
- * @param[out] out               Buffer to place the resource in. Must not be NULL.
- * @param[in]  out_len           Available space in @p out.
+ * @param[in]       client_data       Pointer to the LwM2M client data.
+ * @param[in]       uri               Initialized URI structure specifying the resource to get.
+ * @param[out]      out               Buffer to place the resource in. Must not be NULL.
+ * @param[in, out]  out_len           Available space in @p out, returns the amount of read bytes.
  *
  * @retval 0 on success
  * @retval -ENOMEM when there is not enough space in buffer or can not allocate a data structure
@@ -59,7 +59,7 @@ static inline lwm2m_object_t *lwm2m_get_object_by_id(lwm2m_client_data_t *client
  * @retval -EINVAL when the resource cannot be read or has an unexpected type
  */
 int lwm2m_get_string(lwm2m_client_data_t *client_data, const lwm2m_uri_t *uri, char *out,
-                     size_t out_len);
+                     size_t *out_len);
 
 /**
  * @brief Get the value of a string-type resource, specified by a path @p path.
@@ -69,11 +69,11 @@ int lwm2m_get_string(lwm2m_client_data_t *client_data, const lwm2m_uri_t *uri, c
  *
  * @pre `(client_data != NULL) && (path != NULL) && (out != NULL)`
  *
- * @param[in]  client_data       Pointer to the LwM2M client data.
- * @param[in]  path              Array containing the path to the resource to get.
- * @param[in]  path_len          Length of @p path.
- * @param[out] out               Buffer to place the resource in. Must not be NULL.
- * @param[in]  out_len           Available space in @p out.
+ * @param[in]       client_data       Pointer to the LwM2M client data.
+ * @param[in]       path              Array containing the path to the resource to get.
+ * @param[in]       path_len          Length of @p path.
+ * @param[out]      out               Buffer to place the resource in. Must not be NULL.
+ * @param[in, out]  out_len           Available space in @p out, returns the amount of read bytes.
  *
  * @retval 0 on success
  * @retval -ENOMEM when there is not enough space in buffer or can not allocate a data structure
@@ -81,17 +81,17 @@ int lwm2m_get_string(lwm2m_client_data_t *client_data, const lwm2m_uri_t *uri, c
  * @retval -EINVAL if the path is malformed, the resource cannot be read or has an unexpected type
  */
 int lwm2m_get_string_by_path(lwm2m_client_data_t *client_data, const char *path, size_t path_len,
-                             char *out, size_t out_len);
+                             char *out, size_t *out_len);
 
 /**
  * @brief Get the value of an opaque-type resource, specified by @p uri.
  *
  * @pre `(client_data != NULL) && (uri != NULL) && (out != NULL)`
  *
- * @param[in]  client_data       Pointer to the LwM2M client data.
- * @param[in]  uri               Initialized URI structure specifying the resource to get.
- * @param[out] out               Buffer to place the resource in. Must not be NULL.
- * @param[in]  out_len           Available space in @p out.
+ * @param[in]       client_data       Pointer to the LwM2M client data.
+ * @param[in]       uri               Initialized URI structure specifying the resource to get.
+ * @param[out]      out               Buffer to place the resource in. Must not be NULL.
+ * @param[in, out]  out_len           Available space in @p out, returns the amount of read bytes.
  *
  * @retval 0 on success
  * @retval -ENOMEM when there is not enough space in buffer or can not allocate a data structure
@@ -99,7 +99,7 @@ int lwm2m_get_string_by_path(lwm2m_client_data_t *client_data, const char *path,
  * @retval -EINVAL when the resource cannot be read or has an unexpected type
  */
 int lwm2m_get_opaque(lwm2m_client_data_t *client_data, const lwm2m_uri_t *uri, uint8_t *out,
-                     size_t out_len);
+                     size_t *out_len);
 
 /**
  * @brief Get the value of an opaque-type resource, specified by a path @p path.
@@ -109,11 +109,11 @@ int lwm2m_get_opaque(lwm2m_client_data_t *client_data, const lwm2m_uri_t *uri, u
  *
  * @pre `(client_data != NULL) && (path != NULL) && (out != NULL)`
  *
- * @param[in]  client_data       Pointer to the LwM2M client data.
- * @param[in]  path              Array containing the path to the resource to get.
- * @param[in]  path_len          Length of @p path.
- * @param[out] out               Buffer to place the resource in. Must not be NULL.
- * @param[in]  out_len           Available space in @p out.
+ * @param[in]       client_data       Pointer to the LwM2M client data.
+ * @param[in]       path              Array containing the path to the resource to get.
+ * @param[in]       path_len          Length of @p path.
+ * @param[out]      out               Buffer to place the resource in. Must not be NULL.
+ * @param[in, out]  out_len           Available space in @p out, returns the amount of read bytes.
  *
  * @retval 0 on success
  * @retval -ENOMEM when there is not enough space in buffer or can not allocate a data structure
@@ -121,7 +121,7 @@ int lwm2m_get_opaque(lwm2m_client_data_t *client_data, const lwm2m_uri_t *uri, u
  * @retval -EINVAL if the path is malformed, the resource cannot be read or has an unexpected type
  */
 int lwm2m_get_opaque_by_path(lwm2m_client_data_t *client_data, const char *path, size_t path_len,
-                             uint8_t *out, size_t out_len);
+                             uint8_t *out, size_t *out_len);
 
 /**
  * @brief Get the value of an integer-type resource, specified by @p uri.
