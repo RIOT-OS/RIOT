@@ -34,11 +34,11 @@ typedef struct {
 /**
  * @brief Get data of a given type from an object's instance.
  *
- * @param[in]  client_data       Pointer to the LwM2M client data.
- * @param[in]  uri               Initialized URI structure specifying the resource to get.
- * @param[in]  expected_type     Type of data that is expected from the specified resource.
- * @param[out] out               Pointer where to store the data.
- * @param[in]  out_len           Length of @p out.
+ * @param[in]       client_data       Pointer to the LwM2M client data.
+ * @param[in]       uri               Initialized URI structure specifying the resource to get.
+ * @param[in]       expected_type     Type of data that is expected from the specified resource.
+ * @param[out]      out               Pointer where to store the data.
+ * @param[in, out]  out_len           Length of @p out, returns the amount of read bytes.
  *
  * @retval 0 on success
  * @retval -ENOMEM when there is not enough space in buffer or can not allocate a data structure
@@ -47,11 +47,12 @@ typedef struct {
  * @retval -ENOTSUP when the resource expected type is not known
  */
 static int _get_resource_data(lwm2m_client_data_t *client_data, const lwm2m_uri_t *uri,
-                              lwm2m_data_type_t expected_type, void *out, size_t out_len)
+                              lwm2m_data_type_t expected_type, void *out, size_t *out_len)
 {
     assert(client_data);
     assert(uri);
     assert(out);
+    assert(out_len);
 
     int result = 0;
     int data_num = 1;
@@ -85,14 +86,17 @@ static int _get_resource_data(lwm2m_client_data_t *client_data, const lwm2m_uri_
     switch (expected_type) {
     case LWM2M_TYPE_INTEGER:
         *(int64_t *)out = data->value.asInteger;
+        *out_len = sizeof(int64_t);
         break;
 
     case LWM2M_TYPE_FLOAT:
         *(double *)out = data->value.asFloat;
+        *out_len = sizeof(double);
         break;
 
     case LWM2M_TYPE_BOOLEAN:
         *(bool *)out = data->value.asBoolean;
+        *out_len = sizeof(bool);
         break;
 
     case LWM2M_TYPE_OBJECT_LINK:
@@ -100,17 +104,19 @@ static int _get_resource_data(lwm2m_client_data_t *client_data, const lwm2m_uri_
         _objlink_t *_out = (_objlink_t *)out;
         *_out->object_id = data->value.asObjLink.objectId;
         *_out->instance_id = data->value.asObjLink.objectInstanceId;
+        *out_len = sizeof(_objlink_t);
         break;
     }
 
     case LWM2M_TYPE_STRING:
     case LWM2M_TYPE_OPAQUE:
-        if (data->value.asBuffer.length > out_len) {
+        if (data->value.asBuffer.length > *out_len) {
             DEBUG("[lwm2m:get_data] not enough space in buffer\n");
             result = -ENOMEM;
         }
         else {
             memcpy(out, data->value.asBuffer.buffer, data->value.asBuffer.length);
+            *out_len = data->value.asBuffer.length;
         }
         break;
 
@@ -133,12 +139,12 @@ out:
  * Convenience function to call @ref _get_resource_data with a string representing the resource's
  * path.
  *
- * @param[in]  client_data       Pointer to the LwM2M client data.
- * @param[in]  path              Array containing the path to the resource to get.
- * @param[in]  path_len          Length of @p path.
- * @param[in]  expected_type     Type of data that is expected from the specified resource.
- * @param[out] out               Pointer where to store the data.
- * @param[in]  out_len           Length of @p out.
+ * @param[in]       client_data       Pointer to the LwM2M client data.
+ * @param[in]       path              Array containing the path to the resource to get.
+ * @param[in]       path_len          Length of @p path.
+ * @param[in]       expected_type     Type of data that is expected from the specified resource.
+ * @param[out]      out               Pointer where to store the data.
+ * @param[in, out]  out_len           Length of @p out, returns the amount of read bytes.
  *
  * @retval 0 on success
  * @retval -EINVAL if the path is malformed, the resource cannot be read or has an unexpected type
@@ -147,7 +153,7 @@ out:
  */
 static int _get_resource_data_by_path(lwm2m_client_data_t *client_data, const char *path,
                                       size_t path_len, lwm2m_data_type_t expected_type, void *out,
-                                      size_t out_len)
+                                      size_t *out_len)
 {
     assert(path);
 
@@ -291,30 +297,33 @@ static int _set_resource_data_by_path(lwm2m_client_data_t *client_data, const ch
 }
 
 int lwm2m_get_string(lwm2m_client_data_t *client_data, const lwm2m_uri_t *uri, char *out,
-                     size_t out_len)
+                     size_t *out_len)
 {
     return _get_resource_data(client_data, uri, LWM2M_TYPE_STRING, out, out_len);
 }
 
 int lwm2m_get_opaque(lwm2m_client_data_t *client_data, const lwm2m_uri_t *uri, uint8_t *out,
-                     size_t out_len)
+                     size_t *out_len)
 {
     return _get_resource_data(client_data, uri, LWM2M_TYPE_OPAQUE, out, out_len);
 }
 
 int lwm2m_get_int(lwm2m_client_data_t *client_data, const lwm2m_uri_t *uri, int64_t *out)
 {
-    return _get_resource_data(client_data, uri, LWM2M_TYPE_INTEGER, out, sizeof(int64_t));
+    size_t len = sizeof(int64_t);
+    return _get_resource_data(client_data, uri, LWM2M_TYPE_INTEGER, out, &len);
 }
 
 int lwm2m_get_float(lwm2m_client_data_t *client_data, const lwm2m_uri_t *uri, double *out)
 {
-    return _get_resource_data(client_data, uri, LWM2M_TYPE_FLOAT, out, sizeof(double));
+    size_t len = sizeof(double);
+    return _get_resource_data(client_data, uri, LWM2M_TYPE_FLOAT, out, &len);
 }
 
 int lwm2m_get_bool(lwm2m_client_data_t *client_data, const lwm2m_uri_t *uri, bool *out)
 {
-    return _get_resource_data(client_data, uri, LWM2M_TYPE_BOOLEAN, out, sizeof(bool));
+    size_t len = sizeof(bool);
+    return _get_resource_data(client_data, uri, LWM2M_TYPE_BOOLEAN, out, &len);
 }
 
 int lwm2m_get_objlink(lwm2m_client_data_t *client_data, const lwm2m_uri_t *uri,
@@ -324,17 +333,18 @@ int lwm2m_get_objlink(lwm2m_client_data_t *client_data, const lwm2m_uri_t *uri,
     assert(instance_id_out);
 
     _objlink_t link = { .object_id = object_id_out, .instance_id = instance_id_out };
-    return _get_resource_data(client_data, uri, LWM2M_TYPE_OBJECT_LINK, &link, sizeof(_objlink_t));
+    size_t len = sizeof(_objlink_t);
+    return _get_resource_data(client_data, uri, LWM2M_TYPE_OBJECT_LINK, &link, &len);
 }
 
 int lwm2m_get_string_by_path(lwm2m_client_data_t *client_data, const char *path, size_t path_len,
-                             char *out, size_t out_len)
+                             char *out, size_t *out_len)
 {
     return _get_resource_data_by_path(client_data, path, path_len, LWM2M_TYPE_STRING, out, out_len);
 }
 
 int lwm2m_get_opaque_by_path(lwm2m_client_data_t *client_data, const char *path, size_t path_len,
-                             uint8_t *out, size_t out_len)
+                             uint8_t *out, size_t *out_len)
 {
     return _get_resource_data_by_path(client_data, path, path_len, LWM2M_TYPE_OPAQUE, out, out_len);
 }
@@ -342,22 +352,22 @@ int lwm2m_get_opaque_by_path(lwm2m_client_data_t *client_data, const char *path,
 int lwm2m_get_int_by_path(lwm2m_client_data_t *client_data, const char *path, size_t path_len,
                           int64_t *out)
 {
-    return _get_resource_data_by_path(client_data, path, path_len, LWM2M_TYPE_INTEGER, out,
-                                      sizeof(int64_t));
+    size_t len = sizeof(int64_t);
+    return _get_resource_data_by_path(client_data, path, path_len, LWM2M_TYPE_INTEGER, out, &len);
 }
 
 int lwm2m_get_float_by_path(lwm2m_client_data_t *client_data, const char *path, size_t path_len,
                             double *out)
 {
-    return _get_resource_data_by_path(client_data, path, path_len, LWM2M_TYPE_FLOAT, out,
-                                      sizeof(double));
+    size_t len = sizeof(double);
+    return _get_resource_data_by_path(client_data, path, path_len, LWM2M_TYPE_FLOAT, out, &len);
 }
 
 int lwm2m_get_bool_by_path(lwm2m_client_data_t *client_data, const char *path, size_t path_len,
                            bool *out)
 {
-    return _get_resource_data_by_path(client_data, path, path_len, LWM2M_TYPE_BOOLEAN, out,
-                                      sizeof(bool));
+    size_t len = sizeof(bool);
+    return _get_resource_data_by_path(client_data, path, path_len, LWM2M_TYPE_BOOLEAN, out, &len);
 }
 
 int lwm2m_get_objlink_by_path(lwm2m_client_data_t *client_data, const char *path, size_t path_len,
@@ -367,8 +377,9 @@ int lwm2m_get_objlink_by_path(lwm2m_client_data_t *client_data, const char *path
     assert(instance_id_out);
 
     _objlink_t link = { .object_id = object_id_out, .instance_id = instance_id_out };
+    size_t len = sizeof(_objlink_t);
     return _get_resource_data_by_path(client_data, path, path_len, LWM2M_TYPE_OBJECT_LINK, &link,
-                                      sizeof(_objlink_t));
+                                      &len);
 }
 
 int lwm2m_set_string(lwm2m_client_data_t *client_data, const lwm2m_uri_t *uri, char *val,
@@ -443,6 +454,6 @@ int lwm2m_set_objlink_by_path(lwm2m_client_data_t *client_data, const char *path
 {
 
     _objlink_t link = { .object_id = &object_id_in, .instance_id = &instance_id_in };
-    return _get_resource_data_by_path(client_data, path, path_len, LWM2M_TYPE_OBJECT_LINK, &link,
+    return _set_resource_data_by_path(client_data, path, path_len, LWM2M_TYPE_OBJECT_LINK, &link,
                                       sizeof(_objlink_t));
 }

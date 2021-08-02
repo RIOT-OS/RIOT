@@ -251,6 +251,7 @@ static lwm2m_client_connection_t *_connection_create(uint16_t sec_obj_inst_id,
 {
     lwm2m_client_connection_t *conn = NULL;
     char uri[MAX_URI_LENGTH];
+    size_t uri_len = ARRAY_SIZE(uri);
     char *port;
     bool is_bootstrap;
 
@@ -264,7 +265,7 @@ static lwm2m_client_connection_t *_connection_create(uint16_t sec_obj_inst_id,
         .flag = LWM2M_URI_FLAG_OBJECT_ID | LWM2M_URI_FLAG_INSTANCE_ID | LWM2M_URI_FLAG_RESOURCE_ID
     };
 
-    int res = lwm2m_get_string(client_data, &resource_uri, uri, ARRAY_SIZE(uri));
+    int res = lwm2m_get_string(client_data, &resource_uri, uri, &uri_len);
     if (res < 0) {
         DEBUG("[_connection_create] Could not get security instance URI\n");
         goto out;
