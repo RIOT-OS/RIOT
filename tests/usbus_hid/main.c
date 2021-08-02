@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Nils Ollrogge
+ * Copyright (C) 2021 Nils Ollrogge
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  *
  * @brief       Tests for USB HID
  *
- * @author      Nils Ollrogge <nils-ollrogge@outlook.de>
+ * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
 
 #include <stdio.h>
@@ -22,13 +22,14 @@
 #include "usb/usbus.h"
 #include "xtimer.h"
 #include "usb/usbus/hid.h"
+#include "usb/usbus/hid_io.h"
 
 /*
    this descriptor is used, because the basic usb_hid interface was developed in
    conjunction with FIDO2. Descriptor is taken from CTAP2 specification
    (version 20190130) section 8.1.8.2
  */
-static uint8_t report_desc_ctap[] = {
+static const uint8_t report_desc_ctap[] = {
     0x06, 0xD0, 0xF1,   /* HID_UsagePage ( FIDO_USAGE_PAGE ) */
     0x09, 0x01,         /* HID_Usage ( FIDO_USAGE_CTAPHID ) */
     0xA1, 0x01,         /* HID_Collection ( HID_Application ) */
@@ -49,19 +50,19 @@ static uint8_t report_desc_ctap[] = {
 
 static usbus_t usbus;
 static char _stack[USBUS_STACKSIZE];
+static char test_arg[] = { "Test argument" };
 
-void usb_hid_io_init(usbus_t *usbus, uint8_t *report_desc,
-                     size_t report_desc_size);
-ssize_t usb_hid_io_read(void *buffer, size_t len);
+static void rx_cb(void* arg) {
+    printf("USB_HID rx_cb: %s \n", (char*)arg);
+}
 
-void init(void)
+static void init(void)
 {
     usbdev_t *usbdev = usbdev_get_ctx(0);
 
     usbus_init(&usbus, usbdev);
-
     usb_hid_io_init(&usbus, report_desc_ctap, sizeof(report_desc_ctap));
-
+    usb_hid_io_set_rx_cb(rx_cb, test_arg);
     usbus_create(_stack, USBUS_STACKSIZE, USBUS_PRIO, USBUS_TNAME, &usbus);
 }
 
@@ -80,10 +81,10 @@ int main(void)
         ssize_t len =
             usb_hid_io_read(buffer, CONFIG_USBUS_HID_INTERRUPT_EP_SIZE);
 
-        printf("Msg received via USB HID: ");
+        puts("Msg received via USB HID: ");
         for (int i = 0; i < len; i++) {
             putc(buffer[i], stdout);
         }
-        printf("\n");
+        puts("");
     }
 }

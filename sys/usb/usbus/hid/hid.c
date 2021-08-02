@@ -11,7 +11,7 @@
  * @{
  * @file
  *
- * @author  Nils Ollrogge <nils-ollrogge@outlook.de>
+ * @author  Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  * @}
  */
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Nils Ollrogge
+ * Copyright (C) 2021 Nils Ollrogge
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,12 +7,11 @@
  */
 
 /**
- * @ingroup usbus_hid
+ * @ingroup usbus_hid_io
  * @{
  * @file
- * @brief This file implements a USB HID callback and read/write functions.
  *
- * @author  Nils Ollrogge <nils-ollrogge@outlook.de>
+ * @author  Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  * @}
  */
 
@@ -25,6 +24,7 @@
 
 #include "usb/usbus.h"
 #include "usb/usbus/hid.h"
+#include "usb/usbus/hid_io.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -32,20 +32,25 @@
 static usbus_hid_device_t hid;
 static uint8_t _hid_rx_buf_mem[CONFIG_USBUS_HID_INTERRUPT_EP_SIZE];
 static isrpipe_t _hid_stdio_isrpipe = ISRPIPE_INIT(_hid_rx_buf_mem);
+static usb_hid_io_cb_t _rx_cb;
+static void *_rx_cb_arg;
 
-int usb_hid_io_read(void *buffer, size_t size)
+int usb_hid_io_read(void *buffer, size_t len)
 {
-    return isrpipe_read(&_hid_stdio_isrpipe, buffer, size);
+    assert(buffer);
+    return isrpipe_read(&_hid_stdio_isrpipe, buffer, len);
 }
 
-int usb_hid_io_read_timeout(void *buffer, size_t size, uint32_t timeout)
+int usb_hid_io_read_timeout(void *buffer, size_t len, uint32_t timeout)
 {
-    return isrpipe_read_timeout(&_hid_stdio_isrpipe, buffer, size, timeout);
+    assert(buffer);
+    return isrpipe_read_timeout(&_hid_stdio_isrpipe, buffer, len, timeout);
 }
 
 void usb_hid_io_write(const void *buffer, size_t len)
 {
-    uint8_t* buffer_ep = hid.ep_in->ep->buf;
+    assert(buffer);
+    uint8_t *buffer_ep = hid.ep_in->ep->buf;
     uint16_t max_size = hid.ep_in->maxpacketsize;
     size_t offset = 0;
 
@@ -73,10 +78,22 @@ static void _hid_rx_pipe(usbus_hid_device_t *hid, uint8_t *data, size_t len)
     for (size_t i = 0; i < len; i++) {
         isrpipe_write_one(&_hid_stdio_isrpipe, data[i]);
     }
+
+    if (_rx_cb) {
+        _rx_cb(_rx_cb_arg);
+    }
 }
 
-void usb_hid_io_init(usbus_t *usbus, uint8_t *report_desc,
+void usb_hid_io_init(usbus_t *usbus, const uint8_t *report_desc,
                      size_t report_desc_size)
 {
+    assert(usbus);
+    assert(report_desc);
     usbus_hid_init(usbus, &hid, _hid_rx_pipe,  report_desc, report_desc_size);
+}
+
+void usb_hid_io_set_rx_cb(usb_hid_io_cb_t cb, void *arg)
+{
+    _rx_cb = cb;
+    _rx_cb_arg = arg;
 }

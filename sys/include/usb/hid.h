@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Nils Ollrogge
+ * Copyright (C) 2021 Nils Ollrogge
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for
@@ -16,7 +16,7 @@
  * @file
  * @brief       Definition for USB HID interfaces
  *
- * @author      Nils Ollrogge <nils-ollrogge@outlook.de>
+ * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
 
 #ifndef USB_HID_H

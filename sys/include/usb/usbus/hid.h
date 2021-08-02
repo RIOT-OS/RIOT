@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Nils Ollrogge
+ * Copyright (C) 2021 Nils Ollrogge
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for
@@ -21,7 +21,7 @@
  *              specific handling. A different module is required to provide
  *              functional handling of the data e.g. UART or STDIO integration.
  *
- * @author      Nils Ollrogge <nils-ollrogge@outlook.de>
+ * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
 
 #ifndef USB_USBUS_HID_H
