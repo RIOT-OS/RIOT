@@ -461,6 +461,8 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
 static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
                             const ndp_opt_pi_t *pio);
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
+static uint32_t _handle_rio(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
+                            const ndp_opt_ri_t *pio);
 /** @} */
 
 /* Iterator for NDP options in a packet */
@@ -737,6 +739,9 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             case NDP_OPT_MTU:
                 _handle_mtuo(netif, (const icmpv6_hdr_t *)rtr_adv,
                              (ndp_opt_mtu_t *)opt);
+                break;
+            case NDP_OPT_RI:
+                _handle_rio(netif, ipv6, (ndp_opt_ri_t *)opt);
                 break;
             case NDP_OPT_PI: {
                 uint32_t min_pfx_timeout;
@@ -1584,4 +1589,55 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
     return UINT32_MAX;
 }
 
+static const char *_prio_string(uint8_t prio)
+{
+    switch (prio & NDP_OPT_RI_FLAGS_MASK) {
+    case NDP_OPT_RI_FLAGS_PRF_NONE:
+        return "none";
+    case NDP_OPT_RI_FLAGS_PRF_NEG:
+        return "-1";
+    case NDP_OPT_RI_FLAGS_PRF_ZERO:
+        return "0";
+    case NDP_OPT_RI_FLAGS_PRF_POS:
+        return "1";
+    }
+
+    return "invalid";
+}
+
+static uint32_t _handle_rio(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
+                            const ndp_opt_ri_t *rio)
+{
+    if (!IS_USED(MODULE_GNRC_IPV6_NIB_RIO)) {
+        return 0;
+    }
+
+    uint32_t route_ltime = byteorder_ntohl(rio->route_ltime);
+
+    if (ipv6_addr_is_link_local(&rio->prefix)) {
+        DEBUG("nib: ignoring RIO with invalid data\n");
+        return UINT32_MAX;
+    }
+    DEBUG("nib: received valid Route Information option:\n");
+    DEBUG("     - Prefix: %s/%u\n",
+          ipv6_addr_to_str(addr_str, &rio->prefix, sizeof(addr_str)),
+          rio->prefix_len);
+    DEBUG("     - Priority: %s\n", _prio_string(rio->flags));
+    DEBUG("     - Route lifetime: %" PRIu32 "\n",
+          byteorder_ntohl(rio->route_ltime));
+
+    if (route_ltime < UINT32_MAX) { /* UINT32_MAX means infinite lifetime */
+        /* the valid lifetime is given in seconds, but our timers work in
+         * microseconds, so we have to scale down to the smallest possible
+         * value (UINT32_MAX - 1). This is however alright since we ask for
+         * a new router advertisement before this timeout expires */
+        route_ltime = (route_ltime > (UINT32_MAX / MS_PER_SEC)) ?
+                      (UINT32_MAX - 1) : route_ltime * MS_PER_SEC;
+    }
+
+    gnrc_ipv6_nib_ft_add(&rio->prefix, rio->prefix_len, &ipv6->src,
+                         netif->pid, route_ltime);
+
+    return route_ltime;
+}
 /** @} */
