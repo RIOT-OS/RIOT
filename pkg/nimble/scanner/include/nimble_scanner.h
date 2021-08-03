@@ -68,6 +68,9 @@ int nimble_scanner_init(const struct ble_gap_disc_params *params,
 
 /**
  * @brief   Start scanning using timing parameters configured on initialization
+ *
+ * @note    Scanning will run for ever unless stopped or unless a different
+ *          scan duration is set with @ref nimble_scanner_set_scan_duration
  */
 int nimble_scanner_start(void);
 
@@ -83,6 +86,15 @@ void nimble_scanner_stop(void);
  * @return  NIMBLE_SCANNER_STOPPED if the scanner is stopped
  */
 int nimble_scanner_status(void);
+
+/**
+ * @brief   Set the duration for the scanning procedure.
+ *
+ *          If there is an active scanning process, it will be restarted.
+ *
+ * @param[in]  duration_ms  duration of scanning procedure in ms
+ */
+void nimble_scanner_set_scan_duration(int32_t duration_ms);
 
 #ifdef __cplusplus
 }

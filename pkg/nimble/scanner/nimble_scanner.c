@@ -32,12 +32,18 @@
 static nimble_scanner_cb _disc_cb = NULL;
 static struct ble_gap_disc_params _scan_params = { 0 };
 
+/* duration of the scanning procedure */
+static int32_t _scan_duration = BLE_HS_FOREVER;
+
 static int _on_scan_evt(struct ble_gap_event *event, void *arg)
 {
     /* only interested in the DISC event */
     if (event->type == BLE_GAP_EVENT_DISC) {
         _disc_cb(event->disc.event_type, &event->disc.addr, event->disc.rssi,
                  event->disc.data, (size_t)event->disc.length_data);
+    }
+    else if (event->type == BLE_GAP_EVENT_DISC_COMPLETE) {
+        DEBUG("[scanner] scan cycle completed\n");
     }
     else {
         /* this should never happen */
@@ -51,7 +57,7 @@ static int _on_scan_evt(struct ble_gap_event *event, void *arg)
 int nimble_scanner_start(void)
 {
     if (ble_gap_disc_active() == 0) {
-        int res = ble_gap_disc(nimble_riot_own_addr_type, BLE_HS_FOREVER,
+        int res = ble_gap_disc(nimble_riot_own_addr_type, _scan_duration,
                                &_scan_params, _on_scan_evt, NULL);
         if (res != 0) {
             DEBUG("[scanner] err: start failed (%i)\n", res);
@@ -77,6 +83,15 @@ int nimble_scanner_status(void)
     return (ble_gap_disc_active())
         ? NIMBLE_SCANNER_SCANNING
         : NIMBLE_SCANNER_STOPPED;
+}
+
+void nimble_scanner_set_scan_duration(int32_t duration_ms)
+{
+    _scan_duration = duration_ms;
+    if (ble_gap_disc_active()) {
+        nimble_scanner_stop();
+        nimble_scanner_start();
+    }
 }
 
 int nimble_scanner_init(const struct ble_gap_disc_params *params,
