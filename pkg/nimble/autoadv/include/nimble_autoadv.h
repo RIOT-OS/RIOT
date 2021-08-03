@@ -57,6 +57,17 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Include the advetisement flag field. If this is not
+ *          defined, it will be defined as 1, resulting in including the field.
+ *          The Flags data type shall be included when any of the Flag bits
+ *          are non-zero and the advertising packet is connectable, otherwise
+ *          the Flags data type may be omitted.
+ */
+#ifndef NIMBLE_AUTOADV_FLAG_FIELD
+    #define NIMBLE_AUTOADV_FLAG_FIELD 1
+#endif
+
+/**
 * @brief    Initialize autoadv module.
 */
 void nimble_autoadv_init(void);
