@@ -8,7 +8,6 @@ BOARD ?= nrf52dk
 RIOTBASE ?= $(CURDIR)/../..
 
 # We use the xtimer and the shell in this example
-USEMODULE += xtimer
 USEMODULE += shell
 
 # configure and use Nimble
