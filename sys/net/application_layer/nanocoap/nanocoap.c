@@ -1022,7 +1022,7 @@ void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
     coap_block_slicer_init(slicer, blknum, coap_szx2size(szx));
 }
 
-void coap_block_finish(coap_block_slicer_t *slicer, uint16_t option)
+bool coap_block_finish(coap_block_slicer_t *slicer, uint16_t option)
 {
     assert(slicer->opt);
 
@@ -1032,10 +1032,12 @@ void coap_block_finish(coap_block_slicer_t *slicer, uint16_t option)
     uint8_t *pos = slicer->opt + 1;
     uint16_t delta = _decode_value(*slicer->opt >> 4, &pos, slicer->opt + 3);
 
-    uint32_t blkopt = _slicer2blkopt(slicer, slicer->cur > slicer->end);
+    bool more = slicer->cur > slicer->end;
+    uint32_t blkopt = _slicer2blkopt(slicer, more);
     size_t olen = _encode_uint(&blkopt);
 
     coap_put_option(slicer->opt, option - delta, option, (uint8_t *)&blkopt, olen);
+    return more;
 }
 
 ssize_t coap_block2_build_reply(coap_pkt_t *pkt, unsigned code,
