@@ -754,6 +754,13 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                                               (ndp_opt_pi_t *)opt);
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
                 next_timeout = _min(next_timeout, min_pfx_timeout);
+
+                /* notify optional PIO consumer */
+                if (IS_USED(MODULE_GNRC_IPV6_NIB_RTR_ADV_PIO_CB)) {
+                    extern void gnrc_ipv6_nib_rtr_adv_pio_cb(gnrc_netif_t *netif,
+                                                             const ndp_opt_pi_t *pio);
+                    gnrc_ipv6_nib_rtr_adv_pio_cb(netif, (ndp_opt_pi_t *)opt);
+                }
                 break;
             }
             /* ABRO was already secured in the option check above */
