@@ -34,7 +34,7 @@ extern "C" {
 /**
  * @brief USBUS HID IO RX callback function
  */
-typedef void (*usb_hid_io_cb_t)(void*);
+typedef void (*usb_hid_io_cb_t)(void *);
 
 /**
  * @brief Set USBUS HID IO RX callback

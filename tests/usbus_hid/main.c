@@ -52,8 +52,9 @@ static usbus_t usbus;
 static char _stack[USBUS_STACKSIZE];
 static char test_arg[] = { "Test argument" };
 
-static void rx_cb(void* arg) {
-    printf("USB_HID rx_cb: %s \n", (char*)arg);
+static void rx_cb(void *arg)
+{
+    printf("USB_HID rx_cb: %s \n", (char *)arg);
 }
 
 static void init(void)
