@@ -21,9 +21,6 @@
 #include "os/os_task.h"
 #include "thread.h"
 
-#ifndef LOG_LEVEL
-#define LOG_LEVEL   LOG_INFO
-#endif
 #include "log.h"
 
 #ifdef __cplusplus
@@ -36,7 +33,7 @@ int os_task_init(struct os_task *t, const char *name, os_task_func_t func,
 {
     (void) sanity_itvl;
 
-    LOG_INFO("[mynewt-core]: starting thread %s\n", name);
+    LOG_DEBUG("[mynewt-core]: starting thread %s\n", name);
 
     kernel_pid_t pid = thread_create(stack_bottom, (int) stack_size,
                                      prio, THREAD_CREATE_STACKTEST,
