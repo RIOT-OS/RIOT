@@ -65,7 +65,10 @@ typedef enum {
 /** @} */
 
 #define PM_NUM_MODES          (3U)
-#define STM32_PM_SHUTDOWN     (2U)
+
+#define STM32_PM_STOP         (2U)
+#define STM32_PM_STANDBY      (1U)
+#define STM32_PM_SHUTDOWN     (0U)
 
 #endif /* ndef DOXYGEN */
 

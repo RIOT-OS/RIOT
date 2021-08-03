@@ -139,8 +139,10 @@ extern "C" {
  * @name    Power modes
  * @{
  */
+#ifndef STM32_PM_STOP
 #define STM32_PM_STOP         (1U)
 #define STM32_PM_STANDBY      (0U)
+#endif
 /** @} */
 
 #ifndef PM_EWUP_CONFIG
