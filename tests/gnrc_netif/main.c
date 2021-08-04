@@ -1308,6 +1308,18 @@ static void test_netif_get_by_name(void)
     TEST_ASSERT(netif == netif_get_by_name(name));
 }
 
+static void test_netif_get_by_name_buffer(void)
+{
+    char name[CONFIG_NETIF_NAMELENMAX] = "6nPRK28";
+    netif_t *netif = netif_iter(NULL);
+
+    TEST_ASSERT(netif_get_by_name_buffer(name, strlen(name)) == NULL);
+    /* there must be at least one interface */
+    TEST_ASSERT_NOT_NULL(netif);
+    TEST_ASSERT(netif_get_name(netif, name) > 0);
+    TEST_ASSERT(netif == netif_get_by_name_buffer(name, strlen(name)));
+}
+
 static void test_netif_get_opt(void)
 {
     /* just repeat one of the gnrc_netapi_get tests, just with netif_get_opt */
@@ -1758,6 +1770,7 @@ static Test *embunit_tests_gnrc_netif(void)
             new_TestFixture(test_netif_iter),
             new_TestFixture(test_netif_get_name),
             new_TestFixture(test_netif_get_by_name),
+            new_TestFixture(test_netif_get_by_name_buffer),
             new_TestFixture(test_netif_get_opt),
             new_TestFixture(test_netif_set_opt),
             /* only add tests not involving output here */
