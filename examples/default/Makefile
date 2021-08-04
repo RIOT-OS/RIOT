@@ -34,14 +34,7 @@ USEMODULE += ps
 # include and auto-initialize all available sensors
 USEMODULE += saul_default
 
-BOARD_PROVIDES_NETIF := acd52832 adafruit-clue airfy-beacon atmega256rfr2-xpro \
-        arduino-nano-33-ble avr-rss2 b-l072z-lrwan1 cc2538dk dwm1001 fox \
-        derfmega128 derfmega256 hamilton iotlab-m3 iotlab-a8-m3 lobaro-lorabox lsn50 mulle microbit microbit-v2 msba2 \
-        microduino-corerf native nrf51dk nrf51dongle nrf52dk nrf52840dk nrf52840-mdk nrf52840dongle nrf6310 \
-        nucleo-f207zg nucleo-f767zi openmote-b openmote-cc2538 pba-d-01-kw2x remote-pa \
-        remote-reva ruuvitag same54-xpro samr21-xpro samr30-xpro spark-core telosb thingy52 yunjia-nrf51822 z1 \
-        frdm-kw41z phynode-kw41z usb-kw41z openlabs-kw41z-mini openlabs-kw41z-mini-256kib zigduino
-
+include $(RIOTBASE)/tests/Makefile.boards.netif
 ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
   # Use modules for networking
   # gnrc is a meta module including all required, basic gnrc networking modules
