@@ -22,6 +22,9 @@
 
 #include <stdint.h>
 
+#if IS_USED(MODULE_EVTIMER)
+#include "evtimer.h"
+#endif
 #include "net/ipv6/addr.h"
 
 #ifdef __cplusplus
@@ -121,6 +124,45 @@ void gnrc_ipv6_nib_pl_del(unsigned iface,
  */
 bool gnrc_ipv6_nib_pl_iter(unsigned iface, void **state,
                            gnrc_ipv6_nib_pl_t *ple);
+
+#if IS_USED(MODULE_EVTIMER) || defined(DOXYGEN)
+/**
+ * @brief   Provides the time in milliseconds for which the prefix list
+ *          entry is valid
+ *
+ * @param[in] ple   A prefix list entry.
+ *
+ * @return  The time in milliseconds for which the prefix list entry is valid.
+ *          UINT32_MAX if it is valid forever.
+ */
+static inline uint32_t gnrc_ipv6_nib_pl_valid_offset(const gnrc_ipv6_nib_pl_t *ple)
+{
+
+    return (ple->valid_until == UINT32_MAX)
+        ? UINT32_MAX
+        : (ple->valid_until - evtimer_now_msec());
+}
+
+/**
+ * @brief   Provides the time in milliseconds for which the prefix list
+ *          entry is preferred
+ *
+ * A prefix for which the preference expired is deprecated (see [RFC 4862]
+ * (https://tools.ietf.org/html/rfc4862))
+ *
+ * @param[in] ple   A prefix list entry.
+ *
+ * @return  The time in milliseconds for which the prefix list entry is
+ *          preferred. UINT32_MAX if it is preferred forever.
+ */
+static inline uint32_t gnrc_ipv6_nib_pl_pref_offset(const gnrc_ipv6_nib_pl_t *ple)
+{
+
+    return (ple->pref_until == UINT32_MAX)
+        ? UINT32_MAX
+        : (ple->pref_until - evtimer_now_msec());
+}
+#endif
 
 /**
  * @brief   Prints a prefix list entry

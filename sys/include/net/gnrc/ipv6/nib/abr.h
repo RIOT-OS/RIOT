@@ -23,6 +23,11 @@
 
 #include <kernel_defines.h>
 
+/* prevent cascading include error to xtimer if it is not compiled in or not
+ * supported by board */
+#if IS_USED(MODULE_EVTIMER)
+#include "evtimer.h"
+#endif
 #include "net/ipv6/addr.h"
 #include "net/gnrc/ipv6/nib/conf.h"
 
@@ -98,6 +103,22 @@ void gnrc_ipv6_nib_abr_del(const ipv6_addr_t *addr);
  *          the NIB.
  */
 bool gnrc_ipv6_nib_abr_iter(void **state, gnrc_ipv6_nib_abr_t *abr);
+
+#if IS_USED(MODULE_EVTIMER) || defined(DOXYGEN)
+/**
+ * @brief   Provides the time in minutes for which the authoritative border
+ *          router entry is valid
+ *
+ * @param[in] abr   An authoritative border router entry.
+ *
+ * @return  The time in minutes for which the authoritative border router entry
+ *          is valid.
+ */
+static inline uint32_t gnrc_ipv6_nib_abr_valid_offset(const gnrc_ipv6_nib_abr_t *abr)
+{
+    return abr->valid_until - evtimer_now_min();
+}
+#endif
 
 /**
  * @brief   Prints an authoritative border router list entry
