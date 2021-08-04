@@ -482,8 +482,102 @@ Test *tests_uri_parser_tests(void)
     return (Test *)&uri_parser_tests;
 }
 
+#define PARAMS_NUMOF                (4U)
+#define INIT_URI_RESULTS(q) \
+    _uri_results.query = (q); \
+    _uri_results.query_len = sizeof(q) - 1
+#define TEST_ASSERT_PARAM(exp, idx, comp) \
+    TEST_ASSERT_EQUAL_INT(sizeof(exp) - 1, _params[idx].comp ## _len); \
+    TEST_ASSERT_MESSAGE(!strncmp(exp, _params[idx].comp, _params[idx].comp ## _len), \
+                        #comp " was not " exp);
+
+static uri_parser_query_param_t _params[4U];
+static uri_parser_result_t _uri_results;
+
+static void _setup_query(void)
+{
+    memset(_params, 0, sizeof(_params));
+    memset(&_uri_results, 0, sizeof(_uri_results));
+}
+
+static void test_split_query__broken_input(void)
+{
+    int res;
+
+    INIT_URI_RESULTS("&");
+    res = uri_parser_split_query(&_uri_results, _params, ARRAY_SIZE(_params));
+    TEST_ASSERT_EQUAL_INT(-1, res);
+
+    INIT_URI_RESULTS("=&");
+    res = uri_parser_split_query(&_uri_results, _params, ARRAY_SIZE(_params));
+    TEST_ASSERT_EQUAL_INT(-1, res);
+
+    INIT_URI_RESULTS("=&&");
+    res = uri_parser_split_query(&_uri_results, _params, ARRAY_SIZE(_params));
+    TEST_ASSERT_EQUAL_INT(-1, res);
+
+    INIT_URI_RESULTS("==");
+    res = uri_parser_split_query(&_uri_results, _params, ARRAY_SIZE(_params));
+    TEST_ASSERT_EQUAL_INT(-1, res);
+
+    INIT_URI_RESULTS("key=value&name=value=another");
+    res = uri_parser_split_query(&_uri_results, _params, ARRAY_SIZE(_params));
+    TEST_ASSERT_EQUAL_INT(-1, res);
+}
+
+void test_split_query__truncated(void)
+{
+    int res;
+
+    INIT_URI_RESULTS("this=0&is=1&a=very&long=3&query=foo");
+    TEST_ASSERT_EQUAL_INT(4, ARRAY_SIZE(_params));
+    res = uri_parser_split_query(&_uri_results, _params, ARRAY_SIZE(_params));
+    TEST_ASSERT_EQUAL_INT(-2, res);
+    TEST_ASSERT_PARAM("this", 0, name);
+    TEST_ASSERT_PARAM("0", 0, value);
+    TEST_ASSERT_PARAM("is", 1, name);
+    TEST_ASSERT_PARAM("1", 1, value);
+    TEST_ASSERT_PARAM("a", 2, name);
+    TEST_ASSERT_PARAM("very", 2, value);
+    TEST_ASSERT_PARAM("long", 3, name);
+    TEST_ASSERT_PARAM("3", 3, value);
+}
+
+void test_split_query__success(void)
+{
+    int res;
+
+    INIT_URI_RESULTS("foo=&=&bar=1");
+    res = uri_parser_split_query(&_uri_results, _params, ARRAY_SIZE(_params));
+    TEST_ASSERT_EQUAL_INT(3, res);
+    TEST_ASSERT_PARAM("foo", 0, name);
+    TEST_ASSERT_PARAM("", 0, value);
+    TEST_ASSERT_PARAM("", 1, name);
+    TEST_ASSERT_PARAM("", 1, value);
+    TEST_ASSERT_PARAM("bar", 2, name);
+    TEST_ASSERT_PARAM("1", 2, value);
+    TEST_ASSERT_EQUAL_INT(0, _params[3].name_len);
+    TEST_ASSERT_NULL(_params[3].name);
+    TEST_ASSERT_EQUAL_INT(0, _params[3].value_len);
+    TEST_ASSERT_NULL(_params[3].value);
+}
+
+Test *tests_query_split_tests(void)
+{
+    EMB_UNIT_TESTFIXTURES(fixtures) {
+        new_TestFixture(test_split_query__broken_input),
+        new_TestFixture(test_split_query__truncated),
+        new_TestFixture(test_split_query__success),
+    };
+
+    EMB_UNIT_TESTCALLER(query_split_tests, _setup_query, NULL, fixtures);
+
+    return (Test *)&query_split_tests;
+}
+
 void tests_uri_parser(void)
 {
     TESTS_RUN(tests_uri_parser_tests());
+    TESTS_RUN(tests_query_split_tests());
 }
 /** @} */
