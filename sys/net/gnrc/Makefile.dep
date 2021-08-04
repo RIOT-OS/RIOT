@@ -28,9 +28,8 @@ ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
   USEMODULE += ztimer_msec
   USEMODULE += random
   USEMODULE += hashes
+  USEMODULE += iolist
   USEMODULE += crypto_aes_128
-  USEMODULE += netdev_layer
-  USEMODULE += gnrc_nettype_lorawan
 endif
 
 ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
@@ -67,7 +66,7 @@ ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
-ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
+ifneq (,$(filter gnrc_%,$(filter-out gnrc_lorawan gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
   USEMODULE += gnrc
 endif
 
@@ -125,6 +124,7 @@ ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   endif
   ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
     USEMODULE += gnrc_netif_lorawan
+    USEMODULE += gnrc_nettype_lorawan
   endif
 endif
 

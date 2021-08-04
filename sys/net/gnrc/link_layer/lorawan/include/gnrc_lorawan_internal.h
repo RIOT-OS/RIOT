@@ -25,7 +25,6 @@
 #include "net/lorawan/hdr.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/netdev.h"
-#include "net/netdev/layer.h"
 #include "net/loramac.h"
 
 #ifdef __cplusplus
