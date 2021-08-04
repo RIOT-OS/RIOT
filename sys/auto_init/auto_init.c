@@ -292,4 +292,10 @@ void auto_init(void)
         extern void auto_init_screen(void);
         auto_init_screen();
     }
+
+    if (IS_USED(MODULE_AUTO_INIT_BENCHMARK_UDP)) {
+        LOG_DEBUG("Auto init UDP benchmark\n");
+        extern void benchmark_udp_auto_init(void);
+        benchmark_udp_auto_init();
+    }
 }
