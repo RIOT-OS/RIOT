@@ -39,8 +39,8 @@ extern "C" {
  * @brief container that holds all results
  */
 typedef struct {
-    char *scheme;                   /**< scheme */
-    char *userinfo;                 /**< userinfo */
+    const char *scheme;             /**< scheme */
+    const char *userinfo;           /**< userinfo */
 
     /**
      * @brief host part
@@ -49,7 +49,7 @@ typedef struct {
      * '[' and ']' as well as the zoneid (with leading '%'), if
      * present.
      */
-    char *host;
+    const char *host;
 
     /**
      * @brief Pointer to the start of the address, if @ref host is an
@@ -58,18 +58,18 @@ typedef struct {
      * @note @ref ipv6addr does not include the brackets '[' and ']'
      * and the zoneid part.
      */
-    char *ipv6addr;
+    const char *ipv6addr;
 
     /**
      * @brief zoneid if @ref host is IPv6 address, NULL otherwise
      *
      * @see https://tools.ietf.org/html/rfc6874
      */
-    char *zoneid;
+    const char *zoneid;
 
-    char *port;                     /**< port */
-    char *path;                     /**< path */
-    char *query;                    /**< query */
+    const char *port;               /**< port */
+    const char *path;               /**< path */
+    const char *query;              /**< query */
     uint16_t scheme_len;            /**< length of @ref scheme */
     uint16_t userinfo_len;          /**< length of @ref userinfo */
     uint16_t host_len;              /**< length of @ref host */
@@ -84,8 +84,8 @@ typedef struct {
  * @brief   Container to represent a query parameter
  */
 typedef struct {
-    char *name;                     /**< name of the query parameter */
-    char *value;                    /**< value of the query parameter */
+    const char *name;               /**< name of the query parameter */
+    const char *value;              /**< value of the query parameter */
     uint16_t name_len;              /**< length of @ref name */
     uint16_t value_len;             /**< length of @ref value */
 } uri_parser_query_param_t;
