@@ -26,7 +26,7 @@
 #include "debug.h"
 
 /* strchr for non-Null-terminated strings (buffers) */
-static char *_strchrb(char *start, char *stop, char c)
+static const char *_strchrb(const char *start, const char *stop, char c)
 {
     for (; start < stop; start++) {
         if (*start == c) {
@@ -36,8 +36,8 @@ static char *_strchrb(char *start, char *stop, char c)
     return NULL;
 }
 
-static char *_consume_scheme(uri_parser_result_t *result, char *uri,
-                             char *uri_end, bool *has_authority)
+static const char *_consume_scheme(uri_parser_result_t *result, const char *uri,
+                                   const char *uri_end, bool *has_authority)
 {
     assert(uri);
 
@@ -49,7 +49,7 @@ static char *_consume_scheme(uri_parser_result_t *result, char *uri,
         return NULL;
     }
 
-    char *p = _strchrb(uri, uri_end, ':');
+    const char *p = _strchrb(uri, uri_end, ':');
 
     result->scheme = uri;
     result->scheme_len = p - uri;
@@ -65,11 +65,11 @@ static char *_consume_scheme(uri_parser_result_t *result, char *uri,
     return p + 1;
 }
 
-void _consume_userinfo(uri_parser_result_t *result, char *uri,
-                       char *authority_end)
+void _consume_userinfo(uri_parser_result_t *result, const char *uri,
+                       const char *authority_end)
 {
     /* check for userinfo within authority */
-    char *userinfo_end = _strchrb(uri, authority_end, '@');
+    const char *userinfo_end = _strchrb(uri, authority_end, '@');
 
     /* check if match */
     if (userinfo_end) {
@@ -88,14 +88,14 @@ void _consume_userinfo(uri_parser_result_t *result, char *uri,
     }
 }
 
-bool _consume_port(uri_parser_result_t *result, char *ipv6_end,
-                   char *authority_end)
+bool _consume_port(uri_parser_result_t *result, const char *ipv6_end,
+                   const char *authority_end)
 {
     /* check for port after host part */
-    char *port_begin = NULL;
+    const char *port_begin = NULL;
     /* repeat until last ':' in authority section */
     /* if ipv6 address, check after ipv6 end marker */
-    char *p = (ipv6_end ? ipv6_end : result->host);
+    const char *p = (ipv6_end ? ipv6_end : result->host);
     while (p != NULL && (p < authority_end)) {
         port_begin = p;
         p = _strchrb(p + 1, authority_end, ':');
@@ -116,13 +116,13 @@ bool _consume_port(uri_parser_result_t *result, char *ipv6_end,
     return true;
 }
 
-static char *_consume_authority(uri_parser_result_t *result, char *uri,
-                                char *uri_end)
+static const char *_consume_authority(uri_parser_result_t *result, const char *uri,
+                                      const char *uri_end)
 {
     assert(uri);
 
     /* search until first '/' */
-    char *authority_end = _strchrb(uri, uri_end, '/');
+    const char *authority_end = _strchrb(uri, uri_end, '/');
     if (!authority_end) {
         authority_end = uri_end;
     }
@@ -137,7 +137,7 @@ static char *_consume_authority(uri_parser_result_t *result, char *uri,
         return authority_end;
     }
 
-    char *ipv6_end = NULL;
+    const char *ipv6_end = NULL;
     /* validate IPv6 form */
     if (result->host[0] == '[') {
         ipv6_end = _strchrb(result->host, uri_end, ']');
@@ -146,7 +146,7 @@ static char *_consume_authority(uri_parser_result_t *result, char *uri,
             return NULL;
         }
 
-        char *zoneid_start = _strchrb(result->host, ipv6_end, '%');
+        const char *zoneid_start = _strchrb(result->host, ipv6_end, '%');
         if (zoneid_start) {
             /* skip % */
             result->zoneid = zoneid_start + 1;
@@ -175,8 +175,8 @@ static char *_consume_authority(uri_parser_result_t *result, char *uri,
     return authority_end;
 }
 
-static char *_consume_path(uri_parser_result_t *result, char *uri,
-                           char *uri_end)
+static const char *_consume_path(uri_parser_result_t *result, const char *uri,
+                                 const char *uri_end)
 {
     assert(uri);
 
@@ -184,7 +184,7 @@ static char *_consume_path(uri_parser_result_t *result, char *uri,
     result->path_len = (uri_end - uri);
 
     /* check for query start '?' */
-    char *path_end = _strchrb(uri, uri_end, '?');
+    const char *path_end = _strchrb(uri, uri_end, '?');
 
     /* no query string found, return! */
     if (!path_end) {
@@ -201,8 +201,8 @@ static char *_consume_path(uri_parser_result_t *result, char *uri,
     return (result->query + result->query_len);
 }
 
-static int _parse_relative(uri_parser_result_t *result, char *uri,
-                           char *uri_end)
+static int _parse_relative(uri_parser_result_t *result, const char *uri,
+                           const char *uri_end)
 {
     uri = _consume_path(result, uri, uri_end);
     /* uri should point to uri_end, otherwise there's something left
@@ -214,8 +214,8 @@ static int _parse_relative(uri_parser_result_t *result, char *uri,
     return 0;
 }
 
-static int _parse_absolute(uri_parser_result_t *result, char *uri,
-                           char *uri_end)
+static int _parse_absolute(uri_parser_result_t *result, const char *uri,
+                           const char *uri_end)
 {
     bool has_authority;
 
@@ -246,7 +246,7 @@ static int _parse_absolute(uri_parser_result_t *result, char *uri,
 
 bool uri_parser_is_absolute(const char *uri, size_t uri_len)
 {
-    char *colon = _strchrb((char *)uri, (char *)(uri + uri_len), ':');
+    const char *colon = _strchrb(uri, uri + uri_len, ':');
 
     /* potentially absolute, if ':' exists */
     if (colon) {
@@ -292,10 +292,10 @@ int uri_parser_process(uri_parser_result_t *result, const char *uri,
     memset(result, 0, sizeof(*result));
 
     if (uri_parser_is_absolute(uri, uri_len)) {
-        return _parse_absolute(result, (char *)uri, (char *)(uri + uri_len));
+        return _parse_absolute(result, uri, uri + uri_len);
     }
     else {
-        return _parse_relative(result, (char *)uri, (char *)(uri + uri_len));
+        return _parse_relative(result, uri, uri + uri_len);
     }
 
     return 0;
@@ -343,7 +343,7 @@ int uri_parser_split_query(const uri_parser_result_t *uri,
                 else if ((idx + 1) < params_len) {
                     /* c is an ampersand (&), so mark the next char as the next
                      * parameter's name name */
-                    params[++idx].name = (char *)c + 1U;
+                    params[++idx].name = c + 1U;
                     assert(params[idx].name_len == 0);
                 }
                 else {
@@ -361,7 +361,7 @@ int uri_parser_split_query(const uri_parser_result_t *uri,
                 }
                 params[idx].name_len = c - params[idx].name;
                 /* pick next char as start of value */
-                params[idx].value = (char *)c + 1U;
+                params[idx].value = c + 1U;
                 /* make sure the precondition on params is met */
                 assert(params[idx].value_len == 0);
                 break;

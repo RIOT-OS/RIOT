@@ -82,14 +82,15 @@ static int _connection_send(lwm2m_client_connection_t *conn, uint8_t *buffer,
                             lwm2m_client_data_t *client_data);
 
 /**
- * @brief Tries to find an interface in the host string. If not, it will check
+ * @brief Tries to find an interface by interface string. If not, it will check
  *        if there only exists one interface, and will use it
- * @param[in]  host         host string
+ * @param[in]  iface         interface string
+ * @param[in]  iface_len     interface string length
  *
  * @return  pointer to the interface to use on success
  * @return  NULL on error
  */
-static netif_t *_get_interface(char *host);
+static netif_t *_get_interface(const char *iface, size_t len);
 
 void *lwm2m_connect_server(uint16_t sec_obj_inst_id, void *user_data)
 {
@@ -220,10 +221,9 @@ static int _connection_send(lwm2m_client_connection_t *conn, uint8_t *buffer,
     return 0;
 }
 
-static netif_t *_get_interface(char *host)
+static netif_t *_get_interface(const char *iface, size_t iface_len)
 {
     netif_t *netif = NULL;
-    char *iface = ipv6_addr_split_iface(host);
 
     if (iface == NULL) {
         /* get the number of net interfaces */
@@ -240,7 +240,7 @@ static netif_t *_get_interface(char *host)
         }
     }
     else {
-        netif = netif_get_by_name(iface);
+        netif = netif_get_by_name_buffer(iface, iface_len);
     }
 
     return netif;
@@ -252,7 +252,7 @@ static lwm2m_client_connection_t *_connection_create(uint16_t sec_obj_inst_id,
     lwm2m_client_connection_t *conn = NULL;
     char uri[MAX_URI_LENGTH];
     size_t uri_len = ARRAY_SIZE(uri);
-    char *port;
+    const char *port;
     bool is_bootstrap;
 
     DEBUG("Creating connection\n");
@@ -330,7 +330,7 @@ static lwm2m_client_connection_t *_connection_create(uint16_t sec_obj_inst_id,
      * if not, check the number of interfaces and default to the first if there
      * is only one defined. */
     if (ipv6_addr_is_link_local((ipv6_addr_t *)&conn->remote.addr.ipv6)) {
-        netif_t *netif = _get_interface(parsed_uri.host);
+        netif_t *netif = _get_interface(parsed_uri.zoneid, parsed_uri.zoneid_len);
         if (netif == NULL) {
             goto free_out;
         }
