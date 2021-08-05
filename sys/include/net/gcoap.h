@@ -844,15 +844,43 @@ void gcoap_register_listener(gcoap_listener_t *listener);
  * @param[in] len       Length of the buffer
  * @param[in] code      Request code, one of COAP_METHOD_XXX or COAP_CODE_EMPTY
  *                      to ping
- * @param[in] path      Resource path, may be NULL
+ * @param[in] path      Resource path, may be NULL. @p path_len will be ignored
+ *                      in that case.
+ * @param[in] path_len  Length of @p path.
  *
  * @pre @p path must start with `/` if not NULL
  *
  * @return  0 on success
  * @return  < 0 on error
  */
-int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
-                   unsigned code, const char *path);
+int gcoap_req_init_path_buffer(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                               unsigned code, const char *path,
+                               size_t path_len);
+
+/**
+ * @brief   Initializes a CoAP request PDU on a buffer.
+ *
+ * If @p code is COAP_CODE_EMPTY, prepares a complete "CoAP ping" 4 byte empty
+ * message request, ready to send.
+ *
+ * @param[out] pdu      Request metadata
+ * @param[out] buf      Buffer containing the PDU
+ * @param[in] len       Length of the buffer
+ * @param[in] code      Request code, one of COAP_METHOD_XXX or COAP_CODE_EMPTY
+ *                      to ping
+ * @param[in] path      `\0`-terminated resource path, may be NULL
+ *
+ * @pre @p path must start with `/` if not NULL
+ *
+ * @return  0 on success
+ * @return  < 0 on error
+ */
+static inline int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                                 unsigned code, const char *path)
+{
+    return gcoap_req_init_path_buffer(pdu, buf, len, code, path,
+                                      (path) ? strlen(path) : 0U);
+}
 
 /**
  * @brief   Writes a complete CoAP request PDU when there is not a payload
