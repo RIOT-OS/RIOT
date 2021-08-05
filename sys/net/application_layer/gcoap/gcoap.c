@@ -1023,8 +1023,8 @@ void gcoap_register_listener(gcoap_listener_t *listener)
     }
 }
 
-int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
-                   unsigned code, const char *path)
+int gcoap_req_init_path_buffer(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                               unsigned code, const char *path, size_t path_len)
 {
     assert((path == NULL) || (path[0] == '/'));
 
@@ -1055,8 +1055,8 @@ int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
 
     coap_pkt_init(pdu, buf, len, res);
-    if (path != NULL) {
-        res = coap_opt_add_uri_path(pdu, path);
+    if ((path != NULL) && (path_len > 0)) {
+        res = coap_opt_add_uri_path_buffer(pdu, path, path_len);
     }
     return (res > 0) ? 0 : res;
 }
