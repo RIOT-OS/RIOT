@@ -1131,7 +1131,7 @@ static inline ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum,
  * @note Use this only for null-terminated strings.
  *
  * @param[in,out] pkt         Packet being built
- * @param[in]     path        Resource (sub)path
+ * @param[in]     path        `\0`-terminated resource (sub)path
  *
  * @pre     ((pkt != NULL) && (path != NULL))
  *
@@ -1142,6 +1142,28 @@ static inline ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum,
 static inline ssize_t coap_opt_add_uri_path(coap_pkt_t *pkt, const char *path)
 {
     return coap_opt_add_string(pkt, COAP_OPT_URI_PATH, path, '/');
+}
+
+/**
+ * @brief   Adds one or multiple Uri-Path options in the form '/path' into pkt
+ *
+ * @note Use this only for null-terminated strings.
+ *
+ * @param[in,out] pkt         Packet being built
+ * @param[in]     path        Resource (sub)path
+ * @param[in]     path_len    Length of @p path
+ *
+ * @pre     ((pkt != NULL) && (path != NULL))
+ *
+ * @return        number of bytes written to pkt buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or pkt full
+ */
+static inline ssize_t coap_opt_add_uri_path_buffer(coap_pkt_t *pkt,
+                                                   const char *path,
+                                                   size_t path_len)
+{
+    return coap_opt_add_chars(pkt, COAP_OPT_URI_PATH, path, path_len, '/');
 }
 
 /**
