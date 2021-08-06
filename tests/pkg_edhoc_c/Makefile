@@ -1,5 +1,11 @@
 include ../Makefile.tests_common
 
+include $(RIOTBASE)/tests/Makefile.boards.netif
+BOARD_WHITELIST += $(BOARD_PROVIDES_NETIF)
+# Cannot run the test on `murdock` in `native`
+#   open(/dev/net/tun): No such file or directory
+TEST_ON_CI_BLACKLIST += native
+
 # Edhoc related packages
 USEPKG += edhoc-c
 USEMODULE += edhoc-c_crypto_tinycrypt
