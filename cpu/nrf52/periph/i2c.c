@@ -31,6 +31,7 @@
 #include "assert.h"
 #include "periph/i2c.h"
 #include "periph/gpio.h"
+#include "byteorder.h"
 
 #define ENABLE_DEBUG        0
 #include "debug.h"
@@ -39,6 +40,16 @@
  * @brief   If any of the 8 lower bits are set, the speed value is invalid
  */
 #define INVALID_SPEED_MASK  (0xff)
+
+/**
+ * @brief   Allocate a tx buffer
+ */
+static uint8_t tx_buf[256];
+
+/**
+ * @brief   Mutex for locking the TX buffer
+ */
+static mutex_t buffer_lock;
 
 /**
  * @brief   Initialized dev locks (we have a maximum of two devices...)
@@ -167,21 +178,41 @@ void i2c_release(i2c_t dev)
 int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                    const void *data, size_t len, uint8_t flags)
 {
-    assert((dev < I2C_NUMOF) && data && (len > 0) && (len < 255));
+    assert((dev < I2C_NUMOF) && data && (len > 0) && (len < 253));
 
-    if (flags & (I2C_NOSTART | I2C_REG16 | I2C_ADDR10)) {
+    if (flags & (I2C_NOSTART | I2C_ADDR10)) {
         return -EOPNOTSUPP;
     }
+
     /* the nrf52's TWI device does not support to do two consecutive transfers
      * without a repeated start condition in between. So we have to put all data
-     * to be transferred into a temporary buffer
-     *
-     * CAUTION: this might become critical when transferring large blocks of
-     *          data as the temporary buffer is allocated on the stack... */
-    uint8_t buf_tmp[len + 1];
-    buf_tmp[0] = reg;
-    memcpy(&buf_tmp[1], data, len);
-    return i2c_write_bytes(dev, addr, buf_tmp, (len + 1), flags);
+     * to be transferred into a buffer (tx_buf).
+     *  */
+
+    uint8_t reg_addr_len; /* Length in bytes of the register address */
+
+    /* Lock tx_buf */
+    mutex_lock(&buffer_lock);
+
+    if (flags & (I2C_REG16)) {
+        reg_addr_len = 2;
+        /* Prepare the 16-bit register transfer  */
+        tx_buf[0] = reg >> 8; /* AddrH in the first byte  */
+        tx_buf[1] = reg & 0xFF; /* AddrL in the second byte  */
+    }
+    else{
+        reg_addr_len = 1;
+        tx_buf[0] = reg;
+    }
+
+    memcpy(&tx_buf[reg_addr_len], data, len);
+    int ret = i2c_write_bytes(dev, addr, tx_buf, reg_addr_len + len, flags);
+
+    /* Release tx_buf */
+    mutex_unlock(&buffer_lock);
+
+    return ret;
+
 }
 
 int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len,
@@ -189,7 +220,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len,
 {
     assert((dev < I2C_NUMOF) && data && (len > 0) && (len < 256));
 
-    if (flags & (I2C_NOSTART | I2C_REG16 | I2C_ADDR10)) {
+    if (flags & (I2C_NOSTART | I2C_ADDR10)) {
         return -EOPNOTSUPP;
     }
     DEBUG("[i2c] read_bytes: %i bytes from addr 0x%02x\n", (int)len, (int)addr);
@@ -212,21 +243,32 @@ int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
 {
     assert((dev < I2C_NUMOF) && data && (len > 0) && (len < 256));
 
-    if (flags & (I2C_NOSTART | I2C_REG16 | I2C_ADDR10)) {
+    if (flags & (I2C_NOSTART | I2C_ADDR10)) {
         return -EOPNOTSUPP;
     }
+
     DEBUG("[i2c] read_regs: %i byte(s) from reg 0x%02x at addr 0x%02x\n",
            (int)len, (int)reg, (int)addr);
 
+    /* Prepare transfer */
     bus(dev)->ADDRESS = addr;
+    if (flags & (I2C_REG16)) {
+        /* Register endianness for 16 bit */
+        reg = htons(reg);
+        bus(dev)->TXD.MAXCNT = 2;
+    }
+    else {
+        bus(dev)->TXD.MAXCNT = 1;
+    }
     bus(dev)->TXD.PTR = (uint32_t)&reg;
-    bus(dev)->TXD.MAXCNT = 1;
     bus(dev)->RXD.PTR = (uint32_t)data;
     bus(dev)->RXD.MAXCNT = (uint8_t)len;
     bus(dev)->SHORTS = (TWIM_SHORTS_LASTTX_STARTRX_Msk);
     if (!(flags & I2C_NOSTOP)) {
         bus(dev)->SHORTS |=  TWIM_SHORTS_LASTRX_STOP_Msk;
     }
+
+    /* Start transfer */
     bus(dev)->TASKS_STARTTX = 1;
 
     return finish(dev);
@@ -237,7 +279,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
 {
     assert((dev < I2C_NUMOF) && data && (len > 0) && (len < 256));
 
-    if (flags & (I2C_NOSTART | I2C_REG16 | I2C_ADDR10)) {
+    if (flags & (I2C_NOSTART | I2C_ADDR10)) {
         return -EOPNOTSUPP;
     }
     DEBUG("[i2c] write_bytes: %i byte(s) to addr 0x%02x\n", (int)len, (int)addr);
