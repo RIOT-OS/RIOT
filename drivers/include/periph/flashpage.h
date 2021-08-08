@@ -48,6 +48,7 @@
 #ifndef PERIPH_FLASHPAGE_H
 #define PERIPH_FLASHPAGE_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include "cpu_conf.h"
