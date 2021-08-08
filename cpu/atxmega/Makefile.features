@@ -6,9 +6,6 @@ include $(RIOTCPU)/avr8_common/Makefile.features
 FEATURES_PROVIDED += cpu_core_atxmega
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
-FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_nvm
 FEATURES_PROVIDED += periph_pm
-FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer periph_timer_periodic
-FEATURES_PROVIDED += periph_uart

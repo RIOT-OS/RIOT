@@ -22,7 +22,6 @@ config CPU_COMMON_ATXMEGA
     select HAS_PERIPH_PM
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_TIMER_PERIODIC
-    select HAS_PERIPH_UART
 
 config CPU_CORE_ATXMEGA_A1
     bool

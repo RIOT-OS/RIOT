@@ -12,15 +12,9 @@ config BOARD_ATXMEGA_A3BU_XPLAINED
     bool
     default y
     select CPU_MODEL_XMEGA256A3BU
-    select HAS_PERIPH_CPUID
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_GPIO_IRQ
+
     select HAS_PERIPH_I2C
-    select HAS_PERIPH_NVM
-    select HAS_PERIPH_PM
     select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_TIMER_PERIODIC
     select HAS_PERIPH_UART
 
     select HAVE_SAUL_GPIO
