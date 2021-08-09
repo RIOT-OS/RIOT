@@ -110,7 +110,7 @@ static void _add_static_lladdr(gnrc_netif_t *netif)
     char lladdr_str[] = GNRC_IPV6_STATIC_LLADDR;
     ipv6_addr_t lladdr;
 
-    if(ipv6_addr_from_str(&lladdr, lladdr_str) != NULL) {
+    if (ipv6_addr_from_str(&lladdr, lladdr_str) != NULL) {
         lladdr.u8[15] += netif->pid;
         assert(ipv6_addr_is_link_local(&lladdr));
         gnrc_netif_ipv6_addr_add_internal(
@@ -168,27 +168,25 @@ void gnrc_ipv6_nib_init_iface(gnrc_netif_t *netif)
 static bool _on_link(const ipv6_addr_t *dst, unsigned *iface)
 {
     _nib_offl_entry_t *entry = NULL;
-    uint8_t best_pfx = 0;
+    _nib_offl_entry_t *match = NULL;
 
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
-    if (*iface != 0) {
-        if (gnrc_netif_is_6ln(gnrc_netif_get_by_pid(*iface))) {
-            return ipv6_addr_is_link_local(dst);
-        }
-    }
-#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
-    while ((entry = _nib_offl_iter(entry))) {
-        if ((entry->mode & _PL) && (entry->flags & _PFX_ON_LINK) &&
-            (ipv6_addr_match_prefix(dst, &entry->pfx) >= entry->pfx_len) &&
-            (entry->pfx_len > best_pfx)) {
-            *iface = _nib_onl_get_if(entry->next_hop);
-            best_pfx = entry->pfx_len;
-        }
-    }
-    if (best_pfx) {
+    if (ipv6_addr_is_link_local(dst)) {
         return true;
     }
-    return ipv6_addr_is_link_local(dst);
+
+    while ((entry = _nib_offl_iter(entry))) {
+        if ((ipv6_addr_match_prefix(dst, &entry->pfx) >= entry->pfx_len) &&
+            ((match == NULL) || (entry->pfx_len > match->pfx_len))) {
+            match = entry;
+        }
+    }
+
+    if (match) {
+        *iface = _nib_onl_get_if(match->next_hop);
+        /* check if prefix is on-link */
+        return (match->mode & _PL) && (match->flags & _PFX_ON_LINK);
+    }
+    return false;
 }
 
 static gnrc_netif_t *_acquire_new_iface(unsigned iface)
