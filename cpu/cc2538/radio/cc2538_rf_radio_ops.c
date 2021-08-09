@@ -104,6 +104,8 @@ static int _request_transmit(ieee802154_dev_t *dev)
     else {
         cc2538_cca = false;
 
+        /* Disable RX Chain for CCA (see CC2538 RM, Section 29.9.5.3) */
+        RFCORE_XREG_FRMCTRL0 |= CC2538_FRMCTRL0_RX_MODE_DIS;
         RFCORE_SFR_RFST = ISRXON;
         /* Clear last program */
         RFCORE_SFR_RFST = ISCLEAR;
@@ -314,6 +316,8 @@ static int _request_set_trx_state(ieee802154_dev_t *dev, ieee802154_trx_state_t 
         case IEEE802154_TRX_STATE_RX_ON:
             RFCORE_XREG_RFIRQM0 |= RXPKTDONE;
             RFCORE_SFR_RFST = ISFLUSHRX;
+            /* Enable RX Chain */
+            RFCORE_XREG_FRMCTRL0 &= ~CC2538_FRMCTRL0_RX_MODE_DIS;
             RFCORE_SFR_RFST = ISRXON;
             break;
     }

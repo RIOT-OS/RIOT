@@ -110,6 +110,8 @@ extern "C" {
 #define CC2538_STATE_SFD_WAIT_RANGE_MAX  (0x06U)  /**< max range value of SFD wait state */
 #define CC2538_FRMCTRL1_PENDING_OR_MASK  (0x04)   /**< mask for enabling or disabling the
                                                        frame pending bit */
+#define CC2538_FRMCTRL0_RX_MODE_DIS      (0xC)    /**< mask for disabling RX Chain during
+                                                       CCA */
 
 #define RFCORE_ASSERT(expr) (void)( (expr) || RFCORE_ASSERT_failure(#expr, __FUNCTION__, __LINE__) )
 
