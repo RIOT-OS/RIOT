@@ -36,6 +36,9 @@ ieee802154_dev_t cc2538_rf_dev = {
     .driver = &cc2538_rf_ops,
 };
 
+static bool cc2538_tx_busy;     /**< used to indicate TX chain is busy */
+static bool cc2538_rx_busy;     /**< used to indicate RX chain is busy */
+
 static uint8_t cc2538_min_be = CONFIG_IEEE802154_DEFAULT_CSMA_CA_MIN_BE;
 static uint8_t cc2538_max_be = CONFIG_IEEE802154_DEFAULT_CSMA_CA_MAX_BE;
 static int cc2538_csma_ca_retries = CONFIG_IEEE802154_DEFAULT_CSMA_CA_RETRIES;
@@ -44,8 +47,6 @@ static bool cc2538_cca_status;  /**< status of the last CCA request */
 static bool cc2538_cca;         /**< used to check whether the last CCA result
                                      corresponds to a CCA request or send with
                                      CSMA-CA */
-static bool cc2538_sfd_listen;  /**< used to check whether we should ignore
-                                     the SFD flag */
 
 static int _write(ieee802154_dev_t *dev, const iolist_t *iolist)
 {
@@ -91,6 +92,7 @@ static int _request_transmit(ieee802154_dev_t *dev)
 {
     (void) dev;
 
+    cc2538_tx_busy = true;
     if (cc2538_csma_ca_retries < 0) {
         RFCORE_SFR_RFST = ISTXON;
         /* The CPU Ctrl mask is used here to indicate whether the radio is being
@@ -220,7 +222,6 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
         res = 0;
     }
 
-
     return res;
 }
 
@@ -297,12 +298,7 @@ static int _request_set_trx_state(ieee802154_dev_t *dev, ieee802154_trx_state_t 
 {
 
     (void) dev;
-    bool wait_sfd =
-        RFCORE->XREG_FSMSTAT0bits.FSM_FFCTRL_STATE >= CC2538_STATE_SFD_WAIT_RANGE_MIN
-        && RFCORE->XREG_FSMSTAT0bits.FSM_FFCTRL_STATE <= CC2538_STATE_SFD_WAIT_RANGE_MAX;
-
-    if ((RFCORE->XREG_FSMSTAT1bits.RX_ACTIVE && !wait_sfd) ||
-         RFCORE->XREG_FSMSTAT1bits.TX_ACTIVE) {
+    if (cc2538_tx_busy || cc2538_rx_busy) {
         return -EBUSY;
     }
 
@@ -333,20 +329,24 @@ void cc2538_irq_handler(void)
     RFCORE_SFR_RFIRQF0 = 0;
     RFCORE_SFR_RFIRQF1 = 0;
 
-    if ((flags_f0 & SFD) && cc2538_sfd_listen) {
-        if (RFCORE->XREG_FSMSTAT1bits.TX_ACTIVE) {
+    if ((flags_f0 & SFD)) {
+        /* If the radio already transmitted, this SFD is the TX_START event */
+        if (cc2538_tx_busy) {
             cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_INDICATION_TX_START);
+        }
+        /* If the RX chain was not busy, the detected SFD corresponds to a new
+         * incoming frame. Note the automatic ACK frame also triggers this event.
+         * Therefore, we use this variable to distinguish them. */
+        else if (!cc2538_rx_busy){
+            cc2538_rx_busy = true;
+            cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_INDICATION_RX_START);
         }
     }
 
     if (flags_f1 & TXDONE) {
+        /* TXDONE marks the end of the TX chain. The radio is not busy anymore */
+        cc2538_tx_busy = false;
         cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_CONFIRM_TX_DONE);
-    }
-
-    if ((flags_f0 & SFD) && cc2538_sfd_listen) {
-        if (RFCORE->XREG_FSMSTAT1bits.RX_ACTIVE) {
-            cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_INDICATION_RX_START);
-        }
     }
 
     if (flags_f0 & RXPKTDONE) {
@@ -355,25 +355,28 @@ void cc2538_irq_handler(void)
         if (rfcore_peek_rx_fifo(pkt_len) & CC2538_CRC_BIT_MASK) {
             /* Disable RX while the frame has not been processed */
             RFCORE_XREG_RXMASKCLR = 0xFF;
-            /* If AUTOACK is enabled and the ACK request bit is set */
-            if (!IS_ACTIVE(CONFIG_IEEE802154_AUTO_ACK_DISABLE) &&
-                (rfcore_peek_rx_fifo(1) & IEEE802154_FCF_ACK_REQ)) {
-                /* The next SFD will be the ACK's, ignore it */
-                cc2538_sfd_listen = false;
+            /* If AUTOACK is disabled or the ACK request bit is not set */
+            if (IS_ACTIVE(CONFIG_IEEE802154_AUTO_ACK_DISABLE) ||
+                (!(rfcore_peek_rx_fifo(1) & IEEE802154_FCF_ACK_REQ))) {
+                /* The radio won't send an ACK. Therefore the RX chain is not
+                 * busy anymore
+                 */
+                cc2538_rx_busy = false;
             }
             cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_INDICATION_RX_DONE);
         }
         else {
             /* Disable RX while the frame has not been processed */
             RFCORE_XREG_RXMASKCLR = 0xFF;
-            /* CRC failed; discard packet */
+            /* CRC failed; discard packet. The RX chain is not busy anymore */
+            cc2538_rx_busy = false;
             cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_INDICATION_CRC_ERROR);
         }
     }
 
-    /* Re-Enable SFD ISR after ACK is received */
+    /* The RX chain is not busy anymore on TXACKDONE event */
     if (flags_f1 & TXACKDONE) {
-        cc2538_sfd_listen = true;
+        cc2538_rx_busy = false;
     }
 
     /* Check if the interrupt was triggered because the CSP finished its routine
@@ -387,6 +390,8 @@ void cc2538_irq_handler(void)
                 RFCORE_SFR_RFST = ISTXON;
             }
             else {
+                /* In case of CCA failure the TX chain is not busy anymore */
+                cc2538_tx_busy = false;
                 cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_CONFIRM_TX_DONE);
             }
         }
@@ -463,8 +468,6 @@ static int _request_on(ieee802154_dev_t *dev)
 {
     (void) dev;
     /* TODO */
-    /* when turned on listen for SFD interrupts */
-    cc2538_sfd_listen = true;
     return 0;
 }
 
