@@ -337,7 +337,7 @@ static inline int sched_runq_is_empty(uint8_t prio)
  * @return      Truth value for that information
  * @warning     This API is not intended for out of tree users.
  */
-static inline int sched_runq_is_one(uint8_t prio)
+static inline int sched_runq_exactly_one(uint8_t prio)
 {
     return clist_exactly_one(&sched_runqueues[prio]);
 }
@@ -349,7 +349,7 @@ static inline int sched_runq_is_one(uint8_t prio)
  * @return      Truth value for that information
  * @warning     This API is not intended for out of tree users.
  */
-static inline int sched_runq_greater_one(uint8_t prio)
+static inline int sched_runq_more_than_one(uint8_t prio)
 {
     return clist_more_than_one(&sched_runqueues[prio]);
 }
