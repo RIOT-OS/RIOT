@@ -1243,7 +1243,7 @@ int gnrc_netif_ipv6_add_prefix(gnrc_netif_t *netif,
 {
     int res;
     eui64_t iid;
-    ipv6_addr_t addr;
+    ipv6_addr_t addr = {0};
 
     assert(netif != NULL);
     DEBUG("gnrc_netif: (re-)configure prefix %s/%d\n",
