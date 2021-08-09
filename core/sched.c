@@ -75,8 +75,8 @@ clist_node_t sched_runqueues[SCHED_PRIO_LEVELS];
 static uint32_t runqueue_bitcache = 0;
 
 #ifdef MODULE_SCHED_CB
-static void (*sched_cb) (kernel_pid_t active_thread,
-                         kernel_pid_t next_thread) = NULL;
+static void (*sched_cb)(kernel_pid_t active_thread,
+                        kernel_pid_t next_thread) = NULL;
 #endif
 
 /* Depending on whether the CLZ instruction is available, the order of the
