@@ -7,6 +7,7 @@ STDIO_MODULES = \
   stdio_rtt \
   stdio_semihosting \
   stdio_uart \
+  stdio_telnet \
   #
 
 ifneq (,$(filter newlib picolibc,$(USEMODULE)))
@@ -61,6 +62,11 @@ endif
 ifneq (,$(filter stdio_semihosting,$(USEMODULE)))
   USEMODULE += ztimer_msec
   FEATURES_REQUIRED_ANY += cpu_core_cortexm|arch_riscv
+endif
+
+ifneq (,$(filter stdio_telnet,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_telnet
+  USEMODULE += telnet
 endif
 
 # enable stdout buffering for modules that benefit from sending out buffers in larger chunks

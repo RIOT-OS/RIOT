@@ -324,6 +324,11 @@ ifneq (,$(filter sema_inv,$(USEMODULE)))
   USEMODULE += atomic_utils
 endif
 
+ifneq (,$(filter telnet,$(USEMODULE)))
+  USEMODULE += pipe
+  USEMODULE += sock_tcp
+endif
+
 ifneq (,$(filter luid,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_cpuid
 endif
