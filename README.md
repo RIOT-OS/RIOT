@@ -1,4 +1,5 @@
 [![Nightly CI status master][master-ci-badge]][master-ci-link]
+[![Nightly HiL CI overview][hil-ci-badge]][hil-ci-link]
 [![GitHub release][release-badge]][release-link]
 [![License][license-badge]][license-link]
 [![API docs][api-badge]][api-link]
@@ -158,3 +159,5 @@ https://www.riot-os.org
 [twitter-link]: https://twitter.com/RIOT_OS
 [wiki-badge]: https://img.shields.io/badge/docs-Wiki-informational.svg
 [wiki-link]: https://github.com/RIOT-OS/RIOT/wiki
+[hil-ci-link]: https://hil.riot-os.org/results/nightly/latest/overview
+[hil-ci-badge]: https://img.shields.io/badge/CI-HiL-blue
