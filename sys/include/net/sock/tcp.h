@@ -45,7 +45,7 @@
  *     while (1) {
  *         sock_tcp_t *sock;
  *
- *         if (sock_tcp_accept(&queue, &sock) < 0) {
+ *         if (sock_tcp_accept(&queue, &sock, SOCK_NO_TIMEOUT) < 0) {
  *             puts("Error accepting new sock");
  *         }
  *         else {
@@ -76,7 +76,7 @@
  *             sock_tcp_disconnect(sock);
  *         }
  *     }
- *     sock_tcp_stop_listen(queue);
+ *     sock_tcp_stop_listen(&queue);
  *     return 0;
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
