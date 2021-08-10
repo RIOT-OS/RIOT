@@ -5,6 +5,7 @@
 # directory for more details.
 
 rsource "csma_sender/Kconfig"
+rsource "eui_provider/Kconfig"
 rsource "ieee802154/Kconfig"
 rsource "l2filter/Kconfig"
 rsource "Kconfig.lorawan"

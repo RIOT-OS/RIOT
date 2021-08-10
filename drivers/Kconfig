@@ -6,6 +6,9 @@
 
 menu "Drivers"
 
+config MODULE_NETDEV_DEFAULT
+    bool "Enable default network devices on the platform"
+
 rsource "saul/Kconfig"
 
 menu "Actuator Device Drivers"
