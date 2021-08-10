@@ -21,6 +21,8 @@ fuzzing/**/findings/
 .*.swn
 .*.swo
 .*.swp
+*.save
+*.rej
 \#*\#
 cachegrind.out*
 # Eclipse workspace files
