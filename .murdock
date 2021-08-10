@@ -11,6 +11,7 @@
 native
 samr21-xpro
 nucleo-f103rb
+remote-revb
 "}
 
 : ${TEST_KCONFIG_ENFORCE_APP_GROUPS:="
@@ -35,6 +36,8 @@ tests/periph_*
 tests/prng_*
 tests/xtimer_*
 tests/ztimer_*
+examples/hello-world
+tests/ieee802154_hal
 "}
 
 : ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/driver_at86rf2xx_aes"}
