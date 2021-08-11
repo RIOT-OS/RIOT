@@ -27,6 +27,7 @@ PSEUDOMODULES += dhcpv6_%
 PSEUDOMODULES += dhcpv6_client_dns
 PSEUDOMODULES += dhcpv6_client_ia_pd
 PSEUDOMODULES += dhcpv6_client_mud_url
+PSEUDOMODULES += dns_msg
 PSEUDOMODULES += ecc_%
 PSEUDOMODULES += event_%
 PSEUDOMODULES += event_timeout_ztimer

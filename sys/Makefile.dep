@@ -110,6 +110,10 @@ ifneq (,$(filter dhcpv6_client,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter dns_%,$(USEMODULE)))
+  USEMODULE += dns
+endif
+
 ifneq (,$(filter fuzzing,$(USEMODULE)))
   USEMODULE += netdev_test
   USEMODULE += gnrc_netif
@@ -474,6 +478,7 @@ ifneq (,$(filter sock_async,$(USEMODULE)))
 endif
 
 ifneq (,$(filter sock_dns,$(USEMODULE)))
+  USEMODULE += dns_msg
   USEMODULE += sock_udp
   USEMODULE += sock_util
   USEMODULE += posix_headers

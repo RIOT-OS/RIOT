@@ -7,31 +7,24 @@
  */
 
 /**
- * @ingroup net_sock_dns
  * @{
+ *
  * @file
- * @brief   sock DNS client implementation
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
- * @}
+ * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
 #include <arpa/inet.h>
+#include <errno.h>
 #include <string.h>
-#include <stdio.h>
 
 #include "net/dns.h"
-#include "net/sock/udp.h"
-#include "net/sock/dns.h"
 
 #ifdef RIOT_VERSION
 #include "byteorder.h"
 #endif
 
-/* min domain name length is 1, so minimum record length is 7 */
-#define DNS_MIN_REPLY_LEN   (unsigned)(sizeof(sock_dns_hdr_t ) + 7)
-
-/* global DNS server UDP endpoint */
-sock_udp_ep_t sock_dns_server;
+#include "net/dns/msg.h"
 
 static ssize_t _enc_domain_name(uint8_t *out, const char *domain_name)
 {
@@ -68,14 +61,15 @@ static unsigned _put_short(uint8_t *out, uint16_t val)
     return 2;
 }
 
-static unsigned _get_short(uint8_t *buf)
+static unsigned _get_short(const uint8_t *buf)
 {
     uint16_t _tmp;
     memcpy(&_tmp, buf, 2);
     return _tmp;
 }
 
-static ssize_t _skip_hostname(const uint8_t *buf, size_t len, uint8_t *bufpos)
+static ssize_t _skip_hostname(const uint8_t *buf, size_t len,
+                              const uint8_t *bufpos)
 {
     const uint8_t *buflim = buf + len;
     unsigned res = 0;
@@ -102,11 +96,46 @@ static ssize_t _skip_hostname(const uint8_t *buf, size_t len, uint8_t *bufpos)
     return res + 1;
 }
 
-static int _parse_dns_reply(uint8_t *buf, size_t len, void* addr_out, int family)
+size_t dns_msg_compose_query(void *dns_buf, const char *domain_name,
+                             uint16_t id, int family)
+{
+    uint8_t *buf = dns_buf;
+
+    dns_hdr_t *hdr = (dns_hdr_t*) buf;
+    memset(hdr, 0, sizeof(*hdr));
+    hdr->id = id;
+    hdr->flags = htons(0x0120);
+    hdr->qdcount = htons(1 + (family == AF_UNSPEC));
+
+    uint8_t *bufpos = buf + sizeof(*hdr);
+
+    unsigned _name_ptr;
+    if ((family == AF_INET6) || (family == AF_UNSPEC)) {
+        _name_ptr = (bufpos - buf);
+        bufpos += _enc_domain_name(bufpos, domain_name);
+        bufpos += _put_short(bufpos, htons(DNS_TYPE_AAAA));
+        bufpos += _put_short(bufpos, htons(DNS_CLASS_IN));
+    }
+
+    if ((family == AF_INET) || (family == AF_UNSPEC)) {
+        if (family == AF_UNSPEC) {
+            bufpos += _put_short(bufpos, htons((0xc000) | (_name_ptr)));
+        }
+        else {
+            bufpos += _enc_domain_name(bufpos, domain_name);
+        }
+        bufpos += _put_short(bufpos, htons(DNS_TYPE_A));
+        bufpos += _put_short(bufpos, htons(DNS_CLASS_IN));
+    }
+    return bufpos - buf;
+}
+
+int dns_msg_parse_reply(const uint8_t *buf, size_t len, int family,
+                        void *addr_out)
 {
     const uint8_t *buflim = buf + len;
-    sock_dns_hdr_t *hdr = (sock_dns_hdr_t*) buf;
-    uint8_t *bufpos = buf + sizeof(*hdr);
+    const dns_hdr_t *hdr = (dns_hdr_t *)buf;
+    const uint8_t *bufpos = buf + sizeof(*hdr);
 
     /* skip all queries that are part of the reply */
     for (unsigned n = 0; n < ntohs(hdr->qdcount); n++) {
@@ -166,78 +195,7 @@ static int _parse_dns_reply(uint8_t *buf, size_t len, void* addr_out, int family
         return addrlen;
     }
 
-    return -1;
+    return -EBADMSG;
 }
 
-int sock_dns_query(const char *domain_name, void *addr_out, int family)
-{
-    static uint8_t dns_buf[SOCK_DNS_BUF_LEN];
-
-    if (sock_dns_server.port == 0) {
-        return -ECONNREFUSED;
-    }
-
-    if (strlen(domain_name) > SOCK_DNS_MAX_NAME_LEN) {
-        return -ENOSPC;
-    }
-
-    sock_udp_t sock_dns;
-
-    ssize_t res = sock_udp_create(&sock_dns, NULL, &sock_dns_server, 0);
-    if (res) {
-        goto out;
-    }
-
-    uint16_t id = 0; /* random? */
-    for (int i = 0; i < SOCK_DNS_RETRIES; i++) {
-        uint8_t *buf = dns_buf;
-
-        sock_dns_hdr_t *hdr = (sock_dns_hdr_t*) buf;
-        memset(hdr, 0, sizeof(*hdr));
-        hdr->id = id;
-        hdr->flags = htons(0x0120);
-        hdr->qdcount = htons(1 + (family == AF_UNSPEC));
-
-        uint8_t *bufpos = buf + sizeof(*hdr);
-
-        unsigned _name_ptr;
-        if ((family == AF_INET6) || (family == AF_UNSPEC)) {
-            _name_ptr = (bufpos - buf);
-            bufpos += _enc_domain_name(bufpos, domain_name);
-            bufpos += _put_short(bufpos, htons(DNS_TYPE_AAAA));
-            bufpos += _put_short(bufpos, htons(DNS_CLASS_IN));
-        }
-
-        if ((family == AF_INET) || (family == AF_UNSPEC)) {
-            if (family == AF_UNSPEC) {
-                bufpos += _put_short(bufpos, htons((0xc000) | (_name_ptr)));
-            }
-            else {
-                bufpos += _enc_domain_name(bufpos, domain_name);
-            }
-            bufpos += _put_short(bufpos, htons(DNS_TYPE_A));
-            bufpos += _put_short(bufpos, htons(DNS_CLASS_IN));
-        }
-
-        res = sock_udp_send(&sock_dns, buf, (bufpos-buf), NULL);
-        if (res <= 0) {
-            continue;
-        }
-        res = sock_udp_recv(&sock_dns, dns_buf, sizeof(dns_buf), 1000000LU, NULL);
-        if (res > 0) {
-            if (res > (int)DNS_MIN_REPLY_LEN) {
-                if ((res = _parse_dns_reply(dns_buf, res, addr_out,
-                                            family)) > 0) {
-                    goto out;
-                }
-            }
-            else {
-                res = -EBADMSG;
-            }
-        }
-    }
-
-out:
-    sock_udp_close(&sock_dns);
-    return res;
-}
+/** @} */
