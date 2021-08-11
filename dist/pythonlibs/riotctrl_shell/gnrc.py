@@ -22,6 +22,8 @@ class GNRCICMPv6EchoParser(ShellInteractionParser):
         self.c_reply = re.compile(r"\d+ bytes from "
                                   r"(?P<source>[0-9a-f:]+(%\S+)?): "
                                   r"icmp_seq=(?P<seq>\d+) ttl=(?P<ttl>\d+)"
+                                  r"( corrupted at offset (?P<corrupted>\d+))?"
+                                  r"( truncated by (?P<truncated>\d+) byte)?"
                                   r"( rssi=(?P<rssi>-?\d+) dBm)?"
                                   r"( time=(?P<rtt>\d+.\d+) ms)?"
                                   r"(?P<dup> \(DUP\))?")
@@ -48,6 +50,10 @@ class GNRCICMPv6EchoParser(ShellInteractionParser):
             reply["rssi"] = int(reply["rssi"])
         else:
             reply.pop("rssi", None)
+        if reply.get("truncated") is not None:
+            reply["truncated"] = int(reply["truncated"])
+        if reply.get("corrupted") is not None:
+            reply["corrupted"] = int(reply["corrupted"])
         if "replies" in res:
             res["replies"].append(reply)
         else:
@@ -79,10 +85,12 @@ class GNRCICMPv6EchoParser(ShellInteractionParser):
         >>> res = parser.parse(
         ...     "12 bytes from fe80::385d:f965:106b:1114%6: "
         ...         "icmp_seq=0 ttl=64 rssi=-34 dBm time=8.839 ms\\n"
+        ...     "6 bytes from fe80::385d:f965:106b:1114%6: "
+        ...         "icmp_seq=1 ttl=64 truncated by 6 byte "
+        ...         "rssi=-34 dBm time=6.925 ms\\n"
         ...     "12 bytes from fe80::385d:f965:106b:1114%6: "
-        ...         "icmp_seq=1 ttl=64 rssi=-34 dBm time=6.925 ms\\n"
-        ...     "12 bytes from fe80::385d:f965:106b:1114%6: "
-        ...         "icmp_seq=2 ttl=64 rssi=-34 dBm time=7.885 ms\\n"
+        ...         "icmp_seq=2 ttl=64 corrupted at offset 7 "
+        ...         "rssi=-34 dBm time=7.885 ms\\n"
         ...     "--- fe80::385d:f965:106b:1114 PING statistics ---\\n"
         ...     "3 packets transmitted, 3 packets received, 0% packet loss\\n"
         ...     "round-trip min/avg/max = 6.925/7.883/8.839 ms\\n")
@@ -91,7 +99,7 @@ class GNRCICMPv6EchoParser(ShellInteractionParser):
         >>> len(res["replies"])
         3
         >>> sorted(res["replies"][0])
-        ['rssi', 'rtt', 'seq', 'source', 'ttl']
+        ['corrupted', 'rssi', 'rtt', 'seq', 'source', 'truncated', 'ttl']
         >>> res["replies"][0]["source"]
         'fe80::385d:f965:106b:1114%6'
         >>> res["replies"][0]["seq"]
@@ -102,6 +110,12 @@ class GNRCICMPv6EchoParser(ShellInteractionParser):
         -34
         >>> res["replies"][0]["rtt"]
         8.839
+        >>> res["replies"][0]["corrupted"]
+        >>> res["replies"][0]["truncated"]
+        >>> res["replies"][1]["truncated"]
+        6
+        >>> res["replies"][2]["corrupted"]
+        7
         >>> sorted(res["stats"])
         ['packet_loss', 'rx', 'tx']
         >>> res["stats"]["tx"]
