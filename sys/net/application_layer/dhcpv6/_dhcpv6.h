@@ -144,6 +144,35 @@ typedef struct __attribute__((packed)) {
 } dhcpv6_opt_duid_t;
 
 /**
+ * @brief   DHCPv6 identity association for non-temporary addresses (IA_NA) option
+ *          format
+ * @see [RFC 8415, section 21.4]
+ *      (https://tools.ietf.org/html/rfc8415#section-21.4)
+ */
+typedef struct __attribute__((packed)) {
+    network_uint16_t type;          /**< @ref DHCPV6_OPT_IA_NA */
+    network_uint16_t len;           /**< 12 + length of dhcpv6_opt_ia_na_t::opts in byte */
+    network_uint32_t ia_id;         /**< Unique ID for this IA_NA */
+    network_uint32_t t1;            /**< DHCPv6 T1 time (in sec) */
+    network_uint32_t t2;            /**< DHCPv6 T2 time (in sec) */
+    uint8_t opts[];                 /**< IA_NA options */
+} dhcpv6_opt_ia_na_t;
+
+/**
+ * @brief   DHCPv6 IA address option format
+ * @see [RFC 8415, section 21.6]
+ *      (https://tools.ietf.org/html/rfc8415#section-21.6)
+ */
+typedef struct __attribute__((packed)) {
+    network_uint16_t type;          /**< @ref DHCPV6_OPT_IAADDR */
+    network_uint16_t len;           /**< 25 + length of dhcpv6_opt_iapfx_t::opts in byte */
+    ipv6_addr_t addr;                /**< the address */
+    network_uint32_t pref;          /**< preferred lifetime (in sec) */
+    network_uint32_t valid;         /**< valid lifetime (in sec) */
+    uint8_t opts[];                 /**< IAprefix options */
+} dhcpv6_opt_iaaddr_t;
+
+/**
  * @brief   DHCPv6 option request option format
  * @see [RFC 8415, section 21.7]
  *      (https://tools.ietf.org/html/rfc8415#section-21.7)

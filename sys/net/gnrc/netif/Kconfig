@@ -22,6 +22,7 @@ config GNRC_NETIF_MSG_QUEUE_SIZE_EXP
 
 config GNRC_NETIF_IPV6_ADDRS_NUMOF
     int "Maximum number of unicast and anycast addresses per interface"
+    default 3 if DHCPV6_CLIENT_ADDR_LEASE_MAX != 0
     default 2
     help
         If you change this, please make sure that

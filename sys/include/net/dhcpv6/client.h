@@ -60,6 +60,25 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Maximum number of address leases to be stored
+ */
+#ifndef CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX
+#define CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX (1U)
+#endif
+
+/**
+ * @brief  Number of addresses needed for using DHCPv6 IA_NA.
+ *
+ * @note    Used for calculation of @ref CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF.
+ *          Set to 0 if `dhcpv6_client_ia_na` is not included.
+ */
+#if defined(MODULE_DHCPV6_CLIENT_IA_NA) || defined(DOXYGEN)
+#define DHCPV6_CLIENT_ADDRS_NUMOF ((int)(CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX))
+#else
+#define DHCPV6_CLIENT_ADDRS_NUMOF (0)
+#endif
+
+/**
  * @brief   MUD URL (must use the https:// scheme)
  * For more info, see the [definitions](@ref net_dhcpv6_mud_url_option) below
  */
@@ -140,6 +159,21 @@ void dhcpv6_client_req_ia_pd(unsigned netif, unsigned pfx_len);
 /** @} */
 
 /**
+ * @brief   Configures the client to request non-temporary addresses for a network
+ *          interface from a server
+ * @note    For multi-hop WPAN meshes a DHCPv6 relay (which is not implemented in
+ *          RIOT yet) is required, as DHCPv6 only acts in link scope.
+ *
+ * @param[in] netif     The interface to request non-temporaty addresses for.
+ *
+ * @retval 0 on success
+ * @retval -ENOMEM when there is no lease entry available anymore
+ * @retval -ENOTSUP when module `dhcpv6_client_ia_na` is not being used
+ */
+int dhcpv6_client_req_ia_na(unsigned netif);
+/** @} */
+
+/**
  * @name    Stack-specific functions
  *
  * These functions need to be provided by the network-stack implementation.
@@ -169,6 +203,43 @@ unsigned dhcpv6_client_get_duid_l2(unsigned netif, dhcpv6_duid_l2_t *duid);
 void dhcpv6_client_conf_prefix(unsigned netif, const ipv6_addr_t *pfx,
                                unsigned pfx_len, uint32_t valid,
                                uint32_t pref);
+
+/**
+ * @brief   Checks if the given network interface is configured
+ *          to use DHCPv6 IA_NA
+ *
+ * @param[in] netif     Network interface to check.
+ *
+ * @return  true, if the network interface is set up for IA_NA.
+ */
+bool dhcpv6_client_check_ia_na(unsigned netif);
+
+/**
+ * @brief   Configures a address lease that is provided by the server.
+ *
+ * @param[in] netif     Network interface the address was for.
+ * @param[in] addr      The assigned address.
+ *
+ * @return sizeof(ipv6_addr_t) on success.
+ * @return <0 on error.
+ */
+int dhcpv6_client_add_addr(unsigned netif, ipv6_addr_t *addr);
+
+/**
+ * @brief   Deprecates an existing address from an address lease.
+ *
+ * @param[in] netif     Network interface the address was for.
+ * @param[in] addr      The address to deprecate.
+ */
+void dhcpv6_client_deprecate_addr(unsigned netif, const ipv6_addr_t *addr);
+
+/**
+ * @brief   Removes an existing address that originated from an address lease.
+ *
+ * @param[in] netif     Network interface the address was for.
+ * @param[in] addr      The address to remove.
+ */
+void dhcpv6_client_remove_addr(unsigned netif, ipv6_addr_t *addr);
 
 /**
  * @brief   Determines how long the prefix delegation lease is still valid.

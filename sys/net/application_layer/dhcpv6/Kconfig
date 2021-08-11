@@ -20,6 +20,10 @@ menuconfig KCONFIG_USEMODULE_DHCPV6_CLIENT
 
 if KCONFIG_USEMODULE_DHCPV6_CLIENT
 
+config DHCPV6_CLIENT_ADDR_LEASE_MAX
+    int "Maximum number of leases to be stored"
+    default 1
+
 config DHCPV6_CLIENT_PFX_LEASE_MAX
     int "Maximum number of prefix leases to be stored"
     default 1
