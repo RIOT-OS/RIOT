@@ -15,6 +15,7 @@ from ipaddress import (
 
 
 IA_NA_ADDRESS_POOL_PREFIX = "2001:db8:1::"
+IA_PD_PREFIX = "2001:db8:8000::"
 
 
 def testfunc(child):
@@ -23,17 +24,26 @@ def testfunc(child):
     child.expect(r"Iface\s+\d+")
     child.expect(r"inet6 addr:\s+fe80:[0-9a-f:]+\s+scope: link")
 
-    global_addr_1, global_addr_2 = extract_global_addresses(child)
+    global_addr_1 = extract_global_address(child)
+    global_addr_2 = extract_global_address(child)
+    assert global_addr_1 != global_addr_2
 
-    global_pfx = extract_global_prefix(child)
+    global_pfx_1 = extract_global_prefix(child)
+    global_pfx_2 = extract_global_prefix(child)
+    assert global_pfx_1 != global_pfx_2
 
-    test_global_addrs(global_addr_1, global_addr_2, global_pfx)
+    assert check_ia_na_addr(global_addr_1, global_pfx_1) or \
+           check_ia_pd_addr(global_addr_1, global_pfx_1)
+    assert check_ia_na_addr(global_addr_2, global_pfx_2) or \
+           check_ia_pd_addr(global_addr_2, global_pfx_2)
 
 
 def extract_global_prefix(child):
-    child.expect(r"(?P<global_pfx>[0-9a-f:]+)/64\s+dev #\d\s+"
-                 r"expires \d+ sec\s+"
-                 r"deprecates \d+ sec")
+    child.expect(
+        r"(?P<global_pfx>[0-9a-f:]+)\/(64|128)\s+dev #\d\s+"
+        r"expires \d+ sec\s+"
+        r"deprecates \d+ sec"
+    )
     global_pfx = child.match.group("global_pfx")
 
     if global_pfx.endswith("::"):
@@ -50,36 +60,22 @@ def extract_global_address(child):
     return child.match.group("global_addr")
 
 
-def extract_global_addresses(child):
-    """Extract two global addresses and return them as a tuple."""
-    return extract_global_address(child), extract_global_address(child)
+def check_prefix(addr, prefix):
+    return addr.startswith(prefix)
 
 
-def check_ia_na_addr(ia_na_addr):
+def check_ia_na_addr(ia_na_addr, global_pfx):
     """Check if the expected IA_NA address has been assigned"""
-    return IPv6Address(ia_na_addr) in IPv6Network("{}/64".format(IA_NA_ADDRESS_POOL_PREFIX))
+    result = IPv6Address(ia_na_addr) in IPv6Network(f"{IA_NA_ADDRESS_POOL_PREFIX}/64")
+    result = result and check_prefix(ia_na_addr, global_pfx)
+    return result
 
 
 def check_ia_pd_addr(ia_pd_addr, global_pfx):
     """Check if the expected IA_PD address has been assigned"""
-    return ia_pd_addr.startswith(global_pfx)
-
-
-def check_global_addrs(ia_na_addr, ia_pd_addr, global_pfx):
-    """Perform IA_NA check for the first and IA_PD for the second address"""
-    return {
-        "ia_na_check": check_ia_na_addr(ia_na_addr),
-        "ia_pd_check": check_ia_pd_addr(ia_pd_addr, global_pfx),
-    }
-
-
-def test_global_addrs(global_addr_1, global_addr_2, global_pfx):
-    """Assert that one global address is the IA_NA and the other one is the IA_PD address"""
-    result_1 = check_global_addrs(global_addr_1, global_addr_2, global_pfx)
-    result_2 = check_global_addrs(global_addr_2, global_addr_1, global_pfx)
-    assert result_1 != result_2
-    assert result_1["ia_na_check"] != result_2["ia_na_check"]
-    assert result_1["ia_pd_check"] != result_2["ia_pd_check"]
+    result = IPv6Address(ia_pd_addr) in IPv6Network(f"{IA_PD_PREFIX}/33")
+    result = result and check_prefix(ia_pd_addr, global_pfx)
+    return result
 
 
 if __name__ == "__main__":
