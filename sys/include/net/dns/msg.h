@@ -109,7 +109,8 @@ size_t dns_msg_compose_query(void *dns_buf, const char *domain_name,
  * @return  -EBADMSG, when an address corresponding to @p family can not be found
  *          in @p buf.
  */
-int dns_msg_parse_reply(uint8_t *buf, size_t len, int family, void *addr_out);
+int dns_msg_parse_reply(const uint8_t *buf, size_t len, int family,
+                        void *addr_out);
 
 #ifdef __cplusplus
 }

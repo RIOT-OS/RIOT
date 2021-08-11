@@ -61,14 +61,15 @@ static unsigned _put_short(uint8_t *out, uint16_t val)
     return 2;
 }
 
-static unsigned _get_short(uint8_t *buf)
+static unsigned _get_short(const uint8_t *buf)
 {
     uint16_t _tmp;
     memcpy(&_tmp, buf, 2);
     return _tmp;
 }
 
-static ssize_t _skip_hostname(const uint8_t *buf, size_t len, uint8_t *bufpos)
+static ssize_t _skip_hostname(const uint8_t *buf, size_t len,
+                              const uint8_t *bufpos)
 {
     const uint8_t *buflim = buf + len;
     unsigned res = 0;
@@ -129,11 +130,12 @@ size_t dns_msg_compose_query(void *dns_buf, const char *domain_name,
     return bufpos - buf;
 }
 
-int dns_msg_parse_reply(uint8_t *buf, size_t len, int family, void *addr_out)
+int dns_msg_parse_reply(const uint8_t *buf, size_t len, int family,
+                        void *addr_out)
 {
     const uint8_t *buflim = buf + len;
-    dns_hdr_t *hdr = (dns_hdr_t *)buf;
-    uint8_t *bufpos = buf + sizeof(*hdr);
+    const dns_hdr_t *hdr = (dns_hdr_t *)buf;
+    const uint8_t *bufpos = buf + sizeof(*hdr);
 
     /* skip all queries that are part of the reply */
     for (unsigned n = 0; n < ntohs(hdr->qdcount); n++) {
