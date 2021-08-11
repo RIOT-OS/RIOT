@@ -17,6 +17,10 @@ from scapy.all import Ether, IPv6, TCP, raw, sendp
 from helpers import Runner, RiotTcpServer, RiotTcpClient, HostTcpServer, HostTcpClient, \
                     generate_port_number, sudo_guard
 
+# Custom NO_TIMEOUT constant. Note: the value must match
+# with CUSTOM_GNRC_TCP_NO_TIMEOUT from the makefile
+_GNRC_TCP_NO_TIMEOUT = 1
+
 
 @Runner(timeout=5)
 def test_connection_lifecycle_as_client(child):
@@ -506,6 +510,71 @@ def test_gnrc_tcp_queue_get_local_returns_EADDRNOTAVAIL(child):
     child.expect_exact('gnrc_tcp_queue_get_local: returns -EADDRNOTAVAIL')
 
 
+@Runner(timeout=5)
+def test_gnrc_tcp_accept_respects_GNRC_TCP_NO_TIMEOUT(child):
+    """ gnrc_tcp_accept timeout mechanism must be disabled if GNRC_TCP_NO_TIMEOUT
+        is set as timeout value.
+    """
+
+    pexpect_timeout_sec = _GNRC_TCP_NO_TIMEOUT + 1
+
+    riot_srv = RiotTcpServer(child, generate_port_number())
+    riot_srv.listen()
+
+    child.sendline('gnrc_tcp_accept {}'.format(_GNRC_TCP_NO_TIMEOUT))
+
+    # The test is successful if gnrc_tcp_accept does not return before pexpects timeout.
+    # Afterwards the connection must be still able to accept a connection.
+    returned = True
+    try:
+        child.expect_exact('gnrc_tcp_accept: returns', timeout=pexpect_timeout_sec)
+    except pexpect.TIMEOUT:
+        returned = False
+    finally:
+        if returned:
+            raise RuntimeError('gnrc_tcp_accept returned')
+
+    # Ensure that gnrc_tcp_accept returns after the test host connects
+    with HostTcpClient(riot_srv):
+        child.expect_exact('gnrc_tcp_accept: returns 0')
+        riot_srv.close()
+
+
+@Runner(timeout=5)
+def test_gnrc_tcp_recv_respects_GNRC_TCP_NO_TIMEOUT(child):
+    """ gnrc_tcp_recv timeout mechanism must be disabled if GNRC_TCP_NO_TIMEOUT
+        is set as timeout value.
+    """
+
+    pexpect_timeout_sec = _GNRC_TCP_NO_TIMEOUT + 1
+    payload = "12345"
+
+    # Setup Host as server
+    with HostTcpServer(generate_port_number()) as host_srv:
+        # Setup Riot as client
+        with RiotTcpClient(child, host_srv):
+
+            # Accept connection
+            host_srv.accept()
+
+            # Wait for incoming data blocking.
+            # This gnrc_tcp_recv must not return until some Data was sent.
+            child.sendline('gnrc_tcp_recv {} {}'.format(_GNRC_TCP_NO_TIMEOUT, len(payload)))
+            returned = True
+            try:
+                child.expect_exact('gnrc_tcp_recv: re', timeout=pexpect_timeout_sec)
+            except pexpect.TIMEOUT:
+                returned = False
+            finally:
+                if returned:
+                    raise RuntimeError('gnrc_tcp_recv returned')
+
+            # Send data to unblock gnrc_tcp_recv and teardown the connection
+            host_srv.send(payload)
+            child.expect_exact('gnrc_tcp_recv: received {}'.format(len(payload)))
+            host_srv.close()
+
+
 @Runner(timeout=10)
 def test_connection_listen_accept_cycle(child, iterations=10):
     """ This test verifies gnrc_tcp in a typical server role by
@@ -531,7 +600,7 @@ def test_connection_listen_accept_cycle(child, iterations=10):
                 host_cli.receive(sent_payload=data)
 
                 # Randomize connection teardown: The connections
-                # can't be either closed or aborted from either
+                # can be either closed or aborted from either
                 # side. Regardless the type of the connection teardown
                 # riot_srv must be able to accept the next connection
                 # Note: python sockets don't offer abort...

@@ -8,6 +8,9 @@ TAP ?= tap0
 MSL_MS ?= 1000
 TIMEOUT_MS ?= 3000
 
+# Set custom GNRC_TCP_NO_TIMEOUT constant for testing purposes
+CUSTOM_GNRC_TCP_NO_TIMEOUT ?= 1
+
 # This test depends on tap device setup (only allowed by root)
 # Suppress test execution to avoid CI errors
 TEST_ON_CI_BLACKLIST += all
@@ -56,4 +59,9 @@ endif
 # Set the shell echo configuration via CFLAGS if not being controlled via Kconfig
 ifndef CONFIG_KCONFIG_USEMODULE_SHELL
   CFLAGS += -DCONFIG_SHELL_NO_ECHO
+endif
+
+# Set GNRC_TCP_NO_TIMEOUT via CFLAGS
+ifndef GNRC_TCP_NO_TIMEOUT
+  CFLAGS += -DGNRC_TCP_NO_TIMEOUT=$(CUSTOM_GNRC_TCP_NO_TIMEOUT)
 endif

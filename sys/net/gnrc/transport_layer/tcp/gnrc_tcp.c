@@ -539,7 +539,7 @@ int gnrc_tcp_listen(gnrc_tcp_tcb_queue_t *queue, gnrc_tcp_tcb_t *tcbs, size_t tc
 }
 
 int gnrc_tcp_accept(gnrc_tcp_tcb_queue_t *queue, gnrc_tcp_tcb_t **tcb,
-                    uint32_t user_timeout_duration_ms)
+                    const uint32_t user_timeout_duration_ms)
 {
     TCP_DEBUG_ENTER;
     assert(queue != NULL);
@@ -612,8 +612,10 @@ int gnrc_tcp_accept(gnrc_tcp_tcb_queue_t *queue, gnrc_tcp_tcb_t **tcb,
     }
 
     /* Setup User specified Timeout */
-    _sched_mbox(&event_user_timeout, user_timeout_duration_ms,
-                MSG_TYPE_USER_SPEC_TIMEOUT, &mbox);
+    if (user_timeout_duration_ms != GNRC_TCP_NO_TIMEOUT) {
+        _sched_mbox(&event_user_timeout, user_timeout_duration_ms,
+                    MSG_TYPE_USER_SPEC_TIMEOUT, &mbox);
+    }
 
     /* Wait until a connection was established */
     while (ret >= 0 && *tcb == NULL) {
@@ -692,7 +694,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     /* Setup connection timeout */
     _sched_connection_timeout(&tcb->event_misc, &mbox);
 
-    if (timeout_duration_ms > 0) {
+    if ((0 < timeout_duration_ms) && (timeout_duration_ms != GNRC_TCP_NO_TIMEOUT)) {
         _sched_mbox(&event_user_timeout, timeout_duration_ms,
                     MSG_TYPE_USER_SPEC_TIMEOUT, &mbox);
     }
@@ -841,7 +843,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     /* Setup connection timeout */
     _sched_connection_timeout(&tcb->event_misc, &mbox);
 
-    if (timeout_duration_ms > 0) {
+    if (timeout_duration_ms != GNRC_TCP_NO_TIMEOUT) {
         _sched_mbox(&event_user_timeout, timeout_duration_ms,
                     MSG_TYPE_USER_SPEC_TIMEOUT, &mbox);
     }
