@@ -60,6 +60,50 @@ void spi_init_pins(spi_t bus)
     SPI_MISOSEL = spi_config[bus].miso;
 }
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+
+    if (freq >= MHZ(8)) { 
+        return SPI_FREQUENCY_FREQUENCY_M8;
+    }
+    if (freq >= MHZ(4)) {
+        return SPI_FREQUENCY_FREQUENCY_M4;
+    }
+    if (freq >= MHZ(2)) {
+        return SPI_FREQUENCY_FREQUENCY_M2;
+    }
+    if (freq >= MHZ(1)) {
+        return SPI_FREQUENCY_FREQUENCY_M1;
+    }
+    if (freq >= 500000) {
+        return SPI_FREQUENCY_FREQUENCY_K500;
+    }
+    if (freq >= 250000) {
+        return SPI_FREQUENCY_FREQUENCY_K250;
+    }
+    if (freq >= 125000) {
+        return SPI_FREQUENCY_FREQUENCY_K125;
+    }
+    assert(0);
+}
+
+uint32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+
+    switch (clk) {
+        case SPI_FREQUENCY_FREQUENCY_K125: return 125000;
+        case SPI_FREQUENCY_FREQUENCY_K250: return 250000;
+        case SPI_FREQUENCY_FREQUENCY_K500: return 500000;
+        case SPI_FREQUENCY_FREQUENCY_M1: return MHZ(1);
+        case SPI_FREQUENCY_FREQUENCY_M2: return MHZ(2);
+        case SPI_FREQUENCY_FREQUENCY_M4: return MHZ(4);
+        case SPI_FREQUENCY_FREQUENCY_M8: return MHZ(8);
+        default: return 250000;
+    }
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;

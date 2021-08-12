@@ -35,6 +35,9 @@
 #include "em_cmu.h"
 #include "em_usart.h"
 
+/* DIV_UP is division which rounds up instead of down */
+#define SPI_DIV_UP(a, b)    (((a) + ((b) - 1)) / (b))
+
 static mutex_t spi_lock[SPI_NUMOF];
 
 void spi_init(spi_t bus)
@@ -54,6 +57,69 @@ void spi_init_pins(spi_t bus)
     gpio_init(spi_config[bus].clk_pin, GPIO_OUT);
     gpio_init(spi_config[bus].mosi_pin, GPIO_OUT);
     gpio_init(spi_config[bus].miso_pin, GPIO_IN_PD);
+}
+
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+
+    /* bound divider from 2 to 65536 */
+    if (freq > (CLOCK_CORECLOCK - 1) / 2) {
+        freq = (CLOCK_CORECLOCK - 1) / 2;
+    }
+    assert(freq >= SPI_DIV_UP(CLOCK_CORECLOCK, 65536));
+
+    /* =================================================================
+     * from USART_BaudrateSyncSet() of the gecko SDK
+     */
+    uint32_t ref_freq, clkdiv;
+
+    /* Prevent dividing by 0. */
+    EFM_ASSERT(freq);
+
+    /*
+     * CLKDIV in synchronous mode is given by:
+     *
+     * CLKDIV = 256 * (fHFPERCLK/(2 * br) - 1)
+     */
+
+    /* HFPERCLK/HFPERBCLK used to clock all USART/UART peripheral modules. */
+#if defined(_SILICON_LABS_32B_SERIES_2)
+    ref_freq = CMU_ClockFreqGet(cmuClock_PCLK);
+#else
+#if defined(_CMU_HFPERPRESCB_MASK)
+    if (dev == USART2) {
+        ref_freq = CMU_ClockFreqGet(cmuClock_HFPERB);
+    }
+    else {
+        ref_freq = CMU_ClockFreqGet(cmuClock_HFPER);
+    }
+#else
+    ref_freq = CMU_ClockFreqGet(cmuClock_HFPER);
+#endif
+#endif
+
+    clkdiv = (ref_freq - 1) / (2 * freq);
+    clkdiv = clkdiv << 8;
+
+    /* Verify that resulting clock divider is within limits. */
+    EFM_ASSERT(!(clkdiv & ~_USART_CLKDIV_MASK));
+
+    /* =================================================================
+     * 
+     * The manual say that `the clock division factor have a 15-bit
+     * integral part and a 5-bit fractional part` but only the integral
+     * part was used in the gecko SDK.
+     */
+
+    /* br = fHFPERCLK/(2 x (1 + USARTn_CLKDIV / 256)) */
+    return SPI_DIV_UP(ref_freq, (2 * (1 + (clkdiv >> 8))));
+}
+
+uint32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    return clk;
 }
 
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)

@@ -30,6 +30,14 @@
 #include "schedstatistics.h"
 #include "thread.h"
 
+
+/**
+ * @brief   Driver support arbitrary bus speed
+ */
+#if !defined(CPU_KINETIS)
+#define HAS_ARBITRARY_BUS_SPEED
+#endif
+
 /**
  * @brief   Default port number used for the CS pin if unassigned
  */
@@ -118,27 +126,48 @@ void print_bytes(char* title, uint8_t* data, size_t len)
     printf("\n\n");
 }
 
+static void _dev_help(void)
+{
+    puts("\tdev:");
+    for (int i = 0; i < (int)SPI_NUMOF; i++) {
+        printf("\t\t%i: SPI_DEV(%i)\n", i, i);
+    }
+}
+
+static int _check_dev(int dev)
+{
+    if (dev < 0 || dev >= (int)SPI_NUMOF) {
+        puts("error: invalid SPI device specified");
+        return 1;
+    }
+    return 0;
+}    
+
 int cmd_init(int argc, char **argv)
 {
-    int dev, mode, clk, port, pin, tmp;
+    int dev, mode, port, pin, tmp;
+    uint32_t clk;
 
     if (argc < 4) {
         printf("usage: %s <dev> <mode> <clk> [cs port] [cs pin]\n", argv[0]);
-        puts("\tdev:");
-        for (int i = 0; i < (int)SPI_NUMOF; i++) {
-            printf("\t\t%i: SPI_DEV(%i)\n", i, i);
-        }
+        _dev_help();
         puts("\tmode:");
         puts("\t\t0: POL:0, PHASE:0 - on first rising edge");
         puts("\t\t1: POL:0, PHASE:1 - on second rising edge");
         puts("\t\t2: POL:1, PHASE:0 - on first falling edge");
         puts("\t\t3: POL:1, PHASE:1 - on second falling edge");
         puts("\tclk:");
-        puts("\t\t0: 100 KHz");
-        puts("\t\t1: 400 KHz");
-        puts("\t\t2: 1 MHz");
-        puts("\t\t3: 5 MHz");
-        puts("\t\t4: 10 MHz");
+        puts("\t\t0: SPI_CLK_100KHZ*");
+        puts("\t\t1: SPI_CLK_400KHZ*");
+        puts("\t\t2: SPI_CLK_1MHZ*");
+        puts("\t\t3: SPI_CLK_5MHZ*");
+        puts("\t\t4: SPI_CLK_10MHZ*");
+#ifdef HAS_ARBITRARY_BUS_SPEED
+        puts("\t\t * Deprecated: use arbitrary value insteed");
+        puts("\t\tn: arbitrary value in Hz");
+#else
+        puts("\t\t * arbitrary value not implemented yet");
+#endif
         puts("\tcs port:");
         puts("\t\tPort of the CS pin, set to -1 for hardware chip select");
         puts("\tcs pin:");
@@ -149,8 +178,7 @@ int cmd_init(int argc, char **argv)
 
     /* parse the given SPI device */
     dev = atoi(argv[1]);
-    if (dev < 0 || dev >= (int)SPI_NUMOF) {
-        puts("error: invalid SPI device specified");
+    if (_check_dev(dev)) {
         return 1;
     }
     spiconf.dev = SPI_DEV(dev);
@@ -168,16 +196,24 @@ int cmd_init(int argc, char **argv)
     }
 
     /* parse the targeted clock speed */
+#if (ARCHITECTURE_WORD_BITS == 8)
+    clk = atol(argv[3]);
+#else
     clk = atoi(argv[3]);
+#endif
     switch (clk) {
-        case 0: spiconf.clk = SPI_CLK_100KHZ; break;
-        case 1: spiconf.clk = SPI_CLK_400KHZ; break;
-        case 2: spiconf.clk = SPI_CLK_1MHZ;   break;
-        case 3: spiconf.clk = SPI_CLK_5MHZ;   break;
-        case 4: spiconf.clk = SPI_CLK_10MHZ;  break;
+        case 0: spiconf.clk = spi_get_clk(SPI_DEV(dev), SPI_CLK_100KHZ); break;
+        case 1: spiconf.clk = spi_get_clk(SPI_DEV(dev), SPI_CLK_400KHZ); break;
+        case 2: spiconf.clk = spi_get_clk(SPI_DEV(dev), SPI_CLK_1MHZ);   break;
+        case 3: spiconf.clk = spi_get_clk(SPI_DEV(dev), SPI_CLK_5MHZ);   break;
+        case 4: spiconf.clk = spi_get_clk(SPI_DEV(dev), SPI_CLK_10MHZ);  break;
         default:
+#ifdef HAS_ARBITRARY_BUS_SPEED
+            spiconf.clk = spi_get_clk(SPI_DEV(dev), clk);
+#else
             puts("error: invalid bus speed specified");
             return 1;
+#endif
     }
 
     /* parse chip select port and pin */
@@ -215,13 +251,15 @@ int cmd_init(int argc, char **argv)
         puts("cannot test configuration without assert()ions enabled");
     }
     else {
-        printf("Trying to initialize SPI_DEV(%i): mode: %i, clk: %i, cs_port: %i, cs_pin: %i\n",
-               dev, mode, clk, port, pin);
-        puts("Note: Failed assertion (crash) means configuration not supported");
+        printf("Trying to initialize SPI_DEV(%i): mode: %i, "
+                "clk: %"PRIu32"(%"PRIu32" Hz), cs_port: %i, cs_pin: %i\n",
+                dev, mode,
+                clk, spi_get_freq(SPI_DEV(dev), spiconf.clk), port, pin);
+        puts(
+            "Note: Failed assertion (crash) means configuration not supported");
         spi_acquire(spiconf.dev, spiconf.cs, spiconf.mode, spiconf.clk);
         spi_release(spiconf.dev);
     }
-
     return 0;
 }
 
@@ -527,6 +565,9 @@ int cmd_spi_gpio(int argc, char **argv)
     /* parse the given SPI device */
     if (argc > 1) {
         dev = atoi(argv[1]);
+        if (_check_dev(dev)) {
+            return 1;
+        }
     }
 
     if (dev < 0 || dev >= (int)SPI_NUMOF) {
@@ -565,13 +606,53 @@ int cmd_spi_gpio(int argc, char **argv)
 }
 #endif
 
+int cmd_get_freq(int argc, char **argv)
+{
+    int dev;
+    uint32_t clk;
+
+    if (argc < 3) {
+        printf("usage: %s <dev> <clk>\n", argv[0]);
+        _dev_help();
+        puts("\tclk: arbitrary value in Hz");
+        return 1;
+    }
+
+    /* parse the given SPI device */
+    dev = atoi(argv[1]);
+    if (_check_dev(dev)) {
+        return 1;
+    }
+
+    /* parse the targeted clock speed */
+#if (ARCHITECTURE_WORD_BITS == 8)
+    clk = atol(argv[2]);
+#else
+    clk = atoi(argv[2]);
+#endif
+
+    printf("Requested frequency of %"PRIu32
+        " Hz on SPI_DEV(%i) results in %"PRIu32" Hz\n",
+        clk, dev, spi_get_freq(SPI_DEV(dev), spi_get_clk(SPI_DEV(dev), clk)));
+    return 0;
+}
+
 static const shell_command_t shell_commands[] = {
     { "init", "Setup a particular SPI configuration", cmd_init },
     { "send", "Transfer string to slave", cmd_transfer },
     { "bench", "Runs some benchmarks", cmd_bench },
 #ifdef MODULE_PERIPH_SPI_RECONFIGURE
-    { "spi_gpio", "Re-configures MISO & MOSI pins to GPIO mode and back.", cmd_spi_gpio },
+    {
+        "spi_gpio",
+        "Re-configures MISO & MOSI pins to GPIO mode and back.",
+        cmd_spi_gpio
+    },
 #endif
+    {
+        "get_freq",
+        "Get the actual frequency in Hz corresponding to the given clock config",
+        cmd_get_freq
+    },
     { NULL, NULL, NULL }
 };
 

@@ -158,10 +158,6 @@ because of the additional overhead of calling gpio_set/clear at every transfer.
 
 ### SPI configuration example (for periph_conf.h): ###
 
-    static const uint32_t spi_clk_config[] = {
-    - Use cpu/kinetis/dist/calc_spi_scalers to generate the timing configuration -
-    };
-
     static const spi_conf_t spi_config[] = {
         {
             .dev      = SPI0,

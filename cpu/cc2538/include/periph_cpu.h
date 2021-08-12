@@ -247,46 +247,7 @@ typedef enum {
     SPI_MODE_3 = (SSI_CR0_SPO | SSI_CR0_SPH)    /**< CPOL=1, CPHA=1 */
 } spi_mode_t;
 /** @ */
-
-/**
- * @name   Override SPI clock settings
- * @{
- */
-#define HAVE_SPI_CLK_T
-typedef enum {
-    SPI_CLK_100KHZ = 0,     /**< drive the SPI bus with 100KHz */
-    SPI_CLK_400KHZ = 1,     /**< drive the SPI bus with 400KHz */
-    SPI_CLK_1MHZ   = 2,     /**< drive the SPI bus with 1MHz */
-    SPI_CLK_5MHZ   = 3,     /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ  = 4      /**< drive the SPI bus with 10MHz */
-} spi_clk_t;
-/** @} */
 #endif /* ndef DOXYGEN */
-
-/**
- * @brief   Datafields for static SPI clock configuration values
- */
-typedef struct {
-    uint8_t cpsr;           /**< CPSR clock divider */
-    uint8_t scr;            /**< SCR clock divider */
-} spi_clk_conf_t;
-
-#ifndef BOARD_HAS_SPI_CLK_CONF
-/**
- * @brief   Pre-calculated clock divider values based on a CLOCK_CORECLOCK (32MHz)
- *
- * SPI bus frequency =  CLOCK_CORECLOCK / (CPSR * (SCR + 1)), with
- * CPSR = 2..254 and even,
- *  SCR = 0..255
- */
-static const spi_clk_conf_t spi_clk_config[] = {
-    { .cpsr = 64, .scr =  4 },  /* 100khz */
-    { .cpsr = 16, .scr =  4 },  /* 400khz */
-    { .cpsr = 32, .scr =  0 },  /* 1.0MHz */
-    { .cpsr =  2, .scr =  2 },  /* 5.3MHz */
-    { .cpsr =  2, .scr =  1 }   /* 8.0MHz */
-};
-#endif /* BOARD_HAS_SPI_CLK_CONF */
 
 /**
  * @name    SPI configuration data structure

@@ -30,6 +30,9 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+/* DIV_UP is division which rounds up instead of down */
+#define SPI_DIV_UP(a, b)    (((a) + ((b) - 1)) / (b))
+
 /**
  * @brief Array holding one pre-initialized mutex for each SPI device
  */
@@ -67,12 +70,48 @@ void spi_init_pins(spi_t bus)
     ROM_GPIOPinTypeSSI(spi_confs[bus].gpio_port, spi_confs[bus].pins.mask);
 }
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+    /* SSIClk = SysClk / (CPSDVSR * (1 + SCR)), with
+     * CPSDVSR = 2..254 and even,
+     *  SCR = 0..255 */
+
+    uint32_t sys_ctl_clock = ROM_SysCtlClockGet();
+
+    /* bound divider from 2 to 65024 (254 * (1 + 255)) */
+    if (freq > sys_ctl_clock / 2) {
+        freq = sys_ctl_clock / 2;
+    }
+    assert(freq >= sys_ctl_clock / 65024);
+
+    uint8_t cpsdvsr = 2, scr = 0;
+    uint32_t divider = SPI_DIV_UP(sys_ctl_clock, freq);
+    if (divider % 2) {
+        divider++;
+    }
+    while (divider / cpsdvsr > 256) {
+        cpsdvsr += 2;
+    }
+    scr = divider / cpsdvsr - 1;
+
+    return SPI_DIV_UP(sys_ctl_clock, (cpsdvsr * (1 + scr)));
+}
+
+uint32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    return clk;
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
     assert((unsigned)bus < SPI_NUMOF);
+
     /* lock bus */
     mutex_lock(&locks[bus]);
+
     /* enable clock for SSI */
     ROM_SysCtlPeripheralEnable(spi_confs[bus].ssi_sysctl);
 

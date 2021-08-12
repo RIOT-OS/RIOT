@@ -143,22 +143,6 @@ typedef struct {
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 /** @} */
 
-#ifndef DOXYGEN
-/**
- * @brief   Override SPI clock speed values
- * @{
- */
-#define HAVE_SPI_CLK_T
-typedef enum {
-    SPI_CLK_100KHZ = 100,   /**< drive the SPI bus with 100KHz */
-    SPI_CLK_400KHZ = 400,   /**< drive the SPI bus with 400KHz */
-    SPI_CLK_1MHZ   = 1000,  /**< drive the SPI bus with 1MHz */
-    SPI_CLK_5MHZ   = 5000,  /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ  = 10000  /**< drive the SPI bus with 10MHz */
-} spi_clk_t;
-/** @} */
-#endif /* ndef DOXYGEN */
-
 /**
  * @brief   DAC configuration, valid for all boards using this CPU
  *

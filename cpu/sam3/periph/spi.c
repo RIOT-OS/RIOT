@@ -33,6 +33,9 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+/* DIV_UP is division which rounds up instead of down */
+#define SPI_DIV_UP(a, b)    (((a) + ((b) - 1)) / (b))
+
 /**
  * @brief   Array holding one pre-initialized mutex for each SPI device
  */
@@ -63,6 +66,26 @@ void spi_init_pins(spi_t bus)
     gpio_init_mux(spi_config[bus].miso, spi_config[bus].mux);
 }
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+    /* SPCK Baudrate = MCK / SCBR
+     * SCBR = 1..255 */
+
+    /* bound divider from 1 to 255 */
+    if (freq > CLOCK_CORECLOCK) {
+        freq = CLOCK_CORECLOCK;
+    }
+    assert(freq >= SPI_DIV_UP(CLOCK_CORECLOCK, 255));
+    return SPI_DIV_UP(CLOCK_CORECLOCK, freq);
+}
+
+uint32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    return CLOCK_CORECLOCK / clk;
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
@@ -73,7 +96,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     /* enable SPI device clock */
     PMC->PMC_PCER0 |= (1 << spi_config[bus].id);
     /* set mode and speed */
-    dev(bus)->SPI_CSR[0] = (SPI_CSR_SCBR(CLOCK_CORECLOCK / clk) | mode);
+    dev(bus)->SPI_CSR[0] = (SPI_CSR_SCBR(clk) | mode);
     dev(bus)->SPI_MR = (SPI_MR_MSTR | SPI_MR_MODFDIS);
     dev(bus)->SPI_CR = SPI_CR_SPIEN;
 }
@@ -101,7 +124,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
 
     if (!in_buf) {
         for (size_t i = 0; i < len; i++) {
-            while(!(dev(bus)->SPI_SR & SPI_SR_TDRE)) {}
+            while (!(dev(bus)->SPI_SR & SPI_SR_TDRE)) {}
             dev(bus)->SPI_TDR = out_buf[i];
         }
         while (!(dev(bus)->SPI_SR & SPI_SR_RDRF)) {}
@@ -116,9 +139,9 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     }
     else {
         for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SPI_SR & SPI_SR_TDRE));
+            while (!(dev(bus)->SPI_SR & SPI_SR_TDRE)) {}
             dev(bus)->SPI_TDR = out_buf[i];
-            while (!(dev(bus)->SPI_SR & SPI_SR_RDRF));
+            while (!(dev(bus)->SPI_SR & SPI_SR_RDRF)) {}
             in_buf[i] = dev(bus)->SPI_RDR;
         }
     }

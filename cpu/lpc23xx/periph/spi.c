@@ -26,13 +26,17 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "mutex.h"
-#include "assert.h"
 #include "periph/spi.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+/* DIV_UP is division which rounds up instead of down */
+#define SPI_DIV_UP(a, b)    (((a) + ((b) - 1)) / (b))
 
 /**
  * @brief   Get the pointer to the base register of the given SPI device
@@ -95,6 +99,47 @@ void spi_init_pins(spi_t bus)
     *(&PINSEL0 + cfg->pinsel_clk) |= cfg->pinsel_msk_clk;
 }
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+
+    /* CLOCK_CORECLOCK / (1 << 0..3) / 2..254 and even */
+
+    uint32_t pclksel, cpsr, source_clock = CLOCK_CORECLOCK / 2;
+
+    /* bound divider from 2 to 2032 */
+    if (freq > source_clock) {
+        freq = source_clock;
+    }
+    assert(freq >= SPI_DIV_UP(source_clock, 2032));
+
+    /* result must be at most the requested frequency */
+    freq = CLOCK_CORECLOCK / SPI_DIV_UP(CLOCK_CORECLOCK, freq);
+
+    lpc23xx_pclk_scale(CLOCK_CORECLOCK, freq, &pclksel, &cpsr);
+
+    return (pclksel<<10) | cpsr;
+}
+
+uint32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+
+    uint32_t pclksel, pclkdiv, cpsr;
+
+    pclksel = clk >> 8;
+    cpsr = clk & 0xff;
+
+    switch (pclksel) {
+        case 0: pclkdiv = 4; break;
+        case 1: pclkdiv = 1; break;
+        case 2: pclkdiv = 2; break;
+        case 3: pclkdiv = 8; break;
+        default: pclkdiv = 4; break;
+    }
+    return CLOCK_CORECLOCK / pclkdiv / cpsr;
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs; (void)mode;
@@ -116,7 +161,8 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     dev->CR0 = 7;
 
     /* configure bus clock */
-    lpc23xx_pclk_scale(CLOCK_CORECLOCK / 1000, (uint32_t)clk, &pclksel, &cpsr);
+    pclksel = clk >> 8;
+    cpsr = clk & 0xff;
 
     switch ((uint32_t)dev) {
     case SSP0_BASE_ADDR:

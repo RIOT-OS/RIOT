@@ -36,6 +36,9 @@
 #define ENABLE_DEBUG        0
 #include "debug.h"
 
+/* DIV_UP is division which rounds up instead of down */
+#define SPI_DIV_UP(a, b)    (((a) + ((b) - 1)) / (b))
+
 typedef struct {
     uint8_t *in;          /**< The RX buffer pointer or NULL if unused. */
     uint32_t in_len;      /**< The remaining bytes to receive or 0 if unused. */
@@ -76,28 +79,34 @@ static const uint32_t _spi_func5_mask_fc2 =
     (1u << 4) | /* FC2_COPI */
     (1u << 5);  /* FC2_CIPO */
 
-/**
- * @brief Set the clock divided for the target frequency.
- */
-static void _spi_controller_set_speed(SPI_Type *spi_bus, uint32_t speed_hz)
+static inline uint32_t _spi_divider(uint32_t bus_freq, uint32_t speed_hz)
 {
-    /* The SPI clock source is based on the FLEXCOMM clock with a simple
-     * frequency divider between /1 and /65536. */
-    const uint32_t bus_freq = CLOCK_GetFreq(kCLOCK_BusClk);
-    uint32_t divider = (bus_freq + speed_hz / 2) / speed_hz;
+    uint32_t divider = SPI_DIV_UP(bus_freq, speed_hz);
 
     if (divider == 0) {
         divider = 1;
     }
-    else if (divider > (1u << 16)) {
-        divider = 1u << 16;
-    }
+    assert(divider <= (1u << 16));
+
+    return divider;
+}
+
+/**
+ * @brief Return the DIV register value for the target frequency.
+ */
+static inline uint16_t _spi_controller_get_speed(uint32_t speed_hz)
+{
+    /* The SPI clock source is based on the FLEXCOMM clock with a simple
+     * frequency divider between /1 and /65536. */
+    const uint32_t bus_freq = CLOCK_GetFreq(kCLOCK_BusClk);
+    uint32_t divider = _spi_divider(bus_freq, speed_hz);
+
     DEBUG("[spi] clock requested: %" PRIu32 " Hz, actual: %" PRIu32
           " Hz, divider: /%" PRIu32 "\n", speed_hz, bus_freq / divider,
           divider);
     /* The value stored in DIV is always (divider - 1), meaning that a value of
      * 0 divides by 1. */
-    spi_bus->DIV = divider - 1;
+    return (uint16_t)(divider - 1);
 }
 
 void spi_init(spi_t bus)
@@ -188,6 +197,19 @@ void spi_deinit_pins(spi_t bus)
 }
 #endif /* MODULE_PERIPH_SPI_RECONFIGURE */
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+    /* div = 1..65536 - 1*/
+    return _spi_controller_get_speed(freq);
+}
+
+uint32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    return CLOCK_GetFreq(kCLOCK_BusClk) / (clk + 1);
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     assert((unsigned)bus < SPI_NUMOF);
@@ -198,7 +220,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     /* Set SPI clock speed. This silently chooses the closest frequency, no
      * matter how far it is from the requested one. */
-    _spi_controller_set_speed(conf->dev, clk);
+    conf->dev->DIV = clk;
 
     DEBUG("[spi] acquire: mode CPHA=%d CPOL=%d, cs=0x%" PRIx32 "\n",
           !!(mode & SPI_CFG_CPHA_MASK), !!(mode & SPI_CFG_CPOL_MASK),
