@@ -681,20 +681,6 @@ typedef struct {
 
 #ifndef DOXYGEN
 /**
- * @brief    Override SPI clock speed values
- * @{
- */
-#define HAVE_SPI_CLK_T
-typedef enum {
-    SPI_CLK_100KHZ = 100000,            /**< drive the SPI bus with 100KHz */
-    SPI_CLK_400KHZ = 400000,            /**< drive the SPI bus with 400KHz */
-    SPI_CLK_1MHZ   = 1000000,           /**< drive the SPI bus with 1MHz */
-    SPI_CLK_5MHZ   = 5000000,           /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ  = 10000000           /**< drive the SPI bus with 10MHz */
-} spi_clk_t;
-/** @} */
-
-/**
  * @brief   SPI pin getters
  * @{
  */

@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2019 Tristan Bruns
  *               2019 Inria
+ *               2021-2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  *
  * @author      Tristan Bruns
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -26,6 +28,7 @@
 
 #include "clk.h"
 #include "cpu.h"
+#include "macros/math.h"
 #include "mutex.h"
 #include "periph/spi.h"
 
@@ -33,21 +36,6 @@
 
 #define ENABLE_DEBUG        0
 #include "debug.h"
-
-#define SPI_CLK_NUMOF       ARRAY_SIZE(_spi_clks)
-
-/* DIV_UP is division which rounds up instead of down */
-#define SPI_DIV_UP(a, b)    (((a) + ((b) - 1)) / (b))
-
-static const uint32_t _spi_clks[] = {
-    100000,
-    400000,
-    1000000,
-    5000000,
-    10000000,
-};
-
-static uint32_t _spi_clks_config[SPI_CLK_NUMOF] = { 0 };
 
 /**
  * @brief   Allocation device locks
@@ -61,10 +49,6 @@ void spi_init(spi_t dev)
 
     /* initialize the buses lock */
     mutex_init(&lock);
-
-    for (uint8_t i = 0; i < SPI_CLK_NUMOF; ++i) {
-        _spi_clks_config[i] = SPI_DIV_UP(coreclk(), 2 * _spi_clks[i]) - 1;
-    }
 
     /* trigger pin initialization */
     spi_init_pins(dev);
@@ -104,14 +88,40 @@ int spi_init_cs(spi_t dev, spi_cs_t cs)
     return SPI_OK;
 }
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+    /* fsck = fin / (2 * (div + 1))
+     * div 0..4095 (12 bit)
+     *
+     * div = fin / 2 / fsck - 1
+     */
+
+    uint32_t source_clock = coreclk() / 2;
+
+    /* bound divider to 4096 */
+    if (freq < DIV_ROUND_UP(source_clock, 4096)) {
+        return (spi_clk_t){ .err = -EDOM };
+    }
+    return (spi_clk_t){ .clk = DIV_ROUND_UP(source_clock, freq) - 1 };
+}
+
+int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    if (clk.err) { return -EINVAL; }
+    return coreclk() / (2 * (clk.clk + 1));
+}
+
 void spi_acquire(spi_t dev, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
     assert(dev < SPI_NUMOF);
+    if (clk.err) { return; }
 
     mutex_lock(&lock);
 
-    _REG32(spi_config[dev].addr, SPI_REG_SCKDIV) = _spi_clks_config[clk];
+    _REG32(spi_config[dev].addr, SPI_REG_SCKDIV) = clk.clk;
     _REG32(spi_config[dev].addr, SPI_REG_SCKMODE) = mode;
 }
 

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2021 Otto-von-Guericke-Universität Magdeburg
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  *
  * @author          Fabian Hüßler <fabian.huessler@ovgu.de>
  * @author          Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_H
@@ -751,24 +753,19 @@ void rosc_stop(void);
 
 /** @} */
 
+#ifndef DOXYGEN
 /**
- * @brief   Override SPI clock speed values
+ * @brief   Override SPI clock configuration
  * @{
  */
 #define HAVE_SPI_CLK_T
-enum {
-    SPI_CLK_100KHZ = KHZ(100), /**< drive the SPI bus with 100KHz */
-    SPI_CLK_400KHZ = KHZ(400), /**< drive the SPI bus with 400KHz */
-    SPI_CLK_1MHZ   = MHZ(1),   /**< drive the SPI bus with 1MHz */
-    SPI_CLK_5MHZ   = MHZ(5),   /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ  = MHZ(10),  /**< drive the SPI bus with 10MHz */
-};
-
-/**
- * @brief   SPI clock type
- */
-typedef uint32_t spi_clk_t;
+typedef struct {
+    int err;
+    uint8_t cpsdvsr;
+    uint8_t scr;
+} spi_clk_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Configuration details for an SPI interface needed by the RPX0XX peripheral

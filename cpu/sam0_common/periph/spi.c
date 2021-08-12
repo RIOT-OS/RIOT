@@ -2,6 +2,7 @@
  * Copyright (C) 2014-2016 Freie Universität Berlin
  *               2015 Kaspar Schleiser <kaspar@schleiser.de>
  *               2015 FreshTemp, LLC.
+ *               2021-2023 Hugues Larrive
  *               2022 SSV Software Systems GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -24,6 +25,7 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  * @author      Juergen Fitschen <me@jue.yt>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -31,6 +33,7 @@
 #include <assert.h>
 
 #include "cpu.h"
+#include "macros/math.h"
 #include "mutex.h"
 #include "periph/spi.h"
 #include "pm_layered.h"
@@ -183,9 +186,9 @@ static inline void _init_dma(spi_t bus, const volatile void *reg_rx, volatile vo
  * @brief   QSPI peripheral in SPI mode
  * @{
  */
-#ifdef QSPI
 static void _init_qspi(spi_t bus)
 {
+#ifdef QSPI
     /* reset the peripheral */
     QSPI->CTRLA.bit.SWRST = 1;
 
@@ -195,32 +198,43 @@ static void _init_qspi(spi_t bus)
 
     /* set up DMA channels */
     _init_dma(bus, &QSPI->RXDATA.reg, &QSPI->TXDATA.reg);
+#else
+    (void)bus;
+#endif
+}
+
+static inline uint32_t _qspi_baud(uint32_t freq)
+{
+    /* datasheet says SCK = MCK / (BAUD + 1) */
+    /* but BAUD = 0 does not work, assume SCK = MCK / BAUD */
+    return DIV_ROUND_UP(CLOCK_CORECLOCK, freq);
 }
 
 static void _qspi_acquire(spi_mode_t mode, spi_clk_t clk)
 {
-    /* datasheet says SCK = MCK / (BAUD + 1) */
-    /* but BAUD = 0 does not work, assume SCK = MCK / BAUD */
-    uint32_t baud = CLOCK_CORECLOCK > (2 * clk)
-                  ? (CLOCK_CORECLOCK + clk - 1) / clk
-                  : 1;
-
+#ifdef QSPI
     /* bit order is reversed from SERCOM SPI */
     uint32_t _mode = (mode >> 1)
                    | (mode << 1);
     _mode &= 0x3;
 
     QSPI->CTRLA.bit.ENABLE = 1;
-    QSPI->BAUD.reg = QSPI_BAUD_BAUD(baud) | _mode;
+    QSPI->BAUD.reg = QSPI_BAUD_BAUD(clk.clk) | _mode;
+#else
+    (void)mode; (void)clk;
+#endif
 }
 
 static inline void _qspi_release(void)
 {
+#ifdef QSPI
     QSPI->CTRLA.bit.ENABLE = 0;
+#endif
 }
 
 static void _qspi_blocking_transfer(const void *out, void *in, size_t len)
 {
+#ifdef QSPI
     const uint8_t *out_buf = out;
     uint8_t *in_buf = in;
 
@@ -240,13 +254,10 @@ static void _qspi_blocking_transfer(const void *out, void *in, size_t len)
             in_buf[i] = tmp;
         }
     }
-}
-#else /* !QSPI */
-void _init_qspi(spi_t bus);
-void _qspi_acquire(spi_mode_t mode, spi_clk_t clk);
-void _qspi_release(void);
-void _qspi_blocking_transfer(const void *out, void *in, size_t len);
+#else
+    (void)out; (void)in; (void)len;
 #endif
+}
 /** @} */
 
 /**
@@ -269,22 +280,17 @@ static void _init_spi(spi_t bus, SercomSpi *dev)
     _init_dma(bus, &dev->DATA.reg, &dev->DATA.reg);
 }
 
+static inline uint32_t _spi_baud(spi_t bus, uint32_t freq)
+{
+    uint32_t gclk_src = sam0_gclk_freq(spi_config[bus].gclk_src);
+    /* configure bus clock, in synchronous mode its calculated from
+     * BAUD.reg = f_ref / (2 * f_bus) - 1
+     * with f_ref := CLOCK_CORECLOCK as defined by the board */
+    return DIV_ROUND_UP(gclk_src, (2 * freq)) - 1;
+}
+
 static void _spi_acquire(spi_t bus, spi_mode_t mode, spi_clk_t clk)
 {
-    /* clock can't be higher than source clock */
-    uint32_t gclk_src = sam0_gclk_freq(spi_config[bus].gclk_src);
-    if (clk > gclk_src) {
-        clk = gclk_src;
-    }
-
-    /* configure bus clock, in synchronous mode its calculated from
-     * BAUD.reg = (f_ref / (2 * f_bus) - 1)
-     * with f_ref := CLOCK_CORECLOCK as defined by the board
-     * to mitigate the rounding error due to integer arithmetic, the
-     * equation is modified to
-     * BAUD.reg = ((f_ref + f_bus) / (2 * f_bus) - 1) */
-    const uint8_t baud = (gclk_src + clk) / (2 * clk) - 1;
-
     /* configure device to be master and set mode and pads,
      *
      * NOTE: we could configure the pads already during spi_init, but for
@@ -296,11 +302,11 @@ static void _spi_acquire(spi_t bus, spi_mode_t mode, spi_clk_t clk)
                          | (mode << SERCOM_SPI_CTRLA_CPHA_Pos);
 
     /* first configuration or reconfiguration after altered device usage */
-    if (dev(bus)->BAUD.reg != baud || dev(bus)->CTRLA.reg != ctrla) {
+    if (dev(bus)->BAUD.reg != clk.clk || dev(bus)->CTRLA.reg != ctrla) {
         /* disable the device */
         _disable(dev(bus));
 
-        dev(bus)->BAUD.reg = baud;
+        dev(bus)->BAUD.reg = clk.clk;
         dev(bus)->CTRLA.reg = ctrla;
         /* no synchronization needed here, the enable synchronization below
          * acts as a write-synchronization for both registers */
@@ -408,10 +414,42 @@ void spi_deinit_pins(spi_t bus)
     gpio_disable_mux(spi_config[bus].mosi_pin);
 }
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    uint32_t baud;
+    if (_is_qspi(bus)) {
+        /* BAUD = MCK / freq - 1
+         * 8 bit: 0..255 */
+        baud = _qspi_baud(freq);
+    } else {
+        /* BAUD = fref / (2 * fbaud) - 1
+         * 8 bit: 0..255 */
+        baud = _spi_baud(bus, freq);
+    }
+    if (baud > 255) {
+        return (spi_clk_t){ .err = -EDOM };
+    }
+    return (spi_clk_t){ .clk = baud };
+}
+
+int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    if (clk.err) { return -EINVAL; }
+    if (_is_qspi(bus)) {
+        /* SCK = MCK / (BAUD + 1)
+         * but assume SCK = MCK / BAUD as in _qspi_baud() */
+        return CLOCK_CORECLOCK / clk.clk;
+    } else {
+        /* fbaud = fref / 2 / (BAUD + 1) */
+        return sam0_gclk_freq(spi_config[bus].gclk_src) / 2 / ++clk.clk;
+    }
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
     assert((unsigned)bus < SPI_NUMOF);
+    if (clk.err) { return; }
 
     /* get exclusive access to the device */
     mutex_lock(&locks[bus]);

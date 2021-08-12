@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 Frank Hessel <frank@fhessel.de>
+ *               2021-2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief       Implementation of SPI access from Linux User Space
  *
  * @author      Frank Hessel <frank@fhessel.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @}
  */
 
@@ -145,9 +147,27 @@ void spidev_linux_teardown(void)
     }
 }
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+    /* The Linux userspace driver takes values in Hertz, which values
+     * are available can only be determined at runtime so we let the
+     * value pass through. */
+    return (spi_clk_t){ .clk = freq };
+}
+
+int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    /* From https://www.kernel.org/doc/html/v5.15-rc1/spi/spidev.html
+     * There’s currently no way to report the actual bit rate used to
+     * shift data to/from a given device. */
+    return clk.clk;
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    DEBUG("spi_acquire(%u, %u, 0x%02x, %d)\n", bus, cs, mode, clk);
+    DEBUG("spi_acquire(%u, %u, 0x%02x, %d)\n", bus, cs, mode, clk.clk);
     assert((unsigned)bus < SPI_NUMOF);
 
     mutex_lock(&(device_state[bus].lock));
@@ -262,7 +282,7 @@ void spi_release(spi_t bus)
 static int spi_set_params(int fd, bool hwcs, spi_mode_t mode, spi_clk_t clk)
 {
     uint8_t spi_mode = mode | (hwcs ? 0 : SPI_NO_CS);
-    uint32_t ioctl_clk = clk;
+    uint32_t ioctl_clk = clk.clk;
 
     if (real_ioctl(fd, SPI_IOC_WR_MODE, &spi_mode) < 0) {
         return SPI_NOMODE;

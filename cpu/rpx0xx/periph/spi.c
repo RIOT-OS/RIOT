@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2023 Frank Engelhardt
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Implementation of SPI.
  *
  * @author      Frank Engelhardt <frank@f9e.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -21,6 +23,7 @@
 #include "assert.h"
 #include "bitarithm.h"
 #include "cpu.h"
+#include "macros/math.h"
 #include "mutex.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
@@ -32,16 +35,6 @@
  * @brief   Allocate one lock per SPI device.
  */
 static mutex_t locks[SPI_NUMOF];
-
-/**
- * @brief   Save the clock prescaler values for faster bus acquisition.
- */
-typedef struct {
-    spi_clk_t clk;
-    uint8_t cpsdvsr;
-    uint8_t scr;
-} _pl022_clk_t;
-static _pl022_clk_t pl022_clk[SPI_NUMOF];
 
 gpio_t spi_pin_clk(spi_t spi)
 {
@@ -90,8 +83,6 @@ void spi_init(spi_t spi)
     mutex_init(&locks[spi]);
     /* trigger pin initialization */
     spi_init_pins(spi);
-    /* clock prescaler values must be calculated */
-    pl022_clk[spi].clk = 0xff;
 }
 
 void spi_init_pins(spi_t spi)
@@ -215,9 +206,15 @@ static inline void _check_best_clk_result(uint16_t target_dvsr,
     }
 }
 
-static void _calc_pl022_clk(_pl022_clk_t *pl022_clk, spi_clk_t clk)
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 {
-    uint16_t dvsr = CLOCK_PERIPH / clk;
+    (void)bus;
+    /* bound dividerto 65024 (254 * 256) */
+    if (freq < DIV_ROUND_UP(CLOCK_PERIPH, 65024)) {
+        return (spi_clk_t){ .err = -EDOM };
+    }
+
+    uint16_t dvsr = DIV_ROUND_UP(CLOCK_PERIPH, freq);
     /* The divisor must be split into two 8-bit divisors, cpsdvsr and scr,
      * dvsr = cpsdvsr*scr. cpsdvsr must be an even number greater than 0. */
     uint8_t cpsdvsr = 2, best_cpsdvsr = 2;
@@ -243,26 +240,36 @@ static void _calc_pl022_clk(_pl022_clk_t *pl022_clk, spi_clk_t clk)
                                    &best_scr, &best_cpsdvsr);
         }
     }
-    uint32_t resulting_clk_hz = CLOCK_PERIPH / (best_cpsdvsr * best_scr);
-
-    pl022_clk->clk = clk;
-    pl022_clk->cpsdvsr = best_cpsdvsr;
     /* For scr, +1 is added internally. */
-    pl022_clk->scr = (best_scr - 1);
+    best_scr--;
+
+    uint32_t resulting_clk_hz = CLOCK_PERIPH / (best_cpsdvsr * (best_scr + 1));
     DEBUG("[rpx0xx] Values for spi clock divider registers CPSDVSR=%" PRIu16
           ", SCR=%" PRIu16 ". Resulting clock is %" PRIu32 " Hz.\n",
-          best_cpsdvsr, best_scr - 1, resulting_clk_hz);
+          best_cpsdvsr, best_scr, resulting_clk_hz);
+
+    return (spi_clk_t){
+        .cpsdvsr = best_cpsdvsr,
+        .scr = best_scr
+    };
+}
+
+int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    if (clk.err) { return -EINVAL; }
+    return CLOCK_PERIPH / (clk.cpsdvsr * clk.scr);
 }
 
 void spi_acquire(spi_t spi, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     DEBUG("[rpx0xx] Call spi_acquire(spi=%" PRIuFAST8 ", cs=%" PRIu32
-          ", mode=%" PRIu16 ", clk=%" PRIu32 ")\n", spi, cs, mode, clk);
+          ", mode=%" PRIu16 ", clk.cpsdvsr=%" PRIu8 ", clk.scr=%" PRIu8 ")\n",
+          spi, cs, mode, clk.cpsdvsr, clk.scr);
 
-    assert((unsigned)spi < SPI_NUMOF);
-    assert(clk == SPI_CLK_100KHZ || clk == SPI_CLK_10MHZ || clk == SPI_CLK_1MHZ
-           || clk == SPI_CLK_400KHZ || clk == SPI_CLK_5MHZ);
     (void)cs;
+    assert((unsigned)spi < SPI_NUMOF);
+    if (clk.err) { return; }
 
     /* lock bus */
     mutex_lock(&locks[spi]);
@@ -298,14 +305,11 @@ void spi_acquire(spi_t spi, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     }
 
     /* set clock speed */
-    if (clk != pl022_clk[spi].clk) {
-        _calc_pl022_clk(&pl022_clk[spi], clk);
-    }
     io_reg_write_dont_corrupt(&dev->SSPCPSR,
-                              pl022_clk[spi].cpsdvsr << SPI0_SSPCPSR_CPSDVSR_Pos,
+                              clk.cpsdvsr << SPI0_SSPCPSR_CPSDVSR_Pos,
                               SPI0_SSPCPSR_CPSDVSR_Msk);
     io_reg_write_dont_corrupt(&dev->SSPCR0,
-                              pl022_clk[spi].scr << SPI0_SSPCR0_SCR_Pos,
+                              clk.scr << SPI0_SSPCR0_SCR_Pos,
                               SPI0_SSPCR0_SCR_Msk);
 
     /* enable SPI */

@@ -1,11 +1,12 @@
 /*
-* Copyright (C) 2014 Hamburg University of Applied Sciences
-*               2016-2017 Freie Universität Berlin
+ * Copyright (C) 2014 Hamburg University of Applied Sciences
+ *               2016-2017 Freie Universität Berlin
+ *               2021-2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
-*/
+ */
 
 /**
  * @ingroup     cpu_sam3
@@ -19,6 +20,7 @@
  * @author      Peter Kietzmann  <peter.kietzmann@haw-hamburg.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -26,6 +28,7 @@
 #include <assert.h>
 
 #include "cpu.h"
+#include "macros/math.h"
 #include "mutex.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
@@ -63,17 +66,38 @@ void spi_init_pins(spi_t bus)
     gpio_init_mux(spi_config[bus].miso, spi_config[bus].mux);
 }
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+    /* SPCK Baudrate = MCK / SCBR
+     * SCBR = 1..255 */
+
+    /* bound dividerto 255 */
+    if (freq < DIV_ROUND_UP(CLOCK_CORECLOCK, 255)) {
+        return (spi_clk_t){ .err = -EDOM };
+    }
+    return (spi_clk_t){ .clk = DIV_ROUND_UP(CLOCK_CORECLOCK, freq) };
+}
+
+int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    if (clk.err) { return -EINVAL; }
+    return CLOCK_CORECLOCK / clk.clk;
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
     assert((unsigned)bus < SPI_NUMOF);
+    if (clk.err) { return; }
 
     /* lock bus */
     mutex_lock(&locks[bus]);
     /* enable SPI device clock */
     PMC->PMC_PCER0 |= (1 << spi_config[bus].id);
     /* set mode and speed */
-    dev(bus)->SPI_CSR[0] = (SPI_CSR_SCBR(CLOCK_CORECLOCK / clk) | mode);
+    dev(bus)->SPI_CSR[0] = (SPI_CSR_SCBR(clk.clk) | mode);
     dev(bus)->SPI_MR = (SPI_MR_MSTR | SPI_MR_MODFDIS);
     dev(bus)->SPI_CR = SPI_CR_SPIEN;
 }
@@ -101,7 +125,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
 
     if (!in_buf) {
         for (size_t i = 0; i < len; i++) {
-            while(!(dev(bus)->SPI_SR & SPI_SR_TDRE)) {}
+            while (!(dev(bus)->SPI_SR & SPI_SR_TDRE)) {}
             dev(bus)->SPI_TDR = out_buf[i];
         }
         while (!(dev(bus)->SPI_SR & SPI_SR_RDRF)) {}
@@ -116,9 +140,9 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     }
     else {
         for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SPI_SR & SPI_SR_TDRE));
+            while (!(dev(bus)->SPI_SR & SPI_SR_TDRE)) {}
             dev(bus)->SPI_TDR = out_buf[i];
-            while (!(dev(bus)->SPI_SR & SPI_SR_RDRF));
+            while (!(dev(bus)->SPI_SR & SPI_SR_RDRF)) {}
             in_buf[i] = dev(bus)->SPI_RDR;
         }
     }

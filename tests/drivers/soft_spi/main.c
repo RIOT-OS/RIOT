@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Hamburg University of Applied Sciences
+ *               2021-2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -16,6 +17,7 @@
  *
  * @author      Markus Blechschmidt <Markus.Blechschmidt@haw-hamburg.de>
  * @author      Peter Kietzmann     <peter.kietzmann@haw-hamburg.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -33,6 +35,7 @@ int main(void)
 
     soft_spi_t soft_spi = TEST_SOFT_SPI_DEV;
     soft_spi_cs_t cs = TEST_CS_PIN;
+    soft_spi_clk_t clk = soft_spi_get_clk(soft_spi, SOFT_SPI_CLK_100KHZ);
 
     /* Initialize software SPI device  */
     soft_spi_init(soft_spi);
@@ -45,24 +48,24 @@ int main(void)
     }
 
     puts("Send 0xa5 in all four modes");
-    soft_spi_acquire(soft_spi, cs, SOFT_SPI_MODE_0, SOFT_SPI_CLK_100KHZ);
+    soft_spi_acquire(soft_spi, cs, SOFT_SPI_MODE_0, clk);
     soft_spi_transfer_byte(soft_spi, cs, false, 0xa5);
     soft_spi_release(soft_spi);
 
-    soft_spi_acquire(soft_spi, cs, SOFT_SPI_MODE_1, SOFT_SPI_CLK_100KHZ);
+    soft_spi_acquire(soft_spi, cs, SOFT_SPI_MODE_1, clk);
     soft_spi_transfer_byte(soft_spi, cs, false, 0xa5);
     soft_spi_release(soft_spi);
 
-    soft_spi_acquire(soft_spi, cs, SOFT_SPI_MODE_2, SOFT_SPI_CLK_100KHZ);
+    soft_spi_acquire(soft_spi, cs, SOFT_SPI_MODE_2, clk);
     soft_spi_transfer_byte(soft_spi, cs, false, 0xa5);
     soft_spi_release(soft_spi);
 
-    soft_spi_acquire(soft_spi, cs, SOFT_SPI_MODE_3, SOFT_SPI_CLK_100KHZ);
+    soft_spi_acquire(soft_spi, cs, SOFT_SPI_MODE_3, clk);
     soft_spi_transfer_byte(soft_spi, cs, false, 0xa5);
     soft_spi_release(soft_spi);
 
     printf("Send %s\n",string);
-    soft_spi_acquire(soft_spi, cs, SOFT_SPI_MODE_0, SOFT_SPI_CLK_100KHZ);
+    soft_spi_acquire(soft_spi, cs, SOFT_SPI_MODE_0, clk);
     soft_spi_transfer_bytes(soft_spi, cs, false, string, NULL, sizeof string);
     soft_spi_release(soft_spi);
 

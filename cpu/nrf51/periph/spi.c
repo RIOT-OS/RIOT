@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014-2016 Freie Universität Berlin
+ *               2021-2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,6 +18,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Frank Holtz <frank-riot2015@holtznet.de>
  * @author      Jan Wagner <mail@jwagner.eu>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -60,17 +62,63 @@ void spi_init_pins(spi_t bus)
     SPI_MISOSEL = spi_config[bus].miso;
 }
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+
+    if (freq >= MHZ(8)) {
+        return (spi_clk_t){ .clk = SPI_FREQUENCY_FREQUENCY_M8 };
+    }
+    if (freq >= MHZ(4)) {
+        return (spi_clk_t){ .clk = SPI_FREQUENCY_FREQUENCY_M4 };
+    }
+    if (freq >= MHZ(2)) {
+        return (spi_clk_t){ .clk = SPI_FREQUENCY_FREQUENCY_M2 };
+    }
+    if (freq >= MHZ(1)) {
+        return (spi_clk_t){ .clk = SPI_FREQUENCY_FREQUENCY_M1 };
+    }
+    if (freq >= 500000) {
+        return (spi_clk_t){ .clk = SPI_FREQUENCY_FREQUENCY_K500 };
+    }
+    if (freq >= 250000) {
+        return (spi_clk_t){ .clk = SPI_FREQUENCY_FREQUENCY_K250 };
+    }
+    if (freq >= 125000) {
+        return (spi_clk_t){ .clk = SPI_FREQUENCY_FREQUENCY_K125 };
+    }
+    return (spi_clk_t){ .err = -EDOM };
+}
+
+int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    if (clk.err) { return -EINVAL; }
+
+    switch (clk.clk) {
+        case SPI_FREQUENCY_FREQUENCY_K125: return 125000;
+        case SPI_FREQUENCY_FREQUENCY_K250: return 250000;
+        case SPI_FREQUENCY_FREQUENCY_K500: return 500000;
+        case SPI_FREQUENCY_FREQUENCY_M1: return MHZ(1);
+        case SPI_FREQUENCY_FREQUENCY_M2: return MHZ(2);
+        case SPI_FREQUENCY_FREQUENCY_M4: return MHZ(4);
+        case SPI_FREQUENCY_FREQUENCY_M8: return MHZ(8);
+        default: return -EINVAL;
+    }
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
     assert((unsigned)bus < SPI_NUMOF);
+    if (clk.err) { return; }
 
     mutex_lock(&locks[bus]);
     /* power on the bus (NRF51 only) */
     dev(bus)->POWER = 1;
     /* configure bus */
     dev(bus)->CONFIG = mode;
-    dev(bus)->FREQUENCY = clk;
+    dev(bus)->FREQUENCY = clk.clk;
     /* enable the bus */
     dev(bus)->ENABLE = 1;
 }

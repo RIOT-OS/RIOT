@@ -76,25 +76,6 @@ typedef uint32_t spi_cs_t;
 /** @} */
 
 /**
- * @brief   Override SPI clock speed values
- * @{
- */
-#define HAVE_SPI_CLK_T
-enum {
-    SPI_CLK_100KHZ = KHZ(100), /**< drive the SPI bus with 100KHz */
-    SPI_CLK_400KHZ = KHZ(400), /**< drive the SPI bus with 400KHz */
-    SPI_CLK_1MHZ   = MHZ(1),   /**< drive the SPI bus with 1MHz */
-    SPI_CLK_5MHZ   = MHZ(5),   /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ  = MHZ(10),  /**< drive the SPI bus with 10MHz */
-};
-
-/**
- * @brief   SPI clock type
- */
-typedef uint32_t spi_clk_t;
-/** @} */
-
-/**
  * @brief   Structure for SPI configuration data
  */
 typedef struct {

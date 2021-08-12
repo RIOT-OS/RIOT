@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
  *               2016 Freie Universität Berlin
+ *               2021-2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -22,13 +23,16 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
+#include "macros/math.h"
 #include "mutex.h"
-#include "assert.h"
 #include "periph/spi.h"
 
 #define ENABLE_DEBUG 0
@@ -95,14 +99,50 @@ void spi_init_pins(spi_t bus)
     *(&PINSEL0 + cfg->pinsel_clk) |= cfg->pinsel_msk_clk;
 }
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+
+    /* CLOCK_CORECLOCK / (1 << 0..3) / 2..254 and even */
+
+    uint32_t pclksel, cpsr, source_clock = CLOCK_CORECLOCK / 2;
+
+    /* bound divider to 2032 */
+    if (freq >= DIV_ROUND_UP(source_clock, 2032)) {
+        return (spi_clk_t){ .err = -EDOM };
+    }
+
+    /* result must be at most the requested frequency */
+    freq = CLOCK_CORECLOCK / DIV_ROUND_UP(CLOCK_CORECLOCK, freq);
+
+    lpc23xx_pclk_scale(CLOCK_CORECLOCK, freq, &pclksel, &cpsr);
+
+    return (spi_clk_t){ .pclksel = pclksel, .cpsr = cpsr };
+}
+
+int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    if (clk.err) { return -EINVAL; }
+
+    uint32_t pclkdiv;
+
+    switch (clk.pclksel) {
+        case 0: pclkdiv = 4; break;
+        case 1: pclkdiv = 1; break;
+        case 2: pclkdiv = 2; break;
+        case 3: pclkdiv = 8; break;
+        default: pclkdiv = 4; break;
+    }
+    return CLOCK_CORECLOCK / pclkdiv / clk.cpsr;
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs; (void)mode;
     assert((unsigned)bus < SPI_NUMOF);
     assert(mode == SPI_MODE_0);
-
-    uint32_t pclksel;
-    uint32_t cpsr;
+    if (clk.err) { return; }
 
     lpc23xx_spi_t *dev = get_dev(bus);
 
@@ -116,20 +156,17 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     dev->CR0 = 7;
 
     /* configure bus clock */
-    lpc23xx_pclk_scale(CLOCK_CORECLOCK / 1000, (uint32_t)clk, &pclksel, &cpsr);
-
     switch ((uint32_t)dev) {
     case SSP0_BASE_ADDR:
         PCLKSEL1 &= ~(BIT10 | BIT11);   /* CCLK to PCLK divider*/
-        PCLKSEL1 |= pclksel << 10;
+        PCLKSEL1 |= clk.pclksel << 10;
         break;
     case SSP1_BASE_ADDR:
         PCLKSEL0 &= ~(BIT20 | BIT21);   /* CCLK to PCLK divider*/
-        PCLKSEL0 |= pclksel << 20;
+        PCLKSEL0 |= clk.pclksel << 20;
         break;
     }
-
-    dev->CPSR = cpsr;
+    dev->CPSR = clk.cpsr;
 
     /* enable the bus */
     dev->CR1 |= BIT1;

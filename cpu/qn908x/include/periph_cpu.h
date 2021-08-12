@@ -432,25 +432,6 @@ typedef enum {
 /** @} */
 
 /**
- * @name   Override SPI speed values
- *
- * The speed is configured at run time based on the AHB clock speed using an
- * arbitrary divider between /1 and /65536. The standard macro values just map
- * to the frequency in Hz. The maximum possible speed is 32 MHz assuming a
- * core clock and AHB bus clock of 32 MHz.
- * @{
- */
-#define HAVE_SPI_CLK_T
-typedef enum {
-    SPI_CLK_100KHZ  =   100000u,    /**< drive the SPI bus with 100KHz */
-    SPI_CLK_400KHZ  =   400000u,    /**< drive the SPI bus with 400KHz */
-    SPI_CLK_1MHZ    =  1000000u,    /**< drive the SPI bus with 1MHz */
-    SPI_CLK_5MHZ    =  5000000u,    /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ   = 10000000u     /**< drive the SPI bus with 10MHz */
-} spi_clk_t;
-/** @} */
-
-/**
  * @brief   SPI pin getters
  * @{
  */

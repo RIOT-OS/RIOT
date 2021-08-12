@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 Otto-von-Guericke-Universität Magdeburg
+ *               2021-2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,6 +15,7 @@
  * @brief       Implementation of the Arduino 'SPI' interface
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -29,13 +31,6 @@ extern "C" {
 SPISettings::SPISettings(uint32_t clock_hz, uint8_t bitOrder, uint8_t dataMode)
 {
     (void)bitOrder;
-
-    static const spi_clk_t clocks[] = {
-        SPI_CLK_10MHZ, SPI_CLK_5MHZ, SPI_CLK_1MHZ, SPI_CLK_400KHZ
-    };
-    static const uint32_t steps [] = {
-        10000000, 5000000, 1000000, 400000
-    };
 
     assert(bitOrder == MSBFIRST);
     switch(dataMode) {
@@ -54,14 +49,7 @@ SPISettings::SPISettings(uint32_t clock_hz, uint8_t bitOrder, uint8_t dataMode)
         break;
     }
 
-    for (uint8_t i = 0; i < ARRAY_SIZE(steps); i++) {
-        if (clock_hz >= steps[i]) {
-            clock = clocks[i];
-            return;
-        }
-    }
-
-    clock = SPI_CLK_100KHZ;
+    clock = spi_get_clk(SPI_DEV(0), clock_hz);
 }
 
 SPIClass::SPIClass(spi_t spi_dev)
@@ -133,12 +121,7 @@ void SPIClass::setDataMode(uint8_t dataMode)
 
 void SPIClass::setClockDivider(uint8_t divider)
 {
-    static const spi_clk_t clocks[] = {
-        SPI_CLK_5MHZ, SPI_CLK_1MHZ, SPI_CLK_400KHZ, SPI_CLK_100KHZ
-    };
-
-    assert(divider < ARRAY_SIZE(clocks));
-    settings.clock = clocks[divider];
+    settings.clock = spi_get_clk(SPI_DEV(0), divider);
 }
 
 SPIClass SPI(SPI_DEV(ARDUINO_SPI_INTERFACE));
