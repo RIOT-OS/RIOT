@@ -88,7 +88,7 @@ static uint8_t duid[DHCPV6_CLIENT_DUID_LEN];
 static addr_lease_t addr_leases[CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX];
 static pfx_lease_t pfx_leases[CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX];
 static server_t server;
-static event_timeout_t solicit_renew_timeout, rebind_timeout;
+static event_timeout_t solicit_renew_timeout, information_refresh_timeout, rebind_timeout;
 static event_queue_t *event_queue;
 static sock_udp_t sock;
 static sock_udp_ep_t local = { .family = AF_INET6, .port = DHCPV6_CLIENT_PORT };
@@ -97,14 +97,17 @@ static sock_udp_ep_t remote = { .family = AF_INET6, .port = DHCPV6_SERVER_PORT,
                                    .ipv6 = DHCPV6_ALL_RELAY_AGENTS_AND_SERVERS
                                 } };
 static uint32_t sol_max_rt = DHCPV6_SOL_MAX_RT;
+static uint32_t inf_max_rt = DHCPV6_INF_MAX_RT;
 static uint32_t t2, rebind_time;
 static uint32_t transaction_start;
 static uint32_t transaction_id;
 static uint8_t duid_len = sizeof(dhcpv6_duid_l2_t);
+static uint8_t configuration_mode = DHCPV6_CLIENT_CONF_MODE_INACTIVE;
 
 static const char mud_url[] = CONFIG_DHCPV6_CLIENT_MUD_URL;
 
 static void _post_solicit_servers(void);
+static void _refresh_information(event_t *event);
 static void _solicit_servers(event_t *event);
 static void _request(event_t *event);
 static void _renew(event_t *event);
@@ -116,6 +119,7 @@ static void _set_event_timeout_sec(event_timeout_t *timeout, event_t *event,
                                    uint32_t delay_sec);
 static void _clear_event_timeout(event_timeout_t *timeout);
 
+static event_t refresh_information = { .handler = _refresh_information };
 static event_t solicit_servers = { .handler = _solicit_servers };
 static event_t request = { .handler = _request };
 static event_t renew = { .handler = _renew };
@@ -202,16 +206,53 @@ void dhcpv6_client_init(event_queue_t *eq, uint16_t netif)
     remote.netif = netif;
 }
 
+static void _restart(void)
+{
+
+    _clear_event_timeout(&solicit_renew_timeout);
+    _clear_event_timeout(&rebind_timeout);
+    _clear_event_timeout(&information_refresh_timeout);
+
+    switch (configuration_mode)
+    {
+    case DHCPV6_CLIENT_CONF_MODE_INACTIVE:
+        return;
+    case DHCPV6_CLIENT_CONF_MODE_STATEFUL: {
+        uint32_t delay = random_uint32_range(0, DHCPV6_SOL_MAX_DELAY * MS_PER_SEC);
+        _set_event_timeout_ms(&solicit_renew_timeout, &solicit_servers, delay);
+        break;
+    }
+    case DHCPV6_CLIENT_CONF_MODE_STATELESS: {
+        uint32_t delay = random_uint32_range(0, DHCPV6_INF_MAX_DELAY * MS_PER_SEC);
+        _set_event_timeout_ms(&information_refresh_timeout, &refresh_information, delay);
+        break;
+    }
+    default:
+        DEBUG("DHCPv6 Client: Invalid configuration mode!");
+        assert(0);
+        break;
+    }
+}
+
+void dhcpv6_client_set_conf_mode(uint8_t _configuration_mode) {
+    if (configuration_mode != _configuration_mode) {
+        configuration_mode = _configuration_mode;
+        _restart();
+    }
+}
+
+uint8_t dhcpv6_client_get_conf_mode(void) {
+    return configuration_mode;
+}
+
 void dhcpv6_client_start(void)
 {
     duid_len = dhcpv6_client_get_duid_l2(local.netif,
                                          (dhcpv6_duid_l2_t *)&duid);
     assert(event_queue != NULL);
     if (duid_len > 0) {
-        uint32_t delay = random_uint32_range(0, DHCPV6_SOL_MAX_DELAY * MS_PER_SEC);
-
         sock_udp_create(&sock, &local, NULL, 0);
-        _set_event_timeout_ms(&solicit_renew_timeout, &solicit_servers, delay);
+        _restart();
     }
 }
 
@@ -245,6 +286,8 @@ int dhcpv6_client_req_ia_na(unsigned netif)
                     "`dhcpv6_client_ia_na` is not used\n");
         return -ENOTSUP;
     }
+
+    dhcpv6_client_set_conf_mode(DHCPV6_CLIENT_CONF_MODE_STATEFUL);
 
     addr_lease_t *lease = NULL;
 
@@ -532,6 +575,10 @@ static bool _check_cid_opt(dhcpv6_opt_duid_t *cid)
 
 static bool _check_sid_opt(dhcpv6_opt_duid_t *sid)
 {
+    if (configuration_mode == DHCPV6_CLIENT_CONF_MODE_STATELESS) {
+        return true;
+    }
+
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         if ((byteorder_ntohs(sid->len) != server.duid_len) ||
             (memcmp(sid->duid, server.duid.u8, server.duid_len) != 0)) {
@@ -932,13 +979,15 @@ static bool _parse_ia_na_option(dhcpv6_opt_ia_na_t *ia_na)
     return true;
 }
 
-static bool _parse_reply(uint8_t *rep, size_t len)
+static bool _parse_reply(uint8_t *rep, size_t len, uint8_t request_type)
 {
     dhcpv6_opt_duid_t *cid = NULL, *sid = NULL;
     dhcpv6_opt_ia_pd_t *ia_pd = NULL;
     dhcpv6_opt_ia_na_t *ia_na = NULL;
     dhcpv6_opt_status_t *status = NULL;
     dhcpv6_opt_smr_t *smr = NULL;
+    dhcpv6_opt_imr_t *imr = NULL;
+    dhcpv6_opt_irt_t *irt = NULL;
     size_t orig_len = len;
 
     DEBUG("DHCPv6 client: received REPLY\n");
@@ -975,6 +1024,12 @@ static bool _parse_reply(uint8_t *rep, size_t len)
             case DHCPV6_OPT_SMR:
                 smr = (dhcpv6_opt_smr_t *)opt;
                 break;
+            case DHCPV6_OPT_IMR:
+                imr = (dhcpv6_opt_imr_t *)opt;
+                break;
+            case DHCPV6_OPT_IRT:
+                irt = (dhcpv6_opt_irt_t *)opt;
+                break;
             default:
                 break;
         }
@@ -991,6 +1046,21 @@ static bool _parse_reply(uint8_t *rep, size_t len)
     }
     if (smr != NULL) {
         sol_max_rt = byteorder_ntohl(smr->value);
+    }
+    if (imr != NULL) {
+        inf_max_rt = byteorder_ntohl(imr->value);
+    }
+    if (request_type == DHCPV6_INFO_REQUEST){
+        uint32_t refresh_time;
+        if (irt != NULL) {
+            refresh_time = byteorder_ntohl(irt->value);
+            if (refresh_time < DHCPV6_IRT_MINIMUM) {
+                refresh_time = DHCPV6_IRT_MINIMUM;
+            }
+        } else {
+            refresh_time = DHCPV6_IRT_DEFAULT;
+        }
+        _set_event_timeout_sec(&information_refresh_timeout, &refresh_information, refresh_time);
     }
     if (!_check_status_opt(status)) {
         return false;
@@ -1028,19 +1098,17 @@ static bool _parse_reply(uint8_t *rep, size_t len)
     return true;
 }
 
-static size_t _compose_message(dhcpv6_msg_t *msg, uint8_t type)
+static size_t _compose_message(dhcpv6_msg_t *msg, uint8_t type, bool reconfigure)
 {
     msg->type = type;
     _generate_tid();
     _set_tid(msg->tid);
-    uint16_t oro_opts[] = { DHCPV6_OPT_SMR };
     size_t msg_len = sizeof(dhcpv6_msg_t);
-
     transaction_start = _now_cs();
-
     msg_len += _compose_cid_opt((dhcpv6_opt_duid_t *)&send_buf[msg_len]);
 
-    if (type != DHCPV6_REBIND && type != DHCPV6_SOLICIT) {
+    if (type != DHCPV6_REBIND && type != DHCPV6_SOLICIT &&
+        (type != DHCPV6_INFO_REQUEST && !reconfigure)) {
         /* See RFC 8415, Appendix B */
         msg_len += _compose_sid_opt((dhcpv6_opt_duid_t *)&send_buf[msg_len]);
     }
@@ -1048,8 +1116,19 @@ static size_t _compose_message(dhcpv6_msg_t *msg, uint8_t type)
     msg_len += _compose_mud_url_opt((dhcpv6_opt_mud_url_t *)&send_buf[msg_len],
                                     sizeof(send_buf) - msg_len);
 
-    msg_len += _compose_oro_opt((dhcpv6_opt_oro_t *)&send_buf[msg_len], oro_opts,
-                                ARRAY_SIZE(oro_opts));
+    if (type == DHCPV6_INFO_REQUEST) {
+        uint16_t info_req_oro_opts[] = {
+            DHCPV6_OPT_SMR,
+            DHCPV6_OPT_IRT,
+            DHCPV6_OPT_IMR,
+        };
+        msg_len += _compose_oro_opt((dhcpv6_opt_oro_t *)&send_buf[msg_len], info_req_oro_opts,
+                                    ARRAY_SIZE(info_req_oro_opts));
+    } else {
+        uint16_t general_oro_opts[] = {DHCPV6_OPT_SMR};
+        msg_len += _compose_oro_opt((dhcpv6_opt_oro_t *)&send_buf[msg_len], general_oro_opts,
+                                    ARRAY_SIZE(general_oro_opts));
+    }
 
     msg_len += _add_ia_na(&send_buf[msg_len], sizeof(send_buf) - msg_len);
     msg_len += _add_ia_pd_from_config(&send_buf[msg_len], sizeof(send_buf) - msg_len);
@@ -1069,7 +1148,7 @@ static void _solicit_servers(event_t *event)
 
     (void)event;
 
-    msg_len = _compose_message(msg, DHCPV6_SOLICIT);
+    msg_len = _compose_message(msg, DHCPV6_SOLICIT, false);
     time = (dhcpv6_opt_elapsed_time_t *)&send_buf[msg_len];
     msg_len += _compose_elapsed_time_opt(time);
 
@@ -1151,7 +1230,7 @@ static uint32_t _calculate_mrd_from_leases(void)
     return mrd;
 }
 
-static void _request_renew_rebind(uint8_t type)
+static void _request_renew_rebind(uint8_t type, bool reconfigure)
 {
     dhcpv6_msg_t *msg = (dhcpv6_msg_t *)&send_buf[0];
     dhcpv6_opt_elapsed_time_t *time;
@@ -1165,6 +1244,10 @@ static void _request_renew_rebind(uint8_t type)
     uint32_t mrd = 0;
 
     switch (type) {
+        case DHCPV6_INFO_REQUEST:
+            irt = DHCPV6_INF_TIMEOUT;
+            mrt = DHCPV6_OPT_IMR;
+            break;
         case DHCPV6_REQUEST:
             irt = DHCPV6_REQ_TIMEOUT;
             mrt = DHCPV6_REQ_MAX_RT;
@@ -1190,8 +1273,14 @@ static void _request_renew_rebind(uint8_t type)
         default:
             return;
     }
-    retrans_timeout = _irt_ms(irt, false);
-    msg_len = _compose_message(msg, type);
+
+    if (type == DHCPV6_INFO_REQUEST) {
+        retrans_timeout = _irt_ms(inf_max_rt, false);
+    } else {
+        retrans_timeout = _irt_ms(irt, false);
+    }
+
+    msg_len = _compose_message(msg, type, reconfigure);
 
     time = (dhcpv6_opt_elapsed_time_t *)&send_buf[msg_len];
     msg_len += _compose_elapsed_time_opt(time);
@@ -1215,7 +1304,7 @@ static void _request_renew_rebind(uint8_t type)
         sock_udp_send(&sock, send_buf, msg_len, &remote);
     }
     if ((res > 0) && (recv_buf[0] == DHCPV6_REPLY)) {
-        if (!_parse_reply(recv_buf, res)) {
+        if (!_parse_reply(recv_buf, res, type)) {
             /* try again */
             event_post(event_queue, &request);
         }
@@ -1229,21 +1318,28 @@ static void _request(event_t *event)
 {
     (void)event;
     DEBUG("DHCPv6 client: send REQUEST\n");
-    _request_renew_rebind(DHCPV6_REQUEST);
+    _request_renew_rebind(DHCPV6_REQUEST, false);
 }
 
 static void _renew(event_t *event)
 {
     (void)event;
     DEBUG("DHCPv6 client: send RENEW\n");
-    _request_renew_rebind(DHCPV6_RENEW);
+    _request_renew_rebind(DHCPV6_RENEW, false);
 }
 
 static void _rebind(event_t *event)
 {
     (void)event;
     DEBUG("DHCPv6 client: send REBIND\n");
-    _request_renew_rebind(DHCPV6_REBIND);
+    _request_renew_rebind(DHCPV6_REBIND, false);
+}
+
+static void _refresh_information(event_t *event)
+{
+    (void)event;
+    DEBUG("DHCPv6 client: send INFORMATION REQUEST\n");
+    _request_renew_rebind(DHCPV6_INFO_REQUEST, false);
 }
 
 static void _set_event_timeout_ms(event_timeout_t *timeout, event_t *event,

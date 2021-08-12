@@ -280,6 +280,29 @@ static inline uint32_t dhcpv6_client_addr_valid_until(unsigned netif,
  */
 #define MAX_MUD_URL_LENGTH (0xFF - sizeof(dhcpv6_opt_mud_url_t))
 
+/**
+ * @brief Definition of DHCPv6 client configuration modes.
+ */
+enum {
+    DHCPV6_CLIENT_CONF_MODE_INACTIVE,
+    DHCPV6_CLIENT_CONF_MODE_STATEFUL,
+    DHCPV6_CLIENT_CONF_MODE_STATELESS,
+};
+
+/**
+ * @brief   Changes the DHCPv6 client's configuration mode.
+ *
+ * @param[in] configuration_mode       The new configuration mode.
+ */
+void dhcpv6_client_set_conf_mode(uint8_t configuration_mode);
+
+/**
+ * @brief   Retrieves the DHCPv6 client's current configuration mode.
+ *
+ * @return  The current configuration mode.
+ */
+uint8_t dhcpv6_client_get_conf_mode(void);
+
 /** @} */
 
 #ifdef __cplusplus
