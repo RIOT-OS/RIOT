@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015-2018 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief           nRF5x common definitions for handling peripherals
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_COMMON_H
@@ -230,21 +232,18 @@ typedef enum {
     SPI_MODE_3 = (SPI_CONFIG_CPOL_Msk | SPI_CONFIG_CPHA_Msk)    /**< CPOL=1, CPHA=1 */
 } spi_mode_t;
 /** @} */
+#endif /* ndef CPU_FAM_NRF9160 */
 
 /**
- * @brief   Override SPI clock values
+ * @brief   Override SPI clock configuration
  * @{
  */
 #define HAVE_SPI_CLK_T
-typedef enum {
-    SPI_CLK_100KHZ = SPI_FREQUENCY_FREQUENCY_K125,  /**< 100KHz */
-    SPI_CLK_400KHZ = SPI_FREQUENCY_FREQUENCY_K500,  /**< 400KHz */
-    SPI_CLK_1MHZ   = SPI_FREQUENCY_FREQUENCY_M1,    /**< 1MHz */
-    SPI_CLK_5MHZ   = SPI_FREQUENCY_FREQUENCY_M4,    /**< 5MHz */
-    SPI_CLK_10MHZ  = SPI_FREQUENCY_FREQUENCY_M8     /**< 10MHz */
+typedef struct {
+    uint32_t frequency;
+    int err;
 } spi_clk_t;
 /** @} */
-#endif /* ndef CPU_FAM_NRF9160 */
 #endif /* ndef DOXYGEN */
 
 /**

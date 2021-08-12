@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Hamburg University of Applied Sciences
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  *
  * @author      Markus Blechschmidt <Markus.Blechschmidt@haw-hamburg.de>
  * @author      Peter Kietzmann     <peter.kietzmann@haw-hamburg.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #include <stdio.h>
@@ -108,6 +110,18 @@ static inline int soft_spi_mode_is_valid(soft_spi_mode_t mode)
         return 0;
     }
     return 1;
+}
+
+soft_spi_clk_t soft_spi_get_clk(soft_spi_t bus, uint32_t freq)
+{
+    (void)bus;
+    return MHZ(500) / freq;
+}
+
+uint32_t soft_spi_get_freq(soft_spi_t bus, soft_spi_clk_t clk)
+{
+    (void)bus;
+    return MHZ(500) / clk;
 }
 
 void soft_spi_acquire(soft_spi_t bus, soft_spi_cs_t cs, soft_spi_mode_t mode, soft_spi_clk_t clk)

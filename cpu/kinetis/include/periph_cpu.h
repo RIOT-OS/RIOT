@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015-2016 Freie Universität Berlin
  * Copyright (C) 2017-2018 Eistec AB
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_H
@@ -138,6 +140,19 @@ typedef uint32_t spi_cs_t;
 #define PERIPH_SPI_NEEDS_TRANSFER_REG   1
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS  1
 /** @} */
+
+#ifndef DOXYGEN
+/**
+ * @brief   Override SPI clock configuration
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef struct {
+    uint32_t ctar;
+    int err;
+} spi_clk_t;
+/** @} */
+#endif /* ifndef DOXYGEN */
 
 /**
  * @brief   Prevent shared timer functions from being used

@@ -28,8 +28,6 @@ jobs:
           path: dist/tools
         - name: bossa-nrf52
           path: dist/tools
-        - name: calc_spi_scalers
-          path: cpu/kinetis/dist
         - name: clk_conf
           path: cpu/stm32/dist
         - name: edbg

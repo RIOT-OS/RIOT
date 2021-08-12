@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2022 Gunar Schorcht
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -22,6 +23,7 @@
  * - DMA transfer
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -34,8 +36,9 @@
 
 #include "cpu.h"
 #include "gpio_arch.h"
+#include "macros/math.h"
 #include "mutex.h"
-#include "periph/spi.h"
+/* periph/spi.h must be included after soc/rtc.h since it include macros/units.h */
 #include "syscalls.h"
 
 #include "driver/periph_ctrl.h"
@@ -43,12 +46,13 @@
 #include "esp_rom_gpio.h"
 #include "hal/spi_hal.h"
 #include "hal/spi_types.h"
-#include "soc/rtc.h"
+#include "soc/rtc.h" /* define an unwanted MHZ macro */
 
 #include "esp_idf_api/gpio.h"
 
 #undef MHZ
-#include "macros/units.h"
+/* periph/spi.h already include macros/units.h which define riot's MHZ macro */
+#include "periph/spi.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -63,8 +67,6 @@ struct _spi_bus_t {
     mutex_t lock;                    /* mutex for each SPI interface */
     spi_host_device_t hostid;        /* SPI hostid as used by ESP-IDF */
     const spi_signal_conn_t *periph; /* SPI peripheral descriptor */
-    spi_hal_timing_conf_t timing;    /* calculated SPI timing parameters */
-    spi_clk_t clk_last;               /* SPI clock speed used last time in Hz */
     uint8_t mode_last;               /* SPI mode used last time */
     bool pins_initialized;           /* SPI pins initialized */
 };
@@ -76,7 +78,6 @@ static struct _spi_bus_t _spi[] = {
         .lock = MUTEX_INIT_LOCKED,
         .hostid = spi_config[0].ctrl,
         .periph = &spi_periph_signal[spi_config[0].ctrl],
-        .clk_last = 0,
         .mode_last = UINT8_MAX,
     },
 #endif
@@ -86,7 +87,6 @@ static struct _spi_bus_t _spi[] = {
         .lock = MUTEX_INIT_LOCKED,
         .hostid = spi_config[1].ctrl,
         .periph = &spi_periph_signal[spi_config[1].ctrl],
-        .clk_last = 0,
         .mode_last = UINT8_MAX,
     },
 #endif
@@ -128,7 +128,7 @@ void IRAM_ATTR spi_init(spi_t bus)
     spi_ll_set_tx_lsbfirst(_spi[bus].periph->hw, false);
 
     /* acquire and release to set default parameters */
-    spi_acquire(bus, GPIO_UNDEF, SPI_MODE_0, SPI_CLK_100KHZ);
+    spi_acquire(bus, GPIO_UNDEF, SPI_MODE_0, spi_get_clk(bus, SPI_CLK_100KHZ));
     spi_release(bus);
 
     return;
@@ -263,11 +263,66 @@ void spi_deinit_pins(spi_t bus)
     mutex_lock(&_spi[bus].lock);
 }
 
+spi_clk_t IRAM_ATTR spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+    /*
+     * set SPI clock
+     * see ESP32 Technical Reference, Section 7.8 SPI_CLOCK_REG
+     * https://www.espressif.com/sites/default/files/documentation/esp32_technical_reference_manual_en.pdf
+     */
+
+    uint32_t apb_clk = rtc_clk_apb_freq_get();
+    uint32_t clk_reg;
+
+    /* Section 7.4 GP­SPI Clock Control:
+     * f_spi = f_apb / ((spi_clkcnt_n + 1) * (cpi__clkdiv_pre + 1))
+     * spi_clkdiv_pre 0..8191 (13 bit)
+     * spi_clkcnt_N 1..63 (6 bit)
+     */
+    if (freq > apb_clk / 5) {
+        LOG_TAG_ERROR("spi", "APB clock rate (%"PRIu32" Hz) has to be at "
+                      "least 5 times SPI clock rate (%"PRIu32" Hz)\n",
+                      apb_clk, freq);
+        freq = apb_clk / 5;
+    }
+    else if (freq < DIV_ROUND_UP(apb_clk, (8192 * 64))) {
+        /* As apb_clk / (8192 * 64) result in very low frequency (153 Hz for
+         * an apb_clk frequency of 80 MHz), this should never happen... */
+        return (spi_clk_t){ .err = -EDOM };
+    }
+
+    /* duty cycle is measured in is 1/256th, 50% = 128 */
+    uint32_t _freq = spi_ll_master_cal_clock(apb_clk, freq, 128, &clk_reg);
+
+    DEBUG("%s bus %d: SPI clock frequency: freq=%"PRIu32" eff=%"PRIu32" "
+          "reg=%08"PRIx32"\n",
+          __func__, bus, freq, _freq, clk_reg);
+
+    return (spi_clk_t){ .reg_psc_bits = clk_reg };
+}
+
+int32_t IRAM_ATTR spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    if (clk.err) {
+        return -EINVAL;
+    }
+    uint32_t apb_clk = rtc_clk_apb_freq_get();
+    uint16_t spi_clkdiv_pre = (clk.reg_psc_bits >> 18) & 0x1fff;
+    uint8_t spi_clkcnt_N = (clk.reg_psc_bits >> 12) & 0x3f;
+    return (apb_clk / (spi_clkdiv_pre + 1) / (spi_clkcnt_N +1));
+}
+
 void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    DEBUG("%s bus=%u cs=%u mode=%u clk=%u\n", __func__, bus, cs, mode, clk);
+    DEBUG("%s bus=%u cs=%u mode=%u clk=%"PRIu32"\n",
+            __func__, bus, cs, mode, clk.reg_psc_bits);
 
     assert(bus < SPI_NUMOF);
+    if (clk.err) {
+        return;
+    }
 
     /* if parameter cs is GPIO_UNDEF, the default CS pin is used */
     cs = (cs == GPIO_UNDEF) ? spi_config[bus].cs : cs;
@@ -299,39 +354,8 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
     spi_ll_set_miso_delay(_spi[bus].periph->hw, delay_mode, 0);
     spi_ll_set_mosi_delay(_spi[bus].periph->hw, 0, 0);
 
-    /*
-     * set SPI clock
-     * see ESP32 Technical Reference, Section 7.8 SPI_CLOCK_REG
-     * https://www.espressif.com/sites/default/files/documentation/esp32_technical_reference_manual_en.pdf
-     */
-
-    /* check whether timing has to be recalculated (time consuming) */
-    if (clk != _spi[bus].clk_last) {
-        uint32_t apb_clk = rtc_clk_apb_freq_get();
-        uint32_t clk_reg;
-
-        if (apb_clk / 5 < clk) {
-            LOG_TAG_ERROR("spi", "APB clock rate (%"PRIu32" Hz) has to be at "
-                          "least 5 times SPI clock rate (%d Hz)\n",
-                          apb_clk, clk);
-            assert(false);
-        }
-
-        /* duty cycle is measured in is 1/256th, 50% = 128 */
-        int _clk = spi_ll_master_cal_clock(apb_clk, clk,
-                                           128, &clk_reg);
-
-        _spi[bus].clk_last = clk;
-        _spi[bus].timing.clock_reg = clk_reg;
-        _spi[bus].timing.timing_miso_delay = 0;
-        _spi[bus].timing.timing_dummy = 0;
-
-        DEBUG("%s bus %d: SPI clock frequency: clk=%d eff=%d "
-              "reg=%08"PRIx32"\n",
-              __func__, bus, clk, _clk, clk_reg);
-    }
-    spi_ll_master_set_clock_by_reg(_spi[bus].periph->hw,
-                                   &_spi[bus].timing.clock_reg);
+    /* set SPI clock */
+    spi_ll_master_set_clock_by_reg(_spi[bus].periph->hw, &clk.reg_psc_bits);
 
 #if defined(CPU_FAM_ESP32C3) || defined(CPU_FAM_ESP32S3)
     /*
@@ -354,7 +378,6 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
 #else
 #error Platform implementation is missing
 #endif
-
 }
 
 void IRAM_ATTR spi_release(spi_t bus)

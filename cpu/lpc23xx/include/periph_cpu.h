@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief           CPU specific definitions for internal peripheral handling
  *
  * @author          Kaspar Schleiser <kaspar@schleiser.de>
+ * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_H
@@ -146,19 +148,16 @@ typedef struct {
 
 #ifndef DOXYGEN
 /**
- * @brief   Override SPI clock speed values
+ * @brief   Override SPI clock configuration
  * @{
  */
 #define HAVE_SPI_CLK_T
-typedef enum {
-    SPI_CLK_100KHZ = 100,   /**< drive the SPI bus with 100KHz */
-    SPI_CLK_400KHZ = 400,   /**< drive the SPI bus with 400KHz */
-    SPI_CLK_1MHZ   = 1000,  /**< drive the SPI bus with 1MHz */
-    SPI_CLK_5MHZ   = 5000,  /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ  = 10000  /**< drive the SPI bus with 10MHz */
+typedef struct {
+    uint32_t pclksel_pclk_ssp;
+    uint32_t cpsr_cpsdvsr;
+    int err;
 } spi_clk_t;
-/** @} */
-#endif /* ndef DOXYGEN */
+#endif /* ifndef DOXYGEN */
 
 /**
  * @brief   DAC configuration, valid for all boards using this CPU

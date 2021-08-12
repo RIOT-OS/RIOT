@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Bas Stottelaar <basstottelaar@gmail.com>
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Ucglib driver to interact with RIOT-OS drivers.
  *
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -31,22 +33,17 @@
 #include "periph/gpio.h"
 
 #ifdef MODULE_PERIPH_SPI
-static spi_clk_t ucg_serial_clk_speed_to_spi_speed(uint32_t serial_clk_speed)
+static spi_clk_t spi_clk_cache(spi_t bus, uint32_t period_ns)
 {
-    if (serial_clk_speed < 100) {
-        return SPI_CLK_10MHZ;
-    }
-    else if (serial_clk_speed < 200) {
-        return SPI_CLK_5MHZ;
-    }
-    else if (serial_clk_speed < 1000) {
-        return SPI_CLK_1MHZ;
-    }
-    else if (serial_clk_speed < 2500) {
-        return SPI_CLK_400KHZ;
+    static uint32_t period_ns_cache;
+    static spi_clk_t clk_cache;
+
+    if (period_ns != period_ns_cache) {
+        period_ns_cache = period_ns;
+        clk_cache = spi_get_clk(bus, MHZ(1000) / period_ns);
     }
 
-    return SPI_CLK_100KHZ;
+    return clk_cache;
 }
 #endif /* MODULE_PERIPH_SPI */
 
@@ -90,10 +87,11 @@ int16_t ucg_com_hw_spi_riotos(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *da
 
             /* setup SPI */
             spi_init_pins(dev);
+
             /* correct alignment of data can be assumed, as in pkg callers use
              * ucg_com_info_t to allocate memory */
             ucg_com_info_t *info = (void *)(uintptr_t)data;
-            spi_clk_t speed = ucg_serial_clk_speed_to_spi_speed(info->serial_clk_speed);
+            spi_clk_t speed = spi_clk_cache(dev, info->serial_clk_speed);
             spi_acquire(dev, GPIO_UNDEF, SPI_MODE_0, speed);
 
             break;

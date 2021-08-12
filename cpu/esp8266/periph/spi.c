@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2022 Gunar Schorcht
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief       Low-level SPI driver implementation for ESP8266
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -26,9 +28,10 @@
 #include "log.h"
 
 #include "cpu.h"
+#include "macros/math.h"
+#include "macros/units.h"
 #include "mutex.h"
 #include "periph/spi.h"
-#include "macros/units.h"
 
 #include "esp_attr.h"
 #include "gpio_arch.h"
@@ -43,6 +46,15 @@
 #define SPI_DOUTDIN (BIT(0))
 
 #define SPI_BLOCK_SIZE  64  /* number of bytes per SPI transfer */
+
+/* The ESP8266 can operate at 160 MHz, but contrary to what the
+ * spi_clk_equ_sysclk bit name in the SPI_CLOCK register might suggest,
+ * the SPI clock source frequency is always 80 MHz. */
+#define SPI_CLK_SRC_FREQ    80000000
+/* baud_rate = 80MHz / (spi_clkdiv_pre + 1) / (spi_clkcnt_N + 1)
+ * 80 MHz / 8192 / 2 = 4882 Hz which is very low so we will use a
+ * constant spi_clkcnt_N of 1. */
+#define CONST_SPI_CLKCNT_N  1
 
 /** structure which describes all properties of one SPI bus */
 struct _spi_bus_t {
@@ -133,7 +145,7 @@ static void IRAM_ATTR _spi_init_internal(spi_t bus)
     _spi[bus].regs->ctrl.fastrd_mode = 0;
 
     /* acquire and release to set default parameters */
-    spi_acquire(bus, GPIO_UNDEF, SPI_MODE_0, SPI_CLK_1MHZ);
+    spi_acquire(bus, GPIO_UNDEF, SPI_MODE_0, spi_get_clk(bus, SPI_CLK_1MHZ));
     spi_release(bus);
 }
 
@@ -221,11 +233,76 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
     return SPI_OK;
 }
 
+spi_clk_t IRAM_ATTR spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+    /* set SPI clock
+     * see ESP8266 Technical Reference Appendix 2 - SPI registers
+     * https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf
+     *
+     * spi_clk_equ_sysclk   In the master mode:
+     *                                  1: spi_clk is equal to 80MHz,
+     *                                  0: spi_clk is divided from 80 MHz clock.
+     * spi_clkdiv_pre 0..8191 (13 bit):
+     *      In the master mode, it is pre-divider of spi_clk.
+     * spi_clkcnt_N 1..63 (6 bit):
+     *      In the master mode, it is the divider of spi_clk.
+     *      So spi_clk = 80 MHz / (spi_clkdiv_pre + 1) / (spi_clkcnt_N + 1).
+     * spi_clkcnt_H (6 bits):
+     *      In the master mode, it must be floor((spi_clkcnt_N + 1) / 2 - 1).
+     * spi_clkcnt_L (6 bits):
+     *      In the master mode, it must be equal to spi_clkcnt_N.
+     */
+
+    uint32_t source_clock = SPI_CLK_SRC_FREQ / (CONST_SPI_CLKCNT_N + 1);
+    spi_dev_t spi_regs;
+
+    /* bound divider to 8192 */
+    if (freq < DIV_ROUND_UP(source_clock, 8192)) {
+        return (spi_clk_t){ .err = -EDOM };
+    }
+
+    if (freq >= SPI_CLK_SRC_FREQ) {
+        spi_regs.clock.clk_equ_sysclk = 1;
+    }
+    else {
+        spi_regs.clock.clkcnt_l = CONST_SPI_CLKCNT_N;
+        spi_regs.clock.clkcnt_h = (CONST_SPI_CLKCNT_N + 1) / 2 - 1;
+        spi_regs.clock.clkcnt_n = CONST_SPI_CLKCNT_N;
+        spi_regs.clock.clkdiv_pre = DIV_ROUND_UP(source_clock, freq) - 1;
+    }
+
+    return (spi_clk_t){ .spi_clock = spi_regs.clock.val };
+}
+
+int32_t IRAM_ATTR spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    if (clk.err) {
+        return -EINVAL;
+    }
+    spi_dev_t spi_regs;
+    spi_regs.clock.val = clk.spi_clock;
+    if (spi_regs.clock.clk_equ_sysclk) {
+        return SPI_CLK_SRC_FREQ;
+    }
+    else {
+        /* spi_clk = sysclk / (spi_clkdiv_pre + 1) / (spi_clkcnt_N + 1) */
+        uint32_t sysclk = SPI_CLK_SRC_FREQ;
+        uint32_t clkdiv_pre = spi_regs.clock.clkdiv_pre;
+        uint32_t clkcnt_n = spi_regs.clock.clkcnt_n;
+        return (DIV_ROUND(sysclk / (clkcnt_n + 1), (clkdiv_pre + 1)));
+    }
+}
+
 void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    DEBUG("%s bus=%u cs=%u mode=%u clk=%u\n", __func__, bus, cs, mode, clk);
+    DEBUG("%s bus=%u cs=%u mode=%u spi_clock=%x\n", __func__, bus, cs, mode, clk.spi_clock);
 
     assert(bus < SPI_NUMOF);
+    if (clk.err) {
+        return;
+    }
 
     /* call initialization of the SPI interface if it is not initialized yet */
     if (!_spi[bus].initialized) {
@@ -257,51 +334,11 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
     _spi[bus].regs->ctrl2.mosi_delay_mode = 0;
     _spi[bus].regs->ctrl2.mosi_delay_num = 0;
 
-    /* set SPI clock
-     * see ESP8266 Technical Reference Appendix 2 - SPI registers
-     * https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf
-     */
-
-    uint32_t spi_clkdiv_pre;
-    uint32_t spi_clkcnt_N;
-
-    switch (clk) {
-        case SPI_CLK_10MHZ:  spi_clkdiv_pre = 2;    /* predivides 80 MHz to 40 MHz */
-                             spi_clkcnt_N = 4;      /* 4 cycles results into 10 MHz */
-                             break;
-        case SPI_CLK_5MHZ:   spi_clkdiv_pre = 2;    /* predivides 80 MHz to 40 MHz */
-                             spi_clkcnt_N = 8;      /* 8 cycles results into 5 MHz */
-                             break;
-        case SPI_CLK_1MHZ:   spi_clkdiv_pre = 2;    /* predivides 80 MHz to 40 MHz */
-                             spi_clkcnt_N = 40;     /* 40 cycles results into 1 MHz */
-                             break;
-        case SPI_CLK_400KHZ: spi_clkdiv_pre = 20;   /* predivides 80 MHz to 4 MHz */
-                             spi_clkcnt_N = 10;     /* 10 cycles results into 400 kHz */
-                             break;
-        case SPI_CLK_100KHZ: spi_clkdiv_pre = 20;   /* predivides 80 MHz to 4 MHz */
-                             spi_clkcnt_N = 40;     /* 20 cycles results into 100 kHz */
-                             break;
-        default: spi_clkdiv_pre = 20;   /* predivides 80 MHz to 4 MHz */
-                 spi_clkcnt_N = 40;     /* 20 cycles results into 100 kHz */
+    /* set SPI clock configuration */
+    if (!(clk.spi_clock & 0x80000000)) {
+        IOMUX.CONF &= ~IOMUX_CONF_SPI1_CLOCK_EQU_SYS_CLOCK;
     }
-
-    /* register values are set to deviders-1 */
-    spi_clkdiv_pre--;
-    spi_clkcnt_N--;
-
-    DEBUG("%s spi_clkdiv_prev=%u spi_clkcnt_N=%u\n",
-          __func__, spi_clkdiv_pre, spi_clkcnt_N);
-
-    IOMUX.CONF &= ~IOMUX_CONF_SPI1_CLOCK_EQU_SYS_CLOCK;
-
-    /* SPI clock is derived from APB clock by dividers */
-    _spi[bus].regs->clock.clk_equ_sysclk = 0;
-
-    /* set SPI clock dividers */
-    _spi[bus].regs->clock.clkdiv_pre = spi_clkdiv_pre;
-    _spi[bus].regs->clock.clkcnt_n = spi_clkcnt_N;
-    _spi[bus].regs->clock.clkcnt_h = (spi_clkcnt_N+1)/2-1;
-    _spi[bus].regs->clock.clkcnt_l = spi_clkcnt_N;
+    _spi[bus].regs->clock.val = clk.spi_clock;
 
     DEBUG("%s bus %d: SPI_CLOCK_REG=%08x\n",
           __func__, bus, _spi[bus].regs->clock.val);

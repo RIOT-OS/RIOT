@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Marc Poulhiès
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,6 +15,7 @@
  * @brief       Low-level SPI driver implementation
  *
  * @author      Marc Poulhiès <dkm@kataplop.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -21,6 +23,7 @@
 #include <assert.h>
 
 #include "cpu.h"
+#include "macros/math.h"
 #include "mutex.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
@@ -67,12 +70,55 @@ void spi_init_pins(spi_t bus)
     ROM_GPIOPinTypeSSI(spi_confs[bus].gpio_port, spi_confs[bus].pins.mask);
 }
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+    /* SSIClk = SysClk / (CPSDVSR * (1 + SCR)), with
+     * CPSDVSR = 2..254 and even,
+     *  SCR = 0..255 */
+
+    uint32_t sys_ctl_clock = ROM_SysCtlClockGet();
+
+    /* bound divider to 65024 (254 * (1 + 255)) */
+    if (freq >= DIV_ROUND_UP(sys_ctl_clock, 65024)) {
+        return (spi_clk_t){ .err = -EDOM };
+    }
+
+    uint8_t cpsdvsr = 2, scr = 0;
+    uint32_t divider = DIV_ROUND_UP(sys_ctl_clock, freq);
+    if (divider % 2) {
+        divider++;
+    }
+    while (divider / cpsdvsr > 256) {
+        cpsdvsr += 2;
+    }
+    scr = divider / cpsdvsr - 1;
+
+    return (spi_clk_t){
+        .bit_rate = DIV_ROUND_UP(sys_ctl_clock, (cpsdvsr * (1 + scr)))
+    };
+}
+
+int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    if (clk.err) {
+        return -EINVAL;
+    }
+    return clk.bit_rate;
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
     assert((unsigned)bus < SPI_NUMOF);
+    if (clk.err) {
+        return;
+    }
+
     /* lock bus */
     mutex_lock(&locks[bus]);
+
     /* enable clock for SSI */
     ROM_SysCtlPeripheralEnable(spi_confs[bus].ssi_sysctl);
 
@@ -80,7 +126,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     ROM_SSIConfigSetExpClk(spi_confs[bus].ssi_base, ROM_SysCtlClockGet(),
                            mode,
                            SSI_MODE_MASTER,
-                           clk,
+                           clk.bit_rate,
                            8);
 
     ROM_SSIEnable(spi_confs[bus].ssi_base);

@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com>
- * Copyright (C) 2017 Marc Poulhiès <dkm@kataplop.net>
+ *               2017 Marc Poulhiès <dkm@kataplop.net>
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  *
  * @author          Rakendra Thapa <rakendrathapa@gmail.com>
  * @author          Marc Poulhiès <dkm@kataplop.net>
+ * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_H
@@ -155,21 +157,6 @@ typedef struct {
 
 #ifndef DOXYGEN
 /**
- * @brief   Override SPI clock speed values
- * @{
- */
-#define HAVE_SPI_CLK_T 1
-typedef enum {
-    SPI_CLK_100KHZ = 100000,        /**< drive the SPI bus with 100KHz */
-    SPI_CLK_400KHZ = 400000,        /**< drive the SPI bus with 400KHz */
-    SPI_CLK_1MHZ   = 1000000,       /**< drive the SPI bus with 1MHz */
-    SPI_CLK_4MHZ   = 4000000,       /**< drive the SPI bus with 4MHz */
-    SPI_CLK_5MHZ   = 5000000,       /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ  = 10000000,      /**< drive the SPI bus with 10MHz */
-} spi_clk_t;
-/** @} */
-
-/**
  * @brief   Override SPI mode settings
  * @{
  */
@@ -180,6 +167,17 @@ typedef enum {
     SPI_MODE_2 = SSI_FRF_MOTO_MODE_2,       /**< CPOL=1, CPHA=0 */
     SPI_MODE_3 = SSI_FRF_MOTO_MODE_0,       /**< CPOL=1, CPHA=1 */
 } spi_mode_t;
+/** @} */
+
+/**
+ * @brief   Override SPI clock configuration
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef struct {
+    uint32_t bit_rate;
+    int err;
+} spi_clk_t;
 /** @} */
 #endif /* ndef DOXYGEN */
 

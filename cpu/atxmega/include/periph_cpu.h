@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2021 Gerson Fernando Budke <nandojve@gmail.com>
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief           CPU specific definitions for internal peripheral handling
  *
  * @author          Gerson Fernando Budke <nandojve@gmail.com>
+ * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_H
@@ -340,19 +342,18 @@ typedef struct {
 } spi_conf_t;
 /** @} */
 
+#ifndef DOXYGEN
 /**
- * @brief  Available SPI clock speeds
+ * @brief   Override SPI clock configuration
  * @{
  */
 #define HAVE_SPI_CLK_T
-typedef enum {
-    SPI_CLK_100KHZ = 100000U,       /**< drive the SPI bus with 100KHz */
-    SPI_CLK_400KHZ = 400000U,       /**< drive the SPI bus with 400KHz */
-    SPI_CLK_1MHZ   = 1000000U,      /**< drive the SPI bus with 1MHz */
-    SPI_CLK_5MHZ   = 5000000U,      /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ  = 10000000U,     /**< drive the SPI bus with 10MHz */
+typedef struct {
+    uint8_t ctrl_clk2x_prescaler;
+    int err;
 } spi_clk_t;
 /** @} */
+#endif /* ifndef DOXYGEN */
 
 #if defined(__AVR_ATxmega64A1__)   || \
     defined(__AVR_ATxmega128A1__)  || \
