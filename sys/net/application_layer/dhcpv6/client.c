@@ -683,6 +683,25 @@ static void _update_addr_lease(const dhcpv6_opt_iaaddr_t *iaaddr, addr_lease_t *
     }
 }
 
+static void _update_prefix_lease(const dhcpv6_opt_iapfx_t *iapfx, pfx_lease_t *lease)
+{
+    if (iapfx != NULL) {
+        uint32_t valid = byteorder_ntohl(iapfx->valid);
+        uint32_t pref = byteorder_ntohl(iapfx->pref);
+
+        lease->pfx_len = iapfx->pfx_len;
+        lease->leased = 1U;
+        ipv6_addr_init_prefix(&lease->pfx,
+                              &iapfx->pfx,
+                              iapfx->pfx_len);
+        if (iapfx->pfx_len > 0) {
+            dhcpv6_client_conf_prefix(lease->parent.ia_id.info.netif,
+                                      &lease->pfx, lease->pfx_len,
+                                      valid, pref);
+        }
+    }
+}
+
 static void _parse_advertise(uint8_t *adv, size_t len)
 {
     dhcpv6_opt_smr_t *smr = NULL;
@@ -850,22 +869,7 @@ static bool _parse_ia_pd_option(dhcpv6_opt_ia_pd_t *ia_pd)
         pd_t1 = byteorder_ntohl(ia_pd->t1);
         pd_t2 = byteorder_ntohl(ia_pd->t2);
         _update_t1_t2(pd_t1, pd_t2);
-        if ((iapfx != NULL)) {
-            uint32_t valid = byteorder_ntohl(iapfx->valid);
-            uint32_t pref = byteorder_ntohl(iapfx->pref);
-
-            lease->pfx_len = iapfx->pfx_len;
-            lease->leased = 1U;
-            ipv6_addr_init_prefix(&lease->pfx,
-                                    &iapfx->pfx,
-                                    iapfx->pfx_len);
-            if (iapfx->pfx_len > 0) {
-                dhcpv6_client_conf_prefix(
-                        lease->parent.ia_id.info.netif, &lease->pfx,
-                        lease->pfx_len, valid, pref
-                    );
-            }
-        }
+        _update_prefix_lease(iapfx, lease);
     }
 
     return true;
