@@ -69,8 +69,6 @@ typedef struct {
     lease_t parent;
     ipv6_addr_t addr;
     uint8_t leased;
-    uint32_t valid_until;
-    uint32_t pref_until;
 } addr_lease_t;
 
 /**
@@ -90,8 +88,7 @@ static uint8_t duid[DHCPV6_CLIENT_DUID_LEN];
 static addr_lease_t addr_leases[CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX];
 static pfx_lease_t pfx_leases[CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX];
 static server_t server;
-static event_timeout_t solicit_renew_timeout, rebind_timeout,
-                       deprecate_remove_timeout;
+static event_timeout_t solicit_renew_timeout, rebind_timeout;
 static event_queue_t *event_queue;
 static sock_udp_t sock;
 static sock_udp_ep_t local = { .family = AF_INET6, .port = DHCPV6_CLIENT_PORT };
@@ -112,7 +109,6 @@ static void _solicit_servers(event_t *event);
 static void _request(event_t *event);
 static void _renew(event_t *event);
 static void _rebind(event_t *event);
-static void _deprecate_remove_addrs(event_t *event);
 
 static void _set_event_timeout_ms(event_timeout_t *timeout, event_t *event,
                                   uint32_t delay_ms);
@@ -124,7 +120,6 @@ static event_t solicit_servers = { .handler = _solicit_servers };
 static event_t request = { .handler = _request };
 static event_t renew = { .handler = _renew };
 static event_t rebind = { .handler = _rebind };
-static event_t deprecate_remove_addrs = { .handler = _deprecate_remove_addrs };
 
 #ifdef MODULE_AUTO_INIT_DHCPV6_CLIENT
 static char _thread_stack[DHCPV6_CLIENT_STACK_SIZE];
@@ -681,15 +676,10 @@ static void _update_addr_lease(const dhcpv6_opt_iaaddr_t *iaaddr, addr_lease_t *
 
         lease->leased = 1U;
         memcpy(&lease->addr, &iaaddr->addr, sizeof(ipv6_addr_t));
-        if (dhcpv6_client_add_addr(lease->parent.ia_id.info.netif,
-                                    &lease->addr) == sizeof(ipv6_addr_t)) {
-            DEBUG("IP ADDRESS successfully added!\n");
-            lease->pref_until = pref;
-            lease->valid_until = valid;
-
-            _set_event_timeout_sec(&deprecate_remove_timeout, &deprecate_remove_addrs,
-                                    pref);
-        }
+        dhcpv6_client_conf_addr(
+                lease->parent.ia_id.info.netif, &lease->addr,
+                valid, pref
+            );
     }
 }
 
@@ -1135,7 +1125,9 @@ static void _request_renew_rebind(uint8_t type)
                  (i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX);
                  i++) {
                 const addr_lease_t *lease = &addr_leases[i];
-                uint32_t valid_until = lease->valid_until;
+                uint32_t valid_until = dhcpv6_client_addr_valid_until(
+                        lease->parent.ia_id.info.netif, &lease->addr
+                    );
                 if (valid_until > mrd) {
                     mrd = valid_until;
                 }
@@ -1216,33 +1208,6 @@ static void _rebind(event_t *event)
     (void)event;
     DEBUG("DHCPv6 client: send REBIND\n");
     _request_renew_rebind(DHCPV6_REBIND);
-}
-
-static void _deprecate_remove_addrs(event_t *event)
-{
-    if (!IS_USED(MODULE_DHCPV6_CLIENT_IA_NA)) {
-        return;
-    }
-
-    (void)event;
-
-    for (unsigned i = 0; (i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX); i++) {
-        uint32_t now = _now_sec();
-        addr_lease_t *lease = &addr_leases[i];
-        if (now >= lease->valid_until) {
-            DEBUG("DHCPv6 client: removing address\n");
-            dhcpv6_client_remove_addr(lease->parent.ia_id.info.netif,
-                                      &lease->addr);
-            lease->leased = 0U;
-        } else if (now >= lease->pref_until) {
-            DEBUG("DHCPv6 client: deprecating address\n");
-            dhcpv6_client_deprecate_addr(lease->parent.ia_id.info.netif,
-                                         &lease->addr);
-            _set_event_timeout_sec(&deprecate_remove_timeout,
-                                   &deprecate_remove_addrs,
-                                   lease->valid_until);
-        }
-    }
 }
 
 static void _set_event_timeout_ms(event_timeout_t *timeout, event_t *event,

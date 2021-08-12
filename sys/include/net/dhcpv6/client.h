@@ -205,6 +205,20 @@ void dhcpv6_client_conf_prefix(unsigned netif, const ipv6_addr_t *pfx,
                                uint32_t pref);
 
 /**
+ * @brief   Configures a address lease that is provided by the server.
+ *
+ * @param[in] netif     Network interface the address was for.
+ * @param[in] addr      The assigned address.
+ * @param[in] valid     Valid lifetime of the address.
+ * @param[in] pref      Preferred lifetime of the address.
+ */
+static inline void dhcpv6_client_conf_addr(unsigned netif, const ipv6_addr_t *addr,
+                                           uint32_t valid, uint32_t pref)
+{
+    dhcpv6_client_conf_prefix(netif, addr, IPV6_ADDR_BIT_LEN, valid, pref);
+}
+
+/**
  * @brief   Checks if the given network interface is configured
  *          to use DHCPv6 IA_NA
  *
@@ -213,33 +227,6 @@ void dhcpv6_client_conf_prefix(unsigned netif, const ipv6_addr_t *pfx,
  * @return  true, if the network interface is set up for IA_NA.
  */
 bool dhcpv6_client_check_ia_na(unsigned netif);
-
-/**
- * @brief   Configures a address lease that is provided by the server.
- *
- * @param[in] netif     Network interface the address was for.
- * @param[in] addr      The assigned address.
- *
- * @return sizeof(ipv6_addr_t) on success.
- * @return <0 on error.
- */
-int dhcpv6_client_add_addr(unsigned netif, ipv6_addr_t *addr);
-
-/**
- * @brief   Deprecates an existing address from an address lease.
- *
- * @param[in] netif     Network interface the address was for.
- * @param[in] addr      The address to deprecate.
- */
-void dhcpv6_client_deprecate_addr(unsigned netif, const ipv6_addr_t *addr);
-
-/**
- * @brief   Removes an existing address that originated from an address lease.
- *
- * @param[in] netif     Network interface the address was for.
- * @param[in] addr      The address to remove.
- */
-void dhcpv6_client_remove_addr(unsigned netif, ipv6_addr_t *addr);
 
 /**
  * @brief   Determines how long the prefix delegation lease is still valid.
@@ -253,6 +240,21 @@ void dhcpv6_client_remove_addr(unsigned netif, ipv6_addr_t *addr);
 uint32_t dhcpv6_client_prefix_valid_until(unsigned netif,
                                           const ipv6_addr_t *pfx,
                                           unsigned pfx_len);
+
+/**
+ * @brief   Determines how long the address lease is still valid.
+ *
+ * @param[in] netif     Network interface the address was for.
+ * @param[in] addr      The assigned address.
+ *
+ * @return  Remaining valid lifetime of the address lease in seconds.
+ */
+static inline uint32_t dhcpv6_client_addr_valid_until(unsigned netif,
+                                                      const ipv6_addr_t *addr)
+{
+    return dhcpv6_client_prefix_valid_until(netif, addr, IPV6_ADDR_BIT_LEN);
+}
+
 /** @} */
 
 /**

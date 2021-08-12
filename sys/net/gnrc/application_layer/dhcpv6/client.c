@@ -96,36 +96,6 @@ bool dhcpv6_client_check_ia_na(unsigned iface)
     return netif->ipv6.aac_mode & GNRC_NETIF_AAC_DHCP;
 }
 
-int dhcpv6_client_add_addr(unsigned iface, ipv6_addr_t *addr)
-{
-    gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
-
-    DEBUG("DHCPv6 client: ADD IP ADDRESS\n");
-
-    return gnrc_netif_ipv6_addr_add(netif, addr, 64, 0);
-}
-
-void dhcpv6_client_deprecate_addr(unsigned iface, const ipv6_addr_t *addr)
-{
-    gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
-    int i;
-
-    gnrc_netif_acquire(netif);
-    i = gnrc_netif_ipv6_addr_idx(netif, addr);
-    if (i >= 0) {
-        netif->ipv6.addrs_flags[i] &= ~GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK;
-        netif->ipv6.addrs_flags[i] |= GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_DEPRECATED;
-    }
-    gnrc_netif_release(netif);
-}
-
-void dhcpv6_client_remove_addr(unsigned iface, ipv6_addr_t *addr)
-{
-    gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
-
-    gnrc_netif_ipv6_addr_remove(netif, addr);
-}
-
 uint32_t dhcpv6_client_prefix_valid_until(unsigned netif,
                                           const ipv6_addr_t *pfx,
                                           unsigned pfx_len)
