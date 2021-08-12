@@ -24,7 +24,7 @@
 #include "log.h"
 #include "msg.h"
 #include "net/gnrc/netif/conf.h"
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef NRF24L01P_NG_EXTRA_STACKSIZE
