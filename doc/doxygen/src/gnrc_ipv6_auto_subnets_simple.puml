@@ -1,5 +1,27 @@
 ' to generate SVG run plantuml -tsvg gnrc_ipv6_auto_subnets_simple.puml
 @startuml
+<style>
+nwdiagDiagram {
+	network {
+		BackGroundColor #275a4b
+		LineColor	#3fa687
+		LineThickness	2.0
+	}
+
+	server {
+		BackGroundColor #275a4b
+		LineColor	#3fa687
+		FontColor	#white
+		LineThickness	2.0
+	}
+
+	arrow {
+		LineColor	#3fa687
+		LineThickness	2.0
+	}
+}
+</style>
+
 nwdiag {
 
 	network level1 {

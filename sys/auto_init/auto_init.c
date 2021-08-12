@@ -279,6 +279,11 @@ void auto_init(void)
         gnrc_dhcpv6_client_simple_pd_init();
     }
 
+    if (IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_AUTO_INIT)) {
+        extern void gnrc_ipv6_auto_subnets_init(void);
+        gnrc_ipv6_auto_subnets_init();
+    }
+
     if (IS_USED(MODULE_AUTO_INIT_MULTIMEDIA)) {
         LOG_DEBUG("auto_init MULTIMEDIA\n");
         if (IS_USED(MODULE_DFPLAYER)) {
