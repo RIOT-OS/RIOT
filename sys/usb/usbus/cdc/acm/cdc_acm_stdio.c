@@ -28,7 +28,7 @@
 #include "isrpipe.h"
 
 #if CONFIG_USBUS_CDC_ACM_STDIO_BLOCKING
-#include "xtimer.h"
+#include "mutex.h"
 #endif
 
 #include "usb/usbus.h"
@@ -47,6 +47,10 @@ static uint8_t _cdc_tx_buf_mem[CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE];
 static uint8_t _cdc_rx_buf_mem[CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE];
 static isrpipe_t _cdc_stdio_isrpipe = ISRPIPE_INIT(_cdc_rx_buf_mem);
 
+#if CONFIG_USBUS_CDC_ACM_STDIO_BLOCKING
+static mutex_t _cdc_stdio_isrpipe_lock = MUTEX_INIT;
+#endif
+
 void stdio_init(void)
 {
     /* Initialize this side of the CDC ACM pipe */
@@ -57,9 +61,13 @@ void stdio_init(void)
 
 ssize_t stdio_read(void* buffer, size_t len)
 {
-    (void)buffer;
-    (void)len;
-    return isrpipe_read(&_cdc_stdio_isrpipe, buffer, len);
+    ssize_t n = isrpipe_read(&_cdc_stdio_isrpipe, buffer, len);
+#if CONFIG_USBUS_CDC_ACM_STDIO_BLOCKING
+    if (n > 0) {
+        mutex_unlock(&_cdc_stdio_isrpipe_lock);
+    }
+#endif
+    return n;
 }
 
 ssize_t stdio_write(const void* buffer, size_t len)
@@ -81,11 +89,9 @@ static void _cdc_acm_rx_pipe(usbus_cdcacm_device_t *cdcacm,
     (void)cdcacm;
 
 #if CONFIG_USBUS_CDC_ACM_STDIO_BLOCKING
-    /* shortest possible non-spinning wait */
-    xtimer_ticks32_t delay = { .ticks32 = XTIMER_BACKOFF + 1 };
     for (size_t i = 0; i < len; i++) {
         while (isrpipe_write_one(&_cdc_stdio_isrpipe, data[i]) < 0) {
-            xtimer_tsleep32(delay);
+            mutex_lock(&_cdc_stdio_isrpipe_lock);
         }
     }
 #else
