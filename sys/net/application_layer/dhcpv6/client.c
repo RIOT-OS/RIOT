@@ -887,7 +887,7 @@ static bool _parse_ia_na_option(dhcpv6_opt_ia_na_t *ia_na)
         unsigned na_t1, na_t2;
         uint32_t ia_id = byteorder_ntohl(ia_na->ia_id);
         size_t ia_na_len = byteorder_ntohs(ia_na->len) -
-                            (sizeof(dhcpv6_opt_ia_na_t) - sizeof(dhcpv6_opt_t));
+                           (sizeof(dhcpv6_opt_ia_na_t) - sizeof(dhcpv6_opt_t));
         size_t ia_na_orig_len = ia_na_len;
 
         if (lease->parent.ia_id.id != ia_id) {
@@ -895,12 +895,12 @@ static bool _parse_ia_na_option(dhcpv6_opt_ia_na_t *ia_na)
         }
         /* check for status */
         for (dhcpv6_opt_t *ia_na_opt = (dhcpv6_opt_t *)(ia_na + 1);
-                ia_na_len > 0;
-                ia_na_len -= _opt_len(ia_na_opt),
-                ia_na_opt = _opt_next(ia_na_opt)) {
+             ia_na_len > 0;
+             ia_na_len -= _opt_len(ia_na_opt),
+             ia_na_opt = _opt_next(ia_na_opt)) {
             if (ia_na_len > ia_na_orig_len) {
                 DEBUG("DHCPv6 client: IA_NA options overflow option "
-                        "boundaries\n");
+                      "boundaries\n");
                 return false;
             }
             switch (byteorder_ntohs(ia_na_opt->type)) {
