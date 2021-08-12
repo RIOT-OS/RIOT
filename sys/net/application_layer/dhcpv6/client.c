@@ -1077,6 +1077,40 @@ static void _solicit_servers(event_t *event)
     }
 }
 
+static uint32_t _calculate_mrd_from_leases()
+{
+    uint32_t mrd = 0;
+    /* calculate MRD from prefix leases */
+    for (unsigned i = 0;
+            IS_USED(MODULE_DHCPV6_CLIENT_IA_PD) &&
+            (i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX);
+            i++) {
+        const pfx_lease_t *lease = &pfx_leases[i];
+        uint32_t valid_until = dhcpv6_client_prefix_valid_until(
+                lease->parent.ia_id.info.netif,
+                &lease->pfx, lease->pfx_len
+            );
+        if (valid_until > mrd) {
+            mrd = valid_until;
+        }
+    }
+    /* calculate MRD from addr_leases */
+    for (unsigned i = 0;
+            IS_USED(MODULE_DHCPV6_CLIENT_IA_NA) &&
+            (i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX);
+            i++) {
+        const addr_lease_t *lease = &addr_leases[i];
+        uint32_t valid_until = dhcpv6_client_addr_valid_until(
+                lease->parent.ia_id.info.netif, &lease->addr
+            );
+        if (valid_until > mrd) {
+            mrd = valid_until;
+        }
+    }
+
+    return mrd;
+}
+
 static void _request_renew_rebind(uint8_t type)
 {
     dhcpv6_msg_t *msg = (dhcpv6_msg_t *)&send_buf[0];
@@ -1105,33 +1139,7 @@ static void _request_renew_rebind(uint8_t type)
         case DHCPV6_REBIND: {
             irt = DHCPV6_REB_TIMEOUT;
             mrt = DHCPV6_REB_MAX_RT;
-            /* calculate MRD from prefix leases */
-            for (unsigned i = 0;
-                 IS_USED(MODULE_DHCPV6_CLIENT_IA_PD) &&
-                 (i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX);
-                 i++) {
-                const pfx_lease_t *lease = &pfx_leases[i];
-                uint32_t valid_until = dhcpv6_client_prefix_valid_until(
-                        lease->parent.ia_id.info.netif,
-                        &lease->pfx, lease->pfx_len
-                    );
-                if (valid_until > mrd) {
-                    mrd = valid_until;
-                }
-            }
-            /* calculate MRD from addr_leases */
-            for (unsigned i = 0;
-                 IS_USED(MODULE_DHCPV6_CLIENT_IA_NA) &&
-                 (i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX);
-                 i++) {
-                const addr_lease_t *lease = &addr_leases[i];
-                uint32_t valid_until = dhcpv6_client_addr_valid_until(
-                        lease->parent.ia_id.info.netif, &lease->addr
-                    );
-                if (valid_until > mrd) {
-                    mrd = valid_until;
-                }
-            }
+            mrd = _calculate_mrd_from_leases();
             if (mrd == 0) {
                 /* all leases already expired, don't try to rebind and
                  * solicit immediately */
