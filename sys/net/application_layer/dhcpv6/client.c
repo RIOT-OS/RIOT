@@ -1010,29 +1010,51 @@ static bool _parse_reply(uint8_t *rep, size_t len)
     return true;
 }
 
+static size_t _compose_message(dhcpv6_msg_t *msg, uint8_t type)
+{
+    msg->type = type;
+    _generate_tid();
+    _set_tid(msg->tid);
+    uint16_t oro_opts[] = { DHCPV6_OPT_SMR };
+    size_t msg_len = sizeof(dhcpv6_msg_t);
+
+    transaction_start = _now_cs();
+
+    msg_len += _compose_cid_opt((dhcpv6_opt_duid_t *)&send_buf[msg_len]);
+
+    if (type != DHCPV6_REBIND && type != DHCPV6_SOLICIT) {
+        /* See RFC 8415, Appendix B */
+        msg_len += _compose_sid_opt((dhcpv6_opt_duid_t *)&send_buf[msg_len]);
+    }
+
+    msg_len += _compose_mud_url_opt((dhcpv6_opt_mud_url_t *)&send_buf[msg_len],
+                                    sizeof(send_buf) - msg_len);
+
+    msg_len += _compose_oro_opt((dhcpv6_opt_oro_t *)&send_buf[msg_len], oro_opts,
+                                ARRAY_SIZE(oro_opts));
+
+    msg_len += _add_ia_na(&send_buf[msg_len], sizeof(send_buf) - msg_len);
+    msg_len += _add_ia_pd_from_config(&send_buf[msg_len], sizeof(send_buf) - msg_len);
+
+    return msg_len;
+}
+
 static void _solicit_servers(event_t *event)
 {
     dhcpv6_msg_t *msg = (dhcpv6_msg_t *)&send_buf[0];
     dhcpv6_opt_elapsed_time_t *time;
     uint8_t *buf = NULL;
     uint32_t retrans_timeout = _irt_ms(DHCPV6_SOL_TIMEOUT, true);
-    size_t msg_len = sizeof(dhcpv6_msg_t);
+    size_t msg_len;
     int res, best_res = 0;
     bool first_rt = true;
-    uint16_t oro_opts[] = { DHCPV6_OPT_SMR };
 
     (void)event;
-    _generate_tid();
-    msg->type = DHCPV6_SOLICIT;
-    _set_tid(msg->tid);
-    msg_len += _compose_cid_opt((dhcpv6_opt_duid_t *)&send_buf[msg_len]);
-    transaction_start = _now_cs();
+
+    msg_len = _compose_message(msg, DHCPV6_SOLICIT);
     time = (dhcpv6_opt_elapsed_time_t *)&send_buf[msg_len];
     msg_len += _compose_elapsed_time_opt(time);
-    msg_len += _compose_oro_opt((dhcpv6_opt_oro_t *)&send_buf[msg_len], oro_opts,
-                                ARRAY_SIZE(oro_opts));
-    msg_len += _add_ia_na(&send_buf[msg_len], sizeof(send_buf) - msg_len);
-    msg_len += _add_ia_pd_from_config(&send_buf[msg_len], sizeof(send_buf) - msg_len);
+
     DEBUG("DHCPv6 client: send SOLICIT\n");
     _flush_stale_replies(&sock);
     res = sock_udp_send(&sock, send_buf, msg_len, &remote);
@@ -1077,7 +1099,7 @@ static void _solicit_servers(event_t *event)
     }
 }
 
-static uint32_t _calculate_mrd_from_leases()
+static uint32_t _calculate_mrd_from_leases(void)
 {
     uint32_t mrd = 0;
     /* calculate MRD from prefix leases */
@@ -1116,9 +1138,8 @@ static void _request_renew_rebind(uint8_t type)
     dhcpv6_msg_t *msg = (dhcpv6_msg_t *)&send_buf[0];
     dhcpv6_opt_elapsed_time_t *time;
     uint32_t retrans_timeout;
-    size_t msg_len = sizeof(dhcpv6_msg_t);
+    size_t msg_len;
     int res;
-    uint16_t oro_opts[] = { DHCPV6_OPT_SMR };
     uint8_t retrans = 0;
     uint16_t irt;
     uint16_t mrt;
@@ -1152,22 +1173,11 @@ static void _request_renew_rebind(uint8_t type)
             return;
     }
     retrans_timeout = _irt_ms(irt, false);
-    _generate_tid();
-    msg->type = type;
-    _set_tid(msg->tid);
-    msg_len += _compose_cid_opt((dhcpv6_opt_duid_t *)&send_buf[msg_len]);
-    if (type != DHCPV6_REBIND) {
-        msg_len += _compose_sid_opt((dhcpv6_opt_duid_t *)&send_buf[msg_len]);
-    }
-    msg_len += _compose_mud_url_opt((dhcpv6_opt_mud_url_t *)&send_buf[msg_len],
-                                    sizeof(send_buf) - msg_len);
-    transaction_start = _now_cs();
+    msg_len = _compose_message(msg, type);
+
     time = (dhcpv6_opt_elapsed_time_t *)&send_buf[msg_len];
     msg_len += _compose_elapsed_time_opt(time);
-    msg_len += _compose_oro_opt((dhcpv6_opt_oro_t *)&send_buf[msg_len], oro_opts,
-                                ARRAY_SIZE(oro_opts));
-    msg_len += _add_ia_na(&send_buf[msg_len], sizeof(send_buf) - msg_len);
-    msg_len += _add_ia_pd_from_config(&send_buf[msg_len], sizeof(send_buf) - msg_len);
+
     _flush_stale_replies(&sock);
     while (sock_udp_send(&sock, send_buf, msg_len, &remote) <= 0) {}
     while (((res = sock_udp_recv(&sock, recv_buf, sizeof(recv_buf),
