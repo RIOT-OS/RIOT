@@ -24,7 +24,7 @@
 #include "nrf24l01p_ng_constants.h"
 #include "nrf24l01p_ng_communication.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define SPI_BUS     (dev->params.spi)

@@ -28,7 +28,7 @@
 #include "net/gnrc/lorawan/region.h"
 #include "net/gnrc/netreg.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define MSG_TYPE_MLME_BACKOFF_EXPIRE (0x3458)           /**< Backoff timer expiration message type */
