@@ -32,7 +32,7 @@ extern "C" {
 #include "panic.h"
 #include "periph/i2c.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define WIRE_PORT_OK                    (0)
