@@ -664,8 +664,11 @@ void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
  *
  * @param[in]     slicer      Preallocated slicer struct to use
  * @param[in]     option      option number (block1 or block2)
+ *
+ * @return      true if the `more` bit is set in the block option
+ * @return      false if the `more` bit is not set the block option
  */
-void coap_block_finish(coap_block_slicer_t *slicer, uint16_t option);
+bool coap_block_finish(coap_block_slicer_t *slicer, uint16_t option);
 
 /**
  * @brief Finish a block1 request
@@ -677,10 +680,13 @@ void coap_block_finish(coap_block_slicer_t *slicer, uint16_t option);
  * function overwrites bytes in the packet rather than adding new.
  *
  * @param[in]     slicer      Preallocated slicer struct to use
+ *
+ * @return      true if the `more` bit is set in the block option
+ * @return      false if the `more` bit is not set the block option
  */
-static inline void coap_block1_finish(coap_block_slicer_t *slicer)
+static inline bool coap_block1_finish(coap_block_slicer_t *slicer)
 {
-    coap_block_finish(slicer, COAP_OPT_BLOCK1);
+    return coap_block_finish(slicer, COAP_OPT_BLOCK1);
 }
 
 /**
@@ -693,10 +699,13 @@ static inline void coap_block1_finish(coap_block_slicer_t *slicer)
  * function overwrites bytes in the packet rather than adding new.
  *
  * @param[in]     slicer      Preallocated slicer struct to use
+ *
+ * @return      true if the `more` bit is set in the block option
+ * @return      false if the `more` bit is not set the block option
  */
-static inline void coap_block2_finish(coap_block_slicer_t *slicer)
+static inline bool coap_block2_finish(coap_block_slicer_t *slicer)
 {
-    coap_block_finish(slicer, COAP_OPT_BLOCK2);
+    return coap_block_finish(slicer, COAP_OPT_BLOCK2);
 }
 
 /**
