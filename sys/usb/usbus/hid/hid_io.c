@@ -26,7 +26,7 @@
 #include "usb/usbus/hid.h"
 #include "usb/usbus/hid_io.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static usbus_hid_device_t hid;
