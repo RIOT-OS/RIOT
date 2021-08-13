@@ -18,7 +18,6 @@
  * @}
  */
 
-
 #ifndef IRQ_ARCH_H
 #define IRQ_ARCH_H
 

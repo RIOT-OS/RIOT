@@ -24,7 +24,6 @@
 #include "thread.h"
 #include "msg.h"
 
-
 /* some internally used msg types */
 #define MSG_LONG                (0xcafe)
 #define MSG_MID                 (0xe5e1)
@@ -63,7 +62,6 @@ static int long_sleep_ticks = 0;
 static int mid_msg_ticks = 0;
 static int mid_sleep_ticks = 0;
 static int short_ticks = 0;
-
 
 void *long_sleep(void *arg)
 {

@@ -45,7 +45,6 @@ static saul_reg_t saul_entries[PIR_NUM];
 extern saul_driver_t pir_saul_occup_driver;
 /** @} */
 
-
 void auto_init_pir(void)
 {
     for (unsigned i = 0; i < PIR_NUM; i++) {

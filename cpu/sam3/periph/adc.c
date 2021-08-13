@@ -21,7 +21,6 @@
 #include <assert.h>
 #include <stdio.h>
 
-
 #include "mutex.h"
 #include "periph/adc.h"
 
@@ -34,7 +33,6 @@
 #define ADC_CLOCK_TARGET    (5000000)
 #endif
 #define PRESCALER           ((CLOCK_CORECLOCK / (2 * ADC_CLOCK_TARGET)) - 1)
-
 
 static mutex_t lock = MUTEX_INIT;
 

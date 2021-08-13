@@ -38,7 +38,6 @@ static saul_reg_t s2 = { NULL, NULL, "S2", &s2_dri };
 static saul_reg_t s3a = { NULL, NULL, "S3", &s3a_dri };
 static saul_reg_t s3b = { NULL, NULL, "S3", &s3b_dri };
 
-
 static int count(void)
 {
     int i = 0;

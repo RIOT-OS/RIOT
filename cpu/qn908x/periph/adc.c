@@ -123,7 +123,6 @@ static uint32_t _adc_bandgap_calib_mv(void) {
 /* Mask to and against the adc_conf_t to get the channel enum value. */
 #define ADC_CONF_T_CHANNEL_MASK (0x1fu << 9u)
 
-
 int adc_init(adc_t line)
 {
     if (line >= ADC_NUMOF) {

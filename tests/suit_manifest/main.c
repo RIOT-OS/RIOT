@@ -76,7 +76,6 @@ static int test_suit_manifest(const unsigned char *manifest_bin,
     char _url[SUIT_URL_MAX];
     suit_manifest_t manifest;
 
-
     memset(&manifest, 0, sizeof(manifest));
 
     manifest.urlbuf = _url;

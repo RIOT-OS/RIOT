@@ -71,7 +71,6 @@ void cpu_clock_init(void)
 #endif
 #endif /* CONFIG_BOARD_HAS_XTAL */
 
-
     /* Set up 32K clock source. */
 #if CONFIG_CPU_CLK_32K_XTAL
     CLOCK_AttachClk(kXTAL32K_to_32K_CLK); /* Switch 32K_CLK to XTAL32K */

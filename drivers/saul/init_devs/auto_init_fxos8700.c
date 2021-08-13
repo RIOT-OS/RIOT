@@ -46,7 +46,6 @@ extern saul_driver_t fxos8700_saul_acc_driver;
 extern saul_driver_t fxos8700_saul_mag_driver;
 /** @} */
 
-
 void auto_init_fxos8700(void)
 {
     for (unsigned i = 0; i < FXOS8700_NUM; i++) {

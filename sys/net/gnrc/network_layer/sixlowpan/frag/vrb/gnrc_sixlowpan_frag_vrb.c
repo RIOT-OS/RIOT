@@ -46,7 +46,6 @@ static inline bool _equal_index(const gnrc_sixlowpan_frag_vrb_t *vrbe,
             (memcmp(vrbe->super.src, src, src_len) == 0));
 }
 
-
 gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
         const gnrc_sixlowpan_frag_rb_base_t *base,
         gnrc_netif_t *out_netif, const uint8_t *out_dst, size_t out_dst_len)

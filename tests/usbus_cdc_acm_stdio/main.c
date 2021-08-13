@@ -45,12 +45,10 @@ static int cmd_text(int argc, char **argv)
     return 0;
 }
 
-
 static const shell_command_t shell_commands[] = {
     { "text",  "Generates long text for testing stdio buffer",  cmd_text },
     { NULL, NULL, NULL }
 };
-
 
 int main(void)
 {

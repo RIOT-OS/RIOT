@@ -31,5 +31,4 @@ int _gnrc_ipv6_frag_stats(int argc, char **argv)
     return 0;
 }
 
-
 /** @} */

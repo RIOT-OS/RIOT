@@ -104,7 +104,6 @@ typedef struct {
     int retval; /**< return value from ISR */
 } i2c_state_t;
 
-
 static i2c_state_t i2c_state[I2C_NUMOF];
 
 int i2c_acquire(i2c_t dev)

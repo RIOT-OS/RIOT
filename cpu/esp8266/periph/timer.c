@@ -244,7 +244,6 @@ void IRAM timer_stop(tim_t dev)
     irq_restore (state);
 }
 
-
 static void IRAM __timer_channel_start (struct hw_timer_t* timer, struct hw_channel_t* channel)
 {
     if (!timer->started || !channel->used) {
@@ -505,7 +504,6 @@ void IRAM timer_stop(tim_t dev)
 
     irq_restore (state);
 }
-
 
 static void IRAM __timer_channel_start (struct phy_timer_t* timer, struct phy_channel_t* channel)
 {

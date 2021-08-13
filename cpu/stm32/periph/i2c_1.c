@@ -300,7 +300,6 @@ static int _write(I2C_TypeDef *i2c, uint16_t addr, const void *data,
     return _wait_for_bus(i2c);
 }
 
-
 static int _start(I2C_TypeDef *i2c, uint32_t cr2, uint8_t flags)
 {
     assert(i2c != NULL);

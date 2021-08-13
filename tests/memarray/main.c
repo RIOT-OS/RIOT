@@ -39,7 +39,6 @@
 #define NUMBER_OF_LOOPS      (1)
 #endif
 
-
 extern int _ps_handler(int argc, char **argv);
 
 struct block_t {

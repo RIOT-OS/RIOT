@@ -78,7 +78,6 @@ enum {
  */
 #define PERIPH_TIMER_PROVIDES_SET
 
-
 /**
  * @brief   Available MUX values for configuring a pin's alternate function
  */

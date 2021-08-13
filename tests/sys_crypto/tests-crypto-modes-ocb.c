@@ -50,8 +50,6 @@ static size_t TEST_1_EXPECTED_LEN = 16;
 
 static uint8_t TEST_1_TAG_LEN = 16;
 
-
-
 /* Test 2:
     N: BBAA99887766554433221101
     A: 0001020304050607
@@ -86,7 +84,6 @@ static size_t TEST_2_EXPECTED_LEN = sizeof(TEST_2_EXPECTED);
 
 static uint8_t TEST_2_TAG_LEN = 16;
 
-
 /* Test 3:
     N: BBAA99887766554433221102
     A: 0001020304050607
@@ -118,7 +115,6 @@ static uint8_t TEST_3_EXPECTED[] = {
 static size_t TEST_3_EXPECTED_LEN = sizeof(TEST_3_EXPECTED);
 
 static uint8_t TEST_3_TAG_LEN = 16;
-
 
 /* Test 4:
     N: BBAA99887766554433221103
@@ -152,7 +148,6 @@ static uint8_t TEST_4_EXPECTED[] = {
 static size_t TEST_4_EXPECTED_LEN = sizeof(TEST_4_EXPECTED);
 
 static uint8_t TEST_4_TAG_LEN = 16;
-
 
 /* Test 16:
     N: BBAA9988776655443322110F
@@ -196,8 +191,6 @@ static uint8_t TEST_16_EXPECTED[] = {
 static size_t TEST_16_EXPECTED_LEN = sizeof(TEST_16_EXPECTED);
 
 static uint8_t TEST_16_TAG_LEN = 16;
-
-
 
 /* Test 17:
 
@@ -258,7 +251,6 @@ static uint8_t TEST_17_EXPECTED[] = {
 static size_t TEST_17_EXPECTED_LEN = sizeof(TEST_17_EXPECTED);
 
 static uint8_t TEST_17_TAG_LEN = 12;
-
 
 /* Share test buffer output */
 static uint8_t data[60];

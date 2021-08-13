@@ -50,7 +50,6 @@ static saul_reg_t saul_entries[QMC5883L_NUM];
  */
 extern saul_driver_t qmc5883l_saul_driver;
 
-
 void auto_init_qmc5883l(void)
 {
     assert(QMC5883L_NUM == QMC5883L_INFO_NUM);

@@ -91,7 +91,6 @@ typedef enum {
     STATE_TX,                   /**< device is transmitting data */
 } state_t;
 
-
 /**
  * @brief   Since there can only be 1 nrfmin device, we allocate it right here
  */
@@ -282,7 +281,6 @@ int nrfmin_set_state(netopt_state_t val)
 
     return sizeof(netopt_state_t);
 }
-
 
 /**
  * @brief   Radio interrupt routine

@@ -161,7 +161,6 @@ static void _compile_sub_unsub(asymcute_req_t *req, asymcute_con_t *con,
     size_t topic_len = strlen(sub->topic->name);
     size_t pos = _len_set(req->data, (topic_len + 4));
 
-
     req->msg_id = _msg_id_next(con);
     req->data[pos] = type;
     req->data[pos + 1] = sub->topic->flags;
@@ -630,7 +629,6 @@ int asymcute_topic_init(asymcute_topic_t *topic, const char *topic_name,
                         uint16_t topic_id)
 {
     assert(topic);
-
 
     size_t len = 0;
 

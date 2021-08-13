@@ -112,7 +112,6 @@ void nimble_scanlist_print(void);
  */
 void nimble_scanlist_print_entry(nimble_scanlist_entry_t *e);
 
-
 #ifdef __cplusplus
 }
 #endif

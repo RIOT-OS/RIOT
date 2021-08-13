@@ -351,7 +351,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     /* hdr.frame_len given by device contains 4 bytes checksum */
     size_t payload_len = hdr.frame_len - 4;
 
-
     if (buf) {
         if (payload_len > len) {
             /* payload exceeds buffer size */

@@ -34,7 +34,6 @@ void print_hex(uint8_t *data, unsigned int len)
     printf("\n");
 }
 
-
 void print_asn1(asn1_tree *list, int depth)
 {
     printf("d=%d, Tag: %02x, len=%" PRIu32 "\n", depth, list->type, list->length);
@@ -50,8 +49,6 @@ void print_asn1(asn1_tree *list, int depth)
         print_asn1(list->next, depth);
     }
 }
-
-
 
 int main(void)
 {
@@ -175,7 +172,6 @@ int main(void)
         }
         printf("Encrypted content:\n");
         print_hex(encrypted_content->data, encrypted_content->length);
-
 
     }
 

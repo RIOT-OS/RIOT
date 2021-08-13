@@ -77,7 +77,6 @@ static void binary_ops(void)
                 continue;
             }
 
-
             for (unsigned o = 0; o < ARRAY_SIZE(ops); ++o) {
                 fix16_t c = ops[o].fun(a, b);
 

@@ -31,8 +31,6 @@
 extern "C" {
 #endif
 
-
-
 /**
  * @brief   Device initialization parameters
  */

@@ -16,7 +16,6 @@
  * @}
  */
 
-
 #include "openthread/platform/misc.h"
 #include "periph/pm.h"
 #include "ot.h"

@@ -50,7 +50,6 @@ static saul_reg_t saul_entries[ISL29020_NUM];
  */
 extern saul_driver_t isl29020_saul_driver;
 
-
 void auto_init_isl29020(void)
 {
     assert(ISL29020_NUM == ISL29020_INFO_NUM);

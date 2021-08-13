@@ -111,7 +111,6 @@ bool _check_net(void);
 bool _check_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
                    uint8_t proto, void *data, size_t data_len, uint16_t netif);
 
-
 #ifdef __cplusplus
 }
 #endif

@@ -215,7 +215,6 @@ Test *tests_bitfield_tests(void)
     return (Test *)&bitfield_tests;
 }
 
-
 void tests_bitfield(void)
 {
     TESTS_RUN(tests_bitfield_tests());

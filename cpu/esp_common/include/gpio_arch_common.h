@@ -51,7 +51,6 @@ typedef enum
     _NOT_EXIST  /**< pin cannot be used at all */
 } gpio_pin_usage_t;
 
-
 /**
  * @brief   Set the usage type of the pin
  * @param   pin     GPIO pin

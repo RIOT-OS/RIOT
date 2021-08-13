@@ -98,7 +98,6 @@ extern "C" {
 #define MRF24J40_OPT_PRELOADING         (0x0400)    /**< preloading enabled */
 /** @} */
 
-
 #define MRF24J40_TASK_TX_DONE           (0x01)      /**< TX operation is done */
 #define MRF24J40_TASK_TX_READY          (0x02)      /**< TX operation results ready for processing */
 #define MRF24J40_TASK_RX_READY          (0x04)      /**< RX processing needed */

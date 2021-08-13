@@ -491,7 +491,6 @@ esp_err_t esp_partition_erase_range(const esp_partition_t* part,
     return spi_flash_erase_range(part->address + addr, size);
 }
 
-
 static int _flash_init  (mtd_dev_t *dev)
 {
     DEBUG("%s dev=%p driver=%p\n", __func__, dev, &_flash_driver);

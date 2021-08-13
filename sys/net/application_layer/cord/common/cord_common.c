@@ -27,7 +27,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-
 #ifdef CONFIG_CORD_EP
 #define BUFSIZE         (sizeof(CONFIG_CORD_EP))   /* contains \0 termination char */
 #else

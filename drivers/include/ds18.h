@@ -52,7 +52,6 @@ extern "C" {
 #define DS18_ERROR                    (-1)
 /** @} */
 
-
 /**
  * @brief Device initialization parameters
  */

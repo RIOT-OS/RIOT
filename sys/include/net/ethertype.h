@@ -22,7 +22,6 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-
 #ifndef NET_ETHERTYPE_H
 #define NET_ETHERTYPE_H
 

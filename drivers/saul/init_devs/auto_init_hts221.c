@@ -49,7 +49,6 @@ extern saul_driver_t hts221_saul_temp_driver;
 extern saul_driver_t hts221_saul_hum_driver;
 /** @} */
 
-
 void auto_init_hts221(void)
 {
     assert(HTS221_NUM == HTS221_SAUL_NUM);

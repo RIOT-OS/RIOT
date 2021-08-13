@@ -31,8 +31,6 @@ volatile uint32_t _DEVCFG3 __attribute__((used, section(".devcfg3"))) =
     | (_DEVCFG3_FUSBIDIO_MASK   &  0        << _DEVCFG3_FUSBIDIO_POSITION)
     | (_DEVCFG3_FVBUSONIO_MASK  &  1        << _DEVCFG3_FVBUSONIO_POSITION);
 
-
-
 /* Note this sets the PLL to 96MHz (8/2 * 24) which is only supported by 3xx
  * and 4xx parts and assumes an 8MHz XTAL.
  *
@@ -85,7 +83,6 @@ volatile uint32_t _DEVCFG1 __attribute__ ((used, section(".devcfg1"))) =
     & (~_DEVCFG1_WINDIS_MASK    |  0        << _DEVCFG1_WINDIS_POSITION)
     & (~_DEVCFG1_FWDTEN_MASK    |  0        << _DEVCFG1_FWDTEN_POSITION)
     & (~_DEVCFG1_FWDTWINSZ_MASK |  3        << _DEVCFG1_FWDTWINSZ_POSITION);
-
 
 /*
  * DEVCFG0  @ 0x1FC02FFC

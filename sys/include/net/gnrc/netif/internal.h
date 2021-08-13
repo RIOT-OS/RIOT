@@ -116,7 +116,6 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
 void gnrc_netif_ipv6_addr_remove_internal(gnrc_netif_t *netif,
                                           const ipv6_addr_t *addr);
 
-
 /**
  * @brief   Returns the index of @p addr in gnrc_netif_t::ipv6_addrs of @p
  *          netif

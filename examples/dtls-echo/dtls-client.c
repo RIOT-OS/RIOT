@@ -103,7 +103,6 @@ static int dtls_handle_read(dtls_context_t *ctx)
     sock_udp_t *sock;
     sock =  (sock_udp_t *)dtls_get_app_data(ctx);
 
-
     if (sock_udp_get_remote(sock, &remote) == -ENOTCONN) {
         DEBUG("%s: Unable to retrieve remote!\n", __func__);
         return 0;

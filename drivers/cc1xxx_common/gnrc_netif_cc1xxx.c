@@ -123,7 +123,6 @@ static int cc1xxx_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     DEBUG("[cc1xxx-gnrc] send: payload of packet is %i\n", (int)size);
     netif_hdr = (gnrc_netif_hdr_t *)pkt->data;
 
-
     l2hdr.src_addr = cc1xxx_dev->addr;
     if (netif_hdr->flags & BCAST) {
         l2hdr.dest_addr = CC1XXX_BCAST_ADDR;

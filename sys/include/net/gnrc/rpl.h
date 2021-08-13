@@ -433,7 +433,6 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 #define GNRC_RPL_LEAF_NODE (2)
 /** @} */
 
-
 /**
  * @name RPL Control Message Options
  *  @see <a href="https://tools.ietf.org/html/rfc6550#section-6.7">

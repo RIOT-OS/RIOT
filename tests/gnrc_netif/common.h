@@ -19,7 +19,6 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-
 #include "net/gnrc/netif.h"
 
 #ifdef __cplusplus

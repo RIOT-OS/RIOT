@@ -217,7 +217,6 @@ typedef struct {
     reg32_t SWPWRPROF; /**< Software Power Profiler */
 } aux_sysif_regs_t;
 
-
 /**
  * @brief   AUX_SYSIF register values
  * @{

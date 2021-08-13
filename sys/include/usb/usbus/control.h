@@ -27,7 +27,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @brief helper struct to divide control messages in multiple parts
  */

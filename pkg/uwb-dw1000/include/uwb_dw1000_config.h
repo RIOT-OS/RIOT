@@ -60,7 +60,6 @@ extern "C" {
 #define DW1000_NPHR_DEFAULT         21
 #endif
 
-
 /**
  * @brief   Default channel
  */
@@ -166,7 +165,6 @@ extern "C" {
 #ifndef DW1000_RX_DIAGNOSTIC
 #define DW1000_RX_DIAGNOSTIC    0
 #endif
-
 
 /**
  * @brief Default UWB RX Antenna separation distance in m

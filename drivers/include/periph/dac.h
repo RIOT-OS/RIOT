@@ -129,7 +129,6 @@ void dac_poweron(dac_t line);
  */
 void dac_poweroff(dac_t line);
 
-
 #ifdef __cplusplus
 }
 #endif

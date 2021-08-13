@@ -182,7 +182,6 @@ static const pwm_conf_chan_t pwm_chan1_config[] = {
 };
 #endif
 
-
 /* PWM device configuration */
 static const pwm_conf_t pwm_config[] = {
 #if PWM_0_EN

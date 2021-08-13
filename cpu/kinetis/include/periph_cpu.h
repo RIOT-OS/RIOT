@@ -511,7 +511,6 @@ enum {
    event may be lost. */
 /** @} */
 
-
 /**
  * @brief UART hardware module types
  */

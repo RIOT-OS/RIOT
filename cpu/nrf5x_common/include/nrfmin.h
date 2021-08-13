@@ -217,8 +217,6 @@ int16_t nrfmin_get_txpower(void);
  */
 void nrfmin_set_txpower(int16_t power);
 
-
-
 #ifdef __cplusplus
 }
 #endif

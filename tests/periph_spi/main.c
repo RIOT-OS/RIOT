@@ -530,7 +530,6 @@ int cmd_bench(int argc, char **argv)
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
-
     xtimer_sleep(1);
 
     printf("-- - SUM:\t\t\t\t\t%"PRIu32"\t%"PRIu32"\n", sum, sched_sum);

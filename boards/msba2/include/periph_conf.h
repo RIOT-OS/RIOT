@@ -68,7 +68,6 @@ extern "C" {
 #define PWM_FUNC          (1)
 /** @} */
 
-
 /**
  * @name    UART configuration
  * @{

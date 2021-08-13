@@ -185,7 +185,6 @@ void pn532_reset(const pn532_t *dev);
  */
 int pn532_init(pn532_t *dev, const pn532_params_t *params, pn532_mode_t mode);
 
-
 #if IS_USED(MODULE_PN532_I2C) || DOXYGEN
 /**
  * @brief   Initialization of PN532 using i2c

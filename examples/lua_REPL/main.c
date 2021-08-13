@@ -38,7 +38,6 @@ const struct lua_riot_builtin_lua _lua_riot_builtin_lua_table[] = {
     { "repl", repl_lua, sizeof(repl_lua) }
 };
 
-
 const struct lua_riot_builtin_lua *const lua_riot_builtin_lua_table = _lua_riot_builtin_lua_table;
 
 const size_t lua_riot_builtin_lua_table_len = 1;

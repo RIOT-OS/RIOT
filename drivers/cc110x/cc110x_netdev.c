@@ -327,7 +327,6 @@ static int cc110x_init(netdev_t *netdev)
     dev->state = CC110X_STATE_IDLE;
     cc110x_release(dev);
 
-
     int retval; /*< Store return value to be able to pass through error code */
     /* Apply configuration (if non-NULL) and channel map, which also calls
      * cc110x_full_calibration

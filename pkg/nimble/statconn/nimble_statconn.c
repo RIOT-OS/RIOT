@@ -57,7 +57,6 @@ static uint32_t _conn_timeout;
 
 static nimble_netif_eventcb_t _eventcb = NULL;
 
-
 static slot_t *_get_addr(const uint8_t *addr)
 {
     for (unsigned i = 0; i < ARRAY_SIZE(_slots); i++) {

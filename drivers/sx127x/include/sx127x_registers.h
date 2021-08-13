@@ -464,7 +464,6 @@ extern "C" {
 #define RF_PLL_BANDWIDTH_300                                         (0xC0)  /* Default */
 /** @} */
 
-
 /* FSK modem definitions */
 
 /**

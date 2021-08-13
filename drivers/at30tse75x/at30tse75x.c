@@ -14,7 +14,6 @@
  * @author      Daniel Krebs <github@daniel-krebs.net>
  */
 
-
 #include "periph/i2c.h"
 #include "xtimer.h"
 

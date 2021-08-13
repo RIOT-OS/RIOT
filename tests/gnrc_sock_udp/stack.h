@@ -118,7 +118,6 @@ bool _check_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
                    void *data, size_t data_len, uint16_t netif,
                    bool random_src_port);
 
-
 #ifdef __cplusplus
 }
 #endif

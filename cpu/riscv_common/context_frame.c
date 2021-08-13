@@ -23,7 +23,6 @@
 #include "context_frame.h"
 #include "thread.h"
 
-
 #define CHECK_OFFSET(member)     \
     _Static_assert(offsetof(struct context_switch_frame, \
                             member) == member ## _OFFSET, \

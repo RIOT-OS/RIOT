@@ -491,7 +491,6 @@ int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
 int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                   const void *data, size_t len, uint8_t flags);
 
-
 #ifdef __cplusplus
 }
 #endif

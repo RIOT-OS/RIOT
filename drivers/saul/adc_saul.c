@@ -25,7 +25,6 @@
 #include "phydat.h"
 #include "periph/adc.h"
 
-
 static int read_adc(const void *dev, phydat_t *res)
 {
     const saul_adc_params_t *params = *((const saul_adc_params_t **)dev);

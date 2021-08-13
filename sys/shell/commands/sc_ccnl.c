@@ -73,7 +73,6 @@ int _ccnl_open(int argc, char **argv)
     return 0;
 }
 
-
 static void _content_usage(char *argv)
 {
     printf("usage: %s [URI] [content]\n"

@@ -43,7 +43,6 @@ static lpd8808_t dev;
  */
 static color_rgb_t leds[LPD8808_PARAM_LED_CNT];
 
-
 int main(void)
 {
     xtimer_ticks32_t now = xtimer_now();

@@ -41,7 +41,6 @@
 #define WDT_CONFIG_PER_16K_Val WDT_CONFIG_PER_CYC16384_Val
 #endif
 
-
 static inline void _set_enable(bool on)
 {
 /* work around strange watchdog behaviour if IDLE2 is used on samd21 */

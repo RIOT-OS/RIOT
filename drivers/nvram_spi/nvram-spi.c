@@ -181,7 +181,6 @@ static int nvram_spi_read(nvram_t *dev, uint8_t *dst, uint32_t src, size_t len)
     return (int)len;
 }
 
-
 static int nvram_spi_write_9bit_addr(nvram_t *dev, const uint8_t *src, uint32_t dst, size_t len)
 {
     nvram_spi_params_t *spi_dev = (nvram_spi_params_t *) dev->extra;

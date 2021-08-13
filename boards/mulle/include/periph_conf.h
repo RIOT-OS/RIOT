@@ -7,7 +7,6 @@
  * details.
  */
 
-
 /**
  * @ingroup     boards_mulle
  * @{

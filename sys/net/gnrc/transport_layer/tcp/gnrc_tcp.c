@@ -125,7 +125,6 @@ static void _close(gnrc_tcp_tcb_t *tcb)
     TCP_DEBUG_LEAVE;
 }
 
-
 static void _abort(gnrc_tcp_tcb_t *tcb)
 {
     TCP_DEBUG_ENTER;

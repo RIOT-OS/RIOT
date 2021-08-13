@@ -153,7 +153,6 @@ static void clk_init(void)
                       | GCLK_GENCTRL_SRC_XOSC32K);
 #endif
 
-
 #if CLOCK_USE_PLL
     /* setup generic clock 1 to feed DPLL with 1MHz */
     GCLK->GENDIV.reg = (GCLK_GENDIV_DIV(8) |

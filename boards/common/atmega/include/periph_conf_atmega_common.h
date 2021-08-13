@@ -89,7 +89,6 @@ extern "C" {
 #endif /* UART_NUMOF */
 /** @} */
 
-
 /**
  * @name    SPI configuration
  *

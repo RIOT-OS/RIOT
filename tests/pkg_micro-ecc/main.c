@@ -122,7 +122,6 @@ int main(void)
 
     printf("Testing %d random private key pairs and signature without using HWRNG\n", TESTROUNDS);
 
-
     for (int i = 0; i < TESTROUNDS; ++i) {
         printf("Round %d\n", i);
 

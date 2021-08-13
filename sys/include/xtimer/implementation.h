@@ -35,7 +35,6 @@
 
 #include "irq.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

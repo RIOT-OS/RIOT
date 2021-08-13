@@ -890,7 +890,6 @@ static const uint8_t TEST_WYCHEPROOF_28_EXPECTED[] = {
 };
 static const size_t TEST_WYCHEPROOF_28_EXPECTED_LEN = 63;
 
-
 /* Manually created test vectors */
 /* This is necessary, because no test vectors are published with input length > 256 */
 /* Data has been verified against BouncyCastle (.NET Core) and pycryptodome */
@@ -1162,7 +1161,6 @@ static void test_decrypt_op(const uint8_t *key, uint8_t key_len,
                         ); \
 } while (0)
 
-
 static void test_crypto_modes_ccm_encrypt(void)
 {
     do_test_encrypt_op(RFC_1);
@@ -1254,7 +1252,6 @@ static void test_crypto_modes_ccm_decrypt(void)
     do_test_decrypt_op(CUSTOM_1);
 }
 
-
 typedef int (*func_ccm_t)(const cipher_t *, const uint8_t *, uint32_t,
                           uint8_t, uint8_t, const uint8_t *, size_t,
                           const uint8_t *, size_t, uint8_t *);
@@ -1277,7 +1274,6 @@ static int _test_ccm_len(func_ccm_t func, uint8_t len_encoding,
                nonce, nonce_len, input, input_len, data);
     return ret;
 }
-
 
 /* Test length checking in ccm functions. */
 static void test_crypto_modes_ccm_check_len(void)
@@ -1328,7 +1324,6 @@ static void test_crypto_modes_ccm_check_len(void)
     ret = _test_ccm_len(cipher_encrypt_ccm, 2, NULL, 0, 0xFEFF + 1);
     TEST_ASSERT_EQUAL_INT(-1, ret);
 }
-
 
 Test *tests_crypto_modes_ccm_tests(void)
 {

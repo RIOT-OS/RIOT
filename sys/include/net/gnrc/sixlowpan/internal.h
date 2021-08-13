@@ -55,7 +55,6 @@ void gnrc_sixlowpan_dispatch_recv(gnrc_pktsnip_t *pkt, void *context,
 void gnrc_sixlowpan_dispatch_send(gnrc_pktsnip_t *pkt, void *context,
                                   unsigned page);
 
-
 /**
  * @brief   Checks if packet fits over interface (and fragments if @ref
  *          net_gnrc_sixlowpan_frag is available and required)

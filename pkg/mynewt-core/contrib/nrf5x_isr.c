@@ -17,7 +17,6 @@
  * @}
  */
 
-
 #include "mcu/mcu.h"
 #include "cpu.h"
 

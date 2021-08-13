@@ -190,7 +190,6 @@ static void test_gnrc_priority_pktqueue_pop_empty(void)
     TEST_ASSERT_EQUAL_INT(0, gnrc_priority_pktqueue_length(&pkt_queue));
 }
 
-
 static void test_gnrc_priority_pktqueue_pop(void)
 {
     gnrc_pktsnip_t pkt1 = PKT_INIT_ELEM_STATIC_DATA(TEST_STRING8, NULL);

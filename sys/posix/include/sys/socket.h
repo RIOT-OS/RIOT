@@ -135,7 +135,6 @@ struct sockaddr_storage {
     uint8_t ss_data[SOCKADDR_MAX_DATA_LEN]; /**< Socket address */
 };
 
-
 /**
  * @brief   Accept a new connection on a socket
  * @details The accept() function shall extract the first connection on the

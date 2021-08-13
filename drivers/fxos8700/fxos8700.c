@@ -14,7 +14,6 @@
  * @author      Hyung-Sin Kim <hs.kim@cs.berkeleyedu>
  */
 
-
 #include "periph/i2c.h"
 #include "xtimer.h"
 #include "fxos8700.h"
@@ -114,7 +113,6 @@ int fxos8700_init(fxos8700_t* dev, const fxos8700_params_t *params)
 
     return FXOS8700_OK;
 }
-
 
 int fxos8700_set_active(const fxos8700_t* dev)
 {

@@ -151,7 +151,6 @@ int ili9341_init(ili9341_t *dev, const ili9341_params_t *params)
     command_params[0] = 0x55; /* 16 bit mode */
     _write_cmd(dev, ILI9341_CMD_PIXSET, command_params, 1);
 
-
     command_params[0] = 0x01;
     _write_cmd(dev, ILI9341_CMD_GAMSET, command_params, 1);
 
@@ -230,7 +229,6 @@ void ili9341_read_cmd(const ili9341_t *dev, uint8_t cmd, uint8_t *data, size_t l
                        data, len);
     spi_release(dev->params->spi);
 }
-
 
 void ili9341_fill(const ili9341_t *dev, uint16_t x1, uint16_t x2, uint16_t y1,
                   uint16_t y2, uint16_t color)

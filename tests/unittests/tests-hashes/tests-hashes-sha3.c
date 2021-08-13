@@ -150,7 +150,6 @@ static const uint8_t m03_2[] = { 0xAA, 0x7C, 0x6D, 0xA9, 0xAD, 0xD2, 0x08, 0x89,
                                  0xB1, 0xD8, 0x17 };
 size_t m03_2_len = sizeof(m03_2);
 
-
 static const uint8_t h03_256[] = { 0xB7, 0xD0, 0x31, 0xAA, 0x69, 0xB7, 0xB4, 0xD2,
                                    0x6A, 0x35, 0xB8, 0x96, 0xD7, 0x61, 0x31, 0x4F,
                                    0x1D, 0x61, 0xEB, 0x12, 0xDC, 0xC1, 0xE7, 0x2A,
@@ -294,7 +293,6 @@ static const uint8_t hfail_512[] = { 0x15, 0x0D, 0x78, 0x7D, 0x6E, 0xB4, 0x96, 0
                                      0xB5, 0x5C, 0xC5, 0x88, 0xC6, 0xB9, 0x13, 0x13,
                                      0x2F, 0x1A, 0x65, 0x8F, 0xB1, 0x22, 0xCB, 0x52 };
 
-
 static int calc_and_compare_hash_256(const uint8_t *msg, size_t msg_len, const uint8_t *expected)
 {
     static unsigned char hash[SHA3_256_DIGEST_LENGTH];
@@ -410,7 +408,6 @@ static void test_hashes_sha3_hash_sequence_failing_compare(void)
     TEST_ASSERT(!calc_and_compare_hash_384(mfail, mfail_len, hfail_384));
     TEST_ASSERT(!calc_and_compare_hash_512(mfail, mfail_len, hfail_512));
 }
-
 
 Test *tests_hashes_sha3_tests(void)
 {

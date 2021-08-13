@@ -71,8 +71,6 @@ extern "C"
  */
 #define AIP31068_CMD_SET_DDRAM_ADDR         0x80
 
-
-
 /* Bits for AIP31068_CMD_ENTRY_MODE_SET (page 16, section 3) */
 
 /**
@@ -86,8 +84,6 @@ extern "C"
  *        1 = Automated display scroll
  */
 #define AIP31068_BIT_ENTRY_MODE_AUTOINCREMENT   BIT0
-
-
 
 /* Bits for AIP31068_CMD_DISPLAY_CONTROL (page 16, section 4) */
 
@@ -109,8 +105,6 @@ extern "C"
  */
 #define AIP31068_BIT_DISPLAY_CONTROL_CURSOR_BLINKING    BIT0
 
-
-
 /* Bits for AIP31068_CMD_CURSOR_DISPLAY_SHIFT (page 17, section 5) */
 
 /**
@@ -124,8 +118,6 @@ extern "C"
  *        1 = Shift to the right
  */
 #define AIP31068_BIT_CURSOR_DISPLAY_SHIFT_DIRECTION     BIT2
-
-
 
 /* Bits for AIP31068_CMD_FUNCTION_SET (page 17, section 6) */
 
@@ -146,8 +138,6 @@ extern "C"
  *        1 = 5x10 dots per character
  */
 #define AIP31068_BIT_FUNCTION_SET_FONTSIZE  BIT2
-
-
 
 /* Bits for control byte (page 12) */
 

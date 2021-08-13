@@ -116,7 +116,6 @@ static event_t _crc_error_event = {
     .handler = _crc_error_handler,
 };
 
-
 void _rx_done_handler(event_t *event)
 {
     (void) event;

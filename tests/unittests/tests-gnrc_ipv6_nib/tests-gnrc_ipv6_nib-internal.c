@@ -1848,7 +1848,6 @@ static void test_nib_abr_add_pfx__pfx_in_nib(void)
                                              { .u64 = TEST_UINT64 } } };
     static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
 
-
     TEST_ASSERT_NOT_NULL((abr = _nib_abr_add(&addr)));
     TEST_ASSERT_NOT_NULL((dst = _nib_pl_add(IFACE, &pfx, GLOBAL_PREFIX_LEN,
                                             UINT32_MAX, UINT32_MAX)));

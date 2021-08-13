@@ -49,7 +49,6 @@ extern "C" {
 #endif /* defined(MODULE_PERIPH_SPI) || defined(DOXYGEN) */
 /** @} */
 
-
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

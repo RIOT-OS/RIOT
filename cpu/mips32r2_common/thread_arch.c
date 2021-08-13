@@ -36,7 +36,6 @@
 #define MM_SYSCALL         (0x8B7C0000)
 #define MM_SYSCALL_MASK    (0xfffffc00)
 
-
 #ifdef MIPS_HARD_FLOAT
 /* pointer to the current and old fpu context for lazy context switching */
 static struct fp64ctx *currentfpctx;   /* fpu context of current running task */
@@ -165,7 +164,6 @@ mem_rw(const void *vaddr)
     memcpy(&v, vaddr, sizeof(v));
     return v;
 }
-
 
 #ifdef MIPS_DSP
 extern int _dsp_save(struct dspctx *ctx);

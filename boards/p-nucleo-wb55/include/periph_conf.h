@@ -16,7 +16,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
 
-
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 

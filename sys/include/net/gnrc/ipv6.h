@@ -95,7 +95,6 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-
 #ifndef NET_GNRC_IPV6_H
 #define NET_GNRC_IPV6_H
 
@@ -115,7 +114,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 /**
  * @defgroup    net_gnrc_ipv6_conf  GNRC IPv6 compile configurations

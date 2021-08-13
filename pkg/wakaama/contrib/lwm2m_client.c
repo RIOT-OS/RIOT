@@ -51,7 +51,6 @@ bool lwm2m_device_reboot_requested(void);
  */
 static void *_lwm2m_client_run(void *arg);
 
-
 static char _lwm2m_client_stack[THREAD_STACKSIZE_MAIN +
                                 THREAD_EXTRA_STACKSIZE_PRINTF];
 static lwm2m_client_data_t *_client_data;

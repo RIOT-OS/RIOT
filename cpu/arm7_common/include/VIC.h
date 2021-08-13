@@ -26,7 +26,6 @@ extern "C" {
 
 #define INTMode         (FIQ32Mode | IRQ32Mode)
 
-
 /**
  * @name    IRQ Priority Mapping
  */
@@ -40,7 +39,6 @@ extern "C" {
 #define IRQP_RTC            8
 #define LOWEST_PRIORITY     0x0F
 /** @} */
-
 
 #define WDT_INT         0
 #define SWI_INT         1

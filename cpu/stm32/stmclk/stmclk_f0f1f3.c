@@ -223,7 +223,6 @@
 #error "Cannot use a SYSCLK > 50MHz to output to MCO"
 #endif
 
-
 /* Check whether PLL is required */
 /* Check whether PLL must be enabled:
   - When PLLCLK is used as SYSCLK

@@ -315,5 +315,4 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
 typedef int dont_be_pedantic;
 #endif /* CONFIG_GNRC_IPV6_NIB_6LN */
 
-
 /** @} */

@@ -23,7 +23,6 @@
 #include "thread.h"
 #include "msg.h"
 
-
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -60,7 +59,6 @@ int nrf24l01p_write_reg(const nrf24l01p_t *dev, char reg, char write)
     xtimer_spin(DELAY_AFTER_FUNC_TICKS);
     return 0;
 }
-
 
 int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq)
 {
@@ -280,7 +278,6 @@ int nrf24l01p_preload(const nrf24l01p_t *dev, char *data, unsigned int size)
     return 0;
 }
 
-
 int nrf24l01p_set_channel(const nrf24l01p_t *dev, uint8_t chan)
 {
     if (chan > 125) {
@@ -361,8 +358,6 @@ int nrf24l01p_set_payload_width(const nrf24l01p_t *dev,
     return nrf24l01p_write_reg(dev, pipe_pw_address, width);
 }
 
-
-
 int nrf24l01p_set_tx_address(const nrf24l01p_t *dev, const uint8_t *saddr, unsigned int length)
 {
     /* Acquire exclusive access to the bus. */
@@ -425,7 +420,6 @@ uint64_t nrf24l01p_get_tx_address_long(const nrf24l01p_t *dev)
 
     return saddr_64;
 }
-
 
 int nrf24l01p_set_rx_address(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, const uint8_t *saddr, unsigned int length)
 {
@@ -492,7 +486,6 @@ int nrf24l01p_set_rx_address_long(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pi
     return nrf24l01p_set_rx_address(dev, pipe, buf, length);
 }
 
-
 uint64_t nrf24l01p_get_rx_address_long(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
 {
     char pipe_addr;
@@ -545,7 +538,6 @@ uint64_t nrf24l01p_get_rx_address_long(const nrf24l01p_t *dev, nrf24l01p_rx_pipe
 
     return saddr_64;
 }
-
 
 int nrf24l01p_set_datarate(const nrf24l01p_t *dev, nrf24l01p_dr_t dr)
 {
@@ -627,7 +619,6 @@ int nrf24l01p_get_power(const nrf24l01p_t *dev)
     return _nrf24l01p_power_map[(rf_setup & 0x6) >> 1];
 }
 
-
 int nrf24l01p_set_txmode(const nrf24l01p_t *dev)
 {
     char conf;
@@ -668,7 +659,6 @@ int nrf24l01p_set_rxmode(const nrf24l01p_t *dev)
 
     return status;
 }
-
 
 int nrf24l01p_reset_interrupts(const nrf24l01p_t *dev, char intrs)
 {
@@ -895,7 +885,6 @@ int nrf24l01p_disable_all_auto_ack(const nrf24l01p_t *dev)
 {
     return nrf24l01p_write_reg(dev, REG_EN_AA, 0x00);
 }
-
 
 int nrf24l01p_flush_tx_fifo(const nrf24l01p_t *dev)
 {

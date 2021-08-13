@@ -181,7 +181,6 @@ uint16_t tsl2561_read_illuminance(const tsl2561_t *dev)
     return (uint16_t)(illuminance >> TSL2561_LUXSCALE);
 }
 
-
 static void _enable(const tsl2561_t *dev)
 {
     /* enabling device */
@@ -196,7 +195,6 @@ static void _enable(const tsl2561_t *dev)
         DEBUG("[Info] Enabled ? %s\n", en == 3 ? "true" : "false");
     }
 }
-
 
 static void _disable(const tsl2561_t *dev)
 {

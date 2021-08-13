@@ -236,7 +236,6 @@ int bmx280_init(bmx280_t *dev, const bmx280_params_t *params)
     dev->params = *params;
     uint8_t reg;
 
-
 #ifdef BMX280_USE_SPI
     /* configure the chip-select pin */
     if (spi_init_cs(BUS, CS) != SPI_OK) {

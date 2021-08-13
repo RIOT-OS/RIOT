@@ -71,7 +71,6 @@ int conn_can_raw_create(conn_can_raw_t *conn, struct can_filter *filter, size_t 
     return conn_can_raw_set_filter(conn, filter, count);
 }
 
-
 int conn_can_raw_set_filter(conn_can_raw_t *conn, struct can_filter *filter, size_t count)
 {
     assert(conn != NULL);

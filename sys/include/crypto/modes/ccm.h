@@ -76,7 +76,6 @@ int cipher_encrypt_ccm(const cipher_t *cipher,
                        const uint8_t *input, size_t input_len,
                        uint8_t *output);
 
-
 /**
  * @brief Decrypt data of arbitrary length in ccm mode.
  *

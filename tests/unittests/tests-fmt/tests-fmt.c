@@ -545,7 +545,6 @@ static void test_fmt_s16_dfp(void)
     out[act_len] = '\0';
     TEST_ASSERT_EQUAL_STRING("0.31987", (char *)out);
 
-
     val = -32768;
     fpp = -2;
     len = fmt_s16_dfp(NULL, val, fpp);

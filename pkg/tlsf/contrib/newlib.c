@@ -30,7 +30,6 @@
 #include "tlsf-malloc.h"
 #include "tlsf-malloc-internal.h"
 
-
 /* TODO: Add defines for other compilers */
 #if defined(__GNUC__) && !defined(__clang__)    /* Clang supports __GNUC__ but
                                                  * not the alloc_size()

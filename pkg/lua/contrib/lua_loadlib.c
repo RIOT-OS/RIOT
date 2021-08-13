@@ -225,7 +225,6 @@ static const luaL_Reg pk_funcs[] = {
     { NULL, NULL }
 };
 
-
 static const luaL_Reg ll_funcs[] = {
     { "require", ll_require },
     { NULL, NULL }
@@ -257,7 +256,6 @@ LUAMOD_API int luaopen_package(lua_State *L)
     /* set field 'preload' */
     luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_PRELOAD_TABLE);
     lua_setfield(L, -2, "preload");
-
 
     lua_pushglobaltable(L);
     lua_pushvalue(L, -2);           /* set 'package' as upvalue for next lib */

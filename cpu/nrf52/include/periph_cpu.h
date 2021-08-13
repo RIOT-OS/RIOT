@@ -237,7 +237,6 @@ typedef struct {
 #endif
 } spi_conf_t;
 
-
 /**
  * @brief Common SPI/I2C interrupt callback
  *

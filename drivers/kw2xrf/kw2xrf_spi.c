@@ -130,7 +130,6 @@ void kw2xrf_read_dregs(kw2xrf_t *dev, uint8_t addr, uint8_t *buf, uint8_t length
     kw2xrf_spi_transfer_tail(dev);
 }
 
-
 void kw2xrf_write_iregs(kw2xrf_t *dev, uint8_t addr, uint8_t *buf, uint8_t length)
 {
     if (length > (KW2XRF_IBUF_LENGTH - 1)) {

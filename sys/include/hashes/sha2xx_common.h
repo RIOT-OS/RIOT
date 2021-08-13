@@ -30,7 +30,6 @@
  * $FreeBSD: src/lib/libmd/sha256.h,v 1.1.2.1 2005/06/24 13:32:25 cperciva Exp $
  */
 
-
 /**
  * @defgroup    sys_hashes_sha2xx_common SHA-2xx common
  * @ingroup     sys_hashes_unkeyed

@@ -80,12 +80,9 @@ void sock_dtls_session_destroy(sock_tls_t *sk)
     tls_session_destroy(sk);
 }
 
-
 #ifdef MODULE_SOCK_TCP
 /* TODO */
 #endif
-
-
 
 #ifndef __mips__
 #include <ctype.h>

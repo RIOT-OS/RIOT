@@ -160,7 +160,6 @@ void openthread_bootstrap(void);
  */
 void openthread_radio_init(netdev_t *dev, uint8_t *tb, uint8_t *rb);
 
-
 /**
  * @brief   Starts OpenThread thread.
  *

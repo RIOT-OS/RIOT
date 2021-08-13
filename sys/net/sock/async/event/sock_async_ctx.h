@@ -66,7 +66,6 @@ typedef struct {
     event_queue_t *queue;   /**< event queue to post socket events to */
 } sock_async_ctx_t;
 
-
 #ifdef __cplusplus
 }
 #endif

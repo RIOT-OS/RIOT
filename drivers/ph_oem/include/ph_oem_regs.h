@@ -47,7 +47,6 @@ typedef enum ph_oem_reg {
 
 } ph_oem_reg_t;
 
-
 /**
  * @brief Device ID of the @ref PH_OEM_REG_DEVICE_TYPE register of a pH OEM sensor
  */

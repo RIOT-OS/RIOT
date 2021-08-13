@@ -95,7 +95,6 @@ static int _get_netdev_addr_long(netdev_t *netdev, void *value, size_t max_len)
     return sizeof(_ieee802154_local_eui64);
 }
 
-
 static void _init_interface(void)
 {
     netdev_test_setup(&_ieee802154_dev, NULL);

@@ -207,7 +207,6 @@ typedef enum {
 
 #endif /* ndef DOXYGEN */
 
-
 /**
  * @brief   Size of the UART TX buffer for non-blocking mode.
  */
@@ -836,7 +835,6 @@ typedef struct {
 #define NWDT_TIME_LOWER_LIMIT          (8U)
 #define NWDT_TIME_UPPER_LIMIT          (16384U)
 /** @} */
-
 
 /**
  * @brief Watchdog can be stopped.

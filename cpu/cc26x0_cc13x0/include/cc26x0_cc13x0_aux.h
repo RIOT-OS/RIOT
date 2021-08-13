@@ -24,7 +24,6 @@
 extern "C" {
 #endif
 
-
 /**
  * AUX_AIODIO registers
  */
@@ -47,7 +46,6 @@ typedef struct {
 
 #define AUX_AIODIO0          ((aux_aiodio_regs_t *) (AUX_AIODIO0_BASE)) /**< AUX_AIODIO0 register bank */
 #define AUX_AIODIO1          ((aux_aiodio_regs_t *) (AUX_AIODIO1_BASE)) /**< AUX_AIODIO1 register bank */
-
 
 /**
  * AUX_TDC registers
@@ -72,7 +70,6 @@ typedef struct {
 /** @} */
 
 #define AUX_TDC           ((aux_tdc_regs_t *) (AUX_TDC_BASE)) /**< AUX_TDC register bank */
-
 
 /**
  * AUX_EVCTL registers
@@ -104,7 +101,6 @@ typedef struct {
 /** @} */
 
 #define AUX_EVCTL           ((aux_evctl_regs_t *) (AUX_EVCTL_BASE)) /**< AUX_EVCTL register bank */
-
 
 /**
  * AUX_WUC registers
@@ -154,7 +150,6 @@ typedef struct {
 
 #define AUX_WUC           ((aux_wuc_regs_t *) (AUX_WUC_BASE)) /**< AUX_WUC register bank */
 
-
 /**
  * AUX_TIMER registers
  */
@@ -174,7 +169,6 @@ typedef struct {
 /** @} */
 
 #define AUX_TIMER           ((aux_timer_regs_t *) (AUX_TIMER_BASE)) /**< AUX_TIMER register bank */
-
 
 /**
  * AUX_SMPH registers
@@ -199,7 +193,6 @@ typedef struct {
 
 #define AUX_SMPH ((aux_smph_regs_t *) (AUX_SMPH_BASE)) /**< AUX_SMPH register bank */
 
-
 /**
  * AUX_ANAIF registers
  */
@@ -219,7 +212,6 @@ typedef struct {
 /** @} */
 
 #define AUX_ANAIF           ((aux_anaif_regs_t *) (AUX_ANAIF_BASE)) /**< AUX_ANAIF register bank */
-
 
 /**
  * ADI_4_AUX registers
@@ -245,7 +237,6 @@ typedef struct {
 /** @} */
 
 #define ADI_4_AUX           ((adi_4_aux_regs_t *) (ADI_4_AUX_BASE)) /**< ADI_4_AUX register bank */
-
 
 #define ADDI_SEM AUX_SMPH->SMPH0 /**< the semamphore used for ADDI */
 

@@ -18,7 +18,6 @@
  * @}
  */
 
-
 #include <fcntl.h>
 #include <errno.h>
 #include <inttypes.h>
@@ -218,7 +217,6 @@ static ssize_t _read(vfs_file_t *filp, void *dest, size_t nbytes)
     UINT br;
 
     FRESULT res = f_read(&fd->file, dest, nbytes, &br);
-
 
     if (res != FR_OK) {
         return fatfs_err_to_errno(res);

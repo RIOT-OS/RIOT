@@ -71,7 +71,6 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, v
     bufpos += coap_blockwise_put_char(&slicer, bufpos, 'U');
     bufpos += coap_blockwise_put_char(&slicer, bufpos, '.');
 
-
     unsigned payload_len = bufpos - payload;
     return coap_block2_build_reply(pkt, COAP_CODE_205,
                                    buf, len, payload_len, &slicer);

@@ -458,7 +458,6 @@ extern "C" {
  */
 #define CC110X_GDO_ON_PLL_IN_LOCK       0x0A
 
-
 /**
  * @brief   GDOx remains constantly LOW
  */

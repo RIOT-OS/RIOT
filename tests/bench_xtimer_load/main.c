@@ -193,7 +193,6 @@ int main(void)
                                       THREAD_CREATE_STACKTEST,
                                       worker_thread, NULL, "worker");
 
-
     printf("TEST_HZ=%lu\n", TEST_HZ);
 
     puts("[START]");

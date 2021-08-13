@@ -32,7 +32,6 @@
 #define MOTOR_0_ID  0
 #define MOTOR_1_ID  1
 
-
 void motors_control(int32_t duty_cycle)
 {
     char str[6];

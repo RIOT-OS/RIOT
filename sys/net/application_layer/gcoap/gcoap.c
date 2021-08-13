@@ -980,7 +980,6 @@ static ssize_t _tl_authenticate(gcoap_socket_t *sock, const sock_udp_ep_t *remot
 #endif
 }
 
-
 /*
  * gcoap interface functions
  */

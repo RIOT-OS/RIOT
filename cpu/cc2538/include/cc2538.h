@@ -804,7 +804,6 @@ typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IE
 #define XOSC32K_FREQ                   32768U /**< 32 KHz external oscillator/clock frequency */
 #define RCOSC32K_FREQ                  32753U /**< 32 KHz internal RC oscillator frequency */
 
-
 #define CC2538_VTOR_ALIGN                 512 /**< CC2538 Vector Table alignment */
 
 #ifdef __cplusplus

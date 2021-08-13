@@ -521,7 +521,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-
     int serial_fd = _open_connection(argv[2], serial_option);
     if (serial_fd < 0) {
         fprintf(stderr, "Error opening serial device %s\n", argv[2]);

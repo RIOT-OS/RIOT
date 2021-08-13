@@ -31,7 +31,6 @@
 #define DS3234_CMD_READ         (0x00)
 #define DS3234_CMD_WRITE        (0x80)
 
-
 /**
  * @brief Read one or more registers from the sensor
  *

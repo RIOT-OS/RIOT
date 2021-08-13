@@ -29,7 +29,6 @@
 #include <signal.h>
 #undef __USE_GNU
 
-
 #include <ucontext.h>
 #include <err.h>
 

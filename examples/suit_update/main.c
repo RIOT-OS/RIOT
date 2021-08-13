@@ -177,7 +177,6 @@ static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
 };
 
-
 int main(void)
 {
     puts("RIOT SUIT update example application");

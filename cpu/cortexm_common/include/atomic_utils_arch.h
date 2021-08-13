@@ -181,7 +181,6 @@ static inline void atomic_clear_bit_u64(atomic_bit_u64_t bit)
     _bit_barrier_post();
 }
 
-
 #endif /* CPU_HAS_BITBAND */
 
 #ifdef __cplusplus

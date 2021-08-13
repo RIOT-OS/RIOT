@@ -19,7 +19,6 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-
 #ifndef NET_GNRC_IPV6_EXT_H
 #define NET_GNRC_IPV6_EXT_H
 

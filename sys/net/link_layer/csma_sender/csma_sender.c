@@ -69,7 +69,6 @@ static inline uint32_t choose_backoff_period(int be,
     return period;
 }
 
-
 /**
  * @brief Perform a CCA and send the given packet if medium is available
  *
@@ -188,7 +187,6 @@ int csma_sender_csma_ca_send(netdev_t *dev, iolist_t *iolist,
     DEBUG("csma: Software CSMA/CA failure: medium never available.\n");
     return -EBUSY;
 }
-
 
 int csma_sender_cca_send(netdev_t *dev, iolist_t *iolist)
 {

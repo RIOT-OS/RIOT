@@ -290,7 +290,6 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     return 0;
 }
 
-
 int timer_clear(tim_t tim, int channel)
 {
     DEBUG("%s(%u, %u)\n", __FUNCTION__, tim, channel);

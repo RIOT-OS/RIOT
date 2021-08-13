@@ -70,7 +70,6 @@ static int ccm_compute_cbc_mac(const cipher_t *cipher, const uint8_t iv[16],
     return offset;
 }
 
-
 static int ccm_create_mac_iv(const cipher_t *cipher, uint8_t auth_data_len, uint8_t M,
                              uint8_t L, const uint8_t *nonce, uint8_t nonce_len,
                              size_t plaintext_len, uint8_t X1[16])
@@ -162,7 +161,6 @@ static int ccm_compute_adata_mac(const cipher_t *cipher, const uint8_t *auth_dat
     return 0;
 }
 
-
 /* Check if 'value' can be stored in 'num_bytes' */
 static inline int _fits_in_nbytes(size_t value, uint8_t num_bytes)
 {
@@ -173,7 +171,6 @@ static inline int _fits_in_nbytes(size_t value, uint8_t num_bytes)
 
     return (value >> shift) <= 1;
 }
-
 
 int cipher_encrypt_ccm(const cipher_t *cipher,
                        const uint8_t *auth_data, uint32_t auth_data_len,
@@ -239,7 +236,6 @@ int cipher_encrypt_ccm(const cipher_t *cipher,
 
     return len + mac_length;
 }
-
 
 int cipher_decrypt_ccm(const cipher_t *cipher,
                        const uint8_t *auth_data, uint32_t auth_data_len,

@@ -172,7 +172,6 @@ static const pwm_conf_t pwm_config[] = {
 #define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
 
-
 /**
  * @name    SPI device configuration
  *
@@ -251,7 +250,6 @@ static const spi_conf_t spi_config[] = {
 
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
-
 
 /**
  * @name I2C configuration

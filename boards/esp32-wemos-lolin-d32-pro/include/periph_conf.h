@@ -83,7 +83,6 @@
 #endif
 /** @} */
 
-
 /**
  * @name   I2C configuration
  *
@@ -106,7 +105,6 @@
 #endif
 /** @} */
 
-
 /**
  * @name   PWM channel configuration
  *
@@ -126,8 +124,6 @@
 #define PWM1_GPIOS  { }
 #endif
 /** @} */
-
-
 
 /**
  * @name    SPI configuration
@@ -166,7 +162,6 @@
 #endif
 /** @} */
 
-
 /**
  * @name   UART configuration
  *
@@ -181,7 +176,6 @@
 #define UART0_TXD   GPIO1  /**< direct I/O pin for UART_DEV(0) TxD, can't be changed */
 #define UART0_RXD   GPIO3  /**< direct I/O pin for UART_DEV(0) RxD, can't be changed */
 /** @} */
-
 
 #ifdef __cplusplus
 } /* end extern "C" */

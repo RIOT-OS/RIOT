@@ -57,7 +57,6 @@ extern "C" {
 #endif
 /** @} */
 
-
 /**
  * @name    STDIO configuration
  * @{
@@ -66,7 +65,6 @@ extern "C" {
 #define STDIO_UART_BAUDRATE (115200)    /**< Default baudrate of UART for stdio */
 #endif
 /** @} */
-
 
 #ifndef DOXYGEN
 /**
@@ -80,7 +78,6 @@ extern "C" {
 
 /** @} */
 #endif /* DOXYGEN */
-
 
 #if defined(MODULE_MTD) || defined(DOXYGEN)
 /**
@@ -101,7 +98,6 @@ extern mtd_dev_t *mtd0;
 /** @} */
 #endif /* defined(MODULE_MTD) || defined(DOXYGEN) */
 
-
 #if defined(MODULE_SPIFFS) || defined(DOXYGEN)
 /**
  * @name    SPIFFS configuration
@@ -116,7 +112,6 @@ extern mtd_dev_t *mtd0;
 #define SPIFFS_CACHE 1
 /** @} */
 #endif /* defined(MODULE_SPIFFS) || defined(DOXYGEN) */
-
 
 /**
  * @brief Initialize board specific hardware

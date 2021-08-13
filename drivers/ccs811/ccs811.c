@@ -164,7 +164,6 @@ int ccs811_init(ccs811_t *dev, const ccs811_params_t *params)
     return ccs811_set_mode(dev, dev->params.mode);
 }
 
-
 int ccs811_set_mode(ccs811_t *dev, ccs811_mode_t mode)
 {
     ASSERT_PARAM(dev != NULL);

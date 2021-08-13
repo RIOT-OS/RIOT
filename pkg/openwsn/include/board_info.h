@@ -52,7 +52,6 @@ extern "C" {
 #define SCHEDULER_ENABLE_INTERRUPT()        /* unused by RIOT */
 /** @} */
 
-
 /**
  * @name    OpenWSN platform dependent definitions
  * @{

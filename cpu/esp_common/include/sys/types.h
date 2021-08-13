@@ -20,7 +20,6 @@
  * with pthread types from pthread module.
  */
 
-
 /* unified sys/types.h:
    start with sef's sysvi386 version.
    merge go32 version -- a few ifdefs.
@@ -308,7 +307,6 @@ typedef    struct _types_fd_set {
 
 #undef __MS_types__
 #undef _ST_INT32
-
 
 #ifndef __clockid_t_defined
 typedef _CLOCKID_T_ clockid_t;

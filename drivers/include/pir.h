@@ -48,7 +48,6 @@ typedef struct {
     bool active_high; /**< Active when GPIO pin is high or not */
 } pir_params_t;
 
-
 /**
  * @brief   device descriptor for a PIR sensor
  */

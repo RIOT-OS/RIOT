@@ -372,7 +372,6 @@ kernel_pid_t can_device_init(char *stack, int stacksize, char priority,
     return res;
 }
 
-
 #define SJW 2
 #define CAN_SYNC_SEG 1
 

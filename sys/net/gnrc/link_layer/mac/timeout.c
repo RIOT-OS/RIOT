@@ -46,7 +46,6 @@ void gnrc_mac_init_timeouts(gnrc_mac_timeout_t *mac_timeout,
     evtimer_init_msg(&mac_timeout->evtimer);
 }
 
-
 int gnrc_mac_find_timeout(gnrc_mac_timeout_t *mac_timeout, gnrc_mac_timeout_type_t type)
 {
     assert(mac_timeout);

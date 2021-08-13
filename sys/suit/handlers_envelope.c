@@ -100,7 +100,6 @@ static int _auth_handler(suit_manifest_t *manifest, int key,
         }
     }
 
-
     return res;
 }
 

@@ -26,7 +26,6 @@
 #include "lis3dh.h"
 #include "lis3dh_params.h"
 
-
 #define SLEEP_USEC  (100 * 1000U)
 
 #define WATERMARK_LEVEL 16

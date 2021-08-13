@@ -93,7 +93,6 @@ typedef struct {
     uint8_t data_len;       /**< number ob bytes written to @p data */
 } resp_t;
 
-
 /*
  * Driver's internal utility functions
  */

@@ -134,7 +134,6 @@ int conn_can_raw_send(conn_can_raw_t *conn, const struct can_frame *frame, int f
  */
 int conn_can_raw_set_filter(conn_can_raw_t *conn, struct can_filter *filter, size_t count);
 
-
 #ifdef __cplusplus
 }
 #endif

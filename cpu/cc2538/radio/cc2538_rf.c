@@ -85,7 +85,6 @@ static void _cc2538_observable_signals(void)
     }
 }
 
-
 bool cc2538_channel_clear(void)
 {
     if (RFCORE->XREG_FSMSTAT0bits.FSM_FFCTRL_STATE == FSM_STATE_IDLE) {

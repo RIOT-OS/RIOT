@@ -165,7 +165,6 @@ extern "C" {
 #define BACKUP_RAM_DATA __attribute__((section(".backup.data")))
 #endif /* CPU_HAS_BACKUP_RAM */
 
-
 /**
  * @brief   This arch uses the inlined irq API.
  */

@@ -217,7 +217,6 @@ static inline void gnrc_netif_hdr_set_src_addr(gnrc_netif_hdr_t *hdr,
     memcpy(((uint8_t *)(hdr + 1)), addr, addr_len);
 }
 
-
 /**
  * @brief   Get the destination address from the given header
  *

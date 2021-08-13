@@ -212,7 +212,6 @@ static inline void _tx_isr_handler(int num)
     avr8_exit_isr();
 }
 
-
 #ifdef UART_0_ISR
 ISR(UART_0_ISR, ISR_BLOCK)
 {

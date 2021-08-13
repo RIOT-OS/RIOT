@@ -66,7 +66,6 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     isr_cb = cb;
     isr_arg = arg;
 
-
     /* reset timer counter */
     volatile uint64_t *mtime = (uint64_t *)(CLINT_BASE_ADDR + CLINT_MTIME);
 

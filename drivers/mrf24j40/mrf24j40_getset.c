@@ -120,7 +120,6 @@ static const uint8_t RSSI_value[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
                                       0x25, 0x20, 0x1b, 0x17, 0x12, 0x0d, 0x09, 0x05, 0x02, 0x01, \
                                       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-
 static void mrf24j40_baseband_reset(mrf24j40_t *dev)
 {
     uint8_t softrst;
@@ -175,7 +174,6 @@ uint8_t mrf24j40_get_chan(mrf24j40_t *dev)
 {
     return dev->netdev.chan;
 }
-
 
 void mrf24j40_set_chan(mrf24j40_t *dev, uint8_t channel)
 {
@@ -266,7 +264,6 @@ void mrf24j40_set_pan(mrf24j40_t *dev, uint16_t pan)
     mrf24j40_reg_write_short(dev, MRF24J40_REG_PANIDL, le_pan.u8[0]);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_PANIDH, le_pan.u8[1]);
 }
-
 
 int16_t mrf24j40_get_txpower(mrf24j40_t *dev)
 {
@@ -441,7 +438,6 @@ void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state)
     uint8_t old_state;
 
     old_state = dev->state;
-
 
     if (state == old_state) {
         return;

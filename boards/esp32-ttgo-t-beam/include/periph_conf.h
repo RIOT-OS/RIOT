@@ -73,7 +73,6 @@
 #endif
 /** @} */
 
-
 /**
  * @name   I2C configuration
  *
@@ -95,7 +94,6 @@
 #define I2C0_SDA    GPIO21          /**< SDA signal of I2C_DEV(0) */
 #endif
 /** @} */
-
 
 /**
  * @name   PWM channel configuration
@@ -169,7 +167,6 @@
 #endif /* MODULE_ESP32_TTGO_T_BEAM_V1_0 */
 #endif
 /** @} */
-
 
 #ifdef __cplusplus
 } /* end extern "C" */

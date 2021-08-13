@@ -98,7 +98,6 @@ int fcntl(int fd, int cmd, ...)
     return res;
 }
 
-
 off_t lseek(int fd, off_t off, int whence)
 {
     int res = vfs_lseek(fd, off, whence);

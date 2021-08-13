@@ -204,7 +204,6 @@ static int _start_measurement (sht3x_dev_t* dev)
     return SHT3X_OK;
 }
 
-
 static int _get_raw_data(sht3x_dev_t* dev, uint8_t* raw_data)
 {
     int res = SHT3X_OK;
@@ -260,7 +259,6 @@ static int _get_raw_data(sht3x_dev_t* dev, uint8_t* raw_data)
     return SHT3X_OK;
 }
 
-
 static int _compute_values (uint8_t* raw_data, int16_t* temp, int16_t* hum)
 {
     if (temp) {
@@ -280,7 +278,6 @@ static int _compute_values (uint8_t* raw_data, int16_t* temp, int16_t* hum)
 
     return SHT3X_OK;
 }
-
 
 static int _send_command(sht3x_dev_t* dev, uint16_t cmd)
 {
@@ -307,7 +304,6 @@ static int _send_command(sht3x_dev_t* dev, uint16_t cmd)
 
     return SHT3X_OK;
 }
-
 
 static int _read_data(sht3x_dev_t* dev, uint8_t *data, uint8_t len)
 {
@@ -390,7 +386,6 @@ static int _reset (sht3x_dev_t* dev)
 
     return res;
 }
-
 
 static int _status (sht3x_dev_t* dev, uint16_t* status)
 {

@@ -62,7 +62,6 @@ static void *second_thread(void *arg)
     return NULL;
 }
 
-
 int main(void)
 {
     int thread_success = 0;

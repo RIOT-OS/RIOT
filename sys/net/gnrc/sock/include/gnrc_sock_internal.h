@@ -158,7 +158,6 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
  * @}
  */
 
-
 #ifdef __cplusplus
 }
 #endif

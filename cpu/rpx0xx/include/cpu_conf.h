@@ -25,7 +25,6 @@
 #include "cpu_conf_common.h"
 #include "vendor/RP2040.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

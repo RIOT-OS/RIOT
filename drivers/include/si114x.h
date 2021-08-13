@@ -70,7 +70,6 @@ typedef struct {
     si114x_led_current_t led_current;  /**< Proximity LED current */
 } si114x_params_t;
 
-
 /**
  * @brief Device descriptor for the Si114x sensor
  */

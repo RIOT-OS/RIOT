@@ -96,7 +96,6 @@ void lwm2m_free_object_device(lwm2m_object_t *obj);
  */
 bool lwm2m_device_reboot_requested(void);
 
-
 #ifdef __cplusplus
 }
 #endif

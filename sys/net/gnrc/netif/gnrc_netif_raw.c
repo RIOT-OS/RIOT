@@ -24,7 +24,6 @@
 #define IP_VERSION4     (0x40U)
 #define IP_VERSION6     (0x60U)
 
-
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
 

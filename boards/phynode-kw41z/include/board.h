@@ -43,7 +43,6 @@ extern "C"
 #define LED0_OFF            (GPIOB->PSOR = LED0_MASK)
 #define LED0_TOGGLE         (GPIOB->PTOR = LED0_MASK)
 
-
 #define LED1_PIN            GPIO_PIN(PORT_B,  1)
 #define LED1_MASK           (1 << 1)
 #define LED1_ON             (GPIOB->PCOR = LED1_MASK)

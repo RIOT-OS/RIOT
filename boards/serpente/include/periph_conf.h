@@ -281,7 +281,6 @@ static const adc_conf_chan_t adc_channels[] = {
 #define ADC_NUMOF           ARRAY_SIZE(adc_channels)
 /** @} */
 
-
 /**
  * @name USB peripheral configuration
  * @{

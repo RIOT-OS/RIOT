@@ -24,7 +24,6 @@
 #include "unittests-constants.h"
 #include "tests-nanocoap.h"
 
-
 #define _BUF_SIZE (128U)
 
 /*

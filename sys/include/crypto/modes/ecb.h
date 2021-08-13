@@ -45,7 +45,6 @@ extern "C" {
 int cipher_encrypt_ecb(const cipher_t *cipher, const uint8_t *input,
                        size_t length, uint8_t *output);
 
-
 /**
  * @brief Decrypts data of arbitrary length in ecb mode.
  *

@@ -50,7 +50,6 @@
 #define DELAY_US 50000
 #endif
 
-
 /* Stores each mode string for printing at the end of the test */
 static char mode_strings[TOTAL_OPTIONS][MODE_STR_LEN];
 
@@ -126,7 +125,6 @@ static void _get_mode(const uart_data_bits_t data_bits,
 
     mode_str[MODE_STR_LEN - 1] = '\0';
 }
-
 
 int main(void)
 {

@@ -75,7 +75,6 @@ static inline int _get_num(const char *str)
     return (int)val;
 }
 
-
 static int _check_param(int argc, char **argv, int c_min, int c_max, char *use)
 {
     int dev;

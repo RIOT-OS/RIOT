@@ -116,8 +116,6 @@ extern uint32_t _sstack;
 #define CPU_CORE_CORTEXM_FULL_THUMB 1
 #endif
 
-
-
 /**
  * @brief   Noticeable marker marking the beginning of a stack segment
  *
@@ -225,7 +223,6 @@ char *thread_stack_init(thread_task_func_t task_func,
         *stk = i;
     }
 #endif
-
 
     /* The returned stack pointer will be aligned on a 32 bit boundary not on a
      * 64 bit boundary because of the odd number of registers above (8+9).

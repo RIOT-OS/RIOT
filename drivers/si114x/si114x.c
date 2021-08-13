@@ -186,7 +186,6 @@ void _reset(si114x_t *dev)
     xtimer_usleep(SI114X_WAIT_10MS);
 }
 
-
 void _initialize(si114x_t *dev)
 {
     DEBUG("Initializing sensor.\n");

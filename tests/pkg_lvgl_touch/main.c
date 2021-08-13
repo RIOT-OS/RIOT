@@ -25,7 +25,6 @@
 
 #include "disp_dev.h"
 
-
 static void btn_event_cb(lv_obj_t * btn, lv_event_t event)
 {
     (void)btn;

@@ -29,7 +29,6 @@
  * transfer.
  */
 
-
 #ifndef ILI9341_H
 #define ILI9341_H
 
@@ -119,7 +118,6 @@ typedef struct {
 #endif
     const ili9341_params_t *params;     /**< Device initialization parameters */
 } ili9341_t;
-
 
 /**
  * @brief   Setup an ili9341 display device

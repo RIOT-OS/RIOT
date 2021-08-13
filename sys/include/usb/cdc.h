@@ -296,7 +296,6 @@ typedef struct __attribute__((packed)) {
 #define USB_CDC_ACM_CODING_PARITY_SPACE     4 /**< Space parity  */
 /** @} */
 
-
 /** @} */
 
 #ifdef __cplusplus

@@ -283,7 +283,6 @@ int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
             }
             return sizeof(netopt_enable_t);
 
-
         case NETOPT_PRELOADING:
             if (dev->netdev.flags & KW2XRF_OPT_PRELOADING) {
                 *((netopt_enable_t *)value) = NETOPT_ENABLE;

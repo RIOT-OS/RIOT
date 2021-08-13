@@ -19,7 +19,6 @@
  * @}
  */
 
-
 #include <stdio.h>
 
 #include "cpu.h"
@@ -94,7 +93,6 @@ typedef struct {
 
 static gpio_state_t gpio_config[NUM_OF_PORT][NUM_OF_PINS];
 #endif /* MODULE_PERIPH_GPIO_IRQ */
-
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {

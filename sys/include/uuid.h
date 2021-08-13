@@ -72,7 +72,6 @@ typedef struct __attribute__((packed)) {
     uint8_t node[UUID_NODE_LEN];    /**< The spatially unique node identifier */
 } uuid_t;
 
-
 /**
  * @name Namespace IDs from RFC4122
  *
@@ -96,7 +95,6 @@ extern const uuid_t uuid_namespace_x500;    /**< X.500 DN namespace UUID */
  * @param[in]   len     Length of the byte array
  */
 void uuid_v3(uuid_t *uuid, const uuid_t *ns, const uint8_t *name, size_t len);
-
 
 /**
  * Generate a version 4(Full random) UUID

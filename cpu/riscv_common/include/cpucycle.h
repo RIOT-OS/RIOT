@@ -21,7 +21,6 @@
 
 #include <stdint.h>
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -32,7 +31,6 @@ extern "C" {
  *          start time in the past.
  */
 uint64_t get_cycle_count(void);
-
 
 #ifdef __cplusplus
 }

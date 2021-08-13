@@ -33,7 +33,6 @@ extern "C" {
 
 /* ******************************* INTERFACE ******************************* */
 
-
 /**
  * @brief          A 16 bit integer in little endian.
  * @details        This is a wrapper around an uint16_t to catch missing conversions
@@ -390,7 +389,6 @@ static inline uint32_t ntohl(uint32_t v);
  * @returns        Converted integer.
  */
 static inline uint64_t ntohll(uint64_t v);
-
 
 /* **************************** IMPLEMENTATION ***************************** */
 

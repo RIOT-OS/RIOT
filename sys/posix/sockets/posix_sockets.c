@@ -483,7 +483,6 @@ int socket(int domain, int type, int protocol)
     return res;
 }
 
-
 int accept(int socket, struct sockaddr *restrict address,
            socklen_t *restrict address_len)
 {

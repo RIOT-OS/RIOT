@@ -43,7 +43,6 @@ typedef struct overwrites_tag {
     uint8_t data;
 } overwrites_t;
 
-
 /*****************************************************************************************************************/
 //         This file is created exclusively for use with the transceiver 2.0 silicon
 //         and is provided for the world to use. It contains a list of all
@@ -102,7 +101,6 @@ overwrites_t const overwrites_indirect[] ={
 {0x4D, 0x13}, //CORR_NVAL moved from 0x14 to 0x13 for 0.5 dB improved Rx Sensitivity
 {0x39, 0x3D}  //ACKDELAY new value targeting a delay of 198us (23 May, 2013, Larry Roshak)
 };
-
 
 /* begin of deprecated versions
 
@@ -210,7 +208,6 @@ overwrites_t const overwrites_indirect[] ={
 {0x69, 0x65}  //RSSI_SLOPE
 };
 
-
 ==VERSION 8==
 overwrites_t const overwrites_direct[] ={
 {0x3B, 0x08}  //version 08: updated registers for ED/RSSI
@@ -241,7 +238,6 @@ overwrites_t const overwrites_indirect[] ={
 {0x68, 0x61}, //RSSI_OFFSET
 {0x78, 0x03}  //CHF_PMAGAIN
 };
-
 
 ==VERSION 9==
 overwrites_t const overwrites_direct[] ={

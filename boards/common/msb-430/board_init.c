@@ -153,7 +153,6 @@ void msp430_init_dco(void)
     CCTL2 = CCIS0 + CM0 + CAP;            /* Define CCR2, CAP, ACLK */
     TACTL = TASSEL1 + TACLR + MC1;        /* SMCLK, continuous mode */
 
-
     while (1) {
         unsigned int compare;
 

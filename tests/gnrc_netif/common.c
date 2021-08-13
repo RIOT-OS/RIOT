@@ -159,7 +159,6 @@ static int _get_netdev_max_packet_size(netdev_t *netdev, void *value, size_t max
     return sizeof(uint16_t);
 }
 
-
 void _tests_init(void)
 {
     msg_init_queue(_main_msg_queue, MSG_QUEUE_SIZE);

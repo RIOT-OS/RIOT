@@ -23,7 +23,6 @@
 #include "ecc/golay2412.h"
 #include "ecc/repetition.h"
 
-
 /* source for random bytes: https://www.random.org/bytes */
 unsigned char data_in[] =                        { 201, 240, 154,   5, 227,  60, 116, 192, 214 };
 /* golay encoded sequence */

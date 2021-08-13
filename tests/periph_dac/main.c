@@ -24,7 +24,6 @@
 #include "xtimer.h"
 #include "periph/dac.h"
 
-
 #define DELAY           (100U)
 #define STEPS           (1000U)
 

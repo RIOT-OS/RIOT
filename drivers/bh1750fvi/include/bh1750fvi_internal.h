@@ -19,7 +19,6 @@
 #ifndef BH1750FVI_INTERNAL_H
 #define BH1750FVI_INTERNAL_H
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -57,7 +56,6 @@ extern "C" {
 #define DELAY_HMODE             (120000)    /**< typ. 120ms in H-mode */
 #define DELAY_LMODE             (16000)     /**< typ. 16ms in L-mode */
 /** @} */
-
 
 #ifdef __cplusplus
 }

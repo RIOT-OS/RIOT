@@ -55,7 +55,6 @@ void board_init(void)
     board_antenna_config(RFCTL_ANTENNA_DEFAULT);
 }
 
-
 /**
  * @brief Initialize the boards on-board LED
  */

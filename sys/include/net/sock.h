@@ -144,7 +144,6 @@ extern "C" {
 #define SOCK_FLAGS_REUSE_EP     (0x0001)    /**< allow to reuse end point on bind */
 /** @} */
 
-
 /**
  * @brief   Special netif ID for "any interface"
  * @todo    Use an equivalent definition from PR #5511

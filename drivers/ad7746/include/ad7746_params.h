@@ -84,7 +84,6 @@ static const ad7746_params_t ad7746_params[] =
     AD7746_PARAMS
 };
 
-
 /**
  * @brief   Additional meta information to keep in the SAUL registry
  */

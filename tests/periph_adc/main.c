@@ -24,10 +24,8 @@
 #include "timex.h"
 #include "periph/adc.h"
 
-
 #define RES             ADC_RES_10BIT
 #define DELAY           (100LU * US_PER_MS) /* 100 ms */
-
 
 int main(void)
 {

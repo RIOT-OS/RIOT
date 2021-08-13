@@ -258,7 +258,6 @@ extern const coap_resource_t coap_resources[];
  */
 extern const unsigned coap_resources_numof;
 
-
 /**
  * @name    Functions -- Header Read/Write
  *
@@ -429,7 +428,6 @@ static inline void coap_hdr_set_type(coap_hdr_t *hdr, unsigned type)
     hdr->ver_t_tkl |= type << 4;
 }
 /**@}*/
-
 
 /**
  * @name    Functions -- Options Read
@@ -846,7 +844,6 @@ static inline unsigned coap_szx2size(unsigned szx)
 }
 /**@}*/
 
-
 /**
  * @name    Functions -- Options Write Packet API
  *
@@ -1190,7 +1187,6 @@ static inline ssize_t coap_opt_add_uri_path_buffer(coap_pkt_t *pkt,
 ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags);
 /**@}*/
 
-
 /**
  * @name    Functions -- Options Write Buffer API
  *
@@ -1448,7 +1444,6 @@ static inline size_t coap_opt_put_proxy_uri(uint8_t *buf, uint16_t lastonum,
     return coap_opt_put_string(buf, lastonum, COAP_OPT_PROXY_URI, uri, '\0');
 }
 
-
 /**
  * @brief   Insert block1 option into buffer (from coap_block1_t)
  *
@@ -1521,7 +1516,6 @@ static inline size_t coap_put_option_ct(uint8_t *buf, uint16_t lastonum,
     return coap_opt_put_uint(buf, lastonum, COAP_OPT_CONTENT_FORMAT, content_type);
 }
 /**@}*/
-
 
 /**
  * @name    Functions -- Messaging
@@ -1762,7 +1756,6 @@ extern ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, \
                                                     uint8_t *buf, size_t len,
                                                     void *context);
 /**@}*/
-
 
 /**
  * @brief   Checks if a CoAP resource path matches a given URI

@@ -34,7 +34,6 @@
 #endif
 #include "log.h"
 
-
 #ifndef DW1000_THREAD_PRIORITY
 #define DW1000_THREAD_PRIORITY  MYNEWT_VAL_UWB_DEV_TASK_PRIO
 #endif

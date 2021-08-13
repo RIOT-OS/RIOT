@@ -33,7 +33,6 @@
  */
 static mutex_t spi_lock = MUTEX_INIT;
 
-
 void spi_init(spi_t bus)
 {
     assert(bus <= SPI_NUMOF);

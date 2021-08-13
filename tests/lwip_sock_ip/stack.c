@@ -15,7 +15,6 @@
  * @}
  */
 
-
 #include "msg.h"
 #include "net/ethernet.h"
 #include "net/ipv6.h"

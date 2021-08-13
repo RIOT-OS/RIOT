@@ -30,7 +30,6 @@ extern "C" {
  * if no BTN0_PIN is defined we don't define anything either */
 #include <board.h>
 
-
 /** @brief Button pin for bootloader selection
  *
  * This pin (typically connected to a button) is checked by the riotboot_dfu

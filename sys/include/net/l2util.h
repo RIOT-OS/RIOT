@@ -133,7 +133,6 @@ int l2util_ipv6_iid_to_addr(int dev_type, const eui64_t *iid, uint8_t *addr);
 int l2util_ndp_addr_len_from_l2ao(int dev_type,
                                   const ndp_opt_t *opt);
 
-
 /**
  * @brief   Converts an IPv6 multicast address to a multicast address
  *          of the respective link layer.

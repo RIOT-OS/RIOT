@@ -94,7 +94,6 @@ extern const cc110x_patable_t cc110x_patable_868mhz;
 extern const cc110x_patable_t cc110x_patable_915mhz;
 /** @} */
 
-
 /**
  * @name    Channel mappings for CC110x transceivers
  *

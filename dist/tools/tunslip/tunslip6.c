@@ -100,7 +100,6 @@ ssystem(const char *fmt, ...)
 #define SLIP_ESC_END 0334
 #define SLIP_ESC_ESC 0335
 
-
 /* get sockaddr, IPv4 or IPv6: */
 void *
 get_in_addr(struct sockaddr *sa)
@@ -554,7 +553,6 @@ write_to_serial(int outfd, void *inbuf, int len)
     slip_send(outfd, SLIP_END);
     PROGRESS("t");
 }
-
 
 /*
  * Read from tun, write to slip.

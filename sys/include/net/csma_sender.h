@@ -29,7 +29,6 @@
 
 #include "net/netdev.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -138,7 +137,6 @@ int csma_sender_csma_ca_send(netdev_t *dev, iolist_t *iolist,
  *                      to send the given data
  */
 int csma_sender_cca_send(netdev_t *dev, iolist_t *iolist);
-
 
 #ifdef __cplusplus
 }
