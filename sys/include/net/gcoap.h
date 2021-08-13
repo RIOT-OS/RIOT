@@ -817,6 +817,24 @@ typedef struct {
 kernel_pid_t gcoap_init(void);
 
 /**
+ * @brief   Reads and returns the current set next message ID out of the
+ *          internal structure of gcoap.
+ *
+ * @return  Value of the next message ID
+ */
+uint16_t gcoap_read_next_message_id(void);
+
+/**
+ * @brief   Sets the next message ID with a given value
+ *
+ * @param[in] next_message_id Number of the next message ID
+ *
+ * @note    By default, the next message ID is set automatically with a random
+ *          value while initialization. Only set manually when needed.
+ */
+void gcoap_set_next_message_id(uint16_t next_message_id);
+
+/**
  * @brief   Starts listening for resource paths
  *
  * @pre @p listener is a valid pointer to a single listener (that is,

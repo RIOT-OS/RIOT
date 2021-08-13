@@ -1005,6 +1005,16 @@ kernel_pid_t gcoap_init(void)
     return _pid;
 }
 
+uint16_t gcoap_read_next_message_id(void)
+{
+    return (uint16_t)atomic_load(&_coap_state.next_message_id);
+}
+
+void gcoap_set_next_message_id(uint16_t next_message_id)
+{
+    atomic_init(&_coap_state.next_message_id, next_message_id);
+}
+
 void gcoap_register_listener(gcoap_listener_t *listener)
 {
     /* That item will be overridden, ensure that the user expecting different
