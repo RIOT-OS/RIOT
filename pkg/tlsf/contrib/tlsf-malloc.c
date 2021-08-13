@@ -15,6 +15,16 @@
  * @brief   TLSF-based global memory allocator.
  * @author  Juan I Carrano
  *
+ * # About initialization
+ *
+ * Some system (standard library) routines trigger the allocation of buffers
+ * which results in segmentation faults/ hard faults if using tlsf and the
+ * heap is not yet allocated. This function can possibly be used super early
+ * in the boot process, so the TLSF initialization must run earlier still.
+ *
+ * On native we define a static array and on embedded platforms we use the
+ * _sheap and _eheap linker symbols and sbrk.
+ *
  */
 
 #include <stdio.h>
@@ -55,6 +65,14 @@ void tlsf_size_walker(void* ptr, size_t size, int used, void* user)
         ((tlsf_size_container_t *)user)->free += (unsigned int)size;
     }
 }
+
+/* The C library runs the functions in this array before it initializes itself.
+ * This section constitutes a cross-file array.
+ * Note that in order for this to work this object file has to be added to
+ * UNDEF (see ../Makefile.include) otherwise this symbol gets discarded.
+ */
+void (* const init_tlsf_malloc_p) (void) __attribute__((section (".preinit_array"))) =
+    init_tlsf_malloc;
 
 /**
  * @}

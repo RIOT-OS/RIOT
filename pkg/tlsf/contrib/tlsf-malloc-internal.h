@@ -25,7 +25,23 @@
 extern "C" {
 #endif
 
+#define ROUND_DOWN4(x) (((x)/4)*4) /* Is this necessary??? */
+
+#ifndef TLSF_NATIVE_HEAPSIZE
+/**
+ * Fixed heap size to use in native.
+ *
+ * In native there is virtually unlimited memory and no predefined heap area
+ * in the linker script, so one needs to define it manually.
+ * The default here is 8MiB which should be plenty for RIOT.
+ * Note that this has no effect on other platforms.
+ */
+#define TLSF_NATIVE_HEAPSIZE        (0x800000)
+#endif
+
 extern tlsf_t tlsf_malloc_gheap;
+
+void init_tlsf_malloc(void);
 
 #ifdef __cplusplus
 }
