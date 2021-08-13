@@ -683,6 +683,16 @@ _nib_offl_entry_t *_nib_pl_add(unsigned iface,
  */
 void _nib_pl_remove(_nib_offl_entry_t *nib_offl);
 
+/**
+ * @brief   Removes a prefix from the prefix list as well as the addresses
+ *          associated with the prefix.
+ *
+ * @param[in,out] nib_offl    An entry.
+ *
+ * Corresponding on-link entry is removed, too.
+ */
+void _nib_offl_remove_prefix(_nib_offl_entry_t *pfx);
+
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER) || DOXYGEN
 /**
  * @brief   Creates or gets an existing forwarding table entry by its prefix

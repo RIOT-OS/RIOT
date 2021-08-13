@@ -1331,16 +1331,7 @@ static void _handle_pfx_timeout(_nib_offl_entry_t *pfx)
 
     gnrc_netif_acquire(netif);
     if (now >= pfx->valid_until) {
-        evtimer_del(&_nib_evtimer, &pfx->pfx_timeout.event);
-        for (int i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
-            if (ipv6_addr_match_prefix(&netif->ipv6.addrs[i],
-                                       &pfx->pfx) >= pfx->pfx_len) {
-                gnrc_netif_ipv6_addr_remove_internal(netif,
-                                                     &netif->ipv6.addrs[i]);
-            }
-        }
-        pfx->mode &= ~_PL;
-        _nib_offl_clear(pfx);
+        _nib_offl_remove_prefix(pfx);
     }
     else if (now >= pfx->pref_until) {
         for (int i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
@@ -1495,10 +1486,9 @@ static void _remove_prefix(const ipv6_addr_t *pfx, unsigned pfx_len)
         if ((offl->mode & _PL) &&
             (offl->pfx_len == pfx_len) &&
             (ipv6_addr_match_prefix(&offl->pfx, pfx) >= pfx_len)) {
-            _nib_pl_remove(offl);
+            _nib_offl_remove_prefix(offl);
         }
     }
-    return;
 }
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
