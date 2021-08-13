@@ -40,9 +40,15 @@ ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
 endif
 
 ifneq (,$(filter random,$(USEMODULE)))
-  # select default prng if no prng is selected
-  ifeq (,$(filter prng_%,$(USEMODULE)))
-    USEMODULE += prng_tinymt32
+  ifeq (,$(filter prng_%,$(filter-out $(_DEFAULT_RNG),$(USEMODULE))))
+    # select default prng if no prng is selected
+    ifneq (,$(filter periph_hwrng,$(USEMODULE)))
+      USEMODULE += prng_hwrng
+      USEMODULE := $(filter-out $(_DEFAULT_RNG),$(USEMODULE))
+    else
+      USEMODULE += prng_tinymt32
+      _DEFAULT_RNG = prng_tinymt32 tinymt32
+    endif
   endif
 endif
 

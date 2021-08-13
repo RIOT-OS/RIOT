@@ -435,10 +435,7 @@ ifneq (,$(filter random,$(USEMODULE)))
     FEATURES_REQUIRED += periph_hwrng
   endif
 
-  ifeq (,$(filter puf_sram,$(USEMODULE)))
-    FEATURES_OPTIONAL += periph_hwrng
-  endif
-
+  FEATURES_OPTIONAL += periph_hwrng
   USEMODULE += luid
 endif
 
