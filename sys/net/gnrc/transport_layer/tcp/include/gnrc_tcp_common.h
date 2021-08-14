@@ -42,66 +42,66 @@ extern "C" {
  * @brief TCB status flags
  * @{
  */
-#define STATUS_LISTENING      (1 << 0)
-#define STATUS_ALLOW_ANY_ADDR (1 << 1)
-#define STATUS_NOTIFY_USER    (1 << 2)
-#define STATUS_ACCEPTED       (1 << 3)
-#define STATUS_LOCKED         (1 << 4)
+#define STATUS_LISTENING      (1 << 0) /**< Internal: Status bitmask LISTENING */
+#define STATUS_ALLOW_ANY_ADDR (1 << 1) /**< Internal: Status bitmask ALLOW_ANY_ADDR */
+#define STATUS_NOTIFY_USER    (1 << 2) /**< Internal: Status bitmask NOTIFY_USER */
+#define STATUS_ACCEPTED       (1 << 3) /**< Internal: Status bitmask ACCEPTED */
+#define STATUS_LOCKED         (1 << 4) /**< Internal: Status bitmask LOCKED */
 /** @} */
 
 /**
  * @brief Defines for "eventloop" thread settings.
  * @{
  */
-#define TCP_EVENTLOOP_PRIO       (THREAD_PRIORITY_MAIN - 2U)
-#define TCP_EVENTLOOP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT)
+#define TCP_EVENTLOOP_PRIO       (THREAD_PRIORITY_MAIN - 2U) /**< Internal: Handler priority */
+#define TCP_EVENTLOOP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT)  /**< Internal: Handler stack size */
 /** @} */
 
 /**
  * @brief Bitmasks for control bit field handling.
  * @{
  */
-#define MSK_FIN         (0x0001)
-#define MSK_SYN         (0x0002)
-#define MSK_RST         (0x0004)
-#define MSK_PSH         (0x0008)
-#define MSK_ACK         (0x0010)
-#define MSK_URG         (0x0020)
-#define MSK_FIN_ACK     (0x0011)
-#define MSK_SYN_ACK     (0x0012)
-#define MSK_RST_ACK     (0x0014)
-#define MSK_SYN_FIN_ACK (0x0013)
-#define MSK_FIN_ACK_PSH (0x0019)
-#define MSK_CTL         (0x003F)
-#define MSK_OFFSET      (0xF000)
+#define MSK_FIN         (0x0001) /**< Internal: Packet bitmask FIN */
+#define MSK_SYN         (0x0002) /**< Internal: Packet bitmask SYN */
+#define MSK_RST         (0x0004) /**< Internal: Packet bitmask RST */
+#define MSK_PSH         (0x0008) /**< Internal: Packet bitmask PSH */
+#define MSK_ACK         (0x0010) /**< Internal: Packet bitmask ACK */
+#define MSK_URG         (0x0020) /**< Internal: Packet bitmask URG */
+#define MSK_FIN_ACK     (0x0011) /**< Internal: Packet bitmask FIN & ACK */
+#define MSK_SYN_ACK     (0x0012) /**< Internal: Packet bitmask SYN & ACK */
+#define MSK_RST_ACK     (0x0014) /**< Internal: Packet bitmask RST & ACK */
+#define MSK_SYN_FIN_ACK (0x0013) /**< Internal: Packet bitmask SYN & FIN & ACK */
+#define MSK_FIN_ACK_PSH (0x0019) /**< Internal: Packet bitmask FIN & ACK & PSH */
+#define MSK_CTL         (0x003F) /**< Internal: Packet bitmask TCP status control bits */
+#define MSK_OFFSET      (0xF000) /**< Internal: Packet bitmask TCP status option offset */
 /** @} */
 
 /**
  * @brief Message types for GNRC TCPs internal message passing.
  * @{
  */
-#define MSG_TYPE_CONNECTION_TIMEOUT (GNRC_NETAPI_MSG_TYPE_ACK + 101)
-#define MSG_TYPE_PROBE_TIMEOUT      (GNRC_NETAPI_MSG_TYPE_ACK + 102)
-#define MSG_TYPE_USER_SPEC_TIMEOUT  (GNRC_NETAPI_MSG_TYPE_ACK + 103)
-#define MSG_TYPE_RETRANSMISSION     (GNRC_NETAPI_MSG_TYPE_ACK + 104)
-#define MSG_TYPE_TIMEWAIT           (GNRC_NETAPI_MSG_TYPE_ACK + 105)
-#define MSG_TYPE_NOTIFY_USER        (GNRC_NETAPI_MSG_TYPE_ACK + 106)
+#define MSG_TYPE_CONNECTION_TIMEOUT (GNRC_NETAPI_MSG_TYPE_ACK + 101) /**< Internal: message id */
+#define MSG_TYPE_PROBE_TIMEOUT      (GNRC_NETAPI_MSG_TYPE_ACK + 102) /**< Internal: message id */
+#define MSG_TYPE_USER_SPEC_TIMEOUT  (GNRC_NETAPI_MSG_TYPE_ACK + 103) /**< Internal: message id */
+#define MSG_TYPE_RETRANSMISSION     (GNRC_NETAPI_MSG_TYPE_ACK + 104) /**< Internal: message id */
+#define MSG_TYPE_TIMEWAIT           (GNRC_NETAPI_MSG_TYPE_ACK + 105) /**< Internal: message id */
+#define MSG_TYPE_NOTIFY_USER        (GNRC_NETAPI_MSG_TYPE_ACK + 106) /**< Internal: message id */
 /** @} */
 
 /**
  * @brief Define for marking that time measurement is uninitialized.
  */
-#define RTO_UNINITIALIZED (-1)
+#define RTO_UNINITIALIZED (-1) /**< Internal: Constant RTO uninitialized */
 
 /**
  * @brief Overflow tolerant comparison operators for sequence and
           acknowledgement number comparison.
  * @{
  */
-#define LSS_32_BIT(x, y) (((int32_t) (x)) - ((int32_t) (y)) <  0)
-#define LEQ_32_BIT(x, y) (((int32_t) (x)) - ((int32_t) (y)) <= 0)
-#define GRT_32_BIT(x, y) (!LEQ_32_BIT(x, y))
-#define GEQ_32_BIT(x, y) (!LSS_32_BOT(x, y))
+#define LSS_32_BIT(x, y) (((int32_t) (x)) - ((int32_t) (y)) <  0) /**< Internal: operator < */
+#define LEQ_32_BIT(x, y) (((int32_t) (x)) - ((int32_t) (y)) <= 0) /**< Internal: operator <= */
+#define GRT_32_BIT(x, y) (!LEQ_32_BIT(x, y)) /**< Internal: operator > */
+#define GEQ_32_BIT(x, y) (!LSS_32_BOT(x, y)) /**< Internal: operator >= */
 /** @} */
 
 /**
