@@ -687,6 +687,13 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
         return -ENOTCONN;
     }
 
+    /* Early return for zero length payloads to send */
+    if (!len) {
+        mutex_unlock(&(tcb->function_lock));
+        TCP_DEBUG_LEAVE;
+        return 0;
+    }
+
     /* Setup messaging */
     _gnrc_tcp_fsm_set_mbox(tcb, &mbox);
 
@@ -813,6 +820,13 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
         TCP_DEBUG_ERROR("-ENOTCONN: TCB is not connected.");
         TCP_DEBUG_LEAVE;
         return -ENOTCONN;
+    }
+
+    /* Early return for zero length buffers to store received data */
+    if (!max_len) {
+        mutex_unlock(&(tcb->function_lock));
+        TCP_DEBUG_LEAVE;
+        return 0;
     }
 
     /* If FIN was received (CLOSE_WAIT), no further data can be received. */

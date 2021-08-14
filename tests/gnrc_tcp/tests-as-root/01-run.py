@@ -255,6 +255,54 @@ def test_gnrc_tcp_recv_behavior_on_closed_connection(child):
             child.expect_exact('gnrc_tcp_recv: returns 0')
 
 
+@Runner(timeout=5)
+def test_gnrc_tcp_recv_behavior_on_zero_length_buffer_size(child):
+    """ This test verifies that gnrc_tcp_recv accepts zero as buffer size
+        and returns 0.
+    """
+    with HostTcpServer(generate_port_number()) as host_srv:
+        riot_cli = RiotTcpClient(child, host_srv)
+
+        # Call gnrc_tcp_recv with on data and no timeout on unconnected TCB
+        # This must return -ENOTCONN
+        child.sendline('gnrc_tcp_recv 0 0')
+        child.expect_exact('gnrc_tcp_recv: returns -ENOTCONN')
+
+        with riot_cli:
+            host_srv.accept()
+
+            # Call gnrc_tcp_recv with on data and no timeout
+            # This must return 0 not -EAGAIN
+            child.sendline('gnrc_tcp_recv 0 0')
+            child.expect_exact('gnrc_tcp_recv: returns 0')
+
+            host_srv.close()
+
+
+@Runner(timeout=5)
+def test_gnrc_tcp_send_behavior_on_zero_length_buffer_size(child):
+    """ This test verifies that gnrc_tcp_send accepts zero length payload
+        and returns 0.
+    """
+    with HostTcpServer(generate_port_number()) as host_srv:
+        riot_cli = RiotTcpClient(child, host_srv)
+
+        # Call gnrc_tcp_send with on data and no timeout on unconnected TCB
+        # This must return -ENOTCONN
+        child.sendline('gnrc_tcp_send 0 0')
+        child.expect_exact('gnrc_tcp_send: returns -ENOTCONN')
+
+        with riot_cli:
+            host_srv.accept()
+
+            # Call gnrc_tcp_send with on data and no timeout
+            # This must return 0 not -EAGAIN
+            child.sendline('gnrc_tcp_send 0 0')
+            child.expect_exact('gnrc_tcp_send: returns 0')
+
+            host_srv.close()
+
+
 @Runner(timeout=1)
 def test_gnrc_tcp_ep_from_str(child):
     """ Verify Endpoint construction from string """
