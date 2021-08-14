@@ -17,13 +17,18 @@
 
 #include "kernel_defines.h"
 #include "lwip_init_devs.h"
+#include "lwip/tcpip.h"
 #include "lwip/netif/netdev.h"
+#include "netif/lowpan6.h"
 
 /**
  * @brief   Initializes network interfaces
  */
 void lwip_netif_init_devs(void)
 {
+    /* Ethernet interfaces
+     * ------------------- */
+
     if (IS_USED(MODULE_ATWINC15X0)) {
         extern void auto_init_atwinc15x0(void);
         auto_init_atwinc15x0();
@@ -58,6 +63,14 @@ void lwip_netif_init_devs(void)
         extern void auto_init_netdev_tap(void);
         auto_init_netdev_tap();
     }
+
+    /* 6LoWPAN interfaces
+     * ------------------ */
+
+    if (IS_USED(MODULE_MRF24J40)) {
+        extern void auto_init_mrf24j40(void);
+        auto_init_mrf24j40();
+    }
 }
 
 struct netif *lwip_add_ethernet(struct netif *netif, netdev_t *state)
@@ -68,6 +81,11 @@ struct netif *lwip_add_ethernet(struct netif *netif, netdev_t *state)
         netif_set_default(_if);
     }
     return _if;
+}
+
+struct netif *lwip_add_6lowpan(struct netif *netif, netdev_t *state)
+{
+    return netif_add_noaddr(netif, state, lwip_netdev_init, tcpip_6lowpan_input);
 }
 
 /**@}*/

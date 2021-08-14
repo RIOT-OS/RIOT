@@ -27,11 +27,6 @@
 #include "at86rf2xx_params.h"
 #endif
 
-#ifdef MODULE_MRF24J40
-#include "mrf24j40.h"
-#include "mrf24j40_params.h"
-#endif
-
 #ifdef MODULE_SOCKET_ZEP
 #include "socket_zep.h"
 #include "socket_zep_params.h"
@@ -55,10 +50,6 @@
 #define LWIP_NETIF_NUMOF        ARRAY_SIZE(at86rf2xx_params)
 #endif
 
-#ifdef MODULE_MRF24J40     /* is mutual exclusive with above ifdef */
-#define LWIP_NETIF_NUMOF        ARRAY_SIZE(mrf24j40_params)
-#endif
-
 #ifdef MODULE_SOCKET_ZEP   /* is mutual exclusive with above ifdef */
 #define LWIP_NETIF_NUMOF        ARRAY_SIZE(socket_zep_params)
 #endif
@@ -76,10 +67,6 @@ static struct netif netif[LWIP_NETIF_NUMOF];
 static at86rf2xx_t at86rf2xx_devs[LWIP_NETIF_NUMOF];
 #endif
 
-#ifdef MODULE_MRF24J40
-static mrf24j40_t mrf24j40_devs[LWIP_NETIF_NUMOF];
-#endif
-
 #ifdef MODULE_SOCKET_ZEP
 static socket_zep_t socket_zep_devs[LWIP_NETIF_NUMOF];
 #endif
@@ -93,16 +80,7 @@ void lwip_bootstrap(void)
     lwip_netif_init_devs();
     /* TODO: do for every eligible netdev */
 #ifdef LWIP_NETIF_NUMOF
-#ifdef MODULE_MRF24J40
-    for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
-        mrf24j40_setup(&mrf24j40_devs[i], &mrf24j40_params[i], i);
-        if (netif_add_noaddr(&netif[i], &mrf24j40_devs[i].netdev.netdev, lwip_netdev_init,
-                             tcpip_6lowpan_input) == NULL) {
-            DEBUG("Could not add mrf24j40 device\n");
-            return;
-        }
-    }
-#elif defined(MODULE_AT86RF2XX)
+#if defined(MODULE_AT86RF2XX)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         at86rf2xx_setup(&at86rf2xx_devs[i], &at86rf2xx_params[i], i);
         if (netif_add_noaddr(&netif[i], &at86rf2xx_devs[i].netdev.netdev, lwip_netdev_init,
