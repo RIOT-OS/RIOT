@@ -38,7 +38,7 @@ static inline void _ecall_dispatch(uint32_t num, void *ctx)
         "add a1, x0, %[ctx] \n"
         "ECALL\n"
         : /* No outputs */
-        : [num] "r" (num), [ctx] "r" (ctx)
+        :[num] "r" (num), [ctx] "r" (ctx)
         : "memory", "a0", "a1"
         );
 }

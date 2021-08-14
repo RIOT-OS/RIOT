@@ -38,10 +38,10 @@ typedef void (*clic_isr_cb_t)(unsigned irq);
  * @brief RISC-V CLIC per interrupt configuration registers
  */
 typedef struct __attribute((packed)) {
-    volatile uint8_t ip;     /**< Interrupt pending */
-    volatile uint8_t ie;     /**< Interrupt enable */
-    volatile uint8_t attr;   /**< Interrupt attributes */
-    volatile uint8_t ctl;    /**< Interrupt control */
+    volatile uint8_t ip;        /**< Interrupt pending */
+    volatile uint8_t ie;        /**< Interrupt enable */
+    volatile uint8_t attr;      /**< Interrupt attributes */
+    volatile uint8_t ctl;       /**< Interrupt control */
 } clic_clicint_t;
 
 /**

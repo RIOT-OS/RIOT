@@ -82,13 +82,15 @@ void riscv_irq_init(void)
 /**
  * @brief Global trap and interrupt handler
  */
-static void __attribute((used)) handle_trap(uint32_t mcause)
+__attribute((used))
+static void handle_trap(uint32_t mcause)
 {
     /*  Tell RIOT to set sched_context_switch_request instead of
      *  calling thread_yield(). */
     riscv_in_isr = 1;
 
     uint32_t trap = mcause & CPU_CSR_MCAUSE_CAUSE_MSK;
+
     /* Check for INT or TRAP */
     if ((mcause & MCAUSE_INT) == MCAUSE_INT) {
         /* Cause is an interrupt - determine type */
@@ -149,7 +151,8 @@ static void __attribute((used)) handle_trap(uint32_t mcause)
 /* Marking this as interrupt to ensure an mret at the end, provided by the
  * compiler. Aligned to 64-byte boundary as per RISC-V spec and required by some
  * of the supported platforms (gd32)*/
-static void __attribute((aligned(64))) __attribute__((interrupt)) trap_entry(void)
+__attribute((aligned(64)))
+static void __attribute__((interrupt)) trap_entry(void)
 {
     __asm__ volatile (
         "addi sp, sp, -"XTSTR (CONTEXT_FRAME_SIZE)"          \n"

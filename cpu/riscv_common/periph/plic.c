@@ -30,8 +30,12 @@
 #include "plic.h"
 
 /* Local macros to calculate register offsets */
-#define _REG32(p, i) 			(*(volatile uint32_t *) ((p) + (i)))
-#define PLIC_REG(offset) 		_REG32(PLIC_CTRL_ADDR, offset)
+#ifndef _REG32
+#define _REG32(p, i)            (*(volatile uint32_t *)((p) + (i)))
+#endif
+#ifndef PLIC_REG
+#define PLIC_REG(offset)        _REG32(PLIC_CTRL_ADDR, offset)
+#endif
 
 /* PLIC external ISR function list */
 static plic_isr_cb_t _ext_isrs[PLIC_NUM_INTERRUPTS];
