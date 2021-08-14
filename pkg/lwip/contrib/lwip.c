@@ -37,10 +37,6 @@
 #include "socket_zep_params.h"
 #endif
 
-#ifdef MODULE_SAM0_ETH
-#include "sam0_eth_netdev.h"
-#endif
-
 #ifdef MODULE_STM32_ETH
 #include "stm32_eth.h"
 #endif
@@ -72,10 +68,6 @@
 #endif
 
 /* is mutual exclusive with above ifdef */
-#ifdef MODULE_SAM0_ETH
-#define LWIP_NETIF_NUMOF        (1)
-#endif
-
 #ifdef MODULE_STM32_ETH
 #define LWIP_NETIF_NUMOF        (1)
 #endif
@@ -98,11 +90,6 @@ static mrf24j40_t mrf24j40_devs[LWIP_NETIF_NUMOF];
 
 #ifdef MODULE_SOCKET_ZEP
 static socket_zep_t socket_zep_devs[LWIP_NETIF_NUMOF];
-#endif
-
-#ifdef MODULE_SAM0_ETH
-static netdev_t sam0_eth;
-extern void sam0_eth_setup(netdev_t *netdev);
 #endif
 
 #ifdef MODULE_STM32_ETH
@@ -145,13 +132,6 @@ void lwip_bootstrap(void)
             DEBUG("Could not add socket_zep device\n");
             return;
         }
-    }
-#elif defined(MODULE_SAM0_ETH)
-    sam0_eth_setup(&sam0_eth);
-    if (netif_add_noaddr(&netif[0], &sam0_eth, lwip_netdev_init,
-                         tcpip_input) == NULL) {
-        DEBUG("Could not add sam0_eth device\n");
-        return;
     }
 #elif defined(MODULE_STM32_ETH)
     stm32_eth_netdev_setup(&stm32_eth);
