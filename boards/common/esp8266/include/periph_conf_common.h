@@ -39,7 +39,6 @@ extern "C" {
 #define ADC_NUMOF   (1)     /**< number of ADC channels */
 /** @} */
 
-
 /**
  * @name    DAC configuration
  *
@@ -48,7 +47,6 @@ extern "C" {
  */
 #define DAC_NUMOF   (0)     /**< number of DAC channels */
 /** @} */
-
 
 /**
  * @name   I2C configuration
@@ -203,7 +201,6 @@ static const spi_conf_t spi_config[] = {
 
 #endif /* MODULE_ESP_SW_TIMER */
 /** @} */
-
 
 /**
  * @name   UART configuration

@@ -34,7 +34,6 @@ extern "C" {
 #define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS       (10U)
 #endif
 
-
 /**
  * @def OPENTHREAD_CONFIG_LOG_LEVEL
  *

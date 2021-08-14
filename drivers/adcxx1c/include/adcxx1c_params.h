@@ -105,7 +105,6 @@ static const adcxx1c_params_t adcxx1c_params[] =
     ADCXX1C_PARAMS
 };
 
-
 /**
  * @brief   Additional meta information to keep in the SAUL registry
  */

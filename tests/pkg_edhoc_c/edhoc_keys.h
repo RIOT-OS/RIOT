@@ -126,7 +126,6 @@ static const uint8_t resp_cbor_rpk[] = {
     0x20, 0x6e, 0x61, 0x6d, 0x65, 0x60
 };
 
-
 /* responder CBOR-encoded rpk identifier */
 static const uint8_t resp_cbor_rpk_id[] = {
     0xa1, 0x04, 0x41, 0x05

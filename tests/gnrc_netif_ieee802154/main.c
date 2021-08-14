@@ -17,7 +17,6 @@
 #include "net/gnrc/netif.h"
 #include "net/gnrc/pktdump.h"
 
-
 int main(void)
 {
     char addr_str[GNRC_NETIF_L2ADDR_MAXLEN * 3];

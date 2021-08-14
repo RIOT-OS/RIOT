@@ -438,7 +438,6 @@ int main(int argc, char **argv)
         }
     }
 
-
     /* Print constants */
     fprintf(stderr, "==============================================================\n");
     fprintf(stderr, "Please copy the following code into your board's periph_conf.h\n\n");

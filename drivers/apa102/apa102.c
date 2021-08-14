@@ -35,7 +35,6 @@
 #define BLUE_SHIFT      (16U)
 #define GREEN_SHIFT     (8U)
 
-
 static inline void shift(const apa102_t *dev, uint32_t data)
 {
     for (int i = 31; i >= 0; i--) {

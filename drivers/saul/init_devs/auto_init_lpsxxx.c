@@ -51,7 +51,6 @@ static saul_reg_t saul_entries[LPSXXX_NUM * 2];
 extern saul_driver_t lpsxxx_saul_pres_driver;
 extern saul_driver_t lpsxxx_saul_temp_driver;
 
-
 void auto_init_lpsxxx(void)
 {
     assert(LPSXXX_NUM == LPSXXX_INFO_NUM);

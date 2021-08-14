@@ -36,7 +36,6 @@
 #include "periph/i2c.h"
 #include "saul.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -49,7 +48,6 @@ extern "C" {
 #define JC42_NOI2C                    (-1)
 #define JC42_NODEV                    (-2)
 /** @} */
-
 
 /**
   * @brief   Device descriptor for a jc42 device
@@ -106,7 +104,6 @@ int jc42_get_config(const jc42_t* dev, uint16_t* data);
  * @return                  -1 on error
  */
 int jc42_set_config(const jc42_t* dev, uint16_t data);
-
 
 /**
  * @brief   Get measured temperature

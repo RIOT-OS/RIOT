@@ -26,7 +26,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-
 typedef struct {
     rtc_alarm_cb_t cb; /**< callback called from RTC interrupt */
 }rtc_state_t;

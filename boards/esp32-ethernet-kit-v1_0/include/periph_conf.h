@@ -125,7 +125,6 @@
 #define UART0_RXD   GPIO3  /**< direct I/O pin for UART_DEV(0) RxD, can't be changed */
 /** @} */
 
-
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

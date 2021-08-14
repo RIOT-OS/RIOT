@@ -283,7 +283,6 @@ void mrf24j40_update_tasks(mrf24j40_t *dev)
     }
 }
 
-
 void mrf24j40_hardware_reset(mrf24j40_t *dev)
 {
     /* wake up from sleep in case radio is sleeping */

@@ -216,7 +216,6 @@ static inline gnrc_pktsnip_t *gnrc_pkt_delete(gnrc_pktsnip_t *pkt,
     return (gnrc_pktsnip_t *)list.next;
 }
 
-
 /**
  * @brief Calculates length of a packet in byte up to (including) a snip with the given type.
  *

@@ -268,7 +268,6 @@ int main(void)
          "being printed to STDOUT\n\n"
          "NOTE: all strings need to be '\\n' terminated!\n");
 
-
     puts("\nUART INFO:");
     printf("Available devices:               %i\n", SOFT_UART_NUMOF);
 

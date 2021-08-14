@@ -141,7 +141,6 @@ static void clock_adj_cb(void *arg, int chan)
     mutex_unlock(&sync_mutex);
 }
 
-
 static int test_clock_adjustment(int32_t offset)
 {
     /* Record one extra sample, to throw away the first measurement */

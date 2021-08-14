@@ -51,7 +51,6 @@ static const  saul_gpio_params_t saul_gpio_params[] =
     },
 };
 
-
 #ifdef __cplusplus
 }
 #endif

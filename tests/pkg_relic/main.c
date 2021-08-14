@@ -6,7 +6,6 @@
  * directory for more details.
  */
 
-
 #define TEST_RELIC_SHOW_OUTPUT (0) /**< set if encoded/decoded string is displayed */
 
 #if (TEST_RELIC_SHOW_OUTPUT == 1)

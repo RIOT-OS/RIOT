@@ -55,7 +55,6 @@ extern "C" {
 #define FORTUNA_MIN_POOL_SIZE       (64U)
 #endif
 
-
 /**
  * @brief Definition of the seed file size used to initialize the PRNG. The
  *        default value of 64 bytes is suggested by section 9.6.1.

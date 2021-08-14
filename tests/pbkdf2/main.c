@@ -42,7 +42,6 @@ enum TEST_STATE {
     TEST_ERROR
 };
 
-
 static void _clear_input(void)
 {
     /* clear input buffer */

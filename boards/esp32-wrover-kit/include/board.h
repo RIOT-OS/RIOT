@@ -122,7 +122,6 @@
 #endif
 /** @} */
 
-
 /* include common board definitions as last step */
 #include "board_common.h"
 

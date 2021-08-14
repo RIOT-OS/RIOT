@@ -227,7 +227,6 @@ static const dac_conf_t dac_config[] = {
 #define DAC_NUMOF           ARRAY_SIZE(dac_config)
 /** @} */
 
-
 #ifdef __cplusplus
 }
 #endif

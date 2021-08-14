@@ -80,7 +80,6 @@ typedef struct {
     uint8_t context[CIPHER_MAX_CONTEXT_SIZE];   /**< buffer for cipher operations */
 } cipher_context_t;
 
-
 /**
  * @brief   BlockCipher-Interface for the Cipher-Algorithms
  */
@@ -104,7 +103,6 @@ typedef struct cipher_interface_st {
     int (*decrypt)(const cipher_context_t *ctx, const uint8_t *cipher_block,
                    uint8_t *plain_block);
 } cipher_interface_t;
-
 
 typedef const cipher_interface_t *cipher_id_t;
 
@@ -132,7 +130,6 @@ typedef struct {
                                                  for the algorithm */
 } cipher_t;
 
-
 /**
  * @brief Initialize new cipher state
  *
@@ -151,7 +148,6 @@ typedef struct {
 int cipher_init(cipher_t *cipher, cipher_id_t cipher_id, const uint8_t *key,
                 uint8_t key_size);
 
-
 /**
  * @brief Encrypt data of BLOCK_SIZE length
  * *
@@ -167,7 +163,6 @@ int cipher_init(cipher_t *cipher, cipher_id_t cipher_id, const uint8_t *key,
  */
 int cipher_encrypt(const cipher_t *cipher, const uint8_t *input,
                    uint8_t *output);
-
 
 /**
  * @brief Decrypt data of BLOCK_SIZE length
@@ -185,7 +180,6 @@ int cipher_encrypt(const cipher_t *cipher, const uint8_t *input,
 int cipher_decrypt(const cipher_t *cipher, const uint8_t *input,
                    uint8_t *output);
 
-
 /**
  * @brief Get block size of cipher
  * *
@@ -195,7 +189,6 @@ int cipher_decrypt(const cipher_t *cipher, const uint8_t *input,
  * @return           The cipher's block size (in bytes)
  */
 int cipher_get_block_size(const cipher_t *cipher);
-
 
 #ifdef __cplusplus
 }

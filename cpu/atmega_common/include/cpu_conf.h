@@ -80,6 +80,5 @@ extern "C" {
 }
 #endif
 
-
 #endif /* CPU_CONF_H */
 /** @} */

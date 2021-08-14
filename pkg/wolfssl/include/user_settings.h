@@ -32,8 +32,6 @@ extern "C" {
 #define SP_WORD_SIZE 32
 #define WOLFSSL_SP
 
-
-
 /* GNRC support enabled if not
  * using sockets
  */

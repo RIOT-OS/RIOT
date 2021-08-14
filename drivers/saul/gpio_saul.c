@@ -25,7 +25,6 @@
 #include "periph/gpio.h"
 #include "saul/periph.h"
 
-
 static int read(const void *dev, phydat_t *res)
 {
     const saul_gpio_params_t *p = (const saul_gpio_params_t *)dev;

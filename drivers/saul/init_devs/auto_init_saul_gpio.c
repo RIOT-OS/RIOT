@@ -38,7 +38,6 @@ void auto_init_gpio(void)
 #else
 #define SAUL_GPIO_NUMOF ARRAY_SIZE(saul_gpio_params)
 
-
 /**
  * @brief   Memory for the registry entries
  */
@@ -53,7 +52,6 @@ extern saul_driver_t gpio_in_saul_driver;
  * @brief   Reference to the output mode driver struct
  */
 extern saul_driver_t gpio_out_saul_driver;
-
 
 void auto_init_gpio(void)
 {

@@ -116,7 +116,6 @@ void sha3_256_final(keccak_state_t *ctx, void *digest)
     Keccak_final(ctx, digest, SHA3_256_DIGEST_LENGTH);
 }
 
-
 /**
  *  Function to compute SHA3-384 on the input message. The output length is fixed to 48 bytes.
  */

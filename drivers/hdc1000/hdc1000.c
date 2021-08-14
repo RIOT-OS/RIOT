@@ -134,7 +134,6 @@ int hdc1000_read(const hdc1000_t *dev, int16_t *temp, int16_t *hum)
     return hdc1000_get_results(dev, temp, hum);
 }
 
-
 int hdc1000_read_cached(const hdc1000_t *dev, int16_t *temp, int16_t *hum)
 {
     uint32_t now = xtimer_now_usec();

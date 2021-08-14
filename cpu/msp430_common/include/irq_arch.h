@@ -35,7 +35,6 @@ extern "C" {
  * due to following AND. // Kaspar
  */
 
-
 extern volatile int __irq_is_in;
 #define _GENERAL_INTERRUPT_ENABLE   (0x0008)
 

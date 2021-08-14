@@ -53,7 +53,6 @@ extern saul_driver_t hdc1000_saul_temp_driver;
 extern saul_driver_t hdc1000_saul_hum_driver;
 /** @} */
 
-
 void auto_init_hdc1000(void)
 {
     assert(HDC1000_NUM == HDC1000_INFO_NUM);

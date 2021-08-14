@@ -51,7 +51,6 @@
 
 #include "hashes/sha2xx_common.h"
 
-
 #ifdef __BIG_ENDIAN__
 /* Copy a vector of big-endian uint32_t into a vector of bytes */
 #define be32enc_vect memcpy

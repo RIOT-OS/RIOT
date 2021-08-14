@@ -26,7 +26,6 @@ extern "C"
 {
 #endif
 
-
 /**
 * @name I2C configuration
 * @{

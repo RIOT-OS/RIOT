@@ -102,7 +102,6 @@ static void timer_isr(void)
     mips_setcompare(mips_getcount() + TICKS_PER_US * TIMER_ACCURACY);
 }
 
-
 /*
  * The mips toolchain C library does not implement gettimeofday()
  *

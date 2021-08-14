@@ -24,7 +24,6 @@
 
 #include "suit/transport/coap.h"
 
-
 int _suit_handler(int argc, char **argv)
 {
     if (argc != 2) {

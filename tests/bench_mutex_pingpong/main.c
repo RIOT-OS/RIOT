@@ -40,7 +40,6 @@ static void _timer_callback(void*arg)
     _flag = 1;
 }
 
-
 static void *_second_thread(void *arg)
 {
     (void)arg;

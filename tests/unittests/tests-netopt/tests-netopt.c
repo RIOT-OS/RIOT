@@ -34,7 +34,6 @@ void test_netopt2str_unknown(void)
     TEST_ASSERT_EQUAL_INT(0, strcmp(netopt2str(NETOPT_NUMOF), "unknown"));
 }
 
-
 Test *tests_netopt_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {

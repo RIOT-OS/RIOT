@@ -38,7 +38,6 @@ void board_init(void)
     led_init();
 }
 
-
 /**
  * @brief Initialize the boards on-board LED
  */

@@ -197,7 +197,6 @@ extern "C" {
 #define DFPLAYER_MAX_ADVERT_FILE    (9999)  /**< Highest supported file number in the `"ADVERT"` folder */
 #define DFPLAYER_LOWEST_QUERY       (0x40)  /**< Query commands are 0x40 or higher */
 
-
 #ifdef __cplusplus
 }
 #endif

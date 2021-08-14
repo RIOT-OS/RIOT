@@ -48,7 +48,6 @@ int cipher_encrypt_ctr(const cipher_t *cipher, uint8_t nonce_counter[16],
                        uint8_t nonce_len, const uint8_t *input, size_t length,
                        uint8_t *output);
 
-
 /**
  * @brief Decrypt data of arbitrary length in counter mode. Encryption and
  *        decryption in ctr mode are basically the same.

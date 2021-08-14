@@ -31,7 +31,6 @@ extern "C" {
 #define MCU_IOC_BASE           (0x40081000) /**< IOC (MCU) base address */
 /** @} */
 
-
 /**
  * @brief obtain IOCFG-register for a DIO
  *

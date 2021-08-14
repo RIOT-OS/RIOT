@@ -185,7 +185,6 @@ void cond_init(cond_t *cond);
  */
 void cond_wait(cond_t *cond, mutex_t *mutex);
 
-
 /**
  * @brief Wakes up one thread waiting on the condition variable.
  *

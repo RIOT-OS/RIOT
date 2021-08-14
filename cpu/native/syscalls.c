@@ -306,7 +306,6 @@ int printf(const char *format, ...)
     return r;
 }
 
-
 int vprintf(const char *format, va_list argp)
 {
     return vfprintf(stdout, format, argp);
@@ -337,7 +336,6 @@ int vfprintf(FILE *fp, const char *format, va_list argp)
 
     return r;
 }
-
 
 void vwarn(const char *fmt, va_list args)
 {

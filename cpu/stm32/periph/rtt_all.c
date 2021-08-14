@@ -50,7 +50,6 @@
 #error "RTT config: RTT_FREQUENCY not configured or invalid for your board"
 #endif
 
-
 #if defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7)
 #define CLOCK_SRC_REG       RCC->DCKCFGR2
 #define CLOCK_SRC_MASK      RCC_DCKCFGR2_LPTIM1SEL
@@ -106,7 +105,6 @@ register. */
 #define EXTI_IMR_BIT        EXTI_IMR_MR23
 #define EXTI_PR_BIT         EXTI_PR_PR23
 #endif
-
 
 /* allocate memory for overflow and alarm callbacks + args */
 static rtt_cb_t ovf_cb = NULL;

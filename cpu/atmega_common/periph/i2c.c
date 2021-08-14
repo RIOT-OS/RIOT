@@ -42,7 +42,6 @@
 #define ATMEGA_I2C_FLAG_WRITE      0
 #define ATMEGA_I2C_FLAG_READ       1
 
-
 /* static function definitions */
 static int _start(uint8_t address, uint8_t rw_flag);
 static int _write(const uint8_t *data, int length);
@@ -266,7 +265,6 @@ static int _start(uint8_t address, uint8_t rw_flag)
         _stop();
         return -1;
     }
-
 
     /* Load ADDRESS and R/W Flag into TWDR Register.
      * Clear TWINT bit in TWCR to start transmission of ADDRESS */

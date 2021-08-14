@@ -51,7 +51,6 @@
 #include "hashes/sha256.h"
 #include "hashes/sha2xx_common.h"
 
-
 /* SHA-256 initialization.  Begins a SHA-256 operation. */
 void sha256_init(sha256_context_t *ctx)
 {
@@ -84,7 +83,6 @@ void *sha256(const void *data, size_t len, void *digest)
 
     return digest;
 }
-
 
 void hmac_sha256_init(hmac_context_t *ctx, const void *key, size_t key_length)
 {

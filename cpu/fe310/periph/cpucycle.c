@@ -18,7 +18,6 @@
  */
 #include "cpucycle.h"
 
-
 uint64_t get_cycle_count(void)
 {
     uint32_t lo, hi, hi2;

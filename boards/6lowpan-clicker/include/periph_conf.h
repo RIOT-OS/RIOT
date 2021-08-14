@@ -29,7 +29,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @name    Clock configurations
  * @{

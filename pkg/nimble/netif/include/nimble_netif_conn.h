@@ -114,7 +114,6 @@ int nimble_netif_conn_get_by_addr(const uint8_t *addr);
  */
 int nimble_netif_conn_get_by_gaphandle(uint16_t gaphandle);
 
-
 /**
  * @brief   Iterate over all connection contexts that match the filter condition
  *

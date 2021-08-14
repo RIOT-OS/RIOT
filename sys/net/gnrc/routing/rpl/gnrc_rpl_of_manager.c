@@ -18,8 +18,6 @@
  * @}
  */
 
-
-
 #include "net/gnrc/rpl.h"
 #include "net/gnrc/rpl/of_manager.h"
 #include "of0.h"

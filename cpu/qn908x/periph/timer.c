@@ -58,7 +58,6 @@ static IRQn_Type const ctimers_irqn[FSL_FEATURE_SOC_CTIMER_COUNT] =
 static const clock_ip_name_t ctimers_clocks[FSL_FEATURE_SOC_CTIMER_COUNT] =
     CTIMER_CLOCKS;
 
-
 /**
  * @brief   Check the board config to make sure we do not exceed max number of
  *          timers

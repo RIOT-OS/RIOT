@@ -7,7 +7,6 @@
  * directory for more details.
  */
 
-
 /**
  * @defgroup    sys_timex Timex
  * @brief       Timestamp representation, computation, and conversion

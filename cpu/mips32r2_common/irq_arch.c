@@ -9,7 +9,6 @@
 #include <mips/m32c0.h>
 #include "irq.h"
 
-
 unsigned int irq_enable(void)
 {
     unsigned int status;

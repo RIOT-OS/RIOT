@@ -52,7 +52,6 @@ static saul_reg_t saul_entries[SEESAW_SOIL_NUM];
 extern saul_driver_t seesaw_soil_saul_temp_driver;
 /** @} */
 
-
 void auto_init_seesaw_soil(void)
 {
     assert(SEESAW_SOIL_NUM == SEESAW_SOIL_INFO_NUM);

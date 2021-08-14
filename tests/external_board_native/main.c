@@ -29,6 +29,5 @@ int main(void)
     printf("THIS_BOARD_IS %s\n", THIS_BOARD_IS);
     printf("This board is '%s'\n", external_native_board_description);
 
-
     return 0;
 }

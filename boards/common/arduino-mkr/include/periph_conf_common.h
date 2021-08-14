@@ -31,7 +31,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @name    External oscillator and clock configuration
  *

@@ -37,10 +37,8 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-
 #define SX127X_SPI_SPEED    (SPI_CLK_1MHZ)
 #define SX127X_SPI_MODE     (SPI_MODE_0)
-
 
 int sx127x_check_version(const sx127x_t *dev)
 {

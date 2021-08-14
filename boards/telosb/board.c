@@ -39,7 +39,6 @@ static void telosb_ports_init(void)
     P5OUT = 0x70;    /* Port5 Output: 01110000 = 0x70 */
     P5DIR = 0x70;    /* Port5 Direction: 01110000 = 0x70 */
 
-
     P6SEL = 0xFF;    /* Port6 Select: 11111111 = 0xFF */
     P6OUT = 0x00;    /* Port6 Output: 00000000 = 0x00 */
     P6DIR = 0xFF;    /* Port6 Direction: 11111000 = 0xFF */
@@ -108,7 +107,6 @@ void msp430_init_dco(void)
 
     BCSCTL1 &= ~(DIVA1 + DIVA0);          /* remove /8 divisor from ACLK again */
 }
-
 
 //=========================== public ==========================================
 

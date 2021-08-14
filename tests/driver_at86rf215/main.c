@@ -147,7 +147,6 @@ static int cmd_set_clock_out(int argc, char **argv)
         freq = tmp;
     }
 
-
     gnrc_netif_t *netif = gnrc_netif_get_by_type(NETDEV_AT86RF215, 0);
 
     if (netif == NULL) {

@@ -53,7 +53,6 @@ typedef enum {
     SHT3X_PERIODIC_10_MPS   /**< periodic with  10 measurements per second (mps) */
 } sht3x_mode_t;
 
-
 /**
  * @brief   SHT3x repeatability levels
  *
@@ -77,7 +76,6 @@ typedef enum {
     SHT3X_MEDIUM,   /**< medium repeatability */
     SHT3X_LOW       /**< low repeatability */
 } sht3x_repeat_t;
-
 
 /**
  * @brief   SHT3x device initialization parameters
@@ -105,7 +103,6 @@ typedef struct {
     uint32_t        meas_duration;   /**< time in us until the results of the
                                           current measurement become available */
 } sht3x_dev_t;
-
 
 /**
  * @brief	Initialize the SHT3x sensor device

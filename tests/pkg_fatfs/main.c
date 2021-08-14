@@ -398,7 +398,6 @@ int main(void)
     rtc_set_time(&time);
     #endif
 
-
     #if MODULE_MTD_NATIVE
     fatfs_mtd_devs[0] = mtd0;
     #elif MODULE_MTD_SDCARD

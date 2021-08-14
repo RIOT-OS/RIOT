@@ -176,7 +176,6 @@ static int _power(mtd_dev_t *dev, enum mtd_power_state power)
     return -ENOTSUP;
 }
 
-
 const mtd_desc_t native_flash_driver = {
     .read = _read,
     .power = _power,

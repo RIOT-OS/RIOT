@@ -17,7 +17,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
 
-
 #include <stdio.h>
 
 #include "net/ipv6.h"

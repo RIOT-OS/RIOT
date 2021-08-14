@@ -277,7 +277,6 @@ static int cmd_test(int argc, char **argv)
     return 0;
 }
 
-
 static const shell_command_t shell_commands[] = {
     { "info", "Print information about eeprom", cmd_info },
     { "read", "Read bytes from eeprom", cmd_read },

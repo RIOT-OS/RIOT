@@ -64,7 +64,6 @@ typedef struct {
                              * without pull resistor */
 } dcf77_params_t;
 
-
 /**
  * @brief   Device descriptor for DCF77 sensor devices
  */

@@ -141,7 +141,6 @@ int _gnrc_netapi_send_recv(kernel_pid_t pid, gnrc_pktsnip_t *pkt, uint16_t type)
 int _gnrc_netapi_get_set(kernel_pid_t pid, netopt_t opt, uint16_t context,
                          void *data, size_t data_len, uint16_t type);
 
-
 /**
  * @brief   Shortcut function for sending @ref GNRC_NETAPI_MSG_TYPE_SND messages
  *

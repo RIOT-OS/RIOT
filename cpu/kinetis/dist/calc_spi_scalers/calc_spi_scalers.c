@@ -174,7 +174,6 @@ static long find_closest_delay_scalers(const uint32_t module_clock, const long t
     return closest_frequency;
 }
 
-
 int main(int argc, char **argv)
 {
     uint32_t modclk;
@@ -193,7 +192,6 @@ int main(int argc, char **argv)
 
     printf("\nCalculating SPI clock scalers for a module clock of: %iHz\n\n",
             (int)modclk);
-
 
     puts("static const uint32_t spi_clk_config[] = {");
 

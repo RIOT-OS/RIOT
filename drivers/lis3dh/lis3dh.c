@@ -216,7 +216,6 @@ int lis3dh_get_fifo_level(const lis3dh_t *dev)
     return level;
 }
 
-
 /**
  * @brief Read sequential registers from the LIS3DH.
  *

@@ -39,7 +39,6 @@
 #include "xtimer.h"
 #endif
 
-
 /**
  * @brief Trickle callback function with arguments
  */

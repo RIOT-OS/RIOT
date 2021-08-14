@@ -312,7 +312,6 @@ int mcp2515_configure_bittiming(candev_mcp2515_t *dev)
     c = ((tim->brp - 1) & 0x3F) | ((tim->sjw - 1) << 6);
     mcp2515_spi_write(dev, MCP2515_CNF1, &c, 1);
 
-
     mcp2515_spi_bitmod(dev, MCP2515_CNF2, MCP2515_CNF2_PRSEG_MASK |
                        MCP2515_CNF2_PHSEG_MASK | MCP2515_CNF2_BTLMODE,
                        MCP2515_CNF2_BTLMODE | (tim->prop_seg - 1) |

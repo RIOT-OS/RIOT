@@ -404,7 +404,6 @@ static int cmd_test_last_raw(int argc, char **argv)
     return 0;
 }
 
-
 #ifdef FLASHPAGE_RWWEE_NUMOF
 
 static int getpage_rwwee(const char *str)
@@ -461,7 +460,6 @@ static int cmd_write_rwwee(int argc, char **argv)
            page, flashpage_rwwee_addr(page));
     return 0;
 }
-
 
 static int cmd_test_rwwee(int argc, char **argv)
 {

@@ -215,7 +215,6 @@ static void test_dir(void)
     print_test_result("test_dir__umount", vfs_umount(&_test_vfs_mount) == 0);
 }
 
-
 static void test_rename(void)
 {
     vfs_DIR dir;

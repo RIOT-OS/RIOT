@@ -50,7 +50,6 @@ static saul_reg_t saul_entries[LIS3DH_NUM];
  */
 extern saul_driver_t lis3dh_saul_driver;
 
-
 void auto_init_lis3dh(void)
 {
     assert(LIS3DH_NUM == LIS3DH_INFO_NUM);

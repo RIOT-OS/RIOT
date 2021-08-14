@@ -23,7 +23,6 @@
 extern "C" {
 #endif
 
-
 /**
  * DDI_0_OSC registers
  */
@@ -78,7 +77,6 @@ typedef struct {
 
 #define DDI_0_OSC ((ddi0_osc_regs_t *) (DDI0_OSC_BASE)) /**< DDI_0_OSC register bank */
 
-
 /**
  * AON_SYSCTL registers
  */
@@ -95,7 +93,6 @@ typedef struct {
 /*@}*/
 
 #define AON_SYSCTL ((aon_sysctl_regs_t *) (AON_SYSCTL_BASE)) /**< AON_SYSCTL register bank */
-
 
 /**
  * AON_WUC registers
@@ -225,7 +222,6 @@ typedef struct {
 /** @} */
 
 #define AON_RTC ((aon_rtc_regs_t *) (AON_RTC_BASE)) /**< AON_RTC register bank */
-
 
 /**
  * PRCM registers

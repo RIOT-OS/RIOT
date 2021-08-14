@@ -108,7 +108,6 @@ static inline size_t dbgpin_count(void)
     return ARRAY_SIZE(dbgpin_pins);
 }
 
-
 /**
  * @brief   Initialize the configured input pins
  */

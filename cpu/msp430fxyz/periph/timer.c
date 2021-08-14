@@ -40,7 +40,6 @@ static timer_cb_t isr_cb;
  */
 static void *isr_arg;
 
-
 int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
     /* using fixed TIMER_BASE for now */

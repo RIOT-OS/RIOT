@@ -423,7 +423,6 @@ int fib_sr_entry_overwrite(fib_table_t *table, fib_sr_t *fib_sr,
 int fib_sr_entry_get_address(fib_table_t *table, fib_sr_t *fib_sr, fib_sr_entry_t *sr_path_entry,
                              uint8_t *addr, size_t *addr_size);
 
-
 /**
 * @brief copies a source route to the given destination
 *

@@ -61,7 +61,6 @@ static void itg320x_isr_data_ready (void *arg)
 }
 #endif
 
-
 int main(void)
 {
     itg320x_t dev;

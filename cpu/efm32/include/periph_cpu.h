@@ -385,14 +385,12 @@ typedef struct {
 } timer_conf_t;
 /** @} */
 
-
 /**
  * @brief   Use LETIMER as the base timer for XTIMER
  */
 #ifndef CONFIG_EFM32_XTIMER_USE_LETIMER
 #define CONFIG_EFM32_XTIMER_USE_LETIMER   0
 #endif
-
 
 /**
  * @brief   UART device configuration.

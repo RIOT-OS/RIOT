@@ -25,7 +25,6 @@
 #include "cpu.h"
 #include "board.h"
 
-
 void mips_start(void);
 
 extern void _fini(void);
@@ -60,7 +59,6 @@ void software_init_hook(void)
 
     exit(-1);
 }
-
 
 void mips_start(void)
 {

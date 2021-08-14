@@ -39,7 +39,6 @@ extern gnrc_netif_t *_mock_netif;
 
 void _tests_init(void);
 
-
 #ifdef __cplusplus
 }
 #endif

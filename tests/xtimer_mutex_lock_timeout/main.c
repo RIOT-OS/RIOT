@@ -55,7 +55,6 @@ static int cmd_test_xtimer_mutex_lock_timeout_short_unlocked(int argc,
 static int cmd_test_xtimer_mutex_lock_timeout_short_locked(int argc,
                                                            char **argv);
 
-
 /**
  * @brief   List of command for this application.
  */
@@ -344,7 +343,6 @@ static int cmd_test_xtimer_mutex_lock_timeout_short_unlocked(int argc,
 
     return 0;
 }
-
 
 /**
  * @brief   main function starting shell

@@ -71,7 +71,6 @@ enum {
 #define CC2420_FIFO_WRITE           (CC2420_REG_TXFIFO | CC2420_REG_WRITE)
 /** @} */
 
-
 /**
  * @name    CC2420 strobe commands
  * @see     Datasheet section 37, pages 61--62
@@ -235,7 +234,6 @@ enum {
  */
 #define CC2420_MANFIDH_VAL          (0x3000)
 /** @} */
-
 
 #ifdef __cplusplus
 }

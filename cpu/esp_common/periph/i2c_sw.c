@@ -802,7 +802,6 @@ static IRAM_ATTR int _i2c_write_byte(_i2c_bus_t* bus, uint8_t byte)
     return !bit ? 0 : -EIO;
 }
 
-
 static IRAM_ATTR int _i2c_read_byte(_i2c_bus_t* bus, uint8_t *byte, bool ack)
 {
     bool bit;

@@ -42,7 +42,6 @@ void cpu_init(void)
     periph_init();
 }
 
-
 /**
  * @brief Configure the controllers clock system
  */

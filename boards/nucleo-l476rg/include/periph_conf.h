@@ -56,7 +56,6 @@ static const dma_conf_t dma_config[] = {
 #define DMA_NUMOF           ARRAY_SIZE(dma_config)
 /** @} */
 
-
 /**
  * @name    Timer configuration
  * @{

@@ -87,7 +87,6 @@ int main(void)
         puts("Will now light up each LED once short and twice long in a loop");
     }
 
-
     while (1) {
 #ifdef LED0_ON
         LED0_ON;

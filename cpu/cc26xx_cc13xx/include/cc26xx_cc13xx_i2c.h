@@ -25,7 +25,6 @@
 extern "C" {
 #endif
 
-
 /**
  * I2C registers
  */
@@ -101,7 +100,6 @@ typedef struct {
  *              1: The I2C controller is idle.
  */
 #define MSTAT_IDLE  0x00000020
-
 
 /**
  * @brief       Arbitration lost

@@ -46,7 +46,6 @@ extern "C" {
 int cipher_encrypt_cbc(const cipher_t *cipher, uint8_t iv[16], const uint8_t *input,
                        size_t input_len, uint8_t *output);
 
-
 /**
  * @brief Decrypt encrypted data in cipher block chaining mode.
  *

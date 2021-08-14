@@ -18,7 +18,6 @@
  * @}
  */
 
-
 #include "periph/i2c.h"
 #include "byteorder.h"
 

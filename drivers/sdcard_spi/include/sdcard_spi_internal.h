@@ -33,7 +33,6 @@ extern "C" {
 #include "stdbool.h"
 #include "sdcard_spi.h"
 
-
 /* number of clocks that should be applied to the card on init
    before taking further actions (see sd spec. 6.4.1.1 Power Up Time of Card) */
 #define SD_POWERSEQUENCE_CLOCK_COUNT 74
@@ -80,7 +79,6 @@ extern "C" {
 /* to ensure the voltage range check on init is done properly you need to
    define this according to your actual interface/wiring with the sd-card */
 #define SYSTEM_VOLTAGE (OCR_VOLTAGE_3_2_TO_3_3 | OCR_VOLTAGE_3_2_TO_3_3)
-
 
 /* see sd spec. 7.3.1.3 Detailed Command Description */
 #define SD_CMD_PREFIX_MASK (1<<6)
@@ -284,7 +282,6 @@ uint32_t sdcard_spi_get_au_size(sdcard_spi_t *card);
  * @return                sd_status_t struct that contains all SD status information
  */
 sd_rw_response_t sdcard_spi_read_sds(sdcard_spi_t *card, sd_status_t *sd_status);
-
 
 #ifdef __cplusplus
 }

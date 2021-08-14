@@ -423,7 +423,6 @@ static void test_sock_udp_recv4__aux(void)
     expect(_check_net());
 }
 
-
 static void test_sock_udp_recv_buf4__success(void)
 {
     static const sock_udp_ep_t local = { .family = AF_INET,

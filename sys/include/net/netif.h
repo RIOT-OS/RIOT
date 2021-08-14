@@ -188,7 +188,6 @@ int netif_get_opt(netif_t *netif, netopt_t opt, uint16_t context,
 int netif_set_opt(netif_t *netif, netopt_t opt, uint16_t context,
                   void *value, size_t value_len);
 
-
 /**
  * @brief   Registers a network interface in the global interface list.
  *

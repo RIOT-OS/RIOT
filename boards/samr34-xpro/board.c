@@ -48,7 +48,6 @@ void board_init(void)
 #endif /* USEMODULE_SX127X */
 }
 
-
 /**
  * @brief Initialize the boards on-board LED
  */

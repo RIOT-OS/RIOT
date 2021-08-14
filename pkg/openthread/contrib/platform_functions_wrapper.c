@@ -107,7 +107,6 @@ uint8_t ot_call_command(char* command, void *arg, void* answer)
     return job.status;
 }
 
-
 void output_bytes(const char* name, const uint8_t *aBytes, uint8_t aLength)
 {
     if (IS_ACTIVE(ENABLE_DEBUG)) {
@@ -145,7 +144,6 @@ OT_COMMAND ot_eui64(otInstance* ot_instance, void* arg, void* answer) {
     }
     return 0;
 }
-
 
 OT_COMMAND ot_extaddr(otInstance* ot_instance, void* arg, void* answer) {
     (void)arg;
@@ -234,7 +232,6 @@ OT_COMMAND ot_networkname(otInstance* ot_instance, void* arg, void* answer) {
     }
     return 0;
 }
-
 
 OT_COMMAND ot_panid(otInstance* ot_instance, void* arg, void* answer) {
     if (answer != NULL) {

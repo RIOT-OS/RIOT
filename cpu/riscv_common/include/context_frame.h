@@ -23,7 +23,6 @@
 #include <stdint.h>
 #endif /* __ASSEMBLER__ */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -76,7 +75,6 @@ struct context_switch_frame {
 
 #endif /* __ASSEMBLER__ */
 
-
 /**
  * @name Register offsets
  * @{
@@ -123,7 +121,6 @@ struct context_switch_frame {
  * @brief Offset of stack pointer in struct _thread
  */
 #define SP_OFFSET_IN_THREAD 0
-
 
 #ifdef __cplusplus
 }

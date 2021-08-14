@@ -88,7 +88,6 @@ static int ina2xx_write_reg(const ina2xx_t *dev, uint8_t reg, uint16_t in)
     return 0;
 }
 
-
 int ina2xx_init(ina2xx_t *dev, const ina2xx_params_t *params)
 {
     uint16_t config;

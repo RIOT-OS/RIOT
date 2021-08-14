@@ -243,7 +243,6 @@ BaseType_t IRAM_ATTR _queue_generic_recv (QueueHandle_t xQueue,
                        queue->item_size);
             }
 
-
             /* when only peeking leave the element in queue */
             if (xJustPeeking == pdTRUE) {
                 DEBUG("%s pid=%d queue=%p return pdPASS\n", __func__,

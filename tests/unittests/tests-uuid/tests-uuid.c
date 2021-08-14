@@ -58,7 +58,6 @@ const uint8_t v5_check2[] = {0x7a, 0x1b, 0xf5, 0xdb, 0x5e, 0x77, 0x5e, 0x9b,
 #define RIOTOS_ORG_LEN  (sizeof(riotos_org) -1)
 #define TEST_STR_LEN    (sizeof(test_str) -1)
 
-
 void test_uuid_v3(void)
 {
     uuid_t uuid, uuid_next;

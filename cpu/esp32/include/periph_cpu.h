@@ -496,7 +496,6 @@ typedef struct {
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS  /**< requires function spi_transfer_regs */
 /** @} */
 
-
 /**
  * @name   Timer configuration depending on which implementation is used
  *

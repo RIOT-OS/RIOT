@@ -302,7 +302,6 @@ static void test_ipv6_ext_frag_reass_out_of_order(void)
     gnrc_ipv6_ext_frag_rbuf_t *rbuf;
     gnrc_ipv6_ext_frag_limits_t *ptr;
 
-
     ipv6->nh = PROTNUM_IPV6_EXT_FRAG;
     ipv6->hl = TEST_HL;
     ipv6->len = byteorder_htons(pkt->size);
@@ -411,7 +410,6 @@ static void test_ipv6_ext_frag_reass_out_of_order_rbuf_full(void)
     gnrc_ipv6_ext_frag_rbuf_t *rbuf;
     gnrc_ipv6_ext_frag_limits_t *ptr;
     static const uint32_t foreign_id = TEST_ID + 44U;
-
 
     TEST_ASSERT_EQUAL_INT(1, CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_SIZE);
     /* prepare fragment from a from a foreign datagram */

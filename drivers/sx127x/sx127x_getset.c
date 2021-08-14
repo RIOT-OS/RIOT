@@ -332,7 +332,6 @@ void sx127x_set_rx(sx127x_t *dev)
         ztimer_set(ZTIMER_MSEC, &(dev->_internal.rx_timeout_timer), dev->settings.lora.rx_timeout);
     }
 
-
     if (dev->settings.lora.flags & SX127X_RX_CONTINUOUS_FLAG) {
         sx127x_set_op_mode(dev, SX127X_RF_LORA_OPMODE_RECEIVER);
     }

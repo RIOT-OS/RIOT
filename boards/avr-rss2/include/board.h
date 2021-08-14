@@ -58,14 +58,12 @@ extern "C" {
 #define LED1_ON             (LED_PORT &= ~LED1_MASK)
 #define LED1_TOGGLE         (LED_PORT ^=  LED1_MASK)
 
-
 /**
  * @name    Usage of LED to turn on when a kernel panic occurs.
  * @{
  */
 #define LED_PANIC           LED0_ON
 /** @} */
-
 
 /**
  * @name DS18 pins  OW_BUS_0

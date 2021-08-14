@@ -39,9 +39,7 @@ extern "C" {
 #define CC2420_RESET_DELAY      (500U)
 #define CC2420_XOSCON_DELAY     (2000U)
 
-
 uint8_t cc2420_strobe(const cc2420_t *dev, const uint8_t command);
-
 
 /**
  * @brief   Read from a register at address `addr` from device `dev`.

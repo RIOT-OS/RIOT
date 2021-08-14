@@ -22,11 +22,9 @@
 #ifndef INA2XX_DEFINES_H
 #define INA2XX_DEFINES_H
 
-
 #ifdef __cplusplus
  extern "C" {
 #endif
-
 
 /**
  * @brief INA2XX register addresses

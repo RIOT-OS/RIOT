@@ -209,7 +209,6 @@ typedef enum {
 /** @} */
 #endif /* ifdef DOXYGEN */
 
-
 /**
  * @brief   ADC channel pair configuration
  *

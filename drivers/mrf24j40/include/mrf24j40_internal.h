@@ -30,7 +30,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @brief initialization as described in datasheet
  *

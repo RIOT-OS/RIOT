@@ -606,7 +606,6 @@ static inline bool usbus_handler_isset_flag(usbus_handler_t *handler,
     return handler->flags & flag;
 }
 
-
 #ifdef __cplusplus
 }
 #endif

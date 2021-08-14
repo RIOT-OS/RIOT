@@ -15,7 +15,6 @@
  * @}
  */
 
-
 #include "msg.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/netif/hdr.h"

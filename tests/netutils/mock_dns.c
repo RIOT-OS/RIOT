@@ -28,7 +28,6 @@ int sock_dns_query(const char *domain_name, void *addr_out, int family)
         }
     };
 
-
     if (family != AF_INET6) {
         return -EAFNOSUPPORT;
     }

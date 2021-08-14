@@ -144,7 +144,6 @@ static void _filter_and_connect(struct ble_gap_disc_desc *disc)
     int res;
     bluetil_ad_t ad;
 
-
     /* we use the bluetil module read-only here, so its save to cast the AD
      * buffer to non-const */
     bluetil_ad_init(&ad, (uint8_t *)disc->data,

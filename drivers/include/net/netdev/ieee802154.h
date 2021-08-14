@@ -155,7 +155,6 @@ typedef struct netdev_ieee802154_rx_info {
  */
 void netdev_ieee802154_reset(netdev_ieee802154_t *dev);
 
-
 /**
  * @brief   Fallback function for netdev IEEE 802.15.4 devices' _get function
  *

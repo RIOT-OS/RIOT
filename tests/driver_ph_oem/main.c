@@ -59,7 +59,6 @@ static void reading_available_event_callback(event_t *event)
     printf("pH reading was taken at %d Celsius\n", data);
 }
 
-
 static void interrupt_pin_callback(void *arg)
 {
     puts("\n[IRQ - Reading done. Writing read-event to event queue]");

@@ -141,7 +141,6 @@ void cpu_init(void)
 #endif
                          ;
 
-
     /* Disable the RTC module to prevent synchronization issues during CPU init
        if the RTC was running from a previous boot (e.g wakeup from backup)
        as the module will be re-init during the boot process */

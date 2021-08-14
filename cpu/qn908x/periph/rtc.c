@@ -20,7 +20,6 @@
  * @}
  */
 
-
 #include <stdlib.h>
 
 #include "cpu.h"
@@ -32,7 +31,6 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
 
 /* Callback context. */
 typedef struct {

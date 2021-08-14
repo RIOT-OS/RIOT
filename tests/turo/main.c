@@ -128,7 +128,6 @@ static void _netif_list(turo_t *ctx, int32_t netif_num)
     turo_dict_close(ctx);
 }
 
-
 static int cmd_turo_simple_s32(int argc, char **argv)
 {
     int32_t s32 = 0;

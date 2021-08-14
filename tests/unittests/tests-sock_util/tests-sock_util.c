@@ -38,7 +38,6 @@
                                         .port = 53,                 \
                                     }
 
-
 #define TEST_URL                    "http://[2001:db8::1]:80/local"
 #define TEST_URL_HOSTPART           "[2001:db8::1]:80"
 #define TEST_URL_LOCALPART          "/local"
@@ -70,7 +69,6 @@
 
 static char addr[CONFIG_SOCK_URLPATH_MAXLEN];
 static char urlpath[CONFIG_SOCK_URLPATH_MAXLEN];
-
 
 static void setup(void)
 {

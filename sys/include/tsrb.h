@@ -81,7 +81,6 @@ static inline int tsrb_empty(const tsrb_t *rb)
     return retval;
 }
 
-
 /**
  * @brief       Get number of bytes available for reading
  * @param[in]   rb  Ringbuffer to operate on

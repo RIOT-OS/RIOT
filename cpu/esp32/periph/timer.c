@@ -142,7 +142,6 @@ static const struct hw_timer_hw_t timers_hw[HW_TIMER_NUMOF] =
     }
 };
 
-
 /** Latches the current counter value and return only the low part */
 static inline uint32_t timer_get_counter_lo(tim_t dev)
 {
@@ -565,7 +564,6 @@ void IRAM timer_stop(tim_t dev)
 
     irq_restore (state);
 }
-
 
 static void IRAM __timer_channel_start (struct hw_timer_t* timer, struct hw_channel_t* channel)
 {

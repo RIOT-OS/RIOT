@@ -48,7 +48,6 @@ static void *_thread(void *arg)
     flags = thread_flags_wait_all(0x2 | 0x4);
     printf("thread(): received flags: 0x%04x\n", (unsigned)flags & 0xFFFF);
 
-
     puts("thread(): waiting for any flag, one by one");
     flags = thread_flags_wait_one(0xFFFF);
     printf("thread(): received flags: 0x%04x\n", (unsigned)flags & 0xFFFF);

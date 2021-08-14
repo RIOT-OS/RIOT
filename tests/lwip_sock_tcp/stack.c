@@ -14,7 +14,6 @@
  * @}
  */
 
-
 #include "xtimer.h"
 
 #include "lwip.h"

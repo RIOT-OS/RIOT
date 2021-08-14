@@ -24,7 +24,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @brief   Statistics on fragmentation and reassembly
  *
@@ -49,7 +48,6 @@ typedef struct {
  * @return  The current statistics on fragmentation and reassembly
  */
 gnrc_sixlowpan_frag_stats_t *gnrc_sixlowpan_frag_stats_get(void);
-
 
 #ifdef __cplusplus
 }

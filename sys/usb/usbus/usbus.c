@@ -347,7 +347,6 @@ static void _event_cb(usbdev_t *usbdev, usbdev_event_t event)
     }
 }
 
-
 /* USB generic endpoint callback */
 static void _event_ep_cb(usbdev_ep_t *ep, usbdev_event_t event)
 {

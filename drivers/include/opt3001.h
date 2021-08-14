@@ -50,7 +50,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @name    Conversion time
  * @{

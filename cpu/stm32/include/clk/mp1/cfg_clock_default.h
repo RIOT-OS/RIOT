@@ -6,7 +6,6 @@
  * details.
  */
 
-
 /**
  * @ingroup         cpu_stm32
  * @{

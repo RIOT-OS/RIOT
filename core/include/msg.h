@@ -192,7 +192,6 @@ typedef struct {
     } content;                  /**< Content of the message. */
 } msg_t;
 
-
 /**
  * @brief Send a message (blocking).
  *
@@ -213,7 +212,6 @@ typedef struct {
  */
 int msg_send(msg_t *m, kernel_pid_t target_pid);
 
-
 /**
  * @brief Send a message (non-blocking).
  *
@@ -231,7 +229,6 @@ int msg_send(msg_t *m, kernel_pid_t target_pid);
  * @return -1, on error (invalid PID)
  */
 int msg_try_send(msg_t *m, kernel_pid_t target_pid);
-
 
 /**
  * @brief Send a message to the current thread.

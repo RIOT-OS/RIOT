@@ -59,7 +59,6 @@
  *                                                                    *
  **********************************************************************/
 
-
 /**
  * @ingroup sys
  * @{
@@ -166,7 +165,6 @@ typedef struct {
                                       down from host via debug probe to target */
 } segger_rtt_cb_t;
 
-
 /**
  * @brief The SEGGER Real-Time-Terminal control block (CB)
  */
@@ -177,7 +175,6 @@ static segger_rtt_cb_t rtt_cb = {
     {{ "Terminal", &up_buffer[0],   sizeof(up_buffer),   0, 0, 0 }},
     {{ "Terminal", &down_buffer[0], sizeof(down_buffer), 0, 0, 0 }},
 };
-
 
 /**
  * @brief read bytes from the down buffer. This function does not block.

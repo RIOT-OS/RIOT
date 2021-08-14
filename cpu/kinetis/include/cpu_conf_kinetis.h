@@ -183,7 +183,6 @@ extern "C"
 #endif /* MK20D7_H_ */
 /** @} */
 
-
 #ifdef __cplusplus
 }
 #endif

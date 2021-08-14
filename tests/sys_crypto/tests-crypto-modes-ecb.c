@@ -24,7 +24,6 @@
  *   http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf
  */
 
-
 /* PACKET VECTOR #1 (Page 24) */
 static uint8_t TEST_1_KEY[] = {
     0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,

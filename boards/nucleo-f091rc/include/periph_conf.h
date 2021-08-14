@@ -127,7 +127,6 @@ static const uart_conf_t uart_config[] = {
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
-
 /**
  * @name   SPI configuration
  * @{

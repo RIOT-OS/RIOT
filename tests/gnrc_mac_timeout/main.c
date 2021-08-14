@@ -38,7 +38,6 @@ static uint32_t start_time;
 
 static char worker_stack[THREAD_STACKSIZE_MAIN];
 
-
 /* This thread will print the drift to stdout once per second */
 void *worker_thread(void *arg)
 {
@@ -112,7 +111,6 @@ int main(void)
     printf("Set timeout_1, should be expired at %" PRIu32 " ms)\n", TIMEOUT_1_DURATION + start_time);
     printf("Set timeout_2, should be expired at %" PRIu32 " ms)\n", TIMEOUT_2_DURATION + start_time);
     printf("Set timeout_3, should be expired at %" PRIu32 " ms)\n", TIMEOUT_3_DURATION + start_time);
-
 
     puts("Are the reception times of all 3 msgs close to the supposed values?\n");
     puts("If yes, the tests were successful");

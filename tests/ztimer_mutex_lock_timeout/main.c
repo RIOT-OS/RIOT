@@ -88,7 +88,6 @@ int main(void)
     expect(post - pre > TIMEOUT_LARGE);
     puts("OK");
 
-
     puts("TEST PASSED");
 
     return 0;

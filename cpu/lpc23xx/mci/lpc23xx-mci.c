@@ -33,11 +33,9 @@
 /  occurred due to any interrupt by higher priority process or slow external memory, increasing
 /  N_BUF or decreasing MCLK_RW will solve it. */
 
-
 /* ----- Port definitions ----- */
 #define SOCKINS     !(FIO0PIN2 & 0x20)  /* Card detect switch */
 #define SOCKWP      (FIO0PIN2 & 0x04)   /* Write protect switch */
-
 
 /* ----- MMC/SDC command ----- */
 #define CMD0    (0)             /* GO_IDLE_STATE */
@@ -71,7 +69,6 @@
 #define CT_SD2      0x04        /* SD ver 2 */
 #define CT_SDC      (CT_SD1|CT_SD2) /* SD */
 #define CT_BLOCK    0x08        /* Block addressing */
-
 
 /*--------------------------------------------------------------------------
 
@@ -159,7 +156,6 @@ void Isr_GPDMA(void)
     VICVectAddr = 0;
 }
 
-
 /*-----------------------------------------------------------------------*/
 /* Ready for data reception                                              */
 /*-----------------------------------------------------------------------*/
@@ -211,7 +207,6 @@ static void ready_reception(unsigned int blks, unsigned int bs)
     MCI_DATA_CTRL  = n | 0xB;               /* Start to receive data blocks */
 }
 
-
 /*-----------------------------------------------------------------------*/
 /* Start to transmit a data block                                        */
 /*-----------------------------------------------------------------------*/
@@ -224,7 +219,6 @@ static void start_transmission(unsigned char blks)
 {
     unsigned int n;
     unsigned long dma_ctrl;
-
 
     /* ------ Setting up GPDMA Ch-0 ------ */
 
@@ -263,9 +257,6 @@ static void start_transmission(unsigned char blks)
 }
 #endif  /* _READONLY */
 
-
-
-
 /*-----------------------------------------------------------------------*/
 /* Stop data transfer                                                    */
 /*-----------------------------------------------------------------------*/
@@ -278,9 +269,6 @@ static void stop_transfer(void)
     GPDMA_CH0_CFG &= 0xFFF80420;    /* Disable DMA ch-0 */
 }
 
-
-
-
 /*-----------------------------------------------------------------------*/
 /* Power Control (Device dependent)                                      */
 /*-----------------------------------------------------------------------*/
@@ -289,7 +277,6 @@ static int power_status(void)
 {
     return (MCI_POWER & 3) ? 1 : 0;
 }
-
 
 static void power_on(void)
 {
@@ -328,7 +315,6 @@ static void power_on(void)
     //RegisterIrq(GPDMA_INT, Isr_GPDMA, PRI_LOWEST-1);
     install_irq(GPDMA_INT, Isr_GPDMA, 5);
 
-
     /* Power-on (VCC is always tied to the socket on this board) */
     MCI_POWER = 0x01;                   /* Power on */
 
@@ -337,7 +323,6 @@ static void power_on(void)
 
     MCI_POWER = 0x03;                   /* Enable signals */
 }
-
 
 static void power_off(void)
 {
@@ -364,7 +349,6 @@ static void power_off(void)
 
     Stat |= DISKIO_STA_NOINIT;
 }
-
 
 /*-----------------------------------------------------------------------*/
 /* Send a command packet to the card and receive a response              */
@@ -463,9 +447,6 @@ static int send_cmd(unsigned int idx, unsigned long arg, unsigned int rt, unsign
     return 1;       /* Return with success */
 }
 
-
-
-
 /*-----------------------------------------------------------------------*/
 /* Wait card ready                                                       */
 /*-----------------------------------------------------------------------*/
@@ -499,7 +480,6 @@ static int wait_ready(unsigned short tmr)
 static void bswap_cp(unsigned char *dst, const unsigned long *src)
 {
     unsigned long d;
-
 
     d = *src;
     *dst++ = (unsigned char)(d >> 24);
@@ -670,9 +650,6 @@ di_fail:
     return Stat;
 }
 
-
-
-
 /*-----------------------------------------------------------------------*/
 /* Get Disk Status                                                       */
 /*-----------------------------------------------------------------------*/
@@ -681,9 +658,6 @@ diskio_sta_t mci_status(void)
 {
     return Stat;
 }
-
-
-
 
 /*-----------------------------------------------------------------------*/
 /* Read Sector(s)                                                        */
@@ -753,7 +727,6 @@ diskio_result_t mci_read(unsigned char *buff, unsigned long sector, unsigned cha
 
     return count ? DISKIO_RES_ERROR : DISKIO_RES_OK;
 }
-
 
 /*-----------------------------------------------------------------------*/
 /* Write Sector(s)                                                       */
@@ -861,9 +834,6 @@ diskio_result_t mci_write(const unsigned char *buff, unsigned long sector, unsig
 }
 #endif /* _READONLY */
 
-
-
-
 /*-----------------------------------------------------------------------*/
 /* Miscellaneous Functions                                               */
 /*-----------------------------------------------------------------------*/
@@ -876,7 +846,6 @@ diskio_result_t mci_ioctl(
     diskio_result_t res;
     unsigned char *ptr = (unsigned char *)buff;
     unsigned long resp[4], d, *dp, st, ed;
-
 
     if (Stat & DISKIO_STA_NOINIT) {
         return DISKIO_RES_NOTRDY;

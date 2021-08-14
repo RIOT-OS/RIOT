@@ -20,7 +20,6 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -113,7 +113,6 @@ typedef enum
     USBOPT_ENABLE = 1,          /**< enable a given option */
 } usbopt_enable_t;
 
-
 #ifdef __cplusplus
 }
 #endif

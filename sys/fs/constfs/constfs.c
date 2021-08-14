@@ -75,7 +75,6 @@ static const vfs_dir_ops_t constfs_dir_ops = {
     .closedir = constfs_closedir,
 };
 
-
 const vfs_file_system_t constfs_file_system = {
     .f_op = &constfs_file_ops,
     .fs_op = &constfs_fs_ops,

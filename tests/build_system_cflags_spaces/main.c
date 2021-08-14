@@ -26,7 +26,6 @@
 #define STRING_FROM_DOCKER ""
 #endif
 
-
 int main(void)
 {
     puts("The output of the configuration variables:");

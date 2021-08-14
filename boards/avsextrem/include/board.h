@@ -7,7 +7,6 @@
  *
  */
 
-
 /**
  * @ingroup     boards_avsextrem
  * @{
@@ -18,7 +17,6 @@
  * @author      Heiko Will
  * @author      Zakaria Kasmi
  */
-
 
 #ifndef BOARD_H
 #define BOARD_H

@@ -311,7 +311,6 @@ ssize_t vfs_read(int fd, void *dest, size_t count)
     return filp->f_op->read(filp, dest, count);
 }
 
-
 ssize_t vfs_write(int fd, const void *src, size_t count)
 {
     DEBUG_NOT_STDOUT(fd, "vfs_write: %d, %p, %lu\n", fd, src, (unsigned long)count);
@@ -488,7 +487,6 @@ int vfs_mount(vfs_mount_t *mountp)
     DEBUG("vfs_mount: mount done\n");
     return 0;
 }
-
 
 int vfs_umount(vfs_mount_t *mountp)
 {

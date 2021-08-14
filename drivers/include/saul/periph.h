@@ -173,7 +173,6 @@ typedef struct {
                                      PWM values are dark or bright*/
 } saul_pwm_rgb_params_t;
 
-
 #endif /* MODULE_SAUL_PWM */
 
 #ifdef __cplusplus

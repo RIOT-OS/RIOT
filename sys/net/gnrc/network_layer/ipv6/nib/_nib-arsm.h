@@ -163,7 +163,6 @@ void _probe_nbr(_nib_onl_entry_t *nbr, bool reset);
 void _handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
                     const icmpv6_hdr_t *icmpv6, const ndp_opt_t *tl2ao);
 
-
 /**
  * @brief   Recalculates the (randomized) reachable time of on a network
  *          interface.

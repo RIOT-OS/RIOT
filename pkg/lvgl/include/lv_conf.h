@@ -359,7 +359,6 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 
 #endif /*LV_USE_DEBUG*/
 
-
 /*==================
  *    FONT USAGE
  *===================*/

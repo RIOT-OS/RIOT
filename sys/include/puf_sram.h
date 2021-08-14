@@ -124,7 +124,6 @@ void puf_sram_generate(const uint8_t *ram, size_t len);
  */
 bool puf_sram_softreset(void);
 
-
 #ifdef __cplusplus
 }
 #endif

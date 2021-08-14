@@ -90,7 +90,6 @@ typedef enum {
     DOSE_STATE_ANY     = 0x0F      /**< Special state filter used internally to observe any state transition */
 } dose_state_t;
 
-
 /**
  * @name    Signal definitions
  * @brief   A signal controls the state machine and may cause a state transition
@@ -104,8 +103,6 @@ typedef enum {
     DOSE_SIGNAL_SEND   = 0x50,    /**< Enter send state */
     DOSE_SIGNAL_END    = 0x60     /**< Leave send state */
 } dose_signal_t;
-
-
 
 /**
  * @name    Flag definitions

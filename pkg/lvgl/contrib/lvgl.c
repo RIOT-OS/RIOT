@@ -53,7 +53,6 @@ static lv_color_t buf[LVGL_COLOR_BUF_SIZE];
 
 static screen_dev_t *_screen_dev = NULL;
 
-
 static void _disp_map(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p)
 {
     if (!_screen_dev->display) {

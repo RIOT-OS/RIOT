@@ -45,7 +45,6 @@ static saul_reg_t saul_entries[HMC5883L_NUM];
  */
 extern saul_driver_t hmc5883l_saul_driver;
 
-
 void auto_init_hmc5883l(void)
 {
     assert(HMC5883L_NUM == HMC5883L_INFO_NUM);

@@ -53,7 +53,6 @@ static gnrc_netif_t _netif[ENC28J60_NUM];
  */
 static char stack[ENC28J60_NUM][ENC28J60_MAC_STACKSIZE];
 
-
 void auto_init_enc28j60(void)
 {
     for (unsigned i = 0; i < ENC28J60_NUM; i++) {

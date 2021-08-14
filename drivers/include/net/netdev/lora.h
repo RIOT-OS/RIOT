@@ -17,7 +17,6 @@
  * @author      José Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
 
-
 #ifndef NET_NETDEV_LORA_H
 #define NET_NETDEV_LORA_H
 
@@ -36,7 +35,6 @@ typedef struct {
     uint8_t rssi;           /**< RSSI of a received packet */
     int8_t snr;             /**< S/N ratio */
 } netdev_lora_rx_info_t;
-
 
 #ifdef __cplusplus
 }

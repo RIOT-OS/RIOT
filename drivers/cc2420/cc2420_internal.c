@@ -32,7 +32,6 @@
 #define SPI_MODE            (SPI_MODE_0)
 #define SPI_CLK             (dev->params.spi_clk)
 
-
 uint8_t cc2420_strobe(const cc2420_t *dev, const uint8_t command)
 {
     uint8_t res;

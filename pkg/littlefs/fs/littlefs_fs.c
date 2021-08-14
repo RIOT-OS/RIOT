@@ -18,7 +18,6 @@
  * @}
  */
 
-
 #include <fcntl.h>
 #include <errno.h>
 #include <inttypes.h>

@@ -249,7 +249,6 @@ const char* _gpio_pin_usage_str[] =
     "GPIO", "ADC", "CAN", "DAC", "EMAC", "I2C", "PWM", "SPI", "SPI Flash", "UART", "N/A"
 };
 
-
 #define FUN_GPIO   2 /* the function number for all GPIOs */
 
 #define GPIO_PIN_SET(b) if (b < 32) GPIO.out_w1ts = BIT(b); else GPIO.out1_w1ts.val = BIT(b-32)
@@ -529,7 +528,6 @@ const char* gpio_get_pin_usage_str(gpio_t pin)
 {
     return _gpio_pin_usage_str[_gpio_pin_usage[((pin < GPIO_PIN_NUMOF) ? pin : _NOT_EXIST)]];
 }
-
 
 void gpio_pullup_dis (gpio_t pin)
 {

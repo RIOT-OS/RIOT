@@ -90,7 +90,6 @@ extern "C" {
 #endif
 /** @} */
 
-
 /**
  * @name    STDIO configuration
  * @{
@@ -100,7 +99,6 @@ extern "C" {
 #define STDIO_UART_BAUDRATE      (115200)
 #endif
 /** @} */
-
 
 #if MODULE_MTD || DOXYGEN
 /**
@@ -134,7 +132,6 @@ extern mtd_dev_t *mtd0;
 /** @} */
 #endif /* MODULE_MTD || DOXYGEN */
 
-
 #if MODULE_SPIFFS || DOXYGEN
 /**
  * @name    SPIFFS configuration for the system MTD device
@@ -149,7 +146,6 @@ extern mtd_dev_t *mtd0;
 #define SPIFFS_CACHE 1
 /** @} */
 #endif /* MODULE_SPIFFS || DOXYGEN */
-
 
 /**
  * @brief Initialize the hardware that is common for all ESP32 boards.

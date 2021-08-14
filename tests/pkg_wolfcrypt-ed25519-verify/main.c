@@ -43,7 +43,6 @@ const uint8_t msg_signature[ED25519_SIG_SIZE] = {
     0xB5, 0x48, 0x26, 0x45, 0xD6, 0xC7, 0x00, 0x06
 };
 
-
 int main(void)
 {
     int stat;

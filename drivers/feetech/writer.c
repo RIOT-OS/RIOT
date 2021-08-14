@@ -62,7 +62,6 @@ void feetech_writer_response_make(feetech_writer_t *writer, uint8_t id, const ui
     }
 }
 
-
 void feetech_writer_ack_make(feetech_writer_t *writer, uint8_t id)
 {
     const size_t len = 2;

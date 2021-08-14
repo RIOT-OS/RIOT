@@ -54,7 +54,6 @@ extern saul_driver_t lsm6dsl_saul_gyro_driver;
 extern saul_driver_t lsm6dsl_saul_temp_driver;
 /** @} */
 
-
 void auto_init_lsm6dsl(void)
 {
     assert(LSM6DSL_NUM == LSM6DSL_INFO_NUM);

@@ -7,7 +7,6 @@
  * directory for more details.
  */
 
-
 /**
  * @ingroup     examples
  * @{
@@ -25,7 +24,6 @@
 #include "shell.h"
 #include "msg.h"
 #include "log.h"
-
 
 #ifdef WITH_RIOT_SOCKETS
 #error RIOT-OS is set to use sockets but this DTLS app is configured for socks.

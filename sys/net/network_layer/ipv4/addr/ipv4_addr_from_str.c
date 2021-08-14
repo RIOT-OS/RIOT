@@ -88,5 +88,4 @@ ipv4_addr_t *ipv4_addr_from_str(ipv4_addr_t *result, const char *addr)
     return ipv4_addr_from_buf(result, addr, strlen(addr));
 }
 
-
 /** @} */

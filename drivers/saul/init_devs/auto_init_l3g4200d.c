@@ -50,7 +50,6 @@ static saul_reg_t saul_entries[L3G4200D_NUM];
  */
 extern saul_driver_t l3g4200d_saul_driver;
 
-
 void auto_init_l3g4200d(void)
 {
     assert(L3G4200D_NUM == L3G4200D_INFO_NUM);

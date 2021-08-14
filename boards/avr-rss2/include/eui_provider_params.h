@@ -42,7 +42,6 @@ static inline int _at24mac_get_eui64(uint8_t index, eui64_t *addr)
 #define EUI64_PROVIDER_INDEX  0
 /** @} */
 
-
 #ifdef __cplusplus
 }
 #endif

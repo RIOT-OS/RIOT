@@ -97,7 +97,6 @@ uint8_t _reg_addr_upstream(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                            const sixlowpan_nd_opt_ar_t *aro,
                            const ndp_opt_t *sl2ao, _nib_onl_entry_t *nce);
 
-
 /**
  * @brief   Handles and copies ARO from NS to NA
  *

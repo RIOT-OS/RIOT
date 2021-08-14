@@ -91,8 +91,6 @@ extern "C"
  */
 #define PCA9633_REG_ALLCALLADR  0x0C
 
-
-
 /* Bits in REG_MODE1 (page 12, table 8) */
 
 /**
@@ -142,8 +140,6 @@ extern "C"
  */
 #define PCA9633_BIT_ALLCALL BIT0
 
-
-
 /* Bits in REG_MODE2 (page 12-13, table 9) */
 
 /**
@@ -178,8 +174,6 @@ extern "C"
  *        11 reserved
  */
 #define PCA9633_BITMASK_OUTNE   0x03
-
-
 
 /* Bits in REG_LEDOUT (page 14, table 13) */
 

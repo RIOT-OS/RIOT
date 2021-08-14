@@ -24,7 +24,6 @@
  *   http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf
  */
 
-
 /* PACKET VECTOR #1 (Page 27) */
 static uint8_t TEST_1_KEY[] = {
     0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
@@ -240,7 +239,6 @@ static void test_crypto_modes_cbc_decrypt(void)
     test_decrypt_op_256(TEST_3_KEY, TEST_3_KEY_LEN, TEST_IV, TEST_3_CIPHER,
                     TEST_CIPHER_LEN, TEST_PLAIN, TEST_PLAIN_LEN);
 }
-
 
 Test *tests_crypto_modes_cbc_tests(void)
 {

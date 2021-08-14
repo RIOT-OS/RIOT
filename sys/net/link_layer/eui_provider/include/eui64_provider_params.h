@@ -66,7 +66,6 @@ extern "C" {
                                 },
 #endif
 
-
 /**
  * @name    EUI-64 sources on the board
  *

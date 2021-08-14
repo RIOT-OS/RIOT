@@ -150,7 +150,6 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C || defined(DOXYGEN) */
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN || defined(DOXYGEN) */
 
-
 #ifdef __cplusplus
 }
 #endif

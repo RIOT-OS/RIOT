@@ -21,7 +21,6 @@
  * @}
  */
 
-
 #include "cpu.h"
 #include "board.h"
 
@@ -196,7 +195,6 @@ void msp430_init_dco(void)
     BCSCTL2 = 0;          /* get MCLK and SMCLK from DCO, without divisor */
     BCSCTL3 = XCAP_1;     /* default value for LFXT1 capacitor and frequency */
 }
-
 
 /* "public" specific initialization function for the Zolertia Z1 hardware */
 

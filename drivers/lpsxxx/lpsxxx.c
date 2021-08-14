@@ -214,7 +214,6 @@ int lpsxxx_enable(const lpsxxx_t *dev)
             LPSXXX_CTRL_REG1_BDU | (DEV_RATE << LPSXXX_CTRL_REG1_ODR_POS);
 #endif
 
-
     DEBUG("[lpsxxx] enable: update reg1 with %02X\n", tmp);
 
     if (i2c_write_reg(DEV_I2C, DEV_ADDR, LPSXXX_REG_CTRL_REG1, tmp, 0) < 0) {

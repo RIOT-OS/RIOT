@@ -30,7 +30,6 @@
  */
 saul_reg_t *saul_reg = NULL;
 
-
 int saul_reg_add(saul_reg_t *dev)
 {
     saul_reg_t *tmp = saul_reg;

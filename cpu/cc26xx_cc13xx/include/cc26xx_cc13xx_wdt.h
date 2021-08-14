@@ -23,7 +23,6 @@
 extern "C" {
 #endif
 
-
 /**
  * WDT registers
  */

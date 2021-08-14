@@ -102,7 +102,6 @@ int main(void)
                        thread1, NULL, "nr3");
     puts("THREADS CREATED\n");
 
-
     timer.callback = timer_cb;
     xtimer_set(&timer, OFFSET);
 

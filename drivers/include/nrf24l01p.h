@@ -52,7 +52,6 @@ typedef enum {
     NRF24L01P_AW_5BYTE  /**< address width is 5 Byte */
 } nrf24l01p_aw_t;
 
-
 /**
  * @brief   Defines the RF datarate.
  */
@@ -121,7 +120,6 @@ typedef enum {
 typedef enum {
     RCV_PKT_NRF24L01P = 0,  /**< transceiver received data */
 } nrf24l01p_rx_event_t ;
-
 
 /**
 * @brief   Read one register of the nrf24l01+ transceiver.

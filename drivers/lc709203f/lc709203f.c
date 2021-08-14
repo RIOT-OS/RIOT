@@ -47,7 +47,6 @@ static uint8_t _get_crc(uint8_t *rec_values, uint8_t len)
     return crc;
 }
 
-
 int lc709203f_init(lc709203f_t *dev, const lc709203f_params_t *params)
 {
     assert(dev && params);

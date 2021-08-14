@@ -49,7 +49,6 @@ static gnrc_netif_t _netif[W5100_NUM];
  */
 static char stack[W5100_NUM][MAC_STACKSIZE];
 
-
 void auto_init_w5100(void)
 {
     for (unsigned i = 0; i < W5100_NUM; i++) {

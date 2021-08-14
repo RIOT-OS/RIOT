@@ -77,7 +77,6 @@ static gnrc_pktsnip_t *_build_ipv6_packet(const ipv6_addr_t *src,
     return gnrc_pkt_append(payload, netif_hdr_snip);
 }
 
-
 bool _inject_packet_aux(const ipv6_addr_t *src, const ipv6_addr_t *dst,
                         uint8_t proto, void *data, size_t data_len,
                         uint16_t netif, const inject_aux_t *aux)

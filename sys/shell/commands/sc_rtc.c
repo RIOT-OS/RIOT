@@ -42,7 +42,6 @@ static int dow(int year, int month, int day)
     return (year + year/4 - year/100 + year/400 + t[month-1] + day) % 7;
 }
 
-
 static int _parse_time(char **argv, struct tm *time)
 {
     short i;

@@ -57,7 +57,6 @@ typedef union {
     uint64_t bits;             /**< Value of Bits in a received cycle */
 } dcf77_bits_t;                /**< Union which contains the Bitfields struct */
 
-
 /**
  * @brief device internal states
  */
@@ -66,7 +65,6 @@ enum {
     DCF77_STATE_START,           /**< Device is searching the start for a new minute */
     DCF77_STATE_RX,              /**< Device is in RX mode */
 };
-
 
 #ifdef __cplusplus
 }

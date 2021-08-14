@@ -190,7 +190,6 @@ static inline void irq_handler(qdec_t qdec)
     cortexm_isr_end();
 }
 
-
 #ifdef QDEC_0_ISR
 void QDEC_0_ISR(void)
 {

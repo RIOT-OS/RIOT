@@ -89,7 +89,6 @@ int tlsf_add_global_pool(void *mem, size_t bytes);
  */
 tlsf_t _tlsf_get_global_control(void);
 
-
 #ifdef __cplusplus
 }
 #endif
