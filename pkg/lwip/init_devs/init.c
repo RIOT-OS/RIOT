@@ -49,6 +49,11 @@ void lwip_netif_init_devs(void)
         auto_init_sam0_eth();
     }
 
+    if (IS_USED(MODULE_STM32_ETH)) {
+        extern void auto_init_stm32_eth(void);
+        auto_init_stm32_eth();
+    }
+
     if (IS_USED(MODULE_NETDEV_TAP)) {
         extern void auto_init_netdev_tap(void);
         auto_init_netdev_tap();
