@@ -34,6 +34,16 @@
 extern "C" {
 #endif
 
+/* Note: This value if configurable for test purposes. Do not override it.
+ *       Changing this value may lead to errors that are hard to track down.
+ */
+#ifndef GNRC_TCP_NO_TIMEOUT
+/**
+ * @brief Special timeout value representing no timeout.
+ */
+#define GNRC_TCP_NO_TIMEOUT (UINT32_MAX)
+#endif
+
 /**
  * @brief Address information for a single TCP connection endpoint.
  * @extends sock_tcp_ep_t
@@ -172,7 +182,9 @@ int gnrc_tcp_listen(gnrc_tcp_tcb_queue_t *queue, gnrc_tcp_tcb_t *tcbs, size_t tc
  *
  * @param[in]  queue                      Listening queue to accept connection from.
  * @param[out] tcb                        Pointer to TCB associated with a established connection.
- * @param[in]  user_timeout_duration_ms   User specified timeout in milliseconds.
+ * @param[in]  user_timeout_duration_ms   User specified timeout in milliseconds. If
+ *                                        GNRC_TCP_NO_TIMEOUT the function blocks until a
+ *                                        connection was established or an error occurred.
  *
  * @return 0 on success.
  * @return -ENOMEM if all connection in @p queue were already accepted.
@@ -182,7 +194,7 @@ int gnrc_tcp_listen(gnrc_tcp_tcb_queue_t *queue, gnrc_tcp_tcb_t *tcbs, size_t tc
  *                    could be established.
  */
 int gnrc_tcp_accept(gnrc_tcp_tcb_queue_t *queue, gnrc_tcp_tcb_t **tcb,
-                    uint32_t user_timeout_duration_ms);
+                    const uint32_t user_timeout_duration_ms);
 
 /**
  * @brief Transmit data to connected peer.
@@ -199,6 +211,9 @@ int gnrc_tcp_accept(gnrc_tcp_tcb_queue_t *queue, gnrc_tcp_tcb_t **tcb,
  * @param[in]     user_timeout_duration_ms   If not zero and there was not data transmitted
  *                                           the function returns after user_timeout_duration_ms.
  *                                           If zero, no timeout will be triggered.
+ *                                           If GNRC_TCP_NO_TIMEOUT the timeout is disabled
+ *                                           causing the function to block until some data was
+ *                                           transmitted or and error occurred.
  *
  * @return   The number of successfully transmitted bytes.
  * @return   -ENOTCONN if connection is not established.
@@ -228,6 +243,9 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
  *                                           returns immediately. If not zero the function
  *                                           blocks until data is available or
  *                                           @p user_timeout_duration_ms milliseconds passed.
+ *                                           If GNRC_TCP_NO_TIMEOUT, causing the function to
+ *                                           block until some data was available or an error
+ *                                           occurred.
  *
  * @return   The number of bytes read into @p data.
  * @return   0, if the connection is closing and no further data can be read.
