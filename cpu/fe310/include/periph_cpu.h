@@ -60,10 +60,10 @@ typedef uint8_t gpio_t;
  * @brief   Structure for UART configuration data
  */
 typedef struct {
-    uint32_t addr;            /**< UART control register address */
-    gpio_t   rx;              /**< RX pin */
-    gpio_t   tx;              /**< TX pin */
-    irqn_t   isr_num;         /**< ISR source number */
+    uint32_t addr;              /**< UART control register address */
+    gpio_t rx;                  /**< RX pin */
+    gpio_t tx;                  /**< TX pin */
+    irqn_t isr_num;             /**< ISR source number */
 } uart_conf_t;
 
 /**
