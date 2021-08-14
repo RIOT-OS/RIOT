@@ -24,6 +24,11 @@
  */
 void lwip_netif_init_devs(void)
 {
+    if (IS_USED(MODULE_ATWINC15X0)) {
+        extern void auto_init_atwinc15x0(void);
+        auto_init_atwinc15x0();
+    }
+
     if (IS_USED(MODULE_ESP_ETH)) {
         extern void auto_init_esp_eth(void);
         auto_init_esp_eth();
