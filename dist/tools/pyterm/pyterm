@@ -211,14 +211,20 @@ class SerCmd(cmd.Cmd):
             self.port = defaultport
         # if a TCP port is specified try to connect
         if self.tcp_serial:
-            if self.tcp_serial.find(':') >= 0:
-                host = self.tcp_serial.split(':')[0]
-                port = self.tcp_serial.split(':')[1]
+            # if this is an ipv6 address
+            if self.tcp_serial.find(']:') >= 0:
+                host = self.tcp_serial.split(']:')[0]
+                host = host.split('[')[1]
+                port = self.tcp_serial.split(']:')[1]
             else:
-                self.logger.warning("Host name for TCP connection is "
-                                    "missing, defaulting to \"localhost\"")
-                host = "localhost"
-                port = self.tcp_serial
+                if self.tcp_serial.find(':') >= 0:
+                    host = self.tcp_serial.split(':')[0]
+                    port = self.tcp_serial.split(':')[1]
+                else:
+                    self.logger.warning("Host name for TCP connection is "
+                                        "missing, defaulting to \"localhost\"")
+                    host = "localhost"
+                    port = self.tcp_serial
             self.logger.info("Connect to %s:%s"
                              % (host, port))
             try:
