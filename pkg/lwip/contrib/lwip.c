@@ -27,11 +27,6 @@
 #include "at86rf2xx_params.h"
 #endif
 
-#ifdef MODULE_ENC28J60
-#include "enc28j60.h"
-#include "enc28j60_params.h"
-#endif
-
 #ifdef MODULE_MRF24J40
 #include "mrf24j40.h"
 #include "mrf24j40_params.h"
@@ -68,10 +63,6 @@
 #define LWIP_NETIF_NUMOF        ARRAY_SIZE(at86rf2xx_params)
 #endif
 
-#ifdef MODULE_ENC28J60    /* is mutual exclusive with above ifdef */
-#define LWIP_NETIF_NUMOF        ARRAY_SIZE(enc28j60_params)
-#endif
-
 #ifdef MODULE_MRF24J40     /* is mutual exclusive with above ifdef */
 #define LWIP_NETIF_NUMOF        ARRAY_SIZE(mrf24j40_params)
 #endif
@@ -99,10 +90,6 @@ static struct netif netif[LWIP_NETIF_NUMOF];
 
 #ifdef MODULE_AT86RF2XX
 static at86rf2xx_t at86rf2xx_devs[LWIP_NETIF_NUMOF];
-#endif
-
-#ifdef MODULE_ENC28J60
-static enc28j60_t enc28j60_devs[LWIP_NETIF_NUMOF];
 #endif
 
 #ifdef MODULE_MRF24J40
@@ -147,15 +134,6 @@ void lwip_bootstrap(void)
         if (netif_add_noaddr(&netif[i], &at86rf2xx_devs[i].netdev.netdev, lwip_netdev_init,
                              tcpip_6lowpan_input) == NULL) {
             DEBUG("Could not add at86rf2xx device\n");
-            return;
-        }
-    }
-#elif defined(MODULE_ENC28J60)
-    for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
-        enc28j60_setup(&enc28j60_devs[i], &enc28j60_params[i], i);
-        if (netif_add_noaddr(&netif[0], &enc28j60_devs[i].netdev, lwip_netdev_init,
-                             tcpip_input) == NULL) {
-            DEBUG("Could not add enc28j60 device\n");
             return;
         }
     }
