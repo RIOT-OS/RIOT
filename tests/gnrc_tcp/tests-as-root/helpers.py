@@ -137,8 +137,11 @@ class _RiotTcpNode:
         self.child.sendline('gnrc_tcp_tcb_init')
         self.child.expect_exact('gnrc_tcp_tcb_init: returns')
 
-    def send(self, timeout_ms, payload_to_send):
+    def send(self, timeout_ms, payload_to_send, bytes_to_send=None):
         total_bytes = len(payload_to_send)
+
+        if bytes_to_send is None:
+            bytes_to_send = total_bytes
 
         # Verify that internal buffer can hold the given amount of data
         assert self._setup_internal_buffer() >= total_bytes
@@ -147,8 +150,8 @@ class _RiotTcpNode:
         self._write_data_to_internal_buffer(payload_to_send)
 
         # Send buffer contents via tcp
-        self.child.sendline('gnrc_tcp_send {}'.format(str(timeout_ms)))
-        self.child.expect_exact('gnrc_tcp_send: sent {}'.format(str(total_bytes)))
+        self.child.sendline('gnrc_tcp_send {} {}'.format(timeout_ms, bytes_to_send))
+        self.child.expect_exact('gnrc_tcp_send: sent {}'.format(bytes_to_send))
 
         # Verify that packet buffer is empty
         self._verify_pktbuf_empty()

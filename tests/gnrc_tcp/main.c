@@ -248,13 +248,17 @@ int gnrc_tcp_send_cmd(int argc, char **argv)
 {
     dump_args(argc, argv);
 
-    int timeout = atol(argv[1]);
-    size_t to_send = strlen(buffer);
+    size_t timeout = atol(argv[1]);
+    size_t to_send = atol(argv[2]);
     size_t sent = 0;
 
-    while (sent < to_send) {
+    do {
         int ret = gnrc_tcp_send(tcb, buffer + sent, to_send - sent, timeout);
         switch (ret) {
+            case 0:
+                printf("%s: returns 0\n", argv[0]);
+                return ret;
+
             case -ENOTCONN:
                 printf("%s: returns -ENOTCONN\n", argv[0]);
                 return ret;
@@ -272,7 +276,7 @@ int gnrc_tcp_send_cmd(int argc, char **argv)
                 return ret;
         }
         sent += ret;
-    }
+    } while (sent < to_send);
 
     printf("%s: sent %u\n", argv[0], (unsigned)sent);
     return sent;
@@ -286,7 +290,7 @@ int gnrc_tcp_recv_cmd(int argc, char **argv)
     size_t to_receive = atol(argv[2]);
     size_t rcvd = 0;
 
-    while (rcvd < to_receive) {
+    do {
         int ret = gnrc_tcp_recv(tcb, buffer + rcvd, to_receive - rcvd,
                                 timeout);
         switch (ret) {
@@ -315,7 +319,7 @@ int gnrc_tcp_recv_cmd(int argc, char **argv)
                 return ret;
         }
         rcvd += ret;
-    }
+    } while (rcvd < to_receive);
 
     printf("%s: received %u\n", argv[0], (unsigned)rcvd);
     return 0;
