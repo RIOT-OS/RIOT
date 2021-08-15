@@ -41,7 +41,7 @@ extern "C" {
 /**
  * @brief Transmission control block of GNRC TCP.
  */
-typedef struct _transmission_control_block {
+typedef struct sock_tcp {
     uint8_t address_family;                   /**< Address Family of local_addr / peer_addr */
 #ifdef MODULE_GNRC_IPV6
     uint8_t local_addr[sizeof(ipv6_addr_t)];  /**< Local IP address */
@@ -76,13 +76,13 @@ typedef struct _transmission_control_block {
     ringbuffer_t rcv_buf;    /**< Receive buffer data structure */
     mutex_t fsm_lock;        /**< Mutex for FSM access synchronization */
     mutex_t function_lock;   /**< Mutex for function call synchronization */
-    struct _transmission_control_block *next;   /**< Pointer next TCB */
+    struct sock_tcp *next;   /**< Pointer next TCB */
 } gnrc_tcp_tcb_t;
 
 /**
  * @brief Transmission control block queue.
  */
-typedef struct _transmission_control_block_queue {
+typedef struct sock_tcp_queue {
     mutex_t lock;         /**< Mutex for access synchronization */
     gnrc_tcp_tcb_t *tcbs; /**< Pointer to TCB sequence */
     size_t tcbs_len;      /**< Number of TCBs behind member tcbs */

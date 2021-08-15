@@ -26,8 +26,12 @@
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/tcp/tcb.h"
 
+#ifdef SOCK_HAS_IPV6
+#include "net/sock.h"
+#else
 #ifdef MODULE_GNRC_IPV6
 #include "net/gnrc/ipv6.h"
+#endif
 #endif
 
 #ifdef __cplusplus
@@ -44,6 +48,11 @@ extern "C" {
 #define GNRC_TCP_NO_TIMEOUT (UINT32_MAX)
 #endif
 
+#ifdef SOCK_HAS_IPV6
+/* Re-use sock endpoint if sock is available and supporting IPv6. */
+typedef struct _sock_tl_ep gnrc_tcp_ep_t;
+
+#else
 /**
  * @brief Address information for a single TCP connection endpoint.
  * @extends sock_tcp_ep_t
@@ -59,6 +68,7 @@ typedef struct {
     uint16_t netif;                        /**< Network interface ID */
     uint16_t port;                         /**< Port number (in host byte order) */
 } gnrc_tcp_ep_t;
+#endif
 
 /**
  * @brief Initialize TCP connection endpoint.

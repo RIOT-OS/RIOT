@@ -86,6 +86,10 @@ ifneq (,$(filter gnrc_sock_udp,$(USEMODULE)))
   USEMODULE += random     # to generate random ports
 endif
 
+ifneq (,$(filter gnrc_sock_tcp,$(USEMODULE)))
+  USEMODULE += gnrc_tcp
+endif
+
 ifneq (,$(filter gnrc_sock,$(USEMODULE)))
   USEMODULE += gnrc_netapi_mbox
   USEMODULE += sock
@@ -397,6 +401,9 @@ ifneq (,$(filter gnrc,$(USEMODULE)))
   endif
   ifneq (,$(filter sock_udp, $(USEMODULE)))
     USEMODULE += gnrc_sock_udp
+  endif
+  ifneq (,$(filter sock_tcp, $(USEMODULE)))
+    USEMODULE += gnrc_sock_tcp
   endif
 endif
 
