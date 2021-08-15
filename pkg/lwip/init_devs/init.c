@@ -26,6 +26,8 @@
  */
 void lwip_netif_init_devs(void)
 {
+    /* TODO: do for every eligible netdev */
+
     /* Ethernet interfaces
      * ------------------- */
 
@@ -80,6 +82,11 @@ void lwip_netif_init_devs(void)
     if (IS_USED(MODULE_NRF802154)) {
         extern void auto_init_nrf802154(void);
         auto_init_nrf802154();
+    }
+
+    if (IS_USED(MODULE_SOCKET_ZEP)) {
+        extern void auto_init_socket_zep(void);
+        auto_init_socket_zep();
     }
 }
 
