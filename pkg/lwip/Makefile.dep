@@ -84,6 +84,14 @@ ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter lwip_netif,$(USEMODULE)))
+  USEMODULE += netif
+endif
+
 ifneq (,$(filter lwip_dhcp_auto,$(USEMODULE)))
   USEMODULE += lwip_dhcp
+endif
+
+ifneq (,$(filter netif,$(USEMODULE)))
+  USEMODULE += fmt
 endif
