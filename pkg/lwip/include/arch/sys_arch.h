@@ -116,7 +116,6 @@ static inline void sys_mbox_set_invalid(sys_mbox_t *mbox)
 
 typedef kernel_pid_t sys_thread_t;      /**< Platform specific thread type */
 
-#if DEVELHELP
 /**
  * @name    Functions for locking/unlocking core to assure thread safety.
  * @{
@@ -126,7 +125,6 @@ void sys_lock_tcpip_core(void);
 void sys_unlock_tcpip_core(void);
 #define UNLOCK_TCPIP_CORE()        sys_unlock_tcpip_core()
 /** @} */
-#endif
 
 #ifdef MODULE_RANDOM
 /**
