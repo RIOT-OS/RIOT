@@ -76,6 +76,11 @@ void lwip_netif_init_devs(void)
         extern void auto_init_mrf24j40(void);
         auto_init_mrf24j40();
     }
+
+    if (IS_USED(MODULE_NRF802154)) {
+        extern void auto_init_nrf802154(void);
+        auto_init_nrf802154();
+    }
 }
 
 struct netif *lwip_add_ethernet(struct netif *netif, netdev_t *state)

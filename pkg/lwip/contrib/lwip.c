@@ -27,14 +27,6 @@
 #include "socket_zep_params.h"
 #endif
 
-#ifdef MODULE_NRF802154
-#include "nrf802154.h"
-#endif
-
-#if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC)
-#include "net/netdev/ieee802154_submac.h"
-#endif
-
 #include "lwip.h"
 #include "lwip_init_devs.h"
 
@@ -45,21 +37,12 @@
 #define LWIP_NETIF_NUMOF        ARRAY_SIZE(socket_zep_params)
 #endif
 
-/* is mutual exclusive with above ifdef */
-#ifdef MODULE_NRF802154
-#define LWIP_NETIF_NUMOF        (1)
-#endif
-
 #ifdef LWIP_NETIF_NUMOF
 static struct netif netif[LWIP_NETIF_NUMOF];
 #endif
 
 #ifdef MODULE_SOCKET_ZEP
 static socket_zep_t socket_zep_devs[LWIP_NETIF_NUMOF];
-#endif
-
-#ifdef MODULE_NRF802154
-static netdev_ieee802154_submac_t nrf802154_netdev;
 #endif
 
 void lwip_bootstrap(void)
@@ -75,17 +58,6 @@ void lwip_bootstrap(void)
             DEBUG("Could not add socket_zep device\n");
             return;
         }
-    }
-#elif defined(MODULE_NRF802154)
-    netdev_register(&nrf802154_netdev.dev.netdev, NETDEV_NRF802154, 0);
-    netdev_ieee802154_submac_init(&nrf802154_netdev);
-
-    nrf802154_hal_setup(&nrf802154_netdev.submac.dev);
-    nrf802154_init();
-    if (netif_add_noaddr(&netif[0], &nrf802154_netdev.dev.netdev, lwip_netdev_init,
-                         tcpip_6lowpan_input) == NULL) {
-        DEBUG("Could not add nrf802154 device\n");
-        return;
     }
 #endif
 #endif
