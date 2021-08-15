@@ -22,11 +22,6 @@
 #include "lwip/netifapi.h"
 #include "netif/lowpan6.h"
 
-#ifdef MODULE_AT86RF2XX
-#include "at86rf2xx.h"
-#include "at86rf2xx_params.h"
-#endif
-
 #ifdef MODULE_SOCKET_ZEP
 #include "socket_zep.h"
 #include "socket_zep_params.h"
@@ -46,11 +41,7 @@
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
-#ifdef MODULE_AT86RF2XX
-#define LWIP_NETIF_NUMOF        ARRAY_SIZE(at86rf2xx_params)
-#endif
-
-#ifdef MODULE_SOCKET_ZEP   /* is mutual exclusive with above ifdef */
+#ifdef MODULE_SOCKET_ZEP
 #define LWIP_NETIF_NUMOF        ARRAY_SIZE(socket_zep_params)
 #endif
 
@@ -61,10 +52,6 @@
 
 #ifdef LWIP_NETIF_NUMOF
 static struct netif netif[LWIP_NETIF_NUMOF];
-#endif
-
-#ifdef MODULE_AT86RF2XX
-static at86rf2xx_t at86rf2xx_devs[LWIP_NETIF_NUMOF];
 #endif
 
 #ifdef MODULE_SOCKET_ZEP
@@ -80,16 +67,7 @@ void lwip_bootstrap(void)
     lwip_netif_init_devs();
     /* TODO: do for every eligible netdev */
 #ifdef LWIP_NETIF_NUMOF
-#if defined(MODULE_AT86RF2XX)
-    for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
-        at86rf2xx_setup(&at86rf2xx_devs[i], &at86rf2xx_params[i], i);
-        if (netif_add_noaddr(&netif[i], &at86rf2xx_devs[i].netdev.netdev, lwip_netdev_init,
-                             tcpip_6lowpan_input) == NULL) {
-            DEBUG("Could not add at86rf2xx device\n");
-            return;
-        }
-    }
-#elif defined(MODULE_SOCKET_ZEP)
+#if defined(MODULE_SOCKET_ZEP)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         socket_zep_setup(&socket_zep_devs[i], &socket_zep_params[i], i);
         if (netif_add_noaddr(&netif[i], &socket_zep_devs[i].netdev.netdev, lwip_netdev_init,

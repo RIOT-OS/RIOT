@@ -67,6 +67,11 @@ void lwip_netif_init_devs(void)
     /* 6LoWPAN interfaces
      * ------------------ */
 
+    if (IS_USED(MODULE_AT86RF2XX)) {
+        extern void auto_init_at86rf2xx(void);
+        auto_init_at86rf2xx();
+    }
+
     if (IS_USED(MODULE_MRF24J40)) {
         extern void auto_init_mrf24j40(void);
         auto_init_mrf24j40();
