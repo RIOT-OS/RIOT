@@ -41,11 +41,6 @@ extern "C" {
 #define GNRC_NETIF_PKTQ_DEQUEUE_MSG     (0x1233)
 
 /**
- * @brief   Message type for @ref netdev_event_t "netdev events"
- */
-#define NETDEV_MSG_TYPE_EVENT           (0x1234)
-
-/**
  * @brief   Acquires exclusive access to the interface
  *
  * @param[in] netif the network interface

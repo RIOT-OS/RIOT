@@ -139,7 +139,6 @@ typedef struct {
      * @see net_gnrc_netif_flags
      */
     uint32_t flags;
-#if IS_USED(MODULE_GNRC_NETIF_EVENTS) || defined(DOXYGEN)
     /**
      * @brief   Event queue for asynchronous events
      */
@@ -148,7 +147,6 @@ typedef struct {
      * @brief   ISR event for the network device
      */
     event_t event_isr;
-#endif /* MODULE_GNRC_NETIF_EVENTS */
 #if (GNRC_NETIF_L2ADDR_MAXLEN > 0) || DOXYGEN
     /**
      * @brief   The link-layer address currently used as the source address
