@@ -859,14 +859,18 @@ static void _tx_end(at86rf215_t *dev, netdev_event_t event)
 
 static void _ack_timeout_cb(void* arg) {
     at86rf215_t *dev = arg;
+    netdev_t *netdev = &dev->netdev.netdev;
+
     dev->timeout = AT86RF215_TIMEOUT_ACK;
-    msg_send_int(&dev->timer_msg, dev->timer_msg.sender_pid);
+    netdev->event_callback(netdev, NETDEV_EVENT_ISR);
 }
 
 static void _backoff_timeout_cb(void* arg) {
     at86rf215_t *dev = arg;
+    netdev_t *netdev = &dev->netdev.netdev;
+
     dev->timeout = AT86RF215_TIMEOUT_CSMA;
-    msg_send_int(&dev->timer_msg, dev->timer_msg.sender_pid);
+    netdev->event_callback(netdev, NETDEV_EVENT_ISR);
 }
 
 static void _set_idle(at86rf215_t *dev)
@@ -887,9 +891,6 @@ static void _set_idle(at86rf215_t *dev)
 /* wake up the radio thread after ACK timeout */
 static void _start_ack_timer(at86rf215_t *dev)
 {
-    dev->timer_msg.type = NETDEV_MSG_TYPE_EVENT;
-    dev->timer_msg.sender_pid = thread_getpid();
-
     dev->timer.arg = dev;
     dev->timer.callback = _ack_timeout_cb;
 
@@ -917,9 +918,6 @@ static void _start_backoff_timer(at86rf215_t *dev)
 
     DEBUG("Set CSMA backoff to %"PRIu32" (be %u min %u max %u base: %"PRIu32")\n",
           csma_backoff_usec, be, dev->csma_minbe, dev->csma_maxbe, base);
-
-    dev->timer_msg.type = NETDEV_MSG_TYPE_EVENT;
-    dev->timer_msg.sender_pid = thread_getpid();
 
     dev->timer.arg = dev;
     dev->timer.callback = _backoff_timeout_cb;
