@@ -69,8 +69,7 @@ static int _confirm_transmit(ieee802154_dev_t *dev, ieee802154_tx_info_t *info)
 {
     (void) dev;
 
-    if (RFCORE->XREG_FSMSTAT1bits.TX_ACTIVE != 0
-            || !(RFCORE_XREG_CSPCTRL & CC2538_CSP_MCU_CTRL_MASK)) {
+    if (cc2538_tx_busy) {
         return -EAGAIN;
     }
 
@@ -296,7 +295,9 @@ static int _request_set_trx_state(ieee802154_dev_t *dev, ieee802154_trx_state_t 
 {
 
     (void) dev;
+    int irq = irq_disable();
     if (cc2538_tx_busy || cc2538_rx_busy) {
+        irq_restore(irq);
         return -EBUSY;
     }
 
@@ -306,6 +307,7 @@ static int _request_set_trx_state(ieee802154_dev_t *dev, ieee802154_trx_state_t 
             if (RFCORE->XREG_FSMSTAT0bits.FSM_FFCTRL_STATE != FSM_STATE_IDLE) {
                 RFCORE_SFR_RFST = ISRFOFF;
             }
+            cc2538_rx_busy = false;
             break;
         case IEEE802154_TRX_STATE_RX_ON:
             RFCORE_XREG_RFIRQM0 |= RXPKTDONE;
@@ -316,6 +318,10 @@ static int _request_set_trx_state(ieee802154_dev_t *dev, ieee802154_trx_state_t 
             break;
     }
 
+    RFCORE_SFR_RFIRQF0 = 0;
+    RFCORE_SFR_RFIRQF1 = 0;
+
+    irq_restore(irq);
     return 0;
 }
 
