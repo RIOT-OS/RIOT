@@ -200,12 +200,7 @@ static void _driver_cb(netdev_t *dev, netdev_event_t event)
     gnrc_lorawan_t *mac = &netif->lorawan.mac;
 
     if (event == NETDEV_EVENT_ISR) {
-        msg_t msg = { .type = NETDEV_MSG_TYPE_EVENT,
-                      .content = { .ptr = netif } };
-
-        if (msg_send(&msg, netif->pid) <= 0) {
-            DEBUG("gnrc_netif: possibly lost interrupt.\n");
-        }
+        event_post(&netif->evq, &netif->event_isr);
     }
     else {
         DEBUG("gnrc_netif: event triggered -> %i\n", event);
