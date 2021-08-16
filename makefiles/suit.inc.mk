@@ -27,7 +27,7 @@ SUIT_CLASS ?= $(BOARD)
 
 #
 $(SUIT_MANIFEST): $(SLOT0_RIOT_BIN) $(SLOT1_RIOT_BIN)
-	$(RIOTBASE)/dist/tools/suit/gen_manifest.py \
+	$(Q)$(RIOTBASE)/dist/tools/suit/gen_manifest.py \
 	  --urlroot $(SUIT_COAP_ROOT) \
 	  --seqnr $(SUIT_SEQNR) \
 	  --uuid-vendor $(SUIT_VENDOR) \
@@ -36,19 +36,19 @@ $(SUIT_MANIFEST): $(SLOT0_RIOT_BIN) $(SLOT1_RIOT_BIN)
 	  $(SLOT0_RIOT_BIN):$(SLOT0_OFFSET) \
 	  $(SLOT1_RIOT_BIN):$(SLOT1_OFFSET)
 
-	$(SUIT_TOOL) create -f suit -i $@.tmp -o $@
+	$(Q)$(SUIT_TOOL) create -f suit -i $@.tmp -o $@
 
-	rm -f $@.tmp
+	$(Q)rm -f $@.tmp
 
 
 $(SUIT_MANIFEST_SIGNED): $(SUIT_MANIFEST) $(SUIT_SEC)
-	$(SUIT_TOOL) sign -k $(SUIT_SEC) -m $(SUIT_MANIFEST) -o $@
+	$(Q)$(SUIT_TOOL) sign -k $(SUIT_SEC) -m $(SUIT_MANIFEST) -o $@
 
 $(SUIT_MANIFEST_LATEST): $(SUIT_MANIFEST)
-	@ln -f -s $< $@
+	$(Q)ln -f -s $< $@
 
 $(SUIT_MANIFEST_SIGNED_LATEST): $(SUIT_MANIFEST_SIGNED)
-	@ln -f -s $< $@
+	$(Q)ln -f -s $< $@
 
 SUIT_MANIFESTS := $(SUIT_MANIFEST) \
                   $(SUIT_MANIFEST_LATEST) \
@@ -58,15 +58,15 @@ SUIT_MANIFESTS := $(SUIT_MANIFEST) \
 suit/manifest: $(SUIT_MANIFESTS)
 
 suit/publish: $(SUIT_MANIFESTS) $(SLOT0_RIOT_BIN) $(SLOT1_RIOT_BIN)
-	@mkdir -p $(SUIT_COAP_FSROOT)/$(SUIT_COAP_BASEPATH)
-	@cp $^ $(SUIT_COAP_FSROOT)/$(SUIT_COAP_BASEPATH)
-	@for file in $^; do \
+	$(Q)mkdir -p $(SUIT_COAP_FSROOT)/$(SUIT_COAP_BASEPATH)
+	$(Q)cp $^ $(SUIT_COAP_FSROOT)/$(SUIT_COAP_BASEPATH)
+	$(Q)for file in $^; do \
 		echo "published \"$$file\""; \
 		echo "       as \"$(SUIT_COAP_ROOT)/$$(basename $$file)\""; \
 	done
 
 suit/notify: | $(filter suit/publish, $(MAKECMDGOALS))
-	@test -n "$(SUIT_CLIENT)" || { echo "error: SUIT_CLIENT unset!"; false; }
+	$(Q)test -n "$(SUIT_CLIENT)" || { echo "error: SUIT_CLIENT unset!"; false; }
 	aiocoap-client -m POST "coap://$(SUIT_CLIENT)/suit/trigger" \
 		--payload "$(SUIT_COAP_ROOT)/$(SUIT_NOTIFY_MANIFEST)" && \
 		echo "Triggered $(SUIT_CLIENT) to update."
