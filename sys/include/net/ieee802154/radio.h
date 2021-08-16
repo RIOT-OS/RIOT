@@ -157,6 +157,18 @@ typedef enum {
      * set if the source address matches one from the table.
      */
     IEEE802154_CAP_SRC_ADDR_MATCH       = BIT18,
+    /**
+     * @brief the device stays in RX_ON on @ref
+     * IEEE802154_RADIO_INDICATION_RX_DONE or @ref
+     * IEEE802154_RADIO_INDICATION_CRC_ERROR
+     *
+     * Radios that provide this feature don't need to call @ref
+     * ieee802154_radio_request_set_trx_state on after receiving a frame, in
+     * case more frames are expected. This does not affect Framebuffer
+     * protection (e.g a radio might still be listening but its framebuffer is
+     * locked because the upper layer didn't call @ref ieee802154_radio_read)
+     */
+    IEEE802154_CAP_RX_CONTINUOUS        = BIT19,
 } ieee802154_rf_caps_t;
 
 /**
@@ -1408,6 +1420,22 @@ static inline bool ieee802154_radio_has_phy_mr_fsk(ieee802154_dev_t *dev)
 static inline uint32_t ieee802154_radio_get_phy_modes(ieee802154_dev_t *dev)
 {
     return (dev->driver->caps & IEEE802154_RF_CAPS_PHY_MASK);
+}
+
+/**
+ * @brief Check whether the radio stays in RX_ON after @ref
+ *        IEEE802154_RADIO_INDICATION_RX_DONE or @ref
+ *        IEEE802154_RADIO_INDICATION_CRC_ERROR events (see @ref
+ *        IEEE802154_CAP_RX_CONTINUOUS)
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return true if the device stays in RX_ON state
+ * @return false otherwise
+ */
+static inline bool ieee802154_radio_has_rx_continuous(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_CAP_RX_CONTINUOUS);
 }
 
 /**
