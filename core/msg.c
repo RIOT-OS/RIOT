@@ -56,7 +56,9 @@ static int queue_msg(thread_t *target, const msg_t *m)
     *dest = *m;
 #if MODULE_CORE_THREAD_FLAGS
     target->flags |= THREAD_FLAG_MSG_WAITING;
-    thread_flags_wake(target);
+    if (thread_flags_wake(target)) {
+        thread_yield_higher();
+    }
 #endif
     return 1;
 }
