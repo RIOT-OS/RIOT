@@ -87,6 +87,8 @@ typedef enum {
     DOSE_STATE_IDLE    = 0x02,     /**< Frames will be received or sent */
     DOSE_STATE_RECV    = 0x03,     /**< Currently receiving a frame */
     DOSE_STATE_SEND    = 0x04,     /**< Currently sending a frame */
+    DOSE_STATE_STANDBY = 0x05,     /**< Receiver is turned off, but send will wake it up */
+    DOSE_STATE_SLEEP   = 0x06,     /**< Receiver is turned off and send will be discarded */
     DOSE_STATE_ANY     = 0x0F      /**< Special state filter used internally to observe any state transition */
 } dose_state_t;
 
@@ -158,6 +160,7 @@ typedef struct {
 #if !defined(MODULE_PERIPH_UART_RXSTART_IRQ) || DOXYGEN
     gpio_t sense_pin;                       /**< GPIO to sense for start bits on the UART's rx line */
 #endif
+    gpio_t standby_pin;                     /**< GPIO to put the CAN transceiver in standby mode */
     xtimer_t timeout;                       /**< Timeout timer ensuring always to get back to IDLE state */
     uint32_t timeout_base;                  /**< Base timeout in us */
 } dose_t;
@@ -170,6 +173,7 @@ typedef struct {
 #if !defined(MODULE_PERIPH_UART_RXSTART_IRQ) || DOXYGEN
     gpio_t sense_pin;                       /**< GPIO to sense for start bits on the UART's rx line */
 #endif
+    gpio_t standby_pin;                     /**< GPIO to put the CAN transceiver in standby mode */
     uint32_t baudrate;                      /**< Baudrate to UART device */
 } dose_params_t;
 
