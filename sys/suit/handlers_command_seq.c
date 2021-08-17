@@ -488,8 +488,14 @@ static int _dtv_verify_image_match(suit_manifest_t *manifest, int key,
     LOG_INFO("Starting digest verification against image\n");
     res = _validate_payload(comp, digest, img_size);
     if (res == SUIT_OK) {
-        LOG_INFO("Install correct payload\n");
-        suit_storage_install(comp->storage_backend, manifest);
+        if (!suit_component_check_flag(comp, SUIT_COMPONENT_STATE_INSTALLED)) {
+            LOG_INFO("Install correct payload\n");
+            suit_storage_install(comp->storage_backend, manifest);
+            suit_component_set_flag(comp, SUIT_COMPONENT_STATE_INSTALLED);
+        }
+        if (suit_component_check_flag(comp, SUIT_COMPONENT_STATE_INSTALLED)) {
+            LOG_INFO("Verified installed payload\n");
+        }
     }
     else {
         LOG_INFO("Erasing bad payload\n");
