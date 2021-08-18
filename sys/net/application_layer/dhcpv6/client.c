@@ -968,7 +968,9 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                 }
                 break;
             case DHCPV6_OPT_IA_NA:
-                ia_na = (dhcpv6_opt_ia_na_t *)opt;
+                if (IS_USED(MODULE_DHCPV6_CLIENT_IA_NA)) {
+                    ia_na = (dhcpv6_opt_ia_na_t *)opt;
+                }
                 break;
             case DHCPV6_OPT_SMR:
                 smr = (dhcpv6_opt_smr_t *)opt;
