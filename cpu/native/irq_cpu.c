@@ -201,6 +201,11 @@ unsigned irq_enable(void)
 
     _native_syscall_leave();
 
+    if (_native_in_isr == 0 && sched_context_switch_request) {
+        DEBUG("irq_enable() deferred thread_yield_higher()\n");
+        thread_yield_higher();
+    }
+
     DEBUG("irq_enable(): return\n");
 
     return prev_state;
