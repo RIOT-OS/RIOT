@@ -84,7 +84,10 @@ void dhcpv6_client_conf_prefix(unsigned iface, const ipv6_addr_t *pfx,
 {
     gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
     int idx = gnrc_netif_ipv6_add_prefix(netif, pfx, pfx_len, valid, pref);
-    if (idx >= 0) {
+    if ((idx >= 0) && (pfx_len != IPV6_ADDR_BIT_LEN)) {
+        /* start advertising subnet obtained via DHCPv6 */
+        gnrc_ipv6_nib_change_rtr_adv_iface(netif, true);
+        /* configure this router as RPL root */
         gnrc_rpl_configure_root(netif, &netif->ipv6.addrs[idx]);
     }
 }
