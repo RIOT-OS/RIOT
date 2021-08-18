@@ -57,13 +57,12 @@ typedef struct {
  * @brief Init the IEEE 802.15.4 SubMAC netdev adoption.
  *
  * @param[in] netdev_submac pointer to the netdev submac descriptor.
- * @param[in] dev pointer to the device associated to @p netdev_submac.
  *
  * @return 0 on success.
  * @return negative errno on failure.
  */
-int netdev_ieee802154_submac_init(netdev_ieee802154_submac_t *netdev_submac,
-                                  ieee802154_dev_t *dev);
+int netdev_ieee802154_submac_init(netdev_ieee802154_submac_t *netdev_submac);
+
 #ifdef __cplusplus
 }
 #endif

@@ -273,7 +273,7 @@ static const ieee802154_submac_cb_t _cb = {
 /* Event Notification callback */
 static void _hal_radio_cb(ieee802154_dev_t *dev, ieee802154_trx_ev_t status)
 {
-    ieee802154_submac_t *submac = dev->ctx;
+    ieee802154_submac_t *submac = container_of(dev, ieee802154_submac_t, dev);
     netdev_ieee802154_submac_t *netdev_submac = container_of(submac,
                                                              netdev_ieee802154_submac_t,
                                                              submac);
@@ -329,20 +329,17 @@ static int _init(netdev_t *netdev)
     return 0;
 }
 
-int netdev_ieee802154_submac_init(netdev_ieee802154_submac_t *netdev_submac,
-                                  ieee802154_dev_t *dev)
+int netdev_ieee802154_submac_init(netdev_ieee802154_submac_t *netdev_submac)
 {
     netdev_t *netdev = &netdev_submac->dev.netdev;
 
     netdev->driver = &netdev_submac_driver;
     ieee802154_submac_t *submac = &netdev_submac->submac;
 
-    submac->dev = dev;
     submac->cb = &_cb;
-    submac->dev->ctx = submac;
 
     /* Set the Event Notification */
-    submac->dev->cb = _hal_radio_cb;
+    submac->dev.cb = _hal_radio_cb;
 
     netdev_submac->ack_timer.callback = _ack_timeout;
     netdev_submac->ack_timer.arg = netdev_submac;

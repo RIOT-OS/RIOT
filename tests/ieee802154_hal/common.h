@@ -20,6 +20,13 @@
 
 #include "net/ieee802154/radio.h"
 
+#define RADIOS_NUMOF IS_USED(MODULE_CC2538_RF) + \
+                     IS_USED(MODULE_NRF802154)
+
+#if RADIOS_NUMOF == 0
+#error "Radio is not supported"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,8 +36,15 @@ extern "C" {
  * @internal
  * @{
  */
-void ieee802154_hal_test_init_devs(void);
-ieee802154_dev_t *ieee802154_hal_test_get_dev(int id);
+typedef enum {
+    IEEE802154_DEV_TYPE_CC2538_RF,
+    IEEE802154_DEV_TYPE_NRF802154,
+} ieee802154_dev_type_t;
+
+typedef ieee802154_dev_t* (*ieee802154_dev_cb_t)(ieee802154_dev_type_t type,
+                           void *opaque);
+
+void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque);
 /**
  * @}
  */

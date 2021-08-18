@@ -48,6 +48,13 @@
 #ifdef MODULE_AT86RF2XX
 static at86rf2xx_t at86rf2xx_dev;
 #endif
+#else
+#ifdef MODULE_CC2538_RF
+static ieee802154_dev_t cc2538_rf_dev;
+#endif
+#ifdef MODULE_NRF802154
+static ieee802154_dev_t nrf802154_hal_dev;
+#endif
 #endif
 
 static char _stack[OPENWSN_SCHED_STACKSIZE];
@@ -73,13 +80,13 @@ void* _radio_init_dev(void)
     #endif
 #else
     #ifdef MODULE_CC2538_RF
-        extern ieee802154_dev_t cc2538_rf_dev;
         dev = &cc2538_rf_dev;
+        cc2538_rf_hal_setup(dev);
         cc2538_init();
     #endif
     #ifdef MODULE_NRF802154
-        extern ieee802154_dev_t nrf802154_hal_dev;
         dev = &nrf802154_hal_dev;
+        nrf802154_hal_setup(dev);
         nrf802154_init();
     #endif
 #endif

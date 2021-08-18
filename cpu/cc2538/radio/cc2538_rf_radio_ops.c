@@ -32,9 +32,7 @@
 
 static const ieee802154_radio_ops_t cc2538_rf_ops;
 
-ieee802154_dev_t cc2538_rf_dev = {
-    .driver = &cc2538_rf_ops,
-};
+static ieee802154_dev_t *cc2538_rf_hal;
 
 static bool cc2538_tx_busy;     /**< used to indicate TX chain is busy */
 static bool cc2538_rx_busy;     /**< used to indicate RX chain is busy */
@@ -332,21 +330,21 @@ void cc2538_irq_handler(void)
     if ((flags_f0 & SFD)) {
         /* If the radio already transmitted, this SFD is the TX_START event */
         if (cc2538_tx_busy) {
-            cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_INDICATION_TX_START);
+            cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_INDICATION_TX_START);
         }
         /* If the RX chain was not busy, the detected SFD corresponds to a new
          * incoming frame. Note the automatic ACK frame also triggers this event.
          * Therefore, we use this variable to distinguish them. */
         else if (!cc2538_rx_busy){
             cc2538_rx_busy = true;
-            cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_INDICATION_RX_START);
+            cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_INDICATION_RX_START);
         }
     }
 
     if (flags_f1 & TXDONE) {
         /* TXDONE marks the end of the TX chain. The radio is not busy anymore */
         cc2538_tx_busy = false;
-        cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_CONFIRM_TX_DONE);
+        cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_CONFIRM_TX_DONE);
     }
 
     if (flags_f0 & RXPKTDONE) {
@@ -363,14 +361,14 @@ void cc2538_irq_handler(void)
                  */
                 cc2538_rx_busy = false;
             }
-            cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_INDICATION_RX_DONE);
+            cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_INDICATION_RX_DONE);
         }
         else {
             /* Disable RX while the frame has not been processed */
             RFCORE_XREG_RXMASKCLR = 0xFF;
             /* CRC failed; discard packet. The RX chain is not busy anymore */
             cc2538_rx_busy = false;
-            cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_INDICATION_CRC_ERROR);
+            cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_INDICATION_CRC_ERROR);
         }
     }
 
@@ -392,13 +390,13 @@ void cc2538_irq_handler(void)
             else {
                 /* In case of CCA failure the TX chain is not busy anymore */
                 cc2538_tx_busy = false;
-                cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_CONFIRM_TX_DONE);
+                cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_CONFIRM_TX_DONE);
             }
         }
         else {
             cc2538_cca_status = BOOLEAN(RFCORE->XREG_FSMSTAT1bits.CCA)
                                 && RFCORE->XREG_RSSISTATbits.RSSI_VALID;
-            cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_CONFIRM_CCA);
+            cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_CONFIRM_CCA);
         }
     }
 }
@@ -536,6 +534,15 @@ static int _set_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_
     return 0;
 
 }
+
+void cc2538_rf_hal_setup(ieee802154_dev_t *hal)
+{
+    /* We don't set hal->priv because the context of this device is global */
+    /* We need to store a reference to the HAL descriptor though for the ISR */
+    hal->driver = &cc2538_rf_ops;
+    cc2538_rf_hal = hal;
+}
+
 static const ieee802154_radio_ops_t cc2538_rf_ops = {
     .caps = IEEE802154_CAP_24_GHZ
           | IEEE802154_CAP_AUTO_CSMA

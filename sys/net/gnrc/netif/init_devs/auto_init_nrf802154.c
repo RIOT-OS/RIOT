@@ -22,6 +22,7 @@
 #include "nrf802154.h"
 #include "net/gnrc/netif/ieee802154.h"
 #include "include/init_devs.h"
+#include "net/netdev/ieee802154_submac.h"
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
@@ -38,16 +39,20 @@
 static char _stack[NRF802154_MAC_STACKSIZE];
 static gnrc_netif_t _netif;
 
-static nrf802154_t nrf802154_dev;
+static netdev_ieee802154_submac_t nrf802154_netdev;
 
 void auto_init_nrf802154(void)
 {
     LOG_DEBUG("[auto_init_netif] initializing nrf802154\n");
 
-    nrf802154_setup(&nrf802154_dev);
+    netdev_register(&nrf802154_netdev.dev.netdev, NETDEV_NRF802154, 0);
+    netdev_ieee802154_submac_init(&nrf802154_netdev);
+    nrf802154_hal_setup(&nrf802154_netdev.submac.dev);
+
+    nrf802154_init();
     gnrc_netif_ieee802154_create(&_netif, _stack,
                                  NRF802154_MAC_STACKSIZE,
                                  NRF802154_MAC_PRIO, "nrf802154",
-                                 &nrf802154_dev.netdev.dev.netdev);
+                                 &nrf802154_netdev.dev.netdev);
 }
 /** @} */
