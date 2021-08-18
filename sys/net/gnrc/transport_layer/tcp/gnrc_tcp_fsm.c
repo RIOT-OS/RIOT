@@ -112,8 +112,20 @@ static int _restart_timewait_timer(gnrc_tcp_tcb_t *tcb)
 {
     TCP_DEBUG_ENTER;
     _gnrc_tcp_eventloop_unsched(&tcb->event_timeout);
-    _gnrc_tcp_eventloop_sched(&tcb->event_timeout, 2 * CONFIG_GNRC_TCP_MSL_MS,
-                              MSG_TYPE_TIMEWAIT, tcb);
+
+    size_t val = CONFIG_GNRC_TCP_MSL_MS << 1;
+
+    /* Experimental feature "dynamic msl", calculate timewait timer value
+     * based on the current retransmission timeout.
+     */
+    if (IS_ACTIVE(CONFIG_GNRC_TCP_EXPERIMENTAL_DYN_MSL_EN)) {
+        size_t dyn_msl = CONFIG_GNRC_TCP_EXPERIMENTAL_DYN_MSL_RTO_MUL * tcb->rto;
+        if (dyn_msl < val) {
+            val = dyn_msl;
+        }
+    }
+    _gnrc_tcp_eventloop_sched(&tcb->event_timeout, val,
+                               MSG_TYPE_TIMEWAIT, tcb);
     TCP_DEBUG_LEAVE;
     return 0;
 }

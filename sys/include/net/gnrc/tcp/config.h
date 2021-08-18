@@ -185,6 +185,26 @@ extern "C" {
 #ifndef CONFIG_GNRC_TCP_EVENTLOOP_MSG_QUEUE_SIZE_EXP
 #define CONFIG_GNRC_TCP_EVENTLOOP_MSG_QUEUE_SIZE_EXP (3U)
 #endif
+
+/**
+ * @brief Enable experimental feature "dynamic msl". Disabled by default.
+ * @experimental This feature is experimental because it deviates from the TCP RFC.
+ * @note This features calculates the MSL based by multiplying the latest
+ *       retransmission timeout value with
+ *       CONFIG_GNRC_TCP_EXPERIMENTAL_DYN_MSL_RTO_MUL. This leads to much
+ *       faster return times on gnrc_tcp_close.
+ */
+#ifndef CONFIG_GNRC_TCP_EXPERIMENTAL_DYN_MSL_EN
+#define CONFIG_GNRC_TCP_EXPERIMENTAL_DYN_MSL_EN 0
+#endif
+
+/**
+ * @brief Set RTO multiplication factor if experimental feature "dynamic msl" is enabled.
+ * @experimental This feature is experimental because it deviates from the TCP RFC.
+ */
+#ifndef CONFIG_GNRC_TCP_EXPERIMENTAL_DYN_MSL_RTO_MUL
+#define CONFIG_GNRC_TCP_EXPERIMENTAL_DYN_MSL_RTO_MUL (4U)
+#endif
 /** @} */
 
 #ifdef __cplusplus

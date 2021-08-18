@@ -134,4 +134,23 @@ config GNRC_TCP_EVENTLOOP_MSG_QUEUE_SIZE_SIZE_EXP
         The number of elements in a message queue must be always a power of two.
         This value defines the exponent of 2^n.
 
+config GNRC_TCP_EXPERIMENTAL_DYN_MSL_EN
+    bool "Enable experimental feature \"dynamic MSL\""
+    default n
+    help
+        Enables the experimental feature \"dynamic maximum segment lifetime\".
+        This feature calulates the MSL by multiplying the latest retransmission timeout
+        value with a factor GNRC_TCP_EXPERIMENTAL_DYN_MSL_RTO_MUL instead
+        of using the constant GNRC_TCP_MSL_MS. Using the shorter MSL leads to a faster
+        connection teardown and therfore for a faster return of gnrc_tcp_close.
+
+config GNRC_TCP_EXPERIMENTAL_DYN_MSL_RTO_MUL
+    int "Multiplication factor for experimental feature \"dynamic MSL\""
+    default 4
+    depends on GNRC_TCP_EXPERIMENTAL_DYN_MSL_EN
+    help
+        Multiplication factor for the experimental feature \"dynamic maximum segment lifetime\".
+        This is the factor that is multiplied with the current retransmission timeout value
+        to determine the MSL value.
+
 endif # KCONFIG_USEMODULE_GNRC_TCP
