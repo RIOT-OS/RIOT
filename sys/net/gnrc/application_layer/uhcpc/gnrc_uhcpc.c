@@ -40,15 +40,6 @@ static void set_interface_roles(void)
                             sizeof(addr));
             ipv6_addr_from_str(&addr, "fe80::1");
             gnrc_ipv6_nib_ft_add(&defroute, IPV6_ADDR_BIT_LEN, &addr, dev, 0);
-
-            /* Disable router advertisements on upstream interface. With this,
-             * the border router
-             * 1. Does not confuse the upstream router to add the border router
-             *    to its default router list and
-             * 2. Solicits upstream Router Advertisements quicker to
-             *    auto-configure its upstream global address.
-             */
-            gnrc_ipv6_nib_change_rtr_adv_iface(netif, false);
         }
         else if ((!gnrc_wireless_interface) && (is_wired != 1)) {
             gnrc_wireless_interface = dev;
@@ -86,6 +77,9 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime,
     idx = gnrc_netif_ipv6_add_prefix(wireless, (ipv6_addr_t *)prefix, prefix_len,
                                      lifetime, lifetime);
     if (idx >= 0) {
+        /* start advertising subnet obtained via UHCP */
+        gnrc_ipv6_nib_change_rtr_adv_iface(wireless, true);
+        /* configure this router as RPL root */
         gnrc_rpl_configure_root(wireless, &wireless->ipv6.addrs[idx]);
     }
 }
