@@ -10,6 +10,7 @@ FEATURES_PROVIDED += periph_gpio_fast_read
 # It can still be used in normal and standby mode, but code that relies on it
 # being availiable during deep sleep / backup mode will not be portable here.
 FEATURES_PROVIDED += backup_ram
+FEATURES_PROVIDED += periph_rtc_mem
 
 ifeq (,$(filter $(CPU_MODELS_WITHOUT_HWRNG),$(CPU_MODEL)))
   FEATURES_PROVIDED += periph_hwrng

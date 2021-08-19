@@ -25,6 +25,7 @@
  */
 
 #include <stdint.h>
+#include <string.h>
 #include "periph/rtc.h"
 #include "periph/rtt.h"
 #include "periph_conf.h"
@@ -215,10 +216,70 @@ static void _rtt_clock_setup(void)
 #endif /* MODULE_PERIPH_RTT */
 #endif /* !CPU_COMMON_SAMD21 - Clock Setup */
 
+#ifdef MODULE_PERIPH_RTC_MEM
+/* first two GP registers are shared with COMP[0] / ALARM[0] */
+#ifdef RTC_MODE2_CTRLB_GP2EN
+#define RTC_GPR_START       (2)
+#else
+#define RTC_GPR_START       (0)
+#endif
+
+#define RTC_GPR_NUM_AVAIL   (RTC_GPR_NUM - RTC_GPR_START)
+#define RTC_MEM_SIZE        (RTC_GPR_NUM_AVAIL * sizeof(uint32_t))
+
+size_t rtc_mem_size(void)
+{
+    return RTC_MEM_SIZE;
+}
+
+static void _read_gp(uint32_t *dst)
+{
+    for (unsigned i = RTC_GPR_START; i < RTC_GPR_NUM; ++i) {
+        dst[i - RTC_GPR_START] = RTC->MODE0.GP[i].reg;
+    }
+}
+
+static void _write_gp(const uint32_t *src)
+{
+    for (unsigned i = RTC_GPR_START; i < RTC_GPR_NUM; ++i) {
+        _wait_syncbusy();
+        RTC->MODE0.GP[i].reg = src[i - RTC_GPR_START];
+    }
+}
+
+void rtc_mem_read(unsigned offset, void *data, size_t len)
+{
+    uint32_t tmp[RTC_GPR_NUM_AVAIL];
+
+    if (offset + len > RTC_MEM_SIZE) {
+        assert(0);
+        return;
+    }
+
+    _read_gp(tmp);
+    memcpy(data, ((uint8_t *)tmp) + offset, len);
+}
+
+void rtc_mem_write(unsigned offset, void *data, size_t len)
+{
+    uint32_t tmp[RTC_GPR_NUM_AVAIL];
+
+    if (offset + len > RTC_MEM_SIZE) {
+        assert(0);
+        return;
+    }
+
+    _read_gp(tmp);
+    memcpy(((uint8_t *)tmp) + offset, data, len);
+    _write_gp(tmp);
+}
+#endif /* MODULE_PERIPH_RTC_MEM */
+
 #ifdef MODULE_PERIPH_RTC
 static void _rtc_init(void)
 {
 #ifdef REG_RTC_MODE2_CTRLA
+    /* skip reset if already in RTC mode */
     if (RTC->MODE2.CTRLA.bit.MODE == RTC_MODE2_CTRLA_MODE_CLOCK_Val) {
         return;
     }
@@ -229,6 +290,11 @@ static void _rtc_init(void)
     RTC->MODE2.CTRLA.reg = RTC_MODE2_CTRLA_PRESCALER_DIV1024   /* CLK_RTC_CNT = 1KHz / 1024 -> 1Hz */
                          | RTC_MODE2_CTRLA_CLOCKSYNC           /* Clock Read Synchronization Enable */
                          | RTC_MODE2_CTRLA_MODE_CLOCK;
+#ifdef RTC_MODE2_CTRLB_GP2EN
+    /* RTC driver does not use COMP[1] or ALARM[1] */
+    /* Use second set of Compare registers as general purpose register */
+    RTC->MODE2.CTRLB.reg = RTC_MODE2_CTRLB_GP2EN;
+#endif
 #else
     if (RTC->MODE2.CTRL.bit.MODE == RTC_MODE2_CTRL_MODE_CLOCK_Val) {
         return;
@@ -268,9 +334,25 @@ void rtc_init(void)
 #ifdef MODULE_PERIPH_RTT
 void rtt_init(void)
 {
+
     _rtt_clock_setup();
     _poweron();
+
+#ifdef MODULE_PERIPH_RTC_MEM
+    uint32_t backup[RTC_GPR_NUM_AVAIL];
+    _read_gp(backup);
+#endif
+
     _rtt_reset();
+
+#ifdef MODULE_PERIPH_RTC_MEM
+#ifdef RTC_MODE2_CTRLB_GP2EN
+    /* RTC driver does not use COMP[1] or ALARM[1] */
+    /* Use second set of Compare registers as general purpose register */
+    RTC->MODE2.CTRLB.reg = RTC_MODE2_CTRLB_GP2EN;
+#endif
+    _write_gp(backup);
+#endif /* MODULE_PERIPH_RTC_MEM */
 
     /* set 32bit counting mode & enable the RTC */
 #ifdef REG_RTC_MODE0_CTRLA
