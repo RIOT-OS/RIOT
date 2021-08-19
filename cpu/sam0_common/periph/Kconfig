@@ -20,6 +20,13 @@ config MODULE_PERIPH_RTC_RTT
     bool
     default y if MODULE_PERIPH_RTT || MODULE_PERIPH_RTC
 
+config SAM0_PERIPH_RTT_RTC_PERSIST_GPR
+    bool
+    depends on MODULE_PERIPH_RTC_RTT
+    default n
+    help
+        Persist SAM0 RTC general purpose registers across RTC reset.
+
 config MODULE_PERIPH_UART_NONBLOCKING
     depends on HAS_PERIPH_UART_NONBLOCKING
     depends on MODULE_PERIPH_UART

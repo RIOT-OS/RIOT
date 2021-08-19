@@ -135,12 +135,24 @@ static inline void _rtc_set_enabled(bool on)
 
 static inline void _rtt_reset(void)
 {
+#if CONFIG_SAM0_PERIPH_RTT_RTC_PERSIST_GPR
+#ifdef RTC_GPR_NUM
+    uint32_t persist[RTC_GPR_NUM];
+    int i;
+    for (i = 0; i < RTC_GPR_NUM; i++) persist[i] = RTC->MODE0.GP[i].reg;
+#endif
+#endif
 #ifdef RTC_MODE0_CTRL_SWRST
     RTC->MODE0.CTRL.reg = RTC_MODE0_CTRL_SWRST;
     while (RTC->MODE0.CTRL.bit.SWRST) {}
 #else
     RTC->MODE0.CTRLA.reg = RTC_MODE2_CTRLA_SWRST;
     while (RTC->MODE0.CTRLA.bit.SWRST) {}
+#endif
+#if CONFIG_SAM0_PERIPH_RTT_RTC_PERSIST_GPR
+#ifdef RTC_GPR_NUM
+    for (i = 0; i < RTC_GPR_NUM; i++) RTC->MODE0.GP[i].reg = persist[i];
+#endif
 #endif
 }
 
