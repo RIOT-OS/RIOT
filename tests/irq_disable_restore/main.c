@@ -64,7 +64,7 @@ int main(void)
 
     /* Timer should have fired in the middle of busy_delay(), thus value of
      * a now and during ISR should both be 1, but value of b during ISR should
-     * still be 0 but not it should be 1 */
+     * still be 0 but now it should be 1 */
     if ((atomic_load(&a) == atomic_load(&a_during_isr)) &&
             (atomic_load(&b) != atomic_load(&b_during_isr)))
         {
