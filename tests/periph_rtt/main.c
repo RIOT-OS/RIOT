@@ -23,11 +23,13 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include <inttypes.h>
 
 #include "cpu.h"
 #include "periph_conf.h"
 #include "periph/rtt.h"
+#include "periph/rtc_mem.h"
 
 #define TICKS_TO_WAIT       (5 * RTT_FREQUENCY)
 
@@ -45,6 +47,58 @@ void cb(void *arg)
 
     puts("Hello");
 }
+
+#ifdef MODULE_PERIPH_RTC_MEM
+static const uint8_t riot_msg_offset = 1;
+static const char riot_msg[] = "RIOT";
+static void _set_rtc_mem(void)
+{
+    /* first fill the whole memory */
+    uint8_t size = rtc_mem_size();
+    while (size--) {
+        rtc_mem_write(size, &size, sizeof(size));
+    }
+
+    /* write test data */
+    rtc_mem_write(riot_msg_offset, riot_msg, sizeof(riot_msg) - 1);
+}
+
+static void _get_rtc_mem(void)
+{
+    char buf[4];
+    rtc_mem_read(riot_msg_offset, buf, sizeof(buf));
+
+    if (memcmp(buf, riot_msg, sizeof(buf))) {
+        puts("RTC mem content does not match");
+        for (unsigned i = 0; i < sizeof(buf); ++i) {
+            printf("%02x - %02x\n", riot_msg[i], buf[i]);
+        }
+        return;
+    }
+
+    uint8_t size = rtc_mem_size();
+    while (size--) {
+        uint8_t data;
+
+        if (size >= riot_msg_offset &&
+            size < riot_msg_offset + sizeof(riot_msg)) {
+            continue;
+        }
+
+        rtc_mem_read(size, &data, 1);
+        if (data != size) {
+            puts("RTC mem content does not match");
+            printf("%02x: %02x\n", size, data);
+        }
+    }
+
+
+    puts("RTC mem OK");
+}
+#else
+static inline void _set_rtc_mem(void) {}
+static inline void _get_rtc_mem(void) {}
+#endif
 
 int main(void)
 {
@@ -70,6 +124,9 @@ int main(void)
 
     puts("Initializing the RTT driver");
     rtt_init();
+
+    _set_rtc_mem();
+    _get_rtc_mem();
 
     puts("This test will now display 'Hello' every 5 seconds\n");
     uint32_t now = rtt_get_counter();
@@ -102,6 +159,8 @@ int main(void)
     else {
         puts("rtt_get_alarm() PASSED");
     }
+
+    _get_rtc_mem();
 
     puts("Done setting up the RTT, wait for many Hellos");
     return 0;

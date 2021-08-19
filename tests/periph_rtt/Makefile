@@ -3,6 +3,7 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_rtt
 FEATURES_OPTIONAL += periph_rtt_set_counter
+FEATURES_OPTIONAL += periph_rtc_mem
 
 DISABLE_MODULE += periph_init_rtt
 
