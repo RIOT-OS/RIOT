@@ -51,6 +51,11 @@ void lwip_netif_init_devs(void)
         auto_init_esp_wifi();
     }
 
+    if (IS_USED(MODULE_ETHOS)) {
+        extern void auto_init_ethos(void);
+        auto_init_ethos();
+    }
+
     if (IS_USED(MODULE_SAM0_ETH)) {
         extern void auto_init_sam0_eth(void);
         auto_init_sam0_eth();
