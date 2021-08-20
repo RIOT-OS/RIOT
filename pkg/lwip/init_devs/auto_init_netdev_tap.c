@@ -30,7 +30,7 @@
 static struct netif netif[NETIF_TAP_NUMOF];
 static netdev_tap_t netdev_taps[NETIF_TAP_NUMOF];
 
-void auto_init_netdev_tap(void)
+static void auto_init_netdev_tap(void)
 {
     for (unsigned i = 0; i < NETIF_TAP_NUMOF; i++) {
         netdev_tap_setup(&netdev_taps[i], &netdev_tap_params[i]);
@@ -40,4 +40,6 @@ void auto_init_netdev_tap(void)
         }
     }
 }
+
+LWIP_INIT_ETH_NETIF(auto_init_netdev_tap);
 /** @} */

@@ -30,7 +30,7 @@
 static struct netif netif[NETIF_AT86RF2XX_NUMOF];
 static at86rf2xx_t at86rf2xx_devs[NETIF_AT86RF2XX_NUMOF];
 
-void auto_init_at86rf2xx(void)
+static void auto_init_at86rf2xx(void)
 {
     for (unsigned i = 0; i < NETIF_AT86RF2XX_NUMOF; i++) {
         at86rf2xx_setup(&at86rf2xx_devs[i], &at86rf2xx_params[i], i);
@@ -40,4 +40,6 @@ void auto_init_at86rf2xx(void)
         }
     }
 }
+
+LWIP_INIT_6LOWPAN_NETIF(auto_init_at86rf2xx);
 /** @} */

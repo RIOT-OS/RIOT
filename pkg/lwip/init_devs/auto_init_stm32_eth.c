@@ -29,7 +29,7 @@ extern void stm32_eth_netdev_setup(netdev_t *netdev);
 
 static struct netif netif;
 
-void auto_init_stm32_eth(void)
+static void auto_init_stm32_eth(void)
 {
     stm32_eth_netdev_setup(&stm32_eth);
     if (lwip_add_ethernet(&netif, &stm32_eth) == NULL) {
@@ -37,4 +37,6 @@ void auto_init_stm32_eth(void)
         return;
     }
 }
+
+LWIP_INIT_ETH_NETIF(auto_init_stm32_eth);
 /** @} */

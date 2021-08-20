@@ -30,7 +30,7 @@
 static struct netif netif[NETIF_ATWINC_NUMOF];
 static atwinc15x0_t atwinc15x0_devs[NETIF_ATWINC_NUMOF];
 
-void auto_init_atwinc15x0(void)
+static void auto_init_atwinc15x0(void)
 {
     for (unsigned i = 0; i < NETIF_ATWINC_NUMOF; i++) {
         atwinc15x0_setup(&atwinc15x0_devs[i], &atwinc15x0_params[i]);
@@ -40,4 +40,6 @@ void auto_init_atwinc15x0(void)
         }
     }
 }
+
+LWIP_INIT_ETH_NETIF(auto_init_atwinc15x0);
 /** @} */

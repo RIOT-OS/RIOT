@@ -30,7 +30,7 @@
 static struct netif netif[NETIF_ENC28J60_NUMOF];
 static enc28j60_t enc28j60_devs[NETIF_ENC28J60_NUMOF];
 
-void auto_init_enc28j60(void)
+static void auto_init_enc28j60(void)
 {
     for (unsigned i = 0; i < NETIF_ENC28J60_NUMOF; i++) {
         enc28j60_setup(&enc28j60_devs[i], &enc28j60_params[i], i);
@@ -40,4 +40,6 @@ void auto_init_enc28j60(void)
         }
     }
 }
+
+LWIP_INIT_ETH_NETIF(auto_init_enc28j60);
 /** @} */

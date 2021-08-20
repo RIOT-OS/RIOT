@@ -26,6 +26,7 @@ extern "C" {
 
 #include "lwip/netif.h"
 #include "net/netdev.h"
+#include "xfa.h"
 
 void lwip_netif_init_devs(void);
 
@@ -49,6 +50,22 @@ struct netif *lwip_add_ethernet(struct netif *netif, netdev_t *state);
  * The netif will be set up using the `lwip_netdev_init` helper.
  */
 struct netif *lwip_add_6lowpan(struct netif *netif, netdev_t *state);
+
+typedef void (*lwip_netif_setup_func_t)(void);
+
+/**
+ * @brief Registers initialization function for an Ethernet interface
+ */
+#define LWIP_INIT_ETH_NETIF(func) \
+    XFA_USE_CONST(lwip_netif_setup_func_t, lwip_netif_eth_xfa); \
+    XFA_ADD_PTR(lwip_netif_eth_xfa, func, func, &func)
+
+/**
+ * @brief Registers initialization function for a 6LoWPAN interface
+ */
+#define LWIP_INIT_6LOWPAN_NETIF(func) \
+    XFA_USE_CONST(lwip_netif_setup_func_t, lwip_netif_6lowpan_xfa); \
+    XFA_ADD_PTR(lwip_netif_6lowpan_xfa, func, func, &func)
 
 #ifdef __cplusplus
 }

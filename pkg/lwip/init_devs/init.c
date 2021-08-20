@@ -20,6 +20,10 @@
 #include "lwip/tcpip.h"
 #include "lwip/netif/netdev.h"
 #include "netif/lowpan6.h"
+#include "xfa.h"
+
+XFA_INIT_CONST(lwip_netif_setup_func_t, lwip_netif_eth_xfa);
+XFA_INIT_CONST(lwip_netif_setup_func_t, lwip_netif_6lowpan_xfa);
 
 /**
  * @brief   Initializes network interfaces
@@ -31,67 +35,18 @@ void lwip_netif_init_devs(void)
     /* Ethernet interfaces
      * ------------------- */
 
-    if (IS_USED(MODULE_ATWINC15X0)) {
-        extern void auto_init_atwinc15x0(void);
-        auto_init_atwinc15x0();
-    }
-
-    if (IS_USED(MODULE_ENC28J60)) {
-        extern void auto_init_enc28j60(void);
-        auto_init_enc28j60();
-    }
-
-    if (IS_USED(MODULE_ESP_ETH)) {
-        extern void auto_init_esp_eth(void);
-        auto_init_esp_eth();
-    }
-
-    if (IS_USED(MODULE_ESP_WIFI)) {
-        extern void auto_init_esp_wifi(void);
-        auto_init_esp_wifi();
-    }
-
-    if (IS_USED(MODULE_ETHOS)) {
-        extern void auto_init_ethos(void);
-        auto_init_ethos();
-    }
-
-    if (IS_USED(MODULE_SAM0_ETH)) {
-        extern void auto_init_sam0_eth(void);
-        auto_init_sam0_eth();
-    }
-
-    if (IS_USED(MODULE_STM32_ETH)) {
-        extern void auto_init_stm32_eth(void);
-        auto_init_stm32_eth();
-    }
-
-    if (IS_USED(MODULE_NETDEV_TAP)) {
-        extern void auto_init_netdev_tap(void);
-        auto_init_netdev_tap();
+    int i;
+    const int eth_devs = XFA_LEN(lwip_netif_setup_func_t, lwip_netif_eth_xfa);
+    for (i = 0; i < eth_devs; i++) {
+        lwip_netif_eth_xfa[i]();
     }
 
     /* 6LoWPAN interfaces
      * ------------------ */
 
-    if (IS_USED(MODULE_AT86RF2XX)) {
-        extern void auto_init_at86rf2xx(void);
-        auto_init_at86rf2xx();
-    }
-
-    if (IS_USED(MODULE_MRF24J40)) {
-        extern void auto_init_mrf24j40(void);
-        auto_init_mrf24j40();
-    }
-
-    if (IS_USED(MODULE_NRF802154)) {
-        extern void auto_init_nrf802154(void);
-        auto_init_nrf802154();
-    }
-
-    if (IS_USED(MODULE_SOCKET_ZEP)) {
-        extern void auto_init_socket_zep(void);
-        auto_init_socket_zep();
+    const int sixlowpan_devs = XFA_LEN(lwip_netif_setup_func_t, lwip_netif_6lowpan_xfa);
+    for (i = 0; i < sixlowpan_devs; i++) {
+        lwip_netif_6lowpan_xfa[i]();
     }
 }
 

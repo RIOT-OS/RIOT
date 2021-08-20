@@ -30,7 +30,7 @@
 static struct netif netif[NETIF_SOCKET_ZEP_NUMOF];
 static socket_zep_t socket_zep_devs[NETIF_SOCKET_ZEP_NUMOF];
 
-void auto_init_socket_zep(void)
+static void auto_init_socket_zep(void)
 {
     for (unsigned i = 0; i < NETIF_SOCKET_ZEP_NUMOF; i++) {
         socket_zep_setup(&socket_zep_devs[i], &socket_zep_params[i], i);
@@ -40,4 +40,6 @@ void auto_init_socket_zep(void)
         }
     }
 }
+
+LWIP_INIT_6LOWPAN_NETIF(auto_init_socket_zep);
 /** @} */

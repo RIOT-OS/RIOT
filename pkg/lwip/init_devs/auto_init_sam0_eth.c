@@ -29,7 +29,7 @@ extern void sam0_eth_setup(netdev_t *netdev);
 
 static struct netif netif;
 
-void auto_init_sam0_eth(void)
+static void auto_init_sam0_eth(void)
 {
     sam0_eth_setup(&sam0_eth);
     if (lwip_add_ethernet(&netif, &sam0_eth) == NULL) {
@@ -37,4 +37,6 @@ void auto_init_sam0_eth(void)
         return;
     }
 }
+
+LWIP_INIT_ETH_NETIF(auto_init_sam0_eth);
 /** @} */

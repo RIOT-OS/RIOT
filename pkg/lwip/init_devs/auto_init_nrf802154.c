@@ -28,7 +28,7 @@
 static struct netif netif;
 static netdev_ieee802154_submac_t nrf802154_netdev;
 
-void auto_init_nrf802154(void)
+static void auto_init_nrf802154(void)
 {
     netdev_register(&nrf802154_netdev.dev.netdev, NETDEV_NRF802154, 0);
     netdev_ieee802154_submac_init(&nrf802154_netdev);
@@ -40,4 +40,6 @@ void auto_init_nrf802154(void)
         return;
     }
 }
+
+LWIP_INIT_6LOWPAN_NETIF(auto_init_nrf802154);
 /** @} */

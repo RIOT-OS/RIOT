@@ -32,7 +32,7 @@ static ethos_t ethos_devs[NETIF_ETHOS_NUMOF];
 
 static uint8_t _inbuf[NETIF_ETHOS_NUMOF][2048];
 
-void auto_init_ethos(void)
+static void auto_init_ethos(void)
 {
     for (unsigned i = 0; i < NETIF_ETHOS_NUMOF; i++) {
         ethos_setup(&ethos_devs[i], &ethos_params[i], i, _inbuf[i], sizeof(_inbuf[i]));
@@ -42,4 +42,6 @@ void auto_init_ethos(void)
         }
     }
 }
+
+LWIP_INIT_ETH_NETIF(auto_init_ethos);
 /** @} */

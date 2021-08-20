@@ -31,7 +31,7 @@
 static struct netif netif[NETIF_MRF24J40_NUMOF];
 static mrf24j40_t mrf24j40_devs[NETIF_MRF24J40_NUMOF];
 
-void auto_init_mrf24j40(void)
+static void auto_init_mrf24j40(void)
 {
     for (unsigned i = 0; i < NETIF_MRF24J40_NUMOF; i++) {
         mrf24j40_setup(&mrf24j40_devs[i], &mrf24j40_params[i], i);
@@ -41,4 +41,6 @@ void auto_init_mrf24j40(void)
         }
     }
 }
+
+LWIP_INIT_6LOWPAN_NETIF(auto_init_mrf24j40);
 /** @} */
