@@ -98,5 +98,9 @@ int nrf802154_init(void);
  */
 void nrf802154_setup(nrf802154_t *dev);
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* NRF802154_H */
 /** @} */
