@@ -174,7 +174,7 @@ static int _write(ieee802154_dev_t *dev, const iolist_t *iolist)
     /* specify the length of the package. */
     txbuf[0] = len + IEEE802154_FCS_LEN;
 
-    return len;
+    return 0;
 }
 
 static int _confirm_transmit(ieee802154_dev_t *dev, ieee802154_tx_info_t *info)
