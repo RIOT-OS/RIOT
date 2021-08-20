@@ -72,6 +72,10 @@ ifneq (,$(filter llcc68,$(USEMODULE)))
   USEMODULE += sx126x
 endif
 
+ifneq (,$(filter tmp1075 lm75%,$(USEMODULE)))
+  USEMODULE += lm75
+endif
+
 ifneq (,$(filter lps331ap lps2%hb,$(USEMODULE)))
   USEMODULE += lpsxxx
 endif
