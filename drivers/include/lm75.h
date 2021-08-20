@@ -27,6 +27,7 @@
 #ifndef LM75_H
 #define LM75_H
 
+#include <stdbool.h>
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 
