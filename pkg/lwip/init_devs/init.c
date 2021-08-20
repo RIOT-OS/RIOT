@@ -60,9 +60,11 @@ struct netif *lwip_add_ethernet(struct netif *netif, netdev_t *state)
     return _if;
 }
 
+#if IS_USED(MODULE_LWIP_SIXLOWPAN)
 struct netif *lwip_add_6lowpan(struct netif *netif, netdev_t *state)
 {
     return netif_add_noaddr(netif, state, lwip_netdev_init, tcpip_6lowpan_input);
 }
+#endif /* MODULE_LWIP_SIXLOWPAN */
 
 /**@}*/
