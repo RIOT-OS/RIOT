@@ -167,6 +167,10 @@ void saul_init_devs(void)
         extern void auto_init_lis3mdl(void);
         auto_init_lis3mdl();
     }
+    if (IS_USED(MODULE_LM75)) {
+        extern void auto_init_lm75(void);
+        auto_init_lm75();
+    }
     if (IS_USED(MODULE_LPSXXX)) {
         extern void auto_init_lpsxxx(void);
         auto_init_lpsxxx();
