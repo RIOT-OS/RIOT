@@ -40,7 +40,7 @@ _backup_ram_len = DEFINED( _backup_ram_len ) ? _backup_ram_len : 0x0 ;
 /* not all Cortex-M platforms use cortexm.ld yet */
 MEMORY
 {
-    bkup-ram (w!rx) : ORIGIN = _backup_ram_start_addr, LENGTH = _backup_ram_len
+    bkupram (w!rx) : ORIGIN = _backup_ram_start_addr, LENGTH = _backup_ram_len
 }
 
 /* Section Definitions */
@@ -214,7 +214,7 @@ SECTIONS
         _ebackup_data = .;
         /* Round size so that we can use 4 byte copy in init */
         . = ALIGN(4);
-    } > bkup-ram AT> rom
+    } > bkupram AT> rom
 
     .backup.bss (NOLOAD) : ALIGN(4) {
         _sbackup_bss = .;
@@ -222,10 +222,10 @@ SECTIONS
         _ebackup_bss = .;
         /* Round size so that we can use 4 byte copy in init */
         . = ALIGN(4);
-    } > bkup-ram
+    } > bkupram
 
     .heap3 (NOLOAD) : ALIGN(4) {
         _sheap1 = . ;
-        _eheap1 = ORIGIN(bkup-ram) + LENGTH(bkup-ram);
-    } > bkup-ram
+        _eheap1 = ORIGIN(bkupram) + LENGTH(bkupram);
+    } > bkupram
 }
