@@ -188,6 +188,34 @@ extern "C" {
 #define IS_USED(module) IS_ACTIVE(module)
 
 /**
+ * @def         RIOT_VERSION_NUM(major, minor, patch, extra)
+ * @brief       Generates a 64 bit variable of a release version.
+ *              Comparisons to this only apply to released branches
+ *
+ *              To define @p extra add a file `EXTRAVERSION` to the RIOT root
+ *              with the content
+ *
+ *                  RIOT_EXTRAVERSION = <extra>
+ *
+ *              with `<extra>` being the number of your local version.
+ *              This can be useful if you are maintaining a downstream
+ *              release to base further work on.
+ *
+ * @warning     This is only intended to be used with external boards or
+ *              modules.
+ *              In-tree code must not make use of this macro.
+ *
+ * @param[in]   major   Mayor version of the release
+ * @param[in]   minor   Minor version of the release
+ * @param[in]   patch   Patch level of the release
+ * @param[in]   extra   Extra version, user defined
+ *
+ * @returns     A machine readable version variable
+ */
+#define RIOT_VERSION_NUM(major, minor, patch, extra)   \
+    (((0ULL + major) << 48) + ((0ULL + minor) << 32) + \
+     ((0ULL + patch) << 16) + (extra))
+/**
  * @cond INTERNAL
  */
 /* Here a prefix "__PREFIX_WHEN_" is added to the macro. So if it was a 1 we
