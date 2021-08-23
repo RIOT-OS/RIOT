@@ -22,7 +22,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 #include "shell.h"
 #include "shell_commands.h"
 
@@ -30,25 +31,25 @@
 #include "nimble_scanlist.h"
 
 /* default scan duration (1s) */
-#define DEFAULT_DURATION        (1000000U)
+#define DEFAULT_DURATION_MS        (1 * MS_PER_SEC)
 
 int _cmd_scan(int argc, char **argv)
 {
-    uint32_t timeout = DEFAULT_DURATION;
+    uint32_t timeout = DEFAULT_DURATION_MS;
 
     if ((argc == 2) && (memcmp(argv[1], "help", 4) == 0)) {
         printf("usage: %s [timeout in ms]\n", argv[0]);
         return 0;
     }
     if (argc >= 2) {
-        timeout = (uint32_t)(atoi(argv[1]) * 1000);
+        timeout = atoi(argv[1]);
     }
 
     nimble_scanlist_clear();
-    printf("Scanning for %ums now ...", (unsigned)(timeout / 1000));
+    printf("Scanning for %"PRIu32" ms now ...", timeout);
+    nimble_scanner_set_scan_duration(timeout);
     nimble_scanner_start();
-    xtimer_usleep(timeout);
-    nimble_scanner_stop();
+    ztimer_sleep(ZTIMER_MSEC, timeout);
     puts(" done\n\nResults:");
     nimble_scanlist_print();
     puts("");
