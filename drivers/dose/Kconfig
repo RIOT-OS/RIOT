@@ -13,11 +13,11 @@ menuconfig KCONFIG_USEMODULE_DOSE
 
 if KCONFIG_USEMODULE_DOSE
 
-config DOSE_TIMEOUT_USEC
-    int "Transaction timeout in microseconds [us]"
-    default 5000
+config DOSE_TIMEOUT_BYTES
+    int "Transaction timeout in bytes"
+    default 50
     help
-        Timeout, in microseconds, to bring the driver back into idle state if
+        Timeout, in bytes at the set baudrate, to bring the driver back into idle state if
         the remote side died within a transaction.
 
 endif # KCONFIG_USEMODULE_DOSE

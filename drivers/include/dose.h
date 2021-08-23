@@ -128,12 +128,12 @@ typedef enum {
  * @{
  */
 /**
- * @brief Timeout that brings the driver back into idle state.
+ * @brief Timeout that brings the driver back into idle state expressed as bytes.
  *
  *  Fallback to idle if the remote side died within a transaction.
  */
-#ifndef CONFIG_DOSE_TIMEOUT_USEC
-#define CONFIG_DOSE_TIMEOUT_USEC        (5000)
+#ifndef CONFIG_DOSE_TIMEOUT_BYTES
+#define CONFIG_DOSE_TIMEOUT_BYTES       (50)
 #endif
 /** @} */
 
