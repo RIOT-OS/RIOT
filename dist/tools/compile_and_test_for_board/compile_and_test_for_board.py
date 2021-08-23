@@ -752,7 +752,7 @@ def main(args):
         if not junit_xml:
             raise ImportError("`junit-xml` required for --report-xml")
         report_file = os.path.join(board_result_directory, "report.xml")
-        with open(report_file, "w+") as report:
+        with open(report_file, "w+", encoding="utf-8") as report:
             junit_xml.TestSuite.to_file(
                 report,
                 [junit_xml.TestSuite('compile_and_test_for_{}'.format(board),
