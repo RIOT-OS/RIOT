@@ -164,7 +164,7 @@ jobs:
           TTN_DEV_ID="eui-70b3d57ed00463e7-otaa" \
           TTN_DEV_ID_ABP="eui-70b3d57ed0046d5d-abp" \
           RIOTBASE=${RIOTBASE} \
-          $(which tox) -e test -- ${TOX_ARGS} \
+          $(command -v tox) -e test -- ${TOX_ARGS} \
             ${K} "${{ github.event.inputs.filter }}" -m "${{ matrix.pytest_mark }}"
     - name: junit2html and XML deploy
       if: always()
