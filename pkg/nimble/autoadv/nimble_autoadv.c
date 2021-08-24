@@ -160,8 +160,14 @@ void nimble_autoadv_reset(void)
     int rc = 0;
     (void) rc;
 
-    rc = bluetil_ad_init_with_flags(&_ad, buf, sizeof(buf), BLUETIL_AD_FLAGS_DEFAULT);
-    assert(rc == BLUETIL_AD_OK);
+    if (IS_ACTIVE(NIMBLE_AUTOADV_FLAG_FIELD) && BLUETIL_AD_FLAGS_DEFAULT) {
+        rc = bluetil_ad_init_with_flags(&_ad, buf, sizeof(buf),
+                                        BLUETIL_AD_FLAGS_DEFAULT);
+        assert(rc == BLUETIL_AD_OK);
+    }
+    else {
+        bluetil_ad_init(&_ad, buf, 0, sizeof(buf));
+    }
 
     if (NIMBLE_AUTOADV_DEVICE_NAME != NULL) {
         rc = bluetil_ad_add_name(&_ad, NIMBLE_AUTOADV_DEVICE_NAME);
