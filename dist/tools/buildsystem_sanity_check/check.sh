@@ -334,6 +334,19 @@ check_no_pkg_source_local() {
         | error_with_message "Don't push PKG_SOURCE_LOCAL definitions upstream"
 }
 
+check_shell_which() {
+    local patterns=()
+    local pathspec=()
+
+    patterns+=(-e '(shell[[:blank:]]\+which')
+
+    pathspec+=('Makefile*')
+    pathspec+=('**/Makefile*')
+    pathspec+=('**/*.mk')
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message "Don't use \`which\` in makefiles, use \`command -v\` instead."
+}
+
 error_on_input() {
     ! grep ''
 }
@@ -353,6 +366,7 @@ all_checks() {
     check_no_pseudomodules_in_makefile_dep
     check_no_usemodules_in_makefile_include
     check_no_pkg_source_local
+    check_shell_which
 }
 
 main() {
