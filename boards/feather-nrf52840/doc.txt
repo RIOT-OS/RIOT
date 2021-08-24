@@ -37,10 +37,12 @@ use an external Segger J-Link Programmer connected to the [SWD Connector].
 To flash the uf2 bootloader (if its no longer present on your BOARD) then with
 a jlink attached to your BOARD and [`nrfjprog`][nrfjprog] installed:
 
-$ git clone git@github.com:adafruit/Adafruit_nRF52_Bootloader.git
-$ cd Adafruit_nRF52_Bootloader
-$ make BOARD=feather_nrf52840_express all
-$ make BOARD=feather_nrf52840_express flash
+~~~~~~~~~~~~~{.sh}
+git clone git@github.com:adafruit/Adafruit_nRF52_Bootloader.git
+cd Adafruit_nRF52_Bootloader
+make BOARD=feather_nrf52840_express all
+make BOARD=feather_nrf52840_express flash
+~~~~~~~~~~~~
 
 [nrfjprog]: https://www.nordicsemi.com/Products/Development-tools/nRF-Command-Line-Tools
 
