@@ -35,12 +35,14 @@ use an external Segger J-Link Programmer connected to the [SWD Connector].
 #### Flashing the uf2 bootloader
 
 To flash the uf2 bootloader (if its no longer present on your BOARD) then with
-a jlink attached to your BOARD and `nrf52prog` installed:
+a jlink attached to your BOARD and [`nrfjprog`][nrfjprog] installed:
 
 $ git clone git@github.com:adafruit/Adafruit_nRF52_Bootloader.git
 $ cd Adafruit_nRF52_Bootloader
 $ make BOARD=feather_nrf52840_express all
 $ make BOARD=feather_nrf52840_express flash
+
+[nrfjprog]: https://www.nordicsemi.com/Products/Development-tools/nRF-Command-Line-Tools
 
 ### Terminal
 To connect a terminal to the Feather, RIOT chooses Segger RTT per default.
