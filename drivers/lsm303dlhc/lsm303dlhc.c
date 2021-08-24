@@ -229,7 +229,7 @@ int lsm303dlhc_enable(const lsm303dlhc_t *dev)
     res += i2c_write_reg(DEV_I2C, DEV_ACC_ADDR, LSM303DLHC_REG_CTRL4_A, tmp, 0);
     res += i2c_write_reg(DEV_I2C, DEV_ACC_ADDR, LSM303DLHC_REG_CTRL3_A,
                          LSM303DLHC_CTRL3_A_I1_DRDY1, 0);
-    gpio_init(DEV_ACC_PIN, GPIO_IN);
+    gpio_init(DEV_ACC_PIN, DEV_ACC_PIN_MODE);
 
     tmp = LSM303DLHC_TEMP_EN | LSM303DLHC_TEMP_SAMPLE_75HZ;
     res += i2c_write_reg(DEV_I2C, DEV_MAG_ADDR, LSM303DLHC_REG_CRA_M, tmp, 0);
@@ -241,7 +241,7 @@ int lsm303dlhc_enable(const lsm303dlhc_t *dev)
                         LSM303DLHC_REG_MR_M, LSM303DLHC_MAG_MODE_CONTINUOUS, 0);
     i2c_release(DEV_I2C);
 
-    gpio_init(DEV_MAG_PIN, GPIO_IN);
+    gpio_init(DEV_MAG_PIN, DEV_MAG_PIN_MODE);
 
     return (res < 0) ? -1 : 0;
 }
