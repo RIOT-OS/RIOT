@@ -327,12 +327,12 @@ APPLICATION := $(strip $(APPLICATION))
 
 ifeq (,$(and $(DOWNLOAD_TO_STDOUT),$(DOWNLOAD_TO_FILE)))
   ifeq (,$(WGET))
-    ifeq (0,$(shell which wget 2>&1 > /dev/null ; echo $$?))
+    ifeq (0,$(shell which wget > /dev/null 2>&1 ; echo $$?))
       WGET := $(shell which wget)
     endif
   endif
   ifeq (,$(CURL))
-    ifeq (0,$(shell which curl 2>&1 > /dev/null ; echo $$?))
+    ifeq (0,$(shell which curl > /dev/null 2>&1 ; echo $$?))
       CURL := $(shell which curl)
     endif
   endif
@@ -349,10 +349,10 @@ ifeq (,$(and $(DOWNLOAD_TO_STDOUT),$(DOWNLOAD_TO_FILE)))
 endif
 
 ifeq (,$(UNZIP_HERE))
-  ifeq (0,$(shell which unzip 2>&1 > /dev/null ; echo $$?))
+  ifeq (0,$(shell which unzip > /dev/null 2>&1 ; echo $$?))
     UNZIP_HERE := $(shell which unzip) -q
   else
-    ifeq (0,$(shell which 7z 2>&1 > /dev/null ; echo $$?))
+    ifeq (0,$(shell which 7z > /dev/null 2>&1 ; echo $$?))
       UNZIP_HERE := $(shell which 7z) x -bd
     else
       $(error Neither unzip nor 7z is installed.)
@@ -714,7 +714,7 @@ endef
 # This is not the case on MacOSX, so it must be built on the fly
 ifeq ($(OS),Darwin)
   ifneq (,$(filter debug, $(MAKECMDGOALS)))
-    ifneq (0,$(shell command -v setsid 2>&1 > /dev/null ; echo $$?))
+    ifneq (0,$(shell command -v setsid > /dev/null 2>&1 ; echo $$?))
       SETSID = $(RIOTTOOLS)/setsid/setsid
       $(call target-export-variables,debug,$(SETSID))
       DEBUGDEPS += $(SETSID)

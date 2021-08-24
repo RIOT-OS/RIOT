@@ -3,7 +3,7 @@
 -include makefiles/color.inc.mk
 
 riotgen-installed:
-	@command -v riotgen 2>&1 > /dev/null || \
+	@command -v riotgen > /dev/null 2>&1 || \
 	{ $(COLOR_ECHO) \
 	"$(COLOR_RED)'riotgen' command is not available \
 	please consider installing it from \
