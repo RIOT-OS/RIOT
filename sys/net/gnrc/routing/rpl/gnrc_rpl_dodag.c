@@ -29,6 +29,7 @@
 #include "utlist.h"
 
 #include "net/gnrc/rpl.h"
+#include "net/gnrc/rpl/rpble.h"
 #ifdef MODULE_GNRC_RPL_P2P
 #include "net/gnrc/rpl/p2p.h"
 #include "net/gnrc/rpl/p2p_dodag.h"
@@ -359,6 +360,7 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
     dodag->my_rank = dodag->instance->of->calc_rank(dodag, 0);
     if (dodag->my_rank != old_rank) {
         trickle_reset_timer(&dodag->trickle);
+        gnrc_rpl_rpble_update(dodag);
     }
 
     LL_FOREACH_SAFE(dodag->parents, elt, tmp) {
