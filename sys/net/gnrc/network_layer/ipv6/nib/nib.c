@@ -1633,8 +1633,12 @@ static uint32_t _handle_rio(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                       (UINT32_MAX - 1) : route_ltime * MS_PER_SEC;
     }
 
-    gnrc_ipv6_nib_ft_add(&rio->prefix, rio->prefix_len, &ipv6->src,
-                         netif->pid, route_ltime);
+    if (route_ltime == 0) {
+        gnrc_ipv6_nib_ft_del(&rio->prefix, rio->prefix_len);
+    } else {
+        gnrc_ipv6_nib_ft_add(&rio->prefix, rio->prefix_len, &ipv6->src,
+                             netif->pid, route_ltime);
+    }
 
     return route_ltime;
 }
