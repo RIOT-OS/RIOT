@@ -1,0 +1,9 @@
+FEATURES_PROVIDED += periph_clic
+FEATURES_PROVIDED += periph_gpio
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_wdt
+FEATURES_PROVIDED += periph_pm
+FEATURES_PROVIDED += periph_flashpage
+FEATURES_PROVIDED += periph_flashpage_pagewise
+
+include $(RIOTCPU)/riscv_common/Makefile.features

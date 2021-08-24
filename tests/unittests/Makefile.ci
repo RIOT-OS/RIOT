@@ -96,6 +96,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     samr21-xpro \
     samr30-xpro \
     samr34-xpro \
+    seeedstudio-gd32 \
     sensebox_samd21 \
     slstk3400a \
     slstk3401a \

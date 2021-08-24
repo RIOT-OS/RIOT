@@ -206,6 +206,11 @@ config HAS_PERIPH_MCG
     help
         Indicates that an MCG peripheral is present.
 
+config HAS_PERIPH_CLIC
+    bool
+    help
+        Indicates that a RISC-V Core-local Interrupt Controller (CLIC) peripheral is present.
+
 config HAS_PERIPH_PLIC
     bool
     help

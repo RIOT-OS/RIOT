@@ -32,6 +32,11 @@
 extern "C" {
 #endif
 
+/**
+￼ * @brief   Bit mask for the MCAUSE register
+￼ */
+#define CPU_CSR_MCAUSE_CAUSE_MSK        (0x0fffu)
+
 extern volatile int riscv_in_isr;
 
 /**

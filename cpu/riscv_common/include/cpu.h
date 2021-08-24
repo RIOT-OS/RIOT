@@ -61,6 +61,30 @@ static inline void cpu_print_last_instruction(void)
     /* This function must exist else RIOT won't compile */
 }
 
+/**
+ * @brief   Convenience function to set bit flags in a register
+ *
+ * @param   reg     register to set bits in
+ * @param   mask    bits to set in the register
+ */
+static inline __attribute__((always_inline))
+void cpu_reg_enable_bits(volatile uint32_t *reg, uint32_t mask)
+{
+    __atomic_fetch_or(reg, mask, __ATOMIC_RELAXED);
+}
+
+/**
+ * @brief   Convenience function to clear bit flags in a register
+ *
+ * @param   reg     register to clear bits in
+ * @param   mask    bits to clear in the register
+ */
+static inline __attribute__((always_inline))
+void cpu_reg_disable_bits(volatile uint32_t *reg, uint32_t mask)
+{
+    __atomic_fetch_and(reg, ~mask, __ATOMIC_RELAXED);
+}
+
 #ifdef __cplusplus
 }
 #endif
