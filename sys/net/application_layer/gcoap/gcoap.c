@@ -52,7 +52,7 @@
 static void *_event_loop(void *arg);
 static void _on_sock_udp_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg);
 static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote,
-                              uint8_t *buf, size_t len);
+                              uint8_t *buf, size_t len, bool truncated);
 static void _tl_init_coap_socket(gcoap_socket_t *sock);
 static ssize_t _tl_send(gcoap_socket_t *sock, const void *data, size_t len,
                         const sock_udp_ep_t *remote);
@@ -257,7 +257,8 @@ static void _on_sock_dtls_evt(sock_dtls_t *sock, sock_async_flags_t type, void *
         }
         sock_udp_ep_t ep;
         sock_dtls_session_get_udp_ep(&socket.ctx_dtls_session, &ep);
-        _process_coap_pdu(&socket, &ep,  _listen_buf, res);
+        /* Truncated DTLS messages would already have gotten lost at verification */
+        _process_coap_pdu(&socket, &ep,  _listen_buf, res, false);
     }
 }
 
@@ -284,20 +285,45 @@ static void _on_sock_udp_evt(sock_udp_t *sock, sock_async_flags_t type, void *ar
     sock_udp_ep_t remote;
 
     if (type & SOCK_ASYNC_MSG_RECV) {
-        ssize_t res = sock_udp_recv(sock, _listen_buf, sizeof(_listen_buf),
-                                    0, &remote);
-        if (res <= 0) {
-            DEBUG("gcoap: udp recv failure: %d\n", (int)res);
-            return;
+        void *stackbuf;
+        void *buf_ctx = NULL;
+        bool truncated = false;
+        size_t cursor = 0;
+
+        /* The zero-copy _buf API is not used to its full potential here -- we
+         * still copy out data in what is a manual version of sock_udp_recv,
+         * but this gives the direly needed overflow information.
+         *
+         * A version that actually doesn't copy would vastly change the way
+         * gcoap passes the buffer to be read from and written into to the
+         * handler. Also, given that neither nanocoap nor the handler expects
+         * to gather scattered data, it'd need to rely on the data coming in a
+         * single slice (but that may be a realistic assumption).
+         */
+        while (true) {
+            ssize_t res = sock_udp_recv_buf(sock, &stackbuf, &buf_ctx, 0, &remote);
+            if (res < 0) {
+                DEBUG("gcoap: udp recv failure: %d\n", (int)res);
+                return;
+            }
+            if (res == 0) {
+                break;
+            }
+            if (cursor + res > sizeof(_listen_buf)) {
+                res = sizeof(_listen_buf) - cursor;
+                truncated = true;
+            }
+            memcpy(&_listen_buf[cursor], stackbuf, res);
+            cursor += res;
         }
         gcoap_socket_t socket = { .type = GCOAP_SOCKET_TYPE_UDP, .socket.udp = sock };
-        _process_coap_pdu(&socket, &remote, _listen_buf, res);
+        _process_coap_pdu(&socket, &remote, _listen_buf, cursor, truncated);
     }
 }
 
 /* Processes and evaluates the coap pdu */
 static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote,
-                              uint8_t *buf, size_t len)
+                              uint8_t *buf, size_t len, bool truncated)
 {
     coap_pkt_t pdu;
     gcoap_request_memo_t *memo = NULL;
@@ -314,7 +340,14 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote,
     ssize_t res = coap_parse(&pdu, buf, len);
     if (res < 0) {
         DEBUG("gcoap: parse failure: %d\n", (int)res);
-        /* If a response, can't clear memo, but it will timeout later. */
+        /* If a response, can't clear memo, but it will timeout later.
+         *
+         * There are *some* error cases in which we could continue (eg. all
+         * sorts of "packet ends mid-options" in truncated cases, and maybe
+         * also when the maximum option count is exceeded to at least respond
+         * with Bad Request), but these would likely require incompatible
+         * changes to nanocoap.
+         */
         return;
     }
 
@@ -342,8 +375,16 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote,
         /* normal request */
         else if (coap_get_type(&pdu) == COAP_TYPE_NON
                 || coap_get_type(&pdu) == COAP_TYPE_CON) {
-            size_t pdu_len = _handle_req(&pdu, _listen_buf, sizeof(_listen_buf),
-                                            remote);
+            size_t pdu_len;
+
+            if (truncated) {
+                /* TBD: Set a Size1 */
+                pdu_len = gcoap_response(&pdu, _listen_buf, sizeof(_listen_buf),
+                                         COAP_CODE_REQUEST_ENTITY_TOO_LARGE);
+            } else {
+                pdu_len = _handle_req(&pdu, _listen_buf, sizeof(_listen_buf), remote);
+            }
+
             if (pdu_len > 0) {
                 ssize_t bytes = _tl_send(sock, _listen_buf, pdu_len,
                                                 remote);
@@ -373,7 +414,7 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote,
                 if (memo->resp_evt_tmout.queue) {
                     event_timeout_clear(&memo->resp_evt_tmout);
                 }
-                memo->state = GCOAP_MEMO_RESP;
+                memo->state = truncated ? GCOAP_MEMO_RESP_TRUNC : GCOAP_MEMO_RESP;
                 if (memo->resp_handler) {
                     memo->resp_handler(memo, &pdu, remote);
                 }

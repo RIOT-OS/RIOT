@@ -514,6 +514,8 @@ extern "C" {
 #define GCOAP_MEMO_RESP         (3)     /**< Got response */
 #define GCOAP_MEMO_TIMEOUT      (4)     /**< Timeout waiting for response */
 #define GCOAP_MEMO_ERR          (5)     /**< Error processing response packet */
+#define GCOAP_MEMO_RESP_TRUNC   (6)     /**< Got response, but it got truncated into the receive
+                                             buffer that is now incomplete */
 /** @} */
 
 /**
