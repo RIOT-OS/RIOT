@@ -40,6 +40,12 @@ a jlink attached to your BOARD and [`nrfjprog`][nrfjprog] installed:
 ~~~~~~~~~~~~~{.sh}
 git clone git@github.com:adafruit/Adafruit_nRF52_Bootloader.git
 cd Adafruit_nRF52_Bootloader
+# only download what is needed, use
+#     `git submodule update --init --recursive`
+# to download everything
+git submodule update --init
+git -C lib/tinyusb submodule update --init hw/mcu/nordic/nrfx/
+pip3 install --user adafruit-nrfutil
 make BOARD=feather_nrf52840_express all
 make BOARD=feather_nrf52840_express flash
 ~~~~~~~~~~~~
