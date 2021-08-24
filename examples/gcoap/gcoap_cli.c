@@ -304,7 +304,12 @@ int gcoap_cli_cmd(int argc, char **argv)
 {
     /* Ordered like the RFC method code numbers, but off by 1. GET is code 0. */
     char *method_codes[] = {"ping", "get", "post", "put"};
-    uint8_t buf[CONFIG_GCOAP_PDU_BUF_SIZE];
+    /* We may use statically allocated memory here because gcoap_cli_cmd is
+     * only ever used from the shell main loop, ie. from a single thread, and
+     * is not recursive through any code path. (If that were not the case, this
+     * could not be static, and we'd need to allocate more memory to the
+     * stack). */
+    static uint8_t buf[CONFIG_GCOAP_PDU_BUF_SIZE];
     coap_pkt_t pdu;
     size_t len;
 

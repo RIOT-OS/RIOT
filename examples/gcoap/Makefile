@@ -52,9 +52,4 @@ ifndef CONFIG_KCONFIG_MODULE_GCOAP
 # Increase from default for confirmable block2 follow-on requests
 GCOAP_RESEND_BUFS_MAX ?= 2
 CFLAGS += -DCONFIG_GCOAP_RESEND_BUFS_MAX=$(GCOAP_RESEND_BUFS_MAX)
-
-# A GCOAP_PDU_BUF_SIZE'd buffer is allocated in the CLI command, making the requirements larger than usual.
-# The number is hardcoded because the symbolic value CONFIG_GCOAP_PDU_BUF_SIZE
-# is unavailable at the point where the main stack size is used.
-CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(THREAD_STACKSIZE_DEFAULT\ +\ 1152\)
 endif
