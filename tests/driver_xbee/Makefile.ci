@@ -6,7 +6,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega328p \
     atmega328p-xplained-mini \
-    atxmega-a1u-xpro \
     nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \

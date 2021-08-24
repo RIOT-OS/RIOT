@@ -1,5 +1,8 @@
 export CPU_ATXMEGA 1
 
+# should expand RAM ?
+EXP_RAM = 0
+
 # CPU ROM/RAM
 ifneq (,$(findstring atxmega8,$(CPU_MODEL)))
   RAM_LEN = 1K
@@ -14,13 +17,13 @@ ifneq (,$(findstring atxmega32,$(CPU_MODEL)))
   ROM_LEN = 32K
 endif
 ifneq (,$(findstring atxmega64,$(CPU_MODEL)))
-  RAM_LEN ?= 4K
+  RAM_LEN = 4K
   ROM_LEN = 64K
 endif
-#ifneq (,$(findstring atxmega128,$(CPU_MODEL)))
-  RAM_LEN ?= 8K
+ifneq (,$(findstring atxmega128,$(CPU_MODEL)))
+  RAM_LEN = 8K
   ROM_LEN = 128K
-#endif
+endif
 ifneq (,$(findstring atxmega192,$(CPU_MODEL)))
   RAM_LEN = 16K
   ROM_LEN = 192K
@@ -34,5 +37,14 @@ ifneq (,$(findstring atxmega384,$(CPU_MODEL)))
   ROM_LEN = 384K
 endif
 
+ifneq (,$(findstring a1,$(shell echo $(CPU_MODEL) | cut -c8-)))
+  ifeq ($(EXP_RAM),1)
+    CFLAGS += -DRAM_LEN=$(RAM_LEN)-1
+    LDSCRIPT_EXTRA = -Wl,--defsym=__heap_end=0x800000+$(RAM_LEN)-1
+  endif
+endif
+
 # CPU depends on the avr8 common module, so include it
 include $(RIOTCPU)/avr8_common/Makefile.include
+
+PSEUDOMODULE += atxmega_ebi
