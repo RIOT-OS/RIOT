@@ -48,14 +48,13 @@ git -C lib/tinyusb submodule update --init hw/mcu/nordic/nrfx/
 pip3 install --user adafruit-nrfutil
 make BOARD=feather_nrf52840_express all
 make BOARD=feather_nrf52840_express flash
-~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 [nrfjprog]: https://www.nordicsemi.com/Products/Development-tools/nRF-Command-Line-Tools
 
 ### Terminal
-To connect a terminal to the Feather, RIOT chooses Segger RTT per default.
-This lets you use the Segger J-Link Programmer as a serial interface to the
-device.
+To connect a terminal to the Feather, RIOT chooses `stdio_cdc_acm` per default.
+This lets you access the Feather directly over USB.
 
 You have several alternative possibilities to connect to the board.
 
@@ -67,7 +66,7 @@ You have several alternative possibilities to connect to the board.
    UART-based terminals to connect to the feather
 2. With
    ~~~~~~~~~~~~~~~~~~~~~ {.mk}
-   USEMODULE += stdio_cdc_acm
+   USEMODULE += stdio_rtt
    ~~~~~~~~~~~~~~~~~~~~~
-   you can access the Feather with a terminal directly over USB.
+   you can use the Segger J-Link Programmer as a serial interface to the device.
 */
