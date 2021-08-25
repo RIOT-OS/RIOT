@@ -43,9 +43,10 @@ static void _netif_list_ipv6(struct netif *netif, int addr_index) {
 
 static void _netif_list(struct netif *netif) {
     int i;
+    char name[8];
     struct netdev *dev = netif->state;
-    printf("Iface %c%c%u ", netif->name[0], netif->name[1], netif->num);
-    printf("HWaddr: ");
+    netif_get_name((netif_t *)netif, name);
+    printf("Iface %s HWaddr: ", name);
     for (i = 0; i < netif->hwaddr_len; i++) {
         printf("%02x", netif->hwaddr[i]);
         if ((i+1) < netif->hwaddr_len) {
