@@ -4,7 +4,6 @@ FEATURES_PROVIDED += cpp
 FEATURES_PROVIDED += libstdcpp
 FEATURES_PROVIDED += newlib
 FEATURES_PROVIDED += periph_coretimer
-FEATURES_PROVIDED += periph_plic
 FEATURES_PROVIDED += ssp
 
 # RISC-V toolchain on CI does not work properly with picolibc yet
