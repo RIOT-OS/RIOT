@@ -210,12 +210,9 @@ void thread_yield_higher(void)
 {
     sched_context_switch_request = 1;
 
-    if (_native_in_isr == 0) {
+    if (_native_in_isr == 0 && native_interrupts_enabled) {
         ucontext_t *ctx = (ucontext_t *)(thread_get_active()->sp);
         _native_in_isr = 1;
-        if (!native_interrupts_enabled) {
-            warnx("thread_yield_higher: interrupts are disabled - this should not be");
-        }
         irq_disable();
         native_isr_context.uc_stack.ss_sp = __isr_stack;
         native_isr_context.uc_stack.ss_size = SIGSTKSZ;
