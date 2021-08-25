@@ -1,6 +1,7 @@
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
   USEMODULE += saul_pwm
+  USEMODULE += saul_nrf_vddh
 endif
 
 include $(RIOTBOARD)/common/nrf52/bootloader_nrfutil.dep.mk

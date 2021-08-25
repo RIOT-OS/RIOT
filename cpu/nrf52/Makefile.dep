@@ -20,5 +20,9 @@ ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
   USEMODULE += tsrb
 endif
 
+ifneq (,$(filter saul_nrf_vddh,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_adc
+endif
+
 include $(RIOTCPU)/nrf5x_common/Makefile.dep
 include $(RIOTCPU)/cortexm_common/Makefile.dep
