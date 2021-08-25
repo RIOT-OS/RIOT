@@ -1,12 +1,6 @@
-FEATURES_REQUIRED += periph_clic
-FEATURES_REQUIRED_ANY += newlib|picolibc
-ifneq (,$(filter newlib,$(USEMODULE)))
-  USEMODULE += newlib_nano
-  USEMODULE += newlib_syscalls_default
-endif
-
 USEMODULE += periph
-USEMODULE += riscv_common
+
+FEATURES_REQUIRED += periph_clic
 
 ifneq (,$(filter periph_pm,$(USEMODULE)))
   FEATURES_REQUIRED += periph_wdt
