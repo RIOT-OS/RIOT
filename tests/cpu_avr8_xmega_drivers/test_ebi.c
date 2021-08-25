@@ -36,6 +36,16 @@
  */
 #define BOARD_EBI_RAM_BASE      (0x10000)
 #define BOARD_EBI_RAM_SIZE      (0x30000)
+#elif defined(BOARD_ATXMEGA_A1_XPLAINED)
+/**
+ * 8MB  bytes installed
+ * 64k  bytes reserved for RIOT-OS
+ *
+ * The remaining memory can be addressable by hugemem methods.
+ * It is free for user and it is tested here
+ */
+#define BOARD_EBI_RAM_BASE      (0x10000)
+#define BOARD_EBI_RAM_SIZE      (0x7F0000)
 #else
 /**
  * 128k bytes installed
