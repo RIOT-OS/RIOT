@@ -70,6 +70,11 @@ static inline __attribute__((always_inline)) unsigned irq_enable(void)
     return _cpsr;
 }
 
+static inline __attribute__((always_inline)) int irq_is_enabled(void)
+{
+    return !(__get_cpsr() & IRQ_MASK);
+}
+
 #ifdef __cplusplus
 }
 #endif

@@ -56,6 +56,21 @@ int main(void)
               "======================================\n"
               "\n");
 
+    /* Short enable-restore sequence to check if the irq_is_enabled() function
+     * is reporting the correct IRQ state */
+    print_str("Verifying IRQ state tracking works: ");
+    int state_a = irq_is_enabled();
+    unsigned state = irq_disable();
+    int state_b = irq_is_enabled();
+    irq_restore(state);
+    int state_c = irq_is_enabled();
+    if ((state_a != 0) && (state_b == 0) && (state_c != 0)) {
+        print_str("[SUCCESS]\n");
+    }
+    else {
+        print_str("[FAILURE]\n");
+    }
+
     print_str("Verifying test works: ");
     xtimer_set(&xt, DELAY / 2);
     atomic_store(&a, 1);
@@ -64,7 +79,7 @@ int main(void)
 
     /* Timer should have fired in the middle of busy_delay(), thus value of
      * a now and during ISR should both be 1, but value of b during ISR should
-     * still be 0 but not it should be 1 */
+     * still be 0 but now it should be 1 */
     if ((atomic_load(&a) == atomic_load(&a_during_isr)) &&
             (atomic_load(&b) != atomic_load(&b_during_isr)))
         {
@@ -76,7 +91,7 @@ int main(void)
 
     print_str("Test result: ");
     xtimer_set(&xt, DELAY / 2);
-    unsigned state = irq_disable();
+    state = irq_disable();
     atomic_store(&a, 2);
     busy_delay();
     atomic_store(&b, 2);
