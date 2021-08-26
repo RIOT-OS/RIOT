@@ -8,7 +8,9 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-RIOTBASE="$(cd $(dirname $0)/../../..; pwd)"
+SCRIPTDIR="$(cd $(dirname "$0"); pwd)"
+RIOTBASE="$(cd "${SCRIPTDIR}"/../../..; pwd)"
+EXCLUDE_PATTERN_FILE="${SCRIPTDIR}/exclude_patterns"
 
 . ${RIOTBASE}/dist/tools/ci/github_annotate.sh
 
@@ -24,7 +26,7 @@ else
     CRESET=
 fi
 
-DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc 2>&1)
+DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc 2>&1 | grep -Evf "${EXCLUDE_PATTERN_FILE}")
 DOXY_ERRCODE=$?
 RESULT=0
 
