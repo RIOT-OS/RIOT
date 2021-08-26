@@ -1,6 +1,7 @@
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_pm
+FEATURES_PROVIDED += periph_plic
 FEATURES_PROVIDED += periph_rtt_overflow
 FEATURES_PROVIDED += periph_rtt_set_counter
 FEATURES_PROVIDED += periph_wdt
