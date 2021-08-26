@@ -1,0 +1,8 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    blackpill \
+    bluepill \
+    nucleo-f302r8 \
+    nucleo-f303k8 \
+    nucleo-f334r8 \
+    stm32mp157c-dk2 \
+    #

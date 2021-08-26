@@ -1,0 +1,16 @@
+[package]
+name = "rust-gcoap"
+version = "0.1.0"
+authors = ["Christian Amsüss <chrysn@fsfe.org>"]
+edition = "2018"
+resolver = "2"
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+riot-wrappers = { version = "^0.7", features = [ "with_coap_message", "with_coap_handler" ] }
+
+coap-message-demos = { git = "https://gitlab.com/chrysn/coap-message-demos/", default-features = false }
+coap-handler-implementations = "0.1"
+riot-coap-handler-demos = { git = "https://gitlab.com/etonomy/riot-module-examples/", features = [ "vfs" ] }
