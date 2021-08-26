@@ -269,6 +269,24 @@ void _set_rtr_adv(gnrc_netif_t *netif)
     _handle_snd_mc_ra(netif);
 }
 
+void _snd_rtr_advs_drop_pfx(gnrc_netif_t *netif, const ipv6_addr_t *dst,
+                            _nib_offl_entry_t *pfx)
+{
+    gnrc_pktsnip_t *ext_opts = NULL;
+    uint32_t now = evtimer_now_msec();
+
+    DEBUG("nib: broadcasting removal of %s/%u from %u\n",
+          ipv6_addr_to_str(addr_str, &pfx->pfx, sizeof(addr_str)),
+          pfx->pfx_len, netif->pid
+    );
+
+    pfx->pref_until  = now + 10;   /* add some safety margin */
+    pfx->valid_until = now + 10;   /* will be rounded to sec */
+
+    ext_opts = _offl_to_pio(pfx, ext_opts);
+    gnrc_ndp_rtr_adv_send(netif, NULL, dst, false, ext_opts);
+}
+
 static void _snd_ra(gnrc_netif_t *netif, const ipv6_addr_t *dst,
                     bool final, _nib_abr_entry_t *abr)
 {

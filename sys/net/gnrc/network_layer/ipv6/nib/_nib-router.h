@@ -118,6 +118,16 @@ void _set_rtr_adv(gnrc_netif_t *netif);
  */
 void _snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst,
                   bool final);
+/**
+ * @brief   Send router advertisements to remove a prefix
+ *
+ * @param[in] netif The interface to send the router advertisement over.
+ * @param[in] dst   Destination address for the router advertisement.
+ * @param[in] pfx   Off-link entry of the prefix that should be removed.
+ *
+ */
+void _snd_rtr_advs_drop_pfx(gnrc_netif_t *netif, const ipv6_addr_t *dst,
+                            _nib_offl_entry_t *pfx);
 #else  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 #define _init_iface_router(netif)                       (void)netif
 #define _call_route_info_cb(netif, type, ctx_addr, ctx) (void)netif; \
@@ -130,6 +140,9 @@ void _snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst,
 #define _snd_rtr_advs(netif, dst, final)                (void)netif; \
                                                         (void)dst; \
                                                         (void)final
+#define _snd_rtr_advs_drop_pfx(netif, dst, pfx)         (void)netif; \
+                                                        (void)dst; \
+                                                        (void)pfx;
 #endif /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 
 #ifdef __cplusplus
