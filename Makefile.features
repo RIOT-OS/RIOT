@@ -24,3 +24,6 @@ FEATURES_PROVIDED += cpu_$(CPU)
 # Features that are conflicting for all architectures
 FEATURES_CONFLICT += picolibc:newlib
 FEATURES_CONFLICT_MSG += "Only one standard C library can be used"
+
+FEATURES_CONFLICT += periph_gpio_irq:periph_gpio_ll_irq
+FEATURES_CONFLICT_MSG += "Only one GPIO IRQ implementation can be used"
