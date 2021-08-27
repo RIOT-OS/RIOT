@@ -131,7 +131,7 @@ int ili9341_init(ili9341_t *dev, const ili9341_params_t *params)
     _write_cmd(dev, ILI9341_CMD_VMCTRL2, command_params, 1);
 
     /* Memory access CTL */
-    command_params[0] = ILI9341_MADCTL_HORZ_FLIP;
+    command_params[0] = dev->params->rotation;
     command_params[0] |= dev->params->rgb ? 0 : ILI9341_MADCTL_BGR;
     _write_cmd(dev, ILI9341_CMD_MADCTL, command_params, 1);
 

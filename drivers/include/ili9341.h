@@ -94,19 +94,54 @@ extern "C" {
 /** @} */
 
 /**
+ * @name Memory access control bits
+ * @{
+ */
+#define ILI9341_MADCTL_MY           0x80    /**< Row address order */
+#define ILI9341_MADCTL_MX           0x40    /**< Column access order */
+#define ILI9341_MADCTL_MV           0x20    /**< Row column exchange */
+#define ILI9341_MADCTL_ML           0x10    /**< Vertical refresh order */
+#define ILI9341_MADCTL_BGR          0x08    /**< Color selector switch control */
+#define ILI9341_MADCTL_MH           0x04    /**< Horizontal refresh direction */
+/** @} */
+
+/**
+ * @name Display rotation modes
+ * @{
+ */
+#define ILI9341_MADCTL_VERT         ILI9341_MADCTL_MX       /**< Vertical mode */
+#define ILI9341_MADCTL_VERT_FLIP    ILI9341_MADCTL_MY       /**< Flipped vertical */
+#define ILI9341_MADCTL_HORZ         ILI9341_MADCTL_MV       /**< Horizontal mode */
+#define ILI9341_MADCTL_HORZ_FLIP    ILI9341_MADCTL_MV | \
+                                    ILI9341_MADCTL_MY | \
+                                    ILI9341_MADCTL_MX       /**< Horizontal flipped */
+/** @} */
+
+/**
+ * @brief   Display rotation mode
+ */
+typedef enum {
+    ILI9341_ROTATION_VERT       = ILI9341_MADCTL_VERT,      /**< Vertical mode */
+    ILI9341_ROTATION_VERT_FLIP  = ILI9341_MADCTL_VERT_FLIP, /**< Vertical flipped mode */
+    ILI9341_ROTATION_HORZ       = ILI9341_MADCTL_HORZ,      /**< Horizontal mode */
+    ILI9341_ROTATION_HORZ_FLIP  = ILI9341_MADCTL_HORZ_FLIP, /**< Horizontal flipped mode */
+} ili9341_rotation_t;
+
+/**
  * @brief   Device initialization parameters
  */
 typedef struct {
-    spi_t spi;          /**< SPI device that the display is connected to */
-    spi_clk_t spi_clk;  /**< SPI clock speed to use */
-    spi_mode_t spi_mode;/**< SPI mode */
-    gpio_t cs_pin;      /**< pin connected to the CHIP SELECT line */
-    gpio_t dcx_pin;     /**< pin connected to the DC line */
-    gpio_t rst_pin;     /**< pin connected to the reset line */
-    bool rgb;           /**< True when display is connected in RGB mode
-                          *  False when display is connected in BGR mode */
-    bool inverted;      /**< Display works in inverted color mode */
-    uint16_t lines;     /**< Number of lines, from 16 to 320 in 8 line steps */
+    spi_t spi;                      /**< SPI device that the display is connected to */
+    spi_clk_t spi_clk;              /**< SPI clock speed to use */
+    spi_mode_t spi_mode;            /**< SPI mode */
+    gpio_t cs_pin;                  /**< pin connected to the CHIP SELECT line */
+    gpio_t dcx_pin;                 /**< pin connected to the DC line */
+    gpio_t rst_pin;                 /**< pin connected to the reset line */
+    bool rgb;                       /**< True when display is connected in RGB mode
+                                      *  False when display is connected in BGR mode */
+    bool inverted;                  /**< Display works in inverted color mode */
+    uint16_t lines;                 /**< Number of lines, from 16 to 320 in 8 line steps */
+    ili9341_rotation_t rotation;    /**< Display rotation mode */
 } ili9341_params_t;
 
 /**

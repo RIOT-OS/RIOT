@@ -105,6 +105,7 @@ extern "C" {
 #define ILI9341_PARAM_NUM_LINES         (240U)
 #define ILI9341_PARAM_RGB               (1)
 #define ILI9341_PARAM_INVERTED          (1)
+#define ILI9341_PARAM_ROTATION          (ILI9341_ROTATION_HORZ_FLIP)
 /** @} */
 
 #ifdef __cplusplus

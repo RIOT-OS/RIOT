@@ -65,30 +65,6 @@ extern "C" {
 #define ILI9341_CMD_IFCTL           0xf6    /**< Interface control */
 /** @} */
 
-/**
- * @name Memory access control bits
- * @{
- */
-#define ILI9341_MADCTL_MY           0x80    /**< Row address order */
-#define ILI9341_MADCTL_MX           0x40    /**< Column access order */
-#define ILI9341_MADCTL_MV           0x20    /**< Row column exchange */
-#define ILI9341_MADCTL_ML           0x10    /**< Vertical refresh order */
-#define ILI9341_MADCTL_BGR          0x08    /**< Color selector switch control */
-#define ILI9341_MADCTL_MH           0x04    /**< Horizontal refresh direction */
-/** @} */
-
-/**
- * @name Display rotation modes
- * @{
- */
-#define ILI9341_MADCTL_VERT         ILI9341_MADCTL_MX       /**< Vertical mode */
-#define ILI9341_MADCTL_VERT_FLIP    ILI9341_MADCTL_MY       /**< Flipped vertical */
-#define ILI9341_MADCTL_HORZ         ILI9341_MADCTL_MV       /**< Horizontal mode */
-#define ILI9341_MADCTL_HORZ_FLIP    ILI9341_MADCTL_MV | \
-    ILI9341_MADCTL_MY | \
-    ILI9341_MADCTL_MX                                   /**< Horizontal flipped */
-/** @} */
-
 #define ILI9341_PIXSET_16BIT        0x55    /**< MCU and RGB 16 bit interface */
 #define ILI9341_PIXSET_18BIT        0x66    /**< MCU and RGB 18 bit interface (not implemented) */
 
