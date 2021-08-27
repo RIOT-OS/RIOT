@@ -20,20 +20,11 @@
 
 #include "board.h"
 #include "cpu.h"
-#include "periph/gpio.h"
-
-#ifndef CPU_ATMEGA_CLK_SCALE_INIT
-#define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
-#endif
 
 void led_init(void);
 
 void board_init(void)
 {
-    /* disable usb interrupt */
-    PRR1 |= 1<<PRUSB;
-
-    atmega_set_prescaler(CPU_ATMEGA_CLK_SCALE_INIT);
     avr8_stdio_init();
     cpu_init();
     led_init();

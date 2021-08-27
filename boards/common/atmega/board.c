@@ -22,21 +22,10 @@
 #include "cpu.h"
 #include "periph/gpio.h"
 
-#ifndef CPU_ATMEGA_CLK_SCALE_INIT
-#define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
-#endif
-
 void led_init(void);
 
 void __attribute__((weak)) board_init(void)
 {
-#ifdef CPU_ATMEGA32U4
-    /* disable usb interrupt on Atmega32U4 */
-    PRR1 |= 1<<PRUSB;
-#endif
-
-    atmega_set_prescaler(CPU_ATMEGA_CLK_SCALE_INIT);
-
     cpu_init();
 #ifdef LED0_ON
     led_init();
