@@ -142,7 +142,7 @@ https://www.riot-os.org
 
 
 [api-badge]: https://img.shields.io/badge/docs-API-informational.svg
-[api-link]: https://riot-os.org/api/
+[api-link]: https://doc.riot-os.org/
 [license-badge]: https://img.shields.io/github/license/RIOT-OS/RIOT
 [license-link]: https://github.com/RIOT-OS/RIOT/blob/master/LICENSE
 [master-ci-badge]: https://ci.riot-os.org/RIOT-OS/RIOT/master/latest/badge.svg
