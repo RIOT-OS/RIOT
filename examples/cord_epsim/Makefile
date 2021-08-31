@@ -8,7 +8,7 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
 
 # Enable GNRC networking
-USEMODULE += gnrc_netdev_default
+USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 

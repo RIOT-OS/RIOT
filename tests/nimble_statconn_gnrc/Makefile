@@ -7,7 +7,7 @@ USEMODULE += shell_commands
 USEMODULE += ps
 
 # Include GNRC and RPL
-USEMODULE += gnrc_netdev_default
+USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_router_default
 USEMODULE += auto_init_gnrc_rpl

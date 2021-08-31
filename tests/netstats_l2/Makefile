@@ -6,7 +6,7 @@ BOARD_WHITELIST += $(BOARD_PROVIDES_NETIF)
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += gnrc
-USEMODULE += gnrc_netdev_default
+USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += netstats_l2
 

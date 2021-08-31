@@ -1,6 +1,6 @@
 ifeq ($(BOARD),native)
   USEMODULE += suit_storage_ram
-  USEMODULE += gnrc_netdev_default
+  USEMODULE += netdev_default
 else
   USEMODULE += suit_storage_flashwrite
 endif
