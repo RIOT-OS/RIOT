@@ -133,6 +133,8 @@ static void *_dhcpv6_cl_simple_pd_thread(void *args)
     dhcpv6_client_init(&event_queue, upstream_netif->pid);
     /* configure client to request prefix delegation for WPAN interfaces */
     _configure_dhcpv6_client();
+    /* set client configuration mode to stateful */
+    dhcpv6_client_set_conf_mode(DHCPV6_CLIENT_CONF_MODE_STATEFUL);
     /* start DHCPv6 client */
     dhcpv6_client_start();
     /* start event loop of DHCPv6 client */
