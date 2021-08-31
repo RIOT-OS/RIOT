@@ -190,7 +190,7 @@ static inline void *flashpage_addr(unsigned page)
  *
  * @return              page containing the given address
  */
-static inline unsigned flashpage_page(void *addr)
+static inline unsigned flashpage_page(const void *addr)
 {
     return (((intptr_t)addr - CPU_FLASH_BASE) / FLASHPAGE_SIZE);
 }
@@ -200,7 +200,7 @@ static inline unsigned flashpage_page(void *addr)
 /* Bare prototypes for the above functions. See above for the documentation */
 size_t flashpage_size(unsigned page);
 void *flashpage_addr(unsigned page);
-unsigned flashpage_page(void *addr);
+unsigned flashpage_page(const void *addr);
 
 #endif
 
@@ -319,7 +319,7 @@ static inline void *flashpage_rwwee_addr(unsigned page)
  *
  * @return              RWWEE page containing the given address
  */
-static inline int flashpage_rwwee_page(void *addr)
+static inline int flashpage_rwwee_page(const void *addr)
 {
     return (int)(((int)addr - CPU_FLASH_RWWEE_BASE) / FLASHPAGE_SIZE);
 }

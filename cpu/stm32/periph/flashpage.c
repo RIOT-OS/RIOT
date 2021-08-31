@@ -329,7 +329,7 @@ size_t flashpage_size(unsigned page)
     }
 }
 
-unsigned flashpage_page(void *addr)
+unsigned flashpage_page(const void *addr)
 {
     /* Calculates the flashpage number based on the address for the
      * non-homogeneous flashpage stm32 series.

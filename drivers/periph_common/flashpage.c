@@ -118,7 +118,7 @@ void *flashpage_addr(unsigned page)
 #endif /* PERIPH_FLASHPAGE_NEEDS_FLASHPAGE_ADDR */
 
 #ifdef PERIPH_FLASHPAGE_NEEDS_FLASHPAGE_PAGE
-unsigned flashpage_page(void *addr)
+unsigned flashpage_page(const void *addr)
 {
     unsigned page = 0;
 
