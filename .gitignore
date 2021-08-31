@@ -89,3 +89,6 @@ keys/
 
 # clangd language server
 .clangd/
+
+# custom clang-tidy flags, also used when using clangd language server
+.clang-tidy
