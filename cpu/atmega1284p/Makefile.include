@@ -1,5 +1,7 @@
 RAM_LEN = 16K
 ROM_LEN = 128K
 
+LINKER_SCRIPT ?= avr51.ld
+
 # CPU depends on the atmega common module, so include it
 include $(RIOTCPU)/atmega_common/Makefile.include
