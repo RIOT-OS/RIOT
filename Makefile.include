@@ -844,6 +844,8 @@ objdump:
 	$(call check_cmd,$(OBJDUMP),Objdump program)
 	$(OBJDUMP) $(OBJDUMPFLAGS) $(ELFFILE) | less
 
+# inlcude clang-tidy
+include $(RIOTMAKE)/clang_tidy.inc.mk
 # Support Eclipse IDE.
 include $(RIOTMAKE)/eclipse.inc.mk
 
