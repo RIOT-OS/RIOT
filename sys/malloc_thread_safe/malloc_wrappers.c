@@ -26,7 +26,7 @@ extern void *__real_realloc(void *ptr, size_t size);
 
 static mutex_t _lock;
 
-void *__wrap_malloc(size_t size)
+void __attribute__((used)) *__wrap_malloc(size_t size)
 {
     assert(!irq_is_in());
     mutex_lock(&_lock);
@@ -35,7 +35,7 @@ void *__wrap_malloc(size_t size)
     return ptr;
 }
 
-void __wrap_free(void *ptr)
+void __attribute__((used)) __wrap_free(void *ptr)
 {
     assert(!irq_is_in());
     mutex_lock(&_lock);
@@ -43,7 +43,7 @@ void __wrap_free(void *ptr)
     mutex_unlock(&_lock);
 }
 
-void *__wrap_calloc(size_t nmemb, size_t size)
+void * __attribute__((used)) __wrap_calloc(size_t nmemb, size_t size)
 {
     /* some c libs don't perform proper overflow check (e.g. newlib < 4.0.0). Hence, we
      * just implement calloc on top of malloc ourselves. In addition to ensuring proper
@@ -61,7 +61,7 @@ void *__wrap_calloc(size_t nmemb, size_t size)
     return res;
 }
 
-void *__wrap_realloc(void *ptr, size_t size)
+void * __attribute__((used))__wrap_realloc(void *ptr, size_t size)
 {
     assert(!irq_is_in());
     mutex_lock(&_lock);
