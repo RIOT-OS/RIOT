@@ -8,13 +8,17 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-RIOTBASE="$(cd $(dirname $0)/../../..; pwd)"
+# If we don't find this scripts directory, does it really make sense to exit? So
+# shellcheck disable=SC2164
+SCRIPTDIR="$(cd "$(dirname "$0")"; pwd)"
+RIOTBASE="$(cd "${SCRIPTDIR}"/../../..; pwd)"
+EXCLUDE_PATTERN_FILE="${SCRIPTDIR}/exclude_patterns"
 
-. ${RIOTBASE}/dist/tools/ci/github_annotate.sh
+. "${RIOTBASE}"/dist/tools/ci/github_annotate.sh
 
 github_annotate_setup
 
-if tput colors &> /dev/null && [ $(tput colors) -ge 8 ]; then
+if tput colors &> /dev/null && [ "$(tput colors)" -ge 8 ]; then
     CERROR="\e[1;31m"
     CWARN="\033[1;33m"
     CRESET="\e[0m"
@@ -24,7 +28,7 @@ else
     CRESET=
 fi
 
-DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc 2>&1)
+DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc 2>&1 | grep -Evf "${EXCLUDE_PATTERN_FILE}")
 DOXY_ERRCODE=$?
 RESULT=0
 
@@ -37,6 +41,9 @@ else
     ERRORS=$(echo "${DOXY_OUTPUT}" | grep '.*warning' | sed "s#${PWD}/\([^:]*\)#\1#g")
     if [ -n "${ERRORS}" ] ; then
         if github_annotate_is_on; then
+            # We want to see backslashes here to escape e.g. newlines in
+            # github_annotate_error
+            # shellcheck disable=SC2162
             echo "${ERRORS}" | grep "^.\+:[0-9]\+: warning:" | while read error_line
             do
                 FILENAME=$(echo "${error_line}" | cut -d: -f1)
@@ -90,10 +97,13 @@ then
     do
         INGROUPS=$(echo "${ALL_RAW_INGROUP}" | grep "\<${group}\>$" | sort -u)
         if github_annotate_is_on; then
+            # We want to see backslashes here to escape e.g. newlines in
+            # github_annotate_error
+            # shellcheck disable=SC2162
             echo "${INGROUPS}" | while read ingroup;
             do
                 github_annotate_error \
-                    $(echo ${ingroup} | awk -F: '{ print $1,$2 }') \
+                    "$(echo "${ingroup}" | awk -F: '{ print $1,$2 }')" \
                     "Undefined doxygen group '${group}'"
             done
         else
@@ -124,9 +134,12 @@ then
             grep "\<${group}\>$" | sort -u)
         DEFGROUPFILES=$(echo "${DEFGROUPS}" | awk -F: '{ print "\t" $1 }')
         if github_annotate_is_on; then
+            # We want to see backslashes here to escape e.g. newlines in
+            # github_annotate_error
+            # shellcheck disable=SC2162
             echo "${DEFGROUPS}" | while read defgroup;
             do
-                github_annotate_error $(echo ${defgroup} | awk -F: '{ print $1,$2 }') \
+                github_annotate_error "$(echo "${defgroup}" | awk -F: '{ print $1,$2 }')" \
                     "Multiple doxygen group definitions of '${group}' in\n${DEFGROUPFILES}"
             done
         else
