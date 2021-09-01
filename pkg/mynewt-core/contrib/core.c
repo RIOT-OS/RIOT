@@ -25,10 +25,17 @@
 void mynewt_core_init(void)
 {
 #if (MYNEWT_VAL_OS_CPUTIME_TIMER_NUM >= 0) && (defined(CPU_NRF51) || defined(CPU_NRF52))
-    int rc = hal_timer_init(5, NULL);
+    /* in mynewt-nimble and uwb-core OS_CPUTIMER_TIMER_NUM == 5 is NRF_RTC0,
+       for nimble this must be used for the BLE stack and must go through
+       mynewt timer initialization for it to work properly. The RTC frequency
+       should be set to the highest possible value, so 32768Hz */
+    assert(MYNEWT_VAL_OS_CPUTIME_TIMER_NUM == 5);
+    assert(MYNEWT_VAL_OS_CPUTIME_FREQ == 32768);
+    int rc = hal_timer_init(MYNEWT_VAL_OS_CPUTIME_TIMER_NUM, NULL);
     assert(rc == 0);
-    rc = os_cputime_init(MYNEWT_VAL_OS_CPUTIME_FREQ);
+    rc = hal_timer_config(MYNEWT_VAL_OS_CPUTIME_TIMER_NUM,
+                          MYNEWT_VAL_OS_CPUTIME_FREQ);
     assert(rc == 0);
-    (void) rc;
+    (void)rc;
 #endif
 }
