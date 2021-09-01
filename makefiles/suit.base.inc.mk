@@ -25,16 +25,16 @@ CFLAGS += -I$(SUIT_PUB_HDR_DIR)
 BUILDDEPS += $(SUIT_PUB_HDR)
 
 $(SUIT_SEC): $(CLEAN)
-	@echo suit: generating key in $(SUIT_KEY_DIR)
-	@mkdir -p $(SUIT_KEY_DIR)
-	@$(RIOTBASE)/dist/tools/suit/gen_key.py $(SUIT_SEC)
+	$(Q)echo suit: generating key in $(SUIT_KEY_DIR)
+	$(Q)mkdir -p $(SUIT_KEY_DIR)
+	$(Q)$(RIOTBASE)/dist/tools/suit/gen_key.py $(SUIT_SEC)
 
 # set FORCE so switching between keys using "SUIT_KEY=foo make ..."
 # triggers a rebuild even if the new key would otherwise not (because the other
 # key's mtime is too far back).
 $(SUIT_PUB_HDR): $(SUIT_SEC) FORCE | $(CLEAN)
-	@mkdir -p $(SUIT_PUB_HDR_DIR)
-	@$(SUIT_TOOL) pubkey -f header -k $(SUIT_SEC) \
+	$(Q)mkdir -p $(SUIT_PUB_HDR_DIR)
+	$(Q)$(SUIT_TOOL) pubkey -f header -k $(SUIT_SEC) \
 	  | '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
 
 suit/genkey: $(SUIT_SEC)

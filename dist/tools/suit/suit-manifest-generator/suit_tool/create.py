@@ -27,7 +27,6 @@ def main(options):
     m = json.loads(options.input_file.read(), object_pairs_hook=OrderedDict)
 
     nm = compile_manifest(options, m)
-    print('create done. Serializing')
     if m.get('severable') or (hasattr(options, 'severable') and options.severable):
         nm = nm.to_severable('sha256')
     output = {
