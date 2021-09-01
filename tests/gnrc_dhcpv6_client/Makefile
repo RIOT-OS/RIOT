@@ -41,7 +41,12 @@ include $(RIOTBASE)/Makefile.include
 
 .PHONY: dhcpv6_server
 
-dhcpv6_server: IFACE := ${IFACE}
+# export IFACE variable to environment of dhcpv6_server and
+# test-with-config/check-config rules
+# see: https://doc.riot-os.org/build-system-basics.html#variable-declaration-guidelines
+$(call target-export-variables,test-with-config/check-config,IFACE)
+
+dhcpv6_server:
 dhcpv6_server:
 	$(CURDIR)/dhcpv6_server.sh $(DHCPV6_SERVER_PORT) $(CURDIR)/kea-dhcp6.conf
 
