@@ -53,7 +53,7 @@ EOF
     sleep 1 # sleep to let TAP become active
     cd "$TMPDIR" || exit 1
     KEA_PIDFILE_DIR=. KEA_LOCKFILE_DIR=. \
-        kea-dhcp6 -p "$1" -c "$config"
+        kea-dhcp6 -p "$1" -c "$config" &
 }
 
 # no need to kill from external, kea handles double instances gracefully
