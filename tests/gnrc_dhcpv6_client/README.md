@@ -21,7 +21,9 @@ If you use any platform other than `native`, you need to use `ethos`, otherwise
 `netdev_tap` is chosen.
 
 An instance of Kea that configured via [kea-dhcp6.conf](kea-dhcp6.conf) is
-started in parallel to `make term`/`make test-with-config`.
+started in parallel to `make term`/`make test-with-config`. The
+`{{ env.IFACE }}` template variable will be replaced by the `dhcpv6_server.sh`
+script.
 
 Read the [Kea documentation] on the configuration file for more information.
 

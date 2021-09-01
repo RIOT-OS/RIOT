@@ -25,26 +25,25 @@ _kea_version_lesser_1_7_10() {
 
 _dhcpv6_server() {
     TMPDIR="$(mktemp -u | xargs dirname)/${APPLICATION}_kea"
+    CONFIG="${TMPDIR}/kea-dhcp6.config"
 
     # only used `mktemp` with dry-run above to get temp directory name, so we
     # still need to create the directory
     mkdir -p "${TMPDIR}"
-    if _kea_version_lesser_1_7_10; then
-        config=$2
-    else
+    sed "s/\"{{\s*env\.IFACE\s*}}\"/\"${IFACE}\"/" "$2" > "${CONFIG}"
+    if ! _kea_version_lesser_1_7_10; then
         # Top-level "Logging" config is not supported by Kea >=1.7.10, so move
         # that config to Dhcp6 map, see
         # https://kea.readthedocs.io/en/kea-1.7.10/arm/config.html#json-syntax
-        config="${TMPDIR}/kea-dhcp6.config"
         convert_json="$(cat <<EOF
 import json
 
-with open('$2') as c:
+with open('$CONFIG') as c:
     config = json.load(c)
 logging = config.pop('Logging', None)
 if logging is not None:
     config['Dhcp6'].update(logging)
-with open('$config', 'w') as c:
+with open('$CONFIG', 'w') as c:
     json.dump(config, c)
 EOF
 )"
@@ -53,7 +52,7 @@ EOF
     sleep 1 # sleep to let TAP become active
     cd "$TMPDIR" || exit 1
     KEA_PIDFILE_DIR=. KEA_LOCKFILE_DIR=. \
-        kea-dhcp6 -p "$1" -c "$config" &
+        kea-dhcp6 -p "$1" -c "$CONFIG" &
 }
 
 # no need to kill from external, kea handles double instances gracefully
