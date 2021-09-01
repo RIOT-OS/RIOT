@@ -63,11 +63,6 @@ extern "C" {
  */
 #define IRQ_API_INLINED                 (1)
 
-/**
- * @brief   This arch require special clock initialization.
- */
-#define CPU_AVR8_HAS_CLOCK_INIT          1
-
 #ifdef __cplusplus
 }
 #endif

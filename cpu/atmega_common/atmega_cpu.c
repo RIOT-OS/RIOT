@@ -28,11 +28,16 @@
 
 #include <avr/pgmspace.h>
 
+#include "board.h"
 #include "cpu.h"
 #include "panic.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+#ifndef CPU_ATMEGA_CLK_SCALE_INIT
+#define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
+#endif
 
 extern uint8_t mcusr_mirror;
 extern uint8_t soft_rst;
@@ -60,6 +65,11 @@ void avr8_reset_cause(void)
         DEBUG("JTAG reset!\n");
     }
 #endif
+}
+
+void __attribute__((weak)) avr8_clk_init(void)
+{
+    atmega_set_prescaler(CPU_ATMEGA_CLK_SCALE_INIT);
 }
 
 /* This is a vector which is aliased to __vector_default,
