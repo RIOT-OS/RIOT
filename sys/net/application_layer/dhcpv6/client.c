@@ -683,6 +683,25 @@ static void _update_addr_lease(const dhcpv6_opt_iaaddr_t *iaaddr, addr_lease_t *
     }
 }
 
+static void _update_prefix_lease(const dhcpv6_opt_iapfx_t *iapfx, pfx_lease_t *lease)
+{
+    if (iapfx != NULL) {
+        uint32_t valid = byteorder_ntohl(iapfx->valid);
+        uint32_t pref = byteorder_ntohl(iapfx->pref);
+
+        lease->pfx_len = iapfx->pfx_len;
+        lease->leased = 1U;
+        ipv6_addr_init_prefix(&lease->pfx,
+                              &iapfx->pfx,
+                              iapfx->pfx_len);
+        if (iapfx->pfx_len > 0) {
+            dhcpv6_client_conf_prefix(lease->parent.ia_id.info.netif,
+                                      &lease->pfx, lease->pfx_len,
+                                      valid, pref);
+        }
+    }
+}
+
 static void _parse_advertise(uint8_t *adv, size_t len)
 {
     dhcpv6_opt_smr_t *smr = NULL;
@@ -796,6 +815,66 @@ static void _parse_advertise(uint8_t *adv, size_t len)
     return;
 }
 
+static bool _parse_ia_pd_option(dhcpv6_opt_ia_pd_t *ia_pd)
+{
+    if (!IS_USED(MODULE_DHCPV6_CLIENT_IA_PD)) {
+        return true;
+    }
+
+    for (unsigned i = 0; (i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX); i++) {
+        dhcpv6_opt_iapfx_t *iapfx = NULL;
+        pfx_lease_t *lease = &pfx_leases[i];
+        unsigned pd_t1, pd_t2;
+        uint32_t ia_id = byteorder_ntohl(ia_pd->ia_id);
+        size_t ia_pd_len = byteorder_ntohs(ia_pd->len) -
+                           (sizeof(dhcpv6_opt_ia_pd_t) - sizeof(dhcpv6_opt_t));
+        size_t ia_pd_orig_len = ia_pd_len;
+
+        if (lease->parent.ia_id.id != ia_id) {
+            continue;
+        }
+        /* check for status */
+        for (dhcpv6_opt_t *ia_pd_opt = (dhcpv6_opt_t *)(ia_pd + 1);
+             ia_pd_len > 0;
+             ia_pd_len -= _opt_len(ia_pd_opt),
+             ia_pd_opt = _opt_next(ia_pd_opt)) {
+            if (ia_pd_len > ia_pd_orig_len) {
+                DEBUG("DHCPv6 client: IA_PD options overflow option "
+                      "boundaries\n");
+                return false;
+            }
+            switch (byteorder_ntohs(ia_pd_opt->type)) {
+                case DHCPV6_OPT_STATUS: {
+                    if (!_check_status_opt((dhcpv6_opt_status_t *)ia_pd_opt)) {
+                        continue;
+                    }
+                    break;
+                }
+                case DHCPV6_OPT_IAPFX: {
+                    dhcpv6_opt_iapfx_t *this_iapfx = (dhcpv6_opt_iapfx_t *)ia_pd_opt;
+                    if ((!lease->leased) ||
+                        (iapfx == NULL) ||
+                        ((this_iapfx->pfx_len == lease->pfx_len) &&
+                        ipv6_addr_match_prefix(&this_iapfx->pfx,
+                                               &lease->pfx) >= lease->pfx_len)) {
+                        /* only take first prefix for now */
+                        iapfx = this_iapfx;
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+        pd_t1 = byteorder_ntohl(ia_pd->t1);
+        pd_t2 = byteorder_ntohl(ia_pd->t2);
+        _update_t1_t2(pd_t1, pd_t2);
+        _update_prefix_lease(iapfx, lease);
+    }
+
+    return true;
+}
+
 static bool _parse_ia_na_option(dhcpv6_opt_ia_na_t *ia_na)
 {
     if (!IS_USED(MODULE_DHCPV6_CLIENT_IA_NA)) {
@@ -808,7 +887,7 @@ static bool _parse_ia_na_option(dhcpv6_opt_ia_na_t *ia_na)
         unsigned na_t1, na_t2;
         uint32_t ia_id = byteorder_ntohl(ia_na->ia_id);
         size_t ia_na_len = byteorder_ntohs(ia_na->len) -
-                            (sizeof(dhcpv6_opt_ia_na_t) - sizeof(dhcpv6_opt_t));
+                           (sizeof(dhcpv6_opt_ia_na_t) - sizeof(dhcpv6_opt_t));
         size_t ia_na_orig_len = ia_na_len;
 
         if (lease->parent.ia_id.id != ia_id) {
@@ -816,12 +895,12 @@ static bool _parse_ia_na_option(dhcpv6_opt_ia_na_t *ia_na)
         }
         /* check for status */
         for (dhcpv6_opt_t *ia_na_opt = (dhcpv6_opt_t *)(ia_na + 1);
-                ia_na_len > 0;
-                ia_na_len -= _opt_len(ia_na_opt),
-                ia_na_opt = _opt_next(ia_na_opt)) {
+             ia_na_len > 0;
+             ia_na_len -= _opt_len(ia_na_opt),
+             ia_na_opt = _opt_next(ia_na_opt)) {
             if (ia_na_len > ia_na_orig_len) {
                 DEBUG("DHCPv6 client: IA_NA options overflow option "
-                        "boundaries\n");
+                      "boundaries\n");
                 return false;
             }
             switch (byteorder_ntohs(ia_na_opt->type)) {
@@ -889,7 +968,9 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                 }
                 break;
             case DHCPV6_OPT_IA_NA:
-                ia_na = (dhcpv6_opt_ia_na_t *)opt;
+                if (IS_USED(MODULE_DHCPV6_CLIENT_IA_NA)) {
+                    ia_na = (dhcpv6_opt_ia_na_t *)opt;
+                }
                 break;
             case DHCPV6_OPT_SMR:
                 smr = (dhcpv6_opt_smr_t *)opt;
@@ -925,76 +1006,13 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                 break;
 #endif  /* IS_USED(MODULE_DHCPV6_CLIENT_DNS) */
             case DHCPV6_OPT_IA_PD:
-                for (unsigned i = 0;
-                     IS_USED(MODULE_DHCPV6_CLIENT_IA_PD) &&
-                     (i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX);
-                     i++) {
-                    dhcpv6_opt_iapfx_t *iapfx = NULL;
-                    pfx_lease_t *lease = &pfx_leases[i];
-                    ia_pd = (dhcpv6_opt_ia_pd_t *)opt;
-                    unsigned pd_t1, pd_t2;
-                    uint32_t ia_id = byteorder_ntohl(ia_pd->ia_id);
-                    size_t ia_pd_len = byteorder_ntohs(ia_pd->len) -
-                                       (sizeof(dhcpv6_opt_ia_pd_t) - sizeof(dhcpv6_opt_t));
-                    size_t ia_pd_orig_len = ia_pd_len;
-
-                    if (lease->parent.ia_id.id != ia_id) {
-                        continue;
-                    }
-                    /* check for status */
-                    for (dhcpv6_opt_t *ia_pd_opt = (dhcpv6_opt_t *)(ia_pd + 1);
-                         ia_pd_len > 0;
-                         ia_pd_len -= _opt_len(ia_pd_opt),
-                         ia_pd_opt = _opt_next(ia_pd_opt)) {
-                        if (ia_pd_len > ia_pd_orig_len) {
-                            DEBUG("DHCPv6 client: IA_PD options overflow option "
-                                  "boundaries\n");
-                            return false;
-                        }
-                        switch (byteorder_ntohs(ia_pd_opt->type)) {
-                            case DHCPV6_OPT_STATUS: {
-                                if (!_check_status_opt((dhcpv6_opt_status_t *)ia_pd_opt)) {
-                                    continue;
-                                }
-                                break;
-                            }
-                            case DHCPV6_OPT_IAPFX: {
-                                dhcpv6_opt_iapfx_t *this_iapfx = (dhcpv6_opt_iapfx_t *)ia_pd_opt;
-                                if ((!lease->leased) ||
-                                    (iapfx == NULL) ||
-                                    ((this_iapfx->pfx_len == lease->pfx_len) &&
-                                     ipv6_addr_match_prefix(&this_iapfx->pfx,
-                                                            &lease->pfx) >= lease->pfx_len)) {
-                                    /* only take first prefix for now */
-                                    iapfx = this_iapfx;
-                                }
-                                break;
-                            }
-                            default:
-                                break;
-                        }
-                    }
-                    pd_t1 = byteorder_ntohl(ia_pd->t1);
-                    pd_t2 = byteorder_ntohl(ia_pd->t2);
-                    _update_t1_t2(pd_t1, pd_t2);
-                    if ((iapfx != NULL)) {
-                        uint32_t valid = byteorder_ntohl(iapfx->valid);
-                        uint32_t pref = byteorder_ntohl(iapfx->pref);
-
-                        lease->pfx_len = iapfx->pfx_len;
-                        lease->leased = 1U;
-                        ipv6_addr_init_prefix(&lease->pfx,
-                                              &iapfx->pfx,
-                                              iapfx->pfx_len);
-                        if (iapfx->pfx_len > 0) {
-                            dhcpv6_client_conf_prefix(
-                                    lease->parent.ia_id.info.netif, &lease->pfx,
-                                    lease->pfx_len, valid, pref
-                                );
-                        }
-                    }
-                }
-                break;
+                if (_parse_ia_pd_option((dhcpv6_opt_ia_pd_t *)opt)) {
+                     /* No error occurred */
+                     break;
+                 } else {
+                     /* Something went wrong */
+                     return false;
+                 }
             case DHCPV6_OPT_IA_NA:
                  if (_parse_ia_na_option((dhcpv6_opt_ia_na_t *)opt)) {
                      /* No error occurred */
@@ -1010,29 +1028,51 @@ static bool _parse_reply(uint8_t *rep, size_t len)
     return true;
 }
 
+static size_t _compose_message(dhcpv6_msg_t *msg, uint8_t type)
+{
+    msg->type = type;
+    _generate_tid();
+    _set_tid(msg->tid);
+    uint16_t oro_opts[] = { DHCPV6_OPT_SMR };
+    size_t msg_len = sizeof(dhcpv6_msg_t);
+
+    transaction_start = _now_cs();
+
+    msg_len += _compose_cid_opt((dhcpv6_opt_duid_t *)&send_buf[msg_len]);
+
+    if (type != DHCPV6_REBIND && type != DHCPV6_SOLICIT) {
+        /* See RFC 8415, Appendix B */
+        msg_len += _compose_sid_opt((dhcpv6_opt_duid_t *)&send_buf[msg_len]);
+    }
+
+    msg_len += _compose_mud_url_opt((dhcpv6_opt_mud_url_t *)&send_buf[msg_len],
+                                    sizeof(send_buf) - msg_len);
+
+    msg_len += _compose_oro_opt((dhcpv6_opt_oro_t *)&send_buf[msg_len], oro_opts,
+                                ARRAY_SIZE(oro_opts));
+
+    msg_len += _add_ia_na(&send_buf[msg_len], sizeof(send_buf) - msg_len);
+    msg_len += _add_ia_pd_from_config(&send_buf[msg_len], sizeof(send_buf) - msg_len);
+
+    return msg_len;
+}
+
 static void _solicit_servers(event_t *event)
 {
     dhcpv6_msg_t *msg = (dhcpv6_msg_t *)&send_buf[0];
     dhcpv6_opt_elapsed_time_t *time;
     uint8_t *buf = NULL;
     uint32_t retrans_timeout = _irt_ms(DHCPV6_SOL_TIMEOUT, true);
-    size_t msg_len = sizeof(dhcpv6_msg_t);
+    size_t msg_len;
     int res, best_res = 0;
     bool first_rt = true;
-    uint16_t oro_opts[] = { DHCPV6_OPT_SMR };
 
     (void)event;
-    _generate_tid();
-    msg->type = DHCPV6_SOLICIT;
-    _set_tid(msg->tid);
-    msg_len += _compose_cid_opt((dhcpv6_opt_duid_t *)&send_buf[msg_len]);
-    transaction_start = _now_cs();
+
+    msg_len = _compose_message(msg, DHCPV6_SOLICIT);
     time = (dhcpv6_opt_elapsed_time_t *)&send_buf[msg_len];
     msg_len += _compose_elapsed_time_opt(time);
-    msg_len += _compose_oro_opt((dhcpv6_opt_oro_t *)&send_buf[msg_len], oro_opts,
-                                ARRAY_SIZE(oro_opts));
-    msg_len += _add_ia_na(&send_buf[msg_len], sizeof(send_buf) - msg_len);
-    msg_len += _add_ia_pd_from_config(&send_buf[msg_len], sizeof(send_buf) - msg_len);
+
     DEBUG("DHCPv6 client: send SOLICIT\n");
     _flush_stale_replies(&sock);
     res = sock_udp_send(&sock, send_buf, msg_len, &remote);
@@ -1077,14 +1117,47 @@ static void _solicit_servers(event_t *event)
     }
 }
 
+static uint32_t _calculate_mrd_from_leases(void)
+{
+    uint32_t mrd = 0;
+    /* calculate MRD from prefix leases */
+    for (unsigned i = 0;
+            IS_USED(MODULE_DHCPV6_CLIENT_IA_PD) &&
+            (i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX);
+            i++) {
+        const pfx_lease_t *lease = &pfx_leases[i];
+        uint32_t valid_until = dhcpv6_client_prefix_valid_until(
+                lease->parent.ia_id.info.netif,
+                &lease->pfx, lease->pfx_len
+            );
+        if (valid_until > mrd) {
+            mrd = valid_until;
+        }
+    }
+    /* calculate MRD from addr_leases */
+    for (unsigned i = 0;
+            IS_USED(MODULE_DHCPV6_CLIENT_IA_NA) &&
+            (i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX);
+            i++) {
+        const addr_lease_t *lease = &addr_leases[i];
+        uint32_t valid_until = dhcpv6_client_addr_valid_until(
+                lease->parent.ia_id.info.netif, &lease->addr
+            );
+        if (valid_until > mrd) {
+            mrd = valid_until;
+        }
+    }
+
+    return mrd;
+}
+
 static void _request_renew_rebind(uint8_t type)
 {
     dhcpv6_msg_t *msg = (dhcpv6_msg_t *)&send_buf[0];
     dhcpv6_opt_elapsed_time_t *time;
     uint32_t retrans_timeout;
-    size_t msg_len = sizeof(dhcpv6_msg_t);
+    size_t msg_len;
     int res;
-    uint16_t oro_opts[] = { DHCPV6_OPT_SMR };
     uint8_t retrans = 0;
     uint16_t irt;
     uint16_t mrt;
@@ -1105,33 +1178,7 @@ static void _request_renew_rebind(uint8_t type)
         case DHCPV6_REBIND: {
             irt = DHCPV6_REB_TIMEOUT;
             mrt = DHCPV6_REB_MAX_RT;
-            /* calculate MRD from prefix leases */
-            for (unsigned i = 0;
-                 IS_USED(MODULE_DHCPV6_CLIENT_IA_PD) &&
-                 (i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX);
-                 i++) {
-                const pfx_lease_t *lease = &pfx_leases[i];
-                uint32_t valid_until = dhcpv6_client_prefix_valid_until(
-                        lease->parent.ia_id.info.netif,
-                        &lease->pfx, lease->pfx_len
-                    );
-                if (valid_until > mrd) {
-                    mrd = valid_until;
-                }
-            }
-            /* calculate MRD from addr_leases */
-            for (unsigned i = 0;
-                 IS_USED(MODULE_DHCPV6_CLIENT_IA_NA) &&
-                 (i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX);
-                 i++) {
-                const addr_lease_t *lease = &addr_leases[i];
-                uint32_t valid_until = dhcpv6_client_addr_valid_until(
-                        lease->parent.ia_id.info.netif, &lease->addr
-                    );
-                if (valid_until > mrd) {
-                    mrd = valid_until;
-                }
-            }
+            mrd = _calculate_mrd_from_leases();
             if (mrd == 0) {
                 /* all leases already expired, don't try to rebind and
                  * solicit immediately */
@@ -1144,22 +1191,11 @@ static void _request_renew_rebind(uint8_t type)
             return;
     }
     retrans_timeout = _irt_ms(irt, false);
-    _generate_tid();
-    msg->type = type;
-    _set_tid(msg->tid);
-    msg_len += _compose_cid_opt((dhcpv6_opt_duid_t *)&send_buf[msg_len]);
-    if (type != DHCPV6_REBIND) {
-        msg_len += _compose_sid_opt((dhcpv6_opt_duid_t *)&send_buf[msg_len]);
-    }
-    msg_len += _compose_mud_url_opt((dhcpv6_opt_mud_url_t *)&send_buf[msg_len],
-                                    sizeof(send_buf) - msg_len);
-    transaction_start = _now_cs();
+    msg_len = _compose_message(msg, type);
+
     time = (dhcpv6_opt_elapsed_time_t *)&send_buf[msg_len];
     msg_len += _compose_elapsed_time_opt(time);
-    msg_len += _compose_oro_opt((dhcpv6_opt_oro_t *)&send_buf[msg_len], oro_opts,
-                                ARRAY_SIZE(oro_opts));
-    msg_len += _add_ia_na(&send_buf[msg_len], sizeof(send_buf) - msg_len);
-    msg_len += _add_ia_pd_from_config(&send_buf[msg_len], sizeof(send_buf) - msg_len);
+
     _flush_stale_replies(&sock);
     while (sock_udp_send(&sock, send_buf, msg_len, &remote) <= 0) {}
     while (((res = sock_udp_recv(&sock, recv_buf, sizeof(recv_buf),
