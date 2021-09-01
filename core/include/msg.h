@@ -311,7 +311,13 @@ int msg_try_receive(msg_t *m);
  * @brief Send a message, block until reply received.
  *
  * This function sends a message to *target_pid* and then blocks until target
- * has sent a reply which is then stored in *reply*.
+ * has sent a reply which is then stored in *reply*. The responding thread must
+ * use @ref msg_reply().
+ *
+ * Any incoming messages other than the reply are put into the queue (if one is
+ * configured), block the sender (if sent with @ref msg_send from a thread), or
+ * rejected (if sent with @ref msg_try_send or from an interrupt) -- just like
+ * if the thread were blocked on anything different than message reception.
  *
  * @pre     @p target_pid is not the PID of the current thread.
  *
