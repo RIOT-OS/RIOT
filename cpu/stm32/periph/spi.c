@@ -31,7 +31,6 @@
 #include "bitarithm.h"
 #include "cpu.h"
 #include "mutex.h"
-#include "assert.h"
 #include "periph/spi.h"
 #include "pm_layered.h"
 

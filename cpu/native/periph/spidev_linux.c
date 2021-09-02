@@ -33,7 +33,6 @@
 #undef SPI_MODE_2
 #undef SPI_MODE_3
 
-#include "assert.h"
 #include "native_internal.h"
 #include "spidev_linux.h"
 #ifdef MODULE_PERIPH_GPIO
