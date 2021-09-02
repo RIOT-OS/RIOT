@@ -21,7 +21,7 @@ If you use any platform other than `native`, you need to use `ethos`, otherwise
 `netdev_tap` is chosen.
 
 An instance of Kea that configured via [kea-dhcp6.conf](kea-dhcp6.conf) is
-started in parallel to `make term`/`make test-as-root`.
+started in parallel to `make term`/`make test-with-config`.
 
 Read the [Kea documentation] on the configuration file for more information.
 
