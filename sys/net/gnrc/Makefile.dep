@@ -113,6 +113,12 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
   USEMODULE += evtimer
 endif
 
+ifneq (,$(filter gnrc_ipv6_auto_subnets,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib_rtr_adv_pio_cb
+  CFLAGS += -DCONFIG_GNRC_IPV6_NIB_ADV_ROUTER=0
+  CFLAGS += -DCONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_LAST_RA=1
+endif
+
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += l2util
