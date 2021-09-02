@@ -45,10 +45,11 @@ USEMODULE += mtd_sdcard
 endif
 
 image:
-	@tar -xjf riot_fatfs_disk.tar.gz -C ./bin/
+	${Q}mkdir -p bin
+	${Q}tar -xjf riot_fatfs_disk.tar.bz2 -C ./bin/
 
 #this generates a compressed fat image file that can be used by the fat driver on native
 compressed-image:
-	@./create_fat_image_file.sh $(FATFS_IMAGE_FILE_SIZE_MIB)
+	${Q}./create_fat_image_file.sh $(FATFS_IMAGE_FILE_SIZE_MIB)
 
 include $(RIOTBASE)/Makefile.include

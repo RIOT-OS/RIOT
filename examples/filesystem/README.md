@@ -76,3 +76,47 @@ Hello World!
 cat /const/hello-riot
 Hello RIOT!
 ```
+
+## Example on `native` with `fatfs`
+
+- Unpack the provided image proviced in the `pkg_fatfs` test:
+
+```
+$ tar vxjf ../../tests/pkg_fatfs/riot_fatfs_disk.tar.bz2
+riot_fatfs_disk.img
+```
+
+- Configure the application to use the file and the right geometry by adding
+  these to the Makefile:
+
+```
+CFLAGS += -DMTD_NATIVE_FILENAME=\"riot_fatfs_disk.img\"
+CFLAGS += -DMTD_PAGE_SIZE=512
+CFLAGS += -DMTD_SECTOR_SIZE=512
+CFLAGS += -DMTD_SECTOR_NUM=262144
+```
+
+- In the Makefile, comment the `littlefs2` USEMODULE line, and enable the
+  `fatfs_vfs` line instead.
+
+- Build and run the `filesystem` example application on the `native` target as above.
+
+- Mount the external file system:
+
+```
+> mount
+mount
+/sda successfully mounted
+```
+
+- List the available files in the FAT partition:
+
+```
+> ls /sda
+ls /sda
+TEST.TXT
+total 1 files
+```
+
+- You can also use the writing commands now to create and modify files; run
+  `vfs` for instructions.
