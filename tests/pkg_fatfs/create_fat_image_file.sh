@@ -13,5 +13,5 @@ sudo mount -o loop,umask=000 riot_fatfs_disk.img /media/riot_fatfs_disk
 touch /media/riot_fatfs_disk/test.txt
 echo "the test file content 123 abc" | tr '\n' '\0' >> /media/riot_fatfs_disk/test.txt
 sudo umount /media/riot_fatfs_disk
-tar -cjf riot_fatfs_disk.tar.gz riot_fatfs_disk.img
+tar -cjf riot_fatfs_disk.tar.bz2 riot_fatfs_disk.img
 rm riot_fatfs_disk.img
