@@ -24,10 +24,10 @@
  *
  * @}
  */
+#include <assert.h>
 
 #include "cpu.h"
 #include "mutex.h"
-#include "assert.h"
 #include "periph/spi.h"
 
 /**
@@ -78,10 +78,11 @@ void spi_init_pins(spi_t bus)
 #endif
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)bus;
     (void)cs;
+    assert(bus == SPI_DEV(0));
 
     /* lock the bus and power on the SPI peripheral */
     mutex_lock(&lock);
@@ -94,8 +95,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     /* clear interrupt flag by reading SPSR and data register by reading SPDR */
     (void)SPSR;
     (void)SPDR;
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)

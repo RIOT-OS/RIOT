@@ -23,9 +23,10 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "mutex.h"
-#include "assert.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
 
@@ -62,9 +63,11 @@ void spi_init_pins(spi_t bus)
     gpio_init_mux(spi_config[bus].miso, spi_config[bus].mux);
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    (void) cs;
+    (void)cs;
+    assert((unsigned)bus < SPI_NUMOF);
+
     /* lock bus */
     mutex_lock(&locks[bus]);
     /* enable SPI device clock */
@@ -73,8 +76,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     dev(bus)->SPI_CSR[0] = (SPI_CSR_SCBR(CLOCK_CORECLOCK / clk) | mode);
     dev(bus)->SPI_MR = (SPI_MR_MSTR | SPI_MR_MODFDIS);
     dev(bus)->SPI_CR = SPI_CR_SPIEN;
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)

@@ -74,10 +74,9 @@ static void _nrf24l01p_ng_copy_and_swap_bytes(uint8_t* dst, const uint8_t* src, 
     }
 }
 
-int nrf24l01p_ng_acquire(nrf24l01p_ng_t *dev)
+void nrf24l01p_ng_acquire(nrf24l01p_ng_t *dev)
 {
-    return spi_acquire(dev->params.spi, dev->params.pin_cs, SPI_MODE_0,
-                       dev->params.spi_clk);
+    spi_acquire(dev->params.spi, dev->params.pin_cs, SPI_MODE_0, dev->params.spi_clk);
 }
 
 void nrf24l01p_ng_release(nrf24l01p_ng_t *dev)

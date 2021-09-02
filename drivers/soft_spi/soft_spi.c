@@ -101,18 +101,24 @@ int soft_spi_init_cs(soft_spi_t bus, soft_spi_cs_t cs)
     return SOFT_SPI_OK;
 }
 
-int soft_spi_acquire(soft_spi_t bus, soft_spi_cs_t cs, soft_spi_mode_t mode, soft_spi_clk_t clk)
+static inline int soft_spi_mode_is_valid(soft_spi_mode_t mode)
 {
-    (void) cs;
+    if ((mode != SOFT_SPI_MODE_0) && (mode != SOFT_SPI_MODE_1) &&
+        (mode != SOFT_SPI_MODE_2) && (mode != SOFT_SPI_MODE_3)) {
+        return 0;
+    }
+    return 1;
+}
+
+void soft_spi_acquire(soft_spi_t bus, soft_spi_cs_t cs, soft_spi_mode_t mode, soft_spi_clk_t clk)
+{
+    (void)cs;
     assert(soft_spi_bus_is_valid(bus));
+    assert(soft_spi_mode_is_valid(mode));
 
     /* lock bus */
     mutex_lock(&locks[bus]);
 
-    if ((mode != SOFT_SPI_MODE_0) && (mode != SOFT_SPI_MODE_1) &&
-        (mode != SOFT_SPI_MODE_2) && (mode != SOFT_SPI_MODE_3)) {
-        return SOFT_SPI_NOMODE;
-    }
     soft_spi_config[bus].soft_spi_mode = mode;
     switch (mode) {
         case SOFT_SPI_MODE_0:
@@ -127,7 +133,6 @@ int soft_spi_acquire(soft_spi_t bus, soft_spi_cs_t cs, soft_spi_mode_t mode, sof
             break;
     }
     soft_spi_config[bus].soft_spi_clk = clk;
-    return SOFT_SPI_OK;
 }
 
 void soft_spi_release(soft_spi_t bus)

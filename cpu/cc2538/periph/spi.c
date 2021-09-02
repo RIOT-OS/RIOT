@@ -21,12 +21,13 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "vendor/hw_memmap.h"
 #include "vendor/hw_ssi.h"
 
 #include "cpu.h"
 #include "mutex.h"
-#include "assert.h"
 #include "periph/spi.h"
 
 #define ENABLE_DEBUG 0
@@ -93,10 +94,10 @@ void spi_init_pins(spi_t bus)
     gpio_init_mux(spi_config[bus].miso_pin, OVERRIDE_DISABLE, GPIO_MUX_NONE, rxd);
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     DEBUG("%s: bus=%u\n", __FUNCTION__, bus);
-    (void) cs;
+    (void)cs;
     /* lock the bus */
     mutex_lock(&locks[bus]);
     /* power on device */
@@ -107,8 +108,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     dev(bus)->CR0 = ((spi_clk_config[clk].scr << 8) | mode | SSI_CR0_DSS(8));
     /* enable SSI device */
     dev(bus)->CR1 = SSI_CR1_SSE;
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)
@@ -132,6 +131,7 @@ static uint8_t _trx(cc2538_ssi_t *dev, uint8_t in)
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                         const void *out, void *in, size_t len)
 {
+    assert((unsigned)bus < SPI_NUMOF);
     DEBUG("%s: bus=%u, len=%u\n", __FUNCTION__, bus, (unsigned)len);
 
     const uint8_t *out_buf = out;

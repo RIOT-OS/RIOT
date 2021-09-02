@@ -57,9 +57,7 @@ int cc110x_apply_config(cc110x_t *dev, const cc110x_config_t *conf,
         return -ERANGE;
     }
 
-    if (cc110x_acquire(dev) != SPI_OK) {
-        return -EIO;
-    }
+    cc110x_acquire(dev);
 
     gpio_irq_disable(dev->params.gdo0);
     gpio_irq_disable(dev->params.gdo2);
@@ -107,9 +105,7 @@ int cc110x_set_tx_power(cc110x_t *dev, cc110x_tx_power_t power)
         return -ERANGE;
     }
 
-    if (cc110x_acquire(dev) != SPI_OK) {
-        return -EIO;
-    }
+    cc110x_acquire(dev);
 
     switch (dev->state) {
         case CC110X_STATE_IDLE:
@@ -134,9 +130,7 @@ int cc110x_set_channel(cc110x_t *dev, uint8_t channel)
         return -EINVAL;
     }
 
-    if (cc110x_acquire(dev) != SPI_OK) {
-        return -EIO;
-    }
+    cc110x_acquire(dev);
 
     if ((channel >= CC110X_MAX_CHANNELS) || (dev->channels->map[channel] == 0xff)) {
         /* Channel out of range or not supported in current channel map */

@@ -50,9 +50,7 @@
 #ifdef BMX280_USE_SPI /* using SPI mode */
 static inline int _acquire(const bmx280_t *dev)
 {
-    if (spi_acquire(BUS, CS, MODE, CLK) != SPI_OK) {
-        return BMX280_ERR_BUS;
-    }
+    spi_acquire(BUS, CS, MODE, CLK);
     return BMX280_OK;
 }
 

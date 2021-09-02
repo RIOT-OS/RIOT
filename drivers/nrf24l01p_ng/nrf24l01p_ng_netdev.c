@@ -177,10 +177,7 @@ static int _init(netdev_t *netdev)
         return -EIO;
     }
     gpio_clear(dev->params.pin_ce);
-    if (nrf24l01p_ng_acquire(dev) < 0) {
-        DEBUG_PUTS("[nrf24l01p_ng] _init(): nrf24l01p_ng_acquire() failed");
-        return -EIO;
-    }
+    nrf24l01p_ng_acquire(dev);
     if (dev->state != NRF24L01P_NG_STATE_POWER_DOWN) {
         nrf24l01p_ng_transition_to_power_down(dev);
     }

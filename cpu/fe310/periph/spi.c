@@ -22,9 +22,10 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "mutex.h"
-#include "assert.h"
 #include "periph/spi.h"
 
 #include "vendor/spi.h"
@@ -102,7 +103,7 @@ int spi_init_cs(spi_t dev, spi_cs_t cs)
     return SPI_OK;
 }
 
-int spi_acquire(spi_t dev, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t dev, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
     assert(dev < SPI_NUMOF);
@@ -111,8 +112,6 @@ int spi_acquire(spi_t dev, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     _REG32(spi_config[dev].addr, SPI_REG_SCKDIV) = _spi_clks_config[clk];
     _REG32(spi_config[dev].addr, SPI_REG_SCKMODE) = mode;
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t dev)

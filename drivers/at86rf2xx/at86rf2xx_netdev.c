@@ -89,14 +89,11 @@ static int _init(netdev_t *netdev)
     gpio_set(dev->params.reset_pin);
     gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, _irq_handler, dev);
 
-    /* Intentionally check if bus can be acquired,
-       since getbus() drops the return value */
-    if (spi_acquire(dev->params.spi, dev->params.cs_pin, SPI_MODE_0,
-                                                dev->params.spi_clk) < 0) {
-        DEBUG("[at86rf2xx] error: unable to acquire SPI bus\n");
-        return -EIO;
+    /* Intentionally check if bus can be acquired, if assertions are on */
+    if (!IS_ACTIVE(NDEBUG)) {
+        spi_acquire(dev->params.spi, dev->params.cs_pin, SPI_MODE_0, dev->params.spi_clk);
+        spi_release(dev->params.spi);
     }
-    spi_release(dev->params.spi);
 #endif
 
     /* reset hardware into a defined state */

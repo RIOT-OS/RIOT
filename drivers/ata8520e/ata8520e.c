@@ -156,9 +156,7 @@ static void _irq_handler(void *arg)
 
 static void _getbus(const ata8520e_t *dev)
 {
-    if (spi_acquire(SPIDEV, CSPIN, SPI_MODE_0, dev->params.spi_clk) < 0) {
-        DEBUG("[ata8520e] ERROR: Cannot acquire SPI bus!\n");
-    }
+    spi_acquire(SPIDEV, CSPIN, SPI_MODE_0, dev->params.spi_clk);
 }
 
 static void _spi_transfer_byte(const ata8520e_t *dev, bool cont, uint8_t out)

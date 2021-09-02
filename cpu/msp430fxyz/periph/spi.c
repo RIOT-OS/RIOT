@@ -23,9 +23,10 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "mutex.h"
-#include "assert.h"
 #include "periph/spi.h"
 
 /**
@@ -35,7 +36,7 @@ static mutex_t spi_lock = MUTEX_INIT;
 
 void spi_init(spi_t bus)
 {
-    assert(bus <= SPI_NUMOF);
+    assert((unsigned)bus < SPI_NUMOF);
 
 /* we need to differentiate between the legacy SPI device and USCI */
 #ifndef SPI_USE_USCI
@@ -65,14 +66,12 @@ void spi_init_pins(spi_t bus)
     gpio_periph_mode(SPI_PIN_CLK, true);
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)bus;
     (void)cs;
-
-    if (clk == SPI_CLK_10MHZ) {
-        return SPI_NOCLK;
-    }
+    assert((unsigned)bus < SPI_NUMOF);
+    assert(clk != SPI_CLK_10MHZ);
 
     /* lock the bus */
     mutex_lock(&spi_lock);
@@ -99,8 +98,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     /* release from software reset */
     SPI_BASE->CTL1 &= ~(USCI_SPI_CTL1_SWRST);
 #endif
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)

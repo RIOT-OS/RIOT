@@ -20,7 +20,8 @@
  * @}
  */
 
-#include "assert.h"
+#include <assert.h>
+
 #include "bitarithm.h"
 #include "mutex.h"
 
@@ -187,8 +188,10 @@ void spi_deinit_pins(spi_t bus)
 }
 #endif /* MODULE_PERIPH_SPI_RECONFIGURE */
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
+    assert((unsigned)bus < SPI_NUMOF);
+    assert((mode & ~(SPI_CFG_CPHA_MASK | SPI_CFG_CPOL_MASK)) == 0);
     const spi_conf_t *const conf = &spi_config[bus];
 
     mutex_lock(&locks[bus]);
@@ -197,18 +200,12 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
      * matter how far it is from the requested one. */
     _spi_controller_set_speed(conf->dev, clk);
 
-    if ((mode & ~(SPI_CFG_CPHA_MASK | SPI_CFG_CPOL_MASK)) != 0) {
-        return SPI_NOMODE;
-    }
-
     DEBUG("[spi] acquire: mode CPHA=%d CPOL=%d, cs=0x%" PRIx32 "\n",
           !!(mode & SPI_CFG_CPHA_MASK), !!(mode & SPI_CFG_CPOL_MASK),
           (uint32_t)cs);
 
     conf->dev->CFG =
         (conf->dev->CFG & ~(SPI_CFG_CPHA_MASK | SPI_CFG_CPOL_MASK)) | mode;
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)
