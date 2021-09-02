@@ -41,6 +41,7 @@ include $(RIOTBASE)/Makefile.include
 
 .PHONY: dhcpv6_server
 
+dhcpv6_server: IFACE := ${IFACE}
 dhcpv6_server:
 	$(CURDIR)/dhcpv6_server.sh $(DHCPV6_SERVER_PORT) $(CURDIR)/kea-dhcp6.conf
 
