@@ -157,6 +157,18 @@ typedef enum {
      * set if the source address matches one from the table.
      */
     IEEE802154_CAP_SRC_ADDR_MATCH       = BIT18,
+    /**
+     * @brief the device stays in RX_ON on @ref
+     * IEEE802154_RADIO_INDICATION_RX_DONE or @ref
+     * IEEE802154_RADIO_INDICATION_CRC_ERROR
+     *
+     * Radios that provide this feature don't need to call @ref
+     * ieee802154_radio_request_set_trx_state on after receiving a frame, in
+     * case more frames are expected. This does not affect Framebuffer
+     * protection (e.g a radio might still be listening but its framebuffer is
+     * locked because the upper layer didn't call @ref ieee802154_radio_read)
+     */
+    IEEE802154_CAP_RX_CONTINUOUS        = BIT19,
 } ieee802154_rf_caps_t;
 
 /**
@@ -272,11 +284,10 @@ typedef enum {
      * The transceiver or driver MUST handle the ACK reply if the Ack Request
      * bit is set in the received frame and promiscuous mode is disabled.
      *
-     * The transceiver will be in a "FB Lock" state where no more frames are
+     * The transceiver might be in a "FB Lock" state where no more frames are
      * received. This is done in order to avoid overwriting the Frame Buffer
      * with new frame arrivals.  In order to leave this state, the upper layer
-     * must set the transceiver state (@ref
-     * ieee802154_radio_ops::request_set_trx_state).
+     * must call @ref ieee802154_radio_ops::read.
      */
     IEEE802154_RADIO_INDICATION_RX_DONE,
 
@@ -561,11 +572,13 @@ struct ieee802154_radio_ops {
      * This function reads the received frame from the internal framebuffer.
      * It should try to copy the received PSDU frame into @p buf. The FCS
      * field will **not** be copied and its size **not** be taken into account
-     * for the return value.
+     * for the return value. If the radio provides any kind of framebuffer protection,
+     * this function should release it.
      *
-     * @post It's not safe to call this function again before setting the
-     *       transceiver state to @ref IEEE802154_TRX_STATE_RX_ON (thus flushing
-     *       the RX FIFO).
+     * @post Don't call this function if there was no reception event
+     * (either @ref IEEE802154_RADIO_INDICATION_RX_DONE or @ref
+     * IEEE802154_RADIO_INDICATION_CRC_ERROR). Otherwise there's risk of RX
+     * underflow.
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[out] buf buffer to write the received PSDU frame into.
@@ -1408,6 +1421,22 @@ static inline bool ieee802154_radio_has_phy_mr_fsk(ieee802154_dev_t *dev)
 static inline uint32_t ieee802154_radio_get_phy_modes(ieee802154_dev_t *dev)
 {
     return (dev->driver->caps & IEEE802154_RF_CAPS_PHY_MASK);
+}
+
+/**
+ * @brief Check whether the radio stays in RX_ON after @ref
+ *        IEEE802154_RADIO_INDICATION_RX_DONE or @ref
+ *        IEEE802154_RADIO_INDICATION_CRC_ERROR events (see @ref
+ *        IEEE802154_CAP_RX_CONTINUOUS)
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return true if the device stays in RX_ON state
+ * @return false otherwise
+ */
+static inline bool ieee802154_radio_has_rx_continuous(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_CAP_RX_CONTINUOUS);
 }
 
 /**

@@ -69,8 +69,7 @@ static int _confirm_transmit(ieee802154_dev_t *dev, ieee802154_tx_info_t *info)
 {
     (void) dev;
 
-    if (RFCORE->XREG_FSMSTAT1bits.TX_ACTIVE != 0
-            || !(RFCORE_XREG_CSPCTRL & CC2538_CSP_MCU_CTRL_MASK)) {
+    if (cc2538_tx_busy) {
         return -EAGAIN;
     }
 
@@ -176,50 +175,60 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
 {
     (void) dev;
     int res;
-    size_t pkt_len = rfcore_read_byte();
+    size_t pkt_len;
 
-    pkt_len -= IEEE802154_FCS_LEN;
-
-    if (pkt_len > size) {
-        return -ENOBUFS;
-    }
-
-    if (buf != NULL) {
-        rfcore_read_fifo(buf, pkt_len);
-        res = pkt_len;
-        if (info != NULL) {
-            uint8_t corr_val;
-            int8_t rssi_val;
-            rssi_val = rfcore_read_byte();
-
-            /* The number of dB above maximum sensitivity detected for the
-             * received packet */
-            /* Make sure there is no overflow even if no signal with such
-               low sensitivity should be detected */
-            const int hw_rssi_min = IEEE802154_RADIO_RSSI_OFFSET -
-                                    CC2538_RSSI_OFFSET;
-            int8_t hw_rssi = rssi_val > hw_rssi_min ?
-                (CC2538_RSSI_OFFSET + rssi_val) : IEEE802154_RADIO_RSSI_OFFSET;
-            info->rssi = hw_rssi - IEEE802154_RADIO_RSSI_OFFSET;
-
-            corr_val = rfcore_read_byte() & CC2538_CORR_VAL_MASK;
-            if (corr_val < CC2538_CORR_VAL_MIN) {
-                corr_val = CC2538_CORR_VAL_MIN;
-            }
-            else if (corr_val > CC2538_CORR_VAL_MAX) {
-                corr_val = CC2538_CORR_VAL_MAX;
-            }
-
-            /* Interpolate the correlation value between 0 - 255
-             * to provide an LQI value */
-            info->lqi = 255 * (corr_val - CC2538_CORR_VAL_MIN) /
-                              (CC2538_CORR_VAL_MAX - CC2538_CORR_VAL_MIN);
-        }
-    }
-    else {
+    if (!buf) {
         res = 0;
+        goto end;
     }
 
+    /* The upper layer shouldn't call this function if the RX_DONE event was
+     * not triggered */
+    if (!(RFCORE_XREG_RXFIFOCNT > 0)) {
+        assert(false);
+    }
+
+    pkt_len = rfcore_read_byte() - IEEE802154_FCS_LEN;
+    if (pkt_len > size) {
+        res = -ENOBUFS;
+        goto end;
+    }
+
+    rfcore_read_fifo(buf, pkt_len);
+    res = pkt_len;
+    if (info != NULL) {
+        uint8_t corr_val;
+        int8_t rssi_val;
+        rssi_val = rfcore_read_byte();
+
+        /* The number of dB above maximum sensitivity detected for the
+         * received packet */
+        /* Make sure there is no overflow even if no signal with such
+           low sensitivity should be detected */
+        const int hw_rssi_min = IEEE802154_RADIO_RSSI_OFFSET -
+                                CC2538_RSSI_OFFSET;
+        int8_t hw_rssi = rssi_val > hw_rssi_min ?
+            (CC2538_RSSI_OFFSET + rssi_val) : IEEE802154_RADIO_RSSI_OFFSET;
+        info->rssi = hw_rssi - IEEE802154_RADIO_RSSI_OFFSET;
+
+        corr_val = rfcore_read_byte() & CC2538_CORR_VAL_MASK;
+        if (corr_val < CC2538_CORR_VAL_MIN) {
+            corr_val = CC2538_CORR_VAL_MIN;
+        }
+        else if (corr_val > CC2538_CORR_VAL_MAX) {
+            corr_val = CC2538_CORR_VAL_MAX;
+        }
+
+        /* Interpolate the correlation value between 0 - 255
+         * to provide an LQI value */
+        info->lqi = 255 * (corr_val - CC2538_CORR_VAL_MIN) /
+                          (CC2538_CORR_VAL_MAX - CC2538_CORR_VAL_MIN);
+    }
+
+end:
+    /* Enable RX Chain */
+    RFCORE_XREG_FRMCTRL0 &= ~CC2538_FRMCTRL0_RX_MODE_DIS;
+    RFCORE_SFR_RFST = ISFLUSHRX;
     return res;
 }
 
@@ -296,7 +305,9 @@ static int _request_set_trx_state(ieee802154_dev_t *dev, ieee802154_trx_state_t 
 {
 
     (void) dev;
+    int irq = irq_disable();
     if (cc2538_tx_busy || cc2538_rx_busy) {
+        irq_restore(irq);
         return -EBUSY;
     }
 
@@ -306,16 +317,20 @@ static int _request_set_trx_state(ieee802154_dev_t *dev, ieee802154_trx_state_t 
             if (RFCORE->XREG_FSMSTAT0bits.FSM_FFCTRL_STATE != FSM_STATE_IDLE) {
                 RFCORE_SFR_RFST = ISRFOFF;
             }
+            cc2538_rx_busy = false;
             break;
         case IEEE802154_TRX_STATE_RX_ON:
             RFCORE_XREG_RFIRQM0 |= RXPKTDONE;
-            RFCORE_SFR_RFST = ISFLUSHRX;
             /* Enable RX Chain */
             RFCORE_XREG_FRMCTRL0 &= ~CC2538_FRMCTRL0_RX_MODE_DIS;
             RFCORE_SFR_RFST = ISRXON;
             break;
     }
 
+    RFCORE_SFR_RFIRQF0 = 0;
+    RFCORE_SFR_RFIRQF1 = 0;
+
+    irq_restore(irq);
     return 0;
 }
 
@@ -352,7 +367,7 @@ void cc2538_irq_handler(void)
         uint8_t pkt_len = rfcore_peek_rx_fifo(0);
         if (rfcore_peek_rx_fifo(pkt_len) & CC2538_CRC_BIT_MASK) {
             /* Disable RX while the frame has not been processed */
-            RFCORE_XREG_RXMASKCLR = 0xFF;
+            RFCORE_XREG_FRMCTRL0 |= CC2538_FRMCTRL0_RX_MODE_DIS;
             /* If AUTOACK is disabled or the ACK request bit is not set */
             if (IS_ACTIVE(CONFIG_IEEE802154_AUTO_ACK_DISABLE) ||
                 (!(rfcore_peek_rx_fifo(1) & IEEE802154_FCF_ACK_REQ))) {
@@ -365,7 +380,6 @@ void cc2538_irq_handler(void)
         }
         else {
             /* Disable RX while the frame has not been processed */
-            RFCORE_XREG_RXMASKCLR = 0xFF;
             /* CRC failed; discard packet. The RX chain is not busy anymore */
             cc2538_rx_busy = false;
             cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_INDICATION_CRC_ERROR);
@@ -384,7 +398,6 @@ void cc2538_irq_handler(void)
         RFCORE_XREG_CSPCTRL |= CC2538_CSP_MCU_CTRL_MASK;
         if (!cc2538_cca) {
             if (RFCORE_XREG_CSPZ > 0) {
-                RFCORE_XREG_RXMASKCLR = CC2538_RXENABLE_RXON_MASK;
                 RFCORE_SFR_RFST = ISTXON;
             }
             else {
@@ -551,7 +564,8 @@ static const ieee802154_radio_ops_t cc2538_rf_ops = {
           | IEEE802154_CAP_IRQ_CCA_DONE
           | IEEE802154_CAP_IRQ_RX_START
           | IEEE802154_CAP_IRQ_TX_START
-          | IEEE802154_CAP_PHY_OQPSK,
+          | IEEE802154_CAP_PHY_OQPSK
+          | IEEE802154_CAP_RX_CONTINUOUS,
 
     .write = _write,
     .read = _read,
