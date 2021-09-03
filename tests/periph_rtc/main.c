@@ -23,10 +23,12 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 
 #include "mutex.h"
 #include "periph_conf.h"
 #include "periph/rtc.h"
+#include "periph/rtc_mem.h"
 #include "xtimer.h"
 
 #define PERIOD              (2U)
@@ -69,6 +71,58 @@ static void cb(void *arg)
     mutex_unlock(arg);
 }
 
+#ifdef MODULE_PERIPH_RTC_MEM
+static const uint8_t riot_msg_offset = 1;
+static const char riot_msg[] = "RIOT";
+static void _set_rtc_mem(void)
+{
+    /* first fill the whole memory */
+    uint8_t size = rtc_mem_size();
+    while (size--) {
+        rtc_mem_write(size, &size, sizeof(size));
+    }
+
+    /* write test data */
+    rtc_mem_write(riot_msg_offset, riot_msg, sizeof(riot_msg) - 1);
+}
+
+static void _get_rtc_mem(void)
+{
+    char buf[4];
+    rtc_mem_read(riot_msg_offset, buf, sizeof(buf));
+
+    if (memcmp(buf, riot_msg, sizeof(buf))) {
+        puts("RTC mem content does not match");
+        for (unsigned i = 0; i < sizeof(buf); ++i) {
+            printf("%02x - %02x\n", riot_msg[i], buf[i]);
+        }
+        return;
+    }
+
+    uint8_t size = rtc_mem_size();
+    while (size--) {
+        uint8_t data;
+
+        if (size >= riot_msg_offset &&
+            size < riot_msg_offset + sizeof(riot_msg)) {
+            continue;
+        }
+
+        rtc_mem_read(size, &data, 1);
+        if (data != size) {
+            puts("RTC mem content does not match");
+            printf("%02x: %02x\n", size, data);
+        }
+    }
+
+
+    puts("RTC mem OK");
+}
+#else
+static inline void _set_rtc_mem(void) {}
+static inline void _get_rtc_mem(void) {}
+#endif
+
 int main(void)
 {
     struct tm time = {
@@ -87,6 +141,9 @@ int main(void)
             PERIOD, REPEAT);
 
     rtc_init();
+
+    _set_rtc_mem();
+    _get_rtc_mem();
 
     /* set RTC */
     print_time("  Setting clock to ", &time);
@@ -149,17 +206,17 @@ int main(void)
     puts("");
 
     /* loop over a few alarm cycles */
-    while (1) {
+    do {
         mutex_lock(&rtc_mtx);
         puts("Alarm!");
 
-        if (++cnt < REPEAT) {
-            struct tm time;
-            rtc_get_alarm(&time);
-            inc_secs(&time, PERIOD);
-            rtc_set_alarm(&time, cb, &rtc_mtx);
-        }
-    }
+        struct tm time;
+        rtc_get_alarm(&time);
+        inc_secs(&time, PERIOD);
+        rtc_set_alarm(&time, cb, &rtc_mtx);
+    } while (++cnt < REPEAT);
+
+    _get_rtc_mem();
 
     return 0;
 }
