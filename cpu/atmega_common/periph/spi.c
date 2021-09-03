@@ -59,7 +59,7 @@ static uint8_t spi2x[5], spr[5];
 static uint8_t _clk_shift(uint32_t clk)
 {
     /* Atmega datasheets give the following table:
-     * SPI2X    SPR1    SPR0    SCK Freqency
+     * SPI2X    SPR1    SPR0    SCK Frequency
      * 0        0       0       Fosc/4
      * 0        0       1       Fosc/16
      * 0        1       0       Fosc/64
@@ -94,7 +94,6 @@ static uint8_t _clk_shift(uint32_t clk)
 
 static void _init_clk(void)
 {
-    uint8_t shift;
     for (uint8_t i = 0; i < 5; i++) {
 
         DEBUG("[spi] spi_clk[%"PRIu8"]: %8"PRIu32" -> ", i, spi_clk[i]);
@@ -108,7 +107,7 @@ static void _init_clk(void)
         }
 
         /* Compute shift values */
-        shift = _clk_shift(spi_clk[i]);
+        uint8_t shift = _clk_shift(spi_clk[i]);
 
         /* Save registers bits */
         spi2x[i] = ~shift & 1;
