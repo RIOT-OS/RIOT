@@ -172,8 +172,8 @@ Documentation:
 * Udev manpage
   http://manpages.ubuntu.com/manpages/eoan/en/man7/udev.7.html
 
-# Handling multiple boards without udev-rules
-=============================================
+Handling multiple boards without udev-rules           {#multiple-boards-no-udev}
+===========================================
 
 This is a simpler approach to the above mentioned issue. The solution here only
 uses a makefile script for selecting the debugger and serial port. No
