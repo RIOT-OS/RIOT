@@ -35,4 +35,9 @@ ifneq (,$(filter periph_eth periph_ptp,$(USEMODULE)))
   USEMODULE += periph_eth_common
 endif
 
+# periph_rtc_mem is currently tied to the peripg_rtc
+ifneq (,$(filter periph_rtc_mem,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_rtc
+endif
+
 include $(RIOTCPU)/cortexm_common/Makefile.dep

@@ -209,7 +209,7 @@ static int bcd2val(uint32_t val, int shift, uint32_t mask)
     return (((tmp >> 4) * 10) + (tmp & 0x0f));
 }
 
-static inline void rtc_unlock(void)
+void rtc_unlock(void)
 {
     /* enable backup clock domain */
     stmclk_dbp_unlock();
@@ -221,7 +221,7 @@ static inline void rtc_unlock(void)
     while (!(RTC_REG_ISR & RTC_ISR_INITF)) {}
 }
 
-static inline void rtc_lock(void)
+void rtc_lock(void)
 {
     /* exit RTC init mode */
     RTC_REG_ISR &= ~RTC_ISR_INIT;

@@ -17,6 +17,13 @@ ifneq (,$(filter $(CPU_FAM),f0 f1 f3 g0 g4 l0 l1 l4 l5 wb wl))
   FEATURES_PROVIDED += periph_flashpage_pagewise
 endif
 
+ifneq (,$(filter $(CPU_FAM),f0 f2 f3 f4 f7 l0 l1 l4 l5 wb wl))
+  CPU_MODELS_WITHOUT_RTC_BKPR += stm32f030% stm32f070%
+  ifeq (,$(filter $(CPU_MODELS_WITHOUT_RTC_BKPR),$(CPU_MODEL)))
+    FEATURES_PROVIDED += periph_rtc_mem
+  endif
+endif
+
 # The f2, f4 and f7 do not support the pagewise api
 ifneq (,$(filter $(CPU_FAM),f2 f4 f7))
   FEATURES_PROVIDED += periph_flashpage
