@@ -1,5 +1,5 @@
 # RNG
-Test application for the RNG sourcs.
+Test application for the RNG sources.
 
 ## Supported commands
 * distributions [N] — Take N samples and print a bit distribution graph on the terminal.
