@@ -78,7 +78,7 @@ Next, we should verify that our Bluetooth device is configured properly:
     # Look for available HCI devices.
     hciconfig
 
-This should show us some information about the available Blutooth devices. If no
+This should show us some information about the available Bluetooth devices. If no
 device is listed here, something is wrong...
 
 
