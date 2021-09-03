@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += auto_init_gnrc_netif
-USEMODULE += netdev_default
+USEMODULE += gnrc
 USEMODULE += fmt
 USEMODULE += shell
 USEMODULE += shell_commands
