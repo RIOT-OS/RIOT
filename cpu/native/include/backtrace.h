@@ -36,10 +36,22 @@ extern "C" {
 #endif
 
 /**
- * @brief   Print the last @ref BACKTRACE_SIZE return addresses from call of this
+ * @brief   Print up to the last @ref BACKTRACE_SIZE return addresses from call of this
  *          function
  */
 void backtrace_print(void);
+
+/**
+ * @brief   Print up to the last @ref BACKTRACE_SIZE symbol_names from call of this
+ *          function
+ */
+void backtrace_print_symbols(void);
+
+/**
+ * @brief   get the number of stack frames that are printed by print or print_symbols
+ *
+ */
+int backtrace_len(void);
 
 #ifdef __cplusplus
 }
