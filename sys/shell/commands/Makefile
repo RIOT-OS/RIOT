@@ -5,6 +5,9 @@ SRC = shell_commands.c sc_sys.c
 ifneq (,$(filter app_metadata,$(USEMODULE)))
   SRC += sc_app_metadata.c
 endif
+ifneq (,$(filter benchmark_udp,$(USEMODULE)))
+  SRC += sc_benchmark_udp.c
+endif
 ifneq (,$(filter dfplayer,$(USEMODULE)))
   SRC += sc_dfplayer.c
 endif

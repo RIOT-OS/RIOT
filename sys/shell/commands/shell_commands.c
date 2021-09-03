@@ -163,6 +163,10 @@ extern int _vfs_handler(int argc, char **argv);
 extern int _ls_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_BENCHMARK_UDP
+extern int _benchmark_udp_handler(int argc, char **argv);
+#endif
+
 #ifdef MODULE_CONN_CAN
 extern int _can_handler(int argc, char **argv);
 #endif
@@ -208,6 +212,9 @@ const shell_command_t _shell_command_list[] = {
     {"version", "Prints current RIOT_VERSION", _version_handler},
 #ifdef MODULE_USB_BOARD_RESET
     {"bootloader", "Reboot to bootloader", _bootloader_handler},
+#endif
+#ifdef MODULE_BENCHMARK_UDP
+    {"bench_udp", "UDP benchmark", _benchmark_udp_handler},
 #endif
 #ifdef MODULE_CONFIG
     {"id", "Gets or sets the node's id.", _id_handler},
