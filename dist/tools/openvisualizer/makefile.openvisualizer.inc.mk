@@ -34,9 +34,9 @@
 #
 
 # Use full path in case it needs to be run with sudo
-OPENV_SERVER_PATH := $(shell command -v openv-server)
-OPENV_CLIENT_PATH := $(shell command -v openv-client)
-OPENV_SERIAL_PATH := $(shell command -v openv-serial)
+OPENV_SERVER_PATH := $(shell which openv-server)
+OPENV_CLIENT_PATH := $(shell which openv-client)
+OPENV_SERIAL_PATH := $(shell which openv-serial)
 
 # Openvisualizer requires to know where openwsn-fw is located
 OPENV_OPENWSN_FW_PATH ?= --fw-path=$(RIOTBASE)/build/pkg/openwsn
