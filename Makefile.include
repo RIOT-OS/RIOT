@@ -327,13 +327,13 @@ APPLICATION := $(strip $(APPLICATION))
 
 ifeq (,$(and $(DOWNLOAD_TO_STDOUT),$(DOWNLOAD_TO_FILE)))
   ifeq (,$(WGET))
-    ifeq (,$(shell command -v wget))
-      WGET = $(call memoized,WGET,$(shell command -v wget))
+    ifeq (0,$(shell which wget > /dev/null 2>&1 ; echo $$?))
+      WGET = $(call memoized,WGET,$(shell which wget))
     endif
   endif
   ifeq (,$(CURL))
-    ifneq (,$(shell command -v curl))
-      CURL = $(call memoized,CURL,$(shell command -v curl))
+    ifeq (0,$(shell which curl > /dev/null 2>&1 ; echo $$?))
+      CURL = $(call memoized,CURL,$(shell which curl))
     endif
   endif
   ifeq (,$(WGET)$(CURL))
@@ -349,11 +349,11 @@ ifeq (,$(and $(DOWNLOAD_TO_STDOUT),$(DOWNLOAD_TO_FILE)))
 endif
 
 ifeq (,$(UNZIP_HERE))
-  ifneq (,$(shell command -v unzip))
-    UNZIP_HERE = $(call memoized,UNZIP_HERE,$(shell command -v unzip) -q)
+  ifeq (0,$(shell which unzip > /dev/null 2>&1 ; echo $$?))
+    UNZIP_HERE = $(call memoized,UNZIP_HERE,$(shell which unzip) -q)
   else
-    ifneq (,$(shell command -v 7z))
-      UNZIP_HERE = $(call memoized,UNZIP_HERE,$(shell command -v 7z) x -bd)
+    ifeq (0,$(shell which 7z > /dev/null 2>&1 ; echo $$?))
+      UNZIP_HERE = $(call memoized,UNZIP_HERE,$(shell which 7z) x -bd)
     else
       $(warning Neither unzip nor 7z is installed.)
     endif
