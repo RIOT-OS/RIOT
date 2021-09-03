@@ -25,7 +25,7 @@ TARGET_ARCH_RISCV ?= \
     $(subst -gcc,,\
       $(notdir \
         $(word 1,\
-          $(foreach triple,$(_TRIPLES_TO_TEST),$(shell which $(triple)-gcc 2> /dev/null))))))
+          $(foreach triple,$(_TRIPLES_TO_TEST),$(shell command -v $(triple)-gcc))))))
 
 TARGET_ARCH ?= $(TARGET_ARCH_RISCV)
 

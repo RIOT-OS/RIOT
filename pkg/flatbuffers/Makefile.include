@@ -2,7 +2,7 @@ INCLUDES += -I$(PKGDIRBASE)/flatbuffers/include
 
 FLATC ?= flatc
 
-ifneq (0,$(shell which flatc > /dev/null 2>&1 ; echo $$?))
+ifeq (,$(shell command -v flatc ))
   FLATC = $(RIOTTOOLS)/flatc/flatc
   $(call target-export-variables,all,FLATC)
 endif
