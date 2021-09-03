@@ -29,16 +29,102 @@
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/spi.h"
+#include "macros/units.h"
+
+#define ENABLE_DEBUG        1
+#include "debug.h"
+
+static mutex_t lock = MUTEX_INIT;
 
 /**
  * @brief   Extract BR0, BR1 and SPI2X bits from speed value
  * @{
  */
-#define CLK_MASK            (0x3)
-#define S2X_SHIFT           (2)
-/** @} */
+/* Table of frequencies corresponding to the spi_clk_t enum */
+static uint32_t spi_clk[5] = {
+    /* CLOCK_CORECLOCK: 8M      10M     16M    20M      32M  */
+    KHZ(100),       /*  62.5K   78.125K 125K   156.25K  250K */
+    KHZ(400),       /*  250K    312.5K  250K   312.5K   250K */
+    MHZ(1),         /*  1MHz    625K    1M     625K     1M   */
+    MHZ(5),         /*  4MHz    5M      4M     5M       4M   */
+    MHZ(10)         /*  4MHz    10M     8M     10M      8M   */
+};
 
-static mutex_t lock = MUTEX_INIT;
+/* Tables for Double SPI speed (SPI2X) and SPI Clock Rate Select (SPR1,
+ * SPR0) register bits */
+static uint8_t spi2x[5], spr[5];
+
+/* Helper function to compute a right shift value corresponding to
+ * dividers */
+static uint8_t _clk_shift(uint32_t clk)
+{
+    /* Atmega datasheets give the following table:
+     * SPI2X    SPR1    SPR0    SCK Freqency
+     * 0        0       0       Fosc/4
+     * 0        0       1       Fosc/16
+     * 0        1       0       Fosc/64
+     * 0        1       1       Fosc/128
+     * 1        0       0       Fosc/2
+     * 1        0       1       Fosc/8
+     * 1        1       0       Fosc/32
+     * 1        1       1       Fosc/64
+     *
+     * We can easily sort it by dividers by inverting the SPI2X bit and
+     * taking it as LSB:
+     * Divider  SPR1    SPR2    ~SPI2X
+     * 2        0       0       0
+     * 4        0       0       1
+     * 8        0       1       0
+     * 16       0       1       1
+     * 32       1       0       0
+     * 64       1       0       1
+     * 64       1       1       0
+     * 128      1       1       1
+     * Dividers are all power of two so we can apply them by
+     * right shifting these register value up to 5:
+     * clk = (CLOCK_CORECLOCK / 2) >> (SPR1 << 2 | SPR0 << 1 | ~SPI2X)
+     */
+    uint8_t shift = 0;
+    while (clk << shift < CLOCK_CORECLOCK / 2) {
+        shift++;
+    }
+    /* Beyond 5 we must shift one more time */
+    return shift > 5 ? ++shift : shift;
+}
+
+static void _init_clk(void)
+{
+    uint8_t shift;
+    for (uint8_t i = 0; i < 5; i++) {
+
+        DEBUG("[spi] spi_clk[%"PRIu8"]: %8"PRIu32" -> ", i, spi_clk[i]);
+
+        /* bound divider from 2 to 128 */
+        if (spi_clk[i] > CLOCK_CORECLOCK / 2) {
+            spi_clk[i] = CLOCK_CORECLOCK / 2;
+        }
+        if (spi_clk[i] < CLOCK_CORECLOCK / 128) {
+            spi_clk[i] = CLOCK_CORECLOCK / 128;
+        }
+
+        /* Compute shift values */
+        shift = _clk_shift(spi_clk[i]);
+
+        /* Save registers bits */
+        spi2x[i] = ~shift & 1;
+        spr[i] = shift >> 1;
+
+        /* Save SPI clock frequencies */
+        spi_clk[i] = shift > 5 ?
+            CLOCK_CORECLOCK >> shift : (CLOCK_CORECLOCK / 2) >> shift;
+
+        DEBUG("%8"PRIu32" (%"PRIu32" / %3"PRIu8") "
+            " SPI2X: %"PRIu8"  SPR1: %"PRIu8"  SPR0: %"PRIu8"\n",
+            spi_clk[i], CLOCK_CORECLOCK, ((shift > 5 ? 1 : 2) << shift),
+            spi2x[i], (spr[i] >> 1), (spr[i] & 1));
+    }
+}
+/** @} */
 
 void spi_init(spi_t bus)
 {
@@ -47,6 +133,7 @@ void spi_init(spi_t bus)
     power_spi_disable();
     /* trigger the pin configuration */
     spi_init_pins(bus);
+    _init_clk();
 }
 
 void spi_init_pins(spi_t bus)
@@ -89,8 +176,8 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     power_spi_enable();
 
     /* configure as master, with given mode and clock */
-    SPSR = (clk >> S2X_SHIFT);
-    SPCR = ((1 << SPE) | (1 << MSTR) | mode | (clk & CLK_MASK));
+    SPSR = spi2x[clk];
+    SPCR = ((1 << SPE) | (1 << MSTR) | mode | spr[clk]);
 
     /* clear interrupt flag by reading SPSR and data register by reading SPDR */
     (void)SPSR;
