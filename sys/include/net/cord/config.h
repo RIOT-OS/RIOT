@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_cord_config CoRE RD Endpoint and Lookup Client Configuration
+ * @defgroup    net_cord_config CoRE RD Configuration
  * @ingroup     net_cord
  * @brief       Configuration options for CoRE RD endpoints and lookup clients
  * @{
