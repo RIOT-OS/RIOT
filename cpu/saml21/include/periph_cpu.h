@@ -60,7 +60,6 @@ typedef enum {
     ADC_RES_14BIT = 0xfe,                       /**< not supported */
     ADC_RES_16BIT = 0xfd                        /**< not supported */
 } adc_res_t;
-/** @} */
 #endif /* ndef DOXYGEN */
 
 /**
