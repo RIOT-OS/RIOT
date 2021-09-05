@@ -15,8 +15,6 @@
  * @brief       Implementation of the kernels thread interface
  *
  * @author      Neil Jones <neil.jones@imgtec.com>
- *
- * @}
  */
 #ifndef THREAD_ARCH_H
 #define THREAD_ARCH_H
