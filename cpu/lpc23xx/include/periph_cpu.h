@@ -96,7 +96,7 @@ typedef enum {
     GPIO_RISING = 2,        /**< emit interrupt on rising flank */
     GPIO_BOTH = 3           /**< emit interrupt on both flanks */
 } gpio_flank_t;
-#endif /* ndef DOXYGEN */
+#endif /* ifndef DOXYGEN */
 
 /**
  * @brief   UART device configuration
@@ -141,7 +141,7 @@ typedef struct {
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTE
 #define PERIPH_SPI_NEEDS_TRANSFER_REG
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
-/* @} */
+/** @} */
 
 #ifndef DOXYGEN
 /**
@@ -213,7 +213,7 @@ typedef enum {
     I2C_SPEED_NORMAL = 100000,  /**< normal mode:    ~100 kbit/s */
     I2C_SPEED_FAST   = 400000,  /**< fast mode:      ~400 kbit/s */
 } i2c_speed_t;
-/* @} */
+/** @} */
 #endif /* ndef DOXYGEN */
 
 /**
@@ -228,7 +228,6 @@ typedef struct {
     uint32_t pinsel_msk_sda;/**< SDA PINSEL Mask            */
     uint32_t pinsel_msk_scl;/**< SCL PINSEL Mask            */
 } i2c_conf_t;
-/* @} */
 
 /**
  * @name   Use shared I2C functions
@@ -246,7 +245,7 @@ typedef struct {
 #if defined(MODULE_PERIPH_RTC) && !defined(RTC_NORMALIZE_COMPAT)
 #define RTC_NORMALIZE_COMPAT    (1)
 #endif
-/* @} */
+/** @} */
 
 #ifdef __cplusplus
 }
