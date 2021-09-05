@@ -51,6 +51,7 @@ boards/adafruit\-clue/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_DCX
 boards/adafruit\-clue/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_INVERTED \(macro definition\) of file board\.h is not documented\.
 boards/adafruit\-clue/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_NUM_LINES \(macro definition\) of file board\.h is not documented\.
 boards/adafruit\-clue/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_RGB \(macro definition\) of file board\.h is not documented\.
+boards/adafruit\-clue/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_ROTATION \(macro definition\) of file board\.h is not documented\.
 boards/adafruit\-clue/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_RST \(macro definition\) of file board\.h is not documented\.
 boards/adafruit\-clue/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_SPI \(macro definition\) of file board\.h is not documented\.
 boards/adafruit\-clue/include/board\.h:[0-9]+: warning: Member LED0_MASK \(macro definition\) of file board\.h is not documented\.
@@ -1977,6 +1978,7 @@ boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM
 boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_DCX \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_INVERTED \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member ILi9341_PARAM_RGB \(macro definition\) of file board\.h is not documented\.
+boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_ROTATION \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_RST \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_SPI_CLK \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_SPI \(macro definition\) of file board\.h is not documented\.
@@ -4451,6 +4453,7 @@ boards/pinetime/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_DCX \(mac
 boards/pinetime/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_INVERTED \(macro definition\) of file board\.h is not documented\.
 boards/pinetime/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_NUM_LINES \(macro definition\) of file board\.h is not documented\.
 boards/pinetime/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_RGB \(macro definition\) of file board\.h is not documented\.
+boards/pinetime/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_ROTATION \(macro definition\) of file board\.h is not documented\.
 boards/pinetime/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_RST \(macro definition\) of file board\.h is not documented\.
 boards/pinetime/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_SPI_CLK \(macro definition\) of file board\.h is not documented\.
 boards/pinetime/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_SPI \(macro definition\) of file board\.h is not documented\.
@@ -7009,11 +7012,11 @@ cpu/arm7_common/include/arm7_common\.h:[0-9]+: warning: Member PM_SLEEP \(macro 
 cpu/arm7_common/include/irq_arch\.h:[0-9]+: warning: Member __get_cpsr\(void\) \(function\) of file irq_arch\.h is not documented\.
 cpu/arm7_common/include/irq_arch\.h:[0-9]+: warning: Member irq_disable\(void\) \(function\) of file irq_arch\.h is not documented\.
 cpu/arm7_common/include/irq_arch\.h:[0-9]+: warning: Member irq_enable\(void\) \(function\) of file irq_arch\.h is not documented\.
+cpu/arm7_common/include/irq_arch\.h:[0-9]+: warning: Member irq_is_enabled\(void\) \(function\) of file irq_arch\.h is not documented\.
 cpu/arm7_common/include/irq_arch\.h:[0-9]+: warning: Member irq_is_in\(void\) \(function\) of file irq_arch\.h is not documented\.
 cpu/arm7_common/include/irq_arch\.h:[0-9]+: warning: Member IRQ_MASK \(macro definition\) of file irq_arch\.h is not documented\.
 cpu/arm7_common/include/irq_arch\.h:[0-9]+: warning: Member irq_restore\(unsigned oldCPSR\) \(function\) of file irq_arch\.h is not documented\.
 cpu/arm7_common/include/irq_arch\.h:[0-9]+: warning: Member __set_cpsr\(unsigned val\) \(function\) of file irq_arch\.h is not documented\.
-cpu/arm7_common/include/thread_arch\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/arm7_common/include/VIC\.h:[0-9]+: warning: Member F_Bit \(macro definition\) of group cpu_arm7_common is not documented\.
 cpu/arm7_common/include/VIC\.h:[0-9]+: warning: Member FIQ32Mode \(macro definition\) of group cpu_arm7_common is not documented\.
 cpu/arm7_common/include/VIC\.h:[0-9]+: warning: Member I_Bit \(macro definition\) of group cpu_arm7_common is not documented\.
@@ -7184,7 +7187,6 @@ cpu/atxmega/include/periph_cpu\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANS
 cpu/atxmega/include/periph_cpu\.h:[0-9]+: warning: Member PM_NUM_MODES \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/atxmega/include/periph_cpu\.h:[0-9]+: warning: Member spi_clk_t \(enumeration\) of file periph_cpu\.h is not documented\.
 cpu/atxmega/include/periph_cpu\.h:[0-9]+: warning: Member spi_t \(typedef\) of file periph_cpu\.h is not documented\.
-cpu/avr8_common/include/thread_arch\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/cc2538/include/cc2538_eui_primary\.h:[0-9]+: warning: Member EUI64_PROVIDER_FUNC \(macro definition\) of file cc2538_eui_primary\.h is not documented\.
 cpu/cc2538/include/cc2538_eui_primary\.h:[0-9]+: warning: Member EUI64_PROVIDER_INDEX \(macro definition\) of file cc2538_eui_primary\.h is not documented\.
 cpu/cc2538/include/cc2538_eui_primary\.h:[0-9]+: warning: Member EUI64_PROVIDER_TYPE \(macro definition\) of file cc2538_eui_primary\.h is not documented\.
@@ -7192,9 +7194,6 @@ cpu/cc2538/include/cc2538_gpio\.h:[0-9]+: warning: Member cc2538_ioc_pin_t \(enu
 cpu/cc2538/include/cc2538_gpio\.h:[0-9]+: warning: Member cc2538_ioc_sel_t \(enumeration\) of group cpu_cc2538_gpio is not documented\.
 cpu/cc2538/include/cc2538_gpio\.h:[0-9]+: warning: Member IOC_PXX_OVER \(macro definition\) of group cpu_cc2538_gpio is not documented\.
 cpu/cc2538/include/cc2538_gpio\.h:[0-9]+: warning: Member IOC_PXX_SEL \(macro definition\) of group cpu_cc2538_gpio is not documented\.
-cpu/cc2538/include/cc2538_gptimer\.h:[0-9]+: warning: end of file while inside a group
-cpu/cc2538/include/cc2538\.h:[0-9]+: warning: end of file with unbalanced grouping commands
-cpu/cc2538/include/cc2538_rfcore\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/cc2538/include/cc2538_rf\.h:[0-9]+: warning: Member ABS_DIFF\(x, y\) \(macro definition\) of file cc2538_rf\.h is not documented\.
 cpu/cc2538/include/cc2538_rf\.h:[0-9]+: warning: Member BIT\(n\) \(macro definition\) of file cc2538_rf\.h is not documented\.
 cpu/cc2538/include/cc2538_rf\.h:[0-9]+: warning: Member BOOLEAN\(x\) \(macro definition\) of file cc2538_rf\.h is not documented\.
@@ -7223,7 +7222,6 @@ cpu/cc2538/include/cc2538_rf\.h:[0-9]+: warning: Member NUM_POWER_LEVELS \(macro
 cpu/cc2538/include/cc2538_rf\.h:[0-9]+: warning: Member RFCORE_ASSERT\(expr\) \(macro definition\) of file cc2538_rf\.h is not documented\.
 cpu/cc2538/include/cc2538_rf\.h:[0-9]+: warning: Member RFCORE_FLUSH_RECEIVE_FIFO\(\) \(macro definition\) of file cc2538_rf\.h is not documented\.
 cpu/cc2538/include/cc2538_rf\.h:[0-9]+: warning: Member RFCORE_WAIT_UNTIL\(expr\) \(macro definition\) of file cc2538_rf\.h is not documented\.
-cpu/cc2538/include/cc2538_rf\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/cc2538/include/cc2538_rf_internal\.h:[0-9]+: warning: Member CC2538_RX_FIFO_ADDR \(macro definition\) of file cc2538_rf_internal\.h is not documented\.
 cpu/cc2538/include/cc2538_rf_internal\.h:[0-9]+: warning: Member CC2538_TX_FIFO_ADDR \(macro definition\) of file cc2538_rf_internal\.h is not documented\.
 cpu/cc2538/include/cc2538_rf_internal\.h:[0-9]+: warning: Member RFCORE_ASSERT_failure\(const char \*expr, const char \*func, int line\) \(function\) of file cc2538_rf_internal\.h is not documented\.
@@ -7255,7 +7253,6 @@ cpu/cc2538/include/periph_cpu\.h:[0-9]+: warning: Member RTT_IRQ_PRIO \(macro de
 cpu/cc2538/include/periph_cpu\.h:[0-9]+: warning: Member RTT_ISR \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/cc2538/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MAX_VALUE \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/cc2538/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MIN_OFFSET \(macro definition\) of file periph_cpu\.h is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_aux\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_aux\.h:[0-9]+: warning: Member MODCLKEN0_AIODIO0_EN \(macro definition\) of file cc26x0_cc13x0_aux\.h is not documented\.
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_aux\.h:[0-9]+: warning: Member MODCLKEN0_AIODIO1_EN \(macro definition\) of file cc26x0_cc13x0_aux\.h is not documented\.
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_aux\.h:[0-9]+: warning: Member MODCLKEN0_ANAIF_EN \(macro definition\) of file cc26x0_cc13x0_aux\.h is not documented\.
@@ -7263,25 +7260,23 @@ cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_aux\.h:[0-9]+: warning: Member MODCLKEN0
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_aux\.h:[0-9]+: warning: Member MODCLKEN0_AUX_DDI0_OSC_EN \(macro definition\) of file cc26x0_cc13x0_aux\.h is not documented\.
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_aux\.h:[0-9]+: warning: Member MODCLKEN0_TDC_EN \(macro definition\) of file cc26x0_cc13x0_aux\.h is not documented\.
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_aux\.h:[0-9]+: warning: Member MODCLKEN0_TIMER_EN \(macro definition\) of file cc26x0_cc13x0_aux\.h is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_fcfg\.h:[0-9]+: warning: end of file with unbalanced grouping commands
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: end of file with unbalanced grouping commands
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AONWUC_CTL0_AUX_SRAM_ERASE \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AONWUC_CTL0_MCU_SRAM_ERASE \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AONWUC_CTL0_PWR_DWN_DIS \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AONWUC_CTL1_MCU_RESET_SRC \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AONWUC_CTL1_MCU_WARM_RESET \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCFG_RAM_RET_EN \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCLK_PWR_DWN_SRC_mask \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCLK_PWR_DWN_SRC_pos \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCLK_SCLK_HF_DIV_mask \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCLK_SCLK_HF_DIV_pos \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCLK_SRC_HF \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCLK_SRC_LF \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCLK_SRC_mask \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCTL_AUX_FORCE_ON \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCTL_RESET_REQ \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCTL_SCE_RUN_EN \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCTL_SWEV \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AONWUC_CTL0_AUX_SRAM_ERASE \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AONWUC_CTL0_MCU_SRAM_ERASE \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AONWUC_CTL0_PWR_DWN_DIS \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AONWUC_CTL1_MCU_RESET_SRC \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AONWUC_CTL1_MCU_WARM_RESET \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCFG_RAM_RET_EN \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCLK_PWR_DWN_SRC_mask \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCLK_PWR_DWN_SRC_pos \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCLK_SCLK_HF_DIV_mask \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCLK_SCLK_HF_DIV_pos \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCLK_SRC_HF \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCLK_SRC_LF \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCLK_SRC_mask \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCTL_AUX_FORCE_ON \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCTL_RESET_REQ \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCTL_SCE_RUN_EN \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member AUXCTL_SWEV \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member CLKLOADCTL_LOADDONE \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member DDI_0_OSC_CTL0_ACLK_REF_SRC_SEL_RCOSC_HF \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member DDI_0_OSC_CTL0_ACLK_REF_SRC_SEL_RCOSC_LF \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
@@ -7306,18 +7301,18 @@ cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member GPIOCLKG
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member I2CCLKGDS_CLK_EN \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member I2CCLKGR_CLK_EN \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member I2CCLKGS_CLK_EN \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member JTAGCFG_JTAG_PD_FORCE_ON \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCFG_SRAM_FIXED_WU_EN \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCFG_SRAM_RET_B0124 \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCFG_SRAM_RET_B012 \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCFG_SRAM_RET_B01 \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCFG_SRAM_RET_B0 \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCFG_SRAM_RET_OFF \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCFG_SRAM_VIRT_OFF \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCLK_PWR_DWN_SRC_mask \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCLK_RCOSC_HF_CAL_DONE \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member OSCCFG_PER_E_mask \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member OSCCFG_PER_M_mask \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member JTAGCFG_JTAG_PD_FORCE_ON \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCFG_SRAM_FIXED_WU_EN \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCFG_SRAM_RET_B0124 \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCFG_SRAM_RET_B012 \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCFG_SRAM_RET_B01 \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCFG_SRAM_RET_B0 \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCFG_SRAM_RET_OFF \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCFG_SRAM_VIRT_OFF \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCLK_PWR_DWN_SRC_mask \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member MCUCLK_RCOSC_HF_CAL_DONE \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member OSCCFG_PER_E_mask \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member OSCCFG_PER_M_mask \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PDCTL0_PERIPH_ON \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PDCTL0_RFC_ON \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PDCTL0_SERIAL_ON \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
@@ -7330,22 +7325,22 @@ cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PDSTAT0_
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PDSTAT1_CPU_ON \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PDSTAT1_RFC_ON \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PDSTAT1_VIMS_ON \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PWRSTAT_AUX_BUS_CONNECTED \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PWRSTAT_AUX_PD_ON \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PWRSTAT_AUX_PWR_DNW \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PWRSTAT_AUX_RESET_DONE \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PWRSTAT_JTAG_PD_ON \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PWRSTAT_MCU_PD_ON \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGECFG_ADAPTIVE_EN \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGECFG_C1_mask \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGECFG_C2_mask \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGECFG_MAX_PER_E_mask \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGECFG_MAX_PER_M_mask \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGECFG_PER_E_mask \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGECFG_PER_M_mask \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGESTAT_MAX_USED_PER_mask \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGESTAT_VDDR_SMPLS_mask \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member SHUTDOWN_EN \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PWRSTAT_AUX_BUS_CONNECTED \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PWRSTAT_AUX_PD_ON \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PWRSTAT_AUX_PWR_DNW \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PWRSTAT_AUX_RESET_DONE \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PWRSTAT_JTAG_PD_ON \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member PWRSTAT_MCU_PD_ON \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGECFG_ADAPTIVE_EN \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGECFG_C1_mask \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGECFG_C2_mask \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGECFG_MAX_PER_E_mask \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGECFG_MAX_PER_M_mask \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGECFG_PER_E_mask \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGECFG_PER_M_mask \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGESTAT_MAX_USED_PER_mask \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member RECHARGESTAT_VDDR_SMPLS_mask \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
+cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member SHUTDOWN_EN \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member UARTCLKGDS_CLK_EN_UART0 \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member UARTCLKGR_CLK_EN_UART0 \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
 cpu/cc26x0_cc13x0/include/cc26x0_cc13x0_prcm\.h:[0-9]+: warning: Member UARTCLKGS_CLK_EN_UART0 \(macro definition\) of file cc26x0_cc13x0_prcm\.h is not documented\.
@@ -7359,7 +7354,6 @@ cpu/cc26x2_cc13x2/include/cc26x2_cc13x2_fcfg\.h:[0-9]+: warning: Member FCFG1_DA
 cpu/cc26x2_cc13x2/include/cc26x2_cc13x2_fcfg\.h:[0-9]+: warning: Member FCFG1_DAC_BIAS_CNF_LPM_BIAS_WIDTH_TRIM_m \(macro definition\) of file cc26x2_cc13x2_fcfg\.h is not documented\.
 cpu/cc26x2_cc13x2/include/cc26x2_cc13x2_fcfg\.h:[0-9]+: warning: Member FCFG1_DAC_BIAS_CNF_LPM_BIAS_WIDTH_TRIM_s \(macro definition\) of file cc26x2_cc13x2_fcfg\.h is not documented\.
 cpu/cc26x2_cc13x2/include/cc26x2_cc13x2_fcfg\.h:[0-9]+: warning: Member FCFG1_DAC_BIAS_CNF_LPM_TRIM_IOUT_s \(macro definition\) of file cc26x2_cc13x2_fcfg\.h is not documented\.
-cpu/cc26x2_cc13x2/include/cc26x2_cc13x2_prcm\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 cpu/cc26x2_cc13x2/include/cc26x2_cc13x2_prcm\.h:[0-9]+: warning: Member AON_PMCTL_RESETCTL_BOOT_DET_0_CLR_m \(macro definition\) of file cc26x2_cc13x2_prcm\.h is not documented\.
 cpu/cc26x2_cc13x2/include/cc26x2_cc13x2_prcm\.h:[0-9]+: warning: Member AON_PMCTL_RESETCTL_BOOT_DET_0_m \(macro definition\) of file cc26x2_cc13x2_prcm\.h is not documented\.
 cpu/cc26x2_cc13x2/include/cc26x2_cc13x2_prcm\.h:[0-9]+: warning: Member AON_PMCTL_RESETCTL_BOOT_DET_0_SET_m \(macro definition\) of file cc26x2_cc13x2_prcm\.h is not documented\.
@@ -7627,15 +7621,11 @@ cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_gpt\.h:[0-9]+: warning: Member GPT_TXMR_
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_gpt\.h:[0-9]+: warning: Member GPT_TXMR_TXPWMIE \(macro definition\) of file cc26xx_cc13xx_gpt\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_gpt\.h:[0-9]+: warning: Member GPT_TXMR_TXSNAPS \(macro definition\) of file cc26xx_cc13xx_gpt\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_gpt\.h:[0-9]+: warning: Member GPT_TXMR_TXWOT \(macro definition\) of file cc26xx_cc13xx_gpt\.h is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx\.h:[0-9]+: warning: Member ADI_CLR \(macro definition\) of file cc26xx_cc13xx\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx\.h:[0-9]+: warning: Member ADI_MASK16B \(macro definition\) of file cc26xx_cc13xx\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx\.h:[0-9]+: warning: Member ADI_MASK4B \(macro definition\) of file cc26xx_cc13xx\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx\.h:[0-9]+: warning: Member ADI_MASK8B \(macro definition\) of file cc26xx_cc13xx\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx\.h:[0-9]+: warning: Member ADI_SET \(macro definition\) of file cc26xx_cc13xx\.h is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx\.h:[0-9]+: warning: Member reg16_t \(typedef\) of file cc26xx_cc13xx\.h is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx\.h:[0-9]+: warning: Member reg32_t \(typedef\) of file cc26xx_cc13xx\.h is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx\.h:[0-9]+: warning: Member reg8_t \(typedef\) of file cc26xx_cc13xx\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_hard_api\.h:[0-9]+: warning: Member rom_hapi_fletcher32\(a, b, c\) \(macro definition\) of file cc26xx_cc13xx_hard_api\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_hard_api\.h:[0-9]+: warning: Member rom_hapi_get_chipid\(\) \(macro definition\) of file cc26xx_cc13xx_hard_api\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_hard_api\.h:[0-9]+: warning: Member rom_hapi_get_flashsize\(\) \(macro definition\) of file cc26xx_cc13xx_hard_api\.h is not documented\.
@@ -7649,15 +7639,11 @@ cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_hard_api\.h:[0-9]+: warning: Member rom_
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_hard_api\.h:[0-9]+: warning: Member rom_hapi_select_compa_ref\(a\) \(macro definition\) of file cc26xx_cc13xx_hard_api\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_hard_api\.h:[0-9]+: warning: Member rom_hapi_select_compb_ref\(a\) \(macro definition\) of file cc26xx_cc13xx_hard_api\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_hard_api\.h:[0-9]+: warning: Member rom_hapi_std_deviation_value\(a, b\) \(macro definition\) of file cc26xx_cc13xx_hard_api\.h is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_i2c\.h:[0-9]+: warning: end of file with unbalanced grouping commands
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_ioc\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_ioc\.h:[0-9]+: warning: Member AON_IOC_CLK32KCTL_OEN \(macro definition\) of file cc26xx_cc13xx_ioc\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_ioc\.h:[0-9]+: warning: Member IOCFG_HYST_ENABLE \(macro definition\) of file cc26xx_cc13xx_ioc\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_ioc\.h:[0-9]+: warning: Member IOCFG_INPUT_ENABLE \(macro definition\) of file cc26xx_cc13xx_ioc\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_ioc\.h:[0-9]+: warning: Member IOCFG_WUCFG_HIGH \(macro definition\) of file cc26xx_cc13xx_ioc\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_ioc\.h:[0-9]+: warning: Member IOCFG_WUCFG_LOW \(macro definition\) of file cc26xx_cc13xx_ioc\.h is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_power\.h:[0-9]+: warning: end of file with unbalanced grouping commands
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_rfc\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_rfc\.h:[0-9]+: warning: Member PWMCLKEN_CPE \(macro definition\) of file cc26xx_cc13xx_rfc\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_rfc\.h:[0-9]+: warning: Member PWMCLKEN_CPERAM \(macro definition\) of file cc26xx_cc13xx_rfc\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_rfc\.h:[0-9]+: warning: Member PWMCLKEN_FSCA \(macro definition\) of file cc26xx_cc13xx_rfc\.h is not documented\.
@@ -7725,37 +7711,33 @@ cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_uart\.h:[0-9]+: warning: Member UART_MIS
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_uart\.h:[0-9]+: warning: Member UART_MIS_RTMIS \(macro definition\) of group cpu_cc26xx_cc13xx_definitions is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_uart\.h:[0-9]+: warning: Member UART_MIS_RXMIS \(macro definition\) of group cpu_cc26xx_cc13xx_definitions is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_uart\.h:[0-9]+: warning: Member UART_MIS_TXMIS \(macro definition\) of group cpu_cc26xx_cc13xx_definitions is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member FLASH_CFG_DIS_EFUSECLK \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member FLASH_FPAC1_PSLEEPTDIS_m \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member FLASH_FPAC1_PSLEEPTDIS_s \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_ARB_CFG \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_ARB_CFG_m \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_DYN_CG_EN \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_DYN_CG_EN_m \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_IDCODE_LB_DIS \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_IDCODE_LB_DIS_m \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_MODE_CACHE \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_MODE_GPRAM \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_MODE_m \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_MODE_OFF \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_MODE_SPLIT \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_PREF_EN \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_PREF_EN_m \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_STATS_CLR_m \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_STATS_EN \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_STATS_EN_m \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_SYSBUS_LB_DIS \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_SYSBUS_LB_DIS_m \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_STAT_MODE_CHANGING \(macro definition\) of group cpu_specific_peripheral_memory_map is not documented\.
-cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_wdt\.h:[0-9]+: warning: end of file with unbalanced grouping commands
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_ARB_CFG \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_ARB_CFG_m \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_DYN_CG_EN \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_DYN_CG_EN_m \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_IDCODE_LB_DIS \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_IDCODE_LB_DIS_m \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_MODE_CACHE \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_MODE_GPRAM \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_MODE_m \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_MODE_OFF \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_MODE_SPLIT \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_PREF_EN \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_PREF_EN_m \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_STATS_CLR_m \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_STATS_EN \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_STATS_EN_m \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_SYSBUS_LB_DIS \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_CTL_SYSBUS_LB_DIS_m \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
+cpu/cc26xx_cc13xx/include/cc26xx_cc13xx_vims\.h:[0-9]+: warning: Member VIMS_STAT_MODE_CHANGING \(macro definition\) of file cc26xx_cc13xx_vims\.h is not documented\.
 cpu/cc26xx_cc13xx/include/cpu_conf_cc26xx_cc13xx\.h:[0-9]+: warning: Member CPU_FLASH_BASE \(macro definition\) of group cpu_cc26xx_cc13xx is not documented\.
 cpu/cc26xx_cc13xx/include/cpu_conf_cc26xx_cc13xx\.h:[0-9]+: warning: Member CPU_IRQ_NUMOF \(macro definition\) of group cpu_cc26xx_cc13xx is not documented\.
 cpu/cc26xx_cc13xx/include/cpu_conf_cc26xx_cc13xx\.h:[0-9]+: warning: Member NUM_HEAPS \(macro definition\) of group cpu_cc26xx_cc13xx is not documented\.
 cpu/cortexm_common/include/cpu_conf_common\.h:[0-9]+: warning: Member THREAD_STACKSIZE_DEFAULT \(macro definition\) of file cpu_conf_common\.h is not documented\.
 cpu/cortexm_common/include/cpu_conf_common\.h:[0-9]+: warning: Member THREAD_STACKSIZE_IDLE \(macro definition\) of file cpu_conf_common\.h is not documented\.
-cpu/cortexm_common/include/irq_arch\.h:[0-9]+: warning: unbalanced grouping commands
-cpu/cortexm_common/include/thread_arch\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/efm32/include/cpu_conf\.h:[0-9]+: warning: Member CPU_FLASH_BASE \(macro definition\) of file cpu_conf\.h is not documented\.
 cpu/efm32/include/cpu_conf\.h:[0-9]+: warning: Member CPU_IRQ_NUMOF \(macro definition\) of file cpu_conf\.h is not documented\.
 cpu/efm32/include/cpu_conf\.h:[0-9]+: warning: Member FLASHPAGE_NUMOF \(macro definition\) of file cpu_conf\.h is not documented\.
@@ -7774,8 +7756,6 @@ cpu/efm32/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MIN_FREQUENCY \(macr
 cpu/efm32/include/periph_cpu\.h:[0-9]+: warning: Member WDT_CLOCK_HZ \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/efm32/include/periph_cpu\.h:[0-9]+: warning: Member WDT_HAS_STOP \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/esp32/doc\.txt:[0-9]+: warning: Reached end of file while still inside a \(nested\) comment\. Nesting level 1 \(probable line reference: 9\)
-cpu/esp32/esp\-eth/esp_eth_params\.h:[0-9]+: warning: end of file with unbalanced grouping commands
-cpu/esp32/include/can_params\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 cpu/esp32/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_EXTRA_STACKSIZE_PRINTF \(macro definition\) of group cpu_esp32_conf is not documented\.
 cpu/esp32/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_STACKSIZE_DEFAULT \(macro definition\) of group cpu_esp32_conf is not documented\.
 cpu/esp32/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_STACKSIZE_IDLE \(macro definition\) of group cpu_esp32_conf is not documented\.
@@ -7822,7 +7802,6 @@ cpu/esp32/include/periph_cpu\.h:[0-9]+: warning: Member PROVIDES_PM_OFF \(macro 
 cpu/esp32/include/periph_cpu\.h:[0-9]+: warning: Member PROVIDES_PM_RESTART \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/esp32/include/periph_cpu\.h:[0-9]+: warning: Member PROVIDES_PM_SET_LOWEST \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/esp32/include/periph_cpu\.h:[0-9]+: warning: Member TIMER_CHANNEL_NUMOF \(macro definition\) of file periph_cpu\.h is not documented\.
-cpu/esp32/include/sdk_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 cpu/esp8266/include/cpu_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of group cpu_esp8266_conf is not documented\.
 cpu/esp8266/include/cpu_conf\.h:[0-9]+: warning: Member ESP_NOW_STACKSIZE \(macro definition\) of group cpu_esp8266_conf is not documented\.
 cpu/esp8266/include/cpu_conf\.h:[0-9]+: warning: Member GNRC_IPV6_STACK_SIZE \(macro definition\) of group cpu_esp8266_conf is not documented\.
@@ -7855,10 +7834,7 @@ cpu/esp8266/include/periph_cpu\.h:[0-9]+: warning: Member GPIO9 \(macro definiti
 cpu/esp8266/include/periph_cpu\.h:[0-9]+: warning: Member gpio_t \(typedef\) of file periph_cpu\.h is not documented\.
 cpu/esp8266/include/periph_cpu\.h:[0-9]+: warning: Member RTT_FREQUENCY \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/esp8266/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MAX_VALUE \(macro definition\) of file periph_cpu\.h is not documented\.
-cpu/esp8266/include/sdk_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 cpu/esp_common/include/cpu\.h:[0-9]+: warning: Member PROVIDES_PM_SET_LOWEST \(macro definition\) of file cpu\.h is not documented\.
-cpu/esp_common/include/esp_common\.h:[0-9]+: warning: end of file with unbalanced grouping commands
-cpu/esp_common/include/esp_common_log\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 cpu/esp_common/include/irq_arch_common\.h:[0-9]+: warning: Member critical_enter\(\) \(macro definition\) of file irq_arch_common\.h is not documented\.
 cpu/esp_common/include/irq_arch_common\.h:[0-9]+: warning: Member critical_enter_var\(m\) \(macro definition\) of file irq_arch_common\.h is not documented\.
 cpu/esp_common/include/irq_arch_common\.h:[0-9]+: warning: Member critical_exit\(\) \(macro definition\) of file irq_arch_common\.h is not documented\.
@@ -7866,7 +7842,6 @@ cpu/esp_common/include/irq_arch_common\.h:[0-9]+: warning: Member critical_exit_
 cpu/esp_common/include/irq_arch_common\.h:[0-9]+: warning: Member irq_isr_enter\(\) \(macro definition\) of file irq_arch_common\.h is not documented\.
 cpu/esp_common/include/irq_arch_common\.h:[0-9]+: warning: Member irq_isr_exit\(\) \(macro definition\) of file irq_arch_common\.h is not documented\.
 cpu/esp_common/include/log_module\.h:[0-9]+: warning: Member log_write\(level,\.\.\.\) \(macro definition\) of file log_module\.h is not documented\.
-cpu/esp_common/include/sys/types\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 cpu/fe310/include/clk_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file clk_conf\.h is not documented\.
 cpu/fe310/include/clk_conf\.h:[0-9]+: warning: Member CLOCK_PLL_INPUT_CLOCK \(macro definition\) of file clk_conf\.h is not documented\.
 cpu/fe310/include/clk_conf\.h:[0-9]+: warning: Member CLOCK_PLL_OUT \(macro definition\) of file clk_conf\.h is not documented\.
@@ -7969,7 +7944,6 @@ cpu/lm4f120/include/periph_cpu\.h:[0-9]+: warning: Member gpio_t \(typedef\) of 
 cpu/lm4f120/include/periph_cpu\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_INIT_CS \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/lm4f120/include/periph_cpu\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANSFER_REG \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/lm4f120/include/periph_cpu\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANSFER_REGS \(macro definition\) of file periph_cpu\.h is not documented\.
-cpu/lpc1768/include/cpu_conf\.h:[0-9]+: warning: end of file while inside a group
 cpu/lpc1768/include/cpu_conf\.h:[0-9]+: warning: Member CPU_FLASH_BASE \(macro definition\) of group cpu_lpc1768 is not documented\.
 cpu/lpc1768/include/cpu_conf\.h:[0-9]+: warning: Member CPU_HAS_BITBAND \(macro definition\) of group cpu_lpc1768 is not documented\.
 cpu/lpc1768/include/cpu_conf\.h:[0-9]+: warning: Member CPU_IRQ_NUMOF \(macro definition\) of group cpu_lpc1768 is not documented\.
@@ -7987,14 +7961,12 @@ cpu/lpc23xx/include/cpu_conf\.h:[0-9]+: warning: Member PERIPH_FLASHPAGE_NEEDS_F
 cpu/lpc23xx/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_EXTRA_STACKSIZE_PRINTF \(macro definition\) of file cpu_conf\.h is not documented\.
 cpu/lpc23xx/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_STACKSIZE_DEFAULT \(macro definition\) of file cpu_conf\.h is not documented\.
 cpu/lpc23xx/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_STACKSIZE_IDLE \(macro definition\) of file cpu_conf\.h is not documented\.
-cpu/lpc23xx/include/lpc23xx\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/lpc23xx/include/periph_cpu\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 cpu/lpc23xx/include/periph_cpu\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANSFER_BYTE \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/lpc23xx/include/periph_cpu\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANSFER_REG \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/lpc23xx/include/periph_cpu\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANSFER_REGS \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/lpc23xx/include/periph_cpu\.h:[0-9]+: warning: Member PM_NUM_MODES \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/mips32r2_common/include/cpu\.h:[0-9]+: warning: Member BITARITHM_HAS_CLZ \(macro definition\) of group cpu_mips32r2_common is not documented\.
-cpu/mips32r2_common/include/thread_arch\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/mips_pic32mx/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_STACKSIZE_DEFAULT \(macro definition\) of group cpu_mips_pic32mx is not documented\.
 cpu/mips_pic32mx/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_STACKSIZE_IDLE \(macro definition\) of group cpu_mips_pic32mx is not documented\.
 cpu/mips_pic32mz/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_STACKSIZE_DEFAULT \(macro definition\) of group cpu_mips_pic32mz is not documented\.
@@ -8011,10 +7983,10 @@ cpu/msp430_common/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_STACKSIZE_I
 cpu/msp430_common/include/irq_arch\.h:[0-9]+: warning: Member _GENERAL_INTERRUPT_ENABLE \(macro definition\) of file irq_arch\.h is not documented\.
 cpu/msp430_common/include/irq_arch\.h:[0-9]+: warning: Member irq_disable\(void\) \(function\) of file irq_arch\.h is not documented\.
 cpu/msp430_common/include/irq_arch\.h:[0-9]+: warning: Member irq_enable\(void\) \(function\) of file irq_arch\.h is not documented\.
+cpu/msp430_common/include/irq_arch\.h:[0-9]+: warning: Member irq_is_enabled\(void\) \(function\) of file irq_arch\.h is not documented\.
 cpu/msp430_common/include/irq_arch\.h:[0-9]+: warning: Member __irq_is_in \(variable\) of file irq_arch\.h is not documented\.
 cpu/msp430_common/include/irq_arch\.h:[0-9]+: warning: Member irq_is_in\(void\) \(function\) of file irq_arch\.h is not documented\.
 cpu/msp430_common/include/irq_arch\.h:[0-9]+: warning: Member irq_restore\(unsigned int state\) \(function\) of file irq_arch\.h is not documented\.
-cpu/msp430_common/include/thread_arch\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/msp430fxyz/include/msp430_regs\.h:[0-9]+: warning: Member CLK_BASE \(macro definition\) of file msp430_regs\.h is not documented\.
 cpu/msp430fxyz/include/msp430_regs\.h:[0-9]+: warning: Member CLK \(macro definition\) of file msp430_regs\.h is not documented\.
 cpu/msp430fxyz/include/msp430_regs\.h:[0-9]+: warning: Member PORT_1_BASE \(macro definition\) of file msp430_regs\.h is not documented\.
@@ -8168,7 +8140,6 @@ cpu/msp430fxyz/include/msp430_regs\.h:[0-9]+: warning: Member USCI_SPI_STAT_UCLI
 cpu/msp430fxyz/include/msp430_regs\.h:[0-9]+: warning: Member USCI_SPI_STAT_UCOE \(macro definition\) of file msp430_regs\.h is not documented\.
 cpu/msp430fxyz/include/msp430_regs\.h:[0-9]+: warning: Member WD_BASE \(macro definition\) of file msp430_regs\.h is not documented\.
 cpu/msp430fxyz/include/msp430_regs\.h:[0-9]+: warning: Member WD \(macro definition\) of file msp430_regs\.h is not documented\.
-cpu/msp430fxyz/include/periph_cpu\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 cpu/msp430fxyz/include/periph_cpu\.h:[0-9]+: warning: Member gpio_t \(typedef\) of group cpu_msp430fxyz is not documented\.
 cpu/msp430fxyz/include/periph_cpu\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANSFER_BYTE \(macro definition\) of group cpu_msp430fxyz is not documented\.
 cpu/msp430fxyz/include/periph_cpu\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANSFER_REG \(macro definition\) of group cpu_msp430fxyz is not documented\.
@@ -8197,7 +8168,6 @@ cpu/native/include/periph_cpu\.h:[0-9]+: warning: Member GPIOHANDLE_REQUEST_PULL
 cpu/native/include/periph_cpu\.h:[0-9]+: warning: Member HAVE_GPIO_FLANK_T \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/native/include/periph_cpu\.h:[0-9]+: warning: Member HAVE_GPIO_MODE_T \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/native/include/periph_cpu\.h:[0-9]+: warning: Member PM_NUM_MODES \(macro definition\) of file periph_cpu\.h is not documented\.
-cpu/native/include/thread_arch\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/nrf51/include/cpu_conf\.h:[0-9]+: warning: Member CPU_FLASH_BASE \(macro definition\) of group cpu_nrf51 is not documented\.
 cpu/nrf51/include/cpu_conf\.h:[0-9]+: warning: Member CPU_IRQ_NUMOF \(macro definition\) of group cpu_nrf51 is not documented\.
 cpu/nrf51/include/cpu_conf\.h:[0-9]+: warning: Member FLASHPAGE_WRITE_BLOCK_ALIGNMENT \(macro definition\) of group cpu_nrf51 is not documented\.
@@ -8279,9 +8249,8 @@ cpu/riscv_common/include/context_frame\.h:[0-9]+: warning: Member t6_OFFSET \(ma
 cpu/riscv_common/include/cpu_conf_common\.h:[0-9]+: warning: Member THREAD_EXTRA_STACKSIZE_PRINTF \(macro definition\) of file cpu_conf_common\.h is not documented\.
 cpu/riscv_common/include/cpu_conf_common\.h:[0-9]+: warning: Member THREAD_STACKSIZE_DEFAULT \(macro definition\) of file cpu_conf_common\.h is not documented\.
 cpu/riscv_common/include/cpu_conf_common\.h:[0-9]+: warning: Member THREAD_STACKSIZE_IDLE \(macro definition\) of file cpu_conf_common\.h is not documented\.
+cpu/riscv_common/include/irq_arch\.h:[0-9]+: warning: Member irq_is_enabled\(void\) \(function\) of file irq_arch\.h is not documented\.
 cpu/riscv_common/include/irq_arch\.h:[0-9]+: warning: Member riscv_in_isr \(variable\) of file irq_arch\.h is not documented\.
-cpu/riscv_common/include/plic\.h:[0-9]+: warning: unbalanced grouping commands
-cpu/riscv_common/include/thread_arch\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/rpx0xx/include/cpu_conf\.h:[0-9]+: warning: Member CPU_FLASH_BASE \(macro definition\) of file cpu_conf\.h is not documented\.
 cpu/rpx0xx/include/cpu_conf\.h:[0-9]+: warning: Member CPU_IRQ_NUMOF \(macro definition\) of file cpu_conf\.h is not documented\.
 cpu/rpx0xx/include/periph_cpu\.h:[0-9]+: warning: Member gpio_flank_t \(enumeration\) of file periph_cpu\.h is not documented\.
@@ -8303,15 +8272,10 @@ cpu/sam0_common/include/periph_cpu_common\.h:[0-9]+: warning: Member PERIPH_SPI_
 cpu/sam0_common/include/periph_cpu_common\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANSFER_REG \(macro definition\) of file periph_cpu_common\.h is not documented\.
 cpu/sam0_common/include/periph_cpu_common\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANSFER_REGS \(macro definition\) of file periph_cpu_common\.h is not documented\.
 cpu/sam3/include/periph_cpu\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_cpu\.h is not documented\.
-cpu/sam3/include/periph_cpu\.h:[0-9]+: warning: Member gpio_t \(typedef\) of file periph_cpu\.h is not documented\.
-cpu/sam3/include/periph_cpu\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANSFER_BYTE \(macro definition\) of file periph_cpu\.h is not documented\.
-cpu/sam3/include/periph_cpu\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANSFER_REG \(macro definition\) of file periph_cpu\.h is not documented\.
-cpu/sam3/include/periph_cpu\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANSFER_REGS \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/sam3/include/periph_cpu\.h:[0-9]+: warning: Member RTT_CLOCK_FREQUENCY \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/sam3/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MAX_FREQUENCY \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/sam3/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MAX_VALUE \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/sam3/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MIN_FREQUENCY \(macro definition\) of file periph_cpu\.h is not documented\.
-cpu/sam3/include/periph_cpu\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/sam_common/include/cpu_conf\.h:[0-9]+: warning: Member CPU_FLASH_BASE \(macro definition\) of file cpu_conf\.h is not documented\.
 cpu/sam_common/include/cpu_conf\.h:[0-9]+: warning: Member CPU_HAS_BITBAND \(macro definition\) of file cpu_conf\.h is not documented\.
 cpu/sam_common/include/cpu_conf\.h:[0-9]+: warning: Member CPU_IRQ_NUMOF \(macro definition\) of file cpu_conf\.h is not documented\.
@@ -8321,7 +8285,6 @@ cpu/samd21/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MAX_FREQUENCY \(mac
 cpu/samd21/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MAX_VALUE \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/samd21/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MIN_FREQUENCY \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/samd21/include/periph_cpu\.h:[0-9]+: warning: Member RTT_RUNSTDBY \(macro definition\) of file periph_cpu\.h is not documented\.
-cpu/samd5x/include/periph_cpu\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 cpu/samd5x/include/periph_cpu\.h:[0-9]+: warning: Member PM_NUM_MODES \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/samd5x/include/periph_cpu\.h:[0-9]+: warning: Member RTT_CLOCK_FREQUENCY \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/samd5x/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MAX_FREQUENCY \(macro definition\) of file periph_cpu\.h is not documented\.
@@ -8334,15 +8297,13 @@ cpu/saml1x/include/periph_cpu\.h:[0-9]+: warning: Member RTT_CLOCK_FREQUENCY \(m
 cpu/saml1x/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MAX_FREQUENCY \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/saml1x/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MAX_VALUE \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/saml1x/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MIN_FREQUENCY \(macro definition\) of file periph_cpu\.h is not documented\.
-cpu/saml1x/include/periph_cpu\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/saml21/include/periph_cpu\.h:[0-9]+: warning: Member PM_NUM_MODES \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/saml21/include/periph_cpu\.h:[0-9]+: warning: Member RTT_CLOCK_FREQUENCY \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/saml21/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MAX_FREQUENCY \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/saml21/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MAX_VALUE \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/saml21/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MIN_FREQUENCY \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/saml21/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MIN_OFFSET \(macro definition\) of file periph_cpu\.h is not documented\.
-cpu/stm32/dist/clk_conf/clk_conf\.h:[0-9]+: warning: unbalanced grouping commands
-cpu/stm32/include/candev_stm32\.h:[0-9]+: warning: Member CAN_STM32_NB_FILTER \(macro definition\) of file candev_stm32.h is not documented\.
+cpu/stm32/include/candev_stm32\.h:[0-9]+: warning: Member CAN_STM32_NB_FILTER \(macro definition\) of file candev_stm32\.h is not documented\.
 cpu/stm32/include/candev_stm32\.h:[0-9]+: warning: Member ISR_CAN1_RX0 \(macro definition\) of file candev_stm32\.h is not documented\.
 cpu/stm32/include/candev_stm32\.h:[0-9]+: warning: Member ISR_CAN1_RX1 \(macro definition\) of file candev_stm32\.h is not documented\.
 cpu/stm32/include/candev_stm32\.h:[0-9]+: warning: Member ISR_CAN1_SCE \(macro definition\) of file candev_stm32\.h is not documented\.
@@ -8358,7 +8319,6 @@ cpu/stm32/include/candev_stm32\.h:[0-9]+: warning: Member ISR_CAN3_TX \(macro de
 cpu/stm32/include/clk/cfg_clock_common_fx_gx_mp1\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file cfg_clock_common_fx_gx_mp1\.h is not documented\.
 cpu/stm32/include/clk/cfg_clock_common_fx_gx_mp1\.h:[0-9]+: warning: Member CLOCK_HSI \(macro definition\) of file cfg_clock_common_fx_gx_mp1\.h is not documented\.
 cpu/stm32/include/clk/cfg_clock_common_fx_gx_mp1\.h:[0-9]+: warning: Member CONFIG_USE_CLOCK_PLL \(macro definition\) of file cfg_clock_common_fx_gx_mp1\.h is not documented\.
-cpu/stm32/include/clk/cfg_clock_common_lx_wx\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 cpu/stm32/include/clk/cfg_clock_common_lx_wx\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file cfg_clock_common_lx_wx\.h is not documented\.
 cpu/stm32/include/clk/cfg_clock_common_lx_wx\.h:[0-9]+: warning: Member CLOCK_HSI \(macro definition\) of file cfg_clock_common_lx_wx\.h is not documented\.
 cpu/stm32/include/clk/cfg_clock_common_lx_wx\.h:[0-9]+: warning: Member CONFIG_CLOCK_MSI \(macro definition\) of file cfg_clock_common_lx_wx\.h is not documented\.
@@ -8377,14 +8337,12 @@ cpu/stm32/include/clk/f2f4f7/cfg_clock_default_100\.h:[0-9]+: warning: Member CO
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_100\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_P \(macro definition\) of file cfg_clock_default_100\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_100\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_Q \(macro definition\) of file cfg_clock_default_100\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_100\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_R \(macro definition\) of file cfg_clock_default_100\.h is not documented\.
-cpu/stm32/include/clk/f2f4f7/cfg_clock_default_100\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_120\.h:[0-9]+: warning: Member CONFIG_CLOCK_APB1_DIV \(macro definition\) of file cfg_clock_default_120\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_120\.h:[0-9]+: warning: Member CONFIG_CLOCK_APB2_DIV \(macro definition\) of file cfg_clock_default_120\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_120\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_M \(macro definition\) of file cfg_clock_default_120\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_120\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_N \(macro definition\) of file cfg_clock_default_120\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_120\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_P \(macro definition\) of file cfg_clock_default_120\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_120\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_Q \(macro definition\) of file cfg_clock_default_120\.h is not documented\.
-cpu/stm32/include/clk/f2f4f7/cfg_clock_default_120\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_180\.h:[0-9]+: warning: Member CONFIG_CLOCK_APB1_DIV \(macro definition\) of file cfg_clock_default_180\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_180\.h:[0-9]+: warning: Member CONFIG_CLOCK_APB2_DIV \(macro definition\) of file cfg_clock_default_180\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_180\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_M \(macro definition\) of file cfg_clock_default_180\.h is not documented\.
@@ -8392,7 +8350,6 @@ cpu/stm32/include/clk/f2f4f7/cfg_clock_default_180\.h:[0-9]+: warning: Member CO
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_180\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_P \(macro definition\) of file cfg_clock_default_180\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_180\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_Q \(macro definition\) of file cfg_clock_default_180\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_180\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_R \(macro definition\) of file cfg_clock_default_180\.h is not documented\.
-cpu/stm32/include/clk/f2f4f7/cfg_clock_default_180\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_216\.h:[0-9]+: warning: Member CONFIG_CLOCK_APB1_DIV \(macro definition\) of file cfg_clock_default_216\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_216\.h:[0-9]+: warning: Member CONFIG_CLOCK_APB2_DIV \(macro definition\) of file cfg_clock_default_216\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_216\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_M \(macro definition\) of file cfg_clock_default_216\.h is not documented\.
@@ -8400,7 +8357,6 @@ cpu/stm32/include/clk/f2f4f7/cfg_clock_default_216\.h:[0-9]+: warning: Member CO
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_216\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_P \(macro definition\) of file cfg_clock_default_216\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_216\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_Q \(macro definition\) of file cfg_clock_default_216\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_216\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_R \(macro definition\) of file cfg_clock_default_216\.h is not documented\.
-cpu/stm32/include/clk/f2f4f7/cfg_clock_default_216\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_84\.h:[0-9]+: warning: Member CONFIG_CLOCK_APB1_DIV \(macro definition\) of file cfg_clock_default_84\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_84\.h:[0-9]+: warning: Member CONFIG_CLOCK_APB2_DIV \(macro definition\) of file cfg_clock_default_84\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_84\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_M \(macro definition\) of file cfg_clock_default_84\.h is not documented\.
@@ -8408,7 +8364,6 @@ cpu/stm32/include/clk/f2f4f7/cfg_clock_default_84\.h:[0-9]+: warning: Member CON
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_84\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_P \(macro definition\) of file cfg_clock_default_84\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_84\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_Q \(macro definition\) of file cfg_clock_default_84\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default_84\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_R \(macro definition\) of file cfg_clock_default_84\.h is not documented\.
-cpu/stm32/include/clk/f2f4f7/cfg_clock_default_84\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default\.h:[0-9]+: warning: Member CLOCK_AHB \(macro definition\) of file cfg_clock_default\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default\.h:[0-9]+: warning: Member CLOCK_APB1 \(macro definition\) of file cfg_clock_default\.h is not documented\.
 cpu/stm32/include/clk/f2f4f7/cfg_clock_default\.h:[0-9]+: warning: Member CLOCK_APB2 \(macro definition\) of file cfg_clock_default\.h is not documented\.
@@ -8428,7 +8383,6 @@ cpu/stm32/include/clk/l0l1/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_C
 cpu/stm32/include/clk/l0l1/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_APB2_DIV \(macro definition\) of file cfg_clock_default\.h is not documented\.
 cpu/stm32/include/clk/l0l1/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_DIV \(macro definition\) of file cfg_clock_default\.h is not documented\.
 cpu/stm32/include/clk/l0l1/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_MUL \(macro definition\) of file cfg_clock_default\.h is not documented\.
-cpu/stm32/include/clk/l4l5wx/cfg_clock_default\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 cpu/stm32/include/clk/l4l5wx/cfg_clock_default\.h:[0-9]+: warning: Member CLOCK_AHB \(macro definition\) of file cfg_clock_default\.h is not documented\.
 cpu/stm32/include/clk/l4l5wx/cfg_clock_default\.h:[0-9]+: warning: Member CLOCK_APB1 \(macro definition\) of file cfg_clock_default\.h is not documented\.
 cpu/stm32/include/clk/l4l5wx/cfg_clock_default\.h:[0-9]+: warning: Member CLOCK_APB2 \(macro definition\) of file cfg_clock_default\.h is not documented\.
@@ -8455,7 +8409,6 @@ cpu/stm32/include/clk/mp1/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CL
 cpu/stm32/include/clk/mp1/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_P \(macro definition\) of file cfg_clock_default\.h is not documented\.
 cpu/stm32/include/clk/mp1/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_Q \(macro definition\) of file cfg_clock_default\.h is not documented\.
 cpu/stm32/include/clk/mp1/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_R \(macro definition\) of file cfg_clock_default\.h is not documented\.
-cpu/stm32/include/clk/mp1/cfg_clock_default\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/stm32/include/cpu_conf\.h:[0-9]+: warning: Member CPU_FLASH_BASE \(macro definition\) of file cpu_conf\.h is not documented\.
 cpu/stm32/include/cpu_conf\.h:[0-9]+: warning: Member FLASHPAGE_WRITE_BLOCK_ALIGNMENT \(macro definition\) of file cpu_conf\.h is not documented\.
 cpu/stm32/include/cpu_conf\.h:[0-9]+: warning: Member stm32_flashpage_block_t \(typedef\) of file cpu_conf\.h is not documented\.
@@ -9929,6 +9882,7 @@ drivers/ili9341/include/ili9341_params\.h:[0-9]+: warning: Member ILI9341_PARAM_
 drivers/ili9341/include/ili9341_params\.h:[0-9]+: warning: Member ILI9341_PARAM_INVERTED \(macro definition\) of file ili9341_params\.h is not documented\.
 drivers/ili9341/include/ili9341_params\.h:[0-9]+: warning: Member ILI9341_PARAM_NUM_LINES \(macro definition\) of file ili9341_params\.h is not documented\.
 drivers/ili9341/include/ili9341_params\.h:[0-9]+: warning: Member ILI9341_PARAM_RGB \(macro definition\) of file ili9341_params\.h is not documented\.
+drivers/ili9341/include/ili9341_params\.h:[0-9]+: warning: Member ILI9341_PARAM_ROTATION \(macro definition\) of file ili9341_params\.h is not documented\.
 drivers/ili9341/include/ili9341_params\.h:[0-9]+: warning: Member ILI9341_PARAM_RST \(macro definition\) of file ili9341_params\.h is not documented\.
 drivers/ili9341/include/ili9341_params\.h:[0-9]+: warning: Member ILI9341_PARAMS \(macro definition\) of file ili9341_params\.h is not documented\.
 drivers/ili9341/include/ili9341_params\.h:[0-9]+: warning: Member ILI9341_PARAM_SPI_CLK \(macro definition\) of file ili9341_params\.h is not documented\.
@@ -10004,8 +9958,6 @@ drivers/include/at86rf2xx\.h:[0-9]+: warning: Member AT86RF2XX_MAX_CHANNEL \(mac
 drivers/include/at86rf2xx\.h:[0-9]+: warning: Member AT86RF2XX_MIN_CHANNEL \(macro definition\) of group drivers_at86rf2xx is not documented\.
 drivers/include/at86rf2xx\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/include/bh1900nux\.h:[0-9]+: warning: Member BH1900NUX_REG_ADDR \(macro definition\) of group drivers_bh1900nux is not documented\.
-drivers/include/can/candev\.h:[0-9]+: warning: argument 'type' of command @param is not found in the argument list of candev_event_cb_t\(candev_t \*dev, candev_event_t event, void \*arg\)
-drivers/include/can/candev\.h:[0-9]+: warning: The following parameter of candev_event_cb_t\(candev_t \*dev, candev_event_t event, void \*arg\) is not documented:
 drivers/include/candev_mcp2515\.h:[0-9]+: warning: Member MCP2515_FILTERS \(macro definition\) of group drivers_mcp2515 is not documented\.
 drivers/include/candev_mcp2515\.h:[0-9]+: warning: Member MCP2515_FILTERS_MB0 \(macro definition\) of group drivers_mcp2515 is not documented\.
 drivers/include/candev_mcp2515\.h:[0-9]+: warning: Member MCP2515_FILTERS_MB1 \(macro definition\) of group drivers_mcp2515 is not documented\.
@@ -10134,13 +10086,9 @@ drivers/include/mpu9x50\.h:[0-9]+: warning: Member MPU9X50_MAX_COMP_SMPL_RATE \(
 drivers/include/mpu9x50\.h:[0-9]+: warning: Member MPU9X50_MAX_SAMPLE_RATE \(macro definition\) of group drivers_mpu9x50 is not documented\.
 drivers/include/mpu9x50\.h:[0-9]+: warning: Member MPU9X50_MIN_COMP_SMPL_RATE \(macro definition\) of group drivers_mpu9x50 is not documented\.
 drivers/include/mpu9x50\.h:[0-9]+: warning: Member MPU9X50_MIN_SAMPLE_RATE \(macro definition\) of group drivers_mpu9x50 is not documented\.
-drivers/include/net/netdev\.h:[0-9]+: warning: argument 'type' of command @param is not found in the argument list of netdev_event_cb_t\(netdev_t \*dev, netdev_event_t event\)
-drivers/include/net/netdev\.h:[0-9]+: warning: The following parameters of netdev_event_cb_t\(netdev_t \*dev, netdev_event_t event\) are not documented:
 drivers/include/pcd8544\.h:[0-9]+: warning: Member PCD8544_DEFAULT_BIAS \(macro definition\) of group drivers_pcd8544 is not documented\.
 drivers/include/pcd8544\.h:[0-9]+: warning: Member PCD8544_DEFAULT_CONTRAST \(macro definition\) of group drivers_pcd8544 is not documented\.
 drivers/include/pcd8544\.h:[0-9]+: warning: Member PCD8544_DEFAULT_TEMPCOEF \(macro definition\) of group drivers_pcd8544 is not documented\.
-drivers/include/periph/spi\.h:[0-9]+: warning: return value '\-EINVAL' of spi_acquire has multiple documentation sections
-drivers/include/periph/spi\.h:[0-9]+: warning: return value '\-ENOTSUP' of spi_acquire has multiple documentation sections
 drivers/include/pn532\.h:[0-9]+: warning: Member PN532_FW_FEATURES\(fwver\) \(macro definition\) of group drivers_pn532 is not documented\.
 drivers/include/pn532\.h:[0-9]+: warning: Member PN532_FW_REVISION\(fwver\) \(macro definition\) of group drivers_pn532 is not documented\.
 drivers/include/pn532\.h:[0-9]+: warning: Member PN532_FW_VERSION\(fwver\) \(macro definition\) of group drivers_pn532 is not documented\.
@@ -14081,7 +14029,6 @@ sys/include/can/isotp\.h:[0-9]+: warning: Member CAN_ISOTP_DEFAULT_PAD_CONTENT \
 sys/include/can/isotp\.h:[0-9]+: warning: Member CAN_ISOTP_DEFAULT_RECV_BS \(macro definition\) of group sys_can_isotp is not documented\.
 sys/include/can/isotp\.h:[0-9]+: warning: Member CAN_ISOTP_DEFAULT_RECV_STMIN \(macro definition\) of group sys_can_isotp is not documented\.
 sys/include/can/isotp\.h:[0-9]+: warning: Member CAN_ISOTP_DEFAULT_RECV_WFTMAX \(macro definition\) of group sys_can_isotp is not documented\.
-sys/include/crypto/ciphers\.h:[0-9]+: warning: Member cipher_id_t \(variable\) of file ciphers.h is not documented\.
 sys/include/crypto/aes\.h:[0-9]+: warning: Member AES_BLOCK_SIZE \(macro definition\) of file aes\.h is not documented\.
 sys/include/crypto/aes\.h:[0-9]+: warning: Member AES_KEY_SIZE_128 \(macro definition\) of file aes\.h is not documented\.
 sys/include/crypto/aes\.h:[0-9]+: warning: Member AES_KEY_SIZE_192 \(macro definition\) of file aes\.h is not documented\.
@@ -14096,7 +14043,7 @@ sys/include/crypto/ciphers\.h:[0-9]+: warning: Member CIPHER_ERR_DEC_FAILED \(ma
 sys/include/crypto/ciphers\.h:[0-9]+: warning: Member CIPHER_ERR_ENC_FAILED \(macro definition\) of file ciphers\.h is not documented\.
 sys/include/crypto/ciphers\.h:[0-9]+: warning: Member CIPHER_ERR_INVALID_KEY_SIZE \(macro definition\) of file ciphers\.h is not documented\.
 sys/include/crypto/ciphers\.h:[0-9]+: warning: Member CIPHER_ERR_INVALID_LENGTH \(macro definition\) of file ciphers\.h is not documented\.
-sys/include/crypto/ciphers\.h:[0-9]+: warning: Member cipher_id_t \(typedef\) of file ciphers\.h is not documented\.
+sys/include/crypto/ciphers\.h:[0-9]+: warning: Member cipher_id_t \(variable\) of file ciphers\.h is not documented\.
 sys/include/crypto/ciphers\.h:[0-9]+: warning: Member CIPHER_MAX_BLOCK_SIZE \(macro definition\) of file ciphers\.h is not documented\.
 sys/include/crypto/helper\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 sys/include/crypto/modes/ccm\.h:[0-9]+: warning: Member CCM_ERR_INVALID_CBC_MAC \(macro definition\) of file ccm\.h is not documented\.
@@ -14400,8 +14347,7 @@ sys/include/net/coap\.h:[0-9]+: warning: Member COAP_TYPE_ACK \(macro definition
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_TYPE_CON \(macro definition\) of group net_coap is not documented\.
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_TYPE_NON \(macro definition\) of group net_coap is not documented\.
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_TYPE_RST \(macro definition\) of group net_coap is not documented\.
-sys/include/net/cord/ep_standalone\.h:[0-9]+: warning: argument 't' of command @param is not found in the argument list of cord_ep_standalone_cb_t\(cord_ep_standalone_event_t event\)
-sys/include/net/cord/ep_standalone\.h:[0-9]+: warning: The following parameter of cord_ep_standalone_cb_t\(cord_ep_standalone_event_t event\) is not documented:
+sys/include/net/cord/config\.h:[0-9]+: warning: unbalanced grouping commands
 sys/include/net/dhcpv6/client\.h:[0-9]+: warning: unbalanced grouping commands
 sys/include/net/dhcpv6\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 sys/include/net/dns\.h:[0-9]+: warning: Member DNS_CLASS_IN \(macro definition\) of group net_dns is not documented\.
@@ -14532,8 +14478,6 @@ sys/include/net/sixlowpan/nd\.h:[0-9]+: warning: Member SIXLOWPAN_ND_OPT_6CTX_LE
 sys/include/net/sixlowpan/nd\.h:[0-9]+: warning: Member SIXLOWPAN_ND_OPT_6CTX_LEN_MIN \(macro definition\) of group net_sixlowpan_nd is not documented\.
 sys/include/net/sixlowpan/nd\.h:[0-9]+: warning: Member SIXLOWPAN_ND_OPT_ABR_LEN \(macro definition\) of group net_sixlowpan_nd is not documented\.
 sys/include/net/sixlowpan/nd\.h:[0-9]+: warning: Member SIXLOWPAN_ND_OPT_AR_LEN \(macro definition\) of group net_sixlowpan_nd is not documented\.
-sys/include/net/sock/async/types\.h:[0-9]+: warning: argument 'flags' of command @param is not found in the argument list of sock_udp_cb_t\(sock_udp_t \*sock, sock_async_flags_t type, void \*arg\)
-sys/include/net/sock/async/types\.h:[0-9]+: warning: The following parameter of sock_udp_cb_t\(sock_udp_t \*sock, sock_async_flags_t type, void \*arg\) is not documented:
 sys/include/net/sock/dns\.h:[0-9]+: warning: Member SOCK_DNS_MAX_NAME_LEN \(macro definition\) of group net_sock_dns is not documented\.
 sys/include/net/sock/dns\.h:[0-9]+: warning: Member SOCK_DNS_PORT \(macro definition\) of group net_sock_dns is not documented\.
 sys/include/net/sock/dns\.h:[0-9]+: warning: Member SOCK_DNS_RETRIES \(macro definition\) of group net_sock_dns is not documented\.
