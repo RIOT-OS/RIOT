@@ -86,7 +86,15 @@ extern "C" {
 /**
  * @brief   Extra query parameters added during registration
  *
- * Must be suitable for constructing a static array out of them.
+ * Must be suitable for constructing a static array out of them. Each item of
+ * the array is turned as a Uri-Query option. The [IANA RD Parameters subregistry]
+ * contains usable keys and their descriptions in entries that have an "R" in
+ * their "Use" column. Other keys can be used with known RD implementations.
+ *
+ * The `ep` and `lt` parameters are *not* to be set through this mechanism, but
+ * through @ref CONFIG_CORD_EP and @ref CONFIG_CORD_LT, respectively.
+ *
+ * [IANA RD Parameters subregistry]: https://www.iana.org/assignments/core-parameters/core-parameters.xhtml#rd-parameters
  *
  * Example:
  *
