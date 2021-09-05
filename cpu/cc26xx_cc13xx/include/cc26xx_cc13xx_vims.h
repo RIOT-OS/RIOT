@@ -190,7 +190,7 @@ typedef struct {
  * @brief   FLASH base address
  */
 #define FLASH_BASEADDR       (PERIPH_BASE + 0x30000)
-/*@}*/
+/** @} */
 
 /**
  * @brief   FLASH register bank
@@ -213,7 +213,7 @@ typedef struct {
  * @brief   VIMS base address
  */
 #define VIMS_BASE            (PERIPH_BASE + 0x34000)
-/*@}*/
+/** @} */
 
 /**
  * @brief   VIMS register bank
@@ -259,5 +259,4 @@ typedef struct {
 #endif
 
 #endif /* CC26XX_CC13XX_VIMS_H */
-
-/*@}*/
+/** @} */

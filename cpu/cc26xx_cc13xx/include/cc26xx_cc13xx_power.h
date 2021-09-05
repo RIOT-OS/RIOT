@@ -92,5 +92,4 @@ void power_clock_disable_uart(uart_t uart);
 #endif
 
 #endif /* CC26XX_CC13XX_POWER_H */
-
-/*@}*/
+/** @} */

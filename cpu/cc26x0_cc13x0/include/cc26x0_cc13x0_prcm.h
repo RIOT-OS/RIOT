@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 /**
- * DDI_0_OSC registers
+ * @brief DDI_0_OSC registers
  */
 typedef struct {
     reg32_t CTL0; /**< control 0 */
@@ -69,16 +69,20 @@ typedef struct {
 #define DDI_0_OSC_CTL0_XTAL_IS_24M                  0x80000000
 /** @} */
 
-/** @ingroup cpu_specific_peripheral_memory_map
-  * @{
-  */
+/**
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
+ */
 #define DDI0_OSC_BASE       0x400CA000 /**< DDI0_OSC base address */
-/*@}*/
-
-#define DDI_0_OSC ((ddi0_osc_regs_t *) (DDI0_OSC_BASE)) /**< DDI_0_OSC register bank */
+/** @} */
 
 /**
- * AON_SYSCTL registers
+ * @brief DDI_0_OSC register bank
+ */
+#define DDI_0_OSC ((ddi0_osc_regs_t *) (DDI0_OSC_BASE))
+
+/**
+ * @brief AON_SYSCTL registers
  */
 typedef struct {
     reg32_t PWRCTL; /**< power management */
@@ -86,16 +90,17 @@ typedef struct {
     reg32_t SLEEPCTL; /**< sleep mode */
 } aon_sysctl_regs_t;
 
-/** @ingroup cpu_specific_peripheral_memory_map
-  * @{
-  */
+/**
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
+ */
 #define AON_SYSCTL_BASE       0x40090000 /**< AON_SYSCTL base address */
-/*@}*/
+/** @} */
 
 #define AON_SYSCTL ((aon_sysctl_regs_t *) (AON_SYSCTL_BASE)) /**< AON_SYSCTL register bank */
 
 /**
- * AON_WUC registers
+ * @brief AON_WUC registers
  */
 typedef struct {
     reg32_t MCUCLK; /**< MCU clock management */
@@ -104,14 +109,14 @@ typedef struct {
     reg32_t AUXCFG; /**< AUX config */
     reg32_t AUXCTL; /**< AUX control */
     reg32_t PWRSTAT; /**< power status */
-    reg32_t __reserved1; /**< meh */
+    reg32_t __reserved1; /**< Reserved */
     reg32_t SHUTDOWN; /**< shutdown control */
     reg32_t CTL0; /**< control 0 */
     reg32_t CTL1; /**< control 1 */
-    reg32_t __reserved2[2]; /**< meh */
+    reg32_t __reserved2[2]; /**< Reserved */
     reg32_t RECHARGECFG; /**< recharge controller config */
     reg32_t RECHARGESTAT; /**< recharge controller status */
-    reg32_t __reserved3; /**< meh */
+    reg32_t __reserved3; /**< Reserved */
     reg32_t OSCCFG; /**< oscillator config */
     reg32_t JTAGCFG; /**< JTAG config */
     reg32_t JTAGUSERCODE; /**< JTAG USERCODE */
@@ -181,16 +186,17 @@ typedef struct {
 #define JTAGCFG_JTAG_PD_FORCE_ON        0x10
 /** @} */
 
-/** @ingroup cpu_specific_peripheral_memory_map
-  * @{
-  */
+/**
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
+ */
 #define AON_WUC_BASE       0x40091000 /**< AON_WUC base address */
-/*@}*/
+/** @} */
 
 #define AON_WUC ((aon_wuc_regs_t *) (AON_WUC_BASE)) /**< AON_WUC register bank */
 
 /**
- * AON_RTC registers
+ * @brief AON_RTC registers
  */
 typedef struct {
     reg32_t CTL; /**< Control */
@@ -215,27 +221,28 @@ typedef struct {
  */
 #define AON_RTC_CTL_RTC_UPD_EN 0x00000002
 
-/** @ingroup cpu_specific_peripheral_memory_map
-  * @{
-  */
+/**
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
+ */
 #define AON_RTC_BASE (PERIPH_BASE + 0x92000) /**< AON_RTC base address */
 /** @} */
 
 #define AON_RTC ((aon_rtc_regs_t *) (AON_RTC_BASE)) /**< AON_RTC register bank */
 
 /**
- * PRCM registers
+ * @brief PRCM registers
  */
 typedef struct {
     reg32_t INFRCLKDIVR; /**< infrastructure clock division factor for run mode */
     reg32_t INFRCLKDIVS; /**< infrastructure clock division factor for sleep mode */
     reg32_t INFRCLKDIVDS; /**< infrastructure clock division factor for deep sleep mode */
     reg32_t VDCTL; /**< MCU voltage domain control */
-    reg32_t __reserved1[6]; /**< meh */
+    reg32_t __reserved1[6]; /**< Reserved */
     reg32_t CLKLOADCTL; /**< clock load control */
     reg32_t RFCCLKG; /**< RFC clock gate */
     reg32_t VIMSCLKG; /**< VIMS clock gate */
-    reg32_t __reserved2[2]; /**< meh */
+    reg32_t __reserved2[2]; /**< Reserved */
     reg32_t SECDMACLKGR; /**< TRNG, CRYPTO, and UDMA clock gate for run mode */
     reg32_t SECDMACLKGS; /**< TRNG, CRYPTO, and UDMA clock gate for sleep mode */
     reg32_t SECDMACLKGDS; /**< TRNG, CRYPTO, and UDMA clock gate for deep sleep mode */
@@ -257,47 +264,47 @@ typedef struct {
     reg32_t I2SCLKGR; /**< I2S clock gate for run mode */
     reg32_t I2SCLKGS; /**< I2S clock gate for sleep mode */
     reg32_t I2SCLKGDS; /**< I2S clock gate for deep sleep mode */
-    reg32_t __reserved3[10]; /**< meh */
+    reg32_t __reserved3[10]; /**< Reserved */
     reg32_t CPUCLKDIV; /**< CPU clock division factor */
-    reg32_t __reserved4[3]; /**< meh */
+    reg32_t __reserved4[3]; /**< Reserved */
     reg32_t I2SBCLKSEL; /**< I2S clock select */
     reg32_t GPTCLKDIV; /**< GPT scalar */
     reg32_t I2SCLKCTL; /**< I2S clock control */
     reg32_t I2SMCLKDIV; /**< MCLK division ratio */
     reg32_t I2SBCLKDIV; /**< BCLK division ratio */
     reg32_t I2SWCLKDIV; /**< WCLK division ratio */
-    reg32_t __reserved5[11]; /**< meh */
+    reg32_t __reserved5[11]; /**< Reserved */
     reg32_t SWRESET; /**< SW initiated resets */
     reg32_t WARMRESET; /**< WARM reset control and status */
-    reg32_t __reserved6[6]; /**< meh */
+    reg32_t __reserved6[6]; /**< Reserved */
     reg32_t PDCTL0; /**< power domain control */
     reg32_t PDCTL0RFC; /**< RFC power domain control */
     reg32_t PDCTL0SERIAL; /**< SERIAL power domain control */
     reg32_t PDCTL0PERIPH; /**< PERIPH power domain control */
-    reg32_t __reserved7; /**< meh */
+    reg32_t __reserved7; /**< Reserved */
     reg32_t PDSTAT0; /**< power domain status */
     reg32_t PDSTAT0RFC; /**< RFC power domain status */
     reg32_t PDSTAT0SERIAL; /**< SERIAL power domain status */
     reg32_t PDSTAT0PERIPH; /**< PERIPH power domain status */
-    reg32_t __reserved8[11]; /**< meh */
+    reg32_t __reserved8[11]; /**< Reserved */
     reg32_t PDCTL1; /**< power domain control */
     reg32_t __reserved9; /**< power domain control */
     reg32_t PDCTL1CPU; /**< CPU power domain control */
     reg32_t PDCTL1RFC; /**< RFC power domain control */
     reg32_t PDCTL1VIMS; /**< VIMS power domain control */
-    reg32_t __reserved10; /**< meh */
+    reg32_t __reserved10; /**< Reserved */
     reg32_t PDSTAT1; /**< power domain status */
     reg32_t PDSTAT1BUS; /**< BUS power domain status */
     reg32_t PDSTAT1RFC; /**< RFC power domain status */
     reg32_t PDSTAT1CPU; /**< CPU power domain status */
     reg32_t PDSTAT1VIMS; /**< VIMS power domain status */
-    reg32_t __reserved11[10]; /**< meh */
+    reg32_t __reserved11[10]; /**< Reserved */
     reg32_t RFCMODESEL; /**< selected RFC mode */
-    reg32_t __reserved12[20]; /**< meh */
+    reg32_t __reserved12[20]; /**< Reserved */
     reg32_t RAMRETEN; /**< memory retention control */
-    reg32_t __reserved13; /**< meh */
+    reg32_t __reserved13; /**< Reserved */
     reg32_t PDRETEN; /**< power domain retention (undocumented) */
-    reg32_t __reserved14[8]; /**< meh */
+    reg32_t __reserved14[8]; /**< Reserved */
     reg32_t RAMHWOPT; /**< undocumented */
 } prcm_regs_t;
 
@@ -337,12 +344,13 @@ typedef struct {
 #define UARTCLKGDS_CLK_EN_UART0 0x1
 /** @} */
 
-/** @ingroup cpu_specific_peripheral_memory_map
-  * @{
-  */
+/**
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
+ */
 #define PRCM_BASE        (PERIPH_BASE + 0x82000) /**< PRCM base address */
 #define PRCM_BASE_NONBUF (PERIPH_BASE_NONBUF + 0x82000) /**< PRCM base address (nonbuf) */
-/*@}*/
+/** @} */
 
 #define PRCM        ((prcm_regs_t *) (PRCM_BASE)) /**< PRCM register bank */
 #define PRCM_NONBUF ((prcm_regs_t *) (PRCM_BASE_NONBUF)) /**< PRCM register bank (nonbuf) */
