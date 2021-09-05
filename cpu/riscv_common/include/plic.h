@@ -14,7 +14,6 @@
  * @brief       Platform-Level interrupt controller driver
  *
  * @author      Koen Zandberg <koen@bergzand.net>
- * @}
  */
 
 #ifndef PLIC_H
