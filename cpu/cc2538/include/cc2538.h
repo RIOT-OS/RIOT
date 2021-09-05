@@ -26,9 +26,10 @@ extern "C" {
 /* ************************************************************************** */
 /*   CMSIS DEFINITIONS FOR CC2538 */
 /* ************************************************************************** */
-/** @addtogroup CC2538_cmsis CMSIS Definitions */
-/*@{*/
-
+/**
+ * @addtogroup CC2538_cmsis CMSIS Definitions
+ * @{
+ */
 /** Interrupt Number Definition */
 typedef enum IRQn
 {
@@ -86,7 +87,8 @@ typedef enum IRQn
     PERIPH_COUNT_IRQn     = (MACTIMER_IRQn + 1) /**< Number of peripheral IDs */
 } IRQn_Type;
 
-/** @name Cortex-M3 core interrupt handlers
+/**
+ * @name Cortex-M3 core interrupt handlers
  * @{
  */
 void Reset_Handler(void);        /**< Reset handler */
@@ -113,26 +115,23 @@ void SysTick_Handler(void);      /**< SysTick handler */
 /**
  * @brief CMSIS includes
  */
-
 #include <core_cm3.h>
-
-/*@}*/
+/** @} */
 
 #define IEEE_ADDR_MSWORD            ( *(const uint32_t*)0x00280028 ) /**< Most-significant 32 bits of the IEEE address */
 #define IEEE_ADDR_LSWORD            ( *(const uint32_t*)0x0028002c ) /**< Least-significant 32 bits of the IEEE address */
 
 typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IEEE address */
 
-/** @addtogroup cpu_specific_Peripheral_memory_map
-  * @{
-  */
-
+/**
+ * @addtogroup cpu_specific_Peripheral_memory_map
+ * @{
+ */
 #define FLASH_BASE                  0x00200000 /**< FLASH base address */
 #define SRAM_BASE                   0x20000000 /**< SRAM base address */
 #define PERIPH_BASE                 0x40000000 /**< Peripheral base address */
 
 #define SRAM_BB_BASE                0x22000000 /**< SRAM base address in the bit-band region */
-
 /** @} */
 
 /** @name CC2538 Special Function Registers
@@ -811,5 +810,4 @@ typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IE
 #endif
 
 #endif /* CC2538_H */
-
-/*@}*/
+/** @} */

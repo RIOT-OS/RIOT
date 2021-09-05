@@ -136,7 +136,7 @@ enum {
     FSM_STATE_TX_CALIBRATION = 32,
 };
 
-/*
+/**
  * @brief RFCORE_XREG_RFERRM bits
  */
 enum {
@@ -149,18 +149,18 @@ enum {
     NLOCK      = BIT(0),
 };
 
- /*
-  * @brief RFCORE_XREG_FRMCTRL0 bits
-  */
+/**
+ * @brief RFCORE_XREG_FRMCTRL0 bits
+ */
 enum {
     SET_RXENMASK_ON_TX  = BIT(0),
     IGNORE_TX_UNDERF    = BIT(1),
     PENDING_OR          = BIT(2),
 };
 
- /*
-  * @brief RFCORE_XREG_FRMCTRL1 bits
-  */
+/**
+ * @brief RFCORE_XREG_FRMCTRL1 bits
+ */
 enum {
     ENERGY_SCAN      = BIT(4),
     AUTOACK          = BIT(5),
@@ -168,7 +168,7 @@ enum {
     APPEND_DATA_MODE = BIT(7),
 };
 
-/*
+/**
  * @brief RFCORE_XREG_RFIRQM0 / RFCORE_XREG_RFIRQF0 bits
  */
 enum {
@@ -182,7 +182,7 @@ enum {
     RXMASKZERO       = BIT(7),
 };
 
-/*
+/**
  * @brief RFCORE_XREG_RFIRQM1 / RFCORE_XREG_RFIRQF1 bits
  */
 enum {
@@ -194,14 +194,18 @@ enum {
     CSP_WAIT         = BIT(5),
 };
 
-/* Values for use with CCTEST_OBSSELx registers: */
+/**
+ * @brief Values for use with CCTEST_OBSSELx registers.
+ */
 enum {
     rfc_obs_sig0 = 0,
     rfc_obs_sig1 = 1,
     rfc_obs_sig2 = 2,
 };
 
-/* Values for RFCORE_XREG_RFC_OBS_CTRLx registers: */
+/**
+ * @brief Values for RFCORE_XREG_RFC_OBS_CTRLx registers.
+ */
 enum {
     constant_value_0 = 0x00, /**< Constant value 0 */
     constant_value_1 = 0x01, /**< Constant value 1*/
@@ -248,8 +252,6 @@ enum {
     disabled         = 0xff, /**< disabled */
 };
 
-/** @} */
-
 /**
  * @name    RF CORE observable signals settings
  */
@@ -278,7 +280,6 @@ enum {
      (CONFIG_CC2538_RF_OBS_SIG_0_PCX > 7))
 #error "CONFIG_CC2538_RF_OBS_SIG_X_PCX must be between 0-7 (PC0-PC7)"
 #endif
-/** @} */
 
 /**
  * @brief   Device descriptor for CC2538 transceiver
