@@ -14,8 +14,6 @@
  * @brief       Implementation of the kernels irq interface
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- *
- * @}
  */
 
 #ifndef IRQ_ARCH_H
