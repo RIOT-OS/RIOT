@@ -29,6 +29,37 @@ extern "C" {
 #endif
 
 /**
+ * @name    I2C configuration
+ * @{
+ */
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev = NRF_TWIM3_S,
+        .scl = GPIO_PIN(0, 31),
+        .sda = GPIO_PIN(0, 30),
+        .speed = I2C_SPEED_NORMAL
+    }
+};
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
+/** @} */
+
+/**
+ * @name    SPI configuration
+ * @{
+ */
+static const spi_conf_t spi_config[] = {
+    {
+        .dev  = NRF_SPIM2_S,
+        .sclk = GPIO_PIN(0, 13),
+        .mosi = GPIO_PIN(0, 11),
+        .miso = GPIO_PIN(0, 12),
+    }
+};
+
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
+/** @} */
+
+/**
  * @name   Timer configuration
  * @{
  */
