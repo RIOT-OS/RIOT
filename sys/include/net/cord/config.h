@@ -105,7 +105,6 @@ extern "C" {
 #ifdef DOXYGEN
 #define CONFIG_CORD_EXTRAARGS
 #endif
-/** @} */
 
 #ifdef __cplusplus
 }
