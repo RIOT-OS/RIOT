@@ -11,8 +11,7 @@
  *
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
- *
- * @}
+ * @{
  */
 
 #ifndef CLK_CONF_H
@@ -26,7 +25,7 @@ extern "C" {
 
 /**
  * @name STM32 families
- * @ {
+ * @{
  */
 enum fam {
     STM32F0,
@@ -115,7 +114,6 @@ enum {
 
     MODEL_MP_MAX,
 };
-
 /** @} */
 
 /**
@@ -631,7 +629,7 @@ static const clk_cfg_t stm32_f_clk_cfg[] = {
     },
 };
 
-    /**
+/**
  * @brief Clock config for supported cpu
  */
 static const clk_cfg_t stm32_mp_clk_cfg[] = {
@@ -658,3 +656,4 @@ static const clk_cfg_t stm32_mp_clk_cfg[] = {
 #endif
 
 #endif /* CLK_CONF_H */
+/** @} */

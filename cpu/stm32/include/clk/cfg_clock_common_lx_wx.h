@@ -40,6 +40,7 @@ extern "C" {
 #define CONFIG_USE_CLOCK_PLL            1     /* Use PLL by default */
 #endif
 #endif /* CONFIG_USE_CLOCK_PLL */
+/** @} */
 
 #if IS_ACTIVE(CONFIG_USE_CLOCK_PLL) && \
     (IS_ACTIVE(CONFIG_USE_CLOCK_MSI) || IS_ACTIVE(CONFIG_USE_CLOCK_HSE) || \
