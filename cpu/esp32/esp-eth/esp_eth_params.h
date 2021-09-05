@@ -34,6 +34,7 @@
 /** The priority of the ESP-ETH netdev driver thread */
 #define ESP_ETH_PRIO         GNRC_NETIF_PRIO
 #endif
+/** @} */
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,4 +47,4 @@ extern "C" {
 #endif /* MODULE_ESP_ETH || DOXYGEN */
 
 #endif /* ESP_ETH_PARAMS_H */
-/**@}*/
+/** @} */

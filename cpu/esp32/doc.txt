@@ -1538,4 +1538,5 @@ To start debugging, you have to connect to QEMU with command:
 
 @note
 QEMU for Xtensa ESP32 does not support interrupts. That is, once your application uses interrupts, e.g., timers, the application cannot be debugged using QEMU together with GDB.
+
 */

@@ -137,3 +137,4 @@ extern int ets_printf(const char *fmt, ...);
 #endif /* DOXYGEN */
 
 #endif /* ESP_COMMON_LOG_H */
+/** @} */
