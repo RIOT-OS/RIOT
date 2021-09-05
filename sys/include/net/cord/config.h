@@ -64,13 +64,10 @@ extern "C" {
 #ifndef CONFIG_CORD_EP
 #ifdef DOXYGEN
 /**
- * @ingroup net_cord_conf
  * @brief Endpoint ID definition
- * @{
  */
 #define CONFIG_CORD_EP "MyNewEpName"    //defined for doxygen documentation only
 #endif
-/** @} */
 
 /**
  * @brief   Number of generated hexadecimal characters added to the ep
