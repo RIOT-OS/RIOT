@@ -15,8 +15,6 @@
  * @brief       Implementation of the kernels thread interface
  *
  * @author      Koen Zandberg <koen@bergzand.net>
- *
- * @}
  */
 #ifndef THREAD_ARCH_H
 #define THREAD_ARCH_H
