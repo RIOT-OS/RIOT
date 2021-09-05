@@ -9,6 +9,7 @@
 /**
  * @defgroup    net_cord_config CoRE RD Configuration
  * @ingroup     net_cord
+ * @ingroup     config
  * @brief       Configuration options for CoRE RD endpoints and lookup clients
  * @{
  *
@@ -27,11 +28,6 @@ extern "C" {
 #endif
 
 /**
- * @defgroup net_cord_conf CoRE RD Client compile configurations
- * @ingroup config
- * @{
- */
-/**
  * @brief   Default lifetime in seconds (the default is 1 day)
  */
 #ifndef CONFIG_CORD_LT
@@ -44,7 +40,6 @@ extern "C" {
 #ifndef CONFIG_CORD_UPDATE_INTERVAL
 #define CONFIG_CORD_UPDATE_INTERVAL    ((CONFIG_CORD_LT / 4) * 3)
 #endif
-/** @} */
 
 /**
  * @brief   Delay until the RD client starts to try registering (in seconds)
