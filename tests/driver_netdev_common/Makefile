@@ -1,4 +1,4 @@
 # use the default network interface for the board
-USEMODULE += gnrc_netdev_default
+USEMODULE += netdev_default
 
 include Makefile.netdev.mk

@@ -103,7 +103,7 @@ interface:
 
 #### Provision the wireless device
 [setup-wireless-provision]: #Provision-the-wireless-device
-First un-comment L28 in the application [Makefile](Makefile) so `gnrc_netdev_default`
+First un-comment L28 in the application [Makefile](Makefile) so `netdev_default`
 is included in the build. In this scenario the node will be connected through a border
 router. Ethos must be disabled in the firmware when building and flashing the firmware:
 

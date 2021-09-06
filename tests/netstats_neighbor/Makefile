@@ -1,4 +1,4 @@
-USEMODULE = gnrc_netdev_default
+USEMODULE = netdev_default
 
 USEMODULE += netstats_neighbor_etx
 USEMODULE += netstats_neighbor_count

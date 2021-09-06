@@ -18,7 +18,7 @@ USEMODULE += saul_default
 # gnrc is a meta module including all required, basic gnrc networking modules
 USEMODULE += gnrc
 # use the default network interface for the board
-USEMODULE += gnrc_netdev_default
+USEMODULE += netdev_default
 # automatically initialize the network interface
 USEMODULE += auto_init_gnrc_netif
 # shell command to send L2 packets with a simple string

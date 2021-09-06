@@ -40,7 +40,7 @@ module, you need to specify a network interface like this:
     make term PORT=tap0
 
 **Please note:** in case you're using RIOT's default network stack, the GNRC
-stack, you may also use `gnrc_netdev_default` module and also add
+stack, you may also use `netdev_default` module and also add
 `auto_init_gnrc_netif` in order to automatically initialize the interface.
 
 

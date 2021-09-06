@@ -46,7 +46,7 @@ ifeq (1,$(USE_ETHOS))
   TERMPROG = $(RIOTTOOLS)/ethos/ethos
   TERMFLAGS = $(TAP) $(PORT)
 else
-  USEMODULE += gnrc_netdev_default
+  USEMODULE += netdev_default
 endif
 
 # Ensure both slot bin files are always generated and linked to avoid compiling
