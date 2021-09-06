@@ -57,6 +57,20 @@ It executes without error if tests run by 'make test' are present.
     make test/available
 
 
+Using the HiL (Hardware in the Loop) CI for automated testing
+-------------------------------------------------------------
+
+Some maintainers have access to a growing
+[number of boards](https://hil.riot-os.org/jenkins/labelsdashboard/) to run
+automated tests via the [HiL CI](https://hil.riot-os.org/jenkins/).
+This allows both on-target testing described above as well as
+[Robot Framework based tests](https://github.com/RIOT-OS/RobotFW-tests) with an
+external reference device for peripheral testing,
+[PHiLIP](https://github.com/riot-appstore/PHiLIP).
+To limit time spent on the HiL CI, maintainers select the appropriate
+tests/boards required.
+
+
 Automated Tests Guidelines
 --------------------------
 
