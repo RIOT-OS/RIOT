@@ -227,19 +227,10 @@ void init_ranging(void)
               (uint16_t)ceilf(uwb_dwt_usecs_to_usecs(rng->config.
                                                      tx_holdoff_delay)));
 
-    if (IS_USED(MODULE_UWB_CORE_TWR_SS_ACK)) {
-        uwb_set_autoack(udev, true);
-        uwb_set_autoack_delay(udev, 12);
-    }
-
     dpl_callout_init(&_rng_req_callout, dpl_eventq_dflt_get(),
                      uwb_ev_cb, rng);
     dpl_callout_reset(&_rng_req_callout, RANGE_REQUEST_T_MS);
     dpl_event_init(&_slot_event, _slot_complete_cb, rng);
-
-    /* Apply config */
-    uwb_mac_config(udev, NULL);
-    uwb_txrf_config(udev, &udev->config.txrf);
 
     if ((udev->role & UWB_ROLE_ANCHOR)) {
         printf("Node role: ANCHOR \n");
