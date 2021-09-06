@@ -53,13 +53,11 @@ void uwb_core_init(void)
     extern void uwb_rng_pkg_init(void);
     uwb_rng_pkg_init();
 #endif
-
     /* uwb configuration module */
 #if IS_USED(MODULE_UWB_CORE_UWBCFG)
     extern int uwbcfg_pkg_init(void);
     uwbcfg_pkg_init();
 #endif
-
     /* ranging algorithms */
 #if IS_USED(MODULE_UWB_CORE_TWR_SS)
     twr_ss_pkg_init();

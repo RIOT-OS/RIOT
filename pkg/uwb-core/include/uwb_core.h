@@ -21,23 +21,33 @@
 
 #include <stdint.h>
 #include "event.h"
+#if IS_USED(MODULE_UWB_CORE_EVENT_THREAD)
+#include "event/thread"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief   Priority used for
+ * @brief   The event queue if uwb_core_event_thread is used
  */
-#ifndef UWB_CORE__PRIO
-#define UWB_CORE__PRIO            (THREAD_PRIORITY_MAIN - 2)
+#ifndef UWB_CORE_EVENT_THREAD_QUEUE
+#define UWB_CORE_EVENT_THREAD_QUEUE     EVENT_PRIO_MEDIUM
 #endif
 
 /**
- * @brief   Stacksize used for
+ * @brief   Priority used for uwb-core event queue
  */
-#ifndef UWB_CORE__STACKSIZE
-#define UWB_CORE__STACKSIZE       (THREAD_STACKSIZE_DEFAULT)
+#ifndef UWB_CORE_PRIO
+#define UWB_CORE_PRIO                   (THREAD_PRIORITY_MAIN - 2)
+#endif
+
+/**
+ * @brief   Stacksize used for uwb-core event queue
+ */
+#ifndef UWB_CORE_STACKSIZE
+#define UWB_CORE_STACKSIZE              (THREAD_STACKSIZE_LARGE)
 #endif
 
 /**
@@ -48,8 +58,8 @@ void uwb_core_riot_init(void);
 /**
  * @brief   Retrieves the default event queue.
  *
- * As there is no default event queue in RIOT, uwb-core will start and
- * handle a default event queue.
+ * if uwb_core_event_thread is used then the event_thread module queue will be
+ * used. Otherwise uwb-core will start and handle its own event queue.
  *
  * @return  the default event queue.
  */
