@@ -36,8 +36,8 @@ extern "C" {
  * @brief   MTD power states
  */
 enum mtd_power_state {
-    MTD_POWER_UP,    /**< Power up */
-    MTD_POWER_DOWN,  /**< Power down */
+    MTD_POWER_UP,       /**< Power up */
+    MTD_POWER_DOWN,     /**< Power down */
 };
 
 /**
@@ -56,12 +56,12 @@ typedef struct mtd_desc mtd_desc_t;
  * @brief   MTD device descriptor
  */
 typedef struct {
-    const mtd_desc_t *driver;  /**< MTD driver */
-    uint32_t sector_count;     /**< Number of sector in the MTD */
-    uint32_t pages_per_sector; /**< Number of pages by sector in the MTD */
-    uint32_t page_size;        /**< Size of the pages in the MTD */
+    const mtd_desc_t *driver;   /**< MTD driver */
+    uint32_t sector_count;      /**< Number of sector in the MTD */
+    uint32_t pages_per_sector;  /**< Number of pages by sector in the MTD */
+    uint32_t page_size;         /**< Size of the pages in the MTD */
 #if defined(MODULE_MTD_WRITE_PAGE) || DOXYGEN
-    void *work_area;           /**< sector-sized buffer */
+    void *work_area;            /**< sector-sized buffer */
 #endif
 } mtd_dev_t;
 

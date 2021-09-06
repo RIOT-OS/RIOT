@@ -80,7 +80,8 @@ int mtd_read_page(mtd_dev_t *mtd, void *dest, uint32_t page, uint32_t offset,
         /* TODO: remove when all backends implement read_page */
         if (mtd->driver->read) {
             return mtd->driver->read(mtd, dest, mtd->page_size * page + offset, count);
-        } else {
+        }
+        else {
             return -ENOTSUP;
         }
     }
@@ -94,7 +95,7 @@ int mtd_read_page(mtd_dev_t *mtd, void *dest, uint32_t page, uint32_t offset,
     const uint32_t page_shift = bitarithm_msb(mtd->page_size);
     const uint32_t page_mask = mtd->page_size - 1;
 
-    page  += offset >> page_shift;
+    page += offset >> page_shift;
     offset = offset & page_mask;
 
     char *_dst = dest;
@@ -112,9 +113,9 @@ int mtd_read_page(mtd_dev_t *mtd, void *dest, uint32_t page, uint32_t offset,
             break;
         }
 
-        _dst   += read_bytes;
-        page   += (offset + read_bytes) >> page_shift;
-        offset  = (offset + read_bytes) & page_mask;
+        _dst += read_bytes;
+        page += (offset + read_bytes) >> page_shift;
+        offset = (offset + read_bytes) & page_mask;
     }
 
     return 0;
@@ -191,7 +192,8 @@ int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page, uint32_t 
         /* TODO: remove when all backends implement write_page */
         if (mtd->driver->write) {
             return mtd->driver->write(mtd, src, mtd->page_size * page + offset, count);
-        } else {
+        }
+        else {
             return -ENOTSUP;
         }
     }
@@ -205,7 +207,7 @@ int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page, uint32_t 
     const uint32_t page_shift = bitarithm_msb(mtd->page_size);
     const uint32_t page_mask = mtd->page_size - 1;
 
-    page  += offset >> page_shift;
+    page += offset >> page_shift;
     offset = offset & page_mask;
 
     const char *_src = src;
@@ -223,9 +225,9 @@ int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page, uint32_t 
             break;
         }
 
-        _src   += written;
-        page   += (offset + written) >> page_shift;
-        offset  = (offset + written) & page_mask;
+        _src += written;
+        page += (offset + written) >> page_shift;
+        offset = (offset + written) & page_mask;
     }
 
     return 0;
@@ -271,7 +273,8 @@ int mtd_erase_sector(mtd_dev_t *mtd, uint32_t sector, uint32_t count)
             return mtd->driver->erase(mtd,
                                       sector * sector_size,
                                       count * sector_size);
-        } else {
+        }
+        else {
             return -ENOTSUP;
         }
     }

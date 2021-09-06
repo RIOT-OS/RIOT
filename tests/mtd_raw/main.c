@@ -80,8 +80,8 @@ static mtd_dev_t *_get_dev(int argc, char **argv)
 static uint64_t _get_size(mtd_dev_t *dev)
 {
     return (uint64_t)dev->sector_count
-         * dev->pages_per_sector
-         * dev->page_size;
+           * dev->pages_per_sector
+           * dev->page_size;
 }
 
 static int cmd_read(int argc, char **argv)
@@ -95,9 +95,10 @@ static int cmd_read(int argc, char **argv)
     }
 
     addr = atoi(argv[2]);
-    len  = atoi(argv[3]);
+    len = atoi(argv[3]);
 
     void *buffer = malloc(len);
+
     if (buffer == NULL) {
         puts("out of memory");
         return -1;
@@ -129,11 +130,12 @@ static int cmd_read_page(int argc, char **argv)
         return -1;
     }
 
-    page   = atoi(argv[2]);
+    page = atoi(argv[2]);
     offset = atoi(argv[3]);
-    len    = atoi(argv[4]);
+    len = atoi(argv[4]);
 
     void *buffer = malloc(len);
+
     if (buffer == NULL) {
         puts("out of memory");
         return -1;
@@ -163,7 +165,7 @@ static int cmd_write(int argc, char **argv)
     }
 
     addr = atoi(argv[2]);
-    len  = strlen(argv[3]);
+    len = strlen(argv[3]);
 
     int res = mtd_write(dev, argv[3], addr, len);
 
@@ -184,9 +186,9 @@ static int cmd_write_page_raw(int argc, char **argv)
         return -1;
     }
 
-    page   = atoi(argv[2]);
+    page = atoi(argv[2]);
     offset = atoi(argv[3]);
-    len    = strlen(argv[4]);
+    len = strlen(argv[4]);
 
     int res = mtd_write_page_raw(dev, argv[4], page, offset, len);
 
@@ -207,9 +209,9 @@ static int cmd_write_page(int argc, char **argv)
         return -1;
     }
 
-    page   = atoi(argv[2]);
+    page = atoi(argv[2]);
     offset = atoi(argv[3]);
-    len    = strlen(argv[4]);
+    len = strlen(argv[4]);
 
     int res = mtd_write_page(dev, argv[4], page, offset, len);
 
@@ -232,7 +234,7 @@ static int cmd_erase(int argc, char **argv)
     }
 
     addr = atoi(argv[2]);
-    len  = atoi(argv[3]);
+    len = atoi(argv[3]);
 
     int res = mtd_erase(dev, addr, len);
 
@@ -276,7 +278,8 @@ static void _print_size(uint64_t size)
     if (size == 0) {
         len = 0;
         unit = "byte";
-    } else if ((size & (GiB(1) - 1)) == 0) {
+    }
+    else if ((size & (GiB(1) - 1)) == 0) {
         len = size / GiB(1);
         unit = "GiB";
     }
@@ -287,7 +290,8 @@ static void _print_size(uint64_t size)
     else if ((size & (KiB(1) - 1)) == 0) {
         len = size / KiB(1);
         unit = "kiB";
-    } else {
+    }
+    else {
         len = size;
         unit = "byte";
     }
@@ -297,9 +301,9 @@ static void _print_size(uint64_t size)
 
 static void _print_info(mtd_dev_t *dev)
 {
-    printf("sectors: %"PRIu32"\n", dev->sector_count);
-    printf("pages per sector: %"PRIu32"\n", dev->pages_per_sector);
-    printf("page size: %"PRIu32"\n", dev->page_size);
+    printf("sectors: %" PRIu32 "\n", dev->sector_count);
+    printf("pages per sector: %" PRIu32 "\n", dev->pages_per_sector);
+    printf("page size: %" PRIu32 "\n", dev->page_size);
     printf("total: ");
     _print_size(_get_size(dev));
     puts("");
@@ -345,9 +349,11 @@ static int cmd_power(int argc, char **argv)
 
     if (strcmp(argv[2], "off") == 0) {
         state = MTD_POWER_DOWN;
-    } else if (strcmp(argv[2], "on") == 0) {
+    }
+    else if (strcmp(argv[2], "on") == 0) {
         state = MTD_POWER_UP;
-    } else {
+    }
+    else {
         return _print_power_usage(argv[0]);
     }
 
@@ -383,7 +389,8 @@ static int cmd_test(int argc, char **argv)
 
     if (argc > 2) {
         sector = atoi(argv[2]);
-    } else {
+    }
+    else {
         sector = dev->sector_count - 2;
     }
 
@@ -415,6 +422,7 @@ static int cmd_test(int argc, char **argv)
     /* write test data & read it back */
     const char test_str[] = "0123456789";
     uint32_t offset = 5;
+
     assert(mtd_write_page_raw(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
     assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
     assert(memcmp(test_str, buffer, sizeof(test_str)) == 0);
@@ -427,13 +435,14 @@ static int cmd_test(int argc, char **argv)
 
     /* write across sector boundary */
     offset = page_size - sizeof(test_str) / 2
-           + (dev->pages_per_sector - 1) * page_size;
+             + (dev->pages_per_sector - 1) * page_size;
     assert(mtd_write_page_raw(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
     assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
     assert(memcmp(test_str, buffer, sizeof(test_str)) == 0);
 
     /* overwrite first test string, rely on MTD for read-modify-write */
     const char test_str_2[] = "Hello World!";
+
     offset = 5;
     assert(mtd_write_page(dev, test_str_2, page_0, offset, sizeof(test_str_2)) == 0);
     assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str_2)) == 0);
@@ -441,7 +450,7 @@ static int cmd_test(int argc, char **argv)
 
     /* test error when overflow */
     assert(mtd_write_page(dev, test_str_2, page_0, 0, dev->pages_per_sector
-                            * dev->page_size + 1) == -EOVERFLOW);
+                          * dev->page_size + 1) == -EOVERFLOW);
 
     puts("[SUCCESS]");
 
@@ -454,7 +463,8 @@ static const shell_command_t shell_commands[] = {
     { "info", "Print properties of the MTD device", cmd_info },
     { "power", "Turn the MTD device on/off", cmd_power },
     { "read", "Read a region of memory on the MTD device", cmd_read },
-    { "read_page", "Read a region of memory on the MTD device (pagewise addressing)", cmd_read_page },
+    { "read_page", "Read a region of memory on the MTD device (pagewise addressing)",
+      cmd_read_page },
     { "write", "Write a region of memory on the MTD device", cmd_write },
     { "write_page_raw",
       "Write a region of memory on the MTD device (pagewise addressing)",
@@ -494,6 +504,7 @@ int main(void)
 
     /* run the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
+
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
