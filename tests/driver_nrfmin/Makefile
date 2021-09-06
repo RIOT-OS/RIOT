@@ -4,7 +4,6 @@ include ../Makefile.tests_common
 # include nrfmin, the main purpose of this test
 USEMODULE += nrfmin
 # use a minimal GNRC configuration
-USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6
 USEMODULE += gnrc_icmpv6_echo
