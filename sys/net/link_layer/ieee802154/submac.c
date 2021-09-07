@@ -153,11 +153,21 @@ static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802
         }
         else {
             ieee802154_radio_read(&submac->dev, NULL, 0, NULL);
+
+            /* If the radio doesn't support RX Continuous, go to RX */
+            if (!ieee802154_radio_has_rx_continuous(&submac->dev)) {
+                _req_set_trx_state_wait_busy(&submac->dev, IEEE802154_TRX_STATE_RX_ON);
+            }
+
             /* Keep on current state */
             return IEEE802154_FSM_STATE_RX;
         }
     case IEEE802154_FSM_EV_CRC_ERROR:
         ieee802154_radio_read(&submac->dev, NULL, 0, NULL);
+        /* If the radio doesn't support RX Continuous, go to RX */
+        if (!ieee802154_radio_has_rx_continuous(&submac->dev)) {
+            _req_set_trx_state_wait_busy(&submac->dev, IEEE802154_TRX_STATE_RX_ON);
+        }
         /* Keep on current state */
         return IEEE802154_FSM_STATE_RX;
 
