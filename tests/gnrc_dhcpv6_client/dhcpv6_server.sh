@@ -31,6 +31,7 @@ _dhcpv6_server() {
     # still need to create the directory
     mkdir -p "${TMPDIR}"
 
+    echo "Running kea-dhcpv6 in data directory ${TMPDIR}"
     if [ -f "${TMPDIR}/kea-dhcp6.kea-dhcp6.pid" ]; then
         # Kill Kea instance from potential previous run:w
         kill "$(cat "${TMPDIR}/kea-dhcp6.kea-dhcp6.pid")"
