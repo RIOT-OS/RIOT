@@ -55,7 +55,8 @@ _start_real:
     call __libc_init_array
 
 
-    /* Initialize board and start kernel */
+    /* Initialize CPU, board and start kernel */
+    call cpu_init
     call board_init
     call kernel_init
 
