@@ -18,9 +18,11 @@
 #include <errno.h>
 #include <string.h>
 #include <stdbool.h>
+#include <sys/errno.h>
 
 #include "net/eui64.h"
 #include "net/ieee802154.h"
+#include "net/ieee802154_security.h"
 #include "net/netdev.h"
 #include "random.h"
 
@@ -47,10 +49,20 @@ void netdev_ieee802154_reset(netdev_ieee802154_t *dev)
     dev->netdev.driver->set(&dev->netdev, NETOPT_NID, &dev->pan, sizeof(dev->pan));
 
 #if IS_USED(MODULE_IEEE802154_SECURITY)
-    ieee802154_sec_init(&dev->sec_ctx);
+    /* We can use explicit key index by default.
+       This way, we only require one lookup descriptor with a matching index.
+       For implicit keys we would actually need to store a
+       lookup descriptor for every device we communicate with.
+       If replay protection is enabled, we must have peered with devices.
+       This must come from somewhere else.
+       MIC64 is the only mandatory security mode */
+    ieee802154_sec_init(&dev->sec_ctx,
+                        IEEE802154_SEC_SCF_SECLEVEL_ENC_MIC64,
+                        IEEE802154_SEC_SCF_KEYMODE_INDEX,
+                        0x01, NULL);
     const netopt_enable_t e = NETOPT_ENABLE;
     netdev_ieee802154_set(dev, NETOPT_ENCRYPTION, &e, sizeof(e));
-#endif
+#endif /* IS_USED(MODULE_IEEE802154_SECURITY) */
 }
 
 static inline uint16_t _get_ieee802154_pdu(netdev_ieee802154_t *dev)
@@ -253,12 +265,11 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
             break;
         case NETOPT_ENCRYPTION_KEY:
             assert(len >= IEEE802154_SEC_KEY_LENGTH);
-            if (memcmp(dev->sec_ctx.cipher.context.context, value, len)) {
-                /* If the key changes, the frame conter can be reset to 0*/
-                dev->sec_ctx.frame_counter = 0;
+            /* update default key */
+            if (IEEE802154_SEC_OK !=
+                ieee802154_sec_update_key(&dev->sec_ctx, 0, value)) {
+                return -ECANCELED;
             }
-            memcpy(dev->sec_ctx.cipher.context.context, value,
-                   IEEE802154_SEC_KEY_LENGTH);
             res = IEEE802154_SEC_KEY_LENGTH;
             break;
 #endif /* IS_USED(MODULE_IEEE802154_SECURITY) */
