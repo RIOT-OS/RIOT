@@ -180,6 +180,13 @@ typedef struct {
 } coap_optpos_t;
 
 /**
+ * @brief This is a workaround until RIOT
+ *        gets an abstraction of CoAP endpoints
+ *        to support CoAP not only over UDP
+ */
+typedef void coap_ep_t;
+
+/**
  * @brief   CoAP PDU parsing context structure
  */
 typedef struct {
@@ -192,6 +199,8 @@ typedef struct {
 #ifdef MODULE_GCOAP
     uint32_t observe_value;                           /**< observe value           */
 #endif
+    const coap_ep_t *remote;                          /**< remote endpoint */
+    const coap_ep_t *local;                           /**< local endpoint, NULL if unknown */
 } coap_pkt_t;
 
 /**
