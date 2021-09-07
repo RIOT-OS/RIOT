@@ -44,7 +44,7 @@ include $(RIOTBASE)/Makefile.include
 # export IFACE variable to environment of dhcpv6_server and
 # test-with-config/check-config rules
 # see: https://doc.riot-os.org/build-system-basics.html#variable-declaration-guidelines
-$(call target-export-variables,test-with-config/check-config,IFACE)
+$(call target-export-variables,dhcpv6_server test-with-config/check-config,IFACE)
 
 dhcpv6_server:
 dhcpv6_server:
