@@ -41,6 +41,20 @@
 #define RADIO_DEFAULT_ID (0U)
 
 netdev_ieee802154_submac_t netdev_submac;
+mutex_t lock;
+
+struct send_ctx {
+    event_t ev;
+    iolist_t pkt;
+};
+
+static void _send_handler(event_t *ev)
+{
+    struct send_ctx *ctx = (struct send_ctx*) ev;
+    netdev_t *dev = &netdev_submac.dev.netdev;
+
+    dev->driver->send(dev, &ctx->pkt);
+}
 
 void _ack_timeout(void *arg);
 
@@ -201,6 +215,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         default:
             assert(false);
         }
+        mutex_unlock(&lock);
     }
 }
 
@@ -235,6 +250,8 @@ static int _init(void)
 {
     netdev_t *dev = &netdev_submac.dev.netdev;
 
+    mutex_init(&lock);
+    mutex_lock(&lock);
     dev->event_callback = _event_cb;
     struct _reg_container reg = {0};
     netdev_ieee802154_submac_init(&netdev_submac);
@@ -247,14 +264,13 @@ static int _init(void)
 uint8_t payload[] =
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ornare lacinia mi elementum interdum ligula.";
 
-static iolist_t iol_hdr;
-
 static int send(uint8_t *dst, size_t dst_len,
                 size_t len)
 {
     uint8_t flags;
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
     int mhr_len;
+    struct send_ctx ctx = {0};
 
     le_uint16_t src_pan, dst_pan;
     iolist_t iol_data = {
@@ -278,13 +294,13 @@ static int send(uint8_t *dst, size_t dst_len,
         return 1;
     }
 
-    iol_hdr.iol_next = &iol_data;
-    iol_hdr.iol_base = mhr;
-    iol_hdr.iol_len = mhr_len;
+    ctx.ev.handler = _send_handler;
+    ctx.pkt.iol_next = &iol_data;
+    ctx.pkt.iol_base = mhr;
+    ctx.pkt.iol_len = mhr_len;
 
-    netdev_t *dev = &netdev_submac.dev.netdev;
-
-    dev->driver->send(dev, &iol_hdr);
+    event_post(EVENT_PRIO_HIGHEST, &ctx.ev);
+    mutex_lock(&lock);
     return 0;
 }
 
