@@ -25,7 +25,7 @@ endif
 ifneq (,$(filter uwb-core_dpl,$(USEMODULE)))
   USEPKG += mynewt-core
   USEMODULE += mynewt-core_os
-  ifneq (,$(filter nrf%,$(CPU)))
+  ifneq (,$(filter nrf5%,$(CPU)))
     USEMODULE += mynewt-core_nrf5x_hal
   endif
 endif
