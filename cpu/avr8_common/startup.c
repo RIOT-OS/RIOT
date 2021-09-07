@@ -81,6 +81,8 @@ __attribute__((used)) void reset_handler(void)
     dbgpin_init();
 #endif
 
+    /* initialize the CPU */
+    cpu_init();
     /* initialize the board and startup the kernel */
     board_init();
     /* startup the kernel */
