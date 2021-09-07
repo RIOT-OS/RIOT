@@ -6,7 +6,7 @@
 # Distributed under terms of the MIT license.
 #
 
-if ! command -v kea-dhcp6; then
+if ! command -v kea-dhcp6 > /dev/null; then
   echo -e "\033[31;1mCommand kea-dhcp6 required\033[0m" >&2
   exit 1
 fi
