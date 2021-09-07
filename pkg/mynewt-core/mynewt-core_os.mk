@@ -8,7 +8,7 @@ SRC := \
   os_cputime_pwr2.c \
   #
 
-ifneq (,$(filter nrf%,$(CPU)))
+ifneq (,$(filter nrf5%,$(CPU)))
   SRC += os_cputime.c
 endif
 
