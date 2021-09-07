@@ -155,6 +155,11 @@ int mtd_write_page(mtd_dev_t *mtd, const void *data, uint32_t page,
     const uint32_t sector_page = sector * mtd->pages_per_sector;
     const uint32_t sector_size = mtd->pages_per_sector * mtd->page_size;
 
+    /* prevent heap overflow of work buffer */
+    if (len + (page - sector_page) * mtd->page_size + offset > sector_size) {
+        return -EOVERFLOW;
+    }
+
     /* copy sector to RAM */
     res = mtd_read_page(mtd, work, sector_page, 0, sector_size);
     if (res < 0) {

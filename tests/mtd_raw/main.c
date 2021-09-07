@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include "od.h"
 #include "mtd.h"
@@ -437,6 +438,10 @@ static int cmd_test(int argc, char **argv)
     assert(mtd_write_page(dev, test_str_2, page_0, offset, sizeof(test_str_2)) == 0);
     assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str_2)) == 0);
     assert(memcmp(test_str_2, buffer, sizeof(test_str_2)) == 0);
+
+    /* test error when overflow */
+    assert(mtd_write_page(dev, test_str_2, page_0, 0, dev->pages_per_sector
+                            * dev->page_size + 1) == -EOVERFLOW);
 
     puts("[SUCCESS]");
 
