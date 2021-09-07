@@ -12,14 +12,13 @@ LWIP ?= 0
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
+USEMODULE += netdev_default
 ifeq (0,$(LWIP))
   USEMODULE += auto_init_gnrc_netif
   USEMODULE += gnrc_ipv6_default
-  USEMODULE += gnrc_netdev_default
 else
   USEMODULE += lwip_ipv6
   USEMODULE += lwip_netdev
-  USEMODULE += netdev_default
 endif
 
 # Add also the shell, some shell commands
