@@ -30,8 +30,13 @@
  */
 
 #include <stdint.h>
+#include <limits.h>
+
+#include "kernel_defines.h"
 #include "ieee802154.h"
 #include "crypto/ciphers.h"
+#include "bitfield.h"
+#include "mutex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -115,6 +120,70 @@ struct ieee802154_sec_dev {
 #define CONFIG_IEEE802154_SEC_DEFAULT_KEY       "pizza_margherita"
 #endif
 
+#if !defined(CONFIG_IEEE802154_SEC_DEFAULT_SEC_MODE) || defined(DOXYGEN)
+/**
+ * @brief   Default security mode to use for encryption
+ *
+ * @note    The default is set to the mandatory
+ *          security level of 802.15.4, which provides encryption and a 64 bit MIC.
+ */
+#define CONFIG_IEEE802154_SEC_DEFAULT_SEC_MODE    IEEE802154_SEC_SCF_SECLEVEL_ENC_MIC64
+#endif
+
+#if !defined(CONFIG_IEEE802154_SEC_DEFAULT_KEY_MODE) || defined(DOXYGEN)
+/**
+ * @brief   Default key mode to use for encryption
+ *
+ * @note    The default is set to explicit key mode, which means that the key
+ *          is determined from the key index field of the auxiliary header.
+ */
+#define CONFIG_IEEE802154_SEC_DEFAULT_KEY_MODE    IEEE802154_SEC_SCF_KEYMODE_INDEX
+#endif
+
+#if !defined(CONFIG_IEEE802154_SEC_DEFAULT_KEY_INDEX) || defined(DOXYGEN)
+/**
+ * @brief   Default key index to use for encryption if using explicit key mode
+ *
+ */
+#define CONFIG_IEEE802154_SEC_DEFAULT_KEY_INDEX         0x01
+#endif
+
+#if !defined(CONFIG_IEEE802154_SEC_DEFAULT_KEY_SOURCE) || defined(DOXYGEN)
+/**
+ * @brief   Default key source to use for encryption if using explicit key mode
+ *
+ */
+#define CONFIG_IEEE802154_SEC_DEFAULT_KEY_SOURCE       NULL
+#endif
+
+#if !defined(CONFIG_IEEE802154_SEC_DEFAULT_KEYSTORE_SIZE) || defined(DOXYGEN)
+/**
+ * @brief   Array size to store key structs @ref ieee802154_sec_key_t
+ */
+#define CONFIG_IEEE802154_SEC_DEFAULT_KEYSTORE_SIZE     1U
+#endif
+
+#if !defined(CONFIG_IEEE802154_SEC_DEFAULT_KEYLOOKUP_SIZE) || defined(DOXYGEN)
+/**
+ * @brief   Array size to store key lookup structs @ref ieee802154_sec_key_lookup_t
+ */
+#define CONFIG_IEEE802154_SEC_DEFAULT_KEYLOOKUP_SIZE    CONFIG_IEEE802154_SEC_DEFAULT_KEYSTORE_SIZE
+#endif
+
+#if !defined(CONFIG_IEEE802154_SEC_DEFAULT_DEVSTORE_SIZE) || defined(DOXYGEN)
+/**
+ * @brief   Array size to store device structs @ref ieee802154_sec_peer_t
+ */
+#define CONFIG_IEEE802154_SEC_DEFAULT_DEVSTORE_SIZE     1U
+#endif
+
+#if !defined(CONFIG_IEEE802154_SEC_DEFAULT_PEERLOOKUP_SIZE) || defined(DOXYGEN)
+/**
+ * @brief   Array size to store peer lookup structs @ref ieee802154_sec_peer_lookup_t
+ */
+#define CONFIG_IEEE802154_SEC_DEFAULT_PEERLOOKUP_SIZE    CONFIG_IEEE802154_SEC_DEFAULT_DEVSTORE_SIZE
+#endif
+
 /**
  * @brief   Length of an AES key in bytes
  */
@@ -191,7 +260,7 @@ typedef enum {
  * consists of the key source and the key index fields and is only present
  * if the key identifier mode is not IEEE802154_SEC_SCF_KEYMODE_IMPLICIT.
  * (see 9.4.3 in the spec.)
- *
+ * @verbatim
  * +----------------+-------------+------------------+------------------------------------+
  * |     mode       | key source  | key index        | description                        |
  * +----------------+-------------+------------------+------------------------------------+
@@ -212,6 +281,7 @@ typedef enum {
  * |                |             |                  | the long address of the originator |
  * |                |             |                  | of the frame.                      |
  * +----------------+-------------+------------------+------------------------------------+
+ * @endverbatim
  */
 typedef enum {
     IEEE802154_SEC_SCF_KEYMODE_IMPLICIT         = 0x00, /**< Key is determined implicitly */
@@ -221,20 +291,218 @@ typedef enum {
 } ieee802154_sec_scf_keymode_t;
 
 /**
+ * @brief   Device addressing mode of device descriptor
+ */
+typedef enum {
+    IEEE802154_SEC_DEV_ADDRMODE_NONE            = 0x00, /**< PAN coordinator */
+    IEEE802154_SEC_DEV_ADDRMODE_SHORT           = 0x01, /**< Short address as device address */
+    IEEE802154_SEC_DEV_ADDRMODE_LONG            = 0x02  /**< Long address as device address */
+} ieee802154_sec_dev_addrmode_t;
+
+/**
  * @brief   IEEE 802.15.4 security error codes
  */
 typedef enum {
     IEEE802154_SEC_OK,                                  /**< Everything went fine */
     IEEE802154_SEC_FRAME_COUNTER_OVERFLOW,              /**< The requested operation would let the frame counter overflow */
+    IEEE802154_SEC_FRAME_COUNTER_REPLAY,                /**< The received frame counter is less than expected */
     IEEE802154_SEC_NO_KEY,                              /**< Could not find the key to perform a requested cipher operation */
-    IEEE802154_SEC_MAC_CHECK_FAILURE,                   /**< The computet MAC did not match */
-    IEEE802154_SEC_UNSUPORTED,                          /**< Unsupported operation */
+    IEEE802154_SEC_NO_DEV,                              /**< Could not find peer device to check the frame counter */
+    IEEE802154_SEC_NO_PEER,                             /**< Device was found but pairing has not been done to use the key */
+    IEEE802154_SEC_MAC_CHECK_FAILURE,                   /**< The computed MAC did not match */
+    IEEE802154_SEC_UNSUPPORTED,                         /**< Unsupported operation */
 } ieee802154_sec_error_t;
+
+/**
+ *  @brief  Value to represent an invalid index
+ *
+ *  We shall support 255 valid key slots [0, 254].
+ */
+#define IEEE802154_SEC_NO_IDENT     (UINT8_MAX)
+
+/**
+ * @brief   Type to identify a key
+ */
+typedef uint8_t ieee802154_sec_key_descriptor_t;
+/**
+ * @brief   Type to identify a peer device
+ */
+typedef uint8_t ieee802154_sec_peer_descriptor_t;
+/**
+ * @brief   Type to identify a key lookup
+ */
+typedef uint8_t ieee802154_sec_key_lookup_descriptor_t;
+/**
+ * @brief   Type to identify a peer lookup
+ */
+typedef uint8_t ieee802154_sec_peer_lookup_descriptor_t;
+
+/**
+ * @brief   Stores peer device information
+ */
+typedef struct ieee802154_sec_peer {
+    /**
+     * @brief   PAN ID
+     */
+    uint8_t pan_id[2];
+    /**
+     * @brief   Short address
+     */
+    uint8_t short_addr[IEEE802154_SHORT_ADDRESS_LEN];
+    /**
+     * @brief   Extended address
+     */
+    uint8_t long_addr[IEEE802154_LONG_ADDRESS_LEN];
+} ieee802154_sec_peer_t;
+
+/**
+ * @brief   Lookup table for peer devices to securely communicate with
+ */
+typedef struct ieee802154_sec_peer_table {
+    /**
+     * @brief   Bitmask that shows which slots are occupied
+     */
+    BITFIELD(mask, CONFIG_IEEE802154_SEC_DEFAULT_DEVSTORE_SIZE);
+    /**
+     * @brief   Array of peer devices
+     */
+    ieee802154_sec_peer_t peers[CONFIG_IEEE802154_SEC_DEFAULT_DEVSTORE_SIZE];
+} ieee802154_sec_peer_table_t;
+
+/**
+ * @brief   Key structure
+ *
+ * Table 9.10 secKeyDescriptor
+ */
+typedef struct ieee802154_sec_key {
+    /**
+     * @brief   Key
+     */
+    uint8_t key[IEEE802154_SEC_KEY_LENGTH];
+} ieee802154_sec_key_t;
+
+/**
+ * @brief   Keystore
+ */
+typedef struct ieee802154_sec_key_table {
+    /**
+     *  @brief  Bitmask which shows which key slots are occupied
+     */
+    BITFIELD(mask, CONFIG_IEEE802154_SEC_DEFAULT_KEYSTORE_SIZE);
+    /**
+     *  @brief  Stored keys
+     */
+    ieee802154_sec_key_t keys[CONFIG_IEEE802154_SEC_DEFAULT_KEYSTORE_SIZE];
+} ieee802154_sec_key_table_t;
+
+/**
+ * @brief   Struct to store key properties to find the key to be used for
+ *          encryption or decryption
+ *
+ *          Table 9.9 secKeyIdLookupDescriptor
+ */
+typedef struct ieee802154_sec_key_lookup {
+    /**
+     * @brief   Key mode @ref ieee802154_sec_scf_keymode_t
+     */
+    uint8_t key_mode;
+    /**
+     * @brief   Either an implicit or explicit key lookup
+     */
+    union {
+        /**
+         * @brief Explicit key lookup
+         */
+        struct {
+            /**
+             * @brief Key index
+             */
+            uint8_t key_index;
+            /**
+             * @brief Key source
+             */
+            uint8_t key_source[IEEE802154_LONG_ADDRESS_LEN];
+        } explicit;
+        /**
+         * @brief   Implicit key lookup
+         */
+        struct {
+            /**
+             * @brief   Indicates how to match the device address
+             *          @ref ieee802154_sec_dev_addrmode_t
+             */
+            uint8_t dev_mode;
+            /**
+             * @brief   PAN id
+             */
+            uint8_t dev_pan_id[2];
+            /**
+             * @brief   Device address, either short or extended
+             */
+            uint8_t dev_addr[IEEE802154_LONG_ADDRESS_LEN];
+        } implicit;
+    } key_lookup;
+    /**
+     * @brief   Key descriptor of the key which is associated with this key lookup
+     */
+    ieee802154_sec_key_descriptor_t key;
+    /**
+     *  @brief  Outgoing frame counter for this key
+     */
+    uint32_t fc;
+} ieee802154_sec_key_lookup_t;
+
+/**
+ * @brief   Lookup table for key modes
+ */
+typedef struct ieee802154_sec_key_lookup_table {
+    /**
+     * @brief   Bitmask that shows which slots are occupied
+     */
+    BITFIELD(mask, CONFIG_IEEE802154_SEC_DEFAULT_KEYLOOKUP_SIZE);
+    /**
+     * @brief   Array of key lookup structs
+     */
+    ieee802154_sec_key_lookup_t key_lookup[CONFIG_IEEE802154_SEC_DEFAULT_KEYLOOKUP_SIZE];
+} ieee802154_sec_key_lookup_table_t;
+
+/**
+ * @brief   Peer lookup type to track frame counter per device and key pair.
+ */
+typedef struct ieee802154_sec_peer_lookup {
+    /**
+     * @brief   Incoming frame counter for replay protection
+     */
+    uint32_t fc;
+    /**
+     * @brief   Peer descriptor
+     */
+    ieee802154_sec_peer_descriptor_t peer;
+    /**
+     * @brief   Key descriptor
+     */
+    ieee802154_sec_key_descriptor_t key;
+} ieee802154_sec_peer_lookup_t;
+
+typedef struct ieee802154_sec_peer_lookup_table {
+    /**
+     * @brief   Bitmask that shows which slots are occupied
+     */
+    BITFIELD(mask, CONFIG_IEEE802154_SEC_DEFAULT_DEVSTORE_SIZE);
+    /**
+     * @brief   Array of peer lookups
+     */
+    ieee802154_sec_peer_lookup_t peer_lookup[CONFIG_IEEE802154_SEC_DEFAULT_DEVSTORE_SIZE];
+} ieee802154_sec_peer_lookup_table_t;
 
 /**
  * @brief   Struct to hold IEEE 802.15.4 security information
  */
 typedef struct ieee802154_sec_context {
+    /**
+     * @brief   802.15.4 security dev
+     */
+    ieee802154_sec_dev_t dev;
     /**
      * @brief Cipher context with AES128 interface and key storage
      */
@@ -258,13 +526,33 @@ typedef struct ieee802154_sec_context {
      */
     uint8_t key_source[IEEE802154_LONG_ADDRESS_LEN];
     /**
-     * @brief   Own frame counter
+     * @brief   Key lookup table
+     *
+     * This data structure should be stored in persistent storage.
      */
-    uint32_t frame_counter;
+    ieee802154_sec_key_lookup_table_t key_lookup_table;
     /**
-     * @brief   802.15.4 security dev
+     * @brief   Keystore for this netdev
+     *
+     * This data structure should be stored in persistent storage.
      */
-    ieee802154_sec_dev_t dev;
+    ieee802154_sec_key_table_t keystore;
+    /**
+     * @brief   Peer device lookup table
+     *
+     * This data structure should be stored in persistent storage.
+     */
+    ieee802154_sec_peer_lookup_table_t peer_lookup_table;
+    /**
+     * @brief   Peer device table
+     *
+     * This data structure should be stored in persistent storage.
+     */
+    ieee802154_sec_peer_table_t devstore;
+    /**
+     * @brief   Internal lock to protect concurrent operations on data structures
+     */
+    mutex_t lock;
 } ieee802154_sec_context_t;
 
 /**
@@ -338,6 +626,20 @@ typedef struct __attribute__((packed)) {
 } ieee802154_sec_aux_key_identifier_9_t;
 
 /**
+ * @brief   Struct to store a key identifier
+ */
+typedef struct ieee802154_sec_key_identifier {
+    /**
+     * @brief   Key index of key from originator, defined by key source
+     */
+    uint8_t key_index;
+    /**
+     * @brief   macExtendedAddress or macPANId concatenated with macShortAddress
+     */
+    uint8_t key_source[IEEE802154_LONG_ADDRESS_LEN];
+} ieee802154_sec_key_identifier_t;
+
+/**
  * @brief   Format of 13 byte nonce
  */
 typedef struct __attribute__((packed)) {
@@ -378,8 +680,40 @@ typedef struct __attribute__((packed)) {
  * @brief   Initialize IEEE 802.15.4 security context with default values
  *
  * @param[out]      ctx                     IEEE 802.15.4 security context
+ * @param[in]       sec_level               Default security level of outgoing frames
+ * @param[in]       sec_key_mode            Default key mode of outgoing frames
+ * @param[in]       sec_key_index           Default key index of outgoing frames
+ * @param[in]       sec_key_source          Default key source of outgoing frames
  */
-void ieee802154_sec_init(ieee802154_sec_context_t *ctx);
+void ieee802154_sec_init(ieee802154_sec_context_t *ctx,
+                         ieee802154_sec_scf_seclevel_t sec_level,
+                         ieee802154_sec_scf_keymode_t sec_key_mode,
+                         uint8_t sec_key_index,
+                         const void *sec_key_source);
+
+/**
+ * @brief   Update security context with new default key configuration
+ *
+ * Removes the old key identified by current context state.
+ * Adds the new key to the keystore and updates the default key configuration.
+ * For example when joining a new network, the device will receive a new key and
+ * key identifier of the PAN coordinator.
+ *
+ * @param[in]       ctx                     IEEE 802.15.4 security context
+ * @param[in]       sec_level               Default security level of outgoing frames
+ * @param[in]       sec_key_mode            Default key mode of outgoing frames
+ * @param[in]       sec_key_index           Default key index of outgoing frames
+ * @param[in]       sec_key_source          Default key source of outgoing frames
+ * @param[in]       new                     The new key material
+ *
+ * @retval          IEEE802154_SEC_OK on success
+ */
+int ieee802154_sec_update(ieee802154_sec_context_t *ctx,
+                          ieee802154_sec_scf_seclevel_t sec_level,
+                          ieee802154_sec_scf_keymode_t sec_key_mode,
+                          uint8_t sec_key_index,
+                          const void *sec_key_source,
+                          const uint8_t *new);
 
 /**
  * @brief   Encrypt IEEE 802.15.4 frame according to @p ctx
@@ -415,7 +749,6 @@ int ieee802154_sec_encrypt_frame(ieee802154_sec_context_t *ctx,
  * @param[out]      payload_size            Pointer to store the payload size
  * @param[out]      mic                     Will point to the beginning of the MIC
  * @param[out]      mic_size                Pointer to store the size of the MIC
- * @param[in]       src_address             Pointer to remote long source address
  *
  * @pre     After @p header follows the auxiliary header
  *
@@ -426,9 +759,79 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
                                  uint16_t frame_size,
                                  uint8_t *header, uint8_t *header_size,
                                  uint8_t **payload, uint16_t *payload_size,
-                                 uint8_t **mic, uint8_t *mic_size,
-                                 const uint8_t *src_address);
+                                 uint8_t **mic, uint8_t *mic_size);
 
+/**
+ * @brief   Add an implicit key lookup descriptor to the key lookup table
+ *
+ * A descriptor of this kind allows the recipient to identify the key to be used,
+ * implicitly by the address of the sender.
+ *
+ * @param[in]       ctx                     IEEE 802.15.4 security context
+ * @param[in]       dev_mode                Device addressing mode
+ * @param[in]       dev_pan_id              Device PAN ID (host byte order)
+ * @param[in]       dev_addr                Device address
+ * @param[in]       key_mat                 Key material
+ * @param[in]       add                     Add or remove the key
+ *
+ * @retval          IEEE802154_SEC_OK if key removal or addition was successful
+ * @retval          -IEEE802154_SEC_NO_KEY no more space to store the key
+ */
+int ieee802154_sec_key_lookup_implicit(ieee802154_sec_context_t *ctx,
+                                       ieee802154_sec_dev_addrmode_t dev_mode,
+                                       uint16_t dev_pan_id,
+                                       const uint8_t *dev_addr,
+                                       const uint8_t *key_mat,
+                                       bool add);
+
+/**
+ * @brief   Add or remove an explicit key lookup descriptor to the key lookup table
+ *
+ * An explicit key is a group key.
+ * A descriptor of this kind allows the recipient to identify the key to be used,
+ * explicitly by the sent key parameters @p key_mode, @p key_index , and @p key_source.
+ * If @p key_mode is IEEE802154_SEC_SCF_KEYMODE_INDEX, @p key_source is not evaluated.
+ * If @p key_mode is IEEE802154_SEC_SCF_KEYMODE_SHORT_INDEX, @p key_source is the key
+ * originator´s PAN ID and short address.
+ * If @p key_mode is IEEE802154_SEC_SCF_KEYMODE_HW_INDEX, @p key_source is the key
+ * originator´s long address.
+ *
+ * @param[in]       ctx                     IEEE 802.15.4 security context
+ * @param[in]       key_mode                Key mode
+ * @param[in]       key_index               Key index
+ * @param[in]       key_source              Key source, content depends of @p key_mode
+ * @param[in]       key_mat                 Key material
+ * @param[in]       add                     Add or remove the key
+ *
+ * @retval          IEEE802154_SEC_OK if key removal or addition was successful
+ * @retval          -IEEE802154_SEC_UNSUPPORTED if @p key_mode or @p key_index are not supported
+ * @retval          -IEEE802154_SEC_NO_KEY no more space to store the key
+ */
+
+int ieee802154_sec_key_lookup_explicit(ieee802154_sec_context_t *ctx,
+                                       ieee802154_sec_scf_keymode_t key_mode,
+                                       uint8_t key_index,
+                                       const void *key_source,
+                                       const uint8_t *key_mat,
+                                       bool add);
+
+/**
+ * @brief   Add or remove a peer device to the device table
+ *
+ * @param[in]           ctx                     IEEE 802.15.4 security context
+ * @param[in]           pan_id                  Device PAN ID (host byte order)
+ * @param[in]           short_addr              Device short address
+ * @param[in]           long_addr               Device long address
+ * @param[in]           add                     Add or remove the device
+ *
+ * @return              IEEE802154_SEC_OK if device removal or addition was successful
+ * @return              -IEEE802154_SEC_NO_DEVICE no more space to store the device
+ */
+int ieee802154_sec_peer(ieee802154_sec_context_t *ctx,
+                         uint16_t pan_id,
+                         const uint8_t *short_addr,
+                         const uint8_t *long_addr,
+                         bool add);
 /**
  * @brief Default descriptor that will fallback to default implementations
  */
