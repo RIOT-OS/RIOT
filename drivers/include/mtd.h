@@ -258,16 +258,16 @@ int mtd_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count);
  * @param[out] dest     the buffer to fill in
  * @param[in]  page     Page number to start reading from
  * @param[in]  offset   offset from the start of the page (in bytes)
- * @param[in]  size     the number of bytes to read
+ * @param[in]  count    the number of bytes to read
  *
  * @return 0 on success
  * @return < 0 if an error occurred
  * @return -ENODEV if @p mtd is not a valid device
  * @return -ENOTSUP if operation is not supported on @p mtd
- * @return -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory
+ * @return -EOVERFLOW if @p page or @p count are not valid, i.e. outside memory
  * @return -EIO if I/O error occurred
  */
-int mtd_read_page(mtd_dev_t *mtd, void *dest, uint32_t page, uint32_t offset, uint32_t size);
+int mtd_read_page(mtd_dev_t *mtd, void *dest, uint32_t page, uint32_t offset, uint32_t count);
 
 /**
  * @brief   Write data to a MTD device
@@ -306,7 +306,7 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count);
  * @param[in]  src      the buffer to write
  * @param[in]  page     Page number to start writing to
  * @param[in]  offset   byte offset from the start of the page
- * @param[in]  size     the number of bytes to write
+ * @param[in]  count    the number of bytes to write
  *
  * @return 0 on success
  * @return < 0 if an error occurred
@@ -317,7 +317,7 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count);
  * @return -EINVAL if parameters are invalid
  */
 int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page,
-                       uint32_t offset, uint32_t size);
+                       uint32_t offset, uint32_t count);
 
 /**
  * @brief   Write data to a MTD device with pagewise addressing
@@ -336,7 +336,7 @@ int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page,
  * @param[in]  src      the buffer to write
  * @param[in]  page     Page number to start writing to
  * @param[in]  offset   byte offset from the start of the page
- * @param[in]  size     the number of bytes to write
+ * @param[in]  count    the number of bytes to write
  *
  * @return 0 on success
  * @return < 0 if an error occurred
@@ -347,7 +347,7 @@ int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page,
  * @return -EINVAL if parameters are invalid
  */
 int mtd_write_page(mtd_dev_t *mtd, const void *src, uint32_t page,
-                   uint32_t offset, uint32_t size);
+                   uint32_t offset, uint32_t count);
 
 /**
  * @brief   Erase sectors of a MTD device
@@ -372,7 +372,7 @@ int mtd_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t count);
  *
  * @param      mtd    the device to erase
  * @param[in]  sector the first sector number to erase
- * @param[in]  num    the number of sectors to erase
+ * @param[in]  count  the number of sectors to erase
  *
  * @return 0 if erase successful
  * @return < 0 if an error occurred
@@ -381,7 +381,7 @@ int mtd_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t count);
  * @return -EOVERFLOW if @p addr or @p sector are not valid, i.e. outside memory
  * @return -EIO if I/O error occurred
  */
-int mtd_erase_sector(mtd_dev_t *mtd, uint32_t sector, uint32_t num);
+int mtd_erase_sector(mtd_dev_t *mtd, uint32_t sector, uint32_t count);
 
 /**
  * @brief   Set power mode on a MTD device

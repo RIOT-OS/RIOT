@@ -139,14 +139,14 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count)
 
 #ifdef MODULE_MTD_WRITE_PAGE
 int mtd_write_page(mtd_dev_t *mtd, const void *data, uint32_t page,
-                   uint32_t offset, uint32_t len)
+                   uint32_t offset, uint32_t count)
 {
     if (!mtd || !mtd->driver) {
         return -ENODEV;
     }
 
     if (mtd->work_area == NULL) {
-        return mtd_write_page_raw(mtd, data, page, offset, len);
+        return mtd_write_page_raw(mtd, data, page, offset, count);
     }
 
     int res;
@@ -156,7 +156,7 @@ int mtd_write_page(mtd_dev_t *mtd, const void *data, uint32_t page,
     const uint32_t sector_size = mtd->pages_per_sector * mtd->page_size;
 
     /* prevent heap overflow of work buffer */
-    if (len + (page - sector_page) * mtd->page_size + offset > sector_size) {
+    if (count + (page - sector_page) * mtd->page_size + offset > sector_size) {
         return -EOVERFLOW;
     }
 
@@ -173,7 +173,7 @@ int mtd_write_page(mtd_dev_t *mtd, const void *data, uint32_t page,
     }
 
     /* modify sector in RAM */
-    memcpy(work + (page - sector_page) * mtd->page_size + offset, data, len);
+    memcpy(work + (page - sector_page) * mtd->page_size + offset, data, count);
 
     /* write back modified sector copy */
     return mtd_write_page_raw(mtd, work, sector_page, 0, sector_size);
