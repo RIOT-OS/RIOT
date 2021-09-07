@@ -398,7 +398,7 @@ static void _sock_set_cb(socket_t *socket)
     switch (socket->type) {
 #ifdef MODULE_SOCK_IP
         case SOCK_RAW:
-            sock_ip_set_cb(&socket->sock.ip, callback.ip, socket);
+            sock_ip_set_cb(&socket->sock->raw, callback.ip, socket);
             break;
 #endif
 #ifdef MODULE_SOCK_TCP
