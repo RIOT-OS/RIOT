@@ -656,6 +656,23 @@ static inline msg_bus_t* gnrc_netif_get_bus(gnrc_netif_t *netif,
     assert(type < GNRC_NETIF_BUS_NUMOF);
     return &netif->bus[type];
 }
+
+/**
+ * @brief   Wait for a global address to become available.
+ *          This function blocks until a valid global address has been
+ *          configured, e.g. by receiving a router advertisement or via DHCPv6.
+ *
+ *          Requires the `gnrc_netif_bus` module.
+ *
+ * @param netif         pointer to the interface
+ *                      May be NULL, then this checks for a global address
+ *                      on *any* interface.
+ * @param timeout_ms    Time to wait for an address to become available, in ms.
+ *
+ * @return              true if a global address is configured
+ */
+bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
+                                             uint32_t timeout_ms);
 #endif /* MODULE_GNRC_NETIF_BUS */
 
 #ifdef __cplusplus

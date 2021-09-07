@@ -41,7 +41,7 @@
 #include "fmt.h"
 #include "log.h"
 #include "sched.h"
-#if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
+#if IS_USED(MODULE_XTIMER) || IS_USED(MODULE_ZTIMER_XTIMER_COMPAT)
 #include "xtimer.h"
 #endif
 
@@ -1298,6 +1298,105 @@ int gnrc_netif_ipv6_add_prefix(gnrc_netif_t *netif,
 out:
     return res;
 }
+
+#if IS_USED(MODULE_GNRC_NETIF_BUS)
+static bool _has_global_addr(gnrc_netif_t *netif)
+{
+    bool has_global = false;
+
+    gnrc_netif_acquire(netif);
+
+    for (unsigned i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
+        if (ipv6_addr_is_unspecified(&netif->ipv6.addrs[i])) {
+            continue;
+        }
+        if (!ipv6_addr_is_link_local(&netif->ipv6.addrs[i])) {
+            has_global = true;
+            break;
+        }
+    }
+
+    gnrc_netif_release(netif);
+    return has_global;
+}
+
+static void _netif_bus_attach_and_subscribe_addr_valid(gnrc_netif_t *netif,
+                                                       msg_bus_entry_t *sub)
+{
+    msg_bus_t *bus = gnrc_netif_get_bus(netif, GNRC_NETIF_BUS_IPV6);
+    msg_bus_attach(bus, sub);
+    msg_bus_subscribe(sub, GNRC_IPV6_EVENT_ADDR_VALID);
+}
+
+static void _netif_bus_detach(gnrc_netif_t *netif, msg_bus_entry_t *sub)
+{
+    msg_bus_t *bus = gnrc_netif_get_bus(netif, GNRC_NETIF_BUS_IPV6);
+    msg_bus_detach(bus, sub);
+}
+
+bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
+                                             uint32_t timeout_ms)
+{
+    unsigned netif_numof = gnrc_netif_numof();
+
+    /* no interfaces */
+    if (netif_numof == 0) {
+        return false;
+    }
+
+    msg_bus_entry_t subs[netif_numof];
+    bool has_global = false;
+
+    if (netif) {
+        if (_has_global_addr(netif)) {
+            return true;
+        }
+
+        _netif_bus_attach_and_subscribe_addr_valid(netif, &subs[0]);
+    } else {
+        /* subscribe to all interfaces */
+        for (unsigned count = 0;
+             (netif = gnrc_netif_iter(netif));
+             count++) {
+            if (_has_global_addr(netif)) {
+                has_global = true;
+            }
+
+            _netif_bus_attach_and_subscribe_addr_valid(netif, &subs[count]);
+        }
+    }
+
+    /* wait for global address */
+    msg_t m;
+    while (!has_global) {
+        if (xtimer_msg_receive_timeout(&m, timeout_ms * US_PER_MS) < 0) {
+            DEBUG_PUTS("gnrc_netif: timeout waiting for prefix");
+            break;
+        }
+
+        if (ipv6_addr_is_link_local(m.content.ptr)) {
+            DEBUG_PUTS("gnrc_netif: got link-local address");
+        } else {
+            DEBUG_PUTS("gnrc_netif: got global address");
+            has_global = true;
+        }
+    }
+
+    /* called with a given interface */
+    if (netif != NULL) {
+        _netif_bus_detach(netif, &subs[0]);
+    } else {
+        /* unsubscribe all */
+        for (unsigned count = 0;
+             (netif = gnrc_netif_iter(netif));
+             count++) {
+            _netif_bus_detach(netif, &subs[count]);
+        }
+    }
+
+    return has_global;
+}
+#endif  /* IS_USED(MODULE_GNRC_NETIF_BUS) */
 #endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif)
