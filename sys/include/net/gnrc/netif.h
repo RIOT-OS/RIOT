@@ -422,7 +422,7 @@ static inline int gnrc_netif_ipv6_addrs_get(const gnrc_netif_t *netif,
  * @return  -ENOTSUP, if @p netif doesn't support IPv6.
  */
 static inline int gnrc_netif_ipv6_addr_add(const gnrc_netif_t *netif,
-                                           ipv6_addr_t *addr, unsigned pfx_len,
+                                           const ipv6_addr_t *addr, unsigned pfx_len,
                                            uint8_t flags)
 {
     assert(netif != NULL);
@@ -447,7 +447,7 @@ static inline int gnrc_netif_ipv6_addr_add(const gnrc_netif_t *netif,
  * @return  -ENOTSUP, if @p netif doesn't support IPv6.
  */
 static inline int gnrc_netif_ipv6_addr_remove(const gnrc_netif_t *netif,
-                                              ipv6_addr_t *addr)
+                                              const ipv6_addr_t *addr)
 {
     assert(netif != NULL);
     assert(addr != NULL);
