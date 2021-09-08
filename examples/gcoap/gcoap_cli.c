@@ -59,8 +59,7 @@ static char proxy_uri[64];
 
 static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
                             size_t maxlen, coap_link_encoder_ctx_t *context);
-static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
-                          const sock_udp_ep_t *remote);
+static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu);
 static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 
@@ -113,11 +112,8 @@ static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
 /*
  * Response callback.
  */
-static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
-                          const sock_udp_ep_t *remote)
+static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu)
 {
-    (void)remote;       /* not interested in the source currently */
-
     if (memo->state == GCOAP_MEMO_TIMEOUT) {
         printf("gcoap: timeout for msg ID %02u\n", coap_get_id(pdu));
         return;
@@ -185,7 +181,7 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
             }
 
             int len = coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
-            gcoap_req_send((uint8_t *)pdu->hdr, len, remote,
+            gcoap_req_send((uint8_t *)pdu->hdr, len, pdu->remote,
                            _resp_handler, memo->context);
         }
         else {
