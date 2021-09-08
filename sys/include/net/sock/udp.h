@@ -352,6 +352,79 @@ typedef struct {
     sock_aux_flags_t flags; /**< Flags used request information */
 } sock_udp_aux_tx_t;
 
+
+/**
+ * @brief   Access local UDP endpoint information
+ *
+ * @param[in] aux_rx    Received UDP auxiliary data
+ *
+ * @return  Pointer to local UDP endpoint information
+ * @return  NULL if no information is available
+ */
+static inline sock_udp_ep_t *sock_udp_aux_rx_local(sock_udp_aux_rx_t *aux_rx)
+{
+#if defined(MODULE_SOCK_AUX_LOCAL)
+    return &aux_rx->local;
+#else
+    (void)aux_rx;
+    return NULL;
+#endif
+}
+
+/**
+ * @brief   Access auxiliary timestamp of a received datagram
+ *
+ * @param[in] aux_rx    Received UDP auxiliary data
+ *
+ * @return  Pointer to auxiliary timestamp
+ * @return  NULL if no information is available
+ */
+static inline uint64_t *sock_udp_aux_rx_timestamp(sock_udp_aux_rx_t *aux_rx)
+{
+#if defined(MODULE_SOCK_AUX_TIMESTAMP)
+    return &aux_rx->timestamp;
+#else
+    (void)aux_rx;
+    return NULL;
+#endif
+}
+
+/**
+ * @brief   Access auxiliary RSSI of a received datagram
+ *
+ * @param[in] aux_rx    Received UDP auxiliary data
+ *
+ * @return  Pointer to auxiliary RSSI value
+ * @return  NULL if no information is available
+ */
+static inline int16_t *sock_udp_aux_rx_rss(sock_udp_aux_rx_t *aux_rx)
+{
+#if defined(MODULE_SOCK_AUX_RSSI)
+    return &aux_rx->rssi;
+#else
+    (void)aux_rx;
+    return NULL;
+#endif
+}
+
+/**
+ * @brief   Access auxiliary timestamp of a transmitted datagram
+ *
+ * @param[in] aux_tx    Auxiliary data of transmitted UDP datagram
+ *
+ * @return  Pointer to auxiliary timestamp
+ * @return  NULL if no information is available
+ */
+static inline uint64_t *sock_udp_aux_tx_timestamp(sock_udp_aux_tx_t *aux_tx)
+{
+#if defined(MODULE_SOCK_AUX_TIMESTAMP)
+    return &aux_tx->timestamp;
+#else
+    (void)aux_tx;
+    return NULL;
+#endif
+}
+
 /**
  * @brief   Creates a new UDP sock object
  *
