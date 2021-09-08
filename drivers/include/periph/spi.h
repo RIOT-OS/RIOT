@@ -349,6 +349,16 @@ int spi_init_with_gpio_mode(spi_t bus, spi_gpio_mode_t mode);
 spi_clk_t spi_get_clk(uint32_t freq);
 
 /**
+ * @brief   Get the actual frequency Hertz corresponding to the given clock config
+ * @param[in]   clk     The clock configuration to get the corresponding frequency from
+ * @return  The exact frequency in Hertz matching the clock configuration
+ *
+ * @note    In most cases `spi_get_freq(spi_get_clk(x)) != x` will be true, since `spi_get_clk()`
+ *          will return only the closest match, which will rarely be an exact match.
+ */
+uint32_t spi_get_freq(spi_clk_t clk);
+
+/**
  * @brief   Start a new SPI transaction
  *
  * Starting a new SPI transaction will get exclusive access to the SPI bus
