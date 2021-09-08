@@ -27,6 +27,7 @@
 #include "net/utils.h"
 #include "od.h"
 #include "fmt.h"
+#include "net/sock/util.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -114,6 +115,17 @@ static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
  */
 static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu)
 {
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        char saddr[IPV6_ADDR_MAX_STR_LEN + 6];
+        uint16_t port;
+        sock_udp_ep_fmt(pdu->remote, saddr, &port);
+        printf("remote [%s]:%u\n", saddr, port);
+        if (pdu->local) {
+            sock_udp_ep_fmt(pdu->local, saddr, &port);
+            printf("local [%s]:%u\n", saddr, port);
+        }
+    }
+
     if (memo->state == GCOAP_MEMO_TIMEOUT) {
         printf("gcoap: timeout for msg ID %02u\n", coap_get_id(pdu));
         return;
@@ -202,6 +214,17 @@ static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *c
 {
     (void)ctx;
 
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        char saddr[IPV6_ADDR_MAX_STR_LEN + 6];
+        uint16_t port;
+        sock_udp_ep_fmt(pdu->remote, saddr, &port);
+        printf("remote [%s]:%u\n", saddr, port);
+        if (pdu->local) {
+            sock_udp_ep_fmt(pdu->local, saddr, &port);
+            printf("local [%s]:%u\n", saddr, port);
+        }
+    }
+
     /* read coap method type in packet */
     unsigned method_flag = coap_method2flag(coap_get_code_detail(pdu));
 
@@ -235,6 +258,18 @@ static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *c
 static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx)
 {
     (void)ctx;
+
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        char saddr[IPV6_ADDR_MAX_STR_LEN + 6];
+        uint16_t port;
+        sock_udp_ep_fmt(pdu->remote, saddr, &port);
+        printf("remote [%s]:%u\n", saddr, port);
+        if (pdu->local) {
+            sock_udp_ep_fmt(pdu->local, saddr, &port);
+            printf("local [%s]:%u\n", saddr, port);
+        }
+    }
+
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     coap_opt_add_format(pdu, COAP_FORMAT_TEXT);
     size_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
