@@ -27,7 +27,7 @@ menuconfig KCONFIG_USEMODULE_LM75
 
 if KCONFIG_USEMODULE_LM75
 
-config M75_PARAMS_I2C_ADDR
+config LM75_I2C_ADDR
     hex "Default I2C Address"
     range 0x48 0x4F
     default 0x48
