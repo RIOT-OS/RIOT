@@ -81,8 +81,7 @@ static int _sync(void)
     }
 }
 
-static void _on_register(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
-                         const sock_udp_ep_t *remote)
+static void _on_register(const gcoap_request_memo_t *memo, coap_pkt_t* pdu)
 {
     thread_flags_t flag = FLAG_ERR;
 
@@ -91,7 +90,7 @@ static void _on_register(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
         /* read the location header and save the RD details on success */
         if (coap_get_location_path(pdu, (uint8_t *)_rd_loc,
                                    sizeof(_rd_loc)) > 0) {
-            memcpy(&_rd_remote, remote, sizeof(_rd_remote));
+            memcpy(&_rd_remote, pdu->remote, sizeof(_rd_remote));
             flag = FLAG_SUCCESS;
         }
         else {
@@ -120,17 +119,13 @@ static void _on_update_remove(unsigned req_state, coap_pkt_t *pdu, uint8_t code)
     thread_flags_set(_waiter, flag);
 }
 
-static void _on_update(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
-                       const sock_udp_ep_t *remote)
+static void _on_update(const gcoap_request_memo_t *memo, coap_pkt_t *pdu)
 {
-    (void)remote;
     _on_update_remove(memo->state, pdu, COAP_CODE_CHANGED);
 }
 
-static void _on_remove(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
-                       const sock_udp_ep_t *remote)
+static void _on_remove(const gcoap_request_memo_t *memo, coap_pkt_t *pdu)
 {
-    (void)remote;
     _on_update_remove(memo->state, pdu, COAP_CODE_DELETED);
 }
 
