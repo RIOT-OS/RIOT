@@ -737,8 +737,7 @@ typedef struct gcoap_request_memo gcoap_request_memo_t;
  * If request timed out, the packet header is for the request.
  */
 typedef void (*gcoap_resp_handler_t)(const gcoap_request_memo_t *memo,
-                                     coap_pkt_t* pdu,
-                                     const sock_udp_ep_t *remote);
+                                     coap_pkt_t* pdu);
 
 /**
  * @brief  Extends request memo for resending a confirmable request.
