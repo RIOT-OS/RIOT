@@ -13,6 +13,7 @@ config CPU_FAM_WL
     select HAS_CPU_STM32WL
     select HAS_PERIPH_FLASHPAGE
     select HAS_PERIPH_FLASHPAGE_PAGEWISE
+    select HAS_PERIPH_RTC_MEM
     select HAS_PERIPH_WDT
     select HAS_BOOTLOADER_STM32
 
