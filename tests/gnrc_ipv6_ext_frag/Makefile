@@ -4,7 +4,8 @@ include ../Makefile.tests_common
 
 export TAP ?= tap0
 
-CFLAGS += -DOUTPUT=TEXT
+OUTPUT = TEXT
+
 CFLAGS += -DTEST_SUITES="gnrc_ipv6_ext_frag"
 
 ifeq (native,$(BOARD))
