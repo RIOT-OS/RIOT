@@ -124,10 +124,20 @@ config HAS_CORTEXM_SVC
     help
         Indicates that ARM Cortex-M Supervisor Calls are available.
 
+menu "Cortex-M"
+    depends on TEST_KCONFIG
+    depends on CPU_CORE_CORTEX_M
+
 config MODULE_CORTEXM_FPU
     bool "Cortex-M Floating Point Unit (FPU) support"
     default y
     depends on HAS_CORTEXM_FPU
-    depends on TEST_KCONFIG
+
+config MODULE_MPU_STACK_GUARD
+    bool "Memory Protection Unit (MPU) stack guard"
+    default y if DEVELHELP
+    depends on HAS_CORTEXM_MPU
+
+endmenu # Cortex-M
 
 rsource "periph/Kconfig"

@@ -112,6 +112,11 @@ ifeq (1,$(TEST_KCONFIG))
   SHOULD_RUN_KCONFIG := 1
 endif
 
+# Expose DEVELHELP to kconfig
+ifeq (1,$(DEVELHELP))
+  RIOT_CONFIG_DEVELHELP ?= y
+endif
+
 # export variable to make it visible in other Makefiles
 export SHOULD_RUN_KCONFIG
 

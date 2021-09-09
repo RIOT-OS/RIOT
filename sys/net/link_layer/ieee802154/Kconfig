@@ -4,6 +4,27 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
+menuconfig MODULE_IEEE802154
+    bool "IEEE 802.15.4 support"
+    depends on TEST_KCONFIG
+
+if MODULE_IEEE802154
+
+config MODULE_IEEE802154_SECURITY
+    bool "IEEE 802.15.4 security"
+    select MODULE_CRYPTO
+    select MODULE_CIPHER_MODES
+    help
+        IEEE 802.15.4 security interface
+
+config MODULE_IEEE802154_SUBMAC
+    bool "IEEE 802.15.4 submac"
+    select MODULE_XTIMER
+    help
+        This module defines a common layer for handling the lower part of the IEEE 802.15.4 MAC layer.
+
+endif # MODULE_IEEE802154
+
 menuconfig KCONFIG_USEMODULE_IEEE802154
     bool "Configure IEEE802.15.4"
     depends on USEMODULE_IEEE802154
