@@ -699,7 +699,7 @@ static inline void ipv6_addr_set_solicited_nodes(ipv6_addr_t *out, const ipv6_ad
  * @param[out] result       The resulting string representation of at least
  *                          @ref IPV6_ADDR_MAX_STR_LEN
  * @param[in] addr          An IPv6 address
- * @param[in] result_len    Length of @p result_len
+ * @param[in] result_len    Length of @p result
  *
  * @return  @p result, on success
  * @return  NULL, if @p result_len was lesser than IPV6_ADDR_MAX_STR_LEN
