@@ -117,6 +117,12 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
 #ifdef MODULE_XTIMER
     xtimer_t timeout_timer;
 
+    /* xtimer_spin would make this never receive anything.
+     * Avoid that by setting the minimal not spinning timeout. */
+    if (timeout < XTIMER_BACKOFF && timeout > 0) {
+        timeout = XTIMER_BACKOFF;
+    }
+
     if ((timeout != SOCK_NO_TIMEOUT) && (timeout != 0)) {
         timeout_timer.callback = _callback_put;
         timeout_timer.arg = reg;
