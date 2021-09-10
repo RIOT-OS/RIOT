@@ -296,7 +296,7 @@ static void _do_scan(nimble_scanner_cb cb, unsigned duration)
         printf("err: duration must be > 0\n");
         return;
     }
-    if (nimble_scanner_status() == NIMBLE_SCANNER_SCANNING) {
+    if (nimble_scanner_is_active()) {
         printf("err: scanner already active\n");
         return;
     }
