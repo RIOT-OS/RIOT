@@ -61,11 +61,11 @@ int nimble_scanner_start(void)
                                &_scan_params, _on_scan_evt, NULL);
         if (res != 0) {
             DEBUG("[scanner] err: start failed (%i)\n", res);
-            return NIMBLE_SCANNER_ERR;
+            return -ECANCELED;
         }
     }
 
-    return NIMBLE_SCANNER_OK;
+    return 0;
 }
 
 void nimble_scanner_stop(void)
@@ -76,13 +76,6 @@ void nimble_scanner_stop(void)
         assert(res == 0);
         (void)res;
     }
-}
-
-int nimble_scanner_status(void)
-{
-    return (ble_gap_disc_active())
-        ? NIMBLE_SCANNER_SCANNING
-        : NIMBLE_SCANNER_STOPPED;
 }
 
 void nimble_scanner_set_scan_duration(int32_t duration_ms)
@@ -107,5 +100,5 @@ int nimble_scanner_init(const struct ble_gap_disc_params *params,
     }
     _disc_cb = disc_cb;
 
-    return NIMBLE_SCANNER_OK;
+    return 0;
 }

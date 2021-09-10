@@ -21,6 +21,7 @@
 #ifndef NIMBLE_SCANNER_H
 #define NIMBLE_SCANNER_H
 
+#include <errno.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -29,16 +30,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief   Return values used by this submodule
- */
-enum {
-    NIMBLE_SCANNER_OK       =  0,
-    NIMBLE_SCANNER_SCANNING =  1,
-    NIMBLE_SCANNER_STOPPED  =  2,
-    NIMBLE_SCANNER_ERR      = -1,
-};
 
 /**
  * @brief   Callback signature triggered by this module for each discovered
@@ -61,8 +52,7 @@ typedef void(*nimble_scanner_cb)(uint8_t type,
  *                      default parameters
  * @param[in] disc_cb   callback triggered of each received advertising packet
  *
- * @return  NIMBLE_SCANNER_OK on success
- * @return  NIMBLE_SCANNER_ERR if putting NimBLE into discovery mode failed
+ * @return  0 on success
  */
 int nimble_scanner_init(const struct ble_gap_disc_params *params,
                         nimble_scanner_cb disc_cb);
@@ -72,6 +62,9 @@ int nimble_scanner_init(const struct ble_gap_disc_params *params,
  *
  * @note    Scanning will run for ever unless stopped or unless a different
  *          scan duration is set with @ref nimble_scanner_set_scan_duration
+ *
+ * @return  0 on success
+ * @return  -ECANCELED on error
  */
 int nimble_scanner_start(void);
 
