@@ -67,6 +67,7 @@
 #define NIMBLE_NETIF_H
 
 #include <stdint.h>
+#include <errno.h>
 
 #include "net/ble.h"
 
@@ -132,19 +133,6 @@ extern "C" {
  * @brief   Minimum spacing of connection interval when using randomized
  *          intervals, in multiples of 1.25ms
  */
-
-/**
- * @brief   Return codes used by the NimBLE netif module
- */
-enum {
-    NIMBLE_NETIF_OK         =  0,   /**< everything went fine */
-    NIMBLE_NETIF_NOTCONN    = -1,   /**< not connected */
-    NIMBLE_NETIF_DEVERR     = -2,   /**< internal BLE stack error */
-    NIMBLE_NETIF_BUSY       = -3,   /**< network device is busy */
-    NIMBLE_NETIF_NOMEM      = -4,   /**< insufficient memory */
-    NIMBLE_NETIF_NOTADV     = -5,   /**< not advertising */
-    NIMBLE_NETIF_NOTFOUND   = -6,   /**< no fitting entry found */
-};
 
 /**
  * @brief   Event types triggered by the NimBLE netif module
@@ -219,10 +207,10 @@ void nimble_netif_eventcb(nimble_netif_eventcb_t cb);
  * @param[in] timeout       connect timeout [in ms]
  *
  * @return  the used connection handle on success
- * @return  NIMBLE_NETIF_BUSY if already connected to the given address or if
+ * @return  -EBUSY if already connected to the given address or if
  *          a connection setup procedure is in progress
- * @return  NIMBLE_NETIF_NOMEM if no connection context memory is available
- * @return  NIMBLE_NETIF_NOTFOUND if unable to find valid connection interval
+ * @return  -ENOMEM if no connection context memory is available
+ * @return  -ECANCELED if unable to find valid connection interval
  */
 int nimble_netif_connect(const ble_addr_t *addr,
                          struct ble_gap_conn_params *conn_params,
@@ -233,9 +221,9 @@ int nimble_netif_connect(const ble_addr_t *addr,
  *
  * @param[in] handle        handle for the connection to be closed
  *
- * @return  NIMBLE_NETIF_OK on success
- * @return  NIMBLE_NETIF_NOTFOUND if the handle is invalid
- * @return  NIMBLE_NETIF_NOTCONN if context for given handle is not connected
+ * @return  0 on success
+ * @return  -EINVAL if the handle is invalid
+ * @return  -ENOTCONN if context for given handle is not connected
  */
 int nimble_netif_close(int handle);
 
@@ -246,9 +234,9 @@ int nimble_netif_close(int handle);
  * @param[in] ad_len        length of @p ad in bytes
  * @param[in] adv_params    advertising (timing) parameters to use
  *
- * @return  NIMBLE_NETIF_OK on success
- * @return  NIMBLE_NETIF_BUSY if already advertising
- * @return  NIMBLE_NETIF_NOMEM on insufficient connection memory
+ * @return  0 on success
+ * @return  -EALREADY if already advertising
+ * @return  -ENOMEM on insufficient connection memory
  */
 int nimble_netif_accept(const uint8_t *ad, size_t ad_len,
                         const struct ble_gap_adv_params *adv_params);
@@ -262,9 +250,9 @@ int nimble_netif_accept(const uint8_t *ad, size_t ad_len,
  *                          BLE_HS_FOREVER to disable timeout
  * @param[in] adv_params    advertising (timing) parameters to use
  *
- * @return  NIMBLE_NETIF_OK on success
- * @return  NIMBLE_NETIF_BUSY if already advertising
- * @return  NIMBLE_NETIF_NOMEM on insufficient connection memory
+ * @return  0 on success
+ * @return  -EALREADY if already advertising
+ * @return  -ENOMEM on insufficient connection memory
  */
 int nimble_netif_accept_direct(const ble_addr_t *addr, uint32_t timeout_ms,
                                const struct ble_gap_adv_params *adv_params);
@@ -272,8 +260,8 @@ int nimble_netif_accept_direct(const ble_addr_t *addr, uint32_t timeout_ms,
 /**
  * @brief   Stop accepting incoming connections (stop advertising)
  * *
- * @return  NIMBLE_NETIF_OK on success
- * @return  NIMBLE_NETIF_NOTADV if not currently advertising
+ * @return  0 on success
+ * @return  -EALREADY if not currently advertising
  */
 int nimble_netif_accept_stop(void);
 
@@ -283,9 +271,9 @@ int nimble_netif_accept_stop(void);
  * @param[in] handle        connection handle
  * @param[in] conn_params   new connection parameters to apply
  *
- * @return  NIMBLE_NETIF_OK on success
- * @return  NIMBLE_NETIF_NOTCONN if handle does not point to a connection
- * @return  NIMBLE_NETIF_DEVERR if applying the given parameters failed
+ * @return  0 on success
+ * @return  -ENOTCONN if handle does not point to a connection
+ * @return  -ECANCELED if applying the given parameters failed
  */
 int nimble_netif_update(int handle,
                         const struct ble_gap_upd_params *conn_params);
@@ -299,9 +287,9 @@ int nimble_netif_update(int handle,
  *                          map[1] chan 8-15, ..., map[5] channels 33 to 36.
  *                          **must** be able to hold 5 bytes.
  *
- * @return  NIMBLE_NETIF_OK on success
- * @return  NIMBLE_NETIF_NOTCONN if handle dos not point to a connection
- * @return  NIMBLE_NETIF_DEVERR if reading the channel map failed otherwise
+ * @return  0 on success
+ * @return  -ENOTCONN if handle dos not point to a connection
+ * @return  -ECANCELED if reading the channel map failed otherwise
  */
 int nimble_netif_used_chanmap(int handle, uint8_t map[5]);
 
