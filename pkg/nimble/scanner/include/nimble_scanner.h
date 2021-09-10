@@ -22,6 +22,7 @@
 #define NIMBLE_SCANNER_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "host/ble_hs.h"
 
@@ -82,10 +83,13 @@ void nimble_scanner_stop(void);
 /**
  * @brief   Get the current scanning status
  *
- * @return  NIMBLE_SCANNER_SCANNING if currently scanning
- * @return  NIMBLE_SCANNER_STOPPED if the scanner is stopped
+ * @return  true if currently scanning
+ * @return  false if the scanner is stopped
  */
-int nimble_scanner_status(void);
+static inline bool nimble_scanner_is_active(void)
+{
+    return ble_gap_disc_active();
+}
 
 /**
  * @brief   Set the duration for the scanning procedure.
