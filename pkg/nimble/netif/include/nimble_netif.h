@@ -130,11 +130,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Minimum spacing of connection interval when using randomized
- *          intervals, in multiples of 1.25ms
- */
-
-/**
  * @brief   Event types triggered by the NimBLE netif module
  */
 typedef enum {
