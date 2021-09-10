@@ -233,7 +233,7 @@ static void _cmd_adv(const char *name)
 
     /* start listening for incoming connections */
     res = nimble_netif_accept(ad.buf, ad.pos, &_adv_params);
-    if (res != NIMBLE_NETIF_OK) {
+    if (res != 0) {
         printf("err: unable to start advertising (%i)\n", res);
     }
     else {
@@ -271,7 +271,7 @@ static void _cmd_adv_direct(const char *addr_str)
 
     /* start advertising directed advertising with the given BLE address */
     res = nimble_netif_accept_direct(&addr, BLE_HS_FOREVER, &_adv_params);
-    if (res != NIMBLE_NETIF_OK) {
+    if (res != 0) {
         printf("err: unable to start directed advertising (%i)\n", res);
     }
     else {
@@ -282,10 +282,10 @@ static void _cmd_adv_direct(const char *addr_str)
 static void _cmd_adv_stop(void)
 {
     int res = nimble_netif_accept_stop();
-    if (res == NIMBLE_NETIF_OK) {
+    if (res == 0) {
         puts("canceled advertising");
     }
-    else if (res == NIMBLE_NETIF_NOTADV) {
+    else {
         puts("no advertising in progress");
     }
 }
@@ -371,7 +371,7 @@ static void _cmd_connect_scanlist(unsigned pos)
 static void _cmd_close(int handle)
 {
     int res = nimble_netif_close(handle);
-    if (res != NIMBLE_NETIF_OK) {
+    if (res != 0) {
         puts("err: unable to close connection with given handle");
     }
     else {
@@ -390,7 +390,7 @@ static void _cmd_update(int handle, int itvl, int timeout)
     params.max_ce_len = BLE_GAP_INITIAL_CONN_MAX_CE_LEN;
 
     int res = nimble_netif_update(handle, &params);
-    if (res != NIMBLE_NETIF_OK) {
+    if (res != 0) {
         puts("err: unable to update connection parameters for given handle");
     }
     else {
