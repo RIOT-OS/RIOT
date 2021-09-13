@@ -101,6 +101,7 @@ tests/xtimer_*
 tests/ztimer_*
 examples/hello-world
 tests/ieee802154_hal
+tests/ieee802154_submac
 "}
 
 # This list prevents boards from being tested by the TEST_KCONFIG_TEST_ALLOWLIST
