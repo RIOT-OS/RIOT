@@ -8,5 +8,6 @@
 config HAS_RADIO_NRF802154
     bool
     select HAVE_NRF5X_RADIO
+    select MODULE_NRF802154 if MODULE_NETDEV_DEFAULT
     help
         Indicates that a IEEE 802.15.4 NRF52 radio is present.
