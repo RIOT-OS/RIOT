@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Freie Universität Berlin
+ * Copyright (C) 2019-2021 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -27,8 +27,30 @@
 #include "nimble_scanlist.h"
 #include "nimble/hci_common.h"
 
+static const char *_phys[] = { "N/A", "1M", "2M", "CODED" };
+
 static void _print_type(uint8_t type)
 {
+#if MYNEWT_VAL_BLE_EXT_ADV
+    if (type & NIMBLE_SCANNER_EXT_ADV) {
+        printf(" [EXT");
+        if (type & BLE_HCI_ADV_CONN_MASK) {
+            printf("-CONN");
+        }
+        if (type & BLE_HCI_ADV_SCAN_MASK) {
+            printf("-SCAN");
+        }
+        if (type & BLE_HCI_ADV_DIRECT_MASK) {
+            printf("-DIR");
+        }
+        if (type & BLE_HCI_ADV_SCAN_RSP_MASK) {
+            printf("-SCANRSP");
+        }
+        printf("]");
+        return;
+    }
+#endif
+
     switch (type) {
         case BLE_HCI_ADV_RPT_EVTYPE_ADV_IND:
             printf(" [IND]");
@@ -80,6 +102,7 @@ void nimble_scanlist_print_entry(nimble_scanlist_entry_t *e)
 
     nimble_addr_print(&e->addr);
     _print_type(e->type);
+    printf(" phy:%s-%s", _phys[e->phy_pri], _phys[e->phy_sec]);
     unsigned adv_int = ((e->last_update - e->first_update) / e->adv_msg_cnt);
     printf(" \"%s\", adv_msg_cnt: %u, adv_int: %uus, last_rssi: %i\n",
            name, (unsigned)e->adv_msg_cnt, adv_int, (int)e->last_rssi);
