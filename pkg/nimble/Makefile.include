@@ -77,12 +77,15 @@ endif
 ifneq (,$(filter nimble_addr,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/addr/include
 endif
+
 ifneq (,$(filter nimble_autoadv,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/autoadv/include
 endif
+
 ifneq (,$(filter nimble_autoconn,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/autoconn/include
 endif
+
 ifneq (,$(filter nimble_netif,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/netif/include
 
@@ -113,15 +116,19 @@ ifneq (,$(filter nimble_netif,$(USEMODULE)))
     CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_DATA_LEN_EXT=1
   endif
 endif
+
 ifneq (,$(filter nimble_rpble,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/rpble/include
 endif
+
 ifneq (,$(filter nimble_scanlist,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/scanlist/include
 endif
+
 ifneq (,$(filter nimble_scanner,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/scanner/include
 endif
+
 ifneq (,$(filter nimble_statconn,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/statconn/include
 endif
