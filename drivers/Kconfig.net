@@ -22,4 +22,36 @@ rsource "$(RIOTCPU)/native/socket_zep/Kconfig"
 rsource "sx126x/Kconfig"
 rsource "sx127x/Kconfig"
 rsource "tja1042/Kconfig"
+
+config MODULE_NETDEV_IEEE802154
+    bool
+    help
+        Netdev IEEE 802.15.4 module, provides common functionalities for
+        netdev based IEEE 802.15.4 devices.
+
+config MODULE_NETDEV_IEEE802154_SUBMAC
+    bool
+    select MODULE_IEEE802154_SUBMAC
+    help
+        Netdev IEEE 802.15.4 SubMAC, provides a netdev IEEE 802.15.4 device
+        implementation on top of the IEEE 802.15.4 SubMAC.
+
+config HAVE_IEEE802154_RADIO_HAL
+    bool
+    select HAVE_IEEE802154_RADIO
+    help
+        At least one device provides an IEEE 802.15.4 Radio HAL implementation
+
+config HAVE_NETDEV_IEEE802154
+    select HAVE_IEEE802154_RADIO
+    bool
+    help
+        At least one device provides an IEEE 802.15.4 Netdev driver
+        implementation
+
+config HAVE_IEEE802154_RADIO
+    bool
+    help
+        Indicates that a IEEE 802.15.4 radio is present.
+
 endmenu # Network Device Drivers
