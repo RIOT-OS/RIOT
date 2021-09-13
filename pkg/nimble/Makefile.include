@@ -86,6 +86,26 @@ ifneq (,$(filter nimble_autoconn,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/autoconn/include
 endif
 
+ifneq (,$(filter nimble_adv_ext,$(USEMODULE)))
+  CFLAGS += -DMYNEWT_VAL_BLE_EXT_ADV=1
+  CFLAGS += -DMYNEWT_VAL_BLE_LL_EXT_ADV_AUX_PTR_CNT=2
+  ifneq (,$(filter nimble_controller,$(USEMODULE)))
+    CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_LL_EXT_ADV=1
+  endif
+endif
+
+ifneq (,$(filter nimble_phy_2mbit,$(USEMODULE)))
+  ifneq (,$(filter nimble_controller,$(USEMODULE)))
+    CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_LE_2M_PHY=1
+  endif
+endif
+
+ifneq (,$(filter nimble_phy_coded,$(USEMODULE)))
+  ifneq (,$(filter nimble_controller,$(USEMODULE)))
+    CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_LE_CODED_PHY=1
+  endif
+endif
+
 ifneq (,$(filter nimble_netif,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/netif/include
 
