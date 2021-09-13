@@ -4,8 +4,10 @@ include ../Makefile.tests_common
 BOARD ?= native
 TAP ?= tap0
 
-# Shorten default TCP timeouts to speedup testing
-MSL_MS ?= 1000
+# Enable experimental feature "Dynamic MSL" to speedup testing
+ENABLE_DYNAMIC_MSL ?= 1
+
+# Shorten default connection TCP timeout to speedup testing
 TIMEOUT_MS ?= 3000
 
 # Set custom GNRC_TCP_NO_TIMEOUT constant for testing purposes
@@ -29,8 +31,8 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_tcp
 USEMODULE += gnrc_pktbuf_cmd
-USEMODULE += gnrc_netif_single          # Only one interface used and it makes
-                                        # shell commands easier
+USEMODULE += gnrc_netif_single    # Only one interface used and it makes
+                                  # shell commands easier
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += od
@@ -45,15 +47,16 @@ ethos:
 
 include $(RIOTBASE)/Makefile.include
 
-# Set CONFIG_GNRC_TCP_MSL via CFLAGS if not being set via Kconfig
-ifndef CONFIG_GNRC_TCP_MSL_MS
-  CFLAGS += -DCONFIG_GNRC_TCP_MSL_MS=$(MSL_MS)
-endif
-
 # Set CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION via CFLAGS if not being set
 # via Kconfig
 ifndef CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION_MS
   CFLAGS += -DCONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION_MS=$(TIMEOUT_MS)
+endif
+
+# Set CONFIG_GNRC_TCP_EXPERIMENTAL_DYN_MSL_EN via CFLAGS if not being set
+# via Kconfig
+ifndef CONFIG_GNRC_TCP_EXPERIMENTAL_DYN_MSL_EN
+  CFLAGS += -DCONFIG_GNRC_TCP_EXPERIMENTAL_DYN_MSL_EN=$(ENABLE_DYNAMIC_MSL)
 endif
 
 # Set the shell echo configuration via CFLAGS if not being controlled via Kconfig
