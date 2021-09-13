@@ -32,13 +32,6 @@
 
 
 /**
- * @brief   Driver support arbitrary bus speed
- */
-#if !defined(CPU_KINETIS)
-#define HAS_ARBITRARY_BUS_SPEED
-#endif
-
-/**
  * @brief   Default port number used for the CS pin if unassigned
  */
 #ifndef DEFAULT_SPI_CS_PORT
@@ -162,12 +155,8 @@ int cmd_init(int argc, char **argv)
         puts("\t\t2: SPI_CLK_1MHZ*");
         puts("\t\t3: SPI_CLK_5MHZ*");
         puts("\t\t4: SPI_CLK_10MHZ*");
-#ifdef HAS_ARBITRARY_BUS_SPEED
         puts("\t\t * Deprecated: use arbitrary value insteed");
         puts("\t\tn: arbitrary value in Hz");
-#else
-        puts("\t\t * arbitrary value not implemented yet");
-#endif
         puts("\tcs port:");
         puts("\t\tPort of the CS pin, set to -1 for hardware chip select");
         puts("\tcs pin:");
@@ -208,12 +197,7 @@ int cmd_init(int argc, char **argv)
         case 3: spiconf.clk = spi_get_clk(SPI_DEV(dev), SPI_CLK_5MHZ);   break;
         case 4: spiconf.clk = spi_get_clk(SPI_DEV(dev), SPI_CLK_10MHZ);  break;
         default:
-#ifdef HAS_ARBITRARY_BUS_SPEED
             spiconf.clk = spi_get_clk(SPI_DEV(dev), clk);
-#else
-            puts("error: invalid bus speed specified");
-            return 1;
-#endif
     }
 
     /* parse chip select port and pin */
