@@ -131,3 +131,4 @@ extern "C" {
 #endif /* DOXYGEN */
 
 #endif /* ESP_COMMON_H */
+/** @} */

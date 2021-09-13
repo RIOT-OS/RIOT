@@ -44,7 +44,7 @@ extern "C" {
  * @{
  */
 #define CPUID_LEN                       (16U)
-/* @} */
+/** @} */
 
 #ifdef __cplusplus
 }

@@ -247,11 +247,11 @@ typedef struct {
     reg32_t INFRCLKDIVS; /**< infrastructure clock division factor for sleep mode */
     reg32_t INFRCLKDIVDS; /**< infrastructure clock division factor for deep sleep mode */
     reg32_t VDCTL; /**< MCU voltage domain control */
-    reg32_t __reserved1[6]; /**< meh */
+    reg32_t __reserved1[6]; /**< Reserved */
     reg32_t CLKLOADCTL; /**< clock load control */
     reg32_t RFCCLKG; /**< RFC clock gate */
     reg32_t VIMSCLKG; /**< VIMS clock gate */
-    reg32_t __reserved2[2]; /**< meh */
+    reg32_t __reserved2[2]; /**< Reserved */
     reg32_t SECDMACLKGR; /**< TRNG, CRYPTO, and UDMA clock gate for run mode */
     reg32_t SECDMACLKGS; /**< TRNG, CRYPTO, and UDMA clock gate for sleep mode */
     reg32_t SECDMACLKGDS; /**< TRNG, CRYPTO, and UDMA clock gate for deep sleep mode */
@@ -273,11 +273,11 @@ typedef struct {
     reg32_t I2SCLKGR; /**< I2S clock gate for run mode */
     reg32_t I2SCLKGS; /**< I2S clock gate for sleep mode */
     reg32_t I2SCLKGDS; /**< I2S clock gate for deep sleep mode */
-    reg32_t __reserved3[9]; /**< meh */
+    reg32_t __reserved3[9]; /**< Reserved */
     reg32_t SYSBUSCLKDIV; /**< System bus clock division factor */
     reg32_t CPUCLKDIV; /**< CPU clock division factor */
     reg32_t PERBUSCPUCLKDIV; /**< Peripheral bus division factor */
-    reg32_t __reserved4; /**< meh */
+    reg32_t __reserved4; /**< Reserved */
     reg32_t PERDMACLKDIV; /**< DMA clock division factor */
     reg32_t I2SBCLKSEL; /**< I2S clock select */
     reg32_t GPTCLKDIV; /**< GPT scalar */
@@ -285,7 +285,7 @@ typedef struct {
     reg32_t I2SMCLKDIV; /**< MCLK division ratio */
     reg32_t I2SBCLKDIV; /**< BCLK division ratio */
     reg32_t I2SWCLKDIV; /**< WCLK division ratio */
-    reg32_t __reserved5[4]; /**< meh */
+    reg32_t __reserved5[4]; /**< Reserved */
     reg32_t RESETSECDMA; /**< Reset SEC and UDMA */
     reg32_t RESETGPIO; /**< Reset GPIO */
     reg32_t RESETGPT; /**< Reset GPTs */
@@ -293,39 +293,39 @@ typedef struct {
     reg32_t RESETUART; /**< Reset UART */
     reg32_t RESETSSI; /**< Reset SSI */
     reg32_t RESETI2S; /**< Reset I2S */
-    reg32_t __reserved6[8]; /**< meh */
+    reg32_t __reserved6[8]; /**< Reserved */
     reg32_t PDCTL0; /**< power domain control */
     reg32_t PDCTL0RFC; /**< RFC power domain control */
     reg32_t PDCTL0SERIAL; /**< SERIAL power domain control */
     reg32_t PDCTL0PERIPH; /**< PERIPH power domain control */
-    reg32_t __reserved7; /**< meh */
+    reg32_t __reserved7; /**< Reserved */
     reg32_t PDSTAT0; /**< power domain status */
     reg32_t PDSTAT0RFC; /**< RFC power domain status */
     reg32_t PDSTAT0SERIAL; /**< SERIAL power domain status */
     reg32_t PDSTAT0PERIPH; /**< PERIPH power domain status */
-    reg32_t __reserved8[11]; /**< meh */
+    reg32_t __reserved8[11]; /**< Reserved */
     reg32_t PDCTL1; /**< power domain control */
     reg32_t __reserved9; /**< power domain control */
     reg32_t PDCTL1CPU; /**< CPU power domain control */
     reg32_t PDCTL1RFC; /**< RFC power domain control */
     reg32_t PDCTL1VIMS; /**< VIMS power domain control */
-    reg32_t __reserved10; /**< meh */
+    reg32_t __reserved10; /**< Reserved */
     reg32_t PDSTAT1; /**< power domain status */
     reg32_t PDSTAT1BUS; /**< BUS power domain status */
     reg32_t PDSTAT1RFC; /**< RFC power domain status */
     reg32_t PDSTAT1CPU; /**< CPU power domain status */
     reg32_t PDSTAT1VIMS; /**< VIMS power domain status */
-    reg32_t __reserved11[9]; /**< meh */
+    reg32_t __reserved11[9]; /**< Reserved */
     reg32_t RFCBITS; /**< Control to RFC */
     reg32_t RFCMODESEL; /**< selected RFC mode */
     reg32_t RFCMODEHWOPT; /**< allowed RFC modes */
-    reg32_t __reserved12[2]; /**< meh */
+    reg32_t __reserved12[2]; /**< Reserved */
     reg32_t PWRPROFSTAT; /**< power profiler register */
-    reg32_t __reserved13[14]; /**< meh */
+    reg32_t __reserved13[14]; /**< Reserved */
     reg32_t MCUSRAMCFG; /**< MCU SRAM configuration */
-    reg32_t __reserved14; /**< meh */
+    reg32_t __reserved14; /**< Reserved */
     reg32_t RAMRETEN; /**< memory retention control */
-    reg32_t __reserved15[27]; /**< meh */
+    reg32_t __reserved15[27]; /**< Reserved */
     reg32_t OSCIMSC; /**< oscillator interrupt mask */
     reg32_t OSCRIS; /**< oscillator raw interrupt status */
     reg32_t OSCICR; /**< oscillator raw interrupt clear */
@@ -370,12 +370,13 @@ typedef struct {
 #define UARTCLKGDS_CLK_EN_UART1 0x2
 /** @} */
 
-/** @ingroup cpu_specific_peripheral_memory_map
-  * @{
-  */
+/**
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
+ */
 #define PRCM_BASE        (PERIPH_BASE + 0x82000) /**< PRCM base address */
 #define PRCM_BASE_NONBUF (PERIPH_BASE_NONBUF + 0x82000) /**< PRCM base address (nonbuf) */
-/*@}*/
+/** @} */
 
 #define PRCM        ((prcm_regs_t *) (PRCM_BASE)) /**< PRCM register bank */
 #define PRCM_NONBUF ((prcm_regs_t *) (PRCM_BASE_NONBUF)) /**< PRCM register bank (nonbuf) */
@@ -385,5 +386,4 @@ typedef struct {
 #endif
 
 #endif /* CC26X2_CC13X2_PRCM_H */
-
-/*@}*/
+/** @} */

@@ -93,7 +93,6 @@ typedef enum {
     ADC_RES_14BIT = 0xfe,                       /**< not supported */
     ADC_RES_16BIT = 0xfd                        /**< not supported */
 } adc_res_t;
-/** @} */
 #endif /* DOXYGEN */
 
 /**
@@ -128,7 +127,6 @@ static const gpio_t rtc_tamper_pins[RTC_NUM_OF_TAMPERS] = {
 /**
  * @brief   NVM User Page Mapping - Dedicated Entries
  *          Config values will be applied at power-on.
- * @{
  */
 struct sam0_aux_cfg_mapping {
     /* config word 0 */
@@ -162,7 +160,7 @@ struct sam0_aux_cfg_mapping {
 };
 
 /**
- * @brief   QSPI pins are fixed
+ * @name QSPI pins are fixed
  * @{
  */
 #define SAM0_QSPI_PIN_CLK       GPIO_PIN(PB, 10)    /**< Clock        */

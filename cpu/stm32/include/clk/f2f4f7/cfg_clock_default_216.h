@@ -62,6 +62,7 @@ extern "C" {
 
 /**
  * @name    Clock bus settings (APB1 and APB2)
+ * @{
  */
 #ifndef CONFIG_CLOCK_APB1_DIV
 #define CONFIG_CLOCK_APB1_DIV           (4)         /* max 54MHz */

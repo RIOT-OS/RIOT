@@ -60,7 +60,6 @@ typedef enum {
     ADC_RES_16BIT = 0xfd                        /**< not supported */
 } adc_res_t;
 #endif /* ndef DOXYGEN */
-/** @} */
 
 /**
  * @brief   The MCU has a 10 bit DAC
@@ -94,7 +93,6 @@ static const gpio_t rtc_tamper_pins[RTC_NUM_OF_TAMPERS] = {
 /**
  * @brief   NVM User Row Mapping - Dedicated Entries
  *          Config values will be applied at power-on.
- * @{
  */
 struct sam0_aux_cfg_mapping {
     /* config word 0 */
@@ -138,7 +136,6 @@ struct sam0_aux_cfg_mapping {
     /* config word 7 */
     uint32_t user_crc;            /**< CRC of NVM User Row bits 223:64 (words 2…6)      */
 };
-/** @} */
 
 #ifdef __cplusplus
 }

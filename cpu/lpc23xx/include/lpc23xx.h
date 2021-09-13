@@ -148,7 +148,6 @@ extern "C" {
 #define TXEMR          0x3C
 #define TXCTCR         0x70
 /** @} */
-/** @} */
 
 #ifdef __cplusplus
 }

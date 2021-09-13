@@ -16,8 +16,6 @@
  *
  * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @author Heiko Will <heiko.will@fu-berlin.de>
- *
- * @}
  */
 #ifndef THREAD_ARCH_H
 #define THREAD_ARCH_H

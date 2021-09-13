@@ -89,5 +89,4 @@ typedef struct {
 #endif
 
 #endif /* CC2538_GPTIMER_H */
-
-/* @} */
+/** @} */

@@ -168,5 +168,4 @@ typedef struct {
 #endif
 
 #endif /* CC26XX_CC13XX_RFC_H */
-
-/*@}*/
+/** @} */

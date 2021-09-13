@@ -175,6 +175,7 @@ extern "C" {
 #define CONFIG_CLOCK_APB2_DIV           (2)
 #endif
 #define CLOCK_APB2                      (CLOCK_AHB / CONFIG_CLOCK_APB2_DIV)     /* PCLK1, max: 48/64/80/120MHz */
+/** @} */
 
 #ifdef __cplusplus
 }

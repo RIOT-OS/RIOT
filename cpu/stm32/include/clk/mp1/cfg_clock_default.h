@@ -50,6 +50,7 @@
 
 /**
  * @name    MP1 clock bus settings (MCU, APB1, APB2 and APB3)
+ * @{
  */
 #ifndef CONFIG_CLOCK_MCU_DIV
 #define CONFIG_CLOCK_MCU_DIV            (1)         /* max 208MHz */

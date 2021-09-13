@@ -141,11 +141,11 @@ enum {
     GPIO_PORTS_NUMOF        /**< overall number of available ports */
 };
 
+#if DOXYGEN
 /**
  * @name    ADC CPU configuration
  * @{
  */
-#if DOXYGEN
 /**
  * @brief Define if ADC external capacitor is connected to PA06 pin.
  *
@@ -154,6 +154,7 @@ enum {
  * macro should be defined by the board to make the ADC block use it.
  */
 #define BOARD_HAS_ADC_PA06_CAP
+/** @} */
 #endif
 
 #ifndef DOXYGEN
@@ -206,7 +207,6 @@ typedef enum {
  * Define to one of the qn908x_adc_clock_t values.
  */
 #define QN908X_ADC_CLOCK
-/** @} */
 #endif /* ifdef DOXYGEN */
 
 /**
