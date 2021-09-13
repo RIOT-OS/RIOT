@@ -106,7 +106,7 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
     EFM_ASSERT(!(clkdiv & ~_USART_CLKDIV_MASK));
 
     /* =================================================================
-     * 
+     *
      * The manual say that `the clock division factor have a 15-bit
      * integral part and a 5-bit fractional part` but only the integral
      * part was used in the gecko SDK.

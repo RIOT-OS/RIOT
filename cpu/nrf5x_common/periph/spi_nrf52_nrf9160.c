@@ -185,7 +185,7 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 {
     (void)bus;
 
-    if (freq >= MHZ(8)) { 
+    if (freq >= MHZ(8)) {
         return SPI_FREQUENCY_FREQUENCY_M8;
     }
     if (freq >= MHZ(4)) {

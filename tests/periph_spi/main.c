@@ -141,7 +141,7 @@ static int _check_dev(int dev)
         return 1;
     }
     return 0;
-}    
+}
 
 int cmd_init(int argc, char **argv)
 {
