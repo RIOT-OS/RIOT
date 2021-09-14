@@ -136,7 +136,7 @@ typedef struct {
 /**
  * @brief FCFG register bank
  */
-#define FCFG    ((fcfg_regs_t *) (FCFG_BASE)
+#define FCFG    ((fcfg_regs_t *) (FCFG_BASE))
 
 #ifdef __cplusplus
 } /* end extern "C" */
