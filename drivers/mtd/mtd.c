@@ -138,22 +138,37 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count)
 }
 
 #ifdef MODULE_MTD_WRITE_PAGE
-int mtd_write_page(mtd_dev_t *mtd, const void *data, uint32_t page,
-                   uint32_t offset, uint32_t len)
+/**
+ * @brief   Write to a sector on a Memory Technology Device (MTD) by performing a
+ *          read-modify-write cycle.
+ *
+ *          This reads the sector into RAM, modifies it, clears the sector on the
+ *          device and writes it back from RAM.
+ *
+ * @param[in]  mtd      Pointer to the selected device
+ * @param[in]  data     Pointer to the data to be written
+ * @param[in]  sector   Sector to write
+ * @param[in]  offset   Byte offset from the start of the sector
+ * @param[in]  size     Number of bytes
+ *
+ * @return bytes written on success
+ * @return < 0 value on error
+ */
+static size_t _write_sector(mtd_dev_t *mtd, const void *data, uint32_t sector,
+                            uint32_t offset, uint32_t len)
 {
-    if (!mtd || !mtd->driver) {
-        return -ENODEV;
-    }
-
-    if (mtd->work_area == NULL) {
-        return mtd_write_page_raw(mtd, data, page, offset, len);
-    }
-
     int res;
     uint8_t *work = mtd->work_area;
-    const uint32_t sector = page / mtd->pages_per_sector;
     const uint32_t sector_page = sector * mtd->pages_per_sector;
     const uint32_t sector_size = mtd->pages_per_sector * mtd->page_size;
+
+    if (offset >= sector_size) {
+        return len;
+    }
+
+    if (offset + len > sector_size) {
+        len = sector_size - offset;
+    }
 
     /* copy sector to RAM */
     res = mtd_read_page(mtd, work, sector_page, 0, sector_size);
@@ -168,10 +183,47 @@ int mtd_write_page(mtd_dev_t *mtd, const void *data, uint32_t page,
     }
 
     /* modify sector in RAM */
-    memcpy(work + (page - sector_page) * mtd->page_size + offset, data, len);
+    memcpy(work + offset, data, len);
 
     /* write back modified sector copy */
-    return mtd_write_page_raw(mtd, work, sector_page, 0, sector_size);
+    res = mtd_write_page_raw(mtd, work, sector_page, 0, sector_size);
+    if (res < 0) {
+        return res;
+    }
+
+    return len;
+}
+
+int mtd_write_page(mtd_dev_t *mtd, const void *data, uint32_t page,
+                   uint32_t offset, uint32_t len)
+{
+    if (!mtd || !mtd->driver) {
+        return -ENODEV;
+    }
+
+    if (mtd->work_area == NULL) {
+        return mtd_write_page_raw(mtd, data, page, offset, len);
+    }
+
+    uint32_t sector = page / mtd->pages_per_sector;
+    const uint32_t sector_page = sector * mtd->pages_per_sector;
+    const char *src = data;
+
+    offset += (page - sector_page) * mtd->page_size;
+
+    while (len) {
+        int written = _write_sector(mtd, src, sector, offset, len);
+        if (written < 0) {
+            return written;
+        }
+
+        len -= written;
+        src += written;
+        offset = 0;
+        ++sector;
+    }
+
+    return 0;
 }
 #endif
 
