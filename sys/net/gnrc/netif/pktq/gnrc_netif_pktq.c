@@ -20,6 +20,9 @@
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/netif/pktq.h"
 
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
 static gnrc_pktqueue_t _pool[CONFIG_GNRC_NETIF_PKTQ_POOL_SIZE];
 
 static gnrc_pktqueue_t *_get_free_entry(void)
@@ -61,7 +64,7 @@ int gnrc_netif_pktq_put(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
 void gnrc_netif_pktq_sched_get(gnrc_netif_t *netif)
 {
-#if CONFIG_GNRC_NETIF_PKTQ_TIMER_US >= 0
+#if CONFIG_GNRC_NETIF_PKTQ_TIMER_US > 0
     assert(netif != NULL);
     netif->send_queue.dequeue_msg.type = GNRC_NETIF_PKTQ_DEQUEUE_MSG;
     /* Prevent timer from firing while we add this.
@@ -75,7 +78,13 @@ void gnrc_netif_pktq_sched_get(gnrc_netif_t *netif)
                    CONFIG_GNRC_NETIF_PKTQ_TIMER_US,
                    &netif->send_queue.dequeue_msg, netif->pid);
     irq_restore(state);
-#else   /* CONFIG_GNRC_NETIF_PKTQ_TIMER_US >= 0 */
+#elif CONFIG_GNRC_NETIF_PKTQ_TIMER_US == 0
+    assert(netif != NULL);
+    netif->send_queue.dequeue_msg.type = GNRC_NETIF_PKTQ_DEQUEUE_MSG;
+    if (msg_send(&netif->send_queue.dequeue_msg, netif->pid) < 0) {
+        DEBUG("gnrc_netif_pktq: couldn't schedule packet (msg queue is full)\n");
+    }
+#else
     (void)netif;
 #endif  /* CONFIG_GNRC_NETIF_PKTQ_TIMER_US >= 0 */
 }
