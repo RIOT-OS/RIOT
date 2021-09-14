@@ -438,6 +438,12 @@ static int cmd_test(int argc, char **argv)
     assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str_2)) == 0);
     assert(memcmp(test_str_2, buffer, sizeof(test_str_2)) == 0);
 
+    /* test write_page across sectors */
+    offset = dev->pages_per_sector * dev->page_size - 2;
+    assert(mtd_write_page(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
+    assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
+    assert(memcmp(test_str, buffer, sizeof(test_str)) == 0);
+
     puts("[SUCCESS]");
 
     free(buffer);
