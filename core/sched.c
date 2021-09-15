@@ -75,8 +75,8 @@ clist_node_t sched_runqueues[SCHED_PRIO_LEVELS];
 static uint32_t runqueue_bitcache = 0;
 
 #ifdef MODULE_SCHED_CB
-static void (*sched_cb) (kernel_pid_t active_thread,
-                         kernel_pid_t next_thread) = NULL;
+static void (*sched_cb)(kernel_pid_t active_thread,
+                        kernel_pid_t next_thread) = NULL;
 #endif
 
 /* Depending on whether the CLZ instruction is available, the order of the
@@ -156,6 +156,10 @@ thread_t *__attribute__((used)) sched_run(void)
     thread_t *next_thread = container_of(sched_runqueues[nextrq].next->next,
                                          thread_t, rq_entry);
 
+#if (IS_USED(MODULE_SCHED_RUNQ_CALLBACK))
+    sched_runq_callback(nextrq);
+#endif
+
     DEBUG(
         "sched_run: active thread: %" PRIkernel_pid ", next thread: %" PRIkernel_pid "\n",
         (kernel_pid_t)((active_thread == NULL)
@@ -220,6 +224,16 @@ void sched_set_status(thread_t *process, thread_status_t status)
             clist_rpush(&sched_runqueues[process->priority],
                         &(process->rq_entry));
             _set_runqueue_bit(process);
+
+            /* some thread entered a runqueue
+             * if it is the active runqueue
+             * inform the runqueue_change callback */
+#if (IS_USED(MODULE_SCHED_RUNQ_CALLBACK))
+            thread_t *active_thread = thread_get_active();
+            if (active_thread && active_thread->priority == process->priority) {
+                sched_runq_callback(process->priority);
+            }
+#endif
         }
     }
     else {
@@ -231,6 +245,9 @@ void sched_set_status(thread_t *process, thread_status_t status)
 
             if (!sched_runqueues[process->priority].next) {
                 _clear_runqueue_bit(process);
+#if (IS_USED(MODULE_SCHED_RUNQ_CALLBACK))
+                sched_runq_callback(process->priority);
+#endif
             }
         }
     }

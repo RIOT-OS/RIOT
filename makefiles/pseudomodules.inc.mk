@@ -135,6 +135,7 @@ PSEUDOMODULES += saul_nrf_vddh
 PSEUDOMODULES += saul_pwm
 PSEUDOMODULES += scanf_float
 PSEUDOMODULES += sched_cb
+PSEUDOMODULES += sched_runq_callback
 PSEUDOMODULES += semtech_loramac_rx
 PSEUDOMODULES += shell_hooks
 PSEUDOMODULES += slipdev_stdio
