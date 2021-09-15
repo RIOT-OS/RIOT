@@ -249,7 +249,13 @@ size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload,
     lorawan_hdr_set_maj(lw_hdr, MAJOR_LRWAN_R1);
 
     lw_hdr->addr = mac->dev_addr;
+
     lw_hdr->fctrl = 0;
+
+    if (mac->mlme.sync) {
+        /* The pending bit is used to indicate class B frames */
+        lorawan_hdr_set_frame_pending(lw_hdr, true);
+    }
 
     lorawan_hdr_set_ack(lw_hdr, mac->mcps.ack_requested);
 
@@ -288,12 +294,17 @@ static void _end_of_tx(gnrc_lorawan_t *mac, int type, int status)
 
     mac->mcps.fcnt++;
 
-    gnrc_lorawan_mac_release(mac);
+    mlme_confirm.status = -ETIMEDOUT;
 
     if (mac->mlme.pending_mlme_opts & GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ) {
         mlme_confirm.type = MLME_LINK_CHECK;
-        mlme_confirm.status = -ETIMEDOUT;
         mac->mlme.pending_mlme_opts &= ~GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ;
+        gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
+    }
+
+    if (mac->mlme.pending_mlme_opts & GNRC_LORAWAN_MLME_OPTS_DEVICE_TIME_REQ) {
+        mlme_confirm.type = MLME_DEVICE_TIME;
+        mac->mlme.pending_mlme_opts &= ~GNRC_LORAWAN_MLME_OPTS_DEVICE_TIME_REQ;
         gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
     }
 
@@ -302,6 +313,18 @@ static void _end_of_tx(gnrc_lorawan_t *mac, int type, int status)
     mcps_confirm.msdu = mac->mcps.msdu;
     mac->mcps.msdu = NULL;
     gnrc_lorawan_mcps_confirm(mac, &mcps_confirm);
+}
+
+void gnrc_lorawan_class_b_finish(gnrc_lorawan_t *mac)
+{
+    mcps_confirm_t mcps_confirm;
+    mac->mcps.fcnt++;
+    if (mac->mcps.waiting_for_ack == false) {
+        mcps_confirm.status = GNRC_LORAWAN_REQ_STATUS_SUCCESS;
+        mcps_confirm.msdu = mac->mcps.msdu;
+        mac->mcps.msdu = NULL;
+        gnrc_lorawan_mcps_confirm(mac, &mcps_confirm);
+    }
 }
 
 static void _transmit_pkt(gnrc_lorawan_t *mac)
@@ -341,7 +364,7 @@ static void _handle_retransmissions(gnrc_lorawan_t *mac)
     if (mac->mcps.nb_trials-- == 0) {
         _end_of_tx(mac, MCPS_CONFIRMED, -ETIMEDOUT);
     } else {
-        gnrc_lorawan_set_timer(mac, 1000000 + random_uint32_range(0, 2000000));
+        gnrc_lorawan_set_timer(mac, 1000 + random_uint32_range(0, 2000));
     }
 }
 
@@ -353,7 +376,6 @@ void gnrc_lorawan_event_no_rx(gnrc_lorawan_t *mac)
         /* This was a Join Request */
         mlme_confirm.type = MLME_JOIN;
         mlme_confirm.status = -ETIMEDOUT;
-        gnrc_lorawan_mac_release(mac);
         gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
         return;
     }
@@ -373,14 +395,15 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
                                mcps_confirm_t *mcps_confirm)
 {
     iolist_t *pkt = mcps_request->data.pkt;
+    assert(pkt);
 
     if (mac->mlme.activation == MLME_ACTIVATION_NONE) {
         DEBUG("gnrc_lorawan_mcps: LoRaWAN not activated\n");
         mcps_confirm->status = -ENOTCONN;
-        goto out;
+        return;
     }
 
-    if (!gnrc_lorawan_mac_acquire(mac)) {
+    if (mac->state != LORAWAN_STATE_IDLE) {
         mcps_confirm->status = -EBUSY;
         return;
     }
@@ -388,12 +411,12 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
     if (mcps_request->data.port < LORAMAC_PORT_MIN ||
         mcps_request->data.port > LORAMAC_PORT_MAX) {
         mcps_confirm->status = -EBADMSG;
-        goto out;
+        return;
     }
 
     if (!gnrc_lorawan_validate_dr(mcps_request->data.dr)) {
         mcps_confirm->status = -EINVAL;
-        goto out;
+        return;
     }
 
     uint8_t fopts_length = gnrc_lorawan_build_options(mac, NULL);
@@ -405,7 +428,7 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
     if (mac_payload_size >
         gnrc_lorawan_region_mac_payload_max(mcps_request->data.dr)) {
         mcps_confirm->status = -EMSGSIZE;
-        goto out;
+        return;
     }
 
     int waiting_for_ack = mcps_request->type == MCPS_CONFIRMED;
@@ -422,11 +445,6 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
     mac->last_dr = mcps_request->data.dr;
     _transmit_pkt(mac);
     mcps_confirm->status = GNRC_LORAWAN_REQ_STATUS_DEFERRED;
-out:
-
-    if (mcps_confirm->status != GNRC_LORAWAN_REQ_STATUS_DEFERRED) {
-        gnrc_lorawan_mac_release(mac);
-    }
 }
 
 /** @} */

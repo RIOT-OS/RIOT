@@ -31,6 +31,10 @@
 #define APP_SKEY_B0_START (0x1)
 #define NWK_SKEY_B0_START (0x2)
 
+static uint8_t beacon_key[LORAMAC_APPKEY_LEN] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
+
+
 static cmac_context_t CmacContext;
 static uint8_t digest[LORAMAC_APPKEY_LEN];
 static cipher_t AesContext;
@@ -122,6 +126,23 @@ void gnrc_lorawan_encrypt_payload(iolist_t *iolist, const le_uint32_t *dev_addr,
             c++;
         }
     }
+}
+
+/* It works :) */
+/* TODO: Optimize */
+int gnrc_lorawan_calculate_slot(const void *beacon_time, const void *dev_addr, int ping_period)
+{
+    uint8_t rand[16];
+    uint8_t out[16];
+
+    memset(rand, 0, sizeof(rand));
+    memcpy(rand, beacon_time, 4);
+    memcpy(rand+4, dev_addr, 4);
+
+    cipher_init(&AesContext, CIPHER_AES_128, beacon_key, LORAMAC_APPKEY_LEN);
+    cipher_encrypt(&AesContext, rand, out);
+
+    return (out[0] + (out[1] << 8)) % ping_period;
 }
 
 void gnrc_lorawan_decrypt_join_accept(const uint8_t *key, uint8_t *pkt,

@@ -37,12 +37,16 @@
 #define GNRC_LORAWAN_DL_DR_OFFSET_MASK    (0x70)    /**< DL Settings RX2 DR mask */
 #define GNRC_LORAWAN_DL_DR_OFFSET_POS     (4)       /**< DL Settings RX2 DR pos */
 
+void gnrc_lorawan_schedule_next_pingslot(gnrc_lorawan_t *mac);
+
 static inline void gnrc_lorawan_mlme_reset(gnrc_lorawan_t *mac)
 {
     mac->mlme.activation = MLME_ACTIVATION_NONE;
     mac->mlme.pending_mlme_opts = 0;
     mac->rx_delay = (CONFIG_LORAMAC_DEFAULT_RX1_DELAY / MS_PER_SEC);
     mac->mlme.nid = CONFIG_LORAMAC_DEFAULT_NETID;
+
+    mac->mlme.sync = false;
 }
 
 static inline void gnrc_lorawan_mlme_backoff_init(gnrc_lorawan_t *mac)
@@ -79,7 +83,9 @@ void gnrc_lorawan_init(gnrc_lorawan_t *mac, uint8_t *nwkskey, uint8_t *appskey)
 {
     mac->nwkskey = nwkskey;
     mac->appskey = appskey;
-    mac->busy = false;
+    mac->mlme.ping_period = 1<<(12 - CONFIG_GNRC_LORAWAN_PING_NB_EXP);
+    mac->mlme.ps_dr = CONFIG_GNRC_LORAWAN_DEFAULT_PING_SLOT_DR;
+    mac->mlme.ps_channel = CONFIG_GNRC_LORAWAN_DEFAULT_PING_SLOT_CHANNEL;
     gnrc_lorawan_mlme_backoff_init(mac);
     gnrc_lorawan_reset(mac);
 }
@@ -125,6 +131,12 @@ static void _config_radio(gnrc_lorawan_t *mac, uint32_t channel_freq,
 
     gnrc_lorawan_set_dr(mac, dr);
 
+    netopt_enable_t en = true;
+    dev->driver->set(dev, NETOPT_INTEGRITY_CHECK, &en, sizeof(en));
+
+    const netopt_enable_t fixed = false;
+    dev->driver->set(dev, NETOPT_FIXED_HEADER, &fixed, sizeof(fixed));
+
     if (rx) {
         /* Switch to single listen mode */
         const netopt_enable_t single = true;
@@ -147,10 +159,23 @@ void gnrc_lorawan_open_rx_window(gnrc_lorawan_t *mac)
 
     /* Switch to RX state */
     if (mac->state == LORAWAN_STATE_RX_1) {
-        gnrc_lorawan_set_timer(mac, US_PER_SEC);
+        gnrc_lorawan_set_timer(mac, mac->mlme.rx_ref + MS_PER_SEC - gnrc_lorawan_timer_now(mac));
     }
     netopt_state_t state = NETOPT_STATE_RX;
 
+    dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
+}
+
+void _config_pingslot_rx_window(gnrc_lorawan_t *mac)
+{
+    _config_radio(mac, mac->mlme.ps_channel, mac->mlme.ps_dr , true);
+}
+
+static void gnrc_lorawan_ping_slot_rx(gnrc_lorawan_t *mac)
+{
+    mac->state = LORAWAN_STATE_PING_SLOT;
+    netdev_t *dev = gnrc_lorawan_get_netdev(mac);
+    netopt_state_t state = NETOPT_STATE_RX;
     dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
 }
 
@@ -164,6 +189,19 @@ void gnrc_lorawan_timeout_cb(gnrc_lorawan_t *mac)
         case LORAWAN_STATE_JOIN:
             gnrc_lorawan_trigger_join(mac);
             break;
+        case LORAWAN_STATE_BEACON_ACQUIRE:
+            puts("OPEN_BEACON");
+            gnrc_lorawan_enable_beacon_rx(mac);
+            break;
+        case LORAWAN_STATE_PING_SLOT:
+            assert(false);
+            break;
+        case LORAWAN_STATE_IDLE:
+            puts("OPEN_PING_SLOT");
+            gnrc_lorawan_ping_slot_rx(mac);
+            break;
+        case LORAWAN_STATE_TX:
+            break;
         default:
             gnrc_lorawan_event_ack_timeout(mac);
             break;
@@ -172,23 +210,34 @@ void gnrc_lorawan_timeout_cb(gnrc_lorawan_t *mac)
 
 void gnrc_lorawan_radio_tx_done_cb(gnrc_lorawan_t *mac)
 {
-    mac->state = LORAWAN_STATE_RX_1;
+    mac->mlme.timestamp = gnrc_lorawan_timer_now(mac);
 
-    int rx_1;
+    if (mac->mlme.sync) {
+        mac->state = LORAWAN_STATE_IDLE;
+        _config_pingslot_rx_window(mac);
+        gnrc_lorawan_schedule_next_pingslot(mac);
+        gnrc_lorawan_class_b_finish(mac);
+    }
+    else {
+        mac->state = LORAWAN_STATE_RX_1;
 
-    /* if the MAC is not activated, then this is a Join Request */
-    rx_1 = mac->mlme.activation == MLME_ACTIVATION_NONE ?
-           CONFIG_LORAMAC_DEFAULT_JOIN_DELAY1 : mac->rx_delay;
+        int rx_1;
 
-    gnrc_lorawan_set_timer(mac, rx_1 * US_PER_SEC);
+        /* if the MAC is not activated, then this is a Join Request */
+        rx_1 = mac->mlme.activation == MLME_ACTIVATION_NONE ?
+               CONFIG_LORAMAC_DEFAULT_JOIN_DELAY1 : mac->rx_delay;
 
-    uint8_t dr_offset = (mac->dl_settings & GNRC_LORAWAN_DL_DR_OFFSET_MASK) >>
-                        GNRC_LORAWAN_DL_DR_OFFSET_POS;
+        mac->mlme.rx_ref = mac->mlme.timestamp + rx_1 * MS_PER_SEC;
+        gnrc_lorawan_set_timer(mac, mac->mlme.rx_ref - mac->mlme.timestamp);
 
-    _configure_rx_window(mac, 0,
-                         gnrc_lorawan_rx1_get_dr_offset(mac->last_dr,
-                                                        dr_offset));
+        uint8_t dr_offset = (mac->dl_settings & GNRC_LORAWAN_DL_DR_OFFSET_MASK) >>
+                            GNRC_LORAWAN_DL_DR_OFFSET_POS;
 
+        _configure_rx_window(mac, 0,
+                             gnrc_lorawan_rx1_get_dr_offset(mac->last_dr,
+                                                            dr_offset));
+
+    }
     _sleep_radio(mac);
 }
 
@@ -208,6 +257,17 @@ void gnrc_lorawan_radio_rx_timeout_cb(gnrc_lorawan_t *mac)
             gnrc_lorawan_event_no_rx(mac);
             mac->state = LORAWAN_STATE_IDLE;
             break;
+        case LORAWAN_STATE_PING_SLOT:
+            puts("BIEN WN");
+            mac->state = LORAWAN_STATE_IDLE;
+            gnrc_lorawan_schedule_next_pingslot(mac);
+            break;
+        case LORAWAN_STATE_IDLE:
+            assert(false);
+            break;
+        case LORAWAN_STATE_BEACON_ACQUISITION:
+            gnrc_lorawan_beacon_lost(mac);
+            break;
         default:
             assert(false);
             break;
@@ -220,6 +280,11 @@ void gnrc_lorawan_send_pkt(gnrc_lorawan_t *mac, iolist_t *psdu, uint8_t dr)
     netdev_t *dev = gnrc_lorawan_get_netdev(mac);
 
     mac->state = LORAWAN_STATE_TX;
+    if (mac->mlme.sync) 
+    {
+        /* Remove timer. Recalculate on TX_DONE */
+        gnrc_lorawan_remove_timer(mac);
+    }
 
     uint32_t chan = gnrc_lorawan_pick_channel(mac);
 
@@ -239,25 +304,66 @@ void gnrc_lorawan_send_pkt(gnrc_lorawan_t *mac, iolist_t *psdu, uint8_t dr)
 
 }
 
-void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, uint8_t *psdu,
-                                   size_t size)
+/* TODO: Rewrite */
+void gnrc_lorawan_enable_beacon_rx(gnrc_lorawan_t *mac)
+{
+    mac->state = LORAWAN_STATE_BEACON_ACQUISITION;
+    netdev_t *dev = gnrc_lorawan_get_netdev(mac);
+
+    uint32_t channel_freq = gnrc_lorawan_get_beacon_channel();
+    dev->driver->set(dev, NETOPT_CHANNEL_FREQUENCY, &channel_freq, sizeof(channel_freq));
+
+    netopt_enable_t iq_invert = false;
+    dev->driver->set(dev, NETOPT_IQ_INVERT, &iq_invert, sizeof(iq_invert));
+
+    gnrc_lorawan_set_dr(mac, gnrc_lorawan_get_beacon_dr());
+
+    const netopt_enable_t en = false;
+
+    dev->driver->set(dev, NETOPT_INTEGRITY_CHECK, &en, sizeof(en));
+
+    const netopt_enable_t fixed = true;
+    dev->driver->set(dev, NETOPT_FIXED_HEADER, &fixed, sizeof(fixed));
+
+    uint16_t pdu_length = 17;
+    dev->driver->set(dev, NETOPT_PDU_SIZE, &pdu_length, sizeof(uint16_t));
+
+    netopt_state_t state = NETOPT_STATE_RX;
+    dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
+}
+
+void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, uint8_t *psdu, size_t size, lora_rx_info_t *info)
 {
     assert(psdu);
+    puts("rx_done");
     _sleep_radio(mac);
-    mac->state = LORAWAN_STATE_IDLE;
-    gnrc_lorawan_remove_timer(mac);
+    if (psdu == NULL) {
+        return;
+    }
 
-    uint8_t mtype = (*psdu & MTYPE_MASK) >> 5;
+    if (mac->state != LORAWAN_STATE_BEACON_ACQUISITION) {
+        mac->state = LORAWAN_STATE_IDLE;
+        if (mac->mlme.sync == false) {
+            gnrc_lorawan_remove_timer(mac);
+        }
+        else {
+            gnrc_lorawan_schedule_next_pingslot(mac);
+        }
 
-    switch (mtype) {
-        case MTYPE_JOIN_ACCEPT:
-            gnrc_lorawan_mlme_process_join(mac, psdu, size);
-            break;
-        case MTYPE_CNF_DOWNLINK:
-        case MTYPE_UNCNF_DOWNLINK:
-            gnrc_lorawan_mcps_process_downlink(mac, psdu, size);
-            break;
-        default:
-            break;
+        uint8_t mtype = (*psdu & MTYPE_MASK) >> 5;
+        switch (mtype) {
+            case MTYPE_JOIN_ACCEPT:
+                gnrc_lorawan_mlme_process_join(mac, psdu, size);
+                break;
+            case MTYPE_CNF_DOWNLINK:
+            case MTYPE_UNCNF_DOWNLINK:
+                gnrc_lorawan_mcps_process_downlink(mac, psdu, size);
+                break;
+            default:
+                break;
+        }
+    }
+    else {
+        gnrc_lorawan_mlme_process_beacon(mac, psdu, size, info);
     }
 }

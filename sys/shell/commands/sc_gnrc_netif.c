@@ -79,6 +79,7 @@ static const struct {
     { "checksum", NETOPT_CHECKSUM },
     { "otaa", NETOPT_OTAA },
     { "link_check", NETOPT_LINK_CHECK },
+    { "sync", NETOPT_LORAWAN_DEVICE_CLASS },
 };
 
 /* utility functions */
@@ -368,6 +369,10 @@ static void _print_netopt(netopt_t opt)
 
         case NETOPT_CODING_RATE:
             printf("coding rate");
+            break;
+
+        case NETOPT_LORAWAN_DEVICE_CLASS:
+            printf("sync");
             break;
 #endif /* MODULE_GNRC_NETIF_CMD_LORA */
 #ifdef MODULE_NETDEV_IEEE802154_MULTIMODE

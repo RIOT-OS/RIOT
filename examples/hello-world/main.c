@@ -20,6 +20,10 @@
  */
 
 #include <stdio.h>
+#include "periph/gpio.h"
+#include "periph/rtt.h"
+#include "xtimer.h"
+#include "cpu.h"
 
 int main(void)
 {
@@ -28,5 +32,23 @@ int main(void)
     printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
     printf("This board features a(n) %s MCU.\n", RIOT_MCU);
 
+    uint32_t tmp;
+    gpio_init(GPIO_PIN(PORT_A, 8), GPIO_OUT);
+    gpio_clear(GPIO_PIN(PORT_A, 8));
+    printf("%i\n", RTT_FREQUENCY);
+    tmp = RCC->ICSCR;
+    tmp &= ~0xFF000000;
+    RCC->ICSCR = tmp;
+    gpio_set(GPIO_PIN(PORT_A, 8));
+    xtimer_sleep(10);
+    gpio_clear(GPIO_PIN(PORT_A, 8));
+    xtimer_sleep(1);
+    tmp = RCC->ICSCR;
+    tmp &= ~0xFF000000;
+    tmp |= 0xFF000000;
+    RCC->ICSCR = tmp;
+    gpio_set(GPIO_PIN(PORT_A, 8));
+    xtimer_sleep(10);
+    gpio_clear(GPIO_PIN(PORT_A, 8));
     return 0;
 }
