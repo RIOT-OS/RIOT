@@ -40,8 +40,8 @@
 /core/                                      @kaspar030
 
 /cpu/arm7_common/                           @kaspar030 @maribu
-/cpu/avr8_common/                           @kYc0o @roberthartung @maribu @nandojve
-/cpu/atmega*/                               @kYc0o @roberthartung @maribu
+/cpu/avr8_common/                           @kYc0o @maribu @nandojve
+/cpu/atmega*/                               @kYc0o @maribu
 /cpu/atxmega/                               @nandojve
 /cpu/cc2538/                                @hexluthor @smlng @fjmolinas
 /cpu/cc26x0/                                @hexluthor @smlng
@@ -126,7 +126,7 @@
 /sys/net/gnrc/netif/                        @miri64 @jia200x
 /sys/net/gnrc/routing/rpl/                  @cgundogan @emmanuelsearch
 /sys/net/                                   @miri64 @haukepetersen @PeterKietzmann @cgundogan
-/sys/pm_layered/                            @roberthartung @kaspar030
+/sys/pm_layered/                            @kaspar030
 /sys/random/fortuna/                        @basilfx
 /sys/riotboot/                              @kaspar030 @fjmolinas
 /sys/suit                                   @kaspar030 @fjmolinas @bergzand
@@ -150,4 +150,4 @@
 
 # KConfig maintainers will be notified about all KConfig changes
 Kconfig                                     @leandrolanzieri @jia200x @cgundogan
-pm.c                                        @roberthartung @kaspar030
+pm.c                                        @kaspar030
