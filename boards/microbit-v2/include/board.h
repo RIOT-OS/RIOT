@@ -84,6 +84,11 @@ extern "C" {
  */
 #define LSM303AGR_PARAM_ACC_ADDR    0x19
 #define LSM303AGR_PARAM_MAG_ADDR    0x1E
+/* The interrupt lines are both connected through an inverter to pin 0.01 */
+#define LSM303DLHC_PARAM_ACC_PIN    (GPIO_PIN(0, 25))
+#define LSM303DLHC_PARAM_MAG_PIN    (GPIO_PIN(0, 25))
+#define LSM303DLHC_PARAM_ACC_PIN_MODE GPIO_IN_PU
+#define LSM303DLHC_PARAM_MAG_PIN_MODE GPIO_IN_PU
 /** @} */
 
 #ifdef __cplusplus

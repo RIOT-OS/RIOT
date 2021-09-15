@@ -34,6 +34,16 @@
 #define DEV_MAG_PIN     (dev->params.mag_pin)
 #define DEV_MAG_RATE    (dev->params.mag_rate)
 #define DEV_MAG_GAIN    (dev->params.mag_gain)
+#define DEV_ACC_PIN_MODE (dev->params.acc_pin_mode)
+#define DEV_MAG_PIN_MODE (dev->params.mag_pin_mode)
+
+static inline bool _pin_is_idle(gpio_t pin, gpio_mode_t mode) {
+    if (mode == GPIO_IN_PU) {
+        return gpio_read(pin) != 0;
+    } else {
+        return gpio_read(pin) == 0;
+    }
+}
 
 int lsm303dlhc_init(lsm303dlhc_t *dev, const lsm303dlhc_params_t *params)
 {
@@ -66,22 +76,27 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, const lsm303dlhc_params_t *params)
     res += i2c_write_reg(DEV_I2C, DEV_ACC_ADDR,
                          LSM303DLHC_REG_CTRL3_A, LSM303DLHC_CTRL3_A_I1_NONE, 0);
     /* configure acc data ready pin */
-    gpio_init(DEV_ACC_PIN, GPIO_IN);
+    gpio_init(DEV_ACC_PIN, DEV_ACC_PIN_MODE);
 
     /* configure magnetometer and temperature */
     /* enable temperature output and set sample rate */
-    tmp = LSM303DLHC_TEMP_EN | DEV_MAG_RATE;
+//     tmp = LSM303DLHC_TEMP_EN | DEV_MAG_RATE;
+//     res += i2c_write_reg(DEV_I2C, DEV_MAG_ADDR,
+//                          LSM303DLHC_REG_CRA_M, tmp, 0);
+//     /* configure z-axis gain */
+//     res += i2c_write_reg(DEV_I2C, DEV_MAG_ADDR,
+//                          LSM303DLHC_REG_CRB_M, DEV_MAG_GAIN, 0);
+//     /* set continuous mode */
+//     res += i2c_write_reg(DEV_I2C, DEV_MAG_ADDR,
+//                          LSM303DLHC_REG_MR_M, LSM303DLHC_MAG_MODE_CONTINUOUS, 0);
+    /* LSM303AGR startup sequence as documented in DocID027765 p36 */
     res += i2c_write_reg(DEV_I2C, DEV_MAG_ADDR,
-                         LSM303DLHC_REG_CRA_M, tmp, 0);
-    /* configure z-axis gain */
+                         0x60, 0x00, 0); /* Mag = 10 Hz (high-resolution and continuous mode) */
     res += i2c_write_reg(DEV_I2C, DEV_MAG_ADDR,
-                         LSM303DLHC_REG_CRB_M, DEV_MAG_GAIN, 0);
-    /* set continuous mode */
-    res += i2c_write_reg(DEV_I2C, DEV_MAG_ADDR,
-                         LSM303DLHC_REG_MR_M, LSM303DLHC_MAG_MODE_CONTINUOUS, 0);
+                         0x62, 0x01, 0); /* Mag data-ready interrupt enable */
     i2c_release(DEV_I2C);
     /* configure mag data ready pin */
-    gpio_init(DEV_MAG_PIN, GPIO_IN);
+    gpio_init(DEV_MAG_PIN, DEV_MAG_PIN_MODE);
     if (IS_ACTIVE(ENABLE_DEBUG) && res == 0) {
         DEBUG("[OK]\n");
     }
@@ -141,13 +156,13 @@ int lsm303dlhc_read_mag(const lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data)
     int res;
 
     DEBUG("lsm303dlhc: wait for mag values... ");
-    while (gpio_read(DEV_MAG_PIN) == 0){}
+    while (_pin_is_idle(DEV_MAG_PIN, DEV_MAG_PIN_MODE)){}
 
     DEBUG("read ... ");
 
     i2c_acquire(DEV_I2C);
     res = i2c_read_regs(DEV_I2C, DEV_MAG_ADDR,
-                        LSM303DLHC_REG_OUT_X_H_M, data, 6, 0);
+                        0x68, data, 6, 0);
     i2c_release(DEV_I2C);
 
     if (res < 0) {
@@ -156,15 +171,19 @@ int lsm303dlhc_read_mag(const lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data)
     }
     DEBUG("[done]\n");
 
-    /* interchange y and z axis and fix endiness */
-    int16_t tmp = data->y_axis;
-    data->x_axis = ((data->x_axis<<8)|((data->x_axis>>8)&0xff));
-    data->y_axis = ((data->z_axis<<8)|((data->z_axis>>8)&0xff));
-    data->z_axis = ((tmp<<8)|((tmp>>8)&0xff));
-
-    /* compensate z-axis sensitivity */
-    /* gain is currently hardcoded to LSM303DLHC_GAIN_5 */
-    data->z_axis = ((data->z_axis * 400) / 355);
+    // TBD: unlike DLHC, AGR  has xyz in the right order, and the "right"
+    // endianness; given this is all reinterpreted as platform u16, even on agr
+    // there should be a host-to-LE conversion, added, even though that's
+    // mostly a no-op.
+//     /* interchange y and z axis and fix endiness */
+//     int16_t tmp = data->y_axis;
+//     data->x_axis = ((data->x_axis<<8)|((data->x_axis>>8)&0xff));
+//     data->y_axis = ((data->z_axis<<8)|((data->z_axis>>8)&0xff));
+//     data->z_axis = ((tmp<<8)|((tmp>>8)&0xff));
+//
+//     /* compensate z-axis sensitivity */
+//     /* gain is currently hardcoded to LSM303DLHC_GAIN_5 */
+//     data->z_axis = ((data->z_axis * 400) / 355);
 
     return 0;
 }
@@ -219,7 +238,7 @@ int lsm303dlhc_enable(const lsm303dlhc_t *dev)
     res += i2c_write_reg(DEV_I2C, DEV_ACC_ADDR, LSM303DLHC_REG_CTRL4_A, tmp, 0);
     res += i2c_write_reg(DEV_I2C, DEV_ACC_ADDR, LSM303DLHC_REG_CTRL3_A,
                          LSM303DLHC_CTRL3_A_I1_DRDY1, 0);
-    gpio_init(DEV_ACC_PIN, GPIO_IN);
+    gpio_init(DEV_ACC_PIN, DEV_ACC_PIN_MODE);
 
     tmp = LSM303DLHC_TEMP_EN | LSM303DLHC_TEMP_SAMPLE_75HZ;
     res += i2c_write_reg(DEV_I2C, DEV_MAG_ADDR, LSM303DLHC_REG_CRA_M, tmp, 0);
@@ -231,7 +250,7 @@ int lsm303dlhc_enable(const lsm303dlhc_t *dev)
                         LSM303DLHC_REG_MR_M, LSM303DLHC_MAG_MODE_CONTINUOUS, 0);
     i2c_release(DEV_I2C);
 
-    gpio_init(DEV_MAG_PIN, GPIO_IN);
+    gpio_init(DEV_MAG_PIN, DEV_MAG_PIN_MODE);
 
     return (res < 0) ? -1 : 0;
 }
