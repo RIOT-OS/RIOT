@@ -9,6 +9,7 @@
 [![Twitter][twitter-badge]][twitter-link]
 [![Matrix][matrix-badge]][matrix-link]
 
+<p align="center"><img src="doc/doxygen/src/riot-logo.svg" width="66%"><!--
                           ZZZZZZ
                         ZZZZZZZZZZZZ
                       ZZZZZZZZZZZZZZZZ
@@ -33,7 +34,7 @@
       ZZZZZZ     ZZZZZZ          ZZZZZ      777     7777777777       777
        ZZZZZZZZZZZZZZZ            ZZZZ      777      77777777        777
          ZZZZZZZZZZZ               Z
-            ZZZZZ
+            ZZZZZ                                                           --></p>
 
 The friendly Operating System for IoT!
 
