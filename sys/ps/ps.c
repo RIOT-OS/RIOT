@@ -95,9 +95,9 @@ void ps(void)
             const char *sname = thread_state_to_string(state);              /* get state name */
             const char *queued = thread_is_active(p) ? "Q" : "_";           /* get queued flag */
 #ifdef DEVELHELP
-            int stacksz = p->stack_size;                                    /* get stack size */
+            int stacksz = thread_get_stacksize(p);                          /* get stack size */
             overall_stacksz += stacksz;
-            int stack_free = thread_measure_stack_free(p->stack_start);
+            int stack_free = thread_measure_stack_free(thread_get_stackstart(p));
             stacksz -= stack_free;
             overall_used += stacksz;
 #endif
@@ -115,20 +115,20 @@ void ps(void)
 #endif
                    " | %-8s %.1s | %3i"
 #ifdef DEVELHELP
-                   " | %6i (%5i) (%5i) | %10p | %10p "
+                   " | %6" PRIu32 " (%5i) (%5i) | %10p | %10p "
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
                    " | %2d.%03d%% |  %8u  | %10"PRIu32" "
 #endif
                    "\n",
-                   p->pid,
+                   thread_getpid_of(p),
 #ifdef CONFIG_THREAD_NAMES
-                   p->name,
+                   thread_get_name(p),
 #endif
-                   sname, queued, p->priority
+                   sname, queued, thread_get_priority(p)
 #ifdef DEVELHELP
-                   , p->stack_size, stacksz, stack_free,
-                   (void *)p->stack_start, (void *)p->sp
+                   , (uint32_t)thread_get_stacksize(p), stacksz, stack_free,
+                   thread_get_stackstart(p), thread_get_sp(p)
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
                    , runtime_major, runtime_minor, switches, xtimer_usec_from_ticks(xtimer_ticks)

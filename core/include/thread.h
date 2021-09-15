@@ -508,6 +508,17 @@ static inline thread_status_t thread_get_status(const thread_t *thread)
 }
 
 /**
+ * Get a thread's priority
+ *
+ * @param   thread   thread to work on
+ * @returns priority of thread
+ */
+static inline  uint8_t thread_get_priority(const thread_t *thread)
+{
+    return thread->priority;
+}
+
+/**
  * Returns if a thread is active (currently running or waiting to be scheduled)
  *
  * @param   thread   thread to work on
@@ -525,6 +536,81 @@ static inline bool thread_is_active(const thread_t *thread)
  * @returns ptr to string representation of thread state (or to "unknown")
  */
 const char *thread_state_to_string(thread_status_t state);
+
+/**
+ * Get start address (lowest) of a thread's stack.
+ *
+ * @param   thread thread to work on
+ * @returns current stack pointer, or NULL if not available
+ */
+static inline void *thread_get_stackstart(const thread_t *thread)
+{
+#if defined(DEVELHELP) || defined(SCHED_TEST_STACK) \
+    || defined(MODULE_MPU_STACK_GUARD)
+    return thread->stack_start;
+#else
+    (void)thread;
+    return NULL;
+#endif
+}
+
+/**
+ * Get stored Stack Pointer of thread.
+ *
+ * *Only provides meaningful value if the thread is not currently running!*.
+ *
+ * @param   thread thread to work on
+ * @returns current stack pointer
+ */
+static inline void *thread_get_sp(const thread_t *thread)
+{
+    return thread->sp;
+}
+
+/**
+ * Get size of a thread's stack.
+ *
+ * @param   thread thread to work on
+ * @returns thread stack size, or 0 if not available
+ */
+static inline size_t thread_get_stacksize(const thread_t *thread)
+{
+#if defined(DEVELHELP)
+    return thread->stack_size;
+#else
+    (void)thread;
+    return 0;
+#endif
+}
+
+/**
+ * Get PID of thread.
+ *
+ * This is a simple getter for thread->pid.
+ *
+ * @param   thread thread to work on
+ * @returns thread pid
+ */
+static inline kernel_pid_t thread_getpid_of(const thread_t *thread)
+{
+    return thread->pid;
+}
+
+/**
+ * Get name of thread.
+ *
+ * @param   thread thread to work on
+ * @returns thread name or NULL if not available
+ */
+static inline const char *thread_get_name(const thread_t *thread)
+{
+#if defined(CONFIG_THREAD_NAMES)
+    return thread->name;
+#else
+    (void)thread;
+    return NULL;
+#endif
+}
 
 #ifdef __cplusplus
 }
