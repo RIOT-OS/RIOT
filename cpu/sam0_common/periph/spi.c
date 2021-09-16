@@ -317,13 +317,13 @@ static void _spi_acquire(spi_t bus, spi_mode_t mode, spi_clk_t clk)
     _enable(dev(bus));
 }
 
-static void _spi_release(spi_t bus)
+static inline void _spi_release(spi_t bus)
 {
     /* disable the device */
     _disable(dev(bus));
 }
 
-static inline void _spi_blocking_transfer(spi_t bus, const void *out, void *in, size_t len)
+static void _spi_blocking_transfer(spi_t bus, const void *out, void *in, size_t len)
 {
     const uint8_t *out_buf = out;
     uint8_t *in_buf = in;
