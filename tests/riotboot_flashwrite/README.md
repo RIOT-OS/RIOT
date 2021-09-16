@@ -50,6 +50,6 @@ number:
 Then send via CoAP, for example, with libcoap's coap_client:
 
     $ coap-client -m post coap://[<ip address of node>]/flashwrite \
-       -f bin/<board>/tests_riotboot_flashwrite-slot1.riot.bin -b 64
+       -f bin/<board>/riotboot_files/slot1.bin -b 64
 
 Then reboot the node manually, confirming that it booted from slot 1.
