@@ -113,7 +113,7 @@ ifeq (1,$(TEST_KCONFIG))
 endif
 
 # Expose DEVELHELP to kconfig
-ifeq (1,$(DEVELHELP))
+ifneq (0, $(DEVELHELP))
   RIOT_CONFIG_DEVELHELP ?= y
 endif
 

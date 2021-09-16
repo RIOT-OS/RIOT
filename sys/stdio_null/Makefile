@@ -1,4 +1,4 @@
-ifeq ($(DEVELHELP),1)
+ifneq (0, $(DEVELHELP))
   $(warning STDIO disabled via stdio_null, but DEVELHELP enabled)
 endif
 

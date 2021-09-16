@@ -288,8 +288,11 @@ endif
 # which is not needed in a production environment but helps in the
 # development process:
 DEVELHELP ?= 0
-ifeq ($(DEVELHELP),1)
+ifneq (0, $(DEVELHELP))
   CFLAGS += -DDEVELHELP
+endif
+ifeq (2, $(DEVELHELP))
+  CFLAGS += -DDEBUG_ASSERT_VERBOSE
 endif
 
 # Set this to 1 to enable thread names

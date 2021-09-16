@@ -20,7 +20,7 @@ ifneq (,$(filter cortexm_fpu,$(FEATURES_USED)))
 endif
 
 # Enable the MPU stack guard if develhelp is enabled
-ifeq (1, $(DEVELHELP))
+ifneq (0, $(DEVELHELP))
   FEATURES_OPTIONAL += cortexm_mpu
 endif
 
