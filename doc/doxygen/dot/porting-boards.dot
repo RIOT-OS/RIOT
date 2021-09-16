@@ -1,0 +1,96 @@
+strict digraph {
+  graph [
+    splines=true,
+  ]
+  node [
+    style="filled",
+    fontname="sans-serif",
+    color="#3fa687",
+    fillcolor="#275a4b",
+    fontcolor="white",
+    shape="box",
+    penwidth=2,
+    width=4.1,
+  ];
+  edge [
+    color="#3fa687",
+    fontcolor="#275a4b",
+    fontname="sans-serif",
+    penwidth=2,
+    labelfloat=true,
+  ];
+
+  Start [shape="Mrecord", width=0.75];
+  End [
+    label="Blink the LEDs",
+    tooltip="Blink the LEDs",
+    shape="Mrecord",
+    URL="https://github.com/RIOT-OS/RIOT/tree/master/tests/leds",
+  ];
+
+  IfCPU [
+    label=<CPU/MCU<BR/>already ported?>,
+    tooltip="CPU/MCU already ported?",
+    shape="diamond",
+  ];
+  IfBoard [
+    label=<Board definitions<BR/>already provided?>,
+    tooltip="Board definitions already provided?",
+    shape="diamond",
+  ];
+  IfDrivers [
+    label=<All on-board<BR/>devices supported?>,
+    tooltip="All on-board devices supported?",
+    shape="diamond",
+  ];
+  IfNetdev [
+    label=<Network device<BR/>supported by<BR/>network stack?>,
+    tooltip="Network device supported by network stack?",
+    shape="diamond"
+  ];
+
+  PortCPU [
+    label=<Port <B>CPU</B><BR/>(TBD: provide guide)>,
+    tooltip="Port CPU",
+  ];
+  PortBoard [
+    label=<Provide<BR/><B>board definitions</B>>,
+    tooltip="Provide board definitions",
+    URL="@ref porting-boards",
+  ];
+  PortDrivers [
+    label=<Provide<BR/><B>device drivers</B>>,
+    tooltip="Provide device drivers",
+    URL="@ref driver-guide",
+  ];
+  PortNetdev [
+    label=<Provide <B>network device support</B><BR/>for network stack>,
+    tooltip="Provide network device support for network stack",
+    URL="@ref drivers_netdev",
+  ];
+
+  Start -> IfCPU;
+  IfCPU -> IfBoard [label="Yes"];
+  IfBoard -> IfDrivers [label="Yes"];
+  IfDrivers -> IfNetdev [label="Yes"];
+  IfNetdev -> End [label="Yes"];
+
+  IfCPU -> PortCPU [label="No"];
+  IfBoard -> PortBoard [label="No"];
+  IfDrivers -> PortDrivers [label="No"];
+  IfNetdev -> PortNetdev [label="No"];
+
+  PortCPU -> IfBoard;
+  PortBoard -> IfDrivers;
+  PortDrivers -> IfNetdev;
+  PortNetdev -> End;
+
+  /* ensure No branch is on same row as If */
+  {rank=same; IfCPU PortCPU}
+  {rank=same; IfBoard PortBoard}
+  {rank=same; IfDrivers PortDrivers}
+  {rank=same; IfNetdev PortNetdev}
+  /* ensure PortNodes are on top of each other */
+  edge [style="invis"];
+  PortCPU -> PortBoard -> PortDrivers -> PortNetdev;
+}
