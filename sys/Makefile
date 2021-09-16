@@ -146,6 +146,9 @@ endif
 ifneq (,$(filter sock_dns_mock,$(USEMODULE)))
   DIRS += net/application_layer/sock_dns_mock
 endif
+ifneq (,$(filter sock_dodtls,$(USEMODULE)))
+  DIRS += net/application_layer/sock_dodtls
+endif
 ifneq (,$(filter sock_util,$(USEMODULE)))
   DIRS += net/sock
 endif
