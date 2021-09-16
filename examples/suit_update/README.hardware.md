@@ -574,10 +574,10 @@ The following variables are defined in makefiles/suit.inc.mk:
 
 The following convention is used when naming a manifest
 
-    SUIT_MANIFEST ?= $(BINDIR_APP)-riot.suitv3.$(APP_VER).bin
-    SUIT_MANIFEST_LATEST ?= $(BINDIR_APP)-riot.suitv3.latest.bin
-    SUIT_MANIFEST_SIGNED ?= $(BINDIR_APP)-riot.suitv3_signed.$(APP_VER).bin
-    SUIT_MANIFEST_SIGNED_LATEST ?= $(BINDIR_APP)-riot.suitv3_signed.latest.bin
+    SUIT_MANIFEST ?= $(BINDIR_RIOTBOOT)/riot.suitv3.$(APP_VER).bin
+    SUIT_MANIFEST_LATEST ?= $(BINDIR_RIOTBOOT)/riot.suitv3.latest.bin
+    SUIT_MANIFEST_SIGNED ?= $(BINDIR_RIOTBOOT)/riot.suitv3_signed.$(APP_VER).bin
+    SUIT_MANIFEST_SIGNED_LATEST ?= $(BINDIR_RIOTBOOT)/riot.suitv3_signed.latest.bin
 
 The following default values are using for generating the manifest:
 
