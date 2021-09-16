@@ -23,23 +23,9 @@
 #include <assert.h>
 
 #include "net/bluetil/ad.h"
+#include "nimble_addr.h"
 #include "nimble_scanlist.h"
 #include "nimble/hci_common.h"
-
-static void _print_addr(const ble_addr_t *addr)
-{
-    printf("%02x", (int)addr->val[5]);
-    for (int i = 4; i >= 0; i--) {
-        printf(":%02x", addr->val[i]);
-    }
-    switch (addr->type) {
-        case BLE_ADDR_PUBLIC:       printf(" (PUBLIC)");   break;
-        case BLE_ADDR_RANDOM:       printf(" (RANDOM)");   break;
-        case BLE_ADDR_PUBLIC_ID:    printf(" (PUB_ID)");   break;
-        case BLE_ADDR_RANDOM_ID:    printf(" (RAND_ID)");  break;
-        default:                    printf(" (UNKNOWN)");  break;
-    }
-}
 
 static void _print_type(uint8_t type)
 {
@@ -92,7 +78,7 @@ void nimble_scanlist_print_entry(nimble_scanlist_entry_t *e)
         strncpy(name, "undefined", sizeof(name));
     }
 
-    _print_addr(&e->addr);
+    nimble_addr_print(&e->addr);
     _print_type(e->type);
     unsigned adv_int = ((e->last_update - e->first_update) / e->adv_msg_cnt);
     printf(" \"%s\", adv_msg_cnt: %u, adv_int: %uus, last_rssi: %i\n",
