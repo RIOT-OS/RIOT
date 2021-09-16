@@ -152,13 +152,28 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
 spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 {
     (void)bus;
-    /* Possible prescalers: 2, 3, 5, 7
-     * Possible scalers: 2, 4, 6 (sic!), 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768
+    /* Baud rate:
      *
-     * SCK baud rate = CLOCK_CORECLOCK / (PBR * BR) */
+     * Possible prescalers: 2, 3, 5, 7
+     * Possible scalers: 2, 4, 6, 8, 16, 32, 64, 128, 256, 512, 1024,
+     *                   2048, 4096, 8192, 16384, 32768
+     *
+     * SCK baud rate = CLOCK_BUSCLOCK / (PBR * BR)
+     *
+     * Delays:
+     *
+     * Possible prescalers: 1, 3, 5, 7
+     * Possible scalers: 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048,
+     *                   4096, 8192, 16384, 32768, 65536
+     *
+     * tCSC = (1 / CLOCK_BUSCLOCK) * PCSSCK * CSSCK
+     * tASC = (1 / CLOCK_BUSCLOCK) * PASC * ASC
+     * tDT = (1 / CLOCK_BUSCLOCK) * PDT * DT
+     */
 
-    uint32_t target_divider, divider, scaler;
-    uint8_t prescaler, br, pbr = 0, cssck, pcssck = 0;
+    const uint32_t target_divider = SPI_DIV_UP(CLOCK_BUSCLOCK, freq);
+    uint32_t divider = 4, scaler = 2;
+    uint8_t prescaler = 2, pbr = 0, br, pdt, dt;
 
     /* bound divider from 4 to 229376 */
     if (freq > CLOCK_BUSCLOCK / 4) {
@@ -166,23 +181,59 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
     }
     assert(freq >= SPI_DIV_UP(CLOCK_BUSCLOCK, 229376));
 
-    /* baudrate scalers */
-    target_divider = SPI_DIV_UP(CLOCK_BUSCLOCK, freq);
-    divider = 4;
-    prescaler = 2;
-    scaler = 2;
-    while (divider < target_divider && divider != 229376) {
+    /* Baudrate scalers
+     *
+     * Sorting out dividers:
+     *  previous              previous
+     * prescaler   prescaler   scaler             divider
+     *     7        -> 2     *  (0.5  * 4) = 2 * 2 = 4
+     *     2        -> 5     *   (2   / 2) = 5 * 1 = 5 scaler underflow
+     *     5        -> 3     *   (1   * 2) = 3 * 2 = 6
+     *     3        -> 7     *   (2   / 2) = 7 * 1 = 7 scaler underflow
+     *     7        -> 2     *   (1   * 4) = 2 * 4 = 8
+     *     2        -> 5     *   (4   / 2) = 5 * 2 = 10
+     *     5        -> 3     *   (2   * 2) = 3 * 4 = 12
+     *     3        -> 7     *   (4   / 2) = 7 * 2 = 14
+     *     7        -> 2     *   (2   * 4) = 2 * 8 = 16
+     * first exception for scaler 6:         3 * 6 = 18
+     *     2        -> 5     *   (8   / 2) = 5 * 4 = 20
+     *     5        -> 3     *   (4   * 2) = 3 * 8 = 24
+     *     3        -> 7     *   (8   / 2) = 7 * 4 = 28
+     * second exception for scaler 6:        5 * 6 = 30
+     *     7        -> 2     *   (4   * 4) = 2 * 16 = 32
+     *     2        -> 5     *  (16   / 2) = 5 * 8 = 40
+     * third exception for scaler 6:         7 * 6 = 42
+     *     5        -> 3     *   (8   * 2) = 3 * 16 = 48
+     * from now on, the scaler will never go back below 8
+     *  prescaler 3 -> 7      scaler /= 2
+     *  prescaler 7 -> 2      scaler *= 4
+     *  prescaler 2 -> 5      scaler /= 2
+     *  prescaler 5 -> 3      scaler *= 2
+     *              |                 |
+     *     3        -> 7     * (32768 / 2) = 7 * 16384 = 114688
+     *     7        -> 2     * (16384 * 4) = 2 * 65536 = 131072 scaler overflow
+     *     2        -> 5     * (65536 / 2) = 5 * 32768 = 163840
+     *     5        -> 3     * (32768 * 2) = 3 * 65536 = 196608 scaler overflow
+     *     3        -> 7     * (65536 / 2) = 7 * 32768 = 229376
+     */
+    while (divider < target_divider) {
         switch (divider) {
+            /* do not underflow the scaler */
             case 4: prescaler = 3; break;
             case 6: prescaler = 2; scaler = 4; break;
+            /* first exception for the scaler 6 */
             case 16: prescaler = 3; scaler = 6; break;
             case 18: prescaler = 5; scaler = 4; break;
+            /* second exception for the scaler 6 */
             case 28: prescaler = 5; scaler = 6; break;
             case 30: prescaler = 2; scaler = 16; break;
+            /* third exception for the scaler 6 */
             case 40: prescaler = 7; scaler = 6; break;
             case 42: prescaler = 3; scaler = 16; break;
+            /* do not overflow the scaler */
             case 114688: prescaler = 5; scaler = 32768; break;
-            case 196608: prescaler = 7; scaler = 32768; break;
+            case 163840: prescaler = 7; scaler = 32768; break;
+            /* default progress */
             default: switch (prescaler) {
                 case 2: prescaler = 5; scaler /= 2; break;
                 case 5: prescaler = 3; scaler *= 2; break;
@@ -193,49 +244,44 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
         }
         divider = prescaler * scaler;
     }
+    /* convert prescaler to pbr */
     switch (prescaler) {
         case 2: pbr = 0; break;
         case 3: pbr = 1; break;
         case 5: pbr = 2; break;
         case 7: pbr = 3; break;
     }
+    /* convert scaler to br */
     br = scaler < 6 ? bitarithm_msb(scaler) - 1 : bitarithm_msb(scaler);
 
-    /* delay scalers
-     * Possible prescalers: 1, 3, 5, 7
-     * Possible scalers: 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536
+    /* Delay scalers
+     *
+     * We will use delays of at least one clock period.
+     *
+     * The delay scalers computation is practically the same as the
+     * baudrate scalers so we will reuse the previous results.
+     *
+     * There is the scaler 65536 but we will not handle it as this would
+     * lead into delays less than one clock period.
      */
-    divider = 2;
-    prescaler = 1;
-    scaler = 2;
-    while ( divider < target_divider) {
-        switch (divider) {
-            case 2: scaler = 4; break;
-            case 4: prescaler = 3; scaler = 2; break;
-            case 6: prescaler = 1; scaler = 8; break;
-            default: switch (prescaler) {
-                case 1: prescaler = 5; scaler /= 4; break;
-                case 5: prescaler = 3; scaler *= 2; break;
-                case 3: prescaler = 7; scaler /= 2; break;
-                case 7: prescaler = 1; scaler *= 8; break;
-            }
-            break;
-        }
-        divider = prescaler * scaler;
+    switch (divider) {
+        /* handle the 3 exceptions (there is not the scaler 6) */
+        case 18: pdt = 2; dt = 1; break; /* -> 20 */
+        case 30: pdt = 0; dt = 4; break; /* -> 32 */
+        case 42: pdt = 1; dt = 3; break; /* -> 48 */
+        /* add 1 to br when pbr is 0 (the first prescaler is 1 instead of 2) */
+        default: pdt = pbr; dt = pbr ? br : br + 1; break;
     }
-    switch (prescaler) {
-        case 1: pcssck = 0; break;
-        case 3: pcssck = 1; break;
-        case 5: pcssck = 2; break;
-        case 7: pcssck = 3; break;
+    if (br > 2) {
+        /* there is not the scaler 6 */
+        --dt;
     }
-    cssck = bitarithm_msb(scaler) - 1;
 
     return
         SPI_CTAR_PBR(pbr) | SPI_CTAR_BR(br) |
-        SPI_CTAR_PCSSCK(pcssck) | SPI_CTAR_CSSCK(cssck) |
-        SPI_CTAR_PASC(pcssck) | SPI_CTAR_ASC(cssck) |
-        SPI_CTAR_PDT(pcssck) | SPI_CTAR_DT(cssck);
+        SPI_CTAR_PCSSCK(pdt) | SPI_CTAR_CSSCK(dt) |
+        SPI_CTAR_PASC(pdt) | SPI_CTAR_ASC(dt) |
+        SPI_CTAR_PDT(pdt) | SPI_CTAR_DT(dt);
 }
 
 uint32_t spi_get_freq(spi_t bus, spi_clk_t clk)
