@@ -38,8 +38,8 @@ extern "C" {
 /** 7-bit I2C slave address: 1-0-0-1-A2-A1-A0, where
    the last three bits A2, A1, A0 are defined
    by the voltage level on the ADDR pin */
-#ifndef CONFIG_I2C_ADDR
-#define CONFIG_I2C_ADDR         (0x48) /**< Default I2C address */
+#ifndef CONFIG_LM75_I2C_ADDR
+#define CONFIG_LM75_I2C_ADDR         (0x48) /**< Default I2C address */
 #endif
 
 /* Device operation mode configuration - normal or shutdown */
@@ -146,7 +146,7 @@ extern "C" {
                                  .gpio_alarm      = LM75_PARAM_INT, \
                                  .conv_rate       = LM75A_CONV_RATE, \
                                  .i2c_bus         = LM75_PARAMS_I2C, \
-                                 .i2c_addr        = CONFIG_I2C_ADDR, \
+                                 .i2c_addr        = CONFIG_LM75_I2C_ADDR, \
                                  .shutdown_mode   = CONFIG_OPERATION_MODE, \
                                  .tm_mode         = CONFIG_THERMOSTAT_MODE, \
                                  .polarity        = CONFIG_OS_POLARITY, \
@@ -159,7 +159,7 @@ extern "C" {
                                 .gpio_alarm          = LM75_PARAM_INT, \
                                 .conv_rate           = TMP1075_CONV_RATE, \
                                 .i2c_bus             = LM75_PARAMS_I2C, \
-                                .i2c_addr            = CONFIG_I2C_ADDR, \
+                                .i2c_addr            = CONFIG_LM75_I2C_ADDR, \
                                 .shutdown_mode       = CONFIG_OPERATION_MODE, \
                                 .tm_mode             = CONFIG_THERMOSTAT_MODE, \
                                 .polarity            = CONFIG_OS_POLARITY, \
