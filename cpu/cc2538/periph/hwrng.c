@@ -25,6 +25,7 @@
 #include "vendor/hw_soc_adc.h"
 
 #include "cpu.h"
+#include "cc2538_rfcore.h"
 #include "periph/hwrng.h"
 
 #define ENABLE_DEBUG 0

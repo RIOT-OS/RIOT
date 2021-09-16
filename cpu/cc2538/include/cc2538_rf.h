@@ -25,6 +25,7 @@
 #include <stdbool.h>
 
 #include "board.h"
+#include "cc2538_rfcore.h"
 
 #include "net/ieee802154.h"
 #include "kernel_defines.h"
