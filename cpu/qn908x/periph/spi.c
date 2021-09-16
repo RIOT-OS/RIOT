@@ -79,36 +79,6 @@ static const uint32_t _spi_func5_mask_fc2 =
     (1u << 4) | /* FC2_COPI */
     (1u << 5);  /* FC2_CIPO */
 
-static inline uint32_t _spi_divider(uint32_t bus_freq, uint32_t speed_hz)
-{
-    uint32_t divider = SPI_DIV_UP(bus_freq, speed_hz);
-
-    if (divider == 0) {
-        divider = 1;
-    }
-    assert(divider <= (1u << 16));
-
-    return divider;
-}
-
-/**
- * @brief Return the DIV register value for the target frequency.
- */
-static inline uint16_t _spi_controller_get_speed(uint32_t speed_hz)
-{
-    /* The SPI clock source is based on the FLEXCOMM clock with a simple
-     * frequency divider between /1 and /65536. */
-    const uint32_t bus_freq = CLOCK_GetFreq(kCLOCK_BusClk);
-    uint32_t divider = _spi_divider(bus_freq, speed_hz);
-
-    DEBUG("[spi] clock requested: %" PRIu32 " Hz, actual: %" PRIu32
-          " Hz, divider: /%" PRIu32 "\n", speed_hz, bus_freq / divider,
-          divider);
-    /* The value stored in DIV is always (divider - 1), meaning that a value of
-     * 0 divides by 1. */
-    return (uint16_t)(divider - 1);
-}
-
 void spi_init(spi_t bus)
 {
     assert(bus < SPI_NUMOF);
@@ -200,8 +170,21 @@ void spi_deinit_pins(spi_t bus)
 spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 {
     (void)bus;
-    /* div = 1..65536 - 1*/
-    return _spi_controller_get_speed(freq);
+    /* The SPI clock source is based on the FLEXCOMM clock with a simple
+     * frequency divider between /1 and /65536. */
+    const uint32_t bus_freq = CLOCK_GetFreq(kCLOCK_BusClk);
+
+    /* bound divider from 1 to 65536 */
+    if (freq > bus_freq) {
+        freq = bus_freq;
+    }
+    assert(freq >= SPI_DIV_UP(bus_freq, 65536));
+
+    uint32_t divider = SPI_DIV_UP(bus_freq, freq);
+
+    /* The value stored in DIV is always (divider - 1), meaning that a value of
+     * 0 divides by 1. */
+    return (uint16_t)(divider - 1);
 }
 
 uint32_t spi_get_freq(spi_t bus, spi_clk_t clk)
