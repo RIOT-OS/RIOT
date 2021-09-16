@@ -96,6 +96,7 @@ int sock_dodtls_query(const char *domain_name, void *addr_out, int family)
         timeout -= send_duration;
         if (res <= 0) {
             _sleep_ms(timeout);
+            continue;
         }
         res = sock_dtls_recv(&_dtls_sock, &_server_session,
                              _dns_buf, sizeof(_dns_buf), timeout);
