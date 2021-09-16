@@ -108,7 +108,7 @@ static void _children_accept(void)
 
     /* start advertising this node */
     res = nimble_netif_accept(ad.buf, ad.pos, &_adv_params);
-    assert(res == NIMBLE_NETIF_OK);
+    assert(res == 0);
 }
 
 static void _on_scan_evt(uint8_t type,

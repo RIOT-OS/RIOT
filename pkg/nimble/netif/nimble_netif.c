@@ -582,13 +582,13 @@ int nimble_netif_connect(const ble_addr_t *addr,
     /* check that there is no open connection with the given address */
     if (nimble_netif_conn_connected(addrn) ||
         nimble_netif_conn_connecting()) {
-        return NIMBLE_NETIF_BUSY;
+        return -EBUSY;
     }
 
     /* get empty connection context */
     int handle = nimble_netif_conn_start_connection(addrn);
     if (handle == NIMBLE_NETIF_CONN_INVALID) {
-        return NIMBLE_NETIF_NOMEM;
+        return -ENOMEM;
     }
 
     if ((conn_params != NULL)
@@ -600,7 +600,7 @@ int nimble_netif_connect(const ble_addr_t *addr,
 
         uint16_t itvl = nimble_netif_conn_gen_itvl(itvl_min, itvl_max);
         if (itvl == 0) {
-            return NIMBLE_NETIF_NOTFOUND;
+            return -ECANCELED;
         }
         conn_params->itvl_min = itvl;
         conn_params->itvl_max = itvl;
@@ -625,10 +625,10 @@ int nimble_netif_close(int handle)
 {
     nimble_netif_conn_t *conn = nimble_netif_conn_get(handle);
     if (conn == NULL) {
-        return NIMBLE_NETIF_NOTFOUND;
+        return -EINVAL;
     }
     else if (!(conn->state & NIMBLE_NETIF_L2CAP_CONNECTED)) {
-        return NIMBLE_NETIF_NOTCONN;
+        return -ENOTCONN;
     }
 
     int res = ble_gap_terminate(ble_l2cap_get_conn_handle(conn->coc),
@@ -636,7 +636,7 @@ int nimble_netif_close(int handle)
     assert(res == 0);
     (void)res;
 
-    return NIMBLE_NETIF_OK;
+    return 0;
 }
 
 static int _accept(const uint8_t *ad, size_t ad_len, const ble_addr_t *addr,
@@ -673,7 +673,7 @@ static int _accept(const uint8_t *ad, size_t ad_len, const ble_addr_t *addr,
 
     _notify(handle, NIMBLE_NETIF_ACCEPTING, _netif.l2addr);
 
-    return NIMBLE_NETIF_OK;
+    return 0;
 }
 
 int nimble_netif_accept(const uint8_t *ad, size_t ad_len,
@@ -694,7 +694,7 @@ int nimble_netif_accept_stop(void)
 {
     int handle = nimble_netif_conn_get_adv();
     if (handle == NIMBLE_NETIF_CONN_INVALID) {
-        return NIMBLE_NETIF_NOTADV;
+        return -EALREADY;
     }
 
     int res = ble_gap_adv_stop();
@@ -703,7 +703,7 @@ int nimble_netif_accept_stop(void)
     nimble_netif_conn_free(handle, NULL);
     _notify(handle, NIMBLE_NETIF_ACCEPT_STOP, _netif.l2addr);
 
-    return NIMBLE_NETIF_OK;
+    return 0;
 }
 
 int nimble_netif_update(int handle,
@@ -711,28 +711,28 @@ int nimble_netif_update(int handle,
 {
     nimble_netif_conn_t *conn = nimble_netif_conn_get(handle);
     if (conn == NULL) {
-        return NIMBLE_NETIF_NOTCONN;
+        return -ENOTCONN;
     }
 
     int res = ble_gap_update_params(conn->gaphandle, conn_params);
     if (res != 0) {
-        return NIMBLE_NETIF_DEVERR;
+        return -ECANCELED;
     }
 
-    return NIMBLE_NETIF_OK;
+    return 0;
 }
 
 int nimble_netif_used_chanmap(int handle, uint8_t map[5])
 {
     nimble_netif_conn_t *conn = nimble_netif_conn_get(handle);
     if (conn == NULL) {
-        return NIMBLE_NETIF_NOTCONN;
+        return -ENOTCONN;
     }
 
     int res = ble_hs_hci_read_chan_map(conn->gaphandle, map);
     if (res != 0) {
-        return NIMBLE_NETIF_DEVERR;
+        return -ECANCELED;
     }
 
-    return NIMBLE_NETIF_OK;
+    return 0;
 }

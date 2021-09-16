@@ -167,7 +167,8 @@ int nimble_netif_conn_start_connection(const uint8_t *addr);
  *          connection
  *
  * @return  handle of the reserved context
- * @return  NIMBLE_NETIF_CONN_INVALID if no unused context was available
+ * @return  -EALREADY if already advertising
+ * @return  -ENOMEM if no memory slot is available
  */
 int nimble_netif_conn_start_adv(void);
 
