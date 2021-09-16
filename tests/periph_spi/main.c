@@ -30,7 +30,6 @@
 #include "schedstatistics.h"
 #include "thread.h"
 
-
 /**
  * @brief   Default port number used for the CS pin if unassigned
  */
