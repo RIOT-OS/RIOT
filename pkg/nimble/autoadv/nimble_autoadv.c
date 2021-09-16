@@ -160,7 +160,7 @@ void nimble_autoadv_reset(void)
     int rc = 0;
     (void) rc;
 
-    if (IS_ACTIVE(NIMBLE_AUTOADV_FLAG_FIELD) && BLUETIL_AD_FLAGS_DEFAULT) {
+    if (IS_ACTIVE(NIMBLE_AUTOADV_FLAG_FIELD) && BLUETIL_AD_FLAGS_DEFAULT != 0) {
         rc = bluetil_ad_init_with_flags(&_ad, buf, sizeof(buf),
                                         BLUETIL_AD_FLAGS_DEFAULT);
         assert(rc == BLUETIL_AD_OK);
