@@ -90,6 +90,10 @@ ifeq ($(STM32_TYPE), F)
     else ifeq ($(STM32_MODEL3), 7)
       RAM_LEN = 128K
     endif
+    ifneq (, $(filter $(STM32_MODEL), 205 207 215 217))
+      BACKUP_RAM_ADDR = 0x40024000
+      BACKUP_RAM_LEN = 0x4K
+    endif
   else ifeq ($(STM32_FAMILY), 3)
     ifeq ($(STM32_MODEL), 301)
       RAM_LEN = 16K
@@ -167,6 +171,10 @@ ifeq ($(STM32_TYPE), F)
     ifneq (, $(filter $(STM32_MODEL3), 5 7 9))
       CCMRAM_LEN = 64K
     endif
+    ifneq (, $(filter $(STM32_MODEL), 405 407 415 417 427 429 437 439 446 469 479))
+      BACKUP_RAM_ADDR = 0x40024000
+      BACKUP_RAM_LEN = 0x4K
+    endif
   else ifeq ($(STM32_FAMILY),7)
     ifneq (, $(filter $(STM32_MODEL2), 2 3))
       RAM_LEN = 256K
@@ -175,6 +183,8 @@ ifeq ($(STM32_TYPE), F)
     else ifneq (, $(filter $(STM32_MODEL2), 6 7))
       RAM_LEN = 512K
     endif
+    BACKUP_RAM_ADDR = 0x40024000
+    BACKUP_RAM_LEN = 0x4K
   endif
 else ifeq ($(STM32_TYPE), G)
   ifeq ($(STM32_FAMILY), 0)
@@ -271,6 +281,8 @@ else ifeq ($(STM32_TYPE), U)
     ifneq (, $(filter $(STM32_MODEL2), 7 8))
       RAM_LEN = 768K
       SRAM4_LEN = 16K
+      BACKUP_RAM_ADDR = 0x40036400
+      BACKUP_RAM_LEN = 0x2K
     endif
   endif
 else ifeq ($(STM32_TYPE), W)

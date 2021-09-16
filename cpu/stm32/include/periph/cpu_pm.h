@@ -50,6 +50,22 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @brief   Check whether the backup domain voltage regulator is on
+ */
+bool pm_backup_regulator_is_on(void);
+
+/**
+ * @brief   Enable the backup domain voltage regulator to retain backup
+ *          register content during standby and VBAT mode
+ */
+void pm_backup_regulator_on(void);
+
+/**
+ * @brief   Disable the backup domain voltage regulator
+ */
+void pm_backup_regulator_off(void);
+
 #ifdef __cplusplus
 }
 #endif

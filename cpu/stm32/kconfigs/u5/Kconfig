@@ -9,6 +9,7 @@ config CPU_FAM_U5
     bool
     select CPU_STM32
     select CPU_CORE_CORTEX_M33
+    select HAS_BACKUP_RAM
     select HAS_CPU_STM32U5
     select HAS_PERIPH_FLASHPAGE
     select HAS_PERIPH_FLASHPAGE_PAGEWISE
