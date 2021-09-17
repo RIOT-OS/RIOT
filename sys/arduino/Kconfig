@@ -29,6 +29,7 @@ menuconfig MODULE_ARDUINO
 config MODULE_ARDUINO_PWM
     bool "PWM support for Arduino"
     depends on HAS_PERIPH_PWM
+    depends on HAS_ARDUINO_PWM
     depends on MODULE_ARDUINO
     depends on TEST_KCONFIG
     select MODULE_PERIPH_PWM
