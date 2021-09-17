@@ -219,6 +219,11 @@ PSEUDOMODULES += cc1100
 PSEUDOMODULES += cc1100e
 PSEUDOMODULES += cc1101
 
+# use pseudo-module for band selection
+PSEUDOMODULES += cc110x_433mhz
+PSEUDOMODULES += cc110x_868mhz
+PSEUDOMODULES += cc110x_915mhz
+
 # include variants of ds3231 drivers as pseudo modules
 PSEUDOMODULES += ds3231_int
 

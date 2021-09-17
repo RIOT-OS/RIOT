@@ -8,3 +8,8 @@ FEATURES_REQUIRED += periph_spi
 ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan
 endif
+
+# default to 433 MHz operation
+ifeq (,$(filter cc110x_%mhz,$(USEMODULE)))
+  USEMODULE += cc110x_433mhz
+endif
