@@ -145,6 +145,24 @@ void spidev_linux_teardown(void)
     }
 }
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+    /* The Linux userspace driver takes values in Hertz, which values
+     * are available can only be determined at runtime so we let the
+     * value pass through. */
+    return freq;
+}
+
+uint32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    /* From https://www.kernel.org/doc/html/v5.15-rc1/spi/spidev.html
+     * There’s currently no way to report the actual bit rate used to
+     * shift data to/from a given device. */
+    return clk;
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     DEBUG("spi_acquire(%u, %u, 0x%02x, %d)\n", bus, cs, mode, clk);

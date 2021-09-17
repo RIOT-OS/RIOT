@@ -135,28 +135,6 @@ typedef enum {
  * @brief   Use the common `transfer_regs` SPI function
  */
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
-
-#ifndef DOXYGEN
-/**
- * @brief   Use a custom clock speed type
- */
-#define HAVE_SPI_CLK_T
-/**
- * @brief   SPI clock speed values
- *
- * The Linux userspace driver takes values in Hertz, which values are available
- * can only be determined at runtime.
- * @{
- */
-typedef enum {
-    SPI_CLK_100KHZ = (100000U),
-    SPI_CLK_400KHZ = (400000U),
-    SPI_CLK_1MHZ   = (1000000U),
-    SPI_CLK_5MHZ   = (5000000U),
-    SPI_CLK_10MHZ  = (10000000U)
-} spi_clk_t;
-/** @} */
-#endif /* ndef DOXYGEN */
 #endif /* MODULE_PERIPH_SPI | DOXYGEN */
 
 /**
