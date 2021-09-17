@@ -24,6 +24,8 @@ config BOARD_NUCLEO_L433RC
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
 
+    select MODULE_PERIPH_LPUART if MODULE_STDIO_UART && HAS_PERIPH_LPUART
+
     # Put other features for this board (in alphabetical order)
     # Note that a recent version of OpenOCD is required for flashing an image on
     # the second slot of the flash memory. This version has to be built from source
