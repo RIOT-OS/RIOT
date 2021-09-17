@@ -31,4 +31,4 @@ config BOARD_P_NUCLEO_WB55
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
 
-source "$(RIOTBOARD)/common/stm32/Kconfig"
+source "$(RIOTBOARD)/common/nucleo/Kconfig"
