@@ -33,7 +33,9 @@ void nimble_addr_print(const ble_addr_t *addr)
 
 void nimble_addr_sprint(char *buf, const ble_addr_t *addr)
 {
-    bluetil_addr_sprint(buf, addr->val);
+    uint8_t addrn[BLE_ADDR_LEN];
+    bluetil_addr_swapped_cp(addr->val, addrn);
+    bluetil_addr_sprint(buf, addrn);
     const char *type;
     switch (addr->type) {
         case BLE_ADDR_PUBLIC:       type = " (public) "; break;
@@ -43,5 +45,5 @@ void nimble_addr_sprint(char *buf, const ble_addr_t *addr)
         default:                    type = " (unknown)"; break;
     }
     memcpy(&buf[BLUETIL_ADDR_STRLEN - 1], type, 10);
-    buf[BLUETIL_ADDR_STRLEN - 1] = '\0';
+    buf[NIMBLE_ADDR_STRLEN - 1] = '\0';
 }
