@@ -101,11 +101,11 @@ def _get_latest_release(branches):
 
 def _find_remote(repo, user, repo_name):
     for remote in repo.remotes:
-        if (remote.url.endswith("{}/{}.git".format(user, repo_name)) or
-                remote.url.endswith("{}/{}".format(user, repo_name))):
+        if (remote.url.endswith(f"{user}/{repo_name}.git") or
+                remote.url.endswith(f"{user}/{repo_name}")):
             return remote
-    raise ValueError("Could not find remote with URL ending in {}/{}.git"
-                     .format(user, repo_name))
+    raise ValueError("Could not find remote with URL ending in "
+                     f"{user}/{repo_name}.git")
 
 
 def _get_upstream(repo):
@@ -150,7 +150,7 @@ def main():
     # TODO: exception handling
     status, user = github_api.user.get()
     if status != 200:
-        print("Could not retrieve user: {}".format(user['message']))
+        print(f'Could not retrieve user: {user["message"]}')
         sys.exit(1)
     # Token-scope-check: Is the token is powerful enough to complete
     # the Backport?
@@ -169,21 +169,19 @@ def main():
     username = user['login']
     status, pulldata = github_api.repos[ORG][REPO].pulls[args.PR].get()
     if status != 200:
-        print("Commit #{} not found: {}".format(args.PR, pulldata['message']))
+        print(f'Commit #{args.PR} not found: {pulldata["message"]}')
         sys.exit(2)
     if not pulldata['merged']:
         print("Original PR not yet merged")
         sys.exit(0)
-    print("Fetching for commit: #{}: {}".format(args.PR, pulldata['title']))
+    print(f'Fetching for commit: #{args.PR}: {pulldata["title"]}')
     orig_branch = pulldata['head']['ref']
     status, commits = github_api.repos[ORG][REPO].pulls[args.PR].commits.get()
     if status != 200:
-        print("No commits found for #{}: {}".format(args.PR,
-                                                    commits['message']))
+        print(f'No commits found for #{args.PR}: {commits["message"]}')
         sys.exit(3)
     for commit in commits:
-        print("found {} : {}".format(commit['sha'],
-                                     commit['commit']['message']))
+        print(f'found {commit["sha"]} : {commit["commit"]["message"]}')
 
     # Find latest release branch
     if args.release_branch:
@@ -192,16 +190,14 @@ def main():
     else:
         status, branches = github_api.repos[ORG][REPO].branches.get()
         if status != 200:
-            print("Could not retrieve branches for {}/{}: {}"
-                  .format(ORG,
-                          REPO,
-                          branches['message']))
+            print(f'Could not retrieve branches for {ORG}/{REPO}: '
+                  f'{branches["message"]}')
             sys.exit(4)
         release_shortname, release_fullname = _get_latest_release(branches)
         if not release_fullname:
             print("No release branch found, exiting")
             sys.exit(5)
-    print("Backport based on branch {}".format(release_fullname))
+    print(f"Backport based on branch {release_fullname}")
 
     repo = git.Repo(args.gitdir)
     # Fetch current upstream
@@ -209,20 +205,20 @@ def main():
     if not upstream_remote:
         print("No upstream remote found, can't fetch")
         sys.exit(6)
-    print("Fetching {} remote".format(upstream_remote))
+    print(f"Fetching {upstream_remote} remote")
 
     upstream_remote.fetch()
     # Build topic branch in temp dir
     new_branch = args.backport_branch_fmt.format(release=release_shortname,
                                                  origbranch=orig_branch)
     if new_branch in repo.branches:
-        print("ERROR: Branch {} already exists".format(new_branch))
+        print(f"ERROR: Branch {new_branch} already exists")
         sys.exit(1)
     worktree_dir = os.path.join(args.gitdir, WORKTREE_SUBDIR)
     repo.git.worktree("add", "-b",
                       new_branch,
                       WORKTREE_SUBDIR,
-                      "{}/{}".format(upstream_remote, release_fullname))
+                      f"{upstream_remote}/{release_fullname}")
     # transform branch name into Head object for later configuring
     new_branch = repo.branches[new_branch]
     try:
@@ -232,13 +228,13 @@ def main():
             bp_repo.git.cherry_pick('-x', commit['sha'])
         # Push to github
         origin = _find_remote(repo, username, REPO)
-        print("Pushing branch {} to {}".format(new_branch, origin))
+        print(f"Pushing branch {new_branch} to {origin}")
         if not args.noop:
-            push_info = origin.push('{0}:{0}'.format(new_branch))
+            push_info = origin.push(f"{new_branch}:{new_branch}")
             new_branch.set_tracking_branch(push_info[0].remote_ref)
     except Exception as exc:
         # Delete worktree
-        print("Pruning temporary workdir at {}".format(worktree_dir))
+        print(f"Pruning temporary workdir at {worktree_dir}")
         _delete_worktree(repo, worktree_dir)
         # also delete branch created by worktree; this is only possible after
         # the worktree was deleted
@@ -246,7 +242,7 @@ def main():
         raise exc
     else:
         # Delete worktree
-        print("Pruning temporary workdir at {}".format(worktree_dir))
+        print(f"Pruning temporary workdir at {worktree_dir}")
         _delete_worktree(repo, worktree_dir)
 
     labels = _get_labels(pulldata)
@@ -254,22 +250,19 @@ def main():
     if not args.noop:
         # Open new PR on github
         pull_request = {
-            'title': "{} [backport {}]".format(pulldata['title'],
-                                               release_shortname),
-            'head': '{}:{}'.format(username, new_branch),
+            'title': f'{pulldata["title"]} [backport {release_shortname}]',
+            'head': f'{username}:{new_branch}',
             'base': release_fullname,
-            'body': "# Backport of #{}\n\n{}".format(args.PR,
-                                                     pulldata['body']),
+            'body': f'# Backport of #{args.PR}\n\n{pulldata["body"]}',
             'maintainer_can_modify': True,
         }
         status, new_pr = github_api.repos[ORG][REPO].pulls.post(
             body=pull_request)
         if status != 201:
-            print("Error creating the new pr: \"{}\". Is \"Public Repo\""
-                  " access enabled for the token"
-                  .format(new_pr['message']))
+            print(f'Error creating the new pr: "{new_pr["message"]}". '
+                  'Is "Public Repo" access enabled for the token?')
         pr_number = new_pr['number']
-        print("Create PR number #{} for backport".format(pr_number))
+        print(f"Create PR number #{pr_number} for backport")
         github_api.repos[ORG][REPO].issues[pr_number].labels.post(body=labels)
         review_request = {"reviewers": [merger]}
         github_api.repos[ORG][REPO].pulls[pr_number].\
@@ -277,13 +270,12 @@ def main():
 
     # Put commit under old PR
     if args.comment and not args.noop:
-        comment = {"body": "Backport provided in #{}".format(pr_number)}
+        comment = {"body": f"Backport provided in #{pr_number}"}
         status, res = github_api.repos[ORG][REPO].\
             issues[args.PR].comments.post(body=comment)
         if status != 201:
-            print("Something went wrong adding the comment: {}"
-                  .format(res['message']))
-        print("Added comment to #{}".format(args.PR))
+            print(f'Something went wrong adding the comment: {res["message"]}')
+        print(f"Added comment to #{args.PR}")
 
 
 if __name__ == "__main__":

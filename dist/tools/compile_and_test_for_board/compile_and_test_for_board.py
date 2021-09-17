@@ -182,10 +182,10 @@ def check_is_board(riotdir, board):
     :returns: board name
     """
     if board == 'common':
-        raise ValueError("'%s' is not a board" % board)
+        raise ValueError(f"'{board}' is not a board")
     board_dir = os.path.join(riotdir, 'boards', board)
     if not os.path.isdir(board_dir):
-        raise ValueError("Cannot find '%s' in %s/boards" % (board, riotdir))
+        raise ValueError(f"Cannot find '{board}' in {riotdir}/boards")
     return board
 
 
@@ -254,7 +254,7 @@ class RIOTApplication():
             logging.basicConfig(stream=self.log_stream)
         else:
             self.testcase = None
-        self.logger = logging.getLogger('%s.%s' % (board, appdir))
+        self.logger = logging.getLogger(f'{board}.{appdir}')
 
         # Currently not handling absolute directories or outside of RIOT
         assert is_in_directory(self.resultdir, resultdir), \
@@ -392,7 +392,7 @@ class RIOTApplication():
             create_directory(self.resultdir, clean=True)
             self._skip(
                 'disabled_has_no_tests',
-                "{} has no tests".format(self.appdir)
+                f"{self.appdir} has no tests"
             )
             return
 
@@ -422,7 +422,7 @@ class RIOTApplication():
             else:
                 self._skip(
                     'skip.no_test',
-                    "{} has no tests".format(self.appdir)
+                    f"{self.appdir} has no tests"
                 )
 
         self.logger.info('Success')
@@ -479,7 +479,7 @@ class RIOTApplication():
 
         # Run setup-tasks, output is only kept in case of error
         for taskname, taskargs in setuptasks.items():
-            taskname = '%s.%s' % (name, taskname)
+            taskname = f'{name}.{taskname}'
             self.logger.info('Run %s', taskname)
             try:
                 self.make(taskargs)
@@ -503,7 +503,7 @@ class RIOTApplication():
         Returns `output` if it is there, None if not.
         """
         try:
-            with open(self._outfile('%s.success' % name),
+            with open(self._outfile(f'{name}.success'),
                       encoding='utf-8') as outputfd:
                 self.logger.info('Nothing to be done for %s', name)
                 return outputfd.read()
@@ -515,7 +515,7 @@ class RIOTApplication():
         """Handle exception during make step `name`."""
         output = ' '.join(err.cmd) + '\n'
         output += err.output + '\n'
-        output += 'Return value: %s\n' % err.returncode
+        output += f'Return value: {err.returncode}\n'
         outfile = self._write_resultfile(name, 'failed', output)
 
         self.logger.warning(output)
@@ -523,10 +523,10 @@ class RIOTApplication():
         if self.testcase:
             self.testcase.stderr += err.output + '\n'
             if name == "test":
-                self.testcase.add_failure_info("{} failed".format(err.cmd),
+                self.testcase.add_failure_info(f"{err.cmd} failed",
                                                err.output)
             else:
-                self.testcase.add_error_info("{} had an error".format(err.cmd),
+                self.testcase.add_error_info(f"{err.cmd} had an error",
                                              err.output)
         raise ErrorInTest(name, self, outfile)
 
@@ -537,7 +537,7 @@ class RIOTApplication():
         """
 
         # Delete previous status files
-        resultfiles = glob.glob(self._outfile('%s.*' % name))
+        resultfiles = glob.glob(self._outfile(f'{name}.*'))
         for resultfile in resultfiles:
             try:
                 os.remove(resultfile)
@@ -545,7 +545,7 @@ class RIOTApplication():
                 pass
 
         # Create new file
-        filename = '%s.%s' % (name, status)
+        filename = f'{name}.{status}'
         outfile = self._outfile(filename)
 
         with open(outfile, 'w+', encoding='utf-8',
@@ -595,9 +595,9 @@ def _test_failed_summary(errors, relpathstart=None):
 
     summary = ''
     for step, errs in sorted(errors_dict.items()):
-        summary += 'Failures during %s:\n' % step
+        summary += f'Failures during {step}:\n'
         for appdir, errorfile in errs:
-            summary += '- [%s](%s)\n' % (appdir, errorfile)
+            summary += f'- [{appdir}]({errorfile})\n'
         # Separate sections with a new line
         summary += '\n'
 
@@ -755,7 +755,7 @@ def main(args):
         with open(report_file, "w+", encoding="utf-8") as report:
             junit_xml.TestSuite.to_file(
                 report,
-                [junit_xml.TestSuite('compile_and_test_for_{}'.format(board),
+                [junit_xml.TestSuite(f'compile_and_test_for_{board}',
                                      [app.testcase for app in applications])]
             )
     if num_errors:
