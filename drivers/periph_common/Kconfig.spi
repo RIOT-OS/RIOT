@@ -20,13 +20,25 @@ config MODULE_PERIPH_SPI_RECONFIGURE
     bool "Pin reconfiguration support"
     depends on HAS_PERIPH_SPI_RECONFIGURE
 
-# TODO: this module is actually just an artifact from the way periph_init_%
-# modules are handled in Makefile. We need to define it to keep the list the
-# same for now. We should be able to remove it later on.
+config MODULE_PERIPH_SPI_GPIO_MODE
+    bool "Support initializing SPI pins with adapted GPIO modes"
+    depends on HAS_PERIPH_SPI_GPIO_MODE
+    help
+        Say y to call `spi_init_with_gpio_mode`, which allows to initialize the SPI pins in
+        with an specific GPIO mode.
+
+# TODO: these modules are actually just artifacts from the way periph_init_%
+# modules are handled in Makefile. We need to define them to keep the list the
+# same for now. We should be able to remove them later on.
 
 config MODULE_PERIPH_INIT_SPI_RECONFIGURE
     bool "Auto initialize SPI pin reconfiguration support"
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_SPI_RECONFIGURE
+
+config MODULE_PERIPH_INIT_SPI_GPIO_MODE
+    bool
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_SPI_GPIO_MODE
 
 endif # MODULE_PERIPH_SPI
