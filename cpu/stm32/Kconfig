@@ -16,6 +16,9 @@ config CPU_STM32
     select HAS_PERIPH_UART_MODECFG
     select HAS_PERIPH_UART_NONBLOCKING
 
+    # This CPU requires periph_rtc when periph_rtc_mem
+    select MODULE_PERIPH_RTC if MODULE_PERIPH_RTC_MEM && HAS_PERIPH_RTC
+
 # Common CPU symbol
 config CPU
     default "stm32" if CPU_STM32

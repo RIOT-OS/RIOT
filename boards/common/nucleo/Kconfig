@@ -15,3 +15,5 @@ config MODULE_BOARDS_COMMON_NUCLEO
         stm32 common nucleo code.
 
 endif # TEST_KCONFIG
+
+rsource "../stm32/Kconfig"
