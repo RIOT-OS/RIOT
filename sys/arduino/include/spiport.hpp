@@ -42,13 +42,13 @@
  * a frequency greater than the one it would have on Arduinos.
  * @{
  */
-#define SPI_CLOCK_DIV2      (0) /**< Best match for 8 MHz: 5 MHz */
-#define SPI_CLOCK_DIV4      (1) /**< Best match for 4 MHz: 1 MHz */
-#define SPI_CLOCK_DIV8      (1) /**< Best match for 2 MHz: 1 MHz */
-#define SPI_CLOCK_DIV16     (1) /**< Best match for 1 MHz: 1 MHz */
-#define SPI_CLOCK_DIV32     (2) /**< Best match for 500 kHz: 400 kHz */
-#define SPI_CLOCK_DIV64     (3) /**< Best match for 250 kHZ: 100 kHz */
-#define SPI_CLOCK_DIV128    (3) /**< Best match for 125 kHz: 100 kHz */
+#define SPI_CLOCK_DIV2      MHZ(8)      /**< 16 MHz / 2 */
+#define SPI_CLOCK_DIV4      MHZ(4)      /**< 16 MHz / 4 */
+#define SPI_CLOCK_DIV8      MHZ(2)      /**< 16 MHz / 8 */
+#define SPI_CLOCK_DIV16     MHZ(1)      /**< 16 MHz / 16 */
+#define SPI_CLOCK_DIV32     KHZ(500)    /**< 16 MHz / 32 */
+#define SPI_CLOCK_DIV64     KHZ(250)    /**< 16 MHz / 64 */
+#define SPI_CLOCK_DIV128    KHZ(125)    /**< 16 MHz / 128 */
 /** @} */
 
 /**
@@ -84,7 +84,7 @@ public:
     /**
      * @brief   Create a new SPI settings instance with default settings
      */
-    SPISettings() : SPISettings(4000000, MSBFIRST, SPI_MODE0) { }
+    SPISettings() : SPISettings(MHZ(4), MSBFIRST, SPI_MODE0) { }
 
     friend class SPIClass;
 };

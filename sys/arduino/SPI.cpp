@@ -30,13 +30,6 @@ SPISettings::SPISettings(uint32_t clock_hz, uint8_t bitOrder, uint8_t dataMode)
 {
     (void)bitOrder;
 
-    static const spi_clk_t clocks[] = {
-        SPI_CLK_10MHZ, SPI_CLK_5MHZ, SPI_CLK_1MHZ, SPI_CLK_400KHZ
-    };
-    static const uint32_t steps [] = {
-        10000000, 5000000, 1000000, 400000
-    };
-
     assert(bitOrder == MSBFIRST);
     switch(dataMode) {
     default:
@@ -54,14 +47,7 @@ SPISettings::SPISettings(uint32_t clock_hz, uint8_t bitOrder, uint8_t dataMode)
         break;
     }
 
-    for (uint8_t i = 0; i < ARRAY_SIZE(steps); i++) {
-        if (clock_hz >= steps[i]) {
-            clock = clocks[i];
-            return;
-        }
-    }
-
-    clock = SPI_CLK_100KHZ;
+    clock = spi_get_clk(SPI_DEV(0), clock_hz);
 }
 
 SPIClass::SPIClass(spi_t spi_dev)
@@ -133,12 +119,7 @@ void SPIClass::setDataMode(uint8_t dataMode)
 
 void SPIClass::setClockDivider(uint8_t divider)
 {
-    static const spi_clk_t clocks[] = {
-        SPI_CLK_5MHZ, SPI_CLK_1MHZ, SPI_CLK_400KHZ, SPI_CLK_100KHZ
-    };
-
-    assert(divider < ARRAY_SIZE(clocks));
-    settings.clock = clocks[divider];
+    settings.clock = spi_get_clk(SPI_DEV(0), divider);
 }
 
 SPIClass SPI(SPI_DEV(ARDUINO_SPI_INTERFACE));
