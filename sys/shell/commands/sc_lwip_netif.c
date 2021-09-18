@@ -43,6 +43,30 @@ static void _netif_list_ipv6(struct netif *netif, int addr_index) {
 }
 #endif
 
+#ifdef MODULE_LWIP_IPV4
+static int _dhcp_set(struct netif *netif, char *cmd) {
+    if (!netif_is_flag_set(netif, NETIF_FLAG_ETHERNET)) {
+        puts("DHCP not supported on interface.");
+        return 0;
+    }
+    if (strcmp(cmd, "start") == 0) {
+        if (!netif_is_up(netif)) {
+            puts("Interface must be up to start DHCP.");
+        } else {
+            netifapi_dhcp_start(netif);
+        }
+        return 0;
+    } else if(strcmp(cmd, "stop") == 0) {
+        if (dhcp_supplied_address(netif)) {
+            puts("Releasing bound address");
+        }
+        netifapi_dhcp_release_and_stop(netif);
+        return 0;
+    }
+    return 1;
+}
+#endif
+
 static void _netif_list(struct netif *netif) {
     int i;
     char name[8];
@@ -101,6 +125,10 @@ static void _usage(const char *cmd) {
     puts("      Enable or disable an interface (independent of link)");
     printf("usage: %s <iface> default\n", cmd);
     puts("      Set interface as default for routing");
+#ifdef MODULE_LWIP_IPV4
+    printf("usage: %s <iface> dhcp {start|stop}\n", cmd);
+    puts("      Start or stop DHCP on interface");
+#endif
 }
 
 int _lwip_netif_config(int argc, char **argv)
@@ -147,6 +175,14 @@ int _lwip_netif_config(int argc, char **argv)
                 netifapi_netif_set_default(netif);
                 return 0;
             }
+        } else if (argc == 4) {
+#ifdef MODULE_LWIP_IPV4
+            if (strcmp(argv[2], "dhcp") == 0) {
+                if (_dhcp_set(netif, argv[3]) == 0) {
+                    return 0;
+                }
+            }
+#endif
         }
     }
     _usage(argv[0]);
