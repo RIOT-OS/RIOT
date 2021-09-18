@@ -22,6 +22,7 @@
  *
  * The SubMAC defines the following state machine:
  *
+ * ```
  *  +--------+        +--------+     +--------+
  *  |        |------->|        |     |        |
  *  |   RX   |        |PREPARE |<--->|   TX   |
@@ -43,6 +44,7 @@
  *      |              |  IDLE  |        |
  *      +------------->|        |<-------+
  *                     +--------+
+ * ```
  *
  * - IDLE: The transceiver is off and therefore cannot receive frames. Sending
  *   frames might be triggered using @ref ieee802154_send. The next SubMAC
@@ -73,18 +75,17 @@
  *
  * The following events are valid for each state:
  *
- * +---------------+----+-------+---------+----+--------------+
- * |  Event/State  | RX | IDLE  | PREPARE | TX | WAIT FOR ACK |
- * +---------------+----+-------+---------+----+--------------+
- * | TX_DONE       | -  | -     | -       | X  | -            |
- * | RX_DONE       | X  | X*    | X*      | X* | X            |
- * | CRC_ERROR     | X  | X*    | X*      | X* | X            |
- * | ACK_TIMEOUT   | -  | -     | -       | -  | X            |
- * | BH            | -  | -     | X       | -  | -            |
- * | REQ_TX        | X  | X     | -       | -  | -            |
- * | REQ_SET_RX_ON | -  | X     | -       | -  | -            |
- * | REQ_SET_IDLE  | X  | -     | -       | -  | -            |
- * +---------------+----+-------+---------+----+--------------+
+ *  Event/State  | RX | IDLE  | PREPARE | TX | WAIT FOR ACK
+ * --------------|----|-------|---------|----|-------------
+ * TX_DONE       | -  | -     | -       | X  | -
+ * RX_DONE       | X  | X*    | X*      | X* | X
+ * CRC_ERROR     | X  | X*    | X*      | X* | X
+ * ACK_TIMEOUT   | -  | -     | -       | -  | X
+ * BH            | -  | -     | X       | -  | -
+ * REQ_TX        | X  | X     | -       | -  | -
+ * REQ_SET_RX_ON | -  | X     | -       | -  | -
+ * REQ_SET_IDLE  | X  | -     | -       | -  | -
+ *
  * *: RX_DONE and CRC_ERROR during these events might be a race condition
  *    between the ACK Timer and the radios RX_DONE event. If this happens, the
  *    SubMAC will react accordingly
