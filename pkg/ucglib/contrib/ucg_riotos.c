@@ -31,22 +31,17 @@
 #include "periph/gpio.h"
 
 #ifdef MODULE_PERIPH_SPI
-static spi_clk_t ucg_serial_clk_speed_to_spi_speed(uint32_t serial_clk_speed)
+static spi_clk_t spi_clk_cache(spi_t bus, uint32_t period_ns)
 {
-    if (serial_clk_speed < 100) {
-        return SPI_CLK_10MHZ;
-    }
-    else if (serial_clk_speed < 200) {
-        return SPI_CLK_5MHZ;
-    }
-    else if (serial_clk_speed < 1000) {
-        return SPI_CLK_1MHZ;
-    }
-    else if (serial_clk_speed < 2500) {
-        return SPI_CLK_400KHZ;
+    static uint32_t period_ns_cache;
+    static spi_clk_t clk_cache;
+
+    if (period_ns != period_ns_cache) {
+        period_ns_cache = period_ns;
+        clk_cache = spi_get_clk(bus, MHZ(1000) / period_ns);
     }
 
-    return SPI_CLK_100KHZ;
+    return clk_cache;
 }
 #endif /* MODULE_PERIPH_SPI */
 
@@ -93,8 +88,8 @@ int16_t ucg_com_hw_spi_riotos(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *da
             /* correct alignment of data can be assumed, as in pkg callers use
              * ucg_com_info_t to allocate memory */
             ucg_com_info_t *info = (void *)(uintptr_t)data;
-            spi_clk_t speed = ucg_serial_clk_speed_to_spi_speed(info->serial_clk_speed);
-            spi_acquire(dev, GPIO_UNDEF, SPI_MODE_0, speed);
+            spi_acquire(dev, GPIO_UNDEF, SPI_MODE_0,
+                        spi_clk_cache(dev, info->serial_clk_speed));
 
             break;
         case UCG_COM_MSG_POWER_DOWN:

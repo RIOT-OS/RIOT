@@ -57,6 +57,19 @@ static uint8_t sx126x_radio_wait_until_ready(sx126x_t *dev)
 }
 #endif
 
+static inline spi_clk_t spi_clk_cache(spi_t bus, uint32_t freq)
+{
+    static uint32_t freq_cache;
+    static spi_clk_t clk_cache;
+
+    if (freq != freq_cache) {
+        freq_cache = freq;
+        clk_cache = spi_get_clk(bus, freq);
+    }
+
+    return clk_cache;
+}
+
 sx126x_hal_status_t sx126x_hal_write(const void *context,
                                      const uint8_t *command, const uint16_t command_length,
                                      const uint8_t *data, const uint16_t data_length)
@@ -68,7 +81,8 @@ sx126x_hal_status_t sx126x_hal_write(const void *context,
     if (sx126x_is_stm32wl(dev)) {
 #if IS_USED(MODULE_SX126X_STM32WL)
         sx126x_radio_wait_until_ready(dev);
-        spi_acquire(dev->params->spi, SPI_CS_UNDEF, SX126X_SPI_MODE, SX126X_SPI_SPEED);
+        spi_acquire(dev->params->spi, SPI_CS_UNDEF, SX126X_SPI_MODE,
+                    spi_clk_cache(dev->params->spi, SX126X_SPI_SPEED));
 
         /* Check if radio is set to sleep or `RxDutyCycle` mode */
         if (command[0] == 0x84 || command[0] == 0x94) {
@@ -95,7 +109,8 @@ sx126x_hal_status_t sx126x_hal_write(const void *context,
         /* wait for the device to not be busy anymore */
         while (gpio_read(dev->params->busy_pin)) {}
 
-        spi_acquire(dev->params->spi, SPI_CS_UNDEF, SX126X_SPI_MODE, SX126X_SPI_SPEED);
+        spi_acquire(dev->params->spi, SPI_CS_UNDEF, SX126X_SPI_MODE,
+                    spi_clk_cache(dev->params->spi, SX126X_SPI_SPEED));
         spi_transfer_bytes(dev->params->spi, dev->params->nss_pin, data_length != 0,
                            command, NULL, command_length);
         if (data_length) {
@@ -118,7 +133,8 @@ sx126x_hal_status_t sx126x_hal_read(const void *context,
 #if IS_USED(MODULE_SX126X_STM32WL)
         sx126x_radio_wait_until_ready(dev);
 
-        spi_acquire(dev->params->spi, SPI_CS_UNDEF, SX126X_SPI_MODE, SX126X_SPI_SPEED);
+        spi_acquire(dev->params->spi, SPI_CS_UNDEF, SX126X_SPI_MODE,
+                    spi_clk_cache(dev->params->spi, SX126X_SPI_SPEED));
         /* Pull NSS low */
         PWR->SUBGHZSPICR &= ~PWR_SUBGHZSPICR_NSS;
         spi_transfer_bytes(dev->params->spi, SPI_CS_UNDEF, true, command, NULL, \
@@ -133,7 +149,8 @@ sx126x_hal_status_t sx126x_hal_read(const void *context,
         /* wait for the device to not be busy anymore */
         while (gpio_read(dev->params->busy_pin)) {}
 
-        spi_acquire(dev->params->spi, SPI_CS_UNDEF, SX126X_SPI_MODE, SX126X_SPI_SPEED);
+        spi_acquire(dev->params->spi, SPI_CS_UNDEF, SX126X_SPI_MODE,
+                    spi_clk_cache(dev->params->spi, SX126X_SPI_SPEED));
         spi_transfer_bytes(dev->params->spi, dev->params->nss_pin, true, \
                            command, NULL, command_length);
         spi_transfer_bytes(dev->params->spi, dev->params->nss_pin, false, \
@@ -204,7 +221,8 @@ sx126x_hal_status_t sx126x_hal_wakeup(const void *context)
 #endif
     }
     else {
-        spi_acquire(dev->params->spi, SPI_CS_UNDEF, SX126X_SPI_MODE, SX126X_SPI_SPEED);
+        spi_acquire(dev->params->spi, SPI_CS_UNDEF, SX126X_SPI_MODE,
+                    spi_clk_cache(dev->params->spi, SX126X_SPI_SPEED));
         gpio_clear(dev->params->nss_pin);
         gpio_set(dev->params->nss_pin);
         spi_release(dev->params->spi);
