@@ -258,7 +258,7 @@ int cmd_print_regs(int argc, char **argv)
 
     printf("################## Print Registers ###################\n");
 
-    spi_acquire(SPI_PORT, CS_PIN, SPI_MODE_0, SPI_CLK_400KHZ);
+    spi_acquire(SPI_PORT, CS_PIN, SPI_MODE_0, spi_get_clk(SPI_PORT, KHZ(400)));
 
     puts("REG_CONFIG: ");
     print_register(REG_CONFIG, 1);
