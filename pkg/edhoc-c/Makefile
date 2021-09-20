@@ -5,6 +5,8 @@ PKG_LICENSE = BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
 
+CFLAGS += -Wno-newline-eof
+
 .PHONY: edhoc-c_%
 
 EDHOC_C_MODULES := $(filter edhoc-c_%,$(USEMODULE))
