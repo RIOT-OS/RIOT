@@ -193,7 +193,7 @@ int soft_spi_init_cs(soft_spi_t bus, soft_spi_cs_t cs);
  * @return  The opaque clock configuration that is as close to but not higher than the frequency
  *          given in @p freq
  */
-soft_spi_clk_t soft_spi_get_clk(spi_t bus, uint32_t freq);
+soft_spi_clk_t soft_spi_get_clk(soft_spi_t bus, uint32_t freq);
 
 /**
  * @brief   Get the actual frequency Hertz corresponding to the given clock config
@@ -207,7 +207,7 @@ soft_spi_clk_t soft_spi_get_clk(spi_t bus, uint32_t freq);
  *          since `soft_spi_get_clk()` will return only the closest match, which will
  *          rarely be an exact match.
  */
-uint32_t soft_spi_get_freq(spi_t bus, soft_spi_clk_t clk);
+uint32_t soft_spi_get_freq(soft_spi_t bus, soft_spi_clk_t clk);
 
 /**
  * @brief   Start a new SPI transaction

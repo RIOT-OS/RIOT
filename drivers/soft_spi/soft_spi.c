@@ -110,13 +110,13 @@ static inline int soft_spi_mode_is_valid(soft_spi_mode_t mode)
     return 1;
 }
 
-soft_spi_clk_t soft_spi_get_clk(spi_t bus, uint32_t freq)
+soft_spi_clk_t soft_spi_get_clk(soft_spi_t bus, uint32_t freq)
 {
     (void)bus;
     return MHZ(500) / freq;
 }
 
-uint32_t soft_spi_get_freq(spi_t bus, soft_spi_clk_t clk)
+uint32_t soft_spi_get_freq(soft_spi_t bus, soft_spi_clk_t clk)
 {
     (void)bus;
     return MHZ(500) / clk;
