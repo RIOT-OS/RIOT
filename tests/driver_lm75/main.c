@@ -121,7 +121,6 @@ int main(void) {
     /* Set the hysteresis and overtemperature shutdown */
     if (lm75_set_temp_limits(dev, 24500, 29000, cb, NULL) != LM75_SUCCESS) {
         puts("error setting Hyst and/or OS temps");
-        return -1;
     }
 
     lm75_check_set_temperature_limits(dev);
