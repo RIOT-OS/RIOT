@@ -79,7 +79,12 @@ static void _send_topology(void *ctx, void *buffer, size_t len,
     uint8_t mac_src_len;
 
     if (zep_parse_mac(buffer, len, mac_src, &mac_src_len)) {
-        topology_add(ctx, mac_src, mac_src_len, src_addr);
+        /* a sniffer node has no MAC address and will receive every packet */
+        if (mac_src_len == 0) {
+            topology_set_sniffer(ctx, src_addr);
+        } else {
+            topology_add(ctx, mac_src, mac_src_len, src_addr);
+        }
     }
     topology_send(ctx, sock, src_addr, buffer, len);
 }

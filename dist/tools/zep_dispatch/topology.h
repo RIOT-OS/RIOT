@@ -9,6 +9,7 @@
 #define TOPOLOGY_H
 
 #include "list.h"
+#include <netinet/in.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,9 +19,11 @@ extern "C" {
  * @brief   Struct describing a graph of nodes and their connections
  */
 typedef struct {
-    bool flat;          /**< flat topology, all nodes are connected to each other */
     list_node_t nodes;  /**< list of nodes */
     list_node_t edges;  /**< list of connections between nodes. Unused if topology is flat */
+    struct sockaddr_in6 sniffer_addr;   /**< address of sniffer node. Unused if topology is flat */
+    bool has_sniffer;   /**< true if a sniffer node is connected. Unused if topology is flat */
+    bool flat;          /**< flat topology, all nodes are connected to each other */
 } topology_t;
 
 /**
@@ -57,6 +60,16 @@ int topology_print(const char *file_out, const topology_t *t);
  */
 bool topology_add(topology_t *t, const uint8_t *mac, uint8_t mac_len,
                   struct sockaddr_in6 *addr);
+
+/**
+ * @brief   Add a sniffer to the topology
+ *          A sniffer node will receive every packet but won't be able to
+ *          send packets on it's own.
+ *
+ * @param[in, out]  t       topology to configure
+ * @param[in]       addr    real address of the sniffer
+ */
+void topology_set_sniffer(topology_t *t, struct sockaddr_in6 *addr);
 
 /**
  * @brief   Send a buffer to all nodes connected to a source node
