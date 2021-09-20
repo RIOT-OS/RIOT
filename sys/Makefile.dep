@@ -699,6 +699,10 @@ ifneq (,$(filter sock_dtls, $(USEMODULE)))
     USEMODULE += sock_udp
 endif
 
+ifneq (,$(filter credman_load, $(USEMODULE)))
+  USEPKG += tiny-asn1
+endif
+
 ifneq (,$(filter suit,$(USEMODULE)))
   USEPKG += nanocbor
   USEPKG += libcose

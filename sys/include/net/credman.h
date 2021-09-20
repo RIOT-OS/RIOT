@@ -29,6 +29,7 @@
 
 #include <unistd.h>
 #include <stdint.h>
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,6 +45,13 @@ extern "C" {
  */
 #ifndef CONFIG_CREDMAN_MAX_CREDENTIALS
 #define CONFIG_CREDMAN_MAX_CREDENTIALS  (2)
+#endif
+
+/**
+ * @brief Maximum number of ASN.1 objects when decoding keys.
+ */
+#ifndef CONFIG_CREDMAN_MAX_ASN1_OBJ
+#define CONFIG_CREDMAN_MAX_ASN1_OBJ  (8)
 #endif
 /** @} */
 
@@ -184,6 +192,76 @@ void credman_delete(credman_tag_t tag, credman_type_t type);
  * @return number of credentials currently in the credential pool
  */
 int credman_get_used_count(void);
+
+#if IS_USED(MODULE_CREDMAN_LOAD) || DOXYGEN
+/**
+ * @brief Load a public key from a buffer, as a `SubjectPublicKeyInfo` sequence, according to
+ *        RFC5280. The key should be encoded in DER format.
+ *
+ * @pre `buf != NULL && out != NULL`.
+ *
+ * @note To use this functionality include the module `credman_load`. Credman only supports ECDSA
+ *       for now, so [RFC5480](https://tools.ietf.org/html/rfc5480) applies.
+ *
+ * @experimental This API is considered experimental and will probably change without notice!
+ *
+ * @see https://tools.ietf.org/html/rfc5280#section-4.1
+ *
+ * @param[in]  buf          Buffer holding the encoded public key
+ * @param[in]  buf_len      Length of @p buf
+ * @param[out] out          ECDSA public key to populate
+ *
+ * @retval CREDMAN_OK on success
+ * @retval CREDMAN_INVALID if the key is not valid
+ */
+int credman_load_public_key(const void *buf, size_t buf_len, ecdsa_public_key_t *out);
+
+/**
+ * @brief Load a private key from a buffer, as a `OneAsymmetricKey` sequence, according to RFC5958.
+ *        This is compatible with the previous version PKCS#8 (defined in RFC5208). If the optional
+ *        respective public key is present, it will be loaded as well. The key should be encoded in
+ *        DER format.
+ *
+ * @pre `buf != NULL && cred != NULL`
+ *
+ * @note To use this functionality include the module `credman_load`. Credman only supports ECDSA
+ *       for now.
+ *
+ * @experimental This API is considered experimental and will probably change without notice!
+ *
+ * @see https://tools.ietf.org/html/rfc5958#section-2
+ *
+ * @param[in]  buf          Buffer holding the encoded private key
+ * @param[in]  buf_len      Length of @p buf
+ * @param[out] cred         Credential to populate
+ *
+ * @retval CREDMAN_OK on success
+ * @retval CREDMAN_INVALID if the key is not valid
+ */
+int credman_load_private_key(const void *buf, size_t buf_len, credman_credential_t *cred);
+
+/**
+ * @brief Load an ECC private key from a buffer, as an `ECPrivateKey` sequence, according to RFC5915.
+ *        If the optional respective public key is present, it will be loaded as well. The key
+ *        should be encoded in DER format.
+ *
+ * @pre `buf != NULL && cred != NULL`
+ *
+ * @note To use this functionality include the module `credman_load`.
+ *
+ * @experimental This API is considered experimental and will probably change without notice!
+ *
+ * @see https://tools.ietf.org/html/rfc5915#section-3
+ *
+ * @param[in]  buf          Buffer holding the encoded private key
+ * @param[in]  buf_len      Length of @p buf
+ * @param[out] cred         Credential to populate
+ *
+ * @retval CREDMAN_OK on success
+ * @retval CREDMAN_INVALID if the key is not valid
+ */
+int credman_load_private_ecc_key(const void *buf, size_t buf_len, credman_credential_t *cred);
+#endif /* MODULE_CREDMAN_LOAD || DOXYGEN */
 
 #ifdef TEST_SUITES
 /**
