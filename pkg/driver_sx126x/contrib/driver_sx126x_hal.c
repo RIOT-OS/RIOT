@@ -57,11 +57,10 @@ static uint8_t sx126x_radio_wait_until_ready(sx126x_t *dev)
 }
 #endif
 
+static uint32_t freq_cache;
+static spi_clk_t clk_cache;
 static inline spi_clk_t spi_clk_cache(spi_t bus, uint32_t freq)
 {
-    static uint32_t freq_cache;
-    static spi_clk_t clk_cache;
-
     if (freq != freq_cache) {
         freq_cache = freq;
         clk_cache = spi_get_clk(bus, freq);

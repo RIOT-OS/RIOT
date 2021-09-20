@@ -79,11 +79,10 @@ int8_t bme680_i2c_write_hal(uint8_t dev_id, uint8_t reg_addr,
 #endif /* MODULE_PERIPH_I2C */
 
 #ifdef MODULE_PERIPH_SPI
+static uint32_t freq_cache;
+static spi_clk_t clk_cache;
 static inline spi_clk_t spi_clk_cache(spi_t bus, uint32_t freq)
 {
-    static uint32_t freq_cache;
-    static spi_clk_t clk_cache;
-
     if (freq != freq_cache) {
         freq_cache = freq;
         clk_cache = spi_get_clk(bus, freq);
