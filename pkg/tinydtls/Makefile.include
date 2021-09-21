@@ -28,7 +28,7 @@ ifeq (,$(filter posix_sockets,$(USEMODULE)))
 endif
 
 # Default cipher suite when not using Kconfig
-ifeq (,$(CONFIG_KCONFIG_PKG_TINYDTLS))
+ifeq (,$(CONFIG_KCONFIG_USEPKG_TINYDTLS))
   # NOTE: PSK should be enabled by default BUT if the user define any other cipher
   #       suite(s) it should not be enabled.
   # TODO: Create the flag DTLS_CIPHERS with keywords PSK, ECC (and future)
