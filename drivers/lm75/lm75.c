@@ -39,25 +39,25 @@
 #define TMP1075_CONFIG_ONE_SHOT_MODE   0x81 /* also sets the shutdown register to 1 */
 
 #if IS_ACTIVE(MODULE_LM75A)
-    lm75_properties_t lm75a_properties = {
-        .os_res         = LM75A_OS_RES,
-        .os_mult        = LM75A_OS_MULT,
-        .temp_res       = LM75A_TEMP_RES,
-        .temp_mult      = LM75A_TEMP_MULT,
-        .os_shift       = LM75A_OS_SHIFT,
-        .temp_shift     = LM75A_TEMP_SHIFT,
-    };
+lm75_properties_t lm75a_properties = {
+    .os_res         = LM75A_OS_RES,
+    .os_mult        = LM75A_OS_MULT,
+    .temp_res       = LM75A_TEMP_RES,
+    .temp_mult      = LM75A_TEMP_MULT,
+    .os_shift       = LM75A_OS_SHIFT,
+    .temp_shift     = LM75A_TEMP_SHIFT,
+};
+#endif
 
-#elif IS_ACTIVE(MODULE_TMP1075)
-    lm75_properties_t tmp1075_properties = {
-        .os_res         = TMP1075_OS_RES,
-        .os_mult        = TMP1075_OS_MULT,
-        .temp_res       = TMP1075_TEMP_RES,
-        .temp_mult      = TMP1075_TEMP_MULT,
-        .os_shift       = TMP1075_OS_SHIFT,
-        .temp_shift     = TMP1075_TEMP_SHIFT,
-    };
-
+#if IS_ACTIVE(MODULE_TMP1075)
+lm75_properties_t tmp1075_properties = {
+    .os_res         = TMP1075_OS_RES,
+    .os_mult        = TMP1075_OS_MULT,
+    .temp_res       = TMP1075_TEMP_RES,
+    .temp_mult      = TMP1075_TEMP_MULT,
+    .os_shift       = TMP1075_OS_SHIFT,
+    .temp_shift     = TMP1075_TEMP_SHIFT,
+ };
 #endif
 
 int lm75_init(lm75_t *dev, const lm75_params_t *params) {
@@ -74,27 +74,27 @@ int lm75_init(lm75_t *dev, const lm75_params_t *params) {
     if (IS_USED(MODULE_TMP1075) && (dev->lm75_params.res == &tmp1075_properties)) {
         uint16_t deid = 0;
         if (i2c_read_regs(I2C_BUS, I2C_ADDR, TMP1075_DEVICE_ID_REG, &deid, 2, 0) != 0) {
-            LOG_ERROR("Error reading device ID\n");
+            LOG_ERROR("lm75: error reading device ID\n");
          }
 
         deid = (uint16_t)ntohs(deid);
         /* checks if the device ID corresponds to the TMP1075 sensor
          * and extends the parameter configuration if so */
         if (deid == 0x7500) {
-            DEBUG("Device is a TMP1075\n");
+            DEBUG("lm75: device is a TMP1075\n");
             config |= (params->conv_rate_reg << 5);
         }
         else {
-            LOG_ERROR("Device ID Register doesnt match");
+            LOG_ERROR("lm75: device ID Register doesnt match");
             i2c_release(I2C_BUS);
             return LM75_ERROR;
         }
     }
     else if (IS_USED(MODULE_LM75A) && (dev->lm75_params.res == &lm75a_properties)) {
-        DEBUG("Device is an LM75A\n");
+        DEBUG("lm75: device is an LM75A\n");
     }
     else {
-        LOG_ERROR("Device not supported\n");
+        LOG_ERROR("lm75: device not supported\n");
         i2c_release(I2C_BUS);
         return LM75_ERROR;
     }
@@ -164,7 +164,7 @@ int lm75_set_temp_limits(lm75_t *dev, int temp_hyst, int temp_os, gpio_cb_t cb, 
     }
 
     if (temp_hyst >= temp_os) {
-        LOG_ERROR("THYST must be lower than TOS\n");
+        LOG_ERROR("lm75: THYST must be lower than TOS\n");
         return LM75_ERROR;
     }
     int16_t temp_hyst_short, temp_os_short;
@@ -190,13 +190,13 @@ int lm75_set_temp_limits(lm75_t *dev, int temp_hyst, int temp_os, gpio_cb_t cb, 
 
     if (i2c_write_regs(I2C_BUS, I2C_ADDR, LM75_THYST_REG, &temp_hyst_short, 2, 0) != 0) {
         i2c_release(I2C_BUS);
-        LOG_ERROR("ERROR wrtiting Hyst temp\n");
+        LOG_ERROR("lm75: ERROR wrtiting Hyst temp\n");
         return LM75_ERROR_I2C;
     }
 
     if (i2c_write_regs(I2C_BUS, I2C_ADDR, LM75_TOS_REG, &temp_os_short, 2, 0) != 0) {
         i2c_release(I2C_BUS);
-        LOG_ERROR("ERROR writing OS temp\n");
+        LOG_ERROR("lm75: ERROR writing OS temp\n");
         return LM75_ERROR_I2C;
     }
 
@@ -250,7 +250,7 @@ int lm75_get_hyst_temp(lm75_t *dev, int *temperature) {
 int lm75_get_os_pin(lm75_t *dev, bool *os_pin_state) {
 
     if (!gpio_is_valid(dev->lm75_params.gpio_alarm)) {
-        LOG_ERROR("OS alert pin not connected or defined\n");
+        LOG_ERROR("lm75: OS alert pin not connected or defined\n");
         return LM75_ERROR;
     }
 
@@ -273,7 +273,7 @@ int lm75_poweroff(lm75_t *dev) {
 
     /* sets every register to 0 except the shutdown reg and sees if it is active */
     if ((config & LM75_CONFIG_SHUTDOWN_MODE) != 0) {
-        LOG_ERROR("device already in shutdown mode\n");
+        LOG_ERROR("lm75: device already in shutdown mode\n");
         i2c_release(I2C_BUS);
         return LM75_SUCCESS;
     }
@@ -303,7 +303,7 @@ int lm75_poweron(lm75_t *dev) {
 
     /* sets every reg to 0 except the shutdown register and sees if it is active */
     if ((config & LM75_CONFIG_SHUTDOWN_MODE) == 0) {
-        LOG_INFO("device is already awake\n");
+        LOG_INFO("lm75: device is already awake\n");
         i2c_release(I2C_BUS);
         return LM75_SUCCESS;
     }
@@ -323,7 +323,7 @@ int lm75_poweron(lm75_t *dev) {
 int tmp1075_one_shot(lm75_t *dev) {
 
     if (!IS_USED(MODULE_TMP1075) && (dev->lm75_params.res != &tmp1075_properties)) {
-        LOG_ERROR("Device incompatible with the one shot conversion function\n");
+        LOG_ERROR("lm75: device incompatible with the one shot conversion function\n");
         return LM75_ERROR;
     }
 
