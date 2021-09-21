@@ -1,0 +1,53 @@
+#!/usr/bin/perl -w
+
+# Copyright (c) 2021 Hugues Larrive <hlarrive@pm.me>
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+use strict;
+
+my $name = "AM2301";
+my $address = "192.168.1.230";
+my @colour = (5, 14);
+
+if (defined $ARGV[0]) {
+	if ($ARGV[0] eq 'autoconf') {
+	    my $test = system "ping -c1 $address >/dev/null";
+	    if ($test == 0) {   
+            print "yes\n";
+            exit 0;
+        } else {
+            print "no (sensor not found)\n";
+            exit 1;
+        }
+    }
+    elsif ($ARGV[0] eq 'config') {
+        print "graph_title AM2301 sensor\n";
+        print "graph_args --base 1000 -l 0\n";
+        print "graph_vlabel Temperature (°C) / RH (x10)\n";
+        print "graph_category sensors\n";
+        print "graph_info This graph shows the temperature in degrees Celsius and Relative Humidity (x10).\n";
+        print "Temp_$name.label Temperature (°C)\n";
+        print "Temp_$name.colour COLOUR5\n";
+        print "RH_$name.label Relative humidity (x10)\n";
+        print "RH_$name.colour COLOUR14\n";
+        exit 0;
+    }
+}
+
+my $json = `curl http://$address/?json 2>/dev/null`;
+
+my $temp = $json;
+my $rh = $json;
+
+$temp =~ s/.*"temp":(.*?),.*/$1/;
+$temp /= 10;
+
+$rh =~ s/.*"rh":(.*)}/$1/;
+$rh /= 100;
+
+print "Temp_$name.value $temp\n";
+print "RH_$name.value $rh\n";

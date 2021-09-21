@@ -1,0 +1,127 @@
+<!--
+Copyright (C) 2021 Hugues Larrive <hlarrive@pm.me>
+
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License v2.1. See the file LICENSE in the top level
+directory for more details.
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='viewport'
+content="height=device-height, initial-scale=1.0, maximum-scale=1.0" />
+<style type="text/css">
+* {
+	font-size: 22px;
+	color: gray;
+	font-weight: bold;
+	text-align: right;
+}
+body { background: black; }
+form { float: left; }
+span { display: inline-block; }
+td { padding: 0 0px; }
+legend { text-align: left; }
+</style>
+<script type="text/javascript">
+window.onload = function(){
+
+/* http get function */
+var get = function(url, func){
+	var req = new XMLHttpRequest();
+	req.open("GET", url, true);
+	req.send(null);
+	req.onreadystatechange = function(){
+		if(req.readyState == 4) func(req.responseText);
+	};
+};
+
+var add_fieldset = function(create){
+	var fieldset = document.createElement('fieldset');
+	fieldset.add_legend = function(legend){
+		var lgnd = document.createElement('legend');
+		lgnd.innerHTML = legend;
+		this.appendChild(lgnd);
+	};
+	fieldset.add_span = function(id, inner_html){
+		var span = document.createElement('span');
+		span.id = id;
+		span.innerHTML = inner_html;
+		this.appendChild(span);
+	};
+	fieldset.add_table = function(){
+		var table = document.createElement('table');
+		this.appendChild(table);
+		table.add_row = function(){
+			var row = document.createElement('tr');
+			table.appendChild(row);
+			row.add_cell = function(){
+				var cell = document.createElement('td');
+				row.appendChild(cell);
+				cell.add_button = fieldset.add_button;
+				cell.add_span = fieldset.add_span;
+				return cell;
+			};
+			return row;
+		};
+		return table;
+	};
+	fieldset.create = create;
+	fieldset.create();
+	this.appendChild(fieldset);
+}
+
+/* Sensor */
+sensor = document.createElement('form');
+sensor.add = function(name, id, value){
+	var handler = function(){};
+	this.add_fieldset = add_fieldset;
+	this.add_fieldset((function(){ return function(){
+		this.add_legend("AM2301 Sensor");
+		var table = this.add_table();
+		var row_1 = table.add_row();
+		var row_2 = table.add_row();
+		var row_3 = table.add_row();
+		var A1 = row_1.add_cell();
+		var B1 = row_1.add_cell();
+		var A2 = row_2.add_cell();
+		var B2 = row_2.add_cell();
+		var A3 = row_3.add_cell();
+		var B3 = row_3.add_cell(); 
+		A1.append("cpuid :");
+		B1.add_span("cpuid", "--------");
+		A2.append("Température :");
+		B2.add_span("temp", "----");
+		B2.append("°C");
+		A3.append("Humidité relative :");
+		B3.add_span("rh", "----");
+		B3.append("%");
+	};})());
+};
+sensor.add();
+document.body.appendChild(sensor);
+
+setInterval(function(){
+	get('/?json', function(str){
+		try {
+			var json = JSON.parse(str);
+			document.getElementById("cpuid").innerHTML = json.cpuid;
+			document.getElementById("temp").innerHTML =
+				Number(json.temp) / 10;
+			document.getElementById("rh").innerHTML =
+				Number(json.rh) / 10;
+		}
+		catch (e) {
+			document.getElementById("cpuid").innerHTML = "--------";
+			document.getElementById("temp").innerHTML = "----";
+			document.getElementById("rh").innerHTML = "----";
+		}
+	});
+}, 2000);
+
+};
+</script>	   
+</head>
+<body>
+</body>
+</html>
