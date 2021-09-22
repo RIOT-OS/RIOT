@@ -55,7 +55,7 @@
  *             while (read_res >= 0) {
  *                 read_res = sock_tcp_read(sock, &buf, sizeof(buf),
  *                                          SOCK_NO_TIMEOUT);
- *                 if (read_res < 0) {
+ *                 if (read_res <= 0) {
  *                     puts("Disconnected");
  *                     break;
  *                 }
@@ -153,7 +153,7 @@
  *             while (read_res >= 0) {
  *                 read_res = sock_tcp_read(sock, &buf, sizeof(buf),
  *                                          SOCK_NO_TIMEOUT);
- *                 if (read_res < 0) {
+ *                 if (read_res <= 0) {
  *                     puts("Disconnected");
  *                     break;
  *                 }
@@ -216,7 +216,7 @@
  *     }
  *     else {
  *         if ((res = sock_tcp_read(&sock, &buf, sizeof(buf),
- *                                  SOCK_NO_TIMEOUT)) < 0) {
+ *                                  SOCK_NO_TIMEOUT)) <= 0) {
  *             puts("Disconnected");
  *         }
  *         printf("Read: \"");
@@ -271,7 +271,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  *     else {
  *         if ((res = sock_tcp_read(&sock, &buf, sizeof(buf),
- *                                  SOCK_NO_TIMEOUT)) < 0) {
+ *                                  SOCK_NO_TIMEOUT)) <= 0) {
  *             puts("Disconnected");
  *         }
  *         printf("Read: \"");
@@ -505,7 +505,8 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
  * @note    Function may block.
  *
  * @return  The number of bytes read on success.
- * @return  0, if no read data is available, but everything is in order.
+ * @return  0, if no read data is available or the connection was orderly closed
+ *          by the remote host.
  * @return  -EAGAIN, if @p timeout is `0` and no data is available.
  * @return  -ECONNABORTED, if the connection is aborted while waiting for the
  *          next data.
