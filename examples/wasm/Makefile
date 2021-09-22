@@ -9,13 +9,14 @@ USEPKG += wamr
 
 USEMODULE += xtimer
 USEMODULE += sema
+USEMODULE += event
 
 export WAMR_CONFIG := $(abspath config.cmake)
 
 WPEDANTIC := 0
 WERROR := 0
 
-BLOBS += main.wasm
+BLOBS += main.wasm hello.wasm
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
@@ -25,8 +26,8 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-######################################################
-# Load the rest of the usual RIOT make infastructure #
-######################################################
+#######################################################
+# Load the rest of the usual RIOT make infrastructure #
+#######################################################
 
 include $(RIOTBASE)/Makefile.include

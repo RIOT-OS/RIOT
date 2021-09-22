@@ -1,69 +1,60 @@
-LLVM_VERSION = 11
+#sometimes there might not be a wasm-ld (Ubuntu:focal)
+#lets check if we can find a specific version
 
-#LINK_FLAGS_bak =\
-#		-nostartfiles \
-#		--nostdlib \
-#		--nostdinc \
-#		--print-map\
-#		--initial-memory= \
-#		--allow-undefined-file=<value>
-#		--initial-memory=65536
+ifneq ($(shell (command -v wasm-ld)),)
+  WASM-LD ?= wasm-ld
+  else
+    ifneq ($(shell (command -v wasm-ld-11)),)
+    LLVM_VERSION = 11
+    else
+      ifneq ($(shell (command -v wasm-ld-10)),)
+      LLVM_VERSION = 10
+      else
+        ifneq ($(shell (command -v wasm-ld-9)),)
+        LLVM_VERSION = 9
+        else
+          ifneq ($(shell (command -v wasm-ld-8)),)
+          LLVM_VERSION = 8
+          endif
+      endif
+    endif
+  endif
+endif
 
-# --export-all           Export all symbols (normally combined with --no-gc-sections)
-# --export-dynamic       Put symbols in the dynamic symbol table
-# --export-table         Export function table to the environment
-# --export=<value>       Force a symbol to be exported
-# --fatal-warnings       Treat warnings as errors
-# --import-memory        Import memory from the environment
-# --import-table         Import function table from the environment
-# --initial-memory=<value>
-#                        Initial size of the linear memory
-# --lto-O<opt-level>     Optimization level for LTO
-# --lto-partitions=<value>
-#                        Number of LTO codegen partitions
-# -L <dir>               Add a directory to the library search path
-# -l <libName>           Root name of library to use
-# --max-memory=<value>   Maximum size of the linear memory
-# --merge-data-segments  Enable merging data segments
-# --mllvm <value>        Options to pass to LLVM
-# --pie                  Create a position independent executable
-# --print-gc-sections    List removed unused sections
-# --relocatable          Create relocatable object file
-# --shared-memory        Use shared linear memory
-# --shared               Build a shared object
-# --stack-first          Place stack at start of linear memory rather than after data
-# --strip-all            Strip all symbols
-# --strip-debug          Strip debugging information
-# -S                     Alias for --strip-debug
-# -s                     Alias for --strip-all
-# --thinlto-cache-dir=<value>
-#                        Path to ThinLTO cached object file directory
-# --thinlto-cache-policy=<value>
-#                        Pruning policy for the ThinLTO cache
-# --thinlto-jobs=<value> Number of ThinLTO jobs
-# --threads              Run the linker multi-threaded
-# --undefined=<value>    Force undefined symbol during linking
-# --verbose              Verbose mode
-# --version              Display the version number and exit
-# -z <option>            Linker option extensions
+ifneq ($(LLVM_VERSION),)
+  CLANG ?= clang-$(LLVM_VERSION)
+  CLANGPP ?= clang++-$(LLVM_VERSION)
+  WASM-LD ?= wasm-ld-$(LLVM_VERSION)
+else
+  CLANG ?= clang
+  CLANGPP ?= clang++
+endif
 
+WASM-LD ?= echo !! NO wasm-ld(-VERSION) found !!; false
 
-LINK_FLAGS = --export main \
+LINK_FLAGS = -z stack-size=4096 \
+		--export main \
+		--export=__heap_base \
+		--export=__data_end \
 		--allow-undefined \
-		--export-dynamic \
 		--no-entry \
 		--strip-all \
+		--export-dynamic \
 		-error-limit=0 \
 		--lto-O3 \
 		-O3 \
 		--gc-sections\
-		-z stack-size=4096 \
+		--initial-memory=65536 \
 
-#COMPILE_FLAGS_mov=\
-		-Wl,--allow-undefined\
-		-Wl,--strip-debug \
-		-nostartfiles \
-		-std=c++14 \
+# --initial-memory may only be set in 64kB steps (pagesize of WASM)
+# even though this one page is 64kB
+#	- data starts at 0, (1024 is chosen by lld)
+#	- stack starts at 4kB down
+#	- heap at 4kB up (see stack-size option)
+#	-> memory can be smaller than first page
+# without stack-size option stack will start at 64kB
+#	-> heap needs a second page
+# wasm-ld 8 and 11 do not need --initial-memory=64kB
 
 COMPILE_FLAGS = -Wall \
 		--target=wasm32-unknown-unknown-wasm \
@@ -74,22 +65,28 @@ COMPILE_FLAGS = -Wall \
 		-ffunction-sections \
 		-fdata-sections \
 
+#one might consider adding these
+#		-nostartfiles \
+#		--nostdlib \
+#		--nostdinc \
+#		-std=c++14 \
+
 %.show: %.wasm
 	wasm2wat $<
 
 %.wasm: %.o Makefile
-	wasm-ld-$(LLVM_VERSION) -o $@ $(LINK_FLAGS) $<
+	$(WASM-LD) -o $@ $(LINK_FLAGS) $<
 
 
 %.o: %.cpp Makefile FORCE
-	clang++-$(LLVM_VERSION) \
+	$(CLANGPP) \
 		-c \
 		$(COMPILE_FLAGS) \
 		-o $@ \
 		$<
 
 %.o: %.c Makefile FORCE
-	clang-$(LLVM_VERSION) \
+	$(CLANG)\
 		-c \
 		$(COMPILE_FLAGS) \
 		-o $@ \

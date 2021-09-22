@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include <string.h>
 
@@ -18,18 +19,16 @@
 
 #include <thread.h>
 
-/*provide some test program*/
-#include "blob/main.wasm.h"
+
 
 #define DEFAULT_THREAD_STACKSIZE (6 * 1024)
 #define DEFAULT_THREAD_PRIORITY 50
 
-static int app_argc;
-static char **app_argv;
 
 /* execs the main function in an instantiated module */
 static int iwasm_instance_exec_main(wasm_module_inst_t module_inst, int argc, char **argv)
 {
+    /* exception memory is part of instance -> no buffer need */
     const char *exception = 0;
     int ret = 0;
     wasm_application_execute_main(module_inst, argc, argv);
@@ -45,14 +44,15 @@ static int iwasm_instance_exec_main(wasm_module_inst_t module_inst, int argc, ch
 int iwasm_module_exec_main(wasm_module_t wasm_module , int argc, char **argv)
 {
     wasm_module_inst_t wasm_module_inst = NULL;
-    char error_buf[128];
     int ret = 0;
 
-    /* instantiate the module */
-    if (!(wasm_module_inst = wasm_runtime_instantiate(wasm_module, 8 * 1024,
-        8 * 1024, error_buf, sizeof(error_buf)))) {
-        puts(error_buf);
-        return -1;
+    {   /* instantiate the module */
+        char error_buf[128];
+        if (!(wasm_module_inst = wasm_runtime_instantiate(wasm_module, 8 * 1024,
+            8 * 1024, error_buf, sizeof(error_buf)))) {
+            puts(error_buf);
+            return -1;
+            }
     }
     ret = iwasm_instance_exec_main(wasm_module_inst, argc, argv);
     /* destroy the module instance */
@@ -61,14 +61,13 @@ int iwasm_module_exec_main(wasm_module_t wasm_module , int argc, char **argv)
 }
 
 /* bytecode needs to be writeable*/
-int iwasm_bytecode_exec_main(void *bytecode, size_t bytecode_len, int argc, char **argv){
-//  (uint8_t *) bytecode;
+int iwasm_bytecode_exec_main(uint8_t * bytecode, size_t bytecode_len, int argc, char **argv){
     int ret = 0;
     wasm_module_t wasm_module = NULL;
 
     {   /* load WASM module */
         char error_buf[128];
-        if (!(wasm_module = wasm_runtime_load((uint8_t * )bytecode, bytecode_len,
+        if (!(wasm_module = wasm_runtime_load(bytecode, bytecode_len,
                                           error_buf, sizeof(error_buf)))) {
             puts(error_buf);
             return -1;
@@ -116,27 +115,20 @@ bool iwasm_runtime_init(void)
     return true;
 }
 
+#include "event.h"
+event_queue_t iwasm_q = EVENT_QUEUE_INIT_DETACHED;
+
 void * iwasm_thread(void *arg1)
 {
     (void) arg1; /*unused*/
-    uint8_t *wasm_buf = NULL;
-    unsigned wasm_buf_size = 0;
 
     if(!iwasm_runtime_init())
         return (void *)-1;
 
-    /* we need the bytecode to be writable while loading
-     * loading adds size information to stack POPs */
-    //static uint8_t wasm_test_file[] = main_wasm;
-    wasm_buf = malloc(main_wasm_len);
-    memcpy(wasm_buf, main_wasm, main_wasm_len);
-    /* no copy need if architecture has const in writable mem */
-    /* wasm_buf = (uint8_t *) main_wasm; */
-    wasm_buf_size = main_wasm_len;
+    event_queue_claim(&iwasm_q);
+    event_loop(&iwasm_q);
 
-    iwasm_bytecode_exec_main(wasm_buf, wasm_buf_size, app_argc, app_argv);
-
-    free(wasm_buf);
+    /*next lines should not be reached*/
     wasm_runtime_destroy();
     return NULL;
 }
@@ -159,20 +151,77 @@ bool iwasm_start_thread(void)
         .arg = NULL,
         .name = "simple_wamr"
     };
-
+    event_queue_init_detached(&iwasm_q);
     b.stack=malloc(b.stacksize);
     kernel_pid_t tpid = thread_create (b.stack, b.stacksize, b.priority, b.flags, b.task_func, b.arg, b.name);
 
     return tpid != 0 ? true : false;;
 }
 
-/* this seems to be a very direct interpretation of i like to have a wamr_run */
-int wamr_run(void *bytecode, size_t bytecode_len, int argc, char **argv){
-    return iwasm_bytecode_exec_main(bytecode, bytecode_len, argc, argv);
+#include "mutex.h"
+
+typedef struct run_bytecode_event { event_t super;
+                                    void *bytecode;
+                                    size_t bytecode_len;
+                                    int argc;
+                                    char **argv;
+                                    mutex_t finish;
+} run_bytecode_event_t;
+
+void _wamr_run_call(event_t *event){
+    run_bytecode_event_t * e = (run_bytecode_event_t *) event;
+    e->argc = iwasm_bytecode_exec_main((uint8_t * )e->bytecode, e->bytecode_len, e->argc, e->argv);
+    mutex_unlock(&e->finish);
 }
 
-#define telltruth(X) ((X) ? "true" : "false")
-int main(void)
-{
-    printf("iwasm_thread_initilised: %s\n",telltruth(iwasm_start_thread()));
+/* this seems to be a very direct interpretation of "i like to have a wamr_run" */
+int wamr_run(void *bytecode, size_t bytecode_len, int argc, char **argv){
+    run_bytecode_event_t * e = malloc(sizeof(run_bytecode_event_t));
+    if (!e) return -1;
+
+    *e = (run_bytecode_event_t){ .super.handler = _wamr_run_call,
+                                    .bytecode = bytecode,
+                                    .bytecode_len = bytecode_len,
+                                    .argc = argc, .argv = argv,
+                                    .finish = MUTEX_INIT_LOCKED};
+    event_post(&iwasm_q, (event_t*) e);
+
+    mutex_lock(&e->finish);
+
+    int ret = e->argc;
+    free(e);
+    return ret;
+}
+
+
+int wamr_run_cp(const void *bytecode, size_t bytecode_len, int argc, char *argv[]){
+    /* we need the bytecode to be writable while loading
+     * loading adds size information to stack POPs */
+    uint8_t * wasm_buf = malloc(bytecode_len);
+    if (!wasm_buf) return -1;
+
+    memcpy(wasm_buf, bytecode, bytecode_len);
+    /* no copy need if architecture has const in writable mem */
+    /* wasm_buf = (uint8_t *) main_wasm; */
+
+    unsigned wasm_buf_size = bytecode_len;
+
+    /* iwasm uses argv[0] casted to an int to store mains return value */
+    static char * empty = "";
+    char ** parv;
+    if(argc > 0){
+        parv =  malloc(sizeof(argv[0]) * argc);
+        if (!parv) return -1;
+        memcpy(parv, argv, sizeof(argv[0]) * argc);
+    }else{
+        argc = 1;
+        parv = malloc(sizeof(argv[0]) * argc);
+        if (!parv) return -1;
+        parv[0] = empty;
+    }
+    int ret = wamr_run(wasm_buf, wasm_buf_size, argc, parv);
+    free(parv);
+    free(wasm_buf);
+
+    return ret;
 }
