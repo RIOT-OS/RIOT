@@ -5,10 +5,6 @@
 # directory for more details.
 #
 
-menuconfig MODULE_NEWLIB
-    bool "NewLib"
-    depends on TEST_KCONFIG
-
 if MODULE_NEWLIB
 
 config MODULE_NEWLIB_NANO
@@ -18,9 +14,11 @@ config MODULE_NEWLIB_GNU_SOURCE
     bool "NewLib GNU source"
 
 config MODULE_NEWLIB_SYSCALLS_DEFAULT
-    bool "NewLib Syscalls default implementation"
+    bool
     default y
     depends on !HAVE_CUSTOM_NEWLIB_SYSCALLS
+    help
+        Default implementation of newlib system calls.
 
 endif # MODULE_NEWLIB
 
