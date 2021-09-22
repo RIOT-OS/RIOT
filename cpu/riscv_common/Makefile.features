@@ -1,3 +1,7 @@
+ifeq ($(findstring rv32,$(CPU_CORE)),rv32)
+  CPU_ARCH := rv32
+endif
+
 FEATURES_PROVIDED += arch_32bit
 FEATURES_PROVIDED += arch_riscv
 FEATURES_PROVIDED += cpp

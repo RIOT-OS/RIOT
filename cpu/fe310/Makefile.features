@@ -1,3 +1,5 @@
+CPU_CORE := rv32imac
+
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_pm

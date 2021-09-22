@@ -7,7 +7,7 @@
 
 config CPU_FAM_FE310
     bool
-    select CPU_CORE_RV32I
+    select CPU_CORE_RV32IMAC
     select HAS_CPU_FE310
     select HAS_PERIPH_CPUID
     select HAS_PERIPH_GPIO
@@ -41,6 +41,9 @@ config CPU_MODEL
 
 config CPU
     default "fe310" if CPU_FAM_FE310
+
+config CPU_CORE
+    default "rv32imac" if CPU_CORE_RV32IMAC
 
 rsource "Kconfig.clk"
 
