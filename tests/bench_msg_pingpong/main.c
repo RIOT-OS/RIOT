@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <stdint.h>
 #include <stdatomic.h>
 #include <stdio.h>
 #include "macros/units.h"
