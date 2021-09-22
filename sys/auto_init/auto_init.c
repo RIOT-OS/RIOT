@@ -21,7 +21,7 @@
  */
 #include <stdint.h>
 #include <stdio.h>
-
+#include "sched.h"
 #include "auto_init.h"
 #include "kernel_defines.h"
 #include "log.h"
@@ -90,7 +90,7 @@ void auto_init(void)
     }
     if (IS_USED(MODULE_AUTO_INIT_GNRC_IPV6)) {
         LOG_DEBUG("Auto init gnrc_ipv6.\n");
-        extern void gnrc_ipv6_init(void);
+        extern kernel_pid_t gnrc_ipv6_init(void);
         gnrc_ipv6_init();
     }
     if (IS_USED(MODULE_AUTO_INIT_GNRC_UDP)) {
@@ -100,7 +100,7 @@ void auto_init(void)
     }
     if (IS_USED(MODULE_AUTO_INIT_GNRC_TCP)) {
         LOG_DEBUG("Auto init gnrc_tcp.\n");
-        extern void gnrc_tcp_init(void);
+        extern int gnrc_tcp_init(void);
         gnrc_tcp_init();
     }
     if (IS_USED(MODULE_AUTO_INIT_LWIP)) {
