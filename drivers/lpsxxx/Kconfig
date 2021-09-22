@@ -13,7 +13,7 @@ choice
     depends on TEST_KCONFIG
     help
         Device driver for the LPSXXX pressure sensor family
-        (LPS331AP/LPS25HB/LPS22HB). Select a model.
+        (LPS331AP/LPS25HB/LPS22HB/LPS22HH). Select a model.
 
 config MODULE_LPS331AP
     bool "LPS331AP"
@@ -21,6 +21,10 @@ config MODULE_LPS331AP
 
 config MODULE_LPS22HB
     bool "LPS22HB"
+    select MODULE_LPSXXX
+
+config MODULE_LPS22HH
+    bool "LPS22HH"
     select MODULE_LPSXXX
 
 config MODULE_LPS25HB
