@@ -21,6 +21,7 @@ config CPU_ARCH_NATIVE
     select HAS_PERIPH_PWM
     select HAS_PERIPH_TIMER_PERIODIC
     select HAS_SSP
+    select HAVE_MTD_NATIVE
 
     # needed modules
     select MODULE_PERIPH if TEST_KCONFIG
@@ -88,5 +89,4 @@ rsource "backtrace/Kconfig"
 
 endmenu # Native modules
 
-rsource "mtd/Kconfig"
 rsource "periph/Kconfig"
