@@ -40,6 +40,7 @@
 #include "cpu.h"
 #include "irq.h"
 #include "xtimer.h"
+#include "stdio_base.h"
 
 #include "native_internal.h"
 
@@ -217,6 +218,10 @@ ssize_t _native_read(int fd, void *buf, size_t count)
 {
     ssize_t r;
 
+    if (fd == STDIN_FILENO) {
+        return stdio_read(buf, count);
+    }
+
     _native_syscall_enter();
     r = real_read(fd, buf, count);
     _native_syscall_leave();
@@ -228,6 +233,10 @@ ssize_t _native_write(int fd, const void *buf, size_t count)
 {
     ssize_t r;
 
+    if (fd == STDOUT_FILENO || fd == STDERR_FILENO) {
+        return stdio_write(buf, count);
+    }
+
     _native_syscall_enter();
     r = real_write(fd, buf, count);
     _native_syscall_leave();
@@ -237,7 +246,27 @@ ssize_t _native_write(int fd, const void *buf, size_t count)
 
 ssize_t _native_writev(int fd, const struct iovec *iov, int iovcnt)
 {
-    ssize_t r;
+    ssize_t r = 0;
+
+    if (fd == STDOUT_FILENO || fd == STDERR_FILENO) {
+        while (iovcnt--) {
+            ssize_t res = stdio_write(iov->iov_base, iov->iov_len);
+
+            if (res >= 0) {
+                r += res;
+            } else {
+                return res;
+            }
+
+            if (res < (int)iov->iov_len) {
+                break;
+            }
+
+            iov++;
+        }
+
+        return r;
+    }
 
     _native_syscall_enter();
     r = real_writev(fd, iov, iovcnt);
@@ -251,8 +280,14 @@ ssize_t _native_writev(int fd, const struct iovec *iov, int iovcnt)
 #endif
 int putchar(int c)
 {
-    _native_write(STDOUT_FILENO, &c, 1);
-    return 0;
+    char tmp = c;
+    return _native_write(STDOUT_FILENO, &tmp, sizeof(tmp));
+}
+
+int putc(int c, FILE *fp)
+{
+    char tmp = c;
+    return _native_write(fileno(fp), &tmp, sizeof(tmp));
 }
 
 int puts(const char *s)
@@ -261,6 +296,22 @@ int puts(const char *s)
     r = _native_write(STDOUT_FILENO, (char*)s, strlen(s));
     putchar('\n');
     return r;
+}
+
+int fgetc(FILE *fp)
+{
+    return getc(fp);
+}
+
+int getc(FILE *fp)
+{
+    char c;
+
+    if (_native_read(fileno(fp), &c, sizeof(c)) <= 0) {
+        return EOF;
+    }
+
+    return c;
 }
 
 /* Solve 'format string is not a string literal' as it is validly used in this
