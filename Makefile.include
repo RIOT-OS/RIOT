@@ -476,6 +476,8 @@ endif
 # set some settings useful for continuous integration builds
 ifeq ($(RIOT_CI_BUILD),1)
     RIOT_VERSION ?= buildtest
+    # set a dummy version number
+    RIOT_VERSION_CODE ?= RIOT_VERSION_NUM\(2042,5,23,0\)
     ifneq ($(filter $(BOARD_INSUFFICIENT_MEMORY), $(BOARD)),)
         $(info CI-build: skipping link step)
         RIOTNOLINK:=1
@@ -504,15 +506,21 @@ include $(RIOTMAKE)/cflags.inc.mk
 
 # Include VERSION for releases
 -include $(RIOTBASE)/VERSION
+-include $(RIOTBASE)/EXTRAVERSION
 
 include $(RIOTMAKE)/git_version.inc.mk
 RIOT_VERSION ?= $(or $(GIT_VERSION),'UNKNOWN (builddir: $(RIOTBASE))')
+RIOT_EXTRAVERSION ?= 0
 
 # Deprecate using RIOT_VERSION_OVERRIDE but currently keep the behavior
 ifneq (,$(RIOT_VERSION_OVERRIDE))
   $(warning 'RIOT_VERSION_OVERRIDE' is deprecated, it can now be set with 'RIOT_VERSION' directly.)
   RIOT_VERSION = $(RIOT_VERSION_OVERRIDE)
 endif
+
+# Generate machine readable RIOT VERSION macro
+RIOT_VERSION_CODE ?= $(shell echo ${RIOT_VERSION} | \
+                      sed -E 's/([0-9]+).([0-9]+).?([0-9]+)?.*/RIOT_VERSION_NUM\\\(\1,\2,0\3,${RIOT_EXTRAVERSION}\\\)/')
 
 # Set module by prepending APPLICATION name with 'application_'.
 # It prevents conflict with application and modules with the same name.
@@ -980,6 +988,7 @@ $(RIOTBUILD_CONFIG_HEADER_C).in: FORCE | $(CLEAN)
 
 CFLAGS_WITH_MACROS += $(CFLAGS)
 CFLAGS_WITH_MACROS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
+CFLAGS_WITH_MACROS += -DRIOT_VERSION_CODE=$(RIOT_VERSION_CODE)
 # MODULE_NAME defines. Declared in 'makefiles/modules.inc.mk'
 CFLAGS_WITH_MACROS += $(EXTDEFINES)
 
