@@ -36,8 +36,18 @@
 static const uint8_t apbmul[] = {
 #if (CLOCK_APB1 < CLOCK_CORECLOCK)
     [APB1] = 2,
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
+    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5) || \
+    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32G0)
+    [APB12] = 2,
+#endif
 #else
     [APB1] = 1,
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
+    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5) || \
+    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32G0)
+    [APB12] = 1,
+#endif
 #endif
 #if (CLOCK_APB2 < CLOCK_CORECLOCK)
     [APB2] = 2
