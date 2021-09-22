@@ -18,11 +18,8 @@ _start:
 .option push
 .option norelax
     csrc CSR_MSTATUS, MSTATUS_MIE
-    la a0, _start
-    li a1, ROM_START_ADDR
-    bleu a1, a0, _start_real
-    la a0, _start_real
-    add a0, a0, a1
+    lui a0, %hi(_start_real)
+    addi a0, a0, %lo(_start_real)
     jr a0
 
 _start_real:
