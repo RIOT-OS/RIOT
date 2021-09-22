@@ -81,6 +81,13 @@ typedef enum {
     LPSXXX_RATE_25HZ = 3,       /**< sample with 25Hz, default */
     LPSXXX_RATE_50HZ = 4,       /**< sample with 50Hz */
     LPSXXX_RATE_75HZ = 5        /**< sample with 75Hz */
+#elif MODULE_LPS22HH
+    LPSXXX_RATE_10HZ = 2,       /**< sample with 10Hz */
+    LPSXXX_RATE_25HZ = 3,       /**< sample with 25Hz, default */
+    LPSXXX_RATE_50HZ = 4,       /**< sample with 50Hz */
+    LPSXXX_RATE_75HZ = 5,       /**< sample with 75Hz */
+    LPSXXX_RATE_100HZ = 6,      /**< sample with 100Hz */
+    LPSXXX_RATE_200HZ = 7       /**< sample with 200Hz */
 #endif
 } lpsxxx_rate_t;
 
@@ -89,7 +96,7 @@ typedef enum {
  */
 #if MODULE_LPS331AP || MODULE_LPS25HB
 #define LPSXXX_DEFAULT_RATE     (LPSXXX_RATE_7HZ)
-#else /* MODULE_LPS22HB */
+#else /* MODULE_LPS22HB || MODULE_LPS22HH */
 #define LPSXXX_DEFAULT_RATE     (LPSXXX_RATE_25HZ)
 #endif
 

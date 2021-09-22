@@ -106,6 +106,9 @@ int lpsxxx_init(lpsxxx_t *dev, const lpsxxx_params_t * params)
 #elif MODULE_LPS22HB
     tmp = LPSXXX_CTRL_REG1_EN_LPFP | /* Low-pass filter configuration: ODR/9 */
             LPSXXX_CTRL_REG1_BDU | (DEV_RATE << LPSXXX_CTRL_REG1_ODR_POS);
+#elif MODULE_LPS22HH
+    tmp = LPSXXX_CTRL_REG1_EN_LPFP | /* Low-pass filter configuration: ODR/9 */
+            LPSXXX_CTRL_REG1_BDU | (DEV_RATE << LPSXXX_CTRL_REG1_ODR_POS);
 #endif
 
     DEBUG("[lpsxxx] init: update reg1, value: %02X\n", tmp);

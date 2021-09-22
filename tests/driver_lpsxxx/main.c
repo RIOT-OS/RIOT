@@ -12,7 +12,8 @@
  * @{
  *
  * @file
- * @brief       Test application for the LPS331AP/LPS25HB/LPS22HB pressure sensor
+ * @brief       Test application for the LPS331AP/LPS25HB/LPS22HB/LPS22HH
+ *              pressure sensor
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
