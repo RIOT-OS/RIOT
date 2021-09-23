@@ -130,17 +130,6 @@ void spi_init_pins(spi_t bus)
     gpio_init(spi_config[bus].mosi_pin, GPIO_OUT);
 }
 
-uint32_t spi_clk_info(spi_t bus, spi_clk_t clk)
-{
-    (void)bus;
-    (void)clk;
-    /* in spi_acquire :
-     * CLK2X    PRESCALER
-     * 1        01          ->  ClkPER / 8
-     * All clock prescalers was set to 1 so ClkPER = CLOCK_CORECLOCK */
-    return CLOCK_CORECLOCK / 8;
-}
-
 spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 {
     (void)bus;
