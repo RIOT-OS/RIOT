@@ -139,7 +139,8 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
     }
     assert(freq >= CLOCK_CORECLOCK / 128);
 
-    return _clk_shift(freq);
+    uint8_t shift = _clk_shift(freq);
+    return ((~shift & 1) << 7) | (shift >> 1)
 }
 
 uint32_t spi_get_freq(spi_t bus, spi_clk_t clk)
