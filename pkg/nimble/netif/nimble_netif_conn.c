@@ -224,7 +224,7 @@ unsigned nimble_netif_conn_count(uint16_t filter)
 
 uint16_t nimble_netif_conn_get_itvl_ms(int handle)
 {
-    if ((handle == 0) || (handle >= CONN_CNT)) {
+    if ((handle < 0) || (handle >= CONN_CNT)) {
         return 0;
     }
 
