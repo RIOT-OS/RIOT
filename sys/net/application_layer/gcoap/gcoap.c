@@ -214,11 +214,13 @@ static void _on_sock_dtls_evt(sock_dtls_t *sock, sock_async_flags_t type, void *
         uint8_t minimum_free = CONFIG_GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS;
         if (dsm_get_num_available_slots() < minimum_free)
         {
-            uint32_t timeout = CONFIG_GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_USEC;
+            uint32_t timeout =
+                CONFIG_GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_USEC / 1000;
             event_callback_init(&_dtls_session_free_up_tmout_cb,
                                 _dtls_free_up_session, NULL);
-            event_timeout_init(&_dtls_session_free_up_tmout, &_queue,
-                               &_dtls_session_free_up_tmout_cb.super);
+            event_timeout_ztimer_init(&_dtls_session_free_up_tmout, ZTIMER_MSEC,
+                                      &_queue,
+                                      &_dtls_session_free_up_tmout_cb.super);
             event_timeout_set(&_dtls_session_free_up_tmout, timeout);
         }
     }
@@ -1147,9 +1149,9 @@ ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
     if (memo != NULL && res == 0) {
         if (timeout > 0) {
             event_callback_init(&memo->resp_tmout_cb, _on_resp_timeout, memo);
-            event_timeout_init(&memo->resp_evt_tmout, &_queue,
-                               &memo->resp_tmout_cb.super);
-            event_timeout_set(&memo->resp_evt_tmout, timeout);
+            event_timeout_ztimer_init(&memo->resp_evt_tmout, ZTIMER_MSEC,
+                                      &_queue, &memo->resp_tmout_cb.super);
+            event_timeout_set(&memo->resp_evt_tmout, timeout / 1000);
         }
         else {
             memset(&memo->resp_evt_tmout, 0, sizeof(event_timeout_t));
