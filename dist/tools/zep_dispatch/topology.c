@@ -151,10 +151,14 @@ int topology_print(const char *file, const topology_t *t)
 
     for (list_node_t *edge = t->edges.next; edge; edge = edge->next) {
         struct edge *super = container_of(edge, struct edge, next);
-        fprintf(out, "\t%s -> %s [ label = \"%.2f\" ]\n",
-                super->a->name, super->b->name, super->weight_a_b);
-        fprintf(out, "\t%s -> %s [ label = \"%.2f\" ]\n",
-                super->b->name, super->a->name, super->weight_b_a);
+        if (super->weight_a_b) {
+            fprintf(out, "\t%s -> %s [ label = \"%.2f\" ]\n",
+                    super->a->name, super->b->name, super->weight_a_b);
+        }
+        if (super->weight_b_a) {
+            fprintf(out, "\t%s -> %s [ label = \"%.2f\" ]\n",
+                    super->b->name, super->a->name, super->weight_b_a);
+        }
     }
 
     fprintf(out, "}\n");
