@@ -24,21 +24,31 @@
 #include "periph/adc.h"
 
 /**
- * @brief   Allocate locks for all three available ADC device
+ * @brief   Allocate lock for the ADC device
  *
- * All STM32F0 CPUs we support so far only come with a single ADC device.
+ * All STM32F0 & STM32G0 CPUs we support so far only come with a single ADC device.
  */
 static mutex_t lock = MUTEX_INIT;
 
 static inline void prep(void)
 {
     mutex_lock(&lock);
+#ifdef RCC_APB2ENR_ADCEN
     periph_clk_en(APB2, RCC_APB2ENR_ADCEN);
+#endif
+#ifdef RCC_APBENR2_ADCEN
+    periph_clk_en(APB12, RCC_APBENR2_ADCEN);
+#endif
 }
 
 static inline void done(void)
 {
+#ifdef RCC_APB2ENR_ADCEN
     periph_clk_dis(APB2, RCC_APB2ENR_ADCEN);
+#endif
+#ifdef RCC_APBENR2_ADCEN
+    periph_clk_dis(APB12, RCC_APBENR2_ADCEN);
+#endif
     mutex_unlock(&lock);
 }
 
