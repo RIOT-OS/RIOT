@@ -38,7 +38,7 @@
 #define EVENT_TIMEOUT_H
 
 #include "event.h"
-#if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
+#if IS_USED(MODULE_ZTIMER)
 #include "ztimer.h"
 #else
 #include "xtimer.h"
@@ -52,7 +52,7 @@ extern "C" {
  * @brief   Timeout Event structure
  */
 typedef struct {
-#if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
+#if IS_USED(MODULE_ZTIMER)
     ztimer_t timer;         /**< ztimer object used for timeout */
     ztimer_clock_t *clock;  /**< ztimer clock to use */
 #else
@@ -62,7 +62,7 @@ typedef struct {
     event_t *event;         /**< event to post after timeout    */
 } event_timeout_t;
 
-#if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER) || DOXYGEN
+#if IS_USED(MODULE_ZTIMER) || DOXYGEN
 /**
  * @brief   Initialize timeout event object
  *
@@ -75,6 +75,7 @@ void event_timeout_ztimer_init(event_timeout_t *event_timeout, ztimer_clock_t *c
                                event_queue_t *queue, event_t *event);
 #endif
 
+#if IS_USED(MODULE_EVENT_TIMEOUT_LEGACY) || DOXYGEN
 /**
  * @brief   Initialize timeout event object
  *
@@ -86,6 +87,7 @@ void event_timeout_ztimer_init(event_timeout_t *event_timeout, ztimer_clock_t *c
  */
 void event_timeout_init(event_timeout_t *event_timeout, event_queue_t *queue,
                         event_t *event);
+#endif
 
 /**
  * @brief   Set a timeout

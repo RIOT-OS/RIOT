@@ -9,7 +9,7 @@
  */
 
 #include "kernel_defines.h"
-#if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
+#if IS_USED(MODULE_ZTIMER)
 #include "ztimer.h"
 #else
 #include "xtimer.h"
@@ -30,16 +30,18 @@ static void _event_timeout_init(event_timeout_t *event_timeout, event_queue_t *q
     event_timeout->event = event;
 }
 
+#if IS_USED(MODULE_EVENT_TIMEOUT_LEGACY)
 void event_timeout_init(event_timeout_t *event_timeout, event_queue_t *queue, event_t *event)
 {
-#if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
+#if IS_USED(MODULE_ZTIMER)
     event_timeout_ztimer_init(event_timeout, ZTIMER_USEC, queue, event);
 #else
     _event_timeout_init(event_timeout, queue, event);
 #endif
 }
+#endif
 
-#if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
+#if IS_USED(MODULE_ZTIMER)
 void event_timeout_ztimer_init(event_timeout_t *event_timeout, ztimer_clock_t* clock,
                                event_queue_t *queue, event_t *event)
 {
@@ -50,7 +52,7 @@ void event_timeout_ztimer_init(event_timeout_t *event_timeout, ztimer_clock_t* c
 
 void event_timeout_set(event_timeout_t *event_timeout, uint32_t timeout)
 {
-#if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
+#if IS_USED(MODULE_ZTIMER)
     ztimer_set(event_timeout->clock, &event_timeout->timer, timeout);
 #else
     xtimer_set(&event_timeout->timer, timeout);
@@ -59,7 +61,7 @@ void event_timeout_set(event_timeout_t *event_timeout, uint32_t timeout)
 
 void event_timeout_clear(event_timeout_t *event_timeout)
 {
-#if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
+#if IS_USED(MODULE_ZTIMER)
     if (event_timeout->clock) {
         ztimer_remove(event_timeout->clock, &event_timeout->timer);
     }
