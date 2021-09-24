@@ -1,0 +1,11 @@
+# Copyright (c) 2021 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config PACKAGE_ELK
+    bool "Elk: a tiny Javascript engine"
+    select MODULE_PRINTF_FLOAT
+    depends on !HAS_ARCH_AVR8
+    depends on TEST_KCONFIG
