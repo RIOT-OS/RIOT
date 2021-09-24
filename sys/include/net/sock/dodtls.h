@@ -32,6 +32,7 @@
 #ifndef NET_SOCK_DODTLS_H
 #define NET_SOCK_DODTLS_H
 
+#include "net/sock/dtls.h"
 #include "net/sock/udp.h"
 
 #ifdef __cplusplus
@@ -104,6 +105,20 @@ int sock_dodtls_query(const char *domain_name, void *addr_out, int family);
  * @return  -ENOTCONN, when currently no server is configured.
  */
 int sock_dodtls_get_server(sock_udp_ep_t *server);
+
+/**
+ * @brief   Return the sock used by the DNS over DTLS client
+ *
+ * @return  The sock used by the DNS over DTLS client
+ */
+sock_dtls_t *sock_dodtls_get_dtls_sock(void);
+
+/**
+ * @brief   Return the DTLS ssession used by the DNS over DTLS client
+ *
+ * @return  The DTLS session used by the DNS over DTLS client
+ */
+sock_dtls_session_t *sock_dodtls_get_server_session(void);
 
 /**
  * @brief       Configure and establish session with DNS over DTLS server

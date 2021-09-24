@@ -136,6 +136,16 @@ int sock_dodtls_get_server(sock_udp_ep_t *server)
     return res;
 }
 
+sock_dtls_t *sock_dodtls_get_dtls_sock(void)
+{
+    return &_dtls_sock;
+}
+
+sock_dtls_session_t *sock_dodtls_get_server_session(void)
+{
+    return &_server_session;
+}
+
 int sock_dodtls_set_server(const sock_udp_ep_t *server,
                            const credman_credential_t *creds)
 {
