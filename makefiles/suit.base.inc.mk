@@ -24,7 +24,7 @@ SUIT_PUB_HDR_DIR = $(dir $(SUIT_PUB_HDR))
 CFLAGS += -I$(SUIT_PUB_HDR_DIR)
 BUILDDEPS += $(SUIT_PUB_HDR)
 
-$(SUIT_SEC):
+$(SUIT_SEC): $(if $(filter 1,$(RIOT_CI_BUILD)),$(CLEAN),)
 	$(Q)echo suit: generating key in $(SUIT_KEY_DIR)
 	$(Q)mkdir -p $(SUIT_KEY_DIR)
 	$(Q)$(RIOTBASE)/dist/tools/suit/gen_key.py $(SUIT_SEC)
