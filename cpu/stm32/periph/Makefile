@@ -15,6 +15,8 @@ endif
 ifneq (,$(filter periph_adc,$(USEMODULE)))
   ifneq (,$(filter $(CPU_FAM),f4 f7))
     SRC += adc_f4_f7.c
+  else ifneq (,$(filter $(CPU_FAM),f0 g0))
+    SRC += adc_f0_g0.c
   else
     SRC += adc_$(CPU_FAM).c
   endif

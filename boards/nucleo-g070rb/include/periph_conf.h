@@ -87,6 +87,27 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
+ * @name    ADC configuration
+ *
+ * Note that we do not configure all ADC channels,
+ * and not in the STM32G070 order.  Instead, we
+ * just define 6 ADC channels, for the Nucleo
+ * Arduino header pins A0-A5
+ *
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+    { .pin = GPIO_PIN(PORT_A,  0), .dev = 0, .chan =  0 },
+    { .pin = GPIO_PIN(PORT_A,  1), .dev = 0, .chan =  1 },
+    { .pin = GPIO_PIN(PORT_A,  4), .dev = 0, .chan =  4 },
+    { .pin = GPIO_PIN(PORT_B,  1), .dev = 0, .chan =  9 },
+    { .pin = GPIO_PIN(PORT_B, 11), .dev = 0, .chan = 15 },
+    { .pin = GPIO_PIN(PORT_B, 12), .dev = 0, .chan = 16 },
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
+
+/**
  * @name   SPI configuration
  * @{
  */
