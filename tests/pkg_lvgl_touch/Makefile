@@ -10,4 +10,9 @@ USEMODULE += lvgl_contrib
 # Add touch capabilities
 USEMODULE += lvgl_contrib_touch
 
+# SDL requires more stack
+ifeq (native,$(BOARD))
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN=48*1024
+endif
+
 include $(RIOTBASE)/Makefile.include
