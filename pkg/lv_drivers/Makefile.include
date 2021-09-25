@@ -1,0 +1,30 @@
+INCLUDES += -I$(PKGDIRBASE)/lv_drivers \
+            -I$(RIOTBASE)/pkg/lv_drivers/include \
+            #
+# Don't use relative includes in lvgl
+CFLAGS += -DLV_DRV_NO_CONF
+
+# lv_drivers module is not a concrete module, so declare it as a pseudomodule
+PSEUDOMODULES += lv_drivers
+PSEUDOMODULES += lv_drivers_contrib
+
+ifneq (,$(filter lv_drivers_display_monitor,$(USEMODULE)))
+  LINKFLAGS += $(shell sdl2-config --libs)
+  CFLAGS += $(shell sdl2-config --cflags)
+  CFLAGS += -DUSE_MONITOR=1
+  CFLAGS += -DMONITOR_ZOOM=1
+endif
+
+ifneq (,$(filter lv_drivers_indev_mouse,$(USEMODULE)))
+  LINKFLAGS += $(shell sdl2-config --libs)
+  CFLAGS += $(shell sdl2-config --cflags)
+  CFLAGS += -DUSE_MOUSE=1
+endif
+
+ifneq (,$(filter lv_drivers_mouse,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lv_drivers/contrib/mouse
+endif
+
+ifneq (,$(filter lv_drivers_monitor,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lv_drivers/contrib/monitor
+endif

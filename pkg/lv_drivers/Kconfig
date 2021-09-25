@@ -1,0 +1,49 @@
+# Copyright (c) 2021 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig PACKAGE_LV_DRIVERS
+    bool
+    prompt "LVGL Drivers Package"
+    depends on PACKAGE_LVGL
+    depends on TEST_KCONFIG
+
+if PACKAGE_LV_DRIVERS
+
+config MODULE_LV_DRIVERS_DISPLAY_MONITOR
+    bool "Monitor driver"
+    depends on HAS_ARCH_NATIVE
+    select MODULE_LV_DRIVERS_MONITOR
+
+config MODULE_LV_DRIVERS_MONITOR
+    bool "Monitor driver Adaptation Code"
+    depends on HAS_ARCH_NATIVE
+
+config MODULE_LV_DRIVERS_INDEV_MOUSE
+    bool "Mouse Driver"
+    depends on HAS_ARCH_NATIVE
+    select MODULE_LV_DRIVERS_MOUSE
+
+config MODULE_LV_DRIVERS_MOUSE
+    bool "Mouse Driver Adaptation Code"
+    depends on HAS_ARCH_NATIVE
+
+endif # PACKAGE_LV_DRIVERS
+
+config HAVE_DISPLAY_MONITOR
+    bool
+    imply MODULE_LV_DRIVERS_DISPLAY_MONITOR if MODULE_DISP_DEV
+    imply PACKAGE_LV_DRIVERS if MODULE_DISP_DEV
+    help
+        Indicates a display monitor is present
+
+config HAVE_INDEV_MOUSE
+    bool
+    imply MODULE_LV_DRIVERS_INDEV_MOUSE if MODULE_TOUCH_DEV
+    imply PACKAGE_LV_DRIVERS if MODULE_TOUCH_DEV
+    help
+        Indicates a mouse input device is present
+
