@@ -26,4 +26,20 @@ Example of command line for changing the max activity period to 5s:
 CFLAGS=-DCONFIG_LVGL_ACTIVITY_PERIOD=5000 make -C tests/pkg_lvgl
 ```
 
+### SDL Requirements
+
+To run lvgl inside a simulator (native), SDL is required. Install instructions
+can be found at https://docs.lvgl.io/latest/en/html/get-started/pc-simulator.html#install-sdl-2.
+
+On debian/ubuntu this could be as simple as installing the `libsdl2-dev:i386` package.
+
+Using SDL requires more stack so in case you are using it add
+
+```
+CFLAGS += '-DTHREAD_STACKSIZE_MAIN=48*1024'
+```
+
+to your makefile. 48kB is enough for the test other uses may need more or may
+need this to be applied to other threads using `THREAD_STACKSIZE_DEFAULT`
+
  */

@@ -33,6 +33,10 @@ void auto_init_screen(void)
             extern void auto_init_periph_ltdc(void);
             auto_init_periph_ltdc();
         }
+        if (IS_USED(MODULE_LV_DRIVERS_DISPLAY_MONITOR)) {
+            extern void auto_init_monitor(void);
+            auto_init_monitor();
+        }
     }
 
     if (IS_USED(MODULE_TOUCH_DEV)) {
@@ -45,9 +49,14 @@ void auto_init_screen(void)
             extern void auto_init_ft5x06(void);
             auto_init_ft5x06();
         }
+        if (IS_USED(MODULE_LV_DRIVERS_INDEV_MOUSE)) {
+            extern void auto_init_mouse(void);
+            auto_init_mouse();
+        }
     }
 
     if (IS_USED(MODULE_LVGL)) {
+        DEBUG("auto_init_screen: init LVGL\n");
         extern void auto_init_lvgl(void);
         auto_init_lvgl();
     }

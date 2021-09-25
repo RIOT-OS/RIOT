@@ -24,5 +24,7 @@ config BOARD_NATIVE
     # Various other features (if any)
     select HAS_ETHERNET
     select HAS_MOTOR_DRIVER
+    select HAVE_DISPLAY_MONITOR
+    select HAVE_INDEV_MOUSE
 
 rsource "drivers/Kconfig"

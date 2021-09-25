@@ -30,6 +30,10 @@
 #include "lvgl_riot.h"
 
 #include "screen_dev.h"
+#if IS_USED(MODULE_LV_DRIVERS_DISPLAY_MONITOR)
+#include "display/monitor_disp_dev.h"
+#include "display/monitor.h"
+#endif
 
 #ifndef LVGL_COLOR_BUF_SIZE
 #define LVGL_COLOR_BUF_SIZE         (LV_HOR_RES_MAX * 5)
@@ -105,6 +109,7 @@ void lvgl_init(screen_dev_t *screen_dev)
     assert(screen_dev->display);
 
     lv_disp_drv_t disp_drv;
+
     lv_disp_drv_init(&disp_drv);
     /* Configure horizontal and vertical resolutions based on the
        underlying display device parameters */
@@ -113,7 +118,19 @@ void lvgl_init(screen_dev_t *screen_dev)
 
     disp_drv.flush_cb = _disp_map;
     disp_drv.buffer = &disp_buf;
-    lv_disp_drv_register(&disp_drv);
+    lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
+
+#if IS_USED(MODULE_LV_DRIVERS_DISPLAY_MONITOR)
+    /* monitor init start the SDL handler inside an lvgl task, therefore
+       it needs to be started after lv_init() but before auto_init_lvgl()*/
+    monitor_init();
+    /* since the lv_driver monitor is LVGL based it needs a pointer to
+       the display driver */
+    monitor_t *monitor = (monitor_t *)screen_dev->display;
+    monitor->disp_drv = &disp->driver;
+#else
+    (void)disp;
+#endif
     lv_disp_buf_init(&disp_buf, buf, NULL, LVGL_COLOR_BUF_SIZE);
 
 #if IS_USED(MODULE_TOUCH_DEV)
@@ -154,5 +171,6 @@ void lvgl_run(void)
 void lvgl_wakeup(void)
 {
     thread_t *tcb = thread_get(_task_thread_pid);
+
     thread_flags_set(tcb, LVGL_THREAD_FLAG);
 }
