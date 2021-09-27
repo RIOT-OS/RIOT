@@ -19,13 +19,20 @@ choice RANDOM_IMPLEMENTATION
     default MODULE_PRNG_HWRNG if HAS_PERIPH_HWRNG
     default MODULE_PRNG_TINYMT32
 
-config MODULE_PRNG_FORTUNA
+menuconfig MODULE_PRNG_FORTUNA
     bool "Fortuna"
     select MODULE_HASHES
-    select MODULE_XTIMER
     select MODULE_FORTUNA
     select MODULE_CRYPTO
     select MODULE_CRYPTO_AES_128
+
+if MODULE_PRNG_FORTUNA
+
+config MODULE_FORTUNA_RESEED
+    bool "Reseed prng according to FORTUNA_RESEED_INTERVAL_MS"
+    select MODULE_XTIMER
+    select MODULE_ATOMIC_UTILS
+endif
 
 config MODULE_PRNG_HWRNG
     bool "Hardware RNG"

@@ -21,7 +21,6 @@
 
 #include "log.h"
 #include "mutex.h"
-
 #include "fortuna/fortuna.h"
 
 /**
