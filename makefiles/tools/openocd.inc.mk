@@ -51,6 +51,11 @@ endif
 
 OPENOCD_FLASH_TARGETS = flash flash-only
 
+ifneq (,$(IMAGE_OFFSET))
+  # Export IMAGE_OFFSET only to the flash/flash-only target
+  $(call target-export-variables,$(OPENOCD_FLASH_TARGETS),IMAGE_OFFSET)
+endif
+
 ifneq (,$(OPENOCD_PRE_VERIFY_CMDS))
   # Export OPENOCD_PRE_VERIFY_CMDS only to the flash/flash-only target
   $(call target-export-variables,$(OPENOCD_FLASH_TARGETS),OPENOCD_PRE_VERIFY_CMDS)
