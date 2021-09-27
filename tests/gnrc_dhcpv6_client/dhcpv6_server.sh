@@ -6,7 +6,7 @@
 # Distributed under terms of the MIT license.
 #
 
-if ! command -v kea-dhcp6; then
+if ! command -v kea-dhcp6 > /dev/null; then
   echo -e "\033[31;1mCommand kea-dhcp6 required\033[0m" >&2
   exit 1
 fi
@@ -30,6 +30,12 @@ _dhcpv6_server() {
     # only used `mktemp` with dry-run above to get temp directory name, so we
     # still need to create the directory
     mkdir -p "${TMPDIR}"
+
+    echo "Running kea-dhcpv6 in data directory ${TMPDIR}"
+    if [ -f "${TMPDIR}/kea-dhcp6.kea-dhcp6.pid" ]; then
+        # Kill Kea instance from potential previous run:w
+        kill "$(cat "${TMPDIR}/kea-dhcp6.kea-dhcp6.pid")"
+    fi
     sed "s/\"{{\s*env\.IFACE\s*}}\"/\"${IFACE}\"/" "$2" > "${CONFIG}"
     if ! _kea_version_lesser_1_7_10; then
         # Top-level "Logging" config is not supported by Kea >=1.7.10, so move
@@ -55,5 +61,4 @@ EOF
         kea-dhcp6 -p "$1" -c "$CONFIG" &
 }
 
-# no need to kill from external, kea handles double instances gracefully
 _dhcpv6_server "$1" "$2" &
