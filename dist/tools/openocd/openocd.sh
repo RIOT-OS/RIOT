@@ -113,6 +113,8 @@
 : ${OPENOCD_CMD_RESET_RUN:="-c 'reset run'"}
 # Select core on multi-core processors.
 : ${OPENOCD_CORE:=}
+# Set to any value to skip verifying after flashing.
+: ${OPENOCD_SKIP_VERIFY:=}
 # This is an optional offset to the base address that can be used to flash an
 # image in a different location than it is linked at. This feature can be useful
 # when flashing images for firmware swapping/remapping boot loaders.
@@ -328,6 +330,9 @@ do_flash() {
             exit $RETVAL
         fi
     fi
+    if [ -z "${OPENOCD_SKIP_VERIFY}" ]; then
+        OPENOCD_VERIFY="-c 'verify_image \"${IMAGE_FILE}\" ${IMAGE_OFFSET}'"
+    fi
 
     # In case of binary file, IMAGE_OFFSET should include the flash base address
     # This allows flashing normal binary files without env configuration
@@ -358,7 +363,7 @@ do_flash() {
             ${OPENOCD_PRE_FLASH_CMDS} \
             -c 'flash write_image erase \"${IMAGE_FILE}\" ${IMAGE_OFFSET} ${IMAGE_TYPE}' \
             ${OPENOCD_PRE_VERIFY_CMDS} \
-            -c 'verify_image \"${IMAGE_FILE}\" ${IMAGE_OFFSET}' \
+            ${OPENOCD_VERIFY} \
             -c 'reset run' \
             -c 'shutdown'" &&
     echo 'Done flashing'

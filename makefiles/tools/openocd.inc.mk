@@ -61,6 +61,11 @@ ifneq (,$(OPENOCD_PRE_VERIFY_CMDS))
   $(call target-export-variables,$(OPENOCD_FLASH_TARGETS),OPENOCD_PRE_VERIFY_CMDS)
 endif
 
+ifneq (,$(OPENOCD_SKIP_VERIFY))
+  # Export OPENOCD_SKIP_VERIFY only to the flash/flash-only target
+  $(call target-export-variables,$(OPENOCD_FLASH_TARGETS),OPENOCD_SKIP_VERIFY)
+endif
+
 ifneq (,$(OPENOCD_PRE_FLASH_CMDS))
   # Export OPENOCD_PRE_FLASH_CMDS only to the flash/flash-only targets
   $(call target-export-variables,$(OPENOCD_FLASH_TARGETS),OPENOCD_PRE_FLASH_CMDS)
