@@ -119,7 +119,10 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block,
                   " has a msg_queue. Queueing message.\n", RIOT_FILE_RELATIVE,
                   __LINE__, target_pid);
             irq_restore(state);
-            if (me->status == STATUS_REPLY_BLOCKED) {
+            if (me->status == STATUS_REPLY_BLOCKED
+                || (IS_USED(MODULE_CORE_THREAD_FLAGS) &&
+                    sched_context_switch_request)
+                ) {
                 thread_yield_higher();
             }
             return 1;
