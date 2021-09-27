@@ -58,6 +58,7 @@ PKGDIRBASE                      ?= $(RIOTBASE)/build/pkg
 DLCACHE                         ?= $(RIOTTOOLS)/dlcache/dlcache.sh
 DLCACHE_DIR                     ?= $(RIOTBASE)/.dlcache
 WARNING_EXTERNAL_MODULE_DIRS    ?= 1
+RIOT_VERSION_DUMMY_CODE         ?= RIOT_VERSION_NUM\(2042,5,23,0\)
 
 # include CI info such as BOARD_INSUFFICIENT_MEMORY, if existing
 -include Makefile.ci
@@ -487,7 +488,7 @@ endif
 ifeq ($(RIOT_CI_BUILD),1)
     RIOT_VERSION ?= buildtest
     # set a dummy version number
-    RIOT_VERSION_CODE ?= RIOT_VERSION_NUM\(2042,5,23,0\)
+    RIOT_VERSION_CODE ?= $(RIOT_VERSION_DUMMY_CODE)
     ifneq ($(filter $(BOARD_INSUFFICIENT_MEMORY), $(BOARD)),)
         $(info CI-build: skipping link step)
         RIOTNOLINK:=1
@@ -529,8 +530,9 @@ ifneq (,$(RIOT_VERSION_OVERRIDE))
 endif
 
 # Generate machine readable RIOT VERSION macro
-RIOT_VERSION_CODE ?= $(shell echo ${RIOT_VERSION} | \
-                      sed -E 's/([0-9]+).([0-9]+).?([0-9]+)?.*/RIOT_VERSION_NUM\\\(\1,\2,0\3,${RIOT_EXTRAVERSION}\\\)/')
+RIOT_VERSION_CODE ?= $(shell echo $(RIOT_VERSION) | \
+                      sed -E 's/([0-9]+)\.([0-9]+)\.?([0-9]+)?.*/RIOT_VERSION_NUM\\\(\1,\2,0\3,$(RIOT_EXTRAVERSION)\\\)/' | \
+                      grep RIOT_VERSION_NUM || echo "$(RIOT_VERSION_DUMMY_CODE)")
 
 # Set module by prepending APPLICATION name with 'application_'.
 # It prevents conflict with application and modules with the same name.
