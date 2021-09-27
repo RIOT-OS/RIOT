@@ -102,9 +102,22 @@ Since the USB bridge based on FDI FT2232HL provides a JTAG interface for debuggi
 
 To use the JTAG interface, the `esp_jtag` module must be used to disable the `SPI_DEV(0)` which normally uses the GPIOs for the JTAG signals.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-USEMODULE=esp_jtag make flash BOARD=esp32-ethernet-kit-v1_X ...
+USEMODULE+=esp_jtag make flash BOARD=esp32-ethernet-kit-v1_X ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Furthermore the function switches (DIP switches) for the JTAG signals must be set to ON.
+
+To flash using OpenOCD, install the [openocd-esp32](https://github.com/espressif/openocd-esp32) fork.
+Export where openocd is located and then flash with PROGRAMMER set:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+export OPENOCD="~/openocd-esp32/src/openocd -s ~/openocd-esp32/tcl"
+PROGRAMMER=openocd USEMODULE+=esp_jtag make flash BOARD=esp32-ethernet-kit-v1_X
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To start a debugging session (board will be reset, but not flashed):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+export OPENOCD="~/openocd-esp32/src/openocd -s ~/openocd-esp32/tcl"
+PROGRAMMER=openocd USEMODULE+=esp_jtag make debug BOARD=esp32-ethernet-kit-v1_X
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 [Back to table of contents](#esp32_ethernet_kit_toc)
  */
