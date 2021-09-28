@@ -18,6 +18,9 @@ config CPU_FAM_GD32V
     select HAS_PERIPH_TIMER_PERIODIC
     select HAS_PERIPH_WDT
 
+    select MODULE_PERIPH_CLIC if TEST_KCONFIG
+    select MODULE_PERIPH_WDT if MODULE_PERIPH_PM && HAS_PERIPH_WDT
+
 config CPU_MODEL_GD32VF103VBT6
     bool
     select CPU_FAM_GD32V
@@ -39,5 +42,7 @@ config CPU
 
 config CPU_CORE
     default "rv32imac" if CPU_CORE_RV32IMAC
+
+rsource "periph/Kconfig"
 
 source "$(RIOTCPU)/riscv_common/Kconfig"
