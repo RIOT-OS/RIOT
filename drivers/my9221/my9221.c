@@ -24,7 +24,7 @@
 
 #include "log.h"
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "my9221.h"
 #include "my9221_internal.h"
@@ -57,7 +57,7 @@ static void _latch(my9221_t *dev)
     assert(dev);
 
     gpio_clear(PIN_DAT);
-    xtimer_usleep(MY9221_LATCH_WAIT);
+    ztimer_sleep(ZTIMER_USEC, MY9221_LATCH_WAIT);
 
     for (unsigned i = 0; i < MY9221_LATCH_LOOP; ++i) {
         gpio_set(PIN_DAT);

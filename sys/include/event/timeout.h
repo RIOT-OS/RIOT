@@ -41,7 +41,7 @@
 #if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
 #include "ztimer.h"
 #else
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 
 #ifdef __cplusplus
@@ -56,7 +56,7 @@ typedef struct {
     ztimer_t timer;         /**< ztimer object used for timeout */
     ztimer_clock_t *clock;  /**< ztimer clock to use */
 #else
-    xtimer_t timer;         /**< ztimer object used for timeout */
+    ztimer_t timer;         /**< ztimer object used for timeout */
 #endif
     event_queue_t *queue;   /**< event queue to post event to   */
     event_t *event;         /**< event to post after timeout    */

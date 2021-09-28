@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "bh1900nux.h"
 #include "bh1900nux_params.h"
 
@@ -31,7 +31,7 @@ int main(void)
     int res = 0;
     int16_t temp = 0;
     bh1900nux_t dev;
-    xtimer_ticks32_t last = xtimer_now();
+    uint32_t last = ztimer_now(ZTIMER_USEC);
 
     puts("bh1900nux temperature sensor test\n");
 
@@ -46,7 +46,7 @@ int main(void)
     while (1) {
         bh1900nux_read(&dev, &temp);
         printf("temperature: %d.%d deg. C\n", (int)temp / 1000, temp % 1000);
-        xtimer_periodic_wakeup(&last, RATE);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &last, RATE);
     }
 
     return 0;

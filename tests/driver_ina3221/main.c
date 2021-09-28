@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "fmt.h"
 #include "ina3221_internal.h"
 #include "ina3221_params.h"
@@ -301,7 +301,7 @@ int main(void)
             return 1;
         }
         if (!(flags & INA3221_FLAG_CONV_READY)) {
-            xtimer_sleep(2);
+            ztimer_sleep(ZTIMER_MSEC, 2 * 1000);
             continue;
         }
         if (ch != ina3221_read_shunt_uv(&dev, shunt_uv, NULL)) {

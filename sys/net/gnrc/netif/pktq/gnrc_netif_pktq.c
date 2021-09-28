@@ -74,7 +74,7 @@ void gnrc_netif_pktq_sched_get(gnrc_netif_t *netif)
      * handler to try to send the message to IPC, leaving the system in an
      * invalid state. */
     unsigned state = irq_disable();
-    xtimer_set_msg(&netif->send_queue.dequeue_timer,
+    ztimer_set_msg(ZTIMER_USEC, &netif->send_queue.dequeue_timer,
                    CONFIG_GNRC_NETIF_PKTQ_TIMER_US,
                    &netif->send_queue.dequeue_msg, netif->pid);
     irq_restore(state);

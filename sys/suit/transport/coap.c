@@ -32,7 +32,7 @@
 #include "net/nanocoap_sock.h"
 #include "thread.h"
 #include "periph/pm.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "suit/transport/coap.h"
 #include "net/sock/util.h"
@@ -114,7 +114,7 @@ ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
 
 static inline uint32_t _now(void)
 {
-    return xtimer_now_usec();
+    return ztimer_now(ZTIMER_USEC);
 }
 
 static inline uint32_t deadline_from_interval(int32_t interval)
@@ -236,7 +236,7 @@ int suit_coap_get_blockwise(sock_udp_ep_t *remote, const char *path,
     coap_pkt_t pkt;
 
     /* HACK: use random local port */
-    local.port = 0x8000 + (xtimer_now_usec() % 0XFFF);
+    local.port = 0x8000 + (ztimer_now(ZTIMER_USEC) % 0XFFF);
 
     sock_udp_t sock;
     int res = sock_udp_create(&sock, &local, remote, 0);
@@ -372,7 +372,7 @@ static void _suit_handle_url(const char *url)
             const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(
                 riotboot_slot_other());
             riotboot_hdr_print(hdr);
-            xtimer_sleep(1);
+            ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
             if (riotboot_hdr_validate(hdr) == 0) {
                 LOG_INFO("suit_coap: rebooting...\n");

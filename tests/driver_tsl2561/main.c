@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "board.h"
 
 #include "tsl2561.h"
@@ -58,7 +58,7 @@ int main(void)
                "\n+-------------------------------------+\n",
                (int)tsl2561_read_illuminance(&dev));
 
-        xtimer_usleep(SLEEP_1S);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_1S);
     }
 
     return 0;

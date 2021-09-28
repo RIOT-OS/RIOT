@@ -22,7 +22,7 @@
 #include "assert.h"
 #include "periph/i2c.h"
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "ads101x.h"
 #include "ads101x_params.h"
@@ -138,7 +138,7 @@ int ads101x_read_raw(const ads101x_t *dev, int16_t *raw)
     i2c_write_regs(DEV, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
 
     /* Wait for the sample to be acquired */
-    xtimer_usleep(ADS101X_READ_DELAY);
+    ztimer_sleep(ZTIMER_USEC, ADS101X_READ_DELAY);
 
     /* Read the sample */
     if (i2c_read_regs(DEV, ADDR, ADS101X_CONV_RES_ADDR, &regs, 2, 0x0) < 0) {

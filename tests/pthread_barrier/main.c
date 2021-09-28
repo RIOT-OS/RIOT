@@ -23,7 +23,7 @@
 
 #include "pthread.h"
 #include "random.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define NUM_CHILDREN 4
 #define NUM_ITERATIONS 5
@@ -45,7 +45,7 @@ static void *run(void *id_)
 
         uint32_t timeout_us = random_uint32() % 2500000;
         printf("Child %i sleeps for %8" PRIu32 " us.\n", id, timeout_us);
-        xtimer_usleep(timeout_us);
+        ztimer_sleep(ZTIMER_USEC, timeout_us);
     }
 
     printf("Done %i\n", id);

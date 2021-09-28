@@ -19,7 +19,7 @@
  */
 
 #include <stdio.h>
-#include "xtimer.h"
+#include "ztimer.h"
 #include "irq.h"
 
 #define TEST_COUNT 4
@@ -34,9 +34,9 @@ int main(void)
         uint8_t count = TEST_COUNT;
         while (count) {
             unsigned int state = irq_disable();
-            uint32_t t1 = xtimer_now_usec();
+            uint32_t t1 = ztimer_now(ZTIMER_USEC);
             xtimer_spin(xtimer_ticks((uint32_t)(~XTIMER_MASK) / 2));
-            uint32_t t2 = xtimer_now_usec();
+            uint32_t t2 = ztimer_now(ZTIMER_USEC);
             irq_restore(state);
             if (t2 < t1) {
                 puts("ERROR: wrong time with interrupts disabled");

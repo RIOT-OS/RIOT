@@ -23,7 +23,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "lpd8808.h"
 #include "lpd8808_params.h"
@@ -45,7 +45,7 @@ static color_rgb_t leds[LPD8808_PARAM_LED_CNT];
 
 int main(void)
 {
-    xtimer_ticks32_t now = xtimer_now();
+    uint32_t now = ztimer_now(ZTIMER_USEC);
     int pos = 0;
     int step = 1;
     color_hsv_t col = { 0.0, 1.0, 1.0 };
@@ -77,7 +77,7 @@ int main(void)
             step *= -1;
         }
 
-        xtimer_periodic_wakeup(&now, STEP);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &now, STEP);
     }
 
     return 0;

@@ -21,7 +21,7 @@
  */
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "sdp3x_params.h"
 #include "sdp3x.h"
 
@@ -30,7 +30,7 @@
 static sdp3x_t sdp3x_dev;
 static sdp3x_params_t params = SDP3X_PARAMS;
 sdp3x_measurement_t result;
-xtimer_t continuous_timer;
+ztimer_t continuous_timer;
 
 void continuous_measurement_callback(void *arg)
 {
@@ -38,7 +38,7 @@ void continuous_measurement_callback(void *arg)
 
     sdp3x_read_continuous(&result, &sdp3x_dev);
 
-    xtimer_set(&continuous_timer, *interval);
+    ztimer_set(ZTIMER_USEC, &continuous_timer, *interval);
 }
 
 int main(void)
@@ -46,7 +46,7 @@ int main(void)
 
     sdp3x_init(&sdp3x_dev, &params);
 
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
     uint32_t interval = MEASUREMENT_INTERVAL_US;
 
@@ -58,7 +58,7 @@ int main(void)
     continuous_timer.callback = (void *)continuous_measurement_callback;
     continuous_timer.arg = &interval;
 
-    xtimer_set(&continuous_timer, interval);
+    ztimer_set(ZTIMER_USEC, &continuous_timer, interval);
 
     /*
      * Get measurements using continuous method for TEST_ITERATIONS
@@ -68,7 +68,7 @@ int main(void)
         printf(
             "Continuous values for temp: %.02f°C pressure: %.02fPa \n",
             result.temperature/100.f, result.differential_pressure/100.f);
-        xtimer_sleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
         i++;
     }
 
@@ -85,7 +85,7 @@ int main(void)
         printf(
             "Triggered values for temp: %.02f°C pressure: %.02fPa \n",
             result.temperature/100.f, result.differential_pressure/100.f);
-        xtimer_sleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
         i++;
     }
 

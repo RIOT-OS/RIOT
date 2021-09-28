@@ -17,7 +17,7 @@
  * @}
  */
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "assert.h"
 #include "periph/i2c.h"
 #include "periph/gpio.h"
@@ -270,7 +270,7 @@ static int _new_reading_available(const ph_oem_t *dev)
             i2c_release(DEV_I2C);
             return PH_OEM_READ_ERR;
         }
-        xtimer_msleep(20);
+        ztimer_sleep(ZTIMER_MSEC, 20);
     } while (new_reading_available == 0);
 
     /* need to manually reset register back to 0x00 */

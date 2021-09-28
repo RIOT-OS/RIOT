@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "timex.h"
 #include "periph/adc.h"
 
@@ -29,7 +29,7 @@
 
 int main(void)
 {
-    xtimer_ticks32_t last = xtimer_now();
+    uint32_t last = ztimer_now(ZTIMER_USEC);
     int sample = 0;
 
     puts("\nRIOT ADC peripheral driver test\n");
@@ -55,7 +55,7 @@ int main(void)
                 printf("ADC_LINE(%u): %i\n", i, sample);
             }
         }
-        xtimer_periodic_wakeup(&last, DELAY);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &last, DELAY);
     }
 
     return 0;

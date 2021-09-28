@@ -22,7 +22,7 @@
 #ifndef LSM6DSL_INTERNAL_H
 #define LSM6DSL_INTERNAL_H
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifdef __cplusplus
 extern "C" {

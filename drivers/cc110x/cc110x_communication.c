@@ -25,7 +25,7 @@
 #include "cc110x_internal.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 int cc110x_power_on_and_acquire(cc110x_t *dev)
 {
@@ -35,7 +35,7 @@ int cc110x_power_on_and_acquire(cc110x_t *dev)
         return -EIO;
     }
     gpio_clear(cs);
-    xtimer_usleep(CC110X_WAKEUP_TIME_US);
+    ztimer_sleep(ZTIMER_USEC, CC110X_WAKEUP_TIME_US);
     gpio_set(cs);
     spi_init_cs(dev->params.spi, dev->params.cs);
 
@@ -43,7 +43,7 @@ int cc110x_power_on_and_acquire(cc110x_t *dev)
 
     while (cc110x_state_from_status(cc110x_status(dev)) != CC110X_STATE_IDLE) {
         cc110x_cmd(dev, CC110X_STROBE_IDLE);
-        xtimer_usleep(CC110X_WAKEUP_TIME_US);
+        ztimer_sleep(ZTIMER_USEC, CC110X_WAKEUP_TIME_US);
     }
 
     return 0;

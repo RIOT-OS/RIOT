@@ -9,7 +9,7 @@
 #include "map.h"
 
 #include "embUnit.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "test_utils/interactive_sync.h"
 

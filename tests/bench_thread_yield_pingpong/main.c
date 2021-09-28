@@ -22,7 +22,7 @@
 
 #include "macros/units.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifndef TEST_DURATION
 #define TEST_DURATION       (1000000U)
@@ -61,12 +61,12 @@ int main(void)
                   NULL,
                   "second_thread");
 
-    xtimer_t timer;
+    ztimer_t timer;
     timer.callback = _timer_callback;
 
     uint32_t n = 0;
 
-    xtimer_set(&timer, TEST_DURATION);
+    ztimer_set(ZTIMER_USEC, &timer, TEST_DURATION);
     while(!_flag) {
         thread_yield();
         n++;

@@ -24,7 +24,7 @@
 
 #include "log.h"
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "hd44780.h"
 #include "hd44780_internal.h"
@@ -53,11 +53,11 @@ static inline void _command(const hd44780_t *dev, uint8_t value)
 static void _pulse(const hd44780_t *dev)
 {
     gpio_clear(dev->p.enable);
-    xtimer_usleep(HD44780_PULSE_WAIT_SHORT);
+    ztimer_sleep(ZTIMER_USEC, HD44780_PULSE_WAIT_SHORT);
     gpio_set(dev->p.enable);
-    xtimer_usleep(HD44780_PULSE_WAIT_SHORT);
+    ztimer_sleep(ZTIMER_USEC, HD44780_PULSE_WAIT_SHORT);
     gpio_clear(dev->p.enable);
-    xtimer_usleep(HD44780_PULSE_WAIT_LONG);
+    ztimer_sleep(ZTIMER_USEC, HD44780_PULSE_WAIT_LONG);
 }
 
 /**
@@ -141,7 +141,7 @@ int hd44780_init(hd44780_t *dev, const hd44780_params_t *params)
         gpio_init(dev->p.data[i], GPIO_OUT);
     }
     /* see hitachi HD44780 datasheet pages 45/46 for init specs */
-    xtimer_usleep(HD44780_INIT_WAIT_XXL);
+    ztimer_sleep(ZTIMER_USEC, HD44780_INIT_WAIT_XXL);
     gpio_clear(dev->p.rs);
     gpio_clear(dev->p.enable);
     if (gpio_is_valid(dev->p.rw)) {
@@ -151,22 +151,22 @@ int hd44780_init(hd44780_t *dev, const hd44780_params_t *params)
     if (!(dev->flag & HD44780_8BITMODE)) {
         /* see hitachi HD44780 datasheet figure 24, pg 46 */
         _write_bits(dev, 4, 0x03);
-        xtimer_usleep(HD44780_INIT_WAIT_LONG);
+        ztimer_sleep(ZTIMER_USEC, HD44780_INIT_WAIT_LONG);
 
         _write_bits(dev, 4, 0x03);
-        xtimer_usleep(HD44780_INIT_WAIT_LONG);
+        ztimer_sleep(ZTIMER_USEC, HD44780_INIT_WAIT_LONG);
 
         _write_bits(dev, 4, 0x03);
-        xtimer_usleep(HD44780_INIT_WAIT_SHORT);
+        ztimer_sleep(ZTIMER_USEC, HD44780_INIT_WAIT_SHORT);
 
         _write_bits(dev, 4, 0x02);
     } else {
         /* see hitachi HD44780 datasheet page 45 figure 23 */
         _command(dev, HD44780_FUNCTIONSET | dev->flag);
-        xtimer_usleep(HD44780_INIT_WAIT_LONG);  /* wait more than 4.1ms */
+        ztimer_sleep(ZTIMER_USEC, HD44780_INIT_WAIT_LONG);  /* wait more than 4.1ms */
 
         _command(dev, HD44780_FUNCTIONSET | dev->flag);
-        xtimer_usleep(HD44780_INIT_WAIT_SHORT);
+        ztimer_sleep(ZTIMER_USEC, HD44780_INIT_WAIT_SHORT);
 
         _command(dev, HD44780_FUNCTIONSET | dev->flag);
     }
@@ -186,13 +186,13 @@ int hd44780_init(hd44780_t *dev, const hd44780_params_t *params)
 void hd44780_clear(const hd44780_t *dev)
 {
     _command(dev, HD44780_CLEARDISPLAY);
-    xtimer_usleep(HD44780_CMD_WAIT);
+    ztimer_sleep(ZTIMER_USEC, HD44780_CMD_WAIT);
 }
 
 void hd44780_home(const hd44780_t *dev)
 {
     _command(dev, HD44780_RETURNHOME);
-    xtimer_usleep(HD44780_CMD_WAIT);
+    ztimer_sleep(ZTIMER_USEC, HD44780_CMD_WAIT);
 }
 
 void hd44780_set_cursor(const hd44780_t *dev, uint8_t col, uint8_t row)

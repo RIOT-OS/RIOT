@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "lsm303dlhc.h"
 #include "lsm303dlhc_params.h"
 
@@ -70,7 +70,7 @@ int main(void)
             puts("\nFailed reading magnetometer values\n");
         }
 
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
     }
 
     return 0;

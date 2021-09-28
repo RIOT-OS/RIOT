@@ -181,19 +181,19 @@ int cmd_i2c_gpio(int argc, char **argv)
     gpio_init(sda_pin, GPIO_OUT);
     gpio_init(scl_pin, GPIO_OUT);
 
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
     printf("Command: gpio_set()\n");
     gpio_set(sda_pin);
     gpio_set(scl_pin);
 
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
     printf("Command: gpio_clear()\n");
     gpio_clear(sda_pin);
     gpio_clear(scl_pin);
 
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
     printf("Command: i2c_init_pins(%i)\n", dev);
     i2c_init_pins(dev);

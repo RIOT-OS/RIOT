@@ -25,7 +25,7 @@
 #include <stdio.h>
 
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifdef __cplusplus
 extern "C" {

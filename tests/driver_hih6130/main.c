@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "hih6130.h"
 
 #define SLEEP_USEC  (100 * 1000U)
@@ -52,7 +52,7 @@ int main(void)
         float integral = 0.f;
         float fractional;
 
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
 
         status = hih6130_get_humidity_temperature_float(&dev, &hum, &temp);
         if (status < 0) {

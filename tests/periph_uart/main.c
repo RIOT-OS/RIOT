@@ -28,7 +28,7 @@
 #include "msg.h"
 #include "ringbuffer.h"
 #include "periph/uart.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifdef MODULE_STDIO_UART
 #include "stdio_uart.h"
@@ -191,7 +191,7 @@ static void sleep_test(int num, uart_t uart)
 {
     printf("UARD_DEV(%i): test uart_poweron() and uart_poweroff()  ->  ", num);
     uart_poweroff(uart);
-    xtimer_usleep(POWEROFF_DELAY);
+    ztimer_sleep(ZTIMER_USEC, POWEROFF_DELAY);
     uart_poweron(uart);
     puts("[OK]");
 }

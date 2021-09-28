@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "timex.h"
 #include "ads101x.h"
 #include "ads101x_params.h"
@@ -117,7 +117,7 @@ int main(void)
 
         puts("");
 
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
     }
 
     return 0;

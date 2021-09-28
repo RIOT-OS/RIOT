@@ -32,7 +32,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "periph/i2c.h"
 
@@ -83,7 +83,7 @@ int main(void)
                 temperature / 100, temperature % 100);
 
         /* sleep between measurements */
-        xtimer_msleep(1000);
+        ztimer_sleep(ZTIMER_MSEC, 1000);
     }
 
     return 0;

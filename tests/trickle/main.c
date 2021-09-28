@@ -26,7 +26,7 @@
 #if IS_USED(MODULE_ZTIMER_MSEC)
 #include "ztimer.h"
 #else
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 
 #define TRICKLE_MSG     (0xfeef)
@@ -53,7 +53,7 @@ static void callback(void *args)
 #if IS_USED(MODULE_ZTIMER_MSEC)
     uint32_t now = ztimer_now(ZTIMER_MSEC);
 #else
-    uint32_t now = xtimer_now_usec();
+    uint32_t now = ztimer_now(ZTIMER_USEC);
 #endif
 
     printf("now = %" PRIu32 ", t = %" PRIu32 "\n", now, trickle.t);

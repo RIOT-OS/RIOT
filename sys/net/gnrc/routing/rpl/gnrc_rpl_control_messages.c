@@ -22,7 +22,7 @@
 #if IS_USED(MODULE_ZTIMER_MSEC)
 #include "ztimer.h"
 #else
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 
 #include "net/af.h"
@@ -330,7 +330,7 @@ gnrc_pktsnip_t *_dio_prefix_info_build(gnrc_pktsnip_t *pkt, gnrc_rpl_dodag_t *do
 #if IS_USED(MODULE_ZTIMER_MSEC)
         uint32_t now = (uint32_t)ztimer_now(ZTIMER_MSEC);
 #else
-        uint32_t now = (xtimer_now_usec64() / US_PER_MS) & UINT32_MAX;
+        uint32_t now = (ztimer_now64() / US_PER_MS) & UINT32_MAX;
 #endif
         uint32_t valid_ltime = (ple.valid_until < UINT32_MAX) ?
                                (ple.valid_until - now) / MS_PER_SEC : UINT32_MAX;

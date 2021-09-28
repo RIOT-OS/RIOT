@@ -20,7 +20,7 @@
 #include <errno.h>
 
 #include "isrpipe/read_timeout.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 typedef struct {
     mutex_t *mutex;
@@ -41,9 +41,9 @@ int isrpipe_read_timeout(isrpipe_t *isrpipe, uint8_t *buffer, size_t count, uint
 
     _isrpipe_timeout_t _timeout = { .mutex = &isrpipe->mutex, .flag = 0 };
 
-    xtimer_t timer = { .callback = _cb, .arg = &_timeout };
+    ztimer_t timer = { .callback = _cb, .arg = &_timeout };
 
-    xtimer_set(&timer, timeout);
+    ztimer_set(ZTIMER_USEC, &timer, timeout);
     while (!(res = tsrb_get(&isrpipe->tsrb, buffer, count))) {
         mutex_lock(&isrpipe->mutex);
         if (_timeout.flag) {
@@ -52,7 +52,7 @@ int isrpipe_read_timeout(isrpipe_t *isrpipe, uint8_t *buffer, size_t count, uint
         }
     }
 
-    xtimer_remove(&timer);
+    ztimer_remove(ZTIMER_USEC, &timer);
     return res;
 }
 

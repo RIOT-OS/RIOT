@@ -30,7 +30,7 @@
 #include "thread.h"
 
 #if IS_USED(MODULE_XTIMER)
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 
 void event_post(event_queue_t *queue, event_t *event)
@@ -116,11 +116,11 @@ static event_t *_wait_timeout(event_queue_t *queue)
 #endif
 
 #if IS_USED(MODULE_XTIMER)
-static event_t *_wait_timeout_xtimer(event_queue_t *queue, xtimer_t *timer)
+static event_t *_wait_timeout_xtimer(event_queue_t *queue, ztimer_t *timer)
 {
     event_t *result = _wait_timeout(queue);
     if (result) {
-        xtimer_remove(timer);
+        ztimer_remove(ZTIMER_USEC, timer);
     }
 
     return result;
@@ -128,16 +128,16 @@ static event_t *_wait_timeout_xtimer(event_queue_t *queue, xtimer_t *timer)
 
 event_t *event_wait_timeout(event_queue_t *queue, uint32_t timeout)
 {
-    xtimer_t timer;
+    ztimer_t timer;
 
     thread_flags_clear(THREAD_FLAG_TIMEOUT);
-    xtimer_set_timeout_flag(&timer, timeout);
+    ztimer_set_timeout_flag(ZTIMER_USEC, &timer, timeout);
     return _wait_timeout_xtimer(queue, &timer);
 }
 
 event_t *event_wait_timeout64(event_queue_t *queue, uint64_t timeout)
 {
-    xtimer_t timer;
+    ztimer_t timer;
 
     thread_flags_clear(THREAD_FLAG_TIMEOUT);
     xtimer_set_timeout_flag64(&timer, timeout);

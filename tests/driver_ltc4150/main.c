@@ -25,7 +25,7 @@
 #include "led.h"
 #include "ltc4150.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 typedef struct {
     uint64_t last_usec;
@@ -96,8 +96,8 @@ static void pulse_cb(ltc4150_dev_t *dev, ltc4150_dir_t dir, uint64_t now_usec,
  */
 static void spin(uint32_t seconds)
 {
-    uint32_t till = xtimer_now_usec() + US_PER_SEC * seconds;
-    while (xtimer_now_usec() < till) { }
+    uint32_t till = ztimer_now(ZTIMER_USEC) + US_PER_SEC * seconds;
+    while (ztimer_now(ZTIMER_USEC) < till) { }
 }
 
 /**
@@ -110,14 +110,14 @@ static void *busy_thread(void *arg)
         /* one minute of ~0% CPU usage */
         LED0_OFF;
         LED1_OFF;
-        xtimer_sleep(60);
+        ztimer_sleep(ZTIMER_MSEC, 60 * 1000);
         change_of_load_level = 1;
 
         /* one minute of ~50% CPU usage */
         for (unsigned i = 0; i < 30; i++) {
             LED0_OFF;
             LED1_OFF;
-            xtimer_sleep(1);
+            ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
             LED0_ON;
             LED1_ON;
             spin(1);

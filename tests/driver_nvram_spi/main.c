@@ -23,7 +23,7 @@
 #include <ctype.h>
 
 #include "board.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "periph/spi.h"
 #include "nvram-spi.h"
 
@@ -137,7 +137,7 @@ int main(void)
     puts("!!! This test will erase everything on the NVRAM !!!");
     puts("!!! Unplug/reset/halt device now if this is not acceptable !!!");
     puts("Waiting for 10 seconds before continuing...");
-    xtimer_sleep(start_delay);
+    ztimer_sleep(ZTIMER_MSEC, start_delay * 1000);
 
     puts("Reading current memory contents...");
     for (i = 0; i < TEST_NVRAM_SPI_SIZE; ++i) {

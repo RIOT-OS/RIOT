@@ -23,7 +23,7 @@
 
 #include "opt3001_params.h"
 #include "opt3001.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define OPT3001_TEST_TIME 1000000
 
@@ -55,7 +55,7 @@ int main(void){
         printf("MilliLux: %" PRIu32 "\n", convlux);
         printf("\n+-------------------------------------+\n");
 
-        xtimer_usleep(OPT3001_TEST_TIME);
+        ztimer_sleep(ZTIMER_USEC, OPT3001_TEST_TIME);
     }
 
     return 0;

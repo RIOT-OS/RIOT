@@ -19,7 +19,7 @@
  */
 #include <stdio.h>
 #include <stdint.h>
-#include "xtimer.h"
+#include "ztimer.h"
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 
@@ -29,17 +29,17 @@
 /* Timer functions */
 void atca_delay_us(uint32_t delay)
 {
-    xtimer_usleep(delay);
+    ztimer_sleep(ZTIMER_USEC, delay);
 }
 
 void atca_delay_10us(uint32_t delay)
 {
-    xtimer_usleep(delay * 10);
+    ztimer_sleep(ZTIMER_USEC, delay * 10);
 }
 
 void atca_delay_ms(uint32_t delay)
 {
-    xtimer_usleep(delay * 1000);
+    ztimer_sleep(ZTIMER_USEC, delay * 1000);
 }
 
 /* Hal I2C implementation */

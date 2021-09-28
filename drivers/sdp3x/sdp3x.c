@@ -110,11 +110,12 @@ int32_t sdp3x_read_single_temperature(sdp3x_t *dev, uint8_t flags)
     _SDP3x_start_triggered(dev, flags);
     if (!IS_USED(MODULE_SDP3X_IRQ) || dev->params.irq_pin == GPIO_UNDEF) {
         /* Wait for measurement to be ready if irq pin not used */
-        xtimer_usleep(DATA_READY_SLEEP_US);
+        ztimer_sleep(ZTIMER_USEC, DATA_READY_SLEEP_US);
     }
     else {
         /* Try to lock mutex till the interrupt is raised or till timeut happens */
-        xtimer_mutex_lock_timeout(&dev->mutex, DATA_READY_SLEEP_US);
+        ztimer_mutex_lock_timeout(ZTIMER_USEC, &dev->mutex,
+                                  DATA_READY_SLEEP_US);
     }
     return _SDP3x_read_temp(dev);
 }
@@ -125,11 +126,12 @@ int32_t sdp3x_read_single_differential_pressure(sdp3x_t *dev,
     _SDP3x_start_triggered(dev, flags);
     if (!IS_USED(MODULE_SDP3X_IRQ) || dev->params.irq_pin == GPIO_UNDEF) {
         /* Wait for measurement to be ready if irq pin not used */
-        xtimer_usleep(DATA_READY_SLEEP_US);
+        ztimer_sleep(ZTIMER_USEC, DATA_READY_SLEEP_US);
     }
     else {
         /* Try to lock mutex till the interrupt is raised or till timeut happens */
-        xtimer_mutex_lock_timeout(&dev->mutex, DATA_READY_SLEEP_US);
+        ztimer_mutex_lock_timeout(ZTIMER_USEC, &dev->mutex,
+                                  DATA_READY_SLEEP_US);
     }
     return _SDP3x_read_pressure(dev);
 }
@@ -140,11 +142,12 @@ int8_t sdp3x_read_single_measurement(sdp3x_t *dev, uint8_t flags,
     _SDP3x_start_triggered(dev, flags);
     if (!IS_USED(MODULE_SDP3X_IRQ) || dev->params.irq_pin == GPIO_UNDEF) {
         /* Wait for measurement to be ready if irq pin not used */
-        xtimer_usleep(DATA_READY_SLEEP_US);
+        ztimer_sleep(ZTIMER_USEC, DATA_READY_SLEEP_US);
     }
     else {
         /* Try to lock mutex till the interrupt is raised or till timeut happens */
-        xtimer_mutex_lock_timeout(&dev->mutex, DATA_READY_SLEEP_US);
+        ztimer_mutex_lock_timeout(ZTIMER_USEC, &dev->mutex,
+                                  DATA_READY_SLEEP_US);
     }
     /* read in sensor values here */
     int16_t data[3];
@@ -237,7 +240,7 @@ static int8_t _SDP3x_start_triggered(const sdp3x_t *dev, uint8_t flags)
     return ret;
 }
 
-int8_t sdp3x_stop_continuous(sdp3x_t *dev, xtimer_t *continuous_timer)
+int8_t sdp3x_stop_continuous(sdp3x_t *dev, ztimer_t *continuous_timer)
 {
     int ret = 0;
     uint8_t cmd[2] = { 0x3F, 0xF9 };
@@ -248,7 +251,7 @@ int8_t sdp3x_stop_continuous(sdp3x_t *dev, xtimer_t *continuous_timer)
     ret = i2c_write_bytes(DEV_I2C, DEV_ADDR, cmd, 2, 0);
     i2c_release(DEV_I2C);
 
-    xtimer_remove(continuous_timer);
+    ztimer_remove(ZTIMER_USEC, continuous_timer);
     dev->continuous_measurement = false;
 
     return ret;
@@ -264,7 +267,7 @@ int8_t sdp3x_soft_reset(const sdp3x_t *dev)
     ret = i2c_write_byte(DEV_I2C, 0x00, 0x06, 0);
     i2c_release(DEV_I2C);
     /* Wait 20ms for the reset to be processed */
-    xtimer_usleep(20000);
+    ztimer_sleep(ZTIMER_USEC, 20000);
     DEBUG("[SDP3x] soft_reset: reset done\n");
     return ret;
 }
@@ -296,7 +299,7 @@ int8_t sdp3x_exit_sleep(const sdp3x_t *dev)
         i2c_release(DEV_I2C);
         return ret;
     }
-    xtimer_usleep(2000);
+    ztimer_sleep(ZTIMER_USEC, 2000);
     ret = i2c_write_bytes(DEV_I2C, DEV_ADDR, ptr, 0, 0);
     i2c_release(DEV_I2C);
 

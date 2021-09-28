@@ -26,7 +26,7 @@
 
 #include "periph/wdt.h"
 #include "shell.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 int get_range(int argc, char **argv)
 {
@@ -71,10 +71,10 @@ int start_loop_wdt(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-    printf("start time: %" PRIu32 " us\n", xtimer_now_usec());
+    printf("start time: %" PRIu32 " us\n", ztimer_now(ZTIMER_USEC));
     wdt_start();
     while (1) {
-        printf("reset time: %" PRIu32 " us\n", xtimer_now_usec());
+        printf("reset time: %" PRIu32 " us\n", ztimer_now(ZTIMER_USEC));
     }
     return 0;
 }

@@ -24,7 +24,7 @@
 #include "mutex.h"
 #include "test_utils/expect.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 static mutex_t testlock = MUTEX_INIT;
 
@@ -40,7 +40,7 @@ static void cb_cancel(void *mc)
 
 int main(void)
 {
-    xtimer_t xt;
+    ztimer_t xt;
     puts(
         "Test Application for mutex_cancel / mutex_lock_cancelable\n"
         "=========================================================\n"
@@ -61,7 +61,7 @@ int main(void)
     mc = mutex_cancel_init(&testlock);
     xt.callback = cb_unlock;
     xt.arg = &testlock;
-    xtimer_set(&xt, US_PER_MS * 10);
+    ztimer_set(ZTIMER_USEC, &xt, US_PER_MS * 10);
     expect(mutex_lock_cancelable(&mc) == 0);
     puts("OK");
 
@@ -69,7 +69,7 @@ int main(void)
     mc = mutex_cancel_init(&testlock);
     xt.callback = cb_cancel;
     xt.arg = &mc;
-    xtimer_set(&xt, US_PER_MS * 10);
+    ztimer_set(ZTIMER_USEC, &xt, US_PER_MS * 10);
     expect(mutex_lock_cancelable(&mc) == -ECANCELED);
     puts("OK");
 

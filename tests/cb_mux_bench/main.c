@@ -20,7 +20,7 @@
 #include <stdio.h>
 
 #include "cb_mux.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 /* Number of entries in the cb_mux list */
 #define NUM_ENTRIES (20U)
@@ -40,7 +40,7 @@ unsigned long time_prev, time_curr;
 void cb(void *arg)
 {
     (void)arg;
-    time_curr = xtimer_now_usec();
+    time_curr = ztimer_now(ZTIMER_USEC);
 }
 
 int main(void)
@@ -52,8 +52,8 @@ int main(void)
     puts("cb_mux benchmark application");
 
     /* Delay due to fetching timer with xtimer */
-    time_prev = xtimer_now_usec();
-    xtimer_delay = time_prev - xtimer_now_usec();
+    time_prev = ztimer_now(ZTIMER_USEC);
+    xtimer_delay = time_prev - ztimer_now(ZTIMER_USEC);
 
     /* Test for worst case: finding last entry */
     entries[NUM_ENTRIES - 1].cbid = 1;
@@ -67,7 +67,7 @@ int main(void)
 
     puts("Finding the last list entry");
 
-    time_prev = xtimer_now_usec();
+    time_prev = ztimer_now(ZTIMER_USEC);
 
     entry = cb_mux_find_cbid(cb_mux_head, 1);
     entry->cb(entry->arg);

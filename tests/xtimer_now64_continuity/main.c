@@ -22,7 +22,7 @@
 
 #include <stdint.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "fmt.h"
 
 #define ITERATIONS  (100000LU)

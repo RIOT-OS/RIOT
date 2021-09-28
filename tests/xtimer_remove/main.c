@@ -22,7 +22,7 @@
 
 #include "msg.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define NUMOF (3U)
 
@@ -38,10 +38,11 @@ int main(void)
         msg_t msg[NUMOF];
         for (unsigned int i = 0; i < NUMOF; i++) {
             msg[i].type = i;
-            xtimer_set_msg(&timers[i], 100000*(i+1), &msg[i], me);
+            ztimer_set_msg(ZTIMER_USEC, &timers[i], 100000 * (i + 1), &msg[i],
+                           me);
         }
 
-        xtimer_remove(&timers[n]);
+        ztimer_remove(ZTIMER_USEC, &timers[n]);
 
         unsigned int num = NUMOF-1;
         while(num--) {

@@ -23,7 +23,7 @@
 #include <stdio.h>
 
 #include "fmt.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "hdc1000.h"
 #include "hdc1000_params.h"
 
@@ -57,7 +57,7 @@ int main(void)
         hstr[len] = '\0';
         printf("Reading: T: %s °C  RH: %s %%\n", tstr, hstr);
 
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
     }
 
     return 0;

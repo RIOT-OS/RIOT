@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <inttypes.h>
-#include "xtimer.h"
+#include "ztimer.h"
 #include "time.h"
 #include "periph/gpio.h"
 #include "dcf77_internal.h"

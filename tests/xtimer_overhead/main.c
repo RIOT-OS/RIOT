@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define BASE    1000
 #define SAMPLES 1024

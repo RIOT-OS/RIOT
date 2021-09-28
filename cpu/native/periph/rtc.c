@@ -29,7 +29,7 @@
 
 #include "periph/rtc.h"
 #include "cpu.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "native_internal.h"
 
@@ -44,7 +44,7 @@ static rtc_alarm_cb_t _native_rtc_alarm_callback;
 
 static time_t _native_rtc_offset;
 
-static xtimer_t _native_rtc_timer;
+static ztimer_t _native_rtc_timer;
 
 static void _native_rtc_cb(void *arg) {
     if (_native_rtc_alarm_callback) {
@@ -70,7 +70,7 @@ void rtc_init(void)
 {
     DEBUG("rtc_init\n");
 
-    xtimer_remove(&_native_rtc_timer);
+    ztimer_remove(ZTIMER_USEC, &_native_rtc_timer);
     _native_rtc_timer.callback = _native_rtc_cb;
 
     memset(&_native_rtc_alarm, 0, sizeof(_native_rtc_alarm));
@@ -108,7 +108,7 @@ void rtc_poweroff(void)
     }
 
     if (_native_rtc_alarm_callback) {
-        xtimer_remove(&_native_rtc_timer);
+        ztimer_remove(ZTIMER_USEC, &_native_rtc_timer);
         memset(&_native_rtc_alarm, 0, sizeof(_native_rtc_alarm));
         _native_rtc_alarm_callback = NULL;
     }
@@ -202,7 +202,7 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     time_t tdiff_secs = mktime(&intime) - mktime(&now);
 
     if (_native_rtc_alarm_callback) {
-        xtimer_remove(&_native_rtc_timer);
+        ztimer_remove(ZTIMER_USEC, &_native_rtc_timer);
     }
 
     _native_rtc_alarm = *time;
@@ -243,7 +243,7 @@ void rtc_clear_alarm(void)
         warnx("rtc_clear_alarm: not powered on");
     }
 
-    xtimer_remove(&_native_rtc_timer);
+    ztimer_remove(ZTIMER_USEC, &_native_rtc_timer);
     memset(&_native_rtc_alarm, 0, sizeof(_native_rtc_alarm));
     _native_rtc_alarm_callback = NULL;
 }

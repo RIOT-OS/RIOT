@@ -25,7 +25,7 @@
 #include "encx24j600.h"
 #include "encx24j600_internal.h"
 #include "encx24j600_defines.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "net/netdev.h"
 #include "net/netdev/eth.h"
@@ -248,9 +248,9 @@ static int _init(netdev_t *encdev)
     /* initialization procedure as described in data sheet (39935c.pdf) */
     do {
         do {
-            xtimer_usleep(ENCX24J600_INIT_DELAY);
+            ztimer_sleep(ZTIMER_USEC, ENCX24J600_INIT_DELAY);
             reg_set(dev, ENC_EUDAST, 0x1234);
-            xtimer_usleep(ENCX24J600_INIT_DELAY);
+            ztimer_sleep(ZTIMER_USEC, ENCX24J600_INIT_DELAY);
         } while (reg_get(dev, ENC_EUDAST) != 0x1234);
 
         while (!(reg_get(dev, ENC_ESTAT) & ENC_CLKRDY)) {}
@@ -259,7 +259,7 @@ static int _init(netdev_t *encdev)
         cmd(dev, ENC_SETETHRST);
 
         /* make sure initialization finalizes */
-        xtimer_usleep(1000);
+        ztimer_sleep(ZTIMER_USEC, 1000);
     } while (!(reg_get(dev, ENC_EUDAST) == 0x0000));
 
     /* configure flow control */

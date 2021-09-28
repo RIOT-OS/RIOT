@@ -35,7 +35,7 @@
 #include <string.h>
 
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "ccs811.h"
 #include "ccs811_params.h"

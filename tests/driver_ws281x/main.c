@@ -22,7 +22,7 @@
 
 #include "ws281x.h"
 #include "ws281x_params.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 static const color_rgb_t rainbow[] = {
     {.r = 0x94, .g = 0x00, .b = 0xd3},
@@ -60,18 +60,18 @@ int main(void)
     while (1) {
         unsigned offset = 0;
         puts("\nAnimation: Moving rainbow...");
-        xtimer_ticks32_t last_wakeup = xtimer_now();
+        uint32_t last_wakeup = ztimer_now(ZTIMER_USEC);
         for (unsigned i = 0; i < 100; i++) {
             for (uint16_t j = 0; j < dev.params.numof; j++) {
                 ws281x_set(&dev, j, rainbow[(j + offset) % RAINBOW_LEN]);
             }
             offset++;
             ws281x_write(&dev);
-            xtimer_periodic_wakeup(&last_wakeup, 100 * US_PER_MS);
+            ztimer_periodic_wakeup(ZTIMER_USEC, &last_wakeup, 100 * US_PER_MS);
         }
 
         puts("\nAnimation: Fading rainbow...");
-        last_wakeup = xtimer_now();
+        last_wakeup = ztimer_now(ZTIMER_USEC);
         for (unsigned i = 0; i < RAINBOW_LEN; i++) {
             for (unsigned j = 0; j < 255; j++) {
                 color_rgb_t col;
@@ -80,7 +80,8 @@ int main(void)
                     ws281x_set(&dev, k, col);
                 }
                 ws281x_write(&dev);
-                xtimer_periodic_wakeup(&last_wakeup, 10 * US_PER_MS);
+                ztimer_periodic_wakeup(ZTIMER_USEC, &last_wakeup,
+                                       10 * US_PER_MS);
             }
             for (unsigned j = 255; j > 0; j--) {
                 color_rgb_t col;
@@ -89,7 +90,8 @@ int main(void)
                     ws281x_set(&dev, k, col);
                 }
                 ws281x_write(&dev);
-                xtimer_periodic_wakeup(&last_wakeup, 10 * US_PER_MS);
+                ztimer_periodic_wakeup(ZTIMER_USEC, &last_wakeup,
+                                       10 * US_PER_MS);
             }
         }
 
@@ -106,7 +108,7 @@ int main(void)
         ws281x_end_transmission(&dev);
 
         /* wait some time to allow testers to verify the result */
-        xtimer_sleep(5);
+        ztimer_sleep(ZTIMER_MSEC, 5 * 1000);
     }
 
     return 0;

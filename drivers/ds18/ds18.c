@@ -25,7 +25,7 @@
 
 #include "log.h"
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -54,9 +54,9 @@ static void ds18_write_bit(const ds18_t *dev, uint8_t bit)
     }
 
     /* Wait for slot to end */
-    xtimer_usleep(DS18_DELAY_SLOT);
+    ztimer_sleep(ZTIMER_USEC, DS18_DELAY_SLOT);
     ds18_release(dev);
-    xtimer_usleep(1);
+    ztimer_sleep(ZTIMER_USEC, 1);
 }
 
 static int ds18_read_bit(const ds18_t *dev, uint8_t *bit)
@@ -66,17 +66,17 @@ static int ds18_read_bit(const ds18_t *dev, uint8_t *bit)
     ds18_release(dev);
 
 #if defined(MODULE_DS18_OPTIMIZED)
-    xtimer_usleep(DS18_SAMPLE_TIME);
+    ztimer_sleep(ZTIMER_USEC, DS18_SAMPLE_TIME);
     *bit = gpio_read(dev->params.pin);
-    xtimer_usleep(DS18_DELAY_R_RECOVER);
+    ztimer_sleep(ZTIMER_USEC, DS18_DELAY_R_RECOVER);
     return DS18_OK;
 #else
     uint32_t start, measurement = 0;
 
     /* Measure time low of device pin, timeout after slot time*/
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     while (!gpio_read(dev->params.pin) && measurement < DS18_DELAY_SLOT) {
-        measurement = xtimer_now_usec() - start;
+        measurement = ztimer_now(ZTIMER_USEC) - start;
     }
 
     /* If there was a timeout return error */
@@ -88,7 +88,7 @@ static int ds18_read_bit(const ds18_t *dev, uint8_t *bit)
     *bit = measurement < DS18_SAMPLE_TIME;
 
     /* Wait for slot to end */
-    xtimer_usleep(DS18_DELAY_SLOT - measurement);
+    ztimer_sleep(ZTIMER_USEC, DS18_DELAY_SLOT - measurement);
 
     return DS18_OK;
 #endif
@@ -124,17 +124,17 @@ static int ds18_reset(const ds18_t *dev)
 
     /* Line low and sleep the reset delay */
     ds18_low(dev);
-    xtimer_usleep(DS18_DELAY_RESET);
+    ztimer_sleep(ZTIMER_USEC, DS18_DELAY_RESET);
 
     /* Release and wait for the presence response */
     ds18_release(dev);
-    xtimer_usleep(DS18_DELAY_PRESENCE);
+    ztimer_sleep(ZTIMER_USEC, DS18_DELAY_PRESENCE);
 
     /* Check device presence */
     res = gpio_read(dev->params.pin);
 
     /* Sleep for reset delay */
-    xtimer_usleep(DS18_DELAY_RESET);
+    ztimer_sleep(ZTIMER_USEC, DS18_DELAY_RESET);
 
     return res;
 }
@@ -199,7 +199,7 @@ int ds18_get_temperature(const ds18_t *dev, int16_t *temperature)
     }
 
     DEBUG("[DS18] Wait for convert T\n");
-    xtimer_usleep(DS18_DELAY_CONVERT);
+    ztimer_sleep(ZTIMER_USEC, DS18_DELAY_CONVERT);
 
     return ds18_read(dev, temperature);
 }

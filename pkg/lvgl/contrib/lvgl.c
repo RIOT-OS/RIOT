@@ -22,7 +22,7 @@
 #include "kernel_defines.h"
 #include "thread.h"
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "log.h"
 
 #include "lvgl/lvgl.h"
@@ -146,7 +146,7 @@ void lvgl_run(void)
             lv_disp_trig_activity(NULL);
         }
 
-        xtimer_usleep(CONFIG_LVGL_TASK_HANDLER_DELAY_US);
+        ztimer_sleep(ZTIMER_USEC, CONFIG_LVGL_TASK_HANDLER_DELAY_US);
     }
 }
 

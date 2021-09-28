@@ -26,7 +26,7 @@
 #include "riotboot/magic.h"
 #include "riotboot/usb_dfu.h"
 #ifdef MODULE_RIOTBOOT_USB_DFU
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 #include "periph/pm.h"
 
@@ -48,7 +48,7 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler);
 
 #ifdef MODULE_RIOTBOOT_USB_DFU
 static void _reboot(void *arg);
-static xtimer_t scheduled_reboot = { .callback=_reboot };
+static ztimer_t scheduled_reboot = { .callback=_reboot };
 #define REBOOT_DELAY 2
 #endif
 
@@ -217,7 +217,7 @@ static void _dfu_class_control_req(usbus_t *usbus, usbus_dfu_device_t *dfu, usb_
                 /* Scheduled reboot, so we can answer back dfu-util before rebooting */
                 dfu->dfu_state = USB_DFU_STATE_DFU_DL_IDLE;
 #ifdef MODULE_RIOTBOOT_USB_DFU
-                xtimer_set(&scheduled_reboot, 1 * US_PER_SEC);
+                ztimer_set(ZTIMER_USEC, &scheduled_reboot, 1 * US_PER_SEC);
 #endif
             }
             memset(&buf, 0, sizeof(buf));

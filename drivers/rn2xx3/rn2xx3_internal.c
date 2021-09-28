@@ -53,11 +53,11 @@ static bool _wait_reply(rn2xx3_t *dev, uint8_t timeout)
 
     xtimer_ticks64_t sent_time = xtimer_now64();
 
-    xtimer_t resp_timer;
+    ztimer_t resp_timer;
     resp_timer.callback = isr_resp_timeout;
     resp_timer.arg = dev;
 
-    xtimer_set(&resp_timer, (uint32_t)timeout * US_PER_SEC);
+    ztimer_set(ZTIMER_USEC, &resp_timer, (uint32_t)timeout * US_PER_SEC);
 
     /* wait for results */
     while ((!dev->resp_done) &&
@@ -66,7 +66,7 @@ static bool _wait_reply(rn2xx3_t *dev, uint8_t timeout)
         mutex_lock(&(dev->resp_lock));
     }
 
-    xtimer_remove(&resp_timer);
+    ztimer_remove(ZTIMER_USEC, &resp_timer);
 
     if (dev->resp_done == 0) {
         DEBUG("[rn2xx3] response timeout\n");

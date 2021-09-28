@@ -29,7 +29,7 @@
 #include "ztimer.h"
 static ztimer_t del_timer[GNRC_SIXLOWPAN_CTX_SIZE];
 #else
-#include "xtimer.h"
+#include "ztimer.h"
 static xtimer_t del_timer[GNRC_SIXLOWPAN_CTX_SIZE];
 #endif
 
@@ -130,7 +130,7 @@ int _gnrc_6ctx_del(char *cmd_str, char *ctx_str)
             ztimer_set(ZTIMER_MSEC, &del_timer[cid],
                        SIXLOWPAN_ND_MIN_CTX_CHANGE_SEC_DELAY * MS_PER_SEC);
 #else
-            xtimer_set(&del_timer[cid],
+            ztimer_set(ZTIMER_USEC, &del_timer[cid],
                        SIXLOWPAN_ND_MIN_CTX_CHANGE_SEC_DELAY * US_PER_SEC);
 #endif
         }

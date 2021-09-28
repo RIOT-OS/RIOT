@@ -31,7 +31,7 @@
 #if IS_USED(MODULE_ZTIMER)
 #include "ztimer.h"
 #else
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 
 #define STACKSIZE               THREAD_STACKSIZE_DEFAULT
@@ -91,7 +91,7 @@ static void timed_callback(void *arg)
 #if IS_USED(MODULE_ZTIMER)
     uint32_t now = ztimer_now(ZTIMER_USEC);
 #else
-    uint32_t now = xtimer_now_usec();
+    uint32_t now = ztimer_now(ZTIMER_USEC);
 #endif
     expect((now - before >= 100000LU));
     printf("triggered timed callback with arg 0x%08x after %" PRIu32 "us\n", (unsigned)arg, now - before);
@@ -189,7 +189,7 @@ int main(void)
 #if IS_USED(MODULE_ZTIMER)
     before = ztimer_now(ZTIMER_USEC);
 #else
-    before = xtimer_now_usec();
+    before = ztimer_now(ZTIMER_USEC);
 #endif
     event_timeout_set(&event_timeout, (1 * US_PER_SEC));
 

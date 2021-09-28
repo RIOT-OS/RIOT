@@ -19,7 +19,7 @@
 #ifndef MY9221_INTERNAL_H
 #define MY9221_INTERNAL_H
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifdef __cplusplus
 extern "C" {

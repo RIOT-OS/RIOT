@@ -23,7 +23,7 @@
 #include "net/gnrc/mac/timeout.h"
 #include "thread.h"
 #include "msg.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define TIMEOUT_COUNT    3
 #define TIMEOUT_1_DURATION    1000
@@ -50,7 +50,7 @@ void *worker_thread(void *arg)
         uint32_t now;
 
         msg_receive(&m);
-        now = xtimer_now_usec() / US_PER_MS;
+        now = ztimer_now(ZTIMER_USEC) / US_PER_MS;
 
         if (gnrc_mac_timeout_is_expired(&mac_timeout, timeout_1)) {
             printf("At %6" PRIu32 " ms received msg %i: timeout_1 (set at %" PRIu32 " ms) expired, "
@@ -102,7 +102,7 @@ int main(void)
     timeout_2 = -2;
     timeout_3 = -3;
 
-    start_time = xtimer_now_usec() / US_PER_MS;
+    start_time = ztimer_now(ZTIMER_USEC) / US_PER_MS;
     gnrc_mac_init_timeouts(&mac_timeout, test_timeouts, TIMEOUT_COUNT);
     gnrc_mac_set_timeout(&mac_timeout, timeout_1, TIMEOUT_1_DURATION, pid);
     gnrc_mac_set_timeout(&mac_timeout, timeout_2, TIMEOUT_2_DURATION, pid);

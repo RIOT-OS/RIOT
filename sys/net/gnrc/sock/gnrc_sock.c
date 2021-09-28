@@ -26,7 +26,7 @@
 #include "net/gnrc/tx_sync.h"
 #include "net/udp.h"
 #include "utlist.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "sock_types.h"
 #include "gnrc_sock_internal.h"
@@ -115,7 +115,7 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
         return -EINVAL;
     }
 #ifdef MODULE_XTIMER
-    xtimer_t timeout_timer;
+    ztimer_t timeout_timer;
 
     /* xtimer_spin would make this never receive anything.
      * Avoid that by setting the minimal not spinning timeout. */
@@ -126,7 +126,7 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     if ((timeout != SOCK_NO_TIMEOUT) && (timeout != 0)) {
         timeout_timer.callback = _callback_put;
         timeout_timer.arg = reg;
-        xtimer_set(&timeout_timer, timeout);
+        ztimer_set(ZTIMER_USEC, &timeout_timer, timeout);
     }
 #endif
     if (timeout != 0) {
@@ -138,7 +138,7 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
         }
     }
 #ifdef MODULE_XTIMER
-    xtimer_remove(&timeout_timer);
+    ztimer_remove(ZTIMER_USEC, &timeout_timer);
 #endif
     switch (msg.type) {
         case GNRC_NETAPI_MSG_TYPE_RCV:

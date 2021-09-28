@@ -24,7 +24,7 @@
 #include <stdio.h>
 
 #include "periph/qdec.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 void handler(void *arg)
 {
@@ -57,7 +57,7 @@ int main(void)
             value = qdec_read_and_reset(QDEC_DEV(i));
             printf("QDEC %lu = %ld\n", (unsigned long int)i, (long int)value);
         }
-        xtimer_sleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
     }
 
     return 0;

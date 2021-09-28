@@ -40,7 +40,7 @@ static inline void _lwmac_clear_timeout(gnrc_lwmac_timeout_t *timeout)
 {
     assert(timeout);
 
-    xtimer_remove(&(timeout->timer));
+    ztimer_remove(ZTIMER_USEC, &(timeout->timer));
     timeout->type = GNRC_LWMAC_TIMEOUT_DISABLED;
 }
 
@@ -126,7 +126,7 @@ void gnrc_lwmac_set_timeout(gnrc_netif_t *netif,
         timeout->expired = false;
         timeout->msg.type = GNRC_LWMAC_EVENT_TIMEOUT_TYPE;
         timeout->msg.content.ptr = (void *) timeout;
-        xtimer_set_msg(&(timeout->timer), offset,
+        ztimer_set_msg(ZTIMER_USEC, &(timeout->timer), offset,
                        &(timeout->msg), netif->pid);
     }
     else {

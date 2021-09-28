@@ -32,7 +32,7 @@
 #include "net/sixlowpan/sfr.h"
 #include "thread.h"
 #include "unaligned.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "net/gnrc/sixlowpan/frag/sfr.h"
 
@@ -82,7 +82,7 @@ static char addr_str[GNRC_NETIF_HDR_L2ADDR_PRINT_LEN];
 #endif  /* MODULE_GNRC_IPV6_NIB */
 
 static evtimer_msg_t _arq_timer;
-static xtimer_t _if_gap_timer = { .offset = 0, .long_offset = 0 };
+static ztimer_t _if_gap_timer = { .offset = 0, .long_offset = 0 };
 static msg_t _if_gap_msg = { .type = GNRC_SIXLOWPAN_FRAG_SFR_INTER_FRAG_GAP_MSG };
 static uint32_t _last_frame_sent = 0U;
 
@@ -446,7 +446,7 @@ int gnrc_sixlowpan_frag_sfr_forward(gnrc_pktsnip_t *pkt,
 
 void gnrc_sixlowpan_frag_sfr_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf)
 {
-    uint32_t now = xtimer_now_usec();
+    uint32_t now = ztimer_now(ZTIMER_USEC);
     _frag_desc_t * const head = (_frag_desc_t *)fbuf->sfr.window.next;
     _frag_desc_t *frag_desc = head;
     uint32_t next_arq_offset = fbuf->sfr.arq_timeout;
@@ -554,7 +554,7 @@ void gnrc_sixlowpan_frag_sfr_inter_frame_gap(void)
         _frame_queue_t *node = (_frame_queue_t *)clist_lpop(&_frame_queue);
 
         if (node != NULL) {
-            _last_frame_sent = xtimer_now_usec();
+            _last_frame_sent = ztimer_now(ZTIMER_USEC);
             gnrc_sixlowpan_dispatch_send(node->frame, NULL, node->page);
             /* unset packet just to be safe */
             node->frame = NULL;
@@ -741,7 +741,7 @@ static uint16_t _find_offset_and_copy_rest(uint8_t *data, gnrc_pktsnip_t **pkt,
 
 static bool _send_frame(gnrc_pktsnip_t *frame, void *ctx, unsigned page)
 {
-    uint32_t now = xtimer_now_usec();
+    uint32_t now = ztimer_now(ZTIMER_USEC);
 
     if ((CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US == 0) ||
         ((now - _last_frame_sent) > CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US)) {
@@ -987,7 +987,7 @@ static void _forward_uncomp(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
             tmp.type = GNRC_NETTYPE_UNDEF;
             break;
     }
-    vrb_base.arrival = xtimer_now_usec();
+    vrb_base.arrival = ztimer_now(ZTIMER_USEC);
     memcpy(vrb_base.src, gnrc_netif_hdr_get_src_addr(netif_hdr),
            vrb_base.src_len);
     entry->entry.vrb = gnrc_sixlowpan_frag_vrb_from_route(&vrb_base,
@@ -1105,7 +1105,7 @@ static void _handle_nth_rfrag(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
             gnrc_netif_hdr_get_src_addr(netif_hdr),
             netif_hdr->src_l2addr_len, hdr->base.tag)) != NULL) {
         entry->type = _VRB;
-        entry->entry.base->arrival = xtimer_now_usec();
+        entry->entry.base->arrival = ztimer_now(ZTIMER_USEC);
         _forward_rfrag(pkt, entry, offset, page);
     }
     else {
@@ -1479,14 +1479,15 @@ static void _sched_next_frame(void)
 
         irq_restore(state);
         if (!already_set) {
-            uint32_t last_sent_since = (_last_frame_sent - xtimer_now_usec());
+            uint32_t last_sent_since = (_last_frame_sent - ztimer_now(ZTIMER_USEC));
 
             if (last_sent_since <= CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US) {
                 uint32_t offset = CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US -
                                   last_sent_since;
                 DEBUG("6lo sfr: arming inter-frame timer in %" PRIu32 " us\n",
                       last_sent_since);
-                xtimer_set_msg(&_if_gap_timer, offset, &_if_gap_msg, _getpid());
+                ztimer_set_msg(ZTIMER_USEC, &_if_gap_timer, offset,
+                               &_if_gap_msg, _getpid());
             }
             else {
                 DEBUG("6lo sfr: send frame immediately\n");
@@ -1570,7 +1571,7 @@ static void _handle_ack(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
             if (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER > 0) {
                 /* garbage-collect entry after CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER
                  * microseconds */
-                vrbe->super.arrival = xtimer_now_usec() -
+                vrbe->super.arrival = ztimer_now(ZTIMER_USEC) -
                                       (CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US -
                                        CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER);
             }
@@ -1579,7 +1580,7 @@ static void _handle_ack(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
             }
         }
         else {
-            vrbe->super.arrival = xtimer_now_usec();
+            vrbe->super.arrival = ztimer_now(ZTIMER_USEC);
         }
     }
     else {

@@ -33,7 +33,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "thread.h"
 #include "msg.h"
 #include "log.h"
@@ -59,7 +59,7 @@ static char slacker_stack2[THREAD_STACKSIZE_DEFAULT];
 static char worker_stack[THREAD_STACKSIZE_MAIN];
 
 struct timer_msg {
-    xtimer_t timer;
+    ztimer_t timer;
     uint32_t interval;
     msg_t msg;
 };
@@ -86,11 +86,11 @@ static void *slacker_thread(void *arg)
         msg_receive(&m);
         struct timer_msg *tmsg = m.content.ptr;
         xtimer_now_timex(&now);
-        xtimer_usleep(TEST_MSG_RX_USLEEP);
+        ztimer_sleep(ZTIMER_USEC, TEST_MSG_RX_USLEEP);
 
         tmsg->msg.type = 12345;
         tmsg->msg.content.ptr = tmsg;
-        xtimer_set_msg(&tmsg->timer, tmsg->interval, &tmsg->msg,
+        ztimer_set_msg(ZTIMER_USEC, &tmsg->timer, tmsg->interval, &tmsg->msg,
                        thread_getpid());
     }
 
@@ -110,7 +110,7 @@ void *worker_thread(void *arg)
      * to apply precision loss to expected interval length.
      * test_interval != TEST_INTERVAL */
     uint32_t test_interval =
-        xtimer_usec_from_ticks(xtimer_ticks_from_usec(TEST_INTERVAL));
+        xtimer_ticks_from_usec(TEST_INTERVAL);
     uint32_t start = 0;
     uint32_t last = 0;
     uint32_t loop_counter = 0;
@@ -121,7 +121,7 @@ void *worker_thread(void *arg)
         msg_t m;
         msg_receive(&m);
 
-        uint32_t now = xtimer_now_usec();
+        uint32_t now = ztimer_now(ZTIMER_USEC);
 
         if (start == 0) {
             start = now;
@@ -198,9 +198,9 @@ int main(void)
     puts("[START]");
 
     uint32_t iterations = (TEST_TIME * TEST_HZ) + 1;
-    xtimer_ticks32_t last_wakeup = xtimer_now();
+    uint32_t last_wakeup = ztimer_now(ZTIMER_USEC);
     while (iterations--) {
-        xtimer_periodic_wakeup(&last_wakeup, TEST_INTERVAL);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &last_wakeup, TEST_INTERVAL);
         msg_send(&m, pid3);
     }
 

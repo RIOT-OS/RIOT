@@ -25,7 +25,7 @@
 #include "thread.h"
 
 #include "msg.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifndef TEST_DURATION_US
 #define TEST_DURATION_US    (1000000U)
@@ -65,13 +65,13 @@ int main(void)
     atomic_flag flag = ATOMIC_FLAG_INIT;
     uint32_t n = 0;
 
-    xtimer_t timer = {
+    ztimer_t timer = {
         .callback = _timer_callback,
         .arg = &flag,
     };
 
     atomic_flag_test_and_set(&flag);
-    xtimer_set(&timer, TEST_DURATION_US);
+    ztimer_set(ZTIMER_USEC, &timer, TEST_DURATION_US);
 
     while (atomic_flag_test_and_set(&flag)) {
         msg_t test;

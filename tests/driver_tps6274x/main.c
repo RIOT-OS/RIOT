@@ -20,7 +20,7 @@
 #include <stdio.h>
 
 #include "board.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "tps6274x.h"
 #include "tps6274x_params.h"
 
@@ -37,10 +37,10 @@ int main(void)
         if (voltage != tps6274x_switch_voltage(&dev, voltage)) {
             printf("Not all Selector lines are connected in order to set a level of %umV.", voltage);
         }
-        xtimer_sleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
         puts("Load PIN will be enabled for 2s");
         tps6274x_load_ctrl(&dev, 1);
-        xtimer_sleep(2);
+        ztimer_sleep(ZTIMER_MSEC, 2 * 1000);
         puts("Load PIN will be shut off");
         tps6274x_load_ctrl(&dev, 0);
     }

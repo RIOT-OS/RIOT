@@ -23,7 +23,7 @@
 
 #include "hts221.h"
 #include "hts221_params.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define SLEEP_S     (2U)
 static hts221_t dev;
@@ -55,7 +55,7 @@ int main(void)
         }
         printf("H: %d.%d%%, T: %d.%d°C\n", (hum / 10), (hum % 10),
                (temp / 10), abs(temp % 10));
-        xtimer_sleep(SLEEP_S);
+        ztimer_sleep(ZTIMER_MSEC, SLEEP_S * 1000);
     }
     return 0;
 }

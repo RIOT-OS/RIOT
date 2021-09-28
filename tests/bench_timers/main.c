@@ -33,7 +33,7 @@
 #include "periph/rtt.h"
 #endif
 #if TEST_XTIMER
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 
 #include "board.h"
@@ -369,11 +369,11 @@ static void run_test(test_ctx_t *ctx, uint32_t interval, unsigned int variant)
 {
     interval += TEST_MIN;
     unsigned int interval_ref = TIM_TEST_TO_REF(interval);
-    xtimer_t xt = {
+    ztimer_t xt = {
         .callback = cb,
         .arg = ctx,
     };
-    xtimer_t xt_parallel = {
+    ztimer_t xt_parallel = {
         .callback = nop,
         .arg = NULL,
     };
@@ -428,8 +428,8 @@ static void run_test(test_ctx_t *ctx, uint32_t interval, unsigned int variant)
             break;
     }
     mutex_lock(&mtx_cb);
-    xtimer_remove(&xt_parallel);
-    xtimer_remove(&xt);
+    ztimer_remove(ZTIMER_USEC, &xt_parallel);
+    ztimer_remove(ZTIMER_USEC, &xt);
 }
 #else /* TEST_XTIMER */
 static void run_test(test_ctx_t *ctx, uint32_t interval, unsigned int variant)

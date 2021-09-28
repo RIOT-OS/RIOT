@@ -25,7 +25,7 @@
 #include <inttypes.h>
 
 #ifdef MODULE_XTIMER
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 
 #include "random.h"
@@ -36,7 +36,7 @@ int _random_init(int argc, char **argv)
 
     if (argc == 1) {
 #ifdef MODULE_XTIMER
-        initval = _xtimer_now();
+        initval = ztimer_now(ZTIMER_USEC);
         printf("PRNG initialized to current time: %d\n", initval);
 #else
         (void)initval;

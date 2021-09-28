@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "l3g4200d.h"
 #include "l3g4200d_params.h"
 
@@ -47,7 +47,7 @@ int main(void)
         printf("Gyro data [dps] - X: %6i   Y: %6i   Z: %6i\n",
                acc_data.acc_x, acc_data.acc_y, acc_data.acc_z);
 
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
     }
 
     return 0;

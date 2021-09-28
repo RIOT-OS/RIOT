@@ -14,7 +14,7 @@
 #include "byteorder.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 /**
  * @ingroup     drivers_nvram

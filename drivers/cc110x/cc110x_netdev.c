@@ -27,7 +27,7 @@
 #include "mutex.h"
 #include "net/eui64.h"
 #include "net/netdev.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "cc110x.h"
 #include "cc110x_internal.h"
@@ -478,7 +478,7 @@ static int cc110x_send(netdev_t *netdev, const iolist_t *iolist)
          * called prematurely, so we don't need to worry about extra calls
          * to cc110x_isr() introduced by accident.
          */
-        xtimer_mutex_lock_timeout(&dev->isr_signal, timeout);
+        ztimer_mutex_lock_timeout(ZTIMER_USEC, &dev->isr_signal, timeout);
         cc110x_isr(&dev->netdev);
     }
 

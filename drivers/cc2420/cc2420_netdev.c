@@ -28,7 +28,7 @@
 #include "net/ieee802154.h"
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "cc2420.h"
 #include "cc2420_netdev.h"
@@ -119,7 +119,7 @@ static int _init(netdev_t *netdev)
     /* power on and toggle reset */
     gpio_set(dev->params.pin_vrefen);
     gpio_clear(dev->params.pin_reset);
-    xtimer_usleep(CC2420_RESET_DELAY);
+    ztimer_sleep(ZTIMER_USEC, CC2420_RESET_DELAY);
     gpio_set(dev->params.pin_reset);
 
     /* test the connection to the device by reading MANFIDL register */

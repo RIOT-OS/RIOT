@@ -29,7 +29,7 @@
 
 static void _cb(void *arg)
 {
-    uint32_t t = xtimer_now_usec();
+    uint32_t t = ztimer_now(ZTIMER_USEC);
 
     srf04_t *dev = (srf04_t *)arg;
 
@@ -74,7 +74,7 @@ void srf04_trigger(const srf04_t *dev)
     gpio_irq_enable(dev->p.echo);
 
     gpio_set(dev->p.trigger);
-    xtimer_usleep(10);
+    ztimer_sleep(ZTIMER_USEC, 10);
     gpio_clear(dev->p.trigger);
 }
 
@@ -89,7 +89,7 @@ int srf04_get_distance(const srf04_t *dev)
     srf04_trigger(dev);
 
     /* Give the sensor the required time for sampling */
-    xtimer_usleep(SRF04_SAMPLE_PERIOD);
+    ztimer_sleep(ZTIMER_USEC, SRF04_SAMPLE_PERIOD);
 
     /* Get the result */
     if (dev->distance >= SRF04_OK) {

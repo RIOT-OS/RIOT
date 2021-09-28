@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "srf08.h"
 #include "srf08_params.h"
 #include "periph/i2c.h"
@@ -71,7 +71,7 @@ int main(void)
             else {
                 puts("An error occurred");
             }
-            xtimer_usleep(SLEEP_USEC);
+            ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
         }
     }
 }

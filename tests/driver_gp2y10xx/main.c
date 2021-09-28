@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "timex.h"
 #include "gp2y10xx.h"
 #include "gp2y10xx_params.h"
@@ -52,7 +52,7 @@ int main(void)
             printf("Error reading data. err: %d\n", res);
         }
 
-        xtimer_msleep(250);
+        ztimer_sleep(ZTIMER_MSEC, 250);
     }
 
     return 0;

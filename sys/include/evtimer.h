@@ -51,7 +51,7 @@
 #if IS_USED(MODULE_EVTIMER_ON_ZTIMER)
 #include "ztimer.h"
 #else
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 
 #include "timex.h"
@@ -81,7 +81,7 @@ typedef struct {
     ztimer_t timer;                 /**< Timer */
     uint32_t base;                  /**< Absolute time the first event is built on */
 #else
-    xtimer_t timer;                 /**< Timer */
+    ztimer_t timer;                 /**< Timer */
 #endif
     evtimer_callback_t callback;    /**< Handler function for this evtimer's
                                          event type */
@@ -131,7 +131,7 @@ static inline uint32_t evtimer_now_msec(void)
 #if IS_USED(MODULE_EVTIMER_ON_ZTIMER)
     return ztimer_now(ZTIMER_MSEC);
 #else
-    return xtimer_now_usec64() / US_PER_MS;
+    return ztimer_now64() / US_PER_MS;
 #endif
 }
 
@@ -143,7 +143,7 @@ static inline uint32_t evtimer_now_min(void)
 #if IS_USED(MODULE_EVTIMER_ON_ZTIMER)
     return ztimer_now(ZTIMER_MSEC) / (MS_PER_SEC * SEC_PER_MIN);
 #else
-    return xtimer_now_usec64() / (US_PER_SEC * SEC_PER_MIN);
+    return ztimer_now64() / (US_PER_SEC * SEC_PER_MIN);
 #endif
 }
 

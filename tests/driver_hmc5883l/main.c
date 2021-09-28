@@ -44,7 +44,7 @@
 #include <stdio.h>
 
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "hmc5883l.h"
 #include "hmc5883l_params.h"
@@ -105,7 +105,7 @@ int main(void)
         msg_receive(&msg);
         #else
         /* wait longer than period of HMC5883L DOR */
-        xtimer_usleep(HMC5883L_SLEEP);
+        ztimer_sleep(ZTIMER_USEC, HMC5883L_SLEEP);
         #endif
 
         /* read data in any case */

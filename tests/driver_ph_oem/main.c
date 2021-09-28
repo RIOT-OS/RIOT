@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "event/callback.h"
 
 #include "ph_oem.h"
@@ -93,7 +93,7 @@ int main(void)
     if (ph_oem_set_led_state(&dev, PH_OEM_LED_OFF) == PH_OEM_OK) {
         puts("[OK]");
         /* Sleep 2 seconds to actually see it turning off */
-        xtimer_sleep(2);
+        ztimer_sleep(ZTIMER_MSEC, 2 * 1000);
     }
     else {
         puts("[Failed]");
@@ -282,7 +282,7 @@ int main(void)
                 puts("[Reading compensation failed]");
             }
         }
-        xtimer_sleep(SLEEP_SEC);
+        ztimer_sleep(ZTIMER_MSEC, SLEEP_SEC * 1000);
     }
     return 0;
 }

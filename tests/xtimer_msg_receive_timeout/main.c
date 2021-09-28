@@ -23,7 +23,7 @@
 
 #include "thread.h"
 #include "msg.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "timex.h"
 
 #define TEST_PERIOD     (100LU * US_PER_MS) /* 100ms in US */
@@ -32,13 +32,14 @@
 int main(void)
 {
     msg_t m, tmsg;
-    xtimer_t t;
+    ztimer_t t;
     int64_t offset = -(TEST_PERIOD/10);
     tmsg.type = 42;
     puts("[START]");
     for (unsigned i = 0; i < TEST_COUNT; i++) {
-        xtimer_set_msg(&t, TEST_PERIOD + offset, &tmsg, thread_getpid());
-        if (xtimer_msg_receive_timeout(&m, TEST_PERIOD) < 0) {
+        ztimer_set_msg(ZTIMER_USEC, &t, TEST_PERIOD + offset, &tmsg,
+                       thread_getpid());
+        if (ztimer_msg_receive_timeout(ZTIMER_USEC, &m, TEST_PERIOD) < 0) {
             puts("Timeout!");
             msg_receive(&m);
         }

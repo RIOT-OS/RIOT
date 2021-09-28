@@ -23,7 +23,7 @@
 
 #include "si1133.h"
 #include "si1133_params.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "board.h"
 
 /* Helper macro to define _si1133_strerr */

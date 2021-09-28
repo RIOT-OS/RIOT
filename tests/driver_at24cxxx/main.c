@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "at24cxxx.h"
 #include "at24cxxx_params.h"

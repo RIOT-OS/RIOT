@@ -23,7 +23,7 @@
 #include <stdbool.h>
 
 #include "msg.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "net/gnrc/netif.h"
 #include "types.h"
 

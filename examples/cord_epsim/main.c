@@ -115,7 +115,7 @@ int main(void)
     printf("         lt: %is\n", (int)CONFIG_CORD_LT);
     printf(" RD address: [%s]:%u\n\n", ep_str, ep_port);
 
-    xtimer_sleep(STARTUP_DELAY);
+    ztimer_sleep(ZTIMER_MSEC, STARTUP_DELAY * 1000);
 
     while (1) {
         int res = cord_epsim_state();
@@ -140,7 +140,7 @@ int main(void)
         else if (res == CORD_EPSIM_ERROR) {
             puts("error: unable to trigger simple registration process");
         }
-        xtimer_sleep(CONFIG_CORD_UPDATE_INTERVAL);
+        ztimer_sleep(ZTIMER_MSEC, CONFIG_CORD_UPDATE_INTERVAL * 1000);
     }
 
     return 0;

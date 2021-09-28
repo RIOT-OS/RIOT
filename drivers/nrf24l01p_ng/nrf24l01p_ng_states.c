@@ -22,7 +22,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "net/netopt.h"
 
 #include "nrf24l01p_ng_registers.h"
@@ -57,7 +57,7 @@ void nrf24l01p_ng_transition_to_standby_1(nrf24l01p_ng_t *dev)
             gpio_clear(dev->params.pin_ce);
             uint8_t config = NRF24L01P_NG_FLG_PWR_UP;
             nrf24l01p_ng_reg8_set(dev, NRF24L01P_NG_REG_CONFIG, &config);
-            xtimer_usleep(NRF24L01P_NG_DELAY_US_START_UP);
+            ztimer_sleep(ZTIMER_USEC, NRF24L01P_NG_DELAY_US_START_UP);
             break;
         case NRF24L01P_NG_STATE_RX_MODE:
             gpio_clear(dev->params.pin_ce);
@@ -105,7 +105,7 @@ void nrf24l01p_ng_transition_to_rx_mode(nrf24l01p_ng_t *dev)
     uint8_t config = NRF24L01P_NG_FLG_PRIM_RX;
     nrf24l01p_ng_reg8_set(dev, NRF24L01P_NG_REG_CONFIG, &config);
     gpio_set(dev->params.pin_ce);
-    xtimer_usleep(NRF24L01P_NG_DELAY_US_RX_SETTLING);
+    ztimer_sleep(ZTIMER_USEC, NRF24L01P_NG_DELAY_US_RX_SETTLING);
     dev->state = NRF24L01P_NG_STATE_RX_MODE;
 }
 

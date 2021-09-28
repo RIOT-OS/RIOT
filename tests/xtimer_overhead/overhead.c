@@ -20,7 +20,7 @@
  * @}
  */
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 typedef struct {
     volatile uint32_t *val;
@@ -30,7 +30,7 @@ static void _callback(void *arg)
 {
     callback_arg_t *callback_arg = (callback_arg_t *)arg;
 
-    *callback_arg->val = xtimer_now_usec();
+    *callback_arg->val = ztimer_now(ZTIMER_USEC);
 }
 
 int32_t xtimer_overhead(uint32_t base)
@@ -39,10 +39,10 @@ int32_t xtimer_overhead(uint32_t base)
     uint32_t pre;
 
     callback_arg_t arg = { .val = &after };
-    xtimer_t t = { .callback = _callback, .arg = &arg };
+    ztimer_t t = { .callback = _callback, .arg = &arg };
 
-    pre = xtimer_now_usec();
-    xtimer_set(&t, base);
+    pre = ztimer_now(ZTIMER_USEC);
+    ztimer_set(ZTIMER_USEC, &t, base);
     while (!after) {}
     return after - pre - base;
 }

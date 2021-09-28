@@ -28,7 +28,7 @@
 #include "net/gnrc/pktbuf.h"
 #include "random.h"
 #include "sched.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "net/gnrc/ipv6/ext/frag.h"
 
@@ -39,7 +39,7 @@ static gnrc_ipv6_ext_frag_send_t _snd_bufs[CONFIG_GNRC_IPV6_EXT_FRAG_SEND_SIZE];
 static gnrc_ipv6_ext_frag_rbuf_t _rbuf[CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_SIZE];
 static gnrc_ipv6_ext_frag_limits_t _limits_pool[CONFIG_GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE];
 static clist_node_t _free_limits;
-static xtimer_t _gc_xtimer;
+static ztimer_t _gc_xtimer;
 static msg_t _gc_msg = { .type = GNRC_IPV6_EXT_FRAG_RBUF_GC };
 static gnrc_ipv6_ext_frag_stats_t _stats;
 
@@ -433,8 +433,9 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_frag_reass(gnrc_pktsnip_t *pkt)
         DEBUG("ipv6_ext_frag: reassembly buffer full\n");
         goto error_release;
     }
-    rbuf->arrival = xtimer_now_usec();
-    xtimer_set_msg(&_gc_xtimer, CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US, &_gc_msg,
+    rbuf->arrival = ztimer_now(ZTIMER_USEC);
+    ztimer_set_msg(ZTIMER_USEC, &_gc_xtimer,
+                   CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US, &_gc_msg,
                    thread_getpid());
     nh = fh->nh;
     offset = ipv6_ext_frag_get_offset(fh);
@@ -604,7 +605,7 @@ void gnrc_ipv6_ext_frag_rbuf_free(gnrc_ipv6_ext_frag_rbuf_t *rbuf)
 
 void gnrc_ipv6_ext_frag_rbuf_gc(void)
 {
-    uint32_t now = xtimer_now_usec();
+    uint32_t now = ztimer_now(ZTIMER_USEC);
     for (unsigned i = 0; i < CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_SIZE; i++) {
         gnrc_ipv6_ext_frag_rbuf_t *rbuf = &_rbuf[i];
         if ((now - rbuf->arrival) > CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US) {

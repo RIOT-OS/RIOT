@@ -22,7 +22,7 @@
 #include <string.h>
 
 #include "byteorder.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "periph/i2c.h"
 #include "seesaw_soil.h"
 
@@ -40,7 +40,7 @@ static int _seesaw_read_regs(const seesaw_soil_t *dev, uint16_t reg_addr, void* 
     }
 
     /* wait for the answer */
-    xtimer_usleep(5000);
+    ztimer_sleep(ZTIMER_USEC, 5000);
 
     /* and now we read the register value */
     if ((r = i2c_read_bytes(dev->params.i2c, dev->params.addr,

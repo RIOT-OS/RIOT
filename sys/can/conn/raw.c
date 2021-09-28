@@ -28,7 +28,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define _TIMEOUT_TX_MSG_TYPE    (0x8000)
 #define _TIMEOUT_RX_MSG_TYPE    (0x8001)
@@ -146,14 +146,14 @@ int conn_can_raw_send(conn_can_raw_t *conn, const struct can_frame *frame, int f
         }
     }
     else {
-        xtimer_t timer;
+        ztimer_t timer;
         timer.callback = _tx_conf_timeout;
         timer.arg = conn;
-        xtimer_set(&timer, CONN_CAN_RAW_TIMEOUT_TX_CONF);
+        ztimer_set(ZTIMER_USEC, &timer, CONN_CAN_RAW_TIMEOUT_TX_CONF);
 
         handle = raw_can_send_mbox(conn->ifnum, frame, &conn->mbox);
         if (handle < 0) {
-            xtimer_remove(&timer);
+            ztimer_remove(ZTIMER_USEC, &timer);
             return handle;
         }
 
@@ -161,7 +161,7 @@ int conn_can_raw_send(conn_can_raw_t *conn, const struct can_frame *frame, int f
         int timeout = 5;
         while (1) {
             mbox_get(&conn->mbox, &msg);
-            xtimer_remove(&timer);
+            ztimer_remove(ZTIMER_USEC, &timer);
             switch (msg.type) {
             case CAN_MSG_TX_ERROR:
                 return -EIO;
@@ -186,7 +186,7 @@ int conn_can_raw_send(conn_can_raw_t *conn, const struct can_frame *frame, int f
                 if (!timeout--) {
                     return -EINTR;
                 }
-                xtimer_set(&timer, CONN_CAN_RAW_TIMEOUT_TX_CONF);
+                ztimer_set(ZTIMER_USEC, &timer, CONN_CAN_RAW_TIMEOUT_TX_CONF);
                 break;
             }
         }
@@ -216,12 +216,12 @@ int conn_can_raw_recv(conn_can_raw_t *conn, struct can_frame *frame, uint32_t ti
 
     assert(frame != NULL);
 
-    xtimer_t timer;
+    ztimer_t timer;
 
     if (timeout != 0) {
         timer.callback = _rx_timeout;
         timer.arg = conn;
-        xtimer_set(&timer, timeout);
+        ztimer_set(ZTIMER_USEC, &timer, timeout);
     }
 
     int ret;
@@ -230,7 +230,7 @@ int conn_can_raw_recv(conn_can_raw_t *conn, struct can_frame *frame, uint32_t ti
 
     mbox_get(&conn->mbox, &msg);
     if (timeout != 0) {
-        xtimer_remove(&timer);
+        ztimer_remove(ZTIMER_USEC, &timer);
     }
     switch (msg.type) {
     case CAN_MSG_RX_INDICATION:

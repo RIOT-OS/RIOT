@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "net/gnrc/gomach/hdr.h"
 
 #ifdef __cplusplus
@@ -258,7 +258,7 @@ typedef struct {
  * @brief   GoMacH's timeout structure
  */
 typedef struct {
-    xtimer_t timer;                     /**< xtimer entity. */
+    ztimer_t timer;                     /**< xtimer entity. */
     msg_t msg;                          /**< msg entity. */
     bool expired;                       /**< Timeout expiration indicator. */
     gnrc_gomach_timeout_type_t type;    /**< GoMacH timeout type. */

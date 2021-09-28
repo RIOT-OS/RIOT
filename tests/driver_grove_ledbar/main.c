@@ -21,7 +21,7 @@
 #include <stdio.h>
 
 #include "log.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "grove_ledbar.h"
 #include "grove_ledbar_params.h"
 
@@ -45,16 +45,16 @@ int main(void)
         while (lvl < GROVE_LEDBAR_MAX - TEST_STEP) {
             grove_ledbar_set(&dev, lvl);
             lvl += TEST_STEP;
-            xtimer_usleep(TEST_WAIT);
+            ztimer_sleep(ZTIMER_USEC, TEST_WAIT);
         }
         grove_ledbar_set(&dev, GROVE_LEDBAR_MAX);
         /* turn all off */
-        xtimer_usleep(TEST_WAIT);
+        ztimer_sleep(ZTIMER_USEC, TEST_WAIT);
         lvl = GROVE_LEDBAR_MAX;
         while (lvl > TEST_STEP) {
             grove_ledbar_set(&dev, lvl);
             lvl -= TEST_STEP;
-            xtimer_usleep(TEST_WAIT);
+            ztimer_sleep(ZTIMER_USEC, TEST_WAIT);
         }
         /* turn all off */
         grove_ledbar_clear(&dev);

@@ -23,7 +23,7 @@
 
 #include "fmt.h"
 #include "irq.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define DELAY       (10 * US_PER_MS)
 
@@ -34,8 +34,8 @@ static atomic_uint b_during_isr = ATOMIC_VAR_INIT(0);
 
 static void busy_delay(void)
 {
-    uint32_t start = xtimer_now_usec();
-    while (xtimer_now_usec() - start < DELAY) { }
+    uint32_t start = ztimer_now(ZTIMER_USEC);
+    while (ztimer_now(ZTIMER_USEC) - start < DELAY) { }
 }
 
 /* Timer callback run in interrupt context; should not trigger between
@@ -50,7 +50,7 @@ static void timer_callback(void *unused)
 
 int main(void)
 {
-    xtimer_t xt = { .callback = timer_callback };
+    ztimer_t xt = { .callback = timer_callback };
 
     print_str("Test for irq_disable() / irq_restore()\n"
               "======================================\n"
@@ -72,7 +72,7 @@ int main(void)
     }
 
     print_str("Verifying test works: ");
-    xtimer_set(&xt, DELAY / 2);
+    ztimer_set(ZTIMER_USEC, &xt, DELAY / 2);
     atomic_store(&a, 1);
     busy_delay();
     atomic_store(&b, 1);
@@ -90,7 +90,7 @@ int main(void)
     }
 
     print_str("Test result: ");
-    xtimer_set(&xt, DELAY / 2);
+    ztimer_set(ZTIMER_USEC, &xt, DELAY / 2);
     state = irq_disable();
     atomic_store(&a, 2);
     busy_delay();

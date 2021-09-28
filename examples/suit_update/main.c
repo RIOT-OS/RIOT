@@ -23,7 +23,7 @@
 #include "thread.h"
 #include "irq.h"
 #include "net/nanocoap_sock.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "shell.h"
 

@@ -20,7 +20,7 @@
 
 #include <inttypes.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 
@@ -51,14 +51,14 @@ static int _soft_reset(const stmpe811_t *dev)
         DEBUG("[stmpe811] soft reset: cannot write soft reset bit to SYS_CTRL1 register\n");
         return -STMPE811_ERR_I2C;
     }
-    xtimer_msleep(10);
+    ztimer_sleep(ZTIMER_MSEC, 10);
 
     if (i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
                       STMPE811_SYS_CTRL1, 0, 0) < 0) {
         DEBUG("[stmpe811] soft reset: cannot clear SYS_CTRL1 register\n");
         return -STMPE811_ERR_I2C;
     }
-    xtimer_msleep(2);
+    ztimer_sleep(ZTIMER_MSEC, 2);
 
     return STMPE811_OK;
 }

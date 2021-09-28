@@ -23,7 +23,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "lpsxxx.h"
 #include "lpsxxx_params.h"
 
@@ -42,7 +42,7 @@ int main(void)
     int16_t temp;
     while (1) {
         lpsxxx_enable(&dev);
-        xtimer_sleep(1); /* wait a bit for the measurements to complete */
+        ztimer_sleep(ZTIMER_MSEC, 1 * 1000); /* wait a bit for the measurements to complete */
 
         lpsxxx_read_temp(&dev, &temp);
         lpsxxx_read_pres(&dev, &pres);

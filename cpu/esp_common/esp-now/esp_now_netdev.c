@@ -24,7 +24,7 @@
 #include <errno.h>
 
 #include "net/gnrc.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "esp_common.h"
 #include "esp_attr.h"
@@ -91,7 +91,7 @@ static bool _esp_now_add_peer(const uint8_t* bssid, uint8_t channel, const uint8
 
 #if ESP_NOW_UNICAST
 
-static xtimer_t _esp_now_scan_peers_timer;
+static ztimer_t _esp_now_scan_peers_timer;
 static bool _esp_now_scan_peers_done = false;
 
 #define ESP_NOW_APS_BLOCK_SIZE 8 /* has to be power of two */
@@ -173,7 +173,8 @@ static void esp_now_scan_peers_start(void)
     /* start the scan */
     esp_wifi_scan_start(&scan_cfg, false);
     /* set the time for next scan */
-    xtimer_set(&_esp_now_scan_peers_timer, esp_now_params.scan_period);
+    ztimer_set(ZTIMER_USEC, &_esp_now_scan_peers_timer,
+               esp_now_params.scan_period);
 }
 
 static void IRAM_ATTR esp_now_scan_peers_timer_cb(void* arg)

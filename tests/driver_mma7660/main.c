@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "mma7660.h"
 #include "mma7660_params.h"
 
@@ -47,7 +47,7 @@ int main(void)
         mma7660_read(&dev, &data);
         printf("Acceleration [in mg]: X: %d Y: %d Z: %d\n",
                data.x, data.y, data.z);
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
     }
 
     return 0;

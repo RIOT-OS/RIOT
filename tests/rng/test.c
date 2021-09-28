@@ -14,7 +14,7 @@
 
 #include "fmt.h"
 #include "random.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifdef MODULE_PERIPH_HWRNG
 #include "periph/hwrng.h"
@@ -415,17 +415,17 @@ void test_speed(uint32_t duration)
 
     /* collect samples as long as timer has not expired */
     unsigned running = 1;
-    xtimer_t xt = {
+    ztimer_t xt = {
         .callback = cb_speed_timeout,
         .arg = &running,
     };
-    uint32_t start_usec = xtimer_now_usec();
-    xtimer_set(&xt, duration * US_PER_SEC);
+    uint32_t start_usec = ztimer_now(ZTIMER_USEC);
+    ztimer_set(ZTIMER_USEC, &xt, duration * US_PER_SEC);
     while (running) {
         test_get_uint32();
         samples++;
     }
-    uint32_t actual_duration_usec = xtimer_now_usec() - start_usec;
+    uint32_t actual_duration_usec = ztimer_now(ZTIMER_USEC) - start_usec;
 
     /* print results */
     fmt_u64_dec(tmp1, samples);
@@ -445,17 +445,17 @@ void test_speed_range(uint32_t duration, uint32_t low_thresh, uint32_t high_thre
 
     /* collect samples as long as timer has not expired */
     unsigned running = 1;
-    xtimer_t xt = {
+    ztimer_t xt = {
         .callback = cb_speed_timeout,
         .arg = &running,
     };
-    uint32_t start_usec = xtimer_now_usec();
-    xtimer_set(&xt, duration * US_PER_SEC);
+    uint32_t start_usec = ztimer_now(ZTIMER_USEC);
+    ztimer_set(ZTIMER_USEC, &xt, duration * US_PER_SEC);
     while (running) {
         test_get_uint32_range(low_thresh, high_thresh);
         samples++;
     }
-    uint32_t actual_duration_usec = xtimer_now_usec() - start_usec;
+    uint32_t actual_duration_usec = ztimer_now(ZTIMER_USEC) - start_usec;
 
     /* print results */
     fmt_u64_dec(tmp1, samples);

@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "timex.h"
 #include "adcxx1c.h"
 #include "adcxx1c_params.h"
@@ -62,7 +62,7 @@ int main(void)
     while (1) {
         adcxx1c_read_raw(&dev, &data);
         printf("Raw analog value: %d\n", data);
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
     }
 
     return 0;

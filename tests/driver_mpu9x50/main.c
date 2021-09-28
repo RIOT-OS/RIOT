@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "board.h"
 
 #include "mpu9x50.h"
@@ -92,7 +92,7 @@ int main(void)
         printf("Temperature [milli deg] : %"PRId32"\n", temperature);
         printf("\n+-------------------------------------+\n");
 
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
     }
 
     return 0;

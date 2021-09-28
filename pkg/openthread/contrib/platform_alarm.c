@@ -22,7 +22,7 @@
 #include "openthread/platform/alarm-milli.h"
 #include "ot.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "timex.h"
 
 #define ENABLE_DEBUG 0
@@ -44,7 +44,7 @@ void _timeout_cb(void *arg)
     event_post(openthread_get_evq(), &ev_timer);
 }
 
-static xtimer_t ot_timer = {
+static ztimer_t ot_timer = {
     .callback = _timeout_cb,
 };
 
@@ -67,7 +67,7 @@ void otPlatAlarmMilliStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
     }
     else {
         int dt = aDt * US_PER_MS;
-        xtimer_set(&ot_timer, dt);
+        ztimer_set(ZTIMER_USEC, &ot_timer, dt);
     }
 }
 
@@ -76,13 +76,13 @@ void otPlatAlarmMilliStop(otInstance *aInstance)
 {
     (void)aInstance;
     DEBUG("openthread: otPlatAlarmStop\n");
-    xtimer_remove(&ot_timer);
+    ztimer_remove(ZTIMER_USEC, &ot_timer);
 }
 
 /* OpenThread will call this for getting running time in millisecs */
 uint32_t otPlatAlarmMilliGetNow(void)
 {
-    uint32_t now = xtimer_now_usec() / US_PER_MS;
+    uint32_t now = ztimer_now(ZTIMER_USEC) / US_PER_MS;
     DEBUG("openthread: otPlatAlarmGetNow: %" PRIu32 "\n", now);
     return now;
 }

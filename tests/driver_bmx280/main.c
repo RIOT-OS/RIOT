@@ -26,7 +26,7 @@
 
 #include "bmx280_params.h"
 #include "bmx280.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "fmt.h"
 
 #define MAINLOOP_DELAY  (2)         /* read sensor every 2 seconds */
@@ -103,7 +103,7 @@ int main(void)
 #endif
         puts("\n+-------------------------------------+\n");
 
-        xtimer_sleep(MAINLOOP_DELAY);
+        ztimer_sleep(ZTIMER_MSEC, MAINLOOP_DELAY * 1000);
     }
 
     return 0;

@@ -26,7 +26,7 @@
 #include "gpio_arch.h"
 #include "rtt_arch.h"
 #include "syscalls.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "periph/rtc.h"
 #include "rom/rtc.h"

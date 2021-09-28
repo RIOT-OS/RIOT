@@ -30,7 +30,7 @@
 #include "bitarithm.h"
 #include "byteorder.h"
 
-#include "xtimer.h"
+#include "ztimer.h"
 #define POLL_DELAY_US   (1000)
 
 #ifndef min
@@ -76,7 +76,7 @@ static inline int _wait_until_eeprom_ready(const at25xxx_t *dev)
     uint8_t tries = 10;
     while (_write_in_progress(dev) && --tries) {
         spi_release(dev->params.spi);
-        xtimer_usleep(POLL_DELAY_US);
+        ztimer_sleep(ZTIMER_USEC, POLL_DELAY_US);
         getbus(dev);
     }
 

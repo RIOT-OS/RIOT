@@ -22,7 +22,7 @@
 
 #include <string.h>
 #include "periph/i2c.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "byteorder.h"
 #include "checksum/crc8.h"
 
@@ -86,7 +86,7 @@ int8_t scd30_set_param(const scd30_t *dev, uint16_t param, uint16_t val)
         return SCD30_COM_FAILED;
     }
     else {
-        xtimer_usleep(SCD30_READ_WRITE_SLEEP_US);
+        ztimer_sleep(ZTIMER_USEC, SCD30_READ_WRITE_SLEEP_US);
         return SCD30_OK;
     }
 }
@@ -105,7 +105,7 @@ int8_t scd30_get_param(scd30_t *dev, uint16_t param, uint16_t *val)
     }
     i2c_release(SCD30_I2C);
 
-    xtimer_usleep(SCD30_READ_WRITE_SLEEP_US);
+    ztimer_sleep(ZTIMER_USEC, SCD30_READ_WRITE_SLEEP_US);
 
     i2c_acquire(SCD30_I2C);
     ret = i2c_read_bytes(SCD30_I2C, SCD30_I2C_ADDRESS, buffer, 3, 0);
@@ -145,16 +145,16 @@ int8_t scd30_read_triggered(scd30_t *dev, scd30_measurement_t *result)
     /* Doing this to reduce the traffic on the I2C bus as
      * compared when constantly polling the device for status
      */
-    xtimer_sleep(SCD30_MIN_INTERVAL);
+    ztimer_sleep(ZTIMER_MSEC, SCD30_MIN_INTERVAL * 1000);
 
-    initial_time = xtimer_now_usec();
+    initial_time = ztimer_now(ZTIMER_USEC);
     ret = scd30_get_param(dev, SCD30_STATUS, &state);
     if (ret != 0) {
         return ret;
     }
 
     while (state != 1 &&
-           (xtimer_now_usec() - initial_time) < SCD30_DATA_RDY_TIMEOUT) {
+           (ztimer_now(ZTIMER_USEC) - initial_time) < SCD30_DATA_RDY_TIMEOUT) {
         ret = scd30_get_param(dev, SCD30_STATUS, &state);
         if (ret != 0) {
             return ret;
@@ -182,14 +182,14 @@ uint8_t scd30_read_periodic(scd30_t *dev, scd30_measurement_t *result)
     uint32_t initial_time;
     int ret = 0;
 
-    initial_time = xtimer_now_usec();
+    initial_time = ztimer_now(ZTIMER_USEC);
     ret = scd30_get_param(dev, SCD30_STATUS, &state);
     if (ret != 0) {
         return ret;
     }
 
     while (state != 1 &&
-           (xtimer_now_usec() - initial_time) < SCD30_DATA_RDY_TIMEOUT) {
+           (ztimer_now(ZTIMER_USEC) - initial_time) < SCD30_DATA_RDY_TIMEOUT) {
         scd30_get_param(dev, SCD30_STATUS, &state);
     }
 
@@ -257,7 +257,7 @@ int8_t scd30_reset(scd30_t *dev)
         DEBUG("[scd30]: Error resetting sensor.\n");
         return ret;
     }
-    xtimer_usleep(SCD30_RESET_SLEEP_US);
+    ztimer_sleep(ZTIMER_USEC, SCD30_RESET_SLEEP_US);
     return SCD30_OK;
 }
 

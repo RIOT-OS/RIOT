@@ -24,7 +24,7 @@
 
 #include "msg.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifndef NUMOF_TIMERS
 #define NUMOF_TIMERS   (1000U)
@@ -73,13 +73,13 @@ static uint32_t _timer_val(unsigned n)
 /* set timer 'n' to its intended position 'n' */
 static void _timer_set(unsigned n)
 {
-    xtimer_set(&_timers[n], _timer_val(n));
+    ztimer_set(ZTIMER_USEC, &_timers[n], _timer_val(n));
 }
 
 /* remove timer 'n' */
 static void _timer_remove(unsigned n)
 {
-    xtimer_remove(&_timers[n]);
+    ztimer_remove(ZTIMER_USEC, &_timers[n]);
 }
 
 static void _print_result(const char *desc, unsigned n, uint32_t total)
@@ -100,19 +100,19 @@ int main(void)
         _timers[n].arg = &_triggers;
     }
 
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
 
     /*
      * test setting one set timer REPEAT times
      *
      */
     _base = BASE;
-    before = xtimer_now_usec();
+    before = ztimer_now(ZTIMER_USEC);
     for (n = 0; n < REPEAT; n++) {
         _timer_set(0);
     }
 
-    diff = xtimer_now_usec() - before;
+    diff = ztimer_now(ZTIMER_USEC) - before;
 
     _print_result("set() one", REPEAT, diff);
     expect(!_triggers);
@@ -121,12 +121,12 @@ int main(void)
      * test removing one unset timer REPEAT times
      *
      */
-    before = xtimer_now_usec();
+    before = ztimer_now(ZTIMER_USEC);
     for (n = 0; n < REPEAT; n++) {
         _timer_remove(0);
     }
 
-    diff = xtimer_now_usec() - before;
+    diff = ztimer_now(ZTIMER_USEC) - before;
 
     _print_result("remove() one", REPEAT, diff);
     expect(!_triggers);
@@ -135,14 +135,14 @@ int main(void)
      * test setting / removing one timer REPEAT times
      *
      */
-    before = xtimer_now_usec();
+    before = ztimer_now(ZTIMER_USEC);
     _base = BASE  - (before - start);
     for (n = 0; n < REPEAT; n++) {
         _timer_set(0);
         _timer_remove(0);
     }
 
-    diff = xtimer_now_usec() - before;
+    diff = ztimer_now(ZTIMER_USEC) - before;
 
     _print_result("set() + remove() one", REPEAT, diff);
     expect(!_triggers);
@@ -151,13 +151,13 @@ int main(void)
      * test setting NUMOF_TIMERS timers with increasing targets
      *
      */
-    before = xtimer_now_usec();
+    before = ztimer_now(ZTIMER_USEC);
     _base = BASE  - (before - start);
     for (unsigned int n = 0; n < NUMOF_TIMERS; n++) {
         _timer_set(n);
     }
 
-    diff = xtimer_now_usec() - before;
+    diff = ztimer_now(ZTIMER_USEC) - before;
 
     _print_result("set() many increasing target", NUMOF_TIMERS, diff);
     expect(!_triggers);
@@ -166,13 +166,13 @@ int main(void)
      * test re-setting first timer REPEAT times
      *
      */
-    before = xtimer_now_usec();
+    before = ztimer_now(ZTIMER_USEC);
     _base = BASE  - (before - start);
     for (n = 0; n < REPEAT; n++) {
         _timer_set(0);
     }
 
-    diff = xtimer_now_usec() - before;
+    diff = ztimer_now(ZTIMER_USEC) - before;
 
     _print_result("re-set()  first", REPEAT, diff);
     expect(!_triggers);
@@ -181,13 +181,13 @@ int main(void)
      * test setting middle timer REPEAT times
      *
      */
-    before = xtimer_now_usec();
+    before = ztimer_now(ZTIMER_USEC);
     _base = BASE  - (before - start);
     for (n = 0; n < REPEAT; n++) {
         _timer_set(NUMOF_TIMERS/2);
     }
 
-    diff = xtimer_now_usec() - before;
+    diff = ztimer_now(ZTIMER_USEC) - before;
 
     _print_result("re-set() middle", REPEAT, diff);
     expect(!_triggers);
@@ -196,13 +196,13 @@ int main(void)
      * test setting last timer REPEAT times
      *
      */
-    before = xtimer_now_usec();
+    before = ztimer_now(ZTIMER_USEC);
     _base = BASE  - (before - start);
     for (n = 0; n < REPEAT; n++) {
         _timer_set(NUMOF_TIMERS - 1);
     }
 
-    diff = xtimer_now_usec() - before;
+    diff = ztimer_now(ZTIMER_USEC) - before;
 
     _print_result("re-set()   last", REPEAT, diff);
     expect(!_triggers);
@@ -211,14 +211,14 @@ int main(void)
      * test removing / setting first timer REPEAT times
      *
      */
-    before = xtimer_now_usec();
+    before = ztimer_now(ZTIMER_USEC);
     _base = BASE  - (before - start);
     for (n = 0; n < REPEAT; n++) {
         _timer_remove(0);
         _timer_set(0);
     }
 
-    diff = xtimer_now_usec() - before;
+    diff = ztimer_now(ZTIMER_USEC) - before;
 
     _print_result("remove() + set()  first", REPEAT, diff);
     expect(!_triggers);
@@ -227,14 +227,14 @@ int main(void)
      * test removing / setting middle timer REPEAT times
      *
      */
-    before = xtimer_now_usec();
+    before = ztimer_now(ZTIMER_USEC);
     _base = BASE  - (before - start);
     for (n = 0; n < REPEAT; n++) {
         _timer_remove(NUMOF_TIMERS/2);
         _timer_set(NUMOF_TIMERS/2);
     }
 
-    diff = xtimer_now_usec() - before;
+    diff = ztimer_now(ZTIMER_USEC) - before;
 
     _print_result("remove() + set() middle", REPEAT, diff);
     expect(!_triggers);
@@ -243,14 +243,14 @@ int main(void)
      * test removing / setting last timer REPEAT times
      *
      */
-    before = xtimer_now_usec();
+    before = ztimer_now(ZTIMER_USEC);
     _base = BASE  - (before - start);
     for (n = 0; n < REPEAT; n++) {
         _timer_remove(NUMOF_TIMERS - 1);
         _timer_set(NUMOF_TIMERS - 1);
     }
 
-    diff = xtimer_now_usec() - before;
+    diff = ztimer_now(ZTIMER_USEC) - before;
 
     _print_result("remove() + set()   last", REPEAT, diff);
     expect(!_triggers);
@@ -259,12 +259,12 @@ int main(void)
      * test removing NUMOF_TIMERS timers (latest first)
      *
      */
-    before = xtimer_now_usec();
+    before = ztimer_now(ZTIMER_USEC);
     for (n = 0; n < NUMOF_TIMERS; n++) {
         _timer_remove(NUMOF_TIMERS - n - 1);
     }
 
-    diff = xtimer_now_usec() - before;
+    diff = ztimer_now(ZTIMER_USEC) - before;
 
     _print_result("remove() many decreasing", NUMOF_TIMERS, diff);
     expect(!_triggers);
@@ -273,13 +273,13 @@ int main(void)
      * test xtimer_now()
      *
      */
-    before = xtimer_now_usec();
+    before = ztimer_now(ZTIMER_USEC);
     n = REPEAT;
     while (n--) {
-        xtimer_now_usec();
+        ztimer_now(ZTIMER_USEC);
     }
 
-    diff = xtimer_now_usec() - before;
+    diff = ztimer_now(ZTIMER_USEC) - before;
 
     _print_result("xtimer_now()", REPEAT, diff);
     expect(!_triggers);

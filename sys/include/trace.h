@@ -62,7 +62,7 @@ extern "C" {
 /**
  * @brief   Add entry to trace buffer
  *
- * Adds the current time (e.g., xtimer_now_usec()) and @p val to the trace
+ * Adds the current time (e.g., ztimer_now(ZTIMER_USEC) and @p val to the trace
  * buffer.
  *
  * The value parameter is not used by the trace module itself. The caller is

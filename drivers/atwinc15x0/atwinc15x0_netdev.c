@@ -33,7 +33,7 @@
 #include "log.h"
 #include "net/netdev/eth.h"
 #include "od.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG        0
 #define ENABLE_DEBUG_DUMP   0
@@ -184,7 +184,7 @@ static void _atwinc15x0_wifi_cb(uint8_t type, void *msg)
                     atwinc15x0->netdev.event_callback(&atwinc15x0->netdev,
                                                       NETDEV_EVENT_LINK_DOWN);
                     /* wait and try to reconnect */
-                    xtimer_usleep(ATWINC15X0_WAIT_RECONNECT);
+                    ztimer_sleep(ZTIMER_USEC, ATWINC15X0_WAIT_RECONNECT);
                     _atwinc15x0_connect();
                     break;
                 case M2M_WIFI_CONNECTED:
@@ -381,7 +381,7 @@ static int _atwinc15x0_get(netdev_t *netdev, netopt_t opt, void *val,
             /* wait for the response with a given timeout */
             unsigned int _rssi_info_time_out = ATWINC15X0_WAIT_TIMEOUT;
             while (!_rssi_info_ready && _rssi_info_time_out--) {
-                xtimer_usleep(ATWINC15X0_WAIT_TIME);
+                ztimer_sleep(ZTIMER_USEC, ATWINC15X0_WAIT_TIME);
             }
             /* return the RSSI */
             *((int8_t *)val) = dev->rssi;

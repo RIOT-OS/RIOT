@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "tcs37727.h"
 #include "tcs37727_params.h"
 
@@ -51,7 +51,7 @@ int main(void)
         printf("CT : %5"PRIu32" Lux: %6"PRIu32" AGAIN: %2d ATIME %"PRIu32"\n",
                data.ct, data.lux, dev.again, dev.p.atime);
 
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
     }
 
     return 0;

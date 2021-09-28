@@ -22,7 +22,7 @@
 #include <errno.h>
 #include <stdint.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "sht1x.h"
 #include "sht1x_defines.h"
 #include "bitarithm.h"
@@ -160,9 +160,9 @@ static const int16_t sht1x_d1[] = { -4010, -3980, -3970, -3960, -3940 };
 static inline void clk_signal(const sht1x_dev_t *dev)
 {
     gpio_set(dev->clk);
-    xtimer_usleep(SHT1X_HALF_CLOCK);
+    ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
     gpio_clear(dev->clk);
-    xtimer_usleep(SHT1X_HALF_CLOCK);
+    ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
 }
 
 static int write_byte(const sht1x_dev_t *dev, uint8_t value)
@@ -181,7 +181,7 @@ static int write_byte(const sht1x_dev_t *dev, uint8_t value)
         else {
             gpio_clear(dev->data);
         }
-        xtimer_usleep(SHT1X_HALF_CLOCK);
+        ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
 
         /* trigger clock signal */
         clk_signal(dev);
@@ -194,7 +194,7 @@ static int write_byte(const sht1x_dev_t *dev, uint8_t value)
     if (gpio_init(dev->data, GPIO_IN) == -1) {
         return -EIO;
     }
-    xtimer_usleep(SHT1X_HALF_CLOCK);
+    ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
     ack = gpio_read(dev->data);
 
     clk_signal(dev);
@@ -206,13 +206,13 @@ static int read_byte(const sht1x_dev_t *dev, uint8_t *dest, int ack)
 {
     uint8_t value = 0;
 
-    xtimer_usleep(SHT1X_HALF_CLOCK);
+    ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
 
     /* read value bit by bit */
     for (int i = 0; i < 8; i++) {
         value <<= 1;
         gpio_set(dev->clk);
-        xtimer_usleep(SHT1X_HALF_CLOCK);
+        ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
 
         if (gpio_read(dev->data)) {
             /* set bit when DATA is high */
@@ -220,7 +220,7 @@ static int read_byte(const sht1x_dev_t *dev, uint8_t *dest, int ack)
         }
 
         gpio_clear(dev->clk);
-        xtimer_usleep(SHT1X_HALF_CLOCK);
+        ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
     }
 
     /* send ack if necessary */
@@ -229,7 +229,7 @@ static int read_byte(const sht1x_dev_t *dev, uint8_t *dest, int ack)
     }
 
     gpio_write(dev->data, ack);
-    xtimer_usleep(SHT1X_HALF_CLOCK);
+    ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
 
     clk_signal(dev);
 
@@ -256,27 +256,27 @@ static int transmission_start(const sht1x_dev_t *dev)
 
     /* set initial state */
     gpio_set(dev->data);
-    xtimer_usleep(SHT1X_HALF_CLOCK);
+    ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
     gpio_clear(dev->clk);
-    xtimer_usleep(SHT1X_HALF_CLOCK);
+    ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
 
     gpio_set(dev->clk);
-    xtimer_usleep(SHT1X_HALF_CLOCK);
+    ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
 
     gpio_clear(dev->data);
-    xtimer_usleep(SHT1X_HALF_CLOCK);
+    ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
 
     gpio_clear(dev->clk);
-    xtimer_usleep(SHT1X_HALF_CLOCK);
+    ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
 
     gpio_set(dev->clk);
-    xtimer_usleep(SHT1X_HALF_CLOCK);
+    ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
 
     gpio_set(dev->data);
-    xtimer_usleep(SHT1X_HALF_CLOCK);
+    ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
 
     gpio_clear(dev->clk);
-    xtimer_usleep(SHT1X_HALF_CLOCK);
+    ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
 
     if (gpio_init(dev->data, GPIO_IN) == -1) {
         return -EIO;
@@ -297,9 +297,9 @@ static int connection_reset(const sht1x_dev_t *dev)
     }
 
     gpio_set(dev->data);
-    xtimer_usleep(SHT1X_HALF_CLOCK);
+    ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
     gpio_clear(dev->clk);
-    xtimer_usleep(SHT1X_HALF_CLOCK);
+    ztimer_sleep(ZTIMER_USEC, SHT1X_HALF_CLOCK);
 
     for (int i = 0; i < 9; i++) {
         clk_signal(dev);
@@ -358,7 +358,7 @@ static int measure(const sht1x_dev_t *dev, uint16_t *value, uint8_t mode)
                 return -ECANCELED;
             }
 
-            xtimer_usleep(1000);
+            ztimer_sleep(ZTIMER_USEC, 1000);
             ack = gpio_read(dev->data);
         }
     }
@@ -658,7 +658,7 @@ int sht1x_reset(sht1x_dev_t *dev)
     }
 
     dev->conf = 0;
-    xtimer_usleep(SHT1X_RESET_WAIT);
+    ztimer_sleep(ZTIMER_USEC, SHT1X_RESET_WAIT);
 
     return 0;
 }

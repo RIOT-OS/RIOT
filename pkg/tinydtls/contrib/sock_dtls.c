@@ -616,8 +616,8 @@ ssize_t sock_dtls_send_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
             msg_t msg;
             bool is_timed_out = false;
             do {
-                uint32_t start = xtimer_now_usec();
-                res = xtimer_msg_receive_timeout(&msg, timeout);
+                uint32_t start = ztimer_now(ZTIMER_USEC);
+                res = ztimer_msg_receive_timeout(ZTIMER_USEC, &msg, timeout);
 
                 if (timeout != SOCK_NO_TIMEOUT) {
                     timeout = _update_timeout(start, timeout);
@@ -761,7 +761,7 @@ ssize_t sock_dtls_recv_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
     /* loop breaks when timeout or application data read */
     while (1) {
         ssize_t res;
-        uint32_t start_recv = xtimer_now_usec();
+        uint32_t start_recv = ztimer_now(ZTIMER_USEC);
         msg_t msg;
 
         if (sock->buffer.data != NULL) {
@@ -827,7 +827,7 @@ static void _session_to_ep(const session_t *session, sock_udp_ep_t *ep)
 
 static inline uint32_t _update_timeout(uint32_t start, uint32_t timeout)
 {
-    uint32_t diff = (xtimer_now_usec() - start);
+    uint32_t diff = (ztimer_now(ZTIMER_USEC) - start);
     return (diff > timeout) ? 0: timeout - diff;
 }
 

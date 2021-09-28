@@ -35,7 +35,7 @@
 #include "tmp00x_regs.h"
 #include "byteorder.h"
 #include "kernel_defines.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -209,7 +209,7 @@ int tmp00x_read_temperature(const tmp00x_t *dev, int16_t *ta, int16_t *to)
         if (tmp00x_set_active(dev)) {
             return TMP00X_ERROR;
         }
-        xtimer_usleep(CONFIG_TMP00X_CONVERSION_TIME);
+        ztimer_sleep(ZTIMER_USEC, CONFIG_TMP00X_CONVERSION_TIME);
     }
 
     if (IS_ACTIVE(CONFIG_TMP00X_USE_RAW_VALUES)) {

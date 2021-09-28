@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "touch_dev.h"
 
@@ -77,7 +77,7 @@ int main(void)
             printf("X: %i, Y:%i\n", touches[0].x, touches[0].y);
         }
 
-        xtimer_msleep(10);
+        ztimer_sleep(ZTIMER_MSEC, 10);
     }
 
     return 0;

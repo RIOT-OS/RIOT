@@ -25,7 +25,7 @@
 #include "shell.h"
 
 #if MODULE_STDIO_RTT
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 
 #if MODULE_SHELL_HOOKS

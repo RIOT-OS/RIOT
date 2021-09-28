@@ -24,7 +24,7 @@
 
 #include "bmp180.h"
 #include "bmp180_params.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "board.h"
 
 int main(void)
@@ -84,7 +84,7 @@ int main(void)
                (unsigned long)pressure_0 / 100, (int)(pressure_0 % 100),
                (int)altitude);
 
-        xtimer_sleep(2);
+        ztimer_sleep(ZTIMER_MSEC, 2 * 1000);
     }
 
     return 0;

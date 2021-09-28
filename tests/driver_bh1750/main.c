@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "bh1750fvi.h"
 #include "bh1750fvi_params.h"
 
@@ -30,7 +30,7 @@ int main(void)
 {
     int res;
     bh1750fvi_t dev;
-    xtimer_ticks32_t last = xtimer_now();
+    uint32_t last = ztimer_now(ZTIMER_USEC);
 
     puts("BH1750FVI ambient light sensor test\n");
 
@@ -45,7 +45,7 @@ int main(void)
     while(1) {
         uint16_t val = bh1750fvi_sample(&dev);
         printf("value: %5i lux\n", (int)val);
-        xtimer_periodic_wakeup(&last, RATE);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &last, RATE);
     }
 
     return 0;

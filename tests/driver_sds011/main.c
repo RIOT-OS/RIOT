@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "sds011.h"
 #include "sds011_params.h"
@@ -112,7 +112,7 @@ int main(void)
             puts("[ERROR]");
             return -1;
         }
-        xtimer_usleep(PUT_TO_QUERY_MODE_RETRY_TIMEOUT_MS * 1000);
+        ztimer_sleep(ZTIMER_USEC, PUT_TO_QUERY_MODE_RETRY_TIMEOUT_MS * 1000);
         puts("[RETRY]");
     }
 

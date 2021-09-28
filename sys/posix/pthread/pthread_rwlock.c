@@ -33,7 +33,7 @@
 
 #include "pthread.h"
 #include "sched.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "thread.h"
 
@@ -187,7 +187,7 @@ static int pthread_rwlock_timedlock(pthread_rwlock_t *rwlock,
                                     int incr_when_held,
                                     const struct timespec *abstime)
 {
-    uint64_t now = xtimer_now_usec64();
+    uint64_t now = ztimer_now64();
     uint64_t then = ((uint64_t)abstime->tv_sec * US_PER_SEC) +
                     (abstime->tv_nsec / NS_PER_US);
 
@@ -195,11 +195,11 @@ static int pthread_rwlock_timedlock(pthread_rwlock_t *rwlock,
         return ETIMEDOUT;
     }
     else {
-        xtimer_t timer;
+        ztimer_t timer;
         xtimer_set_wakeup64(&timer, (then - now), thread_getpid());
         int result = pthread_rwlock_lock(rwlock, is_blocked, is_writer, incr_when_held, true);
         if (result != ETIMEDOUT) {
-            xtimer_remove(&timer);
+            ztimer_remove(ZTIMER_USEC, &timer);
         }
 
         return result;

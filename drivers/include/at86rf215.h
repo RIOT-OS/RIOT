@@ -32,7 +32,7 @@
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
 #include "net/gnrc/nettype.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -346,7 +346,7 @@ typedef struct at86rf215 {
     struct at86rf215 *sibling;              /**< The other radio */
     const at86rf215_RF_regs_t  *RF;         /**< Radio Frontend Registers */
     const at86rf215_BBC_regs_t *BBC;        /**< Baseband Registers */
-    xtimer_t timer;                         /**< timer for ACK & CSMA timeout */
+    ztimer_t timer;                         /**< timer for ACK & CSMA timeout */
     uint32_t ack_timeout_usec;              /**< time to wait before retransmission in µs */
     uint32_t csma_backoff_period;           /**< CSMA Backoff period */
     uint16_t flags;                         /**< Device specific flags */

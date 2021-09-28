@@ -33,7 +33,7 @@
 #include "shell.h"
 #include "shell_commands.h"
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define SYMBOL_TIME (16U) /**< 16 us */
 #define ACK_TIMEOUT_TIME (40 * SYMBOL_TIME)
@@ -41,7 +41,7 @@
 static inline void _set_trx_state(int state, bool verbose);
 
 static uint8_t buffer[127];
-static xtimer_t timer_ack;
+static ztimer_t timer_ack;
 static mutex_t lock;
 
 static const char *str_states[3]= {"TRX_OFF", "RX", "TX"};
@@ -97,7 +97,7 @@ void _timer_ack_handler(void *arg)
     event_post(EVENT_PRIO_HIGHEST, &_ack_timeout_ev);
 }
 
-static xtimer_t timer_ack = {
+static ztimer_t timer_ack = {
     .callback = _timer_ack_handler,
 };
 
@@ -174,7 +174,7 @@ static void _tx_finish_handler(event_t *event)
     if (!ieee802154_radio_has_irq_ack_timeout(&_radio[0]) && !ieee802154_radio_has_frame_retrans(&_radio[0])) {
         /* This is just to show how the MAC layer would handle ACKs... */
         _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
-        xtimer_set(&timer_ack, ACK_TIMEOUT_TIME);
+        ztimer_set(ZTIMER_USEC, &timer_ack, ACK_TIMEOUT_TIME);
     }
 
     switch (tx_info.status) {
@@ -445,7 +445,7 @@ int _cca(int argc, char **argv)
 
 static inline void _set_trx_state(int state, bool verbose)
 {
-    xtimer_ticks32_t a;
+    uint32_t a;
     int res;
 
     /* Under certain conditions (internal house-keeping or sending ACK frames
@@ -455,7 +455,7 @@ static inline void _set_trx_state(int state, bool verbose)
     while((res = ieee802154_radio_request_set_trx_state(&_radio[0], state)) == -EBUSY) {}
 
     if (verbose) {
-        a = xtimer_now();
+        a = ztimer_now(ZTIMER_USEC);
         if(res != 0) {
             printf("%i != 0 \n", res);
             assert(false);
@@ -468,7 +468,7 @@ static inline void _set_trx_state(int state, bool verbose)
             printf("%i != 0 \n", res);
             assert(false);
         }
-        uint32_t secs = xtimer_usec_from_ticks(xtimer_diff(xtimer_now(), a));
+        uint32_t secs = xtimer_diff(ztimer_now(ZTIMER_USEC), a);
         printf("\tTransition took %" PRIu32 " usecs\n", secs);
     }
 }

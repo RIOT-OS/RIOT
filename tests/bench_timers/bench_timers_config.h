@@ -25,7 +25,7 @@
 #include "periph/timer.h"
 #include "cpu.h"
 #if TEST_XTIMER
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 
 #ifdef __cplusplus
@@ -242,7 +242,7 @@ extern "C" {
 #define ESTIMATE_CPU_ITERATIONS 2048
 
 #if TEST_XTIMER
-#define READ_TUT() _xtimer_now()
+#define READ_TUT() ztimer_now(ZTIMER_USEC)
 #else
 #define READ_TUT() timer_read(TIM_TEST_DEV)
 #endif

@@ -26,7 +26,7 @@
 #include "periph_conf.h"
 #include "periph/rtt.h"
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define US_PER_TICK     (US_PER_SEC / RTT_FREQUENCY)
 /* min. amount of time to wait between set_alarm() */
@@ -62,8 +62,8 @@ int main(void)
             rtt_clear_alarm();
             uint32_t now = rtt_get_counter();
             rtt_set_alarm((now + offset) % RTT_MAX_VALUE, cb, &lock);
-            ret = xtimer_mutex_lock_timeout(
-                &lock, offset * US_PER_TICK + MIN_WAIT_US);
+            ret = ztimer_mutex_lock_timeout(ZTIMER_USEC, &lock,
+                                            offset * US_PER_TICK + MIN_WAIT_US);
         }
         if (offset > value) {
             value = offset;

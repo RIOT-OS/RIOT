@@ -124,7 +124,7 @@ static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal)
     else {
         backoff = random_uint32_range(1 * ctx->timeout_base, 2 * ctx->timeout_base);
     }
-    xtimer_set(&ctx->timeout, backoff);
+    ztimer_set(ZTIMER_USEC, &ctx->timeout, backoff);
 
     return DOSE_SIGNAL_NONE;
 }
@@ -173,7 +173,7 @@ static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal)
 
     if (rc == DOSE_SIGNAL_NONE) {
         /* No signal is returned. We stay in the RECV state. */
-        xtimer_set(&ctx->timeout, ctx->timeout_base);
+        ztimer_set(ZTIMER_USEC, &ctx->timeout, ctx->timeout_base);
     }
 
     return rc;
@@ -192,7 +192,7 @@ static dose_signal_t state_transit_send(dose_t *ctx, dose_signal_t signal)
      * will bring us back to the BLOCKED state after _send has emitted
      * its last octet. */
 
-    xtimer_set(&ctx->timeout, ctx->timeout_base);
+    ztimer_set(ZTIMER_USEC, &ctx->timeout, ctx->timeout_base);
 
     return DOSE_SIGNAL_NONE;
 }
@@ -600,8 +600,8 @@ void dose_setup(dose_t *ctx, const dose_params_t *params, uint8_t index)
      * transitions are triggered from another state transition setting up the
      * timeout. */
     ctx->timeout_base = CONFIG_DOSE_TIMEOUT_USEC;
-    if (ctx->timeout_base < xtimer_usec_from_ticks(min_timeout)) {
-        ctx->timeout_base = xtimer_usec_from_ticks(min_timeout);
+    if (ctx->timeout_base < min_timeout) {
+        ctx->timeout_base = min_timeout;
     }
     ctx->timeout.callback = _isr_xtimer;
     ctx->timeout.arg = ctx;

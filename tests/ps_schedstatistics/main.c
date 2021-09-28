@@ -47,7 +47,7 @@ static void *_thread_fn(void *arg)
         for (int i = 0; i < (10 * (next + 1)); ++i) {
             _xtimer_now64();
         }
-        xtimer_usleep(XTIMER_BACKOFF * 10);
+        ztimer_sleep(ZTIMER_USEC, XTIMER_BACKOFF * 10);
         msg_send(&m2, pids[next]);
     }
 
@@ -65,7 +65,7 @@ int main(void)
                                 _thread_fn, (void *)i, "thread");
     }
     /* sleep for a second, so that `ps` shows some % on idle at the beginning */
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
     msg_t msg;
     msg_send(&msg, pids[0]);

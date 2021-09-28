@@ -29,7 +29,7 @@
 #include "shell.h"
 #include "thread.h"
 #include "test_utils/expect.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifdef MODULE_SOCK_IP
 static char sock_inbuf[SOCK_INBUF_SIZE];
@@ -154,7 +154,7 @@ static int ip_send(char *addr_str, char *port_str, char *data, unsigned int num,
                    (dst.family == AF_INET6) ? "IPv6" : "IPv4",
                    addr_str, protocol);
         }
-        xtimer_usleep(delay);
+        ztimer_sleep(ZTIMER_USEC, delay);
     }
     return 0;
 }

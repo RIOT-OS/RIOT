@@ -28,7 +28,7 @@
 #include "msg.h"
 #include "sema.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define _MSG_SUCCESS    (0x5cac)
 #define _MSG_TIMEOUT    (0x5cad)
@@ -40,7 +40,7 @@ void sys_init(void)
 
 u32_t sys_now(void)
 {
-    return (uint32_t)(xtimer_now_usec64() / US_PER_MS);
+    return (uint32_t)(ztimer_now64() / US_PER_MS);
 }
 
 err_t sys_mutex_new(sys_mutex_t *mutex)
@@ -86,9 +86,9 @@ u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t count)
     LWIP_ASSERT("invalid semaphore", sys_sem_valid(sem));
     if (count != 0) {
         uint64_t stop, start;
-        start = xtimer_now_usec64();
+        start = ztimer_now64();
         int res = sema_wait_timed((sema_t *)sem, count * US_PER_MS);
-        stop = xtimer_now_usec64() - start;
+        stop = ztimer_now64() - start;
         if (res == -ETIMEDOUT) {
             return SYS_ARCH_TIMEOUT;
         }
@@ -142,17 +142,17 @@ static void _mbox_timeout(void *arg)
 u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
 {
     msg_t m;
-    xtimer_t timer = { .callback = _mbox_timeout, .arg = &mbox->mbox };
+    ztimer_t timer = { .callback = _mbox_timeout, .arg = &mbox->mbox };
     uint64_t start, stop;
 
-    start = xtimer_now_usec64();
+    start = ztimer_now64();
     if (timeout > 0) {
         uint64_t u_timeout = (timeout * US_PER_MS);
         xtimer_set64(&timer, u_timeout);
     }
     mbox_get(&mbox->mbox, &m);
-    stop = xtimer_now_usec64();
-    xtimer_remove(&timer);  /* in case timer did not time out */
+    stop = ztimer_now64();
+    ztimer_remove(ZTIMER_USEC, &timer);  /* in case timer did not time out */
     switch (m.type) {
         case _MSG_SUCCESS:
             *msg = m.content.ptr;

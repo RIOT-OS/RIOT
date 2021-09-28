@@ -26,7 +26,7 @@
  */
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "thread.h"
 #include "log.h"
 
@@ -63,7 +63,7 @@ void *timer_func(void *arg)
         gpio_set((*(timer_arg_t *)(arg)).pin);
         gpio_clear((*(timer_arg_t *)(arg)).pin);
 #endif
-        xtimer_usleep(*(uint32_t *)(arg));
+        ztimer_sleep(ZTIMER_USEC, *(uint32_t *)(arg));
     }
 }
 
@@ -91,18 +91,18 @@ int main(void)
                   timer_func, &sleep_timer2, "timer2");
 
     uint32_t now = 0;
-    uint32_t start = xtimer_now_usec();
+    uint32_t start = ztimer_now(ZTIMER_USEC);
     uint32_t until = start + (TEST_TIME_S * US_PER_SEC);
     uint32_t interval = TEST_INTERVAL_MS * US_PER_MS;
-    xtimer_ticks32_t last_wakeup = xtimer_now();
+    uint32_t last_wakeup = ztimer_now(ZTIMER_USEC);
 
     puts("[START]");
-    while ((now = xtimer_now_usec()) < until) {
+    while ((now = ztimer_now(ZTIMER_USEC)) < until) {
         unsigned percent = (100 * (now - start)) / (until - start);
 #if defined(MAIN_THREAD_PIN)
         gpio_set(main_pin);
 #endif
-        xtimer_periodic_wakeup(&last_wakeup, interval);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &last_wakeup, interval);
 #if defined(MAIN_THREAD_PIN)
         gpio_clear(main_pin);
 #endif

@@ -23,7 +23,7 @@
 #define NET_GNRC_LWMAC_TYPES_H
 
 #include "msg.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "net/gnrc/lwmac/hdr.h"
 
 #ifdef __cplusplus
@@ -186,7 +186,7 @@ typedef enum {
  * @brief   LWMAC timeout structure
  */
 typedef struct {
-    xtimer_t timer;                 /**< xtimer entity */
+    ztimer_t timer;                 /**< xtimer entity */
     msg_t msg;                      /**< msg entity */
     bool expired;                   /**< If type != DISABLED, this indicates if timeout has expired */
     gnrc_lwmac_timeout_type_t type; /**< timeout type */

@@ -22,7 +22,7 @@
 #include <string.h>
 
 #include "mutex.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "assert.h"
 #include "net/ethernet.h"
 #include "net/eui_provider.h"
@@ -265,7 +265,7 @@ static int nd_send(netdev_t *netdev, const iolist_t *iolist)
 
     if (cmd_rcr(dev, REG_ECON1, -1) & ECON1_TXRTS) {
         /* there is already a transmission in progress */
-        if (xtimer_now_usec() - dev->tx_time > MAX_TX_TIME * 2) {
+        if (ztimer_now(ZTIMER_USEC) - dev->tx_time > MAX_TX_TIME * 2) {
             /*
              * if transmission time exceeds the double of maximum transmission
              * time, we suppose that TX logic hangs and has to be reset
@@ -298,7 +298,7 @@ static int nd_send(netdev_t *netdev, const iolist_t *iolist)
     /* trigger the send process */
     cmd_bfs(dev, REG_ECON1, -1, ECON1_TXRTS);
     /* set last transmission time for timeout handling */
-    dev->tx_time = xtimer_now_usec();
+    dev->tx_time = ztimer_now(ZTIMER_USEC);
 
     mutex_unlock(&dev->lock);
     return c;
@@ -379,7 +379,7 @@ static int nd_init(netdev_t *netdev)
     gpio_init_int(INT_PIN, GPIO_IN, GPIO_FALLING, on_int, (void *)dev);
 
     /* wait at least 1ms and then release device from reset state */
-    xtimer_usleep(DELAY_RESET);
+    ztimer_sleep(ZTIMER_USEC, DELAY_RESET);
     gpio_set(RST_PIN);
 
     /* wait for oscillator to be stable before proceeding */

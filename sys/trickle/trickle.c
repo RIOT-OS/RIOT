@@ -96,7 +96,7 @@ void trickle_stop(trickle_t *trickle)
 #if IS_USED(MODULE_ZTIMER_MSEC)
     ztimer_remove(ZTIMER_MSEC, &trickle->msg_timer);
 #else
-    xtimer_remove(&trickle->msg_timer);
+    ztimer_remove(ZTIMER_USEC, &trickle->msg_timer);
 #endif
 }
 

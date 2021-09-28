@@ -186,7 +186,7 @@
  *             }
  *             printf("\"\n");
  *         }
- *         xtimer_sleep(1);
+ *         ztimer_sleep(ZTIMER_MSEC, 1000);
  *     }
  *
  *     return 0;
@@ -251,7 +251,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * Finally, we wait a second before sending out the next "Hello!" with
- * `xtimer_sleep(1)`.
+ * `ztimer_sleep(ZTIMER_MSEC, 1000)`.
  *
  * @{
  *

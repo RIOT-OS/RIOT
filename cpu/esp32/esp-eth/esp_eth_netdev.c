@@ -32,7 +32,7 @@
 #include "net/ethernet.h"
 #include "net/netdev/eth.h"
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "esp_common.h"
 #include "esp_attr.h"
@@ -130,7 +130,7 @@ static void _esp_eth_phy_power_enable_gpio(bool enable)
     gpio_init(EMAC_PHY_POWER_PIN, GPIO_OUT);
     gpio_write(EMAC_PHY_POWER_PIN, enable);
 
-    xtimer_usleep (USEC_PER_MSEC);
+    ztimer_sleep(ZTIMER_USEC, USEC_PER_MSEC);
 
     if (enable) {
         EMAC_ETHERNET_PHY_CONFIG.phy_power_enable(true);
@@ -171,7 +171,7 @@ static int _esp_eth_init(netdev_t *netdev)
      * after activating clock logic it can take some time before we can
      * enable EMAC
      */
-    xtimer_usleep (EMAC_PHY_CLOCK_DELAY);
+    ztimer_sleep(ZTIMER_USEC, EMAC_PHY_CLOCK_DELAY);
 
     if (ret == ESP_OK && (ret = esp_eth_enable()) != ESP_OK) {
         LOG_TAG_ERROR("esp_eth", "enable failed");

@@ -26,7 +26,7 @@
 
 #ifdef MODULE_SCHEDSTATISTICS
 #include "schedstatistics.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 
 #ifdef MODULE_TLSF_MALLOC
@@ -131,7 +131,7 @@ void ps(void)
                    thread_get_stackstart(p), thread_get_sp(p)
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
-                   , runtime_major, runtime_minor, switches, xtimer_usec_from_ticks(xtimer_ticks)
+                   , runtime_major, runtime_minor, switches, xtimer_ticks
 #endif
                   );
         }

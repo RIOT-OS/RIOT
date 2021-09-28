@@ -21,7 +21,7 @@
 #include <stdio.h>
 
 #include "log.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "my9221.h"
 
 #define TEST_STEP       (5U)
@@ -47,39 +47,39 @@ int main(void)
     LOG_INFO("- light up all LEDs one by one.\n");
     for (unsigned i=0; i < dev.params.leds; ++i) {
         my9221_set_led(&dev, i, MY9221_LED_ON);
-        xtimer_usleep(TEST_WAIT);
+        ztimer_sleep(ZTIMER_USEC, TEST_WAIT);
         my9221_set_led(&dev, i, MY9221_LED_OFF);
     }
-    xtimer_usleep(TEST_WAIT);
+    ztimer_sleep(ZTIMER_USEC, TEST_WAIT);
     for (unsigned j=dev.params.leds; j > 0 ; --j) {
         unsigned i = j-1;
         my9221_set_led(&dev, i, MY9221_LED_ON);
-        xtimer_usleep(TEST_WAIT);
+        ztimer_sleep(ZTIMER_USEC, TEST_WAIT);
         my9221_set_led(&dev, i, MY9221_LED_OFF);
     }
-    xtimer_usleep(TEST_WAIT);
+    ztimer_sleep(ZTIMER_USEC, TEST_WAIT);
     LOG_INFO("- light up all LEDs to 33%%.\n");
     for (unsigned i=0; i < dev.params.leds; ++i) {
         my9221_set_led(&dev, i, MY9221_LED_ON/3);
-        xtimer_usleep(TEST_WAIT);
+        ztimer_sleep(ZTIMER_USEC, TEST_WAIT);
     }
-    xtimer_usleep(TEST_WAIT);
+    ztimer_sleep(ZTIMER_USEC, TEST_WAIT);
     LOG_INFO("- light up all LEDs to 66%%.\n");
     for (unsigned i=0; i < dev.params.leds; ++i) {
         my9221_set_led(&dev, i, (MY9221_LED_ON/3)*2);
-        xtimer_usleep(TEST_WAIT);
+        ztimer_sleep(ZTIMER_USEC, TEST_WAIT);
     }
-    xtimer_usleep(TEST_WAIT);
+    ztimer_sleep(ZTIMER_USEC, TEST_WAIT);
     LOG_INFO("- light up all LEDs to 100%%.\n");
     for (unsigned i=0; i < dev.params.leds; ++i) {
         my9221_set_led(&dev, i, MY9221_LED_ON);
-        xtimer_usleep(TEST_WAIT);
+        ztimer_sleep(ZTIMER_USEC, TEST_WAIT);
     }
-    xtimer_usleep(TEST_WAIT);
+    ztimer_sleep(ZTIMER_USEC, TEST_WAIT);
     LOG_INFO("- turn off all LEDs\n");
     for (unsigned i=dev.params.leds; i > 0 ; --i) {
         my9221_toggle_led(&dev, i-1);
-        xtimer_usleep(TEST_WAIT);
+        ztimer_sleep(ZTIMER_USEC, TEST_WAIT);
     }
     puts("[SUCCESS]");
 

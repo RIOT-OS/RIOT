@@ -30,7 +30,7 @@
 #include "periph/gpio.h"
 #include <stdint.h>
 #include <byteorder.h>
-#include "xtimer.h"
+#include "ztimer.h"
 #include "debug.h"
 
 #define I2C_BUS                        dev->lm75_params.i2c_bus
@@ -357,7 +357,7 @@ int lm75_low_power_mode(lm75_t *dev, uint16_t interval) {
         if (tmp1075_one_shot(dev) != 0) {
             return LM75_ERROR;
         }
-        xtimer_msleep(interval);
+        ztimer_sleep(ZTIMER_MSEC, interval);
     }
     else {
         if (lm75_poweron(dev) != 0) {
@@ -366,10 +366,10 @@ int lm75_low_power_mode(lm75_t *dev, uint16_t interval) {
         /* this is required to ensure the temp register updates for followup readings
         * otherwise the temperature register will have outdated and possibly bogus values */
         if (interval < dev->lm75_params.conv_rate) {
-            xtimer_msleep(dev->lm75_params.conv_rate);
+            ztimer_sleep(ZTIMER_MSEC, dev->lm75_params.conv_rate);
         }
         else {
-            xtimer_msleep(interval);
+            ztimer_sleep(ZTIMER_MSEC, interval);
         }
 
         if (lm75_poweroff(dev) != 0) {

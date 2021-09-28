@@ -40,7 +40,7 @@
 #include "esp_common.h"
 #include "irq_arch.h"
 #include "syscalls.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define RTC_PLL_480M    480 /* PLL with 480 MHz at maximum */
 #define RTC_PLL_320M    320 /* PLL with 480 MHz at maximum */

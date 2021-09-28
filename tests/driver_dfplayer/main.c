@@ -25,7 +25,7 @@
 #include "event/thread.h"
 #include "fmt.h"
 #include "shell.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 static const char *_sources[] = {
     [DFPLAYER_SOURCE_USB]       = "USB",
@@ -90,7 +90,7 @@ static void playback_done_handler(event_t *_data)
             break;
     }
     print_str(".mp3: Playback completed\n");
-    xtimer_msleep(DFPLAYER_TIMEOUT_MS);
+    ztimer_sleep(ZTIMER_MSEC, DFPLAYER_TIMEOUT_MS);
     dfplayer_next(dev);
 }
 

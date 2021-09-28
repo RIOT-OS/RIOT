@@ -19,7 +19,7 @@
 #include "net/sock/udp.h"
 #include "net/utils.h"
 #include "sema_inv.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "test_utils/benchmark_udp.h"
 
@@ -50,7 +50,7 @@ static uint32_t _get_rtt(uint32_t seq_num, uint32_t prev)
 {
     for (unsigned i = 0; i < ARRAY_SIZE(record_tx); ++i) {
         if (record_tx[i].seq_no == seq_num) {
-            return xtimer_now_usec() - record_tx[i].time_tx_us;
+            return ztimer_now(ZTIMER_USEC) - record_tx[i].time_tx_us;
         }
     }
 
@@ -60,7 +60,7 @@ static uint32_t _get_rtt(uint32_t seq_num, uint32_t prev)
 static void _put_rtt(uint32_t seq_num) {
     uint8_t oldest = 0;
     uint32_t oldest_diff = 0;
-    uint32_t now = xtimer_now_usec();
+    uint32_t now = ztimer_now(ZTIMER_USEC);
 
     for (unsigned i = 0; i < ARRAY_SIZE(record_tx); ++i) {
         uint32_t diff = now - record_tx[i].time_tx_us;
@@ -134,7 +134,7 @@ static void *_send_thread(void *ctx)
             irq_restore(state);
         }
 
-        xtimer_usleep(delay_us);
+        ztimer_sleep(ZTIMER_USEC, delay_us);
     }
 
     DEBUG_PUTS("bench_udp: sending thread terminates");

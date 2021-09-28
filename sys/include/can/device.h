@@ -28,7 +28,7 @@ extern "C" {
 #include "sched.h"
 
 #ifdef MODULE_CAN_PM
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 #ifdef MODULE_CAN_TRX
 #include "can/can_trx.h"
@@ -79,7 +79,7 @@ typedef struct candev_dev {
     uint32_t tx_wakeup_timeout;     /**< Min timeout loaded when a frame is sent */
     uint32_t last_pm_update;   /**< time when the pm was updated */
     uint32_t last_pm_value;    /**< last pm timer value set */
-    xtimer_t pm_timer;         /**< timer for power management */
+    ztimer_t pm_timer;         /**< timer for power management */
 #endif
 } candev_dev_t;
 

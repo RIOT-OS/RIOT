@@ -17,7 +17,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "aip31068.h"
 #include "aip31068_regs.h"
@@ -135,7 +135,7 @@ int aip31068_init(aip31068_t *dev, const aip31068_params_t *params)
      * HD44780 hidden behind it so to be sure that it works for all kinds of
      * HD44780 we follow the initialization sequence of the HD44780, even though
      * it might be unnecessary for others. */
-    xtimer_msleep(50);
+    ztimer_sleep(ZTIMER_MSEC, 50);
 
     int rc = 0;
 
@@ -146,7 +146,7 @@ int aip31068_init(aip31068_t *dev, const aip31068_params_t *params)
     }
 
     /* wait after the first try */
-    xtimer_msleep(5);
+    ztimer_sleep(ZTIMER_MSEC, 5);
 
     /* second try */
     rc = _command(dev, AIP31068_CMD_FUNCTION_SET | _function_set);
@@ -155,7 +155,7 @@ int aip31068_init(aip31068_t *dev, const aip31068_params_t *params)
     }
 
     /* wait after the second try */
-    xtimer_usleep(500);
+    ztimer_sleep(ZTIMER_USEC, 500);
 
     /* third go */
     rc = _command(dev, AIP31068_CMD_FUNCTION_SET | _function_set);
@@ -201,7 +201,7 @@ int aip31068_clear(aip31068_t *dev)
 {
     int rc = _command(dev, AIP31068_CMD_CLEAR_DISPLAY);
 
-    xtimer_usleep(AIP31068_EXECUTION_TIME_MAX);
+    ztimer_sleep(ZTIMER_USEC, AIP31068_EXECUTION_TIME_MAX);
 
     return rc;
 }
@@ -210,7 +210,7 @@ int aip31068_return_home(aip31068_t *dev)
 {
     int rc = _command(dev, AIP31068_CMD_RETURN_HOME);
 
-    xtimer_usleep(AIP31068_EXECUTION_TIME_MAX);
+    ztimer_sleep(ZTIMER_USEC, AIP31068_EXECUTION_TIME_MAX);
 
     return rc;
 }
@@ -368,7 +368,7 @@ static inline int _data(aip31068_t *dev, uint8_t value)
 {
     int rc = _write(dev, value, false);
 
-    xtimer_usleep(AIP31068_EXECUTION_TIME_DEFAULT);
+    ztimer_sleep(ZTIMER_USEC, AIP31068_EXECUTION_TIME_DEFAULT);
 
     return rc;
 }
@@ -377,7 +377,7 @@ static inline int _command(aip31068_t *dev, uint8_t value)
 {
     int rc = _write(dev, value, true);
 
-    xtimer_usleep(AIP31068_EXECUTION_TIME_DEFAULT);
+    ztimer_sleep(ZTIMER_USEC, AIP31068_EXECUTION_TIME_DEFAULT);
 
     return rc;
 }

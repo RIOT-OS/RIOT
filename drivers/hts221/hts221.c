@@ -24,7 +24,7 @@
 
 #include "hts221.h"
 #include "periph/i2c.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG    0
 #include "debug.h"

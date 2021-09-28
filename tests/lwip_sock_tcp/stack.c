@@ -14,7 +14,7 @@
  * @}
  */
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "lwip.h"
 #include "lwip/netif.h"

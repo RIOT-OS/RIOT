@@ -20,7 +20,7 @@
 
 #include <string.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "lvgl/lvgl.h"
 #include "lvgl_riot.h"

@@ -20,7 +20,7 @@
 #include <stdio.h>
 
 #include "net/nanocoap_sock.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define COAP_INBUF_SIZE (256U)
 
@@ -38,7 +38,7 @@ int main(void)
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
     puts("Waiting for address autoconfiguration...");
-    xtimer_sleep(3);
+    ztimer_sleep(ZTIMER_MSEC, 3 * 1000);
 
     /* print network addresses */
     puts("Configured network interfaces:");

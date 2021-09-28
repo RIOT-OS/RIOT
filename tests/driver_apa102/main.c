@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "color.h"
 
 #include "apa102.h"
@@ -94,13 +94,13 @@ int main(void)
         for (; i <= (int)UINT8_MAX; i += BSTEP) {
             setcolor(col, (uint8_t)i);
             apa102_load_rgba(&dev, leds);
-            xtimer_usleep(DIM);
+            ztimer_sleep(ZTIMER_USEC, DIM);
         }
         i -= BSTEP;
         for (; i >= 0; i -= BSTEP) {
             setcolor(col, (uint8_t)i);
             apa102_load_rgba(&dev, leds);
-            xtimer_usleep(DIM);
+            ztimer_sleep(ZTIMER_USEC, DIM);
         }
     }
 
@@ -110,7 +110,7 @@ int main(void)
     setcolor(-1, 255);
     apa102_load_rgba(&dev, leds);
 
-    xtimer_ticks32_t now = xtimer_now();
+    uint32_t now = ztimer_now(ZTIMER_USEC);
 
     while (1) {
         /* change the active color by running around the hue circle */
@@ -132,7 +132,7 @@ int main(void)
             step *= -1;
         }
 
-        xtimer_periodic_wakeup(&now, STEP);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &now, STEP);
     }
 
     return 0;

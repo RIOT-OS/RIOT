@@ -24,7 +24,7 @@
 #include "mrf24j40.h"
 #include "mrf24j40_internal.h"
 #include "mrf24j40_registers.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -483,7 +483,7 @@ void mrf24j40_assert_awake(mrf24j40_t *dev)
         /* Wake mrf up */
         mrf24j40_reg_write_short(dev, MRF24J40_REG_WAKECON, MRF24J40_WAKECON_IMMWAKE | MRF24J40_WAKECON_REGWAKE);
         /* undocumented delay, needed for stable wakeup */
-        xtimer_usleep(MRF24J40_DELAY_SLEEP_TOGGLE);
+        ztimer_sleep(ZTIMER_USEC, MRF24J40_DELAY_SLEEP_TOGGLE);
         mrf24j40_reg_write_short(dev, MRF24J40_REG_WAKECON, MRF24J40_WAKECON_IMMWAKE);
         /* reset state machine */
         mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, MRF24J40_RFCTL_RFRST);
@@ -491,7 +491,7 @@ void mrf24j40_assert_awake(mrf24j40_t *dev)
         /* After wake-up, delay at least 2 ms to allow 20 MHz main
          * oscillator time to stabilize before transmitting or receiving.
          */
-        xtimer_usleep(MRF24J40_WAKEUP_DELAY);
+        ztimer_sleep(ZTIMER_USEC, MRF24J40_WAKEUP_DELAY);
         /* reset interrupts */
         mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);
         mrf24j40_enable_auto_pa_lna(dev);
@@ -503,7 +503,7 @@ void mrf24j40_reset_state_machine(mrf24j40_t *dev)
 {
     mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, MRF24J40_RFCTL_RFRST);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, 0x00);
-    xtimer_usleep(MRF24J40_STATE_RESET_DELAY);             /* Delay at least 192us */
+    ztimer_sleep(ZTIMER_USEC, MRF24J40_STATE_RESET_DELAY);             /* Delay at least 192us */
 }
 
 void mrf24j40_software_reset(mrf24j40_t *dev)

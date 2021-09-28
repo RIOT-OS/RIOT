@@ -15,7 +15,7 @@
  */
 
 #include "periph/i2c.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "at30tse75x.h"
 
@@ -73,7 +73,7 @@ static int at30tse75x_reset(const at30tse75x_t *dev)
     }
     i2c_release(dev->i2c);
     /* Wait for reset to complete */
-    xtimer_usleep(500);
+    ztimer_sleep(ZTIMER_USEC, 500);
     return 0;
 }
 
@@ -218,7 +218,7 @@ int at30tse75x_save_config(const at30tse75x_t *dev)
     }
     i2c_release(dev->i2c);
     /* Wait for copy to complete */
-    xtimer_usleep(5000);
+    ztimer_sleep(ZTIMER_USEC, 5000);
     return 0;
 }
 
@@ -232,7 +232,7 @@ int at30tse75x_restore_config(const at30tse75x_t *dev)
     }
     i2c_release(dev->i2c);
     /* Wait for copy to complete */
-    xtimer_usleep(200);
+    ztimer_sleep(ZTIMER_USEC, 200);
     return 0;
 }
 
@@ -258,7 +258,7 @@ int at30tse75x_get_temperature(const at30tse75x_t *dev, float *temperature)
                                    AT30TSE75X_CONFIG__RESOLUTION_SHIFT;
 
         /* Wait until conversion is finished */
-        xtimer_usleep((uint32_t)(25000 << resolution));
+        ztimer_sleep(ZTIMER_USEC, (uint32_t)(25000 << resolution));
     }
 
     /* Read temperature */

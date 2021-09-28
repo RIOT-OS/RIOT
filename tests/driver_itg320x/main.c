@@ -42,7 +42,7 @@
 #include <stdio.h>
 
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "itg320x.h"
 #include "itg320x_params.h"
@@ -92,7 +92,7 @@ int main(void)
 #else
         while (1) {
             /* wait longer than period of ITG320X DOR */
-            xtimer_usleep(ITG320X_SLEEP);
+            ztimer_sleep(ZTIMER_USEC, ITG320X_SLEEP);
             if (itg320x_data_ready(&dev) == ITG320X_OK) {
                 break;
             }

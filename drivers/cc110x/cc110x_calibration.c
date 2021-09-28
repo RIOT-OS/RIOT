@@ -22,7 +22,7 @@
 #include <stdint.h>
 
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "cc110x.h"
 #include "cc110x_internal.h"
@@ -62,7 +62,7 @@ int cc110x_recalibrate(cc110x_t *dev)
         /* Manual calibration take 735 micro seconds (see Table 34 on page
          * 54 in the date sheet). We'll wait 750 to be sure
          */
-        xtimer_usleep(750);
+        ztimer_sleep(ZTIMER_USEC, 750);
 
         /* Re-acquire SPI interface in order to check if calibration
          * succeeded

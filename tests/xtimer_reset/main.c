@@ -23,7 +23,7 @@
 #include <stdio.h>
 
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 extern void xtimer_dump_all(void);
 int main(void)
 {
@@ -31,8 +31,8 @@ int main(void)
     printf("It should print three times \"now=<value>\", with values"
            " approximately 100ms (100000us) apart.\n");
 
-    xtimer_t xtimer;
-    xtimer_t xtimer2;
+    ztimer_t xtimer;
+    ztimer_t xtimer2;
 
     kernel_pid_t me = thread_getpid();
 
@@ -48,11 +48,11 @@ int main(void)
     xtimer_set_wakeup(&xtimer, 200000, me);
     xtimer_set_wakeup(&xtimer2, 100000, me);
 
-    printf("now=%" PRIu32 "\n", xtimer_now_usec());
+    printf("now=%" PRIu32 "\n", ztimer_now(ZTIMER_USEC));
     thread_sleep();
-    printf("now=%" PRIu32 "\n", xtimer_now_usec());
+    printf("now=%" PRIu32 "\n", ztimer_now(ZTIMER_USEC));
     thread_sleep();
-    printf("now=%" PRIu32 "\n", xtimer_now_usec());
+    printf("now=%" PRIu32 "\n", ztimer_now(ZTIMER_USEC));
 
     printf("Test completed!\n");
 

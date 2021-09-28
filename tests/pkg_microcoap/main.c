@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 #include "msg.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 void microcoap_server_loop(void);
 
@@ -31,7 +31,7 @@ int main(void)
     puts("RIOT microcoap test application");
 
     puts("Waiting for address autoconfiguration...");
-    xtimer_sleep(3);
+    ztimer_sleep(ZTIMER_MSEC, 3 * 1000);
 
     /* print network addresses */
     puts("Configured network interfaces:");

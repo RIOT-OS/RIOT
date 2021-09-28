@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "thread.h"
 #include "thread_flags.h"
 
@@ -112,7 +112,7 @@ int main(void)
         puts("Error: unable to power off device");
         return 1;
     }
-    xtimer_sleep(PWR_OFF_DELAY);
+    ztimer_sleep(ZTIMER_MSEC, PWR_OFF_DELAY * 1000);
     if (qmc5883l_poweron(&_dev) != QMC5883L_OK) {
         puts("Error: unable to power on the device again");
         return 1;
@@ -139,7 +139,7 @@ int main(void)
     while (1) {
         int ready;
         do {
-            xtimer_usleep(delay);
+            ztimer_sleep(ZTIMER_USEC, delay);
             ready = qmc5883l_data_ready(&_dev);
         } while (ready != QMC5883L_OK);
         _read_and_dump();

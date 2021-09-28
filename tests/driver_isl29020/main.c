@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "isl29020.h"
 #include "isl29020_params.h"
 
@@ -42,7 +42,7 @@ int main(void)
 
     while (1) {
         printf("Light value: %5i LUX\n", isl29020_read(&dev));
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
     }
 
     return 0;

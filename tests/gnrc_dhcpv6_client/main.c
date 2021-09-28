@@ -22,7 +22,7 @@
 #include "net/gnrc/netif.h"
 #include "net/dhcpv6/client.h"
 #include "net/sock.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 static char _dhcpv6_client_stack[DHCPV6_CLIENT_STACK_SIZE];
 
@@ -59,7 +59,7 @@ int main(void)
     thread_create(_dhcpv6_client_stack, DHCPV6_CLIENT_STACK_SIZE,
                   DHCPV6_CLIENT_PRIORITY, THREAD_CREATE_STACKTEST,
                   _dhcpv6_client_thread, NULL, "dhcpv6-client");
-    xtimer_sleep(5);
+    ztimer_sleep(ZTIMER_MSEC, 5 * 1000);
     /* global address should now be configured */
     _gnrc_netif_config(0, NULL);
     _gnrc_ipv6_nib(2, pl);

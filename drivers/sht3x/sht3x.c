@@ -23,7 +23,7 @@
 
 #include "checksum/crc8.h"
 #include "sht3x.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define ASSERT_PARAM(cond) \
     do { \
@@ -180,7 +180,7 @@ static int _start_measurement (sht3x_dev_t* dev)
      */
     if (dev->mode != SHT3X_SINGLE_SHOT) {
         /* sensor needs up to 250 us to process the measurement command */
-        xtimer_usleep (1000);
+        ztimer_sleep(ZTIMER_USEC, 1000);
 
         uint16_t status;
         int res;
@@ -197,7 +197,7 @@ static int _start_measurement (sht3x_dev_t* dev)
         }
     }
 
-    dev->meas_start_time = xtimer_now_usec();
+    dev->meas_start_time = ztimer_now(ZTIMER_USEC);
     dev->meas_duration = SHT3X_MEAS_DURATION_US[dev->repeat];
     dev->meas_started = true;
 
@@ -215,10 +215,10 @@ static int _get_raw_data(sht3x_dev_t* dev, uint8_t* raw_data)
     }
 
     /* determine the time elapsed since the start of current measurement cycle */
-    uint32_t elapsed = xtimer_now_usec() - dev->meas_start_time;
+    uint32_t elapsed = ztimer_now(ZTIMER_USEC) - dev->meas_start_time;
     if (elapsed < dev->meas_duration) {
         /* if necessary, wait until the measurement results become available */
-        xtimer_usleep(dev->meas_duration - elapsed);
+        ztimer_sleep(ZTIMER_USEC, dev->meas_duration - elapsed);
     }
 
     /* send fetch command in any periodic mode (mode > 0) before read raw data */
@@ -240,7 +240,7 @@ static int _get_raw_data(sht3x_dev_t* dev, uint8_t* raw_data)
     }
     /* start next measurement cycle in periodic modes */
     else {
-        dev->meas_start_time = xtimer_now_usec();
+        dev->meas_start_time = ztimer_now(ZTIMER_USEC);
         dev->meas_duration = SHT3X_MEASURE_PERIOD[dev->mode];
     }
 
@@ -348,7 +348,7 @@ static int _reset (sht3x_dev_t* dev)
      * in idle mode. We don't check I2C errors at this moment.
      */
     _send_command(dev, SHT3X_CMD_BREAK);
-    xtimer_usleep (1000);
+    ztimer_sleep(ZTIMER_USEC, 1000);
 
     /* send the soft-reset command */
     if (_send_command(dev, SHT3X_CMD_RESET) != SHT3X_OK) {
@@ -357,7 +357,7 @@ static int _reset (sht3x_dev_t* dev)
     }
 
     /* wait for 2 ms, the time needed to restart (according to datasheet 0.5 ms) */
-    xtimer_usleep (2000);
+    ztimer_sleep(ZTIMER_USEC, 2000);
 
     /* send reset command */
     if (_send_command(dev, SHT3X_CMD_CLEAR_STATUS) != SHT3X_OK) {
@@ -366,7 +366,7 @@ static int _reset (sht3x_dev_t* dev)
     }
 
     /* sensor needs some time to process the command */
-    xtimer_usleep (500);
+    ztimer_sleep(ZTIMER_USEC, 500);
 
     uint16_t status;
     int res = SHT3X_OK;

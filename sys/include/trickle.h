@@ -36,7 +36,7 @@
 #if IS_USED(MODULE_ZTIMER_MSEC)
 #include "ztimer.h"
 #else
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 
 /**
@@ -67,7 +67,7 @@ typedef struct {
     ztimer_t msg_timer;             /**< timer to send a msg_t to the target
                                          thread for a new interval */
 #else
-    xtimer_t msg_timer;             /**< xtimer to send a msg_t to the target
+    ztimer_t msg_timer;             /**< xtimer to send a msg_t to the target
                                          thread for a new interval */
 #endif
 } trickle_t;

@@ -25,7 +25,7 @@
 #include "feetech_writer.h"
 
 #include "periph/uart.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "byteorder.h"
 
 #include <string.h>

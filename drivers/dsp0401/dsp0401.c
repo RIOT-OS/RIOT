@@ -22,7 +22,7 @@
 #include <string.h>
 
 #include "dsp0401.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "periph/gpio.h"
 #include "periph/pwm.h"
 
@@ -164,11 +164,11 @@ static void _shift_char(const dsp0401_t *dev, uint8_t c)
 
 static void _latch(const dsp0401_t *dev)
 {
-    xtimer_usleep(LATCH_DELAY);
+    ztimer_sleep(ZTIMER_USEC, LATCH_DELAY);
     gpio_set(LAT);
-    xtimer_usleep(LATCH_DELAY);
+    ztimer_sleep(ZTIMER_USEC, LATCH_DELAY);
     gpio_clear(LAT);
-    xtimer_usleep(LATCH_DELAY);
+    ztimer_sleep(ZTIMER_USEC, LATCH_DELAY);
 }
 
 int dsp0401_init(dsp0401_t *dev, const dsp0401_params_t *params)
@@ -238,12 +238,12 @@ void dsp0401_scroll_text(const dsp0401_t *dev, char *text, uint16_t delay)
     for (unsigned i = 0; i < strlen(text); ++i) {
         _shift_char(dev, text[i]);
         _latch(dev);
-        xtimer_msleep(delay);
+        ztimer_sleep(ZTIMER_MSEC, delay);
     }
 
     for (unsigned i = 0; i < MOD_COUNT * 4; ++i) {
         _shift_char(dev, ' ');
         _latch(dev);
-        xtimer_msleep(delay);
+        ztimer_sleep(ZTIMER_MSEC, delay);
     }
 }

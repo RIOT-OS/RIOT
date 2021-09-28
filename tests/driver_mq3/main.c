@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "mq3.h"
 #include "periph_conf.h"
 #include "periph/adc.h"
@@ -55,7 +55,7 @@ int main(void)
 
         printf("RAW: %4i, per mille: %1i.%03i\n", raw, alc_a, alc_b);
 
-        xtimer_usleep((uint32_t)500 * 1000);
+        ztimer_sleep(ZTIMER_USEC, (uint32_t)500 * 1000);
     }
     return 0;
 }

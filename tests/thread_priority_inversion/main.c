@@ -24,7 +24,7 @@
 
 #include "thread.h"
 #include "mutex.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 mutex_t res_mtx;
 
@@ -41,12 +41,12 @@ void *t_low_handler(void *arg)
         puts("t_low: allocating resource...");
         mutex_lock(&res_mtx);
         puts("t_low: got resource.");
-        xtimer_sleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
         puts("t_low: freeing resource...");
         mutex_unlock(&res_mtx);
         puts("t_low: freed resource.");
-        xtimer_sleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
     }
     return NULL;
 }
@@ -56,7 +56,7 @@ void *t_mid_handler(void *arg)
     (void) arg;
 
     /* starting working loop after 3s */
-    xtimer_sleep(3);
+    ztimer_sleep(ZTIMER_MSEC, 3 * 1000);
 
     puts("t_mid: doing some stupid stuff...");
     while (1) {
@@ -69,17 +69,17 @@ void *t_high_handler(void *arg)
     (void) arg;
 
     /* starting working loop after 500 ms */
-    xtimer_msleep(500U);
+    ztimer_sleep(ZTIMER_MSEC, 500U);
     while (1) {
         puts("t_high: allocating resource...");
         mutex_lock(&res_mtx);
         puts("t_high: got resource.");
-        xtimer_sleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
         puts("t_high: freeing resource...");
         mutex_unlock(&res_mtx);
         puts("t_high: freed resource.");
-        xtimer_sleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
     }
     return NULL;
 }

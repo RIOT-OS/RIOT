@@ -30,7 +30,7 @@
 #include "net/sock/udp.h"
 #include "net/gnrc/pkt.h"
 #include "test_utils/expect.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define NETIF_STACKSIZE     THREAD_STACKSIZE_DEFAULT
 #define NETIF_PRIO          (THREAD_PRIORITY_MAIN - 4)
@@ -75,7 +75,7 @@ static int netdev_send(netdev_t *dev, const iolist_t *iolist)
     (void)dev;
     if (carries_test_message(iolist)) {
         /* sending part of UDP datagram */
-        xtimer_msleep(100);
+        ztimer_sleep(ZTIMER_MSEC, 100);
         atomic_fetch_add(&sends_completed, 1);
     }
     return iolist_size(iolist);

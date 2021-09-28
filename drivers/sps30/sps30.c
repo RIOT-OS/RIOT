@@ -21,7 +21,7 @@
 
 #include "checksum/crc8.h"
 #include "sps30.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "byteorder.h"
 #include "kernel_defines.h"
 

@@ -24,7 +24,7 @@
 #include "board.h"
 #include "ds18.h"
 #include "ds18_params.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define SAMPLING_PERIOD     2
 
@@ -63,7 +63,7 @@ int main(void)
             puts("[Error] Could not read temperature");
         }
 
-        xtimer_sleep(SAMPLING_PERIOD);
+        ztimer_sleep(ZTIMER_MSEC, SAMPLING_PERIOD * 1000);
     }
 
     return 0;

@@ -46,7 +46,7 @@
 #include <string.h>
 #include <limits.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "shell.h"
 #include "timex.h"
 
@@ -165,7 +165,7 @@ static int _oscillate(int argc, char** argv)
 
     int state = 0;
     int step = OSC_STEP;
-    xtimer_ticks32_t last_wakeup = xtimer_now();
+    uint32_t last_wakeup = ztimer_now(ZTIMER_USEC);
 
     puts("\nRIOT PWM test");
     puts("Connect an LED or scope to PWM pins to see something.\n");
@@ -195,7 +195,7 @@ static int _oscillate(int argc, char** argv)
             step = -step;
         }
 
-        xtimer_periodic_wakeup(&last_wakeup, OSC_INTERVAL);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &last_wakeup, OSC_INTERVAL);
     }
 
     return 0;
@@ -250,7 +250,7 @@ static int _power_test(int argc, char** argv)
            PWR_SLEEP);
     pca9685_pwm_poweroff(&pca9685_dev[dev]);
 
-    xtimer_sleep(PWR_SLEEP);
+    ztimer_sleep(ZTIMER_MSEC, PWR_SLEEP * 1000);
 
     puts("Powering up PWM device.\n");
     pca9685_pwm_poweron(&pca9685_dev[dev]);

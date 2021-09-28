@@ -193,7 +193,7 @@ static void _gomach_rtt_handler(uint32_t event, gnrc_netif_t *netif)
                 gnrc_gomach_set_enter_new_cycle(netif, true);
             }
 
-            netif->mac.prot.gomach.last_wakeup_phase_us = xtimer_now_usec64();
+            netif->mac.prot.gomach.last_wakeup_phase_us = ztimer_now64();
 
             /* Set next cycle's starting time. */
             uint32_t alarm = netif->mac.prot.gomach.last_wakeup +
@@ -407,7 +407,7 @@ static void gomach_init_prepare(gnrc_netif_t *netif)
 
     /* Random delay for avoiding the same wake-up phase among devices. */
     uint32_t random_backoff = random_uint32_range(0, CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US);
-    xtimer_usleep(random_backoff);
+    ztimer_sleep(ZTIMER_USEC, random_backoff);
 
     gnrc_gomach_set_quit_cycle(netif, false);
     netif->mac.prot.gomach.subchannel_occu_flags = 0;
@@ -1454,7 +1454,7 @@ static void _gomach_phase_backoff(gnrc_netif_t *netif)
 {
     /* Execute phase backoff for avoiding CP (wake-up period) overlap. */
     rtt_clear_alarm();
-    xtimer_usleep(netif->mac.prot.gomach.backoff_phase_us);
+    ztimer_sleep(ZTIMER_USEC, netif->mac.prot.gomach.backoff_phase_us);
 
     rtt_set_counter(0);
     netif->mac.prot.gomach.last_wakeup = rtt_get_counter();
@@ -2002,7 +2002,7 @@ static void _gomach_msg_handler(gnrc_netif_t *netif, msg_t *msg)
         case GNRC_MAC_TYPE_GET_DUTYCYCLE: {
             /* Output GoMacH's current radio duty-cycle. */
             uint64_t duty;
-            duty = xtimer_now_usec64();
+            duty = ztimer_now64();
             duty = (netif->mac.prot.gomach.awake_duration_sum_ticks) * 100 /
                    (duty - netif->mac.prot.gomach.system_start_time_ticks);
             printf("[GoMacH]: achieved radio duty-cycle: %lu %% \n",
@@ -2204,7 +2204,7 @@ static void _gomach_init(gnrc_netif_t *netif)
 
 #if (GNRC_MAC_ENABLE_DUTYCYCLE_RECORD == 1)
     /* Start duty cycle recording */
-    netif->mac.prot.gomach.system_start_time_ticks = xtimer_now_usec64();
+    netif->mac.prot.gomach.system_start_time_ticks = ztimer_now64();
     netif->mac.prot.gomach.last_radio_on_time_ticks =
         netif->mac.prot.gomach.system_start_time_ticks;
     netif->mac.prot.gomach.awake_duration_sum_ticks = 0;

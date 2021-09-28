@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 static char stack[THREAD_STACKSIZE_MAIN];
 
@@ -90,19 +90,19 @@ int main(void)
     while(!done) {};
 
     puts("main: setting 100ms timeout...");
-    xtimer_t t;
-    uint32_t before = xtimer_now_usec();
-    xtimer_set_timeout_flag(&t, TIMEOUT);
+    ztimer_t t;
+    uint32_t before = ztimer_now(ZTIMER_USEC);
+    ztimer_set_timeout_flag(ZTIMER_USEC, &t, TIMEOUT);
     thread_flags_wait_any(THREAD_FLAG_TIMEOUT);
-    uint32_t diff = xtimer_now_usec() - before;
+    uint32_t diff = ztimer_now(ZTIMER_USEC) - before;
     printf("main: timeout triggered. time passed: %"PRIu32"us\n", diff);
 
     puts("main: setting 100ms timeout (using uint64)...");
     uint64_t timeout64 = TIMEOUT;
-    before = xtimer_now_usec();
+    before = ztimer_now(ZTIMER_USEC);
     xtimer_set_timeout_flag64(&t, timeout64);
     thread_flags_wait_any(THREAD_FLAG_TIMEOUT);
-    diff = xtimer_now_usec() - before;
+    diff = ztimer_now(ZTIMER_USEC) - before;
     printf("main: timeout triggered. time passed: %"PRIu32"us\n", diff);
 
     if (diff < (TIMEOUT + THRESHOLD)) {

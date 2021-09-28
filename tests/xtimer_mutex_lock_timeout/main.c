@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 #include "shell.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "thread.h"
 #include "msg.h"
 #include "irq.h"
@@ -140,7 +140,7 @@ static int cmd_test_xtimer_mutex_lock_timeout_long_unlocked(int argc,
     puts("starting test: xtimer mutex lock timeout");
     mutex_t test_mutex = MUTEX_INIT;
 
-    if (xtimer_mutex_lock_timeout(&test_mutex, LONG_MUTEX_TIMEOUT) == 0) {
+    if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &test_mutex, LONG_MUTEX_TIMEOUT) == 0) {
         /* mutex has to be locked */
         if (mutex_trylock(&test_mutex) == 0) {
             puts("OK");
@@ -179,7 +179,7 @@ static int cmd_test_xtimer_mutex_lock_timeout_long_locked(int argc,
     mutex_t test_mutex = MUTEX_INIT;
     mutex_lock(&test_mutex);
 
-    if (xtimer_mutex_lock_timeout(&test_mutex, LONG_MUTEX_TIMEOUT) == 0) {
+    if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &test_mutex, LONG_MUTEX_TIMEOUT) == 0) {
         puts("Error: mutex taken");
     }
     else {
@@ -235,7 +235,7 @@ static int cmd_test_xtimer_mutex_lock_timeout_low_prio_thread(int argc,
 
     puts("MAIN THREAD: calling xtimer_mutex_lock_timeout");
 
-    if (xtimer_mutex_lock_timeout(&test_mutex, LONG_MUTEX_TIMEOUT) == 0) {
+    if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &test_mutex, LONG_MUTEX_TIMEOUT) == 0) {
         /* mutex has to be locked */
         if (mutex_trylock(&test_mutex) == 0) {
             puts("OK");
@@ -287,7 +287,7 @@ static int cmd_test_xtimer_mutex_lock_timeout_short_locked(int argc,
     mutex_t test_mutex = MUTEX_INIT;
     mutex_lock(&test_mutex);
 
-    if (xtimer_mutex_lock_timeout(&test_mutex, SHORT_MUTEX_TIMEOUT) == 0) {
+    if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &test_mutex, SHORT_MUTEX_TIMEOUT) == 0) {
         puts("Error: mutex taken");
     }
     else {
@@ -326,7 +326,7 @@ static int cmd_test_xtimer_mutex_lock_timeout_short_unlocked(int argc,
         "starting test: xtimer mutex lock timeout with short timeout and unlocked mutex");
     mutex_t test_mutex = MUTEX_INIT;
 
-    if (xtimer_mutex_lock_timeout(&test_mutex, SHORT_MUTEX_TIMEOUT) == 0) {
+    if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &test_mutex, SHORT_MUTEX_TIMEOUT) == 0) {
         /* mutex has to be locked */
         if (mutex_trylock(&test_mutex) == 0) {
             puts("OK");

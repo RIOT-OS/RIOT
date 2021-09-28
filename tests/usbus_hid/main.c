@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include "usb/usbus.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "usb/usbus/hid.h"
 #include "usb/usbus/hid_io.h"
 
@@ -70,7 +70,7 @@ static void init(void)
 int main(void)
 {
     /* sleep to wait for Pyterm attaching in order to see puts messages */
-    xtimer_sleep(3);
+    ztimer_sleep(ZTIMER_MSEC, 3 * 1000);
     init();
     puts("RIOT USB HID echo test");
     puts(

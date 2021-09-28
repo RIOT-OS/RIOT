@@ -17,7 +17,7 @@
  * @}
  */
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "cc110x.h"
 #include "cc110x_internal.h"
 

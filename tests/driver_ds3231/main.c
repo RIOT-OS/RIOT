@@ -24,7 +24,7 @@
 #include <time.h>
 
 #include "shell.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "ds3231.h"
 #include "ds3231_params.h"
 
@@ -246,7 +246,7 @@ static int _cmd_test(int argc, char **argv)
     }
 
     /* wait a short while and check if time has progressed */
-    xtimer_sleep(TEST_DELAY);
+    ztimer_sleep(ZTIMER_MSEC, TEST_DELAY * 1000);
     res = ds3231_get_time(&_dev, &time);
     if (res != 0) {
         puts("error: unable to read time");
@@ -300,7 +300,7 @@ static int _cmd_test(int argc, char **argv)
 #else
 
     /* wait for the alarm to trigger */
-    xtimer_sleep(TEST_DELAY);
+    ztimer_sleep(ZTIMER_MSEC, TEST_DELAY * 1000);
 
     bool alarm;
 

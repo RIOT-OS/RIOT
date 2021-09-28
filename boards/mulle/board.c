@@ -28,7 +28,7 @@
 #include "periph/spi.h"
 #include "nvram-spi.h"
 #include "nvram.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "vfs.h"
 #include "fs/devfs.h"
 #include "mtd_spi_nor.h"

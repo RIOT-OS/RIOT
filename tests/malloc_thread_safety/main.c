@@ -29,7 +29,7 @@
 #include "sched.h"
 #include "test_utils/expect.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifndef NO_MALLINFO
 #include <malloc.h>
@@ -118,7 +118,7 @@ int main(void)
         expect((t1 != KERNEL_PID_UNDEF) && (t2 != KERNEL_PID_UNDEF));
 
         for (uint16_t i = 0; i < 2 * MS_PER_SEC; i++) {
-            xtimer_usleep(US_PER_MS);
+            ztimer_sleep(ZTIMER_USEC, US_PER_MS);
             /* shuffle t1 and t2 in their run queue. This should eventually hit
              * during a call to malloc() or free() and disclose any missing
              * guards */
@@ -128,7 +128,7 @@ int main(void)
         /* Don't keep threads spinning */
         atomic_store(&is_running, 0);
         /* Give threads time to terminate */
-        xtimer_usleep(10 * US_PER_MS);
+        ztimer_sleep(ZTIMER_USEC, 10 * US_PER_MS);
 
 #ifndef NO_MALLINFO
         struct mallinfo post = mallinfo();

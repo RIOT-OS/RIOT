@@ -22,7 +22,7 @@
 
 #include "pthread_cond.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "sched.h"
 #include "irq.h"
 #include "debug.h"
@@ -126,13 +126,13 @@ int pthread_cond_timedwait(pthread_cond_t *cond, mutex_t *mutex, const struct ti
         return EINVAL;
     }
 
-    uint64_t now = xtimer_now_usec64();
+    uint64_t now = ztimer_now64();
     uint64_t then = ((uint64_t)abstime->tv_sec * US_PER_SEC) +
                     (abstime->tv_nsec / NS_PER_US);
 
     int ret = 0;
     if (then > now) {
-        xtimer_t timer;
+        ztimer_t timer;
         priority_queue_node_t n;
 
         _init_cond_wait(cond, &n);
@@ -148,7 +148,7 @@ int pthread_cond_timedwait(pthread_cond_t *cond, mutex_t *mutex, const struct ti
             irq_restore(old_state);
             ret = ETIMEDOUT;
         }
-        xtimer_remove(&timer);
+        ztimer_remove(ZTIMER_USEC, &timer);
     }
     else {
         mutex_unlock(mutex);

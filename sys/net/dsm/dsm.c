@@ -21,7 +21,7 @@
 #include "net/dsm.h"
 #include "mutex.h"
 #include "net/sock/util.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -79,7 +79,7 @@ dsm_state_t dsm_store(sock_dtls_t *sock, sock_dtls_session_t *session,
         DEBUG("dsm: existing session found, restoring\n")
         memcpy(session, &session_slot->session, sizeof(sock_dtls_session_t));
     }
-    session_slot->last_used_sec = (uint32_t)(xtimer_now_usec64() / US_PER_SEC);
+    session_slot->last_used_sec = (uint32_t)(ztimer_now64() / US_PER_SEC);
 
 out:
     mutex_unlock(&_lock);

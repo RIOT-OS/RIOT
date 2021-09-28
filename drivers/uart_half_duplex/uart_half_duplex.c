@@ -22,7 +22,7 @@
 
 #include "periph/uart.h"
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define IS_SET(dir)   ((dir & 1) == 0)
 #define IS_CLEAR(dir) ((dir & 1) == 1)
@@ -85,8 +85,8 @@ size_t uart_half_duplex_send(const uart_half_duplex_t *dev, size_t size)
 
 size_t uart_half_duplex_recv(const uart_half_duplex_t *dev, size_t size)
 {
-    const uint32_t begin = xtimer_now_usec();
-    while (xtimer_now_usec() - begin < dev->timeout_us) {
+    const uint32_t begin = ztimer_now(ZTIMER_USEC);
+    while (ztimer_now(ZTIMER_USEC) - begin < dev->timeout_us) {
         if (dev->size >= size) {
             break;
         }

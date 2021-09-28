@@ -679,7 +679,7 @@ static const uint32_t transfer_int_mask = I2C_TRANS_COMPLETE_INT_ENA
 
 #define I2C_THREAD_FLAG BIT     (0)
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 void _i2c_transfer_timeout (void *arg)
 {
@@ -712,10 +712,10 @@ static void _i2c_transfer (i2c_t dev)
     _i2c_hw[dev].regs->int_clr.val  = transfer_int_mask;
 
     /* set a timer for the case the I2C hardware gets stuck */
-    xtimer_t i2c_timeout = {};
+    ztimer_t i2c_timeout = {};
     i2c_timeout.callback = _i2c_transfer_timeout;
     i2c_timeout.arg = (void*)dev;
-    xtimer_set(&i2c_timeout, I2C_TRANSFER_TIMEOUT);
+    ztimer_set(ZTIMER_USEC, &i2c_timeout, I2C_TRANSFER_TIMEOUT);
 
     /* start execution of commands in command pipeline registers */
     _i2c_bus[dev].pid = thread_getpid();
@@ -725,7 +725,7 @@ static void _i2c_transfer (i2c_t dev)
 
     /* wait for transfer results and remove timeout timer*/
     thread_flags_wait_one(I2C_THREAD_FLAG);
-    xtimer_remove(&i2c_timeout);
+    ztimer_remove(ZTIMER_USEC, &i2c_timeout);
 
     /* returned from transmission */
     DEBUG("%s results=%08x\n", __func__, _i2c_bus[dev].results);

@@ -20,7 +20,7 @@
 #define PAHO_MQTT_H
 
 #include "mutex.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "thread.h"
 #include "net/sock/tcp.h"
 

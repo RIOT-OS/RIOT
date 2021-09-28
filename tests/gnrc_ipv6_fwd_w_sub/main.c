@@ -35,7 +35,7 @@
 #include "shell.h"
 #include "test_utils/expect.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "common.h"
 
@@ -86,7 +86,7 @@ static void *_dumper_thread(void *arg)
             gnrc_pktsnip_t *pkt = msg.content.ptr;
 
             /* wait a bit to give IPv6 time to handle the packet */
-            xtimer_usleep(500);
+            ztimer_sleep(ZTIMER_USEC, 500);
             /* dump pkt. Should be equal to _l2_payloa*/
             puts("I got a subscription!");
             od_hex_dump(pkt->data, pkt->size, OD_WIDTH_DEFAULT);
@@ -154,7 +154,7 @@ static int _run_test(int argc, char **argv)
                                                  "dumper"));
         expect(_dumper.target.pid > KERNEL_PID_UNDEF);
         /* give dumper thread time to run */
-        xtimer_usleep(200);
+        ztimer_sleep(ZTIMER_USEC, 200);
     }
     /* activate dumping of sent ethernet frames */
     netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,

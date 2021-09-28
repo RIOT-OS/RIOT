@@ -281,7 +281,7 @@ uint64_t gnrc_gomach_phase_now(gnrc_netif_t *netif)
 {
     assert(netif != NULL);
 
-    uint64_t phase_now = xtimer_now_usec64();
+    uint64_t phase_now = ztimer_now64();
 
     /* in case timer overflows */
     if (phase_now < netif->mac.prot.gomach.last_wakeup_phase_us) {
@@ -308,14 +308,14 @@ void gnrc_gomach_set_netdev_state(gnrc_netif_t *netif, netopt_state_t devstate)
 #if (GNRC_GOMACH_ENABLE_DUTYCYLE_RECORD == 1)
     if (devstate == NETOPT_STATE_IDLE) {
         if (!(netif->mac.prot.gomach.gomach_info & GNRC_GOMACH_INTERNAL_INFO_RADIO_IS_ON)) {
-            netif->mac.prot.gomach.last_radio_on_time_ticks = xtimer_now_usec64();
+            netif->mac.prot.gomach.last_radio_on_time_ticks = ztimer_now64();
             netif->mac.prot.gomach.gomach_info |= GNRC_GOMACH_INTERNAL_INFO_RADIO_IS_ON;
         }
         return;
     }
     else if ((devstate == NETOPT_STATE_SLEEP) &&
              (netif->mac.prot.gomach.gomach_info & GNRC_GOMACH_INTERNAL_INFO_RADIO_IS_ON)) {
-        netif->mac.prot.gomach.radio_off_time_ticks = xtimer_now_usec64();
+        netif->mac.prot.gomach.radio_off_time_ticks = ztimer_now64();
 
         netif->mac.prot.gomach.awake_duration_sum_ticks +=
             (netif->mac.prot.gomach.radio_off_time_ticks -
@@ -720,7 +720,7 @@ static void _cp_packet_process_data(gnrc_netif_t *netif,
 #if (GNRC_GOMACH_ENABLE_DUTYCYLE_RECORD == 1)
         /* Output radio duty-cycle ratio */
         uint64_t duty;
-        duty = xtimer_now_usec64();
+        duty = ztimer_now64();
         duty = (netif->mac.prot.gomach.awake_duration_sum_ticks) * 100 /
                (duty - netif->mac.prot.gomach.system_start_time_ticks);
         printf("[GoMacH]: achieved radio duty-cycle: %lu %% \n", (uint32_t)duty);

@@ -23,7 +23,7 @@
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/sixlowpan/frag.h"
 #include "net/gnrc/sixlowpan/frag/rb.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define TEST_NETIF_HDR_SRC      { 0xb3, 0x47, 0x60, 0x49, \
                                   0x78, 0xfe, 0x95, 0x48 }
@@ -366,9 +366,8 @@ static void test_rbuf_add__success_complete(void)
     TEST_ASSERT(0 < gnrc_sixlowpan_frag_rb_dispatch_when_complete(
             entry1, &_test_netif_hdr.hdr
         ));
-    TEST_ASSERT_MESSAGE(
-            xtimer_msg_receive_timeout(&msg, TEST_RECEIVE_TIMEOUT) >= 0,
-            "Receiving reassembled datagram timed out"
+    TEST_ASSERT_MESSAGE(ztimer_msg_receive_timeout(ZTIMER_USEC, &msg, TEST_RECEIVE_TIMEOUT) >= 0,
+                        "Receiving reassembled datagram timed out"
         );
     gnrc_netreg_unregister(TEST_DATAGRAM_NETTYPE, &reg);
     TEST_ASSERT_EQUAL_INT(GNRC_NETAPI_MSG_TYPE_RCV, msg.type);
@@ -628,9 +627,8 @@ static void test_rbuf_gc__timed(void)
             &_test_netif_hdr.hdr, pkt, TEST_FRAGMENT1_OFFSET, TEST_PAGE
         )));
     TEST_ASSERT_NOT_NULL(entry);
-    TEST_ASSERT_MESSAGE(
-            xtimer_msg_receive_timeout(&msg, TEST_GC_TIMEOUT) >= 0,
-            "Waiting for GC timer timed out"
+    TEST_ASSERT_MESSAGE(ztimer_msg_receive_timeout(ZTIMER_USEC, &msg, TEST_GC_TIMEOUT) >= 0,
+                        "Waiting for GC timer timed out"
         );
     TEST_ASSERT_EQUAL_INT(GNRC_SIXLOWPAN_FRAG_RB_GC_MSG, msg.type);
     gnrc_sixlowpan_frag_rb_gc();

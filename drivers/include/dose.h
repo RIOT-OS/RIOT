@@ -63,7 +63,7 @@
 #include "net/eui48.h"
 #include "bitarithm.h"
 #include "mutex.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -158,7 +158,7 @@ typedef struct {
 #if !defined(MODULE_PERIPH_UART_RXSTART_IRQ) || DOXYGEN
     gpio_t sense_pin;                       /**< GPIO to sense for start bits on the UART's rx line */
 #endif
-    xtimer_t timeout;                       /**< Timeout timer ensuring always to get back to IDLE state */
+    ztimer_t timeout;                       /**< Timeout timer ensuring always to get back to IDLE state */
     uint32_t timeout_base;                  /**< Base timeout in us */
 } dose_t;
 

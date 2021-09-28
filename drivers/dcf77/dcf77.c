@@ -23,7 +23,7 @@
 
 #include "log.h"
 #include "assert.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "periph/gpio.h"
 
 #include "dcf77.h"
@@ -52,7 +52,7 @@ static void _level_cb_high(dcf77_t *dev)
     switch (dev->internal_state) {
         case DCF77_STATE_START:
             DEBUG("[dcf77] EVENT START 1 !\n");
-            if ((xtimer_now_usec() - dev->startTime) >
+            if ((ztimer_now(ZTIMER_USEC) - dev->startTime) >
                 DCF77_PULSE_START_HIGH_THRESHOLD_US) {
                 memset(&dev->bitseq.bits, 0, sizeof(dev->bitseq.bits));
                 dev->internal_state = DCF77_STATE_RX;
@@ -63,7 +63,7 @@ static void _level_cb_high(dcf77_t *dev)
             break;
         case DCF77_STATE_RX:
             DEBUG("[dcf77] EVENT RX 1 !\n");
-            dev->startTime = xtimer_now_usec();
+            dev->startTime = ztimer_now(ZTIMER_USEC);
             break;
     }
 }
@@ -73,12 +73,12 @@ static void _level_cb_low(dcf77_t *dev)
     switch (dev->internal_state) {
         case DCF77_STATE_IDLE:
             DEBUG("[dcf77] EVENT IDLE 0  !\n");
-            dev->startTime = xtimer_now_usec();
+            dev->startTime = ztimer_now(ZTIMER_USEC);
             dev->internal_state = DCF77_STATE_START;
             break;
         case DCF77_STATE_RX:
             DEBUG("[dcf77] EVENT RX 0 !\n");
-            if ((xtimer_now_usec() - dev->startTime) >
+            if ((ztimer_now(ZTIMER_USEC) - dev->startTime) >
                 DCF77_PULSE_WIDTH_THRESHOLD_US) {
                 dev->bitseq.bits |=  1ULL << dev->bitCounter;
             }
@@ -87,7 +87,7 @@ static void _level_cb_low(dcf77_t *dev)
 
             if (dev->bitCounter >= DCF77_READING_CYCLE) {
                 dev->bitCounter = 0;
-                dev->startTime = xtimer_now_usec();
+                dev->startTime = ztimer_now(ZTIMER_USEC);
                 dev->last_bitseq.bits = dev->bitseq.bits;
                 dev->internal_state = DCF77_STATE_START;
 

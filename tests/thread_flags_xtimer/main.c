@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "thread.h"
 #include "thread_flags.h"
 
@@ -36,10 +36,10 @@ static void time_evt(void *arg)
 int main(void)
 {
     puts("START");
-    xtimer_t timer;
+    ztimer_t timer;
     timer.callback = time_evt;
     timer.arg = thread_get_active();
-    uint32_t last = xtimer_now_usec();
+    uint32_t last = ztimer_now(ZTIMER_USEC);
 
     puts("Test setting thread flags from (x)timer callback");
     printf("You should see the message '+++ timeout XX +++' printed to the \n"
@@ -47,13 +47,13 @@ int main(void)
             REPEAT, (TIMEOUT / US_PER_MS));
 
     for (unsigned i = 1; i <= REPEAT; i++) {
-        xtimer_set(&timer, TIMEOUT);
+        ztimer_set(ZTIMER_USEC, &timer, TIMEOUT);
         thread_flags_wait_any(0x1);
         printf("+++ timeout %2u +++\n", i);
     }
 
     /* we consider the test successful, if the runtime was above 500ms */
-    uint32_t runtime = xtimer_now_usec() - last;
+    uint32_t runtime = ztimer_now(ZTIMER_USEC) - last;
     if (runtime > RUNTIME) {
         puts("SUCCESS");
     }

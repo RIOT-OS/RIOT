@@ -22,7 +22,7 @@
 
 #include "adxl345.h"
 #include "adxl345_params.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define SLEEP_DELAY 100 * 1000U
 
@@ -47,7 +47,7 @@ int main(void)
         adxl345_read(&dev, &data);
         printf("Acceleration [in mg]: X axis:%d Y axis:%d Z axis:%d\n",
                (int)data.x, (int)data.y, (int)data.z);
-        xtimer_usleep(SLEEP_DELAY);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_DELAY);
     }
     return 0;
 }

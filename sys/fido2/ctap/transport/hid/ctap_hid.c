@@ -17,7 +17,7 @@
 
 #include <string.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "usb/usbus.h"
 #include "usb/usbus/hid_io.h"
 
@@ -527,7 +527,7 @@ bool fido2_ctap_transport_hid_should_cancel(void)
 
 void fido2_ctap_transport_hid_check_timeouts(void)
 {
-    uint64_t now = xtimer_now_usec64();
+    uint64_t now = ztimer_now64();
 
     for (uint8_t i = 0; i < CTAP_HID_CIDS_MAX; i++) {
         /* transaction timed out because cont packets didn't arrive in time */
@@ -546,14 +546,14 @@ void fido2_ctap_transport_hid_check_timeouts(void)
 
 static int8_t _add_cid(uint32_t cid)
 {
-    uint64_t oldest = xtimer_now_usec64();
+    uint64_t oldest = ztimer_now64();
     int8_t index_oldest = -1;
 
     for (int i = 0; i < CTAP_HID_CIDS_MAX; i++) {
         if (!g_cids[i].taken) {
             g_cids[i].taken = true;
             g_cids[i].cid = cid;
-            g_cids[i].last_used = xtimer_now_usec64();
+            g_cids[i].last_used = ztimer_now64();
 
             return CTAP_HID_OK;
         }
@@ -568,7 +568,7 @@ static int8_t _add_cid(uint32_t cid)
     if (index_oldest > -1) {
         g_cids[index_oldest].taken = true;
         g_cids[index_oldest].cid = cid;
-        g_cids[index_oldest].last_used = xtimer_now_usec64();
+        g_cids[index_oldest].last_used = ztimer_now64();
         return CTAP_HID_OK;
     }
 
@@ -579,7 +579,7 @@ static int8_t _refresh_cid(uint32_t cid)
 {
     for (int i = 0; i < CTAP_HID_CIDS_MAX; i++) {
         if (g_cids[i].cid == cid) {
-            g_cids[i].last_used = xtimer_now_usec64();
+            g_cids[i].last_used = ztimer_now64();
             return CTAP_HID_OK;
         }
     }
@@ -621,19 +621,19 @@ static void _wink(uint32_t cid, uint8_t cmd)
     for (int i = 1; i <= 8; i++) {
 #ifdef LED0_TOGGLE
         LED0_TOGGLE;
-        xtimer_msleep(delay);
+        ztimer_sleep(ZTIMER_MSEC, delay);
 #endif
 #ifdef LED1_TOGGLE
         LED1_TOGGLE;
-        xtimer_msleep(delay);
+        ztimer_sleep(ZTIMER_MSEC, delay);
 #endif
 #ifdef LED2_TOGGLE
         LED2_TOGGLE;
-        xtimer_msleep(delay);
+        ztimer_sleep(ZTIMER_MSEC, delay);
 #endif
 #ifdef LED3_TOGGLE
         LED3_TOGGLE;
-        xtimer_msleep(delay);
+        ztimer_sleep(ZTIMER_MSEC, delay);
 #endif
         delay /= 2;
     }

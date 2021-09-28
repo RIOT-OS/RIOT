@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "si70xx_params.h"
 #include "si70xx.h"
@@ -74,7 +74,7 @@ int main(void)
                temperature % 100);
 
         /* sleep between measurements */
-        xtimer_msleep(1000);
+        ztimer_sleep(ZTIMER_MSEC, 1000);
     }
 
     return 0;

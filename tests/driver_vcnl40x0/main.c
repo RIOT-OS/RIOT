@@ -22,7 +22,7 @@
 
 #include "vcnl40x0.h"
 #include "vcnl40x0_params.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "board.h"
 
 #define SLEEP_2S   (2U) /* 2 seconds delay between printf */
@@ -58,7 +58,7 @@ int main(void)
                vcnl40x0_read_ambient_light(&dev),
                vcnl40x0_read_illuminance(&dev));
 
-        xtimer_sleep(SLEEP_2S);
+        ztimer_sleep(ZTIMER_MSEC, SLEEP_2S * 1000);
     }
 
     return 0;

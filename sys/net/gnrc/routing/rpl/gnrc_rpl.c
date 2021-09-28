@@ -30,7 +30,7 @@
 #include "ztimer.h"
 #include "timex.h"
 #else
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 #include "gnrc_rpl_internal/globals.h"
 
@@ -53,7 +53,7 @@ static uint32_t _lt_time = GNRC_RPL_LIFETIME_UPDATE_STEP * MS_PER_SEC;
 static ztimer_t _lt_timer;
 #else
 static uint32_t _lt_time = GNRC_RPL_LIFETIME_UPDATE_STEP * US_PER_SEC;
-static xtimer_t _lt_timer;
+static ztimer_t _lt_timer;
 #endif
 static msg_t _lt_msg = { .type = GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE };
 #endif
@@ -112,7 +112,8 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
         ztimer_set_msg(ZTIMER_MSEC, &_lt_timer, _lt_time,
                        &_lt_msg, gnrc_rpl_pid);
 #else
-        xtimer_set_msg(&_lt_timer, _lt_time, &_lt_msg, gnrc_rpl_pid);
+        ztimer_set_msg(ZTIMER_USEC, &_lt_timer, _lt_time, &_lt_msg,
+                       gnrc_rpl_pid);
 #endif
 #endif
 
@@ -353,7 +354,7 @@ void _update_lifetime(void)
 #if IS_USED(MODULE_ZTIMER_MSEC)
     ztimer_set_msg(ZTIMER_MSEC, &_lt_timer, _lt_time, &_lt_msg, gnrc_rpl_pid);
 #else
-    xtimer_set_msg(&_lt_timer, _lt_time, &_lt_msg, gnrc_rpl_pid);
+    ztimer_set_msg(ZTIMER_USEC, &_lt_timer, _lt_time, &_lt_msg, gnrc_rpl_pid);
 #endif
 }
 #endif

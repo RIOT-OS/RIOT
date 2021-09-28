@@ -93,9 +93,9 @@ extern "C" {
  */
 #define THREAD_FLAG_MSG_WAITING     (1u << 15)
 /**
- * @brief Set by @ref xtimer_set_timeout_flag() when the timer expires
+ * @brief Set by @ref ztimer_set_timeout_flag() when the timer expires
  *
- * @see xtimer_set_timeout_flag
+ * @see ztimer_set_timeout_flag
  */
 #define THREAD_FLAG_TIMEOUT         (1u << 14)
 /** @} */

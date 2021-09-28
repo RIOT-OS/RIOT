@@ -24,7 +24,7 @@
 #include "mpu9x50_regs.h"
 #include "mpu9x50_internal.h"
 #include "periph/i2c.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "byteorder.h"
 
 #define ENABLE_DEBUG        0
@@ -73,7 +73,7 @@ int mpu9x50_init(mpu9x50_t *dev, const mpu9x50_params_t *params)
 
     /* Reset MPU9X50 registers and afterwards wake up the chip */
     i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_PWR_MGMT_1_REG, MPU9X50_PWR_RESET, 0);
-    xtimer_usleep(MPU9X50_RESET_SLEEP_US);
+    ztimer_sleep(ZTIMER_USEC, MPU9X50_RESET_SLEEP_US);
     i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_PWR_MGMT_1_REG, MPU9X50_PWR_WAKEUP, 0);
 
     /* Release the bus, it is acquired again inside each function */
@@ -103,7 +103,7 @@ int mpu9x50_init(mpu9x50_t *dev, const mpu9x50_params_t *params)
     temp &= ~(MPU9X50_PWR_ACCEL | MPU9X50_PWR_GYRO);
     i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_PWR_MGMT_2_REG, temp, 0);
     i2c_release(DEV_I2C);
-    xtimer_usleep(MPU9X50_PWR_CHANGE_SLEEP_US);
+    ztimer_sleep(ZTIMER_USEC, MPU9X50_PWR_CHANGE_SLEEP_US);
 
     return 0;
 }
@@ -144,7 +144,7 @@ int mpu9x50_set_accel_power(mpu9x50_t *dev, mpu9x50_pwr_t pwr_conf)
     i2c_release(DEV_I2C);
 
     dev->conf.accel_pwr = pwr_conf;
-    xtimer_usleep(MPU9X50_PWR_CHANGE_SLEEP_US);
+    ztimer_sleep(ZTIMER_USEC, MPU9X50_PWR_CHANGE_SLEEP_US);
 
     return 0;
 }
@@ -192,7 +192,7 @@ int mpu9x50_set_gyro_power(mpu9x50_t *dev, mpu9x50_pwr_t pwr_conf)
     i2c_release(DEV_I2C);
 
     dev->conf.gyro_pwr = pwr_conf;
-    xtimer_usleep(MPU9X50_PWR_CHANGE_SLEEP_US);
+    ztimer_sleep(ZTIMER_USEC, MPU9X50_PWR_CHANGE_SLEEP_US);
 
     return 0;
 }
@@ -237,7 +237,7 @@ int mpu9x50_set_compass_power(mpu9x50_t *dev, mpu9x50_pwr_t pwr_conf)
     i2c_release(DEV_I2C);
 
     dev->conf.compass_pwr = pwr_conf;
-    xtimer_usleep(MPU9X50_PWR_CHANGE_SLEEP_US);
+    ztimer_sleep(ZTIMER_USEC, MPU9X50_PWR_CHANGE_SLEEP_US);
 
     return 0;
 }
@@ -514,10 +514,10 @@ static int compass_init(mpu9x50_t *dev)
 
     /* Configure Power Down mode */
     i2c_write_reg(DEV_I2C, DEV_COMP_ADDR, COMPASS_CNTL_REG, MPU9X50_COMP_POWER_DOWN, 0);
-    xtimer_usleep(MPU9X50_COMP_MODE_SLEEP_US);
+    ztimer_sleep(ZTIMER_USEC, MPU9X50_COMP_MODE_SLEEP_US);
     /* Configure Fuse ROM access */
     i2c_write_reg(DEV_I2C, DEV_COMP_ADDR, COMPASS_CNTL_REG, MPU9X50_COMP_FUSE_ROM, 0);
-    xtimer_usleep(MPU9X50_COMP_MODE_SLEEP_US);
+    ztimer_sleep(ZTIMER_USEC, MPU9X50_COMP_MODE_SLEEP_US);
     /* Read sensitivity adjustment values from Fuse ROM */
     i2c_read_regs(DEV_I2C, DEV_COMP_ADDR, COMPASS_ASAX_REG, data, 3, 0);
     dev->conf.compass_x_adj = data[0];
@@ -525,7 +525,7 @@ static int compass_init(mpu9x50_t *dev)
     dev->conf.compass_z_adj = data[2];
     /* Configure Power Down mode again */
     i2c_write_reg(DEV_I2C, DEV_COMP_ADDR, COMPASS_CNTL_REG, MPU9X50_COMP_POWER_DOWN, 0);
-    xtimer_usleep(MPU9X50_COMP_MODE_SLEEP_US);
+    ztimer_sleep(ZTIMER_USEC, MPU9X50_COMP_MODE_SLEEP_US);
 
     /* Disable Bypass Mode to configure MPU as master to the compass */
     conf_bypass(dev, 0);
@@ -575,13 +575,13 @@ static void conf_bypass(const mpu9x50_t *dev, uint8_t bypass_enable)
    if (bypass_enable) {
        data &= ~(BIT_I2C_MST_EN);
        i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_USER_CTRL_REG, data, 0);
-       xtimer_usleep(MPU9X50_BYPASS_SLEEP_US);
+       ztimer_sleep(ZTIMER_USEC, MPU9X50_BYPASS_SLEEP_US);
        i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_INT_PIN_CFG_REG, BIT_I2C_BYPASS_EN, 0);
    }
    else {
        data |= BIT_I2C_MST_EN;
        i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_USER_CTRL_REG, data, 0);
-       xtimer_usleep(MPU9X50_BYPASS_SLEEP_US);
+       ztimer_sleep(ZTIMER_USEC, MPU9X50_BYPASS_SLEEP_US);
        i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_INT_PIN_CFG_REG, REG_RESET, 0);
    }
 }

@@ -19,7 +19,7 @@
  */
 
 #include <stdio.h>
-#include "xtimer.h"
+#include "ztimer.h"
 #include "periph_conf.h"
 
 #ifndef NUMOF
@@ -37,13 +37,14 @@ int main(void)
     int32_t min_diff = INT32_MAX;
 
     for (int i = 0; i < NUMOF; i++) {
-        xtimer_ticks32_t now = xtimer_now();
-        printf("Testing interval %" PRIu32 "... (now=%" PRIu32 ")\n", interval, xtimer_usec_from_ticks(now));
-        xtimer_ticks32_t last_wakeup = xtimer_now();
-        xtimer_ticks32_t before = last_wakeup;
-        xtimer_periodic_wakeup(&last_wakeup, interval);
-        now = xtimer_now();
-        res[i] = (xtimer_usec_from_ticks(now) - xtimer_usec_from_ticks(before)) - interval;
+        uint32_t now = ztimer_now(ZTIMER_USEC);
+        printf("Testing interval %" PRIu32 "... (now=%" PRIu32 ")\n", interval,
+               now);
+        uint32_t last_wakeup = ztimer_now(ZTIMER_USEC);
+        uint32_t before = last_wakeup;
+        ztimer_periodic_wakeup(ZTIMER_USEC, &last_wakeup, interval);
+        now = ztimer_now(ZTIMER_USEC);
+        res[i] = (now - before) - interval;
         interval -= 1;
     }
 

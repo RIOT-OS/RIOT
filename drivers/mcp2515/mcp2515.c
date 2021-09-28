@@ -20,7 +20,7 @@
 
 #include <string.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "mcp2515.h"
 #include "mcp2515_spi.h"
 #include "mcp2515_defines.h"
@@ -119,9 +119,9 @@ int mcp2515_init(candev_mcp2515_t *dev, void (*irq_handler_cb)(void *))
 void mcp2515_reset(candev_mcp2515_t *dev)
 {
     gpio_clear(dev->conf->rst_pin);
-    xtimer_usleep(RESET_DELAY_US);
+    ztimer_sleep(ZTIMER_USEC, RESET_DELAY_US);
     gpio_set(dev->conf->rst_pin);
-    xtimer_usleep(_osc_startup(dev));
+    ztimer_sleep(ZTIMER_USEC, _osc_startup(dev));
 }
 
 static void _fill_standard_id(uint32_t id, uint8_t *bytebuf)
@@ -273,7 +273,7 @@ void mcp2515_wake_up(candev_mcp2515_t *dev)
     dev->wakeup_src = MCP2515_WKUP_SRC_INTERNAL;
     mcp2515_spi_bitmod(dev, MCP2515_CANINTF, MCP2515_CANINTF_WAKIF,
                        MCP2515_CANINTF_WAKIF);
-    xtimer_usleep(_osc_startup(dev));
+    ztimer_sleep(ZTIMER_USEC, _osc_startup(dev));
 
     uint8_t flag = mcp2515_get_irq(dev);
 

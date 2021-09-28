@@ -23,7 +23,7 @@
 #include "sema.h"
 
 #if IS_USED(MODULE_XTIMER)
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 
 #define ENABLE_DEBUG 0
@@ -66,9 +66,9 @@ int _sema_wait_xtimer(sema_t *sema, int block, uint64_t us)
             mutex_lock(&sema->mutex);
         }
         else {
-            uint64_t start = xtimer_now_usec64();
-            block = !xtimer_mutex_lock_timeout(&sema->mutex, us);
-            uint64_t elapsed = xtimer_now_usec64() - start;
+            uint64_t start = ztimer_now64();
+            block = !ztimer_mutex_lock_timeout(ZTIMER_USEC, &sema->mutex, us);
+            uint64_t elapsed = ztimer_now64() - start;
 
             if (elapsed < us) {
                 us -= elapsed;

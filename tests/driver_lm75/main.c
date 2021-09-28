@@ -25,7 +25,7 @@
 #include "lm75.h"
 #include "lm75_regs.h"
 #include "lm75_params.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "log.h"
 #include <stdio.h>
 #include <stdint.h>

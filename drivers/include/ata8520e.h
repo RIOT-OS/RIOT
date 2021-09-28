@@ -27,7 +27,7 @@
 
 #include <stdint.h>
 #include <inttypes.h>
-#include "xtimer.h"
+#include "ztimer.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
 

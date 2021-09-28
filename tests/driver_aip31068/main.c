@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "shell.h"
 
 #include "aip31068.h"
@@ -381,17 +381,17 @@ static int _run_demo(int argc, char **argv)
     aip31068_print(&aip31068_dev, "Hello world! ");
     aip31068_print_custom_symbol(&aip31068_dev, CUSTOM_SYMBOL_1);
 
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
     /* 2.a scroll right with text insertion following LEFT_TO_RIGHT */
     aip31068_clear(&aip31068_dev);
     aip31068_set_text_insertion_mode(&aip31068_dev, LEFT_TO_RIGHT);
     aip31068_print(&aip31068_dev, "scroll right");
-    xtimer_msleep(500);
+    ztimer_sleep(ZTIMER_MSEC, 500);
 
     for (int i = 0; i < 4; i++) {
         aip31068_scroll_display_right(&aip31068_dev);
-        xtimer_msleep(500);
+        ztimer_sleep(ZTIMER_MSEC, 500);
     }
 
     /* 2.b scroll left with text insertion following RIGHT_TO_LEFT */
@@ -399,25 +399,25 @@ static int _run_demo(int argc, char **argv)
     aip31068_set_text_insertion_mode(&aip31068_dev, RIGHT_TO_LEFT);
     aip31068_set_cursor_position(&aip31068_dev, 0, COL_COUNT - 1);
     aip31068_print(&aip31068_dev, "tfel llorcs");
-    xtimer_msleep(500);
+    ztimer_sleep(ZTIMER_MSEC, 500);
 
     for (int i = 0; i < 5; i++) {
         aip31068_scroll_display_left(&aip31068_dev);
-        xtimer_msleep(500);
+        ztimer_sleep(ZTIMER_MSEC, 500);
     }
     aip31068_set_text_insertion_mode(&aip31068_dev, LEFT_TO_RIGHT);
 
     /* 3. turning on/off display */
     aip31068_clear(&aip31068_dev);
     aip31068_print(&aip31068_dev, "turning off...");
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
     aip31068_turn_off(&aip31068_dev);
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
     aip31068_clear(&aip31068_dev);
     aip31068_print(&aip31068_dev, "turned on again");
     aip31068_turn_on(&aip31068_dev);
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
     /* 4. autoscroll */
     aip31068_clear(&aip31068_dev);
@@ -433,19 +433,19 @@ static int _run_demo(int argc, char **argv)
     char long_line[] = "This is a very long line";
     for (int i = 0; i < (int) strlen(long_line); i++) {
         aip31068_print_char(&aip31068_dev, long_line[i]);
-        xtimer_msleep(250);
+        ztimer_sleep(ZTIMER_MSEC, 250);
     }
     aip31068_set_auto_scroll_enabled(&aip31068_dev, false);
-    xtimer_sleep(2);
+    ztimer_sleep(ZTIMER_MSEC, 2 * 1000);
 
     /* 5. return home */
     aip31068_return_home(&aip31068_dev);
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
     /* 6. cursor blinking */
     aip31068_clear(&aip31068_dev);
     aip31068_set_cursor_blinking_enabled(&aip31068_dev, true);
-    xtimer_sleep(2);
+    ztimer_sleep(ZTIMER_MSEC, 2 * 1000);
 
     for (int i = 0; i < COL_COUNT; i++) {
 
@@ -458,31 +458,31 @@ static int _run_demo(int argc, char **argv)
         }
 
         aip31068_set_cursor_position(&aip31068_dev, 0, i);
-        xtimer_msleep(500);
+        ztimer_sleep(ZTIMER_MSEC, 500);
     }
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
     aip31068_return_home(&aip31068_dev);
-    xtimer_msleep(500);
+    ztimer_sleep(ZTIMER_MSEC, 500);
     aip31068_set_cursor_blinking_enabled(&aip31068_dev, false);
 
     /* 7. show and move cursor */
     aip31068_set_cursor_visible(&aip31068_dev, true);
     aip31068_clear(&aip31068_dev);
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
     for (int i = 0; i <= 9; i++) {
         aip31068_print_char(&aip31068_dev, '0' + i);
-        xtimer_msleep(250);
+        ztimer_sleep(ZTIMER_MSEC, 250);
     }
 
     aip31068_return_home(&aip31068_dev);
-    xtimer_msleep(100);
+    ztimer_sleep(ZTIMER_MSEC, 100);
     for (int i = 0; i < 50; i++) {
         aip31068_move_cursor_right(&aip31068_dev);
-        xtimer_msleep(100);
+        ztimer_sleep(ZTIMER_MSEC, 100);
     }
     for (int i = 50; i > 0 ; i--) {
         aip31068_move_cursor_left(&aip31068_dev);
-        xtimer_msleep(100);
+        ztimer_sleep(ZTIMER_MSEC, 100);
     }
 
     aip31068_set_cursor_visible(&aip31068_dev, false);
@@ -501,7 +501,7 @@ static int _run_demo(int argc, char **argv)
                 aip31068_print(&aip31068_dev, "B");
             }
 
-            xtimer_msleep(100);
+            ztimer_sleep(ZTIMER_MSEC, 100);
         }
 
         aip31068_clear(&aip31068_dev);
@@ -515,7 +515,7 @@ static int _run_demo(int argc, char **argv)
                 aip31068_print(&aip31068_dev, "Y");
             }
 
-            xtimer_msleep(100);
+            ztimer_sleep(ZTIMER_MSEC, 100);
         }
     }
 
@@ -536,7 +536,7 @@ static int _run_demo(int argc, char **argv)
         aip31068_print(&aip31068_dev, string_rep);
 
         _set_progress(&aip31068_dev, j);
-        xtimer_msleep(100);
+        ztimer_sleep(ZTIMER_MSEC, 100);
     }
     _set_progress_bar_enabled(&aip31068_dev, false);
     aip31068_clear(&aip31068_dev);

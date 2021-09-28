@@ -22,7 +22,7 @@
 
 #include "mutex.h"
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "soft_spi.h"
 #include "soft_spi_params.h"

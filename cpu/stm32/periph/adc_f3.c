@@ -23,7 +23,7 @@
 #include "mutex.h"
 #include "periph/adc.h"
 #include "periph_conf.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define SMP_MIN         (0x2) /*< Sampling time for slow channels
                                   (0x2 = 4.5 ADC clock cycles) */
@@ -134,7 +134,7 @@ int adc_init(adc_t line)
     if (!(dev(line)->CR & ADC_CR_ADEN)) {
         /* Enable ADC internal voltage regulator and wait for startup period */
         dev(line)->CR |= ADC_CR_ADVREGEN;
-        xtimer_usleep(ADC_T_ADCVREG_STUP_US);
+        ztimer_sleep(ZTIMER_USEC, ADC_T_ADCVREG_STUP_US);
 
         if (dev(line)->DIFSEL & (1 << adc_config[line].chan)) {
             /* Configure calibration for differential inputs */

@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "thread.h"
 #include "msg.h"
 
@@ -53,8 +53,8 @@ static char short_stack[THREAD_STACKSIZE_MAIN];
 static kernel_pid_t print_pid;
 
 /* allocate timer structs for mid- and long-term timers */
-static xtimer_t long_timer;
-static xtimer_t mid_timer;
+static ztimer_t long_timer;
+static ztimer_t mid_timer;
 
 /* and some software counters */
 static int long_msg_ticks = 0;
@@ -71,7 +71,7 @@ void *long_sleep(void *arg)
         printf("sleep -- 18min -- %i ticks since\n", long_sleep_ticks);
         long_sleep_ticks = 0;
 
-        xtimer_usleep(INT_LONG_SLEEP);
+        ztimer_sleep(ZTIMER_USEC, INT_LONG_SLEEP);
     }
 
     return NULL;
@@ -85,7 +85,7 @@ void *mid_sleep(void *arg)
         printf("sleep -- 5min  -- %i ticks since\n", mid_sleep_ticks);
         mid_sleep_ticks = 0;
 
-        xtimer_usleep(INT_MID_SLEEP);
+        ztimer_sleep(ZTIMER_USEC, INT_MID_SLEEP);
     }
 
     return NULL;
@@ -94,7 +94,7 @@ void *mid_sleep(void *arg)
 void *ticker(void *arg)
 {
     (void)arg;
-    xtimer_ticks32_t base = xtimer_now();
+    uint32_t base = ztimer_now(ZTIMER_USEC);
 
     while (1) {
         ++short_ticks;
@@ -111,7 +111,7 @@ void *ticker(void *arg)
             msg_send(&msg, print_pid);
         }
 
-        xtimer_periodic_wakeup(&base, INT_SHORT);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &base, INT_SHORT);
     }
 
     return NULL;
@@ -140,9 +140,10 @@ int main(void)
 
     /* initiate the mid- and long-term messages */
     msg_long.type = MSG_LONG;
-    xtimer_set_msg(&long_timer, INT_LONG_MSG, &msg_long, print_pid);
+    ztimer_set_msg(ZTIMER_USEC, &long_timer, INT_LONG_MSG, &msg_long,
+                   print_pid);
     msg_mid.type = MSG_MID;
-    xtimer_set_msg(&mid_timer, INT_MID_MSG, &msg_mid, print_pid);
+    ztimer_set_msg(ZTIMER_USEC, &mid_timer, INT_MID_MSG, &msg_mid, print_pid);
 
     /* watch for incoming messages */
     while (1) {
@@ -152,13 +153,15 @@ int main(void)
             case MSG_LONG:
                 printf("msg   -- 14min -- %i ticks since\n", long_msg_ticks);
                 long_msg_ticks = 0;
-                xtimer_set_msg(&long_timer, INT_LONG_MSG, &msg_long, print_pid);
+                ztimer_set_msg(ZTIMER_USEC, &long_timer, INT_LONG_MSG,
+                               &msg_long, print_pid);
                 break;
 
             case MSG_MID:
                 printf("msg   -- 3min  -- %i ticks since\n", mid_msg_ticks);
                 mid_msg_ticks = 0;
-                xtimer_set_msg(&mid_timer, INT_MID_MSG, &msg_mid, print_pid);
+                ztimer_set_msg(ZTIMER_USEC, &mid_timer, INT_MID_MSG, &msg_mid,
+                               print_pid);
                 break;
 
             case MSG_TICK:

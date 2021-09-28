@@ -15,7 +15,7 @@
  */
 
 #include "periph/i2c.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "fxos8700.h"
 #include "kernel_defines.h"
 
@@ -109,7 +109,7 @@ int fxos8700_init(fxos8700_t* dev, const fxos8700_params_t *params)
     if (fxos8700_read(dev, &dev->acc_cached, &dev->mag_cached) != FXOS8700_OK) {
         return FXOS8700_BUSERR;
     }
-    dev->last_read_time = xtimer_now_usec();
+    dev->last_read_time = ztimer_now(ZTIMER_USEC);
 
     return FXOS8700_OK;
 }
@@ -203,7 +203,7 @@ int fxos8700_read_cached(const void *dev, fxos8700_measurement_t* acc,
                          fxos8700_measurement_t* mag)
 {
     fxos8700_t* fxos_dev = (fxos8700_t *)dev;
-    uint32_t now = xtimer_now_usec();
+    uint32_t now = ztimer_now(ZTIMER_USEC);
 
     /* check if readings are outdated */
     if (now - fxos_dev->last_read_time > fxos_dev->p.renew_interval) {

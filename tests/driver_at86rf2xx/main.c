@@ -24,7 +24,7 @@
 #include "shell.h"
 #include "shell_commands.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "common.h"
 

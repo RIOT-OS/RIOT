@@ -21,7 +21,7 @@
 #include <stdio.h>
 
 #include "fmt.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "seesaw_soil.h"
 #include "seesaw_soil_params.h"
 
@@ -57,7 +57,7 @@ int main(void)
         mstr[len] = '\0';
         printf("Reading: T: %s °C  Moist: %s\n", tstr, mstr);
 
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
     }
 
     return 0;

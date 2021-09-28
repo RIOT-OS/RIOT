@@ -23,7 +23,7 @@
 #include <stdlib.h>
 
 #include "board.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "periph/spi.h"
 #include "adt7310.h"
 
@@ -118,7 +118,7 @@ int main(void)
             {
                 return 1;
             }
-            xtimer_usleep(SLEEP_CONT);
+            ztimer_sleep(ZTIMER_USEC, SLEEP_CONT);
         }
         puts("Set mode to 1SPS, 13 bit... ");
         if (adt7310_set_config(&dev, ADT7310_MODE_1SPS) == 0) {
@@ -136,7 +136,7 @@ int main(void)
             {
                 return 1;
             }
-            xtimer_usleep(SLEEP_1SPS);
+            ztimer_sleep(ZTIMER_USEC, SLEEP_1SPS);
         }
     }
 

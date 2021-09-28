@@ -38,7 +38,7 @@ int main(void)
     puts("Fault handler test application");
     printf("This application will crash by attempting to write to address 0x%08x\n", FORBIDDEN_ADDRESS);
     puts("Waiting 1 second before crashing...");
-    xtimer_usleep(1000000lu);
+    ztimer_sleep(ZTIMER_USEC, 1000000lu);
     puts("Write to forbidden address " PRINT_MACRO(FORBIDDEN_ADDRESS));
     *((volatile unsigned int *) FORBIDDEN_ADDRESS) = 12345u;
     unsigned int readback = *((volatile unsigned int *) FORBIDDEN_ADDRESS);

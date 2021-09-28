@@ -23,7 +23,7 @@
 #include "thread.h"
 
 #include "thread_flags.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifndef TEST_DURATION
 #define TEST_DURATION       (1000000U)
@@ -64,12 +64,12 @@ int main(void)
 
     thread_t *tcb = thread_get(other);
 
-    xtimer_t timer;
+    ztimer_t timer;
     timer.callback = _timer_callback;
 
     uint32_t n = 0;
 
-    xtimer_set(&timer, TEST_DURATION);
+    ztimer_set(ZTIMER_USEC, &timer, TEST_DURATION);
     while(!_flag) {
         thread_flags_set(tcb, 0x1);
         n++;

@@ -28,7 +28,7 @@
 
 #include "log.h"
 #include "assert.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "timex.h"
 #include "periph/gpio.h"
 
@@ -68,7 +68,7 @@ static inline void _reset(dht_t *dev)
 static inline int _wait_for_level(gpio_t pin, bool expect, unsigned timeout)
 {
     while (((gpio_read(pin) > 0) != expect) && timeout) {
-        xtimer_usleep(1);
+        ztimer_sleep(ZTIMER_USEC, 1);
         timeout--;
     }
 
@@ -88,12 +88,12 @@ static int _read(uint16_t *dest, gpio_t pin, int bits)
         if (_wait_for_level(pin, 1, TIMEOUT)) {
             return -1;
         }
-        start = xtimer_now_usec();
+        start = ztimer_now(ZTIMER_USEC);
 
         if (_wait_for_level(pin, 0, TIMEOUT)) {
             return -1;
         }
-        end = xtimer_now_usec();
+        end = ztimer_now(ZTIMER_USEC);
 
         /* if the high phase was more than 40us, we got a 1 */
         if ((end - start) > PULSE_WIDTH_THRESHOLD) {
@@ -118,7 +118,7 @@ int dht_init(dht_t *dev, const dht_params_t *params)
 
     _reset(dev);
 
-    xtimer_msleep(2000);
+    ztimer_sleep(ZTIMER_MSEC, 2000);
 
     DEBUG("dht_init: success\n");
     return DHT_OK;
@@ -131,13 +131,13 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
 
     assert(dev);
 
-    uint32_t now_us = xtimer_now_usec();
+    uint32_t now_us = ztimer_now(ZTIMER_USEC);
     if ((now_us - dev->last_read_us) > DATA_HOLD_TIME) {
         /* send init signal to device */
         gpio_clear(dev->params.pin);
-        xtimer_usleep(START_LOW_TIME);
+        ztimer_sleep(ZTIMER_USEC, START_LOW_TIME);
         gpio_set(dev->params.pin);
-        xtimer_usleep(START_HIGH_TIME);
+        ztimer_sleep(ZTIMER_USEC, START_HIGH_TIME);
 
         /* sync on device */
         gpio_init(dev->params.pin, dev->params.in_mode);

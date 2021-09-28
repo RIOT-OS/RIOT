@@ -24,7 +24,7 @@
 
 #include "hih6130.h"
 #include "periph/i2c.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -119,7 +119,7 @@ int hih6130_get_humidity_temperature_float(const hih6130_t *dev,
         return -1;
     }
 
-    xtimer_usleep(MEASUREMENT_DELAY);
+    ztimer_sleep(ZTIMER_USEC, MEASUREMENT_DELAY);
 
     status = hih6130_get_humidity_temperature_raw(dev, &hum_raw, &temp_raw);
 

@@ -21,7 +21,7 @@
  */
 
 #include <stdio.h>
-#include "xtimer.h"
+#include "ztimer.h"
 #include "log.h"
 
 #include <wolfssl/wolfcrypt/settings.h>
@@ -36,7 +36,7 @@ int main(void)
     /* Wait to work around a failing tests
      * on platforms that don't have RTC synchronized
      */
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
     wolfcrypt_test(NULL);
 #ifdef MODULE_WOLFCRYPT_BENCHMARK
     LOG_INFO("wolfSSL Benchmark!\n");

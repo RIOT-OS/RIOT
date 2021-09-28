@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "at86rf2xx.h"
 #include "at86rf2xx_params.h"
 #include "at86rf2xx_aes.h"

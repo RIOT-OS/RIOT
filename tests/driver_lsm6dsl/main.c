@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "lsm6dsl.h"
 #include "lsm6dsl_params.h"
 
@@ -55,7 +55,7 @@ int main(void)
     }
     puts("[SUCCESS]\n");
 
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
     puts("Powering up LSM6DSL sensor...");
     if (lsm6dsl_acc_power_up(&dev) != LSM6DSL_OK) {
@@ -95,7 +95,7 @@ int main(void)
         }
 
         puts("");
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
     }
 
     return 0;

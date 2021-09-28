@@ -131,17 +131,18 @@ static inline void xtimer_nanosleep(uint32_t nanoseconds)
     ztimer_sleep(ZTIMER_USEC, nanoseconds / NS_PER_US);
 }
 
-static inline void xtimer_set(xtimer_t *timer, uint32_t offset)
+static inline void xtimer_set(ztimer_t *timer, uint32_t offset)
 {
     ztimer_set(ZTIMER_USEC, timer, offset);
 }
 
-static inline void xtimer_remove(xtimer_t *timer)
+static inline void xtimer_remove(ztimer_t *timer)
 {
     ztimer_remove(ZTIMER_USEC, timer);
 }
 
-static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg,
+static inline void xtimer_set_msg(ztimer_t *timer, uint32_t offset,
+                                  msg_t *msg,
                                   kernel_pid_t target_pid)
 {
     ztimer_set_msg(ZTIMER_USEC, timer, offset, msg, target_pid);
@@ -165,7 +166,7 @@ static inline xtimer_ticks32_t xtimer_ticks_from_usec(uint32_t usec)
 
 static inline void xtimer_now_timex(timex_t *out)
 {
-    uint64_t now = xtimer_now_usec64();
+    uint64_t now = ztimer_now64();
 
     out->seconds = div_u64_by_1000000(now);
     out->microseconds = now - (out->seconds * US_PER_SEC);
@@ -176,7 +177,7 @@ static inline int xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout)
     return ztimer_msg_receive_timeout(ZTIMER_USEC, msg, timeout);
 }
 
-static inline void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset,
+static inline void xtimer_set_wakeup(ztimer_t *timer, uint32_t offset,
                                      kernel_pid_t pid)
 {
     ztimer_set_wakeup(ZTIMER_USEC, timer, offset, pid);
@@ -192,15 +193,15 @@ static inline int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us)
     return 0;
 }
 
-static inline void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout)
+static inline void xtimer_set_timeout_flag(ztimer_t *t, uint32_t timeout)
 {
     ztimer_set_timeout_flag(ZTIMER_USEC, t, timeout);
 }
 
-static inline void xtimer_set_timeout_flag64(xtimer_t *t, uint64_t timeout)
+static inline void xtimer_set_timeout_flag64(ztimer_t *t, uint64_t timeout)
 {
     assert(timeout <= UINT32_MAX);
-    xtimer_set_timeout_flag(t, timeout);
+    ztimer_set_timeout_flag(ZTIMER_USEC, t, timeout);
 }
 
 static inline void xtimer_spin(xtimer_ticks32_t ticks)

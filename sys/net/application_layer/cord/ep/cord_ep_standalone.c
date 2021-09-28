@@ -23,7 +23,7 @@
 #include "log.h"
 #include "assert.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "net/cord/ep.h"
 #include "net/cord/config.h"
 #include "net/cord/ep_standalone.h"
@@ -42,7 +42,7 @@
 
 static char _stack[STACKSIZE];
 
-static xtimer_t _timer;
+static ztimer_t _timer;
 static kernel_pid_t _runner_pid;
 static msg_t _msg;
 
@@ -94,7 +94,7 @@ void cord_ep_standalone_run(void)
 void cord_ep_standalone_signal(bool connected)
 {
     /* clear timer in any case */
-    xtimer_remove(&_timer);
+    ztimer_remove(ZTIMER_USEC, &_timer);
     /* reset the update timer in case a connection was established or updated */
     if (connected) {
         _set_timer();

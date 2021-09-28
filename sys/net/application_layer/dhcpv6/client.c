@@ -28,7 +28,7 @@
 #if IS_USED(MODULE_ZTIMER)
 #include "ztimer.h"
 #else
-#include "xtimer.h"
+#include "ztimer.h"
 #include "xtimer/implementation.h"
 #endif
 
@@ -291,7 +291,7 @@ static inline uint32_t _now_cs(void)
 #if IS_USED(MODULE_ZTIMER)
     return (uint32_t)(ztimer_now(ZTIMER_MSEC) / MS_PER_CS);
 #else
-    return (uint32_t)(xtimer_now_usec64() / US_PER_CS);
+    return (uint32_t)(ztimer_now64() / US_PER_CS);
 #endif
 }
 
@@ -300,7 +300,7 @@ static inline uint32_t _now_sec(void)
 #if IS_USED(MODULE_ZTIMER)
     return (uint32_t)ztimer_now(ZTIMER_SEC);
 #else
-    return (uint32_t)(xtimer_now_usec64() / US_PER_SEC);
+    return (uint32_t)(ztimer_now64() / US_PER_SEC);
 #endif
 }
 

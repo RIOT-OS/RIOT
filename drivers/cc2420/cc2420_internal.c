@@ -22,7 +22,7 @@
 
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "cc2420_internal.h"
 #include "cc2420_registers.h"
@@ -117,5 +117,5 @@ uint8_t cc2420_state(cc2420_t *dev)
 void cc2420_en_xosc(cc2420_t *dev)
 {
     cc2420_strobe(dev, CC2420_STROBE_XOSCON);
-    xtimer_usleep(CC2420_XOSCON_DELAY);
+    ztimer_sleep(ZTIMER_USEC, CC2420_XOSCON_DELAY);
 }

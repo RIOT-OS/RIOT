@@ -46,7 +46,7 @@
 #include "mutex.h"
 
 #ifdef MODULE_XTIMER
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 
 #ifdef __cplusplus
@@ -139,7 +139,7 @@ static inline int sema_inv_try_wait(sema_inv_t *s)
  */
 static inline int sema_inv_wait_timeout(sema_inv_t *s, uint32_t us)
 {
-    return xtimer_mutex_lock_timeout(&s->lock, us);
+    return ztimer_mutex_lock_timeout(ZTIMER_USEC, &s->lock, us);
 }
 #endif
 

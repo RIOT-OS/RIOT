@@ -23,7 +23,7 @@
 
 #include "dsp0401_params.h"
 #include "dsp0401.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define TEST_DELAY      (2U)               /* 2 seconds delay between each test */
 #define WORD_DELAY      (750U)             /* 750 milliseconds delay between each word */
@@ -49,19 +49,19 @@ int main(void)
     while (loop < LOOPS) {
         puts("[INFO] Displaying 'THIS IS RIOT'");
         dsp0401_display_text(&dev, (char*)"THIS");
-        xtimer_msleep(WORD_DELAY);
+        ztimer_sleep(ZTIMER_MSEC, WORD_DELAY);
         dsp0401_display_text(&dev, (char*)" IS ");
-        xtimer_msleep(WORD_DELAY);
+        ztimer_sleep(ZTIMER_MSEC, WORD_DELAY);
         dsp0401_display_text(&dev, (char*)"RIOT");
-        xtimer_sleep(TEST_DELAY);
+        ztimer_sleep(ZTIMER_MSEC, TEST_DELAY * 1000);
 
         puts("[INFO] Clearing text!");
         dsp0401_clear_text(&dev);
-        xtimer_sleep(TEST_DELAY);
+        ztimer_sleep(ZTIMER_MSEC, TEST_DELAY * 1000);
 
         puts("[INFO] Scrolling 'THIS IS RIOT'");
         dsp0401_scroll_text(&dev, (char*)("THIS IS RIOT"), SCROLL_DELAY);
-        xtimer_sleep(TEST_DELAY);
+        ztimer_sleep(ZTIMER_MSEC, TEST_DELAY * 1000);
         puts("[INFO] Done\n");
         ++loop;
     }

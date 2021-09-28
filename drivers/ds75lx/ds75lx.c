@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "ds75lx.h"
 #include "ds75lx_internals.h"
@@ -126,7 +126,8 @@ int ds75lx_wakeup(const ds75lx_t *dev)
 
     if (ret == DS75LX_OK) {
         /* Wait max conversion time (depends on resolution) */
-        xtimer_msleep((DS75LX_MAX_CONVERSION_TIME << dev->params.resolution));
+        ztimer_sleep(ZTIMER_MSEC,
+                     (DS75LX_MAX_CONVERSION_TIME << dev->params.resolution));
     }
 
     return ret;

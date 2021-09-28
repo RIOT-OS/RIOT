@@ -19,13 +19,13 @@
 #include "esp_common.h"
 #include "esp_attr.h"
 #include "log.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/timers.h"
 
 typedef struct {
-    xtimer_t    xtimer;         /* xtimer object */
+    ztimer_t xtimer;         /* xtimer object */
     const char* name;           /* FreeRTOS timer name */
     uint32_t    period;         /* in us */
     bool        autoreload;     /* FreeRTOS timer reload indicator */
@@ -40,7 +40,7 @@ static void IRAM_ATTR _xtimer_callback (void *arg)
     freertos_xtimer_t* timer = (freertos_xtimer_t*)arg;
 
     if (timer->autoreload) {
-        xtimer_set(&timer->xtimer, timer->period);
+        ztimer_set(ZTIMER_USEC, &timer->xtimer, timer->period);
     }
 
     if (timer->cb) {
@@ -80,7 +80,7 @@ BaseType_t xTimerDelete(TimerHandle_t xTimer, TickType_t xBlockTime)
     assert(xTimer != NULL);
 
     freertos_xtimer_t* timer = (freertos_xtimer_t*)xTimer;
-    xtimer_remove(&timer->xtimer);
+    ztimer_remove(ZTIMER_USEC, &timer->xtimer);
     free(timer);
 
     return pdTRUE;
@@ -92,7 +92,7 @@ BaseType_t xTimerStart (TimerHandle_t xTimer, TickType_t xBlockTime)
     assert(xTimer != NULL);
 
     freertos_xtimer_t* timer = (freertos_xtimer_t*)xTimer;
-    xtimer_set(&timer->xtimer, timer->period);
+    ztimer_set(ZTIMER_USEC, &timer->xtimer, timer->period);
 
     return pdTRUE;
 }
@@ -103,7 +103,7 @@ BaseType_t xTimerStop  (TimerHandle_t xTimer, TickType_t xBlockTime)
     assert(xTimer != NULL);
 
     freertos_xtimer_t* timer = (freertos_xtimer_t*)xTimer;
-    xtimer_remove(&timer->xtimer);
+    ztimer_remove(ZTIMER_USEC, &timer->xtimer);
 
     return pdTRUE;
 }
@@ -114,7 +114,8 @@ BaseType_t xTimerReset (TimerHandle_t xTimer, TickType_t xBlockTime)
     assert(xTimer != NULL);
 
     freertos_xtimer_t* timer = (freertos_xtimer_t*)xTimer;
-    xtimer_set(&timer->xtimer, xBlockTime * portTICK_PERIOD_MS * USEC_PER_MSEC);
+    ztimer_set(ZTIMER_USEC, &timer->xtimer,
+               xBlockTime * portTICK_PERIOD_MS * USEC_PER_MSEC);
 
     return pdTRUE;
 }

@@ -24,7 +24,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "shell.h"
 #include "periph/spi.h"
 #include "schedstatistics.h"
@@ -96,7 +96,7 @@ static xtimer_ticks32_t _sched_ticks(void)
 
 static uint32_t _xtimer_diff_usec(xtimer_ticks32_t stop, xtimer_ticks32_t start)
 {
-    return xtimer_usec_from_ticks(xtimer_diff(stop, start));
+    return xtimer_diff(stop, start);
 }
 
 void print_bytes(char* title, uint8_t* data, size_t len)
@@ -289,12 +289,12 @@ int cmd_bench(int argc, char **argv)
 
     /* 1 - write 1000 times 1 byte */
     sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         in = spi_transfer_byte(spiconf.dev, spiconf.cs, false, out);
         (void)in;
     }
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
     sched_stop = _sched_ticks();
     sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
     printf(" 1 - write %i times %i byte:", BENCH_REDOS, 1);
@@ -304,12 +304,12 @@ int cmd_bench(int argc, char **argv)
 
     /* 2 - write 1000 times 2 byte */
     sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_bytes(spiconf.dev, spiconf.cs, false,
                            bench_wbuf, NULL, BENCH_SMALL);
     }
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
     sched_stop = _sched_ticks();
     sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
     printf(" 2 - write %i times %i byte:", BENCH_REDOS, BENCH_SMALL);
@@ -319,12 +319,12 @@ int cmd_bench(int argc, char **argv)
 
     /* 3 - write 1000 times 100 byte */
     sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_bytes(spiconf.dev, spiconf.cs, false,
                            bench_wbuf, NULL, BENCH_LARGE);
     }
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
     sched_stop = _sched_ticks();
     sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
     printf(" 3 - write %i times %i byte:", BENCH_REDOS, BENCH_LARGE);
@@ -334,12 +334,12 @@ int cmd_bench(int argc, char **argv)
 
     /* 4 - write 1000 times 1 byte to register */
     sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         in = spi_transfer_reg(spiconf.dev, spiconf.cs, BENCH_REGADDR, out);
         (void)in;
     }
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
     sched_stop = _sched_ticks();
     sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
     printf(" 4 - write %i times %i byte to register:", BENCH_REDOS, 1);
@@ -349,12 +349,12 @@ int cmd_bench(int argc, char **argv)
 
     /* 5 - write 1000 times 2 byte to register */
     sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_regs(spiconf.dev, spiconf.cs, BENCH_REGADDR,
                           bench_wbuf, NULL, BENCH_SMALL);
     }
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
     sched_stop = _sched_ticks();
     sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
     printf(" 5 - write %i times %i byte to register:", BENCH_REDOS, BENCH_SMALL);
@@ -364,12 +364,12 @@ int cmd_bench(int argc, char **argv)
 
     /* 6 - write 1000 times 100 byte to register */
     sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_regs(spiconf.dev, spiconf.cs, BENCH_REGADDR,
                           bench_wbuf, NULL, BENCH_LARGE);
     }
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
     sched_stop = _sched_ticks();
     sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
     printf(" 6 - write %i times %i byte to register:", BENCH_REDOS, BENCH_LARGE);
@@ -379,12 +379,12 @@ int cmd_bench(int argc, char **argv)
 
     /* 7 - read 1000 times 2 byte */
     sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_bytes(spiconf.dev, spiconf.cs, false,
                            NULL, bench_rbuf, BENCH_SMALL);
     }
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
     sched_stop = _sched_ticks();
     sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
     printf(" 7 - read %i times %i byte:", BENCH_REDOS, BENCH_SMALL);
@@ -394,12 +394,12 @@ int cmd_bench(int argc, char **argv)
 
     /* 8 - read 1000 times 100 byte */
     sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_bytes(spiconf.dev, spiconf.cs, false,
                            NULL, bench_rbuf, BENCH_LARGE);
     }
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
     sched_stop = _sched_ticks();
     sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
     printf(" 8 - read %i times %i byte:", BENCH_REDOS, BENCH_LARGE);
@@ -409,12 +409,12 @@ int cmd_bench(int argc, char **argv)
 
     /* 9 - read 1000 times 2 byte from register */
     sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_regs(spiconf.dev, spiconf.cs, BENCH_REGADDR,
                           NULL, bench_rbuf, BENCH_SMALL);
     }
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
     sched_stop = _sched_ticks();
     sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
     printf(" 9 - read %i times %i byte from register:", BENCH_REDOS, BENCH_SMALL);
@@ -424,12 +424,12 @@ int cmd_bench(int argc, char **argv)
 
     /* 10 - read 1000 times 100 byte from register */
     sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_regs(spiconf.dev, spiconf.cs, BENCH_REGADDR,
                           NULL, bench_rbuf, BENCH_LARGE);
     }
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
     sched_stop = _sched_ticks();
     sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
     printf("10 - read %i times %i byte from register:", BENCH_REDOS, BENCH_LARGE);
@@ -439,12 +439,12 @@ int cmd_bench(int argc, char **argv)
 
     /* 11 - transfer 1000 times 2 byte */
     sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_bytes(spiconf.dev, spiconf.cs, false,
                            bench_wbuf, bench_rbuf, BENCH_SMALL);
     }
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
     sched_stop = _sched_ticks();
     sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
     printf("11 - transfer %i times %i byte:", BENCH_REDOS, BENCH_SMALL);
@@ -454,12 +454,12 @@ int cmd_bench(int argc, char **argv)
 
     /* 12 - transfer 1000 times 100 byte */
     sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_bytes(spiconf.dev, spiconf.cs, false,
                            bench_wbuf, bench_rbuf, BENCH_LARGE);
     }
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
     sched_stop = _sched_ticks();
     sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
     printf("12 - transfer %i times %i byte:", BENCH_REDOS, BENCH_LARGE);
@@ -469,12 +469,12 @@ int cmd_bench(int argc, char **argv)
 
     /* 13 - transfer 1000 times 2 byte from/to register */
     sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_regs(spiconf.dev, spiconf.cs, BENCH_REGADDR,
                           bench_wbuf, bench_rbuf, BENCH_SMALL);
     }
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
     sched_stop = _sched_ticks();
     sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
     printf("13 - transfer %i times %i byte to register:", BENCH_REDOS, BENCH_SMALL);
@@ -484,12 +484,12 @@ int cmd_bench(int argc, char **argv)
 
     /* 14 - transfer 1000 times 100 byte from/to register */
     sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_regs(spiconf.dev, spiconf.cs, BENCH_REGADDR,
                           bench_wbuf, bench_rbuf, BENCH_LARGE);
     }
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
     sched_stop = _sched_ticks();
     sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
     printf("14 - transfer %i times %i byte to register:", BENCH_REDOS, BENCH_LARGE);
@@ -499,12 +499,12 @@ int cmd_bench(int argc, char **argv)
 
     /* 15 - release & acquire the bus 1000 times */
     sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_release(spiconf.dev);
         spi_acquire(spiconf.dev, spiconf.cs, spiconf.mode, spiconf.clk);
     }
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
     sched_stop = _sched_ticks();
     sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
     printf("15 - acquire/release %i times:\t\t", BENCH_REDOS);
@@ -512,7 +512,7 @@ int cmd_bench(int argc, char **argv)
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
     printf("-- - SUM:\t\t\t\t\t%"PRIu32"\t%"PRIu32"\n", sum, sched_sum);
 
@@ -546,19 +546,19 @@ int cmd_spi_gpio(int argc, char **argv)
     gpio_init(miso_pin, GPIO_OUT);
     gpio_init(mosi_pin, GPIO_OUT);
 
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
     printf("Command: gpio_set()\n");
     gpio_set(miso_pin);
     gpio_set(mosi_pin);
 
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
     printf("Command: gpio_clear()\n");
     gpio_clear(miso_pin);
     gpio_clear(mosi_pin);
 
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
     printf("Command: spi_init_pins(%i)\n", dev);
     spi_init_pins(dev);

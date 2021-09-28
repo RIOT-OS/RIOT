@@ -19,7 +19,7 @@
 
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "at86rf215_internal.h"
 
 #include <string.h>
@@ -49,9 +49,9 @@ int at86rf215_hardware_reset(at86rf215_t *dev)
 
     /* trigger hardware reset */
     gpio_clear(dev->params.reset_pin);
-    xtimer_usleep(CONFIG_AT86RF215_RESET_PULSE_WIDTH_US);
+    ztimer_sleep(ZTIMER_USEC, CONFIG_AT86RF215_RESET_PULSE_WIDTH_US);
     gpio_set(dev->params.reset_pin);
-    xtimer_usleep(AT86RF215_RESET_DELAY_US);
+    ztimer_sleep(ZTIMER_USEC, AT86RF215_RESET_DELAY_US);
 
     /* While the device is in RESET / DEEP SLEEP, all registers
        but STATE will read 0xFF.

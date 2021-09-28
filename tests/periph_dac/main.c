@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "periph/dac.h"
 
 #define DELAY           (100U)
@@ -29,7 +29,7 @@
 
 int main(void)
 {
-    xtimer_ticks32_t last = xtimer_now();
+    uint32_t last = ztimer_now(ZTIMER_USEC);
     uint16_t val = 0;
     uint16_t step = 0xffff / STEPS;
 
@@ -55,7 +55,7 @@ int main(void)
             dac_set(DAC_LINE(i), val);
         }
         val += step;
-        xtimer_periodic_wakeup(&last, DELAY);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &last, DELAY);
     }
 
     return 0;

@@ -19,7 +19,7 @@
 
 #include <assert.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "net/gnrc/gomach/gomach.h"
 #include "net/gnrc/gomach/timeout.h"
 #include "net/gnrc/gomach/types.h"
@@ -54,7 +54,8 @@ bool gnrc_gomach_timeout_is_expired(gnrc_netif_t *netif, gnrc_gomach_timeout_typ
     int index = _gomach_find_timeout(&netif->mac.prot.gomach, type);
     if (index >= 0) {
         if (netif->mac.prot.gomach.timeouts[index].expired) {
-            xtimer_remove(&(netif->mac.prot.gomach.timeouts[index].timer));
+            ztimer_remove(ZTIMER_USEC,
+                          &(netif->mac.prot.gomach.timeouts[index].timer));
             netif->mac.prot.gomach.timeouts[index].type = GNRC_GOMACH_TIMEOUT_DISABLED;
         }
         return netif->mac.prot.gomach.timeouts[index].expired;
@@ -86,7 +87,8 @@ void gnrc_gomach_clear_timeout(gnrc_netif_t *netif, gnrc_gomach_timeout_type_t t
 
     int index = _gomach_find_timeout(&netif->mac.prot.gomach, type);
     if (index >= 0) {
-        xtimer_remove(&(netif->mac.prot.gomach.timeouts[index].timer));
+        ztimer_remove(ZTIMER_USEC,
+                      &(netif->mac.prot.gomach.timeouts[index].timer));
         netif->mac.prot.gomach.timeouts[index].type = GNRC_GOMACH_TIMEOUT_DISABLED;
         netif->mac.prot.gomach.timeouts[index].expired = false;
     }
@@ -103,7 +105,7 @@ void gnrc_gomach_set_timeout(gnrc_netif_t *netif,
         timeout->expired = false;
         timeout->msg.type = GNRC_GOMACH_EVENT_TIMEOUT_TYPE;
         timeout->msg.content.ptr = (void *) timeout;
-        xtimer_set_msg(&(timeout->timer), offset,
+        ztimer_set_msg(ZTIMER_USEC, &(timeout->timer), offset,
                        &(timeout->msg), netif->pid);
     }
     else {
@@ -117,7 +119,8 @@ void gnrc_gomach_reset_timeouts(gnrc_netif_t *netif)
 
     for (unsigned i = 0; i < GNRC_GOMACH_TIMEOUT_COUNT; i++) {
         if (netif->mac.prot.gomach.timeouts[i].type != GNRC_GOMACH_TIMEOUT_DISABLED) {
-            xtimer_remove(&(netif->mac.prot.gomach.timeouts[i].timer));
+            ztimer_remove(ZTIMER_USEC,
+                          &(netif->mac.prot.gomach.timeouts[i].timer));
             netif->mac.prot.gomach.timeouts[i].type = GNRC_GOMACH_TIMEOUT_DISABLED;
         }
     }

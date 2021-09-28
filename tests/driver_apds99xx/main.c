@@ -30,7 +30,7 @@
 #include <stdio.h>
 
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "apds99xx.h"
 #include "apds99xx_params.h"
@@ -56,7 +56,7 @@ int main(void)
     while (1) {
 
         /* wait for 200 ms */
-        xtimer_usleep(APDS99XX_SLEEP);
+        ztimer_sleep(ZTIMER_USEC, APDS99XX_SLEEP);
 
         /* check whether ambient light and proximity data are available */
         if (apds99xx_data_ready_als(&dev) == APDS99XX_OK &&

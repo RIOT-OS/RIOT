@@ -27,7 +27,7 @@
 #include <stdlib.h>
 
 #include "shell.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "timex.h"
 #include "srf02.h"
 
@@ -81,11 +81,11 @@ static int cmd_sample(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-    xtimer_ticks32_t wakeup = xtimer_now();
+    uint32_t wakeup = ztimer_now(ZTIMER_USEC);
 
     while(1) {
         sample();
-        xtimer_periodic_wakeup(&wakeup, SAMPLE_PERIOD);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &wakeup, SAMPLE_PERIOD);
     }
 
     return 0;

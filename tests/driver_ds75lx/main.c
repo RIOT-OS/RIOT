@@ -23,7 +23,7 @@
 
 #include "ds75lx.h"
 #include "ds75lx_params.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 int main(void)
 {
@@ -59,7 +59,7 @@ int main(void)
                (int)(temperature / 100),
                (int)(temperature % 100));
 
-        xtimer_sleep(2);
+        ztimer_sleep(ZTIMER_MSEC, 2 * 1000);
     }
 
     return 0;

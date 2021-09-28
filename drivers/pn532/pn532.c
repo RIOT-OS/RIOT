@@ -22,7 +22,7 @@
 
 #include "assert.h"
 #include "kernel_defines.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "mutex.h"
 #include "pn532.h"
 #include "periph/gpio.h"
@@ -104,9 +104,9 @@ void pn532_reset(const pn532_t *dev)
 
     DEBUG("pn532: reset\n");
     gpio_clear(dev->conf->reset);
-    xtimer_usleep(RESET_TOGGLE_SLEEP);
+    ztimer_sleep(ZTIMER_USEC, RESET_TOGGLE_SLEEP);
     gpio_set(dev->conf->reset);
-    xtimer_usleep(RESET_BACKOFF);
+    ztimer_sleep(ZTIMER_USEC, RESET_BACKOFF);
 }
 
 int pn532_init(pn532_t *dev, const pn532_params_t *params, pn532_mode_t mode)
@@ -180,7 +180,7 @@ static int _write(const pn532_t *dev, uint8_t *buff, unsigned len)
     case PN532_SPI:
         spi_acquire(dev->conf->spi, SPI_CS_UNDEF, SPI_MODE, SPI_CLK);
         gpio_clear(dev->conf->nss);
-        xtimer_usleep(SPI_WRITE_DELAY_US);
+        ztimer_sleep(ZTIMER_USEC, SPI_WRITE_DELAY_US);
         reverse(buff, len);
         spi_transfer_byte(dev->conf->spi, SPI_CS_UNDEF, true, SPI_DATA_WRITE);
         spi_transfer_bytes(dev->conf->spi, SPI_CS_UNDEF, true, buff, NULL, len);

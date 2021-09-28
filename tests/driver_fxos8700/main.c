@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "fxos8700_params.h"
 
 int main(void)
@@ -48,7 +48,7 @@ int main(void)
             printf("acceleration: (%d, %d, %d)\n", acc.x, acc.y, acc.z);
             printf("magnetic field: (%d, %d, %d)\n", mag.x, mag.y, mag.z);
         }
-        xtimer_usleep(US_PER_SEC);
+        ztimer_sleep(ZTIMER_USEC, US_PER_SEC);
     }
 
     return 0;

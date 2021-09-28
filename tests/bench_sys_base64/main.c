@@ -23,7 +23,7 @@
 
 #include "base64.h"
 #include "fmt.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define MIN(a, b) (a < b) ? a : b
 
@@ -74,23 +74,23 @@ int main(void) {
         print_str("OK\n");
     }
 
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     for (unsigned i = 0; i < 1000; i++) {
         size = sizeof(buf);
         base64_encode(input, sizeof(input), buf, &size);
     }
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
 
     print_str("Encoding 1.000 x 96 bytes (128 bytes in base64): ");
     print_u32_dec(stop - start);
     print_str(" µs\n");
 
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     for (unsigned i = 0; i < 1000; i++) {
         size = sizeof(buf);
         base64_decode(base64, sizeof(base64), buf, &size);
     }
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
 
     print_str("Decoding 1.000 x 96 bytes (128 bytes in base64): ");
     print_u32_dec(stop - start);

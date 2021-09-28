@@ -22,7 +22,7 @@
 
 #include "saul.h"
 #include "veml6070.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 static int read_uv(const void *dev, phydat_t *res)
 {

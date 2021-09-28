@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "phydat.h"
 #include "saul_reg.h"
 
@@ -30,7 +30,7 @@
 int main(void)
 {
     phydat_t res;
-    xtimer_ticks32_t last_wakeup = xtimer_now();
+    uint32_t last_wakeup = ztimer_now(ZTIMER_USEC);
 
     puts("Test application for bmx055 module");
 
@@ -51,7 +51,7 @@ int main(void)
         }
         puts("\n##########################");
 
-        xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &last_wakeup, INTERVAL);
     }
 
     return 0;

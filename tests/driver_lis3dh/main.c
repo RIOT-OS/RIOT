@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "lis3dh.h"
 #include "lis3dh_params.h"
 
@@ -144,7 +144,7 @@ int main(void)
             --fifo_level;
         }
 
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
     }
 
     return 0;

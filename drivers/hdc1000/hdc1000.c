@@ -24,7 +24,7 @@
 #include <string.h>
 
 #include "assert.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "periph/i2c.h"
 #include "hdc1000.h"
 
@@ -71,7 +71,7 @@ int hdc1000_init(hdc1000_t *dev, const hdc1000_params_t *params)
     if (hdc1000_read(dev, &temp_cached, &hum_cached) != HDC1000_OK) {
         return HDC1000_BUSERR;
     }
-    last_read_time = xtimer_now_usec();
+    last_read_time = ztimer_now(ZTIMER_USEC);
 
     /* all set */
     return HDC1000_OK;
@@ -130,13 +130,13 @@ int hdc1000_read(const hdc1000_t *dev, int16_t *temp, int16_t *hum)
     if (hdc1000_trigger_conversion(dev) != HDC1000_OK) {
         return HDC1000_BUSERR;
     }
-    xtimer_usleep(CONFIG_HDC1000_CONVERSION_TIME);
+    ztimer_sleep(ZTIMER_USEC, CONFIG_HDC1000_CONVERSION_TIME);
     return hdc1000_get_results(dev, temp, hum);
 }
 
 int hdc1000_read_cached(const hdc1000_t *dev, int16_t *temp, int16_t *hum)
 {
-    uint32_t now = xtimer_now_usec();
+    uint32_t now = ztimer_now(ZTIMER_USEC);
 
     /* check if readings are outdated */
     if (now - last_read_time > dev->p.renew_interval) {

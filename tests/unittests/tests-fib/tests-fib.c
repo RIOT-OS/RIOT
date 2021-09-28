@@ -13,7 +13,7 @@
 #include <errno.h>
 #include "embUnit.h"
 #include "tests-fib.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "thread.h"
 #include "net/fib.h"
@@ -603,7 +603,7 @@ static void test_fib_15_get_lifetime(void)
                                                     add_buf_size - 1));
 
     /* assuming some ms passed during these operations... */
-    now = xtimer_now_usec64();
+    now = ztimer_now64();
     uint64_t cmp_lifetime = now + 900000lU;
     uint64_t cmp_max_lifetime = now + 1100000lU;
 

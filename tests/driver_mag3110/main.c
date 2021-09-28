@@ -25,7 +25,7 @@
 #include <stdio.h>
 
 #include "timex.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "mag3110.h"
 #include "mag3110_params.h"
@@ -49,7 +49,7 @@ int main(void)
     puts("[SUCCESS]");
 
     while (1) {
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
         mag3110_read(&dev, &data);
         printf("Field strength: X: %d Y: %d Z: %d\n", data.x, data.y, data.z);
         mag3110_read_dtemp(&dev, &temp);

@@ -79,7 +79,7 @@
 #include "stdio_rtt.h"
 #include "thread.h"
 #include "mutex.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #if MODULE_VFS
 #include "vfs.h"
@@ -315,9 +315,10 @@ ssize_t stdio_read(void* buffer, size_t count) {
             /* We only unlock when rtt_stdio_enable_stdin is called
                Note that we assume only one caller invoked this function */
         }
-        xtimer_ticks32_t last_wakeup = xtimer_now();
+        uint32_t last_wakeup = ztimer_now(ZTIMER_USEC);
         while(1) {
-            xtimer_periodic_wakeup(&last_wakeup, STDIO_POLL_INTERVAL);
+            ztimer_periodic_wakeup(ZTIMER_USEC, &last_wakeup,
+                                   STDIO_POLL_INTERVAL);
             res = rtt_read(buffer, count);
             if (res > 0)
                 return res;
@@ -329,9 +330,9 @@ ssize_t stdio_read(void* buffer, size_t count) {
 ssize_t stdio_write(const void* in, size_t len) {
     const char *buffer = (const char *)in;
     int written = rtt_write(buffer, (unsigned)len);
-    xtimer_ticks32_t last_wakeup = xtimer_now();
+    uint32_t last_wakeup = ztimer_now(ZTIMER_USEC);
     while (blocking_stdout && ((size_t)written < len)) {
-        xtimer_periodic_wakeup(&last_wakeup, STDIO_POLL_INTERVAL);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &last_wakeup, STDIO_POLL_INTERVAL);
         written += rtt_write(&buffer[written], len-written);
     }
     return (ssize_t)written;

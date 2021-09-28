@@ -25,7 +25,7 @@
 
 #include "net/sock/udp.h"
 #include "test_utils/expect.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "constants.h"
 #include "stack.h"
@@ -564,7 +564,7 @@ static void test_sock_udp_send__socketed_no_local_no_netif(void)
     expect(_check_packet(&ipv6_addr_unspecified, &dst_addr, 0,
                          _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                          SOCK_ADDR_ANY_NETIF, true));
-    xtimer_usleep(1000);    /* let GNRC stack finish */
+    ztimer_sleep(ZTIMER_USEC, 1000);    /* let GNRC stack finish */
     expect(_check_net());
 }
 
@@ -585,7 +585,7 @@ static void test_sock_udp_send__socketed_no_netif(void)
     expect(_check_packet(&src_addr, &dst_addr, _TEST_PORT_LOCAL,
                          _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                          SOCK_ADDR_ANY_NETIF, false));
-    xtimer_usleep(1000);    /* let GNRC stack finish */
+    ztimer_sleep(ZTIMER_USEC, 1000);    /* let GNRC stack finish */
     expect(_check_net());
 }
 
@@ -603,7 +603,7 @@ static void test_sock_udp_send__socketed_no_local(void)
     expect(_check_packet(&ipv6_addr_unspecified, &dst_addr, 0,
                          _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"), _TEST_NETIF,
                          true));
-    xtimer_usleep(1000);    /* let GNRC stack finish */
+    ztimer_sleep(ZTIMER_USEC, 1000);    /* let GNRC stack finish */
     expect(_check_net());
 }
 
@@ -625,7 +625,7 @@ static void test_sock_udp_send__socketed(void)
     expect(_check_packet(&src_addr, &dst_addr, _TEST_PORT_LOCAL,
                          _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                          _TEST_NETIF, false));
-    xtimer_usleep(1000);    /* let GNRC stack finish */
+    ztimer_sleep(ZTIMER_USEC, 1000);    /* let GNRC stack finish */
     expect(_check_net());
 }
 
@@ -650,7 +650,7 @@ static void test_sock_udp_send__socketed_other_remote(void)
     expect(_check_packet(&src_addr, &dst_addr, _TEST_PORT_LOCAL,
                          _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                          _TEST_NETIF, false));
-    xtimer_usleep(1000);    /* let GNRC stack finish */
+    ztimer_sleep(ZTIMER_USEC, 1000);    /* let GNRC stack finish */
     expect(_check_net());
 }
 
@@ -667,7 +667,7 @@ static void test_sock_udp_send__unsocketed_no_local_no_netif(void)
     expect(_check_packet(&ipv6_addr_unspecified, &dst_addr, 0,
                          _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                          SOCK_ADDR_ANY_NETIF, true));
-    xtimer_usleep(1000);    /* let GNRC stack finish */
+    ztimer_sleep(ZTIMER_USEC, 1000);    /* let GNRC stack finish */
     expect(_check_net());
 }
 
@@ -688,7 +688,7 @@ static void test_sock_udp_send__unsocketed_no_netif(void)
     expect(_check_packet(&src_addr, &dst_addr, _TEST_PORT_LOCAL,
                          _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                          SOCK_ADDR_ANY_NETIF, false));
-    xtimer_usleep(1000);    /* let GNRC stack finish */
+    ztimer_sleep(ZTIMER_USEC, 1000);    /* let GNRC stack finish */
     expect(_check_net());
 }
 
@@ -706,7 +706,7 @@ static void test_sock_udp_send__unsocketed_no_local(void)
     expect(_check_packet(&ipv6_addr_unspecified, &dst_addr, 0,
                          _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"), _TEST_NETIF,
                          true));
-    xtimer_usleep(1000);    /* let GNRC stack finish */
+    ztimer_sleep(ZTIMER_USEC, 1000);    /* let GNRC stack finish */
     expect(_check_net());
 }
 
@@ -728,7 +728,7 @@ static void test_sock_udp_send__unsocketed(void)
     expect(_check_packet(&src_addr, &dst_addr, _TEST_PORT_LOCAL,
                          _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                          _TEST_NETIF, false));
-    xtimer_usleep(1000);    /* let GNRC stack finish */
+    ztimer_sleep(ZTIMER_USEC, 1000);    /* let GNRC stack finish */
     expect(_check_net());
 }
 
@@ -744,7 +744,7 @@ static void test_sock_udp_send__no_sock_no_netif(void)
     expect(_check_packet(&ipv6_addr_unspecified, &dst_addr, 0,
                          _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                          SOCK_ADDR_ANY_NETIF, true));
-    xtimer_usleep(1000);    /* let GNRC stack finish */
+    ztimer_sleep(ZTIMER_USEC, 1000);    /* let GNRC stack finish */
     expect(_check_net());
 }
 
@@ -761,7 +761,7 @@ static void test_sock_udp_send__no_sock(void)
     expect(_check_packet(&ipv6_addr_unspecified, &dst_addr, 0,
                          _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                          _TEST_NETIF, true));
-    xtimer_usleep(1000);    /* let GNRC stack finish */
+    ztimer_sleep(ZTIMER_USEC, 1000);    /* let GNRC stack finish */
     expect(_check_net());
 }
 

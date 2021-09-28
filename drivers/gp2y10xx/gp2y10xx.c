@@ -24,7 +24,7 @@
 
 #include "periph/adc.h"
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -104,14 +104,14 @@ int gp2y10xx_read_density(const gp2y10xx_t *dev, uint16_t *density)
     for (unsigned i = 0; i < CONFIG_GP2Y10XX_MAX_READINGS; i++) {
         /* turn ILED on/off and wait a little bit to read the ADC */
         _iled_on(dev);
-        xtimer_usleep(ILED_PULSE_WAIT_US);
+        ztimer_sleep(ZTIMER_USEC, ILED_PULSE_WAIT_US);
         if ((adc_value = adc_sample(dev->params.aout,
                                     dev->params.adc_res)) < 0) {
             _iled_off(dev);
             return GP2Y10XX_ERR_ADC;
         }
         _iled_off(dev);
-        xtimer_usleep(ILED_PULSE_OFF_US);
+        ztimer_sleep(ZTIMER_USEC, ILED_PULSE_OFF_US);
         DEBUG("[gp2y10xx] read: unfiltered adc_value=%"PRIi32"\n", adc_value);
 
         adc_sum += adc_value;

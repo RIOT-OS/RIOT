@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "periph/hwrng.h"
 
 #define LIMIT       (20U)
@@ -50,7 +50,7 @@ int main(void)
             printf("\n");
         }
 
-        xtimer_usleep(1000 * 1000);
+        ztimer_sleep(ZTIMER_USEC, 1000 * 1000);
     }
 
     return 0;

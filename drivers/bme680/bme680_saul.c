@@ -21,7 +21,7 @@
 #include "saul.h"
 #include "bme680.h"
 #include "bme680_params.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 extern bme680_t bme680_devs_saul[BME680_NUMOF];
 
@@ -65,7 +65,7 @@ static int _read(int dev)
     if ((drt = bme680_get_duration(&bme680_devs_saul[dev])) < 0) {
         return BME680_INVALID;
     }
-    xtimer_msleep(drt);
+    ztimer_sleep(ZTIMER_MSEC, drt);
 
     bme680_field_data_t data;
     if ((res = bme680_get_data(&bme680_devs_saul[dev], &data)) != BME680_OK) {

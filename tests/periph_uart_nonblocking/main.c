@@ -26,7 +26,7 @@
 static inline uint32_t puts_delay(const char* str)
 {
     puts(str);
-    xtimer_usleep(LINE_DELAY_MS * 1000);
+    ztimer_sleep(ZTIMER_USEC, LINE_DELAY_MS * 1000);
     return LINE_DELAY_MS * 1000;
 }
 
@@ -46,7 +46,7 @@ int main(void)
     _irq_disabled_print();
 
     uint32_t total_us = 0;
-    xtimer_ticks32_t counter = xtimer_now();
+    uint32_t counter = ztimer_now(ZTIMER_USEC);
 
     /* Richard Stallman and the Free Software Foundation
        claim no copyright on this song. */
@@ -72,9 +72,10 @@ int main(void)
     total_us += puts_delay("You'll be free, hackers, you'll be free.");
     total_us += puts_delay("");
 
-    counter.ticks32 = xtimer_now().ticks32 - counter.ticks32;
+    counter.ticks32 = ztimer_now(ZTIMER_USEC).ticks32 - counter.ticks32;
 
-    printf("== printed in %" PRIu32 "/%" PRIu32 " µs ==\n", xtimer_usec_from_ticks(counter), total_us);
+    printf("== printed in %" PRIu32 "/%" PRIu32 " µs ==\n", counter,
+           total_us);
 
     puts("[SUCCESS]");
 

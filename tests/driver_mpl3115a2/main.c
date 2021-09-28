@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "mpl3115a2.h"
 #include "mpl3115a2_params.h"
 
@@ -50,7 +50,7 @@ int main(void)
         uint32_t pressure;
         int16_t temp;
         uint8_t status;
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
         if ((mpl3115a2_read_pressure(&dev, &pressure, &status) |
              mpl3115a2_read_temp(&dev, &temp)) != MPL3115A2_OK) {
             puts("[FAILED] read values!");

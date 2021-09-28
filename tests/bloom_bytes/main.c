@@ -22,7 +22,7 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "fmt.h"
 
 #include "hashes.h"
@@ -67,7 +67,7 @@ int main(void)
 
     random_init(myseed);
 
-    unsigned long t1 = xtimer_now_usec();
+    unsigned long t1 = ztimer_now(ZTIMER_USEC);
 
     for (int i = 0; i < lenB; i++) {
         buf_fill(buf, BUF_SIZE);
@@ -77,14 +77,14 @@ int main(void)
                   BUF_SIZE * sizeof(uint32_t) / sizeof(uint8_t));
     }
 
-    unsigned long t2 = xtimer_now_usec();
+    unsigned long t2 = ztimer_now(ZTIMER_USEC);
     printf("adding %d elements took %" PRIu32 "ms\n", lenB,
            (uint32_t) (t2 - t1) / 1000);
 
     int in = 0;
     int not_in = 0;
 
-    unsigned long t3 = xtimer_now_usec();
+    unsigned long t3 = ztimer_now(ZTIMER_USEC);
 
     for (int i = 0; i < lenA; i++) {
         buf_fill(buf, BUF_SIZE);
@@ -100,7 +100,7 @@ int main(void)
         }
     }
 
-    unsigned long t4 = xtimer_now_usec();
+    unsigned long t4 = ztimer_now(ZTIMER_USEC);
     printf("checking %d elements took %" PRIu32 "ms\n", lenA,
            (uint32_t) (t4 - t3) / 1000);
 

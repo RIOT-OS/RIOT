@@ -12,7 +12,7 @@
 #if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
 #include "ztimer.h"
 #else
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 #include "event/timeout.h"
 
@@ -53,7 +53,7 @@ void event_timeout_set(event_timeout_t *event_timeout, uint32_t timeout)
 #if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
     ztimer_set(event_timeout->clock, &event_timeout->timer, timeout);
 #else
-    xtimer_set(&event_timeout->timer, timeout);
+    ztimer_set(ZTIMER_USEC, &event_timeout->timer, timeout);
 #endif
 }
 
@@ -64,6 +64,6 @@ void event_timeout_clear(event_timeout_t *event_timeout)
         ztimer_remove(event_timeout->clock, &event_timeout->timer);
     }
 #else
-    xtimer_remove(&event_timeout->timer);
+    ztimer_remove(ZTIMER_USEC, &event_timeout->timer);
 #endif
 }

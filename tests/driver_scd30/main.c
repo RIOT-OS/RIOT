@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "scd30.h"
 #include "scd30_params.h"
 #include "scd30_internal.h"
@@ -59,7 +59,7 @@ int main(void)
     printf("[test][dev-%d] FRC: %u ppm\n", i, value);
 
     while (i < TEST_ITERATIONS) {
-        xtimer_sleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
         scd30_read_triggered(&scd30_dev, &result);
         printf(
             "[scd30_test-%d] Triggered measurements co2: %.02fppm,"
@@ -73,7 +73,7 @@ int main(void)
                                      &pressure_compensation);
 
     while (i < TEST_ITERATIONS) {
-        xtimer_sleep(MEASUREMENT_INTERVAL_SECS);
+        ztimer_sleep(ZTIMER_MSEC, MEASUREMENT_INTERVAL_SECS * 1000);
         scd30_read_periodic(&scd30_dev, &result);
         printf(
             "[scd30_test-%d] Continuous measurements co2: %.02fppm,"

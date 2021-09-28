@@ -15,7 +15,7 @@
  *              @ref sched_run().
  *
  * @note        If auto_init is disabled `init_schedstatistics()` needs to be
- *              called as well as xtimer_init().
+ *              called as well as ztimer_init().
  * @{
  *
  * @file

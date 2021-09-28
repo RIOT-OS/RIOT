@@ -24,7 +24,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "tmp00x.h"
 #include "tmp00x_params.h"
 
@@ -46,7 +46,7 @@ int main(void)
         puts("start measurement [ERROR]");
         return -1;
     }
-    xtimer_usleep(CONFIG_TMP00X_CONVERSION_TIME);
+    ztimer_sleep(ZTIMER_USEC, CONFIG_TMP00X_CONVERSION_TIME);
     puts("[SUCCESS]\n");
 
     while (1) {
@@ -60,7 +60,7 @@ int main(void)
         else {
             puts("conversion in progress ... ");
         }
-        xtimer_usleep(CONFIG_TMP00X_CONVERSION_TIME);
+        ztimer_sleep(ZTIMER_USEC, CONFIG_TMP00X_CONVERSION_TIME);
     }
 
     return 0;

@@ -26,7 +26,7 @@
 #include "periph/uart.h"
 #include "periph_conf.h"
 #include "stdio_uart.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 /* Number of different options for each mode parameter */
 #define DATA_BIT_OPTIONS (4)
@@ -55,8 +55,8 @@ static char mode_strings[TOTAL_OPTIONS][MODE_STR_LEN];
 
 static void _delay(void)
 {
-    if (IS_USED(MODULE_XTIMER)) {
-        xtimer_usleep(DELAY_US);
+    if (IS_USED(MODULE_ZTIMER)) {
+        ztimer_sleep(ZTIMER_USEC, DELAY_US);
     }
     else {
         /*

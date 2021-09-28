@@ -21,7 +21,7 @@
 
 #include "saul.h"
 #include "si114x.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 static int read_uv(const void *dev, phydat_t *res)
 {

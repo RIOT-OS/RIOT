@@ -28,7 +28,7 @@
 #include "periph/gpio.h"
 #include "periph/uart.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -81,7 +81,7 @@ static void _handle_playback_completed(dfplayer_t *dev, dfplayer_source_t src)
      * Filtering by track number and medium wouldn't work here, as the same
      * song might be played in repeat mode.
      */
-    uint32_t now_us = xtimer_now_usec();
+    uint32_t now_us = ztimer_now(ZTIMER_USEC);
     if (dev->cb_done && (now_us - dev->last_event_us > DFPLAYER_TIMEOUT_MS * US_PER_MS)) {
         dev->cb_done(dev, src, track);
     }
@@ -289,7 +289,7 @@ static int _send(dfplayer_t *dev, uint8_t cmd, uint8_t p1, uint8_t p2,
         mutex_trylock(&dev->sync);
         uart_write(dev->uart, frame, sizeof(frame));
 
-        if (xtimer_mutex_lock_timeout(&dev->sync, timeout_us)) {
+        if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &dev->sync, timeout_us)) {
             DEBUG("[dfplayer] Response timed out\n");
             retval = -ETIMEDOUT;
         }
@@ -321,7 +321,7 @@ static int _send(dfplayer_t *dev, uint8_t cmd, uint8_t p1, uint8_t p2,
         }
 
         /* wait to work around HW bug */
-        xtimer_msleep(DFPLAYER_SEND_DELAY_MS);
+        ztimer_sleep(ZTIMER_MSEC, DFPLAYER_SEND_DELAY_MS);
 
         if (!retval) {
             break;
@@ -375,7 +375,7 @@ int dfplayer_reset(dfplayer_t *dev)
     mutex_trylock(&dev->sync);
 
     const uint32_t bootup_timeout = DFPLAYER_BOOTUP_TIME_MS * US_PER_MS;
-    if (xtimer_mutex_lock_timeout(&dev->sync, bootup_timeout)) {
+    if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &dev->sync, bootup_timeout)) {
         mutex_unlock(&dev->mutex);
         DEBUG("[dfplayer] Waiting for device to boot timed out\n");
         return -ETIMEDOUT;
@@ -404,7 +404,7 @@ int dfplayer_file_cmd(dfplayer_t *dev, uint8_t cmd, uint8_t p1, uint8_t p2)
     mutex_trylock(&dev->sync);
 
     const uint32_t timeout_us = DFPLAYER_TIMEOUT_MS * US_PER_MS;
-    if (xtimer_mutex_lock_timeout(&dev->sync, timeout_us)) {
+    if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &dev->sync, timeout_us)) {
         /* For commands DFPLAYER_CMD_PLAY_FROM_MP3 (0x12) and
          * DFPLAYER_CMD_PLAY_ADVERT (0x13) a second reply is only generated on
          * failure. A timeout could be either:

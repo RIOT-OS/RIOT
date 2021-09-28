@@ -70,7 +70,7 @@
 #include "periph/i2c.h"
 #endif
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "u8g2.h"
 #include "u8x8_riotos.h"
@@ -200,7 +200,7 @@ int main(void)
         screen = (screen + 1) % 3;
 
         /* sleep a little */
-        xtimer_sleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
     }
 
     return 0;

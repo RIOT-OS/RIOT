@@ -105,7 +105,8 @@ static void _set_timer(evtimer_t *evtimer)
     uint64_t offset_us = (uint64_t)next_event->offset * US_PER_MS;
 
     DEBUG("evtimer: now=%" PRIu32 " us setting xtimer to %" PRIu32 ":%" PRIu32 " us\n",
-          xtimer_now_usec(), (uint32_t)(offset_us >> 32), (uint32_t)(offset_us));
+          ztimer_now(ZTIMER_USEC), (uint32_t)(offset_us >> 32),
+          (uint32_t)(offset_us));
 
     xtimer_set64(&evtimer->timer, offset_us);
 #endif
@@ -120,7 +121,7 @@ static void _update_timer(evtimer_t *evtimer)
 #if IS_USED(MODULE_EVTIMER_ON_ZTIMER)
         ztimer_remove(ZTIMER_MSEC, &evtimer->timer);
 #else
-        xtimer_remove(&evtimer->timer);
+        ztimer_remove(ZTIMER_USEC, &evtimer->timer);
 #endif
     }
 }
@@ -141,7 +142,7 @@ static void _update_head_offset(evtimer_t *evtimer)
     }
 }
 #else /* IS_USED(MODULE_EVTIMER_ON_ZTIMER) */
-static uint32_t _get_offset(xtimer_t *timer)
+static uint32_t _get_offset(ztimer_t *timer)
 {
     uint64_t left = xtimer_left_usec(timer);
     /* add half of 125 so integer division rounds to nearest */

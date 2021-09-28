@@ -24,7 +24,7 @@
 
 #include "irq.h"
 #include "log.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -213,14 +213,14 @@ void pca9685_pwm_poweron(pca9685_t *dev)
         byte &= ~PCA9685_MODE1_SLEEP;
         EXEC(_write(dev, PCA9685_REG_MODE1, &byte, 1));
         /* allow 500 us for oscillator to stabilize */
-        xtimer_usleep(500);
+        ztimer_sleep(ZTIMER_USEC, 500);
         /* clear the RESTART bit to start all PWM channels*/
         EXEC(_update(dev, PCA9685_REG_MODE1, PCA9685_MODE1_RESTART, 1));
     }
     else {
         EXEC(_update(dev, PCA9685_REG_MODE1, PCA9685_MODE1_SLEEP, 0));
         /* allow 500 us for oscillator to stabilize */
-        xtimer_usleep(500);
+        ztimer_sleep(ZTIMER_USEC, 500);
         /* clear the RESTART bit to start all PWM channels*/
         EXEC(_update(dev, PCA9685_REG_MODE1, PCA9685_MODE1_RESTART, 1));
     }

@@ -35,7 +35,7 @@
 #include <limits.h>
 
 #include "bitarithm.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define TIMEOUT_S (5ul)
 #define TIMEOUT (TIMEOUT_S * US_PER_SEC)
@@ -64,8 +64,8 @@ static void run_test(const char *name, unsigned (*test)(unsigned))
     unsigned long count = 0;
     atomic_store(&done, false);
 
-    xtimer_t xtimer = { .callback = callback };
-    xtimer_set(&xtimer, TIMEOUT);
+    ztimer_t xtimer = { .callback = callback };
+    ztimer_set(ZTIMER_USEC, &xtimer, TIMEOUT);
 
     do {
         if (++i == UINT_MAX) {
@@ -112,8 +112,8 @@ static void run_test_test_and_clear(void)
     unsigned long count = 0;
     atomic_store(&done, false);
 
-    xtimer_t xtimer = { .callback = callback };
-    xtimer_set(&xtimer, TIMEOUT);
+    ztimer_t xtimer = { .callback = callback };
+    ztimer_set(ZTIMER_USEC, &xtimer, TIMEOUT);
 
     do {
         assert(do_test_and_clear(TEST_AND_CLEAR_TEST_MASK_0) == TEST_AND_CLEAR_TEST_MASK_0);

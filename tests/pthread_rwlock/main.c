@@ -34,7 +34,7 @@
 #include "random.h"
 #include "sched.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define NUM_READERS_HIGH 2
 #define NUM_READERS_LOW 3
@@ -86,7 +86,7 @@ static void do_sleep(int factor)
 {
     uint32_t timeout_us = (random_uint32() % 100000) * factor;
     PRINTF("sleep for % 8i µs.", timeout_us);
-    xtimer_usleep(timeout_us);
+    ztimer_sleep(ZTIMER_USEC, timeout_us);
 }
 
 static void *writer(void *arg)

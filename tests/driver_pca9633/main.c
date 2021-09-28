@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "shell.h"
 
 #include "pca9633.h"
@@ -360,29 +360,29 @@ int run_demo(int argc, char **argv)
     pca9633_set_group_control_mode(&pca9633_dev,
                                    PCA9633_GROUP_CONTROL_MODE_DIMMING);
     pca9633_set_rgb(&pca9633_dev, 255, 255, 255);
-    xtimer_msleep(500);
+    ztimer_sleep(ZTIMER_MSEC, 500);
 
     // 1. turn on/off
     puts("1. turn on/off");
     pca9633_turn_off(&pca9633_dev);
-    xtimer_msleep(500);
+    ztimer_sleep(ZTIMER_MSEC, 500);
 
     pca9633_turn_on(&pca9633_dev);
-    xtimer_msleep(500);
+    ztimer_sleep(ZTIMER_MSEC, 500);
 
     // 2. individual dimming (pca9633_set_rgb() uses pca9633_set_pwm() internally)
     puts("2. individual dimming");
     pca9633_set_rgb(&pca9633_dev, 255, 255, 255);
-    xtimer_msleep(500);
+    ztimer_sleep(ZTIMER_MSEC, 500);
 
     pca9633_set_rgb(&pca9633_dev, 255, 0, 0);
-    xtimer_msleep(500);
+    ztimer_sleep(ZTIMER_MSEC, 500);
 
     pca9633_set_rgb(&pca9633_dev, 0, 255, 0);
-    xtimer_msleep(500);
+    ztimer_sleep(ZTIMER_MSEC, 500);
 
     pca9633_set_rgb(&pca9633_dev, 0, 0, 255);
-    xtimer_msleep(500);
+    ztimer_sleep(ZTIMER_MSEC, 500);
 
     // 3. group dimming
     puts("3. group dimming");
@@ -391,9 +391,9 @@ int run_demo(int argc, char **argv)
 
     for (int pwm = 255; pwm >= 0; pwm--) {
         pca9633_set_grp_pwm(&pca9633_dev, pwm);
-        xtimer_msleep(20);
+        ztimer_sleep(ZTIMER_MSEC, 20);
     }
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
 
     // 4. changing ldr state
     puts("4. changing ldr state");
@@ -401,25 +401,25 @@ int run_demo(int argc, char **argv)
     pca9633_set_rgb(&pca9633_dev, 255, 255, 255);
     pca9633_set_ldr_state(&pca9633_dev, PCA9633_LDR_STATE_OFF, PCA9633_PWM_CHANNEL_1);
     // color should be magenta
-    xtimer_msleep(500);
+    ztimer_sleep(ZTIMER_MSEC, 500);
 
     pca9633_set_grp_pwm(&pca9633_dev, 0);
     pca9633_set_rgb(&pca9633_dev, 0, 0, 0);
     pca9633_set_ldr_state(&pca9633_dev, PCA9633_LDR_STATE_ON, PCA9633_PWM_CHANNEL_1);
     // color should be green
-    xtimer_msleep(500);
+    ztimer_sleep(ZTIMER_MSEC, 500);
 
     pca9633_set_grp_pwm(&pca9633_dev, 255);
     pca9633_set_rgb(&pca9633_dev, 255, 128, 0);
     pca9633_set_ldr_state(&pca9633_dev,PCA9633_LDR_STATE_IND, PCA9633_PWM_CHANNEL_1);
     // color should be orange
-    xtimer_msleep(500);
+    ztimer_sleep(ZTIMER_MSEC, 500);
 
     pca9633_set_grp_pwm(&pca9633_dev, 0);
     pca9633_set_rgb(&pca9633_dev, 255, 255, 255);
     pca9633_set_ldr_state(&pca9633_dev, PCA9633_LDR_STATE_IND_GRP, PCA9633_PWM_CHANNEL_1);
     // should be no color at all
-    xtimer_msleep(500);
+    ztimer_sleep(ZTIMER_MSEC, 500);
 
     // 5. test blinking
     puts("5. test blinking");
@@ -430,20 +430,20 @@ int run_demo(int argc, char **argv)
     pca9633_set_blinking(&pca9633_dev,
             1000,
             PCA9633_BLINKING_RATIO_BALANCED);
-    xtimer_sleep(10);
+    ztimer_sleep(ZTIMER_MSEC, 10 * 1000);
     pca9633_set_group_control_mode(&pca9633_dev,
             PCA9633_GROUP_CONTROL_MODE_DIMMING);
 
     // 6. sleep mode
     puts("6. sleep mode");
     pca9633_set_rgb(&pca9633_dev, 0, 255, 255);
-    xtimer_msleep(500);
+    ztimer_sleep(ZTIMER_MSEC, 500);
 
     pca9633_sleep(&pca9633_dev);
-    xtimer_sleep(2);
+    ztimer_sleep(ZTIMER_MSEC, 2 * 1000);
 
     pca9633_wakeup(&pca9633_dev);
-    xtimer_msleep(500);
+    ztimer_sleep(ZTIMER_MSEC, 500);
 
     puts("[DEMO END]");
 

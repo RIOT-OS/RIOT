@@ -21,7 +21,7 @@
 #include "ot.h"
 #include "random.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifdef MODULE_AT86RF2XX
 #include "at86rf2xx.h"

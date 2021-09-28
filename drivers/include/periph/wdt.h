@@ -58,7 +58,7 @@
  *     wdt_start();
  *
  *     while (1) {
- *         xtimer_usleep(time);
+ *         ztimer_usleep(ZTIMER_USEC, time);
  *         wdt_kick();
  *     }
  *     return 0;
@@ -95,7 +95,7 @@
  *     wdt_start();
  *
  *     while (1) {
- *         xtimer_usleep(MIN_TIME + time);
+ *         ztimer_usleep(ZTIMER_USEC, MIN_TIME + time);
  *         wdt_kick();
  *     }
  *     return 0;
@@ -138,7 +138,7 @@
  *     wdt_setup_reboot_with_callback(0, MAX_TIME, wdt_cb, arg);
  *     wdt_start();
  *     while (1) {
- *         xtimer_usleep(time);
+ *         ztimer_usleep(ZTIMER_USEC, time);
  *         wdt_kick();
  *     }
  *     return 0;

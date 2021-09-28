@@ -14,7 +14,7 @@
 #ifndef DOXYGEN
 
 #include "freertos/FreeRTOS.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifdef __cplusplus
 extern "C" {

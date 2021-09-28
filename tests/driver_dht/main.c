@@ -23,7 +23,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "timex.h"
 #include "fmt.h"
 #include "dht.h"
@@ -65,7 +65,7 @@ int main(void)
         printf("DHT values - temp: %s°C - relative humidity: %s%%\n",
                 temp_s, hum_s);
 
-        xtimer_usleep(DELAY);
+        ztimer_sleep(ZTIMER_USEC, DELAY);
     }
 
     return 0;

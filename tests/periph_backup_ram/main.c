@@ -22,7 +22,7 @@
 
 #include "periph/rtc.h"
 #include "pm_layered.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifndef SLEEP_SEC
 #define SLEEP_SEC 1

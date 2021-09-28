@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "board.h"
 
 #include "periph/gpio.h"
@@ -71,12 +71,12 @@ int main(void)
                "+-------------------------------------+\n",
                (int)temperature,
                (unsigned)((temperature - (int)temperature) * 1000));
-        xtimer_sleep(DELAY_1S);
+        ztimer_sleep(ZTIMER_MSEC, DELAY_1S * 1000);
 
         /* Card detect pin is inverted */
         if (!gpio_read(IO1_SDCARD_SPI_PARAM_DETECT)) {
             _sd_card_cid();
-            xtimer_sleep(DELAY_1S);
+            ztimer_sleep(ZTIMER_MSEC, DELAY_1S * 1000);
         }
 
         uint16_t light;
@@ -84,23 +84,23 @@ int main(void)
         printf("Light level: %i\n"
                "+-------------------------------------+\n",
                light);
-        xtimer_sleep(DELAY_1S);
+        ztimer_sleep(ZTIMER_MSEC, DELAY_1S * 1000);
 
         /* set led */
         gpio_set(IO1_LED_PIN);
-        xtimer_sleep(DELAY_1S);
+        ztimer_sleep(ZTIMER_MSEC, DELAY_1S * 1000);
 
         /* clear led */
         gpio_clear(IO1_LED_PIN);
-        xtimer_sleep(DELAY_1S);
+        ztimer_sleep(ZTIMER_MSEC, DELAY_1S * 1000);
 
         /* toggle led */
         gpio_toggle(IO1_LED_PIN);
-        xtimer_sleep(DELAY_1S);
+        ztimer_sleep(ZTIMER_MSEC, DELAY_1S * 1000);
 
         /* toggle led again */
         gpio_toggle(IO1_LED_PIN);
-        xtimer_sleep(DELAY_1S);
+        ztimer_sleep(ZTIMER_MSEC, DELAY_1S * 1000);
     }
 
     return 0;

@@ -25,7 +25,7 @@
 #include "embUnit.h"
 #include "embUnit/embUnit.h"
 #include "timex.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define TEST_STRING "This is a test"
 
@@ -100,7 +100,7 @@ static void test_get_time(void)
     for (int i = 0; i < 5; i++) {
         struct tm time;
 
-        xtimer_sleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
         ds1307_get_time(&dev, &time);
         TEST_ASSERT(_tm_cmp(&init, &time) <= 0);
     }
@@ -112,7 +112,7 @@ static void test_halt(void)
     for (int i = 0; i < 3; i++) {
         struct tm time;
 
-        xtimer_sleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
         ds1307_get_time(&dev, &time);
         TEST_ASSERT_EQUAL_INT(0, _tm_cmp(&init, &time));
     }

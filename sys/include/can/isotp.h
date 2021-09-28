@@ -28,7 +28,7 @@ extern "C" {
 #include "can/can.h"
 #include "can/common.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "net/gnrc/pktbuf.h"
 
 #ifndef CAN_ISOTP_BS
@@ -110,8 +110,8 @@ struct isotp {
     struct isotp_fc_options txfc;  /**< tx flow control options (defined remotely) */
     struct tpcon tx;               /**< transmit state */
     struct tpcon rx;               /**< receive state */
-    xtimer_t tx_timer;             /**< timer for tx operations */
-    xtimer_t rx_timer;             /**< timer for rx operations */
+    ztimer_t tx_timer;             /**< timer for tx operations */
+    ztimer_t rx_timer;             /**< timer for rx operations */
     can_reg_entry_t entry;         /**< entry containing ifnum and upper layer msg system */
     uint32_t tx_gap;               /**< transmit gap from fc (in us) */
     uint8_t tx_wft;                /**< transmit wait counter */

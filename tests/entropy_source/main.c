@@ -22,7 +22,7 @@
 #include <stdint.h>
 
 #include "fmt.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "entropy_source.h"
 #include "entropy_source/zero_entropy.h"
 #if MODULE_PERIPH_ADC
@@ -83,9 +83,9 @@ int main(void)
     }
 
     /* Request a buffer and measure time */
-    start = xtimer_now_usec();
+    start = ztimer_now(ZTIMER_USEC);
     ret = entropy_source_adc_get(buf2, NUM_BYTES);
-    stop = xtimer_now_usec();
+    stop = ztimer_now(ZTIMER_USEC);
 
     for (unsigned i = 0; i < sizeof(buf2); i++) {
         printf("%02x\n", buf2[i]);

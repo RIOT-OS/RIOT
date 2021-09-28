@@ -26,7 +26,7 @@
 #include "debug.h"
 #include "log.h"
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "periph/timer.h"
 
 #include "esp/common_macros.h"

@@ -23,7 +23,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "periph/i2c.h"
 
 #include "tsl4531x.h"
@@ -73,7 +73,7 @@ int main(void)
             lux = tsl4531x_get_sample(&dev);
             if (lux != lux_last) {
                 lux_last = lux;
-                change_times[changes] = xtimer_now_usec();
+                change_times[changes] = ztimer_now(ZTIMER_USEC);
                 changes++;
             }
         }
@@ -89,7 +89,7 @@ int main(void)
         lux = tsl4531x_get_sample(&dev);
         printf("Illuminance       | Low power mode  | Immediate read after mode change |");
         printf(" [lx] | %u\n", lux);
-        xtimer_usleep(tsl4531x_time_until_sample_ready(&dev));
+        ztimer_sleep(ZTIMER_USEC, tsl4531x_time_until_sample_ready(&dev));
         lux = tsl4531x_get_sample(&dev);
         printf("Illuminance       | Low power mode  | One cycle time after mode change |");
         printf(" [lx] | %u\n", lux);
@@ -104,14 +104,14 @@ int main(void)
 
         /* Verify that the stated time until sample ready is reasonable. */
         uint32_t t = tsl4531x_time_until_sample_ready(&dev);
-        xtimer_usleep(t);
+        ztimer_sleep(ZTIMER_USEC, t);
         lux = tsl4531x_get_sample(&dev);
         printf("Illuminance       | Low power mode  | Asynchronous read                |");
         printf(" [lx] | %u\n", lux);
         printf("Sample ready time | Low power mode  | From driver                      |");
         printf(" [us] | %lu\n", (unsigned long)t);
 
-        xtimer_usleep(_100ms_in_us);
+        ztimer_sleep(ZTIMER_USEC, _100ms_in_us);
     }
 
     return 0;

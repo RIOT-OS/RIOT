@@ -21,7 +21,7 @@
  */
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "mrf24j40_internal.h"
 #include "mrf24j40_registers.h"
 #include "kernel_defines.h"
@@ -291,8 +291,8 @@ void mrf24j40_hardware_reset(mrf24j40_t *dev)
     /* trigger hardware reset */
     gpio_clear(dev->params.reset_pin);
     /* Datasheet - Not specified */
-    xtimer_usleep(MRF24J40_RESET_PULSE_WIDTH);
+    ztimer_sleep(ZTIMER_USEC, MRF24J40_RESET_PULSE_WIDTH);
     gpio_set(dev->params.reset_pin);
     /* Datasheet - MRF24J40 ~2ms */
-    xtimer_usleep(MRF24J40_RESET_DELAY);
+    ztimer_sleep(ZTIMER_USEC, MRF24J40_RESET_DELAY);
 }

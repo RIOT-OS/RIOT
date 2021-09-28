@@ -26,7 +26,7 @@
 #include <errno.h>
 
 #include "mtd.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "thread.h"
 #include "byteorder.h"
 #include "mtd_spi_nor.h"
@@ -313,8 +313,8 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
     unsigned i = 0, j = 0;
     uint32_t div = 2;
     uint32_t diff = 0;
-    if (IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_XTIMER)) {
-        diff = xtimer_now_usec();
+    if (IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_ZTIMER)) {
+        diff = ztimer_now(ZTIMER_USEC);
     }
     do {
         uint8_t status;
@@ -327,7 +327,7 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
         i++;
 #if MODULE_XTIMER
         if (us) {
-            xtimer_usleep(us);
+            ztimer_sleep(ZTIMER_USEC, us);
             /* reduce the waiting time quickly if the estimate was too short,
              * but still avoid busy (yield) waiting */
             if (us > 2 * XTIMER_BACKOFF) {
@@ -349,8 +349,8 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
 #endif
     } while (1);
     DEBUG("wait loop %u times, yield %u times", i, j);
-    if (IS_ACTIVE(ENABLE_DEBUG) && IS_ACTIVE(MODULE_XTIMER)) {
-        diff = xtimer_now_usec() - diff;
+    if (IS_ACTIVE(ENABLE_DEBUG) && IS_ACTIVE(MODULE_ZTIMER)) {
+        diff = ztimer_now(ZTIMER_USEC) - diff;
         DEBUG(", total wait %"PRIu32"us", diff);
     }
     DEBUG("\n");
@@ -390,7 +390,7 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
             uint8_t retries = 0;
             int res = 0;
             do {
-                xtimer_usleep(dev->params->wait_chip_wake_up);
+                ztimer_sleep(ZTIMER_USEC, dev->params->wait_chip_wake_up);
                 res = mtd_spi_read_jedec_id(dev, &dev->jedec_id);
                 retries++;
             } while (res < 0 && retries < MTD_POWER_UP_WAIT_FOR_ID);

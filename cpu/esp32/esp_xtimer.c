@@ -28,13 +28,13 @@
 
 #include "esp_attr.h"
 #include "irq_arch.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "rom/ets_sys.h"
 
 struct _ets_to_xtimer {
     ETSTimer   *ets_timer;
-    xtimer_t   xtimer;
+    ztimer_t xtimer;
 };
 
 /* maximum number of ETS timer to xtimer mapper objects */
@@ -146,7 +146,7 @@ void ets_timer_arm_us(ETSTimer *timer, uint32_t tmout, bool repeat)
     CHECK_PARAM(e2xt != NULL);
     CHECK_PARAM(e2xt->xtimer.callback != NULL);
 
-    xtimer_set(&e2xt->xtimer, tmout);
+    ztimer_set(ZTIMER_USEC, &e2xt->xtimer, tmout);
 
     e2xt->ets_timer->timer_expire = e2xt->xtimer.start_time + e2xt->xtimer.offset;
     e2xt->ets_timer->timer_period = repeat ? tmout : 0;
@@ -165,7 +165,7 @@ void ets_timer_disarm(ETSTimer *timer)
 
     CHECK_PARAM(e2xt != NULL);
 
-    xtimer_remove(&e2xt->xtimer);
+    ztimer_remove(ZTIMER_USEC, &e2xt->xtimer);
 }
 
 void ets_timer_init(void)

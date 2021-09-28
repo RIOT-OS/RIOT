@@ -894,7 +894,7 @@ static void _start_ack_timer(at86rf215_t *dev)
     dev->timer.arg = dev;
     dev->timer.callback = _ack_timeout_cb;
 
-    xtimer_set(&dev->timer, dev->ack_timeout_usec);
+    ztimer_set(ZTIMER_USEC, &dev->timer, dev->ack_timeout_usec);
 }
 
 /* wake up the radio thread after CSMA backoff period */
@@ -922,7 +922,7 @@ static void _start_backoff_timer(at86rf215_t *dev)
     dev->timer.arg = dev;
     dev->timer.callback = _backoff_timeout_cb;
 
-    xtimer_set(&dev->timer, csma_backoff_usec);
+    ztimer_set(ZTIMER_USEC, &dev->timer, csma_backoff_usec);
 }
 
 static inline bool _ack_frame_received(at86rf215_t *dev)
@@ -1225,7 +1225,7 @@ static void _isr(netdev_t *netdev)
 
         if (_ack_frame_received(dev)) {
             timeout = 0;
-            xtimer_remove(&dev->timer);
+            ztimer_remove(ZTIMER_USEC, &dev->timer);
             _tx_end(dev, NETDEV_EVENT_TX_COMPLETE);
             at86rf215_rf_cmd(dev, CMD_RF_RX);
             break;

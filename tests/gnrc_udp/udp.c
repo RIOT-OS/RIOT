@@ -29,7 +29,7 @@
 #include "net/gnrc/pktdump.h"
 #include "timex.h"
 #include "utlist.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define SERVER_MSG_QUEUE_SIZE   (8U)
 #define SERVER_PRIO             (THREAD_PRIORITY_MAIN - 1)
@@ -160,7 +160,7 @@ static void send(char *addr_str, char *port_str, char *data_len_str, unsigned in
          * => use original variable for output */
         printf("Success: send %u byte to [%s]:%u\n", (unsigned)data_len, addr_str,
                port);
-        xtimer_usleep(delay);
+        ztimer_sleep(ZTIMER_USEC, delay);
     }
 }
 

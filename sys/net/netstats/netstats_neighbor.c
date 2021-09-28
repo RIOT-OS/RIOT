@@ -22,7 +22,7 @@
 #include "net/l2util.h"
 #include "net/netdev.h"
 #include "net/netstats/neighbor.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -66,7 +66,7 @@ static void half_freshness(netstats_nb_t *stats, uint16_t now_sec)
 
 static void incr_freshness(netstats_nb_t *stats)
 {
-    uint16_t now = xtimer_now_usec() / US_PER_SEC;;
+    uint16_t now = ztimer_now(ZTIMER_USEC) / US_PER_SEC;;
 
     /* First halve the freshness if applicable */
     half_freshness(stats, now);
@@ -81,7 +81,7 @@ static void incr_freshness(netstats_nb_t *stats)
 
 static bool isfresh(netstats_nb_t *stats)
 {
-    uint16_t now = xtimer_now_usec() / US_PER_SEC;
+    uint16_t now = ztimer_now(ZTIMER_USEC) / US_PER_SEC;
 
     /* Half freshness if applicable to update to current freshness */
     half_freshness(stats, now);
@@ -148,7 +148,7 @@ static netstats_nb_t *netstats_nb_get_or_create(netif_t *dev, const uint8_t *l2_
 {
     netstats_nb_t *old_entry = NULL;
     netstats_nb_t *stats = dev->neighbors.pstats;
-    uint16_t now = xtimer_now_usec() / US_PER_SEC;
+    uint16_t now = ztimer_now(ZTIMER_USEC) / US_PER_SEC;
 
     for (int i = 0; i < NETSTATS_NB_SIZE; i++) {
 
@@ -202,7 +202,7 @@ void netstats_nb_record(netif_t *dev, const uint8_t *l2_addr, uint8_t len)
         dev->neighbors.stats_queue[idx] = NULL;
     } else {
         dev->neighbors.stats_queue[idx] = netstats_nb_get_or_create(dev, l2_addr, len);
-        dev->neighbors.stats_queue_time_tx[idx] = xtimer_now_usec();
+        dev->neighbors.stats_queue_time_tx[idx] = ztimer_now(ZTIMER_USEC);
     }
 
 out:
@@ -347,7 +347,7 @@ static void netstats_nb_incr_count_rx(netstats_nb_t *stats)
 netstats_nb_t *netstats_nb_update_tx(netif_t *dev, netstats_nb_result_t result,
                                      uint8_t transmissions)
 {
-    uint32_t now = xtimer_now_usec();
+    uint32_t now = ztimer_now(ZTIMER_USEC);
     netstats_nb_t *stats;
     uint32_t time_tx = 0;
 

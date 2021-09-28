@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "thread.h"
 #include "msg.h"
 #include "log.h"
@@ -51,7 +51,7 @@ char slacker_stack2[THREAD_STACKSIZE_DEFAULT];
 char worker_stack[THREAD_STACKSIZE_MAIN];
 
 struct timer_msg {
-    xtimer_t timer;
+    ztimer_t timer;
     uint32_t interval;
     msg_t msg;
 };
@@ -78,11 +78,12 @@ void *slacker_thread(void *arg)
         msg_receive(&m);
         struct timer_msg *tmsg = m.content.ptr;
         xtimer_now_timex(&now);
-        xtimer_usleep(TEST_MSG_RX_USLEEP);
+        ztimer_sleep(ZTIMER_USEC, TEST_MSG_RX_USLEEP);
 
         tmsg->msg.type = 12345;
         tmsg->msg.content.ptr = tmsg;
-        xtimer_set_msg(&tmsg->timer, tmsg->interval, &tmsg->msg, thread_getpid());
+        ztimer_set_msg(ZTIMER_USEC, &tmsg->timer, tmsg->interval, &tmsg->msg,
+                       thread_getpid());
     }
 }
 
@@ -94,7 +95,7 @@ void *worker_thread(void *arg)
     /* Calculate interval based on possible precision when 'XTIMER_SHIFT > 0',
      * to apply precision loss to expected interval length.
      * test_interval != TEST_INTERVAL */
-    uint32_t test_interval = xtimer_usec_from_ticks(xtimer_ticks_from_usec(TEST_INTERVAL));
+    uint32_t test_interval = xtimer_ticks_from_usec(TEST_INTERVAL);
     uint32_t loop_counter = 0;
     uint32_t start = 0;
     uint32_t last = 0;
@@ -105,8 +106,8 @@ void *worker_thread(void *arg)
         msg_t m;
         msg_receive(&m);
 
-        xtimer_ticks32_t ticks = xtimer_now();
-        uint32_t now = xtimer_usec_from_ticks(ticks);
+        uint32_t ticks = ztimer_now(ZTIMER_USEC);
+        uint32_t now = ticks;
 
         if (start == 0) {
             start = now;
@@ -172,9 +173,9 @@ int main(void)
                                       worker_thread, NULL, "worker");
 
     puts("[START]\n");
-    xtimer_ticks32_t last_wakeup = xtimer_now();
+    uint32_t last_wakeup = ztimer_now(ZTIMER_USEC);
     while (1) {
-        xtimer_periodic_wakeup(&last_wakeup, TEST_INTERVAL);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &last_wakeup, TEST_INTERVAL);
         msg_try_send(&m, pid3);
     }
 }

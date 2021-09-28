@@ -29,7 +29,7 @@
 #include "periph_conf.h"
 #include "periph/rtc.h"
 #include "periph/rtc_mem.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define PERIOD              (2U)
 #define REPEAT              (4U)
@@ -180,7 +180,7 @@ int main(void)
     }
 
     /* verify alarm has been cleared */
-    xtimer_sleep(PERIOD);
+    ztimer_sleep(ZTIMER_MSEC, PERIOD * 1000);
 
     const char *message;
     if (mutex_trylock(&rtc_mtx)) {

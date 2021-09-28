@@ -21,7 +21,7 @@
 #include <stdio.h>
 
 #include "dbgpin.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define TICK_MS         5U
 
@@ -32,18 +32,18 @@ int main(void)
     for (unsigned p = 0; p < dbgpin_count(); p++) {
         printf("Testing pin %u\n", p);
         dbgpin_set(p);
-        xtimer_msleep(TICK_MS);
+        ztimer_sleep(ZTIMER_MSEC, TICK_MS);
         dbgpin_clear(p);
-        xtimer_msleep(TICK_MS);
+        ztimer_sleep(ZTIMER_MSEC, TICK_MS);
         dbgpin_toggle(p);
-        xtimer_msleep(2 * TICK_MS);
+        ztimer_sleep(ZTIMER_MSEC, 2 * TICK_MS);
         dbgpin_toggle(p);
-        xtimer_msleep(TICK_MS);
+        ztimer_sleep(ZTIMER_MSEC, TICK_MS);
         dbgpin_pulse(p);
-        xtimer_msleep(TICK_MS);
+        ztimer_sleep(ZTIMER_MSEC, TICK_MS);
         for (unsigned i = 2; i <= 5; i++) {
             dbgpin_signal(p, i);
-            xtimer_msleep(TICK_MS);
+            ztimer_sleep(ZTIMER_MSEC, TICK_MS);
         }
     }
 

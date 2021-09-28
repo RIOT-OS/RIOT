@@ -23,7 +23,7 @@
 #define SDP3X_H
 
 #include "saul.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "mutex.h"
 #include "periph/i2c.h"
 #include "periph/gpio.h"
@@ -160,7 +160,7 @@ int8_t sdp3x_read_single_measurement(sdp3x_t *dev, uint8_t flags,
  *
  *  @return                  0 if measurement stopped
  */
-int8_t sdp3x_stop_continuous(sdp3x_t *dev, xtimer_t *continuous_timer);
+int8_t sdp3x_stop_continuous(sdp3x_t *dev, ztimer_t *continuous_timer);
 
 /**
  *  @brief  Resets all I2C devices

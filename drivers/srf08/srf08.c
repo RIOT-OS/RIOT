@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "periph/i2c.h"
 
 #include "srf08.h"
@@ -107,7 +107,7 @@ int srf08_get_distances(const srf08_t *dev, uint16_t *range_array,
         return -2;
     }
 
-    xtimer_usleep(70000);
+    ztimer_sleep(ZTIMER_USEC, 70000);
 
     /* read all echo buffers */
     for (register_location = 2; register_location < max_reg_no_read;

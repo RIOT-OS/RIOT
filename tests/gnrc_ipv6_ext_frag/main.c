@@ -41,7 +41,7 @@
 #include "random.h"
 #include "shell.h"
 #include "test_utils/expect.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define TEST_SAMPLE         "This is a test. Failure might sometimes be an " \
                             "option, but not today. "

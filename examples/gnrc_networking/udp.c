@@ -34,7 +34,7 @@
 #if IS_USED(MODULE_ZTIMER_MSEC)
 #include "ztimer.h"
 #else
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 
 static gnrc_netreg_entry_t server =
@@ -108,7 +108,7 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
 #if IS_USED(MODULE_ZTIMER_MSEC)
         ztimer_sleep(ZTIMER_MSEC, delay);
 #else
-        xtimer_usleep(delay);
+        ztimer_sleep(ZTIMER_USEC, delay);
 #endif
     }
 }

@@ -32,7 +32,7 @@
 #include "thread.h"
 #include "thread_flags.h"
 #include "net/bluetil/ad.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "nimble_l2cap_test_conf.h"
 
@@ -237,7 +237,7 @@ static int _cmd_inctest(int argc, char **argv)
     /* send out packets with increasing payload size */
     thread_flags_clear(FLAG_SYNC);
     uint32_t seq = 0;
-    uint32_t time = xtimer_now_usec();
+    uint32_t time = ztimer_now(ZTIMER_USEC);
     for (size_t i = 8; i < limit; i += step) {
         _send(TYPE_INCTEST, ++seq, i);
         thread_flags_wait_all(FLAG_SYNC);
@@ -247,7 +247,7 @@ static int _cmd_inctest(int argc, char **argv)
             expect(0);
         }
     }
-    time = (xtimer_now_usec() - time);
+    time = (ztimer_now(ZTIMER_USEC) - time);
     puts("# TEST COMPLETE");
     printf("-> runtime: %ums\n", (unsigned)(time / 1000));
     return 0;
@@ -280,7 +280,7 @@ static int _cmd_floodtest(int argc, char **argv)
 
     /* now lets flood */
     uint32_t seq = 0;
-    uint32_t time = xtimer_now_usec();
+    uint32_t time = ztimer_now(ZTIMER_USEC);
     unsigned sum = 0;
     for (unsigned i = 0; i < limit; i++) {
         _send(TYPE_FLOODING, ++seq, pktsize);
@@ -291,7 +291,7 @@ static int _cmd_floodtest(int argc, char **argv)
      * the throughput calculation */
     sum += pktsize;
     while (_last_rx_seq != seq) {}
-    time = (xtimer_now_usec() - time);
+    time = (ztimer_now(ZTIMER_USEC) - time);
     puts("# TEST COMPLETE");
     printf("-> runtime: %ums\n", (unsigned)(time / 1000));
     printf("-> ~ %u bytes/s\n", (unsigned)((sum * 1000) / (time / 1000)));

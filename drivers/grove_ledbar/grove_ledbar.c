@@ -23,7 +23,7 @@
 #include <string.h>
 
 #include "log.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "grove_ledbar.h"
 #include "my9221.h"

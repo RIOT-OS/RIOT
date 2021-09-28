@@ -27,7 +27,7 @@
 #include "iolist.h"
 #include "irq.h"
 #include "net/netdev.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "gnrc_netif_nrf24l01p_ng.h"
 #include "nrf24l01p_ng_constants.h"
@@ -62,9 +62,9 @@ static inline
 void _trigger_send(const nrf24l01p_ng_t *dev)
 {
     gpio_set(dev->params.pin_ce);
-    xtimer_usleep(NRF24L01P_NG_DELAY_US_CE_HIGH_PULSE);
+    ztimer_sleep(ZTIMER_USEC, NRF24L01P_NG_DELAY_US_CE_HIGH_PULSE);
     gpio_clear(dev->params.pin_ce);
-    xtimer_usleep(NRF24L01P_NG_DELAY_US_TX_SETTLING);
+    ztimer_sleep(ZTIMER_USEC, NRF24L01P_NG_DELAY_US_TX_SETTLING);
 }
 
 static int _assert_awake(const nrf24l01p_ng_t *dev)

@@ -24,7 +24,7 @@
 #include "log.h"
 #include "motor_driver.h"
 #include "test_utils/expect.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 /* set interval to 20 milli-second */
 #define INTERVAL (3000 * US_PER_MS)
@@ -71,7 +71,7 @@ void motion_control(void)
 {
     int8_t dir = 1;
     int ret = 0;
-    xtimer_ticks32_t last_wakeup /*, start*/;
+    uint32_t last_wakeup;
     int32_t pwm_res = motor_driver_config[MOTOR_DRIVER_DEV(0)].pwm_resolution;
 
     ret = motor_driver_init(MOTOR_DRIVER_DEV(0));
@@ -82,28 +82,28 @@ void motion_control(void)
 
     for (;;) {
         /* BRAKE - duty cycle 100% */
-        last_wakeup = xtimer_now();
+        last_wakeup = ztimer_now(ZTIMER_USEC);
         motors_brake();
-        xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &last_wakeup, INTERVAL);
 
         /* CW - duty cycle 50% */
-        last_wakeup = xtimer_now();
+        last_wakeup = ztimer_now(ZTIMER_USEC);
         motors_control(dir * pwm_res / 2);
-        xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &last_wakeup, INTERVAL);
 
         /* Disable motor during INTERVAL µs (motor driver must have enable
            feature */
-        last_wakeup = xtimer_now();
+        last_wakeup = ztimer_now(ZTIMER_USEC);
         motor_disable(MOTOR_DRIVER_DEV(0), MOTOR_0_ID);
         motor_disable(MOTOR_DRIVER_DEV(0), MOTOR_1_ID);
-        xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &last_wakeup, INTERVAL);
         motor_enable(MOTOR_DRIVER_DEV(0), MOTOR_0_ID);
         motor_enable(MOTOR_DRIVER_DEV(0), MOTOR_1_ID);
 
         /* CW - duty cycle 100% */
-        last_wakeup = xtimer_now();
+        last_wakeup = ztimer_now(ZTIMER_USEC);
         motors_control(dir * pwm_res);
-        xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
+        ztimer_periodic_wakeup(ZTIMER_USEC, &last_wakeup, INTERVAL);
 
         /* Reverse direction */
         dir = dir * -1;

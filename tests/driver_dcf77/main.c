@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "mutex.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "dcf77_params.h"
 #include "dcf77.h"

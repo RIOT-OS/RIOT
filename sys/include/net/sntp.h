@@ -28,7 +28,7 @@
 
 #include "net/ntp_packet.h"
 #include "net/sock/udp.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,7 +59,7 @@ int64_t sntp_get_offset(void);
  */
 static inline uint64_t sntp_get_unix_usec(void)
 {
-    return (uint64_t)(sntp_get_offset() - (NTP_UNIX_OFFSET * US_PER_SEC) + xtimer_now_usec64());
+    return (uint64_t)(sntp_get_offset() - (NTP_UNIX_OFFSET * US_PER_SEC) + ztimer_now64());
 }
 
 #ifdef __cplusplus

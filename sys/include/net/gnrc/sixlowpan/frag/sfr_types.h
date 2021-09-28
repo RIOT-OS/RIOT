@@ -24,7 +24,7 @@
 #include "clist.h"
 #include "evtimer_msg.h"
 #include "msg.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifdef __cplusplus
 extern "C" {

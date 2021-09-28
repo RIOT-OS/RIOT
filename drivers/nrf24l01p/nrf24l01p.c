@@ -19,7 +19,7 @@
 #include "mutex.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "thread.h"
 #include "msg.h"
 
@@ -191,7 +191,7 @@ int nrf24l01p_on(const nrf24l01p_t *dev)
     nrf24l01p_read_reg(dev, REG_CONFIG, &read);
     status = nrf24l01p_write_reg(dev, REG_CONFIG, (read | PWR_UP));
 
-    xtimer_usleep(DELAY_CHANGE_PWR_MODE_US);
+    ztimer_sleep(ZTIMER_USEC, DELAY_CHANGE_PWR_MODE_US);
 
     return status;
 }
@@ -204,7 +204,7 @@ int nrf24l01p_off(const nrf24l01p_t *dev)
     nrf24l01p_read_reg(dev, REG_CONFIG, &read);
     status = nrf24l01p_write_reg(dev, REG_CONFIG, (read & ~PWR_UP));
 
-    xtimer_usleep(DELAY_CHANGE_PWR_MODE_US);
+    ztimer_sleep(ZTIMER_USEC, DELAY_CHANGE_PWR_MODE_US);
 
     return status;
 }
@@ -212,7 +212,7 @@ int nrf24l01p_off(const nrf24l01p_t *dev)
 void nrf24l01p_transmit(const nrf24l01p_t *dev)
 {
     gpio_set(dev->ce);
-    xtimer_usleep(DELAY_CE_HIGH_US); /* at least 10 us high */
+    ztimer_sleep(ZTIMER_USEC, DELAY_CE_HIGH_US); /* at least 10 us high */
     gpio_clear(dev->ce);
 
     xtimer_spin(DELAY_CHANGE_TXRX_TICKS);
@@ -254,7 +254,7 @@ void nrf24l01p_get_id(const nrf24l01p_t *dev, unsigned int *pid)
 void nrf24l01p_start(const nrf24l01p_t *dev)
 {
     gpio_set(dev->ce);
-    xtimer_usleep(DELAY_CE_START_US);
+    ztimer_sleep(ZTIMER_USEC, DELAY_CE_START_US);
 }
 
 void nrf24l01p_stop(const nrf24l01p_t *dev)
@@ -633,7 +633,7 @@ int nrf24l01p_set_txmode(const nrf24l01p_t *dev)
     conf &= ~(PRIM_RX);
     status = nrf24l01p_write_reg(dev, REG_CONFIG, conf);
 
-    xtimer_usleep(DELAY_CHANGE_TXRX_US);
+    ztimer_sleep(ZTIMER_USEC, DELAY_CHANGE_TXRX_US);
 
     return status;
 }
@@ -654,7 +654,7 @@ int nrf24l01p_set_rxmode(const nrf24l01p_t *dev)
 
     nrf24l01p_start(dev);
 
-    xtimer_usleep(DELAY_CHANGE_TXRX_US);
+    ztimer_sleep(ZTIMER_USEC, DELAY_CHANGE_TXRX_US);
 
     return status;
 }

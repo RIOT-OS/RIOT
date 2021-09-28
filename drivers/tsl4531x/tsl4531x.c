@@ -29,7 +29,7 @@
 #include "log.h"
 #include "tsl4531x.h"
 #include "tsl4531x_internals.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -127,7 +127,7 @@ int tsl4531x_set_low_power_mode(tsl4531x_t *dev, uint8_t low_power_mode)
     /* In high power mode only, we restart the sample ready timer, because only
        in this mode it's used to indicate readiness after startup. */
     if (!dev->low_power_mode) {
-        dev->sample_start_time = xtimer_now_usec();
+        dev->sample_start_time = ztimer_now(ZTIMER_USEC);
     }
 
     return 0;
@@ -159,7 +159,7 @@ int tsl4531x_start_sample(tsl4531x_t *dev)
 
         i2c_release(dev->i2c_dev);
 
-        dev->sample_start_time = xtimer_now_usec();
+        dev->sample_start_time = ztimer_now(ZTIMER_USEC);
     }
 
     return 0;
@@ -170,7 +170,7 @@ uint32_t tsl4531x_time_until_sample_ready(tsl4531x_t *dev)
     assert(dev);
 
     uint32_t t = TSL4531X_GET_INTEGRATION_TIME_USEC(dev->integration_time, TSL4531X_PSAVESKIP_ON) -
-                 (xtimer_now_usec() - dev->sample_start_time);
+                 (ztimer_now(ZTIMER_USEC) - dev->sample_start_time);
 
     /* Clamp t at zero */
     t = (t <= TSL4531X_GET_INTEGRATION_TIME_USEC(dev->integration_time, TSL4531X_PSAVESKIP_ON) ?
@@ -223,7 +223,7 @@ int tsl4531x_simple_read(tsl4531x_t *dev)
         tsl4531x_start_sample(dev);
     }
 
-    xtimer_usleep(tsl4531x_time_until_sample_ready(dev));
+    ztimer_sleep(ZTIMER_USEC, tsl4531x_time_until_sample_ready(dev));
 
     return tsl4531x_get_sample(dev);
 }

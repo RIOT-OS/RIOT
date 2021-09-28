@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "timex.h"
 
 #define RUNS                (5U)
@@ -61,7 +61,7 @@ int main(void)
 
     printf("Running test %u times with %u distinct sleep times\n", RUNS,
            (unsigned)SLEEP_TIMES_NUMOF);
-    start_test = xtimer_now_usec();
+    start_test = ztimer_now(ZTIMER_USEC);
     for (unsigned m = 0; m < RUNS; m++) {
         for (unsigned n = 0;
              n < ARRAY_SIZE(sleep_times);
@@ -70,17 +70,17 @@ int main(void)
             uint32_t start_sleep, diff;
             int32_t err;
 
-            start_sleep = xtimer_now_usec();
+            start_sleep = ztimer_now(ZTIMER_USEC);
 
 #ifdef SLEEP_PIN
             gpio_set(sleep_pin);
 #endif
-            xtimer_usleep(sleep_times[n]);
+            ztimer_sleep(ZTIMER_USEC, sleep_times[n]);
 #ifdef SLEEP_PIN
             gpio_clear(sleep_pin);
 #endif
 
-            diff = xtimer_now_usec() - start_sleep;
+            diff = ztimer_now(ZTIMER_USEC) - start_sleep;
 
             err = diff - sleep_times[n];
 
@@ -88,7 +88,7 @@ int main(void)
                    "Offset: %" PRIi32 " us\n", diff, sleep_times[n], err);
         }
     }
-    testtime = xtimer_now_usec() - start_test;
+    testtime = ztimer_now(ZTIMER_USEC) - start_test;
     printf("Test ran for %" PRIu32 " us\n", testtime);
 
     return 0;

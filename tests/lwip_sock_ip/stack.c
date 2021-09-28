@@ -23,7 +23,7 @@
 #include "net/sock.h"
 #include "sched.h"
 #include "test_utils/expect.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "lwip.h"
 #include "lwip/ip4.h"
@@ -181,7 +181,7 @@ void _net_init(void)
 #endif
     netif_set_default(&netif);
     lwip_bootstrap();
-    xtimer_sleep(3);    /* Let the auto-configuration run warm */
+    ztimer_sleep(ZTIMER_MSEC, 3 * 1000);    /* Let the auto-configuration run warm */
 }
 
 void _prepare_send_checks(void)

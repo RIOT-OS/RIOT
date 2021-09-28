@@ -25,7 +25,7 @@
 #include "net/sock/tcp.h"
 #include "paho_mqtt.h"
 #include "MQTTClient.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "tsrb.h"
 #include "log.h"
 
@@ -215,7 +215,7 @@ void *mqtt_riot_run(void *arg)
         }
         MutexUnlock(&client->mutex);
         /* let other threads do their work */
-        xtimer_msleep(MQTT_YIELD_POLLING_MS);
+        ztimer_sleep(ZTIMER_MSEC, MQTT_YIELD_POLLING_MS);
     }
     return NULL;
 }

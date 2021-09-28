@@ -25,7 +25,7 @@
 #include "string.h"
 #include "hsc.h"
 #include "hsc_params.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define SLEEP_USEC  (1UL * US_PER_SEC)
 
@@ -34,7 +34,7 @@ int main(void)
     hsc_t dev;
     int retval;
 
-    xtimer_usleep(SLEEP_USEC);
+    ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
 
     puts("HSC test application\n");
 
@@ -49,7 +49,7 @@ int main(void)
                 puts("Initialization failed");
             }
         }
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
     } while (retval);
 
     puts("Initialization successful\n");
@@ -72,7 +72,7 @@ int main(void)
         printf("Measured pressure is %" PRId32 "ubar\n", pressure);
         printf("    Measured temp is %d.%d °C\n", temperature/10, temperature%10);
 
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
     }
 
     return 0;

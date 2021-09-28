@@ -23,7 +23,7 @@
 #include "itg320x.h"
 
 #include "log.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -221,7 +221,7 @@ int itg320x_power_up(itg320x_t *dev)
     EXEC_RET(_update_reg(dev, ITG320X_REG_PWR_MGM, ITG320X_REG_PWR_MGM_SLEEP, 0));
 
     /* wait 20 ms after power-up */
-    xtimer_msleep(20);
+    ztimer_sleep(ZTIMER_MSEC, 20);
 
     return ITG320X_OK;
 }
@@ -238,7 +238,7 @@ static int _reset(itg320x_t *dev)
     EXEC_RET(_update_reg(dev, ITG320X_REG_PWR_MGM, ITG320X_REG_PWR_MGM_H_RESET, 1));
 
     /* wait 20 ms after reset */
-    xtimer_msleep(20);
+    ztimer_sleep(ZTIMER_MSEC, 20);
 
     return ITG320X_OK;
 }

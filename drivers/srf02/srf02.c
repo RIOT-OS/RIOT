@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "srf02.h"
 #include "periph/i2c.h"
 
@@ -107,7 +107,7 @@ uint16_t srf02_get_distance(const srf02_t *dev, srf02_mode_t mode)
     /* trigger a new reading */
     srf02_trigger(dev, mode);
     /* give the sensor the required time for sampling */
-    xtimer_usleep(SRF02_RANGE_DELAY);
+    ztimer_sleep(ZTIMER_USEC, SRF02_RANGE_DELAY);
     /* get the results */
     return srf02_read(dev);
 }

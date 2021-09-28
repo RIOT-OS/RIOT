@@ -24,7 +24,7 @@
 #include "log.h"
 #include "mutex.h"
 #include "sched.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "byteorder.h"
 #include "thread_flags.h"
 
@@ -55,7 +55,7 @@ static emcute_sub_t *subs = NULL;
 
 static mutex_t txlock;
 
-static xtimer_t timer;
+static ztimer_t timer;
 static uint16_t id_next = 0x1234;
 static volatile uint8_t waiton = 0xff;
 static volatile uint16_t waitonid = 0;
@@ -106,11 +106,11 @@ static int syncsend(uint8_t resp, size_t len, bool unlock)
         DEBUG("[emcute] syncsend: sending round %i\n", retries);
         sock_udp_send(&sock, tbuf, len, &gateway);
 
-        xtimer_set(&timer, (CONFIG_EMCUTE_T_RETRY * US_PER_SEC));
+        ztimer_set(ZTIMER_USEC, &timer, (CONFIG_EMCUTE_T_RETRY * US_PER_SEC));
         thread_flags_t flags = thread_flags_wait_any(TFLAGS_ANY);
         if (flags & TFLAGS_RESP) {
             DEBUG("[emcute] syncsend: got response [%i]\n", result);
-            xtimer_remove(&timer);
+            ztimer_remove(ZTIMER_USEC, &timer);
             res = result;
             break;
         }
@@ -514,7 +514,7 @@ void emcute_run(uint16_t port, const char *id)
         return;
     }
 
-    uint32_t start = xtimer_now_usec();
+    uint32_t start = ztimer_now(ZTIMER_USEC);
     uint32_t t_out = (CONFIG_EMCUTE_KEEPALIVE * US_PER_SEC);
 
     while (1) {
@@ -561,7 +561,7 @@ void emcute_run(uint16_t port, const char *id)
             }
         }
 
-        uint32_t now = xtimer_now_usec();
+        uint32_t now = ztimer_now(ZTIMER_USEC);
         if ((now - start) >= (CONFIG_EMCUTE_KEEPALIVE * US_PER_SEC)) {
             send_ping();
             start = now;

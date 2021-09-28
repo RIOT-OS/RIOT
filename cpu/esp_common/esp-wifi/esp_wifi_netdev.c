@@ -25,7 +25,7 @@
 #include "net/ethernet.h"
 #include "net/netdev/eth.h"
 #include "od.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "esp_common.h"
 #include "esp_attr.h"

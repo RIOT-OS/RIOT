@@ -24,7 +24,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "thread.h"
 #include "msg.h"
 
@@ -34,7 +34,7 @@ char timer_stack[THREAD_STACKSIZE_DEFAULT];
 char timer_stack_local[THREAD_STACKSIZE_DEFAULT];
 
 struct timer_msg {
-    xtimer_t timer;
+    ztimer_t timer;
     uint32_t interval;
     char *text;
     msg_t msg;
@@ -61,7 +61,7 @@ void *timer_thread(void *arg)
         msg_t m;
         msg_receive(&m);
         struct timer_msg *tmsg = m.content.ptr;
-        uint32_t now = xtimer_now_usec();
+        uint32_t now = ztimer_now(ZTIMER_USEC);
         printf("now=%lu:%lu -> every %lu.%lus: %s\n",
                (now / US_PER_SEC),
                (now % US_PER_SEC),
@@ -71,7 +71,8 @@ void *timer_thread(void *arg)
 
         tmsg->msg.type = 12345;
         tmsg->msg.content.ptr = tmsg;
-        xtimer_set_msg(&tmsg->timer, tmsg->interval, &tmsg->msg, thread_getpid());
+        ztimer_set_msg(ZTIMER_USEC, &tmsg->timer, tmsg->interval, &tmsg->msg,
+                       thread_getpid());
     }
 }
 
@@ -85,7 +86,7 @@ void *timer_thread_local(void *arg)
         msg_t m;
         msg_receive(&m);
 
-        uint32_t now = xtimer_now_usec();
+        uint32_t now = ztimer_now(ZTIMER_USEC);
         int sec = now / US_PER_SEC;
         int min = sec / 60;
         int hr  = sec / 3600;
@@ -127,7 +128,7 @@ int main(void)
     expect(pid_is_valid(pid2));
 
     while (1) {
-        xtimer_sleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1 * 1000);
         msg_try_send(&m, pid2);
     }
 }

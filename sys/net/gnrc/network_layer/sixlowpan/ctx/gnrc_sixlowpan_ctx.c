@@ -21,7 +21,7 @@
 #include "ztimer.h"
 #include "timex.h"
 #else
-#include "xtimer.h"
+#include "ztimer.h"
 #endif
 
 #define ENABLE_DEBUG 0
@@ -139,7 +139,7 @@ static uint32_t _current_minute(void)
 #if IS_USED(MODULE_ZTIMER_MSEC)
     return ztimer_now(ZTIMER_MSEC) / (MS_PER_SEC * SEC_PER_MIN);
 #else
-    return xtimer_now_usec() / (US_PER_SEC * SEC_PER_MIN);
+    return ztimer_now(ZTIMER_USEC) / (US_PER_SEC * SEC_PER_MIN);
 #endif
 }
 

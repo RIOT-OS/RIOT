@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "timex.h"
 #include "ad7746.h"
 #include "ad7746_params.h"
@@ -84,7 +84,7 @@ int main(void)
             printf("Error reading internal temperature\n");
         }
         puts("");
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_USEC, SLEEP_USEC);
     }
 
     return 0;

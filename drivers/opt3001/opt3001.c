@@ -24,7 +24,7 @@
 #include "opt3001.h"
 #include "opt3001_regs.h"
 #include "periph/i2c.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "log.h"
 #include "byteorder.h"
 #include "math.h"
@@ -149,7 +149,7 @@ int opt3001_read_lux(const opt3001_t *dev, uint32_t *convl)
         }
 
         i2c_release(DEV_I2C);
-        xtimer_usleep(1000);
+        ztimer_sleep(ZTIMER_USEC, 1000);
         i2c_acquire(DEV_I2C);
 
         conversion_time += 1000;
