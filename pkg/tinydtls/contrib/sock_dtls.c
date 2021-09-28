@@ -813,7 +813,13 @@ static void _ep_to_session(const sock_udp_ep_t *ep, session_t *session)
     session->port = ep->port;
     session->size = sizeof(ipv6_addr_t) +       /* addr */
                     sizeof(unsigned short);     /* port */
-    session->ifindex = ep->netif;
+    if (ipv6_addr_is_link_local((ipv6_addr_t *)ep->addr.ipv6)) {
+        /* set ifindex for link-local addresses */
+        session->ifindex = ep->netif;
+    }
+    else {
+        session->ifindex = SOCK_ADDR_ANY_NETIF;
+    }
     memcpy(&session->addr, &ep->addr.ipv6, sizeof(ipv6_addr_t));
 }
 
