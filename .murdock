@@ -171,6 +171,7 @@ get_apps() {
 # take app dir as parameter, print all boards that are supported
 # Only print for boards in $BOARDS.
 get_supported_boards() {
+    BOARDS="native samr21-xpro esp32-wroom-32 nrf52dk"
     local appdir=$1
     local boards="$(make --no-print-directory -C$appdir info-boards-supported 2>/dev/null || echo broken)"
 
