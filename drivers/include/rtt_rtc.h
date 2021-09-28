@@ -28,7 +28,8 @@ extern "C" {
 #endif
 
 /**
- * @brief Set the time as epoch with sub-second precision
+ * @brief Set the time as epoch (elapsed seconds since @ref RIOT_EPOCH)
+ *        with sub-second precision
  *        This feature is an extension provided by the `rtt_rtc` module.
  *
  * @note The actual µs precision depends on the underlying hardware.
@@ -40,7 +41,8 @@ extern "C" {
 void rtt_rtc_settimeofday(uint32_t s, uint32_t us);
 
 /**
- * @brief Get the current epoch with sub-second precision
+ * @brief Get the current epoch (elapsed seconds since @ref RIOT_EPOCH)
+ *        with sub-second precision
  *        This feature is an extension provided by the `rtt_rtc` module.
  *
  * @note The actual µs precision depends on the underlying hardware.
