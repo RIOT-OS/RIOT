@@ -1,0 +1,13 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_SIFIVE_DRIVERS_FE310
+    bool
+    default y
+    depends on CPU_FAM_FE310
+    help
+        sifive drivers for fe310.
