@@ -20,4 +20,6 @@ config BOARD_E180_ZG120B_TB
     select HAS_EFM32_CORETEMP
     select HAS_RIOTBOOT
 
+    select HAVE_SAUL_GPIO
+
 source "$(RIOTBOARD)/common/silabs/Kconfig"
