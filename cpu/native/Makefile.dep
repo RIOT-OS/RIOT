@@ -29,6 +29,16 @@ ifneq (,$(filter native_cli_eui_provider,$(USEMODULE)))
   USEMODULE += l2util
 endif
 
+ifneq (,$(filter socket_zep,$(USEMODULE)))
+  USEMODULE += iolist
+  USEMODULE += checksum
+  USEMODULE += random
+  USEMODULE += ieee802154
+  ifneq (,$(filter netdev,$(USEMODULE)))
+    USEMODULE += netdev_ieee802154_submac
+  endif
+endif
+
 USEMODULE += periph
 
 # UART is needed by startup.c
