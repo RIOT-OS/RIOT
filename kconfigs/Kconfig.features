@@ -328,6 +328,11 @@ config HAS_PERIPH_UART_HW_FC
     help
         Indicates that the UART peripheral supports hardware flow control.
 
+config HAS_PERIPH_UART_RS485
+    bool
+    help
+        Indicates that the UART peripheral supports RS485 Data Enable control.
+
 config HAS_PERIPH_UART_MODECFG
     bool
     help

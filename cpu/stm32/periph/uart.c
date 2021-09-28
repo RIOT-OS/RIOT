@@ -128,6 +128,18 @@ static inline void uart_init_cts_pin(uart_t uart)
 }
 #endif
 
+#ifdef MODULE_PERIPH_UART_RS485
+static inline void uart_init_de_pin(uart_t uart)
+{
+    if (uart_config[uart].de_pin != GPIO_UNDEF) {
+        gpio_init(uart_config[uart].de_pin, GPIO_IN);
+#ifndef CPU_FAM_STM32F1
+        gpio_init_af(uart_config[uart].de_pin, uart_config[uart].de_af);
+#endif
+    }
+}
+#endif
+
 static inline void uart_init_pins(uart_t uart, uart_rx_cb_t rx_cb)
 {
      /* configure TX pin */
@@ -146,6 +158,9 @@ static inline void uart_init_pins(uart_t uart, uart_rx_cb_t rx_cb)
 #ifdef MODULE_PERIPH_UART_HW_FC
     uart_init_cts_pin(uart);
     uart_init_rts_pin(uart);
+#endif
+#ifdef MODULE_PERIPH_UART_RS485
+    uart_init_de_pin(uart);
 #endif
 }
 
@@ -214,6 +229,12 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
      * signal level flickers during initialization resulting in garbage being
      * sent. */
     uart_init_pins(uart, rx_cb);
+
+#ifdef MODULE_PERIPH_UART_RS485
+    if (uart_config[uart].de_pin != GPIO_UNDEF) {
+        dev(uart)->CR3 |= USART_CR3_DEM;
+    }
+#endif
 
 #ifdef MODULE_PERIPH_UART_HW_FC
     if (uart_config[uart].cts_pin != GPIO_UNDEF) {

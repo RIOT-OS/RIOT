@@ -678,6 +678,12 @@ typedef struct {
 #endif
     uint8_t bus;            /**< APB bus */
     uint8_t irqn;           /**< IRQ channel */
+#ifdef MODULE_PERIPH_UART_RS485
+    gpio_t de_pin;         /**< DE pin - set to GPIO_UNDEF when not using RS485 */
+#ifndef CPU_FAM_STM32F1
+    gpio_af_t de_af;       /**< alternate function for DE pin */
+#endif
+#endif
 #ifdef MODULE_PERIPH_UART_HW_FC
     gpio_t cts_pin;         /**< CTS pin - set to GPIO_UNDEF when not using HW flow control */
     gpio_t rts_pin;         /**< RTS pin */
