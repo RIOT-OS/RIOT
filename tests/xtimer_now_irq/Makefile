@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 TEST_ON_CI_BLACKLIST += all
 

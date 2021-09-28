@@ -5,7 +5,7 @@ USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_neterr
 USEMODULE += sock_udp
 USEMODULE += od
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 include $(RIOTBASE)/Makefile.include
 

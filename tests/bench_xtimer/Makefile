@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # this test uses 1000 timers by default. for boards that boards don't have
 # enough memory, reduce that to 100 or 20, unless NUMOF_TIMERS has been overridden.

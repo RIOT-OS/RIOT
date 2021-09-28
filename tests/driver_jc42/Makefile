@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += jc42
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # set default device parameters in case they are undefined
 TEST_I2C ?= 0

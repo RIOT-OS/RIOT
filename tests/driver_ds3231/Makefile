@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += ds3231
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 USEMODULE += shell
 
 #USEMODULE += ds3231_int

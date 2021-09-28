@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += adt7310
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # set default device parameters in case they are undefined
 TEST_ADT7310_SPI ?= SPI_DEV\(0\)

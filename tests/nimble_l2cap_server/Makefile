@@ -5,7 +5,7 @@ BOARD ?= nrf52dk
 include ../Makefile.tests_common
 
 # RIOT modules used in for this test
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 USEMODULE += bluetil_ad
 
 # Get the shared NimBLE and test configuration from the backend server

@@ -20,7 +20,7 @@ ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
 endif
 
 ifneq (,$(filter stdio_rtt,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter stdio_ethos,$(USEMODULE)))
@@ -45,7 +45,7 @@ ifneq (,$(filter stdio_uart,$(USEMODULE)))
 endif
 
 ifneq (,$(filter stdio_semihosting,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
   FEATURES_REQUIRED_ANY += cpu_core_cortexm|arch_riscv
 endif
 

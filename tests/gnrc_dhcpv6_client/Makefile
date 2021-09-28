@@ -12,7 +12,7 @@ USEMODULE += dhcpv6_client_ia_pd
 USEMODULE += dhcpv6_client_ia_na
 USEMODULE += gnrc_dhcpv6_client
 USEMODULE += gnrc_ipv6_default
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 ifneq (,$(filter native,$(BOARD)))
   # Has to be provided here and not in Makefile.dep, so TERMFLAGS are properly
   # configured

@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 USEMODULE += srf02
 USEMODULE += shell
 

@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += adc081c
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # set alert parameters in case they are undefined
 TEST_ADCXX1C_LOW_LIMIT     ?= 90

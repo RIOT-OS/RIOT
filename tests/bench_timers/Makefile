@@ -23,7 +23,7 @@ FEATURES_OPTIONAL = periph_rtt
 USEMODULE += random
 USEMODULE += fmt
 USEMODULE += matstat
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 ifeq (,$(findstring TIM_TEST_DEV,$(CFLAGS)))
   ifneq (,$(filter $(BOARD),$(SINGLE_TIMER_BOARDS)))

@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_pwm
 
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 USEMODULE += shell
 
 include $(RIOTBASE)/Makefile.include

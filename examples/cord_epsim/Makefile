@@ -16,7 +16,7 @@ USEMODULE += gnrc_ipv6_default
 USEMODULE += cord_epsim
 
 # We also use the xtimer for periodic RD entry updates in this example
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the

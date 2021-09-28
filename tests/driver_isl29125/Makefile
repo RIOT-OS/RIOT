@@ -4,6 +4,6 @@ BOARD ?= samr21-xpro
 include ../Makefile.tests_common
 
 USEMODULE += isl29125
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 include $(RIOTBASE)/Makefile.include

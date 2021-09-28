@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += mq3
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # set default device parameters in case they are undefined
 MQ3_ADC_LINE  ?= ADC_LINE\(0\)

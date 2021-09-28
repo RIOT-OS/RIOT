@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 # Modules to include.
 USEMODULE += pthread
 USEMODULE += random
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # The test compiles, but these boards have too little RAM for
 # dynamic allocation of thread stacks

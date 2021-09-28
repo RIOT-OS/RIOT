@@ -4,7 +4,7 @@ PICOLIBC ?= 0
 ifneq (0,$(PICOLIBC))
   FEATURES_REQUIRED += picolibc
 endif
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 include $(RIOTBASE)/Makefile.include
 

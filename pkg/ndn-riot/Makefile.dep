@@ -1,7 +1,7 @@
 USEMODULE += ndn-encoding
 USEMODULE += gnrc
 USEMODULE += gnrc_nettype_ndn
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 USEMODULE += random
 USEMODULE += hashes
 USEPKG += micro-ecc

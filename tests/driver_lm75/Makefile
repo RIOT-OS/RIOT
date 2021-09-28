@@ -3,6 +3,6 @@ include ../Makefile.tests_common
 DRIVER ?= tmp1075
 
 USEMODULE += $(DRIVER)
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 include $(RIOTBASE)/Makefile.include

@@ -3,6 +3,6 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_qdec
 
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 include $(RIOTBASE)/Makefile.include

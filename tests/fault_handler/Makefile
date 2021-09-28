@@ -5,6 +5,6 @@ ifeq ($(shell uname),Darwin)
 CFLAGS += -Wno-language-extension-token
 endif
 
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 include $(RIOTBASE)/Makefile.include

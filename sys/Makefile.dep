@@ -73,7 +73,7 @@ ifneq (,$(filter rtt_cmd,$(USEMODULE)))
 endif
 
 ifneq (,$(filter trace,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter ssp,$(USEMODULE)))
@@ -90,7 +90,7 @@ endif
 
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   USEMODULE += random
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter dhcpv6_%,$(USEMODULE)))
@@ -137,7 +137,7 @@ endif
 
 ifneq (,$(filter sntp,$(USEMODULE)))
   USEMODULE += sock_udp
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
@@ -164,7 +164,7 @@ endif
 ifneq (,$(filter trickle,$(USEMODULE)))
   USEMODULE += random
   ifeq (,$(filter ztimer_msec,$(USEMODULE)))
-    USEMODULE += xtimer
+    USEMODULE += ztimer_usec
   endif
 endif
 
@@ -188,7 +188,7 @@ ifneq (,$(filter ipv6_hdr,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ieee802154_submac,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter l2util,$(USEMODULE)))
@@ -229,7 +229,7 @@ ifneq (,$(filter posix_select,$(USEMODULE)))
   endif
   USEMODULE += core_thread_flags
   USEMODULE += posix_headers
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter picolibc,$(USEMODULE)))
@@ -245,7 +245,7 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += vfs
   USEMODULE += posix_headers
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter shell,$(USEMODULE)))
@@ -261,7 +261,7 @@ endif
 
 ifneq (,$(filter isrpipe_read_timeout,$(USEMODULE)))
   USEMODULE += isrpipe
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter shell_commands,$(USEMODULE)))
@@ -296,7 +296,7 @@ endif
 
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
   USEMODULE += sema
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
   USEMODULE += posix_headers
 endif
 
@@ -320,7 +320,7 @@ endif
 
 ifneq (,$(filter fib,$(USEMODULE)))
   USEMODULE += universal_address
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
   USEMODULE += posix_headers
 endif
 
@@ -330,7 +330,7 @@ ifneq (,$(filter log_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
   USEMODULE += timex
   FEATURES_REQUIRED += cpp
   FEATURES_REQUIRED += libstdcpp
@@ -342,16 +342,16 @@ endif
 
 ifneq (,$(filter netstats_neighbor_%, $(USEMODULE)))
   USEMODULE += netstats_neighbor
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter pthread,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
   USEMODULE += timex
 endif
 
 ifneq (,$(filter schedstatistics,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
   USEMODULE += sched_cb
 endif
 
@@ -388,14 +388,14 @@ ifneq (,$(filter can,$(USEMODULE)))
 endif
 
 ifneq (,$(filter can_isotp,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
   USEMODULE += gnrc_pktbuf
 endif
 
 ifneq (,$(filter conn_can,$(USEMODULE)))
   USEMODULE += can
   USEMODULE += can_mbox
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter entropy_source_%,$(USEMODULE)))
@@ -421,7 +421,7 @@ ifneq (,$(filter random,$(USEMODULE)))
     USEMODULE += crypto
     ifneq (,$(filter fortuna_reseed,$(USEMODULE)))
         USEMODULE += atomic_utils
-        USEMODULE += xtimer
+        USEMODULE += ztimer_usec
     endif
   endif
 
@@ -461,7 +461,7 @@ endif
 ifneq (,$(filter emcute,$(USEMODULE)))
   USEMODULE += core_thread_flags
   USEMODULE += sock_udp
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter constfs,$(USEMODULE)))
@@ -523,7 +523,7 @@ ifneq (,$(filter event_timeout,$(USEMODULE)))
   ifneq (,$(filter event_timeout_ztimer,$(USEMODULE)))
     USEMODULE += ztimer_usec
   else
-    USEMODULE += xtimer
+    USEMODULE += ztimer_usec
   endif
 endif
 
@@ -569,7 +569,7 @@ ifneq (,$(filter nanocoap_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter benchmark,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter skald_%,$(USEMODULE)))
@@ -608,7 +608,7 @@ endif
 
 ifneq (,$(filter cord_ep_standalone,$(USEMODULE)))
   USEMODULE += cord_ep
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter cord_lc,$(USEMODULE)))
@@ -752,7 +752,7 @@ ifneq (,$(filter evtimer,$(USEMODULE)))
   ifneq (,$(filter evtimer_on_ztimer,$(USEMODULE)))
     USEMODULE += ztimer_msec
   else
-    USEMODULE += xtimer
+    USEMODULE += ztimer_usec
   endif
 endif
 

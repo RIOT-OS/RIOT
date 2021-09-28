@@ -34,7 +34,7 @@ QUIET ?= 1
 
 #USEMODULE += shell
 #USEMODULE += posix_headers
-#USEMODULE += xtimer
+#USEMODULE += ztimer_usec
 
 # If your application is very simple and doesn't use modules that use
 # messaging, it can be disabled to save some memory:

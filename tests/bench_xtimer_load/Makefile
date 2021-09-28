@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # configure benchmark frequency
 TEST_HZ ?= 64

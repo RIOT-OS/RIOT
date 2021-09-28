@@ -7,7 +7,7 @@ USEMODULE += sock_async_event
 USEMODULE += sock_ip
 USEMODULE += sock_udp
 USEMODULE += od
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 CFLAGS += -DSOCK_HAS_IPV6
 

@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # select if you want to build the SPI or the I2C version of the driver:
 USEMODULE += pn532_i2c

@@ -5,6 +5,6 @@ include ../Makefile.tests_common
 CXXEXFLAGS += -std=c++11
 
 USEMODULE += cpp11-compat
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 include $(RIOTBASE)/Makefile.include

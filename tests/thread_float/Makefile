@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += printf_float
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 #DISABLE_MODULE += cortexm_fpu
 

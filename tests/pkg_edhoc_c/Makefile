@@ -28,7 +28,7 @@ USEMODULE += nanocoap_sock
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # This is an optimized stack value based on testing, if you observe
 # a segmentation fault please increase this stack size.

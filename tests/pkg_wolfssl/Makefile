@@ -17,7 +17,7 @@ USEMODULE += wolfcrypt wolfcrypt-test wolfcrypt_sha512 \
 # Comment the following line to disable full-benchmark test
 USEMODULE += wolfcrypt-benchmark
 
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 ifneq ($(BOARD),native)
   CFLAGS += -DBENCH_EMBEDDED

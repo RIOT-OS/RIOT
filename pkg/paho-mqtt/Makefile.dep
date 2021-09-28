@@ -1,4 +1,4 @@
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 USEMODULE += paho-mqtt-contrib
 USEMODULE += paho-mqtt-packet
 USEMODULE += tsrb

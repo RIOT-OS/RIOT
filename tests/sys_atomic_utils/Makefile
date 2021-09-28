@@ -4,6 +4,6 @@ USEMODULE += atomic_utils
 USEMODULE += fmt
 USEMODULE += random
 USEMODULE += shell
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 include $(RIOTBASE)/Makefile.include

@@ -1,6 +1,6 @@
 USEMODULE += luid
 USEMODULE += netif
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan_default
 endif

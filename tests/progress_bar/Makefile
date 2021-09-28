@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 USEMODULE += progress_bar
 
 CONFIG_PROGRESS_BAR_LENGTH ?= 50

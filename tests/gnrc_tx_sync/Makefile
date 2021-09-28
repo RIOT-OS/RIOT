@@ -13,7 +13,7 @@ endif
 USEMODULE += gnrc_tx_sync
 USEMODULE += netdev_test
 USEMODULE += sock_udp
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += iolist
 

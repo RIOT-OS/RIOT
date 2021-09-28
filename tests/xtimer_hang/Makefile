@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 DISABLE_MODULE := core_msg
 
 # Port and pin configuration for probing with oscilloscope

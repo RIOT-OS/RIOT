@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += hih6130
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # set default device parameters in case they are undefined
 TEST_HIH6130_I2C  ?= I2C_DEV\(0\)

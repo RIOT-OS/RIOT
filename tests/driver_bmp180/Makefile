@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += bmp180
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # set default altitude
 TEST_ALTITUDE ?= 158 # altitude in Polytechnique School campus

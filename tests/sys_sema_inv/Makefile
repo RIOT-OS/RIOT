@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
 USEMODULE += sema_inv
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 include $(RIOTBASE)/Makefile.include

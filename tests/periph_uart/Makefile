@@ -6,7 +6,7 @@ FEATURES_OPTIONAL += periph_uart_modecfg
 FEATURES_OPTIONAL += periph_uart_rxstart_irq
 
 USEMODULE += shell
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # avoid running Kconfig by default
 SHOULD_RUN_KCONFIG ?=

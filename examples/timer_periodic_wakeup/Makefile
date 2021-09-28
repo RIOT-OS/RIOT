@@ -1,7 +1,7 @@
 APPLICATION = timer_periodic_wakeup
 RIOTBASE ?= $(CURDIR)/../..
 BOARD ?= native
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 QUIET ?= 1
 
 # Comment this out to disable code in RIOT that does safety checking

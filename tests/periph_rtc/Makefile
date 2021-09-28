@@ -6,6 +6,6 @@ FEATURES_OPTIONAL += periph_rtc_mem
 
 DISABLE_MODULE += periph_init_rtc
 
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 include $(RIOTBASE)/Makefile.include

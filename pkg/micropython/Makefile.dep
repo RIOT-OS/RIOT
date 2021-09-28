@@ -1,4 +1,4 @@
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 USEMODULE += stdin
 
 # MicroPython doesn't compile for <32bit platforms

@@ -1,3 +1,3 @@
 FEATURES_REQUIRED += periph_spi
 USEMODULE += nvram
-USEMODULE += xtimer
+USEMODULE += ztimer_usec

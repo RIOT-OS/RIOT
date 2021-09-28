@@ -10,7 +10,7 @@ USEMODULE += od
 USEMODULE += ps
 USEMODULE += shell
 USEMODULE += shell_commands
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 CFLAGS += -DTEST_SUITES
 

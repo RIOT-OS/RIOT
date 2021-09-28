@@ -2,7 +2,7 @@ include ../Makefile.tests_common
 
 FORCE_ASSERTS = 1
 USEMODULE += event
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 USEMODULE += core_thread_flags
 
 # stm32f030f4-demo doesn't have enough RAM to run the test

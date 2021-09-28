@@ -2,6 +2,6 @@ include ../Makefile.tests_common
 
 USEMODULE += ds1307
 USEMODULE += embunit
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 include $(RIOTBASE)/Makefile.include

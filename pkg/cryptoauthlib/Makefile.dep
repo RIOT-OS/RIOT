@@ -1,4 +1,4 @@
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 FEATURES_REQUIRED += periph_i2c
 FEATURES_OPTIONAL += periph_i2c_reconfigure
 DEFAULT_MODULE += auto_init_security

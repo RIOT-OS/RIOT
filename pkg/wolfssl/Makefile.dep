@@ -8,7 +8,7 @@ ifneq (,$(filter wolfcrypt-benchmark,$(USEMODULE)))
   USEMODULE += wolfcrypt
   USEMODULE += wolfcrypt_coding
   USEMODULE += printf_float
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter wolfcrypt_poly1305,$(USEMODULE)))

@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += dbgpin
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # Default port used is PORT 1
 # - frdm-64f port A0-4 are connected to the JTAG, setting GPIO(0,0) will

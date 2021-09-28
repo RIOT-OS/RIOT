@@ -1,7 +1,7 @@
 USEPKG += driver_bme680
 
 ifneq (,$(filter saul%,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter bme680_i2c,$(USEMODULE)))

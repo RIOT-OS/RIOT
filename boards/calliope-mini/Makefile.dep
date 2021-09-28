@@ -1,5 +1,5 @@
 ifneq (,$(filter mini,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
   USEMODULE += mineplex
 endif
 

@@ -345,7 +345,7 @@ driver requirements):
 ```
 ifneq (,$(filter <driver name>,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 ```
 

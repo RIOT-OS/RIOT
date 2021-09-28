@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 USEMODULE += hashes
 USEMODULE += bloom
 USEMODULE += random
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 USEMODULE += fmt
 

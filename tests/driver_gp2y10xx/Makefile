@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
 USEMODULE += gp2y10xx
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 include $(RIOTBASE)/Makefile.include

@@ -5,7 +5,7 @@ USEMODULE += gnrc_netif
 USEMODULE += gnrc_netif_bus
 USEMODULE += gnrc_ipv6
 USEMODULE += netdev_test
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # deactivate automatically emitted packets from IPv6 neighbor discovery
 CFLAGS += -DCONFIG_GNRC_IPV6_NIB_ARSM=0

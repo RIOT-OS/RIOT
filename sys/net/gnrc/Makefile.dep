@@ -19,7 +19,7 @@ ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
   USEMODULE += gnrc_netif
   USEMODULE += gnrc_nettype_gomach
   USEMODULE += random
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
   USEMODULE += gnrc_mac
   FEATURES_REQUIRED += periph_rtt
 endif
@@ -111,7 +111,7 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_nib
   USEMODULE += trickle
   ifeq (,$(filter ztimer_msec,$(USEMODULE)))
-    USEMODULE += xtimer
+    USEMODULE += ztimer_usec
   endif
   USEMODULE += evtimer
 endif
@@ -206,7 +206,7 @@ ifneq (,$(filter gnrc_sixlowpan_frag_minfwd,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag_rb,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag_sfr,$(USEMODULE)))
@@ -215,7 +215,7 @@ ifneq (,$(filter gnrc_sixlowpan_frag_sfr,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan_frag_vrb
   USEMODULE += gnrc_sixlowpan_frag_rb
   USEMODULE += evtimer
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
   ifneq (,$(filter gnrc_tx_sync,$(USEMODULE)))
     # TODO: Implement gnrc_tx_sync for gnrc_sixlowpand_frag_sfr
     $(error module gnrc_tx_sync conflicts with gnrc_sixlowpand_frag_sfr)
@@ -227,7 +227,7 @@ ifneq (,$(filter gnrc_sixlowpan_frag_sfr_stats,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag_vrb,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
   USEMODULE += gnrc_sixlowpan_frag_fb
 endif
 
@@ -250,7 +250,7 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
   USEMODULE += ipv6_addr
   ifeq (,$(filter ztimer_msec,$(USEMODULE)))
-    USEMODULE += xtimer
+    USEMODULE += ztimer_usec
   endif
 endif
 
@@ -297,7 +297,7 @@ endif
 
 ifneq (,$(filter gnrc_ipv6_ext_frag,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_ext
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter gnrc_ipv6_ext_opt,$(USEMODULE)))
@@ -436,7 +436,7 @@ ifneq (,$(filter gnrc_netif_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_netif_pktq,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter gnrc_lwmac,$(USEMODULE)))

@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += pthread
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 USEMODULE += random
 
 include $(RIOTBASE)/Makefile.include

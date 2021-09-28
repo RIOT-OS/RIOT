@@ -80,7 +80,7 @@ endif
 
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   USEMODULE += netopt
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter esp_idf_heap,$(USEMODULE)))

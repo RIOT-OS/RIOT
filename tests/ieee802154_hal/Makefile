@@ -26,7 +26,7 @@ USEMODULE += shell
 USEMODULE += ps
 USEMODULE += event_thread_highest
 USEMODULE += event_callback
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 USEMODULE += netdev_default
 
 CFLAGS += -DEVENT_THREAD_HIGHEST_STACKSIZE=1024
