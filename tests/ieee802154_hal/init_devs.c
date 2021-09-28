@@ -31,6 +31,11 @@
 #include "nrf802154.h"
 #endif
 
+#ifdef MODULE_SOCKET_ZEP
+#include "socket_zep.h"
+#include "socket_zep_params.h"
+#endif
+
 void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
 {
     /* Call the init function of the device (this should be handled by
@@ -48,6 +53,14 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
     if ((radio = cb(IEEE802154_DEV_TYPE_NRF802154, opaque)) ){
         nrf802154_hal_setup(radio);
         nrf802154_init();
+    }
+#endif
+
+#ifdef MODULE_SOCKET_ZEP
+    static socket_zep_t _socket_zeps[SOCKET_ZEP_MAX];
+    if ((radio = cb(IEEE802154_DEV_TYPE_SOCKET_ZEP, opaque)) ){
+        socket_zep_hal_setup(&_socket_zeps[0], radio);
+        socket_zep_setup(&_socket_zeps[0], &socket_zep_params[0]);
     }
 #endif
 }
