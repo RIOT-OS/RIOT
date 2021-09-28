@@ -18,11 +18,18 @@ BOARD_WHITELIST :=  \
 					#
 USEMODULE += od
 USEMODULE += shell
+USEMODULE += shell_commands
 USEMODULE += ps
-USEMODULE += event_thread_highest
-USEMODULE += netdev_ieee802154_submac
+USEMODULE += event_thread
 USEMODULE += netdev_default
+USEMODULE += luid
+USEMODULE += l2util
+USEMODULE += eui_provider
+USEMODULE += ieee802154
+USEMODULE += ieee802154_submac
+USEMODULE += ztimer_usec
 
-CFLAGS += -DEVENT_THREAD_HIGHEST_STACKSIZE=1024
+CFLAGS += -DEVENT_THREAD_MEDIUM_STACKSIZE=1024
 
 include $(RIOTBASE)/Makefile.include
+include $(RIOTMAKE)/default-radio-settings.inc.mk
