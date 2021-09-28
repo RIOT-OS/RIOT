@@ -49,7 +49,14 @@ ifneq (,$(OPENOCD_CMD_RESET_RUN))
   $(call target-export-variables,reset,OPENOCD_CMD_RESET_RUN)
 endif
 
-OPENOCD_FLASH_TARGETS = flash flash-only
+OPENOCD_DEBUG_TARGETS = debug debugr debug-server
+
+ifneq (,$(OPENOCD_DBG_EXTRA_CMD))
+  # Export OPENOCD_DBG_EXTRA_CMD only to the flash/flash-only target
+  $(call target-export-variables,$(OPENOCD_DEBUG_TARGETS),OPENOCD_DBG_EXTRA_CMD)
+endif
+
+OPENOCD_FLASH_TARGETS = flash flash-only flashr
 
 ifneq (,$(IMAGE_OFFSET))
   # Export IMAGE_OFFSET only to the flash/flash-only target

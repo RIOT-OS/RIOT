@@ -90,4 +90,6 @@ ifneq (,$(filter esp_jtag,$(USEMODULE)))
   IMAGE_OFFSET = 0x10000
   # Flash checksumming not supported on xtensa
   OPENOCD_SKIP_VERIFY = yes
+  # Without resets debug target fails with 'Target not examined yet'
+  OPENOCD_DBG_EXTRA_CMD += -c 'reset halt'
 endif
