@@ -19,6 +19,20 @@ expression e;
 expression e;
 @@
 
+- xtimer_msleep(e)
++ ztimer_sleep(ZTIMER_MSEC, e)
+
+@@
+expression e;
+@@
+
+- xtimer_sleep(e)
++ ztimer_sleep(ZTIMER_MSEC, e * 1000)
+
+@@
+expression e;
+@@
+
 - xtimer_set(e)
 + ztimer_set(ZTIMER_USEC, e)
 
@@ -28,6 +42,20 @@ expression e;
 
 - xtimer_remove(e)
 + ztimer_remove(ZTIMER_USEC, e)
+
+@@
+expression e;
+@@
+
+- xtimer_now_usec(e)
++ ztimer_now(ZTIMER_USEC, e)
+
+@@
+expression e;
+@@
+
+- xtimer_now_msec(e)
++ ztimer_now(ZTIMER_MSEC, e)
 
 @@
 expression e, e2;
@@ -55,13 +83,13 @@ identifier i;
 @@
 
 - xtimer_now_usec()
-+ ztimer_get(ZTIMER_USEC)
++ ztimer_now(ZTIMER_USEC)
 
 @@
 @@
 
 - _xtimer_now()
-+ ztimer_get(ZTIMER_USEC)
++ ztimer_now(ZTIMER_USEC)
 
 @@
 @@
@@ -166,7 +194,13 @@ expression e;
 @@
 
 - xtimer_now()
-+ ztimer_get(ZTIMER_USEC)
++ ztimer_now(ZTIMER_USEC)
+
+@@
+@@
+
+- MODULE_XTIMER
++ MODULE_ZTIMER
 
 @@
 expression e, e2;
@@ -174,3 +208,25 @@ expression e, e2;
 
 - xtimer_periodic_wakeup(e, e2)
 + ztimer_periodic_wakeup(ZTIMER_USEC, e, e2)
+
+@@
+expression e, e2;
+@@
+
+- xtimer_set_timeout_flag(e, e2)
++ ztimer_set_timeout_flag(ZTIMER_USEC, e, e2)
+
+
+@@
+expression e, e2;
+@@
+
+- xtimer_mutex_lock_timeout(e, e2)
++ ztimer_mutex_lock_timeout(ZTIMER_USEC, e, e2)
+
+@@
+expression e, e2;
+@@
+
+- xtimer_msg_receive_timeout(e, e2)
++ ztimer_msg_receive_timeout(ZTIMER_USEC, e, e2)
