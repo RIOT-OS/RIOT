@@ -28,6 +28,9 @@ p-nucleo-wb55
 remote-revb
 samr21-xpro
 seeedstudio-gd32
+slstk3400a
+sltb001a
+slwstk6220a
 "}
 
 : ${TEST_KCONFIG_ENFORCE_APP_GROUPS:="
