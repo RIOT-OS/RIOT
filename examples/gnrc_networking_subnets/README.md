@@ -1,15 +1,23 @@
-# Auto-configuration for nested subnets on a (simple) tree topology
+# Auto-configuration for nested subnets on a tree topology
 
-This example demonstrates IPv6 subnet auto-configuration for networks on a
-tree topology.
+This example demonstrates IPv6 subnet auto-configuration for networks on
+a tree topology.
 
 This allows to connect multiple links with individual subnets and route
 between them.
-Each link can have an arbitrary number of hosts, but there can be only
-a single router on each link.
+Each link can have an arbitrary number of hosts and routers.
 Routers can have multiple interfaces to connect different downlinks.
 
+![](../../doc/doxygen/src/gnrc_ipv6_auto_subnets.svg)
+
+If you can ensure there is only a single router on each link, you can
+skip the coordination protocol and save some resources by enabling
+the `gnrc_ipv6_auto_subnets_simple` module.
+
 ![](../../doc/doxygen/src/gnrc_ipv6_auto_subnets_simple.svg)
+
+Routers can still have multiple downstream interfaces but there can be
+only a single router in each subnet.
 
 ## Setup on native
 
