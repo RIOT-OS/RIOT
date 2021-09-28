@@ -37,8 +37,6 @@
 
 #define MAX_LINE    (80)
 
-/* Only the first radio is supported so far */
-#define RADIO_DEFAULT_ID (0U)
 
 netdev_ieee802154_submac_t netdev_submac;
 mutex_t lock;
