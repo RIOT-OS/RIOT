@@ -1,0 +1,77 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config PACKAGE_CMSIS-DSP
+    bool "DSP ARM CMSIS package"
+    depends on TEST_KCONFIG
+    help
+        This package uses DSP ARM CMSIS header from the official ARM github repo:
+        https://github.com/ARM-software/CMSIS_5.
+
+if PACKAGE_CMSIS-DSP
+
+config MODULE_CMSIS-DSP_BASICMATHFUNCTIONS
+    bool
+    default y
+    help
+        CMSIS DSP basic math functions.
+
+config MODULE_CMSIS-DSP_COMMONTABLES
+    bool
+    default y
+    help
+        CMSIS DSP common tables.
+
+config MODULE_CMSIS-DSP_COMPLEXMATHFUNCTIONS
+    bool
+    default y
+    help
+        CMSIS DSP complex math functions.
+
+config MODULE_CMSIS-DSP_CONTROLLERFUNCTIONS
+    bool
+    default y
+    help
+        CMSIS DSP controller functions.
+
+config MODULE_CMSIS-DSP_FASTMATHFUNCTIONS
+    bool
+    default y
+    help
+        CMSIS DSP fast math functions.
+
+config MODULE_CMSIS-DSP_FILTERINGFUNCTIONS
+    bool
+    default y
+    help
+        CMSIS DSP filtering functions.
+
+config MODULE_CMSIS-DSP_MATRIXFUNCTIONS
+    bool
+    default y
+    help
+        CMSIS DSP matrix functions.
+
+config MODULE_CMSIS-DSP_STATISTICSFUNCTIONS
+    bool
+    default y
+    help
+        CMSIS DSP statistics functions.
+
+config MODULE_CMSIS-DSP_SUPPORTFUNCTIONS
+    bool
+    default y
+    help
+        CMSIS DSP support functions.
+
+config MODULE_CMSIS-DSP_TRANSFORMFUNCTIONS
+    bool
+    default y
+    help
+        CMSIS DSP transform functions.
+
+endif # PACKAGE_CMSIS-DSP
