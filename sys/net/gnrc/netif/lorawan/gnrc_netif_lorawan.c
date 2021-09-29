@@ -48,7 +48,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
 static void _msg_handler(gnrc_netif_t *netif, msg_t *msg);
 static int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt);
 static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt);
-static void _init(gnrc_netif_t *netif);
+static int _init(gnrc_netif_t *netif);
 
 static const gnrc_netif_ops_t lorawan_ops = {
     .init = _init,
@@ -252,7 +252,7 @@ netdev_t *gnrc_lorawan_get_netdev(gnrc_lorawan_t *mac)
     return netif->dev;
 }
 
-static void _init(gnrc_netif_t *netif)
+static int _init(gnrc_netif_t *netif)
 {
     gnrc_netif_default_init(netif);
     netif->dev->event_callback = _driver_cb;
@@ -279,6 +279,8 @@ static void _init(gnrc_netif_t *netif)
     ztimer_set_msg(ZTIMER_MSEC, &netif->lorawan.backoff_timer,
                    GNRC_LORAWAN_BACKOFF_WINDOW_TICK / 1000,
                    &backoff_msg, thread_getpid());
+
+    return 0;
 }
 
 int gnrc_netif_lorawan_create(gnrc_netif_t *netif, char *stack, int stacksize,

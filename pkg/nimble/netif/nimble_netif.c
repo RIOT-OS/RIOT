@@ -79,7 +79,7 @@ static void _notify(int handle, nimble_netif_event_t event, uint8_t *addr)
     }
 }
 
-static void _netif_init(gnrc_netif_t *netif)
+static int _netif_init(gnrc_netif_t *netif)
 {
     (void)netif;
 
@@ -92,6 +92,8 @@ static void _netif_init(gnrc_netif_t *netif)
      * of this */
     _netif.sixlo.max_frag_size = 0;
 #endif  /* IS_USED(MODULE_GNRC_NETIF_6LO) */
+
+    return 0;
 }
 
 static int _send_pkt(nimble_netif_conn_t *conn, gnrc_pktsnip_t *pkt)

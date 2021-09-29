@@ -63,7 +63,7 @@ static void rtt_cb(void *arg);
 static void lwmac_set_state(gnrc_netif_t *netif, gnrc_lwmac_state_t newstate);
 static void lwmac_schedule_update(gnrc_netif_t *netif);
 static void rtt_handler(uint32_t event, gnrc_netif_t *netif);
-static void _lwmac_init(gnrc_netif_t *netif);
+static int _lwmac_init(gnrc_netif_t *netif);
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
 static void _lwmac_msg_handler(gnrc_netif_t *netif, msg_t *msg);
@@ -939,7 +939,7 @@ static void _lwmac_msg_handler(gnrc_netif_t *netif, msg_t *msg)
     }
 }
 
-static void _lwmac_init(gnrc_netif_t *netif)
+static int _lwmac_init(gnrc_netif_t *netif)
 {
     netdev_t *dev;
 
@@ -984,4 +984,6 @@ static void _lwmac_init(gnrc_netif_t *netif)
     netif->mac.prot.lwmac.awake_duration_sum_ticks = 0;
     netif->mac.prot.lwmac.lwmac_info |= GNRC_LWMAC_RADIO_IS_ON;
 #endif
+
+    return 0;
 }
