@@ -21,6 +21,7 @@ DISABLE_MODULE += auto_init_at86rf2xx auto_init_nrf802154
 
 USEMODULE += od
 USEMODULE += luid
+USEMODULE += l2util
 USEMODULE += ieee802154
 USEMODULE += shell
 USEMODULE += shell_commands
