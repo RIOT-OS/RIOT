@@ -23,6 +23,7 @@ USEMODULE += od
 USEMODULE += luid
 USEMODULE += ieee802154
 USEMODULE += shell
+USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += event_thread_highest
 USEMODULE += event_callback
