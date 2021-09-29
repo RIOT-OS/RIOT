@@ -17,22 +17,29 @@ from riotctrl.shell import ShellInteraction, ShellInteractionParser
 
 # ==== Parsers ====
 
+
 class GNRCICMPv6EchoParser(ShellInteractionParser):
     def __init__(self):
-        self.c_reply = re.compile(r"\d+ bytes from "
-                                  r"(?P<source>[0-9a-f:]+(%\S+)?): "
-                                  r"icmp_seq=(?P<seq>\d+) ttl=(?P<ttl>\d+)"
-                                  r"( corrupted at offset (?P<corrupted>\d+))?"
-                                  r"( truncated by (?P<truncated>\d+) byte)?"
-                                  r"( rssi=(?P<rssi>-?\d+) dBm)?"
-                                  r"( time=(?P<rtt>\d+.\d+) ms)?"
-                                  r"(?P<dup> \(DUP\))?")
-        self.c_stats = re.compile(r"(?P<tx>\d+) packets transmitted, "
-                                  r"(?P<rx>\d+) packets received, "
-                                  r"((?P<dup>\d+) duplicates, )?"
-                                  r"(?P<packet_loss>\d+)% packet loss")
-        self.c_rtts = re.compile(r"round-trip min/avg/max = (?P<min>\d+.\d+)/"
-                                 r"(?P<avg>\d+.\d+)/(?P<max>\d+.\d+) ms")
+        self.c_reply = re.compile(
+            r"\d+ bytes from "
+            r"(?P<source>[0-9a-f:]+(%\S+)?): "
+            r"icmp_seq=(?P<seq>\d+) ttl=(?P<ttl>\d+)"
+            r"( corrupted at offset (?P<corrupted>\d+))?"
+            r"( truncated by (?P<truncated>\d+) byte)?"
+            r"( rssi=(?P<rssi>-?\d+) dBm)?"
+            r"( time=(?P<rtt>\d+.\d+) ms)?"
+            r"(?P<dup> \(DUP\))?"
+        )
+        self.c_stats = re.compile(
+            r"(?P<tx>\d+) packets transmitted, "
+            r"(?P<rx>\d+) packets received, "
+            r"((?P<dup>\d+) duplicates, )?"
+            r"(?P<packet_loss>\d+)% packet loss"
+        )
+        self.c_rtts = re.compile(
+            r"round-trip min/avg/max = (?P<min>\d+.\d+)/"
+            r"(?P<avg>\d+.\d+)/(?P<max>\d+.\d+) ms"
+        )
 
     @staticmethod
     def _add_reply(res, reply):
@@ -153,12 +160,14 @@ class GNRCICMPv6EchoParser(ShellInteractionParser):
 
 class GNRCIPv6NIBNeighShowParser(ShellInteractionParser):
     def __init__(self):
-        self.c_neigh = re.compile(r"(?P<ipv6_addr>[0-9a-f:]+)\s+"
-                                  r"dev\s+#(?P<iface>\d+)\s+"
-                                  r"lladdr\s+(?P<l2addr>[0-9A-F:]+)?"
-                                  r"(\s+(?P<router>router))?"
-                                  r"(\s+((?P<nud_state>[A-Z_]+)|-))?"
-                                  r"(\s+(?P<ar_state>[A-Z_]+))?$")
+        self.c_neigh = re.compile(
+            r"(?P<ipv6_addr>[0-9a-f:]+)\s+"
+            r"dev\s+#(?P<iface>\d+)\s+"
+            r"lladdr\s+(?P<l2addr>[0-9A-F:]+)?"
+            r"(\s+(?P<router>router))?"
+            r"(\s+((?P<nud_state>[A-Z_]+)|-))?"
+            r"(\s+(?P<ar_state>[A-Z_]+))?$"
+        )
 
     def parse(self, cmd_output):
         """
@@ -195,8 +204,7 @@ class GNRCIPv6NIBNeighShowParser(ShellInteractionParser):
         for line in cmd_output.splitlines():
             m = self.c_neigh.search(line)
             if m is not None:
-                res.append({k: v for k, v in m.groupdict().items()
-                            if v is not None})
+                res.append({k: v for k, v in m.groupdict().items() if v is not None})
                 res[-1]["iface"] = int(res[-1]["iface"])
                 if "router" in res[-1]:
                     res[-1]["router"] = True
@@ -205,11 +213,13 @@ class GNRCIPv6NIBNeighShowParser(ShellInteractionParser):
 
 class GNRCIPv6NIBPrefixShowParser(ShellInteractionParser):
     def __init__(self):
-        self.c_prefix = re.compile(r"(?P<prefix>[0-9a-f:]+)/"
-                                   r"(?P<prefix_len>\d+)\s+"
-                                   r"dev\s+#(?P<iface>\d+)"
-                                   r"(\s+expires (?P<valid_sec>\d+) sec)?"
-                                   r"(\s+deprecates (?P<pref_sec>\d+) sec)?$")
+        self.c_prefix = re.compile(
+            r"(?P<prefix>[0-9a-f:]+)/"
+            r"(?P<prefix_len>\d+)\s+"
+            r"dev\s+#(?P<iface>\d+)"
+            r"(\s+expires (?P<valid_sec>\d+) sec)?"
+            r"(\s+deprecates (?P<pref_sec>\d+) sec)?$"
+        )
 
     def parse(self, cmd_output):
         """
@@ -247,11 +257,13 @@ class GNRCIPv6NIBPrefixShowParser(ShellInteractionParser):
 
 class GNRCIPv6NIBRouteShowParser(ShellInteractionParser):
     def __init__(self):
-        self.c_route = re.compile(r"(?P<route>default(?P<primary>\*)?|"
-                                  r"(?P<prefix>[0-9a-f:]+)/"
-                                  r"(?P<prefix_len>\d+))\s+"
-                                  r"(via\s+(?P<next_hop>[0-9a-f:]+)\s+)?"
-                                  r"dev\s+#(?P<iface>\d+)$")
+        self.c_route = re.compile(
+            r"(?P<route>default(?P<primary>\*)?|"
+            r"(?P<prefix>[0-9a-f:]+)/"
+            r"(?P<prefix_len>\d+))\s+"
+            r"(via\s+(?P<next_hop>[0-9a-f:]+)\s+)?"
+            r"dev\s+#(?P<iface>\d+)$"
+        )
 
     def parse(self, cmd_output):
         """
@@ -312,11 +324,17 @@ class GNRCIPv6NIBRouteShowParser(ShellInteractionParser):
             m = self.c_route.search(line)
             if m is not None:
                 fte = {k: v for k, v in m.groupdict().items() if v is not None}
-                fte['iface'] = int(fte['iface'])
-                if "prefix" in fte and fte["prefix"] is not None and \
-                   "prefix_len" in fte and fte["prefix_len"] is not None:
-                    fte["route"] = {"prefix": fte["prefix"],
-                                    "prefix_len": int(fte["prefix_len"])}
+                fte["iface"] = int(fte["iface"])
+                if (
+                    "prefix" in fte
+                    and fte["prefix"] is not None
+                    and "prefix_len" in fte
+                    and fte["prefix_len"] is not None
+                ):
+                    fte["route"] = {
+                        "prefix": fte["prefix"],
+                        "prefix_len": int(fte["prefix_len"]),
+                    }
                 elif fte["route"].startswith("default"):
                     fte["route"] = {"default": True}
                 else:
@@ -334,9 +352,11 @@ class GNRCIPv6NIBRouteShowParser(ShellInteractionParser):
 
 class GNRCIPv6NIBABRShowParser(ShellInteractionParser):
     def __init__(self):
-        self.c_abr = re.compile(r"(?P<addr>[0-9a-f:]+)\s+"
-                                r"v(?P<version>\d+)\s+expires\s+"
-                                r"(?P<valid_min>\d+)min$")
+        self.c_abr = re.compile(
+            r"(?P<addr>[0-9a-f:]+)\s+"
+            r"v(?P<version>\d+)\s+expires\s+"
+            r"(?P<valid_min>\d+)min$"
+        )
 
     def parse(self, cmd_output):
         """
@@ -372,16 +392,20 @@ class GNRCPktbufStatsResults(dict):
         Returns true if the packet buffer stats indicate that the packet buffer
         is empty
         """
-        if "first_byte" not in self or \
-           "first_unused" not in self or \
-           "start" not in self["first_unused"] or \
-           "size" not in self["first_unused"]:
-            raise ValueError("{} has no items 'first_byte' or 'first_unused' "
-                             "or 'first_unused' has no items 'start' or 'size'"
-                             .format(self))
+        if (
+            "first_byte" not in self
+            or "first_unused" not in self
+            or "start" not in self["first_unused"]
+            or "size" not in self["first_unused"]
+        ):
+            raise ValueError(
+                "{} has no items 'first_byte' or 'first_unused' "
+                "or 'first_unused' has no items 'start' or 'size'".format(self)
+            )
         else:
-            return (self["first_byte"] == self["first_unused"]["start"]) and \
-                   (self["size"] == self["first_unused"]["size"])
+            return (self["first_byte"] == self["first_unused"]["start"]) and (
+                self["size"] == self["first_unused"]["size"]
+            )
 
     def fullest_capacity(self):
         """
@@ -389,8 +413,7 @@ class GNRCPktbufStatsResults(dict):
         command was called
         """
         if "last_byte_used" not in self or "size" not in self:
-            raise ValueError("{} has no items 'last_byte_used' or 'size'"
-                             .format(self))
+            raise ValueError("{} has no items 'last_byte_used' or 'size'".format(self))
         else:
             return self["last_byte_used"] / self["size"]
 
@@ -413,11 +436,13 @@ class GNRCPktbufStatsParser(ShellInteractionParser):
 
     @staticmethod
     def _init_res(first_byte, last_byte, size):
-        return GNRCPktbufStatsResults((
-            ("first_byte", int(first_byte, base=16)),
-            ("last_byte", int(last_byte, base=16)),
-            ("size", int(size)),
-        ))
+        return GNRCPktbufStatsResults(
+            (
+                ("first_byte", int(first_byte, base=16)),
+                ("last_byte", int(last_byte, base=16)),
+                ("size", int(size)),
+            )
+        )
 
     @staticmethod
     def _set_last_byte_used(res, last_byte_used):
@@ -425,13 +450,10 @@ class GNRCPktbufStatsParser(ShellInteractionParser):
 
     @staticmethod
     def _set_first_unused(res, first_unused):
-        res["first_unused"] = {
-            "start": int(first_unused["start"], base=16)
-        }
+        res["first_unused"] = {"start": int(first_unused["start"], base=16)}
         if first_unused["next"] is not None:
             res["first_unused"]["next"] = int(first_unused["next"], base=16)
-        if "next" not in res["first_unused"] or \
-           not res["first_unused"]["next"]:
+        if "next" not in res["first_unused"] or not res["first_unused"]["next"]:
             res["first_unused"]["next"] = None
         res["first_unused"]["size"] = int(first_unused["size"])
 
@@ -496,14 +518,29 @@ class GNRCPktbufStatsParser(ShellInteractionParser):
 
 # ==== ShellInteractions ====
 
+
 class GNRCICMPv6Echo(ShellInteraction):
     @ShellInteraction.check_term
-    def ping6(self, hostname, count=3, interval=1000, packet_size=4,
-              hop_limit=None, timeout=1000, async_=False):
-        cmd = "ping6 {hostname} -c {count} -i {interval} " \
-              "-s {packet_size} -W {timeout}" \
-              .format(hostname=hostname, count=count, interval=interval,
-                      packet_size=packet_size, timeout=timeout)
+    def ping6(
+        self,
+        hostname,
+        count=3,
+        interval=1000,
+        packet_size=4,
+        hop_limit=None,
+        timeout=1000,
+        async_=False,
+    ):
+        cmd = (
+            "ping6 {hostname} -c {count} -i {interval} "
+            "-s {packet_size} -W {timeout}".format(
+                hostname=hostname,
+                count=count,
+                interval=interval,
+                packet_size=packet_size,
+                timeout=timeout,
+            )
+        )
 
         if hop_limit is not None:
             cmd += " -h {hop_limit}".format(hop_limit=hop_limit)
@@ -521,14 +558,12 @@ class GNRCIPv6NIB(ShellInteraction):
 
     @ShellInteraction.check_term
     def nib_cmd(self, cmd, args=None, timeout=-1, async_=False):
-        return self.cmd(self._create_cmd(cmd, args),
-                        timeout=timeout, async_=async_)
+        return self.cmd(self._create_cmd(cmd, args), timeout=timeout, async_=async_)
 
     def nib_neigh_show(self, iface=None, timeout=-1, async_=False):
         return self._nib_show(self.NEIGH, iface, timeout, async_)
 
-    def nib_neigh_add(self, iface, ipv6_addr, l2addr=None,
-                      timeout=-1, async_=False):
+    def nib_neigh_add(self, iface, ipv6_addr, l2addr=None, timeout=-1, async_=False):
         args = [iface, ipv6_addr]
         if l2addr:
             args.append(l2addr)
@@ -540,8 +575,9 @@ class GNRCIPv6NIB(ShellInteraction):
     def nib_prefix_show(self, iface=None, timeout=-1, async_=False):
         return self._nib_show(self.PREFIX, iface, timeout, async_)
 
-    def nib_prefix_add(self, iface, prefix, valid_sec=None, pref_sec=None,
-                       timeout=-1, async_=False):
+    def nib_prefix_add(
+        self, iface, prefix, valid_sec=None, pref_sec=None, timeout=-1, async_=False
+    ):
         if valid_sec is None and pref_sec is not None:
             raise ValueError("pref_sec provided with no valid_sec")
         args = [iface, prefix]
@@ -557,8 +593,9 @@ class GNRCIPv6NIB(ShellInteraction):
     def nib_route_show(self, iface=None, timeout=-1, async_=False):
         return self._nib_show(self.ROUTE, iface, timeout, async_)
 
-    def nib_route_add(self, iface, prefix, next_hop, ltime_sec=None,
-                      timeout=-1, async_=False):
+    def nib_route_add(
+        self, iface, prefix, next_hop, ltime_sec=None, timeout=-1, async_=False
+    ):
         args = [iface, prefix, next_hop]
         if ltime_sec:
             args.append(int(ltime_sec))

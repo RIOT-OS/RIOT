@@ -17,6 +17,7 @@ from riotctrl.shell import ShellInteraction, ShellInteractionParser
 
 # ==== Parsers ====
 
+
 class IfconfigListParser(ShellInteractionParser):
     def __init__(self):
         self.iface_c = re.compile(r"Iface\s+(?P<name>\S+)\s")
@@ -25,18 +26,20 @@ class IfconfigListParser(ShellInteractionParser):
         # e.g. for MCS: 1 (BPSK, rate 1/2, 2x frequency repetition)  MTU :1280
         # "1 (BPSK, rate 1/2, 2x frequency repetition)" belongs to the option
         # value, "MTU" does not
-        self.option_c = re.compile(r"^(?P<option>[^:]+):\s?"
-                                   r"(?P<value>\S+(\s\S+)*)$")
+        self.option_c = re.compile(r"^(?P<option>[^:]+):\s?" r"(?P<value>\S+(\s\S+)*)$")
         # options are evaluated before flags, so all options that don't contain
         # colons are flags
         self.flag_c = re.compile(r"^(?P<flag>[^:]+)$")
-        self.ipv6_c = re.compile(r"inet6 (?P<type>addr|group): "
-                                 r"(?P<addr>[0-9a-f:]+)(\s+"
-                                 r"scope:\s+(?P<scope>\S+)"
-                                 r"(?P<anycast>\s+\[anycast\])?\s+"
-                                 r"(?P<state>\S+))?$")
-        self.bl_header_c = re.compile(r"(?P<mode>White|Black)-listed "
-                                      r"link layer addresses:")
+        self.ipv6_c = re.compile(
+            r"inet6 (?P<type>addr|group): "
+            r"(?P<addr>[0-9a-f:]+)(\s+"
+            r"scope:\s+(?P<scope>\S+)"
+            r"(?P<anycast>\s+\[anycast\])?\s+"
+            r"(?P<state>\S+))?$"
+        )
+        self.bl_header_c = re.compile(
+            r"(?P<mode>White|Black)-listed " r"link layer addresses:"
+        )
         self.bl_c = re.compile(r"\d+: (?P<addr>[0-9a-f]{2}(:[0-9a-f]{2})*)$")
 
     def parse(self, cmd_output):
@@ -71,7 +74,7 @@ class IfconfigListParser(ShellInteractionParser):
                     netifs = {}
                 current = netifs[name] = {}
                 # Go ahead in line to not confuse options parser
-                line = line[m.end():]
+                line = line[m.end() :]
                 offset += m.end() + 1
             if current is not None:
                 # XXX checking for IPv4 address might also go here
@@ -90,9 +93,11 @@ class IfconfigListParser(ShellInteractionParser):
                             current["whitelist"].append(m.group("addr"))
                     else:
                         parse_blacklist = False
-                elif not parse_blacklist and \
-                        "blacklist" not in current and \
-                        "whitelist" not in current:
+                elif (
+                    not parse_blacklist
+                    and "blacklist" not in current
+                    and "whitelist" not in current
+                ):
                     m = self.bl_header_c.search(line)
                     if m is not None:
                         if m.group("mode") == "Black":
@@ -184,7 +189,7 @@ class IfconfigListParser(ShellInteractionParser):
         if m is not None:
             addr = m.groupdict()
             typ = addr.pop("type")
-            if typ == "addr":   # unicast address
+            if typ == "addr":  # unicast address
                 # reformat anycast item if existent
                 if addr.get("anycast") is None:
                     addr.pop("anycast", None)
@@ -194,7 +199,7 @@ class IfconfigListParser(ShellInteractionParser):
                     netif["ipv6_addrs"].append(addr)
                 else:
                     netif["ipv6_addrs"] = [addr]
-            else:               # multicast address
+            else:  # multicast address
                 for key in set(addr):
                     # remove empty matches
                     if addr[key] is None:
@@ -210,13 +215,17 @@ class IfconfigListParser(ShellInteractionParser):
 class IfconfigStatsParser(ShellInteractionParser):
     def __init__(self):
         self.header_c = re.compile(r"Statistics for (?P<module>.+)$")
-        self.rx_c = re.compile(r"RX packets\s+(?P<packets>\d+)\s+"
-                               r"bytes\s+(?P<bytes>\d+)$")
-        self.tx_c = re.compile(r"TX packets\s+(?P<packets>\d+)\s+"
-                               r"\(Multicast:\s+(?P<multicast>\d+)\)\s+"
-                               r"bytes\s+(?P<bytes>\d+)$")
-        self.tx_err_c = re.compile(r"TX succeeded\s+(?P<succeeded>\d+)\s+"
-                                   r"errors\s+(?P<errors>\d+)$")
+        self.rx_c = re.compile(
+            r"RX packets\s+(?P<packets>\d+)\s+" r"bytes\s+(?P<bytes>\d+)$"
+        )
+        self.tx_c = re.compile(
+            r"TX packets\s+(?P<packets>\d+)\s+"
+            r"\(Multicast:\s+(?P<multicast>\d+)\)\s+"
+            r"bytes\s+(?P<bytes>\d+)$"
+        )
+        self.tx_err_c = re.compile(
+            r"TX succeeded\s+(?P<succeeded>\d+)\s+" r"errors\s+(?P<errors>\d+)$"
+        )
 
     def parse(self, cmd_output):
         """
@@ -259,13 +268,11 @@ class IfconfigStatsParser(ShellInteractionParser):
                 if "rx" not in current:
                     m = self.rx_c.search(line)
                     if m is not None:
-                        current["rx"] = {k: int(v)
-                                         for k, v in m.groupdict().items()}
+                        current["rx"] = {k: int(v) for k, v in m.groupdict().items()}
                 elif "tx" not in current:
                     m = self.tx_c.search(line)
                     if m is not None:
-                        current["tx"] = {k: int(v)
-                                         for k, v in m.groupdict().items()}
+                        current["tx"] = {k: int(v) for k, v in m.groupdict().items()}
                 elif "tx" in current:
                     m = self.tx_err_c.search(line)
                     if m is not None:
@@ -276,6 +283,7 @@ class IfconfigStatsParser(ShellInteractionParser):
 
 
 # ==== ShellInteractions ====
+
 
 class Ifconfig(ShellInteraction):
     def ifconfig_list(self, netif=None, timeout=-1, async_=False):
@@ -293,81 +301,82 @@ class Ifconfig(ShellInteraction):
         return self.cmd(cmd, timeout=timeout, async_=False)
 
     def ifconfig_help(self, netif, timeout=-1, async_=False):
-        return self.ifconfig_cmd(netif=netif, args=("help",),
-                                 timeout=timeout, async_=async_)
+        return self.ifconfig_cmd(
+            netif=netif, args=("help",), timeout=timeout, async_=async_
+        )
 
     def ifconfig_set(self, netif, key, value, timeout=-1, async_=False):
-        return self._ifconfig_success_cmd(netif=netif,
-                                          args=("set", key, value),
-                                          timeout=timeout, async_=async_)
+        return self._ifconfig_success_cmd(
+            netif=netif, args=("set", key, value), timeout=timeout, async_=async_
+        )
 
     def ifconfig_up(self, netif, timeout=-1, async_=False):
-        self._ifconfig_error_cmd(netif=netif, args=("up",),
-                                 timeout=timeout, async_=async_)
+        self._ifconfig_error_cmd(
+            netif=netif, args=("up",), timeout=timeout, async_=async_
+        )
 
     def ifconfig_down(self, netif, timeout=-1, async_=False):
-        self._ifconfig_error_cmd(netif=netif, args=("down",),
-                                 timeout=timeout, async_=async_)
+        self._ifconfig_error_cmd(
+            netif=netif, args=("down",), timeout=timeout, async_=async_
+        )
 
-    def ifconfig_add(self, netif, addr, anycast=False,
-                     timeout=-1, async_=False):
+    def ifconfig_add(self, netif, addr, anycast=False, timeout=-1, async_=False):
         args = ["add", addr]
         if anycast:
             args.append("anycast")
-        return self._ifconfig_success_cmd(netif=netif, args=args,
-                                          timeout=timeout, async_=async_)
+        return self._ifconfig_success_cmd(
+            netif=netif, args=args, timeout=timeout, async_=async_
+        )
 
     def ifconfig_del(self, netif, addr, timeout=-1, async_=False):
-        return self._ifconfig_success_cmd(netif=netif, args=("del", addr),
-                                          timeout=timeout, async_=async_)
-
-    def ifconfig_flag(self, netif, flag, enable=True,
-                      timeout=-1, async_=False):
         return self._ifconfig_success_cmd(
-            netif=netif, args=("{}{}".format("" if enable else "-", flag),),
-            timeout=timeout, async_=async_
+            netif=netif, args=("del", addr), timeout=timeout, async_=async_
+        )
+
+    def ifconfig_flag(self, netif, flag, enable=True, timeout=-1, async_=False):
+        return self._ifconfig_success_cmd(
+            netif=netif,
+            args=("{}{}".format("" if enable else "-", flag),),
+            timeout=timeout,
+            async_=async_,
         )
 
     def ifconfig_l2filter_add(self, netif, addr, timeout=-1, async_=False):
         return self._ifconfig_success_cmd(
-            netif=netif, args=("l2filter", "add", addr),
-            timeout=timeout, async_=async_
+            netif=netif, args=("l2filter", "add", addr), timeout=timeout, async_=async_
         )
 
     def ifconfig_l2filter_del(self, netif, addr, timeout=-1, async_=False):
         return self._ifconfig_success_cmd(
-            netif=netif, args=("l2filter", "del", addr),
-            timeout=timeout, async_=async_
+            netif=netif, args=("l2filter", "del", addr), timeout=timeout, async_=async_
         )
 
     def ifconfig_stats(self, netif, module, timeout=-1, async_=False):
-        res = self.ifconfig_cmd(netif=netif, args=("stats", module),
-                                timeout=timeout, async_=async_)
+        res = self.ifconfig_cmd(
+            netif=netif, args=("stats", module), timeout=timeout, async_=async_
+        )
         if "Statistics for " in res:
             return res
         raise RuntimeError(res)
 
     def ifconfig_stats_reset(self, netif, module, timeout=-1, async_=False):
-        res = self.ifconfig_cmd(netif=netif, args=("stats", module, "reset"),
-                                timeout=timeout, async_=async_)
+        res = self.ifconfig_cmd(
+            netif=netif, args=("stats", module, "reset"), timeout=timeout, async_=async_
+        )
         if "Reset statistics for module " in res:
             return res
         raise RuntimeError(res)
 
-    def _ifconfig_success_cmd(self, netif=None, args=None,
-                              timeout=-1, async_=False):
+    def _ifconfig_success_cmd(self, netif=None, args=None, timeout=-1, async_=False):
         """For commands that have a success output"""
-        res = self.ifconfig_cmd(netif=netif, args=args,
-                                timeout=timeout, async_=async_)
+        res = self.ifconfig_cmd(netif=netif, args=args, timeout=timeout, async_=async_)
         if "success" in res:
             return res
         raise RuntimeError(res)
 
-    def _ifconfig_error_cmd(self, netif=None, args=None,
-                            timeout=-1, async_=False):
+    def _ifconfig_error_cmd(self, netif=None, args=None, timeout=-1, async_=False):
         """For commands that only have an error output"""
-        res = self.ifconfig_cmd(netif=netif, args=args,
-                                timeout=timeout, async_=async_)
+        res = self.ifconfig_cmd(netif=netif, args=args, timeout=timeout, async_=async_)
         if "error" in res:
             raise RuntimeError(res)
 
@@ -376,9 +385,7 @@ class TXTSnd(ShellInteraction):
     @ShellInteraction.check_term
     def netif_txtsnd(self, netif, target, data, timeout=-1, async_=False):
         cmd = "txtsnd {netif} {target} {data}".format(
-            netif=netif,
-            target=target,
-            data=data
+            netif=netif, target=target, data=data
         )
         res = self.cmd(cmd)
         if "error" in res or "usage" in res:

@@ -15,6 +15,7 @@ from riotctrl.shell import ShellInteraction
 
 class Help(ShellInteraction):
     """Help ShellInteraction"""
+
     @ShellInteraction.check_term
     def help(self, timeout=-1, async_=False):
         """Sends the reboot command via the terminal"""
@@ -23,6 +24,7 @@ class Help(ShellInteraction):
 
 class Reboot(ShellInteraction):
     """Reboot ShellInteraction"""
+
     @ShellInteraction.check_term
     def reboot(self, timeout=-1, async_=False):
         """Sends the reboot command via the terminal"""
@@ -31,6 +33,7 @@ class Reboot(ShellInteraction):
 
 class Version(ShellInteraction):
     """Version ShellInteraction"""
+
     @ShellInteraction.check_term
     def version(self, timeout=-1, async_=False):
         """Sends the reboot command via the terminal"""
