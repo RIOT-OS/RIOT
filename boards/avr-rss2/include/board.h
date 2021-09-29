@@ -103,7 +103,6 @@ extern "C" {
  * @name    User button configuration
  * @{
  */
-#define MODULE_ATMEGA_PCINT0
 #define BTN0_PIN            GPIO_PIN(PORT_B, 0)
 #define BTN0_MODE           GPIO_IN
 /** @} */
