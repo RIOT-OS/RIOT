@@ -57,7 +57,7 @@ static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
         printf("Received valid ACK with sqn %i\n", buffer[2]);
     }
     else {
-        puts("Packet received:");
+        puts("Frame received:");
         for (unsigned i=0;i<size;i++) {
             printf("%02x ", buffer[i]);
         }
@@ -104,7 +104,7 @@ static xtimer_t timer_ack = {
 void _crc_error_handler(event_t *event)
 {
     (void) event;
-    puts("Packet with invalid CRC received");
+    puts("Frame with invalid CRC received");
     ieee802154_dev_t* dev = &_radio[0];
     if (!ieee802154_radio_has_rx_continuous(dev)) {
         /* switch back to RX_ON state */
