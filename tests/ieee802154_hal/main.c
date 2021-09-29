@@ -437,13 +437,13 @@ int txtsnd(int argc, char **argv)
     size_t res;
 
     if (argc != 3) {
-        puts("Usage: txtsnd <long_addr> <len>");
+        puts("Usage: txtsnd <ext_addr> <len>");
         return 1;
     }
 
     res = l2util_addr_from_str(argv[ 1], addr);
     if (res == 0) {
-        puts("Usage: txtsnd <long_addr> <len>");
+        puts("Usage: txtsnd <ext_addr> <len>");
         return 1;
     }
     len = atoi(argv[2]);
