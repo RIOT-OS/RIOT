@@ -103,7 +103,7 @@ size_t dns_msg_compose_query(void *dns_buf, const char *domain_name,
 
     dns_hdr_t *hdr = (dns_hdr_t*) buf;
     memset(hdr, 0, sizeof(*hdr));
-    hdr->id = id;
+    hdr->id = htons(id);
     hdr->flags = htons(0x0120);
     hdr->qdcount = htons(1 + (family == AF_UNSPEC));
 
