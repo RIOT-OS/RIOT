@@ -30,8 +30,9 @@ EXCLUDE="^(.+/vendor/\
 |dist/tools/mcuboot\
 |dist/tools/uhcpd\
 |dist/tools/stm32loader\
-|dist/tools/suit/suit-manifest-generator)\
-|dist/tools/esptool"
+|dist/tools/suit/suit-manifest-generator\
+|dist/tools/esptool\
+|dist/pythonlibs/riotctrl_*)"
 FILEREGEX='(\.py$|pyterm$)'
 FILES=$(FILEREGEX=${FILEREGEX} EXCLUDE=${EXCLUDE} changed_files)
 
