@@ -1,0 +1,23 @@
+# Copyright (c) 2021 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if TEST_KCONFIG
+
+config MODULE_PERIPH_UART_NONBLOCKING
+    depends on HAS_PERIPH_UART_NONBLOCKING
+    depends on MODULE_PERIPH_UART
+    select MODULE_TSRB
+
+config MODULE_PERIPH_SPI
+    depends on HAS_PERIPH_SPI
+    select MODULE_PERIPH_GPIO_IRQ if CPU_MODEL_NRF52832XXAA && HAS_PERIPH_GPIO_IRQ
+
+config MODULE_SAUL_NRF_VDDH
+    bool "Internal Voltage Sensor"
+    depends on HAS_PERIPH_ADC
+
+endif # TEST_KCONFIG

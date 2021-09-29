@@ -35,11 +35,13 @@ config HAS_BLE_NIMBLE_NETIF
 
 config HAS_RADIO_NRFBLE
     bool
+    select HAVE_NRF5X_RADIO
     help
         Indicates that a BLE-compatible nRF radio is present.
 
 config HAS_RADIO_NRFMIN
     bool
+    select HAVE_NRF5X_RADIO
     help
         Indicates that a radio compatible with the nRF minimal radio driver is
         present.
@@ -55,5 +57,13 @@ config HAS_VDD_LC_FILTER_REG1
     help
         Indicates that a board is equipped with an external LC filter circuit
         attached to the CPUs voltage regulator stage 1.
+
+
+config MODULE_CPU_COMMON
+    bool
+    depends on TEST_KCONFIG
+    default y
+
+rsource "periph/Kconfig.nrf5x"
 
 source "$(RIOTCPU)/cortexm_common/Kconfig"

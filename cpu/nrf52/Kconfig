@@ -84,4 +84,7 @@ config HAS_CPU_NRF52
     help
         Indicates that the current cpu is 'nrf52'.
 
+rsource "periph/Kconfig"
+rsource "vectors/Kconfig"
+
 source "$(RIOTCPU)/nrf5x_common/Kconfig"
