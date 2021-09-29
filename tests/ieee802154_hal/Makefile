@@ -25,11 +25,11 @@ USEMODULE += ieee802154
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-USEMODULE += event_thread_highest
+USEMODULE += event_thread
 USEMODULE += event_callback
 USEMODULE += xtimer
 USEMODULE += netdev_default
 
-CFLAGS += -DEVENT_THREAD_HIGHEST_STACKSIZE=1024
+CFLAGS += -DEVENT_THREAD_MEDIUM_STACKSIZE=1024
 
 include $(RIOTBASE)/Makefile.include
