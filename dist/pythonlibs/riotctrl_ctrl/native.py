@@ -17,9 +17,10 @@ class NativeRIOTCtrl(riotctrl.ctrl.RIOTCtrl):
     process, whenever a terminal is started. This allows for `reset()` to also
     work for a the `native` instance.
     """
+
     def _set_debug_adapter_id(self, child):
-        if child.name().endswith('.elf'):
-            self.env['DEBUG_ADAPTER_ID'] = str(child.pid)
+        if child.name().endswith(".elf"):
+            self.env["DEBUG_ADAPTER_ID"] = str(child.pid)
             return True
         return False
 
