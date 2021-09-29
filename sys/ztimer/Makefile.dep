@@ -108,3 +108,27 @@ ifneq (,$(filter ztimer_msec,$(USEMODULE)))
     USEMODULE += ztimer_periph_timer
   endif
 endif
+
+ifneq (,$(filter ztimer_sec,$(USEMODULE)))
+  USEMODULE += ztimer
+  # try to use RTC unless we are on native, as it is based on xtimer it is
+  # actually buggy
+  ifeq (,$(filter native,$(BOARD)))
+    FEATURES_OPTIONAL += periph_rtc
+  endif
+  # HACK: see above
+  include $(RIOTMAKE)/features_check.inc.mk
+  ifneq (,$(filter periph_rtc,$(FEATURES_USED)))
+    USEMODULE += ztimer_periph_rtc
+  else
+    # if there is no RTC try to use RTT
+    FEATURES_OPTIONAL += periph_rtt
+    # HACK: see above
+    include $(RIOTMAKE)/features_check.inc.mk
+    ifneq (,$(filter periph_rtt,$(FEATURES_USED)))
+      USEMODULE += ztimer_periph_rtt
+    else
+      USEMODULE += ztimer_periph_timer
+    endif
+  endif
+endif
