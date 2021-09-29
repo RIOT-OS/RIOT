@@ -10,7 +10,7 @@ config BOARD
 config BOARD_NRF52DK
     bool
     default y
-    select BOARD_COMMON_NRF52XXXDK
+    select BOARDS_COMMON_NRF52XXXDK
     select CPU_MODEL_NRF52832XXAA
 
 source "$(RIOTBOARD)/common/nrf52xxxdk/Kconfig"

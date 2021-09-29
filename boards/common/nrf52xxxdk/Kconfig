@@ -4,7 +4,7 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-config BOARD_COMMON_NRF52XXXDK
+config BOARDS_COMMON_NRF52XXXDK
     bool
     select BOARD_COMMON_NRF52
     select HAS_PERIPH_I2C
@@ -12,5 +12,11 @@ config BOARD_COMMON_NRF52XXXDK
     select HAS_PERIPH_SPI
     select HAS_PERIPH_UART
     select HAS_VDD_LC_FILTER_REG1
+
+    select HAVE_SAUL_GPIO
+
+config MODULE_BOARDS_COMMON_NRF52XXDK
+    bool
+    default y
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"
