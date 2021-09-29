@@ -189,6 +189,7 @@ endif
 
 ifneq (,$(filter ieee802154_submac,$(USEMODULE)))
   USEMODULE += xtimer
+  USEMODULE += random
 endif
 
 ifneq (,$(filter l2util,$(USEMODULE)))
