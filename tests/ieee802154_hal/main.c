@@ -26,6 +26,7 @@
 #include "errno.h"
 #include "event/thread.h"
 #include "luid.h"
+#include "od.h"
 
 #include "net/l2util.h"
 #include "net/ieee802154.h"
@@ -61,11 +62,8 @@ static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
     }
     else {
         puts("Frame received:");
-        for (unsigned i=0;i<size;i++) {
-            printf("%02x ", buffer[i]);
-        }
+        od_hex_dump(buffer, size, 0);
     }
-    puts("");
     printf("LQI: %i, RSSI: %i\n", (int) lqi, (int) rssi);
     puts("");
 }
