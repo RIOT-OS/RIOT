@@ -254,7 +254,12 @@ netdev_t *gnrc_lorawan_get_netdev(gnrc_lorawan_t *mac)
 
 static int _init(gnrc_netif_t *netif)
 {
-    gnrc_netif_default_init(netif);
+    int res = gnrc_netif_default_init(netif);
+
+    if (res < 0) {
+        return res;
+    }
+
     netif->dev->event_callback = _driver_cb;
     _reset(netif);
 
@@ -280,7 +285,7 @@ static int _init(gnrc_netif_t *netif)
                    GNRC_LORAWAN_BACKOFF_WINDOW_TICK / 1000,
                    &backoff_msg, thread_getpid());
 
-    return 0;
+    return res;
 }
 
 int gnrc_netif_lorawan_create(gnrc_netif_t *netif, char *stack, int stacksize,
