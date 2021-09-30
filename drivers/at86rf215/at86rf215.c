@@ -29,6 +29,12 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+__attribute__((weak)) void at86rf215_signal_setup(at86rf215_t *dev, int index)
+{
+    (void) dev;
+    (void) index;
+}
+
 static void _setup_interface(at86rf215_t *dev, const at86rf215_params_t *params, uint8_t index)
 {
     netdev_t *netdev = &dev->netdev.netdev;
@@ -38,6 +44,7 @@ static void _setup_interface(at86rf215_t *dev, const at86rf215_params_t *params,
     dev->state = AT86RF215_STATE_OFF;
 
     netdev_register(netdev, NETDEV_AT86RF215, index);
+    at86rf215_signal_setup(dev, index);
 }
 
 void at86rf215_setup(at86rf215_t *dev_09, at86rf215_t *dev_24, const at86rf215_params_t *params, uint8_t index)
@@ -46,17 +53,18 @@ void at86rf215_setup(at86rf215_t *dev_09, at86rf215_t *dev_24, const at86rf215_p
     if (dev_09) {
         dev_09->RF = &RF09_regs;
         dev_09->BBC = &BBC0_regs;
-        _setup_interface(dev_09, params, 2 * index);
         dev_09->sibling = dev_24;
+        _setup_interface(dev_09, params, 2 * index);
     }
 
     /* configure the 2.4 GHz interface */
     if (dev_24) {
         dev_24->RF = &RF24_regs;
         dev_24->BBC = &BBC1_regs;
-        _setup_interface(dev_24, params, 2 * index + 1);
         dev_24->sibling = dev_09;
+        _setup_interface(dev_24, params, 2 * index + 1);
     }
+
 }
 
 void at86rf215_reset_and_cfg(at86rf215_t *dev)

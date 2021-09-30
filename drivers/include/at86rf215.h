@@ -677,6 +677,21 @@ int at86rf215_enable_batmon(at86rf215_t *dev, unsigned voltage);
  */
 void at86rf215_disable_batmon(at86rf215_t *dev);
 
+/**
+ * @brief   Signal that the AT86RF215 setup function finished.
+ *
+ *          This function is called right after @ref at86rf215_setup finished
+ *          the initialization of @p dev.
+ *          By default this function is a weak no-op symbol. Override if needed
+ *          (e.g clock configuration and trimming).
+ *
+ * @note    This function is called before @ref netdev_driver_t::init.
+ *
+ * @param[in] dev           pointer to the device descriptor
+ * @param[in] index         index of the device
+ */
+void at86rf215_signal_setup(at86rf215_t *dev, int index);
+
 #ifdef __cplusplus
 }
 #endif
