@@ -20,11 +20,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "shell.h"
-#include "ztimer.h"
-#include "thread.h"
-#include "msg.h"
+
+#include "atomic_utils.h"
 #include "irq.h"
+#include "msg.h"
+#include "shell.h"
+#include "thread.h"
+#include "ztimer.h"
 
 /* timeout at one millisecond (1000 us) to make sure it does not spin. */
 #define LONG_RMUTEX_TIMEOUT 1000
@@ -148,8 +150,7 @@ static int cmd_test_ztimer_rmutex_lock_timeout_long_unlocked(int argc,
 
     if (ztimer_rmutex_lock_timeout(ZTIMER_USEC, &test_rmutex, LONG_RMUTEX_TIMEOUT) == 0) {
         /* rmutex has to be locked once */
-        if (atomic_load_explicit(&test_rmutex.owner,
-                                 memory_order_relaxed) == thread_getpid() &&
+        if (atomic_load_kernel_pid(&test_rmutex.owner) == thread_getpid() &&
             test_rmutex.refcount == 1 &&
             mutex_trylock(&test_rmutex.mutex) == 0) {
             puts("OK");
@@ -202,8 +203,7 @@ static int cmd_test_ztimer_rmutex_lock_timeout_long_locked(int argc,
     }
     else {
         /* rmutex has to be locked once */
-        if (atomic_load_explicit(&test_rmutex.owner,
-                                 memory_order_relaxed) == second_t_pid &&
+        if (atomic_load_kernel_pid(&test_rmutex.owner) == second_t_pid &&
             test_rmutex.refcount == 1 &&
             mutex_trylock(&test_rmutex.mutex) == 0) {
             puts("OK");
@@ -254,8 +254,7 @@ static int cmd_test_ztimer_rmutex_lock_timeout_low_prio_thread(
 
     if (ztimer_rmutex_lock_timeout(ZTIMER_USEC, &test_rmutex, LONG_RMUTEX_TIMEOUT) == 0) {
         /* rmutex has to be locked once */
-        if (atomic_load_explicit(&test_rmutex.owner,
-                                 memory_order_relaxed) == thread_getpid() &&
+        if (atomic_load_kernel_pid(&test_rmutex.owner) == thread_getpid() &&
             test_rmutex.refcount == 1 &&
             mutex_trylock(&test_rmutex.mutex) == 0) {
             puts("OK");
@@ -310,8 +309,7 @@ static int cmd_test_ztimer_rmutex_lock_timeout_short_locked(int argc,
     }
     else {
         /* rmutex has to be locked once */
-        if (atomic_load_explicit(&test_rmutex.owner,
-                                 memory_order_relaxed) == second_t_pid &&
+        if (atomic_load_kernel_pid(&test_rmutex.owner) == second_t_pid &&
             test_rmutex.refcount == 1 &&
             mutex_trylock(&test_rmutex.mutex) == 0) {
             puts("OK");
@@ -348,8 +346,7 @@ static int cmd_test_ztimer_rmutex_lock_timeout_short_unlocked(int argc,
 
     if (ztimer_rmutex_lock_timeout(ZTIMER_USEC, &test_rmutex, SHORT_RMUTEX_TIMEOUT) == 0) {
         /* rmutex has to be locked once */
-        if (atomic_load_explicit(&test_rmutex.owner,
-                                 memory_order_relaxed) == thread_getpid() &&
+        if (atomic_load_kernel_pid(&test_rmutex.owner) == thread_getpid() &&
             test_rmutex.refcount == 1 &&
             mutex_trylock(&test_rmutex.mutex) == 0) {
             puts("OK");

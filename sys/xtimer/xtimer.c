@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include "xtimer.h"
+#include "atomic_utils.h"
 #include "msg.h"
 #include "mutex.h"
 #include "rmutex.h"
@@ -224,8 +225,7 @@ int xtimer_rmutex_lock_timeout(rmutex_t *rmutex, uint64_t timeout)
         return 0;
     }
     if (xtimer_mutex_lock_timeout(&rmutex->mutex, timeout) == 0) {
-        atomic_store_explicit(&rmutex->owner,
-                              thread_getpid(), memory_order_relaxed);
+        atomic_store_kernel_pid(&rmutex->owner, thread_getpid());
         rmutex->refcount++;
         return 0;
     }
