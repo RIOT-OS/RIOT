@@ -331,6 +331,14 @@ typedef enum {
  */
 #define NETDEV_INDEX_ANY    (0xFF)
 
+#if DOXYGEN
+/**
+ * @brief   Call @ref netdev_register_signal when the netdev device is
+ *          registered.
+ */
+#define CONFIG_NETDEV_REGISTER_SIGNAL 0
+#endif
+
 /**
  * @brief Structure to hold driver state
  *
@@ -357,6 +365,21 @@ struct netdev {
 };
 
 /**
+ * @brief   Signal that the @ref netdev_register function registered the device.
+ *
+ *          This function is called right after @ref netdev_register registered
+ *          the device.
+ *
+ * @note    This function is called only if the CFLAG @ref
+ *          CONFIG_NETDEV_REGISTER_SIGNAL is set.
+ *
+ * @param[in] dev           pointer to the device descriptor
+ * @param[in] type          the driver used for the netdev
+ * @param[in] index         the index in the config struct
+ */
+void netdev_register_signal(struct netdev *dev, netdev_type_t type, uint8_t index);
+
+/**
  * @brief Register a device with netdev.
  *        Must by called by the driver's setup function.
  *
@@ -374,6 +397,10 @@ static inline void netdev_register(struct netdev *dev, netdev_type_t type, uint8
     (void) type;
     (void) index;
 #endif
+
+    if (IS_ACTIVE(CONFIG_NETDEV_REGISTER_SIGNAL)) {
+        netdev_register_signal(dev, type, index);
+    }
 }
 
 /**
