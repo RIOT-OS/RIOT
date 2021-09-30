@@ -83,7 +83,11 @@ static int _netif_init(gnrc_netif_t *netif)
 {
     (void)netif;
 
-    gnrc_netif_default_init(netif);
+    int res = gnrc_netif_default_init(netif);
+    if (res < 0) {
+        return res;
+    }
+
     /* save the threads context pointer, so we can set its flags */
     _netif_thread = thread_get_active();
 
@@ -92,8 +96,9 @@ static int _netif_init(gnrc_netif_t *netif)
      * of this */
     _netif.sixlo.max_frag_size = 0;
 #endif  /* IS_USED(MODULE_GNRC_NETIF_6LO) */
+    res = 0;
 
-    return 0;
+    return res;
 }
 
 static int _send_pkt(nimble_netif_conn_t *conn, gnrc_pktsnip_t *pkt)
