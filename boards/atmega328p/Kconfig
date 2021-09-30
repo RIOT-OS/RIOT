@@ -21,3 +21,6 @@ config BOARD_ATMEGA328P
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
     # Various other features (if any)
+    select MODULE_BOARDS_COMMON_ATMEGA if TEST_KCONFIG
+
+source "$(RIOTBOARD)/common/atmega/Kconfig"
