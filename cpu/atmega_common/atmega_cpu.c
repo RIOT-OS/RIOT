@@ -87,7 +87,7 @@ void __attribute__((weak)) avr8_clk_init(void)
  * EIFR – External Interrupt Flag Register
  * PCIFR – Pin Change Interrupt Flag Register
  */
-ISR(BADISR_vect, ISR_NAKED)
+ISR(__vector_default, ISR_BLOCK)
 {
     avr8_reset_cause();
 

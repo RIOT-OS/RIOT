@@ -27,8 +27,6 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include <avr/interrupt.h>
-
 #include "cpu.h"
 #include "board.h"
 #include "periph/gpio.h"

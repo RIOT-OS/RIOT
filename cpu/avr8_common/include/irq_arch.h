@@ -44,7 +44,7 @@ __attribute__((always_inline)) static inline unsigned int irq_disable(void)
 {
     uint8_t mask;
     __asm__ volatile(
-        "in %[dest], __SREG__"      "\n\t"
+        "in %[dest], 0x3f"      "\n\t"
         "cli"                       "\n\t"
         : [dest]    "=r"(mask)
         : /* no inputs */
@@ -60,7 +60,7 @@ __attribute__((always_inline)) static inline unsigned int irq_enable(void)
 {
     uint8_t mask;
     __asm__ volatile(
-        "in %[dest], __SREG__"      "\n\t"
+        "in %[dest], 0x3f"      "\n\t"
         "sei"                       "\n\t"
         : [dest]    "=r"(mask)
         : /* no inputs */
@@ -114,7 +114,7 @@ __attribute__((always_inline)) static inline bool irq_is_enabled(void)
 {
     uint8_t mask;
     __asm__ volatile(
-        "in %[dest], __SREG__"      "\n\t"
+        "in %[dest], 0x3f"      "\n\t"
         : [dest]    "=r"(mask)
         : /* no inputs */
         : "memory"

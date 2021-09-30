@@ -32,8 +32,6 @@
 
 #include <stdio.h>
 
-#include <avr/interrupt.h>
-
 #include "cpu.h"
 #include "irq.h"
 #include "board.h"

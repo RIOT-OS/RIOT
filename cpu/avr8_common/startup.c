@@ -24,7 +24,6 @@
  */
 
 #include <stdint.h>
-#include <avr/interrupt.h>
 #include <avr/io.h>
 
 /* For Catchall-Loop */
@@ -35,6 +34,7 @@
 #ifdef MODULE_DBGPIN
 #include "dbgpin.h"
 #endif
+#include "cpu.h"
 
 /**
  * @brief functions for initializing the board, std-lib and kernel

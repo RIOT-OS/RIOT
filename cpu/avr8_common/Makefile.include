@@ -11,4 +11,7 @@ endif
 LINKFLAGS += -Wl,--defsym=flash_printf=printf_P
 LINKFLAGS += -Wl,--defsym=flash_fprintf=fprintf_P
 LINKFLAGS += -Wl,--defsym=flash_snprintf=snprintf_P
+
+TOOLCHAINS_SUPPORTED := gnu llvm
+
 include $(RIOTMAKE)/arch/avr8.inc.mk

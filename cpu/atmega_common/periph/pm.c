@@ -23,8 +23,6 @@
  * @}
  */
 
-#include <avr/wdt.h>
-
 #include "irq.h"
 #include "periph/pm.h"
 

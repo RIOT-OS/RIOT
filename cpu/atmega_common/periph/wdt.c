@@ -27,7 +27,6 @@
 #include "periph/pm.h"
 #include "periph/wdt.h"
 
-#include <avr/interrupt.h>
 #include "avr/wdt.h"
 
 #define ENABLE_DEBUG 0

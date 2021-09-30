@@ -32,7 +32,7 @@ extern "C" {
  * Doxygen */
 #ifndef DOXYGEN
 
-#define FLASH_ATTR __flash
+#define FLASH_ATTR __flash __attribute__((aligned(2)))
 #define PRIsflash "S"
 #define TO_FLASH(x) __extension__({static FLASH_ATTR const char __c[] = (x); &__c[0];})
 

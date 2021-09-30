@@ -45,7 +45,6 @@
  */
 
 #include <assert.h>
-#include <avr/interrupt.h>
 
 #include "byteorder.h"
 #include "cpu.h"
