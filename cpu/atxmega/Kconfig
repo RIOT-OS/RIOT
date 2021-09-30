@@ -77,14 +77,11 @@ source "$(RIOTCPU)/atxmega/Kconfig.XMEGAE"
 config HAS_CPU_ATXMEGA
     bool
 
-config HAS_ATXMEGA_EBI
-    bool
-    help
-        Indicates that the External Bus Interface is present.
-
 config HAS_PERIPH_NVM
     bool
     help
         Indicates that the Non Volatile Memory controller is present.
 
+rsource "ebi/Kconfig"
+rsource "periph/Kconfig"
 source "$(RIOTCPU)/avr8_common/Kconfig"
