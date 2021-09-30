@@ -180,13 +180,14 @@ static inline void __attribute__((always_inline)) cpu_print_last_instruction(voi
     uint8_t lo;
     uint16_t ptr;
 
-    __asm__ volatile ("in __tmp_reg__, __SP_H__  \n\t"
-                      "mov %0, __tmp_reg__       \n\t"
-                      : "=g" (hi));
-
-    __asm__ volatile ("in __tmp_reg__, __SP_L__  \n\t"
-                      "mov %0, __tmp_reg__       \n\t"
-                      : "=g" (lo));
+    __asm__ volatile (
+        "in %[hi], __SP_H__     \n\t"
+        "in %[lo], __SP_L__     \n\t"
+        : [hi] "=r"(hi),
+          [lo] "=r"(lo)
+        : /* no inputs */
+        : /* no clobbers */
+    );
     ptr = hi << 8 | lo;
     printf("Stack Pointer: 0x%04x\n", ptr);
 }
