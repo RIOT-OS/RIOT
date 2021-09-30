@@ -943,7 +943,12 @@ static int _lwmac_init(gnrc_netif_t *netif)
 {
     netdev_t *dev;
 
-    gnrc_netif_default_init(netif);
+    int res = gnrc_netif_default_init(netif);
+
+    if (res < 0) {
+        return res;
+    }
+
     dev = netif->dev;
     dev->event_callback = _lwmac_event_cb;
 
@@ -985,5 +990,5 @@ static int _lwmac_init(gnrc_netif_t *netif)
     netif->mac.prot.lwmac.lwmac_info |= GNRC_LWMAC_RADIO_IS_ON;
 #endif
 
-    return 0;
+    return res;
 }
