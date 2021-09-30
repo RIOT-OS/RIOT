@@ -2119,7 +2119,11 @@ static int _gomach_init(gnrc_netif_t *netif)
 {
     netdev_t *dev;
 
-    gnrc_netif_default_init(netif);
+    int res = gnrc_netif_default_init(netif);
+    if (res < 0) {
+        return res;
+    }
+
     dev = netif->dev;
     dev->event_callback = _gomach_event_cb;
 
