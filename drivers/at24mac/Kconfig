@@ -8,4 +8,11 @@
 config MODULE_AT24MAC
     bool "AT24MAC unique ID chip"
     select MODULE_AT24CXXX
+    depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
+
+config HAVE_AT24MAC
+    bool
+    select MODULE_AT24MAC if EUI_PROVIDER && HAS_PERIPH_I2C
+    help
+       Indicates that an AT24MAC unique ID chip is present.
