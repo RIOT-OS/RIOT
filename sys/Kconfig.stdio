@@ -8,7 +8,7 @@
 menu "Standard Input/Output (STDIO)"
     depends on TEST_KCONFIG
 
-choice
+choice STDIO_IMPLEMENTATION
     bool "STDIO implementation"
     default MODULE_STDIO_NATIVE if CPU_ARCH_NATIVE
     default MODULE_STDIO_UART
