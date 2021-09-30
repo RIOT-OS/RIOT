@@ -37,29 +37,17 @@ config CPU_FAM_ATMEGA128
 config CPU_FAM
     default "atmega128" if CPU_FAM_ATMEGA128
 
-## Declaration of specific features
-config HAS_ATMEGA_PCINT0
-    bool
-    help
-        Indicates that the Pin Change Interrupt bank 0 is present.
-
-config HAS_ATMEGA_PCINT1
-    bool
-    help
-        Indicates that the Pin Change Interrupt bank 1 is present.
-
-config HAS_ATMEGA_PCINT2
-    bool
-    help
-        Indicates that the Pin Change Interrupt bank 2 is present.
-
-config HAS_ATMEGA_PCINT3
-    bool
-    help
-        Indicates that the Pin Change Interrupt bank 3 is present.
-
 config ERROR_MODULES_CONFLICT
     default "On ATmega, the RTC and RTT use to the same hardware timer." if MODULE_PERIPH_RTC && MODULE_PERIPH_RTT
     depends on CPU_COMMON_ATMEGA
 
+config MODULE_ATMEGA_COMMON
+    bool
+    depends on CPU_COMMON_ATMEGA
+    depends on TEST_KCONFIG
+    default y
+    help
+        ATmega common code.
+
+rsource "periph/Kconfig"
 source "$(RIOTCPU)/avr8_common/Kconfig"
