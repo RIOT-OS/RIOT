@@ -8,38 +8,38 @@
 config HAVE_MTD_AT24CXXX
     bool
     depends on MODULE_AT24CXXX
-    select MODULE_MTD_AT24CXXX if MODULE_MTD
+    imply MODULE_MTD_AT24CXXX if MODULE_MTD
     help
         Indicates that a at24cxxx EEPROM MTD is present
 
 config HAVE_MTD_AT25XXX
     bool
     depends on MODULE_AT25XXX
-    select MODULE_MTD_AT25XXX if MODULE_MTD
+    imply MODULE_MTD_AT25XXX if MODULE_MTD
     help
         Indicates that a at25xxx SPI-EEPROM MTD is present
 
 config HAVE_MTD_NATIVE
     bool
-    select MODULE_MTD_NATIVE if MODULE_MTD
+    imply MODULE_MTD_NATIVE if MODULE_MTD
     help
         Indicates that a native MTD is present.
 
 config HAVE_MTD_SD_SCARD
     bool
-    select MODULE_MTD_SD_CARD if MODULE_MTD
+    imply MODULE_MTD_SD_CARD if MODULE_MTD
     help
         Indicates that a sdcard MTD is present
 
 config HAVE_MTD_SPI_NOR
     bool
-    select MODULE_MTD_SPI_NOR if MODULE_MTD
+    imply MODULE_MTD_SPI_NOR if MODULE_MTD
     help
         Indicates that a spi-nor MTD is present
 
 config HAVE_MTD_SPI_MCI
     bool
-    select MODULE_MTD_MCI if MODULE_MTD
+    imply MODULE_MTD_MCI if MODULE_MTD
     help
         Indicates that a Multimedia Card Interface (MCI) MTD is present
 

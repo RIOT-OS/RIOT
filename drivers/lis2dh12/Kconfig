@@ -5,6 +5,12 @@
 # directory for more details.
 #
 
+config HAVE_LIS2DH12
+    bool
+    select MODULE_LIS2DH12 if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a lisdh12 is present
+
 menuconfig MODULE_LIS2DH12
     bool "LIS2DH12 Accelerometer"
     depends on TEST_KCONFIG

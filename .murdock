@@ -8,10 +8,12 @@
 : ${TEST_BOARDS_LLVM_COMPILE:=""}
 
 : ${TEST_KCONFIG_BOARDS_AVAILABLE:="
+dwm1001
 native
-samr21-xpro
+nrf52840dk
 nucleo-f103rb
 remote-revb
+samr21-xpro
 "}
 
 : ${TEST_KCONFIG_ENFORCE_APP_GROUPS:="

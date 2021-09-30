@@ -24,5 +24,6 @@ endif # KCONFIG_USEMODULE_NRF802154
 ## Related features
 config HAS_RADIO_NRF802154
     bool
+    select HAVE_NRF5X_RADIO
     help
         Indicates that a IEEE 802.15.4 NRF52 radio is present.
