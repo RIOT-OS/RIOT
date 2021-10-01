@@ -24,6 +24,12 @@ ifeq (,$(PKG_LICENSE))
   $(error PKG_LICENSE not defined)
 endif
 
+ifneq (, $(PKG_MIRROR_URL))
+  ifneq (0, $(PKG_USE_MIRROR))
+    PKG_URL = $(PKG_MIRROR_URL)
+  endif
+endif
+
 PKG_DIR ?= $(CURDIR)
 PKG_PATCH_DIR ?= $(PKG_DIR)/patches
 
