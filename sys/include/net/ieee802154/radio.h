@@ -270,7 +270,11 @@ typedef enum {
      * The transceiver might be in a "FB Lock" state where no more frames are
      * received. This is done in order to avoid overwriting the Frame Buffer
      * with new frame arrivals.  In order to leave this state, the upper layer
-     * must call @ref ieee802154_radio_ops::read.
+     * must call @ref ieee802154_radio_read
+     *
+     * @note since the behavior of radios after frame reception is undefined,
+     * the upper layer should set the transceiver state to IDLE as soon as
+     * possible before calling @ref ieee802154_radio_read
      */
     IEEE802154_RADIO_INDICATION_RX_DONE,
 
@@ -537,8 +541,8 @@ struct ieee802154_radio_ops {
      * This function reads the received frame from the internal framebuffer.
      * It should try to copy the received PSDU frame into @p buf. The FCS
      * field will **not** be copied and its size **not** be taken into account
-     * for the return value. If the radio provides any kind of framebuffer protection,
-     * this function should release it.
+     * for the return value. If the radio provides any kind of framebuffer
+     * protection, this function should release it.
      *
      * @post Don't call this function if there was no reception event
      * (either @ref IEEE802154_RADIO_INDICATION_RX_DONE or @ref
