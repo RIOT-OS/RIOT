@@ -37,6 +37,14 @@
 #include "debug.h"
 
 /**
+ * @brief   Threshold under which polling transfers are used instead of DMA
+ *          TODO: determine at run-time based on SPI clock
+ */
+#ifndef CONFIG_SPI_DMA_THRESHOLD_BYTES
+#define CONFIG_SPI_DMA_THRESHOLD_BYTES  16
+#endif
+
+/**
  * @brief Array holding one pre-initialized mutex for each SPI device
  */
 static mutex_t locks[SPI_NUMOF];
@@ -508,7 +516,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         gpio_clear((gpio_t)cs);
     }
 
-    if (_use_dma(bus)) {
+    if (_use_dma(bus) && len > CONFIG_SPI_DMA_THRESHOLD_BYTES) {
 #ifdef MODULE_PERIPH_DMA
         /* The DMA promises not to modify the const out data */
         _dma_transfer(bus, out, in, len);
