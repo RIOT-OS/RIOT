@@ -72,7 +72,11 @@ NIGHTLY=${NIGHTLY:-0}
 RUN_TESTS=${RUN_TESTS:-${NIGHTLY}}
 
 DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS -E ENABLE_TEST_CACHE
-         -E TEST_HASH -E CI_PULL_LABELS"
+         -E TEST_HASH -E CI_PULL_LABELS -EPKG_USE_MIRROR"
+
+if [ ${NIGHTLY} -eq 1 ]; then
+    export PKG_USE_MIRROR=0
+fi
 
 get_supported_kconfig_board_app() {
     local board=$1
