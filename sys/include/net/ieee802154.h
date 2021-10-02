@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_ieee802154 IEEE 802.15.4
- * @ingroup     net
+ * @defgroup    net_ieee802154_header IEEE 802.15.4 frame headers and definitions
+ * @ingroup     net_ieee802154
  * @brief       IEEE 802.15.4 header definitions and utility functions
  * @{
  *
