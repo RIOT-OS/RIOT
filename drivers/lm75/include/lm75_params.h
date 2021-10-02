@@ -31,8 +31,8 @@
 extern "C" {
 #endif
 
-#ifndef LM75_PARAMS_I2C
-#define LM75_PARAMS_I2C    I2C_DEV(0) /**< I2C BUS used */
+#ifndef LM75_PARAM_I2C
+#define LM75_PARAM_I2C               I2C_DEV(0) /**< I2C BUS used */
 #endif
 
 /** 7-bit I2C slave address: 1-0-0-1-A2-A1-A0, where
@@ -145,7 +145,7 @@ extern "C" {
 #define LM75_PARAMS        {     .res             = &lm75a_properties, \
                                  .gpio_alarm      = LM75_PARAM_INT, \
                                  .conv_rate       = LM75A_CONV_RATE, \
-                                 .i2c_bus         = LM75_PARAMS_I2C, \
+                                 .i2c_bus         = LM75_PARAM_I2C, \
                                  .i2c_addr        = CONFIG_LM75_I2C_ADDR, \
                                  .shutdown_mode   = CONFIG_OPERATION_MODE, \
                                  .tm_mode         = CONFIG_THERMOSTAT_MODE, \
@@ -158,7 +158,7 @@ extern "C" {
 #define LM75_PARAMS        {    .res                 = &tmp1075_properties, \
                                 .gpio_alarm          = LM75_PARAM_INT, \
                                 .conv_rate           = TMP1075_CONV_RATE, \
-                                .i2c_bus             = LM75_PARAMS_I2C, \
+                                .i2c_bus             = LM75_PARAM_I2C, \
                                 .i2c_addr            = CONFIG_LM75_I2C_ADDR, \
                                 .shutdown_mode       = CONFIG_OPERATION_MODE, \
                                 .tm_mode             = CONFIG_THERMOSTAT_MODE, \
