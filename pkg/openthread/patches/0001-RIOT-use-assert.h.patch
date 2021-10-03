@@ -1,25 +1,25 @@
-From 51cf02a0ee4d6dd441edbc5e20f58eb1ee4c28f4 Mon Sep 17 00:00:00 2001
-From: Benjamin Valentin <benpicco@googlemail.com>
-Date: Thu, 17 Dec 2020 14:33:22 +0100
-Subject: [PATCH] [RIOT] use <assert.h>
+From 49352494e1e22c9d2d85e13867daee1a0553faa5 Mon Sep 17 00:00:00 2001
+From: Alexandre Abadie <alexandre.abadie@inria.fr>
+Date: Sat, 2 Oct 2021 16:39:28 +0200
+Subject: [PATCH 1/1] RIOT use assert.h
 
 ---
  src/core/common/debug.hpp | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/core/common/debug.hpp b/src/core/common/debug.hpp
-index 3ab0eb21b..6e48f7d0d 100644
+index 50dd2b2b2..97d44394f 100644
 --- a/src/core/common/debug.hpp
 +++ b/src/core/common/debug.hpp
-@@ -40,7 +40,7 @@
- #include <stdio.h>
- #include "utils/wrap_string.h"
+@@ -41,7 +41,7 @@
  
--#if defined(OPENTHREAD_TARGET_DARWIN) || defined(OPENTHREAD_TARGET_LINUX)
-+#if defined(OPENTHREAD_TARGET_DARWIN) || defined(OPENTHREAD_TARGET_LINUX) || defined(OPENTHREAD_TARGET_RIOT)
+ #if OPENTHREAD_CONFIG_ASSERT_ENABLE
+ 
+-#if defined(__APPLE__) || defined(__linux__)
++#if defined(__APPLE__) || defined(__linux__) || defined(OPENTHREAD_TARGET_RIOT)
  
  #include <assert.h>
  
 -- 
-2.27.0
+2.30.2
 

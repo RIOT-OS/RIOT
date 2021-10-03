@@ -1,7 +1,7 @@
 OPENTHREAD_DIR = $(RIOTBASE)/pkg/openthread
 
-INCLUDES += -I$(OPENTHREAD_DIR)/include \
-            -I$(BINDIR)/pkg/openthread/include
+INCLUDES += -I$(PKGDIRBASE)/openthread/include
+INCLUDES += -I$(OPENTHREAD_DIR)/include
 
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
   DIRS += $(OPENTHREAD_DIR)/contrib
@@ -16,3 +16,4 @@ endif
 
 ARCHIVES += $(addprefix $(BINDIR)/,$(addsuffix .a,$(filter openthread-%,$(USEMODULE))))
 ARCHIVES += $(BINDIR)/mbedcrypto.a
+ARCHIVES += $(BINDIR)/mbedtls.a

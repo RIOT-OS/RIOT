@@ -94,10 +94,7 @@ static void *_openthread_event_loop(void *arg)
     /* init OpenThread */
     sInstance = otInstanceInitSingle();
 
-    /* enable OpenThread UART */
-    otPlatUartEnable();
-
-#if defined(MODULE_OPENTHREAD_CLI)
+#if defined(MODULE_OPENTHREAD_CLI_FTD) || defined(MODULE_OPENTHREAD_CLI_MTD)
     otCliUartInit(sInstance);
     /* Init default parameters */
     otPanId panid = OPENTHREAD_PANID;
@@ -108,6 +105,9 @@ static void *_openthread_event_loop(void *arg)
     otIp6SetEnabled(sInstance, true);
     /* Start Thread protocol operation */
     otThreadSetEnabled(sInstance, true);
+#else
+    /* enable OpenThread UART */
+    otPlatUartEnable();
 #endif
 
 #if OPENTHREAD_ENABLE_DIAG
