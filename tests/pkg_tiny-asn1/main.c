@@ -14,7 +14,7 @@
 
 #include "tiny-asn1.h"
 
-void print_hex(uint8_t *data, unsigned int len)
+void print_hex(const uint8_t *data, unsigned int len)
 {
     unsigned int count = 0;
     unsigned int blockCount = 0;
