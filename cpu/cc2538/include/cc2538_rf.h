@@ -299,6 +299,24 @@ typedef struct {
 void cc2538_rf_hal_setup(ieee802154_dev_t *hal);
 
 /**
+ * @brief   Enable CC2538 RF IRQs.
+ */
+static inline void cc2538_rf_enable_irq(void)
+{
+    RFCORE_XREG_RFIRQM1 = TXDONE | CSP_STOP | TXACKDONE;
+    RFCORE_XREG_RFIRQM0 = RXPKTDONE | SFD;
+}
+
+/**
+ * @brief   Disable CC2538 RF IRQs.
+ */
+static inline void cc2538_rf_disable_irq(void)
+{
+    RFCORE_XREG_RFIRQM1 = 0;
+    RFCORE_XREG_RFIRQM0 = 0;
+}
+
+/**
  * @brief   IRQ handler for RF events
  *
  */
