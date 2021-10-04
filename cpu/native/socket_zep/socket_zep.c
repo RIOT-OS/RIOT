@@ -610,8 +610,7 @@ static const ieee802154_radio_ops_t socket_zep_rf_ops = {
           | IEEE802154_CAP_AUTO_CSMA
           | IEEE802154_CAP_IRQ_TX_DONE
           | IEEE802154_CAP_IRQ_TX_START
-          | IEEE802154_CAP_PHY_OQPSK
-          | IEEE802154_CAP_RX_CONTINUOUS,
+          | IEEE802154_CAP_PHY_OQPSK,
 
     .write = _write,
     .read = _read,

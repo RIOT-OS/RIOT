@@ -158,18 +158,6 @@ typedef enum {
      * set if the source address matches one from the table.
      */
     IEEE802154_CAP_SRC_ADDR_MATCH       = BIT18,
-    /**
-     * @brief the device stays in RX_ON on @ref
-     * IEEE802154_RADIO_INDICATION_RX_DONE or @ref
-     * IEEE802154_RADIO_INDICATION_CRC_ERROR
-     *
-     * Radios that provide this feature don't need to call @ref
-     * ieee802154_radio_request_set_trx_state on after receiving a frame, in
-     * case more frames are expected. This does not affect Framebuffer
-     * protection (e.g a radio might still be listening but its framebuffer is
-     * locked because the upper layer didn't call @ref ieee802154_radio_read)
-     */
-    IEEE802154_CAP_RX_CONTINUOUS        = BIT19,
 } ieee802154_rf_caps_t;
 
 /**
@@ -238,12 +226,13 @@ typedef enum {
     /**
      * @brief the transceiver received a frame with an invalid crc.
      *
-     * The transceiver might not stay in @ref IEEE802154_TRX_STATE_RX_ON
-     * after receiving an invalid CRC. Therefore the upper layer must
-     * set the transceiver state (@ref ieee802154_radio_ops::request_set_trx_state).
-     * e.g.: @ref IEEE802154_TRX_STATE_TRX_OFF or @ref IEEE802154_TRX_STATE_TX_ON
-     * to stop listening or @ref IEEE802154_TRX_STATE_RX_ON to keep
-     * listening.
+     * @note some radios won't flush the framebuffer on reception of a frame
+     * with invalid CRC. Therefore it's required to call @ref
+     * ieee802154_radio_read.
+     *
+     * @note since the behavior of radios after frame reception is undefined,
+     * the upper layer should set the transceiver state to IDLE as soon as
+     * possible before calling @ref ieee802154_radio_read
      */
     IEEE802154_RADIO_INDICATION_CRC_ERROR,
 
@@ -1554,22 +1543,6 @@ static inline bool ieee802154_radio_has_phy_mr_fsk(ieee802154_dev_t *dev)
 static inline uint32_t ieee802154_radio_get_phy_modes(ieee802154_dev_t *dev)
 {
     return (dev->driver->caps & IEEE802154_RF_CAPS_PHY_MASK);
-}
-
-/**
- * @brief Check whether the radio stays in RX_ON after @ref
- *        IEEE802154_RADIO_INDICATION_RX_DONE or @ref
- *        IEEE802154_RADIO_INDICATION_CRC_ERROR events (see @ref
- *        IEEE802154_CAP_RX_CONTINUOUS)
- *
- * @param[in] dev IEEE802.15.4 device descriptor
- *
- * @return true if the device stays in RX_ON state
- * @return false otherwise
- */
-static inline bool ieee802154_radio_has_rx_continuous(ieee802154_dev_t *dev)
-{
-    return (dev->driver->caps & IEEE802154_CAP_RX_CONTINUOUS);
 }
 
 /**

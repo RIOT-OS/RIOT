@@ -623,7 +623,7 @@ static const ieee802154_radio_ops_t cc2538_rf_ops = {
           | IEEE802154_CAP_IRQ_CCA_DONE
           | IEEE802154_CAP_IRQ_RX_START
           | IEEE802154_CAP_IRQ_TX_START
-          | IEEE802154_CAP_RX_CONTINUOUS,
+          | IEEE802154_CAP_PHY_OQPSK,
 
     .write = _write,
     .read = _read,
