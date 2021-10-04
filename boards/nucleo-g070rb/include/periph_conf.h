@@ -67,6 +67,10 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF1,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
+#ifdef MODULE_PERIPH_UART_RS485
+        .de_pin     = GPIO_PIN(PORT_A, 1),
+        .de_af      = GPIO_AF1
+#endif
     },
     {   /* Arduino pinout on D0/D1 */
         .dev        = USART1,
