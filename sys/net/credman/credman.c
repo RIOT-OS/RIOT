@@ -359,8 +359,8 @@ static int _parse_ecc_point(const asn1_tree *key, const void **x, const void **y
     }
 
     size_t coords_len = (key->length - 2) / 2;
-    uint8_t *_x = &key->data[2]; /* skip format specifier and unused bits */
-    uint8_t *_y = &_x[coords_len];
+    const uint8_t *_x = &key->data[2]; /* skip format specifier and unused bits */
+    const uint8_t *_y = &_x[coords_len];
 
     *x = _x;
     *y = _y;
