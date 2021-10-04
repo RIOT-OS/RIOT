@@ -26,7 +26,9 @@
 #include "errno.h"
 #include "event/thread.h"
 #include "luid.h"
+#include "od.h"
 
+#include "net/l2util.h"
 #include "net/ieee802154.h"
 #include "net/ieee802154/radio.h"
 
@@ -37,6 +39,8 @@
 
 #define SYMBOL_TIME (16U) /**< 16 us */
 #define ACK_TIMEOUT_TIME (40 * SYMBOL_TIME)
+#define IEEE802154_LONG_ADDRESS_LEN_STR_MAX \
+    (sizeof("00:00:00:00:00:00:00:00"))
 
 static inline void _set_trx_state(int state, bool verbose);
 
@@ -57,25 +61,20 @@ static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
         printf("Received valid ACK with sqn %i\n", buffer[2]);
     }
     else {
-        puts("Packet received:");
-        for (unsigned i=0;i<size;i++) {
-            printf("%02x ", buffer[i]);
-        }
+        puts("Frame received:");
+        od_hex_dump(buffer, size, 0);
     }
-    puts("");
     printf("LQI: %i, RSSI: %i\n", (int) lqi, (int) rssi);
     puts("");
 }
 
 static int print_addr(int argc, char **argv)
 {
-    (void) argc;
-    (void) argv;
-    uint8_t *_p = (uint8_t*) &ext_addr;
-    for(int i=0;i<8;i++) {
-        printf("%02x", *_p++);
-    }
-    printf("\n");
+    (void)argc;
+    (void)argv;
+    char addr_str[IEEE802154_LONG_ADDRESS_LEN_STR_MAX];
+    printf("%s\n", l2util_addr_to_str(
+               ext_addr.uint8, IEEE802154_LONG_ADDRESS_LEN, addr_str));
     return 0;
 }
 
@@ -104,7 +103,7 @@ static xtimer_t timer_ack = {
 void _crc_error_handler(event_t *event)
 {
     (void) event;
-    puts("Packet with invalid CRC received");
+    puts("Frame with invalid CRC received");
     ieee802154_dev_t* dev = &_radio[0];
     if (!ieee802154_radio_has_rx_continuous(dev)) {
         /* switch back to RX_ON state */
@@ -356,72 +355,6 @@ static int send(uint8_t *dst, size_t dst_len,
     return 0;
 }
 
-static inline int _dehex(char c, int default_)
-{
-    if ('0' <= c && c <= '9') {
-        return c - '0';
-    }
-    else if ('A' <= c && c <= 'F') {
-        return c - 'A' + 10;
-    }
-    else if ('a' <= c && c <= 'f') {
-        return c - 'a' + 10;
-    }
-    else {
-        return default_;
-    }
-}
-
-static size_t _parse_addr(uint8_t *out, size_t out_len, const char *in)
-{
-    const char *end_str = in;
-    uint8_t *out_end = out;
-    size_t count = 0;
-    int assert_cell = 1;
-
-    if (!in || !*in) {
-        return 0;
-    }
-    while (end_str[1]) {
-        ++end_str;
-    }
-
-    while (end_str >= in) {
-        int a = 0, b = _dehex(*end_str--, -1);
-        if (b < 0) {
-            if (assert_cell) {
-                return 0;
-            }
-            else {
-                assert_cell = 1;
-                continue;
-            }
-        }
-        assert_cell = 0;
-
-        if (end_str >= in) {
-            a = _dehex(*end_str--, 0);
-        }
-
-        if (++count > out_len) {
-            return 0;
-        }
-        *out_end++ = (a << 4) | b;
-    }
-    if (assert_cell) {
-        return 0;
-    }
-    /* out is reversed */
-
-    while (out < --out_end) {
-        uint8_t tmp = *out_end;
-        *out_end = *out;
-        *out++ = tmp;
-    }
-
-    return count;
-}
-
 int _cca(int argc, char **argv)
 {
     (void) argc;
@@ -504,13 +437,13 @@ int txtsnd(int argc, char **argv)
     size_t res;
 
     if (argc != 3) {
-        puts("Usage: txtsnd <long_addr> <len>");
+        puts("Usage: txtsnd <ext_addr> <len>");
         return 1;
     }
 
-    res = _parse_addr(addr, sizeof(addr), argv[1]);
+    res = l2util_addr_from_str(argv[ 1], addr);
     if (res == 0) {
-        puts("Usage: txtsnd <long_addr> <len>");
+        puts("Usage: txtsnd <ext_addr> <len>");
         return 1;
     }
     len = atoi(argv[2]);
