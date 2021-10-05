@@ -1,14 +1,6 @@
-PSEUDOMODULES += at_urc
-PSEUDOMODULES += at_urc_isr
-PSEUDOMODULES += at_urc_isr_low
-PSEUDOMODULES += at_urc_isr_medium
-PSEUDOMODULES += at_urc_isr_highest
-PSEUDOMODULES += at24c%
-PSEUDOMODULES += at86rf215_timestamp
 PSEUDOMODULES += atomic_utils
 PSEUDOMODULES += base64url
 PSEUDOMODULES += board_software_reset
-PSEUDOMODULES += bq2429x_int
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
@@ -83,13 +75,9 @@ PSEUDOMODULES += heap_cmd
 PSEUDOMODULES += i2c_scan
 PSEUDOMODULES += ieee802154_security
 PSEUDOMODULES += ieee802154_submac
-PSEUDOMODULES += ina3221_alerts
 PSEUDOMODULES += l2filter_blacklist
 PSEUDOMODULES += l2filter_whitelist
 PSEUDOMODULES += libstdcpp
-PSEUDOMODULES += lis2dh12_i2c
-PSEUDOMODULES += lis2dh12_int
-PSEUDOMODULES += lis2dh12_spi
 PSEUDOMODULES += log
 PSEUDOMODULES += log_printfnoformat
 PSEUDOMODULES += log_color
@@ -128,7 +116,6 @@ PSEUDOMODULES += printf_float
 PSEUDOMODULES += prng
 PSEUDOMODULES += prng_%
 PSEUDOMODULES += fortuna_reseed
-PSEUDOMODULES += qmc5883l_int
 PSEUDOMODULES += riotboot_%
 PSEUDOMODULES += rtt_cmd
 PSEUDOMODULES += saul_adc
@@ -180,146 +167,6 @@ NO_PSEUDOMODULES += netdev_ieee802154_submac
 # print ascii representation in function od_hex_dump()
 PSEUDOMODULES += od_string
 
-# handle at24cxxx being a distinct module
-NO_PSEUDOMODULES += at24cxxx
-
-# include variants of the AT86RF2xx drivers as pseudo modules
-PSEUDOMODULES += at86rf23%
-PSEUDOMODULES += at86rf21%
-PSEUDOMODULES += at86rfa1
-PSEUDOMODULES += at86rfr2
-PSEUDOMODULES += at86rf2xx_aes_spi
-NO_PSEUDOMODULES += at86rf215
-
-# include variants of the BME680 drivers as pseudo modules
-PSEUDOMODULES += bme680_i2c
-PSEUDOMODULES += bme680_spi
-PSEUDOMODULES += bme680_fp
-
-# include variants of the BMX280 drivers as pseudo modules
-PSEUDOMODULES += bmp280_i2c
-PSEUDOMODULES += bmp280_spi
-PSEUDOMODULES += bme280_i2c
-PSEUDOMODULES += bme280_spi
-
-# variants of TI ADCXX1C
-PSEUDOMODULES += adc081c
-PSEUDOMODULES += adc101c
-PSEUDOMODULES += adc121c
-
-# include variants of APDS99XX drivers as pseudo modules
-PSEUDOMODULES += apds9900
-PSEUDOMODULES += apds9901
-PSEUDOMODULES += apds9930
-PSEUDOMODULES += apds9950
-PSEUDOMODULES += apds9960
-PSEUDOMODULES += apds99xx_full
-
-# full featured version of CCS811 driver as pseudo module
-PSEUDOMODULES += ccs811_full
-
-# include variants of CC110X drivers as pseudo modules
-PSEUDOMODULES += cc1100
-PSEUDOMODULES += cc1100e
-PSEUDOMODULES += cc1101
-
-# use pseudo-module for band selection
-PSEUDOMODULES += cc110x_433mhz
-PSEUDOMODULES += cc110x_868mhz
-PSEUDOMODULES += cc110x_915mhz
-
-# include variants of ds3231 drivers as pseudo modules
-PSEUDOMODULES += ds3231_int
-
-# interrupt variant of the HMC5883L driver
-PSEUDOMODULES += hmc5883l_int
-
-# interrupt variant of the ITG320X driver as pseudo module
-PSEUDOMODULES += itg320x_int
-
-# include variants of MH-Z19 drivers as pseudo modules
-PSEUDOMODULES += mhz19_uart
-PSEUDOMODULES += mhz19_pwm
-
-# include variants of MPU9X50 drivers as pseudo modules
-PSEUDOMODULES += mpu9150
-PSEUDOMODULES += mpu9250
-
-# include variants of INA2xx drivers as pseudo modules
-PSEUDOMODULES += ina219
-PSEUDOMODULES += ina220
-
-# include vairants of lm75 drivers as pseudo modules
-PSEUDOMODULES += lm75a
-PSEUDOMODULES += tmp1075
-
-# include variants of mrf24j40 drivers as pseudo modules
-PSEUDOMODULES += mrf24j40m%
-
-# include variants of the pn532 drivers as pseudo modules
-PSEUDOMODULES += pn532_i2c
-PSEUDOMODULES += pn532_spi
-
-# include variants of sdp3x drivers as pseudo modules
-PSEUDOMODULES += sdp3x_irq
-
-# include variants of SX126X drivers and LLCC68 driver as pseudo modules
-PSEUDOMODULES += sx1261
-PSEUDOMODULES += sx1262
-PSEUDOMODULES += sx1268
-PSEUDOMODULES += llcc68
-PSEUDOMODULES += sx126x_stm32wl
-
-# include RF switch implemented in the board for use with sx126x
-PSEUDOMODULES += sx126x_rf_switch
-
-# include variants of SX127X drivers as pseudo modules
-PSEUDOMODULES += sx1272
-PSEUDOMODULES += sx1276
-
-# include variants of SHT1X drivers as pseudo modules
-PSEUDOMODULES += sht10
-PSEUDOMODULES += sht11
-PSEUDOMODULES += sht15
-
-# include variants of Si114x drivers as pseudo modules
-PSEUDOMODULES += si1145
-PSEUDOMODULES += si1146
-PSEUDOMODULES += si1147
-
-# include variants of Si70xx drivers as pseudo modules
-PSEUDOMODULES += si7006
-PSEUDOMODULES += si7013
-PSEUDOMODULES += si7020
-PSEUDOMODULES += si7021
-PSEUDOMODULES += si7050
-PSEUDOMODULES += si7051
-PSEUDOMODULES += si7053
-PSEUDOMODULES += si7054
-PSEUDOMODULES += si7055
-
-#include variants of tmp00x drivers as pseudo modules
-PSEUDOMODULES += tmp006
-PSEUDOMODULES += tmp007
-
-# include variants of RN2XX3 drivers as pseudo modules
-PSEUDOMODULES += rn2483
-PSEUDOMODULES += rn2903
-
-# include variants of VCNL40x0 drivers as pseudo modules
-PSEUDOMODULES += vcnl4010
-PSEUDOMODULES += vcnl4020
-PSEUDOMODULES += vcnl4040
-
-# implementations of ws281x_write as submodules of ws281x:
-PSEUDOMODULES += ws281x_%
-
-# include variants of lpsxxx drivers as pseudo modules
-PSEUDOMODULES += lps331ap
-PSEUDOMODULES += lps22hb
-PSEUDOMODULES += lps22hh
-PSEUDOMODULES += lps25hb
-
 # add all pseudo random number generator variants as pseudomodules
 PSEUDOMODULES += prng_%
 
@@ -333,9 +180,6 @@ NO_PSEUDOMODULES += periph_common
 # Submodules provided by Skald
 PSEUDOMODULES += skald_ibeacon
 PSEUDOMODULES += skald_eddystone
-
-# define optimized read function of DS18 driver as a pseudo module
-PSEUDOMODULES += ds18_optimized
 
 PSEUDOMODULES += crypto_aes_128
 PSEUDOMODULES += crypto_aes_192
@@ -357,4 +201,4 @@ NO_PSEUDOMODULES += auto_init_security
 NO_PSEUDOMODULES += auto_init_usbus
 NO_PSEUDOMODULES += auto_init_screen
 
-# Packages may also add modules to PSEUDOMODULES in their `Makefile.include`.
+# Packages and drivers may also add modules to PSEUDOMODULES in their `Makefile.include`.
