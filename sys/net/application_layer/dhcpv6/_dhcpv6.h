@@ -67,6 +67,14 @@ extern "C" {
 
 #define DHCPV6_REB_TIMEOUT          (10U)   /**< REB_TIMEOUT (in sec) */
 #define DHCPV6_REB_MAX_RT           (600U)  /**< REB_MAX_RT (in sec) */
+
+#define DHCPV6_INF_MAX_DELAY        (1U)    /**< INF_MAX_DELAY (in sec) */
+#define DHCPV6_INF_TIMEOUT          (1U)    /**< INF_TIMEOUT (in sec) */
+#define DHCPV6_INF_MAX_RT           (3600U) /**< INF_MAX_RT (in sec) */
+
+#define DHCPV6_IRT_DEFAULT          (86400U) /**< IRT_DEFAULT (in sec) */
+#define DHCPV6_IRT_MINIMUM          (600U)   /**< IRT_MINIMUM (in sec) */
+
 /** @} */
 
 #define DHCPV6_DUID_MAX_LEN         (128U)  /**< maximum length of DUID */
@@ -287,6 +295,18 @@ typedef struct __attribute__((packed)) {
 } dhcpv6_opt_iapfx_t;
 
 /**
+ * @brief   DHCPv6 Information Refresh Time option format
+ * @see [RFC 8415, section 21.23]
+ *      (https://tools.ietf.org/html/rfc8415#section-21.23)
+ */
+typedef struct __attribute__((packed)) {
+    network_uint16_t type;          /**< @ref DHCPV6_OPT_IRT */
+    network_uint16_t len;           /**< always 4 */
+    network_uint32_t value;         /**< Time duration relative to the
+                                         current time (in sec) */
+} dhcpv6_opt_irt_t;
+
+/**
  * @brief   DHCPv6 SOL_MAX_RT option format
  * @see [RFC 8415, section 21.24]
  *      (https://tools.ietf.org/html/rfc8415#section-21.24)
@@ -296,6 +316,17 @@ typedef struct __attribute__((packed)) {
     network_uint16_t len;           /**< always 4 */
     network_uint32_t value;         /**< overriding value for SOL_MAX_RT (in sec) */
 } dhcpv6_opt_smr_t;
+
+/**
+ * @brief   DHCPv6 INF_MAX_RT option format
+ * @see [RFC 8415, section 21.25]
+ *      (https://tools.ietf.org/html/rfc8415#section-21.25)
+ */
+typedef struct __attribute__((packed)) {
+    network_uint16_t type;          /**< @ref DHCPV6_OPT_IMR */
+    network_uint16_t len;           /**< always 4 */
+    network_uint32_t value;         /**< overriding value for INF_MAX_RT (in sec) */
+} dhcpv6_opt_imr_t;
 
 /**
  * @brief   MUD URL DHCPv6 option format
