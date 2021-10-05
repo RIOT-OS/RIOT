@@ -47,7 +47,7 @@ This section describes
 ### <a name="mcu"> MCU </a> &nbsp;&nbsp; [[TOC](#toc)]
 
 Most features of the board are provided by the ESP32 SoC. For detailed
-information about the ESP32, see section \ref esp32_mcu "MCU ESP32".
+information about the ESP32, see section \ref esp32_mcu_esp32 "MCU ESP32".
 
 ### <a name="common_board_configuration"> Board Configuration </a> &nbsp;&nbsp; [[TOC](#toc)]
 

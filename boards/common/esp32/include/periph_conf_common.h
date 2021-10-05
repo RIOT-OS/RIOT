@@ -13,7 +13,7 @@
  * This file contains peripheral configurations that are valid for all ESP32.
  *
  * For detailed information about the configuration of ESP32 boards, see
- * section \ref esp32_comm_periph "Common Peripherals".
+ * section \ref esp32_peripherals "Common Peripherals".
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @file
@@ -170,6 +170,7 @@ static const gpio_t pwm1_channels[] = PWM1_GPIOS;
 
 /**
  * @name   SPI configuration
+ * @{
  */
 
 /**
@@ -205,11 +206,11 @@ static const spi_conf_t spi_config[] = {
  * @note SPI_NUMOF definition must not be changed.
  */
 #define SPI_NUMOF   ARRAY_SIZE(spi_config)
-
 /** @} */
 
 /**
  * @name   UART configuration
+ * @{
  */
 
 #ifndef UART0_TXD

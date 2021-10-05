@@ -50,7 +50,7 @@ This section describes
 ### <a name="mcu"> MCU </a> &nbsp;&nbsp; [[TOC](#toc)]
 
 Most features of the board are provided by the ESP32 SoC. For detailed
-information about the ESP32, see section \ref esp32_mcu "MCU ESP32".
+information about the ESP32, see section \ref esp32_mcu_esp32 "MCU ESP32".
 
 ### <a name="board_configuration"> Board Configuration </a> &nbsp;&nbsp; [[TOC](#toc)]
 
@@ -88,7 +88,7 @@ unless you exactly know what you are doing.
 
 The following table shows the default board configuration, which is sorted
 according to the defined functionality of GPIOs. This configuration can be
-overridden by \ref esp32_app_spec_conf "application-specific configurations".
+overridden by \ref esp32_application_specific_configurations "application-specific configurations".
 
 <center>
 \anchor esp32_heltec_lora_32_v2_table_board_configuration
@@ -120,7 +120,7 @@ OLED RESET      | GPIO16 | | |
   \ref esp32_flash_modes "flash modes".
 
 For detailed information about the configuration of ESP32 boards, see
-section \ref esp32_comm_periph "Common Peripherals".
+section \ref esp32_peripherals "Common Peripherals".
 
 ### <a name="oled_display"> Using the OLED Display </a> &nbsp;&nbsp; [[TOC](#toc)]
 
@@ -167,7 +167,7 @@ BOARD=esp32-heltec-lora32-v2 make -C tests/pkg_u8g2/ flash
 MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet
 network interface modules have been tested with the board. You could use
 the following code in your
-\ref esp32_app_spec_conf "application-specific configuration"
+\ref esp32_application_specific_configurations "application-specific configuration"
 to use such modules:
 
 ```

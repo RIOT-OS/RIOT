@@ -41,7 +41,7 @@ This section describes
 ### <a name="mcu"> MCU </a> &nbsp;&nbsp; [[TOC](#toc)]
 
 Most features of the board are provided by the ESP32 SoC. For detailed
-information about the ESP32, see section \ref esp32_mcu "MCU ESP32".
+information about the ESP32, see section \ref esp32_mcu_esp32 "MCU ESP32".
 
 ### <a name="board_configuration"> Board Configuration </a> &nbsp;&nbsp; [[TOC](#toc)]
 
@@ -65,7 +65,7 @@ That is, the purpose for which a GPIO is used depends on which module or functio
 
 For example, if module periph_i2c is not used, the GPIOs listed in I2C configuration can be used for the other purposes.
 
-The following table shows the default board configuration, which is sorted according to the defined functionality of GPIOs. This configuration can be overridden by \ref esp32_app_spec_conf "application-specific configurations".
+The following table shows the default board configuration, which is sorted according to the defined functionality of GPIOs. This configuration can be overridden by \ref esp32_application_specific_configurations "application-specific configurations".
 
 <center>
 \anchor esp32_wroom_32_table_board_configuration
@@ -97,11 +97,11 @@ UART_DEV(1):RxD | GPIO9  | not available in **qout** and **qio** flash mode | \r
 - The configuration of DAC channels contains all ESP32 GPIOs that can be used as DAC channels.
 - GPIO9 and GIOP10 can only be used in **dout** and **dio** \ref esp32_flash_modes "flash modes".
 
-For detailed information about the configuration of ESP32 boards, see section \ref esp32_comm_periph "Common Peripherals".
+For detailed information about the configuration of ESP32 boards, see section \ref esp32_peripherals "Common Peripherals".
 
 ### <a name="optional_hardware"> Optional Hardware Configurations </a> &nbsp;&nbsp; [[TOC](#toc)]
 
-MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet network interface modules have been tested with the board. You could use the following code in your \ref esp32_app_spec_conf "application-specific configuration" to use such modules:
+MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet network interface modules have been tested with the board. You could use the following code in your \ref esp32_application_specific_configurations "application-specific configuration" to use such modules:
 
 ```
 #ifdef BOARD_ESP32_WROOM-32

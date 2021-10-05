@@ -51,7 +51,7 @@ This section describes
 ### <a name="mcu"> MCU </a> &nbsp;&nbsp; [[TOC](#toc)]
 
 Most features of the board are provided by the ESP32 SoC. For detailed
-information about the ESP32, see section \ref esp32_mcu "MCU ESP32".
+information about the ESP32, see section \ref esp32_mcu_esp32 "MCU ESP32".
 
 ### <a name="board_configuration"> Board Configuration </a> &nbsp;&nbsp; [[TOC](#toc)]
 
@@ -88,7 +88,7 @@ unless you exactly know what you are doing.
 
 The following table shows the default board configuration, which is sorted
 according to the defined functionality of GPIOs. This configuration can be
-overridden by \ref esp32_app_spec_conf "application-specific configurations".
+overridden by \ref esp32_application_specific_configurations "application-specific configurations".
 
 TTGO- T-Beam rev1
 
@@ -141,7 +141,7 @@ UART_DEV(1):RxD | GPIO12 | GPS (configuration is fixed) | \ref esp32_uart_interf
   as ADC channels.
 
 For detailed information about the configuration of ESP32 boards, see
-section \ref esp32_comm_periph "Common Peripherals".
+section \ref esp32_peripherals "Common Peripherals".
 
 ### <a name="pinout"> Board Pinout </a> &nbsp;&nbsp; [[TOC](#toc)]
 

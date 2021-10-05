@@ -16,7 +16,7 @@
  * The board can be used with lots of optional stackable hardware modules.
  * This file contains the default configurations for those hardware modules
  * that have been tested. Most of these configurations can be overridden by an
- * \ref esp32_app_spec_conf "application-specific configuration".
+ * \ref esp32_application_specific_configurations "application-specific configuration".
  *
  * The configurations of the respective hardware modules only take place if
  * the corresponding driver modules are used.
@@ -71,7 +71,7 @@ extern "C" {
  * CS signal.
  *
  * @note Please override the definition of CS pin by an by \ref
- * esp32_app_spec_conf "application-specific configurations" according to your
+ * esp32_application_specific_configurations "application-specific configurations" according to your
  * solder bride configuration.
  * @{
  */
