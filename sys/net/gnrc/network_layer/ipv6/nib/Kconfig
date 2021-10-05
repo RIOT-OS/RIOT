@@ -47,6 +47,7 @@ config GNRC_IPV6_NIB_QUEUE_PKT
 
 config GNRC_IPV6_NIB_ARSM
     bool "Use classic NDP address resolution state-machine"
+    default y if USEMODULE_GNRC_IPV6_NIB_6LBR
     default n if USEMODULE_GNRC_IPV6_NIB_6LN && !GNRC_IPV6_NIB_6LR
     default y
 
