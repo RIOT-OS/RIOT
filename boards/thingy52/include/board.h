@@ -21,6 +21,10 @@
 
 #include "cpu.h"
 
+#if IS_USED(MODULE_PWM_DAC)
+#include "pwm_dac_for_board.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -59,6 +63,22 @@ extern "C" {
  * @brief   Initialize board specific hardware
  */
 void board_init(void);
+
+/**
+ * @brief   Enable the speaker
+ *
+ * Before this is called, it's a good time to run
+ * `dac_poweron(DAC_LINE(0));`.
+ */
+void board_speaker_on(void);
+
+/**
+ * @brief   Disable the speaker
+ *
+ * After this is called, it's a good time to run
+ * `dac_poweroff(DAC_LINE(0));`.
+ */
+void board_speaker_off(void);
 
 #ifdef __cplusplus
 }
