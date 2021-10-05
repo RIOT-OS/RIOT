@@ -1,0 +1,29 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if MODULE_PICOLIBC
+
+config PICOLIBC_STDOUT_BUFFERED
+    bool "Buffered standard output"
+    default USE_STDOUT_BUFFERED
+    help
+        Say y to use buffering in the standard output, usually good for modules that benefit from
+        sending out buffers in larger chunks.
+
+config MODULE_PICOLIBC_SYSCALLS_DEFAULT
+    bool
+    default y
+    depends on !HAVE_CUSTOM_PICOLIBC_SYSCALLS
+    help
+        Default implementation of picolibc system calls.
+
+endif # MODULE_PICOLIBC
+
+config HAVE_CUSTOM_PICOLIB_SYSCALLS
+    bool
+    help
+        Indicates that a custom picolibc syscalls implementation is present.

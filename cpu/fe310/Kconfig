@@ -18,6 +18,10 @@ config CPU_FAM_FE310
     select HAS_PERIPH_RTT_SET_COUNTER
     select HAS_PERIPH_WDT
 
+    select MODULE_PERIPH_PLIC if TEST_KCONFIG
+    select MODULE_PERIPH_CORETIMER if MODULE_PERIPH_TIMER && HAS_PERIPH_CORETIMER
+    select MODULE_PERIPH_RTT if MODULE_PERIPH_RTC && HAS_PERIPH_RTT
+
 config CPU_MODEL_FE310_G000
     bool
     select CPU_FAM_FE310
@@ -46,5 +50,7 @@ config CPU_CORE
     default "rv32imac" if CPU_CORE_RV32IMAC
 
 rsource "Kconfig.clk"
+rsource "periph/Kconfig"
+rsource "vendor/Kconfig"
 
 source "$(RIOTCPU)/riscv_common/Kconfig"
