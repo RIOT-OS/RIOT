@@ -28,18 +28,18 @@
 
 void auto_init(void)
 {
-   if (IS_USED(MODULE_AUTO_INIT_ZTIMER)) {
+    if (IS_USED(MODULE_AUTO_INIT_ZTIMER)) {
         LOG_DEBUG("Auto init ztimer.\n");
         void ztimer_init(void);
         ztimer_init();
     }
     if (IS_USED(MODULE_AUTO_INIT_XTIMER) &&
-            !IS_USED(MODULE_ZTIMER_XTIMER_COMPAT)) {
+        !IS_USED(MODULE_ZTIMER_XTIMER_COMPAT)) {
         LOG_DEBUG("Auto init xtimer.\n");
         extern void xtimer_init(void);
         xtimer_init();
     }
-   if (IS_USED(MODULE_AUTO_INIT_RANDOM)) {
+    if (IS_USED(MODULE_AUTO_INIT_RANDOM)) {
         LOG_DEBUG("Auto init random.\n");
         extern void auto_init_random(void);
         auto_init_random();
