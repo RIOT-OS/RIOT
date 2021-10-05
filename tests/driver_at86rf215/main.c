@@ -32,6 +32,18 @@
 #include "od.h"
 
 static char batmon_stack[THREAD_STACKSIZE_MAIN];
+static at86rf215_t *dev;
+
+void netdev_register_signal(netdev_t *netdev, netdev_type_t type, uint8_t index)
+{
+   (void) index;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    if (type == NETDEV_AT86RF215 && !dev) {
+        dev = container_of(netdev_ieee802154, at86rf215_t, netdev);
+    }
+}
 
 void *batmon_thread(void *arg)
 {
@@ -91,18 +103,10 @@ static int cmd_set_trim(int argc, char **argv)
         return 1;
     }
 
-    gnrc_netif_t *netif = gnrc_netif_get_by_type(NETDEV_AT86RF215, 0);
-
-    if (netif == NULL) {
+    if (dev == NULL) {
         puts("No at86rf215 radio found");
         return 1;
     }
-
-    netdev_t *netdev = netif->dev;
-    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev,
-                                                          netdev_ieee802154_t,
-                                                          netdev);
-    at86rf215_t* dev = container_of(netdev_ieee802154, at86rf215_t, netdev);
 
     printf("setting trim to %u fF\n", 300U * trim);
     at86rf215_set_trim(dev, trim);
@@ -147,18 +151,10 @@ static int cmd_set_clock_out(int argc, char **argv)
         freq = tmp;
     }
 
-    gnrc_netif_t *netif = gnrc_netif_get_by_type(NETDEV_AT86RF215, 0);
-
-    if (netif == NULL) {
+    if (dev == NULL) {
         puts("No at86rf215 radio found");
         return 1;
     }
-
-    netdev_t *netdev = netif->dev;
-    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev,
-                                                          netdev_ieee802154_t,
-                                                          netdev);
-    at86rf215_t* dev = container_of(netdev_ieee802154, at86rf215_t, netdev);
 
     printf("Clock output set to %s %s\n", keys[freq], freq ? "MHz" : "");
     at86rf215_set_clock_output(dev, AT86RF215_CLKO_4mA, freq);
@@ -183,18 +179,10 @@ static int cmd_get_random(int argc, char **argv)
         return 1;
     }
 
-    gnrc_netif_t *netif = gnrc_netif_get_by_type(NETDEV_AT86RF215, 0);
-
-    if (netif == NULL) {
+    if (dev == NULL) {
         puts("No at86rf215 radio found");
         return 1;
     }
-
-    netdev_t *netdev = netif->dev;
-    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev,
-                                                          netdev_ieee802154_t,
-                                                          netdev);
-    at86rf215_t* dev = container_of(netdev_ieee802154, at86rf215_t, netdev);
 
     at86rf215_get_random(dev, buffer, values);
 
