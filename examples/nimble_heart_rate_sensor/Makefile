@@ -8,7 +8,7 @@ BOARD ?= nrf52dk
 RIOTBASE ?= $(CURDIR)/../..
 
 # Some RIOT modules needed for this example
-USEMODULE += event_timeout
+USEMODULE += event_timeout_ztimer
 
 # Include NimBLE
 USEPKG += nimble
