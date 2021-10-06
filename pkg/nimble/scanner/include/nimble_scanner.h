@@ -35,7 +35,8 @@ extern "C" {
  * @brief   Callback signature triggered by this module for each discovered
  *          advertising packet
  *
- * @param[in] type      type of advertising packet, e.g BLE_HCI_ADV_TYPE_ADV_IND
+ * @param[in] type      type of advertising packet, e.g
+ *                      BLE_HCI_ADV_RPT_EVTYPE_ADV_IND
  * @param[in] addr      advertising address of the source node
  * @param[in] rssi      RSSI value for the received packet
  * @param[in] ad        advertising data
