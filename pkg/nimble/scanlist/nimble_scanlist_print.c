@@ -30,20 +30,20 @@
 static void _print_type(uint8_t type)
 {
     switch (type) {
-        case BLE_HCI_ADV_TYPE_ADV_IND:
+        case BLE_HCI_ADV_RPT_EVTYPE_ADV_IND:
             printf(" [IND]");
             break;
-        case BLE_HCI_ADV_TYPE_ADV_DIRECT_IND_HD:
-            printf(" [DIRECT_IND_HD]");
+        case BLE_HCI_ADV_RPT_EVTYPE_DIR_IND:
+            printf(" [DIRECT_IND]");
             break;
-        case BLE_HCI_ADV_TYPE_ADV_SCAN_IND:
+        case BLE_HCI_ADV_RPT_EVTYPE_SCAN_IND:
             printf(" [SCAN_IND]");
             break;
-        case BLE_HCI_ADV_TYPE_ADV_NONCONN_IND:
+        case BLE_HCI_ADV_RPT_EVTYPE_NONCONN_IND:
             printf(" [NONCONN_IND]");
             break;
-        case BLE_HCI_ADV_TYPE_ADV_DIRECT_IND_LD:
-            printf(" [DIRECT_IND_LD]");
+        case BLE_HCI_ADV_RPT_EVTYPE_SCAN_RSP:
+            printf(" [SCAN_RSP]");
             break;
         default:
             printf(" [INVALID]");
