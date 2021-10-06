@@ -198,7 +198,7 @@ int topology_parse(const char *file, topology_t *out)
 }
 
 void topology_send(const topology_t *t, int sock,
-                   const uint8_t *mac_src, size_t mac_src_len,
+                   const struct sockaddr_in6 *src_addr,
                    void *buffer, size_t len)
 {
     for (list_node_t *edge = t->edges.next; edge; edge = edge->next) {
@@ -208,8 +208,7 @@ void topology_send(const topology_t *t, int sock,
             continue;
         }
 
-        if ((mac_src_len == super->a->mac_len) &&
-            (memcmp(super->a->mac, mac_src, mac_src_len) == 0)) {
+        if (memcmp(&super->a->addr, src_addr, sizeof(*src_addr)) == 0) {
             /* packet loss */
             if (random() > super->weight_a_b * RAND_MAX) {
                 return;
@@ -219,8 +218,7 @@ void topology_send(const topology_t *t, int sock,
                    (struct sockaddr *)&super->b->addr,
                    sizeof(super->b->addr));
         }
-        else if ((mac_src_len == super->a->mac_len) &&
-                 (memcmp(super->b->mac, mac_src, mac_src_len) == 0)) {
+        else if (memcmp(&super->b->addr, src_addr, sizeof(*src_addr)) == 0) {
             /* packet loss */
             if (random() > super->weight_b_a * RAND_MAX) {
                 return;

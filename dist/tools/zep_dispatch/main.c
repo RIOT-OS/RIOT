@@ -78,10 +78,10 @@ static void _send_topology(void *ctx, void *buffer, size_t len,
     uint8_t mac_src[8];
     uint8_t mac_src_len;
 
-    if (zep_parse_mac(buffer, len, mac_src, &mac_src_len) &&
-        topology_add(ctx, mac_src, mac_src_len, src_addr)) {
-        topology_send(ctx, sock, mac_src, mac_src_len, buffer, len);
+    if (zep_parse_mac(buffer, len, mac_src, &mac_src_len)) {
+        topology_add(ctx, mac_src, mac_src_len, src_addr);
     }
+    topology_send(ctx, sock, src_addr, buffer, len);
 }
 
 static void dispatch_loop(int sock, dispatch_cb_t dispatch, void *ctx)

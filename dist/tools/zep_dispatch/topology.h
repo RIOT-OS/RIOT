@@ -63,13 +63,12 @@ bool topology_add(topology_t *t, const uint8_t *mac, uint8_t mac_len,
  *
  * @param[in] t             topology to use
  * @param[in] sock          socket to use for sending
- * @param[in] mac_src       ZEP source l2 address
- * @param[in] mac_src_len   ZEP source l2 address length
+ * @param[in] src_addr      source node address
  * @param[in] buffer        ZEP frame to send
  * @param[in] len           ZEP frame length
  */
 void topology_send(const topology_t *t, int sock,
-                   const uint8_t *mac_src, size_t mac_src_len,
+                   const struct sockaddr_in6 *src_addr,
                    void *buffer, size_t len);
 
 #ifdef __cplusplus
