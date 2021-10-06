@@ -80,7 +80,9 @@ extern "C" {
 #define DHCPV6_OPT_IA_PD            (25U)   /**< identity association for prefix
                                              *   delegation (IA_PD) option */
 #define DHCPV6_OPT_IAPFX            (26U)   /**< IA prefix option */
+#define DHCPV6_OPT_IRT              (32U)   /**< Information Refresh Time Option */
 #define DHCPV6_OPT_SMR              (82U)   /**< SOL_MAX_RT option */
+#define DHCPV6_OPT_IMR              (83U)   /**< INF_MAX_RT option */
 #define DHCPV6_OPT_MUD_URL          (112U)  /**< MUD URL option (see RFC 8520) */
 /** @} */
 

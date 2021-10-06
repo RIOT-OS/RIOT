@@ -32,6 +32,9 @@
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
 #include "net/sock/dns.h"
 #endif
+#if IS_ACTIVE(MODULE_DHCPV6_CLIENT)
+#include "net/dhcpv6/client.h"
+#endif
 
 #include "_nib-internal.h"
 #include "_nib-arsm.h"
@@ -794,6 +797,20 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     if (dr == NULL) {
         return;
     }
+#if IS_ACTIVE(MODULE_DHCPV6_CLIENT)
+    uint8_t current_conf_mode = dhcpv6_client_get_conf_mode();
+    if (rtr_adv->flags & NDP_RTR_ADV_FLAGS_M) {
+        if (IS_USED(MODULE_DHCPV6_CLIENT_IA_NA)) {
+            netif->ipv6.aac_mode |= GNRC_NETIF_AAC_DHCP;
+            dhcpv6_client_req_ia_na(netif->pid);
+        } else {
+            dhcpv6_client_set_conf_mode(DHCPV6_CLIENT_CONF_MODE_STATEFUL);
+        }
+    } else if ((rtr_adv->flags & NDP_RTR_ADV_FLAGS_O) &&
+               (current_conf_mode != DHCPV6_CLIENT_CONF_MODE_STATEFUL)) {
+        dhcpv6_client_set_conf_mode(DHCPV6_CLIENT_CONF_MODE_STATELESS);
+    }
+#endif /* MODULE_DHCPV6_CLIENT */
 
     /* stop sending router solicitations
      * see https://tools.ietf.org/html/rfc4861#section-6.3.7 */

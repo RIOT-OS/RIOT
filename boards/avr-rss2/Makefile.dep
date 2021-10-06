@@ -1,5 +1,8 @@
 USEMODULE += boards_common_atmega
 
+# enable pin change interrupts bank 0
+USEMODULE += atmega_pcint0
+
 ifneq (,$(filter eui_provider,$(USEMODULE)))
   USEMODULE += at24mac
 endif

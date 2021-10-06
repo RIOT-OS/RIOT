@@ -1,6 +1,6 @@
 PKG_NAME=emlearn
 PKG_URL=https://github.com/emlearn/emlearn
-PKG_VERSION=e9e9d645fc64b1f764d8a8ece6d6427a5297c098 # 0.11.6
+PKG_VERSION=d8cffb6cdd5619eb26d01287f07a530128958b60 # 0.12
 PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
