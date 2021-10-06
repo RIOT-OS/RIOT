@@ -26,6 +26,8 @@
  * @}
  */
 
+#include <avr/pgmspace.h>
+
 #include "board.h"
 #include "cpu.h"
 #include "panic.h"
@@ -98,7 +100,8 @@ ISR(BADISR_vect)
     LED_PANIC;
 #endif
 
-    core_panic(PANIC_GENERAL_ERROR, "BADISR");
+    core_panic(PANIC_GENERAL_ERROR, PSTR("FATAL ERROR: BADISR_vect called, unprocessed Interrupt.\n"
+                  "STOP Execution.\n"));
 }
 
 #if defined(CPU_ATMEGA128RFA1) || defined (CPU_ATMEGA256RFR2)

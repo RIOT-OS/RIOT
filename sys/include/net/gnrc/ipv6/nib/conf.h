@@ -38,9 +38,6 @@ extern "C" {
 #ifndef CONFIG_GNRC_IPV6_NIB_SLAAC
 #define CONFIG_GNRC_IPV6_NIB_SLAAC                    1
 #endif
-#ifndef CONFIG_GNRC_IPV6_NIB_QUEUE_PKT
-#define CONFIG_GNRC_IPV6_NIB_QUEUE_PKT                1
-#endif
 #ifndef CONFIG_GNRC_IPV6_NIB_NUMOF
 #define CONFIG_GNRC_IPV6_NIB_NUMOF                   (16)
 #endif

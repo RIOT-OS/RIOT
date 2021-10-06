@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <avr/pgmspace.h>
+
 #include "cpu.h"
 #include "cpu_clock.h"
 #include "cpu_pm.h"
@@ -119,5 +121,7 @@ ISR(BADISR_vect)
     LED_PANIC;
 #endif
 
-    core_panic(PANIC_GENERAL_ERROR, "BADISR");
+    core_panic(PANIC_GENERAL_ERROR,
+               PSTR("FATAL ERROR: BADISR_vect called, unprocessed Interrupt.\n"
+                    "STOP Execution.\n"));
 }

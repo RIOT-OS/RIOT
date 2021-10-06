@@ -30,39 +30,21 @@
 
 #include "net/ieee802154/radio.h"
 
-#define ENABLE_DEBUG 0
-#include "debug.h"
-
 static const ieee802154_radio_ops_t cc2538_rf_ops;
 
 static ieee802154_dev_t *cc2538_rf_hal;
 
-typedef enum {
-    CC2538_STATE_READY,             /**< The radio is ready to receive requests */
-    CC2538_STATE_TRX_TRANSITION,    /**< There's a pending TRX state transition */
-    CC2538_STATE_CONFIRM_TX,        /**< Transmission finished and waiting for confirm */
-    CC2538_STATE_TX_BUSY,           /**< The radio is busy transmitting */
-    CC2538_STATE_TX_ACK,            /**< The radio is currently transmitting an ACK frame */
-    CC2538_STATE_CCA,               /**< The radio is doing CCA */
-    CC2538_STATE_CONFIRM_CCA,       /**< CCA finished and waiting for confirm */
-} cc2538_state_t;
+static bool cc2538_tx_busy;     /**< used to indicate TX chain is busy */
+static bool cc2538_rx_busy;     /**< used to indicate RX chain is busy */
 
-static cc2538_state_t cc2538_state;
 static uint8_t cc2538_min_be = CONFIG_IEEE802154_DEFAULT_CSMA_CA_MIN_BE;
 static uint8_t cc2538_max_be = CONFIG_IEEE802154_DEFAULT_CSMA_CA_MAX_BE;
 static int cc2538_csma_ca_retries = CONFIG_IEEE802154_DEFAULT_CSMA_CA_RETRIES;
 
 static bool cc2538_cca_status;  /**< status of the last CCA request */
-
-static void _enable_rx(void)
-{
-    RFCORE_XREG_FRMCTRL0 &= ~CC2538_FRMCTRL0_RX_MODE_DIS;
-}
-
-static void _disable_rx(void)
-{
-    RFCORE_XREG_FRMCTRL0 |= CC2538_FRMCTRL0_RX_MODE_DIS;
-}
+static bool cc2538_cca;         /**< used to check whether the last CCA result
+                                     corresponds to a CCA request or send with
+                                     CSMA-CA */
 
 static int _write(ieee802154_dev_t *dev, const iolist_t *iolist)
 {
@@ -87,10 +69,8 @@ static int _confirm_transmit(ieee802154_dev_t *dev, ieee802154_tx_info_t *info)
 {
     (void) dev;
 
-    cc2538_rf_disable_irq();
-    int res = -EAGAIN;
-    if (cc2538_state != CC2538_STATE_CONFIRM_TX) {
-        goto end;
+    if (cc2538_tx_busy) {
+        return -EAGAIN;
     }
 
     if (info) {
@@ -102,22 +82,14 @@ static int _confirm_transmit(ieee802154_dev_t *dev, ieee802154_tx_info_t *info)
         }
     }
 
-    cc2538_state = CC2538_STATE_READY;
-    res = 0;
-
-end:
-    cc2538_rf_enable_irq();
-    return res;
+    return 0;
 }
 
 static int _request_transmit(ieee802154_dev_t *dev)
 {
     (void) dev;
 
-    cc2538_rf_disable_irq();
-    assert(cc2538_state != CC2538_STATE_TX_BUSY);
-    cc2538_state = CC2538_STATE_TX_BUSY;
-
+    cc2538_tx_busy = true;
     if (cc2538_csma_ca_retries < 0) {
         RFCORE_SFR_RFST = ISTXON;
         /* The CPU Ctrl mask is used here to indicate whether the radio is being
@@ -129,8 +101,10 @@ static int _request_transmit(ieee802154_dev_t *dev)
         RFCORE_XREG_CSPCTRL |= CC2538_CSP_MCU_CTRL_MASK;
     }
     else {
+        cc2538_cca = false;
+
         /* Disable RX Chain for CCA (see CC2538 RM, Section 29.9.5.3) */
-        _disable_rx();
+        RFCORE_XREG_FRMCTRL0 |= CC2538_FRMCTRL0_RX_MODE_DIS;
         RFCORE_SFR_RFST = ISRXON;
         /* Clear last program */
         RFCORE_SFR_RFST = ISCLEAR;
@@ -188,7 +162,6 @@ static int _request_transmit(ieee802154_dev_t *dev)
         /* Execute the program */
         RFCORE_SFR_RFST = ISSTART;
     }
-    cc2538_rf_enable_irq();
     return 0;
 }
 
@@ -253,12 +226,8 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
     }
 
 end:
-    /* Don't enable RX chain if the radio is currently doing CCA or during
-     * transmission. */
-    if (cc2538_state != CC2538_STATE_CCA
-            && cc2538_state != CC2538_STATE_TX_BUSY) {
-        _enable_rx();
-    }
+    /* Enable RX Chain */
+    RFCORE_XREG_FRMCTRL0 &= ~CC2538_FRMCTRL0_RX_MODE_DIS;
     RFCORE_SFR_RFST = ISFLUSHRX;
     return res;
 }
@@ -267,38 +236,22 @@ static int _confirm_cca(ieee802154_dev_t *dev)
 {
     (void) dev;
 
-    int res = -EAGAIN;
-    cc2538_rf_disable_irq();
-    assert(cc2538_state == CC2538_STATE_CCA || cc2538_state == CC2538_STATE_CONFIRM_CCA);
+    RFCORE_XREG_RFIRQM0 |= RXPKTDONE;
 
-    if (cc2538_state != CC2538_STATE_CONFIRM_CCA) {
-        goto end;
-    }
-
-    cc2538_state = CC2538_STATE_READY;
-    _enable_rx();
-    res = cc2538_cca_status;
-
-end:
-    cc2538_rf_enable_irq();
-
-    return res;
+    return cc2538_cca_status;
 }
 
 static int _request_cca(ieee802154_dev_t *dev)
 {
     (void) dev;
-    int res = -EINVAL;
-    cc2538_rf_disable_irq();
     if (!RFCORE->XREG_FSMSTAT1bits.RX_ACTIVE) {
-        goto end;
+        return -EINVAL;
     }
 
-    cc2538_state = CC2538_STATE_CCA;
-
     /* Ignore baseband processing */
-    _disable_rx();
+    RFCORE_XREG_RFIRQM0 &= ~RXPKTDONE;
 
+    cc2538_cca = true;
     RFCORE_SFR_RFST = ISCLEAR;
     RFCORE_SFR_RFST = STOP;
     RFCORE_XREG_CSPCTRL &= ~CC2538_CSP_MCU_CTRL_MASK;
@@ -306,9 +259,7 @@ static int _request_cca(ieee802154_dev_t *dev)
     /* Execute the last program */
     RFCORE_SFR_RFST = ISSTART;
 
-end:
-    cc2538_rf_enable_irq();
-    return res;
+    return 0;
 }
 
 static int _set_cca_threshold(ieee802154_dev_t *dev, int8_t threshold)
@@ -344,9 +295,9 @@ static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
 static int _confirm_set_trx_state(ieee802154_dev_t *dev)
 {
     (void) dev;
-    assert(cc2538_state == CC2538_STATE_TRX_TRANSITION);
-    cc2538_state = CC2538_STATE_READY;
-    cc2538_rf_enable_irq();
+    if (RFCORE->XREG_FSMSTAT0bits.FSM_FFCTRL_STATE == FSM_STATE_RX_CALIBRATION) {
+        return -EAGAIN;
+    }
     return 0;
 }
 
@@ -354,14 +305,11 @@ static int _request_set_trx_state(ieee802154_dev_t *dev, ieee802154_trx_state_t 
 {
 
     (void) dev;
-    cc2538_rf_disable_irq();
-    int res = -EBUSY;
-    if (cc2538_state != CC2538_STATE_READY) {
-        goto end;
+    int irq = irq_disable();
+    if (cc2538_tx_busy || cc2538_rx_busy) {
+        irq_restore(irq);
+        return -EBUSY;
     }
-
-    res = 0;
-    cc2538_state = CC2538_STATE_TRX_TRANSITION;
 
     switch (state) {
         case IEEE802154_TRX_STATE_TRX_OFF:
@@ -369,23 +317,21 @@ static int _request_set_trx_state(ieee802154_dev_t *dev, ieee802154_trx_state_t 
             if (RFCORE->XREG_FSMSTAT0bits.FSM_FFCTRL_STATE != FSM_STATE_IDLE) {
                 RFCORE_SFR_RFST = ISRFOFF;
             }
+            cc2538_rx_busy = false;
             break;
         case IEEE802154_TRX_STATE_RX_ON:
+            RFCORE_XREG_RFIRQM0 |= RXPKTDONE;
             /* Enable RX Chain */
-            _enable_rx();
+            RFCORE_XREG_FRMCTRL0 &= ~CC2538_FRMCTRL0_RX_MODE_DIS;
             RFCORE_SFR_RFST = ISRXON;
             break;
     }
 
-    RFCORE_SFR_RFIRQF0 &= ~RXPKTDONE;
-    RFCORE_SFR_RFIRQF0 &= ~SFD;
+    RFCORE_SFR_RFIRQF0 = 0;
+    RFCORE_SFR_RFIRQF1 = 0;
 
-end:
-    if (res < 0) {
-        cc2538_rf_enable_irq();
-    }
-
-    return res;
+    irq_restore(irq);
+    return 0;
 }
 
 void cc2538_irq_handler(void)
@@ -393,108 +339,79 @@ void cc2538_irq_handler(void)
     uint_fast8_t flags_f0 = RFCORE_SFR_RFIRQF0;
     uint_fast8_t flags_f1 = RFCORE_SFR_RFIRQF1;
 
-    uint8_t handled_f0 = 0;
-    uint8_t handled_f1 = 0;
-
-    assert(cc2538_state != CC2538_STATE_TRX_TRANSITION);
-
-    if (flags_f1 & TXDONE) {
-        handled_f1 |= TXDONE;
-        /* TXDONE marks the end of the TX chain. The radio is not busy anymore */
-        assert(cc2538_state == CC2538_STATE_TX_BUSY);
-        cc2538_state = CC2538_STATE_CONFIRM_TX;
-        cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_CONFIRM_TX_DONE);
-    }
-
-    /* The RX chain is not busy anymore on TXACKDONE event */
-    if (flags_f1 & TXACKDONE) {
-        handled_f1 |= TXACKDONE;
-        assert(cc2538_state == CC2538_STATE_TX_ACK);
-        cc2538_state = CC2538_STATE_READY;
-    }
+    RFCORE_SFR_RFIRQF0 = 0;
+    RFCORE_SFR_RFIRQF1 = 0;
 
     if ((flags_f0 & SFD)) {
-        handled_f0 |= SFD;
-        switch(cc2538_state) {
-        case CC2538_STATE_READY:
-            cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_INDICATION_RX_START);
-            break;
-        case CC2538_STATE_TX_BUSY:
-            /* If the radio already transmitted, this SFD is the TX_START event */
+        /* If the radio already transmitted, this SFD is the TX_START event */
+        if (cc2538_tx_busy) {
             cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_INDICATION_TX_START);
-            break;
-        case CC2538_STATE_TX_ACK:
-            /* The detected SFD comes from the transmitted ACK frame. Simply
-             * ignore it */
-            break;
-        default:
-            /* This should never happen */
-            DEBUG("ERROR: cc2538_state: %i\n", cc2538_state);
-            assert(false);
+        }
+        /* If the RX chain was not busy, the detected SFD corresponds to a new
+         * incoming frame. Note the automatic ACK frame also triggers this event.
+         * Therefore, we use this variable to distinguish them. */
+        else if (!cc2538_rx_busy){
+            cc2538_rx_busy = true;
+            cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_INDICATION_RX_START);
         }
     }
 
+    if (flags_f1 & TXDONE) {
+        /* TXDONE marks the end of the TX chain. The radio is not busy anymore */
+        cc2538_tx_busy = false;
+        cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_CONFIRM_TX_DONE);
+    }
+
     if (flags_f0 & RXPKTDONE) {
-        handled_f0 |= RXPKTDONE;
         /* CRC check */
         uint8_t pkt_len = rfcore_peek_rx_fifo(0);
         if (rfcore_peek_rx_fifo(pkt_len) & CC2538_CRC_BIT_MASK) {
             /* Disable RX while the frame has not been processed */
-            _disable_rx();
+            RFCORE_XREG_FRMCTRL0 |= CC2538_FRMCTRL0_RX_MODE_DIS;
             /* If AUTOACK is disabled or the ACK request bit is not set */
             if (IS_ACTIVE(CONFIG_IEEE802154_AUTO_ACK_DISABLE) ||
                 (!(rfcore_peek_rx_fifo(1) & IEEE802154_FCF_ACK_REQ))) {
                 /* The radio won't send an ACK. Therefore the RX chain is not
                  * busy anymore
                  */
-                cc2538_state = CC2538_STATE_READY;
-            }
-            else {
-                cc2538_state = CC2538_STATE_TX_ACK;
+                cc2538_rx_busy = false;
             }
             cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_INDICATION_RX_DONE);
         }
         else {
             /* Disable RX while the frame has not been processed */
             /* CRC failed; discard packet. The RX chain is not busy anymore */
-            cc2538_state = CC2538_STATE_READY;
+            cc2538_rx_busy = false;
             cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_INDICATION_CRC_ERROR);
         }
+    }
+
+    /* The RX chain is not busy anymore on TXACKDONE event */
+    if (flags_f1 & TXACKDONE) {
+        cc2538_rx_busy = false;
     }
 
     /* Check if the interrupt was triggered because the CSP finished its routine
      * (CSMA-CA or CCA request)
      */
     if (flags_f1 & CSP_STOP) {
-        handled_f1 |= CSP_STOP;
         RFCORE_XREG_CSPCTRL |= CC2538_CSP_MCU_CTRL_MASK;
-        switch (cc2538_state) {
-        case CC2538_STATE_TX_BUSY:
+        if (!cc2538_cca) {
             if (RFCORE_XREG_CSPZ > 0) {
                 RFCORE_SFR_RFST = ISTXON;
             }
             else {
                 /* In case of CCA failure the TX chain is not busy anymore */
-                cc2538_state = CC2538_STATE_CONFIRM_TX;
+                cc2538_tx_busy = false;
                 cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_CONFIRM_TX_DONE);
             }
-            break;
-        case CC2538_STATE_CCA:
+        }
+        else {
             cc2538_cca_status = BOOLEAN(RFCORE->XREG_FSMSTAT1bits.CCA)
                                 && RFCORE->XREG_RSSISTATbits.RSSI_VALID;
-            cc2538_state = CC2538_STATE_CONFIRM_CCA;
             cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_CONFIRM_CCA);
-            break;
-        default:
-            /* This should never happen */
-            DEBUG("ERROR: cc2538_state: %i\n", cc2538_state);
-            assert(false);
-            break;
         }
     }
-
-    RFCORE_SFR_RFIRQF0 &= ~handled_f0;
-    RFCORE_SFR_RFIRQF1 &= ~handled_f1;
 }
 
 static int _off(ieee802154_dev_t *dev)
