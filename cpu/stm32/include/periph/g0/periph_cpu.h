@@ -34,6 +34,14 @@ extern "C" {
 
 #endif /* ndef DOXYGEN */
 
+/**
+ * @brief   TIM6, DAC and LPTIM1 share the same interrupt
+ */
+#if defined(CPU_LINE_STM32G0B1xx) || defined(CPU_LINE_STM32G081xx) || \
+    defined(CPU_LINE_STM32G071xx) || defined(CPU_LINE_STM32G0C1xx)
+#define TIM6_DAC_LPTIM1_SHARED_IRQ
+#endif
+
 #ifdef __cplusplus
 }
 #endif

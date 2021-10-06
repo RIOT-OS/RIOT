@@ -15,5 +15,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     slstk3400a \
     stk3200 \
     stm32f030f4-demo \
+    stm32g0316-disco \
     stm32l0538-disco \
     #

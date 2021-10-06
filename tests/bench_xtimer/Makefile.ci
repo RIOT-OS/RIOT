@@ -12,5 +12,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     samd10-xmini \
     slstk3400a \
     stk3200 \
+    stm32g0316-disco \
     zigduino \
     #

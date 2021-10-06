@@ -1,0 +1,8 @@
+CPU = stm32
+CPU_MODEL = stm32g031j6
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_gpio
+FEATURES_PROVIDED += periph_rtt
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
