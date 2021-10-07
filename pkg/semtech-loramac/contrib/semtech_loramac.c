@@ -698,10 +698,11 @@ void *_semtech_loramac_event_loop(void *arg)
                     MlmeIndication_t *indication = (MlmeIndication_t *)msg.content.ptr;
                     if (indication->MlmeIndication == MLME_SCHEDULE_UPLINK) {
                         DEBUG("[semtech-loramac] MLME indication: schedule an uplink\n");
-                        uint8_t prev_port = mac->port;
-                        mac->port = 0;
-                        _semtech_loramac_send(mac, NULL, 0);
-                        mac->port = prev_port;
+#ifdef MODULE_SEMTECH_LORAMAC_RX
+                        msg_t msg_ret;
+                        msg_ret.content.value = SEMTECH_LORAMAC_TX_SCHEDULE;
+                        msg_send(&msg_ret, mac->rx_pid);
+#endif
                     }
                     break;
                 }
@@ -787,18 +788,8 @@ void *_semtech_loramac_event_loop(void *arg)
 
                     /* Check Multicast
                        Check Port
-                       Check Datarate
-                       Check FramePending */
-                    if (indication->FramePending) {
-                        /* The server signals that it has pending data to be sent.
-                           We schedule an uplink as soon as possible to flush the server. */
-                        DEBUG("[semtech-loramac] MCPS indication: pending data, schedule an "
-                              "uplink\n");
-                        uint8_t prev_port = mac->port;
-                        mac->port = 0;
-                        _semtech_loramac_send(mac, NULL, 0);
-                        mac->port = prev_port;
-                    }
+                       Check Datarate */
+
 #ifdef MODULE_SEMTECH_LORAMAC_RX
                     if (indication->RxData) {
                         DEBUG("[semtech-loramac] MCPS indication: data received\n");
