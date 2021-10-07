@@ -47,7 +47,7 @@ extern "C" {
  * Note that we do not configure all ADC channels,
  * and not in the STM32F302 order.  Instead, we
  * just define 6 ADC channels, for the Nucleo
- * Arduino header pins A0-A5
+ * Arduino header pins A0-A5 and the internal VBAT channel.
  *
  * @{
  */
@@ -58,8 +58,10 @@ static const adc_conf_t adc_config[] = {
     { .pin = GPIO_PIN(PORT_B, 0), .dev = 0, .chan = 11 }, /* ADC_IN11, slow */
     { .pin = GPIO_PIN(PORT_C, 1), .dev = 0, .chan =  7 }, /* ADC_IN7,  slow */
     { .pin = GPIO_PIN(PORT_C, 0), .dev = 0, .chan =  6 }, /* ADC_IN6,  slow */
+    { .pin = GPIO_UNDEF, .dev = 0, .chan = 17 }, /* VBAT */
 };
 
+#define VBAT_ADC            ADC_LINE(6) /**< VBAT ADC line */
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 

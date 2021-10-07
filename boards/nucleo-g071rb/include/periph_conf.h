@@ -90,7 +90,7 @@ static const uart_conf_t uart_config[] = {
  * Note that we do not configure all ADC channels,
  * and not in the STM32G071 order.  Instead, we
  * just define 6 ADC channels, for the Nucleo
- * Arduino header pins A0-A5
+ * Arduino header pins A0-A5 and the internal VBAT channel.
  *
  * @{
  */
@@ -101,8 +101,10 @@ static const adc_conf_t adc_config[] = {
     { .pin = GPIO_PIN(PORT_B,  1), .dev = 0, .chan =  9 },
     { .pin = GPIO_PIN(PORT_B, 11), .dev = 0, .chan = 15 },
     { .pin = GPIO_PIN(PORT_B, 12), .dev = 0, .chan = 16 },
+    { .pin = GPIO_UNDEF, .dev = 0, .chan = 14}, /* VBAT */
 };
 
+#define VBAT_ADC            ADC_LINE(6) /**< VBAT ADC line */
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 

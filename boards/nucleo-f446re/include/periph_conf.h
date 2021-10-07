@@ -253,7 +253,7 @@ static const spi_conf_t spi_config[] = {
  * Note that we do not configure all ADC channels,
  * and not in the STM32F446 order.  Instead, we
  * just define 6 ADC channels, for the Nucleo
- * Arduino header pins A0-A5
+ * Arduino header pins A0-A5 and the internal VBAT channel.
  *
  * @{
  */
@@ -264,8 +264,10 @@ static const adc_conf_t adc_config[] = {
     {GPIO_PIN(PORT_B, 0), 0, 8},
     {GPIO_PIN(PORT_C, 1), 0, 11},
     {GPIO_PIN(PORT_C, 0), 0, 10},
+    {GPIO_UNDEF, 0, 18}, /* VBAT */
 };
 
+#define VBAT_ADC            ADC_LINE(6) /**< VBAT ADC line */
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
