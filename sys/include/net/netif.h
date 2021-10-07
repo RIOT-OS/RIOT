@@ -45,6 +45,8 @@
 #include "net/netstats.h"
 #endif
 
+#include "net/gnrc/netif/conf.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -225,6 +227,13 @@ static inline char *netif_addr_to_str(const uint8_t *addr, size_t addr_len, char
 }
 
 /**
+ * @brief   Maximum length of the link-layer address.
+ *
+ * Based on GNRC_NETIF_L2ADDR_MAXLEN from GNRC.
+ */
+#define NETIF_L2ADDR_MAXLEN    (GNRC_NETIF_L2ADDR_MAXLEN)
+
+/**
  * @brief   Parses a string of colon-separated hexadecimals to a hardware
  *          address.
  *
@@ -235,11 +244,11 @@ static inline char *netif_addr_to_str(const uint8_t *addr, size_t addr_len, char
  *
  * @pre `(out != NULL)`
  * @pre @p out **MUST** have allocated at least
- *      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes.
+ *      @ref NETIF_L2ADDR_MAXLEN bytes.
  *
  * @param[in] str       A string of colon-separated hexadecimals.
  * @param[out] out      The resulting hardware address. Must at least have
- *                      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes allocated.
+ *                      @ref NETIF_L2ADDR_MAXLEN bytes allocated.
  *
  * @return  Actual length of @p out on success.
  * @return  0, on failure.

@@ -449,7 +449,7 @@ static void test_l2util_addr_from_str(void)
     static const uint8_t ethernet_l2addr[] = ETHERNET_SRC;
     static const uint8_t ieee802154_l2addr_long[] = IEEE802154_LONG_SRC;
     static const uint8_t ieee802154_l2addr_short[] = IEEE802154_SHORT_SRC;
-    uint8_t out[GNRC_NETIF_L2ADDR_MAXLEN];
+    uint8_t out[NETIF_L2ADDR_MAXLEN];
 
     TEST_ASSERT_EQUAL_INT(0, l2util_addr_from_str("", out));
     TEST_ASSERT_EQUAL_INT(sizeof(ethernet_l2addr),

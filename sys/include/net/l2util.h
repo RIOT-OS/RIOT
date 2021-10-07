@@ -179,11 +179,11 @@ char *l2util_addr_to_str(const uint8_t *addr, size_t addr_len, char *out);
  *
  * @pre `(out != NULL)`
  * @pre @p out **MUST** have allocated at least
- *      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes.
+ *      @ref NETIF_L2ADDR_MAXLEN bytes.
  *
  * @param[in] str       A string of colon-separated hexadecimals.
  * @param[out] out      The resulting hardware address. Must at least have
- *                      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes allocated.
+ *                      @ref NETIF_L2ADDR_MAXLEN bytes allocated.
  *
  * @return  Actual length of @p out on success.
  * @return  0, on failure.
