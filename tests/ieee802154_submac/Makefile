@@ -6,6 +6,7 @@ BOARD_WHITELIST :=  \
 					arduino-nano-33-ble \
 					cc2538dk \
 					feather-nrf52840 \
+					native \
 					nrf52840dk \
 					nrf52840dongle \
 					nrf52840-mdk \
@@ -28,6 +29,12 @@ USEMODULE += eui_provider
 USEMODULE += ieee802154
 USEMODULE += ieee802154_submac
 USEMODULE += ztimer_usec
+
+ifeq ($(BOARD), native)
+  ZEP_PORT_BASE ?= 17754
+  TERMFLAGS += -z [::1]:$(ZEP_PORT_BASE)
+  USEMODULE += socket_zep
+endif
 
 CFLAGS += -DEVENT_THREAD_MEDIUM_STACKSIZE=1024
 
