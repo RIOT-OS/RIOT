@@ -1251,7 +1251,7 @@ static int _netif_set_lw_key(netif_t *iface, netopt_t opt, char *key_str)
 static int _netif_set_addr(netif_t *iface, netopt_t opt, char *addr_str)
 {
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
-    size_t addr_len = gnrc_netif_addr_from_str(addr_str, addr);
+    size_t addr_len = netif_addr_from_str(addr_str, addr);
 
     if (addr_len == 0) {
         puts("error: unable to parse address.\n"
@@ -1399,7 +1399,7 @@ static int _netif_set_encrypt_key(netif_t *iface, netopt_t opt, char *key_str)
 static int _netif_addrm_l2filter(netif_t *iface, char *val, bool add)
 {
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
-    size_t addr_len = gnrc_netif_addr_from_str(val, addr);
+    size_t addr_len = netif_addr_from_str(val, addr);
 
     if ((addr_len == 0) || (addr_len > CONFIG_L2FILTER_ADDR_MAXLEN)) {
         puts("error: given address is invalid");
@@ -1745,7 +1745,7 @@ int _gnrc_netif_send(int argc, char **argv)
     }
 
     /* parse address */
-    addr_len = gnrc_netif_addr_from_str(argv[2], addr);
+    addr_len = netif_addr_from_str(argv[2], addr);
 
     if (addr_len == 0) {
         if (strcmp(argv[2], "bcast") == 0) {

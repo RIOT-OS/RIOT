@@ -224,6 +224,31 @@ static inline char *netif_addr_to_str(const uint8_t *addr, size_t addr_len, char
     return l2util_addr_to_str(addr, addr_len, out);
 }
 
+/**
+ * @brief   Parses a string of colon-separated hexadecimals to a hardware
+ *          address.
+ *
+ * @note    Compatibility wrapper for @see l2util_addr_from_str
+ *
+ * @details The input format must be like `xx:xx:xx:xx` where `xx` will be the
+ *          bytes of @p addr in hexadecimal representation.
+ *
+ * @pre `(out != NULL)`
+ * @pre @p out **MUST** have allocated at least
+ *      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes.
+ *
+ * @param[in] str       A string of colon-separated hexadecimals.
+ * @param[out] out      The resulting hardware address. Must at least have
+ *                      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes allocated.
+ *
+ * @return  Actual length of @p out on success.
+ * @return  0, on failure.
+ */
+static inline size_t netif_addr_from_str(const char *str, uint8_t *out)
+{
+    return l2util_addr_from_str(str, out);
+}
+
 #ifdef __cplusplus
 }
 #endif

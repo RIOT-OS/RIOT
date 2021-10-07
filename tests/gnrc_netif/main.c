@@ -229,18 +229,18 @@ static void test_addr_from_str(void)
     static const uint8_t ieee802154_l2addr_short[] = IEEE802154_SHORT_SRC;
     uint8_t out[GNRC_NETIF_L2ADDR_MAXLEN];
 
-    TEST_ASSERT_EQUAL_INT(0, gnrc_netif_addr_from_str("", out));
+    TEST_ASSERT_EQUAL_INT(0, netif_addr_from_str("", out));
     TEST_ASSERT_EQUAL_INT(sizeof(ethernet_l2addr),
-                          gnrc_netif_addr_from_str("3E:E6:B5:22:FD:0A", out));
+                          netif_addr_from_str("3E:E6:B5:22:FD:0A", out));
     TEST_ASSERT_EQUAL_INT(0, memcmp(ethernet_l2addr, out,
                                     sizeof(ethernet_l2addr)));
     TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_long),
-                          gnrc_netif_addr_from_str("3E:E6:B5:0F:19:22:FD:0A",
-                                                   out));
+                          netif_addr_from_str("3E:E6:B5:0F:19:22:FD:0A",
+                                              out));
     TEST_ASSERT_EQUAL_INT(0, memcmp(ieee802154_l2addr_long, out,
                                     sizeof(ieee802154_l2addr_long)));
     TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_short),
-                          gnrc_netif_addr_from_str("FD:0A", out));
+                          netif_addr_from_str("FD:0A", out));
     TEST_ASSERT_EQUAL_INT(0, memcmp(ieee802154_l2addr_short, out,
                                     sizeof(ieee802154_l2addr_short)));
 }

@@ -580,31 +580,6 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
 gnrc_netif_t *gnrc_netif_get_by_type(netdev_type_t type, uint8_t index);
 
 /**
- * @brief   Parses a string of colon-separated hexadecimals to a hardware
- *          address.
- *
- * @note    Compatibility wrapper for @see l2util_addr_from_str
- *
- * @details The input format must be like `xx:xx:xx:xx` where `xx` will be the
- *          bytes of @p addr in hexadecimal representation.
- *
- * @pre `(out != NULL)`
- * @pre @p out **MUST** have allocated at least
- *      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes.
- *
- * @param[in] str       A string of colon-separated hexadecimals.
- * @param[out] out      The resulting hardware address. Must at least have
- *                      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes allocated.
- *
- * @return  Actual length of @p out on success.
- * @return  0, on failure.
- */
-static inline size_t gnrc_netif_addr_from_str(const char *str, uint8_t *out)
-{
-    return l2util_addr_from_str(str, out);
-}
-
-/**
  * @brief   Send a GNRC packet via a given @ref gnrc_netif_t interface.
  *
  * @param netif         pointer to the interface
