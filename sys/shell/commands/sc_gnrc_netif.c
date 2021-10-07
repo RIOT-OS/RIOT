@@ -621,7 +621,7 @@ static void _netif_list(netif_t *iface)
     if (res >= 0) {
         char hwaddr_str[res * 3];
         printf(" HWaddr: %s ",
-               gnrc_netif_addr_to_str(hwaddr, res, hwaddr_str));
+               netif_addr_to_str(hwaddr, res, hwaddr_str));
     }
     res = netif_get_opt(iface, NETOPT_CHANNEL, 0, &u16, sizeof(u16));
     if (res >= 0) {
@@ -748,7 +748,7 @@ static void _netif_list(netif_t *iface)
     if (res >= 0) {
         char hwaddr_str[res * 3];
         printf("Long HWaddr: ");
-        printf("%s ", gnrc_netif_addr_to_str(hwaddr, res, hwaddr_str));
+        printf("%s ", netif_addr_to_str(hwaddr, res, hwaddr_str));
         line_thresh++;
     }
     line_thresh = _newline(0U, line_thresh);
@@ -895,8 +895,8 @@ static void _netif_list(netif_t *iface)
         for (unsigned i = 0; i < CONFIG_L2FILTER_LISTSIZE; i++) {
             if (filter[i].addr_len > 0) {
                 char hwaddr_str[filter[i].addr_len * 3];
-                gnrc_netif_addr_to_str(filter[i].addr, filter[i].addr_len,
-                                       hwaddr_str);
+                netif_addr_to_str(filter[i].addr, filter[i].addr_len,
+                                  hwaddr_str);
                 printf("            %2i: %s\n", count++, hwaddr_str);
             }
         }

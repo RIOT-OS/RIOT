@@ -805,7 +805,7 @@ static gnrc_pktsnip_t *_build_ack(gnrc_netif_t *netif,
     ack_netif = gnrc_netif_hdr_build(NULL, 0, dst, dst_len);
     if (ack_netif == NULL) {
         DEBUG("6lo sfr: can't allocate netif header for ACK for (%s, %02x).\n",
-              gnrc_netif_addr_to_str(dst, dst_len, addr_str), hdr->tag);
+              netif_addr_to_str(dst, dst_len, addr_str), hdr->tag);
         return NULL;
     }
     gnrc_netif_hdr_set_netif(ack_netif->data, netif);
@@ -815,7 +815,7 @@ static gnrc_pktsnip_t *_build_ack(gnrc_netif_t *netif,
 
     if (ack_snip == NULL) {
         DEBUG("6lo sfr: can't allocate ACK for (%s, %02x).\n",
-              gnrc_netif_addr_to_str(dst, dst_len, addr_str), hdr->tag);
+              netif_addr_to_str(dst, dst_len, addr_str), hdr->tag);
         gnrc_pktbuf_release(ack_netif);
         return NULL;
     }
@@ -895,8 +895,8 @@ static void _try_reassembly(gnrc_netif_hdr_t *netif_hdr,
         int res;
 
         DEBUG("6lo sfr: reassembling datagram (%s, %u)\n",
-              gnrc_netif_addr_to_str(gnrc_netif_hdr_get_src_addr(netif_hdr),
-                                     netif_hdr->src_l2addr_len, addr_str),
+              netif_addr_to_str(gnrc_netif_hdr_get_src_addr(netif_hdr),
+                                netif_hdr->src_l2addr_len, addr_str),
               base.tag);
         entry->type = _RB;
         bf_set(entry->entry.rb->received, seq);
@@ -1036,8 +1036,8 @@ static void _handle_1st_rfrag(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         bool release_pkt = true;
 
         DEBUG("6lo sfr: Abort for datagram (%s, %u) received\n",
-              gnrc_netif_addr_to_str(gnrc_netif_hdr_get_src_addr(netif_hdr),
-                                     netif_hdr->src_l2addr_len, addr_str),
+              netif_addr_to_str(gnrc_netif_hdr_get_src_addr(netif_hdr),
+                                netif_hdr->src_l2addr_len, addr_str),
               hdr->base.tag);
         if ((entry->entry.vrb = gnrc_sixlowpan_frag_vrb_get(
                 gnrc_netif_hdr_get_src_addr(netif_hdr),
@@ -1065,8 +1065,8 @@ static void _handle_1st_rfrag(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         return;
     }
     DEBUG("6lo sfr: First fragment (%s, %u) received\n",
-          gnrc_netif_addr_to_str(gnrc_netif_hdr_get_src_addr(netif_hdr),
-                                 netif_hdr->src_l2addr_len, addr_str),
+          netif_addr_to_str(gnrc_netif_hdr_get_src_addr(netif_hdr),
+                            netif_hdr->src_l2addr_len, addr_str),
           hdr->base.tag);
 
     payload = (uint8_t *)(hdr + 1);
@@ -1093,8 +1093,8 @@ static void _handle_nth_rfrag(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     uint16_t offset = sixlowpan_sfr_rfrag_get_offset(hdr);
 
     DEBUG("6lo sfr: Subsequent fragment (%s, %u) received\n",
-          gnrc_netif_addr_to_str(gnrc_netif_hdr_get_src_addr(netif_hdr),
-                                 netif_hdr->src_l2addr_len, addr_str),
+          netif_addr_to_str(gnrc_netif_hdr_get_src_addr(netif_hdr),
+                            netif_hdr->src_l2addr_len, addr_str),
           hdr->base.tag);
     if (gnrc_sixlowpan_frag_rb_exists(netif_hdr, hdr->base.tag)) {
         DEBUG("6lo sfr: I am destination endpoint => adding to reassembly "
@@ -1438,8 +1438,8 @@ static void _abort_rb(gnrc_pktsnip_t *pkt, _generic_rb_entry_t *entry,
     sixlowpan_sfr_rfrag_t *hdr = pkt->data;
 
     DEBUG("6lo sfr: Aborting datagram (%s, %02x)\n",
-          gnrc_netif_addr_to_str(gnrc_netif_hdr_get_src_addr(netif_hdr),
-                                 netif_hdr->src_l2addr_len, addr_str),
+          netif_addr_to_str(gnrc_netif_hdr_get_src_addr(netif_hdr),
+                            netif_hdr->src_l2addr_len, addr_str),
           hdr->base.tag);
     if (send_ack) {
         if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
@@ -1460,7 +1460,7 @@ static void _send_ack(gnrc_netif_t *netif, const uint8_t *dst, uint8_t dst_len,
     gnrc_pktsnip_t *ack = _build_ack(netif, dst, dst_len, hdr, bitmap);
 
     DEBUG("6lo sfr: Sending ACK for (%s, %02x): %02X%02X%02X%02X\n",
-          gnrc_netif_addr_to_str(dst, dst_len, addr_str),
+          netif_addr_to_str(dst, dst_len, addr_str),
           hdr->tag, bitmap[0], bitmap[1], bitmap[2], bitmap[3]);
     if (ack != NULL) {
         _send_frame(ack, NULL, 0);
@@ -1546,9 +1546,9 @@ static void _handle_ack(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
 
     (void)page;
     DEBUG("6lo sfr: received ACK for datagram (%s, %02x): %02X%02X%02X%02X\n",
-          gnrc_netif_addr_to_str(gnrc_netif_hdr_get_src_addr(netif_hdr),
-                                 netif_hdr->src_l2addr_len,
-                                 addr_str), hdr->base.tag,
+          netif_addr_to_str(gnrc_netif_hdr_get_src_addr(netif_hdr),
+                            netif_hdr->src_l2addr_len,
+                            addr_str), hdr->base.tag,
           hdr->bitmap[0], hdr->bitmap[1], hdr->bitmap[2], hdr->bitmap[3]);
     if ((vrbe = gnrc_sixlowpan_frag_vrb_reverse(
             gnrc_netif_hdr_get_netif(netif_hdr),
@@ -1558,8 +1558,8 @@ static void _handle_ack(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         sixlowpan_sfr_t mock_base = { .disp_ecn = hdr->base.disp_ecn,
                                       .tag = vrbe->super.tag };
         DEBUG("6lo sfr: forward ACK to (%s, %02x)\n",
-              gnrc_netif_addr_to_str(vrbe->super.src, vrbe->super.src_len,
-                                     addr_str), vrbe->super.tag);
+              netif_addr_to_str(vrbe->super.src, vrbe->super.src_len,
+                                addr_str), vrbe->super.tag);
         _send_ack(vrbe->in_netif, vrbe->super.src, vrbe->super.src_len,
                   &mock_base, hdr->bitmap);
         if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
@@ -1626,8 +1626,8 @@ static int _forward_rfrag(gnrc_pktsnip_t *pkt, _generic_rb_entry_t *entry,
      * it in reverse look-up */
     entry->entry.vrb->out_tag &= UINT8_MAX;
     DEBUG("6lo sfr: Forwarding to (%s, %u)\n",
-          gnrc_netif_addr_to_str(entry->entry.base->dst,
-                                 entry->entry.base->dst_len, addr_str),
+          netif_addr_to_str(entry->entry.base->dst,
+                            entry->entry.base->dst_len, addr_str),
           entry->entry.vrb->out_tag);
     if (new == NULL) {
         DEBUG("6lo sfr: Unable to forward fragment, "

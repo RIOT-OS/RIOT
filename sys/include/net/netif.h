@@ -37,6 +37,7 @@
 #include <string.h>
 
 #include "list.h"
+#include "net/l2util.h"
 #include "net/netopt.h"
 
 #ifdef MODULE_NETSTATS_NEIGHBOR
@@ -199,6 +200,29 @@ int netif_set_opt(netif_t *netif, netopt_t opt, uint16_t context,
  * @return  -EINVAL if @p netif is NULL.
  */
 int netif_register(netif_t *netif);
+
+/**
+ * @brief   Converts a hardware address to a human readable string.
+ *
+ * @note    Compatibility wrapper for @see l2util_addr_to_str
+ *
+ * @details The format will be like `xx:xx:xx:xx` where `xx` are the bytes
+ *          of @p addr in hexadecimal representation.
+ *
+ * @pre `(out != NULL) && ((addr != NULL) || (addr_len == 0))`
+ * @pre @p out **MUST** have allocated at least 3 * @p addr_len bytes.
+ *
+ * @param[in] addr      A hardware address.
+ * @param[in] addr_len  Length of @p addr.
+ * @param[out] out      A string to store the output in. Must at least have
+ *                      3 * @p addr_len bytes allocated.
+ *
+ * @return  @p out.
+ */
+static inline char *netif_addr_to_str(const uint8_t *addr, size_t addr_len, char *out)
+{
+    return l2util_addr_to_str(addr, addr_len, out);
+}
 
 #ifdef __cplusplus
 }

@@ -155,6 +155,10 @@ ifneq (,$(filter uhcpc,$(USEMODULE)))
   USEMODULE += posix_inet
 endif
 
+ifneq (,$(filter netif,$(USEMODULE)))
+  USEMODULE += l2util
+endif
+
 ifneq (,$(filter netdev_tap,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += netdev_eth

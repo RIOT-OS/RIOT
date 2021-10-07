@@ -995,11 +995,11 @@ static int _forward_frag(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *frag_hdr,
     }
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_SFR */
     DEBUG("6lo iphc: Do not know how to forward fragment from (%s, %u) ",
-          gnrc_netif_addr_to_str(vrbe->super.src, vrbe->super.src_len,
-                                 addr_str), vrbe->super.tag);
+          netif_addr_to_str(vrbe->super.src, vrbe->super.src_len,
+                            addr_str), vrbe->super.tag);
     DEBUG("to (%s, %u)\n",
-          gnrc_netif_addr_to_str(vrbe->super.dst, vrbe->super.dst_len,
-                                 addr_str), vrbe->out_tag);
+          netif_addr_to_str(vrbe->super.dst, vrbe->super.dst_len,
+                            addr_str), vrbe->out_tag);
     if (IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_OD)) {
         DEBUG("Original fragmentation header:\n");
         od_hex_dump(frag_hdr->data, frag_hdr->size, OD_WIDTH_DEFAULT);

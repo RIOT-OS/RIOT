@@ -528,12 +528,12 @@ static bool _rbuf_update_ints(gnrc_sixlowpan_frag_rb_base_t *entry,
     new->end = end;
 
     DEBUG("6lo rfrag: add interval (%" PRIu16 ", %" PRIu16 ") to entry (%s, ",
-          new->start, new->end, gnrc_netif_addr_to_str(entry->src,
-                                                       entry->src_len,
-                                                       l2addr_str));
-    DEBUG("%s, %u, %u)\n", gnrc_netif_addr_to_str(entry->dst,
-                                                  entry->dst_len,
-                                                  l2addr_str),
+          new->start, new->end, netif_addr_to_str(entry->src,
+                                                  entry->src_len,
+                                                  l2addr_str));
+    DEBUG("%s, %u, %u)\n", netif_addr_to_str(entry->dst,
+                                             entry->dst_len,
+                                             l2addr_str),
           entry->datagram_size, entry->tag);
 
     LL_PREPEND(entry->ints, new);
@@ -564,13 +564,13 @@ void gnrc_sixlowpan_frag_rb_gc(void)
               ((now_usec - rbuf[i].super.arrival) >
                CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {
             DEBUG("6lo rfrag: entry (%s, ",
-                  gnrc_netif_addr_to_str(rbuf[i].super.src,
-                                         rbuf[i].super.src_len,
-                                         l2addr_str));
+                  netif_addr_to_str(rbuf[i].super.src,
+                                    rbuf[i].super.src_len,
+                                    l2addr_str));
             DEBUG("%s, %u, %u) timed out\n",
-                  gnrc_netif_addr_to_str(rbuf[i].super.dst,
-                                         rbuf[i].super.dst_len,
-                                         l2addr_str),
+                  netif_addr_to_str(rbuf[i].super.dst,
+                                    rbuf[i].super.dst_len,
+                                    l2addr_str),
                   (unsigned)rbuf[i].super.datagram_size, rbuf[i].super.tag);
 
             _gc_pkt(&rbuf[i]);
@@ -610,13 +610,13 @@ static int _rbuf_get(const void *src, size_t src_len,
             (memcmp(rbuf[i].super.src, src, src_len) == 0) &&
             (memcmp(rbuf[i].super.dst, dst, dst_len) == 0)) {
             DEBUG("6lo rfrag: entry %p (%s, ", (void *)(&rbuf[i]),
-                  gnrc_netif_addr_to_str(rbuf[i].super.src,
-                                         rbuf[i].super.src_len,
-                                         l2addr_str));
+                  netif_addr_to_str(rbuf[i].super.src,
+                                    rbuf[i].super.src_len,
+                                    l2addr_str));
             DEBUG("%s, %u, %u) found\n",
-                  gnrc_netif_addr_to_str(rbuf[i].super.dst,
-                                         rbuf[i].super.dst_len,
-                                         l2addr_str),
+                  netif_addr_to_str(rbuf[i].super.dst,
+                                    rbuf[i].super.dst_len,
+                                    l2addr_str),
                   (unsigned)rbuf[i].super.datagram_size, rbuf[i].super.tag);
 #if CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER > 0
             if (rbuf[i].super.current_size == 0) {
@@ -724,11 +724,11 @@ static int _rbuf_get(const void *src, size_t src_len,
 #endif  /* IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
 
     DEBUG("6lo rfrag: entry %p (%s, ", (void *)res,
-          gnrc_netif_addr_to_str(res->super.src, res->super.src_len,
-                                 l2addr_str));
+          netif_addr_to_str(res->super.src, res->super.src_len,
+                            l2addr_str));
     DEBUG("%s, %u, %u) created\n",
-          gnrc_netif_addr_to_str(res->super.dst, res->super.dst_len,
-                                 l2addr_str), res->super.datagram_size,
+          netif_addr_to_str(res->super.dst, res->super.dst_len,
+                            l2addr_str), res->super.datagram_size,
           res->super.tag);
 
     _set_rbuf_timeout();

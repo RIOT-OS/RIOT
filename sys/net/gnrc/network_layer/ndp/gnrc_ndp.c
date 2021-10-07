@@ -161,7 +161,7 @@ gnrc_pktsnip_t *gnrc_ndp_opt_sl2a_build(const uint8_t *l2addr,
 {
     assert((l2addr != NULL) && (l2addr_len != 0));
     DEBUG("ndp: building source link-layer address option (l2addr: %s)\n",
-          gnrc_netif_addr_to_str(l2addr, l2addr_len, addr_str));
+          netif_addr_to_str(l2addr, l2addr_len, addr_str));
     return _opt_l2a_build(l2addr, l2addr_len, next, NDP_OPT_SL2A);
 }
 
@@ -171,7 +171,7 @@ gnrc_pktsnip_t *gnrc_ndp_opt_tl2a_build(const uint8_t *l2addr,
 {
     assert((l2addr != NULL) && (l2addr_len != 0));
     DEBUG("ndp: building target link-layer address option (l2addr: %s)\n",
-          gnrc_netif_addr_to_str(l2addr, l2addr_len, addr_str));
+          netif_addr_to_str(l2addr, l2addr_len, addr_str));
     return _opt_l2a_build(l2addr, l2addr_len, next, NDP_OPT_TL2A);
 }
 

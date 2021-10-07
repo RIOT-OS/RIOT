@@ -133,7 +133,6 @@ endif
 
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   USEMODULE += netif
-  USEMODULE += l2util
   USEMODULE += fmt
   ifneq (,$(filter netdev_ieee802154_submac,$(USEMODULE)))
     USEMODULE += gnrc_netif_pktq

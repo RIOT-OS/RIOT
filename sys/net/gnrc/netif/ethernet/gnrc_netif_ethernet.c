@@ -207,7 +207,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         }
 
         DEBUG("gnrc_netif_ethernet: received packet from %s of length %d\n",
-              gnrc_netif_addr_to_str(pkt->data, ETHERNET_ADDR_LEN, addr_str),
+              netif_addr_to_str(pkt->data, ETHERNET_ADDR_LEN, addr_str),
               nread);
 #if defined(MODULE_OD) && ENABLE_DEBUG
         od_hex_dump(pkt->data, nread, OD_WIDTH_DEFAULT);

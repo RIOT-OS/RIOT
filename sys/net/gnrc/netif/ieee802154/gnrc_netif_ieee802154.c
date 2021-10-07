@@ -217,9 +217,9 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
                 char src_str[GNRC_NETIF_HDR_L2ADDR_PRINT_LEN];
 
                 DEBUG("_recv_ieee802154: received packet from %s of length %u\n",
-                    gnrc_netif_addr_to_str(gnrc_netif_hdr_get_src_addr(hdr),
-                                            hdr->src_l2addr_len,
-                                            src_str),
+                    netif_addr_to_str(gnrc_netif_hdr_get_src_addr(hdr),
+                                      hdr->src_l2addr_len,
+                                      src_str),
                     nread);
                 if (IS_USED(MODULE_OD)) {
                     od_hex_dump(pkt->data, nread, OD_WIDTH_DEFAULT);

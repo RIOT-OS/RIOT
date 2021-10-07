@@ -62,7 +62,7 @@ static void _print_neighbors(netif_t *dev)
         }
 
         printf("%-24s ",
-               gnrc_netif_addr_to_str(entry->l2_addr, entry->l2_addr_len, l2addr_str));
+               netif_addr_to_str(entry->l2_addr, entry->l2_addr_len, l2addr_str));
         if (netstats_nb_isfresh(dev, entry)) {
             printf("%5u", (unsigned)entry->freshness);
         } else {

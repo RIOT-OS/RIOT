@@ -57,8 +57,8 @@ bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                   (unsigned)netif->pid);
             nce->l2addr_len = l2addr_len;
             DEBUG("%s\n",
-                  gnrc_netif_addr_to_str(nce->l2addr, nce->l2addr_len,
-                                         addr_str));
+                  netif_addr_to_str(nce->l2addr, nce->l2addr_len,
+                                    addr_str));
             memcpy(&nce->ipv6, dst, sizeof(nce->ipv6));
             nce->info = 0;
             nce->info |= (netif->pid << GNRC_IPV6_NIB_NC_INFO_IFACE_POS) &

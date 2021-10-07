@@ -22,9 +22,9 @@ int main(void)
     char addr_str[GNRC_NETIF_L2ADDR_MAXLEN * 3];
     gnrc_netif_t *netif = gnrc_netif_iter(NULL);
 
-    printf("l2_addr: %s\n", gnrc_netif_addr_to_str(netif->l2addr,
-                                                   netif->l2addr_len,
-                                                   addr_str));
+    printf("l2_addr: %s\n", netif_addr_to_str(netif->l2addr,
+                                              netif->l2addr_len,
+                                              addr_str));
 
     gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(
             GNRC_NETREG_DEMUX_CTX_ALL,

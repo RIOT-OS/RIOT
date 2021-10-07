@@ -69,18 +69,18 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
                 vrbe->out_tag = gnrc_sixlowpan_frag_fb_next_tag();
                 vrbe->super.dst_len = out_dst_len;
                 DEBUG("6lo vrb: creating entry (%s, ",
-                      gnrc_netif_addr_to_str(vrbe->super.src,
-                                             vrbe->super.src_len,
-                                             addr_str));
+                      netif_addr_to_str(vrbe->super.src,
+                                        vrbe->super.src_len,
+                                        addr_str));
                 DEBUG("%s, %u, %u) => ",
-                      gnrc_netif_addr_to_str(vrbe->super.dst,
-                                             vrbe->super.dst_len,
-                                             addr_str),
+                      netif_addr_to_str(vrbe->super.dst,
+                                        vrbe->super.dst_len,
+                                        addr_str),
                       (unsigned)vrbe->super.datagram_size, vrbe->super.tag);
                 DEBUG("(%s, %u)\n",
-                      gnrc_netif_addr_to_str(vrbe->super.dst,
-                                             vrbe->super.dst_len,
-                                             addr_str), vrbe->out_tag);
+                      netif_addr_to_str(vrbe->super.dst,
+                                        vrbe->super.dst_len,
+                                        addr_str), vrbe->out_tag);
             }
             /* _equal_index() => append intervals of `base`, so they don't get
              * lost. We use append, so we don't need to change base! */
@@ -167,15 +167,15 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
         const uint8_t *src, size_t src_len, unsigned src_tag)
 {
     DEBUG("6lo vrb: trying to get entry for (%s, %u)\n",
-          gnrc_netif_addr_to_str(src, src_len, addr_str), src_tag);
+          netif_addr_to_str(src, src_len, addr_str), src_tag);
     for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
         gnrc_sixlowpan_frag_vrb_t *vrbe = &_vrb[i];
 
         if (_equal_index(vrbe, src, src_len, src_tag)) {
             DEBUG("6lo vrb: got VRB to (%s, %u)\n",
-                  gnrc_netif_addr_to_str(vrbe->super.dst,
-                                         vrbe->super.dst_len,
-                                         addr_str), vrbe->out_tag);
+                  netif_addr_to_str(vrbe->super.dst,
+                                    vrbe->super.dst_len,
+                                    addr_str), vrbe->out_tag);
             return vrbe;
         }
     }
@@ -188,14 +188,14 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_reverse(
         unsigned tag)
 {
     DEBUG("6lo vrb: trying to get entry for reverse label switching (%s, %u)\n",
-          gnrc_netif_addr_to_str(src, src_len, addr_str), tag);
+          netif_addr_to_str(src, src_len, addr_str), tag);
     for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
         gnrc_sixlowpan_frag_vrb_t *vrbe = &_vrb[i];
 
         if ((vrbe->out_tag == tag) && (vrbe->out_netif == netif) &&
             (memcmp(vrbe->super.dst, src, src_len) == 0)) {
             DEBUG("6lo vrb: got VRB entry from (%s, %u)\n",
-                  gnrc_netif_addr_to_str(vrbe->super.src,
+                  netif_addr_to_str(vrbe->super.src,
                                          vrbe->super.src_len,
                                          addr_str), vrbe->super.tag);
             return vrbe;
@@ -214,13 +214,13 @@ void gnrc_sixlowpan_frag_vrb_gc(void)
         if (!gnrc_sixlowpan_frag_vrb_entry_empty(&_vrb[i]) &&
             (now_usec - _vrb[i].super.arrival) > CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US) {
             DEBUG("6lo vrb: entry (%s, ",
-                  gnrc_netif_addr_to_str(_vrb[i].super.src,
-                                         _vrb[i].super.src_len,
-                                         addr_str));
+                  netif_addr_to_str(_vrb[i].super.src,
+                                    _vrb[i].super.src_len,
+                                    addr_str));
             DEBUG("%s, %u, %u) timed out\n",
-                  gnrc_netif_addr_to_str(_vrb[i].super.dst,
-                                         _vrb[i].super.dst_len,
-                                         addr_str),
+                  netif_addr_to_str(_vrb[i].super.dst,
+                                    _vrb[i].super.dst_len,
+                                    addr_str),
                   (unsigned)_vrb[i].super.datagram_size, _vrb[i].super.tag);
             gnrc_sixlowpan_frag_vrb_rm(&_vrb[i]);
         }
