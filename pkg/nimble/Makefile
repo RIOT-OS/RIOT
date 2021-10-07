@@ -1,6 +1,6 @@
 PKG_NAME    = nimble
 PKG_URL     = https://github.com/apache/mynewt-nimble.git
-PKG_VERSION = 7d3f3cc6afce62a628404856fe4f90e27e04350a
+PKG_VERSION = cddb7c4ccee72e718c8b1a57166e702917e02c13
 PKG_LICENSE = Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
