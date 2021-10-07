@@ -50,7 +50,6 @@ ifneq (,$(filter openwsn_cjoin,$(USEMODULE)))
 endif
 
 ifneq (,$(filter openwsn_sock%,$(USEMODULE)))
-  CFLAGS += -DSOCK_HAS_IPV6
   ifneq (,$(filter openwsn_sock_async,$(USEMODULE)))
     CFLAGS += -DSOCK_HAS_ASYNC
   endif
