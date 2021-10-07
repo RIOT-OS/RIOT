@@ -60,6 +60,10 @@ static void *_wait_recv(void *arg)
                 puts("Received ACK from network");
                 break;
 
+            case SEMTECH_LORAMAC_TX_SCHEDULE:
+                puts("The Network Server has pending data");
+                break;
+
             default:
                 break;
         }
