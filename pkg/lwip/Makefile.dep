@@ -28,6 +28,7 @@ ifneq (,$(filter lwip_ipv6_autoconfig lwip_ipv6_mld,$(USEMODULE)))
 endif
 
 ifneq (,$(filter lwip_ipv6,$(USEMODULE)))
+  USEMODULE += ipv6
   USEMODULE += random
 endif
 

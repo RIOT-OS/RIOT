@@ -75,6 +75,7 @@ PSEUDOMODULES += heap_cmd
 PSEUDOMODULES += i2c_scan
 PSEUDOMODULES += ieee802154_security
 PSEUDOMODULES += ieee802154_submac
+PSEUDOMODULES += ipv6
 PSEUDOMODULES += l2filter_blacklist
 PSEUDOMODULES += l2filter_whitelist
 PSEUDOMODULES += libstdcpp
