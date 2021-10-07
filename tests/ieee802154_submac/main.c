@@ -139,6 +139,10 @@ void ieee802154_submac_ack_timer_cancel(ieee802154_submac_t *submac)
 {
     (void)submac;
     ztimer_remove(ZTIMER_USEC, &ack_timer);
+    /* Avoid race conditions between RX_DONE and ACK_TIMEOUT */
+    if (ev_ack_timeout.list_node.next) {
+        event_cancel(EVENT_PRIO_HIGHEST, &ev_ack_timeout);
+    }
 }
 
 static void _ack_timeout(void *arg)
