@@ -33,6 +33,12 @@
 #endif
 #include "ztimer.h"
 
+#ifndef POWERSAFE_ULTRA
+#define ZERO_SET(X,Y) set(X,Y)
+#else
+#define ZERO_SET(X,Y) cancel(X)
+#endif
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -302,7 +308,7 @@ static void _ztimer_update(ztimer_clock_t *clock)
                                      clock->max_value >> 1));
         }
         else {
-            clock->ops->set(clock, clock->max_value >> 1);
+            clock->ops->ZERO_SET(clock, clock->max_value >> 1);
         }
 #else
     if (0) {
@@ -315,7 +321,7 @@ static void _ztimer_update(ztimer_clock_t *clock)
         else {
             if (IS_USED(MODULE_ZTIMER_NOW64)) {
                 /* ensure there's at least one ISR per half period */
-                clock->ops->set(clock, clock->max_value >> 1);
+                clock->ops->ZERO_SET(clock, clock->max_value >> 1);
             }
             else {
                 clock->ops->cancel(clock);
@@ -353,7 +359,7 @@ void ztimer_handler(ztimer_clock_t *clock)
         }
         else {
             DEBUG("ztimer_handler(): %p intermediate\n", (void *)clock);
-            clock->ops->set(clock, clock->max_value >> 1);
+            clock->ops->ZERO_SET(clock, clock->max_value >> 1);
             return;
         }
     }
