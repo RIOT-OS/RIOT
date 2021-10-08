@@ -18,6 +18,7 @@
 #include "kernel_defines.h"
 #include "lwip_init_devs.h"
 #include "lwip/tcpip.h"
+#include "lwip/netif/compat.h"
 #include "lwip/netif/netdev.h"
 #include "netif/lowpan6.h"
 #include "xfa.h"
@@ -50,10 +51,21 @@ void lwip_netif_init_devs(void)
     }
 }
 
-struct netif *lwip_add_ethernet(struct netif *netif, netdev_t *state)
+static struct netif *setup_netif(lwip_netif_t *netif, netdev_t *state,
+                                 netif_input_fn input_fn)
 {
-    struct netif *_if = netif_add_noaddr(netif, state, lwip_netdev_init,
-                                         tcpip_input);
+    state->context = netif;
+    struct netif *_if = netif_add_noaddr(&netif->lwip_netif, state, lwip_netdev_init,
+                                         input_fn);
+    if (_if) {
+        netif_register(&netif->common_netif);
+    }
+    return _if;
+}
+
+struct netif *lwip_add_ethernet(lwip_netif_t *netif, netdev_t *state)
+{
+    struct netif *_if = setup_netif(netif, state, tcpip_input);
     if (_if && netif_default == NULL) {
         netif_set_default(_if);
     }
@@ -61,9 +73,9 @@ struct netif *lwip_add_ethernet(struct netif *netif, netdev_t *state)
 }
 
 #if IS_USED(MODULE_LWIP_SIXLOWPAN)
-struct netif *lwip_add_6lowpan(struct netif *netif, netdev_t *state)
+struct netif *lwip_add_6lowpan(lwip_netif_t *netif, netdev_t *state)
 {
-    return netif_add_noaddr(netif, state, lwip_netdev_init, tcpip_6lowpan_input);
+    return setup_netif(netif, state, tcpip_6lowpan_input);
 }
 #endif /* MODULE_LWIP_SIXLOWPAN */
 

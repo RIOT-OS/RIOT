@@ -27,7 +27,7 @@
 extern esp_wifi_netdev_t _esp_wifi_dev;
 extern void esp_wifi_setup(esp_wifi_netdev_t *dev);
 
-static struct netif netif;
+static lwip_netif_t netif;
 
 static void auto_init_esp_wifi(void)
 {

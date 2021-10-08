@@ -27,7 +27,7 @@
 
 #define NETIF_DOSE_NUMOF    ARRAY_SIZE(dose_params)
 
-static struct netif netif[NETIF_DOSE_NUMOF];
+static lwip_netif_t netif[NETIF_DOSE_NUMOF];
 static dose_t dose_devs[NETIF_DOSE_NUMOF];
 
 static void auto_init_dose(void)

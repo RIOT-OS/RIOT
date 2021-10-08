@@ -27,7 +27,7 @@
 
 #define NETIF_ETHOS_NUMOF        ARRAY_SIZE(ethos_params)
 
-static struct netif netif[NETIF_ETHOS_NUMOF];
+static lwip_netif_t netif[NETIF_ETHOS_NUMOF];
 static ethos_t ethos_devs[NETIF_ETHOS_NUMOF];
 
 static uint8_t _inbuf[NETIF_ETHOS_NUMOF][2048];

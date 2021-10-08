@@ -28,7 +28,7 @@
 
 #define NETIF_MRF24J40_NUMOF        ARRAY_SIZE(mrf24j40_params)
 
-static struct netif netif[NETIF_MRF24J40_NUMOF];
+static lwip_netif_t netif[NETIF_MRF24J40_NUMOF];
 static mrf24j40_t mrf24j40_devs[NETIF_MRF24J40_NUMOF];
 
 static void auto_init_mrf24j40(void)

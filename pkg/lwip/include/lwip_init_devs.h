@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-#include "lwip/netif.h"
+#include "lwip/netif/compat.h"
 #include "net/netdev.h"
 #include "xfa.h"
 
@@ -39,7 +39,7 @@ void lwip_netif_init_devs(void);
  * The netif will be set up using the `lwip_netdev_init` helper.
  * The first netif added will be marked as the default route.
  */
-struct netif *lwip_add_ethernet(struct netif *netif, netdev_t *state);
+struct netif *lwip_add_ethernet(lwip_netif_t *netif, netdev_t *state);
 
 #if IS_USED(MODULE_LWIP_SIXLOWPAN)
 /**
@@ -50,7 +50,7 @@ struct netif *lwip_add_ethernet(struct netif *netif, netdev_t *state);
  *
  * The netif will be set up using the `lwip_netdev_init` helper.
  */
-struct netif *lwip_add_6lowpan(struct netif *netif, netdev_t *state);
+struct netif *lwip_add_6lowpan(lwip_netif_t *netif, netdev_t *state);
 #endif /* MODULE_LWIP_SIXLOWPAN */
 
 typedef void (*lwip_netif_setup_func_t)(void);

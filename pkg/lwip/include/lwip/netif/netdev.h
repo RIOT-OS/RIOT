@@ -46,6 +46,7 @@ extern "C" {
  * to an existing netdev_t instance
  *
  * @pre netif->state is set to an existing netdev_t instance.
+ *      netif->state->context pointing to the lwip_netif_t containing this netif.
  *
  * @param[in] netif The network interface intended to be initialized.
  *

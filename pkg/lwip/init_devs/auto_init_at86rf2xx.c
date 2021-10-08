@@ -27,7 +27,7 @@
 
 #define NETIF_AT86RF2XX_NUMOF        ARRAY_SIZE(at86rf2xx_params)
 
-static struct netif netif[NETIF_AT86RF2XX_NUMOF];
+static lwip_netif_t netif[NETIF_AT86RF2XX_NUMOF];
 static at86rf2xx_t at86rf2xx_devs[NETIF_AT86RF2XX_NUMOF];
 
 static void auto_init_at86rf2xx(void)

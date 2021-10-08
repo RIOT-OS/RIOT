@@ -27,7 +27,7 @@
 static netdev_t stm32_eth;
 extern void stm32_eth_netdev_setup(netdev_t *netdev);
 
-static struct netif netif;
+static lwip_netif_t netif;
 
 static void auto_init_stm32_eth(void)
 {
