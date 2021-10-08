@@ -18,8 +18,9 @@
  * @}
  */
 
+#include <kernel_defines.h>
 #include <stdio.h>
-#include "lwip/netif.h"
+#include "lwip/netif/compat.h"
 #include "net/netdev.h"
 #include "net/netopt.h"
 
@@ -43,9 +44,10 @@ static void _netif_list_ipv6(struct netif *netif, int addr_index) {
 
 static void _netif_list(struct netif *netif) {
     int i;
-    char name[8];
+    char name[CONFIG_NETIF_NAMELENMAX];
     struct netdev *dev = netif->state;
-    netif_get_name((netif_t *)netif, name);
+    lwip_netif_t *compat = container_of(netif, lwip_netif_t, lwip_netif);
+    netif_get_name(&compat->common_netif, name);
     printf("Iface %s HWaddr: ", name);
     for (i = 0; i < netif->hwaddr_len; i++) {
         printf("%02x", netif->hwaddr[i]);
