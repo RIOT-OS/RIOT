@@ -486,23 +486,6 @@ typedef enum {
 /** @} */
 
 /**
- * @brief   Available number of ADC devices
- */
-#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2)
-#define ADC_DEVS            (2U)
-#elif defined(CPU_LINE_STM32F401xE) || defined(CPU_LINE_STM32F410Rx) \
-    || defined(CPU_LINE_STM32F411xE) || defined(CPU_LINE_STM32F412Zx) \
-    || defined(CPU_LINE_STM32F413xx) || defined(CPU_LINE_STM32F423xx) \
-    || defined(CPU_MODEL_STM32L452RE) || defined(CPU_MODEL_STM32L432KC)
-#define ADC_DEVS            (1U)
-#elif defined(CPU_LINE_STM32F405xx)  || defined(CPU_LINE_STM32F407xx) \
-    || defined(CPU_LINE_STM32F415xx) || defined(CPU_LINE_STM32F429xx) \
-    || defined(CPU_LINE_STM32F437xx) || defined(CPU_LINE_STM32F446xx) \
-    || defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L475VG)
-#define ADC_DEVS            (3U)
-#endif
-
-/**
  * @brief   ADC channel configuration data
  */
 typedef struct {
