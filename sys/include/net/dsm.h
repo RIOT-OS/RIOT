@@ -31,6 +31,8 @@
 #define NET_DSM_H
 
 #include <stdint.h>
+
+#include "dtls.h"
 #include "net/sock/dtls.h"
 
 #ifdef __cplusplus
@@ -41,7 +43,7 @@ extern "C" {
  * @brief   Maximum number of maintained DTLS sessions (tinyDTLS)
  */
 #ifndef CONFIG_DSM_PEER_MAX
-#define CONFIG_DSM_PEER_MAX   (1)
+#define CONFIG_DSM_PEER_MAX   (CONFIG_DTLS_PEER_MAX)
 #endif
 
 /**
