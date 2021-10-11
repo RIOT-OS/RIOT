@@ -52,6 +52,11 @@ extern "C" {
 #define RTT_MAX_FREQUENCY   (RTT_CLOCK_FREQUENCY / 2) /* in Hz */
 /** @} */
 
+/**
+ * @brief   Available number of ADC devices
+ */
+#define ADC_DEVS            (2U)
+
 #ifdef __cplusplus
 }
 #endif
