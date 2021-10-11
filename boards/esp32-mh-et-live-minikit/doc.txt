@@ -65,11 +65,11 @@ This section describes
 ### <a name="mcu"> MCU </a> &nbsp;&nbsp; [[TOC](#toc)]
 
 Most features of the board are provided by the ESP32 SoC. For detailed
-information about the ESP32, see section \ref esp32_mcu "MCU ESP32".
+information about the ESP32, see section \ref esp32_mcu_esp32 "MCU ESP32".
 
 ### <a name="board_configuration"> Board Configuration </a> &nbsp;&nbsp; [[TOC](#toc)]
 
-The following table shows the default board configuration, which is sorted according to the defined functionality of GPIOs. This configuration can be overridden by an \ref esp32_app_spec_conf "application-specific configuration".
+The following table shows the default board configuration, which is sorted according to the defined functionality of GPIOs. This configuration can be overridden by an \ref esp32_application_specific_configurations "application-specific configuration".
 
 <center>
 \anchor esp32_mh-et-live-minikit_table_board_configuration
@@ -111,11 +111,11 @@ GPIO33 | -   | | | |
 - GPIO9 and GIOP10 can only be used in **dout** and **dio** \ref esp32_flash_modes "flash modes".
 - The **RESET** signal of MRF24J40 shield can be connected to the RST **pin** of the board (see \ref esp32_mh-et-live-minikit "pinout") to keep the configured GPIO free for other purposes.
 
-For detailed information about the configuration of ESP32 boards, see section \ref esp32_comm_periph "Common Peripherals".
+For detailed information about the configuration of ESP32 boards, see section \ref esp32_peripherals "Common Peripherals".
 
 ### <a name="optional_hardware"> Optional Hardware Configurations </a> &nbsp;&nbsp; [[TOC](#toc)]
 
-ENC28J60-based Ethernet network interface modules have been tested with the board. You could use the following code in your \ref esp32_app_spec_conf "application-specific configuration" to use such a module:
+ENC28J60-based Ethernet network interface modules have been tested with the board. You could use the following code in your \ref esp32_application_specific_configurations "application-specific configuration" to use such a module:
 
 ```
 #if MODULE_ENC28J80 && BOARD_ESP32_MH_ET_LIVE_MINIKIT

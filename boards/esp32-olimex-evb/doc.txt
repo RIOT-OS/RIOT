@@ -54,7 +54,7 @@ This section describes
 ### <a name="mcu"> MCU </a> &nbsp;&nbsp; [[TOC](#toc)]
 
 Most features of the board are provided by the ESP32 SoC. For detailed
-information about the ESP32, see section \ref esp32_mcu "MCU ESP32".
+information about the ESP32, see section \ref esp32_mcu_esp32 "MCU ESP32".
 
 ### <a name="board_configuration"> Board Configuration </a> &nbsp;&nbsp; [[TOC](#toc)]
 
@@ -67,7 +67,7 @@ Olimex ESP32-EVB and Olimex ESP32-GATEWAY have the following on-board components
 - two Relais (Olimex ESP32-EVB only)
 - [UEXT](https://www.olimex.com/Products/Modules/UEXT/) connector with I2C, SPI and UART interfaces (Olimex ESP32-EVB only)
 
-The following table shows the default board configuration, which is sorted according to the defined functionality of GPIOs. This configuration can be overridden by \ref esp32_app_spec_conf "application-specific configurations".
+The following table shows the default board configuration, which is sorted according to the defined functionality of GPIOs. This configuration can be overridden by \ref esp32_application_specific_configurations "application-specific configurations".
 
 <center>
 \anchor esp32_olimex-esp32-evb_table_board_configuration
@@ -111,11 +111,11 @@ USEMODULE += olimex_esp32_gateway
 - GPIO9 and GIOP10 can only be used in **dout** and **dio** \ref esp32_flash_modes "flash modes".
 - It might be necessary to remove the SD card or the peripheral hardware attached to the SPI_DEV(0) interface for flashing RIOT. Reason is that the **SPI_DEV(0)** interface uses the HSPI interface with the GPIO2 pin as the MISO signal, which has bootstrapping functionality.
 
-For detailed information about the configuration of ESP32 boards, see section \ref esp32_comm_periph "Common Peripherals".
+For detailed information about the configuration of ESP32 boards, see section \ref esp32_peripherals "Common Peripherals".
 
 ### <a name="optional_hardware"> Optional Hardware Configurations </a> &nbsp;&nbsp; [[TOC](#toc)]
 
-MRF24J40-based IEEE 802.15.4 radio modules have been tested with the board. You could use the following code in your \ref esp32_app_spec_conf "application-specific configuration" to use such modules:
+MRF24J40-based IEEE 802.15.4 radio modules have been tested with the board. You could use the following code in your \ref esp32_application_specific_configurations "application-specific configuration" to use such modules:
 
 ```
 #ifdef BOARD_ESP32_OLIMEX_EVB && !MODULE_ESP32_OLIMEX_GATEWAY

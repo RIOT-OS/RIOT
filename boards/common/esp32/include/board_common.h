@@ -13,7 +13,7 @@
  * This file contains board configurations that are valid for all ESP32.
  *
  * For detailed information about the configuration of ESP32 boards, see
- * section \ref esp32_comm_periph "Common Peripherals".
+ * section \ref esp32_peripherals "Common Peripherals".
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @file
@@ -112,7 +112,7 @@ extern "C" {
  * @brief   MTD drive start address in SPI flash memory
  *
  * Defines the start address of the MTD system device in the SPI
- * flash memory. It can be overridden by \ref esp32_app_spec_conf
+ * flash memory. It can be overridden by \ref esp32_application_specific_configurations
  * "application-specific board configuration"
  *
  * If the MTD start address is not defined or is 0, the first possible

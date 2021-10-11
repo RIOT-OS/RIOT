@@ -50,7 +50,7 @@ extern "C" {
 #define ARDUINO_PIN_A3  GPIO35      /**< Arduino Uno pin A3 */
 #define ARDUINO_PIN_A4  GPIO36      /**< Arduino Uno pin A4 (SDA) */
 #define ARDUINO_PIN_A5  GPIO39      /**< Arduino Uno pin A5 (SCL) */
-/** @ */
+/** @} */
 
 #ifdef __cplusplus
 }

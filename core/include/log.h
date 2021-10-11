@@ -12,6 +12,7 @@
  *
  * @file
  * @brief       System logging header
+ * @anchor      core_util_log
  *
  * This header offers a bunch of "LOG_*" functions that, with the default
  * implementation, just use printf, but honour a verbosity level.
