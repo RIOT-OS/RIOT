@@ -151,6 +151,9 @@ void ieee802154_submac_ack_timer_cancel(ieee802154_submac_t *submac)
                                                              submac);
 
     xtimer_remove(&netdev_submac->ack_timer);
+    /* Prevent a race condition between the RX_DONE event and the ACK timeout */
+    netdev_submac->isr_flags &= ~NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT;
+
 }
 
 static int _send(netdev_t *netdev, const iolist_t *pkt)
