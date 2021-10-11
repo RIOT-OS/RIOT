@@ -39,6 +39,7 @@ int netif_get_opt(netif_t *iface, netopt_t opt, uint16_t context,
     (void)context;
     lwip_netif_t *lwip_netif = (lwip_netif_t*) iface;
     struct netif *netif = &lwip_netif->lwip_netif;
+    struct netdev *dev = netif->state;
     int res = -ENOTSUP;
     switch (opt) {
 #ifdef MODULE_LWIP_IPV6
@@ -62,6 +63,10 @@ int netif_get_opt(netif_t *iface, netopt_t opt, uint16_t context,
 #endif
         default:
             break;
+    }
+    if (res == -ENOTSUP) {
+        // Ask underlying netdev
+        res = dev->driver->get(dev, opt, value, max_len);
     }
     return res;
 }
