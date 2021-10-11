@@ -580,7 +580,7 @@ static unsigned _netif_list_flag(netif_t *iface, netopt_t opt, char *str,
     return line_thresh;
 }
 
-#ifdef MODULE_GNRC_IPV6
+#ifdef MODULE_IPV6
 static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
 {
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
@@ -600,6 +600,7 @@ static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
     else {
         printf("unknown");
     }
+#if MODULE_GNRC_IPV6
     if (flags & GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST) {
         printf(" [anycast]");
     }
@@ -620,6 +621,7 @@ static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
             break;
         }
     }
+#endif
     _newline(0U, _LINE_THRESHOLD);
 }
 
@@ -636,7 +638,7 @@ static void _netif_list_groups(ipv6_addr_t *addr)
 
 static void _netif_list(netif_t *iface)
 {
-#ifdef MODULE_GNRC_IPV6
+#ifdef MODULE_IPV6
     ipv6_addr_t ipv6_addrs[CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF];
     ipv6_addr_t ipv6_groups[GNRC_NETIF_IPV6_GROUPS_NUMOF];
 #endif
@@ -892,11 +894,11 @@ static void _netif_list(netif_t *iface)
         line_thresh++;
     }
     line_thresh = _newline(0U, line_thresh);
-#ifdef MODULE_GNRC_IPV6
     printf("Link type: %s",
            (netif_get_opt(iface, NETOPT_IS_WIRED, 0, &u16, sizeof(u16)) > 0) ?
            "wired" : "wireless");
     _newline(0U, ++line_thresh);
+#ifdef MODULE_IPV6
     res = netif_get_opt(iface, NETOPT_IPV6_ADDR, 0, ipv6_addrs,
                         sizeof(ipv6_addrs));
     if (res >= 0) {
