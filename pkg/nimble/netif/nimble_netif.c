@@ -51,6 +51,10 @@
 #define NETTYPE                 GNRC_NETTYPE_UNDEF
 #endif
 
+#ifndef NIMBLE_NETIF_PRIO
+#define NIMBLE_NETIF_PRIO       GNRC_NETIF_PRIO
+#endif
+
 /* thread flag used for signaling transmit readiness */
 #define FLAG_TX_UNSTALLED       (1u << 13)
 #define FLAG_TX_NOTCONN         (1u << 12)
@@ -556,7 +560,7 @@ void nimble_netif_init(void)
     assert(res == 0);
     (void)res;
 
-    gnrc_netif_create(&_netif, _stack, sizeof(_stack), GNRC_NETIF_PRIO,
+    gnrc_netif_create(&_netif, _stack, sizeof(_stack), NIMBLE_NETIF_PRIO,
                       "nimble_netif", &_nimble_netdev_dummy, &_nimble_netif_ops);
 }
 
