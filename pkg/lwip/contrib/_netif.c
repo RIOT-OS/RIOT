@@ -71,4 +71,16 @@ int netif_get_opt(netif_t *iface, netopt_t opt, uint16_t context,
     return res;
 }
 
+int netif_set_opt(netif_t *iface, netopt_t opt, uint16_t context,
+                  void *value, size_t value_len)
+{
+    (void)iface;
+    (void)opt;
+    (void)context;
+    (void)value;
+    (void)value_len;
+
+    return -ENOTSUP;
+}
+
 /** @} */
