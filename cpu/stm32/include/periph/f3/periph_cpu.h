@@ -50,6 +50,12 @@ extern "C" {
 #define STM32_BOOTLOADER_ADDR   (0x1FFFD800)
 
 /**
+ * @brief   Readout Protection (RDP) option bytes
+ */
+#define STM32_OPTION_BYTES   ((uint32_t*) 0x1FFFF800)
+#define GET_RDP(x) (x & 0xFF)
+
+/**
  * @brief   Override ADC resolution values
  * @{
  */

@@ -36,6 +36,16 @@ endif
 include $(RIOTCPU)/stm32/stm32_line.mk
 CPU_LINE ?= $(shell echo $(CPU_MODEL) | cut -c -9 | tr 'a-z-' 'A-Z_')xx
 
+ifeq ($(CONFIG_RDP0),y)
+  CFLAGS += -DCONFIG_STM32_RDP=0
+endif
+ifeq ($(CONFIG_RDP1),y)
+  CFLAGS += -DCONFIG_STM32_RDP=1
+endif
+ifeq ($(CONFIG_RDP2),y)
+  CFLAGS += -DCONFIG_STM32_RDP=2
+endif
+
 # Set CFLAGS
 CFLAGS += -D$(CPU_LINE) -DCPU_LINE_$(CPU_LINE)
 CFLAGS += -DSTM32_FLASHSIZE=$(FLASHSIZE)U

@@ -50,6 +50,12 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Readout Protection (RDP) option bytes
+ */
+#define STM32_OPTION_BYTES   ((uint32_t*) 0x1FFFC000)
+#define GET_RDP(x) ((x & 0xFF00) >> 8)
+
+/**
  * @brief   Override the ADC resolution configuration
  * @{
  */
