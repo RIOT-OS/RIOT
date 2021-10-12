@@ -21,7 +21,8 @@
 #include "net/netif.h"
 #include "utlist.h"
 
-static list_node_t netif_list;
+static list_node_t netif_list_head;
+static list_node_t *netif_list_tail = &netif_list_head;
 
 int netif_register(netif_t *netif)
 {
@@ -30,7 +31,8 @@ int netif_register(netif_t *netif)
     }
 
     unsigned state = irq_disable();
-    list_add(&netif_list, &netif->node);
+    list_add(netif_list_tail, &netif->node);
+    netif_list_tail = &netif->node;
     irq_restore(state);
 
     return 0;
@@ -39,7 +41,7 @@ int netif_register(netif_t *netif)
 netif_t *netif_iter(netif_t *last)
 {
     if (last == NULL) {
-        return (netif_t *)netif_list.next;
+        return (netif_t *)netif_list_head.next;
     }
 
     return (netif_t *)last->node.next;
@@ -47,7 +49,7 @@ netif_t *netif_iter(netif_t *last)
 
 __attribute__((weak)) int16_t netif_get_id(const netif_t *netif)
 {
-    list_node_t *node = netif_list.next;
+    list_node_t *node = netif_list_head.next;
     for (int16_t i = 0; node; i++, node = node->next) {
         if (netif == (netif_t *)node) {
             return i;
@@ -64,7 +66,7 @@ netif_t *netif_get_by_name_buffer(const char *name, size_t name_len)
         return NULL;
     }
 
-    list_node_t *node = netif_list.next;
+    list_node_t *node = netif_list_head.next;
 
     char tmp[CONFIG_NETIF_NAMELENMAX];
 
@@ -82,7 +84,7 @@ netif_t *netif_get_by_name_buffer(const char *name, size_t name_len)
 
 __attribute__((weak)) netif_t *netif_get_by_id(int16_t id)
 {
-    list_node_t *node = netif_list.next;
+    list_node_t *node = netif_list_head.next;
     for (int16_t i = 0; node; i++, node = node->next) {
         if (i == id) {
             return (netif_t *)node;
