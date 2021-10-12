@@ -16,6 +16,16 @@ ALLBOARDS := $(sort \
 # Set the default value from `BOARDS`
 BOARDS ?= $(ALLBOARDS)
 
-.PHONY: info-boards
+.PHONY: info-boards info-emulated-boards
 info-boards:
 	@echo $(BOARDS)
+
+EMULATED_BOARDS_RENODE := $(wildcard $(BOARDSDIRS)/*/dist/board.resc)
+EMULATED_BOARDS_QEMU := microbit
+EMULATED_BOARDS := \
+  $(EMULATED_BOARDS_QEMU) \
+  $(foreach board_path,$(EMULATED_BOARDS_RENODE),$(subst $(strip $(BOARDSDIRS)/),,$(subst /dist/board.resc,,$(board_path))))
+  #
+
+info-emulated-boards:
+	@echo $(sort $(EMULATED_BOARDS))
