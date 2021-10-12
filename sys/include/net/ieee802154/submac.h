@@ -544,7 +544,9 @@ ieee802154_fsm_state_t ieee802154_submac_process_ev(ieee802154_submac_t *submac,
  *
  * This function must be called when the ACK timeout timer fires.
  *
- * @note this function should not be called inside ISR context.
+ * @note this function should not be called inside ISR context and MUST NOT
+ *       be invoked if @ref ieee802154_submac_ack_timer_cancel was already
+ *       called.
  *
  * @param[in] submac pointer to the SubMAC descriptor
  */
