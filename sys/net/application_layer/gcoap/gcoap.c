@@ -910,9 +910,18 @@ static ssize_t _tl_send(gcoap_socket_t *sock, const void *data, size_t len,
         /* send application data */
         res = sock_dtls_send(sock->socket.dtls, &sock->ctx_dtls_session, data, len,
                                 SOCK_NO_TIMEOUT);
-        if (res <= 0 ) {
+        switch (res) {
+        case -EHOSTUNREACH:
+        case -ENOTCONN:
+        case 0:
+            DEBUG("gcoap: DTLS sock not connected or remote unreachable. "
+                  "Destroying session.\n");
             dsm_remove(sock->socket.dtls, &sock->ctx_dtls_session);
             sock_dtls_session_destroy(sock->socket.dtls, &sock->ctx_dtls_session);
+            break;
+        default:
+            /* Temporary error. Keeping the DTLS session */
+            break;
         }
 #endif
     } else if (sock->type == GCOAP_SOCKET_TYPE_UDP) {
