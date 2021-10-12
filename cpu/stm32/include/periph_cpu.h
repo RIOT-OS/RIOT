@@ -72,6 +72,7 @@
 #include "periph/cpu_timer.h"
 #include "periph/cpu_uart.h"
 #include "periph/cpu_usbdev.h"
+#include "periph/cpu_vbat.h"
 #include "periph/cpu_wdt.h"
 
 #ifdef MODULE_PERIPH_CAN

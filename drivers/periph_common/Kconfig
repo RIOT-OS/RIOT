@@ -170,4 +170,5 @@ config HAVE_SHARED_PERIPH_RTT_PERIPH_RTC
         only one can be selected.
 
 rsource "Kconfig.timer"
+rsource "Kconfig.vbat"
 rsource "Kconfig.wdt"

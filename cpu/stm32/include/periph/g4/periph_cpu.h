@@ -32,6 +32,14 @@ extern "C" {
  */
 #define STM32_BOOTLOADER_ADDR   (0x1FFF0000)
 
+/**
+ * @name   Constants for internal VBAT ADC line
+ * @{
+ */
+#define VBAT_ADC_RES        ADC_RES_12BIT
+#define VBAT_ADC_MAX        4095
+/** @} */
+
 #endif /* ndef DOXYGEN */
 
 #ifdef __cplusplus
