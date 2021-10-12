@@ -17,6 +17,13 @@ with the `RIOT_EMULATOR` variable. Possible values are `qemu` and `renode`.
 If no emulator is specified by the board configuration (e.g. in its
 `Makefile.include`), the default emulator is `renode`.
 
+The boards with emulator supported can be listed using the
+`info-emulated-boards` target:
+
+```
+$ make info-emulated-boards
+```
+
 ## Features
 
 Be aware that not all hardware features provided by a board - and described as
