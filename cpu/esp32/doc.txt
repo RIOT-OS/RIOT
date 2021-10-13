@@ -81,6 +81,8 @@ ESP-IDF SDK.
 The following table gives a short reference of all board configuration parameters used by the ESP32
 port in alphabetical order.
 
+<center>
+
 Parameter                               | Short Description                                                 | Type*
 ----------------------------------------|-------------------------------------------------------------------|------
 [ADC_GPIOS](#esp32_adc_channels)        | GPIOs that can be used as ADC channels                            | m
@@ -110,12 +112,15 @@ Parameter                               | Short Description                     
 [UART2_TXD](#esp32_uart_interfaces)     | GPIO used as TxD for UART_DEV(2)                                  | o
 [UART2_RXD](#esp32_uart_interfaces)     | GPIO used as RxD for UART_DEV(2)                                  | o
 
+</center>
+
 **Type:* m - mandatory, o - optional
 
 The following table gives a short reference  in alphabetical order of modules
 that can be enabled/disabled by board configurations and/or application's
 makefile using `USEMODULE` and `DISABLE_MODULE`.
 
+<center>
 
 Module                                              | Default   | Short description
 ----------------------------------------------------|-----------|-------------------
@@ -134,6 +139,8 @@ Module                                              | Default   | Short descript
 [esp_wifi](#esp32_wifi_network_interface)           | not used  | enable the Wifi network device in WPA2 personal mode
 [esp_wifi_ap](#esp32_wifi_ap_network_interface)     | not used  | enable the WiFi SoftAP network device
 [esp_wifi_enterprise](#esp32_wifi_network_interface)| not used  | enable the Wifi network device in WPA2 enterprise mode
+
+</center>
 
 
 [Back to table of contents](#esp32_toc)
