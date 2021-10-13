@@ -14,6 +14,7 @@
  *
  * @file
  * @brief       Interface definition for the ENC28J60 driver
+ * @anchor      drivers_enc28j60
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */

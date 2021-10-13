@@ -54,6 +54,7 @@
  *
  * @file
  * @brief       Interface definition for MRF24J40 based drivers
+ * @anchor      drivers_mrf24j40
  *
  * @author      Neo Nenaco <neo@nenaco.de>
  * @author      Koen Zandberg <koen@bergzand.net>
