@@ -43,7 +43,9 @@ Furthermore, many GPIOs are broken out for extension. The USB bridge based on
 FDI FT2232HL provides a JTAG interface for OCD debugging through the USB
 interface.
 
-@image html "https://dl.espressif.com/dl/schematics/pictures/esp-wrover-kit-v3.jpg" "ESP-WROVER-KIT V3"
+@image html "https://dl.espressif.com/dl/schematics/pictures/esp-wrover-kit-v3.jpg" "ESP-WROVER-KIT V3" width=500px
+
+[Back to table of contents](#esp32_wrover_kit_toc)
 
 ## Hardware {#esp32_wrover_kit_hardware}
 
@@ -54,10 +56,14 @@ This section describes
 - [optional hardware configurations](#esp32_wrover_kit_optional_hardware),
 - the [board pinout](#esp32_wrover_kit_pinout).
 
+[Back to table of contents](#esp32_wrover_kit_toc)
+
 ### MCU {#esp32_wrover_kit_mcu}
 
 Most features of the board are provided by the ESP32 SoC. For detailed
 information about the ESP32, see section \ref esp32_mcu_esp32 "MCU ESP32".
+
+[Back to table of contents](#esp32_wrover_kit_toc)
 
 ### Board Configuration {#esp32_wrover_kit_board_configuration}
 
@@ -76,7 +82,7 @@ configuration can be overridden by \ref esp32_application_specific_configuration
 
 These abbreviations are used in subsequent tables:
 
-*SDC* = SD-Card interface is used (module **sdcard_spi** is enabled)<br>
+*SDC* = SD-Card interface is used (module **sdcard_spi** is enabled)\n
 *CAM* = Camera is plugged in/used
 
 <center>
@@ -164,6 +170,7 @@ Following table shows the default board configuration sorted by GPIOs.
 | GPIO35 | ADC_LINE(1)            | ADC_LINE(1)         | ADC_LINE(1)         | CAMERA_D7                  | |
 | GPIO36 | ADC_LINE(2)            | ADC_LINE(2)         | ADC_LINE(2)         | CAMERA_D4                  | |
 | GPIO39 | ADC_LINE(3)            | ADC_LINE(3)         | ADC_LINE(3)         | CAMERA_D5                  | |
+\n
 
 </center>
 
@@ -192,7 +199,7 @@ Following table shows the default board configuration sorted by GPIOs.
 For detailed information about the configuration of ESP32 boards, see
 section Peripherals in \ref esp32_riot.
 
-https://docs.espressif.com/projects/esp-idf/en/latest/get-started/get-started-wrover-kit.html
+[Back to table of contents](#esp32_wrover_kit_toc)
 
 ### Optional Hardware Configurations  {#esp32_wrover_kit_optional_hardware}
 
@@ -228,18 +235,21 @@ For other parameters, the default values defined by the drivers can be used.
   connected to the **RST** pin of the board (see \ref esp32_wrover_kit_pinout
   "pinout") to keep the configured GPIO free for other purposes.
 
+[Back to table of contents](#esp32_wrover_kit_toc)
+
 ### Board Pinout  {#esp32_wrover_kit_pinout}
 
 The following picture shows the pinout of the ESP-WROVER-KIT V3 boards as
 defined by the default board configuration. The light green GPIOs are not used
 by configured on-board hardware components and can be used for any purpose.
 However, if optional off-board hardware modules are used, these GPIOs may also
-be occupied, see \ref esp32_wrover_kit_board_configuration in table board configuration.
+be occupied, see section \ref esp32_wrover_kit_board_configuration for
+more information.
 
 The corresponding board schematic can be found
 [here](https://dl.espressif.com/dl/schematics/ESP-WROVER-KIT_SCH-3.pdf).
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/ESP-WROVER-KIT_V3_pinout.png?inline=false" "ESP32-WROVER-KIT V3 Pinout"
+@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/ESP-WROVER-KIT_V3_pinout.png" "ESP32-WROVER-KIT V3 Pinout"
 
 ## Flashing the Device  {#esp32_wrover_kit_flashing}
 
@@ -267,6 +277,8 @@ make flash BOARD=esp32-wrover-kit PORT=/dev/ttyUSB1 ...
 For detailed information about ESP32 as well as configuring and compiling RIOT
 for ESP32 boards, see \ref esp32_riot.
 
+[Back to table of contents](#esp32_wrover_kit_toc)
+
 ## On-Chip Debugging with the Device {#esp32_wrover_kit_debugging}
 
 Since the USB bridge based on FDI FT2232HL provides a JTAG interface for
@@ -275,9 +287,12 @@ convenient way for On-Chip debugging. Please refer the
 [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/jtag-debugging/index.html)
 for details on how to setup and how to use ESP-WROVER-KIT and OpenOCD.
 
+[Back to table of contents](#esp32_wrover_kit_toc)
+
 ## Other Documentation Resources  {#esp32_wrover_kit_other-resources}
 
 There is a comprehensive
-[Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/get-started/get-started-wrover-kit-v3.html)
+[Getting Started Guide]
+(https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-wrover-kit-v3.html)
 for the ESP-WROVER-KIT with a lot information about hardware configuration.
  */
