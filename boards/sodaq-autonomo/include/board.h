@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_sodaq-autonomo SODAQ Autonomo
- * @ingroup     boards
- * @brief       Support for the SODAQ Autonomo board.
+ * @ingroup     boards_sodaq-autonomo
  * @{
  *
  * @file
@@ -22,20 +20,11 @@
 #define BOARD_H
 
 #include "cpu.h"
-#include "periph_conf.h"
-#include "periph_cpu.h"
+#include "board_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    xtimer configuration
- * @{
- */
-#define XTIMER              TIMER_1
-#define XTIMER_CHAN         (0)
-/** @} */
 
 /**
  * @name    LED pin definitions and handlers
@@ -50,11 +39,6 @@ extern "C" {
 #define LED0_OFF            (LED_PORT.OUTCLR.reg = LED0_MASK)
 #define LED0_TOGGLE         (LED_PORT.OUTTGL.reg = LED0_MASK)
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

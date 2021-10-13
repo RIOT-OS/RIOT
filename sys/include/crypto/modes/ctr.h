@@ -40,11 +40,13 @@ extern "C" {
  * @param length        length of the input data
  * @param output        pointer to allocated memory for encrypted data. It has
  *                      to be of size data_len.
+ *
+ * @return              Length of encrypted data on a successful encryption
+ * @return              A negative error code if something went wrong
  */
-int cipher_encrypt_ctr(cipher_t* cipher, uint8_t nonce_counter[16],
-                       uint8_t nonce_len, uint8_t* input, size_t length,
-                       uint8_t* output);
-
+int cipher_encrypt_ctr(const cipher_t *cipher, uint8_t nonce_counter[16],
+                       uint8_t nonce_len, const uint8_t *input, size_t length,
+                       uint8_t *output);
 
 /**
  * @brief Decrypt data of arbitrary length in counter mode. Encryption and
@@ -61,13 +63,17 @@ int cipher_encrypt_ctr(cipher_t* cipher, uint8_t nonce_counter[16],
  * @param length        length of the input data
  * @param output        pointer to allocated memory for encrypted data. It has
  *                      to be of size data_len.
+ *
+ * @return              Length of decrypted data on a successful decryption
+ * @return              A negative error code if something went wrong
  */
-int cipher_decrypt_ctr(cipher_t* cipher, uint8_t nonce_counter[16],
-                       uint8_t nonce_len, uint8_t* input, size_t length,
-                       uint8_t* output);
+int cipher_decrypt_ctr(const cipher_t *cipher, uint8_t nonce_counter[16],
+                       uint8_t nonce_len, const uint8_t *input, size_t length,
+                       uint8_t *output);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* CRYPTO_MODES_CTR_H */
+/** @} */

@@ -207,12 +207,12 @@ static void test_pktbuf_add__success(void)
     gnrc_pktsnip_t *pkt, *pkt_prev = NULL;
 
     for (int i = 0; i < 9; i++) {
-        pkt = gnrc_pktbuf_add(NULL, NULL, (GNRC_PKTBUF_SIZE / 10) + 4, GNRC_NETTYPE_TEST);
+        pkt = gnrc_pktbuf_add(NULL, NULL, (CONFIG_GNRC_PKTBUF_SIZE / 10) + 4, GNRC_NETTYPE_TEST);
 
         TEST_ASSERT_NOT_NULL(pkt);
         TEST_ASSERT_NULL(pkt->next);
         TEST_ASSERT_NOT_NULL(pkt->data);
-        TEST_ASSERT_EQUAL_INT((GNRC_PKTBUF_SIZE / 10) + 4, pkt->size);
+        TEST_ASSERT_EQUAL_INT((CONFIG_GNRC_PKTBUF_SIZE / 10) + 4, pkt->size);
         TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_TEST, pkt->type);
         TEST_ASSERT_EQUAL_INT(1, pkt->users);
 
@@ -509,12 +509,12 @@ static void test_pktbuf_realloc_data__size_0(void)
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
 
-#ifndef MODULE_GNRC_PKTBUF_MALLOC   /* GNRC_PKTBUF_SIZE does not apply for gnrc_pktbuf_malloc */
+#ifndef MODULE_GNRC_PKTBUF_MALLOC   /* CONFIG_GNRC_PKTBUF_SIZE does not apply for gnrc_pktbuf_malloc */
 static void test_pktbuf_realloc_data__memfull(void)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL, sizeof(TEST_STRING8), GNRC_NETTYPE_TEST);
 
-    TEST_ASSERT_EQUAL_INT(ENOMEM, gnrc_pktbuf_realloc_data(pkt, GNRC_PKTBUF_SIZE + 1));
+    TEST_ASSERT_EQUAL_INT(ENOMEM, gnrc_pktbuf_realloc_data(pkt, CONFIG_GNRC_PKTBUF_SIZE + 1));
     gnrc_pktbuf_release(pkt);
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
@@ -653,6 +653,54 @@ static void test_pktbuf_realloc_data__success3(void)
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
 
+#ifndef MODULE_GNRC_PKTBUF_MALLOC
+static void test_pktbuf_merge_data__memfull(void)
+{
+    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL, (CONFIG_GNRC_PKTBUF_SIZE / 4),
+                                          GNRC_NETTYPE_TEST);
+
+    pkt = gnrc_pktbuf_add(pkt, NULL, (CONFIG_GNRC_PKTBUF_SIZE / 4) + 1,
+                          GNRC_NETTYPE_TEST);
+    TEST_ASSERT_EQUAL_INT(ENOMEM, gnrc_pktbuf_merge(pkt));
+    gnrc_pktbuf_release(pkt);
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+}
+#endif /* MODULE_GNRC_PKTBUF_MALLOC */
+
+static void test_pktbuf_merge_data__success1(void)
+{
+    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL, 0, GNRC_NETTYPE_TEST);
+
+    TEST_ASSERT_NOT_NULL(pkt);
+    TEST_ASSERT_NULL(pkt->data);
+
+    TEST_ASSERT_EQUAL_INT(0, gnrc_pktbuf_merge(pkt));
+    gnrc_pktbuf_release(pkt);
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+}
+
+static void test_pktbuf_merge_data__success2(void)
+{
+    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, TEST_STRING4,
+                                          sizeof(TEST_STRING4),
+                                          GNRC_NETTYPE_TEST);
+
+    pkt = gnrc_pktbuf_add(pkt, TEST_STRING8, sizeof(TEST_STRING8), GNRC_NETTYPE_TEST);
+    pkt = gnrc_pktbuf_add(pkt, TEST_STRING16, sizeof(TEST_STRING16), GNRC_NETTYPE_TEST);
+
+    TEST_ASSERT_EQUAL_INT(0, gnrc_pktbuf_merge(pkt));
+    TEST_ASSERT_NULL(pkt->next);
+    TEST_ASSERT_EQUAL_STRING(TEST_STRING16, pkt->data);
+    TEST_ASSERT_EQUAL_STRING(TEST_STRING8,
+                             (char *) pkt->data + sizeof(TEST_STRING16));
+    TEST_ASSERT_EQUAL_STRING(TEST_STRING4,
+                             (char *) pkt->data + sizeof(TEST_STRING16) +
+                             sizeof(TEST_STRING8));
+    gnrc_pktbuf_release(pkt);
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+}
+
 static void test_pktbuf_hold__pkt_null(void)
 {
     gnrc_pktbuf_hold(NULL, 1);
@@ -661,7 +709,7 @@ static void test_pktbuf_hold__pkt_null(void)
 
 static void test_pktbuf_hold__pkt_external(void)
 {
-    gnrc_pktsnip_t pkt = { NULL, TEST_STRING8, sizeof(TEST_STRING8), 1, GNRC_NETTYPE_TEST };
+    gnrc_pktsnip_t pkt = { NULL, (void *)TEST_STRING8, sizeof(TEST_STRING8), 1, GNRC_NETTYPE_TEST };
 
     gnrc_pktbuf_hold(&pkt, 1);
     TEST_ASSERT(gnrc_pktbuf_is_empty());
@@ -765,57 +813,43 @@ static void test_pktbuf_start_write__pkt_users_2(void)
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
 
-static void test_pktbuf_get_iovec__1_elem(void)
+#ifndef MODULE_GNRC_PKTBUF_MALLOC
+static void test_pktbuf_reverse_snips__too_full(void)
 {
-    struct iovec *vec;
-    size_t len;
-    gnrc_pktsnip_t *snip = gnrc_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16),
-                                           GNRC_NETTYPE_UNDEF);
-    snip = gnrc_pktbuf_get_iovec(snip, &len);
-    vec = (struct iovec *)snip->data;
+    gnrc_pktsnip_t *pkt, *pkt_next, *pkt_huge;
+    const size_t pkt_huge_size = CONFIG_GNRC_PKTBUF_SIZE - (3 * 8) -
+                                 (3 * sizeof(gnrc_pktsnip_t)) - 4;
 
-    TEST_ASSERT_EQUAL_INT(sizeof(struct iovec), snip->size);
-    TEST_ASSERT_EQUAL_INT(1, len);
-    TEST_ASSERT(snip->next->data == vec[0].iov_base);
-    TEST_ASSERT_EQUAL_INT(snip->next->size, vec[0].iov_len);
-
-    gnrc_pktbuf_release(snip);
+    pkt_next = gnrc_pktbuf_add(NULL, TEST_STRING8, 8, GNRC_NETTYPE_TEST);
+    TEST_ASSERT_NOT_NULL(pkt_next);
+    /* hold to enforce duplication */
+    gnrc_pktbuf_hold(pkt_next, 1);
+    pkt = gnrc_pktbuf_add(pkt_next, TEST_STRING8, 8, GNRC_NETTYPE_TEST);
+    TEST_ASSERT_NOT_NULL(pkt);
+    /* filling up rest of packet buffer */
+    pkt_huge = gnrc_pktbuf_add(NULL, NULL, pkt_huge_size, GNRC_NETTYPE_UNDEF);
+    TEST_ASSERT_NOT_NULL(pkt_huge);
+    TEST_ASSERT_NULL(gnrc_pktbuf_reverse_snips(pkt));
+    gnrc_pktbuf_release(pkt_huge);
+    /* release because of hold above */
+    gnrc_pktbuf_release(pkt_next);
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
+#endif /* MODULE_GNRC_PKTBUF_MALLOC */
 
-static void test_pktbuf_get_iovec__3_elem(void)
+static void test_pktbuf_reverse_snips__success(void)
 {
-    struct iovec *vec;
-    size_t len;
-    gnrc_pktsnip_t *snip = gnrc_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16),
-                                           GNRC_NETTYPE_UNDEF);
-    snip = gnrc_pktbuf_add(snip, TEST_STRING8, sizeof(TEST_STRING8), GNRC_NETTYPE_UNDEF);
-    snip = gnrc_pktbuf_add(snip, TEST_STRING4, sizeof(TEST_STRING4), GNRC_NETTYPE_UNDEF);
-    snip = gnrc_pktbuf_get_iovec(snip, &len);
-    vec = (struct iovec *)snip->data;
+    gnrc_pktsnip_t *pkt, *pkt_next, *pkt_reversed;
 
-    TEST_ASSERT_EQUAL_INT((sizeof(struct iovec) * 3), snip->size);
-    TEST_ASSERT_EQUAL_INT(3, len);
-    TEST_ASSERT(snip->next->data == vec[0].iov_base);
-    TEST_ASSERT(snip->next->next->data == vec[1].iov_base);
-    TEST_ASSERT(snip->next->next->next->data == vec[2].iov_base);
-    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING4), vec[0].iov_len);
-    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8), vec[1].iov_len);
-    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING16), vec[2].iov_len);
-
-    gnrc_pktbuf_release(snip);
+    pkt_next = gnrc_pktbuf_add(NULL, TEST_STRING8, 8, GNRC_NETTYPE_TEST);
+    TEST_ASSERT_NOT_NULL(pkt_next);
+    pkt = gnrc_pktbuf_add(pkt_next, TEST_STRING8, 8, GNRC_NETTYPE_TEST);
+    TEST_ASSERT_NOT_NULL(pkt);
+    pkt_reversed = gnrc_pktbuf_reverse_snips(pkt);
+    TEST_ASSERT(pkt_reversed == pkt_next);
+    TEST_ASSERT(pkt_reversed->next == pkt);
+    gnrc_pktbuf_release(pkt_reversed);
     TEST_ASSERT(gnrc_pktbuf_is_empty());
-}
-
-static void test_pktbuf_get_iovec__null(void)
-{
-    gnrc_pktsnip_t *res;
-    size_t len;
-
-    res = gnrc_pktbuf_get_iovec(NULL, &len);
-
-    TEST_ASSERT(res == NULL);
-    TEST_ASSERT_EQUAL_INT(0, len);
 }
 
 Test *tests_pktbuf_tests(void)
@@ -858,6 +892,11 @@ Test *tests_pktbuf_tests(void)
         new_TestFixture(test_pktbuf_realloc_data__success),
         new_TestFixture(test_pktbuf_realloc_data__success2),
         new_TestFixture(test_pktbuf_realloc_data__success3),
+#ifndef MODULE_GNRC_PKTBUF_MALLOC
+        new_TestFixture(test_pktbuf_merge_data__memfull),
+#endif /* MODULE_GNRC_PKTBUF_MALLOC */
+        new_TestFixture(test_pktbuf_merge_data__success1),
+        new_TestFixture(test_pktbuf_merge_data__success2),
         new_TestFixture(test_pktbuf_hold__pkt_null),
         new_TestFixture(test_pktbuf_hold__pkt_external),
         new_TestFixture(test_pktbuf_hold__success),
@@ -867,9 +906,10 @@ Test *tests_pktbuf_tests(void)
         new_TestFixture(test_pktbuf_start_write__NULL),
         new_TestFixture(test_pktbuf_start_write__pkt_users_1),
         new_TestFixture(test_pktbuf_start_write__pkt_users_2),
-        new_TestFixture(test_pktbuf_get_iovec__1_elem),
-        new_TestFixture(test_pktbuf_get_iovec__3_elem),
-        new_TestFixture(test_pktbuf_get_iovec__null),
+#ifndef MODULE_GNRC_PKTBUF_MALLOC
+        new_TestFixture(test_pktbuf_reverse_snips__too_full),
+#endif /* MODULE_GNRC_PKTBUF_MALLOC */
+        new_TestFixture(test_pktbuf_reverse_snips__success),
     };
 
     EMB_UNIT_TESTCALLER(gnrc_pktbuf_tests, set_up, NULL, fixtures);

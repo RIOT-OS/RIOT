@@ -35,10 +35,9 @@
 #include <stdio.h>
 #include "CompilerOutputter.h"
 
-static void CompilerOutputter_printHeader(OutputterRef self,TestRef test)
+static void CompilerOutputter_printHeader(OutputterRef self)
 {
     (void)self;
-    (void)test;
 }
 
 static void CompilerOutputter_printStartTest(OutputterRef self,TestRef test)

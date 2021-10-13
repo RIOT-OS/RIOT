@@ -1,0 +1,42 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_CSMA_SENDER
+    bool "Configure CSMA sender"
+    depends on USEMODULE_CSMA_SENDER
+    help
+        Configure the CSMA_SENDER using Kconfig.
+
+if KCONFIG_USEMODULE_CSMA_SENDER
+
+config CSMA_SENDER_MIN_BE_DEFAULT
+    int "Exponent for minimum CSMA/CA backoff time"
+    default 3
+    help
+        Configure 'CONFIG_CSMA_SENDER_MIN_BE_DEFAULT'. Minimum CSMA backoff time
+        is calculated as a function of 'CONFIG_CSMA_SENDER_BACKOFF_PERIOD_UNIT'
+        and the power of 'CONFIG_CSMA_SENDER_MIN_BE_DEFAULT'.
+
+config CSMA_SENDER_MAX_BE_DEFAULT
+    int "Exponent for maximum CSMA/CA backoff time"
+    default 5
+    help
+        Configure 'CONFIG_CSMA_SENDER_MAX_BE_DEFAULT'. Maximum CSMA backoff time
+        is calculated as a function of 'CONFIG_CSMA_SENDER_BACKOFF_PERIOD_UNIT'
+        and the power of 'CONFIG_CSMA_SENDER_MAX_BE_DEFAULT'.
+
+config CSMA_SENDER_MAX_BACKOFFS_DEFAULT
+    int "Maximum number of retries for CSMA/CA method"
+    default 4
+
+config CSMA_SENDER_BACKOFF_PERIOD_UNIT
+    int "Backoff period for CSMA/CA in microseconds"
+    default 320
+    help
+        Configure 'CONFIG_CSMA_SENDER_BACKOFF_PERIOD_UNIT'. Maximum and Minimum
+        CSMA backoff time depends on unit times the value of this configuration.
+
+endif # KCONFIG_USEMODULE_CSMA_SENDER

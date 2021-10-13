@@ -18,7 +18,7 @@ except KeyError:
 else:
     gdb.execute('set substitute-path /data/riotbuild/riotcpu ' + path)
 try:
-    path = os.environ['RIOTBOARD']
+    path = os.environ['BOARDSDIR']
 except KeyError:
     # Environment variable wasn't set.
     pass

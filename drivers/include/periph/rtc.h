@@ -16,6 +16,17 @@
  * conform to the `struct tm` specification.
  * Compare: http://pubs.opengroup.org/onlinepubs/7908799/xsh/time.h.html
  *
+ * # (Low-) Power Implications
+ *
+ * After the RTC has been initialized (i.e. after calling rtc_init()), the RTC
+ * should be powered on and running. The RTC can then be powered off manually
+ * at a later point in time by calling the rtc_poweroff() function. When the RTC
+ * is powered back on using the rtc_poweron() function, it **should**
+ * transparently continue its previously configured operation.
+ *
+ * On many CPUs, certain power states might need to be blocked in rtc_init(), so
+ * that it is ensured that the RTC will function properly while it is enabled.
+ *
  * @{
  * @file
  * @brief       Low-level RTC peripheral driver interface definitions
@@ -26,11 +37,25 @@
 #ifndef PERIPH_RTC_H
 #define PERIPH_RTC_H
 
+#include <stdbool.h>
+#include <stdint.h>
 #include <time.h>
 #include "periph_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#if !defined(RIOT_EPOCH) || DOXYGEN
+/**
+ * @brief Earliest year of the RTC
+ *
+ * 01.01.$RIOT_EPOCH will be the reset value of the RTC if supported.
+ *
+ * Internal RTC helper functions such as @ref rtc_mktime and @ref rtc_localtime
+ * will not work on dates earlier than that.
+ */
+#define RIOT_EPOCH (2020)
 #endif
 
 /**
@@ -64,6 +89,19 @@ int rtc_set_time(struct tm *time);
  * @return -1 an error occurred
  */
 int rtc_get_time(struct tm *time);
+
+/**
+ * @brief Get current RTC time with sub-second component.
+ *        Requires the `periph_rtc_ms` feature.
+ *
+ * @param[out] time         Pointer to the struct to write the time to.
+ * @param[out] ms           Pointer to a variable to hold the microsecond
+ *                          component of the current RTC time.
+ *
+ * @return  0 for success
+ * @return -1 an error occurred
+ */
+int rtc_get_time_ms(struct tm *time, uint16_t *ms);
 
 /**
  * @brief Set an alarm for RTC to the specified value.
@@ -104,6 +142,71 @@ void rtc_poweron(void);
  * @brief Turns the RTC hardware module off
  */
 void rtc_poweroff(void);
+
+/**
+ * @brief Normalize the time struct
+ *
+ * @note  The function modifies the fields of the tm structure as follows:
+ *        If structure members are outside their valid interval,
+ *        they will be normalized.
+ *        So that, for example, 40 October is changed into 9 November.
+ *
+ *        If RTC_NORMALIZE_COMPAT is 1 `tm_wday` and `tm_yday` are set
+ *        to values determined from the contents of the other fields.
+ *
+ * @param time        Pointer to the struct to normalize.
+ */
+void rtc_tm_normalize(struct tm *time);
+
+/**
+ * @brief Compare two time structs.
+ *
+ * @pre   The time structs @p a and @p b are assumed to be normalized.
+ *        Use @ref rtc_tm_normalize to normalize a struct tm that has been
+ *        manually edited.
+ *
+ * @param[in] a       The first time struct.
+ * @param[in] b       The second time struct.
+ *
+ * @return an integer < 0 if a is earlier than b
+ * @return an integer > 0 if a is later than b
+ * @return              0 if a and b are equal
+ */
+int rtc_tm_compare(const struct tm *a, const struct tm *b);
+
+/**
+ * @brief Convert time struct into timestamp.
+ *
+ * @pre   The time structs @p a and @p b are assumed to be normalized.
+ *        Use @ref rtc_tm_normalize to normalize a struct tm that has been
+ *        manually edited.
+ *
+ * @param[in] t       The time struct to convert
+ *
+ * @return            elapsed seconds since `RIOT_EPOCH`
+ */
+uint32_t rtc_mktime(struct tm *t);
+
+/**
+ * @brief Converts an RTC timestamp into a  time struct.
+ *
+ * @param[in]  time   elapsed seconds since `RIOT_EPOCH`
+ * @param[out] t      the corresponding timestamp
+ */
+void rtc_localtime(uint32_t time, struct tm *t);
+
+/**
+ * @brief Verify that a time struct @p t contains valid data.
+ *
+ * @note    This function checks whether the fields of the
+ *          struct @p t are positive and within the bounds set
+ *          by @ref rtc_tm_normalize.
+ *
+ * @param[in] t       The struct to be checked.
+ *
+ * @return            true when valid, false if not
+ */
+bool rtc_tm_valid(const struct tm *t);
 
 #ifdef __cplusplus
 }

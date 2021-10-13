@@ -1,0 +1,222 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_AT86RF215
+    bool "Configure AT86RF215 driver"
+    depends on USEMODULE_AT86RF215
+    help
+        Configure the AT86RF215 driver using Kconfig.
+
+if KCONFIG_USEMODULE_AT86RF215
+
+menuconfig KCONFIG_USEMODULE_AT86RF215_BATMON
+    bool "AT86RF215 Battery Monitor"
+    depends on USEMODULE_AT86RF215
+    help
+        Configure the AT86RF215 battery monitor using Kconfig.
+
+config AT86RF215_BATMON_THRESHOLD
+    int "Treshold voltage (in mV) of the battery monitor"
+    range 1700 3675
+    default 1800
+    depends on KCONFIG_USEMODULE_AT86RF215_BATMON
+    help
+        If the supply voltage falls below the configured threshold
+        a SYS_BUS_POWER_EVENT_LOW_VOLTAGE event is generated on the
+        SYS_BUS_POWER bus.
+
+        Battery Monitoring is disabled when the device is in Deep Sleep.
+
+config AT86RF215_USE_CLOCK_OUTPUT
+    bool "Enable clock output"
+    help
+        Enable this to enable the clock output pin of the AT86RF215 chip.
+        This way it can be used as a clock source in place of a separate crystal.
+        You also have to enable this if you want to measure the clock frequency
+        for trimming. After proper trim value is applied this may be disabled
+        if not used otherwise.
+        By Default it is turned off to save energy.
+
+config AT86RF215_TRIM_VAL_EN
+    bool "Enable crystal oscillator trimming"
+    help
+        Enable crystal oscillator trimming.
+
+config AT86RF215_RPC_EN
+    bool "Enable Reduced Power Consumption"
+    help
+        Reduce Power Consumption in RX IDLE by duty-cycling the RF circuitry.
+
+config AT86RF215_TRIM_VAL
+    int "Trim value for the crystal oscillator"
+    range 0 15
+    default 0
+    depends on AT86RF215_TRIM_VAL_EN
+    help
+        Each increment adds 300nF capacitance between the crystal oscillator pins
+        TCXO and XTAL2.Tweak the value until the measured clock output matches
+        26 MHz the best.
+        For more information Refer Table 6-25 TRIM in Datasheet
+
+config AT86RF215_RESET_PULSE_WIDTH_US
+    int "Width of the reset pulse (µs)"
+    range 16 1000
+    default 16
+    help
+        If your board design includes a filtering capacitor on the reset line, this raises
+        the rise time of the reset pulse.
+        To accommodate for this, select a larger reset pulse width here.
+
+        If unsure, leave this at the default value of 16 µs.
+
+choice
+    prompt "Default Modulation"
+
+config AT86RF215_DEFAULT_LEGACY_OQPSK
+    bool "legacy O-QPSK"
+    help
+        O-QPSK compatible with IEEE 802.15.4-2003 devices
+
+config AT86RF215_DEFAULT_MR_OQPSK
+    bool "MR-O-QPSK"
+    help
+        MR-O-QPSK according to IEEE 802.15.4g
+
+config AT86RF215_DEFAULT_MR_OFDM
+    bool "MR-OFDM"
+    help
+        MR-O-OFDM according to IEEE 802.15.4g
+
+config AT86RF215_DEFAULT_MR_FSK
+    bool "MR-FSK"
+    help
+        MR-FSK according to IEEE 802.15.4g
+
+endchoice
+
+menu "O-QPSK (802.15.4) configuration"
+    depends on AT86RF215_DEFAULT_LEGACY_OQPSK
+
+config AT86RF215_DEFAULT_OQPSK_RATE
+    int "Default (legacy) O-QPSK rate mode"
+    range 0 1
+    default 0
+    help
+        The at86rf215 supports proprietary high data rates that are compatible
+        with the at86rf2xx parts.
+        Set this to 1 to configure the proprietary high-data rate option as default.
+        If unsure, leave this at 0.
+
+endmenu # legacy O-QPSK
+
+menu "MR-O-QPSK (802.15.4g) configuration"
+    depends on AT86RF215_DEFAULT_MR_OQPSK
+
+config AT86RF215_DEFAULT_MR_OQPSK_RATE
+    int "Default MR-O-QPSK rate mode"
+    range 0 3
+    default 2
+    help
+        Default Rate Mode of the MR-O-QPSK PHY
+        Each increment doubles the PSDU data rate.
+
+choice
+    prompt "Default MR-O-QPSK Chip Rate"
+
+config AT86RF215_DEFAULT_MR_OQPSK_CHIPS_100
+    bool "100 kchip/s"
+
+config AT86RF215_DEFAULT_MR_OQPSK_CHIPS_200
+    bool "200 kchip/s"
+
+config AT86RF215_DEFAULT_MR_OQPSK_CHIPS_1000
+    bool "1000 kchip/s"
+
+config AT86RF215_DEFAULT_MR_OQPSK_CHIPS_2000
+    bool "2000 kchip/s"
+
+endchoice
+
+endmenu # MR-O-QPSK
+
+menu "MR-OFDM (802.15.4g) configuration"
+    depends on AT86RF215_DEFAULT_MR_OFDM
+
+config AT86RF215_DEFAULT_MR_OFDM_OPT
+    int "Default MR-OFDM option"
+    range 1 4
+    default 2
+    help
+        Default Option of the MR-OFDM PHY
+        Each increment halves the PSDU data rate.
+
+config AT86RF215_DEFAULT_MR_OFDM_MCS
+    int "Default MR-OFDM Modulation & Coding Scheme"
+    range 0 6
+    default 2
+    help
+        Default Modulation & Coding Scheme of the MR-OFDM PHY.
+        Higher schemes correspond to higher data rates and lower range.
+
+        0: BPSK, rate 1⁄2, 4 x frequency repetition
+        1: BPSK, rate 1⁄2, 2 x frequency repetition
+        2: QPSK, rate 1⁄2, 2 x frequency repetition
+        3: QPSK, rate 1⁄2
+        4: QPSK, rate 3⁄4
+        5: 16-QAM, rate 1⁄2
+        6: 16-QAM, rate 3⁄4
+
+endmenu
+
+menu "MR-FSK (802.15.4g) configuration"
+    depends on AT86RF215_DEFAULT_MR_FSK
+
+config AT86RF215_DEFAULT_MR_FSK_SRATE
+    int "Default MR-FSK Symbol Rate"
+    range 0 5
+    default 3
+    help
+        Default Symbol Rate of the MR-FSK PHY
+
+        0:  50 kHz
+        1: 100 kHZ
+        2: 150 kHZ
+        3: 200 kHZ
+        4: 300 kHZ
+        5: 400 kHZ
+
+config AT86RF215_DEFAULT_MR_FSK_MOD_IDX
+    int "Default MR-FSK Modulation Index"
+    range 0 128
+    default 64
+    help
+        Default Modulation Index of the MR-FSK PHY as a fraction of 64.
+        (32/64 = 0.5; 64/64 = 1 …)
+
+config AT86RF215_DEFAULT_MR_FSK_MORD
+    int "Default MR-FSK Modulation Order"
+    range 0 1
+    default 1
+    help
+        Default FSK Modulation Order
+
+        0: 2-FSK
+        1: 4-FSk
+
+config AT86RF215_DEFAULT_MR_FSK_FEC
+    int "Default MR-FSK Forward Error Correction Scheme"
+    range 0 2
+    default 0
+    help
+        Default Settings for Forward Error Correction
+
+        0: No Forward Error Correction
+        1: Non-recursive and non-systematic code
+        2: Recursive and systematic code
+
+endmenu
+
+endif # KCONFIG_USEMODULE_AT86RF215

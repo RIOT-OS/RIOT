@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_cc2538dk CC2538DK
- * @ingroup     boards
- * @brief       Support for the Texas Instruments CC2538DK board.
+ * @ingroup     boards_cc2538dk
  * @{
  *
  * @file
@@ -22,6 +20,7 @@
 
 #include "cpu.h"
 #include "periph/gpio.h"
+#include "cc2538_eui_primary.h"
 
 #ifdef __cplusplus
 extern "C" {

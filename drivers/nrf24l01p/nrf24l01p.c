@@ -23,8 +23,7 @@
 #include "thread.h"
 #include "msg.h"
 
-
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define DELAY_CS_TOGGLE_TICKS       (xtimer_ticks_from_usec(DELAY_CS_TOGGLE_US))
@@ -40,7 +39,7 @@ int nrf24l01p_read_reg(const nrf24l01p_t *dev, char reg, char *answer)
     spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
     *answer = (char)spi_transfer_reg(dev->spi, dev->cs,
                                      (CMD_R_REGISTER | (REGISTER_MASK & reg)),
-                                     CMD_NOP);
+                                     CMD_NOOP);
     /* Release the bus for other threads. */
     spi_release(dev->spi);
 
@@ -61,12 +60,11 @@ int nrf24l01p_write_reg(const nrf24l01p_t *dev, char reg, char write)
     return 0;
 }
 
-
 int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq)
 {
     int status;
-    static const char INITIAL_TX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
-    static const char INITIAL_RX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
+    static const uint8_t INITIAL_TX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
+    static const uint8_t INITIAL_RX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
 
     dev->spi = spi;
     dev->ce = ce;
@@ -83,12 +81,11 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq
     /* Init IRQ pin */
     gpio_init_int(dev->irq, GPIO_IN_PU, GPIO_FALLING, nrf24l01p_rx_cb, dev);
 
-    /* Test the SPI connection */
-    if (spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK) != SPI_OK) {
-        DEBUG("error: unable to acquire SPI bus with given params\n");
-        return -1;
+    /* Test the SPI connection, if assertions are on */
+    if (!IS_ACTIVE(NDEBUG)) {
+        spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
+        spi_release(dev->spi);
     }
-    spi_release(dev->spi);
 
     xtimer_spin(DELAY_AFTER_FUNC_TICKS);
 
@@ -106,7 +103,7 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq
         return status;
     }
 
-    /* Setup adress width */
+    /* Setup address width */
     status = nrf24l01p_set_address_width(dev, NRF24L01P_AW_5BYTE);
 
     if (status < 0) {
@@ -148,7 +145,7 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq
         return status;
     }
 
-    /* Set RX Adress */
+    /* Set RX Address */
     status = nrf24l01p_set_rx_address(dev, NRF24L01P_PIPE0, INITIAL_RX_ADDRESS, INITIAL_ADDRESS_WIDTH);
 
     if (status < 0) {
@@ -280,7 +277,6 @@ int nrf24l01p_preload(const nrf24l01p_t *dev, char *data, unsigned int size)
     return 0;
 }
 
-
 int nrf24l01p_set_channel(const nrf24l01p_t *dev, uint8_t chan)
 {
     if (chan > 125) {
@@ -361,9 +357,7 @@ int nrf24l01p_set_payload_width(const nrf24l01p_t *dev,
     return nrf24l01p_write_reg(dev, pipe_pw_address, width);
 }
 
-
-
-int nrf24l01p_set_tx_address(const nrf24l01p_t *dev, const char *saddr, unsigned int length)
+int nrf24l01p_set_tx_address(const nrf24l01p_t *dev, const uint8_t *saddr, unsigned int length)
 {
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
@@ -426,8 +420,7 @@ uint64_t nrf24l01p_get_tx_address_long(const nrf24l01p_t *dev)
     return saddr_64;
 }
 
-
-int nrf24l01p_set_rx_address(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, const char *saddr, unsigned int length)
+int nrf24l01p_set_rx_address(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, const uint8_t *saddr, unsigned int length)
 {
     char pipe_addr;
 
@@ -477,7 +470,7 @@ int nrf24l01p_set_rx_address(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, c
 
 int nrf24l01p_set_rx_address_long(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, uint64_t saddr, unsigned int length)
 {
-    char buf[length];
+    uint8_t buf[length];
 
     if (length <= INITIAL_ADDRESS_WIDTH) {
         for (unsigned int i = 0; i < length; i++) {
@@ -491,7 +484,6 @@ int nrf24l01p_set_rx_address_long(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pi
 
     return nrf24l01p_set_rx_address(dev, pipe, buf, length);
 }
-
 
 uint64_t nrf24l01p_get_rx_address_long(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
 {
@@ -546,7 +538,6 @@ uint64_t nrf24l01p_get_rx_address_long(const nrf24l01p_t *dev, nrf24l01p_rx_pipe
     return saddr_64;
 }
 
-
 int nrf24l01p_set_datarate(const nrf24l01p_t *dev, nrf24l01p_dr_t dr)
 {
     char rf_setup;
@@ -581,7 +572,7 @@ int nrf24l01p_get_status(const nrf24l01p_t *dev)
 
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
-    status = spi_transfer_byte(dev->spi, dev->cs, false, CMD_NOP);
+    status = spi_transfer_byte(dev->spi, dev->cs, false, CMD_NOOP);
     /* Release the bus for other threads. */
     spi_release(dev->spi);
 
@@ -618,32 +609,14 @@ int nrf24l01p_set_power(const nrf24l01p_t *dev, int pwr)
     return nrf24l01p_write_reg(dev, REG_RF_SETUP, rf_setup);
 }
 
+static const int8_t _nrf24l01p_power_map[4] = { -18, -12, -6, 0 };
+
 int nrf24l01p_get_power(const nrf24l01p_t *dev)
 {
     char rf_setup;
-    int pwr;
-
     nrf24l01p_read_reg(dev, REG_RF_SETUP, &rf_setup);
-
-    if ((rf_setup & 0x6) == 0) {
-        pwr = -18;
-    }
-
-    if ((rf_setup & 0x6) == 2) {
-        pwr = -12;
-    }
-
-    if ((rf_setup & 0x6) == 4) {
-        pwr = -6;
-    }
-
-    if ((rf_setup & 0x6) == 6) {
-        pwr = 0;
-    }
-
-    return pwr;
+    return _nrf24l01p_power_map[(rf_setup & 0x6) >> 1];
 }
-
 
 int nrf24l01p_set_txmode(const nrf24l01p_t *dev)
 {
@@ -685,7 +658,6 @@ int nrf24l01p_set_rxmode(const nrf24l01p_t *dev)
 
     return status;
 }
-
 
 int nrf24l01p_reset_interrupts(const nrf24l01p_t *dev, char intrs)
 {
@@ -912,7 +884,6 @@ int nrf24l01p_disable_all_auto_ack(const nrf24l01p_t *dev)
 {
     return nrf24l01p_write_reg(dev, REG_EN_AA, 0x00);
 }
-
 
 int nrf24l01p_flush_tx_fifo(const nrf24l01p_t *dev)
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-16 Freie Universität Berlin
+ * Copyright (C) 2015-2019 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -26,10 +26,16 @@
 
 #include "byteorder.h"
 #include "net/eui64.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   Default start frame delimiter
+ */
+#define IEEE802154_SFD                      (0xa7)
 
 /**
  * @brief IEEE 802.15.4 address lengths
@@ -89,10 +95,96 @@ extern "C" {
 #define IEEE802154_CHANNEL_MAX          (26U)   /**< Maximum channel for 2.4 GHz band */
 /** @} */
 
-#define IEEE802154_FRAME_LEN_MAX        (127U)  /**< maximum frame length */
+#define IEEE802154_FRAME_LEN_MAX        (127U)  /**< maximum 802.15.4 frame length */
+#define IEEE802154G_FRAME_LEN_MAX      (2047U)  /**< maximum 802.15.4g-2012 frame length */
+#define IEEE802154_ACK_FRAME_LEN          (5U)  /**< ACK frame length */
 
 /**
- * @brief   Special address defintions
+ * @brief Number of symbols to wait during Long Inter Frame Spacing
+ */
+#define IEEE802154_LIFS_SYMS            (40U)
+
+/**
+ * @brief Number of symbols to wait during Short Inter Frame Spacing
+ */
+#define IEEE802154_SIFS_SYMS            (12U)
+
+/**
+ * @brief Maximum frame size to consider a frame as short.
+ */
+#define IEEE802154_SIFS_MAX_FRAME_SIZE  (18U)
+
+/**
+ * @brief value of measured power when RSSI is zero.
+ *
+ * This value is defined in the IEEE 802.15.4 standard
+ */
+#define IEEE802154_RADIO_RSSI_OFFSET        (-174)
+
+#define IEEE802154_PHY_MR_FSK_PHR_LEN      (2)  /**< MR-FSK PHY header length */
+#define IEEE802154_PHY_MR_FSK_2FSK_SFD_LEN (2)  /**< MR-FSK SFD length on Filtered 2-FSK */
+
+/**
+ * For the MR-FSK PHY, the SFD value when PHR + PSDU are coded/uncoded and with
+ * phyMRFSKSFD = 0 or 1 respectively
+ *
+ * 802.15.4g, Table 131 (p. 51)
+ *
+ *  @{
+ */
+#define IEEE802154_PHY_MR_FSK_2FSK_CODED_SFD_0      (0x6F4E)
+#define IEEE802154_PHY_MR_FSK_2FSK_CODED_SFD_1      (0x632D)
+#define IEEE802154_PHY_MR_FSK_2FSK_UNCODED_SFD_0    (0x90E4)
+#define IEEE802154_PHY_MR_FSK_2FSK_UNCODED_SFD_1    (0x7A0E)
+/** @} */
+
+/**
+ * For the SUN PHYs, the value is 1 ms expressed in symbol periods, rounded
+ * up to the next integer number of symbol periods using the ceiling() function.
+ *
+ * 802.15.4g, Table 70 (p. 43)
+ */
+#define IEEE802154G_ATURNAROUNDTIME_US          (1 * US_PER_MS)
+
+/**
+ * IEEE Std 802.15.4-2020
+ * Table 11-1—PHY constants: The value is 12 for all other PHYs.
+ */
+#define IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS   (12)
+
+/**
+ * IEEE Std 802.15.4-2020
+ * Table 11-1—PHY constants: For all other PHYs¹, the duration of
+ * 8 symbol periods.
+ *
+ * [1] all but MR-O-QPSK
+ */
+#define IEEE802154_CCA_DURATION_IN_SYMBOLS      (8)
+
+/**
+ * @brief   802.15.4 PHY modes
+ */
+typedef enum {
+    IEEE802154_PHY_DISABLED,        /**< PHY disabled, no mode selected */
+    IEEE802154_PHY_BPSK,            /**< Binary Phase Shift Keying */
+    IEEE802154_PHY_ASK,             /**< Amplitude-Shift Keying */
+    IEEE802154_PHY_OQPSK,           /**< Offset Quadrature Phase-Shift Keying */
+    IEEE802154_PHY_MR_OQPSK,        /**< Multi-Rate Offset Quadrature Phase-Shift Keying */
+    IEEE802154_PHY_MR_OFDM,         /**< Multi-Rate Orthogonal Frequency-Division Multiplexing */
+    IEEE802154_PHY_MR_FSK           /**< Multi-Rate Frequency Shift Keying */
+} ieee802154_phy_mode_t;
+
+/**
+ * @brief   802.15.4 forward error correction schemes
+ */
+enum {
+    IEEE802154_FEC_NONE,            /**< no forward error correction */
+    IEEE802154_FEC_NRNSC,           /**< non-recursive and non-systematic code */
+    IEEE802154_FEC_RSC              /**< recursive and systematic code */
+};
+
+/**
+ * @brief   Special address definitions
  * @{
  */
 /**
@@ -112,30 +204,109 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
 /** @} */
 
 /**
+ * @defgroup net_ieee802154_conf    IEEE802.15.4 compile configurations
+ * @ingroup  config
  * @{
- * @name    Default values
- * @brief   Default values for devices to choose
  */
-#ifndef IEEE802154_DEFAULT_SUBGHZ_CHANNEL
-#define IEEE802154_DEFAULT_SUBGHZ_CHANNEL   (5U)
+/**
+ * @brief IEEE802.15.4 default PHY mode
+ * @{
+ */
+#if IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_BPSK)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_BPSK
+#elif IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_ASK)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_ASK
+#elif IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_OQPSK)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_OQPSK
+#elif IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_MR_OQPSK)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_MR_OQPSK
+#elif IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_MR_OFDM)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_MR_OFDM
+#elif IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_MR_FSK)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_MR_FSK
 #endif
 
-#ifndef IEEE802154_DEFAULT_CHANNEL
-#define IEEE802154_DEFAULT_CHANNEL          (26U)
-#endif
-
-#ifndef IEEE802154_DEFAULT_SUBGHZ_PAGE
-#define IEEE802154_DEFAULT_SUBGHZ_PAGE      (2U)
-#endif
-
-#ifndef IEEE802154_DEFAULT_PANID
-#define IEEE802154_DEFAULT_PANID            (0x0023U)
-#endif
-
-#ifndef IEEE802154_DEFAULT_TXPOWER
-#define IEEE802154_DEFAULT_TXPOWER          (0) /* in dBm */
+#ifndef CONFIG_IEEE802154_DEFAULT_PHY_MODE
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_OQPSK
 #endif
 /** @} */
+/**
+ * @brief IEEE802.15.4 default sub-GHZ channel
+ */
+#ifndef CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL
+#define CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL   (5U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 default channel
+ */
+#ifndef CONFIG_IEEE802154_DEFAULT_CHANNEL
+#define CONFIG_IEEE802154_DEFAULT_CHANNEL          (26U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 default sub-GHZ page
+ */
+#ifndef CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE
+#define CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE      (2U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 default PANID
+ */
+#ifndef CONFIG_IEEE802154_DEFAULT_PANID
+#define CONFIG_IEEE802154_DEFAULT_PANID            (0x0023U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 Broadcast PANID
+ */
+#ifndef IEEE802154_PANID_BCAST
+#define IEEE802154_PANID_BCAST              { 0xff, 0xff }
+#endif
+
+/**
+ * @brief IEEE802.15.4 default TX power (in dBm)
+ */
+#ifndef CONFIG_IEEE802154_DEFAULT_TXPOWER
+#define CONFIG_IEEE802154_DEFAULT_TXPOWER          (0)
+#endif
+/** @} */
+
+/**
+ * @brief IEEE802.15.4 default value for minimum backoff exponent
+ */
+#ifndef CONFIG_IEEE802154_DEFAULT_CSMA_CA_MIN_BE
+#define CONFIG_IEEE802154_DEFAULT_CSMA_CA_MIN_BE   (3U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 default value for maximum number of CSMA-CA retries.
+ */
+#ifndef CONFIG_IEEE802154_DEFAULT_CSMA_CA_RETRIES
+#define CONFIG_IEEE802154_DEFAULT_CSMA_CA_RETRIES  (4U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 default value for maximum backoff exponent
+ */
+#ifndef CONFIG_IEEE802154_DEFAULT_CSMA_CA_MAX_BE
+#define CONFIG_IEEE802154_DEFAULT_CSMA_CA_MAX_BE   (5U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 default value for CCA threshold (in dBm)
+ */
+#ifndef CONFIG_IEEE802154_CCA_THRESH_DEFAULT
+#define CONFIG_IEEE802154_CCA_THRESH_DEFAULT       (-70)
+#endif
+
+/**
+ * @brief Disable Auto ACK support
+ */
+#ifdef DOXYGEN
+#define CONFIG_IEEE802154_AUTO_ACK_DISABLE 0
+#endif
 
 /**
  * @brief   Initializes an IEEE 802.15.4 MAC frame header in @p buf.
@@ -167,7 +338,7 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
  *                      Otherwise, it will be ignored, when
  *                      @ref IEEE802154_FCF_PAN_COMP is set.
  * @param[in] dst_pan   Destination PAN ID in little-endian.
- * @param[in] flags     Flags for the frame. These are interchangable with the
+ * @param[in] flags     Flags for the frame. These are interchangeable with the
  *                      first byte of the IEEE 802.15.4 FCF. This means that
  *                      it encompasses the type values,
  *                      @ref IEEE802154_FCF_SECURITY_EN,
@@ -224,6 +395,25 @@ int ieee802154_get_src(const uint8_t *mhr, uint8_t *src, le_uint16_t *src_pan);
  * @return  -EINVAL, if @p mhr contains unexpected flags.
  */
 int ieee802154_get_dst(const uint8_t *mhr, uint8_t *dst, le_uint16_t *dst_pan);
+
+/**
+ * @brief  Check whether a frame pass the IEEE 802.15.4 frame filter.
+ *
+ * A frame passes the frame filter only if:
+ * - The PAN ID matches the PAN ID of the frame filter or the broadcast PAN ID
+ * - Either the Short or Extended Address matches the frame filter OR the
+ *   Short Address is the broadcast address.
+ *
+ * @param[in] mhr           MAC header (PSDU)
+ * @param[in] pan           PAN ID of the frame filter.
+ * @param[in] short_addr    Short Address of the frame filter.
+ * @param[in] ext_addr      Extended Address of the frame filter.
+ *
+ * @return 0            if frame passes the frame filter.
+ * @return 1            if frame doesn't pass the frame filter.
+ */
+int ieee802154_dst_filter(const uint8_t *mhr, uint16_t pan,
+                          network_uint16_t short_addr, const eui64_t *ext_addr);
 
 /**
  * @brief   Gets sequence number from MAC header.
@@ -296,6 +486,49 @@ static inline eui64_t *ieee802154_get_iid(eui64_t *eui64, const uint8_t *addr,
     }
 
     return eui64;
+}
+
+/**
+ * @brief Convert from RSSI scale to dBm.
+ *
+ * The RSSI calculation is based on the IEEE 802.15.4 2020 specification and
+ * it's represented as one octet of integer.
+ *
+ * RSSI equal to zero maps to -174 dBm and has the same scale as dBm (1 RSSI
+ * step == 1 dBm). Therefore an RSSI value of 254 maps to +80 dBm.
+ *
+ * @note RSSI == 255 is defined as reserved by the standard and ignored by this
+ * function.
+ *
+ * @param[in] rssi RF power in RSSI scale
+ *
+ * @return RF power in dBm scale
+ */
+static inline int16_t ieee802154_rssi_to_dbm(uint8_t rssi)
+{
+    return rssi + IEEE802154_RADIO_RSSI_OFFSET;
+}
+
+/**
+ * @brief Convert from dBm scale to RSSI.
+ *
+ * The RSSI calculation is based on the IEEE 802.15.4 2020 specification and
+ * it's represented as one octet of integer.
+ *
+ * RSSI equal to zero maps to -174 dBm and has the same scale as dBm (1 RSSI
+ * step == 1 dBm). Therefore an RSSI value of 254 maps to +80 dBm.
+ *
+ * @param[in] dbm RF power in dBm scale.
+ *
+ * @return RF power in RSSI scale.
+ */
+static inline uint8_t ieee802154_dbm_to_rssi(int16_t dbm)
+{
+    const int min = IEEE802154_RADIO_RSSI_OFFSET;
+    const int max = min + (UINT8_MAX - 1);
+
+    int val = dbm <= min ? min : (dbm >= max ? max : dbm);
+    return val - IEEE802154_RADIO_RSSI_OFFSET;
 }
 
 #ifdef __cplusplus

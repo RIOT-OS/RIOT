@@ -1,10 +1,5 @@
 include ../Makefile.tests_common
 
-# exclude boards with insufficient memory
-BOARD_INSUFFICIENT_MEMORY := nucleo32-f031
-
-FEATURES_REQUIRED = periph_spi
-
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps

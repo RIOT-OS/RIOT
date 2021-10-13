@@ -1,14 +1,9 @@
 PKG_NAME = tiny-asn1
 PKG_URL = https://gitlab.com/mtausig/tiny-asn1.git
-PKG_VERSION = 82e3a26273900b532e33e5b377f193fa08ee7d1b
+PKG_VERSION = 7005fcff4706e96b857f257ef94b8518211c9fbc
 PKG_LICENSE = LGPL-3
 
-export TINYASN1_ROOT=$(CURDIR)
-INCLUDES+=-I$(TINYASN1_ROOT)/src
-
-.PHONY: all
-
-all: git-download
-	"$(MAKE)" -C $(PKG_BUILDDIR)/src
-
 include $(RIOTBASE)/pkg/pkg.mk
+
+all:
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)

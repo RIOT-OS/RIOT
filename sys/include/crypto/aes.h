@@ -13,6 +13,14 @@
  * @file
  * @brief       Headers for the implementation of the AES cipher-algorithm
  *
+ * The default key size is 128 bits. To use a different key size add
+ * USEMODULE += crypto_aes_192 and/or USEMODULE += crypto_aes_256 to
+ * your Makefile.
+ *
+ * If only one key size is needed and that key size is not 128 bits, the 128 bit
+ * key size can be disabled with DISABLE_MODULE += crypto_aes_128 as an
+ * optimization.
+ *
  * @author      Freie Universitaet Berlin, Computer Systems & Telematics
  * @author      Nicolai Schmittberger <nicolai.schmittberger@fu-berlin.de>
  * @author      Fabrice Bellard
@@ -37,32 +45,35 @@ typedef uint32_t u32;
 typedef uint16_t u16;
 typedef uint8_t u8;
 
-
-/* This controls loop-unrolling in aes_core.c */
-#undef FULL_UNROLL
 # define GETU32(pt) (((u32)(pt)[0] << 24) ^ ((u32)(pt)[1] << 16) ^ \
-                             ((u32)(pt)[2] <<  8) ^ ((u32)(pt)[3]))
+                     ((u32)(pt)[2] <<  8) ^ ((u32)(pt)[3]))
 # define PUTU32(ct, st) { (ct)[0] = (u8)((st) >> 24); \
-                              (ct)[1] = (u8)((st) >> 16); \
-                              (ct)[2] = (u8)((st) >>  8); \
-                              (ct)[3] = (u8)(st); }
+                          (ct)[1] = (u8)((st) >> 16); \
+                          (ct)[2] = (u8)((st) >>  8); \
+                          (ct)[3] = (u8)(st); }
 
 #define AES_MAXNR         14
 #define AES_BLOCK_SIZE    16
-#define AES_KEY_SIZE      16
+
+/**
+ * @name AES key sizes
+ * @{
+ */
+#define AES_KEY_SIZE_128    16
+#define AES_KEY_SIZE_192    24
+#define AES_KEY_SIZE_256    32
+/** @} */
 
 /**
  * @brief AES key
  * @see cipher_context_t
  */
-struct aes_key_st {
+typedef struct aes_key_st {
     /** @cond INTERNAL */
     uint32_t rd_key[4 * (AES_MAXNR + 1)];
     int rounds;
     /** @endcond */
-};
-
-typedef struct aes_key_st AES_KEY;
+} AES_KEY;
 
 /**
  * @brief the cipher_context_t-struct adapted for AES
@@ -75,14 +86,17 @@ typedef struct {
 /**
  * @brief   initializes the AES Cipher-algorithm with the passed parameters
  *
- * @param       context   the cipher_context_t-struct to save the initialization
- *                        of the cipher in
+ * @param       context   the cipher_context_t-struct to save the
+ *                        initialization of the cipher in
  * @param       keySize   the size of the key
+ *                        Must be 16, since this implementation does not
+ *                        support key lengths of 24 or 32 bytes
  * @param       key       a pointer to the key
  *
  * @return  CIPHER_INIT_SUCCESS if the initialization was successful.
- *          The command may be unsuccessful if the key size is not valid.
- *          CIPHER_ERR_BAD_CONTEXT_SIZE if CIPHER_MAX_CONTEXT_SIZE has not been defined (which means that the cipher has not been included in the build)
+ * @return  CIPHER_ERR_BAD_CONTEXT_SIZE if CIPHER_MAX_CONTEXT_SIZE has not
+ *          been defined (which means that the cipher has not been included
+ *          in the build)
  */
 int aes_init(cipher_context_t *context, const uint8_t *key, uint8_t keySize);
 
@@ -99,7 +113,9 @@ int aes_init(cipher_context_t *context, const uint8_t *key, uint8_t keySize);
  * @param       cipher_block  a pointer to the place where the ciphertext will
  *                            be stored
  *
- * @return  1 or result of aes_set_encrypt_key if it failed
+ * @return  1 on success
+ * @return  A negative value if the cipher key cannot be expanded with the
+ *          AES key schedule
  */
 int aes_encrypt(const cipher_context_t *context, const uint8_t *plain_block,
                 uint8_t *cipher_block);
@@ -117,8 +133,9 @@ int aes_encrypt(const cipher_context_t *context, const uint8_t *plain_block,
  * @param       plain_block   a pointer to the place where the decrypted
  *                            plaintext will be stored
  *
- * @return  1 or negative value if cipher key cannot be expanded into
- *          decryption key schedule
+ * @return  1 on success
+ * @return  A negative value if the cipher key cannot be expanded with the
+ *          AES key schedule
  */
 int aes_decrypt(const cipher_context_t *context, const uint8_t *cipher_block,
                 uint8_t *plain_block);

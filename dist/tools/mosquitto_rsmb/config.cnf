@@ -1,0 +1,10 @@
+# Uncomment this to show you packets being sent and received
+trace_output protocol
+
+# MQTT-SN listener
+listener 1883 INADDR_ANY mqtts
+ipv6 true
+
+# MQTT listener
+listener 1883 INADDR_ANY mqtt
+ipv6 true

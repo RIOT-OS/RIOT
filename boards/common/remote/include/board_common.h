@@ -26,6 +26,7 @@
 #include "cpu.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
+#include "cc2538_eui_primary.h"
 
 #ifdef __cplusplus
  extern "C" {

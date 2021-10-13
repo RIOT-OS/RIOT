@@ -18,7 +18,6 @@
  * @}
  */
 
-
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
@@ -70,7 +69,7 @@ void *t_high_handler(void *arg)
     (void) arg;
 
     /* starting working loop after 500 ms */
-    xtimer_usleep(500U * US_PER_MS);
+    xtimer_msleep(500U);
     while (1) {
         puts("t_high: allocating resource...");
         mutex_lock(&res_mtx);

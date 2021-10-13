@@ -1,0 +1,127 @@
+From 21a0864451b15d53a468a359e465084b498cc37b Mon Sep 17 00:00:00 2001
+From: Alexandre Abadie <alexandre.abadie@inria.fr>
+Date: Sun, 1 Apr 2018 19:52:58 +0200
+Subject: [PATCH] adapt to RIOT
+
+---
+ src/mac/LoRaMac.c       | 28 +++++++++++-----------------
+ src/mac/LoRaMac.h       |  4 ++--
+ src/mac/region/Region.h |  2 +-
+ 3 files changed, 14 insertions(+), 20 deletions(-)
+
+diff --git a/src/mac/LoRaMac.c b/src/mac/LoRaMac.c
+index ca90cd2..ca9c370 100644
+--- a/src/mac/LoRaMac.c
++++ b/src/mac/LoRaMac.c
+@@ -32,6 +32,7 @@
+ #include "LoRaMac.h"
+ #include "LoRaMacCrypto.h"
+ #include "LoRaMacTest.h"
++#include "radio.h"
+ 
+ /*!
+  * Maximum PHY layer payload size
+@@ -322,11 +323,6 @@ static LoRaMacPrimitives_t *LoRaMacPrimitives;
+  */
+ static LoRaMacCallback_t *LoRaMacCallbacks;
+ 
+-/*!
+- * Radio events function pointer
+- */
+-static RadioEvents_t RadioEvents;
+-
+ /*!
+  * LoRaMac duty cycle delayed Tx timer
+  */
+@@ -732,8 +728,7 @@ static void PrepareRxDoneAbort( void )
+     LoRaMacFlags.Bits.MacDone = 1;
+ 
+     // Trig OnMacCheckTimerEvent call as soon as possible
+-    TimerSetValue( &MacStateCheckTimer, 1 );
+-    TimerStart( &MacStateCheckTimer );
++    OnMacStateCheckTimerEvent();
+ }
+ 
+ static void OnRadioRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr )
+@@ -1129,13 +1124,12 @@ static void OnRadioRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t
+     CheckToDisableAckTimeout( NodeAckRequested, LoRaMacDeviceClass, McpsConfirm.AckReceived,
+                                 AckTimeoutRetriesCounter, AckTimeoutRetries );
+ 
+-    if( AckTimeoutTimer.IsRunning == false )
++    if( AckTimeoutTimer.running == false )
+     {// Procedure is completed when the AckTimeoutTimer is not running anymore
+         LoRaMacFlags.Bits.MacDone = 1;
+ 
+         // Trig OnMacCheckTimerEvent call as soon as possible
+-        TimerSetValue( &MacStateCheckTimer, 1 );
+-        TimerStart( &MacStateCheckTimer );
++        OnMacStateCheckTimerEvent();
+     }
+ }
+ 
+@@ -2384,7 +2378,7 @@ LoRaMacStatus_t SetTxContinuousWave1( uint16_t timeout, uint32_t frequency, uint
+     return LORAMAC_STATUS_OK;
+ }
+ 
+-LoRaMacStatus_t LoRaMacInitialization( LoRaMacPrimitives_t *primitives, LoRaMacCallback_t *callbacks, LoRaMacRegion_t region )
++LoRaMacStatus_t LoRaMacInitialization( RadioEvents_t *radio_events, LoRaMacPrimitives_t *primitives, LoRaMacCallback_t *callbacks, LoRaMacRegion_t region )
+ {
+     GetPhyParams_t getPhy;
+     PhyParam_t phyParam;
+@@ -2514,12 +2508,12 @@ LoRaMacStatus_t LoRaMacInitialization( LoRaMacPrimitives_t *primitives, LoRaMacC
+     LoRaMacInitializationTime = TimerGetCurrentTime( );
+ 
+     // Initialize Radio driver
+-    RadioEvents.TxDone = OnRadioTxDone;
+-    RadioEvents.RxDone = OnRadioRxDone;
+-    RadioEvents.RxError = OnRadioRxError;
+-    RadioEvents.TxTimeout = OnRadioTxTimeout;
+-    RadioEvents.RxTimeout = OnRadioRxTimeout;
+-    Radio.Init( &RadioEvents );
++    radio_events->TxDone = OnRadioTxDone;
++    radio_events->RxDone = OnRadioRxDone;
++    radio_events->RxError = OnRadioRxError;
++    radio_events->TxTimeout = OnRadioTxTimeout;
++    radio_events->RxTimeout = OnRadioRxTimeout;
++    Radio.Init( radio_events );
+ 
+     // Random seed initialization
+     srand1( Radio.Random( ) );
+diff --git a/src/mac/LoRaMac.h b/src/mac/LoRaMac.h
+index 7899ac2..78ed66c 100644
+--- a/src/mac/LoRaMac.h
++++ b/src/mac/LoRaMac.h
+@@ -102,7 +102,7 @@
+ 
+ #include <stdint.h>
+ #include <stdbool.h>
+-#include "timer.h"
++#include "semtech-loramac/timer.h"
+ #include "radio.h"
+ 
+ /*!
+@@ -1822,7 +1822,7 @@ static const uint8_t LoRaMacMaxEirpTable[] = { 8, 10, 12, 13, 14, 16, 18, 20, 21
+  *          \ref LORAMAC_STATUS_PARAMETER_INVALID,
+  *          \ref LORAMAC_STATUS_REGION_NOT_SUPPORTED.
+  */
+-LoRaMacStatus_t LoRaMacInitialization( LoRaMacPrimitives_t *primitives, LoRaMacCallback_t *callbacks, LoRaMacRegion_t region );
++LoRaMacStatus_t LoRaMacInitialization( RadioEvents_t *radio_events, LoRaMacPrimitives_t *primitives, LoRaMacCallback_t *callbacks, LoRaMacRegion_t region );
+ 
+ /*!
+  * \brief   Queries the LoRaMAC if it is possible to send the next frame with
+diff --git a/src/mac/region/Region.h b/src/mac/region/Region.h
+index fa0fd44..810f0ea 100644
+--- a/src/mac/region/Region.h
++++ b/src/mac/region/Region.h
+@@ -54,7 +54,7 @@
+ 
+ #include <stdint.h>
+ #include <stdbool.h>
+-#include "timer.h"
++#include "semtech-loramac/timer.h"
+ 
+ /*!
+  * Macro to compute bit of a channel index.
+-- 
+2.14.1
+

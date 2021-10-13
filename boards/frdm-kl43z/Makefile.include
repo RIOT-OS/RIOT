@@ -1,0 +1,8 @@
+# This board comes with OpenSDA configured with a P&E debugger application,
+# which we do not have any support for. Update your OpenSDA firmware with
+# the latest CMSIS-DAP firmware for your board from
+# https://www.nxp.com/support/developer-resources/run-time-software/kinetis-developer-resources/ides-for-kinetis-mcus/opensda-serial-and-debug-adapter:OPENSDA
+OPENOCD_DEBUG_ADAPTER ?= dap
+
+# Include default FRDM board config
+include $(RIOTBOARD)/common/frdm/Makefile.include

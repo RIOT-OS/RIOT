@@ -1,14 +1,14 @@
 include ../Makefile.tests_common
 
-# the stm32f4discovery does not have the arduino pinout
-BOARD_BLACKLIST := stm32f4discovery jiminy-mega256rfr2
-
-# currently the test provides config params for arduinos only
-FEATURES_REQUIRED += arduino
-
 USEMODULE += hd44780
 
-test:
-	tests/01-run.py
+# disable native GPIOs for automatic test
+ifeq (native,$(BOARD))
+  USEMODULE += periph_gpio_mock
+  # the same for Kconfig
+  ifeq (1,$(TEST_KCONFIG))
+    KCONFIG_ADD_CONFIG += $(APPDIR)/app.config.test.native
+  endif
+endif
 
 include $(RIOTBASE)/Makefile.include

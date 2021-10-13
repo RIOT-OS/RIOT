@@ -1,0 +1,8 @@
+# configure the terminal program
+PORT_LINUX  ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+BAUD        ?= 9600
+
+ARDUINO_NANO_BOOTLOADER ?= atmegaboot
+
+include $(RIOTBOARD)/common/arduino-atmega/Makefile.include

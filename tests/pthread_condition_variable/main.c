@@ -26,7 +26,6 @@ static mutex_t mutex = MUTEX_INIT;
 static pthread_cond_t cv;
 static volatile int is_finished;
 static volatile long count;
-static volatile long expected_value;
 static char stack[THREAD_STACKSIZE_MAIN];
 
 /**
@@ -50,12 +49,17 @@ static void *second_thread(void *arg)
     return NULL;
 }
 
+#ifdef BOARD_NATIVE
+#define ITERATION_STEPS 100000
+#else
+#define ITERATION_STEPS 10000
+#endif
+
 int main(void)
 {
     puts("START");
     count = 0;
     is_finished = 0;
-    expected_value = 1000ul * 1000ul;
     pthread_cond_init(&cv, NULL);
 
     kernel_pid_t pid = thread_create(stack,sizeof(stack), THREAD_PRIORITY_MAIN - 1,
@@ -67,11 +71,11 @@ int main(void)
         thread_wakeup(pid);
         count++;
 
-        if ((count % 100000) == 0) {
+        if ((count % ITERATION_STEPS) == 0) {
             printf("Still alive alternated [count: %ldk] times.\n", count / 1000);
         }
 
-        if (count == expected_value) {
+        if (count == (10ul * ITERATION_STEPS)) {
             puts("condition fulfilled.");
             is_finished = 1;
             mutex_unlock(&mutex);

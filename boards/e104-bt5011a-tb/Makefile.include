@@ -1,0 +1,1 @@
+include $(RIOTBOARD)/common/e104-bt50xxa-tb/Makefile.include

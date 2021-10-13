@@ -97,7 +97,6 @@ int can_trx_init(can_trx_t *dev);
  */
 int can_trx_set_mode(can_trx_t *dev, can_trx_mode_t mode);
 
-
 #ifdef __cplusplus
 }
 #endif

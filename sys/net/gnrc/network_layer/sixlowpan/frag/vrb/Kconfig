@@ -1,0 +1,26 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_VRB
+    bool "Configure GNRC 6LoWPAN Virtual reassembly buffer"
+    depends on USEMODULE_GNRC_SIXLOWPAN_FRAG_VRB
+    help
+        Configure GNRC 6LoWPAN Virtual reassembly buffer module using Kconfig.
+
+if KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_VRB
+
+config GNRC_SIXLOWPAN_FRAG_VRB_SIZE
+    int "Size of the virtual reassembly buffer"
+    default 16
+    help
+        Has a direct influence on the number of available
+        gnrc_sixlowpan_frag_rb_int_t entries.
+
+config GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US
+    int "Timeout for a virtual reassembly buffer entry in microseconds"
+    default 3000000
+
+endif # KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_VRB

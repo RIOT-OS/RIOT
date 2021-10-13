@@ -1,0 +1,111 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU lines
+config CPU_LINE_STM32L412XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L422XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L431XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L432XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L433XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L442XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L443XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L451XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L452XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L462XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L471XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L475XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L476XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L485XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L486XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L496XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4A6XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4P5XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4Q5XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4R5XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4R7XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4R9XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4S5XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4S7XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4S9XX
+    bool
+    select CPU_FAM_L4

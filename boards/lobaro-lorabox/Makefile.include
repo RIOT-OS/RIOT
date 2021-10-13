@@ -1,0 +1,19 @@
+# add the common header files to the include path
+INCLUDES += -I$(RIOTBOARD)/common/stm32/include
+
+# configure the serial terminal
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+# Configure programmer
+PROGRAMMER ?= stm32loader
+
+# -u: use sector by sector erase
+# -S: swap RTS and DTR
+# -l 0x1ff: amount of sectors to erase
+STM32LOADER_FLAGS ?= -u -S -l 0x1ff
+
+PYTERMFLAGS +=  --set-rts 0
+
+# stm32loader programmer is supported
+PROGRAMMERS_SUPPORTED += stm32loader

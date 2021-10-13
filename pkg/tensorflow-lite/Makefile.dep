@@ -1,0 +1,15 @@
+USEMODULE += cpp11-compat
+
+USEPKG += flatbuffers
+USEPKG += gemmlowp
+
+USEMODULE += tensorflow-lite
+USEMODULE += tensorflow-lite-c
+USEMODULE += tensorflow-lite-core
+USEMODULE += tensorflow-lite-kernels
+USEMODULE += tensorflow-lite-kernels-internal
+USEMODULE += tensorflow-lite-memory
+USEMODULE += tensorflow-lite-micro-kernels
+
+# C++ support on ESP32 in RIOT doesn't work with TensorFlow-Lite for the moment
+FEATURES_BLACKLIST += arch_esp32

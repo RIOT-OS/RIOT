@@ -8,8 +8,9 @@
 
 import os
 import sys
-
 import socket
+from testrunner import run
+
 
 IEEE802154_FRAME_LEN_MAX = 127
 ZEP_DATA_HEADER_SIZE = 32
@@ -53,15 +54,12 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-    import testrunner
-
     os.environ['TERMFLAGS'] = "-z [%s]:%d,[%s]:%d" % (
             zep_params['local_addr'], zep_params['local_port'],
             zep_params['remote_addr'], zep_params['remote_port'])
     s = socket.socket(family=socket.AF_INET6, type=socket.SOCK_DGRAM)
     s.bind(("::", zep_params['remote_port']))
-    res = testrunner.run(testfunc, timeout=1, echo=True, traceback=True)
+    res = run(testfunc, timeout=1, echo=True, traceback=True)
     s.close()
     if (res == 0):
         print("Run tests successful")

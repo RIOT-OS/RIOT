@@ -55,11 +55,26 @@ static volatile unsigned counter;
 
 static kernel_pid_t main_thread_pid;
 
-#define PRINTF(FMT, ...)                                \
-    printf("%c%" PRIkernel_pid " (prio=%u): " FMT "\n", \
-           __func__[0], sched_active_pid,               \
-           sched_active_thread->priority,               \
-           (int)__VA_ARGS__)
+/* The test assumes that 'printf/puts' are non interruptible operations
+ * use a mutex to guarantee it */
+static mutex_t stdout_mutex = MUTEX_INIT;
+
+#define PRINTF(FMT, ...)                                    \
+    do {                                                    \
+        mutex_lock(&stdout_mutex);                          \
+        printf("%c%" PRIkernel_pid " (prio=%u): " FMT "\n", \
+               __func__[0], thread_getpid(),                \
+               thread_get_active()->priority,                \
+               (int)__VA_ARGS__);                           \
+        mutex_unlock(&stdout_mutex);                        \
+    } while (0)
+
+#define PUTS(s)                                             \
+    do {                                                    \
+        mutex_lock(&stdout_mutex);                          \
+        puts(s);                                            \
+        mutex_unlock(&stdout_mutex);                        \
+    } while (0)
 
 static void _notify_main_thread(void)
 {
@@ -77,7 +92,7 @@ static void do_sleep(int factor)
 static void *writer(void *arg)
 {
     (void) arg;
-    puts("start");
+    PUTS("start");
     for (unsigned i = 0; i < NUM_ITERATIONS; ++i) {
         pthread_rwlock_wrlock(&rwlock);
         unsigned cur = ++counter;
@@ -86,7 +101,7 @@ static void *writer(void *arg)
         pthread_rwlock_unlock(&rwlock);
         do_sleep(2);
     }
-    puts("done");
+    PUTS("done");
     _notify_main_thread();
     return NULL;
 }
@@ -94,7 +109,7 @@ static void *writer(void *arg)
 static void *reader(void *arg)
 {
     (void) arg;
-    puts("start");
+    PUTS("start");
     for (unsigned i = 0; i < NUM_ITERATIONS; ++i) {
         pthread_rwlock_rdlock(&rwlock);
         unsigned cur = counter;
@@ -103,7 +118,7 @@ static void *reader(void *arg)
         pthread_rwlock_unlock(&rwlock);
         do_sleep(1);
     }
-    puts("done");
+    PUTS("done");
     _notify_main_thread();
 
     return NULL;
@@ -113,7 +128,7 @@ int main(void)
 {
     static char stacks[NUM_CHILDREN][THREAD_STACKSIZE_MAIN];
 
-    puts("START");
+    PUTS("START");
     /* Get main thread pid */
     main_thread_pid = thread_getpid();
 
@@ -154,7 +169,7 @@ int main(void)
         msg_receive(&msg);
     }
 
-    puts("SUCCESS");
+    PUTS("SUCCESS");
 
     return 0;
 }

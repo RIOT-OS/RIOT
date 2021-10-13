@@ -7,68 +7,46 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-# TinyDTLS only has support for 32-bit architectures ATM
-BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno chronos \
-                   msb-430 msb-430h telosb waspmote-pro wsn430-v1_3b wsn430-v1_4 \
-                   z1 jiminy-mega256rfr2 mega-xplained
-
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini \
-                             cc2650-launchpad cc2650stk maple-mini \
-                             microbit nrf51dongle nrf6310 nucleo32-f031 \
-                             nucleo32-f042 nucleo32-f303 nucleo32-l031 nucleo-f030 \
-                             nucleo-f070 nucleo-f072 nucleo-f103 nucleo-f302 nucleo-f334 \
-                             nucleo-l053 nucleo-l073 opencm904 \
-                             spark-core stm32f0discovery yunjia-nrf51822
-
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
-USEMODULE += gnrc_netdev_default
+USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
-# Specify the mandatory networking modules for IPv6 and sUDP
-USEMODULE += gnrc_ipv6_router_default
-USEMODULE += gnrc_udp
-# Add a routing protocol
-USEMODULE += gnrc_rpl
-# This application dumps received packets to STDIO using the pktdump module
-USEMODULE += gnrc_pktdump
-# Additional networking modules that can be dropped if not needed
-USEMODULE += gnrc_icmpv6_echo
+# Specify the mandatory networking modules for IPv6 and UDP
+USEMODULE += gnrc_ipv6_default
+USEMODULE += sock_udp
+
 # Add also the shell, some shell commands
 USEMODULE += shell
 USEMODULE += shell_commands
-USEMODULE += ps
 
-#TinyDTLs (crypto.c) made use of pthread
- ifneq ($(BOARD),native)
-   USEMODULE += pthread
- endif
+USEPKG += tinydtls
+# tinydtls needs crypto secure PRNG
+USEMODULE += prng_sha1prng
+
+# UDP Port to use (20220 is default for DTLS).
+DTLS_PORT ?= 20220
+CFLAGS += -DDTLS_DEFAULT_PORT=$(DTLS_PORT)
+
+# NOTE: If no cipher suite is selected, CONFIG_DTLS_PSK is used by default.
+# This section should be commented out if using Kconfig
+# This adds support for TLS_PSK_WITH_AES_128_CCM_8
+# CFLAGS += -DCONFIG_DTLS_PSK
+# This adds support for TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8
+# CFLAGS += -DCONFIG_DTLS_ECC
+
+# Enable this line for setting tinyDTLS in debug mode.
+# CFLAGS += -DCONFIG_DTLS_DEBUG
+
+# FIXME: This is a temporary patch
+# TinyDTLS <= 0.8.6 requires around 426 bytes in RAM.
+CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(3*THREAD_STACKSIZE_DEFAULT\)
+# TINYDTLS_EXTRA_BUFF can be used for increasing the server stack memory.
+# CFLAGS += -DTINYDTLS_EXTRA_BUFF=\(512\)
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
 DEVELHELP ?= 1
-
-# NOTE: Add the package for TinyDTLS
-USEPKG += tinydtls
-
-# NOTE: Those are taken from TinyDTLS. As the original Makefiles are
-#      overwitten is a good idea to preserve them here.
-CFLAGS += -DDTLSv12 -DWITH_SHA256
-
-# NOTE: This adds support for TLS_PSK_WITH_AES_128_CCM_8
-CFLAGS += -DDTLS_PSK
-
-# NOTE: This adds support for TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8
-CFLAGS += -DDTLS_ECC
-
-# NOTE: If enabled TinyDTLS' log are disabled (if memory is a issue).
-# WARNING: Sometimes the log leads to Stack pointer corrupted.
-#          The reason is not identified yet.
-#          If said issue appears, enable this line.
-#CFLAGS += -DNDEBUG
-
-# NOTE: The configuration for socket or non-socket  communication in TinyDTLS.
-CFLAGS += -DWITH_RIOT_GNRC
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1

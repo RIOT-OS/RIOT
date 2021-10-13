@@ -35,7 +35,6 @@ extern "C" {
 #include "can/common.h"
 #include "mutex.h"
 
-
 /**
  * @brief   Possible event types that are sent from the device driver to the
  *          upper layer

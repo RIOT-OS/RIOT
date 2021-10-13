@@ -7,6 +7,7 @@
  */
 
 /**
+ * @defgroup    drivers_netdev_eth Ethernet drivers
  * @ingroup     drivers_netdev_api
  * @{
  *
@@ -27,6 +28,25 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @name    Flags for use in @ref netdev_eth_rx_info_t::flags
+ * @{
+ */
+#define NETDEV_ETH_RX_INFO_FLAG_TIMESTAMP       (0x01)  /**< Timestamp valid */
+/** @} */
+
+/**
+ * @brief   Received frame status information for Ethernet devices
+ */
+typedef struct {
+    /**
+     * @brief   Time of the reception of the start of frame delimiter in
+     *          nanoseconds since epoch
+     */
+    uint64_t timestamp;
+    uint8_t flags;      /**< Flags e.g. used to mark other fields as valid */
+} netdev_eth_rx_info_t;
 
 /**
  * @brief   Fallback function for netdev ethernet devices' _get function

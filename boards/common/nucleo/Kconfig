@@ -1,0 +1,17 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if TEST_KCONFIG
+
+config MODULE_BOARDS_COMMON_NUCLEO
+    bool
+    default y
+    select MODULE_SAUL_GPIO if MODULE_SAUL_DEFAULT && HAS_PERIPH_GPIO
+    help
+        stm32 common nucleo code.
+
+endif # TEST_KCONFIG

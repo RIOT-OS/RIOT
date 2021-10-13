@@ -1,0 +1,73 @@
+// Copyright 2015-2017 Espressif Systems (Shanghai) PTE LTD
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef ETHERNET_ETH_PHY_PHY_IP101G_H
+#define ETHERNET_ETH_PHY_PHY_IP101G_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef RIOT_VERSION
+#include "eth_phy/phy.h"
+#else
+#include "phy.h"
+#endif
+
+/** @brief Dump all IP101G PHY SMI configuration registers
+ *
+ * @note These registers are dumped at 'debug' level, so output
+ * may not be visible depending on default log levels.
+ */
+void phy_ip101g_dump_registers(void);
+
+/** @brief Default IP101G phy_check_init function.
+ */
+void phy_ip101g_check_phy_init(void);
+
+/** @brief Default IP101G phy_get_speed_mode function.
+ */
+eth_speed_mode_t phy_ip101g_get_speed_mode(void);
+
+/** @brief Default IP101G phy_get_duplex_mode function.
+ */
+eth_duplex_mode_t phy_ip101g_get_duplex_mode(void);
+
+/** @brief Default IP101G phy_power_enable function.
+ *
+ * @note This function may need to be replaced with a custom function
+ * if the PHY has a GPIO to enable power or start a clock.
+ *
+ * Consult the ethernet example to see how this is done.
+ */
+void phy_ip101g_power_enable(bool);
+
+/** @brief Default IP101G phy_init function.
+ */
+void phy_ip101g_init(void);
+
+/** @brief Default IP101G PHY configuration
+ *
+ * This configuration is not suitable for use as-is, it will need
+ * to be modified for your particular PHY hardware setup.
+ *
+ * Consult the Ethernet example to see how this is done.
+ */
+extern const eth_config_t phy_ip101g_default_ethernet_config;
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* ETHERNET_ETH_PHY_PHY_IP101G_H */

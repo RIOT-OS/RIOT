@@ -1,0 +1,2 @@
+INCLUDES += -I$(PKGDIRBASE)/libb2/src
+INCLUDES += -I$(RIOTPKG)/libb2/include

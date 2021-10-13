@@ -1,0 +1,15 @@
+INCLUDES += -I$(PKGDIRBASE)/libcose/include
+CFLAGS += -DUSE_CBOR_CONTEXT
+
+ifneq (,$(filter libcose_crypt_hacl,$(USEMODULE)))
+  CFLAGS += -DCRYPTO_HACL
+endif
+ifneq (,$(filter libcose_crypt_c25519,$(USEMODULE)))
+  CFLAGS += -DCRYPTO_C25519
+endif
+ifneq (,$(filter libcose_crypt_tinycrypt,$(USEMODULE)))
+  CFLAGS += -DCRYPTO_TINYCRYPT
+endif
+
+# Declare pseudomodules here to be selfcontained
+PSEUDOMODULES += libcose_crypt_%

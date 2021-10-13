@@ -30,6 +30,18 @@
  * waiting for the result of a conversion (e.g. through putting the calling
  * thread to sleep while waiting for the conversion results).
  *
+ * # (Low-) Power Implications
+ *
+ * The ADC peripheral(s) **should** only be powered on while adc_sample() is
+ * active. For implementing adc_sample() this means, that the peripheral should
+ * be powered on (i.e. through peripheral clock gating) at the beginning of the
+ * function and it should be powered back off at the end of the function.
+ *
+ * If the adc_sample() function is implemented in a way, that it will put the
+ * active thread to sleep for a certain amount of time, the implementation
+ * might need to block certain power states.
+ *
+ *
  * @todo        Extend interface for continuous mode?
  *
  * @{
@@ -44,6 +56,7 @@
 #define PERIPH_ADC_H
 
 #include <limits.h>
+#include <stdint.h>
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
@@ -113,7 +126,7 @@ int adc_init(adc_t line);
  * @return                  the sampled value on success
  * @return                  -1 if resolution is not applicable
  */
-int adc_sample(adc_t line, adc_res_t res);
+int32_t adc_sample(adc_t line, adc_res_t res);
 
 #ifdef __cplusplus
 }

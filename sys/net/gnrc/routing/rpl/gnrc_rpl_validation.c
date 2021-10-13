@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Cenk Gündoğan <mail@cgundogan.de>
+ * Copyright (C) 2016 Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -11,7 +11,7 @@
  *
  * @file
  *
- * @author  Cenk Gündoğan <mail@cgundogan.de>
+ * @author  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
 #include "net/gnrc/icmpv6.h"
@@ -20,10 +20,10 @@
 #include "net/gnrc/rpl.h"
 #include "gnrc_rpl_internal/validation.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if ENABLE_DEBUG
+#if IS_ACTIVE(ENABLE_DEBUG)
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
@@ -33,12 +33,17 @@ bool gnrc_rpl_validation_options(int msg_type, gnrc_rpl_instance_t *inst,
     uint16_t expected_len = 0;
 
     while(expected_len < len) {
-        switch(opt->type) {
-            case (GNRC_RPL_OPT_PAD1):
-                expected_len += 1;
-                opt = (gnrc_rpl_opt_t *) (((uint8_t *) opt) + 1);
-                continue;
+        if (opt->type == GNRC_RPL_OPT_PAD1) {
+            expected_len += 1;
+            opt = (gnrc_rpl_opt_t *) (((uint8_t *) opt) + 1);
+            continue;
+        }
 
+        if ((expected_len + sizeof(gnrc_rpl_opt_t)) > len) {
+            break;
+        }
+
+        switch(opt->type) {
             case (GNRC_RPL_OPT_DODAG_CONF):
                 if (msg_type != GNRC_RPL_ICMPV6_CODE_DIO) {
                     DEBUG("RPL: DODAG CONF DIO option not expected\n");
@@ -101,6 +106,11 @@ bool gnrc_rpl_validation_options(int msg_type, gnrc_rpl_instance_t *inst,
 
         }
         expected_len += opt->length + sizeof(gnrc_rpl_opt_t);
+
+        if (expected_len >= len) {
+          break;
+        }
+
         opt = (gnrc_rpl_opt_t *) (((uint8_t *) (opt + 1)) + opt->length);
     }
 

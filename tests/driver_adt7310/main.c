@@ -79,8 +79,8 @@ int test_adt7310_sample_print(adt7310_t *dev)
     float fractional;
     fractional = modff(celsius_float, &integral);
 
-    printf("0x%04" PRIx16 " %7" PRId32 " mC %4d.%07u C)\n", raw, millicelsius,
-        (int)integral, abs(fractional * 10000000.f));
+    printf("0x%04" PRIx16 " %7" PRId32 " mC %4d.%07lu C)\n", raw, millicelsius,
+        (int)integral, labs((long)(fractional * 10000000.f)));
     return 0;
 }
 

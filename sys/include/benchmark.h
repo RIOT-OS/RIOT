@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
+ * Copyright (C) 2017,2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -23,6 +23,7 @@
 
 #include <stdint.h>
 
+#include "irq.h"
 #include "xtimer.h"
 
 #ifdef __cplusplus
@@ -42,13 +43,11 @@ extern "C" {
  */
 #define BENCHMARK_FUNC(name, runs, func)                    \
     {                                                           \
-        unsigned _benchmark_irqstate = irq_disable();           \
         uint32_t _benchmark_time = xtimer_now_usec();           \
         for (unsigned long i = 0; i < runs; i++) {              \
             func;                                               \
         }                                                       \
         _benchmark_time = (xtimer_now_usec() - _benchmark_time);\
-        irq_restore(_benchmark_irqstate);                       \
         benchmark_print_time(_benchmark_time, runs, name);      \
     }
 

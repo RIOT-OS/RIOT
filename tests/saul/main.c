@@ -28,7 +28,6 @@
  */
 #define INTERVAL            (1LU * US_PER_SEC)
 
-
 int main(void)
 {
     phydat_t res;

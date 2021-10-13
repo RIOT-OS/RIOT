@@ -18,7 +18,6 @@
  * @}
  */
 
-
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -26,6 +25,8 @@
 
 #include "can/conn/raw.h"
 #include "can/raw.h"
+
+#include "timex.h"
 
 #define SC_CAN_MAX_FILTERS  10
 #define xstr(a) str(a)
@@ -83,7 +84,7 @@ static int _dump(int argc, char **argv)
         return 0;
     }
 
-    int ret;
+    int ret = -1;
     struct can_filter filters[SC_CAN_MAX_FILTERS];
     conn_can_raw_t conn;
     struct can_frame frame;

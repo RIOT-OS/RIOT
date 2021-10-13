@@ -1,0 +1,1 @@
+USEMODULE += uart_half_duplex

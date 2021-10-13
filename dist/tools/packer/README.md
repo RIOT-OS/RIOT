@@ -1,11 +1,11 @@
 # Packer
 
 ## About
-[Packer](https://www.packer.io/) is a command-line tool to create virtual machines 
+[Packer](https://www.packer.io/) is a command-line tool to create virtual machines
 based on a source configuration file.
 
 ## Requirements
-To use packer you need to download and install it (compare [Install Packer](https://www.packer.io/docs/installation.html)). 
+To use packer you need to download and install it (compare [Install Packer](https://www.packer.io/docs/installation.html)).
 
 ## Usage
 A simple build of the vagrant box can be done by:

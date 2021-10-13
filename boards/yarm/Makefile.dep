@@ -1,0 +1,1 @@
+include $(RIOTBOARD)/common/makefiles/stdio_cdc_acm.dep.mk

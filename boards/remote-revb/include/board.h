@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_remote-revb RE-Mote Revision B
- * @ingroup     boards
- * @brief       Support for the RE-Mote board Revision B
+ * @ingroup     boards_remote-revb
  * @{
  *
  * @file

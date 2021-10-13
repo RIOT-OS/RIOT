@@ -20,7 +20,6 @@
 
 #include "rgbled.h"
 
-
 /**
  * @name Drive the RGB-LED by default with 500Hz
  */
@@ -30,7 +29,6 @@
  * @name Set the default resolution to 8-bit per color (for a 24-bit color space)
  */
 #define PWM_RES         (256)
-
 
 void rgbled_init(rgbled_t *led, pwm_t pwm, int channel_r, int channel_g, int channel_b)
 {

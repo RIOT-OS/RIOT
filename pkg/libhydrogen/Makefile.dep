@@ -1,0 +1,6 @@
+USEMODULE += random
+
+# libhydrogen is only supported by 32 bit architectures
+# AVR boards: require avr-gcc >= 7.0 (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=60040)
+# MSP430 boards: invalid alignment of 'hydro_random_context'
+FEATURES_REQUIRED += arch_32bit

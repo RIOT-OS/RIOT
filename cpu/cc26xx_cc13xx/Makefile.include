@@ -1,0 +1,6 @@
+VARIANT = $(shell echo $(CPU_VARIANT) | tr 'a-z-' 'A-Z_')
+CFLAGS += -DCPU_VARIANT_$(VARIANT)
+
+LINKER_SCRIPT ?= $(RIOTCPU)/cc26xx_cc13xx/ldscripts/cc26xx_cc13xx.ld
+
+INCLUDES += -I${RIOTCPU}/cc26xx_cc13xx/include

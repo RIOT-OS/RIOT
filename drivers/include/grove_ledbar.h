@@ -9,7 +9,10 @@
 /**
  * @defgroup    drivers_grove_ledbar Grove ledbar
  * @ingroup     drivers_actuators
+ * @ingroup     drivers_saul
  * @brief       Driver for the Grove ledbar
+ *
+ * This driver provides @ref drivers_saul capabilities.
  *
  * @{
  * @file

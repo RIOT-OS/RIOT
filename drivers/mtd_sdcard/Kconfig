@@ -1,0 +1,24 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#               2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_MTD_SDCARD
+    bool "Configure MTD_SDCARD driver"
+    depends on USEMODULE_MTD_SDCARD
+    help
+        Configure the MTD_SDCARD driver using Kconfig.
+
+if KCONFIG_USEMODULE_MTD_SDCARD
+
+config MTD_SDCARD_ERASE
+    bool "Enable SD card erase"
+    help
+        Enable this to erase sector before a data write operation.
+        SDCards handle sector erase internally so it's
+        possible to directly write to the card without erasing
+        the sector first hence this feature is disabled by default.
+
+endif # KCONFIG_USEMODULE_MTD_SDCARD

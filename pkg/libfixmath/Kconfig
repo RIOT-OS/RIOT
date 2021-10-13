@@ -1,0 +1,22 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig PACKAGE_LIBFIXMATH
+    bool "Fixed Point Math package"
+    depends on TEST_KCONFIG
+
+if PACKAGE_LIBFIXMATH
+
+config MODULE_LIBFIXMATH
+    bool "Fixed Point Math module"
+
+config MODULE_LIBFIXMATH_UNITTESTS
+    bool "Fixed Point Math unittests"
+    depends on !HAS_ARCH_8BIT
+    depends on !HAS_MSP430
+
+endif # PACKAGE_LIBFIXMATH

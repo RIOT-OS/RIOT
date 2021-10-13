@@ -77,7 +77,7 @@ static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
     return (ticks << XTIMER_SHIFT); /* multiply by power of two */
 }
 #endif /* defined(XTIMER_SHIFT) && (XTIMER_SHIFT != 0) */
-#elif XTIMER_HZ == (1000000ul)
+#elif (XTIMER_HZ == (1000000ul)) || defined(MODULE_XTIMER_ON_ZTIMER)
 /* This is the most straightforward as the xtimer API is based around
  * microseconds for representing time values. */
 static inline uint32_t _xtimer_usec_from_ticks(uint32_t ticks) {

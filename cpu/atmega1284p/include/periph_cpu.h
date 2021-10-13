@@ -35,7 +35,7 @@ extern "C" {
 #define GPIO_PIN(x, y)          ((x << 4) | y)
 
 /**
- * @brief   Available ports on the ATmega328p family
+ * @brief   Available ports on the ATmega1284p family
  */
 enum {
     PORT_A = 0,       /**< port A */
@@ -45,6 +45,15 @@ enum {
 };
 
 /**
+ * @brief   Available external interrupt pins on the ATmega1284p family
+ *
+ * In order of their interrupt number
+ */
+#define CPU_ATMEGA_EXT_INTS    { GPIO_PIN(PORT_D, 2), \
+                                 GPIO_PIN(PORT_D, 3), \
+                                 GPIO_PIN(PORT_B, 2) }
+
+/**
  * @name   Defines for the I2C interface
  * @{
  */
@@ -52,9 +61,19 @@ enum {
 #define I2C_PIN_MASK            (1 << PORTC0) | (1 << PORTC1)
 /** @} */
 
+/**
+ * @name    EEPROM configuration
+ * @{
+ */
+#define EEPROM_SIZE                (4096U)  /* 4kB */
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
+
+#include "periph_conf.h"
+#include "default_timer_config.h"
 
 #endif /* PERIPH_CPU_H */
 /** @} */

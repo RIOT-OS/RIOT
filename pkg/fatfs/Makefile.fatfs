@@ -1,3 +1,0 @@
-MODULE=fatfs
-
-include $(RIOTBASE)/Makefile.base

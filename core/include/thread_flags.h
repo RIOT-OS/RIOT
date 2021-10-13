@@ -54,15 +54,10 @@
 #ifndef THREAD_FLAGS_H
 #define THREAD_FLAGS_H
 
-#ifndef MODULE_CORE_THREAD_FLAGS
-#error Missing USEMODULE += core_thread_flags
-#endif
-
-#include "kernel_types.h"
 #include "sched.h"  /* for thread_t typedef */
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -96,13 +91,13 @@
  *          ...
  *      }
  */
-#define THREAD_FLAG_MSG_WAITING      (0x1<<15)
+#define THREAD_FLAG_MSG_WAITING     (1u << 15)
 /**
  * @brief Set by @ref xtimer_set_timeout_flag() when the timer expires
  *
  * @see xtimer_set_timeout_flag
  */
-#define THREAD_FLAG_TIMEOUT          (0x1<<14)
+#define THREAD_FLAG_TIMEOUT         (1u << 14)
 /** @} */
 
 /**
@@ -136,11 +131,11 @@ thread_flags_t thread_flags_clear(thread_flags_t mask);
  * immediately, otherwise, it will suspend the thread (as
  * THREAD_STATUS_WAIT_ANY) until any of the flags in mask get set.
  *
- * Both ways, it will clear and return (sched_active_thread-flags & mask).
+ * Both ways, it will clear and return (`thread_get_active()->flags & mask`).
  *
  * @param[in]   mask    mask of flags to wait for
  *
- * @returns     flags that caused return/wakeup ((sched_active_thread-flags & mask).
+ * @returns     flags that caused return/wakeup (`thread_get_active()->flags & mask`).
  */
 thread_flags_t thread_flags_wait_any(thread_flags_t mask);
 
@@ -151,7 +146,7 @@ thread_flags_t thread_flags_wait_any(thread_flags_t mask);
  * immediately, otherwise, it will suspend the thread (as
  * THREAD_STATUS_WAIT_ALL) until all of the flags in mask have been set.
  *
- * Both ways, it will clear and return (sched_active_thread-flags & mask).
+ * Both ways, it will clear and return (`thread_get_active()->flags & mask`).
  *
  * @param[in]   mask    mask of flags to wait for
  *

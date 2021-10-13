@@ -1,0 +1,21 @@
+# include common nrf51 headers
+INCLUDES += -I$(RIOTBOARD)/common/nrf51/include
+
+# use alternative xtimer mapping if applicable
+ifneq (,$(filter nimble,$(USEPKG)))
+  CFLAGS += -DBOARD_NRF51_XTIMER_ALT
+endif
+
+# Use openocd by default
+PROGRAMMER ?= openocd
+
+ifeq ($(PROGRAMMER),openocd)
+  # use common openocd configuration for nrf51
+  OPENOCD_CONFIG = $(RIOTBOARD)/common/nrf51/dist/openocd.cfg
+else ifeq ($(PROGRAMMER),jlink)
+  # setup JLink for flashing
+  JLINK_DEVICE = nrf51822
+endif
+
+# Set openocd as default supported programmers
+PROGRAMMERS_SUPPORTED += openocd

@@ -15,6 +15,16 @@ Put here the description of your contribution:
 -->
 
 
+### Testing procedure
+
+<!--
+Details steps to test your contribution:
+- which test/example to compile for which board and is there a 'test' command
+- how to know that it was not working/available in master
+- the expected success test output
+-->
+
+
 ### Issues/PRs references
 
 <!--

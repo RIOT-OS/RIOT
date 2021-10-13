@@ -9,7 +9,6 @@
 
 #include "cpu.h"
 #include "board.h"
-#include "uart_stdio.h"
 
 void uart_init(void);
 
@@ -39,7 +38,6 @@ static void telosb_ports_init(void)
     P5SEL = 0x00;    /* Port5 Select: 00000000 = 0x00 */
     P5OUT = 0x70;    /* Port5 Output: 01110000 = 0x70 */
     P5DIR = 0x70;    /* Port5 Direction: 01110000 = 0x70 */
-
 
     P6SEL = 0xFF;    /* Port6 Select: 11111111 = 0xFF */
     P6OUT = 0x00;    /* Port6 Output: 00000000 = 0x00 */
@@ -71,14 +69,14 @@ void msp430_init_dco(void)
     }
 
     CCTL2 = CCIS0 + CM0 + CAP;            /* Define CCR2, CAP, ACLK */
-    TACTL = TASSEL1 + TACLR + MC1;        /* SMCLK, continous mode */
+    TACTL = TASSEL1 + TACLR + MC1;        /* SMCLK, continuous mode */
 
     while (1) {
         unsigned int compare;
 
-        while ((CCTL2 & CCIFG) != CCIFG);   /* Wait until capture occured!*/
+        while ((CCTL2 & CCIFG) != CCIFG);   /* Wait until capture occurred!*/
 
-        CCTL2 &= ~CCIFG;                    /* Capture occured, clear flag */
+        CCTL2 &= ~CCIFG;                    /* Capture occurred, clear flag */
         compare = CCR2;                     /* Get current captured SMCLK */
         compare = compare - oldcapture;     /* SMCLK difference */
         oldcapture = CCR2;                  /* Save current captured SMCLK */
@@ -110,7 +108,6 @@ void msp430_init_dco(void)
     BCSCTL1 &= ~(DIVA1 + DIVA0);          /* remove /8 divisor from ACLK again */
 }
 
-
 //=========================== public ==========================================
 
 void board_init(void)
@@ -121,9 +118,6 @@ void board_init(void)
 
     telosb_ports_init();
     msp430_init_dco();
-
-    /* initialize STDIO over UART */
-    uart_stdio_init();
 
     /* enable interrupts */
     __bis_SR_register(GIE);

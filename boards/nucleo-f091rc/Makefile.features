@@ -1,0 +1,18 @@
+CPU = stm32
+CPU_MODEL = stm32f091rc
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_dma
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_pwm
+# For RTC, Nucleos with MB1136 C-02 or MB1136 C-03 -sticker on it have the
+# required LSE oscillator provided on the X2 slot.
+# See Nucleo User Manual UM1724 section 5.6.2.
+FEATURES_PROVIDED += periph_rtc
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_spi
+
+# load the common Makefile.features for Nucleo boards
+include $(RIOTBOARD)/common/nucleo64/Makefile.features

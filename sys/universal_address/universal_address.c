@@ -27,14 +27,14 @@
 #endif
 #include "mutex.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 #include "universal_address.h"
 
 /**
  * @brief Maximum number of entries handled
  */
-/* determine the maximum numer of entries */
+/* determine the maximum number of entries */
 #ifndef UNIVERSAL_ADDRESS_MAX_ENTRIES
 /* all potential users of universal addresses have to add their requirements here */
 #   if defined(MODULE_FIB) && defined(MODULE_GNRC_IPV6)
@@ -98,7 +98,8 @@ static universal_address_container_t *universal_address_get_next_unused_entry(vo
      * (reason: UNIVERSAL_ADDRESS_MAX_ENTRIES may be zero in which case this
      * code is optimized out) */
     if (universal_address_table_filled < UNIVERSAL_ADDRESS_MAX_ENTRIES) {
-        /* cppcheck-suppress unsignedLessThanZero */
+        /* cppcheck-suppress unsignedLessThanZero
+         * (reason: UNIVERSAL_ADDRESS_MAX_ENTRIES may be zero, see above) */
         for (size_t i = 0; i < UNIVERSAL_ADDRESS_MAX_ENTRIES; ++i) {
             if (universal_address_table[i].use_count == 0) {
                 return &(universal_address_table[i]);

@@ -1,0 +1,3 @@
+INCLUDES += -I$(PKGDIRBASE)/lua
+INCLUDES += -I$(RIOTPKG)/lua/include
+DIRS += $(RIOTPKG)/lua/contrib

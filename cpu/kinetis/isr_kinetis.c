@@ -155,6 +155,7 @@ WEAK_DEFAULT void isr_i2c0(void);
 WEAK_DEFAULT void isr_i2c1(void);
 WEAK_DEFAULT void isr_i2c2(void);
 WEAK_DEFAULT void isr_i2c3(void);
+WEAK_DEFAULT void isr_i2s0(void);
 WEAK_DEFAULT void isr_i2s0_rx(void);
 WEAK_DEFAULT void isr_i2s0_tx(void);
 WEAK_DEFAULT void isr_llwu(void);
@@ -180,6 +181,7 @@ WEAK_DEFAULT void isr_portc(void);
 WEAK_DEFAULT void isr_portd(void);
 WEAK_DEFAULT void isr_porte(void);
 WEAK_DEFAULT void isr_portb_portc(void);
+WEAK_DEFAULT void isr_portc_portd(void);
 WEAK_DEFAULT void isr_radio_0(void);
 WEAK_DEFAULT void isr_radio_1(void);
 WEAK_DEFAULT void isr_rng(void);
@@ -195,17 +197,24 @@ WEAK_DEFAULT void isr_tpm1(void);
 WEAK_DEFAULT void isr_tpm2(void);
 WEAK_DEFAULT void isr_tsi0(void);
 WEAK_DEFAULT void isr_trng0(void);
+WEAK_DEFAULT void isr_uart0(void);
 WEAK_DEFAULT void isr_uart0_err(void);
 WEAK_DEFAULT void isr_uart0_lon(void);
 WEAK_DEFAULT void isr_uart0_rx_tx(void);
+WEAK_DEFAULT void isr_uart1(void);
 WEAK_DEFAULT void isr_uart1_err(void);
 WEAK_DEFAULT void isr_uart1_rx_tx(void);
+WEAK_DEFAULT void isr_uart2(void);
 WEAK_DEFAULT void isr_uart2_err(void);
+WEAK_DEFAULT void isr_uart2_flexio(void);
 WEAK_DEFAULT void isr_uart2_rx_tx(void);
+WEAK_DEFAULT void isr_uart3(void);
 WEAK_DEFAULT void isr_uart3_err(void);
 WEAK_DEFAULT void isr_uart3_rx_tx(void);
+WEAK_DEFAULT void isr_uart4(void);
 WEAK_DEFAULT void isr_uart4_err(void);
 WEAK_DEFAULT void isr_uart4_rx_tx(void);
+WEAK_DEFAULT void isr_uart5(void);
 WEAK_DEFAULT void isr_uart5_err(void);
 WEAK_DEFAULT void isr_uart5_rx_tx(void);
 WEAK_DEFAULT void isr_usb0(void);
@@ -213,6 +222,8 @@ WEAK_DEFAULT void isr_usbdcd(void);
 WEAK_DEFAULT void isr_usbhs(void);
 WEAK_DEFAULT void isr_usbhsdcd(void);
 WEAK_DEFAULT void isr_wdog_ewm(void);
+WEAK_DEFAULT void isr_mscan_rx(void);
+WEAK_DEFAULT void isr_mscan_tx(void);
 
 /* Empty interrupt vector padding to ensure that all sanity checks in the
  * linking stage are fulfilled. These will be placed in the area between the
@@ -223,4 +234,4 @@ WEAK_DEFAULT void isr_wdog_ewm(void);
  * tables, or link the table from a different CPU, and catch many other mistakes. */
 /* We subtract the expected number of used vectors, which are: The initial stack
  * pointer + the Cortex-M common IRQs + the Kinetis CPU specific IRQs */
-ISR_VECTOR(99) const isr_t vector_padding[(0x400 / sizeof(isr_t)) - 1 - CPU_NONISR_EXCEPTIONS - CPU_IRQ_NUMOF];
+ISR_VECTOR(99) const isr_t vector_padding[(0x400 / sizeof(isr_t)) - 1 - CPU_NONISR_EXCEPTIONS - CPU_IRQ_NUMOF] = { 0 };

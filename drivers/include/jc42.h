@@ -9,6 +9,7 @@
 /**
  * @defgroup    drivers_jc42 JC42 compliant temperature sensor driver
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  *
  * @brief       JC42 compliant temperature sensor driver
  *
@@ -20,6 +21,7 @@
  * temperature from these sensors. The sensors support a alarm wire, but this
  * is not supported by this driver.
  *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file
@@ -34,7 +36,6 @@
 #include "periph/i2c.h"
 #include "saul.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -47,7 +48,6 @@ extern "C" {
 #define JC42_NOI2C                    (-1)
 #define JC42_NODEV                    (-2)
 /** @} */
-
 
 /**
   * @brief   Device descriptor for a jc42 device
@@ -104,7 +104,6 @@ int jc42_get_config(const jc42_t* dev, uint16_t* data);
  * @return                  -1 on error
  */
 int jc42_set_config(const jc42_t* dev, uint16_t data);
-
 
 /**
  * @brief   Get measured temperature

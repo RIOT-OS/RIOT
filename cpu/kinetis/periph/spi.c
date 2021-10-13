@@ -26,12 +26,13 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "mutex.h"
-#include "assert.h"
 #include "periph/spi.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 /**
@@ -62,10 +63,16 @@ static inline void poweron(spi_t bus)
             break;
 #endif
     }
+
+    /* Enable the module */
+    dev(bus)->MCR &= ~(SPI_MCR_MDIS_MASK);
 }
 
 static inline void poweroff(spi_t bus)
 {
+    /* Disable the module */
+    dev(bus)->MCR |= SPI_MCR_MDIS_MASK;
+
     switch((uint32_t)dev(bus)) {
         case (uint32_t)SPI0:
         case (uint32_t)SPI1:
@@ -96,10 +103,13 @@ void spi_init(spi_t bus)
     dev(bus)->MCR = (SPI_MCR_MSTR_MASK | SPI_MCR_PCSIS_MASK |
                      SPI_MCR_CLR_RXF_MASK | SPI_MCR_CLR_TXF_MASK |
                      SPI_MCR_DIS_RXF_MASK | SPI_MCR_DIS_TXF_MASK |
-                     SPI_MCR_DOZE_MASK | SPI_MCR_HALT_MASK | SPI_MCR_MDIS_MASK);
+                     SPI_MCR_DOZE_MASK | SPI_MCR_HALT_MASK);
 
     /* disable all DMA and interrupt requests */
     dev(bus)->RSER = 0;
+
+    /* Wait for the hardware to acknowledge the halt command */
+    while (dev(bus)->SR & SPI_SR_TXRXS_MASK) {}
 
     /* and power off the bus until it is actually used */
     poweroff(bus);
@@ -135,9 +145,10 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
     return SPI_OK;
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    (void) cs;
+    (void)cs;
+    assert((unsigned)bus < SPI_NUMOF);
     /* lock and power on the bus */
     mutex_lock(&locks[bus]);
     poweron(bus);
@@ -147,14 +158,17 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     /* configure clock and mode */
     dev(bus)->CTAR[0] = (mode | SPI_CTAR_FMSZ(7) | spi_clk_config[clk]);
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)
 {
-    /* disable, power off, and unlock the bus */
-    dev(bus)->MCR |= (SPI_MCR_HALT_MASK | SPI_MCR_MDIS_MASK);
+    /* Halt transfers */
+    dev(bus)->MCR |= SPI_MCR_HALT_MASK;
+
+    /* Wait for the module to acknowledge the stop */
+    while (dev(bus)->SR & SPI_SR_TXRXS_MASK) {}
+
+    /* Disable the module */
     poweroff(bus);
     mutex_unlock(&locks[bus]);
 }

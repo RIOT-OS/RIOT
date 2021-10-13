@@ -10,8 +10,20 @@
  * @defgroup    drivers_periph_timer Timer
  * @ingroup     drivers_periph
  * @brief       Low-level timer peripheral driver
- * @{
  *
+ * # (Low-) Power Implications
+ *
+ * After calling timer_init(), the underlying hardware timer **should** be
+ * powered on and running. When a timer is explicitly stopped by calling
+ * timer_stop(), the timer **should** be stopped and powered down (e.g. by
+ * peripheral clock gating). Once the timer is started again (by calling
+ * timer_start()), it should transparently continue its previously configured
+ * operation.
+ *
+ * While the timer is active, the implementation might need to block certain
+ * power modes on specific CPU implementation.
+ *
+ * @{
  * @file
  * @brief       Low-level timer peripheral driver interface definitions
  *
@@ -22,10 +34,10 @@
 #define PERIPH_TIMER_H
 
 #include <limits.h>
+#include <stdint.h>
 
 #include "periph_cpu.h"
-/** @todo remove dev_enums.h include once all platforms are ported to the updated periph interface */
-#include "periph/dev_enums.h"
+#include "periph_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,6 +67,26 @@ extern "C" {
  */
 #ifndef HAVE_TIMER_T
 typedef unsigned int tim_t;
+#endif
+
+/**
+ * @brief   Reset the timer when the set() function is called
+ *
+ * When set, calling the timer_set_periodic() function resets the timer count value.
+ */
+#ifndef TIM_FLAG_RESET_ON_SET
+#define TIM_FLAG_RESET_ON_SET   (0x01)
+#endif
+
+/**
+ * @brief   Reset the timer on match
+ *
+ * When set, a match on this channel will reset the timer count value.
+ * When set on multiple channels, only the channel with the lowest match value
+ * will be reached.
+ */
+#ifndef TIM_FLAG_RESET_ON_MATCH
+#define TIM_FLAG_RESET_ON_MATCH (0x02)
 #endif
 
 /**
@@ -95,7 +127,7 @@ typedef struct {
  * @return                  0 on success
  * @return                  -1 if speed not applicable or unknown device given
  */
-int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg);
+int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg);
 
 /**
  * @brief Set a given timer channel for the given timer device
@@ -108,7 +140,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg);
  * @param[in] timeout       timeout in ticks after that the registered callback
  *                          is executed
  *
- * @return                  1 on success
+ * @return                  0 on success
  * @return                  -1 on error
  */
 int timer_set(tim_t dev, int channel, unsigned int timeout);
@@ -116,15 +148,38 @@ int timer_set(tim_t dev, int channel, unsigned int timeout);
 /**
  * @brief Set an absolute timeout value for the given channel of the given timer
  *
+ * Timers that are less wide than `unsigned int` accept and truncate overflown
+ * values.
+ *
  * @param[in] dev           the timer device to set
  * @param[in] channel       the channel to set
  * @param[in] value         the absolute compare value when the callback will be
  *                          triggered
  *
- * @return                  1 on success
+ * @return                  0 on success
  * @return                  -1 on error
  */
 int timer_set_absolute(tim_t dev, int channel, unsigned int value);
+
+/**
+ * @brief Set an absolute timeout value for the given channel of the given timer.
+ *        The timeout will be called periodically for each iteration.
+ *
+ * @note  Only one channel with `TIM_FLAG_RESET_ON_MATCH` can be active.
+ *        Some platforms (Atmel) only allow to use the first channel as TOP value.
+ *
+ * @note  Needs to be enabled with `FEATURES_REQUIRED += periph_timer_periodic`.
+ *
+ * @param[in] dev           the timer device to set
+ * @param[in] channel       the channel to set
+ * @param[in] value         the absolute compare value when the callback will be
+ *                          triggered
+ * @param[in] flags         options
+ *
+ * @return                  0 on success
+ * @return                  -1 on error
+ */
+int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags);
 
 /**
  * @brief Clear the given channel of the given timer device
@@ -132,7 +187,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value);
  * @param[in] dev           the timer device to clear
  * @param[in] channel       the channel on the given device to clear
  *
- * @return                  1 on success
+ * @return                  0 on success
  * @return                  -1 on error
  */
 int timer_clear(tim_t dev, int channel);
@@ -159,6 +214,9 @@ void timer_start(tim_t dev);
  * @brief Stop the given timer
  *
  * This will effect all of the timer's channels.
+ *
+ * When the timer is stopped, the underlying timer peripheral should be
+ * completely powered off.
  *
  * @param[in] dev           the timer to stop
  */

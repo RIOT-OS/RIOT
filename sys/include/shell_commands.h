@@ -7,7 +7,8 @@
  */
 
 /**
- * @ingroup     sys_shell_commands
+ * @defgroup    sys_shell_commands Shell commands
+ * @ingroup     sys
  *
  * @{
  *
@@ -26,12 +27,20 @@
 extern "C" {
 #endif
 
+/**
+ * @name    Disk manipulation command names
+ * @{
+ */
 #define DISK_GET_SECTOR_SIZE    "dget_ssize"
 #define DISK_GET_SECTOR_COUNT   "dget_scount"
 #define DISK_GET_BLOCK_SIZE     "dget_bsize"
 #define DISK_READ_SECTOR_CMD    "dread_sec"
 #define DISK_READ_BYTES_CMD     "dread"
+/** @} */
 
+/**
+ * @brief   List of shell commands
+ */
 extern const shell_command_t _shell_command_list[];
 
 #ifdef __cplusplus

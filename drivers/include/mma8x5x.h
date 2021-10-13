@@ -10,14 +10,17 @@
 /**
  * @defgroup    drivers_mma8x5x MMA8x5x Accelerometer
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Driver for the Freescale MMA8x5x 3-Axis accelerometer.
- *              The driver will initialize the accelerometer for best
- *              resolution. After the initialization the accelerometer will make
- *              measurements at periodic times. The measurements period and
- *              scale range can be determined by accelerometer initialization.
- *              This driver only implements basic functionality (i.e. no support
- *              for external interrupt pins).
  *
+ * The driver will initialize the accelerometer for best resolution. After the
+ * initialization the accelerometer will make measurements at periodic times.
+ * The measurements period and scale range can be determined by accelerometer
+ * initialization.
+ * This driver only implements basic functionality (i.e. no support
+ * for external interrupt pins).
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file
@@ -37,9 +40,21 @@
 extern "C" {
 #endif
 
-#ifndef MMA8X5X_I2C_ADDRESS
-#define MMA8X5X_I2C_ADDRESS           0x1D /**< Accelerometer Default Address */
+/**
+ * @defgroup drivers_mma8x5x_config     MMA8x5x Accelerometer driver compile configuration
+ * @ingroup config_drivers_sensors
+ * @{
+ */
+/**
+ * @brief   Accelerometer Default Address
+ *
+ * The address value depends on the state of SA0 Address Pin in the case of MMA845x series.
+ * For more details refer Table 1 in datasheet (MMA8451Q/MMA8452Q/MMA8453Q)
+ */
+#ifndef CONFIG_MMA8X5X_I2C_ADDRESS
+#define CONFIG_MMA8X5X_I2C_ADDRESS           0x1D
 #endif
+/** @} */
 
 /**
  * @brief   Devices supported by this driver
@@ -56,14 +71,14 @@ enum {
  * @brief   Available sampling rates
  */
 enum {
-    MMA8X5X_RATE_800HZ = (0 << 3),  /**< 800 Hz Ouput Data Rate in WAKE mode */
-    MMA8X5X_RATE_400HZ = (1 << 3),  /**< 400 Hz Ouput Data Rate in WAKE mode */
-    MMA8X5X_RATE_200HZ = (2 << 3),  /**< 200 Hz Ouput Data Rate in WAKE mode */
-    MMA8X5X_RATE_100HZ = (3 << 3),  /**< 100 Hz Ouput Data Rate in WAKE mode */
-    MMA8X5X_RATE_50HZ  = (4 << 3),  /**< 50 Hz Ouput Data Rate in WAKE mode */
-    MMA8X5X_RATE_1HZ25 = (5 << 3),  /**< 12.5 Hz Ouput Data Rate in WAKE mode */
-    MMA8X5X_RATE_6HZ25 = (6 << 3),  /**< 6.25 Hz Ouput Data Rate in WAKE mode */
-    MMA8X5X_RATE_1HZ56 = (7 << 3)   /**< 1.56 Hz Ouput Data Rate in WAKE mode */
+    MMA8X5X_RATE_800HZ = (0 << 3),  /**< 800 Hz Output Data Rate in WAKE mode */
+    MMA8X5X_RATE_400HZ = (1 << 3),  /**< 400 Hz Output Data Rate in WAKE mode */
+    MMA8X5X_RATE_200HZ = (2 << 3),  /**< 200 Hz Output Data Rate in WAKE mode */
+    MMA8X5X_RATE_100HZ = (3 << 3),  /**< 100 Hz Output Data Rate in WAKE mode */
+    MMA8X5X_RATE_50HZ  = (4 << 3),  /**< 50 Hz Output Data Rate in WAKE mode */
+    MMA8X5X_RATE_1HZ25 = (5 << 3),  /**< 12.5 Hz Output Data Rate in WAKE mode */
+    MMA8X5X_RATE_6HZ25 = (6 << 3),  /**< 6.25 Hz Output Data Rate in WAKE mode */
+    MMA8X5X_RATE_1HZ56 = (7 << 3)   /**< 1.56 Hz Output Data Rate in WAKE mode */
 };
 
 /**
@@ -92,7 +107,6 @@ enum {
 typedef struct {
     i2c_t i2c;                  /**< I2C bus the device is connected to */
     uint8_t addr;               /**< I2C bus address of the device */
-    uint8_t type;               /**< device type */
     uint8_t rate;               /**< sampling rate to use */
     uint8_t range;              /**< scale range to use */
     uint8_t offset[3];          /**< data offset in X, Y, and Z direction */

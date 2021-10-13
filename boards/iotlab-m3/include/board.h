@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_iotlab-m3 IoT-LAB M3 open node
- * @ingroup     boards
- * @brief       Support for the iotlab-m3 board
+ * @ingroup     boards_iotlab-m3
  * @{
  *
  * @file
@@ -48,7 +46,7 @@ extern "C" {
  * @name Define the interface to the LPS331AP pressure sensor
  * @{
  */
-#define LPS331AP_PARAM_ADDR        (0x5C)
+#define LPSXXX_PARAM_ADDR          (0x5C)
 /** @} */
 
 /**

@@ -1,24 +1,23 @@
 #
 # This file allows specifying a local folder using PKG_SOURCE_LOCAL.
 #
-# Every clean or prepare will remove $(PKG_BUILDDIR) and copy over
+# Every clean or prepare will remove $(PKG_SOURCE_DIR) and copy over
 # $(PKG_SOURCE_LOCAL).  This is intended to be used during package development.
 #
-# WARNING: any local changes made to $(PKG_BUILDDIR) *will* get lost!
+# WARNING: any local changes made to $(PKG_SOURCE_DIR) *will* get lost!
 
-.PHONY: prepare git-download clean
+.PHONY: prepare clean all FORCE
 
-git-download:
+all: $(PKG_SOURCE_DIR)/.prepared
+
+prepare: $(PKG_SOURCE_DIR)/.prepared
 	@true
 
-prepare: $(PKG_BUILDDIR)/.prepared
-	@true
-
-$(PKG_BUILDDIR)/.prepared:
-	rm -Rf $(PKG_BUILDDIR)
-	mkdir -p $$(dirname $(PKG_BUILDDIR))
-	cp -a $(PKG_SOURCE_LOCAL) $(PKG_BUILDDIR)
+$(PKG_SOURCE_DIR)/.prepared:
+	rm -Rf $(PKG_SOURCE_DIR)
+	mkdir -p $$(dirname $(PKG_SOURCE_DIR))
+	cp -a $(PKG_SOURCE_LOCAL) $(PKG_SOURCE_DIR)
 	touch $@
 
 clean::
-	@rm -f $(PKG_BUILDDIR)/.prepared
+	@rm -f $(PKG_SOURCE_DIR)/.prepared

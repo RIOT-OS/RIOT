@@ -1,0 +1,44 @@
+# See doc.txt on nRF antenna selection
+BOARD_NRFANTENNA_DEFAULT ?= BUILTIN
+CFLAGS += -DBOARD_NRFANTENNA_DEFAULT=BOARD_NRFANTENNA_$(BOARD_NRFANTENNA_DEFAULT)
+
+# add the common header files to the include path
+INCLUDES += -I$(RIOTBOARD)/common/particle-mesh/include
+
+PROGRAMMERS_SUPPORTED += dfu-util pyocd
+
+ifeq (1,$(PARTICLE_MONOFIRMWARE))
+  CFLAGS += -DPARTICLE_MONOFIRMWARE
+  ROM_OFFSET = 0x30000
+  FW_ROM_LEN = 0xc4000
+  FLASHFILE = $(BINFILE)-checksummed
+  # Setting DFU_ARGS won't work as the implied --reset causes errors.
+  FFLAGS = -d 0x2B04:0xD00E -a 0 -s 0x30000:leave -D $(FLASHFILE)
+  PROGRAMMER = dfu-util
+  # If CDC-ACM is *not* enabled, any pre-flash resets will just not work -- but
+  # then again nothing can be done in that case anyway, and the preflash
+  # routines fall through without erring.
+  include $(RIOTMAKE)/tools/usb_board_reset.mk
+
+  # Only dfu-util is supported in this case
+  PROGRAMMERS_SUPPORTED = dfu-util
+else
+  # This board uses a DAP-Link programmer
+  # Flashing support is provided through pyocd (default) and openocd.
+  # For openocd, a version built against the development branch and containing
+  # the support for nrf52 cpu is required.
+  PROGRAMMER ?= pyocd
+  # The board is not recognized automatically by pyocd, so the CPU target
+  # option is passed explicitly
+  PYOCD_FLASH_TARGET_TYPE ?= -t nrf52840
+  OPENOCD_DEBUG_ADAPTER ?= dap
+endif
+
+MONOFIRMWARETOOL = ${RIOTBOARD}/common/particle-mesh/monofirmware-tool.py
+
+# Rule (variations) for building a monofirmware populated with the right
+# (lengths and) checksum in it; only used iuf PARTICLE_MONOFIRMWARE=1
+%.bin-checksummed: %.bin %.elf ${MONOFIRMWARETOOL}
+	${MONOFIRMWARETOOL} $*.elf $< $@
+
+include $(RIOTBOARD)/common/nrf52/Makefile.include

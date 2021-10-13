@@ -28,28 +28,28 @@
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/udp.h"
 #include "net/gnrc/pktdump.h"
+#include "net/utils.h"
 #include "timex.h"
 #include "utlist.h"
+#if IS_USED(MODULE_ZTIMER_MSEC)
+#include "ztimer.h"
+#else
 #include "xtimer.h"
+#endif
 
-static gnrc_netreg_entry_t server = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
-                                                               KERNEL_PID_UNDEF);
-
+static gnrc_netreg_entry_t server =
+                        GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                   KERNEL_PID_UNDEF);
 
 static void send(char *addr_str, char *port_str, char *data, unsigned int num,
                  unsigned int delay)
 {
-    int iface;
+    netif_t *netif;
     uint16_t port;
     ipv6_addr_t addr;
 
-    /* get interface, if available */
-    iface = ipv6_addr_split_iface(addr_str);
-    if ((iface < 0) && (gnrc_netif_numof() == 1)) {
-        iface = gnrc_netif_iter(NULL)->pid;
-    }
     /* parse destination address */
-    if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
+    if (netutils_get_ipv6(&addr, &netif, addr_str) < 0) {
         puts("Error: unable to parse destination address");
         return;
     }
@@ -86,23 +86,30 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
             return;
         }
         /* add netif header, if interface was given */
-        if (iface > 0) {
-            gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+        if (netif != NULL) {
+            gnrc_pktsnip_t *netif_hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
 
-            ((gnrc_netif_hdr_t *)netif->data)->if_pid = (kernel_pid_t)iface;
-            LL_PREPEND(ip, netif);
+            gnrc_netif_hdr_set_netif(netif_hdr->data,
+                                     container_of(netif, gnrc_netif_t, netif));
+            ip = gnrc_pkt_prepend(ip, netif_hdr);
         }
         /* send packet */
-        if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL, ip)) {
+        if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP,
+                                       GNRC_NETREG_DEMUX_CTX_ALL, ip)) {
             puts("Error: unable to locate UDP thread");
             gnrc_pktbuf_release(ip);
             return;
         }
-        /* access to `payload` was implicitly given up with the send operation above
+        /* access to `payload` was implicitly given up with the send operation
+         * above
          * => use temporary variable for output */
         printf("Success: sent %u byte(s) to [%s]:%u\n", payload_size, addr_str,
                port);
+#if IS_USED(MODULE_ZTIMER_MSEC)
+        ztimer_sleep(ZTIMER_MSEC, delay);
+#else
         xtimer_usleep(delay);
+#endif
     }
 }
 
@@ -153,8 +160,13 @@ int udp_cmd(int argc, char **argv)
         uint32_t num = 1;
         uint32_t delay = 1000000;
         if (argc < 5) {
-            printf("usage: %s send <addr> <port> <data> [<num> [<delay in us>]]\n",
-                   argv[0]);
+#if IS_USED(MODULE_ZTIMER_MSEC)
+            printf("usage: %s send "
+                   "<addr> <port> <data> [<num> [<delay in ms>]]\n", argv[0]);
+#else
+            printf("usage: %s send "
+                   "<addr> <port> <data> [<num> [<delay in us>]]\n", argv[0]);
+#endif
             return 1;
         }
         if (argc > 5) {

@@ -1,2 +1,10 @@
-export INCLUDES += -I$(RIOTBOARD)/common/silabs/include
-export INCLUDES += -I$(RIOTBOARD)/common/silabs/drivers/include
+INCLUDES += -I$(RIOTBOARD)/common/silabs/include
+INCLUDES += -I$(RIOTBOARD)/common/silabs/drivers/include
+
+PROGRAMMER ?= jlink
+
+# Silabs boards can use openocd programmer
+PROGRAMMERS_SUPPORTED += openocd
+
+JLINK_DEVICE ?= ${CPU_MODEL}
+OPENOCD_CONFIG ?= board/efm32.cfg

@@ -1,0 +1,17 @@
+# Copyright (c) {{ year }} Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU lines
+{%- for line in lines %}
+config CPU_LINE_{{ line }}
+    bool
+    select CPU_FAM_{{ fam | upper }}
+{% endfor -%}

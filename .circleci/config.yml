@@ -1,0 +1,25 @@
+# CircleCI configuration file used to build and get a preview of the generated
+# Doxygen documentation.
+# Note that the job on CircleCI takes around 30 minutes to complete because
+# copying +19k individual files to their cloud storage is very slow.
+
+version: 2
+
+jobs:
+  doc-build:
+    docker:
+      - image: riot/static-test-tools
+    steps:
+      - checkout
+      - run: make doc
+      - run:
+          command: |
+            cp -R doc/doxygen/html /doc
+      - store_artifacts:
+          path: /doc
+
+workflows:
+  version: 2
+  doc-build:
+    jobs:
+      - doc-build

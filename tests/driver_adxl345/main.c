@@ -31,14 +31,11 @@ int main(void)
     adxl345_t dev;
     adxl345_data_t data;
 
-    dev.i2c = ADXL345_PARAM_I2C;
-    dev.addr = ADXL345_PARAM_ADDR;
-
     puts("ADXL345 test application");
     printf("Initializing ADXL345 accelerometer at I2C_DEV(%i)... ",
-           dev.i2c);
+           adxl345_params[0].i2c);
 
-    if (adxl345_init(&dev, (adxl345_params_t*)adxl345_params) == ADXL345_OK) {
+    if (adxl345_init(&dev, &adxl345_params[0]) == ADXL345_OK) {
         puts("[OK]\n");
     }
     else {

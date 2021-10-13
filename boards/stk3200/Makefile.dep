@@ -1,0 +1,14 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += efm32_coretemp
+  USEMODULE += saul_gpio
+endif
+
+# limit the stack size so most tests and examples compile
+CFLAGS += -DTHREAD_STACKSIZE_DEFAULT=512
+
+# add board common drivers
+USEMODULE += boards_common_silabs
+USEMODULE += silabs_bc
+
+# include board common dependencies
+include $(RIOTBOARD)/common/silabs/Makefile.dep

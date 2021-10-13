@@ -9,7 +9,7 @@ should be scheduled periodically and produce some output:
 2017-07-17 17:00:30,343 - INFO # t_high: freeing resource...
 ```
 During this phase of 1s, **t_high** lockes the mutex **res_mtx** which
-represents a shared ressource. After unlocking the mutex, **t_high** waits 1s
+represents a shared resource. After unlocking the mutex, **t_high** waits 1s
 before restaring its cycle again.
 
 A low priority thread **t_low** is doing the same. Since both threads sharing

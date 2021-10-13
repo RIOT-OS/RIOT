@@ -38,7 +38,7 @@ typedef struct
 } pthread_rwlockattr_t;
 
 /**
- * @brief           Initilize the attribute set with the defaults.
+ * @brief           Initialize the attribute set with the defaults.
  * @details         Default value for pshared: `PTHREAD_PROCESS_PRIVATE`.
  *                  A zeroed out datum is initialized.
  * @param[in,out]   attr   Attribute set to initialize.

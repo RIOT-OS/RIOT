@@ -1,3 +1,0 @@
-ifneq (,$(filter atmega_common cortexm_common,$(USEMODULE)))
-  USEMODULE += qDSA_asm
-endif

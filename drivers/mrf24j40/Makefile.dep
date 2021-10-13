@@ -1,0 +1,17 @@
+USEMODULE += xtimer
+USEMODULE += ieee802154
+USEMODULE += netdev_ieee802154
+FEATURES_REQUIRED += periph_gpio
+FEATURES_REQUIRED += periph_gpio_irq
+FEATURES_REQUIRED += periph_spi
+
+ifneq (,$(filter mrf24j40m%,$(USEMODULE)))
+  DEFAULT_MODULE += netdev_ieee802154_oqpsk
+
+  ifndef CONFIG_KCONFIG_MODULE_MRF24J40
+    # all modules but mrf24j40ma have an external PA
+    ifeq (,$(filter mrf24j40ma,$(USEMODULE)))
+      CFLAGS += -DCONFIG_MRF24J40_USE_EXT_PA_LNA
+    endif
+  endif
+endif

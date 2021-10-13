@@ -20,6 +20,7 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,48 +36,45 @@ extern "C" {
 #define CLK16                           4
 #define CLK1                            5
 #define CLOCK_SOURCE                    CLK40
+#define CLOCK_CORECLOCK                 MHZ(80)
 /** @} */
 
 /**
- * @name Timer configuration
+ * @name    Timer configuration
  * @{
  */
-#define TIMER_NUMOF         (2U)
-#define TIMER_0_EN          1
-#define TIMER_1_EN          1
-#define TIMER_IRQ_PRIO      1
+static const timer_conf_t timer_config[] = {
+    {
+        .dev      = WTIMER0_BASE,
+        .max      = 0xffffffff,
+        .irqn     = Timer0A_IRQn,
+        .sysctl   = SYSCTL_PERIPH_WTIMER0,
+        .intbase  = INT_WTIMER0A,
+        .channels = 1
+    },
+    {
+        .dev      = WTIMER1_BASE,
+        .max      = 0xffffffff,
+        .irqn     = Timer1A_IRQn,
+        .sysctl   = SYSCTL_PERIPH_WTIMER1,
+        .intbase  = INT_WTIMER1A,
+        .channels = 1
+    },
+};
 
-/* Timer 0 configuration
- *
- * WTIMER0 is a 32/64bits timer.
- * We use timer_a as TIMER_0
- */
-#define TIMER_0_CHANNELS    1
-#define TIMER_0_MAX_VALUE   (0xffffffff)
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
+
 #define TIMER_0_ISR         isr_wtimer0a
-#define TIMER_0_IRQ_CHAN    Timer0A_IRQn
-
-/* Timer 1 configuration
- *
- * WTIMER1 is a 32/64bits timer.
- * We use timer_a as TIMER_1
- */
-
-#define TIMER_1_CHANNELS    1
-#define TIMER_1_MAX_VALUE   (0xffffffff)
 #define TIMER_1_ISR         isr_wtimer1a
-#define TIMER_1_IRQ_CHAN    Timer1A_IRQn
-/** @} */
 
 /**
  * @name UART configuration
  * @{
  */
 #define UART_NUMOF          (1U)
-#define UART_0_EN           1
-#define UART_1_EN           0
 #define UART_IRQ_PRIO       1
-#define UART_CLK            ROM_SysCtlClockGet()  /* UART clock runs with 40MHz */
+/* UART clock runs with 40MHz */
+#define UART_CLK            ROM_SysCtlClockGet()
 /* UART 0 device configuration */
 #define UART_0_DEV          UART0_BASE
 #define UART_0_CLK          (40000000)
@@ -86,12 +84,6 @@ extern "C" {
 #define UART_0_PORT         GPIOA
 #define UART_0_TX_PIN       UART_PA1_U0TX
 #define UART_0_RX_PIN       UART_PA0_U0RX
-
-/* UART 1 device configuration */
-#define UART_1_DEV          UART1_BASE
-#define UART_1_CLK          (40000000)
-#define UART_1_IRQ_CHAN     UART1_IRQn
-#define UART_1_ISR          isr_uart1
 /** @} */
 
 /**
@@ -160,7 +152,7 @@ static const spi_conf_t spi_confs[] = {
     },
 };
 
-#define SPI_NUMOF (sizeof(spi_confs) / sizeof(spi_confs[0]))
+#define SPI_NUMOF ARRAY_SIZE(spi_confs)
 /** @} */
 
 #ifdef __cplusplus

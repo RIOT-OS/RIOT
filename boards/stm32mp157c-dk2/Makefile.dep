@@ -1,0 +1,6 @@
+USEMODULE += mpu_stack_guard
+
+# Uncomment this line to build firmware in Engineering mode (BOOT0 off and
+# BOOT2 on).
+# You can also add it in your application Makefile.
+# USEMODULE += stm32mp1_eng_mode

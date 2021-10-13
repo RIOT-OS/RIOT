@@ -22,7 +22,6 @@
 #define ENCX24J600_H
 
 #include "mutex.h"
-#include "kernel_types.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #include "net/netdev.h"
@@ -40,7 +39,7 @@ typedef struct {
     spi_t spi;              /**< SPI device the enc is connected to*/
     gpio_t cs;              /**< SPI chip select pin */
     gpio_t int_pin;         /**< SPI interrupt pin */
-    uint16_t rx_next_ptr;   /**< ptr to next packet whithin devices memory */
+    uint16_t rx_next_ptr;   /**< ptr to next packet within devices memory */
 } encx24j600_t;
 
 /**

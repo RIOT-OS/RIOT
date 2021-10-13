@@ -37,7 +37,7 @@
 #include "kw2xrf_getset.h"
 #include "kw2xrf_intern.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static void kw2xrf_set_address(kw2xrf_t *dev)
@@ -56,16 +56,20 @@ static void kw2xrf_set_address(kw2xrf_t *dev)
 
 void kw2xrf_setup(kw2xrf_t *dev, const kw2xrf_params_t *params)
 {
-    netdev_t *netdev = (netdev_t *)dev;
+    netdev_t *netdev = &dev->netdev.netdev;
 
     netdev->driver = &kw2xrf_driver;
     /* initialize device descriptor */
-    memcpy(&dev->params, params, sizeof(kw2xrf_params_t));
+    dev->params = *params;
     dev->idle_state = XCVSEQ_RECEIVE;
     dev->state = 0;
     dev->pending_tx = 0;
     kw2xrf_spi_init(dev);
     kw2xrf_set_power_mode(dev, KW2XRF_IDLE);
+    DEBUG("[kw2xrf] enabling RX/TX completion and start events");
+    kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2, MKW2XDM_PHY_CTRL2_RX_WMRK_MSK);
+    kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2, MKW2XDM_PHY_CTRL2_RXMSK);
+    kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2, MKW2XDM_PHY_CTRL2_TXMSK);
     DEBUG("[kw2xrf] setup finished\n");
 }
 
@@ -90,23 +94,13 @@ int kw2xrf_init(kw2xrf_t *dev, gpio_cb_t cb)
 
 void kw2xrf_reset_phy(kw2xrf_t *dev)
 {
-    /* reset options and sequence number */
-    dev->netdev.seq = 0;
-    dev->netdev.flags = 0;
-
-    /* set default protocol */
-#ifdef MODULE_GNRC_SIXLOWPAN
-    dev->netdev.proto = GNRC_NETTYPE_SIXLOWPAN;
-#elif MODULE_GNRC
-    dev->netdev.proto = GNRC_NETTYPE_UNDEF;
-#endif
+    netdev_ieee802154_reset(&dev->netdev);
 
     dev->tx_power = KW2XRF_DEFAULT_TX_POWER;
     kw2xrf_set_tx_power(dev, dev->tx_power);
 
     kw2xrf_set_channel(dev, KW2XRF_DEFAULT_CHANNEL);
 
-    kw2xrf_set_pan(dev, KW2XRF_DEFAULT_PANID);
     kw2xrf_set_address(dev);
 
     kw2xrf_set_cca_mode(dev, 1);
@@ -120,13 +114,10 @@ void kw2xrf_reset_phy(kw2xrf_t *dev)
     kw2xrf_set_power_mode(dev, KW2XRF_AUTODOZE);
     kw2xrf_set_sequence(dev, dev->idle_state);
 
-    kw2xrf_set_option(dev, KW2XRF_OPT_TELL_RX_START, true);
-    kw2xrf_set_option(dev, KW2XRF_OPT_TELL_RX_END, true);
-    kw2xrf_set_option(dev, KW2XRF_OPT_TELL_TX_END, true);
     kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2, MKW2XDM_PHY_CTRL2_SEQMSK);
 
     kw2xrf_enable_irq_b(dev);
 
-    DEBUG("[kw2xrf] init phy and (re)set to channel %d and pan %d.\n",
-          KW2XRF_DEFAULT_CHANNEL, KW2XRF_DEFAULT_PANID);
+    DEBUG("[kw2xrf] init phy and (re)set to channel %d.\n",
+          KW2XRF_DEFAULT_CHANNEL);
 }

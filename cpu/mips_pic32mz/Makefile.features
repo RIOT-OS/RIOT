@@ -1,3 +1,6 @@
+CPU_CORE = m5101
+CPU_FAM = pic32mz
+
 FEATURES_PROVIDED += periph_hwrng
 
--include $(RIOTCPU)/mips_pic32_common/Makefile.features
+include $(RIOTCPU)/mips_pic32_common/Makefile.features

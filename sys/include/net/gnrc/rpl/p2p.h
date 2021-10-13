@@ -126,7 +126,7 @@ extern const uint8_t gnrc_rpl_p2p_lifetime_lookup[4];
  * @param[in] instance_id       Id of the instance
  * @param[in] dodag_id          Id of the DODAG
  * @param[in] target            Target of the P2P-RPL routes discovery
- * @param[in] gen_inst_id       Flag indicating whether to generate a local isntance id.
+ * @param[in] gen_inst_id       Flag indicating whether to generate a local instance id.
  *                              If true, @p instance_id will be ignored
  *
  * @return  Pointer to the new Instance, on success.

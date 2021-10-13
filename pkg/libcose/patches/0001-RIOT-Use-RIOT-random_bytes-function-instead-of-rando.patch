@@ -1,0 +1,102 @@
+From 0104f8d1558fbd40d25dc48291508b3eac9965fa Mon Sep 17 00:00:00 2001
+From: Kaspar Schleiser <kaspar@schleiser.de>
+Date: Fri, 5 Jul 2019 14:51:09 +0200
+Subject: [PATCH] RIOT: Use RIOT random_bytes function instead of randombytes
+
+---
+ src/crypt/c25519.c     | 5 ++---
+ src/crypt/hacl.c       | 6 +++---
+ src/crypt/monocypher.c | 7 +++----
+ 3 files changed, 8 insertions(+), 10 deletions(-)
+
+diff --git a/src/crypt/c25519.c b/src/crypt/c25519.c
+index c23749b..f30e92a 100644
+--- a/src/crypt/c25519.c
++++ b/src/crypt/c25519.c
+@@ -17,8 +17,7 @@
+ #include "cose/crypto.h"
+ #include "cose/crypto/c25519.h"
+ #include "cose/crypto/selectors.h"
+-
+-extern void randombytes(uint8_t *target, uint64_t n);
++#include "random.h"
+ 
+ #ifdef CRYPTO_C25519_INCLUDE_ED25519
+ int cose_crypto_sign_ed25519(const cose_key_t *key, uint8_t *sign, size_t *signlen, uint8_t *msg, unsigned long long int msglen)
+@@ -38,7 +37,7 @@ int cose_crypto_verify_ed25519(const cose_key_t *key, const uint8_t *sign, size_
+ 
+ void cose_crypto_keypair_ed25519(cose_key_t *key)
+ {
+-    randombytes(key->d, EDSIGN_SECRET_KEY_SIZE);
++    random_bytes(key->d, EDSIGN_SECRET_KEY_SIZE);
+     edsign_sec_to_pub(key->x, key->d);
+ }
+ 
+diff --git a/src/crypt/hacl.c b/src/crypt/hacl.c
+index c24d751..3bdcabf 100644
+--- a/src/crypt/hacl.c
++++ b/src/crypt/hacl.c
+@@ -19,10 +19,10 @@
+ #include <stdint.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include "random.h"
+ 
+ extern void Hacl_Ed25519_sign(uint8_t *signature, uint8_t *secret, uint8_t *msg, uint32_t len1);
+ extern bool Hacl_Ed25519_verify(uint8_t *public, uint8_t *msg, uint32_t len1, uint8_t *signature);
+-extern void randombytes(uint8_t *target, uint64_t n);
+ 
+ #ifdef CRYPTO_HACL_INCLUDE_CHACHAPOLY
+ int cose_crypto_aead_encrypt_chachapoly(uint8_t *c,
+@@ -67,7 +67,7 @@ COSE_ssize_t cose_crypto_keygen_chachapoly(uint8_t *sk, size_t len)
+     if (len < COSE_CRYPTO_AEAD_CHACHA20POLY1305_KEYBYTES) {
+         return COSE_ERR_NOMEM;
+     }
+-    randombytes(sk, COSE_CRYPTO_AEAD_CHACHA20POLY1305_KEYBYTES);
++    random_bytes(sk, COSE_CRYPTO_AEAD_CHACHA20POLY1305_KEYBYTES);
+     return COSE_CRYPTO_AEAD_CHACHA20POLY1305_KEYBYTES;
+ }
+ 
+@@ -76,7 +76,7 @@ size_t cose_crypto_aead_nonce_chachapoly(uint8_t *nonce, size_t len)
+     if (len < COSE_CRYPTO_AEAD_CHACHA20POLY1305_NONCEBYTES) {
+         return 0;
+     }
+-    randombytes(nonce, COSE_CRYPTO_AEAD_CHACHA20POLY1305_NONCEBYTES);
++    random_bytes(nonce, COSE_CRYPTO_AEAD_CHACHA20POLY1305_NONCEBYTES);
+     return COSE_CRYPTO_AEAD_CHACHA20POLY1305_NONCEBYTES;
+ }
+ #endif /* CRYPTO_HACL_INCLUDE_CHACHAPOLY */
+diff --git a/src/crypt/monocypher.c b/src/crypt/monocypher.c
+index f3186f7..fd27839 100644
+--- a/src/crypt/monocypher.c
++++ b/src/crypt/monocypher.c
+@@ -19,7 +19,7 @@
+ #include "cose/crypto.h"
+ #include "cose/crypto/selectors.h"
+ 
+-extern void randombytes(uint8_t *target, uint64_t n);
++#include "random.h"
+ static const uint8_t zero[32] = { 0 };
+ 
+ #ifdef CRYPTO_MONOCYPHER_INCLUDE_CHACHAPOLY
+@@ -109,7 +109,7 @@ COSE_ssize_t cose_crypto_keygen_chachapoly(uint8_t *sk, size_t len)
+     if (len < 64) {
+         return COSE_ERR_NOMEM;
+     }
+-    randombytes((unsigned char*)sk, 64);
++    random_bytes((unsigned char*)sk, 64);
+     return 64;
+ }
+ #endif /* CRYPTO_MONOCYPHER_INCLUDE_CHACHAPOLY */
+@@ -137,7 +137,7 @@ static void _ed25519_clamp(uint8_t *key)
+ 
+ void cose_crypto_keypair_ed25519(cose_key_t *key)
+ {
+-    randombytes(key->d, COSE_CRYPTO_SIGN_ED25519_SECRETKEYBYTES);
++    random_bytes(key->d, COSE_CRYPTO_SIGN_ED25519_SECRETKEYBYTES);
+     _ed25519_clamp(key->d);
+     crypto_ed25519_public_key(key->x, key->d);
+ }
+-- 
+2.21.0
+

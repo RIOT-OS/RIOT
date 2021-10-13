@@ -1,0 +1,12 @@
+## CPU Models
+config CPU_MODEL_SAMR30E18A
+    bool
+    select CPU_FAM_SAMR30
+
+config CPU_MODEL_SAMR30G18A
+    bool
+    select CPU_FAM_SAMR30
+
+config CPU_MODEL
+    default "samr30e18a" if CPU_MODEL_SAMR30E18A
+    default "samr30g18a" if CPU_MODEL_SAMR30G18A

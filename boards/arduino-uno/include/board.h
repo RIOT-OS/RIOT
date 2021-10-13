@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_arduino-uno Arduino Uno
- * @ingroup     boards
- * @brief       Support for the Arduino Uno board
+ * @ingroup     boards_arduino-uno
  * @{
  *
  * @file

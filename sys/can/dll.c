@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 OTA keys S.A.
+ * Copyright (C) 2016-2018 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -23,6 +23,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <errno.h>
 #include <string.h>
 
@@ -35,7 +36,7 @@
 #include "can/router.h"
 #include "utlist.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static candev_dev_t *candev_list[CAN_DLL_NUMOF];
@@ -56,9 +57,7 @@ static int _get_ifnum(kernel_pid_t pid)
 
 int _send_pkt(can_pkt_t *pkt)
 {
-    if (!pkt) {
-        return -ENOMEM;
-    }
+    assert(pkt);
 
     msg_t msg;
     int handle = pkt->handle;
@@ -71,6 +70,9 @@ int _send_pkt(can_pkt_t *pkt)
     msg.content.ptr = (void*) pkt;
 
     if (msg_send(&msg, candev_list[pkt->entry.ifnum]->pid) <= 0) {
+        mutex_lock(&tx_lock);
+        LL_DELETE(tx_list[pkt->entry.ifnum], &pkt->entry);
+        mutex_unlock(&tx_lock);
         return -EOVERFLOW;
     }
 
@@ -85,11 +87,18 @@ int raw_can_send(int ifnum, const struct can_frame *frame, kernel_pid_t pid)
     assert(ifnum < candev_nb);
 
     pkt = can_pkt_alloc_tx(ifnum, frame, pid);
+    if (!pkt) {
+        return -ENOMEM;
+    }
 
     DEBUG("raw_can_send: ifnum=%d, id=0x%" PRIx32 " from pid=%" PRIkernel_pid ", handle=%d\n",
           ifnum, frame->can_id, pid, pkt->handle);
 
-    return _send_pkt(pkt);
+    int ret = _send_pkt(pkt);
+    if (ret < 0) {
+        can_pkt_free(pkt);
+    }
+    return ret;
 }
 
 #ifdef MODULE_CAN_MBOX
@@ -101,10 +110,17 @@ int raw_can_send_mbox(int ifnum, const struct can_frame *frame, mbox_t *mbox)
     assert(ifnum < candev_nb);
 
     pkt = can_pkt_alloc_mbox_tx(ifnum, frame, mbox);
+    if (!pkt) {
+        return -ENOMEM;
+    }
 
     DEBUG("raw_can_send: ifnum=%d, id=0x%" PRIx32 ", handle=%d\n", ifnum, frame->can_id, pkt->handle);
 
-    return _send_pkt(pkt);
+    int ret = _send_pkt(pkt);
+    if (ret < 0) {
+        can_pkt_free(pkt);
+    }
+    return ret;
 }
 #endif
 
@@ -112,7 +128,8 @@ int raw_can_abort(int ifnum, int handle)
 {
     msg_t msg, reply;
     can_pkt_t *pkt = NULL;
-    can_reg_entry_t *entry;
+    can_reg_entry_t *entry = NULL;
+    can_reg_entry_t *prev = tx_list[ifnum];
 
     assert(ifnum < candev_nb);
 
@@ -122,11 +139,16 @@ int raw_can_abort(int ifnum, int handle)
     LL_FOREACH(tx_list[ifnum], entry) {
         pkt = container_of(entry, can_pkt_t, entry);
         if (pkt->handle == handle) {
+            if (prev == tx_list[ifnum]) {
+                tx_list[ifnum] = entry->next;
+            }
+            else {
+                prev->next = entry->next;
+            }
             break;
         }
+        prev = entry;
     }
-
-    LL_DELETE(tx_list[ifnum], entry);
     mutex_unlock(&tx_lock);
 
     if (pkt == NULL) {
@@ -263,6 +285,9 @@ int raw_can_unsubscribe_rx_mbox(int ifnum, struct can_filter *filter, mbox_t *mb
 
 int raw_can_free_frame(can_rx_data_t *frame)
 {
+    if (!frame) {
+        return 0;
+    }
     int ret = can_router_free_frame((struct can_frame *)frame->data.iov_base);
 
     can_pkt_free_rx_data(frame);
@@ -333,32 +358,56 @@ int can_dll_dispatch_rx_frame(struct can_frame *frame, kernel_pid_t pid)
     return can_router_dispatch_rx_indic(pkt);
 }
 
+static int _remove_entry_from_list(can_reg_entry_t **list, can_reg_entry_t *entry)
+{
+    assert(list);
+    int res = -1;
+    can_reg_entry_t *_tmp;
+    if (*list == entry) {
+        res = 0;
+        *list = (*list)->next;
+    }
+    else if (*list != NULL) {
+        _tmp = *list;
+        while (_tmp->next && (_tmp->next != entry)) {
+            _tmp = _tmp->next;
+        }
+        if (_tmp->next) {
+            _tmp->next = entry->next;
+            res = 0;
+        }
+    }
+    return res;
+}
+
 int can_dll_dispatch_tx_conf(can_pkt_t *pkt)
 {
-    DEBUG("can_dll_dispatch_tx_conf: pkt=0x%p\n", (void*)pkt);
-
-    can_router_dispatch_tx_conf(pkt);
+    DEBUG("can_dll_dispatch_tx_conf: pkt=%p\n", (void*)pkt);
 
     mutex_lock(&tx_lock);
-    LL_DELETE(tx_list[pkt->entry.ifnum], &pkt->entry);
+    int res = _remove_entry_from_list(&tx_list[pkt->entry.ifnum], &pkt->entry);
     mutex_unlock(&tx_lock);
 
-    can_pkt_free(pkt);
+    if (res == 0) {
+        can_router_dispatch_tx_conf(pkt);
+        can_pkt_free(pkt);
+    }
 
     return 0;
 }
 
 int can_dll_dispatch_tx_error(can_pkt_t *pkt)
 {
-    DEBUG("can_dll_dispatch_tx_error: pkt=0x%p\n", (void*)pkt);
-
-    can_router_dispatch_tx_error(pkt);
+    DEBUG("can_dll_dispatch_tx_error: pkt=%p\n", (void*)pkt);
 
     mutex_lock(&tx_lock);
-    LL_DELETE(tx_list[pkt->entry.ifnum], &pkt->entry);
+    int res = _remove_entry_from_list(&tx_list[pkt->entry.ifnum], &pkt->entry);
     mutex_unlock(&tx_lock);
 
-    can_pkt_free(pkt);
+    if (res == 0) {
+        can_router_dispatch_tx_error(pkt);
+        can_pkt_free(pkt);
+    }
 
     return 0;
 
@@ -375,6 +424,7 @@ int can_dll_dispatch_bus_off(kernel_pid_t pid)
     while (entry) {
         can_pkt_t *pkt = container_of(entry, can_pkt_t, entry);
         can_router_dispatch_tx_error(pkt);
+        can_pkt_free(pkt);
         LL_DELETE(tx_list[ifnum], entry);
         entry = tx_list[ifnum];
     }
@@ -386,6 +436,7 @@ int can_dll_dispatch_bus_off(kernel_pid_t pid)
 int can_dll_init(void)
 {
     can_pkt_init();
+    can_router_init();
 
     return 0;
 }
@@ -420,7 +471,9 @@ int raw_can_power_up(int ifnum)
 
 int raw_can_set_bitrate(int ifnum, uint32_t bitrate, uint32_t sample_point)
 {
-    assert(ifnum < candev_nb);
+    if (ifnum < 0 || ifnum >= candev_nb) {
+        return -1;
+    }
 
     int res = 0;
     int ret;

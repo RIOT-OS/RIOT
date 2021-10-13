@@ -1,0 +1,11 @@
+# configure the terminal program
+PORT_LINUX  ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+BAUD        ?= 115200
+
+# Avrdude programmer defaults to UM232H which is a FT232H breakout board
+# externally connected using wires
+PROGRAMMER_MICRODUINO_CORERF ?= UM232H
+AVRDUDE_PROGRAMMER ?= $(PROGRAMMER_MICRODUINO_CORERF)
+
+include $(RIOTBOARD)/common/atmega/Makefile.include

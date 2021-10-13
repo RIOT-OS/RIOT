@@ -1,0 +1,9 @@
+FLASHER ?= $(RIOTTOOLS)/bmp/bmp.py
+DEBUGGER ?= $(RIOTTOOLS)/bmp/bmp.py
+RESET ?= $(RIOTTOOLS)/bmp/bmp.py
+
+FLASHFILE ?= $(ELFFILE)
+
+FFLAGS ?= $(BMP_OPTIONS) flash $(FLASHFILE)
+DEBUGGER_FLAGS ?= $(BMP_OPTIONS) debug $(ELFFILE)
+RESET_FLAGS ?= $(BMP_OPTIONS) reset

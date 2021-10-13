@@ -1,0 +1,19 @@
+USEPKG += tlsf
+USEMODULE += lua-contrib
+USEMODULE += printf_float
+
+# LUA is only supported by 32-bit architectures
+FEATURES_REQUIRED += arch_32bit
+
+# LUA is not supported on MIPS because of missing stdin over UART
+FEATURES_BLACKLIST += arch_mips32r2
+
+# LUA is not supported on RISCV because of build issues with the toolchain
+# (undefined reference to _times, _unlink and _link functions in provided
+# newlib nano).
+FEATURES_BLACKLIST += arch_riscv
+
+# LUA is not compatible with picolibc and raises errors at compile time:
+# - lua/liolib.c:671:38: error: '_IOFBF' undeclared (first use in this function)
+# - lua/liolib.c:671:46: error: '_IOLBF' undeclared (first use in this function)
+FEATURES_BLACKLIST += picolibc

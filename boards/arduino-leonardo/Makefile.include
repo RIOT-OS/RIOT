@@ -1,0 +1,10 @@
+PORT_LINUX      ?= /dev/ttyUSB0
+PROG_DEV        ?= /dev/ttyACM0
+PORT_DARWIN     ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+BAUD            ?= 9600
+
+# PROGRAMMER defaults to avr109 which is the internal flasher via USB. Can be
+# overridden for debugging (which requires changes that require to use an ISP)
+ARDUINO_LEONARDO_BOOTLOADER ?= avr109
+
+include $(RIOTBOARD)/common/arduino-atmega/Makefile.include

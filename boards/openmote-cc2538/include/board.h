@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_openmote-cc2538 OpenMote-cc2538
- * @ingroup     boards
- * @brief       Support for the OpenMote-cc2538 board
+ * @ingroup     boards_openmote-cc2538
  * @{
  *
  * @file
@@ -23,6 +21,7 @@
 
 #include "cpu.h"
 #include "periph/gpio.h"
+#include "cc2538_eui_primary.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -80,6 +79,15 @@
 #define CCA_BACKDOOR_ENABLE       (1)
 #define CCA_BACKDOOR_PORT_A_PIN   (6) /**< ON/SLEEP Pin */
 #define CCA_BACKDOOR_ACTIVE_LEVEL (0) /**< Active low */
+/** @} */
+
+/**
+ * @name    RF CORE observable signals settings
+ * @{
+ */
+#define CONFIG_CC2538_RF_OBS_SIG_0_PCX  5   /* PC5 */
+#define CONFIG_CC2538_RF_OBS_SIG_1_PCX  6   /* PC6 */
+#define CONFIG_CC2538_RF_OBS_SIG_2_PCX  7   /* PC7 */
 /** @} */
 
 /**

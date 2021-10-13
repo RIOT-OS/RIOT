@@ -14,31 +14,31 @@
  */
 
 #include "net/gnrc/pktbuf.h"
+#include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/netif/raw.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 #include "debug.h"
 
 #define IP_VERSION_MASK (0xf0U)
 #define IP_VERSION4     (0x40U)
 #define IP_VERSION6     (0x60U)
 
-
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
 
 static const gnrc_netif_ops_t raw_ops = {
+    .init = gnrc_netif_default_init,
     .send = _send,
     .recv = _recv,
     .get = gnrc_netif_get_from_netdev,
     .set = gnrc_netif_set_from_netdev,
 };
 
-gnrc_netif_t *gnrc_netif_raw_create(char *stack, int stacksize,
-                                    char priority, char *name,
-                                    netdev_t *dev)
+int gnrc_netif_raw_create(gnrc_netif_t *netif, char *stack, int stacksize,
+                          char priority, char *name, netdev_t *dev)
 {
-    return gnrc_netif_create(stack, stacksize, priority, name, dev,
+    return gnrc_netif_create(netif, stack, stacksize, priority, name, dev,
                              &raw_ops);
 }
 
@@ -54,6 +54,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
     gnrc_pktsnip_t *pkt = NULL;
 
     if (bytes_expected > 0) {
+        gnrc_pktsnip_t *hdr;
         int nread;
 
         pkt = gnrc_pktbuf_add(NULL, NULL, bytes_expected, GNRC_NETTYPE_UNDEF);
@@ -70,6 +71,19 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             gnrc_pktbuf_release(pkt);
             return NULL;
         }
+        hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+        if (!hdr) {
+            DEBUG("gnrc_netif_raw: cannot allocate pktsnip.\n");
+            gnrc_pktbuf_release(pkt);
+            return NULL;
+        }
+        gnrc_netif_hdr_set_netif(hdr->data, netif);
+        LL_APPEND(pkt, hdr);
+#ifdef MODULE_NETSTATS_L2
+        netif->stats.rx_count++;
+        netif->stats.rx_bytes += nread;
+#endif
+
         if (nread < bytes_expected) {
             /* we've got less then the expected packet size,
              * so free the unused space.*/
@@ -102,7 +116,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     netdev_t *dev = netif->dev;
 
 #ifdef MODULE_NETSTATS_L2
-    dev->stats.tx_unicast_count++;
+    netif->stats.tx_unicast_count++;
 #endif
 
     res = dev->driver->send(dev, (iolist_t *)pkt);

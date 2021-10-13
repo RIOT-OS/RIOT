@@ -18,13 +18,20 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
+#include <assert.h>
+#include <ctype.h>
+#include <limits.h>
 #include <stdio.h>
+#include <string.h>
 
+#include "net/netif.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/lora.h"
+#include "net/loramac.h"
+#include "fmt.h"
 
 #ifdef MODULE_NETSTATS
 #include "net/netstats.h"
@@ -44,11 +51,6 @@
 #define _LINE_THRESHOLD                 (8U)
 
 /**
- * @brief   Determine length of array in elements
- */
-#define _ARRAY_LEN(x)                   (sizeof(x) / sizeof(x[0]))
-
-/**
  * @brief   Flag command mapping
  *
  * @note    Add options that are changed with netopt_enable_t here
@@ -57,6 +59,7 @@ static const struct {
     char *name;
     netopt_t opt;
 } flag_cmds[] = {
+    { "6lo", NETOPT_6LO },
     { "ack_req", NETOPT_ACK_REQ },
     { "autoack", NETOPT_AUTOACK },
     { "autocca", NETOPT_AUTOCCA },
@@ -67,28 +70,68 @@ static const struct {
     { "iphc", NETOPT_6LO_IPHC },
     { "preload", NETOPT_PRELOADING },
     { "promisc", NETOPT_PROMISCUOUSMODE },
+    { "phy_busy", NETOPT_PHY_BUSY },
     { "raw", NETOPT_RAWMODE },
     { "rtr_adv", NETOPT_IPV6_SND_RTR_ADV },
     { "iq_invert", NETOPT_IQ_INVERT },
     { "rx_single", NETOPT_SINGLE_RECEIVE },
-    { "chan_hop", NETOPT_CHANNEL_HOP }
+    { "chan_hop", NETOPT_CHANNEL_HOP },
+    { "checksum", NETOPT_CHECKSUM },
+    { "otaa", NETOPT_OTAA },
+    { "link_check", NETOPT_LINK_CHECK },
 };
 
 /* utility functions */
-static bool _is_number(char *str)
+static void _print_iface_name(netif_t *iface)
 {
-    for (; *str; str++) {
-        if (*str < '0' || *str > '9') {
-            return false;
-        }
-    }
-
-    return true;
+    char name[CONFIG_NETIF_NAMELENMAX];
+    netif_get_name(iface, name);
+    printf("%s", name);
 }
 
-static inline bool _is_iface(kernel_pid_t iface)
+__attribute__ ((unused))
+static void str_toupper(char *str)
 {
-    return (gnrc_netif_get_by_pid(iface) != NULL);
+    while (*str) {
+        *str = toupper((unsigned) *str);
+        ++str;
+    }
+}
+
+__attribute__ ((unused))
+static uint8_t gcd(uint8_t a, uint8_t b)
+{
+    if (a == 0 || b == 0) {
+        return 0;
+    }
+
+    do {
+        uint8_t r = a % b;
+        a = b;
+        b = r;
+    } while (b);
+
+    return a;
+}
+
+__attribute__ ((unused))
+static void frac_short(uint8_t *a, uint8_t *b)
+{
+    uint8_t d = gcd(*a, *b);
+
+    if (d == 0) {
+        return;
+    }
+
+    *a /= d;
+    *b /= d;
+}
+
+__attribute__ ((unused))
+static void frac_extend(uint8_t *a, uint8_t *b, uint8_t base)
+{
+    *a *= base / *b;
+    *b  = base;
 }
 
 #ifdef MODULE_NETSTATS
@@ -106,11 +149,11 @@ static const char *_netstats_module_to_str(uint8_t module)
     }
 }
 
-static int _netif_stats(kernel_pid_t iface, unsigned module, bool reset)
+static int _netif_stats(netif_t *iface, unsigned module, bool reset)
 {
     netstats_t *stats;
-    int res = gnrc_netapi_get(iface, NETOPT_STATS, module, &stats,
-                              sizeof(&stats));
+    int res = netif_get_opt(iface, NETOPT_STATS, module, &stats,
+                            sizeof(&stats));
 
     if (res < 0) {
         puts("           Protocol or device doesn't provide statistics.");
@@ -138,6 +181,11 @@ static int _netif_stats(kernel_pid_t iface, unsigned module, bool reset)
 }
 #endif /* MODULE_NETSTATS */
 
+static void _link_usage(char *cmd_name)
+{
+    printf("usage: %s <if_id> [up|down]\n", cmd_name);
+}
+
 static void _set_usage(char *cmd_name)
 {
     printf("usage: %s <if_id> set <key> <value>\n", cmd_name);
@@ -150,6 +198,7 @@ static void _set_usage(char *cmd_name)
          "       * \"freq\" - sets the \"channel\" center frequency\n"
          "       * \"channel\" - sets the frequency channel\n"
          "       * \"chan\" - alias for \"channel\"\n"
+         "       * \"checksum\" - set checksumming on-off\n"
          "       * \"csma_retries\" - set max. number of channel access attempts\n"
          "       * \"encrypt\" - set the encryption on-off\n"
          "       * \"hop_limit\" - set hop limit\n"
@@ -160,9 +209,37 @@ static void _set_usage(char *cmd_name)
          "       * \"page\" - set the channel page (IEEE 802.15.4)\n"
          "       * \"pan\" - alias for \"nid\"\n"
          "       * \"pan_id\" - alias for \"nid\"\n"
+         "       * \"phy_busy\" - set busy mode on-off\n"
+#ifdef MODULE_GNRC_NETIF_CMD_LORA
          "       * \"bw\" - alias for channel bandwidth\n"
          "       * \"sf\" - alias for spreading factor\n"
          "       * \"cr\" - alias for coding rate\n"
+         "       * \"appeui\" - sets Application EUI\n"
+         "       * \"appkey\" - sets Application key\n"
+         "       * \"appskey\" - sets Application session key\n"
+         "       * \"deveui\" - sets Device EUI\n"
+         "       * \"dr\" - sets datarate\n"
+         "       * \"rx2_dr\" - sets datarate of RX2 (lorawan)\n"
+         "       * \"nwkskey\" - sets Network Session Key\n"
+#endif
+#ifdef MODULE_NETDEV_IEEE802154_MULTIMODE
+         "       * \"phy_mode\" - select PHY mode\n"
+#endif
+#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+         "       * \"chip_rate\" - BPSK/QPSK chip rate in kChip/s\n"
+         "       * \"rate_mode\" - BPSK/QPSK rate mode\n"
+#endif
+#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+         "       * \"option\" - OFDM option\n"
+         "       * \"scheme\" - OFDM modulation & coding scheme\n"
+#endif
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+         "       * \"modulation_index\" - FSK modulation index\n"
+         "       * \"modulation_order\" - FSK modulation order\n"
+         "       * \"symbol_rate\" - FSK symbol rate\n"
+         "       * \"fec\" - FSK forward error correction\n"
+         "       * \"channel_spacing\" - channel spacing\n"
+#endif
          "       * \"power\" - TX power in dBm\n"
          "       * \"retrans\" - max. number of retransmissions\n"
          "       * \"src_len\" - sets the source address length in byte\n"
@@ -172,9 +249,9 @@ static void _set_usage(char *cmd_name)
 static void _flag_usage(char *cmd_name)
 {
     printf("usage: %s <if_id> [-]{", cmd_name);
-    for (unsigned i = 0; i < _ARRAY_LEN(flag_cmds); i++) {
+    for (unsigned i = 0; i < ARRAY_SIZE(flag_cmds); i++) {
         printf("%s", flag_cmds[i].name);
-        if (i < (_ARRAY_LEN(flag_cmds) - 1)) {
+        if (i < (ARRAY_SIZE(flag_cmds) - 1)) {
             printf("|");
         }
     }
@@ -212,6 +289,22 @@ static void _print_netopt(netopt_t opt)
             printf("long address");
             break;
 
+        case NETOPT_LORAWAN_APPKEY:
+            printf("AppKey");
+            break;
+
+        case NETOPT_LORAWAN_APPSKEY:
+            printf("AppSKey");
+            break;
+
+        case NETOPT_LORAWAN_NWKSKEY:
+            printf("NwkSKey");
+            break;
+
+        case NETOPT_LORAWAN_APPEUI:
+            printf("AppEUI");
+            break;
+
         case NETOPT_SRC_LEN:
             printf("source address length");
             break;
@@ -229,10 +322,10 @@ static void _print_netopt(netopt_t opt)
             break;
 
         case NETOPT_HOP_LIMIT:
-            printf("MTU");
+            printf("hop limit");
             break;
 
-        case NETOPT_MAX_PACKET_SIZE:
+        case NETOPT_MAX_PDU_SIZE:
             printf("MTU");
             break;
 
@@ -264,6 +357,7 @@ static void _print_netopt(netopt_t opt)
             printf("encryption key");
             break;
 
+#ifdef MODULE_GNRC_NETIF_CMD_LORA
         case NETOPT_BANDWIDTH:
             printf("bandwidth");
             break;
@@ -274,6 +368,90 @@ static void _print_netopt(netopt_t opt)
 
         case NETOPT_CODING_RATE:
             printf("coding rate");
+            break;
+#endif /* MODULE_GNRC_NETIF_CMD_LORA */
+#ifdef MODULE_NETDEV_IEEE802154_MULTIMODE
+
+        case NETOPT_IEEE802154_PHY:
+            printf("PHY mode");
+            break;
+
+#endif /* MODULE_NETDEV_IEEE802154_MULTIMODE */
+#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+
+        case NETOPT_OQPSK_RATE:
+            printf("high rate");
+            break;
+
+#endif /* MODULE_NETDEV_IEEE802154_OQPSK */
+#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+
+        case NETOPT_MR_OQPSK_CHIPS:
+            printf("chip rate");
+            break;
+
+        case NETOPT_MR_OQPSK_RATE:
+            printf("rate mode");
+            break;
+
+#endif /* MODULE_NETDEV_IEEE802154_MR_OQPSK */
+#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+
+        case NETOPT_MR_OFDM_OPTION:
+            printf("OFDM option");
+            break;
+
+        case NETOPT_MR_OFDM_MCS:
+            printf("modulation/coding scheme");
+            break;
+
+#endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+
+        case NETOPT_MR_FSK_MODULATION_INDEX:
+            printf("FSK modulation index");
+            break;
+
+        case NETOPT_MR_FSK_MODULATION_ORDER:
+            printf("FSK modulation order");
+            break;
+
+        case NETOPT_MR_FSK_SRATE:
+            printf("FSK symbol rate");
+            break;
+
+        case NETOPT_MR_FSK_FEC:
+            printf("FSK Forward Error Correction");
+            break;
+
+        case NETOPT_CHANNEL_SPACING:
+            printf("Channel Spacing");
+            break;
+
+#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
+
+        case NETOPT_CHECKSUM:
+            printf("checksum");
+            break;
+
+        case NETOPT_OTAA:
+            printf("otaa");
+            break;
+
+        case NETOPT_LINK_CHECK:
+            printf("link check");
+            break;
+
+        case NETOPT_PHY_BUSY:
+            printf("PHY busy");
+            break;
+
+        case NETOPT_LORAWAN_DR:
+            printf("datarate");
+            break;
+
+        case NETOPT_LORAWAN_RX2_DR:
+            printf("RX2 datarate");
             break;
 
         default:
@@ -292,6 +470,7 @@ static const char *_netopt_state_str[] = {
     [NETOPT_STATE_STANDBY] = "STANDBY"
 };
 
+#ifdef MODULE_GNRC_NETIF_CMD_LORA
 static const char *_netopt_bandwidth_str[] = {
     [LORA_BW_125_KHZ] = "125",
     [LORA_BW_250_KHZ] = "250",
@@ -304,6 +483,39 @@ static const char *_netopt_coding_rate_str[] = {
     [LORA_CR_4_7] = "4/7",
     [LORA_CR_4_8] = "4/8"
 };
+#endif
+
+#ifdef MODULE_NETDEV_IEEE802154
+static const char *_netopt_ieee802154_phy_str[] = {
+    [IEEE802154_PHY_DISABLED] = "DISABLED",
+    [IEEE802154_PHY_BPSK] = "BPSK",
+    [IEEE802154_PHY_ASK] = "ASK",
+    [IEEE802154_PHY_OQPSK] = "O-QPSK",
+    [IEEE802154_PHY_MR_OQPSK] = "MR-O-QPSK",
+    [IEEE802154_PHY_MR_OFDM] = "MR-OFDM",
+    [IEEE802154_PHY_MR_FSK] = "MR-FSK"
+};
+#endif
+
+#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+static const char *_netopt_ofdm_mcs_str[] = {
+    [0] = "BPSK, rate 1/2, 4x frequency repetition",
+    [1] = "BPSK, rate 1/2, 2x frequency repetition",
+    [2] = "QPSK, rate 1/2, 2x frequency repetition",
+    [3] = "QPSK, rate 1/2",
+    [4] = "QPSK, rate 3/4",
+    [5] = "16-QAM, rate 1/2",
+    [6] = "16-QAM, rate 3/4",
+};
+#endif
+
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+static const char *_netopt_fec_str[] = {
+    [IEEE802154_FEC_NONE] = "none",
+    [IEEE802154_FEC_NRNSC] = "NRNSC",
+    [IEEE802154_FEC_RSC] = "RSC"
+};
+#endif
 
 /* for some lines threshold might just be 0, so we can't use _LINE_THRESHOLD
  * here */
@@ -316,12 +528,11 @@ static unsigned _newline(unsigned threshold, unsigned line_thresh)
     return line_thresh;
 }
 
-
-static unsigned _netif_list_flag(kernel_pid_t iface, netopt_t opt, char *str,
+static unsigned _netif_list_flag(netif_t *iface, netopt_t opt, char *str,
                                  unsigned line_thresh)
 {
     netopt_enable_t enable = NETOPT_DISABLE;
-    int res = gnrc_netapi_get(iface, opt, 0, &enable,
+    int res = netif_get_opt(iface, opt, 0, &enable,
                               sizeof(enable));
 
     if ((res >= 0) && (enable == NETOPT_ENABLE)) {
@@ -335,51 +546,60 @@ static unsigned _netif_list_flag(kernel_pid_t iface, netopt_t opt, char *str,
 static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
 {
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
-    unsigned line_thresh = _LINE_THRESHOLD;
 
     printf("inet6 addr: ");
     ipv6_addr_to_str(addr_str, addr, sizeof(addr_str));
     printf("%s  scope: ", addr_str);
-    if ((ipv6_addr_is_link_local(addr))) {
-        printf("local");
+    if (ipv6_addr_is_link_local(addr)) {
+        printf("link");
+    }
+    else if (ipv6_addr_is_site_local(addr)) {
+        printf("site");
+    }
+    else if (ipv6_addr_is_global(addr)) {
+        printf("global");
     }
     else {
-        printf("global");
+        printf("unknown");
     }
     if (flags & GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST) {
         printf(" [anycast]");
     }
-    switch (flags & GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK) {
-        case GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE:
-            printf("  TNT");
-            break;
-        case GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_DEPRECATED:
-            printf("  DPR");
-            break;
-        case GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID:
-            printf("  VAL");
-            break;
+    if (flags & GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE) {
+        printf("  TNT[%u]",
+               flags & GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE);
     }
-    line_thresh = _newline(0U, line_thresh);
+    else {
+        switch (flags & GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK) {
+            case GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_DEPRECATED:
+                printf("  DPR");
+                break;
+            case GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID:
+                printf("  VAL");
+                break;
+            default:
+                printf("  UNK");
+                break;
+        }
+    }
+    _newline(0U, _LINE_THRESHOLD);
 }
 
 static void _netif_list_groups(ipv6_addr_t *addr)
 {
-    unsigned line_thresh = _LINE_THRESHOLD;
-
     if ((ipv6_addr_is_multicast(addr))) {
         char addr_str[IPV6_ADDR_MAX_STR_LEN];
         ipv6_addr_to_str(addr_str, addr, sizeof(addr_str));
         printf("inet6 group: %s", addr_str);
     }
-    line_thresh = _newline(0U, line_thresh);
+    _newline(0U, _LINE_THRESHOLD);
 }
 #endif
 
-static void _netif_list(kernel_pid_t iface)
+static void _netif_list(netif_t *iface)
 {
 #ifdef MODULE_GNRC_IPV6
-    ipv6_addr_t ipv6_addrs[GNRC_NETIF_IPV6_ADDRS_NUMOF];
+    ipv6_addr_t ipv6_addrs[CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF];
     ipv6_addr_t ipv6_groups[GNRC_NETIF_IPV6_GROUPS_NUMOF];
 #endif
     uint8_t hwaddr[GNRC_NETIF_L2ADDR_MAXLEN];
@@ -387,51 +607,144 @@ static void _netif_list(kernel_pid_t iface)
     uint16_t u16;
     int16_t i16;
     uint8_t u8;
+    int8_t i8;
     int res;
     netopt_state_t state;
     unsigned line_thresh = 1;
 
-    printf("Iface %2d ", iface);
-    res = gnrc_netapi_get(iface, NETOPT_ADDRESS, 0, hwaddr, sizeof(hwaddr));
+    printf("Iface  ");
+    _print_iface_name(iface);
+    printf(" ");
+
+    /* XXX divide options and flags by at least two spaces! */
+    res = netif_get_opt(iface, NETOPT_ADDRESS, 0, hwaddr, sizeof(hwaddr));
     if (res >= 0) {
         char hwaddr_str[res * 3];
         printf(" HWaddr: %s ",
                gnrc_netif_addr_to_str(hwaddr, res, hwaddr_str));
     }
-    res = gnrc_netapi_get(iface, NETOPT_CHANNEL, 0, &u16, sizeof(u16));
+    res = netif_get_opt(iface, NETOPT_CHANNEL, 0, &u16, sizeof(u16));
     if (res >= 0) {
         printf(" Channel: %" PRIu16 " ", u16);
     }
-    res = gnrc_netapi_get(iface, NETOPT_CHANNEL_FREQUENCY, 0, &u32, sizeof(u32));
+    res = netif_get_opt(iface, NETOPT_CHANNEL_FREQUENCY, 0, &u32, sizeof(u32));
     if (res >= 0) {
         printf(" Frequency: %" PRIu32 "Hz ", u32);
     }
-    res = gnrc_netapi_get(iface, NETOPT_CHANNEL_PAGE, 0, &u16, sizeof(u16));
+    res = netif_get_opt(iface, NETOPT_CHANNEL_PAGE, 0, &u16, sizeof(u16));
     if (res >= 0) {
         printf(" Page: %" PRIu16 " ", u16);
     }
-    res = gnrc_netapi_get(iface, NETOPT_NID, 0, &u16, sizeof(u16));
+    res = netif_get_opt(iface, NETOPT_NID, 0, &u16, sizeof(u16));
     if (res >= 0) {
-        printf(" NID: 0x%" PRIx16, u16);
+        printf(" NID: 0x%" PRIx16 " ", u16);
     }
-    res = gnrc_netapi_get(iface, NETOPT_BANDWIDTH, 0, &u8, sizeof(u8));
+    res = netif_get_opt(iface, NETOPT_RSSI, 0, &i8, sizeof(i8));
+    if (res >= 0) {
+        printf(" RSSI: %d ", i8);
+    }
+#ifdef MODULE_GNRC_NETIF_CMD_LORA
+    res = netif_get_opt(iface, NETOPT_BANDWIDTH, 0, &u8, sizeof(u8));
     if (res >= 0) {
         printf(" BW: %skHz ", _netopt_bandwidth_str[u8]);
     }
-    res = gnrc_netapi_get(iface, NETOPT_SPREADING_FACTOR, 0, &u8, sizeof(u8));
+    res = netif_get_opt(iface, NETOPT_SPREADING_FACTOR, 0, &u8, sizeof(u8));
     if (res >= 0) {
         printf(" SF: %u ", u8);
     }
-    res = gnrc_netapi_get(iface, NETOPT_CODING_RATE, 0, &u8, sizeof(u8));
+    res = netif_get_opt(iface, NETOPT_CODING_RATE, 0, &u8, sizeof(u8));
     if (res >= 0) {
         printf(" CR: %s ", _netopt_coding_rate_str[u8]);
     }
-    res = gnrc_netapi_get(iface, NETOPT_LINK_CONNECTED, 0, &u8, sizeof(u8));
+#endif /* MODULE_GNRC_NETIF_CMD_LORA */
+#ifdef MODULE_NETDEV_IEEE802154
+    res = netif_get_opt(iface, NETOPT_IEEE802154_PHY, 0, &u8, sizeof(u8));
     if (res >= 0) {
-        printf(" Link: %s ", (netopt_enable_t)u8 ? "up" : "down" );
+        printf(" PHY: %s ", _netopt_ieee802154_phy_str[u8]);
+        switch (u8) {
+
+#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+        case IEEE802154_PHY_OQPSK:
+            printf("\n          ");
+            res = netif_get_opt(iface, NETOPT_OQPSK_RATE, 0, &u8, sizeof(u8));
+            if (res >= 0 && u8) {
+                printf(" high data rate: %d ", u8);
+            }
+
+            break;
+
+#endif /* MODULE_NETDEV_IEEE802154_OQPSK */
+#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+        case IEEE802154_PHY_MR_OQPSK:
+            printf("\n          ");
+            res = netif_get_opt(iface, NETOPT_MR_OQPSK_CHIPS, 0, &u16, sizeof(u16));
+            if (res >= 0) {
+                printf(" chip rate: %u ", u16);
+            }
+            res = netif_get_opt(iface, NETOPT_MR_OQPSK_RATE, 0, &u8, sizeof(u8));
+            if (res >= 0) {
+                printf(" rate mode: %d ", u8);
+            }
+
+            break;
+
+#endif /* MODULE_NETDEV_IEEE802154_MR_OQPSK */
+#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+        case IEEE802154_PHY_MR_OFDM:
+            printf("\n          ");
+            res = netif_get_opt(iface, NETOPT_MR_OFDM_OPTION, 0, &u8, sizeof(u8));
+            if (res >= 0) {
+                printf(" Option: %u ", u8);
+            }
+            res = netif_get_opt(iface, NETOPT_MR_OFDM_MCS, 0, &u8, sizeof(u8));
+            if (res >= 0) {
+                printf(" MCS: %u (%s) ", u8, _netopt_ofdm_mcs_str[u8]);
+            }
+
+            break;
+#endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+        case IEEE802154_PHY_MR_FSK:
+            printf("\n          ");
+            res = netif_get_opt(iface, NETOPT_MR_FSK_MODULATION_INDEX, 0, &u8, sizeof(u8));
+            if (res >= 0) {
+                hwaddr[0] = 64; /* convenient temp var */
+                frac_short(&u8, hwaddr);
+                if (hwaddr[0] == 1) {
+                    printf(" modulation index: %u ", u8);
+                } else {
+                    printf(" modulation index: %u/%u ", u8, hwaddr[0]);
+                }
+            }
+            res = netif_get_opt(iface, NETOPT_MR_FSK_MODULATION_ORDER, 0, &u8, sizeof(u8));
+            if (res >= 0) {
+                printf(" %u-FSK ", u8);
+            }
+            res = netif_get_opt(iface, NETOPT_MR_FSK_SRATE, 0, &u16, sizeof(u16));
+            if (res >= 0) {
+                printf(" symbol rate: %u kHz ", u16);
+            }
+            res = netif_get_opt(iface, NETOPT_MR_FSK_FEC, 0, &u8, sizeof(u8));
+            if (res >= 0) {
+                printf(" FEC: %s ", _netopt_fec_str[u8]);
+            }
+            res = netif_get_opt(iface, NETOPT_CHANNEL_SPACING, 0, &u16, sizeof(u16));
+            if (res >= 0) {
+                printf(" BW: %ukHz ", u16);
+            }
+
+            break;
+#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
+        }
+    }
+#endif /* MODULE_NETDEV_IEEE802154 */
+    netopt_enable_t link;
+    res = netif_get_opt(iface, NETOPT_LINK, 0, &link, sizeof(netopt_enable_t));
+    if (res >= 0) {
+        printf(" Link: %s ", (link == NETOPT_ENABLE) ? "up" : "down" );
     }
     line_thresh = _newline(0U, line_thresh);
-    res = gnrc_netapi_get(iface, NETOPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
+    res = netif_get_opt(iface, NETOPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
     if (res >= 0) {
         char hwaddr_str[res * 3];
         printf("Long HWaddr: ");
@@ -439,29 +752,42 @@ static void _netif_list(kernel_pid_t iface)
         line_thresh++;
     }
     line_thresh = _newline(0U, line_thresh);
-    res = gnrc_netapi_get(iface, NETOPT_TX_POWER, 0, &i16, sizeof(i16));
+    res = netif_get_opt(iface, NETOPT_TX_POWER, 0, &i16, sizeof(i16));
     if (res >= 0) {
         printf(" TX-Power: %" PRIi16 "dBm ", i16);
     }
-    res = gnrc_netapi_get(iface, NETOPT_STATE, 0, &state, sizeof(state));
+    res = netif_get_opt(iface, NETOPT_STATE, 0, &state, sizeof(state));
     if (res >= 0) {
         printf(" State: %s ", _netopt_state_str[state]);
         line_thresh++;
     }
-    res = gnrc_netapi_get(iface, NETOPT_RETRANS, 0, &u8, sizeof(u8));
+    res = netif_get_opt(iface, NETOPT_RETRANS, 0, &u8, sizeof(u8));
     if (res >= 0) {
         printf(" max. Retrans.: %u ", (unsigned)u8);
         line_thresh++;
     }
-    res = gnrc_netapi_get(iface, NETOPT_CSMA_RETRIES, 0, &u8, sizeof(u8));
+    res = netif_get_opt(iface, NETOPT_CSMA_RETRIES, 0, &u8, sizeof(u8));
     if (res >= 0) {
         netopt_enable_t enable = NETOPT_DISABLE;
-        res = gnrc_netapi_get(iface, NETOPT_CSMA, 0, &enable, sizeof(enable));
+        res = netif_get_opt(iface, NETOPT_CSMA, 0, &enable, sizeof(enable));
         if ((res >= 0) && (enable == NETOPT_ENABLE)) {
             printf(" CSMA Retries: %u ", (unsigned)u8);
         }
         line_thresh++;
     }
+#ifdef MODULE_GNRC_NETIF_CMD_LORA
+    res = netif_get_opt(iface, NETOPT_DEMOD_MARGIN, 0, &u8, sizeof(u8));
+    if (res >= 0) {
+        printf(" Demod margin.: %u ", (unsigned) u8);
+        line_thresh++;
+    }
+    res = netif_get_opt(iface, NETOPT_NUM_GATEWAYS, 0, &u8, sizeof(u8));
+    if (res >= 0) {
+        printf(" Num gateways.: %u ", (unsigned) u8);
+        line_thresh++;
+    }
+#endif
+    /* XXX divide options and flags by at least two spaces! */
     line_thresh = _newline(0U, line_thresh);
     line_thresh = _netif_list_flag(iface, NETOPT_PROMISCUOUSMODE, "PROMISC  ",
                                    line_thresh);
@@ -478,21 +804,29 @@ static void _netif_list(kernel_pid_t iface)
     line_thresh = _netif_list_flag(iface, NETOPT_CSMA, "CSMA  ",
                                    line_thresh);
     line_thresh += _LINE_THRESHOLD + 1; /* enforce linebreak after this option */
-    line_thresh = _netif_list_flag(iface, NETOPT_AUTOCCA, "AUTOCCA",
+    line_thresh = _netif_list_flag(iface, NETOPT_AUTOCCA, "AUTOCCA  ",
                                    line_thresh);
-    line_thresh = _netif_list_flag(iface, NETOPT_IQ_INVERT, "IQ_INVERT",
+    line_thresh = _netif_list_flag(iface, NETOPT_IQ_INVERT, "IQ_INVERT  ",
                                    line_thresh);
-    line_thresh = _netif_list_flag(iface, NETOPT_SINGLE_RECEIVE, "RX_SINGLE",
+    line_thresh = _netif_list_flag(iface, NETOPT_SINGLE_RECEIVE, "RX_SINGLE  ",
                                    line_thresh);
-    line_thresh = _netif_list_flag(iface, NETOPT_CHANNEL_HOP, "CHAN_HOP",
+    line_thresh = _netif_list_flag(iface, NETOPT_CHANNEL_HOP, "CHAN_HOP  ",
                                    line_thresh);
+    line_thresh = _netif_list_flag(iface, NETOPT_OTAA, "OTAA  ",
+                                   line_thresh);
+    /* XXX divide options and flags by at least two spaces! */
+    res = netif_get_opt(iface, NETOPT_MAX_PDU_SIZE, 0, &u16, sizeof(u16));
+    if (res > 0) {
+        printf("L2-PDU:%" PRIu16 "  ", u16);
+        line_thresh++;
+    }
 #ifdef MODULE_GNRC_IPV6
-    res = gnrc_netapi_get(iface, NETOPT_MAX_PACKET_SIZE, GNRC_NETTYPE_IPV6, &u16, sizeof(u16));
+    res = netif_get_opt(iface, NETOPT_MAX_PDU_SIZE, GNRC_NETTYPE_IPV6, &u16, sizeof(u16));
     if (res > 0) {
         printf("MTU:%" PRIu16 "  ", u16);
         line_thresh++;
     }
-    res = gnrc_netapi_get(iface, NETOPT_HOP_LIMIT, 0, &u8, sizeof(u8));
+    res = netif_get_opt(iface, NETOPT_HOP_LIMIT, 0, &u8, sizeof(u8));
     if (res > 0) {
         printf("HL:%u  ", u8);
         line_thresh++;
@@ -504,38 +838,42 @@ static void _netif_list(kernel_pid_t iface)
 #endif
     line_thresh = _netif_list_flag(iface, NETOPT_IPV6_SND_RTR_ADV, "RTR_ADV  ",
                                    line_thresh);
+#ifdef MODULE_GNRC_SIXLOWPAN
+    line_thresh = _netif_list_flag(iface, NETOPT_6LO, "6LO  ", line_thresh);
+#endif
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
     line_thresh += _LINE_THRESHOLD + 1; /* enforce linebreak after this option */
     line_thresh = _netif_list_flag(iface, NETOPT_6LO_IPHC, "IPHC  ",
                                    line_thresh);
 #endif
 #endif
-    res = gnrc_netapi_get(iface, NETOPT_SRC_LEN, 0, &u16, sizeof(u16));
+    res = netif_get_opt(iface, NETOPT_SRC_LEN, 0, &u16, sizeof(u16));
+    /* XXX divide options and flags by at least two spaces before this line! */
     if (res >= 0) {
-        printf("Source address length: %" PRIu16 , u16);
+        printf("Source address length: %" PRIu16, u16);
         line_thresh++;
     }
     line_thresh = _newline(0U, line_thresh);
 #ifdef MODULE_GNRC_IPV6
     printf("Link type: %s",
-           (gnrc_netapi_get(iface, NETOPT_IS_WIRED, 0, &u16, sizeof(u16)) > 0) ?
+           (netif_get_opt(iface, NETOPT_IS_WIRED, 0, &u16, sizeof(u16)) > 0) ?
             "wired" : "wireless");
-    line_thresh = _newline(0U, ++line_thresh);
-    res = gnrc_netapi_get(iface, NETOPT_IPV6_ADDR, 0, ipv6_addrs,
+    _newline(0U, ++line_thresh);
+    res = netif_get_opt(iface, NETOPT_IPV6_ADDR, 0, ipv6_addrs,
                           sizeof(ipv6_addrs));
     if (res >= 0) {
-        uint8_t ipv6_addrs_flags[GNRC_NETIF_IPV6_ADDRS_NUMOF];
+        uint8_t ipv6_addrs_flags[CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF];
 
         memset(ipv6_addrs_flags, 0, sizeof(ipv6_addrs_flags));
         /* assume it to succeed (otherwise array will stay 0) */
-        gnrc_netapi_get(iface, NETOPT_IPV6_ADDR_FLAGS, 0, ipv6_addrs_flags,
+        netif_get_opt(iface, NETOPT_IPV6_ADDR_FLAGS, 0, ipv6_addrs_flags,
                         sizeof(ipv6_addrs_flags));
         /* yes, the res of NETOPT_IPV6_ADDR is meant to be here ;-) */
         for (unsigned i = 0; i < (res / sizeof(ipv6_addr_t)); i++) {
             _netif_list_ipv6(&ipv6_addrs[i], ipv6_addrs_flags[i]);
         }
     }
-    res = gnrc_netapi_get(iface, NETOPT_IPV6_GROUP, 0, ipv6_groups,
+    res = netif_get_opt(iface, NETOPT_IPV6_GROUP, 0, ipv6_groups,
                           sizeof(ipv6_groups));
     if (res >= 0) {
         for (unsigned i = 0; i < (res / sizeof(ipv6_addr_t)); i++) {
@@ -546,7 +884,7 @@ static void _netif_list(kernel_pid_t iface)
 
 #ifdef MODULE_L2FILTER
     l2filter_t *filter = NULL;
-    res = gnrc_netapi_get(iface, NETOPT_L2FILTER, 0, &filter, sizeof(filter));
+    res = netif_get_opt(iface, NETOPT_L2FILTER, 0, &filter, sizeof(filter));
     if (res > 0) {
 #ifdef MODULE_L2FILTER_WHITELIST
         puts("\n           White-listed link layer addresses:");
@@ -554,7 +892,7 @@ static void _netif_list(kernel_pid_t iface)
         puts("\n           Black-listed link layer addresses:");
 #endif
         int count = 0;
-        for (unsigned i = 0; i < L2FILTER_LISTSIZE; i++) {
+        for (unsigned i = 0; i < CONFIG_L2FILTER_LISTSIZE; i++) {
             if (filter[i].addr_len > 0) {
                 char hwaddr_str[filter[i].addr_len * 3];
                 gnrc_netif_addr_to_str(filter[i].addr, filter[i].addr_len,
@@ -578,13 +916,13 @@ static void _netif_list(kernel_pid_t iface)
     puts("");
 }
 
-static int _netif_set_u32(kernel_pid_t iface, netopt_t opt, uint32_t context,
+static int _netif_set_u32(netif_t *iface, netopt_t opt, uint32_t context,
                           char *u32_str)
 {
     unsigned long int res;
     bool hex = false;
 
-    if (_is_number(u32_str)) {
+    if (fmt_is_number(u32_str)) {
         if ((res = strtoul(u32_str, NULL, 10)) == ULONG_MAX) {
             puts("error: unable to parse value.\n"
                  "Must be a 32-bit unsigned integer (dec or hex)\n");
@@ -603,8 +941,8 @@ static int _netif_set_u32(kernel_pid_t iface, netopt_t opt, uint32_t context,
 
     assert(res <= ULONG_MAX);
 
-    if (gnrc_netapi_set(iface, opt, context, (uint32_t *)&res,
-                        sizeof(uint32_t)) < 0) {
+    if (netif_set_opt(iface, opt, context, (uint32_t *)&res,
+                      sizeof(uint32_t)) < 0) {
         printf("error: unable to set ");
         _print_netopt(opt);
         puts("");
@@ -613,7 +951,9 @@ static int _netif_set_u32(kernel_pid_t iface, netopt_t opt, uint32_t context,
 
     printf("success: set ");
     _print_netopt(opt);
-    printf(" on interface %" PRIkernel_pid " to ", iface);
+    printf(" on interface ");
+    _print_iface_name(iface);
+    printf(" to ");
 
     if (hex) {
         printf("0x%04lx\n", res);
@@ -625,7 +965,8 @@ static int _netif_set_u32(kernel_pid_t iface, netopt_t opt, uint32_t context,
     return 0;
 }
 
-static int _netif_set_bandwidth(kernel_pid_t iface, char *value)
+#ifdef MODULE_GNRC_NETIF_CMD_LORA
+static int _netif_set_bandwidth(netif_t *iface, char *value)
 {
     uint8_t bw;
 
@@ -642,18 +983,19 @@ static int _netif_set_bandwidth(kernel_pid_t iface, char *value)
         puts("usage: ifconfig <if_id> set bw [125|250|500]");
         return 1;
     }
-    if (gnrc_netapi_set(iface, NETOPT_BANDWIDTH, 0,
-                        &bw, sizeof(uint8_t)) < 0) {
+    if (netif_set_opt(iface, NETOPT_BANDWIDTH, 0,
+                      &bw, sizeof(uint8_t)) < 0) {
         printf("error: unable to set bandwidth to %s\n", value);
         return 1;
     }
-    printf("success: set bandwidth of interface %" PRIkernel_pid " to %s\n",
-           iface, value);
+    printf("success: set bandwidth of interface ");
+    _print_iface_name(iface);
+    printf(" to %s\n", value);
 
     return 0;
 }
 
-static int _netif_set_coding_rate(kernel_pid_t iface, char *value)
+static int _netif_set_coding_rate(netif_t *iface, char *value)
 {
     uint8_t cr;
 
@@ -673,24 +1015,107 @@ static int _netif_set_coding_rate(kernel_pid_t iface, char *value)
         puts("usage: ifconfig <if_id> set cr [4/5|4/6|4/7|4/8]");
         return 1;
     }
-    if (gnrc_netapi_set(iface, NETOPT_CODING_RATE, 0,
-                        &cr, sizeof(uint8_t)) < 0) {
+    if (netif_set_opt(iface, NETOPT_CODING_RATE, 0,
+                      &cr, sizeof(uint8_t)) < 0) {
         printf("error: unable to set coding rate to %s\n", value);
         return 1;
     }
-    printf("success: set coding rate of interface %" PRIkernel_pid " to %s\n",
-           iface, value);
+    printf("success: set coding rate of interface ");
+    _print_iface_name(iface);
+    printf(" to %s\n", value);
 
     return 0;
 }
+#endif /* MODULE_GNRC_NETIF_CMD_LORA */
 
-static int _netif_set_u16(kernel_pid_t iface, netopt_t opt, uint16_t context,
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+static int _netif_set_fsk_fec(netif_t *iface, char *value)
+{
+    /* ignore case */
+    str_toupper(value);
+
+    for (size_t i = 0; i < ARRAY_SIZE(_netopt_fec_str); ++i) {
+
+        if (strcmp(value, _netopt_fec_str[i])) {
+            continue;
+        }
+
+        if (netif_set_opt(iface, NETOPT_MR_FSK_FEC, 0, &i, sizeof(uint8_t)) < 0) {
+            printf("error: unable to set forward error correction to %s\n", value);
+            return 1;
+        }
+
+        printf("success: set forward error correction to %s\n", value);
+        return 0;
+    }
+
+    puts("usage: ifconfig <if_id> set fec [none|NRNSC|RSC]");
+    return 1;
+}
+
+static int _netif_set_fsk_modulation_index(netif_t *iface, char *value)
+{
+    uint8_t a, b;
+    char* frac = strchr(value, '/');
+    if (frac) {
+        *frac = 0;
+        b = atoi(frac + 1);
+    } else {
+        b = 1;
+    }
+    a = atoi(value);
+
+    frac_extend(&a, &b, 64);
+
+    int res = netif_set_opt(iface, NETOPT_MR_FSK_MODULATION_INDEX, 0, &a, sizeof(uint8_t));
+    if (res < 0) {
+        printf("error: unable to set modulation index to %d/%d\n", a, b);
+        return 1;
+    } else {
+        printf("success: set modulation index to %d/%d\n", res, b);
+    }
+
+    return 0;
+}
+#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
+
+#ifdef MODULE_NETDEV_IEEE802154_MULTIMODE
+static int _netif_set_ieee802154_phy_mode(netif_t *iface, char *value)
+{
+    /* ignore case */
+    str_toupper(value);
+
+    for (uint8_t i = 0; i < ARRAY_SIZE(_netopt_ieee802154_phy_str); ++i) {
+
+        if (strcmp(_netopt_ieee802154_phy_str[i], value)) {
+            continue;
+        }
+
+        if (netif_set_opt(iface, NETOPT_IEEE802154_PHY, 0, &i, sizeof(uint8_t)) < 0) {
+            printf("error: unable to set PHY mode to %s\n", value);
+            return 1;
+        }
+
+        printf("success: set PHY mode %s\n", value);
+        return 0;
+    }
+
+    printf("usage: ifconfig <if_id> set phy ");
+    for (unsigned i = 0; i < ARRAY_SIZE(_netopt_ieee802154_phy_str); ++i) {
+        printf("%c%s", i ? '|' : '[', _netopt_ieee802154_phy_str[i]);
+    }
+    puts("]");
+    return 1;
+}
+#endif /* MODULE_NETDEV_IEEE802154_MULTIMODE */
+
+static int _netif_set_u16(netif_t *iface, netopt_t opt, uint16_t context,
                           char *u16_str)
 {
     unsigned long int res;
     bool hex = false;
 
-    if (_is_number(u16_str)) {
+    if (fmt_is_number(u16_str)) {
         if ((res = strtoul(u16_str, NULL, 10)) == ULONG_MAX) {
             puts("error: unable to parse value.\n"
                  "Must be a 16-bit unsigned integer (dec or hex)\n");
@@ -713,8 +1138,8 @@ static int _netif_set_u16(kernel_pid_t iface, netopt_t opt, uint16_t context,
         return 1;
     }
 
-    if (gnrc_netapi_set(iface, opt, context, (uint16_t *)&res,
-                        sizeof(uint16_t)) < 0) {
+    if (netif_set_opt(iface, opt, context, (uint16_t *)&res,
+                      sizeof(uint16_t)) < 0) {
         printf("error: unable to set ");
         _print_netopt(opt);
         puts("");
@@ -723,7 +1148,9 @@ static int _netif_set_u16(kernel_pid_t iface, netopt_t opt, uint16_t context,
 
     printf("success: set ");
     _print_netopt(opt);
-    printf(" on interface %" PRIkernel_pid " to ", iface);
+    printf(" on interface ");
+    _print_iface_name(iface);
+    printf(" to ");
 
     if (hex) {
         printf("0x%04lx\n", res);
@@ -735,11 +1162,11 @@ static int _netif_set_u16(kernel_pid_t iface, netopt_t opt, uint16_t context,
     return 0;
 }
 
-static int _netif_set_i16(kernel_pid_t iface, netopt_t opt, char *i16_str)
+static int _netif_set_i16(netif_t *iface, netopt_t opt, char *i16_str)
 {
     int16_t val = atoi(i16_str);
 
-    if (gnrc_netapi_set(iface, opt, 0, (int16_t *)&val, sizeof(int16_t)) < 0) {
+    if (netif_set_opt(iface, opt, 0, (int16_t *)&val, sizeof(int16_t)) < 0) {
         printf("error: unable to set ");
         _print_netopt(opt);
         puts("");
@@ -748,18 +1175,20 @@ static int _netif_set_i16(kernel_pid_t iface, netopt_t opt, char *i16_str)
 
     printf("success: set ");
     _print_netopt(opt);
-    printf(" on interface %" PRIkernel_pid " to %i\n", iface, val);
+    printf(" on interface ");
+    _print_iface_name(iface);
+    printf(" to %i\n", val);
 
     return 0;
 }
 
-static int _netif_set_u8(kernel_pid_t iface, netopt_t opt, uint16_t context,
+static int _netif_set_u8(netif_t *iface, netopt_t opt, uint16_t context,
                          char *u8_str)
 {
     uint8_t val = atoi(u8_str);
 
-    if (gnrc_netapi_set(iface, opt, context, (uint8_t *)&val,
-                        sizeof(uint8_t)) < 0) {
+    if (netif_set_opt(iface, opt, context, (uint8_t *)&val,
+                      sizeof(uint8_t)) < 0) {
         printf("error: unable to set ");
         _print_netopt(opt);
         puts("");
@@ -768,15 +1197,16 @@ static int _netif_set_u8(kernel_pid_t iface, netopt_t opt, uint16_t context,
 
     printf("success: set ");
     _print_netopt(opt);
-    printf(" on interface %" PRIkernel_pid " to %i\n", iface, val);
+    printf(" on interface ");
+    _print_iface_name(iface);
+    printf(" to %i\n", val);
 
     return 0;
 }
 
-static int _netif_set_flag(kernel_pid_t iface, netopt_t opt,
-                           netopt_enable_t set)
+static int _netif_set_flag(netif_t *iface, netopt_t opt, netopt_enable_t set)
 {
-    if (gnrc_netapi_set(iface, opt, 0, &set, sizeof(netopt_enable_t)) < 0) {
+    if (netif_set_opt(iface, opt, 0, &set, sizeof(netopt_enable_t)) < 0) {
         puts("error: unable to set option");
         return 1;
     }
@@ -784,7 +1214,41 @@ static int _netif_set_flag(kernel_pid_t iface, netopt_t opt,
     return 0;
 }
 
-static int _netif_set_addr(kernel_pid_t iface, netopt_t opt, char *addr_str)
+#ifdef MODULE_GNRC_NETIF_CMD_LORA
+static int _netif_set_lw_key(netif_t *iface, netopt_t opt, char *key_str)
+{
+    /* This is the longest key */
+    uint8_t key[LORAMAC_APPKEY_LEN];
+
+    size_t key_len = fmt_hex_bytes(key, key_str);
+    size_t expected_len;
+    switch (opt) {
+        case NETOPT_LORAWAN_APPKEY:
+        case NETOPT_LORAWAN_APPSKEY:
+        case NETOPT_LORAWAN_NWKSKEY:
+            /* All keys have the same length as the APP KEY */
+            expected_len = LORAMAC_APPKEY_LEN;
+            break;
+        default:
+            /* Same rationale here */
+            expected_len = LORAMAC_DEVEUI_LEN;
+    }
+    if (!key_len || key_len != expected_len) {
+        puts("error: unable to parse key.\n");
+        return 1;
+    }
+
+    netif_set_opt(iface, opt, 0, &key, expected_len);
+    printf("success: set ");
+    _print_netopt(opt);
+    printf(" on interface ");
+    _print_iface_name(iface);
+    printf(" to %s\n", key_str);
+    return 0;
+}
+#endif
+
+static int _netif_set_addr(netif_t *iface, netopt_t opt, char *addr_str)
 {
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
     size_t addr_len = gnrc_netif_addr_from_str(addr_str, addr);
@@ -796,7 +1260,7 @@ static int _netif_set_addr(kernel_pid_t iface, netopt_t opt, char *addr_str)
         return 1;
     }
 
-    if (gnrc_netapi_set(iface, opt, 0, addr, addr_len) < 0) {
+    if (netif_set_opt(iface, opt, 0, addr, addr_len) < 0) {
         printf("error: unable to set ");
         _print_netopt(opt);
         puts("");
@@ -805,12 +1269,14 @@ static int _netif_set_addr(kernel_pid_t iface, netopt_t opt, char *addr_str)
 
     printf("success: set ");
     _print_netopt(opt);
-    printf(" on interface %" PRIkernel_pid " to %s\n", iface, addr_str);
+    printf(" on interface ");
+    _print_iface_name(iface);
+    printf(" to %s\n", addr_str);
 
     return 0;
 }
 
-static int _netif_set_state(kernel_pid_t iface, char *state_str)
+static int _netif_set_state(netif_t *iface, char *state_str)
 {
     netopt_state_t state;
 
@@ -845,13 +1311,14 @@ static int _netif_set_state(kernel_pid_t iface, char *state_str)
         puts("usage: ifconfig <if_id> set state [off|sleep|idle|rx|tx|reset|standby]");
         return 1;
     }
-    if (gnrc_netapi_set(iface, NETOPT_STATE, 0,
-                        &state, sizeof(netopt_state_t)) < 0) {
+    if (netif_set_opt(iface, NETOPT_STATE, 0,
+                      &state, sizeof(netopt_state_t)) < 0) {
         printf("error: unable to set state to %s\n", _netopt_state_str[state]);
         return 1;
     }
-    printf("success: set state of interface %" PRIkernel_pid " to %s\n", iface,
-           _netopt_state_str[state]);
+    printf("success: set state of interface ");
+    _print_iface_name(iface);
+    printf(" to %s\n", _netopt_state_str[state]);
 
     return 0;
 }
@@ -871,7 +1338,7 @@ static int _hex_to_int(char c) {
     }
 }
 
-static int _netif_set_encrypt_key(kernel_pid_t iface, netopt_t opt, char *key_str)
+static int _netif_set_encrypt_key(netif_t *iface, netopt_t opt, char *key_str)
 {
     size_t str_len = strlen(key_str);
     size_t key_len = str_len / 2;
@@ -912,13 +1379,14 @@ static int _netif_set_encrypt_key(kernel_pid_t iface, netopt_t opt, char *key_st
         key[i / 2] = (uint8_t)((i1 << 4) + i2);
     }
 
-    if (gnrc_netapi_set(iface, opt, 0, key, key_len) < 0) {
+    if (netif_set_opt(iface, opt, 0, key, key_len) < 0) {
         puts("error: unable to set encryption key");
         return 1;
     }
 
-    printf("success: set encryption key on interface %" PRIkernel_pid " to \n",
-           iface);
+    printf("success: set encryption key on interface ");
+    _print_iface_name(iface);
+    printf(" to \n");
     for (size_t i = 0; i < key_len; i++) {
         /* print the hex value of the key */
         printf("%02x", key[i]);
@@ -928,25 +1396,25 @@ static int _netif_set_encrypt_key(kernel_pid_t iface, netopt_t opt, char *key_st
 }
 
 #ifdef MODULE_L2FILTER
-static int _netif_addrm_l2filter(kernel_pid_t iface, char *val, bool add)
+static int _netif_addrm_l2filter(netif_t *iface, char *val, bool add)
 {
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
     size_t addr_len = gnrc_netif_addr_from_str(val, addr);
 
-    if ((addr_len == 0) || (addr_len > L2FILTER_ADDR_MAXLEN)) {
+    if ((addr_len == 0) || (addr_len > CONFIG_L2FILTER_ADDR_MAXLEN)) {
         puts("error: given address is invalid");
         return 1;
     }
 
     if (add) {
-        if (gnrc_netapi_set(iface, NETOPT_L2FILTER, 0, addr, addr_len) < 0) {
+        if (netif_set_opt(iface, NETOPT_L2FILTER, 0, addr, addr_len) < 0) {
             puts("unable to add link layer address to filter");
             return 1;
         }
         puts("successfully added address to filter");
     }
     else {
-        if (gnrc_netapi_set(iface, NETOPT_L2FILTER_RM, 0, addr, addr_len) < 0) {
+        if (netif_set_opt(iface, NETOPT_L2FILTER_RM, 0, addr, addr_len) < 0) {
             puts("unable to remove link layer address from filter");
             return 1;
         }
@@ -964,6 +1432,7 @@ static void _l2filter_usage(const char *cmd)
 static void _usage(char *cmd)
 {
     printf("usage: %s\n", cmd);
+    _link_usage(cmd);
     _set_usage(cmd);
     _flag_usage(cmd);
     _add_usage(cmd);
@@ -976,7 +1445,7 @@ static void _usage(char *cmd)
 #endif
 }
 
-static int _netif_set(char *cmd_name, kernel_pid_t iface, char *key, char *value)
+static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
 {
     if ((strcmp("addr", key) == 0) || (strcmp("addr_short", key) == 0)) {
         return _netif_set_addr(iface, NETOPT_ADDRESS, value);
@@ -990,6 +1459,7 @@ static int _netif_set(char *cmd_name, kernel_pid_t iface, char *key, char *value
     else if ((strcmp("frequency", key) == 0) || (strcmp("freq", key) == 0)) {
         return _netif_set_u32(iface, NETOPT_CHANNEL_FREQUENCY, 0, value);
     }
+#ifdef MODULE_GNRC_NETIF_CMD_LORA
     else if ((strcmp("bandwidth", key) == 0) || (strcmp("bw", key) == 0)) {
         return _netif_set_bandwidth(iface, value);
     }
@@ -999,6 +1469,71 @@ static int _netif_set(char *cmd_name, kernel_pid_t iface, char *key, char *value
     else if ((strcmp("coding_rate", key) == 0) || (strcmp("cr", key) == 0)) {
         return _netif_set_coding_rate(iface, value);
     }
+    else if (strcmp("appeui", key) == 0) {
+        return _netif_set_lw_key(iface, NETOPT_LORAWAN_APPEUI, value);
+    }
+    else if (strcmp("appkey", key) == 0) {
+        return _netif_set_lw_key(iface, NETOPT_LORAWAN_APPKEY, value);
+    }
+    else if (strcmp("deveui", key) == 0) {
+        return _netif_set_addr(iface, NETOPT_ADDRESS_LONG, value);
+    }
+    else if (strcmp("appskey", key) == 0) {
+        return _netif_set_addr(iface, NETOPT_LORAWAN_APPSKEY, value);
+    }
+    else if (strcmp("nwkskey", key) == 0) {
+        return _netif_set_addr(iface, NETOPT_LORAWAN_NWKSKEY, value);
+    }
+    else if (strcmp("dr", key) == 0) {
+        return _netif_set_u8(iface, NETOPT_LORAWAN_DR, 0, value);
+    }
+    else if (strcmp("rx2_dr", key) == 0) {
+        return _netif_set_u8(iface, NETOPT_LORAWAN_RX2_DR, 0, value);
+    }
+#endif /* MODULE_GNRC_NETIF_CMD_LORA */
+#ifdef MODULE_NETDEV_IEEE802154_MULTIMODE
+    else if ((strcmp("phy_mode", key) == 0) || (strcmp("phy", key) == 0)) {
+        return _netif_set_ieee802154_phy_mode(iface, value);
+    }
+#endif /* MODULE_NETDEV_IEEE802154_MULTIMODE */
+#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+    else if (strcmp("high_rate", key) == 0) {
+        return _netif_set_u8(iface, NETOPT_OQPSK_RATE, 0, value);
+    }
+#endif /* MODULE_NETDEV_IEEE802154_OQPSK */
+#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+    else if ((strcmp("chip_rate", key) == 0) || (strcmp("chips", key) == 0)) {
+        return _netif_set_u16(iface, NETOPT_MR_OQPSK_CHIPS, 0, value);
+    }
+    else if (strcmp("rate_mode", key) == 0) {
+        return _netif_set_u8(iface, NETOPT_MR_OQPSK_RATE, 0, value);
+    }
+#endif /* MODULE_NETDEV_IEEE802154_MR_OQPSK */
+#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+    else if ((strcmp("option", key) == 0) || (strcmp("opt", key) == 0)) {
+        return _netif_set_u8(iface, NETOPT_MR_OFDM_OPTION, 0, value);
+    }
+    else if ((strcmp("scheme", key) == 0) || (strcmp("mcs", key) == 0)) {
+        return _netif_set_u8(iface, NETOPT_MR_OFDM_MCS, 0, value);
+    }
+#endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+    else if ((strcmp("modulation_index", key) == 0) || (strcmp("midx", key) == 0)) {
+        return _netif_set_fsk_modulation_index(iface, value);
+    }
+    else if ((strcmp("modulation_order", key) == 0) || (strcmp("mord", key) == 0)) {
+        return _netif_set_u8(iface, NETOPT_MR_FSK_MODULATION_ORDER, 0, value);
+    }
+    else if ((strcmp("symbol_rate", key) == 0) || (strcmp("srate", key) == 0)) {
+        return _netif_set_u16(iface, NETOPT_MR_FSK_SRATE, 0, value);
+    }
+    else if ((strcmp("forward_error_correction", key) == 0) || (strcmp("fec", key) == 0)) {
+        return _netif_set_fsk_fec(iface, value);
+    }
+    else if ((strcmp("channel_spacing", key) == 0) || (strcmp("bw", key) == 0)) {
+        return _netif_set_u16(iface, NETOPT_CHANNEL_SPACING, 0, value);
+    }
+#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
     else if ((strcmp("channel", key) == 0) || (strcmp("chan", key) == 0)) {
         return _netif_set_u16(iface, NETOPT_CHANNEL, 0, value);
     }
@@ -1013,7 +1548,7 @@ static int _netif_set(char *cmd_name, kernel_pid_t iface, char *key, char *value
     }
 #ifdef MODULE_GNRC_IPV6
     else if (strcmp("mtu", key) == 0) {
-        return _netif_set_u16(iface, NETOPT_MAX_PACKET_SIZE, GNRC_NETTYPE_IPV6,
+        return _netif_set_u16(iface, NETOPT_MAX_PDU_SIZE, GNRC_NETTYPE_IPV6,
                               value);
     }
 #endif
@@ -1041,7 +1576,7 @@ static int _netif_set(char *cmd_name, kernel_pid_t iface, char *key, char *value
     return 1;
 }
 
-static int _netif_flag(char *cmd, kernel_pid_t iface, char *flag)
+static int _netif_flag(char *cmd, netif_t *iface, char *flag)
 {
     netopt_enable_t set = NETOPT_ENABLE;
 
@@ -1049,7 +1584,7 @@ static int _netif_flag(char *cmd, kernel_pid_t iface, char *flag)
         set = NETOPT_DISABLE;
         flag++;
     }
-    for (unsigned i = 0; i < _ARRAY_LEN(flag_cmds); i++) {
+    for (unsigned i = 0; i < ARRAY_SIZE(flag_cmds); i++) {
         if (strcmp(flag_cmds[i].name, flag) == 0) {
             return _netif_set_flag(iface, flag_cmds[i].opt, set);
         }
@@ -1061,7 +1596,7 @@ static int _netif_flag(char *cmd, kernel_pid_t iface, char *flag)
 #ifdef MODULE_GNRC_IPV6
 static uint8_t _get_prefix_len(char *addr)
 {
-    int prefix_len = ipv6_addr_split(addr, '/', _IPV6_DEFAULT_PREFIX_LEN);
+    int prefix_len = ipv6_addr_split_int(addr, '/', _IPV6_DEFAULT_PREFIX_LEN);
 
     if (prefix_len < 1) {
         prefix_len = _IPV6_DEFAULT_PREFIX_LEN;
@@ -1071,7 +1606,16 @@ static uint8_t _get_prefix_len(char *addr)
 }
 #endif
 
-static int _netif_add(char *cmd_name, kernel_pid_t iface, int argc, char **argv)
+static int _netif_link(netif_t *iface, netopt_enable_t en)
+{
+    if (netif_set_opt(iface, NETOPT_LINK, 0, &en, sizeof(en)) < 0) {
+        printf("error: unable to set link %s\n", en == NETOPT_ENABLE ? "up" : "down");
+        return 1;
+    }
+    return 0;
+}
+
+static int _netif_add(char *cmd_name, netif_t *iface, int argc, char **argv)
 {
 #ifdef MODULE_GNRC_IPV6
     enum {
@@ -1106,8 +1650,8 @@ static int _netif_add(char *cmd_name, kernel_pid_t iface, int argc, char **argv)
     }
 
     if (ipv6_addr_is_multicast(&addr)) {
-        if (gnrc_netapi_set(iface, NETOPT_IPV6_GROUP, 0, &addr,
-                            sizeof(addr)) < 0) {
+        if (netif_set_opt(iface, NETOPT_IPV6_GROUP, 0, &addr,
+                          sizeof(addr)) < 0) {
             printf("error: unable to join IPv6 multicast group\n");
             return 1;
         }
@@ -1117,15 +1661,16 @@ static int _netif_add(char *cmd_name, kernel_pid_t iface, int argc, char **argv)
             flags |= GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST;
         }
         flags |= (prefix_len << 8U);
-        if (gnrc_netapi_set(iface, NETOPT_IPV6_ADDR, flags, &addr,
-                            sizeof(addr)) < 0) {
+        if (netif_set_opt(iface, NETOPT_IPV6_ADDR, flags, &addr,
+                          sizeof(addr)) < 0) {
             printf("error: unable to add IPv6 address\n");
             return 1;
         }
     }
 
-    printf("success: added %s/%d to interface %" PRIkernel_pid "\n", addr_str,
-           prefix_len, iface);
+    printf("success: added %s/%d to interface ", addr_str, prefix_len);
+    _print_iface_name(iface);
+    printf("\n");
 
     return 0;
 #else
@@ -1139,7 +1684,7 @@ static int _netif_add(char *cmd_name, kernel_pid_t iface, int argc, char **argv)
 #endif
 }
 
-static int _netif_del(kernel_pid_t iface, char *addr_str)
+static int _netif_del(netif_t *iface, char *addr_str)
 {
 #ifdef MODULE_GNRC_IPV6
     ipv6_addr_t addr;
@@ -1150,22 +1695,23 @@ static int _netif_del(kernel_pid_t iface, char *addr_str)
     }
 
     if (ipv6_addr_is_multicast(&addr)) {
-        if (gnrc_netapi_set(iface, NETOPT_IPV6_GROUP_LEAVE, 0, &addr,
-                            sizeof(addr)) < 0) {
+        if (netif_set_opt(iface, NETOPT_IPV6_GROUP_LEAVE, 0, &addr,
+                          sizeof(addr)) < 0) {
             printf("error: unable to leave IPv6 multicast group\n");
             return 1;
         }
     }
     else {
-        if (gnrc_netapi_set(iface, NETOPT_IPV6_ADDR_REMOVE, 0, &addr,
-                            sizeof(addr)) < 0) {
+        if (netif_set_opt(iface, NETOPT_IPV6_ADDR_REMOVE, 0, &addr,
+                          sizeof(addr)) < 0) {
             printf("error: unable to remove IPv6 address\n");
             return 1;
         }
     }
 
-    printf("success: removed %s to interface %" PRIkernel_pid "\n", addr_str,
-           iface);
+    printf("success: removed %s to interface ", addr_str);
+    _print_iface_name(iface);
+    printf("\n");
 
     return 0;
 #else
@@ -1180,7 +1726,7 @@ static int _netif_del(kernel_pid_t iface, char *addr_str)
 #ifdef MODULE_GNRC_TXTSND
 int _gnrc_netif_send(int argc, char **argv)
 {
-    kernel_pid_t iface;
+    netif_t *iface;
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
     size_t addr_len;
     gnrc_pktsnip_t *pkt, *hdr;
@@ -1192,10 +1738,8 @@ int _gnrc_netif_send(int argc, char **argv)
         return 1;
     }
 
-    /* parse interface */
-    iface = atoi(argv[1]);
-
-    if (!_is_iface(iface)) {
+    iface = netif_get_by_name(argv[1]);
+    if (!iface) {
         puts("error: invalid interface given");
         return 1;
     }
@@ -1225,11 +1769,11 @@ int _gnrc_netif_send(int argc, char **argv)
         gnrc_pktbuf_release(pkt);
         return 1;
     }
-    LL_PREPEND(pkt, hdr);
+    pkt = gnrc_pkt_prepend(pkt, hdr);
     nethdr = (gnrc_netif_hdr_t *)hdr->data;
     nethdr->flags = flags;
     /* and send it */
-    if (gnrc_netapi_send(iface, pkt) < 1) {
+    if (gnrc_netif_send((gnrc_netif_t *)iface, pkt) < 1) {
         puts("error: unable to send");
         gnrc_pktbuf_release(pkt);
         return 1;
@@ -1242,109 +1786,113 @@ int _gnrc_netif_send(int argc, char **argv)
 int _gnrc_netif_config(int argc, char **argv)
 {
     if (argc < 2) {
-        gnrc_netif_t *netif = NULL;
+        netif_t *netif = NULL;
 
-        while ((netif = gnrc_netif_iter(netif))) {
-            _netif_list(netif->pid);
+        while ((netif = netif_iter(netif))) {
+            _netif_list(netif);
         }
 
         return 0;
     }
-    else if (_is_number(argv[1])) {
-        kernel_pid_t iface = atoi(argv[1]);
-
-        if (_is_iface(iface)) {
-            if (argc < 3) {
-                _netif_list(iface);
-                return 0;
-            }
-            else if (strcmp(argv[2], "set") == 0) {
-                if (argc < 5) {
-                    _set_usage(argv[0]);
-                    return 1;
-                }
-
-                return _netif_set(argv[0], iface, argv[3], argv[4]);
-            }
-            else if (strcmp(argv[2], "add") == 0) {
-                if (argc < 4) {
-                    _add_usage(argv[0]);
-                    return 1;
-                }
-
-                return _netif_add(argv[0], (kernel_pid_t)iface, argc - 3, argv + 3);
-            }
-            else if (strcmp(argv[2], "del") == 0) {
-                if (argc < 4) {
-                    _del_usage(argv[0]);
-                    return 1;
-                }
-
-                return _netif_del((kernel_pid_t)iface, argv[3]);
-            }
-#ifdef MODULE_L2FILTER
-            else if (strcmp(argv[2], "l2filter") == 0) {
-                if (argc < 5) {
-                    _l2filter_usage(argv[2]);
-                }
-                else if (strcmp(argv[3], "add") == 0) {
-                    return _netif_addrm_l2filter(iface, argv[4], true);
-                }
-                else if (strcmp(argv[3], "del") == 0) {
-                    return _netif_addrm_l2filter(iface, argv[4], false);
-                }
-                else {
-                    _l2filter_usage(argv[2]);
-                }
-                return 1;
-            }
-#endif
-#ifdef MODULE_NETSTATS
-            else if (strcmp(argv[2], "stats") == 0) {
-                uint8_t module;
-                bool reset = false;
-
-                /* check for requested module */
-                if ((argc == 3) || (strcmp(argv[3], "all") == 0)) {
-                    module = NETSTATS_ALL;
-                }
-                else if (strcmp(argv[3], "l2") == 0) {
-                    module = NETSTATS_LAYER2;
-                }
-                else if (strcmp(argv[3], "ipv6") == 0) {
-                    module = NETSTATS_IPV6;
-                }
-                else {
-                    printf("Module %s doesn't exist or does not provide statistics.\n", argv[3]);
-
-                    return 0;
-                }
-
-                /* check if reset flag was given */
-                if ((argc > 4) && (strncmp(argv[4], "reset", 5) == 0)) {
-                    reset = true;
-                }
-                if (module & NETSTATS_LAYER2) {
-                    _netif_stats((kernel_pid_t) iface, NETSTATS_LAYER2, reset);
-                }
-                if (module & NETSTATS_IPV6) {
-                    _netif_stats((kernel_pid_t) iface, NETSTATS_IPV6, reset);
-                }
-
-                return 1;
-            }
-#endif
-            else if (strcmp(argv[2], "help") == 0) {
-                _usage(argv[0]);
-                return 0;
-            }
-            else {
-                return _netif_flag(argv[0], iface, argv[2]);
-            }
-        }
-        else {
+    else {
+        netif_t *iface = netif_get_by_name(argv[1]);
+        if (!iface) {
             puts("error: invalid interface given");
             return 1;
+        }
+
+        if (argc < 3) {
+            _netif_list(iface);
+            return 0;
+        }
+        else if (strcmp(argv[2], "set") == 0) {
+            if (argc < 5) {
+                _set_usage(argv[0]);
+                return 1;
+            }
+
+            return _netif_set(argv[0], iface, argv[3], argv[4]);
+        }
+        else if (strcmp(argv[2], "up") == 0) {
+            return _netif_link(iface, NETOPT_ENABLE);
+        }
+        else if (strcmp(argv[2], "down") == 0) {
+            return _netif_link(iface, NETOPT_DISABLE);
+        }
+        else if (strcmp(argv[2], "add") == 0) {
+            if (argc < 4) {
+                _add_usage(argv[0]);
+                return 1;
+            }
+
+            return _netif_add(argv[0], iface, argc - 3, argv + 3);
+        }
+        else if (strcmp(argv[2], "del") == 0) {
+            if (argc < 4) {
+                _del_usage(argv[0]);
+                return 1;
+            }
+
+            return _netif_del(iface, argv[3]);
+        }
+#ifdef MODULE_L2FILTER
+        else if (strcmp(argv[2], "l2filter") == 0) {
+            if (argc < 5) {
+                _l2filter_usage(argv[2]);
+            }
+            else if (strcmp(argv[3], "add") == 0) {
+                return _netif_addrm_l2filter(iface, argv[4], true);
+            }
+            else if (strcmp(argv[3], "del") == 0) {
+                return _netif_addrm_l2filter(iface, argv[4], false);
+            }
+            else {
+                _l2filter_usage(argv[2]);
+            }
+            return 1;
+        }
+#endif
+#ifdef MODULE_NETSTATS
+        else if (strcmp(argv[2], "stats") == 0) {
+            uint8_t module;
+            bool reset = false;
+
+            /* check for requested module */
+            if ((argc == 3) || (strcmp(argv[3], "all") == 0)) {
+                module = NETSTATS_ALL;
+            }
+            else if (strcmp(argv[3], "l2") == 0) {
+                module = NETSTATS_LAYER2;
+            }
+            else if (strcmp(argv[3], "ipv6") == 0) {
+                module = NETSTATS_IPV6;
+            }
+            else {
+                printf("Module %s doesn't exist or does not provide statistics.\n", argv[3]);
+
+                return 0;
+            }
+
+            /* check if reset flag was given */
+            if ((argc > 4) && (strncmp(argv[4], "reset", 5) == 0)) {
+                reset = true;
+            }
+            if (module & NETSTATS_LAYER2) {
+                _netif_stats(iface, NETSTATS_LAYER2, reset);
+            }
+            if (module & NETSTATS_IPV6) {
+                _netif_stats(iface, NETSTATS_IPV6, reset);
+            }
+
+            return 1;
+        }
+#endif
+        else if (strcmp(argv[2], "help") == 0) {
+            _usage(argv[0]);
+            return 0;
+        }
+        else {
+            return _netif_flag(argv[0], iface, argv[2]);
         }
     }
 

@@ -8,7 +8,7 @@
  */
 
 /**
- * @addtogroup  core_util
+ * @ingroup     core_util
  *
  * @{
  * @file
@@ -56,7 +56,7 @@ extern "C" {
 extern const char assert_crash_message[];
 
 #ifdef NDEBUG
-#define assert(ignore)((void) 0)
+#define assert(ignore)((void)0)
 #elif defined(DEBUG_ASSERT_VERBOSE)
 /**
  * @brief   Function to handle failed assertion
@@ -101,12 +101,11 @@ NORETURN void _assert_failure(const char *file, unsigned line);
  *
  * @see http://pubs.opengroup.org/onlinepubs/9699919799/functions/assert.html
  */
-#define assert(cond) \
-    if (!(cond)) { \
-        _assert_failure(RIOT_FILE_RELATIVE, __LINE__); \
-    }
+#define assert(cond) ((cond) ? (void)0 :  _assert_failure(RIOT_FILE_RELATIVE, \
+                                                          __LINE__))
 #else
-#define assert(cond) ((cond) ? (void)0 : core_panic(PANIC_ASSERT_FAIL, assert_crash_message))
+#define assert(cond) ((cond) ? (void)0 : core_panic(PANIC_ASSERT_FAIL, \
+                                                    assert_crash_message))
 #endif
 
 #if !defined __cplusplus
@@ -117,9 +116,12 @@ NORETURN void _assert_failure(const char *file, unsigned line);
 #define static_assert(...) _Static_assert(__VA_ARGS__)
 #else
 /**
- * @brief static_assert dummy for c-version < c11
+ * @brief static_assert for c-version < c11
+ *
+ * Generates a division by zero compile error when cond is false
  */
-#define static_assert(...) struct static_assert_dummy
+#define static_assert(cond, ...) \
+    { enum { static_assert_failed_on_div_by_0 = 1 / (!!(cond)) }; }
 #endif
 #endif
 

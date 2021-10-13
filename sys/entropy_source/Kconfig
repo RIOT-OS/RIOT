@@ -1,0 +1,37 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menuconfig KCONFIG_USEMODULE_ENTROPY_SOURCE
+    bool "Configure entropy sources"
+    depends on USEMODULE_ENTROPY_SOURCE_ADC_NOISE || USEMODULE_ENTROPY_SOURCE_ZERO_ENTROPY
+    help
+        Configure entropy sources using Kconfig.
+
+if KCONFIG_USEMODULE_ENTROPY_SOURCE
+
+config ENTROPY_SOURCE_TESTS_WIN
+    int "Window size for Adaptive Proportion Test"
+    default 512
+    depends on ENTROPY_SOURCE_ADC_HEALTH_TEST || ENTROPY_SOURCE_ZERO_HEALTH_TEST
+    help
+        In (NIST SP 800-90B 4.4.2) a window size of 512 samples is recommended for non-binary
+        sources. Typically, RIOT use cases will not request as many samples, thus, it might be worth
+        considering a smaller window size so the test is more likely to complete a cycle. It is
+        noteworthy that a cutoff value calculated by @ref entropy_source_test_prop_cutoff that is
+        greater than the window size may lead to undetected errors.
+
+config ENTROPY_SOURCE_NEUMANN_ABORT
+    int "Abort factor for von Neumann extractor"
+    default 5
+    help
+        Abort factor for von Neumann extractor. The algorithms runs as long as no bit
+        changes appear in subsequent samples. This define adds a factor that
+        aborts the procedure after (factor * requested length) samples.
+
+rsource "adc_noise/Kconfig"
+rsource "zero_entropy/Kconfig"
+
+endif # KCONFIG_USEMODULE_ENTROPY_SOURCE

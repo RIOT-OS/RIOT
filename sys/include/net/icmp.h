@@ -29,7 +29,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @brief   Echo request and response message format.
  *
@@ -44,7 +43,6 @@ typedef struct __attribute__((packed)){
     network_uint16_t id;    /**< identifier */
     network_uint16_t sn;    /**< sequence number */
 } icmp_echo_t;
-
 
 #ifdef __cplusplus
 }

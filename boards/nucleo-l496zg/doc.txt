@@ -1,0 +1,5 @@
+/**
+@defgroup    boards_nucleo-l496zg STM32 Nucleo-L496ZG
+@ingroup     boards_common_nucleo144
+@brief       Support for the STM32 Nucleo-l496zg
+ */

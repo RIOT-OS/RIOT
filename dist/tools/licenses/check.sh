@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Copyright 2017 Kaspar Schleiser <kaspar@schleiser.de>
 # Copyright 2014 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
@@ -7,7 +7,11 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-. ${RIOTBASE:+${RIOTBASE}/}dist/tools/ci/changed_files.sh
+: "${RIOTBASE:=$(cd $(dirname $0)/../../../; pwd)}"
+cd $RIOTBASE
+
+: "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
+. "${RIOTTOOLS}"/ci/changed_files.sh
 
 # customizable
 CHECKROOT=$(dirname "${0}")

@@ -1,0 +1,205 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU models
+config CPU_MODEL_STM32F205RB
+    bool
+    select CPU_LINE_STM32F205XX
+
+config CPU_MODEL_STM32F205RC
+    bool
+    select CPU_LINE_STM32F205XX
+
+config CPU_MODEL_STM32F205RE
+    bool
+    select CPU_LINE_STM32F205XX
+
+config CPU_MODEL_STM32F205RF
+    bool
+    select CPU_LINE_STM32F205XX
+
+config CPU_MODEL_STM32F205RG
+    bool
+    select CPU_LINE_STM32F205XX
+
+config CPU_MODEL_STM32F205VB
+    bool
+    select CPU_LINE_STM32F205XX
+
+config CPU_MODEL_STM32F205VC
+    bool
+    select CPU_LINE_STM32F205XX
+
+config CPU_MODEL_STM32F205VE
+    bool
+    select CPU_LINE_STM32F205XX
+
+config CPU_MODEL_STM32F205VF
+    bool
+    select CPU_LINE_STM32F205XX
+
+config CPU_MODEL_STM32F205VG
+    bool
+    select CPU_LINE_STM32F205XX
+
+config CPU_MODEL_STM32F205ZC
+    bool
+    select CPU_LINE_STM32F205XX
+
+config CPU_MODEL_STM32F205ZE
+    bool
+    select CPU_LINE_STM32F205XX
+
+config CPU_MODEL_STM32F205ZF
+    bool
+    select CPU_LINE_STM32F205XX
+
+config CPU_MODEL_STM32F205ZG
+    bool
+    select CPU_LINE_STM32F205XX
+
+config CPU_MODEL_STM32F207IC
+    bool
+    select CPU_LINE_STM32F207XX
+
+config CPU_MODEL_STM32F207IE
+    bool
+    select CPU_LINE_STM32F207XX
+
+config CPU_MODEL_STM32F207IF
+    bool
+    select CPU_LINE_STM32F207XX
+
+config CPU_MODEL_STM32F207IG
+    bool
+    select CPU_LINE_STM32F207XX
+
+config CPU_MODEL_STM32F207VC
+    bool
+    select CPU_LINE_STM32F207XX
+
+config CPU_MODEL_STM32F207VE
+    bool
+    select CPU_LINE_STM32F207XX
+
+config CPU_MODEL_STM32F207VF
+    bool
+    select CPU_LINE_STM32F207XX
+
+config CPU_MODEL_STM32F207VG
+    bool
+    select CPU_LINE_STM32F207XX
+
+config CPU_MODEL_STM32F207ZC
+    bool
+    select CPU_LINE_STM32F207XX
+
+config CPU_MODEL_STM32F207ZE
+    bool
+    select CPU_LINE_STM32F207XX
+
+config CPU_MODEL_STM32F207ZF
+    bool
+    select CPU_LINE_STM32F207XX
+
+config CPU_MODEL_STM32F207ZG
+    bool
+    select CPU_LINE_STM32F207XX
+
+config CPU_MODEL_STM32F215RE
+    bool
+    select CPU_LINE_STM32F215XX
+
+config CPU_MODEL_STM32F215RG
+    bool
+    select CPU_LINE_STM32F215XX
+
+config CPU_MODEL_STM32F215VE
+    bool
+    select CPU_LINE_STM32F215XX
+
+config CPU_MODEL_STM32F215VG
+    bool
+    select CPU_LINE_STM32F215XX
+
+config CPU_MODEL_STM32F215ZE
+    bool
+    select CPU_LINE_STM32F215XX
+
+config CPU_MODEL_STM32F215ZG
+    bool
+    select CPU_LINE_STM32F215XX
+
+config CPU_MODEL_STM32F217IE
+    bool
+    select CPU_LINE_STM32F217XX
+
+config CPU_MODEL_STM32F217IG
+    bool
+    select CPU_LINE_STM32F217XX
+
+config CPU_MODEL_STM32F217VE
+    bool
+    select CPU_LINE_STM32F217XX
+
+config CPU_MODEL_STM32F217VG
+    bool
+    select CPU_LINE_STM32F217XX
+
+config CPU_MODEL_STM32F217ZE
+    bool
+    select CPU_LINE_STM32F217XX
+
+config CPU_MODEL_STM32F217ZG
+    bool
+    select CPU_LINE_STM32F217XX
+
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32f205rb" if CPU_MODEL_STM32F205RB
+    default "stm32f205rc" if CPU_MODEL_STM32F205RC
+    default "stm32f205re" if CPU_MODEL_STM32F205RE
+    default "stm32f205rf" if CPU_MODEL_STM32F205RF
+    default "stm32f205rg" if CPU_MODEL_STM32F205RG
+    default "stm32f205vb" if CPU_MODEL_STM32F205VB
+    default "stm32f205vc" if CPU_MODEL_STM32F205VC
+    default "stm32f205ve" if CPU_MODEL_STM32F205VE
+    default "stm32f205vf" if CPU_MODEL_STM32F205VF
+    default "stm32f205vg" if CPU_MODEL_STM32F205VG
+    default "stm32f205zc" if CPU_MODEL_STM32F205ZC
+    default "stm32f205ze" if CPU_MODEL_STM32F205ZE
+    default "stm32f205zf" if CPU_MODEL_STM32F205ZF
+    default "stm32f205zg" if CPU_MODEL_STM32F205ZG
+    default "stm32f207ic" if CPU_MODEL_STM32F207IC
+    default "stm32f207ie" if CPU_MODEL_STM32F207IE
+    default "stm32f207if" if CPU_MODEL_STM32F207IF
+    default "stm32f207ig" if CPU_MODEL_STM32F207IG
+    default "stm32f207vc" if CPU_MODEL_STM32F207VC
+    default "stm32f207ve" if CPU_MODEL_STM32F207VE
+    default "stm32f207vf" if CPU_MODEL_STM32F207VF
+    default "stm32f207vg" if CPU_MODEL_STM32F207VG
+    default "stm32f207zc" if CPU_MODEL_STM32F207ZC
+    default "stm32f207ze" if CPU_MODEL_STM32F207ZE
+    default "stm32f207zf" if CPU_MODEL_STM32F207ZF
+    default "stm32f207zg" if CPU_MODEL_STM32F207ZG
+    default "stm32f215re" if CPU_MODEL_STM32F215RE
+    default "stm32f215rg" if CPU_MODEL_STM32F215RG
+    default "stm32f215ve" if CPU_MODEL_STM32F215VE
+    default "stm32f215vg" if CPU_MODEL_STM32F215VG
+    default "stm32f215ze" if CPU_MODEL_STM32F215ZE
+    default "stm32f215zg" if CPU_MODEL_STM32F215ZG
+    default "stm32f217ie" if CPU_MODEL_STM32F217IE
+    default "stm32f217ig" if CPU_MODEL_STM32F217IG
+    default "stm32f217ve" if CPU_MODEL_STM32F217VE
+    default "stm32f217vg" if CPU_MODEL_STM32F217VG
+    default "stm32f217ze" if CPU_MODEL_STM32F217ZE
+    default "stm32f217zg" if CPU_MODEL_STM32F217ZG

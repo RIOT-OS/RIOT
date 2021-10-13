@@ -1,0 +1,8 @@
+INCLUDES += -I$(PKGDIRBASE)/tinycbor/src
+
+ifeq (,$(filter tinycbor_float,$(USEMODULE)))
+  CFLAGS += -DCBOR_NO_FLOATING_POINT
+endif
+
+# Declare pseudomodules here to be selfcontained
+PSEUDOMODULES += tinycbor_%

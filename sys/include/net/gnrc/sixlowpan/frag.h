@@ -26,11 +26,16 @@
 #define NET_GNRC_SIXLOWPAN_FRAG_H
 
 #include <inttypes.h>
-#include <stdbool.h>
 
 #include "byteorder.h"
-#include "kernel_types.h"
 #include "net/gnrc/pkt.h"
+#include "net/gnrc/netif/hdr.h"
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_HINT
+#include "net/gnrc/sixlowpan/frag/hint.h"
+#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_HINT */
+#include "net/gnrc/sixlowpan/frag/fb.h"
+#include "net/gnrc/sixlowpan/internal.h"
+#include "net/ieee802154.h"
 #include "net/sixlowpan.h"
 
 #ifdef __cplusplus
@@ -38,35 +43,29 @@ extern "C" {
 #endif
 
 /**
- * @brief   Message type for passing one 6LoWPAN fragment down the network stack
- */
-#define GNRC_SIXLOWPAN_MSG_FRAG_SND    (0x0225)
-
-/**
- * @brief   Definition of 6LoWPAN fragmentation type.
- */
-typedef struct {
-    kernel_pid_t pid;       /**< PID of the interface */
-    gnrc_pktsnip_t *pkt;    /**< Pointer to the IPv6 packet to be fragmented */
-    size_t datagram_size;   /**< Length of just the IPv6 packet to be fragmented */
-    uint16_t offset;        /**< Offset of the Nth fragment from the beginning of the
-                             *   payload datagram */
-} gnrc_sixlowpan_msg_frag_t;
-
-/**
- * @brief   Sends a packet fragmented.
+ * @brief   Sends a packet fragmented
  *
- * @param[in] fragment_msg    Message containing status of the 6LoWPAN
- *                            fragmentation progress
+ * @pre `ctx != NULL`
+ * @pre gnrc_sixlowpan_frag_fb_t::pkt of @p ctx is equal to @p pkt or
+ *      `pkt == NULL`.
+ *
+ * @param[in] pkt       A packet. May be NULL.
+ * @param[in] ctx       A fragmentation buffer entry. Expected to be of type
+ *                      @ref gnrc_sixlowpan_frag_fb_t, with
+ *                      gnrc_sixlowpan_frag_fb_t set to @p pkt. Must not be
+ *                      NULL.
+ * @param[in] page      Current 6Lo dispatch parsing page.
  */
-void gnrc_sixlowpan_frag_send(gnrc_sixlowpan_msg_frag_t *fragment_msg);
+void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
 
 /**
- * @brief   Handles a packet containing a fragment header.
+ * @brief   Handles a packet containing a fragment header
  *
- * @param[in] pkt   The packet to handle.
+ * @param[in] pkt       The packet to handle
+ * @param[in] ctx       Context for the packet. May be NULL.
+ * @param[in] page      Current 6Lo dispatch parsing page.
  */
-void gnrc_sixlowpan_frag_handle_pkt(gnrc_pktsnip_t *pkt);
+void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
 
 #ifdef __cplusplus
 }

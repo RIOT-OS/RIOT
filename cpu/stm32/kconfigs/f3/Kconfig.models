@@ -1,0 +1,360 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU models
+config CPU_MODEL_STM32F301C6
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F301C8
+    bool
+    select CPU_LINE_STM32F301X8
+
+config CPU_MODEL_STM32F301K6
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F301K8
+    bool
+    select CPU_LINE_STM32F301X8
+
+config CPU_MODEL_STM32F301R6
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F301R8
+    bool
+    select CPU_LINE_STM32F301X8
+
+config CPU_MODEL_STM32F302C6
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F302C8
+    bool
+    select CPU_LINE_STM32F302X8
+
+config CPU_MODEL_STM32F302CB
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F302CC
+    bool
+    select CPU_LINE_STM32F302XC
+
+config CPU_MODEL_STM32F302K6
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F302K8
+    bool
+    select CPU_LINE_STM32F302X8
+
+config CPU_MODEL_STM32F302R6
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F302R8
+    bool
+    select CPU_LINE_STM32F302X8
+
+config CPU_MODEL_STM32F302RB
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F302RC
+    bool
+    select CPU_LINE_STM32F302XC
+
+config CPU_MODEL_STM32F302RD
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F302RE
+    bool
+    select CPU_LINE_STM32F302XE
+
+config CPU_MODEL_STM32F302VB
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F302VC
+    bool
+    select CPU_LINE_STM32F302XC
+
+config CPU_MODEL_STM32F302VD
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F302VE
+    bool
+    select CPU_LINE_STM32F302XE
+
+config CPU_MODEL_STM32F302ZD
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F302ZE
+    bool
+    select CPU_LINE_STM32F302XE
+
+config CPU_MODEL_STM32F303C6
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F303C8
+    bool
+    select CPU_LINE_STM32F303X8
+
+config CPU_MODEL_STM32F303CB
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F303CC
+    bool
+    select CPU_LINE_STM32F303XC
+
+config CPU_MODEL_STM32F303K6
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F303K8
+    bool
+    select CPU_LINE_STM32F303X8
+
+config CPU_MODEL_STM32F303R6
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F303R8
+    bool
+    select CPU_LINE_STM32F303X8
+
+config CPU_MODEL_STM32F303RB
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F303RC
+    bool
+    select CPU_LINE_STM32F303XC
+
+config CPU_MODEL_STM32F303RD
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F303RE
+    bool
+    select CPU_LINE_STM32F303XE
+
+config CPU_MODEL_STM32F303VB
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F303VC
+    bool
+    select CPU_LINE_STM32F303XC
+
+config CPU_MODEL_STM32F303VD
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F303VE
+    bool
+    select CPU_LINE_STM32F303XE
+
+config CPU_MODEL_STM32F303ZD
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F303ZE
+    bool
+    select CPU_LINE_STM32F303XE
+
+config CPU_MODEL_STM32F318C8
+    bool
+    select CPU_LINE_STM32F318XX
+
+config CPU_MODEL_STM32F318K8
+    bool
+    select CPU_LINE_STM32F318XX
+
+config CPU_MODEL_STM32F328C8
+    bool
+    select CPU_LINE_STM32F328XX
+
+config CPU_MODEL_STM32F334C4
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F334C6
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F334C8
+    bool
+    select CPU_LINE_STM32F334X8
+
+config CPU_MODEL_STM32F334K4
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F334K6
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F334K8
+    bool
+    select CPU_LINE_STM32F334X8
+
+config CPU_MODEL_STM32F334R6
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F334R8
+    bool
+    select CPU_LINE_STM32F334X8
+
+config CPU_MODEL_STM32F358CC
+    bool
+    select CPU_LINE_STM32F358XX
+
+config CPU_MODEL_STM32F358RC
+    bool
+    select CPU_LINE_STM32F358XX
+
+config CPU_MODEL_STM32F358VC
+    bool
+    select CPU_LINE_STM32F358XX
+
+config CPU_MODEL_STM32F373C8
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F373CB
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F373CC
+    bool
+    select CPU_LINE_STM32F373XC
+
+config CPU_MODEL_STM32F373R8
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F373RB
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F373RC
+    bool
+    select CPU_LINE_STM32F373XC
+
+config CPU_MODEL_STM32F373V8
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F373VB
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F373VC
+    bool
+    select CPU_LINE_STM32F373XC
+
+config CPU_MODEL_STM32F378CC
+    bool
+    select CPU_LINE_STM32F378XX
+
+config CPU_MODEL_STM32F378RC
+    bool
+    select CPU_LINE_STM32F378XX
+
+config CPU_MODEL_STM32F378VC
+    bool
+    select CPU_LINE_STM32F378XX
+
+config CPU_MODEL_STM32F398VE
+    bool
+    select CPU_LINE_STM32F398XX
+
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32f301c6" if CPU_MODEL_STM32F301C6
+    default "stm32f301c8" if CPU_MODEL_STM32F301C8
+    default "stm32f301k6" if CPU_MODEL_STM32F301K6
+    default "stm32f301k8" if CPU_MODEL_STM32F301K8
+    default "stm32f301r6" if CPU_MODEL_STM32F301R6
+    default "stm32f301r8" if CPU_MODEL_STM32F301R8
+    default "stm32f302c6" if CPU_MODEL_STM32F302C6
+    default "stm32f302c8" if CPU_MODEL_STM32F302C8
+    default "stm32f302cb" if CPU_MODEL_STM32F302CB
+    default "stm32f302cc" if CPU_MODEL_STM32F302CC
+    default "stm32f302k6" if CPU_MODEL_STM32F302K6
+    default "stm32f302k8" if CPU_MODEL_STM32F302K8
+    default "stm32f302r6" if CPU_MODEL_STM32F302R6
+    default "stm32f302r8" if CPU_MODEL_STM32F302R8
+    default "stm32f302rb" if CPU_MODEL_STM32F302RB
+    default "stm32f302rc" if CPU_MODEL_STM32F302RC
+    default "stm32f302rd" if CPU_MODEL_STM32F302RD
+    default "stm32f302re" if CPU_MODEL_STM32F302RE
+    default "stm32f302vb" if CPU_MODEL_STM32F302VB
+    default "stm32f302vc" if CPU_MODEL_STM32F302VC
+    default "stm32f302vd" if CPU_MODEL_STM32F302VD
+    default "stm32f302ve" if CPU_MODEL_STM32F302VE
+    default "stm32f302zd" if CPU_MODEL_STM32F302ZD
+    default "stm32f302ze" if CPU_MODEL_STM32F302ZE
+    default "stm32f303c6" if CPU_MODEL_STM32F303C6
+    default "stm32f303c8" if CPU_MODEL_STM32F303C8
+    default "stm32f303cb" if CPU_MODEL_STM32F303CB
+    default "stm32f303cc" if CPU_MODEL_STM32F303CC
+    default "stm32f303k6" if CPU_MODEL_STM32F303K6
+    default "stm32f303k8" if CPU_MODEL_STM32F303K8
+    default "stm32f303r6" if CPU_MODEL_STM32F303R6
+    default "stm32f303r8" if CPU_MODEL_STM32F303R8
+    default "stm32f303rb" if CPU_MODEL_STM32F303RB
+    default "stm32f303rc" if CPU_MODEL_STM32F303RC
+    default "stm32f303rd" if CPU_MODEL_STM32F303RD
+    default "stm32f303re" if CPU_MODEL_STM32F303RE
+    default "stm32f303vb" if CPU_MODEL_STM32F303VB
+    default "stm32f303vc" if CPU_MODEL_STM32F303VC
+    default "stm32f303vd" if CPU_MODEL_STM32F303VD
+    default "stm32f303ve" if CPU_MODEL_STM32F303VE
+    default "stm32f303zd" if CPU_MODEL_STM32F303ZD
+    default "stm32f303ze" if CPU_MODEL_STM32F303ZE
+    default "stm32f318c8" if CPU_MODEL_STM32F318C8
+    default "stm32f318k8" if CPU_MODEL_STM32F318K8
+    default "stm32f328c8" if CPU_MODEL_STM32F328C8
+    default "stm32f334c4" if CPU_MODEL_STM32F334C4
+    default "stm32f334c6" if CPU_MODEL_STM32F334C6
+    default "stm32f334c8" if CPU_MODEL_STM32F334C8
+    default "stm32f334k4" if CPU_MODEL_STM32F334K4
+    default "stm32f334k6" if CPU_MODEL_STM32F334K6
+    default "stm32f334k8" if CPU_MODEL_STM32F334K8
+    default "stm32f334r6" if CPU_MODEL_STM32F334R6
+    default "stm32f334r8" if CPU_MODEL_STM32F334R8
+    default "stm32f358cc" if CPU_MODEL_STM32F358CC
+    default "stm32f358rc" if CPU_MODEL_STM32F358RC
+    default "stm32f358vc" if CPU_MODEL_STM32F358VC
+    default "stm32f373c8" if CPU_MODEL_STM32F373C8
+    default "stm32f373cb" if CPU_MODEL_STM32F373CB
+    default "stm32f373cc" if CPU_MODEL_STM32F373CC
+    default "stm32f373r8" if CPU_MODEL_STM32F373R8
+    default "stm32f373rb" if CPU_MODEL_STM32F373RB
+    default "stm32f373rc" if CPU_MODEL_STM32F373RC
+    default "stm32f373v8" if CPU_MODEL_STM32F373V8
+    default "stm32f373vb" if CPU_MODEL_STM32F373VB
+    default "stm32f373vc" if CPU_MODEL_STM32F373VC
+    default "stm32f378cc" if CPU_MODEL_STM32F378CC
+    default "stm32f378rc" if CPU_MODEL_STM32F378RC
+    default "stm32f378vc" if CPU_MODEL_STM32F378VC
+    default "stm32f398ve" if CPU_MODEL_STM32F398VE

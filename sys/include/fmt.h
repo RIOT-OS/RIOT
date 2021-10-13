@@ -46,6 +46,39 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Test if the given character is a numerical digit (regex `[0-9]`)
+ *
+ * @param[in] c     Character to test
+ *
+ * @return  true if @p c is a digit, false otherwise
+ */
+static inline int fmt_is_digit(char c)
+{
+    return (c >= '0' && c <= '9');
+}
+
+/**
+ * @brief   Test if the given character is an uppercase letter (regex `[A-Z]`)
+ *
+ * @param[in] c     Character to test
+ *
+ * @return  true if @p c is an uppercase letter, false otherwise
+ */
+static inline int fmt_is_upper(char c)
+{
+    return (c >= 'A' && c <= 'Z');
+}
+
+/**
+ * @brief   Test if the given string is a number (regex `[0-9]+`)
+ *
+ * @param[in] str   String to test, **must be `\0` terminated**
+ *
+ * @return  true if @p str solely contains digits, false otherwise
+ */
+int fmt_is_number(const char *str);
+
+/**
  * @brief Format a byte value as hex
  *
  * E.g., converts byte value 0 to the string 00, 255 to the string FF.
@@ -92,6 +125,17 @@ size_t fmt_bytes_hex(char *out, const uint8_t *ptr, size_t n);
 size_t fmt_bytes_hex_reverse(char *out, const uint8_t *ptr, size_t n);
 
 /**
+ * @brief Converts a sequence of two hex characters to a byte
+ *
+ * The hex characters sequence must contain valid hexadecimal characters
+ * otherwise the result is undefined.
+ *
+ * @param[in]  hex  Pointer to input buffer
+ * @returns    byte based on hex string
+ */
+uint8_t fmt_hex_byte(const char *hex);
+
+/**
  * @brief Converts a sequence of hex bytes to an array of bytes
  *
  * The sequence of hex characters must have an even length:
@@ -107,6 +151,20 @@ size_t fmt_bytes_hex_reverse(char *out, const uint8_t *ptr, size_t n);
  * @returns    0 otherwise
  */
 size_t fmt_hex_bytes(uint8_t *out, const char *hex);
+
+/**
+ * @brief   Convert a uint16 value to hex string.
+ *
+ * Will write 4 bytes to @p out.
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
+ *
+ * @param[out]  out  Pointer to output buffer, or NULL
+ * @param[in]   val  Value to convert
+ *
+ * @return      4
+ */
+size_t fmt_u16_hex(char *out, uint16_t val);
 
 /**
  * @brief Convert a uint32 value to hex string.
@@ -286,6 +344,19 @@ size_t fmt_s32_dfp(char *out, int32_t val, int fp_digits);
 size_t fmt_float(char *out, float f, unsigned precision);
 
 /**
+ * @brief   Copy @p in char to string (without terminating '\0')
+ *
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
+ *
+ * @param[out]  out     string to write to (or NULL)
+ * @param[in]   c       char value to append
+ *
+ * @return      nr of bytes the function did or would write to out
+ */
+size_t fmt_char(char *out, char c);
+
+/**
  * @brief Count characters until '\0' (exclusive) in @p str
  *
  * @param[in]   str  Pointer to string
@@ -293,6 +364,17 @@ size_t fmt_float(char *out, float f, unsigned precision);
  * @return      nr of characters in string @p str points to
  */
 size_t fmt_strlen(const char *str);
+
+/**
+ * @brief Count at most @p maxlen characters until '\0' (exclusive) in @p str
+ *
+ * @param[in]   str     Pointer to string
+ * @param[in]   maxlen  Maximum number of chars to count
+ *
+ * @return      nr of characters in string @p str points to, or @p maxlen if no
+ *              null terminator is found within @p maxlen chars
+ */
+size_t fmt_strnlen(const char *str, size_t maxlen);
 
 /**
  * @brief Copy null-terminated string (excluding terminating \0)
@@ -308,6 +390,14 @@ size_t fmt_strlen(const char *str);
 size_t fmt_str(char *out, const char *str);
 
 /**
+ * @brief   Copy null-terminated string to a lowercase string (excluding terminating \0)
+ *
+ * @param[out]  out     Pointer to output buffer, or NULL
+ * @param[in]   str     Pointer to null-terminated source string
+ */
+size_t fmt_to_lower(char *out, const char *str);
+
+/**
  * @brief Convert digits to uint32
  *
  * Will convert up to @p n digits. Stops at any non-digit or '\0' character.
@@ -318,6 +408,18 @@ size_t fmt_str(char *out, const char *str);
  * @return      converted uint32_t value
  */
 uint32_t scn_u32_dec(const char *str, size_t n);
+
+/**
+ * @brief Convert hexadecimal characters to uin32_t
+ *
+ * Will convert up to @p n char. Stop at any non-hexadecimal or '\0' character
+ *
+ * @param[in]   str Pointer to string to read from
+ * @param[in]   n   Maximum number of characters to consider
+ *
+ * @return  converted uint32_t value
+ */
+uint32_t scn_u32_hex(const char *str, size_t n);
 
 /**
  * @brief Print string to stdout
@@ -372,6 +474,15 @@ void print_u64_hex(uint64_t val);
  * @param[in]   val  Value to print
  */
 void print_u64_dec(uint64_t val);
+
+/**
+ * @brief Print int64 value as decimal to stdout
+ *
+ * @note This uses fmt_s64_dec(), which uses ~400b of code.
+ *
+ * @param[in]   val  Value to print
+ */
+void print_s64_dec(uint64_t val);
 
 /**
  * @brief Print float value

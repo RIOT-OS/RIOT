@@ -42,10 +42,13 @@ extern "C" {
 /**
  * Linux candev configuration
  */
-typedef struct candev_linux_conf {
+typedef struct candev_conf {
     /** local interface name */
     char interface_name[CAN_MAX_SIZE_INTERFACE_NAME + 1];
-} candev_linux_conf_t;
+} can_conf_t;
+
+/** CAN device configuration type can_conf_t is redefined by native CAN */
+#define HAVE_CAN_CONF_T
 
 #ifndef CANDEV_LINUX_MAX_FILTERS_RX
 /**
@@ -74,25 +77,18 @@ typedef struct candev_linux_conf {
 typedef struct candev_linux {
     candev_t candev;                  /**< candev base structure */
     int sock;                         /**< local socket id */
-    const candev_linux_conf_t *conf;  /**< device configuration */
+    const can_conf_t *conf;  /**< device configuration */
     /** filter list */
     struct can_filter filters[CANDEV_LINUX_MAX_FILTERS_RX];
-} candev_linux_t;
+} can_t;
 
-/**
- * @brief Device specific initialization function
- *
- * @param[inout] dev   the device to initialize
- * @param[in] conf     the device configuration
- *
- * @return 0 on success
- */
-int candev_linux_init(candev_linux_t *dev, const candev_linux_conf_t *conf);
+/** CAN device type can_t is redefined by native CAN */
+#define HAVE_CAN_T
 
 /**
  * @brief Array containing socketCAN device names
  */
-extern candev_linux_conf_t candev_linux_conf[CAN_DLL_NUMOF];
+extern can_conf_t candev_conf[CAN_DLL_NUMOF];
 
 #endif /* defined(__linux__) */
 

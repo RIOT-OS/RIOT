@@ -25,28 +25,12 @@
 #include "common.h"
 #include "lwip.h"
 #include "lwip/netif.h"
+#if LWIP_IPV4
 #include "net/ipv6/addr.h"
-#include "shell.h"
-
-static int ifconfig(int argc, char **argv)
-{
-    (void)argc;
-    (void)argv;
-    for (struct netif *iface = netif_list; iface != NULL; iface = iface->next) {
-        printf("%s_%02u: ", iface->name, iface->num);
-#ifdef MODULE_LWIP_IPV6
-        char addrstr[IPV6_ADDR_MAX_STR_LEN];
-        for (int i = 0; i < LWIP_IPV6_NUM_ADDRESSES; i++) {
-            if (!ipv6_addr_is_unspecified((ipv6_addr_t *)&iface->ip6_addr[i])) {
-                printf(" inet6 %s\n", ipv6_addr_to_str(addrstr, (ipv6_addr_t *)&iface->ip6_addr[i],
-                                                       sizeof(addrstr)));
-            }
-        }
+#else
+#include "net/ipv4/addr.h"
 #endif
-        puts("");
-    }
-    return 0;
-}
+#include "shell.h"
 
 static const shell_command_t shell_commands[] = {
 #ifdef MODULE_SOCK_IP
@@ -58,9 +42,9 @@ static const shell_command_t shell_commands[] = {
 #ifdef MODULE_SOCK_UDP
     { "udp", "Send UDP messages and listen for messages on UDP port", udp_cmd },
 #endif
-    { "ifconfig", "Shows assigned IPv6 addresses", ifconfig },
     { NULL, NULL, NULL }
 };
+
 static char line_buf[SHELL_DEFAULT_BUFSIZE];
 
 int main(void)

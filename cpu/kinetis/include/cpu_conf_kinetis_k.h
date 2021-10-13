@@ -119,9 +119,40 @@
     defined(CPU_MODEL_MK64FX512VLQ12) || \
     defined(CPU_MODEL_MK64FX512VMD12)
 #include "vendor/MK64F12.h"
+
+/**
+ * @name Hardware random number generator module configuration
+ *
+ *       For K64F SCG3 or SCG6 can be used depending on if the the
+ *       peripheral is accessed through AIPS-lite0 or AIPS-lite1.
+ *       For K64F RNGA is only mapped to SCG6.
+ * @{
+ */
+#define HWRNG_CLK_REG           (SIM->SCGC6)
+#define HWRNG_CLK_REG_SHIFT     (SIM_SCGC6_RNGA_SHIFT)
+/** @} */
+
 #endif
 #endif /* (KINETIS_SUBFAMILY == y) */
 #endif /* (KINETIS_FAMILY == x) */
+
+/**
+ * @name   Flashpage configuration
+ * @{
+ */
+#define FLASHPAGE_SIZE      (4096U)
+#define FLASHPAGE_NUMOF     ((KINETIS_ROMSIZE * 1024) / FLASHPAGE_SIZE)
+
+/* The minimum block size which can be written is 8B (Phrase). However, the
+ * erase block is always FLASHPAGE_SIZE.
+ */
+#define FLASHPAGE_BLOCK_PHRASE              (8U)
+#define FLASHPAGE_WRITE_BLOCK_SIZE          FLASHPAGE_BLOCK_PHRASE
+/* Writing should be always 8 bytes aligned */
+#define FLASHPAGE_WRITE_BLOCK_ALIGNMENT     FLASHPAGE_BLOCK_PHRASE
+/* Section erase and programming must be 16 bytes aligned */
+#define FLASHPAGE_BLOCK_SECTION_ALIGNMENT   (16U)
+/** @} */
 
 #ifdef __cplusplus
 extern "C"

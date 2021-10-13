@@ -23,6 +23,7 @@
 #include <inttypes.h>
 
 #include "xtimer.h"
+#include "fmt.h"
 
 #include "hashes.h"
 #include "bloom.h"
@@ -58,8 +59,6 @@ static void buf_fill(uint32_t *buf, int len)
 
 int main(void)
 {
-    xtimer_init();
-
     bloom_init(&bloom, BLOOM_BITS, bf, hashes, BLOOM_HASHF);
 
     printf("Testing Bloom filter.\n\n");
@@ -109,7 +108,13 @@ int main(void)
     printf("%d elements probably in the filter.\n", in);
     printf("%d elements not in the filter.\n", not_in);
     double false_positive_rate = (double) in / (double) lenA;
-    printf("%f false positive rate.\n", false_positive_rate);
+    /* Use 'fmt/print_float' to work on all platforms (atmega)
+     * Stdout should be flushed before to prevent garbled output. */
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
+    fflush(stdout);
+#endif
+    print_float(false_positive_rate, 6);
+    puts(" false positive rate.");
 
     bloom_del(&bloom);
     printf("\nAll done!\n");

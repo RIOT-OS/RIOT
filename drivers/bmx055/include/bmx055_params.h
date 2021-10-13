@@ -33,13 +33,13 @@ extern "C" {
 #define BMX055_PARAM_I2C        I2C_DEV(0)
 #endif
 #ifndef BMX055_PARAM_MAG_ADDR
-#define BMX055_PARAM_MAG_ADDR   BMX055_MAG_ADDR_DEFAULT
+#define BMX055_PARAM_MAG_ADDR   CONFIG_BMX055_MAG_ADDR_DEFAULT
 #endif
 #ifndef BMX055_PARAM_ACC_ADDR
-#define BMX055_PARAM_ACC_ADDR   BMX055_ACC_ADDR_DEFAULT
+#define BMX055_PARAM_ACC_ADDR   CONFIG_BMX055_ACC_ADDR_DEFAULT
 #endif
 #ifndef BMX055_PARAM_GYRO_ADDR
-#define BMX055_PARAM_GYRO_ADDR  BMX055_GYRO_ADDR_DEFAULT
+#define BMX055_PARAM_GYRO_ADDR  CONFIG_BMX055_GYRO_ADDR_DEFAULT
 #endif
 #ifndef BMX055_PARAM_INT1
 #define BMX055_PARAM_INT1       GPIO_PIN(0, 0)
@@ -88,7 +88,7 @@ static const bmx055_params_t bmx055_params[] = {
 };
 
 /**
- * @brief   SAUL registry entires
+ * @brief   SAUL registry entries
  */
 static const saul_reg_info_t bmx055_saul_info[][3] = {
     BMX055_SAULINFO

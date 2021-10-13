@@ -1,0 +1,9 @@
+INCLUDES += -I$(PKGDIRBASE)/cmsis-nn/CMSIS/NN/Include
+
+# Required for some basic math functions
+INCLUDES += -I$(PKGDIRBASE)/cmsis-nn/CMSIS/DSP/Include
+
+CFLAGS += -Wno-sign-compare
+
+# cmsis-nn module is not a concrete module, so declare it as a pseudomodule
+PSEUDOMODULES += cmsis-nn

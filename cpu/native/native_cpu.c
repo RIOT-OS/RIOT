@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup native_cpu
+ * @ingroup cpu_native
  * @{
  *
  * @file
@@ -28,7 +28,6 @@
 #define __USE_GNU
 #include <signal.h>
 #undef __USE_GNU
-
 
 #include <ucontext.h>
 #include <err.h>
@@ -59,7 +58,7 @@ extern netdev_tap_t netdev_tap;
 
 #include "native_internal.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 ucontext_t end_context;
@@ -142,12 +141,12 @@ void isr_cpu_switch_context_exit(void)
     ucontext_t *ctx;
 
     DEBUG("isr_cpu_switch_context_exit\n");
-    if ((sched_context_switch_request == 1) || (sched_active_thread == NULL)) {
+    if ((sched_context_switch_request == 1) || (thread_get_active() == NULL)) {
         sched_run();
     }
 
-    DEBUG("isr_cpu_switch_context_exit: calling setcontext(%" PRIkernel_pid ")\n\n", sched_active_pid);
-    ctx = (ucontext_t *)(sched_active_thread->sp);
+    DEBUG("isr_cpu_switch_context_exit: calling setcontext(%" PRIkernel_pid ")\n\n", thread_getpid());
+    ctx = (ucontext_t *)(thread_get_active()->sp);
 
     native_interrupts_enabled = 1;
     _native_mod_ctx_leave_sigh(ctx);
@@ -171,7 +170,7 @@ void cpu_switch_context_exit(void)
         irq_disable();
         _native_in_isr = 1;
         native_isr_context.uc_stack.ss_sp = __isr_stack;
-        native_isr_context.uc_stack.ss_size = sizeof(__isr_stack);
+        native_isr_context.uc_stack.ss_size = SIGSTKSZ;
         native_isr_context.uc_stack.ss_flags = 0;
         makecontext(&native_isr_context, isr_cpu_switch_context_exit, 0);
         if (setcontext(&native_isr_context) == -1) {
@@ -195,8 +194,9 @@ void isr_thread_yield(void)
     }
 
     sched_run();
-    ucontext_t *ctx = (ucontext_t *)(sched_active_thread->sp);
-    DEBUG("isr_thread_yield: switching to(%" PRIkernel_pid ")\n\n", sched_active_pid);
+    ucontext_t *ctx = (ucontext_t *)(thread_get_active()->sp);
+    DEBUG("isr_thread_yield: switching to(%" PRIkernel_pid ")\n\n",
+          thread_getpid());
 
     native_interrupts_enabled = 1;
     _native_mod_ctx_leave_sigh(ctx);
@@ -208,12 +208,11 @@ void isr_thread_yield(void)
 
 void thread_yield_higher(void)
 {
-    if (_native_in_isr == 0) {
-        ucontext_t *ctx = (ucontext_t *)(sched_active_thread->sp);
+    sched_context_switch_request = 1;
+
+    if (_native_in_isr == 0 && native_interrupts_enabled) {
+        ucontext_t *ctx = (ucontext_t *)(thread_get_active()->sp);
         _native_in_isr = 1;
-        if (!native_interrupts_enabled) {
-            warnx("thread_yield_higher: interrupts are disabled - this should not be");
-        }
         irq_disable();
         native_isr_context.uc_stack.ss_sp = __isr_stack;
         native_isr_context.uc_stack.ss_size = SIGSTKSZ;
@@ -223,9 +222,6 @@ void thread_yield_higher(void)
             err(EXIT_FAILURE, "thread_yield_higher: swapcontext");
         }
         irq_enable();
-    }
-    else {
-        sched_context_switch_request = 1;
     }
 }
 

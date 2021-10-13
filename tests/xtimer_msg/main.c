@@ -28,6 +28,8 @@
 #include "thread.h"
 #include "msg.h"
 
+#include "test_utils/expect.h"
+
 char timer_stack[THREAD_STACKSIZE_DEFAULT];
 char timer_stack_local[THREAD_STACKSIZE_DEFAULT];
 
@@ -60,7 +62,7 @@ void *timer_thread(void *arg)
         msg_receive(&m);
         struct timer_msg *tmsg = m.content.ptr;
         uint32_t now = xtimer_now_usec();
-        printf("now=%" PRIu32 ":%" PRIu32 " -> every %" PRIu32 ".%" PRIu32 "s: %s\n",
+        printf("now=%lu:%lu -> every %lu.%lus: %s\n",
                (now / US_PER_SEC),
                (now % US_PER_SEC),
                tmsg->interval / US_PER_SEC,
@@ -103,6 +105,8 @@ int main(void)
                   NULL,
                   "timer");
 
+    expect(pid_is_valid(pid));
+
     puts("sending 1st msg");
     m.content.ptr = &msg_a;
     msg_try_send(&m, pid);
@@ -119,6 +123,8 @@ int main(void)
                    timer_thread_local,
                    NULL,
                    "timer local");
+
+    expect(pid_is_valid(pid2));
 
     while (1) {
         xtimer_sleep(1);

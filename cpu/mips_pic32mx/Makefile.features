@@ -1,1 +1,4 @@
--include $(RIOTCPU)/mips_pic32_common/Makefile.features
+CPU_CORE = m4k
+CPU_FAM = pic32mx
+
+include $(RIOTCPU)/mips_pic32_common/Makefile.features

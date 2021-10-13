@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 OTA keys S.A.
+ * Copyright (C) 2016-2018 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -26,8 +26,6 @@ extern "C" {
 
 #include <stdatomic.h>
 
-#include "net/gnrc/pktbuf.h"
-
 #include "can/common.h"
 #include "can/can.h"
 #include "msg.h"
@@ -45,7 +43,6 @@ typedef struct {
     atomic_uint ref_count;   /**< Reference counter (for rx frames) */
     int handle;              /**< handle (for tx frames */
     struct can_frame frame;  /**< CAN Frame */
-    gnrc_pktsnip_t *snip;    /**< Pointer to the allocated snip */
 } can_pkt_t;
 
 /**
@@ -65,7 +62,7 @@ void can_pkt_init(void);
  * @param[in] frame  the frame to copy
  * @param[in] tx_pid the pid of the sender's device thread
  *
- * @return an allocated CAN packet, NULL if an error occured
+ * @return an allocated CAN packet, NULL if an error occurred
  */
 can_pkt_t *can_pkt_alloc_tx(int ifnum, const struct can_frame *frame, kernel_pid_t tx_pid);
 
@@ -75,7 +72,7 @@ can_pkt_t *can_pkt_alloc_tx(int ifnum, const struct can_frame *frame, kernel_pid
  * @param[in] ifnum  the interface number
  * @param[in] frame  the received frame
  *
- * @return an allocated CAN packet, NULL if an error occured
+ * @return an allocated CAN packet, NULL if an error occurred
  */
 can_pkt_t *can_pkt_alloc_rx(int ifnum, const struct can_frame *frame);
 
@@ -90,7 +87,7 @@ can_pkt_t *can_pkt_alloc_rx(int ifnum, const struct can_frame *frame);
  * @param[in] frame  the frame to copy
  * @param[in] mbox   the pointer to the sender's mbox
  *
- * @return an allocated CAN packet, NULL if an error occured
+ * @return an allocated CAN packet, NULL if an error occurred
  */
 can_pkt_t *can_pkt_alloc_mbox_tx(int ifnum, const struct can_frame *frame, mbox_t *mbox);
 #endif

@@ -1,0 +1,561 @@
+From 41f67fba4ece1191851d21178167e953ecb85227 Mon Sep 17 00:00:00 2001
+From: Fabio Utzig <utzig@apache.org>
+Date: Tue, 31 Mar 2020 17:36:50 -0300
+Subject: [PATCH] Add a HKDF implementation
+
+HKDF, as defined by RFC5869, is a simple (HMAC)-based key derivation function,
+which can be used as a building block in various protocols and applications.
+
+Signed-off-by: Fabio Utzig <utzig@apache.org>
+---
+ lib/include/tinycrypt/hkdf.h | 102 ++++++++++++++
+ lib/source/hkdf.c            | 141 +++++++++++++++++++
+ tests/Makefile               |   3 +
+ tests/test_hkdf.c            | 264 +++++++++++++++++++++++++++++++++++
+ 4 files changed, 510 insertions(+)
+ create mode 100644 lib/include/tinycrypt/hkdf.h
+ create mode 100644 lib/source/hkdf.c
+ create mode 100644 tests/test_hkdf.c
+
+diff --git a/lib/include/tinycrypt/hkdf.h b/lib/include/tinycrypt/hkdf.h
+new file mode 100644
+index 0000000..230fba6
+--- /dev/null
++++ b/lib/include/tinycrypt/hkdf.h
+@@ -0,0 +1,102 @@
++/* hkdf.h - TinyCrypt interface to an HKDF implementation */
++
++/*
++ *  Copyright (C) 2020 by JUUL Labs, All Rights Reserved.
++ *
++ *  Redistribution and use in source and binary forms, with or without
++ *  modification, are permitted provided that the following conditions are met:
++ *
++ *    - Redistributions of source code must retain the above copyright notice,
++ *     this list of conditions and the following disclaimer.
++ *
++ *    - Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ *    - Neither the name of Intel Corporation nor the names of its contributors
++ *    may be used to endorse or promote products derived from this software
++ *    without specific prior written permission.
++ *
++ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
++ *  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ *  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ *  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
++ *  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++ *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++ *  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
++ *  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
++ *  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ *  POSSIBILITY OF SUCH DAMAGE.
++ */
++
++/**
++ * @file
++ * @brief Interface to an HKDF SHA-256 implementation.
++ *
++ *  Overview:   HKDF is a simple (HMAC)-based key derivation function (HKDF),
++ *              which can be used as a building block in various protocols and
++ *              applications. TinyCrypt uses HMAC with hard coded SHA-256 as
++ *              the hash function. HKDF is stateless, so no initialization
++ *              or context pointers are required for its use.
++ *
++ *  Requires:   HMAC
++ *
++ *  Usage:      1) call tc_hkdf_extract to create a new pseudorandom key. When
++ *                 a PRK with good random properties is already available by
++ *                 the HKDF client, calling this function might be skipped.
++ *
++ *              2) call tc_hkdf_expand to expand the given pseudorandom key
++ *                 into a given number of octets. Usually the PRK will come
++ *                 from the output of tc_hkdf_extract.
++ */
++
++#ifndef __TC_HKDF_H__
++#define __TC_HKDF_H__
++
++#include <tinycrypt/sha256.h>
++#include <tinycrypt/hmac.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/**
++ *  @brief HKDF extract
++ *  Outputs a pseudorandom key of size TC_SHA256_DIGEST_SIZE from input
++ *  keying material
++ *  @return returns TC_CRYPTO_SUCCCESS (1)
++ *          returns TC_CRYPTO_FAIL (0) if:
++ *                ikm == NULL or
++ *                ikmlen == 0 or
++ *                prk == NULL
++ *  @param ikm IN -- input keying material
++ *  @param ikmlen IN - size of keying material
++ *  @param salt IN - optional salt value
++ *  @param saltlen IN - size of salt (not used if salt == NULL)
++ *  @param prk OUT - output pseudorandom key for expand
++ */
++int tc_hkdf_extract(const void *ikm, size_t ikmlen, const void *salt,
++		    size_t saltlen, void *prk);
++
++/**
++ *  @brief HKDF expand
++ *  Expands a key into L number of bytes written on okm
++ *  @return returns TC_CRYPTO_SUCCESS (1)
++ *          returns TC_CRYPTO_FAIL (0) if:
++ *                prk == NULL or
++ *                okm == NULL
++ *  @param prk IN -- a pseudorandom key (can be generated with tc_hkdf_extract)
++ *  @param info IN -- an application specific information tag
++ *  @param infolen IN -- size of info in bytes
++ *  @param L IN -- number of bytes of the key to derive into okm
++ *  @param okm OUT -- buffer for the key derivation output
++ */
++int tc_hkdf_expand(const void *prk, const void *info, size_t infolen,
++		   size_t L, void *okm);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /*__TC_HKDF_H__*/
+diff --git a/lib/source/hkdf.c b/lib/source/hkdf.c
+new file mode 100644
+index 0000000..f5ee0ed
+--- /dev/null
++++ b/lib/source/hkdf.c
+@@ -0,0 +1,141 @@
++/* hkdf.c - TinyCrypt implementation of HKDF-SHA256 */
++
++/*
++ *  Copyright (C) 2020 by JUUL Labs, All Rights Reserved.
++ *
++ *  Redistribution and use in source and binary forms, with or without
++ *  modification, are permitted provided that the following conditions are met:
++ *
++ *    - Redistributions of source code must retain the above copyright notice,
++ *     this list of conditions and the following disclaimer.
++ *
++ *    - Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ *    - Neither the name of Intel Corporation nor the names of its contributors
++ *    may be used to endorse or promote products derived from this software
++ *    without specific prior written permission.
++ *
++ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
++ *  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ *  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ *  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
++ *  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++ *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++ *  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
++ *  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
++ *  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ *  POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#include <tinycrypt/hkdf.h>
++#include <tinycrypt/sha256.h>
++#include <tinycrypt/constants.h>
++#include <tinycrypt/utils.h>
++
++int tc_hkdf_extract(const void *ikm, size_t ikmlen, const void *salt,
++		    size_t saltlen, void *prk)
++{
++	uint8_t _salt[TC_SHA256_DIGEST_SIZE];
++	struct tc_hmac_state_struct hmac_state;
++	unsigned int rc;
++
++	if (ikm == (const void *) 0 ||
++	    ikmlen == 0 ||
++	    prk == (void *) 0) {
++		return TC_CRYPTO_FAIL;
++	}
++
++	if (salt == (const void *) 0) {
++		_set(_salt, 0, TC_SHA256_DIGEST_SIZE);
++		rc = tc_hmac_set_key(&hmac_state, _salt, TC_SHA256_DIGEST_SIZE);
++	} else {
++		rc = tc_hmac_set_key(&hmac_state, salt, saltlen);
++	}
++
++	if (rc != TC_CRYPTO_SUCCESS) {
++		return TC_CRYPTO_FAIL;
++	}
++
++	rc = tc_hmac_init(&hmac_state);
++	if (rc != TC_CRYPTO_SUCCESS) {
++		return TC_CRYPTO_FAIL;
++	}
++
++	rc = tc_hmac_update(&hmac_state, ikm, ikmlen);
++	if (rc != TC_CRYPTO_SUCCESS) {
++		return TC_CRYPTO_FAIL;
++	}
++
++	return tc_hmac_final(prk, TC_SHA256_DIGEST_SIZE, &hmac_state);
++}
++
++int tc_hkdf_expand(const void *prk, const void *info, size_t infolen,
++		   size_t L, void *okm)
++{
++	uint8_t T[TC_SHA256_DIGEST_SIZE];
++	struct tc_hmac_state_struct hmac_state;
++	uint16_t off;
++	uint16_t len;
++	uint8_t counter;
++	uint8_t *u8okm;
++	bool first;
++	int rc;
++
++	if (prk == (const void *) 0 || okm == (void *) 0) {
++		return TC_CRYPTO_FAIL;
++	}
++
++	u8okm = (uint8_t *)okm;
++	len = L;
++	counter = 1;
++	first = true;
++	for (off = 0; len > 0; off += TC_SHA256_DIGEST_SIZE, ++counter) {
++		rc = tc_hmac_set_key(&hmac_state, prk, TC_SHA256_DIGEST_SIZE);
++		if (rc != TC_CRYPTO_SUCCESS) {
++			return TC_CRYPTO_FAIL;
++		}
++
++		rc = tc_hmac_init(&hmac_state);
++		if (rc != TC_CRYPTO_SUCCESS) {
++			return TC_CRYPTO_FAIL;
++		}
++
++		if (!first) {
++			rc = tc_hmac_update(&hmac_state, T,
++					    TC_SHA256_DIGEST_SIZE);
++			if (rc != TC_CRYPTO_SUCCESS) {
++				return TC_CRYPTO_FAIL;
++			}
++		} else {
++			first = false;
++		}
++
++		rc = tc_hmac_update(&hmac_state, info, infolen);
++		if (rc != TC_CRYPTO_SUCCESS) {
++			return TC_CRYPTO_FAIL;
++		}
++
++		rc = tc_hmac_update(&hmac_state, &counter, 1);
++		if (rc != TC_CRYPTO_SUCCESS) {
++			return TC_CRYPTO_FAIL;
++		}
++
++		rc = tc_hmac_final(T, TC_SHA256_DIGEST_SIZE, &hmac_state);
++		if (rc != TC_CRYPTO_SUCCESS) {
++			return TC_CRYPTO_FAIL;
++		}
++
++		if (len > TC_SHA256_DIGEST_SIZE) {
++			memcpy(&u8okm[off], T, TC_SHA256_DIGEST_SIZE);
++			len -= TC_SHA256_DIGEST_SIZE;
++		} else {
++			memcpy(&u8okm[off], T, len);
++			len = 0;
++		}
++	}
++
++	return TC_CRYPTO_SUCCESS;
++}
+diff --git a/tests/Makefile b/tests/Makefile
+index eff5a88..ce8ce12 100644
+--- a/tests/Makefile
++++ b/tests/Makefile
+@@ -53,6 +53,9 @@ test_hmac_prng$(DOTEXE): test_hmac_prng.o hmac_prng.o hmac.o \
+ 		sha256.o utils.o
+ 	$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
+ 
++test_hkdf$(DOTEXE): test_hkdf.o hkdf.o hmac.o sha256.o utils.o
++	$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
++
+ test_sha256$(DOTEXE): test_sha256.o sha256.o utils.o
+ 	$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
+ 
+diff --git a/tests/test_hkdf.c b/tests/test_hkdf.c
+new file mode 100644
+index 0000000..ef1b817
+--- /dev/null
++++ b/tests/test_hkdf.c
+@@ -0,0 +1,264 @@
++/*  test_hkdf.c - TinyCrypt implementation of some HKDF tests */
++
++/*
++ *  Copyright (C) 2020 by JUUL Labs
++ *
++ *  Redistribution and use in source and binary forms, with or without
++ *  modification, are permitted provided that the following conditions are met:
++ *
++ *  - Redistributions of source code must retain the above copyright notice,
++ *    this list of conditions and the following disclaimer.
++ *
++ *  - Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ *  - Neither the name of Intel Corporation nor the names of its contributors
++ *    may be used to endorse or promote products derived from this software
++ *    without specific prior written permission.
++ *
++ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
++ *  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ *  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ *  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
++ *  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++ *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++ *  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
++ *  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
++ *  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ *  POSSIBILITY OF SUCH DAMAGE.
++ */
++
++/*
++  DESCRIPTION
++  This module tests the following HKDF routines:
++  - tc_hkdf_extract
++  - tc_hkdf_expand
++
++  Scenarios tested include:
++  - HKDF tests (RFC 5869 test vectors)
++*/
++
++#include <tinycrypt/hkdf.h>
++#include <tinycrypt/sha256.h>
++#include <tinycrypt/constants.h>
++#include <test_utils.h>
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <stdint.h>
++
++#define MAX_L 82
++
++unsigned int do_hkdf_test(unsigned int testnum,
++			  const uint8_t *ikm, size_t ikmlen,
++			  const uint8_t *salt, size_t saltlen,
++			  const uint8_t *info, size_t infolen,
++			  const uint8_t *expected_prk, size_t L,
++			  const uint8_t *expected_okm)
++{
++	uint8_t prk[TC_SHA256_DIGEST_SIZE];
++	uint8_t okm[MAX_L];
++	unsigned int result = TC_PASS;
++	int rc;
++
++	if (L > MAX_L) {
++		return TC_FAIL;
++	}
++
++	/* Check extract and expand as separate operations */
++	rc = tc_hkdf_extract(ikm, ikmlen, salt, saltlen, prk);
++	if (rc != TC_CRYPTO_SUCCESS) {
++		return TC_FAIL;
++	}
++	result = check_result(testnum, expected_prk, TC_SHA256_DIGEST_SIZE,
++			      prk, TC_SHA256_DIGEST_SIZE);
++	if (result != TC_PASS) {
++		return result;
++	}
++	rc = tc_hkdf_expand(prk, info, infolen, L, okm);
++	if (rc != TC_CRYPTO_SUCCESS) {
++		return TC_FAIL;
++	}
++	return check_result(testnum, expected_okm, L, okm, L);
++}
++
++/*
++ * RFC5869 HKDF-SHA256 test vectors
++ */
++unsigned int test_1(void)
++{
++	unsigned int result = TC_PASS;
++	TC_PRINT("HKDF %s:\n", __func__);
++
++	const uint8_t IKM[22] = {
++		0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
++		0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
++		0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
++	};
++	const uint8_t salt[13] = {
++		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
++		0x08, 0x09, 0x0a, 0x0b, 0x0c,
++	};
++	const uint8_t info[10] = {
++		0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7,
++		0xf8, 0xf9,
++	};
++	const uint8_t PRK[TC_SHA256_DIGEST_SIZE] = {
++		0x07, 0x77, 0x09, 0x36, 0x2c, 0x2e, 0x32, 0xdf,
++		0x0d, 0xdc, 0x3f, 0x0d, 0xc4, 0x7b, 0xba, 0x63,
++		0x90, 0xb6, 0xc7, 0x3b, 0xb5, 0x0f, 0x9c, 0x31,
++		0x22, 0xec, 0x84, 0x4a, 0xd7, 0xc2, 0xb3, 0xe5,
++	};
++	const uint8_t L = 42;
++	const uint8_t OKM[42] = {
++		0x3c, 0xb2, 0x5f, 0x25, 0xfa, 0xac, 0xd5, 0x7a,
++		0x90, 0x43, 0x4f, 0x64, 0xd0, 0x36, 0x2f, 0x2a,
++		0x2d, 0x2d, 0x0a, 0x90, 0xcf, 0x1a, 0x5a, 0x4c,
++		0x5d, 0xb0, 0x2d, 0x56, 0xec, 0xc4, 0xc5, 0xbf,
++		0x34, 0x00, 0x72, 0x08, 0xd5, 0xb8, 0x87, 0x18,
++		0x58, 0x65,
++	};
++
++	result = do_hkdf_test(1, IKM, sizeof(IKM), salt,
++		sizeof(salt), info, sizeof(info), PRK, L, OKM);
++	TC_END_RESULT(result);
++	return result;
++}
++
++unsigned int test_2(void)
++{
++	unsigned int result = TC_PASS;
++	TC_PRINT("HKDF %s:\n", __func__);
++	const uint8_t IKM[80] = {
++		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
++		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
++		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
++		0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
++		0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
++		0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
++		0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
++		0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
++		0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
++		0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f,
++	};
++	const uint8_t salt[80] = {
++		0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67,
++		0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f,
++		0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77,
++		0x78, 0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f,
++		0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
++		0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
++		0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97,
++		0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f,
++		0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7,
++		0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf,
++	};
++	const uint8_t info[80] = {
++		0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7,
++		0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf,
++		0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7,
++		0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf,
++		0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7,
++		0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
++		0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7,
++		0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xef,
++		0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7,
++		0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff,
++	};
++	const uint8_t PRK[TC_SHA256_DIGEST_SIZE] = {
++		0x06, 0xa6, 0xb8, 0x8c, 0x58, 0x53, 0x36, 0x1a,
++		0x06, 0x10, 0x4c, 0x9c, 0xeb, 0x35, 0xb4, 0x5c,
++		0xef, 0x76, 0x00, 0x14, 0x90, 0x46, 0x71, 0x01,
++		0x4a, 0x19, 0x3f, 0x40, 0xc1, 0x5f, 0xc2, 0x44,
++	};
++	const uint8_t L = 82;
++	const uint8_t OKM[82] = {
++		0xb1, 0x1e, 0x39, 0x8d, 0xc8, 0x03, 0x27, 0xa1,
++		0xc8, 0xe7, 0xf7, 0x8c, 0x59, 0x6a, 0x49, 0x34,
++		0x4f, 0x01, 0x2e, 0xda, 0x2d, 0x4e, 0xfa, 0xd8,
++		0xa0, 0x50, 0xcc, 0x4c, 0x19, 0xaf, 0xa9, 0x7c,
++		0x59, 0x04, 0x5a, 0x99, 0xca, 0xc7, 0x82, 0x72,
++		0x71, 0xcb, 0x41, 0xc6, 0x5e, 0x59, 0x0e, 0x09,
++		0xda, 0x32, 0x75, 0x60, 0x0c, 0x2f, 0x09, 0xb8,
++		0x36, 0x77, 0x93, 0xa9, 0xac, 0xa3, 0xdb, 0x71,
++		0xcc, 0x30, 0xc5, 0x81, 0x79, 0xec, 0x3e, 0x87,
++		0xc1, 0x4c, 0x01, 0xd5, 0xc1, 0xf3, 0x43, 0x4f,
++		0x1d, 0x87,
++	};
++
++	result = do_hkdf_test(2, IKM, sizeof(IKM), salt,
++		sizeof(salt), info, sizeof(info), PRK, L, OKM);
++	TC_END_RESULT(result);
++	return result;
++}
++
++unsigned int test_3(void)
++{
++	unsigned int result = TC_PASS;
++	TC_PRINT("HKDF %s:\n", __func__);
++	const uint8_t IKM[22] = {
++		0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
++		0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
++		0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
++	};
++	const uint8_t *salt = NULL;
++	const uint8_t *info = NULL;
++	const uint8_t PRK[TC_SHA256_DIGEST_SIZE] = {
++		0x19, 0xef, 0x24, 0xa3, 0x2c, 0x71, 0x7b, 0x16,
++		0x7f, 0x33, 0xa9, 0x1d, 0x6f, 0x64, 0x8b, 0xdf,
++		0x96, 0x59, 0x67, 0x76, 0xaf, 0xdb, 0x63, 0x77,
++		0xac, 0x43, 0x4c, 0x1c, 0x29, 0x3c, 0xcb, 0x04,
++	};
++	const uint8_t L = 42;
++	const uint8_t OKM[42] = {
++		0x8d, 0xa4, 0xe7, 0x75, 0xa5, 0x63, 0xc1, 0x8f,
++		0x71, 0x5f, 0x80, 0x2a, 0x06, 0x3c, 0x5a, 0x31,
++		0xb8, 0xa1, 0x1f, 0x5c, 0x5e, 0xe1, 0x87, 0x9e,
++		0xc3, 0x45, 0x4e, 0x5f, 0x3c, 0x73, 0x8d, 0x2d,
++		0x9d, 0x20, 0x13, 0x95, 0xfa, 0xa4, 0xb6, 0x1a,
++		0x96, 0xc8,
++	};
++
++	result = do_hkdf_test(3, IKM, sizeof(IKM), salt, 0, info, 0, PRK,
++			      L, OKM);
++	TC_END_RESULT(result);
++	return result;
++}
++
++/*
++ * Main task to test HKDF
++ */
++int main(void)
++{
++	unsigned int result = TC_PASS;
++
++	TC_START("Performing HKDF tests (RFC5869 test vectors):");
++
++	result = test_1();
++	if (result == TC_FAIL) {
++		/* terminate test */
++		TC_ERROR("HKDF test #1 failed.\n");
++		goto exitTest;
++	}
++	result = test_2();
++	if (result == TC_FAIL) {
++		/* terminate test */
++		TC_ERROR("HKDF test #2 failed.\n");
++		goto exitTest;
++	}
++	result = test_3();
++	if (result == TC_FAIL) {
++		/* terminate test */
++		TC_ERROR("HKDF test #3 failed.\n");
++		goto exitTest;
++	}
++
++	TC_PRINT("All HKDF tests succeeded!\n");
++
++exitTest:
++	TC_END_RESULT(result);
++	TC_END_REPORT(result);
++}
+-- 
+2.28.0
+

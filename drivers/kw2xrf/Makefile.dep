@@ -1,0 +1,7 @@
+USEMODULE += luid
+USEMODULE += ieee802154
+USEMODULE += netdev_ieee802154
+USEMODULE += core_thread_flags
+FEATURES_REQUIRED += periph_spi
+FEATURES_REQUIRED += periph_gpio
+FEATURES_REQUIRED += periph_gpio_irq

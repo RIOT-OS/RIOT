@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_nrf51822
+ * @ingroup     cpu_nrf51
  * @{
  *
  * @file

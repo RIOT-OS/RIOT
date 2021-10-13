@@ -1,0 +1,12 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config EFM32_XTIMER_USE_LETIMER
+    bool "Xtimer uses letimer"
+    depends on CPU_COMMON_EFM32 && USEMODULE_XTIMER
+    default n
+    help
+        Xtimer will use EFM32 Low Energy Timer as its low level timer.

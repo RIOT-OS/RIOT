@@ -39,14 +39,14 @@
 #define OSC_STEP        (10)
 #define OSC_MODE        PWM_LEFT
 #define OSC_FREQU       (1000U)
-#define OSC_STEPS       (1000U)
+#define OSC_STEPS       (256U)
 #define PWR_SLEEP       (1U)
 
 static uint32_t initiated;
 
 static unsigned _get_dev(const char *dev_str)
 {
-    unsigned dev = (unsigned)atoi(dev_str);
+    unsigned dev = atoi(dev_str);
     if (dev >= PWM_NUMOF) {
         printf("Error: device PWM_DEV(%u) is unknown\n", dev);
         return UINT_MAX;
@@ -64,7 +64,7 @@ static int _init(int argc, char** argv)
         puts("\t\t1: right aligned\n");
         puts("\t\t2: center aligned\n");
         puts("\tfrequency: desired frequency in Hz\n");
-        printf("\tresolution: number between 2 and %" PRIu16 "\n", UINT16_MAX);
+        puts("\tresolution: number between 2 and 65535");
         return 1;
     }
 
@@ -123,7 +123,7 @@ static int _set(int argc, char**argv)
         return 1;
     }
 
-    uint8_t chan = (uint8_t)atoi(argv[2]);
+    uint8_t chan = atoi(argv[2]);
     if (chan >= pwm_channels(PWM_DEV(dev))) {
         printf("Error: channel %d is unknown.\n", chan);
         return 1;

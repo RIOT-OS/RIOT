@@ -1,0 +1,12 @@
+CPU_CORE = cortex-m4f
+CPU_FAM  = qn908x
+
+FEATURES_PROVIDED += cortexm_mpu
+FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_gpio periph_gpio_irq
+FEATURES_PROVIDED += periph_i2c_reconfigure
+FEATURES_PROVIDED += periph_rtc
+FEATURES_PROVIDED += periph_spi_reconfigure
+FEATURES_PROVIDED += periph_wdt periph_wdt_cb
+
+include $(RIOTCPU)/cortexm_common/Makefile.features

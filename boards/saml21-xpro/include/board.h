@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_saml21-xpro Atmel SAM L21 Xplained Pro
- * @ingroup     boards
- * @brief       Support for the Atmel SAM L21 Xplained Pro board.
+ * @ingroup     boards_saml21-xpro
  * @{
  *
  * @file
@@ -50,7 +48,6 @@ extern "C" {
 #define BTN0_PIN            GPIO_PIN(PA, 2)
 #define BTN0_MODE           GPIO_IN_PU
 /** @} */
-
 
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO

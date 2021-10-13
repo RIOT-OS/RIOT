@@ -31,7 +31,7 @@
  * to the physical support, the region where the device is used needs to be
  * set at compile time. Example for EU868:
  * ```
- *     CFLAGS += -DREGION_EU868
+ *     LORA_REGION = EU868
  * ```
  *
  * # Using the package API
@@ -43,14 +43,12 @@
  * In your `main.c`, some header files must be first included:
  * ```c
  *     #include "net/loramac.h"     /* core loramac definitions */
- *     #include "semtech-loramac.h" /* package API */
- *     #include "sx127x.h"          /* SX1272/6 device driver API */
- *     #include "sx127x_params.h"   /* SX1272/6 device driver initialization parameters */
+ *     #include "semtech_loramac.h" /* package API */
  * ```
  *
  * Then define global variables:
  * ```c
- *     sx127x_t sx127x;  /* SX1272/6 device descriptor */
+ *     semtech_loramac_t loramac;  /* The loramac stack device descriptor */
  *     /* define the required keys for OTAA, e.g over-the-air activation (the
  *        null arrays need to be updated with valid LoRa values) */
  *     static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = { 0x00, 0x00, 0x00, 0x00, \
@@ -64,41 +62,112 @@
  * ```
  *
  * Now in the `main` function:
- * 1. setup the radio driver with the initialization parameters (spi bus, pins, etc)
- * 2. initialize the LoRaMAC MAC layer
- * 3. set the LoRa keys
- * 4. join the network
- * 5. send some data to the network
+ * 1. initialize the LoRaMAC MAC layer
+ * 2. set the LoRa keys
+ * 3. join the network
+ * 4. send some data to the network
  *
  * ```c
  * int main(void)
  * {
- *     /* 1. setup the radio driver */
- *     sx127x_setup(&sx127x, &sx127x_params[0]);
+ *     /* 1. initialize the LoRaMAC MAC layer */
+ *     semtech_loramac_init(&loramac);
  *
- *     /* 2. initialize the LoRaMAC MAC layer */
- *     semtech_loramac_init(&sx127x);
+ *     /* 2. set the keys identifying the device */
+ *     semtech_loramac_set_deveui(&loramac, deveui);
+ *     semtech_loramac_set_appeui(&loramac, appeui);
+ *     semtech_loramac_set_appkey(&loramac, appkey);
  *
- *     /* 3. set the device required keys */
- *     semtech_loramac_set_deveui(deveui);
- *     semtech_loramac_set_appeui(appeui);
- *     semtech_loramac_set_appkey(appkey);
- *
- *     /* 4. join the network */
- *     if (semtech_loramac_join(LORAMAC_JOIN_OTAA) != SEMTECH_LORAMAC_JOIN_SUCCEEDED) {
+ *     /* 3. join the network */
+ *     if (semtech_loramac_join(&loramac, LORAMAC_JOIN_OTAA) != SEMTECH_LORAMAC_JOIN_SUCCEEDED) {
  *         puts("Join procedure failed");
  *         return 1;
  *     }
  *     puts("Join procedure succeeded");
  *
- *     /* 5. send some data using confirmable mode on port 10 and assuming no
- *           data is received */
+ *     /* 4. send some data */
  *     char *message = "This is RIOT";
- *     semtech_loramac_rx_data_t rx_data;
- *     semtech_loramac_send(LORAMAC_TX_CNF, 10,
-                            (uint8_t *)message, strlen(message), &rx_data);
+ *     if (semtech_loramac_send(&loramac,
+ *                              (uint8_t *)message, strlen(message)) != SEMTECH_LORAMAC_TX_DONE) {
+           printf("Cannot send message '%s'\n", message);
+ *         return 1;
+ *     }
+ *
  * }
  * ```
+ *
+ * To receive downlink messages, enable the `semtech_loramac_rx` and use a
+ * dedicated receiving thread.
+ * - In the application Makefile, add
+ * ```mk
+ * USEMODULE += semtech_loramac_rx
+ * ```
+ * - At the beginning of the application source file, add the necessary
+ * includes and declare the message queue and stack arrays:
+ * ```c
+ * #include "thread.h"
+ *
+ * #define RECV_MSG_QUEUE                   (4U)
+ * static msg_t _recv_queue[RECV_MSG_QUEUE];
+ *
+ * static char _recv_stack[THREAD_STACKSIZE_DEFAULT];
+ * ```
+ * - Implement the thread: it initializes its message queue and then
+ * simply calls the blocking `semtech_loramac_recv` function in a loop:
+ * ```c
+ * static void *_recv(void *arg)
+ * {
+ *     msg_init_queue(_recv_queue, RECV_MSG_QUEUE);
+ *
+ *     (void)arg;
+ *     while (1) {
+ *         /* blocks until some data is received */
+ *         semtech_loramac_recv(&loramac);
+ *         loramac.rx_data.payload[loramac.rx_data.payload_len] = 0;
+ *         printf("Data received: %s, port: %d\n",
+ *                (char *)loramac.rx_data.payload, loramac.rx_data.port);
+ *     }
+ *     return NULL;
+ * }
+ * ```
+ * - Finally, this thread can be started after the join procedure
+ * succeeds:
+ * ```c
+ * thread_create(_recv_stack, sizeof(_recv_stack),
+ *               THREAD_PRIORITY_MAIN - 1, 0, _recv, NULL, "recv thread");
+ * ```
+ *
+ * # Persistence
+ *
+ * If the board CPU provides an internal EEPROM, this package provides a
+ * mechanism for storing EUIs, keys and some MAC parameters (frame counter,
+ * join status).
+ * After a successful join procedure, use `semtech_loramac_save` function to
+ * persist this information and it will be loaded automatically at the next
+ * reboot.
+ * If the device is already joined to a network, to avoid another OTAA join
+ * procedure use `semtech_loramac_is_mac_joined` function to check the join
+ * status of the device.
+ *
+ * This mechanism is especially useful when using deep sleep power modes that
+ * don't preserve RAM.
+ *
+ * # Low power considerations
+ *
+ * The internal implementation of the required LoRaWAN timings (delay before
+ * opening RX windows, duty-cycle delays) automatically achieves the lowest
+ * possible power consumption while remaining usable when RIOT's low power modes
+ * are not blocked. All timings are managed by the @ref sys_ztimer
+ * running on the low-level @ref drivers_periph_rtt peripheral which
+ * allows for:
+ * - going to a deep-sleep mode with RAM retention (no reboot) between TX and
+ * RX1 and between RX1 and RX2 windows, and as a result reduces the power
+ * consumption
+ * - using deep-sleep mode with RAM retention and have the duty-cycle
+ * restriction still usable between each active cycle (wake-up, measure, send,
+ * receive, sleep).
+ * As a result, this package can only be used on boards that provide the
+ * `periph_rtt` feature.
  *
  * @warning It is not possible to directly call the original LoRaMAC-node API
  *          using this package. This package should only be considered as a
@@ -109,5 +178,5 @@
  *
  * The library is using the BSD 3-clause license.
  *
- * @see      github.com/Lora-net/LoRaMac-node
+ * @see      https://github.com/Lora-net/LoRaMac-node
  */

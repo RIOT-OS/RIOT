@@ -1,0 +1,6 @@
+# include variants of MPU9X50 drivers as pseudo modules
+PSEUDOMODULES += mpu9150
+PSEUDOMODULES += mpu9250
+
+USEMODULE_INCLUDES_mpu9x50 := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_mpu9x50)

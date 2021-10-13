@@ -1,3 +1,12 @@
-ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
-  USEMODULE += nrfmin
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += lis2dh12
+  USEMODULE += hts221
+  USEMODULE += lps22hb
 endif
+
+# Use Segger's RTT unless another stdio_% is already used
+ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
+  USEMODULE += stdio_rtt
+endif
+
+include $(RIOTBOARD)/common/nrf52/Makefile.dep

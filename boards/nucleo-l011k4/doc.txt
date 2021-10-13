@@ -1,0 +1,5 @@
+/**
+@defgroup    boards_nucleo-l011k4 STM32 Nucleo-L011K4
+@ingroup     boards_common_nucleo32
+@brief       Support for the STM32 Nucleo-L011K4
+ */

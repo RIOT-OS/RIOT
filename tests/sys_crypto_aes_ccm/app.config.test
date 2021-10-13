@@ -1,0 +1,11 @@
+# this file enables modules defined in Kconfig. Do not use this file for
+# application configuration. This is only needed during migration.
+
+CONFIG_MODULE_CRYPTO=y
+CONFIG_MODULE_CRYPTO_AES_128=y
+CONFIG_MODULE_CRYPTO_AES_192=y
+CONFIG_MODULE_CRYPTO_AES_256=y
+CONFIG_MODULE_CIPHER_MODES=y
+
+CONFIG_MODULE_EMBUNIT=y
+CONFIG_MODULE_TEST_UTILS_INTERACTIVE_SYNC=y

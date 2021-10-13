@@ -1,0 +1,89 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU lines
+config CPU_LINE_STM32F030X6
+    bool
+    select CPU_FAM_F0
+
+config CPU_LINE_STM32F030X8
+    bool
+    select CPU_FAM_F0
+    select CLOCK_HAS_NO_MCO_PRE
+
+config CPU_LINE_STM32F030XC
+    bool
+    select CPU_FAM_F0
+
+config CPU_LINE_STM32F031X6
+    bool
+    select CPU_FAM_F0
+    select HAS_PERIPH_RTC_MEM
+
+config CPU_LINE_STM32F038XX
+    bool
+    select CPU_FAM_F0
+    select HAS_PERIPH_RTC_MEM
+
+config CPU_LINE_STM32F042X6
+    bool
+    select CPU_FAM_F0
+    select HAS_PERIPH_RTC_MEM
+
+config CPU_LINE_STM32F048XX
+    bool
+    select CPU_FAM_F0
+    select HAS_PERIPH_RTC_MEM
+
+config CPU_LINE_STM32F051X8
+    bool
+    select CPU_FAM_F0
+    select CLOCK_HAS_NO_MCO_PRE
+    select HAS_PERIPH_RTC_MEM
+
+config CPU_LINE_STM32F058XX
+    bool
+    select CPU_FAM_F0
+    select CLOCK_HAS_NO_MCO_PRE
+    select HAS_PERIPH_RTC_MEM
+
+config CPU_LINE_STM32F070X6
+    bool
+    select CPU_FAM_F0
+
+config CPU_LINE_STM32F070XB
+    bool
+    select CPU_FAM_F0
+
+config CPU_LINE_STM32F071XB
+    bool
+    select CPU_FAM_F0
+    select HAS_PERIPH_RTC_MEM
+
+config CPU_LINE_STM32F072XB
+    bool
+    select CPU_FAM_F0
+    select HAS_PERIPH_RTC_MEM
+
+config CPU_LINE_STM32F078XX
+    bool
+    select CPU_FAM_F0
+    select HAS_PERIPH_RTC_MEM
+
+config CPU_LINE_STM32F091XC
+    bool
+    select CPU_FAM_F0
+    select HAS_PERIPH_RTC_MEM
+
+config CPU_LINE_STM32F098XX
+    bool
+    select CPU_FAM_F0
+    select HAS_PERIPH_RTC_MEM

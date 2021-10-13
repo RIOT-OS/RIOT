@@ -1,0 +1,35 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menuconfig KCONFIG_USEMODULE_ENTROPY_SOURCE_ZERO_ENTROPY
+    bool "Configure zero entropy source module"
+    depends on USEMODULE_ENTROPY_SOURCE_ZERO_ENTROPY
+    help
+        Configure the zero entropy source using Kconfig.
+
+if KCONFIG_USEMODULE_ENTROPY_SOURCE_ZERO_ENTROPY
+
+config ENTROPY_SOURCE_ZERO_HMIN
+    int "Estimated entropy per sample (byte)"
+    default 58982
+    help
+        This is a dummy default value for testing. The zero entropy module does not
+        contain any entropy at all.
+
+config ENTROPY_SOURCE_ZERO_HEALTH_TEST
+    bool "Enable health test"
+    default y
+    help
+        Enable health test by default. Testing is the only purpose of this module.
+
+config ENTROPY_SOURCE_ZERO_COND
+    bool "Enable conditioning"
+    help
+        Disable conditioning by default. Conditioning is useless for zeros only. The von
+        Neumann extractor would never finish and wait for the stop criterion given by
+        @ref CONFIG_ENTROPY_SOURCE_NEUMANN_ABORT.
+
+endif # KCONFIG_USEMODULE_ENTROPY_SOURCE_ZERO_ENTROPY

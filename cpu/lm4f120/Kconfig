@@ -1,0 +1,35 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_FAM_LM4F120
+    bool
+    select CPU_CORE_CORTEX_M4F
+    select HAS_CORTEXM_MPU
+    select HAS_CPU_LM4F120
+
+config CPU_MODEL_LM4F120H5QR
+    bool
+    select CPU_FAM_LM4F120
+
+## Declaration of specific features
+config HAS_CPU_LM4F120
+    bool
+    help
+        Indicates that a 'lm4f120' cpu is being used.
+
+## Common CPU symbols
+config CPU_FAM
+    default "lm4f120" if CPU_FAM_LM4F120
+
+config CPU
+    default "lm4f120" if CPU_FAM_LM4F120
+
+config CPU_MODEL
+    # uppercase to match the Makefile.features
+    default "LM4F120H5QR" if CPU_MODEL_LM4F120H5QR
+
+source "$(RIOTCPU)/cortexm_common/Kconfig"

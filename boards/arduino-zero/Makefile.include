@@ -1,8 +1,1 @@
-# define the cpu used by Arduino/Genuino Zero board
-export CPU = samd21
-export CPU_MODEL = samd21g18a
-
-# set edbg device type
-EDBG_DEVICE_TYPE = atmel_cm0p
-
-include $(RIOTMAKE)/boards/sam0.inc.mk
+include $(RIOTBOARD)/common/arduino-zero/Makefile.include

@@ -25,11 +25,7 @@
  * @}
  */
 
-#if defined(MCU_ATMEGA2560) || defined(MCU_ATMEGA1281) || defined(MCU_ATMEGA328P)
 #include <stdlib.h>
-#else
-#include <malloc.h>
-#endif
 
 #include "pipe.h"
 
@@ -46,8 +42,9 @@ pipe_t *pipe_malloc(unsigned size)
     if (m_pipe) {
         ringbuffer_init(&m_pipe->rb, m_pipe->buffer, size);
         pipe_init(&m_pipe->pipe, &m_pipe->rb, free);
+        return &m_pipe->pipe;
     }
-    return &m_pipe->pipe;
+    return NULL;
 }
 
 void pipe_free(pipe_t *rp)

@@ -19,6 +19,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/priority_pktqueue.h"
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2014  Oliver Hahm <oliver.hahm@inria.fr>
@@ -25,6 +25,7 @@ except ImportError:
     import ConfigParser as configparser
 
 import cmd
+import errno
 import serial
 import socket
 import sys
@@ -55,9 +56,9 @@ try:
     from twisted.internet.protocol import Protocol, \
         ReconnectingClientFactory
 except ImportError:
-    logging.getLogger("").warn("Twisted not available, please install "
-                               "it if you want to use pyterm's JSON "
-                               "capabilities")
+    logging.getLogger("").warning("Twisted not available, please install "
+                                  "it if you want to use pyterm's JSON "
+                                  "capabilities")
 
     class Protocol():
         def __init__(self):
@@ -86,13 +87,17 @@ defaultfile = "pyterm-" + defaulthostname + ".conf"
 defaultrunname = "default-run"
 
 # default logging prefix format string
-default_fmt_str = '%(asctime)s - %(levelname)s # %(message)s'
+default_fmt_str = '%(asctime)s # %(message)s'
 
 # default newline setting
 defaultnewline = "LF"
 
 # default prompt character
 defaultprompt = '>'
+
+# repeat command on empty line instead of sending the line
+defaultrepeat_cmd_empty_line = True
+defaultreconnect = True
 
 
 class SerCmd(cmd.Cmd):
@@ -105,7 +110,9 @@ class SerCmd(cmd.Cmd):
     def __init__(self, port=None, baudrate=None, toggle=None, tcp_serial=None,
                  confdir=None, conffile=None, host=None, run_name=None,
                  log_dir_name=None, newline=None, formatter=None,
-                 serprompt=None):
+                 set_rts=None, set_dtr=None, serprompt=None,
+                 repeat_command_on_empty_line=defaultrepeat_cmd_empty_line,
+                 reconnect=defaultreconnect):
         """Constructor.
 
         Args:
@@ -124,6 +131,8 @@ class SerCmd(cmd.Cmd):
         self.port = port
         self.baudrate = baudrate
         self.toggle = toggle
+        self.set_rts = set_rts
+        self.set_dtr = set_dtr
         self.tcp_serial = tcp_serial
         self.configdir = confdir
         self.configfile = conffile
@@ -132,6 +141,8 @@ class SerCmd(cmd.Cmd):
         self.log_dir_name = log_dir_name
         self.newline = newline
         self.serprompt = serprompt
+        self.repeat_command_on_empty_line = repeat_command_on_empty_line
+        self.reconnect = reconnect
         if formatter is not None:
             self.fmt_str = formatter
 
@@ -200,14 +211,20 @@ class SerCmd(cmd.Cmd):
             self.port = defaultport
         # if a TCP port is specified try to connect
         if self.tcp_serial:
-            if self.tcp_serial.find(':') >= 0:
-                host = self.tcp_serial.split(':')[0]
-                port = self.tcp_serial.split(':')[1]
+            # if this is an ipv6 address
+            if self.tcp_serial.find(']:') >= 0:
+                host = self.tcp_serial.split(']:')[0]
+                host = host.split('[')[1]
+                port = self.tcp_serial.split(']:')[1]
             else:
-                self.logger.warn("Host name for TCP connection is "
-                                 "missing, defaulting to \"localhost\"")
-                host = "localhost"
-                port = self.tcp_serial
+                if self.tcp_serial.find(':') >= 0:
+                    host = self.tcp_serial.split(':')[0]
+                    port = self.tcp_serial.split(':')[1]
+                else:
+                    self.logger.warning("Host name for TCP connection is "
+                                        "missing, defaulting to \"localhost\"")
+                    host = "localhost"
+                    port = self.tcp_serial
             self.logger.info("Connect to %s:%s"
                              % (host, port))
             try:
@@ -217,12 +234,12 @@ class SerCmd(cmd.Cmd):
                     af, socktype, proto, canonname, sa = res
                     try:
                         s = fdsocket(af, socktype, proto)
-                    except socket.error as msg:
+                    except socket.error:
                         s = None
                         continue
                     try:
                         s.connect(sa)
-                    except socket.error as msg:
+                    except socket.error:
                         s.close()
                         s = None
                         continue
@@ -238,13 +255,27 @@ class SerCmd(cmd.Cmd):
                 sys.exit(1)
         # otherwise go for the serial port
         elif self.port:
+            connected = False
             self.logger.info("Connect to serial port %s" % self.port)
-            try:
-                self.serial_connect()
-            except OSError as e:
-                self.logger.error("Cannot connect to serial port {}: {}"
-                                  .format(self.port, e.strerror))
-                sys.exit(1)
+            while not connected:
+                try:
+                    self.serial_connect()
+                except serial.SerialException as e:
+                    self.logger.error("%s", e.strerror)
+                    if (not self.reconnect) or (e.errno == errno.ENOENT):
+                        sys.exit(e.errno)
+                    self.logger.info("Trying to reconnect to {} in 10 sec"
+                                     .format(self.port))
+                    time.sleep(10)
+                except OSError as e:
+                    self.logger.error("Cannot connect to serial port {}: {}"
+                                      .format(self.port, e.strerror))
+                    sys.exit(e.errno)
+                except Exception as e:
+                    self.logger.error("Unexpected exception {}".format(e))
+                    sys.exit(1)
+                else:
+                    connected = True
 
         # wait until connection is established and fire startup
         # commands to the node
@@ -264,8 +295,18 @@ class SerCmd(cmd.Cmd):
         """
         self.logger.debug("processing line #%s#" % line)
         if (line.startswith("/")):
-                return "PYTERM_" + line[1:]
+            return "PYTERM_" + line[1:]
         return line
+
+    def emptyline(self):
+        """Either send empty line or repeat previous command.
+
+        Behavior can be configured with `repeat_command_on_empty_line`.
+        """
+        if self.repeat_command_on_empty_line:
+            super().emptyline()
+        else:
+            self.default('')
 
     def default(self, line):
         """In case of no Pyterm specific prefix is detected, split
@@ -286,11 +327,25 @@ class SerCmd(cmd.Cmd):
         """
         self.ser.write("help\n".encode("utf-8"))
 
+    def do_EOF(self, line):
+        """Handle EOF (Ctrl+D) nicely."""
+        self.logger.debug("Received EOF")
+        self.do_PYTERM_exit("")
+        sys.exit(0)
+
     def complete_date(self, text, line, begidx, endidm):
         """Auto completion for date string.
         """
         date = time.strftime("%Y-%m-%d %H:%M:%S")
         return ["%s" % (date)]
+
+    def do_PYTERM_sleep(self, line):
+        """Pyterm command: Sleep for n seconds.
+        """
+        if line:
+            time.sleep(float(line))
+        else:
+            self.logger.error("sleep: missing operand")
 
     def do_PYTERM_reset(self, line):
         """Pyterm command: Send a reset to the node.
@@ -487,7 +542,7 @@ class SerCmd(cmd.Cmd):
     def load_config(self):
         """Internal function to laod configuration from file.
         """
-        self.config = configparser.SafeConfigParser()
+        self.config = configparser.ConfigParser()
         cf = os.path.join(self.configdir, self.configfile)
         self.config.read(cf)
         logging.getLogger("").info("Reading file: %s" % cf)
@@ -602,9 +657,36 @@ class SerCmd(cmd.Cmd):
     def serial_connect(self):
         self.ser = serial.Serial(port=self.port, dsrdtr=0, rtscts=0)
         self.ser.baudrate = self.baudrate
+
         if self.toggle:
             self.ser.setDTR(0)
             self.ser.setRTS(0)
+
+        if self.set_rts == 1 or self.set_rts == 0:
+            self.ser.setRTS(self.set_rts)
+
+        if self.set_dtr == 1 or self.set_dtr == 0:
+            self.ser.setDTR(self.set_dtr)
+
+    def _read_char(self):
+        # check if serial port can be accessed.
+        sr = codecs.getreader("UTF-8")(self.ser,
+                                       errors='replace')
+        return sr.read(1)
+
+    def _handle_serial_exception(self):
+        self.logger.warning("Serial port disconnected, waiting to "
+                            "get reconnected...")
+        self.ser.close()
+        time.sleep(1)
+        if os.path.exists(self.port):
+            self.logger.warning("Try to reconnect to %s again..."
+                                % (self.port))
+            try:
+                self.serial_connect()
+                self.logger.info("Reconnected to serial port %s" % self.port)
+            except serial.SerialException:
+                pass
 
     def reader(self):
         """Serial or TCP reader.
@@ -612,27 +694,17 @@ class SerCmd(cmd.Cmd):
         output = ""
         crreceived = False
         nlreceived = False
+        c_already_read = False
         while (1):
-            # check if serial port can be accessed.
-            try:
-                sr = codecs.getreader("UTF-8")(self.ser,
-                                               errors='replace')
-                c = sr.read(1)
-            # try to re-open it with a timeout of 1s otherwise
-            except (serial.SerialException, ValueError):
-                self.logger.warn("Serial port disconnected, waiting to "
-                                 "get reconnected...")
-                self.ser.close()
-                time.sleep(1)
-                if os.path.exists(self.port):
-                    self.logger.warn("Try to reconnect to %s again..."
-                                     % (self.port))
-                    try:
-                        self.serial_connect()
-                        self.logger.info("Reconnected to serial port %s" % self.port)
-                    except serial.SerialException:
-                        pass
-                continue
+            # one of the if branches might have read c already
+            if not c_already_read:
+                try:
+                    c = self._read_char()
+                # try to re-open it with a timeout of 1s otherwise
+                except (serial.SerialException, ValueError):
+                    self._handle_serial_exception()
+                    continue
+            c_already_read = False
             if c == '\r':
                 if (self.newline == "LFCR" and nlreceived) or (self.newline == "CR"):
                     self.handle_line(output)
@@ -644,8 +716,31 @@ class SerCmd(cmd.Cmd):
             elif c == self.serprompt and output == "":
                 sys.stdout.write('%c ' % self.serprompt)
                 sys.stdout.flush()
+                # self.serprompt was read, but a space (that we also printed
+                # above) may follow. As such, read the next character, but keep
+                # it for the next iteration in case it is not a space.
+                # If we don't do this, the space from the prompt will be
+                # prepended to the next output, causing the next prompt on empty
+                # output potentially to be ignored, since `output` will be " "
+                try:
+                    c = self._read_char()
+                # try to re-open it with a timeout of 1s otherwise
+                except (serial.SerialException, ValueError):
+                    self._handle_serial_exception()
+                    continue
+                if c != ' ':            # not a space?
+                    # then use `c` in the next iteration
+                    c_already_read = True
             else:
                 output += c
+
+            # Hack to correctly handle reset ANSI escape code in the stream
+            # When the reset escape sequence is detected, it is written and
+            # flushed immediately to stdout
+            if output == '\033[0m':
+                sys.stdout.write(output)
+                sys.stdout.flush()
+                output = ""
 
             crreceived = c == '\r'
             nlreceived = c == '\n'
@@ -703,8 +798,8 @@ class fdsocket(socket.socket):
         try:
             return self.sendall(string)
         except socket.error as e:
-            logging.getLogger("").warn("Error in TCP connection (%s), "
-                                       "closing down" % str(e))
+            logging.getLogger("").warning("Error in TCP connection (%s), "
+                                          "closing down" % str(e))
             self.close()
             sys.exit(0)
 
@@ -729,6 +824,18 @@ if __name__ == "__main__":
                         action="store_true",
                         help="toggles the DTR and RTS pin of the serial line "
                         "when connecting, default is not toggling the pins")
+    parser.add_argument("-sr", "--set-rts",
+                        dest="set_rts",
+                        type=int,
+                        action="store",
+                        default=None,
+                        help="Specifies the value of RTS pin")
+    parser.add_argument("-sd", "--set-dtr",
+                        dest="set_dtr",
+                        type=int,
+                        action="store",
+                        default=None,
+                        help="Specifies the value of DTR pin")
     parser.add_argument('-d', '--directory',
                         help="Specify the Pyterm directory, default is %s"
                         % defaultdir,
@@ -766,13 +873,38 @@ if __name__ == "__main__":
                         % defaultprompt,
                         default=defaultprompt)
 
+    # Keep help message in sync if changing the default
+    parser.add_argument("--repeat-command-on-empty-line",
+                        dest='repeat_command_on_empty_line',
+                        action='store_true',
+                        help="Repeat command on empty line (Default)")
+    parser.add_argument("--no-repeat-command-on-empty-line",
+                        dest='repeat_command_on_empty_line',
+                        action="store_false",
+                        help="Do not repeat command on empty line")
+    parser.add_argument("--reconnect",
+                        dest='reconnect',
+                        action='store_true',
+                        help="Try to reconnect when failing on connection "
+                             "setup (Default)")
+    parser.add_argument("--no-reconnect",
+                        dest='reconnect',
+                        action="store_false",
+                        help="Do not try to reconnect when failing on "
+                             "connection setup (Default)")
+    parser.set_defaults(
+        repeat_command_on_empty_line=defaultrepeat_cmd_empty_line,
+        reconnect=defaultreconnect)
+
     args = parser.parse_args()
 
     if args.noprefix:
         args.format = ""
     myshell = SerCmd(args.port, args.baudrate, args.toggle, args.tcp_serial,
                      args.directory, args.config, args.host, args.run_name,
-                     args.log_dir_name, args.newline, args.format, args.prompt)
+                     args.log_dir_name, args.newline, args.format,
+                     args.set_rts, args.set_dtr, args.prompt,
+                     args.repeat_command_on_empty_line)
     myshell.prompt = ''
 
     try:

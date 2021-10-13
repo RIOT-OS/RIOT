@@ -1,0 +1,17 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "remote-reva" if BOARD_REMOTE_REVA
+
+config BOARD_REMOTE_REVA
+    bool
+    default y
+    select BOARD_COMMON_REMOTE
+    select HAVE_SAUL_ADC
+    select HAVE_SAUL_GPIO
+
+source "$(RIOTBOARD)/common/remote/Kconfig"

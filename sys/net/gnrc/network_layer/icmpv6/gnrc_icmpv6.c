@@ -15,6 +15,7 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <stdlib.h>
@@ -30,7 +31,7 @@
 #include "net/gnrc/icmpv6.h"
 #include "net/gnrc/icmpv6/echo.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static inline uint16_t _calc_csum(gnrc_pktsnip_t *hdr,
@@ -69,6 +70,7 @@ void gnrc_icmpv6_demux(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
     if (icmpv6->size < sizeof(icmpv6_hdr_t)) {
         DEBUG("icmpv6: packet too short.\n");
+        gnrc_pktbuf_release(pkt);
         return;
     }
 
@@ -78,7 +80,7 @@ void gnrc_icmpv6_demux(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
     if (_calc_csum(icmpv6, ipv6, pkt)) {
         DEBUG("icmpv6: wrong checksum.\n");
-        /* don't release: IPv6 does this */
+        gnrc_pktbuf_release(pkt);
         return;
     }
 

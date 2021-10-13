@@ -1,0 +1,17 @@
+MODULE = tensorflow-lite-hello_world
+
+CXXEXFLAGS += -Wno-type-limits
+CXXEXFLAGS += -Wno-unused-parameter
+
+SRCXXEXT = cc
+SRCXXEXCLUDE = $(wildcard *_test.$(SRCXXEXT))
+
+NO_AUTO_SRC = 1
+SRCXX = \
+    constants.cc \
+    main_functions.cc \
+    output_handler.cc \
+    sine_model_data.cc \
+    #
+
+include $(RIOTBASE)/Makefile.base

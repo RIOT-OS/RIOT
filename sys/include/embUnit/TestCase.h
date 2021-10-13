@@ -44,7 +44,7 @@ typedef struct __TestCase*  TestCaseRef;/*compatible embUnit1.0*/
 
 struct __TestCase {
     TestImplement* isa;
-    char *name;
+    const char *name;
     void(*setUp)(void);
     void(*tearDown)(void);
     void(*runTest)(void);

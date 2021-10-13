@@ -12,12 +12,42 @@
  * @brief       An open source implementation of Thread stack
  * @see         https://github.com/openthread/openthread
  *
- * Thread if a mesh oriented network stack running for IEEE802.15.4 networks.
+ * Thread is a mesh oriented network stack running for IEEE802.15.4 networks.
+ *
+ * The RIOT port allows to directly call OpenThread API functions using
+ * @ref sys_event. For example:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * #include "ot.h"
+ * #include "openthread/thread.h"
+ *
+ * static void _panid_handler(event_t *event);
+ * static event_t event_panid = {
+ *     .handler = _panid_handler
+ * };
+ *
+ * static void _panid_handler(event_t *event)
+ * {
+ *     (void) event;
+ *     uint16_t panid = otLinkGetPanId(openthread_get_instance());
+ *     do_something_with_panid(panid);
+ * }
+ *
+ * int main(void)
+ * {
+ *     event_post(openthread_get_evq(), &event_panid);
+ *     return 0;
+ * }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * @see https://openthread.io/releases/thread-reference-20180619
+ *
  * @{
  *
  * @file
  *
- * @author  José Ignacio Alamos <jialamos@uc.cl>
+ * @author      Jose Ignacio Alamos <jialamos@uc.cl>
+ * @author      Baptiste Clenet <bapclenet@gmail.com>
  */
 
 #ifndef OT_H
@@ -32,26 +62,54 @@ extern "C" {
 #include "net/ethernet.h"
 #include "net/netdev.h"
 #include "thread.h"
-#include "openthread/types.h"
+#include "openthread/instance.h"
+#include "event.h"
 
-#define OPENTHREAD_XTIMER_MSG_TYPE_EVENT (0x2235)        /**< xtimer message receiver event*/
-#define OPENTHREAD_NETDEV_MSG_TYPE_EVENT (0x2236)        /**< message received from driver */
-#define OPENTHREAD_SERIAL_MSG_TYPE_EVENT (0x2237)        /**< event indicating a serial (UART) message was sent to OpenThread */
-#define OPENTHREAD_MSG_TYPE_RECV         (0x2238)        /**< event for frame reception */
-#define OPENTHREAD_JOB_MSG_TYPE_EVENT    (0x2240)        /**< event indicating an OT_JOB message */
+/**
+ * @name    Openthread constants
+ * @{
+ */
+/** @brief   number of serial reception buffer */
+#define OPENTHREAD_NUMBER_OF_SERIAL_BUFFER                  (1U)
+/** @brief   sizeof in bytes the two first members of she serial structure */
+#define OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF               (4U)
+/** @brief   sizeof the serial buffer */
+#define OPENTHREAD_SERIAL_BUFFER_SIZE                       OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF + 100
+/** @brief   sizeof the spinel payload data */
+#define OPENTHREAD_SERIAL_BUFFER__PAYLOAD_SIZE              OPENTHREAD_SERIAL_BUFFER_SIZE - OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF
+/** @brief   error when no more buffer available */
+#define OPENTHREAD_ERROR_NO_EMPTY_SERIAL_BUFFER             -1
+/** @brief   serial buffer ready to use */
+#define OPENTHREAD_SERIAL_BUFFER_STATUS_FREE                (0x0001)
+/** @brief   serial buffer ready for processing */
+#define OPENTHREAD_SERIAL_BUFFER_STATUS_READY_TO_PROCESS    (0x0002)
+/** @brief   serial buffer payload full */
+#define OPENTHREAD_SERIAL_BUFFER_STATUS_FULL                (0x0004)
+/** @brief   Max length for IEEE802154 frame */
+#define IEEE802154_MAX_LENGTH                               (127U)
+/** @brief   Max length for a netdev buffer  */
+#define OPENTHREAD_NETDEV_BUFLEN                            (IEEE802154_MAX_LENGTH)
+/** @} */
 
 /**
  * @brief   Struct containing a serial message
  */
 typedef struct {
-    void *buf;  /**< buffer containing the message */
-    size_t len; /**< length of the message */
+    uint16_t length;                                        /**< length of the message */
+    uint16_t serial_buffer_status;                          /**< status of the buffer */
+    uint8_t buf[OPENTHREAD_SERIAL_BUFFER__PAYLOAD_SIZE];    /**< buffer containing the message */
 } serial_msg_t;
 
 /**
  * @brief   Struct containing an OpenThread job
+ *
+ * @deprecated   This structure is not needed anymore since it's possible to
+ *               run OpenThread code via @ref sys_event (see @ref openthread_get_evq).
+ *               Therefore it will be removed after the 2022.01 release.
  */
 typedef struct {
+    event_t ev;                             /**< Event associated to the OpenThread job */
+    int status;                             /**< Status of the job */
     const char *command;                    /**< A pointer to the job name string. */
     void *arg;                              /**< arg for the job **/
     void *answer;                           /**< answer from the job **/
@@ -75,6 +133,20 @@ void recv_pkt(otInstance *aInstance, netdev_t *dev);
 void send_pkt(otInstance *aInstance, netdev_t *dev, netdev_event_t event);
 
 /**
+ * @brief Get OpenThread event queue
+ *
+ * @return pointer to the event queue
+ */
+event_queue_t *openthread_get_evq(void);
+
+/**
+ * @brief Get pointer to the OpenThread instance
+ *
+ * @return pointer to the OpenThread instance
+ */
+otInstance* openthread_get_instance(void);
+
+/**
  * @brief   Bootstrap OpenThread
  */
 void openthread_bootstrap(void);
@@ -87,7 +159,6 @@ void openthread_bootstrap(void);
  * @param[in]  rb                 pointer to the RX buffer designed for Open_Thread
  */
 void openthread_radio_init(netdev_t *dev, uint8_t *tb, uint8_t *rb);
-
 
 /**
  * @brief   Starts OpenThread thread.
@@ -104,24 +175,16 @@ void openthread_radio_init(netdev_t *dev, uint8_t *tb, uint8_t *rb);
 int openthread_netdev_init(char *stack, int stacksize, char priority, const char *name, netdev_t *netdev);
 
 /**
- * @brief   get PID of OpenThread thread.
- *
- * @return  PID of OpenThread thread
- */
-kernel_pid_t openthread_get_pid(void);
-
-/**
  * @brief   Init OpenThread random
  */
 void ot_random_init(void);
 
 /**
- * @brief   Run OpenThread UART simulator (stdio)
- */
-void openthread_uart_run(void);
-
-/**
  * @brief   Execute OpenThread command. Call this function only in OpenThread thread
+ *
+ * @deprecated   This function is not needed anymore since it's possible to
+ *               run OpenThread code via @ref sys_event (see @ref openthread_get_evq).
+ *               Therefore it will be removed after the 2022.01 release.
  *
  * @param[in]   ot_instance     OpenThread instance
  * @param[in]   command         OpenThread command name
@@ -137,6 +200,10 @@ uint8_t ot_exec_command(otInstance *ot_instance, const char* command, void *arg,
  *
  * @note    An OpenThread command allows direct calls to OpenThread API (otXXX functions) without worrying about concurrency
  * issues. All API calls should be made in OT_JOB type functions.
+ *
+ * @deprecated   This function is not needed anymore since it's possible to
+ *               run OpenThread code via @ref sys_event (see @ref openthread_get_evq).
+ *               Therefore it will be removed after the 2022.01 release.
  *
  * @param[in]   command         name of the command to call
  * @param[in]   arg             arg for the command

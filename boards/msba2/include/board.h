@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_msba2 MSB-A2
- * @ingroup     boards
- * @brief       Support for the ScatterWeb MSB-A2 board
+ * @ingroup     boards_msba2
  * @{
  *
  * @file
@@ -21,7 +19,8 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "msba2_common.h"
+#include "lpc23xx.h"
+#include "mtd.h"
 #include "bitarithm.h"
 
 #ifdef __cplusplus
@@ -48,17 +47,14 @@ extern "C" {
 /** @} */
 
 /**
- * @name    xtimer tuning values
+ * @name MTD configuration
  * @{
  */
-#define XTIMER_OVERHEAD     7
-#define XTIMER_SHOOT_EARLY  3
+#ifdef MODULE_MTD_MCI
+extern mtd_dev_t *mtd0;
+#define MTD_0 mtd0
+#endif
 /** @} */
-
-/**
- * @brief   initialize the board's clock system
- */
-void init_clks1(void);
 
 #ifdef __cplusplus
 }

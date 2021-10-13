@@ -1,0 +1,18 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "nrf6310" if BOARD_NRF6310
+
+config BOARD_NRF6310
+    bool
+    default y
+    select BOARD_COMMON_NRF51
+    select CPU_MODEL_NRF51X22XXAA
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_UART
+
+source "$(RIOTBOARD)/common/nrf51/Kconfig"

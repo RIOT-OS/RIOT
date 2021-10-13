@@ -1,0 +1,10 @@
+USEMODULE += periph_uart_hw_fc
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+  # USEMODULE += si7034 # TODO: add when si70xx driver is updated
+endif
+
+ifneq (,$(filter vfs,$(USEMODULE)))
+  USEMODULE += mtd_sdcard
+endif

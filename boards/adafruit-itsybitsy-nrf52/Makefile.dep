@@ -1,0 +1,6 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
+include $(RIOTBOARD)/common/nrf52/bootloader_nrfutil.dep.mk
+include $(RIOTBOARD)/common/nrf52/Makefile.dep

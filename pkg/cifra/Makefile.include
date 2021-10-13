@@ -1,0 +1,2 @@
+INCLUDES += -I$(PKGDIRBASE)/cifra/src
+INCLUDES += -I$(PKGDIRBASE)/cifra/src/ext

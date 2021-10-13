@@ -47,11 +47,12 @@ static void *run_middle(void *arg)
 
     unsigned read_total = 0;
     while (read_total < BYTES_TOTAL) {
-        char buf[4];
-        unsigned read = pipe_read(&pipes[0], buf, sizeof (buf));
+        char buf[5];
+        unsigned read = pipe_read(&pipes[0], buf, sizeof(buf) - 1);
+        buf[read] = 0;
         unsigned read_start = read_total;
         read_total += read;
-        printf("Middle read: <%.*s> [%u:%u]\n", read, buf,
+        printf("Middle read: <%s> [%u:%u]\n", buf,
                read_start, read_total);
 
         unsigned written_total = 0;
@@ -72,11 +73,12 @@ static void *run_end(void *arg)
 
     unsigned read_total = 0;
     while (read_total < BYTES_TOTAL) {
-        char buf[3];
-        int read = pipe_read(&pipes[1], buf, sizeof (buf));
+        char buf[4];
+        int read = pipe_read(&pipes[1], buf, sizeof(buf) - 1);
+        buf[read] = 0;
         unsigned read_start = read_total;
         read_total += read;
-        printf("End read: <%.*s> [%u:%u]\n", read, buf,
+        printf("End read: <%s> [%u:%u]\n", buf,
                read_start, read_total);
     }
 

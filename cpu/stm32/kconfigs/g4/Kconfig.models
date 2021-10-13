@@ -1,0 +1,315 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU models
+config CPU_MODEL_STM32G431C6
+    bool
+    select CPU_LINE_STM32G431XX
+
+config CPU_MODEL_STM32G431C8
+    bool
+    select CPU_LINE_STM32G431XX
+
+config CPU_MODEL_STM32G431CB
+    bool
+    select CPU_LINE_STM32G431XX
+
+config CPU_MODEL_STM32G431K6
+    bool
+    select CPU_LINE_STM32G431XX
+
+config CPU_MODEL_STM32G431K8
+    bool
+    select CPU_LINE_STM32G431XX
+
+config CPU_MODEL_STM32G431KB
+    bool
+    select CPU_LINE_STM32G431XX
+
+config CPU_MODEL_STM32G431M6
+    bool
+    select CPU_LINE_STM32G431XX
+
+config CPU_MODEL_STM32G431M8
+    bool
+    select CPU_LINE_STM32G431XX
+
+config CPU_MODEL_STM32G431MB
+    bool
+    select CPU_LINE_STM32G431XX
+
+config CPU_MODEL_STM32G431R6
+    bool
+    select CPU_LINE_STM32G431XX
+
+config CPU_MODEL_STM32G431R8
+    bool
+    select CPU_LINE_STM32G431XX
+
+config CPU_MODEL_STM32G431RB
+    bool
+    select CPU_LINE_STM32G431XX
+
+config CPU_MODEL_STM32G431V6
+    bool
+    select CPU_LINE_STM32G431XX
+
+config CPU_MODEL_STM32G431V8
+    bool
+    select CPU_LINE_STM32G431XX
+
+config CPU_MODEL_STM32G431VB
+    bool
+    select CPU_LINE_STM32G431XX
+
+config CPU_MODEL_STM32G441CB
+    bool
+    select CPU_LINE_STM32G441XX
+
+config CPU_MODEL_STM32G441KB
+    bool
+    select CPU_LINE_STM32G441XX
+
+config CPU_MODEL_STM32G441MB
+    bool
+    select CPU_LINE_STM32G441XX
+
+config CPU_MODEL_STM32G441RB
+    bool
+    select CPU_LINE_STM32G441XX
+
+config CPU_MODEL_STM32G441VB
+    bool
+    select CPU_LINE_STM32G441XX
+
+config CPU_MODEL_STM32G473CB
+    bool
+    select CPU_LINE_STM32G473XX
+
+config CPU_MODEL_STM32G473CC
+    bool
+    select CPU_LINE_STM32G473XX
+
+config CPU_MODEL_STM32G473CE
+    bool
+    select CPU_LINE_STM32G473XX
+
+config CPU_MODEL_STM32G473MB
+    bool
+    select CPU_LINE_STM32G473XX
+
+config CPU_MODEL_STM32G473MC
+    bool
+    select CPU_LINE_STM32G473XX
+
+config CPU_MODEL_STM32G473ME
+    bool
+    select CPU_LINE_STM32G473XX
+
+config CPU_MODEL_STM32G473QB
+    bool
+    select CPU_LINE_STM32G473XX
+
+config CPU_MODEL_STM32G473QC
+    bool
+    select CPU_LINE_STM32G473XX
+
+config CPU_MODEL_STM32G473QE
+    bool
+    select CPU_LINE_STM32G473XX
+
+config CPU_MODEL_STM32G473RB
+    bool
+    select CPU_LINE_STM32G473XX
+
+config CPU_MODEL_STM32G473RC
+    bool
+    select CPU_LINE_STM32G473XX
+
+config CPU_MODEL_STM32G473RE
+    bool
+    select CPU_LINE_STM32G473XX
+
+config CPU_MODEL_STM32G473VB
+    bool
+    select CPU_LINE_STM32G473XX
+
+config CPU_MODEL_STM32G473VC
+    bool
+    select CPU_LINE_STM32G473XX
+
+config CPU_MODEL_STM32G473VE
+    bool
+    select CPU_LINE_STM32G473XX
+
+config CPU_MODEL_STM32G474CB
+    bool
+    select CPU_LINE_STM32G474XX
+
+config CPU_MODEL_STM32G474CC
+    bool
+    select CPU_LINE_STM32G474XX
+
+config CPU_MODEL_STM32G474CE
+    bool
+    select CPU_LINE_STM32G474XX
+
+config CPU_MODEL_STM32G474MB
+    bool
+    select CPU_LINE_STM32G474XX
+
+config CPU_MODEL_STM32G474MC
+    bool
+    select CPU_LINE_STM32G474XX
+
+config CPU_MODEL_STM32G474ME
+    bool
+    select CPU_LINE_STM32G474XX
+
+config CPU_MODEL_STM32G474QB
+    bool
+    select CPU_LINE_STM32G474XX
+
+config CPU_MODEL_STM32G474QC
+    bool
+    select CPU_LINE_STM32G474XX
+
+config CPU_MODEL_STM32G474QE
+    bool
+    select CPU_LINE_STM32G474XX
+
+config CPU_MODEL_STM32G474RB
+    bool
+    select CPU_LINE_STM32G474XX
+
+config CPU_MODEL_STM32G474RC
+    bool
+    select CPU_LINE_STM32G474XX
+
+config CPU_MODEL_STM32G474RE
+    bool
+    select CPU_LINE_STM32G474XX
+
+config CPU_MODEL_STM32G474VB
+    bool
+    select CPU_LINE_STM32G474XX
+
+config CPU_MODEL_STM32G474VC
+    bool
+    select CPU_LINE_STM32G474XX
+
+config CPU_MODEL_STM32G474VE
+    bool
+    select CPU_LINE_STM32G474XX
+
+config CPU_MODEL_STM32G483CE
+    bool
+    select CPU_LINE_STM32G483XX
+
+config CPU_MODEL_STM32G483ME
+    bool
+    select CPU_LINE_STM32G483XX
+
+config CPU_MODEL_STM32G483QE
+    bool
+    select CPU_LINE_STM32G483XX
+
+config CPU_MODEL_STM32G483RE
+    bool
+    select CPU_LINE_STM32G483XX
+
+config CPU_MODEL_STM32G483VE
+    bool
+    select CPU_LINE_STM32G483XX
+
+config CPU_MODEL_STM32G484CE
+    bool
+    select CPU_LINE_STM32G484XX
+
+config CPU_MODEL_STM32G484ME
+    bool
+    select CPU_LINE_STM32G484XX
+
+config CPU_MODEL_STM32G484QE
+    bool
+    select CPU_LINE_STM32G484XX
+
+config CPU_MODEL_STM32G484RE
+    bool
+    select CPU_LINE_STM32G484XX
+
+config CPU_MODEL_STM32G484VE
+    bool
+    select CPU_LINE_STM32G484XX
+
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32g431c6" if CPU_MODEL_STM32G431C6
+    default "stm32g431c8" if CPU_MODEL_STM32G431C8
+    default "stm32g431cb" if CPU_MODEL_STM32G431CB
+    default "stm32g431k6" if CPU_MODEL_STM32G431K6
+    default "stm32g431k8" if CPU_MODEL_STM32G431K8
+    default "stm32g431kb" if CPU_MODEL_STM32G431KB
+    default "stm32g431m6" if CPU_MODEL_STM32G431M6
+    default "stm32g431m8" if CPU_MODEL_STM32G431M8
+    default "stm32g431mb" if CPU_MODEL_STM32G431MB
+    default "stm32g431r6" if CPU_MODEL_STM32G431R6
+    default "stm32g431r8" if CPU_MODEL_STM32G431R8
+    default "stm32g431rb" if CPU_MODEL_STM32G431RB
+    default "stm32g431v6" if CPU_MODEL_STM32G431V6
+    default "stm32g431v8" if CPU_MODEL_STM32G431V8
+    default "stm32g431vb" if CPU_MODEL_STM32G431VB
+    default "stm32g441cb" if CPU_MODEL_STM32G441CB
+    default "stm32g441kb" if CPU_MODEL_STM32G441KB
+    default "stm32g441mb" if CPU_MODEL_STM32G441MB
+    default "stm32g441rb" if CPU_MODEL_STM32G441RB
+    default "stm32g441vb" if CPU_MODEL_STM32G441VB
+    default "stm32g473cb" if CPU_MODEL_STM32G473CB
+    default "stm32g473cc" if CPU_MODEL_STM32G473CC
+    default "stm32g473ce" if CPU_MODEL_STM32G473CE
+    default "stm32g473mb" if CPU_MODEL_STM32G473MB
+    default "stm32g473mc" if CPU_MODEL_STM32G473MC
+    default "stm32g473me" if CPU_MODEL_STM32G473ME
+    default "stm32g473qb" if CPU_MODEL_STM32G473QB
+    default "stm32g473qc" if CPU_MODEL_STM32G473QC
+    default "stm32g473qe" if CPU_MODEL_STM32G473QE
+    default "stm32g473rb" if CPU_MODEL_STM32G473RB
+    default "stm32g473rc" if CPU_MODEL_STM32G473RC
+    default "stm32g473re" if CPU_MODEL_STM32G473RE
+    default "stm32g473vb" if CPU_MODEL_STM32G473VB
+    default "stm32g473vc" if CPU_MODEL_STM32G473VC
+    default "stm32g473ve" if CPU_MODEL_STM32G473VE
+    default "stm32g474cb" if CPU_MODEL_STM32G474CB
+    default "stm32g474cc" if CPU_MODEL_STM32G474CC
+    default "stm32g474ce" if CPU_MODEL_STM32G474CE
+    default "stm32g474mb" if CPU_MODEL_STM32G474MB
+    default "stm32g474mc" if CPU_MODEL_STM32G474MC
+    default "stm32g474me" if CPU_MODEL_STM32G474ME
+    default "stm32g474qb" if CPU_MODEL_STM32G474QB
+    default "stm32g474qc" if CPU_MODEL_STM32G474QC
+    default "stm32g474qe" if CPU_MODEL_STM32G474QE
+    default "stm32g474rb" if CPU_MODEL_STM32G474RB
+    default "stm32g474rc" if CPU_MODEL_STM32G474RC
+    default "stm32g474re" if CPU_MODEL_STM32G474RE
+    default "stm32g474vb" if CPU_MODEL_STM32G474VB
+    default "stm32g474vc" if CPU_MODEL_STM32G474VC
+    default "stm32g474ve" if CPU_MODEL_STM32G474VE
+    default "stm32g483ce" if CPU_MODEL_STM32G483CE
+    default "stm32g483me" if CPU_MODEL_STM32G483ME
+    default "stm32g483qe" if CPU_MODEL_STM32G483QE
+    default "stm32g483re" if CPU_MODEL_STM32G483RE
+    default "stm32g483ve" if CPU_MODEL_STM32G483VE
+    default "stm32g484ce" if CPU_MODEL_STM32G484CE
+    default "stm32g484me" if CPU_MODEL_STM32G484ME
+    default "stm32g484qe" if CPU_MODEL_STM32G484QE
+    default "stm32g484re" if CPU_MODEL_STM32G484RE
+    default "stm32g484ve" if CPU_MODEL_STM32G484VE

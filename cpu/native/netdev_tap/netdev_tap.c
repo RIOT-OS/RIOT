@@ -10,7 +10,7 @@
  */
 
 /*
- * @ingroup netdev
+ * @ingroup drivers_netdev
  * @{
  * @brief   Low-level ethernet driver for tap interfaces
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
@@ -61,7 +61,7 @@
 #include "netdev_tap.h"
 #include "net/netopt.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* netdev interface */
@@ -71,26 +71,26 @@ static int _recv(netdev_t *netdev, void *buf, size_t n, void *info);
 
 static inline void _get_mac_addr(netdev_t *netdev, uint8_t *dst)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
     memcpy(dst, dev->addr, ETHERNET_ADDR_LEN);
 }
 
 static inline void _set_mac_addr(netdev_t *netdev, const uint8_t *src)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
     memcpy(dev->addr, src, ETHERNET_ADDR_LEN);
 }
 
-static inline int _get_promiscous(netdev_t *netdev)
+static inline int _get_promiscuous(netdev_t *netdev)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
-    return dev->promiscous;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
+    return dev->promiscuous;
 }
 
-static inline int _set_promiscous(netdev_t *netdev, int value)
+static inline int _set_promiscuous(netdev_t *netdev, int value)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
-    dev->promiscous = value;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
+    dev->promiscuous = value;
     return value;
 }
 
@@ -121,7 +121,7 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
             }
             break;
         case NETOPT_PROMISCUOUSMODE:
-            *((bool*)value) = (bool)_get_promiscous(dev);
+            *((bool*)value) = (bool)_get_promiscuous(dev);
             res = sizeof(bool);
             break;
         default:
@@ -144,7 +144,7 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len
             res = ETHERNET_ADDR_LEN;
             break;
         case NETOPT_PROMISCUOUSMODE:
-            _set_promiscous(dev, ((const bool *)value)[0]);
+            _set_promiscuous(dev, ((const bool *)value)[0]);
             res = sizeof(netopt_enable_t);
             break;
         default:
@@ -155,7 +155,7 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len
     return res;
 }
 
-static netdev_driver_t netdev_driver_tap = {
+static const netdev_driver_t netdev_driver_tap = {
     .send = _send,
     .recv = _recv,
     .init = _init,
@@ -206,7 +206,7 @@ static void _continue_reading(netdev_tap_t *dev)
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
     (void)info;
 
     if (!buf) {
@@ -222,9 +222,9 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             }
             */
 
-            static uint8_t buf[ETHERNET_FRAME_LEN];
+            static uint8_t nullbuf[ETHERNET_FRAME_LEN];
 
-            real_read(dev->tap_fd, buf, sizeof(buf));
+            real_read(dev->tap_fd, nullbuf, sizeof(nullbuf));
 
             _continue_reading(dev);
         }
@@ -239,7 +239,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     if (nread > 0) {
         ethernet_hdr_t *hdr = (ethernet_hdr_t *)buf;
-        if (!(dev->promiscous) && !_is_addr_multicast(hdr->dst) &&
+        if (!(dev->promiscuous) && !_is_addr_multicast(hdr->dst) &&
             !_is_addr_broadcast(hdr->dst) &&
             (memcmp(hdr->dst, dev->addr, ETHERNET_ADDR_LEN) != 0)) {
             DEBUG("netdev_tap: received for %02x:%02x:%02x:%02x:%02x:%02x\n"
@@ -254,10 +254,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
         _continue_reading(dev);
 
-#ifdef MODULE_NETSTATS_L2
-        netdev->stats.rx_count++;
-        netdev->stats.rx_bytes += nread;
-#endif
         return nread;
     }
     else if (nread == -1) {
@@ -279,19 +275,15 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
 
     struct iovec iov[iolist_count(iolist)];
 
     unsigned n;
-    size_t bytes = iolist_to_iovec(iolist, iov, &n);
+    iolist_to_iovec(iolist, iov, &n);
 
     int res = _native_writev(dev->tap_fd, iov, n);
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += bytes;
-#else
-    (void)bytes;
-#endif
+
     if (netdev->event_callback) {
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
     }
@@ -300,16 +292,18 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 
 void netdev_tap_setup(netdev_tap_t *dev, const netdev_tap_params_t *params) {
     dev->netdev.driver = &netdev_driver_tap;
-    strncpy(dev->tap_name, *(params->tap_name), IFNAMSIZ);
+    strncpy(dev->tap_name, *(params->tap_name), IFNAMSIZ - 1);
+    dev->tap_name[IFNAMSIZ - 1] = '\0';
 }
 
 static void _tap_isr(int fd, void *arg) {
     (void) fd;
 
-    netdev_t *netdev = (netdev_t *)arg;
+    netdev_tap_t *dev = arg;
+    netdev_t *netdev = &dev->netdev;
 
     if (netdev->event_callback) {
-        netdev->event_callback(netdev, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr(netdev);
     }
     else {
         puts("netdev_tap: _isr: no event callback.");
@@ -320,7 +314,7 @@ static int _init(netdev_t *netdev)
 {
     DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
 
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
 
     /* check device parametrs */
     if (dev == NULL) {
@@ -339,7 +333,7 @@ static int _init(netdev_t *netdev)
     const char *clonedev = "/dev/net/tun";
 #endif
     /* initialize device descriptor */
-    dev->promiscous = 0;
+    dev->promiscuous = 0;
     /* implicitly create the tap interface */
     if ((dev->tap_fd = real_open(clonedev, O_RDWR | O_NONBLOCK)) == -1) {
         err(EXIT_FAILURE, "open(%s)", clonedev);
@@ -391,9 +385,6 @@ static int _init(netdev_t *netdev)
     native_async_read_setup();
     native_async_read_add_handler(dev->tap_fd, netdev, _tap_isr);
 
-#ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0, sizeof(netstats_t));
-#endif
     DEBUG("gnrc_tapnet: initialized.\n");
     return 0;
 }

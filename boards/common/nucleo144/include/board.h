@@ -37,11 +37,19 @@ extern "C" {
  * @name    LED pin definitions and handlers
  * @{
  */
+#if defined(CPU_MODEL_STM32L496ZG) || defined(CPU_MODEL_STM32L4R5ZI) || \
+    defined(CPU_MODEL_STM32L552ZE)
+#define LED0_PORT           GPIOC
+#define LED0_PIN            GPIO_PIN(PORT_C, 7)
+#define LED0_MASK           (1 << 7)
+#else
+#define LED0_PORT           GPIOB
 #define LED0_PIN            GPIO_PIN(PORT_B, 0)
 #define LED0_MASK           (1 << 0)
-#define LED0_ON             (GPIOB->BSRR = LED0_MASK)
-#define LED0_OFF            (GPIOB->BSRR = (LED0_MASK << 16))
-#define LED0_TOGGLE         (GPIOB->ODR  ^= LED0_MASK)
+#endif
+#define LED0_ON             (LED0_PORT->BSRR = LED0_MASK)
+#define LED0_OFF            (LED0_PORT->BSRR = (LED0_MASK << 16))
+#define LED0_TOGGLE         (LED0_PORT->ODR  ^= LED0_MASK)
 
 #define LED1_PIN            GPIO_PIN(PORT_B, 7)
 #define LED1_MASK           (1 << 7)
@@ -49,18 +57,27 @@ extern "C" {
 #define LED1_OFF            (GPIOB->BSRR = (LED1_MASK << 16))
 #define LED1_TOGGLE         (GPIOB->ODR  ^= LED1_MASK)
 
+#if defined(CPU_MODEL_STM32L552ZE)
+#define LED2_PORT           GPIOA
+#define LED2_PIN            GPIO_PIN(PORT_A, 9)
+#define LED2_MASK           (1 << 9)
+#else
+#define LED2_PORT           GPIOB
 #define LED2_PIN            GPIO_PIN(PORT_B, 14)
 #define LED2_MASK           (1 << 14)
-#define LED2_ON             (GPIOB->BSRR = LED2_MASK)
-#define LED2_OFF            (GPIOB->BSRR = (LED2_MASK << 16))
-#define LED2_TOGGLE         (GPIOB->ODR  ^= LED2_MASK)
+#endif
+#define LED2_ON             (LED2_PORT->BSRR = LED2_MASK)
+#define LED2_OFF            (LED2_PORT->BSRR = (LED2_MASK << 16))
+#define LED2_TOGGLE         (LED2_PORT->ODR  ^= LED2_MASK)
 
 /* the Nucleo144 boards always use LED0, as there is no dual use of its pin */
+#ifndef AUTO_INIT_LED0
 #define AUTO_INIT_LED0
+#endif
 /** @} */
 
 /**
- * @brief   User button
+ * @name    User button
  * @{
  */
 #define BTN0_PIN            GPIO_PIN(PORT_C, 13)

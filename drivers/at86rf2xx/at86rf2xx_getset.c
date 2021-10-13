@@ -24,32 +24,33 @@
  * @}
  */
 
+#include <string.h>
+
 #include "at86rf2xx.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
 #include "periph/spi.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifdef MODULE_AT86RF212B
 /* See: Table 9-15. Recommended Mapping of TX Power, Frequency Band, and
  * PHY_TX_PWR (register 0x05), AT86RF212B data sheet. */
-static const uint8_t dbm_to_tx_pow_868[] = {0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x18,
-                                            0x17, 0x15, 0x14, 0x13, 0x12, 0x11,
-                                            0x10, 0x0f, 0x31, 0x30, 0x2f, 0x94,
-                                            0x93, 0x91, 0x90, 0x29, 0x49, 0x48,
-                                            0x47, 0xad, 0xcd, 0xcc, 0xcb, 0xea,
-                                            0xe9, 0xe8, 0xe7, 0xe6, 0xe4, 0x80,
-                                            0xa0};
-static const uint8_t dbm_to_tx_pow_915[] = {0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x17,
-                                            0x16, 0x15, 0x14, 0x13, 0x12, 0x11,
-                                            0x10, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b,
-                                            0x09, 0x91, 0x08, 0x07, 0x05, 0x27,
-                                            0x04, 0x03, 0x02, 0x01, 0x00, 0x86,
-                                            0x40, 0x84, 0x83, 0x82, 0x80, 0xc1,
-                                            0xc0};
-
+static const uint8_t dbm_to_tx_pow_868[] = { 0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x18,
+                                             0x17, 0x15, 0x14, 0x13, 0x12, 0x11,
+                                             0x10, 0x0f, 0x31, 0x30, 0x2f, 0x94,
+                                             0x93, 0x91, 0x90, 0x29, 0x49, 0x48,
+                                             0x47, 0xad, 0xcd, 0xcc, 0xcb, 0xea,
+                                             0xe9, 0xe8, 0xe7, 0xe6, 0xe4, 0x80,
+                                             0xa0 };
+static const uint8_t dbm_to_tx_pow_915[] = { 0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x17,
+                                             0x16, 0x15, 0x14, 0x13, 0x12, 0x11,
+                                             0x10, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b,
+                                             0x09, 0x91, 0x08, 0x07, 0x05, 0x27,
+                                             0x04, 0x03, 0x02, 0x01, 0x00, 0x86,
+                                             0x40, 0x84, 0x83, 0x82, 0x80, 0xc1,
+                                             0xc0 };
 static int16_t _tx_pow_to_dbm_212b(uint8_t channel, uint8_t page, uint8_t reg)
 {
     if (page == 0 || page == 2) {
@@ -59,12 +60,12 @@ static int16_t _tx_pow_to_dbm_212b(uint8_t channel, uint8_t page, uint8_t reg)
         if (channel == 0) {
             /* Channel 0 is 868.3 MHz */
             dbm_to_tx_pow = &dbm_to_tx_pow_868[0];
-            nelem = sizeof(dbm_to_tx_pow_868) / sizeof(dbm_to_tx_pow_868[0]);
+            nelem = ARRAY_SIZE(dbm_to_tx_pow_868);
         }
         else {
             /* Channels 1+ are 915 MHz */
             dbm_to_tx_pow = &dbm_to_tx_pow_915[0];
-            nelem = sizeof(dbm_to_tx_pow_915) / sizeof(dbm_to_tx_pow_915[0]);
+            nelem = ARRAY_SIZE(dbm_to_tx_pow_915);
         }
 
         for (size_t i = 0; i < nelem; ++i) {
@@ -78,57 +79,53 @@ static int16_t _tx_pow_to_dbm_212b(uint8_t channel, uint8_t page, uint8_t reg)
 }
 
 #elif MODULE_AT86RF233
-static const int16_t tx_pow_to_dbm[] = {4, 4, 3, 3, 2, 2, 1,
-                                        0, -1, -2, -3, -4, -6, -8, -12, -17};
-static const uint8_t dbm_to_tx_pow[] = {0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
-                                        0x0e, 0x0d, 0x0d, 0x0d, 0x0c, 0x0c,
-                                        0x0b, 0x0b, 0x0a, 0x09, 0x08, 0x07,
-                                        0x06, 0x05, 0x03,0x00};
+static const int16_t tx_pow_to_dbm[] = { 4, 4, 3, 3, 2, 2, 1,
+                                         0, -1, -2, -3, -4, -6, -8, -12, -17 };
+static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
+                                         0x0e, 0x0d, 0x0d, 0x0d, 0x0c, 0x0c,
+                                         0x0b, 0x0b, 0x0a, 0x09, 0x08, 0x07,
+                                         0x06, 0x05, 0x03, 0x00 };
 #else
-static const int16_t tx_pow_to_dbm[] = {3, 3, 2, 2, 1, 1, 0,
-                                        -1, -2, -3, -4, -5, -7, -9, -12, -17};
-static const uint8_t dbm_to_tx_pow[] = {0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
-                                        0x0e, 0x0d, 0x0d, 0x0c, 0x0c, 0x0b,
-                                        0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06,
-                                        0x05, 0x03, 0x00};
+static const int16_t tx_pow_to_dbm[] = { 3, 3, 2, 2, 1, 1, 0,
+                                         -1, -2, -3, -4, -5, -7, -9, -12, -17 };
+static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
+                                         0x0e, 0x0d, 0x0d, 0x0c, 0x0c, 0x0b,
+                                         0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06,
+                                         0x05, 0x03, 0x00 };
 #endif
 
-uint16_t at86rf2xx_get_addr_short(const at86rf2xx_t *dev)
+void at86rf2xx_get_addr_short(const at86rf2xx_t *dev, network_uint16_t *addr)
 {
-    return (dev->netdev.short_addr[0] << 8) | dev->netdev.short_addr[1];
+    memcpy(addr, dev->netdev.short_addr, sizeof(*addr));
 }
 
-void at86rf2xx_set_addr_short(at86rf2xx_t *dev, uint16_t addr)
+void at86rf2xx_set_addr_short(at86rf2xx_t *dev, const network_uint16_t *addr)
 {
-    dev->netdev.short_addr[0] = (uint8_t)(addr);
-    dev->netdev.short_addr[1] = (uint8_t)(addr >> 8);
+    memcpy(dev->netdev.short_addr, addr, sizeof(*addr));
 #ifdef MODULE_SIXLOWPAN
     /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
      * 0 for unicast addresses */
     dev->netdev.short_addr[0] &= 0x7F;
 #endif
+    /* device use lsb first, not network byte order */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_0,
                         dev->netdev.short_addr[1]);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_1,
                         dev->netdev.short_addr[0]);
 }
 
-uint64_t at86rf2xx_get_addr_long(const at86rf2xx_t *dev)
+void at86rf2xx_get_addr_long(const at86rf2xx_t *dev, eui64_t *addr)
 {
-    uint64_t addr;
-    uint8_t *ap = (uint8_t *)(&addr);
-    for (int i = 0; i < 8; i++) {
-        ap[i] = dev->netdev.long_addr[i];
-    }
-    return addr;
+    memcpy(addr, dev->netdev.long_addr, sizeof(*addr));
 }
 
-void at86rf2xx_set_addr_long(at86rf2xx_t *dev, uint64_t addr)
+void at86rf2xx_set_addr_long(at86rf2xx_t *dev, const eui64_t *addr)
 {
+    memcpy(dev->netdev.long_addr, addr, sizeof(*addr));
     for (int i = 0; i < 8; i++) {
-        dev->netdev.long_addr[i] = (uint8_t)(addr >> (i * 8));
+        /* device use lsb first, not network byte order */
         at86rf2xx_reg_write(dev, (AT86RF2XX_REG__IEEE_ADDR_0 + i),
-                            (addr >> ((7 - i) * 8)));
+                dev->netdev.long_addr[IEEE802154_LONG_ADDRESS_LEN - 1 - i]);
     }
 }
 
@@ -139,11 +136,11 @@ uint8_t at86rf2xx_get_chan(const at86rf2xx_t *dev)
 
 void at86rf2xx_set_chan(at86rf2xx_t *dev, uint8_t channel)
 {
-    if ((channel > AT86RF2XX_MAX_CHANNEL) ||
+    if ((channel > AT86RF2XX_MAX_CHANNEL)
 #if AT86RF2XX_MIN_CHANNEL /* is zero for sub-GHz */
-        (channel < AT86RF2XX_MIN_CHANNEL) ||
+       || (channel < AT86RF2XX_MIN_CHANNEL)
 #endif
-        (dev->netdev.chan == channel)) {
+        ) {
         return;
     }
 
@@ -175,6 +172,48 @@ void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page)
 #endif
 }
 
+uint8_t at86rf2xx_get_phy_mode(at86rf2xx_t *dev)
+{
+#ifdef MODULE_AT86RF212B
+    uint8_t ctrl2;
+    ctrl2 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
+    if (ctrl2 & AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK) {
+        return IEEE802154_PHY_OQPSK;
+    } else {
+        return IEEE802154_PHY_BPSK;
+    }
+#else
+    (void) dev;
+    return IEEE802154_PHY_OQPSK;
+#endif
+}
+
+int at86rf2xx_set_rate(at86rf2xx_t *dev, uint8_t rate)
+{
+    uint8_t ctrl2;
+
+    if (rate > 3) {
+        return -ERANGE;
+    }
+
+    ctrl2 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
+    ctrl2 &= ~AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_DATA_RATE;
+    ctrl2 |= rate;
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2, ctrl2);
+
+    return 0;
+}
+
+uint8_t at86rf2xx_get_rate(at86rf2xx_t *dev)
+{
+    uint8_t rate;
+
+    rate = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
+    rate &= AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_DATA_RATE;
+
+    return rate;
+}
+
 uint16_t at86rf2xx_get_pan(const at86rf2xx_t *dev)
 {
     return dev->netdev.pan;
@@ -182,8 +221,8 @@ uint16_t at86rf2xx_get_pan(const at86rf2xx_t *dev)
 
 void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan)
 {
-    le_uint16_t le_pan = byteorder_btols(byteorder_htons(pan));
-    dev->netdev.pan = pan;
+    le_uint16_t le_pan = byteorder_htols(pan);
+
     DEBUG("pan0: %u, pan1: %u\n", le_pan.u8[0], le_pan.u8[1]);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PAN_ID_0, le_pan.u8[0]);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PAN_ID_1, le_pan.u8[1]);
@@ -197,7 +236,7 @@ int16_t at86rf2xx_get_txpower(const at86rf2xx_t *dev)
     return _tx_pow_to_dbm_212b(dev->netdev.chan, dev->page, txpower);
 #else
     uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR)
-                & AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR;
+                      & AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR;
     return tx_pow_to_dbm[txpower];
 #endif
 }
@@ -227,6 +266,37 @@ void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower)
 #endif
 }
 
+int8_t at86rf2xx_get_rxsensitivity(const at86rf2xx_t *dev)
+{
+    uint8_t rxsens = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN)
+                     & AT86RF2XX_RX_SYN__RX_PDT_LEVEL;
+    /* From datasheet (see below) */
+    return rxsens > 0 ? RSSI_BASE_VAL + ((rxsens - 1) * 3) : MIN_RX_SENSITIVITY;
+}
+
+void at86rf2xx_set_rxsensitivity(const at86rf2xx_t *dev, int8_t rxsens)
+{
+    uint8_t hwval;
+    /* From datasheet, rxsens = @ref RSSI_BASE_VAL + (3 * (RX_PDT_LEVEL-1)).
+     * If rxsens < @ref RSSI_BASE_VAL, the RX sensitivity is equal to @ref
+     * MIN_RX_SENSITIVITY.
+     */
+    if (rxsens < RSSI_BASE_VAL) {
+        hwval = 0;
+    }
+    else if (rxsens > RSSI_BASE_VAL + (3 * (AT86RF2XX_RX_SYN__RX_PDT_LEVEL)) - 1) {
+        hwval = AT86RF2XX_RX_SYN__RX_PDT_LEVEL;
+    }
+    else {
+        hwval = ((rxsens - RSSI_BASE_VAL + 3) / 3);
+    }
+
+    uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN);
+    tmp &= ~(AT86RF2XX_RX_SYN__RX_PDT_LEVEL);
+    tmp |= (hwval & AT86RF2XX_RX_SYN__RX_PDT_LEVEL);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, tmp);
+}
+
 uint8_t at86rf2xx_get_max_retries(const at86rf2xx_t *dev)
 {
     return (at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_0) >> 4);
@@ -235,6 +305,7 @@ uint8_t at86rf2xx_get_max_retries(const at86rf2xx_t *dev)
 void at86rf2xx_set_max_retries(const at86rf2xx_t *dev, uint8_t max)
 {
     uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_0);
+
     tmp &= ~(AT86RF2XX_XAH_CTRL_0__MAX_FRAME_RETRIES);
     tmp |= ((max > 7) ? 7 : max) << 4;
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__XAH_CTRL_0, tmp);
@@ -243,7 +314,8 @@ void at86rf2xx_set_max_retries(const at86rf2xx_t *dev, uint8_t max)
 uint8_t at86rf2xx_get_csma_max_retries(const at86rf2xx_t *dev)
 {
     uint8_t tmp;
-    tmp  = at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_0);
+
+    tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_0);
     tmp &= AT86RF2XX_XAH_CTRL_0__MAX_CSMA_RETRIES;
     tmp >>= 1;
     return tmp;
@@ -251,8 +323,8 @@ uint8_t at86rf2xx_get_csma_max_retries(const at86rf2xx_t *dev)
 
 void at86rf2xx_set_csma_max_retries(const at86rf2xx_t *dev, int8_t retries)
 {
-    retries = (retries > 5) ? 5 : retries; /* valid values: 0-5 */
-    retries = (retries < 0) ? 7 : retries; /* max < 0 => disable CSMA (set to 7) */
+    retries = (retries > 5) ? 5 : retries;  /* valid values: 0-5 */
+    retries = (retries < 0) ? 7 : retries;  /* max < 0 => disable CSMA (set to 7) */
     DEBUG("[at86rf2xx] opt: Set CSMA retries to %u\n", retries);
 
     uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_0);
@@ -273,7 +345,7 @@ void at86rf2xx_set_csma_backoff_exp(const at86rf2xx_t *dev,
 
 void at86rf2xx_set_csma_seed(const at86rf2xx_t *dev, const uint8_t entropy[2])
 {
-    if(entropy == NULL) {
+    if (entropy == NULL) {
         DEBUG("[at86rf2xx] opt: CSMA seed entropy is nullpointer\n");
         return;
     }
@@ -290,6 +362,7 @@ void at86rf2xx_set_csma_seed(const at86rf2xx_t *dev, const uint8_t entropy[2])
 int8_t at86rf2xx_get_cca_threshold(const at86rf2xx_t *dev)
 {
     int8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CCA_THRES);
+
     tmp &= AT86RF2XX_CCA_THRES_MASK__CCA_ED_THRES;
     tmp <<= 1;
     return (RSSI_BASE_VAL + tmp);
@@ -315,6 +388,7 @@ void at86rf2xx_set_cca_threshold(const at86rf2xx_t *dev, int8_t value)
 int8_t at86rf2xx_get_ed_level(at86rf2xx_t *dev)
 {
     uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_ED_LEVEL);
+
 #if MODULE_AT86RF212B
     /* AT86RF212B has different scale than the other variants */
     int8_t ed = (int8_t)(((int16_t)tmp * 103) / 100) + RSSI_BASE_VAL;
@@ -331,8 +405,8 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
     DEBUG("set option %i to %i\n", option, state);
 
     /* set option field */
-    dev->netdev.flags = (state) ? (dev->netdev.flags |  option)
-                                : (dev->netdev.flags & ~option);
+    dev->flags = (state) ? (dev->flags |  option)
+                         : (dev->flags & ~option);
     /* trigger option specific actions */
     switch (option) {
         case AT86RF2XX_OPT_CSMA:
@@ -371,14 +445,6 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
             tmp = (state) ? (tmp & ~AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK)
                           : (tmp |  AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK);
             at86rf2xx_reg_write(dev, AT86RF2XX_REG__CSMA_SEED_1, tmp);
-            break;
-        case AT86RF2XX_OPT_TELL_RX_START:
-            DEBUG("[at86rf2xx] opt: %s SFD IRQ\n",
-                  (state ? "enable" : "disable"));
-            tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_MASK);
-            tmp = (state) ? (tmp |  AT86RF2XX_IRQ_STATUS_MASK__RX_START)
-                          : (tmp & ~AT86RF2XX_IRQ_STATUS_MASK__RX_START);
-            at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
             break;
         case AT86RF2XX_OPT_ACK_PENDING:
             DEBUG("[at86rf2xx] opt: enabling pending ACKs\n");
@@ -435,6 +501,8 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
         old_state = at86rf2xx_get_status(dev);
     } while (old_state == AT86RF2XX_STATE_BUSY_RX_AACK ||
              old_state == AT86RF2XX_STATE_BUSY_TX_ARET ||
+             old_state == AT86RF2XX_STATE_BUSY_RX      ||
+             old_state == AT86RF2XX_STATE_BUSY_TX      ||
              old_state == AT86RF2XX_STATE_IN_PROGRESS);
 
     if (state == AT86RF2XX_STATE_FORCE_TRX_OFF) {
@@ -452,13 +520,21 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
         if (state == AT86RF2XX_STATE_SLEEP) {
             /* First go to TRX_OFF */
             _set_state(dev, AT86RF2XX_STATE_TRX_OFF,
-                            AT86RF2XX_STATE_FORCE_TRX_OFF);
+                       AT86RF2XX_STATE_FORCE_TRX_OFF);
             /* Discard all IRQ flags, framebuffer is lost anyway */
             at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
             /* Go to SLEEP mode from TRX_OFF */
+#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+            /* reset interrupts states in device */
+            dev->irq_status = 0;
+            /* Setting SLPTR bit brings radio transceiver to sleep in in TRX_OFF*/
+            *AT86RF2XX_REG__TRXPR |= (AT86RF2XX_TRXPR_SLPTR);
+#else
             gpio_set(dev->params.sleep_pin);
+#endif
             dev->state = state;
-        } else {
+        }
+        else {
             if (old_state == AT86RF2XX_STATE_SLEEP) {
                 DEBUG("at86rf2xx: waking up from sleep mode\n");
                 at86rf2xx_assert_awake(dev);

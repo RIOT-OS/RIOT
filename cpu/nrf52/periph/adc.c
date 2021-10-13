@@ -20,6 +20,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/adc.h"
@@ -103,7 +105,7 @@ int adc_init(adc_t line)
     return 0;
 }
 
-int adc_sample(adc_t line, adc_res_t res)
+int32_t adc_sample(adc_t line, adc_res_t res)
 {
     assert(line < ADC_NUMOF);
 
@@ -112,13 +114,23 @@ int adc_sample(adc_t line, adc_res_t res)
         return -1;
     }
 
+#ifdef SAADC_CH_PSELP_PSELP_VDDHDIV5
+    if (line == NRF52_VDDHDIV5) {
+        line = SAADC_CH_PSELP_PSELP_VDDHDIV5;
+    } else {
+        line += 1;
+    }
+#else
+    line += 1;
+#endif
+
     /* prepare device */
     prep();
 
     /* set resolution */
     NRF_SAADC->RESOLUTION = res;
     /* set line to sample */
-    NRF_SAADC->CH[0].PSELP = (line + 1);
+    NRF_SAADC->CH[0].PSELP = line;
 
     /* start the SAADC and wait for the started event */
     NRF_SAADC->EVENTS_STARTED = 0;

@@ -38,7 +38,6 @@ extern "C" {
 #ifdef MODULE_CAN_MBOX
 #include "mbox.h"
 #endif
-#include "net/gnrc/pktbuf.h"
 
 /**
  * @brief CAN options
@@ -64,8 +63,8 @@ typedef enum {
     CANOPT_STATE_SLEEP,           /**< sleep mode */
     CANOPT_STATE_LISTEN_ONLY,     /**< listen only mode */
     CANOPT_STATE_ON,              /**< power on, rx / tx mode */
+    CANOPT_STATE_LOOPBACK,        /**< loopback mode */
 } canopt_state_t;
-
 
 /**
  * @brief Structure to pass a CAN option
@@ -123,9 +122,7 @@ enum can_msg {
 typedef struct can_rx_data {
     struct iovec data;    /**< iovec containing received data */
     void *arg;            /**< upper layer private param */
-    gnrc_pktsnip_t *snip; /**< pointer to the allocated snip */
 } can_rx_data_t;
-
 
 /**
  * @brief registry entry types

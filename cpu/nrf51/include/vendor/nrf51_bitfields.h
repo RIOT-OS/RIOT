@@ -1,38 +1,37 @@
-/* Copyright (c) 2015, Nordic Semiconductor ASA
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   * Redistributions of source code must retain the above copyright notice, this
- *     list of conditions and the following disclaimer.
- *
- *   * Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
- *
- *   * Neither the name of Nordic Semiconductor ASA nor the names of its
- *     contributors may be used to endorse or promote products derived from
- *     this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- */
-#ifndef NRF51_BITS_H
-#define NRF51_BITS_H
+/*
 
-#ifdef __cplusplus
- extern "C" {
-#endif
+Copyright (c) 2010 - 2018, Nordic Semiconductor ASA All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+
+3. Neither the name of Nordic Semiconductor ASA nor the names of its
+   contributors may be used to endorse or promote products derived from this
+   software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY, AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+*/
+
+#ifndef __NRF51_BITS_H
+#define __NRF51_BITS_H
 
 /*lint ++flb "Enter library region" */
 
@@ -223,604 +222,6 @@
 #define ADC_POWER_POWER_Msk (0x1UL << ADC_POWER_POWER_Pos) /*!< Bit mask of POWER field. */
 #define ADC_POWER_POWER_Disabled (0UL) /*!< Module power disabled. */
 #define ADC_POWER_POWER_Enabled (1UL) /*!< Module power enabled. */
-
-
-/* Peripheral: AMLI */
-/* Description: AHB Multi-Layer Interface. */
-
-/* Register: AMLI_RAMPRI_CPU0 */
-/* Description: Configurable priority configuration register for CPU0. */
-
-/* Bits 31..28 : Configuration field for RAM block 7. */
-#define AMLI_RAMPRI_CPU0_RAM7_Pos (28UL) /*!< Position of RAM7 field. */
-#define AMLI_RAMPRI_CPU0_RAM7_Msk (0xFUL << AMLI_RAMPRI_CPU0_RAM7_Pos) /*!< Bit mask of RAM7 field. */
-#define AMLI_RAMPRI_CPU0_RAM7_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_CPU0_RAM7_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_CPU0_RAM7_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_CPU0_RAM7_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_CPU0_RAM7_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_CPU0_RAM7_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_CPU0_RAM7_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_CPU0_RAM7_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 27..24 : Configuration field for RAM block 6. */
-#define AMLI_RAMPRI_CPU0_RAM6_Pos (24UL) /*!< Position of RAM6 field. */
-#define AMLI_RAMPRI_CPU0_RAM6_Msk (0xFUL << AMLI_RAMPRI_CPU0_RAM6_Pos) /*!< Bit mask of RAM6 field. */
-#define AMLI_RAMPRI_CPU0_RAM6_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_CPU0_RAM6_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_CPU0_RAM6_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_CPU0_RAM6_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_CPU0_RAM6_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_CPU0_RAM6_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_CPU0_RAM6_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_CPU0_RAM6_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 23..20 : Configuration field for RAM block 5. */
-#define AMLI_RAMPRI_CPU0_RAM5_Pos (20UL) /*!< Position of RAM5 field. */
-#define AMLI_RAMPRI_CPU0_RAM5_Msk (0xFUL << AMLI_RAMPRI_CPU0_RAM5_Pos) /*!< Bit mask of RAM5 field. */
-#define AMLI_RAMPRI_CPU0_RAM5_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_CPU0_RAM5_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_CPU0_RAM5_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_CPU0_RAM5_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_CPU0_RAM5_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_CPU0_RAM5_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_CPU0_RAM5_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_CPU0_RAM5_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 19..16 : Configuration field for RAM block 4. */
-#define AMLI_RAMPRI_CPU0_RAM4_Pos (16UL) /*!< Position of RAM4 field. */
-#define AMLI_RAMPRI_CPU0_RAM4_Msk (0xFUL << AMLI_RAMPRI_CPU0_RAM4_Pos) /*!< Bit mask of RAM4 field. */
-#define AMLI_RAMPRI_CPU0_RAM4_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_CPU0_RAM4_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_CPU0_RAM4_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_CPU0_RAM4_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_CPU0_RAM4_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_CPU0_RAM4_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_CPU0_RAM4_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_CPU0_RAM4_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 15..12 : Configuration field for RAM block 3. */
-#define AMLI_RAMPRI_CPU0_RAM3_Pos (12UL) /*!< Position of RAM3 field. */
-#define AMLI_RAMPRI_CPU0_RAM3_Msk (0xFUL << AMLI_RAMPRI_CPU0_RAM3_Pos) /*!< Bit mask of RAM3 field. */
-#define AMLI_RAMPRI_CPU0_RAM3_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_CPU0_RAM3_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_CPU0_RAM3_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_CPU0_RAM3_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_CPU0_RAM3_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_CPU0_RAM3_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_CPU0_RAM3_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_CPU0_RAM3_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 11..8 : Configuration field for RAM block 2. */
-#define AMLI_RAMPRI_CPU0_RAM2_Pos (8UL) /*!< Position of RAM2 field. */
-#define AMLI_RAMPRI_CPU0_RAM2_Msk (0xFUL << AMLI_RAMPRI_CPU0_RAM2_Pos) /*!< Bit mask of RAM2 field. */
-#define AMLI_RAMPRI_CPU0_RAM2_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_CPU0_RAM2_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_CPU0_RAM2_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_CPU0_RAM2_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_CPU0_RAM2_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_CPU0_RAM2_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_CPU0_RAM2_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_CPU0_RAM2_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 7..4 : Configuration field for RAM block 1. */
-#define AMLI_RAMPRI_CPU0_RAM1_Pos (4UL) /*!< Position of RAM1 field. */
-#define AMLI_RAMPRI_CPU0_RAM1_Msk (0xFUL << AMLI_RAMPRI_CPU0_RAM1_Pos) /*!< Bit mask of RAM1 field. */
-#define AMLI_RAMPRI_CPU0_RAM1_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_CPU0_RAM1_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_CPU0_RAM1_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_CPU0_RAM1_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_CPU0_RAM1_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_CPU0_RAM1_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_CPU0_RAM1_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_CPU0_RAM1_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 3..0 : Configuration field for RAM block 0. */
-#define AMLI_RAMPRI_CPU0_RAM0_Pos (0UL) /*!< Position of RAM0 field. */
-#define AMLI_RAMPRI_CPU0_RAM0_Msk (0xFUL << AMLI_RAMPRI_CPU0_RAM0_Pos) /*!< Bit mask of RAM0 field. */
-#define AMLI_RAMPRI_CPU0_RAM0_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_CPU0_RAM0_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_CPU0_RAM0_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_CPU0_RAM0_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_CPU0_RAM0_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_CPU0_RAM0_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_CPU0_RAM0_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_CPU0_RAM0_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Register: AMLI_RAMPRI_SPIS1 */
-/* Description: Configurable priority configuration register for SPIS1. */
-
-/* Bits 31..28 : Configuration field for RAM block 7. */
-#define AMLI_RAMPRI_SPIS1_RAM7_Pos (28UL) /*!< Position of RAM7 field. */
-#define AMLI_RAMPRI_SPIS1_RAM7_Msk (0xFUL << AMLI_RAMPRI_SPIS1_RAM7_Pos) /*!< Bit mask of RAM7 field. */
-#define AMLI_RAMPRI_SPIS1_RAM7_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_SPIS1_RAM7_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_SPIS1_RAM7_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_SPIS1_RAM7_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_SPIS1_RAM7_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_SPIS1_RAM7_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_SPIS1_RAM7_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_SPIS1_RAM7_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 27..24 : Configuration field for RAM block 6. */
-#define AMLI_RAMPRI_SPIS1_RAM6_Pos (24UL) /*!< Position of RAM6 field. */
-#define AMLI_RAMPRI_SPIS1_RAM6_Msk (0xFUL << AMLI_RAMPRI_SPIS1_RAM6_Pos) /*!< Bit mask of RAM6 field. */
-#define AMLI_RAMPRI_SPIS1_RAM6_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_SPIS1_RAM6_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_SPIS1_RAM6_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_SPIS1_RAM6_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_SPIS1_RAM6_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_SPIS1_RAM6_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_SPIS1_RAM6_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_SPIS1_RAM6_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 23..20 : Configuration field for RAM block 5. */
-#define AMLI_RAMPRI_SPIS1_RAM5_Pos (20UL) /*!< Position of RAM5 field. */
-#define AMLI_RAMPRI_SPIS1_RAM5_Msk (0xFUL << AMLI_RAMPRI_SPIS1_RAM5_Pos) /*!< Bit mask of RAM5 field. */
-#define AMLI_RAMPRI_SPIS1_RAM5_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_SPIS1_RAM5_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_SPIS1_RAM5_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_SPIS1_RAM5_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_SPIS1_RAM5_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_SPIS1_RAM5_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_SPIS1_RAM5_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_SPIS1_RAM5_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 19..16 : Configuration field for RAM block 4. */
-#define AMLI_RAMPRI_SPIS1_RAM4_Pos (16UL) /*!< Position of RAM4 field. */
-#define AMLI_RAMPRI_SPIS1_RAM4_Msk (0xFUL << AMLI_RAMPRI_SPIS1_RAM4_Pos) /*!< Bit mask of RAM4 field. */
-#define AMLI_RAMPRI_SPIS1_RAM4_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_SPIS1_RAM4_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_SPIS1_RAM4_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_SPIS1_RAM4_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_SPIS1_RAM4_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_SPIS1_RAM4_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_SPIS1_RAM4_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_SPIS1_RAM4_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 15..12 : Configuration field for RAM block 3. */
-#define AMLI_RAMPRI_SPIS1_RAM3_Pos (12UL) /*!< Position of RAM3 field. */
-#define AMLI_RAMPRI_SPIS1_RAM3_Msk (0xFUL << AMLI_RAMPRI_SPIS1_RAM3_Pos) /*!< Bit mask of RAM3 field. */
-#define AMLI_RAMPRI_SPIS1_RAM3_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_SPIS1_RAM3_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_SPIS1_RAM3_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_SPIS1_RAM3_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_SPIS1_RAM3_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_SPIS1_RAM3_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_SPIS1_RAM3_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_SPIS1_RAM3_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 11..8 : Configuration field for RAM block 2. */
-#define AMLI_RAMPRI_SPIS1_RAM2_Pos (8UL) /*!< Position of RAM2 field. */
-#define AMLI_RAMPRI_SPIS1_RAM2_Msk (0xFUL << AMLI_RAMPRI_SPIS1_RAM2_Pos) /*!< Bit mask of RAM2 field. */
-#define AMLI_RAMPRI_SPIS1_RAM2_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_SPIS1_RAM2_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_SPIS1_RAM2_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_SPIS1_RAM2_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_SPIS1_RAM2_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_SPIS1_RAM2_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_SPIS1_RAM2_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_SPIS1_RAM2_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 7..4 : Configuration field for RAM block 1. */
-#define AMLI_RAMPRI_SPIS1_RAM1_Pos (4UL) /*!< Position of RAM1 field. */
-#define AMLI_RAMPRI_SPIS1_RAM1_Msk (0xFUL << AMLI_RAMPRI_SPIS1_RAM1_Pos) /*!< Bit mask of RAM1 field. */
-#define AMLI_RAMPRI_SPIS1_RAM1_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_SPIS1_RAM1_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_SPIS1_RAM1_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_SPIS1_RAM1_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_SPIS1_RAM1_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_SPIS1_RAM1_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_SPIS1_RAM1_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_SPIS1_RAM1_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 3..0 : Configuration field for RAM block 0. */
-#define AMLI_RAMPRI_SPIS1_RAM0_Pos (0UL) /*!< Position of RAM0 field. */
-#define AMLI_RAMPRI_SPIS1_RAM0_Msk (0xFUL << AMLI_RAMPRI_SPIS1_RAM0_Pos) /*!< Bit mask of RAM0 field. */
-#define AMLI_RAMPRI_SPIS1_RAM0_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_SPIS1_RAM0_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_SPIS1_RAM0_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_SPIS1_RAM0_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_SPIS1_RAM0_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_SPIS1_RAM0_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_SPIS1_RAM0_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_SPIS1_RAM0_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Register: AMLI_RAMPRI_RADIO */
-/* Description: Configurable priority configuration register for RADIO. */
-
-/* Bits 31..28 : Configuration field for RAM block 7. */
-#define AMLI_RAMPRI_RADIO_RAM7_Pos (28UL) /*!< Position of RAM7 field. */
-#define AMLI_RAMPRI_RADIO_RAM7_Msk (0xFUL << AMLI_RAMPRI_RADIO_RAM7_Pos) /*!< Bit mask of RAM7 field. */
-#define AMLI_RAMPRI_RADIO_RAM7_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_RADIO_RAM7_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_RADIO_RAM7_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_RADIO_RAM7_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_RADIO_RAM7_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_RADIO_RAM7_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_RADIO_RAM7_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_RADIO_RAM7_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 27..24 : Configuration field for RAM block 6. */
-#define AMLI_RAMPRI_RADIO_RAM6_Pos (24UL) /*!< Position of RAM6 field. */
-#define AMLI_RAMPRI_RADIO_RAM6_Msk (0xFUL << AMLI_RAMPRI_RADIO_RAM6_Pos) /*!< Bit mask of RAM6 field. */
-#define AMLI_RAMPRI_RADIO_RAM6_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_RADIO_RAM6_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_RADIO_RAM6_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_RADIO_RAM6_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_RADIO_RAM6_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_RADIO_RAM6_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_RADIO_RAM6_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_RADIO_RAM6_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 23..20 : Configuration field for RAM block 5. */
-#define AMLI_RAMPRI_RADIO_RAM5_Pos (20UL) /*!< Position of RAM5 field. */
-#define AMLI_RAMPRI_RADIO_RAM5_Msk (0xFUL << AMLI_RAMPRI_RADIO_RAM5_Pos) /*!< Bit mask of RAM5 field. */
-#define AMLI_RAMPRI_RADIO_RAM5_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_RADIO_RAM5_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_RADIO_RAM5_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_RADIO_RAM5_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_RADIO_RAM5_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_RADIO_RAM5_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_RADIO_RAM5_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_RADIO_RAM5_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 19..16 : Configuration field for RAM block 4. */
-#define AMLI_RAMPRI_RADIO_RAM4_Pos (16UL) /*!< Position of RAM4 field. */
-#define AMLI_RAMPRI_RADIO_RAM4_Msk (0xFUL << AMLI_RAMPRI_RADIO_RAM4_Pos) /*!< Bit mask of RAM4 field. */
-#define AMLI_RAMPRI_RADIO_RAM4_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_RADIO_RAM4_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_RADIO_RAM4_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_RADIO_RAM4_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_RADIO_RAM4_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_RADIO_RAM4_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_RADIO_RAM4_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_RADIO_RAM4_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 15..12 : Configuration field for RAM block 3. */
-#define AMLI_RAMPRI_RADIO_RAM3_Pos (12UL) /*!< Position of RAM3 field. */
-#define AMLI_RAMPRI_RADIO_RAM3_Msk (0xFUL << AMLI_RAMPRI_RADIO_RAM3_Pos) /*!< Bit mask of RAM3 field. */
-#define AMLI_RAMPRI_RADIO_RAM3_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_RADIO_RAM3_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_RADIO_RAM3_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_RADIO_RAM3_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_RADIO_RAM3_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_RADIO_RAM3_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_RADIO_RAM3_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_RADIO_RAM3_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 11..8 : Configuration field for RAM block 2. */
-#define AMLI_RAMPRI_RADIO_RAM2_Pos (8UL) /*!< Position of RAM2 field. */
-#define AMLI_RAMPRI_RADIO_RAM2_Msk (0xFUL << AMLI_RAMPRI_RADIO_RAM2_Pos) /*!< Bit mask of RAM2 field. */
-#define AMLI_RAMPRI_RADIO_RAM2_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_RADIO_RAM2_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_RADIO_RAM2_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_RADIO_RAM2_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_RADIO_RAM2_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_RADIO_RAM2_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_RADIO_RAM2_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_RADIO_RAM2_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 7..4 : Configuration field for RAM block 1. */
-#define AMLI_RAMPRI_RADIO_RAM1_Pos (4UL) /*!< Position of RAM1 field. */
-#define AMLI_RAMPRI_RADIO_RAM1_Msk (0xFUL << AMLI_RAMPRI_RADIO_RAM1_Pos) /*!< Bit mask of RAM1 field. */
-#define AMLI_RAMPRI_RADIO_RAM1_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_RADIO_RAM1_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_RADIO_RAM1_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_RADIO_RAM1_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_RADIO_RAM1_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_RADIO_RAM1_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_RADIO_RAM1_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_RADIO_RAM1_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 3..0 : Configuration field for RAM block 0. */
-#define AMLI_RAMPRI_RADIO_RAM0_Pos (0UL) /*!< Position of RAM0 field. */
-#define AMLI_RAMPRI_RADIO_RAM0_Msk (0xFUL << AMLI_RAMPRI_RADIO_RAM0_Pos) /*!< Bit mask of RAM0 field. */
-#define AMLI_RAMPRI_RADIO_RAM0_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_RADIO_RAM0_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_RADIO_RAM0_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_RADIO_RAM0_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_RADIO_RAM0_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_RADIO_RAM0_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_RADIO_RAM0_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_RADIO_RAM0_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Register: AMLI_RAMPRI_ECB */
-/* Description: Configurable priority configuration register for ECB. */
-
-/* Bits 31..28 : Configuration field for RAM block 7. */
-#define AMLI_RAMPRI_ECB_RAM7_Pos (28UL) /*!< Position of RAM7 field. */
-#define AMLI_RAMPRI_ECB_RAM7_Msk (0xFUL << AMLI_RAMPRI_ECB_RAM7_Pos) /*!< Bit mask of RAM7 field. */
-#define AMLI_RAMPRI_ECB_RAM7_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_ECB_RAM7_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_ECB_RAM7_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_ECB_RAM7_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_ECB_RAM7_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_ECB_RAM7_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_ECB_RAM7_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_ECB_RAM7_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 27..24 : Configuration field for RAM block 6. */
-#define AMLI_RAMPRI_ECB_RAM6_Pos (24UL) /*!< Position of RAM6 field. */
-#define AMLI_RAMPRI_ECB_RAM6_Msk (0xFUL << AMLI_RAMPRI_ECB_RAM6_Pos) /*!< Bit mask of RAM6 field. */
-#define AMLI_RAMPRI_ECB_RAM6_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_ECB_RAM6_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_ECB_RAM6_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_ECB_RAM6_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_ECB_RAM6_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_ECB_RAM6_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_ECB_RAM6_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_ECB_RAM6_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 23..20 : Configuration field for RAM block 5. */
-#define AMLI_RAMPRI_ECB_RAM5_Pos (20UL) /*!< Position of RAM5 field. */
-#define AMLI_RAMPRI_ECB_RAM5_Msk (0xFUL << AMLI_RAMPRI_ECB_RAM5_Pos) /*!< Bit mask of RAM5 field. */
-#define AMLI_RAMPRI_ECB_RAM5_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_ECB_RAM5_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_ECB_RAM5_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_ECB_RAM5_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_ECB_RAM5_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_ECB_RAM5_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_ECB_RAM5_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_ECB_RAM5_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 19..16 : Configuration field for RAM block 4. */
-#define AMLI_RAMPRI_ECB_RAM4_Pos (16UL) /*!< Position of RAM4 field. */
-#define AMLI_RAMPRI_ECB_RAM4_Msk (0xFUL << AMLI_RAMPRI_ECB_RAM4_Pos) /*!< Bit mask of RAM4 field. */
-#define AMLI_RAMPRI_ECB_RAM4_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_ECB_RAM4_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_ECB_RAM4_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_ECB_RAM4_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_ECB_RAM4_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_ECB_RAM4_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_ECB_RAM4_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_ECB_RAM4_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 15..12 : Configuration field for RAM block 3. */
-#define AMLI_RAMPRI_ECB_RAM3_Pos (12UL) /*!< Position of RAM3 field. */
-#define AMLI_RAMPRI_ECB_RAM3_Msk (0xFUL << AMLI_RAMPRI_ECB_RAM3_Pos) /*!< Bit mask of RAM3 field. */
-#define AMLI_RAMPRI_ECB_RAM3_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_ECB_RAM3_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_ECB_RAM3_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_ECB_RAM3_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_ECB_RAM3_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_ECB_RAM3_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_ECB_RAM3_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_ECB_RAM3_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 11..8 : Configuration field for RAM block 2. */
-#define AMLI_RAMPRI_ECB_RAM2_Pos (8UL) /*!< Position of RAM2 field. */
-#define AMLI_RAMPRI_ECB_RAM2_Msk (0xFUL << AMLI_RAMPRI_ECB_RAM2_Pos) /*!< Bit mask of RAM2 field. */
-#define AMLI_RAMPRI_ECB_RAM2_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_ECB_RAM2_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_ECB_RAM2_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_ECB_RAM2_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_ECB_RAM2_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_ECB_RAM2_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_ECB_RAM2_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_ECB_RAM2_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 7..4 : Configuration field for RAM block 1. */
-#define AMLI_RAMPRI_ECB_RAM1_Pos (4UL) /*!< Position of RAM1 field. */
-#define AMLI_RAMPRI_ECB_RAM1_Msk (0xFUL << AMLI_RAMPRI_ECB_RAM1_Pos) /*!< Bit mask of RAM1 field. */
-#define AMLI_RAMPRI_ECB_RAM1_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_ECB_RAM1_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_ECB_RAM1_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_ECB_RAM1_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_ECB_RAM1_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_ECB_RAM1_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_ECB_RAM1_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_ECB_RAM1_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 3..0 : Configuration field for RAM block 0. */
-#define AMLI_RAMPRI_ECB_RAM0_Pos (0UL) /*!< Position of RAM0 field. */
-#define AMLI_RAMPRI_ECB_RAM0_Msk (0xFUL << AMLI_RAMPRI_ECB_RAM0_Pos) /*!< Bit mask of RAM0 field. */
-#define AMLI_RAMPRI_ECB_RAM0_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_ECB_RAM0_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_ECB_RAM0_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_ECB_RAM0_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_ECB_RAM0_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_ECB_RAM0_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_ECB_RAM0_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_ECB_RAM0_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Register: AMLI_RAMPRI_CCM */
-/* Description: Configurable priority configuration register for CCM. */
-
-/* Bits 31..28 : Configuration field for RAM block 7. */
-#define AMLI_RAMPRI_CCM_RAM7_Pos (28UL) /*!< Position of RAM7 field. */
-#define AMLI_RAMPRI_CCM_RAM7_Msk (0xFUL << AMLI_RAMPRI_CCM_RAM7_Pos) /*!< Bit mask of RAM7 field. */
-#define AMLI_RAMPRI_CCM_RAM7_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_CCM_RAM7_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_CCM_RAM7_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_CCM_RAM7_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_CCM_RAM7_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_CCM_RAM7_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_CCM_RAM7_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_CCM_RAM7_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 27..24 : Configuration field for RAM block 6. */
-#define AMLI_RAMPRI_CCM_RAM6_Pos (24UL) /*!< Position of RAM6 field. */
-#define AMLI_RAMPRI_CCM_RAM6_Msk (0xFUL << AMLI_RAMPRI_CCM_RAM6_Pos) /*!< Bit mask of RAM6 field. */
-#define AMLI_RAMPRI_CCM_RAM6_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_CCM_RAM6_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_CCM_RAM6_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_CCM_RAM6_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_CCM_RAM6_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_CCM_RAM6_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_CCM_RAM6_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_CCM_RAM6_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 23..20 : Configuration field for RAM block 5. */
-#define AMLI_RAMPRI_CCM_RAM5_Pos (20UL) /*!< Position of RAM5 field. */
-#define AMLI_RAMPRI_CCM_RAM5_Msk (0xFUL << AMLI_RAMPRI_CCM_RAM5_Pos) /*!< Bit mask of RAM5 field. */
-#define AMLI_RAMPRI_CCM_RAM5_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_CCM_RAM5_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_CCM_RAM5_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_CCM_RAM5_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_CCM_RAM5_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_CCM_RAM5_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_CCM_RAM5_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_CCM_RAM5_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 19..16 : Configuration field for RAM block 4. */
-#define AMLI_RAMPRI_CCM_RAM4_Pos (16UL) /*!< Position of RAM4 field. */
-#define AMLI_RAMPRI_CCM_RAM4_Msk (0xFUL << AMLI_RAMPRI_CCM_RAM4_Pos) /*!< Bit mask of RAM4 field. */
-#define AMLI_RAMPRI_CCM_RAM4_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_CCM_RAM4_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_CCM_RAM4_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_CCM_RAM4_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_CCM_RAM4_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_CCM_RAM4_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_CCM_RAM4_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_CCM_RAM4_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 15..12 : Configuration field for RAM block 3. */
-#define AMLI_RAMPRI_CCM_RAM3_Pos (12UL) /*!< Position of RAM3 field. */
-#define AMLI_RAMPRI_CCM_RAM3_Msk (0xFUL << AMLI_RAMPRI_CCM_RAM3_Pos) /*!< Bit mask of RAM3 field. */
-#define AMLI_RAMPRI_CCM_RAM3_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_CCM_RAM3_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_CCM_RAM3_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_CCM_RAM3_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_CCM_RAM3_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_CCM_RAM3_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_CCM_RAM3_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_CCM_RAM3_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 11..8 : Configuration field for RAM block 2. */
-#define AMLI_RAMPRI_CCM_RAM2_Pos (8UL) /*!< Position of RAM2 field. */
-#define AMLI_RAMPRI_CCM_RAM2_Msk (0xFUL << AMLI_RAMPRI_CCM_RAM2_Pos) /*!< Bit mask of RAM2 field. */
-#define AMLI_RAMPRI_CCM_RAM2_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_CCM_RAM2_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_CCM_RAM2_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_CCM_RAM2_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_CCM_RAM2_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_CCM_RAM2_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_CCM_RAM2_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_CCM_RAM2_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 7..4 : Configuration field for RAM block 1. */
-#define AMLI_RAMPRI_CCM_RAM1_Pos (4UL) /*!< Position of RAM1 field. */
-#define AMLI_RAMPRI_CCM_RAM1_Msk (0xFUL << AMLI_RAMPRI_CCM_RAM1_Pos) /*!< Bit mask of RAM1 field. */
-#define AMLI_RAMPRI_CCM_RAM1_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_CCM_RAM1_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_CCM_RAM1_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_CCM_RAM1_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_CCM_RAM1_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_CCM_RAM1_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_CCM_RAM1_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_CCM_RAM1_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 3..0 : Configuration field for RAM block 0. */
-#define AMLI_RAMPRI_CCM_RAM0_Pos (0UL) /*!< Position of RAM0 field. */
-#define AMLI_RAMPRI_CCM_RAM0_Msk (0xFUL << AMLI_RAMPRI_CCM_RAM0_Pos) /*!< Bit mask of RAM0 field. */
-#define AMLI_RAMPRI_CCM_RAM0_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_CCM_RAM0_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_CCM_RAM0_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_CCM_RAM0_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_CCM_RAM0_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_CCM_RAM0_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_CCM_RAM0_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_CCM_RAM0_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Register: AMLI_RAMPRI_AAR */
-/* Description: Configurable priority configuration register for AAR. */
-
-/* Bits 31..28 : Configuration field for RAM block 7. */
-#define AMLI_RAMPRI_AAR_RAM7_Pos (28UL) /*!< Position of RAM7 field. */
-#define AMLI_RAMPRI_AAR_RAM7_Msk (0xFUL << AMLI_RAMPRI_AAR_RAM7_Pos) /*!< Bit mask of RAM7 field. */
-#define AMLI_RAMPRI_AAR_RAM7_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_AAR_RAM7_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_AAR_RAM7_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_AAR_RAM7_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_AAR_RAM7_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_AAR_RAM7_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_AAR_RAM7_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_AAR_RAM7_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 27..24 : Configuration field for RAM block 6. */
-#define AMLI_RAMPRI_AAR_RAM6_Pos (24UL) /*!< Position of RAM6 field. */
-#define AMLI_RAMPRI_AAR_RAM6_Msk (0xFUL << AMLI_RAMPRI_AAR_RAM6_Pos) /*!< Bit mask of RAM6 field. */
-#define AMLI_RAMPRI_AAR_RAM6_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_AAR_RAM6_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_AAR_RAM6_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_AAR_RAM6_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_AAR_RAM6_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_AAR_RAM6_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_AAR_RAM6_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_AAR_RAM6_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 23..20 : Configuration field for RAM block 5. */
-#define AMLI_RAMPRI_AAR_RAM5_Pos (20UL) /*!< Position of RAM5 field. */
-#define AMLI_RAMPRI_AAR_RAM5_Msk (0xFUL << AMLI_RAMPRI_AAR_RAM5_Pos) /*!< Bit mask of RAM5 field. */
-#define AMLI_RAMPRI_AAR_RAM5_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_AAR_RAM5_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_AAR_RAM5_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_AAR_RAM5_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_AAR_RAM5_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_AAR_RAM5_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_AAR_RAM5_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_AAR_RAM5_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 19..16 : Configuration field for RAM block 4. */
-#define AMLI_RAMPRI_AAR_RAM4_Pos (16UL) /*!< Position of RAM4 field. */
-#define AMLI_RAMPRI_AAR_RAM4_Msk (0xFUL << AMLI_RAMPRI_AAR_RAM4_Pos) /*!< Bit mask of RAM4 field. */
-#define AMLI_RAMPRI_AAR_RAM4_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_AAR_RAM4_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_AAR_RAM4_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_AAR_RAM4_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_AAR_RAM4_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_AAR_RAM4_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_AAR_RAM4_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_AAR_RAM4_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 15..12 : Configuration field for RAM block 3. */
-#define AMLI_RAMPRI_AAR_RAM3_Pos (12UL) /*!< Position of RAM3 field. */
-#define AMLI_RAMPRI_AAR_RAM3_Msk (0xFUL << AMLI_RAMPRI_AAR_RAM3_Pos) /*!< Bit mask of RAM3 field. */
-#define AMLI_RAMPRI_AAR_RAM3_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_AAR_RAM3_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_AAR_RAM3_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_AAR_RAM3_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_AAR_RAM3_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_AAR_RAM3_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_AAR_RAM3_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_AAR_RAM3_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 11..8 : Configuration field for RAM block 2. */
-#define AMLI_RAMPRI_AAR_RAM2_Pos (8UL) /*!< Position of RAM2 field. */
-#define AMLI_RAMPRI_AAR_RAM2_Msk (0xFUL << AMLI_RAMPRI_AAR_RAM2_Pos) /*!< Bit mask of RAM2 field. */
-#define AMLI_RAMPRI_AAR_RAM2_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_AAR_RAM2_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_AAR_RAM2_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_AAR_RAM2_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_AAR_RAM2_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_AAR_RAM2_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_AAR_RAM2_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_AAR_RAM2_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 7..4 : Configuration field for RAM block 1. */
-#define AMLI_RAMPRI_AAR_RAM1_Pos (4UL) /*!< Position of RAM1 field. */
-#define AMLI_RAMPRI_AAR_RAM1_Msk (0xFUL << AMLI_RAMPRI_AAR_RAM1_Pos) /*!< Bit mask of RAM1 field. */
-#define AMLI_RAMPRI_AAR_RAM1_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_AAR_RAM1_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_AAR_RAM1_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_AAR_RAM1_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_AAR_RAM1_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_AAR_RAM1_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_AAR_RAM1_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_AAR_RAM1_Pri14 (0xEUL) /*!< Priority 14. */
-
-/* Bits 3..0 : Configuration field for RAM block 0. */
-#define AMLI_RAMPRI_AAR_RAM0_Pos (0UL) /*!< Position of RAM0 field. */
-#define AMLI_RAMPRI_AAR_RAM0_Msk (0xFUL << AMLI_RAMPRI_AAR_RAM0_Pos) /*!< Bit mask of RAM0 field. */
-#define AMLI_RAMPRI_AAR_RAM0_Pri0 (0x0UL) /*!< Priority 0. */
-#define AMLI_RAMPRI_AAR_RAM0_Pri2 (0x2UL) /*!< Priority 2. */
-#define AMLI_RAMPRI_AAR_RAM0_Pri4 (0x4UL) /*!< Priority 4. */
-#define AMLI_RAMPRI_AAR_RAM0_Pri6 (0x6UL) /*!< Priority 6. */
-#define AMLI_RAMPRI_AAR_RAM0_Pri8 (0x8UL) /*!< Priority 8. */
-#define AMLI_RAMPRI_AAR_RAM0_Pri10 (0xAUL) /*!< Priority 10. */
-#define AMLI_RAMPRI_AAR_RAM0_Pri12 (0xCUL) /*!< Priority 12. */
-#define AMLI_RAMPRI_AAR_RAM0_Pri14 (0xEUL) /*!< Priority 14. */
 
 
 /* Peripheral: CCM */
@@ -2925,7 +2326,7 @@
 /* Bit 0 : Result of last compare. Decision point SAMPLE task. */
 #define LPCOMP_RESULT_RESULT_Pos (0UL) /*!< Position of RESULT field. */
 #define LPCOMP_RESULT_RESULT_Msk (0x1UL << LPCOMP_RESULT_RESULT_Pos) /*!< Bit mask of RESULT field. */
-#define LPCOMP_RESULT_RESULT_Bellow (0UL) /*!< Input voltage is bellow the reference threshold. */
+#define LPCOMP_RESULT_RESULT_Below (0UL) /*!< Input voltage is bellow the reference threshold. */
 #define LPCOMP_RESULT_RESULT_Above (1UL) /*!< Input voltage is above the reference threshold. */
 
 /* Register: LPCOMP_ENABLE */
@@ -4600,186 +4001,6 @@
 #define PPI_CHG_CH0_Included (1UL) /*!< Channel included. */
 
 
-/* Peripheral: PU */
-/* Description: Patch unit. */
-
-/* Register: PU_PATCHADDR */
-/* Description: Relative address of patch instructions. */
-
-/* Bits 24..0 : Relative address of patch instructions. */
-#define PU_PATCHADDR_PATCHADDR_Pos (0UL) /*!< Position of PATCHADDR field. */
-#define PU_PATCHADDR_PATCHADDR_Msk (0x1FFFFFFUL << PU_PATCHADDR_PATCHADDR_Pos) /*!< Bit mask of PATCHADDR field. */
-
-/* Register: PU_PATCHEN */
-/* Description: Patch enable register. */
-
-/* Bit 7 : Patch 7 enabled. */
-#define PU_PATCHEN_PATCH7_Pos (7UL) /*!< Position of PATCH7 field. */
-#define PU_PATCHEN_PATCH7_Msk (0x1UL << PU_PATCHEN_PATCH7_Pos) /*!< Bit mask of PATCH7 field. */
-#define PU_PATCHEN_PATCH7_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHEN_PATCH7_Enabled (1UL) /*!< Patch enabled. */
-
-/* Bit 6 : Patch 6 enabled. */
-#define PU_PATCHEN_PATCH6_Pos (6UL) /*!< Position of PATCH6 field. */
-#define PU_PATCHEN_PATCH6_Msk (0x1UL << PU_PATCHEN_PATCH6_Pos) /*!< Bit mask of PATCH6 field. */
-#define PU_PATCHEN_PATCH6_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHEN_PATCH6_Enabled (1UL) /*!< Patch enabled. */
-
-/* Bit 5 : Patch 5 enabled. */
-#define PU_PATCHEN_PATCH5_Pos (5UL) /*!< Position of PATCH5 field. */
-#define PU_PATCHEN_PATCH5_Msk (0x1UL << PU_PATCHEN_PATCH5_Pos) /*!< Bit mask of PATCH5 field. */
-#define PU_PATCHEN_PATCH5_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHEN_PATCH5_Enabled (1UL) /*!< Patch enabled. */
-
-/* Bit 4 : Patch 4 enabled. */
-#define PU_PATCHEN_PATCH4_Pos (4UL) /*!< Position of PATCH4 field. */
-#define PU_PATCHEN_PATCH4_Msk (0x1UL << PU_PATCHEN_PATCH4_Pos) /*!< Bit mask of PATCH4 field. */
-#define PU_PATCHEN_PATCH4_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHEN_PATCH4_Enabled (1UL) /*!< Patch enabled. */
-
-/* Bit 3 : Patch 3 enabled. */
-#define PU_PATCHEN_PATCH3_Pos (3UL) /*!< Position of PATCH3 field. */
-#define PU_PATCHEN_PATCH3_Msk (0x1UL << PU_PATCHEN_PATCH3_Pos) /*!< Bit mask of PATCH3 field. */
-#define PU_PATCHEN_PATCH3_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHEN_PATCH3_Enabled (1UL) /*!< Patch enabled. */
-
-/* Bit 2 : Patch 2 enabled. */
-#define PU_PATCHEN_PATCH2_Pos (2UL) /*!< Position of PATCH2 field. */
-#define PU_PATCHEN_PATCH2_Msk (0x1UL << PU_PATCHEN_PATCH2_Pos) /*!< Bit mask of PATCH2 field. */
-#define PU_PATCHEN_PATCH2_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHEN_PATCH2_Enabled (1UL) /*!< Patch enabled. */
-
-/* Bit 1 : Patch 1 enabled. */
-#define PU_PATCHEN_PATCH1_Pos (1UL) /*!< Position of PATCH1 field. */
-#define PU_PATCHEN_PATCH1_Msk (0x1UL << PU_PATCHEN_PATCH1_Pos) /*!< Bit mask of PATCH1 field. */
-#define PU_PATCHEN_PATCH1_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHEN_PATCH1_Enabled (1UL) /*!< Patch enabled. */
-
-/* Bit 0 : Patch 0 enabled. */
-#define PU_PATCHEN_PATCH0_Pos (0UL) /*!< Position of PATCH0 field. */
-#define PU_PATCHEN_PATCH0_Msk (0x1UL << PU_PATCHEN_PATCH0_Pos) /*!< Bit mask of PATCH0 field. */
-#define PU_PATCHEN_PATCH0_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHEN_PATCH0_Enabled (1UL) /*!< Patch enabled. */
-
-/* Register: PU_PATCHENSET */
-/* Description: Patch enable register. */
-
-/* Bit 7 : Patch 7 enabled. */
-#define PU_PATCHENSET_PATCH7_Pos (7UL) /*!< Position of PATCH7 field. */
-#define PU_PATCHENSET_PATCH7_Msk (0x1UL << PU_PATCHENSET_PATCH7_Pos) /*!< Bit mask of PATCH7 field. */
-#define PU_PATCHENSET_PATCH7_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHENSET_PATCH7_Enabled (1UL) /*!< Patch enabled. */
-#define PU_PATCHENSET_PATCH7_Set (1UL) /*!< Enable patch on write. */
-
-/* Bit 6 : Patch 6 enabled. */
-#define PU_PATCHENSET_PATCH6_Pos (6UL) /*!< Position of PATCH6 field. */
-#define PU_PATCHENSET_PATCH6_Msk (0x1UL << PU_PATCHENSET_PATCH6_Pos) /*!< Bit mask of PATCH6 field. */
-#define PU_PATCHENSET_PATCH6_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHENSET_PATCH6_Enabled (1UL) /*!< Patch enabled. */
-#define PU_PATCHENSET_PATCH6_Set (1UL) /*!< Enable patch on write. */
-
-/* Bit 5 : Patch 5 enabled. */
-#define PU_PATCHENSET_PATCH5_Pos (5UL) /*!< Position of PATCH5 field. */
-#define PU_PATCHENSET_PATCH5_Msk (0x1UL << PU_PATCHENSET_PATCH5_Pos) /*!< Bit mask of PATCH5 field. */
-#define PU_PATCHENSET_PATCH5_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHENSET_PATCH5_Enabled (1UL) /*!< Patch enabled. */
-#define PU_PATCHENSET_PATCH5_Set (1UL) /*!< Enable patch on write. */
-
-/* Bit 4 : Patch 4 enabled. */
-#define PU_PATCHENSET_PATCH4_Pos (4UL) /*!< Position of PATCH4 field. */
-#define PU_PATCHENSET_PATCH4_Msk (0x1UL << PU_PATCHENSET_PATCH4_Pos) /*!< Bit mask of PATCH4 field. */
-#define PU_PATCHENSET_PATCH4_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHENSET_PATCH4_Enabled (1UL) /*!< Patch enabled. */
-#define PU_PATCHENSET_PATCH4_Set (1UL) /*!< Enable patch on write. */
-
-/* Bit 3 : Patch 3 enabled. */
-#define PU_PATCHENSET_PATCH3_Pos (3UL) /*!< Position of PATCH3 field. */
-#define PU_PATCHENSET_PATCH3_Msk (0x1UL << PU_PATCHENSET_PATCH3_Pos) /*!< Bit mask of PATCH3 field. */
-#define PU_PATCHENSET_PATCH3_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHENSET_PATCH3_Enabled (1UL) /*!< Patch enabled. */
-#define PU_PATCHENSET_PATCH3_Set (1UL) /*!< Enable patch on write. */
-
-/* Bit 2 : Patch 2 enabled. */
-#define PU_PATCHENSET_PATCH2_Pos (2UL) /*!< Position of PATCH2 field. */
-#define PU_PATCHENSET_PATCH2_Msk (0x1UL << PU_PATCHENSET_PATCH2_Pos) /*!< Bit mask of PATCH2 field. */
-#define PU_PATCHENSET_PATCH2_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHENSET_PATCH2_Enabled (1UL) /*!< Patch enabled. */
-#define PU_PATCHENSET_PATCH2_Set (1UL) /*!< Enable patch on write. */
-
-/* Bit 1 : Patch 1 enabled. */
-#define PU_PATCHENSET_PATCH1_Pos (1UL) /*!< Position of PATCH1 field. */
-#define PU_PATCHENSET_PATCH1_Msk (0x1UL << PU_PATCHENSET_PATCH1_Pos) /*!< Bit mask of PATCH1 field. */
-#define PU_PATCHENSET_PATCH1_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHENSET_PATCH1_Enabled (1UL) /*!< Patch enabled. */
-#define PU_PATCHENSET_PATCH1_Set (1UL) /*!< Enable patch on write. */
-
-/* Bit 0 : Patch 0 enabled. */
-#define PU_PATCHENSET_PATCH0_Pos (0UL) /*!< Position of PATCH0 field. */
-#define PU_PATCHENSET_PATCH0_Msk (0x1UL << PU_PATCHENSET_PATCH0_Pos) /*!< Bit mask of PATCH0 field. */
-#define PU_PATCHENSET_PATCH0_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHENSET_PATCH0_Enabled (1UL) /*!< Patch enabled. */
-#define PU_PATCHENSET_PATCH0_Set (1UL) /*!< Enable patch on write. */
-
-/* Register: PU_PATCHENCLR */
-/* Description: Patch disable register. */
-
-/* Bit 7 : Patch 7 enabled. */
-#define PU_PATCHENCLR_PATCH7_Pos (7UL) /*!< Position of PATCH7 field. */
-#define PU_PATCHENCLR_PATCH7_Msk (0x1UL << PU_PATCHENCLR_PATCH7_Pos) /*!< Bit mask of PATCH7 field. */
-#define PU_PATCHENCLR_PATCH7_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHENCLR_PATCH7_Enabled (1UL) /*!< Patch enabled. */
-#define PU_PATCHENCLR_PATCH7_Clear (1UL) /*!< Disable patch on write. */
-
-/* Bit 6 : Patch 6 enabled. */
-#define PU_PATCHENCLR_PATCH6_Pos (6UL) /*!< Position of PATCH6 field. */
-#define PU_PATCHENCLR_PATCH6_Msk (0x1UL << PU_PATCHENCLR_PATCH6_Pos) /*!< Bit mask of PATCH6 field. */
-#define PU_PATCHENCLR_PATCH6_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHENCLR_PATCH6_Enabled (1UL) /*!< Patch enabled. */
-#define PU_PATCHENCLR_PATCH6_Clear (1UL) /*!< Disable patch on write. */
-
-/* Bit 5 : Patch 5 enabled. */
-#define PU_PATCHENCLR_PATCH5_Pos (5UL) /*!< Position of PATCH5 field. */
-#define PU_PATCHENCLR_PATCH5_Msk (0x1UL << PU_PATCHENCLR_PATCH5_Pos) /*!< Bit mask of PATCH5 field. */
-#define PU_PATCHENCLR_PATCH5_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHENCLR_PATCH5_Enabled (1UL) /*!< Patch enabled. */
-#define PU_PATCHENCLR_PATCH5_Clear (1UL) /*!< Disable patch on write. */
-
-/* Bit 4 : Patch 4 enabled. */
-#define PU_PATCHENCLR_PATCH4_Pos (4UL) /*!< Position of PATCH4 field. */
-#define PU_PATCHENCLR_PATCH4_Msk (0x1UL << PU_PATCHENCLR_PATCH4_Pos) /*!< Bit mask of PATCH4 field. */
-#define PU_PATCHENCLR_PATCH4_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHENCLR_PATCH4_Enabled (1UL) /*!< Patch enabled. */
-#define PU_PATCHENCLR_PATCH4_Clear (1UL) /*!< Disable patch on write. */
-
-/* Bit 3 : Patch 3 enabled. */
-#define PU_PATCHENCLR_PATCH3_Pos (3UL) /*!< Position of PATCH3 field. */
-#define PU_PATCHENCLR_PATCH3_Msk (0x1UL << PU_PATCHENCLR_PATCH3_Pos) /*!< Bit mask of PATCH3 field. */
-#define PU_PATCHENCLR_PATCH3_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHENCLR_PATCH3_Enabled (1UL) /*!< Patch enabled. */
-#define PU_PATCHENCLR_PATCH3_Clear (1UL) /*!< Disable patch on write. */
-
-/* Bit 2 : Patch 2 enabled. */
-#define PU_PATCHENCLR_PATCH2_Pos (2UL) /*!< Position of PATCH2 field. */
-#define PU_PATCHENCLR_PATCH2_Msk (0x1UL << PU_PATCHENCLR_PATCH2_Pos) /*!< Bit mask of PATCH2 field. */
-#define PU_PATCHENCLR_PATCH2_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHENCLR_PATCH2_Enabled (1UL) /*!< Patch enabled. */
-#define PU_PATCHENCLR_PATCH2_Clear (1UL) /*!< Disable patch on write. */
-
-/* Bit 1 : Patch 1 enabled. */
-#define PU_PATCHENCLR_PATCH1_Pos (1UL) /*!< Position of PATCH1 field. */
-#define PU_PATCHENCLR_PATCH1_Msk (0x1UL << PU_PATCHENCLR_PATCH1_Pos) /*!< Bit mask of PATCH1 field. */
-#define PU_PATCHENCLR_PATCH1_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHENCLR_PATCH1_Enabled (1UL) /*!< Patch enabled. */
-#define PU_PATCHENCLR_PATCH1_Clear (1UL) /*!< Disable patch on write. */
-
-/* Bit 0 : Patch 0 enabled. */
-#define PU_PATCHENCLR_PATCH0_Pos (0UL) /*!< Position of PATCH0 field. */
-#define PU_PATCHENCLR_PATCH0_Msk (0x1UL << PU_PATCHENCLR_PATCH0_Pos) /*!< Bit mask of PATCH0 field. */
-#define PU_PATCHENCLR_PATCH0_Disabled (0UL) /*!< Patch disabled. */
-#define PU_PATCHENCLR_PATCH0_Enabled (1UL) /*!< Patch enabled. */
-#define PU_PATCHENCLR_PATCH0_Clear (1UL) /*!< Disable patch on write. */
-
-
 /* Peripheral: QDEC */
 /* Description: Rotary decoder. */
 
@@ -5135,13 +4356,6 @@
 #define RADIO_CRCSTATUS_CRCSTATUS_Msk (0x1UL << RADIO_CRCSTATUS_CRCSTATUS_Pos) /*!< Bit mask of CRCSTATUS field. */
 #define RADIO_CRCSTATUS_CRCSTATUS_CRCError (0UL) /*!< Packet received with CRC error. */
 #define RADIO_CRCSTATUS_CRCSTATUS_CRCOk (1UL) /*!< Packet received with CRC ok. */
-
-/* Register: RADIO_CD */
-/* Description: Carrier detect. */
-
-/* Bit 0 : Carrier detect. */
-#define RADIO_CD_CD_Pos (0UL) /*!< Position of CD field. */
-#define RADIO_CD_CD_Msk (0x1UL << RADIO_CD_CD_Pos) /*!< Bit mask of CD field. */
 
 /* Register: RADIO_RXMATCH */
 /* Description: Received address. */
@@ -5961,197 +5175,6 @@
 #define SPI_POWER_POWER_Enabled (1UL) /*!< Module power enabled. */
 
 
-/* Peripheral: SPIM */
-/* Description: SPI master with easyDMA 1. */
-
-/* Register: SPIM_SHORTS */
-/* Description: Shortcuts for SPIM. */
-
-/* Bit 17 : Shortcut between END event and START task. */
-#define SPIM_SHORTS_END_START_Pos (17UL) /*!< Position of END_START field. */
-#define SPIM_SHORTS_END_START_Msk (0x1UL << SPIM_SHORTS_END_START_Pos) /*!< Bit mask of END_START field. */
-#define SPIM_SHORTS_END_START_Disabled (0UL) /*!< Shortcut disabled. */
-#define SPIM_SHORTS_END_START_Enabled (1UL) /*!< Shortcut enabled. */
-
-/* Register: SPIM_INTENSET */
-/* Description: Interrupt enable set register. */
-
-/* Bit 19 : Enable interrupt on STARTED event. */
-#define SPIM_INTENSET_STARTED_Pos (19UL) /*!< Position of STARTED field. */
-#define SPIM_INTENSET_STARTED_Msk (0x1UL << SPIM_INTENSET_STARTED_Pos) /*!< Bit mask of STARTED field. */
-#define SPIM_INTENSET_STARTED_Disabled (0UL) /*!< Interrupt disabled. */
-#define SPIM_INTENSET_STARTED_Enabled (1UL) /*!< Interrupt enabled. */
-#define SPIM_INTENSET_STARTED_Set (1UL) /*!< Enable interrupt on write. */
-
-/* Bit 8 : Enable interrupt on ENDTX event. */
-#define SPIM_INTENSET_ENDTX_Pos (8UL) /*!< Position of ENDTX field. */
-#define SPIM_INTENSET_ENDTX_Msk (0x1UL << SPIM_INTENSET_ENDTX_Pos) /*!< Bit mask of ENDTX field. */
-#define SPIM_INTENSET_ENDTX_Disabled (0UL) /*!< Interrupt disabled. */
-#define SPIM_INTENSET_ENDTX_Enabled (1UL) /*!< Interrupt enabled. */
-#define SPIM_INTENSET_ENDTX_Set (1UL) /*!< Enable interrupt on write. */
-
-/* Bit 6 : Enable interrupt on END event. */
-#define SPIM_INTENSET_END_Pos (6UL) /*!< Position of END field. */
-#define SPIM_INTENSET_END_Msk (0x1UL << SPIM_INTENSET_END_Pos) /*!< Bit mask of END field. */
-#define SPIM_INTENSET_END_Disabled (0UL) /*!< Interrupt disabled. */
-#define SPIM_INTENSET_END_Enabled (1UL) /*!< Interrupt enabled. */
-#define SPIM_INTENSET_END_Set (1UL) /*!< Enable interrupt on write. */
-
-/* Bit 4 : Enable interrupt on ENDRX event. */
-#define SPIM_INTENSET_ENDRX_Pos (4UL) /*!< Position of ENDRX field. */
-#define SPIM_INTENSET_ENDRX_Msk (0x1UL << SPIM_INTENSET_ENDRX_Pos) /*!< Bit mask of ENDRX field. */
-#define SPIM_INTENSET_ENDRX_Disabled (0UL) /*!< Interrupt disabled. */
-#define SPIM_INTENSET_ENDRX_Enabled (1UL) /*!< Interrupt enabled. */
-#define SPIM_INTENSET_ENDRX_Set (1UL) /*!< Enable interrupt on write. */
-
-/* Bit 1 : Enable interrupt on STOPPED event. */
-#define SPIM_INTENSET_STOPPED_Pos (1UL) /*!< Position of STOPPED field. */
-#define SPIM_INTENSET_STOPPED_Msk (0x1UL << SPIM_INTENSET_STOPPED_Pos) /*!< Bit mask of STOPPED field. */
-#define SPIM_INTENSET_STOPPED_Disabled (0UL) /*!< Interrupt disabled. */
-#define SPIM_INTENSET_STOPPED_Enabled (1UL) /*!< Interrupt enabled. */
-#define SPIM_INTENSET_STOPPED_Set (1UL) /*!< Enable interrupt on write. */
-
-/* Register: SPIM_INTENCLR */
-/* Description: Interrupt enable clear register. */
-
-/* Bit 19 : Disable interrupt on STARTED event. */
-#define SPIM_INTENCLR_STARTED_Pos (19UL) /*!< Position of STARTED field. */
-#define SPIM_INTENCLR_STARTED_Msk (0x1UL << SPIM_INTENCLR_STARTED_Pos) /*!< Bit mask of STARTED field. */
-#define SPIM_INTENCLR_STARTED_Disabled (0UL) /*!< Interrupt disabled. */
-#define SPIM_INTENCLR_STARTED_Enabled (1UL) /*!< Interrupt enabled. */
-#define SPIM_INTENCLR_STARTED_Clear (1UL) /*!< Disable interrupt on write. */
-
-/* Bit 8 : Disable interrupt on ENDTX event. */
-#define SPIM_INTENCLR_ENDTX_Pos (8UL) /*!< Position of ENDTX field. */
-#define SPIM_INTENCLR_ENDTX_Msk (0x1UL << SPIM_INTENCLR_ENDTX_Pos) /*!< Bit mask of ENDTX field. */
-#define SPIM_INTENCLR_ENDTX_Disabled (0UL) /*!< Interrupt disabled. */
-#define SPIM_INTENCLR_ENDTX_Enabled (1UL) /*!< Interrupt enabled. */
-#define SPIM_INTENCLR_ENDTX_Clear (1UL) /*!< Disable interrupt on write. */
-
-/* Bit 6 : Disable interrupt on END event. */
-#define SPIM_INTENCLR_END_Pos (6UL) /*!< Position of END field. */
-#define SPIM_INTENCLR_END_Msk (0x1UL << SPIM_INTENCLR_END_Pos) /*!< Bit mask of END field. */
-#define SPIM_INTENCLR_END_Disabled (0UL) /*!< Interrupt disabled. */
-#define SPIM_INTENCLR_END_Enabled (1UL) /*!< Interrupt enabled. */
-#define SPIM_INTENCLR_END_Clear (1UL) /*!< Disable interrupt on write. */
-
-/* Bit 4 : Disable interrupt on ENDRX event. */
-#define SPIM_INTENCLR_ENDRX_Pos (4UL) /*!< Position of ENDRX field. */
-#define SPIM_INTENCLR_ENDRX_Msk (0x1UL << SPIM_INTENCLR_ENDRX_Pos) /*!< Bit mask of ENDRX field. */
-#define SPIM_INTENCLR_ENDRX_Disabled (0UL) /*!< Interrupt disabled. */
-#define SPIM_INTENCLR_ENDRX_Enabled (1UL) /*!< Interrupt enabled. */
-#define SPIM_INTENCLR_ENDRX_Clear (1UL) /*!< Disable interrupt on write. */
-
-/* Bit 1 : Disable interrupt on STOPPED event. */
-#define SPIM_INTENCLR_STOPPED_Pos (1UL) /*!< Position of STOPPED field. */
-#define SPIM_INTENCLR_STOPPED_Msk (0x1UL << SPIM_INTENCLR_STOPPED_Pos) /*!< Bit mask of STOPPED field. */
-#define SPIM_INTENCLR_STOPPED_Disabled (0UL) /*!< Interrupt disabled. */
-#define SPIM_INTENCLR_STOPPED_Enabled (1UL) /*!< Interrupt enabled. */
-#define SPIM_INTENCLR_STOPPED_Clear (1UL) /*!< Disable interrupt on write. */
-
-/* Register: SPIM_ENABLE */
-/* Description: Enable SPIM. */
-
-/* Bits 3..0 : Enable or disable SPIM. */
-#define SPIM_ENABLE_ENABLE_Pos (0UL) /*!< Position of ENABLE field. */
-#define SPIM_ENABLE_ENABLE_Msk (0xFUL << SPIM_ENABLE_ENABLE_Pos) /*!< Bit mask of ENABLE field. */
-#define SPIM_ENABLE_ENABLE_Disabled (0x00UL) /*!< Disabled SPIM. */
-#define SPIM_ENABLE_ENABLE_Enabled (0x07UL) /*!< Enable SPIM. */
-
-/* Register: SPIM_FREQUENCY */
-/* Description: SPI frequency. */
-
-/* Bits 31..0 : SPI master data rate. */
-#define SPIM_FREQUENCY_FREQUENCY_Pos (0UL) /*!< Position of FREQUENCY field. */
-#define SPIM_FREQUENCY_FREQUENCY_Msk (0xFFFFFFFFUL << SPIM_FREQUENCY_FREQUENCY_Pos) /*!< Bit mask of FREQUENCY field. */
-#define SPIM_FREQUENCY_FREQUENCY_K125 (0x02000000UL) /*!< 125 kbps. */
-#define SPIM_FREQUENCY_FREQUENCY_K250 (0x04000000UL) /*!< 250 kbps. */
-#define SPIM_FREQUENCY_FREQUENCY_K500 (0x08000000UL) /*!< 500 kbps. */
-#define SPIM_FREQUENCY_FREQUENCY_M1 (0x10000000UL) /*!< 1 Mbps. */
-#define SPIM_FREQUENCY_FREQUENCY_M2 (0x20000000UL) /*!< 2 Mbps. */
-#define SPIM_FREQUENCY_FREQUENCY_M4 (0x40000000UL) /*!< 4 Mbps. */
-#define SPIM_FREQUENCY_FREQUENCY_M8 (0x80000000UL) /*!< 8 Mbps. */
-
-/* Register: SPIM_RXD_PTR */
-/* Description: Data pointer. */
-
-/* Bits 31..0 : Data pointer. */
-#define SPIM_RXD_PTR_PTR_Pos (0UL) /*!< Position of PTR field. */
-#define SPIM_RXD_PTR_PTR_Msk (0xFFFFFFFFUL << SPIM_RXD_PTR_PTR_Pos) /*!< Bit mask of PTR field. */
-
-/* Register: SPIM_RXD_MAXCNT */
-/* Description: Maximum number of buffer bytes to receive. */
-
-/* Bits 7..0 : Maximum number of buffer bytes to receive. */
-#define SPIM_RXD_MAXCNT_MAXCNT_Pos (0UL) /*!< Position of MAXCNT field. */
-#define SPIM_RXD_MAXCNT_MAXCNT_Msk (0xFFUL << SPIM_RXD_MAXCNT_MAXCNT_Pos) /*!< Bit mask of MAXCNT field. */
-
-/* Register: SPIM_RXD_AMOUNT */
-/* Description: Number of bytes received in the last transaction. */
-
-/* Bits 7..0 : Number of bytes received in the last transaction. */
-#define SPIM_RXD_AMOUNT_AMOUNT_Pos (0UL) /*!< Position of AMOUNT field. */
-#define SPIM_RXD_AMOUNT_AMOUNT_Msk (0xFFUL << SPIM_RXD_AMOUNT_AMOUNT_Pos) /*!< Bit mask of AMOUNT field. */
-
-/* Register: SPIM_TXD_PTR */
-/* Description: Data pointer. */
-
-/* Bits 31..0 : Data pointer. */
-#define SPIM_TXD_PTR_PTR_Pos (0UL) /*!< Position of PTR field. */
-#define SPIM_TXD_PTR_PTR_Msk (0xFFFFFFFFUL << SPIM_TXD_PTR_PTR_Pos) /*!< Bit mask of PTR field. */
-
-/* Register: SPIM_TXD_MAXCNT */
-/* Description: Maximum number of buffer bytes to send. */
-
-/* Bits 7..0 : Maximum number of buffer bytes to send. */
-#define SPIM_TXD_MAXCNT_MAXCNT_Pos (0UL) /*!< Position of MAXCNT field. */
-#define SPIM_TXD_MAXCNT_MAXCNT_Msk (0xFFUL << SPIM_TXD_MAXCNT_MAXCNT_Pos) /*!< Bit mask of MAXCNT field. */
-
-/* Register: SPIM_TXD_AMOUNT */
-/* Description: Number of bytes sent in the last transaction. */
-
-/* Bits 7..0 : Number of bytes sent in the last transaction. */
-#define SPIM_TXD_AMOUNT_AMOUNT_Pos (0UL) /*!< Position of AMOUNT field. */
-#define SPIM_TXD_AMOUNT_AMOUNT_Msk (0xFFUL << SPIM_TXD_AMOUNT_AMOUNT_Pos) /*!< Bit mask of AMOUNT field. */
-
-/* Register: SPIM_CONFIG */
-/* Description: Configuration register. */
-
-/* Bit 2 : Serial clock (SCK) polarity. */
-#define SPIM_CONFIG_CPOL_Pos (2UL) /*!< Position of CPOL field. */
-#define SPIM_CONFIG_CPOL_Msk (0x1UL << SPIM_CONFIG_CPOL_Pos) /*!< Bit mask of CPOL field. */
-#define SPIM_CONFIG_CPOL_ActiveHigh (0UL) /*!< Active high. */
-#define SPIM_CONFIG_CPOL_ActiveLow (1UL) /*!< Active low. */
-
-/* Bit 1 : Serial clock (SCK) phase. */
-#define SPIM_CONFIG_CPHA_Pos (1UL) /*!< Position of CPHA field. */
-#define SPIM_CONFIG_CPHA_Msk (0x1UL << SPIM_CONFIG_CPHA_Pos) /*!< Bit mask of CPHA field. */
-#define SPIM_CONFIG_CPHA_Leading (0UL) /*!< Sample on leading edge of the clock. Shift serial data on trailing edge. */
-#define SPIM_CONFIG_CPHA_Trailing (1UL) /*!< Sample on trailing edge of the clock. Shift serial data on leading edge. */
-
-/* Bit 0 : Bit order. */
-#define SPIM_CONFIG_ORDER_Pos (0UL) /*!< Position of ORDER field. */
-#define SPIM_CONFIG_ORDER_Msk (0x1UL << SPIM_CONFIG_ORDER_Pos) /*!< Bit mask of ORDER field. */
-#define SPIM_CONFIG_ORDER_MsbFirst (0UL) /*!< Most significant bit transmitted out first. */
-#define SPIM_CONFIG_ORDER_LsbFirst (1UL) /*!< Least significant bit transmitted out first. */
-
-/* Register: SPIM_ORC */
-/* Description: Over-read character. */
-
-/* Bits 7..0 : Over-read character. */
-#define SPIM_ORC_ORC_Pos (0UL) /*!< Position of ORC field. */
-#define SPIM_ORC_ORC_Msk (0xFFUL << SPIM_ORC_ORC_Pos) /*!< Bit mask of ORC field. */
-
-/* Register: SPIM_POWER */
-/* Description: Peripheral power control. */
-
-/* Bit 0 : Peripheral power control. */
-#define SPIM_POWER_POWER_Pos (0UL) /*!< Position of POWER field. */
-#define SPIM_POWER_POWER_Msk (0x1UL << SPIM_POWER_POWER_Pos) /*!< Bit mask of POWER field. */
-#define SPIM_POWER_POWER_Disabled (0UL) /*!< Module power disabled. */
-#define SPIM_POWER_POWER_Enabled (1UL) /*!< Module power enabled. */
-
-
 /* Peripheral: SPIS */
 /* Description: SPI slave 1. */
 
@@ -6174,6 +5197,13 @@
 #define SPIS_INTENSET_ACQUIRED_Enabled (1UL) /*!< Interrupt enabled. */
 #define SPIS_INTENSET_ACQUIRED_Set (1UL) /*!< Enable interrupt on write. */
 
+/* Bit 4 : enable interrupt on ENDRX event. */
+#define SPIS_INTENSET_ENDRX_Pos (4UL) /*!< Position of ENDRX field. */
+#define SPIS_INTENSET_ENDRX_Msk (0x1UL << SPIS_INTENSET_ENDRX_Pos) /*!< Bit mask of ENDRX field. */
+#define SPIS_INTENSET_ENDRX_Disabled (0UL) /*!< Interrupt disabled. */
+#define SPIS_INTENSET_ENDRX_Enabled (1UL) /*!< Interrupt enabled. */
+#define SPIS_INTENSET_ENDRX_Set (1UL) /*!< Enable interrupt on write. */
+
 /* Bit 1 : Enable interrupt on END event. */
 #define SPIS_INTENSET_END_Pos (1UL) /*!< Position of END field. */
 #define SPIS_INTENSET_END_Msk (0x1UL << SPIS_INTENSET_END_Pos) /*!< Bit mask of END field. */
@@ -6190,6 +5220,13 @@
 #define SPIS_INTENCLR_ACQUIRED_Disabled (0UL) /*!< Interrupt disabled. */
 #define SPIS_INTENCLR_ACQUIRED_Enabled (1UL) /*!< Interrupt enabled. */
 #define SPIS_INTENCLR_ACQUIRED_Clear (1UL) /*!< Disable interrupt on write. */
+
+/* Bit 4 : Disable interrupt on ENDRX event. */
+#define SPIS_INTENCLR_ENDRX_Pos (4UL) /*!< Position of ENDRX field. */
+#define SPIS_INTENCLR_ENDRX_Msk (0x1UL << SPIS_INTENCLR_ENDRX_Pos) /*!< Bit mask of ENDRX field. */
+#define SPIS_INTENCLR_ENDRX_Disabled (0UL) /*!< Interrupt disabled. */
+#define SPIS_INTENCLR_ENDRX_Enabled (1UL) /*!< Interrupt enabled. */
+#define SPIS_INTENCLR_ENDRX_Clear (1UL) /*!< Disable interrupt on write. */
 
 /* Bit 1 : Disable interrupt on END event. */
 #define SPIS_INTENCLR_END_Pos (1UL) /*!< Position of END field. */
@@ -6657,7 +5694,7 @@
 #define TWI_FREQUENCY_FREQUENCY_Msk (0xFFFFFFFFUL << TWI_FREQUENCY_FREQUENCY_Pos) /*!< Bit mask of FREQUENCY field. */
 #define TWI_FREQUENCY_FREQUENCY_K100 (0x01980000UL) /*!< 100 kbps. */
 #define TWI_FREQUENCY_FREQUENCY_K250 (0x04000000UL) /*!< 250 kbps. */
-#define TWI_FREQUENCY_FREQUENCY_K400 (0x06680000UL) /*!< 400 kbps. */
+#define TWI_FREQUENCY_FREQUENCY_K400 (0x06680000UL) /*!< 400 kbps (actual rate 410.256 kbps). */
 
 /* Register: TWI_ADDRESS */
 /* Description: Address used in the two-wire transfer. */
@@ -6678,6 +5715,21 @@
 
 /* Peripheral: UART */
 /* Description: Universal Asynchronous Receiver/Transmitter. */
+
+/* Register: UART_SHORTS */
+/* Description: Shortcuts for UART. */
+
+/* Bit 4 : Shortcut between NCTS event and STOPRX task. */
+#define UART_SHORTS_NCTS_STOPRX_Pos (4UL) /*!< Position of NCTS_STOPRX field. */
+#define UART_SHORTS_NCTS_STOPRX_Msk (0x1UL << UART_SHORTS_NCTS_STOPRX_Pos) /*!< Bit mask of NCTS_STOPRX field. */
+#define UART_SHORTS_NCTS_STOPRX_Disabled (0UL) /*!< Shortcut disabled. */
+#define UART_SHORTS_NCTS_STOPRX_Enabled (1UL) /*!< Shortcut enabled. */
+
+/* Bit 3 : Shortcut between CTS event and STARTRX task. */
+#define UART_SHORTS_CTS_STARTRX_Pos (3UL) /*!< Position of CTS_STARTRX field. */
+#define UART_SHORTS_CTS_STARTRX_Msk (0x1UL << UART_SHORTS_CTS_STARTRX_Pos) /*!< Bit mask of CTS_STARTRX field. */
+#define UART_SHORTS_CTS_STARTRX_Disabled (0UL) /*!< Shortcut disabled. */
+#define UART_SHORTS_CTS_STARTRX_Enabled (1UL) /*!< Shortcut enabled. */
 
 /* Register: UART_INTENSET */
 /* Description: Interrupt enable set register. */
@@ -6836,7 +5888,9 @@
 #define UART_BAUDRATE_BAUDRATE_Baud14400 (0x003B0000UL) /*!< 14400 baud. */
 #define UART_BAUDRATE_BAUDRATE_Baud19200 (0x004EA000UL) /*!< 19200 baud. */
 #define UART_BAUDRATE_BAUDRATE_Baud28800 (0x0075F000UL) /*!< 28800 baud. */
+#define UART_BAUDRATE_BAUDRATE_Baud31250 (0x00800000UL) /*!< 31250 baud. */
 #define UART_BAUDRATE_BAUDRATE_Baud38400 (0x009D5000UL) /*!< 38400 baud. */
+#define UART_BAUDRATE_BAUDRATE_Baud56000 (0x00E50000UL) /*!< 56000 baud. */
 #define UART_BAUDRATE_BAUDRATE_Baud57600 (0x00EBF000UL) /*!< 57600 baud. */
 #define UART_BAUDRATE_BAUDRATE_Baud76800 (0x013A9000UL) /*!< 76800 baud. */
 #define UART_BAUDRATE_BAUDRATE_Baud115200 (0x01D7E000UL) /*!< 115200 baud. */
@@ -7072,9 +6126,6 @@
 #define WDT_POWER_POWER_Disabled (0UL) /*!< Module power disabled. */
 #define WDT_POWER_POWER_Enabled (1UL) /*!< Module power enabled. */
 
-#ifdef __cplusplus
-}
-#endif
 
 /*lint --flb "Leave library region" */
-#endif /* NRF51_BITS_H */
+#endif

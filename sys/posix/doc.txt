@@ -14,3 +14,9 @@
  *      </a>
  * @ingroup sys
  */
+
+/**
+ * @defgroup config_posix  POSIX wrapper compile configurations
+ * @ingroup posix
+ * @ingroup config
+ */

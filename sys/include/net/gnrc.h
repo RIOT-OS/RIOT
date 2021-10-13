@@ -69,7 +69,7 @@
  *     msg_init_queue(_msg_q, Q_SZ);
  *     gnrc_netreg_entry me_reg = GNRC_NETREG_ENTRY_INIT_PID(
  *                                      GNRC_NETREG_DEMUX_CTX_ALL,
- *                                      sched_active_pid);
+ *                                      thread_getpid());
  *     gnrc_netreg_register(GNRC_NETTYPE_IPV6, &me_reg);
  *     while (1) {
  *         msg_receive(&msg);
@@ -216,7 +216,7 @@
  *
  * - To include the default network device(s) on your board:
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- *   USEMODULE += gnrc_netdev_default
+ *   USEMODULE += netdev_default
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * - To auto-initialize these network devices as GNRC network interfaces

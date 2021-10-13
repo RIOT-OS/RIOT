@@ -1,13 +1,25 @@
 PKG_NAME=cmsis-dsp
-PKG_URL=https://github.com/gebart/CMSIS-DSP.git
-PKG_VERSION=v1.4.5a-riot2
-PKG_LICENSE=BSD-3-Clause
-
-CFLAGS += -Wno-strict-aliasing
-
-.PHONY: all
-
-all: git-download
-	"$(MAKE)" -C $(PKG_BUILDDIR)
+PKG_URL=https://github.com/ARM-software/CMSIS_5
+PKG_VERSION=5.4.0
+PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
+
+CMSIS_DSP_MODULES =                \
+    cmsis-dsp_BasicMathFunctions   \
+    cmsis-dsp_CommonTables         \
+    cmsis-dsp_ComplexMathFunctions \
+    cmsis-dsp_ControllerFunctions  \
+    cmsis-dsp_FastMathFunctions    \
+    cmsis-dsp_FilteringFunctions   \
+    cmsis-dsp_MatrixFunctions      \
+    cmsis-dsp_StatisticsFunctions  \
+    cmsis-dsp_SupportFunctions     \
+    cmsis-dsp_TransformFunctions   \
+
+.PHONY: cmsis-dsp_%
+
+all: $(CMSIS_DSP_MODULES)
+
+cmsis-dsp_%:
+	$(MAKE) -C $(PKG_SOURCE_DIR)/CMSIS/DSP/Source/$* -f $(CURDIR)/Makefile.cmsis-dsp MODULE=$@

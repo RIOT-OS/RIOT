@@ -1,1 +1,16 @@
-include $(RIOTBOARD)/common/msba2/Makefile.dep
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  USEMODULE += cc1100
+  USEMODULE += cc110x_868mhz
+endif
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += ltc4150
+  USEMODULE += sht11
+endif
+
+# default to mtd_mci if no other MTD backend is selected
+ifneq (,$(filter mtd,$(USEMODULE)))
+  ifeq (,$(filter mtd_%,$(USEMODULE)))
+    USEMODULE += mtd_mci
+  endif
+endif

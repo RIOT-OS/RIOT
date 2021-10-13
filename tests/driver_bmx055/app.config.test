@@ -1,0 +1,13 @@
+# this file enables modules defined in Kconfig. Do not use this file for
+# application configuration. This is only needed during migration.
+# include and auto-initialize all available sensors
+CONFIG_MODULE_PHYDAT=y
+CONFIG_MODULE_SAUL=y
+CONFIG_MODULE_SAUL_REG=y
+CONFIG_MODULE_SAUL_DEFAULT=y
+
+# include driver for bmx055 sensor
+CONFIG_MODULE_BMX055=y
+
+# include xtimer for polling
+CONFIG_MODULE_XTIMER=y

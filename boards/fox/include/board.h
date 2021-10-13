@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_fox fox
- * @ingroup     boards
- * @brief       Support for the fox board
+ * @ingroup     boards_fox
  * @{
  *
  * @file
@@ -58,7 +56,7 @@ extern "C" {
  * @name    Define the interface to the LPS331AP pressure sensor
  * @{
  */
-#define LPS331AP_PARAM_ADDR        (0x5C)
+#define LPSXXX_PARAM_ADDR          (0x5C)
 /** @} */
 
 /**

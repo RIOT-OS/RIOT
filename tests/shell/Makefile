@@ -1,18 +1,22 @@
 DEVELHELP=0
 include ../Makefile.tests_common
 
+USEMODULE += app_metadata
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 
-DISABLE_MODULE += auto_init
+# for z1, socat doesn't work (unknown reason)
+ifeq (z1, $(BOARD))
+  RIOT_TERMINAL ?= pyterm
+endif
 
-# chronos is missing a getchar implementation
-BOARD_BLACKLIST += chronos
+# Use a terminal that does not introduce extra characters into the stream.
+RIOT_TERMINAL ?= socat
 
-TEST_ON_CI_WHITELIST += all
+APP_SHELL_FMT ?= NONE
 
 include $(RIOTBASE)/Makefile.include
 
-test:
-	tests/01-run.py
+# the test script skips tests if socat is not used
+$(call target-export-variables,$(RIOT_TERMINAL),RIOT_TERMINAL)

@@ -1,0 +1,14 @@
+# This board uses a DAP-Link programmer
+# Flashing support is provided through pyocd (default) and openocd.
+# For openocd, a version built against the development branch and containing
+# the support for nrf52 cpu is required.
+PROGRAMMER ?= pyocd
+# The board is not recognized automatically by pyocd, so the CPU target
+# option is passed explicitly
+PYOCD_FLASH_TARGET_TYPE ?= -t nrf52840
+OPENOCD_DEBUG_ADAPTER = dap
+
+# This board can also be flashed with pyocd
+PROGRAMMERS_SUPPORTED += pyocd
+
+include $(RIOTBOARD)/common/nrf52/Makefile.include

@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_skald_ibeacon Skald about iBeacon
- * @ingroup     net_skald
+ * @defgroup    ble_skald_ibeacon Skald about iBeacon
+ * @ingroup     ble_skald
  * @brief       Skald's simple iBeacon abstraction
  *
  * # About

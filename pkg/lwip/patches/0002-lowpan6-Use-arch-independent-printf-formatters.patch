@@ -1,0 +1,51 @@
+From e02d126b07388c5ff49a6cd25cef14214157b52f Mon Sep 17 00:00:00 2001
+From: Erik Ekman <erik@kryo.se>
+Date: Sat, 13 Feb 2021 21:14:29 +0100
+Subject: [PATCH] lowpan6: Use arch-independent printf formatters
+
+---
+ src/netif/lowpan6_common.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/netif/lowpan6_common.c b/src/netif/lowpan6_common.c
+index 6900eec7..01b62dfd 100644
+--- a/src/netif/lowpan6_common.c
++++ b/src/netif/lowpan6_common.c
+@@ -440,7 +440,7 @@ lowpan6_decompress_hdr(u8_t *lowpan6_buffer, size_t lowpan6_bufsize,
+   if ((lowpan6_buffer[0] & 0x18) == 0x00) {
+     header_temp = ((lowpan6_buffer[lowpan6_offset+1] & 0x0f) << 16) | \
+       (lowpan6_buffer[lowpan6_offset + 2] << 8) | lowpan6_buffer[lowpan6_offset+3];
+-    LWIP_DEBUGF(LWIP_LOWPAN6_DECOMPRESSION_DEBUG, ("TF: 00, ECN: 0x%2x, Flowlabel+DSCP: 0x%8X\n", \
++    LWIP_DEBUGF(LWIP_LOWPAN6_DECOMPRESSION_DEBUG, ("TF: 00, ECN: 0x%"X8_F", Flowlabel+DSCP: 0x%8"X32_F"\n", \
+       lowpan6_buffer[lowpan6_offset],header_temp));
+     IP6H_VTCFL_SET(ip6hdr, 6, lowpan6_buffer[lowpan6_offset], header_temp);
+     /* increase offset, processed 4 bytes here:
+@@ -448,14 +448,14 @@ lowpan6_decompress_hdr(u8_t *lowpan6_buffer, size_t lowpan6_bufsize,
+     lowpan6_offset += 4;
+   } else if ((lowpan6_buffer[0] & 0x18) == 0x08) {
+     header_temp = ((lowpan6_buffer[lowpan6_offset] & 0x0f) << 16) | (lowpan6_buffer[lowpan6_offset + 1] << 8) | lowpan6_buffer[lowpan6_offset+2];
+-    LWIP_DEBUGF(LWIP_LOWPAN6_DECOMPRESSION_DEBUG, ("TF: 01, ECN: 0x%2x, Flowlabel: 0x%2X, DSCP ignored\n", \
++    LWIP_DEBUGF(LWIP_LOWPAN6_DECOMPRESSION_DEBUG, ("TF: 01, ECN: 0x%"X8_F", Flowlabel: 0x%2"X32_F", DSCP ignored\n", \
+       lowpan6_buffer[lowpan6_offset] & 0xc0,header_temp));
+     IP6H_VTCFL_SET(ip6hdr, 6, lowpan6_buffer[lowpan6_offset] & 0xc0, header_temp);
+     /* increase offset, processed 3 bytes here:
+      * TF=01:  ECN + 2-bit Pad + Flow Label (3 bytes), DSCP is elided.*/
+     lowpan6_offset += 3;
+   } else if ((lowpan6_buffer[0] & 0x18) == 0x10) {
+-    LWIP_DEBUGF(LWIP_LOWPAN6_DECOMPRESSION_DEBUG, ("TF: 10, DCSP+ECN: 0x%2x, Flowlabel ignored\n", lowpan6_buffer[lowpan6_offset]));
++    LWIP_DEBUGF(LWIP_LOWPAN6_DECOMPRESSION_DEBUG, ("TF: 10, DCSP+ECN: 0x%"X8_F", Flowlabel ignored\n", lowpan6_buffer[lowpan6_offset]));
+     IP6H_VTCFL_SET(ip6hdr, 6, lowpan6_buffer[lowpan6_offset],0);
+     /* increase offset, processed 1 byte here:
+      * ECN + DSCP (1 byte), Flow Label is elided.*/
+@@ -564,7 +564,7 @@ lowpan6_decompress_hdr(u8_t *lowpan6_buffer, size_t lowpan6_bufsize,
+ #if LWIP_6LOWPAN_NUM_CONTEXTS > 0
+       ip6hdr->src.addr[0] = lowpan6_contexts[i].addr[0];
+       ip6hdr->src.addr[1] = lowpan6_contexts[i].addr[1];
+-      LWIP_DEBUGF(LWIP_LOWPAN6_DECOMPRESSION_DEBUG, ("SAM == xx, context compression found @%d: %8X, %8X\n", (int)i, ip6hdr->src.addr[0], ip6hdr->src.addr[1]));
++      LWIP_DEBUGF(LWIP_LOWPAN6_DECOMPRESSION_DEBUG, ("SAM == xx, context compression found @%d: %8"X32_F", %8"X32_F"\n", (int)i, ip6hdr->src.addr[0], ip6hdr->src.addr[1]));
+ #else
+       LWIP_UNUSED_ARG(lowpan6_contexts);
+ #endif
+-- 
+2.29.2
+

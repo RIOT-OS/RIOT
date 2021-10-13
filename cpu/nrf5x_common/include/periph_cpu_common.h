@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 Freie Universität Berlin
+ * Copyright (C) 2015-2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -26,6 +26,12 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Compatibility wrapper for nRF9160
+ */
+#ifdef NRF_FICR_S
+#define NRF_FICR NRF_FICR_S
+#endif
+/**
  * @name    Power management configuration
  * @{
  */
@@ -35,7 +41,11 @@ extern "C" {
 /**
  * @brief   Starting offset of CPU_ID
  */
+#ifdef FICR_INFO_DEVICEID_DEVICEID_Msk
+#define CPUID_ADDR          (&NRF_FICR->INFO.DEVICEID[0])
+#else
 #define CPUID_ADDR          (&NRF_FICR->DEVICEID[0])
+#endif
 /**
  * @brief   Length of the CPU_ID in octets
  */
@@ -46,21 +56,29 @@ extern "C" {
  *
  * The port definition is used (and zeroed) to suppress compiler warnings
  */
-#ifdef CPU_MODEL_NRF52840XXAA
+#if GPIO_COUNT > 1
 #define GPIO_PIN(x,y)       ((x << 5) | y)
 #else
 #define GPIO_PIN(x,y)       ((x & 0) | y)
 #endif
 
 /**
+ * @brief   Override GPIO_UNDEF value
+ */
+/* The precise value matters where GPIO_UNDEF is set in registers like
+ * PWM.PSEL.OUT where it is used in sign-extended form to get a UINT32_MAX */
+#define GPIO_UNDEF          (UINT8_MAX)
+
+/**
  * @brief   Generate GPIO mode bitfields
  *
  * We use 4 bit to encode the pin mode:
- * - bit   0: output enable
- * - bit   1: input connect
- * - bit 2+3: pull resistor configuration
+ * - bit      0: output enable
+ * - bit      1: input connect
+ * - bit    2+3: pull resistor configuration
+ * - bit 8+9+10: drive configuration
  */
-#define GPIO_MODE(oe, ic, pr)   (oe | (ic << 1) | (pr << 2))
+#define GPIO_MODE(oe, ic, pr, dr)   (oe | (ic << 1) | (pr << 2) | (dr << 8))
 
 /**
  * @brief   No support for HW chip select...
@@ -79,6 +97,14 @@ extern "C" {
 
 #ifndef DOXYGEN
 /**
+ * @brief   Overwrite the default gpio_t type definition
+ * @{
+ */
+#define HAVE_GPIO_T
+typedef uint8_t gpio_t;
+/** @} */
+
+/**
  * @brief   Override GPIO modes
  *
  * We use 4 bit to encode the pin mode:
@@ -89,12 +115,13 @@ extern "C" {
  */
 #define HAVE_GPIO_MODE_T
 typedef enum {
-    GPIO_IN    = GPIO_MODE(0, 0, 0),    /**< IN */
-    GPIO_IN_PD = GPIO_MODE(0, 0, 1),    /**< IN with pull-down */
-    GPIO_IN_PU = GPIO_MODE(0, 0, 3),    /**< IN with pull-up */
-    GPIO_OUT   = GPIO_MODE(1, 1, 0),    /**< OUT (push-pull) */
-    GPIO_OD    = (0xff),                /**< not supported by HW */
-    GPIO_OD_PU = (0xfe)                 /**< not supported by HW */
+    GPIO_IN       = GPIO_MODE(0, 0, 0, 0), /**< IN */
+    GPIO_IN_PD    = GPIO_MODE(0, 0, 1, 0), /**< IN with pull-down */
+    GPIO_IN_PU    = GPIO_MODE(0, 0, 3, 0), /**< IN with pull-up */
+    GPIO_IN_OD_PU = GPIO_MODE(0, 0, 3, 6), /**< IN with pull-up and open drain output */
+    GPIO_OUT      = GPIO_MODE(1, 1, 0, 0), /**< OUT (push-pull) */
+    GPIO_OD       = (0xff),                /**< not supported by HW */
+    GPIO_OD_PU    = (0xfe)                 /**< not supported by HW */
 } gpio_mode_t;
 /** @} */
 
@@ -121,10 +148,12 @@ typedef struct {
     uint8_t irqn;           /**< IRQ number of the timer device */
 } timer_conf_t;
 
+#ifndef DOXYGEN
 /**
  * @brief   Override SPI mode values
  * @{
  */
+#ifndef CPU_FAM_NRF9160
 #define HAVE_SPI_MODE_T
 typedef enum {
     SPI_MODE_0 = 0,                                             /**< CPOL=0, CPHA=0 */
@@ -147,16 +176,27 @@ typedef enum {
     SPI_CLK_10MHZ  = SPI_FREQUENCY_FREQUENCY_M8     /**< 10MHz */
 } spi_clk_t;
 /** @} */
+#endif /* ndef CPU_FAM_NRF9160 */
+#endif /* ndef DOXYGEN */
 
 /**
- * @brief  SPI configuration values
+ * @name    WDT upper and lower bound times in ms
+ * @{
  */
-typedef struct {
-    NRF_SPI_Type *dev;  /**< SPI device used */
-    uint8_t sclk;       /**< CLK pin */
-    uint8_t mosi;       /**< MOSI pin */
-    uint8_t miso;       /**< MISO pin */
-} spi_conf_t;
+#define NWDT_TIME_LOWER_LIMIT          (1)
+/* Set upper limit to the maximum possible value that could go in CRV register */
+#define NWDT_TIME_UPPER_LIMIT          ((UINT32_MAX >> 15) * US_PER_MS + 1)
+/** @} */
+
+/**
+ * @brief Retrieve the exti(GPIOTE) channel associated with a gpio
+ *
+ * @param   pin     GPIO pin to retrieve the channel for
+ *
+ * @return          the channel number
+ * @return          0xff if no channel is found
+ */
+uint8_t gpio_int_get_exti(gpio_t pin);
 
 #ifdef __cplusplus
 }

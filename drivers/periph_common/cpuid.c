@@ -9,7 +9,7 @@
  */
 
 /**
- * @addtogroup  drivers
+ * @ingroup     drivers_periph_cpuid
  * @{
  *
  * @file

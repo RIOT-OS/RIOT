@@ -1,25 +1,30 @@
 #!/usr/bin/env python3
 
-import os
 import sys
+from testrunner import run
+
+THREAD_NAMES = ("nr1", "nr2", "nr3")
 
 
 def testfunc(child):
-    child.expect("START")
-    child.expect("THREADS CREATED")
-    child.expect("THREAD nr1 \(pid:3\) start")
-    child.expect("THREAD nr1 \(pid:3\) end.")
-    child.expect("THREAD nr2 \(pid:4\) start")
-    child.expect("THREAD nr3 \(pid:5\) start")
-    child.expect("Got msg from pid 3: \"nr1\"")
-    child.expect("THREAD nr2 \(pid:4\) end.")
-    child.expect("Got msg from pid 4: \"nr2\"")
-    child.expect("THREAD nr3 \(pid:5\) end.")
-    child.expect("Got msg from pid 5: \"nr3\"")
-    child.expect("SUCCESS")
+    child.expect_exact("START")
+    # Collect pids
+    thread_pids = []
+    for name in THREAD_NAMES:
+        child.expect(r"THREAD {} \(pid:(\d+)\) start".format(name))
+        thread_pids.append(int(child.match.group(1)))
+    child.expect_exact("THREADS CREATED")
+
+    for index, name in enumerate(THREAD_NAMES):
+        child.expect(r"THREAD {} \(pid:(\d+)\) end.".format(name))
+        thread_pid = int(child.match.group(1))
+        assert thread_pid == thread_pids[index]
+        child.expect(r'Got msg from pid (\d+): "{}"'.format(name))
+        thread_pid = int(child.match.group(1))
+        assert thread_pid == thread_pids[index]
+
+    child.expect_exact("SUCCESS")
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-    from testrunner import run
     sys.exit(run(testfunc))

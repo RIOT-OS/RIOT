@@ -1,0 +1,156 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_GNRC_TCP
+    bool "Configure GNRC_TCP"
+    depends on USEMODULE_GNRC_TCP
+    help
+        Configure the GNRC_TCP using Kconfig.
+
+if KCONFIG_USEMODULE_GNRC_TCP
+
+config GNRC_TCP_CONNECTION_TIMEOUT_DURATION_MS
+    int "Timeout duration for user calls in milliseconds"
+    default 120000
+    help
+        Timeout duration for user calls. Default value is 120000 milliseconds
+        (2 minutes).
+
+config GNRC_TCP_MSL_MS
+    int "Maximum segment lifetime (MSL) in milliseconds"
+    default 30000
+    help
+        Maximum segment lifetime (MSL) in milliseconds. Default value is 30
+        seconds.
+
+config GNRC_TCP_MSS
+    int "Maximum Segment Size (MSS)"
+    default 1220 if USEMODULE_GNRC_IPV6
+    default 576
+
+config GNRC_TCP_MSS_MULTIPLICATOR
+    int "Number of MSS sized packets stored in receive buffer"
+    default 1
+    help
+        Configure MSS Multiplicator i.e. number of MSS sized packets stored in
+        receive buffer.
+
+config GNRC_TCP_DEFAULT_WINDOW_EN
+    bool "Enable configuration of TCP window size"
+    help
+        Enable configuration of TCP window size. If not enabled, TCP window size
+        will default to the product of Maximum Segment Size and the number of
+        MSS sized packets i.e. CONFIG_GNRC_TCP_MSS *
+        CONFIG_GNRC_TCP_MSS_MULTIPLICATOR.
+
+config GNRC_TCP_DEFAULT_WINDOW
+    int "TCP receive window size"
+    default 1220 if USEMODULE_GNRC_IPV6
+    default 576
+    depends on GNRC_TCP_DEFAULT_WINDOW_EN
+    help
+        Configure TCP receive window size. This value determines the maximum
+        amount of bytes that can be received from the peer at a given moment.
+
+config GNRC_TCP_RCV_BUFFERS
+    int "Number of preallocated receive buffers"
+    default 1
+
+config GNRC_TCP_RTO_LOWER_BOUND_MS
+    int "Lower bound for RTO in milliseconds"
+    default 1000
+    help
+        Lower bound value for retransmission timeout (RTO) in milliseconds.
+        Default value is 1000 milliseconds (1 second). Retransmission
+        timeout determines how long TCP waits for acknowledgment (ACK) of
+        transmitted segment. Refer to RFC 6298 for more information.
+
+config GNRC_TCP_RTO_UPPER_BOUND_MS
+    int "Upper bound for RTO in milliseconds"
+    default 60000
+    help
+        Upper bound value for retransmission timeout (RTO) in milliseconds.
+        Default value is 60000 milliseconds (60 seconds). Refer to RFC 6298
+        for more information.
+
+config GNRC_TCP_RTO_GRANULARITY_MS
+    int "Clock granularity for RTO in milliseconds"
+    default 10
+    help
+        Clock granularity for retransmission timeout (RTO) for TCP in
+        milliseconds. Default value is 10 milliseconds.
+        Refer to RFC 6298 for more information.
+
+config GNRC_TCP_RTO_A_DIV
+    int "Alpha value divisor for RTO calculation"
+    default 8
+    help
+        Alpha value divisor to calculate retransmission timeout (RTO). The
+        default value for divisor is 8 which would result in an alpha value of
+        1/8.
+
+config GNRC_TCP_RTO_B_DIV
+    int "Beta value divisor for RTO calculation"
+    default 4
+    help
+        Beta value divisor to calculate retransmission timeout (RTO). The
+        default value for divisor is 4 which would result in a beta value of
+        1/4.
+
+config GNRC_TCP_RTO_K
+    int "K value for RTO calculation"
+    default 4
+
+config GNRC_TCP_PROBE_LOWER_BOUND_MS
+    int "Lower bound for the duration between probes in milliseconds"
+    default 1000
+    help
+        Lower bound value for window probes in milliseconds.
+        Default value is 1000 milliseconds (1 second).
+        Refer to RFC 6298 for more information.
+
+config GNRC_TCP_PROBE_UPPER_BOUND_MS
+    int "Lower bound for the duration between probes in milliseconds"
+    default 60000
+    help
+        Upper bound value for window probes in milliseconds.
+        Default value is 60000 milliseconds (60 seconds). Refer to RFC 6298
+        for more information.
+
+config GNRC_TCP_MSG_QUEUE_SIZE_SIZE_EXP
+    int "Message queue size for TCP API internal messaging (as exponent of 2^n)"
+    default 2
+    help
+        The number of elements in a message queue must be always a power of two.
+        This value defines the exponent of 2^n.
+
+config GNRC_TCP_EVENTLOOP_MSG_QUEUE_SIZE_SIZE_EXP
+    int "Message queue size for the TCP eventloop (as exponent of 2^n)"
+    default 3
+    help
+        The number of elements in a message queue must be always a power of two.
+        This value defines the exponent of 2^n.
+
+config GNRC_TCP_EXPERIMENTAL_DYN_MSL_EN
+    bool "Enable experimental feature \"dynamic MSL\""
+    default n
+    help
+        Enables the experimental feature \"dynamic maximum segment lifetime\".
+        This feature calulates the MSL by multiplying the latest retransmission timeout
+        value with a factor GNRC_TCP_EXPERIMENTAL_DYN_MSL_RTO_MUL instead
+        of using the constant GNRC_TCP_MSL_MS. Using the shorter MSL leads to a faster
+        connection teardown and therfore for a faster return of gnrc_tcp_close.
+
+config GNRC_TCP_EXPERIMENTAL_DYN_MSL_RTO_MUL
+    int "Multiplication factor for experimental feature \"dynamic MSL\""
+    default 4
+    depends on GNRC_TCP_EXPERIMENTAL_DYN_MSL_EN
+    help
+        Multiplication factor for the experimental feature \"dynamic maximum segment lifetime\".
+        This is the factor that is multiplied with the current retransmission timeout value
+        to determine the MSL value.
+
+endif # KCONFIG_USEMODULE_GNRC_TCP

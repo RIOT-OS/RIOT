@@ -1,0 +1,36 @@
+USEMODULE += nrf52_vectors
+
+ifneq (,$(filter nrf52811xxaa nrf52820xxaa nrf52833xxaa nrf52840xxaa,$(CPU_MODEL)))
+  # include dependencies for 802.15.4 radio
+  include $(RIOTCPU)/nrf52/Makefile.nrf802154.dep
+else
+  # include dependencies for BLE
+  include $(RIOTCPU)/nrf52/Makefile.nimble.dep
+endif
+
+ifneq (,$(filter nrf802154,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_timer
+  FEATURES_REQUIRED += radio_nrf802154
+  USEMODULE += luid
+  ifneq (,$(filter netdev,$(USEMODULE)))
+    USEMODULE += netdev_ieee802154_submac
+  endif
+endif
+
+# The nrf52832 requires gpio IRQ with SPI to work around errata 58
+ifneq (,$(filter nrf52832xxaa,$(CPU_MODEL)))
+  ifneq (,$(filter periph_spi,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_gpio_irq
+  endif
+endif
+
+ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
+  USEMODULE += tsrb
+endif
+
+ifneq (,$(filter saul_nrf_vddh,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_adc
+endif
+
+include $(RIOTCPU)/nrf5x_common/Makefile.dep
+include $(RIOTCPU)/cortexm_common/Makefile.dep

@@ -1,0 +1,26 @@
+/**
+@defgroup    boards_nucleo-g431rb STM32 Nucleo-G431RB
+@ingroup     boards_common_nucleo64
+@brief       Support for the STM32 Nucleo-G431RB
+
+## Flashing the device
+
+The ST Nucleo-G431RB board includes an on-board ST-LINK V3 programmer. The
+easiest way to program the board is to use OpenOCD. Once you have installed
+OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
+installation instructions), you can flash the board simply by typing
+
+```
+make BOARD=nucleo-g431rb flash
+```
+and debug via GDB by simply typing
+```
+make BOARD=nucleo-g431rb debug
+```
+
+## Supported Toolchains
+
+For using the ST Nucleo-G431RB board we recommend the usage of the
+[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
+toolchain.
+ */

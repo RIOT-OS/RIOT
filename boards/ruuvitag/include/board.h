@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Feie Universität Berlin
+ * Copyright (C) 2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_ruuvitag RuuviTag
- * @ingroup     boards
- * @brief       Support for the RuuviTag board
+ * @ingroup     boards_ruuvitag
  * @{
  *
  * @file
@@ -75,9 +73,9 @@ extern "C" {
  * @name    Accelerometer configuration
  * @{
  */
-#define LIS2DH12_PARAM_CS   GPIO_PIN(0, 8)
-#define LIS2DH12_PARAM_INT1 GPIO_PIN(0, 2)
-#define LIS2DH12_PARAM_INT2 GPIO_PIN(0, 6)
+#define LIS2DH12_PARAM_CS       GPIO_PIN(0, 8)
+#define LIS2DH12_PARAM_INT_PIN1 GPIO_PIN(0, 2)
+#define LIS2DH12_PARAM_INT_PIN2 GPIO_PIN(0, 6)
 /** @} */
 
 /**

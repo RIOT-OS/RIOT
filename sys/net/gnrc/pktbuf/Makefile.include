@@ -1,0 +1,8 @@
+# Check that only one implementation of pktbuf is used
+USED_PKTBUF_IMPLEMENTATIONS := $(filter-out gnrc_pktbuf_cmd,$(filter gnrc_pktbuf_%,$(USEMODULE)))
+ifneq (1,$(words $(USED_PKTBUF_IMPLEMENTATIONS)))
+  $(error Only one implementation of gnrc_pktbuf should be used. Currently using: $(USED_PKTBUF_IMPLEMENTATIONS))
+endif
+
+USEMODULE_INCLUDES_gnrc_pktbuf := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_gnrc_pktbuf)

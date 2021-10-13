@@ -2,6 +2,7 @@ PKG_NAME    = my_pkg                       # name of the package
 PKG_URL     = http://example.com/downloads # source url of the package e.g. a git repository
 PKG_VERSION = v1.2.3                       # version of the package to use e.g. a git commit/ref
 PKG_EXT     = zip                          # extension of this package
+PKG_LICENSE = MIT                          # license of the package
 
 ifneq ($(RIOTBASE),)
 include $(RIOTBASE)/Makefile.base

@@ -7,13 +7,7 @@
  */
 
 /**
- * @defgroup    pkg_lwip    lwIP
- * @ingroup     pkg
- * @brief       A lightweight TCP/IP stack
- * @see         http://savannah.nongnu.org/projects/lwip/
- *
- * lwIP is a lightweight TCP/IP stack primarily for usage with Ethernet.
- * It can be used with the the @ref conn.
+ * @ingroup     pkg_lwip
  *
  * @{
  *

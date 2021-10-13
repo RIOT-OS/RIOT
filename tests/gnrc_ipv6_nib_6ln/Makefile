@@ -1,9 +1,5 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := chronos nucleo-f030 nucleo-l053 nucleo32-f031 \
-                             nucleo32-l031 nucleo32-f042 stm32f0discovery \
-                             telosb wsn430-v1_3b wsn430-v1_4
-
 USEMODULE += gnrc_ipv6
 USEMODULE += gnrc_sixlowpan
 USEMODULE += gnrc_sixlowpan_ctx
@@ -13,13 +9,14 @@ USEMODULE += embunit
 USEMODULE += netdev_ieee802154
 USEMODULE += netdev_test
 
+# lower log-level to save memory of LOG_WARNING() in gnrc_netif
+CFLAGS += -DLOG_LEVEL=LOG_ERROR
 CFLAGS += -DGNRC_NETTYPE_NDP=GNRC_NETTYPE_TEST
-CFLAGS += -DGNRC_PKTBUF_SIZE=512
 CFLAGS += -DTEST_SUITES
-
-TEST_ON_CI_WHITELIST += all
 
 include $(RIOTBASE)/Makefile.include
 
-test:
-	tests/01-run.py
+# Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
+ifndef CONFIG_GNRC_PKTBUF_SIZE
+  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=512
+endif

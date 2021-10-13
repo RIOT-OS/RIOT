@@ -1,0 +1,8 @@
+# include variants of the BMX280 drivers as pseudo modules
+PSEUDOMODULES += bmp280_i2c
+PSEUDOMODULES += bmp280_spi
+PSEUDOMODULES += bme280_i2c
+PSEUDOMODULES += bme280_spi
+
+USEMODULE_INCLUDES_bmx280 := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_bmx280)

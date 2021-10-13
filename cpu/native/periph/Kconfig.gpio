@@ -1,0 +1,36 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+choice NATIVE_GPIO_IMPLEMENTATION
+    bool "Native GPIO peripheral implementation"
+    depends on MODULE_PERIPH_GPIO
+    depends on CPU_ARCH_NATIVE
+    depends on TEST_KCONFIG
+    default MODULE_PERIPH_GPIO_LINUX if NATIVE_OS_LINUX
+
+config MODULE_PERIPH_GPIO_LINUX
+    bool "Linux GPIO"
+    depends on NATIVE_OS_LINUX
+
+config MODULE_PERIPH_GPIO_MOCK
+    bool "Mock"
+
+endchoice
+
+# TODO: these modules are actually just artifacts from the way periph_init_%
+# modules are handled in Makefile. We need to define them to keep the list the
+# same for now. We should be able to remove them later on.
+
+config MODULE_PERIPH_INIT_GPIO_LINUX
+    bool
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_GPIO_LINUX
+
+config MODULE_PERIPH_INIT_GPIO_MOCK
+    bool
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_GPIO_MOCK

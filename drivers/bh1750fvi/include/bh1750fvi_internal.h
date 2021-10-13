@@ -19,7 +19,6 @@
 #ifndef BH1750FVI_INTERNAL_H
 #define BH1750FVI_INTERNAL_H
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,7 +27,7 @@ extern "C" {
  * @brief   Result divisor (1.2 times 65535)
  *
  * The 16-bit RAW results have to be divided by 1.2. We do this by using fixed
- * floating point arithmetics by multiplying divisor and RAW value by 65535 (
+ * floating point arithmetic by multiplying divisor and RAW value by 65535 (
  * uint16_t max).
  */
 #define RES_DIV                 (78642)
@@ -57,7 +56,6 @@ extern "C" {
 #define DELAY_HMODE             (120000)    /**< typ. 120ms in H-mode */
 #define DELAY_LMODE             (16000)     /**< typ. 16ms in L-mode */
 /** @} */
-
 
 #ifdef __cplusplus
 }

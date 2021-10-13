@@ -7,12 +7,14 @@
  */
 
 /**
- * @ingroup     core_sync Synchronization
+ * @defgroup    core_sync_rmutex Recursive Mutex
+ * @ingroup     core_sync
  * @brief       Recursive Mutex for thread synchronization
+ *
  * @{
  *
  * @file
- * @brief       RIOT synchronization API
+ * @brief       Recursive Mutex for thread synchronization
  *
  * @author      Martin Elshuber <martin.elshuber@theobroma-systems.com>
  *
@@ -21,13 +23,18 @@
 #ifndef RMUTEX_H
 #define RMUTEX_H
 
+#include <stdint.h>
+#ifdef __cplusplus
+#include "c11_atomics_compat.hpp"
+#else
 #include <stdatomic.h>
+#endif
 
 #include "mutex.h"
-#include "kernel_types.h"
+#include "sched.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -73,6 +80,7 @@ typedef struct rmutex_t {
 static inline void rmutex_init(rmutex_t *rmutex)
 {
     rmutex_t empty_rmutex = RMUTEX_INIT;
+
     *rmutex = empty_rmutex;
 }
 

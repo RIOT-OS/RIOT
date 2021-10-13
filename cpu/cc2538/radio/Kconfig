@@ -1,0 +1,30 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_CC2538_RF
+    bool "CC2538 IEEE 802.15.4 radio"
+    depends on TEST_KCONFIG
+    depends on CPU_FAM_CC2538
+
+if MODULE_CC2538_RF
+
+config MODULE_CC2538_RF_OBS_SIG
+    bool "Output observation signals"
+    help
+        Say y to output different observation signals from the RF Core
+        to GPIO pins. These signals can be useful for debugging of
+        low-level protocols or control of external PA, LNA, or switches.
+
+        For more information check section 9.2.4 of the CC2538 User's Manual.
+
+endif # MODULE_CC2538_RF
+
+config HAVE_CC2538_RF
+    bool
+    select MODULE_CC2538_RF if MODULE_NETDEV_DEFAULT
+    help
+        Indicates that a cc2538 radio is present.

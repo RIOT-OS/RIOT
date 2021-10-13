@@ -33,6 +33,11 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#ifdef SOCK_HAS_IPV6
+#include "net/ipv6/addr.h"     /* for interface parsing */
+#include "net/netif.h"         /* for resolving ipv6 scope */
+#endif /* SOCK_HAS_IPV6 */
+
 #include "thread.h"
 
 #define SERVER_MSG_QUEUE_SIZE   (8)
@@ -98,6 +103,20 @@ static int udp_send(char *addr_str, char *port_str, char *data, unsigned int num
     src.sin6_family = AF_INET6;
     dst.sin6_family = AF_INET6;
     memset(&src.sin6_addr, 0, sizeof(src.sin6_addr));
+    /* parse interface id */
+#ifdef SOCK_HAS_IPV6
+    char *iface;
+    iface = ipv6_addr_split_iface(addr_str); /* also removes interface id */
+    if (iface) {
+        netif_t *netif = netif_get_by_name(iface);
+        if (netif) {
+            dst.sin6_scope_id = (uint32_t) netif_get_id(netif);
+        }
+        else {
+            printf("unknown network interface %s\n", iface);
+        }
+    }
+#endif /* SOCK_HAS_IPV6 */
     /* parse destination address */
     if (inet_pton(AF_INET6, addr_str, &dst.sin6_addr) != 1) {
         puts("Error: unable to parse destination address");

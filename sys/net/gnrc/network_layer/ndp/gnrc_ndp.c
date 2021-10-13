@@ -13,6 +13,10 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <assert.h>
+#include <string.h>
+#include <inttypes.h>
+
 #include "net/gnrc/icmpv6.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/netif/internal.h"
@@ -23,11 +27,10 @@
 
 #include "net/gnrc/ndp.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
+#include "timex.h"
 
-/* For PRIu8 etc. */
-#include <inttypes.h>
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
@@ -45,11 +48,9 @@ gnrc_pktsnip_t *gnrc_ndp_nbr_sol_build(const ipv6_addr_t *tgt,
         nbr_sol->tgt.u64[0].u64 = tgt->u64[0].u64;
         nbr_sol->tgt.u64[1].u64 = tgt->u64[1].u64;
     }
-#if ENABLE_DEBUG
     else {
         DEBUG("ndp: NS not created due to no space in packet buffer\n");
     }
-#endif
     return pkt;
 }
 
@@ -68,11 +69,9 @@ gnrc_pktsnip_t *gnrc_ndp_nbr_adv_build(const ipv6_addr_t *tgt, uint8_t flags,
         nbr_adv->tgt.u64[0].u64 = tgt->u64[0].u64;
         nbr_adv->tgt.u64[1].u64 = tgt->u64[1].u64;
     }
-#if ENABLE_DEBUG
     else {
         DEBUG("ndp: NA not created due to no space in packet buffer\n");
     }
-#endif
     return pkt;
 }
 
@@ -86,11 +85,9 @@ gnrc_pktsnip_t *gnrc_ndp_rtr_sol_build(gnrc_pktsnip_t *options)
         ndp_rtr_sol_t *rtr_sol = pkt->data;
         rtr_sol->resv.u32 = 0;
     }
-#if ENABLE_DEBUG
     else {
         DEBUG("ndp: RS not created due to no space in packet buffer\n");
     }
-#endif
     return pkt;
 }
 
@@ -111,11 +108,9 @@ gnrc_pktsnip_t *gnrc_ndp_rtr_adv_build(uint8_t cur_hl, uint8_t flags,
         rtr_adv->reach_time = byteorder_htonl(reach_time);
         rtr_adv->retrans_timer = byteorder_htonl(retrans_timer);
     }
-#if ENABLE_DEBUG
     else {
         DEBUG("ndp: RA not created due to no space in packet buffer\n");
     }
-#endif
     return pkt;
 }
 
@@ -136,11 +131,9 @@ gnrc_pktsnip_t *gnrc_ndp_opt_build(uint8_t type, size_t size,
         opt->type = type;
         opt->len = (uint8_t)(pkt->size / 8);
     }
-#if ENABLE_DEBUG
     else {
         DEBUG("ndp: option not created due to no space in packet buffer\n");
     }
-#endif
     return pkt;
 }
 
@@ -208,6 +201,30 @@ gnrc_pktsnip_t *gnrc_ndp_opt_pi_build(const ipv6_addr_t *prefix,
     return pkt;
 }
 
+gnrc_pktsnip_t *gnrc_ndp_opt_ri_build(const ipv6_addr_t *prefix,
+                                      uint8_t prefix_len,
+                                      uint32_t route_ltime,
+                                      uint8_t flags, gnrc_pktsnip_t *next)
+{
+    assert(prefix != NULL);
+    assert(!ipv6_addr_is_link_local(prefix) && !ipv6_addr_is_multicast(prefix));
+    assert(prefix_len <= 128);
+    gnrc_pktsnip_t *pkt = gnrc_ndp_opt_build(NDP_OPT_RI, sizeof(ndp_opt_ri_t),
+                                             next);
+
+    if (pkt != NULL) {
+        ndp_opt_ri_t *ri_opt = pkt->data;
+
+        ri_opt->prefix_len = prefix_len;
+        ri_opt->flags = (flags & NDP_OPT_PI_FLAGS_MASK);
+        ri_opt->route_ltime = byteorder_htonl(route_ltime);
+        /* Bits beyond prefix_len MUST be 0 */
+        ipv6_addr_set_unspecified(&ri_opt->prefix);
+        ipv6_addr_init_prefix(&ri_opt->prefix, prefix, prefix_len);
+    }
+    return pkt;
+}
+
 gnrc_pktsnip_t *gnrc_ndp_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next)
 {
     gnrc_pktsnip_t *pkt = gnrc_ndp_opt_build(NDP_OPT_MTU,
@@ -218,6 +235,27 @@ gnrc_pktsnip_t *gnrc_ndp_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next)
 
         mtu_opt->resv.u16 = 0;
         mtu_opt->mtu = byteorder_htonl(mtu);
+    }
+    return pkt;
+}
+
+gnrc_pktsnip_t *gnrc_ndp_opt_rdnss_build(uint32_t ltime, ipv6_addr_t *addrs,
+                                         unsigned addrs_num,
+                                         gnrc_pktsnip_t *next)
+{
+    assert(addrs != NULL);
+    assert(addrs_num > 0);
+    size_t opt_size = sizeof(ndp_opt_t) + (sizeof(ipv6_addr_t) * addrs_num);
+    gnrc_pktsnip_t *pkt = gnrc_ndp_opt_build(NDP_OPT_RDNSS, opt_size, next);
+
+    if (pkt != NULL) {
+        ndp_opt_rdnss_impl_t *rdnss_opt = pkt->data;
+        rdnss_opt->resv.u16 = 0;
+        rdnss_opt->ltime = byteorder_htonl(ltime);
+        for (unsigned i = 0; i < addrs_num; i++) {
+            memcpy(&rdnss_opt->addrs[i], &addrs[i],
+                   sizeof(rdnss_opt->addrs[i]));
+        }
     }
     return pkt;
 }
@@ -317,11 +355,16 @@ void gnrc_ndp_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
     gnrc_netif_acquire(netif);
     do {    /* XXX: hidden goto */
         int tgt_idx;
+        gnrc_netif_t *tgt_netif = gnrc_netif_get_by_ipv6_addr(tgt);
 
-        if ((tgt_idx = gnrc_netif_ipv6_addr_idx(netif, tgt)) < 0) {
+        if (tgt_netif == NULL) {
             DEBUG("ndp: tgt not assigned to interface. Abort sending\n");
             break;
         }
+
+        tgt_idx = gnrc_netif_ipv6_addr_idx(tgt_netif, tgt);
+        assert(tgt_idx >= 0);
+
         if (gnrc_netif_is_rtr(netif) && gnrc_netif_is_rtr_adv(netif)) {
             adv_flags |= NDP_NBR_ADV_FLAGS_R;
         }
@@ -352,9 +395,9 @@ void gnrc_ndp_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
                 pkt = hdr;
             }
         }
-        /* TODO: also check if the node provides proxy servies for tgt */
+        /* TODO: also check if the node provides proxy services for tgt */
         if ((pkt != NULL) &&
-            (netif->ipv6.addrs_flags[tgt_idx] &
+            (tgt_netif->ipv6.addrs_flags[tgt_idx] &
              GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST)) {
             /* TL2A is not supplied and tgt is not anycast */
             adv_flags |= NDP_NBR_ADV_FLAGS_O;
@@ -449,7 +492,7 @@ void gnrc_ndp_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
                            const ipv6_addr_t *dst, bool fin,
                            gnrc_pktsnip_t *ext_opts)
 {
-#if GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     gnrc_pktsnip_t *hdr = NULL, *pkt = ext_opts;
     uint32_t reach_time = 0, retrans_timer = 0;
     uint16_t adv_ltime = 0;
@@ -475,6 +518,11 @@ void gnrc_ndp_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
             /* get address from source selection algorithm.
              * Only link local addresses may be used (RFC 4861 section 4.1) */
             src = gnrc_netif_ipv6_addr_best_src(netif, dst, true);
+
+            if (src == NULL) {
+                DEBUG("ndp rtr: no VALID source address found for RA\n");
+                break;
+            }
         }
         /* add SL2A for source address */
         if (src != NULL) {
@@ -500,6 +548,9 @@ void gnrc_ndp_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
         if (netif->flags & GNRC_NETIF_FLAGS_IPV6_ADV_CUR_HL) {
             cur_hl = netif->cur_hl;
         }
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
+        /* netif->ipv6.reach_time_base is only available with Address Resolution
+         * State Machine */
         if (netif->flags & GNRC_NETIF_FLAGS_IPV6_ADV_REACH_TIME) {
             if (netif->ipv6.reach_time_base > (3600 * MS_PER_SEC)) {
                 /* reach_time > 1 hour */
@@ -509,13 +560,14 @@ void gnrc_ndp_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
                 reach_time = netif->ipv6.reach_time_base;
             }
         }
+#endif /* CONFIG_GNRC_IPV6_NIB_ARSM */
         if (netif->flags & GNRC_NETIF_FLAGS_IPV6_ADV_RETRANS_TIMER) {
             retrans_timer = netif->ipv6.retrans_time;
         }
         if (!fin) {
             adv_ltime = netif->ipv6.rtr_ltime;
         }
-        if (netif->ipv6.aac_mode == GNRC_NETIF_AAC_DHCP) {
+        if (netif->ipv6.aac_mode & GNRC_NETIF_AAC_DHCP) {
             flags |= NDP_RTR_ADV_FLAGS_M;
             if (netif->flags & GNRC_NETIF_FLAGS_IPV6_ADV_O_FLAG) {
                 flags |= NDP_RTR_ADV_FLAGS_O;
@@ -554,7 +606,7 @@ void gnrc_ndp_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
     (void)fin;
     DEBUG("ndp: not a router, dropping ext_opts\n");
     gnrc_pktbuf_release(ext_opts);
-#endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 }
 
 static gnrc_pktsnip_t *_build_headers(gnrc_netif_t *netif,
@@ -569,7 +621,7 @@ static gnrc_pktsnip_t *_build_headers(gnrc_netif_t *netif,
         DEBUG("ndp: error allocating IPv6 header.\n");
         return NULL;
     }
-    ((ipv6_hdr_t *)iphdr->data)->hl = 255;
+    ((ipv6_hdr_t *)iphdr->data)->hl = NDP_HOP_LIMIT;
     /* add netif header for send interface specification */
     l2hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
     if (l2hdr == NULL) {
@@ -577,9 +629,8 @@ static gnrc_pktsnip_t *_build_headers(gnrc_netif_t *netif,
         gnrc_pktbuf_remove_snip(iphdr, iphdr);
         return NULL;
     }
-    ((gnrc_netif_hdr_t *)l2hdr->data)->if_pid = netif->pid;
-    LL_PREPEND(iphdr, l2hdr);
-    return l2hdr;
+    gnrc_netif_hdr_set_netif(l2hdr->data, netif);
+    return gnrc_pkt_prepend(iphdr, l2hdr);
 }
 
 static inline size_t _get_l2src(const gnrc_netif_t *netif, uint8_t *l2src)

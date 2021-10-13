@@ -1,0 +1,5 @@
+/**
+@defgroup    boards_nucleo-f429zi STM32 Nucleo-F429ZI
+@ingroup     boards_common_nucleo144
+@brief       Support for the STM32 Nucleo-F429ZI
+ */

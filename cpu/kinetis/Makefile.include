@@ -1,7 +1,16 @@
-ifeq (,$(KINETIS_SERIES))
-  # Parse parameters from CPU_MODEL using the kinetis-info.mk script in the same
-  # directory as this Makefile.
-  include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/kinetis-info.mk
+# "The Vector table must be naturally aligned to a power of two whose alignment
+# value is greater than or equal to number of Exceptions supported x 4"
+# CPU_IRQ_NUMOF for KWxD and KxF boards is < 102+16 so (81*4 bytes = 472 bytes ~= 0x200)
+# RIOTBOOT_HDR_LEN can be set to 0x200
+ifneq (,$(filter FK DW,$(KINETIS_CORE)$(KINETIS_SERIES)))
+  RIOTBOOT_HDR_LEN ?= 0x200
+endif
+
+# Slot size is determined by "((total_flash_size - RIOTBOOT_LEN) / 2)".
+# If RIOTBOOT_LEN uses an uneven number of flashpages, the remainder of the
+# flash cannot be divided by two slots while staying FLASHPAGE_SIZE aligned.
+ifeq (K, $(KINETIS_SERIES))
+  RIOTBOOT_LEN ?= 0x2000
 endif
 
 # Add search path for linker scripts
@@ -12,9 +21,13 @@ LINKER_SCRIPT = kinetis.ld
 
 ROM_START_ADDR = 0x00000000
 RAM_BASE_ADDR  = 0x20000000
-RAM_START_ADDR = $$(($(RAM_BASE_ADDR)-($(KINETIS_SRAM_L_SIZE) * 1024)))
-ROM_LEN = $$(($(KINETIS_ROMSIZE) * 1024))
-RAM_LEN = $$(($(KINETIS_RAMSIZE) * 1024))
+RAM_START_ADDR := $(shell printf "0x%08x" $$(($(RAM_BASE_ADDR)-($(KINETIS_SRAM_L_SIZE) * 1024))))
+
+# Define ROM_LEN with a non arithmetic value as it must be
+# evaluated in `cortexm_common` without a shell context
+# The `K` is correctly handled by both the linker and `cortexm_common`.
+ROM_LEN := $(KINETIS_ROMSIZE)K
+RAM_LEN := $(shell echo $$(($(KINETIS_RAMSIZE) * 1024)))
 
 CFLAGS += \
   -DKINETIS_CORE_$(KINETIS_CORE) \
@@ -23,25 +36,5 @@ CFLAGS += \
   -DKINETIS_SUBFAMILY=$(KINETIS_SUBFAMILY) \
   -DKINETIS_ROMSIZE=$(KINETIS_ROMSIZE) \
   #
-
-LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_rom_start_addr=$(ROM_START_ADDR)
-LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_base_addr=$(RAM_BASE_ADDR)
-LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_start_addr=$(RAM_START_ADDR)
-LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_rom_length=$(ROM_LEN)
-LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_length=$(RAM_LEN)
-
-# add the CPU specific flash configuration field for the linker
-export UNDEF += $(BINDIR)/cpu/fcfield.o
-
-# include common periph drivers
-USEMODULE += periph_common
-
-# select kinetis periph drivers
-USEMODULE += periph_mcg
-USEMODULE += periph_wdog
-
-# Define a recipe to build the watchdog disable binary, used when flashing
-$(RIOTCPU)/$(CPU)/dist/wdog-disable.bin: $(RIOTCPU)/$(CPU)/dist/wdog-disable.s
-	$(Q)$(MAKE) -C $(RIOTCPU)/$(CPU)/dist/ $(notdir $@)
 
 include $(RIOTMAKE)/arch/cortexm.inc.mk

@@ -55,7 +55,7 @@ void *sender_thread(void *arg)
 int main(void)
 {
     msg_t msg;
-    p_recv = sched_active_pid;
+    p_recv = thread_getpid();
 
     msg_t msg_q[1];
     msg_init_queue(msg_q, 1);

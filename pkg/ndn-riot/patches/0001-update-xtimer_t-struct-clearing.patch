@@ -1,0 +1,53 @@
+From 1534f82714a2a11bb338e14ed9dd18a24799cd38 Mon Sep 17 00:00:00 2001
+From: Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
+Date: Thu, 9 Jan 2020 11:16:38 +0100
+Subject: [PATCH] update xtimer_t struct clearing
+
+---
+ app.c | 2 +-
+ l2.c  | 2 +-
+ pit.c | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/app.c b/app.c
+index 8d37bd970af..bc4718d31b9 100644
+--- a/app.c
++++ b/app.c
+@@ -380,7 +380,7 @@ int ndn_app_schedule(ndn_app_t* handle, ndn_app_sched_cb_t cb, void* context,
+     if (entry == NULL) return -1;
+ 
+     // initialize the timer
+-    entry->timer.target = entry->timer.long_target = 0;
++    entry->timer = (xtimer_t) {0};
+ 
+     // initialize the msg struct
+     entry->timer_msg.type = MSG_XTIMER;
+diff --git a/l2.c b/l2.c
+index 77d6be49cd9..a0546b5e4a2 100644
+--- a/l2.c
++++ b/l2.c
+@@ -155,7 +155,7 @@ ndn_shared_block_t* ndn_l2_frag_receive(kernel_pid_t iface,
+         entry->id = id;
+ 
+         // initialize timer
+-        entry->timer.target = entry->timer.long_target = 0;
++        entry->timer = (xtimer_t) {0};
+         entry->timer_msg.type = NDN_L2_FRAG_MSG_TYPE_TIMEOUT;
+         entry->timer_msg.content.ptr = (char*)(&entry->timer_msg);
+ 
+diff --git a/pit.c b/pit.c
+index 644cf089d9c..692105ea1ed 100644
+--- a/pit.c
++++ b/pit.c
+@@ -155,7 +155,7 @@ int ndn_pit_add(kernel_pid_t face_id, int face_type, ndn_shared_block_t* si,
+ 	*pit_entry = entry;
+ 
+     /* initialize the timer */
+-    entry->timer.target = entry->timer.long_target = 0;
++    entry->timer = (xtimer_t) {0};
+ 
+     /* initialize the msg struct */
+     entry->timer_msg.type = NDN_PIT_MSG_TYPE_TIMEOUT;
+-- 
+2.25.0
+

@@ -7,7 +7,7 @@
  */
 
 /**
- * @addtogroup      cpu_sam3x8e
+ * @addtogroup      cpu_sam3
  * @{
  *
  * @file
@@ -21,7 +21,7 @@
 MEMORY
 {
     rom (rx)    : ORIGIN = 0x00080000, LENGTH = 512K
-    ram (rwx)   : ORIGIN = 0x20070000, LENGTH = 96K
+    ram (w!rx)  : ORIGIN = 0x20070000, LENGTH = 96K
 }
 
 INCLUDE cortexm_base.ld

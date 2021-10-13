@@ -178,7 +178,7 @@ cv_status condition_variable::wait_for(unique_lock<mutex>& lock,
     = (duration_cast<microseconds>(timeout_duration - s)).count();
   xtimer_now_timex(&before);
   xtimer_t timer;
-  xtimer_set_wakeup(&timer, timex_uint64(timeout), sched_active_pid);
+  xtimer_set_wakeup(&timer, timex_uint64(timeout), thread_getpid());
   wait(lock);
   xtimer_now_timex(&after);
   xtimer_remove(&timer);

@@ -1,0 +1,15 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    arduino-duemilanove \
+    arduino-leonardo \
+    arduino-nano \
+    arduino-uno \
+    atmega328p \
+    atmega328p-xplained-mini \
+    nucleo-f031k6 \
+    nucleo-l011k4 \
+    samd10-xmini \
+    stk3200 \
+    stm32f030f4-demo \
+    telosb \
+    z1 \
+    #

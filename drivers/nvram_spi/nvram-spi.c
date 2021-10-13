@@ -17,7 +17,7 @@
 #include "xtimer.h"
 
 /**
- * @ingroup     nvram
+ * @ingroup     drivers_nvram
  * @{
  *
  * @file
@@ -180,7 +180,6 @@ static int nvram_spi_read(nvram_t *dev, uint8_t *dst, uint32_t src, size_t len)
     /* status contains the number of bytes actually read from the SPI bus. */
     return (int)len;
 }
-
 
 static int nvram_spi_write_9bit_addr(nvram_t *dev, const uint8_t *src, uint32_t dst, size_t len)
 {

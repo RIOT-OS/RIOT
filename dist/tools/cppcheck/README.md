@@ -33,7 +33,9 @@ you want to get warnings about "unusedStructMembers" run the script with the
 
 You should read the code carefully. While cppcheck certainly produces
 valuable information, it can also warn about code that is actually OK.
-If this happens, you can add an "inline suppression" like this:
+If this happens, you can add an "inline suppression" and briefly state
+why this is required like this:
 
-    /* cppcheck-suppress passedByValue */
+    /* cppcheck-suppress passedByValue
+     * (reason: <add rationale on why it is necessary to suppress this here>) */
     timex_t timex_add(const timex_t a, const timex_t b);

@@ -32,7 +32,6 @@ extern "C" {
  */
 extern const netdev_driver_t mrf24j40_driver;
 
-
 #ifdef __cplusplus
 }
 #endif

@@ -1,0 +1,25 @@
+From ab9a5b8af22158512060079e931c964fb0bc2303 Mon Sep 17 00:00:00 2001
+From: Lena Boeckmann <einhornhool@mobi31.inet.haw-hamburg.de>
+Date: Tue, 7 Jan 2020 14:36:09 +0100
+Subject: [PATCH 1/2] change include_directories to target_include_directories
+
+---
+ lib/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/CMakeLists.txt b/lib/CMakeLists.txt
+index b15ec66..2168e47 100644
+--- a/lib/CMakeLists.txt
++++ b/lib/CMakeLists.txt
+@@ -123,7 +123,7 @@ if(ATCA_PRINTF)
+ add_definitions(-DATCAPRINTF)
+ endif(ATCA_PRINTF)
+
+-include_directories(cryptoauth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ../third_party/hidapi/hidapi ${USB_INCLUDE_DIR})
++target_include_directories(cryptoauth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ../third_party/hidapi/hidapi ${USB_INCLUDE_DIR})
+
+ if(WIN32)
+ set_target_properties(cryptoauth PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS true)
+--
+2.23.0
+

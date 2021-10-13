@@ -516,3 +516,6 @@ dl.todo > dt {
   background-color: #f5f5f5;
   padding: 4px 6px;
 }
+table.retval > tbody > tr > td.paramname {
+  padding-right: 2em;
+}

@@ -1,0 +1,28 @@
+# Copyright (c) 2021 Freie Universität Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+if !TEST_KCONFIG
+menu "CongURE congestion control abstraction"
+    depends on USEMODULE_CONGURE
+
+rsource "mock/Kconfig"
+rsource "test/Kconfig"
+
+endmenu # CongURE congestion control abstraction
+endif # !TEST_KCONFIG
+
+if TEST_KCONFIG
+menuconfig MODULE_CONGURE
+    bool "CongURE congestion control abstraction"
+    depends on TEST_KCONFIG
+
+if MODULE_CONGURE
+
+rsource "mock/Kconfig"
+rsource "test/Kconfig"
+
+endif   # MODULE_CONGURE
+endif   # TEST_KCONFIG

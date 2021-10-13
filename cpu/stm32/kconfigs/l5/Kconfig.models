@@ -1,0 +1,100 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU models
+config CPU_MODEL_STM32L552CC
+    bool
+    select CPU_LINE_STM32L552XX
+
+config CPU_MODEL_STM32L552CE
+    bool
+    select CPU_LINE_STM32L552XX
+
+config CPU_MODEL_STM32L552ME
+    bool
+    select CPU_LINE_STM32L552XX
+
+config CPU_MODEL_STM32L552QC
+    bool
+    select CPU_LINE_STM32L552XX
+
+config CPU_MODEL_STM32L552QE
+    bool
+    select CPU_LINE_STM32L552XX
+
+config CPU_MODEL_STM32L552RC
+    bool
+    select CPU_LINE_STM32L552XX
+
+config CPU_MODEL_STM32L552RE
+    bool
+    select CPU_LINE_STM32L552XX
+
+config CPU_MODEL_STM32L552VC
+    bool
+    select CPU_LINE_STM32L552XX
+
+config CPU_MODEL_STM32L552VE
+    bool
+    select CPU_LINE_STM32L552XX
+
+config CPU_MODEL_STM32L552ZC
+    bool
+    select CPU_LINE_STM32L552XX
+
+config CPU_MODEL_STM32L552ZE
+    bool
+    select CPU_LINE_STM32L552XX
+
+config CPU_MODEL_STM32L562CE
+    bool
+    select CPU_LINE_STM32L562XX
+
+config CPU_MODEL_STM32L562ME
+    bool
+    select CPU_LINE_STM32L562XX
+
+config CPU_MODEL_STM32L562QE
+    bool
+    select CPU_LINE_STM32L562XX
+
+config CPU_MODEL_STM32L562RE
+    bool
+    select CPU_LINE_STM32L562XX
+
+config CPU_MODEL_STM32L562VE
+    bool
+    select CPU_LINE_STM32L562XX
+
+config CPU_MODEL_STM32L562ZE
+    bool
+    select CPU_LINE_STM32L562XX
+
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32l552cc" if CPU_MODEL_STM32L552CC
+    default "stm32l552ce" if CPU_MODEL_STM32L552CE
+    default "stm32l552me" if CPU_MODEL_STM32L552ME
+    default "stm32l552qc" if CPU_MODEL_STM32L552QC
+    default "stm32l552qe" if CPU_MODEL_STM32L552QE
+    default "stm32l552rc" if CPU_MODEL_STM32L552RC
+    default "stm32l552re" if CPU_MODEL_STM32L552RE
+    default "stm32l552vc" if CPU_MODEL_STM32L552VC
+    default "stm32l552ve" if CPU_MODEL_STM32L552VE
+    default "stm32l552zc" if CPU_MODEL_STM32L552ZC
+    default "stm32l552ze" if CPU_MODEL_STM32L552ZE
+    default "stm32l562ce" if CPU_MODEL_STM32L562CE
+    default "stm32l562me" if CPU_MODEL_STM32L562ME
+    default "stm32l562qe" if CPU_MODEL_STM32L562QE
+    default "stm32l562re" if CPU_MODEL_STM32L562RE
+    default "stm32l562ve" if CPU_MODEL_STM32L562VE
+    default "stm32l562ze" if CPU_MODEL_STM32L562ZE

@@ -7,8 +7,7 @@
  */
 
 /**
- * @defgroup
- * @ingroup
+ * @ingroup     tests
  * @brief
  * @{
  *
@@ -16,6 +15,7 @@
  * @brief
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @}
  */
 #ifndef STACK_H
 #define STACK_H
@@ -34,4 +34,3 @@ void _net_init(void);
 #endif
 
 #endif /* STACK_H */
-/** @} */

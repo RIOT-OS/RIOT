@@ -1,0 +1,12 @@
+# include variants of CC110X drivers as pseudo modules
+PSEUDOMODULES += cc1100
+PSEUDOMODULES += cc1100e
+PSEUDOMODULES += cc1101
+
+# use pseudo-module for band selection
+PSEUDOMODULES += cc110x_433mhz
+PSEUDOMODULES += cc110x_868mhz
+PSEUDOMODULES += cc110x_915mhz
+
+USEMODULE_INCLUDES_cc110x := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_cc110x)

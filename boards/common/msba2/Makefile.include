@@ -1,34 +1,14 @@
-## the cpu to build for
-export CPU = lpc2387
-
-FLASHER = lpc2k_pgm
-
 # configure serial interface
-export TERMFLAGS += -tg -p "$(PORT)"
-include $(RIOTMAKE)/tools/serial.inc.mk
+PORT_LINUX ?= /dev/ttyUSB0
+# This does not make a lot of sense, but it has the same value as the previous code
+PORT_DARWIN ?= /dev/tty.usbserial-ARM
 
-export CFLAGS_CPU   = -mcpu=arm7tdmi-s
-export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
-export CFLAGS_DBG  ?= -ggdb -g3
-export CFLAGS_OPT  ?= -Os
+# Use lpc2k_pgm programmer
+PROGRAMMER ?= lpc2k_pgm
 
-export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
-export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
-export LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ldscripts/$(CPU).ld
-export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -nostartfiles
-export LINKFLAGS += -Wl,--gc-sections
+PROGRAMMERS_SUPPORTED += lpc2k_pgm
 
-# use the nano-specs of Newlib when available
-USEMODULE += newlib_nano
+# when using miniterm set RTS and DTR lines to 0, otherwise the board is reset
+MINITERMFLAGS += --rts 0 --dtr 0
 
-ifeq ($(PORT),)
-  export PORT = /dev/ttyUSB0
-endif
-export FFLAGS = $(PORT) $(HEXFILE)
-
-INCLUDES += -I$(RIOTBOARD)/common/msba2/include
-INCLUDES += -I$(RIOTBOARD)/common/msba2/drivers/include
-
-export UNDEF += $(BINDIR)/cpu/startup.o
-
-USEMODULE += boards_common_msba2-drivers
+PYTERMFLAGS += -tg

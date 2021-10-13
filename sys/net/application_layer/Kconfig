@@ -1,0 +1,23 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menu "CoAP"
+
+rsource "Kconfig.coap"
+rsource "gcoap/Kconfig"
+rsource "nanocoap/Kconfig"
+
+endmenu # CoAP
+
+rsource "cord/Kconfig"
+rsource "dhcpv6/Kconfig"
+
+menu "MQTT-SN"
+
+rsource "asymcute/Kconfig"
+rsource "emcute/Kconfig"
+
+endmenu # MQTT-SN

@@ -27,15 +27,19 @@
 #error "Do not include this file directly! Use xtimer.h instead"
 #endif
 
+#ifdef MODULE_XTIMER_ON_ZTIMER
+#include "ztimer.h"
+#else
 #include "periph/timer.h"
+#endif
+
+#include "irq.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if XTIMER_MASK
-extern volatile uint32_t _xtimer_high_cnt;
-#endif
+extern volatile uint64_t _xtimer_current_time;
 
 /**
  * @brief IPC message type for xtimer msg callback
@@ -47,7 +51,12 @@ extern volatile uint32_t _xtimer_high_cnt;
  */
 static inline uint32_t _xtimer_lltimer_now(void)
 {
+#ifndef MODULE_XTIMER_ON_ZTIMER
     return timer_read(XTIMER_DEV);
+#else
+    return ztimer_now(ZTIMER_USEC);
+#endif
+
 }
 
 /**
@@ -65,17 +74,19 @@ static inline uint32_t _xtimer_lltimer_mask(uint32_t val)
  * @brief xtimer internal stuff
  * @internal
  */
-uint64_t _xtimer_now64(void);
-int _xtimer_set_absolute(xtimer_t *timer, uint32_t target);
-void _xtimer_set(xtimer_t *timer, uint32_t offset);
+
+uint32_t _xtimer_now(void);
+
 void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset);
 void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period);
-void _xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid);
-void _xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t target_pid);
 void _xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid);
 void _xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid);
+#ifdef MODULE_CORE_MSG
 int _xtimer_msg_receive_timeout(msg_t *msg, uint32_t ticks);
 int _xtimer_msg_receive_timeout64(msg_t *msg, uint64_t ticks);
+void _xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid);
+void _xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t target_pid);
+#endif /* MODULE_CORE_MSG */
 
 /**
  * @brief  Sleep for the given number of ticks
@@ -93,24 +104,23 @@ void _xtimer_tsleep(uint32_t offset, uint32_t long_offset);
 #ifndef DOXYGEN
 /* Doxygen warns that these are undocumented, but the documentation can be found in xtimer.h */
 
-static inline uint32_t _xtimer_now(void)
+static inline uint64_t _xtimer_now64(void)
 {
+    uint32_t now, elapsed;
+
+    /* time sensitive since _xtimer_current_time is updated here */
+    unsigned state = irq_disable();
+    now = _xtimer_lltimer_now();
 #if XTIMER_MASK
-    uint32_t latched_high_cnt, now;
-
-    /* _high_cnt can change at any time, so check the value before
-     * and after reading the low-level timer. If it hasn't changed,
-     * then it can be safely applied to the timer count. */
-
-    do {
-        latched_high_cnt = _xtimer_high_cnt;
-        now = _xtimer_lltimer_now();
-    } while (_xtimer_high_cnt != latched_high_cnt);
-
-    return latched_high_cnt | now;
+    elapsed = _xtimer_lltimer_mask(now - _xtimer_lltimer_mask((uint32_t)_xtimer_current_time));
+    _xtimer_current_time += (uint64_t)elapsed;
 #else
-    return _xtimer_lltimer_now();
+    elapsed = now - ((uint32_t)_xtimer_current_time & 0xFFFFFFFF);
+    _xtimer_current_time += (uint64_t)elapsed;
 #endif
+    irq_restore(state);
+
+    return _xtimer_current_time;
 }
 
 static inline xtimer_ticks32_t xtimer_now(void)
@@ -161,6 +171,11 @@ static inline void xtimer_spin(xtimer_ticks32_t ticks) {
     _xtimer_spin(ticks.ticks32);
 }
 
+static inline void xtimer_msleep(uint32_t milliseconds)
+{
+    _xtimer_tsleep64(_xtimer_ticks_from_usec64(milliseconds * US_PER_MS));
+}
+
 static inline void xtimer_usleep(uint32_t microseconds)
 {
     _xtimer_tsleep32(_xtimer_ticks_from_usec(microseconds));
@@ -196,16 +211,6 @@ static inline void xtimer_periodic_wakeup(xtimer_ticks32_t *last_wakeup, uint32_
     _xtimer_periodic_wakeup(&last_wakeup->ticks32, _xtimer_ticks_from_usec(period));
 }
 
-static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid)
-{
-    _xtimer_set_msg(timer, _xtimer_ticks_from_usec(offset), msg, target_pid);
-}
-
-static inline void xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t target_pid)
-{
-    _xtimer_set_msg64(timer, _xtimer_ticks_from_usec64(offset), msg, target_pid);
-}
-
 static inline void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid)
 {
     _xtimer_set_wakeup(timer, _xtimer_ticks_from_usec(offset), pid);
@@ -218,7 +223,7 @@ static inline void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_
 
 static inline void xtimer_set(xtimer_t *timer, uint32_t offset)
 {
-    _xtimer_set(timer, _xtimer_ticks_from_usec(offset));
+    _xtimer_set64(timer, _xtimer_ticks_from_usec(offset), 0);
 }
 
 static inline void xtimer_set64(xtimer_t *timer, uint64_t period_us)
@@ -227,6 +232,7 @@ static inline void xtimer_set64(xtimer_t *timer, uint64_t period_us)
     _xtimer_set64(timer, ticks, ticks >> 32);
 }
 
+#ifdef MODULE_CORE_MSG
 static inline int xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout)
 {
     return _xtimer_msg_receive_timeout(msg, _xtimer_ticks_from_usec(timeout));
@@ -236,6 +242,17 @@ static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout)
 {
     return _xtimer_msg_receive_timeout64(msg, _xtimer_ticks_from_usec64(timeout));
 }
+
+static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid)
+{
+    _xtimer_set_msg(timer, _xtimer_ticks_from_usec(offset), msg, target_pid);
+}
+
+static inline void xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t target_pid)
+{
+    _xtimer_set_msg64(timer, _xtimer_ticks_from_usec64(offset), msg, target_pid);
+}
+#endif /* MODULE_CORE_MSG */
 
 static inline xtimer_ticks32_t xtimer_ticks_from_usec(uint32_t usec)
 {

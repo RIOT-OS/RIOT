@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_common_atmega
+ * @ingroup     boards_common
  * @{
  *
  * @file
@@ -20,15 +20,14 @@
 
 #include "board.h"
 #include "cpu.h"
-#include "irq.h"
 #include "periph/gpio.h"
 
 void led_init(void);
 
-void board_init(void)
+void __attribute__((weak)) board_init(void)
 {
-    atmega_stdio_init();
     cpu_init();
+#ifdef LED0_ON
     led_init();
-    irq_enable();
+#endif
 }

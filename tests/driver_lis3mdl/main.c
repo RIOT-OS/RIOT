@@ -25,7 +25,7 @@
 #include "lis3mdl.h"
 #include "lis3mdl_params.h"
 
-#define SLEEP       (800 * 800U)
+#define SLEEP_USEC  (800 * 800U)
 
 int main(void)
 {
@@ -54,7 +54,7 @@ int main(void)
         lis3mdl_read_temp(&dev, &temp_value);
         printf("Temperature:\t\t%i°C\n", temp_value);
 
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_USEC);
     }
 
     return 0;

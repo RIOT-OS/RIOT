@@ -61,8 +61,6 @@ void pic_init(void)
 {
     gpio_init(PIC_INT_WAKE_PIN, GPIO_OD);
     gpio_set(PIC_INT_WAKE_PIN);
-
-    i2c_init_master(PIC_I2C, I2C_SPEED_NORMAL);
 }
 
 void pic_write(uint8_t addr, uint8_t value)
@@ -74,7 +72,7 @@ void pic_write(uint8_t addr, uint8_t value)
     /* write to gpio expander */
     i2c_acquire(PIC_I2C);
     uint8_t bytes[] = { addr, value };
-    i2c_write_bytes(PIC_I2C, PIC_I2C_ADDR, bytes, 2);
+    i2c_write_bytes(PIC_I2C, PIC_I2C_ADDR, bytes, 2, 0);
     i2c_release(PIC_I2C);
 
     /* put PIC in sleep mode again */

@@ -1,17 +1,31 @@
 #!/usr/bin/env sh
-echo "SET(CMAKE_SYSTEM_NAME Generic)"
-echo "SET(CMAKE_SYSTEM_VERSION 1)"
+
+# When setting variables, use the 'bracket argument' format to allow having \"
+# inside the string. Which is not supported by quoted arguments
+# https://cmake.org/cmake/help/latest/manual/cmake-language.7.html#bracket-argument
+#
+#     bracket_argument ::=  bracket_open bracket_content bracket_close
+#     bracket_open     ::=  '[' '='* '['
+#     bracket_content  ::=  <any text not containing a bracket_close with
+#                            the same number of '=' as the bracket_open>
+#                            bracket_close    ::=  ']' '='* ']'
+#
+# I will use [==[value]==] in this file, to not maybe match a case with one '='
+# I used it for all variables even ones that currently do not need it.
+
+printf 'SET(CMAKE_SYSTEM_NAME Generic)\n'
+printf 'SET(CMAKE_SYSTEM_VERSION 1)\n'
 # specify the cross compiler"
-echo "SET(CMAKE_C_COMPILER \"${CC}\" CACHE STRING \"\")"
-echo "SET(CMAKE_CXX_COMPILER \"${CXX}\" CACHE STRING \"\")"
-echo "SET(CMAKE_LINKER \"${LINK}\" CACHE STRING \"\")"
-echo "SET(CMAKE_RANLIB \"${RANLIB}\" CACHE STRING \"\")"
+printf 'SET(CMAKE_C_COMPILER [==[%s]==] CACHE STRING "")\n' "${CC}"
+printf 'SET(CMAKE_CXX_COMPILER [==[%s]==] CACHE STRING "")\n' "${CXX}"
+printf 'SET(CMAKE_LINKER [==[%s]==] CACHE STRING "")\n' "${LINK}"
+printf 'SET(CMAKE_RANLIB [==[%s]==] CACHE STRING "")\n' "${RANLIB}"
 # disable linker test
-echo "SET(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)"
-echo "SET(CMAKE_C_FLAGS \"${CFLAGS}\" CACHE STRING \"\")"
-echo "SET(CMAKE_EXE_LINKER_FLAGS \"${LFLAGS}\" CACHE STRING \"\")"
+printf 'SET(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)\n'
+printf 'SET(CMAKE_C_FLAGS [==[%s]==] CACHE STRING "")\n' "${CFLAGS}"
+printf 'SET(CMAKE_EXE_LINKER_FLAGS [==[%s]==] CACHE STRING "")\n' "${LFLAGS}"
 # search for programs in the build host directories
-echo "SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)"
+printf 'SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)\n'
 # for libraries and headers in the target directories
-echo "SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)"
-echo "SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)"
+printf 'SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)\n'
+printf 'SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)\n'

@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_stm32f3discovery STM32F3Discovery
- * @ingroup     boards
- * @brief       Support for the STM32F3Discovery board
+ * @ingroup     boards_stm32f3discovery
  * @{
  *
  * @file
@@ -85,13 +83,19 @@ extern "C" {
 /** @} */
 
 /**
- * @brief User button
+ * @name User button
  * @{
  */
 #define BTN0_PIN            GPIO_PIN(PORT_A, 0)
 #define BTN0_MODE           GPIO_IN
 /** @} */
 
+/**
+ * @name LSM303DLHC magnetometer data ready pin
+ * @{
+ */
+#define LSM303DLHC_PARAM_MAG_PIN    GPIO_PIN(PORT_E, 2)
+/** @} */
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO

@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_samr21-xpro Atmel SAM R21 Xplained Pro
- * @ingroup     boards
- * @brief       Support for the Atmel SAM R21 Xplained Pro board.
+ * @ingroup     boards_samr21-xpro
  * @{
  *
  * @file
@@ -37,6 +35,16 @@ extern "C" {
  */
 #define XTIMER_DEV          TIMER_DEV(1)
 #define XTIMER_CHAN         (0)
+/** @} */
+
+/**
+ * @name    ztimer configuration
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_TYPE    ZTIMER_TYPE_PERIPH_TIMER
+#define CONFIG_ZTIMER_USEC_DEV     TIMER_DEV(1)
+/* timer_set() may underflow for values smaller than 9, set 10 as margin */
+#define CONFIG_ZTIMER_USEC_MIN     (10)
 /** @} */
 
 /**
@@ -73,10 +81,39 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Antenna configuration pin interface
+ * @{
+ */
+#define RFCTL1_PIN          GPIO_PIN(0, 9)
+#define RFCTL2_PIN          GPIO_PIN(0, 12)
+/** @} */
+
+/**
+ * @brief   Antenna configuration values
+ */
+enum {
+    RFCTL_ANTENNA_BOARD,
+    RFCTL_ANTENNA_EXT,
+};
+
+/**
+ * @name    Default antenna configuration
+ * @{
+ */
+#ifndef RFCTL_ANTENNA_DEFAULT
+#define RFCTL_ANTENNA_DEFAULT      RFCTL_ANTENNA_BOARD
+#endif
+/** @} */
+
+/**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
 
+/**
+ * @brief   Set antenna switch
+ */
+void board_antenna_config(uint8_t antenna);
 #ifdef __cplusplus
 }
 #endif

@@ -125,7 +125,7 @@ int pthread_barrierattr_getpshared(const pthread_barrierattr_t *attr, int *pshar
 
 /**
  * @brief     Set if the barrier should be shared with child processes
- * @details   Since RIOT is a single process OS, pthread_barrier_init() wil ignore the value.
+ * @details   Since RIOT is a single process OS, pthread_barrier_init() will ignore the value.
  * @param     attr      Attribute set for pthread_barrier_init()
  * @param     pshared   Either #PTHREAD_PROCESS_PRIVATE or #PTHREAD_PROCESS_SHARED
  * @returns   0, the invocation cannot fail

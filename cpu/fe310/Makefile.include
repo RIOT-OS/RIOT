@@ -1,0 +1,14 @@
+CFLAGS += -Wno-pedantic
+
+RAM_START_ADDR ?= 0x80000000
+RAM_LEN ?= 16K
+
+ifeq ($(CPU_MODEL), fe310_g000)
+  ROM_START_ADDR ?= 0x20400000
+  ROM_LEN ?= 0x1fc00000
+else ifeq ($(CPU_MODEL), fe310_g002)
+  ROM_START_ADDR ?= 0x20010000
+  ROM_LEN ?= 0x0006a120
+endif
+
+include $(RIOTCPU)/riscv_common/Makefile.include

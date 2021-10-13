@@ -1,0 +1,9 @@
+# load the common Makefile.include for Nucleo boards
+include $(RIOTBOARD)/common/nucleo64/Makefile.include
+
+# On-board debugger uses SWD, so JTAG-only pins PA15, PB3(*), and PB4 can be
+# remapped as regular GPIOs instead. (Note: PB3 is also used as SWO. The user
+# needs to take care to not enable SWO with the debugger while at the same time
+# PB3 is used as GPIO. But RIOT does not use SWO in any case, so if a user adds
+# this feature in her/his own code, she/he should be well aware of this.)
+CFLAGS += -DSTM32F1_DISABLE_JTAG

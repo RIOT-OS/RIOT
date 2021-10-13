@@ -75,12 +75,13 @@ extern "C" {
  * @{
  * @name Codes for destination unreachable messages
  *
+ * @anchor net_icmpv6_error_dst_unr_codes
  * @see <a href="https://tools.ietf.org/html/rfc4443#section-3.1">
  *          RFC 4443, section 3.1
  *      </a>
  */
 #define ICMPV6_ERROR_DST_UNR_NO_ROUTE   (0) /**< no route to destination */
-#define ICMPV6_ERROR_DST_UNR_PROHIB     (1) /**< communictation with
+#define ICMPV6_ERROR_DST_UNR_PROHIB     (1) /**< communication with
                                              *   destination administratively
                                              *   prohibited */
 #define ICMPV6_ERROR_DST_UNR_SCOPE      (2) /**< beyond scope of source address */
@@ -97,6 +98,7 @@ extern "C" {
  * @{
  * @name Codes for time exceeded messages
  *
+ * @anchor net_icmpv6_error_time_exc_codes
  * @see <a href="https://tools.ietf.org/html/rfc4443#section-3.3">
  *          RFC 4443, section 3.3
  *      </a>
@@ -111,11 +113,12 @@ extern "C" {
  * @{
  * @name Codes for parameter problem messages
  *
+ * @anchor net_icmpv6_error_param_prob_codes
  * @see <a href="https://tools.ietf.org/html/rfc4443#section-3.4">
  *          RFC 4443, section 3.4
  *      </a>
  */
-#define ICMPV6_ERROR_PARAM_PROB_HDR_FIELD   (0) /**< errorneous header field
+#define ICMPV6_ERROR_PARAM_PROB_HDR_FIELD   (0) /**< erroneous header field
                                                  *   encountered */
 #define ICMPV6_ERROR_PARAM_PROB_NH          (1) /**< unrecognized next header
                                                  *   field encountered */

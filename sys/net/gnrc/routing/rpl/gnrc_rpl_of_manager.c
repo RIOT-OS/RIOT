@@ -10,7 +10,7 @@
 
 /**
  *
- * @ingroup rpl
+ * @ingroup net_gnrc_rpl
  * @{
  * @file
  * @brief   RPL Objective functions manager
@@ -18,13 +18,11 @@
  * @}
  */
 
-
-
 #include "net/gnrc/rpl.h"
 #include "net/gnrc/rpl/of_manager.h"
 #include "of0.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 /* !!! TODO: port etx/mrhof to the new network stack */
 

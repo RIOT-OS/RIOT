@@ -1,10 +1,14 @@
 ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += bmp280_i2c
+  USEMODULE += ccs811
+  USEMODULE += efm32_coretemp
   USEMODULE += saul_gpio
-  USEMODULE += bmp280
   USEMODULE += si7021
 endif
 
+# add board common drivers
+USEMODULE += boards_common_silabs
+USEMODULE += silabs_pic
+
 # include board common dependencies
 include $(RIOTBOARD)/common/silabs/Makefile.dep
-
-include $(RIOTCPU)/efm32/Makefile.dep

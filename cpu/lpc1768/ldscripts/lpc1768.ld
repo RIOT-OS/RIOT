@@ -21,9 +21,9 @@
 MEMORY
 {
     rom (rx)        : ORIGIN = 0x00000000, LENGTH = 512K
-    ram (rwx)       : ORIGIN = 0x100000C8, LENGTH = (32K - 0xC8)
-    usb_ram (rwx)   : ORIGIN = 0x2007C000, LENGTH = 16K
-    eth_ram (rwx)   : ORIGIN = 0x20080000, LENGTH = 16K
+    ram (w!rx)      : ORIGIN = 0x100000C8, LENGTH = (32K - 0xC8)
+    usb_ram         : ORIGIN = 0x2007C000, LENGTH = 16K
+    eth_ram         : ORIGIN = 0x20080000, LENGTH = 16K
 }
 
 INCLUDE cortexm_base.ld

@@ -9,7 +9,7 @@
 #include "net/af.h"
 #include "net/sock/udp.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #include "coap.h"

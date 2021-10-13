@@ -1,0 +1,217 @@
+From cf9073ddfebe79941fba7fd718549ff1d5dc29ed Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Tue, 1 Dec 2020 12:05:42 +0100
+Subject: [PATCH 11/13] treewide: changes to use RIOT sock
+
+---
+ inc/opendefs.h                                     |  3 ++-
+ openapps/uecho/uecho.c                             |  9 +++++++--
+ openapps/uexpiration_monitor/uexpiration_monitor.c |  9 +++++++--
+ openapps/uinject/uinject.c                         |  9 +++++++--
+ openstack/04-TRAN/{ => sock}/async.h               |  0
+ openstack/04-TRAN/{ => sock}/async_types.h         |  0
+ openstack/04-TRAN/{ => sock}/sock.c                |  0
+ openstack/04-TRAN/{ => sock}/sock.h                |  0
+ openstack/04-TRAN/{ => sock}/sock_types.h          |  0
+ openstack/openstack.c                              |  8 +++++++-
+ openweb/opencoap/coap.c                            |  7 ++++---
+ openweb/opencoap/coap.h                            | 13 +++++++++----
+ 12 files changed, 43 insertions(+), 15 deletions(-)
+ rename openstack/04-TRAN/{ => sock}/async.h (100%)
+ rename openstack/04-TRAN/{ => sock}/async_types.h (100%)
+ rename openstack/04-TRAN/{ => sock}/sock.c (100%)
+ rename openstack/04-TRAN/{ => sock}/sock.h (100%)
+ rename openstack/04-TRAN/{ => sock}/sock_types.h (100%)
+
+diff --git a/inc/opendefs.h b/inc/opendefs.h
+index 29076b5c..6a263ca0 100644
+--- a/inc/opendefs.h
++++ b/inc/opendefs.h
+@@ -17,7 +17,8 @@
+ #include "config.h"
+ #include "toolchain_defs.h"
+ #include "board_info.h"
+-#include "af.h"
++#include "net/af.h"
++// #include "af.h"
+ 
+ 
+ //=========================== define ==========================================
+diff --git a/openapps/uecho/uecho.c b/openapps/uecho/uecho.c
+index 4c4a6ec8..036ccfa3 100644
+--- a/openapps/uecho/uecho.c
++++ b/openapps/uecho/uecho.c
+@@ -4,12 +4,17 @@
+ 
+ #include "opendefs.h"
+ #include "uecho.h"
+-#include "sock.h"
+-#include "async.h"
++// #include "sock.h"
++// #include "async.h"
+ #include "openqueue.h"
+ #include "openserial.h"
+ #include "packetfunctions.h"
+ 
++#ifdef SOCK_HAS_ASYNC
++#include "net/sock/async.h"
++#endif
++#include "net/sock/udp.h"
++
+ //=========================== variables =======================================
+ 
+ sock_udp_t uecho_sock;
+diff --git a/openapps/uexpiration_monitor/uexpiration_monitor.c b/openapps/uexpiration_monitor/uexpiration_monitor.c
+index 37155c25..c67e31dd 100644
+--- a/openapps/uexpiration_monitor/uexpiration_monitor.c
++++ b/openapps/uexpiration_monitor/uexpiration_monitor.c
+@@ -4,8 +4,8 @@
+ 
+ #include "opendefs.h"
+ #include "uexpiration_monitor.h"
+-#include "sock.h"
+-#include "async.h"
++// #include "sock.h"
++// #include "async.h"
+ #include "openserial.h"
+ #include "packetfunctions.h"
+ 
+@@ -13,6 +13,11 @@
+ #include "iphc.h"
+ #endif
+ 
++#ifdef SOCK_HAS_ASYNC
++#include "net/sock/async.h"
++#endif
++#include "net/sock/udp.h"
++
+ //=========================== variables =======================================
+ 
+ static sock_udp_t _sock;
+diff --git a/openapps/uinject/uinject.c b/openapps/uinject/uinject.c
+index 499d6633..08d9bbe6 100644
+--- a/openapps/uinject/uinject.c
++++ b/openapps/uinject/uinject.c
+@@ -4,8 +4,8 @@
+ 
+ #include "opendefs.h"
+ #include "uinject.h"
+-#include "sock.h"
+-#include "async.h"
++// #include "sock.h"
++// #include "async.h"
+ #include "openserial.h"
+ #include "packetfunctions.h"
+ #include "scheduler.h"
+@@ -15,6 +15,11 @@
+ #include "idmanager.h"
+ #include "openrandom.h"
+ 
++#ifdef SOCK_HAS_ASYNC
++#include "net/sock/async.h"
++#endif
++#include "net/sock/udp.h"
++
+ #include "msf.h"
+ 
+ //=========================== defines =========================================
+diff --git a/openstack/04-TRAN/async.h b/openstack/04-TRAN/sock/async.h
+similarity index 100%
+rename from openstack/04-TRAN/async.h
+rename to openstack/04-TRAN/sock/async.h
+diff --git a/openstack/04-TRAN/async_types.h b/openstack/04-TRAN/sock/async_types.h
+similarity index 100%
+rename from openstack/04-TRAN/async_types.h
+rename to openstack/04-TRAN/sock/async_types.h
+diff --git a/openstack/04-TRAN/sock.c b/openstack/04-TRAN/sock/sock.c
+similarity index 100%
+rename from openstack/04-TRAN/sock.c
+rename to openstack/04-TRAN/sock/sock.c
+diff --git a/openstack/04-TRAN/sock.h b/openstack/04-TRAN/sock/sock.h
+similarity index 100%
+rename from openstack/04-TRAN/sock.h
+rename to openstack/04-TRAN/sock/sock.h
+diff --git a/openstack/04-TRAN/sock_types.h b/openstack/04-TRAN/sock/sock_types.h
+similarity index 100%
+rename from openstack/04-TRAN/sock_types.h
+rename to openstack/04-TRAN/sock/sock_types.h
+diff --git a/openstack/openstack.c b/openstack/openstack.c
+index c220b8ff..a5b8c468 100644
+--- a/openstack/openstack.c
++++ b/openstack/openstack.c
+@@ -34,7 +34,13 @@
+ #include "icmpv6echo.h"
+ #include "icmpv6rpl.h"
+ //-- 04-TRAN
+-#include "sock.h"
++// #include "sock.h"
++#if OPENWSN_UDP_C
++#ifdef SOCK_HAS_ASYNC
++#include "net/sock/async.h"
++#endif
++#include "net/sock/udp.h"
++#endif
+ 
+ //===== application-layer
+ #include "openweb.h"
+diff --git a/openweb/opencoap/coap.c b/openweb/opencoap/coap.c
+index 95b314d5..779c8c81 100644
+--- a/openweb/opencoap/coap.c
++++ b/openweb/opencoap/coap.c
+@@ -93,8 +93,9 @@ void coap_init(void) {
+ 
+     // register at UDP stack
+     memset(&coap_vars.sock, 0, sizeof(sock_udp_t));
++    local.family = AF_INET6;
++    local.netif = SOCK_ADDR_ANY_NETIF;
+     local.port = WKP_UDP_COAP;
+-
+     if (sock_udp_create(&coap_vars.sock, &local, NULL, 0) < 0) {
+         openserial_printf("Could not create socket\n");
+         return;
+@@ -1023,9 +1024,9 @@ owerror_t coap_sock_send_internal(OpenQueueEntry_t *msg) {
+     int16_t res;
+ 
+     // init remote endpoint
+-    remote.family = AF_INET6;
+     memcpy(&remote.addr, &msg->l3_destinationAdd.addr_128b, LENGTH_ADDR128b);
+-    remote.netif = 0;
++    remote.family = AF_INET6;
++    remote.netif = SOCK_ADDR_ANY_NETIF;
+     remote.port = msg->l4_destination_port;
+ 
+     if ((res = sock_udp_send(&coap_vars.sock, msg->payload, msg->length, &remote)) >= 0) {
+diff --git a/openweb/opencoap/coap.h b/openweb/opencoap/coap.h
+index c7305a4e..8b9b89ac 100644
+--- a/openweb/opencoap/coap.h
++++ b/openweb/opencoap/coap.h
+@@ -9,9 +9,14 @@
+ */
+ 
+ #include "config.h"
+-#include "sock.h"
+-#include "async.h"
+-
++#include "opendefs.h"
++// #include "sock.h"
++// #include "async.h"
++
++#ifdef SOCK_HAS_ASYNC
++#include "net/sock/async.h"
++#endif
++#include "net/sock/udp.h"
+ //=========================== define ==========================================
+ 
+ // IPv6 addresses of servers on the Internet
+@@ -166,7 +171,7 @@ typedef struct {
+     uint8_t commonIV[AES_CCM_16_64_128_IV_LEN];
+     uint8_t idContext[OSCOAP_MAX_ID_LEN];
+     uint8_t idContextLen;
+-    // sender context 
++    // sender context
+     uint8_t senderID[OSCOAP_MAX_ID_LEN];
+     uint8_t senderIDLen;
+     uint8_t senderKey[AES_CCM_16_64_128_KEY_LEN];
+-- 
+2.28.0
+

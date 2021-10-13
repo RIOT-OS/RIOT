@@ -1,6 +1,0 @@
-## the cpu to build for
-export CPU = stm32f1
-export CPU_MODEL = stm32f103rb
-
-# load the common Makefile.include for Nucleo boards
-include $(RIOTBOARD)/common/nucleo64/Makefile.include

@@ -1,0 +1,5 @@
+# this file enables modules defined in Kconfig. Do not use this file for
+# application configuration. This is only needed during migration.
+CONFIG_MODULE_PH_OEM=y
+CONFIG_MODULE_EVENT=y
+CONFIG_MODULE_EVENT_CALLBACK=y

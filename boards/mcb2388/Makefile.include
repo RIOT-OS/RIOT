@@ -1,0 +1,6 @@
+# FLASHER will be lpc2k_pgm still
+OPENOCD_DEBUG_ADAPTER ?= dap
+JLINK_DEVICE := LPC2388
+OPENOCD_TRANSPORT := jtag
+
+include $(RIOTBOARD)/common/msba2/Makefile.include

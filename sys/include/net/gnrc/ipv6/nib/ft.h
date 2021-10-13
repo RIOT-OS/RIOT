@@ -139,7 +139,6 @@ void gnrc_ipv6_nib_ft_del(const ipv6_addr_t *dst, unsigned dst_len);
 bool gnrc_ipv6_nib_ft_iter(const ipv6_addr_t *next_hop, unsigned iface,
                            void **state, gnrc_ipv6_nib_ft_t *fte);
 
-
 /**
  * @brief   Prints a forwarding table entry
  *

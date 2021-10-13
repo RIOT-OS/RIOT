@@ -1,0 +1,3 @@
+CPU_MODEL = nrf52811xxaa
+
+include $(RIOTBOARD)/common/e104-bt50xxa-tb/Makefile.features

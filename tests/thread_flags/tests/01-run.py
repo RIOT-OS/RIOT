@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import os
 import sys
+from testrunner import run
 
 
 def testfunc(child):
@@ -24,10 +24,10 @@ def testfunc(child):
     child.expect_exact("thread(): received flags: 0x0008")
     child.expect_exact("main: setting 100ms timeout...")
     child.expect("main: timeout triggered. time passed: [0-9]{6}us")
+    child.expect_exact("main: setting 100ms timeout (using uint64)...")
+    child.expect("main: timeout triggered. time passed: [0-9]{6}us")
     child.expect("SUCCESS")
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-    from testrunner import run
     sys.exit(run(testfunc))

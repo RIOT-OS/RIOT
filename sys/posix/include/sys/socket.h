@@ -42,7 +42,6 @@
 #include <sys/types.h>
 #include <sys/uio.h>
 
-#include "kernel_types.h"
 #include "net/af.h"
 #include "sys/bytes.h"
 
@@ -136,7 +135,6 @@ struct sockaddr_storage {
     uint8_t ss_data[SOCKADDR_MAX_DATA_LEN]; /**< Socket address */
 };
 
-
 /**
  * @brief   Accept a new connection on a socket
  * @details The accept() function shall extract the first connection on the
@@ -229,7 +227,7 @@ int bind(int socket, const struct sockaddr *address,
  *                          on the address family of the socket.
  * @param[in] address_len   Specifies the length of the sockaddr structure
  *                          pointed to by the address argument.
- * @post The socket will be implicitely bound to an addressed, if it is not already bound.
+ * @post The socket will be implicitly bound to an addressed, if it is not already bound.
  *       According to
  *       http://pubs.opengroup.org/onlinepubs/009695399/functions/connect.html
  *       for a "socket [that] has not already been bound to a local address,
@@ -408,7 +406,7 @@ static inline ssize_t recv(int socket, void *buffer, size_t length, int flags)
  * @param[in] address_len   Specifies the length of the sockaddr structure pointed
  *                          to by the @p address argument.
  *
- * @post    The socket will implicitely be bound to the unspecified address and
+ * @post    The socket will implicitly be bound to the unspecified address and
  *          a random port, in case it is not already bound. Rationale: A client
  *          should not require to explicitly call bind() to receive packets,
  *          but is expected to receive replies sent to the ephemeral port that

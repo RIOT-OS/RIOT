@@ -1,26 +1,18 @@
-# define the used CPU
-export CPU = nrf51
-export CPU_MODEL = nrf51x22xxab
-
 # define the default port depending on the host OS
-PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
+# for this board we support flashing via openocd or pyocd
+PROGRAMMER ?= openocd
+PROGRAMMERS_SUPPORTED += pyocd
 
-# we support flashing through plain fscopy or using JLink
-PROGRAMMER ?= fscopy
-ifeq (fscopy,$(PROGRAMMER))
-  export FFLAGS =
-  export DEBUGGER_FLAGS =
+OPENOCD_DEBUG_ADAPTER = dap
 
-  export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-  export DEBUGGER =
-  export DEBUGSERVER =
-else ifeq (jlink,$(PROGRAMMER))
-  export JLINK_DEVICE := nrf51822
-  include $(RIOTMAKE)/tools/jlink.inc.mk
-else
-  $(info ERROR: invalid flash tool specified)
+# QEMU 4.0 added microbit system emulation.
+RIOT_EMULATOR ?= qemu
+
+ifneq (,$(filter microbit,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBOARD)/common/microbit/include
 endif
+
+# include nrf51 boards common configuration
+include $(RIOTBOARD)/common/nrf51/Makefile.include

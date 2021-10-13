@@ -1,0 +1,17 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_AT25XXX
+    bool "AT25xxx SPI-EEPROMs"
+    depends on HAS_PERIPH_SPI
+    depends on TEST_KCONFIG
+    select HAVE_MTD_AT25XXX
+    select MODULE_PERIPH_SPI
+    select MODULE_XTIMER
+    help
+        This driver also supports M95xxx, 25AAxxx, 25LCxxx, CAT25xxx & BR25Sxxx
+        families.

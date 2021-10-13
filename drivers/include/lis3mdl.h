@@ -9,7 +9,10 @@
 /**
  * @defgroup    drivers_lis3mdl LIS3MDL 3-axis magnetometer
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Device driver for the LIS3MDL 3-axis magnetometer
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file
@@ -102,7 +105,6 @@ typedef struct {
     lis3mdl_scale_t scale;           /**< Scale factor */
     lis3mdl_op_t op_mode;            /**< Operation mode */
 } lis3mdl_params_t;
-
 
 /**
  * @brief   Device descriptor for LIS3MDL sensor

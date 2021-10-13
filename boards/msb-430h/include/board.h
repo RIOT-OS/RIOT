@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_msb430h MSB-430H
- * @ingroup     boards
- * @brief       Support for the ScatterWeb MSB-430H board
+ * @ingroup     boards_msb430h
  * @{
  *
  * @file
@@ -45,6 +43,14 @@ extern "C" {
 #define F_RC_OSCILLATOR             32768
 #define MSP430_HAS_DCOR             1
 #define MSP430_HAS_EXTERNAL_CRYSTAL 1
+/** @} */
+
+/**
+ * @name   Configure on-board SHT11 device
+ * @{
+ */
+#define SHT1X_PARAM_CLK             (GPIO_PIN(3, 5))
+#define SHT1X_PARAM_DATA            (GPIO_PIN(3, 4))
 /** @} */
 
 #ifdef __cplusplus

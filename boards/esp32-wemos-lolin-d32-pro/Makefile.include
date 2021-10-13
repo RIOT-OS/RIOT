@@ -1,0 +1,3 @@
+PSEUDOMODULES += esp_lolin_tft
+
+include $(RIOTBOARD)/common/esp32/Makefile.include

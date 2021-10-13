@@ -1,0 +1,134 @@
+#
+# ztimer dependencies
+#
+
+# "ztimer" is the default meta-module of ztimer
+ifneq (,$(filter ztimer,$(USEMODULE)))
+  USEMODULE += ztimer_core
+  USEMODULE += ztimer_convert_frac
+  USEMODULE += ztimer_convert_shift
+
+  # ztimer's auto_init code resides in it's submodule "ztimer_auto_init",
+  # but RIOT's auto_init scheme expects "auto_init_ztimer" in DEFAULT_MODULES so
+  # it can be disabled (by adding to DISABLE_MODULES).
+  #
+  # "auto_init_%" modules cannot have further dependencies, so we cannot do
+  # "if auto_init_ztimer: use ztimer_auto_init".
+  #
+  # So, if neither "auto_init" nor "auto_init_ztimer" are disabled, pull in
+  # "ztimer_auto_init".
+  DEFAULT_MODULE += auto_init_ztimer
+  ifeq (,$(filter auto_init auto_init_ztimer,$(DISABLE_MODULE)))
+    USEMODULE += ztimer_auto_init
+  endif
+endif
+
+# unless ztimer_xtimer_compat is used, make xtimer use ztimer_usec as backend.
+ifneq (,$(filter ztimer_periph_timer,$(USEMODULE)))
+  ifneq  (,$(filter xtimer,$(USEMODULE)))
+    ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+      USEMODULE += xtimer_on_ztimer
+    endif
+  endif
+  ifneq (,$(filter evtimer,$(USEMODULE)))
+    USEMODULE += evtimer_on_ztimer
+  endif
+endif
+
+# make xtimer use ztimer_usec as low level timer
+ifneq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
+  USEMODULE += ztimer_usec
+endif
+
+# make evtimer use ztimer_msec as low level timer
+ifneq (,$(filter evtimer_on_ztimer,$(USEMODULE)))
+  USEMODULE += ztimer_msec
+  USEMODULE += ztimer_now64
+endif
+
+# "ztimer_xtimer_compat" is a wrapper of the xtimer API on ztimer_used
+# (it is currently incomplete). Unless doing testing, use "xtimer_on_ztimer".
+ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+  USEMODULE += div
+  USEMODULE += ztimer_usec
+endif
+
+ifneq (,$(filter ztimer_%,$(USEMODULE)))
+  USEMODULE += ztimer_core
+  USEMODULE += ztimer_extend
+endif
+
+ifneq (,$(filter ztimer_convert_%,$(USEMODULE)))
+  USEMODULE += ztimer_convert
+endif
+
+ifneq (,$(filter ztimer_periph_timer,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_timer
+endif
+
+ifneq (,$(filter ztimer_periph_rtc,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_rtc
+endif
+
+ifneq (,$(filter ztimer_periph_rtt,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_rtt
+endif
+
+ifneq (,$(filter ztimer_periph_ptp,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_ptp_timer
+endif
+
+ifneq (,$(filter ztimer_convert_frac,$(USEMODULE)))
+  USEMODULE += frac
+endif
+
+ifneq (,$(filter ztimer_usec,$(USEMODULE)))
+  USEMODULE += ztimer
+  USEMODULE += ztimer_periph_timer
+endif
+
+ifneq (,$(filter ztimer_msec,$(USEMODULE)))
+  USEMODULE += ztimer
+  FEATURES_OPTIONAL += periph_rtt
+  # HACK: periph_rtt will get used only in the next iteration but an updated
+  # state for FEATURES_USED is needed here so include `features_check.inc.mk`
+  # here instead.
+  # An other option would be to check FEATURES_PROVIDED this would avoid the
+  # order of inclusion problem but it would no take into account possible conflicts
+  # and is also currently not allowed in the build system.
+  # An other alternative would be to delay to the next loop, but this produce a
+  # case where another loop is not executed and the conditional not evaluated
+  # If these kind of usecases pop up before Kconfig migration is completed
+  # then another alternative would be introduce a variable to require an extra
+  # loop independent of USEMODULE, FEATURES_REQUIRED and USEPKG
+  include $(RIOTMAKE)/features_check.inc.mk
+  ifneq (,$(filter periph_rtt,$(FEATURES_USED)))
+    USEMODULE += ztimer_periph_rtt
+  else
+    USEMODULE += ztimer_periph_timer
+  endif
+endif
+
+ifneq (,$(filter ztimer_sec,$(USEMODULE)))
+  USEMODULE += ztimer
+  # try to use RTC unless we are on native, as it is based on xtimer it is
+  # actually buggy
+  ifeq (,$(filter native,$(BOARD)))
+    FEATURES_OPTIONAL += periph_rtc
+  endif
+  # HACK: see above
+  include $(RIOTMAKE)/features_check.inc.mk
+  ifneq (,$(filter periph_rtc,$(FEATURES_USED)))
+    USEMODULE += ztimer_periph_rtc
+  else
+    # if there is no RTC try to use RTT
+    FEATURES_OPTIONAL += periph_rtt
+    # HACK: see above
+    include $(RIOTMAKE)/features_check.inc.mk
+    ifneq (,$(filter periph_rtt,$(FEATURES_USED)))
+      USEMODULE += ztimer_periph_rtt
+    else
+      USEMODULE += ztimer_periph_timer
+    endif
+  endif
+endif

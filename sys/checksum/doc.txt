@@ -9,7 +9,7 @@
 
 /**
  * @defgroup    sys_checksum Checksum
- * @ingroup     sys
+ * @ingroup     sys_hashes
  * @brief       Checksum function libraries
  *
  * This module provides a number of checksum functions. Most notably is the

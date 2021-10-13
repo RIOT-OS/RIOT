@@ -1,0 +1,29 @@
+# Copyright (c) 2021 Freie Universität Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD
+    default "nucleo-wl55jc" if BOARD_NUCLEO_WL55JC
+
+config BOARD_NUCLEO_WL55JC
+    bool
+    default y
+    select BOARD_COMMON_NUCLEO64
+    select CPU_MODEL_STM32WL55JC
+
+    # Put defined MCU peripherals here (in alphabetical order)
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_LPUART
+    select HAS_PERIPH_RTT
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+
+    # Put other features for this board (in alphabetical order)
+    select HAS_ARDUINO
+    select HAS_RIOTBOOT
+
+source "$(RIOTBOARD)/common/nucleo64/Kconfig"

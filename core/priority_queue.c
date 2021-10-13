@@ -22,13 +22,13 @@
 
 #include "priority_queue.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 void priority_queue_remove(priority_queue_t *root_, priority_queue_node_t *node)
 {
     /* The strict aliasing rules allow this assignment. */
-    priority_queue_node_t *root = (priority_queue_node_t *) root_;
+    priority_queue_node_t *root = (priority_queue_node_t *)root_;
 
     while (root->next != NULL) {
         if (root->next == node) {
@@ -44,6 +44,7 @@ void priority_queue_remove(priority_queue_t *root_, priority_queue_node_t *node)
 priority_queue_node_t *priority_queue_remove_head(priority_queue_t *root)
 {
     priority_queue_node_t *head = root->first;
+
     if (head) {
         root->first = head->next;
     }
@@ -53,7 +54,7 @@ priority_queue_node_t *priority_queue_remove_head(priority_queue_t *root)
 void priority_queue_add(priority_queue_t *root, priority_queue_node_t *new_obj)
 {
     /* The strict aliasing rules allow this assignment. */
-    priority_queue_node_t *node = (priority_queue_node_t *) root;
+    priority_queue_node_t *node = (priority_queue_node_t *)root;
 
     while (node->next != NULL) {
         /* not trying to add the same node twice */
@@ -71,18 +72,20 @@ void priority_queue_add(priority_queue_t *root, priority_queue_node_t *new_obj)
     new_obj->next = NULL;
 }
 
-#if ENABLE_DEBUG
+#if IS_ACTIVE(ENABLE_DEBUG)
 void priority_queue_print(priority_queue_t *root)
 {
     printf("queue:\n");
 
     for (priority_queue_node_t *node = root->first; node; node = node->next) {
-        printf("Data: %u Priority: %lu\n", node->data, (unsigned long) node->priority);
+        printf("Data: %u Priority: %lu\n", node->data,
+               (unsigned long)node->priority);
     }
 }
 
 void priority_queue_print_node(priority_queue_node_t *node)
 {
-    printf("Data: %u Priority: %lu Next: %u\n", (unsigned int) node->data, (unsigned long) node->priority, (unsigned int)node->next);
+    printf("Data: %u Priority: %lu Next: %u\n", (unsigned int)node->data,
+           (unsigned long)node->priority, (unsigned int)node->next);
 }
 #endif

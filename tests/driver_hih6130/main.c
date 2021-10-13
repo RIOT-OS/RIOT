@@ -32,19 +32,13 @@
 #include "xtimer.h"
 #include "hih6130.h"
 
-#define SLEEP    (100 * 1000U)
+#define SLEEP_USEC  (100 * 1000U)
 
 int main(void)
 {
     hih6130_t dev;
 
     puts("HIH6130 sensor driver test application\n");
-    printf("Initializing I2C_%i... ", TEST_HIH6130_I2C);
-    if (i2c_init_master(TEST_HIH6130_I2C, I2C_SPEED_FAST) < 0) {
-        puts("[Failed]");
-        return -1;
-    }
-    puts("[OK]");
 
     printf("Initializing HIH6130 sensor at I2C_%i, address 0x%02x... ",
         TEST_HIH6130_I2C, TEST_HIH6130_ADDR);
@@ -58,7 +52,7 @@ int main(void)
         float integral = 0.f;
         float fractional;
 
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_USEC);
 
         status = hih6130_get_humidity_temperature_float(&dev, &hum, &temp);
         if (status < 0) {
@@ -71,10 +65,10 @@ int main(void)
         /* Split value into two integer parts for printing. */
         fractional = modff(hum, &integral);
         printf("humidity: %4d.%04u %%",
-            (int)integral, (unsigned int)abs(fractional * 10000.f));
+            (int)integral, (unsigned int)abs((int)(fractional * 10000.f)));
         fractional = modff(temp, &integral);
         printf("  temperature: %4d.%04u C\n",
-            (int)integral, (unsigned int)abs(fractional * 10000.f));
+            (int)integral, (unsigned int)abs((int)(fractional * 10000.f)));
     }
 
     return 0;

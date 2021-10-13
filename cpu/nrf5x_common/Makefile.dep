@@ -1,0 +1,12 @@
+# include nrf5x common periph drivers
+USEMODULE += nrf5x_common_periph
+
+# link common cpu code
+USEMODULE += cpu_common
+
+# per default, enable DCDC converter if an external LC filter is provided
+# reg1 feature denotes state 1 on two-stage regulator models or the single
+# state in single-regulator models
+FEATURES_OPTIONAL += vdd_lc_filter_reg1
+# reg0 feature denotes stage 0 two-stage regulator models
+FEATURES_OPTIONAL += vdd_lc_filter_reg0

@@ -1,0 +1,156 @@
+/**
+ * @defgroup pkg_wolfssl  WolfSSL Embedded SSL/TLS library
+ * @ingroup  pkg
+ * @ingroup  net net_dtls
+ * @brief    Provides the WolfSSL SSL/TLS solution
+ *
+ * # Introduction
+ *
+ * This package provides an embedded SSL/TLS library specifically developed for
+ * memory-constrained devices.
+ *
+ * # License
+ *
+ * wolfSSL’s software is available under two distinct licensing models:
+ * Open Source (GPLv2) or proprietary.
+ *
+ * Open Source
+ *
+ * wolfSSL (formerly CyaSSL) offers multiple products including, but not limited
+ * to:
+ *
+ * wolfSSL
+ * wolfCrypt
+ * wolfMQTT
+ * wolfSSH
+ *
+ * These software products are free software and may be modified to
+ * the needs of the user as long as the user adheres to version two of the GPL
+ * License. The GPLv2 license can be found on the gnu.org website
+ * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
+ *
+ *
+ * Commercial Licensing
+ *
+ * Businesses and enterprises who wish to incorporate wolfSSL products into
+ * proprietary appliances or other commercial software products for
+ * re-distribution must license commercial versions. Commercial licenses for
+ * wolfSSL, yaSSL, and wolfCrypt are available. Licenses are generally issued
+ * for one product and include unlimited royalty-free distribution. Custom
+ * licensing terms are also available.
+ *
+ * Commercial licenses are also available for wolfMQTT and wolfSSH.
+ * Please contact licensing@wolfssl.com with inquiries.
+ *
+ * @see https://github.com/wolfssl/wolfssl.git
+ *
+ *
+ * wolfSSL is securing over 2 billion end points today and is one of the
+ * industry leading SSL/TLS/Cryptographic providers for embedded systems and the
+ * IoT space. wolfSSL is very excited to be working with the RIOT-OS team!
+ *
+ * You can easily take advantage of wolfSSL by using the following in your
+ * application Makefile:
+ *
+ * ```makefile
+ * USEPKG += wolfssl
+ * ```
+ *
+ * Don't forget to use the wolfSSL settings header in your app. This header
+ * should always be included FIRST preceding any other wolfSSL headers to
+ * ensure the correct configuration is picked up when including other wolfSSL
+ * headers:
+ *
+ * ```c
+ * #include <wolfssl/wolfcrypt/settings.h>
+ * ```
+ *
+ * FEATURES:
+ *
+ * Because wolfSSL was designed with embedded systems in mind the library is
+ * extremely modular. There are very few dependencies in wolfSSL Cryptographic
+ * library and we have chosen to setup the pkg makefile to allow for easy
+ * modification by developers. We chose to include the core of our library in a
+ * singular list and then separate out the features that a developer may or may
+ * not wish to use by default. Please reference the Makefile.wolfssl in
+ * "<RIOT-root>/pkg/wolfssl" directory. wolfSSL has chosen to enable a
+ * significant portion of our wolfcrypt functionality by default and provided
+ * informative comments to explain how a feature might be enabled/disabled.
+ *
+ * Features should be controlled with the header "user_settings.h" included with
+ * the package.
+ * On RIOT-OS, wolfSSL and wolfCrypt libraries can be configured using
+ * PSEUDOMODULES. After selecting the wolfSSL package via:
+ *
+ * ```makefile
+ * USEPKG+=wolfssl
+ * ```
+ *
+ * Single ciphers, algorithms and features can be selected by including the
+ * associated pseudomodule, e.g.:
+ *
+ * ```makefile
+ * USEMODULE += wolfcrypt
+ * USEMODULE += wolfssl
+ * USEMODULE += wolfcrypt-test
+ * USEMODULE += wolfssl_dtls
+ * ```
+ *
+ * NOTES ON TRANSPORT LAYER:
+ *
+ * wolfSSL package for RIOT-OS supports two types of socket communication:
+ * - GNRC UDP/IP interface (based on sock_udp)
+ * - generic full-POSIX socket support (based on module posix-socket)
+ *
+ * By default, GNRC support is compiled in for UDP/IP communication when the
+ * module `wolfssl_dtls` is selected. Ensure that the module `gnrc_sock_udp`
+ * is also included in the build.
+ *
+ * Alternatively, to enable full-POSIX TLS/DTLS, select the `wolfssl_socket` module by
+ * adding the followint to the application's Makefile:
+ *
+ * ```makefile
+ * USEMODULE += wolfssl_socket
+ * ```
+ *
+ * Refer to the examples in the following section for more details about the API
+ * and the integration with the transport layer.
+ *
+ * EXAMPLES:
+ *
+ * wolfSSL has provided a few examples of using this package in the RIOT
+ * examples directory. To test these do any of the following:
+ *
+ * wolfSSL Test/Benchmark:
+ * Useful to verify that the ciphers are working properly
+ * on the target, and comparing performance on different
+ * platforms.
+ *
+ * ```makefile
+ * cd <path-to>/RIOT/tests/wolfssl-test
+ * make
+ * ./bin/native/wolfssl-test.elf # execute native port
+ * ```
+ *
+ * ED25519 signature verification demo
+ * Very small footprint application to demonstrate
+ * Ed25519 signature verification with a very small footprint
+ * and memory requirements
+ *
+ * ```makefile
+ * cd <path-to>/RIOT/tests/wolfcrypt-ed25519-verify
+ * make
+ * ./bin/native/wolfcrypt-ed25519-verify.elf # execute native port
+ * ```
+ *
+ *
+ * DTLS Client and Server Example
+ * DTLS example over GNRC UDP/IP stack.
+ * See documentation in `examples/dtls-wolfssl/README.md`
+ *
+ * QUESTIONS / CONCERNS / FEEDBACK:
+ *
+ * For any questions, concerns, or other feedback please contact
+ * support@wolfssl.com anytime, we are always happy to help in any way we can!!
+ *
+ */

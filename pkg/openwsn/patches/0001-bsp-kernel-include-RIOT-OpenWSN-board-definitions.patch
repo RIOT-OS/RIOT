@@ -1,0 +1,53 @@
+From 2d29cff11033b519d7cbf8ee1cc18bef4f2ba0e2 Mon Sep 17 00:00:00 2001
+From: PeterKietzmann <peter.kietzmann@haw-hamburg.de>
+Date: Thu, 8 Feb 2018 10:23:00 +0100
+Subject: [PATCH 01/11] bsp-kernel: include RIOT-OpenWSN board definitions
+
+---
+ bsp/boards/radio.h        | 2 +-
+ bsp/boards/sctimer.h      | 2 +-
+ kernel/openos/scheduler.c | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/bsp/boards/radio.h b/bsp/boards/radio.h
+index df4333e8..8435a951 100644
+--- a/bsp/boards/radio.h
++++ b/bsp/boards/radio.h
+@@ -12,7 +12,7 @@
+ \author Thomas Watteyne <watteyne@eecs.berkeley.edu>, February 2012.
+ */
+ 
+-#include "board.h"
++#include "openwsn_board.h"
+ 
+ //=========================== define ==========================================
+ 
+diff --git a/bsp/boards/sctimer.h b/bsp/boards/sctimer.h
+index 668496cb..90978f89 100644
+--- a/bsp/boards/sctimer.h
++++ b/bsp/boards/sctimer.h
+@@ -13,7 +13,7 @@
+ */
+ 
+ #include "stdint.h"
+-#include "board.h"
++#include "openwsn_board.h"
+ 
+ //=========================== typedef =========================================
+ 
+diff --git a/kernel/openos/scheduler.c b/kernel/openos/scheduler.c
+index 4b63d624..f52f35d4 100644
+--- a/kernel/openos/scheduler.c
++++ b/kernel/openos/scheduler.c
+@@ -6,7 +6,7 @@
+ 
+ #include "opendefs.h"
+ #include "scheduler.h"
+-#include "board.h"
++#include "openwsn_board.h"
+ #include "debugpins.h"
+ #include "leds.h"
+ 
+-- 
+2.28.0
+

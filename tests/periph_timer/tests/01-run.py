@@ -6,12 +6,12 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-import os
 import sys
+from testrunner import run
 
 
 def testfunc(child):
-    child.expect('Available timers: (\d+)')
+    child.expect(r'Available timers: (\d+)\r\n')
     timers_num = int(child.match.group(1))
     for timer in range(timers_num):
         child.expect_exact('Testing TIMER_{}'.format(timer))
@@ -22,6 +22,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-    from testrunner import run
     sys.exit(run(testfunc))

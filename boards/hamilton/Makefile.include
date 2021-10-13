@@ -1,0 +1,8 @@
+# debugger config
+PROGRAMMER ?= jlink
+JLINK_DEVICE = atsamr21e18a
+OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
+OFLAGS := --gap-fill 0xff
+
+# use JLink Segger RTT by default
+RIOT_TERMINAL ?= jlink

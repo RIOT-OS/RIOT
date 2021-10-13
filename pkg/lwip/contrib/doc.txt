@@ -1,3 +1,0 @@
-/**
- * @defgroup lwip_contrib   RIOT lwIP port
- */

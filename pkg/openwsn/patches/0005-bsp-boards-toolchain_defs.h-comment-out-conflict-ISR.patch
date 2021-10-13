@@ -1,0 +1,43 @@
+From 9a0c7499639d096800d22b31fd81db384c7205c5 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Thu, 2 Apr 2020 16:04:29 +0200
+Subject: [PATCH 05/11] bsp/boards/toolchain_defs.h: comment out conflict ISR
+ definitions
+
+The ISR definition conflicts with AVR ISR definitions.
+---
+ bsp/boards/toolchain_defs.h | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/bsp/boards/toolchain_defs.h b/bsp/boards/toolchain_defs.h
+index afcbcbf6..e288e52e 100644
+--- a/bsp/boards/toolchain_defs.h
++++ b/bsp/boards/toolchain_defs.h
+@@ -16,15 +16,15 @@
+ 
+ //===== ISR and pragma
+ 
+-#if defined(__GNUC__) && (__GNUC__==4)  && (__GNUC_MINOR__<=5) && defined(__MSP430__)
+-   // mspgcc <4.5.x
+-   #include <signal.h>
+-   #define              ISR(v) interrupt (v ## _VECTOR) v ## _ISR(void)
+-#else
+-   // other
+-   #define              __PRAGMA__(x) _Pragma(#x)
+-   #define              ISR(v) __PRAGMA__(vector=v ##_VECTOR) __interrupt void v ##_ISR(void)
+-#endif
++// #if defined(__GNUC__) && (__GNUC__==4)  && (__GNUC_MINOR__<=5) && defined(__MSP430__)
++//    // mspgcc <4.5.x
++//    #include <signal.h>
++//    #define              ISR(v) interrupt (v ## _VECTOR) v ## _ISR(void)
++// #else
++//    // other
++//    #define              __PRAGMA__(x) _Pragma(#x)
++//    #define              ISR(v) __PRAGMA__(vector=v ##_VECTOR) __interrupt void v ##_ISR(void)
++// #endif
+ 
+ //===== inline
+ 
+-- 
+2.28.0
+

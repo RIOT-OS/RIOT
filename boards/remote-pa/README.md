@@ -1,7 +1,7 @@
 Zolertia RE-Mote platform
 ============================================
 
-<a href="url"><img src="http://goo.gl/3AGZkI" align="center" height="320" ></a>
+<a href="url"><img src="https://zolertia.io/wp-content/uploads/2017/06/Untitled-design-12.png" align="center" height="320" ></a>
 
 The RE-Mote platform (prototype A) is a IoT Hardware development platform based
 on TI's CC2538 system on chip (SoC), featuring an ARM Cortex-M3 with 512KB
@@ -110,8 +110,12 @@ On Linux:
 
 More Reading
 ============
-2. [CC2538 System-on-Chip Solution for 2.4-GHz IEEE 802.15.4 and ZigBee applications (SWRU319B)][cc2538]
-3. [CC1120 sub-1GHz RF transceiver][cc1120]
+1. [Zolertia RE-Mote website][remote-site]
+2. [Zolertia Wiki page][zolertia-wiki]
+3. [CC2538 System-on-Chip Solution for 2.4-GHz IEEE 802.15.4 and ZigBee applications (SWRU319B)][cc2538]
+4. [CC1120 sub-1GHz RF transceiver][cc1120]
 
+[remote-site]: https://zolertia.io/product/re-mote/ "Zolertia RE-Mote"
+[zolertia-wiki]: https://github.com/Zolertia/Resources/wiki
 [cc1120]: http://www.ti.com/cc1120 "CC1120"
 [cc2538]: http://www.ti.com/product/cc2538     "CC2538"

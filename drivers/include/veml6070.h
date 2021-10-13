@@ -9,7 +9,10 @@
 /**
  * @defgroup    drivers_veml6070 VEML6070 UV sensor
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Device driver interface for the VEML6070 UV sensor
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file

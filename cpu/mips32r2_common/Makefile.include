@@ -1,18 +1,6 @@
-export INCLUDES += -I$(RIOTCPU)/mips32r2_common/include
+INCLUDES += -I$(RIOTCPU)/mips32r2_common/include
 
-export USEMODULE += mips32r2_common
-export USEMODULE += mips32r2_common_periph
-export USEMODULE += periph_common
-export USEMODULE += newlib
-
-# mips32 needs periph_timer for its gettimeofday() implementation
-export USEMODULE += periph_timer
-
-ifeq ($(USE_UHI_SYSCALLS),1)
-  #Use UHI to handle syscalls
-  export LINKFLAGS += -luhi
-  export USEMODULE += newlib_syscalls_mips_uhi
-else
-  #Use RIOT to handle syscalls (default)
-  export USEMODULE += newlib_syscalls_default
+ifneq (,$(filter newlib_syscalls_mips_uhi,$(USEMODULE)))
+  CFLAGS += -DHAVE_HEAP_STATS
+  LINKFLAGS += -luhi
 endif

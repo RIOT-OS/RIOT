@@ -1,0 +1,53 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menu "FE310 clock configuration"
+    depends on CPU_FAM_FE310
+
+choice
+bool "Clock source selection"
+default USE_CLOCK_HFXOSC_PLL
+
+config USE_CLOCK_HFXOSC_PLL
+    bool "PLL clocked by high frequency external oscillator (HFXOSC)"
+
+config USE_CLOCK_HFXOSC
+    bool "Direct High frequency external oscillator (HFXOSC)"
+
+config USE_CLOCK_HFROSC_PLL
+    bool "PLL clocked by High frequency internal oscillator (HFROSC)"
+
+config USE_CLOCK_HFROSC
+    bool "Direct High frequency internal oscillator (HFROSC)"
+endchoice
+
+# the configuration macros must always be defined for clock.c to compile
+config CLOCK_PLL_F
+    int "F: REFR multiply factor" if USE_CLOCK_HFXOSC_PLL
+    default 39
+
+config CLOCK_PLL_Q
+    int "Q: VCO divide factor" if USE_CLOCK_HFXOSC_PLL
+    default 1
+
+config CLOCK_DESIRED_FREQUENCY
+    int
+    prompt "Desired clock frequency" if USE_CLOCK_HFROSC_PLL
+    default 320000000
+    range 1000000 320000000
+
+config CLOCK_HFROSC_TRIM
+    int "TRIM: input frequency multiplier" if USE_CLOCK_HFROSC
+    default 6
+    range 0 31
+
+config CLOCK_HFROSC_DIV
+    int "DIV: output frequency divider" if USE_CLOCK_HFROSC
+    default 1
+    range 0 63
+
+endmenu

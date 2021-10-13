@@ -1,0 +1,7 @@
+# include variants of SHT1X drivers as pseudo modules
+PSEUDOMODULES += sht10
+PSEUDOMODULES += sht11
+PSEUDOMODULES += sht15
+
+USEMODULE_INCLUDES_sht1x := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_sht1x)

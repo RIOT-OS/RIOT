@@ -24,11 +24,13 @@
 #include "assert.h"
 #include "xtimer.h"
 #include "fmt.h"
+#include "kernel_defines.h"
+
 #include "rn2xx3_params.h"
 #include "rn2xx3.h"
 #include "rn2xx3_internal.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 /* Warning: to correctly display the debug message from sleep timer callback,,
    add CFLAGS+=-DTHREAD_STACKSIZE_IDLE=THREAD_STACKSIZE_DEFAULT to the build
    command.
@@ -38,15 +40,15 @@
 /**
  * @brief   Delay when resetting the device, 10ms
  */
-#define RESET_DELAY                 (10UL * US_PER_MS)
+#define RESET_DELAY     (10UL * US_PER_MS)
 
 /*
  * Interrupt callbacks
  */
 static void _rx_cb(void *arg, uint8_t c)
 {
-    rn2xx3_t *dev = (rn2xx3_t *)arg;
-    netdev_t *netdev = (netdev_t *)dev;
+    rn2xx3_t *dev = arg;
+    netdev_t *netdev = &dev->netdev;
 
     /* Avoid overflow of module response buffer */
     if (dev->resp_size >= RN2XX3_MAX_BUF) {
@@ -62,15 +64,11 @@ static void _rx_cb(void *arg, uint8_t c)
         if (dev->int_state == RN2XX3_INT_STATE_MAC_RX_MESSAGE) {
             /* RX state: closing RX buffer */
             dev->rx_buf[(dev->rx_size + 1) / 2] = 0;
-            if (netdev->event_callback) {
-                netdev->event_callback(netdev, NETDEV_EVENT_ISR);
-            }
+            netdev_trigger_event_isr(netdev);
         }
         else if (dev->int_state == RN2XX3_INT_STATE_MAC_TX) {
             /* still in TX state: transmission complete but no data received */
-            if (netdev->event_callback) {
-                netdev->event_callback(netdev, NETDEV_EVENT_ISR);
-            }
+            netdev_trigger_event_isr(netdev);
         }
         dev->resp_size = 0;
         dev->rx_size = 0;
@@ -129,7 +127,7 @@ static void _rx_cb(void *arg, uint8_t c)
 static void _sleep_timer_cb(void *arg)
 {
     DEBUG("[rn2xx3] exit sleep\n");
-    rn2xx3_t *dev = (rn2xx3_t *)arg;
+    rn2xx3_t *dev = arg;
     dev->int_state = RN2XX3_INT_STATE_IDLE;
 }
 
@@ -141,10 +139,10 @@ void rn2xx3_setup(rn2xx3_t *dev, const rn2xx3_params_t *params)
     assert(dev && (params->uart < UART_NUMOF));
 
     /* initialize device parameters */
-    memcpy(&dev->p, params, sizeof(rn2xx3_params_t));
+    dev->p = *params;
 
     /* initialize pins and perform hardware reset */
-    if (dev->p.pin_reset != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->p.pin_reset)) {
         gpio_init(dev->p.pin_reset, GPIO_OUT);
         gpio_set(dev->p.pin_reset);
     }
@@ -166,7 +164,7 @@ int rn2xx3_init(rn2xx3_t *dev)
     }
 
     /* if reset pin is connected, do a hardware reset */
-    if (dev->p.pin_reset != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->p.pin_reset)) {
         gpio_clear(dev->p.pin_reset);
         xtimer_usleep(RESET_DELAY);
         gpio_set(dev->p.pin_reset);
@@ -175,7 +173,7 @@ int rn2xx3_init(rn2xx3_t *dev)
     dev->sleep_timer.callback = _sleep_timer_cb;
     dev->sleep_timer.arg = dev;
 
-    rn2xx3_sys_set_sleep_duration(dev, RN2XX3_DEFAULT_SLEEP);
+    rn2xx3_sys_set_sleep_duration(dev, CONFIG_RN2XX3_DEFAULT_SLEEP);
 
     /* sending empty command to clear uart buffer */
     if (rn2xx3_write_cmd(dev) == RN2XX3_TIMEOUT) {
@@ -222,9 +220,23 @@ int rn2xx3_sys_factory_reset(rn2xx3_t *dev)
 int rn2xx3_sys_sleep(rn2xx3_t *dev)
 {
     size_t p = snprintf(dev->cmd_buf, sizeof(dev->cmd_buf) - 1,
-                        "sys sleep %lu", (unsigned long)dev->sleep);
+                        "sys sleep %" PRIu32 "", dev->sleep);
     dev->cmd_buf[p] = 0;
-    if (rn2xx3_write_cmd_no_wait(dev) == RN2XX3_ERR_INVALID_PARAM) {
+
+    if (dev->int_state == RN2XX3_INT_STATE_SLEEP) {
+        DEBUG("[rn2xx3] sleep: device already in sleep mode\n");
+        return RN2XX3_ERR_SLEEP_MODE;
+    }
+
+    /* always succeeds */
+    rn2xx3_write_cmd_no_wait(dev);
+
+    /* Wait a little to check if the device could go to sleep. No answer means
+       it worked. */
+    xtimer_msleep(1);
+
+    DEBUG("[rn2xx3] RESP: %s\n", dev->resp_buf);
+    if (rn2xx3_process_response(dev) == RN2XX3_ERR_INVALID_PARAM) {
         DEBUG("[rn2xx3] sleep: cannot put module in sleep mode\n");
         return RN2XX3_ERR_INVALID_PARAM;
     }
@@ -237,17 +249,17 @@ int rn2xx3_sys_sleep(rn2xx3_t *dev)
 
 int rn2xx3_mac_init(rn2xx3_t *dev)
 {
-    rn2xx3_mac_set_dr(dev, LORAMAC_DEFAULT_DR);
-    rn2xx3_mac_set_tx_power(dev, LORAMAC_DEFAULT_TX_POWER);
-    rn2xx3_mac_set_tx_port(dev, LORAMAC_DEFAULT_TX_PORT);
-    rn2xx3_mac_set_tx_mode(dev, LORAMAC_DEFAULT_TX_MODE);
-    rn2xx3_mac_set_adr(dev, LORAMAC_DEFAULT_ADR);
-    rn2xx3_mac_set_retx(dev, LORAMAC_DEFAULT_RETX);
-    rn2xx3_mac_set_linkchk_interval(dev, LORAMAC_DEFAULT_LINKCHK);
-    rn2xx3_mac_set_rx1_delay(dev, LORAMAC_DEFAULT_RX1_DELAY);
-    rn2xx3_mac_set_ar(dev, LORAMAC_DEFAULT_AR);
-    rn2xx3_mac_set_rx2_dr(dev, LORAMAC_DEFAULT_RX2_DR);
-    rn2xx3_mac_set_rx2_freq(dev, LORAMAC_DEFAULT_RX2_FREQ);
+    rn2xx3_mac_set_dr(dev, CONFIG_LORAMAC_DEFAULT_DR);
+    rn2xx3_mac_set_tx_power(dev, CONFIG_LORAMAC_DEFAULT_TX_POWER);
+    rn2xx3_mac_set_tx_port(dev, CONFIG_LORAMAC_DEFAULT_TX_PORT);
+    rn2xx3_mac_set_tx_mode(dev, CONFIG_LORAMAC_DEFAULT_TX_MODE);
+    rn2xx3_mac_set_adr(dev, IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_ADR));
+    rn2xx3_mac_set_retx(dev, CONFIG_LORAMAC_DEFAULT_RETX);
+    rn2xx3_mac_set_linkchk_interval(dev, CONFIG_LORAMAC_DEFAULT_LINKCHK);
+    rn2xx3_mac_set_rx1_delay(dev, CONFIG_LORAMAC_DEFAULT_RX1_DELAY);
+    rn2xx3_mac_set_ar(dev, IS_ACTIVE(CONFIG_RN2XX3_DEFAULT_AR));
+    rn2xx3_mac_set_rx2_dr(dev, CONFIG_LORAMAC_DEFAULT_RX2_DR);
+    rn2xx3_mac_set_rx2_freq(dev, CONFIG_LORAMAC_DEFAULT_RX2_FREQ);
 
     return RN2XX3_OK;
 }
@@ -293,8 +305,8 @@ int rn2xx3_mac_join_network(rn2xx3_t *dev, loramac_join_mode_t mode)
     rn2xx3_set_internal_state(dev, RN2XX3_INT_STATE_MAC_JOIN);
 
     ret = rn2xx3_wait_reply(dev,
-                            LORAMAC_DEFAULT_JOIN_DELAY1 + \
-                            LORAMAC_DEFAULT_JOIN_DELAY2);
+                            CONFIG_LORAMAC_DEFAULT_JOIN_DELAY1 + \
+                            CONFIG_LORAMAC_DEFAULT_JOIN_DELAY2);
 
     rn2xx3_set_internal_state(dev, RN2XX3_INT_STATE_IDLE);
 

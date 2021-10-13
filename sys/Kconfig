@@ -1,0 +1,106 @@
+# Copyright (c) 2019 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menu "System"
+
+rsource "analog_util/Kconfig"
+rsource "app_metadata/Kconfig"
+rsource "arduino/Kconfig"
+rsource "auto_init/Kconfig"
+rsource "base64/Kconfig"
+rsource "benchmark/Kconfig"
+rsource "bitfield/Kconfig"
+rsource "bloom/Kconfig"
+rsource "cb_mux/Kconfig"
+rsource "checksum/Kconfig"
+rsource "color/Kconfig"
+rsource "crypto/Kconfig"
+rsource "congure/Kconfig"
+rsource "div/Kconfig"
+rsource "embunit/Kconfig"
+rsource "entropy_source/Kconfig"
+rsource "eepreg/Kconfig"
+rsource "event/Kconfig"
+rsource "fido2/Kconfig"
+rsource "fmt/Kconfig"
+rsource "frac/Kconfig"
+rsource "hashes/Kconfig"
+rsource "iolist/Kconfig"
+rsource "isrpipe/Kconfig"
+
+menu "Libc"
+
+choice LIBC_IMPLEMENTATION
+    bool "Libc implementation"
+    depends on TEST_KCONFIG
+
+config MODULE_NEWLIB
+    bool "NewLib"
+    depends on HAS_NEWLIB
+
+config MODULE_PICOLIBC
+    bool "Picolibc"
+    depends on HAS_PICOLIBC
+
+endchoice
+
+rsource "Kconfig.newlib"
+rsource "Kconfig.picolibc"
+
+endmenu # Libc
+
+rsource "luid/Kconfig"
+rsource "malloc_thread_safe/Kconfig"
+rsource "matstat/Kconfig"
+rsource "memarray/Kconfig"
+rsource "mineplex/Kconfig"
+rsource "net/Kconfig"
+rsource "Kconfig.stdio"
+rsource "od/Kconfig"
+rsource "posix/Kconfig"
+rsource "oneway-malloc/Kconfig"
+rsource "phydat/Kconfig"
+rsource "pm_layered/Kconfig"
+rsource "progress_bar/Kconfig"
+rsource "ps/Kconfig"
+rsource "random/Kconfig"
+rsource "saul_reg/Kconfig"
+rsource "schedstatistics/Kconfig"
+rsource "sema/Kconfig"
+rsource "seq/Kconfig"
+rsource "shell/Kconfig"
+rsource "test_utils/Kconfig"
+rsource "timex/Kconfig"
+rsource "tsrb/Kconfig"
+rsource "uri_parser/Kconfig"
+rsource "usb/Kconfig"
+rsource "xtimer/Kconfig"
+rsource "ztimer/Kconfig"
+
+config MODULE_CPP
+    bool "Use CPP compiler"
+    depends on TEST_KCONFIG
+    depends on HAS_CPP
+
+config MODULE_LIBSTDCPP
+    bool "Use the CPP standard library"
+    depends on TEST_KCONFIG
+    depends on HAS_LIBSTDCPP
+    depends on HAS_CPP
+    select MODULE_CPP
+
+config MODULE_ATOMIC_UTILS
+    bool "Atomic access utility functions"
+    depends on TEST_KCONFIG
+
+config MODULE_SYS
+    bool
+    default y
+    depends on TEST_KCONFIG
+    help
+        System module, it serves to pull in all the rest of system modules.
+
+endmenu # System

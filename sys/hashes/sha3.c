@@ -40,7 +40,7 @@
 
    The drawbacks of this implementation are:
     - There is no message queue. The whole message must be ready in a buffer.
-    - It is not optimized for peformance.
+    - It is not optimized for performance.
 
    The implementation is even simpler on a little endian platform. Just define the
    LITTLE_ENDIAN symbol in that case.
@@ -115,7 +115,6 @@ void sha3_256_final(keccak_state_t *ctx, void *digest)
 {
     Keccak_final(ctx, digest, SHA3_256_DIGEST_LENGTH);
 }
-
 
 /**
  *  Function to compute SHA3-384 on the input message. The output length is fixed to 48 bytes.
@@ -424,7 +423,6 @@ void Keccak_update(keccak_state_t *ctx, const unsigned char *input,
 
         if (blockSize == ctx->rateInBytes) {
             KeccakF1600_StatePermute(ctx->state);
-            blockSize = 0;
             ctx->i = 0;
         }
     }

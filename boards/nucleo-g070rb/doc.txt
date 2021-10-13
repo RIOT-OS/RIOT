@@ -1,0 +1,5 @@
+/**
+@defgroup    boards_nucleo-g070rb STM32 Nucleo-G070RB
+@ingroup     boards_common_nucleo64
+@brief       Support for the STM32 Nucleo-G070RB
+ */

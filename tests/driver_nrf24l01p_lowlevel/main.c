@@ -31,7 +31,6 @@
 #error "IRQ_PIN not defined"
 #endif
 
-
 #include <stdio.h>
 #include <stdint.h>
 #include <inttypes.h>

@@ -1,0 +1,42 @@
+/**
+@defgroup    boards_nucleo-l552ze-q STM32 Nucleo-L552ZE-Q
+@ingroup     boards_common_nucleo144
+@brief       Support for the STM32 Nucleo-L552ZE-Q
+
+## Flashing the device
+
+The ST Nucleo-L552ZE-Q board includes an on-board ST-LINK programmer and can be
+flashed using OpenOCD.
+@note The upstream version of OpenOCD doesn't contain yet support for this board,
+so the source code version from http://openocd.zylin.com/#/c/5510
+must be built to be able to flash this board (adapt the configure command with
+your preferred installation directory):
+
+```
+$ git clone https://git.code.sf.net/p/openocd/code openocd
+$ cd openocd
+$ git fetch http://openocd.zylin.com/openocd refs/changes/10/5510/5 && git checkout FETCH_HEAD
+$ ./bootstrap
+$ ./configure --prefix=<installation directory>
+$ make -j
+$ sudo make install
+```
+
+Once the patched OpenOCD is built and installed, you can flash the board simply
+by typing
+
+```
+make BOARD=nucleo-l552ze-q flash
+```
+
+and debug via GDB by simply typing
+```
+make BOARD=nucleo-l552ze-q debug
+```
+
+## Supported Toolchains
+
+For using the ST Nucleo-L552ZE-Q board we recommend the usage of the
+[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
+toolchain.
+ */

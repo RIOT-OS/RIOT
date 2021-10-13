@@ -1,0 +1,21 @@
+# ATM openwsn does not support the at86rf215 radio
+ifneq (,$(filter openwsn,$(USEPKG)))
+  USEMODULE += cc2538_rf
+endif
+
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  ifeq (,$(filter cc2538_rf,$(USEMODULE)))
+    USEMODULE += at86rf215
+  endif
+endif
+
+# at86rf215 is hard-wired to sub-GHz, but 2.4 GHz can be switched between
+# at86rf215 and cc2538_rf. Use 2.4 GHz for cc2538_rf if both are used.
+ifeq (at86rf215 cc2538_rf, $(filter at86rf215 cc2538_rf,$(USEMODULE)))
+  DISABLE_MODULE += at86rf215_24ghz
+endif
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+  USEMODULE += si7006
+endif

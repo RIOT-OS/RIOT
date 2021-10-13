@@ -38,13 +38,16 @@ extern "C" {
 #define TCS37727_PARAM_ADDR         (TCS37727_I2C_ADDRESS)
 #endif
 #ifndef TCS37727_PARAM_ATIME
-#define TCS37727_PARAM_ATIME        (TCS37727_ATIME_DEFAULT)
+#define TCS37727_PARAM_ATIME        (CONFIG_TCS37727_ATIME_DEFAULT)
 #endif
 
 #ifndef TCS37727_PARAMS
 #define TCS37727_PARAMS             { .i2c   = TCS37727_PARAM_I2C,  \
                                       .addr  = TCS37727_PARAM_ADDR, \
                                       .atime = TCS37727_PARAM_ATIME }
+#endif
+#ifndef TCS37727_SAUL_INFO
+#define TCS37727_SAUL_INFO          { .name = "tcs37727" }
 #endif
 /**@}*/
 
@@ -61,7 +64,7 @@ static const tcs37727_params_t tcs37727_params[] =
  */
 static const saul_reg_info_t tcs37727_saul_info[] =
 {
-    { .name = "tcs37727" }
+    TCS37727_SAUL_INFO
 };
 
 #ifdef __cplusplus

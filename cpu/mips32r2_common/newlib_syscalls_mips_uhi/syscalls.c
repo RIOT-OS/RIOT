@@ -7,7 +7,7 @@
  */
 
 /**
-  * @ingroup sys_newlib
+  * @ingroup    sys_newlib
   * @{
   *
   * @file
@@ -46,6 +46,8 @@ extern char _sheap; /* start of the heap */
 extern char _eheap; /* end of the heap */
 char *heap_top = &_sheap + 4;
 
+/* Only need to define these when MIPS newlib is not used */
+#ifndef __mips__
 /**
  * @brief Free resources on NewLib de-initialization, not used for RIOT
  */
@@ -69,11 +71,8 @@ void _exit(int n)
 {
     exit(n);
 
-    /*
-     * Disable unreachableCode cppcheck as pm_off spins indefinately after
-     * pulling the plug
-     */
-    /* cppcheck-suppress unreachableCode */
+    /* cppcheck-suppress unreachableCode
+     * (reason: pm_off spins indefinitely after pulling the plug) */
     pm_off();
 }
 
@@ -100,6 +99,7 @@ void *_sbrk_r(struct _reent *r, ptrdiff_t incr)
     irq_restore(state);
     return res;
 }
+#endif /*__mips__*/
 
 /**
 * @brief Get the process-ID of the current thread
@@ -108,7 +108,7 @@ void *_sbrk_r(struct _reent *r, ptrdiff_t incr)
 */
 pid_t _getpid(void)
 {
-    return sched_active_pid;
+    return thread_getpid();
 }
 
 /**
@@ -118,8 +118,8 @@ pid_t _getpid(void)
 */
 pid_t _getpid_r(struct _reent *ptr)
 {
-    (void) ptr;
-    return sched_active_pid;
+    (void)ptr;
+    return thread_getpid();
 }
 
 /**
@@ -130,13 +130,13 @@ pid_t _getpid_r(struct _reent *ptr)
 * @param sig signal number to pass to process
 *
 * @return -1 on error
-* @return 0 on sucess
+* @return 0 on success
 */
 __attribute__ ((weak))
 int _kill_r(struct _reent *r, pid_t pid, int sig)
 {
-    (void) pid;
-    (void) sig;
+    (void)pid;
+    (void)sig;
     r->_errno = ESRCH; /* not implemented yet */
     return -1;
 }
@@ -334,8 +334,8 @@ int _isatty_r(struct _reent *r, int fd)
 __attribute__ ((weak))
 int _kill(pid_t pid, int sig)
 {
-    (void) pid;
-    (void) sig;
+    (void)pid;
+    (void)sig;
     errno = ESRCH; /* not implemented yet */
     return -1;
 }

@@ -1,19 +1,38 @@
-RIOT_EDBG = $(RIOTBASE)/dist/tools/edbg/edbg
-EDBG ?= $(RIOT_EDBG)
-FLASHER ?= $(EDBG)
-HEXFILE = $(BINFILE)
+include $(RIOTMAKE)/tools/edbg-devices.inc.mk
+
+# Edbg use a bin file for flashing
+FLASHFILE ?= $(BINFILE)
+
+EDBG ?= $(RIOTTOOLS)/edbg/edbg
+FLASHDEPS += $(EDBG)
+
 # Use USB serial number to select device when more than one is connected
 # Use /dist/tools/usb-serial/list-ttys.sh to find out serial number.
 #   Usage:
-# export DEBUG_ADAPTER_ID="ATML..."
+# DEBUG_ADAPTER_ID="ATML..."
 # BOARD=<board> make flash
 ifneq (,$(DEBUG_ADAPTER_ID))
   EDBG_ARGS += --serial $(DEBUG_ADAPTER_ID)
 endif
-FFLAGS ?= $(EDBG_ARGS) -t $(EDBG_DEVICE_TYPE) -b -e -v -p -f $(HEXFILE)
 
-ifeq ($(RIOT_EDBG),$(FLASHER))
-  FLASHDEPS += $(RIOT_EDBG)
-endif
-RESET ?= $(EDBG)
-RESET_FLAGS ?= $(EDBG_ARGS) -t $(EDBG_DEVICE_TYPE)
+# Set offset according to IMAGE_OFFSET if it's defined
+EDBG_ARGS += $(if $(IMAGE_OFFSET),--offset $(IMAGE_OFFSET))
+EDBG_ARGS += --target $(EDBG_DEVICE_TYPE)
+
+EDBG_TARGETS = flash flash-only reset
+# Export EDBG to required targets
+$(call target-export-variables,$(EDBG_TARGETS),EDBG)
+
+# Export EDBG_ARGS to required targets
+$(call target-export-variables,$(EDBG_TARGETS),EDBG_ARGS)
+
+# Set flasher and reset for the RIOT build system
+FLASHER ?= $(RIOTTOOLS)/edbg/edbg.sh
+FFLAGS ?= flash $(FLASHFILE)
+
+RESET ?= $(RIOTTOOLS)/edbg/edbg.sh
+RESET_FLAGS ?= reset
+
+# use openocd for debugging, must be included at the end so FLASHER/RESET
+# variables are already set for edbg.
+include $(RIOTMAKE)/tools/openocd.inc.mk

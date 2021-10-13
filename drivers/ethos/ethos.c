@@ -22,7 +22,6 @@
 #include <errno.h>
 #include <string.h>
 
-#include "random.h"
 #include "ethos.h"
 #include "periph/uart.h"
 #include "tsrb.h"
@@ -31,15 +30,20 @@
 #include "net/netdev.h"
 #include "net/netdev/eth.h"
 #include "net/eui64.h"
+#include "net/eui_provider.h"
 #include "net/ethernet.h"
 
 #ifdef USE_ETHOS_FOR_STDIO
-#include "uart_stdio.h"
-#include "isrpipe.h"
-extern isrpipe_t uart_stdio_isrpipe;
+#error USE_ETHOS_FOR_STDIO is deprecated, use USEMODULE+=stdio_ethos instead
 #endif
 
-#define ENABLE_DEBUG (0)
+#ifdef MODULE_STDIO_ETHOS
+#include "stdio_uart.h"
+#include "isrpipe.h"
+extern isrpipe_t stdio_uart_isrpipe;
+#endif
+
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static void _get_mac_addr(netdev_t *dev, uint8_t* buf);
@@ -49,8 +53,8 @@ static const netdev_driver_t netdev_driver_ethos;
 static const uint8_t _esc_esc[] = {ETHOS_ESC_CHAR, (ETHOS_ESC_CHAR ^ 0x20)};
 static const uint8_t _esc_delim[] = {ETHOS_ESC_CHAR, (ETHOS_FRAME_DELIMITER ^ 0x20)};
 
-
-void ethos_setup(ethos_t *dev, const ethos_params_t *params)
+void ethos_setup(ethos_t *dev, const ethos_params_t *params, uint8_t idx,
+                 void *inbuf, size_t inbuf_size)
 {
     dev->netdev.driver = &netdev_driver_ethos;
     dev->uart = params->uart;
@@ -58,17 +62,13 @@ void ethos_setup(ethos_t *dev, const ethos_params_t *params)
     dev->framesize = 0;
     dev->frametype = 0;
     dev->last_framesize = 0;
+    dev->accept_new = true;
 
-    tsrb_init(&dev->inbuf, (char*)params->buf, params->bufsize);
+    tsrb_init(&dev->inbuf, inbuf, inbuf_size);
     mutex_init(&dev->out_mutex);
 
-    uint32_t a = random_uint32();
-    memcpy(dev->mac_addr, (char*)&a, 4);
-    a = random_uint32();
-    memcpy(dev->mac_addr+4, (char*)&a, 2);
-
-    dev->mac_addr[0] &= (0x2);      /* unset globally unique bit */
-    dev->mac_addr[0] &= ~(0x1);     /* set unicast bit*/
+    netdev_register(&dev->netdev, NETDEV_ETHOS, idx);
+    netdev_eui48_get(&dev->netdev, (eui48_t *)&dev->mac_addr);
 
     uart_init(params->uart, params->baudrate, ethos_isr, (void*)dev);
 
@@ -82,6 +82,7 @@ static void _reset_state(ethos_t *dev)
     dev->state = WAIT_FRAMESTART;
     dev->frametype = 0;
     dev->framesize = 0;
+    dev->accept_new = true;
 }
 
 static void _handle_char(ethos_t *dev, char c)
@@ -90,19 +91,22 @@ static void _handle_char(ethos_t *dev, char c)
         case ETHOS_FRAME_TYPE_DATA:
         case ETHOS_FRAME_TYPE_HELLO:
         case ETHOS_FRAME_TYPE_HELLO_REPLY:
-             if (tsrb_add_one(&dev->inbuf, c) == 0) {
-                dev->framesize++;
-            } else {
+            if (dev->accept_new) {
+                if (tsrb_add_one(&dev->inbuf, c) == 0) {
+                    dev->framesize++;
+                }
+            }
+            else {
                 //puts("lost frame");
                 dev->inbuf.reads = 0;
                 dev->inbuf.writes = 0;
                 _reset_state(dev);
             }
             break;
-#ifdef USE_ETHOS_FOR_STDIO
+#ifdef MODULE_STDIO_ETHOS
         case ETHOS_FRAME_TYPE_TEXT:
             dev->framesize++;
-            isrpipe_write_one(&uart_stdio_isrpipe, c);
+            isrpipe_write_one(&stdio_uart_isrpipe, c);
 #endif
     }
 }
@@ -112,8 +116,10 @@ static void _end_of_frame(ethos_t *dev)
     switch(dev->frametype) {
         case ETHOS_FRAME_TYPE_DATA:
             if (dev->framesize) {
+                assert(dev->last_framesize == 0);
                 dev->last_framesize = dev->framesize;
-                dev->netdev.event_callback((netdev_t*) dev, NETDEV_EVENT_ISR);
+                netdev_trigger_event_isr(&dev->netdev);
+
             }
             break;
         case ETHOS_FRAME_TYPE_HELLO:
@@ -121,7 +127,7 @@ static void _end_of_frame(ethos_t *dev)
             /* fall through */
         case ETHOS_FRAME_TYPE_HELLO_REPLY:
             if (dev->framesize == 6) {
-                tsrb_get(&dev->inbuf, (char*)dev->remote_mac_addr, 6);
+                tsrb_get(&dev->inbuf, dev->remote_mac_addr, 6);
             }
             break;
     }
@@ -137,6 +143,9 @@ static void ethos_isr(void *arg, uint8_t c)
         case WAIT_FRAMESTART:
             if (c == ETHOS_FRAME_DELIMITER) {
                 _reset_state(dev);
+                if (dev->last_framesize) {
+                    dev->accept_new = false;
+                }
                 dev->state = IN_FRAME;
             }
             break;
@@ -178,14 +187,12 @@ static void ethos_isr(void *arg, uint8_t c)
 
 static void _isr(netdev_t *netdev)
 {
-    ethos_t *dev = (ethos_t *) netdev;
-    dev->netdev.event_callback((netdev_t*) dev, NETDEV_EVENT_RX_COMPLETE);
+    netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
 }
 
 static int _init(netdev_t *encdev)
 {
-    ethos_t *dev = (ethos_t *) encdev;
-    (void)dev;
+    (void)encdev;
     return 0;
 }
 
@@ -200,16 +207,16 @@ static size_t iolist_count_total(const iolist_t *iolist)
 
 static void _write_escaped(uart_t uart, uint8_t c)
 {
-    uint8_t *out;
+    const uint8_t *out;
     int n;
 
     switch(c) {
         case ETHOS_FRAME_DELIMITER:
-            out = (uint8_t*)_esc_delim;
+            out = _esc_delim;
             n = 2;
             break;
         case ETHOS_ESC_CHAR:
-            out = (uint8_t*)_esc_esc;
+            out = _esc_esc;
             n = 2;
             break;
         default:
@@ -244,7 +251,7 @@ void ethos_send_frame(ethos_t *dev, const uint8_t *data, size_t len, unsigned fr
 
     /* send frame content */
     while(len--) {
-        _write_escaped(dev->uart, *(uint8_t*)data++);
+        _write_escaped(dev->uart, *data++);
     }
 
     /* end of frame */
@@ -304,17 +311,25 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void* info)
         }
 
         len = dev->last_framesize;
-        dev->last_framesize = 0;
 
         if ((tsrb_get(&dev->inbuf, buf, len) != (int)len)) {
             DEBUG("ethos _recv(): inbuf doesn't contain enough bytes.\n");
+            dev->last_framesize = 0;
             return -1;
         }
 
+        dev->last_framesize = 0;
         return (int)len;
     }
     else {
-        return dev->last_framesize;
+        if (len) {
+            int dropsize = dev->last_framesize;
+            dev->last_framesize = 0;
+            return tsrb_drop(&dev->inbuf, dropsize);
+        }
+        else {
+            return dev->last_framesize;
+        }
     }
 }
 

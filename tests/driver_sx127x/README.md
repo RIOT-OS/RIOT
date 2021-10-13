@@ -25,7 +25,7 @@ DRIVER = sx1276
 ```
 You can also pass `DRIVER` when building the application:
 ```
-$ make BOARD=nucleo-l073 DRIVER=sx1272 -C tests/drivers_sx127x flash term
+$ make BOARD=nucleo-l073rz DRIVER=sx1272 -C tests/drivers_sx127x flash term
 ```
 
 ## Usage

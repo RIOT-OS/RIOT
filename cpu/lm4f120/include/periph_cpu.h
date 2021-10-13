@@ -21,7 +21,6 @@
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
-
 #include "cpu.h"
 
 #ifdef __cplusplus
@@ -34,7 +33,7 @@ extern "C" {
  */
 #define HAVE_GPIO_T
 typedef uint32_t gpio_t;
-#define GPIO_PIN(x,y) ((gpio_t)((x<<4) | y))
+#define GPIO_PIN(x, y) ((gpio_t)((x<<4) | y))
 /** @} */
 
 #ifndef DOXYGEN
@@ -107,6 +106,18 @@ typedef enum {
 #endif /* ndef DOXYGEN */
 
 /**
+ * @brief   Define timer configuration values
+ */
+typedef struct {
+    uint32_t dev;       /**< Address of timer base */
+    uint32_t max;       /**< Max tick value of timer */
+    int irqn;           /**< Number of the higher timer IRQ channel */
+    uint32_t sysctl;    /**< Address of timer system control */
+    uint32_t intbase;   /**< Interrupt base of timer */
+    int channels;       /**< Number of channels for the timer */
+} timer_conf_t;
+
+/**
  * @brief   Override SPI hardware chip select macro
  *
  * As of now, we do not support HW CS, so we always set it to a fixed value
@@ -142,6 +153,7 @@ typedef struct {
 #define PERIPH_SPI_NEEDS_INIT_CS 1
 /** @} */
 
+#ifndef DOXYGEN
 /**
  * @brief   Override SPI clock speed values
  * @{
@@ -169,6 +181,7 @@ typedef enum {
     SPI_MODE_3 = SSI_FRF_MOTO_MODE_0,       /**< CPOL=1, CPHA=1 */
 } spi_mode_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 #ifdef __cplusplus
 }

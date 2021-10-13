@@ -1,0 +1,9 @@
+# we use shared STM32 configuration snippets
+INCLUDES += -I$(RIOTBOARD)/common/stm32/include
+
+# this board uses openocd with st-link
+PROGRAMMER ?= openocd
+OPENOCD_DEBUG_ADAPTER ?= stlink
+
+# Only openocd programmer is supported
+PROGRAMMERS_SUPPORTED += openocd

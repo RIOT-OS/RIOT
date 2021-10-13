@@ -1,3 +1,0 @@
-export CPU_ARCH = cortex-m4f
-
-include $(RIOTMAKE)/arch/cortexm.inc.mk

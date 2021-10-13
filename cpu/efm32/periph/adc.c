@@ -19,6 +19,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "mutex.h"
 
@@ -59,7 +61,7 @@ int adc_init(adc_t line)
     return 0;
 }
 
-int adc_sample(adc_t line, adc_res_t res)
+int32_t adc_sample(adc_t line, adc_res_t res)
 {
     /* resolutions larger than 12 bits are not supported */
     if (res >= ADC_MODE_UNDEF(0)) {
@@ -77,9 +79,9 @@ int adc_sample(adc_t line, adc_res_t res)
     init.acqTime = adc_channel_config[line].acq_time;
     init.reference = adc_channel_config[line].reference;
     init.resolution = (ADC_Res_TypeDef) (res & 0x0F);
-#ifdef _SILICON_LABS_32B_SERIES_0
+#if defined(_SILICON_LABS_32B_SERIES_0)
     init.input = adc_channel_config[line].input;
-#else
+#elif defined(_SILICON_LABS_32B_SERIES_1)
     init.posSel = adc_channel_config[line].input;
 #endif
 
@@ -88,7 +90,7 @@ int adc_sample(adc_t line, adc_res_t res)
     /* start conversion and block until it completes */
     ADC_Start(adc_config[dev].dev, adcStartSingle);
 
-    while (adc_config[dev].dev->STATUS & ADC_STATUS_SINGLEACT);
+    while ((adc_config[dev].dev->STATUS & ADC_STATUS_SINGLEDV) == 0);
 
     int result = ADC_DataSingleGet(adc_config[dev].dev);
 

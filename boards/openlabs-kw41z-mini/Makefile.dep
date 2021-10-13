@@ -1,0 +1,8 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_adc
+  USEMODULE += saul_gpio
+endif
+
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  USEMODULE += kw41zrf
+endif

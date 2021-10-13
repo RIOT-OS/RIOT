@@ -3,39 +3,24 @@
  *
  * \brief Instance description for AC
  *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2016 Atmel Corporation,
+ *                    a wholly owned subsidiary of Microchip Technology Inc.
  *
  * \asf_license_start
  *
  * \page License
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the Licence at
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * \asf_license_stop
  *
@@ -46,35 +31,35 @@
 
 /* ========== Register definition for AC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-#define REG_AC_CTRLA               (0x42004400U) /**< \brief (AC) Control A */
-#define REG_AC_CTRLB               (0x42004401U) /**< \brief (AC) Control B */
-#define REG_AC_EVCTRL              (0x42004402U) /**< \brief (AC) Event Control */
-#define REG_AC_INTENCLR            (0x42004404U) /**< \brief (AC) Interrupt Enable Clear */
-#define REG_AC_INTENSET            (0x42004405U) /**< \brief (AC) Interrupt Enable Set */
-#define REG_AC_INTFLAG             (0x42004406U) /**< \brief (AC) Interrupt Flag Status and Clear */
-#define REG_AC_STATUSA             (0x42004408U) /**< \brief (AC) Status A */
-#define REG_AC_STATUSB             (0x42004409U) /**< \brief (AC) Status B */
-#define REG_AC_STATUSC             (0x4200440AU) /**< \brief (AC) Status C */
-#define REG_AC_WINCTRL             (0x4200440CU) /**< \brief (AC) Window Control */
-#define REG_AC_COMPCTRL0           (0x42004410U) /**< \brief (AC) Comparator Control 0 */
-#define REG_AC_COMPCTRL1           (0x42004414U) /**< \brief (AC) Comparator Control 1 */
-#define REG_AC_SCALER0             (0x42004420U) /**< \brief (AC) Scaler 0 */
-#define REG_AC_SCALER1             (0x42004421U) /**< \brief (AC) Scaler 1 */
+#define REG_AC_CTRLA               (0x42004400) /**< \brief (AC) Control A */
+#define REG_AC_CTRLB               (0x42004401) /**< \brief (AC) Control B */
+#define REG_AC_EVCTRL              (0x42004402) /**< \brief (AC) Event Control */
+#define REG_AC_INTENCLR            (0x42004404) /**< \brief (AC) Interrupt Enable Clear */
+#define REG_AC_INTENSET            (0x42004405) /**< \brief (AC) Interrupt Enable Set */
+#define REG_AC_INTFLAG             (0x42004406) /**< \brief (AC) Interrupt Flag Status and Clear */
+#define REG_AC_STATUSA             (0x42004408) /**< \brief (AC) Status A */
+#define REG_AC_STATUSB             (0x42004409) /**< \brief (AC) Status B */
+#define REG_AC_STATUSC             (0x4200440A) /**< \brief (AC) Status C */
+#define REG_AC_WINCTRL             (0x4200440C) /**< \brief (AC) Window Control */
+#define REG_AC_COMPCTRL0           (0x42004410) /**< \brief (AC) Comparator Control 0 */
+#define REG_AC_COMPCTRL1           (0x42004414) /**< \brief (AC) Comparator Control 1 */
+#define REG_AC_SCALER0             (0x42004420) /**< \brief (AC) Scaler 0 */
+#define REG_AC_SCALER1             (0x42004421) /**< \brief (AC) Scaler 1 */
 #else
-#define REG_AC_CTRLA               (*(RwReg8 *)0x42004400U) /**< \brief (AC) Control A */
-#define REG_AC_CTRLB               (*(WoReg8 *)0x42004401U) /**< \brief (AC) Control B */
-#define REG_AC_EVCTRL              (*(RwReg16*)0x42004402U) /**< \brief (AC) Event Control */
-#define REG_AC_INTENCLR            (*(RwReg8 *)0x42004404U) /**< \brief (AC) Interrupt Enable Clear */
-#define REG_AC_INTENSET            (*(RwReg8 *)0x42004405U) /**< \brief (AC) Interrupt Enable Set */
-#define REG_AC_INTFLAG             (*(RwReg8 *)0x42004406U) /**< \brief (AC) Interrupt Flag Status and Clear */
-#define REG_AC_STATUSA             (*(RoReg8 *)0x42004408U) /**< \brief (AC) Status A */
-#define REG_AC_STATUSB             (*(RoReg8 *)0x42004409U) /**< \brief (AC) Status B */
-#define REG_AC_STATUSC             (*(RoReg8 *)0x4200440AU) /**< \brief (AC) Status C */
-#define REG_AC_WINCTRL             (*(RwReg8 *)0x4200440CU) /**< \brief (AC) Window Control */
-#define REG_AC_COMPCTRL0           (*(RwReg  *)0x42004410U) /**< \brief (AC) Comparator Control 0 */
-#define REG_AC_COMPCTRL1           (*(RwReg  *)0x42004414U) /**< \brief (AC) Comparator Control 1 */
-#define REG_AC_SCALER0             (*(RwReg8 *)0x42004420U) /**< \brief (AC) Scaler 0 */
-#define REG_AC_SCALER1             (*(RwReg8 *)0x42004421U) /**< \brief (AC) Scaler 1 */
+#define REG_AC_CTRLA               (*(RwReg8 *)0x42004400UL) /**< \brief (AC) Control A */
+#define REG_AC_CTRLB               (*(WoReg8 *)0x42004401UL) /**< \brief (AC) Control B */
+#define REG_AC_EVCTRL              (*(RwReg16*)0x42004402UL) /**< \brief (AC) Event Control */
+#define REG_AC_INTENCLR            (*(RwReg8 *)0x42004404UL) /**< \brief (AC) Interrupt Enable Clear */
+#define REG_AC_INTENSET            (*(RwReg8 *)0x42004405UL) /**< \brief (AC) Interrupt Enable Set */
+#define REG_AC_INTFLAG             (*(RwReg8 *)0x42004406UL) /**< \brief (AC) Interrupt Flag Status and Clear */
+#define REG_AC_STATUSA             (*(RoReg8 *)0x42004408UL) /**< \brief (AC) Status A */
+#define REG_AC_STATUSB             (*(RoReg8 *)0x42004409UL) /**< \brief (AC) Status B */
+#define REG_AC_STATUSC             (*(RoReg8 *)0x4200440AUL) /**< \brief (AC) Status C */
+#define REG_AC_WINCTRL             (*(RwReg8 *)0x4200440CUL) /**< \brief (AC) Window Control */
+#define REG_AC_COMPCTRL0           (*(RwReg  *)0x42004410UL) /**< \brief (AC) Comparator Control 0 */
+#define REG_AC_COMPCTRL1           (*(RwReg  *)0x42004414UL) /**< \brief (AC) Comparator Control 1 */
+#define REG_AC_SCALER0             (*(RwReg8 *)0x42004420UL) /**< \brief (AC) Scaler 0 */
+#define REG_AC_SCALER1             (*(RwReg8 *)0x42004421UL) /**< \brief (AC) Scaler 1 */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for AC peripheral ========== */

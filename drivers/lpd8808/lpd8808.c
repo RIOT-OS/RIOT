@@ -13,7 +13,7 @@
  * @file
  * @brief       LPD8808 based LED strip driver implementation
  *
- * @author      Hauke Petersen <mail@haukepetersen.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -56,7 +56,7 @@ static void flush(const lpd8808_t *dev)
 
 int lpd8808_init(lpd8808_t *dev, const lpd8808_params_t *params)
 {
-    memcpy(dev, params, sizeof(lpd8808_params_t));
+    *dev = *params;
 
     /* initialize pins */
     gpio_init(dev->pin_dat, GPIO_OUT);

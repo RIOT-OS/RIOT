@@ -1,9 +1,14 @@
-ifneq (,$(filter tinydtls,$(USEPKG)))
-  USEMODULE += tinydtls
-endif
+USEMODULE += tinydtls
 
-ifneq (,$(filter tinydtls,$(USEMODULE)))
-  USEMODULE += tinydtls_aes
-  USEMODULE += tinydtls_ecc
-  USEMODULE += tinydtls_sha2
+USEMODULE += memarray
+USEMODULE += hashes
+USEMODULE += random
+USEMODULE += tinydtls_aes
+USEMODULE += tinydtls_ecc
+
+# TinyDTLS only has support for 32-bit architectures ATM
+FEATURES_REQUIRED += arch_32bit
+
+ifneq (,$(filter sock_dtls,$(USEMODULE)))
+  USEMODULE += tinydtls_sock_dtls
 endif

@@ -90,16 +90,16 @@ typedef struct {
      */
     gnrc_mac_rx_t rx;
 #endif /* ((GNRC_MAC_RX_QUEUE_SIZE != 0) || (GNRC_MAC_DISPATCH_BUFFER_SIZE != 0)) || DOXYGEN */
-#if ((GNRC_MAC_TX_QUEUE_SIZE != 0) || (GNRC_MAC_NEIGHBOR_COUNT != 0)) || DOXYGEN
+#if ((GNRC_MAC_TX_QUEUE_SIZE != 0) || (CONFIG_GNRC_MAC_NEIGHBOR_COUNT != 0)) || DOXYGEN
     /**
      * @brief MAC internal object which stores transmission parameters, queues, and
      *        state machines.
      *
      * @note    Only available if @ref GNRC_MAC_TX_QUEUE_SIZE or
-     *          @ref GNRC_MAC_NEIGHBOR_COUNT is greater than 0.
+     *          @ref CONFIG_GNRC_MAC_NEIGHBOR_COUNT is greater than 0.
      */
     gnrc_mac_tx_t tx;
-#endif  /* ((GNRC_MAC_TX_QUEUE_SIZE != 0) || (GNRC_MAC_NEIGHBOR_COUNT == 0)) || DOXYGEN */
+#endif  /* ((GNRC_MAC_TX_QUEUE_SIZE != 0) || (CONFIG_GNRC_MAC_NEIGHBOR_COUNT == 0)) || DOXYGEN */
 
 #if defined(MODULE_GNRC_LWMAC) || defined(MODULE_GNRC_GOMACH)
     gnrc_mac_prot_t prot;

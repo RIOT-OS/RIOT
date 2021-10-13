@@ -18,14 +18,24 @@
  * @}
  */
 
+#include "cpu_conf.h"
+
+#if defined(MODULE_NEWLIB_SYSCALLS_DEFAULT) || defined (HAVE_HEAP_STATS)
 extern void heap_stats(void);
+#else
+#include <stdio.h>
+#endif
 
 int _heap_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
 
+#if defined(MODULE_NEWLIB_SYSCALLS_DEFAULT) || defined (HAVE_HEAP_STATS)
     heap_stats();
-
     return 0;
+#else
+    printf("heap statistics are not supported for %s cpu\n", RIOT_CPU);
+    return 1;
+#endif
 }

@@ -19,13 +19,20 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "kernel_defines.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "net/sixlowpan/nd.h"
 #include "timex.h"
-#include "xtimer.h"
 
+#if IS_USED(MODULE_ZTIMER_MSEC)
+#include "ztimer.h"
+static ztimer_t del_timer[GNRC_SIXLOWPAN_CTX_SIZE];
+#else
+#include "xtimer.h"
 static xtimer_t del_timer[GNRC_SIXLOWPAN_CTX_SIZE];
+#endif
+
 void _del_cb(void *ptr)
 {
     gnrc_sixlowpan_ctx_t *ctx = ptr;
@@ -69,6 +76,9 @@ int _gnrc_6ctx_add(char *cmd_str, char *ctx_str, char *prefix_str, char *ltime_s
         _usage(cmd_str);
         return 1;
     }
+    if (!IS_USED(MODULE_GNRC_IPV6_NIB_6LBR)) {
+        puts("WARNING: context dissemination by non-6LBR not supported");
+    }
     addr_str = strtok_r(prefix_str, "/", &save_ptr);
     if (addr_str == NULL) {
         _usage(cmd_str);
@@ -106,15 +116,23 @@ int _gnrc_6ctx_del(char *cmd_str, char *ctx_str)
         _usage(cmd_str);
         return 1;
     }
-    else if (del_timer[cid].callback == NULL) {
+    if (!IS_USED(MODULE_GNRC_IPV6_NIB_6LBR)) {
+        puts("WARNING: context dissemination by non-6LBR not supported");
+    }
+    if (del_timer[cid].callback == NULL) {
         ctx = gnrc_sixlowpan_ctx_lookup_id(cid);
         if (ctx != NULL) {
             ctx->flags_id &= ~GNRC_SIXLOWPAN_CTX_FLAGS_COMP;
             ctx->ltime = 0;
             del_timer[cid].callback = _del_cb;
             del_timer[cid].arg = ctx;
+#if IS_USED(MODULE_ZTIMER_MSEC)
+            ztimer_set(ZTIMER_MSEC, &del_timer[cid],
+                       SIXLOWPAN_ND_MIN_CTX_CHANGE_SEC_DELAY * MS_PER_SEC);
+#else
             xtimer_set(&del_timer[cid],
                        SIXLOWPAN_ND_MIN_CTX_CHANGE_SEC_DELAY * US_PER_SEC);
+#endif
         }
     }
     else {

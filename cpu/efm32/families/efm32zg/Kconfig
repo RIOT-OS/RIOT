@@ -1,0 +1,98 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_FAM_EFM32ZG
+    bool
+    select CPU_CORE_CORTEX_M0PLUS
+    select CPU_COMMON_EFM32
+    select CPU_EFM32_SERIES0
+
+## CPU Models
+config CPU_MODEL_EFM32ZG222F16
+    bool
+    select CPU_FAM_EFM32ZG
+
+config CPU_MODEL_EFM32ZG108F8
+    bool
+    select CPU_FAM_EFM32ZG
+
+config CPU_MODEL_EFM32ZG110F16
+    bool
+    select CPU_FAM_EFM32ZG
+
+config CPU_MODEL_EFM32ZG108F32
+    bool
+    select CPU_FAM_EFM32ZG
+
+config CPU_MODEL_EFM32ZG210F4
+    bool
+    select CPU_FAM_EFM32ZG
+
+config CPU_MODEL_EFM32ZG210F32
+    bool
+    select CPU_FAM_EFM32ZG
+
+config CPU_MODEL_EFM32ZG222F8
+    bool
+    select CPU_FAM_EFM32ZG
+
+config CPU_MODEL_EFM32ZG110F4
+    bool
+    select CPU_FAM_EFM32ZG
+
+config CPU_MODEL_EFM32ZG210F16
+    bool
+    select CPU_FAM_EFM32ZG
+
+config CPU_MODEL_EFM32ZG108F4
+    bool
+    select CPU_FAM_EFM32ZG
+
+config CPU_MODEL_EFM32ZG210F8
+    bool
+    select CPU_FAM_EFM32ZG
+
+config CPU_MODEL_EFM32ZG222F32
+    bool
+    select CPU_FAM_EFM32ZG
+
+config CPU_MODEL_EFM32ZG222F4
+    bool
+    select CPU_FAM_EFM32ZG
+
+config CPU_MODEL_EFM32ZG110F32
+    bool
+    select CPU_FAM_EFM32ZG
+
+config CPU_MODEL_EFM32ZG110F8
+    bool
+    select CPU_FAM_EFM32ZG
+
+config CPU_MODEL_EFM32ZG108F16
+    bool
+    select CPU_FAM_EFM32ZG
+
+## Common CPU symbols
+config CPU_FAM
+    default "efm32zg" if CPU_FAM_EFM32ZG
+
+config CPU_MODEL
+    default "efm32zg222f16" if CPU_MODEL_EFM32ZG222F16
+    default "efm32zg108f8" if CPU_MODEL_EFM32ZG108F8
+    default "efm32zg110f16" if CPU_MODEL_EFM32ZG110F16
+    default "efm32zg108f32" if CPU_MODEL_EFM32ZG108F32
+    default "efm32zg210f4" if CPU_MODEL_EFM32ZG210F4
+    default "efm32zg210f32" if CPU_MODEL_EFM32ZG210F32
+    default "efm32zg222f8" if CPU_MODEL_EFM32ZG222F8
+    default "efm32zg110f4" if CPU_MODEL_EFM32ZG110F4
+    default "efm32zg210f16" if CPU_MODEL_EFM32ZG210F16
+    default "efm32zg108f4" if CPU_MODEL_EFM32ZG108F4
+    default "efm32zg210f8" if CPU_MODEL_EFM32ZG210F8
+    default "efm32zg222f32" if CPU_MODEL_EFM32ZG222F32
+    default "efm32zg222f4" if CPU_MODEL_EFM32ZG222F4
+    default "efm32zg110f32" if CPU_MODEL_EFM32ZG110F32
+    default "efm32zg110f8" if CPU_MODEL_EFM32ZG110F8
+    default "efm32zg108f16" if CPU_MODEL_EFM32ZG108F16

@@ -3,39 +3,25 @@
  *
  * \brief Instance description for EIC
  *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2018 Microchip Technology Inc.
  *
  * \asf_license_start
  *
  * \page License
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * SPDX-License-Identifier: Apache-2.0
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the Licence at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * \asf_license_stop
  *
@@ -46,29 +32,29 @@
 
 /* ========== Register definition for EIC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-#define REG_EIC_CTRLA              (0x40002400U) /**< \brief (EIC) Control */
-#define REG_EIC_NMICTRL            (0x40002401U) /**< \brief (EIC) NMI Control */
-#define REG_EIC_NMIFLAG            (0x40002402U) /**< \brief (EIC) NMI Interrupt Flag */
-#define REG_EIC_SYNCBUSY           (0x40002404U) /**< \brief (EIC) Syncbusy register */
-#define REG_EIC_EVCTRL             (0x40002408U) /**< \brief (EIC) Event Control */
-#define REG_EIC_INTENCLR           (0x4000240CU) /**< \brief (EIC) Interrupt Enable Clear */
-#define REG_EIC_INTENSET           (0x40002410U) /**< \brief (EIC) Interrupt Enable Set */
-#define REG_EIC_INTFLAG            (0x40002414U) /**< \brief (EIC) Interrupt Flag Status and Clear */
-#define REG_EIC_ASYNCH             (0x40002418U) /**< \brief (EIC) EIC Asynchronous edge Detection Enable */
-#define REG_EIC_CONFIG0            (0x4000241CU) /**< \brief (EIC) Configuration 0 */
-#define REG_EIC_CONFIG1            (0x40002420U) /**< \brief (EIC) Configuration 1 */
+#define REG_EIC_CTRLA              (0x40002400) /**< \brief (EIC) Control */
+#define REG_EIC_NMICTRL            (0x40002401) /**< \brief (EIC) NMI Control */
+#define REG_EIC_NMIFLAG            (0x40002402) /**< \brief (EIC) NMI Interrupt Flag */
+#define REG_EIC_SYNCBUSY           (0x40002404) /**< \brief (EIC) Syncbusy register */
+#define REG_EIC_EVCTRL             (0x40002408) /**< \brief (EIC) Event Control */
+#define REG_EIC_INTENCLR           (0x4000240C) /**< \brief (EIC) Interrupt Enable Clear */
+#define REG_EIC_INTENSET           (0x40002410) /**< \brief (EIC) Interrupt Enable Set */
+#define REG_EIC_INTFLAG            (0x40002414) /**< \brief (EIC) Interrupt Flag Status and Clear */
+#define REG_EIC_ASYNCH             (0x40002418) /**< \brief (EIC) EIC Asynchronous edge Detection Enable */
+#define REG_EIC_CONFIG0            (0x4000241C) /**< \brief (EIC) Configuration 0 */
+#define REG_EIC_CONFIG1            (0x40002420) /**< \brief (EIC) Configuration 1 */
 #else
-#define REG_EIC_CTRLA              (*(RwReg8 *)0x40002400U) /**< \brief (EIC) Control */
-#define REG_EIC_NMICTRL            (*(RwReg8 *)0x40002401U) /**< \brief (EIC) NMI Control */
-#define REG_EIC_NMIFLAG            (*(RwReg16*)0x40002402U) /**< \brief (EIC) NMI Interrupt Flag */
-#define REG_EIC_SYNCBUSY           (*(RoReg  *)0x40002404U) /**< \brief (EIC) Syncbusy register */
-#define REG_EIC_EVCTRL             (*(RwReg  *)0x40002408U) /**< \brief (EIC) Event Control */
-#define REG_EIC_INTENCLR           (*(RwReg  *)0x4000240CU) /**< \brief (EIC) Interrupt Enable Clear */
-#define REG_EIC_INTENSET           (*(RwReg  *)0x40002410U) /**< \brief (EIC) Interrupt Enable Set */
-#define REG_EIC_INTFLAG            (*(RwReg  *)0x40002414U) /**< \brief (EIC) Interrupt Flag Status and Clear */
-#define REG_EIC_ASYNCH             (*(RwReg  *)0x40002418U) /**< \brief (EIC) EIC Asynchronous edge Detection Enable */
-#define REG_EIC_CONFIG0            (*(RwReg  *)0x4000241CU) /**< \brief (EIC) Configuration 0 */
-#define REG_EIC_CONFIG1            (*(RwReg  *)0x40002420U) /**< \brief (EIC) Configuration 1 */
+#define REG_EIC_CTRLA              (*(RwReg8 *)0x40002400UL) /**< \brief (EIC) Control */
+#define REG_EIC_NMICTRL            (*(RwReg8 *)0x40002401UL) /**< \brief (EIC) NMI Control */
+#define REG_EIC_NMIFLAG            (*(RwReg16*)0x40002402UL) /**< \brief (EIC) NMI Interrupt Flag */
+#define REG_EIC_SYNCBUSY           (*(RoReg  *)0x40002404UL) /**< \brief (EIC) Syncbusy register */
+#define REG_EIC_EVCTRL             (*(RwReg  *)0x40002408UL) /**< \brief (EIC) Event Control */
+#define REG_EIC_INTENCLR           (*(RwReg  *)0x4000240CUL) /**< \brief (EIC) Interrupt Enable Clear */
+#define REG_EIC_INTENSET           (*(RwReg  *)0x40002410UL) /**< \brief (EIC) Interrupt Enable Set */
+#define REG_EIC_INTFLAG            (*(RwReg  *)0x40002414UL) /**< \brief (EIC) Interrupt Flag Status and Clear */
+#define REG_EIC_ASYNCH             (*(RwReg  *)0x40002418UL) /**< \brief (EIC) EIC Asynchronous edge Detection Enable */
+#define REG_EIC_CONFIG0            (*(RwReg  *)0x4000241CUL) /**< \brief (EIC) Configuration 0 */
+#define REG_EIC_CONFIG1            (*(RwReg  *)0x40002420UL) /**< \brief (EIC) Configuration 1 */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for EIC peripheral ========== */
