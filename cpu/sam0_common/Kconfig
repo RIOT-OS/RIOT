@@ -25,13 +25,11 @@ config CPU_COMMON_SAM0
     select HAS_PERIPH_WDT
     select HAS_PERIPH_WDT_CB
     select HAS_PERIPH_WDT_WARNING_PERIOD
+    select HAVE_SHARED_PERIPH_RTT_PERIPH_RTC
 
 if CPU_COMMON_SAM0
 
 rsource "periph/Kconfig"
-
-config ERROR_MODULES_CONFLICT
-    default "On SAM0, the RTC and RTT map to the same hardware peripheral." if MODULE_PERIPH_RTC && MODULE_PERIPH_RTT
 
 endif # CPU_COMMON_SAM0
 

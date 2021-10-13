@@ -162,5 +162,11 @@ config MODULE_PERIPH_INIT_USBDEV
 
 endif # TEST_KCONFIG
 
+config HAVE_SHARED_PERIPH_RTT_PERIPH_RTC
+    bool
+    help
+        The periph_rtc module or the periph_rtt module share hardware, thus,
+        only one can be selected.
+
 rsource "Kconfig.timer"
 rsource "Kconfig.wdt"

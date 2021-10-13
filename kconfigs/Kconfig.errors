@@ -15,6 +15,7 @@
 
 config ERROR_MODULES_CONFLICT
     string
+    default "The RTC and RTT map to the same hardware peripheral." if MODULE_PERIPH_RTC && MODULE_PERIPH_RTT && HAVE_SHARED_PERIPH_RTT_PERIPH_RTC
     help
         Used to indicate that conflicting modules (i.e. modules that can't be
         active at the same time) are being used together.

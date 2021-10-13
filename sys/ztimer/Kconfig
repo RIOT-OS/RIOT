@@ -75,8 +75,7 @@ choice
     bool "Backend"
     depends on MODULE_ZTIMER_SEC
     default ZTIMER_SEC_BACKEND_RTC if !BOARD_NATIVE && \
-                                      !CPU_COMMON_SAM0 && \
-                                      !CPU_COMMON_EFM32
+                                      !HAVE_SHARED_PERIPH_RTT_PERIPH_RTC
     default ZTIMER_SEC_BACKEND_RTT
 
 config ZTIMER_SEC_BACKEND_TIMER
