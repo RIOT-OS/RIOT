@@ -79,6 +79,8 @@ These abbreviations are used in subsequent tables:
 *SDC* = SD-Card interface is used (module **sdcard_spi** is enabled)<br>
 *CAM* = Camera is plugged in/used
 
+<center>
+
 | Function              | None      | SDC       | CAM       | SDC + CAM | Remarks                       | Configuration                 |
 |:----------------------|-----------|-----------|-----------|-----------|:------------------------------|-------------------------------|
 | `ADC_LINE(0)`         | `GPIO34`  | `GPIO34`  | -         | -         | `CAMERA_D6`                   | \ref esp32_adc_channels       |
@@ -122,7 +124,11 @@ These abbreviations are used in subsequent tables:
 | `CAMERA_SIO_C`        | -         | -         | `GPIO27`  | `GPIO27`  |                               |                               |
 | `CAMERA_RESET`        | -         | -         | `GPIO0`   | `GPIO0`   |                               |                               |
 
+</center>
+
 Following table shows the default board configuration sorted by GPIOs.
+
+<center>
 
 | Pin    | None                   | SDC                 | CAM                 | SDC+CAM                    | Remarks |
 |:-------|:-----------------------|:--------------------|:--------------------|:---------------------------|:-----|
@@ -158,6 +164,8 @@ Following table shows the default board configuration sorted by GPIOs.
 | GPIO35 | ADC_LINE(1)            | ADC_LINE(1)         | ADC_LINE(1)         | CAMERA_D7                  | |
 | GPIO36 | ADC_LINE(2)            | ADC_LINE(2)         | ADC_LINE(2)         | CAMERA_D4                  | |
 | GPIO39 | ADC_LINE(3)            | ADC_LINE(3)         | ADC_LINE(3)         | CAMERA_D5                  | |
+
+</center>
 
 @note
 - SPI_DEV(0) uses the HSPI interface with the GPIO2 pin as the MISO signal.
