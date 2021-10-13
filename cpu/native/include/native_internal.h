@@ -150,8 +150,8 @@ extern volatile int _native_sigpend;
 extern volatile int _native_in_isr;
 extern volatile int _native_in_syscall;
 
-extern char __isr_stack[SIGSTKSZ];
-extern char __end_stack[SIGSTKSZ];
+extern char __isr_stack[];
+extern char __end_stack[];
 extern ucontext_t native_isr_context;
 extern ucontext_t end_context;
 extern ucontext_t *_native_cur_ctx, *_native_isr_ctx;
