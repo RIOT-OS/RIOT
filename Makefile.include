@@ -57,7 +57,6 @@ BINDIR                          ?= $(BINDIRBASE)/$(BOARD)
 PKGDIRBASE                      ?= $(RIOTBASE)/build/pkg
 DLCACHE                         ?= $(RIOTTOOLS)/dlcache/dlcache.sh
 DLCACHE_DIR                     ?= $(RIOTBASE)/.dlcache
-WARNING_EXTERNAL_MODULE_DIRS    ?= 1
 RIOT_VERSION_DUMMY_CODE         ?= RIOT_VERSION_NUM\(2042,5,23,0\)
 
 # include CI info such as BOARD_INSUFFICIENT_MEMORY, if existing
@@ -114,14 +113,6 @@ ifneq ($(RIOT_CI_BUILD),1)
     ifneq (,$(BOARDSDIR))
       $(warning Using BOARDSDIR is deprecated use EXTERNAL_BOARD_DIRS instead)
       $(info EXTERNAL_BOARD_DIRS can contain multiple folders separated by space)
-    endif
-
-    # API change warning for EXTERNAL_MODULE_DIRS, remove by 2021.10
-    ifneq (,$(EXTERNAL_MODULE_DIRS))
-      ifeq (1,$(WARNING_EXTERNAL_MODULE_DIRS))
-        $(info Warning! EXTERNAL_MODULE_DIRS is a search folder since 2021.07-branch, see \
-               https://doc.riot-os.org/creating-modules.html#modules-outside-of-riotbase)
-      endif
     endif
   endif
 endif
