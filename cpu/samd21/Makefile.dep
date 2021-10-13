@@ -1,0 +1,3 @@
+USEMODULE += samd21_vectors
+
+include $(RIOTCPU)/sam0_common/Makefile.dep

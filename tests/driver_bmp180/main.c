@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <inttypes.h>
 
@@ -35,11 +36,7 @@ int main(void)
 
     printf("+------------Initializing------------+\n");
     result = bmp180_init(&dev, &bmp180_params[0]);
-    if (result == -BMP180_ERR_NOI2C) {
-        puts("[Error] The given i2c is not enabled");
-        return 1;
-    }
-    else if (result == -BMP180_ERR_NODEV) {
+    if (result == -BMP180_ERR_NODEV) {
         puts("[Error] The sensor did not answer correctly on the given address");
         return 1;
     }
@@ -77,12 +74,12 @@ int main(void)
         /* Get altitude in meters */
         int16_t altitude = bmp180_altitude(&dev, pressure_0);
 
-        printf("Temperature [°C]: %d.%d\n"
+        printf("Temperature [°C]: %i.%d\n"
                "Pressure [hPa]: %lu.%d\n"
                "Pressure at see level [hPa]: %lu.%d\n"
               "Altitude [m]: %i\n"
                "\n+-------------------------------------+\n",
-               (int)(temperature / 10), (int)(temperature % 10),
+               (int)(temperature / 10), abs(temperature % 10),
                (unsigned long)pressure / 100, (int)(pressure % 100),
                (unsigned long)pressure_0 / 100, (int)(pressure_0 % 100),
                (int)altitude);

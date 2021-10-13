@@ -1,0 +1,53 @@
+From 16a6d98096f5cc15a5716b665341fd22d04ec426 Mon Sep 17 00:00:00 2001
+From: Koen Zandberg <koen@bergzand.net>
+Date: Thu, 5 Sep 2019 09:45:50 +0200
+Subject: [PATCH 1/2] Replace typeof with __typeof__ for compatibility
+
+---
+ src/ext/handy.h | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/ext/handy.h b/src/ext/handy.h
+index a9b2d9d..d7d9dd4 100644
+--- a/src/ext/handy.h
++++ b/src/ext/handy.h
+@@ -15,14 +15,14 @@
+ /* Normal MIN/MAX macros.  Evaluate argument expressions only once. */
+ #ifndef MIN
+   #define MIN(x, y) \
+-    ({ typeof (x) __x = (x); \
+-       typeof (y) __y = (y); \
++    ({ __typeof__ (x) __x = (x); \
++       __typeof__ (y) __y = (y); \
+        __x < __y ? __x : __y; })
+ #endif
+ #ifndef MAX
+   #define MAX(x, y) \
+-    ({ typeof (x) __x = (x); \
+-       typeof (y) __y = (y); \
++    ({ __typeof__ (x) __x = (x); \
++       __typeof__ (y) __y = (y); \
+        __x > __y ? __x : __y; })
+ #endif
+ 
+@@ -30,7 +30,7 @@
+ #ifndef SWAP
+   #define SWAP(x, y) \
+     do { \
+-      typeof (x) __tmp = (x); \
++      __typeof__ (x) __tmp = (x); \
+       (x) = (y); \
+       (y) = __tmp; \
+     } while (0)
+@@ -48,7 +48,7 @@
+ /** Error: return. 
+  *  
+  *  If the expression fails, return the error from this function. */
+-#define ER(expr) do { typeof (expr) err_ = (expr); if (err_) return err_; } while (0)
++#define ER(expr) do { __typeof__ (expr) err_ = (expr); if (err_) return err_; } while (0)
+ 
+ /** Error: goto.
+  *
+-- 
+2.21.0
+

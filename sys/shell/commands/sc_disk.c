@@ -142,7 +142,7 @@ int _read_bytes(int argc, char **argv)
         /* calculate sector and offset position */
         sector = (offset / ssize) + 1;
         offset = (offset % ssize);
-        /* preapre buffer (size must be a multiple of sector size) */
+        /* prepare buffer (size must be a multiple of sector size) */
         unsigned char read_buf[((length / ssize) + 1) * 512];
 
         /* read from several sectors */

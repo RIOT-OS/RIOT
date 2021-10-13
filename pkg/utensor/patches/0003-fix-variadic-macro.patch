@@ -1,0 +1,55 @@
+From f68167af0e950ac5330ba5586758ebdc77cb66a1 Mon Sep 17 00:00:00 2001
+From: Alexandre Abadie <alexandre.abadie@inria.fr>
+Date: Mon, 25 Nov 2019 16:18:30 +0100
+Subject: [PATCH] util: fix variadic macros
+
+---
+ src/uTensor/util/uTensor_util.hpp | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/uTensor/util/uTensor_util.hpp b/src/uTensor/util/uTensor_util.hpp
+index 9fff08b..31206a3 100644
+--- a/src/uTensor/util/uTensor_util.hpp
++++ b/src/uTensor/util/uTensor_util.hpp
+@@ -28,9 +28,9 @@ void return_error(int ret_val);
+     return_error(FUNC);   \
+   }
+ 
+-#define DEBUG(MSG, ...)         \
++#define DEBUG(...)         \
+   {                             \
+-    printf(MSG, ##__VA_ARGS__); \
++    printf(__VA_ARGS__); \
+     fflush(stdout);             \
+   }
+ 
+@@ -44,16 +44,16 @@ enum Padding {
+ // }
+ 
+ #define ON_ERR(FUNC, MSG) FUNC
+-#define DEBUG(MSG, ...)
++#define DEBUG(...)
+ 
+ #endif
+ 
+ void utensor_exit(void);
+ 
+-#define ERR_EXIT(MSG, ...)                                      \
++#define ERR_EXIT(...)                                      \
+   {                                                             \
+     printf("[Error] %s:%d @%s ", __FILE__, __LINE__, __func__); \
+-    printf(MSG, ##__VA_ARGS__);                                 \
++    printf(__VA_ARGS__);                                 \
+     fflush(stdout);                                             \
+     utensor_exit();                                          \
+   }
+@@ -130,4 +130,4 @@ uint16_t ntoh16(uint16_t val);
+ uint32_t ntoh32(uint32_t val);
+ 
+ void init_env();
+-#endif
+\ No newline at end of file
++#endif
+-- 
+2.20.1
+

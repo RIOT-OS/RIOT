@@ -1,0 +1,15 @@
+CPU = stm32
+CPU_MODEL = stm32g070rb
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
+
+# Put other features for this board (in alphabetical order)
+FEATURES_PROVIDED += riotboot
+
+# load the common Makefile.features for Nucleo boards
+include $(RIOTBOARD)/common/nucleo64/Makefile.features

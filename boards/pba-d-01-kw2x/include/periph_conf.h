@@ -43,20 +43,24 @@ static const clock_config_t clock_config = {
      */
     .clkdiv1 = SIM_CLKDIV1_OUTDIV1(0) | SIM_CLKDIV1_OUTDIV2(0) |
                SIM_CLKDIV1_OUTDIV4(1),
+    .rtc_clc = 0, /* External load caps on the FRDM-K22F board */
+    .osc32ksel = SIM_SOPT1_OSC32KSEL(2),
+    .clock_flags =
+        /* No OSC0_EN, use modem clock from EXTAL0 */
+        KINETIS_CLOCK_RTCOSC_EN |
+        KINETIS_CLOCK_USE_FAST_IRC |
+        0,
     .default_mode = KINETIS_MCG_MODE_PEE,
     /* The modem generates a 4 MHz clock signal */
     .erc_range = KINETIS_MCG_ERC_RANGE_HIGH,
-    .fcrdiv = 0, /* Fast IRC divide by 1 => 4 MHz */
-    .oscsel = 0, /* Use EXTAL0 for external clock */
-    .clc = 0, /* OSC0 is unused*/
-    .fll_frdiv = 0b010, /* Divide by 128 */
+    .osc_clc = 0, /* OSC0 is unused*/
+    .oscsel = MCG_C7_OSCSEL(0), /* Use EXTAL0 for external clock */
+    .fcrdiv = MCG_SC_FCRDIV(0), /* Fast IRC divide by 1 => 4 MHz */
+    .fll_frdiv = MCG_C1_FRDIV(0b010), /* Divide by 128 */
     .fll_factor_fei = KINETIS_MCG_FLL_FACTOR_1464, /* FLL freq = 48 MHz */
     .fll_factor_fee = KINETIS_MCG_FLL_FACTOR_1280, /* FLL freq = 40 MHz */
-    .pll_prdiv = 0b00001, /* Divide by 2 */
-    .pll_vdiv = 0b00000, /* Multiply by 24 => PLL freq = 48 MHz */
-    .enable_oscillator = false, /* Use modem clock from EXTAL0 */
-    .select_fast_irc = true,
-    .enable_mcgirclk = false,
+    .pll_prdiv = MCG_C5_PRDIV0(0b00001), /* Divide by 2 */
+    .pll_vdiv = MCG_C6_VDIV0(0b00000), /* Multiply by 24 => PLL freq = 48 MHz */
 };
 #define CLOCK_CORECLOCK              (48000000ul)
 #define CLOCK_BUSCLOCK               (CLOCK_CORECLOCK / 1)
@@ -84,8 +88,6 @@ static const clock_config_t clock_config = {
 #define PIT_BASECLOCK           (CLOCK_BUSCLOCK)
 #define PIT_ISR_0               isr_pit1
 #define PIT_ISR_1               isr_pit3
-#define LPTMR_ISR_0             isr_lptmr0
-
 /** @} */
 
 /**
@@ -124,7 +126,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_0_ISR          (isr_uart2_rx_tx)
 #define UART_1_ISR          (isr_uart0_rx_tx)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
@@ -132,15 +134,15 @@ static const uart_conf_t uart_config[] = {
  * @{
  */
 static const adc_conf_t adc_config[] = {
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_E, 2), .chan =  1 },
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_E, 3), .chan =  1 },
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_D, 7), .chan = 22 },
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_D, 5), .chan =  6 },
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_E, 0), .chan = 10 },
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_E, 1), .chan = 11 }
+    [ 0] = { .dev = ADC0, .pin = GPIO_PIN(PORT_E, 2), .chan =  1, .avg = ADC_AVG_MAX },
+    [ 1] = { .dev = ADC0, .pin = GPIO_PIN(PORT_E, 3), .chan =  1, .avg = ADC_AVG_MAX },
+    [ 2] = { .dev = ADC0, .pin = GPIO_PIN(PORT_D, 7), .chan = 22, .avg = ADC_AVG_MAX },
+    [ 3] = { .dev = ADC0, .pin = GPIO_PIN(PORT_D, 5), .chan =  6, .avg = ADC_AVG_MAX },
+    [ 4] = { .dev = ADC0, .pin = GPIO_PIN(PORT_E, 0), .chan = 10, .avg = ADC_AVG_MAX },
+    [ 5] = { .dev = ADC0, .pin = GPIO_PIN(PORT_E, 1), .chan = 11, .avg = ADC_AVG_MAX }
 };
 
-#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /*
  * KW2xD ADC reference settings:
  * 0: VREFH/VREFL external pin pair
@@ -167,9 +169,8 @@ static const pwm_conf_t pwm_config[] = {
     }
 };
 
-#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
-
 
 /**
  * @name    SPI device configuration
@@ -247,58 +248,27 @@ static const spi_conf_t spi_config[] = {
     }
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
-
 
 /**
  * @name I2C configuration
  * @{
  */
-#define I2C_NUMOF               (1U)
-#define I2C_0_EN                1
-/* Low (10 kHz): MUL = 2, SCL divider = 2560, total: 5120 */
-#define KINETIS_I2C_F_ICR_LOW        (0x3D)
-#define KINETIS_I2C_F_MULT_LOW       (1)
-/* Normal (100 kHz): MUL = 2, SCL divider = 240, total: 480 */
-#define KINETIS_I2C_F_ICR_NORMAL     (0x1F)
-#define KINETIS_I2C_F_MULT_NORMAL    (1)
-/* Fast (400 kHz): MUL = 1, SCL divider = 128, total: 128 */
-#define KINETIS_I2C_F_ICR_FAST       (0x17)
-#define KINETIS_I2C_F_MULT_FAST      (0)
-/* Fast plus (1000 kHz): MUL = 1, SCL divider = 48, total: 48 */
-#define KINETIS_I2C_F_ICR_FAST_PLUS  (0x10)
-#define KINETIS_I2C_F_MULT_FAST_PLUS (0)
-
-/* I2C 0 device configuration */
-#define I2C_0_DEV               I2C1
-#define I2C_0_CLKEN()           (SIM->SCGC4 |= (SIM_SCGC4_I2C1_MASK))
-#define I2C_0_CLKDIS()          (SIM->SCGC4 &= ~(SIM_SCGC4_I2C1_MASK))
-#define I2C_0_IRQ               I2C1_IRQn
-#define I2C_0_IRQ_HANDLER       isr_i2c1
-/* I2C 0 pin configuration */
-#define I2C_0_PORT              PORTE
-#define I2C_0_PORT_CLKEN()      (SIM->SCGC5 |= (SIM_SCGC5_PORTE_MASK))
-#define I2C_0_PIN_AF            6
-#define I2C_0_SDA_PIN           0
-#define I2C_0_SCL_PIN           1
-#define I2C_0_PORT_CFG          (PORT_PCR_MUX(I2C_0_PIN_AF) | PORT_PCR_ODE_MASK)
-
-/** @} */
-
-/**
-* @name RTT and RTC configuration
-* @{
-*/
-#define RTT_NUMOF            (1U)
-#define RTC_NUMOF            (1U)
-#define RTT_DEV              RTC
-#define RTT_IRQ              RTC_IRQn
-#define RTT_IRQ_PRIO         10
-#define RTT_UNLOCK()         (SIM->SCGC6 |= (SIM_SCGC6_RTC_MASK))
-#define RTT_ISR              isr_rtc
-#define RTT_FREQUENCY        (1)
-#define RTT_MAX_VALUE        (0xffffffff)
+static const i2c_conf_t i2c_config[] = {
+    {
+        .i2c = I2C1,
+        .scl_pin = GPIO_PIN(PORT_E,  1),
+        .sda_pin = GPIO_PIN(PORT_E,  0),
+        .freq = CLOCK_BUSCLOCK,
+        .speed = I2C_SPEED_FAST,
+        .irqn = I2C1_IRQn,
+        .scl_pcr = (PORT_PCR_MUX(6) | PORT_PCR_ODE_MASK),
+        .sda_pcr = (PORT_PCR_MUX(6) | PORT_PCR_ODE_MASK),
+    },
+};
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
+#define I2C_0_ISR           (isr_i2c1)
 /** @} */
 
 #ifdef __cplusplus

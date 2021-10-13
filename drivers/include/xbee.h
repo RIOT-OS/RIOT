@@ -73,12 +73,12 @@ extern "C" {
 /**
  * @brief   Default PAN ID used after initialization
  */
-#define XBEE_DEFAULT_PANID          (IEEE802154_DEFAULT_PANID)
+#define XBEE_DEFAULT_PANID          (CONFIG_IEEE802154_DEFAULT_PANID)
 
 /**
  * @brief   Default channel used after initialization
  */
-#define XBEE_DEFAULT_CHANNEL        (IEEE802154_DEFAULT_CHANNEL)
+#define XBEE_DEFAULT_CHANNEL        (CONFIG_IEEE802154_DEFAULT_CHANNEL)
 
 /**
  * @name    Address flags
@@ -131,9 +131,6 @@ typedef struct {
     const struct netdev_driver *driver;     /**< ptr to that driver's interface. */
     netdev_event_cb_t event_callback;       /**< callback for device events */
     void* context;                          /**< ptr to network stack context */
-#ifdef MODULE_NETSTATS_L2
-    netstats_t stats;                       /**< transceiver's statistics */
-#endif
     /* device driver specific fields */
     xbee_params_t p;                    /**< configuration parameters */
     uint8_t options;                    /**< options field */

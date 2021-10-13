@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <errno.h>
 
 #include "thread.h"
@@ -30,7 +31,7 @@
 #include "can/can_trx.h"
 #endif
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef CAN_DEVICE_MSG_QUEUE_SIZE
@@ -40,14 +41,12 @@
 #ifdef MODULE_CAN_PM
 #define CAN_DEVICE_PM_DEFAULT_RX_TIMEOUT (10 * US_PER_SEC)
 #define CAN_DEVICE_PM_DEFAULT_TX_TIMEOUT (2 * US_PER_SEC)
+static void pm_cb(void *arg);
+static void pm_reset(candev_dev_t *candev_dev, uint32_t value);
 #endif
 
 static int power_up(candev_dev_t *candev_dev);
 static int power_down(candev_dev_t *candev_dev);
-#ifdef MODULE_CAN_PM
-static void pm_cb(void *arg);
-static void pm_reset(candev_dev_t *candev_dev, uint32_t value);
-#endif
 
 static void _can_event(candev_t *dev, candev_event_t event, void *arg)
 {
@@ -157,11 +156,11 @@ static int power_down(candev_dev_t *candev_dev)
 #ifdef MODULE_CAN_PM
 static void pm_cb(void *arg)
 {
-    candev_dev_t *dev = arg;
+    candev_dev_t *candev_dev = (candev_dev_t *)arg;
     msg_t msg;
     msg.type = CAN_MSG_PM;
 
-    msg_send(&msg, dev->pid);
+    msg_send(&msg, candev_dev->pid);
 }
 
 static void pm_reset(candev_dev_t *candev_dev, uint32_t value)
@@ -307,7 +306,7 @@ static void *_can_device_thread(void *args)
             DEBUG("can device: CAN_MSG_POWER_UP received\n");
             res = power_up(candev_dev);
 #ifdef MODULE_CAN_PM
-            pm_reset(candev_dev, 0);
+            pm_reset(candev_dev, candev_dev->tx_wakeup_timeout);
 #endif
             /* send reply to calling thread */
             reply.type = CAN_MSG_ACK;
@@ -317,6 +316,9 @@ static void *_can_device_thread(void *args)
         case CAN_MSG_POWER_DOWN:
             DEBUG("can device: CAN_MSG_POWER_DOWN received\n");
             res = power_down(candev_dev);
+#ifdef MODULE_CAN_PM
+            pm_reset(candev_dev, 0);
+#endif
             /* send reply to calling thread */
             reply.type = CAN_MSG_ACK;
             reply.content.value = (uint32_t)res;
@@ -369,7 +371,6 @@ kernel_pid_t can_device_init(char *stack, int stacksize, char priority,
 
     return res;
 }
-
 
 #define SJW 2
 #define CAN_SYNC_SEG 1
@@ -502,7 +503,7 @@ int can_device_calc_bittiming(uint32_t clock, const struct can_bittiming_const *
          tseg >= timing_const->tseg1_min + timing_const->tseg2_min; tseg--) {
         uint32_t nbt = tseg + CAN_SYNC_SEG;
 
-        /* theoritical brp */
+        /* theoretical brp */
         uint32_t brp = clock / (timing->bitrate * nbt);
         /* brp according to brp_inc */
         brp = (brp / timing_const->brp_inc) * timing_const->brp_inc;

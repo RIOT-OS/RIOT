@@ -1,4 +1,21 @@
 /**
+ * @defgroup config Compile time configurations
+ * @brief    List of compile-time configurations
+ *
+ * This group contains all compile-time configurations macros that are
+ * intended to be modified by the user.
+ *
+ * These configuration macros are defined within modules like this:
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [.c]
+ * #ifndef SOME_CONFIGURATION_PARAM
+ * #define SOME_CONFIGURATION_PARAM DEFAULT_VALUE
+ * #endif
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Because of that, configurations can be altered e.g via CFLAGS (e.g
+ * `CFLAGS += -DSOME_CONFIGURATION_PARAM=SOME_VALUE`)
+ */
+
+/**
  * @defgroup utils Utilities
  * @brief Utilities and helper functionality
  *
@@ -11,12 +28,38 @@
  * @def DEVELHELP
  * @brief   This global macro activates functionality to help developers.
  *
- *          Additional code parts such as (extensive) debug output and sanity
- *          checks using assertions. To activate it set environment variable
- *          `DEVELHELP=1`, or disable explicitly with `DEVELHELP=0`.
+ * To activate it set environment variable `DEVELHELP=1`, or disable explicitly
+ * with `DEVELHELP=0`.
+ *
+ * The following list of what `DEVELHELP=1` enables is not comprehensive, but
+ * should give a rough impression of what to expect:
+ *
+ * * Many runtime checks are enabled (stack overflow protection, warnings when
+ *   sending messages to invalid PIDs, …), some of which just log errors to
+ *   stdout, some even halt the system.
+ * * Some structures contain additional information, e.g. threads store their
+ *   names and stack sizes.
+ * * Some error paths that are active even at `DEVELHELP=0` perform more
+ *   complex tasks to give useful output.
+ * * The @ref assert() function is only evaluated with `DEVELHELP=1` (or when
+ *   `FORCE_ASSERTS=1`). Otherwise, the build system sets `NDEBUG` and thus
+ *   skips assertions entirely.
+ * * On a panic, the system halts (or enters the bootloader) instead of
+ *   restarting.
  */
 #if DOXYGEN
 #   define DEVELHELP
+#endif
+
+/**
+ * @def CONFIG_THREAD_NAMES
+ * @brief   This global macro enable storage of thread names to help developers.
+ *
+ *          To activate it set environment variable `THREAD_NAMES=1`, or use Kconfig.
+ *          It is automatically enabled if `DEVELHELP` is.
+ */
+#if DOXYGEN
+#   define CONFIG_THREAD_NAMES
 #endif
 
 /**

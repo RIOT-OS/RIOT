@@ -1,0 +1,25 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_FAM_G0
+    bool
+    select CPU_STM32
+    select CPU_CORE_CORTEX_M0PLUS
+    select HAS_CPU_STM32G0
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_PAGEWISE
+    select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_PERIPH_WDT
+    select HAS_BOOTLOADER_STM32
+
+config CPU_FAM
+    default "g0" if CPU_FAM_G0
+
+config HAS_CPU_STM32G0
+    bool
+    help
+        Indicates that the cpu being used belongs to the 'stm32g0' family.

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_lsm303dlhc
+ * @ingroup     drivers_lsm303dlhc
  *
  * @{
  *

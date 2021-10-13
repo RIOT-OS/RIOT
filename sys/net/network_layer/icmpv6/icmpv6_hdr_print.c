@@ -21,7 +21,8 @@
 
 void icmpv6_hdr_print(icmpv6_hdr_t *hdr)
 {
-    printf("   type: %3" PRIu8 "  code: %3" PRIu8 "\n", hdr->type, hdr->code);
+    printf("   type: %3" PRIu16 "  code: %3" PRIu16 "\n",
+           (uint16_t)hdr->type, (uint16_t)hdr->code);
     printf("   cksum: 0x%04" PRIx16 "\n", byteorder_ntohs(hdr->csum));
 }
 /** @} */

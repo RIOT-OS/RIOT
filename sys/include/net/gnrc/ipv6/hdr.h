@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_ipv6_hdr IPv6 header defintions
+ * @defgroup    net_gnrc_ipv6_hdr IPv6 header definitions
  * @ingroup     net_gnrc_ipv6
  * @{
  *

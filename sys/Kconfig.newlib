@@ -1,0 +1,28 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if MODULE_NEWLIB
+
+config MODULE_NEWLIB_NANO
+    bool "NewLib Nano"
+
+config MODULE_NEWLIB_GNU_SOURCE
+    bool "NewLib GNU source"
+
+config MODULE_NEWLIB_SYSCALLS_DEFAULT
+    bool
+    default y
+    depends on !HAVE_CUSTOM_NEWLIB_SYSCALLS
+    help
+        Default implementation of newlib system calls.
+
+endif # MODULE_NEWLIB
+
+config HAVE_CUSTOM_NEWLIB_SYSCALLS
+    bool
+    help
+        Indicates that a custom newlib syscalls implementation is present.

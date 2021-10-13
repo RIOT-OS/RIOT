@@ -192,7 +192,6 @@ do {                                                                            
   }                                                                                            \
 } while (0)
 
-
 #define DL_SORT(list, cmp)                                                                     \
     DL_SORT2(list, cmp, prev, next)
 
@@ -731,7 +730,6 @@ do {                                                                            
  }                                                                                             \
 } while (0)
 /** @} */
-
 
 /**
  * @name    Circular doubly linked list macros

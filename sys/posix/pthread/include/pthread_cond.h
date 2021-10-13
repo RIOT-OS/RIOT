@@ -21,17 +21,17 @@
 #include "mutex.h"
 #include "priority_queue.h"
 
-#if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
-#   include "msp430_types.h"
+#if defined(__WITH_AVRLIBC__)
+/* avr-libc 'time.h' does not include 'sys/types.h' but we need 'clockid_t' */
+#   include <sys/types.h>
 #endif
 
 #ifdef __MACH__
 /* needed for AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER */
 #include <AvailabilityMacros.h>
-#endif
-
-#if defined(__WITH_AVRLIBC__) || (defined(__MACH__) && !defined(AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER))
+#if !defined(AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER)
 typedef int clockid_t;
+#endif
 #endif
 
 #ifdef __cplusplus
@@ -88,7 +88,7 @@ int pthread_condattr_getpshared(const pthread_condattr_t *attr, int *pshared);
 int pthread_condattr_setpshared(pthread_condattr_t *attr, int pshared);
 
 /**
- * @brief Get the clock selected for the conditon variable attribute attr.
+ * @brief Get the clock selected for the condition variable attribute attr.
  * @note currently NOT USED in RIOT.
  * @param[in] attr pre-allocated condition attribute variable structure.
  * @param[out] clock_id the clock ID that is used to measure the timeout service
@@ -97,7 +97,7 @@ int pthread_condattr_setpshared(pthread_condattr_t *attr, int pshared);
 int pthread_condattr_getclock(const pthread_condattr_t *attr, clockid_t *clock_id);
 
 /**
- * @brief Set the clock selected for the conditon variable attribute ATTR.
+ * @brief Set the clock selected for the condition variable attribute ATTR.
  * @note currently NOT USED in RIOT.
  * @param[in, out] attr pre-allocated condition attribute variable structure.
  * @param[in] clock_id the clock ID that shall be used to measure the timeout service

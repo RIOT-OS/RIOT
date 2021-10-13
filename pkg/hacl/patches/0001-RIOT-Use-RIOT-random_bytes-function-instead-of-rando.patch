@@ -1,0 +1,43 @@
+From 23c0d7e698ec5a31d65d7da172891f6aabad39d5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Joakim=20Nohlg=C3=A5rd?= <joakim.nohlgard@eistec.se>
+Date: Tue, 15 May 2018 13:17:38 +0200
+Subject: [PATCH] RIOT: Use RIOT random_bytes function instead of randombytes
+
+---
+ haclnacl.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/haclnacl.c b/haclnacl.c
+index e9bf635309..072a2db6b3 100644
+--- a/haclnacl.c
++++ b/haclnacl.c
+@@ -28,7 +28,7 @@
+ #include "NaCl.h"
+ 
+ 
+-extern void randombytes(uint8_t *bytes, uint64_t bytes_len);
++#include "random.h"
+ 
+ 
+ /* HACL* Primitives and Constructions */
+@@ -93,7 +93,7 @@ int crypto_auth_verify(const unsigned char *tag, const unsigned char *input, uns
+ 
+ 
+ int crypto_box_keypair(unsigned char *pk, unsigned char *sk){
+-  randombytes(sk, 32);
++  random_bytes(sk, 32);
+   uint8_t basepoint[32] = {9};
+   curve25519_scalarmult(pk, sk, basepoint);
+   return 0;
+@@ -241,7 +241,7 @@ int crypto_sign_open(unsigned char *unsigned_msg, unsigned long long *unsigned_m
+ }
+ 
+ int crypto_sign_keypair(uint8_t pk[32], uint8_t sk[64]){
+-  randombytes(sk, 32 * sizeof(uint8_t));
++  random_bytes(sk, 32 * sizeof(uint8_t));
+   Hacl_Ed25519_secret_to_public(pk, sk);
+   for (int i = 0; i < 32; i++) sk[32+i] = pk[i];
+   return 0;
+-- 
+2.17.0
+

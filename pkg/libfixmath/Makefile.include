@@ -1,10 +1,14 @@
-PKG_BUILDDIR ?= $(PKGDIRBASE)/libfixmath
+PKG_SOURCE_DIR ?= $(PKGDIRBASE)/libfixmath
 
 # The static cache is huge, disable it.
 CFLAGS += -DFIXMATH_NO_CACHE
 
-INCLUDES += -I$(PKG_BUILDDIR)/libfixmath
+ifneq (,$(filter arch_8bit,$(FEATURES_USED)))
+  CFLAGS += -DFIXMATH_OPTIMIZE_8BIT
+endif
+
+INCLUDES += -I$(PKG_SOURCE_DIR)/libfixmath
 
 ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
-  INCLUDES += -I$(PKG_BUILDDIR)/unittests
+  INCLUDES += -I$(PKG_SOURCE_DIR)/unittests
 endif

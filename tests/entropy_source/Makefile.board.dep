@@ -1,0 +1,13 @@
+# Only include adc noise source if BOARD has an adc
+FEATURES_OPTIONAL += periph_adc
+
+ifneq (,$(filter periph_adc,$(FEATURES_USED)))
+  USEMODULE += entropy_source_adc_noise
+  ifndef CONFIG_KCONFIG_USEMODULE_ENTROPY_SOURCE_ADC_NOISE
+    # set a dummy default value for the provided amount of entropy
+    CFLAGS += -DCONFIG_ENTROPY_SOURCE_ADC_HMIN=65536
+    # enable ADC health tests and conditioning
+    CFLAGS += -DCONFIG_ENTROPY_SOURCE_ADC_COND=1
+    CFLAGS += -DCONFIG_ENTROPY_SOURCE_ADC_HEALTH_TEST=1
+  endif
+endif

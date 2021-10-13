@@ -1,0 +1,13 @@
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  USEMODULE += cc1101
+  USEMODULE += cc110x_868mhz
+endif
+
+# add support for LEDs and buttons as default saul devices
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+# add support for the MPU-9150 as default saul device
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += mpu9150
+endif

@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    cpu_efm32 Silicon Labs EFM32/EFR32/EZR32
- * @ingroup     cpu
- * @brief       Support for Silicon Labs EFM32/EFR32/EZR32 CPUs
+ * @ingroup     cpu_efm32
  * @{
  *
  * @file
@@ -45,6 +43,21 @@ extern "C" {
  */
 #define FLASHPAGE_SIZE                  (FLASH_PAGE_SIZE)
 #define FLASHPAGE_NUMOF                 (FLASH_SIZE / FLASH_PAGE_SIZE)
+/* The minimum block size which can be written is 4B. However, the erase
+ * block is always FLASHPAGE_SIZE.
+ */
+#define FLASHPAGE_WRITE_BLOCK_SIZE      (4U)
+/* Writing should be always 4 bytes aligned */
+#define FLASHPAGE_WRITE_BLOCK_ALIGNMENT (4U)
+/** @} */
+
+/**
+ * @brief   Bit-Band configuration
+ * @{
+ */
+#ifdef BITBAND_RAM_BASE
+#define CPU_HAS_BITBAND 1
+#endif
 /** @} */
 
 #ifdef __cplusplus

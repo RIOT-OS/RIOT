@@ -1,0 +1,21 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    arduino-duemilanove \
+    arduino-leonardo \
+    arduino-mega2560 \
+    arduino-nano \
+    arduino-uno \
+    atmega256rfr2-xpro \
+    atmega328p \
+    atmega328p-xplained-mini \
+    derfmega128 \
+    derfmega256 \
+    mega-xplained \
+    microduino-corerf \
+    nucleo-f031k6 \
+    nucleo-f042k6 \
+    nucleo-l011k4 \
+    samd10-xmini \
+    stk3200 \
+    stm32f030f4-demo \
+    zigduino \
+    #

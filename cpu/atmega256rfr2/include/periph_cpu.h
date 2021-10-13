@@ -28,13 +28,6 @@ extern "C" {
 #endif
 
 /**
- * @name   Length of the CPU_ID in octets
- * @{
- */
-#define CPUID_LEN           (8U)
-/** @} */
-
-/**
  * @name   Available ports on the ATmega256rfr family
  * @{
  */
@@ -45,6 +38,21 @@ enum {
     PORT_F  = 5,        /**< port F */
     PORT_G  = 6,        /**< port G */
 };
+/** @} */
+
+/**
+ * @brief   Available external interrupt pins on the ATmega256rfr family
+ *
+ * In order of their interrupt number.
+ */
+#define CPU_ATMEGA_EXT_INTS    { GPIO_PIN(PORT_D, 0), \
+                                 GPIO_PIN(PORT_D, 1), \
+                                 GPIO_PIN(PORT_D, 2), \
+                                 GPIO_PIN(PORT_D, 3), \
+                                 GPIO_PIN(PORT_E, 4), \
+                                 GPIO_PIN(PORT_E, 5), \
+                                 GPIO_PIN(PORT_E, 6), \
+                                 GPIO_PIN(PORT_E, 7) }
 
 /**
  * @name   Defines for the I2C interface
@@ -55,17 +63,18 @@ enum {
 /** @} */
 
 /**
- * @name   GPIO pin not defined
+ * @name    EEPROM configuration
  * @{
  */
-#ifndef GPIO_UNDEF
-#define GPIO_UNDEF          (0xFFFF)
-#endif
-/** @}*/
+#define EEPROM_SIZE             (8192U)  /* 8kB */
+/** @} */
 
 #ifdef __cplusplus
 }
 #endif
+
+#include "periph_conf.h"
+#include "default_timer_config.h"
 
 #endif /* PERIPH_CPU_H */
 /** @} */

@@ -1,0 +1,9 @@
+USEMODULE += arm7_common
+USEMODULE += bitfield
+USEMODULE += periph
+
+ifneq (,$(filter mci,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
+include $(RIOTCPU)/arm7_common/Makefile.dep

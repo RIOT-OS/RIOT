@@ -1,0 +1,5 @@
+FEATURES_REQUIRED += periph_i2c
+
+ifneq (,$(filter ds3231_int,$(USEMODULE)))
+   FEATURES_REQUIRED += periph_gpio_irq
+endif

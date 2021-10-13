@@ -23,9 +23,11 @@
 #include "common.h"
 #include "od.h"
 #include "net/af.h"
+#include "net/sock/async/event.h"
 #include "net/sock/tcp.h"
-#include "net/ipv6.h"
+#include "net/sock/util.h"
 #include "shell.h"
+#include "test_utils/expect.h"
 #include "thread.h"
 #include "xtimer.h"
 
@@ -36,10 +38,68 @@ static sock_tcp_t server_sock, client_sock;
 static sock_tcp_queue_t server_queue;
 static char server_stack[THREAD_STACKSIZE_DEFAULT];
 static msg_t server_msg_queue[SERVER_MSG_QUEUE_SIZE];
+static char _addr_str[IPV6_ADDR_MAX_STR_LEN];
+static event_queue_t _ev_queue;
+
+static void _tcp_recv(sock_tcp_t *sock, sock_async_flags_t flags, void *arg)
+{
+    sock_tcp_ep_t client;
+    uint16_t port;
+
+    expect(strcmp(arg, "test") == 0);
+    if (sock_tcp_get_remote(sock, &client) < 0) {
+        /* socket was disconnected between event firing and this handler */
+        return;
+    }
+    sock_tcp_ep_fmt(&client, _addr_str, &port);
+    if (flags & SOCK_ASYNC_MSG_RECV) {
+        int res;
+
+        /* we don't use timeouts so all errors should be related to a lost
+         * connection */
+        while ((res = sock_tcp_read(sock, sock_inbuf, sizeof(sock_inbuf),
+                                    0)) >= 0) {
+            printf("Received TCP data from client [%s]:%u\n", _addr_str, port);
+            if (res > 0) {
+                od_hex_dump(sock_inbuf, res, 0);
+            }
+            else {
+                puts("(nul)");
+            }
+        }
+    }
+    if (flags & SOCK_ASYNC_CONN_FIN) {
+        printf("TCP connection to [%s]:%u reset\n", _addr_str, port);
+        sock_tcp_disconnect(sock);
+    }
+}
+
+static void _tcp_accept(sock_tcp_queue_t *queue, sock_async_flags_t flags,
+                        void *arg)
+{
+    expect(strcmp(arg, "test") == 0);
+    if (flags & SOCK_ASYNC_CONN_RECV) {
+        sock_tcp_t *sock = NULL;
+        int res;
+
+        if ((res = sock_tcp_accept(queue, &sock, 0)) < 0) {
+            printf("Error on TCP accept [%d]\n", res);
+        }
+        else {
+            sock_tcp_ep_t client;
+            uint16_t port;
+
+            sock_tcp_event_init(sock, &_ev_queue, _tcp_recv, "test");
+            sock_tcp_get_remote(sock, &client);
+            sock_tcp_ep_fmt(&client, _addr_str, &port);
+            printf("TCP client [%s]:%u connected\n", _addr_str, port);
+        }
+    }
+}
 
 static void *_server_thread(void *args)
 {
-    sock_tcp_ep_t server_addr = SOCK_IPV6_EP_ANY;
+    sock_tcp_ep_t server_addr = SOCK_IP_EP_ANY;
     int res;
 
     msg_init_queue(server_msg_queue, SERVER_MSG_QUEUE_SIZE);
@@ -54,64 +114,37 @@ static void *_server_thread(void *args)
     server_running = true;
     printf("Success: started TCP server on port %" PRIu16 "\n",
            server_addr.port);
-    while (1) {
-        char client_addr[IPV6_ADDR_MAX_STR_LEN];
-        sock_tcp_t *sock = NULL;
-        int res;
-        unsigned client_port;
-
-        if ((res = sock_tcp_accept(&server_queue, &sock, SOCK_NO_TIMEOUT)) < 0) {
-            puts("Error on TCP accept");
-            continue;
-        }
-        else {
-            sock_tcp_ep_t client;
-
-            sock_tcp_get_remote(sock, &client);
-            ipv6_addr_to_str(client_addr, (ipv6_addr_t *)&client.addr.ipv6,
-                             sizeof(client_addr));
-            client_port = client.port;
-            printf("TCP client [%s]:%u connected\n",
-                   client_addr, client_port);
-        }
-        /* we don't use timeouts so all errors should be related to a lost
-         * connection */
-        while ((res = sock_tcp_read(sock, sock_inbuf, sizeof(sock_inbuf),
-                                    SOCK_NO_TIMEOUT)) >= 0) {
-            printf("Received TCP data from client [%s]:%u:\n",
-                   client_addr, client_port);
-            if (res > 0) {
-                od_hex_dump(sock_inbuf, res, 0);
-            }
-            else {
-                puts("(nul)");
-            }
-        }
-        printf("TCP connection to [%s]:%u reset, starting to accept again\n",
-               client_addr, client_port);
-        sock_tcp_disconnect(sock);
-    }
+    event_queue_init(&_ev_queue);
+    sock_tcp_queue_event_init(&server_queue, &_ev_queue, _tcp_accept, "test");
+    event_loop(&_ev_queue);
     return NULL;
 }
 
-static int tcp_connect(char *addr_str, char *port_str, char *local_port_str)
+static int tcp_connect(char *addr_str, char *local_port_str)
 {
-    sock_tcp_ep_t dst = SOCK_IPV6_EP_ANY;
+    sock_tcp_ep_t dst = SOCK_IP_EP_ANY;
     uint16_t local_port = 0;
 
     if (client_running) {
-        puts("Cient already connected");
+        puts("Client already connected");
+        return 1;
     }
 
     /* parse destination address */
-    if (ipv6_addr_from_str((ipv6_addr_t *)&dst.addr.ipv6, addr_str) == NULL) {
+    if (sock_tcp_str2ep(&dst, addr_str) < 0) {
         puts("Error: unable to parse destination address");
         return 1;
     }
-    /* parse port */
-    dst.port = atoi(port_str);
+    if (dst.port == 0) {
+        puts("Error: no port or illegal port value provided");
+        return 1;
+    }
     if (local_port_str != NULL) {
-        local_port = atoi(port_str);
+        local_port = atoi(local_port_str);
+        if (local_port == 0) {
+            puts("Error: Illegal local port 0");
+            return 1;
+        }
     }
     if (sock_tcp_connect(&client_sock, &dst, local_port, 0) < 0) {
         puts("Error: unable to connect");
@@ -166,15 +199,15 @@ int tcp_cmd(int argc, char **argv)
     if (strcmp(argv[1], "connect") == 0) {
         char *local_port = NULL;
 
-        if (argc < 4) {
-            printf("usage: %s connect <addr> <port> [local_port]\n",
+        if (argc < 3) {
+            printf("usage: %s connect <addr>:<port> [local_port]\n",
                    argv[0]);
             return 1;
         }
-        if (argc > 4) {
-            local_port = argv[4];
+        if (argc > 3) {
+            local_port = argv[3];
         }
-        return tcp_connect(argv[2], argv[3], local_port);
+        return tcp_connect(argv[2], local_port);
     }
     if (strcmp(argv[1], "disconnect") == 0) {
         return tcp_disconnect();

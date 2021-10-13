@@ -1,0 +1,6 @@
+USEMODULE += xtimer
+USEMODULE += ieee802154
+USEMODULE += netdev_ieee802154
+FEATURES_REQUIRED += periph_gpio
+FEATURES_REQUIRED += periph_gpio_irq
+FEATURES_REQUIRED += periph_spi

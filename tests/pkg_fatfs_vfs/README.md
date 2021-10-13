@@ -6,7 +6,7 @@ Using FatFs (with VFS) on RIOT
 To use this test on native you can either use a FAT-formatted image file or
 directly use the mkfs command from the RIOT shell. Use `make image` to extract
 a prepared image file that already contains a simple test.txt file. This is
-only a convinience function to allow testing against a "default linux"
+only a convenience function to allow testing against a "default linux"
 formatted fat volume without the need to call mount or other stuff that may
 require super user privileges. Optionally `make compressed-image` can be used
 to generate the compressed image that is in turn used by `make image`.
@@ -21,6 +21,8 @@ FAT) That implies it doesn't show any modifications in RIOT that you perform on
 your OS and the other way round. So always remember to mount/unmount correctly
 or your FS will probably get damaged.
 
+    make flash test-with-config
+
 # Real Hardware
 
 Currently the test defaults to sdcard_spi on real hardware. But generally any
@@ -30,3 +32,5 @@ storage device (e.g. your SD-card). To copy the image onto the card you can use
 something like `make image && dd if=bin/riot_fatfs_disk.img
 of=/dev/<your_sdcard>`. After that you can connect the card to your RIOT device
 and check the test output via terminal.
+
+    make flash test-with-config

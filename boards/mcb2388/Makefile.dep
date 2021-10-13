@@ -1,0 +1,11 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_adc
+  USEMODULE += saul_gpio
+endif
+
+# default to mtd_mci if no other MTD backend is selected
+ifneq (,$(filter mtd,$(USEMODULE)))
+  ifeq (,$(filter mtd_%,$(USEMODULE)))
+    USEMODULE += mtd_mci
+  endif
+endif

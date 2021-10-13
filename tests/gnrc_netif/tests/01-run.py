@@ -7,13 +7,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-import os
 import sys
+from testrunner import run, check_unittests
 
 
 def testfunc(child):
     # embUnit tests
-    child.expect(r"OK \(\d+ tests\)")
+    check_unittests(child)
     # output cross-checked hex data with WireShark -> "Import from Hex Dump..."
     # test_netapi_send__raw_unicast_ethernet_packet
     child.expect("Sending data from Ethernet device:")
@@ -80,44 +80,48 @@ def testfunc(child):
     child.expect("pktdump dumping Ethernet packet with empty payload")
     child.expect("PKTDUMP: data received:")
     child.expect(r"~~ SNIP  0 - size:   0 byte, type: NETTYPE_UNDEF \(0\)")
-    child.expect(r"00000000~~ SNIP  1 - size:  \d+ byte, type: NETTYPE_NETIF \(-1\)")
-    child.expect(r"if_pid: \d+  rssi: -?\d+  lqi: \d+")
+    child.expect(r"~~ SNIP  1 - size:  \d+ byte, type: NETTYPE_NETIF \(-1\)")
+    child.expect(r"if_pid: (\d+)  rssi: -?\d+  lqi: \d+")
+    assert 0 < int(child.match.group(1))
     child.expect("flags: 0x0")
-    child.expect("src_l2addr: 3e:e6:b5:22:fd:0b")
-    child.expect("dst_l2addr: 3e:e6:b5:22:fd:0a")
-    child.expect("~~ PKT    -  2 snips, total size:  \d+ byte")
+    child.expect("src_l2addr: 3E:E6:B5:22:FD:0B")
+    child.expect("dst_l2addr: 3E:E6:B5:22:FD:0A")
+    child.expect(r"~~ PKT    -  2 snips, total size:  \d+ byte")
     # test_netapi_recv__empty_ieee802154_payload
     child.expect(r"pktdump dumping IEEE 802\.15\.4 packet with empty payload")
     child.expect("PKTDUMP: data received:")
     child.expect(r"~~ SNIP  0 - size:   0 byte, type: NETTYPE_UNDEF \(0\)")
-    child.expect(r"00000000~~ SNIP  1 - size:  \d+ byte, type: NETTYPE_NETIF \(-1\)")
-    child.expect(r"if_pid: \d+  rssi: -?\d+  lqi: \d+")
+    child.expect(r"~~ SNIP  1 - size:  \d+ byte, type: NETTYPE_NETIF \(-1\)")
+    child.expect(r"if_pid: (\d+)  rssi: -?\d+  lqi: \d+")
+    assert 0 < int(child.match.group(1))
     child.expect("flags: 0x0")
-    child.expect("src_l2addr: 3e:e6:b5:0f:19:22:fd:0b")
-    child.expect("dst_l2addr: 3e:e6:b5:0f:19:22:fd:0a")
-    child.expect("~~ PKT    -  2 snips, total size:  \d+ byte")
+    child.expect("src_l2addr: 3E:E6:B5:0F:19:22:FD:0B")
+    child.expect("dst_l2addr: 3E:E6:B5:0F:19:22:FD:0A")
+    child.expect(r"~~ PKT    -  2 snips, total size:  \d+ byte")
     # test_netapi_recv__raw_ethernet_payload
     child.expect("pktdump dumping Ethernet packet with payload 12 34 45 56")
     child.expect("PKTDUMP: data received:")
     child.expect(r"~~ SNIP  0 - size:   4 byte, type: NETTYPE_UNDEF \(0\)")
     child.expect("00000000  12  34  45  56")
     child.expect(r"~~ SNIP  1 - size:  \d+ byte, type: NETTYPE_NETIF \(-1\)")
-    child.expect(r"if_pid: \d+  rssi: -?\d+  lqi: \d+")
+    child.expect(r"if_pid: (\d+)  rssi: -?\d+  lqi: \d+")
+    assert 0 < int(child.match.group(1))
     child.expect("flags: 0x0")
-    child.expect("src_l2addr: 3e:e6:b5:22:fd:0b")
-    child.expect("dst_l2addr: 3e:e6:b5:22:fd:0a")
-    child.expect("~~ PKT    -  2 snips, total size:  \d+ byte")
+    child.expect("src_l2addr: 3E:E6:B5:22:FD:0B")
+    child.expect("dst_l2addr: 3E:E6:B5:22:FD:0A")
+    child.expect(r"~~ PKT    -  2 snips, total size:  \d+ byte")
     # test_netapi_recv__raw_ieee802154_payload
     child.expect(r"pktdump dumping IEEE 802\.15\.4 packet with payload 12 34 45 56")
     child.expect("PKTDUMP: data received:")
     child.expect(r"~~ SNIP  0 - size:   4 byte, type: NETTYPE_UNDEF \(0\)")
     child.expect("00000000  12  34  45  56")
     child.expect(r"~~ SNIP  1 - size:  \d+ byte, type: NETTYPE_NETIF \(-1\)")
-    child.expect(r"if_pid: \d+  rssi: -?\d+  lqi: \d+")
+    child.expect(r"if_pid: (\d+)  rssi: -?\d+  lqi: \d+")
+    assert 0 < int(child.match.group(1))
     child.expect("flags: 0x0")
-    child.expect("src_l2addr: 3e:e6:b5:0f:19:22:fd:0b")
-    child.expect("dst_l2addr: 3e:e6:b5:0f:19:22:fd:0a")
-    child.expect("~~ PKT    -  2 snips, total size:  \d+ byte")
+    child.expect("src_l2addr: 3E:E6:B5:0F:19:22:FD:0B")
+    child.expect("dst_l2addr: 3E:E6:B5:0F:19:22:FD:0A")
+    child.expect(r"~~ PKT    -  2 snips, total size:  \d+ byte")
     # test_netapi_recv__ipv6_ethernet_payload
     child.expect("pktdump dumping IPv6 over Ethernet packet with payload 01")
     child.expect("PKTDUMP: data received:")
@@ -130,14 +134,13 @@ def testfunc(child):
     child.expect("source address: fe80::3fe6:b5ff:fe22:fd0a")
     child.expect("destination address: fe80::3fe6:b5ff:fe22:fd0b")
     child.expect(r"~~ SNIP  1 - size:  \d+ byte, type: NETTYPE_NETIF \(-1\)")
-    child.expect(r"if_pid: \d+  rssi: -?\d+  lqi: \d+")
+    child.expect(r"if_pid: (\d+)  rssi: -?\d+  lqi: \d+")
+    assert 0 < int(child.match.group(1))
     child.expect("flags: 0x0")
-    child.expect("src_l2addr: 3e:e6:b5:22:fd:0b")
-    child.expect("dst_l2addr: 3e:e6:b5:22:fd:0a")
-    child.expect("~~ PKT    -  2 snips, total size:  \d+ byte")
+    child.expect("src_l2addr: 3E:E6:B5:22:FD:0B")
+    child.expect("dst_l2addr: 3E:E6:B5:22:FD:0A")
+    child.expect(r"~~ PKT    -  2 snips, total size:  \d+ byte")
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-    from testrunner import run
     sys.exit(run(testfunc, timeout=1, traceback=True))

@@ -28,7 +28,7 @@
 #include "test.h"
 
 /*
- * Foward declarations
+ * Forward declarations
  */
 static int cmd_distributions(int argc, char **argv);
 static int cmd_dump(int argc, char **argv);
@@ -90,12 +90,25 @@ static int cmd_dump(int argc, char **argv)
 {
     uint32_t samples = 100;
 
-    if (argc > 1) {
-        samples = strtoul(argv[1], NULL, 0);
+    if (argc < 2) {
+        /* run the test */
+        test_dump(samples);
     }
-
-    /* run the test */
-    test_dump(samples);
+    else if (argc == 2) {
+        samples = strtoul(argv[1], NULL, 0);
+        /* run the test */
+        test_dump(samples);
+    }
+    else if (argc == 4) {
+        samples = strtoul(argv[1], NULL, 0);
+        uint32_t low_thresh = strtoul(argv[2], NULL, 0);
+        uint32_t high_thresh = strtoul(argv[3], NULL, 0);
+        /* run the test */
+        test_dump_range(samples, low_thresh, high_thresh);
+    }
+    else {
+        printf("usage: %s [samples] [lower-bound upper-bound]\n", argv[0]);
+    }
 
     return 0;
 }
@@ -220,12 +233,25 @@ static int cmd_speed(int argc, char **argv)
 {
     uint32_t duration = 10;
 
-    if (argc > 1) {
-        duration = strtoul(argv[1], NULL, 0);
+    if (argc < 2) {
+        /* run the test */
+        test_speed(duration);
     }
-
-    /* run the test */
-    test_speed(duration);
+    else if (argc == 2) {
+        duration = strtoul(argv[1], NULL, 0);
+        /* run the test */
+        test_speed(duration);
+    }
+    else if (argc == 4) {
+        duration = strtoul(argv[1], NULL, 0);
+        uint32_t low_thresh = strtoul(argv[2], NULL, 0);
+        uint32_t high_thresh = strtoul(argv[3], NULL, 0);
+        /* run the test */
+        test_speed_range(duration, low_thresh, high_thresh);
+    }
+    else {
+        printf("usage: %s [duration] [lower-bound upper-bound]\n", argv[0]);
+    }
 
     return 0;
 }
@@ -233,7 +259,7 @@ static int cmd_speed(int argc, char **argv)
 int main(void)
 {
     puts("Starting shell...");
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    static char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;

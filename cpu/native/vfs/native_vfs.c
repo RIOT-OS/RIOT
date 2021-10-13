@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     native_cpu
+ * @ingroup     cpu_native
  * @{
  *
  * @file
@@ -97,7 +97,6 @@ int fcntl(int fd, int cmd, ...)
     }
     return res;
 }
-
 
 off_t lseek(int fd, off_t off, int whence)
 {

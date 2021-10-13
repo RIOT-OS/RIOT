@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_stm32f4discovery STM32F4Discovery
- * @ingroup     boards
- * @brief       Support for the STM32F4Discovery board
+ * @ingroup     boards_stm32f4discovery
  * @{
  *
  * @file
@@ -33,7 +31,6 @@ extern "C" {
  * @name xtimer configuration
  * @{
  */
-#define XTIMER_OVERHEAD     (6)
 #define XTIMER_BACKOFF      (10)
 /** @} */
 
@@ -76,13 +73,12 @@ extern "C" {
 /** @} */
 
 /**
- * @brief User button
+ * @name User button
  * @{
  */
 #define BTN0_PIN            GPIO_PIN(PORT_A, 0)
 #define BTN0_MODE           GPIO_IN
 /** @} */
-
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO

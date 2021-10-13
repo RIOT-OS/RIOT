@@ -1,0 +1,13 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_BH1750FVI
+    bool "BH1750FVI ambient light sensor"
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+    select MODULE_XTIMER

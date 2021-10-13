@@ -29,10 +29,9 @@
 extern "C" {
 #endif
 
-
 /**
  * @brief   Header of a PPP packet
- * @details A PPP packet is transmited as a payload of an HDLC packet. PPP packets only carry information about control protocol
+ * @details A PPP packet is transmitted as a payload of an HDLC packet. PPP packets only carry information about control protocol
  * of a PPP stack (Link Control Protocol, IP Control Protocol, etc). IP packets encapsulated in HDLC frame are not
  * considered PPP packet.
  *

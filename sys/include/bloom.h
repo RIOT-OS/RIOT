@@ -201,7 +201,7 @@ void bloom_add(bloom_t *bloom, const uint8_t *buf, size_t len);
  * it may also be that another string just happened to produce a hash value
  * that would also set this bit. That would be a false positive. This is why
  * we have k > 1, so we can minimize the likelihood of false positives
- * occuring.
+ * occurring.
  *
  * If every bit corresponding to every one of the k hashes of our query
  * string is set, we can say with some probability of being correct that

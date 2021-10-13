@@ -1,0 +1,12 @@
+USEMODULE += ndn-encoding
+USEMODULE += gnrc
+USEMODULE += gnrc_nettype_ndn
+USEMODULE += xtimer
+USEMODULE += random
+USEMODULE += hashes
+USEPKG += micro-ecc
+
+# Blacklist platforms using nimble_netif with gnrc netif, e.g providing
+# ble_nimble: NimBLE and ndn-riot use different crypto libraries that have
+# name clashes (tinycrypt vs uECC)
+FEATURES_BLACKLIST += ble_nimble

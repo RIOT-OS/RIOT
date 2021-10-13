@@ -237,15 +237,22 @@ static int _foreach_test_trampoline(clist_node_t *node, void *arg)
 
 static void test_clist_foreach(void)
 {
+    void *res;
     list_node_t *list = &test_clist;
+
+    _foreach_called = 0;
+    res = clist_foreach(list, _foreach_test_trampoline, NULL);
+    TEST_ASSERT(_foreach_called == 0);
+    TEST_ASSERT(res == NULL);
 
     for (int i = 0; i < TEST_CLIST_LEN; i++) {
         clist_rpush(list, &tests_clist_buf[i]);
     }
 
-    clist_foreach(list, _foreach_test_trampoline, NULL);
+    res = clist_foreach(list, _foreach_test_trampoline, NULL);
 
     TEST_ASSERT(_foreach_called == _foreach_abort_after);
+    TEST_ASSERT(res == &tests_clist_buf[_foreach_abort_after-1]);
 
     _foreach_called = 0;
     for (int i = 0; i < TEST_CLIST_LEN; i++) {
@@ -253,9 +260,10 @@ static void test_clist_foreach(void)
     }
 
     _foreach_abort_after = (TEST_CLIST_LEN + 1);
-    clist_foreach(list, _foreach_test_trampoline, NULL);
+    res = clist_foreach(list, _foreach_test_trampoline, NULL);
 
     TEST_ASSERT(_foreach_called == TEST_CLIST_LEN);
+    TEST_ASSERT(res == NULL);
 }
 
 static int _cmp(clist_node_t *a, clist_node_t *b)
@@ -306,6 +314,79 @@ static void test_clist_sort(void)
     }
 }
 
+static void test_clist_count(void)
+{
+    size_t n = clist_count(&test_clist);
+    TEST_ASSERT(n == 0);
+
+    for (unsigned i = 1; i <= TEST_CLIST_LEN; i++) {
+        clist_rpush(&test_clist, &tests_clist_buf[i - 1]);
+        n = clist_count(&test_clist);
+        TEST_ASSERT(n == i);
+    }
+    for (unsigned i = TEST_CLIST_LEN; i > 0; i--) {
+        clist_lpop(&test_clist);
+        n = clist_count(&test_clist);
+        TEST_ASSERT(n == (i - 1));
+    }
+}
+
+static void test_clist_is_empty(void)
+{
+    TEST_ASSERT(clist_is_empty(&test_clist));
+
+    for (unsigned i = 1; i <= TEST_CLIST_LEN; i++) {
+        clist_rpush(&test_clist, &tests_clist_buf[i - 1]);
+        TEST_ASSERT(!clist_is_empty(&test_clist));
+    }
+    for (unsigned i = TEST_CLIST_LEN; i > 0; i--) {
+        clist_lpop(&test_clist);
+        /* when i == 1 at the beginning of the iteration, there's one element
+           left, which is then dropped in the line above.
+           So in all cases but that last one, the list is not empty. */
+        TEST_ASSERT(clist_is_empty(&test_clist) == (i == 1));
+    }
+}
+
+static void test_clist_special_cardinality(void)
+{
+    unsigned i = 0;
+    TEST_ASSERT(clist_is_empty(&test_clist));
+    TEST_ASSERT(!clist_exactly_one(&test_clist));
+    TEST_ASSERT(!clist_more_than_one(&test_clist));
+
+    clist_rpush(&test_clist, &tests_clist_buf[i++]);
+
+    TEST_ASSERT(!clist_is_empty(&test_clist));
+    TEST_ASSERT(clist_exactly_one(&test_clist));
+    TEST_ASSERT(!clist_more_than_one(&test_clist));
+
+    while (i < TEST_CLIST_LEN) {
+        clist_rpush(&test_clist, &tests_clist_buf[i++]);
+
+        TEST_ASSERT(!clist_is_empty(&test_clist));
+        TEST_ASSERT(!clist_exactly_one(&test_clist));
+        TEST_ASSERT(clist_more_than_one(&test_clist));
+    }
+    do {
+        TEST_ASSERT(!clist_is_empty(&test_clist));
+        TEST_ASSERT(!clist_exactly_one(&test_clist));
+        TEST_ASSERT(clist_more_than_one(&test_clist));
+
+        clist_lpop(&test_clist);
+    } while (--i > 1);
+
+    TEST_ASSERT(!clist_is_empty(&test_clist));
+    TEST_ASSERT(clist_exactly_one(&test_clist));
+    TEST_ASSERT(!clist_more_than_one(&test_clist));
+
+    clist_lpop(&test_clist);
+
+    TEST_ASSERT(clist_is_empty(&test_clist));
+    TEST_ASSERT(!clist_exactly_one(&test_clist));
+    TEST_ASSERT(!clist_more_than_one(&test_clist));
+}
+
 Test *tests_core_clist_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -323,6 +404,9 @@ Test *tests_core_clist_tests(void)
         new_TestFixture(test_clist_foreach),
         new_TestFixture(test_clist_sort_empty),
         new_TestFixture(test_clist_sort),
+        new_TestFixture(test_clist_count),
+        new_TestFixture(test_clist_is_empty),
+        new_TestFixture(test_clist_special_cardinality),
     };
 
     EMB_UNIT_TESTCALLER(core_clist_tests, set_up, NULL,

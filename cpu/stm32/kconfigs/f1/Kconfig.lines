@@ -1,0 +1,67 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU lines
+config CPU_LINE_STM32F100XB
+    bool
+    select CPU_FAM_F1
+
+config CPU_LINE_STM32F100XE
+    bool
+    select CPU_FAM_F1
+
+config CPU_LINE_STM32F101X6
+    bool
+    select CPU_FAM_F1
+
+config CPU_LINE_STM32F101XB
+    bool
+    select CPU_FAM_F1
+
+config CPU_LINE_STM32F101XE
+    bool
+    select CPU_FAM_F1
+
+config CPU_LINE_STM32F101XG
+    bool
+    select CPU_FAM_F1
+
+config CPU_LINE_STM32F102X6
+    bool
+    select CPU_FAM_F1
+
+config CPU_LINE_STM32F102XB
+    bool
+    select CPU_FAM_F1
+
+config CPU_LINE_STM32F103X6
+    bool
+    select CPU_FAM_F1
+
+config CPU_LINE_STM32F103XB
+    bool
+    select CPU_FAM_F1
+
+config CPU_LINE_STM32F103XE
+    bool
+    select CPU_FAM_F1
+
+config CPU_LINE_STM32F103XG
+    bool
+    select CPU_FAM_F1
+
+config CPU_LINE_STM32F105XC
+    bool
+    select CPU_FAM_F1
+
+config CPU_LINE_STM32F107XC
+    bool
+    select CPU_FAM_F1

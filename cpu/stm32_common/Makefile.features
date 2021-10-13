@@ -1,7 +1,0 @@
-FEATURES_PROVIDED += periph_cpuid
-
-ifneq (,$(filter $(BOARDS_WITHOUT_HWRNG),$(BOARD)))
-  FEATURES_PROVIDED := $(filter-out periph_hwrng,$(FEATURES_PROVIDED))
-endif
-
--include $(RIOTCPU)/cortexm_common/Makefile.features

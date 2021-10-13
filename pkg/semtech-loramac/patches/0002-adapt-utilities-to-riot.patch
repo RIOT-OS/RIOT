@@ -1,0 +1,86 @@
+From 6a902f4c2406aa9bf3286bb73a8116953b21257a Mon Sep 17 00:00:00 2001
+From: Alexandre Abadie <alexandre.abadie@inria.fr>
+Date: Mon, 6 Aug 2018 15:46:40 +0200
+Subject: [PATCH] Applying: patch utilities functions
+
+---
+ src/boards/mcu/utilities.c | 16 ++++++----------
+ src/boards/utilities.h     | 11 -----------
+ 2 files changed, 6 insertions(+), 21 deletions(-)
+
+diff --git a/src/boards/mcu/utilities.c b/src/boards/mcu/utilities.c
+index d32d5735..be141100 100644
+--- a/src/boards/mcu/utilities.c
++++ b/src/boards/mcu/utilities.c
+@@ -22,7 +22,9 @@
+  */
+ #include <stdlib.h>
+ #include <stdio.h>
++#include <string.h>
+ #include "utilities.h"
++#include "random.h"
+ 
+ /*!
+  * Redefinition of rand() and srand() standard C functions.
+@@ -41,21 +43,18 @@ int32_t rand1( void )
+ 
+ void srand1( uint32_t seed )
+ {
+-    next = seed;
++    (void) seed;
+ }
+ // Standard random functions redefinition end
+ 
+ int32_t randr( int32_t min, int32_t max )
+ {
+-    return ( int32_t )rand1( ) % ( max - min + 1 ) + min;
++    return (min == max) ? min : (int32_t) (random_uint32_range(0, max - min) + min);
+ }
+ 
+ void memcpy1( uint8_t *dst, const uint8_t *src, uint16_t size )
+ {
+-    while( size-- )
+-    {
+-        *dst++ = *src++;
+-    }
++    memcpy(dst, src, size);
+ }
+ 
+ void memcpyr( uint8_t *dst, const uint8_t *src, uint16_t size )
+@@ -69,10 +68,7 @@ void memcpyr( uint8_t *dst, const uint8_t *src, uint16_t size )
+ 
+ void memset1( uint8_t *dst, uint8_t value, uint16_t size )
+ {
+-    while( size-- )
+-    {
+-        *dst++ = value;
+-    }
++    memset(dst, value, size);
+ }
+ 
+ int8_t Nibble2HexChar( uint8_t a )
+diff --git a/src/boards/utilities.h b/src/boards/utilities.h
+index 8e0b0284..9e226d4a 100644
+--- a/src/boards/utilities.h
++++ b/src/boards/utilities.h
+@@ -25,17 +25,6 @@
+ 
+ #include <stdint.h>
+ 
+-/*!
+- * Generic definition
+- */
+-#ifndef SUCCESS
+-#define SUCCESS                                     1
+-#endif
+-
+-#ifndef FAIL
+-#define FAIL                                        0
+-#endif
+-
+ /*!
+  * \brief Returns the minimum value between a and b
+  *
+-- 
+2.20.1
+

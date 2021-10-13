@@ -199,15 +199,6 @@ void ata8520e_read_pac(const ata8520e_t *dev, char *pac);
 void ata8520e_read_id(const ata8520e_t *dev, char *id);
 
 /**
- * @brief Check the current status of the device
- *
- * Calling this function clears the system event line.
- *
- * @param[in] dev           Pointer to device descriptor
- */
-void ata8520e_status(const ata8520e_t *dev);
-
-/**
  * @brief Send a frame
  *
  * @param[in] dev           Pointer to device descriptor

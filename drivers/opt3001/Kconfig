@@ -1,0 +1,50 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#               2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_OPT3001
+    bool "OPT3001 Ambient Light Sensor"
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+    select MODULE_XTIMER
+
+menuconfig KCONFIG_USEMODULE_OPT3001
+    bool "Configure OPT3001 driver"
+    depends on USEMODULE_OPT3001
+    help
+        Configure the OPT3001 driver using Kconfig.
+
+if KCONFIG_USEMODULE_OPT3001
+
+config OPT3001_I2C_ADDRESS
+    hex "Default I2C address"
+    range 0x44 0x47
+    default 0x45
+    help
+        The OPT3001 allows up to 4 devices on single bus. The address depends on
+        the state of ADDR Pin. The default value (0x45) corresponds to ADDR pin
+        tied to VDD. For more information check the I2C Address Selection
+        (7.3.4.1) section in the Datasheet.
+
+choice
+    bool "Conversion time"
+    default OPT3001_CONVERSION_TIME_800
+    help
+        Time over which the results are integrated. A longer integration time
+        allows for a lower noise measurement.
+        time periods.
+
+config OPT3001_CONVERSION_TIME_100
+    bool "100 ms"
+
+config OPT3001_CONVERSION_TIME_800
+    bool "800 ms"
+
+endchoice
+
+endif # KCONFIG_USEMODULE_OPT3001

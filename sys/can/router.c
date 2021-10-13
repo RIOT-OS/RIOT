@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 OTA keys S.A.
+ * Copyright (C) 2016-2018 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -19,10 +19,9 @@
 
 #include <stdint.h>
 #include <errno.h>
+#include <inttypes.h>
 
 #include "kernel_defines.h"
-
-#include "net/gnrc/pktbuf.h"
 
 #include "can/router.h"
 #include "can/pkt.h"
@@ -30,17 +29,12 @@
 #include "utlist.h"
 #include "mutex.h"
 #include "assert.h"
+#include "memarray.h"
 
-#ifdef MODULE_CAN_MBOX
 #include "mbox.h"
-#endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
-
-#if ENABLE_DEBUG
-#include <inttypes.h>
-#endif
 
 /**
  * This is a can_id element
@@ -50,7 +44,6 @@ typedef struct filter_el {
     canid_t can_id;          /**< CAN ID of the element */
     canid_t mask;            /**< Mask of the element */
     void *data;              /**< Private data */
-    gnrc_pktsnip_t *snip;    /**< Pointer to the allocated snip */
 } filter_el_t;
 
 /**
@@ -58,7 +51,12 @@ typedef struct filter_el {
  */
 static can_reg_entry_t *table[CAN_DLL_NUMOF];
 
+#ifndef CAN_ROUTER_MAX_FILTER
+#define CAN_ROUTER_MAX_FILTER   64
+#endif
 
+static filter_el_t _filter_buf[CAN_ROUTER_MAX_FILTER];
+static memarray_t _filter_array;
 static mutex_t lock = MUTEX_INIT;
 
 static filter_el_t *_alloc_filter_el(canid_t can_id, canid_t mask, void *data);
@@ -67,7 +65,7 @@ static void _insert_to_list(can_reg_entry_t **list, filter_el_t *el);
 static filter_el_t *_find_filter_el(can_reg_entry_t *list, can_reg_entry_t *entry, canid_t can_id, canid_t mask, void *data);
 static int _filter_is_used(unsigned int ifnum, canid_t can_id, canid_t mask);
 
-#if ENABLE_DEBUG
+#if IS_ACTIVE(ENABLE_DEBUG)
 static void _print_filters(void)
 {
     for (int i = 0; i < (int)CAN_DLL_NUMOF; i++) {
@@ -80,27 +78,30 @@ static void _print_filters(void)
         }
     }
 }
-
 #define PRINT_FILTERS() _print_filters()
 #else
 #define PRINT_FILTERS()
 #endif
 
+void can_router_init(void)
+{
+    mutex_init(&lock);
+    memarray_init(&_filter_array, _filter_buf, sizeof(filter_el_t), CAN_ROUTER_MAX_FILTER);
+}
+
 static filter_el_t *_alloc_filter_el(canid_t can_id, canid_t mask, void *data)
 {
     filter_el_t *el;
-    gnrc_pktsnip_t *snip = gnrc_pktbuf_add(NULL, NULL, sizeof(*el), GNRC_NETTYPE_UNDEF);
-    if (!snip) {
+    el = memarray_alloc(&_filter_array);
+    if (!el) {
         DEBUG("can_router: _alloc_canid_el: out of memory\n");
         return NULL;
     }
 
-    el = snip->data;
     el->can_id = can_id;
     el->mask = mask;
     el->data = data;
     el->entry.next = NULL;
-    el->snip = snip;
     DEBUG("_alloc_canid_el: el allocated with can_id=0x%" PRIx32 ", mask=0x%" PRIx32
           ", data=%p\n", can_id, mask, data);
     return el;
@@ -108,10 +109,12 @@ static filter_el_t *_alloc_filter_el(canid_t can_id, canid_t mask, void *data)
 
 static void _free_filter_el(filter_el_t *el)
 {
+    assert(el);
+
     DEBUG("_free_canid_el: el freed with can_id=0x%" PRIx32 ", mask=0x%" PRIx32
           ", data=%p\n", el->can_id, el->mask, el->data);
 
-    gnrc_pktbuf_release(el->snip);
+    memarray_free(&_filter_array, el);
 }
 
 /* Insert to the list in a sorted way
@@ -204,13 +207,15 @@ int can_router_register(can_reg_entry_t *entry, canid_t can_id, canid_t mask, vo
     filter_el_t *filter;
     int ret;
 
-#if ENABLE_DEBUG
-    if (entry->type == CAN_TYPE_DEFAULT) {
-        DEBUG("can_router_register: ifnum=%d, pid=%" PRIkernel_pid ", can_id=0x%" PRIx32
-              ", mask=0x%" PRIx32 ", data=%p\n", entry->ifnum, entry->target.pid, can_id, mask, param);
-    } else if (entry->type == CAN_TYPE_MBOX) {
-        DEBUG("can_router_register: ifnum=%d, mbox=%p, can_id=0x%" PRIx32
-              ", mask=0x%" PRIx32 ", data=%p\n", entry->ifnum, (void *)entry->target.mbox, can_id, mask, param);
+#ifdef MODULE_CAN_MBOX
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        if (entry->type == CAN_TYPE_DEFAULT) {
+            DEBUG("can_router_register: ifnum=%d, pid=%" PRIkernel_pid ", can_id=0x%" PRIx32
+                ", mask=0x%" PRIx32 ", data=%p\n", entry->ifnum, entry->target.pid, can_id, mask, param);
+        } else if (entry->type == CAN_TYPE_MBOX) {
+            DEBUG("can_router_register: ifnum=%d, mbox=%p, can_id=0x%" PRIx32
+                ", mask=0x%" PRIx32 ", data=%p\n", entry->ifnum, (void *)entry->target.mbox, can_id, mask, param);
+        }
     }
 #endif
 
@@ -253,13 +258,15 @@ int can_router_unregister(can_reg_entry_t *entry, canid_t can_id,
     filter_el_t *el;
     int ret;
 
-#if ENABLE_DEBUG
-    if (entry->type == CAN_TYPE_DEFAULT) {
-        DEBUG("can_router_unregister: ifnum=%d, pid=%" PRIkernel_pid ", can_id=0x%" PRIx32
-              ", mask=0x%" PRIx32 ", data=%p", entry->ifnum, entry->target.pid, can_id, mask, param);
-    } else if (entry->type == CAN_TYPE_MBOX) {
-        DEBUG("can_router_unregister: ifnum=%d, mbox=%p, can_id=0x%" PRIx32
-              ", mask=0x%" PRIx32 ", data=%p\n", entry->ifnum, (void *)entry->target.mbox, can_id, mask, param);
+#ifdef MODULE_CAN_MBOX
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        if (entry->type == CAN_TYPE_DEFAULT) {
+            DEBUG("can_router_unregister: ifnum=%d, pid=%" PRIkernel_pid ", can_id=0x%" PRIx32
+                ", mask=0x%" PRIx32 ", data=%p", entry->ifnum, entry->target.pid, can_id, mask, param);
+        } else if (entry->type == CAN_TYPE_MBOX) {
+            DEBUG("can_router_unregister: ifnum=%d, mbox=%p, can_id=0x%" PRIx32
+                ", mask=0x%" PRIx32 ", data=%p\n", entry->ifnum, (void *)entry->target.mbox, can_id, mask, param);
+        }
     }
 #endif
 
@@ -307,14 +314,13 @@ int can_router_dispatch_rx_indic(can_pkt_t *pkt)
     int res = 0;
     msg_t msg;
     msg.type = CAN_MSG_RX_INDICATION;
-#if ENABLE_DEBUG
     int msg_cnt = 0;
-#endif
+
     DEBUG("can_router_dispatch_rx_indic: pkt=%p, ifnum=%d, can_id=%" PRIx32 "\n",
           (void *)pkt, pkt->entry.ifnum, pkt->frame.can_id);
 
     mutex_lock(&lock);
-    can_reg_entry_t *entry;
+    can_reg_entry_t *entry = NULL;
     filter_el_t *el;
     LL_FOREACH(table[pkt->entry.ifnum], entry) {
         el = container_of(entry, filter_el_t, entry);
@@ -325,9 +331,11 @@ int can_router_dispatch_rx_indic(can_pkt_t *pkt)
                   PRIkernel_pid "\n", entry->target.pid);
             atomic_fetch_add(&pkt->ref_count, 1);
             msg.content.ptr = can_pkt_alloc_rx_data(&pkt->frame, sizeof(pkt->frame), el->data);
-#if ENABLE_DEBUG
-            msg_cnt++;
-#endif
+
+            if (IS_ACTIVE(ENABLE_DEBUG)) {
+                msg_cnt++;
+            }
+
             if (!msg.content.ptr || (_send_msg(&msg, entry) <= 0)) {
                 can_pkt_free_rx_data(msg.content.ptr);
                 atomic_fetch_sub(&pkt->ref_count, 1);
@@ -339,9 +347,9 @@ int can_router_dispatch_rx_indic(can_pkt_t *pkt)
         }
     }
     mutex_unlock(&lock);
-#if ENABLE_DEBUG
+
     DEBUG("can_router_dispatch_rx: msg send to %d threads\n", msg_cnt);
-#endif
+
     if (atomic_load(&pkt->ref_count) == 0) {
         can_pkt_free(pkt);
     }
@@ -383,9 +391,7 @@ int can_router_dispatch_tx_error(can_pkt_t *pkt)
 
 int can_router_free_frame(struct can_frame *frame)
 {
-    can_pkt_t *pkt = NULL;
-
-    pkt = container_of(frame, can_pkt_t, frame);
+    can_pkt_t *pkt = container_of(frame, can_pkt_t, frame);
 
     DEBUG("can_router_free_frame: pkt=%p\n", (void*) pkt);
 

@@ -21,39 +21,13 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "cfg_clock_16_1.h"
+#include "cfg_timer_012.h"
+#include "cfg_rtt_default.h"
 
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-/**
- * @name    Clock configuration
- *
- * @note    The radio will not work with the internal RC oscillator!
- *
- * @{
- */
-#define CLOCK_HFCLK         (16U)           /* set to  0: internal RC oscillator
-                                                      16: 16MHz crystal
-                                                      32: 32MHz crystal */
-#define CLOCK_LFCLK         (1)             /* set to  0: internal RC oscillator
-                                             *         1: 32.768 kHz crystal
-                                             *         2: derived from HFCLK */
-/** @} */
-
-/**
- * @name    Timer configuration
- * @{
- */
-static const timer_conf_t timer_config[] = {
-    /* dev, channels, width */
-    { NRF_TIMER0, 3, TIMER_BITMODE_BITMODE_24Bit, TIMER0_IRQn }
-};
-
-#define TIMER_0_ISR         isr_timer0
-
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
-/** @} */
 
 /**
  * @name    UART configuration
@@ -64,16 +38,6 @@ static const timer_conf_t timer_config[] = {
 #define UART_NUMOF          (1U)
 #define UART_PIN_RX         17
 #define UART_PIN_TX         18
-/** @} */
-
-/**
- * @name    Real time counter configuration
- * @{
- */
-#define RTT_NUMOF           (1U)
-#define RTT_DEV             (1)             /* NRF_RTC1 */
-#define RTT_MAX_VALUE       (0x00ffffff)
-#define RTT_FREQUENCY       (1024)
 /** @} */
 
 /**
@@ -89,7 +53,7 @@ static const spi_conf_t spi_config[] = {
     }
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
@@ -101,17 +65,19 @@ static const i2c_conf_t i2c_config[] = {
         .dev     = NRF_TWI0,
         .pin_scl = 7,
         .pin_sda = 8,
-        .ppi     = 0
+        .ppi     = 0,
+        .speed   = I2C_SPEED_NORMAL,
     },
     {
         .dev     = NRF_TWI1,
         .pin_scl = 9,
         .pin_sda = 10,
-        .ppi     = 1
+        .ppi     = 1,
+        .speed   = I2C_SPEED_NORMAL,
     }
 };
 
-#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
 /**
@@ -120,18 +86,9 @@ static const i2c_conf_t i2c_config[] = {
  * The configuration consists simply of a list of channels that should be used
  * @{
  */
-#define ADC_CONFIG          {3, 4, 5, 6}
-#define ADC_NUMOF           (4)
-/** @} */
+static const adc_conf_t adc_config[] = {3, 4, 5, 6};
 
-/**
- * @name    Radio device configuration
- *
- * The radio is not guarded by a NUMOF define, as the radio is selected by its
- * own module in the build system.
- * @{
- */
-#define RADIO_IRQ_PRIO      1
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 #ifdef __cplusplus

@@ -49,7 +49,7 @@ typedef struct {
     uint8_t page_program;    /**< Page program */
     uint8_t sector_erase;    /**< Block erase 4 KiB */
     uint8_t block_erase_32k; /**< 32KiB block erase */
-    uint8_t block_erase;     /**< Block erase (usually 64 KiB) */
+    uint8_t block_erase_64k; /**< Block erase (usually 64 KiB) */
     uint8_t chip_erase;      /**< Chip erase */
     uint8_t sleep;           /**< Deep power down */
     uint8_t wake;            /**< Release from deep power down */
@@ -75,13 +75,46 @@ typedef struct __attribute__((packed)) {
 #define JEDEC_NEXT_BANK (0x7f)
 
 /**
+ * @brief   The highest possible bank number when reading manufacturer ID
+ *
+ * @see http://www.jedec.org/standards-documents/results/jep106
+ */
+#define JEDEC_BANK_MAX  (10)
+
+/**
  * @brief   Flag to set when the device support 4KiB sector erase (sector_erase opcode)
  */
 #define SPI_NOR_F_SECT_4K   (1)
+
 /**
  * @brief   Flag to set when the device support 32KiB block erase (block_erase_32k opcode)
  */
 #define SPI_NOR_F_SECT_32K  (2)
+
+/**
+ * @brief   Flag to set when the device support 64KiB block erase (block_erase_32k opcode)
+ */
+#define SPI_NOR_F_SECT_64K  (4)
+
+/**
+ * @brief Compile-time parameters for a serial flash device
+ */
+typedef struct {
+    const mtd_spi_nor_opcode_t *opcode; /**< Opcode table for the device */
+    uint32_t wait_chip_erase;   /**< Full chip erase wait time in µs */
+    uint32_t wait_64k_erase;    /**< 64KB page erase wait time in µs */
+    uint32_t wait_32k_erase;    /**< 32KB page erase wait time in µs */
+    uint32_t wait_sector_erase; /**< 4KB sector erase wait time in µs */
+    uint32_t wait_chip_wake_up; /**< Chip wake up time in µs */
+    spi_clk_t clk;           /**< SPI clock */
+    uint16_t flag;           /**< Config flags */
+    spi_t spi;               /**< SPI bus the device is connected to */
+    spi_mode_t mode;         /**< SPI mode */
+    gpio_t cs;               /**< CS pin GPIO handle */
+    gpio_t wp;               /**< Write Protect pin GPIO handle */
+    gpio_t hold;             /**< HOLD pin GPIO handle */
+    uint8_t addr_width;      /**< Number of bytes in addresses, usually 3 for small devices */
+} mtd_spi_nor_params_t;
 
 /**
  * @brief   Device descriptor for serial flash memory devices
@@ -90,13 +123,9 @@ typedef struct __attribute__((packed)) {
  */
 typedef struct {
     mtd_dev_t base;          /**< inherit from mtd_dev_t object */
-    const mtd_spi_nor_opcode_t *opcode; /**< Opcode table for the device */
-    spi_t spi;               /**< SPI bus the device is connected to */
-    gpio_t cs;               /**< CS pin GPIO handle */
-    spi_mode_t mode;         /**< SPI mode */
-    spi_clk_t clk;           /**< SPI clock */
-    uint16_t flag;           /**< Config flags */
+    const mtd_spi_nor_params_t *params; /**< SPI NOR params */
     mtd_jedec_id_t jedec_id; /**< JEDEC ID of the chip */
+
     /**
      * @brief   bitmask to corresponding to the page address
      *
@@ -109,7 +138,6 @@ typedef struct {
      * Computed by mtd_spi_nor_init, no need to touch outside the driver.
      */
     uint32_t sec_addr_mask;
-    uint8_t addr_width;      /**< Number of bytes in addresses, usually 3 for small devices */
     /**
      * @brief   number of right shifts to get the address to the start of the page
      *
@@ -139,6 +167,13 @@ extern const mtd_desc_t mtd_spi_nor_driver;
  * different devices, as well as in the Linux kernel, so they seem quite
  * sensible for default values. */
 extern const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default;
+
+/**
+ * @brief   Default 4-byte addresses opcodes
+ *
+ * Commands for 4-byte addresses chips (above 128Mb)
+ */
+extern const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default_4bytes;
 
 #ifdef __cplusplus
 }

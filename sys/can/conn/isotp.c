@@ -17,6 +17,7 @@
  */
 
 #ifdef MODULE_CAN_ISOTP
+#include <assert.h>
 #include <errno.h>
 #include <string.h>
 
@@ -28,7 +29,7 @@
 #include "utlist.h"
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #include "xtimer.h"
@@ -41,6 +42,15 @@
 #ifndef CONN_CAN_ISOTP_TIMEOUT_TX_CONF
 #define CONN_CAN_ISOTP_TIMEOUT_TX_CONF (10 * US_PER_SEC)
 #endif
+
+static inline int try_put_msg(conn_can_isotp_t *conn, msg_t *msg)
+{
+#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+    return mbox_try_put(&conn->master->mbox, msg);
+#else
+    return mbox_try_put(&conn->mbox, msg);
+#endif
+}
 
 static inline void put_msg(conn_can_isotp_t *conn, msg_t *msg)
 {
@@ -91,7 +101,7 @@ int conn_can_isotp_create(conn_can_isotp_t *conn, struct isotp_options *options,
     return 0;
 }
 
-int conn_can_isotp_bind(conn_can_isotp_t *conn)
+int conn_can_isotp_bind(conn_can_isotp_t *conn, struct isotp_fc_options *fc_options)
 {
     assert(conn != NULL);
     assert(conn->isotp.opt.tx_id != 0 || conn->isotp.opt.rx_id != 0);
@@ -126,7 +136,7 @@ int conn_can_isotp_bind(conn_can_isotp_t *conn)
         put_msg(conn, &msg);
     }
 
-    ret = isotp_bind(&conn->isotp, &entry, conn);
+    ret = isotp_bind(&conn->isotp, &entry, conn, fc_options);
     if (!ret) {
         conn->bound = 1;
     }
@@ -141,7 +151,7 @@ static void _tx_conf_timeout(void *arg)
     msg.type = _TIMEOUT_TX_MSG_TYPE;
     msg.content.value = _TIMEOUT_MSG_VALUE;
 
-    put_msg(conn, &msg);
+    try_put_msg(conn, &msg);
 }
 
 int conn_can_isotp_send(conn_can_isotp_t *conn, const void *buf, size_t size, int flags)
@@ -205,7 +215,7 @@ static void _rx_timeout(void *arg)
     msg.type = _TIMEOUT_RX_MSG_TYPE;
     msg.content.value = _TIMEOUT_MSG_VALUE;
 
-    put_msg(conn, &msg);
+    try_put_msg(conn, &msg);
 }
 
 int conn_can_isotp_recv(conn_can_isotp_t *conn, void *buf, size_t size, uint32_t timeout)
@@ -358,7 +368,7 @@ int conn_can_isotp_close(conn_can_isotp_t *conn)
 
     msg.type = _CLOSE_CONN_MSG_TYPE;
     msg.content.ptr = conn;
-    put_msg(conn, &msg);
+    try_put_msg(conn, &msg);
 
     conn->bound = 0;
 

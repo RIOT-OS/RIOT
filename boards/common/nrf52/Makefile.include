@@ -1,0 +1,28 @@
+# include this module into the build
+INCLUDES += -I$(RIOTBOARD)/common/nrf52/include
+
+ifeq (bmp,$(PROGRAMMER))
+  # On Blackmagic Probe, the first ACM is used to connect to the gdb server,
+  # the second is the BMP's UART interface
+  PORT_LINUX ?= /dev/ttyACM1
+  PORT_DARWIN ?= $(wordlist 2, 2, $(sort $(wildcard /dev/tty.usbmodem*)))
+endif
+
+PROGRAMMER ?= jlink
+# setup JLink for flashing
+JLINK_DEVICE = nrf52
+# setup OpenOCD for flashing. Version 0.10 of OpenOCD doesn't contain support
+# for nrf52dk and nrf52840dk boards. To use OpenOCD with these a version
+# build from source (master > 2018, August the 13rd) is required.
+OPENOCD_DEBUG_ADAPTER ?= jlink
+OPENOCD_CONFIG = $(RIOTBOARD)/common/nrf52/dist/openocd.cfg
+
+ifneq (,$(filter $(BOARD),ruuvitag thingy52))
+  # openocd doesn't fully work with ruuvitag and thingy52
+  ifeq (openocd,$(PROGRAMMER))
+    $(error Cannot use OpenOCD with $(BOARD) board)
+  endif
+endif
+
+# set list of supported programmers
+PROGRAMMERS_SUPPORTED += bmp openocd

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     netdev
+ * @ingroup     drivers_netdev
  * @brief
  * @{
  *

@@ -1,0 +1,47 @@
+#!/usr/bin/tclsh
+
+# F001: Source files should not use the '\r' (CR) character
+# L001: No trailing whitespace
+# L002: Don't use tab characters
+# L003: No leading and no trailing empty lines
+# L004: Line cannot be too long
+# L005: There should not be too many consecutive empty lines
+# L006: Source file should not be too long
+# T001: One-line comments should not have forced continuation
+# T003: Some keywords should be followed by a single space
+# T004: Some keywords should be immediately followed by a colon
+# T005: Keywords break and continue should be immediately followed by a semicolon
+# T006: Keywords return and throw should be immediately followed by a semicolon or a single space
+# T007: Semicolons should not be isolated by spaces or comments from the rest of the code
+# T008: Keywords catch, for, if and while should be followed by a single space
+# T009: Comma should not be preceded by whitespace, but should be followed by one
+# T010: Identifiers should not be composed of 'l' and 'O' characters only
+# T013: Source files should contain the copyright notice
+# T015: HTML links in comments and string literals should be correct
+# T017: Unnamed namespaces are not allowed in header files
+# T018: using namespace are not allowed in header files
+# T019: control structures should have complete curly-braced block of code
+
+set rules {
+  F001
+  L001
+  L002
+  L003
+  L004
+  L005
+  L006
+  T001
+  T003
+  T004
+  T005
+  T006
+  T007
+  T008
+  T009
+  T010
+  T013
+  T015
+  T017
+  T018
+  T019
+}

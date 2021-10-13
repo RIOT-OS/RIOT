@@ -1,0 +1,5 @@
+# Add board common includes
+INCLUDES += -I$(RIOTBOARD)/common/sodaq/include
+
+# Include all definitions for flashing with bossa over USB
+include $(RIOTBOARD)/common/samdx1-arduino-bootloader/Makefile.include

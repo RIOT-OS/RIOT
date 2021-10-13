@@ -1,3 +1,3 @@
 MODULE = auto_init_can
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTMAKE)/auto_init.inc.mk

@@ -1,0 +1,7 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += ccs811
+  USEMODULE += mma8x5x
+  USEMODULE += tcs37727
+endif
+
+include $(RIOTBOARD)/common/kw41z/Makefile.dep

@@ -26,7 +26,7 @@
 #include "periph/gpio.h"
 #include "periph/pwm.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define LATCH_DELAY         (50U) /* 50 us */
@@ -238,12 +238,12 @@ void dsp0401_scroll_text(const dsp0401_t *dev, char *text, uint16_t delay)
     for (unsigned i = 0; i < strlen(text); ++i) {
         _shift_char(dev, text[i]);
         _latch(dev);
-        xtimer_usleep((uint32_t)(delay * US_PER_MS));
+        xtimer_msleep(delay);
     }
 
     for (unsigned i = 0; i < MOD_COUNT * 4; ++i) {
         _shift_char(dev, ' ');
         _latch(dev);
-        xtimer_usleep((uint32_t)(delay * US_PER_MS));
+        xtimer_msleep(delay);
     }
 }

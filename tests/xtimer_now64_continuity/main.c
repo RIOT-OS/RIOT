@@ -34,8 +34,8 @@ int main(void)
     uint64_t diff_min = UINT64_MAX;
     uint64_t diff_max = 0;
     uint64_t diff_sum = 0;
-    xtimer_ticks64_t before = xtimer_now64();
     print_str("[START]\n");
+    xtimer_ticks64_t before = xtimer_now64();
     while(--n) {
         xtimer_ticks64_t now = xtimer_now64();
         xtimer_ticks64_t diff = xtimer_diff64(now, before);

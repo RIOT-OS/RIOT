@@ -1,0 +1,24 @@
+From f87d1a3ca89118b654a32cea58f4b03774042c17 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 13 Nov 2020 15:20:42 +0100
+Subject: [PATCH 5/5] hw/drivers/uwb/include/uwb: add UWB_ROLE_TAG role
+
+---
+ hw/drivers/uwb/include/uwb/uwb.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hw/drivers/uwb/include/uwb/uwb.h b/hw/drivers/uwb/include/uwb/uwb.h
+index 2872e46..00017be 100644
+--- a/hw/drivers/uwb/include/uwb/uwb.h
++++ b/hw/drivers/uwb/include/uwb/uwb.h
+@@ -68,6 +68,7 @@ typedef enum uwb_extension_id {
+ } uwb_extension_id_t;
+ 
+ //! Device Roles
++#define UWB_ROLE_TAG          (0x0000)  //!< Act as a TAG
+ #define UWB_ROLE_CCP_MASTER   (0x0001)  //!< Act as Clock Master for the network
+ #define UWB_ROLE_PAN_MASTER   (0x0002)  //!< Act as Pan Master handing out slots and addresses
+ #define UWB_ROLE_ANCHOR       (0x0004)  //!< Act as an Anchor, a non-mobile unit
+-- 
+2.28.0
+

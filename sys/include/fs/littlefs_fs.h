@@ -31,14 +31,6 @@ extern "C" {
 #include "mtd.h"
 #include "mutex.h"
 
-#if VFS_FILE_BUFFER_SIZE < 52
-#error "VFS_FILE_BUFFER_SIZE is too small, at least 52 bytes is required"
-#endif
-
-#if VFS_DIR_BUFFER_SIZE < 44
-#error "VFS_DIR_BUFFER_SIZE is too small, at least 44 bytes is required"
-#endif
-
 /**
  * @name    littlefs configuration
  * @{

@@ -19,13 +19,20 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "kernel_defines.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/sixlowpan/ctx.h"
-#include "net/gnrc/sixlowpan/nd.h"
+#include "net/sixlowpan/nd.h"
 #include "timex.h"
-#include "xtimer.h"
 
+#if IS_USED(MODULE_ZTIMER_MSEC)
+#include "ztimer.h"
+static ztimer_t del_timer[GNRC_SIXLOWPAN_CTX_SIZE];
+#else
+#include "xtimer.h"
 static xtimer_t del_timer[GNRC_SIXLOWPAN_CTX_SIZE];
+#endif
+
 void _del_cb(void *ptr)
 {
     gnrc_sixlowpan_ctx_t *ctx = ptr;
@@ -45,13 +52,14 @@ int _gnrc_6ctx_list(void)
 {
     puts("cid|prefix                                     |C|ltime");
     puts("-----------------------------------------------------------");
-    for (uint8_t i = 0; i < GNRC_SIXLOWPAN_CTX_SIZE; i++) {
-        gnrc_sixlowpan_ctx_t *ctx = gnrc_sixlowpan_ctx_lookup_id(i);
+    for (uint8_t cid = 0; cid < GNRC_SIXLOWPAN_CTX_SIZE; cid++) {
+        gnrc_sixlowpan_ctx_t *ctx = gnrc_sixlowpan_ctx_lookup_id(cid);
         if (ctx != NULL) {
             char addr_str[IPV6_ADDR_MAX_STR_LEN];
-            printf(" %2" PRIu8 "|%39s/%-3" PRIu8 "|%" PRIx8 "|%5" PRIu16 " min\n", i,
-                   ipv6_addr_to_str(addr_str, &ctx->prefix, sizeof(addr_str)), ctx->prefix_len,
-                   (uint8_t) ((ctx->flags_id & 0xf0) >> 4), ctx->ltime);
+            printf(" %2u|%39s/%-3u|%x|%5umin\n", cid,
+                   ipv6_addr_to_str(addr_str, &ctx->prefix, sizeof(addr_str)),
+                   ctx->prefix_len, (uint8_t) ((ctx->flags_id & 0xf0) >> 4),
+                   ctx->ltime);
         }
     }
     return 0;
@@ -67,6 +75,9 @@ int _gnrc_6ctx_add(char *cmd_str, char *ctx_str, char *prefix_str, char *ltime_s
     if (ctx >= GNRC_SIXLOWPAN_CTX_SIZE) {
         _usage(cmd_str);
         return 1;
+    }
+    if (!IS_USED(MODULE_GNRC_IPV6_NIB_6LBR)) {
+        puts("WARNING: context dissemination by non-6LBR not supported");
     }
     addr_str = strtok_r(prefix_str, "/", &save_ptr);
     if (addr_str == NULL) {
@@ -105,22 +116,29 @@ int _gnrc_6ctx_del(char *cmd_str, char *ctx_str)
         _usage(cmd_str);
         return 1;
     }
-    else if (del_timer[cid].callback == NULL) {
+    if (!IS_USED(MODULE_GNRC_IPV6_NIB_6LBR)) {
+        puts("WARNING: context dissemination by non-6LBR not supported");
+    }
+    if (del_timer[cid].callback == NULL) {
         ctx = gnrc_sixlowpan_ctx_lookup_id(cid);
         if (ctx != NULL) {
             ctx->flags_id &= ~GNRC_SIXLOWPAN_CTX_FLAGS_COMP;
             ctx->ltime = 0;
             del_timer[cid].callback = _del_cb;
             del_timer[cid].arg = ctx;
-            xtimer_set(&del_timer[cid], GNRC_SIXLOWPAN_ND_RTR_MIN_CTX_DELAY * US_PER_SEC);
+#if IS_USED(MODULE_ZTIMER_MSEC)
+            ztimer_set(ZTIMER_MSEC, &del_timer[cid],
+                       SIXLOWPAN_ND_MIN_CTX_CHANGE_SEC_DELAY * MS_PER_SEC);
+#else
+            xtimer_set(&del_timer[cid],
+                       SIXLOWPAN_ND_MIN_CTX_CHANGE_SEC_DELAY * US_PER_SEC);
+#endif
         }
     }
     else {
         printf("Context %u already marked for removal\n", cid);
         return 1;
     }
-    /* advertise updated context */
-    _adv_ctx();
     return 0;
 }
 

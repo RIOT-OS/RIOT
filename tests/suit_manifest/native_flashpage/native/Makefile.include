@@ -1,0 +1,8 @@
+CFLAGS += -DFLASHPAGE_SIZE=256
+CFLAGS += -DFLASHPAGE_NUMOF=16
+
+# We must duplicate the include done by $(RIOTBASE)/Makefile.include
+# to also include the main board header
+INCLUDES += $(addprefix -I,$(wildcard $(RIOTBOARD)/native/include))
+
+include $(RIOTBOARD)/native/Makefile.include

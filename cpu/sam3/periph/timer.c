@@ -75,7 +75,7 @@ static inline Tc *dev(tim_t tim)
  * For each timer, channel 1 is used to implement a prescaler. Channel 1 is
  * driven by the MCK / 2 (42MHz) (TIMER_CLOCK1).
  */
-int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
+int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
 {
     /* check if device is valid */
     if (tim >= TIMER_NUMOF) {
@@ -124,10 +124,18 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 
 int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
-    if (channel >= TIMER_CHANNELS) {
+    if (channel >= TIMER_CHANNEL_NUMOF) {
         return -1;
     }
     (&dev(tim)->TC_CHANNEL[0].TC_RA)[channel] = value;
+
+    /* read TC status register to clear any possibly pending
+     * ISR flag (that has not been served yet).
+     * timer_clear() disables the interrupt, but does not clear the flags.
+     * if we don't clear them here, re-enabling the interrupt below
+     * can trigger for the previously disabled timer. */
+    (void)dev(tim)->TC_CHANNEL[0].TC_SR;
+
     dev(tim)->TC_CHANNEL[0].TC_IER = (TC_IER_CPAS << channel);
 
     return 0;
@@ -135,13 +143,13 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 
 int timer_clear(tim_t tim, int channel)
 {
-    if (channel >= TIMER_CHANNELS) {
+    if (channel >= TIMER_CHANNEL_NUMOF) {
         return -1;
     }
 
     dev(tim)->TC_CHANNEL[0].TC_IDR = (TC_IDR_CPAS << channel);
 
-    return 1;
+    return 0;
 }
 
 unsigned int timer_read(tim_t tim)
@@ -163,7 +171,7 @@ static inline void isr_handler(tim_t tim)
 {
     uint32_t status = dev(tim)->TC_CHANNEL[0].TC_SR;
 
-    for (int i = 0; i < TIMER_CHANNELS; i++) {
+    for (int i = 0; i < TIMER_CHANNEL_NUMOF; i++) {
         if (status & (TC_SR_CPAS << i)) {
             dev(tim)->TC_CHANNEL[0].TC_IDR = (TC_IDR_CPAS << i);
             isr_ctx[tim].cb(isr_ctx[tim].arg, i);

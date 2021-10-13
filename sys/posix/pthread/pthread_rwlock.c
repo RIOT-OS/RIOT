@@ -37,7 +37,7 @@
 
 #include "thread.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr)
@@ -83,7 +83,7 @@ bool __pthread_rwlock_blocked_readingly(const pthread_rwlock_t *rwlock)
     }
 
     priority_queue_node_t *qnode = rwlock->queue.first;
-    if (qnode->priority > sched_active_thread->priority) {
+    if (qnode->priority > thread_get_active()->priority) {
         /* the waiting thread has a lower priority */
         return false;
     }
@@ -124,11 +124,11 @@ static int pthread_rwlock_lock(pthread_rwlock_t *rwlock,
         /* queue for the lock */
         __pthread_rwlock_waiter_node_t waiting_node = {
             .is_writer = is_writer,
-            .thread = (thread_t *) sched_active_thread,
+            .thread = thread_get_active(),
             .qnode = {
                 .next = NULL,
                 .data = (uintptr_t) &waiting_node,
-                .priority = sched_active_thread->priority,
+                .priority = thread_get_active()->priority,
             },
             .continue_ = false,
         };
@@ -191,12 +191,12 @@ static int pthread_rwlock_timedlock(pthread_rwlock_t *rwlock,
     uint64_t then = ((uint64_t)abstime->tv_sec * US_PER_SEC) +
                     (abstime->tv_nsec / NS_PER_US);
 
-    if ((then - now) <= 0) {
+    if (now >= then) {
         return ETIMEDOUT;
     }
     else {
         xtimer_t timer;
-        xtimer_set_wakeup64(&timer, (then - now), sched_active_pid);
+        xtimer_set_wakeup64(&timer, (then - now), thread_getpid());
         int result = pthread_rwlock_lock(rwlock, is_blocked, is_writer, incr_when_held, true);
         if (result != ETIMEDOUT) {
             xtimer_remove(&timer);
@@ -261,7 +261,7 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
     }
 
     if (rwlock->readers != 0 || rwlock->queue.first == NULL) {
-        /* this thread was not the last reader, or no one is waiting to aquire the lock */
+        /* this thread was not the last reader, or no one is waiting to acquire the lock */
         DEBUG("Thread %" PRIkernel_pid ": pthread_rwlock_%s(): no one is waiting\n", thread_getpid(), "unlock");
         mutex_unlock(&rwlock->mutex);
         return 0;

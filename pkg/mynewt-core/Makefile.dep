@@ -1,0 +1,17 @@
+USEMODULE += event_callback
+USEMODULE += sema
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
+
+USEMODULE += mynewt-core
+
+DEFAULT_MODULE += auto_init_mynewt-core
+
+# MyNewt `os_hw_is_in_critical` function needs to know whether ISR are masked
+# of if the function is being called in ISR context. There is no such function
+# in RIOT except for arm (__get_PRIMASK), therefore unless a similar function
+# is provided for other arch, this port is currently only enabled for those arch.
+# Note: that this should not be a hindrance since nimble only works on nordic
+# and uwb-core breakouts are all arm.
+FEATURES_REQUIRED += arch_arm
+FEATURES_BLACKLIST += arch_arm7

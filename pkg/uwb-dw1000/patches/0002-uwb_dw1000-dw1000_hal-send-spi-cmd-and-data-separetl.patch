@@ -1,0 +1,57 @@
+From 3a3f9c49095768d2dc908f240ca02ee998c3d9b9 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 14 Aug 2020 13:55:11 +0200
+Subject: [PATCH 2/5] uwb_dw1000/dw1000_hal: send spi cmd and data separetly
+ for RIOT
+
+---
+ hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c b/hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c
+index 2390635..b195c23 100644
+--- a/hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c
++++ b/hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c
+@@ -310,7 +310,7 @@ hal_dw1000_read(struct _dw1000_dev_instance_t * inst,
+
+     hal_gpio_write(inst->ss_pin, 0);
+
+-#if !defined(MYNEWT)
++#if !defined(MYNEWT) && !defined(RIOT_VERSION)
+     /* Linux mode really, for when we can't split the command and data */
+     assert(cmd_size + length < inst->uwb_dev.txbuf_size);
+     assert(cmd_size + length < MYNEWT_VAL(DW1000_HAL_SPI_MAX_CNT));
+@@ -322,7 +322,7 @@ hal_dw1000_read(struct _dw1000_dev_instance_t * inst,
+                       inst->uwb_dev.txbuf, cmd_size+length);
+     memcpy(buffer, inst->uwb_dev.txbuf + cmd_size, length);
+ #else
+-    rc = hal_spi_txrx(inst->spi_num, (void*)cmd, 0, cmd_size);
++    rc = hal_spi_txrx(inst->spi_num, (void*)cmd, NULL, cmd_size);
+     assert(rc == DPL_OK);
+     int step = (inst->uwb_dev.txbuf_size > MYNEWT_VAL(DW1000_HAL_SPI_MAX_CNT)) ?
+         MYNEWT_VAL(DW1000_HAL_SPI_MAX_CNT) : inst->uwb_dev.txbuf_size;
+@@ -537,7 +537,7 @@ hal_dw1000_write(struct _dw1000_dev_instance_t * inst, const uint8_t * cmd, uint
+
+     hal_gpio_write(inst->ss_pin, 0);
+
+-#if !defined(MYNEWT)
++#if !defined(MYNEWT) && !defined(RIOT_VERSION)
+     /* Linux mode really, for when we can't split the command and data */
+     assert(cmd_size + length < inst->uwb_dev.txbuf_size);
+     assert(cmd_size + length < MYNEWT_VAL(DW1000_HAL_SPI_MAX_CNT));
+@@ -549,10 +549,10 @@ hal_dw1000_write(struct _dw1000_dev_instance_t * inst, const uint8_t * cmd, uint
+                       0, cmd_size+length);
+     assert(rc == DPL_OK);
+ #else
+-    rc = hal_spi_txrx(inst->spi_num, (void*)cmd, 0, cmd_size);
++    rc = hal_spi_txrx(inst->spi_num, (void*)cmd, NULL, cmd_size);
+     assert(rc == DPL_OK);
+     if (length) {
+-        hal_spi_txrx(inst->spi_num, (void*)buffer, 0, length);
++        hal_spi_txrx(inst->spi_num, (void*)buffer, NULL, length);
+     }
+ #endif
+
+--
+2.28.0
+

@@ -1,0 +1,4 @@
+INCLUDES += -I$(PKGDIRBASE)/driver_bme680
+INCLUDES += -I$(RIOTPKG)/driver_bme680/include
+
+DIRS += $(RIOTPKG)/driver_bme680/contrib

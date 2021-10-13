@@ -18,7 +18,6 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-
 #ifndef NET_ETHERNET_H
 #define NET_ETHERNET_H
 
@@ -46,29 +45,6 @@ extern "C" {
  * @brief maximum number of bytes in an ethernet frame (with FCF)
  */
 #define ETHERNET_MAX_LEN        (ETHERNET_FRAME_LEN + ETHERNET_FCS_LEN)
-
-/**
- * @brief   Generates an IPv6 interface identifier from a 48-bit MAC address.
- *
- * @see <a href="https://tools.ietf.org/html/rfc2464#section-4">
- *          RFC 2464, section 4
- *      </a>
- *
- * @param[out] eui64    The resulting EUI-64.
- * @param[in] mac       A 48-bit MAC address. Is expected to be at least
- *                      @ref ETHERNET_ADDR_LEN long.
- */
-static inline void ethernet_get_iid(eui64_t *eui64, uint8_t *mac)
-{
-    eui64->uint8[0] = mac[0] ^ 0x02;
-    eui64->uint8[1] = mac[1];
-    eui64->uint8[2] = mac[2];
-    eui64->uint8[3] = 0xff;
-    eui64->uint8[4] = 0xfe;
-    eui64->uint8[5] = mac[3];
-    eui64->uint8[6] = mac[4];
-    eui64->uint8[7] = mac[5];
-}
 
 #ifdef __cplusplus
 }

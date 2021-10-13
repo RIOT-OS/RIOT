@@ -9,7 +9,10 @@
 /**
  * @defgroup    drivers_lis3dh LIS3DH accelerometer
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Device driver for the LIS3DH accelerometer
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file
@@ -736,10 +739,8 @@ typedef struct {
  * @brief   Device descriptor for LIS3DH sensors
  */
 typedef struct {
-    spi_t spi;              /**< SPI device the sensor is connected to */
-    spi_clk_t clk;          /**< clock speed of the SPI bus */
-    gpio_t cs;              /**< Chip select pin */
-    int16_t scale;          /**< Current scale setting of the sensor */
+    lis3dh_params_t params; /**< Device initialization parameters */
+    uint16_t scale;         /**< Internal sensor scale */
 } lis3dh_t;
 
 /**

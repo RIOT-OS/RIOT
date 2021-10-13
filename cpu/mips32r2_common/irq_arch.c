@@ -9,7 +9,6 @@
 #include <mips/m32c0.h>
 #include "irq.h"
 
-
 unsigned int irq_enable(void)
 {
     unsigned int status;
@@ -39,4 +38,8 @@ void irq_restore(unsigned int state)
 int irq_is_in(void)
 {
     return (mips32_get_c0(C0_STATUS) & SR_EXL) != 0;
+}
+
+int irq_is_enabled(void) {
+    return mips32_get_c0(C0_STATUS) & SR_IE;
 }

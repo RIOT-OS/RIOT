@@ -1,6 +1,7 @@
 Expected result
 ===============
-When everything works as expected, you should see a alarm message after 10 seconds from start-up.
+When everything works as expected, after start-up, 4 alarm messages are
+displayed every 2 seconds.
 
 Background
 ==========

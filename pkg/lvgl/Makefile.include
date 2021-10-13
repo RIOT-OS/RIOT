@@ -1,0 +1,18 @@
+INCLUDES += -I$(RIOTBASE)/pkg/lvgl/include
+INCLUDES += -I$(PKGDIRBASE)
+
+# Don't use relative includes in lvgl
+CFLAGS += -DLV_CONF_INCLUDE_SIMPLE
+
+ifneq (,$(filter lvgl_contrib,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lvgl/contrib
+endif
+
+# Configure the lvgl_riot_conf.h header for lvgl kconfig management
+CFLAGS += -DLV_CONF_KCONFIG_EXTERNAL_INCLUDE=\""lvgl_riot_conf.h"\"
+
+# lvgl module is not a concrete module, so declare it as a pseudomodule
+PSEUDOMODULES += lvgl
+
+# touch capabilities are available via a pseudomodule
+PSEUDOMODULES += lvgl_contrib_touch

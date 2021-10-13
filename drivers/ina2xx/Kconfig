@@ -1,0 +1,29 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+choice
+    bool "INA2XX current/power monitor"
+    optional
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    help
+        Select one of the supported models.
+
+config MODULE_INA219
+    bool "INA219"
+    select MODULE_INA2XX
+
+config MODULE_INA220
+    bool "INA220"
+    select MODULE_INA2XX
+
+endchoice
+
+config MODULE_INA2XX
+    bool
+    depends on HAS_PERIPH_I2C
+    select MODULE_PERIPH_I2C

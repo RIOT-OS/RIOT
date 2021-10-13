@@ -1,0 +1,2 @@
+USEMODULE += credman
+USEMODULE += credman_load

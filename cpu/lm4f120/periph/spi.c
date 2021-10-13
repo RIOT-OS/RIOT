@@ -17,6 +17,9 @@
  *
  * @}
  */
+
+#include <assert.h>
+
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/gpio.h"
@@ -24,10 +27,8 @@
 #include "periph_conf.h"
 #include "board.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
-
-#ifdef SPI_NUMOF
 
 /**
  * @brief Array holding one pre-initialized mutex for each SPI device
@@ -66,9 +67,10 @@ void spi_init_pins(spi_t bus)
     ROM_GPIOPinTypeSSI(spi_confs[bus].gpio_port, spi_confs[bus].pins.mask);
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    (void) cs;
+    (void)cs;
+    assert((unsigned)bus < SPI_NUMOF);
     /* lock bus */
     mutex_lock(&locks[bus]);
     /* enable clock for SSI */
@@ -82,8 +84,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
                            8);
 
     ROM_SSIEnable(spi_confs[bus].ssi_base);
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)
@@ -137,5 +137,3 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         gpio_set((gpio_t)cs);
     }
 }
-
-#endif /* SPI_NUMOF */

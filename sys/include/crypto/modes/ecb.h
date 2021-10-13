@@ -37,10 +37,13 @@ extern "C" {
  * @param length     length of the input data
  * @param output     pointer to allocated memory for encrypted data. It has to
  *                   be of size data_len + BLOCK_SIZE - data_len % BLOCK_SIZE.
+ *
+ * @return           Length of encrypted data on a successful encryption
+ * @return           A negative error code if something went wrong
+ *
  */
-int cipher_encrypt_ecb(cipher_t* cipher, uint8_t* input, size_t length,
-                       uint8_t* output);
-
+int cipher_encrypt_ecb(const cipher_t *cipher, const uint8_t *input,
+                       size_t length, uint8_t *output);
 
 /**
  * @brief Decrypts data of arbitrary length in ecb mode.
@@ -51,12 +54,16 @@ int cipher_encrypt_ecb(cipher_t* cipher, uint8_t* input, size_t length,
  * @param length     length of the input data
  * @param output     pointer to allocated memory for plaintext data. It has to
  *                   be of size `lengh`.
+ *
+ * @return           Length of decrypted data on a successful decryption
+ * @return           A negative error code if something went wrong
  */
-int cipher_decrypt_ecb(cipher_t* cipher, uint8_t* input, size_t length,
-                       uint8_t* output);
+int cipher_decrypt_ecb(const cipher_t *cipher, const uint8_t *input,
+                       size_t length, uint8_t *output);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* CRYPTO_MODES_ECB_H */
+/** @} */

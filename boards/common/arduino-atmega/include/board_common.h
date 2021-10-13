@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2016 Laurent Navet <laurent.navet@gmail.com>
+ *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Laurent Navet <laurent.navet@gmail.com>
+ * @author      Thomas Perrot <thomas.perrot@tupi.fr>
  */
 
 #ifndef BOARD_COMMON_H
@@ -37,7 +39,7 @@ extern "C" {
  * baudrate to 9600 for this board
  * @{
  */
-#define UART_STDIO_BAUDRATE (9600U)
+#define STDIO_UART_BAUDRATE (9600U)
 /** @} */
 
 /**
@@ -49,41 +51,50 @@ extern "C" {
 #define LED0_MASK           (1 << DDB5)
 #endif
 
+#ifdef CPU_ATMEGA32U4
+#define LED0_PIN            GPIO_PIN(2, 7) /**< BUILTIN LED */
+#define LED0_MASK           (1 << DDC7)
+#define LED1_PIN            GPIO_PIN(1, 0) /**< RX LED */
+#define LED1_MASK           (1 << DDB0)
+#define LED2_PIN            GPIO_PIN(3, 5) /**< TX LED */
+#define LED2_MASK           (1 << DDD5)
+#endif
+
 #ifdef CPU_ATMEGA2560
 #define LED0_PIN            GPIO_PIN(1, 7)
 #define LED0_MASK           (1 << DDB7)
 #endif
 
-#define LED0_ON             (PORTB |=  LED0_MASK)
-#define LED0_OFF            (PORTB &= ~LED0_MASK)
-#define LED0_TOGGLE         (PORTB ^=  LED0_MASK)
+#ifdef CPU_ATMEGA32U4
+#define LED0_ON             (PORTC |=  LED0_MASK) /**< BUILTIN LED */
+#define LED0_OFF            (PORTC &= ~LED0_MASK)
+#define LED0_TOGGLE         (PORTC ^=  LED0_MASK)
+#define LED1_OFF            (PORTB |=  LED1_MASK) /**< RX LED */
+#define LED1_ON             (PORTB &= ~LED1_MASK)
+#define LED1_TOGGLE         (PORTB ^=  LED1_MASK)
+#define LED2_OFF            (PORTD |=  LED2_MASK) /**< TX LED */
+#define LED2_ON             (PORTD &= ~LED2_MASK)
+#define LED2_TOGGLE         (PORTD ^=  LED2_MASK)
+#else
+#define LED0_ON             (PORTD |=  LED0_MASK)
+#define LED0_OFF            (PORTD &= ~LED0_MASK)
+#define LED0_TOGGLE         (PORTD ^=  LED0_MASK)
+#endif
 /** @} */
 
 /**
- * @brief   Context swap defines
- *
- * Setup to use PC5 which is pin change interrupt 13 (PCINT13)
- * This emulates a software triggered interrupt
+ * @name    Usage of LED to turn on when a kernel panic occurs.
+ * @{
  */
-#ifdef CPU_ATMEGA328P
-#define AVR_CONTEXT_SWAP_INIT do { \
-            DDRD |= (1 << PD7); \
-            PCICR |= (1 << PCIE2); \
-            PCMSK2 |= (1 << PCINT23); \
-} while (0)
-#define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT2_vect
-#define AVR_CONTEXT_SWAP_TRIGGER   PORTD ^= (1 << PD7)
-#endif
+#define LED_PANIC           LED0_ON
+/** @} */
 
-#ifdef CPU_ATMEGA2560
-#define AVR_CONTEXT_SWAP_INIT do { \
-    DDRJ |= (1 << PJ6); \
-    PCICR |= (1 << PCIE1); \
-    PCMSK1 |= (1 << PCINT15); \
-} while (0)
-#define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT1_vect
-#define AVR_CONTEXT_SWAP_TRIGGER   PORTJ ^= (1 << PJ6)
-#endif
+/**
+ * @name CPU clock scale for arduino boards
+ *
+ */
+#define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
+/** @} */
 
 /**
  * @name    xtimer configuration values
@@ -92,6 +103,30 @@ extern "C" {
 #define XTIMER_WIDTH                (16)
 #define XTIMER_HZ                   (250000UL)
 #define XTIMER_BACKOFF              (40)
+/** @} */
+
+/**
+ * @name    ztimer configuration values
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_TYPE     ZTIMER_TYPE_PERIPH_TIMER
+#define CONFIG_ZTIMER_USEC_DEV      (TIMER_DEV(0))
+#define CONFIG_ZTIMER_USEC_FREQ     (250000LU)
+#define CONFIG_ZTIMER_USEC_WIDTH    (16)
+#define CONFIG_ZTIMER_USEC_ADJUST_SET     (124)
+#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   (120)
+/** @} */
+
+/**
+ * @name    Configuration parameters for the W5100 driver
+ * @{
+ */
+#ifndef W5100_PARAM_CS
+#define W5100_PARAM_CS          (ARDUINO_PIN_10)
+#endif
+#ifndef W5100_PARAM_EVT
+#define W5100_PARAM_EVT         (ARDUINO_PIN_2)
+#endif
 /** @} */
 
 /**

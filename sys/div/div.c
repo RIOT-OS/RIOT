@@ -5,7 +5,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup sys_util
+ * @ingroup     sys_div
  * @{
  * @file
  * @brief    Integer division function implementations

@@ -107,7 +107,8 @@ gnrc_rpl_instance_t *gnrc_rpl_instance_get(uint8_t instance_id);
  * @return  true, if DODAG could be created.
  * @return  false, if DODAG could not be created or exists already.
  */
-bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id, kernel_pid_t iface);
+bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, const ipv6_addr_t *dodag_id,
+                         kernel_pid_t iface);
 
 /**
  * @brief   Remove all parents from the @p dodag.
@@ -146,6 +147,14 @@ bool gnrc_rpl_parent_remove(gnrc_rpl_parent_t *parent);
  * @param[in] parent    Pointer to the parent
  */
 void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent);
+
+/**
+ * @brief Removes the dodag state of @p dodag after
+ * CONFIG_GNRC_RPL_CLEANUP_TIME milliseconds
+ *
+ * @param[in] dodag     Pointer to the DODAG
+ */
+void gnrc_rpl_cleanup_start(gnrc_rpl_dodag_t *dodag);
 
 /**
  * @brief   Start a local repair.

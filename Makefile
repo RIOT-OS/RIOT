@@ -1,6 +1,6 @@
 .all:
 
-.PHONY: all doc doc-man doc-latex docclean welcome
+.PHONY: all doc doc-man doc-latex docclean print-versions welcome
 
 all: welcome
 	@echo ""
@@ -20,11 +20,15 @@ docclean:
 
 clean:
 	@echo "Cleaning all build products for the current board"
-	@find ./examples/ ./tests/ -maxdepth 2 -mindepth 2 -type f -name Makefile -execdir "$(MAKE)" clean ';'
+	@for dir in $(APPLICATION_DIRS); do "$(MAKE)" -C$$dir clean; done
 
-distclean: docclean
+pkg-clean:
+	@echo "Cleaning all package sources"
+	rm -rf build/pkg
+
+distclean: docclean pkg-clean
 	@echo "Cleaning all build products"
-	@find ./examples/ ./tests/ -maxdepth 2 -mindepth 2 -type f -name Makefile -execdir "$(MAKE)" distclean ';'
+	@for dir in $(APPLICATION_DIRS); do "$(MAKE)" -C$$dir distclean; done
 
 welcome:
 	@echo "Welcome to RIOT - The friendly OS for IoT!"
@@ -34,7 +38,14 @@ welcome:
 	@echo ""
 	@echo "Please see our Quick Start Guide at:"
 	@echo "    https://doc.riot-os.org/getting-started.html"
-	@echo "Or ask questions on our mailing list:"
-	@echo "    users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)"
+	@echo "You can ask questions or discuss with other users on our forum:"
+	@echo "    https://forum.riot-os.org"
 
+print-versions:
+	@./dist/tools/ci/print_toolchain_versions.sh
+
+include makefiles/boards.inc.mk
+include makefiles/app_dirs.inc.mk
+
+include makefiles/tools/riotgen.inc.mk
 -include makefiles/tests.inc.mk

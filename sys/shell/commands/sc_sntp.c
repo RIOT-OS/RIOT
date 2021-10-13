@@ -46,10 +46,8 @@ int _ntpdate(int argc, char **argv)
     sock_udp_ep_t server = { .port = NTP_PORT, .family = AF_INET6 };
     ipv6_addr_t *addr = (ipv6_addr_t *)&server.addr;
 
-    kernel_pid_t src_iface = ipv6_addr_split_iface(argv[1]);
-    if (src_iface == -1) {
-        src_iface = KERNEL_PID_UNDEF;
-    }
+    char *iface = ipv6_addr_split_iface(argv[1]);
+    kernel_pid_t src_iface = iface ? atoi(iface) : KERNEL_PID_UNDEF;
 
     if (ipv6_addr_from_str(addr, argv[1]) == NULL) {
         puts("error: malformed address");
@@ -84,7 +82,7 @@ int _ntpdate(int argc, char **argv)
         puts("Error in synchronization");
         return 1;
     }
-#ifdef MODULE_NEWLIB
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
     struct tm *tm;
     time_t time = (time_t)(sntp_get_unix_usec() / US_PER_SEC);
 

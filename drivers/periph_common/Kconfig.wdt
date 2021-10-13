@@ -1,0 +1,40 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+if TEST_KCONFIG
+
+menuconfig MODULE_PERIPH_WDT
+    bool "Watchdog Timer peripheral driver"
+    depends on HAS_PERIPH_WDT
+    select MODULE_PERIPH_COMMON
+
+config MODULE_PERIPH_INIT_WDT
+    bool "Auto initialize the Watchdog Timer peripheral"
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_WDT
+
+endif # TEST_KCONFIG
+
+menuconfig KCONFIG_USEMODULE_PERIPH_WDT
+    bool "Configure Watchdog peripheral"
+    depends on USEMODULE_PERIPH_WDT
+    help
+        Configure Watchdog peripheral using Kconfig.
+
+if KCONFIG_USEMODULE_PERIPH_WDT
+
+config WDT_WARNING_PERIOD
+    int "Warning period (in ms)"
+    depends on HAS_PERIPH_WDT_WARNING_PERIOD
+    help
+        Period in ms before reboot where wdt_cb() is executed.
+
+endif # KCONFIG_USEMODULE_PERIPH_WDT
+
+config HAS_PERIPH_WDT_WARNING_PERIOD
+    bool
+    help
+        Indicates that a CPU provides a warning period configuration option.

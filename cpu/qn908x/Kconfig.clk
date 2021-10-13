@@ -1,0 +1,120 @@
+# Copyright (c) 2020 iosabi
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menu "QN908x clock configuration"
+    depends on CPU_FAM_QN908X
+
+config BOARD_HAS_XTAL32K
+    bool
+    help
+         Indicates that the board has an external low frequency 32.786 KHz
+         crystal oscillator connected to the XTAL32_IN / XTAL32_OUT pins.
+         This should only be set from board definition.
+
+choice
+    prompt "32K low frequency clock selector"
+    default CPU_CLK_32K_XTAL if BOARD_HAS_XTAL32K
+    default CPU_CLK_32K_RCO
+    help
+        The "32K" clock bus runs at either 32 KHz from the internal RCO or
+        32.768 KHz from an external crystal oscillator. This clock can be used
+        to drive the "System clock" for a very low power operation, but it can
+        independently also be used for the watchdog timer (WDT) and other low
+        frequency system timers like a real time clock.
+
+config CPU_CLK_32K_XTAL
+    bool "External 32.768 KHz crystal"
+    depends on BOARD_HAS_XTAL32K
+
+config CPU_CLK_32K_RCO
+    bool "Internal 32 KHz oscillator"
+
+endchoice
+
+config BOARD_HAS_XTAL
+    bool
+    help
+         Indicates that the board has an external high frequency crystal
+         oscillator connected to the XTAL_IN / XTAL_OUT pins.
+         This should only be set from board definition.
+
+config BOARD_HAS_XTAL_16M
+    bool
+    imply BOARD_HAS_XTAL
+    depends on !BOARD_HAS_XTAL_32M
+    help
+        Indicates that the external high frequency crystal oscillator is a
+        16 MHz crystal. This should only be set from board definition.
+
+config BOARD_HAS_XTAL_32M
+    bool
+    imply BOARD_HAS_XTAL
+    help
+        Indicates that the external high frequency crystal oscillator is a
+        32 MHz crystal. This should only be set from board definition.
+
+config CPU_CLK_OSC32M_DIV
+    bool "Internal OSC32M clock input /2 divider"
+    help
+        Selecting this option will set the high-speed internal oscillator
+        divider to /2, making it a 16 MHz clock source. See "System clock
+        configuration selector" for selecting this source.
+
+config CPU_CLK_XTAL_DIV
+    bool "External XTAL 32 MHz clock input /2 divider"
+    depends on BOARD_HAS_XTAL_32M
+    help
+        Selecting this option will set the high-speed external crystal
+        oscillator divider to /2. This option is only available when the
+        external oscillator is a 32 MHz one. See "System clock
+        configuration selector" for selecting this source.
+
+choice
+    prompt "System clock configuration selector"
+    default CPU_CLK_SYS_XTAL if BOARD_HAS_XTAL
+    default CPU_CLK_SYS_OSC32M
+    help
+        The System clock is used to derive the AHB clock, which drives the ARM
+        core and most peripherals.
+
+config CPU_CLK_SYS_XTAL
+    bool "External 16/32 MHz crystal source (with optional divider)"
+    depends on BOARD_HAS_XTAL
+
+config CPU_CLK_SYS_OSC32M
+    bool "Internal 32 MHz oscillator source (with optional divider)"
+
+config CPU_CLK_SYS_32K
+    bool "Low frequency clock source (32 or 32.768 KHz)"
+
+endchoice
+
+config CPU_CLK_AHB_DIV
+    int "AHB clock divider"
+    default 1
+    range 1 8192
+    help
+        The AHB clock is derived from the System clock using this divider value,
+        between 1 and 8192, and serves as a clock source for ARM core, FSP, SCT,
+        Quad-SPI, Flexcomm (UART, SPI, I2C), GPIO, BLE_AHB and DMA.
+        Note: When BLE is enabled, the AHB clock must be at least the BLE clock
+        (either 8 or 16 MHz) limiting the range of allowed values for this
+        divider so that the AHB clock is 8, 16 or 32 MHz.
+
+config CPU_CLK_APB_DIV
+    int "APB clock divider"
+    default 1
+    range 1 16
+    help
+        The APB clock is derived from the AHB clock using this divide value,
+        between 1 and 16, and serves as the clock source for several
+        peripherals, such as the RTC, ADC, DAC, Capacitive Sense (CS) and
+        optionally the WDT.
+
+# TODO: Add USB PLL and BLE clock selectors.
+
+endmenu

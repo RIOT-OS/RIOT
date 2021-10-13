@@ -1,0 +1,13 @@
+menuconfig KCONFIG_EXTERNAL_MODULE_1
+    bool "Configure external module message 1"
+    default y
+    help
+        This will enable configuring the external module message
+
+if KCONFIG_EXTERNAL_MODULE_1
+
+config EXTERNAL_MODULE_1_MESSAGE
+    string "External module 1 text"
+    default "External Message 1 defined in Kconfig file"
+
+endif # KCONFIG_EXTERNAL_MODULE_1

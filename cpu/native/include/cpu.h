@@ -7,8 +7,8 @@
  */
 
 /**
- * @ingroup arch
- * @defgroup    native_cpu  Native
+ * @ingroup cpu
+ * @defgroup    cpu_native  Native
  * @brief       Native CPU specific code
  * @details     The native CPU uses system calls to simulate hardware access.
  * @ingroup     cpu
@@ -21,10 +21,17 @@
 #define CPU_H
 
 #include <stdio.h>
+#include "cpu_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   The CPU supports unaligned memory access.
+ *          Even if the underlying architecture does not support it, the kernel will take care of it.
+ */
+#define CPU_HAS_UNALIGNED_ACCESS
 
 /**
  * @brief   Prints the address the callee will return to

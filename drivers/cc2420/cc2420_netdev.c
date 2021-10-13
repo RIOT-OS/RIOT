@@ -35,9 +35,8 @@
 #include "cc2420_internal.h"
 #include "cc2420_registers.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
-
 
 static int _send(netdev_t *netdev, const iolist_t *iolist);
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
@@ -57,11 +56,9 @@ const netdev_driver_t cc2420_driver = {
 
 static void _irq_handler(void *arg)
 {
-    netdev_t *dev = (netdev_t *)arg;
+    netdev_t *dev = arg;
 
-    if(dev->event_callback) {
-        dev->event_callback(dev, NETDEV_EVENT_ISR);
-    }
+    netdev_trigger_event_isr(dev);
 }
 
 static inline uint16_t to_u16(const void *buf)
@@ -99,7 +96,8 @@ static inline int opt_state(void *buf, bool cond)
 
 static int _init(netdev_t *netdev)
 {
-    cc2420_t *dev = (cc2420_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    cc2420_t *dev = container_of(netdev_ieee802154, cc2420_t, netdev);
 
     uint16_t reg;
 
@@ -138,11 +136,7 @@ static int _init(netdev_t *netdev)
         return -1;
     }
 
-#ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0, sizeof(netstats_t));
-#endif
-
-    return cc2420_init((cc2420_t *)dev);
+    return cc2420_init(dev);
 }
 
 static void _isr(netdev_t *netdev)
@@ -152,13 +146,15 @@ static void _isr(netdev_t *netdev)
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
-    cc2420_t *dev = (cc2420_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    cc2420_t *dev = container_of(netdev_ieee802154, cc2420_t, netdev);
     return (int)cc2420_send(dev, iolist);
 }
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
-    cc2420_t *dev = (cc2420_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    cc2420_t *dev = container_of(netdev_ieee802154, cc2420_t, netdev);
     return (int)cc2420_rx(dev, buf, len, info);
 }
 
@@ -168,7 +164,8 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
         return -ENODEV;
     }
 
-    cc2420_t *dev = (cc2420_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    cc2420_t *dev = container_of(netdev_ieee802154, cc2420_t, netdev);
 
     int ext = netdev_ieee802154_get(&dev->netdev, opt, val, max_len);
     if (ext > 0) {
@@ -220,16 +217,11 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             return opt_state(val, (dev->options & CC2420_OPT_PROMISCUOUS));
 
         case NETOPT_RX_START_IRQ:
-            return opt_state(val, (dev->options & CC2420_OPT_TELL_RX_START));
-
         case NETOPT_RX_END_IRQ:
-            return opt_state(val, (dev->options & CC2420_OPT_TELL_TX_END));
-
         case NETOPT_TX_START_IRQ:
-            return opt_state(val, (dev->options & CC2420_OPT_TELL_RX_START));
-
         case NETOPT_TX_END_IRQ:
-            return opt_state(val, (dev->options & CC2420_OPT_TELL_RX_END));
+            *((netopt_enable_t *)val) = NETOPT_ENABLE;
+            return sizeof(netopt_enable_t);
 
         default:
             return -ENOTSUP;
@@ -242,7 +234,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t val_len)
         return -ENODEV;
     }
 
-    cc2420_t *dev = (cc2420_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    cc2420_t *dev = container_of(netdev_ieee802154, cc2420_t, netdev);
 
     int ext = netdev_ieee802154_set(&dev->netdev, opt, val, val_len);
 
@@ -286,18 +279,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t val_len)
 
         case NETOPT_PROMISCUOUSMODE:
             return cc2420_set_option(dev, CC2420_OPT_PROMISCUOUS, to_bool(val));
-
-        case NETOPT_RX_START_IRQ:
-            return cc2420_set_option(dev, CC2420_OPT_TELL_RX_START, to_bool(val));
-
-        case NETOPT_RX_END_IRQ:
-            return cc2420_set_option(dev, CC2420_OPT_TELL_RX_END, to_bool(val));
-
-        case NETOPT_TX_START_IRQ:
-            return cc2420_set_option(dev, CC2420_OPT_TELL_TX_START, to_bool(val));
-
-        case NETOPT_TX_END_IRQ:
-            return cc2420_set_option(dev, CC2420_OPT_TELL_TX_END, to_bool(val));
 
         default:
             return ext;

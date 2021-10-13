@@ -1,5 +1,3 @@
-MODULE = native-drivers
+MODULE = native_drivers
 
 include $(RIOTBASE)/Makefile.base
-
-INCLUDES = $(NATIVEINCLUDES)

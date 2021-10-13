@@ -11,8 +11,8 @@
  *
  * @file
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @}
  */
-
 
 #include "xtimer.h"
 
@@ -23,8 +23,5 @@
 
 void _net_init(void)
 {
-    xtimer_init();
     lwip_bootstrap();
 }
-
-/** @} */

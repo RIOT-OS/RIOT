@@ -21,34 +21,40 @@
 
 #include "periph/pm.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 void pm_set(unsigned mode)
 {
-    if (mode < PM_NUM_MODES) {
-        uint32_t _mode;
+    int deep = 0;
+    uint32_t _mode;
 
-        switch (mode) {
-            case 0:
-                DEBUG("pm_set(): setting BACKUP mode.\n");
-                _mode = PM_SLEEPCFG_SLEEPMODE_BACKUP;
-                break;
-            case 1:
-                DEBUG("pm_set(): setting STANDBY mode.\n");
-                _mode = PM_SLEEPCFG_SLEEPMODE_STANDBY;
-                break;
-            case 2:
-                DEBUG("pm_set(): setting IDLE mode.\n");
-                _mode = PM_SLEEPCFG_SLEEPMODE_IDLE2;
-                break;
-        }
-
-        /* write sleep configuration */
-        PM->SLEEPCFG.bit.SLEEPMODE = _mode;
-        /* make sure value has been set */
-        while (PM->SLEEPCFG.bit.SLEEPMODE != _mode) {}
+    switch (mode) {
+        case 0:
+            DEBUG_PUTS("pm_set(): setting BACKUP mode.");
+            _mode = PM_SLEEPCFG_SLEEPMODE_BACKUP;
+            deep  = 1;
+            break;
+        case 1:
+            DEBUG_PUTS("pm_set(): setting STANDBY mode.");
+            _mode = PM_SLEEPCFG_SLEEPMODE_STANDBY;
+            deep  = 1;
+            break;
+        default: /* Falls through */
+        case 2:
+            DEBUG_PUTS("pm_set(): setting IDLE mode.");
+#if !defined(PM_SLEEPCFG_SLEEPMODE_IDLE2)
+            _mode = PM_SLEEPCFG_SLEEPMODE_IDLE;
+#else
+            _mode = PM_SLEEPCFG_SLEEPMODE_IDLE2;
+#endif
+            break;
     }
 
-    cortexm_sleep(0);
+    /* write sleep configuration */
+    PM->SLEEPCFG.bit.SLEEPMODE = _mode;
+    /* make sure value has been set */
+    while (PM->SLEEPCFG.bit.SLEEPMODE != _mode) {}
+
+    sam0_cortexm_sleep(deep);
 }

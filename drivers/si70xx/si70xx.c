@@ -24,7 +24,7 @@
 #include "si70xx_internals.h"
 #include "si70xx.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define SI70XX_I2C     (dev->params.i2c_dev)
@@ -39,11 +39,11 @@ static uint16_t _do_measure(const si70xx_t *dev, uint8_t command)
 
     i2c_acquire(SI70XX_I2C);
 
-    if (i2c_write_byte(SI70XX_I2C, SI70XX_ADDR, command) != 1) {
+    if (i2c_write_byte(SI70XX_I2C, SI70XX_ADDR, command, 0) != 0) {
         DEBUG("[ERROR] Cannot write command '%d' to I2C.\n", command);
     }
 
-    if (i2c_read_bytes(SI70XX_I2C, SI70XX_ADDR, result, 2) != 2) {
+    if (i2c_read_bytes(SI70XX_I2C, SI70XX_ADDR, result, 2, 0) != 0) {
         DEBUG("[ERROR] Cannot read command '%d' result from I2C.\n", command);
     }
 
@@ -53,10 +53,7 @@ static uint16_t _do_measure(const si70xx_t *dev, uint8_t command)
     return ((uint16_t)result[0] << 8) + (result[1] & 0xfc);
 }
 
-/**
- * @brief   Internal helper function that reads the device serial number.
- */
-static uint64_t _get_serial(const si70xx_t *dev)
+uint64_t si70xx_get_serial(const si70xx_t *dev)
 {
     uint8_t out[2];
     uint8_t in_first[8] = { 0 };
@@ -66,11 +63,11 @@ static uint64_t _get_serial(const si70xx_t *dev)
     out[0] = SI70XX_READ_ID_FIRST_A;
     out[1] = SI70XX_READ_ID_FIRST_B;
 
-    if (i2c_write_bytes(SI70XX_I2C, SI70XX_ADDR, out, 2) != 2) {
+    if (i2c_write_bytes(SI70XX_I2C, SI70XX_ADDR, out, 2, 0) != 0) {
         DEBUG("[ERROR] Cannot write command 'READ_ID_FIRST' to I2C.\n");
     }
 
-    if (i2c_read_bytes(SI70XX_I2C, SI70XX_ADDR, in_first, 8) != 8) {
+    if (i2c_read_bytes(SI70XX_I2C, SI70XX_ADDR, in_first, 8, 0) != 0) {
         DEBUG("[ERROR] Cannot read device first ID from I2C.\n");
     }
 
@@ -78,11 +75,11 @@ static uint64_t _get_serial(const si70xx_t *dev)
     out[0] = SI70XX_READ_ID_SECOND_A;
     out[1] = SI70XX_READ_ID_SECOND_B;
 
-    if (i2c_write_bytes(SI70XX_I2C, SI70XX_ADDR, out, 2) != 2) {
+    if (i2c_write_bytes(SI70XX_I2C, SI70XX_ADDR, out, 2, 0) != 0) {
         DEBUG("[ERROR] Cannot write command 'READ_ID_SECOND' to I2C.\n");
     }
 
-    if (i2c_read_bytes(SI70XX_I2C, SI70XX_ADDR, in_second, 8) != 8) {
+    if (i2c_read_bytes(SI70XX_I2C, SI70XX_ADDR, in_second, 8, 0) != 0) {
         DEBUG("[ERROR] Cannot read device second ID from I2C.\n");
     }
 
@@ -95,18 +92,12 @@ static uint64_t _get_serial(const si70xx_t *dev)
     return (((uint64_t) id_first) << 32) + id_second;
 }
 
-/**
- * @brief   Internal helper function that reads the device identifier.
- */
-static uint8_t _get_id(const si70xx_t *dev)
+uint8_t si70xx_get_id(const si70xx_t *dev)
 {
-    return (_get_serial(dev) >> 24) & 0xff;
+    return (si70xx_get_serial(dev) >> 24) & 0xff;
 }
 
-/**
- * @brief   Internal helper function that reads the device serial revision.
- */
-static uint8_t _get_revision(const si70xx_t *dev)
+uint8_t si70xx_get_revision(const si70xx_t *dev)
 {
     uint8_t out[2];
     uint8_t in = 0;
@@ -115,11 +106,11 @@ static uint8_t _get_revision(const si70xx_t *dev)
     out[0] = SI70XX_READ_REVISION_A;
     out[1] = SI70XX_READ_REVISION_B;
 
-    if (i2c_write_bytes(SI70XX_I2C, SI70XX_ADDR, out, 2) != 2) {
+    if (i2c_write_bytes(SI70XX_I2C, SI70XX_ADDR, out, 2, 0) != 0) {
         DEBUG("[ERROR] Cannot write command 'READ_REVISION' to I2C.\n");
     }
 
-    if (i2c_read_byte(SI70XX_I2C, SI70XX_ADDR, &in) != 1) {
+    if (i2c_read_byte(SI70XX_I2C, SI70XX_ADDR, &in, 0) != 0) {
         DEBUG("[ERROR] Cannot read device revision from I2C.\n");
     }
 
@@ -128,17 +119,19 @@ static uint8_t _get_revision(const si70xx_t *dev)
 
 static int _test_device(const si70xx_t *dev)
 {
-    uint8_t revision = _get_revision(dev);
+    uint8_t revision = si70xx_get_revision(dev);
 
     if (revision != SI70XX_REVISION_1 && revision != SI70XX_REVISION_2) {
         DEBUG("[ERROR] Bad device revision (%d).\n", revision);
         return -SI70XX_ERR_NODEV;
     }
 
-    uint8_t id = _get_id(dev);
+    uint8_t id = si70xx_get_id(dev);
 
-    if (id != SI70XX_ID) {
-        DEBUG("[ERROR] Not a valid Si7006/13/20/21 device\n");
+    const bool valid_id = (id == SI70XX_ID);
+    if (!valid_id) {
+        DEBUG("[ERROR] Not a valid Si7006/13/20/21/5x device: %u\n",
+              (unsigned)id);
         return -SI70XX_ERR_NODEV;;
     }
 
@@ -148,16 +141,10 @@ static int _test_device(const si70xx_t *dev)
 int si70xx_init(si70xx_t *dev, const si70xx_params_t *params)
 {
     /* initialize the device descriptor */
-    memcpy(&dev->params, params, sizeof(si70xx_params_t));
+    dev->params = *params;
 
     /* setup the i2c bus */
     i2c_acquire(SI70XX_I2C);
-
-    if (i2c_init_master(SI70XX_I2C, I2C_SPEED_NORMAL) != 0) {
-        DEBUG("[ERROR] Cannot initialize I2C bus.\n");
-        i2c_release(SI70XX_I2C);
-        return -SI70XX_ERR_NOI2C;
-    }
 
     if (_test_device(dev) != SI70XX_OK) {
         DEBUG("[ERROR] No valid device found.\n");
@@ -166,7 +153,7 @@ int si70xx_init(si70xx_t *dev, const si70xx_params_t *params)
     }
 
     /* initialize the peripheral */
-    if (i2c_write_byte(SI70XX_I2C, SI70XX_ADDR, SI70XX_RESET) != 1) {
+    if (i2c_write_byte(SI70XX_I2C, SI70XX_ADDR, SI70XX_RESET, 0) != 0) {
         DEBUG("[ERROR] Cannot reset device.\n");
         i2c_release(SI70XX_I2C);
         return SI70XX_ERR_I2C;
@@ -175,7 +162,7 @@ int si70xx_init(si70xx_t *dev, const si70xx_params_t *params)
     i2c_release(SI70XX_I2C);
 
     /* sensor is ready after at most 25 ms */
-    xtimer_usleep(25 * US_PER_MS);
+    xtimer_msleep(25);
 
     DEBUG("[DEBUG] Device initialized with success.\n");
     return SI70XX_OK;

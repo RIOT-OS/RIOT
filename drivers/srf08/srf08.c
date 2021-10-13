@@ -17,37 +17,29 @@
  *
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
+ * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  *
  * @}
  */
 
 #include <stdint.h>
 #include <stdio.h>
+
 #include "xtimer.h"
-#include "srf08.h"
 #include "periph/i2c.h"
 
-#define ENABLE_DEBUG (0)
+#include "srf08.h"
+#include "srf08_params.h"
+
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
+#define SRF08_DEV_I2C       (dev->params.i2c)
+#define SRF08_DEV_ADDR      (dev->params.addr)
 
-int srf08_init(srf08_t *dev, i2c_t i2c, uint8_t addr, i2c_speed_t speed)
+int srf08_init(srf08_t *dev, const srf08_params_t *params)
 {
-    int status;
-
-    dev->i2c = i2c;
-    dev->addr = addr;
-
-    /* Acquire exclusive access to the bus. */
-    i2c_acquire(dev->i2c);
-    /* initialize i2c interface */
-    status = i2c_init_master(dev->i2c, speed);
-    /* Release the bus for other threads. */
-    i2c_release(dev->i2c);
-
-    if(status < 0) {
-        return -1;
-    }
+    dev->params = *params;
 
     /* set the maximum range */
     if (srf08_set_max_range(dev, SRF08_MAX_RANGE_6M) < 0) {
@@ -62,36 +54,34 @@ int srf08_init(srf08_t *dev, i2c_t i2c, uint8_t addr, i2c_speed_t speed)
     return 0;
 }
 
-
 int srf08_set_max_range(const srf08_t *dev, uint8_t max_range)
 {
     int status;
 
     /* Acquire exclusive access to the bus. */
-    i2c_acquire(dev->i2c);
-    status = i2c_write_reg(dev->i2c, dev->addr, SRF08_RANGE_REG, max_range);
+    i2c_acquire(SRF08_DEV_I2C);
+    status = i2c_write_reg(SRF08_DEV_I2C, SRF08_DEV_ADDR, SRF08_RANGE_REG, max_range, 0);
     /* Release the bus for other threads. */
-    i2c_release(dev->i2c);
+    i2c_release(SRF08_DEV_I2C);
 
     return status;
 }
-
 
 int srf08_set_max_gain(const srf08_t *dev, uint8_t gain)
 {
     int status;
 
     /* Acquire exclusive access to the bus. */
-    i2c_acquire(dev->i2c);
-    status = i2c_write_reg(dev->i2c, dev->addr, SRF08_GAIN_REG, gain);
+    i2c_acquire(SRF08_DEV_I2C);
+    status = i2c_write_reg(SRF08_DEV_I2C, SRF08_DEV_ADDR, SRF08_GAIN_REG, gain, 0);
     /* Release the bus for other threads. */
-    i2c_release(dev->i2c);
+    i2c_release(SRF08_DEV_I2C);
 
     return status;
 }
 
-
-int srf08_get_distances(const srf08_t *dev, uint16_t *range_array, int num_echos, srf08_mode_t ranging_mode)
+int srf08_get_distances(const srf08_t *dev, uint16_t *range_array,
+                        int num_echos, srf08_mode_t ranging_mode)
 {
     int status;
     int echo_number = 0;
@@ -100,13 +90,14 @@ int srf08_get_distances(const srf08_t *dev, uint16_t *range_array, int num_echos
     char max_reg_no_read = (num_echos * sizeof(range_bytes)) +1;
 
     /* Acquire exclusive access to the bus. */
-    i2c_acquire(dev->i2c);
+    i2c_acquire(SRF08_DEV_I2C);
     /* set ranging mode */
-    status = i2c_write_reg(dev->i2c, dev->addr, SRF08_COMMAND_REG, ranging_mode);
+    status = i2c_write_reg(SRF08_DEV_I2C, SRF08_DEV_ADDR, SRF08_COMMAND_REG,
+                           ranging_mode, 0);
     /* Release the bus for other threads. */
-    i2c_release(dev->i2c);
+    i2c_release(SRF08_DEV_I2C);
 
-    if (!status) {
+    if (status != 0) {
         DEBUG("Write the ranging command to the i2c-interface is failed\n");
         return -1;
     }
@@ -123,13 +114,14 @@ int srf08_get_distances(const srf08_t *dev, uint16_t *range_array, int num_echos
          register_location += sizeof(range_bytes)) {
 
         /* Acquire exclusive access to the bus. */
-        i2c_acquire(dev->i2c);
+        i2c_acquire(SRF08_DEV_I2C);
         /* read the echo bytes */
-        status = i2c_read_regs(dev->i2c, dev->addr, register_location, range_bytes, sizeof(range_bytes));
+        status = i2c_read_regs(SRF08_DEV_I2C, SRF08_DEV_ADDR, register_location,
+                               range_bytes, sizeof(range_bytes), 0);
         /* Release the bus for other threads. */
-        i2c_release(dev->i2c);
+        i2c_release(SRF08_DEV_I2C);
 
-        if (!status) {
+        if (status != 0) {
             DEBUG("Read the echo bytes from the i2c-interface is failed\n");
             return -3;
         }

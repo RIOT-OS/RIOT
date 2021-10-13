@@ -1,0 +1,15 @@
+USED_PRNG_IMPLEMENTATIONS := $(filter prng_%,$(USEMODULE))
+
+# Check that prng_shaxprng is not used by itself
+ifneq (,$(filter prng_shaxprng,$(USEMODULE)))
+  ifeq (,$(filter prng_sha1prng prng_sha256prng,$(USEMODULE)))
+    $(error prng_shaxprng should not be used directly. Select one of: prng_sha1prng, prng_sha256prng)
+  endif
+endif
+
+# Check that only one implementation of PRNG is used
+# NOTE: prng_shaxprng is filtered out because it is used by the specific implementations
+ifneq (1,$(words $(filter-out prng_shaxprng,$(USED_PRNG_IMPLEMENTATIONS))))
+  $(info Currently the following prng modules are used: $(USED_PRNG_IMPLEMENTATIONS))
+  $(error Only one implementation of PRNG should be used.)
+endif

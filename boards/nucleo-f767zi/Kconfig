@@ -1,0 +1,37 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD
+    default "nucleo-f767zi" if BOARD_NUCLEO_F767ZI
+
+config BOARD_NUCLEO_F767ZI
+    bool
+    default y
+    select BOARD_COMMON_NUCLEO144
+    select CPU_MODEL_STM32F767ZI
+
+    # Put defined MCU peripherals here (in alphabetical order)
+    select HAS_PERIPH_ADC
+    select HAS_PERIPH_DMA
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_RTC
+    select HAS_PERIPH_RTT
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+    select HAS_PERIPH_USBDEV
+    select HAS_PERIPH_ETH
+    select HAS_PERIPH_PTP
+    select HAS_PERIPH_PTP_SPEED_ADJUSTMENT
+    select HAS_PERIPH_PTP_TIMER
+    select HAS_PERIPH_PTP_TXRX_TIMESTAMPS
+    select HAS_PERIPH_CAN
+
+    # Put other features for this board (in alphabetical order)
+    select HAS_RIOTBOOT
+
+source "$(RIOTBOARD)/common/nucleo144/Kconfig"

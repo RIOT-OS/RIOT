@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-import os
 import sys
 import math
+from testrunner import run
 
 FACTORIAL_PARAM = 6
 
@@ -18,6 +18,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-    from testrunner import run
     sys.exit(run(testfunc))

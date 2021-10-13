@@ -1,0 +1,5 @@
+/**
+@defgroup    boards_nucleo-f767zi STM32 Nucleo-F767ZI
+@ingroup     boards_common_nucleo144
+@brief       Support for the STM32 Nucleo-F767ZI
+ */

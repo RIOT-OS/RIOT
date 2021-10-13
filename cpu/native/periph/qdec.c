@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Gilles DOFFE <gdoffe@gmail.com>
+ * Copyright (C) 2017 Gilles DOFFE <g.doffe@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,14 +7,14 @@
  */
 
 /**
- * @ingroup     native_cpu
+ * @ingroup     cpu_native
  * @ingroup     drivers_periph_qdec
  * @{
  *
  * @file
  * @brief       Low-level QDEC driver implementation
  *
- * @author      Gilles DOFFE <gilles.doffe@gmail.com>
+ * @author      Gilles DOFFE <g.doffe@gmail.com>
  *
  * @}
  */
@@ -44,7 +44,7 @@
 #include "periph/qdec.h"
 #include "periph/gpio.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifdef QDEC_NUMOF

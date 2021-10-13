@@ -1,14 +1,8 @@
-# name of your application
-APPLICATION = trace
 include ../Makefile.tests_common
 
 USEMODULE += trace
 
-BOARD_WHITELIST := native
+# reduce tracebuffer (default is 512), so this test compiles for more boards
+CFLAGS += -DCONFIG_TRACE_BUFSIZE=64
 
 include $(RIOTBASE)/Makefile.include
-
-test:
-# `testrunner` calls `make term` recursively, results in duplicated `TERMFLAGS`.
-# So clears `TERMFLAGS` before run.
-	TERMFLAGS= tests/01-run.py

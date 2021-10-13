@@ -1,0 +1,10 @@
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += mtd_spi_nor
+endif
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_pwm
+endif
+
+# setup the samd21 arduino bootloader related dependencies
+include $(RIOTBOARD)/common/samdx1-arduino-bootloader/Makefile.dep

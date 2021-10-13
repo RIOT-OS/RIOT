@@ -1,0 +1,4 @@
+# mEDBG does not support faster baudrates
+BAUD ?= 57600
+
+include $(RIOTMAKE)/boards/sam0.inc.mk

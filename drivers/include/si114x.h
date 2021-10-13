@@ -9,7 +9,10 @@
 /**
  * @defgroup    drivers_si114x Si1145/6/7 UV/Ambient light/Proximity sensors
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Device driver for the Si1145/6/7 sensors family
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file
@@ -66,7 +69,6 @@ typedef struct {
     i2c_t i2c_dev;                     /**< I2C device which is used */
     si114x_led_current_t led_current;  /**< Proximity LED current */
 } si114x_params_t;
-
 
 /**
  * @brief Device descriptor for the Si114x sensor

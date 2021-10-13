@@ -4,3 +4,6 @@ INCLUDES += -I$(PKGDIRBASE)/spiffs/src/
 ifneq (,$(filter spiffs_fs,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/spiffs/fs
 endif
+
+SPIFFS_NB_FD ?= 8
+CFLAGS += '-DSPIFFS_FS_FD_SPACE_SIZE=(32 * $(SPIFFS_NB_FD))'

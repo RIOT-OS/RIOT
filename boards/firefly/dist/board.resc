@@ -1,0 +1,31 @@
+:name: Zolertia Firefly
+:description: This script runs Zolertia Firefly on RIOT.
+
+$name?="Zolertia-Firefly"
+using sysbus
+mach create $name
+
+machine LoadPlatformDescription @platforms/boards/zolertia-firefly.repl
+
+machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x400D2004 0x4 True "sysctrl"
+
+showAnalyzer uart0
+
+$id = `next_value 1`
+
+macro reset
+"""
+    #set node address. 0x00 0x12 0x4B is TI OUI
+    sysbus WriteDoubleWord 0x00280028 $id
+    sysbus WriteDoubleWord 0x0028002C 0x00
+    sysbus WriteDoubleWord 0x00280030 0xAB
+    sysbus WriteDoubleWord 0x00280034 0x89
+    sysbus WriteDoubleWord 0x00280038 0x00
+    sysbus WriteDoubleWord 0x0028003C 0x4B
+    sysbus WriteDoubleWord 0x00280040 0x12
+    sysbus WriteDoubleWord 0x00280044 0x00
+
+    sysbus LoadELF $image_file
+"""
+
+runMacro $reset

@@ -22,6 +22,7 @@
 #include "cpu.h"
 #include "periph_conf.h"
 #include "periph/init.h"
+#include "stdio_base.h"
 
 #include "em_chip.h"
 #include "em_cmu.h"
@@ -50,15 +51,21 @@
 #define EMU_EM4INIT         EMU_EM4INIT_DEFAULT
 #endif
 
-#ifdef _SILICON_LABS_32B_SERIES_1
+#ifndef RIOTBOOT
+
+#if defined(DCDC_PRESENT) && DCDC_COUNT > 0
 /**
  * @brief   Initialize integrated DC-DC regulator
  */
 static void dcdc_init(void)
 {
+#ifdef EMU_DCDCINIT_OFF
+    EMU_DCDCPowerOff();
+#else
     EMU_DCDCInit_TypeDef init_dcdc = EMU_DCDCINIT;
 
     EMU_DCDCInit(&init_dcdc);
+#endif
 }
 #endif
 
@@ -92,9 +99,15 @@ static void clk_init(void)
         CMU_OscillatorEnable(cmuOsc_HFRCO, false, false);
     }
 
+#if defined(_SILICON_LABS_32B_SERIES_1)
+    /* disable LFRCO comparator chopping and dynamic element matching
+     * else LFRCO has too much jitter for LEUART > 1800 baud */
+    CMU->LFRCOCTRL &= ~(CMU_LFRCOCTRL_ENCHOP | CMU_LFRCOCTRL_ENDEM);
+#endif
+
     /* initialize LFXO with board-specific parameters before switching */
     if (CLOCK_LFA == cmuSelect_LFXO || CLOCK_LFB == cmuSelect_LFXO ||
-#ifdef _SILICON_LABS_32B_SERIES_1
+#if defined(_SILICON_LABS_32B_SERIES_1)
         CLOCK_LFE == cmuSelect_LFXO)
 #else
         false)
@@ -111,14 +124,14 @@ static void clk_init(void)
     /* set (and enable) the LFB clock source */
     CMU_ClockSelectSet(cmuClock_LFB, CLOCK_LFB);
 
-#ifdef _SILICON_LABS_32B_SERIES_1
+#if defined(_SILICON_LABS_32B_SERIES_1)
     /* set (and enable) the LFE clock source */
     CMU_ClockSelectSet(cmuClock_LFE, CLOCK_LFE);
 #endif
 
     /* disable the LFRCO if external crystal is used */
     if (CLOCK_LFA == cmuSelect_LFXO && CLOCK_LFB == cmuSelect_LFXO &&
-#ifdef _SILICON_LABS_32B_SERIES_1
+#if defined(_SILICON_LABS_32B_SERIES_1)
         CLOCK_LFE == cmuSelect_LFXO)
 #else
         true)
@@ -141,7 +154,7 @@ static void pm_init(void)
 
     EMU_EM23Init(&init_em23);
 
-#ifdef _SILICON_LABS_32B_SERIES_1
+#if defined(_SILICON_LABS_32B_SERIES_1)
     /* initialize EM4 */
     EMU_EM4Init_TypeDef init_em4 = EMU_EM4INIT;
 
@@ -149,15 +162,21 @@ static void pm_init(void)
 #endif
 }
 
+#endif
+
 void cpu_init(void)
 {
+#ifndef RIOTBOOT
     /* apply errata that may be applicable (see em_chip.h) */
     CHIP_Init();
+#endif
 
     /* initialize the Cortex-M core */
     cortexm_init();
 
-#ifdef _SILICON_LABS_32B_SERIES_1
+#ifndef RIOTBOOT
+
+#if defined(DCDC_PRESENT) && DCDC_COUNT > 0
     /* initialize dc-dc */
     dcdc_init();
 #endif
@@ -168,6 +187,10 @@ void cpu_init(void)
     /* initialize power management interface */
     pm_init();
 
+    /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
+    stdio_init();
+
     /* trigger static peripheral initialization */
     periph_init();
+#endif
 }

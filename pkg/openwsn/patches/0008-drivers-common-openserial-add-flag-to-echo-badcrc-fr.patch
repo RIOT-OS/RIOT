@@ -1,0 +1,32 @@
+From 7e947bc6a84bfbeec42f586352107f77cd4d997f Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Thu, 4 Jun 2020 15:39:07 +0200
+Subject: [PATCH 08/11] drivers/common/openserial: add flag to echo badcrc
+ frames
+
+---
+ drivers/common/openserial.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/common/openserial.c b/drivers/common/openserial.c
+index 8a082722..d0b7dfbb 100644
+--- a/drivers/common/openserial.c
++++ b/drivers/common/openserial.c
+@@ -748,9 +748,13 @@ port_INLINE void inputHdlcClose(void) {
+         openserial_vars.inputBufFillLevel -= 2;
+     } else {
+         // the CRC is incorrect
+-
++#ifdef OPENSERIAL_ECHO_BADCRC
++        // Force echo on invalid crc
++        openserial_vars.inputBuf[0] = SERFRAME_PC2MOTE_TRIGGERSERIALECHO;
++#else
+         // drop the incoming frame
+         openserial_vars.inputBufFillLevel = 0;
++#endif
+     }
+ }
+ 
+-- 
+2.28.0
+

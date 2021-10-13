@@ -1,0 +1,9 @@
+USEMODULE += periph
+
+FEATURES_REQUIRED += periph_clic
+
+ifneq (,$(filter periph_pm,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_wdt
+endif
+
+include $(RIOTCPU)/riscv_common/Makefile.dep

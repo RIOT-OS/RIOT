@@ -1,6 +1,0 @@
-/**
- * @defgroup pkg_nordic-softdevice-ble   Nordic Softdevice BLE
- * @ingroup  pkg
- * @ingroup  net
- * @brief    Provides a RIOT adaption for Nordic Softdevice BLE library
- */

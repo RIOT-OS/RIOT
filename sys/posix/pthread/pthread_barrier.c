@@ -20,7 +20,7 @@
 #include "sched.h"
 #include "pthread.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int pthread_barrier_init(pthread_barrier_t *barrier,
@@ -56,7 +56,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
 
     mutex_lock(&barrier->mutex);
     DEBUG("%s: hit a synchronization barrier. pid=%" PRIkernel_pid"\n",
-          thread_getname(sched_active_pid), sched_active_pid);
+          thread_getname(thread_getpid()), thread_getpid());
 
     int switch_prio = -1;
 
@@ -64,10 +64,10 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
         /* need to wait for further threads */
 
         DEBUG("%s: waiting for %u threads. pid=%" PRIkernel_pid "\n",
-              thread_getname(sched_active_pid), barrier->count, sched_active_pid);
+              thread_getname(thread_getpid()), barrier->count, thread_getpid());
 
         pthread_barrier_waiting_node_t node;
-        node.pid = sched_active_pid;
+        node.pid = thread_getpid();
         node.next = barrier->next;
         node.cont = 0;
 
@@ -76,7 +76,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
 
         while (1) {
             /* The mutex is reacquired before checking if we should continue,
-             * so that the waiting thread don't accidentially run before the
+             * so that the waiting thread don't accidentally run before the
              * wake up loop has ended. Otherwise the thread could run into the
              * the barrier again before `barrier->count` was reset. */
             mutex_lock(&barrier->mutex);
@@ -90,7 +90,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
         /* all threads have arrived, wake everybody up */
 
         DEBUG("%s: waking every other thread up. pid=%" PRIkernel_pid "\n",
-              thread_getname(sched_active_pid), sched_active_pid);
+              thread_getname(thread_getpid()), thread_getpid());
 
         int count = 1; /* Count number of woken up threads.
                         * The first thread is the current thread. */
@@ -99,7 +99,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
             ++count;
             next->cont = 1;
 
-            thread_t *other = (thread_t *) sched_threads[next->pid];
+            thread_t *other = thread_get(next->pid);
             switch_prio = priority_min(switch_prio, other->priority);
             sched_set_status(other, STATUS_PENDING);
         }

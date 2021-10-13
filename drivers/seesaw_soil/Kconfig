@@ -1,0 +1,32 @@
+# Copyright (c) 2020 Viktor Gal
+#               2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_SEESAW_SOIL
+    bool "Adafruit Seesaw Soil Moisture and Temperature Sensor"
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+    select MODULE_XTIMER
+
+menuconfig KCONFIG_MODULE_SEESAW_SOIL
+    bool "Configure SEESAW_SOIL driver"
+    depends on MODULE_SEESAW_SOIL
+    help
+        Configure the SEESAW_SOIL driver using Kconfig.
+
+if KCONFIG_MODULE_SEESAW_SOIL
+
+config SEESAW_SOIL_I2C_ADDRESS
+    hex "I2C default address"
+    range 0x36 0x39
+    default 0x36
+    help
+        SEESAW_SOIL allows for up to 4 devices on single bus. The value depends on
+        the state of AD1 and AD0 pins.
+
+endif # KCONFIG_MODULE_SEESAW_SOIL

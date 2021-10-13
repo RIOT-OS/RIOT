@@ -1,1 +1,0 @@
-include $(RIOTBOARD)/common/wsn430/Makefile.features

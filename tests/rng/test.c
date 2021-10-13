@@ -51,16 +51,24 @@ static void test_init(char *name)
     printf("Running %s test, with seed %" PRIu32 " using ", name, seed);
 
     if (source == RNG_PRNG) {
-#if MODULE_PRNG_MERSENNE
+#if MODULE_PRNG_FORTUNA
+        puts("Fortuna PRNG.\n");
+#elif MODULE_PRNG_MERSENNE
         puts("Mersenne Twister PRNG.\n");
 #elif MODULE_PRNG_MINSTD
         puts("Park & Miller Minimal Standard PRNG.\n");
 #elif MODULE_PRNG_MUSL_LCG
         puts("Musl C PRNG.\n");
+#elif MODULE_PRNG_SHA1PRNG
+        puts("SHA1 PRNG.\n");
+#elif MODULE_PRNG_SHA256PRNG
+        puts("SHA256 PRNG.\n");
 #elif MODULE_PRNG_TINYMT32
         puts("Tiny Mersenne Twister PRNG.\n");
 #elif MODULE_PRNG_XORSHIFT
         puts("XOR Shift PRNG.\n");
+#elif MODULE_PRNG_HWRNG
+        puts("Hardware RNG.\n");
 #else
         puts("unknown PRNG.\n");
 #endif
@@ -89,6 +97,27 @@ static inline uint32_t test_get_uint32(void)
         hwrng_read(&result, 4);
 
         return result;
+    }
+#endif
+    else if (source == RNG_CONSTANT) {
+        /* use the seed as the constant value */
+        return seed;
+    }
+
+    return 0;
+}
+
+/**
+ * @brief   Retrieve a 32-bit number of the source RNG on [a,b)-interval
+ */
+static inline uint32_t test_get_uint32_range(uint32_t a, uint32_t b)
+{
+    if (source == RNG_PRNG) {
+        return random_uint32_range(a, b);
+    }
+#ifdef MODULE_PERIPH_HWRNG
+    else if (source == RNG_HWRNG) {
+        puts("Range feature not supported by HWRNG");
     }
 #endif
     else if (source == RNG_CONSTANT) {
@@ -129,7 +158,7 @@ void test_distributions(uint32_t samples)
 
         /* count bits */
         for (int i = 0; i < 32; i++) {
-            if (value & (1 << i)) {
+            if (value & (UINT32_C(1) << i)) {
                 distributions[i]++;
             }
         }
@@ -185,6 +214,15 @@ void test_dump(uint32_t samples)
 
     while (samples--) {
         printf("%" PRIu32 "\n", test_get_uint32());
+    }
+}
+
+void test_dump_range(uint32_t samples, uint32_t low_thresh, uint32_t high_thresh)
+{
+    test_init("dump range");
+
+    while (samples--) {
+        printf("%" PRIu32 "\n", test_get_uint32_range(low_thresh, high_thresh));
     }
 }
 
@@ -348,29 +386,80 @@ void test_entropy(uint32_t samples)
     }
 
     /* print results */
-    printf("Calculated %02f bits of entropy from %" PRIu32 " samples.\n", (double) entropy, samples);
+    /* Use 'fmt/print_float' to work on all platforms (atmega)
+     * Stdout should be flushed before to prevent garbled output. */
+    printf("Calculated ");
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
+    /* no fflush on msp430 */
+    fflush(stdout);
+#endif
+    print_float(entropy, 6);
+    printf(" bits of entropy from %" PRIu32 " samples.\n", samples);
+}
+
+void cb_speed_timeout(void *arg)
+{
+    unsigned *running = arg;
+    *running = 0;
 }
 
 void test_speed(uint32_t duration)
 {
-    char tmp1[16] = { 0 }, tmp2[16] = { 0 };
+    char tmp1[16] = { 0 }, tmp2[16] = { 0 }, tmp3[16] = { 0 };
 
-    uint64_t timeout = 0;
     uint64_t samples = 0;
 
     /* initialize test */
     test_init("speed");
+    printf("Running speed test for %" PRIu32 " seconds\n", duration);
 
     /* collect samples as long as timer has not expired */
-    timeout = xtimer_now_usec64() + (duration * US_PER_SEC);
-
-    while (xtimer_now_usec64() < timeout) {
+    unsigned running = 1;
+    xtimer_t xt = {
+        .callback = cb_speed_timeout,
+        .arg = &running,
+    };
+    uint32_t start_usec = xtimer_now_usec();
+    xtimer_set(&xt, duration * US_PER_SEC);
+    while (running) {
         test_get_uint32();
         samples++;
     }
+    uint32_t actual_duration_usec = xtimer_now_usec() - start_usec;
 
     /* print results */
     fmt_u64_dec(tmp1, samples);
-    fmt_u64_dec(tmp2, (samples * 4 / 1024) / duration);
-    printf("Collected %s samples in %" PRIu32 " seconds (%s KiB/s).\n", tmp1, duration, tmp2);
+    fmt_u64_dec(tmp2, (samples * 4000000 / 1024) / actual_duration_usec);
+    fmt_s32_dfp(tmp3, actual_duration_usec, -6);
+    printf("Collected %s samples in %s seconds (%s KiB/s).\n", tmp1, tmp3, tmp2);
+}
+
+void test_speed_range(uint32_t duration, uint32_t low_thresh, uint32_t high_thresh)
+{
+    char tmp1[16] = { 0 }, tmp2[16] = { 0 }, tmp3[16] = { 0 };
+
+    uint64_t samples = 0;
+
+    /* initialize test */
+    test_init("speed range");
+
+    /* collect samples as long as timer has not expired */
+    unsigned running = 1;
+    xtimer_t xt = {
+        .callback = cb_speed_timeout,
+        .arg = &running,
+    };
+    uint32_t start_usec = xtimer_now_usec();
+    xtimer_set(&xt, duration * US_PER_SEC);
+    while (running) {
+        test_get_uint32_range(low_thresh, high_thresh);
+        samples++;
+    }
+    uint32_t actual_duration_usec = xtimer_now_usec() - start_usec;
+
+    /* print results */
+    fmt_u64_dec(tmp1, samples);
+    fmt_u64_dec(tmp2, (samples * 4000000 / 1024) / actual_duration_usec);
+    fmt_s32_dfp(tmp3, actual_duration_usec, -6);
+    printf("Collected %s samples in %s seconds (%s KiB/s).\n", tmp1, tmp3, tmp2);
 }

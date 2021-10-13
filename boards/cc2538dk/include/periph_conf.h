@@ -22,41 +22,12 @@
 #include "cpu.h"
 #include "periph_cpu.h"
 
+#include "cfg_clk_default.h"
+#include "cfg_timer_default.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Timer configuration
- *
- * General purpose timers (GPT[0-3]) are configured consecutively and in order
- * (without gaps) starting from GPT0, i.e. if multiple timers are enabled.
- *
- * @{
- */
-static const timer_conf_t timer_config[] = {
-    {
-        .chn = 2,
-        .cfg = GPTMCFG_16_BIT_TIMER, /* required for XTIMER */
-    },
-    {
-        .chn = 1,
-        .cfg = GPTMCFG_32_BIT_TIMER,
-    },
-    {
-        .chn = 2,
-        .cfg = GPTMCFG_16_BIT_TIMER,
-    },
-    {
-        .chn = 1,
-        .cfg = GPTMCFG_32_BIT_TIMER,
-    },
-};
-
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
-
-#define TIMER_IRQ_PRIO      1
-/** @} */
 
 /**
  * @name    UART configuration
@@ -67,8 +38,10 @@ static const uart_conf_t uart_config[] = {
         .dev      = UART0_BASEADDR,
         .rx_pin   = GPIO_PIN(0, 0),
         .tx_pin   = GPIO_PIN(0, 1),
+#ifdef MODULE_PERIPH_UART_HW_FC
         .cts_pin  = GPIO_UNDEF,
         .rts_pin  = GPIO_UNDEF
+#endif
     }
 };
 
@@ -76,7 +49,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_0_ISR          isr_uart0
 
 /* macros common across all UARTs */
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 
 /** @} */
 
@@ -84,39 +57,18 @@ static const uart_conf_t uart_config[] = {
  * @name I2C configuration
  * @{
  */
-#define I2C_NUMOF               1
-#define I2C_0_EN                1
 #define I2C_IRQ_PRIO            1
 
-/* I2C 0 device configuration */
-#define I2C_0_DEV               0
-#define I2C_0_IRQ               I2C_IRQn
-#define I2C_0_IRQ_HANDLER       isr_i2c
-#define I2C_0_SCL_PIN           GPIO_PA2 /* SPI_SCK on the SmartRF06 baseboard */
-#define I2C_0_SDA_PIN           GPIO_PA4 /* SPI_MOSI on the SmartRF06 baseboard */
-
-static const i2c_conf_t i2c_config[I2C_NUMOF] = {
+static const i2c_conf_t i2c_config[] = {
     {
-        .scl_pin = GPIO_PA2, /* SPI_SCK on the SmartRF06 baseboard */
-        .sda_pin = GPIO_PA4, /* SPI_MOSI on the SmartRF06 baseboard */
+        .speed = I2C_SPEED_FAST,    /**< bus speed */
+        .scl_pin = GPIO_PIN(0, 2),  /**< GPIO_PA2, SPI_SCK  on SmartRF06 */
+        .sda_pin = GPIO_PIN(0, 4)   /**< GPIO_PA4, SPI_MOSI on SmartRF06 */
     },
 };
-/** @} */
 
-/**
- * @brief   Pre-calculated clock divider values based on a CLOCK_CORECLOCK (32MHz)
- *
- * Calculated with (CPSR * (SCR + 1)) = (CLOCK_CORECLOCK / bus_freq), where
- * 1 < CPSR < 255 and
- * 0 < SCR  < 256
- */
-static const spi_clk_conf_t spi_clk_config[] = {
-    { .cpsr = 10, .scr = 31 },  /* 100khz */
-    { .cpsr =  2, .scr = 39 },  /* 400khz */
-    { .cpsr =  2, .scr = 15 },  /* 1MHz */
-    { .cpsr =  2, .scr =  2 },  /* ~4.5MHz */
-    { .cpsr =  2, .scr =  1 }   /* ~10.7MHz */
-};
+#define I2C_NUMOF               ARRAY_SIZE(i2c_config)
+/** @} */
 
 /**
  * @name SPI configuration
@@ -124,35 +76,28 @@ static const spi_clk_conf_t spi_clk_config[] = {
  */
 static const spi_conf_t spi_config[] = {
     {
-        .dev      = SSI0,
-        .mosi_pin = GPIO_PA4,
-        .miso_pin = GPIO_PA5,
-        .sck_pin  = GPIO_PA2,
-        .cs_pin   = GPIO_PD0
+        .num      = 0,
+        .mosi_pin = GPIO_PIN(0, 4),
+        .miso_pin = GPIO_PIN(0, 5),
+        .sck_pin  = GPIO_PIN(0, 2),
+        .cs_pin   = GPIO_PIN(3, 0)
     }
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
  * @name ADC configuration
  * @{
  */
-#define SOC_ADC_ADCCON_REF  SOC_ADC_ADCCON_REF_AVDD5
+#define SOC_ADC_ADCCON3_EREF  SOC_ADC_ADCCON3_EREF_AVDD5
 
 static const adc_conf_t adc_config[] = {
     GPIO_PIN(0, 6), /**< GPIO_PA6 = ADC_ALS_PIN */
 };
 
-#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
-/** @} */
-
-/**
- * @name Radio peripheral configuration
- * @{
- */
-#define RADIO_IRQ_PRIO      1
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 #ifdef __cplusplus

@@ -1,0 +1,22 @@
+# additional modules dependencies
+
+include $(RIOTCPU)/esp_common/Makefile.dep
+
+USEMODULE += esp_idf_esp8266
+USEMODULE += esp_idf_nvs_flash
+USEMODULE += esp_idf_spi_flash
+USEMODULE += esp_idf_util
+USEMODULE += esp_idf_wpa_supplicant_crypto
+USEMODULE += esp_sdk
+USEMODULE += mtd
+USEMODULE += periph_common
+USEMODULE += ps
+
+ifneq (,$(filter periph_i2c,$(USEMODULE)))
+  USEMODULE += esp_i2c_sw
+  USEMODULE += periph_i2c_sw
+endif
+
+ifneq (,$(filter periph_rtc,$(USEMODULE)))
+  USEMODULE += rtt_rtc
+endif

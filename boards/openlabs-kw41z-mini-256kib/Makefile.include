@@ -1,0 +1,4 @@
+SLOT0_LEN ?= 0x1C000
+
+INCLUDES  += -I$(RIOTBOARD)/openlabs-kw41z-mini/include
+include $(RIOTBOARD)/openlabs-kw41z-mini/Makefile.include

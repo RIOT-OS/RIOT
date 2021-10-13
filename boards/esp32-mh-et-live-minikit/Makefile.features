@@ -1,0 +1,13 @@
+CPU_MODEL = esp32-wroom_32
+
+# common board and CPU features
+include $(RIOTBOARD)/common/esp32/Makefile.features
+
+# additional features provided by the board
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_dac
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_pwm
+FEATURES_PROVIDED += periph_spi
+
+FEATURES_PROVIDED += arduino

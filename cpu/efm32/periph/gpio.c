@@ -14,7 +14,7 @@
  * @file
  * @brief       Low-level GPIO driver implementation
  *
- * @author      Hauke Petersen <mail@haukepetersen.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Ryan Kurte <ryankurte@gmail.com>
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  *
@@ -27,15 +27,17 @@
 
 #include "em_gpio.h"
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
 /**
  * @brief   Number of external interrupt lines.
  */
-#define NUMOF_IRQS         (GPIO_PIN_MAX)
+#define NUMOF_IRQS         (GPIO_PIN_MAX + 1)
 
 /**
  * @brief   Hold one interrupt context per interrupt line
  */
 static gpio_isr_ctx_t isr_ctx[NUMOF_IRQS];
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 static inline GPIO_Port_TypeDef _port_num(gpio_t pin)
 {
@@ -45,11 +47,6 @@ static inline GPIO_Port_TypeDef _port_num(gpio_t pin)
 static inline uint32_t _pin_num(gpio_t pin)
 {
     return (pin & 0x0f);
-}
-
-static inline uint32_t _pin_mask(gpio_t pin)
-{
-    return (1 << _pin_num(pin));
 }
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
@@ -65,50 +62,11 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 
     /* configure pin */
     GPIO_PinModeSet(_port_num(pin), _pin_num(pin), mode >> 1, mode & 0x1);
-#ifdef _SILICON_LABS_32B_SERIES_0
+#if defined(_SILICON_LABS_32B_SERIES_0)
     GPIO_DriveModeSet(_port_num(pin), gpioDriveModeStandard);
 #endif
 
     return 0;
-}
-
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
-{
-    int result = gpio_init(pin, mode);
-
-    if (result != 0) {
-        return result;
-    }
-
-    /* just in case, disable the interrupt for this pin */
-    GPIO_IntDisable(_pin_num(pin));
-
-    /* store interrupt callback */
-    isr_ctx[_pin_num(pin)].cb = cb;
-    isr_ctx[_pin_num(pin)].arg = arg;
-
-    /* enable interrupts */
-    GPIO_IntConfig(_port_num(pin), _pin_num(pin),
-                   flank & GPIO_RISING, flank & GPIO_FALLING, true);
-
-    NVIC_ClearPendingIRQ(GPIO_EVEN_IRQn);
-    NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);
-
-    NVIC_EnableIRQ(GPIO_EVEN_IRQn);
-    NVIC_EnableIRQ(GPIO_ODD_IRQn);
-
-    return 0;
-}
-
-void gpio_irq_enable(gpio_t pin)
-{
-    GPIO_IntEnable(_pin_mask(pin));
-}
-
-void gpio_irq_disable(gpio_t pin)
-{
-    GPIO_IntDisable(_pin_mask(pin));
 }
 
 int gpio_read(gpio_t pin)
@@ -141,6 +99,51 @@ void gpio_write(gpio_t pin, int value)
     }
 }
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
+static inline uint32_t _pin_mask(gpio_t pin)
+{
+    return (1 << _pin_num(pin));
+}
+
+int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                  gpio_cb_t cb, void *arg)
+{
+    int result = gpio_init(pin, mode);
+
+    if (result != 0) {
+        return result;
+    }
+
+    /* just in case, disable the interrupt for this pin */
+    GPIO_IntDisable(_pin_mask(pin));
+
+    /* store interrupt callback */
+    isr_ctx[_pin_num(pin)].cb = cb;
+    isr_ctx[_pin_num(pin)].arg = arg;
+
+    /* enable interrupts */
+    GPIO_IntConfig(_port_num(pin), _pin_num(pin),
+                   flank & GPIO_RISING, flank & GPIO_FALLING, true);
+
+    NVIC_ClearPendingIRQ(GPIO_EVEN_IRQn);
+    NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);
+
+    NVIC_EnableIRQ(GPIO_EVEN_IRQn);
+    NVIC_EnableIRQ(GPIO_ODD_IRQn);
+
+    return 0;
+}
+
+void gpio_irq_enable(gpio_t pin)
+{
+    GPIO_IntEnable(_pin_mask(pin));
+}
+
+void gpio_irq_disable(gpio_t pin)
+{
+    GPIO_IntDisable(_pin_mask(pin));
+}
+
 /**
  * @brief   Actual interrupt handler for both even and odd pin index numbers.
  */
@@ -170,3 +173,4 @@ void isr_gpio_odd(void)
 {
     gpio_irq();
 }
+#endif /* MODULE_PERIPH_GPIO_IRQ */

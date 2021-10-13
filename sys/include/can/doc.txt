@@ -7,7 +7,7 @@
  * It includes a low-level interface, a data link layer, an ISO-TP layer and
  * a user interface.
  *
- * The low-level interface, candev, must be implemented by controler drivers.
+ * The low-level interface, candev, must be implemented by controller drivers.
  * The optional transceiver support can also be activated. Transceiver drivers must
  * then implement the trx_can interface.
  *

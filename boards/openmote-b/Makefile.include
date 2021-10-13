@@ -1,0 +1,10 @@
+# define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyUSB1
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
+
+PROGRAMMER ?= cc2538-bsl
+
+CC2538_BSL_FLAGS_OPTS ?= --bootloader-invert-lines
+CC2538_BSL_FLASHFILE ?= $(HEXFILE)
+
+include $(RIOTBOARD)/common/cc2538/Makefile.include

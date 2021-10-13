@@ -46,13 +46,8 @@ int main(void)
     unsigned len;
     int ret;
 
-#if defined(PN532_SUPPORT_I2C)
-    ret = pn532_init_i2c(&pn532, &pn532_conf[0]);
-#elif defined(PN532_SUPPORT_SPI)
-    ret = pn532_init_spi(&pn532, &pn532_conf[0]);
-#else
-#error None of PN532_SUPPORT_I2C and PN532_SUPPORT_SPI set!
-#endif
+    pn532_mode_t mode = IS_ACTIVE(MODULE_PN532_I2C) ? PN532_I2C : PN532_SPI;
+    ret = pn532_init(&pn532, &pn532_conf[0], mode);
 
     if (ret != 0) {
         LOG_INFO("init error %d\n", ret);
@@ -64,7 +59,6 @@ int main(void)
     uint32_t fwver;
     pn532_fw_version(&pn532, &fwver);
     LOG_INFO("ver %d.%d\n", (unsigned)PN532_FW_VERSION(fwver), (unsigned)PN532_FW_REVISION(fwver));
-
 
     ret = pn532_sam_configuration(&pn532, PN532_SAM_NORMAL, 1000);
     LOG_INFO("set sam %d\n", ret);

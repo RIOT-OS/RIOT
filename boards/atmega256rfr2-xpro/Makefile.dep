@@ -1,0 +1,7 @@
+USEMODULE += boards_common_atmega
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  # I2C sensor available at address 0x4B
+  USEMODULE += at30tse75x
+  USEMODULE += saul_gpio
+endif

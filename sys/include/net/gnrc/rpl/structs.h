@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2013  INRIA.
- * Copyright (C) 2015 Cenk Gündoğan <cnkgndgn@gmail.com>
+ * Copyright (C) 2017       HAW Hamburg
+ * Copyright (C) 2015–2018  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
+ * Copyright (C) 2013       INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,7 +18,7 @@
  * Header file, which defines all structs used by RPL.
  *
  * @author      Eric Engel <eric.engel@fu-berlin.de>
- * @author      Cenk Gündoğan <cnkgndgn@gmail.com>
+ * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
 #ifndef NET_GNRC_RPL_STRUCTS_H
@@ -29,7 +30,8 @@ extern "C" {
 
 #include "byteorder.h"
 #include "net/ipv6/addr.h"
-#include "xtimer.h"
+#include "evtimer.h"
+#include "evtimer_msg.h"
 #include "trickle.h"
 
 /**
@@ -129,6 +131,21 @@ typedef struct __attribute__((packed)) {
 } gnrc_rpl_dis_t;
 
 /**
+ * @brief DIS Solicited Information option
+ * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.7.9">
+ *          RFC6550, section 6.7.9, Solicited Information
+ *      </a>
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t type;               /**< Option Type: 0x07 */
+    uint8_t length;             /**< Option Length: 19 bytes*/
+    uint8_t instance_id;        /**< id of the instance */
+    uint8_t VID_flags;          /**< V|I|D predicate options followed by 5 bit unused flags */
+    ipv6_addr_t dodag_id;       /**< DODAG ID predicate */
+    uint8_t version_number;     /**< version number of the DODAG */
+} gnrc_rpl_opt_dis_solicited_t;
+
+/**
  * @brief Destination Advertisement Object
  * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.4">
  *          RFC6550, section 6.4, Destination Advertisement Object
@@ -221,14 +238,17 @@ typedef struct gnrc_rpl_instance gnrc_rpl_instance_t;
  * @cond INTERNAL */
 struct gnrc_rpl_parent {
     gnrc_rpl_parent_t *next;        /**< pointer to the next parent */
-    uint8_t state;                  /**< 0 for unsued, 1 for used */
+    uint8_t state;                  /**< see @ref gnrc_rpl_parent_states */
     ipv6_addr_t addr;               /**< link-local IPv6 address of this parent */
     uint8_t dtsn;                   /**< last seen dtsn of this parent */
     uint16_t rank;                  /**< rank of the parent */
     gnrc_rpl_dodag_t *dodag;        /**< DODAG the parent belongs to */
-    uint32_t lifetime;              /**< lifetime of this parent in seconds */
-    double  link_metric;            /**< metric of the link */
+    double link_metric;             /**< metric of the link */
     uint8_t link_metric_type;       /**< type of the metric */
+    /**
+     * @brief Parent timeout events (see @ref GNRC_RPL_MSG_TYPE_PARENT_TIMEOUT)
+     */
+    evtimer_msg_event_t timeout_event;
 };
 /**
  * @endcond
@@ -239,8 +259,17 @@ struct gnrc_rpl_parent {
  */
 typedef struct {
     uint16_t ocp;   /**< objective code point */
-    uint16_t (*calc_rank)(gnrc_rpl_parent_t *parent, uint16_t base_rank); /**< calculate the rank */
-    gnrc_rpl_parent_t *(*which_parent)(gnrc_rpl_parent_t *, gnrc_rpl_parent_t *); /**< retrieve the better parent */
+
+    /**
+     * @brief Calculate the rank of this node.
+     *
+     * @param[in]   dodag       RPL DODAG to calculate rank from.
+     * @param[in]   base_rank   BASE_RANK parameter as in rfc6550
+     *
+     * @return      RPL Rank of this node.
+     * @return      GNRC_RPL_INFINITE_RANK, if no rank calculation is possible.
+     */
+    uint16_t (*calc_rank)(gnrc_rpl_dodag_t *dodag, uint16_t base_rank);
 
     /**
      * @brief   Compare two @ref gnrc_rpl_parent_t.
@@ -259,9 +288,21 @@ typedef struct {
      */
     int (*parent_cmp)(gnrc_rpl_parent_t *parent1, gnrc_rpl_parent_t *parent2);
     gnrc_rpl_dodag_t *(*which_dodag)(gnrc_rpl_dodag_t *, gnrc_rpl_dodag_t *); /**< compare for dodags */
-    void (*reset)(gnrc_rpl_dodag_t *);    /**< resets the OF */
+
+    /**
+     * @brief Reset the state of the objective function.
+     *
+     * @param[in]   dodag   RPL dodag object.
+     */
+    void (*reset)(gnrc_rpl_dodag_t *dodag);
     void (*parent_state_callback)(gnrc_rpl_parent_t *, int, int); /**< retrieves the state of a parent*/
-    void (*init)(void);  /**< OF specific init function */
+
+    /**
+     * @brief Initialize the objective function.
+     *
+     * @param[in]   dodag   RPL dodag object.
+     */
+    void (*init)(gnrc_rpl_dodag_t *dodag);
     void (*process_dio)(void);  /**< DIO processing callback (acc. to OF0 spec, chpt 5) */
 } gnrc_rpl_of_t;
 
@@ -289,7 +330,7 @@ struct gnrc_rpl_dodag {
     bool dao_ack_received;          /**< flag to check for DAO-ACK */
     uint8_t dio_opts;               /**< options in the next DIO
                                          (see @ref GNRC_RPL_REQ_DIO_OPTS "DIO Options") */
-    uint8_t dao_time;               /**< time to schedule a DAO in seconds */
+    evtimer_msg_event_t dao_event;  /**< DAO TX events (see @ref GNRC_RPL_MSG_TYPE_DODAG_DAO_TX) */
     trickle_t trickle;              /**< trickle representation */
 };
 
@@ -301,11 +342,34 @@ struct gnrc_rpl_instance {
     gnrc_rpl_of_t *of;              /**< configured Objective Function */
     uint16_t min_hop_rank_inc;      /**< minimum hop rank increase */
     uint16_t max_rank_inc;          /**< max increase in the rank */
-    int8_t cleanup;                 /**< cleanup time in seconds */
+    /**
+     * @brief Instance cleanup events (see @ref GNRC_RPL_MSG_TYPE_INSTANCE_CLEANUP)
+     */
+    evtimer_msg_event_t cleanup_event;
 };
 /**
  * @endcond
  */
+
+/**
+ * @brief internal unpacked struct type for option insertion
+ */
+typedef struct {
+    uint8_t type;       /**< Option Type */
+    uint8_t length;     /**< Option Length, does not include the first two byte */
+} gnrc_rpl_internal_opt_t;
+
+/**
+ * @brief internal unpacked struct type for DIS solicited option insertion
+ */
+typedef struct  {
+    uint8_t type;                /**< Option Type: 0x07 */
+    uint8_t length;              /**< Option Length: 19 bytes*/
+    uint8_t instance_id;         /**< id of the instance */
+    uint8_t VID_flags;           /**< V|I|D predicate options followed by 5 bit unused flags */
+    ipv6_addr_t dodag_id;        /**< DODAG ID predicate */
+    uint8_t version_number;      /**< version number of the DODAG */
+} gnrc_rpl_internal_opt_dis_solicited_t;
 
 #ifdef __cplusplus
 }

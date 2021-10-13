@@ -1,0 +1,6 @@
+CPU = gd32v
+CPU_MODEL = gd32vf103vbt6
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart

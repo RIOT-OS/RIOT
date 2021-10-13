@@ -1,0 +1,7 @@
+CPU = esp32
+
+# additional features provided by all boards are GPIOs and at least one UART
+FEATURES_PROVIDED += periph_gpio
+FEATURES_PROVIDED += periph_gpio_irq
+FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_uart_modecfg

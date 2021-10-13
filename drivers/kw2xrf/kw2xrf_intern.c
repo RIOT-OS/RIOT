@@ -24,7 +24,7 @@
 #include "kw2xrf_intern.h"
 #include "overwrites.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 void kw2xrf_disable_interrupts(kw2xrf_t *dev)
@@ -45,7 +45,7 @@ void kw2xrf_disable_interrupts(kw2xrf_t *dev)
 void kw2xrf_update_overwrites(kw2xrf_t *dev)
 {
     kw2xrf_write_dreg(dev, MKW2XDM_OVERWRITE_VER, overwrites_direct[0].data);
-    for (uint8_t i = 0; i < sizeof(overwrites_indirect)/sizeof(overwrites_t); i++) {
+    for (uint8_t i = 0; i < ARRAY_SIZE(overwrites_indirect); i++) {
         kw2xrf_write_iregs(dev, overwrites_indirect[i].address,
                            (uint8_t *)&(overwrites_indirect[i].data), 1);
     }

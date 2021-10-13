@@ -22,9 +22,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "kernel_types.h"
 #include "xtimer.h"
-#include "net/gnrc.h"
 #include "net/gnrc/gomach/hdr.h"
 
 #ifdef __cplusplus

@@ -1,0 +1,152 @@
+/**
+ * @defgroup pkg_lua Lua ported to RIOT
+ * @ingroup  pkg
+ * @brief    Provides a Lua interpreter for RIOT
+ * @see      https://github.com/lua/lua
+ * @see      sys_lua
+ *
+ * # Lua programming language support
+ *
+ * ## Introduction
+ *
+ * This package embeds a [Lua 5.3](https://www.lua.org/) interpreter into RIOT.
+ * With a few exceptions, all the APIs mentioned in the
+ * [official documentation](https://www.lua.org/manual/5.3/) are available in
+ * this package too.
+ *
+ * ## Running Lua code.
+ *
+ * lua_run.h contains functions that make it easy to setup the interpreter and
+ * catch errors in a safe way. The functions from Lua's auxlib can still be used
+ * but then you must supply your own allocator and panic routines, load the
+ * builtin modules, etc.
+ *
+ * To run a chunk of code stored in an array use:
+ * ```
+ * lua_riot_do_buffer(const char *buf, size_t buflen, void *memory,
+ *                            size_t mem_size, uint16_t modmask, int *retval);
+ * ```
+ * The interpreter will not use the global heap for allocations, instead the
+ * user must supply a memory buffer.
+ *
+ * To save some memory, some builtin modules can be left out. `modmask` specifies
+ * which builtins to load. Note that if a builtin is not loaded by C code, then
+ * it cannot be loaded by Lua code later.
+ *
+ * `lua_riot_do_buffer` takes care of setting up the Lua state, registering a panic
+ * handler that does not crash the application, configuring an allocator, loading
+ * libraries, etc.
+ *
+ * To run a module as a script use `lua_riot_do_module`. This is roughly equivalent
+ * to executing:
+ * ```
+ * require('modulename')
+ * ```
+ *
+ * ## Memory requirements
+ *
+ * While generally efficient, the Lua interpreter was not really designed for
+ * constrained devices.
+ *
+ * A basic interpreter session typically requires about 12kB RAM. The stack
+ * but it depends on the functions used (string handling tends to use more stack).
+ * It also depends on the platform.
+ *
+ * There is currently no easy way to determine the stack needs other than trial
+ * and error. Future versions of the package will include instrumentation to
+ * this end.
+ *
+ * ## Adding your own modules.
+ *
+ * `lua_loadlib.c` contains two loaders, one for modules written in Lua and
+ * another one for C extensions.
+ *
+ * An index to the modules is stored in a table (there are two, one for each
+ * kind of module). The tables are indexed by the module name and must be sorted
+ * in ascending order by this key.
+ *
+ * The definitions for the table types are in `lua_builtin.h`. The loader module
+ * contains empty tables, defined as weak symbols so they can be ovewritten
+ * by the application. The variables that must be defined are:
+ *
+ * ```
+ * /** Table containing all built in pure lua modules */
+ * const struct lua_riot_builtin_lua *const lua_riot_builtin_lua_table;
+ * /** Number of elements of lua_riot_builtin_lua_table */
+ * const size_t lua_riot_builtin_lua_table_len;
+ *
+ * /** Table containing all built in c lua modules */
+ * const struct lua_riot_builtin_c *const lua_riot_builtin_c_table;
+ * /** Number of elements of lua_riot_builtin_c_table */
+ * const size_t lua_riot_builtin_c_table_len;
+ * ```
+ *
+ * Currently, these must be defined manually in the application code. In the
+ * future a script will generate this tables, populating them with both RIOT
+ * modules and the user modules.
+ *
+ *
+ * ## Customizations
+ *
+ * The upstream Lua code is used without with the following modifications.
+ *
+ * Modifications that affect the API:
+ *
+ * - lua.c (the main interface to the interpreter) is replaced by our own
+ *   stripped-down version. The REPL is no longer included.
+ * - loadlib.c (the "package" module) is replaced by our own (simplified)
+ *   loader. All the code dealing with files and dynamic loading has been
+ *   removed.
+ * - os.tmpname() is removed as it caused compiler warnings and it is not
+ *   really possible to use it right. Use io.tmpfile() instead.
+ * - The test module has been modified to allow it run in the RIOT environment.
+ *   This is not a public API, though.
+ *
+ * Other modifications:
+ *
+ * - There is a patch changing the Makefile. This updated makefile is not used
+ *   in the package, but is provided to aid development in a PC.
+ * - Some patches to reduce stack and memory usage.
+ *
+ * ### Patches
+ *
+ * A version of Lua with the patches applied is available at [GitHub]
+ * (https://github.com/riot-appstore/lua) It can be downloaded and compiled in
+ * desktop computer, and the official [test suite](https://www.lua.org/tests/)
+ * can then be run.
+ *
+ * Alternatively, the patches in this package can be directly applied to the
+ * official distribution.
+ *
+ * The updated makefile creates two standalone executables. Tests should be run
+ * with the debug executable.
+ *
+ * ## TODO
+ *
+ * The following features are missing and will be eventually added:
+ *
+ * - Load source code incrementally. It can be done now, but then the rest of the
+ *   interpreter setup must be loaded manually.
+ * - Bindings to access RIOT functionality.
+ * - Support in the build system for easily including application-specific
+ *   modules.
+ * - Instrumentation to measure stack consumption (and maybe prevent overflow).
+ * - Support for "frozen tables" (i.e. tables that live in ROM).
+ * - Provide a better way of supplying data to a script and getting back results.
+ * - Specify a function to call inside a module (????)
+ * - Expand this readme into a proper manual.
+ *
+ */
+
+/* These are docs for the future (when we have the script to compile module tables) */
+/*
+ * # Running Lua and C code
+ *
+ * see \ref sys_lua for information on how to access RIOT modules from within
+ * Lua.
+ *
+ * While it is possible to include your application specific modules and run
+ * arbitrary Lua code only just using this interpreter, the \ref sys_lua module
+ * provides an automated way of handling Lua modules.
+ *
+ */

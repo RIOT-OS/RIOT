@@ -32,6 +32,8 @@ int main(void)
     puts("Test for the CPUID driver");
     puts("This test is reading out the CPUID of the platforms CPU\n");
 
+    printf("CPUID_LEN: %u\n", CPUID_LEN);
+
     /* read the CPUID */
     cpuid_get(id);
 

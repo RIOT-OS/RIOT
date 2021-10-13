@@ -39,7 +39,7 @@ simplest way to compile and link an application with RIOT, is to set up a
 Makefile providing at least the following variables:
 
  * `APPLICATION`: should contain the (unique) name of your application
- * `BOARD`: specifies the platform the application should be build for by
+ * `BOARD`: specifies the platform the application should be built for by
    default
  * `RIOTBASE`: specifies the path to your copy of the RIOT repository (note,
    that you may want to use `$(CURDIR)` here, to give a relative path)
@@ -140,3 +140,128 @@ make -C examples/gnrc_networking/ term \
     TERMPROG=gtkterm \
     TERMFLAGS="-s 115200 -p /dev/ttyACM0 -e"
 ~~~~~~~~
+
+Configuring an application                         {#configuring-an-application}
+--------------------------
+Many modules in RIOT offer configuration options that will be considered during
+compile-time.They are modeled as macros that can be overridden by the user.
+Currently there are two ways of doing this: using `CFLAGS` or via
+@ref kconfig-in-riot "Kconfig" (the last one is currently only possible for a
+subset of modules).
+
+For instructions on how to configure via `CFLAGS` check the
+@ref config "identified compile-time configurations". To learn how to use
+Kconfig in RIOT, please refer to the @ref kconfig-users-guide.
+
+Default configurations                                 {#default-configurations}
+----------------------
+When devices have a common access interface, having a default configuration to
+enable them across platforms, without having to explicitly specify which modules
+to include, comes in handy. For this, two pseudomodules are defined:
+
+- `saul_default`: will enable all the drivers of sensors and actuators that are
+present in the target platform.
+
+- `netdev_default`: will enable all the drivers of network devices
+present in the target platform.
+
+Use Docker to build RIOT                           {#docker}
+========================
+[Docker](https://www.docker.com/) is a platform that allows packaging software into containers that can easily be run on any Linux that has Docker installed.
+
+You can download a RIOT Docker container from the Docker Hub and then use that to build your project making use of all toolchains that we've preinstalled in the container.
+
+Setup                                              {#docker-setup}
+-----
+
+### Installing docker
+
+To use the RIOT docker build image, the Docker application needs to be installed on your system.
+To install Docker, depending on your operating system, use `sudo apt-get install docker` or a variant.
+
+The user on your computer requires permission to access and use docker. There are two ways to manage this:
+- Your OS distribution may create a group called `docker`. If so, then adding yourself to that group (and logging out and in again) should grant you permission.
+- Execute docker with sudo. This is in fact the most secure and recommended setup (see [here](https://docs.docker.com/install/linux/linux-postinstall/), [here](https://docs.docker.com/engine/security/security/#docker-daemon-attack-surface), [here](https://www.projectatomic.io/blog/2015/08/why-we-dont-let-non-root-users-run-docker-in-centos-fedora-or-rhel/) and [here](https://fosterelli.co/privilege-escalation-via-docker.html)). No extra setup steps are needed. `make` should be instructed to use `sudo` by setting `DOCKER="sudo docker"` in the command line.
+
+Finally, download the pre-built RIOT Docker container:
+
+```console
+# docker pull riot/riotbuild
+```
+
+This will take a while. If it finishes correctly, you can then use the toolchains contained in the Docker container:
+(**from the riot root**):
+
+```console
+$ docker run --rm -i -t -u $UID -v $(pwd):/data/riotbuild riot/riotbuild ./dist/tools/compile_test/compile_test.py
+```
+
+# Usage
+
+The RIOT build system provides support for using the Docker container to build RIOT projects, so you do not need to type the long docker command line every time:
+
+(**from the directory you would normally run make, e.g. examples/default**)
+
+```console
+$ make BUILD_IN_DOCKER=1
+```
+
+If your user does not have permissions to access the Docker daemon:
+
+```console
+$ make BUILD_IN_DOCKER=1 DOCKER="sudo docker"
+```
+
+to always use Docker for building, set `BUILD_IN_DOCKER=1` (and if necessary `DOCKER="sudo docker"`) in the environment:
+
+```console
+$ export BUILD_IN_DOCKER=1
+```
+
+running make without specifying `BUILD_IN_DOCKER=1` will still use Docker (because of the environment variable)
+
+Troubleshooting                                    {#docker-troubleshooting}
+---------------
+
+On some Ubuntu versions a make with `BUILD_IN_DOCKER=1` can't resolve the host name of for example github.com. To fix this add the file `/etc/docker/daemon.json` with the address of your DNS Server.
+
+Generating `compile_commands.json` e.g. for code completion in IDEs
+===================================================================
+
+A `compile_commands.json` for the selected board can be generated by running inside the application
+folder the following:
+
+```console
+$ make compile-commands
+```
+
+This target will honor the variables controlling the build process such as `BOARD`, `TOOLCHAIN`,
+`DEVELHELP`, etc. just like the usual build process. This works without actual compilation. By
+default, the `compile_commands.json` is placed in the RIOT base directory. This behavior can be
+overwritten using the `COMPILE_COMMANDS_PATH` variable by specifying the full absolute path
+(including file name) of the `compile_commands.json` instead.
+
+***Note:*** By default, the built-in include search directories of GCC will be explicitly added
+and flags incompatible with `clangd` will be dropped. This will allow using `clangd` as language
+server out of the box. If this is not desired, run `export COMPILE_COMMANDS_FLAGS=""` to turn
+modification of the compile commands off. For a list of available flags, run
+`./dist/tools/compile_commands/compile_commands.py --help` in the RIOT base directory.
+
+Using the native port with networking
+=====================================
+
+If you compile RIOT for the native cpu and include the `netdev_tap` module,
+you can specify a network interface like this: `PORT=tap0 make term`
+
+Setting up a tap network
+------------------------
+
+There is a shell script in `RIOT/dist/tools/tapsetup` called `tapsetup` which
+you can use to create a network of tap interfaces.
+
+*USAGE*
+
+To create a bridge and two (or `count` at your option) tap interfaces:
+~~~~~~~{.sh}
+    sudo ./dist/tools/tapsetup/tapsetup [-c [<count>]]
+~~~~~~~

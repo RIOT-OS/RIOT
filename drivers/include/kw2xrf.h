@@ -43,17 +43,15 @@ extern "C" {
 #define KW2XRF_MAX_PKT_LENGTH           (IEEE802154_FRAME_LEN_MAX)
 
 /**
- * @brief   Default PAN ID used after initialization
- */
-#define KW2XRF_DEFAULT_PANID            (IEEE802154_DEFAULT_PANID)
-
-/**
- * @name    Default channel used after initialization
- *
+ * @defgroup drivers_kw2xrf_config     CR20A and KW2xD radio driver compile configuration
+ * @ingroup config_drivers_netdev
  * @{
  */
+/**
+ * @brief Default channel used after initialization.
+ */
 #ifndef KW2XRF_DEFAULT_CHANNEL
-#define KW2XRF_DEFAULT_CHANNEL          (IEEE802154_DEFAULT_CHANNEL)
+#define KW2XRF_DEFAULT_CHANNEL          (CONFIG_IEEE802154_DEFAULT_CHANNEL)
 #endif
 /** @} */
 
@@ -69,7 +67,7 @@ extern "C" {
 /**
  * @brief   Default TX_POWER in dbm used after initialization
  */
-#define KW2XRF_DEFAULT_TX_POWER         (IEEE802154_DEFAULT_TXPOWER)
+#define KW2XRF_DEFAULT_TX_POWER         (CONFIG_IEEE802154_DEFAULT_TXPOWER)
 
 /**
  * @brief   Maximum output power of the kw2x device in dBm
@@ -93,18 +91,10 @@ extern "C" {
 #define KW2XRF_OPT_RAWDUMP          (NETDEV_IEEE802154_RAW)            /**< legacy define */
 #define KW2XRF_OPT_ACK_REQ          (NETDEV_IEEE802154_ACK_REQ)        /**< legacy define */
 
-#define KW2XRF_OPT_AUTOCCA          (0x0100)    /**< CCA befor TX active */
+#define KW2XRF_OPT_AUTOCCA          (0x0100)    /**< CCA before TX active */
 #define KW2XRF_OPT_PROMISCUOUS      (0x0200)    /**< promiscuous mode
                                                   *   active */
 #define KW2XRF_OPT_PRELOADING       (0x0400)    /**< preloading enabled */
-#define KW2XRF_OPT_TELL_TX_START    (0x0800)    /**< notify MAC layer on TX
-                                                  *   start */
-#define KW2XRF_OPT_TELL_TX_END      (0x1000)    /**< notify MAC layer on TX
-                                                  *   finished */
-#define KW2XRF_OPT_TELL_RX_START    (0x2000)    /**< notify MAC layer on RX
-                                                  *   start */
-#define KW2XRF_OPT_TELL_RX_END      (0x4000)    /**< notify MAC layer on RX
-                                                  *   finished */
 #define KW2XRF_OPT_AUTOACK          (0x8000)    /**< enable automatically ACK
                                                   *   for incommint packet */
 /** @} */

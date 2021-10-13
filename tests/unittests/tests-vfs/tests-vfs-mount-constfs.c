@@ -52,7 +52,7 @@ static const constfs_file_t _files[] = {
 
 static const constfs_t fs_data = {
     .files = _files,
-    .nfiles = sizeof(_files) / sizeof(_files[0]),
+    .nfiles = ARRAY_SIZE(_files),
 };
 
 static vfs_mount_t _test_vfs_mount_invalid_mount = {
@@ -171,7 +171,7 @@ static void test_vfs_constfs_read_lseek(void)
     TEST_ASSERT_EQUAL_INT(0, res);
 }
 
-#if MODULE_NEWLIB || defined(BOARD_NATIVE)
+#if MODULE_NEWLIB || MODULE_PICOLIBC || defined(BOARD_NATIVE)
 static void test_vfs_constfs__posix(void)
 {
     int res;
@@ -210,7 +210,7 @@ Test *tests_vfs_mount_constfs_tests(void)
         new_TestFixture(test_vfs_umount__invalid_mount),
         new_TestFixture(test_vfs_constfs_open),
         new_TestFixture(test_vfs_constfs_read_lseek),
-#if MODULE_NEWLIB || defined(BOARD_NATIVE)
+#if MODULE_NEWLIB || MODULE_PICOLIBC || defined(BOARD_NATIVE)
         new_TestFixture(test_vfs_constfs__posix),
 #endif
     };

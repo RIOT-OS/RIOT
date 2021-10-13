@@ -1,34 +1,32 @@
-/**************************************************************************//**
- * @file efr32mg1p_acmp.h
+/***************************************************************************//**
+ * @file
  * @brief EFR32MG1P_ACMP register and bit field definitions
- * @version 5.4.0
- ******************************************************************************
+ *******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
- ******************************************************************************
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * SPDX-License-Identifier: Zlib
+ *
+ * The licensor of this software is Silicon Laboratories Inc.
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
  *
  * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
  *
  * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software.@n
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
- *    misrepresented as being the original software.@n
+ *    misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  *
- * DISCLAIMER OF WARRANTY/LIMITATION OF REMEDIES: Silicon Laboratories, Inc.
- * has no obligation to support this Software. Silicon Laboratories, Inc. is
- * providing the Software "AS IS", with no express or implied warranties of any
- * kind, including, but not limited to, any implied warranties of
- * merchantability or fitness for any particular purpose or warranties against
- * infringement of any proprietary rights of a third party.
- *
- * Silicon Laboratories, Inc. will not be liable for any consequential,
- * incidental, or special damages, or any other relief, or for any claim by
- * any third party, arising from your use of this Software.
- *
- *****************************************************************************/
+ ******************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,15 +39,15 @@ extern "C" {
 #pragma clang system_header  /* Treat file as system include file. */
 #endif
 
-/**************************************************************************//**
-* @addtogroup Parts
-* @{
-******************************************************************************/
-/**************************************************************************//**
+/***************************************************************************//**
+ * @addtogroup Parts
+ * @{
+ ******************************************************************************/
+/***************************************************************************//**
  * @defgroup EFR32MG1P_ACMP ACMP
  * @{
  * @brief EFR32MG1P_ACMP Register Declaration
- *****************************************************************************/
+ ******************************************************************************/
 /** ACMP Register Declaration */
 typedef struct {
   __IOM uint32_t CTRL;          /**< Control Register  */
@@ -59,23 +57,23 @@ typedef struct {
   __IOM uint32_t IFS;           /**< Interrupt Flag Set Register  */
   __IOM uint32_t IFC;           /**< Interrupt Flag Clear Register  */
   __IOM uint32_t IEN;           /**< Interrupt Enable Register  */
-  uint32_t       RESERVED0[1];  /**< Reserved for future use **/
+  uint32_t       RESERVED0[1U]; /**< Reserved for future use **/
   __IM uint32_t  APORTREQ;      /**< APORT Request Status Register  */
   __IM uint32_t  APORTCONFLICT; /**< APORT Conflict Status Register  */
   __IOM uint32_t HYSTERESIS0;   /**< Hysteresis 0 Register  */
   __IOM uint32_t HYSTERESIS1;   /**< Hysteresis 1 Register  */
 
-  uint32_t       RESERVED1[4];  /**< Reserved for future use **/
+  uint32_t       RESERVED1[4U]; /**< Reserved for future use **/
   __IOM uint32_t ROUTEPEN;      /**< I/O Routing Pine Enable Register  */
   __IOM uint32_t ROUTELOC0;     /**< I/O Routing Location Register  */
 } ACMP_TypeDef;                 /** @} */
 
-/**************************************************************************//**
+/***************************************************************************//**
  * @addtogroup EFR32MG1P_ACMP
  * @{
  * @defgroup EFR32MG1P_ACMP_BitFields  ACMP Bit Fields
  * @{
- *****************************************************************************/
+ ******************************************************************************/
 
 /* Bit fields for ACMP CTRL */
 #define _ACMP_CTRL_RESETVALUE                          0x07000000UL                               /**< Default value for ACMP_CTRL */
@@ -325,6 +323,8 @@ typedef struct {
 #define _ACMP_INPUTSEL_POSSEL_APORT4XCH11              0x0000008BUL                             /**< Mode APORT4XCH11 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_POSSEL_APORT4YCH12              0x0000008CUL                             /**< Mode APORT4YCH12 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_POSSEL_APORT4XCH13              0x0000008DUL                             /**< Mode APORT4XCH13 for ACMP_INPUTSEL */
+#define _ACMP_INPUTSEL_POSSEL_APORT4YCH14              0x0000008EUL                             /**< Mode APORT4YCH14 for ACMP_INPUTSEL */
+#define _ACMP_INPUTSEL_POSSEL_APORT4XCH15              0x0000008FUL                             /**< Mode APORT4XCH15 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_POSSEL_APORT4YCH16              0x00000090UL                             /**< Mode APORT4YCH16 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_POSSEL_APORT4XCH17              0x00000091UL                             /**< Mode APORT4XCH17 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_POSSEL_APORT4YCH18              0x00000092UL                             /**< Mode APORT4YCH18 for ACMP_INPUTSEL */
@@ -340,8 +340,6 @@ typedef struct {
 #define _ACMP_INPUTSEL_POSSEL_APORT4YCH28              0x0000009CUL                             /**< Mode APORT4YCH28 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_POSSEL_APORT4XCH29              0x0000009DUL                             /**< Mode APORT4XCH29 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_POSSEL_APORT4YCH30              0x0000009EUL                             /**< Mode APORT4YCH30 for ACMP_INPUTSEL */
-#define _ACMP_INPUTSEL_POSSEL_APORT4YCH14              0x0000009EUL                             /**< Mode APORT4YCH14 for ACMP_INPUTSEL */
-#define _ACMP_INPUTSEL_POSSEL_APORT4XCH15              0x0000009FUL                             /**< Mode APORT4XCH15 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_POSSEL_APORT4XCH31              0x0000009FUL                             /**< Mode APORT4XCH31 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_POSSEL_VLP                      0x000000FBUL                             /**< Mode VLP for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_POSSEL_VBDIV                    0x000000FCUL                             /**< Mode VBDIV for ACMP_INPUTSEL */
@@ -491,6 +489,8 @@ typedef struct {
 #define ACMP_INPUTSEL_POSSEL_APORT4XCH11               (_ACMP_INPUTSEL_POSSEL_APORT4XCH11 << 0) /**< Shifted mode APORT4XCH11 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_POSSEL_APORT4YCH12               (_ACMP_INPUTSEL_POSSEL_APORT4YCH12 << 0) /**< Shifted mode APORT4YCH12 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_POSSEL_APORT4XCH13               (_ACMP_INPUTSEL_POSSEL_APORT4XCH13 << 0) /**< Shifted mode APORT4XCH13 for ACMP_INPUTSEL */
+#define ACMP_INPUTSEL_POSSEL_APORT4YCH14               (_ACMP_INPUTSEL_POSSEL_APORT4YCH14 << 0) /**< Shifted mode APORT4YCH14 for ACMP_INPUTSEL */
+#define ACMP_INPUTSEL_POSSEL_APORT4XCH15               (_ACMP_INPUTSEL_POSSEL_APORT4XCH15 << 0) /**< Shifted mode APORT4XCH15 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_POSSEL_APORT4YCH16               (_ACMP_INPUTSEL_POSSEL_APORT4YCH16 << 0) /**< Shifted mode APORT4YCH16 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_POSSEL_APORT4XCH17               (_ACMP_INPUTSEL_POSSEL_APORT4XCH17 << 0) /**< Shifted mode APORT4XCH17 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_POSSEL_APORT4YCH18               (_ACMP_INPUTSEL_POSSEL_APORT4YCH18 << 0) /**< Shifted mode APORT4YCH18 for ACMP_INPUTSEL */
@@ -506,8 +506,6 @@ typedef struct {
 #define ACMP_INPUTSEL_POSSEL_APORT4YCH28               (_ACMP_INPUTSEL_POSSEL_APORT4YCH28 << 0) /**< Shifted mode APORT4YCH28 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_POSSEL_APORT4XCH29               (_ACMP_INPUTSEL_POSSEL_APORT4XCH29 << 0) /**< Shifted mode APORT4XCH29 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_POSSEL_APORT4YCH30               (_ACMP_INPUTSEL_POSSEL_APORT4YCH30 << 0) /**< Shifted mode APORT4YCH30 for ACMP_INPUTSEL */
-#define ACMP_INPUTSEL_POSSEL_APORT4YCH14               (_ACMP_INPUTSEL_POSSEL_APORT4YCH14 << 0) /**< Shifted mode APORT4YCH14 for ACMP_INPUTSEL */
-#define ACMP_INPUTSEL_POSSEL_APORT4XCH15               (_ACMP_INPUTSEL_POSSEL_APORT4XCH15 << 0) /**< Shifted mode APORT4XCH15 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_POSSEL_APORT4XCH31               (_ACMP_INPUTSEL_POSSEL_APORT4XCH31 << 0) /**< Shifted mode APORT4XCH31 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_POSSEL_VLP                       (_ACMP_INPUTSEL_POSSEL_VLP << 0)         /**< Shifted mode VLP for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_POSSEL_VBDIV                     (_ACMP_INPUTSEL_POSSEL_VBDIV << 0)       /**< Shifted mode VBDIV for ACMP_INPUTSEL */
@@ -659,6 +657,8 @@ typedef struct {
 #define _ACMP_INPUTSEL_NEGSEL_APORT4XCH11              0x0000008BUL                             /**< Mode APORT4XCH11 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_NEGSEL_APORT4YCH12              0x0000008CUL                             /**< Mode APORT4YCH12 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_NEGSEL_APORT4XCH13              0x0000008DUL                             /**< Mode APORT4XCH13 for ACMP_INPUTSEL */
+#define _ACMP_INPUTSEL_NEGSEL_APORT4YCH14              0x0000008EUL                             /**< Mode APORT4YCH14 for ACMP_INPUTSEL */
+#define _ACMP_INPUTSEL_NEGSEL_APORT4XCH15              0x0000008FUL                             /**< Mode APORT4XCH15 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_NEGSEL_APORT4YCH16              0x00000090UL                             /**< Mode APORT4YCH16 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_NEGSEL_APORT4XCH17              0x00000091UL                             /**< Mode APORT4XCH17 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_NEGSEL_APORT4YCH18              0x00000092UL                             /**< Mode APORT4YCH18 for ACMP_INPUTSEL */
@@ -674,8 +674,6 @@ typedef struct {
 #define _ACMP_INPUTSEL_NEGSEL_APORT4YCH28              0x0000009CUL                             /**< Mode APORT4YCH28 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_NEGSEL_APORT4XCH29              0x0000009DUL                             /**< Mode APORT4XCH29 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_NEGSEL_APORT4YCH30              0x0000009EUL                             /**< Mode APORT4YCH30 for ACMP_INPUTSEL */
-#define _ACMP_INPUTSEL_NEGSEL_APORT4YCH14              0x0000009EUL                             /**< Mode APORT4YCH14 for ACMP_INPUTSEL */
-#define _ACMP_INPUTSEL_NEGSEL_APORT4XCH15              0x0000009FUL                             /**< Mode APORT4XCH15 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_NEGSEL_APORT4XCH31              0x0000009FUL                             /**< Mode APORT4XCH31 for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_NEGSEL_VLP                      0x000000FBUL                             /**< Mode VLP for ACMP_INPUTSEL */
 #define _ACMP_INPUTSEL_NEGSEL_VBDIV                    0x000000FCUL                             /**< Mode VBDIV for ACMP_INPUTSEL */
@@ -825,6 +823,8 @@ typedef struct {
 #define ACMP_INPUTSEL_NEGSEL_APORT4XCH11               (_ACMP_INPUTSEL_NEGSEL_APORT4XCH11 << 8) /**< Shifted mode APORT4XCH11 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_NEGSEL_APORT4YCH12               (_ACMP_INPUTSEL_NEGSEL_APORT4YCH12 << 8) /**< Shifted mode APORT4YCH12 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_NEGSEL_APORT4XCH13               (_ACMP_INPUTSEL_NEGSEL_APORT4XCH13 << 8) /**< Shifted mode APORT4XCH13 for ACMP_INPUTSEL */
+#define ACMP_INPUTSEL_NEGSEL_APORT4YCH14               (_ACMP_INPUTSEL_NEGSEL_APORT4YCH14 << 8) /**< Shifted mode APORT4YCH14 for ACMP_INPUTSEL */
+#define ACMP_INPUTSEL_NEGSEL_APORT4XCH15               (_ACMP_INPUTSEL_NEGSEL_APORT4XCH15 << 8) /**< Shifted mode APORT4XCH15 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_NEGSEL_APORT4YCH16               (_ACMP_INPUTSEL_NEGSEL_APORT4YCH16 << 8) /**< Shifted mode APORT4YCH16 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_NEGSEL_APORT4XCH17               (_ACMP_INPUTSEL_NEGSEL_APORT4XCH17 << 8) /**< Shifted mode APORT4XCH17 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_NEGSEL_APORT4YCH18               (_ACMP_INPUTSEL_NEGSEL_APORT4YCH18 << 8) /**< Shifted mode APORT4YCH18 for ACMP_INPUTSEL */
@@ -840,8 +840,6 @@ typedef struct {
 #define ACMP_INPUTSEL_NEGSEL_APORT4YCH28               (_ACMP_INPUTSEL_NEGSEL_APORT4YCH28 << 8) /**< Shifted mode APORT4YCH28 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_NEGSEL_APORT4XCH29               (_ACMP_INPUTSEL_NEGSEL_APORT4XCH29 << 8) /**< Shifted mode APORT4XCH29 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_NEGSEL_APORT4YCH30               (_ACMP_INPUTSEL_NEGSEL_APORT4YCH30 << 8) /**< Shifted mode APORT4YCH30 for ACMP_INPUTSEL */
-#define ACMP_INPUTSEL_NEGSEL_APORT4YCH14               (_ACMP_INPUTSEL_NEGSEL_APORT4YCH14 << 8) /**< Shifted mode APORT4YCH14 for ACMP_INPUTSEL */
-#define ACMP_INPUTSEL_NEGSEL_APORT4XCH15               (_ACMP_INPUTSEL_NEGSEL_APORT4XCH15 << 8) /**< Shifted mode APORT4XCH15 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_NEGSEL_APORT4XCH31               (_ACMP_INPUTSEL_NEGSEL_APORT4XCH31 << 8) /**< Shifted mode APORT4XCH31 for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_NEGSEL_VLP                       (_ACMP_INPUTSEL_NEGSEL_VLP << 8)         /**< Shifted mode VLP for ACMP_INPUTSEL */
 #define ACMP_INPUTSEL_NEGSEL_VBDIV                     (_ACMP_INPUTSEL_NEGSEL_VBDIV << 8)       /**< Shifted mode VBDIV for ACMP_INPUTSEL */

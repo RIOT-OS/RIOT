@@ -26,10 +26,10 @@
 static int read_acc(const void *dev, phydat_t *res)
 {
     const lsm303dlhc_t *d = (const lsm303dlhc_t *)dev;
-    lsm303dlhc_read_acc(d, (lsm303dlhc_3d_data_t *)res);
+    lsm303dlhc_read_acc(d, (lsm303dlhc_3d_data_t *)res->val);
 
     /* normalize result */
-    int fac = (1 << (d->acc_scale >> 4));
+    int fac = (1 << (d->params.acc_scale >> 4));
     for (int i = 0; i < 3; i++) {
         res->val[i] *= fac;
     }
@@ -43,11 +43,11 @@ static int read_mag(const void *dev, phydat_t *res)
 {
     const lsm303dlhc_t *d = (const lsm303dlhc_t *)dev;
 
-    lsm303dlhc_read_mag(d, (lsm303dlhc_3d_data_t *)res);
+    lsm303dlhc_read_mag(d, (lsm303dlhc_3d_data_t *)res->val);
 
     /* normalize results */
     int gain;
-    switch (d->mag_gain) {
+    switch (d->params.mag_gain) {
         case LSM303DLHC_MAG_GAIN_1100_980_GAUSS: gain = 1100; break;
         case LSM303DLHC_MAG_GAIN_855_760_GAUSS:  gain = 855;  break;
         case LSM303DLHC_MAG_GAIN_670_600_GAUSS:  gain = 670;  break;

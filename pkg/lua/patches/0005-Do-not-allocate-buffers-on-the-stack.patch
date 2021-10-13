@@ -1,0 +1,164 @@
+From e8f6c3d34a36a0e9a994d49d2f3ae4c3af18a09a Mon Sep 17 00:00:00 2001
+From: Juan Carrano <j.carrano@fu-berlin.de>
+Date: Wed, 9 May 2018 14:05:53 +0200
+Subject: [PATCH 5/7] Do not allocate buffers on the stack.
+
+Change luaL_Buffer so that the memory for the object is always allocated in the heap.
+---
+ lauxlib.c | 29 +++++++++++++++++++----------
+ lauxlib.h |  1 -
+ lstrlib.c |  6 +++---
+ ltablib.c |  2 +-
+ 4 files changed, 23 insertions(+), 15 deletions(-)
+
+diff --git a/lauxlib.c b/lauxlib.c
+index 8bd2b5af..3767439f 100644
+--- a/lauxlib.c
++++ b/lauxlib.c
+@@ -23,6 +23,7 @@
+ */
+ 
+ #include "lua.h"
++#include "llimits.h" /* to get lua_assert */
+ 
+ #include "lauxlib.h"
+ 
+@@ -493,10 +494,9 @@ static void *newbox (lua_State *L, size_t newsize) {
+ 
+ 
+ /*
+-** check whether buffer is using a userdata on the stack as a temporary
+-** buffer
++** check whether buffer has been assigned a memory region.
+ */
+-#define buffonstack(B)	((B)->b != (B)->initb)
++#define buffallocated(B) ((B)->b != NULL)
+ 
+ 
+ /*
+@@ -504,6 +504,15 @@ static void *newbox (lua_State *L, size_t newsize) {
+ */
+ LUALIB_API char *luaL_prepbuffsize (luaL_Buffer *B, size_t sz) {
+   lua_State *L = B->L;
++
++  lua_assert((B->size == 0) == (B->b == NULL));
++  lua_assert((B->n <= B->size));
++
++  /* Force an allocation if the requested size is zero and the buffer is not
++   * initialized. This avoids weird bugs */
++  if (sz == 0 && B->size == 0)
++    sz = 1;
++
+   if (B->size - B->n < sz) {  /* not enough space? */
+     char *newbuff;
+     size_t newsize = B->size * 2;  /* double buffer size */
+@@ -512,11 +521,10 @@ LUALIB_API char *luaL_prepbuffsize (luaL_Buffer *B, size_t sz) {
+     if (newsize < B->n || newsize - B->n < sz)
+       luaL_error(L, "buffer too large");
+     /* create larger buffer */
+-    if (buffonstack(B))
++    if (buffallocated(B))
+       newbuff = (char *)resizebox(L, -1, newsize);
+     else {  /* no buffer yet */
+       newbuff = (char *)newbox(L, newsize);
+-      memcpy(newbuff, B->b, B->n * sizeof(char));  /* copy original content */
+     }
+     B->b = newbuff;
+     B->size = newsize;
+@@ -542,7 +550,7 @@ LUALIB_API void luaL_addstring (luaL_Buffer *B, const char *s) {
+ LUALIB_API void luaL_pushresult (luaL_Buffer *B) {
+   lua_State *L = B->L;
+   lua_pushlstring(L, B->b, B->n);
+-  if (buffonstack(B)) {
++  if (buffallocated(B)) {
+     resizebox(L, -2, 0);  /* delete old buffer */
+     lua_remove(L, -2);  /* remove its header from the stack */
+   }
+@@ -559,23 +567,24 @@ LUALIB_API void luaL_addvalue (luaL_Buffer *B) {
+   lua_State *L = B->L;
+   size_t l;
+   const char *s = lua_tolstring(L, -1, &l);
+-  if (buffonstack(B))
++  if (buffallocated(B))
+     lua_insert(L, -2);  /* put value below buffer */
+   luaL_addlstring(B, s, l);
+-  lua_remove(L, (buffonstack(B)) ? -2 : -1);  /* remove value */
++  lua_remove(L, -2);  /* remove value */
+ }
+ 
+ 
+ LUALIB_API void luaL_buffinit (lua_State *L, luaL_Buffer *B) {
+   B->L = L;
+-  B->b = B->initb;
++  B->b = NULL;
+   B->n = 0;
+-  B->size = LUAL_BUFFERSIZE;
++  B->size = 0;
+ }
+ 
+ 
+ LUALIB_API char *luaL_buffinitsize (lua_State *L, luaL_Buffer *B, size_t sz) {
+   luaL_buffinit(L, B);
++
+   return luaL_prepbuffsize(B, sz);
+ }
+ 
+diff --git a/lauxlib.h b/lauxlib.h
+index 77d1494d..b11afc9a 100644
+--- a/lauxlib.h
++++ b/lauxlib.h
+@@ -148,7 +148,6 @@ typedef struct luaL_Buffer {
+   size_t size;  /* buffer size */
+   size_t n;  /* number of characters in buffer */
+   lua_State *L;
+-  char initb[LUAL_BUFFERSIZE];  /* initial buffer */
+ } luaL_Buffer;
+ 
+ 
+diff --git a/lstrlib.c b/lstrlib.c
+index 934b7db8..a978d07a 100644
+--- a/lstrlib.c
++++ b/lstrlib.c
+@@ -773,7 +773,7 @@ static int str_gsub (lua_State *L) {
+   luaL_argcheck(L, tr == LUA_TNUMBER || tr == LUA_TSTRING ||
+                    tr == LUA_TFUNCTION || tr == LUA_TTABLE, 3,
+                       "string/function/table expected");
+-  luaL_buffinit(L, &b);
++  luaL_buffinitsize(L, &b, luaL_len(L, 1));
+   if (anchor) {
+     p++; lp--;  /* skip anchor character */
+   }
+@@ -1020,7 +1020,7 @@ static int str_format (lua_State *L) {
+   const char *strfrmt = luaL_checklstring(L, arg, &sfl);
+   const char *strfrmt_end = strfrmt+sfl;
+   luaL_Buffer b;
+-  luaL_buffinit(L, &b);
++  luaL_buffinitsize(L, &b, LUAL_BUFFERSIZE);
+   while (strfrmt < strfrmt_end) {
+     if (*strfrmt != L_ESC)
+       luaL_addchar(&b, *strfrmt++);
+@@ -1335,7 +1335,7 @@ static int str_pack (lua_State *L) {
+   size_t totalsize = 0;  /* accumulate total size of result */
+   initheader(L, &h);
+   lua_pushnil(L);  /* mark to separate arguments from string buffer */
+-  luaL_buffinit(L, &b);
++  luaL_buffinitsize(L, &b, LUAL_BUFFERSIZE);
+   while (*fmt != '\0') {
+     int size, ntoalign;
+     KOption opt = getdetails(&h, totalsize, &fmt, &size, &ntoalign);
+diff --git a/ltablib.c b/ltablib.c
+index 588bf40d..0e50898b 100644
+--- a/ltablib.c
++++ b/ltablib.c
+@@ -173,7 +173,7 @@ static int tconcat (lua_State *L) {
+   const char *sep = luaL_optlstring(L, 2, "", &lsep);
+   lua_Integer i = luaL_optinteger(L, 3, 1);
+   last = luaL_optinteger(L, 4, last);
+-  luaL_buffinit(L, &b);
++  luaL_buffinitsize(L, &b, LUAL_BUFFERSIZE);
+   for (; i < last; i++) {
+     addfield(L, &b, i);
+     luaL_addlstring(&b, sep, lsep);
+-- 
+2.25.1
+

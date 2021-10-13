@@ -3,7 +3,8 @@ APPLICATION = ccn-lite-relay
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
 
-BOARD_WHITELIST := fox iotlab-m3 msba2 mulle native pba-d-01-kw2x samr21-xpro
+BOARD_WHITELIST := fox iotlab-m3 msba2 mulle native nrf52dk nrf52840dk \
+                   pba-d-01-kw2x samr21-xpro
 
 
 # This has to be the absolute path to the RIOT base directory:
@@ -29,16 +30,11 @@ USEMODULE += shell
 USEMODULE += shell_commands
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
-USEMODULE += gnrc_netdev_default
+USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
 # This application dumps received packets to STDIO using the pktdump module
 USEMODULE += gnrc_pktdump
-USEMODULE += timex
-USEMODULE += xtimer
-USEMODULE += random
 USEMODULE += prng_xorshift
-
-USEPKG += tlsf
 
 USEPKG += ccn-lite
 

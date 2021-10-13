@@ -1,0 +1,8 @@
+FEATURES_REQUIRED += cpu_core_cortexm
+
+USEMODULE += cmsis-nn_ActivationFunctions
+USEMODULE += cmsis-nn_ConvolutionFunctions
+USEMODULE += cmsis-nn_FullyConnectedFunctions
+USEMODULE += cmsis-nn_NNSupportFunctions
+USEMODULE += cmsis-nn_PoolingFunctions
+USEMODULE += cmsis-nn_SoftmaxFunctions

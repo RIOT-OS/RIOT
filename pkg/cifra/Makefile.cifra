@@ -1,0 +1,30 @@
+MODULE := cifra
+
+CFLAGS += -Wno-pedantic
+
+SRC += aes.c
+SRC += sha256.c
+SRC += sha512.c
+SRC += chash.c
+SRC += hmac.c
+SRC += pbkdf2.c
+SRC += modes.c
+SRC += eax.c
+SRC += gf128.c
+SRC += blockwise.c
+SRC += cmac.c
+SRC += salsa20.c
+SRC += chacha20.c
+SRC += curve25519.c
+SRC += gcm.c
+SRC += cbcmac.c
+SRC += ccm.c
+SRC += sha3.c
+SRC += sha1.c
+SRC += poly1305.c
+SRC += norx.c
+SRC += chacha20poly1305.c
+SRC += drbg.c
+SRC += ocb.c
+
+include $(RIOTBASE)/Makefile.base

@@ -1,0 +1,90 @@
+From 9f22d187cbd8a692b340aa6961ccfffde67fda9d Mon Sep 17 00:00:00 2001
+From: Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
+Date: Tue, 26 Nov 2019 13:18:36 +0100
+Subject: [PATCH 1/1] Fix multiple log of strings
+
+---
+ core/data.c        | 4 +++-
+ core/json.c        | 4 +++-
+ core/transaction.c | 6 ++++--
+ core/uri.c         | 8 +++++---
+ 4 files changed, 15 insertions(+), 7 deletions(-)
+
+diff --git a/core/data.c b/core/data.c
+index 824d9bf..e4dc154 100644
+--- a/core/data.c
++++ b/core/data.c
+@@ -255,7 +255,9 @@ void lwm2m_data_encode_nstring(const char * string,
+                                size_t length,
+                                lwm2m_data_t * dataP)
+ {
+-    LOG_ARG("length: %d, string: \"%s\"", length, string);
++    if (string) {
++        LOG_ARG("length: %d, string: \"%s\"", length, string);
++    }
+     lwm2m_data_encode_opaque((uint8_t *)string, length, dataP);
+ 
+     if (dataP->type == LWM2M_TYPE_OPAQUE)
+diff --git a/core/json.c b/core/json.c
+index 459fe9d..91562ce 100644
+--- a/core/json.c
++++ b/core/json.c
+@@ -768,7 +768,9 @@ int json_parse(lwm2m_uri_t * uriP,
+     _record_t * recordArray;
+     lwm2m_data_t * parsedP;
+ 
+-    LOG_ARG("bufferLen: %d, buffer: \"%s\"", bufferLen, (char *)buffer);
++    if (buffer) {
++        LOG_ARG("bufferLen: %d, buffer: \"%s\"", bufferLen, (char *)buffer);
++    }
+     LOG_URI(uriP);
+     *dataP = NULL;
+     recordArray = NULL;
+diff --git a/core/transaction.c b/core/transaction.c
+index de78b83..1749003 100644
+--- a/core/transaction.c
++++ b/core/transaction.c
+@@ -152,8 +152,10 @@ lwm2m_transaction_t * transaction_new(void * sessionH,
+     lwm2m_transaction_t * transacP;
+     int result;
+ 
+-    LOG_ARG("method: %d, altPath: \"%s\", mID: %d, token_len: %d",
+-            method, altPath, mID, token_len);
++    LOG_ARG("method: %d, mID: %d, token_len: %d", method, mID, token_len);
++    if (altPath) {
++        LOG_ARG("altPath: \"%s\"", altPath);
++    }
+     LOG_URI(uriP);
+ 
+     // no transactions without peer
+diff --git a/core/uri.c b/core/uri.c
+index bfe0a48..4f2ecae 100644
+--- a/core/uri.c
++++ b/core/uri.c
+@@ -99,7 +99,9 @@ lwm2m_uri_t * uri_decode(char * altPath,
+     lwm2m_uri_t * uriP;
+     int readNum;
+ 
+-    LOG_ARG("altPath: \"%s\"", altPath);
++    if (altPath) {
++        LOG_ARG("altPath: \"%s\"", altPath);
++    }
+ 
+     uriP = (lwm2m_uri_t *)lwm2m_malloc(sizeof(lwm2m_uri_t));
+     if (NULL == uriP) return NULL;
+@@ -212,10 +214,10 @@ int lwm2m_stringToUri(const char * buffer,
+     size_t head;
+     int readNum;
+ 
+-    LOG_ARG("buffer_len: %u, buffer: \"%.*s\"", buffer_len, buffer_len, buffer);
+-
+     if (buffer == NULL || buffer_len == 0 || uriP == NULL) return 0;
+ 
++    LOG_ARG("buffer_len: %u, buffer: \"%.*s\"", buffer_len, buffer_len, buffer);
++
+     memset(uriP, 0, sizeof(lwm2m_uri_t));
+ 
+     // Skip any white space
+-- 
+2.20.1
+

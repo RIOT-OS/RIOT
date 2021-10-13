@@ -1,0 +1,5 @@
+ifneq (,$(filter periph_gpio_tamper_wake,$(USEMODULE)))
+  USEMODULE += periph_rtc_rtt
+endif
+
+include $(RIOTCPU)/sam0_common/Makefile.dep

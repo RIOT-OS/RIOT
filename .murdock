@@ -1,15 +1,99 @@
 #!/bin/sh
 
-export TEST_BOARDS_AVAILABLE=${TEST_BOARDS_AVAILABLE:-"samr21-xpro"}
+: ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
+
+# temporarily disabling llvm builds until https://github.com/RIOT-OS/RIOT/pull/15595
+# is in
+#: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
+: ${TEST_BOARDS_LLVM_COMPILE:=""}
+
+: ${TEST_KCONFIG_BOARDS_AVAILABLE:="
+dwm1001
+hifive1
+native
+nrf52840dk
+nucleo-f103rb
+remote-revb
+samr21-xpro
+seeedstudio-gd32
+"}
+
+: ${TEST_KCONFIG_ENFORCE_APP_GROUPS:="
+tests/cb_mux*
+tests/congure_*
+tests/driver_b*
+tests/driver_f*
+tests/driver_g*
+tests/driver_h*
+tests/driver_i*
+tests/driver_j*
+tests/driver_l*
+tests/driver_o*
+tests/driver_p*
+tests/driver_q*
+tests/driver_r*
+tests/driver_s*
+tests/driver_t*
+tests/driver_u*
+tests/driver_v*
+tests/periph_*
+tests/prng_*
+tests/xtimer_*
+tests/ztimer_*
+examples/hello-world
+tests/ieee802154_hal
+"}
+
+: ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/driver_at86rf2xx_aes"}
+
 export RIOT_CI_BUILD=1
-export STATIC_TESTS=${STATIC_TESTS:-1}
+export CC_NOCOLOR=1
+export STATIC_TESTS=0
 export CFLAGS_DBG=""
 export DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
+export ENABLE_TEST_CACHE=${ENABLE_TEST_CACHE:-1}
+
+# This is a work around for a bug in CCACHE which interacts very badly with
+# some features of RIOT and of murdock. The result is that ccache is
+# ineffective (i.e. objects are never reused, resulting in extreme cache miss
+# rate) and murdock becomes slow.
+#
+# - CCACHE thinks that -gz by itself enables debugging, which is not true.
+#   see https://github.com/ccache/ccache/issues/464
+#   - When debug info is included, CCACHE hashes the file paths, as these
+#     influence the debug information (the name of compile units and/or their
+#     "comp_dir" attribute)
+# - Riot does not set -fdebug-prefix-map. This is not that easy as it may not
+#   be supported in every toolchain (some are quite old).
+# - Murdock builds PRs in different directories each time.
+#
+# It is only the combination of these three factors which causes this bug.
+export OPTIONAL_CFLAGS_BLACKLIST="-gz"
 
 NIGHTLY=${NIGHTLY:-0}
 RUN_TESTS=${RUN_TESTS:-${NIGHTLY}}
 
-DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS"
+DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS -E ENABLE_TEST_CACHE
+         -E TEST_HASH -E CI_PULL_LABELS -EPKG_USE_MIRROR"
+
+if [ ${NIGHTLY} -eq 1 ]; then
+    export PKG_USE_MIRROR=0
+fi
+
+get_supported_kconfig_board_app() {
+    local board=$1
+    local appdir=$2
+
+    if is_in_list "${board}" "${TEST_KCONFIG_BOARDS_AVAILABLE}"; then
+        if is_in_list "${appdir}" "${TEST_KCONFIG_ENFORCE_APP_GROUPS}"; then
+            return 0
+        fi
+        if [ -f "${appdir}/app.config.test" ]; then
+            return 0
+        fi
+    fi
+    return 1
+}
 
 check_label() {
     local label="${1}"
@@ -22,9 +106,37 @@ check_label() {
     check_label "CI: run tests" && RUN_TESTS=1
 }
 
+[ "$ENABLE_TEST_CACHE" = "1" ] && {
+    check_label "CI: disable test cache" && export ENABLE_TEST_CACHE=0
+}
+
 error() {
     echo "$@"
     exit 1
+}
+
+# true if "$2" starts with "$1", false otherwise
+startswith() {
+  case "${2}" in
+    ${1}*) true ;;
+    *) false ;;
+  esac
+}
+
+# if MURDOCK_HOOK is set, this function will execute it and pass on all it's
+# parameters. should the hook script exit with negative exit code, hook() makes
+# this script exit with error, too.
+# hook() will be called from different locations of this script.
+# currently, the only caller is "run_test", which calls "hook run_test_pre".
+# More hooks will be added as needed.
+hook() {
+    if [ -n "${MURDOCK_HOOK}" ]; then
+        echo "- executing hook $1"
+        "${MURDOCK_HOOK}" "$@" || {
+            error "$0: hook \"${MURDOCK_HOOK} $@\" failed!"
+        }
+        echo "- hook $1 finished"
+    fi
 }
 
 # true if word "$1" is in list of words "$2", false otherwise
@@ -39,11 +151,17 @@ is_in_list() {
     echo "$haystack" | grep -q -w "$needle"
 }
 
+# grep that doesn't return error on empty input
+_grep() {
+    grep "$@"
+    true
+}
+
 _greplist() {
     if [ $# -eq 0 ]; then
         echo cat
     else
-        echo -n "grep -E ($1"
+        echo -n "_grep -E ($1"
         shift
         for i in $*; do
             echo -n "|$i"
@@ -54,9 +172,8 @@ _greplist() {
 
 # get list of all app directories
 get_apps() {
-    find tests/ examples/ \
-        -mindepth 2 -maxdepth 2 -name Makefile -type f \
-        | xargs dirname | $(_greplist $APPS) | sort
+    make -f makefiles/app_dirs.inc.mk info-applications \
+        | $(_greplist $APPS) | sort
 }
 
 # take app dir as parameter, print all boards that are supported
@@ -76,22 +193,50 @@ get_supported_boards() {
     done | $(_greplist $BOARDS)
 }
 
-# given an app dir as parameter, print "$appdir board" for each supported
-# board. Only print for boards in $BOARDS.
-get_app_board_pairs() {
+get_supported_toolchains() {
     local appdir=$1
-    for board in $(get_supported_boards $appdir)
+    local board=$2
+    local toolchains="gnu"
+
+    if is_in_list "${board}" "${TEST_BOARDS_LLVM_COMPILE}"; then
+        toolchains="$(make -s --no-print-directory -C${appdir} BOARD=${board} \
+                      info-toolchains-supported 2> /dev/null | grep -o -e "llvm" -e "gnu")"
+    fi
+    echo "${toolchains}"
+}
+
+# given an app dir as parameter, print "$appdir $board:$toolchain" for each
+# supported board and toolchain. Only print for boards in $BOARDS.
+# if extra args are given, they will be prepended to each output line.
+get_app_board_toolchain_pairs() {
+    local appdir=$1
+    local boards="$(get_supported_boards $appdir)"
+
+    # collect extra arguments into prefix variable
+    shift
+    local prefix="$*"
+
+    if [ "$boards" = makefile_broken ]; then
+        echo "$appdir makefile_broken"
+        return
+    fi
+
+    for board in ${boards}
     do
-        echo $appdir $board
+        for toolchain in $(get_supported_toolchains $appdir $board)
+        do
+            echo $prefix $appdir $board:$toolchain
+        done
     done | $(_greplist $BOARDS)
 }
 
-# use dwqc to create full "appdir board" compile job list
+# use dwqc to create full "appdir board toolchain" compile job list
 get_compile_jobs() {
+    check_label "CI: skip compile test" && return
     get_apps | \
         dwqc ${DWQ_ENV} -s \
-        "$0 get_app_board_pairs \${1}" \
-        | xargs '-d\n' -n 1 echo $0 compile
+        ${DWQ_JOBID:+--subjob} \
+        "$0 get_app_board_toolchain_pairs \${1} $0 compile"
 }
 
 print_worker() {
@@ -99,12 +244,42 @@ print_worker() {
         echo "-- running on worker ${DWQ_WORKER} thread ${DWQ_WORKER_THREAD}, build number $DWQ_WORKER_BUILDNUM."
 }
 
-# compile one app for one board. delete intermediates.
+test_hash_calc() {
+    local bindir=$1
+
+    # Why two times cut?
+    # "test-input-hash.sha1" contains a list of lines containing
+    # "<hash> <filename>" on each line.
+    # We need to filter out the filename, as it contains the full path name,
+    # which differs depending on the build machine.
+    #
+    # After piping through sha1sum, we get "<hash> -". " -" has to go so we save the
+    # hassle of escaping the resulting hash.
+
+    cat ${bindir}/test-input-hash.sha1 | cut -f1 -d' ' | sha1sum | cut -f1 -d' '
+}
+
+test_cache_get() {
+    test "${ENABLE_TEST_CACHE}" = "1" || return 1
+    test -n "$(redis-cli get $1)" > /dev/null
+}
+
+test_cache_put() {
+    redis-cli set "$1" ok
+}
+
+# compile one app for one board with one toolchain. delete intermediates.
 compile() {
     local appdir=$1
-    local board=$2
+    local board=$(echo $2 | cut -f 1 -d':')
+    local toolchain=$(echo $2 | cut -f 2 -d':')
 
-    [ "$board" = "makefile_broken" ] && error "$0: Makefile in \"$appdir\" seems to be broken!"
+    [ "$board" = "makefile_broken" ] && {
+        echo "$0: There seems to be a problem in \"$appdir\" while getting supported boards!"
+        echo "$0: testing \"make -C$appdir info-boards-supported\"..."
+        make -C$appdir info-boards-supported && echo "$0: success. no idea what's wrong." || echo "$0: failed!"
+        exit 1
+    }
 
     # set build directory. CI ensures only one build at a time in $(pwd).
     export BINDIR="$(pwd)/build"
@@ -116,14 +291,44 @@ compile() {
     print_worker
 
     # sanity checks
-    [ $# -ne 2 ] && error "$0: compile: invalid parameters (expected \$appdir \$board)"
+    [ $# -ne 2 ] && error "$0: compile: invalid parameters (expected \$appdir \$board:\$toolchain)"
     [ ! -d "$appdir" ] && error "$0: compile: error: application directory \"$appdir\" doesn't exist"
-    [ ! -d "boards/$board" ] && error "$0: compile: error: board directory \"boards/$board\" doesn't exist"
 
-    # compile
-    CCACHE_BASEDIR="$(pwd)" BOARD=$board RIOT_CI_BUILD=1 \
-        make -C${appdir} clean all -j${JOBS:-4}
+    # We compile a first time with Kconfig based dependency
+    # resolution for regression purposes. $TEST_KCONFIG contains a
+    # list of board-application tuples that are currently modeled to
+    # run with Kconfig
+
+    should_check_kconfig_hash=0
+
+    if get_supported_kconfig_board_app "${board}" "${appdir}"; then
+        should_check_kconfig_hash=1
+        BOARD=${board} make -C${appdir} clean
+        CCACHE_BASEDIR="$(pwd)" BOARD=${board} TOOLCHAIN=${toolchain} RIOT_CI_BUILD=1 TEST_KCONFIG=1 \
+                        make -C${appdir} all test-input-hash -j${JOBS:-4}
+        RES=$?
+        if [ $RES -eq 0 ]; then
+            kconfig_test_hash=$(test_hash_calc "${BINDIR}")
+        else
+            kconfig_test_hash=0
+            echo "An error occurred while compiling using Kconfig";
+        fi
+    fi
+
+    # compile without Kconfig
+    CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
+        make -C${appdir} clean all test-input-hash -j${JOBS:-4}
     RES=$?
+
+    test_hash=$(test_hash_calc "$BINDIR")
+
+    if [ ${should_check_kconfig_hash} != 0 ]; then
+        if [ ${kconfig_test_hash} != ${test_hash} ]; then
+            echo "Hashes of binaries with and without Kconfig mismatch for ${appdir}";
+            echo "Please check that all used modules are modelled in Kconfig and enabled";
+            RES=1
+        fi
+    fi
 
     # run tests
     if [ $RES -eq 0 ]; then
@@ -133,8 +338,14 @@ compile() {
                     BOARD=$board make -C${appdir} test
                     RES=$?
                 elif is_in_list "$board" "$TEST_BOARDS_AVAILABLE"; then
-                    BOARD=$board make -C${appdir} test-murdock
-                    RES=$?
+                    echo "-- test_hash=$test_hash"
+                    if test_cache_get $test_hash; then
+                        echo "-- skipping test due to positive cache hit"
+                    else
+                        BOARD=$board TOOLCHAIN=$toolchain TEST_HASH=$test_hash \
+                            make -C${appdir} test-murdock
+                        RES=$?
+                    fi
                 fi
             fi
         fi
@@ -153,51 +364,78 @@ compile() {
 
 test_job() {
     local appdir=$1
-    local board=$2
-    local flashfile="$3"
+    local board=$(echo $2 | cut -f 1 -d':')
+    local toolchain=$(echo $2 | cut -f 2 -d':')
 
-    [ ! -f "$flashfile" ] && {
-        echo "$0: _test(): flashfile \"$flashfile\" doesn't exist!"
-        return 1
-    }
+    # interpret any extra arguments as file names.
+    # They will be sent along with the job to the test worker
+    # and stored in the application's binary folder.
+    shift 2
+    local files=""
+    for filename in "$@"; do
+        # check if the file is within $(BINDIR)
+        if startswith "${BINDIR}" "${filename}"; then
+          # get relative (to $(BINDIR) path
+          local relpath="$(realpath --relative-to ${BINDIR} ${filename})"
+        else
+          error "$0: error: extra test files not within \${BINDIR}!"
+        fi
+
+        # set remote file path.
+        # currently, the test workers build in the default build path.
+        local remote_bindir="${appdir}/bin/${board}"
+        files="${files} --file ${filename}:${remote_bindir}/${relpath}"
+    done
 
     dwqc \
         ${DWQ_ENV} \
         ${DWQ_JOBID:+--subjob} \
-        --file $flashfile:$appdir/bin/${board}/$(basename $flashfile) \
         --queue ${TEST_QUEUE:-$board} \
         --maxfail 1 \
-        "./.murdock run_test $appdir $board"
+        $files \
+        "./.murdock run_test $appdir $board:$toolchain"
 }
 
 run_test() {
     local appdir=$1
-    local board=$2
+    local board=$(echo $2 | cut -f 1 -d':')
+    local toolchain=$(echo $2 | cut -f 2 -d':')
     print_worker
-    echo "-- executing tests for $appdir on $board:"
-    BOARD=$board make -C$appdir flash-only test
+    echo "-- executing tests for $appdir on $board (compiled with $toolchain toolchain):"
+    hook run_test_pre
+
+    # do flashing and building of termdeps simultaneously
+    BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir flash-only termdeps -j2
+
+    # now run the actual test
+    if is_in_list "${appdir}" "${TEST_WITH_CONFIG_SUPPORTED}"; then
+        BOARD=${board} TOOLCHAIN=${toolchain} make -C${appdir} test-with-config
+    else
+        BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir test
+    fi
+    RES=$?
+
+    if [ $RES -eq 0 -a -n "$TEST_HASH" ]; then
+        echo -n "-- saving test result to cache: "
+        test_cache_put $TEST_HASH
+    fi
+
+    return $RES
 }
 
 # execute static tests
 static_tests() {
-    local repo=${CI_BASE_REPO:-https://github.com/RIOT-OS/RIOT}
-    local branch=${CI_BASE_BRANCH:-master}
-
     print_worker
+    ./dist/tools/ci/static_tests.sh
+}
 
-    OUT="$(git remote add upstream $repo 2>&1 && git fetch upstream ${branch}:${branch} 2>&1)"
-    RES=$?
-    if [ $RES -ne 0 ]; then
-        echo "$OUT"
-        exit 1
-    fi
-
-    BUILDTEST_MCU_GROUP=static-tests ./dist/tools/ci/build_and_test.sh
+get_non_compile_jobs() {
+    [ "$STATIC_TESTS" = "1" ] && \
+        echo "$0 static_tests"
 }
 
 get_jobs() {
-    [ "$STATIC_TESTS" = "1" ] && \
-        echo "$0 static_tests###{ \"jobdir\" : \"exclusive\" }"
+    get_non_compile_jobs
     get_compile_jobs
 }
 

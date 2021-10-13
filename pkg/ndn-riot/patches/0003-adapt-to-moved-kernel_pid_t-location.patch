@@ -1,0 +1,140 @@
+From 17b6e4d2da20af995e914c8650ee825d052c5bc6 Mon Sep 17 00:00:00 2001
+From: Kaspar Schleiser <kaspar@schleiser.de>
+Date: Mon, 23 Nov 2020 12:44:54 +0100
+Subject: [PATCH] adapt to moved kernel_pid_t location
+
+---
+ app.h                 | 2 +-
+ cs.h                  | 1 -
+ face-table.h          | 2 +-
+ fib.h                 | 2 +-
+ forwarding-strategy.h | 2 +-
+ l2.h                  | 2 +-
+ ndn.h                 | 2 +-
+ netif.h               | 2 +-
+ pit.h                 | 2 +-
+ 9 files changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/app.h b/app.h
+index 6428921acf..c357692a38 100644
+--- a/app.h
++++ b/app.h
+@@ -23,9 +23,9 @@
+ #include "encoding/name.h"
+ #include "forwarding-strategy.h"
+ 
+-#include <kernel_types.h>
+ #include <xtimer.h>
+ #include <net/gnrc/pktbuf.h>
++#include "sched.h"
+ 
+ #ifdef __cplusplus
+ extern "C" {
+diff --git a/cs.h b/cs.h
+index 36bf38d82a..01edf2bbc1 100644
+--- a/cs.h
++++ b/cs.h
+@@ -22,7 +22,6 @@
+ 
+ #include "encoding/shared-block.h"
+ 
+-#include <kernel_types.h>
+ //#include <xtimer.h>
+ 
+ #ifdef __cplusplus
+diff --git a/face-table.h b/face-table.h
+index 28b44a5c02..fb0c39b083 100644
+--- a/face-table.h
++++ b/face-table.h
+@@ -20,7 +20,7 @@
+ #ifndef NDN_FACE_TABLE_H_
+ #define NDN_FACE_TABLE_H_
+ 
+-#include <kernel_types.h>
++#include "sched.h"
+ 
+ #ifdef __cplusplus
+ extern "C" {
+diff --git a/fib.h b/fib.h
+index 8d5f01ab79..5e190d283a 100644
+--- a/fib.h
++++ b/fib.h
+@@ -23,8 +23,8 @@
+ #include "encoding/shared-block.h"
+ #include "face-table.h"
+ 
+-#include <kernel_types.h>
+ #include <xtimer.h>
++#include "sched.h"
+ 
+ #ifdef __cplusplus
+ extern "C" {
+diff --git a/forwarding-strategy.h b/forwarding-strategy.h
+index 43ad66c276..15fdc5b8c7 100644
+--- a/forwarding-strategy.h
++++ b/forwarding-strategy.h
+@@ -22,7 +22,7 @@
+ 
+ #include "encoding/shared-block.h"
+ 
+-#include <kernel_types.h>
++#include "sched.h"
+ 
+ #ifdef __cplusplus
+ extern "C" {
+diff --git a/l2.h b/l2.h
+index 2dc1dad986..6322276f10 100644
+--- a/l2.h
++++ b/l2.h
+@@ -22,8 +22,8 @@
+ 
+ #include "encoding/shared-block.h"
+ 
+-#include <kernel_types.h>
+ #include <net/gnrc/pktbuf.h>
++#include "sched.h"
+ 
+ #ifdef __cplusplus
+ extern "C" {
+diff --git a/ndn.h b/ndn.h
+index d8d148c7f7..47d2032301 100644
+--- a/ndn.h
++++ b/ndn.h
+@@ -20,7 +20,7 @@
+ #ifndef NDN_H_
+ #define NDN_H_
+ 
+-#include <kernel_types.h>
++#include "sched.h"
+ 
+ #ifdef __cplusplus
+ extern "C" {
+diff --git a/netif.h b/netif.h
+index 2175858fbd..4cf3c9bd54 100644
+--- a/netif.h
++++ b/netif.h
+@@ -20,7 +20,7 @@
+ #ifndef NDN_NETIF_H_
+ #define NDN_NETIF_H_
+ 
+-#include <kernel_types.h>
++#include "sched.h"
+ 
+ #include "encoding/block.h"
+ 
+diff --git a/pit.h b/pit.h
+index dbe433eeda..3384a4c887 100644
+--- a/pit.h
++++ b/pit.h
+@@ -23,7 +23,7 @@
+ #include "encoding/shared-block.h"
+ #include "face-table.h"
+ 
+-#include <kernel_types.h>
++#include "sched.h"
+ #include <xtimer.h>
+ 
+ #ifdef __cplusplus
+-- 
+2.29.2
+

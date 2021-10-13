@@ -1,0 +1,5 @@
+CFLAGS += -Wno-strict-aliasing
+CFLAGS += -Wno-unused-parameter
+
+# Include RIOT settings and recipes
+include $(RIOTBASE)/Makefile.base

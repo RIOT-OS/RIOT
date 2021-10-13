@@ -1,0 +1,55 @@
+# Copyright (c) 2019 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_SOCK_UTIL
+    bool "Configure SOCK utility functions"
+    depends on USEMODULE_SOCK_UTIL
+
+if KCONFIG_USEMODULE_SOCK_UTIL
+
+config SOCK_SCHEME_MAXLEN
+    int "Maximum length of the scheme part"
+    default 16
+    help
+        This value is used in sock_urlsplit().
+
+config SOCK_HOSTPORT_MAXLEN
+    int "Maximum length of host:port part"
+    default 64
+    help
+        This value is used in sock_urlsplit().
+
+config SOCK_URLPATH_MAXLEN
+    int "Maximum path length"
+    default 64
+    help
+        This value is used in sock_urlsplit().
+
+endif # KCONFIG_USEMODULE_SOCK_UTIL
+
+menuconfig KCONFIG_USEMODULE_SOCK_DTLS
+    bool "Configure SOCK DTLS"
+    depends on USEMODULE_SOCK_DTLS
+
+if KCONFIG_USEMODULE_SOCK_DTLS
+
+config DTLS_HANDSHAKE_BUFSIZE_EXP
+    int "Exponent for the DTLS buffer size (resulting in the buffer size 2^n)"
+    default 8
+    help
+        As the buffer size ALWAYS needs to be power of two, this option
+        represents the exponent of 2^n, which will be used as the size of the
+        buffer. The buffer is used to hold credentials during DTLS handshakes.
+
+config DTLS_CREDENTIALS_MAX
+    int "Buffer size for TLS credential tags"
+    default 4
+
+config DTLS_PSK_ID_HINT_MAX_SIZE
+    int "Maximum size for a PSK Identity hint string"
+    default 32
+
+endif # KCONFIG_USEMODULE_SOCK_DTLS

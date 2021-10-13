@@ -1,9 +1,3 @@
-# define the cpu used by the saml21 board
-export CPU = saml21
-export CPU_MODEL = saml21j18a
-export CFLAGS += -D__SAML21J18A__
-
-# set edbg device type
-EDBG_DEVICE_TYPE = atmel_cm0p
+CFLAGS += -D__SAML21J18A__
 
 include $(RIOTMAKE)/boards/sam0.inc.mk

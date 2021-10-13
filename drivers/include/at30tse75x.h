@@ -64,7 +64,6 @@ extern "C" {
 #define AT30TSE75X_FRACTIONAL_BASE      (0.0625f)
 /** @} */
 
-
 /**
  * @name    AT30TSE75x configuration register
  *
@@ -118,7 +117,7 @@ typedef enum {
 /**
   * @brief   Operation mode
   *
-  * The device can run in continous or one-shot mode. While in one-shot mode it
+  * The device can run in continuous or one-shot mode. While in one-shot mode it
   * is effectively shutdown and only wakes up to perform a single measurement.
   * When in comparator or interrupt mode, the device samples contiously the
   * temperature and sets the ALERT pin according to the chosen mode.
@@ -162,7 +161,6 @@ typedef struct {
  *
  * @param[out] dev          device descriptor
  * @param[in] i2c           I2C bus the device is connected to
- * @param[in] speed         I2C speed to use
  * @param[in] addr          I2C address of the device
  *
  * The valid address range is 0x48 - 0x4f depending on the configuration of the
@@ -172,7 +170,7 @@ typedef struct {
  * @return                  -1 on error
  * @return                  -2 on invalid address
  */
-int at30tse75x_init(at30tse75x_t* dev, i2c_t i2c, i2c_speed_t speed, uint8_t addr);
+int at30tse75x_init(at30tse75x_t* dev, i2c_t i2c, uint8_t addr);
 
 /**
  * @brief   Save configuration register to non-volatile backup register

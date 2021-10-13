@@ -1,0 +1,21 @@
+PICO_DEBUG      ?=
+ROM_LEN         ?= 2097152 # = 2 MiB used in the RPi Pico
+ROM_OFFSET      := 256 # bootloader size
+RAM_LEN         := 270336 # = 264 KiB
+ROM_START_ADDR  := 0x10000000
+RAM_START_ADDR  := 0x20000000
+
+CFLAGS += -D$(CPU_MODEL)
+CFLAGS += -DROM_START_ADDR=$(ROM_START_ADDR)
+CFLAGS += -DRAM_START_ADDR=$(RAM_START_ADDR)
+
+INCLUDES += -I$(RIOTCPU)/rpx0xx/include
+
+VECTORS_O       ?= $(BINDIR)/cpu/vectors.o
+VECTORS_FILE    := $(RIOTCPU)/rpx0xx/vectors.c
+
+PROGRAMMERS_SUPPORTED   := uf2conv openocd jlink
+PROGRAMMER              ?= openocd
+OPENOCD_DEBUG_ADAPTER   ?= dap
+
+include $(RIOTMAKE)/arch/cortexm.inc.mk

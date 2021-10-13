@@ -16,8 +16,8 @@
 // For some boards RIOT defines a macro assigning the required baudrate of the
 // serial link. If this macro is not set, the default baudrate is set to
 // 115200.
-#ifdef UART_STDIO_BAUDRATE
-#define SERIAL_BAUDRATE UART_STDIO_BAUDRATE
+#ifdef STDIO_UART_BAUDRATE
+#define SERIAL_BAUDRATE STDIO_UART_BAUDRATE
 #else
 #define SERIAL_BAUDRATE 115200
 #endif

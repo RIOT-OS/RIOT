@@ -14,7 +14,7 @@
  *
  * @note    **WARNING!!** Do not store data structures that are not packed
  *          (defined with `__attribute__((packed))`) or enforce alignment in
- *          in any way in here if @ref GNRC_PKTBUF_SIZE > 0. On some RISC architectures
+ *          in any way in here if @ref CONFIG_GNRC_PKTBUF_SIZE > 0. On some RISC architectures
  *          this *will* lead to alignment problems and can potentially result
  *          in segmentation/hard faults and other unexpected behaviour.
  *
@@ -35,6 +35,7 @@
 #include <string.h>
 
 #include "cpu_conf.h"
+#include "mutex.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/neterr.h"
 #include "net/gnrc/nettype.h"
@@ -45,18 +46,24 @@ extern "C" {
 #endif
 
 /**
- * @def     GNRC_PKTBUF_SIZE
+ * @def     CONFIG_GNRC_PKTBUF_SIZE
+ * @defgroup net_gnrc_pktbuf_conf GNRC PKTBUF compile configurations
+ * @ingroup net_gnrc_conf
+ * @{
+ */
+/**
  * @brief   Maximum size of the static packet buffer.
  *
  * @details The rational here is to have at least space for 4 full-MTU IPv6
  *          packages (2 incoming, 2 outgoing; 2 * 2 * 1280 B = 5 KiB) +
  *          Meta-Data (roughly estimated to 1 KiB; might be smaller). If
- *          @ref GNRC_PKTBUF_SIZE is 0 the packet buffer will use dynamic memory
+ *          @ref CONFIG_GNRC_PKTBUF_SIZE is 0 the packet buffer will use dynamic memory
  *          management to allocate packets.
  */
-#ifndef GNRC_PKTBUF_SIZE
-#define GNRC_PKTBUF_SIZE    (6144)
-#endif  /* GNRC_PKTBUF_SIZE */
+#ifndef CONFIG_GNRC_PKTBUF_SIZE
+#define CONFIG_GNRC_PKTBUF_SIZE    (6144)
+#endif
+/** @} */
 
 /**
  * @brief   Initializes packet buffer module.
@@ -70,7 +77,7 @@ void gnrc_pktbuf_init(void);
  *          function externally. This will most likely create memory leaks or
  *          not allowed memory access.
  *
- * @pre size < GNRC_PKTBUF_SIZE
+ * @pre size < CONFIG_GNRC_PKTBUF_SIZE
  *
  * @param[in] next      Next gnrc_pktsnip_t in the packet. Leave NULL if you
  *                      want to create a new packet.
@@ -84,7 +91,7 @@ void gnrc_pktbuf_init(void);
  * @return  Pointer to the packet part that represents the new gnrc_pktsnip_t.
  * @return  NULL, if no space is left in the packet buffer.
  */
-gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, void *data, size_t size,
+gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, const void *data, size_t size,
                                 gnrc_nettype_t type);
 
 /**
@@ -112,6 +119,9 @@ gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, void *data, size_t size,
  * @param[in] pkt   A received packet.
  * @param[in] size  The size of the new packet snip.
  * @param[in] type  The type of the new packet snip.
+ *
+ * @note    It's not guaranteed that `result->data` points to the same address
+ *          as the original `pkt->data`.
  *
  * @return  The new packet snip in @p pkt on success.
  * @return  NULL, if pkt == NULL or size == 0 or size > pkt->size or pkt->data == NULL.
@@ -172,37 +182,20 @@ static inline void gnrc_pktbuf_release(gnrc_pktsnip_t *pkt)
 }
 
 /**
- * @brief   Must be called once before there is a write operation in a thread.
+ * @brief   Must be called once before there is a write operation on a
+ *          [packet snip](@ref gnrc_pktsnip_t) in a thread.
  *
- * @details This function duplicates a packet in the packet buffer if
+ * @details This function duplicates a packet snip in the packet buffer (both
+ *          the instance of the gnrc_pktsnip_t and its data) if
  *          gnrc_pktsnip_t::users of @p pkt > 1.
  *
- * @note    Do *not* call this function in a thread twice on the same packet.
+ * @param[in] pkt   The packet snip you want to write into.
  *
- * @param[in] pkt   The packet you want to write into.
- *
- * @return  The (new) pointer to the pkt.
+ * @return  The (new) pointer to the packet snip.
  * @return  NULL, if gnrc_pktsnip_t::users of @p pkt > 1 and if there is not
  *          enough space in the packet buffer.
  */
 gnrc_pktsnip_t *gnrc_pktbuf_start_write(gnrc_pktsnip_t *pkt);
-
-/**
- * @brief   Create a IOVEC representation of the packet pointed to by *pkt*
- *
- * @pre `(len != NULL)`
- *
- * @details This function will create a new packet snip in the packet buffer,
- *          which points to the given *pkt* and contains a IOVEC representation
- *          of the referenced packet in its data section.
- *
- * @param[in]  pkt  Packet to export as IOVEC
- * @param[out] len  Number of elements in the IOVEC
- *
- * @return  Pointer to the 'IOVEC packet snip'
- * @return  NULL, if packet is empty of the packet buffer is full
- */
-gnrc_pktsnip_t *gnrc_pktbuf_get_iovec(gnrc_pktsnip_t *pkt, size_t *len);
 
 /**
  * @brief   Deletes a snip from a packet and the packet buffer.
@@ -215,65 +208,76 @@ gnrc_pktsnip_t *gnrc_pktbuf_get_iovec(gnrc_pktsnip_t *pkt, size_t *len);
 gnrc_pktsnip_t *gnrc_pktbuf_remove_snip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *snip);
 
 /**
- * @brief   Replace a snip from a packet and the packet buffer by another snip.
+ * @brief   Reverses snip order of a packet in a write-protected manner.
  *
- * @param[in] pkt   A packet
- * @param[in] old   snip currently in the packet
- * @param[in] add   snip which will replace old
+ * This can be used to change the send/receive order of a packet (see
+ * @ref gnrc_pktsnip_t)
  *
- * @return  The new reference to @p pkt
+ * @note    @p pkt is released on failure.
+ *
+ * @param[in] pkt   A packet. When this function fails (due to a full packet
+ *                  packet buffer) @p pkt will be released.
+ *
+ * @return  The reversed version of @p pkt on success
+ * @return  NULL, when there is not enough space in the packet buffer to reverse
+ *          the packet in a write-protected manner. @p pkt is released in that
+ *          case.
  */
-gnrc_pktsnip_t *gnrc_pktbuf_replace_snip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *old, gnrc_pktsnip_t *add);
+gnrc_pktsnip_t *gnrc_pktbuf_reverse_snips(gnrc_pktsnip_t *pkt);
 
 /**
- * @brief Duplicates pktsnip chain upto (including) a snip with the given type
- *        as a continuous snip.
+ * @brief   Merge pktsnip chain to single pktsnip.
  *
- *          Example:
- *              Input:
- *                                                                  buffer
- *              +---------------------------+                      +------+
- *              | size = 8                  | data       +-------->|      |
- *              | type = NETTYPE_IPV6_EXT   |------------+         +------+
- *              +---------------------------+                      .      .
- *                    | next                                       .      .
- *                    v                                            .      .
- *              +---------------------------+                      +------+
- *              | size = 40                 | data    +----------->|      |
- *              | type = NETTYPE_IPV6       |---------+            +------+
- *              +---------------------------+                      .      .
- *                    | next                                       .      .
- *                    v
- *              +---------------------------+                      +------+
- *              | size = 14                 | data +-------------->|      |
- *              | type = NETTYPE_NETIF      |------+               +------+
- *              +---------------------------+                      .      .
+ * Specifically it calls @ref gnrc_pktbuf_realloc_data() on @p pkt, then copies
+ * the data of all following packet snips into that reallocated space, and
+ * removes the packet snip the data was copied from afterwards.
+ *
+ * ### Example
+ * #### Input
+ *
+ *                                                         buffer
+ *     +---------------------------+                      +------+
+ *     | size = 8                  | data       +-------->|      |
+ *     | type = NETTYPE_IPV6       |------------+         +------+
+ *     +---------------------------+                      .      .
+ *           | next                                       .      .
+ *           v                                            .      .
+ *     +---------------------------+                      +------+
+ *     | size = 40                 | data    +----------->|      |
+ *     | type = NETTYPE_UDP        |---------+            +------+
+ *     +---------------------------+                      .      .
+ *           | next                                       .      .
+ *           v
+ *     +---------------------------+                      +------+
+ *     | size = 14                 | data +-------------->|      |
+ *     | type = NETTYPE_UNDEF      |------+               +------+
+ *     +---------------------------+                      .      .
  *
  *
- *              Output:
- *                                                                  buffer
- *              +---------------------------+                      +------+
- *              | size = 48                 | data       +-------->|      |
- *              | type = NETTYPE_IPV6       |------------+         |      |
- *              +---------------------------+                      |      |
- *                    |                                            +------+
- *                    |                                            .      .
- *                    | next                                       .      .
- *                    v
- *              +---------------------------+                      +------+
- *              | size = 14                 | data +-------------->|      |
- *              | type = NETTYPE_NETIF      |------+               +------+
- *              +---------------------------+                      .      .
+ * #### Output
  *
- *        The original snip is keeped as is except `users` decremented.
+ *                                                         buffer
+ *     +---------------------------+                      +------+
+ *     | size = 62                 | data       +-------->|      |
+ *     | type = NETTYPE_IPV6       |------------+         |      |
+ *     +---------------------------+                      |      |
+ *                                                        |      |
+ *                                                        |      |
+ *                                                        |      |
+ *                                                        +------+
+ *                                                                 .      .
  *
- * @param[in,out] pkt   The snip to duplicate.
- * @param[in]     type  The type of snip to stop duplication.
+ * @warning @p pkt needs to write protected before calling this function.
+ * @note    Packets in receive order need to call
+ *          @ref gnrc_pktbuf_reverse_snips() first to get the data in the
+ *          correct order.
  *
- * @return The duplicated snip, if succeeded.
- * @return NULL, if no space is left in the packet buffer.
+ * @param[in,out] pkt   The snip to merge.
+ *
+ * @return  0, on success
+ * @return  ENOMEM, if no space is left in the packet buffer.
  */
-gnrc_pktsnip_t *gnrc_pktbuf_duplicate_upto(gnrc_pktsnip_t *pkt, gnrc_nettype_t type);
+int gnrc_pktbuf_merge(gnrc_pktsnip_t *pkt);
 
 #ifdef DEVELHELP
 /**

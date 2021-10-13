@@ -7,11 +7,14 @@
  */
 
 /**
- * @defgroup   drivers_adcxx1x ADCXX1C ADC device driver
+ * @defgroup   drivers_adcxx1c ADCXX1C ADC device driver
  * @ingroup    drivers_sensors
+ * @ingroup    drivers_saul
  * @brief      I2C Analog-to-Digital Converter device driver
  *
- *             This driver works with adc081c, adc101c and adc121c versions.
+ * This driver works with adc081c, adc101c and adc121c versions.
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file
@@ -85,6 +88,14 @@ enum {
 };
 
 /**
+ * @brief   Alert values
+ */
+enum {
+    ADCXX1C_ALERT_UNDER_RANGE   = 1,    /**< Measured voltage fell below Vlow */
+    ADCXX1C_ALERT_OVER_RANGE    = 2,    /**< Measured voltage exceeded Vhigh */
+};
+
+/**
  * @brief   ADCxx1C params
  */
 typedef struct adcxx1c_params {
@@ -155,6 +166,16 @@ int adcxx1c_enable_alert(adcxx1c_t *dev, adcxx1c_cb_t cb, void *arg);
  */
 int adcxx1c_set_alert_parameters(const adcxx1c_t *dev, int16_t low_limit,
                                  int16_t high_limit, int16_t hysteresis);
+
+/**
+ * @brief   Get alert source and clear it
+ *
+ * @param[in,out]   dev       device descriptor
+ *
+ * @return a combination of ADCXX1C_ALERT_OVER_RANGE and ADCXX1C_ALERT_UNDER_RANGE on success
+ * @return negative error code on error
+ */
+int adcxx1c_get_and_clear_alert(const adcxx1c_t *dev);
 
 #ifdef __cplusplus
 }

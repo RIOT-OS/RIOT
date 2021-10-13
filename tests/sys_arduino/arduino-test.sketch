@@ -1,0 +1,179 @@
+/*
+ * Copyright (C) 2018 Federico Pellegrin <fede@evolware.org>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     tests
+ * @{
+ *
+ * @file
+ * @brief       Test application for arduino module
+ *
+ * @author      Federico Pellegrin <fede@evolware.org>
+ *
+ * @}
+ */
+
+#include <stdlib.h>
+#include <string.h>
+
+#ifdef STDIO_UART_BAUDRATE
+#define SERIAL_BAUDRATE STDIO_UART_BAUDRATE
+#else
+#define SERIAL_BAUDRATE 115200
+#endif
+
+/* Input buffer for receiving chars on the serial port */
+char buf[64];
+
+/* Counter of received chars in currently receiving line */
+int count = 0;
+
+void setup(void)
+{
+    Serial.begin(SERIAL_BAUDRATE);
+    Serial.println("Hello Arduino!");
+}
+
+static void print_test(void)
+{
+    const SerialFormat formats[] = { BIN, OCT, DEC, HEX };
+    const char *s_formats[] = {
+        [BIN] = "BIN",
+        [OCT] = "OCT",
+        [DEC] = "DEC",
+        [HEX] = "HEX",
+    };
+
+    const int si = -1337;
+    const int ui = 42;
+    const long sl = -1234567890;
+    const long ul = 1234567890;
+
+    for (unsigned i = 0; i < ARRAY_SIZE(formats); i++) {
+        SerialFormat f = formats[i];
+        Serial.print("print(int, ");
+        Serial.print(s_formats[f]);
+        Serial.print("): ");
+        Serial.print(si, f);
+        Serial.println();
+        Serial.print("println(int, ");
+        Serial.print(s_formats[f]);
+        Serial.print("): ");
+        Serial.println(si, f);
+    }
+
+    for (unsigned i = 0; i < ARRAY_SIZE(formats); i++) {
+        SerialFormat f = formats[i];
+        Serial.print("print(unsigned int, ");
+        Serial.print(s_formats[f]);
+        Serial.print("): ");
+        Serial.print(ui, f);
+        Serial.println();
+        Serial.print("println(unsigned int, ");
+        Serial.print(s_formats[f]);
+        Serial.print("): ");
+        Serial.println(ui, f);
+    }
+
+    for (unsigned i = 0; i < ARRAY_SIZE(formats); i++) {
+        SerialFormat f = formats[i];
+        Serial.print("print(long, ");
+        Serial.print(s_formats[f]);
+        Serial.print("): ");
+        Serial.print(sl, f);
+        Serial.println();
+        Serial.print("println(long, ");
+        Serial.print(s_formats[f]);
+        Serial.print("): ");
+        Serial.println(sl, f);
+    }
+
+    for (unsigned i = 0; i < ARRAY_SIZE(formats); i++) {
+        SerialFormat f = formats[i];
+        Serial.print("print(unsigned long, ");
+        Serial.print(s_formats[f]);
+        Serial.print("): ");
+        Serial.print(ul, f);
+        Serial.println();
+        Serial.print("println(unsigned long, ");
+        Serial.print(s_formats[f]);
+        Serial.print("): ");
+        Serial.println(ul, f);
+    }
+
+    Serial.print("print(float): ");
+    Serial.print((float)3.1415);
+    Serial.println();
+    for (int i = 0; i < 4; i++) {
+        Serial.print("print(float): ");
+        Serial.print((float)3.1415, i);
+        Serial.println();
+    }
+}
+
+void loop(void)
+{
+    /* Read chars if available and seek for CR or LF */
+    while (Serial.available() > 0) {
+        int tmp = Serial.read();
+        if (tmp == '\n' || tmp == '\r') {
+           buf[count] = 0;
+
+           if (count > 1) {
+                if (strncmp(buf, "echo", 4) == 0) {
+                    /* echo command just echoes back the input string */
+                    Serial.write("ECHO:");
+                    for (int i = 4; i < count; i++) {
+                        Serial.write(buf[i]);
+                    }
+                } else if (strncmp(buf, "numb", 4) == 0) {
+                    /* numb command prints input number in various formats */
+                    int numb=atoi(buf + 5);
+                    Serial.print(numb);
+                    Serial.print(" ");
+                    Serial.print(numb, DEC);
+                    Serial.print(" ");
+                    Serial.print(numb, HEX);
+                    Serial.print(" ");
+                    Serial.print(numb, OCT);
+                } else if (strncmp(buf, "time", 4) == 0) {
+                    /* time command tests printing time and sleeps  */
+                    unsigned long curtime = micros();
+                    unsigned long curtime2, curtime3;
+
+                    Serial.print(curtime);
+                    delay(36);
+                    Serial.print(" ");
+                    curtime2=micros();
+                    Serial.print(curtime2);
+                    delayMicroseconds(36000);
+                    Serial.print(" ");
+                    curtime3=micros();
+                    Serial.print(curtime3);
+
+                    /* test also that time is actually running */
+                    if ((curtime3 > curtime2) && (curtime2 > curtime)) {
+                        Serial.print(" OK END");
+                    } else {
+                        Serial.print(" ERR END");
+                    }
+                } else if (strncmp(buf, "print", 5) == 0) {
+                    print_test();
+                } else {
+                    Serial.write("UNK");
+                }
+                Serial.println("");
+            }
+            count = 0;
+        }
+        else {
+            buf[count++] = tmp;
+        }
+    }
+    delay(500);
+}

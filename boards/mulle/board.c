@@ -48,6 +48,21 @@ static devfs_t mulle_nvram_devfs = {
     .private_data = &mulle_nvram_dev,
 };
 
+static const mtd_spi_nor_params_t mulle_nor_params = {
+    .opcode = &mtd_spi_nor_opcode_default,
+    .wait_chip_erase = 16LU * US_PER_SEC,
+    .wait_sector_erase = 10LU * US_PER_MS,
+    .wait_32k_erase = 20LU * US_PER_MS,
+    .wait_chip_wake_up = 1LU * US_PER_MS,
+    .spi = MULLE_NOR_SPI_DEV,
+    .addr_width = 3,
+    .mode = SPI_MODE_3,
+    .cs = MULLE_NOR_SPI_CS,
+    .wp = GPIO_UNDEF,
+    .hold = GPIO_UNDEF,
+    .clk = SPI_CLK_10MHZ,
+};
+
 static mtd_spi_nor_t mulle_nor_dev = {
     .base = {
         .driver = &mtd_spi_nor_driver,
@@ -55,12 +70,7 @@ static mtd_spi_nor_t mulle_nor_dev = {
         .pages_per_sector = 256,
         .sector_count = 32,
     },
-    .opcode = &mtd_spi_nor_opcode_default,
-    .spi = MULLE_NOR_SPI_DEV,
-    .cs = MULLE_NOR_SPI_CS,
-    .addr_width = 3,
-    .mode = SPI_MODE_3,
-    .clk = SPI_CLK_10MHZ,
+    .params = &mulle_nor_params,
 };
 
 mtd_dev_t *mtd0 = (mtd_dev_t *)&mulle_nor_dev;
@@ -102,28 +112,6 @@ void board_init(void)
 
     /* Turn on AVDD for reading voltages */
     gpio_set(MULLE_POWER_AVDD);
-
-    /* Initialize RTC oscillator as early as possible since we are using it as a
-     * base clock for the FLL.
-     * It takes a while to stabilize the oscillator, therefore we do this as
-     * soon as possible during boot in order to let it stabilize while other
-     * stuff is initializing. */
-    /* If the clock is not stable then the UART will have the wrong baud rate
-     * for debug prints as well */
-    rtt_init();
-
-    /* Set 32 kHz clock source */
-    SIM->SOPT1 = (SIM->SOPT1 & ~(SIM_SOPT1_OSC32KSEL_MASK)) | SIM_SOPT1_OSC32KSEL(2);
-
-    /* At this point we need to wait for 1 ms until the clock is stable.
-     * Since the clock is not yet stable we can only guess how long we must
-     * wait. I have tried to make this as short as possible but still being able
-     * to read the initialization messages written on the UART.
-     * (If the clock is not stable all UART output is garbled until it has
-     * stabilized) */
-    for (int i = 0; i < 100000; ++i) {
-        __asm__ volatile("nop\n");
-    }
 
     /* initialize the CPU */
     cpu_init();
@@ -187,9 +175,7 @@ static int mulle_nvram_init(void)
     }
 
     /* Register DevFS node */
-    devfs_register(&mulle_nvram_devfs);
-
-    return 0;
+    return devfs_register(&mulle_nvram_devfs);
 }
 
 static void increase_boot_count(void)
@@ -212,7 +198,7 @@ int mulle_nor_init(void)
 
     if (res >= 0) {
         /* Register DevFS node */
-        devfs_register(&mulle_nor_devfs);
+        res = devfs_register(&mulle_nor_devfs);
     }
 
     return res;

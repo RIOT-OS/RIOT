@@ -57,11 +57,34 @@ extern "C" {
 #define RN2XX3_SLEEP_MIN                (100U)
 
 /**
+ * @defgroup drivers_rn2xx3_config     RN2483/RN2903 Radio driver compile configuration
+ * @ingroup config_drivers_netdev
+ * @{
+ */
+/**
  * @brief   Default sleep duration (in ms)
  */
-#ifndef RN2XX3_DEFAULT_SLEEP
-#define RN2XX3_DEFAULT_SLEEP            (5000U)
+#ifndef CONFIG_RN2XX3_DEFAULT_SLEEP
+#define CONFIG_RN2XX3_DEFAULT_SLEEP            (5000U)
 #endif
+
+/**
+ * @brief   Default automatic reply status
+ *
+ * Set to 1 to enable the automatic reply. The module will transmit a packet without a
+ * payload immediately after a confirmed downlink is received, or when the Frame
+ * Pending bit has been set by the server.
+ *
+ * @note If all enabled channels are busy due to duty cycle limitations, the
+ * module will wait for the first channel that will become free to transmit. The
+ * user will not be able to initiate uplink transmissions until the automatic
+ * transmissions are done. Refer RN2483 LoRa™ Technology Module Command
+ * Reference User’s Guide for more information.
+ */
+#ifdef DOXYGEN
+#define CONFIG_RN2XX3_DEFAULT_AR
+#endif
+/** @} */
 
 #if defined(MODULE_RN2903)
 #define RN2XX3_FREQ_BAND                (915U)
@@ -260,22 +283,14 @@ int rn2xx3_mac_init(rn2xx3_t *dev);
 int rn2xx3_write_cmd(rn2xx3_t *dev);
 
 /**
- * @brief   Writes a command to the RN2XX3 device but don't wait for timeout
+ * @brief   Writes a command to the RN2XX3 device but don't wait for timeout or response
  *
- * The module will immediately reply with a meaningful message if the command
- * is valid or not.
+ * The response can be checked in the `dev->resp_buf` buffer after a small delay
+ * (for example 1ms).
  *
  * @param[in] dev           RN2XX3 device descriptor
  *
  * @return                  RN2XX3_OK on success
- * @return                  RN2XX3_ERR_INVALID_PARAM if command is invalid
- * @return                  RN2XX3_ERR_NOT_JOINED if network is not joined
- * @return                  RN2XX3_ERR_NO_FREE_CH if no free channel
- * @return                  RN2XX3_ERR_SILENT if device is in Silent state
- * @return                  RN2XX3_ERR_FR_CNT_REJOIN_NEEDED if frame counter rolled over
- * @return                  RN2XX3_ERR_BUSY if MAC is not in Idle state
- * @return                  RN2XX3_ERR_INVALID_DATA_LENGTH if payload is too large
- * @return                  RN2XX3_ERR_KEYS_NOT_INIT if keys are not configured
  */
 int rn2xx3_write_cmd_no_wait(rn2xx3_t *dev);
 
@@ -308,7 +323,7 @@ int rn2xx3_wait_response(rn2xx3_t *dev);
  * @return                  RN2XX3_REPLY_TX_MAC_ERR when MAC transmission failed
  * @return                  RN2XX3_REPLY_TX_MAC_RX when received downlink data from server
  * @return                  RN2XX3_REPLY_TX_INVALID_DATA_LEN when Application payload is too large
- * @return                  RN2XX3_REPLY_JOIN_ACCEPTED when the join procedure succeded
+ * @return                  RN2XX3_REPLY_JOIN_ACCEPTED when the join procedure succeeded
  * @return                  RN2XX3_REPLY_JOIN_DENIED when the join procedure failed
  * @return                  RN2XX3_REPLY_OTHER when an unknown reply is received
  */
@@ -325,7 +340,7 @@ int rn2xx3_wait_reply(rn2xx3_t *dev, uint8_t timeout);
  * @return                  RN2XX3_ERR_NO_FREE_CH if channels are busy
  * @return                  RN2XX3_ERR_SILENT if device is in Silent state
  * @return                  RN2XX3_ERR_BUSY if MAC layer is in idle state
- * @return                  RN2XX3_ERR_MAC_PAUSED if MAC layed is paused
+ * @return                  RN2XX3_ERR_MAC_PAUSED if MAC laid is paused
  * @return                  RN2XX3_REPLY_TX_INVALID_DATA_LEN if payload is too large
  * @return                  RN2XX3_REPLY_TX_MAC_ERR when MAC transmission failed
  * @return                  RN2XX3_REPLY_TX_MAC_RX when received downlink data from server
@@ -343,8 +358,8 @@ int rn2xx3_mac_tx(rn2xx3_t *dev, uint8_t *payload, uint8_t payload_len);
  * @return                  RN2XX3_ERR_NO_FREE_CH if channels are busy
  * @return                  RN2XX3_ERR_SILENT if device is in Silent state
  * @return                  RN2XX3_ERR_BUSY if MAC layer is in idle state
- * @return                  RN2XX3_ERR_MAC_PAUSED if MAC layed is paused
- * @return                  RN2XX3_REPLY_JOIN_ACCEPTED when the join procedure succeded
+ * @return                  RN2XX3_ERR_MAC_PAUSED if MAC layer is paused
+ * @return                  RN2XX3_REPLY_JOIN_ACCEPTED when the join procedure succeeded
  * @return                  RN2XX3_REPLY_JOIN_DENIED when the join procedure failed
  */
 int rn2xx3_mac_join_network(rn2xx3_t *dev, loramac_join_mode_t mode);

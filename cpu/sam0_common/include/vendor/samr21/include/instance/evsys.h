@@ -3,39 +3,24 @@
  *
  * \brief Instance description for EVSYS
  *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2016 Atmel Corporation,
+ *                    a wholly owned subsidiary of Microchip Technology Inc.
  *
  * \asf_license_start
  *
  * \page License
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the Licence at
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * \asf_license_stop
  *
@@ -46,21 +31,21 @@
 
 /* ========== Register definition for EVSYS peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-#define REG_EVSYS_CTRL             (0x42000400U) /**< \brief (EVSYS) Control */
-#define REG_EVSYS_CHANNEL          (0x42000404U) /**< \brief (EVSYS) Channel */
-#define REG_EVSYS_USER             (0x42000408U) /**< \brief (EVSYS) User Multiplexer */
-#define REG_EVSYS_CHSTATUS         (0x4200040CU) /**< \brief (EVSYS) Channel Status */
-#define REG_EVSYS_INTENCLR         (0x42000410U) /**< \brief (EVSYS) Interrupt Enable Clear */
-#define REG_EVSYS_INTENSET         (0x42000414U) /**< \brief (EVSYS) Interrupt Enable Set */
-#define REG_EVSYS_INTFLAG          (0x42000418U) /**< \brief (EVSYS) Interrupt Flag Status and Clear */
+#define REG_EVSYS_CTRL             (0x42000400) /**< \brief (EVSYS) Control */
+#define REG_EVSYS_CHANNEL          (0x42000404) /**< \brief (EVSYS) Channel */
+#define REG_EVSYS_USER             (0x42000408) /**< \brief (EVSYS) User Multiplexer */
+#define REG_EVSYS_CHSTATUS         (0x4200040C) /**< \brief (EVSYS) Channel Status */
+#define REG_EVSYS_INTENCLR         (0x42000410) /**< \brief (EVSYS) Interrupt Enable Clear */
+#define REG_EVSYS_INTENSET         (0x42000414) /**< \brief (EVSYS) Interrupt Enable Set */
+#define REG_EVSYS_INTFLAG          (0x42000418) /**< \brief (EVSYS) Interrupt Flag Status and Clear */
 #else
-#define REG_EVSYS_CTRL             (*(WoReg8 *)0x42000400U) /**< \brief (EVSYS) Control */
-#define REG_EVSYS_CHANNEL          (*(RwReg  *)0x42000404U) /**< \brief (EVSYS) Channel */
-#define REG_EVSYS_USER             (*(RwReg16*)0x42000408U) /**< \brief (EVSYS) User Multiplexer */
-#define REG_EVSYS_CHSTATUS         (*(RoReg  *)0x4200040CU) /**< \brief (EVSYS) Channel Status */
-#define REG_EVSYS_INTENCLR         (*(RwReg  *)0x42000410U) /**< \brief (EVSYS) Interrupt Enable Clear */
-#define REG_EVSYS_INTENSET         (*(RwReg  *)0x42000414U) /**< \brief (EVSYS) Interrupt Enable Set */
-#define REG_EVSYS_INTFLAG          (*(RwReg  *)0x42000418U) /**< \brief (EVSYS) Interrupt Flag Status and Clear */
+#define REG_EVSYS_CTRL             (*(WoReg8 *)0x42000400UL) /**< \brief (EVSYS) Control */
+#define REG_EVSYS_CHANNEL          (*(RwReg  *)0x42000404UL) /**< \brief (EVSYS) Channel */
+#define REG_EVSYS_USER             (*(RwReg16*)0x42000408UL) /**< \brief (EVSYS) User Multiplexer */
+#define REG_EVSYS_CHSTATUS         (*(RoReg  *)0x4200040CUL) /**< \brief (EVSYS) Channel Status */
+#define REG_EVSYS_INTENCLR         (*(RwReg  *)0x42000410UL) /**< \brief (EVSYS) Interrupt Enable Clear */
+#define REG_EVSYS_INTENSET         (*(RwReg  *)0x42000414UL) /**< \brief (EVSYS) Interrupt Enable Set */
+#define REG_EVSYS_INTFLAG          (*(RwReg  *)0x42000418UL) /**< \brief (EVSYS) Interrupt Flag Status and Clear */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for EVSYS peripheral ========== */
@@ -160,8 +145,6 @@
 #define EVSYS_ID_GEN_AC_COMP_1      69
 #define EVSYS_ID_GEN_AC_WIN_0       70
 #define EVSYS_ID_GEN_DAC_EMPTY      71
-#define EVSYS_ID_GEN_PTC_EOC        72
-#define EVSYS_ID_GEN_PTC_WCOMP      73
 
 // USERS
 #define EVSYS_ID_USER_DMAC_CH_0     0
@@ -192,6 +175,5 @@
 #define EVSYS_ID_USER_AC_SOC_0      25
 #define EVSYS_ID_USER_AC_SOC_1      26
 #define EVSYS_ID_USER_DAC_START     27
-#define EVSYS_ID_USER_PTC_STCONV    28
 
 #endif /* _SAMR21_EVSYS_INSTANCE_ */

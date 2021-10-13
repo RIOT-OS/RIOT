@@ -36,7 +36,7 @@
 #include "TestCase.h"
 #include "TestCaller.h"
 
-char* TestCaller_name(TestCaller* self)
+const char* TestCaller_name(TestCaller* self)
 {
     return self->name;
 }

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     fs
+ * @ingroup     pkg_fatfs
  * @{
  *
  * @file
@@ -17,7 +17,6 @@
  *
  * @}
  */
-
 
 #include <fcntl.h>
 #include <errno.h>
@@ -30,7 +29,7 @@
 #include "kernel_defines.h" /* needed for BUILD_BUG_ON */
 #include "time.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include <debug.h>
 
 static int fatfs_err_to_errno(int32_t err);
@@ -151,7 +150,12 @@ static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode,
         fatfs_flags |= FA_CREATE_ALWAYS;
     }
     if ((flags & O_CREAT) == O_CREAT) {
-        fatfs_flags |= FA_CREATE_NEW;
+        if ((flags & O_EXCL) == O_EXCL) {
+            fatfs_flags |= FA_CREATE_NEW;
+        }
+        else {
+            fatfs_flags |= FA_OPEN_ALWAYS;
+        }
     }
     else {
         fatfs_flags |= FA_OPEN_EXISTING;
@@ -214,7 +218,6 @@ static ssize_t _read(vfs_file_t *filp, void *dest, size_t nbytes)
 
     FRESULT res = f_read(&fd->file, dest, nbytes, &br);
 
-
     if (res != FR_OK) {
         return fatfs_err_to_errno(res);
     }
@@ -252,12 +255,9 @@ static off_t _lseek(vfs_file_t *filp, off_t off, int whence)
 
 static int _fstat(vfs_file_t *filp, struct stat *buf)
 {
-    fatfs_file_desc_t *fd = (fatfs_file_desc_t *)filp->private_data.buffer;
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)filp->mp->private_data;
     FILINFO fi;
     FRESULT res;
-
-    _build_abs_path(fs_desc, fd->fname);
 
     memset(buf, 0, sizeof(*buf));
 
@@ -443,6 +443,7 @@ static const vfs_file_system_ops_t fatfs_fs_ops = {
     .unlink = _unlink,
     .mkdir = _mkdir,
     .rmdir = _rmdir,
+    .stat = vfs_sysop_stat_from_fstat,
 };
 
 static const vfs_file_ops_t fatfs_file_ops = {

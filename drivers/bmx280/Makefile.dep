@@ -1,0 +1,8 @@
+ifneq (,$(filter bm%280_spi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
+  FEATURES_REQUIRED += periph_gpio
+endif
+
+ifneq (,$(filter bm%280_i2c,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif

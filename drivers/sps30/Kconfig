@@ -1,0 +1,33 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#               2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_SPS30
+    bool "SPS30 Particulate Matter Sensor"
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_CHECKSUM
+    select MODULE_PERIPH_I2C
+
+menuconfig KCONFIG_USEMODULE_SPS30
+    bool "Configure SPS30 driver"
+    depends on USEMODULE_SPS30
+    help
+        Configure the SPS30 driver using Kconfig.
+
+if KCONFIG_USEMODULE_SPS30
+
+config SPS30_ERROR_RETRY
+    int "Maximum number of error retries"
+    default 500
+    help
+        Maximum number of automatic retries on communication errors.
+        Change this to 0 if more fine-grained feedback is required.
+        The value may be increased if the device is connected over
+        suboptimal wiring.
+
+endif # KCONFIG_USEMODULE_SPS30

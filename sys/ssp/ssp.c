@@ -22,9 +22,6 @@
 
 #include "panic.h"
 
-/* this should be randomized for each build */
-#define STACK_CHK_GUARD 0x595e9fbd94fda766
-
 uintptr_t __stack_chk_guard = (uintptr_t) STACK_CHK_GUARD;
 
 __attribute__((noreturn)) void __stack_chk_fail(void)

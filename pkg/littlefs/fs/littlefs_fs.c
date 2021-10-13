@@ -18,7 +18,6 @@
  * @}
  */
 
-
 #include <fcntl.h>
 #include <errno.h>
 #include <inttypes.h>
@@ -28,7 +27,7 @@
 
 #include "kernel_defines.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include <debug.h>
 
 static int littlefs_err_to_errno(ssize_t err)
@@ -72,12 +71,8 @@ static int _dev_read(const struct lfs_config *c, lfs_block_t block,
     DEBUG("lfs_read: c=%p, block=%" PRIu32 ", off=%" PRIu32 ", buf=%p, size=%" PRIu32 "\n",
           (void *)c, block, off, buffer, size);
 
-    int ret = mtd_read(mtd, buffer, ((fs->base_addr + block) * c->block_size) + off, size);
-    if (ret >= 0) {
-        return 0;
-    }
-
-    return ret;
+    return mtd_read_page(mtd, buffer, (fs->base_addr + block) * mtd->pages_per_sector,
+                         off, size);
 }
 
 static int _dev_write(const struct lfs_config *c, lfs_block_t block,
@@ -89,20 +84,8 @@ static int _dev_write(const struct lfs_config *c, lfs_block_t block,
     DEBUG("lfs_write: c=%p, block=%" PRIu32 ", off=%" PRIu32 ", buf=%p, size=%" PRIu32 "\n",
           (void *)c, block, off, buffer, size);
 
-    const uint8_t *buf = buffer;
-    uint32_t addr = ((fs->base_addr + block) * c->block_size) + off;
-    for (const uint8_t *part = buf; part < buf + size; part += c->prog_size,
-         addr += c->prog_size) {
-        int ret = mtd_write(mtd, part, addr, c->prog_size);
-        if (ret < 0) {
-            return ret;
-        }
-        else if ((unsigned)ret != c->prog_size) {
-            return -EIO;
-        }
-    }
-
-    return 0;
+    return mtd_write_page_raw(mtd, buffer, (fs->base_addr + block) * mtd->pages_per_sector,
+                              off, size);
 }
 
 static int _dev_erase(const struct lfs_config *c, lfs_block_t block)
@@ -112,12 +95,7 @@ static int _dev_erase(const struct lfs_config *c, lfs_block_t block)
 
     DEBUG("lfs_erase: c=%p, block=%" PRIu32 "\n", (void *)c, block);
 
-    int ret = mtd_erase(mtd, ((fs->base_addr + block) * c->block_size), c->block_size);
-    if (ret >= 0) {
-        return 0;
-    }
-
-    return ret;
+    return mtd_erase_sector(mtd, fs->base_addr + block, 1);
 }
 
 static int _dev_sync(const struct lfs_config *c)
@@ -131,6 +109,12 @@ static int prepare(littlefs_desc_t *fs)
 {
     mutex_init(&fs->lock);
     mutex_lock(&fs->lock);
+
+    int ret = mtd_init(fs->dev);
+
+    if (ret) {
+        return ret;
+    }
 
     memset(&fs->fs, 0, sizeof(fs->fs));
 
@@ -163,7 +147,7 @@ static int prepare(littlefs_desc_t *fs)
     fs->config.prog_buffer = fs->prog_buf;
 #endif
 
-    return mtd_init(fs->dev);
+    return 0;
 }
 
 static int _format(vfs_mount_t *mountp)
@@ -184,6 +168,11 @@ static int _format(vfs_mount_t *mountp)
 
 static int _mount(vfs_mount_t *mountp)
 {
+    /* if one of the lines below fail to compile you probably need to adjust
+       vfs buffer sizes ;) */
+    BUILD_BUG_ON(VFS_DIR_BUFFER_SIZE < sizeof(lfs_dir_t));
+    BUILD_BUG_ON(VFS_FILE_BUFFER_SIZE < sizeof(lfs_file_t));
+
     littlefs_desc_t *fs = mountp->private_data;
 
     DEBUG("littlefs: mount: mountp=%p\n", (void *)mountp);

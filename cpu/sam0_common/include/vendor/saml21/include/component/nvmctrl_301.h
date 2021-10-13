@@ -3,39 +3,25 @@
  *
  * \brief Component description for NVMCTRL
  *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2018 Microchip Technology Inc.
  *
  * \asf_license_start
  *
  * \page License
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * SPDX-License-Identifier: Apache-2.0
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the Licence at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * \asf_license_stop
  *
@@ -66,26 +52,26 @@ typedef union {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 #define NVMCTRL_CTRLA_OFFSET        0x00         /**< \brief (NVMCTRL_CTRLA offset) Control A */
-#define NVMCTRL_CTRLA_RESETVALUE    0x0000ul     /**< \brief (NVMCTRL_CTRLA reset_value) Control A */
+#define NVMCTRL_CTRLA_RESETVALUE    _U_(0x0000)  /**< \brief (NVMCTRL_CTRLA reset_value) Control A */
 
 #define NVMCTRL_CTRLA_CMD_Pos       0            /**< \brief (NVMCTRL_CTRLA) Command */
-#define NVMCTRL_CTRLA_CMD_Msk       (0x7Ful << NVMCTRL_CTRLA_CMD_Pos)
+#define NVMCTRL_CTRLA_CMD_Msk       (_U_(0x7F) << NVMCTRL_CTRLA_CMD_Pos)
 #define NVMCTRL_CTRLA_CMD(value)    (NVMCTRL_CTRLA_CMD_Msk & ((value) << NVMCTRL_CTRLA_CMD_Pos))
-#define   NVMCTRL_CTRLA_CMD_ER_Val        0x2ul  /**< \brief (NVMCTRL_CTRLA) Erase Row - Erases the row addressed by the ADDR register. */
-#define   NVMCTRL_CTRLA_CMD_WP_Val        0x4ul  /**< \brief (NVMCTRL_CTRLA) Write Page - Writes the contents of the page buffer to the page addressed by the ADDR register. */
-#define   NVMCTRL_CTRLA_CMD_EAR_Val       0x5ul  /**< \brief (NVMCTRL_CTRLA) Erase Auxiliary Row - Erases the auxiliary row addressed by the ADDR register. This command can be given only when the security bit is not set and only to the user configuration row. */
-#define   NVMCTRL_CTRLA_CMD_WAP_Val       0x6ul  /**< \brief (NVMCTRL_CTRLA) Write Auxiliary Page - Writes the contents of the page buffer to the page addressed by the ADDR register. This command can be given only when the security bit is not set and only to the user configuration row. */
-#define   NVMCTRL_CTRLA_CMD_SF_Val        0xAul  /**< \brief (NVMCTRL_CTRLA) Security Flow Command */
-#define   NVMCTRL_CTRLA_CMD_WL_Val        0xFul  /**< \brief (NVMCTRL_CTRLA) Write lockbits */
-#define   NVMCTRL_CTRLA_CMD_RWWEEER_Val   0x1Aul  /**< \brief (NVMCTRL_CTRLA) RWW EEPROM area Erase Row - Erases the row addressed by the ADDR register. */
-#define   NVMCTRL_CTRLA_CMD_RWWEEWP_Val   0x1Cul  /**< \brief (NVMCTRL_CTRLA) RWW EEPROM Write Page - Writes the contents of the page buffer to the page addressed by the ADDR register. */
-#define   NVMCTRL_CTRLA_CMD_LR_Val        0x40ul  /**< \brief (NVMCTRL_CTRLA) Lock Region - Locks the region containing the address location in the ADDR register. */
-#define   NVMCTRL_CTRLA_CMD_UR_Val        0x41ul  /**< \brief (NVMCTRL_CTRLA) Unlock Region - Unlocks the region containing the address location in the ADDR register. */
-#define   NVMCTRL_CTRLA_CMD_SPRM_Val      0x42ul  /**< \brief (NVMCTRL_CTRLA) Sets the power reduction mode. */
-#define   NVMCTRL_CTRLA_CMD_CPRM_Val      0x43ul  /**< \brief (NVMCTRL_CTRLA) Clears the power reduction mode. */
-#define   NVMCTRL_CTRLA_CMD_PBC_Val       0x44ul  /**< \brief (NVMCTRL_CTRLA) Page Buffer Clear - Clears the page buffer. */
-#define   NVMCTRL_CTRLA_CMD_SSB_Val       0x45ul  /**< \brief (NVMCTRL_CTRLA) Set Security Bit - Sets the security bit by writing 0x00 to the first byte in the lockbit row. */
-#define   NVMCTRL_CTRLA_CMD_INVALL_Val    0x46ul  /**< \brief (NVMCTRL_CTRLA) Invalidate all cache lines. */
+#define   NVMCTRL_CTRLA_CMD_ER_Val        _U_(0x2)   /**< \brief (NVMCTRL_CTRLA) Erase Row - Erases the row addressed by the ADDR register. */
+#define   NVMCTRL_CTRLA_CMD_WP_Val        _U_(0x4)   /**< \brief (NVMCTRL_CTRLA) Write Page - Writes the contents of the page buffer to the page addressed by the ADDR register. */
+#define   NVMCTRL_CTRLA_CMD_EAR_Val       _U_(0x5)   /**< \brief (NVMCTRL_CTRLA) Erase Auxiliary Row - Erases the auxiliary row addressed by the ADDR register. This command can be given only when the security bit is not set and only to the user configuration row. */
+#define   NVMCTRL_CTRLA_CMD_WAP_Val       _U_(0x6)   /**< \brief (NVMCTRL_CTRLA) Write Auxiliary Page - Writes the contents of the page buffer to the page addressed by the ADDR register. This command can be given only when the security bit is not set and only to the user configuration row. */
+#define   NVMCTRL_CTRLA_CMD_SF_Val        _U_(0xA)   /**< \brief (NVMCTRL_CTRLA) Security Flow Command */
+#define   NVMCTRL_CTRLA_CMD_WL_Val        _U_(0xF)   /**< \brief (NVMCTRL_CTRLA) Write lockbits */
+#define   NVMCTRL_CTRLA_CMD_RWWEEER_Val   _U_(0x1A)   /**< \brief (NVMCTRL_CTRLA) RWW EEPROM area Erase Row - Erases the row addressed by the ADDR register. */
+#define   NVMCTRL_CTRLA_CMD_RWWEEWP_Val   _U_(0x1C)   /**< \brief (NVMCTRL_CTRLA) RWW EEPROM Write Page - Writes the contents of the page buffer to the page addressed by the ADDR register. */
+#define   NVMCTRL_CTRLA_CMD_LR_Val        _U_(0x40)   /**< \brief (NVMCTRL_CTRLA) Lock Region - Locks the region containing the address location in the ADDR register. */
+#define   NVMCTRL_CTRLA_CMD_UR_Val        _U_(0x41)   /**< \brief (NVMCTRL_CTRLA) Unlock Region - Unlocks the region containing the address location in the ADDR register. */
+#define   NVMCTRL_CTRLA_CMD_SPRM_Val      _U_(0x42)   /**< \brief (NVMCTRL_CTRLA) Sets the power reduction mode. */
+#define   NVMCTRL_CTRLA_CMD_CPRM_Val      _U_(0x43)   /**< \brief (NVMCTRL_CTRLA) Clears the power reduction mode. */
+#define   NVMCTRL_CTRLA_CMD_PBC_Val       _U_(0x44)   /**< \brief (NVMCTRL_CTRLA) Page Buffer Clear - Clears the page buffer. */
+#define   NVMCTRL_CTRLA_CMD_SSB_Val       _U_(0x45)   /**< \brief (NVMCTRL_CTRLA) Set Security Bit - Sets the security bit by writing 0x00 to the first byte in the lockbit row. */
+#define   NVMCTRL_CTRLA_CMD_INVALL_Val    _U_(0x46)   /**< \brief (NVMCTRL_CTRLA) Invalidate all cache lines. */
 #define NVMCTRL_CTRLA_CMD_ER        (NVMCTRL_CTRLA_CMD_ER_Val      << NVMCTRL_CTRLA_CMD_Pos)
 #define NVMCTRL_CTRLA_CMD_WP        (NVMCTRL_CTRLA_CMD_WP_Val      << NVMCTRL_CTRLA_CMD_Pos)
 #define NVMCTRL_CTRLA_CMD_EAR       (NVMCTRL_CTRLA_CMD_EAR_Val     << NVMCTRL_CTRLA_CMD_Pos)
@@ -102,11 +88,11 @@ typedef union {
 #define NVMCTRL_CTRLA_CMD_SSB       (NVMCTRL_CTRLA_CMD_SSB_Val     << NVMCTRL_CTRLA_CMD_Pos)
 #define NVMCTRL_CTRLA_CMD_INVALL    (NVMCTRL_CTRLA_CMD_INVALL_Val  << NVMCTRL_CTRLA_CMD_Pos)
 #define NVMCTRL_CTRLA_CMDEX_Pos     8            /**< \brief (NVMCTRL_CTRLA) Command Execution */
-#define NVMCTRL_CTRLA_CMDEX_Msk     (0xFFul << NVMCTRL_CTRLA_CMDEX_Pos)
+#define NVMCTRL_CTRLA_CMDEX_Msk     (_U_(0xFF) << NVMCTRL_CTRLA_CMDEX_Pos)
 #define NVMCTRL_CTRLA_CMDEX(value)  (NVMCTRL_CTRLA_CMDEX_Msk & ((value) << NVMCTRL_CTRLA_CMDEX_Pos))
-#define   NVMCTRL_CTRLA_CMDEX_KEY_Val     0xA5ul  /**< \brief (NVMCTRL_CTRLA) Execution Key */
+#define   NVMCTRL_CTRLA_CMDEX_KEY_Val     _U_(0xA5)   /**< \brief (NVMCTRL_CTRLA) Execution Key */
 #define NVMCTRL_CTRLA_CMDEX_KEY     (NVMCTRL_CTRLA_CMDEX_KEY_Val   << NVMCTRL_CTRLA_CMDEX_Pos)
-#define NVMCTRL_CTRLA_MASK          0xFF7Ful     /**< \brief (NVMCTRL_CTRLA) MASK Register */
+#define NVMCTRL_CTRLA_MASK          _U_(0xFF7F)  /**< \brief (NVMCTRL_CTRLA) MASK Register */
 
 /* -------- NVMCTRL_CTRLB : (NVMCTRL Offset: 0x04) (R/W 32) Control B -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -129,42 +115,42 @@ typedef union {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 #define NVMCTRL_CTRLB_OFFSET        0x04         /**< \brief (NVMCTRL_CTRLB offset) Control B */
-#define NVMCTRL_CTRLB_RESETVALUE    0x00000000ul /**< \brief (NVMCTRL_CTRLB reset_value) Control B */
+#define NVMCTRL_CTRLB_RESETVALUE    _U_(0x00000000) /**< \brief (NVMCTRL_CTRLB reset_value) Control B */
 
 #define NVMCTRL_CTRLB_RWS_Pos       1            /**< \brief (NVMCTRL_CTRLB) NVM Read Wait States */
-#define NVMCTRL_CTRLB_RWS_Msk       (0xFul << NVMCTRL_CTRLB_RWS_Pos)
+#define NVMCTRL_CTRLB_RWS_Msk       (_U_(0xF) << NVMCTRL_CTRLB_RWS_Pos)
 #define NVMCTRL_CTRLB_RWS(value)    (NVMCTRL_CTRLB_RWS_Msk & ((value) << NVMCTRL_CTRLB_RWS_Pos))
-#define   NVMCTRL_CTRLB_RWS_SINGLE_Val    0x0ul  /**< \brief (NVMCTRL_CTRLB) Single Auto Wait State */
-#define   NVMCTRL_CTRLB_RWS_HALF_Val      0x1ul  /**< \brief (NVMCTRL_CTRLB) Half Auto Wait State */
-#define   NVMCTRL_CTRLB_RWS_DUAL_Val      0x2ul  /**< \brief (NVMCTRL_CTRLB) Dual Auto Wait State */
+#define   NVMCTRL_CTRLB_RWS_SINGLE_Val    _U_(0x0)   /**< \brief (NVMCTRL_CTRLB) Single Auto Wait State */
+#define   NVMCTRL_CTRLB_RWS_HALF_Val      _U_(0x1)   /**< \brief (NVMCTRL_CTRLB) Half Auto Wait State */
+#define   NVMCTRL_CTRLB_RWS_DUAL_Val      _U_(0x2)   /**< \brief (NVMCTRL_CTRLB) Dual Auto Wait State */
 #define NVMCTRL_CTRLB_RWS_SINGLE    (NVMCTRL_CTRLB_RWS_SINGLE_Val  << NVMCTRL_CTRLB_RWS_Pos)
 #define NVMCTRL_CTRLB_RWS_HALF      (NVMCTRL_CTRLB_RWS_HALF_Val    << NVMCTRL_CTRLB_RWS_Pos)
 #define NVMCTRL_CTRLB_RWS_DUAL      (NVMCTRL_CTRLB_RWS_DUAL_Val    << NVMCTRL_CTRLB_RWS_Pos)
 #define NVMCTRL_CTRLB_MANW_Pos      7            /**< \brief (NVMCTRL_CTRLB) Manual Write */
-#define NVMCTRL_CTRLB_MANW          (0x1ul << NVMCTRL_CTRLB_MANW_Pos)
+#define NVMCTRL_CTRLB_MANW          (_U_(0x1) << NVMCTRL_CTRLB_MANW_Pos)
 #define NVMCTRL_CTRLB_SLEEPPRM_Pos  8            /**< \brief (NVMCTRL_CTRLB) Power Reduction Mode during Sleep */
-#define NVMCTRL_CTRLB_SLEEPPRM_Msk  (0x3ul << NVMCTRL_CTRLB_SLEEPPRM_Pos)
+#define NVMCTRL_CTRLB_SLEEPPRM_Msk  (_U_(0x3) << NVMCTRL_CTRLB_SLEEPPRM_Pos)
 #define NVMCTRL_CTRLB_SLEEPPRM(value) (NVMCTRL_CTRLB_SLEEPPRM_Msk & ((value) << NVMCTRL_CTRLB_SLEEPPRM_Pos))
-#define   NVMCTRL_CTRLB_SLEEPPRM_WAKEONACCESS_Val 0x0ul  /**< \brief (NVMCTRL_CTRLB) NVM block enters low-power mode when entering sleep.NVM block exits low-power mode upon first access. */
-#define   NVMCTRL_CTRLB_SLEEPPRM_WAKEUPINSTANT_Val 0x1ul  /**< \brief (NVMCTRL_CTRLB) NVM block enters low-power mode when entering sleep.NVM block exits low-power mode when exiting sleep. */
-#define   NVMCTRL_CTRLB_SLEEPPRM_DISABLED_Val 0x3ul  /**< \brief (NVMCTRL_CTRLB) Auto power reduction disabled. */
+#define   NVMCTRL_CTRLB_SLEEPPRM_WAKEONACCESS_Val _U_(0x0)   /**< \brief (NVMCTRL_CTRLB) NVM block enters low-power mode when entering sleep.NVM block exits low-power mode upon first access. */
+#define   NVMCTRL_CTRLB_SLEEPPRM_WAKEUPINSTANT_Val _U_(0x1)   /**< \brief (NVMCTRL_CTRLB) NVM block enters low-power mode when entering sleep.NVM block exits low-power mode when exiting sleep. */
+#define   NVMCTRL_CTRLB_SLEEPPRM_DISABLED_Val _U_(0x3)   /**< \brief (NVMCTRL_CTRLB) Auto power reduction disabled. */
 #define NVMCTRL_CTRLB_SLEEPPRM_WAKEONACCESS (NVMCTRL_CTRLB_SLEEPPRM_WAKEONACCESS_Val << NVMCTRL_CTRLB_SLEEPPRM_Pos)
 #define NVMCTRL_CTRLB_SLEEPPRM_WAKEUPINSTANT (NVMCTRL_CTRLB_SLEEPPRM_WAKEUPINSTANT_Val << NVMCTRL_CTRLB_SLEEPPRM_Pos)
 #define NVMCTRL_CTRLB_SLEEPPRM_DISABLED (NVMCTRL_CTRLB_SLEEPPRM_DISABLED_Val << NVMCTRL_CTRLB_SLEEPPRM_Pos)
 #define NVMCTRL_CTRLB_FWUP_Pos      11           /**< \brief (NVMCTRL_CTRLB) fast wake-up */
-#define NVMCTRL_CTRLB_FWUP          (0x1ul << NVMCTRL_CTRLB_FWUP_Pos)
+#define NVMCTRL_CTRLB_FWUP          (_U_(0x1) << NVMCTRL_CTRLB_FWUP_Pos)
 #define NVMCTRL_CTRLB_READMODE_Pos  16           /**< \brief (NVMCTRL_CTRLB) NVMCTRL Read Mode */
-#define NVMCTRL_CTRLB_READMODE_Msk  (0x3ul << NVMCTRL_CTRLB_READMODE_Pos)
+#define NVMCTRL_CTRLB_READMODE_Msk  (_U_(0x3) << NVMCTRL_CTRLB_READMODE_Pos)
 #define NVMCTRL_CTRLB_READMODE(value) (NVMCTRL_CTRLB_READMODE_Msk & ((value) << NVMCTRL_CTRLB_READMODE_Pos))
-#define   NVMCTRL_CTRLB_READMODE_NO_MISS_PENALTY_Val 0x0ul  /**< \brief (NVMCTRL_CTRLB) The NVM Controller (cache system) does not insert wait states on a cache miss. Gives the best system performance. */
-#define   NVMCTRL_CTRLB_READMODE_LOW_POWER_Val 0x1ul  /**< \brief (NVMCTRL_CTRLB) Reduces power consumption of the cache system, but inserts a wait state each time there is a cache miss. This mode may not be relevant if CPU performance is required, as the application will be stalled and may lead to increase run time. */
-#define   NVMCTRL_CTRLB_READMODE_DETERMINISTIC_Val 0x2ul  /**< \brief (NVMCTRL_CTRLB) The cache system ensures that a cache hit or miss takes the same amount of time, determined by the number of programmed flash wait states. This mode can be used for real-time applications that require deterministic execution timings. */
+#define   NVMCTRL_CTRLB_READMODE_NO_MISS_PENALTY_Val _U_(0x0)   /**< \brief (NVMCTRL_CTRLB) The NVM Controller (cache system) does not insert wait states on a cache miss. Gives the best system performance. */
+#define   NVMCTRL_CTRLB_READMODE_LOW_POWER_Val _U_(0x1)   /**< \brief (NVMCTRL_CTRLB) Reduces power consumption of the cache system, but inserts a wait state each time there is a cache miss. This mode may not be relevant if CPU performance is required, as the application will be stalled and may lead to increase run time. */
+#define   NVMCTRL_CTRLB_READMODE_DETERMINISTIC_Val _U_(0x2)   /**< \brief (NVMCTRL_CTRLB) The cache system ensures that a cache hit or miss takes the same amount of time, determined by the number of programmed flash wait states. This mode can be used for real-time applications that require deterministic execution timings. */
 #define NVMCTRL_CTRLB_READMODE_NO_MISS_PENALTY (NVMCTRL_CTRLB_READMODE_NO_MISS_PENALTY_Val << NVMCTRL_CTRLB_READMODE_Pos)
 #define NVMCTRL_CTRLB_READMODE_LOW_POWER (NVMCTRL_CTRLB_READMODE_LOW_POWER_Val << NVMCTRL_CTRLB_READMODE_Pos)
 #define NVMCTRL_CTRLB_READMODE_DETERMINISTIC (NVMCTRL_CTRLB_READMODE_DETERMINISTIC_Val << NVMCTRL_CTRLB_READMODE_Pos)
 #define NVMCTRL_CTRLB_CACHEDIS_Pos  18           /**< \brief (NVMCTRL_CTRLB) Cache Disable */
-#define NVMCTRL_CTRLB_CACHEDIS      (0x1ul << NVMCTRL_CTRLB_CACHEDIS_Pos)
-#define NVMCTRL_CTRLB_MASK          0x00070B9Eul /**< \brief (NVMCTRL_CTRLB) MASK Register */
+#define NVMCTRL_CTRLB_CACHEDIS      (_U_(0x1) << NVMCTRL_CTRLB_CACHEDIS_Pos)
+#define NVMCTRL_CTRLB_MASK          _U_(0x00070B9E) /**< \brief (NVMCTRL_CTRLB) MASK Register */
 
 /* -------- NVMCTRL_PARAM : (NVMCTRL Offset: 0x08) (R/W 32) NVM Parameter -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -180,22 +166,22 @@ typedef union {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 #define NVMCTRL_PARAM_OFFSET        0x08         /**< \brief (NVMCTRL_PARAM offset) NVM Parameter */
-#define NVMCTRL_PARAM_RESETVALUE    0x00000000ul /**< \brief (NVMCTRL_PARAM reset_value) NVM Parameter */
+#define NVMCTRL_PARAM_RESETVALUE    _U_(0x00000000) /**< \brief (NVMCTRL_PARAM reset_value) NVM Parameter */
 
 #define NVMCTRL_PARAM_NVMP_Pos      0            /**< \brief (NVMCTRL_PARAM) NVM Pages */
-#define NVMCTRL_PARAM_NVMP_Msk      (0xFFFFul << NVMCTRL_PARAM_NVMP_Pos)
+#define NVMCTRL_PARAM_NVMP_Msk      (_U_(0xFFFF) << NVMCTRL_PARAM_NVMP_Pos)
 #define NVMCTRL_PARAM_NVMP(value)   (NVMCTRL_PARAM_NVMP_Msk & ((value) << NVMCTRL_PARAM_NVMP_Pos))
 #define NVMCTRL_PARAM_PSZ_Pos       16           /**< \brief (NVMCTRL_PARAM) Page Size */
-#define NVMCTRL_PARAM_PSZ_Msk       (0x7ul << NVMCTRL_PARAM_PSZ_Pos)
+#define NVMCTRL_PARAM_PSZ_Msk       (_U_(0x7) << NVMCTRL_PARAM_PSZ_Pos)
 #define NVMCTRL_PARAM_PSZ(value)    (NVMCTRL_PARAM_PSZ_Msk & ((value) << NVMCTRL_PARAM_PSZ_Pos))
-#define   NVMCTRL_PARAM_PSZ_8_Val         0x0ul  /**< \brief (NVMCTRL_PARAM) 8 bytes */
-#define   NVMCTRL_PARAM_PSZ_16_Val        0x1ul  /**< \brief (NVMCTRL_PARAM) 16 bytes */
-#define   NVMCTRL_PARAM_PSZ_32_Val        0x2ul  /**< \brief (NVMCTRL_PARAM) 32 bytes */
-#define   NVMCTRL_PARAM_PSZ_64_Val        0x3ul  /**< \brief (NVMCTRL_PARAM) 64 bytes */
-#define   NVMCTRL_PARAM_PSZ_128_Val       0x4ul  /**< \brief (NVMCTRL_PARAM) 128 bytes */
-#define   NVMCTRL_PARAM_PSZ_256_Val       0x5ul  /**< \brief (NVMCTRL_PARAM) 256 bytes */
-#define   NVMCTRL_PARAM_PSZ_512_Val       0x6ul  /**< \brief (NVMCTRL_PARAM) 512 bytes */
-#define   NVMCTRL_PARAM_PSZ_1024_Val      0x7ul  /**< \brief (NVMCTRL_PARAM) 1024 bytes */
+#define   NVMCTRL_PARAM_PSZ_8_Val         _U_(0x0)   /**< \brief (NVMCTRL_PARAM) 8 bytes */
+#define   NVMCTRL_PARAM_PSZ_16_Val        _U_(0x1)   /**< \brief (NVMCTRL_PARAM) 16 bytes */
+#define   NVMCTRL_PARAM_PSZ_32_Val        _U_(0x2)   /**< \brief (NVMCTRL_PARAM) 32 bytes */
+#define   NVMCTRL_PARAM_PSZ_64_Val        _U_(0x3)   /**< \brief (NVMCTRL_PARAM) 64 bytes */
+#define   NVMCTRL_PARAM_PSZ_128_Val       _U_(0x4)   /**< \brief (NVMCTRL_PARAM) 128 bytes */
+#define   NVMCTRL_PARAM_PSZ_256_Val       _U_(0x5)   /**< \brief (NVMCTRL_PARAM) 256 bytes */
+#define   NVMCTRL_PARAM_PSZ_512_Val       _U_(0x6)   /**< \brief (NVMCTRL_PARAM) 512 bytes */
+#define   NVMCTRL_PARAM_PSZ_1024_Val      _U_(0x7)   /**< \brief (NVMCTRL_PARAM) 1024 bytes */
 #define NVMCTRL_PARAM_PSZ_8         (NVMCTRL_PARAM_PSZ_8_Val       << NVMCTRL_PARAM_PSZ_Pos)
 #define NVMCTRL_PARAM_PSZ_16        (NVMCTRL_PARAM_PSZ_16_Val      << NVMCTRL_PARAM_PSZ_Pos)
 #define NVMCTRL_PARAM_PSZ_32        (NVMCTRL_PARAM_PSZ_32_Val      << NVMCTRL_PARAM_PSZ_Pos)
@@ -205,9 +191,9 @@ typedef union {
 #define NVMCTRL_PARAM_PSZ_512       (NVMCTRL_PARAM_PSZ_512_Val     << NVMCTRL_PARAM_PSZ_Pos)
 #define NVMCTRL_PARAM_PSZ_1024      (NVMCTRL_PARAM_PSZ_1024_Val    << NVMCTRL_PARAM_PSZ_Pos)
 #define NVMCTRL_PARAM_RWWEEP_Pos    20           /**< \brief (NVMCTRL_PARAM) RWW EEPROM Pages */
-#define NVMCTRL_PARAM_RWWEEP_Msk    (0xFFFul << NVMCTRL_PARAM_RWWEEP_Pos)
+#define NVMCTRL_PARAM_RWWEEP_Msk    (_U_(0xFFF) << NVMCTRL_PARAM_RWWEEP_Pos)
 #define NVMCTRL_PARAM_RWWEEP(value) (NVMCTRL_PARAM_RWWEEP_Msk & ((value) << NVMCTRL_PARAM_RWWEEP_Pos))
-#define NVMCTRL_PARAM_MASK          0xFFF7FFFFul /**< \brief (NVMCTRL_PARAM) MASK Register */
+#define NVMCTRL_PARAM_MASK          _U_(0xFFF7FFFF) /**< \brief (NVMCTRL_PARAM) MASK Register */
 
 /* -------- NVMCTRL_INTENCLR : (NVMCTRL Offset: 0x0C) (R/W  8) Interrupt Enable Clear -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -222,13 +208,13 @@ typedef union {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 #define NVMCTRL_INTENCLR_OFFSET     0x0C         /**< \brief (NVMCTRL_INTENCLR offset) Interrupt Enable Clear */
-#define NVMCTRL_INTENCLR_RESETVALUE 0x00ul       /**< \brief (NVMCTRL_INTENCLR reset_value) Interrupt Enable Clear */
+#define NVMCTRL_INTENCLR_RESETVALUE _U_(0x00)    /**< \brief (NVMCTRL_INTENCLR reset_value) Interrupt Enable Clear */
 
 #define NVMCTRL_INTENCLR_READY_Pos  0            /**< \brief (NVMCTRL_INTENCLR) NVM Ready Interrupt Enable */
-#define NVMCTRL_INTENCLR_READY      (0x1ul << NVMCTRL_INTENCLR_READY_Pos)
+#define NVMCTRL_INTENCLR_READY      (_U_(0x1) << NVMCTRL_INTENCLR_READY_Pos)
 #define NVMCTRL_INTENCLR_ERROR_Pos  1            /**< \brief (NVMCTRL_INTENCLR) Error Interrupt Enable */
-#define NVMCTRL_INTENCLR_ERROR      (0x1ul << NVMCTRL_INTENCLR_ERROR_Pos)
-#define NVMCTRL_INTENCLR_MASK       0x03ul       /**< \brief (NVMCTRL_INTENCLR) MASK Register */
+#define NVMCTRL_INTENCLR_ERROR      (_U_(0x1) << NVMCTRL_INTENCLR_ERROR_Pos)
+#define NVMCTRL_INTENCLR_MASK       _U_(0x03)    /**< \brief (NVMCTRL_INTENCLR) MASK Register */
 
 /* -------- NVMCTRL_INTENSET : (NVMCTRL Offset: 0x10) (R/W  8) Interrupt Enable Set -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -243,13 +229,13 @@ typedef union {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 #define NVMCTRL_INTENSET_OFFSET     0x10         /**< \brief (NVMCTRL_INTENSET offset) Interrupt Enable Set */
-#define NVMCTRL_INTENSET_RESETVALUE 0x00ul       /**< \brief (NVMCTRL_INTENSET reset_value) Interrupt Enable Set */
+#define NVMCTRL_INTENSET_RESETVALUE _U_(0x00)    /**< \brief (NVMCTRL_INTENSET reset_value) Interrupt Enable Set */
 
 #define NVMCTRL_INTENSET_READY_Pos  0            /**< \brief (NVMCTRL_INTENSET) NVM Ready Interrupt Enable */
-#define NVMCTRL_INTENSET_READY      (0x1ul << NVMCTRL_INTENSET_READY_Pos)
+#define NVMCTRL_INTENSET_READY      (_U_(0x1) << NVMCTRL_INTENSET_READY_Pos)
 #define NVMCTRL_INTENSET_ERROR_Pos  1            /**< \brief (NVMCTRL_INTENSET) Error Interrupt Enable */
-#define NVMCTRL_INTENSET_ERROR      (0x1ul << NVMCTRL_INTENSET_ERROR_Pos)
-#define NVMCTRL_INTENSET_MASK       0x03ul       /**< \brief (NVMCTRL_INTENSET) MASK Register */
+#define NVMCTRL_INTENSET_ERROR      (_U_(0x1) << NVMCTRL_INTENSET_ERROR_Pos)
+#define NVMCTRL_INTENSET_MASK       _U_(0x03)    /**< \brief (NVMCTRL_INTENSET) MASK Register */
 
 /* -------- NVMCTRL_INTFLAG : (NVMCTRL Offset: 0x14) (R/W  8) Interrupt Flag Status and Clear -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -264,13 +250,13 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 #define NVMCTRL_INTFLAG_OFFSET      0x14         /**< \brief (NVMCTRL_INTFLAG offset) Interrupt Flag Status and Clear */
-#define NVMCTRL_INTFLAG_RESETVALUE  0x00ul       /**< \brief (NVMCTRL_INTFLAG reset_value) Interrupt Flag Status and Clear */
+#define NVMCTRL_INTFLAG_RESETVALUE  _U_(0x00)    /**< \brief (NVMCTRL_INTFLAG reset_value) Interrupt Flag Status and Clear */
 
 #define NVMCTRL_INTFLAG_READY_Pos   0            /**< \brief (NVMCTRL_INTFLAG) NVM Ready */
-#define NVMCTRL_INTFLAG_READY       (0x1ul << NVMCTRL_INTFLAG_READY_Pos)
+#define NVMCTRL_INTFLAG_READY       (_U_(0x1) << NVMCTRL_INTFLAG_READY_Pos)
 #define NVMCTRL_INTFLAG_ERROR_Pos   1            /**< \brief (NVMCTRL_INTFLAG) Error */
-#define NVMCTRL_INTFLAG_ERROR       (0x1ul << NVMCTRL_INTFLAG_ERROR_Pos)
-#define NVMCTRL_INTFLAG_MASK        0x03ul       /**< \brief (NVMCTRL_INTFLAG) MASK Register */
+#define NVMCTRL_INTFLAG_ERROR       (_U_(0x1) << NVMCTRL_INTFLAG_ERROR_Pos)
+#define NVMCTRL_INTFLAG_MASK        _U_(0x03)    /**< \brief (NVMCTRL_INTFLAG) MASK Register */
 
 /* -------- NVMCTRL_STATUS : (NVMCTRL Offset: 0x18) (R/W 16) Status -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -290,21 +276,21 @@ typedef union {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 #define NVMCTRL_STATUS_OFFSET       0x18         /**< \brief (NVMCTRL_STATUS offset) Status */
-#define NVMCTRL_STATUS_RESETVALUE   0x0000ul     /**< \brief (NVMCTRL_STATUS reset_value) Status */
+#define NVMCTRL_STATUS_RESETVALUE   _U_(0x0000)  /**< \brief (NVMCTRL_STATUS reset_value) Status */
 
 #define NVMCTRL_STATUS_PRM_Pos      0            /**< \brief (NVMCTRL_STATUS) Power Reduction Mode */
-#define NVMCTRL_STATUS_PRM          (0x1ul << NVMCTRL_STATUS_PRM_Pos)
+#define NVMCTRL_STATUS_PRM          (_U_(0x1) << NVMCTRL_STATUS_PRM_Pos)
 #define NVMCTRL_STATUS_LOAD_Pos     1            /**< \brief (NVMCTRL_STATUS) NVM Page Buffer Active Loading */
-#define NVMCTRL_STATUS_LOAD         (0x1ul << NVMCTRL_STATUS_LOAD_Pos)
+#define NVMCTRL_STATUS_LOAD         (_U_(0x1) << NVMCTRL_STATUS_LOAD_Pos)
 #define NVMCTRL_STATUS_PROGE_Pos    2            /**< \brief (NVMCTRL_STATUS) Programming Error Status */
-#define NVMCTRL_STATUS_PROGE        (0x1ul << NVMCTRL_STATUS_PROGE_Pos)
+#define NVMCTRL_STATUS_PROGE        (_U_(0x1) << NVMCTRL_STATUS_PROGE_Pos)
 #define NVMCTRL_STATUS_LOCKE_Pos    3            /**< \brief (NVMCTRL_STATUS) Lock Error Status */
-#define NVMCTRL_STATUS_LOCKE        (0x1ul << NVMCTRL_STATUS_LOCKE_Pos)
+#define NVMCTRL_STATUS_LOCKE        (_U_(0x1) << NVMCTRL_STATUS_LOCKE_Pos)
 #define NVMCTRL_STATUS_NVME_Pos     4            /**< \brief (NVMCTRL_STATUS) NVM Error */
-#define NVMCTRL_STATUS_NVME         (0x1ul << NVMCTRL_STATUS_NVME_Pos)
+#define NVMCTRL_STATUS_NVME         (_U_(0x1) << NVMCTRL_STATUS_NVME_Pos)
 #define NVMCTRL_STATUS_SB_Pos       8            /**< \brief (NVMCTRL_STATUS) Security Bit Status */
-#define NVMCTRL_STATUS_SB           (0x1ul << NVMCTRL_STATUS_SB_Pos)
-#define NVMCTRL_STATUS_MASK         0x011Ful     /**< \brief (NVMCTRL_STATUS) MASK Register */
+#define NVMCTRL_STATUS_SB           (_U_(0x1) << NVMCTRL_STATUS_SB_Pos)
+#define NVMCTRL_STATUS_MASK         _U_(0x011F)  /**< \brief (NVMCTRL_STATUS) MASK Register */
 
 /* -------- NVMCTRL_ADDR : (NVMCTRL Offset: 0x1C) (R/W 32) Address -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -318,12 +304,12 @@ typedef union {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 #define NVMCTRL_ADDR_OFFSET         0x1C         /**< \brief (NVMCTRL_ADDR offset) Address */
-#define NVMCTRL_ADDR_RESETVALUE     0x00000000ul /**< \brief (NVMCTRL_ADDR reset_value) Address */
+#define NVMCTRL_ADDR_RESETVALUE     _U_(0x00000000) /**< \brief (NVMCTRL_ADDR reset_value) Address */
 
 #define NVMCTRL_ADDR_ADDR_Pos       0            /**< \brief (NVMCTRL_ADDR) NVM Address */
-#define NVMCTRL_ADDR_ADDR_Msk       (0x3FFFFFul << NVMCTRL_ADDR_ADDR_Pos)
+#define NVMCTRL_ADDR_ADDR_Msk       (_U_(0x3FFFFF) << NVMCTRL_ADDR_ADDR_Pos)
 #define NVMCTRL_ADDR_ADDR(value)    (NVMCTRL_ADDR_ADDR_Msk & ((value) << NVMCTRL_ADDR_ADDR_Pos))
-#define NVMCTRL_ADDR_MASK           0x003FFFFFul /**< \brief (NVMCTRL_ADDR) MASK Register */
+#define NVMCTRL_ADDR_MASK           _U_(0x003FFFFF) /**< \brief (NVMCTRL_ADDR) MASK Register */
 
 /* -------- NVMCTRL_LOCK : (NVMCTRL Offset: 0x20) (R/W 16) Lock Section -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -336,12 +322,12 @@ typedef union {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 #define NVMCTRL_LOCK_OFFSET         0x20         /**< \brief (NVMCTRL_LOCK offset) Lock Section */
-#define NVMCTRL_LOCK_RESETVALUE     0x0000ul     /**< \brief (NVMCTRL_LOCK reset_value) Lock Section */
+#define NVMCTRL_LOCK_RESETVALUE     _U_(0x0000)  /**< \brief (NVMCTRL_LOCK reset_value) Lock Section */
 
 #define NVMCTRL_LOCK_LOCK_Pos       0            /**< \brief (NVMCTRL_LOCK) Region Lock Bits */
-#define NVMCTRL_LOCK_LOCK_Msk       (0xFFFFul << NVMCTRL_LOCK_LOCK_Pos)
+#define NVMCTRL_LOCK_LOCK_Msk       (_U_(0xFFFF) << NVMCTRL_LOCK_LOCK_Pos)
 #define NVMCTRL_LOCK_LOCK(value)    (NVMCTRL_LOCK_LOCK_Msk & ((value) << NVMCTRL_LOCK_LOCK_Pos))
-#define NVMCTRL_LOCK_MASK           0xFFFFul     /**< \brief (NVMCTRL_LOCK) MASK Register */
+#define NVMCTRL_LOCK_MASK           _U_(0xFFFF)  /**< \brief (NVMCTRL_LOCK) MASK Register */
 
 /** \brief NVMCTRL APB hardware registers */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -365,55 +351,23 @@ typedef struct {
 
 #ifdef __GNUC__
  #define SECTION_NVMCTRL_CAL          __attribute__ ((section(".flash")))
-#elif defined(__ICCARM__)
- #define SECTION_NVMCTRL_CAL          @".flash"
-#endif
-
-#ifdef __GNUC__
  #define SECTION_NVMCTRL_LOCKBIT      __attribute__ ((section(".flash")))
-#elif defined(__ICCARM__)
- #define SECTION_NVMCTRL_LOCKBIT      @".flash"
-#endif
-
-#ifdef __GNUC__
  #define SECTION_NVMCTRL_OTP1         __attribute__ ((section(".flash")))
-#elif defined(__ICCARM__)
- #define SECTION_NVMCTRL_OTP1         @".flash"
-#endif
-
-#ifdef __GNUC__
  #define SECTION_NVMCTRL_OTP2         __attribute__ ((section(".flash")))
-#elif defined(__ICCARM__)
- #define SECTION_NVMCTRL_OTP2         @".flash"
-#endif
-
-#ifdef __GNUC__
  #define SECTION_NVMCTRL_OTP3         __attribute__ ((section(".flash")))
-#elif defined(__ICCARM__)
- #define SECTION_NVMCTRL_OTP3         @".flash"
-#endif
-
-#ifdef __GNUC__
  #define SECTION_NVMCTRL_OTP4         __attribute__ ((section(".flash")))
-#elif defined(__ICCARM__)
- #define SECTION_NVMCTRL_OTP4         @".flash"
-#endif
-
-#ifdef __GNUC__
  #define SECTION_NVMCTRL_OTP5         __attribute__ ((section(".flash")))
-#elif defined(__ICCARM__)
- #define SECTION_NVMCTRL_OTP5         @".flash"
-#endif
-
-#ifdef __GNUC__
  #define SECTION_NVMCTRL_TEMP_LOG     __attribute__ ((section(".flash")))
-#elif defined(__ICCARM__)
- #define SECTION_NVMCTRL_TEMP_LOG     @".flash"
-#endif
-
-#ifdef __GNUC__
  #define SECTION_NVMCTRL_USER         __attribute__ ((section(".flash")))
 #elif defined(__ICCARM__)
+ #define SECTION_NVMCTRL_CAL          @".flash"
+ #define SECTION_NVMCTRL_LOCKBIT      @".flash"
+ #define SECTION_NVMCTRL_OTP1         @".flash"
+ #define SECTION_NVMCTRL_OTP2         @".flash"
+ #define SECTION_NVMCTRL_OTP3         @".flash"
+ #define SECTION_NVMCTRL_OTP4         @".flash"
+ #define SECTION_NVMCTRL_OTP5         @".flash"
+ #define SECTION_NVMCTRL_TEMP_LOG     @".flash"
  #define SECTION_NVMCTRL_USER         @".flash"
 #endif
 
@@ -428,155 +382,135 @@ typedef struct {
 
 #define ADC_FUSES_BIASCOMP_ADDR     NVMCTRL_OTP5
 #define ADC_FUSES_BIASCOMP_Pos      3            /**< \brief (NVMCTRL_OTP5) ADC Comparator Scaling */
-#define ADC_FUSES_BIASCOMP_Msk      (0x7ul << ADC_FUSES_BIASCOMP_Pos)
+#define ADC_FUSES_BIASCOMP_Msk      (_U_(0x7) << ADC_FUSES_BIASCOMP_Pos)
 #define ADC_FUSES_BIASCOMP(value)   (ADC_FUSES_BIASCOMP_Msk & ((value) << ADC_FUSES_BIASCOMP_Pos))
 
 #define ADC_FUSES_BIASREFBUF_ADDR   NVMCTRL_OTP5
 #define ADC_FUSES_BIASREFBUF_Pos    0            /**< \brief (NVMCTRL_OTP5) ADC Bias Reference Buffer Scaling */
-#define ADC_FUSES_BIASREFBUF_Msk    (0x7ul << ADC_FUSES_BIASREFBUF_Pos)
+#define ADC_FUSES_BIASREFBUF_Msk    (_U_(0x7) << ADC_FUSES_BIASREFBUF_Pos)
 #define ADC_FUSES_BIASREFBUF(value) (ADC_FUSES_BIASREFBUF_Msk & ((value) << ADC_FUSES_BIASREFBUF_Pos))
 
 #define FUSES_BOD12_DIS_ADDR        NVMCTRL_USER
 #define FUSES_BOD12_DIS_Pos         23           /**< \brief (NVMCTRL_USER) BOD12 Disable */
-#define FUSES_BOD12_DIS_Msk         (0x1ul << FUSES_BOD12_DIS_Pos)
+#define FUSES_BOD12_DIS_Msk         (_U_(0x1) << FUSES_BOD12_DIS_Pos)
 
 #define FUSES_BOD12_HYST_ADDR       (NVMCTRL_USER + 4)
 #define FUSES_BOD12_HYST_Pos        10           /**< \brief (NVMCTRL_USER) BOD12 Hysteresis */
-#define FUSES_BOD12_HYST_Msk        (0x1ul << FUSES_BOD12_HYST_Pos)
+#define FUSES_BOD12_HYST_Msk        (_U_(0x1) << FUSES_BOD12_HYST_Pos)
 
 #define FUSES_BOD33USERLEVEL_ADDR   NVMCTRL_USER
 #define FUSES_BOD33USERLEVEL_Pos    8            /**< \brief (NVMCTRL_USER) BOD33 User Level */
-#define FUSES_BOD33USERLEVEL_Msk    (0x3Ful << FUSES_BOD33USERLEVEL_Pos)
+#define FUSES_BOD33USERLEVEL_Msk    (_U_(0x3F) << FUSES_BOD33USERLEVEL_Pos)
 #define FUSES_BOD33USERLEVEL(value) (FUSES_BOD33USERLEVEL_Msk & ((value) << FUSES_BOD33USERLEVEL_Pos))
 
 #define FUSES_BOD33_ACTION_ADDR     NVMCTRL_USER
 #define FUSES_BOD33_ACTION_Pos      15           /**< \brief (NVMCTRL_USER) BOD33 Action */
-#define FUSES_BOD33_ACTION_Msk      (0x3ul << FUSES_BOD33_ACTION_Pos)
+#define FUSES_BOD33_ACTION_Msk      (_U_(0x3) << FUSES_BOD33_ACTION_Pos)
 #define FUSES_BOD33_ACTION(value)   (FUSES_BOD33_ACTION_Msk & ((value) << FUSES_BOD33_ACTION_Pos))
 
 #define FUSES_BOD33_DIS_ADDR        NVMCTRL_USER
 #define FUSES_BOD33_DIS_Pos         14           /**< \brief (NVMCTRL_USER) BOD33 Disable */
-#define FUSES_BOD33_DIS_Msk         (0x1ul << FUSES_BOD33_DIS_Pos)
+#define FUSES_BOD33_DIS_Msk         (_U_(0x1) << FUSES_BOD33_DIS_Pos)
 
 #define FUSES_BOD33_HYST_ADDR       (NVMCTRL_USER + 4)
 #define FUSES_BOD33_HYST_Pos        9            /**< \brief (NVMCTRL_USER) BOD33 Hysteresis */
-#define FUSES_BOD33_HYST_Msk        (0x1ul << FUSES_BOD33_HYST_Pos)
+#define FUSES_BOD33_HYST_Msk        (_U_(0x1) << FUSES_BOD33_HYST_Pos)
 
 #define FUSES_HOT_ADC_VAL_ADDR      (NVMCTRL_TEMP_LOG + 4)
 #define FUSES_HOT_ADC_VAL_Pos       20           /**< \brief (NVMCTRL_TEMP_LOG) 12-bit ADC conversion at hot temperature */
-#define FUSES_HOT_ADC_VAL_Msk       (0xFFFul << FUSES_HOT_ADC_VAL_Pos)
+#define FUSES_HOT_ADC_VAL_Msk       (_U_(0xFFF) << FUSES_HOT_ADC_VAL_Pos)
 #define FUSES_HOT_ADC_VAL(value)    (FUSES_HOT_ADC_VAL_Msk & ((value) << FUSES_HOT_ADC_VAL_Pos))
 
 #define FUSES_HOT_INT1V_VAL_ADDR    (NVMCTRL_TEMP_LOG + 4)
 #define FUSES_HOT_INT1V_VAL_Pos     0            /**< \brief (NVMCTRL_TEMP_LOG) 2's complement of the internal 1V reference drift at hot temperature (versus a 1.0 centered value) */
-#define FUSES_HOT_INT1V_VAL_Msk     (0xFFul << FUSES_HOT_INT1V_VAL_Pos)
+#define FUSES_HOT_INT1V_VAL_Msk     (_U_(0xFF) << FUSES_HOT_INT1V_VAL_Pos)
 #define FUSES_HOT_INT1V_VAL(value)  (FUSES_HOT_INT1V_VAL_Msk & ((value) << FUSES_HOT_INT1V_VAL_Pos))
 
 #define FUSES_HOT_TEMP_VAL_DEC_ADDR NVMCTRL_TEMP_LOG
 #define FUSES_HOT_TEMP_VAL_DEC_Pos  20           /**< \brief (NVMCTRL_TEMP_LOG) Decimal part of hot temperature */
-#define FUSES_HOT_TEMP_VAL_DEC_Msk  (0xFul << FUSES_HOT_TEMP_VAL_DEC_Pos)
+#define FUSES_HOT_TEMP_VAL_DEC_Msk  (_U_(0xF) << FUSES_HOT_TEMP_VAL_DEC_Pos)
 #define FUSES_HOT_TEMP_VAL_DEC(value) (FUSES_HOT_TEMP_VAL_DEC_Msk & ((value) << FUSES_HOT_TEMP_VAL_DEC_Pos))
 
 #define FUSES_HOT_TEMP_VAL_INT_ADDR NVMCTRL_TEMP_LOG
 #define FUSES_HOT_TEMP_VAL_INT_Pos  12           /**< \brief (NVMCTRL_TEMP_LOG) Integer part of hot temperature in oC */
-#define FUSES_HOT_TEMP_VAL_INT_Msk  (0xFFul << FUSES_HOT_TEMP_VAL_INT_Pos)
+#define FUSES_HOT_TEMP_VAL_INT_Msk  (_U_(0xFF) << FUSES_HOT_TEMP_VAL_INT_Pos)
 #define FUSES_HOT_TEMP_VAL_INT(value) (FUSES_HOT_TEMP_VAL_INT_Msk & ((value) << FUSES_HOT_TEMP_VAL_INT_Pos))
 
 #define FUSES_ROOM_ADC_VAL_ADDR     (NVMCTRL_TEMP_LOG + 4)
 #define FUSES_ROOM_ADC_VAL_Pos      8            /**< \brief (NVMCTRL_TEMP_LOG) 12-bit ADC conversion at room temperature */
-#define FUSES_ROOM_ADC_VAL_Msk      (0xFFFul << FUSES_ROOM_ADC_VAL_Pos)
+#define FUSES_ROOM_ADC_VAL_Msk      (_U_(0xFFF) << FUSES_ROOM_ADC_VAL_Pos)
 #define FUSES_ROOM_ADC_VAL(value)   (FUSES_ROOM_ADC_VAL_Msk & ((value) << FUSES_ROOM_ADC_VAL_Pos))
 
 #define FUSES_ROOM_INT1V_VAL_ADDR   NVMCTRL_TEMP_LOG
 #define FUSES_ROOM_INT1V_VAL_Pos    24           /**< \brief (NVMCTRL_TEMP_LOG) 2's complement of the internal 1V reference drift at room temperature (versus a 1.0 centered value) */
-#define FUSES_ROOM_INT1V_VAL_Msk    (0xFFul << FUSES_ROOM_INT1V_VAL_Pos)
+#define FUSES_ROOM_INT1V_VAL_Msk    (_U_(0xFF) << FUSES_ROOM_INT1V_VAL_Pos)
 #define FUSES_ROOM_INT1V_VAL(value) (FUSES_ROOM_INT1V_VAL_Msk & ((value) << FUSES_ROOM_INT1V_VAL_Pos))
 
 #define FUSES_ROOM_TEMP_VAL_DEC_ADDR NVMCTRL_TEMP_LOG
 #define FUSES_ROOM_TEMP_VAL_DEC_Pos 8            /**< \brief (NVMCTRL_TEMP_LOG) Decimal part of room temperature */
-#define FUSES_ROOM_TEMP_VAL_DEC_Msk (0xFul << FUSES_ROOM_TEMP_VAL_DEC_Pos)
+#define FUSES_ROOM_TEMP_VAL_DEC_Msk (_U_(0xF) << FUSES_ROOM_TEMP_VAL_DEC_Pos)
 #define FUSES_ROOM_TEMP_VAL_DEC(value) (FUSES_ROOM_TEMP_VAL_DEC_Msk & ((value) << FUSES_ROOM_TEMP_VAL_DEC_Pos))
 
 #define FUSES_ROOM_TEMP_VAL_INT_ADDR NVMCTRL_TEMP_LOG
 #define FUSES_ROOM_TEMP_VAL_INT_Pos 0            /**< \brief (NVMCTRL_TEMP_LOG) Integer part of room temperature in oC */
-#define FUSES_ROOM_TEMP_VAL_INT_Msk (0xFFul << FUSES_ROOM_TEMP_VAL_INT_Pos)
+#define FUSES_ROOM_TEMP_VAL_INT_Msk (_U_(0xFF) << FUSES_ROOM_TEMP_VAL_INT_Pos)
 #define FUSES_ROOM_TEMP_VAL_INT(value) (FUSES_ROOM_TEMP_VAL_INT_Msk & ((value) << FUSES_ROOM_TEMP_VAL_INT_Pos))
 
 #define NVMCTRL_FUSES_BOOTPROT_ADDR NVMCTRL_USER
 #define NVMCTRL_FUSES_BOOTPROT_Pos  0            /**< \brief (NVMCTRL_USER) Bootloader Size */
-#define NVMCTRL_FUSES_BOOTPROT_Msk  (0x7ul << NVMCTRL_FUSES_BOOTPROT_Pos)
+#define NVMCTRL_FUSES_BOOTPROT_Msk  (_U_(0x7) << NVMCTRL_FUSES_BOOTPROT_Pos)
 #define NVMCTRL_FUSES_BOOTPROT(value) (NVMCTRL_FUSES_BOOTPROT_Msk & ((value) << NVMCTRL_FUSES_BOOTPROT_Pos))
 
 #define NVMCTRL_FUSES_EEPROM_SIZE_ADDR NVMCTRL_USER
 #define NVMCTRL_FUSES_EEPROM_SIZE_Pos 4            /**< \brief (NVMCTRL_USER) EEPROM Size */
-#define NVMCTRL_FUSES_EEPROM_SIZE_Msk (0x7ul << NVMCTRL_FUSES_EEPROM_SIZE_Pos)
+#define NVMCTRL_FUSES_EEPROM_SIZE_Msk (_U_(0x7) << NVMCTRL_FUSES_EEPROM_SIZE_Pos)
 #define NVMCTRL_FUSES_EEPROM_SIZE(value) (NVMCTRL_FUSES_EEPROM_SIZE_Msk & ((value) << NVMCTRL_FUSES_EEPROM_SIZE_Pos))
-
-#define NVMCTRL_FUSES_NVMP_ADDR     NVMCTRL_OTP1
-#define NVMCTRL_FUSES_NVMP_Pos      16           /**< \brief (NVMCTRL_OTP1) Number of NVM Pages */
-#define NVMCTRL_FUSES_NVMP_Msk      (0x1FFFul << NVMCTRL_FUSES_NVMP_Pos)
-#define NVMCTRL_FUSES_NVMP(value)   (NVMCTRL_FUSES_NVMP_Msk & ((value) << NVMCTRL_FUSES_NVMP_Pos))
-
-#define NVMCTRL_FUSES_NVM_LOCK_ADDR NVMCTRL_OTP1
-#define NVMCTRL_FUSES_NVM_LOCK_Pos  0            /**< \brief (NVMCTRL_OTP1) NVM Lock */
-#define NVMCTRL_FUSES_NVM_LOCK_Msk  (0xFFul << NVMCTRL_FUSES_NVM_LOCK_Pos)
-#define NVMCTRL_FUSES_NVM_LOCK(value) (NVMCTRL_FUSES_NVM_LOCK_Msk & ((value) << NVMCTRL_FUSES_NVM_LOCK_Pos))
-
-#define NVMCTRL_FUSES_PSZ_ADDR      NVMCTRL_OTP1
-#define NVMCTRL_FUSES_PSZ_Pos       8            /**< \brief (NVMCTRL_OTP1) NVM Page Size */
-#define NVMCTRL_FUSES_PSZ_Msk       (0x3ul << NVMCTRL_FUSES_PSZ_Pos)
-#define NVMCTRL_FUSES_PSZ(value)    (NVMCTRL_FUSES_PSZ_Msk & ((value) << NVMCTRL_FUSES_PSZ_Pos))
 
 #define NVMCTRL_FUSES_REGION_LOCKS_ADDR (NVMCTRL_USER + 4)
 #define NVMCTRL_FUSES_REGION_LOCKS_Pos 16           /**< \brief (NVMCTRL_USER) NVM Region Locks */
-#define NVMCTRL_FUSES_REGION_LOCKS_Msk (0xFFFFul << NVMCTRL_FUSES_REGION_LOCKS_Pos)
+#define NVMCTRL_FUSES_REGION_LOCKS_Msk (_U_(0xFFFF) << NVMCTRL_FUSES_REGION_LOCKS_Pos)
 #define NVMCTRL_FUSES_REGION_LOCKS(value) (NVMCTRL_FUSES_REGION_LOCKS_Msk & ((value) << NVMCTRL_FUSES_REGION_LOCKS_Pos))
-
-#define NVMCTRL_FUSES_RWWEEP_ADDR   (NVMCTRL_OTP1 + 4)
-#define NVMCTRL_FUSES_RWWEEP_Pos    0            /**< \brief (NVMCTRL_OTP1) Number of RWW EEPROM Pages */
-#define NVMCTRL_FUSES_RWWEEP_Msk    (0xFFul << NVMCTRL_FUSES_RWWEEP_Pos)
-#define NVMCTRL_FUSES_RWWEEP(value) (NVMCTRL_FUSES_RWWEEP_Msk & ((value) << NVMCTRL_FUSES_RWWEEP_Pos))
 
 #define USB_FUSES_TRANSN_ADDR       NVMCTRL_OTP5
 #define USB_FUSES_TRANSN_Pos        13           /**< \brief (NVMCTRL_OTP5) USB pad Transn calibration */
-#define USB_FUSES_TRANSN_Msk        (0x1Ful << USB_FUSES_TRANSN_Pos)
+#define USB_FUSES_TRANSN_Msk        (_U_(0x1F) << USB_FUSES_TRANSN_Pos)
 #define USB_FUSES_TRANSN(value)     (USB_FUSES_TRANSN_Msk & ((value) << USB_FUSES_TRANSN_Pos))
 
 #define USB_FUSES_TRANSP_ADDR       NVMCTRL_OTP5
 #define USB_FUSES_TRANSP_Pos        18           /**< \brief (NVMCTRL_OTP5) USB pad Transp calibration */
-#define USB_FUSES_TRANSP_Msk        (0x1Ful << USB_FUSES_TRANSP_Pos)
+#define USB_FUSES_TRANSP_Msk        (_U_(0x1F) << USB_FUSES_TRANSP_Pos)
 #define USB_FUSES_TRANSP(value)     (USB_FUSES_TRANSP_Msk & ((value) << USB_FUSES_TRANSP_Pos))
 
 #define USB_FUSES_TRIM_ADDR         NVMCTRL_OTP5
 #define USB_FUSES_TRIM_Pos          23           /**< \brief (NVMCTRL_OTP5) USB pad Trim calibration */
-#define USB_FUSES_TRIM_Msk          (0x7ul << USB_FUSES_TRIM_Pos)
+#define USB_FUSES_TRIM_Msk          (_U_(0x7) << USB_FUSES_TRIM_Pos)
 #define USB_FUSES_TRIM(value)       (USB_FUSES_TRIM_Msk & ((value) << USB_FUSES_TRIM_Pos))
 
 #define WDT_FUSES_ALWAYSON_ADDR     NVMCTRL_USER
 #define WDT_FUSES_ALWAYSON_Pos      27           /**< \brief (NVMCTRL_USER) WDT Always On */
-#define WDT_FUSES_ALWAYSON_Msk      (0x1ul << WDT_FUSES_ALWAYSON_Pos)
+#define WDT_FUSES_ALWAYSON_Msk      (_U_(0x1) << WDT_FUSES_ALWAYSON_Pos)
 
 #define WDT_FUSES_ENABLE_ADDR       NVMCTRL_USER
 #define WDT_FUSES_ENABLE_Pos        26           /**< \brief (NVMCTRL_USER) WDT Enable */
-#define WDT_FUSES_ENABLE_Msk        (0x1ul << WDT_FUSES_ENABLE_Pos)
+#define WDT_FUSES_ENABLE_Msk        (_U_(0x1) << WDT_FUSES_ENABLE_Pos)
 
 #define WDT_FUSES_EWOFFSET_ADDR     (NVMCTRL_USER + 4)
 #define WDT_FUSES_EWOFFSET_Pos      4            /**< \brief (NVMCTRL_USER) WDT Early Warning Offset */
-#define WDT_FUSES_EWOFFSET_Msk      (0xFul << WDT_FUSES_EWOFFSET_Pos)
+#define WDT_FUSES_EWOFFSET_Msk      (_U_(0xF) << WDT_FUSES_EWOFFSET_Pos)
 #define WDT_FUSES_EWOFFSET(value)   (WDT_FUSES_EWOFFSET_Msk & ((value) << WDT_FUSES_EWOFFSET_Pos))
 
 #define WDT_FUSES_PER_ADDR          NVMCTRL_USER
 #define WDT_FUSES_PER_Pos           28           /**< \brief (NVMCTRL_USER) WDT Period */
-#define WDT_FUSES_PER_Msk           (0xFul << WDT_FUSES_PER_Pos)
+#define WDT_FUSES_PER_Msk           (_U_(0xF) << WDT_FUSES_PER_Pos)
 #define WDT_FUSES_PER(value)        (WDT_FUSES_PER_Msk & ((value) << WDT_FUSES_PER_Pos))
 
 #define WDT_FUSES_WEN_ADDR          (NVMCTRL_USER + 4)
 #define WDT_FUSES_WEN_Pos           8            /**< \brief (NVMCTRL_USER) WDT Window Mode Enable */
-#define WDT_FUSES_WEN_Msk           (0x1ul << WDT_FUSES_WEN_Pos)
+#define WDT_FUSES_WEN_Msk           (_U_(0x1) << WDT_FUSES_WEN_Pos)
 
 #define WDT_FUSES_WINDOW_ADDR       (NVMCTRL_USER + 4)
 #define WDT_FUSES_WINDOW_Pos        0            /**< \brief (NVMCTRL_USER) WDT Window */
-#define WDT_FUSES_WINDOW_Msk        (0xFul << WDT_FUSES_WINDOW_Pos)
+#define WDT_FUSES_WINDOW_Msk        (_U_(0xF) << WDT_FUSES_WINDOW_Pos)
 #define WDT_FUSES_WINDOW(value)     (WDT_FUSES_WINDOW_Msk & ((value) << WDT_FUSES_WINDOW_Pos))
 
 /*@}*/

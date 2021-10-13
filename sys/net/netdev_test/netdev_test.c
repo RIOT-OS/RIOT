@@ -33,7 +33,8 @@ void netdev_test_reset(netdev_test_t *dev)
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
-    netdev_test_t *dev = (netdev_test_t *)netdev;
+    netdev_test_t *dev = container_of(container_of(netdev, netdev_ieee802154_t, netdev),
+                                      netdev_test_t, netdev);
     int res = -EINVAL;
 
     mutex_lock(&dev->mutex);
@@ -46,7 +47,8 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
-    netdev_test_t *dev = (netdev_test_t *)netdev;
+    netdev_test_t *dev = container_of(container_of(netdev, netdev_ieee802154_t, netdev),
+                                      netdev_test_t, netdev);
     int res = (buf == NULL) ? 0 : len;  /* assume everything would be fine */
 
     mutex_lock(&dev->mutex);
@@ -63,7 +65,8 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 static int _init(netdev_t *netdev)
 {
-    netdev_test_t *dev = (netdev_test_t *)netdev;
+    netdev_test_t *dev = container_of(container_of(netdev, netdev_ieee802154_t, netdev),
+                                      netdev_test_t, netdev);
     int res = 0;        /* assume everything would be fine */
 
     mutex_lock(&dev->mutex);
@@ -76,7 +79,8 @@ static int _init(netdev_t *netdev)
 
 static void _isr(netdev_t *netdev)
 {
-    netdev_test_t *dev = (netdev_test_t *)netdev;
+    netdev_test_t *dev = container_of(container_of(netdev, netdev_ieee802154_t, netdev),
+                                      netdev_test_t, netdev);
 
     mutex_lock(&dev->mutex);
     if (dev->isr_cb != NULL) {
@@ -90,7 +94,8 @@ static void _isr(netdev_t *netdev)
 
 static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
-    netdev_test_t *dev = (netdev_test_t *)netdev;
+    netdev_test_t *dev = container_of(container_of(netdev, netdev_ieee802154_t, netdev),
+                                      netdev_test_t, netdev);
     int res = -ENOTSUP;     /* option assumed to be not supported */
 
     mutex_lock(&dev->mutex);
@@ -103,7 +108,8 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 
 static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_len)
 {
-    netdev_test_t *dev = (netdev_test_t *)netdev;
+    netdev_test_t *dev = container_of(container_of(netdev, netdev_ieee802154_t, netdev),
+                                      netdev_test_t, netdev);
     int res = -ENOTSUP;     /* option assumed to be not supported */
 
     mutex_lock(&dev->mutex);
@@ -125,9 +131,7 @@ static const netdev_driver_t _driver = {
 
 void netdev_test_setup(netdev_test_t *dev, void *state)
 {
-    netdev_t *netdev = (netdev_t *)dev;
-
-    netdev->driver = &_driver;
+    dev->netdev.netdev.driver = &_driver;
     dev->state = state;
     mutex_init(&dev->mutex);
     netdev_test_reset(dev);

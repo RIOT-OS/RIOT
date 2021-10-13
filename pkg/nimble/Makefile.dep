@@ -1,0 +1,107 @@
+# RIOT specific dependencies
+USEMODULE += sema
+USEMODULE += event_callback
+USEMODULE += ztimer_msec
+
+# Requires nimble feature
+FEATURES_REQUIRED += ble_nimble
+
+# glue code
+USEMODULE += nimble_riot_contrib
+
+# RIOT port
+USEMODULE += nimble_porting_nimble
+
+# NOTE: this dependency depends on inclusion order, for it to work properly
+# mynewt-core should be selected as nimble backend as early as possible,
+# i.e. at the application level.
+ifneq (,$(filter mynewt-core,$(USEPKG)))
+  USEMODULE += mynewt-core_os
+  USEMODULE += mynewt-core_util
+  USEMODULE += mynewt-core_nrf5x_hal
+else
+  # uwb-% requires mynewt-core so is incompatible with nimble_npl_riot
+  ifeq (,$(filter uwb%,$(USEPKG)))
+    USEMODULE += nimble_npl_riot
+  endif
+endif
+
+# if nothing else is specified, we build the host and controller
+ifeq (,$(filter nimble_host nimble_controller,$(USEMODULE)))
+  USEMODULE += nimble_host
+  USEMODULE += nimble_controller
+endif
+
+# include host dependencies
+ifneq (,$(filter nimble_host,$(USEMODULE)))
+  USEMODULE += nimble_host_util
+  USEMODULE += nimble_host_store_ram
+  USEPKG += tinycrypt
+endif
+
+# nimble controller dependencies
+ifneq (,$(filter nimble_controller,$(USEMODULE)))
+  USEMODULE += nimble_transport_ram
+  ifneq (,$(filter nrf5%,$(CPU_FAM)))
+    USEMODULE += nimble_drivers_nrf5x
+  endif
+endif
+
+# RIOT specific submodule dependencies
+ifneq (,$(filter nimble_addr,$(USEMODULE)))
+  USEMODULE += bluetil_addr
+endif
+
+ifneq (,$(filter nimble_autoadv,$(USEMODULE)))
+  USEMODULE += bluetil_ad
+endif
+
+ifneq (,$(filter nimble_autoconn_%,$(USEMODULE)))
+  USEMODULE += nimble_autoconn
+endif
+
+ifneq (,$(filter nimble_autoconn,$(USEMODULE)))
+  USEMODULE += random
+  USEMODULE += nimble_netif
+  USEMODULE += nimble_scanner
+  USEMODULE += bluetil_ad
+endif
+
+ifneq (,$(filter nimble_rpble,$(USEMODULE)))
+  USEMODULE += gnrc_rpl
+  USEMODULE += nimble_netif
+  USEMODULE += nimble_scanner
+  USEMODULE += bluetil_ad
+endif
+
+ifneq (,$(filter nimble_scanlist,$(USEMODULE)))
+  USEMODULE += nimble_addr
+  USEMODULE += bluetil_ad
+  USEMODULE += ztimer_usec
+endif
+
+ifneq (,$(filter nimble_statconn,$(USEMODULE)))
+  USEMODULE += random
+  USEMODULE += nimble_netif
+  USEMODULE += nimble_addr
+endif
+
+ifneq (,$(filter nimble_netif,$(USEMODULE)))
+  FEATURES_REQUIRED += ble_nimble_netif
+  USEMODULE += random
+  USEMODULE += l2util
+  USEMODULE += bluetil_addr
+  ifneq (,$(filter gnrc_ipv6_%,$(USEMODULE)))
+    USEMODULE += nimble_svc_ipss
+  endif
+  ifneq (,$(filter gnrc_ipv6_router_default,$(USEMODULE)))
+    USEMODULE += gnrc_ipv6_nib_6lr
+    USEMODULE += gnrc_sixlowpan
+    USEMODULE += gnrc_sixlowpan_iphc
+  endif
+  ifneq (,$(filter gnrc_ipv6_default,$(USEMODULE)))
+    USEMODULE += gnrc_ipv6_nib_6ln
+    USEMODULE += gnrc_sixlowpan
+    USEMODULE += gnrc_sixlowpan_iphc
+  endif
+endif

@@ -1,0 +1,96 @@
+# Copyright (C) 2021 Freie Universität Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menuconfig KCONFIG_USEMODULE_FIDO2_CTAP
+    bool "FIDO2 CTAP"
+    depends on USEMODULE_FIDO2_CTAP
+    help
+        Configure a FIDO2 CTAP authenticator via KConfig.
+
+if KCONFIG_USEMODULE_FIDO2_CTAP
+
+config FIDO2_CTAP_STACK_SIZE
+    int "CTAP thread stack size"
+    default 15000
+
+config FIDO2_CTAP_DEVICE_AAGUID
+    string "AAGUID of the CTAP authenticator"
+    default "9c295865fa2c36b705a42320af9c8f16"
+    help
+        The AAGUID is identifying the type of the authenticator (e.g manufacturer
+        and model). The AAGUID needs to be 128 bits long. The default value here
+        is a fallback value that was randomly generated.
+
+config FIDO2_CTAP_DISABLE_UP
+    bool "Disable user presence tests"
+    help
+        When set, the authenticator will not ask for permission before creating
+        a new credential pair or authenticating.
+
+config FIDO2_CTAP_DISABLE_LED
+    bool "Disable LED animations"
+    help
+        When set, the authenticator will not use LED's.
+
+config FIDO2_CTAP_UP_TIMEOUT
+    int "Seconds until user presence test times out"
+    default 15
+
+config FIDO2_CTAP_UP_BUTTON_PORT
+    int "Port of user presence button"
+    depends on !FIDO2_CTAP_DISABLE_UP
+    default -1
+
+config FIDO2_CTAP_UP_BUTTON_PIN
+    int "Pin of user presence button"
+    depends on !FIDO2_CTAP_DISABLE_UP
+    default -1
+
+choice
+    bool "User presence button mode"
+    depends on !FIDO2_CTAP_DISABLE_UP
+    default FIDO2_CTAP_UP_BUTTON_MODE_IN_PU
+
+config FIDO2_CTAP_UP_BUTTON_MODE_IN_PU
+    bool "GPIO_IN_PU"
+    help
+        Configure as input with pull-up resistor
+
+config FIDO2_CTAP_UP_BUTTON_MODE_IN_PD
+    bool "GPIO_IN_PD"
+    help
+        Configure as input with pull-down resistor
+
+config FIDO2_CTAP_UP_BUTTON_MODE_IN
+    bool "GPIO_IN"
+    help
+        Configure as input without pull resistor
+
+endchoice
+
+choice
+    bool "User presence button pin flank"
+    depends on !FIDO2_CTAP_DISABLE_UP
+    default FIDO2_CTAP_UP_BUTTON_FLANK_FALLING
+
+config FIDO2_CTAP_UP_BUTTON_FLANK_FALLING
+    bool "GPIO_FALLING"
+
+config FIDO2_CTAP_UP_BUTTON_FLANK_RISING
+    bool "GPIO_RISING"
+
+endchoice
+
+config FIDO2_CTAP_FLASH_START_PAGE
+    int "First flash page to store data in"
+    default -1
+    help
+        Configuring this incorrectly can lead to firmware corruption so make sure
+        the flash page is located after the firmware.
+
+rsource "transport/Kconfig"
+
+endif # KCONFIG_USEMODULE_FIDO2_CTAP

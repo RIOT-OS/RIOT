@@ -6,22 +6,24 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-import os
 import sys
+import os
+from testrunner import run
+
+
+# Allow setting a specific port to test
+PORT_UNDER_TEST = int(os.environ.get('PORT_UNDER_TEST') or 0)
 
 
 def testfunc(child):
-    child.expect_exact("GPIO peripheral driver test")
-    child.expect_exact(">")
-
     for pin in range(0, 8):
-        child.sendline("bench 0 {}".format(pin))
-        child.expect(r" *nop loop: +(\d+)us  --- +(\d+\.\d+)us per call")
-        child.expect(r" *gpio_set: +(\d+)us  --- +(\d+\.\d+)us per call")
-        child.expect(r" *gpio_clear: +(\d+)us  --- +(\d+\.\d+)us per call")
-        child.expect(r" *gpio_toggle: +(\d+)us  --- +(\d+\.\d+)us per call")
-        child.expect(r" *gpio_read: +(\d+)us  --- +(\d+\.\d+)us per call")
-        child.expect(r" *gpio_write: +(\d+)us  --- +(\d+\.\d+)us per call")
+        child.sendline("bench {} {}".format(PORT_UNDER_TEST, pin))
+        child.expect(r" *nop loop: +(\d+)us  --- +(\d+\.\d+)us per call  --- +(\d+) calls per sec")
+        child.expect(r" *gpio_set: +(\d+)us  --- +(\d+\.\d+)us per call  --- +(\d+) calls per sec")
+        child.expect(r" *gpio_clear: +(\d+)us  --- +(\d+\.\d+)us per call  --- +(\d+) calls per sec")
+        child.expect(r" *gpio_toggle: +(\d+)us  --- +(\d+\.\d+)us per call  --- +(\d+) calls per sec")
+        child.expect(r" *gpio_read: +(\d+)us  --- +(\d+\.\d+)us per call  --- +(\d+) calls per sec")
+        child.expect(r" *gpio_write: +(\d+)us  --- +(\d+\.\d+)us per call  --- +(\d+) calls per sec")
         child.expect_exact(" --- DONE ---")
         child.expect_exact(">")
 
@@ -33,6 +35,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-    from testrunner import run
-    sys.exit(run(testfunc, timeout=10))
+    sys.exit(run(testfunc))

@@ -40,12 +40,11 @@ extern "C" {
  *
  * @return            <0 on error
  * @return            CIPHER_ERR_INVALID_LENGTH when input_len % BLOCK_SIZE != 0
- * @return            CIPHER_ERR_ENC_FAILED on internal encrption error
+ * @return            CIPHER_ERR_ENC_FAILED on internal encryption error
  * @return            otherwise number of input bytes that aren't consumed
  */
-int cipher_encrypt_cbc(cipher_t *cipher, uint8_t iv[16], const uint8_t *input,
+int cipher_encrypt_cbc(const cipher_t *cipher, uint8_t iv[16], const uint8_t *input,
                        size_t input_len, uint8_t *output);
-
 
 /**
  * @brief Decrypt encrypted data in cipher block chaining mode.
@@ -62,7 +61,7 @@ int cipher_encrypt_cbc(cipher_t *cipher, uint8_t iv[16], const uint8_t *input,
  * @return            CIPHER_ERR_DEC_FAILED on internal decryption error
  * @return            otherwise number of bytes decrypted
  */
-int cipher_decrypt_cbc(cipher_t *cipher, uint8_t iv[16], const uint8_t *input,
+int cipher_decrypt_cbc(const cipher_t *cipher, uint8_t iv[16], const uint8_t *input,
                        size_t input_len, uint8_t *output);
 
 #ifdef __cplusplus
@@ -70,3 +69,4 @@ int cipher_decrypt_cbc(cipher_t *cipher, uint8_t iv[16], const uint8_t *input,
 #endif
 
 #endif /* CRYPTO_MODES_CBC_H */
+/** @} */

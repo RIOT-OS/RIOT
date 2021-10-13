@@ -7,8 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup native_cpu
- * @ingroup irq
+ * @ingroup cpu_native
  * @{
  * @file
  * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
@@ -41,7 +40,7 @@
 
 #include "native_internal.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 volatile int native_interrupts_enabled = 0;
@@ -202,6 +201,11 @@ unsigned irq_enable(void)
 
     _native_syscall_leave();
 
+    if (_native_in_isr == 0 && sched_context_switch_request) {
+        DEBUG("irq_enable() deferred thread_yield_higher()\n");
+        thread_yield_higher();
+    }
+
     DEBUG("irq_enable(): return\n");
 
     return prev_state;
@@ -221,6 +225,11 @@ void irq_restore(unsigned state)
     return;
 }
 
+int irq_is_enabled(void)
+{
+    return native_interrupts_enabled;
+}
+
 int irq_is_in(void)
 {
     DEBUG("irq_is_in: %i\n", _native_in_isr);
@@ -230,7 +239,7 @@ int irq_is_in(void)
 int _native_popsig(void)
 {
     int nread, nleft, i;
-    int sig;
+    int sig = 0;
 
     nleft = sizeof(int);
     i = 0;
@@ -299,9 +308,9 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     if (context == NULL) {
         errx(EXIT_FAILURE, "native_isr_entry: context is null - unhandled");
     }
-    if (sched_active_thread == NULL) {
+    if (thread_get_active() == NULL) {
         _native_in_isr++;
-        warnx("native_isr_entry: sched_active_thread is null - unhandled");
+        warnx("native_isr_entry: thread_get_active() is null - unhandled");
         _native_in_isr--;
         return;
     }
@@ -326,7 +335,7 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     native_isr_context.uc_stack.ss_size = sizeof(__isr_stack);
     native_isr_context.uc_stack.ss_flags = 0;
     makecontext(&native_isr_context, native_irq_handler, 0);
-    _native_cur_ctx = (ucontext_t *)sched_active_thread->sp;
+    _native_cur_ctx = (ucontext_t *)thread_get_active()->sp;
 
     DEBUG("\n\n\t\tnative_isr_entry: return to _native_sig_leave_tramp\n\n");
     /* disable interrupts in context */
@@ -452,7 +461,7 @@ static void native_shutdown(int sig, siginfo_t *info, void *context)
 
 /**
  * register internal signal handler,
- * initalize local variables
+ * initialize local variables
  *
  * TODO: see register_interrupt
  */
@@ -541,7 +550,6 @@ void native_interrupt_init(void)
     if (sigaction(SIGINT, &sa, NULL)) {
         err(EXIT_FAILURE, "native_interrupt_init: sigaction");
     }
-
 
     puts("RIOT native interrupts/signals initialized.");
 }

@@ -1,0 +1,24 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "esp32-olimex-evb" if BOARD_ESP32_OLIMEX_EVB
+
+config BOARD_ESP32_OLIMEX_EVB
+    bool
+    default y
+    select BOARD_COMMON_ESP32
+    select CPU_MODEL_ESP32_WROOM_32
+    select HAS_ARDUINO
+    select HAS_PERIPH_ADC if USEMODULE_OLIMEX_ESP32_GATEWAY
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_PWM
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_ETH
+    select HAS_PERIPH_CAN
+    select HAS_PERIPH_IR
+
+source "$(RIOTBOARD)/common/esp32/Kconfig"

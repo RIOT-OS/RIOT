@@ -1,0 +1,450 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU models
+config CPU_MODEL_STM32L100C6
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L100C6_A
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L100R8
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L100R8_A
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L100RB
+    bool
+    select CPU_LINE_STM32L100XB
+
+config CPU_MODEL_STM32L100RB_A
+    bool
+    select CPU_LINE_STM32L100XBA
+
+config CPU_MODEL_STM32L100RC
+    bool
+    select CPU_LINE_STM32L100XC
+
+config CPU_MODEL_STM32L151C6
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L151C6_A
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L151C8
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L151C8_A
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L151CB
+    bool
+    select CPU_LINE_STM32L151XB
+
+config CPU_MODEL_STM32L151CB_A
+    bool
+    select CPU_LINE_STM32L151XBA
+
+config CPU_MODEL_STM32L151CC
+    bool
+    select CPU_LINE_STM32L151XC
+
+config CPU_MODEL_STM32L151QC
+    bool
+    select CPU_LINE_STM32L151XC
+
+config CPU_MODEL_STM32L151QD
+    bool
+    select CPU_LINE_STM32L151XD
+
+config CPU_MODEL_STM32L151QE
+    bool
+    select CPU_LINE_STM32L151XE
+
+config CPU_MODEL_STM32L151R6
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L151R6_A
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L151R8
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L151R8_A
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L151RB
+    bool
+    select CPU_LINE_STM32L151XB
+
+config CPU_MODEL_STM32L151RB_A
+    bool
+    select CPU_LINE_STM32L151XBA
+
+config CPU_MODEL_STM32L151RC
+    bool
+    select CPU_LINE_STM32L151XC
+
+config CPU_MODEL_STM32L151RC_A
+    bool
+    select CPU_LINE_STM32L151XCA
+
+config CPU_MODEL_STM32L151RD
+    bool
+    select CPU_LINE_STM32L151XD
+
+config CPU_MODEL_STM32L151RE
+    bool
+    select CPU_LINE_STM32L151XE
+
+config CPU_MODEL_STM32L151UC
+    bool
+    select CPU_LINE_STM32L151XC
+
+config CPU_MODEL_STM32L151V8
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L151V8_A
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L151VB
+    bool
+    select CPU_LINE_STM32L151XB
+
+config CPU_MODEL_STM32L151VB_A
+    bool
+    select CPU_LINE_STM32L151XBA
+
+config CPU_MODEL_STM32L151VC
+    bool
+    select CPU_LINE_STM32L151XC
+
+config CPU_MODEL_STM32L151VC_A
+    bool
+    select CPU_LINE_STM32L151XCA
+
+config CPU_MODEL_STM32L151VD
+    bool
+    select CPU_LINE_STM32L151XD
+
+config CPU_MODEL_STM32L151VD_X
+    bool
+    select CPU_LINE_STM32L151XDX
+
+config CPU_MODEL_STM32L151VE
+    bool
+    select CPU_LINE_STM32L151XE
+
+config CPU_MODEL_STM32L151ZC
+    bool
+    select CPU_LINE_STM32L151XC
+
+config CPU_MODEL_STM32L151ZD
+    bool
+    select CPU_LINE_STM32L151XD
+
+config CPU_MODEL_STM32L151ZE
+    bool
+    select CPU_LINE_STM32L151XE
+
+config CPU_MODEL_STM32L152C6
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L152C6_A
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L152C8
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L152C8_A
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L152CB
+    bool
+    select CPU_LINE_STM32L152XB
+
+config CPU_MODEL_STM32L152CB_A
+    bool
+    select CPU_LINE_STM32L152XBA
+
+config CPU_MODEL_STM32L152CC
+    bool
+    select CPU_LINE_STM32L152XC
+
+config CPU_MODEL_STM32L152QC
+    bool
+    select CPU_LINE_STM32L152XC
+
+config CPU_MODEL_STM32L152QD
+    bool
+    select CPU_LINE_STM32L152XD
+
+config CPU_MODEL_STM32L152QE
+    bool
+    select CPU_LINE_STM32L152XE
+
+config CPU_MODEL_STM32L152R6
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L152R6_A
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L152R8
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L152R8_A
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L152RB
+    bool
+    select CPU_LINE_STM32L152XB
+
+config CPU_MODEL_STM32L152RB_A
+    bool
+    select CPU_LINE_STM32L152XBA
+
+config CPU_MODEL_STM32L152RC
+    bool
+    select CPU_LINE_STM32L152XC
+
+config CPU_MODEL_STM32L152RC_A
+    bool
+    select CPU_LINE_STM32L152XCA
+
+config CPU_MODEL_STM32L152RD
+    bool
+    select CPU_LINE_STM32L152XD
+
+config CPU_MODEL_STM32L152RE
+    bool
+    select CPU_LINE_STM32L152XE
+
+config CPU_MODEL_STM32L152UC
+    bool
+    select CPU_LINE_STM32L152XC
+
+config CPU_MODEL_STM32L152V8
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L152V8_A
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L152VB
+    bool
+    select CPU_LINE_STM32L152XB
+
+config CPU_MODEL_STM32L152VB_A
+    bool
+    select CPU_LINE_STM32L152XBA
+
+config CPU_MODEL_STM32L152VC
+    bool
+    select CPU_LINE_STM32L152XC
+
+config CPU_MODEL_STM32L152VC_A
+    bool
+    select CPU_LINE_STM32L152XCA
+
+config CPU_MODEL_STM32L152VD
+    bool
+    select CPU_LINE_STM32L152XD
+
+config CPU_MODEL_STM32L152VD_X
+    bool
+    select CPU_LINE_STM32L152XDX
+
+config CPU_MODEL_STM32L152VE
+    bool
+    select CPU_LINE_STM32L152XE
+
+config CPU_MODEL_STM32L152ZC
+    bool
+    select CPU_LINE_STM32L152XC
+
+config CPU_MODEL_STM32L152ZD
+    bool
+    select CPU_LINE_STM32L152XD
+
+config CPU_MODEL_STM32L152ZE
+    bool
+    select CPU_LINE_STM32L152XE
+
+config CPU_MODEL_STM32L162QC
+    bool
+    select CPU_LINE_STM32L162XC
+
+config CPU_MODEL_STM32L162QD
+    bool
+    select CPU_LINE_STM32L162XD
+
+config CPU_MODEL_STM32L162RC
+    bool
+    select CPU_LINE_STM32L162XC
+
+config CPU_MODEL_STM32L162RC_A
+    bool
+    select CPU_LINE_STM32L162XCA
+
+config CPU_MODEL_STM32L162RD
+    bool
+    select CPU_LINE_STM32L162XD
+
+config CPU_MODEL_STM32L162RE
+    bool
+    select CPU_LINE_STM32L162XE
+
+config CPU_MODEL_STM32L162VC
+    bool
+    select CPU_LINE_STM32L162XC
+
+config CPU_MODEL_STM32L162VC_A
+    bool
+    select CPU_LINE_STM32L162XCA
+
+config CPU_MODEL_STM32L162VD
+    bool
+    select CPU_LINE_STM32L162XD
+
+config CPU_MODEL_STM32L162VD_X
+    bool
+    select CPU_LINE_STM32L162XDX
+
+config CPU_MODEL_STM32L162VE
+    bool
+    select CPU_LINE_STM32L162XE
+
+config CPU_MODEL_STM32L162ZC
+    bool
+    select CPU_LINE_STM32L162XC
+
+config CPU_MODEL_STM32L162ZD
+    bool
+    select CPU_LINE_STM32L162XD
+
+config CPU_MODEL_STM32L162ZE
+    bool
+    select CPU_LINE_STM32L162XE
+
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32l100c6" if CPU_MODEL_STM32L100C6
+    default "stm32l100c6_a" if CPU_MODEL_STM32L100C6_A
+    default "stm32l100r8" if CPU_MODEL_STM32L100R8
+    default "stm32l100r8_a" if CPU_MODEL_STM32L100R8_A
+    default "stm32l100rb" if CPU_MODEL_STM32L100RB
+    default "stm32l100rb_a" if CPU_MODEL_STM32L100RB_A
+    default "stm32l100rc" if CPU_MODEL_STM32L100RC
+    default "stm32l151c6" if CPU_MODEL_STM32L151C6
+    default "stm32l151c6_a" if CPU_MODEL_STM32L151C6_A
+    default "stm32l151c8" if CPU_MODEL_STM32L151C8
+    default "stm32l151c8_a" if CPU_MODEL_STM32L151C8_A
+    default "stm32l151cb" if CPU_MODEL_STM32L151CB
+    default "stm32l151cb_a" if CPU_MODEL_STM32L151CB_A
+    default "stm32l151cc" if CPU_MODEL_STM32L151CC
+    default "stm32l151qc" if CPU_MODEL_STM32L151QC
+    default "stm32l151qd" if CPU_MODEL_STM32L151QD
+    default "stm32l151qe" if CPU_MODEL_STM32L151QE
+    default "stm32l151r6" if CPU_MODEL_STM32L151R6
+    default "stm32l151r6_a" if CPU_MODEL_STM32L151R6_A
+    default "stm32l151r8" if CPU_MODEL_STM32L151R8
+    default "stm32l151r8_a" if CPU_MODEL_STM32L151R8_A
+    default "stm32l151rb" if CPU_MODEL_STM32L151RB
+    default "stm32l151rb_a" if CPU_MODEL_STM32L151RB_A
+    default "stm32l151rc" if CPU_MODEL_STM32L151RC
+    default "stm32l151rc_a" if CPU_MODEL_STM32L151RC_A
+    default "stm32l151rd" if CPU_MODEL_STM32L151RD
+    default "stm32l151re" if CPU_MODEL_STM32L151RE
+    default "stm32l151uc" if CPU_MODEL_STM32L151UC
+    default "stm32l151v8" if CPU_MODEL_STM32L151V8
+    default "stm32l151v8_a" if CPU_MODEL_STM32L151V8_A
+    default "stm32l151vb" if CPU_MODEL_STM32L151VB
+    default "stm32l151vb_a" if CPU_MODEL_STM32L151VB_A
+    default "stm32l151vc" if CPU_MODEL_STM32L151VC
+    default "stm32l151vc_a" if CPU_MODEL_STM32L151VC_A
+    default "stm32l151vd" if CPU_MODEL_STM32L151VD
+    default "stm32l151vd_x" if CPU_MODEL_STM32L151VD_X
+    default "stm32l151ve" if CPU_MODEL_STM32L151VE
+    default "stm32l151zc" if CPU_MODEL_STM32L151ZC
+    default "stm32l151zd" if CPU_MODEL_STM32L151ZD
+    default "stm32l151ze" if CPU_MODEL_STM32L151ZE
+    default "stm32l152c6" if CPU_MODEL_STM32L152C6
+    default "stm32l152c6_a" if CPU_MODEL_STM32L152C6_A
+    default "stm32l152c8" if CPU_MODEL_STM32L152C8
+    default "stm32l152c8_a" if CPU_MODEL_STM32L152C8_A
+    default "stm32l152cb" if CPU_MODEL_STM32L152CB
+    default "stm32l152cb_a" if CPU_MODEL_STM32L152CB_A
+    default "stm32l152cc" if CPU_MODEL_STM32L152CC
+    default "stm32l152qc" if CPU_MODEL_STM32L152QC
+    default "stm32l152qd" if CPU_MODEL_STM32L152QD
+    default "stm32l152qe" if CPU_MODEL_STM32L152QE
+    default "stm32l152r6" if CPU_MODEL_STM32L152R6
+    default "stm32l152r6_a" if CPU_MODEL_STM32L152R6_A
+    default "stm32l152r8" if CPU_MODEL_STM32L152R8
+    default "stm32l152r8_a" if CPU_MODEL_STM32L152R8_A
+    default "stm32l152rb" if CPU_MODEL_STM32L152RB
+    default "stm32l152rb_a" if CPU_MODEL_STM32L152RB_A
+    default "stm32l152rc" if CPU_MODEL_STM32L152RC
+    default "stm32l152rc_a" if CPU_MODEL_STM32L152RC_A
+    default "stm32l152rd" if CPU_MODEL_STM32L152RD
+    default "stm32l152re" if CPU_MODEL_STM32L152RE
+    default "stm32l152uc" if CPU_MODEL_STM32L152UC
+    default "stm32l152v8" if CPU_MODEL_STM32L152V8
+    default "stm32l152v8_a" if CPU_MODEL_STM32L152V8_A
+    default "stm32l152vb" if CPU_MODEL_STM32L152VB
+    default "stm32l152vb_a" if CPU_MODEL_STM32L152VB_A
+    default "stm32l152vc" if CPU_MODEL_STM32L152VC
+    default "stm32l152vc_a" if CPU_MODEL_STM32L152VC_A
+    default "stm32l152vd" if CPU_MODEL_STM32L152VD
+    default "stm32l152vd_x" if CPU_MODEL_STM32L152VD_X
+    default "stm32l152ve" if CPU_MODEL_STM32L152VE
+    default "stm32l152zc" if CPU_MODEL_STM32L152ZC
+    default "stm32l152zd" if CPU_MODEL_STM32L152ZD
+    default "stm32l152ze" if CPU_MODEL_STM32L152ZE
+    default "stm32l162qc" if CPU_MODEL_STM32L162QC
+    default "stm32l162qd" if CPU_MODEL_STM32L162QD
+    default "stm32l162rc" if CPU_MODEL_STM32L162RC
+    default "stm32l162rc_a" if CPU_MODEL_STM32L162RC_A
+    default "stm32l162rd" if CPU_MODEL_STM32L162RD
+    default "stm32l162re" if CPU_MODEL_STM32L162RE
+    default "stm32l162vc" if CPU_MODEL_STM32L162VC
+    default "stm32l162vc_a" if CPU_MODEL_STM32L162VC_A
+    default "stm32l162vd" if CPU_MODEL_STM32L162VD
+    default "stm32l162vd_x" if CPU_MODEL_STM32L162VD_X
+    default "stm32l162ve" if CPU_MODEL_STM32L162VE
+    default "stm32l162zc" if CPU_MODEL_STM32L162ZC
+    default "stm32l162zd" if CPU_MODEL_STM32L162ZD
+    default "stm32l162ze" if CPU_MODEL_STM32L162ZE

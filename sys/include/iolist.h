@@ -1,5 +1,7 @@
 /*
  * Copyright (C) 2018 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2018 Inria
+ *               2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -52,7 +54,7 @@ unsigned iolist_count(const iolist_t *iolist);
 /**
  * @brief   Sum up number of bytes in iolist
  *
- * This function returns the summed ip lenght values of all entries in @p
+ * This function returns the summed ip length values of all entries in @p
  * iolist.
  *
  * @param[in]   iolist  iolist to sum up

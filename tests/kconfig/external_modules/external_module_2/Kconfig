@@ -1,0 +1,13 @@
+menuconfig KCONFIG_EXTERNAL_MODULE_2
+    bool "Configure external module message 2"
+    default y
+    help
+        This will enable configuring the external module message
+
+if KCONFIG_EXTERNAL_MODULE_2
+
+config EXTERNAL_MODULE_2_MESSAGE
+    string "External module 2 text"
+    default "External Message 2 defined in Kconfig file"
+
+endif # KCONFIG_EXTERNAL_MODULE_2

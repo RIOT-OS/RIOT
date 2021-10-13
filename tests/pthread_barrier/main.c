@@ -56,7 +56,8 @@ int main(void)
 {
     random_init(RAND_SEED);
 
-    puts("START\n");
+    printf("NUM_CHILDREN: %d, NUM_ITERATIONS: %d\n", NUM_CHILDREN,
+           NUM_ITERATIONS);
     pthread_barrier_init(&barrier, NULL, NUM_CHILDREN);
 
     pthread_t children[NUM_CHILDREN];

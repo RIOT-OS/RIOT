@@ -1,0 +1,36 @@
+MODULE = wolfcrypt
+
+CFLAGS += -Wno-unused
+
+ifeq (llvm,$(TOOLCHAIN))
+  CFLAGS += -Wno-unused-parameter
+endif
+
+SUBMODULES += 1
+
+NO_AUTO_SRC = 1
+
+#-------------------------------------------------------------#
+# Default CRYPTO source files                                 #
+#-------------------------------------------------------------#
+SRC +=  error.c \
+        hash.c \
+        logging.c \
+        wc_encrypt.c \
+        wc_port.c \
+        wolfmath.c
+
+#-------------------------------------------------------------#
+# Optional CRYPTO source files, enabled by default            #
+#-------------------------------------------------------------#
+
+# Enabled by default
+SRC +=  sha.c
+SRC +=  sha256.c
+SRC +=  fe_low_mem.c
+SRC +=  ge_low_mem.c
+SRC +=  sp_int.c
+SRC +=  sp_c32.c
+
+
+include $(RIOTBASE)/Makefile.base

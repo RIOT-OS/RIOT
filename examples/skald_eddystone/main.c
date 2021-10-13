@@ -34,7 +34,6 @@
 /* calibrated TX power value */
 #define TX_PWR          (0U)
 
-
 /* allocate two advertising contexts, one for Eddystone-URL and one for
  * Eddystone-URI */
 static skald_ctx_t _ctx_uid;

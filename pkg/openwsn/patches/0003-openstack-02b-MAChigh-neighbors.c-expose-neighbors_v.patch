@@ -1,0 +1,26 @@
+From fa749c96d40ea17a6cdf9bb7200f15624f81449f Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 27 Mar 2020 10:15:43 +0100
+Subject: [PATCH 03/11] openstack/02b-MAChigh/neighbors.c: expose
+ neighbors_vars
+
+---
+ openstack/02b-MAChigh/neighbors.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/openstack/02b-MAChigh/neighbors.c b/openstack/02b-MAChigh/neighbors.c
+index 18bbcdd1..f104aad5 100644
+--- a/openstack/02b-MAChigh/neighbors.c
++++ b/openstack/02b-MAChigh/neighbors.c
+@@ -10,7 +10,7 @@
+ 
+ //=========================== variables =======================================
+ 
+-static neighbors_vars_t neighbors_vars;
++neighbors_vars_t neighbors_vars;
+ 
+ //=========================== prototypes ======================================
+ 
+-- 
+2.28.0
+

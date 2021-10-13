@@ -559,7 +559,6 @@ enum mkw2xdrf_iregister {
 #define MKW2XDMI_TX_MODE_CTRL_DTS0                      (1 << 0)
 #define MKW2XDMI_TX_MODE_CTRL_DTS_MASK                  7
 
-
 #ifdef __cplusplus
 }
 #endif

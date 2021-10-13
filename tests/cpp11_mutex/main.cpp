@@ -19,13 +19,14 @@
  */
 #include <string>
 #include <cstdio>
-#include <cassert>
 #include <system_error>
 
 #include "riot/mutex.hpp"
 #include "riot/chrono.hpp"
 #include "riot/thread.hpp"
 #include "riot/condition_variable.hpp"
+
+#include "test_utils/expect.h"
 
 using namespace std;
 using namespace riot;
@@ -46,16 +47,22 @@ int main() {
         m.unlock();
       }
     };
+#ifndef NDEBUG
+    /* We can't use expect here, otherwise cppcheck will produce errors */
     assert(resource == 0);
+#endif
     auto start = std::chrono::system_clock::now();
     thread t1(f);
     thread t2(f);
     t1.join();
     t2.join();
+#ifndef NDEBUG
+    /* We can't use expect here, otherwise cppcheck will produce errors */
     assert(resource == 6);
+#endif
     auto duration = std::chrono::duration_cast
       <chrono::milliseconds>(std::chrono::system_clock::now() - start);
-    assert(duration.count() >= 600);
+    expect(duration.count() >= 600);
   }
   puts("Done\n");
 
@@ -65,7 +72,7 @@ int main() {
     m.lock();
     thread([&m] {
              auto res = m.try_lock();
-             assert(res == false);
+             expect(res == false);
            }).detach();
     m.unlock();
   }
@@ -74,7 +81,7 @@ int main() {
     mutex m;
     thread([&m] {
              auto res = m.try_lock();
-             assert(res == true);
+             expect(res == true);
              m.unlock();
            }).detach();
   }

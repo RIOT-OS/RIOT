@@ -1,6 +1,0 @@
-MODULE := cn-cbor
-
-# Enable code forcing aligned reads
-CFLAGS += -DCBOR_ALIGN_READS
-
-include $(RIOTBASE)/Makefile.base

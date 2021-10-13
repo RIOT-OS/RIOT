@@ -1,0 +1,23 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    arduino-duemilanove \
+    arduino-leonardo \
+    arduino-mega2560 \
+    arduino-nano \
+    arduino-uno \
+    atmega256rfr2-xpro \
+    atmega328p \
+    atmega328p-xplained-mini \
+    derfmega128 \
+    derfmega256 \
+    hifive1 \
+    hifive1b \
+    i-nucleo-lrwan1 \
+    im880b \
+    mega-xplained \
+    microduino-corerf \
+    nucleo-f031k6 \
+    nucleo-l011k4 \
+    stm32l0538-disco \
+    waspmote-pro \
+    zigduino \
+    #

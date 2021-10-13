@@ -1,15 +1,17 @@
 include ../Makefile.tests_common
 
-# avr8, msp430 and mips don't support ssp (yet)
-BOARD_BLACKLIST := arduino-mega2560 waspmote-pro arduino-uno arduino-duemilanove \
-                   chronos msb-430 msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1 \
-                   pic32-clicker pic32-wifire jiminy-mega256rfr2 mega-xplained
-
 USEMODULE += ssp
 
-TEST_ON_CI_WHITELIST += all
+# This test intentionally crashes the firmware and when using a board with
+# stdio via CDC ACM, RIOT can't print anything after the crash.
+FEATURES_BLACKLIST += highlevel_stdio
 
 include $(RIOTBASE)/Makefile.include
 
-test:
-	tests/01-run.py
+ifneq (,$(shell $(CC) --help=warnings | grep '\-Wstringop-overflow='))
+  CFLAGS += -Wstringop-overflow=0
+endif
+
+ifneq (,$(shell $(CC) --help=warnings | grep '\-Warray-bounds='))
+  CFLAGS += -Warray-bounds=0
+endif

@@ -1,0 +1,76 @@
+From 37f6d02ec7bedd03d36f261322043675a3a37180 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Mon, 19 Apr 2021 15:50:06 +0200
+Subject: [PATCH 1/3] hw/mcu/nrf5x: adapt NVIC init to RIOT
+
+---
+ hw/mcu/nordic/nrf51xxx/src/hal_timer.c | 10 +++++-----
+ hw/mcu/nordic/nrf52xxx/src/hal_timer.c | 11 +++++------
+ 2 files changed, 10 insertions(+), 11 deletions(-)
+
+diff --git a/hw/mcu/nordic/nrf51xxx/src/hal_timer.c b/hw/mcu/nordic/nrf51xxx/src/hal_timer.c
+index a99be65cb..3efc81fa0 100644
+--- a/hw/mcu/nordic/nrf51xxx/src/hal_timer.c
++++ b/hw/mcu/nordic/nrf51xxx/src/hal_timer.c
+@@ -22,11 +22,9 @@
+ #include <assert.h>
+ #include <errno.h>
+ #include "os/mynewt.h"
+-#include "mcu/cmsis_nvic.h"
++#include "mcu/mcu.h"
+ #include "hal/hal_timer.h"
+-#include "nrf51.h"
+-#include "nrf51_bitfields.h"
+-#include "mcu/nrf51_hal.h"
++#include "nrfx.h"
+ 
+ /* IRQ prototype */
+ typedef void (*hal_timer_irq_handler_t)(void);
+@@ -575,8 +573,10 @@ hal_timer_init(int timer_num, void *cfg)
+ 
+     /* Disable IRQ, set priority and set vector in table */
+     NVIC_DisableIRQ(irq_num);
++#ifndef RIOT_VERSION
+     NVIC_SetPriority(irq_num, (1 << __NVIC_PRIO_BITS) - 1);
+-    NVIC_SetVector(irq_num, (uint32_t)irq_isr);
++#endif
++    nrf5x_hw_set_isr(irq_num, irq_isr);
+ 
+     return 0;
+ 
+diff --git a/hw/mcu/nordic/nrf52xxx/src/hal_timer.c b/hw/mcu/nordic/nrf52xxx/src/hal_timer.c
+index fc6fe834d..c2ca88f65 100644
+--- a/hw/mcu/nordic/nrf52xxx/src/hal_timer.c
++++ b/hw/mcu/nordic/nrf52xxx/src/hal_timer.c
+@@ -22,11 +22,9 @@
+ #include <assert.h>
+ #include <errno.h>
+ #include "os/mynewt.h"
+-#include "mcu/cmsis_nvic.h"
++#include "mcu/mcu.h"
+ #include "hal/hal_timer.h"
+-#include "nrf.h"
+-#include "mcu/nrf52_hal.h"
+-#include "mcu/nrf52_clock.h"
++#include "nrfx.h"
+ 
+ /* IRQ prototype */
+ typedef void (*hal_timer_irq_handler_t)(void);
+@@ -537,11 +535,12 @@ hal_timer_init(int timer_num, void *cfg)
+ 
+     bsptimer->tmr_reg = hwtimer;
+     bsptimer->tmr_irq_num = irq_num;
+-
+     /* Disable IRQ, set priority and set vector in table */
+     NVIC_DisableIRQ(irq_num);
++#ifndef RIOT_VERSION
+     NVIC_SetPriority(irq_num, (1 << __NVIC_PRIO_BITS) - 1);
+-    NVIC_SetVector(irq_num, (uint32_t)irq_isr);
++#endif
++    nrf5x_hw_set_isr(irq_num, irq_isr);
+ 
+     return 0;
+ 
+-- 
+2.28.0
+

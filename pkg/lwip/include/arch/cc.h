@@ -7,20 +7,19 @@
  */
 
 /**
- * @defgroup    lwip_arch_cc    Compiler and processor description
- * @ingroup     lwip
+ * @addtogroup  pkg_lwip_sys
  * @brief       Describes compiler and processor to lwIP
  * @{
  *
  * @file
- * @brief   Compiler and processor definitions
+ * @brief   Compiler/platform abstraction
+ * @see     http://www.nongnu.org/lwip/2_1_x/group__compiler__abstraction.html
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 #ifndef ARCH_CC_H
 #define ARCH_CC_H
 
-#include <assert.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,22 +28,26 @@
 #include "byteorder.h"
 #include "mutex.h"
 
+#ifdef MODULE_LOG
+#include "log.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #ifndef BYTE_ORDER
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#   define BYTE_ORDER  (LITTLE_ENDIAN)  /**< platform's endianess */
+#   define BYTE_ORDER  (LITTLE_ENDIAN)  /**< platform's endianness */
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#   define BYTE_ORDER  (BIG_ENDIAN)     /**< platform's endianess */
+#   define BYTE_ORDER  (BIG_ENDIAN)     /**< platform's endianness */
 #else
 #   error "Byte order is neither little nor big!"
 #endif
 #endif
 
 /**
- * @brief   (sn)printf formatters for the generic lwIP types
+ * @name    (sn)printf formatters for the generic lwIP types
  * @{
  */
 #define X8_F    "02" PRIx8
@@ -55,28 +58,23 @@ extern "C" {
 #define S32_F   PRId32
 #define X32_F   PRIx32
 
-#define SZT_F   "lu"
-/**
- * @}
- */
+#define SZT_F   PRIuPTR
+/** @} */
 
 /**
- * @brief   Compiler hints for packing structures
+ * @name    Compiler hints for packing structures
  * @{
  */
 #define PACK_STRUCT_FIELD(x)    x
 #define PACK_STRUCT_STRUCT      __attribute__((packed))
 #define PACK_STRUCT_BEGIN
 #define PACK_STRUCT_END
-/**
- * @}
- */
+/** @} */
 
 /**
- * @todo check for best value
+ * @name    Platform specific diagnostic output
+ * @{
  */
-#define LWIP_CHKSUM_ALGORITHM   (3)
-
 #ifdef MODULE_LOG
 #  define LWIP_PLATFORM_DIAG(x)   LOG_INFO x
 #  ifdef NDEBUG
@@ -102,10 +100,7 @@ extern "C" {
         } while (0)
 #  endif
 #endif
-
-#define SYS_ARCH_PROTECT(x)         mutex_lock(&x)
-#define SYS_ARCH_UNPROTECT(x)       mutex_unlock(&x)
-#define SYS_ARCH_DECL_PROTECT(x)    mutex_t x = MUTEX_INIT
+/** @} */
 
 #ifdef __cplusplus
 }

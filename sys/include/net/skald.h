@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_skald Skald, who advertises to the world
- * @ingroup     net
+ * @defgroup    ble_skald Skald, who advertises to the world
+ * @ingroup     ble
  * @brief       Skald, a minimalistic BLE advertising stack
  *
  * # About
@@ -20,7 +20,7 @@
  * # Design Decisions and Limitations
  * - support for local addresses only (using `luid` to generate them)
  * - advertising interval is configured during compile time, override by setting
- *   `CFLAGS+=-DSKALD_INTERVAL=xxx`
+ *   `CFLAGS+=-DCONFIG_SKALD_INTERVAL=xxx`
  * - advertising channels are configured during compile time, override by
  *   setting `CFLAGS+=-DSKALD_ADV_CHAN={37,39}`
  *
@@ -46,7 +46,7 @@
 
 #include <stdint.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "net/ble.h"
 #include "net/netdev/ble.h"
 
@@ -55,17 +55,23 @@ extern "C" {
 #endif
 
 /**
- * @brief   Static advertising interval
+ * @defgroup net_skald_conf Skald compile configurations
+ * @ingroup config
+ * @{
  */
-#ifndef SKALD_INTERVAL
-#define SKALD_INTERVAL          (1 * US_PER_SEC)
+/**
+ * @brief   Advertising interval in microseconds
+ */
+#ifndef CONFIG_SKALD_INTERVAL_MS
+#define CONFIG_SKALD_INTERVAL_MS        (1000U)
 #endif
+/** @} */
 
 /**
- * @brief   Static list of used advertising channels
+ * @brief   List of advertising channels
  */
 #ifndef SKALD_ADV_CHAN
-#define SKALD_ADV_CHAN          { 37, 38, 39 }
+#define SKALD_ADV_CHAN                 { 37, 38, 39 }
 #endif
 
 /**
@@ -80,8 +86,8 @@ typedef struct {
  */
 typedef struct {
     netdev_ble_pkt_t pkt;   /**< packet holding the advertisement (GAP) data */
-    xtimer_t timer;         /**< timer for scheduling advertising events */
-    uint32_t last;          /**< last timer trigger (for offset compensation) */
+    ztimer_t timer;         /**< timer for scheduling advertising events */
+    ztimer_now_t last;      /**< last timer trigger (for offset compensation) */
     uint8_t cur_chan;       /**< keep track of advertising channels */
 } skald_ctx_t;
 
@@ -93,7 +99,7 @@ void skald_init(void);
 /**
  * @brief   Start advertising the given packet
  *
- * The packet will be send out each advertising interval (see SKALD_INTERVAL) on
+ * The packet will be send out each advertising interval (see CONFIG_SKALD_INTERVAL) on
  * each of the defined advertising channels (see SKALD_ADV_CHAN).
  *
  * @param[in,out] ctx   start advertising this context

@@ -1,0 +1,10 @@
+# include module specific includes
+INCLUDES += -I$(RIOTCPU)/avr8_common/include \
+            -isystem$(RIOTCPU)/avr8_common/avr_libc_extra/include \
+            -isystem$(RIOTCPU)/avr8_common/avr_libc_extra/include/vendor
+
+ifneq (,$(filter printf_float,$(USEMODULE)))
+  LINKFLAGS += -Wl,-u,vfprintf -lprintf_flt -lm
+endif
+
+include $(RIOTMAKE)/arch/avr8.inc.mk

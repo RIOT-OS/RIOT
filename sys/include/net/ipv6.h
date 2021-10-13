@@ -41,6 +41,5 @@ extern "C" {
 }
 #endif
 
-
 #endif /* NET_IPV6_H */
 /** @} */

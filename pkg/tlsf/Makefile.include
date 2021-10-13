@@ -1,1 +1,9 @@
-INCLUDES += -I$(PKGDIRBASE)/tlsf/src
+INCLUDES += -I$(PKGDIRBASE)/tlsf
+
+ifneq (,$(filter tlsf-malloc,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/tlsf/contrib/include
+  DIRS += $(RIOTPKG)/tlsf/contrib
+endif
+
+PSEUDOMODULES += tlsf-malloc_newlib
+PSEUDOMODULES += tlsf-malloc_native

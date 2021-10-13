@@ -1,0 +1,6 @@
+ifneq (,$(filter stdio_uart,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_lpuart
+endif
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  USEMODULE += sx1272
+endif

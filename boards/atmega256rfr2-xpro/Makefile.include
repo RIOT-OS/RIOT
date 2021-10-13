@@ -1,0 +1,4 @@
+# Use EDBG (xplainedpro) programmer with avrdude
+AVRDUDE_PROGRAMMER ?= xplainedpro
+
+include $(RIOTBOARD)/common/atmega/Makefile.include

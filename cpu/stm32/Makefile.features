@@ -1,0 +1,68 @@
+include $(RIOTCPU)/stm32/stm32_info.mk
+
+ifneq (mp1,$(CPU_FAM))
+  FEATURES_PROVIDED += bootloader_stm32
+  FEATURES_PROVIDED += periph_wdt
+endif
+FEATURES_PROVIDED += cpu_stm32$(CPU_FAM)
+FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_gpio periph_gpio_irq
+FEATURES_PROVIDED += periph_timer_periodic
+FEATURES_PROVIDED += periph_rtt_overflow
+FEATURES_PROVIDED += periph_uart_modecfg
+FEATURES_PROVIDED += periph_uart_nonblocking
+
+ifneq (,$(filter $(CPU_FAM),f0 f1 f3 g0 g4 l0 l1 l4 l5 wb wl))
+  FEATURES_PROVIDED += periph_flashpage
+  FEATURES_PROVIDED += periph_flashpage_pagewise
+endif
+
+ifneq (,$(filter $(CPU_FAM),f0 f2 f3 f4 f7 l0 l1 l4 l5 wb wl))
+  CPU_MODELS_WITHOUT_RTC_BKPR += stm32f030% stm32f070%
+  ifeq (,$(filter $(CPU_MODELS_WITHOUT_RTC_BKPR),$(CPU_MODEL)))
+    FEATURES_PROVIDED += periph_rtc_mem
+  endif
+endif
+
+# The f2, f4 and f7 do not support the pagewise api
+ifneq (,$(filter $(CPU_FAM),f2 f4 f7))
+  FEATURES_PROVIDED += periph_flashpage
+endif
+
+ifneq (,$(filter $(CPU_FAM),l0 l1))
+  FEATURES_PROVIDED += periph_eeprom
+endif
+
+ifeq (f1,$(CPU_FAM))
+  FEATURES_CONFLICT += periph_rtc:periph_rtt
+  FEATURES_CONFLICT_MSG += "On the STM32F1, the RTC and RTT map to the same hardware peripheral."
+  FEATURES_PROVIDED += periph_rtt_set_counter
+endif
+
+# Not all F4 and L0 parts implement a RNG.
+CPU_MODELS_WITHOUT_HWRNG = stm32f401% stm32f411% stm32f446% stm32l031% stm32l011%
+ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l0 l4 l5 wb))
+  ifeq (,$(filter $(CPU_MODELS_WITHOUT_HWRNG),$(CPU_MODEL)))
+    FEATURES_PROVIDED += periph_hwrng
+  endif
+endif
+
+ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l1 l4 mp1))
+  FEATURES_PROVIDED += cortexm_mpu
+endif
+
+# only some stm32f3 have an MPU, stm32l052t8 provides an MPU but support is
+# broken for cortex-m0+
+STM32_WITH_MPU += stm32f303re stm32f303vc stm32f303ze
+ifneq (,$(filter $(CPU_MODEL),$(STM32_WITH_MPU)))
+  FEATURES_PROVIDED += cortexm_mpu
+endif
+
+# Add stm32 configs after including cortexm_common so stm32 takes precendence
+# This configuration enables modules that are only available when using Kconfig
+# module modelling
+ifeq (1, $(TEST_KCONFIG))
+  KCONFIG_ADD_CONFIG += $(RIOTCPU)/stm32/stm32.config
+endif
+
+include $(RIOTCPU)/cortexm_common/Makefile.features

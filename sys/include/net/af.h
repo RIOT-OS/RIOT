@@ -20,8 +20,6 @@
 #ifndef NET_AF_H
 #define NET_AF_H
 
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -1,0 +1,10 @@
+FLASHFILE=$(BINFILE)
+
+# configure the terminal program
+PORT_LINUX  ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+# refine serial port information for pyterm
+BAUD        ?= 115200
+DERFMEGA256_BOOTLOADER  ?= derfmega
+
+include $(RIOTBOARD)/common/atmega/Makefile.include

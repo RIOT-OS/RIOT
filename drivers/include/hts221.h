@@ -9,7 +9,10 @@
 /**
  * @defgroup    drivers_hts221 ST HTS221 digital Humidity Sensor
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Driver for the ST HTS221 digital Humidity Sensor
+ *
+ * This driver provides @ref drivers_saul capabilities.
  *
  * @{
  * @file
@@ -33,9 +36,7 @@ extern "C" {
 /**
  * @brief   Default I2C bus address (7 Bit) of HTS221 devices
  */
-#ifndef HTS221_I2C_ADDRESS
 #define HTS221_I2C_ADDRESS           (0x5F)
-#endif
 
 /**
  * @brief   Parameters needed for device initialization

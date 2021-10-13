@@ -1,0 +1,19 @@
+ifneq (,$(filter samd51%,$(CPU_MODEL)))
+  CFLAGS += -DCPU_SAMD51
+endif
+ifneq (,$(filter same54%,$(CPU_MODEL)))
+  CFLAGS += -DCPU_SAME54
+endif
+
+CFLAGS += -DCPU_COMMON_SAMD5X
+
+# Slot size is determined by "((total_flash_size - RIOTBOOT_LEN) / 2)".
+# If RIOTBOOT_LEN uses an uneven number of flashpages, the remainder of the
+# flash cannot be divided by two slots while staying FLASHPAGE_SIZE aligned.
+RIOTBOOT_LEN ?= 0x4000
+
+BACKUP_RAM_ADDR = 0x47000000
+BACKUP_RAM_LEN  = 0x2000
+
+include $(RIOTCPU)/sam0_common/Makefile.include
+include $(RIOTMAKE)/arch/cortexm.inc.mk

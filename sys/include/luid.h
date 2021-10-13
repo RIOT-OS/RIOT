@@ -55,6 +55,10 @@
 
 #include <stddef.h>
 
+#include "net/eui48.h"
+#include "net/eui64.h"
+#include "net/netdev.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -71,7 +75,24 @@ extern "C" {
  * @brief   Get a unique ID
  *
  * The resulting ID is built from the base ID generated with luid_base(), which
- * isXORed with an 8-bit incrementing counter value into the most significant
+ * isXORed with an 8-bit incrementing counter value into the first (lowest index)
+ * byte.
+ *
+ * @note    The resulting LUID will repeat after 255 calls.
+ * @post    The generated LUID must be used unchanged, as it could collide with
+ *          other LUIDs if altered.
+ *
+ * @param[out] buf      memory location to copy the LUID into. MUST be able to
+ *                      hold at least @p len bytes
+ * @param[in]  len      length of the LUID in bytes
+ */
+void luid_get(void *buf, size_t len);
+
+/**
+ * @brief   Get a unique ID with change in the last byte
+ *
+ * The resulting ID is built from the base ID generated with luid_base(), which
+ * isXORed with an 8-bit incrementing counter value into the last (highest index)
  * byte.
  *
  * @note    The resulting LUID will repeat after 255 calls.
@@ -80,7 +101,70 @@ extern "C" {
  *                      hold at least @p len bytes
  * @param[in]  len      length of the LUID in bytes
  */
-void luid_get(void *buf, size_t len);
+void luid_get_lb(void *buf, size_t len);
+
+/**
+ * @brief   Get a unique short unicast address
+ *
+ * The resulting address is built from the base ID generated with luid_base(), which
+ * isXORed with an 8-bit incrementing counter value into the least significant
+ * byte.
+ *
+ * @note    The resulting address will repeat after 255 calls.
+ *
+ * @param[out] addr     memory location to copy the address into.
+ */
+void luid_get_short(network_uint16_t *addr);
+
+/**
+ * @brief   Get a unique EUI48 address
+ *
+ * The resulting address is built from the base ID generated with luid_base(), which
+ * isXORed with an 8-bit incrementing counter value into the least significant byte.
+ *
+ * @note    The resulting address will repeat after 255 calls.
+ *
+ * @param[out] addr     memory location to copy the address into.
+ */
+void luid_get_eui48(eui48_t *addr);
+
+/**
+ * @brief   Get a unique EUI48 address
+ *
+ * The resulting address is built from the base ID generated with luid_base(), which
+ * isXORed with the netdev type and netdev index in the least significant bytes.
+ *
+ * @pre the netdev registered itself with @see netdev_register
+ *
+ * @param[in]  netdev   Netdev to generate the EUI48 for.
+ * @param[out] addr     memory location to copy the address into.
+ */
+void luid_netdev_get_eui48(const netdev_t *netdev, eui48_t *addr);
+
+/**
+ * @brief   Get a unique EUI64 address
+ *
+ * The resulting address is built from the base ID generated with luid_base(), which
+ * isXORed with an 8-bit incrementing counter value into the least significant byte.
+ *
+ * @note    The resulting address will repeat after 255 calls.
+ *
+ * @param[out] addr     memory location to copy the address into.
+ */
+void luid_get_eui64(eui64_t *addr);
+
+/**
+ * @brief   Get a unique EUI64 address
+ *
+ * The resulting address is built from the base ID generated with luid_base(), which
+ * isXORed with the netdev type and netdev index in the least significant bytes.
+ *
+ * @pre the netdev registered itself with @see netdev_register
+ *
+ * @param[in]  netdev   Netdev to generate the EUI64 for.
+ * @param[out] addr     memory location to copy the address into.
+ */
+void luid_netdev_get_eui64(const netdev_t *netdev, eui64_t *addr);
 
 /**
  * @brief   Get a custom unique ID based on a user given generator value

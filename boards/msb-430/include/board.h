@@ -7,13 +7,11 @@
  */
 
 /**
- * @defgroup    boards_msb430 MSB-430
- * @ingroup     boards
- * @brief       Support for the ScatterWeb MSB-430 board
+ * @ingroup     boards_msb430
  *
  * @details
  * See
- * http://www.mi.fu-berlin.de/inf/groups/ag-tech/projects/Z_Finished_Projects/ScatterWeb/modules/mod_MSB-430.html
+ * https://www.mi.fu-berlin.de/inf/groups/ag-tech/projects/ScatterWeb/modules/mod_MSB-430.html
  * for circuit diagram etc.
  *
  * <h2>Components</h2>
@@ -57,6 +55,14 @@ extern "C" {
 #define F_RC_OSCILLATOR             32768
 #define MSP430_HAS_DCOR             1
 #define MSP430_HAS_EXTERNAL_CRYSTAL 0
+/** @} */
+
+/**
+ * @name   Configure on-board SHT11 device
+ * @{
+ */
+#define SHT1X_PARAM_CLK             (GPIO_PIN(3, 5))
+#define SHT1X_PARAM_DATA            (GPIO_PIN(3, 4))
 /** @} */
 
 #ifdef __cplusplus

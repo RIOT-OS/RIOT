@@ -1,0 +1,11 @@
+# define the default port depending on the host OS
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
+
+# use openocd by default to program this board
+PROGRAMMER ?= openocd
+
+# dap debug adapter is required for openocd
+OPENOCD_DEBUG_ADAPTER = dap
+
+# include nrf51 boards common configuration
+include $(RIOTBOARD)/common/nrf51/Makefile.include

@@ -1,0 +1,8 @@
+CPU = cc26x0_cc13x0
+CPU_MODEL = cc13x0f128
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_gpio periph_gpio_irq
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_i2c

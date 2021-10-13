@@ -21,25 +21,40 @@
 #ifndef ETHOS_H
 #define ETHOS_H
 
-#include "kernel_types.h"
+#include <stdbool.h>
+
 #include "periph/uart.h"
 #include "net/netdev.h"
 #include "tsrb.h"
 #include "mutex.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* if using ethos + stdio, use UART_STDIO values unless overridden */
-#ifdef USE_ETHOS_FOR_STDIO
-#include "uart_stdio.h"
+/* if using ethos + stdio, use STDIO_UART values unless overridden */
+#if IS_USED(MODULE_STDIO_ETHOS) || defined(DOXYGEN)
+#include "stdio_uart.h"
+/**
+ * @defgroup drivers_ethos_config     Ethernet-over-serial driver driver compile configuration
+ * @ingroup config_drivers_netdev
+ * @{
+ */
+/**
+ * @brief Set the default UART Interface.
+ */
 #ifndef ETHOS_UART
-#define ETHOS_UART     UART_STDIO_DEV
+#define ETHOS_UART     STDIO_UART_DEV
 #endif
+
+/**
+ * @brief Set the default baudrate.
+ */
 #ifndef ETHOS_BAUDRATE
-#define ETHOS_BAUDRATE UART_STDIO_BAUDRATE
+#define ETHOS_BAUDRATE STDIO_UART_BAUDRATE
 #endif
+/** @} */
 #endif
 
 /**
@@ -78,6 +93,7 @@ typedef struct {
     unsigned frametype;     /**< type of currently incoming frame */
     size_t last_framesize;  /**< size of last completed frame */
     mutex_t out_mutex;      /**< mutex used for locking concurrent sends */
+    bool accept_new;        /**< incoming frame can be stored or not */
 } ethos_t;
 
 /**
@@ -86,8 +102,6 @@ typedef struct {
 typedef struct {
     uart_t uart;            /**< UART device to use */
     uint32_t baudrate;      /**< baudrate to UART device */
-    uint8_t *buf;           /**< buffer for incoming packets */
-    size_t bufsize;         /**< size of ethos_params_t::buf */
 } ethos_params_t;
 
 /**
@@ -101,8 +115,13 @@ typedef struct {
  *
  * @param[out]  dev         handle of the device to initialize
  * @param[in]   params      parameters for device initialization
+ * @param[in]   index       Index of @p params in a global parameter struct array.
+ *                          If initialized manually, pass a unique identifier instead.
+ * @param[in]   inbuf       buffer to store a received frame in
+ * @param[in]   inbuf_size  size of the receive buffer
  */
-void ethos_setup(ethos_t *dev, const ethos_params_t *params);
+void ethos_setup(ethos_t *dev, const ethos_params_t *params, uint8_t index,
+                 void *inbuf, size_t inbuf_size);
 
 /**
  * @brief   Send frame over serial port using ethos' framing

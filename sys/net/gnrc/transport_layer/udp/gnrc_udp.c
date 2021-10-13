@@ -17,6 +17,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdint.h>
 #include <errno.h>
 
@@ -27,10 +28,10 @@
 #include "net/ipv6/hdr.h"
 #include "net/gnrc/udp.h"
 #include "net/gnrc.h"
+#include "net/gnrc/icmpv6/error.h"
 #include "net/inet_csum.h"
 
-
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**
@@ -41,11 +42,7 @@ static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 /**
  * @brief   Allocate memory for the UDP thread's stack
  */
-#if ENABLE_DEBUG
-static char _stack[GNRC_UDP_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
-#else
-static char _stack[GNRC_UDP_STACK_SIZE];
-#endif
+static char _stack[GNRC_UDP_STACK_SIZE + DEBUG_EXTRA_STACKSIZE];
 
 /**
  * @brief   Calculate the UDP checksum dependent on the network protocol
@@ -157,6 +154,8 @@ static void _receive(gnrc_pktsnip_t *pkt)
     /* send payload to receivers */
     if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_UDP, port, pkt)) {
         DEBUG("udp: unable to forward packet as no one is interested in it\n");
+        /* TODO determine if IPv6 packet, when IPv4 is implemented */
+        gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_PORT, pkt);
         gnrc_pktbuf_release(pkt);
     }
 }
@@ -223,7 +222,7 @@ static void *_event_loop(void *arg)
     msg_t msg, reply;
     msg_t msg_queue[GNRC_UDP_MSG_QUEUE_SIZE];
     gnrc_netreg_entry_t netreg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
-                                                            sched_active_pid);
+                                                            thread_getpid());
     /* preset reply message */
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
     reply.content.value = (uint32_t)-ENOTSUP;
@@ -280,6 +279,8 @@ int gnrc_udp_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr)
 gnrc_pktsnip_t *gnrc_udp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src,
                                    uint16_t dst)
 {
+    assert((src > 0) && (dst > 0));
+
     gnrc_pktsnip_t *res;
     udp_hdr_t *hdr;
 

@@ -100,7 +100,6 @@ ssystem(const char *fmt, ...)
 #define SLIP_ESC_END 0334
 #define SLIP_ESC_ESC 0335
 
-
 /* get sockaddr, IPv4 or IPv6: */
 void *
 get_in_addr(struct sockaddr *sa)
@@ -191,7 +190,7 @@ serial_to_tun(FILE *inslip, int outfd)
     } uip;
     static unsigned int inbufptr = 0;
     /* cppcheck-suppress variableScope
-     * rationale: cannot be reduced if built on linux */
+     * (reason: cannot be reduced if built on linux) */
     int ret;
     unsigned char c;
 
@@ -555,7 +554,6 @@ write_to_serial(int outfd, void *inbuf, int len)
     PROGRESS("t");
 }
 
-
 /*
  * Read from tun, write to slip.
  */
@@ -651,7 +649,7 @@ devopen(const char *dev, int flags)
     char t[1024];
     strcpy(t, "/dev/");
     /* cppcheck-suppress bufferAccessOutOfBounds
-     * reason: seems to be a cppcheck bug */
+     * (reason: seems to be a bug in cppcheck 1.7x) */
     strncat(t, dev, sizeof(t) - 5);
     return open(t, flags);
 }

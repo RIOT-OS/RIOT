@@ -2,13 +2,87 @@
 INCLUDES += -I$(RIOTCPU)/cortexm_common/include
 INCLUDES += -I$(RIOTCPU)/cortexm_common/include/vendor
 
-ifneq (,$(ROM_OFFSET))
-  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_rom_offset=$(ROM_OFFSET)
-endif
-
+# All variables must be defined in the CPU configuration when using the common
+# `ldscripts/cortexm.ld`
 ifneq (,$(ROM_START_ADDR)$(RAM_START_ADDR)$(ROM_LEN)$(RAM_LEN))
+  $(if $(ROM_START_ADDR),,$(error ROM_START_ADDR is not defined))
+  $(if $(RAM_START_ADDR),,$(error RAM_START_ADDR is not defined))
+  $(if $(ROM_LEN),,$(error ROM_LEN is not defined))
+  $(if $(RAM_LEN),,$(error RAM_LEN is not defined))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_rom_start_addr=$(ROM_START_ADDR)
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_start_addr=$(RAM_START_ADDR)
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_rom_length=$(ROM_LEN)
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_length=$(RAM_LEN)
 endif
+
+ifneq (,$(BACKUP_RAM_LEN))
+  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_backup_ram_start_addr=$(BACKUP_RAM_ADDR)
+  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_backup_ram_len=$(BACKUP_RAM_LEN)
+  CFLAGS    += -DCPU_HAS_BACKUP_RAM=1
+endif
+
+TOOLCHAINS_SUPPORTED = gnu llvm
+
+# Only define the linker symbol if the variable is set
+# The variable can be set using target specific variable thanks to lazy evaluation
+
+# ROM_OFFSET: offset in rom to start linking, allows supporting a bootloader
+LINKFLAGS += $(if $(ROM_OFFSET),$(LINKFLAGPREFIX)--defsym=_rom_offset=$(ROM_OFFSET))
+# FW_ROM_LEN: rom length to use for firmware linking. Allows linking only in a section of the rom.
+LINKFLAGS += $(if $(FW_ROM_LEN),$(LINKFLAGPREFIX)--defsym=_fw_rom_length=$(FW_ROM_LEN))
+
+# Cortex-M riotboot settings
+
+# From ARMv8-M (M23, M33) architecture reference manual, section B3.27
+# https://static.docs.arm.com/ddi0553/a/DDI0553A_e_armv8m_arm.pdf
+# "In a PE with a configurable vector table base, the vector table must be
+# naturally aligned to a power of two, with an alignment value that is:
+# * A minimum of 128 bytes.
+# * Greater than or equal to (Number of Exceptions supported x4)."
+
+# From ARMv7-M (M4, M4F, M3, M7) architecture reference manual, section B1.5.3
+# https://static.docs.arm.com/ddi0403/e/DDI0403E_d_armv7m_arm.pdf
+# "The Vector table must be naturally aligned to a power of two whose alignment
+# value is greater than or equal to number of Exceptions supported x 4"
+
+# From ARMv6-M (M0, M0+, M1) architecture reference manual, section B1.5.3
+# https://static.docs.arm.com/ddi0419/d/DDI0419D_armv6m_arm.pdf
+# "The table offset address that VTOR defines is 32-word aligned. Where more
+# than 16 external interrupts are used, the offset word alignment must be
+# increased to accommodate vectors for all the exceptions and interrupts
+# supported and keep the required table size naturally aligned."
+
+# For reference on the max number in interrupts per processor look in The
+# technical reference manual "Interrupt Controller Type Register, ICTR" section.
+# * For M23 & M33: Maximum of 480 exception (480 * 4 bytes ~= 0x800).
+# * For M4, M4F, M3 & M7: Maximum of 256 exceptions (256*4 bytes == 0x400).
+# * For M0, M0+ & M1: Maximum of 48 exceptions (48*4 bytes = 192 bytes ~= 0x100).
+
+# The values defined here are a theoretical maximum, in practice most cpu's
+# CPU_IRQ_NUMOF value is around 100, in these cases the value can be reduced
+# accordingly in the cpu Makefile.include, e.g: `kinetis/Makefile.include`
+ifneq (,$(filter cortex-m23% cortex-m33%,$(CPU_CORE)))
+  RIOTBOOT_HDR_LEN ?= 0x800
+else ifneq (,$(filter cortex-m3% cortex-m4% cortex-m7%,$(CPU_CORE)))
+  RIOTBOOT_HDR_LEN ?= 0x400
+else
+  RIOTBOOT_HDR_LEN ?= 0x100
+endif
+
+# Configure riotboot bootloader and slot lengths
+# 4KB are currently enough, set it to 16KB if USB-DFU is used
+ifneq (,$(filter usbus_dfu,$(USEMODULE)))
+  RIOTBOOT_LEN ?= 0x4000
+else
+  RIOTBOOT_LEN ?= 0x1000
+endif
+# Currently 2 slots are supported by default, equals in length
+NUM_SLOTS ?= 2
+# Take the whole flash minus RIOTBOOT_LEN and divide it by NUM_SLOTS
+SLOT0_LEN ?= $(shell printf "0x%x" $$((($(ROM_LEN:%K=%*1024)-$(RIOTBOOT_LEN)) / $(NUM_SLOTS))))
+SLOT1_LEN ?= $(SLOT0_LEN)
+SLOT0_LEN := $(SLOT0_LEN)
+SLOT1_LEN := $(SLOT1_LEN)
+
+# JLink is able to flash any ARM CPUs
+PROGRAMMERS_SUPPORTED += jlink

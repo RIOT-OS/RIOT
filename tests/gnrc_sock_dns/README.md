@@ -14,7 +14,6 @@ Start dnsmasq (in another console):
 
     $ sudo dnsmasq -d -2 -z -i tap0 -q --no-resolv \
         --dhcp-range=::1,constructor:tap0,ra-only \
-        --listen-address 2001:db8::1 \
         --host-record=example.org,10.0.0.1,2001:db8::1
 
 (NetworkManager is known to start an interfering dnsmasq instance. It needs to
@@ -24,7 +23,11 @@ Then run the test application
 
     $ make term
 
-The application will take a little while to auto-configure it's IP address.
-Then you should see something like
+Now use the RIOT shell to configure the DNS server and request `example.org`
+from it
 
+    > dns server 2001:db8::1
+    > dns server
+    DNS server: [2001:db8::1]:53
+    > dns request example.org
     example.org resolves to 2001:db8::1

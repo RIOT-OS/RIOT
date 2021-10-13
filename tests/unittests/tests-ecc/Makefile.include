@@ -1,1 +1,3 @@
-USEMODULE += hamming256
+USEMODULE += ecc_golay2412
+USEMODULE += ecc_hamming256
+USEMODULE += ecc_repetition

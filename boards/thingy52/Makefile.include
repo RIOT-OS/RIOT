@@ -1,10 +1,12 @@
-# CPU configuration for the Thingy:52
-CPU_MODEL = nrf52832xxaa
-
-# for this board, we are using Segger's RTT as default terminal interface
-USEMODULE += rtt_stdio
-TERMPROG = $(RIOTBASE)/dist/tools/jlink/jlink.sh
-TERMFLAGS = term_rtt
+# HACK: replicate dependency resolution in Makefile.dep, only works
+# if `USEMODULE` or `DEFAULT_MODULE` is set by the command line or in the
+# application Makefile.
+ifeq (,$(filter stdio_%,$(DISABLE_MODULE) $(USEMODULE)))
+  RIOT_TERMINAL ?= jlink
+endif
 
 # use shared Makefile.include
-include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.include
+include $(RIOTBOARD)/common/nrf52/Makefile.include
+
+# openocd doesn't fully work with this board
+PROGRAMMERS_SUPPORTED := $(filter-out openocd,$(PROGRAMMERS_SUPPORTED))

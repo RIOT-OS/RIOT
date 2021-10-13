@@ -1,0 +1,5 @@
+CPU_MODEL = esp8266ex
+
+# Board provides all common peripheral features defined for all ESP8266 boards
+
+include $(RIOTBOARD)/common/esp8266/Makefile.features

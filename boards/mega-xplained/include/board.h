@@ -39,29 +39,15 @@ extern "C" {
  * baudrate to 9600 for this board
  * @{
  */
-#ifndef UART_STDIO_BAUDRATE
-#define UART_STDIO_BAUDRATE (9600U)
+#ifndef STDIO_UART_BAUDRATE
+#define STDIO_UART_BAUDRATE (9600U)
 #endif
 /** @} */
 
 /**
  * @brief   Use the UART 1 for STDIO on this board
  */
-#define UART_STDIO_DEV       (UART_DEV(1))
-
-/**
- * @brief   Context swap defines
- *
- * Setup to use PD7 which is pin change interrupt 31 (PCINT31)
- * This emulates a software triggered interrupt
- */
-#define AVR_CONTEXT_SWAP_INIT do { \
-            DDRD |= (1 << PD7); \
-            PCICR |= (1 << PCIE3); \
-            PCMSK3 |= (1 << PCINT31); \
-} while (0)
-#define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT3_vect
-#define AVR_CONTEXT_SWAP_TRIGGER   PORTD ^= (1 << PD7)
+#define STDIO_UART_DEV       (UART_DEV(1))
 
 /**
  * @name    xtimer configuration values
@@ -105,6 +91,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Usage of LED to turn on when a kernel panic occurs.
+ * @{
+ */
+#define LED_PANIC           LED1_ON
+/** @} */
+
+/**
  * @name    Button pin configuration
  * @{
  */
@@ -120,9 +113,16 @@ extern "C" {
  * @name    ADC NTC, light sensor, and filter lines
  * @{
  */
-#define NTC_OUTPUT             GPIO_PIN(PORT_A, 5)
-#define LIGHT_SENSOR_OUTPUT    GPIO_PIN(PORT_A, 6)
-#define FILTER_OUTPUT          GPIO_PIN(PORT_A, 7)
+#define NTC_OUTPUT             ADC_LINE(7)
+#define LIGHT_SENSOR_OUTPUT    ADC_LINE(6)
+#define FILTER_OUTPUT          ADC_LINE(5)
+/** @} */
+
+/**
+ * @name CPU clock scale for mega-xplained
+ *
+ */
+#define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
 /** @} */
 
 /**

@@ -283,7 +283,7 @@ static inline int sem_trywait(sem_t *sem)
 static inline int sem_getvalue(sem_t *sem, int *sval)
 {
     if (sem != NULL) {
-        *sval = (int)sem->value;
+        *sval = (int)sema_get_value((sema_t *)sem);
         return 0;
     }
     errno = EINVAL;

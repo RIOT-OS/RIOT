@@ -1,0 +1,14 @@
+MODULE = ucglib_sdl
+
+# Ignore warnings generated when compiling this module.
+CFLAGS += -Wno-empty-translation-unit \
+          -Wno-newline-eof \
+          -Wno-unused-parameter \
+          -Wno-unused \
+          -Wno-overlength-strings \
+          -Wno-pointer-arith
+
+# Configure SDL2 CFLAGS
+CFLAGS +=  $(shell sdl2-config --cflags)
+
+include $(RIOTBASE)/Makefile.base

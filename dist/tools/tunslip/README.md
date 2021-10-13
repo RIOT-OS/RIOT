@@ -1,13 +1,13 @@
-Creating a SLIP network interface
-=================================
+# Creating a SLIP network interface
 
 The module `slipdev` (Serial line IP) enables the RIOT network stack to
-communicate IP packets over the serial interface. This collection of tools
-originally from Contiki [1] enables Linux to interpret this data. Though there
-is a tool for such operations on Linux (`slattach`) it is only able to handle
-IPv4 packages and is unnecessarily complicated.
+send and receive IP packets over a serial interface. This collection of
+tools originally from Contiki [1] enables Linux to interpret this data.
+Though there is a tool for such operations on Linux (`slattach`) it is
+only able to handle IPv4 packages and is unnecessarily complicated.
 
-# Installation
+## Installation
+
 Just install them using
 
 ``` {.sh}
@@ -15,8 +15,8 @@ make
 sudo make install
 ```
 
-By default they are installed to the `/usr/local/bin` directory, you can however
-change that by setting the PREFIX environment variable
+By default they are installed to the `/usr/local/bin` directory, you
+can however change that by setting the `PREFIX` environment variable:
 
 ``` {.sh}
 export PREFIX=${HOME}/.local
@@ -24,15 +24,16 @@ make
 sudo make install
 ```
 
-# Usage
-`tapslip6` allows you to open a TAP interface (includes link-layer data) for
-a serial interace handling IPv6 data,
-`tunslip` allows you to open a TUN interface (includes only network-layer data)
-for a serial interace handling IPv4 data, and
-`tunslip6` allows you to open a TUN interface (includes only network-layer data)
-for a serial interace handling IPv6 data.
+## Usage
 
-For more information use the help feature of the tools
+- `tapslip6` opens a TAP interface (includes link-layer data) for
+  a serial interface handling IPv6 packets,
+- `tunslip` opens a TUN interface (includes network-layer data)
+  for a serial interface handling IPv4 packets, and
+- `tunslip6` opens a TUN interface (includes network-layer data)
+  for a serial interface handling IPv6 packets.
+
+For more information use the help feature of the tools:
 
 ``` {.sh}
 tapslip -h

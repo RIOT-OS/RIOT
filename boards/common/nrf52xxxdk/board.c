@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_common_nrf52xxxdk
+ * @ingroup     boards_common_nrf52
  * @{
  *
  * @file

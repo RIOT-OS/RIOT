@@ -5,3 +5,24 @@ endif
 ifneq (,$(filter periph_rtt,$(USEMODULE)))
   USEMODULE += periph_rtt_series$(EFM32_SERIES)
 endif
+
+ifneq (,$(filter periph_wdt,$(USEMODULE)))
+  USEMODULE += periph_wdt_series$(EFM32_SERIES)
+endif
+
+# include Gecko SDK package
+USEPKG += gecko_sdk
+
+ifneq (,$(filter efm32_coretemp,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_adc
+endif
+
+# CMSIS-DSP is needed for arm_math.h on Cortex-M0+ architectures
+ifeq ($(CPU_CORE),cortex-m0plus)
+  USEPKG += cmsis-dsp
+endif
+
+# include CPU family module
+USEMODULE += cpu_$(CPU_FAM)
+
+include $(RIOTCPU)/cortexm_common/Makefile.dep

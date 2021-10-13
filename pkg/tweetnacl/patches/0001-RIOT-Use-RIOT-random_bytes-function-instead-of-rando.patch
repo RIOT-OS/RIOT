@@ -1,0 +1,48 @@
+From cf440385f3aef5e9e94739c3fcdb5130d553f66c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Joakim=20Nohlg=C3=A5rd?= <joakim.nohlgard@eistec.se>
+Date: Tue, 15 May 2018 13:08:50 +0200
+Subject: [PATCH] RIOT: Use RIOT random_bytes function instead of randombytes
+
+---
+ tweetnacl.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tweetnacl.c b/tweetnacl.c
+index 96a847b57c..6b49b17fdc 100644
+--- a/tweetnacl.c
++++ b/tweetnacl.c
+@@ -1,4 +1,5 @@
+ #include "tweetnacl.h"
++#include "random.h"
+ #define FOR(i,n) for (i = 0;i < n;++i)
+ #define sv static void
+ 
+@@ -7,7 +8,6 @@ typedef unsigned long u32;
+ typedef unsigned long long u64;
+ typedef long long i64;
+ typedef i64 gf[16];
+-extern void randombytes(u8 *,u64);
+ 
+ static const u8
+   _0[16],
+@@ -450,7 +450,7 @@ int crypto_scalarmult_base(u8 *q,const u8 *n)
+ 
+ int crypto_box_keypair(u8 *y,u8 *x)
+ {
+-  randombytes(x,32);
++  random_bytes(x,32);
+   return crypto_scalarmult_base(y,x);
+ }
+ 
+@@ -660,7 +660,7 @@ int crypto_sign_keypair(u8 *pk, u8 *sk)
+   gf p[4];
+   int i;
+ 
+-  randombytes(sk, 32);
++  random_bytes(sk, 32);
+   crypto_hash(d, sk, 32);
+   d[0] &= 248;
+   d[31] &= 127;
+-- 
+2.17.0
+

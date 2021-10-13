@@ -53,7 +53,7 @@ void feetech_writer_init(feetech_writer_t *writer, uint8_t *buffer, size_t buffe
  *
  * @param[out] writer    the packet writer
  *
- * @return the begining address of the buffer
+ * @return the beginning address of the buffer
  */
 const uint8_t *feetech_writer_get_data(const feetech_writer_t *writer);
 

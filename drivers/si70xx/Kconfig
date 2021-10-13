@@ -1,0 +1,40 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if TEST_KCONFIG
+
+choice
+    bool "Si7006/13/20/21 temperature and humidity sensors"
+    optional
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+
+config MODULE_SI7006
+    bool "SI7006"
+    select MODULE_SI70XX
+
+config MODULE_SI7013
+    bool "SI7013"
+    select MODULE_SI70XX
+
+config MODULE_SI7020
+    bool "SI7020"
+    select MODULE_SI70XX
+
+config MODULE_SI7021
+    bool "SI7021"
+    select MODULE_SI70XX
+
+endchoice
+
+config MODULE_SI70XX
+    bool
+    depends on HAS_PERIPH_I2C
+    select MODULE_PERIPH_I2C
+    select MODULE_XTIMER
+
+endif # TEST_KCONFIG

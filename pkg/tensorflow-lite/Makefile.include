@@ -1,0 +1,6 @@
+INCLUDES += -I$(PKGDIRBASE)/tensorflow-lite
+
+ifneq (,$(filter cortex-m%,$(CPU_CORE)))
+  # LLVM/clang triggers a hard fault on Cortex-M
+  TOOLCHAINS_BLACKLIST += llvm
+endif

@@ -26,20 +26,6 @@
  * @name Interrupt vector definition
  * @{
  */
-
-/* This is needed to homogenize the symbolic IRQ names across different versions
- * of the vendor headers. These must be defined before any vendor headers are
- * included */
-#define FTFA_IRQn FTF_IRQn
-#define FTFA_Collision_IRQn Read_Collision_IRQn
-#define FTFE_IRQn FTF_IRQn
-#define FTFE_Collision_IRQn Read_Collision_IRQn
-#define FTFL_IRQn FTF_IRQn
-#define FTFL_Collision_IRQn Read_Collision_IRQn
-#define PMC_IRQn LVD_LVW_IRQn
-#define Watchdog_IRQn WDOG_EWM_IRQn
-#define LVD_LVW_DCDC_IRQn LVD_LVW_IRQn
-
 #include "vectors_kinetis.h"
 
 /* CPU specific interrupt vector table */
@@ -183,35 +169,68 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [SPI2_IRQn       ] = isr_spi2,            /* SPI2 Interrupt */
 #endif
 #ifdef I2S0
+#ifdef I2S_TCR1_TFW_MASK
+    /* K parts */
     [I2S0_Tx_IRQn    ] = isr_i2s0_tx,         /* I2S0 transmit interrupt */
     [I2S0_Rx_IRQn    ] = isr_i2s0_rx,         /* I2S0 receive interrupt */
+#else
+    /* KL parts */
+    [I2S0_IRQn       ] = isr_i2s0,            /* I2S0 interrupt */
+#endif
 #endif
 #ifdef UART0
+#ifdef KINETIS_SINGLE_UART_IRQ
+    [UART0_IRQn] = isr_uart0,     /* UART0 interrupt */
+#else
 #ifdef UART_RPL_RPL_MASK
     [UART0_LON_IRQn  ] = isr_uart0_lon,       /* UART0 LON interrupt */
 #endif
     [UART0_RX_TX_IRQn] = isr_uart0_rx_tx,     /* UART0 Receive/Transmit interrupt */
     [UART0_ERR_IRQn  ] = isr_uart0_err,       /* UART0 Error interrupt */
 #endif
+#endif
 #ifdef UART1
+#ifdef KINETIS_SINGLE_UART_IRQ
+    [UART1_IRQn] = isr_uart1,     /* UART1 interrupt */
+#else
     [UART1_RX_TX_IRQn] = isr_uart1_rx_tx,     /* UART1 Receive/Transmit interrupt */
     [UART1_ERR_IRQn  ] = isr_uart1_err,       /* UART1 Error interrupt */
 #endif
+#endif
 #ifdef UART2
+#if defined(KINETIS_SINGLE_UART_IRQ)
+    [UART2_IRQn] = isr_uart2,                 /* UART2 interrupt */
+#elif defined(FLEXIO_VERID_MAJOR_MASK)
+    /* KL parts with FlexIO uses combined IRQ */
+    [UART2_FLEXIO_IRQn] = isr_uart2_flexio,   /* UART2 or FLEXIO */
+#else
     [UART2_RX_TX_IRQn] = isr_uart2_rx_tx,     /* UART2 Receive/Transmit interrupt */
     [UART2_ERR_IRQn  ] = isr_uart2_err,       /* UART2 Error interrupt */
 #endif
+#endif
 #ifdef UART3
+#ifdef KINETIS_SINGLE_UART_IRQ
+    [UART3_IRQn] = isr_uart3,     /* UART3 interrupt */
+#else
     [UART3_RX_TX_IRQn] = isr_uart3_rx_tx,     /* UART3 Receive/Transmit interrupt */
     [UART3_ERR_IRQn  ] = isr_uart3_err,       /* UART3 Error interrupt */
 #endif
+#endif
 #ifdef UART4
+#ifdef KINETIS_SINGLE_UART_IRQ
+    [UART4_IRQn] = isr_uart4,     /* UART4 interrupt */
+#else
     [UART4_RX_TX_IRQn] = isr_uart4_rx_tx,     /* UART4 Receive/Transmit interrupt */
     [UART4_ERR_IRQn  ] = isr_uart4_err,       /* UART4 Error interrupt */
 #endif
+#endif
 #ifdef UART5
+#ifdef KINETIS_SINGLE_UART_IRQ
+    [UART5_IRQn] = isr_uart5,     /* UART5 interrupt */
+#else
     [UART5_RX_TX_IRQn] = isr_uart5_rx_tx,     /* UART5 Receive/Transmit interrupt */
     [UART5_ERR_IRQn  ] = isr_uart5_err,       /* UART5 Error interrupt */
+#endif
 #endif
 #ifdef ADC0
     [ADC0_IRQn       ] = isr_adc0,            /* ADC0 interrupt */
@@ -251,11 +270,18 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
 #endif
 #ifdef RTC
     [RTC_IRQn        ] = isr_rtc,             /* RTC interrupt */
+#  ifndef KINETIS_SERIES_EA
     [RTC_Seconds_IRQn] = isr_rtc_seconds,     /* RTC seconds interrupt */
+#  endif
 #endif
 #ifdef PIT
 #ifdef KINETIS_CORE_Z
+#  ifdef KINETIS_SERIES_EA
+    [PIT0_IRQn        ] = isr_pit0,             /* PIT timer channel 0 interrupt */
+    [PIT1_IRQn        ] = isr_pit1,             /* PIT timer channel 1 interrupt */
+#  else
     [PIT_IRQn        ] = isr_pit,             /* PIT any channel interrupt */
+#endif
 #else
     [PIT0_IRQn       ] = isr_pit0,            /* PIT timer channel 0 interrupt */
     [PIT1_IRQn       ] = isr_pit1,            /* PIT timer channel 1 interrupt */
@@ -279,8 +305,11 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [DAC1_IRQn       ] = isr_dac1,            /* DAC1 interrupt */
 #endif
 #ifdef MCG
+#ifndef MCG_MC_LIRC_DIV2_MASK
+    /* Only on full MCG, not MCG_Lite */
     [MCG_IRQn        ] = isr_mcg,             /* MCG Interrupt */
-#endif
+#endif /* MCG_MC_LIRC_DIV2_MASK */
+#endif /* MCG */
 #ifdef LPTMR0
     [LPTMR0_IRQn     ] = isr_lptmr0,          /* LPTimer interrupt */
 #endif
@@ -288,8 +317,10 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [PORTA_IRQn      ] = isr_porta,           /* Port A interrupt */
 #endif
 #ifdef KINETIS_CORE_Z
-#if defined(PORTB) && defined(PORTC)
+#if defined(PORTB) && defined(PORTC) && !defined(PORTD)
     [PORTB_PORTC_IRQn] = isr_portb_portc,     /* Port B, C combined interrupt */
+#elif defined(PORTC) && defined(PORTD)
+    [PORTC_PORTD_IRQn] = isr_portc_portd,     /* Port C, D combined interrupt */
 #endif
 #else
 #ifdef PORTB
@@ -324,6 +355,10 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [CAN1_Rx_Warning_IRQn] = isr_can1_rx_warning, /* CAN1 Rx warning interrupt */
     [CAN1_Wake_Up_IRQn] = isr_can1_wake_up,    /* CAN1 wake up interrupt */
 #endif
+#ifdef MSCAN
+    [MSCAN_RX_IRQn] = isr_mscan_rx, /* MSCAN RX interrupt */
+    [MSCAN_TX_IRQn] = isr_mscan_tx, /* MSCAN TX/Err/Wake-up interrupt */
+#endif
 #ifdef SDHC
     [SDHC_IRQn       ] = isr_sdhc,            /* SDHC interrupt */
 #endif
@@ -331,7 +366,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [ENET_1588_Timer_IRQn] = isr_enet_1588_timer, /* Ethernet MAC IEEE 1588 Timer Interrupt */
     [ENET_Transmit_IRQn] = isr_enet_transmit,   /* Ethernet MAC Transmit Interrupt */
     [ENET_Receive_IRQn] = isr_enet_receive,    /* Ethernet MAC Receive Interrupt */
-    [ENET_Error_IRQn ] = isr_enet_error,      /* Ethernet MAC Error and miscelaneous Interrupt */
+    [ENET_Error_IRQn ] = isr_enet_error,      /* Ethernet MAC Error and miscellaneous Interrupt */
 #endif
 #ifdef LPUART0
     [LPUART0_IRQn    ] = isr_lpuart0,         /* LPUART0 status/error interrupt */

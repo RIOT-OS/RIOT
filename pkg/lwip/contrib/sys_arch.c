@@ -22,7 +22,9 @@
 #include "lwip/mem.h"
 #include "lwip/opt.h"
 #include "lwip/sys.h"
+#include "lwip/tcpip.h"
 
+#include "irq.h"
 #include "msg.h"
 #include "sema.h"
 #include "thread.h"
@@ -75,13 +77,13 @@ void sys_sem_free(sys_sem_t *sem)
 
 void sys_sem_signal(sys_sem_t *sem)
 {
-    LWIP_ASSERT("invalid semaphor", sys_sem_valid(sem));
+    LWIP_ASSERT("invalid semaphore", sys_sem_valid(sem));
     sema_post((sema_t *)sem);
 }
 
 u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t count)
 {
-    LWIP_ASSERT("invalid semaphor", sys_sem_valid(sem));
+    LWIP_ASSERT("invalid semaphore", sys_sem_valid(sem));
     if (count != 0) {
         uint64_t stop, start;
         start = xtimer_now_usec64();
@@ -146,7 +148,7 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
     start = xtimer_now_usec64();
     if (timeout > 0) {
         uint64_t u_timeout = (timeout * US_PER_MS);
-        _xtimer_set64(&timer, (uint32_t)u_timeout, (uint32_t)(u_timeout >> 32));
+        xtimer_set64(&timer, u_timeout);
     }
     mbox_get(&mbox->mbox, &m);
     stop = xtimer_now_usec64();
@@ -178,21 +180,76 @@ u32_t sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg)
     }
 }
 
+/**
+ * @brief   parameters to _lwip_thread_wrapper
+ */
+typedef struct {
+    mutex_t sync;
+    lwip_thread_fn thread;
+    void *arg;
+} _lwip_thread_params_t;
+
+static void *_lwip_thread_wrapper(void *params_ptr)
+{
+    _lwip_thread_params_t *params = params_ptr;
+    lwip_thread_fn thread = params->thread;
+    void *arg = params->arg;
+    mutex_unlock(&params->sync);
+    thread(arg);
+    /* TODO: free stack? */
+    return NULL;
+}
+
 sys_thread_t sys_thread_new(const char *name, lwip_thread_fn thread, void *arg,
                             int stacksize, int prio)
 {
     kernel_pid_t res;
     char *stack = mem_malloc((size_t)stacksize);
+    _lwip_thread_params_t params = {
+        .sync = MUTEX_INIT_LOCKED,
+        .thread = thread,
+        .arg = arg,
+    };
 
     if (stack == NULL) {
         return ERR_MEM;
     }
     if ((res = thread_create(stack, stacksize, prio, THREAD_CREATE_STACKTEST,
-                             (thread_task_func_t)thread, arg, name)) <= KERNEL_PID_UNDEF) {
+                             _lwip_thread_wrapper, &params,
+                             name)) <= KERNEL_PID_UNDEF) {
         abort();
     }
-    sched_switch((char)prio);
+    mutex_lock(&params.sync);
+    thread_yield_higher();
     return res;
+}
+
+static kernel_pid_t lwip_tcpip_thread = KERNEL_PID_UNDEF;
+static kernel_pid_t lwip_lock_thread;
+
+void sys_mark_tcpip_thread(void) {
+    lwip_tcpip_thread = thread_getpid();
+}
+
+void sys_lock_tcpip_core(void) {
+    sys_mutex_lock(&lock_tcpip_core);
+    lwip_lock_thread = thread_getpid();
+}
+void sys_unlock_tcpip_core(void) {
+    lwip_lock_thread = KERNEL_PID_UNDEF;
+    sys_mutex_unlock(&lock_tcpip_core);
+}
+
+bool sys_check_core_locked(void) {
+    /* Don't call from inside isr */
+    if (irq_is_in()) {
+        return false;
+    }
+    if (lwip_tcpip_thread != KERNEL_PID_UNDEF) {
+        /* only call from thread with lock */
+        return lwip_lock_thread == thread_getpid();
+    }
+    return true;
 }
 
 /** @} */

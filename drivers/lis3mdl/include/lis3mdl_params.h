@@ -58,8 +58,8 @@ extern "C" {
                                        .addr    = LIS3MDL_PARAM_ADDR,   \
                                        .xy_mode = LIS3MDL_PARAM_XYMODE, \
                                        .z_mode  = LIS3MDL_PARAM_ZMODE,  \
-                                       .odr     = LIS3MDL_PARAM_SCALE,  \
-                                       .scale   = LIS3MDL_PARAM_ODR,    \
+                                       .odr     = LIS3MDL_PARAM_ODR,  \
+                                       .scale   = LIS3MDL_PARAM_SCALE,    \
                                        .op_mode = LIS3MDL_PARAM_OPMODE }
 #endif
 #ifndef LIS3MDL_SAUL_INFO

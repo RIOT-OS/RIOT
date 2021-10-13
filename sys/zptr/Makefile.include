@@ -1,0 +1,14 @@
+# zptr can use pointer compression of four byte aligned pointers, by right-
+# shifting them by two and stuffing in an uint16_t.
+# That only works on 32bit platforms, if total RAM size is <=2**18 and the
+# start address is known.
+ifneq (,$(filter arch_32bit,$(FEATURES_USED)))
+  ifneq (,$(RAM_START_ADDR))
+    ifneq (,$(RAM_LEN))
+      # this handles 0xXXX and xxxK
+      ifeq (1,$(shell echo $$(($(subst K,*1024,$(RAM_LEN)) <= 262144))))
+        CFLAGS += -DZPTR_BASE=$(RAM_START_ADDR)
+      endif
+    endif
+  endif
+endif

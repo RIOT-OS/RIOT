@@ -1,0 +1,8 @@
+FEATURES_REQUIRED += periph_i2c
+
+USEMODULE += xtimer
+
+ifeq (esp32,$(CPU))
+  # necessary to fix driver initialization on esp32
+  USEMODULE += esp_i2c_hw
+endif

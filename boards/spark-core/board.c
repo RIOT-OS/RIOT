@@ -24,6 +24,9 @@
 
 void board_init(void)
 {
+    /* initialize the CPU */
+    cpu_init();
+
     /* initialize the boards LEDs */
     gpio_init(LED0_PIN, GPIO_OUT);
     gpio_init(LED1_PIN, GPIO_OUT);
@@ -34,8 +37,6 @@ void board_init(void)
     gpio_set(LED2_PIN);
     gpio_set(LED3_PIN);
 
-    /* initialize the CPU */
-    cpu_init();
     /* disable systick interrupt, set by the spark bootloader */
     SysTick->CTRL = 0;
     /* signal to spark bootloader: do not enable IWDG! set Stop Mode Flag! */

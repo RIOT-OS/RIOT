@@ -1,6 +1,0 @@
-# define the cpu used by the nucleo144-f446 board
-export CPU = stm32f4
-export CPU_MODEL = stm32f446ze
-
-# load the common Makefile.include for Nucleo-144 boards
-include $(RIOTBOARD)/common/nucleo144/Makefile.include

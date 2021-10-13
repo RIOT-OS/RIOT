@@ -1,0 +1,32 @@
+From e24924004bfa6914029a2db693fdb512c35f1785 Mon Sep 17 00:00:00 2001
+From: chrysn <chrysn@fsfe.org>
+Date: Sun, 8 Nov 2020 06:40:16 +0100
+Subject: [PATCH] RIOT: Provide PRIx64 if needed
+
+Not all RIOT platforms provide a PRIx64 or even 64-bit printing.
+
+As the debug routines that actually use this definition are unlikely to
+be used with RIOT, providing a definition that builds (and, depending on
+platform support, may or may not produce correct output) is a suitable
+fix.
+---
+ kremlib.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/kremlib.h b/kremlib.h
+index 138846a..2fce712 100644
+--- a/kremlib.h
++++ b/kremlib.h
+@@ -25,6 +25,9 @@
+ 
+ #include "kremlib_base.h"
+ 
++#ifndef PRIx64
++#define PRIx64 "llx"
++#endif
+ 
+ /* For tests only: we might need this function to be forward-declared, because
+  * the dependency on WasmSupport appears very late, after SimplifyWasm, and
+-- 
+2.29.2
+

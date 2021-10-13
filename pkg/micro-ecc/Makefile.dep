@@ -1,0 +1,4 @@
+# micro-ecc is not 16 bit compatible
+FEATURES_BLACKLIST += arch_16bit
+
+USEMODULE += random

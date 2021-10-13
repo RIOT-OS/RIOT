@@ -167,7 +167,8 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "kernel_types.h"
+
+#include "sched.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -191,7 +192,6 @@ typedef struct {
     } content;                  /**< Content of the message. */
 } msg_t;
 
-
 /**
  * @brief Send a message (blocking).
  *
@@ -212,7 +212,6 @@ typedef struct {
  */
 int msg_send(msg_t *m, kernel_pid_t target_pid);
 
-
 /**
  * @brief Send a message (non-blocking).
  *
@@ -230,7 +229,6 @@ int msg_send(msg_t *m, kernel_pid_t target_pid);
  * @return -1, on error (invalid PID)
  */
 int msg_try_send(msg_t *m, kernel_pid_t target_pid);
-
 
 /**
  * @brief Send a message to the current thread.
@@ -313,7 +311,13 @@ int msg_try_receive(msg_t *m);
  * @brief Send a message, block until reply received.
  *
  * This function sends a message to *target_pid* and then blocks until target
- * has sent a reply which is then stored in *reply*.
+ * has sent a reply which is then stored in *reply*. The responding thread must
+ * use @ref msg_reply().
+ *
+ * Any incoming messages other than the reply are put into the queue (if one is
+ * configured), block the sender (if sent with @ref msg_send from a thread), or
+ * rejected (if sent with @ref msg_try_send or from an interrupt) -- just like
+ * if the thread were blocked on anything different than message reception.
  *
  * @pre     @p target_pid is not the PID of the current thread.
  *

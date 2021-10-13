@@ -1,0 +1,11 @@
+MODULE = libb2
+
+# Compiling for native triggers this warning
+CFLAGS += -Wno-unused-function
+
+SRC := blake2s-ref.c \
+       blake2b-ref.c \
+       blake2sp.c \
+       blake2bp.c
+
+include $(RIOTBASE)/Makefile.base

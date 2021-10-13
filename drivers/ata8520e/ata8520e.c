@@ -33,7 +33,7 @@
 #include "ata8520e_internals.h"
 #include "ata8520e.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 /* Warning: to correctly display the debug messages in callbacks,
    add CFLAGS+=-DTHREAD_STACKSIZE_IDLE=THREAD_STACKSIZE_DEFAULT to the build
    command.
@@ -45,8 +45,7 @@
 #define INTPIN               (dev->params.int_pin)
 #define RESETPIN             (dev->params.reset_pin)
 #define POWERPIN             (dev->params.power_pin)
-#define SPI_CS_DELAY         (US_PER_MS)
-#define DELAY_10_MS          (10 * US_PER_MS) /* 10 ms */
+#define SPI_CS_DELAY_MS      (1)
 #define TX_TIMEOUT           (8U)             /* 8 s */
 #define TX_RX_TIMEOUT        (50U)            /* 50 s */
 
@@ -93,7 +92,8 @@ static void _print_atmel_status(uint8_t status)
             DEBUG("[ata8520e] Atmel: Send error\n");
             break;
         default:
-            DEBUG("[ata8520e] Atmel: Invalid status code\n");
+            DEBUG("[ata8520e] Atmel: Unknown status code '%02X'\n",
+                  (status >> 1) & 0x0F);
             break;
     }
 }
@@ -102,56 +102,32 @@ static void _print_sigfox_status(uint8_t status)
 {
     DEBUG("[ata8520e] Sigfox status: %d\n", status);
     switch (status) {
-        case ATA8520E_SIGFOX_OK:
+        case ATA8520E_SIGFOX_NO_ERROR:
             DEBUG("[ata8520e] Sigfox: OK\n");
             break;
-        case ATA8520E_SIGFOX_MANUFACTURER_ERROR:
-            DEBUG("[ata8520e] Sigfox: Manufacturer error\n");
+        case ATA8520E_SIGFOX_TX_LEN_TOO_LONG:
+            DEBUG("[ata8520e] Sigfox: TX data length exceeds 12 bytes\n");
             break;
-        case ATA8520E_SIGFOX_ID_OR_KEY_ERROR:
-            DEBUG("[ata8520e] Sigfox: ID or Key error\n");
+        case ATA8520E_SIGFOX_RX_TIMEOUT:
+            DEBUG("[ata8520e] Sigfox: Timeout for downlink message\n");
             break;
-        case ATA8520E_SIGFOX_STATE_MACHINE_ERROR:
-            DEBUG("[ata8520e] Sigfox: State machine error\n");
+        case ATA8520E_SIGFOX_RX_BIT_TIMEOUT:
+            DEBUG("[ata8520e] Sigfox: Timeout for bit downlink\n");
             break;
-        case ATA8520E_SIGFOX_FRAME_SIZE_ERROR:
-            DEBUG("[ata8520e] Sigfox: Frame size error\n");
+        case ATA8520E_SIGFOX2_INIT_ERROR:
+            DEBUG("[ata8520e] Sigfox2: Initialization error\n");
             break;
-        case ATA8520E_SIGFOX_MANUFACTURER_SEND_ERROR:
-            DEBUG("[ata8520e] Sigfox: Manufacturer send error\n");
+        case ATA8520E_SIGFOX2_TX_ERROR:
+            DEBUG("[ata8520e] Sigfox2: Error during send\n");
             break;
-        case ATA8520E_SIGFOX_GET_VOLTAGE_TEMP_ERROR:
-            DEBUG("[ata8520e] Sigfox: Get voltage/temperature error\n");
+        case ATA8520E_SIGFOX2_RF_ERROR:
+            DEBUG("[ata8520e] Sigfox2: Error in RF frequency\n");
             break;
-        case ATA8520E_SIGFOX_CLOSE_ERROR:
-            DEBUG("[ata8520e] Sigfox: Close issues encountered\n");
-            break;
-        case ATA8520E_SIGFOX_API_ERROR:
-            DEBUG("[ata8520e] Sigfox: API error indication\n");
-            break;
-        case ATA8520E_SIGFOX_GET_PN9_ERROR:
-            DEBUG("[ata8520e] Sigfox: Error getting PN9\n");
-            break;
-        case ATA8520E_SIGFOX_GET_FREQUENCY_ERROR:
-            DEBUG("[ata8520e] Sigfox: Error getting frequency\n");
-            break;
-        case ATA8520E_SIGFOX_BUILDING_FRAME_ERROR:
-            DEBUG("[ata8520e] Sigfox: Error building frame\n");
-            break;
-        case ATA8520E_SIGFOX_DELAY_ROUTINE_ERROR:
-            DEBUG("[ata8520e] Sigfox: Error in delay routine\n");
-            break;
-        case ATA8520E_SIGFOX_CALLBACK_ERROR:
-            DEBUG("[ata8520e] Sigfox: Callback causes error\n");
-            break;
-        case ATA8520E_SIGFOX_TIMING_ERROR:
-            DEBUG("[ata8520e] Sigfox: Timing error\n");
-            break;
-        case ATA8520E_SIGFOX_FREQUENCY_ERROR:
-            DEBUG("[ata8520e] Sigfox: Frequency error\n");
+        case ATA8520E_SIGFOX2_DF_WAIT_ERROR:
+            DEBUG("[ata8520e] Sigfox2: Error during wait for data frame\n");
             break;
         default:
-            DEBUG("[ata8520e] Sigfox: Invalid status code [%d]\n", status);
+            DEBUG("[ata8520e] Sigfox: Internal error '%02X'\n", status);
             break;
     }
 }
@@ -180,9 +156,7 @@ static void _irq_handler(void *arg)
 
 static void _getbus(const ata8520e_t *dev)
 {
-    if (spi_acquire(SPIDEV, CSPIN, SPI_MODE_0, dev->params.spi_clk) < 0) {
-        DEBUG("[ata8520e] ERROR: Cannot acquire SPI bus!\n");
-    }
+    spi_acquire(SPIDEV, CSPIN, SPI_MODE_0, dev->params.spi_clk);
 }
 
 static void _spi_transfer_byte(const ata8520e_t *dev, bool cont, uint8_t out)
@@ -190,9 +164,9 @@ static void _spi_transfer_byte(const ata8520e_t *dev, bool cont, uint8_t out)
     /* Manually triggering CS because of a required delay, see datasheet,
        section 2.1.1, page 10 */
     gpio_clear((gpio_t)CSPIN);
-    xtimer_usleep(SPI_CS_DELAY);
+    xtimer_msleep(SPI_CS_DELAY_MS);
     spi_transfer_byte(SPIDEV, SPI_CS_UNDEF, cont, out);
-    xtimer_usleep(SPI_CS_DELAY);
+    xtimer_msleep(SPI_CS_DELAY_MS);
     gpio_set((gpio_t)CSPIN);
 }
 
@@ -202,9 +176,9 @@ static void _spi_transfer_bytes(const ata8520e_t *dev, bool cont,
     /* Manually triggering CS because of a required delay, see datasheet,
        section 2.1.1, page 10 */
     gpio_clear((gpio_t)CSPIN);
-    xtimer_usleep(SPI_CS_DELAY);
+    xtimer_msleep(SPI_CS_DELAY_MS);
     spi_transfer_bytes(SPIDEV, SPI_CS_UNDEF, cont, out, in, len);
-    xtimer_usleep(SPI_CS_DELAY);
+    xtimer_msleep(SPI_CS_DELAY_MS);
     gpio_set((gpio_t)CSPIN);
 }
 
@@ -215,23 +189,51 @@ static void _send_command(const ata8520e_t *dev, uint8_t command)
     spi_release(SPIDEV);
 }
 
+static void _status(const ata8520e_t *dev)
+{
+    /* clear the event line and check the device status,
+       see datasheet, section 2.1.2.10, page 12 */
+    _getbus(dev);
+    _spi_transfer_byte(dev, true, ATA8520E_GET_STATUS);
+    _spi_transfer_byte(dev, true, 0);
+    _spi_transfer_byte(dev, true, 0); /* SSM unused */
+    uint8_t atmel = spi_transfer_byte(SPIDEV, CSPIN, true, 0);
+    uint8_t sigfox = spi_transfer_byte(SPIDEV, CSPIN, true, 0);
+    uint8_t sigfox2 = spi_transfer_byte(SPIDEV, CSPIN, false, 0);
+    spi_release(SPIDEV);
+
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        _print_atmel_status(atmel);
+        _print_sigfox_status(sigfox);
+        _print_sigfox_status(sigfox2);
+    }
+    else {
+        (void)atmel;
+        (void)sigfox;
+        (void)sigfox2;
+    }
+}
+
 static void _reset(const ata8520e_t *dev)
 {
     gpio_set(RESETPIN);
-    xtimer_usleep(DELAY_10_MS);
+    xtimer_msleep(10);
     gpio_clear(RESETPIN);
-    xtimer_usleep(DELAY_10_MS);
+    xtimer_msleep(10);
     gpio_set(RESETPIN);
 }
 
 static void _poweron(const ata8520e_t *dev)
 {
+    /* power up procedure, see datasheet, section 2.2.1, page 24 */
     gpio_set(POWERPIN);
     _reset(dev);
 }
 
 static void _poweroff(const ata8520e_t *dev)
 {
+    /* power down procedure, see datasheet, section 2.2.2, page 24 */
+    _status(dev);
     gpio_clear(POWERPIN);
     _send_command(dev, ATA8520E_OFF_MODE);
 }
@@ -239,7 +241,7 @@ static void _poweroff(const ata8520e_t *dev)
 int ata8520e_init(ata8520e_t *dev, const ata8520e_params_t *params)
 {
     /* write config params to device descriptor */
-    memcpy(&dev->params, params, sizeof(ata8520e_params_t));
+    dev->params = *params;
 
     /* Initialize pins*/
     if (gpio_init_int(INTPIN, GPIO_IN_PD,
@@ -265,9 +267,9 @@ int ata8520e_init(ata8520e_t *dev, const ata8520e_params_t *params)
         return -ATA8520E_ERR_SPI;
     }
 
-    xtimer_usleep(100 * US_PER_MS); /* 100 ms */
+    xtimer_msleep(100);
 
-    if (ENABLE_DEBUG) {
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
         char sigfox_id[SIGFOX_ID_LENGTH + 1];
         ata8520e_read_id(dev, sigfox_id);
 
@@ -287,8 +289,8 @@ int ata8520e_init(ata8520e_t *dev, const ata8520e_params_t *params)
         DEBUG("[ata8520e] Sigfox PAC: %s\n", sigfox_pac);
     }
 
-    /* Get status and clear event line */
-    ata8520e_status(dev);
+    /* clear event line */
+    _status(dev);
 
     dev->internal_state = ATA8520E_STATE_IDLE;
 
@@ -353,24 +355,6 @@ void ata8520e_read_id(const ata8520e_t *dev, char *id)
     _poweroff(dev);
 }
 
-
-void ata8520e_status(const ata8520e_t *dev)
-{
-    _getbus(dev);
-    _spi_transfer_byte(dev, true, ATA8520E_OFF_MODE);
-    _spi_transfer_byte(dev, true, 0);
-    _spi_transfer_byte(dev, true, 0); /* SSM unused */
-    uint8_t atmel = spi_transfer_byte(SPIDEV, CSPIN, true, 0);
-    uint8_t sigfox = spi_transfer_byte(SPIDEV, CSPIN, true, 0);
-    _spi_transfer_byte(dev, false, 0);
-    spi_release(SPIDEV);
-
-    if (ENABLE_DEBUG) {
-        _print_atmel_status(atmel);
-        _print_sigfox_status(sigfox);
-    }
-}
-
 static void isr_event_timeout(void *arg)
 {
     ata8520e_t *dev = (ata8520e_t *)arg;
@@ -405,8 +389,8 @@ static bool _wait_event(ata8520e_t *dev, uint8_t timeout)
 static void _prepare_send_frame(ata8520e_t *dev, uint8_t *msg, uint8_t msg_len)
 {
     _poweron(dev);
-    xtimer_usleep(5 * US_PER_MS);
-    ata8520e_status(dev);
+    xtimer_msleep(5);
+    _status(dev);
 
     /* Verify message length */
     if (msg_len > SIGFOX_MAX_TX_LENGTH) {
@@ -440,7 +424,7 @@ static int _wait_send(ata8520e_t *dev, uint8_t timeout)
     }
 
     /* Clear event line */
-    ata8520e_status(dev);
+    _status(dev);
 
     /* back to idle state */
     dev->internal_state = ATA8520E_STATE_IDLE;
@@ -500,8 +484,8 @@ int ata8520e_send_bit(ata8520e_t *dev, bool bit)
 {
     DEBUG("[ata8520e] Sending bit '%d'\n", bit);
     _poweron(dev);
-    xtimer_usleep(5 * US_PER_MS);
-    ata8520e_status(dev);
+    xtimer_msleep(5);
+    _status(dev);
 
     dev->internal_state = ATA8520E_STATE_TX;
 

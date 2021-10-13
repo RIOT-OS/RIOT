@@ -1,0 +1,35 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD
+    default "lsn50" if BOARD_LSN50
+
+config BOARD_LSN50
+    bool
+    default y
+    select CPU_MODEL_STM32L072CZ
+
+    # Put defined MCU peripherals here (in alphabetical order)
+    select HAS_PERIPH_DMA
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_RTC
+    select HAS_PERIPH_RTT
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_SPI_GPIO_MODE
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+
+    # Put other features for this board (in alphabetical order)
+    # For riotboot you need an openocd that supports dualbank flashing.
+    # The 0.10.0 openocd version in Ubuntu Bionic doesn't work. The change was
+    # introduced after Jun 8, 2017 - v0.10.0-1-20170607-2132-dev.
+    select HAS_RIOTBOOT
+
+    # Clock configuration
+    select BOARD_HAS_LSE
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"

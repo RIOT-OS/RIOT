@@ -1,0 +1,59 @@
+# Copyright (c) 2019 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+mainmenu "RIOT Configuration"
+
+# Load macro definitions
+rsource "kconfigs/Kconfig.consts"
+
+# Load feature declarations
+rsource "kconfigs/Kconfig.features"
+
+# Load error symbols
+rsource "kconfigs/Kconfig.errors"
+
+# For now, get used modules as macros from this file (see kconfig.mk)
+osource "$(KCONFIG_GENERATED_DEPENDENCIES)"
+
+# Load first board configurations, which might override CPU's
+orsource "$(BOARDDIR)/Kconfig"
+orsource "$(RIOTCPU)/$(CPU)/Kconfig"
+
+rsource "$(RIOTBOARD)/Kconfig"
+rsource "$(RIOTCPU)/Kconfig"
+
+# The application may declare new symbols as well
+osource "$(APPDIR)/Kconfig"
+
+rsource "core/Kconfig"
+rsource "drivers/Kconfig"
+rsource "sys/Kconfig"
+rsource "pkg/Kconfig"
+
+menu "External Modules"
+osource "$(KCONFIG_EXTERNAL_CONFIGS)"
+endmenu # External Modules
+
+comment "RIOT is in a migration phase."
+comment "Some configuration options may not be here. Use CFLAGS instead."
+
+comment "!! ERROR: There are conflicting modules active !!"
+    depends on ERROR_MODULES_CONFLICT != ""
+
+config TEST_KCONFIG
+    bool
+    default y if '$(TEST_KCONFIG)' = '1'
+    help
+        This is used during the Kconfig migration to test the module dependency
+        modelling. Don't change the default value unless you know what you are
+        doing.
+
+config DEVELHELP
+    bool "Development Help"
+    help
+        Set to enable code in RIOT that does safety checking which might not be
+        needed in a production environment but helps in the development
+        process.

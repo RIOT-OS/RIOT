@@ -6,19 +6,18 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-import os
 import sys
+from testrunner import run
 
 
 def testfunc(child):
     child.expect_exact("Start.")
-    child.expect('\+ bitarithm_msb: \d+ iterations per second')
-    child.expect('\+ bitarithm_lsb: \d+ iterations per second')
-    child.expect('\+ bitarithm_bits_set: \d+ iterations per second')
+    child.expect(r'\+ bitarithm_msb: \d+ iterations per second')
+    child.expect(r'\+ bitarithm_lsb: \d+ iterations per second')
+    child.expect(r'\+ bitarithm_bits_set: \d+ iterations per second')
+    child.expect(r'\+ bitarithm_test_and_clear: \d+ iterations per second')
     child.expect_exact("Done.")
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-    from testrunner import run
     sys.exit(run(testfunc, timeout=30))

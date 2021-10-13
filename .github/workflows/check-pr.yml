@@ -1,0 +1,36 @@
+name: check-pr
+on:
+  pull_request:
+    types: [opened, reopened, labeled, unlabeled, synchronize]
+  pull_request_review:
+    types: [submitted, dismissed]
+jobs:
+  check-labels:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: RIOT-OS/check-labels-action@v1.0.0
+      with:
+        access_token: ${{ secrets.GITHUB_TOKEN }}
+        unset_labels: 'CI: needs squashing,State: waiting for other PR,Process: blocked by feature freeze'
+        cond_labels: '(Process: needs >1 ACK,review.approvals>1),(Area: RDM,review.approvals>2)'
+  check-commits:
+    runs-on: ubuntu-latest
+    if: ${{ github.base_ref }}
+    strategy:
+      fail-fast: false
+      matrix:
+        check: [commit-msg, pr_check]
+    steps:
+    - uses: actions/checkout@master
+      with:
+        # Use the SHA of the PR branch as-is, not the PR branch merged
+        # in master (default behavior in GH actions)
+        # See https://github.com/actions/checkout#checkout-pull-request-head-commit-instead-of-merge-commit
+        ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: 0
+    - name: Fetch base branch
+      run:
+        git fetch origin '${{ github.base_ref }}:${{ github.base_ref }}'
+    - name: Run checks
+      run: |
+        ./dist/tools/${{ matrix.check }}/check.sh "${{ github.base_ref }}"

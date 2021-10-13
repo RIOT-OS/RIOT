@@ -1,0 +1,9 @@
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  USEMODULE += sx126x_stm32wl
+endif
+ifneq (,$(filter sx126x_stm32wl,$(USEMODULE)))
+  USEMODULE += sx126x_rf_switch
+endif
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif

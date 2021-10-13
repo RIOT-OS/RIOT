@@ -27,7 +27,7 @@
 #include "hdc1000.h"
 #include "hdc1000_params.h"
 
-#define SLEEP       (1000 * 1000U)
+#define SLEEP_USEC  (1000 * 1000U)
 
 int main(void)
 {
@@ -51,13 +51,13 @@ int main(void)
         size_t len;
         hdc1000_read(&dev, &temp, &hum);
 
-        len = fmt_s16_dfp(tstr, temp, 2);
+        len = fmt_s16_dfp(tstr, temp, -2);
         tstr[len] = '\0';
-        len = fmt_s16_dfp(hstr, hum, 2);
+        len = fmt_s16_dfp(hstr, hum, -2);
         hstr[len] = '\0';
         printf("Reading: T: %s °C  RH: %s %%\n", tstr, hstr);
 
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_USEC);
     }
 
     return 0;

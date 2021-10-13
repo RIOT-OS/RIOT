@@ -1,0 +1,15 @@
+# configuration
+MP_RIOT_HEAPSIZE ?= 16384U
+
+CFLAGS += -DMP_RIOT_HEAPSIZE=$(MP_RIOT_HEAPSIZE)
+
+# include paths
+INCLUDES += -I$(RIOTBASE)/pkg/micropython/include
+INCLUDES += -I$(BINDIR)/pkg/micropython
+INCLUDES += -I$(BINDIR)/pkg/micropython/ports/riot
+
+# include archive
+ARCHIVES += $(BINDIR)/micropython.a
+
+# The port currently doesn't build with llvm
+TOOLCHAINS_BLACKLIST += llvm

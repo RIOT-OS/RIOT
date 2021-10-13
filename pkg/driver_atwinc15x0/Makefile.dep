@@ -1,0 +1,6 @@
+FEATURES_REQUIRED += periph_gpio_irq
+FEATURES_REQUIRED += periph_spi
+
+USEMODULE += driver_atwinc15x0
+USEMODULE += driver_atwinc15x0_common
+USEMODULE += driver_atwinc15x0_spi_flash

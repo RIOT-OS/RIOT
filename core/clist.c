@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2017 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2017 Inria
+ *               2017 Freie Universität Berlin
+ *               2017 Kaspar Schleiser <kaspar@schleiser.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -78,6 +80,8 @@ clist_node_t *_clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
             for (i = 0; i < insize; i++) {
                 psize++;
                 q = (q->next == oldhead) ? NULL : q->next;
+                /* cppcheck-suppress nullPointer
+                 * (reason: possible bug in cppcheck 1.6x) */
                 if (!q) {
                     break;
                 }
@@ -134,7 +138,8 @@ clist_node_t *_clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
             p = q;
         }
 
-        /* cppcheck-suppress nullPointer */
+        /* cppcheck-suppress nullPointer
+         * (reason: tail cannot be NULL at this point, because list != NULL) */
         tail->next = list;
 
         /* If we have done only one merge, we're finished. */

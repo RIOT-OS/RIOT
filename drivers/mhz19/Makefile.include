@@ -1,0 +1,6 @@
+# include variants of MH-Z19 drivers as pseudo modules
+PSEUDOMODULES += mhz19_uart
+PSEUDOMODULES += mhz19_pwm
+
+USEMODULE_INCLUDES_mhz19 := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_mhz19)

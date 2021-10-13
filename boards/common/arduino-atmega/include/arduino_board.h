@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Freie Universität Berlin
+ *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,12 +16,14 @@
  *
  * @author      Hauke Petersen  <hauke.petersen@fu-berlin.de>
  * @author      Laurent Navet   <laurent.navet@gmail.com>
+ * @author      Thomas Perrot   <thomas.perrot@tupi.fr>
  */
 
 #ifndef ARDUINO_BOARD_H
 #define ARDUINO_BOARD_H
 
 #include "arduino_pinmap.h"
+#include "periph/pwm.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,18 +58,24 @@ static const gpio_t arduino_pinmap[] = {
     ARDUINO_PIN_17,
     ARDUINO_PIN_18,
     ARDUINO_PIN_19,
-#ifdef CPU_ATMEGA2560
+#if defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA32U4)
     ARDUINO_PIN_20,
     ARDUINO_PIN_21,
     ARDUINO_PIN_22,
     ARDUINO_PIN_23,
+#endif
+#ifdef CPU_ATMEGA2560
     ARDUINO_PIN_24,
     ARDUINO_PIN_25,
     ARDUINO_PIN_26,
     ARDUINO_PIN_27,
     ARDUINO_PIN_28,
     ARDUINO_PIN_29,
+#endif
+#if defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA32U4)
     ARDUINO_PIN_30,
+#endif
+#ifdef CPU_ATMEGA2560
     ARDUINO_PIN_31,
     ARDUINO_PIN_32,
     ARDUINO_PIN_33,
@@ -130,6 +139,34 @@ static const adc_t arduino_analog_map[] = {
     ARDUINO_A13,
     ARDUINO_A14,
     ARDUINO_A15,
+#endif
+};
+
+/**
+ * @brief   PWM frequency
+ */
+#define ARDUINO_PWM_FREQU       (490U)
+
+/**
+ * @brief   List of PWM GPIO mappings
+ */
+static const arduino_pwm_t arduino_pwm_list[] = {
+#if defined(CPU_ATMEGA2560)
+    { .pin = 13, .dev = PWM_DEV(0), .chan = 0 },
+    { .pin = 4,  .dev = PWM_DEV(0), .chan = 1 },
+#elif defined(CPU_ATMEGA32U4)
+    { .pin = 11, .dev = PWM_DEV(0), .chan = 0 },
+    { .pin = 3,  .dev = PWM_DEV(0), .chan = 1 },
+#else /* CPU_ATMEGA328p */
+    { .pin = 6, .dev = PWM_DEV(0), .chan = 0 },
+    { .pin = 5, .dev = PWM_DEV(0), .chan = 1 },
+#endif
+#if defined(CPU_ATMEGA2560)
+    { .pin = 10, .dev = PWM_DEV(1), .chan = 0 },
+    { .pin = 9,  .dev = PWM_DEV(1), .chan = 1 },
+#else /* CPU_ATMEGA328p */
+    { .pin = 11, .dev = PWM_DEV(1), .chan = 0 },
+    { .pin = 3,  .dev = PWM_DEV(1), .chan = 1 },
 #endif
 };
 

@@ -329,7 +329,6 @@ extern "C" {
 #define EFLOCON_FCEN_MASK   0x03
 /** @} */
 
-
 /**
  * @name    PHCON1 bitfields
  * @{

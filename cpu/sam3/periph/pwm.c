@@ -29,10 +29,10 @@
 #include "periph/pwm.h"
 #include "periph/gpio.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 #include "debug.h"
 
-#define PREA_MAX            (10U)
+#define PREA_MAX        (10U)
 
 static uint16_t pwm_period;
 static uint8_t pwm_chan_mask;

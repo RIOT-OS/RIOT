@@ -1,0 +1,38 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_CRYPTO
+    bool "Crypto"
+    depends on TEST_KCONFIG
+
+if MODULE_CRYPTO
+
+menu "Crypto AES options"
+
+config MODULE_CRYPTO_AES_128
+    bool "AES-128"
+    default y
+
+config MODULE_CRYPTO_AES_192
+    bool "AES-192"
+
+config MODULE_CRYPTO_AES_256
+    bool "AES-256"
+
+config MODULE_CRYPTO_AES_PRECALCULATED
+    bool "Pre-calculate T tables"
+
+config MODULE_CRYPTO_AES_UNROLL
+    bool "Unroll loop in AES"
+    help
+        This unrolls a loop in AES, but it uses more flash.
+
+endmenu # Crypto AES options
+
+rsource "modes/Kconfig"
+
+endif # Crypto

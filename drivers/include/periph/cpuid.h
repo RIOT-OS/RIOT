@@ -13,6 +13,13 @@
  *
  * Provides access the CPU's serial number
  *
+ * # (Low-) Power Implications
+ *
+ * The implementation **should** make sure, that calling cpuid_get() does not
+ * introduce any long-term power usage penalties. If e.g. some peripheral has to
+ * be powered on for the CPU ID to be read, the implementation **should** take
+ * care to disable the peripheral again after the read is finished.
+ *
  * @{
  * @file
  * @brief       Low-level CPUID peripheral driver interface definitions
@@ -41,7 +48,7 @@ extern "C" {
 /**
  * @brief   Gets the serial number of the CPU.
  *
- * @param[out] id   The serial number of the CPU of length CPU_ID_LEN (must be
+ * @param[out] id   The serial number of the CPU of length CPUID_LEN (must be
  *                  defined in the CPU's cpu_conf.h)
  */
 void cpuid_get(void *id);

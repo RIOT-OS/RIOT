@@ -1,0 +1,51 @@
+From 737ff6e1e4f3411a557b3f7436ed94461c67249e Mon Sep 17 00:00:00 2001
+From: Alexandre Abadie <alexandre.abadie@inria.fr>
+Date: Sat, 23 Nov 2019 13:09:31 +0100
+Subject: [PATCH] Fix wrong integer format in print
+
+---
+ src/uTensor/core/context.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/uTensor/core/context.cpp b/src/uTensor/core/context.cpp
+index 112308e..96020f5 100644
+--- a/src/uTensor/core/context.cpp
++++ b/src/uTensor/core/context.cpp
+@@ -3,7 +3,7 @@
+ S_TENSOR Context::add(Tensor* t, TName _name, uint8_t init_count) {
+   if(t == nullptr) { ERR_EXIT("null pointer tensor"); }
+   if(rTable.find(_name) != rTable.end()) {
+-    ERR_EXIT("tensor with name \"%d\" address already exist in rTable", t->getName().get_value());
++    ERR_EXIT("tensor with name \"%d\" address already exist in rTable", static_cast<unsigned>(t->getName().get_value()));
+   }
+ 
+   t->setName(_name);
+@@ -23,7 +23,7 @@ S_TENSOR Context::add(Tensor* t, TName _name, uint8_t init_count) {
+ }
+ 
+ S_TENSOR Context::get(TName const &t_name) {
+-  if(rTable.find(t_name) == rTable.end()) ERR_EXIT("No tensor with name: %d", t_name.get_value());
++  if(rTable.find(t_name) == rTable.end()) ERR_EXIT("No tensor with name: %d", static_cast<unsigned>(t_name.get_value()));
+   return rTable[t_name].ptr;
+ }
+ 
+@@ -64,14 +64,14 @@ void Context::push(Operator* op, TNameList &in_names, TNameList &out_names) {
+   //error checking in the Op class
+   S_TList _inputs;
+   for(auto in:in_names) {
+-    if(rTable.find(in) == rTable.end()) { ERR_EXIT("Tensor \"%d\" not found", in.get_value()); }
++    if(rTable.find(in) == rTable.end()) { ERR_EXIT("Tensor \"%d\" not found", static_cast<unsigned>(in.get_value())); }
+     Ref_Record r = rTable[in];
+     _inputs.push_back(r.ptr);
+   }
+ 
+   S_TList _outputs;
+   for(auto out:out_names) {
+-    if(rTable.find(out) == rTable.end()) { ERR_EXIT("Tensor \"%d\" not found", out.get_value()); }
++    if(rTable.find(out) == rTable.end()) { ERR_EXIT("Tensor \"%d\" not found", static_cast<unsigned>(out.get_value())); }
+     Ref_Record r = rTable[out];
+     _outputs.push_back(r.ptr);
+   }
+-- 
+2.20.1
+

@@ -1,0 +1,2 @@
+CPU_FAM = efr32mg1p
+include $(RIOTBOARD)/common/slwstk6000b/Makefile.features

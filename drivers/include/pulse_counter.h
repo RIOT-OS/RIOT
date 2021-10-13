@@ -7,16 +7,17 @@
  */
 
 /**
- * @defgroup    drivers_pulse_counter extra sensor
+ * @defgroup    drivers_pulse_counter Pulse counter
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  *
- * The connection between the MCU and the PULSE_COUNTER is based on the
- * GPIO-interface.
+ * @brief       GPIO based pulse counting driver
  *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file
- * @brief       Driver for the PULSE_COUNTER extra sensor
+ * @brief       Driver for the pulse counter
  *
  * @author      Hyung-Sin Kim <hs.kim@cs.berkeley.edu>
  */
@@ -25,6 +26,11 @@
 #define PULSE_COUNTER_H
 
 #include <stdint.h>
+#ifdef __cplusplus
+#include "c11_atomics_compat.hpp"
+#else
+#include <stdatomic.h>
+#endif
 #include "periph/gpio.h"
 
 #ifdef __cplusplus
@@ -40,14 +46,14 @@ typedef struct {
 } pulse_counter_params_t;
 
 /**
-  * @brief   Device descriptor for a PULSE_COUNTER device
+  * @brief   Device descriptor for a pulse counter device
   */
 typedef struct {
-    int16_t pulse_count;       /**< pulse counter */
+    atomic_uint_least16_t pulse_count;  /**< pulse counter */
 } pulse_counter_t;
 
 /**
- * @brief   Initialize an PULSE_COUNTER device
+ * @brief   Initialize a pulse counter device
  *
  * @param[out] dev          device descriptor
  * @param[in] params        configuration parameters
@@ -58,29 +64,29 @@ typedef struct {
 int pulse_counter_init(pulse_counter_t *dev, const pulse_counter_params_t *params);
 
 /**
- * @brief   Read and reset PULSE_COUNTER value
+ * @brief   Read and reset pulse counter value
+ *
+ * @param[out] dev          device descriptor of sensor
+ *
+ * @return                  Accumulated pulse counts
+ */
+int16_t pulse_counter_read_with_reset(pulse_counter_t *dev);
+
+/**
+ * @brief   Read pulse counter value
  *
  * @param[in]  dev          device descriptor of sensor
  *
  * @return                  Accumulated pulse counts
  */
-int16_t pulse_counter_read_with_reset(const void *dev);
+int16_t pulse_counter_read_without_reset(pulse_counter_t *dev);
 
 /**
- * @brief   Read PULSE_COUNTER value
+ * @brief   Reset pulse counter value
  *
- * @param[in]  dev          device descriptor of sensor
- *
- * @return                  Accumulated pulse counts
+ * @param[out] dev         device descriptor of sensor
  */
-int16_t pulse_counter_read_without_reset(const void *dev);
-
-/**
- * @brief   Reset PULSE_COUNTER value
- *
- * @param[in]  dev          device descriptor of sensor
- */
-void pulse_counter_reset(const void *dev);
+void pulse_counter_reset(pulse_counter_t *dev);
 
 #ifdef __cplusplus
 }

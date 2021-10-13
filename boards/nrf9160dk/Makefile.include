@@ -1,0 +1,2 @@
+# include this module into the build
+INCLUDES += -I$(RIOTBOARD)/nrf9160dk/include

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     test
+ * @ingroup     tests
  * @{
  *
  * @file

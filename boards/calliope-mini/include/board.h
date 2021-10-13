@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_calliope-mini Calliope mini
- * @ingroup     boards
- * @brief       Support for the Calliope mini
+ * @ingroup     boards_calliope-mini
  *
  * This board is for calliope-mini revision 1.0.
  * @{
@@ -24,20 +22,11 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "cpu.h"
-#include "periph_conf.h"
+#include "board_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Xtimer configuration
- * @{
- */
-#define XTIMER_WIDTH                (24)
-#define XTIMER_BACKOFF              (40)
-/** @} */
 
 /**
  * @name    LED matrix pin configuration
@@ -66,11 +55,6 @@ extern "C" {
 #define BTN1_PIN                    GPIO_PIN(0, 16)
 #define BTN1_MODE                   GPIO_IN
 /** @} */
-
-/**
- * @brief   Initialize the board, also triggers the CPU initialization
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

@@ -1,0 +1,20 @@
+# The radio board connected to the slwstk6000b mainboard
+BOARD_MODULE = $(word 2, $(subst -, ,$(BOARD)))
+
+include $(RIOTBOARD)/common/slwstk6000b/slwstk6000b.info.mk
+CPU_MODEL = $(word 1, $(SLWSTK6000B_MAINBOARD_VARS_$(BOARD_MODULE)))
+
+ifeq (,$(CPU_MODEL))
+  $(error $(BOARD_MODULE) can not be used with slwstk600b mainboard)
+endif
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_rtc
+FEATURES_PROVIDED += periph_rtt
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart periph_uart_modecfg
+
+include $(RIOTBOARD)/common/silabs/Makefile.features

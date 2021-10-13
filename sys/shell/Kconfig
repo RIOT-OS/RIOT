@@ -1,0 +1,32 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if !TEST_KCONFIG
+
+menuconfig KCONFIG_USEMODULE_SHELL
+    bool "Configure the Shell interpreter"
+    depends on USEMODULE_SHELL
+
+if KCONFIG_USEMODULE_SHELL
+rsource "Kconfig.config"
+endif # KCONFIG_USEMODULE_SHELL
+
+endif # !TEST_KCONFIG
+
+if TEST_KCONFIG
+menuconfig MODULE_SHELL
+    bool "Shell interpreter"
+    select MODULE_STDIN
+    depends on TEST_KCONFIG
+
+rsource "commands/Kconfig"
+
+if MODULE_SHELL
+rsource "Kconfig.config"
+endif
+
+endif # TEST_KCONFIG

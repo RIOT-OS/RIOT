@@ -1,0 +1,5 @@
+# define optimized read function of DS18 driver as a pseudo module
+PSEUDOMODULES += ds18_optimized
+
+USEMODULE_INCLUDES_ds18 := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_ds18)

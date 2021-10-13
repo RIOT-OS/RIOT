@@ -78,7 +78,7 @@ int main(void)
 
     puts("On-board LED test\n");
     /* cppcheck-suppress knownConditionTrueFalse
-     * rationale: board-dependent ifdefs */
+     * (reason: board-dependent ifdefs) */
     if (numof == 0) {
         puts("NO LEDs AVAILABLE");
     }
@@ -86,7 +86,6 @@ int main(void)
         printf("Available LEDs: %i\n\n", numof);
         puts("Will now light up each LED once short and twice long in a loop");
     }
-
 
     while (1) {
 #ifdef LED0_ON

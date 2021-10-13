@@ -28,7 +28,7 @@
 #include "cc2420_registers.h"
 #include "periph/spi.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**
@@ -114,7 +114,6 @@ uint16_t cc2420_get_pan(cc2420_t *dev)
 
 void cc2420_set_pan(cc2420_t *dev, uint16_t pan)
 {
-    dev->netdev.pan = pan;
     cc2420_ram_write(dev, CC2420_RAM_PANID, (uint8_t *)&pan, 2);
 }
 
@@ -200,14 +199,6 @@ int cc2420_set_option(cc2420_t *dev, uint16_t option, bool state)
                 DEBUG("cc2420: set_opt: CC2420_OPT_PRELOADING\n");
                 break;
 
-            case CC2420_OPT_TELL_TX_START:
-            case CC2420_OPT_TELL_TX_END:
-            case CC2420_OPT_TELL_RX_START:
-            case CC2420_OPT_TELL_RX_END:
-                DEBUG("cc2420: set_opt: TX/RX START/END\n");
-                /* TODO */
-                break;
-
             default:
                 return -ENOTSUP;
         }
@@ -241,14 +232,6 @@ int cc2420_set_option(cc2420_t *dev, uint16_t option, bool state)
 
             case CC2420_OPT_PRELOADING:
                 DEBUG("cc2420: clr_opt: CC2420_OPT_PRELOADING\n");
-                break;
-
-            case CC2420_OPT_TELL_TX_START:
-            case CC2420_OPT_TELL_TX_END:
-            case CC2420_OPT_TELL_RX_START:
-            case CC2420_OPT_TELL_RX_END:
-                DEBUG("cc2420: clr_opt: TX/RX START/END\n");
-                /* TODO */
                 break;
 
             default:

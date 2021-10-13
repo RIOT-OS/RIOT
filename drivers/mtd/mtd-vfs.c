@@ -100,12 +100,12 @@ static ssize_t mtd_vfs_read(vfs_file_t *filp, void *dest, size_t nbytes)
         nbytes = size - src;
     }
     int res = mtd_read(mtd, dest, src, nbytes);
-    if (res < 0) {
-        return res;
+    if (res != 0) {
+        return -EIO;
     }
     /* Advance file position */
-    filp->pos += res;
-    return res;
+    filp->pos += nbytes;
+    return nbytes;
 }
 
 static ssize_t mtd_vfs_write(vfs_file_t *filp, const void *src, size_t nbytes)
@@ -124,12 +124,12 @@ static ssize_t mtd_vfs_write(vfs_file_t *filp, const void *src, size_t nbytes)
         nbytes = size - dest;
     }
     int res = mtd_write(mtd, src, dest, nbytes);
-    if (res < 0) {
-        return res;
+    if (res != 0) {
+        return -EIO;
     }
     /* Advance file position */
-    filp->pos += res;
-    return res;
+    filp->pos += nbytes;
+    return nbytes;
 }
 
 /** @} */

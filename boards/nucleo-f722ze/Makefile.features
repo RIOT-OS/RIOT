@@ -1,0 +1,17 @@
+CPU = stm32
+CPU_MODEL = stm32f722ze
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_rtc
+FEATURES_PROVIDED += periph_rtt
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_usbdev
+FEATURES_PROVIDED += periph_can
+
+# Put other features for this board (in alphabetical order)
+FEATURES_PROVIDED += riotboot
+
+# load the common Makefile.features for Nucleo144 boards
+include $(RIOTBOARD)/common/nucleo144/Makefile.features

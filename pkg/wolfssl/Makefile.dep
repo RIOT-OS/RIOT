@@ -1,0 +1,87 @@
+
+ifneq (,$(filter wolfcrypt-test,$(USEMODULE)))
+  USEMODULE += wolfcrypt
+  USEMODULE += wolfcrypt_coding
+endif
+
+ifneq (,$(filter wolfcrypt-benchmark,$(USEMODULE)))
+  USEMODULE += wolfcrypt
+  USEMODULE += wolfcrypt_coding
+  USEMODULE += printf_float
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter wolfcrypt_poly1305,$(USEMODULE)))
+  ifneq (,$(filter wolfcrypt_chacha,$(USEMODULE)))
+    USEMODULE += wolfcrypt_chacha20_poly1305
+  endif
+endif
+
+ifneq (,$(filter wolfcrypt_ed25519,$(USEMODULE)))
+  USEMODULE += wolfcrypt_sha512
+endif
+
+ifneq (,$(filter wolfcrypt_aes,$(USEMODULE)))
+  USEMODULE += wolfcrypt_cmac
+  USEMODULE += wolfcrypt_coding
+endif
+
+ifneq (,$(filter wolfcrypt_pwdbased,$(USEMODULE)))
+  USEMODULE += wolfcrypt_pkcs12
+endif
+
+ifneq (,$(filter wolfcrypt_asn,$(USEMODULE)))
+  USEMODULE += wolfcrypt_pkcs12
+endif
+
+ifneq (,$(filter wolfssl_tls13,$(USEMODULE)))
+  USEMODULE += wolfcrypt_aes
+  USEMODULE += sock_tls
+endif
+
+ifneq (,$(filter wolfssl_dtls,$(USEMODULE)))
+  USEMODULE += sock_tls
+endif
+
+ifneq (,$(filter wolfssl_psk,$(USEMODULE)))
+  USEMODULE += sock_tls
+endif
+
+ifneq (,$(filter sock_tls,$(USEMODULE)))
+  USEMODULE += wolfcrypt
+  USEMODULE += wolfcrypt_aes
+  USEMODULE += wolfcrypt_asn
+  USEMODULE += wolfcrypt_hmac
+  USEMODULE += wolfcrypt_md5
+  USEMODULE += wolfcrypt_sha
+  USEMODULE += wolfcrypt_random
+  USEMODULE += wolfssl_internal
+  USEMODULE += wolfssl_wolfio
+  USEMODULE += wolfssl_keys
+  USEMODULE += wolfssl_ssl
+  USEMODULE += wolfssl_tls
+endif
+
+ifneq (,$(filter wolfssl_socket,$(USEMODULE)))
+  USEMODULE += wolfcrypt
+  USEMODULE += wolfcrypt_aes
+  USEMODULE += wolfcrypt_asn
+  USEMODULE += wolfcrypt_hmac
+  USEMODULE += wolfcrypt_md5
+  USEMODULE += wolfcrypt_sha
+  USEMODULE += wolfcrypt_random
+  USEMODULE += wolfssl_internal
+  USEMODULE += wolfssl_wolfio
+  USEMODULE += wolfssl_keys
+  USEMODULE += wolfssl_ssl
+  USEMODULE += wolfssl_tls
+  USEMODULE += posix_sockets
+  USEMODULE += posix_inet
+endif
+
+ifneq (,$(filter wolfcrypt_random,$(USEMODULE)))
+  USEMODULE += random
+endif
+
+# wolfssl is only supported by 32 bit architectures
+FEATURES_REQUIRED += arch_32bit

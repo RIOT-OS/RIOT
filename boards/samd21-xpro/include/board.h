@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_samd21-xpro Atmel SAM D21 Xplained Pro
- * @ingroup     boards
- * @brief       Support for the Atmel SAM D21 Xplained Pro board.
+ * @ingroup     boards_samd21-xpro
  * @{
  *
  * @file
@@ -34,7 +32,7 @@ extern "C" {
 #endif
 
 /**
- * @name   xtimer configuration
+ * @name    xtimer configuration
  * @{
  */
 #define XTIMER_DEV          TIMER_DEV(1)

@@ -1,5 +1,2 @@
 INCLUDES += -I$(PKGDIRBASE)/gecko_sdk/dist/emlib/inc
 INCLUDES += -I$(PKGDIRBASE)/gecko_sdk/dist/emlib-extra/inc
-
-USEMODULE += gecko_sdk_emlib
-USEMODULE += gecko_sdk_emlib_extra

@@ -1,0 +1,22 @@
+From 7a2923020f3686b030d38c3e604b1f3801ca2e43 Mon Sep 17 00:00:00 2001
+From: Thomas Mueller <tmueller@sysgo.com>
+Date: Mon, 8 Feb 2021 19:17:20 +0100
+Subject: [PATCH] Fix typo in definition of netif_is_flag_set() macro
+
+---
+ src/include/lwip/netif.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/include/lwip/netif.h b/src/include/lwip/netif.h
+index 5ecf8cdc8..6e04ce84b 100644
+--- a/src/include/lwip/netif.h
++++ b/src/include/lwip/netif.h
+@@ -469,7 +469,7 @@ void netif_set_gw(struct netif *netif, const ip4_addr_t *gw);
+ 
+ #define netif_set_flags(netif, set_flags)     do { (netif)->flags = (u8_t)((netif)->flags |  (set_flags)); } while(0)
+ #define netif_clear_flags(netif, clr_flags)   do { (netif)->flags = (u8_t)((netif)->flags & (u8_t)(~(clr_flags) & 0xff)); } while(0)
+-#define netif_is_flag_set(nefif, flag)        (((netif)->flags & (flag)) != 0)
++#define netif_is_flag_set(netif, flag)        (((netif)->flags & (flag)) != 0)
+ 
+ void netif_set_up(struct netif *netif);
+ void netif_set_down(struct netif *netif);

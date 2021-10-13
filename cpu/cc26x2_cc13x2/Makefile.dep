@@ -1,0 +1,3 @@
+USEMODULE += cc26xx_cc13xx
+
+include ${RIOTCPU}/cc26xx_cc13xx/Makefile.dep

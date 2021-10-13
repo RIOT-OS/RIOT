@@ -1,0 +1,8 @@
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+# Include all definitions for flashing with bossa over USB
+include $(RIOTBOARD)/common/samdx1-arduino-bootloader/Makefile.include
+
+# Include handling of serial and non-bossa programmers (if selected by user)
+include $(RIOTMAKE)/boards/sam0.inc.mk

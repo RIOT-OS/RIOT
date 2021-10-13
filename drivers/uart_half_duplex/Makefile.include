@@ -1,0 +1,2 @@
+USEMODULE_INCLUDES_uart_half_duplex := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_uart_half_duplex)

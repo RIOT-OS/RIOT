@@ -1,0 +1,32 @@
+# Copyright (c) 2020 Locha Inc
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_GP2Y10XX
+    bool "GP2Y10xx Optical Dust Sensor device driver"
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_ADC
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_ADC
+    select MODULE_XTIMER
+
+menuconfig KCONFIG_USEMODULE_GP2Y10XX
+    bool "Configure GP2Y10xx driver"
+    depends on USEMODULE_GP2Y10XX
+    help
+        Configure the GP2Y10XX driver using Kconfig.
+
+if KCONFIG_USEMODULE_GP2Y10XX
+
+config GP2Y10XX_MAX_READINGS
+    int "Numbers of readings to use for average ADC value"
+    default 10
+    help
+        This configures the maximum number of ADC readings to calculate
+        the average ADC value.
+
+endif # KCONFIG_USEMODULE_GP2Y10XX

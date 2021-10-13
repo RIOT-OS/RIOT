@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Feie Universität Berlin
+ * Copyright (C) 2016-2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_nrf52dk nRF52 DK
- * @ingroup     boards
- * @brief       Support for the nRF52 DK
+ * @ingroup     boards_nrf52dk
  * @{
  *
  * @file

@@ -1,0 +1,41 @@
+# Copyright (c) 2020 Deutsches Zentrum für Luft- und Raumfahrt e.V. (DLR)
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_HSC
+    bool "Driver for Honeywell HSC series pressure and temperature sensor"
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+    help
+        This driver supports the Honeywell HSC series pressure and temperature
+        sensors that use an I2C interface.
+
+menuconfig KCONFIG_USEMODULE_HSC
+    bool "Configure HSC pressure and temperature sensor driver"
+    depends on USEMODULE_HSC
+    help
+        Configure the hsc driver using Kconfig.
+
+if KCONFIG_USEMODULE_HSC
+
+config HSC_I2C_ADDRESS
+    hex "I2C address of the HSC pressure and temperature sensor"
+    range 0x28 0x98
+    default 0x28
+    help
+        The HSC sensors can have one of the following I2C addresses:
+        0x28, 0x38, 0x48, 0x58, 0x68, 0x78, 0x88, and 0x98
+
+config HSC_RANGE
+    int "Pressure range in millibar"
+    range 1 10000
+    default 40
+    help
+        The HSC sensors support a pressure range of 1.6 millibar to 10 bar,
+        depending on the model.
+
+endif # KCONFIG_USEMODULE_HSC

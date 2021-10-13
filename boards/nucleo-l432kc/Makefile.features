@@ -1,0 +1,21 @@
+CPU = stm32
+CPU_MODEL = stm32l432kc
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_pwm
+FEATURES_PROVIDED += periph_rtc
+FEATURES_PROVIDED += periph_rtt
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
+
+# Put other features for this board (in alphabetical order)
+# Note that a recent version of OpenOCD is required for flashing an image on
+# the second slot of the flash memory. This version has to be built from source
+# and at least contains the following commit
+# https://github.com/ntfreak/openocd/commit/a4d50544de07f13e3f9644d2b48e41ebdc91a7a3
+FEATURES_PROVIDED += riotboot
+
+# load the common Makefile.features for Nucleo-32 boards
+include $(RIOTBOARD)/common/nucleo32/Makefile.features

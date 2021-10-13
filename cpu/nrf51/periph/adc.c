@@ -24,11 +24,6 @@
 #include "periph_conf.h"
 
 /**
- * @brief   Load the ADC configuration
- */
-static const uint8_t adc_config[] = ADC_CONFIG;
-
-/**
  * @brief   Lock to prevent concurrency issues when used from different threads
  */
 static mutex_t lock;
@@ -55,7 +50,7 @@ int adc_init(adc_t line)
     return 0;
 }
 
-int adc_sample(adc_t line, adc_res_t res)
+int32_t adc_sample(adc_t line, adc_res_t res)
 {
     int val;
 

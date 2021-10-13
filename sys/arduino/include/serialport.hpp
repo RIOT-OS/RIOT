@@ -48,6 +48,8 @@ private:
     uart_t dev;
     char rx_mem[SERIAL_RX_BUFSIZE];
     ringbuffer_t rx_buf;
+    template<typename T> size_t _println(T val);
+    template<typename T> size_t _println(T val, SerialFormat format);
 
 public:
     /**
@@ -128,6 +130,93 @@ public:
     /**
      * @brief   Prints data to the serial port as human-readable ASCII text
      *
+     * Prints data to the serial port as human-readable ASCII text. This command
+     * can take many forms. Numbers are printed using an ASCII character for
+     * each digit. Floats are similarly printed as ASCII digits, defaulting to
+     * two decimal places. Bytes are sent as a single character. Characters and
+     * strings are sent as is.
+     *
+     * Copied from https://www.arduino.cc/en/Serial/Print
+     *
+     * @param[in] val       the value to print
+     *
+     * @return  the number of bytes written, reading that number is optional
+     */
+    size_t print(unsigned int val);
+
+    /**
+     * @brief   Prints data to the serial port as human-readable ASCII text
+     *
+     * @see print()
+     *
+     * @param[in] val       the value to print
+     * @param[in] format    specifies the number base
+     *
+     * @return  the number of bytes written, reading that number is optional
+     */
+    size_t print(unsigned int val, SerialFormat format);
+
+    /**
+     * @brief   Prints data to the serial port as human-readable ASCII text
+     *
+     * Prints data to the serial port as human-readable ASCII text. This command
+     * can take many forms. Numbers are printed using an ASCII character for
+     * each digit. Floats are similarly printed as ASCII digits, defaulting to
+     * two decimal places. Bytes are sent as a single character. Characters and
+     * strings are sent as is.
+     *
+     * Copied from https://www.arduino.cc/en/Serial/Print
+     *
+     * @param[in] val       the value to print
+     *
+     * @return  the number of bytes written, reading that number is optional
+     */
+    size_t print(long val);
+
+    /**
+     * @brief   Prints data to the serial port as human-readable ASCII text
+     *
+     * @see print()
+     *
+     * @param[in] val       the value to print
+     * @param[in] format    specifies the number base
+     *
+     * @return  the number of bytes written, reading that number is optional
+     */
+    size_t print(long val, SerialFormat format);
+
+    /**
+     * @brief   Prints data to the serial port as human-readable ASCII text
+     *
+     * Prints data to the serial port as human-readable ASCII text. This command
+     * can take many forms. Numbers are printed using an ASCII character for
+     * each digit. Floats are similarly printed as ASCII digits, defaulting to
+     * two decimal places. Bytes are sent as a single character. Characters and
+     * strings are sent as is.
+     *
+     * Copied from https://www.arduino.cc/en/Serial/Print
+     *
+     * @param[in] val       the value to print
+     *
+     * @return  the number of bytes written, reading that number is optional
+     */
+    size_t print(unsigned long val);
+
+    /**
+     * @brief   Prints data to the serial port as human-readable ASCII text
+     *
+     * @see print()
+     *
+     * @param[in] val       the value to print
+     * @param[in] format    specifies the number base
+     *
+     * @return  the number of bytes written, reading that number is optional
+     */
+    size_t print(unsigned long val, SerialFormat format);
+
+    /**
+     * @brief   Prints data to the serial port as human-readable ASCII text
+     *
      * @param[in] val       the value to print
      *
      * @return  the number of bytes written, reading that number is optional
@@ -202,6 +291,93 @@ public:
      *          followed by a carriage return character (ASCII 13, or "\r") and
      *          a newline character (ASCII 10, or "\n")
      *
+     * This command takes the same forms as @ref print().
+     *
+     * Copied from https://www.arduino.cc/en/Serial/Println
+     *
+     * @param[in] val       the value to print
+     *
+     * @return  the number of bytes written, reading that number is optional
+     */
+    size_t println(unsigned int val);
+
+    /**
+     * @brief   Prints data to the serial port as human-readable ASCII text
+     *          followed by a carriage return character (ASCII 13, or "\r") and
+     *          a newline character (ASCII 10, or "\n")
+     *
+     * @see println()
+     *
+     * @param[in] val       the value to print
+     * @param[in] format    specifies the number base
+     *
+     * @return  the number of bytes written, reading that number is optional
+     */
+    size_t println(unsigned int val, SerialFormat format);
+
+    /**
+     * @brief   Prints data to the serial port as human-readable ASCII text
+     *          followed by a carriage return character (ASCII 13, or "\r") and
+     *          a newline character (ASCII 10, or "\n")
+     *
+     * This command takes the same forms as @ref print().
+     *
+     * Copied from https://www.arduino.cc/en/Serial/Println
+     *
+     * @param[in] val       the value to print
+     *
+     * @return  the number of bytes written, reading that number is optional
+     */
+    size_t println(long val);
+
+    /**
+     * @brief   Prints data to the serial port as human-readable ASCII text
+     *          followed by a carriage return character (ASCII 13, or "\r") and
+     *          a newline character (ASCII 10, or "\n")
+     *
+     * @see println()
+     *
+     * @param[in] val       the value to print
+     * @param[in] format    specifies the number base
+     *
+     * @return  the number of bytes written, reading that number is optional
+     */
+    size_t println(long val, SerialFormat format);
+
+    /**
+     * @brief   Prints data to the serial port as human-readable ASCII text
+     *          followed by a carriage return character (ASCII 13, or "\r") and
+     *          a newline character (ASCII 10, or "\n")
+     *
+     * This command takes the same forms as @ref print().
+     *
+     * Copied from https://www.arduino.cc/en/Serial/Println
+     *
+     * @param[in] val       the value to print
+     *
+     * @return  the number of bytes written, reading that number is optional
+     */
+    size_t println(unsigned long val);
+
+    /**
+     * @brief   Prints data to the serial port as human-readable ASCII text
+     *          followed by a carriage return character (ASCII 13, or "\r") and
+     *          a newline character (ASCII 10, or "\n")
+     *
+     * @see println()
+     *
+     * @param[in] val       the value to print
+     * @param[in] format    specifies the number base
+     *
+     * @return  the number of bytes written, reading that number is optional
+     */
+    size_t println(unsigned long val, SerialFormat format);
+
+    /**
+     * @brief   Prints data to the serial port as human-readable ASCII text
+     *          followed by a carriage return character (ASCII 13, or "\r") and
+     *          a newline character (ASCII 10, or "\n")
+     *
      * @see println()
      *
      * @param[in] val       the value to print
@@ -249,6 +425,16 @@ public:
      * @return  the number of bytes written, reading that number is optional
      */
     size_t println(const char *val);
+
+    /**
+     * @brief   Prints a carriage return character (ASCII 13, or "\r") and
+     *          a newline character (ASCII 10, or "\n")
+     *
+     * @see println()
+     *
+     * @return  the number of bytes written, reading that number is optional
+     */
+    size_t println(void);
 
     /**
      * @brief   Reads incoming serial data

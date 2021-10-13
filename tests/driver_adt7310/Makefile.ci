@@ -1,0 +1,8 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    arduino-mega2560 \
+    mega-xplained \
+    microduino-corerf \
+    stm32f030f4-demo \
+    waspmote-pro \
+    zigduino \
+    #

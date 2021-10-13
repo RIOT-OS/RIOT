@@ -10,6 +10,10 @@
  * @defgroup    sys_bitfield Bitfields
  * @ingroup     sys
  * @brief       Bitfields of arbitrary length
+ *
+ * The bitfields in this module have their most significant bytes first and
+ * their most significant bits within each byte of the bitfield also first.
+ *
  * @file
  * @{
  *
@@ -49,7 +53,7 @@ extern "C" {
  */
 static inline void bf_set(uint8_t field[], size_t idx)
 {
-    field[idx / 8] |= (1u << (idx % 8));
+    field[idx / 8] |= (1u << (7 - (idx % 8)));
 }
 
 /**
@@ -60,7 +64,7 @@ static inline void bf_set(uint8_t field[], size_t idx)
  */
 static inline void bf_unset(uint8_t field[], size_t idx)
 {
-    field[idx / 8] &= ~(1u << (idx % 8));
+    field[idx / 8] &= ~(1u << (7 - (idx % 8)));
 }
 
 /**
@@ -71,7 +75,7 @@ static inline void bf_unset(uint8_t field[], size_t idx)
  */
 static inline void bf_toggle(uint8_t field[], size_t idx)
 {
-    field[idx / 8] ^= (1u << (idx % 8));
+    field[idx / 8] ^= (1u << (7 - (idx % 8)));
 }
 
 /**
@@ -82,7 +86,7 @@ static inline void bf_toggle(uint8_t field[], size_t idx)
  */
 static inline bool bf_isset(uint8_t field[], size_t idx)
 {
-    return (field[idx / 8] & (1u << (idx % 8)));
+    return (field[idx / 8] & (1u << (7 - (idx % 8))));
 }
 
 /**

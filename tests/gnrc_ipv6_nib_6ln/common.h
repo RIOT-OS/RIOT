@@ -43,7 +43,6 @@ void _tests_init(void);
 int _mock_netif_get(gnrc_netapi_opt_t *opt);
 void _common_set_up(void);
 
-
 #ifdef __cplusplus
 }
 #endif

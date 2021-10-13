@@ -1,7 +1,9 @@
-MODULE := semtech_loramac_arch
+MODULE = semtech_loramac_arch
 
-SRCS := utilities.c
+SRC = utilities.c
 
 CFLAGS += -Wno-sign-compare
+
+INCLUDES += -I$(PKGDIRBASE)/semtech-loramac/src/boards
 
 include $(RIOTBASE)/Makefile.base

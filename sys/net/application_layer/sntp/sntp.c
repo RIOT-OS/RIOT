@@ -26,7 +26,7 @@
 #include "mutex.h"
 #include "byteorder.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static sock_udp_t _sntp_sock;

@@ -21,6 +21,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <sys/socket.h>
 #include <sys/time.h>
 
 #include "async_read.h"
@@ -31,10 +32,16 @@
 
 #include "socket_zep.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG            0
 #include "debug.h"
 
 #define _UNIX_NTP_ERA_OFFSET    (2208988800U)
+/* can't use timex.h's US_PER_SEC as timeval's tv_usec is signed long
+ * (https://pubs.opengroup.org/onlinepubs/9699919799.2016edition/basedefs/time.h.html) */
+#define TV_USEC_PER_SEC         (1000000L)
+
+/* dummy packet to register with ZEP dispatcher */
+#define SOCKET_ZEP_V2_TYPE_HELLO   (255)
 
 static size_t _zep_hdr_fill_v2_data(socket_zep_t *dev, zep_v2_data_hdr_t *hdr,
                                     size_t payload_len)
@@ -49,7 +56,10 @@ static size_t _zep_hdr_fill_v2_data(socket_zep_t *dev, zep_v2_data_hdr_t *hdr,
     hdr->lqi_mode = 1;
     hdr->lqi_val = 0xff;                /* TODO: set */
     hdr->time.seconds = byteorder_htonl(tv.tv_sec + _UNIX_NTP_ERA_OFFSET);
-    hdr->time.fraction = byteorder_htonl((tv.tv_usec * 1000000) / 232);
+    assert(tv.tv_usec < TV_USEC_PER_SEC);
+    hdr->time.fraction = byteorder_htonl(
+            (uint32_t)((uint64_t)tv.tv_usec * TV_USEC_PER_SEC) / 232U
+        );
     hdr->seq = byteorder_htonl(dev->seq);
     memset(hdr->resv, 0, sizeof(hdr->resv));
     hdr->length = payload_len;
@@ -94,19 +104,19 @@ static size_t _prep_vector(socket_zep_t *dev, const iolist_t *iolist,
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
-    socket_zep_t *dev = (socket_zep_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    socket_zep_t *dev = container_of(netdev_ieee802154, socket_zep_t, netdev);
     unsigned n = iolist_count(iolist);
     struct iovec v[n + 2];
-    size_t bytes;
     int res;
 
     assert((dev != NULL) && (dev->sock_fd != 0));
-    bytes = _prep_vector(dev, iolist, n, v);
+    _prep_vector(dev, iolist, n, v);
     DEBUG("socket_zep::send(%p, %p, %u)\n", (void *)netdev, (void *)iolist, n);
     /* simulate TX_STARTED interrupt */
     if (netdev->event_callback) {
         dev->last_event = NETDEV_EVENT_TX_STARTED;
-        netdev->event_callback(netdev, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr(netdev);
         thread_yield();
     }
     res = writev(dev->sock_fd, v, n + 2);
@@ -117,14 +127,9 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     /* simulate TX_COMPLETE interrupt */
     if (netdev->event_callback) {
         dev->last_event = NETDEV_EVENT_TX_COMPLETE;
-        netdev->event_callback(netdev, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr(netdev);
         thread_yield();
     }
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += bytes;
-#else
-    (void)bytes;
-#endif
 
     return res - v[0].iov_len - v[n + 1].iov_len;
 }
@@ -175,21 +180,22 @@ static inline bool _dst_not_me(socket_zep_t *dev, const void *buf)
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
-    socket_zep_t *dev = (socket_zep_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    socket_zep_t *dev = container_of(netdev_ieee802154, socket_zep_t, netdev);
     int size = 0;
 
     DEBUG("socket_zep::recv(%p, %p, %u, %p)\n", (void *)netdev, buf,
           (unsigned)len, (void *)info);
     if ((buf == NULL) || (len == 0)) {
         int res = real_ioctl(dev->sock_fd, FIONREAD, &size);
-#if ENABLE_DEBUG
-        if (res < 0) {
-            DEBUG("socket_zep::recv: error reading FIONREAD: %s",
-                  strerror(errno));
+
+        if (IS_ACTIVE(ENABLE_DEBUG)) {
+            if (res < 0) {
+                DEBUG("socket_zep::recv: error reading FIONREAD: %s",
+                    strerror(errno));
+            }
         }
-#else
-        (void)res;
-#endif
+
         return size;
     }
     else if (len > 0) {
@@ -208,13 +214,13 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                     void *payload = &dev->rcv_buf[sizeof(zep_v2_data_hdr_t)];
 
                     if (zep->type != ZEP_V2_TYPE_DATA) {
-                        DEBUG("socket_zep::recv: unexpect ZEP type\n");
+                        DEBUG("socket_zep::recv: unexpected ZEP type\n");
                         /* don't support ACK frames for now*/
                         return -1;
                     }
                     if (((sizeof(zep_v2_data_hdr_t) + zep->length) != (unsigned)size) ||
                         (zep->length > len) || (zep->chan != dev->netdev.chan) ||
-                        /* TODO promiscous mode */
+                        /* TODO promiscuous mode */
                         _dst_not_me(dev, payload)) {
                         /* TODO: check checksum */
                         return -1;
@@ -252,17 +258,15 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         }
     }
     _continue_reading(dev);
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.rx_count++;
-    netdev->stats.rx_bytes += size;
-#endif
+
     return size;
 }
 
 static void _isr(netdev_t *netdev)
 {
     if (netdev->event_callback) {
-        socket_zep_t *dev = (socket_zep_t *)netdev;
+        netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+        socket_zep_t *dev = container_of(netdev_ieee802154, socket_zep_t, netdev);
 
         DEBUG("socket_zep::isr: firing %u\n", (unsigned)dev->last_event);
         netdev->event_callback(netdev, dev->last_event);
@@ -274,7 +278,7 @@ static void _socket_isr(int fd, void *arg)
 {
     (void)fd;
     (void)arg;
-    netdev_t *netdev = (netdev_t *)arg;
+    netdev_t *netdev = arg;
 
     DEBUG("socket_zep::_socket_isr: %d, %p (netdev == %p)\n",
           fd, arg, (void *)netdev);
@@ -282,54 +286,39 @@ static void _socket_isr(int fd, void *arg)
         return;
     }
     if (netdev->event_callback) {
-        socket_zep_t *dev = (socket_zep_t *)netdev;
+        netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+        socket_zep_t *dev = container_of(netdev_ieee802154, socket_zep_t, netdev);
 
         dev->last_event = NETDEV_EVENT_RX_COMPLETE;
-        netdev->event_callback(netdev, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr(netdev);
     }
 }
 
 static int _init(netdev_t *netdev)
 {
-    socket_zep_t *dev = (socket_zep_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    socket_zep_t *dev = container_of(netdev_ieee802154, socket_zep_t, netdev);
+
+    netdev_ieee802154_reset(&dev->netdev);
 
     assert(dev != NULL);
-    dev->netdev.chan = IEEE802154_DEFAULT_CHANNEL;
-    dev->netdev.pan = IEEE802154_DEFAULT_PANID;
-#ifdef MODULE_GNRC_SIXLOWPAN
-    dev->netdev.proto = GNRC_NETTYPE_SIXLOWPAN;
-#elif MODULE_GNRC
-    dev->netdev.proto = GNRC_NETTYPE_UNDEF;
-#endif
-    dev->seq = random_uint32();
+    dev->netdev.chan = CONFIG_IEEE802154_DEFAULT_CHANNEL;
 
     return 0;
 }
 
 static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
-    socket_zep_t *dev = (socket_zep_t *)netdev;
-    uint16_t *v = value;
-
-    assert((dev != NULL));
-    switch (opt) {
-        case NETOPT_MAX_PACKET_SIZE:
-            assert(value != NULL);
-            if (max_len != sizeof(uint16_t)) {
-                return -EOVERFLOW;
-            }
-            *v = SOCKET_ZEP_FRAME_PAYLOAD_LEN;
-            return sizeof(uint16_t);
-        default:
-            return netdev_ieee802154_get(&dev->netdev, opt, value, max_len);
-    }
+    assert(netdev != NULL);
+    return netdev_ieee802154_get(container_of(netdev, netdev_ieee802154_t, netdev),
+                                 opt, value, max_len);
 }
 
 static int _set(netdev_t *netdev, netopt_t opt, const void *value,
                 size_t value_len)
 {
     assert(netdev != NULL);
-    return netdev_ieee802154_set((netdev_ieee802154_t *)netdev, opt,
+    return netdev_ieee802154_set(container_of(netdev, netdev_ieee802154_t, netdev), opt,
                                   value, value_len);
 }
 
@@ -342,24 +331,24 @@ static const netdev_driver_t socket_zep_driver = {
     .set = _set,
 };
 
-void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params)
+static int _bind_local(const socket_zep_params_t *params)
 {
+    int res;
     static const struct addrinfo hints = { .ai_family = AF_UNSPEC,
                                            .ai_socktype = SOCK_DGRAM };
-    struct addrinfo *ai = NULL, *remote;
-    int res;
+    struct addrinfo *ai = NULL;
 
-    DEBUG("socket_zep_setup(%p, %p)\n", (void *)dev, (void *)params);
-    assert((params->local_addr != NULL) && (params->local_port != NULL) &&
-           (params->remote_addr != NULL) && (params->remote_port != NULL));
-    memset(dev, 0, sizeof(socket_zep_t));
-    dev->netdev.netdev.driver = &socket_zep_driver;
+    if (params->local_addr == NULL) {
+        return -1;
+    }
+
     /* bind and connect socket */
     if ((res = real_getaddrinfo(params->local_addr, params->local_port, &hints,
                                 &ai)) < 0) {
         errx(EXIT_FAILURE, "ZEP: unable to get local address: %s\n",
              gai_strerror(res));
     }
+
     for (struct addrinfo *local = ai; local != NULL; local = local->ai_next) {
         if ((res = real_socket(local->ai_family, local->ai_socktype,
                                local->ai_protocol)) < 0) {
@@ -370,55 +359,97 @@ void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params)
         }
     }
     real_freeaddrinfo(ai);
+
     if (res < 0) {
         err(EXIT_FAILURE, "ZEP: Unable to bind socket");
     }
-    dev->sock_fd = res;
-    ai = NULL;
+
+    return res;
+}
+
+static int _connect_remote(socket_zep_t *dev, const socket_zep_params_t *params)
+{
+    int res;
+    static const struct addrinfo hints = { .ai_family = AF_UNSPEC,
+                                           .ai_socktype = SOCK_DGRAM };
+    struct addrinfo *ai = NULL, *remote;
+
+    if (params->remote_addr == NULL) {
+        return -1;
+    }
+
     if ((res = real_getaddrinfo(params->remote_addr, params->remote_port, &hints,
                                 &ai)) < 0) {
         errx(EXIT_FAILURE, "ZEP: unable to get remote address: %s\n",
              gai_strerror(res));
     }
+
     for (remote = ai; remote != NULL; remote = remote->ai_next) {
         if (real_connect(dev->sock_fd, remote->ai_addr, remote->ai_addrlen) == 0) {
             break;  /* successfully connected */
         }
     }
+
     if (remote == NULL) {
         err(EXIT_FAILURE, "ZEP: Unable to connect socket");
     }
+
     real_freeaddrinfo(ai);
 
-    /* generate hardware address from local address */
-    uint8_t ss_array[sizeof(struct sockaddr_storage)] = { 0 };
-    socklen_t ss_len = sizeof(struct sockaddr_storage);
+    return res;
+}
 
-    if (getpeername(dev->sock_fd, (struct sockaddr *)&ss_array, &ss_len) < 0) {
-        err(EXIT_FAILURE, "ZEP: Unable to retrieve remote address");
-    }
-    assert(ss_len >= IEEE802154_LONG_ADDRESS_LEN);
-    if (getsockname(dev->sock_fd, (struct sockaddr *)&ss_array, &ss_len) < 0) {
-        err(EXIT_FAILURE, "ZEP: Unable to retrieve local address");
-    }
-    assert(ss_len >= IEEE802154_LONG_ADDRESS_LEN);
+static void _send_zep_hello(socket_zep_t *dev)
+{
+    if (IS_USED(MODULE_SOCKET_ZEP_HELLO)) {
+        /* dummy packet */
+        zep_v2_data_hdr_t hdr = {
+            .hdr.preamble = "EX",
+            .hdr.version  = 2,
+            .type = SOCKET_ZEP_V2_TYPE_HELLO,
+            .resv = "HELLO",
+            .length = sizeof(dev->netdev.long_addr),
+        };
 
-    /* generate hardware address from socket address and port info */
-    dev->netdev.long_addr[1] = 'Z';     /* The "OUI" */
-    dev->netdev.long_addr[2] = 'E';
-    dev->netdev.long_addr[3] = 'P';
-    for (unsigned i = 0; i < ss_len; i++) { /* generate NIC from local source */
-        unsigned addr_idx = (i % (IEEE802154_LONG_ADDRESS_LEN / 2)) +
-                            (IEEE802154_LONG_ADDRESS_LEN / 2);
-        dev->netdev.long_addr[addr_idx] ^= ss_array[i];
+        /* append HW addr */
+        real_send(dev->sock_fd, &hdr, sizeof(hdr), MSG_MORE);
+        real_send(dev->sock_fd, dev->netdev.long_addr, sizeof(dev->netdev.long_addr), 0);
     }
-    dev->netdev.short_addr[0] = dev->netdev.long_addr[6];
-    dev->netdev.short_addr[1] = dev->netdev.long_addr[7];
+}
+
+void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params, uint8_t index)
+{
+    int res;
+
+    DEBUG("socket_zep_setup(%p, %p)\n", (void *)dev, (void *)params);
+    assert((params->remote_addr != NULL) && (params->remote_port != NULL));
+
+    memset(dev, 0, sizeof(socket_zep_t));
+    dev->netdev.netdev.driver = &socket_zep_driver;
+
+    netdev_register(&dev->netdev.netdev, NETDEV_SOCKET_ZEP, index);
+
+    res = _bind_local(params);
+
+    if (res < 0) {
+        dev->sock_fd = socket(AF_INET6, SOCK_DGRAM, 0);
+    } else {
+        dev->sock_fd = res;
+    }
+
+    /* only send hello if we are connected to a remote */
+    bool send_hello = !_connect_remote(dev, params);
+
+    /* setup hardware address */
+    netdev_ieee802154_setup(&dev->netdev);
+
+    /* send dummy data to connect to dispatcher */
+    if (send_hello) {
+        _send_zep_hello(dev);
+    }
+
     native_async_read_setup();
     native_async_read_add_handler(dev->sock_fd, dev, _socket_isr);
-#ifdef MODULE_NETSTATS_L2
-    memset(&dev->netdev.netdev.stats, 0, sizeof(netstats_t));
-#endif
 }
 
 void socket_zep_cleanup(socket_zep_t *dev)

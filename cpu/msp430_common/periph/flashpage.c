@@ -20,38 +20,80 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "irq.h"
 #include "periph/flashpage.h"
 
-void flashpage_write(int page, const void *data)
+static inline int _unlock(void)
 {
-    assert(page < FLASHPAGE_NUMOF);
-
-    const uint8_t *src = data;
-    uint8_t *dst = (uint8_t *)flashpage_addr(page);
-    unsigned istate;
-
-    /* disable interrupts and unlock flash */
-    istate = irq_disable();
+    int state;
+    state = irq_disable();
     FCTL3 = FWKEY;
     while (FCTL3 & BUSY) {}
+    return state;
+}
+
+static inline void _lock(int state)
+{
+    FCTL3 = (FWKEY | LOCK);
+    irq_restore(state);
+}
+
+static inline void _erase(uint16_t *page_addr)
+{
+    /* disable interrupts and unlock flash */
+    int state = _unlock();
 
     /* erase page */
     FCTL1 = (FWKEY | ERASE);
-    *dst = 0;                   /* erases the page */
+    *page_addr = 0;
     while (FCTL3 & BUSY) {}
 
-    if (data) {
-        FCTL1 = (FWKEY | WRT);
-        for (unsigned i = 0; i < FLASHPAGE_SIZE; i++) {
-            *(dst++) = *(src++);
-            while (!(FCTL3 & WAIT)) {}
-        }
+    /* lock flash and re-enable interrupts */
+    _lock(state);
+}
+
+void flashpage_erase(unsigned page)
+{
+    assert((unsigned) page < FLASHPAGE_NUMOF);
+
+    uint16_t *page_addr = (uint16_t *)flashpage_addr(page);
+
+    /* erase page */
+    _erase(page_addr);
+}
+
+void flashpage_write(void *target_addr, const void *data, size_t len)
+{
+    /* assert multiples of FLASHPAGE_WRITE_BLOCK_SIZE are written and no less of
+       that length. */
+    assert(!(len % FLASHPAGE_WRITE_BLOCK_SIZE));
+
+    /* ensure writes are aligned */
+    assert(!(((unsigned)target_addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) ||
+            ((unsigned)data % FLASHPAGE_WRITE_BLOCK_ALIGNMENT)));
+
+    /* ensure the length doesn't exceed the actual flash size */
+    assert(((unsigned)target_addr + len) <
+           (CPU_FLASH_BASE + (FLASHPAGE_SIZE * FLASHPAGE_NUMOF) - 1));
+
+    uint8_t *page_addr = target_addr;
+    const uint8_t *data_addr = data;
+
+   /* disable interrupts and unlock flash */
+    int state = _unlock();
+
+   /* enable write access, and write*/
+    FCTL1 = (FWKEY | WRT);
+    for (unsigned i = 0; i < len; i++) {
+        *(page_addr++) = *(data_addr++);
+        while (!(FCTL3 & WAIT)) {}
     }
+   /* disable write access */
+    FCTL1 = (FWKEY);
 
     /* lock flash and re-enable interrupts */
-    FCTL1 = (FWKEY);
-    FCTL3 = (FWKEY | LOCK);
-    irq_restore(istate);
+    _lock(state);
 }

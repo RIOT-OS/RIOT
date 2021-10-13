@@ -1,0 +1,14 @@
+# we use shared STM32 configuration snippets
+INCLUDES += -I$(RIOTBOARD)/common/stm32/include
+
+# to flash this board, use an ST-link adapter
+OPENOCD_DEBUG_ADAPTER ?= stlink
+
+# this board can become un-flashable after a hardfault,
+# use connect_assert_srst to always be able to flash or reset the boards.
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
+
+# this board uses openocd
+PROGRAMMER ?= openocd
+# openocd programmer is supported
+PROGRAMMERS_SUPPORTED += openocd

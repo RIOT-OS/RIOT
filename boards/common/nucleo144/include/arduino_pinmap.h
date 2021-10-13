@@ -60,7 +60,8 @@ extern "C" {
 #define ARDUINO_PIN_A0          GPIO_PIN(PORT_A, 3)
 #define ARDUINO_PIN_A1          GPIO_PIN(PORT_C, 0)
 #define ARDUINO_PIN_A2          GPIO_PIN(PORT_C, 3)
-#if defined(CPU_MODEL_STM32F413ZH) || defined(CPU_MODEL_STM32F412ZG)
+#if defined(CPU_MODEL_STM32F413ZH) || defined(CPU_MODEL_STM32F412ZG) || \
+    defined(CPU_MODEL_STM32L496ZG)
 #define ARDUINO_PIN_A3          GPIO_PIN(PORT_C, 1)
 #define ARDUINO_PIN_A4          GPIO_PIN(PORT_C, 4)
 #define ARDUINO_PIN_A5          GPIO_PIN(PORT_C, 5)

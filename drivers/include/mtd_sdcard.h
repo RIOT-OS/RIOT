@@ -43,16 +43,24 @@ typedef struct {
     const sdcard_spi_params_t *params; /**< params for sdcard_spi init */
 } mtd_sdcard_t;
 
-
 /**
- * @brief   sdcards handle sector erase internally so it's possible to directly
- *          write to the card without erasing the sector first.
- *          Attention: an erase call will therefore NOT touch the content,
- *                     so disable this feature to ensure overriding the data.
+ * @defgroup drivers_mtd_sdcard_config     SDCard driver compile configuration
+ * @ingroup config_drivers_storage
+ * @{
  */
-#ifndef MTD_SDCARD_SKIP_ERASE
-#define MTD_SDCARD_SKIP_ERASE (1)
+/**
+ * @brief   Enable SDCard Erase
+ * @note    SDCards handle sector erase internally so it's
+ *          possible to directly write to the card without erasing
+ *          the sector first.
+ *          Attention: an erase call will therefore NOT touch the content,
+ *          so enable this feature to ensure overriding the data.
+ *          This feature is currently not supported.
+ */
+#ifdef DOXYGEN
+#define CONFIG_MTD_SDCARD_ERASE
 #endif
+/** @} */
 
 /**
  * @brief   sdcard device operations table for mtd

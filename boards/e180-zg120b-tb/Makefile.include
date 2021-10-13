@@ -1,0 +1,4 @@
+# setup JLink for flashing
+PROGRAMMER ?= jlink
+JLINK_DEVICE = EFR32MG1BxxxF256
+JLINK_PRE_FLASH = r

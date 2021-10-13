@@ -9,7 +9,7 @@
  */
 
 /**
- * @ingroup     boards_frdm-k64f
+ * @ingroup     boards_frdm-k22f
  * @{
  *
  * @file
@@ -20,9 +20,7 @@
  * @}
  */
 
-#include <stdint.h>
 #include "board.h"
-#include "mcg.h"
 #include "periph/gpio.h"
 
 void board_init(void)
@@ -32,9 +30,9 @@ void board_init(void)
 
     /* initialize and turn off the on-board RGB-LED */
     gpio_init(LED0_PIN, GPIO_OUT);
-    gpio_init(LED1_PIN, GPIO_OUT);
-    gpio_init(LED2_PIN, GPIO_OUT);
     gpio_set(LED0_PIN);
+    gpio_init(LED1_PIN, GPIO_OUT);
     gpio_set(LED1_PIN);
+    gpio_init(LED2_PIN, GPIO_OUT);
     gpio_set(LED2_PIN);
 }

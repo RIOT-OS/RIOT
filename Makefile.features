@@ -1,0 +1,26 @@
+# Process provided FEATURES
+#
+# The board/board common are responsible for defining the CPU and CPU_MODEL
+# variables in their Makefile.features.
+# This makes them available when setting features based on CPU_MODEL in the cpu
+# Makefile.features and also during dependency resolution.
+
+# Transition:
+#   Moving 'CPU/CPU_MODEL' to Makefile.features is an ongoing work and may not
+#   reflect the state of all boards for the moment.
+
+include $(BOARDDIR)/Makefile.features
+
+# Sanity check
+ifeq (,$(CPU))
+  $(error CPU must be defined by board / board_common Makefile.features)
+endif
+
+include $(RIOTCPU)/$(CPU)/Makefile.features
+
+# Provide CPU as a feature to allow listing all boards with a CPU
+FEATURES_PROVIDED += cpu_$(CPU)
+
+# Features that are conflicting for all architectures
+FEATURES_CONFLICT += picolibc:newlib
+FEATURES_CONFLICT_MSG += "Only one standard C library can be used"

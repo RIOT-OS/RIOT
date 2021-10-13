@@ -1,6 +1,0 @@
-# define the cpu used by the nucleo144-f303 board
-export CPU = stm32f3
-export CPU_MODEL = stm32f303ze
-
-# load the common Makefile.include for Nucleo-144 boards
-include $(RIOTBOARD)/common/nucleo144/Makefile.include

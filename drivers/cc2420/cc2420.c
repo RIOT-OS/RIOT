@@ -20,7 +20,6 @@
  * @}
  */
 
-#include "luid.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
 #include "net/gnrc.h"
@@ -29,56 +28,39 @@
 #include "cc2420_netdev.h"
 #include "cc2420_registers.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
-
-void cc2420_setup(cc2420_t * dev, const cc2420_params_t *params)
+void cc2420_setup(cc2420_t * dev, const cc2420_params_t *params, uint8_t index)
 {
+    netdev_t *netdev = &dev->netdev.netdev;
+
     /* set pointer to the devices netdev functions */
-    dev->netdev.netdev.driver = &cc2420_driver;
+    netdev->driver = &cc2420_driver;
     /* pull in device configuration parameters */
-    memcpy(&dev->params, params, sizeof(cc2420_params_t));
+    dev->params = *params;
     dev->state = CC2420_STATE_IDLE;
     /* reset device descriptor fields */
     dev->options = 0;
+
+    netdev_register(netdev, NETDEV_CC2420, index);
+    netdev_ieee802154_setup(&dev->netdev);
 }
 
 int cc2420_init(cc2420_t *dev)
 {
     uint16_t reg;
-    uint8_t addr[8];
 
-    /* reset options and sequence number */
-    dev->netdev.seq = 0;
-    dev->netdev.flags = 0;
+    netdev_ieee802154_reset(&dev->netdev);
 
-    /* set default address, channel, PAN ID, and TX power */
-    luid_get(addr, sizeof(addr));
-    /* make sure we mark the address as non-multicast and not globally unique */
-    addr[0] &= ~(0x01);
-    addr[0] |= 0x02;
-    cc2420_set_addr_short(dev, &addr[6]);
-    cc2420_set_addr_long(dev, addr);
-    cc2420_set_pan(dev, CC2420_PANID_DEFAULT);
+    cc2420_set_addr_short(dev, dev->netdev.short_addr);
+    cc2420_set_addr_long(dev, dev->netdev.long_addr);
     cc2420_set_chan(dev, CC2420_CHAN_DEFAULT);
     cc2420_set_txpower(dev, CC2420_TXPOWER_DEFAULT);
 
     /* set default options */
     cc2420_set_option(dev, CC2420_OPT_AUTOACK, true);
     cc2420_set_option(dev, CC2420_OPT_CSMA, true);
-    cc2420_set_option(dev, CC2420_OPT_TELL_TX_START, true);
-    cc2420_set_option(dev, CC2420_OPT_TELL_RX_END, true);
-
-#ifdef MODULE_NETSTATS_L2
-    cc2420_set_option(dev, CC2420_OPT_TELL_RX_END, true);
-#endif
-    /* set default protocol*/
-#ifdef MODULE_GNRC_SIXLOWPAN
-    dev->netdev.proto = GNRC_NETTYPE_SIXLOWPAN;
-#elif MODULE_GNRC
-    dev->netdev.proto = GNRC_NETTYPE_UNDEF;
-#endif
 
     /* change default RX bandpass filter to 1.3uA (as recommended) */
     reg = cc2420_reg_read(dev, CC2420_REG_RXCTRL1);
@@ -102,11 +84,10 @@ int cc2420_init(cc2420_t *dev)
     cc2420_reg_write(dev, CC2420_REG_MDMCTRL0, reg);
 
     /* go into RX state */
-    cc2420_set_state(dev, CC2420_GOTO_RX);
+    cc2420_set_state(dev, NETOPT_STATE_IDLE);
 
     return 0;
 }
-
 
 bool cc2420_cca(cc2420_t *dev)
 {
@@ -146,9 +127,11 @@ size_t cc2420_tx_prepare(cc2420_t *dev, const iolist_t *iolist)
     cc2420_strobe(dev, CC2420_STROBE_FLUSHTX);
     /* push packet length to TX FIFO */
     cc2420_fifo_write(dev, (uint8_t *)&pkt_len, 1);
-    /* push packet to TX FIFO */
+    /* push packet to TX FIFO, only if iol->iol_len > 0 */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
-        cc2420_fifo_write(dev, iol->iol_base, iol->iol_len);
+        if (iol->iol_len > 0) {
+            cc2420_fifo_write(dev, iol->iol_base, iol->iol_len);
+        }
     }
     DEBUG("cc2420: tx_prep: loaded %i byte into the TX FIFO\n", (int)pkt_len);
 
@@ -158,7 +141,7 @@ size_t cc2420_tx_prepare(cc2420_t *dev, const iolist_t *iolist)
 void cc2420_tx_exec(cc2420_t *dev)
 {
     /* trigger the transmission */
-    if (dev->options & CC2420_OPT_TELL_TX_START) {
+    if (dev->netdev.netdev.event_callback) {
         dev->netdev.netdev.event_callback(&dev->netdev.netdev,
                                           NETDEV_EVENT_TX_STARTED);
     }
@@ -171,6 +154,15 @@ void cc2420_tx_exec(cc2420_t *dev)
         DEBUG("cc2420: tx_exec: triggering TX without CCA\n");
         cc2420_strobe(dev, CC2420_STROBE_TXON);
     }
+}
+
+static inline void _flush_rx_fifo(cc2420_t *dev)
+{
+    /* as stated in the CC2420 datasheet (section 14.3), the SFLUSHRX command
+     * strobe should be issued twice to ensure that the SFD pin goes back to its
+     * idle state */
+    cc2420_strobe(dev, CC2420_STROBE_FLUSHRX);
+    cc2420_strobe(dev, CC2420_STROBE_FLUSHRX);
 }
 
 int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
@@ -186,14 +178,21 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
         cc2420_ram_read(dev, CC2420_RAM_RXFIFO, &len, 1);
         len -= 2;   /* subtract RSSI and FCF */
         DEBUG("cc2420: recv: packet of length %i in RX FIFO\n", (int)len);
+        if (max_len != 0) {
+            DEBUG("cc2420: recv: Dropping frame as requested\n");
+            _flush_rx_fifo(dev);
+        }
     }
     else {
         /* read length byte */
         cc2420_fifo_read(dev, &len, 1);
         len -= 2;   /* subtract RSSI and FCF */
 
-        /* if a buffer is given, read (and drop) the packet */
-        len = (len > max_len) ? max_len : len;
+        if (len > max_len) {
+            DEBUG("cc2420: recv: Supplied buffer to small\n");
+            _flush_rx_fifo(dev);
+            return -ENOBUFS;
+        }
 
         /* read fifo contents */
         DEBUG("cc2420: recv: reading %i byte of the packet\n", (int)len);
@@ -217,8 +216,7 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
         }
 
         /* finally flush the FIFO */
-        cc2420_strobe(dev, CC2420_STROBE_FLUSHRX);
-        cc2420_strobe(dev, CC2420_STROBE_FLUSHRX);
+        _flush_rx_fifo(dev);
     }
 
     return (int)len;

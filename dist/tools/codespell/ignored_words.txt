@@ -1,0 +1,115 @@
+# This file contains ignored words that triggered false positive with codespell
+#
+# Extend it when needed, one word per line with documentation in a comment.
+
+# nd (Neighbor Discovery) => and, 2nd
+nd
+
+# wan (Wide Area Network) => want
+wan
+
+# od (Object Dump) => of
+od
+
+# dout (Digital out) => doubt
+dout
+
+# ALS (Ambient Light Sensing) => ALSO
+als
+
+# Technik (From "Beuth Hochschule für Technik Berlin") => Technique
+technik
+
+# inout (Doxygen input/output param) => input, in out
+inout
+
+# OT (OpenThread) => TO, OF, OR
+ot
+
+# fo  (fragment offset) => of, for
+fo
+
+# AACK (802.15.4 Auto ACK) => ACK
+aack
+
+# pres (variable used for pressure measurement) => press
+pres
+
+# tHW (concatenation of \t and HW) => the, thaw
+thw
+
+# tThe (concatenation of \t and The) => the
+tthe
+
+# HSI (High Speed Internal oscillator) => HIS
+hsi
+
+# hart (RISC-V hart) => heart, harm
+hart
+
+# produkt (used in an url) => product
+produkt
+
+# BORD (a define in arm7_common) => BOARD, BORED, BORDER
+bord
+
+# PTD (a define in kinetis) => PDF
+ptd
+
+# THRE (a register of AVR UART peripheral) => THREE, THERE, THEIR, THE
+thre
+
+# UE (a register of AVR UART peripheral) => USE, DUE
+ue
+
+# BA (an hexadecimal value in tests-hashes-sha1.c) => BY, BE
+ba
+
+# doesnt (used in a test string in tests-crypto-modes-ccm.c) => doesn't, does not
+doesnt
+
+# creat (a POSIX fnctl function name) => create
+creat
+
+# Manal (firstname of a contributor) => Manual
+manal
+
+# ths (a variable name in thread_cooperation/main.c) => the, this
+ths
+
+# te, hel (partial words used in shell test script) => the, be, help, hell, heal
+te
+hel
+
+# GUAs (Global Unicast Address) => gauss
+guas
+
+# extint (variable for external interrupt) => extinct, extant
+extint
+
+# ser (variable name in espreset.py script) => set
+ser
+
+# keypair (function name used in qdsa test) => key pair
+keypair
+
+# comprE (RPL number of prefix octets) => compare, compère
+compre
+
+# files' (when files is the last word in string, between quotes) => file's
+files'
+
+# dedup (used in a GNRC header file name) => dedupe
+dedup
+
+# circularly (used in "circularly linked list" in clist.h) => circular
+circularly
+
+# Chang (common name) => Change
+chang
+
+# filp (variable name for file pointer) => flip
+filp
+
+# Ether (Scapy class name and means Ethernet in some parts of the code) => Either
+ether

@@ -26,9 +26,10 @@ extern "C" {
 /* ************************************************************************** */
 /*   CMSIS DEFINITIONS FOR CC2538 */
 /* ************************************************************************** */
-/** @addtogroup CC2538_cmsis CMSIS Definitions */
-/*@{*/
-
+/**
+ * @addtogroup CC2538_cmsis CMSIS Definitions
+ * @{
+ */
 /** Interrupt Number Definition */
 typedef enum IRQn
 {
@@ -86,7 +87,8 @@ typedef enum IRQn
     PERIPH_COUNT_IRQn     = (MACTIMER_IRQn + 1) /**< Number of peripheral IDs */
 } IRQn_Type;
 
-/** @name Cortex-M3 core interrupt handlers
+/**
+ * @name Cortex-M3 core interrupt handlers
  * @{
  */
 void Reset_Handler(void);        /**< Reset handler */
@@ -113,26 +115,23 @@ void SysTick_Handler(void);      /**< SysTick handler */
 /**
  * @brief CMSIS includes
  */
-
 #include <core_cm3.h>
-
-/*@}*/
+/** @} */
 
 #define IEEE_ADDR_MSWORD            ( *(const uint32_t*)0x00280028 ) /**< Most-significant 32 bits of the IEEE address */
 #define IEEE_ADDR_LSWORD            ( *(const uint32_t*)0x0028002c ) /**< Least-significant 32 bits of the IEEE address */
 
 typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IEEE address */
 
-/** @addtogroup cpu_specific_Peripheral_memory_map
-  * @{
-  */
-
+/**
+ * @addtogroup cpu_specific_Peripheral_memory_map
+ * @{
+ */
 #define FLASH_BASE                  0x00200000 /**< FLASH base address */
 #define SRAM_BASE                   0x20000000 /**< SRAM base address */
 #define PERIPH_BASE                 0x40000000 /**< Peripheral base address */
 
 #define SRAM_BB_BASE                0x22000000 /**< SRAM base address in the bit-band region */
-
 /** @} */
 
 /** @name CC2538 Special Function Registers
@@ -609,38 +608,38 @@ typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IE
 #define IOC_PD5_SEL                 ( *(cc2538_reg_t*)0x400d4074 ) /**< Peripheral select control for PD5 */
 #define IOC_PD6_SEL                 ( *(cc2538_reg_t*)0x400d4078 ) /**< Peripheral select control for PD6 */
 #define IOC_PD7_SEL                 ( *(cc2538_reg_t*)0x400d407c ) /**< Peripheral select control for PD7 */
-#define IOC_PA0_OVER                ( *(cc2538_reg_t*)0x400d4080 ) /**< Overide configuration register for PA0. */
-#define IOC_PA1_OVER                ( *(cc2538_reg_t*)0x400d4084 ) /**< Overide configuration register for PA1. */
-#define IOC_PA2_OVER                ( *(cc2538_reg_t*)0x400d4088 ) /**< Overide configuration register for PA2. */
-#define IOC_PA3_OVER                ( *(cc2538_reg_t*)0x400d408c ) /**< Overide configuration register for PA3. */
-#define IOC_PA4_OVER                ( *(cc2538_reg_t*)0x400d4090 ) /**< Overide configuration register for PA4. */
-#define IOC_PA5_OVER                ( *(cc2538_reg_t*)0x400d4094 ) /**< Overide configuration register for PA5. */
-#define IOC_PA6_OVER                ( *(cc2538_reg_t*)0x400d4098 ) /**< Overide configuration register for PA6. */
-#define IOC_PA7_OVER                ( *(cc2538_reg_t*)0x400d409c ) /**< Overide configuration register for PA7. */
-#define IOC_PB0_OVER                ( *(cc2538_reg_t*)0x400d40a0 ) /**< Overide configuration register for PB0. */
-#define IOC_PB1_OVER                ( *(cc2538_reg_t*)0x400d40a4 ) /**< Overide configuration register for PB1. */
-#define IOC_PB2_OVER                ( *(cc2538_reg_t*)0x400d40a8 ) /**< Overide configuration register for PB2. */
-#define IOC_PB3_OVER                ( *(cc2538_reg_t*)0x400d40ac ) /**< Overide configuration register for PB3. */
-#define IOC_PB4_OVER                ( *(cc2538_reg_t*)0x400d40b0 ) /**< Overide configuration register for PB4. */
-#define IOC_PB5_OVER                ( *(cc2538_reg_t*)0x400d40b4 ) /**< Overide configuration register for PB5. */
-#define IOC_PB6_OVER                ( *(cc2538_reg_t*)0x400d40b8 ) /**< Overide configuration register for PB6. */
-#define IOC_PB7_OVER                ( *(cc2538_reg_t*)0x400d40bc ) /**< Overide configuration register for PB7. */
-#define IOC_PC0_OVER                ( *(cc2538_reg_t*)0x400d40c0 ) /**< Overide configuration register for PC0. PC0 has high drive capability. */
-#define IOC_PC1_OVER                ( *(cc2538_reg_t*)0x400d40c4 ) /**< Overide configuration register for PC1. PC1 has high drive capability. */
-#define IOC_PC2_OVER                ( *(cc2538_reg_t*)0x400d40c8 ) /**< Overide configuration register for PC2. PC2 has high drive capability. */
-#define IOC_PC3_OVER                ( *(cc2538_reg_t*)0x400d40cc ) /**< Overide configuration register for PC3. PC3 has high drive capability. */
-#define IOC_PC4_OVER                ( *(cc2538_reg_t*)0x400d40d0 ) /**< Overide configuration register for PC4. */
-#define IOC_PC5_OVER                ( *(cc2538_reg_t*)0x400d40d4 ) /**< Overide configuration register for PC5. */
-#define IOC_PC6_OVER                ( *(cc2538_reg_t*)0x400d40d8 ) /**< Overide configuration register for PC6. */
-#define IOC_PC7_OVER                ( *(cc2538_reg_t*)0x400d40dc ) /**< Overide configuration register for PC7. */
-#define IOC_PD0_OVER                ( *(cc2538_reg_t*)0x400d40e0 ) /**< Overide configuration register for PD0. */
-#define IOC_PD1_OVER                ( *(cc2538_reg_t*)0x400d40e4 ) /**< Overide configuration register for PD1. */
-#define IOC_PD2_OVER                ( *(cc2538_reg_t*)0x400d40e8 ) /**< Overide configuration register for PD2. */
-#define IOC_PD3_OVER                ( *(cc2538_reg_t*)0x400d40ec ) /**< Overide configuration register for PD3. */
-#define IOC_PD4_OVER                ( *(cc2538_reg_t*)0x400d40f0 ) /**< Overide configuration register for PD4. */
-#define IOC_PD5_OVER                ( *(cc2538_reg_t*)0x400d40f4 ) /**< Overide configuration register for PD5. */
-#define IOC_PD6_OVER                ( *(cc2538_reg_t*)0x400d40f8 ) /**< Overide configuration register for PD6. */
-#define IOC_PD7_OVER                ( *(cc2538_reg_t*)0x400d40fc ) /**< Overide configuration register for PD7. */
+#define IOC_PA0_OVER                ( *(cc2538_reg_t*)0x400d4080 ) /**< Override configuration register for PA0. */
+#define IOC_PA1_OVER                ( *(cc2538_reg_t*)0x400d4084 ) /**< Override configuration register for PA1. */
+#define IOC_PA2_OVER                ( *(cc2538_reg_t*)0x400d4088 ) /**< Override configuration register for PA2. */
+#define IOC_PA3_OVER                ( *(cc2538_reg_t*)0x400d408c ) /**< Override configuration register for PA3. */
+#define IOC_PA4_OVER                ( *(cc2538_reg_t*)0x400d4090 ) /**< Override configuration register for PA4. */
+#define IOC_PA5_OVER                ( *(cc2538_reg_t*)0x400d4094 ) /**< Override configuration register for PA5. */
+#define IOC_PA6_OVER                ( *(cc2538_reg_t*)0x400d4098 ) /**< Override configuration register for PA6. */
+#define IOC_PA7_OVER                ( *(cc2538_reg_t*)0x400d409c ) /**< Override configuration register for PA7. */
+#define IOC_PB0_OVER                ( *(cc2538_reg_t*)0x400d40a0 ) /**< Override configuration register for PB0. */
+#define IOC_PB1_OVER                ( *(cc2538_reg_t*)0x400d40a4 ) /**< Override configuration register for PB1. */
+#define IOC_PB2_OVER                ( *(cc2538_reg_t*)0x400d40a8 ) /**< Override configuration register for PB2. */
+#define IOC_PB3_OVER                ( *(cc2538_reg_t*)0x400d40ac ) /**< Override configuration register for PB3. */
+#define IOC_PB4_OVER                ( *(cc2538_reg_t*)0x400d40b0 ) /**< Override configuration register for PB4. */
+#define IOC_PB5_OVER                ( *(cc2538_reg_t*)0x400d40b4 ) /**< Override configuration register for PB5. */
+#define IOC_PB6_OVER                ( *(cc2538_reg_t*)0x400d40b8 ) /**< Override configuration register for PB6. */
+#define IOC_PB7_OVER                ( *(cc2538_reg_t*)0x400d40bc ) /**< Override configuration register for PB7. */
+#define IOC_PC0_OVER                ( *(cc2538_reg_t*)0x400d40c0 ) /**< Override configuration register for PC0. PC0 has high drive capability. */
+#define IOC_PC1_OVER                ( *(cc2538_reg_t*)0x400d40c4 ) /**< Override configuration register for PC1. PC1 has high drive capability. */
+#define IOC_PC2_OVER                ( *(cc2538_reg_t*)0x400d40c8 ) /**< Override configuration register for PC2. PC2 has high drive capability. */
+#define IOC_PC3_OVER                ( *(cc2538_reg_t*)0x400d40cc ) /**< Override configuration register for PC3. PC3 has high drive capability. */
+#define IOC_PC4_OVER                ( *(cc2538_reg_t*)0x400d40d0 ) /**< Override configuration register for PC4. */
+#define IOC_PC5_OVER                ( *(cc2538_reg_t*)0x400d40d4 ) /**< Override configuration register for PC5. */
+#define IOC_PC6_OVER                ( *(cc2538_reg_t*)0x400d40d8 ) /**< Override configuration register for PC6. */
+#define IOC_PC7_OVER                ( *(cc2538_reg_t*)0x400d40dc ) /**< Override configuration register for PC7. */
+#define IOC_PD0_OVER                ( *(cc2538_reg_t*)0x400d40e0 ) /**< Override configuration register for PD0. */
+#define IOC_PD1_OVER                ( *(cc2538_reg_t*)0x400d40e4 ) /**< Override configuration register for PD1. */
+#define IOC_PD2_OVER                ( *(cc2538_reg_t*)0x400d40e8 ) /**< Override configuration register for PD2. */
+#define IOC_PD3_OVER                ( *(cc2538_reg_t*)0x400d40ec ) /**< Override configuration register for PD3. */
+#define IOC_PD4_OVER                ( *(cc2538_reg_t*)0x400d40f0 ) /**< Override configuration register for PD4. */
+#define IOC_PD5_OVER                ( *(cc2538_reg_t*)0x400d40f4 ) /**< Override configuration register for PD5. */
+#define IOC_PD6_OVER                ( *(cc2538_reg_t*)0x400d40f8 ) /**< Override configuration register for PD6. */
+#define IOC_PD7_OVER                ( *(cc2538_reg_t*)0x400d40fc ) /**< Override configuration register for PD7. */
 #define IOC_UARTRXD_UART0           ( *(cc2538_reg_t*)0x400d4100 ) /**< Pin selection for UART0 RX. */
 #define IOC_UARTCTS_UART1           ( *(cc2538_reg_t*)0x400d4104 ) /**< Pin selection for UART1 CTS. */
 #define IOC_UARTRXD_UART1           ( *(cc2538_reg_t*)0x400d4108 ) /**< Pin selection for UART1 RX. */
@@ -675,14 +674,6 @@ typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IE
 #define SMWDTHROSC_STCV2            ( *(cc2538_reg_t*)0x400d5064 ) /**< Sleep Timer Capture value byte 2 */
 #define SMWDTHROSC_STCV3            ( *(cc2538_reg_t*)0x400d5068 ) /**< Sleep Timer Capture value byte 3 */
 #define ANA_REGS_IVCTRL             ( *(cc2538_reg_t*)0x400d6004 ) /**< Analog control register */
-#define SOC_ADC_ADCCON1             ( *(cc2538_reg_t*)0x400d7000 ) /**< ADC Control Register 1 */
-#define SOC_ADC_ADCCON2             ( *(cc2538_reg_t*)0x400d7004 ) /**< ADC Control Register 2 */
-#define SOC_ADC_ADCCON3             ( *(cc2538_reg_t*)0x400d7008 ) /**< ADC Control Register 3 */
-#define SOC_ADC_ADCL                ( *(cc2538_reg_t*)0x400d700c ) /**< Least-significant part of ADC conversion result. */
-#define SOC_ADC_ADCH                ( *(cc2538_reg_t*)0x400d7010 ) /**< Most-significant part of ADC conversion result. */
-#define SOC_ADC_RNDL                ( *(cc2538_reg_t*)0x400d7014 ) /**< Random-number-generator data; low byte. */
-#define SOC_ADC_RNDH                ( *(cc2538_reg_t*)0x400d7018 ) /**< Random-number-generator data; high byte. */
-#define SOC_ADC_CMPCTL              ( *(cc2538_reg_t*)0x400d7024 ) /**< Analog comparator control and status register. */
 #define GPIO_A_DATA                 ( *(cc2538_reg_t*)0x400d9000 ) /**< GPIO_A Data Register */
 #define GPIO_A_DIR                  ( *(cc2538_reg_t*)0x400d9400 ) /**< GPIO_A data direction register */
 #define GPIO_A_IS                   ( *(cc2538_reg_t*)0x400d9404 ) /**< GPIO_A Interrupt Sense register */
@@ -806,15 +797,17 @@ typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IE
 #define CCTEST_USBCTRL              ( *(cc2538_reg_t*)0x44010050 ) /**< CCTEST USB PHY stand-by control */
 /** @} */
 
-#define XOSC32M_FREQ                32000000 /**< 32 MHz external oscillator/clock frequency */
-#define RCOSC16M_FREQ               16000000 /**< 16 MHz internal RC oscillator frequency */
+#define XOSC32M_FREQ                32000000U /**< 32 MHz external oscillator/clock frequency */
+#define RCOSC16M_FREQ               16000000U /**< 16 MHz internal RC oscillator frequency */
 
-#define CC2538_VTOR_ALIGN                512 /**< CC2538 Vector Table alignment */
+#define XOSC32K_FREQ                   32768U /**< 32 KHz external oscillator/clock frequency */
+#define RCOSC32K_FREQ                  32753U /**< 32 KHz internal RC oscillator frequency */
+
+#define CC2538_VTOR_ALIGN                 512 /**< CC2538 Vector Table alignment */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* CC2538_H */
-
-/*@}*/
+/** @} */

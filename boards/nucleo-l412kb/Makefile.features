@@ -1,0 +1,19 @@
+CPU = stm32
+CPU_MODEL = stm32l412kb
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_pwm
+FEATURES_PROVIDED += periph_rtt
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
+
+# Put other features for this board (in alphabetical order)
+# Note that a recent version of OpenOCD with a slightly patched code is required
+# for flashing this board. Refer to the following PR for more info:
+# https://github.com/RIOT-OS/RIOT/pull/12144#issuecomment-527090161
+FEATURES_PROVIDED += riotboot
+
+# load the common Makefile.features for Nucleo-32 boards
+include $(RIOTBOARD)/common/nucleo32/Makefile.features

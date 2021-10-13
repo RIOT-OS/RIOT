@@ -18,15 +18,26 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef ARDUINO_H
-#define ARDUINO_H
+#ifndef ARDUINO_HPP
+#define ARDUINO_HPP
 
 extern "C" {
+#include <stdint.h>
 #include "periph/gpio.h"
 #include "arduino_board.h"
 }
 
 #include "serialport.hpp"
+
+/**
+ * @brief    Arduino boolean data type definion
+ */
+typedef bool boolean;
+
+/**
+ * @brief    Arduino byte data type definion
+ */
+typedef uint8_t byte;
 
 /**
  * @brief   Possible pin configurations
@@ -45,10 +56,17 @@ enum {
     HIGH = 1            /**< pin is set */
 };
 
+#ifndef ARDUINO_UART_DEV
 /**
- * @brief   Primary serial port (mapped to UART_DEV(0))
+ * @brief UART device to use for Arduino serial
  */
-static SerialPort Serial(UART_DEV(0));
+#define ARDUINO_UART_DEV        UART_DEV(0)
+#endif
+
+/**
+ * @brief   Primary serial port (mapped to ARDUINO_UART_DEV)
+ */
+static SerialPort Serial(ARDUINO_UART_DEV);
 
 /**
  * @brief   Configure a pin as either input or output
@@ -83,6 +101,28 @@ int digitalRead(int pin);
 void delay(unsigned long msec);
 
 /**
+ * @brief   Sleep for a given amount of time [microseconds]
+ *
+ * @param[in] usec      number of microseconds to sleep
+ */
+void delayMicroseconds(unsigned long usec);
+
+/**
+ * @brief   Returns the number of microseconds since start
+ *
+ * @return value of microseconds since start
+ */
+unsigned long micros();
+
+/**
+ * @brief   Returns the number of milliseconds since start
+ *
+ * @return value of milliseconds since start
+ */
+unsigned long millis();
+
+#if MODULE_PERIPH_ADC || DOXYGEN
+/**
  * @brief   Read the current value of the given analog pin
  *
  * @param[in] pin       pin to read
@@ -91,6 +131,39 @@ void delay(unsigned long msec);
  * to the voltage applied to the pin
  */
 int analogRead(int pin);
+#endif
 
-#endif /* ARDUINO_H */
+#if MODULE_PERIPH_PWM || DOXYGEN
+/**
+ * @brief   PWM default frequency
+ *
+ * Can be overridden at board level in arduino_board.h.
+ *
+ * See table from https://www.arduino.cc/reference/en/language/functions/analog-io/analogwrite/
+ * for reference values.
+ */
+#ifndef ARDUINO_PWM_FREQU
+#define ARDUINO_PWM_FREQU           (1000U)
+#endif
+
+/**
+ * @brief   PWM mode
+ */
+#define ARDUINO_PWM_MODE            PWM_LEFT
+
+/**
+ * @brief   PWM steps
+ */
+#define ARDUINO_PWM_STEPS           (256U)
+
+/**
+ * @brief   Write an analog value to a pin
+ *
+ * @param[in] pin       pin to write
+ * @param[in] value     duty cycle value, between 0 and 255
+ */
+void analogWrite(int pin, int value);
+#endif
+
+#endif /* ARDUINO_HPP */
 /** @} */

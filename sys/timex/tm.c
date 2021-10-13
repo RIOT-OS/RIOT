@@ -49,7 +49,11 @@ int tm_doomsday(int year)
     return result;
 }
 
+#ifndef ATMEGA_INCOMPATIBLE_TIME_H
 void tm_get_wyday(int year, int mon, int mday, int *wday, int *yday)
+#else
+void tm_get_wyday(int year, int mon, int mday, int8_t *wday, int16_t *yday)
+#endif
 {
     int is_leap_year = tm_is_leap_year(year);
     *yday = TM_MON_DAYS_ACCU[mon] + mday + (mon <= TM_MON_FEB ? 0 : is_leap_year) - 1;

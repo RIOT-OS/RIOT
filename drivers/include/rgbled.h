@@ -38,7 +38,6 @@ typedef struct {
     int channel_b;      /**< set the B value in RGB */
 } rgbled_t;
 
-
 /**
  * @brief   Initialize the RGB LED by assigning PWM channels to colors
  *

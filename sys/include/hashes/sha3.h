@@ -3,7 +3,7 @@
  * Joan Daemen, Michaël Peeters, Gilles Van Assche and Ronny Van Keer, hereby
  * denoted as "the implementer".
  *
- * RIOT-OS adaptaion by Mathias Tausig
+ * RIOT-OS adaptation by Mathias Tausig
  *
  * This software is released under the Creative Commons CC0 1.0 license.
  * To the extent possible under law, the implementer has waived all copyright
@@ -12,7 +12,9 @@
  */
 
 /**
- * @ingroup     sys_hashes
+ * @defgroup    sys_hashes_sha3 SHA-3
+ * @ingroup     sys_hashes_unkeyed
+ * @brief       Implementation of the SHA-3 hashing function
  * @{
  *
  * @file
@@ -31,8 +33,19 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Length of SHA3-256 digests in bytes
+ */
 #define SHA3_256_DIGEST_LENGTH 32
+
+/**
+ * @brief   Length of SHA3-384 digests in bytes
+ */
 #define SHA3_384_DIGEST_LENGTH 48
+
+/**
+ * @brief   Length of SHA3-512 digests in bytes
+ */
 #define SHA3_512_DIGEST_LENGTH 64
 
 /**
@@ -85,7 +98,7 @@ void Keccak_final(keccak_state_t *ctx, unsigned char *output,
                   unsigned long long int outputByteLen);
 
 /**
- * @brief SHA-3-256 initialization.  Begins a SHA-3-256 operation.
+ * @brief SHA3-256 initialization.  Begins a SHA3-256 operation.
  *
  * @param[in] ctx  keccak_state_t handle to initialise
  */
@@ -101,7 +114,7 @@ void sha3_256_init(keccak_state_t *ctx);
 void sha3_update(keccak_state_t *ctx, const void *data, size_t len);
 
 /**
- * @brief SHA-3-256 finalization.  Pads the input data and exports the hash value
+ * @brief SHA3-256 finalization.  Pads the input data and exports the hash value
  *
  * @param[in,out] ctx    context handle to use
  * @param[out] digest    resulting digest, this is the hash of all the bytes
@@ -109,14 +122,14 @@ void sha3_update(keccak_state_t *ctx, const void *data, size_t len);
 void sha3_256_final(keccak_state_t *ctx, void *digest);
 
 /**
- * @brief SHA-3-384 initialization.  Begins a SHA-3-256 operation.
+ * @brief SHA3-384 initialization.  Begins a SHA3-384 operation.
  *
  * @param[in] ctx  keccak_state_t handle to initialise
  */
 void sha3_384_init(keccak_state_t *ctx);
 
 /**
- * @brief SHA-3-384 finalization.  Pads the input data and exports the hash value
+ * @brief SHA3-384 finalization.  Pads the input data and exports the hash value
  *
  * @param[in,out] ctx    context handle to use
  * @param[out] digest    resulting digest, this is the hash of all the bytes
@@ -124,14 +137,14 @@ void sha3_384_init(keccak_state_t *ctx);
 void sha3_384_final(keccak_state_t *ctx, void *digest);
 
 /**
- * @brief SHA-3-512 initialization.  Begins a SHA-3-256 operation.
+ * @brief SHA3-512 initialization.  Begins a SHA3-512 operation.
  *
  * @param[in] ctx  keccak_state_t handle to initialise
  */
 void sha3_512_init(keccak_state_t *ctx);
 
 /**
- * @brief SHA-3-512 finalization.  Pads the input data and exports the hash value
+ * @brief SHA3-512 finalization.  Pads the input data and exports the hash value
  *
  * @param[in,out] ctx    context handle to use
  * @param[out] digest    resulting digest, this is the hash of all the bytes
@@ -141,7 +154,7 @@ void sha3_512_final(keccak_state_t *ctx, void *digest);
 
 /**
  * @brief A wrapper function to simplify the generation of a hash, this is
- * usefull for generating SHA-3-256 from one buffer
+ * useful for generating SHA3-256 from one buffer
  *
  * @param[in] data     pointer to the buffer to generate hash from
  * @param[in] len      length of the buffer
@@ -152,7 +165,7 @@ void sha3_256(void *digest, const void *data, size_t len);
 
 /**
  * @brief A wrapper function to simplify the generation of a hash, this is
- * usefull for generating SHA-3-384 from one buffer
+ * useful for generating SHA3-384 from one buffer
  *
  * @param[in] data     pointer to the buffer to generate hash from
  * @param[in] len      length of the buffer
@@ -163,7 +176,7 @@ void sha3_384(void *digest, const void *data, size_t len);
 
 /**
  * @brief A wrapper function to simplify the generation of a hash, this is
- * usefull for generating SHA-3-512 from one buffer
+ * useful for generating SHA3-512 from one buffer
  *
  * @param[in] data     pointer to the buffer to generate hash from
  * @param[in] len      length of the buffer

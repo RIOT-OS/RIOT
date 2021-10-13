@@ -1,0 +1,53 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config HAS_PROTOCOL_COAP
+    bool
+    help
+        Specifies that CoAP support is present.
+
+menuconfig KCONFIG_COAP
+    bool "Configure CoAP generic options"
+    depends on HAS_PROTOCOL_COAP
+    help
+        Configure CoAP generic options via Kconfig.
+
+if KCONFIG_COAP
+
+config COAP_ACK_TIMEOUT
+    int "Timeout in seconds for a response to a confirmable request"
+    default 2
+    help
+        This value is for the response to the initial confirmable message. The
+        timeout doubles for subsequent retries. To avoid synchronization of
+        resends across hosts, the actual timeout is chosen randomly between
+        @ref CONFIG_COAP_ACK_TIMEOUT and
+        (@ref CONFIG_COAP_ACK_TIMEOUT * @ref CONFIG_COAP_RANDOM_FACTOR_1000 / 1000).
+        The default of 2 seconds is taken from
+        [RFC 7252, section 4.8](https://tools.ietf.org/html/rfc7252#section-4.8).
+
+config COAP_RANDOM_FACTOR_1000
+    int "Timeout random factor (multiplied by 1000)"
+    default 1500
+    help
+        This value is used to calculate the upper bound for the timeout. It
+        represents the `ACK_RANDOM_FACTOR`
+        ([RFC 7252, section 4.2](https://tools.ietf.org/html/rfc7252#section-4.2))
+        multiplied by 1000, to avoid floating point arithmetic.
+        The default that represents 1.5 seconds is taken from
+        The default of 2 seconds is taken from
+        [RFC 7252, section 4.8](https://tools.ietf.org/html/rfc7252#section-4.8).
+
+config COAP_MAX_RETRANSMIT
+    int "Maximum number of retransmissions"
+    default 4
+    help
+        Maximum number of retransmissions for a confirmable request. The default
+        of 4 retransmissions is taken from
+        [RFC 7252, section 4.8](https://tools.ietf.org/html/rfc7252#section-4.8).
+
+endif # KCONFIG_COAP

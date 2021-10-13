@@ -1,0 +1,17 @@
+PKG_SOURCE_DIR ?= $(PKGDIRBASE)/cryptoauthlib
+PKG_TESTINCLDIR = $(PKG_SOURCE_DIR)/test
+
+INCLUDES += -I$(PKG_SOURCE_DIR)
+INCLUDES += -I$(PKG_SOURCE_DIR)/lib
+INCLUDES += -I$(PKG_SOURCE_DIR)/app
+INCLUDES += -I$(RIOTPKG)/cryptoauthlib/include
+
+DIRS += $(RIOTPKG)/cryptoauthlib/contrib
+ARCHIVES += $(BINDIR)/cryptoauthlib.a
+
+ifneq (,$(filter cryptoauthlib_test,$(USEMODULE)))
+  INCLUDES += -I$(PKG_TESTINCLDIR)
+  INCLUDES += -I$(PKG_TESTINCLDIR)/jwt
+  INCLUDES += -I$(PKG_TESTINCLDIR)/tng
+  INCLUDES += -I$(PKG_TESTINCLDIR)/atcacert
+endif

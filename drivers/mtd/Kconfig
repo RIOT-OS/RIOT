@@ -1,0 +1,94 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config HAVE_MTD_AT24CXXX
+    bool
+    depends on MODULE_AT24CXXX
+    imply MODULE_MTD_AT24CXXX if MODULE_MTD
+    help
+        Indicates that a at24cxxx EEPROM MTD is present
+
+config HAVE_MTD_AT25XXX
+    bool
+    depends on MODULE_AT25XXX
+    imply MODULE_MTD_AT25XXX if MODULE_MTD
+    help
+        Indicates that a at25xxx SPI-EEPROM MTD is present
+
+config HAVE_MTD_NATIVE
+    bool
+    imply MODULE_MTD_NATIVE if MODULE_MTD
+    help
+        Indicates that a native MTD is present.
+
+config HAVE_MTD_SD_SCARD
+    bool
+    imply MODULE_MTD_SD_CARD if MODULE_MTD
+    help
+        Indicates that a sdcard MTD is present
+
+config HAVE_MTD_SPI_NOR
+    bool
+    imply MODULE_MTD_SPI_NOR if MODULE_MTD
+    help
+        Indicates that a spi-nor MTD is present
+
+config HAVE_MTD_SPI_MCI
+    bool
+    imply MODULE_MTD_MCI if MODULE_MTD
+    help
+        Indicates that a Multimedia Card Interface (MCI) MTD is present
+
+menuconfig MODULE_MTD
+    bool "Memory Technology Device interface (MTD)"
+    depends on TEST_KCONFIG
+
+if MODULE_MTD
+
+menu "MTD Interefaces"
+
+config MODULE_MTD_SPI_NOR
+    bool "MTD interface for SPI NOR Flash"
+    depends on HAS_PERIPH_SPI
+    select MODULE_PERIPH_SPI
+
+config MODULE_MTD_FLASHPAGE
+    bool "MTD interface for Flashpage"
+    depends on HAS_PERIPH_FLASHPAGE
+    depends on HAS_PERIPH_FLASHPAGE_PAGEWISE
+    select MODULE_PERIPH_FLASHPAGE
+    select MODULE_PERIPH_FLASHPAGE_PAGEWISE
+    help
+        Driver for internal flash devices implementing flashpage interface.
+
+config MODULE_MTD_NATIVE
+    bool "MTD native driver"
+    depends on NATIVE_OS_LINUX
+
+config MODULE_MTD_AT24CXXX
+    bool "MTD implementation for AT24CXXX"
+    depends on MODULE_AT24CXXX
+
+config MODULE_MTD_AT25XXX
+    bool "MTD implementation for AT25XXX"
+    depends on MODULE_AT25XXX
+
+config MODULE_MTD_MCI
+    bool "MTD interface for LPC23XX MCI"
+    depends on CPU_FAM_LPC23XX
+    select MODULE_MCI
+
+config MODULE_MTD_SDCARD
+    bool "MTD interface for SPI SD-Card"
+    depends on MODULE_SDCARD_SPI
+
+endmenu # MTD Interfacs
+
+config MODULE_MTD_WRITE_PAGE
+    bool "MTD write page API"
+
+endif

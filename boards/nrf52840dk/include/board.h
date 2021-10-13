@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Feie Universität Berlin
+ * Copyright (C) 2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_nrf52840dk nRF52840 DK
- * @ingroup     boards
- * @brief       Support for the nRF52840 DK
+ * @ingroup     boards_nrf52840dk
  * @{
  *
  * @file
@@ -23,6 +21,7 @@
 #define BOARD_H
 
 #include "board_common.h"
+#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,6 +59,28 @@ extern "C" {
 #define LED3_OFF            (LED_PORT->OUTSET = LED3_MASK)
 #define LED3_TOGGLE         (LED_PORT->OUT   ^= LED3_MASK)
 /** @} */
+
+/**
+ * @name SPI NOR flash hardware configuration
+ *
+ * A Macronix MX25R6435F is present on the board
+ * @{
+ */
+#define NRF52840DK_NOR_PAGE_SIZE          (256)
+#define NRF52840DK_NOR_PAGES_PER_SECTOR   (16)
+#define NRF52840DK_NOR_SECTOR_COUNT       (2048)
+#define NRF52840DK_NOR_FLAGS              (SPI_NOR_F_SECT_4K | SPI_NOR_F_SECT_32K)
+#define NRF52840DK_NOR_SPI_DEV            SPI_DEV(1)
+#define NRF52840DK_NOR_SPI_CLK            SPI_CLK_10MHZ
+#define NRF52840DK_NOR_SPI_CS             GPIO_PIN(0, 17)
+#define NRF52840DK_NOR_SPI_MODE           SPI_MODE_0
+/** @} */
+
+/** Default MTD device */
+#define MTD_0 mtd0
+
+/** mtd flash emulation device */
+extern mtd_dev_t *mtd0;
 
 /**
  * @name    Button pin configuration

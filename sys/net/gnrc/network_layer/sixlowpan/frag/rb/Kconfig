@@ -1,0 +1,42 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_RB
+    bool "Configure GNRC 6LoWPAN Reassembly buffer"
+    depends on USEMODULE_GNRC_SIXLOWPAN_FRAG_RB
+    help
+        Configure GNRC 6LoWPAN Reassembly buffer using Kconfig.
+
+if KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_RB
+
+config GNRC_SIXLOWPAN_FRAG_RBUF_SIZE
+    int "Size of the reassembly buffer"
+    default 4
+
+config GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US
+    int "Timeout for reassembly buffer entries in microseconds"
+    default 3000000
+
+config GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE
+    bool "Do not override oldest datagram when reassembly buffer is full"
+    help
+        When not set, it will cause the reassembly buffer to override the oldest
+        entry when a fragment for a new datagram is received. When set, only the
+        oldest entry that is older than @ref
+        CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US will be overwritten (they
+        will still timeout normally if reassembly buffer is not full).
+
+config GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER
+    int "Deletion timer for reassembly buffer entries in microseconds"
+    default 0
+    help
+        Time to pass between completion of a datagram and the deletion
+        of its reassembly buffer entry. If this value is 0, the entry
+        is dropped immediately. Use this value to prevent re-creation
+        of a reassembly buffer entry on late arriving link-layer
+        uplicates.
+
+endif # KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_RB

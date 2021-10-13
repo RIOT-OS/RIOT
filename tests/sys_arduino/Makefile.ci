@@ -1,0 +1,6 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    arduino-uno \
+    arduino-duemilanove \
+    arduino-nano \
+    nucleo-l011k4 \
+    #

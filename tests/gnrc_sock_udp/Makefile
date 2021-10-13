@@ -1,18 +1,31 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := chronos nucleo32-f031 nucleo32-f042 nucleo32-l031
+AUX_LOCAL ?= 1
+AUX_TIMESTAMP ?= 1
+AUX_RSSI ?= 1
+
+ifeq (1, $(AUX_LOCAL))
+  USEMODULE += sock_aux_local
+endif
+
+ifeq (1, $(AUX_TIMESTAMP))
+  USEMODULE += sock_aux_timestamp
+endif
+
+ifeq (1, $(AUX_RSSI))
+  USEMODULE += sock_aux_rssi
+endif
 
 USEMODULE += gnrc_sock_check_reuse
-USEMODULE += gnrc_sock_udp
+USEMODULE += sock_udp
 USEMODULE += gnrc_ipv6
 USEMODULE += ps
 
-CFLAGS += -DGNRC_PKTBUF_SIZE=400
 CFLAGS += -DTEST_SUITES
-
-TEST_ON_CI_WHITELIST += all
 
 include $(RIOTBASE)/Makefile.include
 
-test:
-	./tests/01-run.py
+# Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
+ifndef CONFIG_GNRC_PKTBUF_SIZE
+  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=400
+endif

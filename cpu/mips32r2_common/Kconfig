@@ -1,0 +1,38 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_ARCH_MIPS32R2
+    bool
+    select HAS_ARCH_32BIT
+    select HAS_ARCH_MIPS32R2
+    select HAS_NEWLIB
+    select HAS_CPP
+    select HAS_LIBSTDCPP
+    select HAS_PERIPH_PM
+    select MODULE_MALLOC_THREAD_SAFE if TEST_KCONFIG
+
+config CPU_CORE_M4K
+    bool
+    select CPU_ARCH_MIPS32R2
+
+config CPU_CORE_M5101
+    bool
+    select CPU_ARCH_MIPS32R2
+
+## Declaration of specific features
+config HAS_ARCH_MIPS32R2
+    bool
+    help
+        Indicates that the current architecture is 'mips32r2'.
+
+## Common CPU symbols
+config CPU_ARCH
+    default "mips32r2" if CPU_ARCH_MIPS32R2
+
+config CPU_CORE
+    default "m4k" if CPU_CORE_M4K
+    default "m5101" if CPU_CORE_M5101

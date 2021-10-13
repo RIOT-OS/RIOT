@@ -573,7 +573,7 @@ const char* const A[1000] = {"osteopathic"
 ,"culilawan"
 ,"trigonocephalous"
 ,"Musca"
-,"donnot"
+,"donot"
 ,"lobose"
 ,"Suevian"
 ,"Frenchwise"
@@ -1027,7 +1027,6 @@ const char* const B[10] = {"interbedded"
 ,"meeting"
 ,"amplifier"
 };
-
 
 #ifdef __cplusplus
 }

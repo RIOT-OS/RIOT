@@ -1,0 +1,6 @@
+# additional PCINTs for atmega2560
+ifneq (,$(filter atmega_pcint,$(USEMODULE)))
+  USEMODULE += atmega_pcint1 atmega_pcint2
+endif
+
+include $(RIOTCPU)/atmega_common/Makefile.dep

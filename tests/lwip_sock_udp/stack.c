@@ -11,17 +11,19 @@
  *
  * @file
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @}
  */
-
 
 #include "msg.h"
 #include "net/ethernet.h"
 #include "net/ipv6.h"
+#include "net/l2util.h"
 #include "net/netdev/eth.h"
 #include "net/netdev_test.h"
 #include "net/sock.h"
 #include "net/udp.h"
 #include "sched.h"
+#include "test_utils/expect.h"
 #include "xtimer.h"
 
 #include "lwip.h"
@@ -38,7 +40,7 @@
 #include "constants.h"
 #include "stack.h"
 
-#define _MSG_QUEUE_SIZE         (1)
+#define _MSG_QUEUE_SIZE         (4)
 #define _SEND_DONE              (0x92d7)
 #define _NETDEV_BUFFER_SIZE     (128)
 
@@ -50,17 +52,9 @@ static kernel_pid_t _check_pid = KERNEL_PID_UNDEF;
 static mutex_t _netdev_buffer_mutex = MUTEX_INIT;
 static uint8_t _netdev_buffer_size;
 
-static inline void _get_iid(uint8_t *iid)
-{
-    static const uint8_t _local_ip[] = _TEST_ADDR6_LOCAL;
-
-    memcpy(iid, &_local_ip[8], sizeof(uint64_t));
-    iid[0] ^= 0x2;
-}
-
 static int _get_max_pkt_size(netdev_t *dev, void *value, size_t max_len)
 {
-    return netdev_eth_get(dev, NETOPT_MAX_PACKET_SIZE, value, max_len);
+    return netdev_eth_get(dev, NETOPT_MAX_PDU_SIZE, value, max_len);
 }
 
 static int _get_src_len(netdev_t *dev, void *value, size_t max_len)
@@ -79,24 +73,13 @@ static int _get_src_len(netdev_t *dev, void *value, size_t max_len)
 
 static int _get_addr(netdev_t *dev, void *value, size_t max_len)
 {
-    uint8_t iid[ETHERNET_ADDR_LEN + 2];
-    uint8_t *addr = value;
+    static const uint8_t _local_ip[] = _TEST_ADDR6_LOCAL;
 
     (void)dev;
-    if (max_len < ETHERNET_ADDR_LEN) {
-        return -EOVERFLOW;
-    }
-
-    _get_iid(iid);
-
-    addr[0] = iid[0];
-    addr[1] = iid[1];
-    addr[2] = iid[2];
-    addr[3] = iid[5];
-    addr[4] = iid[6];
-    addr[5] = iid[7];
-
-    return ETHERNET_ADDR_LEN;
+    expect(max_len >= ETHERNET_ADDR_LEN);
+    return l2util_ipv6_iid_to_addr(NETDEV_TYPE_ETHERNET,
+                                   (eui64_t *)&_local_ip[8],
+                                   value);
 }
 
 static int _get_addr_len(netdev_t *dev, void *value, size_t max_len)
@@ -107,16 +90,6 @@ static int _get_addr_len(netdev_t *dev, void *value, size_t max_len)
 static int _get_device_type(netdev_t *dev, void *value, size_t max_len)
 {
     return netdev_eth_get(dev, NETOPT_DEVICE_TYPE, value, max_len);
-}
-
-static int _get_ipv6_iid(netdev_t *dev, void *value, size_t max_len)
-{
-    (void)dev;
-    if (max_len != sizeof(uint64_t)) {
-        return -EOVERFLOW;
-    }
-    _get_iid(value);
-    return sizeof(uint64_t);
 }
 
 static void _netdev_isr(netdev_t *dev)
@@ -167,13 +140,12 @@ static int _netdev_send(netdev_t *dev, const iolist_t *iolist)
 
 void _net_init(void)
 {
-    xtimer_init();
     msg_init_queue(_msg_queue, _MSG_QUEUE_SIZE);
-    _check_pid = sched_active_pid;
+    _check_pid = thread_getpid();
 
     netdev_test_setup(&netdev, NULL);
     netdev_test_set_get_cb(&netdev, NETOPT_SRC_LEN, _get_src_len);
-    netdev_test_set_get_cb(&netdev, NETOPT_MAX_PACKET_SIZE,
+    netdev_test_set_get_cb(&netdev, NETOPT_MAX_PDU_SIZE,
                             _get_max_pkt_size);
     netdev_test_set_get_cb(&netdev, NETOPT_ADDRESS, _get_addr);
     netdev_test_set_get_cb(&netdev, NETOPT_ADDR_LEN,
@@ -182,25 +154,30 @@ void _net_init(void)
                             _get_addr_len);
     netdev_test_set_get_cb(&netdev, NETOPT_DEVICE_TYPE,
                             _get_device_type);
-    netdev_test_set_get_cb(&netdev, NETOPT_IPV6_IID,
-                            _get_ipv6_iid);
     netdev_test_set_recv_cb(&netdev, _netdev_recv);
     netdev_test_set_isr_cb(&netdev, _netdev_isr);
     /* netdev needs to be set-up */
-    assert(netdev.netdev.driver);
+    expect(netdev.netdev.netdev.driver);
 #if LWIP_IPV4
     ip4_addr_t local4, mask4, gw4;
-    local4.addr = htonl(_TEST_ADDR4_LOCAL);
-    mask4.addr = htonl(_TEST_ADDR4_MASK);
-    gw4.addr = htonl(_TEST_ADDR4_GW);
+    local4.addr = _TEST_ADDR4_LOCAL;
+    mask4.addr = _TEST_ADDR4_MASK;
+    gw4.addr = _TEST_ADDR4_GW;
     netif_add(&netif, &local4, &mask4, &gw4, &netdev, lwip_netdev_init, tcpip_input);
 #else
     netif_add(&netif, &netdev, lwip_netdev_init, tcpip_input);
 #endif
 #if LWIP_IPV6
-    static const uint8_t local6[] = _TEST_ADDR6_LOCAL;
+    static const uint8_t local6_a[] = _TEST_ADDR6_LOCAL;
+    /* XXX need to copy into a stack variable. Otherwise, when just using
+     * `local6_a` this leads to weird alignment problems on some platforms with
+     * netif_add_ip6_address() below */
+    ip6_addr_t local6;
     s8_t idx;
-    netif_add_ip6_address(&netif, (ip6_addr_t *)&local6, &idx);
+
+    memcpy(&local6.addr, local6_a, sizeof(local6.addr));
+    ip6_addr_clear_zone(&local6);
+    netif_add_ip6_address(&netif, &local6, &idx);
     for (int i = 0; i <= idx; i++) {
         netif.ip6_addr_state[i] |= IP6_ADDR_VALID;
     }
@@ -223,8 +200,8 @@ void _prepare_send_checks(void)
 
     netdev_test_set_send_cb(&netdev, _netdev_send);
 #if LWIP_ARP
-    const ip4_addr_t remote4 = { .addr = htonl(_TEST_ADDR4_REMOTE) };
-    assert(ERR_OK == etharp_add_static_entry(&remote4, (struct eth_addr *)mac));
+    const ip4_addr_t remote4 = { .addr = _TEST_ADDR4_REMOTE };
+    expect(ERR_OK == etharp_add_static_entry(&remote4, (struct eth_addr *)mac));
 #endif
 #if LWIP_IPV6
     memset(destination_cache, 0,
@@ -235,7 +212,9 @@ void _prepare_send_checks(void)
         struct nd6_neighbor_cache_entry *nc = &neighbor_cache[i];
         if (nc->state == ND6_NO_ENTRY) {
             nc->state = ND6_REACHABLE;
-            memcpy(&nc->next_hop_address, remote6, sizeof(ip6_addr_t));
+            memcpy(&nc->next_hop_address.addr, remote6, sizeof(nc->next_hop_address.addr));
+            ip6_addr_assign_zone(&nc->next_hop_address,
+                                 IP6_UNICAST, &netif);
             memcpy(&nc->lladdr, mac, 6);
             nc->netif = &netif;
             nc->counter.reachable_time = UINT32_MAX;
@@ -258,15 +237,15 @@ bool _inject_4packet(uint32_t src, uint32_t dst, uint16_t src_port,
     const uint16_t udp_len = (uint16_t)(sizeof(udp_hdr_t) + data_len);
     (void)netif;
 
-    _get_addr((netdev_t *)&netdev, &eth_hdr->dst, sizeof(eth_hdr->dst));
+    _get_addr(&netdev.netdev.netdev, &eth_hdr->dst, sizeof(eth_hdr->dst));
     eth_hdr->type = byteorder_htons(ETHERTYPE_IPV4);
     IPH_VHL_SET(ip_hdr, 4, 5);
     IPH_TOS_SET(ip_hdr, 0);
     IPH_LEN_SET(ip_hdr, htons(sizeof(struct ip_hdr) + udp_len));
     IPH_TTL_SET(ip_hdr, 64);
     IPH_PROTO_SET(ip_hdr, PROTNUM_UDP);
-    ip_hdr->src.addr = htonl(src);
-    ip_hdr->dest.addr = htonl(dst);
+    ip_hdr->src.addr = src;
+    ip_hdr->dest.addr = dst;
     IPH_CHKSUM_SET(ip_hdr, 0);
     IPH_CHKSUM_SET(ip_hdr, inet_chksum(ip_hdr, sizeof(struct ip_hdr)));
 
@@ -280,7 +259,7 @@ bool _inject_4packet(uint32_t src, uint32_t dst, uint16_t src_port,
     _netdev_buffer_size = sizeof(ethernet_hdr_t) + sizeof(struct ip_hdr) +
                           sizeof(udp_hdr_t) + data_len;
     mutex_unlock(&_netdev_buffer_mutex);
-    ((netdev_t *)&netdev)->event_callback((netdev_t *)&netdev, NETDEV_EVENT_ISR);
+    netdev_trigger_event_isr(&netdev.netdev.netdev);
 
     return true;
 #else
@@ -304,7 +283,7 @@ bool _inject_6packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
     uint16_t csum = 0;
     (void)netif;
 
-    _get_addr((netdev_t *)&netdev, &eth_hdr->dst, sizeof(eth_hdr->dst));
+    _get_addr(&netdev.netdev.netdev, &eth_hdr->dst, sizeof(eth_hdr->dst));
     eth_hdr->type = byteorder_htons(ETHERTYPE_IPV6);
     ipv6_hdr_set_version(ipv6_hdr);
     ipv6_hdr->len = byteorder_htons(udp_len);
@@ -329,7 +308,7 @@ bool _inject_6packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
     _netdev_buffer_size = sizeof(ethernet_hdr_t) + sizeof(ipv6_hdr_t) +
                           sizeof(udp_hdr_t) + data_len;
     mutex_unlock(&_netdev_buffer_mutex);
-    ((netdev_t *)&netdev)->event_callback((netdev_t *)&netdev, NETDEV_EVENT_ISR);
+    netdev_trigger_event_isr(&netdev.netdev.netdev);
 
     return true;
 #else
@@ -350,7 +329,7 @@ bool _check_4packet(uint32_t src, uint32_t dst, uint16_t src_port,
                     uint16_t netif, bool random_src_port)
 {
 #if LWIP_IPV4
-    msg_t msg;
+    msg_t msg = { .content = { .value = 0 } };
 
     (void)netif;
     while (data_len != (msg.content.value - sizeof(struct ip_hdr))) {
@@ -384,7 +363,7 @@ bool _check_6packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
                     bool random_src_port)
 {
 #if LWIP_IPV6
-    msg_t msg;
+    msg_t msg = { .content = { .value = 0 } };
 
     (void)netif;
     while (data_len != (msg.content.value - sizeof(ipv6_hdr_t))) {
@@ -412,5 +391,3 @@ bool _check_6packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
     return false;
 #endif
 }
-
-/** @} */

@@ -1,0 +1,18 @@
+# by default, we use BOSSA to flash this board to take into account the
+# pre-flashed Arduino bootloader
+PROGRAMMER ?= bossa
+PROGRAMMERS_SUPPORTED += bossa
+
+# in case J-Link is attached to SWD pins, use a plain CPU memory model
+JLINK_DEVICE = atsamd21
+
+ifeq ($(PROGRAMMER),bossa)
+  # ROM_OFFSET skips the space taken by the pre-flashed Arduino bootloader.
+  ROM_OFFSET ?= 0x2000
+endif
+
+# Include all definitions for flashing with bossa over USB
+include $(RIOTBOARD)/common/samdx1-arduino-bootloader/Makefile.include
+
+# Include handling of serial and non-bossa programmers (if selected by user)
+include $(RIOTMAKE)/boards/sam0.inc.mk

@@ -19,7 +19,6 @@
  * @}
  */
 
-#include <assert.h>
 #include <errno.h>
 
 #include "mutex.h"
@@ -33,12 +32,7 @@
 #include "net/eui64.h"
 #include "net/ethernet.h"
 
-#ifdef MODULE_NETSTATS_L2
-#include <string.h>
-#include "net/netstats.h"
-#endif
-
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define SPI_CLK                 SPI_CLK_1MHZ
@@ -55,7 +49,7 @@
 #define TX_BUFFER_END           (RX_BUFFER_START)
 #define TX_BUFFER_START         (TX_BUFFER_END - TX_BUFFER_LEN)
 
-static void cmd(encx24j600_t *dev, char cmd);
+static void cmd(encx24j600_t *dev, uint8_t cmd);
 static void reg_set(encx24j600_t *dev, uint8_t reg, uint16_t value);
 static uint16_t reg_get(encx24j600_t *dev, uint8_t reg);
 static void reg_clear_bits(encx24j600_t *dev, uint8_t reg, uint16_t mask);
@@ -98,13 +92,13 @@ void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params)
 
 static void encx24j600_isr(void *arg)
 {
-    encx24j600_t *dev = (encx24j600_t *) arg;
+    encx24j600_t *dev = arg;
 
     /* disable interrupt line */
     gpio_irq_disable(dev->int_pin);
 
     /* call netdev hook */
-    dev->netdev.event_callback((netdev_t*) dev, NETDEV_EVENT_ISR);
+    netdev_trigger_event_isr(&dev->netdev);
 }
 
 static void _isr(netdev_t *netdev)
@@ -168,8 +162,8 @@ static void phy_reg_set(encx24j600_t *dev, uint8_t reg, uint16_t value) {
     reg_set(dev, ENC_MIWR, value);
 }
 
-static void cmd(encx24j600_t *dev, char cmd) {
-    spi_transfer_byte(dev->spi, dev->cs, false, (uint8_t)cmd);
+static void cmd(encx24j600_t *dev, uint8_t cmd) {
+    spi_transfer_byte(dev->spi, dev->cs, false, cmd);
 }
 
 static void cmdn(encx24j600_t *dev, uint8_t cmd, char *out, char *in, int len) {
@@ -209,6 +203,10 @@ static void sram_op(encx24j600_t *dev, uint16_t cmd, uint16_t addr, char *ptr, i
     uint16_t reg;
     char* in = NULL;
     char* out = NULL;
+
+    if (!len) {
+        return;
+    }
 
     /* determine pointer addr
      *
@@ -285,9 +283,6 @@ static int _init(netdev_t *encdev)
 
     unlock(dev);
 
-#ifdef MODULE_NETSTATS_L2
-    memset(&encdev->stats, 0, sizeof(netstats_t));
-#endif
     return 0;
 }
 
@@ -316,10 +311,6 @@ static int _send(netdev_t *netdev, const iolist_t *iolist) {
     /* wait for sending to complete */
     /* (not sure if it is needed, keeping the line uncommented) */
     /*while ((reg_get(dev, ENC_ECON1) & ENC_TXRTS)) {}*/
-
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += len;
-#endif
 
     unlock(dev);
 
@@ -360,20 +351,18 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     /* hdr.frame_len given by device contains 4 bytes checksum */
     size_t payload_len = hdr.frame_len - 4;
 
-
     if (buf) {
         if (payload_len > len) {
             /* payload exceeds buffer size */
             unlock(dev);
             return -ENOBUFS;
         }
-#ifdef MODULE_NETSTATS_L2
-        netdev->stats.rx_count++;
-        netdev->stats.rx_bytes += payload_len;
-#endif
         /* read packet (without 4 bytes checksum) */
         sram_op(dev, ENC_RRXDATA, 0xFFFF, buf, payload_len);
+    }
 
+    /* Frame was retrieved or drop was requested --> remove it from buffer */
+    if (buf || (len > 0)) {
         /* decrement available packet count */
         cmd(dev, ENC_SETPKTDEC);
 
@@ -401,14 +390,19 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
                 res = ETHERNET_ADDR_LEN;
             }
             break;
-        case NETOPT_LINK_CONNECTED:
-            if (reg_get((encx24j600_t *)dev, ENC_ESTAT) & ENC_PHYLNK) {
-                *((netopt_enable_t *)value) = NETOPT_ENABLE;
+        case NETOPT_LINK:
+            {
+                encx24j600_t * encdev = (encx24j600_t *) dev;
+                lock(encdev);
+                if (reg_get(encdev, ENC_ESTAT) & ENC_PHYLNK) {
+                    *((netopt_enable_t *)value) = NETOPT_ENABLE;
+                }
+                else {
+                    *((netopt_enable_t *)value) = NETOPT_DISABLE;
+                }
+                unlock(encdev);
+                return sizeof(netopt_enable_t);
             }
-            else {
-                *((netopt_enable_t *)value) = NETOPT_DISABLE;
-            }
-            return sizeof(netopt_enable_t);
         default:
             res = netdev_eth_get(dev, opt, value, max_len);
             break;

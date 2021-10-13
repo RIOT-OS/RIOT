@@ -49,9 +49,9 @@ int main(void)
     while (loop < LOOPS) {
         puts("[INFO] Displaying 'THIS IS RIOT'");
         dsp0401_display_text(&dev, (char*)"THIS");
-        xtimer_usleep(WORD_DELAY * US_PER_MS);
+        xtimer_msleep(WORD_DELAY);
         dsp0401_display_text(&dev, (char*)" IS ");
-        xtimer_usleep(WORD_DELAY * US_PER_MS);
+        xtimer_msleep(WORD_DELAY);
         dsp0401_display_text(&dev, (char*)"RIOT");
         xtimer_sleep(TEST_DELAY);
 

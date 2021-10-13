@@ -19,7 +19,6 @@
 #ifndef L3G4200D_REGS_H
 #define L3G4200D_REGS_H
 
-
 #ifdef __cplusplus
  extern "C" {
 #endif

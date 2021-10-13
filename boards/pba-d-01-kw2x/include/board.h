@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_pba-d-01-kw2x phyWAVE-KW22 Board
- * @ingroup     boards
- * @brief       Support for the phyWAVE evaluation board
+ * @ingroup     boards_pba-d-01-kw2x
  * @{
  *
  * @file
@@ -85,6 +83,14 @@ extern "C"
 #define KW2XRF_PARAM_CS            GPIO_PIN(KW2XDRF_PORT, KW2XDRF_PCS0_PIN)
 #define KW2XRF_PARAM_INT           GPIO_PIN(KW2XDRF_PORT, KW2XDRF_IRQ_PIN)
 #define KW2XRF_SHARED_SPI          (0)
+/** @}*/
+
+/**
+ * @name TMP006 configuration
+ *
+ * @{
+ */
+#define TMP00X_PARAM_ADDR          (0x41)
 /** @}*/
 
 /**

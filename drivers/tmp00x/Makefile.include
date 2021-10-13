@@ -1,0 +1,6 @@
+#include variants of tmp00x drivers as pseudo modules
+PSEUDOMODULES += tmp006
+PSEUDOMODULES += tmp007
+
+USEMODULE_INCLUDES_tmp00x := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_tmp00x)

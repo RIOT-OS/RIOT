@@ -25,8 +25,9 @@
 #include "kw2xrf_reg.h"
 #include "kw2xrf_getset.h"
 #include "kw2xrf_intern.h"
+#include "byteorder.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define KW2XRF_LQI_HW_MAX           230      /**< LQI Saturation Level */
@@ -134,8 +135,6 @@ int kw2xrf_set_channel(kw2xrf_t *dev, uint8_t channel)
     kw2xrf_write_dreg(dev, MKW2XDM_PLL_INT0, MKW2XDM_PLL_INT0_VAL(pll_int_lt[tmp]));
     kw2xrf_write_dreg(dev, MKW2XDM_PLL_FRAC0_LSB, (uint8_t)pll_frac_lt[tmp]);
     kw2xrf_write_dreg(dev, MKW2XDM_PLL_FRAC0_MSB, (uint8_t)(pll_frac_lt[tmp] >> 8));
-
-    dev->netdev.chan = channel;
 
     if (old_seq) {
         kw2xrf_set_sequence(dev, old_seq);
@@ -255,14 +254,11 @@ void kw2xrf_set_sequence(kw2xrf_t *dev, kw2xrf_physeq_t seq)
 
 void kw2xrf_set_pan(kw2xrf_t *dev, uint16_t pan)
 {
-    dev->netdev.pan = pan;
-
     uint8_t val_ar[2];
     val_ar[1] = (pan >> 8);
     val_ar[0] = (uint8_t)pan;
     kw2xrf_write_iregs(dev, MKW2XDMI_MACPANID0_LSB, val_ar, 2);
     LOG_DEBUG("[kw2xrf] set pan to: 0x%x\n", pan);
-    dev->netdev.pan = pan;
 }
 
 void kw2xrf_set_addr_short(kw2xrf_t *dev, uint16_t addr)
@@ -270,12 +266,10 @@ void kw2xrf_set_addr_short(kw2xrf_t *dev, uint16_t addr)
     uint8_t val_ar[2];
     val_ar[0] = (addr >> 8);
     val_ar[1] = (uint8_t)addr;
-    dev->netdev.short_addr[0] = val_ar[1];
-    dev->netdev.short_addr[1] = val_ar[0];
 #ifdef MODULE_SIXLOWPAN
     /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
      * 0 for unicast addresses */
-    dev->netdev.short_addr[1] &= 0x7F;
+    val_ar[0] &= 0x7F;
 #endif
     kw2xrf_write_iregs(dev, MKW2XDMI_MACSHORTADDRS0_LSB, val_ar,
                        IEEE802154_SHORT_ADDRESS_LEN);
@@ -287,7 +281,6 @@ void kw2xrf_set_addr_long(kw2xrf_t *dev, uint64_t addr)
     uint8_t *ap = (uint8_t *)(&tmp);
 
     for (unsigned i = 0; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
-        dev->netdev.long_addr[i] = (uint8_t)(addr >> (i * 8));
         ap[i] = (addr >> ((IEEE802154_LONG_ADDRESS_LEN - 1 - i) * 8));
     }
 
@@ -297,7 +290,11 @@ void kw2xrf_set_addr_long(kw2xrf_t *dev, uint64_t addr)
 
 uint16_t kw2xrf_get_addr_short(kw2xrf_t *dev)
 {
-    return (dev->netdev.short_addr[0] << 8) | dev->netdev.short_addr[1];
+    uint16_t addr;
+    uint8_t *ap = (uint8_t *)(&addr);
+    kw2xrf_read_iregs(dev, MKW2XDMI_MACSHORTADDRS0_LSB, ap,
+                      IEEE802154_SHORT_ADDRESS_LEN);
+    return byteorder_swaps(addr);
 }
 
 uint64_t kw2xrf_get_addr_long(kw2xrf_t *dev)
@@ -308,7 +305,8 @@ uint64_t kw2xrf_get_addr_long(kw2xrf_t *dev)
     kw2xrf_read_iregs(dev, MKW2XDMI_MACLONGADDRS0_0, ap,
                       IEEE802154_LONG_ADDRESS_LEN);
 
-    return addr;
+    /* Address is always read as little endian and API specifies big endian */
+    return byteorder_swapll(addr);
 }
 
 int8_t kw2xrf_get_cca_threshold(kw2xrf_t *dev)
@@ -400,22 +398,6 @@ void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state)
                     MKW2XDM_PHY_CTRL1_RXACKRQD);
                 break;
 
-            case KW2XRF_OPT_TELL_RX_START:
-                kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2,
-                    MKW2XDM_PHY_CTRL2_RX_WMRK_MSK);
-                break;
-
-            case KW2XRF_OPT_TELL_RX_END:
-                kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2,
-                    MKW2XDM_PHY_CTRL2_RXMSK);
-                break;
-
-            case KW2XRF_OPT_TELL_TX_END:
-                kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2,
-                    MKW2XDM_PHY_CTRL2_TXMSK);
-                break;
-
-            case KW2XRF_OPT_TELL_TX_START:
             default:
                 /* do nothing */
                 break;
@@ -455,23 +437,6 @@ void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state)
                     MKW2XDM_PHY_CTRL1_RXACKRQD);
                 break;
 
-            case KW2XRF_OPT_TELL_RX_START:
-                kw2xrf_set_dreg_bit(dev, MKW2XDM_PHY_CTRL2,
-                    MKW2XDM_PHY_CTRL2_RX_WMRK_MSK);
-                break;
-
-            case KW2XRF_OPT_TELL_RX_END:
-                kw2xrf_set_dreg_bit(dev, MKW2XDM_PHY_CTRL2,
-                    MKW2XDM_PHY_CTRL2_RXMSK);
-                break;
-
-            case KW2XRF_OPT_TELL_TX_END:
-                kw2xrf_set_dreg_bit(dev, MKW2XDM_PHY_CTRL2,
-                    MKW2XDM_PHY_CTRL2_TXMSK);
-                break;
-
-
-            case KW2XRF_OPT_TELL_TX_START:
             default:
                 /* do nothing */
                 break;

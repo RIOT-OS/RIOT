@@ -1,0 +1,2 @@
+INCLUDES += -I$(RIOTPKG)/nanocbor/include
+INCLUDES += -I$(PKGDIRBASE)/nanocbor/include

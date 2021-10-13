@@ -1,0 +1,25 @@
+From fe110d931bfa6c2b02cb99293d59dc1daee4e00a Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 14 Aug 2020 13:38:05 +0200
+Subject: [PATCH 1/5] uwb_dw1000/include/dw1000/dw1000_dev: add linked list
+ next ptr
+
+---
+ hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_dev.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_dev.h b/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_dev.h
+index aec0bec..2dcd7f8 100644
+--- a/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_dev.h
++++ b/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_dev.h
+@@ -204,6 +204,7 @@ typedef struct _dw1000_dev_instance_t{
+     /* To allow translation from ticks to usecs in gdb during backtrace*/
+     uint32_t bt_ticks2usec;
+ #endif
++    struct _dw1000_dev_instance_t* next;
+ } dw1000_dev_instance_t;
+ 
+ //! SPI and other init parameters
+-- 
+2.28.0
+

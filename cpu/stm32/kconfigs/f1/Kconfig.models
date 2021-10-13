@@ -1,0 +1,490 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU models
+config CPU_MODEL_STM32F100C4
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F100C6
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F100C8
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F100CB
+    bool
+    select CPU_LINE_STM32F100XB
+
+config CPU_MODEL_STM32F100R4
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F100R6
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F100R8
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F100RB
+    bool
+    select CPU_LINE_STM32F100XB
+
+config CPU_MODEL_STM32F100RC
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F100RD
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F100RE
+    bool
+    select CPU_LINE_STM32F100XE
+
+config CPU_MODEL_STM32F100V8
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F100VB
+    bool
+    select CPU_LINE_STM32F100XB
+
+config CPU_MODEL_STM32F100VC
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F100VD
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F100VE
+    bool
+    select CPU_LINE_STM32F100XE
+
+config CPU_MODEL_STM32F100ZC
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F100ZD
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F100ZE
+    bool
+    select CPU_LINE_STM32F100XE
+
+config CPU_MODEL_STM32F101C4
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F101C6
+    bool
+    select CPU_LINE_STM32F101X6
+
+config CPU_MODEL_STM32F101C8
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F101CB
+    bool
+    select CPU_LINE_STM32F101XB
+
+config CPU_MODEL_STM32F101R4
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F101R6
+    bool
+    select CPU_LINE_STM32F101X6
+
+config CPU_MODEL_STM32F101R8
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F101RB
+    bool
+    select CPU_LINE_STM32F101XB
+
+config CPU_MODEL_STM32F101RC
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F101RD
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F101RE
+    bool
+    select CPU_LINE_STM32F101XE
+
+config CPU_MODEL_STM32F101RF
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F101RG
+    bool
+    select CPU_LINE_STM32F101XG
+
+config CPU_MODEL_STM32F101T4
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F101T6
+    bool
+    select CPU_LINE_STM32F101X6
+
+config CPU_MODEL_STM32F101T8
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F101TB
+    bool
+    select CPU_LINE_STM32F101XB
+
+config CPU_MODEL_STM32F101V8
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F101VB
+    bool
+    select CPU_LINE_STM32F101XB
+
+config CPU_MODEL_STM32F101VC
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F101VD
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F101VE
+    bool
+    select CPU_LINE_STM32F101XE
+
+config CPU_MODEL_STM32F101VF
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F101VG
+    bool
+    select CPU_LINE_STM32F101XG
+
+config CPU_MODEL_STM32F101ZC
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F101ZD
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F101ZE
+    bool
+    select CPU_LINE_STM32F101XE
+
+config CPU_MODEL_STM32F101ZF
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F101ZG
+    bool
+    select CPU_LINE_STM32F101XG
+
+config CPU_MODEL_STM32F102C4
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F102C6
+    bool
+    select CPU_LINE_STM32F102X6
+
+config CPU_MODEL_STM32F102C8
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F102CB
+    bool
+    select CPU_LINE_STM32F102XB
+
+config CPU_MODEL_STM32F102R4
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F102R6
+    bool
+    select CPU_LINE_STM32F102X6
+
+config CPU_MODEL_STM32F102R8
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F102RB
+    bool
+    select CPU_LINE_STM32F102XB
+
+config CPU_MODEL_STM32F103C4
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103C6
+    bool
+    select CPU_LINE_STM32F103X6
+
+config CPU_MODEL_STM32F103C8
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103CB
+    bool
+    select CPU_LINE_STM32F103XB
+
+config CPU_MODEL_STM32F103R4
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103R6
+    bool
+    select CPU_LINE_STM32F103X6
+
+config CPU_MODEL_STM32F103R8
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103RB
+    bool
+    select CPU_LINE_STM32F103XB
+
+config CPU_MODEL_STM32F103RC
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103RD
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103RE
+    bool
+    select CPU_LINE_STM32F103XE
+
+config CPU_MODEL_STM32F103RF
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103RG
+    bool
+    select CPU_LINE_STM32F103XG
+
+config CPU_MODEL_STM32F103T4
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103T6
+    bool
+    select CPU_LINE_STM32F103X6
+
+config CPU_MODEL_STM32F103T8
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103TB
+    bool
+    select CPU_LINE_STM32F103XB
+
+config CPU_MODEL_STM32F103V8
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103VB
+    bool
+    select CPU_LINE_STM32F103XB
+
+config CPU_MODEL_STM32F103VC
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103VD
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103VE
+    bool
+    select CPU_LINE_STM32F103XE
+
+config CPU_MODEL_STM32F103VF
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103VG
+    bool
+    select CPU_LINE_STM32F103XG
+
+config CPU_MODEL_STM32F103ZC
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103ZD
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103ZE
+    bool
+    select CPU_LINE_STM32F103XE
+
+config CPU_MODEL_STM32F103ZF
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103ZG
+    bool
+    select CPU_LINE_STM32F103XG
+
+config CPU_MODEL_STM32F105R8
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F105RB
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F105RC
+    bool
+    select CPU_LINE_STM32F105XC
+
+config CPU_MODEL_STM32F105V8
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F105VB
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F105VC
+    bool
+    select CPU_LINE_STM32F105XC
+
+config CPU_MODEL_STM32F107RB
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F107RC
+    bool
+    select CPU_LINE_STM32F107XC
+
+config CPU_MODEL_STM32F107VB
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F107VC
+    bool
+    select CPU_LINE_STM32F107XC
+
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32f100c4" if CPU_MODEL_STM32F100C4
+    default "stm32f100c6" if CPU_MODEL_STM32F100C6
+    default "stm32f100c8" if CPU_MODEL_STM32F100C8
+    default "stm32f100cb" if CPU_MODEL_STM32F100CB
+    default "stm32f100r4" if CPU_MODEL_STM32F100R4
+    default "stm32f100r6" if CPU_MODEL_STM32F100R6
+    default "stm32f100r8" if CPU_MODEL_STM32F100R8
+    default "stm32f100rb" if CPU_MODEL_STM32F100RB
+    default "stm32f100rc" if CPU_MODEL_STM32F100RC
+    default "stm32f100rd" if CPU_MODEL_STM32F100RD
+    default "stm32f100re" if CPU_MODEL_STM32F100RE
+    default "stm32f100v8" if CPU_MODEL_STM32F100V8
+    default "stm32f100vb" if CPU_MODEL_STM32F100VB
+    default "stm32f100vc" if CPU_MODEL_STM32F100VC
+    default "stm32f100vd" if CPU_MODEL_STM32F100VD
+    default "stm32f100ve" if CPU_MODEL_STM32F100VE
+    default "stm32f100zc" if CPU_MODEL_STM32F100ZC
+    default "stm32f100zd" if CPU_MODEL_STM32F100ZD
+    default "stm32f100ze" if CPU_MODEL_STM32F100ZE
+    default "stm32f101c4" if CPU_MODEL_STM32F101C4
+    default "stm32f101c6" if CPU_MODEL_STM32F101C6
+    default "stm32f101c8" if CPU_MODEL_STM32F101C8
+    default "stm32f101cb" if CPU_MODEL_STM32F101CB
+    default "stm32f101r4" if CPU_MODEL_STM32F101R4
+    default "stm32f101r6" if CPU_MODEL_STM32F101R6
+    default "stm32f101r8" if CPU_MODEL_STM32F101R8
+    default "stm32f101rb" if CPU_MODEL_STM32F101RB
+    default "stm32f101rc" if CPU_MODEL_STM32F101RC
+    default "stm32f101rd" if CPU_MODEL_STM32F101RD
+    default "stm32f101re" if CPU_MODEL_STM32F101RE
+    default "stm32f101rf" if CPU_MODEL_STM32F101RF
+    default "stm32f101rg" if CPU_MODEL_STM32F101RG
+    default "stm32f101t4" if CPU_MODEL_STM32F101T4
+    default "stm32f101t6" if CPU_MODEL_STM32F101T6
+    default "stm32f101t8" if CPU_MODEL_STM32F101T8
+    default "stm32f101tb" if CPU_MODEL_STM32F101TB
+    default "stm32f101v8" if CPU_MODEL_STM32F101V8
+    default "stm32f101vb" if CPU_MODEL_STM32F101VB
+    default "stm32f101vc" if CPU_MODEL_STM32F101VC
+    default "stm32f101vd" if CPU_MODEL_STM32F101VD
+    default "stm32f101ve" if CPU_MODEL_STM32F101VE
+    default "stm32f101vf" if CPU_MODEL_STM32F101VF
+    default "stm32f101vg" if CPU_MODEL_STM32F101VG
+    default "stm32f101zc" if CPU_MODEL_STM32F101ZC
+    default "stm32f101zd" if CPU_MODEL_STM32F101ZD
+    default "stm32f101ze" if CPU_MODEL_STM32F101ZE
+    default "stm32f101zf" if CPU_MODEL_STM32F101ZF
+    default "stm32f101zg" if CPU_MODEL_STM32F101ZG
+    default "stm32f102c4" if CPU_MODEL_STM32F102C4
+    default "stm32f102c6" if CPU_MODEL_STM32F102C6
+    default "stm32f102c8" if CPU_MODEL_STM32F102C8
+    default "stm32f102cb" if CPU_MODEL_STM32F102CB
+    default "stm32f102r4" if CPU_MODEL_STM32F102R4
+    default "stm32f102r6" if CPU_MODEL_STM32F102R6
+    default "stm32f102r8" if CPU_MODEL_STM32F102R8
+    default "stm32f102rb" if CPU_MODEL_STM32F102RB
+    default "stm32f103c4" if CPU_MODEL_STM32F103C4
+    default "stm32f103c6" if CPU_MODEL_STM32F103C6
+    default "stm32f103c8" if CPU_MODEL_STM32F103C8
+    default "stm32f103cb" if CPU_MODEL_STM32F103CB
+    default "stm32f103r4" if CPU_MODEL_STM32F103R4
+    default "stm32f103r6" if CPU_MODEL_STM32F103R6
+    default "stm32f103r8" if CPU_MODEL_STM32F103R8
+    default "stm32f103rb" if CPU_MODEL_STM32F103RB
+    default "stm32f103rc" if CPU_MODEL_STM32F103RC
+    default "stm32f103rd" if CPU_MODEL_STM32F103RD
+    default "stm32f103re" if CPU_MODEL_STM32F103RE
+    default "stm32f103rf" if CPU_MODEL_STM32F103RF
+    default "stm32f103rg" if CPU_MODEL_STM32F103RG
+    default "stm32f103t4" if CPU_MODEL_STM32F103T4
+    default "stm32f103t6" if CPU_MODEL_STM32F103T6
+    default "stm32f103t8" if CPU_MODEL_STM32F103T8
+    default "stm32f103tb" if CPU_MODEL_STM32F103TB
+    default "stm32f103v8" if CPU_MODEL_STM32F103V8
+    default "stm32f103vb" if CPU_MODEL_STM32F103VB
+    default "stm32f103vc" if CPU_MODEL_STM32F103VC
+    default "stm32f103vd" if CPU_MODEL_STM32F103VD
+    default "stm32f103ve" if CPU_MODEL_STM32F103VE
+    default "stm32f103vf" if CPU_MODEL_STM32F103VF
+    default "stm32f103vg" if CPU_MODEL_STM32F103VG
+    default "stm32f103zc" if CPU_MODEL_STM32F103ZC
+    default "stm32f103zd" if CPU_MODEL_STM32F103ZD
+    default "stm32f103ze" if CPU_MODEL_STM32F103ZE
+    default "stm32f103zf" if CPU_MODEL_STM32F103ZF
+    default "stm32f103zg" if CPU_MODEL_STM32F103ZG
+    default "stm32f105r8" if CPU_MODEL_STM32F105R8
+    default "stm32f105rb" if CPU_MODEL_STM32F105RB
+    default "stm32f105rc" if CPU_MODEL_STM32F105RC
+    default "stm32f105v8" if CPU_MODEL_STM32F105V8
+    default "stm32f105vb" if CPU_MODEL_STM32F105VB
+    default "stm32f105vc" if CPU_MODEL_STM32F105VC
+    default "stm32f107rb" if CPU_MODEL_STM32F107RB
+    default "stm32f107rc" if CPU_MODEL_STM32F107RC
+    default "stm32f107vb" if CPU_MODEL_STM32F107VB
+    default "stm32f107vc" if CPU_MODEL_STM32F107VC

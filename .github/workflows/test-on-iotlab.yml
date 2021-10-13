@@ -1,0 +1,137 @@
+name: test-on-iotlab
+
+# Run 'compile_and_test_for_board.py' on IoT-LAB boards.
+#
+# This workflow will launch all tests on a list of IoT-LAB boards.
+#
+# This workflow is only run periodically on master with a cron and on new
+# pushed release candidates tags.
+
+on:
+  # Schedule weekly runs on Monday at 00:00 on master
+  schedule:
+    - cron: '00 0 * * 1'
+  push:
+    # Run on all new releases and release candidates tags
+    tags:
+      - '[0-9][0-9][0-9][0-9].[0-9][0-9]-RC[0-9]*'
+      - '[0-9][0-9][0-9][0-9].[0-9][0-9]'
+      - '[0-9][0-9][0-9][0-9].[0-9][0-9].*'
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      riot_version:
+        description: 'RIOT version to checkout'
+        required: true
+        default: 'master'
+
+jobs:
+  # Runs all tests on IoT-LAB boards
+  compile_and_test_for_board:
+    strategy:
+      max-parallel: 8
+      fail-fast: false
+      matrix:
+        boards:
+          - riot: iotlab-m3
+            iotlab:
+              archi: m3:at86rf231
+              site: saclay
+          - riot: nrf51dk
+            iotlab:
+              archi: nrf51dk:ble
+              site: saclay
+          - riot: nrf52dk
+            iotlab:
+              archi: nrf52dk:ble
+              site: saclay
+          - riot: nrf52840dk
+            iotlab:
+              archi: nrf52840dk:multi
+              site: saclay
+          - riot: nrf52832-mdk
+            iotlab:
+              archi: nrf52832mdk:ble
+              site: saclay
+          - riot: samr21-xpro
+            iotlab:
+              archi: samr21:at86rf233
+              site: saclay
+          - riot: b-l072z-lrwan1
+            iotlab:
+              archi: st-lrwan1:sx1276
+              site: saclay
+          - riot: b-l475e-iot01a
+            iotlab:
+              archi: st-iotnode:multi
+              site: saclay
+    runs-on: ubuntu-latest
+    name: ${{ matrix.boards.riot }}
+    env:
+      IOTLAB_NODE: auto
+      BUILD_IN_DOCKER: 1
+      # Force .bin files generation because these files are used to flash on IoT-LAB and
+      # because compile_and_test_for_board forces RIOT_CI_BUILD which skip .bin
+      # files generation
+      DOCKER_ENVIRONMENT_CMDLINE: -e BUILD_FILES=\$$\(BINFILE\)
+      COMPILE_AND_TEST_FOR_BOARD: ./dist/tools/compile_and_test_for_board/compile_and_test_for_board.py
+      COMPILE_AND_TEST_ARGS: --with-test-only --jobs=2 --report-xml
+      # Exclude applications that are expected to fail or cannot run on iotlab
+      # - tests/periph_timer_short_relative_set is expected to fail
+      # - tests/riotboot requires the riotboot feature and provides a test
+      #   but flashing at a specific offset is not (yet) supported on IoT-LAB
+      #   so it will always fail because of that limitation
+      APPLICATIONS_EXCLUDE: tests/periph_timer_short_relative_set tests/riotboot
+      # Increase tolerance error with `tests/periph_timer_periodic` because
+      # of timing issues with the test script when running in the github
+      # actions environment
+      TEST_PERIPH_TIMER_PERIODIC_PRECISION: 0.30
+    steps:
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install iotlabcli pexpect riotctrl[rapidjson] junit-xml
+      - name: Configure credentials
+        run: echo '${{ secrets.IOTLABRC }}' > ~/.iotlabrc
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.4.1
+        with:
+          ssh-private-key: ${{ secrets.IOTLAB_PRIVATE_KEY }}
+      - name: Fetch host key from IoT-LAB ${{ matrix.boards.iotlab.site }} site
+        run: |
+          IOTLAB_USER=$(cat ~/.iotlabrc | cut -f1 -d:)
+          ssh -oStrictHostKeyChecking=accept-new \
+          ${IOTLAB_USER}@${{ matrix.boards.iotlab.site }}.iot-lab.info exit
+      - name: Pull riotbuild docker image
+        run: |
+          docker pull riot/riotbuild:latest
+      - name: Checkout RIOT
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.riot_version }}
+      - name: Launch IoT-LAB experiment
+        run: |
+          IOTLAB_EXP_ID=$(iotlab-experiment --jmespath="id" submit \
+            -n "riot-ci-${{ matrix.boards.riot }}" -d 360 \
+            -l 1,site=${{ matrix.boards.iotlab.site }}+archi=${{ matrix.boards.iotlab.archi }})
+          iotlab-experiment wait -i ${IOTLAB_EXP_ID}
+          echo "IOTLAB_EXP_ID=${IOTLAB_EXP_ID}" >> $GITHUB_ENV
+      - name: Run compile_and_test_for_board.py on ${{ matrix.boards.riot }}
+        run: |
+          ${COMPILE_AND_TEST_FOR_BOARD} . ${{ matrix.boards.riot }} \
+            results-${{ matrix.boards.riot }} ${COMPILE_AND_TEST_ARGS} \
+            --applications-exclude="${APPLICATIONS_EXCLUDE}"
+      - name: Stop IoT-LAB experiment
+        if: always()
+        run: iotlab-experiment stop -i ${IOTLAB_EXP_ID}
+      - name: Archive results
+        if: always()
+        # Store generated results-<riot board name> artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.boards.riot }}
+          path: results-${{ matrix.boards.riot }}

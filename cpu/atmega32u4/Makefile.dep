@@ -1,0 +1,2 @@
+# common Makefile.dep expand the atmega_pcint pseudo module
+include $(RIOTCPU)/atmega_common/Makefile.dep

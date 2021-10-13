@@ -19,52 +19,23 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+/* This board provides an LSE */
+#ifndef CONFIG_BOARD_HAS_LSE
+#define CONFIG_BOARD_HAS_LSE    1
+#endif
+
+/* HSE is clocked at 16MHz */
+#ifndef CONFIG_BOARD_HAS_HSE
+#define CONFIG_BOARD_HAS_HSE    1
+#endif
+#define CLOCK_HSE               MHZ(16)
+
 #include "periph_cpu.h"
+#include "clk_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Clock system configuration
- * @{
- **/
-/* high speed clock configuration:
- * 0 := use internal HSI oscillator (always 8MHz)
- * HSE frequency value := use external HSE oscillator with given freq [in Hz]
- *                        must be 4000000 <= value <= 16000000 */
-#define CLOCK_HSE           (16000000U)
-/* low speed clock configuration:
- * 0 := use internal LSI oscillator (~40kHz)
- * 1 := use extern LSE oscillator, always 32.768kHz */
-#define CLOCK_LSE           (1)
-/* targeted system clock speed [in Hz], must be <= 72MHz */
-#define CLOCK_CORECLOCK     (72000000U)
-/* PLL configuration, set both values to zero to disable PLL usage. The values
- * must be set to satisfy the following equation:
- * CORECLOCK := CLOCK_SOURCE / PLL_DIV * PLL_MUL
- * with
- * 1 <= CLOCK_PLL_DIV <= 2
- * 2 <= CLOCK_PLL_MUL <= 17 */
-#define CLOCK_PLL_DIV       (2)
-#define CLOCK_PLL_MUL       (9)
-/* AHB and APBx bus clock configuration, keep in mind the following constraints:
- * ABP1 <= 36MHz
- */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV1
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV2
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 2)
-/** @} */
-
-/**
- * @name    ADC configuration
- * @{
- */
-#define ADC_NUMOF           (0)
-/** @} */
 
 /**
  * @name    Timer configuration
@@ -90,7 +61,7 @@ static const timer_conf_t timer_config[] = {
 #define TIMER_0_ISR         isr_tim2
 #define TIMER_1_ISR         isr_tim3
 
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
@@ -119,33 +90,13 @@ static const uart_conf_t uart_config[] = {
 #define UART_0_ISR          (isr_usart2)
 #define UART_1_ISR          (isr_usart1)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
  * @name    SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 36000000Hz */
-        7,  /* -> 140625Hz */
-        6,  /* -> 281250Hz */
-        4,  /* -> 1125000Hz */
-        2,  /* -> 4500000Hz */
-        1   /* -> 9000000Hz */
-    },
-    {       /* for APB2 @ 72000000Hz */
-        7,  /* -> 281250Hz */
-        7,  /* -> 281250Hz */
-        5,  /* -> 1125000Hz */
-        3,  /* -> 4500000Hz */
-        2   /* -> 9000000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
         .dev      = SPI2,
@@ -158,44 +109,38 @@ static const spi_conf_t spi_config[] = {
     }
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
  * @name    Real time counter configuration
  * @{
  */
-#define RTT_NUMOF           (1U)
-#define RTT_IRQ_PRIO        1
-
-#define RTT_DEV             RTC
-#define RTT_IRQ             RTC_IRQn
-#define RTT_ISR             isr_rtc
-#define RTT_MAX_VALUE       (0xffffffff)
-#define RTT_FREQUENCY       (1)             /* in Hz */
-#define RTT_PRESCALER       (0x7fff)        /* run with 1 Hz */
+#ifndef RTT_FREQUENCY
+#define RTT_FREQUENCY       (RTT_MAX_FREQUENCY)     /* in Hz */
+#endif
 /** @} */
 
 /**
  * @name    I2C configuration
   * @{
  */
-#define I2C_NUMOF           (1U)
-#define I2C_0_EN            1
-#define I2C_IRQ_PRIO        1
-#define I2C_APBCLK          (CLOCK_APB1)
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev            = I2C1,
+        .speed          = I2C_SPEED_NORMAL,
+        .scl_pin        = GPIO_PIN(PORT_B, 6),
+        .sda_pin        = GPIO_PIN(PORT_B, 7),
+        .bus            = APB1,
+        .rcc_mask       = RCC_APB1ENR_I2C1EN,
+        .clk            = CLOCK_APB1,
+        .irqn           = I2C1_EV_IRQn
+    }
+};
 
-/* I2C 0 device configuration */
-#define I2C_0_DEV           I2C1
-#define I2C_0_CLKEN()       (periph_clk_en(APB1, RCC_APB1ENR_I2C1EN))
-#define I2C_0_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_I2C1EN))
-#define I2C_0_EVT_IRQ       I2C1_EV_IRQn
-#define I2C_0_EVT_ISR       isr_i2c1_ev
-#define I2C_0_ERR_IRQ       I2C1_ER_IRQn
-#define I2C_0_ERR_ISR       isr_i2c1_er
-/* I2C 0 pin configuration */
-#define I2C_0_SCL_PIN       GPIO_PIN(PORT_B,6)
-#define I2C_0_SDA_PIN       GPIO_PIN(PORT_B,7)
+#define I2C_0_ISR           isr_i2c1_ev
+
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
 #ifdef __cplusplus

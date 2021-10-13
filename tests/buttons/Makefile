@@ -1,10 +1,5 @@
 include ../Makefile.tests_common
 
-USEMODULE += xtimer
-
-TEST_ON_CI_WHITELIST += all
+FEATURES_REQUIRED += periph_gpio_irq
 
 include $(RIOTBASE)/Makefile.include
-
-test:
-	tests/01-run.py

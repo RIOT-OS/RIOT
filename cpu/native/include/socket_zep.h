@@ -13,6 +13,39 @@
  *
  * @see @ref net_zep for protocol definitions
  *
+ * This ZEP implementation can send a dummy HELLO packet on startup.
+ * This is used to make dispatchers aware of the node.
+ * To enable this behavior, add
+ *
+ * ```
+ * USEMODULE += socket_zep_hello
+ * ```
+ *
+ * to your Makefile.
+ *
+ * A ZEP dispatcher can just drop those packets (ZEP type 0xFF) if it
+ * chooses to parse the ZEP header.
+ *
+ * The header of the HELLO packet will look like this:
+ *
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *     |         Preamble (EX)         |  Version (2)  |  Type  (255)  |
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *     |                                                               |
+ *     +                                                               +
+ *     |                                                               |
+ *     +                         Reserved (0)                         +
+ *     |                                                               |
+ *     +                                                               +
+ *     |                                                               |
+ *     +               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *     |               |      'H'      |      'E'      |      'L'      |
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *     |      'L'      |      'O'      |       0       |       0       |
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *     |       0       |       0       |       0       |       0       |
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *
  * @{
  *
  * @file
@@ -30,9 +63,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/* 127 - 25 as in at86rf2xx */
-#define SOCKET_ZEP_FRAME_PAYLOAD_LEN    (102)   /**< maximum possible payload size */
 
 /**
  * @brief   ZEP device state
@@ -68,8 +98,10 @@ typedef struct {
  *
  * @param[in] dev       the preallocated socket_zep_t device handle to setup
  * @param[in] params    initialization parameters
+ * @param[in] index     index of @p params in a global parameter struct array.
+ *                      If initialized manually, pass a unique identifier instead.
  */
-void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params);
+void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params, uint8_t index);
 
 /**
  * @brief Cleanup socket resources

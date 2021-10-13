@@ -1,0 +1,17 @@
+# Configure riotboot bootloader and slot lengths.
+RIOTBOOT_LEN ?= 0x4000
+NUM_SLOTS ?= 2
+SLOT0_LEN ?= 0x3C000
+SLOT1_LEN ?= $(SLOT0_LEN)
+
+# support SWD and UART via Pi GPIO header
+PORT_LINUX ?= /dev/serial0
+# TODO change to bcm2835gpio after it's merged as it's faster
+# OPENOCD_DEBUG_ADAPTER ?= bcm2835gpio
+OPENOCD_DEBUG_ADAPTER ?= sysfs_gpio
+SRST_PIN ?= 16
+SWCLK_PIN ?= 20
+SWDIO_PIN ?= 21
+
+# Include default FRDM board config for openocd configuration
+include $(RIOTBOARD)/common/frdm/Makefile.include

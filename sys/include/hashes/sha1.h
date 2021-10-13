@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    sys_hashes_sha1 SHA-1
- * @ingroup     sys_hashes
+ * @ingroup     sys_hashes_unkeyed
  * @brief       Implementation of the SHA-1 hashing function
 
  * @{
@@ -61,7 +61,6 @@ typedef struct {
     /** temporary buffer for the inner hashing */
     uint8_t inner_hash[SHA1_DIGEST_LENGTH];
 } sha1_context;
-
 
 /**
  * @brief Initialize SHA-1 message digest context

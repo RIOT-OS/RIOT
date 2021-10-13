@@ -23,7 +23,7 @@
 
 #include <inttypes.h>
 
-#include "kernel_types.h"
+#include "sched.h"
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/pkt.h"
 
@@ -40,7 +40,7 @@ extern "C" {
 /**
  *  @brief  The type of the netreg entry.
  *
- *          Different types are availalbe dependent on the used modules.
+ *          Different types are available dependent on the used modules.
  */
 typedef enum {
     /**
@@ -107,15 +107,15 @@ typedef enum {
  *
  * @param[in] demux_ctx The @ref gnrc_netreg_entry_t::demux_ctx "demux context"
  *                      for the netreg entry
- * @param[in] mbox      Target @ref core_mbox "mailbox" for the registry entry
+ * @param[in] _mbox      Target @ref core_mbox "mailbox" for the registry entry
  *
  * @note    Only available with @ref net_gnrc_netapi_mbox.
  *
  * @return  An initialized netreg entry
  */
-#define GNRC_NETREG_ENTRY_INIT_MBOX(demux_ctx, mbox) { NULL, demux_ctx, \
+#define GNRC_NETREG_ENTRY_INIT_MBOX(demux_ctx, _mbox) { NULL, demux_ctx, \
                                                        GNRC_NETREG_TYPE_MBOX, \
-                                                       { .mbox = mbox } }
+                                                       { .mbox = _mbox } }
 #endif
 
 #if defined(MODULE_GNRC_NETAPI_CALLBACKS) || defined(DOXYGEN)
@@ -124,15 +124,15 @@ typedef enum {
  *
  * @param[in] demux_ctx The @ref gnrc_netreg_entry_t::demux_ctx "demux context"
  *                      for the netreg entry
- * @param[in] cbd       Target callback for the registry entry
+ * @param[in] _cbd       Target callback for the registry entry
  *
  * @note    Only available with @ref net_gnrc_netapi_callbacks.
  *
  * @return  An initialized netreg entry
  */
-#define GNRC_NETREG_ENTRY_INIT_CB(demux_ctx, cbd)   { NULL, demux_ctx, \
+#define GNRC_NETREG_ENTRY_INIT_CB(demux_ctx, _cbd)   { NULL, demux_ctx, \
                                                       GNRC_NETREG_TYPE_CB, \
-                                                      { .cbd = cbd } }
+                                                      { .cbd = _cbd } }
 /** @} */
 
 /**
@@ -305,7 +305,9 @@ static inline void gnrc_netreg_entry_init_cb(gnrc_netreg_entry_t *entry,
  * @warning Call gnrc_netreg_unregister() *before* you leave the context you
  *          allocated @p entry in. Otherwise it might get overwritten.
  *
- * @pre The calling thread must provide a message queue.
+ * @pre The calling thread must provide a [message queue](@ref msg_init_queue)
+ *      when using @ref GNRC_NETREG_TYPE_DEFAULT for gnrc_netreg_entry_t::type
+ *      of @p entry.
  *
  * @return  0 on success
  * @return  -EINVAL if @p type was < GNRC_NETTYPE_UNDEF or >= GNRC_NETTYPE_NUMOF

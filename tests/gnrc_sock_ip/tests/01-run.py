@@ -6,8 +6,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-import os
 import sys
+from testrunner import run
 
 
 def testfunc(child):
@@ -30,7 +30,8 @@ def testfunc(child):
     child.expect_exact(u"Calling test_sock_ip_recv__unsocketed()")
     child.expect_exact(u"Calling test_sock_ip_recv__unsocketed_with_remote()")
     child.expect_exact(u"Calling test_sock_ip_recv__with_timeout()")
-    child.expect_exact(u"Calling test_sock_ip_send__EAFNOSUPPORT()")
+    child.expect_exact(u"Calling test_sock_ip_send__EAFNOSUPPORT_INET()")
+    child.expect_exact(u"Calling test_sock_ip_send__EAFNOSUPPORT_UNSPEC()")
     child.expect_exact(u"Calling test_sock_ip_send__EINVAL_addr()")
     child.expect_exact(u"Calling test_sock_ip_send__EINVAL_netif()")
     child.expect_exact(u"Calling test_sock_ip_send__ENOTCONN()")
@@ -49,6 +50,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-    from testrunner import run
     sys.exit(run(testfunc))

@@ -1,0 +1,22 @@
+## CPU Models
+config CPU_MODEL_SAME54N19A
+    bool
+    select CPU_FAM_SAME54
+
+config CPU_MODEL_SAME54N20A
+    bool
+    select CPU_FAM_SAME54
+
+config CPU_MODEL_SAME54P19A
+    bool
+    select CPU_FAM_SAME54
+
+config CPU_MODEL_SAME54P20A
+    bool
+    select CPU_FAM_SAME54
+
+config CPU_MODEL
+    default "same54n19a" if CPU_MODEL_SAME54N19A
+    default "same54n20a" if CPU_MODEL_SAME54N20A
+    default "same54p19a" if CPU_MODEL_SAME54P19A
+    default "same54p20a" if CPU_MODEL_SAME54P20A

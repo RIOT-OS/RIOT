@@ -2,6 +2,7 @@
  * Copyright (C) 2015 Daniel Amkaer Sorensen
  *               2016 Freie Universität Berlin
  *               2017 Hamburg University of Applied Sciences
+ *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -19,13 +20,14 @@
  * @author      Daniel Amkaer Sorensen <daniel.amkaer@gmail.com>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Dimitri Nahm <dimitri.nahm@haw-hamburg.de>
+ * @author      Thomas Perrot <thomas.perrot@tupi.fr>
  *
  * @}
  */
+#include <assert.h>
 
 #include "cpu.h"
 #include "mutex.h"
-#include "assert.h"
 #include "periph/spi.h"
 
 /**
@@ -60,7 +62,7 @@ void spi_init_pins(spi_t bus)
 #if defined (CPU_ATMEGA1284P)
     DDRB |= ((1 << DDB4) | (1 << DDB5) | (1 << DDB7));
 #endif
-#if defined (CPU_ATMEGA256RFR2)
+#if defined(CPU_ATMEGA128RFA1) || defined(CPU_ATMEGA256RFR2)
     /* Master: PB3 MISO set to out
      *         PB2 MOSI set to input by hardware
      *         PB1 SCK  set to out
@@ -71,12 +73,16 @@ void spi_init_pins(spi_t bus)
      * */
     DDRB |= ((1 << DDB2) | (1 << DDB1));
 #endif
+#ifdef CPU_ATMEGA32U4
+    DDRB |= ((1 << DDB0) | (1 << DDB1) | (1 << DDB2));
+#endif
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)bus;
     (void)cs;
+    assert(bus == SPI_DEV(0));
 
     /* lock the bus and power on the SPI peripheral */
     mutex_lock(&lock);
@@ -89,8 +95,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     /* clear interrupt flag by reading SPSR and data register by reading SPDR */
     (void)SPSR;
     (void)SPDR;
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)

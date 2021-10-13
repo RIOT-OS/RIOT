@@ -6,22 +6,34 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+. "$(dirname "$0")/../ci/github_annotate.sh"
+github_annotate_setup
 
 FLAKE8_CMD="python3 -m flake8"
 
-if tput colors &> /dev/null && [ $(tput colors) -ge 8 ]; then
-    CERROR="\e[1;31m"
-    CRESET="\e[0m"
+if tput colors &> /dev/null && [ "$(tput colors)" -ge 8 ]; then
+    CERROR=$'\033[1;31m'
+    CRESET=$'\033[0m'
 else
     CERROR=
     CRESET=
 fi
 
-DIST_TOOLS=${RIOTBASE:-.}/dist/tools
+: "${RIOTBASE:=$(cd $(dirname $0)/../../../; pwd)}"
+cd $RIOTBASE
 
-. ${DIST_TOOLS}/ci/changed_files.sh
+: "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
+. "${RIOTTOOLS}"/ci/changed_files.sh
 
-FILES=$(FILEREGEX='(?=*.py$|pyterm$)' changed_files)
+EXCLUDE="^(.+/vendor/\
+|dist/tools/cc2538-bsl\
+|dist/tools/mcuboot\
+|dist/tools/uhcpd\
+|dist/tools/stm32loader\
+|dist/tools/suit/suit-manifest-generator)\
+|dist/tools/esptool"
+FILEREGEX='(\.py$|pyterm$)'
+FILES=$(FILEREGEX=${FILEREGEX} EXCLUDE=${EXCLUDE} changed_files)
 
 if [ -z "${FILES}" ]
 then
@@ -29,16 +41,28 @@ then
 fi
 
 ${FLAKE8_CMD} --version &> /dev/null || {
-    printf "${CERROR}$0: cannot execute \"${FLAKE8_CMD}\"!${CRESET}\n"
+    printf "%s%s: cannot execute \"%s\"!%s\n" "${CERROR}" "$0" "${FLAKE8_CMD}" "${CRESET}"
     exit 1
 }
 
-ERRORS=$(${FLAKE8_CMD} --config=${DIST_TOOLS}/flake8/flake8.cfg ${FILES})
+ERRORS=$(${FLAKE8_CMD} --config="${RIOTTOOLS}"/flake8/flake8.cfg ${FILES})
+
+if github_annotate_is_on; then
+    echo "${ERRORS}" | grep "^.\+:[0-9]\+:" | while read line; do
+        FILENAME=$(echo "${line}" | cut -d: -f1)
+        LINENR=$(echo "${line}" | cut -d: -f2)
+        DETAILS=$(echo "${line}" | cut -d: -f4- |
+                  sed -e 's/^[ \t]*//' -e 's/[ \t]*$//')
+        github_annotate_error "${FILENAME}" "${LINENR}" "${DETAILS}"
+    done
+fi
+
+github_annotate_teardown
 
 if [ -n "${ERRORS}" ]
 then
-    printf "${CERROR}There are style issues in the following Python scripts:${CRESET}\n\n"
-    printf "${ERRORS}\n"
+    printf "%sThere are style issues in the following Python scripts:%s\n\n" "${CERROR}" "${CRESET}"
+    printf "%s\n" "${ERRORS}"
     exit 1
 else
     exit 0

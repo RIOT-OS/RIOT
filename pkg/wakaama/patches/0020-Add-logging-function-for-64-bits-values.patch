@@ -1,0 +1,95 @@
+From 9a02f0d63cb14e7e6b195550882dd8363183e22c Mon Sep 17 00:00:00 2001
+From: Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
+Date: Fri, 29 Nov 2019 18:17:54 +0100
+Subject: [PATCH 1/1] Add logging function for 64-bits values
+
+---
+ core/data.c      |  6 ++++--
+ core/internals.h | 13 +++++++++++++
+ core/liblwm2m.c  |  6 ++++--
+ 3 files changed, 21 insertions(+), 4 deletions(-)
+
+diff --git a/core/data.c b/core/data.c
+index e4dc154..d304410 100644
+--- a/core/data.c
++++ b/core/data.c
+@@ -269,7 +269,8 @@ void lwm2m_data_encode_nstring(const char * string,
+ void lwm2m_data_encode_int(int64_t value,
+                            lwm2m_data_t * dataP)
+ {
+-    LOG_ARG("value: %" PRId64 "", value);
++    LOG("value: ");
++    LOG_VALUE("%" PRId64, value);
+     dataP->type = LWM2M_TYPE_INTEGER;
+     dataP->value.asInteger = value;
+ }
+@@ -334,7 +335,8 @@ int lwm2m_data_decode_int(const lwm2m_data_t * dataP,
+     default:
+         return 0;
+     }
+-    LOG_ARG("result: %d, value: %" PRId64, result, *valueP);
++    LOG_ARG("result: %d, value: ", result);
++    LOG_VALUE("%" PRId64, *valueP);
+ 
+     return result;
+ }
+diff --git a/core/internals.h b/core/internals.h
+index 08e951c..84c841f 100644
+--- a/core/internals.h
++++ b/core/internals.h
+@@ -71,8 +71,20 @@
+ 
+ #ifdef LWM2M_WITH_LOGS
+ #include <inttypes.h>
++#include "fmt.h"
+ #define LOG(STR) lwm2m_printf("[%s:%d] " STR "\r\n", __func__ , __LINE__)
+ #define LOG_ARG(FMT, ...) lwm2m_printf("[%s:%d] " FMT "\r\n", __func__ , __LINE__ , __VA_ARGS__)
++/* Log a single value. Use this for 64-bits numbers */
++#define LOG_VALUE(FMT, VALUE)                                                       \
++{                                                                                   \
++    if (!strcmp(FMT, "%"PRId64))                                                    \
++    {                                                                               \
++        char int64_str[20];                                                         \
++        int64_str[fmt_s64_dec(int64_str, (VALUE))] = '\0';                          \
++        lwm2m_printf("[%s:%d] %s \r\n", __func__ , __LINE__ , int64_str);           \
++    }                                                                               \
++    else lwm2m_printf("[%s:%d] " FMT "\r\n", __func__ , __LINE__ , (VALUE));        \
++}
+ #define LOG_URI(URI)                                                                \
+ {                                                                                   \
+     if ((URI) == NULL) lwm2m_printf("[%s:%d] NULL\r\n", __func__ , __LINE__);     \
+@@ -119,6 +131,7 @@
+ #else
+ #define LOG_ARG(FMT, ...)
+ #define LOG(STR)
++#define LOG_VALUE(FMT, VALUE)
+ #define LOG_URI(URI)
+ #endif
+ 
+diff --git a/core/liblwm2m.c b/core/liblwm2m.c
+index 1dbcf7a..140a85a 100644
+--- a/core/liblwm2m.c
++++ b/core/liblwm2m.c
+@@ -373,7 +373,8 @@ int lwm2m_step(lwm2m_context_t * contextP,
+     int result;
+ #endif
+ 
+-    LOG_ARG("timeoutP: %" PRId64, *timeoutP);
++    LOG("timeoutP: ");
++    LOG_VALUE("%" PRId64, *timeoutP);
+     tv_sec = lwm2m_gettime();
+     if (tv_sec < 0) return COAP_500_INTERNAL_SERVER_ERROR;
+ 
+@@ -481,7 +482,8 @@ next_step:
+     registration_step(contextP, tv_sec, timeoutP);
+     transaction_step(contextP, tv_sec, timeoutP);
+ 
+-    LOG_ARG("Final timeoutP: %" PRId64, *timeoutP);
++    LOG("Final timeoutP:");
++    LOG_VALUE("%" PRId64, *timeoutP);
+ #ifdef LWM2M_CLIENT_MODE
+     LOG_ARG("Final state: %s", STR_STATE(contextP->state));
+ #endif
+-- 
+2.20.1
+

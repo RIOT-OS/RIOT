@@ -1,9 +1,13 @@
 # CMSIS from Atmel Software Foundation (ASF)
 
-The include files in the directory tree are copied from ASF (verion 3.35.1).
+The include files in this directory tree are copied from Atmel
+sources. Most of the sam0 files are from ASF (Atmel Software Foundation,
+version 3.35.1). The SAML10 and SAML11 files are from, so called, atpacks.
 
-The directory tree was copied "as is" from ASF path `sam0/utils/cmsis/` and its
-structure is as follows:
+## The sam0 files
+
+The directory tree was copied "as is" from ASF path `sam0/utils/cmsis/` and
+its  structure is as follows:
 
     cmsis
     ├── samd21
@@ -32,12 +36,86 @@ all `source` folders are removed.
 Be aware that if you want to make changes to any file in this tree that the
 changes will be lost when a new ASF release is going to be used.
 
-# Usage and porting for SAM based CPUs
+### sam0.h
 
-SAM based CPU should include `sam0.h` in this directory, which will resolve any
-CPU family specific includes required.
+A SAM based CPU should include `sam0.h` in this directory, which will
+resolve  any CPU family specific includes required.
 
-Currently only SAMD21, SAML21, and SAMR21 based CPUs are supported, i.e., only
-their CMSIS header files are copied from the ASF. If other CPUs are needed copy
-CMSIS files from the ASF for the respective CPU family here and adapt `sam0.h`
-accordingly.
+## SAMD10 files
+
+samd10: `Atmel.SAMD10_DFP.1.1.77.atpack`
+
+## SAMD20 files
+
+samd20: `Atmel.SAMD20_DFP.1.3.165.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT. The files are copied unmodified.
+
+## SAMD21 files
+
+samd21: `Atmel.SAMD21_DFP.1.3.395.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT. The files are copied unmodified.
+
+## SAML10/SAML11 files
+
+Since 2019 the necessary variant files are available in atpacks at
+
+    http://packs.download.atmel.com/
+
+saml10: `Atmel.SAML10_DFP.1.0.142.atpack`
+saml11: `Atmel.SAML11_DFP.1.0.91.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT. The files are copied unmodified.
+
+## SAML21 files
+
+saml21: `Atmel.SAML21_DFP.1.2.125.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT. The files are copied unmodified.
+
+## SAMR21 files
+
+samr21: `Atmel.SAMR21_DFP.1.1.72.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT. The following replacements were done for compatibility with newlib:
+
+    find -name '*.h' -exec sed -ie 's/_U(/_U_(/g' {} \;
+    find -name '*.h' -exec sed -ie 's/_L(/_L_(/g' {} \;
+
+## SAMR30 files
+
+samr30: `Atmel.SAMR30_DFP.1.1.35.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT.
+
+The PIN_($pin)_EIC_EXTINT_NUM macos and integer literal macros (_L_() etc)
+were added manually.
+It is expected for those to appear in the next atpack release by
+Microchip.
+
+If *_EIC_EXTINT_NUM macros are missing after an update, GPIO interrupts
+not work. See 93d536f76 for how to generate them.
+
+## SAMR34 files
+
+samr34: `Atmel.SAMR34_DFP.1.0.11.atpacks`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT. The files are copied unmodified.
+
+### sam23.h
+
+A SAML1x based CPU should include `sam23.h` in this directory, which will
+resolve any CPU family specific includes required.
+
+## Usage and porting for SAM based CPUs
+
+If other CPUs are needed, copy the include files from ASF or atpack for the
+respective  CPU family here and adapt `sam0.h` or `sam23.h` accordingly.

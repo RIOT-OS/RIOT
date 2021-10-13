@@ -57,9 +57,9 @@ int main(void)
             continue;
         }
 
-        size_t n = fmt_s16_dfp(temp_s, temp, 1);
+        size_t n = fmt_s16_dfp(temp_s, temp, -1);
         temp_s[n] = '\0';
-        n = fmt_s16_dfp(hum_s, hum, 1);
+        n = fmt_s16_dfp(hum_s, hum, -1);
         hum_s[n] = '\0';
 
         printf("DHT values - temp: %s°C - relative humidity: %s%%\n",

@@ -90,7 +90,7 @@ enum {
  * @return     UART_HALF_DUPLEX_OK if everything is in order
  * @return     UART_HALF_DUPLEX_NODEV if invalid UART device was given
  * @return     UART_HALF_DUPLEX_NOBAUD if given baudrate is not applicable
- * @return     UART_HALF_DUPLEX_INTERR if an other internal error occured
+ * @return     UART_HALF_DUPLEX_INTERR if an other internal error occurred
  * @return     UART_HALF_DUPLEX_NOMODE if the given mode is not applicable
  * @return     UART_HALF_DUPLEX_NOBUFF if an invalid buffer was given
  */

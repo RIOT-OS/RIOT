@@ -1,0 +1,16 @@
+# cpu used by the samr34-xpro board is based on saml21
+CPU = saml21
+CPU_MODEL = samr34j18b
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_rtc
+FEATURES_PROVIDED += periph_rtt
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_usbdev
+
+# Put other features for this board (in alphabetical order)
+FEATURES_PROVIDED += riotboot

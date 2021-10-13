@@ -29,7 +29,7 @@
 #include "fs/constfs.h"
 #include "vfs.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* File system operations */
@@ -74,7 +74,6 @@ static const vfs_dir_ops_t constfs_dir_ops = {
     .readdir = constfs_readdir,
     .closedir = constfs_closedir,
 };
-
 
 const vfs_file_system_t constfs_file_system = {
     .f_op = &constfs_file_ops,

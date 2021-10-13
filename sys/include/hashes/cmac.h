@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    sys_hashes_cmac AES_CMAC
- * @ingroup     sys_hashes
+ * @ingroup     sys_hashes_keyed
  * @brief       Implementation of the AES CMAC hashing function
 
  * @{
@@ -40,7 +40,7 @@ extern "C" {
 typedef struct {
     /** AES128 context */
     cipher_t aes_ctx;
-    /** auxiliar array for CMAC calculations **/
+    /** auxiliary array for CMAC calculations **/
     uint8_t X[CMAC_BLOCK_SIZE];
     /** current last block **/
     uint8_t M_last[CMAC_BLOCK_SIZE];

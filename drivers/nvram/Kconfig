@@ -1,0 +1,16 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_NVRAM
+    bool "Non-volatile RAM"
+    depends on TEST_KCONFIG
+    help
+        This API is designed around non-volatile memories which do not need
+        blockwise erase, such as ferro-electric RAM (FRAM) or magneto-resistive
+        RAM (MRAM).
+
+        This interface is not suitable for flash memories.

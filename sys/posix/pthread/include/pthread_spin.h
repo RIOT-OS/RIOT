@@ -20,10 +20,11 @@
 #ifndef PTHREAD_SPIN_H
 #define PTHREAD_SPIN_H
 
-#include <stdatomic.h>
-
 #ifdef __cplusplus
-extern "C" {
+#include <atomic>
+using std::atomic_flag;
+#else
+#include <stdatomic.h>
 #endif
 
 /**
@@ -36,8 +37,12 @@ typedef struct {
     atomic_flag flag; /**< Current lock state */
 } pthread_spinlock_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
- * @brief           Intializes a spinlock.
+ * @brief           Initializes a spinlock.
  * @warning         See the warning in pthread_spinlock_t.
  * @details         A zeroed out datum is initialized.
  * @param[in,out]   lock      Datum to initialize.

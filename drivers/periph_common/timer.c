@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     drivers
+ * @ingroup     drivers_periph_timer
  * @{
  *
  * @file
@@ -19,10 +19,14 @@
  */
 
 #include "periph/timer.h"
+#include "irq.h"
 
 #ifndef PERIPH_TIMER_PROVIDES_SET
 int timer_set(tim_t dev, int channel, unsigned int timeout)
 {
-    return timer_set_absolute(dev, channel, timer_read(dev) + timeout);
+    unsigned int state = irq_disable();
+    int res = timer_set_absolute(dev, channel, timer_read(dev) + timeout);
+    irq_restore(state);
+    return res;
 }
 #endif
