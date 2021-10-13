@@ -142,7 +142,7 @@ void rtt_init(void)
     EXTI->RTSR_REG |= EXTI_RTSR_BIT;
     EXTI->PR_REG = EXTI_PR_BIT;
 #endif
-#if defined(CPU_FAM_STM32G0)
+#if defined(TIM6_DAC_LPTIM1_SHARED_IRQ)
     NVIC_EnableIRQ(TIM6_DAC_LPTIM1_IRQn);
 #else
     NVIC_EnableIRQ(LPTIM1_IRQn);
