@@ -26,7 +26,11 @@
 
 ## Overview {#esp32_wroom_32_overview}
 
-This board definition covers not just a single board, but rather a large set of generic boards that use an ESP32-WROOM-32 module and simply break out all GPIOs to external pads without having any special hardware or interfaces on-board. Examples are Espressif's ESP32-DevKitC or NodeMCU-ESP32S and a large number of clones.
+This board definition covers not just a single board, but rather a large set
+of generic boards that use an ESP32-WROOM-32 module and simply break out all
+GPIOs to external pads without having any special hardware or interfaces
+on-board. Examples are Espressif's ESP32-DevKitC or NodeMCU-ESP32S and a
+large number of clones.
 
 \image html "https://dl.espressif.com/dl/schematics/pictures/esp32-devkitc-v4-front.jpg" "Espressif ESP32-DevKitC V4" width=400px
 
@@ -52,7 +56,9 @@ information about the ESP32, see section \ref esp32_mcu_esp32 "MCU ESP32".
 
 ### Board Configuration {#esp32_wroom_32_board_configuration}
 
-Generic ESP32-WROOM-32 boards do not have special hardware on board and all GPIOs are simply broken out for flexibility. Therefore, the board configuration is the most flexible one with provides:
+Generic ESP32-WROOM-32 boards do not have special hardware on board and all
+GPIOs are simply broken out for flexibility. Therefore, the board
+configuration is the most flexible one with provides:
 
 18 x ADC channels at maximum
 2 x DAC channels at maximum
@@ -60,19 +66,30 @@ Generic ESP32-WROOM-32 boards do not have special hardware on board and all GPIO
 1 x I2C at maximum
 2 x UART
 
-Since all GPIOs have broken out, GPIOs can be used for different purposes in different applications. For flexibility, GPIOs can be listed in various peripheral configurations. For example, GPIO13 is used in the ADC channel definition and the definition of the MOSI signal of SPI_DEV(0).
+Since all GPIOs have broken out, GPIOs can be used for different purposes
+in different applications. For flexibility, GPIOs can be listed in various
+peripheral configurations. For example, GPIO13 is used in the ADC channel
+definition and the definition of the MOSI signal of SPI_DEV(0).
 
-This is possible because GPIOs are only used for a specific peripheral interface when
+This is possible because GPIOs are only used for a specific peripheral
+interface when
 
-- the corresponding peripheral module is used, eg. periph_i2c, or
-- a corresponding init function is called z. adc_init, dac_init and pwm_init or
-- The corresponding peripheral interface is used for the first time, eg. spi_aqcuire.
+- the corresponding peripheral module is used, e.g. `periph_i2c`, or
+- a corresponding init function is called z. `adc_init`, `dac_init` and
+  `pwm_init` or
+- The corresponding peripheral interface is used for the first time,
+  e.g. `spi_aqcuire.
 
-That is, the purpose for which a GPIO is used depends on which module or function is used first.
+That is, the purpose for which a GPIO is used depends on which module
+or function is used first.
 
-For example, if module periph_i2c is not used, the GPIOs listed in I2C configuration can be used for the other purposes.
+For example, if module periph_i2c is not used, the GPIOs listed in I2C
+configuration can be used for the other purposes.
 
-The following table shows the default board configuration, which is sorted according to the defined functionality of GPIOs. This configuration can be overridden by \ref esp32_application_specific_configurations "application-specific configurations".
+The following table shows the default board configuration, which is sorted
+according to the defined functionality of GPIOs. This configuration can be
+overridden by \ref esp32_application_specific_configurations
+"application-specific configurations".
 
 <center>
 Function        | GPIOs  | Remarks |Configuration
@@ -99,17 +116,24 @@ UART_DEV(1):RxD | GPIO9  | not available in **qout** and **qio** flash mode | \r
 </center>
 \n
 @note
-- The configuration of ADC channels contains all ESP32 GPIOs that can be used as ADC channels.
-- The configuration of DAC channels contains all ESP32 GPIOs that can be used as DAC channels.
-- GPIO9 and GIOP10 can only be used in **dout** and **dio** \ref esp32_flash_modes "flash modes".
+- The configuration of ADC channels contains all ESP32 GPIOs that can be
+  used as ADC channels.
+- The configuration of DAC channels contains all ESP32 GPIOs that can be used
+  as DAC channels.
+- GPIO9 and GIOP10 can only be used in **dout** and **dio**
+  \ref esp32_flash_modes "flash modes".
 
-For detailed information about the configuration of ESP32 boards, see section \ref esp32_peripherals "Common Peripherals".
+For detailed information about the configuration of ESP32 boards, see
+section \ref esp32_peripherals "Common Peripherals".
 
 [Back to table of contents](#esp32_wroom_32_toc)
 
 ### Optional Hardware Configurations {#esp32_wroom_32_optional_hardware}
 
-MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet network interface modules have been tested with the board. You could use the following code in your \ref esp32_application_specific_configurations "application-specific configuration" to use such modules:
+MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet
+network interface modules have been tested with the board. You could use
+the following code in your \ref esp32_application_specific_configurations
+"application-specific configuration" to use such modules:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
 #ifdef BOARD_ESP32_WROOM-32
@@ -131,15 +155,23 @@ MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet network i
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 For other parameters, the default values defined by the drivers can be used.
 
-@note The **RESET** signal of MRF24J40 and ENC28J60 based modules can also be connected to the **RST** pin of the board (see \ref esp32_wroom_32_pinout "pinout") to keep the configured GPIO free for other purposes.
+@note The **RESET** signal of MRF24J40 and ENC28J60 based modules can also
+be connected to the **RST** pin of the board (see \ref esp32_wroom_32_pinout
+"pinout") to keep the configured GPIO free for other purposes.
 
 [Back to table of contents](#esp32_wroom_32_toc)
 
 ### Board Pinout {#esp32_wroom_32_pinout}
 
-The following figure shows the pinout of the defined default configuration for the EPS32-DevKitC board as an example of generic ESP32-WROOM-32 boards. The light green GPIOs are not used by configured on-board hardware components and can be used for any purpose. However, if optional off-board hardware modules are used, these GPIOs may also be occupied, see section \ref esp32_wroom_32_board_configuration for more information.
+The following figure shows the pinout of the defined default configuration
+for the EPS32-DevKitC board as an example of generic ESP32-WROOM-32 boards.
+The light green GPIOs are not used by configured on-board hardware components
+and can be used for any purpose. However, if optional off-board hardware
+modules are used, these GPIOs may also be occupied, see
+section \ref esp32_wroom_32_board_configuration for more information.
 
-The corresponding board schematics can be found her [here](https://dl.espressif.com/dl/schematics/esp32_devkitc_v4-sch-20180607a.pdf)
+The corresponding board schematics can be found her [here]
+(https://dl.espressif.com/dl/schematics/esp32_devkitc_v4-sch-20180607a.pdf)
 
 @image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/ESP32-WROOM-32_pinouts.png" "EPS32-DevKitC V4 Pinout"
 
@@ -147,11 +179,14 @@ The corresponding board schematics can be found her [here](https://dl.espressif.
 
 ## Flashing the Device {#esp32_wroom_32_flashing}
 
-Flashing RIOT is quite easy. The board has a Micro-USB connector with reset/boot/flash logic. Just connect the board to your host computer and type using the programming port:
+Flashing RIOT is quite easy. The board has a Micro-USB connector with
+reset/boot/flash logic. Just connect the board to your host computer
+and type using the programming port:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 make flash BOARD=esp32-wroom-32 ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-For detailed information about ESP32 as well as configuring and compiling RIOT for ESP32 boards, see \ref esp32_riot.
+For detailed information about ESP32 as well as configuring and compiling
+RIOT for ESP32 boards, see \ref esp32_riot.
 
 [Back to table of contents](#esp32_wroom_32_toc)
  */

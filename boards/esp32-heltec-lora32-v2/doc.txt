@@ -22,7 +22,8 @@
     2. [Board Configuration](#esp32_heltec_lora32_v2_board_configuration)
     3. [Board Pinout](#esp32_heltec_lora32_v2_pinout)
     4. [Using the OLED Display](#esp32_heltec_lora32_v2_oled_display)
-    5. [Optional Hardware Configurations](#esp32_heltec_lora32_v2_optional_hardware)
+    5. [Optional Hardware Configurations]
+       (#esp32_heltec_lora32_v2_optional_hardware)
 3. [Flashing the Device](#esp32_heltec_lora32_v2_flashing)
 
 ## Overview {#esp32_heltec_lora32_v2_overview}
@@ -75,7 +76,8 @@ There are two hardware versions of the board:
 Since many GPIOs are broken out, they can be used for different purposes
 in different applications. For flexibility, some GPIOs might be listed in
 various peripheral configurations. For example, GPIO0 is used in the ADC
-channel definition \ref ADC_GPIOS and the PWM channel definition \ref PWM0_GPIOS.
+channel definition \ref ADC_GPIOS and the PWM channel definition
+\ref PWM0_GPIOS.
 
 This is possible because GPIOs are only used for a specific peripheral
 interface when
@@ -95,7 +97,8 @@ unless you exactly know what you are doing.
 
 The following table shows the default board configuration, which is sorted
 according to the defined functionality of GPIOs. This configuration can be
-overridden by \ref esp32_application_specific_configurations "application-specific configurations".
+overridden by \ref esp32_application_specific_configurations
+"application-specific configurations".
 
 <center>
 Function        | GPIOs  | Remarks |Configuration
@@ -176,9 +179,8 @@ BOARD=esp32-heltec-lora32-v2 make -C tests/pkg_u8g2/ flash
 
 MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet
 network interface modules have been tested with the board. You could use
-the following code in your
-\ref esp32_application_specific_configurations "application-specific configuration"
-to use such modules:
+the following code in your \ref esp32_application_specific_configurations
+"application-specific configuration" to use such modules:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
 #ifdef BOARD_ESP32_HELTEC_LORA32_V2
@@ -215,9 +217,10 @@ purpose. However, if optional off-board hardware modules are used,
 these GPIOs may also be occupied,
 see section \ref esp32_heltec_lora32_v2_board_configuration for more information.
 
-The corresponding board schematics can be found
-[here for SX1276 version](https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/blob/master/SchematicDiagram/WiFi_LoRa_32(V2)/WIFI_LoRa_32_V2(868-915).PDF) and
-[here for SX1278 version](https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/blob/master/SchematicDiagram/WiFi_LoRa_32(V2)/WiFi_LoRa_32_V2(433%2C470-510).PDF).
+The corresponding board schematics can be found [here for SX1276 version]
+(https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/blob/master/SchematicDiagram/WiFi_LoRa_32(V2)/WIFI_LoRa_32_V2(868-915).PDF)
+and [here for SX1278 version]
+(https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/blob/master/SchematicDiagram/WiFi_LoRa_32(V2)/WiFi_LoRa_32_V2(433%2C470-510).PDF).
 
 \anchor esp32_heltec_lora_32_v2_pinout_img
 @image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Heltec_WiFi_LoRa_32_V2_pinout.png" "WiFi LoRa 32 V2 Pintout Diagram"
@@ -226,11 +229,14 @@ The corresponding board schematics can be found
 
 ## Flashing the Device {#esp32_heltec_lora32_v2_flashing}
 
-Flashing RIOT is quite easy. The board has a Micro-USB connector with reset/boot/flash logic. Just connect the board to your host computer and type using the programming port:
+Flashing RIOT is quite easy. The board has a Micro-USB connector with
+reset/boot/flash logic. Just connect the board to your host computer and
+type using the programming port:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 make flash BOARD=esp32-heltec-lora32-v2 ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-For detailed information about ESP32 as well as configuring and compiling RIOT for ESP32 boards, see \ref esp32_riot.
+For detailed information about ESP32 as well as configuring and compiling RIOT
+for ESP32 boards, see \ref esp32_riot.
 
 [Back to table of contents](#esp32_heltec_lora32_v2_toc)
  */

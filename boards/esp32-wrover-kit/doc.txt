@@ -78,7 +78,8 @@ ESP-WROVER-KIT has the following on-board components
 
 The following table shows the default board configuration sorted according to
 the defined functionality of GPIOs for different hardware options. This
-configuration can be overridden by \ref esp32_application_specific_configurations .
+configuration can be overridden by
+\ref esp32_application_specific_configurations .
 
 These abbreviations are used in subsequent tables:
 
@@ -208,7 +209,7 @@ interface modules have been tested with the board. You could use the following
 code in your \ref esp32_application_specific_configurations
 "application-specific configuration" to use such modules:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
 #ifdef BOARD_ESP32_WROVER_KIT
 
 #if MODULE_MRF24J40
@@ -224,7 +225,7 @@ code in your \ref esp32_application_specific_configurations
 #endif
 
 #endif
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 For other parameters, the default values defined by the drivers can be used.
 
 @note
@@ -257,22 +258,23 @@ Flashing RIOT is quite straight forward. The board has a Micro-USB connector
 with reset/boot/flash logic. Just connect the board using the programming port
 to your host computer and type:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 make flash BOARD=esp32-wrover-kit ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The USB bridge is based on FDI FT2232HL and offers two USB interfaces:
 
-- the first interface is the JTAG interface for [On-Chip debugging](#esp32_wrover_kit_debugging)
+- the first interface is the JTAG interface for
+  [On-Chip debugging](#esp32_wrover_kit_debugging)
 - the second interface is the console interface, which is also used for flashing
 
 Therefore, you have to declare the USB interface in the make command. For
 example, if the ESP32-WROVER-KIT is connected to the host computer through the
 USB interfaces `/dev/ttyUSB0` and `/dev/ttyUSB1`, the make command would be
 used as following:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 make flash BOARD=esp32-wrover-kit PORT=/dev/ttyUSB1 ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For detailed information about ESP32 as well as configuring and compiling RIOT
 for ESP32 boards, see \ref esp32_riot.

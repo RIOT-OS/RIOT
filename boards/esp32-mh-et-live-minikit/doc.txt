@@ -21,7 +21,8 @@
     1. [MCU](#esp32_mh_et_live_minikit_mcu)
     2. [Board Configuration](#esp32_mh_et_live_minikit_board_configuration)
     3. [Board Pinout](#esp32_mh_et_live_minikit_pinout)
-    4. [Optional Hardware Configurations](#esp32_mh_et_live_minikit_optional_hardware)
+    4. [Optional Hardware Configurations]
+       (#esp32_mh_et_live_minikit_optional_hardware)
 3. [Flashing the Device](#esp32_mh_et_live_minikit_flashing)
 
 ## Overview {#esp32_mh_et_live_minikit_overview}
@@ -38,9 +39,11 @@ can also be used with ESP32. Examples for such shields are:
 - RGB LED Shield
 - ...
 
-This makes it possible to create different hardware configurations without the need for a soldering iron or a breadboard.
+This makes it possible to create different hardware configurations without
+the need for a soldering iron or a breadboard.
 
-MH-ET LIVE MiniKit for ESP32 belongs to the class of general purpose boards where most ESP32 pins are broken out for easier access.
+MH-ET LIVE MiniKit for ESP32 belongs to the class of general purpose boards
+where most ESP32 pins are broken out for easier access.
 
 @image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/MH-ET_LIVE_D1_mini_ESP32_2.png" "MH-ET LIVE MiniKit for ESP32" width=250px
 
@@ -50,7 +53,8 @@ This stackable platform was tested in an RIOT application with:
 - MRF24J40 IEEE 802.15.4 radio Shield (contact gunar@schorcht.net for more information)
 - BMP180 Pressure Sensor Shield
 
-This application is a good example how easy it is with this board to create different hardware applications.
+This application is a good example how easy it is with this board to create
+different hardware applications.
 
 @image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/MH-ET_LIVE_D1_mini_ESP32_5.png" "RIOT application with SD-Card, MRF24J40 Radio, and BMP180 Pressure Sensor"
 
@@ -76,7 +80,10 @@ information about the ESP32, see section \ref esp32_mcu_esp32 "MCU ESP32".
 
 ### Board Configuration {#esp32_mh_et_live_minikit_board_configuration}
 
-The following table shows the default board configuration, which is sorted according to the defined functionality of GPIOs. This configuration can be overridden by an \ref esp32_application_specific_configurations "application-specific configuration".
+The following table shows the default board configuration, which is sorted
+according to the defined functionality of GPIOs. This configuration can be
+overridden by an \ref esp32_application_specific_configurations
+"application-specific configuration".
 
 <center>
 Pin    | Default Configuration* | Optional Modules | Remarks / Prerequisites | Configuration
@@ -111,19 +118,27 @@ GPIO32 | -   | | | |
 GPIO33 | -   | | | |
 </center>
 
-\b * Default configuration cannot be used or is not available at all when optional hardware is used.
+\b * Default configuration cannot be used or is not available at all when
+optional hardware is used.
 
 @note
-- GPIO9 and GIOP10 can only be used in **dout** and **dio** \ref esp32_flash_modes "flash modes".
-- The **RESET** signal of MRF24J40 shield can be connected to the RST **pin** of the board (see \ref esp32_mh_et_live_minikit_pinout_img "pinout") to keep the configured GPIO free for other purposes.
+- GPIO9 and GIOP10 can only be used in **dout** and **dio**
+  \ref esp32_flash_modes "flash modes".
+- The **RESET** signal of MRF24J40 shield can be connected to the RST **pin**
+  of the board (see \ref esp32_mh_et_live_minikit_pinout_img "pinout") to
+  keep the configured GPIO free for other purposes.
 
-For detailed information about the configuration of ESP32 boards, see section \ref esp32_peripherals "Common Peripherals".
+For detailed information about the configuration of ESP32 boards, see
+section \ref esp32_peripherals "Common Peripherals".
 
 [Back to table of contents](#esp32_mh_et_live_minikit_toc)
 
 ### Optional Hardware Configurations {#esp32_mh_et_live_minikit_optional_hardware}
 
-ENC28J60-based Ethernet network interface modules have been tested with the board. You could use the following code in your \ref esp32_application_specific_configurations "application-specific configuration" to use such a module:
+ENC28J60-based Ethernet network interface modules have been tested with the
+board. You could use the following code in your
+\ref esp32_application_specific_configurations
+"application-specific configuration" to use such a module:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
 #if MODULE_ENC28J80 && BOARD_ESP32_MH_ET_LIVE_MINIKIT
@@ -132,17 +147,26 @@ ENC28J60-based Ethernet network interface modules have been tested with the boar
 #define ENC28J80_PARAM_RESET    GPIO12      /* ENC28J80 RESET signal */
 #endif
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-For **ENC28J80_PARAM_SPI** the default parameter defined by the driver can be used.
+For **ENC28J80_PARAM_SPI** the default parameter defined by the driver can
+be used.
 
-@note The **RESET** signal of ENC28J60 based modules can also be connected to the **RST** pin of the board (see \ref esp32_mh_et_live_minikit_pinout_img "pinout") to keep the configured GPIO free for other purposes.
+@note The **RESET** signal of ENC28J60 based modules can also be connected
+to the **RST** pin of the board (see \ref esp32_mh_et_live_minikit_pinout_img
+"pinout") to keep the configured GPIO free for other purposes.
 
 [Back to table of contents](#esp32_mh_et_live_minikit_toc)
 
 ### Board Pinout {#esp32_mh_et_live_minikit_pinout}
 
-The following picture shows the pinout of MH-ET LIVE MiniKit for ESP32 board as defined by the default board configuration. The light green GPIOs are not used by configured on-board hardware components and can be used for any purpose. However, if optional off-board hardware modules are used, these GPIOs may also be occupied, see section \ref esp32_mh_et_live_minikit_board_configuration for more information.
+The following picture shows the pinout of MH-ET LIVE MiniKit for ESP32 board
+as defined by the default board configuration. The light green GPIOs are not
+used by configured on-board hardware components and can be used for any
+purpose. However, if optional off-board hardware modules are used, these
+GPIOs may also be occupied, see section
+\ref esp32_mh_et_live_minikit_board_configuration for more information.
 
-The corresponding board schematic can be found [here](https://i.imgur.com/EpE4dGj.jpg)
+The corresponding board schematic can be found
+[here](https://i.imgur.com/EpE4dGj.jpg)
 
 \anchor esp32_mh_et_live_minikit_pinout_img
 @image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/MH-ET_LIVE_D1_mini_ESP32_pinout.png" "MH-ET LIVE MiniKit for ESP32 pinout"
@@ -151,11 +175,14 @@ The corresponding board schematic can be found [here](https://i.imgur.com/EpE4dG
 
 ## Flashing the Device {#esp32_mh_et_live_minikit_flashing}
 
-Flashing RIOT is quite easy. The board has a Micro-USB connector with a reset/boot/flash logic. Just connect the board to your host computer using the programming port and type:
+Flashing RIOT is quite easy. The board has a Micro-USB connector with a
+reset/boot/flash logic. Just connect the board to your host computer using
+the programming port and type:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 make flash BOARD=esp32-mh-et-live-minikit ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-For detailed information about ESP32 as well as configuring and compiling RIOT for ESP32 boards, see \ref esp32_riot.
+For detailed information about ESP32 as well as configuring and compiling
+RIOT for ESP32 boards, see \ref esp32_riot.
 
 [Back to table of contents](#esp32_mh_et_live_minikit_toc)
 */

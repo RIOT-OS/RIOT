@@ -78,8 +78,11 @@ UART_DEV(0):RxD | GPIO3  | Console (configuration is fixed) | \ref esp32_uart_in
 </center>
 \n
 @note
-- GPIO4 only works properly on the board if the function switch for GPIO4 (DIP SW 5) is OFF.
-- SPI_DEV(0) is not available if module `esp_jtag` is used. For the SPI_DEV(0) pins to work properly, the function switches (DIP switches) for the JTAG signals must be set to OFF.
+- GPIO4 only works properly on the board if the function switch
+  for GPIO4 (DIP SW 5) is OFF.
+- SPI_DEV(0) is not available if module `esp_jtag` is used. For the
+  SPI_DEV(0) pins to work properly, the function switches (DIP switches)
+  for the JTAG signals must be set to OFF.
 
 [Back to table of contents](#esp32_ethernet_kit_v1_0_toc)
 
@@ -87,8 +90,9 @@ UART_DEV(0):RxD | GPIO3  | Console (configuration is fixed) | \ref esp32_uart_in
 
 The board schematic can be found [here](https://dl.espressif.com/dl/schematics/SCH_ESP32-ETHERNET-KIT_A_V1.0_20190517.pdf).
 
-By default, only 3 bidirectional GPIO pins are unused: GPIO4, GPIO32, GPIO33. The suggested configuration is for PWM
-and I2C, but they can also be used for SPI or another serial port. By disabling the JTAG interface on the board,
+By default, only 3 bidirectional GPIO pins are unused: GPIO4, GPIO32, GPIO33.
+The suggested configuration is for PWM and I2C, but they can also be used
+for SPI or another serial port. By disabling the JTAG interface on the board,
 another 4 GPIOs can be made available (GPIO12, GPIO13, GPIO14, GPIO15).
 
 [Back to table of contents](#esp32_ethernet_kit_v1_0_toc)

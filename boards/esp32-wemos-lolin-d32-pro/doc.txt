@@ -21,18 +21,21 @@
     1. [MCU](#esp32_wemos_lolin_d32_pro_mcu)
     2. [Board Configuration](#esp32_wemos_lolin_d32_pro_board_configuration)
     3. [Board Pinout](#esp32_wemos_lolin_d32_pro_pinout)
-    4. [Optional Hardware Configurations](#esp32_wemos_lolin_d32_pro_optional_hardware)
+    4. [Optional Hardware Configurations]
+       (#esp32_wemos_lolin_d32_pro_optional_hardware)
 3. [Flashing the Device](#esp32_wemos_lolin_d32_pro_flashing)
 
 ## Overview {#esp32_wemos_lolin_d32_pro_overview}
 
-Wemos LOLIN D32 Pro is a development board that uses the ESP32-WROVER module which has a built-in 4 MByte SPI RAM. Most important features of the board are
+Wemos LOLIN D32 Pro is a development board that uses the ESP32-WROVER module
+which has a built-in 4 MByte SPI RAM. Most important features of the board are
 
 - Micro-SD card interface
 - TFT display interface
 - SPI RAM 4 MByte
 
-Wemos LOLIN D32 Pro belongs to the class of general purpose boards where most ESP32 pins are broken out for easier access.
+Wemos LOLIN D32 Pro belongs to the class of general purpose boards where most
+ESP32 pins are broken out for easier access.
 
 @image html
 "https://docs.wemos.cc/en/latest/_static/boards/d32_pro_v2.0.0_1_16x16.jpg" "Wemos LOLIN D32 PRO" width=400px
@@ -65,7 +68,10 @@ The board for the Wemos LOLIN D32 Pro has the following on-board components:
 - 1 x Micro SD card interface
 - 1 x TFT display connector
 
-The following table shows the default board configuration, which is sorted according to the defined functionality of GPIOs. This configuration can be overridden by an \ref esp32_application_specific_configurations "application-specific configuration".
+The following table shows the default board configuration, which is sorted
+according to the defined functionality of GPIOs. This configuration can be
+overridden by an \ref esp32_application_specific_configurations
+"application-specific configuration".
 
 <center>
 Pin    | Default Configuration* | Optional Configuration | Remarks / Prerequisites | Configuration
@@ -96,9 +102,13 @@ GPIO14 | -  | TFT_CS | when TFT is connected | |
 GPIO27 | -  | TFT_DC | when TFT is connected | |
 </center>
 
-\b * Default configuration cannot be used or is not available at all when optional configuration is used. For example, when the TFT is connected, GPIO32 is used as **TFT_LED** signal and ADC_LINE(4) is not available.
+\b * Default configuration cannot be used or is not available at all when
+optional configuration is used. For example, when the TFT is connected,
+GPIO32 is used as **TFT_LED** signal and ADC_LINE(4) is not available.
 
-@note When the TFT display is connected, add the following line to the makefile of the application to enable the according default board and peripheral configuration:
+@note When the TFT display is connected, add the following line to the
+makefile of the application to enable the according default board and
+peripheral configuration:
 \n
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE += esp_lolin_tft
@@ -110,7 +120,10 @@ For detailed information about the configuration of ESP32 boards, see section \r
 
 ### Optional Hardware Configurations {#esp32_wemos_lolin_d32_pro_optional_hardware}
 
-MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet network interface modules have been tested with the board. You could use the following code in your \ref esp32_application_specific_configurations "application-specific configuration" to use such modules:
+MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet
+network interface modules have been tested with the board. You could use
+the following code in your \ref esp32_application_specific_configurations
+"application-specific configuration" to use such modules:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
 #ifdef BOARD_ESP32_WEMOS_LOLIN_D32_PRO
@@ -132,14 +145,24 @@ MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet network i
 For other parameters, the default values defined by the drivers can be used.
 
 @note
-- Only a few GPIOs are available for external hardware on the Wemos LOLIN D32 PRO. Therefore, MRF24J40 and ENC28J60 based modules use the same GPIOs and only one of these modules can be used simultaneously.
-- The **RESET** signal of MRF24J40 and ENC28J60 based modules can also be connected to the **RST** pin of the board (see \ref esp32_wemos_lolin_d32_pro_pinout_img "pinout") to keep the configured GPIO free for other purposes.
+- Only a few GPIOs are available for external hardware on the
+  Wemos LOLIN D32 PRO. Therefore, MRF24J40 and ENC28J60 based modules use
+  the same GPIOs and only one of these modules can be used simultaneously.
+- The **RESET** signal of MRF24J40 and ENC28J60 based modules can also be
+  connected to the **RST** pin of the board (see
+  \ref esp32_wemos_lolin_d32_pro_pinout_img "pinout") to keep the configured
+  GPIO free for other purposes.
 
 [Back to table of contents](#esp32_wemos_lolin_d32_pro_toc)
 
 ### Board Pinout {#esp32_wemos_lolin_d32_pro_pinout}
 
-The following picture shows the pinout of WEMOS LOLIN D32 PRO board as defined by the default board configuration. The light green GPIOs are not used by configured on-board hardware components and can be used for any purpose. However, if optional off-board hardware modules are used, these GPIOs may also be occupied, see section \ref esp32_wemos_lolin_d32_pro_board_configuration for more information.
+The following picture shows the pinout of WEMOS LOLIN D32 PRO board as
+defined by the default board configuration. The light green GPIOs are
+not used by configured on-board hardware components and can be used for
+any purpose. However, if optional off-board hardware modules are used,
+these GPIOs may also be occupied, see section
+\ref esp32_wemos_lolin_d32_pro_board_configuration for more information.
 
 The corresponding board schematic can be found [here]
 (https://docs.wemos.cc/en/latest/_static/files/sch_d32_pro_v2.0.0.pdf).
@@ -151,11 +174,14 @@ The corresponding board schematic can be found [here]
 
 ## Flashing the Device {#esp32_wemos_lolin_d32_pro_flashing}
 
-Flashing RIOT is quite easy. The board has a Micro-USB connector with reset/boot/flash logic. Just connect the board to your host computer using the programming port and type:
+Flashing RIOT is quite easy. The board has a Micro-USB connector with
+reset/boot/flash logic. Just connect the board to your host computer
+using the programming port and type:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 make flash BOARD=esp32-wemos-lolin-d32-pro ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-For detailed information about ESP32 as well as configuring and compiling RIOT for ESP32 boards, see \ref esp32_riot.
+For detailed information about ESP32 as well as configuring and compiling
+RIOT for ESP32 boards, see \ref esp32_riot.
 
 [Back to table of contents](#esp32_wemos_lolin_d32_pro_toc)
 */
