@@ -39,7 +39,7 @@ void uhcp_handle_udp(uint8_t *buf, size_t len, uint8_t *src, uint16_t port, uhcp
         LOG_ERROR("error: wrong protocol version.\n");
     }
 
-    switch(type) {
+    switch (type) {
 #ifdef UHCP_SERVER
         case UHCP_REQ:
             if (len < sizeof(uhcp_req_t)) {
