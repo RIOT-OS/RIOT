@@ -161,6 +161,7 @@ extern "C" {
 
 /**
  * @brief   Join solicited-node multicast address on interface initialization
+ *          This allows to respond to multicast NS from neighbors using ARSM.
  *
  *          Enable this if you want your 6LoWPAN network to recover
  *          from a border router restart.

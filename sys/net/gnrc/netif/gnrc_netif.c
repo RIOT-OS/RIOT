@@ -603,10 +603,10 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
         }
     }
     else if (!gnrc_netif_is_6ln(netif)) {
-        LOG_WARNING("Address-resolution state-machine not activated. Neighbors "
+        LOG_WARNING("Not joining solicited-node multicast address. Neighbors "
                     "from interface %u\nwill not be able to resolve address "
                     "%s\n"
-                    "    Use CONFIG_GNRC_IPV6_NIB_ARSM=1 to activate.\n",
+                    "    Use CONFIG_GNRC_IPV6_NIB_JOIN_SOLICITED_NODES=1 to activate.\n",
                     netif->pid, ipv6_addr_to_str(addr_str, addr,
                                                  sizeof(addr_str)));
     }
