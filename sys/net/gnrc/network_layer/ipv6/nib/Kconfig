@@ -51,7 +51,7 @@ config GNRC_IPV6_NIB_ARSM
     default n if USEMODULE_GNRC_IPV6_NIB_6LN && !GNRC_IPV6_NIB_6LR
     default y
 
-config GNRC_IPV6_SOLICITED_NODE_MULTICAST
+config GNRC_IPV6_NIB_JOIN_SOLICITED_NODES
     bool "Join solicited-node multicast address on interface initialization"
     default y if GNRC_IPV6_NIB_ARSM
     help

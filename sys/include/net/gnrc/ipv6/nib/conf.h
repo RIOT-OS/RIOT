@@ -165,11 +165,11 @@ extern "C" {
  *          Enable this if you want your 6LoWPAN network to recover
  *          from a border router restart.
  */
-#ifndef CONFIG_GNRC_IPV6_SOLICITED_NODE_MULTICAST
+#ifndef CONFIG_GNRC_IPV6_NIB_JOIN_SOLICITED_NODES
 #if CONFIG_GNRC_IPV6_NIB_ARSM
-#define CONFIG_GNRC_IPV6_SOLICITED_NODE_MULTICAST     1
+#define CONFIG_GNRC_IPV6_NIB_JOIN_SOLICITED_NODES     1
 #else
-#define CONFIG_GNRC_IPV6_SOLICITED_NODE_MULTICAST     0
+#define CONFIG_GNRC_IPV6_NIB_JOIN_SOLICITED_NODES     0
 #endif
 #endif
 
