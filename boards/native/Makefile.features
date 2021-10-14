@@ -11,3 +11,6 @@ FEATURES_PROVIDED += periph_qdec
 # Various other features (if any)
 FEATURES_PROVIDED += ethernet
 FEATURES_PROVIDED += motor_driver
+
+# Put other features for this board (in alphabetical order)
+FEATURES_PROVIDED += riotboot

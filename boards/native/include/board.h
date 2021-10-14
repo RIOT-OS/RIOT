@@ -71,6 +71,9 @@ void _native_LED_RED_TOGGLE(void);
 #ifndef MTD_NATIVE_FILENAME
 #define MTD_NATIVE_FILENAME     "MEMORY.bin"
 #endif
+#ifndef MTD_NATIVE_CFG_FILENAME
+#define MTD_NATIVE_CFG_FILENAME "CONFIG.bin"
+#endif
 /** @} */
 
 /** Default MTD device */
@@ -78,6 +81,12 @@ void _native_LED_RED_TOGGLE(void);
 
 /** mtd flash emulation device */
 extern mtd_dev_t *mtd0;
+
+#ifdef MODULE_CFG_PAGE
+#define MTD_1 mtd1
+extern mtd_dev_t *mtd1;
+#endif
+
 #endif
 
 #if defined(MODULE_SPIFFS) || DOXYGEN
