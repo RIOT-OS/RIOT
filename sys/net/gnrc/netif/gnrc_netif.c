@@ -585,24 +585,23 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
         gnrc_netif_release(netif);
         return -ENOMEM;
     }
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
-    ipv6_addr_t sol_nodes;
-    int res;
+    if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM) || gnrc_netif_is_6ln(netif)) {
+        ipv6_addr_t sol_nodes;
+        int res;
 
-    /* TODO: SHOULD delay join between 0 and MAX_RTR_SOLICITATION_DELAY
-     * for SLAAC */
-    ipv6_addr_set_solicited_nodes(&sol_nodes, addr);
-    res = gnrc_netif_ipv6_group_join_internal(netif, &sol_nodes);
-    if (res < 0) {
-        DEBUG("gnrc_netif: Can't join solicited-nodes of %s on interface %"
-              PRIkernel_pid "\n",
-              ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
-              netif->pid);
-        gnrc_netif_release(netif);
-        return res;
-    }
-#else  /* CONFIG_GNRC_IPV6_NIB_ARSM */
-    if (!gnrc_netif_is_6ln(netif)) {
+        /* TODO: SHOULD delay join between 0 and MAX_RTR_SOLICITATION_DELAY
+         * for SLAAC */
+        ipv6_addr_set_solicited_nodes(&sol_nodes, addr);
+        res = gnrc_netif_ipv6_group_join_internal(netif, &sol_nodes);
+        if (res < 0) {
+            DEBUG("gnrc_netif: Can't join solicited-nodes of %s on interface %"
+                  PRIkernel_pid "\n",
+                  ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
+                  netif->pid);
+            gnrc_netif_release(netif);
+            return res;
+        }
+    } else {
         LOG_WARNING("Address-resolution state-machine not activated. Neighbors "
                     "from interface %u\nwill not be able to resolve address "
                     "%s\n"
@@ -610,7 +609,6 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
                     netif->pid, ipv6_addr_to_str(addr_str, addr,
                                                  sizeof(addr_str)));
     }
-#endif /* CONFIG_GNRC_IPV6_NIB_ARSM */
     netif->ipv6.addrs_flags[idx] = flags;
     memcpy(&netif->ipv6.addrs[idx], addr, sizeof(netif->ipv6.addrs[idx]));
 #ifdef MODULE_GNRC_IPV6_NIB
