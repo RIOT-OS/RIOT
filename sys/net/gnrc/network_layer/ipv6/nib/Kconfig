@@ -52,7 +52,7 @@ config GNRC_IPV6_NIB_ARSM
     default y
 
 config GNRC_IPV6_SOLICITED_NODE_MULTICAST
-    bool "Configure solicited-node multicast address"
+    bool "Join solicited-node multicast address on interface initialization"
     default y if GNRC_IPV6_NIB_ARSM
     help
         Enable this if you want your 6LoWPAN network to recover from a border router restart.
