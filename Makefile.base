@@ -114,7 +114,11 @@ $(BINDIR)/$(MODULE)/:
 	$(Q)mkdir -p $@
 
 OLD_OBJECTS = $(wildcard $(BINDIR)/$(MODULE)/*.o)
-OBJECTS_TO_REMOVE = $(filter-out $(OBJ),$(OLD_OBJECTS))
+
+# do not clean objects from bindist modules
+ifeq (,$(filter $(MODULE),$(BIN_USEMODULE)))
+  OBJECTS_TO_REMOVE = $(filter-out $(OBJ),$(OLD_OBJECTS))
+endif
 
 $(MODULE).module compile-commands $(OBJ): | $(BINDIR)/$(MODULE)/
 
