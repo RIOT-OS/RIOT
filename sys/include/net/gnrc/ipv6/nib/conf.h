@@ -160,7 +160,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Configure solicited-node multicast address
+ * @brief   Join solicited-node multicast address on interface initialization
  *
  *          Enable this if you want your 6LoWPAN network to recover
  *          from a border router restart.
