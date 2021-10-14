@@ -51,6 +51,12 @@ config GNRC_IPV6_NIB_ARSM
     default n if USEMODULE_GNRC_IPV6_NIB_6LN && !GNRC_IPV6_NIB_6LR
     default y
 
+config GNRC_IPV6_SOLICITED_NODE_MULTICAST
+    bool "Configure solicited-node multicast address"
+    default y if GNRC_IPV6_NIB_ARSM
+    help
+        Enable this if you want your 6LoWPAN network to recover from a border router restart.
+
 config GNRC_IPV6_NIB_DNS
     bool "Support for DNS configuration options"
     default y if USEMODULE_GNRC_IPV6_NIB_DNS

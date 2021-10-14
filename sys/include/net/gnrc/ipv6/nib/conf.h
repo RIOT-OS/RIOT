@@ -160,6 +160,20 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Configure solicited-node multicast address
+ *
+ *          Enable this if you want your 6LoWPAN network to recover
+ *          from a border router restart.
+ */
+#ifndef CONFIG_GNRC_IPV6_SOLICITED_NODE_MULTICAST
+#if CONFIG_GNRC_IPV6_NIB_ARSM
+#define CONFIG_GNRC_IPV6_SOLICITED_NODE_MULTICAST     1
+#else
+#define CONFIG_GNRC_IPV6_SOLICITED_NODE_MULTICAST     0
+#endif
+#endif
+
+/**
  * @brief    queue packets for address resolution
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_QUEUE_PKT
