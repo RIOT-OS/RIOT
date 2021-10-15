@@ -523,12 +523,14 @@ static inline uint32_t _irt_ms(uint16_t irt, bool greater_irt)
 static inline uint32_t _sub_rt_ms(uint32_t rt_prev_ms, uint16_t mrt)
 {
     uint32_t sub_rt_ms = (2 * rt_prev_ms) +
-                         ((get_rand_ms_factor() * rt_prev_ms) / MS_PER_SEC);
+                         ((int32_t)(get_rand_ms_factor() * rt_prev_ms) /
+                          (int32_t)MS_PER_SEC);
 
     if (sub_rt_ms > (mrt * MS_PER_SEC)) {
         uint32_t mrt_ms = mrt * MS_PER_SEC;
 
-        sub_rt_ms = mrt_ms + ((get_rand_ms_factor() * mrt_ms) / MS_PER_SEC);
+        sub_rt_ms = mrt_ms + ((int32_t)(get_rand_ms_factor() * mrt_ms) /
+                              (int32_t)MS_PER_SEC);
     }
     return sub_rt_ms;
 }
