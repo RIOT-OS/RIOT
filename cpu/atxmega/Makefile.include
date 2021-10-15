@@ -44,6 +44,12 @@ ifneq (,$(findstring a1,$(shell echo $(CPU_MODEL) | cut -c8-)))
   endif
 endif
 
+ifneq (,$(filter atxmega128a1 atxmega128a1u atxmega128a4u,$(CPU_MODEL)))
+  LINKER_SCRIPT ?= avrxmega7.ld
+else
+  LINKER_SCRIPT ?= avrxmega6.ld
+endif
+
 # CPU depends on the avr8 common module, so include it
 include $(RIOTCPU)/avr8_common/Makefile.include
 

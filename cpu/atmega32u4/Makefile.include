@@ -4,5 +4,7 @@ export ATMEGA_COMMON = $(RIOTCPU)/atmega_common/
 RAM_LEN = 2560
 ROM_LEN = 32K
 
+LINKER_SCRIPT ?= avr51.ld
+
 # CPU depends on the atmega common module, so include it
 include $(ATMEGA_COMMON)Makefile.include

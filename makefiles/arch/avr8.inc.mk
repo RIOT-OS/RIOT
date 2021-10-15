@@ -17,10 +17,9 @@ CFLAGS_OPT  ?= -Os
 CFLAGS    += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 ASFLAGS   += $(CFLAGS_CPU) $(CFLAGS_DBG)
 
-# needed for xfa support. Order is important.
-LINKFLAGS += -T$(RIOTCPU)/avr8_common/ldscripts/xfa.ld
-
 LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -e reset_handler -Wl,--gc-sections
+LINKFLAGS += -L$(RIOTCPU)/avr8_common/ldscripts
+LINKFLAGS += -T$(LINKER_SCRIPT)
 
 # Use ROM_LEN and RAM_LEN during link
 $(if $(ROM_LEN),,$(error ROM_LEN is not defined))
