@@ -23,8 +23,15 @@
 #define RISCV_CSR_H
 
 /* Some things missing from the official encoding.h */
+#ifndef USE_OWN_CSR_REG
+#ifndef MCAUSE_INT
 #define MCAUSE_INT         0x80000000
+#endif
+
+#ifndef MCAUSE_CAUSE
 #define MCAUSE_CAUSE       0x7FFFFFFF
+#endif
+#endif
 
 #define MSTATUS_UIE         0x00000001
 #define MSTATUS_SIE         0x00000002
@@ -79,22 +86,59 @@
 #define DCSR_CAUSE_STEP     4
 #define DCSR_CAUSE_HALT     5
 
+#ifndef USE_OWN_CSR_REG
 #define MCONTROL_TYPE(xlen)    (0xfULL<<((xlen)-4))
 #define MCONTROL_DMODE(xlen)   (1ULL<<((xlen)-5))
 #define MCONTROL_MASKMAX(xlen) (0x3fULL<<((xlen)-11))
 
+#ifndef MCONTROL_SELECT
 #define MCONTROL_SELECT     (1<<19)
+#endif
+
+#ifndef MCONTROL_TIMING
 #define MCONTROL_TIMING     (1<<18)
+#endif
+
+#ifndef MCONTROL_ACTION
 #define MCONTROL_ACTION     (0x3f<<12)
+#endif
+
+#ifndef MCONTROL_CHAIN
 #define MCONTROL_CHAIN      (1<<11)
+#endif
+
+#ifndef MCONTROL_MATCH
 #define MCONTROL_MATCH      (0xf<<7)
+#endif
+
+#ifndef MCONTROL_M
 #define MCONTROL_M          (1<<6)
+#endif
+
+#ifndef MCONTROL_H
 #define MCONTROL_H          (1<<5)
+#endif
+
+#ifndef MCONTROL_S
 #define MCONTROL_S          (1<<4)
+#endif
+
+#ifndef MCONTROL_U
 #define MCONTROL_U          (1<<3)
+#endif
+
+#ifndef MCONTROL_EXECUTE
 #define MCONTROL_EXECUTE    (1<<2)
+#endif
+
+#ifndef MCONTROL_STORE
 #define MCONTROL_STORE      (1<<1)
+#endif
+
+#ifndef MCONTROL_LOAD
 #define MCONTROL_LOAD       (1<<0)
+#endif
+#endif
 
 #define MCONTROL_TYPE_NONE      0
 #define MCONTROL_TYPE_MATCH     2
@@ -112,15 +156,43 @@
 #define MCONTROL_MATCH_MASK_LOW  4
 #define MCONTROL_MATCH_MASK_HIGH 5
 
+#ifndef USE_OWN_CSR_REG
+#ifndef MIP_SSIP
 #define MIP_SSIP            (1 << IRQ_S_SOFT)
+#endif
+
+#ifndef MIP_HSIP
 #define MIP_HSIP            (1 << IRQ_H_SOFT)
+#endif
+
+#ifndef MIP_MSIP
 #define MIP_MSIP            (1 << IRQ_M_SOFT)
+#endif
+
+#ifndef MIP_STIP
 #define MIP_STIP            (1 << IRQ_S_TIMER)
+#endif
+
+#ifndef MIP_HTIP
 #define MIP_HTIP            (1 << IRQ_H_TIMER)
+#endif
+
+#ifndef MIP_MTIP
 #define MIP_MTIP            (1 << IRQ_M_TIMER)
+#endif
+
+#ifndef MIP_SEIP
 #define MIP_SEIP            (1 << IRQ_S_EXT)
+#endif
+
+#ifndef MIP_HEIP
 #define MIP_HEIP            (1 << IRQ_H_EXT)
+#endif
+
+#ifndef MIP_MEIP
 #define MIP_MEIP            (1 << IRQ_M_EXT)
+#endif
+#endif
 
 #define SIP_SSIP MIP_SSIP
 #define SIP_STIP MIP_STIP
@@ -173,22 +245,29 @@
 
 #ifdef __riscv
 
+#ifndef USE_OWN_CSR_REG
 #ifdef __riscv64
 # define MSTATUS_SD MSTATUS64_SD
 # define SSTATUS_SD SSTATUS64_SD
 # define RISCV_PGLEVEL_BITS 9
 #else
+#ifndef MSTATUS_SD
 # define MSTATUS_SD MSTATUS32_SD
+#endif
+#ifndef SSTATUS_SD
 # define SSTATUS_SD SSTATUS32_SD
+#endif
+#ifndef RISCV_PGLEVEL_BITS
 # define RISCV_PGLEVEL_BITS 10
+#endif
 #endif
 #define RISCV_PGSHIFT 12
 #define RISCV_PGSIZE (1 << RISCV_PGSHIFT)
-
+#endif
 #ifndef __ASSEMBLER__
 
 #ifdef __GNUC__
-
+#ifndef USE_OWN_CSR_REG
 #define read_csr(reg) ({ unsigned long __tmp; \
   __asm__ volatile ("csrr %0, " #reg : "=r"(__tmp)); \
   __tmp; })
@@ -219,6 +298,7 @@
   else \
     __asm__ volatile ("csrrc %0, " #reg ", %1" : "=r"(__tmp) : "r"(bit)); \
   __tmp; })
+#endif /* USE_OWN_CSR_REG */
 
 #define rdtime() read_csr(time)
 #define rdcycle() read_csr(cycle)

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_fe310
+ * @ingroup     cpu_riscv_common
  * @{
  *
  * @file
@@ -26,7 +26,11 @@ extern "C" {
 
 /* Doc is provided centrally in architecture.h, hide this from Doxygen */
 #ifndef DOXYGEN
+#ifdef CPU_MPFS
+#define ARCHITECTURE_WORD_BITS      (64U)
+#else
 #define ARCHITECTURE_WORD_BITS      (32U)
+#endif /* CPU_MPFS */
 #endif /* DOXYGEN */
 
 #ifdef __cplusplus

@@ -1,8 +1,14 @@
 ifeq ($(findstring rv32,$(CPU_CORE)),rv32)
   CPU_ARCH := rv32
+  FEATURES_PROVIDED += arch_32bit
 endif
 
-FEATURES_PROVIDED += arch_32bit
+ifeq ($(findstring rv64,$(CPU_CORE)),rv64)
+  CPU_ARCH := rv64
+  FEATURES_PROVIDED += arch_64bit
+endif
+
+
 FEATURES_PROVIDED += arch_riscv
 FEATURES_PROVIDED += cpp
 FEATURES_PROVIDED += libstdcpp

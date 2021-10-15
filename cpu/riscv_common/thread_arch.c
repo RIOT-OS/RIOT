@@ -101,11 +101,11 @@ char *thread_stack_init(thread_task_func_t task_func,
     memset(sf, 0, sizeof(*sf));
 
     /* set initial reg values */
-    sf->pc = (uint32_t)task_func;
-    sf->a0 = (uint32_t)arg;
+    sf->pc = (uint64_t)task_func;
+    sf->a0 = (uint64_t)arg;
 
     /* if the thread exits go to sched_task_exit() */
-    sf->ra = (uint32_t)sched_task_exit;
+    sf->ra = (uint64_t)sched_task_exit;
 
     return (char *)stk_top;
 }
@@ -129,15 +129,15 @@ void thread_print_stack(void)
 
 #ifdef DEVELHELP
     printf("thread name: %s\n", active_thread->name);
-    printf("stack start: 0x%08x\n", (unsigned)(active_thread->stack_start));
-    printf("stack end  : 0x%08x\n",
-           (unsigned)(active_thread->stack_start + active_thread->stack_size));
+    printf("stack start: 0x%08lx\n", (unsigned long)(active_thread->stack_start));
+    printf("stack end  : 0x%08lx\n",
+           (unsigned long)(active_thread->stack_start + active_thread->stack_size));
 #endif
 
     printf("  address:      data:\n");
 
     do {
-        printf("  0x%08x:   0x%08x\n", (unsigned)sp, (unsigned)*sp);
+        printf("  0x%08lx:   0x%08lx\n", (unsigned long)sp, (unsigned long)*sp);
         sp++;
         count++;
     } while (*sp != STACK_MARKER);
@@ -188,6 +188,6 @@ void heap_stats(void)
     long int heap_size = &_eheap - &_sheap;
     struct mallinfo minfo = mallinfo();
 
-    printf("heap: %ld (used %u, free %ld) [bytes]\n",
+    printf("heap: %ld (used %lu, free %ld) [bytes]\n",
            heap_size, minfo.uordblks, heap_size - minfo.uordblks);
 }
