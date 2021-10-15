@@ -9,7 +9,6 @@ create_tap() {
     ip link set ${TAP} up
     ip a a fe80::1/64 dev ${TAP}
     ip a a fd00:dead:beef::1/128 dev lo
-    ip route add ${PREFIX} via fe80::2 dev ${TAP}
 }
 
 remove_tap() {
@@ -31,13 +30,23 @@ cleanup() {
 }
 
 start_uhcpd() {
+    ip route add "${PREFIX}" via fe80::2 dev "${TAP}"
     ${UHCPD} ${TAP} ${PREFIX} > /dev/null &
     UHCPD_PID=$!
 }
 
 start_dhcpd() {
+    ip route add "${PREFIX}" via fe80::2 dev "${TAP}"
     DHCPD_PIDFILE=$(mktemp)
     ${DHCPD} -d -p ${DHCPD_PIDFILE} ${TAP} ${PREFIX} 2> /dev/null
+}
+
+start_radvd() {
+    ADDR=$(echo "${PREFIX}" | sed -e 's/::\//::1\//')
+    ip a a "${ADDR}" dev "${TAP}"
+    sysctl net.ipv6.conf."${TAP}".accept_ra=2
+    sysctl net.ipv6.conf."${TAP}".accept_ra_rt_info_max_plen=64
+    ${RADVD} -c "${TAP}" "${PREFIX}"
 }
 
 if [ "$1" = "-d" ] || [ "$1" = "--use-dhcpv6" ]; then
@@ -45,6 +54,13 @@ if [ "$1" = "-d" ] || [ "$1" = "--use-dhcpv6" ]; then
     shift 1
 else
     USE_DHCPV6=0
+fi
+
+if [ "$1" = "-r" ] || [ "$1" = "--use-radvd" ]; then
+    USE_RADVD=1
+    shift 1
+else
+    USE_RADVD=0
 fi
 
 if [ "$1" = "-e" ] || [ "$1" = "--ethos-only" ]; then
@@ -61,7 +77,7 @@ BAUDRATE=115200
 START_ETHOS=1
 
 [ -z "${PORT}" -o -z "${TAP}" -o -z "${PREFIX}" ] && {
-    echo "usage: $0 [-d|--use-dhcp] [-e|--ethos-only] " \
+    echo "usage: $0 [-d|--use-dhcp] [-e|--ethos-only] [-r|--use-radvd]" \
          "<serial-port> <tap-device> <prefix> " \
          "[baudrate]"
     exit 1
@@ -79,6 +95,10 @@ if [ ${ETHOS_ONLY} -ne 1 ]; then
     if [ ${USE_DHCPV6} -eq 1 ]; then
         DHCPD="$(readlink -f "${ETHOS_DIR}/../dhcpv6-pd_ia/")/dhcpv6-pd_ia.py"
         start_dhcpd
+        START_ETHOS=$?
+    elif [ ${USE_RADVD} -eq 1 ]; then
+        RADVD="$(readlink -f "${ETHOS_DIR}/../radvd/")/radvd.sh"
+        start_radvd
         START_ETHOS=$?
     else
         UHCPD="$(readlink -f "${ETHOS_DIR}/../uhcpd/bin")/uhcpd"
