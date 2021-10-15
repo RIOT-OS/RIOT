@@ -44,17 +44,24 @@ USEMODULE += ps
 
 # When using a regular network uplink we should use DHCPv6
 ifneq (,$(filter cdc-ecm wifi ethernet,$(UPLINK)))
-  USE_DHCPV6 ?= 1
+  PREFIX_CONF ?= dhcpv6
 else
-  USE_DHCPV6 ?= 0
+  PREFIX_CONF ?= uhcp
 endif
 
-ifeq (1,$(USE_DHCPV6))
+# Check if the selected method for prefix configuration is valid
+ifeq (,$(filter dhcpv6 uhcp auto_subnets,$(PREFIX_CONF)))
+  $(error Supported methods for prefix configuration are `dhcpv6`, `uhcp` and `auto_subnets`)
+endif
+
+ifeq (dhcpv6,$(PREFIX_CONF))
   # include DHCPv6 client for 6LoWPAN border router
   USEMODULE += gnrc_dhcpv6_client_6lbr
-else
+else ifeq (uhcp,$(PREFIX_CONF))
   # include UHCP client
   USEMODULE += gnrc_uhcpc
+else ifeq (auto_subnets,$(PREFIX_CONF))
+  USEMODULE += gnrc_ipv6_auto_subnets_simple
 endif
 
 # Comment this out to disable code in RIOT that does safety checking
@@ -67,7 +74,7 @@ QUIET ?= 1
 
 # Ethos/native TAP interface and UHCP prefix can be configured from make command
 TAP ?= tap0
-ifeq (1,$(USE_DHCPV6))
+ifneq (,$(filter dhcpv6 auto_subnets,$(PREFIX_CONF)))
   # with DHCPv6 the 64-bit delegated prefixes are generated from a shorter
   # configured prefix.
   IPV6_PREFIX ?= 2001:db8::/32
@@ -110,7 +117,7 @@ include $(RIOTBASE)/Makefile.include
 
 # Compile-time configuration for DHCPv6 client (needs to come after
 # Makefile.include as this might come from Kconfig)
-ifeq (1,$(USE_DHCPV6))
+ifeq (dhcpv6,$(PREFIX_CONF))
   ifndef CONFIG_GNRC_DHCPV6_CLIENT_6LBR_STATIC_ROUTE
     ifeq (1,$(STATIC_ROUTES))
       CFLAGS += -DCONFIG_GNRC_DHCPV6_CLIENT_6LBR_STATIC_ROUTE=1
@@ -129,7 +136,7 @@ host-tools:
 
 # define native specific targets to only run UHCP daemon when required
 ifneq (,$(filter native,$(BOARD)))
-ifneq (1,$(USE_DHCPV6))
+ifeq (uhcp,$(PREFIX_CONF))
 .PHONY: uhcpd-daemon
 
 uhcpd-daemon: host-tools
