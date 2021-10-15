@@ -5,7 +5,7 @@
 
 \section esp8266_riot  RIOT-OS on ESP8266 and ESP8285 boards
 
-## <a name="esp8266_toc"> Table of Contents </a>
+## Table of Contents {#esp8266_toc}
 
 1. [Overview](#esp8266_overview)
 2. [Short Configuration Reference](#esp8266_short_configuration_reference)
@@ -44,7 +44,7 @@
     1. [QEMU Mode and GDB](#esp8266_qemu_mode_and_gdb)
     2. [Module esp_gdbstub](#esp8266_esp_gdbstub)
 
-# <a name="esp8266_overview"> Overview </a> &nbsp;&nbsp; [[TOC](#esp8266_toc)]
+# Overview {#esp8266_overview}
 
 <b>RIOT-Xtensa-ESP</b> is a bare metal implementation of <b>RIOT-OS</b> for
 <b>ESP8266 / ESP8285</b> SOCs which supports most features of RIOT-OS. The
@@ -58,9 +58,9 @@ the [ESP8266 RTOS SDK v3.x](https://github.com/gschorcht/RIOT-Xtensa-ESP8266-RTO
 To build a RIOT application, simply use the `make` command and specify an
 existing ESP8266 board, for example:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 make flash BOARD=esp8266-esp-12x -C tests/shell ...
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For more information about the `make` command variables and specific compile
 options, see section [Compile Options](#esp8266_compile_options).
@@ -71,14 +71,18 @@ the <b>ESP8266 SOC definitions</b> provided by SDK header files. In addition,
 it needs the hardware abstraction library (libhal), and <b>ESP8266 WiFi stack
 binary</b> libraries which are part of the SDK.
 
-# <a name=esp8266_mcu_esp8266> MCU ESP8266 </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+# MCU ESP8266 {#esp8266_mcu_esp8266}
 
 ESP8266 is a low-cost, ultra-low-power, single-core SoCs with an integrated
 WiFi module from Espressif Systems. The processor core is based on the
 Tensilica Xtensa Diamond Standard 106Micro 32-bit Controller Processor Core,
 which Espressif calls L106. The key features of ESP8266 are:
 
-# <a name="esp8266_short_configuration_reference"> Short Configuration Reference </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+# Short Configuration Reference {#esp8266_short_configuration_reference}
 
 The following table gives a short reference of all board configuration
 parameters used by the ESP8266 port in alphabetical order.
@@ -145,7 +149,9 @@ Technical Reference | [Technical Reference](https://www.espressif.com/sites/defa
 documentation also applies to the SoC ESP8285, even if only the ESP8266 SoC is
 described below.
 
-# <a name="esp8266_toolchain"> Toolchain <a>
+[Back to table of contents](#esp8266_toc)
+
+# Toolchain {#esp8266_toolchain}
 
 The following software components are required for compilation:
 
@@ -163,7 +169,9 @@ There are two options to install the toolchain:
 In both cases, the ESP flash programmer tool `esptool.py` is required,
 see section [Installation of `esptool.py`](#esp8266_installation_of_esptool).
 
-## <a name="esp8266_riot_docker_toolchain"> RIOT Docker Toolchain (riotdocker) </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## RIOT Docker Toolchain (riotdocker) {#esp8266_riot_docker_toolchain}
 
 The easiest way to install the toolchain is to use RIOT Docker
 `riotdocker`. The compilation process using RIOT Docker consists of two steps
@@ -176,11 +184,13 @@ where step 2 requires that the ESP flash programmer tool `esptool.py` is
 installed. Both steps can also be performed with a single command on the host
 system using the `BUILD_IN_DOCKER` variable:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 BUILD_IN_DOCKER=1 make BOARD=... flash
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### <a name="esp8266_preparing_the_environment"> Preparing the Environment </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+### Preparing the Environment {#esp8266_preparing_the_environment}
 
 Using RIOT Docker requires at least the following software components:
 
@@ -192,34 +202,38 @@ For information about installing Docker on your host, refer to the appropriate
 manuals for your operating system. The easiest way to install Docker on an
 Ubuntu/Debian system is for example:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 sudo apt-get install docker.io
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For information on how to install `esptool.py`, see section
-[Installation of `esptool.py`](#esp8266_installation_of_esptool).
+[Installation of esptool.py](#esp8266_installation_of_esptool).
 
-### <a name="esp8266_using_existing_docker_image"> Using an Existing RIOT Docker Image </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+### Using an Existing RIOT Docker Image {#esp8266_using_existing_docker_image}
 
 The easiest way to use RIOT Docker is to use an existing `riotdocker` image.
 You can either pull and start the
 [schorcht/riotbuild_esp8266_rtos](https://hub.docker.com/r/schorcht/riotbuild_esp8266_rtos)
 Docker image which only contains the toolchain for ESP8266 RTOS SDK using
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cd /path/to/RIOT
 docker run -i -t -u $UID -v $(pwd):/data/riotbuild schorcht/riotbuild_esp8266_rtos_sdk
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 or the [riot/riotbuild](https://hub.docker.com/r/riot/riotbuild/) Docker image
 (size is about 1.5 GB) which contains the toolchains for all platforms using
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cd /path/to/RIOT
 docker run -i -t -u $UID -v $(pwd):/data/riotbuild riot/riotbuild
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### <a name="esp8266_generating_docker_image"> Generating a riotdocker Image </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+### Generating a riotdocker Image {#esp8266_generating_docker_image}
 
 Alternatively, you can generate the `riotdocker` image by yourself.
 A `riotdocker` fork that only installs the toolchain for ESP8266 RTOS SDK is
@@ -227,13 +241,13 @@ available at [GitHub](https://github.com/gschorcht/riotdocker-Xtensa-ESP.git).
 After cloning this repository, checkout branch `esp8266_only_rtos_sdk` to
 generate a Docker image with a size of "only" 890 MByte:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cd $HOME/esp
 git clone https://github.com/gschorcht/riotdocker-Xtensa-ESP.git
 cd riotdocker-Xtensa-ESP
 git checkout esp8266_only_rtos_sdk
 docker build -t riotbuild .
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A `riotdocker` version that contains toolchains for all platforms supported
 by RIOT can be found at [GitHub](https://github.com/RIOT-OS/riotdocker).
@@ -243,10 +257,10 @@ about 1.5 GByte.
 Once the Docker image has been created, it can be started with the following
 commands while in the RIOT root directory:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cd /path/to/RIOT
 docker run -i -t -u $UID -v $(pwd):/data/riotbuild riotbuild
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note RIOT's root directory `/path/to/RIOT` becomes visible as the home
 directory of the `riotbuild` user in the Docker. That is, the output
@@ -255,7 +269,9 @@ of compilations in RIOT Docker are also accessible on the host system.
 Please refer the [RIOT wiki](https://github.com/RIOT-OS/RIOT/wiki/Use-Docker-to-build-RIOT)
 on how to use the Docker image to compile RIOT OS.
 
-### <a name="esp8266_flashing_using_docker"> Make Process with RIOT Docker</a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+### Make Process with RIOT Docker {#esp8266_flashing_using_docker}
 
 Using RIOT Docker, the make process consists of the following two steps:
 
@@ -266,9 +282,9 @@ Once the according RIOT Docker image has been started from RIOT's root
 directory, a RIOT application can be compiled inside RIOT Docker using the
 make command as usual, for example:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 make BOARD=esp8266-esp-12x -C tests/shell ...
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This will generate a RIOT binary in ELF format.
 
 @note You can't use the `flash` target inside RIOT Docker.
@@ -278,17 +294,19 @@ the RIOT Docker image was started while in RIOT's root directory, the output
 of the compilations is also accessible on the host system. On the host system,
 the `flash-only` target can then be used to flash the binary.
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 make flash-only BOARD=esp8266-esp-12x -C tests/shell
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note Both steps can also be performed with a single command on the host
 system using the `BUILD_IN_DOCKER` variable:
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `BUILD_IN_DOCKER=1 make BOARD=... flash
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## <a name="esp8266_manual_toolchain_installation"> Manual Toolchain Installation </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## Manual Toolchain Installation {#esp8266_manual_toolchain_installation}
 
 A more difficult way to install the toolchain is the manual installation of
 all required components as described below.
@@ -299,37 +317,41 @@ Furthermore, the following packages (Debian/Ubuntu) have to be installed:<br>
 `graphviz`, `make`, `pcregrep`, `python`, `python-serial`, `python3`,
 `python3-flake8`, `unzip`, `wget`
 
-### <a name="esp8266_installation_of_xtensa_gcc"> Installation of Xtensa GCC compiler suite </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+### Installation of Xtensa GCC compiler suite {#esp8266_installation_of_xtensa_gcc}
 
 The Xtensa GCC compiler for ESP8266 configured for use with RIOT-OS can
 be downloaded and installed as precompiled binary archive from
 [GitHub](https://github.com/gschorcht/xtensa-esp8266-elf):
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 mkdir -p $HOME/esp
 cd $HOME/esp
 git clone https://github.com/gschorcht/xtensa-esp8266-elf
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once the compiler is installed, you have to expand your `PATH` variable by
 the directory with Xtensa GCC binaries:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 export PATH=$HOME/esp/xtensa-esp8266-elf/bin:$PATH
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### <a name="esp8266_installation_of_esp_idf"> Installation of the ESP8266 RTOS SDK</a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+### Installation of the ESP8266 RTOS SDK{#esp8266_installation_of_esp_idf}
 
 To compile RIOT-OS with the ESP8266 RTOS SDK, a modified version of the SDK is
 required. This modified version can also be downloaded as
 [GIT](https://github.com/gschorcht/RIOT-Xtensa-ESP8266-RTOS-SDK.git) repository.
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cd $HOME/esp
 git clone https://github.com/gschorcht/RIOT-Xtensa-ESP8266-RTOS-SDK.git ESP8266_RTOS_SDK
 cd ESP8266_RTOS_SDK/
 git checkout release/v3.1-for-riot-os-v2
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 @note
 - Please be sure to checkout the correct branch that was used for the
 RIOT-OS port. Other versions will not work because they do not have the
@@ -340,12 +362,13 @@ SDK does not need to be compiled in any way.
 To use the installed ESP8266 RTOS SDK, set the environment variable
 `ESP8266_RTOS_SDK_DIR`.
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 export ESP8266_RTOS_SDK_DIR=$HOME/esp/ESP8266_RTOS_SDK
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+[Back to table of contents](#esp8266_toc)
 
-### <a name="esp8266_installation_of_esptool"> Installation of `esptool.py` (ESP flash programmer tool) </a> &nbsp;[[TOC](#esp8266_toc)]
+### Installation of `esptool.py` (ESP flash programmer tool) {#esp8266_installation_of_esptool}
 
 The RIOT port does not work with the `esptool.py` ESP flasher program
 available on [GitHub](https://github.com/espressif/esptool) or
@@ -362,37 +385,41 @@ Therefore, it is **not necessary to install** `esptool.py` explicitly. However
 `esptool.py` depends on `pySerial` which can be installed either
 using `pip`
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 sudo pip install pyserial
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 or the package manager of your OS, for example on Debian/Ubuntu systems:
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 apt install python-pyserial
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 For more information on `esptool.py`, please refer the
 [git repository](https://github.com/espressif/esptool).
 
-# <a name="esp8266_flashing_the_device"> Flashing the Device </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
 
-## <a name="esp8266_toolchain_usage"> Toolchain Usage </a> &nbsp;[[TOC](#esp8266_toc)]
+# Flashing the Device {#esp8266_flashing_the_device}
+
+## Toolchain Usage {#esp8266_toolchain_usage}
 
 Once you have installed all required components, you should have the following
 directories.
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /path/to/esp/xtensa-esp8266-elf
 /path/to/esp/ESP8266_RTOS_SDK
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To use the toolchain, please ensure that your environment variables are set
 correctly to
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 export PATH=/path/to/esp/xtensa-esp8266-elf/bin:$PATH
 export ESP8266_RTOS_SDK_DIR=/path/to/esp/ESP8266_RTOS_SDK
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## <a name="esp8266_compile_options"> Compile Options </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## Compile Options {#esp8266_compile_options}
 
 The compilation process can be controlled by following make variables:
 
@@ -428,18 +455,20 @@ For example, to activate the SPIFFS drive in on-board flash memory, the
 makefile of application has simply to add the `esp_spiffs` module to
 `USEMODULE` make variable:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE += esp_spiffs
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Modules can also be activated temporarily at the command line when calling
 the make command:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE="esp_spiffs" make BOARD=...
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## <a name="esp8266_flash_modes"> Flash Modes </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## Flash Modes {#esp8266_flash_modes}
 
 The `FLASH_MODE` make command variable determines the mode that is used for
 flash access in normal operation.
@@ -460,16 +489,20 @@ For more information about these flash modes, refer the documentation of
 `dout`, ESP8285 modules have to be always flashed in `dout` mode. The
 default flash mode is `dout`.
 
-## <a name="esp8266_erasing"> Erasing the Device </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## Erasing the Device {#esp8266_erasing}
 
 The flash memory of ESP8266 can be erased completely with following command:
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 esptool.py erase_flash
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# <a name="esp8266_peripherals"> Peripherals </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
 
-## <a name="esp8266_gpio_pins"> GPIO pins </a> &nbsp;[[TOC](#esp8266_toc)]
+# Peripherals {#esp8266_peripherals}
+
+## GPIO pins {#esp8266_gpio_pins}
 
 ESP8266 has 17 GPIO pins, which are all digital pins. Some of them can not be
 used at all or have bootstrapping capabilities and are therefore not available on all boards.
@@ -511,7 +544,9 @@ GPIO0 | GPIO2 | GPIO15 (MTDO) | Mode
 
 </center>
 
-## <a name="esp8266_adc_channels"> ADC Channels </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## ADC Channels {#esp8266_adc_channels}
 
 ESP8266 has **one dedicated ADC** pin with a resolution of 10 bits. This ADC
 pin can measure voltages in the range of **0 V ... 1.1 V**.
@@ -519,7 +554,9 @@ pin can measure voltages in the range of **0 V ... 1.1 V**.
 @note Some boards have voltage dividers to scale this range to a maximum of
 3.3 V. For more information, see the hardware manual for the board.
 
-## <a name="esp8266_spi_interfaces"> SPI Interfaces </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## SPI Interfaces {#esp8266_spi_interfaces}
 
 ESP8266 has two SPI controllers:
 
@@ -550,7 +587,9 @@ signal. In `dio` and `dout` flash modes (see section
 [Flash Modes](#esp8266_flash_modes)), GPIOs 9 and 10 can also be used as
 CS signal.
 
-## <a name="esp8266_i2c_interfaces"> I2C Interfaces </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## I2C Interfaces {#esp8266_i2c_interfaces}
 
 Since the ESP8266 does not or only partially support the I2C in hardware,
 I2C interfaces are realized as **bit-banging protocol in software**. The
@@ -566,14 +605,14 @@ from these definitions.
 
 In the following example, only one I2C bus is defined:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
 #define I2C0_SPEED     I2C_SPEED_FAST
 #define I2C0_SDA       GPIO4
 #define I2C0_SCL       GPIO5
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 A configuration with two I2C buses would look like the following:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
 #define I2C0_SPEED     I2C_SPEED_FAST
 #define I2C0_SDA       GPIO4
 #define I2C0_SCL       GPIO5
@@ -581,12 +620,14 @@ A configuration with two I2C buses would look like the following:
 #define I2C1_SPEED     I2C_SPEED_NORMAL
 #define I2C1_SDA       GPIO2
 #define I2C1_SCL       GPIO14
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 All these configurations can be overridden by an
 [application-specific board configuration](#esp8266_application_specific_board_configuration).
 
-## <a name="esp8266_pwm_channels"> PWM Channels </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## PWM Channels {#esp8266_pwm_channels}
 
 The hardware implementation of ESP8266 PWM supports only frequencies as power
 of two. Therefore, a **software implementation** of **one PWM device**
@@ -610,11 +651,13 @@ To define other GPIOs as PWM channels, just overwrite the definition of
 #PWM0_GPIOS in an
 [application-specific board configuration](#esp8266_application_specific_board_configuration)
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
 #define PWM0_GPIOS { GPIO12, GPIO13, GPIO14, GPIO15 }
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## <a name="esp8266_timers"> Timers </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## Timers {#esp8266_timers}
 
 There are two timer implementations:
 
@@ -629,7 +672,9 @@ Although these SDK timers usually have a precision of a few microseconds, they
 can deviate up to 500 microseconds. So if you need a timer with high accuracy,
 you'll need to use the hardware timer with only one timer channel.
 
-## <a name="esp8266_spiffs_device"> SPIFFS Device </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## SPIFFS Device {#esp8266_spiffs_device}
 
 If SPIFFS module is enabled (`USEMODULE += esp_spiffs`), the implemented
 MTD system drive #mtd0 for the on-board SPI flash memory is used together
@@ -641,15 +686,17 @@ address `0x80000` (512 kByte) on first boot. All sectors up to the last
 fixed sector size of 4096 bytes, the top address of the SPIFF is
 `flash_size - 5 * 4096`, e.g., `0xfb000` for a flash memory of 1 MByte.
 The size of the SPIFF then results from:
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 flash_size - 5 * 4096 - 512 kByte
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Please refer file `$RIOTBASE/tests/unittests/test-spiffs/tests-spiffs.c`
 for more information on how to use SPIFFS and VFS together with a MTD
 device #mtd0 alias `MTD_0`.
 
-## <a name="esp8266_other_peripherals"> Other Peripherals </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## Other Peripherals {#esp8266_other_peripherals}
 
 The ESP8266 port of RIOT also supports
 
@@ -660,7 +707,9 @@ The ESP8266 port of RIOT also supports
 
 RTC is not yet implemented.
 
-# <a name="esp8266_network_interfaces"> Network Interfaces </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+# Network Interfaces {#esp8266_network_interfaces}
 
 ESP8266 provides different built-in possibilities to realize network devices:
 
@@ -668,8 +717,9 @@ ESP8266 provides different built-in possibilities to realize network devices:
 - <b>ESP-NOW</b>, a WiFi based AP-less and connectionless peer to
   peer communication protocol
 
-\anchor esp8266_wifi_network_interface
-## <a name="esp8266_wifi_network_interface"> WiFi Network Interface </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## WiFi Network Interface {#esp8266_wifi_network_interface}
 
 The RIOT port for ESP8266 implements in module `esp_wifi` a `netdev`
 driver for
@@ -679,9 +729,9 @@ the built-in WiFi interface.
 `netdev_default` is used. Instead, if necessary, the application has to add
 the module `esp_wifi` in the Makefile.
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE += esp_wifi
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Furthermore, the following configuration parameters have to be defined:
 
@@ -699,16 +749,16 @@ These configuration parameter definitions, as well as enabling the `esp_wifi`
 module, can be done either in the makefile of the project or at make command
 line, e.g.:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_wifi \
 CFLAGS='-DESP_WIFI_SSID=\"MySSID\" -DESP_WIFI_PASS=\"MyPassphrase\"' \
 make -C examples/gnrc_networking BOARD=...
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note
 - Module `esp_wifi` is not enabled automatically when module
 `netdev_default` is used.
-- Leave 'ESP_WIFI_PASS' undefined to connect to an open WiFi access point.
+- Leave `ESP_WIFI_PASS` undefined to connect to an open WiFi access point.
 - The Wifi network interface (module `esp_wifi`) and the
 [ESP-NOW network interface](#esp8266_esp_now_network_interface)
 (module `esp_now`) can be used simultaneously, for example, to realize a
@@ -717,8 +767,9 @@ In this case the ESP-NOW interface must use the same channel as the AP of the
 infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
 the channel of the AP asvalue for the parameter 'ESP_NOW_CHANNEL'.
 
-\anchor esp8266_wifi_ap_network_interface
-## <a name="esp8266_wifi_ap_network_interface"> WiFi SoftAP Network Interface </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## WiFi SoftAP Network Interface {#esp8266_wifi_ap_network_interface}
 
 The RIOT port for the ESP8266 supports a `netdev` interface for the ESP32 WiFi
 SoftAP mode. Module `esp_wifi_ap` has to be enabled to use it.
@@ -743,11 +794,11 @@ These configuration parameter definitions, as well as enabling the `esp_wifi_ap`
 module, can be done either in the makefile of the project or at make command
 line, for example:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_wifi_ap \
 CFLAGS='-DESP_WIFI_SSID=\"MySSID\" -DESP_WIFI_PASS=\"MyPassphrase\" -DESP_WIFI_MAX_CONN=1 \
 make -C examples/gnrc_networking BOARD=...
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note
 - The `esp_wifi_ap` module is not used by default when `netdev_default` is used.
@@ -764,8 +815,9 @@ they may experience multicast packet loss. This affects RIOT, because
 NDP relies on multicast packets to work correctly.
 Refer to the SDK documentation from Espressif on [AP Sleep](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/wifi.html#ap-sleep) for more information.
 
-\anchor esp8266_esp_now_network_interface
-## <a name="esp8266_esp_now_network_interface"> ESP-NOW Network Interface </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## ESP-NOW Network Interface {#esp8266_esp_now_network_interface}
 
 With ESP-NOW, the ESP8266 provides a connectionless communication technology,
 featuring short packet transmission. It applies the IEEE802.11 Action Vendor
@@ -781,9 +833,9 @@ ESP8266 nodes. In this network, each node can send short packets with up to
 @note Module `esp_now` is not enabled automatically if the `netdev_default`
 module is used. Instead, the application has to add the `esp_now` module in
 its makefile when needed.<br>
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE += esp_now
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For ESP-NOW, ESP8266 nodes are used in WiFi SoftAP + Station mode to advertise
 their SSID and become visible to other ESP8266 nodes. The SSID of an ESP8266
@@ -813,31 +865,37 @@ In this case the ESP-NOW interface must use the same channel as the AP of the
 infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
 the channel of the AP asvalue for the parameter 'ESP_NOW_CHANNEL'.
 
-# <a name="esp8266_preconfigured_devices"> Preconfigured Devices </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+# Preconfigured Devices {#esp8266_preconfigured_devices}
 
 The ESP8266 port of RIOT has been tested with several common external
 devices that can be connected to ESP8266 boards and are preconfigured
 accordingly.
 
-## <a name="esp8266_network_devices"> Network Devices </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## Network Devices {#esp8266_network_devices}
 
 RIOT provides a number of driver modules for different types of network
 devices, e.g., IEEE 802.15.4 radio modules and Ethernet modules. The RIOT
 port for ESP8266 has been tested with the following network devices:
 
-- [mrf24j40](https://riot-os.org/api/group__drivers__mrf24j40.html)
-  (driver for Microchip MRF24j40 based IEEE 802.15.4
-- [enc28j60](https://riot-os.org/api/group__drivers__enc28j60.html)
+- \ref drivers_mrf24j40 "mrf24j40"
+  (driver for Microchip MRF24j40 based IEEE 802.15.4)
+- \ref drivers_enc28j60 "enc28j60"
   (driver for Microchip ENC28J60 based Ethernet modules)
 
-### <a name="esp8266_using_mrf24j40"> Using MRF24J40 (module `mrf24j40`) </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+### Using MRF24J40 (module mrf24j40) {#esp8266_using_mrf24j40}
 
 To use MRF24J40 based IEEE 802.15.4 modules as network device, the
 `mrf24j40` driver module has to be added to the makefile of the application:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE += mrf24j40
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The `mrf24j40` driver module uses the following preconfigured interface
 parameters for ESP8266 boards:
@@ -857,14 +915,16 @@ Parameter               | Default      | Remarks
 The GPIOs in this configuration can be overridden by
 [application-specific board configurations](#esp8266_application_specific_board_configuration).
 
-### <a name="esp8266_using_enc28j60"> Using ENC28J60 (module `enc28j60`) </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+### Using ENC28J60 (module enc28j60) {#esp8266_using_enc28j60}
 
 To use ENC28J60 Ethernet modules as network device, the `enc28j60` driver
 module has to be added to the makefile of the application:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE += enc28j60
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The `enc28j60` driver module uses the following preconfigured interface parameters for ESP8266 boards:
 
@@ -882,16 +942,18 @@ Parameter             | Default      | Remarks
 The GPIOs in this configuration can be overridden by
 [application-specific board configurations](#esp8266_application_specific_board_configuration).
 
-## <a name="esp8266_sd_card_device"> SD-Card Device </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## SD-Card Device {#esp8266_sd_card_device}
 
 ESP8266 port of RIOT is preconfigured for RIOT applications that use the
-[SPI SD-Card driver](https://riot-os.org/api/group__drivers__sdcard__spi.html).
+\ref drivers_sdcard_spi "SPI SD-Card driver.
 To use SPI SD-Card driver, the `sdcard_spi` module has to be added to
 a makefile:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE += sdcard_spi
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The `sdcard_spi` driver module uses the following preconfigured interface
 parameters for ESP8266 boards:
@@ -908,9 +970,9 @@ Parameter               | Default     | Remarks
 The GPIO used as CS signal can be overridden by
 [application-specific board configurations](#esp8266_application_specific_board_configuration).
 
+[Back to table of contents](#esp8266_toc)
 
-\anchor esp8266_app_spec_conf
-# <a name="esp8266_application_specific_configurations"> Application-Specific Configurations </a> &nbsp;[[TOC](#esp8266_toc)]
+# Application-Specific Configurations {#esp8266_application_specific_configurations}
 
 The board-specific configuration files `board.h` and `periph_conf.h` as
 well as the driver parameter configuration files `<driver>_params.h`
@@ -925,7 +987,9 @@ configurations for individual applications. For example, while many
 PWM channels are needed in one application, another application does
 not need PWM channels, but many ADC channels.
 
-## <a name="esp8266_application_specific_board_configuration"> Application-Specific Board Configuration </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## Application-Specific Board Configuration {#esp8266_application_specific_board_configuration}
 
 To override default board configurations, simply create an
 application-specific board configuration file `$APPDIR/board.h` in
@@ -937,25 +1001,25 @@ preprocessor directive as the <b>last</b> line.
 For example to override the default definition of the GPIOs that are
 used as PWM channels, the application-specific board configuration
 file `$APPDIR/board.h` could look like the following:
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
 #ifdef CPU_ESP8266
 #define PWM0_GPIOS { GPIO12, GPIO13, GPIO14, GPIO15 }
 #endif
 
 #include_next "board.h"
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It is important to ensure that the application-specific board
 configuration `$APPDIR/board.h` is included first. Insert the following
 line as the <b>first</b> line to the application makefile `$APPDIR/Makefile`.
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 INCLUDES += -I$(APPDIR)
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note To make such application-specific board configurations dependent
 on the ESP8266 MCU or a particular ESP8266 board, you should always
 enclose these definitions in the following constructs
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
 #ifdef CPU_ESP8266
 ...
 #endif
@@ -963,9 +1027,11 @@ enclose these definitions in the following constructs
 #ifdef BOARD_ESP8266_ESP-12X
 ...
 #endif
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## <a name="esp8266_application_specific_driver_configuration"> Application-Specific Driver Configuration </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## Application-Specific Driver Configuration {#esp8266_application_specific_driver_configuration}
 
 Using the approach for overriding board configurations, the parameters
 of drivers that are typically defined in
@@ -979,25 +1045,25 @@ that, add the `include_next` preprocessor directive as the <b>last</b> line.
 For example, to override a GPIO used for LIS3DH sensor, the
 application-specific driver parameter file `$APPDIR/<device>_params.h`
 could look like the following:
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
 #ifdef CPU_ESP8266
 #define LIS3DH_PARAM_INT2           (GPIO_PIN(0, 4))
 #endif
 
 #include_next "lis3dh_params.h"
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It is important to ensure that the application-specific driver parameter
 file `$APPDIR/<device>_params.h` is included first. Insert the following
 line as the <b>first</b> line to the application makefile `$APPDIR/Makefile`.
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 INCLUDES += -I$(APPDIR)
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Please note:** To make such application-specific board configurations
+@note To make such application-specific board configurations
 dependent on the ESP8266 MCU or a particular ESP8266 board, you should
 always enclose these definitions in the following constructs:
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
 #ifdef CPU_ESP8266
 ...
 #endif
@@ -1005,26 +1071,30 @@ always enclose these definitions in the following constructs:
 #ifdef BOARD_ESP8266_ESP-12X
 ...
 #endif
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# <a name="esp8266_sdk_specifics"> SDK Specific Information </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
 
-## <a name="esp8266_sdk_tasks"> SDK Tasks </a> &nbsp;[[TOC](#esp8266_toc)]
+# SDK Specific Information {#esp8266_sdk_specifics}
+
+## SDK Tasks {#esp8266_sdk_tasks}
 
 ESP8266 RTOS SDK libraries create a number of high-priority threads, see the
 listing below, which handle high priority interrupts from SoC and WiFi
 hardware. These threads are also created, if the WiFi hardware is not used.
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	pid | name                 | state    Q | pri | stack  ( used) | base addr  | current
 	  - | isr_stack            | -        - |   - |   2048 (  832) | 0x3ffe8420 | 0x3ffe8c20
 	  1 | ppT                  | bl rx    _ |   2 |   3632 ( 1296) | 0x3fff5df0 | 0x3fff6ac0
 	  2 | pmT                  | bl rx    _ |   4 |   1072 (  320) | 0x3fff6c70 | 0x3fff6f70
 	  3 | rtT                  | bl rx    _ |   3 |   2096 ( 1376) | 0x3fff70b0 | 0x3fff77b0
 	  4 | esp_events           | bl rx    _ |   5 |   2096 (  864) | 0x3fff7f20 | 0x3fff8600
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## <a name="esp8266_esp_idf_heap_implementation"> SDK Heap Implementation </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## SDK Heap Implementation {#esp8266_esp_idf_heap_implementation}
 
 Using module `esp_idf_heap` enables the compilation of SDK heap handling
 instead of memory management provided by `newlibc`.
@@ -1037,10 +1107,10 @@ ESP8266 IRAM (Command RAM) as the additional heap memory region.
 
 The following example shows the heap when the `esp_idf_heap` is used:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Heap region 0 @40107690: 18800 (used 8, free 18792) [bytes]
 Heap region 1 @3fff1760: 59552 (used 8520, free 51032) [bytes]
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In this example, heap region 0 at address `0x401xxxxx` is located in IRAM and
 heap region 1 at address `0x3fffxxxx` in DRAM. While memory management
@@ -1048,14 +1118,16 @@ functions of `newlibc` use always heap region 1 in DRAM, functions of
 binary SDK libraries like the WiFi stack can also also heap region 0
 for 32-bit aligned data.
 
-# <a name="esp8266_debugging"> Debugging </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+# Debugging {#esp8266_debugging}
 
 There are two options to debug your RIOT application for ESP8266 either
 
 - using `QEMU` and module `esp_gdb`, see [QEMU Mode andB](#esp8266_qemu_mode_and_gdb) or
 - using module `esp_gdbstub`, see [Module esp_gdbstub](#esp8266_esp_gdbstub).
 
-## <a name="esp8266_qemu_mode_and_gdb"> QEMU Mode and GDB </a> &nbsp;[[TOC](#esp8266_toc)]
+## QEMU Mode and GDB {#esp8266_qemu_mode_and_gdb}
 
 ### Compilation for `QEMU`
 
@@ -1069,16 +1141,18 @@ application.
 For debugging purposes, the application should be compiled with debugging
 information. This can either be done by using the `esp_gdb` module, for example:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_gdb make flash BOARD=esp8266-esp-12x -C tests/shell
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Back to table of contents](#esp8266_toc)
 
 ### Installation of `QEMU`
 
 To use `QEMU`, you have to install `QEMU` for Xtensa with ESP8266 machine
 implementation first as following.
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cd /my/source/dir
 git clone https://github.com/gschorcht/qemu-xtensa
 cd qemu-xtensa/
@@ -1087,7 +1161,9 @@ export QEMU=/path/to/esp/qemu
 ./configure --prefix=$QEMU --target-list=xtensa-softmmu --disable-werror
 make
 make install
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Back to table of contents](#esp8266_toc)
 
 ### Start Debugging with `QEMU`
 
@@ -1095,31 +1171,33 @@ Once the compilation has been finished, `QEMU` for Xtensa with ESP8266
 machine implementation should be available in `/path/to/esp/qemu/bin` and
 you can start it in first terminal with
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 term1> $QEMU/bin/qemu-system-xtensa -M esp8266 -nographic -serial stdio -monitor none -s -S \
                                     -kernel /path/to/build/dir/esp8266flash.bin
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 where `/path/to/build/dir` is the path to the application build directory
 `$(BINDIR)` where `$ELFFILE.bin` is generated by the `make` command, for example
 `$(RIOTBASE)/tests/shell/bin/esp8266-esp-12x`. After that you can
 start `GDB` in second terminal window using command:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 term2> xtensa-esp8266-elf-gdb /path/to/build/dir/image.elf
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To start debugging, you have to connect to `QEMU` from `GDB` with command:
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 (gdb) target remote :1234
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-@note: `QEMU` does not support the emulation of hardware interrupts or
+@note `QEMU` does not support the emulation of hardware interrupts or
 special hardware modules like the WiFi module. Applications that rely on
 interrupts or the WiFi interface can only be debugged with restrictions
 with `QEMU` and `GDB`.
 
-## <a name="esp8266_esp_gdbstub"> Module `esp_gdbstub` </a> &nbsp;[[TOC](#esp8266_toc)]
+[Back to table of contents](#esp8266_toc)
+
+## Module esp_gdbstub {#esp8266_esp_gdbstub}
 
 ### Compilation with `esp_gdbstub`
 
@@ -1133,38 +1211,40 @@ with RIOT it had to be changed a lot.
 @note Enabling the `gdbstub` interface automatically enables the compilation
 with debug information (module `esp_gdb`) `gdbstub`.
 
+[Back to table of contents](#esp8266_toc)
+
 ### Start Debugging with `esp_gdbstub`
 
 To start debugging, the application has to be compiled using
 module `esp_gdbstub`, for example:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_gdbstub make flash BOARD=esp8266-esp-12x -C tests/shell
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once, the application is flashed to ESP82666, debugging can be started as
 following.
 
 1. Start in first terminal window a terminal program which connects to the
 port of the ESP8266 module as console window:
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 term1> python -m serial.tools.miniterm &lt;port&gt; 115200
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 where `&lt;port&gt;` is the serial interface to which the ESP8266 module is connected,
 e.g., `/dev/ttyUSB0`.
 
 2. Start GDB with the application in a second terminal window:
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 term2> xtensa-esp8266-elf-gdb /path/to/the/build/dir/image.elf
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 where `/path/to/build/dir` is the path to the application build directory
 `$(BINDIR)` where `$ELFFILE.bin` is generated by the `make` command, for example
 `$(RIOTBASE)/tests/shell/bin/esp8266-esp-12x`.
 
 3. Connect from `GDB` to the ESP8266 module with command:
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 (gdb) target remote &lt;port&gt;
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 where `&lt;port&gt;` is the serial interface to which the ESP8266 module is connected,
 e.g., `/dev/ttyUSB0`.
 
@@ -1172,7 +1252,7 @@ By default, `gdbstub` stops the execution automatically using function
 `gdbstub_do_break` after the board initialization and before the kernel
 is initialized.
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 (gdb) tar rem /dev/ttyUSB0
 Remote debugging using /dev/ttyUSB0
 gdbstub_do_break_breakpoint_addr () at cpu/esp8266/vendor/esp-gdbstub/gdbstub-entry.S:400
@@ -1180,7 +1260,7 @@ gdbstub_do_break_breakpoint_addr () at cpu/esp8266/vendor/esp-gdbstub/gdbstub-en
 (gdb) bt
 #0  gdbstub_do_break_breakpoint_addr () at cpu/esp8266/vendor/esp-gdbstub/gdbstub-entry.S:400
 #1  0x40100f89 in gdbstub_init () at cpu/esp8266/vendor/esp-gdbstub/gdbstub.c:985
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 At this time, you can set breakpoints, execute
 the application stepwise or just continue the execution using the `continue`
 command. Please note the limitations below. Once you have started the execution
@@ -1195,12 +1275,14 @@ typed characters can be lost sporadically.
 
 When you reset the ESP8266 module, you will observe a message such as the
 following after boot messages in the console window.
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $T05#b9
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This is simply the first GDB Remote Protocol packet that is generated as a
 result of the automatic break during the initialization when the GDB is not
 yet connected to the ESP8266 module.
+
+[Back to table of contents](#esp8266_toc)
 
 ### Limitations of `esp_gdbstub`
 
@@ -1221,14 +1303,14 @@ source code level, you have to ensure that the function you want to debug is
 located in RAM. For that purpose, add the `IRAM` attribute to that function,
 for example:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
 #include "esp/common_macros.h"
 ...
 void IRAM my_func(void)
 {
     ...
 }
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Then you should be able to set a breakpoint to this function using command `bp`
 and to execute it stepwise after break.
@@ -1236,5 +1318,7 @@ and to execute it stepwise after break.
 Another option is to use `gdbstub_do_break()` wherever you want to break the
 execution. If you know where you want to break before downloading the program
 to the target, you can use `gdbstub_do_break()` as much as you want.
+
+[Back to table of contents](#esp8266_toc)
 
 */

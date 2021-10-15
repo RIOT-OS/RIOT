@@ -55,6 +55,7 @@
 #ifndef PWM0_GPIOS
 #define PWM0_GPIOS  { GPIO0, GPIO5, GPIO16 }
 #endif
+/** @} */
 
 #ifdef __cplusplus
 } /* end extern "C" */
