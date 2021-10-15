@@ -1,0 +1,8 @@
+PROGRAMMER ?= openocd
+
+FLASHFILE = $(HEXFILE)
+
+# Set debug specific arguments for GDB
+DBG_EXTRA_FLAGS +=  -ex 'set mem inaccessible-by-default off' \
+-ex 'set pagination off' -ex 'set arch riscv:rv64' -ex 'load' -ex 'continue'
+export DBG_EXTRA_FLAGS

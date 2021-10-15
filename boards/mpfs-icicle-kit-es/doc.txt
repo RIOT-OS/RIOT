@@ -1,0 +1,36 @@
+/**
+@defgroup    boards_mpfs-icicle-kit-es MPFS Icicle Kit ES
+@ingroup     boards
+@brief       Support for the MPFS Icicle Kit ES
+
+## Overview:
+This board provides support for Microchip PolarFire SoC (Engineering Sample).
+
+## openOCD
+This board needs a special version of openOCD. Upstream support is supposed to be ongoing.
+For now, the only way to get this openOCD version is by installing the Libero tool (available
+on Windows and GNU/Linux).
+If you already have an openOCD installed in your PATH environment, you can still use a
+custom openOCD by calling `OPENOCD=/path/to/openocd/bin/openocd make ..`
+
+## Flash the board
+
+`make flash` is currently unsupported. To test your application, please use
+`make debug` for now. It will load the application to the LIM memory which is
+volatile. You need to Microchip custom openOCD and make sure to have GDB
+in your PATH environment.
+
+TODO: add fpgenprog tool support to RIOT to use it with 'make flash' to
+flash the eNVM memory.
+
+## Accessing STDIO via UART
+
+The STDIO is directly accessible via the USB port (J1). On a Linux host, it's
+generally mapped to `/dev/ttyUSB0`.
+MMUART0 is mapped to `/dev/ttyUSB0`.
+
+Use the `term` target to connect to the board serial port<br/>
+```
+    make BOARD=mpfs-icicle-kit-es -C examples/hello-world term
+```
+ */
