@@ -32,7 +32,7 @@
 #ifdef MODULE_PERIPH_GPIO_IRQ
 static void cb(void *arg)
 {
-    printf("INT: external interrupt from pin %i\n", (int)arg);
+    printf("INT: external interrupt from pin %" PRIuMAX "\n", (uintptr_t)arg);
 }
 #endif
 
@@ -89,7 +89,7 @@ static int init_od_pu(int argc, char **argv)
 #ifdef MODULE_PERIPH_GPIO_IRQ
 static int init_int(int argc, char **argv)
 {
-    int po, pi;
+    unsigned po, pi;
     gpio_mode_t mode = GPIO_IN;
     gpio_flank_t flank;
     int fl;
@@ -144,7 +144,7 @@ static int init_int(int argc, char **argv)
         }
     }
 
-    if (gpio_init_int(GPIO_PIN(po, pi), mode, flank, cb, (void *)pi) < 0) {
+    if (gpio_init_int(GPIO_PIN(po, pi), mode, flank, cb, (void *)(uintptr_t)pi) < 0) {
         printf("error: init_int of GPIO_PIN(%i, %i) failed\n", po, pi);
         return 1;
     }

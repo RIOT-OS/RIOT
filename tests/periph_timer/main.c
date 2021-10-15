@@ -43,7 +43,7 @@ static volatile unsigned args[MAX_CHANNELS];
 static void cb(void *arg, int chan)
 {
     timeouts[chan] = sw_count;
-    args[chan] = (unsigned)arg + chan;
+    args[chan] = (uintptr_t)arg + chan;
     fired++;
 }
 
@@ -60,7 +60,7 @@ static int test_timer(unsigned num)
     }
 
     /* initialize and halt timer */
-    if (timer_init(TIMER_DEV(num), TIMER_SPEED, cb, (void *)(COOKIE * num)) < 0) {
+    if (timer_init(TIMER_DEV(num), TIMER_SPEED, cb, (void *)(uintptr_t)(COOKIE * num)) < 0) {
         printf("TIMER_%u: ERROR on initialization - skipping\n\n", num);
         return 0;
     }
