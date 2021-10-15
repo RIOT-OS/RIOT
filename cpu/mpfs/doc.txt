@@ -1,0 +1,6 @@
+/**
+ * @defgroup        cpu_mpfs   Microchip PolarFire Soc
+ * @ingroup         cpu
+ * @brief           Microchip Polarfire RISC-V Microcontrollers
+ *
+ */

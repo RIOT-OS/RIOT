@@ -1,0 +1,6 @@
+USEMODULE += periph
+
+USEPKG += mpfs_sdk
+FEATURES_REQUIRED += periph_plic
+
+include $(RIOTCPU)/riscv_common/Makefile.dep
