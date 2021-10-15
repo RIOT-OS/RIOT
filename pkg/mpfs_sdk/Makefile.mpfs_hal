@@ -1,0 +1,6 @@
+MODULE=mpfs_hal
+
+SRC += mss_peripherals.c mss_util.c mss_plic.c mss_mtrap.c mss_irq_handler_stubs.c
+SRC += mss_clint.c
+
+include $(RIOTBASE)/Makefile.base

@@ -1,0 +1,6 @@
+MODULE=mpfs_sdk
+
+SRC += mss_uart.c mss_gpio.c
+
+CFLAGS += -Wno-unused-variable
+include $(RIOTBASE)/Makefile.base

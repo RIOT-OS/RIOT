@@ -1,0 +1,200 @@
+From 4082db8476103c4e8ae5a6adda9b8f0dbf501383 Mon Sep 17 00:00:00 2001
+From: dylad <dylan.laduranty@mesotic.com>
+Date: Tue, 28 Sep 2021 21:15:45 +0200
+Subject: [PATCH] revert asm to __asm__
+
+---
+ 0001-revert-asm-to-__asm__.patch | 80 ++++++++++++++++++++++++++++++++
+ mpfs_hal/common/atomic.h         |  2 +-
+ mpfs_hal/common/encoding.h       | 16 +++----
+ mpfs_hal/common/mss_util.c       |  6 +--
+ 4 files changed, 92 insertions(+), 12 deletions(-)
+ create mode 100644 0001-revert-asm-to-__asm__.patch
+
+diff --git a/0001-revert-asm-to-__asm__.patch b/0001-revert-asm-to-__asm__.patch
+new file mode 100644
+index 0000000..a5634e6
+--- /dev/null
++++ b/0001-revert-asm-to-__asm__.patch
+@@ -0,0 +1,80 @@
++From 51d7b96446ccbb52975ed62eb303d406a5cf91de Mon Sep 17 00:00:00 2001
++From: dylad <dylan.laduranty@mesotic.com>
++Date: Tue, 28 Sep 2021 21:15:45 +0200
++Subject: [PATCH] revert asm to __asm__
++
++---
++ mpfs_hal/common/atomic.h   |  2 +-
++ mpfs_hal/common/encoding.h | 16 ++++++++--------
++ 2 files changed, 9 insertions(+), 9 deletions(-)
++
++diff --git a/mpfs_hal/common/atomic.h b/mpfs_hal/common/atomic.h
++index 48110f0..9c81adb 100644
++--- a/mpfs_hal/common/atomic.h
+++++ b/mpfs_hal/common/atomic.h
++@@ -36,7 +36,7 @@
++ extern "C" {
++ #endif
++ 
++-#define mb() asm volatile ("fence" ::: "memory")
+++#define mb() __asm__ volatile ("fence" ::: "memory")
++ #define atomic_set(ptr, val) (*(volatile typeof(*(ptr)) *)(ptr) = val)
++ #define atomic_read(ptr) (*(volatile typeof(*(ptr)) *)(ptr))
++ 
++diff --git a/mpfs_hal/common/encoding.h b/mpfs_hal/common/encoding.h
++index c86fb17..ef912ce 100644
++--- a/mpfs_hal/common/encoding.h
+++++ b/mpfs_hal/common/encoding.h
++@@ -228,33 +228,33 @@
++ #ifdef __GNUC__
++ 
++ #define read_reg(reg) ({ unsigned long __tmp; \
++-  asm volatile ("mv %0, " #reg : "=r"(__tmp)); \
+++  __asm__ volatile ("mv %0, " #reg : "=r"(__tmp)); \
++   __tmp; })
++ 
++ #define read_csr(reg) __extension__({ unsigned long __tmp; \
++-  asm volatile ("csrr %0, " #reg : "=r"(__tmp)); \
+++  __asm__ volatile ("csrr %0, " #reg : "=r"(__tmp)); \
++   __tmp; })
++ 
++ #define write_csr(reg, val) __extension__({ \
++-  asm volatile ("csrw " #reg ", %0" :: "rK"(val)); })
+++  __asm__ volatile ("csrw " #reg ", %0" :: "rK"(val)); })
++ 
++ #define swap_csr(reg, val) ({ unsigned long __tmp; \
++-  asm volatile ("csrrw %0, " #reg ", %1" : "=r"(__tmp) : "rK"(val)); \
+++  __asm__ volatile ("csrrw %0, " #reg ", %1" : "=r"(__tmp) : "rK"(val)); \
++   __tmp; })
++ 
++ #define set_csr(reg, bit) __extension__({ unsigned long __tmp; \
++-  asm volatile ("csrrs %0, " #reg ", %1" : "=r"(__tmp) : "rK"(bit)); \
+++  __asm__ volatile ("csrrs %0, " #reg ", %1" : "=r"(__tmp) : "rK"(bit)); \
++   __tmp; })
++ 
++ #define clear_csr(reg, bit) __extension__({ unsigned long __tmp; \
++-  asm volatile ("csrrc %0, " #reg ", %1" : "=r"(__tmp) : "rK"(bit)); \
+++  __asm__ volatile ("csrrc %0, " #reg ", %1" : "=r"(__tmp) : "rK"(bit)); \
++   __tmp; })
++ 
++ #if 0
++ #define csr_write(csr, val)                 \
++ ({                              \
++     unsigned long __v = (unsigned long)(val);       \
++-    asm volatile ("csrw " __ASM_STR(csr) ", %0" \
+++    __asm__ volatile ("csrw " ____asm___STR(csr) ", %0" \
++                   : : "rK" (__v)            \
++                   : "memory");          \
++ })
++@@ -262,7 +262,7 @@
++ #define csr_write(csr, val)                 \
++ ({                              \
++     unsigned long __v = (unsigned long)(val);       \
++-    __asm__ __volatile__ ("csrw " __ASM_STR(csr) ", %0" \
+++    ____asm____ __volatile__ ("csrw " ____asm___STR(csr) ", %0" \
++                   : : "rK" (__v)            \
++                   : "memory");          \
++ })
++-- 
++2.17.1
++
+diff --git a/mpfs_hal/common/atomic.h b/mpfs_hal/common/atomic.h
+index 48110f0..9c81adb 100644
+--- a/mpfs_hal/common/atomic.h
++++ b/mpfs_hal/common/atomic.h
+@@ -36,7 +36,7 @@
+ extern "C" {
+ #endif
+ 
+-#define mb() asm volatile ("fence" ::: "memory")
++#define mb() __asm__ volatile ("fence" ::: "memory")
+ #define atomic_set(ptr, val) (*(volatile typeof(*(ptr)) *)(ptr) = val)
+ #define atomic_read(ptr) (*(volatile typeof(*(ptr)) *)(ptr))
+ 
+diff --git a/mpfs_hal/common/encoding.h b/mpfs_hal/common/encoding.h
+index c86fb17..ef912ce 100644
+--- a/mpfs_hal/common/encoding.h
++++ b/mpfs_hal/common/encoding.h
+@@ -228,33 +228,33 @@
+ #ifdef __GNUC__
+ 
+ #define read_reg(reg) ({ unsigned long __tmp; \
+-  asm volatile ("mv %0, " #reg : "=r"(__tmp)); \
++  __asm__ volatile ("mv %0, " #reg : "=r"(__tmp)); \
+   __tmp; })
+ 
+ #define read_csr(reg) __extension__({ unsigned long __tmp; \
+-  asm volatile ("csrr %0, " #reg : "=r"(__tmp)); \
++  __asm__ volatile ("csrr %0, " #reg : "=r"(__tmp)); \
+   __tmp; })
+ 
+ #define write_csr(reg, val) __extension__({ \
+-  asm volatile ("csrw " #reg ", %0" :: "rK"(val)); })
++  __asm__ volatile ("csrw " #reg ", %0" :: "rK"(val)); })
+ 
+ #define swap_csr(reg, val) ({ unsigned long __tmp; \
+-  asm volatile ("csrrw %0, " #reg ", %1" : "=r"(__tmp) : "rK"(val)); \
++  __asm__ volatile ("csrrw %0, " #reg ", %1" : "=r"(__tmp) : "rK"(val)); \
+   __tmp; })
+ 
+ #define set_csr(reg, bit) __extension__({ unsigned long __tmp; \
+-  asm volatile ("csrrs %0, " #reg ", %1" : "=r"(__tmp) : "rK"(bit)); \
++  __asm__ volatile ("csrrs %0, " #reg ", %1" : "=r"(__tmp) : "rK"(bit)); \
+   __tmp; })
+ 
+ #define clear_csr(reg, bit) __extension__({ unsigned long __tmp; \
+-  asm volatile ("csrrc %0, " #reg ", %1" : "=r"(__tmp) : "rK"(bit)); \
++  __asm__ volatile ("csrrc %0, " #reg ", %1" : "=r"(__tmp) : "rK"(bit)); \
+   __tmp; })
+ 
+ #if 0
+ #define csr_write(csr, val)                 \
+ ({                              \
+     unsigned long __v = (unsigned long)(val);       \
+-    asm volatile ("csrw " __ASM_STR(csr) ", %0" \
++    __asm__ volatile ("csrw " ____asm___STR(csr) ", %0" \
+                   : : "rK" (__v)            \
+                   : "memory");          \
+ })
+@@ -262,7 +262,7 @@
+ #define csr_write(csr, val)                 \
+ ({                              \
+     unsigned long __v = (unsigned long)(val);       \
+-    __asm__ __volatile__ ("csrw " __ASM_STR(csr) ", %0" \
++    ____asm____ __volatile__ ("csrw " ____asm___STR(csr) ", %0" \
+                   : : "rK" (__v)            \
+                   : "memory");          \
+ })
+diff --git a/mpfs_hal/common/mss_util.c b/mpfs_hal/common/mss_util.c
+index 78ff22b..2102d95 100644
+--- a/mpfs_hal/common/mss_util.c
++++ b/mpfs_hal/common/mss_util.c
+@@ -131,7 +131,7 @@ void sleep_cycles(uint64_t ncycles)
+ __attribute__((aligned(16))) uint64_t get_program_counter(void)
+ {
+     uint64_t prog_counter;
+-    asm volatile ("auipc %0, 0" : "=r"(prog_counter));
++    __asm__ volatile ("auipc %0, 0" : "=r"(prog_counter));
+     return (prog_counter);
+ }
+ 
+@@ -142,7 +142,7 @@ __attribute__((aligned(16))) uint64_t get_program_counter(void)
+ uint64_t get_stack_pointer(void)
+ {
+     uint64_t stack_pointer;
+-    asm volatile ("addi %0, sp, 0" : "=r"(stack_pointer));
++    __asm__ volatile ("addi %0, sp, 0" : "=r"(stack_pointer));
+     return (stack_pointer);
+ }
+ 
+@@ -157,7 +157,7 @@ uint64_t get_stack_pointer(void)
+ uint64_t get_tp_reg(void)
+ {
+     uint64_t tp_reg_val;
+-    asm volatile ("addi %0, tp, 0" : "=r"(tp_reg_val));
++    __asm__ volatile ("addi %0, tp, 0" : "=r"(tp_reg_val));
+     return (tp_reg_val);
+ }
+ 
+-- 
+2.17.1
+
