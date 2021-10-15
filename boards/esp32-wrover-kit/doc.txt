@@ -289,6 +289,25 @@ convenient way for On-Chip debugging. Please refer the
 [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/jtag-debugging/index.html)
 for details on how to setup and how to use ESP-WROVER-KIT and OpenOCD.
 
+To use the JTAG interface, the `esp_jtag` module must be enabled.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+USEMODULE+=esp_jtag make flash BOARD=esp32-wrover-kit ...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To flash using OpenOCD, install the [openocd-esp32](https://github.com/espressif/openocd-esp32) fork.
+The OpenOCD configuration selected by default is for using JTAG via the FTDI chip.
+Export where openocd is located and then flash with PROGRAMMER set:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+export OPENOCD="~/openocd-esp32/src/openocd -s ~/openocd-esp32/tcl"
+PROGRAMMER=openocd USEMODULE+=esp_jtag make flash BOARD=esp32-wrover-kit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To start a debugging session (board will be reset, but not flashed):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+export OPENOCD="~/openocd-esp32/src/openocd -s ~/openocd-esp32/tcl"
+PROGRAMMER=openocd USEMODULE+=esp_jtag make debug BOARD=esp32-wrover-kit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 [Back to table of contents](#esp32_wrover_kit_toc)
 
 ## Other Documentation Resources  {#esp32_wrover_kit_other-resources}
