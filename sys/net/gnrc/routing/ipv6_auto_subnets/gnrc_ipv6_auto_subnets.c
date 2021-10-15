@@ -310,7 +310,7 @@ static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t 
 
         /* add route information option with new subnet */
         tmp = gnrc_ndp_opt_ri_build(&new_prefix, new_prefix_len, valid_ltime,
-                                    NDP_OPT_RI_FLAGS_PRF_NONE, ext_opts);
+                                    NDP_OPT_RI_FLAGS_PRF_ZERO, ext_opts);
         if (tmp == NULL) {
             DEBUG("auto_subnets: No space left in packet buffer. Not adding RIO\n");
         } else {
@@ -320,8 +320,7 @@ static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t 
 
     /* immediately send an RA with RIO */
     if (ext_opts) {
-        gnrc_ndp_rtr_adv_send(upstream, NULL,
-                              &ipv6_addr_all_nodes_link_local, true, ext_opts);
+        gnrc_ndp_rtr_adv_send(upstream, NULL, NULL, true, ext_opts);
     } else {
         DEBUG("auto_subnets: Options empty, not sending RA\n");
     }

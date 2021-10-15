@@ -216,7 +216,7 @@ gnrc_pktsnip_t *gnrc_ndp_opt_ri_build(const ipv6_addr_t *prefix,
         ndp_opt_ri_t *ri_opt = pkt->data;
 
         ri_opt->prefix_len = prefix_len;
-        ri_opt->flags = (flags & NDP_OPT_PI_FLAGS_MASK);
+        ri_opt->flags = (flags & NDP_OPT_RI_FLAGS_MASK);
         ri_opt->route_ltime = byteorder_htonl(route_ltime);
         /* Bits beyond prefix_len MUST be 0 */
         ipv6_addr_set_unspecified(&ri_opt->prefix);
