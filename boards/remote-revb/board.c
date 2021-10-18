@@ -31,8 +31,6 @@ void board_init(void)
 {
     /* initialize the boards LEDs */
     leds_init();
-    /* initialize the CPU */
-    cpu_init();
     /* initialize the 2.4GHz RF switch */
     rf_switch_init();
 }

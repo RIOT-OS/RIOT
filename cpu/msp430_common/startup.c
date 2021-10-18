@@ -25,6 +25,7 @@
 #include "periph/init.h"
 #include "kernel_init.h"
 #include "stdio_base.h"
+#include "cpu.h"
 #include "irq.h"
 #include "log.h"
 #ifdef MODULE_DBGPIN
@@ -32,9 +33,12 @@
 #endif
 
 extern void board_init(void);
+extern void msp430_cpu_init(void);
 
 __attribute__((constructor)) static void startup(void)
 {
+    msp430_cpu_init();
+
     board_init();
 
 #ifdef MODULE_DBGPIN

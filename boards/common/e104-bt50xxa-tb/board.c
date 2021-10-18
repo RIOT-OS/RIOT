@@ -36,6 +36,4 @@ void board_init(void)
                   pm_reboot, NULL);
 #endif
 
-    /* initialize the CPU */
-    cpu_init();
 }

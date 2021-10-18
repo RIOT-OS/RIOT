@@ -24,8 +24,6 @@ void board_init(void)
 {
     /* initialize the boards LEDs */
     leds_init();
-    /* initialize the CPU */
-    cpu_init();
     /* The boot pin must be set to input otherwise it may lock the bootloader */
     gpio_init(BOOT_PIN, GPIO_IN);
 

@@ -31,7 +31,6 @@ void __attribute__((weak)) led_init(void)
 
 void __attribute__((weak)) board_init(void)
 {
-    cpu_init();
 #ifdef LED_PORT
     led_init();
 #endif

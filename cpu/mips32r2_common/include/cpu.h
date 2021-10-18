@@ -51,11 +51,6 @@ static inline void cpu_print_last_instruction(void)
 }
 
 /**
- * @brief Initialize the CPU, set IRQ priorities
- */
-void cpu_init(void);
-
-/**
  * @brief   Trigger a conditional context scheduler run / context switch
  *
  * This function is supposed to be called in the end of each ISR.

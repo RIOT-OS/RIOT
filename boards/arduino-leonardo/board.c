@@ -25,7 +25,5 @@ void led_init(void);
 
 void board_init(void)
 {
-    avr8_stdio_init();
-    cpu_init();
     led_init();
 }

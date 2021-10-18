@@ -26,8 +26,6 @@ void board_init(void)
     gpio_init(LED1_PIN, GPIO_OUT);
     gpio_clear(LED1_PIN);
 
-    /* initialize the CPU */
-    cpu_init();
 }
 
 /** @} */

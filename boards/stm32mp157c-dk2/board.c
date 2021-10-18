@@ -25,6 +25,4 @@
 
 void board_init(void)
 {
-    /* initialize the CPU */
-    cpu_init();
 }

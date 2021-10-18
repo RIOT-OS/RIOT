@@ -23,6 +23,4 @@
 
 void board_init(void)
 {
-    /* Initialize CPU and clocks */
-    cpu_init();
 }

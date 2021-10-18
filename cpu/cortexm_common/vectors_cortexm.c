@@ -181,6 +181,10 @@ void reset_handler_default(void)
     dbgpin_init();
 #endif
 
+    /* initialize the CPU */
+    extern void cpu_init(void);
+    cpu_init();
+
     /* initialize the board (which also initiates CPU initialization) */
     board_init();
 

@@ -23,9 +23,6 @@
 
 void board_init(void)
 {
-    /* initialize the CPU */
-    cpu_init();
-
     /* initialize the mini's buttons */
     gpio_init(BTN0_PIN, BTN0_MODE);
     gpio_init(BTN1_PIN, BTN1_MODE);

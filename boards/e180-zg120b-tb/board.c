@@ -23,9 +23,6 @@
 
 void board_init(void)
 {
-    /* initialize the CPU */
-    cpu_init();
-
 #ifndef RIOTBOOT
     /* initialize the LEDs */
     gpio_init(LED0_PIN, GPIO_OUT);
