@@ -6,22 +6,11 @@ export TAP ?= tap0
 
 USEPKG += paho-mqtt
 
-USEMODULE += lwip_netdev
-USEMODULE += lwip
-USEMODULE += sock_tcp
+NETWORK_STACK ?= lwip
 
 # paho-mqtt depends on TCP support, choose the stack you want
-LWIP_IPV4 ?= 0
-
-ifneq (0,$(LWIP_IPV4))
-  USEMODULE += ipv4_addr
-  USEMODULE += lwip_arp
-  USEMODULE += lwip_ipv4
-  USEMODULE += lwip_dhcp_auto
-  CFLAGS += -DETHARP_SUPPORT_STATIC_ENTRIES=1
-  LWIP_IPV6 ?= 0
-else
-  LWIP_IPV6 ?= 1
+ifeq (,$(filter lwip gnrc,$(NETWORK_STACK)))
+  $(error Supported network stacks are `lwip` and `gnrc`)
 endif
 
 USEMODULE += sock_tcp

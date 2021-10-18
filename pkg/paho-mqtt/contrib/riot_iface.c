@@ -57,20 +57,23 @@ static int mqtt_read(struct Network *n, unsigned char *buf, int len,
     void *_buf;
     int rc = -1;
 
-    if (IS_USED(MODULE_LWIP)) {
-        /* As LWIP doesn't support packet reading byte per byte and
-         * PAHO MQTT reads like that to decode it on the fly,
-         * we read TSRB_MAX_SIZE at once and keep them in a ring buffer.
-         */
-        _buf = _temp_buf;
-        _len = TSRB_MAX_SIZE;
-        _timeout = 0;
-    }
-    else {
-        _buf = buf;
-        _len = len;
-        _timeout = timeout_ms;
-    }
+#if defined(MODULE_LWIP)
+    /* As LWIP doesn't support packet reading byte per byte and
+        * PAHO MQTT reads like that to decode it on the fly,
+        * we read TSRB_MAX_SIZE at once and keep them in a ring buffer.
+        */
+    _buf = _temp_buf;
+    _len = TSRB_MAX_SIZE;
+    _timeout = 0;
+#elif defined(MODULE_GNRC)
+    _buf = buf;
+    _len = len;
+    _timeout = 0;
+#else
+    _buf = buf;
+    _len = len;
+    _timeout = timeout_ms;
+#endif
 
     uint32_t send_time = ztimer_now(ZTIMER_MSEC) + timeout_ms;
     do {
@@ -79,16 +82,17 @@ static int mqtt_read(struct Network *n, unsigned char *buf, int len,
             rc = 0;
         }
 
-        if (IS_USED(MODULE_LWIP)) {
-            if (rc > 0) {
-                tsrb_add(&tsrb_lwip_tcp, _temp_buf, rc);
-            }
-
-            rc = tsrb_get(&tsrb_lwip_tcp, buf, len);
+#if defined(MODULE_LWIP)
+        if (rc > 0) {
+            tsrb_add(&tsrb_lwip_tcp, _temp_buf, rc);
         }
+
+        rc = tsrb_get(&tsrb_lwip_tcp, buf, len);
+#endif
     } while (rc < len && ztimer_now(ZTIMER_MSEC) < send_time && rc >= 0);
 
-    if (IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_LWIP) && rc > 0) {
+#if defined(MODULE_LWIP)
+    if (IS_ACTIVE(ENABLE_DEBUG) && rc > 0) {
         DEBUG("MQTT buf asked for %d, available to read %d\n",
                 rc, tsrb_avail(&tsrb_lwip_tcp));
         for (int i = 0; i < rc; i++) {
@@ -96,6 +100,7 @@ static int mqtt_read(struct Network *n, unsigned char *buf, int len,
         }
         DEBUG("\n");
     }
+#endif
 
     return rc;
 }
@@ -111,9 +116,9 @@ static int mqtt_write(struct Network *n, unsigned char *buf, int len,
 
 void NetworkInit(Network *n)
 {
-    if (IS_USED(MODULE_LWIP)) {
-        tsrb_init(&tsrb_lwip_tcp, buffer, TSRB_MAX_SIZE);
-    }
+#if defined(MODULE_LWIP)
+    tsrb_init(&tsrb_lwip_tcp, buffer, TSRB_MAX_SIZE);
+#endif
     n->mqttread = mqtt_read;
     n->mqttwrite = mqtt_write;
 }

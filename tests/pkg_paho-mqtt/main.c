@@ -24,10 +24,14 @@
 #include "shell.h"
 #include "paho_mqtt.h"
 #include "MQTTClient.h"
+#ifdef MODULE_GNRC
+#include "msg.h"
+#endif
+#include "ztimer.h"
 
-#define PAHO_MQTT_PRIO      (THREAD_PRIORITY_MAIN - 1)
+#define PAHO_MQTT_PRIO                  (THREAD_PRIORITY_MAIN - 1)
 
-#define PAHO_BUF_SIZE       512
+#define PAHO_BUF_SIZE                   512
 
 #define PAHO_COMMAND_TIMEOUT_MS         4000
 
@@ -43,6 +47,12 @@
 
 #define MAX_TOPICS                      4
 #define MAX_LEN_TOPIC                   100
+
+#ifdef MODULE_GNRC
+#define MAIN_QUEUE_SIZE                 8
+
+static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
+#endif
 
 static char _shell_buffer[SHELL_DEFAULT_BUFSIZE];
 
@@ -104,7 +114,7 @@ static int _con(int argc, char **argv)
 
     printf("success: connecting to %s\n", argv[1]);
     /* wait for test script to listen on broker port */
-    xtimer_sleep(2);
+    ztimer_sleep(ZTIMER_MSEC, 2000);
 
     int ret = -1;
 
@@ -276,9 +286,13 @@ int main(void)
 {
 #ifdef MODULE_LWIP
     /* let LWIP initialize */
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1000);
 #endif
     puts("success: starting test application");
+
+#ifdef MODULE_GNRC
+    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
+#endif
 
     /* initialize Paho MQTT client */
     NetworkInit(&network);
