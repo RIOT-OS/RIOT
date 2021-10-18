@@ -37,13 +37,13 @@ static int _find_session(sock_dtls_t *sock, sock_dtls_session_t *to_find,
                          dsm_session_t **session);
 
 static mutex_t _lock;
-static dsm_session_t _sessions[DTLS_PEER_MAX];
+static dsm_session_t _sessions[CONFIG_DSM_PEER_MAX];
 static uint8_t _available_slots;
 
 void dsm_init(void)
 {
     mutex_init(&_lock);
-    _available_slots = DTLS_PEER_MAX;
+    _available_slots = CONFIG_DSM_PEER_MAX;
 }
 
 dsm_state_t dsm_store(sock_dtls_t *sock, sock_dtls_session_t *session,
@@ -116,7 +116,7 @@ uint8_t dsm_get_num_available_slots(void)
 
 uint8_t dsm_get_num_maximum_slots(void)
 {
-    return DTLS_PEER_MAX;
+    return CONFIG_DSM_PEER_MAX;
 }
 
 ssize_t dsm_get_least_recently_used_session(sock_dtls_t *sock, sock_dtls_session_t *session)
@@ -124,12 +124,12 @@ ssize_t dsm_get_least_recently_used_session(sock_dtls_t *sock, sock_dtls_session
     int res = -1;
     dsm_session_t *session_slot = NULL;
 
-    if (dsm_get_num_available_slots() == DTLS_PEER_MAX) {
+    if (dsm_get_num_available_slots() == CONFIG_DSM_PEER_MAX) {
         return res;
     }
 
     mutex_lock(&_lock);
-    for (uint8_t i=0; i < DTLS_PEER_MAX; i++) {
+    for (uint8_t i=0; i < CONFIG_DSM_PEER_MAX; i++) {
         if (_sessions[i].state != SESSION_STATE_ESTABLISHED) {
             continue;
         }
@@ -164,7 +164,7 @@ static int _find_session(sock_dtls_t *sock, sock_dtls_session_t *to_find,
     dsm_session_t *empty_session = NULL;
 
     sock_dtls_session_get_udp_ep(to_find, &to_find_ep);
-    for (uint8_t i=0; i < DTLS_PEER_MAX; i++) {
+    for (uint8_t i=0; i < CONFIG_DSM_PEER_MAX; i++) {
         if (_sessions[i].state == SESSION_STATE_NONE) {
             empty_session = &_sessions[i];
             continue;
