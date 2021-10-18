@@ -36,6 +36,7 @@ struct cfg_page_desc_t {
 };
 
 extern int cfg_page_init(struct cfg_page_desc_t *cpd);
+extern int cfg_page_validate(struct cfg_page_desc_t *cpd, int cfg_slot_no);
 extern struct cfg_page_desc_t cfgpage;
 
 #ifdef __cplusplus
