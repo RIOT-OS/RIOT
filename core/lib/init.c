@@ -74,6 +74,11 @@ static void *main_trampoline(void *arg)
     }
 #endif
 
+    if (IS_USED(MODULE_COVERAGE)) {
+        extern void gcov_coverage_dump(void);
+        gcov_coverage_dump();
+    }
+
     return NULL;
 }
 
