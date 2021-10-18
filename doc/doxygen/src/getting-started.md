@@ -21,16 +21,127 @@ git clone git://github.com/RIOT-OS/RIOT.git
 Compiling RIOT                                                {#compiling-riot}
 ==============
 
-Setting up a toolchain                                {#setting-up-a-toolchain}
-----------------------
-Depending on the hardware you want to use, you need to first install a
-corresponding toolchain. The Wiki on RIOT's Github page contains a lot of
-information that can help you with your platform:
+Required Software for Development {#setting-up-a-toolchain}
+-----------------------------------------------------------
 
-* [ARM-based platforms](https://github.com/RIOT-OS/RIOT/wiki/Family:-ARM)
-* [TI MSP430](https://github.com/RIOT-OS/RIOT/wiki/Family:-MSP430)
-* [Atmel ATmega](https://github.com/RIOT-OS/RIOT/wiki/Family%3A-ATmega)
-* [native](https://github.com/RIOT-OS/RIOT/wiki/Family:-native)
+A set of common tools and a toolchain for the hardware you target needs to be installed first.
+
+### Choosing an Operating System for the Development PC
+
+Most of the RIOT OS developers are using Linux on their development PCs, so you can expect the
+most streamlined experience here. Other POSIX-compliant OSes such as current versions of Mac OS or
+the various BSD flavours will also be fine - however, we rely on users to report bugs regarding
+tooling incompatibilities here. So expect occasional issues for the development branch and please
+help testing during the feature freeze period, if you develop on Mac OS or BSD.
+
+Native development on Windows machines is not officially supported. What works well is using Linux
+in a virtual machine, but at much lower performance than running Linux natively. For development
+using the
+[Windows Subsystem for Linux (WSL)](https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux)
+is a good option
+([installation instructions here](https://docs.microsoft.com/en-us/windows/wsl/install)), but it
+is (as of October 2021) not possible to directly access USB devices from Linux. As a result,
+accessing the serial connection to a board running RIOT, flashing it, and on-chip-debugging from WSL
+will not be possible. (It is possible to pass through the file system of USB storage device. This
+should allow flashing boards that have an [UF2 compatible](https://github.com/Microsoft/uf2) from
+within WSL, but this has not been tested yet.) Hence, WSL users will have to use native Windows
+tools for accessing the serial connection and flashing the board.
+
+### Common Tools
+
+The following tools are required or useful regardless of the architecture and board you are
+developing for:
+
+* Essential system development tools (GNU Make GCC, standard C library headers)
+* git
+* GDB in the multiarch variant (alternatively: install for each architecture you target the
+  corresponding GDB package)
+* unzip or p7zip
+* wget or curl
+* python3
+* pyserial (linux distro package often named python3-serial or py3-serial)
+* Doxygen for building the documentation
+
+@note For each architecture a default tool for flashing and on-chip debugging is listed below - in
+      most cases OpenOCD. However, some boards use different tools, e.g. because a bootloader is
+      installed that allows flashing via the serial interface. Check the board documentation for any
+      details on this. If that documentation contains no info about a flashing tool, the default
+      tool for its architecture is used.
+
+@details Running `BOARD=<INSERT_TARGET_BOARD_HERE> make info-programmers-supported` in your
+         application folder lists the programmers supported by RIOT for the given board.
+
+### Architecture: ARM7 and ARM Cortex M*
+
+* GCC, binutils, and newlib for `arm-none-eabi`
+    * Alternatively: Install docker and export `BUILD_IN_DOCKER=1`
+* OpenOCD for debugging/flashing (most boards)
+    * Some boards use UF2 based bootloaders, which require auto-mounting to work with `make flash`
+    * Some boards default to using J-Link for flashing/debugging. Either install that or export
+      `PROGRAMMER=openocd` to just use OpenOCD instead
+* Optional: picolibc for `arm-none-eabi` to link against picolibc instead of newlib
+* Optional: clang to build with `TOOLCHAIN=llvm`
+* Optional: GDB multiarch for debugging
+    * If no multiarch package is available, use GDB for `arm-none-eabi` instead
+
+### Architecture: Xtensa
+
+#### ESP32
+
+* @ref esp32_toolchain "Toolchain for ESP32"
+* [esptool](https://github.com/espressif/esptool) for flashing
+* Optional: OpenOCD and GDB (multiarch version) for @ref esp32_jtag_debugging "debugging via JTAG"
+
+#### ESP8266
+
+* @ref esp8266_toolchain "Toolchain for ESP8266"
+* [esptool](https://github.com/espressif/esptool) for flashing
+* Optional: GDB (multiarch version) for @ref esp8266_esp_gdbstub "debugging via the gdbstub"
+  interface for the ESP8266
+
+### Architecture: AVR
+
+* GCC and binutils for AVR and avrlibc
+    * Alternatively: Install docker and export `BUILD_IN_DOCKER=1`
+* avrdude for flashing
+* Optional: AVaRICE and GDB (multiarch version) for debugging
+
+### Architecture: RISC-V
+
+* GCC, binutils, and newlib for RISC-V (target triple should start with `riscv` and end with
+  `-none-elf` or `-unknown-elf`. Note that most packages are multilib, e.g. `riscv64-unknown-elf`
+  will likely work fine for 32 bit RISC-V boards)
+    * Alternatively: Install docker and export `BUILD_IN_DOCKER=1`
+* OpenOCD for debugging/flashing (some new boards might require a patched version of OpenOCD or a
+  recent build from the git sources
+* Optional: picolibc to link against picolibc instead of newlib (recommended)
+* Optional: clang to build with `TOOLCHAIN=llvm`
+* Optional: GDB multiarch for debugging
+
+### Architecture: MSP430
+
+* GCC, binutils, and newlib for MSP430
+    * Alternatively: Install docker and export `BUILD_IN_DOCKER=1`
+* [mspdebug](https://github.com/dlbeer/mspdebug) for flashing/debugging
+    * Optional: [MSP Debug Stack](https://www.ti.com/tool/download/MSPDS-OPEN-SOURCE) for additional
+      board support
+* Optional: GDB multiarch for debugging
+
+### Architecture: MIPS
+
+* GCC, binutils, and newlib for MIPS
+    * Alternatively: Install docker and export `BUILD_IN_DOCKER=1`
+* Check board documentation for flashing and debugging
+
+### Architecture: native
+
+* On 64 bit systems: multilib versions for your host compilers, standard C library, and development
+  headers
+    * Alternatively: Compile with `BUILD_IN_DOCKER=1`. Note that for running the executable you
+      still need a multilib system (or 32 bit Linux) with glibc a standard C library.
+* A C library supporting the deprecated POSIX.1-2001 ucontext library (e.g. glibc, FreeBSD's libc,
+  Mac OS's libc)
+* Optional: GDB for debugging. (Prefer the multiarch version, this will also work for other boards)
 
 The build system                                            {#the-build-system}
 ----------------
