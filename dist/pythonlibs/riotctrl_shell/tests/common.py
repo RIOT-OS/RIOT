@@ -14,6 +14,7 @@ class MockSpawn():
         # set some expected attributes
         self.before = None
         self.echo = False
+        self.expect_res = 0
 
     @property
     def last_command(self):
@@ -41,6 +42,9 @@ class MockSpawn():
     def expect_exact(self, *args, **kwargs):
         # always match on prompt with replwrap
         return 0
+
+    def expect(self, *args, **kwargs):
+        return self.expect_res
 
 
 class MockRIOTCtrl():
