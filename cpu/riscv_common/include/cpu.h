@@ -30,11 +30,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Initialization of the CPU
- */
-void cpu_init(void);
-
-/**
  * @brief   Initialize rv32i specific core parts of the CPU
  *
  * Initialized the interrupt controller and the enables the FPU if present

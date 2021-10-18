@@ -118,11 +118,6 @@ static inline void __attribute__((always_inline)) __exit_isr(void)
 }
 
 /**
- * @brief   Initialize the cpu
- */
-void msp430_cpu_init(void);
-
-/**
  * @brief   Print the last instruction's address
  *
  * @todo:   Not supported

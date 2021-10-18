@@ -38,6 +38,7 @@
  * @brief functions for initializing the board, std-lib and kernel
  */
 extern void board_init(void);
+extern void cpu_init(void);
 extern void kernel_init(void);
 extern void __libc_init_array(void);
 

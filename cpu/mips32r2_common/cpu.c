@@ -68,6 +68,7 @@ void cpu_init(void)
     /* trigger static peripheral initialization */
     periph_init();
 }
+
 void mips_start(void)
 {
     cpu_init();

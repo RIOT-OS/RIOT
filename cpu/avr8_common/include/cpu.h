@@ -162,11 +162,6 @@ static inline int avr8_is_uart_tx_pending(void)
 void avr8_exit_isr(void);
 
 /**
- * @brief Initialization of the CPU
- */
-void cpu_init(void);
-
-/**
  * @brief Initialization of the CPU clock
  */
 void avr8_clk_init(void);

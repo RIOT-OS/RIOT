@@ -33,6 +33,7 @@
 #endif
 
 extern void board_init(void);
+extern void msp430_cpu_init(void);
 
 __attribute__((constructor)) static void startup(void)
 {

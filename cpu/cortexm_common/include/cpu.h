@@ -67,11 +67,6 @@ extern "C" {
 #define CORTEXM_SCB_CPACR_FPU_ACCESS_FULL         (0x00f00000)
 
 /**
- * @brief   Initialization of the CPU
- */
-void cpu_init(void);
-
-/**
  * @brief   Initialize Cortex-M specific core parts of the CPU
  *
  * @ref cortexm_init calls, in a default order, @ref cortexm_init_fpu,
