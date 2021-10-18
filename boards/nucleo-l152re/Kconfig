@@ -6,9 +6,9 @@
 #
 
 config BOARD
-    default "nucleo-l152re" if BOARD_NUCLE0_L152RE
+    default "nucleo-l152re" if BOARD_NUCLEO_L152RE
 
-config BOARD_NUCLE0_L152RE
+config BOARD_NUCLEO_L152RE
     bool
     default y
     select BOARD_COMMON_NUCLEO64
