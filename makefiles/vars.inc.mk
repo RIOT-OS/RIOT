@@ -21,6 +21,7 @@ export CXXINCLUDES           # The extra include paths for c++, set by the vario
 export NATIVEINCLUDES        # The native include paths, set by the various native Makefile.include files.
 
 export USEMODULE             # Sys Module dependencies of the application. Set in the application's Makefile.
+export BIN_USEMODULE         # Modules specific to bindist (see bindist.ink.mk). Set in the application's Makefile.
 export USEPKG                # Pkg dependencies (third party modules) of the application. Set in the application's Makefile.
 export DISABLE_MODULE        # Used in the application's Makefile to suppress DEFAULT_MODULEs.
 # APPDEPS                    # Files / Makefile targets that need to be created before the application can be build. Set in the application's Makefile.

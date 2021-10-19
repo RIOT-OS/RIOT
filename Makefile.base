@@ -18,7 +18,7 @@ _MOD := $(shell basename $(CURDIR))
 MODULE ?= $(_MOD)
 
 .PHONY: all clean $(DIRS:%=ALL--%) $(DIRS:%=CLEAN--%) $(MODULE).module \
-        compile-commands $(DIRS:%=COMPILE-COMMANDS--%)
+        compile-commands $(DIRS:%=COMPILE-COMMANDS--%) $(MODULE).cleanup
 
 all: $(MODULE).module ..nothing
 
@@ -113,9 +113,20 @@ include $(RIOTMAKE)/tools/fixdep.inc.mk
 $(BINDIR)/$(MODULE)/:
 	$(Q)mkdir -p $@
 
+OLD_OBJECTS = $(wildcard $(BINDIR)/$(MODULE)/*.o)
+
+# do not clean objects from bindist modules
+ifeq (,$(filter $(MODULE),$(BIN_USEMODULE)))
+  OBJECTS_TO_REMOVE = $(filter-out $(OBJ),$(OLD_OBJECTS))
+endif
+
 $(MODULE).module compile-commands $(OBJ): | $(BINDIR)/$(MODULE)/
 
-$(MODULE).module: $(OBJ) | $(DIRS:%=ALL--%)
+$(MODULE).module: $(OBJ) $(if $(OBJECTS_TO_REMOVE),$(MODULE).cleanup) | $(DIRS:%=ALL--%)
+
+$(MODULE).cleanup:
+	$(Q)# cleanup non selected source files objects
+	$(Q)$(RM) $(OBJECTS_TO_REMOVE)
 
 CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
 CCASFLAGS = $(filter-out $(CCASUWFLAGS), $(CFLAGS)) $(CCASEXFLAGS)
