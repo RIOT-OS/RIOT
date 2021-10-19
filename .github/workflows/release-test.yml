@@ -139,16 +139,16 @@ jobs:
           GITHUB_REPOSITORY=${GITHUB_REPOSITORY} \
           GITHUB_RUN_ID=${GITHUB_RUN_ID} \
           GITHUB_SERVER_URL=${GITHUB_SERVER_URL} \
-          APPKEY="${{ secrets.CI_TTN_APPKEY  }}" \
-          NWKSKEY="${{ secrets.CI_TTN_NWKSKEY_ABP  }}" \
-          APPSKEY="${{ secrets.CI_TTN_APPSKEY_ABP  }}" \
-          LORAWAN_DL_KEY="${{ secrets.CI_TTN_APPID_KEY  }}" \
-          DEVEUI="009E40529364FBE6" \
-          APPEUI="70B3D57ED003B26A" \
-          DEVADDR="26011EB0" \
-          TTN_APP_ID="11-lorawan" \
-          TTN_DEV_ID="riot_lorawan_1" \
-          TTN_DEV_ID_ABP="riot_lorawan_1_abp" \
+          APPKEY="${{ secrets.CI_TTN_APPKEY }}" \
+          NWKSKEY="${{ secrets.CI_TTN_NWKSKEY_ABP }}" \
+          APPSKEY="${{ secrets.CI_TTN_APPSKEY_ABP }}" \
+          DEVEUI="70B3D57ED00463E7" \
+          APPEUI="0000000000000000" \
+          DEVADDR="260B41C7" \
+          TTN_DL_KEY="${{ secrets.CI_TTN_DL_KEY }}" \
+          TTN_APP_ID="release-tests" \
+          TTN_DEV_ID="eui-70b3d57ed00463e7-otaa" \
+          TTN_DEV_ID_ABP="eui-70b3d57ed0046d5d-abp" \
           RIOTBASE=${RIOTBASE} \
           $(which tox) -e test -- ${TOX_ARGS} \
             ${K} "${{ github.event.inputs.filter }}" -m "${{ matrix.pytest_mark }}"
