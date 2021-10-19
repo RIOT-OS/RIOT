@@ -9,11 +9,13 @@ To run the tests, setup of a tap interface is required. This can be done using
 
 ```
 sudo ip tuntap add tap0 mode tap user ${USER}
-sudo ip link set tap0 up)
+sudo ip link set tap0 up
 ```
 
 The tests can then be run with:
 
 ```
-BOARD=<your choice> make flash test-as-root
+BOARD=<your choice> NETWORK_STACK=<your choice> make flash test-as-root
 ```
+
+The supported network stack options are `lwip` and `gnrc`.
