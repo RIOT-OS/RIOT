@@ -16,6 +16,10 @@ menuconfig MODULE_AUTO_INIT
 
 if MODULE_AUTO_INIT
 
+config AUTO_INIT_ENABLE_DEBUG
+    bool "Print a debug message before a module is initialized"
+    default n
+
 rsource "screen/Kconfig"
 rsource "multimedia/Kconfig"
 
