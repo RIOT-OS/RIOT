@@ -61,3 +61,13 @@ void flashpage_write(void *target_addr, const void *data, size_t len)
 
     _flash_write(target_addr, data, len);
 }
+
+unsigned flashpage_first_free(void)
+{
+    return flashpage_page(&_native_flash[0]);
+}
+
+unsigned flashpage_last_free(void)
+{
+    return flashpage_page(&_native_flash[FLASHPAGE_SIZE * FLASHPAGE_NUMOF - 1]);
+}
