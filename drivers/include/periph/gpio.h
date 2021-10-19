@@ -182,6 +182,8 @@ int gpio_init(gpio_t pin, gpio_mode_t mode);
  * @note    You have to add the module `periph_gpio_irq` to your project to
  *          enable this function
  *
+ * @pre     @p cb must not be NULL
+ *
  * @param[in] pin       pin to initialize
  * @param[in] mode      mode of the pin, see @c gpio_mode_t
  * @param[in] flank     define the active flank(s)
