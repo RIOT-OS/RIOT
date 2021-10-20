@@ -25,10 +25,13 @@
 #include "board.h"
 #include "cfg_page.h"
 
+#include "native_internal.h"
+
 int main(void)
 {
     puts("CFG-PAGE test application starting...");
 
     cfg_page_print(&cfgpage);
 
+    real_exit(0);
 }

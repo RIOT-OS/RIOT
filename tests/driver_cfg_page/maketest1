@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# d9 d9f8        # tag(55800)
+#   da 52494f54  # tag(1380536148)
+#      43        # bytes(3)
+#         424f52 # "BOR"
+# 00 # unsigned(0)
+# 19 c63b # unsigned(50747) - CRC16 of above.
+# bf
+#   01            # unsigned(1)
+#    65            # text(5)
+#      68656C6C6F # "hello"
+
+
+(
+echo "d9 d9 f8 da 52 49 4f 54  43 42 4f 52 " | pretty2diag.rb | diag2cbor.rb
+echo "00 "  | pretty2diag.rb | diag2cbor.rb
+echo "19 c6 3b" | pretty2diag.rb | diag2cbor.rb
+echo "bf 01 65 68656C6C6F ff" | pretty2diag.rb | diag2cbor.rb
+) >TEST1.bin
+
+cp TEST1.bin CONFIG.bin && bin/native/tests_driver_cfg_page.elf
