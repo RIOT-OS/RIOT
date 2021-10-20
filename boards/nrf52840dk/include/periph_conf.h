@@ -20,6 +20,7 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include "kernel_defines.h"
 #include "periph_conf_common.h"
 
 #ifdef __cplusplus
