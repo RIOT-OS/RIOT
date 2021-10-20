@@ -235,11 +235,17 @@ static int picolibc_get(FILE *file)
 FILE picolibc_stdio =
     FDEV_SETUP_STREAM(picolibc_put, picolibc_get, picolibc_flush, _FDEV_SETUP_RW);
 
+#ifdef PICOLIBC_STDIO_GLOBALS
+FILE *const stdout = &picolibc_stdio;
+FILE *const stdin = &picolibc_stdio;
+FILE *const stderr = &picolibc_stdio;
+#else
 FILE *const __iob[] = {
-    &picolibc_stdio,    /* stdin  */
-    &picolibc_stdio,    /* stdout */
-    &picolibc_stdio,    /* stderr */
+    &picolibc_stdio,        /* stdin  */
+    &picolibc_stdio,        /* stdout */
+    &picolibc_stdio,        /* stderr */
 };
+#endif
 
 #include <thread.h>
 /**
