@@ -181,9 +181,9 @@ The timer under test and the reference timer can be chosen at compile time by
 defining TIM_TEST_DEV and TIM_REF_DEV, respectively. The frequencies for
 these timers can be configured through TIM_DEV_FREQ and TIM_REF_FREQ. For
 example, to compare timer device 2 running at 32768 Hz against a reference timer
-on timer device 0 (default) running at 1 MHz (default) on Mulle:
+on timer device 0 (default) running at 1 MHz (default) on frdm-k64f:
 
-    CFLAGS='-DTIM_TEST_DEV=TIMER_DEV\(2\) -DTIM_TEST_FREQ=32768' BOARD=mulle make flash
+    CFLAGS='-DTIM_TEST_DEV=TIMER_DEV\(2\) -DTIM_TEST_FREQ=32768' BOARD=frdm-k64f make flash
 
 ### Default configuration
 

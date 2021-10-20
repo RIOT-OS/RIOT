@@ -14,9 +14,6 @@ endif
 ifneq (,$(filter iotlab-m3 fox,$(BOARD)))
   DRIVER := at86rf231
 endif
-ifneq (,$(filter mulle,$(BOARD)))
-  DRIVER := at86rf212b
-endif
 
 # use the at86rf231 as fallback device
 DRIVER ?= at86rf231

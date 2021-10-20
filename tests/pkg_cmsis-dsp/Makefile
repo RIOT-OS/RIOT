@@ -12,7 +12,6 @@ BOARD_WHITELIST := \
   iotlab-m3 \
   mbed_lpc1768 \
   msbiot \
-  mulle \
   nucleo-f091rc \
   nucleo-f103rb \
   nucleo-f103rb \

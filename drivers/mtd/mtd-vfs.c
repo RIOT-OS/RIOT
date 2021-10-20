@@ -25,9 +25,9 @@
  *
  * This allows the MTD driver to register as a node on DevFS
  *
- * See boards/mulle or tests/unittests/tests-devfs for examples on how to use.
+ * See tests/unittests/tests-devfs for examples on how to use.
  *
- * Tested with mtd_spi_nor on Mulle
+ * Tested with mtd_spi_nor on Mulle (removed)
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */

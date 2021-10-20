@@ -30,7 +30,7 @@ BOARD_WHITELIST := airfy-beacon arduino-due arduino-duemilanove \
                    bluepill bluepill-128kib cc2538dk ek-lm4f120xl \
                    feather-m0 fox frdm-k22f frdm-k64f ikea-tradfri i-nucleo-lrwan1 \
                    iotlab-a8-m3 iotlab-m3 limifrog-v1 maple-mini msba2 msbiot \
-                   mulle nrf52840dk nrf52dk nrf6310 nucleo-f207zg nucleo-f303ze \
+                   nrf52840dk nrf52dk nrf6310 nucleo-f207zg nucleo-f303ze \
                    nucleo-f412zg nucleo-f413zh nucleo-f429zi nucleo-f446ze \
                    nucleo-f042k6 nucleo-f303k8 nucleo-l031k6 \
                    nucleo-l432kc nucleo-f072rb nucleo-f091rc nucleo-f103rb nucleo-f302r8 \

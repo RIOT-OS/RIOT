@@ -11,7 +11,6 @@ BOARD_WHITELIST += samr21-xpro
 BOARD_WHITELIST += frdm-kw41z
 BOARD_WHITELIST += frdm-k64f
 BOARD_WHITELIST += frdm-k22f
-BOARD_WHITELIST += mulle
 BOARD_WHITELIST += pba-d-01-kw2x
 BOARD_WHITELIST += teensy31
 # Boards using a bootloader and ROM_OFFSET by default

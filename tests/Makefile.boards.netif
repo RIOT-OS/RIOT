@@ -22,7 +22,6 @@ BOARD_PROVIDES_NETIF := \
     microbit-v2 \
     microduino-corerf \
     msba2 \
-    mulle \
     native \
     nrf51dk \
     nrf51dongle \
