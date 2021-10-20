@@ -236,9 +236,18 @@ FILE picolibc_stdio =
     FDEV_SETUP_STREAM(picolibc_put, picolibc_get, picolibc_flush, _FDEV_SETUP_RW);
 
 #ifdef PICOLIBC_STDIO_GLOBALS
-FILE *const stdout = &picolibc_stdio;
+#ifdef __strong_reference
+/* This saves two const pointers.
+ * See https://github.com/RIOT-OS/RIOT/pull/17001#issuecomment-945936918
+ */
+#define STDIO_ALIAS(x) __strong_reference(stdin, x);
+#else
+#define STDIO_ALIAS(x) FILE *const x = &__picolibc_stdio;
+#endif
+
 FILE *const stdin = &picolibc_stdio;
-FILE *const stderr = &picolibc_stdio;
+STDIO_ALIAS(stdout);
+STDIO_ALIAS(stderr);
 #else
 FILE *const __iob[] = {
     &picolibc_stdio,        /* stdin  */
