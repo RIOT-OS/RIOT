@@ -192,11 +192,11 @@ int cfg_page_format(cfg_page_desc_t *cpd, int cfg_slot_no, int serialno)
 
     int error = 0;
     /* erase the entire page */
-    if(mtd_erase(cpd->dev, byte_offset, MTD_PAGE_SIZE) != 0) {
-        DEBUG("erase failed\n");
+    if((error = mtd_erase(cpd->dev, byte_offset, MTD_SECTOR_SIZE)) != 0) {
+        DEBUG("erase failed: %d\n\n", error);
         return -10;
     }
-    if((error = mtd_write(cpd->dev, header_buffer, byte_offset, write_size)) != NANOCBOR_OK) {
+    if((error = mtd_write(cpd->dev, header_buffer, byte_offset, write_size)) != 0) {
         DEBUG("write failed: %d\n", error);
         return -11;
     }
@@ -222,6 +222,45 @@ int cfg_page_init_reader(cfg_page_desc_t *cpd,
 
     return 0;
 }
+
+static unsigned char cfg_page_active_buffer[MTD_PAGE_SIZE];
+int cfg_page_get_value(cfg_page_desc_t *cpd, uint32_t wantedkey, nanocbor_value_t *valuereader)
+{
+    nanocbor_value_t reader;
+    nanocbor_value_t values;
+    int ret = 0;
+
+    if(cfg_page_init_reader(cpd, cfg_page_active_buffer, sizeof(cfg_page_active_buffer), &reader) < 0) {
+        return -1;
+    }
+
+    if(nanocbor_get_type(&reader) != NANOCBOR_TYPE_MAP ||
+       nanocbor_enter_map(&reader, &values) != NANOCBOR_OK) {
+        return -2;
+    }
+
+    while(!nanocbor_at_end(&values)) {
+        uint32_t key = 0;
+        if(nanocbor_get_uint32(&values, &key) < 0) {
+            DEBUG("non interger key value found: %d", nanocbor_get_type(&values));
+            return -3;
+        }
+
+        if(key == wantedkey) {
+            /* found a key, but might not be last one */
+            if(valuereader) {
+                /* make copy of reader so that caller can read out value */
+                *valuereader = values;
+                ret = 1;
+            }
+        }
+
+        /* skip the map value */
+        nanocbor_skip(&values);
+    }
+    return ret;
+}
+
 
 int cfg_page_init(cfg_page_desc_t *cpd)
 {

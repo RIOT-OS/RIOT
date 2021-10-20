@@ -35,6 +35,7 @@ extern "C" {
 typedef struct cfg_page_desc {
   mtd_dev_t *dev;
   nanocbor_encoder_t writer;
+  nanocbor_value_t   reader;
   uint8_t            active_page;  /* 0 or 1 */
 } cfg_page_desc_t;
 
@@ -45,6 +46,9 @@ extern int cfg_page_print(cfg_page_desc_t *cpd);
 extern int cfg_page_init_reader(cfg_page_desc_t *cpd,
                                 unsigned char *cfg_page_buffer, size_t cfg_page_size,
                                 nanocbor_value_t *cfg_page_reader);
+extern int cfg_page_get_value(cfg_page_desc_t *cpd,
+                              uint32_t wantedkey,
+                              nanocbor_value_t *valuereader);
 extern cfg_page_desc_t cfgpage;
 
 #ifdef __cplusplus

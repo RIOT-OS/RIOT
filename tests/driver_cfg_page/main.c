@@ -29,7 +29,15 @@
 
 int main(void)
 {
+    nanocbor_value_t valuereader;
+    const uint8_t *strvalue;
+    size_t strlen;
     puts("CFG-PAGE test application starting...");
+
+    if(cfg_page_get_value(&cfgpage, 1, &valuereader) == 1 &&
+       nanocbor_get_tstr(&valuereader, &strvalue, &strlen) == NANOCBOR_OK) {
+        printf("key: 1 found value: %.*s\n", strlen, strvalue);
+    }
 
     cfg_page_print(&cfgpage);
 
