@@ -25,11 +25,10 @@
 #include "board.h"
 #include "cfg_page.h"
 
-//static char cfg_page_temp[MTD_PAGE_SIZE];
-
 int main(void)
 {
     puts("CFG-PAGE test application starting...");
 
-    cfg_page_init(&cfgpage);
+    cfg_page_print(&cfgpage);
+
 }

@@ -52,8 +52,22 @@
 #define CFG_PAGE_HEADER_SIZE 16
 #endif
 
+int _calculate_slot_offset(unsigned int cfg_slot_no)
+{
+  int byte_offset = 0;
 
-int cfg_page_validate(struct cfg_page_desc_t *cpd, int cfg_slot_no)
+  if(cfg_slot_no == 0) {
+    byte_offset = 0;
+  } else if(cfg_slot_no == 1) {
+    byte_offset = MTD_SECTOR_SIZE;
+  } else {
+    return -1;
+  }
+  return byte_offset;
+}
+
+
+int cfg_page_validate(cfg_page_desc_t *cpd, int cfg_slot_no)
 {
   unsigned char header_buffer[CFG_PAGE_HEADER_SIZE];
   nanocbor_value_t decoder;
@@ -127,7 +141,7 @@ int cfg_page_validate(struct cfg_page_desc_t *cpd, int cfg_slot_no)
   return serialno;
 }
 
-int cfg_page_format(struct cfg_page_desc_t *cpd, int cfg_slot_no, int serialno)
+int cfg_page_format(cfg_page_desc_t *cpd, int cfg_slot_no, int serialno)
 {
   unsigned char header_buffer[CFG_PAGE_HEADER_SIZE+2];
   nanocbor_encoder_t encoder;
@@ -167,14 +181,7 @@ int cfg_page_format(struct cfg_page_desc_t *cpd, int cfg_slot_no, int serialno)
     return -9;
   }
 
-  unsigned int byte_offset = 0;
-  if(cfg_slot_no == 0) {
-    byte_offset = 0;
-  } else if(cfg_slot_no == 1) {
-    byte_offset = MTD_SECTOR_SIZE;
-  } else {
-    return -1;
-  }
+  unsigned int byte_offset = _calculate_slot_offset(cfg_slot_no);
 
   /* read things in a specific block in first */
   DEBUG("writing %d bytes to slot_no: %d, at offset: %u\n", write_size,
@@ -192,7 +199,25 @@ int cfg_page_format(struct cfg_page_desc_t *cpd, int cfg_slot_no, int serialno)
   return 0;
 }
 
-int cfg_page_init(struct cfg_page_desc_t *cpd)
+int cfg_page_init_reader(cfg_page_desc_t *cpd,
+                         unsigned char *cfg_page_buffer, size_t cfg_page_size,
+                         nanocbor_value_t *cfg_page_reader)
+{
+  unsigned int byte_offset = _calculate_slot_offset(cpd->active_page);
+
+  /* read in the whole page */
+  if(mtd_read(cpd->dev, cfg_page_buffer, byte_offset, cfg_page_size) != 0) {
+    DEBUG("read failed\n");
+    return -1;
+  }
+
+  nanocbor_decoder_init(cfg_page_reader, cfg_page_buffer+CFG_PAGE_HEADER_SIZE,
+                        cfg_page_size - CFG_PAGE_HEADER_SIZE);
+
+  return 0;
+}
+
+int cfg_page_init(cfg_page_desc_t *cpd)
 {
     DEBUG("cfg_page: init\n");
 #ifdef MTD_1
@@ -206,7 +231,7 @@ int cfg_page_init(struct cfg_page_desc_t *cpd)
 
     if(slot0_serial < 0 && slot1_serial < 0) {
       DEBUG("Formatting cfg page %u\n", cpd->active_page);
-      cfg_page_format(&cfgpage, cfg_active_page, 0);
+      cfg_page_format(&cfgpage, cpd->active_page, 0);
     } else if(slot0_serial <  0  && slot1_serial >= 0) {
       cpd->active_page = 1;
     } else if(slot0_serial >= 0  && slot1_serial < 0) {

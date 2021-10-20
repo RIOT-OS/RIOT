@@ -24,7 +24,7 @@
 
 #ifdef MODULE_CFG_PAGE
 #include "cfg_page.h"
-struct cfg_page_desc_t cfgpage;
+cfg_page_desc_t cfgpage;
 #endif
 
 /**

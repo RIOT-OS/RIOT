@@ -32,16 +32,20 @@ extern "C" {
  * @name    CFG page configuration
  * @{
  */
-struct cfg_page_desc_t {
+typedef struct cfg_page_desc {
   mtd_dev_t *dev;
   nanocbor_encoder_t writer;
   uint8_t            active_page;  /* 0 or 1 */
-};
+} cfg_page_desc_t;
 
-extern int cfg_page_init(struct cfg_page_desc_t *cpd);
-extern int cfg_page_validate(struct cfg_page_desc_t *cpd, int cfg_slot_no);
-extern int cfg_page_format(struct cfg_page_desc_t *cpd, int cfg_slot_no, int slotno);
-extern struct cfg_page_desc_t cfgpage;
+extern int cfg_page_init(cfg_page_desc_t *cpd);
+extern int cfg_page_validate(cfg_page_desc_t *cpd, int cfg_slot_no);
+extern int cfg_page_format(cfg_page_desc_t *cpd, int cfg_slot_no, int slotno);
+extern int cfg_page_print(cfg_page_desc_t *cpd);
+extern int cfg_page_init_reader(cfg_page_desc_t *cpd,
+                                unsigned char *cfg_page_buffer, size_t cfg_page_size,
+                                nanocbor_value_t *cfg_page_reader);
+extern cfg_page_desc_t cfgpage;
 
 #ifdef __cplusplus
 }
