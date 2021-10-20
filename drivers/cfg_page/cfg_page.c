@@ -73,9 +73,18 @@ int cfg_page_validate(struct cfg_page_desc_t *cpd, int cfg_slot_no)
   int8_t   serialno = 0;
   const uint8_t  *bytes   = NULL;
   size_t   bytes_len;
+  unsigned int byte_offset = 0;
+
+  if(cfg_slot_no == 0) {
+    byte_offset = 0;
+  } else if(cfg_slot_no == 1) {
+    byte_offset = MTD_SECTOR_SIZE;
+  } else {
+    return -1;
+  }
 
   /* read things in a specific block in first */
-  if(mtd_read(cpd->dev, header_buffer, 0, CFG_PAGE_HEADER_SIZE) != 0) {
+  if(mtd_read(cpd->dev, header_buffer, byte_offset, CFG_PAGE_HEADER_SIZE) != 0) {
     puts("read failed\n");
     return -1;
   }
@@ -128,3 +137,69 @@ int cfg_page_validate(struct cfg_page_desc_t *cpd, int cfg_slot_no)
   /* Good News Everyone! */
   return serialno;
 }
+
+int cfg_page_format(struct cfg_page_desc_t *cpd, int cfg_slot_no, int serialno)
+{
+  unsigned char header_buffer[CFG_PAGE_HEADER_SIZE+2];
+  nanocbor_encoder_t encoder;
+  unsigned int write_size=CFG_PAGE_HEADER_SIZE+2;
+
+  nanocbor_encoder_init(&encoder, header_buffer, write_size);
+
+  if(nanocbor_fmt_tag(&encoder, CBOR_SEQ_TAG) < 0) {
+    return -1;
+  }
+
+  if(nanocbor_fmt_tag(&encoder, CFG_PAGE_RIOT_TAG) < 0) {
+    return -1;
+  }
+
+  if(nanocbor_put_bstr(&encoder, (unsigned const char *)"BOR", 3) < 0) {
+    return -1;
+  }
+
+  if(nanocbor_fmt_uint(&encoder, serialno) < NANOCBOR_OK) {
+    return -6;
+  }
+
+  /* now calculate the CRC */
+  /* calculate a 16-bit checksum across the bytes so far */
+  uint16_t calculated = crc16_ccitt_calc(header_buffer, (encoder.cur - header_buffer));
+
+  if(nanocbor_fmt_uint(&encoder, calculated) < NANOCBOR_OK) {
+    return -7;
+  }
+
+  /* now initialize an indefinite map, and stop code */
+  if(nanocbor_fmt_map_indefinite(&encoder) < 0) {
+    return -8;
+  }
+  if(nanocbor_fmt_end_indefinite(&encoder) < 0) {
+    return -9;
+  }
+
+  unsigned int byte_offset = 0;
+  if(cfg_slot_no == 0) {
+    byte_offset = 0;
+  } else if(cfg_slot_no == 1) {
+    byte_offset = MTD_SECTOR_SIZE;
+  } else {
+    return -1;
+  }
+
+  /* read things in a specific block in first */
+  printf("writing %d bytes to slot_no: %d, at offset: %u\n", write_size,
+         cfg_slot_no, byte_offset);
+
+  od_hex_dump_ext(header_buffer, write_size, 16, 0);
+
+  int error = 0;
+  if((error = mtd_write(cpd->dev, header_buffer, byte_offset, write_size)) != NANOCBOR_OK) {
+    printf("write failed: %d\n", error);
+    return -11;
+  }
+
+  printf("formatted slot %u\n", cfg_slot_no);
+  return 0;
+}
+
