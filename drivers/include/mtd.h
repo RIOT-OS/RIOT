@@ -276,6 +276,9 @@ int mtd_read_page(mtd_dev_t *mtd, void *dest, uint32_t page, uint32_t offset, ui
  * but the buffer cannot overlap two pages. Though some devices might enforce alignment
  * on both @p addr and @p buf.
  *
+ * If the underlying sector needs to be erased before it can be written, the MTD
+ * layer will take care of the read-modify-write operation.
+ *
  * @param      mtd   the device to write to
  * @param[in]  src   the buffer to write
  * @param[in]  addr  the start address to write to
@@ -325,8 +328,7 @@ int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page,
  * The MTD layer will take care of splitting up the transaction into multiple
  * writes if it is required by the underlying storage media.
  *
- * If the underlying sector needs to be erased before it can be written, the MTD
- * layer will take care of the read-modify-write operation.
+ * This interface does not erase the underlying page, nor perform a read-modify-write operation.
  *
  * @p offset must be smaller than the page size
  *
