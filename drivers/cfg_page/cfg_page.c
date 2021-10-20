@@ -54,167 +54,167 @@
 
 int _calculate_slot_offset(unsigned int cfg_slot_no)
 {
-  int byte_offset = 0;
+    int byte_offset = 0;
 
-  if(cfg_slot_no == 0) {
-    byte_offset = 0;
-  } else if(cfg_slot_no == 1) {
-    byte_offset = MTD_SECTOR_SIZE;
-  } else {
-    return -1;
-  }
-  return byte_offset;
+    if(cfg_slot_no == 0) {
+        byte_offset = 0;
+    } else if(cfg_slot_no == 1) {
+        byte_offset = MTD_SECTOR_SIZE;
+    } else {
+        return -1;
+    }
+    return byte_offset;
 }
 
 
 int cfg_page_validate(cfg_page_desc_t *cpd, int cfg_slot_no)
 {
-  unsigned char header_buffer[CFG_PAGE_HEADER_SIZE];
-  nanocbor_value_t decoder;
-  uint32_t tagval = 0x12345678;
-  uint16_t  checksum = 0;
-  int8_t   serialno = 0;
-  const uint8_t  *bytes   = NULL;
-  size_t   bytes_len;
-  unsigned int byte_offset = 0;
+    unsigned char header_buffer[CFG_PAGE_HEADER_SIZE];
+    nanocbor_value_t decoder;
+    uint32_t tagval = 0x12345678;
+    uint16_t  checksum = 0;
+    int8_t   serialno = 0;
+    const uint8_t  *bytes   = NULL;
+    size_t   bytes_len;
+    unsigned int byte_offset = 0;
 
-  if(cfg_slot_no == 0) {
-    byte_offset = 0;
-  } else if(cfg_slot_no == 1) {
-    byte_offset = MTD_SECTOR_SIZE;
-  } else {
-    return -1;
-  }
+    if(cfg_slot_no == 0) {
+        byte_offset = 0;
+    } else if(cfg_slot_no == 1) {
+        byte_offset = MTD_SECTOR_SIZE;
+    } else {
+        return -1;
+    }
 
-  /* read things in a specific block in first */
-  if(mtd_read(cpd->dev, header_buffer, byte_offset, CFG_PAGE_HEADER_SIZE) != 0) {
-    DEBUG("read failed\n");
-    return -1;
-  }
+    /* read things in a specific block in first */
+    if(mtd_read(cpd->dev, header_buffer, byte_offset, CFG_PAGE_HEADER_SIZE) != 0) {
+        DEBUG("read failed\n");
+        return -1;
+    }
 
-  //od_hex_dump_ext(header_buffer, CFG_PAGE_HEADER_SIZE, 16, 0);
+    //od_hex_dump_ext(header_buffer, CFG_PAGE_HEADER_SIZE, 16, 0);
 
-  /* validate the checksum */
-  nanocbor_decoder_init(&decoder, header_buffer, CFG_PAGE_HEADER_SIZE);
+    /* validate the checksum */
+    nanocbor_decoder_init(&decoder, header_buffer, CFG_PAGE_HEADER_SIZE);
 
-  /* pull in the tags */
-  if(nanocbor_get_tag(&decoder, &tagval) != NANOCBOR_OK) {
-    return -1;
-  }
+    /* pull in the tags */
+    if(nanocbor_get_tag(&decoder, &tagval) != NANOCBOR_OK) {
+        return -1;
+    }
 
-  if(tagval != CBOR_SEQ_TAG) {
-    return -2;
-  }
+    if(tagval != CBOR_SEQ_TAG) {
+        return -2;
+    }
 
-  if(nanocbor_get_tag(&decoder, &tagval) != NANOCBOR_OK) {
-    return -3;
-  }
+    if(nanocbor_get_tag(&decoder, &tagval) != NANOCBOR_OK) {
+        return -3;
+    }
 
-  if(tagval != CFG_PAGE_RIOT_TAG) {
-    return -4;
-  }
+    if(tagval != CFG_PAGE_RIOT_TAG) {
+        return -4;
+    }
 
-  if(nanocbor_get_bstr(&decoder, &bytes, &bytes_len) != NANOCBOR_OK
-     || bytes_len != 3
-     || bytes[0]!= 'B'
-     || bytes[1]!= 'O'
-     || bytes[2]!= 'R') {
-    return -5;
-  }
+    if(nanocbor_get_bstr(&decoder, &bytes, &bytes_len) != NANOCBOR_OK
+       || bytes_len != 3
+       || bytes[0]!= 'B'
+       || bytes[1]!= 'O'
+       || bytes[2]!= 'R') {
+        return -5;
+    }
 
-  if(nanocbor_get_int8(&decoder, &serialno) < NANOCBOR_OK) {
-    return -6;
-  }
+    if(nanocbor_get_int8(&decoder, &serialno) < NANOCBOR_OK) {
+        return -6;
+    }
 
-  /* calculate a 16-bit checksum across the bytes so far */
-  uint16_t calculated = crc16_ccitt_calc(header_buffer, (decoder.cur - header_buffer));
+    /* calculate a 16-bit checksum across the bytes so far */
+    uint16_t calculated = crc16_ccitt_calc(header_buffer, (decoder.cur - header_buffer));
 
-  if(nanocbor_get_uint16(&decoder, &checksum) < NANOCBOR_OK) {
-    return -7;
-  }
+    if(nanocbor_get_uint16(&decoder, &checksum) < NANOCBOR_OK) {
+        return -7;
+    }
 
-  if(calculated != checksum) {
-    return -8;
-  }
+    if(calculated != checksum) {
+        return -8;
+    }
 
-  /* Good News Everyone! */
-  return serialno;
+    /* Good News Everyone! */
+    return serialno;
 }
 
 int cfg_page_format(cfg_page_desc_t *cpd, int cfg_slot_no, int serialno)
 {
-  unsigned char header_buffer[CFG_PAGE_HEADER_SIZE+2];
-  nanocbor_encoder_t encoder;
-  unsigned int write_size=CFG_PAGE_HEADER_SIZE+2;
+    unsigned char header_buffer[CFG_PAGE_HEADER_SIZE+2];
+    nanocbor_encoder_t encoder;
+    unsigned int write_size=CFG_PAGE_HEADER_SIZE+2;
 
-  nanocbor_encoder_init(&encoder, header_buffer, write_size);
+    nanocbor_encoder_init(&encoder, header_buffer, write_size);
 
-  if(nanocbor_fmt_tag(&encoder, CBOR_SEQ_TAG) < 0) {
-    return -1;
-  }
+    if(nanocbor_fmt_tag(&encoder, CBOR_SEQ_TAG) < 0) {
+        return -1;
+    }
 
-  if(nanocbor_fmt_tag(&encoder, CFG_PAGE_RIOT_TAG) < 0) {
-    return -1;
-  }
+    if(nanocbor_fmt_tag(&encoder, CFG_PAGE_RIOT_TAG) < 0) {
+        return -1;
+    }
 
-  if(nanocbor_put_bstr(&encoder, (unsigned const char *)"BOR", 3) < 0) {
-    return -1;
-  }
+    if(nanocbor_put_bstr(&encoder, (unsigned const char *)"BOR", 3) < 0) {
+        return -1;
+    }
 
-  if(nanocbor_fmt_uint(&encoder, serialno) < NANOCBOR_OK) {
-    return -6;
-  }
+    if(nanocbor_fmt_uint(&encoder, serialno) < NANOCBOR_OK) {
+        return -6;
+    }
 
-  /* now calculate the CRC */
-  /* calculate a 16-bit checksum across the bytes so far */
-  uint16_t calculated = crc16_ccitt_calc(header_buffer, (encoder.cur - header_buffer));
+    /* now calculate the CRC */
+    /* calculate a 16-bit checksum across the bytes so far */
+    uint16_t calculated = crc16_ccitt_calc(header_buffer, (encoder.cur - header_buffer));
 
-  if(nanocbor_fmt_uint(&encoder, calculated) < NANOCBOR_OK) {
-    return -7;
-  }
+    if(nanocbor_fmt_uint(&encoder, calculated) < NANOCBOR_OK) {
+        return -7;
+    }
 
-  /* now initialize an indefinite map, and stop code */
-  if(nanocbor_fmt_map_indefinite(&encoder) < 0) {
-    return -8;
-  }
-  if(nanocbor_fmt_end_indefinite(&encoder) < 0) {
-    return -9;
-  }
+    /* now initialize an indefinite map, and stop code */
+    if(nanocbor_fmt_map_indefinite(&encoder) < 0) {
+        return -8;
+    }
+    if(nanocbor_fmt_end_indefinite(&encoder) < 0) {
+        return -9;
+    }
 
-  unsigned int byte_offset = _calculate_slot_offset(cfg_slot_no);
+    unsigned int byte_offset = _calculate_slot_offset(cfg_slot_no);
 
-  /* read things in a specific block in first */
-  DEBUG("writing %d bytes to slot_no: %d, at offset: %u\n", write_size,
-         cfg_slot_no, byte_offset);
+    /* read things in a specific block in first */
+    DEBUG("writing %d bytes to slot_no: %d, at offset: %u\n", write_size,
+          cfg_slot_no, byte_offset);
 
-  od_hex_dump_ext(header_buffer, write_size, 16, 0);
+    od_hex_dump_ext(header_buffer, write_size, 16, 0);
 
-  int error = 0;
-  if((error = mtd_write(cpd->dev, header_buffer, byte_offset, write_size)) != NANOCBOR_OK) {
-    DEBUG("write failed: %d\n", error);
-    return -11;
-  }
+    int error = 0;
+    if((error = mtd_write(cpd->dev, header_buffer, byte_offset, write_size)) != NANOCBOR_OK) {
+        DEBUG("write failed: %d\n", error);
+        return -11;
+    }
 
-  DEBUG("formatted slot %u\n", cfg_slot_no);
-  return 0;
+    DEBUG("formatted slot %u\n", cfg_slot_no);
+    return 0;
 }
 
 int cfg_page_init_reader(cfg_page_desc_t *cpd,
                          unsigned char *cfg_page_buffer, size_t cfg_page_size,
                          nanocbor_value_t *cfg_page_reader)
 {
-  unsigned int byte_offset = _calculate_slot_offset(cpd->active_page);
+    unsigned int byte_offset = _calculate_slot_offset(cpd->active_page);
 
-  /* read in the whole page */
-  if(mtd_read(cpd->dev, cfg_page_buffer, byte_offset, cfg_page_size) != 0) {
-    DEBUG("read failed\n");
-    return -1;
-  }
+    /* read in the whole page */
+    if(mtd_read(cpd->dev, cfg_page_buffer, byte_offset, cfg_page_size) != 0) {
+        DEBUG("read failed\n");
+        return -1;
+    }
 
-  nanocbor_decoder_init(cfg_page_reader, cfg_page_buffer+CFG_PAGE_HEADER_SIZE,
-                        cfg_page_size - CFG_PAGE_HEADER_SIZE);
+    nanocbor_decoder_init(cfg_page_reader, cfg_page_buffer+CFG_PAGE_HEADER_SIZE,
+                          cfg_page_size - CFG_PAGE_HEADER_SIZE);
 
-  return 0;
+    return 0;
 }
 
 int cfg_page_init(cfg_page_desc_t *cpd)
@@ -230,16 +230,16 @@ int cfg_page_init(cfg_page_desc_t *cpd)
     cpd->active_page = 0;
 
     if(slot0_serial < 0 && slot1_serial < 0) {
-      DEBUG("Formatting cfg page %u\n", cpd->active_page);
-      cfg_page_format(&cfgpage, cpd->active_page, 0);
+        DEBUG("Formatting cfg page %u\n", cpd->active_page);
+        cfg_page_format(&cfgpage, cpd->active_page, 0);
     } else if(slot0_serial <  0  && slot1_serial >= 0) {
-      cpd->active_page = 1;
+        cpd->active_page = 1;
     } else if(slot0_serial >= 0  && slot1_serial < 0) {
-      cpd->active_page = 0;
+        cpd->active_page = 0;
     } else if(slot0_serial >= slot1_serial) {
-      cpd->active_page = 0;
+        cpd->active_page = 0;
     } else {
-      cpd->active_page = 1;
+        cpd->active_page = 1;
     }
 
     DEBUG("Using cfg page %u\n", cpd->active_page);
@@ -248,8 +248,6 @@ int cfg_page_init(cfg_page_desc_t *cpd)
      * now setup with a nanocbor writer, pointing at the end of the
      * active page
      */
-
-
 
     return 0;
 }
