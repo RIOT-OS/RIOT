@@ -97,7 +97,8 @@ static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size
 
     for (size_t i = 0; i < size; i++) {
         real_fseek(f, addr+i, SEEK_SET);
-        uint8_t c = real_fgetc(f);
+        int c = real_fgetc(f);
+        if(c == EOF) { c = 0xff; }
         real_fseek(f, addr+i, SEEK_SET);
         real_fputc(c & ((uint8_t*)buff)[i], f);  /* simulates can only write 1->0 */
     }
