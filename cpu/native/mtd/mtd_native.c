@@ -138,12 +138,7 @@ static int _write_page(mtd_dev_t *dev, const void *buff, uint32_t page, uint32_t
     if (!f) {
         return -EIO;
     }
-    real_fseek(f, addr, SEEK_SET);
-    for (size_t i = 0; i < size; i++) {
-        uint8_t c = real_fgetc(f);
-        real_fseek(f, -1, SEEK_CUR);
-        real_fputc(c & ((uint8_t*)buff)[i], f);
-    }
+    _write_bytes(f, buff, addr, size);
     real_fclose(f);
 
     return size;
