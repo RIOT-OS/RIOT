@@ -33,4 +33,8 @@ On Debian/Ubuntu you can install the required libraries with
 sudo apt install gcc-multilib
 ```
 
+# Native details
+
+Most code about the Native "board" is kept in /cpu/native.
+
  */
