@@ -30,6 +30,7 @@ ifneq (,$(filter openwsn_riotos,$(USEMODULE)))
 endif
 
 ifneq (,$(filter openwsn_ipv6,$(USEMODULE)))
+  USEMODULE += ipv6
   DEFAULT_MODULE += openwsn_icmpv6_echo
 endif
 
