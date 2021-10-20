@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# this test case is shows how a page is initialized if there is no valid signature
+
+ruby -e 'print "\xff" * 8192;' >CONFIG.bin
+# very empty.
+
+bin/native/tests_driver_cfg_page.elf
+cborseq2diag.rb CONFIG.bin
+
