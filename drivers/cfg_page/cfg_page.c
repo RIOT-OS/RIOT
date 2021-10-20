@@ -134,6 +134,7 @@ int cfg_page_validate(cfg_page_desc_t *cpd, int cfg_slot_no)
     }
 
     if(calculated != checksum) {
+        DEBUG("slot:%d expected %04x got %04x\n", cfg_slot_no, calculated, checksum);
         return -8;
     }
 
