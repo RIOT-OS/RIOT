@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# this test has a valid contents at slot 0,
+# but has contents at slot 1 with a higher serial no.
+
+# d9 d9f8        # tag(55800)
+#   da 52494f54  # tag(1380536148)
+#      43        # bytes(3)
+#         424f52 # "BOR"
+# 00 # unsigned(0)
+# 19 c63b # unsigned(50747) - CRC16 of above.
+# bf
+#   02
+#     82    # array(2)
+#       01 # unsigned(1)
+#       02 # unsigned(2)
+#   01            # unsigned(1)
+#   65            # text(5)
+#      68656C6C6F # "hello"
+
+echo -n >TEST3.bin
+
+(
+echo "d9 d9 f8 da 52 49 4f 54  43 42 4f 52 " | pretty2cbor.rb
+echo "00 "  | pretty2cbor.rb
+echo "19 c6 3b" | pretty2cbor.rb
+(echo "bf ";  echo "02 82 01 02 ";  echo "01 65 68656C6C6F";  echo "ff") | pretty2cbor.rb
+) | dd of=TEST3.bin bs=1 seek=0 status=none
+
+(
+echo "d9 d9 f8 da 52 49 4f 54  43 42 4f 52 " | pretty2cbor.rb
+echo "01 "  | pretty2cbor.rb
+echo "19 d6 1a" | pretty2cbor.rb
+(echo "bf ";  echo "02 82 04 05 ";  echo "01 65  63 72 65 61 6d";  echo "ff") | pretty2cbor.rb
+) | dd of=TEST3.bin bs=1 seek=4096 status=none
+
+cp TEST3.bin CONFIG.bin && bin/native/tests_driver_cfg_page.elf

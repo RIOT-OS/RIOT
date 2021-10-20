@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# this test case is the most basic contents of "cfg_page" nvram.
+# it has a single key (1) with value "hello"
+
 # d9 d9f8        # tag(55800)
 #   da 52494f54  # tag(1380536148)
 #      43        # bytes(3)
