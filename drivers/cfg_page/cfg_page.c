@@ -188,9 +188,14 @@ int cfg_page_format(cfg_page_desc_t *cpd, int cfg_slot_no, int serialno)
     DEBUG("writing %d bytes to slot_no: %d, at offset: %u\n", write_size,
           cfg_slot_no, byte_offset);
 
-    od_hex_dump_ext(header_buffer, write_size, 16, 0);
+    //od_hex_dump_ext(header_buffer, write_size, 16, 0);
 
     int error = 0;
+    /* erase the entire page */
+    if(mtd_erase(cpd->dev, byte_offset, MTD_PAGE_SIZE) != 0) {
+        DEBUG("erase failed\n");
+        return -10;
+    }
     if((error = mtd_write(cpd->dev, header_buffer, byte_offset, write_size)) != NANOCBOR_OK) {
         DEBUG("write failed: %d\n", error);
         return -11;
