@@ -28,7 +28,7 @@ BOARD_WHITELIST := airfy-beacon arduino-due arduino-duemilanove \
                    arduino-mkrzero arduino-uno arduino-zero avsextrem \
                    b-l072z-lrwan1 b-l475e-iot01a blackpill blackpill-128kib \
                    bluepill bluepill-128kib cc2538dk ek-lm4f120xl \
-                   feather-m0 fox frdm-k22f frdm-k64f ikea-tradfri i-nucleo-lrwan1 \
+                   feather-m0 frdm-k22f frdm-k64f ikea-tradfri i-nucleo-lrwan1 \
                    iotlab-a8-m3 iotlab-m3 limifrog-v1 maple-mini msba2 msbiot \
                    mulle nrf52840dk nrf52dk nrf6310 nucleo-f207zg nucleo-f303ze \
                    nucleo-f412zg nucleo-f413zh nucleo-f429zi nucleo-f446ze \

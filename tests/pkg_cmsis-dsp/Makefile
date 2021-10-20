@@ -8,7 +8,6 @@ BOARD_WHITELIST := \
   arduino-due \
   cc2538dk \
   f4vi1 \
-  fox \
   iotlab-m3 \
   mbed_lpc1768 \
   msbiot \

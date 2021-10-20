@@ -2073,45 +2073,6 @@ boards/firefly/include/board\.h:[0-9]+: warning: Member LED2_PIN \(macro definit
 boards/firefly/include/board\.h:[0-9]+: warning: Member LED2_TOGGLE \(macro definition\) of file board\.h is not documented\.
 boards/firefly/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/firefly/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_CS \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_INT \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_RESET \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SLEEP \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member L3G4200D_PARAM_INT1 \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member L3G4200D_PARAM_INT2 \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member LED0_MASK \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member LED0_OFF \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member LED0_ON \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member LED0_PIN \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member LED0_TOGGLE \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member LED1_MASK \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member LED1_OFF \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member LED1_ON \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member LED1_PIN \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member LED1_TOGGLE \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member LPSXXX_PARAM_ADDR \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member LSM303DLHC_PARAM_ACC_ADDR \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member LSM303DLHC_PARAM_ACC_PIN \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member LSM303DLHC_PARAM_MAG_ADDR \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member LSM303DLHC_PARAM_MAG_PIN \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
-boards/fox/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
-boards/fox/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
-boards/fox/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
-boards/fox/include/periph_conf\.h:[0-9]+: warning: Member I2C_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
-boards/fox/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
-boards/fox/include/periph_conf\.h:[0-9]+: warning: Member RTT_FREQUENCY \(macro definition\) of file periph_conf\.h is not documented\.
-boards/fox/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
-boards/fox/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
-boards/fox/include/periph_conf\.h:[0-9]+: warning: Member TIMER_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
-boards/fox/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
-boards/fox/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
-boards/fox/include/periph_conf\.h:[0-9]+: warning: Member UART_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
-boards/fox/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
-boards/fox/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/fox/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/fox/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/fox/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/frdm\-k22f/include/board\.h:[0-9]+: warning: Member BTN0_MODE \(macro definition\) of file board\.h is not documented\.
 boards/frdm\-k22f/include/board\.h:[0-9]+: warning: Member BTN0_PIN \(macro definition\) of file board\.h is not documented\.
 boards/frdm\-k22f/include/board\.h:[0-9]+: warning: Member BTN1_MODE \(macro definition\) of file board\.h is not documented\.
