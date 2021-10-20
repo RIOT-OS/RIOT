@@ -303,7 +303,8 @@ int cfg_page_init_writer(cfg_page_desc_t *cpd,
         DEBUG("swap slotno\n");
     }
 
-    size_t writeoffset = (reader.cur-cfg_page_active_buffer);
+    /* -1 to remove 0xff stop code */
+    size_t writeoffset = (reader.cur-cfg_page_active_buffer)-1;
     DEBUG("found end of old values at: %u, amountleft=%u\n",
           writeoffset, amountleft);
 

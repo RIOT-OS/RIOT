@@ -20,7 +20,7 @@ ruby -e 'print "\xff" * 8192;' >TEST1.bin
 echo "d9 d9 f8 da 52 49 4f 54  43 42 4f 52 " | pretty2diag.rb | diag2cbor.rb
 echo "00 "  | pretty2diag.rb | diag2cbor.rb
 echo "19 c6 3b" | pretty2diag.rb | diag2cbor.rb
-echo "bf 01 65 68656C6C6F ff" | pretty2diag.rb | diag2cbor.rb
+echo "bf 01 65 68656C6C6F ff" | pretty2cbor.rb
 ) | dd of=TEST1.bin bs=1 seek=0 conv=notrunc status=none
 
 cp TEST1.bin CONFIG.bin && bin/native/tests_driver_cfg_page.elf
