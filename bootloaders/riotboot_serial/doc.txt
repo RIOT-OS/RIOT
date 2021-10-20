@@ -3,7 +3,7 @@
 @ingroup     bootloaders
 
 # Overview
-`riotboot_dfu` is a variation on @ref bootloader_riotboot that adds the capability to flash
+`riotboot_serial` is a variation on @ref bootloader_riotboot that adds the capability to flash
 a new firmware using a serial (UART) connection.
 
 After reset, riotboot will wait for `RIOTBOOT_DELAY_MS` ms, if within that time no command is
@@ -22,3 +22,5 @@ to `riotboot_serial` and chose the `PORT` accordingly.
 e.g.
 
     make BOARD=same54-xpro PORT=/dev/ttyACM0 PROGRAMMER=riotboot_serial flash
+
+*/
