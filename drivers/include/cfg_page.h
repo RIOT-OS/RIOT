@@ -49,6 +49,10 @@ extern int cfg_page_init_reader(cfg_page_desc_t *cpd,
 extern int cfg_page_get_value(cfg_page_desc_t *cpd,
                               uint32_t wantedkey,
                               nanocbor_value_t *valuereader);
+extern int cfg_page_set_str_value(cfg_page_desc_t *cpd,
+                                  uint32_t newkey,
+                                  const uint8_t *strvalue, size_t strlen);
+
 extern cfg_page_desc_t cfgpage;
 
 #ifdef __cplusplus

@@ -41,5 +41,11 @@ int main(void)
 
     cfg_page_print(&cfgpage);
 
+    if(cfg_page_set_str_value(&cfgpage, 1, (const uint8_t *)"bob", 3) != 0) {
+        printf("set key 1 failed\n");
+    }
+
+    cfg_page_print(&cfgpage);
+
     real_exit(0);
 }

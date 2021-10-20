@@ -223,7 +223,7 @@ int cfg_page_init_reader(cfg_page_desc_t *cpd,
     return 0;
 }
 
-static unsigned char cfg_page_active_buffer[MTD_PAGE_SIZE];
+static unsigned char cfg_page_active_buffer[MTD_SECTOR_SIZE];
 int cfg_page_get_value(cfg_page_desc_t *cpd, uint32_t wantedkey, nanocbor_value_t *valuereader)
 {
     nanocbor_value_t reader;
@@ -259,6 +259,99 @@ int cfg_page_get_value(cfg_page_desc_t *cpd, uint32_t wantedkey, nanocbor_value_
         nanocbor_skip(&values);
     }
     return ret;
+}
+
+/* this one is a doozy! */
+static int cfg_page_swap_slotno(cfg_page_desc_t *cpd, nanocbor_value_t *reader)
+{
+    (void)cpd;
+    (void)reader;
+    printf("swap\n");
+    return -1;
+}
+
+int cfg_page_init_writer(cfg_page_desc_t *cpd,
+                         nanocbor_encoder_t **writer,
+                         uint8_t            **begin,
+                         size_t valuelen)
+{
+    nanocbor_value_t reader;
+    nanocbor_value_t values;
+
+    /* start by bringin in the reader */
+    if(cfg_page_init_reader(cpd, cfg_page_active_buffer, sizeof(cfg_page_active_buffer), &reader) < 0) {
+        return -1;
+    }
+
+    if(nanocbor_get_type(&reader) != NANOCBOR_TYPE_MAP ||
+       nanocbor_enter_map(&reader, &values) != NANOCBOR_OK) {
+        return -2;
+    }
+
+    while(!nanocbor_at_end(&values)) {
+        nanocbor_skip(&values);   /* key */
+        nanocbor_skip(&values);   /* value */
+    }
+    nanocbor_leave_container(&reader, &values);
+
+    /* we are now located at end of space */
+    /* calculate how much space is left */
+    size_t amountleft = reader.end - reader.cur;
+    if(valuelen > amountleft) {
+        /* move all values to other page and switch over there */
+        cfg_page_swap_slotno(cpd, &reader);
+        DEBUG("swap slotno\n");
+    }
+
+    size_t writeoffset = (reader.cur-cfg_page_active_buffer);
+    DEBUG("found end of old values at: %u, amountleft=%u\n",
+          writeoffset, amountleft);
+
+    /* initialize the writer at this location */
+    if(writer) {
+        /* recalculate where ot write without screwing with const pointer */
+        uint8_t *writehere = cfg_page_active_buffer + writeoffset;
+        if(begin) {
+            *begin = writehere;
+        }
+        nanocbor_encoder_init(*writer, writehere, amountleft);
+    }
+    return 0;
+}
+
+int cfg_page_finish_writer(cfg_page_desc_t *cpd,
+                           const uint8_t   *writebegin,
+                           nanocbor_encoder_t *writer)
+{
+    int error;
+    unsigned int byte_offset = _calculate_slot_offset(cpd->active_page);
+
+    byte_offset += (writebegin - cfg_page_active_buffer);
+
+    if((error = mtd_write(cpd->dev, writebegin, byte_offset, writer->len)) != 0) {
+        DEBUG("finish write failed: %d\n", error);
+        return -11;
+    }
+    return 0;
+}
+
+int cfg_page_set_str_value(cfg_page_desc_t *cpd, uint32_t newkey, const uint8_t *strvalue, size_t strlen)
+{
+    nanocbor_encoder_t *writer;
+    uint8_t            *begin;
+
+    if(cfg_page_init_writer(cpd, &writer, &begin, strlen+2) < 0) {
+        return -1;
+    }
+
+    nanocbor_fmt_uint(writer, newkey);
+    nanocbor_put_tstrn(writer, (const char *)strvalue, strlen);
+
+    if(cfg_page_finish_writer(cpd, begin, writer) < 0) {
+        return -2;
+    }
+
+    return 0;
 }
 
 
