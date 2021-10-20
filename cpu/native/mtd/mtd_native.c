@@ -76,6 +76,19 @@ static int _read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
     return (nread == size) ? 0 : -EIO;
 }
 
+static int _write_bytes(FILE *f, const void *buff, u_int32_t addr, uint32_t size)
+{
+    for (size_t i = 0; i < size; i++) {
+        real_fseek(f, addr+i, SEEK_SET);
+        int c = real_fgetc(f);
+        if(c == EOF) { c = 0xff; }
+        real_fseek(f, addr+i, SEEK_SET);
+        real_fputc(c & ((uint8_t*)buff)[i], f);  /* simulates can only write 1->0 */
+    }
+    /* XXX what errors should it return? */
+    return 0;
+}
+
 static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
 {
     mtd_native_dev_t *_dev = (mtd_native_dev_t*) dev;
@@ -95,13 +108,7 @@ static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size
         return -EIO;
     }
 
-    for (size_t i = 0; i < size; i++) {
-        real_fseek(f, addr+i, SEEK_SET);
-        int c = real_fgetc(f);
-        if(c == EOF) { c = 0xff; }
-        real_fseek(f, addr+i, SEEK_SET);
-        real_fputc(c & ((uint8_t*)buff)[i], f);  /* simulates can only write 1->0 */
-    }
+    _write_bytes(f, buff, addr, size);
     real_fclose(f);
 
     return 0;
