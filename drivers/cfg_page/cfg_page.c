@@ -45,17 +45,6 @@
 /* for MTD_1 */
 #include "board.h"
 
-int cfg_page_init(struct cfg_page_desc_t *cpd)
-{
-    DEBUG("cfg_page: init\n");
-#ifdef MTD_1
-    cpd->dev = MTD_1;
-    mtd_init(cpd->dev);
-#endif
-
-    return 0;
-}
-
 #define CBOR_SEQ_TAG      55800             /* per draft-ietf-cbor-file-magic */
 #define CFG_PAGE_RIOT_TAG 1380536148        /* 'RIOT' = 0x52 0x49 0x4f 0x54 */
 
@@ -85,7 +74,7 @@ int cfg_page_validate(struct cfg_page_desc_t *cpd, int cfg_slot_no)
 
   /* read things in a specific block in first */
   if(mtd_read(cpd->dev, header_buffer, byte_offset, CFG_PAGE_HEADER_SIZE) != 0) {
-    puts("read failed\n");
+    DEBUG("read failed\n");
     return -1;
   }
 
@@ -188,18 +177,55 @@ int cfg_page_format(struct cfg_page_desc_t *cpd, int cfg_slot_no, int serialno)
   }
 
   /* read things in a specific block in first */
-  printf("writing %d bytes to slot_no: %d, at offset: %u\n", write_size,
+  DEBUG("writing %d bytes to slot_no: %d, at offset: %u\n", write_size,
          cfg_slot_no, byte_offset);
 
   od_hex_dump_ext(header_buffer, write_size, 16, 0);
 
   int error = 0;
   if((error = mtd_write(cpd->dev, header_buffer, byte_offset, write_size)) != NANOCBOR_OK) {
-    printf("write failed: %d\n", error);
+    DEBUG("write failed: %d\n", error);
     return -11;
   }
 
-  printf("formatted slot %u\n", cfg_slot_no);
+  DEBUG("formatted slot %u\n", cfg_slot_no);
   return 0;
+}
+
+int cfg_page_init(struct cfg_page_desc_t *cpd)
+{
+    DEBUG("cfg_page: init\n");
+#ifdef MTD_1
+    cpd->dev = MTD_1;
+    mtd_init(cpd->dev);
+#endif
+
+    int slot0_serial = cfg_page_validate(&cfgpage, 0);
+    int slot1_serial = cfg_page_validate(&cfgpage, 1);
+    cpd->active_page = 0;
+
+    if(slot0_serial < 0 && slot1_serial < 0) {
+      DEBUG("Formatting cfg page %u\n", cpd->active_page);
+      cfg_page_format(&cfgpage, cfg_active_page, 0);
+    } else if(slot0_serial <  0  && slot1_serial >= 0) {
+      cpd->active_page = 1;
+    } else if(slot0_serial >= 0  && slot1_serial < 0) {
+      cpd->active_page = 0;
+    } else if(slot0_serial >= slot1_serial) {
+      cpd->active_page = 0;
+    } else {
+      cpd->active_page = 1;
+    }
+
+    DEBUG("Using cfg page %u\n", cpd->active_page);
+
+    /*
+     * now setup with a nanocbor writer, pointing at the end of the
+     * active page
+     */
+
+
+
+    return 0;
 }
 

@@ -22,6 +22,7 @@
 #define CFG_PAGE_H
 
 #include "mtd.h"
+#include "nanocbor/nanocbor.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,6 +34,8 @@ extern "C" {
  */
 struct cfg_page_desc_t {
   mtd_dev_t *dev;
+  nanocbor_encoder_t writer;
+  uint8_t            active_page;  /* 0 or 1 */
 };
 
 extern int cfg_page_init(struct cfg_page_desc_t *cpd);

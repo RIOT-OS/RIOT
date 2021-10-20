@@ -31,11 +31,5 @@ int main(void)
 {
     puts("CFG-PAGE test application starting...");
 
-    cfg_page_init(&cfgpage, 0);
-
-    if(cfg_page_validate(&cfgpage) == 0) {
-      puts("succeed\n");
-    } else {
-      puts("failed\n");
-    }
+    cfg_page_init(&cfgpage);
 }
