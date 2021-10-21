@@ -46,5 +46,5 @@ void benchmark_print_time(uint32_t time, unsigned long runs, const char *name)
 
     turo_dict_close(&ctx);
 
-    print("", 1);
+    print("\n", 1);
 }
