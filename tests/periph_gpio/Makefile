@@ -9,6 +9,10 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += benchmark
 
+# select benchmark output format
+OUTPUT_FORMAT ?= json
+USEMODULE += test_utils_result_output_${OUTPUT_FORMAT}
+
 # disable native GPIOs for automatic test
 ifeq (native,$(BOARD))
   USEMODULE += periph_gpio_mock
