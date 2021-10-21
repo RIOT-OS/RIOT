@@ -32,6 +32,7 @@ int main(void)
     nanocbor_value_t valuereader;
     const uint8_t *strvalue;
     size_t strlen;
+    int i;
     puts("CFG-PAGE test application starting...");
 
     if(cfg_page_get_value(&cfgpage, 1, &valuereader) == 1 &&
@@ -41,8 +42,10 @@ int main(void)
 
     cfg_page_print(&cfgpage);
 
-    if(cfg_page_set_str_value(&cfgpage, 1, (const uint8_t *)"bob", 3) != 0) {
-        printf("set key 1 failed\n");
+    for(i=0; i<2048; i++) {
+        if(cfg_page_set_str_value(&cfgpage, 1, (const uint8_t *)"bob", 3) != 0) {
+            printf("set key 1 failed\n");
+        }
     }
 
     cfg_page_print(&cfgpage);

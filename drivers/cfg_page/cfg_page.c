@@ -326,13 +326,31 @@ int cfg_page_finish_writer(cfg_page_desc_t *cpd,
 {
     int error;
     unsigned int byte_offset = _calculate_slot_offset(cpd->active_page);
+    int lefttowrite = writer->cur - writebegin;
+    if(lefttowrite < 0) {
+        DEBUG("can not write %d bytes\n", lefttowrite);
+        return -12;
+    }
 
     byte_offset += (writebegin - cfg_page_active_buffer);
 
-    if((error = mtd_write(cpd->dev, writebegin, byte_offset, writer->len)) != 0) {
-        DEBUG("finish write failed: %d\n", error);
-        return -11;
+    while(lefttowrite > 0) {
+        size_t spot_on_page = (byte_offset % cpd->dev->page_size);
+        int    left_on_page = cpd->dev->page_size - spot_on_page;
+        if(left_on_page > lefttowrite) {
+            left_on_page = lefttowrite;
+        }
+
+        if(0) DEBUG("writing %u of %u bytes to offset: %u\n", left_on_page, lefttowrite, byte_offset);
+        if((error = mtd_write(cpd->dev, writebegin, byte_offset, left_on_page)) != 0) {
+            DEBUG("lefttowrite: %u finish write failed: %d\n", lefttowrite, error);
+            return -11;
+        }
+        lefttowrite -= left_on_page;
+        writebegin  += left_on_page;
+        byte_offset += left_on_page;
     }
+
     return 0;
 }
 
