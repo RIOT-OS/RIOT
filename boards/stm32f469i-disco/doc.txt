@@ -1,8 +1,7 @@
 /**
- * @defgroup    boards_stm32f469i-disco STM32F469I-DISCO
- * @ingroup     boards
- * @brief       Support for the STM32F469I-DISCO board
- */
+@defgroup    boards_stm32f469i-disco STM32F469I-DISCO
+@ingroup     boards
+@brief       Support for the STM32F469I-DISCO board
 
 ## Table of Contents:
 
@@ -97,3 +96,4 @@ the USB Mini-B connector try to compile and flash some code, type:
 ```
 make flash BOARD=stm32f469i-disco
 ```
+*/
