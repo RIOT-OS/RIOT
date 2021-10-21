@@ -15,7 +15,7 @@ LVGL_TASK_THREAD_PRIO cannot be configured via Kconfig.
 
 - `CONFIG_LVGL_INACTIVITY_PERIOD_MS`: maximum inactivity period before going to sleep in ms.
   (default: 5s)
-- `CONFIG_LVGL_TASK_HANDLER_DELAY_US`: delay between lvgl task handle call in us.
+- `CONFIG_LVGL_TASK_HANDLER_DELAY_MS`: delay between lvgl task handle call in us.
   (default: 5ms)
 - `LVGL_TASK_THREAD_PRIO`: lvgl task handler thread priority.
   (default: THREAD_PRIORITY_MAIN - 1)
