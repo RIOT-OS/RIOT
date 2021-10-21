@@ -1,0 +1,16 @@
+/*
+ * Copyright (C) 2021 Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup    sys_coding Error correction codes
+ * @ingroup     sys
+ * @brief       Error correction function libraries
+ *
+ * This module provides functions to generate redundancy data for error
+ * correction.
+ */
