@@ -8,4 +8,5 @@
 config MODULE_BENCHMARK
     bool "Simple benchmarks support"
     depends on MODULE_XTIMER
+    depends on MODULE_FMT
     depends on TEST_KCONFIG

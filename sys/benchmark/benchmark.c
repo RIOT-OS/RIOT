@@ -20,17 +20,31 @@
 
 #include <stdio.h>
 
+#include "fmt.h"
 #include "benchmark.h"
+#include "test_utils/result_output.h"
 
 void benchmark_print_time(uint32_t time, unsigned long runs, const char *name)
 {
-    uint32_t full = (time / runs);
-    uint32_t div  = (time - (full * runs)) / (runs / 1000);
+    uint64_t per_sec = (uint64_t)(((uint64_t)1000000UL * runs) / time);
 
-    uint32_t per_sec = (uint32_t)(((uint64_t)1000000UL * runs) / time);
+    turo_t ctx;
+    turo_init(&ctx);
+    turo_dict_open(&ctx);
 
-    printf("%25s: %9" PRIu32 "us"
-           "  ---  %2" PRIu32 ".%03" PRIu32 "us per call"
-           "  ---  %9" PRIu32 " calls per sec\n",
-           name, time, full, div, per_sec);
+    turo_dict_key(&ctx, name);
+    turo_dict_open(&ctx);
+
+    turo_dict_key(&ctx, "us");
+    turo_u32(&ctx, time);
+
+    turo_dict_key(&ctx, "us/call");
+    turo_float(&ctx, (float)time/(float)runs);
+
+    turo_dict_key(&ctx, "calls/s");
+    turo_u64(&ctx, per_sec);
+
+    turo_dict_close(&ctx);
+
+    print("", 1);
 }
