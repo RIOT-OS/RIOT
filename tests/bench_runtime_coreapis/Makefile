@@ -4,4 +4,8 @@ include ../Makefile.tests_common
 USEMODULE += core_thread_flags
 USEMODULE += benchmark
 
+# select output format
+OUTPUT_FORMAT ?= json
+USEMODULE += test_utils_result_output_${OUTPUT_FORMAT}
+
 include $(RIOTBASE)/Makefile.include
