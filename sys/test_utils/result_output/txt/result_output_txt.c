@@ -49,7 +49,7 @@ void turo_u64(turo_t *ctx, uint64_t val)
 void turo_float(turo_t *ctx, float val)
 {
     (void)ctx;
-    print_float(val, 8);
+    print_float(val, 7);
     print_str(" ");
 }
 
