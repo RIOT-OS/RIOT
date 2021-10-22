@@ -8,6 +8,7 @@ FEATURES_OPTIONAL += periph_gpio_tamper_wake
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += benchmark
+USEMODULE += ztimer_usec
 
 # select benchmark output format
 OUTPUT_FORMAT ?= json
