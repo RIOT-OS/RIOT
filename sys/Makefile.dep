@@ -571,6 +571,10 @@ endif
 
 ifneq (,$(filter benchmark,$(USEMODULE)))
   USEMODULE += xtimer
+  # default to json output. override by including a different output module
+  ifeq (,$(filter test_utils_result_output_%, $(USEMODULE)))
+    USEMODULE += test_utils_result_output_json
+  endif
 endif
 
 ifneq (,$(filter skald_%,$(USEMODULE)))
