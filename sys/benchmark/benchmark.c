@@ -20,16 +20,16 @@
 
 #include <stdio.h>
 
-#include "fmt.h"
 #include "benchmark.h"
 #include "test_utils/result_output.h"
 
 void benchmark_print_time(uint32_t time, unsigned long runs, const char *name)
 {
-    uint64_t per_sec = (uint64_t)(((uint64_t)1000000UL * runs) / time);
+    uint64_t per_sec = ((uint64_t)1000000UL * runs) / time;
 
     turo_t ctx;
     turo_init(&ctx);
+    turo_container_open(&ctx);
     turo_dict_open(&ctx);
 
     turo_dict_key(&ctx, name);
@@ -45,6 +45,5 @@ void benchmark_print_time(uint32_t time, unsigned long runs, const char *name)
     turo_u64(&ctx, per_sec);
 
     turo_dict_close(&ctx);
-
-    print("\n", 1);
+    turo_container_close(&ctx, 0);
 }
