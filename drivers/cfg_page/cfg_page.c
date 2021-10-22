@@ -261,7 +261,23 @@ int cfg_page_get_value(cfg_page_desc_t *cpd, uint32_t wantedkey, nanocbor_value_
     return ret;
 }
 
-/* this one is a doozy! */
+/*
+ * process through all the attributes in the filled current space,
+ * copying the last value for each key into the new space.
+ *
+ * This is done by going through the old space looking for keys which
+ * have not been copied.
+ * Once a new has been found, it's location is remembered for later.
+ * The old space is processed looking for the last value, and when that is
+ * is found, it is copied to the new space.
+ * While processing the duplicate keys, each one is changed to keyid=0,
+ * which is not allowed.
+ *
+ * After the last value for a given key is found, then the process returns to the
+ * spot in the old space where the first instance of the current key was found.
+ * Processing resumes from there, ingoring keyid=0.
+ *
+ */
 static int cfg_page_swap_slotno(cfg_page_desc_t *cpd, nanocbor_value_t *reader)
 {
     (void)cpd;
