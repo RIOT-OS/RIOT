@@ -35,6 +35,7 @@
   - "doc/**/*"
   - "**/*.md"
   - "**/*.txt"
+  - "**/*.cff"
 
 "Area: drivers":
   - "drivers/**/*"
