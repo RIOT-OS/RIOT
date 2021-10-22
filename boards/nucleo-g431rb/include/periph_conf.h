@@ -102,6 +102,26 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
+/**
+ * @name   PWM configuration
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev      = TIM3,
+        .rcc_mask = RCC_APB1ENR1_TIM3EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_C, 6), .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_C, 7), .cc_chan = 1 },
+                      { .pin = GPIO_PIN(PORT_C, 8), .cc_chan = 2 },
+                      { .pin = GPIO_PIN(PORT_C, 9), .cc_chan = 3 } },
+        .af       = GPIO_AF2,
+        .bus      = APB1
+    }
+};
+
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
