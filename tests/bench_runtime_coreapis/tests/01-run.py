@@ -12,8 +12,11 @@ from testrunner import run
 
 # The default timeout is not enough for this test on some of the slower boards
 TIMEOUT = 30
-BENCHMARK_REGEXP = r"\s+{func}:\s+\d+us\s+---\s+\d*\.*\d+us per call\s+---\s+\d+ calls per sec"
 
+# expecting turo output like this:
+# {"nop loop": {"us": 616, "us/call": 0.0006159, "calls/s": 1623376623}
+# not checking the whole json object here, just ensure that everything is there.
+BENCHMARK_REGEXP = r"{{\"{func}\":"
 
 def testfunc(child):
     child.expect_exact('Runtime of Selected Core API functions')
@@ -27,6 +30,7 @@ def testfunc(child):
     child.expect(BENCHMARK_REGEXP.format(func="thread flags set/wait one"), timeout=TIMEOUT)
     child.expect(BENCHMARK_REGEXP.format(func=r"msg_try_receive\(\)"), timeout=TIMEOUT)
     child.expect(BENCHMARK_REGEXP.format(func=r"msg_avail\(\)"))
+
     child.expect_exact('[SUCCESS]')
 
 
