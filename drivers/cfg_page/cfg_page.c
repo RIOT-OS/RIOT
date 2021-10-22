@@ -294,10 +294,14 @@ int cfg_page_init_writer(cfg_page_desc_t *cpd,
     nanocbor_value_t reader;
     nanocbor_value_t values;
 
-    /* start by bringin in the reader */
+    /* start by bringin in the content */
+    /* XXX could avoid this if we think the content is already loaded */
     if(cfg_page_init_reader(cpd, cfg_page_active_buffer, sizeof(cfg_page_active_buffer), &reader) < 0) {
         return -1;
     }
+
+    /* XXX at this point, if cpd->writer is initialized, can return it immediately */
+    /* but premature optimization, and there are caching issues here */
 
     if(nanocbor_get_type(&reader) != NANOCBOR_TYPE_MAP ||
        nanocbor_enter_map(&reader, &values) != NANOCBOR_OK) {
@@ -324,10 +328,13 @@ int cfg_page_init_writer(cfg_page_desc_t *cpd,
     DEBUG("found end of old values at: %u, amountleft=%u\n",
           writeoffset, amountleft);
 
-    /* initialize the writer at this location */
+    /* initialize the writer at this location, using the writer in cpd->writer */
     if(writer) {
-        /* recalculate where ot write without screwing with const pointer */
+        /* recalculate where to write without screwing with const pointer */
         uint8_t *writehere = cfg_page_active_buffer + writeoffset;
+        if(*writer == NULL) {
+            *writer = &cpd->writer;
+        }
         if(begin) {
             *begin = writehere;
         }
@@ -372,8 +379,8 @@ int cfg_page_finish_writer(cfg_page_desc_t *cpd,
 
 int cfg_page_set_str_value(cfg_page_desc_t *cpd, uint32_t newkey, const uint8_t *strvalue, size_t strlen)
 {
-    nanocbor_encoder_t *writer;
-    uint8_t            *begin;
+    nanocbor_encoder_t *writer = NULL;
+    uint8_t            *begin  = NULL;
 
     if(cfg_page_init_writer(cpd, &writer, &begin, strlen+2) < 0) {
         return -1;
