@@ -1,9 +1,7 @@
 include ../Makefile.tests_common
 
-OUTPUT_FORMAT ?= json
-USEMODULE += test_utils_result_output_${OUTPUT_FORMAT}
+USEMODULE += test_utils_result_output
 USEMODULE += shell
-USEMODULE += fmt
 
 # Use a terminal that does not introduce extra characters into the stream.
 RIOT_TERMINAL ?= socat
