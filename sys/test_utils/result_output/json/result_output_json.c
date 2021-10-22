@@ -16,7 +16,7 @@
 static void _print_comma(turo_t *ctx, turo_state_t state)
 {
     if (ctx->state == TURO_STATE_NEED_COMMA) {
-        print_str(",");
+        print_str(", ");
     }
     ctx->state = state;
 }
@@ -59,7 +59,7 @@ void turo_u64(turo_t *ctx, uint64_t val)
 void turo_float(turo_t *ctx, float val)
 {
     _print_comma(ctx, TURO_STATE_NEED_COMMA);
-    print_float(val, 8);
+    print_float(val, 7);
 }
 
 void turo_string(turo_t *ctx, const char *str)
