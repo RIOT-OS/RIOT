@@ -18,18 +18,19 @@ PORT_UNDER_TEST = int(os.environ.get('PORT_UNDER_TEST') or 0)
 def testfunc(child):
     for pin in range(0, 8):
         child.sendline("bench {} {}".format(PORT_UNDER_TEST, pin))
-        child.expect(r" *nop loop: +(\d+)us  --- +(\d+\.\d+)us per call  --- +(\d+) calls per sec")
-        child.expect(r" *gpio_set: +(\d+)us  --- +(\d+\.\d+)us per call  --- +(\d+) calls per sec")
-        child.expect(r" *gpio_clear: +(\d+)us  --- +(\d+\.\d+)us per call  --- +(\d+) calls per sec")
-        child.expect(r" *gpio_toggle: +(\d+)us  --- +(\d+\.\d+)us per call  --- +(\d+) calls per sec")
-        child.expect(r" *gpio_read: +(\d+)us  --- +(\d+\.\d+)us per call  --- +(\d+) calls per sec")
-        child.expect(r" *gpio_write: +(\d+)us  --- +(\d+\.\d+)us per call  --- +(\d+) calls per sec")
+
+        functions = ["nop loop", "gpio_set", "gpio_clear", "gpio_toggle",
+                    "gpio_read", "gpio_write"]
+
+        for f in functions:
+            child.expect(
+            r'{"%s": {"us": \d+, "us/call": \d+\.\d+, "calls/s": \d+}' % f)
+
         child.expect_exact(" --- DONE ---")
         child.expect_exact(">")
 
     # TODO do some automated verification here? E.g. all pins should have the
     #      same timing?
-    # TODO parse output data and put in some unified format?
 
     print("Benchmark was successful")
 
