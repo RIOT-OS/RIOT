@@ -35,7 +35,7 @@
 
 int cfg_page_print(cfg_page_desc_t *cpd)
 {
-    static unsigned char cfg_page_temp[MTD_PAGE_SIZE];
+    static unsigned char cfg_page_temp[MTD_SECTOR_SIZE];
     nanocbor_value_t reader;
     nanocbor_value_t values;
 
@@ -48,6 +48,8 @@ int cfg_page_print(cfg_page_desc_t *cpd)
         return -2;
     }
 
+    //printf("buffer is at: %p\n", cfg_page_temp);
+
     while(!nanocbor_at_end(&values)) {
         uint32_t key;
         unsigned int type;
@@ -59,7 +61,8 @@ int cfg_page_print(cfg_page_desc_t *cpd)
         }
 
         type = nanocbor_get_type(&values);
-        printf("key: %u[type=%u]\n", key, type);
+        printf("key: %02u[type=%02u] where=%p:%d ", key, type, values.cur,
+               values.cur-cfg_page_temp);
         switch(type) {
         case NANOCBOR_TYPE_BSTR:
             if(nanocbor_get_bstr(&values, &str, &len) == NANOCBOR_OK) {
@@ -71,12 +74,13 @@ int cfg_page_print(cfg_page_desc_t *cpd)
             if(nanocbor_get_tstr(&values, &str, &len) == NANOCBOR_OK) {
                 /* XXX print as bounded string? */
                 //od_hex_dump_ext(str, len, 16, 0);
-                printf("  value: %.*s\n", len, str);
+                printf("  value[%04u]: %.*s\n", len, len, str);
             }
             break;
 
         default:
             nanocbor_skip(&values);
+            printf("\n");
         }
 
     }
