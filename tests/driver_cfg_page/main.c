@@ -31,20 +31,30 @@ int main(void)
 {
     nanocbor_value_t valuereader;
     const uint8_t *strvalue;
-    size_t strlen;
+    size_t len;
     int i;
     puts("CFG-PAGE test application starting...");
 
     if(cfg_page_get_value(&cfgpage, 1, &valuereader) == 1 &&
-       nanocbor_get_tstr(&valuereader, &strvalue, &strlen) == NANOCBOR_OK) {
-        printf("key: 1 found value: %.*s\n", strlen, strvalue);
+       nanocbor_get_tstr(&valuereader, &strvalue, &len) == NANOCBOR_OK) {
+        printf("key: 1 found value: %.*s\n", len, strvalue);
     }
 
     cfg_page_print(&cfgpage);
 
-    for(i=0; i<2048; i++) {
-        if(cfg_page_set_str_value(&cfgpage, 1, (const uint8_t *)"bob", 3) != 0) {
+    for(i=0; i<127; i++) {
+        uint8_t buf2[16];
+        snprintf((char *)buf2, 16, "bob%04x", i);
+        if(cfg_page_set_str_value(&cfgpage, 1, buf2, strlen((const char *)buf2)) != 0) {
             printf("set key 1 failed\n");
+        }
+        snprintf((char *)buf2, 16, "frank%04x", i);
+        if(cfg_page_set_str_value(&cfgpage, 2, buf2, strlen((const char *)buf2)) != 0) {
+            printf("set key 2 failed\n");
+        }
+        snprintf((char *)buf2, 16, "george%04x", i);
+        if(cfg_page_set_str_value(&cfgpage, 3, buf2, strlen((const char *)buf2)) != 0) {
+            printf("set key 3 failed\n");
         }
     }
 
