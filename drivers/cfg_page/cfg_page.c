@@ -290,13 +290,14 @@ int cfg_page_get_value(cfg_page_desc_t *cpd, uint32_t wantedkey, nanocbor_value_
  * Processing resumes from there, ingoring keyid=0.
  *
  */
-static int cfg_page_swap_slotno(cfg_page_desc_t *cpd, nanocbor_value_t *oreader)
+static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
 {
     unsigned char new_page[MTD_SECTOR_SIZE];
     nanocbor_encoder_t writer;
     nanocbor_value_t   reader, values, nreader2;
     nanocbor_value_t   okey1, value_st, okey2;
     size_t value_len;
+    int ret = 0;
 
     if(cfg_page_init_reader(cpd, cfg_page_active_buffer, sizeof(cfg_page_active_buffer), &reader) < 0) {
         return -1;
@@ -399,13 +400,35 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd, nanocbor_value_t *oreader)
 
     }
 
+    /*
+     * now, initialize the newpage with serialno+1, and
+     * read it back in
+     */
+    cpd->active_serialno++;
+    if(cpd->active_serialno > 23) {
+        cpd->active_serialno = 1;
+    }
+    nanocbor_encoder_init(&writer, new_page, CFG_PAGE_HEADER_SIZE);
+    if((ret = _cfg_page_format_stuff(&writer, new_page, cpd->active_serialno)) < 0) {
+        return ret;
+    }
     //printf("new:\n");
     //od_hex_dump_ext(new_page, MTD_SECTOR_SIZE, 16, 0);
 
+    /* flip bit on which page is active */
+    cpd->active_page = !cpd->active_page;
 
-    (void)oreader;
-    /* now setup reader to point to where the new page ends */
-    /* some book keeping needed on cpd->? */
+    unsigned int byte_offset = _calculate_slot_offset(cpd->active_page);
+    /* erase the entire page */
+    if((ret = mtd_erase(cpd->dev, byte_offset, MTD_SECTOR_SIZE)) != 0) {
+        DEBUG("erase failed: %d\n\n",ret);
+        return -10;
+    }
+    if((ret = mtd_write(cpd->dev, new_page, byte_offset, MTD_SECTOR_SIZE)) != 0) {
+        DEBUG("write failed: %d\n", ret);
+        return -11;
+    }
+
     return 0;
 }
 
@@ -416,35 +439,44 @@ int cfg_page_init_writer(cfg_page_desc_t *cpd,
 {
     nanocbor_value_t reader;
     nanocbor_value_t values;
+    bool tryswap = 0;
+    size_t amountleft = 0;
 
-    /* start by bringin in the content */
-    /* XXX could avoid this if we think the content is already loaded */
-    if(cfg_page_init_reader(cpd, cfg_page_active_buffer, sizeof(cfg_page_active_buffer), &reader) < 0) {
-        return -1;
-    }
+    do { /* this at most twice */
 
-    /* XXX at this point, if cpd->writer is initialized, can return it immediately */
-    /* but premature optimization, and there are caching issues here */
+        /* start by bringin in the content */
+        /* XXX could avoid this if we think the content is already loaded */
+        if(cfg_page_init_reader(cpd, cfg_page_active_buffer, sizeof(cfg_page_active_buffer), &reader) < 0) {
+            return -1;
+        }
 
-    if(nanocbor_get_type(&reader) != NANOCBOR_TYPE_MAP ||
-       nanocbor_enter_map(&reader, &values) != NANOCBOR_OK) {
-        return -2;
-    }
+        /* XXX at this point, if cpd->writer is initialized, can return it immediately */
+        /* but premature optimization, and there are caching issues here */
 
-    while(!nanocbor_at_end(&values)) {
-        nanocbor_skip(&values);   /* key */
-        nanocbor_skip(&values);   /* value */
-    }
-    nanocbor_leave_container(&reader, &values);
+        if(nanocbor_get_type(&reader) != NANOCBOR_TYPE_MAP ||
+           nanocbor_enter_map(&reader, &values) != NANOCBOR_OK) {
+            return -2;
+        }
 
-    /* we are now located at end of space */
-    /* calculate how much space is left */
-    size_t amountleft = reader.end - reader.cur;
-    if(valuelen > amountleft) {
-        /* move all values to other page and switch over there */
-        cfg_page_swap_slotno(cpd, &reader);
-        DEBUG("swap slotno\n");
-    }
+        while(!nanocbor_at_end(&values)) {
+            nanocbor_skip(&values);   /* key */
+            nanocbor_skip(&values);   /* value */
+        }
+        nanocbor_leave_container(&reader, &values);
+
+        /* we are now located at end of space */
+        /* calculate how much space is left */
+        amountleft = reader.end - reader.cur;
+        if(valuelen > amountleft) {
+            if(tryswap) {
+                return -ENOSPC;
+            }
+            /* move all values to other page and switch over there */
+            cfg_page_swap_slotno(cpd);
+            tryswap = 1;
+            DEBUG("swap slotno to %d\n", cpd->active_page);
+        }
+    } while(!tryswap);
 
     /* -1 to remove 0xff stop code */
     size_t writeoffset = (reader.cur-cfg_page_active_buffer)-1;
