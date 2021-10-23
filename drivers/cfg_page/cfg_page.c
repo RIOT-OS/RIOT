@@ -33,6 +33,7 @@
 
 #include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "nanocbor/nanocbor.h"
 #include "checksum/crc16_ccitt.h"
@@ -289,12 +290,123 @@ int cfg_page_get_value(cfg_page_desc_t *cpd, uint32_t wantedkey, nanocbor_value_
  * Processing resumes from there, ingoring keyid=0.
  *
  */
-static int cfg_page_swap_slotno(cfg_page_desc_t *cpd, nanocbor_value_t *reader)
+static int cfg_page_swap_slotno(cfg_page_desc_t *cpd, nanocbor_value_t *oreader)
 {
-    (void)cpd;
-    (void)reader;
-    printf("swap\n");
-    return -1;
+    unsigned char new_page[MTD_SECTOR_SIZE];
+    nanocbor_encoder_t writer;
+    nanocbor_value_t   reader, values, nreader2;
+    nanocbor_value_t   okey1, value_st, okey2;
+    size_t value_len;
+
+    if(cfg_page_init_reader(cpd, cfg_page_active_buffer, sizeof(cfg_page_active_buffer), &reader) < 0) {
+        return -1;
+    }
+    if(nanocbor_get_type(&reader) != NANOCBOR_TYPE_MAP ||
+       nanocbor_enter_map(&reader, &values) != NANOCBOR_OK) {
+        return -2;
+    }
+
+    /* setup writer, but do not initialize the header until we are done */
+    nanocbor_encoder_init(&writer,
+                          new_page+CFG_PAGE_HEADER_SIZE,
+                          MTD_SECTOR_SIZE-CFG_PAGE_HEADER_SIZE);
+
+    memset(new_page, 0xff, MTD_SECTOR_SIZE);
+
+    //printf("old %u:\n", values.cur - cfg_page_active_buffer);
+    //od_hex_dump_ext(cfg_page_active_buffer, MTD_SECTOR_SIZE, 16, 0);
+
+    while(!nanocbor_at_end(&values)) {
+        uint32_t key = 0;
+        int keysize = 0;
+
+        /* keep track of where key is, so we can come back to stomp it */
+        okey1 = reader;
+        if(nanocbor_get_uint32(&values, &key) < 0) {
+            /* what to do here is unclear */
+            DEBUG("failed to get uint32\n");
+            return -1;
+        }
+        if(key == 0) {
+            /* this key has already been moved, move on */
+            //DEBUG("at %p key already processed\n", okey1.cur);
+            nanocbor_skip(&values);
+            continue;
+        }
+        /* calculate size of key that was just read */
+        keysize = reader.cur - okey1.cur;
+
+        /* not blanked out, so keep track of where value is */
+        value_st = reader;
+
+        /* skip the value */
+        nanocbor_skip(&values);
+        value_len= reader.cur - value_st.cur;
+
+        /* now run forward looking for newer keys with the same value */
+        nreader2  = values;
+        DEBUG("process at %u for newest key=%u\n", nreader2.cur - cfg_page_active_buffer, key);
+        while(!nanocbor_at_end(&nreader2)) {
+            uint32_t nkey = 0;
+
+            okey2 = nreader2;
+            if(nanocbor_get_uint32(&nreader2, &nkey) < 0) {
+                DEBUG("failed to get uint32 nkey\n");
+                /* what to do here is unclear */
+                return -1;
+            }
+            if(key != nkey) {
+                //DEBUG("different key %u=%u\n", nkey, key);
+                nanocbor_skip(&nreader2);
+                continue;
+            }
+            /* okay, it's the same */
+            /* replace the values we had above */
+            value_st = nreader2;
+            nanocbor_skip(&nreader2);
+            value_len= nreader2.cur - value_st.cur;
+
+            /* reach back, and obliterate the key we had */
+            /* has intimate knowledge of CBOR uint */
+            //DEBUG("splatting old key %u %p\n", key, okey1.cur);
+            *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT;
+            if(keysize > 0) {
+                int i;
+                for(i=1; i < keysize; i++) {
+                    ((uint8_t *)okey1.cur)[i] = 0;
+                }
+            }
+
+            /* skip key forward */
+            okey1 = okey2;
+        }
+
+        /* at this point, key has the int value of the key */
+        /* value_st has the last value that we've found. */
+        /* previous instances of the same `key` have been turned to 0 */
+        /* so, insert this stuff into the new_page */
+
+        DEBUG("writing key %u value[%u]\n", key, value_len);
+        nanocbor_fmt_uint(&writer, key);
+        /* memcpy! */
+        writer.len += value_len;
+        if((size_t)(writer.end - writer.cur) >= value_len) {
+            memcpy(writer.cur, value_st.cur, value_len);
+            writer.cur += value_len;
+        } else {
+            return -4;
+        }
+
+    }
+
+    //printf("new:\n");
+    //od_hex_dump_ext(new_page, MTD_SECTOR_SIZE, 16, 0);
+
+
+    (void)oreader;
+    /* now setup reader to point to where the new page ends */
+    /* some book keeping needed on cpd->? */
+    return 0;
 }
 
 int cfg_page_init_writer(cfg_page_desc_t *cpd,
@@ -423,14 +535,19 @@ int cfg_page_init(cfg_page_desc_t *cpd)
     if(slot0_serial < 0 && slot1_serial < 0) {
         DEBUG("Formatting cfg page %u\n", cpd->active_page);
         cfg_page_format(&cfgpage, cpd->active_page, 0);
+        cfgpage.active_serialno = 0;
     } else if(slot0_serial <  0  && slot1_serial >= 0) {
         cpd->active_page = 1;
+        cfgpage.active_serialno = slot1_serial;
     } else if(slot0_serial >= 0  && slot1_serial < 0) {
         cpd->active_page = 0;
+        cfgpage.active_serialno = slot0_serial;
     } else if(slot0_serial >= slot1_serial) {
         cpd->active_page = 0;
+        cfgpage.active_serialno = slot0_serial;
     } else {
         cpd->active_page = 1;
+        cfgpage.active_serialno = slot1_serial;
     }
 
     DEBUG("Using cfg page %u\n", cpd->active_page);

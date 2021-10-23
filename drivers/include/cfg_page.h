@@ -37,7 +37,10 @@ typedef struct cfg_page_desc {
   nanocbor_encoder_t writer;
   nanocbor_value_t   reader;
   uint8_t            active_page;  /* 0 or 1 */
+  uint8_t            active_serialno;
 } cfg_page_desc_t;
+
+#define CFG_PAGE_HEADER_SIZE 16
 
 extern int cfg_page_init(cfg_page_desc_t *cpd);
 extern int cfg_page_validate(cfg_page_desc_t *cpd, int cfg_slot_no);
