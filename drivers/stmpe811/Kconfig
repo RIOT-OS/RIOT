@@ -6,12 +6,32 @@
 #
 
 config MODULE_STMPE811
-    bool "STMPE811 Touchscreen Controller"
+    bool
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_GPIO_IRQ
-    depends on HAS_PERIPH_I2C
-    depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
-    select MODULE_PERIPH_I2C
     select MODULE_XTIMER
+    depends on TEST_KCONFIG
+
+choice
+    bool "STMPE811 Touchscreen Controller"
+    optional
+    depends on TEST_KCONFIG
+    help
+        The driver supports both STMPE811 connected either via SPI or
+        I2C bus. Select one combination.
+
+config MODULE_STMPE811_I2C
+    bool "STMPE811 on I2C"
+    depends on HAS_PERIPH_I2C
+    select MODULE_PERIPH_I2C
+    select MODULE_STMPE811
+
+config MODULE_STMPE811_SPI
+    bool "STMPE811 on SPI"
+    depends on HAS_PERIPH_SPI
+    select MODULE_PERIPH_SPI
+    select MODULE_STMPE811
+
+endchoice

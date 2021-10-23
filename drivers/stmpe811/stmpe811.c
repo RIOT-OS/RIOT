@@ -21,7 +21,11 @@
 #include <inttypes.h>
 
 #include "xtimer.h"
+#if IS_USED(MODULE_STMPE811_SPI)
+#include "periph/spi.h"
+#else
 #include "periph/i2c.h"
+#endif
 #include "periph/gpio.h"
 
 #include "stmpe811.h"
@@ -31,12 +35,93 @@
 #define ENABLE_DEBUG        0
 #include "debug.h"
 
-#define STMPE811_DEV_I2C    (dev->params.i2c)
-#define STMPE811_DEV_ADDR   (dev->params.addr)
+#if IS_USED(MODULE_STMPE811_SPI)
+#define BUS                 (dev->params.spi)
+#define CS                  (dev->params.cs)
+#define CLK                 (dev->params.clk)
+#define MODE                (dev->params.mode)
+#define WRITE_MASK          (0x7F)
+#else
+#define BUS                 (dev->params.i2c)
+#define ADDR                (dev->params.addr)
+#endif
+
+
+#if IS_USED(MODULE_STMPE811_SPI) /* using SPI mode */
+static inline void _acquire(const stmpe811_t *dev)
+{
+    spi_acquire(BUS, CS, MODE, CLK);
+}
+
+static inline void _release(const stmpe811_t *dev)
+{
+    spi_release(BUS);
+}
+
+static int _read_reg(const stmpe811_t *dev, uint8_t reg, uint8_t *data)
+{
+    *data = spi_transfer_reg(BUS, CS, reg | 0x80, 0x00);
+    return 0;
+}
+
+static int _write_reg(const stmpe811_t *dev, uint8_t reg, uint8_t data)
+{
+    (void)spi_transfer_reg(BUS, CS, (reg & WRITE_MASK), data);
+    return 0;
+}
+
+static int _read_burst(const stmpe811_t *dev, uint8_t reg, void *buf, size_t len)
+{
+    uint8_t reg_read = reg | 0x80;
+
+    /* since SPI is in auto-increment mode subsequent reads will ignore the
+       content of the reg_read buffer, and itself can't overflow since it matches
+       the amount of data per register */
+    spi_transfer_regs(BUS, CS, reg_read, &reg_read, buf, len);
+    return 0;
+}
+
+#else /* using I2C mode */
+
+static inline void _acquire(const stmpe811_t *dev)
+{
+    i2c_acquire(BUS);
+}
+
+static inline void _release(const stmpe811_t *dev)
+{
+    i2c_release(BUS);
+}
+
+static int _read_reg(const stmpe811_t *dev, uint8_t reg, uint8_t *data)
+{
+    if (i2c_read_reg(BUS, ADDR, reg, data, 0) != 0) {
+        return -EIO;
+    }
+    return 0;
+}
+
+static int _write_reg(const stmpe811_t *dev, uint8_t reg, uint8_t data)
+{
+    if (i2c_write_reg(BUS, ADDR, reg, data, 0) != 0) {
+        return -EIO;
+    }
+    return 0;
+}
+
+static int _read_burst(const stmpe811_t *dev, uint8_t reg, void *buf, size_t len)
+{
+    if (i2c_read_regs(BUS, ADDR, reg, buf, len, 0) != 0) {
+        return -EIO;
+    }
+    return 0;
+}
+#endif /* bus mode selection */
 
 static void _gpio_irq(void *arg)
 {
     const stmpe811_t *dev = (const stmpe811_t *)arg;
+
     assert(dev);
 
     if (dev->cb) {
@@ -46,15 +131,13 @@ static void _gpio_irq(void *arg)
 
 static int _soft_reset(const stmpe811_t *dev)
 {
-    if (i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                      STMPE811_SYS_CTRL1, STMPE811_SYS_CTRL1_SOFT_RESET, 0) < 0) {
+    if (_write_reg(dev, STMPE811_SYS_CTRL1, STMPE811_SYS_CTRL1_SOFT_RESET ) < 0) {
         DEBUG("[stmpe811] soft reset: cannot write soft reset bit to SYS_CTRL1 register\n");
         return -EPROTO;
     }
     xtimer_msleep(10);
 
-    if (i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                      STMPE811_SYS_CTRL1, 0, 0) < 0) {
+    if (_write_reg(dev, STMPE811_SYS_CTRL1, 0) < 0) {
         DEBUG("[stmpe811] soft reset: cannot clear SYS_CTRL1 register\n");
         return -EPROTO;
     }
@@ -65,33 +148,78 @@ static int _soft_reset(const stmpe811_t *dev)
 
 static void _reset_fifo(const stmpe811_t *dev)
 {
-    i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                  STMPE811_FIFO_CTRL_STA, STMPE811_FIFO_CTRL_STA_RESET, 0);
-    i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                  STMPE811_FIFO_CTRL_STA, 0, 0);
+    _write_reg(dev, STMPE811_FIFO_CTRL_STA, STMPE811_FIFO_CTRL_STA_RESET);
+    _write_reg(dev, STMPE811_FIFO_CTRL_STA, 0);
 }
 
 static void _clear_interrupt_status(const stmpe811_t *dev)
 {
-    i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR, STMPE811_INT_STA, 0xff, 0);
+    _write_reg(dev, STMPE811_INT_STA, 0xff);
 }
 
-int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params, stmpe811_event_cb_t cb, void *arg)
+#if IS_USED(MODULE_STMPE811_SPI)
+static int _stmpe811_check_mode(stmpe811_t *dev)
+{
+    /* can iterate directly through the enum since they might not be
+       monotonically incrementing */
+    uint8_t modes[] = { SPI_MODE_0, SPI_MODE_1, SPI_MODE_2, SPI_MODE_3};
+    uint8_t reg;
+
+    for (uint8_t i = 0; i < sizeof(modes); i++) {
+        DEBUG("[stmpe811] init: set spi mode to 0x%02x ... ", modes[i]);
+        dev->params.mode = modes[i];
+        /* acquire */
+        _acquire(dev);
+        /* configure auto increment SPI */
+        _read_reg(dev, STMPE811_SPI_CFG, &reg);
+        reg = STMPE811_SPI_CFG_AUTO_INCR;
+        _write_reg(dev, STMPE811_SPI_CFG, reg);
+        _read_reg(dev, STMPE811_SPI_CFG, &reg);
+        if (reg & STMPE811_SPI_CFG_AUTO_INCR) {
+            DEBUG("success\n");
+            _release(dev);
+            return 0;
+        }
+        DEBUG("failed\n");
+        _release(dev);
+    }
+    return 1;
+}
+#endif
+
+int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t *params, stmpe811_event_cb_t cb,
+                  void *arg)
 {
     dev->params = *params;
     dev->cb = cb;
     dev->cb_arg = arg;
+    dev->prev_x = 0;
+    dev->prev_y = 0;
 
     int ret = 0;
+    uint8_t reg;
 
-    /* Acquire I2C device */
-    i2c_acquire(STMPE811_DEV_I2C);
+#if IS_USED(MODULE_STMPE811_SPI)
+    /* configure the chip-select pin */
+    if (spi_init_cs(BUS, CS) != SPI_OK) {
+        DEBUG("[stmpe811] error: unable to configure chip the select pin\n");
+        return -EIO;
+    }
+
+    /* check mode configuration */
+    if(_stmpe811_check_mode(dev) != 0) {
+        DEBUG("[stmpe811] error: couldn't setup SPI\n");
+        return -EIO;
+    }
+#endif
+
+    /* acquire bus */
+    _acquire(dev);
 
     uint16_t device_id;
-    if (i2c_read_regs(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                      STMPE811_CHIP_ID, &device_id, 2, 0) < 0) {
+    if (_read_burst(dev, STMPE811_CHIP_ID, &device_id, 2) < 0) {
         DEBUG("[stmpe811] init: cannot read CHIP_ID register\n");
-        i2c_release(STMPE811_DEV_I2C);
+        _release(dev);
         return -EPROTO;
     }
 
@@ -99,7 +227,7 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params, stmpe811_ev
     if (device_id != STMPE811_CHIP_ID_VALUE) {
         DEBUG("[stmpe811] init: invalid device id (actual: 0x%04X, expected: 0x%04X)\n",
               device_id, STMPE811_CHIP_ID_VALUE);
-        i2c_release(STMPE811_DEV_I2C);
+        _release(dev);
         return -ENODEV;
     }
 
@@ -108,7 +236,7 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params, stmpe811_ev
     ret = _soft_reset(dev);
     if (ret != 0) {
         DEBUG("[stmpe811] init: reset failed\n");
-        i2c_release(STMPE811_DEV_I2C);
+        _release(dev);
         return -EIO;
     }
 
@@ -117,58 +245,50 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params, stmpe811_ev
     /* Initialization sequence */
 
     /* disable temperature sensor and GPIO */
-    ret = i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                        STMPE811_SYS_CTRL2,
-                        (STMPE811_SYS_CTRL2_TS_OFF | STMPE811_SYS_CTRL2_GPIO_OFF), 0);
+    ret =
+        _write_reg(dev, STMPE811_SYS_CTRL2,
+                   (STMPE811_SYS_CTRL2_TS_OFF | STMPE811_SYS_CTRL2_GPIO_OFF));
 
     /* set to 80 cycles and adc resolution to 12 bit*/
-    uint8_t reg = ((uint8_t)(STMPE811_ADC_CTRL1_SAMPLE_TIME_80 << STMPE811_ADC_CTRL1_SAMPLE_TIME_POS) |
-                    STMPE811_ADC_CTRL1_MOD_12B);
-    ret += i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                         STMPE811_ADC_CTRL1, reg, 0);
+    reg =
+        ((uint8_t)(STMPE811_ADC_CTRL1_SAMPLE_TIME_80 << STMPE811_ADC_CTRL1_SAMPLE_TIME_POS) |
+         STMPE811_ADC_CTRL1_MOD_12B);
+
+    ret += _write_reg(dev, STMPE811_ADC_CTRL1, reg);
 
     /* set adc clock speed to 3.25 MHz */
-    ret += i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                         STMPE811_ADC_CTRL2, STMPE811_ADC_CTRL2_FREQ_3_25MHZ, 0);
+    ret += _write_reg(dev, STMPE811_ADC_CTRL2, STMPE811_ADC_CTRL2_FREQ_3_25MHZ);
 
     /* set GPIO AF to function as ts/adc */
-    ret += i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                         STMPE811_GPIO_ALT_FUNCTION, 0x00, 0);
+    ret += _write_reg(dev, STMPE811_GPIO_ALT_FUNCTION, 0x00);
 
     /* set touchscreen configuration */
     reg = ((uint8_t)(STMPE811_TSC_CFG_AVE_CTRL_4 << STMPE811_TSC_CFG_AVE_CTRL_POS) |
-                (uint8_t)(STMPE811_TSC_CFG_TOUCH_DET_DELAY_500US << STMPE811_TSC_CFG_TOUCH_DET_DELAY_POS) |
-                (STMPE811_TSC_CFG_SETTLING_500US));
-    ret += i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                         STMPE811_TSC_CFG, reg, 0);
+           (uint8_t)(STMPE811_TSC_CFG_TOUCH_DET_DELAY_500US <<
+                     STMPE811_TSC_CFG_TOUCH_DET_DELAY_POS) |
+           (STMPE811_TSC_CFG_SETTLING_500US));
+    ret += _write_reg(dev, STMPE811_TSC_CFG, reg);
 
     /* set fifo threshold */
-    ret += i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                         STMPE811_FIFO_TH, 0x01, 0);
+    ret += _write_reg(dev, STMPE811_FIFO_TH, 0x01);
 
     /* reset fifo */
     _reset_fifo(dev);
 
     /* set fractional part to 7, whole part to 1 */
-    ret += i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                         STMPE811_TSC_FRACTION_Z, STMPE811_TSC_FRACTION_Z_7_1, 0);
+    ret += _write_reg(dev, STMPE811_TSC_FRACTION_Z, STMPE811_TSC_FRACTION_Z_7_1);
 
     /* set current limit value to 50 mA */
-    ret += i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                         STMPE811_TSC_I_DRIVE, STMPE811_TSC_I_DRIVE_50MA, 0);
+    ret += _write_reg(dev, STMPE811_TSC_I_DRIVE, STMPE811_TSC_I_DRIVE_50MA);
 
     /* enable touchscreen clock */
-    ret += i2c_read_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                        STMPE811_SYS_CTRL2, &reg, 0);
+    ret += _read_reg(dev, STMPE811_SYS_CTRL2, &reg);
     reg &= ~STMPE811_SYS_CTRL2_TSC_OFF;
-    ret += i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                         STMPE811_SYS_CTRL2, reg, 0);
+    ret += _write_reg(dev, STMPE811_SYS_CTRL2, reg);
 
-    ret += i2c_read_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                        STMPE811_TSC_CTRL, &reg, 0);
+    ret += _read_reg(dev, STMPE811_TSC_CTRL, &reg);
     reg |= STMPE811_TSC_CTRL_EN;
-    ret += i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                         STMPE811_TSC_CTRL, reg, 0);
+    ret += _write_reg(dev, STMPE811_TSC_CTRL, reg);
 
     /* clear interrupt status */
     _clear_interrupt_status(dev);
@@ -178,22 +298,21 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params, stmpe811_ev
         gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_FALLING, _gpio_irq, dev);
 
         /* Enable touchscreen interrupt */
-        ret += i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                             STMPE811_INT_EN, STMPE811_INT_EN_TOUCH_DET, 0);
+        ret += _write_reg(dev, STMPE811_INT_EN, STMPE811_INT_EN_TOUCH_DET);
 
         /* Enable global interrupt */
-        ret += i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                             STMPE811_INT_CTRL, STMPE811_INT_CTRL_GLOBAL_INT | STMPE811_INT_CTRL_INT_TYPE, 0);
+        ret += _write_reg(dev, STMPE811_INT_CTRL,
+                          STMPE811_INT_CTRL_GLOBAL_INT | STMPE811_INT_CTRL_INT_TYPE);
     }
 
     if (ret < 0) {
-        i2c_release(STMPE811_DEV_I2C);
+        _release(dev);
         DEBUG("[stmpe811] init: initialization sequence failed\n");
         return -EPROTO;
     }
 
     /* Release I2C device */
-    i2c_release(STMPE811_DEV_I2C);
+    _release(dev);
 
     DEBUG("[stmpe811] initialization successful\n");
 
@@ -204,31 +323,40 @@ int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *pos
 {
     uint16_t tmp_x, tmp_y;
 
-    /* Acquire I2C device */
-    i2c_acquire(STMPE811_DEV_I2C);
+    /* Acquire device bus */
+    _acquire(dev);
 
     /* Ensure there's a least one position measured in the FIFO */
     uint8_t fifo_size = 0;
+
     do {
-        i2c_read_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                     STMPE811_FIFO_SIZE, &fifo_size, 0);
+        _read_reg(dev, STMPE811_FIFO_SIZE, &fifo_size);
     } while (!fifo_size);
 
-    uint8_t  xyz[4];
+    uint8_t xyz[4];
     uint32_t xyz_ul;
 
-    if (i2c_read_regs(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                      STMPE811_TSC_DATA_NON_INC, &xyz, sizeof(xyz), 0) < 0) {
+#if IS_USED(MODULE_STMPE811_SPI)
+    for (uint8_t i = 0; i < sizeof(xyz); i++) {
+        if (_read_reg(dev, STMPE811_TSC_DATA_NON_INC, &xyz[i]) < 0) {
+            DEBUG("[stmpe811] position: cannot read position\n");
+            _release(dev);
+            return -EPROTO;
+        }
+    }
+#else
+    if (_read_burst(dev, STMPE811_TSC_DATA_NON_INC, xyz, sizeof(xyz)) < 0) {
         DEBUG("[stmpe811] position: cannot read position\n");
-        i2c_release(STMPE811_DEV_I2C);
+        _release(dev);
         return -EPROTO;
     }
+#endif
 
-    /* Release I2C device */
-    i2c_release(STMPE811_DEV_I2C);
+    /* Release device bus */
+    _release(dev);
 
     xyz_ul = ((uint32_t)xyz[0] << 24) | ((uint32_t)xyz[1] << 16) | \
-            ((uint32_t)xyz[2] << 8) | (xyz[3] << 0);
+             ((uint32_t)xyz[2] << 8) | (xyz[3] << 0);
 
     tmp_x = (xyz_ul >> 20) & 0xfff;
     tmp_y = (xyz_ul >>  8) & 0xfff;
@@ -272,12 +400,12 @@ int stmpe811_read_touch_state(const stmpe811_t *dev, stmpe811_touch_state_t *sta
 {
     uint8_t val;
 
-    /* Acquire I2C device */
-    i2c_acquire(STMPE811_DEV_I2C);
+    /* Acquire device bus */
+    _acquire(dev);
 
-    if (i2c_read_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR, STMPE811_TSC_CTRL, &val, 0) < 0) {
+    if (_read_reg(dev, STMPE811_TSC_CTRL, &val) < 0) {
         DEBUG("[stmpe811] position: cannot read touch state\n");
-        i2c_release(STMPE811_DEV_I2C);
+        _release(dev);
         return -EPROTO;
     }
 
@@ -292,7 +420,7 @@ int stmpe811_read_touch_state(const stmpe811_t *dev, stmpe811_touch_state_t *sta
     }
 
     /* Release I2C device */
-    i2c_release(STMPE811_DEV_I2C);
+    _release(dev);
 
     return 0;
 }

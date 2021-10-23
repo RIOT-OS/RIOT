@@ -7,5 +7,5 @@ ifneq (,$(filter disp_dev,$(USEMODULE)))
 endif
 
 ifneq (,$(filter touch_dev,$(USEMODULE)))
-  USEMODULE += stmpe811
+  USEMODULE += stmpe811_i2c
 endif

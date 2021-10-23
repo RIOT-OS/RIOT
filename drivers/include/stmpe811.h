@@ -23,7 +23,11 @@
 
 #include "saul.h"
 #include "periph/gpio.h"
+#if IS_USED(MODULE_STMPE811_SPI)
+#include "periph/spi.h"
+#else
 #include "periph/i2c.h"
+#endif
 
 #ifdef MODULE_TOUCH_DEV
 #include "touch_dev.h"
@@ -60,8 +64,17 @@ typedef void (*stmpe811_event_cb_t)(void *arg);
  * @brief   Device initialization parameters
  */
 typedef struct {
+#if IS_USED(MODULE_STMPE811_SPI)
+    /* SPI configuration */
+    spi_t spi;                          /**< SPI bus */
+    spi_mode_t mode;                    /**< SPI mode */
+    spi_clk_t clk;                      /**< clock speed for the SPI bus */
+    gpio_t cs;                          /**< chip select pin */
+#else
+    /* I2C details */
     i2c_t i2c;                         /**< I2C device which is used */
     uint8_t addr;                      /**< Device I2C address */
+#endif
     gpio_t int_pin;                    /**< Touch screen interrupt pin */
     uint16_t xmax;                     /**< Touch screen max X position */
     uint16_t ymax;                     /**< Touch screen max Y position */
@@ -92,7 +105,7 @@ typedef struct {
  * @return                  0 on success
  * @return                  -ENODEV when no valid device
  * @return                  -EIO when software reset failed
- * @return                  -EPROTO on any I2C error
+ * @return                  -EPROTO on any bus error
  */
 int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params,
                   stmpe811_event_cb_t cb, void *arg);
@@ -104,7 +117,7 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params,
  * @param[out] position     Touch position
  *
  * @return                  0 on success
- * @return                  -EPROTO on any I2C error
+ * @return                  -EPROTO on any bus error
  */
 int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *position);
 
@@ -115,7 +128,7 @@ int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *pos
  * @param[out] state        Touch state
  *
  * @return                  0 on success
- * @return                  -EPROTO on any I2C error
+ * @return                  -EPROTO on any busI2aC error
  */
 int stmpe811_read_touch_state(const stmpe811_t *dev, stmpe811_touch_state_t *state);
 
