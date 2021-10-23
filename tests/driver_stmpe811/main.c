@@ -39,7 +39,7 @@ int main(void)
 
     printf("+------------Initializing------------+\n");
     int ret = stmpe811_init(&dev, &stmpe811_params[0], _touch_event_cb, &lock);
-    if (ret != STMPE811_OK) {
+    if (ret != 0) {
         puts("[Error] Initialization failed");
         return 1;
     }

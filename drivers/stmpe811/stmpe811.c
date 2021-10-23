@@ -49,18 +49,18 @@ static int _soft_reset(const stmpe811_t *dev)
     if (i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
                       STMPE811_SYS_CTRL1, STMPE811_SYS_CTRL1_SOFT_RESET, 0) < 0) {
         DEBUG("[stmpe811] soft reset: cannot write soft reset bit to SYS_CTRL1 register\n");
-        return -STMPE811_ERR_I2C;
+        return -EPROTO;
     }
     xtimer_msleep(10);
 
     if (i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
                       STMPE811_SYS_CTRL1, 0, 0) < 0) {
         DEBUG("[stmpe811] soft reset: cannot clear SYS_CTRL1 register\n");
-        return -STMPE811_ERR_I2C;
+        return -EPROTO;
     }
     xtimer_msleep(2);
 
-    return STMPE811_OK;
+    return 0;
 }
 
 static void _reset_fifo(const stmpe811_t *dev)
@@ -82,7 +82,7 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params, stmpe811_ev
     dev->cb = cb;
     dev->cb_arg = arg;
 
-    int ret = STMPE811_OK;
+    int ret = 0;
 
     /* Acquire I2C device */
     i2c_acquire(STMPE811_DEV_I2C);
@@ -92,7 +92,7 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params, stmpe811_ev
                       STMPE811_CHIP_ID, &device_id, 2, 0) < 0) {
         DEBUG("[stmpe811] init: cannot read CHIP_ID register\n");
         i2c_release(STMPE811_DEV_I2C);
-        return -STMPE811_ERR_I2C;
+        return -EPROTO;
     }
 
     device_id = (device_id << 8) | (device_id >> 8);
@@ -100,16 +100,16 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params, stmpe811_ev
         DEBUG("[stmpe811] init: invalid device id (actual: 0x%04X, expected: 0x%04X)\n",
               device_id, STMPE811_CHIP_ID_VALUE);
         i2c_release(STMPE811_DEV_I2C);
-        return -STMPE811_ERR_NODEV;
+        return -ENODEV;
     }
 
     DEBUG("[stmpe811] init: valid device\n");
 
     ret = _soft_reset(dev);
-    if (ret != STMPE811_OK) {
+    if (ret != 0) {
         DEBUG("[stmpe811] init: reset failed\n");
         i2c_release(STMPE811_DEV_I2C);
-        return -STMPE811_ERR_RESET;
+        return -EIO;
     }
 
     DEBUG("[stmpe811] init: soft reset done\n");
@@ -189,7 +189,7 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params, stmpe811_ev
     if (ret < 0) {
         i2c_release(STMPE811_DEV_I2C);
         DEBUG("[stmpe811] init: initialization sequence failed\n");
-        return -STMPE811_ERR_I2C;
+        return -EPROTO;
     }
 
     /* Release I2C device */
@@ -221,7 +221,7 @@ int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *pos
                       STMPE811_TSC_DATA_NON_INC, &xyz, sizeof(xyz), 0) < 0) {
         DEBUG("[stmpe811] position: cannot read position\n");
         i2c_release(STMPE811_DEV_I2C);
-        return -STMPE811_ERR_I2C;
+        return -EPROTO;
     }
 
     /* Release I2C device */
@@ -265,7 +265,7 @@ int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *pos
     position->x = tmp_x;
     position->y = tmp_y;
 
-    return STMPE811_OK;
+    return 0;
 }
 
 int stmpe811_read_touch_state(const stmpe811_t *dev, stmpe811_touch_state_t *state)
@@ -278,7 +278,7 @@ int stmpe811_read_touch_state(const stmpe811_t *dev, stmpe811_touch_state_t *sta
     if (i2c_read_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR, STMPE811_TSC_CTRL, &val, 0) < 0) {
         DEBUG("[stmpe811] position: cannot read touch state\n");
         i2c_release(STMPE811_DEV_I2C);
-        return -STMPE811_ERR_I2C;
+        return -EPROTO;
     }
 
     _clear_interrupt_status(dev);
@@ -294,5 +294,5 @@ int stmpe811_read_touch_state(const stmpe811_t *dev, stmpe811_touch_state_t *sta
     /* Release I2C device */
     i2c_release(STMPE811_DEV_I2C);
 
-    return STMPE811_OK;
+    return 0;
 }

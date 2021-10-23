@@ -34,16 +34,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Return codes
- */
-enum {
-    STMPE811_OK = 0,                    /**< Everything was fine */
-    STMPE811_ERR_I2C,                   /**< Error on the I2C bus */
-    STMPE811_ERR_NODEV,                 /**< No valid device on I2C bus */
-    STMPE811_ERR_RESET,                 /**< Software reset failed */
-};
-
-/**
  * @brief  Touch state enum
  */
 typedef enum {
@@ -99,10 +89,10 @@ typedef struct {
  * @param[in] cb            Callback function called on touch interrupts
  * @param[in] arg           Context argument used in callback function
  *
- * @return                  STMPE811_OK on success
- * @return                  -STMPE811_ERR_NODEV when no valid device
- * @return                  -STMPE811_ERR_RESET when software reset failed
- * @return                  -STMPE811_ERR_I2C on any I2C error
+ * @return                  0 on success
+ * @return                  -ENODEV when no valid device
+ * @return                  -EIO when software reset failed
+ * @return                  -EPROTO on any I2C error
  */
 int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params,
                   stmpe811_event_cb_t cb, void *arg);
@@ -113,8 +103,8 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params,
  * @param[in] dev           Device descriptor of the STMPE811
  * @param[out] position     Touch position
  *
- * @return                  STMPE811_OK on success
- * @return                  -STMPE811_ERR_I2C on any I2C error
+ * @return                  0 on success
+ * @return                  -EPROTO on any I2C error
  */
 int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *position);
 
@@ -124,8 +114,8 @@ int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *pos
  * @param[in] dev           Device descriptor of the STMPE811
  * @param[out] state        Touch state
  *
- * @return                  STMPE811_OK on success
- * @return                  -STMPE811_ERR_I2C on any I2C error
+ * @return                  0 on success
+ * @return                  -EPROTO on any I2C error
  */
 int stmpe811_read_touch_state(const stmpe811_t *dev, stmpe811_touch_state_t *state);
 
