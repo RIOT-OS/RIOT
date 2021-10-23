@@ -262,6 +262,13 @@ Reason for removal:
 - New implementation (with the same name) that is based on `cpu/efm32` was
   added in commit [fe941ac9fe3f81c0f08ff3b8564cf439639abcda]
 
+### boards/fox [81458c8eed8949c686d5ded652dbee10748e860b]
+Author(s):
+- Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+
+Reason for removal:
+- Hardware not available so can't be tested
+
 [cdc252ab7bd4161cc046bf93a3e55995704b24d4]: https://github.com/RIOT-OS/RIOT/commit/cdc252ab7bd4161cc046bf93a3e55995704b24d4
 [ed3887ac5c1e95308c2827bce3cdca8b0f146c22]: https://github.com/RIOT-OS/RIOT/commit/ed3887ac5c1e95308c2827bce3cdca8b0f146c22
 [0e2a62078850e1ecc74db2db4d639cf2d8fb96d3]: https://github.com/RIOT-OS/RIOT/commit/0e2a62078850e1ecc74db2db4d639cf2d8fb96d3
@@ -290,3 +297,4 @@ Reason for removal:
 [a2dd6f90e51ca9edef643ba72bd1fd18113cf0d2]: https://github.com/RIOT-OS/RIOT/commit/a2dd6f90e51ca9edef643ba72bd1fd18113cf0d2
 [cab1ea66b49e3c72e2827c8686c09d84ae3ef9a9]: https://github.com/RIOT-OS/RIOT/commit/cab1ea66b49e3c72e2827c8686c09d84ae3ef9a9
 [fe941ac9fe3f81c0f08ff3b8564cf439639abcda]: https://github.com/RIOT-OS/RIOT/commit/fe941ac9fe3f81c0f08ff3b8564cf439639abcda
+[81458c8eed8949c686d5ded652dbee10748e860b]: https://github.com/RIOT-OS/RIOT/commit/81458c8eed8949c686d5ded652dbee10748e860b
