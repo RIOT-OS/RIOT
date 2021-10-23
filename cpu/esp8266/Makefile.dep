@@ -2,6 +2,9 @@
 
 include $(RIOTCPU)/esp_common/Makefile.dep
 
+# Include ESP8266 RTOS SDK vendor package.
+USEPKG += esp8266_sdk
+
 USEMODULE += esp_idf_esp8266
 USEMODULE += esp_idf_nvs_flash
 USEMODULE += esp_idf_spi_flash
