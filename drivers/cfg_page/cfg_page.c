@@ -171,13 +171,6 @@ static int _cfg_page_format_stuff(nanocbor_encoder_t *encoder,
         return -7;
     }
 
-    /* now initialize an indefinite map, and stop code */
-    if(nanocbor_fmt_map_indefinite(encoder) < 0) {
-        return -8;
-    }
-    if(nanocbor_fmt_end_indefinite(encoder) < 0) {
-        return -9;
-    }
     return 0;
 }
 
@@ -192,6 +185,13 @@ int cfg_page_format(cfg_page_desc_t *cpd, int cfg_slot_no, int serialno)
 
     if((ret =_cfg_page_format_stuff(&encoder, header_buffer, serialno)) < 0) {
         return ret;
+    }
+    /* now initialize an indefinite map, and stop code */
+    if(nanocbor_fmt_map_indefinite(&encoder) < 0) {
+        return -8;
+    }
+    if(nanocbor_fmt_end_indefinite(&encoder) < 0) {
+        return -9;
     }
 
     unsigned int byte_offset = _calculate_slot_offset(cfg_slot_no);
