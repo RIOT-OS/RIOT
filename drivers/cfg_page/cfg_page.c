@@ -142,44 +142,55 @@ int cfg_page_validate(cfg_page_desc_t *cpd, int cfg_slot_no)
     return serialno;
 }
 
-int cfg_page_format(cfg_page_desc_t *cpd, int cfg_slot_no, int serialno)
-{
-    unsigned char header_buffer[CFG_PAGE_HEADER_SIZE+2];
-    nanocbor_encoder_t encoder;
-    unsigned int write_size=CFG_PAGE_HEADER_SIZE+2;
+static int _cfg_page_format_stuff(nanocbor_encoder_t *encoder,
+                                  unsigned char *header_buffer,
+                                  int serialno) {
 
-    nanocbor_encoder_init(&encoder, header_buffer, write_size);
-
-    if(nanocbor_fmt_tag(&encoder, CBOR_SEQ_TAG) < 0) {
+    if(nanocbor_fmt_tag(encoder, CBOR_SEQ_TAG) < 0) {
         return -1;
     }
 
-    if(nanocbor_fmt_tag(&encoder, CFG_PAGE_RIOT_TAG) < 0) {
+    if(nanocbor_fmt_tag(encoder, CFG_PAGE_RIOT_TAG) < 0) {
         return -1;
     }
 
-    if(nanocbor_put_bstr(&encoder, (unsigned const char *)"BOR", 3) < 0) {
+    if(nanocbor_put_bstr(encoder, (unsigned const char *)"BOR", 3) < 0) {
         return -1;
     }
 
-    if(nanocbor_fmt_uint(&encoder, serialno) < NANOCBOR_OK) {
+    if(nanocbor_fmt_uint(encoder, serialno) < NANOCBOR_OK) {
         return -6;
     }
 
     /* now calculate the CRC */
     /* calculate a 16-bit checksum across the bytes so far */
-    uint16_t calculated = crc16_ccitt_calc(header_buffer, (encoder.cur - header_buffer));
+    uint16_t calculated = crc16_ccitt_calc(header_buffer, (encoder->cur - header_buffer));
 
-    if(nanocbor_fmt_uint(&encoder, calculated) < NANOCBOR_OK) {
+    if(nanocbor_fmt_uint(encoder, calculated) < NANOCBOR_OK) {
         return -7;
     }
 
     /* now initialize an indefinite map, and stop code */
-    if(nanocbor_fmt_map_indefinite(&encoder) < 0) {
+    if(nanocbor_fmt_map_indefinite(encoder) < 0) {
         return -8;
     }
-    if(nanocbor_fmt_end_indefinite(&encoder) < 0) {
+    if(nanocbor_fmt_end_indefinite(encoder) < 0) {
         return -9;
+    }
+    return 0;
+}
+
+int cfg_page_format(cfg_page_desc_t *cpd, int cfg_slot_no, int serialno)
+{
+    unsigned char header_buffer[CFG_PAGE_HEADER_SIZE+2];
+    nanocbor_encoder_t encoder;
+    int ret;
+    unsigned int write_size=CFG_PAGE_HEADER_SIZE+2;
+
+    nanocbor_encoder_init(&encoder, header_buffer, write_size);
+
+    if((ret =_cfg_page_format_stuff(&encoder, header_buffer, serialno)) < 0) {
+        return ret;
     }
 
     unsigned int byte_offset = _calculate_slot_offset(cfg_slot_no);
