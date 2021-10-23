@@ -11,7 +11,6 @@ BOARD_WHITELIST = \
   cc2538dk \
   feather-nrf52840 \
   firefly \
-  fox \
   iotlab-m3 \
   iotlab-a8-m3 \
   nrf52840-mdk \

@@ -11,7 +11,7 @@ USEMODULE += ps
 ifneq (,$(filter samr21-xpro,$(BOARD)))
   DRIVER := at86rf233
 endif
-ifneq (,$(filter iotlab-m3 fox,$(BOARD)))
+ifneq (,$(filter iotlab-m3,$(BOARD)))
   DRIVER := at86rf231
 endif
 ifneq (,$(filter mulle,$(BOARD)))

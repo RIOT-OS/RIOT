@@ -7,7 +7,6 @@ BOARD ?= samr21-xpro
 BOARD_WHITELIST := \
                     samr21-xpro \
                     iotlab-m3 \
-                    fox \
                     iotlab-a8-m3 \
                     frdm-kw41z \
                     openlabs-kw41z-mini-256kib \
