@@ -222,6 +222,58 @@ static void test_bf_ops(void)
     TEST_ASSERT_EQUAL_INT(0, memcmp(c, b, sizeof(c)));
 }
 
+static void test_bf_find_first_set(void)
+{
+    int res;
+    uint8_t field[5];
+    memset(field, 0, sizeof(field));
+
+    res = bf_find_first_set(field, 40);
+    TEST_ASSERT_EQUAL_INT(-1, res);
+
+    bf_set(field, 23);
+    res = bf_find_first_set(field, 40);
+    TEST_ASSERT_EQUAL_INT(23, res);
+
+    bf_set(field, 24);
+    res = bf_find_first_set(field, 40);
+    TEST_ASSERT_EQUAL_INT(23, res);
+
+    bf_set(field, 13);
+    res = bf_find_first_set(field, 40);
+    TEST_ASSERT_EQUAL_INT(13, res);
+
+    bf_set(field, 3);
+    res = bf_find_first_set(field, 40);
+    TEST_ASSERT_EQUAL_INT(3, res);
+}
+
+static void test_bf_find_first_unset(void)
+{
+    int res;
+    uint8_t field[5];
+    memset(field, 0xff, sizeof(field));
+
+    res = bf_find_first_unset(field, 40);
+    TEST_ASSERT_EQUAL_INT(-1, res);
+
+    bf_unset(field, 23);
+    res = bf_find_first_unset(field, 40);
+    TEST_ASSERT_EQUAL_INT(23, res);
+
+    bf_unset(field, 24);
+    res = bf_find_first_unset(field, 40);
+    TEST_ASSERT_EQUAL_INT(23, res);
+
+    bf_unset(field, 13);
+    res = bf_find_first_unset(field, 40);
+    TEST_ASSERT_EQUAL_INT(13, res);
+
+    bf_unset(field, 3);
+    res = bf_find_first_unset(field, 40);
+    TEST_ASSERT_EQUAL_INT(3, res);
+}
+
 Test *tests_bitfield_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -234,6 +286,8 @@ Test *tests_bitfield_tests(void)
         new_TestFixture(test_bf_get_unset_middle),
         new_TestFixture(test_bf_get_unset_lastbyte),
         new_TestFixture(test_bf_ops),
+        new_TestFixture(test_bf_find_first_set),
+        new_TestFixture(test_bf_find_first_unset),
     };
 
     EMB_UNIT_TESTCALLER(bitfield_tests, NULL, NULL, fixtures);
