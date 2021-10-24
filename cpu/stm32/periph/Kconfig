@@ -8,7 +8,8 @@
 config MODULE_PERIPH
     bool
     default y
-    select MODULE_XTIMER if MODULE_PERIPH_USBDEV
+    select MODULE_ZTIMER if MODULE_PERIPH_USBDEV
+    select MODULE_ZTIMER_MSEC if MODULE_PERIPH_USBDEV
     help
         stm32 common peripheral code.
 
