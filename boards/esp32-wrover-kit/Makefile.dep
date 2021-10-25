@@ -2,4 +2,7 @@ ifneq (,$(filter disp_dev,$(USEMODULE)))
   USEMODULE += ili9341
 endif
 
+# Sets up configuration for openocd
+USEMODULE += esp_jtag
+
 include $(RIOTBOARD)/common/esp32/Makefile.dep
