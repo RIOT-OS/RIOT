@@ -23,7 +23,7 @@
 #include <stdio.h>
 
 #include "atomic_utils.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 /* On fast CPUs: 1.000.000 loops */
 #if defined(CPU_CORE_CORTEX_M7) || defined(CPU_ESP32)
@@ -51,32 +51,32 @@ enum {
                                                                                \
         {                                                                      \
             volatile type val;                                                 \
-            start = xtimer_now_usec();                                         \
+            start = ztimer_now(ZTIMER_USEC);                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
                 val = 42;                                                      \
             }                                                                  \
             (void)val;                                                         \
-            stop = xtimer_now_usec();                                          \
+            stop = ztimer_now(ZTIMER_USEC);                                          \
             result_us[IMPL_VOLATILE] = stop - start;                           \
         }                                                                      \
                                                                                \
         {                                                                      \
             type val;                                                          \
-            start = xtimer_now_usec();                                         \
+            start = ztimer_now(ZTIMER_USEC);                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
                 CONCAT(atomic_store_, name)(&val, 42);                         \
             }                                                                  \
-            stop = xtimer_now_usec();                                          \
+            stop = ztimer_now(ZTIMER_USEC);                                          \
             result_us[IMPL_ATOMIC_UTIL] = stop - start;                        \
         }                                                                      \
                                                                                \
         {                                                                      \
             c11type val;                                                       \
-            start = xtimer_now_usec();                                         \
+            start = ztimer_now(ZTIMER_USEC);                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
                 atomic_store(&val, 42);                                        \
             }                                                                  \
-            stop = xtimer_now_usec();                                          \
+            stop = ztimer_now(ZTIMER_USEC);                                          \
             result_us[IMPL_C11_ATOMIC] = stop - start;                         \
         }                                                                      \
     }
@@ -92,34 +92,34 @@ BENCH_ATOMIC_STORE(u64, uint64_t, atomic_uint_least64_t)
                                                                                \
         {                                                                      \
             volatile type val = 0;                                             \
-            start = xtimer_now_usec();                                         \
+            start = ztimer_now(ZTIMER_USEC);                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
                 type tmp = val;                                                \
                 (void)tmp;                                                     \
             }                                                                  \
-            stop = xtimer_now_usec();                                          \
+            stop = ztimer_now(ZTIMER_USEC);                                          \
             result_us[IMPL_VOLATILE] = stop - start;                           \
         }                                                                      \
                                                                                \
         {                                                                      \
             type val = 0;                                                      \
-            start = xtimer_now_usec();                                         \
+            start = ztimer_now(ZTIMER_USEC);                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
                 type tmp = CONCAT(atomic_load_, name)(&val);                   \
                 (void)tmp;                                                     \
             }                                                                  \
-            stop = xtimer_now_usec();                                          \
+            stop = ztimer_now(ZTIMER_USEC);                                          \
             result_us[IMPL_ATOMIC_UTIL] = stop - start;                        \
         }                                                                      \
                                                                                \
         {                                                                      \
             c11type val = ATOMIC_VAR_INIT(0);                                  \
-            start = xtimer_now_usec();                                         \
+            start = ztimer_now(ZTIMER_USEC);                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
                 type tmp = atomic_load(&val);                                  \
                 (void)tmp;                                                     \
             }                                                                  \
-            stop = xtimer_now_usec();                                          \
+            stop = ztimer_now(ZTIMER_USEC);                                          \
             result_us[IMPL_C11_ATOMIC] = stop - start;                         \
         }                                                                      \
     }
@@ -135,32 +135,32 @@ BENCH_ATOMIC_LOAD(u64, uint64_t, atomic_uint_least64_t)
                                                                                \
         {                                                                      \
             volatile type val = 0;                                             \
-            start = xtimer_now_usec();                                         \
+            start = ztimer_now(ZTIMER_USEC);                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
                 val = val op 1;                                                \
             }                                                                  \
             (void)val;                                                         \
-            stop = xtimer_now_usec();                                          \
+            stop = ztimer_now(ZTIMER_USEC);                                          \
             result_us[IMPL_VOLATILE] = stop - start;                           \
         }                                                                      \
                                                                                \
         {                                                                      \
             type val = 0;                                                      \
-            start = xtimer_now_usec();                                         \
+            start = ztimer_now(ZTIMER_USEC);                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
                 CONCAT4(atomic_fetch_, opname, _, name)(&val, 1);              \
             }                                                                  \
-            stop = xtimer_now_usec();                                          \
+            stop = ztimer_now(ZTIMER_USEC);                                          \
             result_us[IMPL_ATOMIC_UTIL] = stop - start;                        \
         }                                                                      \
                                                                                \
         {                                                                      \
             c11type val = ATOMIC_VAR_INIT(0);                                  \
-            start = xtimer_now_usec();                                         \
+            start = ztimer_now(ZTIMER_USEC);                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
                 CONCAT(atomic_fetch_, opname)(&val, 1);                        \
             }                                                                  \
-            stop = xtimer_now_usec();                                          \
+            stop = ztimer_now(ZTIMER_USEC);                                          \
             result_us[IMPL_C11_ATOMIC] = stop - start;                         \
         }                                                                      \
     }
@@ -194,7 +194,7 @@ BENCH_ATOMIC_FETCH_OP(and, &, u64, uint64_t, atomic_uint_least64_t)
                                                                                \
         {                                                                      \
             volatile type val = 0;                                             \
-            start = xtimer_now_usec();                                         \
+            start = ztimer_now(ZTIMER_USEC);                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
                 if (set_or_clear) {                                            \
                     val |= mask;                                               \
@@ -204,7 +204,7 @@ BENCH_ATOMIC_FETCH_OP(and, &, u64, uint64_t, atomic_uint_least64_t)
                 }                                                              \
             }                                                                  \
             (void)val;                                                         \
-            stop = xtimer_now_usec();                                          \
+            stop = ztimer_now(ZTIMER_USEC);                                          \
             result_us[IMPL_VOLATILE] = stop - start;                           \
         }                                                                      \
                                                                                \
@@ -212,17 +212,17 @@ BENCH_ATOMIC_FETCH_OP(and, &, u64, uint64_t, atomic_uint_least64_t)
             static type val = 0;                                               \
             CONCAT3(atomic_bit_, name, _t) bit =                               \
                 CONCAT(atomic_bit_, name)(&val, _bit);                         \
-            start = xtimer_now_usec();                                         \
+            start = ztimer_now(ZTIMER_USEC);                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
                 CONCAT4(atomic_, opname, _bit_, name)(bit);                    \
             }                                                                  \
-            stop = xtimer_now_usec();                                          \
+            stop = ztimer_now(ZTIMER_USEC);                                          \
             result_us[IMPL_ATOMIC_UTIL] = stop - start;                        \
         }                                                                      \
                                                                                \
         {                                                                      \
             c11type val = ATOMIC_VAR_INIT(0);                                  \
-            start = xtimer_now_usec();                                         \
+            start = ztimer_now(ZTIMER_USEC);                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
                 if (set_or_clear) {                                            \
                     atomic_fetch_or(&val, mask);                               \
@@ -231,7 +231,7 @@ BENCH_ATOMIC_FETCH_OP(and, &, u64, uint64_t, atomic_uint_least64_t)
                     atomic_fetch_and(&val, ~(mask));                           \
                 }                                                              \
             }                                                                  \
-            stop = xtimer_now_usec();                                          \
+            stop = ztimer_now(ZTIMER_USEC);                                          \
             result_us[IMPL_C11_ATOMIC] = stop - start;                         \
         }                                                                      \
     }
@@ -251,32 +251,32 @@ BENCH_ATOMIC_SET_CLEAR_BIT(u64, uint64_t, atomic_uint_least64_t, clear, 0)
                                                                                \
         {                                                                      \
             volatile type val = 0;                                             \
-            start = xtimer_now_usec();                                         \
+            start = ztimer_now(ZTIMER_USEC);                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
                 val = val op 1;                                                \
             }                                                                  \
             (void)val;                                                         \
-            stop = xtimer_now_usec();                                          \
+            stop = ztimer_now(ZTIMER_USEC);                                          \
             result_us[IMPL_VOLATILE] = stop - start;                           \
         }                                                                      \
                                                                                \
         {                                                                      \
             type val = 0;                                                      \
-            start = xtimer_now_usec();                                         \
+            start = ztimer_now(ZTIMER_USEC);                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
                 CONCAT4(semi_atomic_fetch_, opname, _, name)(&val, 1);         \
             }                                                                  \
-            stop = xtimer_now_usec();                                          \
+            stop = ztimer_now(ZTIMER_USEC);                                          \
             result_us[IMPL_ATOMIC_UTIL] = stop - start;                        \
         }                                                                      \
                                                                                \
         {                                                                      \
             c11type val = ATOMIC_VAR_INIT(0);                                  \
-            start = xtimer_now_usec();                                         \
+            start = ztimer_now(ZTIMER_USEC);                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
                 CONCAT(atomic_fetch_, opname)(&val, 1);                        \
             }                                                                  \
-            stop = xtimer_now_usec();                                          \
+            stop = ztimer_now(ZTIMER_USEC);                                          \
             result_us[IMPL_C11_ATOMIC] = stop - start;                         \
         }                                                                      \
     }

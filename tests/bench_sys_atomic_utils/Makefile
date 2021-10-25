@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 USEMODULE += atomic_utils
 USEMODULE += test_utils_interactive_sync
 
