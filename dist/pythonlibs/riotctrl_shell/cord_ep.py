@@ -17,13 +17,15 @@ from riotctrl.shell import ShellInteraction, ShellInteractionParser
 
 # ==== Parsers ====
 
-class CordEpRegistrationInfoParser(ShellInteractionParser):
 
+class CordEpRegistrationInfoParser(ShellInteractionParser):
     def __init__(self):
         self.comps = {
-            "rdaddr": re.compile(r"RD address:\s+"
-                                 r"(?P<rdaddr>coaps?://"
-                                 r"\[[0-9a-f:]+(%\S+)?\](:\d+)?)"),
+            "rdaddr": re.compile(
+                r"RD address:\s+"
+                r"(?P<rdaddr>coaps?://"
+                r"\[[0-9a-f:]+(%\S+)?\](:\d+)?)"
+            ),
             "epname": re.compile(r"ep name:\s+(?P<epname>.+)$"),
             "ltime": re.compile(r"lifetime:\s+(?P<ltime>\d+)s$"),
             "regif": re.compile(r"reg if:\s+(?P<regif>\S+)$"),
@@ -73,10 +75,8 @@ class CordEpRegistrationInfoParser(ShellInteractionParser):
 
 
 class CordEpDiscoverParser(ShellInteractionParser):
-
     def __init__(self):
-        self.comp = re.compile(r"the registration interface is"
-                               r"\s+'(?P<regif>\S+)'$")
+        self.comp = re.compile(r"the registration interface is" r"\s+'(?P<regif>\S+)'$")
 
     def parse(self, cmd_output):
         """
@@ -117,8 +117,7 @@ class CordEp(ShellInteraction):
     def cord_ep_info(self, timeout=-1, async_=False):
         return self.cord_ep_cmd(self.INFO, None, timeout, async_)
 
-    def cord_ep_register(self, uri, regif=None,
-                         timeout=-1, async_=False):
+    def cord_ep_register(self, uri, regif=None, timeout=-1, async_=False):
         args = [uri]
         if regif is not None:
             args.append(regif)
