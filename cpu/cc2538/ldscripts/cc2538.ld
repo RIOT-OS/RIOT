@@ -18,11 +18,13 @@
 
 INCLUDE cortexm_rom_offset.ld
 
+_cca_length = 44;
+
 /* Memory Space Definitions: */
 MEMORY
 {
-    rom (rx)    : ORIGIN = _rom_start_addr + _rom_offset, LENGTH = _fw_rom_length
-    cca         : ORIGIN = 0x0027ffd4, LENGTH = 44
+    rom (rx)    : ORIGIN = _rom_start_addr + _rom_offset, LENGTH = _fw_rom_length - _cca_length
+    cca         : ORIGIN = 0x0027ffd4, LENGTH = _cca_length
     sram0       : ORIGIN = 0x20000000, LENGTH = 16K /* Lost in PM2 and PM3 */
     sram1       : ORIGIN = 0x20004000, LENGTH = 16K
     ram (w!rx)  : ORIGIN = _ram_start_addr, LENGTH = _ram_length
