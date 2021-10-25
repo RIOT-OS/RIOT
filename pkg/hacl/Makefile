@@ -7,7 +7,7 @@ PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-CFLAGS += -DKRML_NOUINT128 -Wno-unused-parameter
+CFLAGS += -DKRML_NOUINT128 -Wno-unused-parameter -Wno-array-parameter
 
 all:
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(RIOTBASE)/Makefile.base
