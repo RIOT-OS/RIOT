@@ -9,8 +9,19 @@
 #ifndef RESULT_OUTPUT_TYPES_H
 #define RESULT_OUTPUT_TYPES_H
 
+#include "kernel_defines.h"
+
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+/**
+ * @brief   Enable to add a whitespace after a whitespace after a symbol
+ *
+ * e.g.: {"key1":1,"key2":2}" -> {"key1": 1, "key2: 2}
+ */
+#ifndef CONFIG_TURO_JSON_WHITESPACE_AFTER_SYMBOL
+#define CONFIG_TURO_JSON_WHITESPACE_AFTER_SYMBOL 1
 #endif
 
 /**

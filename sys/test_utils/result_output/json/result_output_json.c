@@ -13,10 +13,19 @@
 
 #include "test_utils/result_output.h"
 
+/**
+ * @brief   TURO whitespace symbol macro
+ */
+#if IS_ACTIVE(CONFIG_TURO_JSON_WHITESPACE_AFTER_SYMBOL)
+#define TURO_JSON_POST_SYMBOL_WHITESPACE  " "
+#else
+#define TURO_JSON_POST_SYMBOL_WHITESPACE  ""
+#endif
+
 static void _print_comma(turo_t *ctx, turo_state_t state)
 {
     if (ctx->state == TURO_STATE_NEED_COMMA) {
-        print_str(", ");
+        print_str("," TURO_JSON_POST_SYMBOL_WHITESPACE);
     }
     ctx->state = state;
 }
@@ -92,7 +101,7 @@ void turo_dict_key(turo_t *ctx, const char *key)
     _print_comma(ctx, TURO_STATE_READY);
     print_str("\"");
     print_str(key);
-    print_str("\": ");
+    print_str("\":" TURO_JSON_POST_SYMBOL_WHITESPACE);
 }
 
 void turo_dict_close(turo_t *ctx)
