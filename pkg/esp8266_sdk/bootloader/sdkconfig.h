@@ -41,7 +41,8 @@ extern "C" {
 #endif
 
 #ifndef CONFIG_LOG_BOOTLOADER_LEVEL
-/* SDK Log levels:
+/*
+ * SDK Log levels:
  *
  *  0 = NONE
  *  1 = ERROR
@@ -69,16 +70,20 @@ extern "C" {
 #error "Unknown flash mode selected."
 #endif
 
-/* Bootloader output baudrate, defined by the app settings as BAUD or
- * BOOTLOADER_BAUD. */
+/*
+ * Bootloader output baudrate, defined by the app settings as BAUD or
+ * BOOTLOADER_BAUD.
+ */
 #define CONFIG_CONSOLE_UART_BAUDRATE (RIOT_BOOTLOADER_BAUD)
 
-/* The Makefile FLASH_SIZE value is set in MB, but set as bytes to
- * CONFIG_SPI_FLASH_SIZE. */
+/*
+ * The Makefile FLASH_SIZE value is set in MB, but set as bytes to
+ * CONFIG_SPI_FLASH_SIZE.
+ */
 #define CONFIG_SPI_FLASH_SIZE ((RIOT_FLASH_SIZE) * 1024 * 1024)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  /* SDKCONFIG_H */
+#endif /* SDKCONFIG_H */
