@@ -75,16 +75,15 @@ usbdev_ep_t *_new_ep(usbdev_t *dev, usb_ep_type_t type, usb_ep_dir_t dir,
 
             res = &testdev->out[0];
             res->ep.num = 0;
-            res->ep.buf = _out_buf;
+            res->buf = _out_buf;
         }
         else {
             res = &testdev->in[0];
             res->ep.num = 0;
-            res->ep.buf = _in_buf;
+            res->buf = _in_buf;
         }
     }
     if (res) {
-        res->buf_start = res->ep.buf;
         res->state = EP_STATE_READY;
         res->available = 0;
         res->ep.len = buf_len;
@@ -190,26 +189,30 @@ void _ep_esr(usbdev_ep_t *ep)
           ep->num, ep->dir == USB_EP_DIR_OUT ? "out" : "in");
     usbdev_mock_ep_t *mock_ep = (usbdev_mock_ep_t *)ep;
 
+    if (mock_ep->ep.dir == USB_EP_DIR_OUT) {
+        memcpy(mock_ep->target_buf, mock_ep->buf, mock_ep->available);
+    }
     if (mock_ep->state == EP_STATE_DATA_AVAILABLE) {
         dev->ep_esr_cb(dev, mock_ep);
         mock_ep->state = EP_STATE_READY;
     }
 }
 
-int _ready(usbdev_ep_t *ep, size_t len)
+int _xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
 {
     DEBUG("[mock]: Readying EP %u, dir %s, len %u\n",
           ep->num, ep->dir == USB_EP_DIR_OUT ? "out" : "in", (unsigned)len);
     if (ep->num == 0) {
         usbdev_mock_t *usbdev_mock = _ep2dev(ep);
         usbdev_mock_ep_t *mock_ep = (usbdev_mock_ep_t *)ep;
-
-        mock_ep->available = len;
-        mock_ep->ep.buf += len;
+        mock_ep->target_buf = buf;
+        if (ep->dir == USB_EP_DIR_IN) {
+            memcpy(mock_ep->buf + mock_ep->available, mock_ep->target_buf, len);
+            mock_ep->available = len;
+        }
         mock_ep->state = EP_STATE_DATA_AVAILABLE;
 
         usbdev_mock->ready_cb(usbdev_mock, (usbdev_mock_ep_t *)ep, len);
-
     }
     return 0;
 }
@@ -224,5 +227,5 @@ static const usbdev_driver_t testdriver = {
     .ep_get = _ep_get,
     .ep_set = _ep_set,
     .ep_esr = _ep_esr,
-    .ready = _ready,
+    .xmit = _xmit,
 };

@@ -40,10 +40,11 @@ typedef enum {
  * @brief usbdev mock device endpoint
  */
 typedef struct {
-    usbdev_ep_t ep;                 /**< Generic endpoint struct        */
-    usbdev_mock_ep_state_t state;   /**< Endpoint state                 */
-    size_t available;               /**< Bytes available in the buffer  */
-    uint8_t *buf_start;             /**< Start location of the buffer   */
+    usbdev_ep_t ep;                 /**< Generic endpoint struct                    */
+    usbdev_mock_ep_state_t state;   /**< Endpoint state                             */
+    size_t available;               /**< Bytes available in the buffer              */
+    uint8_t *target_buf;            /**< Buffer as passed by @ref usbdev_ep_xmit    */
+    uint8_t *buf;                   /**< Internal mock buffer pointer */
 } usbdev_mock_ep_t;
 
 /**
