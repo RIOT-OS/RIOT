@@ -57,17 +57,6 @@ extern "C" {
 #endif
 
 /**
- * @brief Buffer space available for endpoint TX/RX data
- */
-#ifndef STM32_USB_OTG_BUF_SPACE
-#define STM32_USB_OTG_BUF_SPACE  USBDEV_EP_BUF_SPACE
-#endif
-
-#if (STM32_USB_OTG_BUF_SPACE % 4) != 0
-#error "STM32_USB_OTG_BUF_SPACE needs to be a multiple of 4"
-#endif
-
-/**
  * @brief Number of endpoints available with the OTG FS peripheral
  *        including the control endpoint
  */
@@ -122,16 +111,22 @@ extern "C" {
 #endif
 
 /**
+ * @brief stm32 USB OTG peripheral device out endpoint struct
+ */
+typedef struct {
+    usbdev_ep_t ep;     /**< Inherited usbdev endpoint struct */
+    uint8_t *out_buf;   /**< Requested data output buffer */
+} stm32_usb_otg_fshs_out_ep_t;
+
+/**
  * @brief stm32 USB OTG peripheral device context
  */
 typedef struct {
     usbdev_t usbdev;                            /**< Inherited usbdev struct */
     const stm32_usb_otg_fshs_config_t *config;  /**< USB peripheral config   */
-    uint8_t buffer[STM32_USB_OTG_BUF_SPACE];    /**< Buffer space for endpoints */
-    size_t occupied;                            /**< Buffer space occupied */
     size_t fifo_pos;                            /**< FIFO space occupied */
     usbdev_ep_t *in;                            /**< In endpoints */
-    usbdev_ep_t *out;                           /**< Out endpoints */
+    stm32_usb_otg_fshs_out_ep_t *out;           /**< Out endpoints */
     bool suspend;                               /**< Suspend status */
 } stm32_usb_otg_fshs_t;
 
