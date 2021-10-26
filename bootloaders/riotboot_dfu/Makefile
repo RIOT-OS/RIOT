@@ -5,7 +5,8 @@ APPLICATION = riotboot_dfu
 USEMODULE += riotboot_usb_dfu
 
 # Use xtimer for scheduled reboot
-USEMODULE += xtimer
+USEMODULE += ztimer
+USEMODULE += ztimer_auto_init
 
 # USB device vendor and product ID
 # pid.codes test VID/PID, not globally unique

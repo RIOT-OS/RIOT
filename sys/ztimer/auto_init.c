@@ -37,7 +37,7 @@
  */
 
 #include "kernel_defines.h"
-#if IS_USED(MODULE_AUTO_INIT_ZTIMER)
+#if IS_USED(MODULE_AUTO_INIT_ZTIMER) || RIOTBOOT
 
 #include "board.h"
 #include "ztimer.h"
@@ -302,4 +302,4 @@ void ztimer_init(void)
 #  endif
 #endif
 }
-#endif /* IS_USED(MODULE_AUTO_INIT_ZTIMER) */
+#endif /* IS_USED(MODULE_AUTO_INIT_ZTIMER) || RIOTBOOT*/
