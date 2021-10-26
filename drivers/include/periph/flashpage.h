@@ -213,11 +213,17 @@ void flashpage_erase(unsigned page);
 
 /**
  * @brief Get number of first free flashpage
+ *
+ * If riotboot is used in two slot mode, this number will change across
+ * firmware updates as the firmware slots alternate.
  */
 unsigned flashpage_first_free(void);
 
 /**
  * @brief Get number of last free flashpage
+ *
+ * If riotboot is used in two slot mode, this number will change across
+ * firmware updates as the firmware slots alternate.
  */
 unsigned flashpage_last_free(void);
 
