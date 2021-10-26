@@ -142,6 +142,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
         return pktlen;
     }
     if (pktlen <= max_len) {
+        /* Copy the received data from the host to the netif buffer */
         memcpy(buf, cdcecm->data_out, pktlen);
     }
     _signal_rx_flush(cdcecm);

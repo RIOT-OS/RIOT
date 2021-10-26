@@ -77,7 +77,7 @@ static void _handle_tx_ready(event_t *ev)
 {
     usbus_hid_device_t *hid = container_of(ev, usbus_hid_device_t, tx_ready);
 
-    usbdev_ep_ready(hid->ep_in->ep, hid->occupied);
+    usbdev_ep_xmit(hid->ep_in->ep, hid->in_buf, hid->occupied);
 }
 
 void usbus_hid_init(usbus_t *usbus, usbus_hid_device_t *hid, usbus_hid_cb_t cb,
@@ -138,7 +138,8 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     usbus_enable_endpoint(hid->ep_out);
 
     /* signal that INTERRUPT OUT is ready to receive data */
-    usbdev_ep_ready(hid->ep_out->ep, 0);
+    usbdev_ep_xmit(hid->ep_out->ep, hid->out_buf,
+                    CONFIG_USBUS_HID_INTERRUPT_EP_SIZE);
 
     usbus_add_interface(usbus, &hid->iface);
 }
@@ -222,8 +223,8 @@ static void _transfer_handler(usbus_t *usbus, usbus_handler_t *handler,
         size_t len;
         usbdev_ep_get(ep, USBOPT_EP_AVAILABLE, &len, sizeof(size_t));
         if (len > 0) {
-            hid->cb(hid, ep->buf, len);
+            hid->cb(hid, hid->out_buf, len);
         }
-        usbdev_ep_ready(ep, 0);
+        usbdev_ep_xmit(ep, hid->out_buf, CONFIG_USBUS_HID_INTERRUPT_EP_SIZE);
     }
 }

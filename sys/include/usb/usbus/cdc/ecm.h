@@ -113,7 +113,7 @@ typedef struct usbus_cdcecm_device {
     unsigned active_iface;                  /**< Current active data interface */
 
     /**
-     * @brief Buffer for received frames
+     * @brief Buffer for received frames from the host
      */
     usbdev_ep_buf_t data_out[ETHERNET_FRAME_LEN];
 
