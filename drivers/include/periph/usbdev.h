@@ -37,22 +37,26 @@
  * it's endpoint number. It can simply request an available endpoint from the
  * usb device with the @ref usbdev_new_ep function.
  *
- * Data transmission is done by requesting the endpoint with a max packet size.
- * Memory for this buffer is allocated from dedicated memory of the MCU USB
- * peripheral or from a buffer allocated by the peripheral specific usbdev
- * struct. Received data from the host ends up at this buffer automatically
- * by the low level drivers. Signalling that the data at the specified address
- * is ready to be reused is done with the @ref usbdev_ep_ready function by
- * supplying a size of 0 for the @p len argument.
+ * Each interface handler can request multiple endpoints from the usbdev device.
+ * It must supply the expected maximum endpoint transfer size and other
+ * properties of the endpoint. A pointer to an usbdev endpoint is returned if
+ * an endpoint fitting the requirements is available.
+ *
+ * Data transmission is done via the @ref usbdev_ep_xmit function. A buffer and
+ * length must be supplied. Received data from the host ends up at this buffer
+ * automatically by the low level drivers after reception. For reception the
+ * maximum expected transfer length must be supplied, equal to the maximum
+ * endpoint transfer size. The data received can be less than this.
  *
  * For transmitting data back to the host, a similar approach is used. The data
- * to be transmitted is written to the specified address and the
- * @ref usbdev_ep_ready function is called with the size of the data as @p len
- * argument.
+ * to be transmitted is supplied as buffer and the @ref usbdev_ep_xmit function
+ * is called with the buffer and the size of the data.
  *
- * This approach of setting the address and only indicating new data available
- * is done to allow the low level USB peripheral to use DMA to transfer the data
- * from and to the MCU memory.
+ * To ensure that the data buffers adhere to the restrictions of the low level
+ * USB peripheral memory interface, the specific @ref usbdev_ep_buf_t data type
+ * must be used. It behaves as a regular `uint8_t` byte buffer, but is
+ * instantiated with the attributes to ensure that the low level DMA interface
+ * can use it.
  *
  * A callback function is required for signalling events from the driver. The
  * @ref USBDEV_EVENT_ESR is special in that it indicates that the USB peripheral
@@ -75,6 +79,7 @@
 #include <stddef.h>
 
 #include "assert.h"
+#include "periph_cpu.h"
 #include "usb.h"
 #include "usb/usbopt.h"
 
@@ -93,15 +98,30 @@ typedef struct usbdev usbdev_t;
 typedef struct usbdev_ep usbdev_ep_t;
 
 /**
- * @brief Statically allocated buffer space for endpoints.
+ * @brief USBDEV endpoint buffer CPU-specific requirements
  *
- * When the device doesn't have dedicated memory for endpoint buffers, a
- * buffer of this size is allocated to contain the endpoint buffers. Only
- * needs to be as big as the total buffer space required by all endpoints
+ * Can be overridden by periph_cpu if needed by the USB peripheral DMA.
  */
-#ifndef USBDEV_EP_BUF_SPACE
-#define USBDEV_EP_BUF_SPACE     1024
+#ifndef USBDEV_CPU_DMA_REQUIREMENTS
+#define USBDEV_CPU_DMA_REQUIREMENTS
 #endif
+
+/**
+ * @brief Instantiation type for usbdev endpoint buffers
+ *
+ * Functions passing around pointers to these buffers can still use `uint8_t`
+ * for the argument type.
+ *
+ * Example usage:
+ *
+ * ```
+ * usbdev_ep_buf_t buffer[64];
+ * ```
+ *
+ * @note This is a define and not a typedef so that the above works. With a
+ * typedef it would
+ */
+#define usbdev_ep_buf_t USBDEV_CPU_DMA_REQUIREMENTS uint8_t
 
 /**
  * @brief Number of USB IN and OUT endpoints allocated
@@ -232,8 +252,7 @@ struct usbdev {
  */
 struct usbdev_ep {
     usbdev_t *dev;      /**< USB device this endpoint belongs to            */
-    uint8_t *buf;       /**< Ptr to the data buffer                         */
-    size_t len;         /**< Size of the data buffer in bytes               */
+    size_t len;         /**< Endpoint configured max transfer size in bytes */
     usb_ep_dir_t dir;   /**< Endpoint direction                             */
     usb_ep_type_t type; /**< Endpoint type                                  */
     uint8_t num;        /**< Endpoint number                                */
@@ -265,12 +284,12 @@ typedef struct usbdev_driver {
      * @param[in]   dev     USB device descriptor
      * @param[in]   type    USB endpoint type
      * @param[in]   dir     USB endpoint direction
-     * @param[in]   buf_len optimal USB endpoint buffer size
+     * @param[in]   size    USB endpoint buffer size
      *
      * @return              ptr to the new USB endpoint descriptor
      * @return              NULL on error
      */
-    usbdev_ep_t *(*new_ep)(usbdev_t *dev, usb_ep_type_t type, usb_ep_dir_t dir, size_t buf_len);
+    usbdev_ep_t *(*new_ep)(usbdev_t *dev, usb_ep_type_t type, usb_ep_dir_t dir, size_t size);
 
     /**
      * @brief   Get an option value from a given usb device
@@ -359,14 +378,22 @@ typedef struct usbdev_driver {
     void (*ep_esr)(usbdev_ep_t *ep);
 
     /**
-     * @brief Signal data buffer ready for data transmission
+     * @brief Transmit a data buffer
+     *
+     * Ownership of the @p buf is transferred to the usbdev device after calling
+     * this. Do not modify (or unallocate) the buffer between calling this and
+     * when it is released via the @ref USBDEV_EVENT_TR_COMPLETE event.
      *
      * This clears the stall setting in the endpoint if that is enabled.
      *
+     * @note The @p buf passed here must have been declared as
+     * @ref usbdev_ep_buf_t before so that DMA restrictions are applied to it
+     *
      * @param[in] ep        USB endpoint descriptor
-     * @param[in] len       length of the data to be transmitted
+     * @param[inout] buf    Buffer with the data to transfer
+     * @param[in] len       (Max) Length of the data to transfer
      */
-    int (*ready)(usbdev_ep_t *ep, size_t len);
+    int (*xmit)(usbdev_ep_t *ep, uint8_t *buf, size_t len);
 } usbdev_driver_t;
 
 /**
@@ -410,16 +437,16 @@ static inline void usbdev_init(usbdev_t *dev)
  * @param[in]   dev     USB device descriptor
  * @param[in]   type    USB endpoint type
  * @param[in]   dir     USB endpoint direction
- * @param[in]   buf_len optimal USB endpoint buffer size
+ * @param[in]   size    Maximum USB endpoint buffer size used
  *
  * @return              ptr to the new USB endpoint descriptor
  * @return              NULL on error
  */
 static inline usbdev_ep_t * usbdev_new_ep(usbdev_t *dev, usb_ep_type_t type,
-                                          usb_ep_dir_t dir, size_t buf_len)
+                                          usb_ep_dir_t dir, size_t size)
 {
     assert(dev);
-    return dev->driver->new_ep(dev, type, dir, buf_len);
+    return dev->driver->new_ep(dev, type, dir, size);
 }
 
 /**
@@ -564,21 +591,26 @@ static inline void usbdev_ep_esr(usbdev_ep_t *ep)
 }
 
 /**
- * @brief Signal data buffer ready for data transmission
+ * @brief Submit a buffer for a USB endpoint transmission
  *
- * @see @ref usbdev_driver_t::ready
+ * When dealing with an OUT type endpoint, @p len must be the maximum allowed
+ * transfer size for the endpoint. The host is allowed to transfer fewer bytes
+ * than @p len.
+ *
+ * @see @ref usbdev_driver_t::xmit
  *
  * @pre `(ep != NULL)`
  * @pre `(ep->dev != NULL)`
  *
- * @param[in] ep        USB endpoint descriptor
- * @param[in] len       length of the data to be transmitted
+ * @param[in]    ep     USB endpoint descriptor
+ * @param[inout] buf    Buffer to submit for transmission
+ * @param[in]    len    length of the buffer in bytes to be transmitted or received
  */
-static inline int usbdev_ep_ready(usbdev_ep_t *ep, size_t len)
+static inline int usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
 {
     assert(ep);
     assert(ep->dev);
-    return ep->dev->driver->ready(ep, len);
+    return ep->dev->driver->xmit(ep, buf, len);
 }
 
 #ifdef __cplusplus
