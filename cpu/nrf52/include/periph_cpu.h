@@ -263,6 +263,17 @@ void spi_twi_irq_register_spi(NRF_SPIM_Type *bus,
  */
 void spi_twi_irq_register_i2c(NRF_TWIM_Type *bus,
                               spi_twi_irq_cb_t cb, void *arg);
+
+/**
+ * @brief USBDEV buffers must be word aligned because of DMA restrictions
+ */
+#define USBDEV_CPU_DMA_ALIGNMENT       (4)
+
+/**
+ * @brief USBDEV buffer instantiation requirement
+ */
+#define USBDEV_CPU_DMA_REQUIREMENTS    __attribute__((aligned(USBDEV_CPU_DMA_ALIGNMENT)))
+
 #ifdef __cplusplus
 }
 #endif
