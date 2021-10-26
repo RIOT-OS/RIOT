@@ -209,7 +209,7 @@ int cfg_page_format(cfg_page_desc_t *cpd, int cfg_slot_no, int serialno)
         return -10;
     }
     if((error = mtd_write(cpd->dev, header_buffer, byte_offset, write_size)) != 0) {
-        DEBUG("write failed: %d\n", error);
+        DEBUG("fmt write failed: %d\n", error);
         return -11;
     }
 
@@ -307,12 +307,23 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
         return -2;
     }
 
-    /* setup writer, but do not initialize the header until we are done */
-    nanocbor_encoder_init(&writer,
-                          new_page+CFG_PAGE_HEADER_SIZE,
-                          MTD_SECTOR_SIZE-CFG_PAGE_HEADER_SIZE);
-
     memset(new_page, 0xff, MTD_SECTOR_SIZE);
+
+    /* setup writer */
+    nanocbor_encoder_init(&writer,new_page,MTD_SECTOR_SIZE);
+
+    /* setup the header: this should be deferred if this is real NAND */
+    cpd->active_serialno++;
+    if(cpd->active_serialno > 23) {
+        cpd->active_serialno = 1;
+    }
+    if((ret =_cfg_page_format_stuff(&writer, new_page, cpd->active_serialno)) < 0) {
+        return ret;
+    }
+    /* now initialize an indefinite map, stop code implied by erase */
+    if(nanocbor_fmt_map_indefinite(&writer) < 0) {
+        return -8;
+    }
 
     //printf("old %u:\n", values.cur - cfg_page_active_buffer);
     //od_hex_dump_ext(cfg_page_active_buffer, MTD_SECTOR_SIZE, 16, 0);
@@ -346,7 +357,7 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
 
         /* now run forward looking for newer keys with the same value */
         nreader2  = values;
-        DEBUG("process at %u for newest key=%u\n", nreader2.cur - cfg_page_active_buffer, key);
+        //DEBUG("process at %u for newest key=%u\n", nreader2.cur - cfg_page_active_buffer, key);
         while(!nanocbor_at_end(&nreader2)) {
             uint32_t nkey = 0;
 
@@ -357,7 +368,7 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
                 return -1;
             }
             if(key != nkey) {
-                //DEBUG("different key %u=%u\n", nkey, key);
+                DEBUG("different key %u=%u\n", nkey, key);
                 nanocbor_skip(&nreader2);
                 continue;
             }
@@ -369,7 +380,7 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
 
             /* reach back, and obliterate the key we had */
             /* has intimate knowledge of CBOR uint */
-            //DEBUG("splatting old key %u %p\n", key, okey1.cur);
+            DEBUG("splatting old key %u %p\n", key, okey1.cur);
             *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT;
             if(keysize > 0) {
                 int i;
@@ -404,16 +415,8 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
      * now, initialize the newpage with serialno+1, and
      * read it back in
      */
-    cpd->active_serialno++;
-    if(cpd->active_serialno > 23) {
-        cpd->active_serialno = 1;
-    }
-    nanocbor_encoder_init(&writer, new_page, CFG_PAGE_HEADER_SIZE);
-    if((ret = _cfg_page_format_stuff(&writer, new_page, cpd->active_serialno)) < 0) {
-        return ret;
-    }
-    //printf("new:\n");
-    //od_hex_dump_ext(new_page, MTD_SECTOR_SIZE, 16, 0);
+    printf("new:\n");
+    od_hex_dump_ext(new_page, MTD_SECTOR_SIZE, 16, 0);
 
     /* flip bit on which page is active */
     cpd->active_page = !cpd->active_page;
@@ -425,7 +428,7 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
         return -10;
     }
     if((ret = mtd_write(cpd->dev, new_page, byte_offset, MTD_SECTOR_SIZE)) != 0) {
-        DEBUG("write failed: %d\n", ret);
+        DEBUG("swap write to %u page: %u failed: %d\n", byte_offset, cpd->active_page, ret);
         return -11;
     }
 
@@ -439,14 +442,16 @@ int cfg_page_init_writer(cfg_page_desc_t *cpd,
 {
     nanocbor_value_t reader;
     nanocbor_value_t values;
-    bool tryswap = 0;
+    bool   foundspace = 0;
+    bool   tryswap    = 0;
     size_t amountleft = 0;
 
-    do { /* this at most twice */
-
+    while(!foundspace) {
+        DEBUG("finding end of valid values: %d\n", tryswap);
         /* start by bringin in the content */
         /* XXX could avoid this if we think the content is already loaded */
         if(cfg_page_init_reader(cpd, cfg_page_active_buffer, sizeof(cfg_page_active_buffer), &reader) < 0) {
+            DEBUG("cfg_page: failed to init reader\n");
             return -1;
         }
 
@@ -455,6 +460,7 @@ int cfg_page_init_writer(cfg_page_desc_t *cpd,
 
         if(nanocbor_get_type(&reader) != NANOCBOR_TYPE_MAP ||
            nanocbor_enter_map(&reader, &values) != NANOCBOR_OK) {
+            DEBUG("cfg_page: failed to process map\n");
             return -2;
         }
 
@@ -469,14 +475,19 @@ int cfg_page_init_writer(cfg_page_desc_t *cpd,
         amountleft = reader.end - reader.cur;
         if(valuelen > amountleft) {
             if(tryswap) {
+                DEBUG("cfg_page: did not found space after swap: %u > %u\n", valuelen, amountleft);
                 return -ENOSPC;
             }
             /* move all values to other page and switch over there */
             cfg_page_swap_slotno(cpd);
-            tryswap = 1;
             DEBUG("swap slotno to %d\n", cpd->active_page);
+            foundspace = 0;
+            tryswap    = 1;
+        } else {
+            foundspace = 1;
         }
-    } while(!tryswap);
+    }
+
 
     /* -1 to remove 0xff stop code */
     size_t writeoffset = (reader.cur-cfg_page_active_buffer)-1;
