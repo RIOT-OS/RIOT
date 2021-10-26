@@ -207,6 +207,10 @@ SECTIONS
     _sram = ORIGIN(ram);
     _eram = ORIGIN(ram) + LENGTH(ram);
 
+    /* Populate information about rom size */
+    _srom = ORIGIN(rom);
+    _erom = ORIGIN(rom) + LENGTH(rom);
+
     _sbackup_data_load = LOADADDR(.backup.data);
     .backup.data :  ALIGN(4) {
         _sbackup_data = .;
@@ -228,4 +232,8 @@ SECTIONS
         _sheap1 = . ;
         _eheap1 = ORIGIN(bkup_ram) + LENGTH(bkup_ram);
     } > bkup_ram
+
+    .end_fw (NOLOAD) : ALIGN(4) {
+        _end_fw = . ;
+    } > rom
 }

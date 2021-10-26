@@ -212,6 +212,16 @@ unsigned flashpage_page(const void *addr);
 void flashpage_erase(unsigned page);
 
 /**
+ * @brief Get number of first free flashpage
+ */
+unsigned flashpage_first_free(void);
+
+/**
+ * @brief Get number of last free flashpage
+ */
+unsigned flashpage_last_free(void);
+
+/**
  * @brief   Write the given page with the given data
  *
  * @param[in] page      page to write

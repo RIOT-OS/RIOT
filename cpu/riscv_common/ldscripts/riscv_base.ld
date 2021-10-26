@@ -34,6 +34,10 @@ SECTIONS
 {
   __stack_size     = DEFINED(__stack_size) ? __stack_size : 256;
 
+  /* Populate information about rom size */
+  _srom = ORIGIN(rom);
+  _erom = ORIGIN(rom) + LENGTH(rom);
+
   .init           :
   {
     KEEP (*(SORT_NONE(.init)))
@@ -213,4 +217,8 @@ SECTIONS
     . = __stack_size;
     PROVIDE( _sp = . );
   } >ram AT>ram :ram
+
+  .end_fw (NOLOAD) : ALIGN(4) {
+    _end_fw = . ;
+  } > rom
 }
