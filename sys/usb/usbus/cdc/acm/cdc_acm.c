@@ -303,7 +303,8 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
                 usbus_endpoint_t *data_out = usbus_interface_find_endpoint(
                         &cdcacm->iface_data, USB_EP_TYPE_BULK, USB_EP_DIR_OUT);
                 assert(data_out);
-                usbdev_ep_ready(data_out->ep, 0);
+                usbdev_ep_xmit(data_out->ep, cdcacm->out_buf,
+                               CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE);
                 usbus_cdc_acm_flush(cdcacm);
             }
             else {
@@ -329,13 +330,13 @@ static void _handle_in(usbus_cdcacm_device_t *cdcacm,
     unsigned old = irq_disable();
     while (!tsrb_empty(&cdcacm->tsrb)) {
         int c = tsrb_get_one(&cdcacm->tsrb);
-        ep->buf[cdcacm->occupied++] = (uint8_t)c;
+        cdcacm->in_buf[cdcacm->occupied++] = (uint8_t)c;
         if (cdcacm->occupied >= CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE) {
             break;
         }
     }
     irq_restore(old);
-    usbdev_ep_ready(ep, cdcacm->occupied);
+    usbdev_ep_xmit(ep, cdcacm->in_buf, cdcacm->occupied);
 }
 
 static void _transfer_handler(usbus_t *usbus, usbus_handler_t *handler,
@@ -349,9 +350,9 @@ static void _transfer_handler(usbus_t *usbus, usbus_handler_t *handler,
         /* Retrieve incoming data */
         usbdev_ep_get(ep, USBOPT_EP_AVAILABLE, &len, sizeof(size_t));
         if (len > 0) {
-            cdcacm->cb(cdcacm, ep->buf, len);
+            cdcacm->cb(cdcacm, cdcacm->out_buf, len);
         }
-        usbdev_ep_ready(ep, 0);
+        usbdev_ep_xmit(ep, cdcacm->out_buf, CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE);
     }
     if ((ep->dir == USB_EP_DIR_IN) && (ep->type == USB_EP_TYPE_BULK)) {
         cdcacm->occupied = 0;
