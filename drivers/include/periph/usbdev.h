@@ -119,7 +119,8 @@ typedef struct usbdev_ep usbdev_ep_t;
  * ```
  *
  * @note This is a define and not a typedef so that the above works. With a
- * typedef it would
+ * typedef it would instantiate an array of aligned uint8_t and not an aligned
+ * array of uint8_t (assuming the requirement is alignment).
  */
 #define usbdev_ep_buf_t USBDEV_CPU_DMA_REQUIREMENTS uint8_t
 
