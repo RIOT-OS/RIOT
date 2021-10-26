@@ -50,7 +50,6 @@ static const uint32_t gnrc_lorawan_default_channels[] = {
 #endif
 };
 
-
 #define GNRC_LORAWAN_DEFAULT_CHANNELS_NUMOF \
     ARRAY_SIZE(gnrc_lorawan_default_channels) /**< Number of default channels */
 
