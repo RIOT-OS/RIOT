@@ -127,6 +127,27 @@ class TestTuro(TestTuroBase):
         resp = self.exec_turo_cmd(cmd)
         self.assertDictEqual(resp, test_dict)
 
+    def test_test_s32_frac(self):
+        vals = [-0x7FFFFFF, -1, 0, 1, 10, 0x7FFFFFF]
+        decs = [0, 1, 7, 8, 0xFFFF]
+        # Since we are dealing with fixed points comparing to floating
+        # we add a tolerance when comparing.
+        tol = 0.0000001
+        cmd = 'test_s32_frac'
+        for val in vals:
+            for dec in decs:
+                exp = val/(10 ** dec)
+                result = self.exec_turo_cmd(f'{cmd} {val} {dec}')
+                result = float(result)
+                if exp >= 0:
+                    float_tol = exp * tol + tol
+                else:
+                    float_tol = exp * tol - tol
+                if (exp >= 0):
+                    assert (exp - float_tol <= result <= exp + float_tol)
+                else:
+                    assert (exp + float_tol <= result <= exp - float_tol)
+
     def test_test_netif(self):
         resp = self.exec_turo_cmd("test_netif")
 

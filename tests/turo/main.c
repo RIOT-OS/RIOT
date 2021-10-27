@@ -254,6 +254,33 @@ static int cmd_test_multi_element_dict(int argc, char **argv)
     return 0;
 }
 
+static int cmd_test_s32_frac(int argc, char **argv)
+{
+    int32_t val = 0;
+    int32_t digit = 0;
+
+    if (argc != 3) {
+        turo_simple_exit_status(&ctx, -16);
+        return 1;
+    }
+
+    if (_sc_arg2s32(argv[1], &val) != 0) {
+        turo_simple_exit_status(&ctx, -17);
+        return 1;
+    }
+
+    if (_sc_arg2s32(argv[2], &digit) != 0) {
+        turo_simple_exit_status(&ctx, -18);
+        return 1;
+    }
+
+    turo_container_open(&ctx);
+    turo_s32_frac(&ctx, val, digit);
+    turo_container_close(&ctx, 0);
+
+    return 0;
+}
+
 static int cmd_test_netif(int argc, char **argv)
 {
     (void) argc;
@@ -275,6 +302,7 @@ static const shell_command_t shell_commands[] = {
     { "turo_simple_dict_s32", "", cmd_turo_simple_dict_s32 },
     { "turo_simple_exit_status", "", cmd_turo_simple_exit_status },
     { "test_multi_element_dict", "", cmd_test_multi_element_dict },
+    { "test_s32_frac", "", cmd_test_s32_frac },
     { "test_netif", "", cmd_test_netif },
     { NULL, NULL, NULL }
 };
