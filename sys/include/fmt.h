@@ -305,11 +305,9 @@ size_t fmt_s16_dfp(char *out, int16_t val, int scale);
  *
  * This multiplies a 32bit signed number by 10^(scale) before formatting.
  *
- * The resulting string will always be padded with zeros after the decimal point.
- *
- * For example: if @p val is -35648 and @p scale is -2, the resulting
- * string will be "-352.48"( -35648*10^-2). The same value for @p val with
- * @p scale of 2 will result in "-3524800" (-35648*10^2).
+ * For example: if @p val is -35648 and @p fp_digits is -2, the resulting
+ * string will be "-356.48". The same value for @p val with @p fp_digits of 2
+ * will result in "-3546800".
  *
  * @param[out] out          Pointer to the output buffer, or NULL
  * @param[in]  val          Fixed point value
