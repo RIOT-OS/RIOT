@@ -140,7 +140,7 @@ void turo_u64(turo_t *ctx, uint64_t val);
 void turo_float(turo_t *ctx, float val);
 
 /**
- * @brief  Outputs a formatted string string.
+ * @brief  Outputs a formatted string.
  *
  * @pre `turo_container_open` called
  *
