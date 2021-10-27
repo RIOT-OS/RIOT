@@ -481,6 +481,21 @@ void print_u64_dec(uint64_t val);
 void print_s64_dec(uint64_t val);
 
 /**
+ * @brief Print int32 value with a decimal point
+ *
+ * This avoids floats allowing a decimal point to be inserted in an integer.
+ *
+ * For example: if @p val is -35648 and @p digit is 2, the resulting
+ * string will be "-356.48".
+ *
+ * @note This uses a portion of fmt_s32_dfp()
+ *
+ * @param[in]   val     Value to print
+ * @param[in]   digit   Decimal point place starting from the right
+ */
+void print_s32_frac_dec(int32_t val, unsigned digit);
+
+/**
  * @brief Print float value
  *
  * @note See fmt_float for code size warning!

@@ -568,6 +568,16 @@ void print_s64_dec(uint64_t val)
     print(buf, len);
 }
 
+void print_s32_frac_dec(int32_t val, unsigned digit)
+{
+    char buf[12]; /* "-214.7483648" */
+    for (; digit >= TENMAP_SIZE; digit--) {
+        val /= 10;
+    }
+    size_t len = fmt_s32_dfp(buf, val, -(int)digit);
+    print(buf, len);
+}
+
 void print_float(float f, unsigned precision)
 {
     char buf[19];
