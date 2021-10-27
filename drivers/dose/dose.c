@@ -41,6 +41,7 @@ static void _isr_uart(void *arg, uint8_t c);
 static void _isr_gpio(void *arg);
 static void _isr_xtimer(void *arg);
 static void clear_recv_buf(dose_t *ctx);
+static void clear_recv_header(dose_t *ctx);
 static void _isr(netdev_t *netdev);
 static int _recv(netdev_t *dev, void *buf, size_t len, void *info);
 static uint8_t wait_for_state(dose_t *ctx, uint8_t state);
@@ -106,17 +107,41 @@ static inline void _disable_sense(dose_t *ctx)
 #endif
 }
 
+static inline uint32_t _line_time_us(dose_t *ctx, uint32_t bytes)
+{
+    return ctx->timeout_base * bytes;
+}
+
+static void _set_timeout(dose_t *ctx, uint32_t us)
+{
+    static const xtimer_ticks32_t min_timeout = {.ticks32 = XTIMER_BACKOFF};
+    if (us < xtimer_usec_from_ticks(min_timeout)) {
+        us = xtimer_usec_from_ticks(min_timeout);
+    }
+    xtimer_set(&ctx->timeout, us);
+}
+
+static void _set_timeout_bytes(dose_t *ctx, uint32_t bytes)
+{
+    uint32_t us = _line_time_us(ctx, bytes);
+    _set_timeout(ctx, us);
+}
+
 static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal)
 {
-    uint32_t backoff;
+    uint32_t backoff, timeout_base;
     (void) signal;
 
     if (ctx->state == DOSE_STATE_RECV) {
-        /* We got here from RECV state. The driver's thread has to look
-         * if this frame should be processed. By queuing NETDEV_EVENT_ISR,
-         * the netif thread will call _isr at some time. */
-        SETBIT(ctx->flags, DOSE_FLAG_RECV_BUF_DIRTY);
-        netdev_trigger_event_isr(&ctx->netdev);
+        clear_recv_header(ctx);
+
+        if (ctx->flags & DOSE_FLAG_END_RECEIVED) {
+            /* We got here from RECV state. The driver's thread has to look
+             * if this frame should be processed. By queuing NETDEV_EVENT_ISR,
+             * the netif thread will call _isr at some time. */
+            SETBIT(ctx->flags, DOSE_FLAG_RECV_BUF_DIRTY);
+            netdev_trigger_event_isr(&ctx->netdev);
+        }
     }
 
     /* Enable interrupt for start bit sensing */
@@ -128,13 +153,14 @@ static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal)
      * SEND state, a time in the interval [2 * timeout, 3 * timeout]
      * will be picked. This ensures that responding nodes get preferred
      * bus access and sending nodes do not overwhelm listening nodes. */
+    timeout_base = _line_time_us(ctx, CONFIG_DOSE_TIMEOUT_BYTES);
     if (ctx->state == DOSE_STATE_SEND) {
-        backoff = random_uint32_range(2 * ctx->timeout_base, 3 * ctx->timeout_base);
+        backoff = random_uint32_range(2 * timeout_base, 3 * timeout_base);
     }
     else {
-        backoff = random_uint32_range(1 * ctx->timeout_base, 2 * ctx->timeout_base);
+        backoff = random_uint32_range(1 * timeout_base, 2 * timeout_base);
     }
-    xtimer_set(&ctx->timeout, backoff);
+    _set_timeout(ctx, backoff);
 
     return DOSE_SIGNAL_NONE;
 }
@@ -144,49 +170,79 @@ static dose_signal_t state_transit_idle(dose_t *ctx, dose_signal_t signal)
     (void) ctx;
     (void) signal;
 
+    DEBUG_PUTS("dose: idle");
+
     return DOSE_SIGNAL_NONE;
 }
 
 static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal)
 {
-    dose_signal_t rc = DOSE_SIGNAL_NONE;
-
     if (ctx->state != DOSE_STATE_RECV) {
         /* We freshly entered this state. Thus, no start bit sensing is required
          * anymore. Disable RX Start IRQs during the transmission. */
         _disable_sense(ctx);
+        _set_timeout_bytes(ctx, 4 * DOSE_FRAME_HEADER_LEN);
     }
 
+    /* We received a new octet */
     if (signal == DOSE_SIGNAL_UART) {
-        /* We received a new octet */
-        int esc = (ctx->flags & DOSE_FLAG_ESC_RECEIVED);
-        if (!esc && ctx->uart_octet == DOSE_OCTET_ESC) {
-            SETBIT(ctx->flags, DOSE_FLAG_ESC_RECEIVED);
-        }
-        else if (!esc && ctx->uart_octet == DOSE_OCTET_END) {
-            SETBIT(ctx->flags, DOSE_FLAG_END_RECEIVED);
-            rc = DOSE_SIGNAL_END;
-        }
-        else {
-            if (esc) {
-                CLRBIT(ctx->flags, DOSE_FLAG_ESC_RECEIVED);
+        const dose_header_t *header = (dose_header_t *)ctx->header_recv_buf;
+        bool sof = ctx->flags & DOSE_FLAG_SOF_RECEIVED;
+        bool have_len = ctx->header_buf_ptr == DOSE_FRAME_HEADER_LEN;
+
+        /* no start of frame marker found yet */
+        if (!sof) {
+            assert(!have_len);
+            switch (ctx->uart_octet) {
+            case DOSE_OCTET_PREAMBLE:
+                /* there might be multiple preamble octets, ignore them */
+                return DOSE_SIGNAL_NONE;
+            case DOSE_OCTET_SOF:
+                /* start of frame marker found, begin frame processing */
+                SETBIT(ctx->flags, DOSE_FLAG_SOF_RECEIVED);
+                break;
+            default:
+                /* invalid octet, discard frame */
+                DEBUG_PUTS("dose: bad octet");
+                return DOSE_SIGNAL_END;
             }
+        }
+
+        if (have_len) {
             /* Since the dirty flag is set after the RECV state is left,
              * it indicates that the receive buffer contains unprocessed data
              * from a previously received frame. Thus, we just ignore new data. */
-            if (!(ctx->flags & DOSE_FLAG_RECV_BUF_DIRTY)
-                && ctx->recv_buf_ptr < DOSE_FRAME_LEN) {
-                ctx->recv_buf[ctx->recv_buf_ptr++] = ctx->uart_octet;
+            if (ctx->flags & DOSE_FLAG_RECV_BUF_DIRTY) {
+                DEBUG_PUTS("dose: rx buffer locked");
+                return DOSE_SIGNAL_NONE;
+            }
+
+            ctx->recv_buf[ctx->recv_buf_ptr++] = ctx->uart_octet;
+
+            if (ctx->recv_buf_ptr == header->frame_len) {
+                SETBIT(ctx->flags, DOSE_FLAG_END_RECEIVED);
+                return DOSE_SIGNAL_END;
+            }
+        } else {
+
+            ctx->header_recv_buf[ctx->header_buf_ptr++] = ctx->uart_octet;
+
+            if (ctx->header_buf_ptr == DOSE_FRAME_HEADER_LEN) {
+                /* invalid parity */
+                if ((ctx->header_recv_buf[1] ^
+                     ctx->header_recv_buf[2] ^
+                     ctx->header_recv_buf[3]) || header->frame_len > DOSE_FRAME_LEN) {
+                    clear_recv_header(ctx);
+                    DEBUG_PUTS("dose: invalid len");
+                    return DOSE_SIGNAL_END;
+                }
+                /* set timeout based on frame length, sender might be slow */
+                _set_timeout_bytes(ctx, 4 * header->frame_len);
             }
         }
     }
 
-    if (rc == DOSE_SIGNAL_NONE) {
-        /* No signal is returned. We stay in the RECV state. */
-        xtimer_set(&ctx->timeout, ctx->timeout_base);
-    }
-
-    return rc;
+    return DOSE_SIGNAL_NONE;
 }
 
 static dose_signal_t state_transit_send(dose_t *ctx, dose_signal_t signal)
@@ -201,8 +257,7 @@ static dose_signal_t state_transit_send(dose_t *ctx, dose_signal_t signal)
     /* Don't trace any END octets ... the timeout or the END signal
      * will bring us back to the BLOCKED state after _send has emitted
      * its last octet. */
-
-    xtimer_set(&ctx->timeout, ctx->timeout_base);
+    _set_timeout_bytes(ctx, CONFIG_DOSE_TIMEOUT_BYTES);
 
     return DOSE_SIGNAL_NONE;
 }
@@ -286,9 +341,19 @@ static void clear_recv_buf(dose_t *ctx)
     unsigned irq_state = irq_disable();
 
     ctx->recv_buf_ptr = 0;
-    CLRBIT(ctx->flags, DOSE_FLAG_RECV_BUF_DIRTY);
-    CLRBIT(ctx->flags, DOSE_FLAG_END_RECEIVED);
-    CLRBIT(ctx->flags, DOSE_FLAG_ESC_RECEIVED);
+    ctx->header_buf_ptr = 0;
+    ctx->flags = 0;
+
+    irq_restore(irq_state);
+}
+
+static void clear_recv_header(dose_t *ctx)
+{
+    unsigned irq_state = irq_disable();
+
+    ctx->header_buf_ptr = 0;
+    CLRBIT(ctx->flags, DOSE_FLAG_SOF_RECEIVED);
+
     irq_restore(irq_state);
 }
 
@@ -296,12 +361,12 @@ static void _isr(netdev_t *netdev)
 {
     dose_t *ctx = container_of(netdev, dose_t, netdev);
     unsigned irq_state;
-    int dirty, end;
+    bool dirty, end;
 
     /* Get current flags atomically */
     irq_state = irq_disable();
-    dirty = (ctx->flags & DOSE_FLAG_RECV_BUF_DIRTY);
-    end = (ctx->flags & DOSE_FLAG_END_RECEIVED);
+    dirty = ctx->flags & DOSE_FLAG_RECV_BUF_DIRTY;
+    end = ctx->flags & DOSE_FLAG_END_RECEIVED;
     irq_restore(irq_state);
 
     /* If the receive buffer does not contain any data just abort ... */
@@ -414,29 +479,10 @@ static int send_octet(dose_t *ctx, uint8_t c)
     return 0;
 }
 
-static int send_data_octet(dose_t *ctx, uint8_t c)
-{
-    int rc;
-
-    /* Escape special octets */
-    if (c == DOSE_OCTET_ESC || c == DOSE_OCTET_END) {
-        rc = send_octet(ctx, DOSE_OCTET_ESC);
-        if (rc) {
-            return rc;
-        }
-    }
-
-    /* Send data octet */
-    rc = send_octet(ctx, c);
-
-    return rc;
-}
-
 static int _send(netdev_t *dev, const iolist_t *iolist)
 {
     dose_t *ctx = container_of(dev, dose_t, netdev);
     int8_t retries = 3;
-    size_t pktlen;
     uint16_t crc;
 
     /* discard data when interface is in SLEEP mode */
@@ -449,9 +495,24 @@ static int _send(netdev_t *dev, const iolist_t *iolist)
         _set_state(ctx, NETOPT_STATE_IDLE);
     }
 
+    /* prepare DOSE frame header */
+    dose_header_t header = {
+        .sof_marker = DOSE_OCTET_SOF,
+        .frame_len  = iolist_size(iolist) + DOSE_FRAME_CRC_LEN,
+    };
+    const uint8_t *header_buf = (void *)&header;
+    header.parity = header_buf[2] ^ header_buf[3];
+
+    /* prepend DOSE frame header before ethernet frame */
+    iolist_t header_iol = {
+        .iol_next = (iolist_t *)iolist,
+        .iol_base = &header,
+        .iol_len  = sizeof(header),
+    };
+    iolist = &header_iol;
+
 send:
     crc = 0xffff;
-    pktlen = 0;
 
     /* Switch to state SEND */
     do {
@@ -459,19 +520,25 @@ send:
         state(ctx, DOSE_SIGNAL_SEND);
     } while (wait_for_state(ctx, DOSE_STATE_ANY) != DOSE_STATE_SEND);
 
+    /* Send preamble */
+    if (send_octet(ctx, DOSE_OCTET_PREAMBLE)) {
+        goto collision;
+    }
+
     /* Send packet buffer */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         size_t n = iol->iol_len;
-        pktlen += n;
         uint8_t *ptr = iol->iol_base;
         while (n--) {
             /* Send data octet */
-            if (send_data_octet(ctx, *ptr)) {
+            if (send_octet(ctx, *ptr)) {
                 goto collision;
             }
 
-            /* Update CRC */
-            crc = crc16_update(crc, *ptr);
+            /* Update CRC - skip header*/
+            if (iol != iolist) {
+                crc = crc16_update(crc, *ptr);
+            }
 
             ptr++;
         }
@@ -479,15 +546,10 @@ send:
 
     /* Send CRC */
     network_uint16_t crc_nw = byteorder_htons(crc);
-    if (send_data_octet(ctx, crc_nw.u8[0])) {
+    if (send_octet(ctx, crc_nw.u8[0])) {
         goto collision;
     }
-    if (send_data_octet(ctx, crc_nw.u8[1])) {
-        goto collision;
-    }
-
-    /* Send END octet */
-    if (send_octet(ctx, DOSE_OCTET_END)) {
+    if (send_octet(ctx, crc_nw.u8[1])) {
         goto collision;
     }
 
@@ -497,7 +559,7 @@ send:
     /* Get out of the SEND state */
     state(ctx, DOSE_SIGNAL_END);
 
-    return pktlen;
+    return header.frame_len - DOSE_FRAME_CRC_LEN;
 
 collision:
     DEBUG("dose _send(): collision!\n");
@@ -617,6 +679,7 @@ static int _init(netdev_t *dev)
     irq_state = irq_disable();
     ctx->opts = 0;
     ctx->recv_buf_ptr = 0;
+    ctx->header_buf_ptr = 0;
     ctx->flags = 0;
     ctx->state = DOSE_STATE_INIT;
     irq_restore(irq_state);
@@ -637,8 +700,6 @@ static const netdev_driver_t netdev_driver_dose = {
 
 void dose_setup(dose_t *ctx, const dose_params_t *params, uint8_t index)
 {
-    static const xtimer_ticks32_t min_timeout = {.ticks32 = XTIMER_BACKOFF};
-
     ctx->netdev.driver = &netdev_driver_dose;
 
     mutex_init(&ctx->state_mtx);
@@ -658,15 +719,10 @@ void dose_setup(dose_t *ctx, const dose_params_t *params, uint8_t index)
           ctx->mac_addr.uint8[3], ctx->mac_addr.uint8[4], ctx->mac_addr.uint8[5]
           );
 
-    /* The timeout base is the minimal timeout base used for this driver.
-     * We have to ensure it is above the XTIMER_BACKOFF. Otherwise state
-     * transitions are triggered from another state transition setting up the
-     * timeout. */
-    ctx->timeout_base = CONFIG_DOSE_TIMEOUT_BYTES * 10UL * US_PER_SEC / params->baudrate;
-    if (ctx->timeout_base < xtimer_usec_from_ticks(min_timeout)) {
-        ctx->timeout_base = xtimer_usec_from_ticks(min_timeout);
-    }
-    DEBUG("dose timeout set to %" PRIu32 " µs\n", ctx->timeout_base);
+    /* line time of a single byte */
+    ctx->timeout_base = (10UL * US_PER_SEC) / params->baudrate;
     ctx->timeout.callback = _isr_xtimer;
     ctx->timeout.arg = ctx;
+
+    DEBUG("dose timeout set to %" PRIu32 " µs\n", ctx->timeout_base);
 }

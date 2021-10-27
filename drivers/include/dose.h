@@ -73,8 +73,8 @@ extern "C" {
  * @name    Escape octet definitions
  * @{
  */
-#define DOSE_OCTET_END  (0xFF)     /**< Magic octet indicating the end of frame */
-#define DOSE_OCTET_ESC  (0xFE)     /**< Magic octet escaping 0xFF in byte stream */
+#define DOSE_OCTET_PREAMBLE (0x55) /**< Dummy bytes before SOF marker, help sync UART */
+#define DOSE_OCTET_SOF      (0xFF) /**< Magic octet indicating the start of frame */
 /** @} */
 
 /**
@@ -113,7 +113,7 @@ typedef enum {
  */
 #define DOSE_FLAG_RECV_BUF_DIRTY (BIT0)     /**< Receive buffer contains a complete unhandled frame */
 #define DOSE_FLAG_END_RECEIVED   (BIT1)     /**< END octet has been received */
-#define DOSE_FLAG_ESC_RECEIVED   (BIT2)     /**< ESC octet has been received */
+#define DOSE_FLAG_SOF_RECEIVED   (BIT2)     /**< Start of Frame marker has been received */
 /** @} */
 
 /**
@@ -139,6 +139,17 @@ typedef enum {
 #endif
 /** @} */
 
+/**
+ * @brief   DOSE on-line header
+ *          This precedes the DOSE Ethernet frame
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t sof_marker;                     /**< Start of Frame marker */
+    uint8_t parity;                         /**< xor of the two length bytes */
+    uint16_t frame_len;                     /**< length of the subsequent DOSE frame */
+} dose_header_t;
+
+#define DOSE_FRAME_HEADER_LEN       (sizeof(dose_header_t))      /**< size of DOSE frame header */
 #define DOSE_FRAME_CRC_LEN          (2)     /**< CRC16 is used */
 #define DOSE_FRAME_LEN (ETHERNET_FRAME_LEN + DOSE_FRAME_CRC_LEN) /**< dose frame length */
 
@@ -152,8 +163,9 @@ typedef struct {
     uint8_t opts;                           /**< Driver options */
     dose_state_t state;                     /**< Current state of the driver's state machine */
     mutex_t state_mtx;                      /**< Is unlocked every time a state is (re)entered */
+    uint8_t header_recv_buf[DOSE_FRAME_HEADER_LEN]; /**< Buffer to hold the DOSE header */
     uint8_t recv_buf[DOSE_FRAME_LEN];       /**< Receive buffer for incoming frames */
-    size_t recv_buf_ptr;                    /**< Index of the next empty octet of the recveive buffer */
+    uint16_t recv_buf_ptr;                  /**< Index of the next empty octet of the recveive buffer */
 #if !defined(MODULE_PERIPH_UART_RXSTART_IRQ) || DOXYGEN
     gpio_t sense_pin;                       /**< GPIO to sense for start bits on the UART's rx line */
 #endif
@@ -163,6 +175,7 @@ typedef struct {
     uart_t uart;                            /**< UART device to use */
     uint8_t uart_octet;                     /**< Last received octet */
     uint8_t flags;                          /**< Several flags */
+    uint8_t header_buf_ptr;                 /**< Index of the next header byte */
 } dose_t;
 
 /**
