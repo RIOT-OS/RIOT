@@ -130,6 +130,18 @@ void turo_s64(turo_t *ctx, int64_t val);
 void turo_u64(turo_t *ctx, uint64_t val);
 
 /**
+ * @brief  Outputs a formatted signed 32 bit integer with a decimal point.
+ *
+ * @pre `turo_container_open` called
+ * @pre digit < TENMAP_SIZE (== 8)
+ *
+ * @param[in] ctx       The implementation specific turo context.
+ * @param[in] val       The value to output.
+ * @param[in] digit     Decimal point place starting from the right
+ */
+void turo_s32_frac(turo_t *ctx, int32_t val, unsigned digit);
+
+/**
  * @brief  Outputs a formatted float result of varied precision.
  *
  * @pre `turo_container_open` called

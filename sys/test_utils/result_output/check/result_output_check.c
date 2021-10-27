@@ -56,6 +56,13 @@ void turo_u64(turo_t *ctx, uint64_t val)
     _val_check(ctx);
 }
 
+void turo_s32_frac(turo_t *ctx, int32_t val, unsigned digit)
+{
+    (void)val;
+    (void)digit;
+    _val_check(ctx);
+}
+
 void turo_float(turo_t *ctx, float val)
 {
     (void)val;
