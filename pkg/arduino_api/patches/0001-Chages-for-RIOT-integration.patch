@@ -1,0 +1,95 @@
+From 450ac61995792240213e2d05ab83039e4ef07df0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=2E=20David=20Ib=C3=A1=C3=B1ez?= <jdavid.ibp@gmail.com>
+Date: Wed, 13 Oct 2021 09:25:24 +0200
+Subject: [PATCH 1/1] Chages for RIOT integration
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- Fix "has not been declared" errors
+- Remove attach/detach interrupt funcions
+
+Signed-off-by: J. David Ibáñez <jdavid.ibp@gmail.com>
+---
+ api/Common.h     |  3 ---
+ api/Interrupts.h | 44 --------------------------------------------
+ api/Stream.h     |  2 +-
+ 3 files changed, 1 insertion(+), 48 deletions(-)
+
+diff --git api/Common.h api/Common.h
+index c40a35a..c2d9de4 100644
+--- api/Common.h
++++ api/Common.h
+@@ -109,9 +109,6 @@ unsigned long pulseInLong(pin_size_t pin, uint8_t state, unsigned long timeout);
+ void shiftOut(pin_size_t dataPin, pin_size_t clockPin, BitOrder bitOrder, uint8_t val);
+ uint8_t shiftIn(pin_size_t dataPin, pin_size_t clockPin, BitOrder bitOrder);
+ 
+-void attachInterrupt(pin_size_t interruptNumber, voidFuncPtr callback, PinStatus mode);
+-void attachInterruptParam(pin_size_t interruptNumber, voidFuncPtrParam callback, PinStatus mode, void* param);
+-void detachInterrupt(pin_size_t interruptNumber);
+ 
+ void setup(void);
+ void loop(void);
+diff --git api/Interrupts.h api/Interrupts.h
+index e306fc7..e69de29 100644
+--- api/Interrupts.h
++++ api/Interrupts.h
+@@ -1,44 +0,0 @@
+-#ifndef W_INTERRUPTS_CPP
+-#define W_INTERRUPTS_CPP
+-#ifdef __cplusplus
+-
+-#include <stdlib.h>
+-#include <stdbool.h>
+-#include <stdint.h>
+-#include "Common.h"
+-
+-namespace arduino {
+-
+-template <typename T>
+-using voidTemplateFuncPtrParam =  void (*)(T param);
+-
+-template<typename T> struct __container__ {
+-  void* param;
+-  voidTemplateFuncPtrParam<T> function;
+-};
+-
+-// C++ only overloaded version of attachInterrupt function
+-template<typename T> void attachInterrupt(pin_size_t interruptNum, voidTemplateFuncPtrParam<T> userFunc, PinStatus mode, T& param) {
+-
+-  struct __container__<T> *cont = new __container__<T>();
+-  cont->param = &param;
+-  cont->function = userFunc;
+-
+-  // TODO: check lambda scope
+-  // TODO: add structure to delete(__container__) when detachInterrupt() is called
+-  auto f = [](void* a) -> void
+-  {
+-    T param = *(T*)((struct __container__<T>*)a)->param;
+-    (((struct __container__<T>*)a)->function)(param);
+-  };
+-
+-  attachInterruptParam(interruptNum, f, mode, cont);
+-}
+-
+-template<typename T> void attachInterrupt(pin_size_t interruptNum, voidTemplateFuncPtrParam<T*> userFunc, PinStatus mode, T* param) {
+-  attachInterruptParam(interruptNum, (voidFuncPtrParam)userFunc, mode, (void*)param);
+-}
+-
+-}
+-#endif
+-#endif
+diff --git api/Stream.h api/Stream.h
+index e81c71b..b22d0b2 100644
+--- api/Stream.h
++++ api/Stream.h
+@@ -130,4 +130,4 @@ class Stream : public Print
+ 
+ }
+ 
+-using arduino::Stream;
+\ No newline at end of file
++using namespace arduino;
+-- 
+2.32.0
+
