@@ -68,6 +68,10 @@ developing for:
       details on this. If that documentation contains no info about a flashing tool, the default
       tool for its architecture is used.
 
+For example, in Ubuntu the above tools can be installed with the following command:
+
+    sudo apt install git gcc-arm-none-eabi make gcc-multilib openocd gdb-multiarch doxygen wget unzip python3-serial
+
 @details Running `BOARD=<INSERT_TARGET_BOARD_HERE> make info-programmers-supported` in your
          application folder lists the programmers supported by RIOT for the given board.
 
@@ -79,6 +83,7 @@ developing for:
     * Some boards use UF2 based bootloaders, which require auto-mounting to work with `make flash`
     * Some boards default to using J-Link for flashing/debugging. Either install that or export
       `PROGRAMMER=openocd` to just use OpenOCD instead
+    * installation instructions can be found [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD)
 * Optional: picolibc for `arm-none-eabi` to link against picolibc instead of newlib
 * Optional: clang to build with `TOOLCHAIN=llvm`
 * Optional: GDB multiarch for debugging
@@ -113,7 +118,7 @@ developing for:
   will likely work fine for 32 bit RISC-V boards)
     * Alternatively: Install docker and export `BUILD_IN_DOCKER=1`
 * OpenOCD for debugging/flashing (some new boards might require a patched version of OpenOCD or a
-  recent build from the git sources
+  recent build from the git sources)
 * Optional: picolibc to link against picolibc instead of newlib (recommended)
 * Optional: clang to build with `TOOLCHAIN=llvm`
 * Optional: GDB multiarch for debugging
@@ -252,6 +257,12 @@ make -C examples/gnrc_networking/ term \
     TERMFLAGS="-s 115200 -p /dev/ttyACM0 -e"
 ~~~~~~~~
 
+You may not see the greeting
+
+    main(): This is RIOT!
+
+when you flash the board. In this case, type `reboot` in the command line or reboot manually.
+
 Configuring an application                         {#configuring-an-application}
 --------------------------
 Many modules in RIOT offer configuration options that will be considered during
@@ -281,6 +292,9 @@ Use Docker to build RIOT                           {#docker}
 [Docker](https://www.docker.com/) is a platform that allows packaging software into containers that can easily be run on any Linux that has Docker installed.
 
 You can download a RIOT Docker container from the Docker Hub and then use that to build your project making use of all toolchains that we've preinstalled in the container.
+
+It can be helpful to use Docker especially if you are working with ESP, since the
+installation might be easier this way.
 
 Setup                                              {#docker-setup}
 -----
@@ -376,3 +390,5 @@ To create a bridge and two (or `count` at your option) tap interfaces:
 ~~~~~~~{.sh}
     sudo ./dist/tools/tapsetup/tapsetup [-c [<count>]]
 ~~~~~~~
+
+A detailed example can be found in `examples/gnrc_networking`.
