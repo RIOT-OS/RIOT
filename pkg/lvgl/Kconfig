@@ -31,7 +31,8 @@ config MODULE_LVGL_CONTRIB
     bool "Contrib"
     select MODULE_DISP_DEV
     select MODULE_CORE_THREAD_FLAGS
-    select MODULE_XTIMER
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
 
 config MODULE_LVGL_CONTRIB_TOUCH
     bool "Touch support"

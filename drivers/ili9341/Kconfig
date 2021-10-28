@@ -12,7 +12,8 @@ config MODULE_ILI9341
     depends on TEST_KCONFIG
     select MODULE_PERIPH_SPI
     select MODULE_PERIPH_GPIO
-    select MODULE_XTIMER
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
 
 menuconfig KCONFIG_USEMODULE_ILI9341
     bool "Configure ILI9341 driver"

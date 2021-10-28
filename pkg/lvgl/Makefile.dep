@@ -10,7 +10,8 @@ USEMODULE += lvgl_widgets
 ifneq (,$(filter lvgl_contrib,$(USEMODULE)))
   USEMODULE += disp_dev
   USEMODULE += core_thread_flags
-  USEMODULE += xtimer
+  USEMODULE += ztimer
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter lvgl_contrib_touch,$(USEMODULE)))

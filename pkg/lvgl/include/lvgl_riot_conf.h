@@ -28,8 +28,8 @@ typedef int16_t lv_coord_t;
 
 #define LV_TICK_CUSTOM     1
 #if LV_TICK_CUSTOM == 1
-#define LV_TICK_CUSTOM_INCLUDE  "xtimer.h"       /*Header for the sys time function*/
-#define LV_TICK_CUSTOM_SYS_TIME_EXPR (xtimer_now_usec() / US_PER_MS)     /*Expression evaluating to current systime in ms*/
+#define LV_TICK_CUSTOM_INCLUDE  "ztimer.h"       /*Header for the sys time function*/
+#define LV_TICK_CUSTOM_SYS_TIME_EXPR (ztimer_now(ZTIMER_MSEC))     /*Expression evaluating to current systime in ms*/
 #endif   /*LV_TICK_CUSTOM*/
 
 #ifdef __cplusplus

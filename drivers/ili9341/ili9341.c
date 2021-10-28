@@ -22,7 +22,7 @@
 #include <string.h>
 #include "byteorder.h"
 #include "periph/spi.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "kernel_defines.h"
 
 #include "ili9341.h"
@@ -101,16 +101,16 @@ int ili9341_init(ili9341_t *dev, const ili9341_params_t *params)
     if (gpio_is_valid(dev->params->rst_pin)) {
         gpio_init(dev->params->rst_pin, GPIO_OUT);
         gpio_clear(dev->params->rst_pin);
-        xtimer_msleep(120);
+        ztimer_sleep(ZTIMER_MSEC, 120);
         gpio_set(dev->params->rst_pin);
     }
-    xtimer_msleep(120);
+    ztimer_sleep(ZTIMER_MSEC, 120);
 
     /* Acquire once at release at the end */
     _ili9341_spi_acquire(dev);
     /* Soft Reset */
     _write_cmd(dev, ILI9341_CMD_SWRESET, NULL, 0);
-    xtimer_msleep(120);
+    ztimer_sleep(ZTIMER_MSEC, 120);
 
     /* Display off */
     _write_cmd(dev, ILI9341_CMD_DISPOFF, NULL, 0);

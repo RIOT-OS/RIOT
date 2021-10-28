@@ -2,7 +2,8 @@ BOARD ?= stm32f429i-disc1
 include ../Makefile.tests_common
 
 USEMODULE += ili9341
-USEMODULE += xtimer
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
 
 include $(RIOTBASE)/Makefile.include
 
