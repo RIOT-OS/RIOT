@@ -213,6 +213,39 @@ static inline void xtimer_spin(xtimer_ticks32_t ticks)
     }
 }
 
+static inline xtimer_ticks32_t xtimer_diff(xtimer_ticks32_t a,
+                                           xtimer_ticks32_t b)
+{
+    return a - b;
+}
+
+static inline xtimer_ticks64_t xtimer_diff64(xtimer_ticks64_t a,
+                                             xtimer_ticks64_t b)
+{
+    return a - b;
+}
+
+static inline xtimer_ticks32_t xtimer_diff32_64(xtimer_ticks64_t a,
+                                                xtimer_ticks64_t b)
+{
+    return (xtimer_ticks32_t)(a - b);
+}
+
+static inline xtimer_ticks64_t xtimer_ticks64(uint64_t ticks)
+{
+    return ticks;
+}
+
+static inline bool xtimer_less(xtimer_ticks32_t a, xtimer_ticks32_t b)
+{
+    return a < b;
+}
+
+static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b)
+{
+    return a < b;
+}
+
 /*
    static inline void xtimer_set64(xtimer_t *timer, uint64_t offset_us);
    static inline void xtimer_tsleep32(xtimer_ticks32_t ticks);
@@ -223,15 +256,6 @@ static inline void xtimer_spin(xtimer_ticks32_t ticks)
    static inline xtimer_ticks64_t xtimer_ticks_from_usec64(uint64_t usec);
    static inline uint32_t xtimer_usec_from_ticks(xtimer_ticks32_t ticks);
    static inline uint64_t xtimer_usec_from_ticks64(xtimer_ticks64_t ticks);
-   static inline xtimer_ticks64_t xtimer_ticks64(uint64_t ticks);
-   static inline xtimer_ticks32_t xtimer_diff(xtimer_ticks32_t a,
-                                           xtimer_ticks32_t b);
-   static inline xtimer_ticks64_t xtimer_diff64(xtimer_ticks64_t a,
-                                             xtimer_ticks64_t b);
-   static inline xtimer_ticks32_t xtimer_diff32_64(xtimer_ticks64_t a,
-                                                xtimer_ticks64_t b);
-   static inline bool xtimer_less(xtimer_ticks32_t a, xtimer_ticks32_t b);
-   static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b);
 
  #if defined(MODULE_CORE_MSG) || defined(DOXYGEN)
    static inline void xtimer_set_msg64(xtimer_t *timer, uint64_t offset,
