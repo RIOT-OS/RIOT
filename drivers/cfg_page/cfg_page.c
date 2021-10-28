@@ -276,25 +276,29 @@ int cfg_page_get_value(cfg_page_desc_t *cpd, uint32_t wantedkey, nanocbor_value_
 static void _cfg_page_splat_key(nanocbor_value_t okey1, int keysize)
 {
   switch(keysize) {
-  case 1:
+  case 0:
     *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT;
     break;
 
-  case 1+2:
+  case 1:
     *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT+NANOCBOR_SIZE_BYTE;
     break;
 
-  case 1+4:
+  case 2:
     *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT+NANOCBOR_SIZE_SHORT;
     break;
 
-  case 1+8:
+  case 4:
     *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT+NANOCBOR_SIZE_WORD;
     break;
 
-  case 1+16:
-    *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT+NANOCBOR_SIZE_WORD;
+  case 8:
+    *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT+NANOCBOR_SIZE_LONG;
     break;
+
+  default:
+    DEBUG("bad keysize: %d\n", keysize);
+    return;
   }
   if(keysize > 0) {
     /* make a zero of a bigger size */
