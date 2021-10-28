@@ -61,7 +61,7 @@ int cfg_page_print(cfg_page_desc_t *cpd)
         }
 
         type = nanocbor_get_type(&values);
-        printf("key: %02u[type=%02u] where=%p:%d ", key, type, values.cur,
+        printf("key: %06u[type=%02u] where=%p:%d ", key, type, values.cur,
                values.cur-cfg_page_temp);
         switch(type) {
         case NANOCBOR_TYPE_BSTR:

@@ -475,7 +475,7 @@ int cfg_page_init_writer(cfg_page_desc_t *cpd,
     size_t amountleft = 0;
 
     while(!foundspace) {
-        DEBUG("finding end of valid values: %d\n", tryswap);
+        //DEBUG("finding end of valid values: %d\n", tryswap);
         /* start by bringin in the content */
         /* XXX could avoid this if we think the content is already loaded */
         if(cfg_page_init_reader(cpd, cfg_page_active_buffer, sizeof(cfg_page_active_buffer), &reader) < 0) {
@@ -519,7 +519,7 @@ int cfg_page_init_writer(cfg_page_desc_t *cpd,
 
     /* -1 to remove 0xff stop code */
     size_t writeoffset = (reader.cur-cfg_page_active_buffer)-1;
-    DEBUG("found end of old values at: %u, amountleft=%u\n",
+    DEBUG("found end of old values at: %04u, amountleft=%04u\n",
           writeoffset, amountleft);
 
     /* initialize the writer at this location, using the writer in cpd->writer */
