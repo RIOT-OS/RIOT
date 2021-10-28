@@ -1,4 +1,4 @@
-export DOCKER_IMAGE ?= riot/riotbuild:latest
+export DOCKER_IMAGE ?= riot/riotbuild:2021.10
 export DOCKER_BUILD_ROOT ?= /data/riotbuild
 DOCKER_RIOTBASE ?= $(DOCKER_BUILD_ROOT)/riotbase
 # List of Docker-enabled make goals
