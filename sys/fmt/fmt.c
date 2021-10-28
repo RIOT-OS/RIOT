@@ -315,8 +315,6 @@ size_t fmt_s16_dfp(char *out, int16_t val, int fp_digits)
 
 size_t fmt_s32_dfp(char *out, int32_t val, int fp_digits)
 {
-    assert(fp_digits > -(int)TENMAP_SIZE);
-
     unsigned  pos = 0;
 
     if (fp_digits == 0) {
@@ -331,6 +329,13 @@ size_t fmt_s32_dfp(char *out, int32_t val, int fp_digits)
     }
     else {
         fp_digits *= -1;
+
+        /* ensure we're not using a higher precision than we can handle */
+        while ((unsigned)fp_digits >= TENMAP_SIZE) {
+            val /= 10;
+            fp_digits -= 1;
+        }
+
         uint32_t e = _tenmap[fp_digits];
         int32_t abs = (val / (int32_t)e);
         int32_t div = val - (abs * e);

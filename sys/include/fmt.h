@@ -287,8 +287,7 @@ size_t fmt_s16_dec(char *out, int16_t val);
  *
  * @param[out] out          Pointer to the output buffer, or NULL
  * @param[in]  val          Fixed point value
- * @param[in]  fp_digits    Number of digits after the decimal point, MUST be
- *                          >= -7
+ * @param[in]  fp_digits    Number of digits after the decimal point
  *
  * @return      Length of the resulting string
  */
@@ -310,12 +309,12 @@ size_t fmt_s16_dfp(char *out, int16_t val, int fp_digits);
  * will be "-35.48". The same value for @p val with @p fp_digits of 2 will
  * result in "-354800".
  *
- * @pre fp_digits > -8 (TENMAP_SIZE)
+ * If fp_digits is negative, it will only print up to (TENMAP_SIZE-1) digits
+ * after the decimal point.
  *
  * @param[out] out          Pointer to the output buffer, or NULL
  * @param[in]  val          Fixed point value
- * @param[in]  fp_digits    Number of digits after the decimal point, MUST be
- *                          >= -7
+ * @param[in]  fp_digits    Number of digits after the decimal point
  *
  * @return      Length of the resulting string
  */
