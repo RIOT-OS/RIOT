@@ -738,6 +738,15 @@ static void test_fmt_s32_dfp(void)
     out[act_len] = '\0';
     TEST_ASSERT_EQUAL_STRING("-0.0000001", (char *)out);
 
+    val = -1234567890;
+    fpp = -10;     /* exceeding TENMAP_SIZE */
+    len = fmt_s32_dfp(NULL, val, fpp);
+    TEST_ASSERT_EQUAL_INT(10, len);
+    act_len = fmt_s32_dfp(out, val, fpp);
+    TEST_ASSERT_EQUAL_INT(10, act_len);
+    out[act_len] = '\0';
+    TEST_ASSERT_EQUAL_STRING("-0.1234567", (char *)out);
+
     /* check that the buffer was not overflowed */
     TEST_ASSERT_EQUAL_STRING("z", &out[28]);
 }
