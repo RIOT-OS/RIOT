@@ -308,61 +308,62 @@ size_t fmt_s16_dec(char *out, int16_t val)
     return fmt_s32_dec(out, val);
 }
 
-size_t fmt_s16_dfp(char *out, int16_t val, int fp_digits)
+size_t fmt_s16_dfp(char *out, int16_t val, int scale)
 {
-    return fmt_s32_dfp(out, val, fp_digits);
+    return fmt_s32_dfp(out, val, scale);
 }
 
-size_t fmt_s32_dfp(char *out, int32_t val, int fp_digits)
+size_t fmt_s32_dfp(char *out, int32_t val, int scale)
 {
-    assert(fp_digits > -(int)TENMAP_SIZE);
+    unsigned pos = 0;
 
-    unsigned  pos = 0;
-
-    if (fp_digits == 0) {
+    if (scale == 0) {
         pos = fmt_s32_dec(out, val);
     }
-    else if (fp_digits > 0) {
+    else if (scale > 0) {
         pos = fmt_s32_dec(out, val);
         if (out) {
-            memset(&out[pos], '0', fp_digits);
+            memset(&out[pos], '0', scale);
         }
-        pos += fp_digits;
+        pos += scale;
     }
     else {
-        fp_digits *= -1;
-        uint32_t e = _tenmap[fp_digits];
-        int32_t abs = (val / (int32_t)e);
-        int32_t div = val - (abs * e);
-
-        /* the divisor should never be negative */
-        if (div < 0) {
-            div *= -1;
-        }
-        /* handle special case for negative number with zero as absolute value */
-        if ((abs == 0) && (val < 0)) {
+        scale = -scale;
+        char buf[10]; /* "2147483648" */
+        int negative = val < 0;
+        uint32_t uval = negative ? -val : val;
+        int len = fmt_u32_dec(buf, uval);
+        if (negative) {
             if (out) {
                 out[pos] = '-';
             }
             pos++;
         }
+        if (len <= scale) {
+            int zeroes = scale - len + 1;
+            if (out) {
+                memset(&out[pos], '0', zeroes);
+            }
+            pos += zeroes;
+        }
+        if (out) {
+            memcpy(&out[pos], buf, len);
+        }
 
-        if (!out) {
-            /* compensate for the decimal point character... */
-            pos += fmt_s32_dec(NULL, abs) + 1;
+        pos += len;
+
+        if (out) {
+            unsigned dot_pos = pos - scale;
+            for (unsigned i = pos; i >= dot_pos; i--) {
+                out[i] = out[i - 1];
+            }
+            out[dot_pos] = '.';
         }
-        else {
-            pos += fmt_s32_dec(&out[pos], abs);
-            out[pos++] = '.';
-            unsigned div_len = fmt_s32_dec(&out[pos], div);
-            fmt_lpad(&out[pos], div_len, (size_t)fp_digits, '0');
-        }
-        pos += fp_digits;
+        pos += 1;
     }
 
     return pos;
 }
-
 /* this is very probably not the most efficient implementation, as it at least
  * pulls in floating point math.  But it works, and it's always nice to have
  * low hanging fruits when optimizing. (Kaspar)
