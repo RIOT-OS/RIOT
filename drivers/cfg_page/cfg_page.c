@@ -273,6 +273,21 @@ int cfg_page_get_value(cfg_page_desc_t *cpd, uint32_t wantedkey, nanocbor_value_
     return ret;
 }
 
+static void _cfg_page_splat_key(nanocbor_value_t okey1, int keysize)
+{
+  *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT;
+  if(keysize > 0) {
+    /*
+     * XXX this is not right.  It needs to make a TYPE_UINT which is
+     * multiple bytes
+     */
+    int i;
+    for(i=1; i < keysize; i++) {
+      ((uint8_t *)okey1.cur)[i] = 0;
+    }
+  }
+}
+
 /*
  * process through all the attributes in the filled current space,
  * copying the last value for each key into the new space.
@@ -381,13 +396,7 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
             /* reach back, and obliterate the key we had */
             /* has intimate knowledge of CBOR uint */
             DEBUG("splatting old key %u %p\n", key, okey1.cur);
-            *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT;
-            if(keysize > 0) {
-                int i;
-                for(i=1; i < keysize; i++) {
-                    ((uint8_t *)okey1.cur)[i] = 0;
-                }
-            }
+            _cfg_page_splat_key(okey1, keysize);
 
             /* skip key forward */
             okey1 = okey2;
@@ -409,6 +418,8 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
             return -4;
         }
 
+        /* now splat the last copy of the key, since it is copied */
+        _cfg_page_splat_key(okey1, keysize);
     }
 
     /*
