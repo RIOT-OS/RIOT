@@ -42,18 +42,19 @@ int main(void)
 
     cfg_page_print(&cfgpage);
 
-    for(i=0; i<127; i++) {
+    for(i=0; i<128; i++) {
+        printf("writing iteration %d\n", i);
         uint8_t buf2[16];
         snprintf((char *)buf2, 16, "bob%04x", i);
         if(cfg_page_set_str_value(&cfgpage, 1, buf2, strlen((const char *)buf2)) != 0) {
             printf("set key 1 failed\n");
         }
         snprintf((char *)buf2, 16, "frank%04x", i);
-        if(cfg_page_set_str_value(&cfgpage, 2, buf2, strlen((const char *)buf2)) != 0) {
+        if(cfg_page_set_str_value(&cfgpage, 32, buf2, strlen((const char *)buf2)) != 0) {
             printf("set key 2 failed\n");
         }
         snprintf((char *)buf2, 16, "george%04x", i);
-        if(cfg_page_set_str_value(&cfgpage, 3, buf2, strlen((const char *)buf2)) != 0) {
+        if(cfg_page_set_str_value(&cfgpage, 65537, buf2, strlen((const char *)buf2)) != 0) {
             printf("set key 3 failed\n");
         }
     }
