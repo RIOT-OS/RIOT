@@ -24,7 +24,7 @@
 #include <errno.h>
 
 #include "bitarithm.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "cpu.h"
 #include "cpu_conf.h"
 #include "periph/pm.h"
@@ -606,7 +606,7 @@ static void _set_mode_device(stm32_usb_otg_fshs_t *usbdev)
     _global_regs(conf)->GUSBCFG |= USB_OTG_GUSBCFG_FDMOD;
     /* Spinlock to prevent a context switch here, needs a delay of 25 ms when
      * force switching mode */
-    xtimer_spin(xtimer_ticks_from_usec(25 * US_PER_MS));
+    ztimer_spin(ZTIMER_MSEC, 25);
 }
 
 static void _usbdev_init(usbdev_t *dev)
