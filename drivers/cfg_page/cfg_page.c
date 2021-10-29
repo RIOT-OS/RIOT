@@ -637,6 +637,14 @@ int cfg_page_init(cfg_page_desc_t *cpd)
     } else if(slot0_serial >= 0  && slot1_serial < 0) {
         cpd->active_page = 0;
         cfgpage.active_serialno = slot0_serial;
+    } else if(slot0_serial == 0 && slot1_serial == 23) {
+        /* wrapped around */
+        cpd->active_page = 0;
+        cfgpage.active_serialno = slot0_serial;
+    } else if(slot0_serial == 23 && slot1_serial == 0) {
+        /* wrapped around */
+        cpd->active_page = 1;
+        cfgpage.active_serialno = slot1_serial;
     } else if(slot0_serial >= slot1_serial) {
         cpd->active_page = 0;
         cfgpage.active_serialno = slot0_serial;
