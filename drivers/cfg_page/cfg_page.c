@@ -472,11 +472,19 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
         DEBUG("erase failed: %d\n\n",ret);
         return -10;
     }
-    if((ret = mtd_write(cpd->dev, new_page, byte_offset, MTD_SECTOR_SIZE)) != 0) {
-        DEBUG("swap write to %u page: %u failed: %d\n", byte_offset, cpd->active_page, ret);
-        return -11;
-    }
 
+    /* mtd_write does not let us write multiple pages */
+    u_int8_t *start = new_page;
+    int write_count  = 0;
+    for(; write_count < MTD_SECTOR_SIZE; write_count += MTD_PAGE_SIZE) {
+        //DEBUG("writing offset:%d,%d from %p\n", write_count, byte_offset, start);
+        if((ret = mtd_write(cpd->dev, start, byte_offset, MTD_PAGE_SIZE)) != 0) {
+            DEBUG("swap write to %u page: %u failed: %d\n", byte_offset, cpd->active_page, ret);
+            return -11;
+        }
+        start += MTD_PAGE_SIZE;
+        byte_offset += MTD_PAGE_SIZE;
+    }
     return 0;
 }
 
