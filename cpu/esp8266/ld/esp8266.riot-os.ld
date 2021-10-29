@@ -240,6 +240,7 @@ SECTIONS
     *core/sched.o(.literal .text .literal.* .text.*)
     *esp_wifi/*(.literal .text .literal.* .text.*)
     *freertos/*(.literal .text .literal.* .text.*)
+    *freertos_common/*(.literal .text .literal.* .text.*)
     *periph/*(.literal .text .literal.* .text.*)
     *xtimer/*(.literal .text .literal.* .text.*)
 
