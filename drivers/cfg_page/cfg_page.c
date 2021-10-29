@@ -275,7 +275,7 @@ int cfg_page_get_value(cfg_page_desc_t *cpd, uint32_t wantedkey, nanocbor_value_
 
 static void _cfg_page_splat_key(nanocbor_value_t okey1, int keysize)
 {
-    DEBUG("splat keysize: %d\n", keysize);
+    //DEBUG("splat keysize: %d\n", keysize);
     switch(keysize) {
     case 1:
         *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT;  /* zero */
@@ -375,10 +375,10 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
             /* what to do here is unclear */
             DEBUG("failed to get uint32\n");
 
-            printf("old %04x:\n", values.cur - cfg_page_active_buffer);
-            od_hex_dump_ext(cfg_page_active_buffer, MTD_SECTOR_SIZE, 16, 0);
-            printf("new:\n");
-            od_hex_dump_ext(new_page, MTD_SECTOR_SIZE, 16, 0);
+            //printf("old %04x:\n", values.cur - cfg_page_active_buffer);
+            //od_hex_dump_ext(cfg_page_active_buffer, MTD_SECTOR_SIZE, 16, 0);
+            //printf("new:\n");
+            //od_hex_dump_ext(new_page, MTD_SECTOR_SIZE, 16, 0);
             return -1;
         }
         if(key == 0) {
@@ -406,11 +406,15 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
             okey2 = nreader2;
             if(nanocbor_get_uint32(&nreader2, &nkey) < 0) {
                 DEBUG("failed to get uint32 nkey\n");
+                //printf("old %04x:\n", values.cur - cfg_page_active_buffer);
+                //od_hex_dump_ext(cfg_page_active_buffer, MTD_SECTOR_SIZE, 16, 0);
+                //printf("new:\n");
+                //od_hex_dump_ext(new_page, MTD_SECTOR_SIZE, 16, 0);
                 /* what to do here is unclear */
                 return -1;
             }
             if(key != nkey) {
-                DEBUG("different key %u=%u\n", nkey, key);
+                //DEBUG("different key %u=%u\n", nkey, key);
                 nanocbor_skip(&nreader2);
                 continue;
             }
@@ -425,7 +429,7 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
 
             /* reach back, and obliterate the key we had */
             /* has intimate knowledge of CBOR uint */
-            DEBUG("splatting old key %u %03x\n", key, okey1.cur - cfg_page_active_buffer);
+            //DEBUG("splatting old key %u %03x\n", key, okey1.cur - cfg_page_active_buffer);
             _cfg_page_splat_key(okey1, keysize);
 
             /* skip key forward */
@@ -456,8 +460,8 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
      * now, initialize the newpage with serialno+1, and
      * read it back in
      */
-    printf("new:\n");
-    od_hex_dump_ext(new_page, MTD_SECTOR_SIZE, 16, 0);
+    //printf("new:\n");
+    //od_hex_dump_ext(new_page, MTD_SECTOR_SIZE, 16, 0);
 
     /* flip bit on which page is active */
     cpd->active_page = !cpd->active_page;
@@ -532,8 +536,7 @@ int cfg_page_init_writer(cfg_page_desc_t *cpd,
 
     /* -1 to remove 0xff stop code */
     size_t writeoffset = (reader.cur-cfg_page_active_buffer)-1;
-    DEBUG("found end of old values at: %04u, amountleft=%04u\n",
-          writeoffset, amountleft);
+    //DEBUG("found end of old values at: %04u, amountleft=%04u\n",writeoffset, amountleft);
 
     /* initialize the writer at this location, using the writer in cpd->writer */
     if(writer) {
