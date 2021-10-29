@@ -42,7 +42,7 @@ int main(void)
 
     cfg_page_print(&cfgpage);
 
-    for(i=0; i<128; i++) {
+    for(i=0; i<256; i++) {
         printf("writing iteration %d\n", i);
         uint8_t buf2[16];
         snprintf((char *)buf2, 16, "bob%04x", i);
