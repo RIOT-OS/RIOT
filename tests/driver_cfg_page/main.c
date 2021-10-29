@@ -51,12 +51,12 @@ int main(void)
             break;
         }
         snprintf((char *)buf2, 16, "frank%04x", i);
-        if(cfg_page_set_str_value(&cfgpage, 21, buf2, strlen((const char *)buf2)) != 0) {
+        if(cfg_page_set_str_value(&cfgpage, 37, buf2, strlen((const char *)buf2)) != 0) {
             printf("set key 2 failed\n");
             break;
         }
         snprintf((char *)buf2, 16, "george%04x", i);
-        if(cfg_page_set_str_value(&cfgpage, 17, buf2, strlen((const char *)buf2)) != 0) {
+        if(cfg_page_set_str_value(&cfgpage, 65537, buf2, strlen((const char *)buf2)) != 0) {
             printf("set key 3 failed\n");
             break;
         }
