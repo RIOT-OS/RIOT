@@ -14496,3 +14496,7 @@ sys/posix/pthread/include/pthread_cancellation\.h:[0-9]+: warning: Member PTHREA
 sys/posix/pthread/include/pthread_cancellation\.h:[0-9]+: warning: Member PTHREAD_CANCEL_ENABLE \(macro definition\) of file pthread_cancellation\.h is not documented\.
 sys/posix/pthread/include/pthread_mutex_attr\.h:[0-9]+: warning: Member pthread_mutexattr_getprioceiling\(const pthread_mutexattr_t \*attr, int \*prioceiling\) \(function\) of file pthread_mutex_attr\.h is not documented\.
 sys/posix/pthread/include/pthread_mutex_attr\.h:[0-9]+: warning: Member pthread_mutexattr_setprioceiling\(pthread_mutexattr_t \*attr, int prioceiling\) \(function\) of file pthread_mutex_attr\.h is not documented\.
+boards/nucleo\-g071rb/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-g071rb/include/periph_conf\.h:[0-9]+: warning: Member adc_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/nucleo\-g070rb/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-g070rb/include/periph_conf\.h:[0-9]+: warning: Member adc_config\[\] \(variable\) of file periph_conf\.h is not documented\.

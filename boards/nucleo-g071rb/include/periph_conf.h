@@ -104,6 +104,7 @@ static const adc_conf_t adc_config[] = {
 };
 
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
+/** @} */
 
 /**
  * @name   SPI configuration
