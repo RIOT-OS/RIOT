@@ -275,38 +275,39 @@ int cfg_page_get_value(cfg_page_desc_t *cpd, uint32_t wantedkey, nanocbor_value_
 
 static void _cfg_page_splat_key(nanocbor_value_t okey1, int keysize)
 {
-  switch(keysize) {
-  case 0:
-    *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT;
-    break;
+    DEBUG("splat keysize: %d\n", keysize);
+    switch(keysize) {
+    case 1:
+        *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT;  /* zero */
+        break;
 
-  case 1:
-    *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT+NANOCBOR_SIZE_BYTE;
-    break;
+    case 1+1:
+        *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT+NANOCBOR_SIZE_BYTE;
+        break;
 
-  case 2:
-    *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT+NANOCBOR_SIZE_SHORT;
-    break;
+    case 1+2:
+        *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT+NANOCBOR_SIZE_SHORT;
+        break;
 
-  case 4:
-    *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT+NANOCBOR_SIZE_WORD;
-    break;
+    case 1+4:
+        *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT+NANOCBOR_SIZE_WORD;
+        break;
 
-  case 8:
-    *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT+NANOCBOR_SIZE_LONG;
-    break;
+    case 1+8:
+        *((uint8_t *)okey1.cur) = NANOCBOR_TYPE_UINT+NANOCBOR_SIZE_LONG;
+        break;
 
-  default:
-    DEBUG("bad keysize: %d\n", keysize);
-    return;
-  }
-  if(keysize > 0) {
-    /* make a zero of a bigger size */
-    int i;
-    for(i=1; i < keysize; i++) {
-      ((uint8_t *)okey1.cur)[i] = 0;
+    default:
+        DEBUG("bad keysize: %d\n", keysize);
+        return;
     }
-  }
+    if(keysize > 0) {
+        /* make a zero of a bigger size */
+        int i;
+        for(i=1; i < keysize; i++) {
+            ((uint8_t *)okey1.cur)[i] = 0;
+        }
+    }
 }
 
 /*
@@ -369,10 +370,15 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
         int keysize = 0;
 
         /* keep track of where key is, so we can come back to stomp it */
-        okey1 = reader;
+        okey1 = values;
         if(nanocbor_get_uint32(&values, &key) < 0) {
             /* what to do here is unclear */
             DEBUG("failed to get uint32\n");
+
+            printf("old %04x:\n", values.cur - cfg_page_active_buffer);
+            od_hex_dump_ext(cfg_page_active_buffer, MTD_SECTOR_SIZE, 16, 0);
+            printf("new:\n");
+            od_hex_dump_ext(new_page, MTD_SECTOR_SIZE, 16, 0);
             return -1;
         }
         if(key == 0) {
@@ -382,14 +388,14 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
             continue;
         }
         /* calculate size of key that was just read */
-        keysize = reader.cur - okey1.cur;
+        keysize = values.cur - okey1.cur;
 
         /* not blanked out, so keep track of where value is */
-        value_st = reader;
+        value_st = values;
 
         /* skip the value */
         nanocbor_skip(&values);
-        value_len= reader.cur - value_st.cur;
+        value_len= values.cur - value_st.cur;
 
         /* now run forward looking for newer keys with the same value */
         nreader2  = values;
@@ -408,6 +414,9 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
                 nanocbor_skip(&nreader2);
                 continue;
             }
+            /* calculate size of key that was just read */
+            keysize = nreader2.cur - okey2.cur;
+
             /* okay, it's the same */
             /* replace the values we had above */
             value_st = nreader2;
@@ -416,7 +425,7 @@ static int cfg_page_swap_slotno(cfg_page_desc_t *cpd)
 
             /* reach back, and obliterate the key we had */
             /* has intimate knowledge of CBOR uint */
-            DEBUG("splatting old key %u %p\n", key, okey1.cur);
+            DEBUG("splatting old key %u %03x\n", key, okey1.cur - cfg_page_active_buffer);
             _cfg_page_splat_key(okey1, keysize);
 
             /* skip key forward */
