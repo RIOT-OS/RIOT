@@ -584,12 +584,23 @@ static inline void _enable_ep_stall_in(UsbDeviceEndpoint *ep_reg)
 
 static inline void _disable_ep_stall_out(UsbDeviceEndpoint *ep_reg)
 {
-    ep_reg->EPSTATUSCLR.reg = USB_DEVICE_EPSTATUSCLR_STALLRQ0;
+    ep_reg->EPSTATUSCLR.reg = USB_DEVICE_EPSTATUSCLR_STALLRQ0 |
+                              USB_DEVICE_EPSTATUSCLR_DTGLOUT;
 }
 
 static inline void _disable_ep_stall_in(UsbDeviceEndpoint *ep_reg)
 {
-    ep_reg->EPSTATUSCLR.reg = USB_DEVICE_EPSTATUSCLR_STALLRQ1;
+    ep_reg->EPSTATUSCLR.reg = USB_DEVICE_EPSTATUSCLR_STALLRQ1 |
+                              USB_DEVICE_EPSTATUSCLR_DTGLIN;
+}
+
+static void _usbdev_ep0_stall(usbdev_t *usbdev)
+{
+    sam0_common_usb_t *sam_usbdev = (sam0_common_usb_t *)usbdev;
+    UsbDeviceEndpoint *ep0_reg = &sam_usbdev->config->device->DeviceEndpoint[0];
+
+    ep0_reg->EPSTATUSSET.reg = USB_DEVICE_EPSTATUSSET_STALLRQ1 |
+                               USB_DEVICE_EPSTATUSSET_STALLRQ0;
 }
 
 static void _ep_set_stall(usbdev_ep_t *ep, usbopt_enable_t enable)
@@ -623,6 +634,11 @@ usbopt_enable_t _ep_get_stall(usbdev_ep_t *ep)
     }
     return res;
 
+}
+
+static void _usbdev_ep_stall(usbdev_ep_t *ep, bool enable)
+{
+    _ep_set_stall(ep, enable);
 }
 
 static void _usbdev_ep_init(usbdev_ep_t *ep)
@@ -773,7 +789,9 @@ const usbdev_driver_t driver = {
     .get = _usbdev_get,
     .set = _usbdev_set,
     .esr = _usbdev_esr,
+    .ep0_stall = _usbdev_ep0_stall,
     .ep_init = _usbdev_ep_init,
+    .ep_stall = _usbdev_ep_stall,
     .ep_get = _usbdev_ep_get,
     .ep_set = _usbdev_ep_set,
     .ep_esr = _usbdev_ep_esr,
