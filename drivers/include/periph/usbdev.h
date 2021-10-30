@@ -75,6 +75,7 @@
 #ifndef PERIPH_USBDEV_H
 #define PERIPH_USBDEV_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
 
@@ -331,6 +332,15 @@ typedef struct usbdev_driver {
     void (*esr)(usbdev_t *dev);
 
     /**
+     * @brief Stall both OUT and IN packets on endpoint 0 until a setup packet
+     * is received.
+     *
+     * @note The stall condition should be cleared automatically either by
+     * hardware or by the usbdev implementation after receiving a setup packet.
+     */
+    void (*ep0_stall)(usbdev_t *usbdev);
+
+    /**
      * @brief Initialize the USB endpoint
      *
      * This initializes the USB endpoint with the settings from the
@@ -339,6 +349,22 @@ typedef struct usbdev_driver {
      * @param[in]   ep      USB endpoint descriptor
      */
     void (*ep_init)(usbdev_ep_t *ep);
+
+    /**
+     * @brief Enable or disable the stall condition on the USB endpoint
+     *
+     * After clearing the stall condition on the endpoint, the usb peripheral
+     * must reinitialize the data toggle to DATA0.
+     *
+     * @note For enabling stall on endpoint 0 @ref usbdev_driver_t::ep0_stall
+     * must be used.
+     *
+     * @pre (ep->num != 0)
+     *
+     * @param[in]   ep      USB endpoint descriptor
+     * @param[in]   enable  True to set stall, false to disable stall
+     */
+    void (*ep_stall)(usbdev_ep_t *ep, bool enable);
 
     /**
      * @brief   Get an option value from a given usb device endpoint
@@ -510,6 +536,25 @@ static inline void usbdev_esr(usbdev_t *dev)
 }
 
 /**
+ * @brief Stall both OUT and IN packets on endpoint 0 until a setup packet
+ * is received.
+ *
+ * @see @ref usbdev_driver_t::ep0_stall
+ *
+ * @note The stall condition is automatically cleared after receiving a
+ * setup packet.
+ *
+ * @pre `(dev != NULL)`
+ *
+ * @param[in]   dev     USB device descriptor
+ */
+static inline void usbdev_ep0_stall(usbdev_t *dev)
+{
+    assert(dev);
+    dev->driver->ep0_stall(dev);
+}
+
+/**
  * @brief Initialize the USB endpoint
  *
  * @see @ref usbdev_driver_t::ep_init
@@ -524,6 +569,26 @@ static inline void usbdev_ep_init(usbdev_ep_t *ep)
     assert(ep);
     assert(ep->dev);
     ep->dev->driver->ep_init(ep);
+}
+
+/**
+ * @brief Enable or disable the stall condition on the USB endpoint
+ *
+ * @note For enabling stall on endpoint 0 @ref usbdev_driver_t::ep0_stall
+ * must be used.
+ *
+ * @see @ref usbdev_driver_t::ep_stall
+ *
+ * @pre (ep->num != 0)
+ *
+ * @param[in]   ep      USB endpoint descriptor
+ * @param[in]   enable  True to set stall, false to disable stall
+ */
+static inline void usbdev_ep_stall(usbdev_ep_t *ep, bool enable)
+{
+    assert(ep);
+    assert(ep->dev);
+    ep->dev->driver->ep_stall(ep, enable);
 }
 
 /**
