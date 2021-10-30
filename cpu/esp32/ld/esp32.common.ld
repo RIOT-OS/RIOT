@@ -133,7 +133,9 @@ SECTIONS
     /* part of the RIOT port that should run in IRAM */
     *cpu/*(.literal .text .literal.* .text.*)
     *esp_common/*(.literal .text .literal.* .text.*)
+    *esp_freertos_common/*(.literal .text .literal.* .text.*)
     *periph/*(.literal .text .literal.* .text.*)
+    *esp_periph_common/*(.literal .text .literal.* .text.*)
     *mtd/**(.literal .text .literal.* .text.*)
 
     INCLUDE esp32.spiram.rom-functions-iram.ld
