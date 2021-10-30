@@ -259,6 +259,11 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
     usbus_cdcacm_device_t *cdcacm = (usbus_cdcacm_device_t*)handler;
     switch(setup->request) {
         case USB_CDC_MGNT_REQUEST_SET_LINE_CODING:
+            if (!(cdcacm->coding_cb)) {
+                /* Line coding not supported, return STALL */
+                DEBUG("CDCACM: line coding not supported\n");
+                return -1;
+            }
             if ((state == USBUS_CONTROL_REQUEST_STATE_OUTDATA) &&
                     (setup->length == sizeof(usb_req_cdcacm_coding_t))) {
                 size_t len = 0;
