@@ -132,7 +132,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
     (void)info;
     usbus_cdcecm_device_t *cdcecm = _netdev_to_cdcecm(netdev);
 
-    size_t pktlen = cdcecm->len;
+    size_t pktlen = cdcecm->out_urb.transferred;
 
     if (max_len == 0 && buf == NULL) {
         return pktlen;
@@ -198,7 +198,7 @@ static void _isr(netdev_t *dev)
 {
     usbus_cdcecm_device_t *cdcecm = _netdev_to_cdcecm(dev);
 
-    if (cdcecm->len) {
+    if (cdcecm->out_urb.transferred) {
         cdcecm->netdev.event_callback(&cdcecm->netdev,
                                       NETDEV_EVENT_RX_COMPLETE);
     }

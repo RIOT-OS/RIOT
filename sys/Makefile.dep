@@ -831,6 +831,7 @@ ifneq (,$(filter usbus_cdc_ecm,$(USEMODULE)))
   USEMODULE += iolist
   USEMODULE += fmt
   USEMODULE += usbus
+  USEMODULE += usbus_urb
   USEMODULE += netdev_eth
   USEMODULE += luid
 endif
