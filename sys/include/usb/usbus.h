@@ -134,6 +134,31 @@ extern "C" {
 /** @} */
 
 /**
+ * @name USBUS URB flags
+ *
+ * @{
+ */
+
+/**
+ * @brief   End the URB with a zero length packet if the URB is a full number of
+ *          USB transfers in length
+ */
+#define USBUS_URB_FLAG_AUTO_ZLP     (0x0001)
+
+/**
+ * @brief   URB needs a zero length packet and it is requested
+ * @internal
+ */
+#define USBUS_URB_FLAG_NEEDS_ZLP    (0x1000)
+
+/**
+ * @brief   URB must be cancelled after the next finished xmit
+ * @internal
+ */
+#define USBUS_URB_FLAG_CANCELLED    (0x2000)
+/** @} */
+
+/**
  * @brief USB handler events
  */
 typedef enum {
@@ -285,11 +310,25 @@ typedef struct usbus_endpoint {
     usbus_descr_gen_t *descr_gen;   /**< Linked list of optional additional
                                          descriptor generators */
     usbdev_ep_t *ep;                /**< ptr to the matching usbdev endpoint */
+#ifdef MODULE_USBUS_URB
+    clist_node_t urb_list;          /**< clist of urbs */
+#endif
     uint16_t maxpacketsize;         /**< Max packet size of this endpoint */
     uint8_t interval;               /**< Poll interval for interrupt endpoints */
     bool active;                    /**< If the endpoint should be activated after
                                          reset */
 } usbus_endpoint_t;
+
+/**
+ * @brief USBUS USB request/response block
+ */
+typedef struct usbus_urb {
+    clist_node_t list;  /**< clist block in the queue */
+    uint32_t flags;     /**< Transfer flags */
+    uint8_t *buf;       /**< Pointer to the (aligned) buffer */
+    size_t len;         /**< Length of the data */
+    size_t transferred; /**< amount transferred, only valid for OUT */
+} usbus_urb_t;
 
 /**
  * @brief USBUS interface alternative setting
@@ -553,6 +592,65 @@ void usbus_create(char *stack, int stacksize, char priority,
                   const char *name, usbus_t *usbus);
 
 /**
+ * @brief Initialize a new URB.
+ *
+ * Must be called before submitting an URB to an endpoint.
+ *
+ * @note When using this for OUT endpoints, the buffer size and the @p len
+ * argument must allow for a whole number of max length transfers.
+ *
+ * @note Requires the `usbus_urb` module.
+ *
+ * @param[in] urb   URB to submit
+ * @param[in] buf   Buffer to store or transmit the data from
+ * @param[in] len   Length of @p buf in bytes
+ * @param[in] flags Flags to set for the URB such as @ref USBUS_URB_FLAG_AUTO_ZLP
+ */
+static inline void usbus_urb_init(usbus_urb_t *urb,
+                                  uint8_t *buf,
+                                  size_t len,
+                                  uint32_t flags)
+{
+    urb->buf = buf;
+    urb->len = len;
+    urb->flags = flags;
+    urb->transferred = 0;
+}
+
+/**
+ * @brief Submit an URB to an endpoint.
+ *
+ * @note Requires the `usbus_urb` module.
+ *
+ * @param[in] usbus     USBUS context
+ * @param[in] endpoint  USBUS endpoint the URB is queued to
+ * @param[in] urb       URB to submit
+ */
+void usbus_urb_submit(usbus_t *usbus, usbus_endpoint_t *endpoint, usbus_urb_t *urb);
+
+/**
+ * @brief Cancel and already queued URB.
+ *
+ * The URB will be cancelled after the next transmission if the URB is already
+ * partially completed. It is up to the handler code to gracefully handle the
+ * partially aborted transfer on the endpoint pipe.
+ *
+ * The callback will be called if the URB was already started and cancelled
+ * while (partially) transferred
+ *
+ * @note Requires the `usbus_urb` module.
+ *
+ * @param[in] usbus     USBUS context
+ * @param[in] endpoint  USBUS endpoint the URB is queued to
+ * @param[in] urb       URB to cancel
+ *
+ * @returns             0 if the URB is partially completed
+ *                      1 if the URB was not yet started
+ *                      -1 if the URB was not found in the endpoint queue
+ */
+int usbus_urb_cancel(usbus_t *usbus, usbus_endpoint_t *endpoint, usbus_urb_t *urb);
+
+/**
  * @brief Enable an endpoint
  *
  * @note must only be used before the usb peripheral is attached to the host
@@ -612,6 +710,44 @@ static inline bool usbus_handler_isset_flag(usbus_handler_t *handler,
                                             uint32_t flag)
 {
     return handler->flags & flag;
+}
+
+/**
+ * @brief enable an URB flag
+ *
+ * @param[in]   urb     URB to enable the flag for
+ * @param[in]   flag    flag to enable
+ */
+static inline void usbus_urb_set_flag(usbus_urb_t *urb,
+                                      uint32_t flag)
+{
+    urb->flags |= flag;
+}
+
+/**
+ * @brief disable an URB flag
+ *
+ * @param[in]   urb     URB to disable the flag for
+ * @param[in]   flag    flag to disable
+ */
+static inline void usbus_urb_remove_flag(usbus_urb_t *urb,
+                                         uint32_t flag)
+{
+    urb->flags &= ~flag;
+}
+
+/**
+ * @brief check if an URB flag is set
+ *
+ * @param[in]   urb     URB to check for flag
+ * @param[in]   flag    flag to check
+ *
+ * @return          true if the flag is set for this URB
+ */
+static inline bool usbus_urb_isset_flag(usbus_urb_t *urb,
+                                        uint32_t flag)
+{
+    return urb->flags & flag;
 }
 
 #ifdef __cplusplus
