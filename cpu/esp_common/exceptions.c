@@ -31,6 +31,11 @@
 #include "xtensa/corebits.h"
 #include "xtensa/xtensa_api.h"
 
+#ifdef MCU_ESP8266
+#include "esp8266/rom_functions.h"
+#include "esp8266/spi_register.h"
+#endif
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -80,8 +85,42 @@ static const char* exception_names [] =
     "Coprocessor7Disabled",        /* 39 */
 };
 
+#ifdef MCU_ESP8266
+
+/* Enables the IROM cache if needed. */
+static void IRAM ensure_flash_cache_enabled(void)
+{
+    if (!(READ_PERI_REG(CACHE_FLASH_CTRL_REG) & CACHE_READ_EN_BIT)) {
+        /* Wait_SPI_Idle() is in the bootrom. */
+        Wait_SPI_Idle(&flashchip);
+        SET_PERI_REG_MASK(PERIPHS_SPI_FLASH_CTRL, SPI_ENABLE_AHB);
+        SET_PERI_REG_MASK(CACHE_FLASH_CTRL_REG, CACHE_READ_EN_BIT);
+    }
+}
+
+#else  /* MCU_ESP8266 */
+
+static void IRAM ensure_flash_cache_enabled(void) {}
+
+#endif  /* MCU_ESP8266 */
+
 void IRAM NORETURN exception_handler (XtExcFrame *frame)
 {
+    static uint8_t exception_handler_calls = 0;
+    if (exception_handler_calls > 0) {
+        /* Break to the debugger if the exception handler was called more than
+         * once. This normally indicates an exception while handling the
+         * exception, for example trying to use a function from IROM while the
+         * cache is disabled.
+         */
+        __asm__("break 8, 0");
+    }
+    exception_handler_calls++;
+    /* Several functions here, including the string literals passed to
+     * ets_printf(), require the flash cache to be enabled.
+     */
+    ensure_flash_cache_enabled();
+
     uint32_t excsave1;
     uint32_t epc1;
     RSR(excsave1, excsave1);
@@ -212,6 +251,7 @@ void IRAM NORETURN panic_arch(void)
 
 void _panic_handler(uint32_t addr)
 {
+    ensure_flash_cache_enabled();
     ets_printf("#! _xt_panic called from 0x%08x: powering off\n", addr);
     pm_off();
     while (1) { };
