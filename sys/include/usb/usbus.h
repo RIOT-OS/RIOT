@@ -327,6 +327,7 @@ typedef struct usbus_endpoint {
     uint8_t interval;               /**< Poll interval for interrupt endpoints */
     bool active;                    /**< If the endpoint should be activated after
                                          reset */
+    bool halted;                    /**< Endpoint is halted */
 } usbus_endpoint_t;
 
 /**
@@ -675,6 +676,22 @@ void usbus_urb_submit(usbus_t *usbus, usbus_endpoint_t *endpoint, usbus_urb_t *u
  *                      -1 if the URB was not found in the endpoint queue
  */
 int usbus_urb_cancel(usbus_t *usbus, usbus_endpoint_t *endpoint, usbus_urb_t *urb);
+
+/**
+ * @brief Set the halt condition on an endpoint.
+ *
+ * The endpoint will respond with stall to all packets and must explicitly be
+ * cleared by the host by clearing the halt condition or switching interfaces
+ */
+void usbus_endpoint_halt(usbus_endpoint_t *ep);
+
+/**
+ * @brief Clear the halt condition on an endpoint
+ *
+ * @note Must only be used when the endpoint is halted and when the host issues
+ * a SetInterface request on the interface containing the endpoint
+ */
+void usbus_endpoint_clear_halt(usbus_endpoint_t *ep);
 
 /**
  * @brief Enable an endpoint
