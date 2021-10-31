@@ -2,4 +2,4 @@
 FEATURES_REQUIRED += arch_esp8266
 
 # Always include the ESP8266 SDK bootloader.
-USEMODULE += esp8266_bootloader
+USEMODULE += esp_bootloader

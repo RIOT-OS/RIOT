@@ -1,5 +1,5 @@
 # Bootloader binary blob
-MODULE := esp8266_bootloader
+MODULE := esp_bootloader
 
 # We are compiling the bootloader from the ESP8266_RTOS_SDK_DIR sources, so we
 # can't use the automatic module SRC discovery rules. Also, the compiled code

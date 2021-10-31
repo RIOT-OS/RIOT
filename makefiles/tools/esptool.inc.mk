@@ -8,7 +8,7 @@ ifneq (,$(filter esp_log_startup,$(USEMODULE)))
   BOOTLOADER_INFO = _info
 endif
 # Full path to the bootloader binary. In the ESP8266 case this is set by the
-# esp8266_bootloader module.
+# esp_bootloader module.
 BOOTLOADER_BIN ?= $(RIOTCPU)/$(CPU)/bin/bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
 endif
 
