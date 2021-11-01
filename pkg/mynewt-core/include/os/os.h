@@ -117,7 +117,7 @@ static inline void os_hw_exit_critical(uint32_t ctx)
  */
 static inline bool os_hw_is_in_critical(void)
 {
-    return (irq_is_in() || __get_PRIMASK());
+    return (irq_is_in() || !irq_is_enabled());
 }
 
 /* Mynewt components (not abstracted in NPL or DPL) */

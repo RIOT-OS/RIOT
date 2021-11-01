@@ -8,4 +8,4 @@
 config MODULE_SEMA
     bool "Semaphore"
     depends on TEST_KCONFIG
-    select MODULE_XTIMER
+    depends on MODULE_XTIMER || MODULE_ZTIMER
