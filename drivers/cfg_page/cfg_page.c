@@ -520,15 +520,29 @@ int cfg_page_init_writer(cfg_page_desc_t *cpd,
             return -2;
         }
 
-        while(!nanocbor_at_end(&values)) {
+        int num = 0;
+        int max = 388;  /* this is a limit that keeps nanocbor_at_end() from running away */
+        while(!nanocbor_at_end(&values) && num < max) {
             nanocbor_skip(&values);   /* key */
             nanocbor_skip(&values);   /* value */
+            //DEBUG("%04d skipping %04x\n", num, values.cur - cfg_page_active_buffer);
+            num++;
         }
+        if(num == max) {
+            DEBUG("failed to find end: %03x %03x\n",
+                  values.cur - cfg_page_active_buffer,
+                  values.end - cfg_page_active_buffer
+                );
+            od_hex_dump_ext(cfg_page_active_buffer, MTD_SECTOR_SIZE, 16, 0);
+            return -ENOSPC;
+        }
+
         nanocbor_leave_container(&reader, &values);
 
         /* we are now located at end of space */
         /* calculate how much space is left */
         amountleft = reader.end - reader.cur;
+        DEBUG("end is found at num %d with %d left > %d needed\n", num, amountleft, valuelen);
         if(valuelen > amountleft) {
             if(tryswap) {
                 DEBUG("cfg_page: did not found space after swap: %u > %u\n", valuelen, amountleft);
