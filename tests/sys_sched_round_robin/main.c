@@ -19,17 +19,18 @@
 #include <stdint.h>
 
 #include "thread.h"
-#include "mutex.h"
 
-static mutex_t _shared_mutex;
+static kernel_pid_t main_pid;
 
-void * thread_mutex_unlock(void *d)
+
+void * thread_wakeup_main(void *d)
 {
     (void) d;
-    puts("mutex_thread yield");
+    puts("wakup_thread yield");
     thread_yield();
-    puts("unlock mutex");
-    mutex_unlock(&_shared_mutex);
+    while (puts("wakeup main"), thread_wakeup(main_pid) == (int)STATUS_NOT_FOUND) {
+        thread_yield();
+    };
     return NULL;
 }
 
@@ -45,26 +46,21 @@ void * thread_bad(void *d)
 /* each thread gets a stack */
 static char stack[2][THREAD_STACKSIZE_DEFAULT];
 
-/* with priority inversion this should be set to THREAD_PRIORITY_MAIN
- * until then a lower priority (higher number) is the better choice */
-const uint8_t shared_prio = THREAD_PRIORITY_MAIN + 1;
+/* shared priority of the threads - lower than main waiting for it to sleep */
+static const uint8_t shared_prio = THREAD_PRIORITY_MAIN + 1;
 
 int main(void)
 {
     puts("starting threads");
-
-    mutex_init(&_shared_mutex);
+    main_pid = thread_getpid();
     thread_create(stack[0], sizeof(stack[0]), shared_prio, THREAD_CREATE_STACKTEST,
-                  thread_mutex_unlock, NULL, "TMutex");
+                  thread_wakeup_main, NULL, "TWakeup");
     thread_create(stack[1], sizeof(stack[1]), shared_prio, THREAD_CREATE_STACKTEST,
                   thread_bad, NULL, "TBad");
+    puts("main is going to sleep");
+    thread_sleep();
 
-    puts("double locking mutex");
-
-    mutex_lock(&_shared_mutex);
-    mutex_lock(&_shared_mutex);
-
-    /* success: mutex got unlocked, which means thread "TMutex" got cpu time
+    /* success: main got woken up again which means "TWakup" got cpu time
      * even though "TBad" was trying to hog the whole CPU */
     puts("[SUCCESS]");
 }

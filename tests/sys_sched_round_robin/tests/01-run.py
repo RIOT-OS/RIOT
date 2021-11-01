@@ -12,8 +12,8 @@ from testrunner import run
 
 def testfunc(child):
     child.expect_exact("starting threads")
-    child.expect_exact("double locking mutex")
-    child.expect_exact("unlock mutex")
+    child.expect_exact("main is going to sleep")
+    child.expect_exact("wakeup main")
     child.expect_exact("[SUCCESS]")
 
 
