@@ -475,6 +475,7 @@ reserved for the cases described below:
 | `HAS_` | Models a [feature](build-system-basics.html#features) |
 | `KCONFIG_USEMODULE_` | Used during transition to enable configuration of a module via Kconfig |
 | `KCONFIG_USEPKG_` | Used during transition to enable configuration of a package via Kconfig |
+| `HAVE_` | Models a feature not present in makefiles, will be unified in the future |
 | `USEMODULE_` | Models a [RIOT module](creating-modules.html#creating-modules). Generated from `USEMODULE` variable |
 | `USEPKG_` | Models an [external package](group__pkg.html). Generated from `USEPKG` variable |
 

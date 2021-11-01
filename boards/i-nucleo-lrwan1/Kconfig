@@ -23,6 +23,8 @@ config BOARD_I_NUCLEO_LRWAN1
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
 
+    select MODULE_PERIPH_LPUART if MODULE_STDIO_UART && HAS_PERIPH_LPUART
+
     # Clock configuration
     select BOARD_HAS_LSE
 

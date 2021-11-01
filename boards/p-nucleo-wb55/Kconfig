@@ -21,6 +21,7 @@ config BOARD_P_NUCLEO_WB55
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+    select MODULE_PERIPH_LPUART if MODULE_STDIO_UART && HAS_PERIPH_LPUART
 
     # Put other features for this board (in alphabetical order)
     select HAS_ARDUINO
@@ -30,4 +31,4 @@ config BOARD_P_NUCLEO_WB55
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
 
-source "$(RIOTBOARD)/common/stm32/Kconfig"
+source "$(RIOTBOARD)/common/nucleo/Kconfig"

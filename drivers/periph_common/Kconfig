@@ -126,6 +126,11 @@ config MODULE_PERIPH_RTT_SET_COUNTER
     bool "rtc_set_counter() implementation in the RTT peripheral driver"
     depends on HAS_PERIPH_RTT_SET_COUNTER && MODULE_PERIPH_RTT
 
+config MODULE_PERIPH_INIT_RTT_SET_COUNTER
+    bool "Auto initialize rtc_set_counter() with RTT"
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_RTT_SET_COUNTER
+
 config MODULE_PERIPH_INIT_RTT
     bool "Auto initialize RTT peripheral"
     default y if MODULE_PERIPH_INIT
@@ -156,6 +161,12 @@ config MODULE_PERIPH_INIT_USBDEV
     depends on MODULE_PERIPH_USBDEV
 
 endif # TEST_KCONFIG
+
+config HAVE_SHARED_PERIPH_RTT_PERIPH_RTC
+    bool
+    help
+        The periph_rtc module or the periph_rtt module share hardware, thus,
+        only one can be selected.
 
 rsource "Kconfig.timer"
 rsource "Kconfig.wdt"

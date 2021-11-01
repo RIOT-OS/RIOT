@@ -10,8 +10,10 @@ if TEST_KCONFIG
 config MODULE_BOARDS_COMMON_NUCLEO
     bool
     default y
-    select MODULE_SAUL_GPIO if MODULE_SAUL_DEFAULT && HAS_PERIPH_GPIO
+    select HAVE_SAUL_GPIO
     help
         stm32 common nucleo code.
 
 endif # TEST_KCONFIG
+
+rsource "../stm32/Kconfig"

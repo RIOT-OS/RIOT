@@ -8,4 +8,7 @@ DISABLE_MODULE += periph_init_rtc
 
 USEMODULE += xtimer
 
+# avoid running Kconfig by default
+SHOULD_RUN_KCONFIG ?=
+
 include $(RIOTBASE)/Makefile.include
