@@ -499,6 +499,9 @@ int cfg_page_init_writer(cfg_page_desc_t *cpd,
     bool   tryswap    = 0;
     size_t amountleft = 0;
 
+    /* increment valuelen by 5, to account for key */
+    valuelen += 5;
+
     while(!foundspace) {
         //DEBUG("finding end of valid values: %d\n", tryswap);
         /* start by bringin in the content */
