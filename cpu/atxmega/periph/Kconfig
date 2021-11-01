@@ -17,6 +17,6 @@ config MODULE_PERIPH_NVM
     bool
     depends on MODULE_ATXMEGA_PERIPH
     depends on HAS_PERIPH_NVM
-    default y if MODULE_CPUID
+    default y if MODULE_PERIPH_CPUID
     help
         Internal ATXmega Non Volatile Memory (NVM) driver.
