@@ -23,7 +23,7 @@
 #include <inttypes.h>
 #include <string.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "fmt.h"
 
 #include "periph/spi.h"
@@ -164,9 +164,9 @@ static void _spi_transfer_byte(const ata8520e_t *dev, bool cont, uint8_t out)
     /* Manually triggering CS because of a required delay, see datasheet,
        section 2.1.1, page 10 */
     gpio_clear((gpio_t)CSPIN);
-    xtimer_msleep(SPI_CS_DELAY_MS);
+    ztimer_sleep(ZTIMER_MSEC, SPI_CS_DELAY_MS);
     spi_transfer_byte(SPIDEV, SPI_CS_UNDEF, cont, out);
-    xtimer_msleep(SPI_CS_DELAY_MS);
+    ztimer_sleep(ZTIMER_MSEC, SPI_CS_DELAY_MS);
     gpio_set((gpio_t)CSPIN);
 }
 
@@ -176,9 +176,9 @@ static void _spi_transfer_bytes(const ata8520e_t *dev, bool cont,
     /* Manually triggering CS because of a required delay, see datasheet,
        section 2.1.1, page 10 */
     gpio_clear((gpio_t)CSPIN);
-    xtimer_msleep(SPI_CS_DELAY_MS);
+    ztimer_sleep(ZTIMER_MSEC, SPI_CS_DELAY_MS);
     spi_transfer_bytes(SPIDEV, SPI_CS_UNDEF, cont, out, in, len);
-    xtimer_msleep(SPI_CS_DELAY_MS);
+    ztimer_sleep(ZTIMER_MSEC, SPI_CS_DELAY_MS);
     gpio_set((gpio_t)CSPIN);
 }
 
@@ -217,9 +217,9 @@ static void _status(const ata8520e_t *dev)
 static void _reset(const ata8520e_t *dev)
 {
     gpio_set(RESETPIN);
-    xtimer_msleep(10);
+    ztimer_sleep(ZTIMER_MSEC, 10);
     gpio_clear(RESETPIN);
-    xtimer_msleep(10);
+    ztimer_sleep(ZTIMER_MSEC, 10);
     gpio_set(RESETPIN);
 }
 
@@ -267,7 +267,7 @@ int ata8520e_init(ata8520e_t *dev, const ata8520e_params_t *params)
         return -ATA8520E_ERR_SPI;
     }
 
-    xtimer_msleep(100);
+    ztimer_sleep(ZTIMER_MSEC, 100);
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         char sigfox_id[SIGFOX_ID_LENGTH + 1];
@@ -364,19 +364,18 @@ static void isr_event_timeout(void *arg)
 static bool _wait_event(ata8520e_t *dev, uint8_t timeout)
 {
     dev->event_received = 0;
-    xtimer_ticks64_t start_time = xtimer_now64();
-    xtimer_t event_timer;
+    ztimer_now_t start_time = ztimer_now(ZTIMER_MSEC);
+    ztimer_t event_timer;
     event_timer.callback = isr_event_timeout;
     event_timer.arg = dev;
-    xtimer_set(&event_timer, (uint32_t)timeout * US_PER_SEC);
+    ztimer_set(ZTIMER_MSEC, &event_timer, (uint32_t)timeout);
 
     /* waiting for the event */
     while ((!dev->event_received) &&
-           xtimer_less(xtimer_diff32_64(xtimer_now64(), start_time),
-                       xtimer_ticks_from_usec(timeout * US_PER_SEC))) {
+            ((int32_t)(start_time + timeout - ztimer_now(ZTIMER_MSEC)) > 0)) {
         mutex_lock(&(dev->event_lock));
     }
-    xtimer_remove(&event_timer);
+    ztimer_remove(ZTIMER_MSEC, &event_timer);
 
     if (dev->event_received == 0) {
         DEBUG("[ata8520e] event timeout\n");
@@ -389,7 +388,7 @@ static bool _wait_event(ata8520e_t *dev, uint8_t timeout)
 static void _prepare_send_frame(ata8520e_t *dev, uint8_t *msg, uint8_t msg_len)
 {
     _poweron(dev);
-    xtimer_msleep(5);
+    ztimer_sleep(ZTIMER_MSEC, 5);
     _status(dev);
 
     /* Verify message length */
@@ -484,7 +483,7 @@ int ata8520e_send_bit(ata8520e_t *dev, bool bit)
 {
     DEBUG("[ata8520e] Sending bit '%d'\n", bit);
     _poweron(dev);
-    xtimer_msleep(5);
+    ztimer_sleep(ZTIMER_MSEC, 5);
     _status(dev);
 
     dev->internal_state = ATA8520E_STATE_TX;
