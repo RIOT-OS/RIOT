@@ -22,6 +22,10 @@
  * On many CPUs, certain power states might need to be blocked in rtt_init(), so
  * that it is ensured that the RTT will function properly while it is enabled.
  *
+ * @warning     This module will be automatically be used as a backend for
+ *              ZTIMER_SEC and ZTIMER_MSEC. If direct access to RTT is needed
+ *              then include `ztimer_no_periph_rtt` to avoid auto-selection,
+ *              i.e.: `USEMODULE += ztimer_no_periph_rtt`.
  * @{
  * @file
  * @brief       Low-level RTT (Real Time Timer) peripheral driver interface
