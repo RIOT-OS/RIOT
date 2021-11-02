@@ -100,6 +100,7 @@ typedef struct {
 static uint8_t _cksum(size_t offset, uint8_t *buf, size_t size)
 {
     uint8_t res = 0xff;
+
     for (size_t i = offset; i < size; i++) {
         res -= buf[i];
     }
@@ -155,7 +156,7 @@ static void _api_at_cmd(xbee_t *dev, uint8_t *cmd, uint8_t size, resp_t *resp)
 
     /* wait for results */
     while ((dev->resp_limit != dev->resp_count) &&
-        ((int32_t)(sent_time + RESP_TIMEOUT_MS - ztimer_now(ZTIMER_MSEC)) > 0))  {
+           ((int32_t)(sent_time + RESP_TIMEOUT_MS - ztimer_now(ZTIMER_MSEC)) > 0)) {
         mutex_lock(&(dev->resp_lock));
     }
 
@@ -186,58 +187,58 @@ static void _rx_cb(void *arg, uint8_t c)
     xbee_t *dev = (xbee_t *)arg;
 
     switch (dev->int_state) {
-        case XBEE_INT_STATE_IDLE:
-            /* check for beginning of new data frame */
-            if (c == API_START_DELIMITER) {
-                dev->int_state = XBEE_INT_STATE_SIZE1;
-            }
-            break;
-        case XBEE_INT_STATE_SIZE1:
-            dev->int_size = ((uint16_t)c) << 8;
-            dev->int_state = XBEE_INT_STATE_SIZE2;
-            break;
-        case XBEE_INT_STATE_SIZE2:
-            dev->int_size += c;
-            dev->int_state = XBEE_INT_STATE_TYPE;
-            break;
-        case XBEE_INT_STATE_TYPE:
-            if (c == API_ID_RX_SHORT_ADDR || c == API_ID_RX_LONG_ADDR) {
-                /* in case old data was not processed, ignore incoming data */
-                if (dev->rx_count != 0) {
-                    dev->int_state = XBEE_INT_STATE_IDLE;
-                    return;
-                }
-                dev->rx_limit = dev->int_size + 1;
-                dev->rx_buf[dev->rx_count++] = c;
-                dev->int_state = XBEE_INT_STATE_RX;
-            }
-            else if (c == API_ID_AT_RESP) {
-                dev->resp_limit = dev->int_size;
-                dev->int_state = XBEE_INT_STATE_RESP;
-            }
-            else {
+    case XBEE_INT_STATE_IDLE:
+        /* check for beginning of new data frame */
+        if (c == API_START_DELIMITER) {
+            dev->int_state = XBEE_INT_STATE_SIZE1;
+        }
+        break;
+    case XBEE_INT_STATE_SIZE1:
+        dev->int_size = ((uint16_t)c) << 8;
+        dev->int_state = XBEE_INT_STATE_SIZE2;
+        break;
+    case XBEE_INT_STATE_SIZE2:
+        dev->int_size += c;
+        dev->int_state = XBEE_INT_STATE_TYPE;
+        break;
+    case XBEE_INT_STATE_TYPE:
+        if (c == API_ID_RX_SHORT_ADDR || c == API_ID_RX_LONG_ADDR) {
+            /* in case old data was not processed, ignore incoming data */
+            if (dev->rx_count != 0) {
                 dev->int_state = XBEE_INT_STATE_IDLE;
+                return;
             }
-            break;
-        case XBEE_INT_STATE_RESP:
-            dev->resp_buf[dev->resp_count++] = c;
-            if (dev->resp_count == dev->resp_limit) {
-                /* here we ignore the checksum to prevent deadlocks */
-                mutex_unlock(&(dev->resp_lock));
-                dev->int_state = XBEE_INT_STATE_IDLE;
-            }
-            break;
-        case XBEE_INT_STATE_RX:
+            dev->rx_limit = dev->int_size + 1;
             dev->rx_buf[dev->rx_count++] = c;
-            if (dev->rx_count == dev->rx_limit) {
-                /* packet is complete */
-                netdev_trigger_event_isr((netdev_t*) dev);
-                dev->int_state = XBEE_INT_STATE_IDLE;
-            }
-            break;
-        default:
-            /* this should never be the case */
-            break;
+            dev->int_state = XBEE_INT_STATE_RX;
+        }
+        else if (c == API_ID_AT_RESP) {
+            dev->resp_limit = dev->int_size;
+            dev->int_state = XBEE_INT_STATE_RESP;
+        }
+        else {
+            dev->int_state = XBEE_INT_STATE_IDLE;
+        }
+        break;
+    case XBEE_INT_STATE_RESP:
+        dev->resp_buf[dev->resp_count++] = c;
+        if (dev->resp_count == dev->resp_limit) {
+            /* here we ignore the checksum to prevent deadlocks */
+            mutex_unlock(&(dev->resp_lock));
+            dev->int_state = XBEE_INT_STATE_IDLE;
+        }
+        break;
+    case XBEE_INT_STATE_RX:
+        dev->rx_buf[dev->rx_count++] = c;
+        if (dev->rx_count == dev->rx_limit) {
+            /* packet is complete */
+            netdev_trigger_event_isr((netdev_t *)dev);
+            dev->int_state = XBEE_INT_STATE_IDLE;
+        }
+        break;
+    default:
+        /* this should never be the case */
+        break;
     }
 }
 
@@ -323,24 +324,24 @@ static int _set_addr_len(xbee_t *dev, const uint16_t *val, size_t len)
     }
 
     switch (*val) {
-        case IEEE802154_LONG_ADDRESS_LEN:
-            dev->addr_flags |= XBEE_ADDR_FLAGS_LONG;
+    case IEEE802154_LONG_ADDRESS_LEN:
+        dev->addr_flags |= XBEE_ADDR_FLAGS_LONG;
 
-            /* disable short address */
-            uint8_t disabled_addr[] = { 0xFF, 0xFF };
+        /* disable short address */
+        uint8_t disabled_addr[] = { 0xFF, 0xFF };
 
-            _set_short_addr(dev, disabled_addr);
+        _set_short_addr(dev, disabled_addr);
 
-            break;
-        case IEEE802154_SHORT_ADDRESS_LEN:
-            dev->addr_flags &= ~XBEE_ADDR_FLAGS_LONG;
+        break;
+    case IEEE802154_SHORT_ADDRESS_LEN:
+        dev->addr_flags &= ~XBEE_ADDR_FLAGS_LONG;
 
-            /* restore short address */
-            _set_short_addr(dev, dev->addr_short);
+        /* restore short address */
+        _set_short_addr(dev, dev->addr_short);
 
-            break;
-        default:
-            return -EINVAL;
+        break;
+    default:
+        return -EINVAL;
     }
 
     return sizeof(uint16_t);
@@ -426,13 +427,14 @@ static int _set_encryption(xbee_t *dev, const uint8_t *val)
 {
     uint8_t cmd[3];
     resp_t resp;
+
     /* get the current state of Encryption */
     cmd[0] = 'E';
     cmd[1] = 'E';
     _api_at_cmd(dev, cmd, 2, &resp);
 
     /* Prevent writing the same value in EE. */
-    if (val[0] != resp.data[0] ){
+    if (val[0] != resp.data[0]) {
         cmd[0] = 'E';
         cmd[1] = 'E';
         cmd[2] = val[0];
@@ -446,22 +448,23 @@ static int _set_encryption(xbee_t *dev, const uint8_t *val)
 
 static int _set_encryption_key(xbee_t *dev, const uint8_t *val, size_t len)
 {
-        uint8_t cmd[18];
-        resp_t resp;
-        if (len != 16) { /* the AES key is 128bit, 16 byte */
-            return  -EINVAL;
-        }
-        cmd[0] = 'K';
-        cmd[1] = 'Y';
+    uint8_t cmd[18];
+    resp_t resp;
 
-       for (int i = 0; i < 16; i++) { /* Append the key to the KY API AT command */
-           cmd[i + 2] = val[i];
-       }
-        _api_at_cmd(dev, cmd, 18, &resp);
-        if (resp.status == 0) {
-            return 2;
-        }
-        return -ECANCELED;
+    if (len != 16) {     /* the AES key is 128bit, 16 byte */
+        return -EINVAL;
+    }
+    cmd[0] = 'K';
+    cmd[1] = 'Y';
+
+    for (int i = 0; i < 16; i++) {    /* Append the key to the KY API AT command */
+        cmd[i + 2] = val[i];
+    }
+    _api_at_cmd(dev, cmd, 18, &resp);
+    if (resp.status == 0) {
+        return 2;
+    }
+    return -ECANCELED;
 }
 #endif
 
@@ -519,6 +522,7 @@ int xbee_build_hdr(xbee_t *dev, uint8_t *xhdr, size_t payload_len,
 
     /* finally configure the packet size and copy the actual dst address */
     uint16_t size = (uint16_t)(payload_len + addr_len + 3);
+
     xhdr[1] = (uint8_t)(size >> 8);
     xhdr[2] = (uint8_t)(size & 0xff);
     memcpy(&xhdr[5], dst_addr, addr_len);
@@ -598,10 +602,10 @@ int xbee_init(netdev_t *dev)
     /* put XBee module in "API mode without escaped characters" */
     _at_cmd(xbee, "ATAP1\r");
     /* disable xbee CTS and RTS, unless hardware flow control is used */
-    if(!IS_USED(MODULE_PERIPH_UART_HW_FC)) {
+    if (!IS_USED(MODULE_PERIPH_UART_HW_FC)) {
         DEBUG("[xbee] init: WARNING if using an arduino BOARD + arduino xbee " \
-            "shield with ICSP connector, hardware flow control can't be " \
-            "used since CTS pin is connected to ICSP RESET pin\n");
+              "shield with ICSP connector, hardware flow control can't be " \
+              "used since CTS pin is connected to ICSP RESET pin\n");
         _at_cmd(xbee, "ATD6 0\r");
         _at_cmd(xbee, "ATD7 0\r");
     }
@@ -734,79 +738,81 @@ static void xbee_isr(netdev_t *netdev)
 static int xbee_get(netdev_t *ndev, netopt_t opt, void *value, size_t max_len)
 {
     xbee_t *dev = (xbee_t *)ndev;
+
     assert(dev);
 
     switch (opt) {
-        case NETOPT_ADDRESS:
-            assert(max_len >= IEEE802154_SHORT_ADDRESS_LEN);
-            memcpy(value, dev->addr_short, IEEE802154_SHORT_ADDRESS_LEN);
-            return IEEE802154_SHORT_ADDRESS_LEN;
-        case NETOPT_ADDRESS_LONG:
-            assert(max_len >= IEEE802154_LONG_ADDRESS_LEN);
-            memcpy(value, dev->addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
-            return IEEE802154_LONG_ADDRESS_LEN;
-        case NETOPT_ADDR_LEN:
-        case NETOPT_SRC_LEN:
-            if (max_len < sizeof(uint16_t)) {
-                return -EOVERFLOW;
-            }
-            if (dev->addr_flags & XBEE_ADDR_FLAGS_LONG) {
-                *((uint16_t *)value) = IEEE802154_LONG_ADDRESS_LEN;
-            }
-            else {
-                *((uint16_t *)value) = IEEE802154_SHORT_ADDRESS_LEN;
-            }
-            return sizeof(uint16_t);
-        case NETOPT_DEVICE_TYPE:
-            assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
-            return sizeof(uint16_t);
-        case NETOPT_CHANNEL:
-            return _get_channel(dev, (uint8_t *)value, max_len);
-        case NETOPT_MAX_PDU_SIZE:
-            if (max_len < sizeof(uint16_t)) {
-                return -EOVERFLOW;
-            }
-            *((uint16_t *)value) = XBEE_MAX_PAYLOAD_LENGTH;
-            return sizeof(uint16_t);
-        case NETOPT_NID:
-            return _get_panid(dev, (uint8_t *)value, max_len);
+    case NETOPT_ADDRESS:
+        assert(max_len >= IEEE802154_SHORT_ADDRESS_LEN);
+        memcpy(value, dev->addr_short, IEEE802154_SHORT_ADDRESS_LEN);
+        return IEEE802154_SHORT_ADDRESS_LEN;
+    case NETOPT_ADDRESS_LONG:
+        assert(max_len >= IEEE802154_LONG_ADDRESS_LEN);
+        memcpy(value, dev->addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
+        return IEEE802154_LONG_ADDRESS_LEN;
+    case NETOPT_ADDR_LEN:
+    case NETOPT_SRC_LEN:
+        if (max_len < sizeof(uint16_t)) {
+            return -EOVERFLOW;
+        }
+        if (dev->addr_flags & XBEE_ADDR_FLAGS_LONG) {
+            *((uint16_t *)value) = IEEE802154_LONG_ADDRESS_LEN;
+        }
+        else {
+            *((uint16_t *)value) = IEEE802154_SHORT_ADDRESS_LEN;
+        }
+        return sizeof(uint16_t);
+    case NETOPT_DEVICE_TYPE:
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
+        return sizeof(uint16_t);
+    case NETOPT_CHANNEL:
+        return _get_channel(dev, (uint8_t *)value, max_len);
+    case NETOPT_MAX_PDU_SIZE:
+        if (max_len < sizeof(uint16_t)) {
+            return -EOVERFLOW;
+        }
+        *((uint16_t *)value) = XBEE_MAX_PAYLOAD_LENGTH;
+        return sizeof(uint16_t);
+    case NETOPT_NID:
+        return _get_panid(dev, (uint8_t *)value, max_len);
 #ifdef MODULE_GNRC
-        case NETOPT_PROTO:
-            if (max_len != sizeof(gnrc_nettype_t)) {
-                return -EOVERFLOW;
-            }
-            *((gnrc_nettype_t *)value) = XBEE_DEFAULT_PROTOCOL;
-            return sizeof(gnrc_nettype_t);
+    case NETOPT_PROTO:
+        if (max_len != sizeof(gnrc_nettype_t)) {
+            return -EOVERFLOW;
+        }
+        *((gnrc_nettype_t *)value) = XBEE_DEFAULT_PROTOCOL;
+        return sizeof(gnrc_nettype_t);
 #endif
-        default:
-            return -ENOTSUP;
+    default:
+        return -ENOTSUP;
     }
 }
 
 static int xbee_set(netdev_t *ndev, netopt_t opt, const void *value, size_t len)
 {
     xbee_t *dev = (xbee_t *)ndev;
+
     assert(dev);
 
     switch (opt) {
-        case NETOPT_ADDRESS:
-            return _set_addr(dev, value, len);
-        case NETOPT_ADDR_LEN:
-        case NETOPT_SRC_LEN:
-            return _set_addr_len(dev, value, len);
-        case NETOPT_CHANNEL:
-            return _set_channel(dev, value, len);
-        case NETOPT_NID:
-            return _set_panid(dev, value, len);
+    case NETOPT_ADDRESS:
+        return _set_addr(dev, value, len);
+    case NETOPT_ADDR_LEN:
+    case NETOPT_SRC_LEN:
+        return _set_addr_len(dev, value, len);
+    case NETOPT_CHANNEL:
+        return _set_channel(dev, value, len);
+    case NETOPT_NID:
+        return _set_panid(dev, value, len);
 #ifdef MODULE_XBEE_ENCRYPTION
-        case NETOPT_ENCRYPTION:
-            return _set_encryption(dev, value);
-        case NETOPT_ENCRYPTION_KEY:
-            return _set_encryption_key(dev, value, len);
+    case NETOPT_ENCRYPTION:
+        return _set_encryption(dev, value);
+    case NETOPT_ENCRYPTION_KEY:
+        return _set_encryption_key(dev, value, len);
 #endif
-        default:
-            return -ENOTSUP;
+    default:
+        return -ENOTSUP;
     }
 }
 
@@ -817,7 +823,7 @@ const netdev_driver_t xbee_driver = {
     .send = xbee_send,
     .recv = xbee_recv,
     .init = xbee_init,
-    .isr  = xbee_isr,
-    .get  = xbee_get,
-    .set  = xbee_set,
+    .isr = xbee_isr,
+    .get = xbee_get,
+    .set = xbee_set,
 };
