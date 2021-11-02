@@ -22,6 +22,8 @@
  * On many CPUs, certain power states might need to be blocked in rtt_init(), so
  * that it is ensured that the RTT will function properly while it is enabled.
  *
+ * @warning     this may be automatically used by ztimer since 2021.07
+ *
  * @{
  * @file
  * @brief       Low-level RTT (Real Time Timer) peripheral driver interface
