@@ -30,7 +30,8 @@ config MODULE_RN2XX3
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_UART
     select MODULE_FMT
-    select MODULE_XTIMER
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
 
 endif # TEST_KCONFIG
 

@@ -23,7 +23,7 @@
 
 #include <stdint.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "periph/uart.h"
 #include "periph/gpio.h"
 #include "net/netdev.h"
@@ -189,7 +189,7 @@ typedef struct {
     uint16_t rx_size;                  /**< counter for received char in RX */
 
     /* timers */
-    xtimer_t sleep_timer;              /**< Timer used to count module sleep time */
+    ztimer_t sleep_timer;              /**< Timer used to count module sleep time */
     uint32_t sleep;                    /**< module sleep duration */
 } rn2xx3_t;
 
