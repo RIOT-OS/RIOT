@@ -1,3 +1,14 @@
+ifneq (,$(filter rest_client,$(USEMODULE)))
+  USEMODULE += sock_dns
+  USEMODULE += auto_init_sock_dns
+  USEMODULE += posix_inet
+  USEMODULE += rest_client_internal
+endif
+
+ifneq (,$(filter rest_client_transport_%, $(USEMODULE)))
+  USEMODULE += rest_client_transport
+endif
+
 ifneq (,$(filter arduino,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_adc
   FEATURES_OPTIONAL += periph_i2c
