@@ -14500,3 +14500,67 @@ boards/nucleo\-g071rb/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \
 boards/nucleo\-g071rb/include/periph_conf\.h:[0-9]+: warning: Member adc_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/nucleo\-g070rb/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/nucleo\-g070rb/include/periph_conf\.h:[0-9]+: warning: Member adc_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED0_PIN \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED1_PIN \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED2_PIN \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED3_PIN \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED0_PORT \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED1_PORT \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED2_PORT \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED3_PORT \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED0_MASK \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED1_MASK \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED2_MASK \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED3_MASK \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED0_ON \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED0_OFF \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED0_TOGGLE \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED1_ON \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED1_OFF \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED1_TOGGLE \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED2_ON \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED2_OFF \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED2_TOGGLE \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED3_ON \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED3_OFF \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member LED3_TOGGLE \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member BTN0_PIN \(macro definition\) of file board\.h is not documented\.
+boards/stm32f469i\-disco/include/board\.h:[0-9]+: warning: Member BTN0_MODE \(macro definition\) of file board\.h is not documented\.
+boards/stm32g0316\-disco/include/board\.h:[0-9]+: warning: Member LED0_PIN \(macro definition\) of file board\.h is not documented\.
+boards/stm32g0316\-disco/include/board\.h:[0-9]+: warning: Member LED0_MODE \(macro definition\) of file board\.h is not documented\.
+boards/stm32g0316\-disco/include/board\.h:[0-9]+: warning: Member LED0_MASK \(macro definition\) of file board\.h is not documented\.
+boards/stm32g0316\-disco/include/board\.h:[0-9]+: warning: Member LED0_ON \(macro definition\) of file board\.h is not documented\.
+boards/stm32g0316\-disco/include/board\.h:[0-9]+: warning: Member LED0_OFF \(macro definition\) of file board\.h is not documented\.
+boards/stm32g0316\-disco/include/board\.h:[0-9]+: warning: Member LED0_TOGGLE \(macro definition\) of file board\.h is not documented\.
+boards/stm32g0316\-disco/include/board\.h:[0-9]+: warning: Member BTN0_PIN \(macro definition\) of file board\.h is not documented\.
+boards/stm32g0316\-disco/include/board\.h:[0-9]+: warning: Member BTN0_MODE \(macro definition\) of file board\.h is not documented\.
+boards/esp32\-ethernet\-kit\-v1_0/include/periph_conf\.h:[0-9]+: warning: Member DAC_GPIOS \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-g431rb/include/periph_conf\.h:[0-9]+: warning: Member PWM_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-g431rb/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member DMA_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member DMA_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member DMA_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member dma_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member UART_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member I2C_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member I2C_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member PWM_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member adc_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/stm32g0316\-disco/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32g0316\-disco/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32g0316\-disco/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/stm32g0316\-disco/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32g0316\-disco/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32g0316\-disco/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
