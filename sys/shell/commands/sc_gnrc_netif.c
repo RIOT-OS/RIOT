@@ -1432,6 +1432,7 @@ static void _l2filter_usage(const char *cmd)
 static void _usage(char *cmd)
 {
     printf("usage: %s\n", cmd);
+    printf("usage: %s help\n", cmd);
     _link_usage(cmd);
     _set_usage(cmd);
     _flag_usage(cmd);
@@ -1797,8 +1798,14 @@ int _gnrc_netif_config(int argc, char **argv)
     else {
         netif_t *iface = netif_get_by_name(argv[1]);
         if (!iface) {
-            puts("error: invalid interface given");
-            return 1;
+            if ((strcmp(argv[1], "help") == 0) ||
+                (strcmp(argv[1], "--help") == 0)) {
+                _usage(argv[0]);
+                return 0;
+            } else {
+                puts("error: invalid interface given");
+                return 1;
+            }
         }
 
         if (argc < 3) {
