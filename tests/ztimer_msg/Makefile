@@ -2,10 +2,10 @@ include ../Makefile.tests_common
 
 USEMODULE += ztimer_usec
 
-# uncomment this to test using ztimer msec on rtt
-#USEMODULE += ztimer_msec ztimer_periph_rtt
+# uncomment this to test using ztimer msec
+#USEMODULE += ztimer_msec
 
-# uncomment this to test using ztimer sec on rtc
-#USEMODULE += ztimer_sec ztimer_periph_rtc
+# uncomment this to test using ztimer sec
+#USEMODULE += ztimer_sec
 
 include $(RIOTBASE)/Makefile.include
