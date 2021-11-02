@@ -11,7 +11,8 @@ USEMODULE += wakaama_objects
 # include the 'device' object implementation (mandatory)
 USEMODULE += wakaama_objects_device
 
-USEMODULE += xtimer
+USEMODULE += ztimer
+USEMODULE += ztimer_sec
 USEPKG += tlsf
 
 # If logs for the package are active, we need fmt
