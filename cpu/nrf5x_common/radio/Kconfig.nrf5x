@@ -25,6 +25,7 @@ choice NRF5X_RADIO_BACKEND
 
 config MODULE_NRF802154
     bool "Implementation of the IEEE 802.15.4 for nRF52 radio"
+    depends on TEST_KCONFIG
     depends on HAS_RADIO_NRF802154
     depends on HAS_PERIPH_TIMER
     select MODULE_LUID
