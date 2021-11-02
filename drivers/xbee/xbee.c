@@ -23,12 +23,13 @@
 #include <string.h>
 #include <errno.h>
 
-#include "xbee.h"
 #include "assert.h"
-#include "xtimer.h"
 #include "net/eui64.h"
-#include "net/netdev.h"
 #include "net/ieee802154.h"
+#include "net/netdev.h"
+#include "timex.h"
+#include "xbee.h"
+#include "ztimer.h"
 #ifdef MODULE_GNRC
 #include "net/gnrc.h"
 #endif
@@ -44,16 +45,16 @@
 /**
  * @brief   Delay when entering command mode, must be > 1s
  */
-#define ENTER_CMD_MODE_DELAY    (1100UL * US_PER_MS)
+#define ENTER_CMD_MODE_DELAY_MS (1100UL)
 /**
  * @brief   Delay when resetting the device, 10ms
  */
-#define RESET_DELAY             (10UL * US_PER_MS)
+#define RESET_DELAY_MS          (10UL)
 
 /**
  * @brief   Timeout for receiving AT command response
  */
-#define RESP_TIMEOUT_USEC       (US_PER_SEC)
+#define RESP_TIMEOUT_MS         (1UL * MS_PER_SEC)
 
 /**
  * @brief   Start delimiter in API frame mode
@@ -143,24 +144,22 @@ static void _api_at_cmd(xbee_t *dev, uint8_t *cmd, uint8_t size, resp_t *resp)
     /* start send data */
     uart_write(dev->p.uart, dev->cmd_buf, size + 6);
 
-    xtimer_ticks64_t sent_time = xtimer_now64();
+    ztimer_now_t sent_time = ztimer_now(ZTIMER_MSEC);
 
-    xtimer_t resp_timer;
+    ztimer_t resp_timer;
 
     resp_timer.callback = isr_resp_timeout;
     resp_timer.arg = dev;
 
-    xtimer_set(&resp_timer, RESP_TIMEOUT_USEC);
+    ztimer_set(ZTIMER_MSEC, &resp_timer, RESP_TIMEOUT_MS);
 
     /* wait for results */
     while ((dev->resp_limit != dev->resp_count) &&
-           (xtimer_less(
-                xtimer_diff32_64(xtimer_now64(), sent_time),
-                xtimer_ticks_from_usec(RESP_TIMEOUT_USEC)))) {
+        ((int32_t)(sent_time + RESP_TIMEOUT_MS - ztimer_now(ZTIMER_MSEC)) > 0))  {
         mutex_lock(&(dev->resp_lock));
     }
 
-    xtimer_remove(&resp_timer);
+    ztimer_remove(ZTIMER_MSEC, &resp_timer);
 
     if (dev->resp_limit != dev->resp_count) {
         DEBUG("[xbee] api_at_cmd: response timeout\n");
@@ -587,13 +586,13 @@ int xbee_init(netdev_t *dev)
     /* if reset pin is connected, do a hardware reset */
     if (gpio_is_valid(xbee->p.pin_reset)) {
         gpio_clear(xbee->p.pin_reset);
-        xtimer_usleep(RESET_DELAY);
+        ztimer_sleep(ZTIMER_MSEC, RESET_DELAY_MS);
         gpio_set(xbee->p.pin_reset);
     }
     /* put the XBee device into command mode */
-    xtimer_usleep(ENTER_CMD_MODE_DELAY);
+    ztimer_sleep(ZTIMER_MSEC, ENTER_CMD_MODE_DELAY_MS);
     _at_cmd(xbee, "+++");
-    xtimer_usleep(ENTER_CMD_MODE_DELAY);
+    ztimer_sleep(ZTIMER_MSEC, ENTER_CMD_MODE_DELAY_MS);
     /* disable non IEEE802.15.4 extensions */
     _at_cmd(xbee, "ATMM2\r");
     /* put XBee module in "API mode without escaped characters" */
