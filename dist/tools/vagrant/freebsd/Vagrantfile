@@ -1,7 +1,7 @@
 $init_riot = <<-INIT_RIOT
   # vim for xxd
   pkg install -y bash git gmake gcc cmake afl afl++ \
-      python3 py37-pip py37-scipy py37-pycrypto py37-cython py37-scapy \
+      python3 py37-pip py37-scipy py37-pycryptodome py37-cython py37-scapy \
       vim
   chsh -s /usr/local/bin/bash vagrant
   if ! [ -d /home/vagrant/RIOT ]; then

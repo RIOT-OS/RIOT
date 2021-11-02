@@ -17,7 +17,7 @@ sudo -u /${SSH_USERNAME} pip3 install --user iotlabwscli iotlabsshcli iotlabcli
 
 # Python tools
 sudo -u /${SSH_USERNAME} pip3 install --user aiocoap pyocd paho-mqtt pyserial flake8 tox \
-            pyasn1 ecdsa pexpect pycrypto ed25519 cbor cryptography \
+            pyasn1 ecdsa pexpect pycryptodome ed25519 cbor cryptography \
             scapy codespell protobuf jupyterlab \
             #
 
