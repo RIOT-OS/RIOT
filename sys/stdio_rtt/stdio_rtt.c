@@ -87,8 +87,8 @@
 
 /* This parameter affects the bandwidth of both input and output. Decreasing
    it will significantly improve bandwidth at the cost of CPU time. */
-#ifndef STDIO_POLL_INTERVAL
-#define STDIO_POLL_INTERVAL 50U
+#ifndef STDIO_POLL_INTERVAL_MS
+#define STDIO_POLL_INTERVAL_MS 50U
 #endif
 
 #define MIN(a, b)        (((a) < (b)) ? (a) : (b))
@@ -317,7 +317,8 @@ ssize_t stdio_read(void* buffer, size_t count) {
         }
         uint32_t last_wakeup = ztimer_now(ZTIMER_MSEC);
         while(1) {
-            ztimer_periodic_wakeup(ZTIMER_MSEC, &last_wakeup, STDIO_POLL_INTERVAL);
+            ztimer_periodic_wakeup(ZTIMER_MSEC, &last_wakeup,
+                                   STDIO_POLL_INTERVAL_MS);
             res = rtt_read(buffer, count);
             if (res > 0)
                 return res;
@@ -331,7 +332,7 @@ ssize_t stdio_write(const void* in, size_t len) {
     int written = rtt_write(buffer, (unsigned)len);
     uint32_t last_wakeup = ztimer_now(ZTIMER_MSEC);
     while (blocking_stdout && ((size_t)written < len)) {
-        ztimer_periodic_wakeup(ZTIMER_MSEC, &last_wakeup, STDIO_POLL_INTERVAL);
+        ztimer_periodic_wakeup(ZTIMER_MSEC, &last_wakeup, STDIO_POLL_INTERVAL_MS);
         written += rtt_write(&buffer[written], len-written);
     }
     return (ssize_t)written;
