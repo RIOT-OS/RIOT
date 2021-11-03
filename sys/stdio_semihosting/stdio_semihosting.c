@@ -25,7 +25,7 @@
 #include <string.h>
 
 #include "stdio_semihosting.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #if MODULE_VFS
 #include "vfs.h"
@@ -33,9 +33,9 @@
 
 /**
  * @brief Rate at which the stdin read polls (breaks) the debugger for input
- * data
+ * data in milliseconds
  */
-#define STDIO_SEMIHOSTING_POLL_RATE     (10 * US_PER_MS)
+#define STDIO_SEMIHOSTING_POLL_RATE_MS     (10)
 
 /**
  * @brief ARM Semihosting STDIN file descriptor. Also used with RISC-V
@@ -157,10 +157,11 @@ void stdio_init(void)
 ssize_t stdio_read(void* buffer, size_t count)
 {
     if (STDIO_SEMIHOSTING_RX) {
-        xtimer_ticks32_t last_wakeup = xtimer_now();
+        uint32_t last_wakeup = ztimer_now(ZTIMER_MSEC);
         ssize_t bytes_read = _semihosting_read(buffer, count);
         while (bytes_read == 0) {
-            xtimer_periodic_wakeup(&last_wakeup, STDIO_SEMIHOSTING_POLL_RATE);
+            ztimer_periodic_wakeup(ZTIMER_MSEC, &last_wakeup,
+                                   STDIO_SEMIHOSTING_POLL_RATE_MS);
             bytes_read = _semihosting_read(buffer, count);
         }
         return bytes_read;
