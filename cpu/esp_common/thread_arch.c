@@ -360,6 +360,8 @@ void thread_isr_stack_init(void)
 
 int thread_isr_stack_usage(void)
 {
+    /* cppcheck-suppress comparePointers
+     * (reason: comes from ESP-SDK, so should be valid) */
     return &port_IntStackTop - &port_IntStack -
            thread_measure_stack_free((char*)&port_IntStack);
 }
@@ -379,6 +381,8 @@ void *thread_isr_stack_start(void)
 void thread_isr_stack_print(void)
 {
     printf("Printing current ISR\n");
+    /* cppcheck-suppress comparePointers
+     * (reason: comes from ESP-SDK, so should be valid) */
     esp_hexdump(&port_IntStack, &port_IntStackTop-&port_IntStack, 'w', 8);
 }
 
