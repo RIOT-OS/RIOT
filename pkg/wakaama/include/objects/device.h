@@ -229,7 +229,7 @@ enum lwm2m_device_error_codes {
 
 /**
  * @brief Device binding and queue mode
- * 
+ *
  * @note Select using CONFIG_LWM2M_DEVICE_BINDING_*
  */
 #if defined(CONFIG_LWM2M_DEVICE_BINDING_U)

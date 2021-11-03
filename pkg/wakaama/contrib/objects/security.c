@@ -185,7 +185,7 @@ static int _get_value(lwm2m_data_t *data, lwm2m_obj_security_inst_t *instance);
 
 /**
  * @brief Initialize a new instance with the given arguments.
- * 
+ *
  * @param instance[out]     Instance to initialize.
  * @param instance_id[in]   ID of the instance.
  * @param args[in]          Arguments to initialize the instance with.

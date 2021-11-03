@@ -74,7 +74,7 @@
  * To use this security mode the following keys are required:
  *  - server public key (`SubjectPublicKeyInfo` DER encoded, according to RFC5280)
  *  - own public (`SubjectPublicKeyInfo` DER encoded) and private (as a `ECPrivateKey` DER encoded
- *    sequence, according to RFC5915)keys. See bellow on how they can be generated.
+ *    sequence, according to RFC5915)keys. See below on how they can be generated.
  *
  * It is possible that you may need to increase @ref CONFIG_DTLS_HANDSHAKE_BUFSIZE_EXP when using
  * RPK mode.
@@ -119,7 +119,7 @@
  * ~~~~~~~~~~~~~~~~~~~~
  *  $ openssl ec -in keys.der -inform DER -outform DER -pubout | xxd -i
  * ~~~~~~~~~~~~~~~~~~~~
- * 
+ *
  * 3. Get the private part of the key:
  * ~~~~~~~~~~~~~~~~~~~~
  *  $ openssl ec -in keys.der -inform DER -no_public -outform DER | xxd -i
@@ -264,7 +264,7 @@ extern "C" {
 #define LWM2M_SECURITY_HOLD_OFF_ID            11
 
 /**
- * @brief Boostrap server account timeout
+ * @brief Bootstrap server account timeout
  */
 #define LWM2M_SECURITY_BOOTSTRAP_TIMEOUT_ID   12
 /** @} */
