@@ -43,7 +43,7 @@
  */
 #define REFRESH             (6000)      /* 6ms * 3 rows -> ~55Hz */
 
-#if defined(BOARD_MICROBIT)
+#if defined(BOARD_MICROBIT) || defined(BOARD_CALLIOPE_MINI)
 /**
  * @brief   The electrical number of rows and columns
  */
