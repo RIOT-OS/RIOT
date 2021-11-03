@@ -18,7 +18,8 @@ ifeq (,$(filter stdio_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter eui_provider,$(USEMODULE)))
