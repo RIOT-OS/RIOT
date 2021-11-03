@@ -1,0 +1,4 @@
+ifneq (,$(filter microbit,$(USEMODULE)))
+  USEMODULE += xtimer
+  USEMODULE += mineplex
+endif
