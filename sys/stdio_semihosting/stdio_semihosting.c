@@ -33,9 +33,9 @@
 
 /**
  * @brief Rate at which the stdin read polls (breaks) the debugger for input
- * data
+ * data in milliseconds
  */
-#define STDIO_SEMIHOSTING_POLL_RATE     (10)
+#define STDIO_SEMIHOSTING_POLL_RATE_MS     (10)
 
 /**
  * @brief ARM Semihosting STDIN file descriptor. Also used with RISC-V
@@ -161,7 +161,7 @@ ssize_t stdio_read(void* buffer, size_t count)
         ssize_t bytes_read = _semihosting_read(buffer, count);
         while (bytes_read == 0) {
             ztimer_periodic_wakeup(ZTIMER_MSEC, &last_wakeup,
-                                   STDIO_SEMIHOSTING_POLL_RATE);
+                                   STDIO_SEMIHOSTING_POLL_RATE_MS);
             bytes_read = _semihosting_read(buffer, count);
         }
         return bytes_read;
