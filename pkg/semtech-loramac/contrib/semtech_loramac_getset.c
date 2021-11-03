@@ -334,7 +334,6 @@ void semtech_loramac_set_rx2_freq(semtech_loramac_t *mac, uint32_t freq)
     MibRequestConfirm_t mibReq;
     mibReq.Type = MIB_RX2_DEFAULT_CHANNEL;
     LoRaMacMibGetRequestConfirm(&mibReq);
-    p.Frequency = freq;
     p.Datarate = mibReq.Param.Rx2DefaultChannel.Datarate;
     semtech_loramac_channel_params_t params;
     params.frequency = freq;
@@ -364,7 +363,6 @@ void semtech_loramac_set_rx2_dr(semtech_loramac_t *mac, uint8_t dr)
     MibRequestConfirm_t mibReq;
     mibReq.Type = MIB_RX2_DEFAULT_CHANNEL;
     LoRaMacMibGetRequestConfirm(&mibReq);
-    p.Datarate = dr;
     p.Frequency = mibReq.Param.Rx2DefaultChannel.Frequency;
     semtech_loramac_channel_params_t params;
     params.datarate = dr;
