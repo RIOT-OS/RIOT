@@ -157,10 +157,9 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     usbus_handler_set_flag(handler, USBUS_HANDLER_FLAG_RESET);
 }
 
-static void _dfu_class_control_req(usbus_t *usbus, usbus_dfu_device_t *dfu, usb_setup_t *pkt)
+static int _dfu_class_control_req(usbus_t *usbus, usbus_dfu_device_t *dfu, usb_setup_t *pkt)
 {
     static const usbopt_enable_t disable = USBOPT_DISABLE;
-
     DEBUG("DFU control request:%x\n", pkt->request);
     switch (pkt->request) {
         case DFU_DETACH:
@@ -186,18 +185,29 @@ static void _dfu_class_control_req(usbus_t *usbus, usbus_dfu_device_t *dfu, usb_
             else {
                 /* Retrieve firmware data */
                 size_t len = 0;
+                int ret = 0;
                 uint8_t *data = usbus_control_get_out_data(usbus, &len);
                  /* skip writing the riotboot signature */
                 if (dfu->skip_signature) {
+                    /* Avoid underflow condition */
+                    if (len < RIOTBOOT_FLASHWRITE_SKIPLEN) {
+                        dfu->dfu_state = USB_DFU_STATE_DFU_ERROR;
+                        return -1;
+                    }
                     riotboot_flashwrite_init(&dfu->writer, dfu->selected_slot);
                     len -= RIOTBOOT_FLASHWRITE_SKIPLEN;
                     dfu->skip_signature = false;
-                    riotboot_flashwrite_putbytes(&dfu->writer,
+                    ret = riotboot_flashwrite_putbytes(&dfu->writer,
                                                  &data[RIOTBOOT_FLASHWRITE_SKIPLEN],
                                                  len, true);
                 }
                 else {
-                    riotboot_flashwrite_putbytes(&dfu->writer, data, len, true);
+                    ret = riotboot_flashwrite_putbytes(&dfu->writer, data, len, true);
+                }
+                if (ret < 0) {
+                    /* Error occurs, stall the current transfer */
+                    dfu->dfu_state = USB_DFU_STATE_DFU_ERROR;
+                    return -1;
                 }
             }
             break;
@@ -227,11 +237,17 @@ static void _dfu_class_control_req(usbus_t *usbus, usbus_dfu_device_t *dfu, usb_
             break;
         }
         case DFU_CLR_STATUS:
-            DEBUG("CLRSTATUS To be implemented\n");
+            if (dfu->dfu_state == USB_DFU_STATE_DFU_ERROR) {
+                dfu->dfu_state = USB_DFU_STATE_DFU_IDLE;
+            } else {
+                DEBUG("CLRSTATUS: unhandled case");
+            }
             break;
         default:
             DEBUG("Unhandled DFU control request:%d\n", pkt->request);
     }
+
+    return 0;
 }
 
 static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
@@ -240,12 +256,16 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
 {
     (void)usbus;
     (void)state;
+
     usbus_dfu_device_t *dfu = (usbus_dfu_device_t *)handler;
     DEBUG("DFU: Request: 0x%x\n", setup->request);
 
     /* Process DFU class request */
     if (setup->type & USB_SETUP_REQUEST_TYPE_CLASS) {
-        _dfu_class_control_req(usbus, dfu, setup);
+        if (_dfu_class_control_req(usbus, dfu, setup) < 0) {
+            DEBUG("DFU: control request %u failed\n", setup->request);
+            return -1;
+        }
     }
     else {
         switch (setup->request) {
