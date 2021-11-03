@@ -513,7 +513,7 @@ static inline thread_status_t thread_get_status(const thread_t *thread)
  * @param   thread   thread to work on
  * @returns priority of thread
  */
-static inline  uint8_t thread_get_priority(const thread_t *thread)
+static inline uint8_t thread_get_priority(const thread_t *thread)
 {
     return thread->priority;
 }
