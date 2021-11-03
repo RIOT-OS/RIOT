@@ -10,15 +10,16 @@
 # triple to the least correct triple all that might be able to produce our
 # binaries. Finally, "riscv-none-embed" is also tested for compatibility with
 # an previously popular legacy toolchain.
+# For a CI transition period, it is tested first.
 
 _TRIPLES_TO_TEST := \
+    riscv-none-embed \
     riscv32-none-elf \
     riscv-none-elf \
     riscv32-unknown-elf \
     riscv-unknown-elf \
     riscv64-none-elf \
-    riscv64-unknown-elf \
-    riscv-none-embed
+    riscv64-unknown-elf
 
 TARGET_ARCH_RISCV ?= \
   $(strip \
