@@ -21,7 +21,7 @@
 #include <stdio.h>
 
 #include "timex.h"
-#include "mini.h"
+#include "microbit.h"
 
 #define DELAY           (120 * US_PER_MS)
 
@@ -30,10 +30,10 @@ int main(void)
     puts("Welcome to RIOT!\n");
     puts("Please refer to the README.md for more information about this app\n");
 
-    mini_matrix_init();
+    microbit_matrix_init();
 
     while (1) {
-        mini_matrix_shift_str("Welcome RIOT @ Calliope mini!", DELAY);
+        microbit_matrix_shift_str("Welcome RIOT @ Calliope mini!", DELAY);
     }
 
     return 0;
