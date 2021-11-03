@@ -1,9 +1,5 @@
 include ../Makefile.tests_common
 
-ifneq (,$(filter remote-revb,$(BOARD)))
-  USEMODULE += cpp11-compat
-endif
-
 USEPKG += arduino_sdi_12
 
 BOARD_WHITELIST := \
