@@ -20,7 +20,7 @@ ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
 endif
 
 ifneq (,$(filter stdio_rtt,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter stdio_ethos,$(USEMODULE)))
