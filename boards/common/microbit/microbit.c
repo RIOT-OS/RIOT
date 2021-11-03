@@ -19,7 +19,7 @@
  */
 
 #include <string.h>
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "board.h"
 #include "microbit.h"
@@ -189,7 +189,7 @@ static void shift_next(uint8_t *cur, const uint8_t *next, uint32_t delay)
             cur[(r * COLS) + COLS - 1] = next[(r * COLS) + i];
         }
         microbit_matrix_set_raw((uint8_t *)cur);
-        xtimer_usleep(delay);
+        ztimer_sleep(ZTIMER_USEC, delay);
     }
 }
 
