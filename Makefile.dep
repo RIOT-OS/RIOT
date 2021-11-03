@@ -93,6 +93,11 @@ ifneq (1, $(RIOTBOOT_BUILD))
   FEATURES_OPTIONAL += periph_pm
 endif
 
+# convenience variable to select picolibc from command line
+ifeq (1, $(PICOLIBC))
+  FEATURES_REQUIRED += picolibc
+endif
+
 # always select provided architecture features
 FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
 
