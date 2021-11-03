@@ -233,7 +233,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     _init_tls(thread->tls);
 #endif
 
-#if defined(DEVELHELP) || defined(SCHED_TEST_STACK)
+#if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK)
     if (flags & THREAD_CREATE_STACKTEST) {
         /* assign each int of the stack the value of it's address. Alignment
          * has been handled above, so silence -Wcast-align */
@@ -274,7 +274,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     thread->pid = pid;
     thread->sp = thread_stack_init(function, arg, stack, stacksize);
 
-#if defined(DEVELHELP) || defined(SCHED_TEST_STACK) || \
+#if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) || \
     defined(MODULE_MPU_STACK_GUARD)
     thread->stack_start = stack;
 #endif
