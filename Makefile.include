@@ -47,6 +47,7 @@ RIOTCPU                         ?= $(RIOTBASE)/cpu
 RIOTBOARD                       ?= $(RIOTBASE)/boards
 EXTERNAL_BOARD_DIRS             ?=
 RIOTMAKE                        ?= $(RIOTBASE)/makefiles
+RIOTKCONFIG                     ?= $(RIOTBASE)/kconfigs
 RIOTPKG                         ?= $(RIOTBASE)/pkg
 RIOTTOOLS                       ?= $(RIOTBASE)/dist/tools
 RIOTPROJECT                     ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
