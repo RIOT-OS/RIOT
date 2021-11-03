@@ -2003,10 +2003,9 @@ static void _gomach_msg_handler(gnrc_netif_t *netif, msg_t *msg)
             /* Output GoMacH's current radio duty-cycle. */
             uint64_t duty;
             duty = xtimer_now_usec64();
-            duty = (netif->mac.prot.gomach.awake_duration_sum_ticks) * 100 /
-                   (duty - netif->mac.prot.gomach.system_start_time_ticks);
-            printf("[GoMacH]: achieved radio duty-cycle: %lu %% \n",
-                   (unsigned long)duty);
+            duty = (netif->mac.prot.gomach.awake_duration_sum_ms) * 100 /
+                   (duty - netif->mac.prot.gomach.system_start_time_ms);
+            printf("[GoMacH]: achieved radio duty-cycle: %u %% \n", (unsigned)duty);
             break;
         }
 #endif
@@ -2204,10 +2203,10 @@ static void _gomach_init(gnrc_netif_t *netif)
 
 #if (GNRC_MAC_ENABLE_DUTYCYCLE_RECORD == 1)
     /* Start duty cycle recording */
-    netif->mac.prot.gomach.system_start_time_ticks = xtimer_now_usec64();
-    netif->mac.prot.gomach.last_radio_on_time_ticks =
-        netif->mac.prot.gomach.system_start_time_ticks;
-    netif->mac.prot.gomach.awake_duration_sum_ticks = 0;
+    netif->mac.prot.gomach.system_start_time_ms = xtimer_now_usec64();
+    netif->mac.prot.gomach.last_radio_on_time_ms =
+        netif->mac.prot.gomach.system_start_time_ms;
+    netif->mac.prot.gomach.awake_duration_sum_ms = 0;
     netif->mac.prot.gomach.gomach_info |= GNRC_GOMACH_INTERNAL_INFO_RADIO_IS_ON;
 #endif
 
