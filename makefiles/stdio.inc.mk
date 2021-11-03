@@ -45,7 +45,7 @@ ifneq (,$(filter stdio_uart,$(USEMODULE)))
 endif
 
 ifneq (,$(filter stdio_semihosting,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_msec
   FEATURES_REQUIRED_ANY += cpu_core_cortexm|arch_riscv
 endif
 
