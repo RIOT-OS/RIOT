@@ -15,16 +15,12 @@
  */
 
 #include "periph/i2c.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "at30tse75x.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-#ifndef xtimer_spin_usec
-#define xtimer_spin_usec(X) xtimer_spin(xtimer_ticks_from_usec(X))
-#endif
 
 static inline float temperature_to_float(uint16_t temp)
 {
@@ -41,7 +37,7 @@ static inline float temperature_to_float(uint16_t temp)
 static int at30tse75x_get_register(const at30tse75x_t *dev, uint8_t reg, uint16_t* data)
 {
     i2c_acquire(dev->i2c);
-    xtimer_spin_usec(AT30TSE75X_BUS_FREE_TIME_US);
+    ztimer_spin(ZTIMER_USEC, AT30TSE75X_BUS_FREE_TIME_US);
     if (i2c_read_regs(dev->i2c, dev->addr, reg, data, 2, 0) < 0) {
         DEBUG("[at30tse75x] Can't read register 0x%x\n", reg);
         i2c_release(dev->i2c);
@@ -55,7 +51,7 @@ static int at30tse75x_get_register(const at30tse75x_t *dev, uint8_t reg, uint16_
 static int at30tse75x_set_register(const at30tse75x_t *dev, uint8_t reg, uint16_t *data)
 {
     i2c_acquire(dev->i2c);
-    xtimer_spin_usec(AT30TSE75X_BUS_FREE_TIME_US);
+    ztimer_spin(ZTIMER_USEC, AT30TSE75X_BUS_FREE_TIME_US);
     if (i2c_write_regs(dev->i2c, dev->addr, reg, data, 2, 0) < 0) {
         DEBUG("[at30tse75x] Can't write to register 0x%x\n", reg);
         i2c_release(dev->i2c);
@@ -69,21 +65,21 @@ static int at30tse75x_set_register(const at30tse75x_t *dev, uint8_t reg, uint16_
 static int at30tse75x_reset(const at30tse75x_t *dev)
 {
     i2c_acquire(dev->i2c);
-    xtimer_spin_usec(AT30TSE75X_BUS_FREE_TIME_US);
+    ztimer_spin(ZTIMER_USEC, AT30TSE75X_BUS_FREE_TIME_US);
     if (i2c_write_byte(dev->i2c, 0x00, AT30TSE75X_CMD__GENERAL_CALL_RESET, 0) < 0) {
         i2c_release(dev->i2c);
         return -1;
     }
     i2c_release(dev->i2c);
     /* Wait for reset to complete */
-    xtimer_usleep(500);
+    ztimer_sleep(ZTIMER_USEC, 500);
     return 0;
 }
 
 int at30tse75x_get_config(const at30tse75x_t *dev, uint8_t *data)
 {
     i2c_acquire(dev->i2c);
-    xtimer_spin_usec(AT30TSE75X_BUS_FREE_TIME_US);
+    ztimer_spin(ZTIMER_USEC, AT30TSE75X_BUS_FREE_TIME_US);
     if (i2c_read_reg(dev->i2c, dev->addr, AT30TSE75X_REG__CONFIG, data, 0) < 0) {
         DEBUG("[at30tse75x] Can't read CONFIG register\n");
         i2c_release(dev->i2c);
@@ -97,7 +93,7 @@ int at30tse75x_get_config(const at30tse75x_t *dev, uint8_t *data)
 int at30tse75x_set_config(const at30tse75x_t *dev, uint8_t data)
 {
     i2c_acquire(dev->i2c);
-    xtimer_spin_usec(AT30TSE75X_BUS_FREE_TIME_US);
+    ztimer_spin(ZTIMER_USEC, AT30TSE75X_BUS_FREE_TIME_US);
     if (i2c_write_reg(dev->i2c, dev->addr, AT30TSE75X_REG__CONFIG, data, 0) < 0) {
         DEBUG("[at30tse75x] Can't write to CONFIG register\n");
         i2c_release(dev->i2c);
@@ -214,28 +210,28 @@ int at30tse75x_set_limit_high(const at30tse75x_t *dev, int8_t t_high)
 int at30tse75x_save_config(const at30tse75x_t *dev)
 {
     i2c_acquire(dev->i2c);
-    xtimer_spin_usec(AT30TSE75X_BUS_FREE_TIME_US);
+    ztimer_spin(ZTIMER_USEC, AT30TSE75X_BUS_FREE_TIME_US);
     if(i2c_write_byte(dev->i2c, dev->addr, AT30TSE75X_CMD__SAVE_TO_NVRAM, 0) < 0) {
         i2c_release(dev->i2c);
         return -1;
     }
     i2c_release(dev->i2c);
     /* Wait for copy to complete */
-    xtimer_usleep(5000);
+    ztimer_sleep(ZTIMER_USEC, 5000);
     return 0;
 }
 
 int at30tse75x_restore_config(const at30tse75x_t *dev)
 {
     i2c_acquire(dev->i2c);
-    xtimer_spin_usec(AT30TSE75X_BUS_FREE_TIME_US);
+    ztimer_spin(ZTIMER_USEC, AT30TSE75X_BUS_FREE_TIME_US);
     if(i2c_write_byte(dev->i2c, dev->addr, AT30TSE75X_CMD__RESTORE_FROM_NVRAM, 0) < 0) {
         i2c_release(dev->i2c);
         return -1;
     }
     i2c_release(dev->i2c);
     /* Wait for copy to complete */
-    xtimer_usleep(200);
+    ztimer_sleep(ZTIMER_USEC, 200);
     return 0;
 }
 
@@ -261,7 +257,7 @@ int at30tse75x_get_temperature(const at30tse75x_t *dev, float *temperature)
                                    AT30TSE75X_CONFIG__RESOLUTION_SHIFT;
 
         /* Wait until conversion is finished */
-        xtimer_usleep((uint32_t)(25000 << resolution));
+        ztimer_sleep(ZTIMER_USEC, (uint32_t)(25000 << resolution));
     }
 
     /* Read temperature */
