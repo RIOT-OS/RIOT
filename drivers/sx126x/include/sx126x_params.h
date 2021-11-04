@@ -61,6 +61,10 @@ extern "C" {
 #define SX126X_PARAM_SET_RF_MODE_CB         NULL
 #endif
 
+#ifndef SX126X_PARAM_TX_PA_MODE
+#define SX126X_PARAM_TX_PA_MODE             SX126X_RF_MODE_TX_LPA
+#endif
+
 #ifndef SX126X_PARAM_TYPE
 #    if IS_USED(MODULE_SX1261)
 #        define SX126X_PARAM_TYPE SX126X_TYPE_SX1261
@@ -78,9 +82,11 @@ extern "C" {
 #endif
 
 #if IS_USED(MODULE_SX126X_RF_SWITCH)
-#define SX126X_SET_RF_MODE  .set_rf_mode = SX126X_PARAM_SET_RF_MODE_CB
+#define SX126X_SET_RF_MODE  .set_rf_mode = SX126X_PARAM_SET_RF_MODE_CB,
+#define SX126X_TX_PA_MODE   .tx_pa_mode = SX126X_PARAM_TX_PA_MODE
 #else
 #define SX126X_SET_RF_MODE
+#define SX126X_TX_PA_MODE
 #endif
 
 #define SX126X_PARAMS             { .spi = SX126X_PARAM_SPI,            \
@@ -90,7 +96,8 @@ extern "C" {
                                     .dio1_pin = SX126X_PARAM_DIO1,      \
                                     .type     = SX126X_PARAM_TYPE,      \
                                     .regulator = SX126X_PARAM_REGULATOR, \
-                                    SX126X_SET_RF_MODE }
+                                    SX126X_SET_RF_MODE \
+                                    SX126X_TX_PA_MODE}
 
 /**@}*/
 

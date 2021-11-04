@@ -49,13 +49,6 @@
 #define CONFIG_SX126X_RAMP_TIME_DEFAULT         (SX126X_RAMP_10_US)
 #endif
 
-const sx126x_pa_cfg_params_t sx1262_pa_cfg = {
-    .pa_duty_cycle = 0x02,
-    .hp_max = 0x02,
-    .device_sel = 0x00,
-    .pa_lut = 0x01
-};
-
 const sx126x_pa_cfg_params_t sx1268_pa_cfg = {
     .pa_duty_cycle = 0x04,
     .hp_max = 0x06,
@@ -63,10 +56,17 @@ const sx126x_pa_cfg_params_t sx1268_pa_cfg = {
     .pa_lut = 0x01
 };
 
-const sx126x_pa_cfg_params_t sx1261_pa_cfg = {
+const sx126x_pa_cfg_params_t lpa_cfg = {
     .pa_duty_cycle = 0x04,
     .hp_max = 0x00,
     .device_sel = 0x01,
+    .pa_lut = 0x01
+};
+
+const sx126x_pa_cfg_params_t hpa_cfg = {
+    .pa_duty_cycle = 0x02,
+    .hp_max = 0x02,
+    .device_sel = 0x00,
     .pa_lut = 0x01
 };
 
@@ -108,14 +108,21 @@ static void sx126x_init_default_config(sx126x_t *dev)
      * and are optimal for a TX output power of 14dBm.
      */
     if (sx126x_is_llcc68(dev) || sx126x_is_sx1262(dev)) {
-        sx126x_set_pa_cfg(dev, &sx1262_pa_cfg);
+        sx126x_set_pa_cfg(dev, &hpa_cfg);
     }
     else if (sx126x_is_sx1268(dev)) {
         sx126x_set_pa_cfg(dev, &sx1268_pa_cfg);
     }
-    else { /* sx126x_is_sx1261(dev) or sx126x_is_stm32wl(dev)  */
-        sx126x_set_pa_cfg(dev, &sx1261_pa_cfg);
+    else if (sx126x_is_sx1261(dev)) {
+        sx126x_set_pa_cfg(dev, &lpa_cfg);
     }
+#if IS_USED(MODULE_SX126X_RF_SWITCH)
+    if (dev->params->tx_pa_mode == SX126X_RF_MODE_TX_LPA){
+        sx126x_set_pa_cfg(dev, &lpa_cfg);
+    } else {
+        sx126x_set_pa_cfg(dev, &hpa_cfg);
+    }
+#endif
     sx126x_set_tx_params(dev, CONFIG_SX126X_TX_POWER_DEFAULT, CONFIG_SX126X_RAMP_TIME_DEFAULT);
 
     dev->mod_params.bw = (sx126x_lora_bw_t)(CONFIG_LORA_BW_DEFAULT + SX126X_LORA_BW_125);

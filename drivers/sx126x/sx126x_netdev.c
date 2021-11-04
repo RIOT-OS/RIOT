@@ -333,7 +333,7 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
         DEBUG("[sx126x] netdev: set NETOPT_STATE_TX state\n");
 #if IS_USED(MODULE_SX126X_RF_SWITCH)
         if (dev->params->set_rf_mode) {
-            dev->params->set_rf_mode(dev, SX126X_RF_MODE_TX_LPA);
+            dev->params->set_rf_mode(dev, dev->params->tx_pa_mode);
         }
 #endif
         sx126x_set_tx(dev, 0);
