@@ -1,0 +1,5 @@
+# For numeric values, Elk uses float string formatting...
+USEMODULE += printf_float
+
+# Blacklist AVR8 since printing float is not well supported on these platforms
+FEATURES_BLACKLIST += arch_avr8
