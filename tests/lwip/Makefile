@@ -31,6 +31,7 @@ USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += od
 USEMODULE += netdev_default
+USEMODULE += ztimer_usec
 
 ifeq ($(BOARD),native)
   USEMODULE += lwip_ethernet

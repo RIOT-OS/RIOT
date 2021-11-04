@@ -13,9 +13,6 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @}
  */
-
-#include "xtimer.h"
-
 #include "lwip.h"
 #include "lwip/netif.h"
 
