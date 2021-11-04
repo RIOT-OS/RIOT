@@ -118,10 +118,17 @@ static int _rename(vfs_mount_t *mountp, const char *from_path,
                                        fatfs_abs_path_to));
 }
 
+static fatfs_file_desc_t * _get_fatfs_file_desc(vfs_file_t *f)
+{
+    /* the private buffer is part of a union that also contains a
+     * void pointer, hence, it is naturally aligned */
+    return (fatfs_file_desc_t *)(uintptr_t)f->private_data.buffer;
+}
+
 static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode,
                  const char *abs_path)
 {
-    fatfs_file_desc_t *fd = (fatfs_file_desc_t *)&filp->private_data.buffer[0];
+    fatfs_file_desc_t *fd = _get_fatfs_file_desc(filp);
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)filp->mp->private_data;
     _build_abs_path(fs_desc, name);
 
@@ -179,7 +186,7 @@ static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode,
 
 static int _close(vfs_file_t *filp)
 {
-    fatfs_file_desc_t *fd = (fatfs_file_desc_t *)filp->private_data.buffer;
+    fatfs_file_desc_t *fd = _get_fatfs_file_desc(filp);
 
     DEBUG("fatfs_vfs.c: _close: private_data = %p\n", filp->mp->private_data);
 
@@ -197,7 +204,7 @@ static int _close(vfs_file_t *filp)
 
 static ssize_t _write(vfs_file_t *filp, const void *src, size_t nbytes)
 {
-    fatfs_file_desc_t *fd = (fatfs_file_desc_t *)filp->private_data.buffer;
+    fatfs_file_desc_t *fd = _get_fatfs_file_desc(filp);
 
     UINT bw;
 
@@ -212,7 +219,7 @@ static ssize_t _write(vfs_file_t *filp, const void *src, size_t nbytes)
 
 static ssize_t _read(vfs_file_t *filp, void *dest, size_t nbytes)
 {
-    fatfs_file_desc_t *fd = (fatfs_file_desc_t *)filp->private_data.buffer;
+    fatfs_file_desc_t *fd = _get_fatfs_file_desc(filp);
 
     UINT br;
 
@@ -227,7 +234,7 @@ static ssize_t _read(vfs_file_t *filp, void *dest, size_t nbytes)
 
 static off_t _lseek(vfs_file_t *filp, off_t off, int whence)
 {
-    fatfs_file_desc_t *fd = (fatfs_file_desc_t *)filp->private_data.buffer;
+    fatfs_file_desc_t *fd = _get_fatfs_file_desc(filp);
     FRESULT res;
     off_t new_pos = 0;
 
@@ -294,9 +301,16 @@ static int _fstat(vfs_file_t *filp, struct stat *buf)
     return fatfs_err_to_errno(res);
 }
 
+static inline DIR * _get_DIR(vfs_DIR *d)
+{
+    /* the private buffer is part of a union that also contains a
+     * void pointer, hence, it is naturally aligned */
+    return (DIR *)(uintptr_t)d->private_data.buffer;
+}
+
 static int _opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path)
 {
-    DIR *dir = (DIR *)&dirp->private_data.buffer;
+    DIR *dir = _get_DIR(dirp);
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)dirp->mp->private_data;
     (void) abs_path;
 
@@ -307,7 +321,7 @@ static int _opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path)
 
 static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
 {
-    DIR *dir = (DIR *)&dirp->private_data.buffer[0];
+    DIR *dir = _get_DIR(dirp);
     FILINFO fi;
 
     FRESULT res = f_readdir(dir, &fi);
@@ -328,7 +342,7 @@ static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
 
 static int _closedir(vfs_DIR *dirp)
 {
-    DIR *dir = (DIR *)&dirp->private_data.buffer[0];
+    DIR *dir = _get_DIR(dirp);
 
     return fatfs_err_to_errno(f_closedir(dir));
 }
