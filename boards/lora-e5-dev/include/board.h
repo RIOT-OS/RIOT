@@ -34,6 +34,7 @@ extern "C" {
  * @{
  */
 #define SX126X_PARAM_SPI                    (SPI_DEV(0))
+#define SX126X_PARAM_TX_PA_MODE             SX126X_RF_MODE_TX_HPA
 #if IS_USED(MODULE_SX126X_STM32WL)
 extern void lora_e5_dev_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mode);
 #define SX126X_PARAM_SET_RF_MODE_CB         lora_e5_dev_sx126x_set_rf_mode

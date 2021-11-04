@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <assert.h>
 #include "kernel_defines.h"
 #include "cpu.h"
 #include "board.h"
@@ -72,6 +73,8 @@ void lora_e5_dev_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mode)
         gpio_set(FE_CTRL2);
         break;
     default:
+        /* SX126X_RF_MODE_TX_LPA is not supported */
+        assert(0);
         break;
     }
 }
