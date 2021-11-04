@@ -1,3 +1,21 @@
+## @defgroup pseudomodules Pseudomodules
+## @brief Modules without dedicated files
+##
+## These are implemented in other modules or core components,
+## and serve to enable certain functionality.
+##
+## Pseudomodules are used instead of plain defines (that would be set using `CFLAGS += -DMODULE_NAME`)
+## because they can participate in dependency resolution:
+## they can pull in other modules.
+##
+## Pseudomodules are often enabled automatically through module dependencies,
+## but can also be enabled manually by stating `USEMODULE += module_name` in the Makefile.
+##
+## The list of documented pseudomodules is not comprehensive by far;
+## @ref makefiles/pseudomodules.inc.mk lists all that are not defined inside their main modules.
+##
+## @{
+
 PSEUDOMODULES += atomic_utils
 PSEUDOMODULES += base64url
 PSEUDOMODULES += board_software_reset
@@ -214,3 +232,5 @@ NO_PSEUDOMODULES += auto_init_usbus
 NO_PSEUDOMODULES += auto_init_screen
 
 # Packages and drivers may also add modules to PSEUDOMODULES in their `Makefile.include`.
+
+## @}
