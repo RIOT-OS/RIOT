@@ -1,7 +1,7 @@
 MODULE = board
 
-ifneq (,$(filter mini,$(USEMODULE)))
-  DIRS += mini
+ifneq (,$(filter microbit,$(USEMODULE)))
+  DIRS += $(RIOTBOARD)/common/microbit
 endif
 
 include $(RIOTBASE)/Makefile.base
