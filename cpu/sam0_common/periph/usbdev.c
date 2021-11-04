@@ -80,12 +80,13 @@ static inline UsbDeviceEndpoint *_ep_reg_from_ep(usbdev_ep_t *ep)
 
 static inline void _enable_irq(sam0_common_usb_t *dev)
 {
-    dev->config->device->INTENSET.reg = USB_DEVICE_INTENSET_EORST;
     if (dev->suspended) {
-        dev->config->device->INTENSET.reg = USB_DEVICE_INTENSET_WAKEUP;
+        dev->config->device->INTENSET.reg = USB_DEVICE_INTENSET_WAKEUP |
+                                            USB_DEVICE_INTENCLR_EORST;
     }
     else {
-        dev->config->device->INTENSET.reg = USB_DEVICE_INTENSET_SUSPEND;
+        dev->config->device->INTENSET.reg = USB_DEVICE_INTENSET_SUSPEND |
+                                            USB_DEVICE_INTENSET_EORST;
     }
 }
 
@@ -156,32 +157,32 @@ static int _bank_set_size(usbdev_ep_t *ep)
     unsigned val = 0x00;
 
     switch (ep->len) {
-        case 8:
-            val = 0x0;
-            break;
-        case 16:
-            val = 0x1;
-            break;
-        case 32:
-            val = 0x2;
-            break;
-        case 64:
-            val = 0x3;
-            break;
-        case 128:
-            val = 0x4;
-            break;
-        case 256:
-            val = 0x5;
-            break;
-        case 512:
-            val = 0x6;
-            break;
-        case 1023:
-            val = 0x7;
-            break;
-        default:
-            return -1;
+    case 8:
+        val = 0x0;
+        break;
+    case 16:
+        val = 0x1;
+        break;
+    case 32:
+        val = 0x2;
+        break;
+    case 64:
+        val = 0x3;
+        break;
+    case 128:
+        val = 0x4;
+        break;
+    case 256:
+        val = 0x5;
+        break;
+    case 512:
+        val = 0x6;
+        break;
+    case 1023:
+        val = 0x7;
+        break;
+    default:
+        return -1;
     }
     bank->PCKSIZE.bit.SIZE = val;
     return val;
@@ -245,11 +246,11 @@ static inline void _poweron(sam0_common_usb_t *dev)
 
 #if defined(CPU_COMMON_SAMD21)
     GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN
-                      | GCLK_CLKCTRL_GEN(dev->config->gclk_src)
-                      | GCLK_CLKCTRL_ID(USB_GCLK_ID);
+                        | GCLK_CLKCTRL_GEN(dev->config->gclk_src)
+                        | GCLK_CLKCTRL_ID(USB_GCLK_ID);
 #else
     GCLK->PCHCTRL[USB_GCLK_ID].reg = GCLK_PCHCTRL_CHEN
-                                   | GCLK_PCHCTRL_GEN(dev->config->gclk_src);
+                                     | GCLK_PCHCTRL_GEN(dev->config->gclk_src);
 #endif
 }
 
@@ -308,7 +309,7 @@ static void _unblock_pm(void)
 }
 
 static void _setup(sam0_common_usb_t *usbdev,
-                      const sam0_common_usb_config_t *config)
+                   const sam0_common_usb_config_t *config)
 {
     usbdev->usbdev.driver = &driver;
     usbdev->config = config;
@@ -332,6 +333,7 @@ static void _usbdev_init(usbdev_t *dev)
     DEBUG("Initializing sam0 usb peripheral\n");
     /* Only one usb device on this board */
     sam0_common_usb_t *usbdev = (sam0_common_usb_t *)dev;
+
     usbdev->used = 0;
     /* Set GPIO */
     gpio_init(usbdev->config->dp, GPIO_IN);
@@ -392,20 +394,21 @@ static int _usbdev_get(usbdev_t *usbdev, usbopt_t opt,
     (void)usbdev;
     (void)max_len;
     int res = -ENOTSUP;
+
     switch (opt) {
-        case USBOPT_MAX_VERSION:
-            assert(max_len == sizeof(usb_version_t));
-            *(usb_version_t *)value = USB_VERSION_20;
-            res = sizeof(usb_version_t);
-            break;
-        case USBOPT_MAX_SPEED:
-            assert(max_len == sizeof(usb_speed_t));
-            *(usb_speed_t *)value = USB_SPEED_FULL;
-            res = sizeof(usb_speed_t);
-            break;
-        default:
-            DEBUG("Unhandled get call: 0x%x\n", opt);
-            break;
+    case USBOPT_MAX_VERSION:
+        assert(max_len == sizeof(usb_version_t));
+        *(usb_version_t *)value = USB_VERSION_20;
+        res = sizeof(usb_version_t);
+        break;
+    case USBOPT_MAX_SPEED:
+        assert(max_len == sizeof(usb_speed_t));
+        *(usb_speed_t *)value = USB_SPEED_FULL;
+        res = sizeof(usb_speed_t);
+        break;
+    default:
+        DEBUG("Unhandled get call: 0x%x\n", opt);
+        break;
     }
     return res;
 }
@@ -417,25 +420,26 @@ static int _usbdev_set(usbdev_t *dev, usbopt_t opt,
 
     (void)value_len;
     int res = -ENOTSUP;
+
     switch (opt) {
-        case USBOPT_ADDRESS:
-            assert(value_len == sizeof(uint8_t));
-            uint8_t addr = (*((uint8_t *)value));
-            _set_address(usbdev, addr);
-            break;
-        case USBOPT_ATTACH:
-            assert(value_len == sizeof(usbopt_enable_t));
-            if (*((usbopt_enable_t *)value)) {
-                usb_attach(usbdev);
-            }
-            else {
-                usb_detach(usbdev);
-            }
-            res = sizeof(usbopt_enable_t);
-            break;
-        default:
-            DEBUG("Unhandled set call: 0x%x\n", opt);
-            break;
+    case USBOPT_ADDRESS:
+        assert(value_len == sizeof(uint8_t));
+        uint8_t addr = (*((uint8_t *)value));
+        _set_address(usbdev, addr);
+        break;
+    case USBOPT_ATTACH:
+        assert(value_len == sizeof(usbopt_enable_t));
+        if (*((usbopt_enable_t *)value)) {
+            usb_attach(usbdev);
+        }
+        else {
+            usb_detach(usbdev);
+        }
+        res = sizeof(usbopt_enable_t);
+        break;
+    default:
+        DEBUG("Unhandled set call: 0x%x\n", opt);
+        break;
     }
     return res;
 }
@@ -460,21 +464,21 @@ static void _ep_enable(usbdev_ep_t *ep)
     uint8_t type = 0;
 
     switch (ep->type) {
-        case USB_EP_TYPE_CONTROL:
-            type = 0x01;
-            break;
-        case USB_EP_TYPE_ISOCHRONOUS:
-            type = 0x02;
-            break;
-        case USB_EP_TYPE_BULK:
-            type = 0x03;
-            break;
-        case USB_EP_TYPE_INTERRUPT:
-            type = 0x04;
-            break;
-        default:
-            /* Must never happen */
-            assert(false);
+    case USB_EP_TYPE_CONTROL:
+        type = 0x01;
+        break;
+    case USB_EP_TYPE_ISOCHRONOUS:
+        type = 0x02;
+        break;
+    case USB_EP_TYPE_BULK:
+        type = 0x03;
+        break;
+    case USB_EP_TYPE_INTERRUPT:
+        type = 0x04;
+        break;
+    default:
+        /* Must never happen */
+        assert(false);
     }
     if (ep->dir == USB_EP_DIR_OUT) {
         ep_reg->EPCFG.bit.EPTYPE0 = type;
@@ -642,20 +646,21 @@ static int _usbdev_ep_get(usbdev_ep_t *ep, usbopt_ep_t opt,
 {
     (void)max_len;
     int res = -ENOTSUP;
+
     switch (opt) {
-        case USBOPT_EP_STALL:
-            assert(max_len == sizeof(usbopt_enable_t));
-            *(usbopt_enable_t *)value = _ep_get_stall(ep);
-            res = sizeof(usbopt_enable_t);
-            break;
-        case USBOPT_EP_AVAILABLE:
-            assert(max_len == sizeof(size_t));
-            *(size_t *)value = _ep_get_available(ep);
-            res = sizeof(size_t);
-            break;
-        default:
-            DEBUG("sam_usb: Unhandled get call: 0x%x\n", opt);
-            break;
+    case USBOPT_EP_STALL:
+        assert(max_len == sizeof(usbopt_enable_t));
+        *(usbopt_enable_t *)value = _ep_get_stall(ep);
+        res = sizeof(usbopt_enable_t);
+        break;
+    case USBOPT_EP_AVAILABLE:
+        assert(max_len == sizeof(size_t));
+        *(size_t *)value = _ep_get_available(ep);
+        res = sizeof(size_t);
+        break;
+    default:
+        DEBUG("sam_usb: Unhandled get call: 0x%x\n", opt);
+        break;
     }
     return res;
 }
@@ -665,36 +670,37 @@ static int _usbdev_ep_set(usbdev_ep_t *ep, usbopt_ep_t opt,
 {
     (void)value_len;
     int res = -ENOTSUP;
+
     switch (opt) {
-        case USBOPT_EP_ENABLE:
-            assert(value_len == sizeof(usbopt_enable_t));
-            if (*((usbopt_enable_t *)value)) {
-                _ep_enable(ep);
-                _usbdev_ep_init(ep);
-            }
-            else {
-                _ep_disable(ep);
-            }
-            res = sizeof(usbopt_enable_t);
-            break;
-        case USBOPT_EP_STALL:
-            assert(value_len == sizeof(usbopt_enable_t));
-            _ep_set_stall(ep, *(usbopt_enable_t *)value);
-            res = sizeof(usbopt_enable_t);
-            break;
-        case USBOPT_EP_READY:
-            assert(value_len == sizeof(usbopt_enable_t));
-            if (*((usbopt_enable_t *)value)) {
-                _ep_unready(ep);
-            }
-            else {
-                _usbdev_ep_ready(ep, 0);
-            }
-            res = sizeof(usbopt_enable_t);
-            break;
-        default:
-            DEBUG("sam_usb: Unhandled set call: 0x%x\n", opt);
-            break;
+    case USBOPT_EP_ENABLE:
+        assert(value_len == sizeof(usbopt_enable_t));
+        if (*((usbopt_enable_t *)value)) {
+            _ep_enable(ep);
+            _usbdev_ep_init(ep);
+        }
+        else {
+            _ep_disable(ep);
+        }
+        res = sizeof(usbopt_enable_t);
+        break;
+    case USBOPT_EP_STALL:
+        assert(value_len == sizeof(usbopt_enable_t));
+        _ep_set_stall(ep, *(usbopt_enable_t *)value);
+        res = sizeof(usbopt_enable_t);
+        break;
+    case USBOPT_EP_READY:
+        assert(value_len == sizeof(usbopt_enable_t));
+        if (*((usbopt_enable_t *)value)) {
+            _ep_unready(ep);
+        }
+        else {
+            _usbdev_ep_ready(ep, 0);
+        }
+        res = sizeof(usbopt_enable_t);
+        break;
+    default:
+        DEBUG("sam_usb: Unhandled set call: 0x%x\n", opt);
+        break;
     }
     return res;
 }
