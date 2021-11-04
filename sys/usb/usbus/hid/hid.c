@@ -174,7 +174,7 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
                                            hid->report_desc_size);
         }
         else if (desc_type == USB_HID_DESCR_HID) {
-            _gen_hid_descriptor(usbus, NULL);
+            _gen_hid_descriptor(usbus, hid);
         }
         break;
     }
