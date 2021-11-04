@@ -105,8 +105,21 @@ PSEUDOMODULES += log
 PSEUDOMODULES += log_printfnoformat
 PSEUDOMODULES += log_color
 PSEUDOMODULES += lora
+
+## @defgroup pseudomodule_mpu_stack_guard mpu_stack_guard
+## @brief MPU based stack guard
+##
+## When this module is active (which it is by default on supported MCUs),
+## the Memory Protection Unit will be configured to detect stack overflows.
 PSEUDOMODULES += mpu_stack_guard
+
+## @defgroup pseudomodule_mpu_noexec_ram mpu_noexec_ram
+## @brief Mark RAM as non-executable using the MPU
+##
+## Mark the RAM non executable.
+## This is a protection mechanism which makes exploitation of buffer overflows significantly harder.
 PSEUDOMODULES += mpu_noexec_ram
+
 PSEUDOMODULES += mtd_write_page
 PSEUDOMODULES += nanocoap_%
 PSEUDOMODULES += netdev_default
