@@ -176,7 +176,7 @@ static void _test_sequence(usbdev_mock_t *dev)
             next_phase = TESTPHASE_REQ_DEV_FULL;
             DEBUG("[test]: Requesting full device descriptor\n");
             _build_conf_req(dev->out[0].ep.buf,
-                            sizeof(usb_descriptor_device_t));                     /* initial config request */
+                            sizeof(usb_descriptor_device_t));
             dev->req_len = sizeof(usb_descriptor_device_t);
             dev->out[0].state = EP_STATE_DATA_AVAILABLE;
             dev->out[0].available = sizeof(usb_setup_t);
