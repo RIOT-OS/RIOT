@@ -108,14 +108,14 @@ int at30tse75x_set_resolution(const at30tse75x_t *dev, at30tse75x_resolution_t r
 {
     uint8_t config;
 
-    if(at30tse75x_get_config(dev, &config) != 0) {
+    if (at30tse75x_get_config(dev, &config) != 0) {
         return -1;
     }
 
     config &= ~(AT30TSE75X_CONFIG__RESOLUTION_MASK);
     config |= resolution << AT30TSE75X_CONFIG__RESOLUTION_SHIFT;
 
-    if(at30tse75x_set_config(dev, config) != 0) {
+    if (at30tse75x_set_config(dev, config) != 0) {
         return -1;
     }
 
@@ -125,11 +125,11 @@ int at30tse75x_set_resolution(const at30tse75x_t *dev, at30tse75x_resolution_t r
 int at30tse75x_set_mode(const at30tse75x_t *dev, at30tse75x_mode_t mode)
 {
     uint8_t config;
-    if(at30tse75x_get_config(dev, &config) != 0) {
+    if (at30tse75x_get_config(dev, &config) != 0) {
         return -1;
     }
 
-    switch(mode) {
+    switch (mode) {
     case AT30TSE75X_MODE_ONE_SHOT:
         config |= AT30TSE75X_CONFIG__SHUTDOWN_BIT;
         /* Don't touch alarm mode */
@@ -146,7 +146,7 @@ int at30tse75x_set_mode(const at30tse75x_t *dev, at30tse75x_mode_t mode)
         return -2;
     }
 
-    if(at30tse75x_set_config(dev, config) != 0) {
+    if (at30tse75x_set_config(dev, config) != 0) {
         return -1;
     }
 
@@ -156,11 +156,11 @@ int at30tse75x_set_mode(const at30tse75x_t *dev, at30tse75x_mode_t mode)
 int at30tse75x_set_alarm_polarity(const at30tse75x_t *dev, at30tse75x_alarm_polatity_t polarity)
 {
     uint8_t config;
-    if(at30tse75x_get_config(dev, &config) != 0) {
+    if (at30tse75x_get_config(dev, &config) != 0) {
         return -1;
     }
 
-    switch(polarity) {
+    switch (polarity) {
     case AT30TSE75X_ALARM_ACTIVE_HIGH:
         config |= AT30TSE75X_CONFIG__ALERT_POL_BIT;
         break;
@@ -171,7 +171,7 @@ int at30tse75x_set_alarm_polarity(const at30tse75x_t *dev, at30tse75x_alarm_pola
         return -2;
     }
 
-    if(at30tse75x_set_config(dev, config) != 0) {
+    if (at30tse75x_set_config(dev, config) != 0) {
             return -1;
         }
 
@@ -181,14 +181,14 @@ int at30tse75x_set_alarm_polarity(const at30tse75x_t *dev, at30tse75x_alarm_pola
 int at30tse75x_set_fault_tolerance(const at30tse75x_t *dev, at30tse75x_fault_tolerance_t tolerance)
 {
     uint8_t config;
-    if(at30tse75x_get_config(dev, &config) != 0) {
+    if (at30tse75x_get_config(dev, &config) != 0) {
         return -1;
     }
 
     config &= ~(AT30TSE75X_CONFIG__FTQ_MASK);
     config |= tolerance << AT30TSE75X_CONFIG__FTQ_SHIFT;
 
-    if(at30tse75x_set_config(dev, config) != 0) {
+    if (at30tse75x_set_config(dev, config) != 0) {
         return -1;
     }
 
@@ -211,7 +211,7 @@ int at30tse75x_save_config(const at30tse75x_t *dev)
 {
     i2c_acquire(dev->i2c);
     ztimer_spin(ZTIMER_USEC, AT30TSE75X_BUS_FREE_TIME_US);
-    if(i2c_write_byte(dev->i2c, dev->addr, AT30TSE75X_CMD__SAVE_TO_NVRAM, 0) < 0) {
+    if (i2c_write_byte(dev->i2c, dev->addr, AT30TSE75X_CMD__SAVE_TO_NVRAM, 0) < 0) {
         i2c_release(dev->i2c);
         return -1;
     }
@@ -225,7 +225,7 @@ int at30tse75x_restore_config(const at30tse75x_t *dev)
 {
     i2c_acquire(dev->i2c);
     ztimer_spin(ZTIMER_USEC, AT30TSE75X_BUS_FREE_TIME_US);
-    if(i2c_write_byte(dev->i2c, dev->addr, AT30TSE75X_CMD__RESTORE_FROM_NVRAM, 0) < 0) {
+    if (i2c_write_byte(dev->i2c, dev->addr, AT30TSE75X_CMD__RESTORE_FROM_NVRAM, 0) < 0) {
         i2c_release(dev->i2c);
         return -1;
     }
@@ -240,15 +240,15 @@ int at30tse75x_get_temperature(const at30tse75x_t *dev, float *temperature)
     uint16_t tmp;
     uint8_t config;
 
-    if(at30tse75x_get_config(dev, &config) != 0) {
+    if (at30tse75x_get_config(dev, &config) != 0) {
         return -1;
     }
 
     /* If sensor is shutdown trigger One-Shot mode*/
-    if(config & AT30TSE75X_CONFIG__SHUTDOWN_BIT) {
+    if (config & AT30TSE75X_CONFIG__SHUTDOWN_BIT) {
 
         config |= AT30TSE75X_CONFIG__OS_BIT;
-        if(at30tse75x_set_config(dev, config) != 0) {
+        if (at30tse75x_set_config(dev, config) != 0) {
             return -1;
         }
 
@@ -261,7 +261,7 @@ int at30tse75x_get_temperature(const at30tse75x_t *dev, float *temperature)
     }
 
     /* Read temperature */
-    if(at30tse75x_get_register(dev, AT30TSE75X_REG__TEMPERATURE, &tmp) != 0) {
+    if (at30tse75x_get_register(dev, AT30TSE75X_REG__TEMPERATURE, &tmp) != 0) {
         return -1;
     }
 
@@ -277,19 +277,19 @@ int at30tse75x_init(at30tse75x_t *dev, i2c_t i2c, uint8_t addr)
 
     dev->i2c = i2c;
 
-    if( (addr < 0x48) || (addr > 0x4f) ) {
+    if ( (addr < 0x48) || (addr > 0x4f) ) {
         DEBUG("[at30tse75x] Invalid address\n");
         return -2;
     }
     dev->addr = addr;
 
     /* Reset the device */
-    if(at30tse75x_reset(dev) != 0) {
+    if (at30tse75x_reset(dev) != 0) {
         return -1;
     }
 
     /* Poll the device, fail if unavailable */
-    if(at30tse75x_get_config(dev, &config) != 0) {
+    if (at30tse75x_get_config(dev, &config) != 0) {
         return -1;
     }
 
