@@ -193,7 +193,7 @@ struct _thread {
     msg_t *msg_array;               /**< memory holding messages sent
                                          to this thread's message queue */
 #endif
-#if defined(DEVELHELP) || defined(SCHED_TEST_STACK) \
+#if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) \
     || defined(MODULE_MPU_STACK_GUARD) || defined(DOXYGEN)
     char *stack_start;              /**< thread's stack start address   */
 #endif
@@ -513,7 +513,7 @@ static inline thread_status_t thread_get_status(const thread_t *thread)
  * @param   thread   thread to work on
  * @returns priority of thread
  */
-static inline  uint8_t thread_get_priority(const thread_t *thread)
+static inline uint8_t thread_get_priority(const thread_t *thread)
 {
     return thread->priority;
 }
@@ -545,7 +545,7 @@ const char *thread_state_to_string(thread_status_t state);
  */
 static inline void *thread_get_stackstart(const thread_t *thread)
 {
-#if defined(DEVELHELP) || defined(SCHED_TEST_STACK) \
+#if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) \
     || defined(MODULE_MPU_STACK_GUARD)
     return thread->stack_start;
 #else

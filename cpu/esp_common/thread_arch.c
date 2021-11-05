@@ -150,7 +150,7 @@ char* thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     sp = (uint8_t*)(((uintptr_t)(top_of_stack + 1) - XT_STK_FRMSZ - XT_CP_SIZE) & ~0xf);
 
     /* Clear whole stack with a known value to assist debugging */
-    #if !defined(DEVELHELP) && !defined(SCHED_TEST_STACK)
+    #if !defined(DEVELHELP) && !IS_ACTIVE(SCHED_TEST_STACK)
         /* Unfortunately, this affects thread_measure_stack_free function */
         memset(stack_start, 0, stack_size);
     #else
@@ -360,6 +360,8 @@ void thread_isr_stack_init(void)
 
 int thread_isr_stack_usage(void)
 {
+    /* cppcheck-suppress comparePointers
+     * (reason: comes from ESP-SDK, so should be valid) */
     return &port_IntStackTop - &port_IntStack -
            thread_measure_stack_free((char*)&port_IntStack);
 }
@@ -379,6 +381,8 @@ void *thread_isr_stack_start(void)
 void thread_isr_stack_print(void)
 {
     printf("Printing current ISR\n");
+    /* cppcheck-suppress comparePointers
+     * (reason: comes from ESP-SDK, so should be valid) */
     esp_hexdump(&port_IntStack, &port_IntStackTop-&port_IntStack, 'w', 8);
 }
 

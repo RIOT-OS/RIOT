@@ -119,6 +119,15 @@ extern "C" {
  */
 #define PRIkernel_pid PRIi16
 
+#if defined(DEVELHELP) || defined(DOXYGEN)
+/**
+ * Enables detection of stack overflows and measures stack usage when != 0
+ */
+#ifndef SCHED_TEST_STACK
+#define SCHED_TEST_STACK    1
+#endif  /* SCHED_TEST_STACK */
+#endif  /* DEVELHELP */
+
 /**
  * Unique process identifier
  */

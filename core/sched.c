@@ -119,7 +119,7 @@ static void _unschedule(thread_t *active_thread)
         active_thread->status = STATUS_PENDING;
     }
 
-#ifdef SCHED_TEST_STACK
+#if IS_ACTIVE(SCHED_TEST_STACK)
     if (*((uintptr_t *)active_thread->stack_start) !=
         (uintptr_t)active_thread->stack_start) {
         LOG_WARNING(
