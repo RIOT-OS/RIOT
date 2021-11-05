@@ -60,6 +60,9 @@ USEMODULE += sock_ip
 USEMODULE += sock_udp
 USEMODULE += sock_tcp
 
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
+
 ####
 
 include $(RIOTBASE)/Makefile.include

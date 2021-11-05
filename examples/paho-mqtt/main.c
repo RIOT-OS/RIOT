@@ -21,7 +21,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 #include "shell.h"
 #include "thread.h"
 #include "mutex.h"
@@ -294,7 +295,7 @@ int main(void)
 {
 #ifdef MODULE_LWIP
     /* let LWIP initialize */
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
 #endif
 
     NetworkInit(&network);
