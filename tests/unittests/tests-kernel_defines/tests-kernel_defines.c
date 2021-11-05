@@ -46,10 +46,20 @@ static void test_kernel_version(void)
 #endif
 }
 
+static void test_index_of(void)
+{
+    unsigned foo[8];
+    uint8_t bar[32];
+
+    TEST_ASSERT_EQUAL_INT(5, index_of(foo, &foo[5]));
+    TEST_ASSERT_EQUAL_INT(17, index_of(bar, &bar[17]));
+}
+
 Test *tests_kernel_defines_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_kernel_version),
+        new_TestFixture(test_index_of),
     };
 
     EMB_UNIT_TESTCALLER(kernel_defines_tests, NULL, NULL, fixtures);
