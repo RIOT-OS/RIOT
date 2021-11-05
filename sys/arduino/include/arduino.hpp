@@ -26,6 +26,13 @@ extern "C" {
 #include "irq.h"
 #include "periph/gpio.h"
 #include "arduino_board.h"
+
+/**
+ * @brief   Returns the number of milliseconds since start
+ *
+ * @return value of milliseconds since start
+ */
+unsigned long millis();
 }
 
 #include "serialport.hpp"
@@ -114,13 +121,6 @@ void delayMicroseconds(unsigned long usec);
  * @return value of microseconds since start
  */
 unsigned long micros();
-
-/**
- * @brief   Returns the number of milliseconds since start
- *
- * @return value of milliseconds since start
- */
-unsigned long millis();
 
 #if MODULE_PERIPH_ADC || DOXYGEN
 /**
