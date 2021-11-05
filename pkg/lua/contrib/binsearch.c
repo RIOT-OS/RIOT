@@ -26,7 +26,7 @@ int binsearch_str(const void *start, size_t offset, size_t stride, size_t nmemb,
 
     while (lo < hi) {
         size_t mid = (lo + hi) / 2;
-        const char *target = *((const char *const *)(cstart + mid * stride));
+        const char *target = *((const char *const *)(uintptr_t)(cstart + mid * stride));
         int cmp = strncmp(str, target, n);
 
         if (cmp == 0) {
