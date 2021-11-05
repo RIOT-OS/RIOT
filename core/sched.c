@@ -120,7 +120,11 @@ static void _unschedule(thread_t *active_thread)
     }
 
 #if IS_ACTIVE(SCHED_TEST_STACK)
-    if (*((uintptr_t *)active_thread->stack_start) !=
+    /* All platforms align the stack to word boundaries (possible wasting one
+     * word of RAM), so this access is not unaligned. Using an intermediate
+     * cast to uintptr_t to silence -Wcast-align
+     */
+    if (*((uintptr_t *)(uintptr_t)active_thread->stack_start) !=
         (uintptr_t)active_thread->stack_start) {
         LOG_WARNING(
             "scheduler(): stack overflow detected, pid=%" PRIkernel_pid "\n",
