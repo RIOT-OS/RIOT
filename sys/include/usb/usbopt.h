@@ -107,8 +107,7 @@ typedef enum {
 /**
  * @brief   Binary parameter for enabling and disabling options
  */
-typedef enum
-{
+typedef enum {
     USBOPT_DISABLE = 0,         /**< disable a given option */
     USBOPT_ENABLE = 1,          /**< enable a given option */
 } usbopt_enable_t;

@@ -24,7 +24,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static usbdev_mock_t usbdev_mock;
+static usbdev_mock_t _usbdev_mock;
 static uint8_t _in_buf[256];    /* "host" in */
 static uint8_t _out_buf[64];    /* "host" out */
 
@@ -36,26 +36,24 @@ static usbdev_mock_t *_ep2dev(usbdev_ep_t *ep)
 }
 
 void usbdev_init_lowlevel(void)
-{
-
-}
+{}
 
 usbdev_t *usbdev_get_ctx(unsigned num)
 {
     (void)num;
-    return &usbdev_mock.usbdev;
+    return &_usbdev_mock.usbdev;
 }
 
 void usbdev_mock_setup(usbdev_mock_esr_cb_t esr_cb,
                        usbdev_mock_ep_esr_cb_t ep_esr_cb,
                        usbdev_mock_ready_cb_t ready_cb)
 {
-    memset(&usbdev_mock, 0, sizeof(usbdev_mock));
-    usbdev_mock.usbdev.driver = &testdriver;
+    memset(&_usbdev_mock, 0, sizeof(_usbdev_mock));
+    _usbdev_mock.usbdev.driver = &testdriver;
 
-    usbdev_mock.esr_cb = esr_cb;
-    usbdev_mock.ep_esr_cb = ep_esr_cb;
-    usbdev_mock.ready_cb = ready_cb;
+    _usbdev_mock.esr_cb = esr_cb;
+    _usbdev_mock.ep_esr_cb = ep_esr_cb;
+    _usbdev_mock.ready_cb = ready_cb;
 }
 
 static void _init(usbdev_t *usbdev)
@@ -116,18 +114,19 @@ int _set(usbdev_t *usbdev, usbopt_t opt,
 
     (void)value_len;
     int res = -ENOTSUP;
+
     switch (opt) {
-        case USBOPT_ADDRESS:
-            testdev->config_addr = *(uint8_t *)value;
-            res = sizeof(uint8_t);
-            break;
-        case USBOPT_ATTACH:
-            expect(value_len == sizeof(usbopt_enable_t));
-            res = sizeof(usbopt_enable_t);
-            break;
-        default:
-            DEBUG("[mock]: Unhandled set call: 0x%x\n", opt);
-            break;
+    case USBOPT_ADDRESS:
+        testdev->config_addr = *(uint8_t *)value;
+        res = sizeof(uint8_t);
+        break;
+    case USBOPT_ATTACH:
+        expect(value_len == sizeof(usbopt_enable_t));
+        res = sizeof(usbopt_enable_t);
+        break;
+    default:
+        DEBUG("[mock]: Unhandled set call: 0x%x\n", opt);
+        break;
     }
     return res;
 }
@@ -151,12 +150,12 @@ int _ep_get(usbdev_ep_t *ep, usbopt_ep_t opt,
 
     (void)max_len;
     switch (opt) {
-        case USBOPT_EP_AVAILABLE:
-            *((size_t *)value) = testep->available;
-            return sizeof(size_t);
-        default:
-            DEBUG("[mock]: Unhandled endpoint get call: 0x%x\n", opt);
-            break;
+    case USBOPT_EP_AVAILABLE:
+        *((size_t *)value) = testep->available;
+        return sizeof(size_t);
+    default:
+        DEBUG("[mock]: Unhandled endpoint get call: 0x%x\n", opt);
+        break;
     }
     return -ENOTSUP;
 }
@@ -168,16 +167,17 @@ int _ep_set(usbdev_ep_t *ep, usbopt_ep_t opt,
     (void)value;
     (void)value_len;
     int res = -ENOTSUP;
+
     switch (opt) {
-        case USBOPT_EP_ENABLE:
-            res = sizeof(usbopt_enable_t);
-            break;
-        case USBOPT_EP_STALL:
-            res = sizeof(usbopt_enable_t);
-            break;
-        default:
-            DEBUG("[mock]: Unhandled ep set call: 0x%x\n", opt);
-            break;
+    case USBOPT_EP_ENABLE:
+        res = sizeof(usbopt_enable_t);
+        break;
+    case USBOPT_EP_STALL:
+        res = sizeof(usbopt_enable_t);
+        break;
+    default:
+        DEBUG("[mock]: Unhandled ep set call: 0x%x\n", opt);
+        break;
     }
     return res;
 }
@@ -189,6 +189,7 @@ void _ep_esr(usbdev_ep_t *ep)
     DEBUG("[mock]: ESR EP %u, dir %s\n",
           ep->num, ep->dir == USB_EP_DIR_OUT ? "out" : "in");
     usbdev_mock_ep_t *mock_ep = (usbdev_mock_ep_t *)ep;
+
     if (mock_ep->state == EP_STATE_DATA_AVAILABLE) {
         dev->ep_esr_cb(dev, mock_ep);
         mock_ep->state = EP_STATE_READY;

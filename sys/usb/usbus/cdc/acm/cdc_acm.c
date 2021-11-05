@@ -213,13 +213,13 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     cdcacm->cdcacm_descr.arg = cdcacm;
 
     /* Configure Interface 0 as control interface */
-    cdcacm->iface_ctrl.class = USB_CLASS_CDC_CONTROL ;
+    cdcacm->iface_ctrl.class = USB_CLASS_CDC_CONTROL;
     cdcacm->iface_ctrl.subclass = USB_CDC_SUBCLASS_ACM;
     cdcacm->iface_ctrl.protocol = USB_CDC_PROTOCOL_NONE;
     cdcacm->iface_ctrl.descr_gen = &cdcacm->cdcacm_descr;
     cdcacm->iface_ctrl.handler = handler;
     /* Configure second interface to handle data endpoint */
-    cdcacm->iface_data.class = USB_CLASS_CDC_DATA ;
+    cdcacm->iface_data.class = USB_CLASS_CDC_DATA;
     cdcacm->iface_data.subclass = USB_CDC_SUBCLASS_NONE;
     cdcacm->iface_data.protocol = USB_CDC_PROTOCOL_NONE;
     cdcacm->iface_data.descr_gen = NULL;
@@ -257,7 +257,7 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
 {
     (void)state;
     usbus_cdcacm_device_t *cdcacm = (usbus_cdcacm_device_t*)handler;
-    switch(setup->request) {
+    switch (setup->request) {
         case USB_CDC_MGNT_REQUEST_SET_LINE_CODING:
             if (!(cdcacm->coding_cb)) {
                 /* Line coding not supported, return STALL */
@@ -381,7 +381,7 @@ static void _handle_reset(usbus_handler_t *handler)
 static void _event_handler(usbus_t *usbus, usbus_handler_t *handler, usbus_event_usb_t event)
 {
     (void)usbus;
-    switch(event) {
+    switch (event) {
         case USBUS_EVENT_USB_RESET:
             _handle_reset(handler);
             break;
