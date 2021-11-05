@@ -65,6 +65,7 @@ export STATIC_TESTS=0
 export CFLAGS_DBG=""
 export DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
 export ENABLE_TEST_CACHE=${ENABLE_TEST_CACHE:-1}
+export MURDOCK_REDIS_HOST=${MURDOCK_REDIS_HOST:-127.0.0.1}
 
 # This is a work around for a bug in CCACHE which interacts very badly with
 # some features of RIOT and of murdock. The result is that ccache is
@@ -274,11 +275,11 @@ test_hash_calc() {
 
 test_cache_get() {
     test "${ENABLE_TEST_CACHE}" = "1" || return 1
-    test -n "$(redis-cli get $1)" > /dev/null
+    test -n "$(redis-cli -h ${MURDOCK_REDIS_HOST} get $1)" > /dev/null
 }
 
 test_cache_put() {
-    redis-cli set "$1" ok
+    redis-cli -h ${MURDOCK_REDIS_HOST} set "$1" ok
 }
 
 # compile one app for one board with one toolchain. delete intermediates.
