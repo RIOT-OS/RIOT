@@ -32,6 +32,7 @@
 #include "mutex.h"
 #include "random.h"
 #include "thread.h"
+#include "xtimer.h"
 
 #if IS_USED(MODULE_GCOAP_DTLS)
 #include "net/sock/dtls.h"

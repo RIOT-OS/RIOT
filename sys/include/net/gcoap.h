@@ -405,7 +405,7 @@
 #include "net/sock/dtls.h"
 #endif
 #include "net/nanocoap.h"
-#include "xtimer.h"
+#include "timex.h"
 
 #ifdef __cplusplus
 extern "C" {
