@@ -4,12 +4,18 @@
 @bad exists@
 position p;
 identifier x;
+identifier fn;
 type T;
 @@
 
+fn(...)
+{
+...
 static T x@p;
 ...
-x = <+...x...+>
+x = <+... x ...+>
+...
+}
 
 @@
 identifier x;
