@@ -12,6 +12,7 @@ JERRY_GC_LIMIT ?= 0  # Use default value, e.g. 1/32 of total heap size
 JERRY_GC_MARK_LIMIT ?= 8  # maximum recursion depth during GC mark phase
 
 EXT_CFLAGS := -D__TARGET_RIOT
+CFLAGS += -Wno-cast-align
 
 # disable warnings when compiling with LLVM for board native
 ifeq ($(TOOLCHAIN)_$(BOARD),llvm_native)
