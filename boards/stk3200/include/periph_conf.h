@@ -107,6 +107,7 @@ static const i2c_conf_t i2c_config[] = {
 
 /**
  * @name    SPI configuration
+ *
  * @{
  */
 static const spi_dev_t spi_config[] = {
@@ -115,7 +116,8 @@ static const spi_dev_t spi_config[] = {
         .mosi_pin = GPIO_PIN(PD, 7),
         .miso_pin = GPIO_PIN(PD, 6),
         .clk_pin = GPIO_PIN(PC, 15),
-        .loc = USART_ROUTE_LOCATION_LOC1,
+/* page 81 https://www.silabs.com/documents/public/data-sheets/efm32zg-datasheet.pdf */
+        .loc = USART_ROUTE_LOCATION_LOC3,
         .cmu = cmuClock_USART1,
         .irq = USART1_RX_IRQn
     }
