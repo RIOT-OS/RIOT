@@ -20,10 +20,16 @@
  */
 
 #include <stdio.h>
+#include <inttypes.h>
+
+static uint8_t dummy;
 
 int main(void)
 {
     puts("Hello World!");
+
+    dummy = 0;
+    (void)dummy;
 
     printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
     printf("This board features a(n) %s MCU.\n", RIOT_MCU);
