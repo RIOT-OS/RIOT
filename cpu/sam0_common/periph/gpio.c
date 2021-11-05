@@ -289,8 +289,8 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     /* if it's a tamper pin configure wake from Deep Sleep */
     _init_rtc_pin(pin, flank);
 
-    /* make sure EIC channel is valid */
-    if (exti == -1) {
+    /* make sure EIC channel and callback are valid */
+    if (exti == -1 || cb == NULL) {
         return -1;
     }
 
@@ -440,8 +440,8 @@ void isr_eic(void)
 #endif
 {
     /* read & clear interrupt flags */
-    uint32_t state = _EIC->INTFLAG.reg;
-    state &= (1 << NUMOF_IRQS) - 1;
+    uint32_t state = _EIC->INTFLAG.reg & _EIC->INTENSET.reg;
+    state &= EIC_INTFLAG_EXTINT_Msk;
     _EIC->INTFLAG.reg = state;
 
     /* execute interrupt callbacks */
