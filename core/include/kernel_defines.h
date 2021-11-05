@@ -71,7 +71,7 @@ extern "C" {
  * @param[in]   ELEMENT  pointer to an array element
  * @return      Index of the element in the array
  */
-#define index_of(ARRAY, ELEMENT) (((uintptr_t)(ELEMENT) - (uintptr_t)(ARRAY)) / sizeof(*(ELEMENT)))
+#define index_of(ARRAY, ELEMENT) (((uintptr_t)(ELEMENT) - (uintptr_t)(ARRAY)) / sizeof((ARRAY)[0]))
 
 /**
  * @def NORETURN
