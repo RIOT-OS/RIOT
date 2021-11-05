@@ -88,8 +88,11 @@ enum {
     ERASE_ERROR         = -6,
 };
 
-/* Pointer to FCCOB register */
-volatile uint32_t *const FCCOBx = (volatile uint32_t *)&FTFx->FCCOB3;
+/* Pointer to FCCOB register. An intermediate cast is used to silence
+ * -Wcast-align as the address of the h/w register is properly aligned
+ * for 32 bit accesses
+ */
+static volatile uint32_t *const FCCOBx = (volatile uint32_t *)(uintptr_t)&FTFx->FCCOB3;
 
 /* Erasing/Programming flash is not allowed inside the same flash block
    where the program is being read, for _run_command to be executed in
