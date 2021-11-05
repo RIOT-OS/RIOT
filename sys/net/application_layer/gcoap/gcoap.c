@@ -32,7 +32,7 @@
 #include "mutex.h"
 #include "random.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #if IS_USED(MODULE_GCOAP_DTLS)
 #include "net/sock/dtls.h"
@@ -1010,12 +1010,12 @@ static ssize_t _tl_authenticate(gcoap_socket_t *sock, const sock_udp_ep_t *remot
     msg_t msg;
     bool is_timed_out = false;
     do {
-        uint32_t start = xtimer_now_usec();
-        res = xtimer_msg_receive_timeout(&msg, timeout);
+        uint32_t start = ztimer_now(ZTIMER_USEC);
+        res = ztimer_msg_receive_timeout(ZTIMER_USEC, &msg, timeout);
 
         /* ensure whole timeout time for the case we receive other messages than DTLS_EVENT_CONNECTED */
         if (timeout != SOCK_NO_TIMEOUT) {
-            uint32_t diff = (xtimer_now_usec() - start);
+            uint32_t diff = (ztimer_now(ZTIMER_USEC) - start);
             timeout = (diff > timeout) ? 0: timeout - diff;
             is_timed_out = (res < 0) || (timeout == 0);
         }
@@ -1240,7 +1240,7 @@ int gcoap_resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code)
 
     if (coap_get_observe(pdu) == COAP_OBS_REGISTER) {
         /* generate initial notification value */
-        uint32_t now       = xtimer_now_usec();
+        uint32_t now       = ztimer_now(ZTIMER_USEC);
         pdu->observe_value = (now >> GCOAP_OBS_TICK_EXPONENT) & 0xFFFFFF;
         coap_opt_add_uint(pdu, COAP_OPT_OBSERVE, pdu->observe_value);
     }
@@ -1267,7 +1267,7 @@ int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     if (hdrlen > 0) {
         coap_pkt_init(pdu, buf, len, hdrlen);
 
-        uint32_t now       = xtimer_now_usec();
+        uint32_t now       = ztimer_now(ZTIMER_USEC);
         pdu->observe_value = (now >> GCOAP_OBS_TICK_EXPONENT) & 0xFFFFFF;
         coap_opt_add_uint(pdu, COAP_OPT_OBSERVE, pdu->observe_value);
 
