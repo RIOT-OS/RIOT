@@ -64,6 +64,16 @@ extern "C" {
 #endif
 
 /**
+ * @def         index_of(ARRAY, ELEMENT)
+ * @brief       Returns the index of a pointer to an array element.
+
+ * @param[in]   ARRAY    an array
+ * @param[in]   ELEMENT  pointer to an array element
+ * @return      Index of the element in the array
+ */
+#define index_of(ARRAY, ELEMENT) (((uintptr_t)(ELEMENT) - (uintptr_t)(ARRAY)) / sizeof(*(ELEMENT)))
+
+/**
  * @def NORETURN
  * @brief The *NORETURN* keyword tells the compiler to assume that the function
  *        cannot return.
