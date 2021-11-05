@@ -15,4 +15,5 @@ config MODULE_ATA8520E
     select MODULE_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_SPI
     select MODULE_FMT
-    select MODULE_XTIMER
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
