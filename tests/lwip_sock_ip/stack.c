@@ -198,7 +198,9 @@ void _prepare_send_checks(void)
     netdev_test_set_send_cb(&netdev, _netdev_send);
 #if LWIP_ARP
     const ip4_addr_t remote4 = { .addr = _TEST_ADDR4_REMOTE };
+    LOCK_TCPIP_CORE();
     expect(ERR_OK == etharp_add_static_entry(&remote4, (struct eth_addr *)mac));
+    UNLOCK_TCPIP_CORE();
 #endif
 #if LWIP_IPV6
     memset(destination_cache, 0,
