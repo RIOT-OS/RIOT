@@ -326,13 +326,15 @@ static inline int _packets_available(encx24j600_t *dev)
 static void _get_mac_addr(netdev_t *encdev, uint8_t* buf)
 {
     encx24j600_t * dev = (encx24j600_t *) encdev;
-    uint16_t *addr = (uint16_t *) buf;
+    uint16_t addr[3];
 
     lock(dev);
 
     addr[0] = reg_get(dev, ENC_MAADR1);
     addr[1] = reg_get(dev, ENC_MAADR2);
     addr[2] = reg_get(dev, ENC_MAADR3);
+
+    memcpy(buf, addr, sizeof(addr));
 
     unlock(dev);
 }
