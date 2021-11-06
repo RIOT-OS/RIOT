@@ -134,6 +134,27 @@ static const tc32_conf_t timer_config[] = {
 /** @} */
 
 /**
+ * @name Tcc based countdown timer configuration
+ * @{
+ */
+static const countdown_conf_t countdown_config_tcc[] = {
+    {
+        .tim = TCC_CONFIG(TCC0),
+        .gclk_src = SAM0_GCLK_1MHZ,
+    },
+    {
+        .tim = TCC_CONFIG(TCC1),
+        .gclk_src = SAM0_GCLK_1MHZ,
+    },
+};
+
+#define COUNTDOWN_TCC_0_ISR isr_tcc0
+#define COUNTDOWN_TCC_1_ISR isr_tcc1
+
+#define COUNTDOWN_TCC_NUMOF ARRAY_SIZE(countdown_config_tcc)
+/** @} */
+
+/**
  * @name    UART configuration
  * @{
  */
