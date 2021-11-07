@@ -32,4 +32,9 @@ config BOARD_STM32F429I_DISC1
     select HAVE_ILI9341
     select HAVE_STMPE811_I2C
 
+    # L3Gxxxx gyro
+    select HAVE_L3GXXXX_SPI
+    select HAVE_I3G4250D
+    select HAVE_L3GD20
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"
