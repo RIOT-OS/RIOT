@@ -149,10 +149,10 @@ static inline void enc_spi_transfer(encx24j600_t *dev, char *out, char *in, int 
 
 static inline uint16_t reg_get(encx24j600_t *dev, uint8_t reg)
 {
-    char cmd[4] = { ENC_RCRU, reg, 0, 0 };
+    char cmd_buf[4] = { ENC_RCRU, reg, 0, 0 };
     char result[4];
 
-    enc_spi_transfer(dev, cmd, result, 4);
+    enc_spi_transfer(dev, cmd_buf, result, 4);
 
     return result[2] | (result[3] << 8);
 }
@@ -173,20 +173,20 @@ static void cmdn(encx24j600_t *dev, uint8_t cmd, char *out, char *in, int len) {
 
 static void reg_set(encx24j600_t *dev, uint8_t reg, uint16_t value)
 {
-    char cmd[4] = { ENC_WCRU, reg, value, value >> 8 };
-    enc_spi_transfer(dev, cmd, NULL, 4);
+    char cmd_buf[4] = { ENC_WCRU, reg, value, value >> 8 };
+    enc_spi_transfer(dev, cmd_buf, NULL, 4);
 }
 
 static void reg_set_bits(encx24j600_t *dev, uint8_t reg, uint16_t mask)
 {
-    char cmd[4] = { ENC_BFSU, reg, mask, mask >> 8 };
-    enc_spi_transfer(dev, cmd, NULL, 4);
+    char cmd_buf[4] = { ENC_BFSU, reg, mask, mask >> 8 };
+    enc_spi_transfer(dev, cmd_buf, NULL, 4);
 }
 
 static void reg_clear_bits(encx24j600_t *dev, uint8_t reg, uint16_t mask)
 {
-    char cmd[4] = { ENC_BFCU, reg, mask, mask >> 8 };
-    enc_spi_transfer(dev, cmd, NULL, 4);
+    char cmd_buf[4] = { ENC_BFCU, reg, mask, mask >> 8 };
+    enc_spi_transfer(dev, cmd_buf, NULL, 4);
 }
 
 /*
