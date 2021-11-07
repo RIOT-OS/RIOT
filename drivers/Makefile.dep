@@ -76,6 +76,10 @@ ifneq (,$(filter itg320x_%,$(USEMODULE)))
   USEMODULE += itg320x
 endif
 
+ifneq (,$(filter l3gxxxx_%,$(USEMODULE)))
+  USEMODULE += l3gxxxx
+endif
+
 ifneq (,$(filter lis2dh12%,$(USEMODULE)))
   USEMODULE += lis2dh12
 endif
