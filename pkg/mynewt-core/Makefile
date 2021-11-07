@@ -8,6 +8,7 @@ include $(RIOTBASE)/pkg/pkg.mk
 CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-unused-but-set-variable
 CFLAGS += -Wno-sign-compare
+CFLAGS += -Wno-cast-align
 
 MYNEWT_CORE_MODULES := mynewt-core_os \
                        mynewt-core_util \
