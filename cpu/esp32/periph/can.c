@@ -149,7 +149,7 @@ static const struct can_bittiming_const bittiming_const = {
 
 static void _esp_can_isr(candev_t *candev)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     DEBUG("%s candev=%p\n", __func__, candev);
 
@@ -217,7 +217,7 @@ static void _esp_can_isr(candev_t *candev)
 
 static int _esp_can_init(candev_t *candev)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     DEBUG("%s candev=%p\n", __func__, candev);
 
@@ -234,7 +234,7 @@ static int _esp_can_init(candev_t *candev)
 
 static int _esp_can_send(candev_t *candev, const struct can_frame *frame)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     DEBUG("%s candev=%p frame=%p\n", __func__, candev, frame);
 
@@ -301,7 +301,7 @@ static int _esp_can_send(candev_t *candev, const struct can_frame *frame)
 
 static int _esp_can_set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     assert(dev);
     assert(value);
@@ -354,7 +354,7 @@ static int _esp_can_set(candev_t *candev, canopt_t opt, void *value, size_t valu
 
 static int _esp_can_get(candev_t *candev, canopt_t opt, void *value, size_t max_len)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     DEBUG("%s\n", __func__);
 
@@ -447,7 +447,7 @@ static int _esp_can_get(candev_t *candev, canopt_t opt, void *value, size_t max_
 
 static int _esp_can_abort(candev_t *candev, const struct can_frame *frame)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     DEBUG("%s candev=%p frame=%p\n", __func__, candev, frame);
 
@@ -465,7 +465,7 @@ static int _esp_can_abort(candev_t *candev, const struct can_frame *frame)
 
 static int _esp_can_set_filter(candev_t *candev, const struct can_filter *filter)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     DEBUG("%s candev=%p filter=%p\n", __func__, candev, filter);
 
@@ -502,7 +502,7 @@ static int _esp_can_set_filter(candev_t *candev, const struct can_filter *filter
 
 static int _esp_can_remove_filter(candev_t *candev, const struct can_filter *filter)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     DEBUG("%s candev=%p filter=%p\n", __func__, candev, filter);
 
