@@ -119,7 +119,7 @@ static void _mcp2515_irq_handler(void *arg)
 static int _init(candev_t *candev)
 {
     int res = 0;
-    candev_mcp2515_t *dev = (candev_mcp2515_t *)candev;
+    candev_mcp2515_t *dev = container_of(candev, candev_mcp2515_t, candev);
 
     memset(dev->tx_mailbox, 0, sizeof(dev->tx_mailbox));
 
@@ -151,7 +151,7 @@ static int _init(candev_t *candev)
 
 static int _send(candev_t *candev, const struct can_frame *frame)
 {
-    candev_mcp2515_t *dev = (candev_mcp2515_t *)candev;
+    candev_mcp2515_t *dev = container_of(candev, candev_mcp2515_t, candev);
     int box;
     int ret = 0;
     enum mcp2515_mode mode;
@@ -210,7 +210,7 @@ static int _send(candev_t *candev, const struct can_frame *frame)
 
 static int _abort(candev_t *candev, const struct can_frame *frame)
 {
-    candev_mcp2515_t *dev = (candev_mcp2515_t *)candev;
+    candev_mcp2515_t *dev = container_of(candev, candev_mcp2515_t, candev);
     int box;
 
     DEBUG("Inside mcp2515 abort\n");
@@ -241,7 +241,7 @@ static int _abort(candev_t *candev, const struct can_frame *frame)
 static void _isr(candev_t *candev)
 {
     uint8_t flag;
-    candev_mcp2515_t *dev = (candev_mcp2515_t *)candev;
+    candev_mcp2515_t *dev = container_of(candev, candev_mcp2515_t, candev);
 
     if (mutex_trylock(&_mcp_mutex)) {
         flag = mcp2515_get_irq(dev);
@@ -309,7 +309,7 @@ static void _isr(candev_t *candev)
 
 static int _set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
 {
-    candev_mcp2515_t *dev = (candev_mcp2515_t *)candev;
+    candev_mcp2515_t *dev = container_of(candev, candev_mcp2515_t, candev);
     int res = 0;
 
     DEBUG("Inside mcp2515 set opt=%d\n", opt);
@@ -379,7 +379,7 @@ static int _set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
 
 static int _get(candev_t *candev, canopt_t opt, void *value, size_t max_len)
 {
-    candev_mcp2515_t *dev = (candev_mcp2515_t *)candev;
+    candev_mcp2515_t *dev = container_of(candev, candev_mcp2515_t, candev);
     int res = 0;
 
     DEBUG("Inside mcp2515 get opt=%d\n", opt);
@@ -436,7 +436,7 @@ static int _set_filter(candev_t *dev, const struct can_filter *filter)
     int res = -1;
     enum mcp2515_mode mode;
 
-    candev_mcp2515_t *dev_mcp = (candev_mcp2515_t *)dev;
+    candev_mcp2515_t *dev_mcp = container_of(dev, candev_mcp2515_t, candev);
 
     if (f.can_mask == 0) {
         return -EINVAL; /* invalid mask */
@@ -538,7 +538,7 @@ static int _remove_filter(candev_t *dev, const struct can_filter *filter)
     int res = 0;
     enum mcp2515_mode mode;
 
-    candev_mcp2515_t *dev_mcp = (candev_mcp2515_t *)dev;
+    candev_mcp2515_t *dev_mcp = container_of(dev, candev_mcp2515_t, candev);
 
     if (f.can_mask == 0) {
         return -1; /* invalid mask */
