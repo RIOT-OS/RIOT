@@ -29,6 +29,7 @@ OPENWSN_MODULES := $(filter-out $(IGNORE_MODULES),$(filter openwsn_%,$(USEMODULE
 OPENWSN_LOG_LEVEL ?= LOG_NONE
 
 CFLAGS += -Wno-array-bounds
+CFLAGS += -Wno-cast-align
 CFLAGS += -Wno-implicit-fallthrough
 CFLAGS += -Wno-implicit-function-declaration
 CFLAGS += -Wno-incompatible-pointer-types
@@ -36,8 +37,8 @@ CFLAGS += -Wno-maybe-uninitialized
 CFLAGS += -Wno-old-style-definition
 CFLAGS += -Wno-return-type
 CFLAGS += -Wno-sign-compare
-CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-strict-prototypes
+CFLAGS += -Wno-unused-parameter
 CFLAGS += -DLOG_LEVEL=$(OPENWSN_LOG_LEVEL)
 
 OPENWSN_PATH_openstack      = openstack
