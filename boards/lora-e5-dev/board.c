@@ -18,6 +18,7 @@
  * @}
  */
 
+#include "kernel_defines.h"
 #include "cpu.h"
 #include "board.h"
 #include "periph/gpio.h"
@@ -33,6 +34,16 @@ void board_init(void)
     gpio_init(LED0_PIN, GPIO_OUT);
     LED0_OFF;
 #endif
+
+    if(IS_ACTIVE(CONFIG_LORA_E5_DEV_ENABLE_3P3V)) {
+        gpio_init(LORA_E5_DEV_3P3V_ENABLE_PIN, GPIO_OUT);
+        gpio_set(LORA_E5_DEV_3P3V_ENABLE_PIN);
+    }
+
+    if(IS_ACTIVE(CONFIG_LORA_E5_DEV_ENABLE_5V)) {
+        gpio_init(LORA_E5_DEV_5V_ENABLE_PIN, GPIO_OUT);
+        gpio_set(LORA_E5_DEV_5V_ENABLE_PIN);
+    }
 
     if (IS_USED(MODULE_SX126X_STM32WL)) {
         /* Initialize the GPIO control for RF 3-port switch (SP3T) */
