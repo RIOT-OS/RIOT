@@ -5,6 +5,8 @@ PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
 
+CFLAGS += -Wno-cast-align
+
 CMSIS_NN_MODULES =                   \
     cmsis-nn_ActivationFunctions     \
     cmsis-nn_ConvolutionFunctions    \
