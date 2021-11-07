@@ -45,7 +45,7 @@ extern "C" {
  *
  * @see [RFC 1035, section 4.1.1](https://tools.ietf.org/html/rfc1035#section-4.1.1)
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     uint16_t id;        /**< identifier */
     /**
      * @brief   flags
