@@ -23,3 +23,11 @@ config BOARD_LORA_E5_DEV
 
     # Put other features for this board (in alphabetical order)
     select HAS_RIOTBOOT
+
+config LORA_E5_DEV_ENABLE_3P3V
+    bool "LoRa-E5 Development Kit - Enable 3.3V output"
+    default y
+
+config LORA_E5_DEV_ENABLE_5V
+    bool "LoRa-E5 Development Kit - Enable 5V output"
+    default y

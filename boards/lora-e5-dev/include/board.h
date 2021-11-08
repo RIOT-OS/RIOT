@@ -83,6 +83,27 @@ extern void lora_e5_dev_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mo
 /** @} */
 
 /**
+ * @brief    Enable 3.3V output
+ */
+#ifndef CONFIG_LORA_E5_DEV_ENABLE_3P3V
+#define CONFIG_LORA_E5_DEV_ENABLE_3P3V      1
+#endif
+/**
+ * @brief    Enable 5V output
+ */
+#ifndef CONFIG_LORA_E5_DEV_ENABLE_5V
+#define CONFIG_LORA_E5_DEV_ENABLE_5V        1
+#endif
+/**
+ * @brief    lora-e5-dev 3.3V gpio enable pin
+ */
+#define LORA_E5_DEV_3P3V_ENABLE_PIN         GPIO_PIN(PORT_A, 9)
+/**
+ * @brief    lora-e5-dev 5V gpio enable pin
+ */
+#define LORA_E5_DEV_5V_ENABLE_PIN           GPIO_PIN(PORT_B, 10)
+
+/**
  * @brief   Board level initialization
  */
 void board_init(void);
