@@ -220,7 +220,7 @@ void spi_flash_drive_init (void)
     return ESP_FAIL; \
 } while(0)
 
-uint8_t _flash_buf[ESP_ROM_SPIFLASH_BUFF_BYTE_READ_NUM];
+static uint32_t _flash_buf[ESP_ROM_SPIFLASH_BUFF_BYTE_READ_NUM / sizeof(uint32_t)];
 
 esp_err_t IRAM_ATTR spi_flash_read(size_t addr, void *buff, size_t size)
 {
@@ -245,8 +245,8 @@ esp_err_t IRAM_ATTR spi_flash_read(size_t addr, void *buff, size_t size)
         critical_enter();
         Cache_Read_Disable(PRO_CPU_NUM);
 
-        result = esp_rom_spiflash_read (word_addr, (uint32_t*)_flash_buf, 4);
-        memcpy(buff, _flash_buf + pos_in_word, len_in_word);
+        result = esp_rom_spiflash_read(word_addr, _flash_buf, 4);
+        memcpy(buff, (uint8_t *)_flash_buf + pos_in_word, len_in_word);
 
         /* enable interrupts and the cache */
         Cache_Read_Enable(PRO_CPU_NUM);
@@ -269,7 +269,7 @@ esp_err_t IRAM_ATTR spi_flash_read(size_t addr, void *buff, size_t size)
         critical_enter();
         Cache_Read_Disable(PRO_CPU_NUM);
 
-        result |= esp_rom_spiflash_read (addr, (uint32_t*)_flash_buf, len_full_words);
+        result |= esp_rom_spiflash_read(addr, _flash_buf, len_full_words);
         memcpy(buff, _flash_buf, len_full_words);
 
         /* enable interrupts and the cache */
@@ -287,7 +287,7 @@ esp_err_t IRAM_ATTR spi_flash_read(size_t addr, void *buff, size_t size)
         critical_enter();
         Cache_Read_Disable(PRO_CPU_NUM);
 
-        result |= esp_rom_spiflash_read (addr, (uint32_t*)_flash_buf, 4);
+        result |= esp_rom_spiflash_read(addr, _flash_buf, 4);
         memcpy(buff, _flash_buf, len);
 
         /* enable interrupts and the cache */
@@ -323,9 +323,9 @@ esp_err_t IRAM_ATTR spi_flash_write(size_t addr, const void *buff, size_t size)
         critical_enter();
         Cache_Read_Disable(PRO_CPU_NUM);
 
-        result |= esp_rom_spiflash_read (word_addr, (uint32_t*)_flash_buf, 4);
-        memcpy(_flash_buf + pos_in_word, buff, len_in_word);
-        result |= esp_rom_spiflash_write (word_addr, (uint32_t*)_flash_buf, 4);
+        result |= esp_rom_spiflash_read(word_addr, _flash_buf, 4);
+        memcpy((uint8_t *)_flash_buf + pos_in_word, buff, len_in_word);
+        result |= esp_rom_spiflash_write(word_addr, _flash_buf, 4);
 
         /* enable interrupts and the cache */
         Cache_Read_Enable(PRO_CPU_NUM);
@@ -349,7 +349,7 @@ esp_err_t IRAM_ATTR spi_flash_write(size_t addr, const void *buff, size_t size)
         Cache_Read_Disable(PRO_CPU_NUM);
 
         memcpy(_flash_buf, buff, len_full_words);
-        result |= esp_rom_spiflash_write (addr, (uint32_t*)_flash_buf, len_full_words);
+        result |= esp_rom_spiflash_write(addr, _flash_buf, len_full_words);
 
         /* enable interrupts and the cache */
         Cache_Read_Enable(PRO_CPU_NUM);
@@ -366,9 +366,9 @@ esp_err_t IRAM_ATTR spi_flash_write(size_t addr, const void *buff, size_t size)
         critical_enter();
         Cache_Read_Disable(PRO_CPU_NUM);
 
-        result |= esp_rom_spiflash_read (addr, (uint32_t*)_flash_buf, 4);
+        result |= esp_rom_spiflash_read(addr, _flash_buf, 4);
         memcpy(_flash_buf, buff, len);
-        result |= esp_rom_spiflash_write (addr, (uint32_t*)_flash_buf, 4);
+        result |= esp_rom_spiflash_write(addr, _flash_buf, 4);
 
         /* enable interrupts and the cache */
         Cache_Read_Enable(PRO_CPU_NUM);
