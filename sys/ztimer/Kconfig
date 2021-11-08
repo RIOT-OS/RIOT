@@ -132,15 +132,16 @@ menu "xtimer and evtimer compatibility"
 
 choice
     bool "xtimer compatibility"
-    optional
-    depends on MODULE_ZTIMER_USEC
+    depends on MODULE_XTIMER
 
 config MODULE_XTIMER_ON_ZTIMER
     bool "ztimer_usec as timer backend for xtimer"
+    select MODULE_ZTIMER_USEC
 
 config MODULE_ZTIMER_XTIMER_COMPAT
     bool "map xtimer calls to ztimer"
     select MODULE_DIV
+    select MODULE_ZTIMER_USEC
     help
         This is a wrapper of xtimer API on ztimer_usec and is currently
         incomplete. Unless doing testing, use xtimer on ztimer.
