@@ -262,10 +262,19 @@ static int _rmdir(vfs_mount_t *mountp, const char *name)
     return littlefs_err_to_errno(ret);
 }
 
+static inline lfs_file_t * _get_lfs_file(vfs_file_t *f)
+{
+    /* The buffer in `private_data` is part of a union that also contains a
+     * pointer, so the alignment is fine. Adding an intermediate cast to
+     * uintptr_t to silence -Wcast-align
+     */
+    return (lfs_file_t *)(uintptr_t)f->private_data.buffer;
+}
+
 static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode, const char *abs_path)
 {
     littlefs_desc_t *fs = filp->mp->private_data;
-    lfs_file_t *fp = (lfs_file_t *)&filp->private_data.buffer;
+    lfs_file_t *fp = _get_lfs_file(filp);
     (void) abs_path;
     (void) mode;
 
@@ -307,7 +316,7 @@ static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode, con
 static int _close(vfs_file_t *filp)
 {
     littlefs_desc_t *fs = filp->mp->private_data;
-    lfs_file_t *fp = (lfs_file_t *)&filp->private_data.buffer;
+    lfs_file_t *fp = _get_lfs_file(filp);
 
     mutex_lock(&fs->lock);
 
@@ -322,7 +331,7 @@ static int _close(vfs_file_t *filp)
 static ssize_t _write(vfs_file_t *filp, const void *src, size_t nbytes)
 {
     littlefs_desc_t *fs = filp->mp->private_data;
-    lfs_file_t *fp = (lfs_file_t *)&filp->private_data.buffer;
+    lfs_file_t *fp = _get_lfs_file(filp);
 
     mutex_lock(&fs->lock);
 
@@ -338,7 +347,7 @@ static ssize_t _write(vfs_file_t *filp, const void *src, size_t nbytes)
 static ssize_t _read(vfs_file_t *filp, void *dest, size_t nbytes)
 {
     littlefs_desc_t *fs = filp->mp->private_data;
-    lfs_file_t *fp = (lfs_file_t *)&filp->private_data.buffer;
+    lfs_file_t *fp = _get_lfs_file(filp);
 
     mutex_lock(&fs->lock);
 
@@ -354,7 +363,7 @@ static ssize_t _read(vfs_file_t *filp, void *dest, size_t nbytes)
 static off_t _lseek(vfs_file_t *filp, off_t off, int whence)
 {
     littlefs_desc_t *fs = filp->mp->private_data;
-    lfs_file_t *fp = (lfs_file_t *)&filp->private_data.buffer;
+    lfs_file_t *fp = _get_lfs_file(filp);
 
     mutex_lock(&fs->lock);
 
@@ -427,11 +436,20 @@ static int _statvfs(vfs_mount_t *mountp, const char *restrict path, struct statv
     return littlefs_err_to_errno(ret);
 }
 
+static inline lfs_dir_t * _get_lfs_dir(vfs_DIR *dirp)
+{
+    /* The buffer in `private_data` is part of a union that also contains a
+     * pointer, so the alignment is fine. Adding an intermediate cast to
+     * uintptr_t to silence -Wcast-align
+     */
+    return (lfs_dir_t *)(uintptr_t)dirp->private_data.buffer;
+}
+
 static int _opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path)
 {
     (void)abs_path;
     littlefs_desc_t *fs = dirp->mp->private_data;
-    lfs_dir_t *dir = (lfs_dir_t *)&dirp->private_data.buffer;
+    lfs_dir_t *dir = _get_lfs_dir(dirp);
 
     mutex_lock(&fs->lock);
 
@@ -447,7 +465,7 @@ static int _opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path)
 static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
 {
     littlefs_desc_t *fs = dirp->mp->private_data;
-    lfs_dir_t *dir = (lfs_dir_t *)&dirp->private_data.buffer;
+    lfs_dir_t *dir = _get_lfs_dir(dirp);
 
     mutex_lock(&fs->lock);
 
@@ -470,7 +488,7 @@ static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
 static int _closedir(vfs_DIR *dirp)
 {
     littlefs_desc_t *fs = dirp->mp->private_data;
-    lfs_dir_t *dir = (lfs_dir_t *)&dirp->private_data.buffer;
+    lfs_dir_t *dir = _get_lfs_dir(dirp);
 
     mutex_lock(&fs->lock);
 
