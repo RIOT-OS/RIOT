@@ -21,7 +21,6 @@ ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += xtimer
   USEMODULE += gnrc_mac
-  FEATURES_REQUIRED += periph_rtt
 endif
 
 ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
