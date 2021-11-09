@@ -24,6 +24,7 @@
 #include "dose.h"
 #include "random.h"
 #include "irq.h"
+#include "periph/timer.h"
 
 #include "net/eui_provider.h"
 #include "net/netdev/eth.h"
@@ -107,21 +108,77 @@ static inline void _disable_sense(dose_t *ctx)
 #endif
 }
 
-static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal)
-{
-    uint32_t backoff;
-    (void) signal;
+#ifdef MODULE_DOSE_WATCHDOG
+static unsigned _watchdog_users;
+static dose_t *_dose_base;
+static uint8_t _dose_numof;
 
-    if (ctx->state == DOSE_STATE_RECV) {
-        /* We got here from RECV state. The driver's thread has to look
-         * if this frame should be processed. By queuing NETDEV_EVENT_ISR,
-         * the netif thread will call _isr at some time. */
-        SETBIT(ctx->flags, DOSE_FLAG_RECV_BUF_DIRTY);
-        netdev_trigger_event_isr(&ctx->netdev);
+static inline void _watchdog_start(void)
+{
+    if (_watchdog_users) {
+        return;
     }
 
-    /* Enable interrupt for start bit sensing */
-    _enable_sense(ctx);
+    _watchdog_users++;
+    timer_start(DOSE_TIMER_DEV);
+}
+
+static inline void _watchdog_stop(void)
+{
+    if (_watchdog_users == 0 || --_watchdog_users) {
+        return;
+    }
+
+    timer_stop(DOSE_TIMER_DEV);
+}
+
+static void _dose_watchdog_cb(void *arg, int chan)
+{
+    (void) chan;
+    (void) arg;
+
+    for (unsigned i = 0; i < _dose_numof; ++i) {
+        dose_t *ctx = &_dose_base[i];
+
+        switch (ctx->state) {
+        case DOSE_STATE_RECV:
+            if (ctx->recv_buf_ptr_last != ctx->recv_buf_ptr) {
+                ctx->recv_buf_ptr_last = ctx->recv_buf_ptr;
+                break;
+            }
+
+            if (ctx->flags & DOSE_FLAG_RECV_BUF_DIRTY) {
+                break;
+            }
+
+            /* fall-through */
+        case DOSE_STATE_BLOCKED:
+            state(&_dose_base[i], DOSE_SIGNAL_XTIMER);
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+static void _watchdog_init(unsigned timeout_us)
+{
+    timer_init(DOSE_TIMER_DEV, US_PER_SEC, _dose_watchdog_cb, NULL);
+    timer_set_periodic(DOSE_TIMER_DEV, 0, timeout_us, TIM_FLAG_RESET_ON_MATCH);
+    timer_stop(DOSE_TIMER_DEV);
+}
+
+static inline void _set_random_backoff(dose_t *ctx)
+{
+    (void) ctx;
+}
+
+#else
+static inline void _watchdog_start(void) {}
+static inline void _watchdog_stop(void) {}
+static inline void _set_random_backoff(dose_t *ctx)
+{
+    uint32_t backoff;
 
     /* The timeout will bring us back into IDLE state by a random time.
      * If we entered this state from RECV state, the random time lays
@@ -136,6 +193,27 @@ static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal)
         backoff = random_uint32_range(1 * ctx->timeout_base, 2 * ctx->timeout_base);
     }
     xtimer_set(&ctx->timeout, backoff);
+}
+#endif
+
+static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal)
+{
+    (void) signal;
+
+    if (ctx->state == DOSE_STATE_RECV) {
+        /* We got here from RECV state. The driver's thread has to look
+         * if this frame should be processed. By queuing NETDEV_EVENT_ISR,
+         * the netif thread will call _isr at some time. */
+        SETBIT(ctx->flags, DOSE_FLAG_RECV_BUF_DIRTY);
+        netdev_trigger_event_isr(&ctx->netdev);
+    } else if (ctx->state == DOSE_STATE_INIT) {
+        _watchdog_start();
+    }
+
+    /* Enable interrupt for start bit sensing */
+    _enable_sense(ctx);
+
+    _set_random_backoff(ctx);
 
     return DOSE_SIGNAL_NONE;
 }
@@ -144,6 +222,8 @@ static dose_signal_t state_transit_idle(dose_t *ctx, dose_signal_t signal)
 {
     (void) ctx;
     (void) signal;
+
+    _watchdog_stop();
 
     return DOSE_SIGNAL_NONE;
 }
@@ -156,6 +236,7 @@ static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal)
         /* We freshly entered this state. Thus, no start bit sensing is required
          * anymore. Disable RX Start IRQs during the transmission. */
         _disable_sense(ctx);
+        _watchdog_start();
     }
 
     if (signal == DOSE_SIGNAL_UART) {
@@ -182,7 +263,7 @@ static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal)
         }
     }
 
-    if (rc == DOSE_SIGNAL_NONE) {
+    if (rc == DOSE_SIGNAL_NONE && !IS_ACTIVE(MODULE_DOSE_WATCHDOG)) {
         /* No signal is returned. We stay in the RECV state. */
         xtimer_set(&ctx->timeout, ctx->timeout_base);
     }
@@ -197,6 +278,7 @@ static dose_signal_t state_transit_send(dose_t *ctx, dose_signal_t signal)
     if (ctx->state != DOSE_STATE_SEND) {
         /* Disable RX Start IRQs during the transmission. */
         _disable_sense(ctx);
+        _watchdog_start();
     }
 
     /* Don't trace any END octets ... the timeout or the END signal
@@ -287,6 +369,9 @@ static void clear_recv_buf(dose_t *ctx)
     unsigned irq_state = irq_disable();
 
     ctx->recv_buf_ptr = 0;
+#ifdef MODULE_DOSE_WATCHDOG
+    ctx->recv_buf_ptr_last = -1;
+#endif
     CLRBIT(ctx->flags, DOSE_FLAG_RECV_BUF_DIRTY);
     CLRBIT(ctx->flags, DOSE_FLAG_END_RECEIVED);
     CLRBIT(ctx->flags, DOSE_FLAG_ESC_RECEIVED);
@@ -723,4 +808,14 @@ void dose_setup(dose_t *ctx, const dose_params_t *params, uint8_t index)
     DEBUG("dose timeout set to %" PRIu32 " µs\n", ctx->timeout_base);
     ctx->timeout.callback = _isr_xtimer;
     ctx->timeout.arg = ctx;
+
+#ifdef MODULE_DOSE_WATCHDOG
+    if (index >= _dose_numof) {
+        _dose_numof = index + 1;
+    }
+    if (index == 0) {
+        _dose_base = ctx;
+        _watchdog_init(ctx->timeout_base * 2);
+    }
+#endif /* MODULE_DOSE_WATCHDOG */
 }
