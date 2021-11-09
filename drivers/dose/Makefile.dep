@@ -3,6 +3,10 @@ FEATURES_REQUIRED += periph_uart
 FEATURES_OPTIONAL += periph_uart_collision
 FEATURES_OPTIONAL += periph_uart_rxstart_irq
 
+ifneq (,$(filter dose_watchdog,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_timer_periodic
+endif
+
 USEMODULE += eui_provider
 USEMODULE += iolist
 USEMODULE += netdev_eth
