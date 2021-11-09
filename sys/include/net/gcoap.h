@@ -395,6 +395,7 @@
 #ifndef NET_GCOAP_H
 #define NET_GCOAP_H
 
+#include <assert.h>
 #include <stdint.h>
 
 #include "event/callback.h"
@@ -1044,6 +1045,320 @@ ssize_t gcoap_encode_link(const coap_resource_t *resource, char *buf,
  */
 sock_dtls_t *gcoap_get_sock_dtls(void);
 #endif
+
+/**
+ * @defgroup net_gcoap_nanocoap gCoAP packet abstraction layer
+ * @ingroup net_gcoap
+ *
+ * gCoAP utilizes @ref net_nanocoap to parse and abstract CoAP packets. To separate those to modules
+ * cleanly, this module provides wrappers around nanocoap's functionality.
+ * @{
+ */
+/**
+ * @name    Buffer manipulation
+ * @{
+ */
+static inline uint8_t *gcoap_pkt_get_buf(coap_pkt_t *pdu)
+{
+    return (uint8_t *)pdu->hdr;
+}
+
+static inline void gcoap_pkt_set_buf(coap_pkt_t *pdu, uint8_t *buf)
+{
+    pdu->hdr = (coap_hdr_t *)buf;
+}
+/** @} */
+
+/**
+ * @name    Header manipulation
+ * @{
+ */
+static inline int gcoap_pkt_parse(coap_pkt_t *pdu, uint8_t *buf, size_t len)
+{
+    return coap_parse(pdu, buf, len);
+}
+
+static inline ssize_t gcoap_pkt_build_hdr(uint8_t *buf, unsigned type, uint8_t *token,
+                                          size_t token_len, unsigned code, uint16_t id)
+{
+    return coap_build_hdr((coap_hdr_t *)buf, type, token, token_len, code, id);
+}
+
+static inline void gcoap_pkt_init(coap_pkt_t *pdu, uint8_t *buf, size_t buf_len, size_t hdr_len)
+{
+    coap_pkt_init(pdu, buf, buf_len, hdr_len);
+}
+
+static inline unsigned gcoap_pkt_get_type(coap_pkt_t *pdu)
+{
+    return coap_get_type(pdu);
+}
+
+static inline void gcoap_pkt_set_type(coap_pkt_t *pdu, unsigned type)
+{
+    coap_hdr_set_type(pdu->hdr, type);
+}
+
+static inline void gcoap_pkt_set_token_len(coap_pkt_t *pdu, uint8_t token_len)
+{
+    coap_set_token_len(pdu, token_len);
+}
+
+static inline unsigned gcoap_pkt_get_code_raw(coap_pkt_t *pdu)
+{
+    return coap_get_code_raw(pdu);
+}
+
+static inline unsigned gcoap_pkt_get_code_class(coap_pkt_t *pdu)
+{
+    return coap_get_code_class(pdu);
+}
+
+static inline unsigned gcoap_pkt_get_code_detail(coap_pkt_t *pdu)
+{
+    return coap_get_code_detail(pdu);
+}
+
+static inline void gcoap_pkt_set_code_raw(coap_pkt_t *pdu, uint8_t code)
+{
+    coap_hdr_set_code(pdu->hdr, code);
+}
+
+static inline coap_method_flags_t gcoap_pkt_get_method_flag(coap_pkt_t *pdu)
+{
+    assert(coap_get_code_class(pdu) == COAP_CLASS_REQ);
+    return coap_method2flag(coap_get_code_detail(pdu));
+}
+
+static inline uint16_t gcoap_pkt_get_id(coap_pkt_t *pdu)
+{
+    return coap_get_id(pdu);
+}
+
+static inline bool gcoap_pkt_has_id(coap_pkt_t *pdu, uint16_t id)
+{
+    return coap_get_id(pdu) == id;
+}
+
+static inline ssize_t gcoap_pkt_get_token(coap_pkt_t *pdu, uint8_t *token)
+{
+    ssize_t res = coap_get_token_len(pdu);
+    if (res > 0) {
+        memcpy(token, pdu->token, res);
+    }
+    return res;
+}
+
+static inline bool gcoap_pkt_has_token(coap_pkt_t *pdu, const uint8_t *token, size_t token_len)
+{
+    return (coap_get_token_len(pdu) == token_len) && (memcmp(pdu, token, token_len) == 0);
+}
+
+static inline unsigned gcoap_pkt_get_total_hdr_len(const coap_pkt_t *pkt)
+{
+    return coap_get_total_hdr_len(pkt);
+}
+
+static inline uint8_t *gcoap_pkt_data_ptr(coap_pkt_t *pdu)
+{
+    return ((uint8_t *)pdu->hdr) + sizeof(coap_hdr_t);
+}
+/** @} */
+
+/**
+ * @name Option manipulation
+ *
+ * The `gcoap_pkt_opt_add_*` functions **must** be called in the order of the
+ * @ref net_coap_opt "option numbers" added.
+ * @{
+ */
+static inline int gcoap_pkt_opt_get_uint(coap_pkt_t *pdu, uint16_t optnum, uint32_t *value)
+{
+    return coap_opt_get_uint(pdu, optnum, value);
+}
+
+static inline ssize_t gcoap_pkt_opt_add_uint(coap_pkt_t *pdu, uint16_t optnum, uint32_t value)
+{
+    return coap_opt_add_uint(pdu, optnum, value);
+}
+
+static inline int gcoap_pkt_opt_get_str(const coap_pkt_t *pdu, uint16_t optnum,
+                                        uint8_t *str, size_t max_len, char separator)
+{
+    return coap_opt_get_string(pdu, optnum, str, max_len, separator);
+}
+
+static inline ssize_t coap_opt_add_str(coap_pkt_t *pdu, uint16_t optnum, const char *str,
+                                       size_t str_len, char separator)
+{
+    return coap_opt_add_chars(pdu, optnum, str, str_len, separator);
+}
+
+static inline ssize_t gcoap_pkt_opt_get_opaque(coap_pkt_t *pdu, uint16_t optnum, uint8_t **val)
+{
+    return coap_opt_get_opaque(pdu, optnum, val);
+}
+
+static inline ssize_t gcoap_pkt_opt_add_opaque(coap_pkt_t *pdu, uint16_t optnum, const uint8_t *val,
+                                               size_t val_len)
+{
+    return coap_opt_add_opaque(pdu, optnum, val, val_len);
+}
+
+static inline bool gcoap_pkt_has_observe(coap_pkt_t *pdu)
+{
+    return coap_has_observe(pdu);
+}
+
+static inline void gcoap_pkt_clear_observe(coap_pkt_t *pdu)
+{
+    coap_clear_observe(pdu);
+}
+
+static inline uint32_t gcoap_pkt_get_observe(coap_pkt_t *pdu)
+{
+    return coap_get_observe(pdu);
+}
+
+static inline ssize_t gcoap_pkt_opt_add_observe(coap_pkt_t *pdu, uint32_t observe_value)
+{
+    pdu->observe_value = observe_value & 0xFFFFFF;
+    return coap_opt_add_uint(pdu, COAP_OPT_OBSERVE, pdu->observe_value);
+}
+
+static inline ssize_t gcoap_pkt_opt_get_location_path(const coap_pkt_t *pdu, char *path,
+                                                      size_t max_len)
+{
+    return coap_get_location_path(pdu, (uint8_t *)path, max_len);
+}
+
+static inline ssize_t gcoap_pkt_opt_add_location_path(coap_pkt_t *pdu, const char *path,
+                                                      size_t path_len)
+{
+    return coap_opt_add_chars(pdu, COAP_OPT_LOCATION_PATH, path, path_len, '/');
+}
+
+static inline ssize_t gcoap_pkt_opt_get_uri_path(const coap_pkt_t *pkt, char *path)
+{
+    return coap_get_uri_path(pkt, (uint8_t *)path);
+}
+
+static inline ssize_t gcoap_pkt_opt_add_uri_path(coap_pkt_t *pkt, const char *path, size_t path_len)
+{
+    return coap_opt_add_uri_path_buffer(pkt, path, path_len);
+}
+
+static inline unsigned gcoap_pkt_opt_get_content_format(coap_pkt_t *pdu)
+{
+    return coap_get_content_type(pdu);
+}
+
+static inline ssize_t gcoap_pkt_opt_add_content_format(coap_pkt_t *pdu, uint16_t format)
+{
+    return coap_opt_add_format(pdu, format);
+}
+
+static inline ssize_t gcoap_pkt_opt_get_uri_query(const coap_pkt_t *pdu, char *query,
+                                                  size_t max_len)
+{
+    return coap_opt_get_string(pdu, COAP_OPT_URI_QUERY, (uint8_t *)query, max_len, '&');
+}
+
+static inline ssize_t gcoap_pkt_opt_add_uri_query(coap_pkt_t *pdu, const char *key, size_t key_len,
+                                                  const char *value, size_t value_len)
+{
+    return coap_opt_add_uri_query2(pdu, key, key_len, value, value_len);
+}
+
+static inline ssize_t gcoap_pkt_opt_add_uri_query_str(coap_pkt_t *pdu, const char *key,
+                                                      const char *value)
+{
+    return coap_opt_add_uri_query(pdu, key, value);
+}
+
+static inline unsigned gcoap_pkt_opt_get_accept(coap_pkt_t *pdu)
+{
+    uint32_t ret;
+
+    if (coap_opt_get_uint(pdu, COAP_OPT_ACCEPT, &ret) < 0) {
+        return COAP_FORMAT_NONE;
+    }
+    return ret;
+}
+
+static inline ssize_t gcoap_pkt_opt_add_accept(coap_pkt_t *pdu, uint16_t format)
+{
+    return coap_opt_add_accept(pdu, format);
+}
+
+static inline int gcoap_pkt_opt_get_block1(coap_pkt_t *pdu, coap_block1_t *block)
+{
+    return coap_get_block1(pdu, block);
+}
+
+static inline ssize_t gcoap_pkt_opt_add_block1(coap_pkt_t *pdu, coap_block1_t *block)
+{
+    return coap_opt_add_block1_control(pdu, block);
+}
+
+static inline int gcoap_pkt_opt_get_block2(coap_pkt_t *pdu, coap_block1_t *block)
+{
+    return coap_get_block2(pdu, block);
+}
+
+static inline ssize_t gcoap_pkt_opt_add_block2(coap_pkt_t *pdu, coap_block1_t *block)
+{
+    return coap_opt_add_block2_control(pdu, block);
+}
+
+static inline ssize_t gcoap_pkt_opt_get_proxy_uri(coap_pkt_t *pdu, char **uri)
+{
+    return coap_get_proxy_uri(pdu, uri);
+}
+
+static inline ssize_t gcoap_pkt_opt_add_proxy_uri(coap_pkt_t *pdu, const char *uri)
+{
+    return coap_opt_add_proxy_uri(pdu, uri);
+}
+/** @} */
+
+/**
+ * @name Payload manipulation
+ * @{
+ */
+static inline ssize_t gcoap_pkt_finish(coap_pkt_t *pdu)
+{
+    return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
+}
+
+static inline ssize_t gcoap_pkt_get_payload(coap_pkt_t *pdu, uint8_t **payload)
+{
+    *payload = pdu->payload;
+    return pdu->payload_len;
+}
+
+static inline ssize_t gcoap_pkt_set_payload(coap_pkt_t *pdu, uint8_t *payload, size_t payload_len)
+{
+    ssize_t res = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
+    if ((res < 0) || (pdu->payload_len < payload_len)) {
+        return -ENOSPC;
+    }
+    memcpy(pdu->payload, payload, payload_len);
+    pdu->payload_len = payload_len;
+    return res + payload_len;
+}
+/** @} */
+
+/**
+ * @name    Other helper functions
+ * @{
+ */
+static inline int gcoap_resource_match_path(const coap_resource_t *resource, uint8_t *uri)
+{
+    return coap_match_path(resource, uri);
+}
+/** @} */
+/** @} */
 
 #ifdef __cplusplus
 }
