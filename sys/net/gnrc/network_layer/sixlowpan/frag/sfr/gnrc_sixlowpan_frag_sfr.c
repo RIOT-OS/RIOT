@@ -13,6 +13,8 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <stddef.h>
+
 #include "irq.h"
 #include "kernel_defines.h"
 #ifdef MODULE_GNRC_IPV6_NIB
@@ -106,7 +108,7 @@ static gnrc_sixlowpan_frag_sfr_stats_t _stats;
  *
  * @return  A gnrc_sixlowpan_frag_sfr_bitmap_t.
  */
-static inline gnrc_sixlowpan_frag_sfr_bitmap_t *_to_bitmap(uint8_t *bitmap);
+static inline gnrc_sixlowpan_frag_sfr_bitmap_t *_get_bitmap(gnrc_sixlowpan_frag_rb_t *frag_rb);
 
 /**
  * @brief   Checks if fragment represented by a fragment descriptor requested an
@@ -927,7 +929,7 @@ static void _try_reassembly(gnrc_netif_hdr_t *netif_hdr,
                       entry->entry.rb->received[3],
                       entry->entry.base->current_size,
                       entry->entry.base->datagram_size);
-                bitmap = _to_bitmap(entry->entry.rb->received);
+                bitmap = _get_bitmap(entry->entry.rb);
                 if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
                     _stats.acks.partly++;
                 }
@@ -1209,9 +1211,14 @@ static void _check_failed_frags(sixlowpan_sfr_ack_t *ack,
 
 /* ====== INTERNAL FUNCTIONS USED BY PUBLIC FUNCTIONS ======
  * ====== AND TO MANIPULATE INTERNAL DATA STRUCTURES  ====== */
-static inline gnrc_sixlowpan_frag_sfr_bitmap_t *_to_bitmap(uint8_t *bitmap)
+static inline gnrc_sixlowpan_frag_sfr_bitmap_t *_get_bitmap(gnrc_sixlowpan_frag_rb_t *frag_rb)
 {
-    return (gnrc_sixlowpan_frag_sfr_bitmap_t *)bitmap;
+    DECLARE_CONSTANT(is_aligned,
+        HAS_ALIGNMENT_OF(offsetof(gnrc_sixlowpan_frag_rb_t, received),
+                         alignof(gnrc_sixlowpan_frag_sfr_bitmap_t)))
+    static_assert(is_aligned,
+                  "gnrc_sixlowpan_frag_rb_t::received must be suitably aligned");
+    return (gnrc_sixlowpan_frag_sfr_bitmap_t *)(uintptr_t)frag_rb->received;
 }
 
 static inline bool _frag_ack_req(_frag_desc_t *frag)
