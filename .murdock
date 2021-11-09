@@ -449,8 +449,20 @@ get_non_compile_jobs() {
 }
 
 get_jobs() {
+    # supporting murdock-scripts calling "get_jobs()"
+    # TODO: remove this, rename real_get_jobs, when murdock-scripts are
+    # migrated
+    echo "build"
+}
+
+real_get_jobs() {
     get_non_compile_jobs
     get_compile_jobs
+}
+
+build() {
+    dwqc ${DWQ_ENV} "./.murdock real_get_jobs" | dwqc ${DWQ_ENV} --subjob
+    echo "Build started."
 }
 
 $*
