@@ -42,6 +42,15 @@ This way, their names are never removed from the RIOT repository.
 
 # Removed Features
 
+### pkg/libcoap [d83d08f0995a88f399e70a7d07b44dd780082436]
+
+Author:
+- Martine Lenders <mlenders@inf.fu-berlin.de>
+
+Reasons for removal:
+- Not maintained anymore, no updates for 8 years
+- Upstream libcoap allows building with RIOT, so there is a migration path for users
+
 ### sys/net/gnrc/nettest [cdc252ab7bd4161cc046bf93a3e55995704b24d4]
 Author:
 - Martine Lenders <mlenders@inf.fu-berlin.de>
