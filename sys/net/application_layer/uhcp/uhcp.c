@@ -17,7 +17,7 @@ void uhcp_handle_udp(uint8_t *buf, size_t len, uint8_t *src, uint16_t port, uhcp
 {
     char addr_str[INET6_ADDRSTRLEN];
     inet_ntop(AF_INET6, src, addr_str, INET6_ADDRSTRLEN);
-    LOG_INFO("got packet from %s port %u\n", addr_str, (unsigned)port);
+    LOG_DEBUG("got packet from %s port %u\n", addr_str, (unsigned)port);
 
     if (len < sizeof(uhcp_req_t)) {
         LOG_ERROR("error: packet too small.\n");
@@ -39,7 +39,7 @@ void uhcp_handle_udp(uint8_t *buf, size_t len, uint8_t *src, uint16_t port, uhcp
         LOG_ERROR("error: wrong protocol version.\n");
     }
 
-    switch(type) {
+    switch (type) {
 #ifdef UHCP_SERVER
         case UHCP_REQ:
             if (len < sizeof(uhcp_req_t)) {
@@ -108,7 +108,7 @@ void uhcp_handle_push(uhcp_push_t *req, uint8_t *src, uint16_t port, uhcp_iface_
 
     inet_ntop(AF_INET6, prefix, prefix_str, INET6_ADDRSTRLEN);
 
-    LOG_INFO("uhcp: push from %s:%u prefix=%s/%u\n", addr_str, (unsigned)port,
+    LOG_DEBUG("uhcp: push from %s:%u prefix=%s/%u\n", addr_str, (unsigned)port,
              prefix_str, req->prefix_len);
     uhcp_handle_prefix(prefix, req->prefix_len, 0xFFFF, src, iface);
 }
