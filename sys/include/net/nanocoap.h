@@ -350,6 +350,22 @@ static inline unsigned coap_get_token_len(const coap_pkt_t *pkt)
 }
 
 /**
+ * @brief   Re-set a message's token length [in byte]
+ *
+ * @param[in] pkt       CoAP packet
+ * @param[in] token_len Desired length of the token
+ *
+ * @warning This should only be used to change the token length before any options are added or for
+ *          an empty CoAP message. The data after the token is not moved by this function.
+ */
+static inline void coap_set_token_len(coap_pkt_t *pkt, uint8_t token_len)
+{
+    assert(!(token_len & 0x0f));    /* token_len <= 0xf */
+
+    pkt->hdr->ver_t_tkl &= (0xf0 | token_len);
+}
+
+/**
  * @brief   Get the total header length (4-byte header + token length)
  *
  * @param[in]   pkt   CoAP packet
