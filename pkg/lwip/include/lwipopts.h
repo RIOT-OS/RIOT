@@ -32,7 +32,7 @@ extern "C" {
  * @see     lwIP documentation
  * @{
  */
-#ifdef MODULE_LWIP_ARP
+#if defined(MODULE_LWIP_ARP) && defined(MODULE_LWIP_ETHERNET)
 #define LWIP_ARP                1
 #else  /* MODULE_LWIP_ARP */
 #define LWIP_ARP                0
