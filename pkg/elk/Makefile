@@ -5,6 +5,7 @@ PKG_LICENSE=GPLv2
 
 include $(RIOTBASE)/pkg/pkg.mk
 
+CFLAGS += -Wno-cast-align
 CFLAGS += -Wno-format-nonliteral
 CFLAGS += -Wno-pedantic
 CFLAGS += -Wno-unused-parameter
