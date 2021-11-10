@@ -91,6 +91,26 @@ typedef int32_t     sword_t;
 #define WORD_ALIGNED __attribute__((aligned(ARCHITECTURE_WORD_BYTES)))
 
 /**
+ * @brief       Check if @p addr is alignment to @p alignment
+ * @param[in]   addr        Address to check for being aligned
+ * @param[in]   alignment   Alignment to check for
+ * @pre         @p alignment is a power of two. (But this is naturally
+ *              fulfilled, as all possible alignment requirements in C
+ *              are powers of two.)
+ * @retval      1           @p addr is aligned to @p alignment
+ * @retval      0           @p addr is unaligned
+ */
+#define HAS_ALIGNMENT_OF(addr, alignment) (((uintptr_t)(addr) & ((alignment) - 1)) == 0)
+
+/**
+ * @brief       Check if @p addr is word-aligned
+ * @param[in]   addr        Address to check for word alignment
+ * @retval      1           @p addr is word-aligned
+ * @retval      0           @p addr is unaligned
+ */
+#define IS_WORD_ALIGNED(addr) HAS_ALIGNMENT_OF(addr, ARCHITECTURE_WORD_BYTES)
+
+/**
  * @brief   Smallest number an uword_t can hold
  */
 #define UWORD_MIN                   0

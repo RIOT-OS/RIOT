@@ -48,23 +48,30 @@ int main(void)
      * with the non-C11 fallback implementation of static_assert, so we just
      * use a single use statement.
      */
-    static_assert(
-        (ARCHITECTURE_WORD_BITS == CORRECT_WORD_BITS) &&
-        (ARCHITECTURE_WORD_BYTES == CORRECT_WORD_BITS / 8) &&
-        (sizeof(uword_t) == ARCHITECTURE_WORD_BYTES) &&
-        (sizeof(sword_t) == ARCHITECTURE_WORD_BYTES) &&
-        (UWORD_MIN == 0) &&
-        ((ARCHITECTURE_WORD_BITS != 8) || (UWORD_MAX == 255)) &&
-        ((ARCHITECTURE_WORD_BITS != 8) || (SWORD_MIN == -128)) &&
-        ((ARCHITECTURE_WORD_BITS != 8) || (SWORD_MAX == 127)) &&
-        ((ARCHITECTURE_WORD_BITS != 16) || (UWORD_MAX == 65535)) &&
-        ((ARCHITECTURE_WORD_BITS != 16) || (SWORD_MIN == -32768)) &&
-        ((ARCHITECTURE_WORD_BITS != 16) || (SWORD_MAX == 32767)) &&
-        ((ARCHITECTURE_WORD_BITS != 32) || (UWORD_MAX == 4294967295)) &&
-        ((ARCHITECTURE_WORD_BITS != 32) || (SWORD_MIN == -2147483648)) &&
-        ((ARCHITECTURE_WORD_BITS != 32) || (SWORD_MAX == 2147483647)),
-        "word size details are incorrect"
-    );
+     static_assert((ARCHITECTURE_WORD_BITS == CORRECT_WORD_BITS)
+                   && (ARCHITECTURE_WORD_BYTES == CORRECT_WORD_BITS / 8)
+                   && (sizeof(uword_t) == ARCHITECTURE_WORD_BYTES)
+                   && (sizeof(sword_t) == ARCHITECTURE_WORD_BYTES)
+                   && (UWORD_MIN == 0)
+                   && ((ARCHITECTURE_WORD_BITS != 8) || (UWORD_MAX == 255))
+                   && ((ARCHITECTURE_WORD_BITS != 8) || (SWORD_MIN == -128))
+                   && ((ARCHITECTURE_WORD_BITS != 8) || (SWORD_MAX == 127))
+                   && ((ARCHITECTURE_WORD_BITS != 16) || (UWORD_MAX == 65535))
+                   && ((ARCHITECTURE_WORD_BITS != 16) || (SWORD_MIN == -32768))
+                   && ((ARCHITECTURE_WORD_BITS != 16) || (SWORD_MAX == 32767))
+                   && ((ARCHITECTURE_WORD_BITS != 32) || (UWORD_MAX == 4294967295))
+                   && ((ARCHITECTURE_WORD_BITS != 32) || (SWORD_MIN == -2147483648))
+                   && ((ARCHITECTURE_WORD_BITS != 32) || (SWORD_MAX == 2147483647)),
+                   "word size details are incorrect");
+
+    DECLARE_CONSTANT(_workaround, HAS_ALIGNMENT_OF((void *)3, 1)
+                                  && HAS_ALIGNMENT_OF((void *)8, 2)
+                                  && HAS_ALIGNMENT_OF((void *)8, 4)
+                                  && HAS_ALIGNMENT_OF((void *)8, 8)
+                                  && !HAS_ALIGNMENT_OF((void *)7, 2)
+                                  && !HAS_ALIGNMENT_OF((void *)7, 4)
+                                  && !HAS_ALIGNMENT_OF((void *)7, 8))
+    static_assert(_workaround, "HAS_ALIGNMENT_OF() is not working");
 
     printf("One word is %u bits or %u bytes in size\n",
            ARCHITECTURE_WORD_BITS, ARCHITECTURE_WORD_BYTES);
