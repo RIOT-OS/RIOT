@@ -161,7 +161,7 @@ err_t lwip_netdev_init(struct netif *netif)
             }
             /* netif_create_ip6_linklocal_address() does weird byte-swapping
              * with full IIDs, so let's do it ourselves */
-            addr = &(netif->ip6_addr[0]);
+            addr = ip_2_ip6(&(netif->ip6_addr[0]));
             /* addr->addr is a uint32_t array */
             if (l2util_ipv6_iid_from_addr(dev_type,
                                           netif->hwaddr, netif->hwaddr_len,
