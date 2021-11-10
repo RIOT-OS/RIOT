@@ -18,19 +18,23 @@
  * @}
  */
 
-#include <stdio.h>
 #include <inttypes.h>
+#include <stdalign.h>
+#include <stdio.h>
 
 #include "model.h"
 
-/* the digit array included must be 4-byte aligned */
-__attribute__((__aligned__(4)))
+/* the digit array will be casted to float, so it has to meet that alignment */
+alignas(float)
 #include "blob/digit.h"
 
 int main(void)
 {
+    /* Use intermediate cast to uintptr_t to silence -Wcast-align. Since
+     * we add the alignas() attribute, the alignment is ensured */
+    const float *digit_as_float = (const float *)(uintptr_t)digit;
     printf("Predicted digit: %" PRIi32 "\n",
-           model_predict((const float *)digit, digit_len >> 2));
+           model_predict(digit_as_float, digit_len >> 2));
 
     return 0;
 }
