@@ -1,5 +1,5 @@
 CFLAGS?=-g -O3 -Wall
-CFLAGS_EXTRA=-DUHCP_SERVER
+CFLAGS_EXTRA=-DMODULE_UHCPD
 all: bin bin/uhcpd
 
 bin:
