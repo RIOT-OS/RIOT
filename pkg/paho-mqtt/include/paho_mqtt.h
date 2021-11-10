@@ -20,7 +20,6 @@
 #define PAHO_MQTT_H
 
 #include "mutex.h"
-#include "xtimer.h"
 #include "thread.h"
 #include "net/sock/tcp.h"
 
@@ -54,8 +53,8 @@ extern "C" {
  *
  */
 typedef struct {
-    xtimer_ticks64_t set_ticks;             /**< timeout ticks */
-    xtimer_ticks64_t ticks_timeout;         /**< timeout in ticks */
+    uint32_t timeout;                   /**< timeout in ms */
+    uint32_t time_set;                  /**< set time in ms */
 } Timer;
 
 /**
