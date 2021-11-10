@@ -14,7 +14,7 @@ def testfunc(child):
     child.expect(r"BACKTRACE_SIZE: (\d+)\r\n")
     trace_size = int(child.match.group(1))
     for i in range(trace_size):
-        child.expect(r"0x[0-9a-f]{7,8}")
+        child.expect(r"0x[0-9a-f]+")
 
     print("All tests successful")
 
