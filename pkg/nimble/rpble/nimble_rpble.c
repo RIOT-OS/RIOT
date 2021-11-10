@@ -118,7 +118,7 @@ static void _on_scan_evt(uint8_t type,
     int res;
 
     /* filter out all non-connectible advertisements */
-    if (type != BLE_HCI_ADV_TYPE_ADV_IND) {
+    if (type != BLE_HCI_ADV_RPT_EVTYPE_ADV_IND) {
         return;
     }
 

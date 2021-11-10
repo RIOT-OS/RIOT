@@ -138,7 +138,7 @@ static void _on_scan_evt(uint8_t type, const ble_addr_t *addr, int8_t rssi,
 
     /* we are only interested in ADV_IND packets, the rest can be dropped right
      * away */
-    if (type != BLE_HCI_ADV_TYPE_ADV_IND) {
+    if (type != BLE_HCI_ADV_RPT_EVTYPE_ADV_IND) {
         return;
     }
 
