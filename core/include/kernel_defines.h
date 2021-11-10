@@ -225,6 +225,37 @@ extern "C" {
 #define RIOT_VERSION_NUM(major, minor, patch, extra)   \
     (((0ULL + major) << 48) + ((0ULL + minor) << 32) + \
      ((0ULL + patch) << 16) + (extra))
+
+/**
+ * @brief   Disable -Wpedantic for the argument, but restore diagnostic
+ *          settings afterwards
+ * @param   ...     The expression that -Wpendantic should not apply to
+ *
+ * @warning This is intended for internal use only
+ *
+ * This is particularly useful when declaring non-strictly conforming
+ * preprocessor macros, as the diagnostics need to be disabled where the
+ * macro is evaluated, not where the macro is declared.
+ */
+#define WITHOUT_PEDANTIC(...) \
+    _Pragma("GCC diagnostic push") \
+    _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
+    __VA_ARGS__ \
+    _Pragma("GCC diagnostic pop")
+
+/**
+ * @brief   Declare a constant named @p identifier as anonymous `enum` that has
+ *          the value @p const_expr
+ *
+ * @warning This is intended for internal use only
+ *
+ * This turns any expression that is constant and known at compile time into
+ * a formal compile time constant. This allows e.g. using non-formally but
+ * still constant expressions in `static_assert()`.
+ */
+#define DECLARE_CONSTANT(identifier, const_expr) \
+    WITHOUT_PEDANTIC(enum { identifier = const_expr };)
+
 /**
  * @cond INTERNAL
  */
