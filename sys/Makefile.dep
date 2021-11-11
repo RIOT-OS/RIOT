@@ -723,7 +723,8 @@ ifneq (,$(filter suit_transport_%, $(USEMODULE)))
 endif
 
 ifneq (,$(filter suit_transport_coap, $(USEMODULE)))
-  USEMODULE += nanocoap
+  USEMODULE += nanocoap_sock
+  USEMODULE += sock_util
 endif
 
 ifneq (,$(filter suit_storage_%, $(USEMODULE)))
