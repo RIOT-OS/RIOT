@@ -5,15 +5,7 @@
 # directory for more details.
 #
 
-menuconfig MODULE_ZTIMER
-    bool "ztimer - High level timer abstraction layer"
-    depends on TEST_KCONFIG
-    select MODULE_ZTIMER_CORE
-    select MODULE_ZTIMER_CONVERT_FRAC
-    select MODULE_ZTIMER_CONVERT_SHIFT
-    select MODULE_ZTIMER_EXTEND
-
-if MODULE_ZTIMER
+menu "ztimer - High level timer abstraction layer"
 
 config ZTIMER_CUSTOM_BACKEND_CONFIGURATION
     bool "Override default backend selection"
@@ -45,12 +37,21 @@ endmenu # Backends
 
 menu "Clocks"
 
-config MODULE_ZTIMER_USEC
+# TODO: this extra indirection in the entry point for ztimer_usec is required
+# to allow xtimer compatibility modules to depend on ztimer being there while
+# still selecting ztimer_usec.
+config ZTIMER_USEC
     bool "Microseconds"
+    select MODULE_ZTIMER_USEC
+    select MODULE_ZTIMER
+
+config MODULE_ZTIMER_USEC
+    bool
     select MODULE_ZTIMER_PERIPH_TIMER
 
 config MODULE_ZTIMER_MSEC
     bool "Milliseconds"
+    select MODULE_ZTIMER
 
 choice
     bool "Backend"
@@ -70,6 +71,7 @@ endchoice
 
 config MODULE_ZTIMER_SEC
     bool "Seconds"
+    select MODULE_ZTIMER
 
 choice
     bool "Backend"
@@ -95,6 +97,7 @@ endchoice
 endmenu # Clocks
 
 menu "Frequency conversion"
+    depends on MODULE_ZTIMER
 
 config MODULE_ZTIMER_CONVERT_MULDIV64
     bool "64-bits arithmetic conversion"
@@ -132,15 +135,16 @@ menu "xtimer and evtimer compatibility"
 
 choice
     bool "xtimer compatibility"
-    optional
-    depends on MODULE_ZTIMER_USEC
+    depends on MODULE_XTIMER && MODULE_ZTIMER
 
 config MODULE_XTIMER_ON_ZTIMER
     bool "ztimer_usec as timer backend for xtimer"
+    select MODULE_ZTIMER_USEC
 
 config MODULE_ZTIMER_XTIMER_COMPAT
     bool "map xtimer calls to ztimer"
     select MODULE_DIV
+    select MODULE_ZTIMER_USEC
     help
         This is a wrapper of xtimer API on ztimer_usec and is currently
         incomplete. Unless doing testing, use xtimer on ztimer.
@@ -157,6 +161,15 @@ config MODULE_EVTIMER_ON_ZTIMER
 
 endmenu # xtimer compatibility
 
+config MODULE_ZTIMER
+    bool
+    depends on TEST_KCONFIG
+    select MODULE_ZTIMER_CORE
+    select MODULE_ZTIMER_CONVERT_FRAC
+    select MODULE_ZTIMER_CONVERT_SHIFT
+    select MODULE_ZTIMER_EXTEND
+
+if MODULE_ZTIMER
 
 # TODO: only use MODULE_ZTIMER_AUTO_INIT, for now we try to get the same modules
 # as the Makefile dependency resolution. See sys/ztimer/Makefile.dep for more
@@ -191,3 +204,5 @@ config MODULE_ZTIMER_EXTEND
     bool
 
 endif # MODULE_ZTIMER
+
+endmenu

@@ -2,5 +2,5 @@
 # application configuration. This is only needed during migration.
 CONFIG_MODULE_SM_PWM_01C=y
 CONFIG_MODULE_ZTIMER=y
-CONFIG_MODULE_ZTIMER_USEC=y
+CONFIG_ZTIMER_USEC=y
 CONFIG_MODULE_PROGRESS_BAR=y
