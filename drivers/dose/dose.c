@@ -48,8 +48,9 @@ static int send_octet(dose_t *ctx, uint8_t c);
 static int _send(netdev_t *dev, const iolist_t *iolist);
 static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len);
 static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t len);
-static int _set_state(dose_t *ctx, netopt_state_t state);
 static int _init(netdev_t *dev);
+static void _poweron(dose_t *dev);
+static void _poweroff(dose_t *dev, dose_state_t sleep_state);
 
 static uint16_t crc16_update(uint16_t crc, uint8_t octet)
 {
@@ -446,7 +447,7 @@ static int _send(netdev_t *dev, const iolist_t *iolist)
 
     /* sending data wakes the interface from STANDBY */
     if (ctx->state == DOSE_STATE_STANDBY) {
-        _set_state(ctx, NETOPT_STATE_IDLE);
+        _poweron(ctx);
     }
 
 send:
@@ -537,37 +538,55 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
     return 0;
 }
 
-static void _gpio_try_set(gpio_t pin)
+static void _poweron(dose_t *ctx)
 {
-    if (gpio_is_valid(pin)) {
-        gpio_set(pin);
+    /* interface is already powered on - do nothing */
+    if (ctx->state != DOSE_STATE_STANDBY &&
+        ctx->state != DOSE_STATE_SLEEP) {
+        return;
     }
+
+    if (gpio_is_valid(ctx->standby_pin)) {
+        gpio_clear(ctx->standby_pin);
+    }
+
+    uart_poweron(ctx->uart);
+    _enable_sense(ctx);
+
+    ctx->state = DOSE_STATE_IDLE;
 }
 
-static void _gpio_try_clear(gpio_t pin)
+static void _poweroff(dose_t *ctx, dose_state_t sleep_state)
 {
-    if (gpio_is_valid(pin)) {
-        gpio_clear(pin);
+    /* interface is already powered off - do nothing */
+    if (ctx->state == DOSE_STATE_STANDBY ||
+        ctx->state == DOSE_STATE_SLEEP) {
+        return;
     }
+
+    wait_for_state(ctx, DOSE_STATE_IDLE);
+
+    if (gpio_is_valid(ctx->standby_pin)) {
+        gpio_set(ctx->standby_pin);
+    }
+
+    _disable_sense(ctx);
+    uart_poweroff(ctx->uart);
+
+    ctx->state = sleep_state;
 }
 
 static int _set_state(dose_t *ctx, netopt_state_t state)
 {
     switch (state) {
     case NETOPT_STATE_STANDBY:
-        _gpio_try_set(ctx->standby_pin);
-        uart_poweroff(ctx->uart);
-        ctx->state = DOSE_STATE_STANDBY;
+        _poweroff(ctx, DOSE_STATE_STANDBY);
         return sizeof(netopt_state_t);
     case NETOPT_STATE_SLEEP:
-        _gpio_try_set(ctx->standby_pin);
-        uart_poweroff(ctx->uart);
-        ctx->state = DOSE_STATE_SLEEP;
+        _poweroff(ctx, DOSE_STATE_SLEEP);
         return sizeof(netopt_state_t);
     case NETOPT_STATE_IDLE:
-        uart_poweron(ctx->uart);
-        _gpio_try_clear(ctx->standby_pin);
-        ctx->state = DOSE_STATE_IDLE;
+        _poweron(ctx);
         return sizeof(netopt_state_t);
     default:
         break;
