@@ -5,7 +5,7 @@
 # directory for more details.
 #
 
-config MODULE_DFPLAYER
+menuconfig MODULE_DFPLAYER
     bool "DFPlayer Mini MP3 Player"
     depends on HAS_PERIPH_UART
     depends on HAS_PERIPH_GPIO
@@ -16,3 +16,14 @@ config MODULE_DFPLAYER
     select HAVE_MULTIMEDIA_DEVICE
 # Perhaps this could be moved to its own symbol to enable the dfplayer commands
     select MODULE_FMT if MODULE_SHELL_COMMANDS
+
+config DFPLAYER_NO_STRERROR
+    bool
+    prompt "Avoid using strerror in shell command" if !(HAS_ARCH_AVR8 || HAS_ARCH_MSP430)
+    depends on MODULE_DFPLAYER
+    depends on MODULE_SHELL_COMMANDS
+    # no strerror() on AVR and MSP430
+    default y if (HAS_ARCH_AVR8 || HAS_ARCH_MSP430)
+    help
+        Say y to print error codes as numbers when using the shell, instead of the corresponding
+        standard error string.
