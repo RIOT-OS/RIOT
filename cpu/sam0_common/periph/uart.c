@@ -95,14 +95,16 @@ static inline void _reset(SercomUsart *dev)
 #endif
 }
 
-static void _set_baud(uart_t uart, uint32_t baudrate)
+static void _set_baud(uart_t uart, uint32_t baudrate, uint32_t f_src)
 {
-    const uint32_t f_src = sam0_gclk_freq(uart_config[uart].gclk_src);
 #if IS_ACTIVE(CONFIG_SAM0_UART_BAUD_FRAC)
     /* Asynchronous Fractional */
-    uint32_t baud = (((f_src * 8) / baudrate) / 16);
-    dev(uart)->BAUD.FRAC.FP = (baud % 8);
-    dev(uart)->BAUD.FRAC.BAUD = (baud / 8);
+    /* BAUD + FP / 8 = f_src / (S * f_baud)       */
+    /* BAUD * 8 + FP = (8 * f_src) / (S * f_baud) */
+    /* S * (BAUD + 8 * FP) = (8 * f_src) / f_baud */
+    uint32_t baud = (f_src * 8) / baudrate;
+    dev(uart)->BAUD.FRAC.FP = (baud >> 4) & 0x7; /* baud / 16 */
+    dev(uart)->BAUD.FRAC.BAUD = baud >> 7; /* baud / (8 * 16) */
 #else
     /* Asynchronous Arithmetic */
     /* BAUD = 2^16     * (2^0 - 2^4 * f_baud / f_src)     */
@@ -180,12 +182,27 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* configure clock generator */
     sercom_set_gen(dev(uart), uart_config[uart].gclk_src);
 
+    uint32_t f_src = sam0_gclk_freq(uart_config[uart].gclk_src);
+
+#if IS_ACTIVE(CONFIG_SAM0_UART_BAUD_FRAC)
+    uint32_t sampr;
+    /* constraint: f_baud ≤ f_src / S */
+    if (baudrate * 16 > f_src) {
+        /* 8x oversampling */
+        sampr = SERCOM_USART_CTRLA_SAMPR(0x3);
+        f_src <<= 1;
+    } else {
+        /* 16x oversampling */
+        sampr = SERCOM_USART_CTRLA_SAMPR(0x1);
+    }
+#endif
+
     /* set asynchronous mode w/o parity, LSB first, TX and RX pad as specified
      * by the board in the periph_conf.h, x16 sampling and use internal clock */
     dev(uart)->CTRLA.reg = SERCOM_USART_CTRLA_DORD
 #if IS_ACTIVE(CONFIG_SAM0_UART_BAUD_FRAC)
     /* enable Asynchronous Fractional mode */
-                         | SERCOM_USART_CTRLA_SAMPR(0x1)
+                         | sampr
 #endif
                          | SERCOM_USART_CTRLA_TXPO(uart_config[uart].tx_pad)
                          | SERCOM_USART_CTRLA_RXPO(uart_config[uart].rx_pad)
@@ -197,7 +214,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     }
 
     /* calculate and set baudrate */
-    _set_baud(uart, baudrate);
+    _set_baud(uart, baudrate, f_src);
 
     /* enable transmitter, and configure 8N1 mode */
     if (uart_config[uart].tx_pin != GPIO_UNDEF) {
