@@ -27,7 +27,12 @@
 #include "thread.h"
 #include "fmt.h"
 
+#if IS_USED(MODULE_PERIPH_RTC)
 #include "periph/rtc.h"
+#else
+#include "timex.h"
+#include "ztimer.h"
+#endif
 
 #include "net/loramac.h"
 #include "semtech_loramac.h"
@@ -45,7 +50,7 @@
 #endif
 
 /* Messages are sent every 20s to respect the duty cycle on each channel */
-#define PERIOD              (20U)
+#define PERIOD_S            (20U)
 
 #define SENDER_PRIO         (THREAD_PRIORITY_MAIN - 1)
 static kernel_pid_t sender_pid;
@@ -58,6 +63,9 @@ static sx127x_t sx127x;
 #if IS_USED(MODULE_SX126X)
 static sx126x_t sx126x;
 #endif
+#if !IS_USED(MODULE_PERIPH_RTC)
+static ztimer_t timer;
+#endif
 
 static const char *message = "This is RIOT!";
 
@@ -65,7 +73,7 @@ static uint8_t deveui[LORAMAC_DEVEUI_LEN];
 static uint8_t appeui[LORAMAC_APPEUI_LEN];
 static uint8_t appkey[LORAMAC_APPKEY_LEN];
 
-static void rtc_cb(void *arg)
+static void _alarm_cb(void *arg)
 {
     (void) arg;
     msg_t msg;
@@ -74,12 +82,17 @@ static void rtc_cb(void *arg)
 
 static void _prepare_next_alarm(void)
 {
+#if IS_USED(MODULE_PERIPH_RTC)
     struct tm time;
     rtc_get_time(&time);
     /* set initial alarm */
-    time.tm_sec += PERIOD;
+    time.tm_sec += PERIOD_S;
     mktime(&time);
-    rtc_set_alarm(&time, rtc_cb, NULL);
+    rtc_set_alarm(&time, _alarm_cb, NULL);
+#else
+    timer.callback = _alarm_cb;
+    ztimer_set(ZTIMER_MSEC, &timer, PERIOD_S * MS_PER_SEC);
+#endif
 }
 
 static void _send_message(void)

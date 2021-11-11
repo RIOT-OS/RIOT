@@ -27,7 +27,7 @@ USEPKG += semtech-loramac
 
 USEMODULE += $(DRIVER)
 USEMODULE += fmt
-FEATURES_REQUIRED += periph_rtc
+FEATURES_OPTIONAL += periph_rtc
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
