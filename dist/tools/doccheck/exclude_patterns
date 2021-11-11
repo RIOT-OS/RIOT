@@ -14564,3 +14564,6 @@ boards/stm32g0316\-disco/include/periph_conf\.h:[0-9]+: warning: Member timer_co
 boards/stm32g0316\-disco/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32g0316\-disco/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32g0316\-disco/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/lora\-e5\-dev/include/board\.h:[0-9]+: warning: Member SX126X_PARAM_TX_PA_MODE \(macro definition\) of file board\.h is not documented\.
+drivers/sx126x/include/sx126x_params\.h:[0-9]+: warning: Member SX126X_PARAM_TX_PA_MODE \(macro definition\) of file sx126x_params\.h is not documented\.
+drivers/sx126x/include/sx126x_params\.h:[0-9]+: warning: Member SX126X_TX_PA_MODE \(macro definition\) of file sx126x_params\.h is not documented\.

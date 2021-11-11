@@ -95,6 +95,7 @@ typedef struct {
      * @ brief  Interface to set RF switch parameters
      */
     void(*set_rf_mode)(sx126x_t *dev, sx126x_rf_mode_t rf_mode);
+    sx126x_rf_mode_t tx_pa_mode;        /**< Power amplifier TX operating mode*/
 #endif
 } sx126x_params_t;
 
