@@ -11,6 +11,7 @@
  *
  * @file
  */
+#include "assert.h"
 #include "embUnit.h"
 #include "kernel_defines.h"
 
@@ -55,11 +56,33 @@ static void test_index_of(void)
     TEST_ASSERT_EQUAL_INT(17, index_of(bar, &bar[17]));
 }
 
+static void test_declare_constant(void)
+{
+    /* the expression that is assigned to foo is not an integer constant expression,
+     * but it is still constant.
+     */
+    DECLARE_CONSTANT(foo, (uintptr_t)((void *) 7) & 3);
+
+    /* static_assert() only excepts integer constant expressions. If that
+     * compiles, foo is an integer constant expression (even though the value
+     * assigned to it was not an integer constant expression */
+    static_assert(foo == 3, "ensure correct value of constant foo");
+
+    /* temporarily add -Werror=vla to ensure that using foo as length in an
+     * array does not create variable length arrays */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic error "-Wvla"
+    char test_array[foo];
+#pragma GCC diagnostic pop
+    static_assert(sizeof(test_array) == 3, "test_array should be 3 bytes long");
+}
+
 Test *tests_kernel_defines_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_kernel_version),
         new_TestFixture(test_index_of),
+        new_TestFixture(test_declare_constant),
     };
 
     EMB_UNIT_TESTCALLER(kernel_defines_tests, NULL, NULL, fixtures);
