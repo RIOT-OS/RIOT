@@ -1,0 +1,28 @@
+From 540627a749f627df4a23fe3fc03757f37616c2eb Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Thu, 11 Nov 2021 09:51:13 +0100
+Subject: [PATCH] cmake: Use -std=c11 instead of -std=c99
+
+---
+ src/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index a56946be..a30f77fc 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -89,9 +89,9 @@ if(CCNL_RIOT)
+ endif()
+ 
+ if (NOT CCNL_RIOT)
+-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -Werror -std=c99 -g -pedantic") #TODO: add -fsanitize=address
++    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -Werror -std=c11 -g -pedantic") #TODO: add -fsanitize=address
+ else()
+-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -Werror -std=c99 -g")
++    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -Werror -std=c11 -g")
+ endif()
+ 
+ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -g")
+-- 
+2.33.1
+
