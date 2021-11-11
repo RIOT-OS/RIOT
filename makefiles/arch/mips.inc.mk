@@ -23,13 +23,9 @@ ifeq ($(ROMABLE),1)
   MIPS_HAL_LDFLAGS += -T bootcode.ld
 endif
 
-# define build specific options
-# Remove -std=gnu99 once the MIPS toolchain headers are updated to include upstream
-# newlib commit 81c17949f0419d1c4fee421c60987ea1149522ae
-# https://cygwin.com/git/gitweb.cgi?p=newlib-cygwin.git;a=commitdiff;h=81c17949f0419d1c4fee421c60987ea1149522ae
 # Otherwise we get an error about a missing declaration of strnlen in some parts.
 ifeq (, $(filter -std=%, $(CFLAGS)))
-  CFLAGS += -std=gnu99
+  CFLAGS += -std=gnu11
 endif
 CFLAGS_CPU   = -EL -mabi=$(ABI)
 CFLAGS_LINK  = -ffunction-sections -fno-builtin -fshort-enums -fdata-sections
