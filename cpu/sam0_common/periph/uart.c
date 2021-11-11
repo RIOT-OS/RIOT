@@ -314,6 +314,7 @@ void uart_poweron(uart_t uart)
 {
     sercom_clk_en(dev(uart));
     dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
+    _syncbusy(dev(uart));
 }
 
 void uart_poweroff(uart_t uart)
