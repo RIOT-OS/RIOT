@@ -680,7 +680,10 @@ void dose_setup(dose_t *ctx, const dose_params_t *params, uint8_t index)
     /* The timeout base is the minimal timeout base used for this driver.
      * We have to ensure it is above the XTIMER_BACKOFF. Otherwise state
      * transitions are triggered from another state transition setting up the
-     * timeout. */
+     * timeout.
+     * To calculate how long it takes to transfer one byte we assume
+     * 8 data bits + 1 start bit + 1 stop bit per byte.
+     */
     ctx->timeout_base = CONFIG_DOSE_TIMEOUT_BYTES * 10UL * US_PER_SEC / params->baudrate;
     if (ctx->timeout_base < xtimer_usec_from_ticks(min_timeout)) {
         ctx->timeout_base = xtimer_usec_from_ticks(min_timeout);
