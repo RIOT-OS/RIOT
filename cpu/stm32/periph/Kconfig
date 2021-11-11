@@ -27,3 +27,10 @@ config MODULE_PERIPH_CAN
     select MODULE_PERIPH_I2C
     help
         STM32 CAN peripheral controller.
+
+config MODULE_PERIPH_ADC
+    bool "ADC peripheral driver"
+    depends on HAS_PERIPH_ADC
+    select MODULE_ZTIMER if HAS_CPU_STM32WL
+    select MODULE_ZTIMER_MSEC if HAS_CPU_STM32WL
+    select MODULE_PERIPH_COMMON

@@ -491,7 +491,7 @@ typedef enum {
 typedef struct {
     gpio_t pin;             /**< pin connected to the channel */
 #if !defined(CPU_FAM_STM32F0) && !defined(CPU_FAM_STM32L0) && \
-    !defined(CPU_FAM_STM32L1)
+    !defined(CPU_FAM_STM32L1) && !defined(CPU_FAM_STM32WL)
     uint8_t dev;            /**< ADCx - 1 device used for the channel */
 #endif
     uint8_t chan;           /**< CPU ADC channel connected to the pin */
