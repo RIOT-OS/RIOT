@@ -152,17 +152,17 @@ typedef struct {
     uint8_t opts;                           /**< Driver options */
     dose_state_t state;                     /**< Current state of the driver's state machine */
     mutex_t state_mtx;                      /**< Is unlocked every time a state is (re)entered */
-    uint8_t flags;                          /**< Several flags */
     uint8_t recv_buf[DOSE_FRAME_LEN];       /**< Receive buffer for incoming frames */
     size_t recv_buf_ptr;                    /**< Index of the next empty octet of the recveive buffer */
-    uart_t uart;                            /**< UART device to use */
-    uint8_t uart_octet;                     /**< Last received octet */
 #if !defined(MODULE_PERIPH_UART_RXSTART_IRQ) || DOXYGEN
     gpio_t sense_pin;                       /**< GPIO to sense for start bits on the UART's rx line */
 #endif
     gpio_t standby_pin;                     /**< GPIO to put the CAN transceiver in standby mode */
     xtimer_t timeout;                       /**< Timeout timer ensuring always to get back to IDLE state */
     uint32_t timeout_base;                  /**< Base timeout in us */
+    uart_t uart;                            /**< UART device to use */
+    uint8_t uart_octet;                     /**< Last received octet */
+    uint8_t flags;                          /**< Several flags */
 } dose_t;
 
 /**
