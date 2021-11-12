@@ -90,8 +90,11 @@ int16_t ucg_com_hw_spi_riotos(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *da
 
             /* setup SPI */
             spi_init_pins(dev);
-            spi_acquire(dev, GPIO_UNDEF, SPI_MODE_0,
-                        ucg_serial_clk_speed_to_spi_speed(((ucg_com_info_t *)data)->serial_clk_speed));
+            /* correct alignment of data can be assumed, as in pkg callers use
+             * ucg_com_info_t to allocate memory */
+            ucg_com_info_t *info = (void *)(uintptr_t)data;
+            spi_clk_t speed = ucg_serial_clk_speed_to_spi_speed(info->serial_clk_speed);
+            spi_acquire(dev, GPIO_UNDEF, SPI_MODE_0, speed);
 
             break;
         case UCG_COM_MSG_POWER_DOWN:
