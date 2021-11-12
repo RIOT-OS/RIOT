@@ -5,5 +5,7 @@ PKG_LICENSE=Apache2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
 
+CFLAGS += -Wno-cast-align
+
 all:
 	@:
