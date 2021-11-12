@@ -56,7 +56,7 @@ extern "C" {
  * @brief   Default value for timer not defined
  */
 #ifndef TIMER_UNDEF
-#define TIMER_UNDEF         (UINT_MAX)
+#define TIMER_UNDEF         (UINT_FAST8_MAX)
 #endif
 
 /**
@@ -66,7 +66,7 @@ extern "C" {
  * and vendor device header.
  */
 #ifndef HAVE_TIMER_T
-typedef unsigned int tim_t;
+typedef uint_fast8_t tim_t;
 #endif
 
 /**

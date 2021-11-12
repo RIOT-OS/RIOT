@@ -139,7 +139,7 @@ extern "C" {
  * @{
  */
 #ifndef I2C_UNDEF
-#define I2C_UNDEF           (UINT_MAX)
+#define I2C_UNDEF           (UINT_FAST8_MAX)
 #endif
 /** @} */
 
@@ -148,7 +148,7 @@ extern "C" {
  * @{
  */
 #ifndef HAVE_I2C_T
-typedef unsigned int i2c_t;
+typedef uint_fast8_t i2c_t;
 #endif
 /**  @} */
 

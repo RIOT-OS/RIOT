@@ -91,7 +91,7 @@ extern "C" {
  * @brief   Define global value for undefined SPI device
  */
 #ifndef SPI_UNDEF
-#define SPI_UNDEF       (UINT_MAX)
+#define SPI_UNDEF       (UINT_FAST8_MAX)
 #endif
 
 /**
@@ -116,7 +116,7 @@ extern "C" {
  * @brief   Default type for SPI devices
  */
 #ifndef HAVE_SPI_T
-typedef unsigned int spi_t;
+typedef uint_fast8_t spi_t;
 #endif
 
 /**
