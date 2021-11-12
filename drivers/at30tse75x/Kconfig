@@ -10,6 +10,7 @@ config MODULE_AT30TSE75X
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
-    select MODULE_XTIMER
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_USEC
     help
         AT30TSE75x temperature sensor with serial EEPROM.
