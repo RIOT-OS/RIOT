@@ -3,6 +3,10 @@
  * @ingroup     boards
  * @brief       Support for the LoRa-E5 Development Board - STM32WLE5JC board.
  *
+ * @warning     This BOARD comes with arduino style pin headers, but the gpio
+ *              mapping does not map to arduino BOARDs, even 3.3V and 5V pins
+ *              are placed differently, so don't use arduino expansion-boards
+ *              since these might short-circuit the mcu and/or expansion-board.
  *
  *  ### MCU
  *
@@ -45,7 +49,8 @@
  *
  * The BOARD comes pre-flashed with a Factory AT Firmware with RDP (Read Protection)
  * level 1, this needs to be removed to enable subsequent flashing. The easiest
- * way is with STM32CubeProgramer as described in [seedstudio wiki](https://wiki.seeedstudio.com/LoRa-E5_STM32WLE5JC_Module/#2-develop-with-stm32cube-mcu-package).
+ * way is with [STM32CubeProgramer](https://www.st.com/en/development-tools/stm32cubeprog.html)
+ * as described in [seedstudio wiki](https://wiki.seeedstudio.com/LoRa-E5_STM32WLE5JC_Module/#2-develop-with-stm32cube-mcu-package).
  *
  * Once read protection is removed subsequent flashing can be performed with and
  * attached ST-LINK on the SWD pins (do not connect RST but only GND, SWCLK and SWDIO).
