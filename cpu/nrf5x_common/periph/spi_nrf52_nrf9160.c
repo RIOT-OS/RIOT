@@ -63,7 +63,7 @@ static inline bool _in_ram(const uint8_t *data)
 #ifdef ERRATA_SPI_SINGLE_BYTE_WORKAROUND
 void spi_gpio_handler(void *arg)
 {
-    spi_t bus = (spi_t)arg;
+    spi_t bus = (spi_t)(uintptr_t)arg;
 
     /**
      * Immediately disable the IRQ, we only care about one PPI event per
@@ -85,7 +85,7 @@ static void _setup_workaround_for_ftpan_58(spi_t bus)
 {
 #ifdef ERRATA_SPI_SINGLE_BYTE_WORKAROUND
     gpio_init_int(spi_config[bus].sclk, GPIO_OUT, GPIO_BOTH,
-                  spi_gpio_handler, (void *)bus);
+                  spi_gpio_handler, (void *)(uintptr_t)bus);
     gpio_irq_disable(spi_config[bus].sclk);
     uint8_t channel = gpio_int_get_exti(spi_config[bus].sclk);
     assert(channel != 0xff);
@@ -145,7 +145,7 @@ void spi_init_pins(spi_t bus)
     SPI_MOSISEL = spi_config[bus].mosi;
     SPI_MISOSEL = spi_config[bus].miso;
     _setup_workaround_for_ftpan_58(bus);
-    spi_twi_irq_register_spi(dev(bus), spi_isr_handler, (void *)bus);
+    spi_twi_irq_register_spi(dev(bus), spi_isr_handler, (void *)(uintptr_t)bus);
 }
 
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
@@ -251,7 +251,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
 
 void spi_isr_handler(void *arg)
 {
-    spi_t bus = (spi_t)arg;
+    spi_t bus = (spi_t)(uintptr_t)arg;
 
     mutex_unlock(&busy[bus]);
     dev(bus)->EVENTS_END = 0;
