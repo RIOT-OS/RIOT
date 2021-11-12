@@ -7,6 +7,7 @@ include $(RIOTBASE)/pkg/pkg.mk
 
 # This warning is triggered on non-32bit platforms
 CFLAGS += -Wno-type-limits
+CFLAGS += -Wno-cast-align
 
 all:
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(RIOTBASE)/Makefile.base
