@@ -15,6 +15,8 @@ LVGL_MODULES =      \
     lvgl_widgets    \
     #
 
+CFLAGS += -Wno-cast-align
+
 .PHONY: lvgl_%
 
 all: $(LVGL_MODULES)
