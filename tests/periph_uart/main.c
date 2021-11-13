@@ -98,7 +98,7 @@ static void rxs_cb(void *arg)
 
 static void rx_cb(void *arg, uint8_t data)
 {
-    uart_t dev = (uart_t)arg;
+    uart_t dev = (uart_t)(uintptr_t)arg;
 
     ringbuffer_add_one(&ctx[dev].rx_buf, data);
 
@@ -113,7 +113,7 @@ static int _self_test(uart_t dev, unsigned baud)
 {
     const char test_string[] = "Hello UART!";
 
-    if (uart_init(UART_DEV(dev), baud, rx_cb, (void *)dev)) {
+    if (uart_init(UART_DEV(dev), baud, rx_cb, (void *)(uintptr_t)dev)) {
         printf("error configuring %u baud\n", baud);
         return -1;
     }
