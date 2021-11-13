@@ -72,7 +72,7 @@ static int parse_dev(char *arg)
 
 static void rx_cb(void *arg, uint8_t data)
 {
-    uart_t dev = (uart_t)arg;
+    uart_t dev = (soft_uart_t)arg;
 
     ringbuffer_add_one(&(ctx[dev].rx_buf), data);
     if (data == '\n' || ringbuffer_full(&(ctx[dev].rx_buf))) {
