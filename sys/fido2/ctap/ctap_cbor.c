@@ -47,7 +47,7 @@ static int _parse_exclude_list(CborValue *it, ctap_cred_desc_alt_t *exclude_list
  *        @ref ctap_cred_desc_alt_t struct
  */
 static int _parse_allow_list(CborValue *it, ctap_cred_desc_alt_t *allow_list,
-                             size_t *allow_list_len);
+                             uint8_t *allow_list_len);
 
 /**
  * @brief Parse CBOR encoded sequence of PublicKeyCredentialType and cryptographic
@@ -86,9 +86,18 @@ static int _parse_fixed_len_byte_array(CborValue *map, uint8_t *dst,
 static int _parse_byte_array(CborValue *it, uint8_t *dst, size_t *len);
 
 /**
+ * @brief Parse CBOR encoded unknown length array into dst
+ */
+static int _parse_byte_array_u8len(CborValue *it, uint8_t *dst, uint8_t *len);
+
+/**
  * @brief Parse CBOR encoded string into dst
  */
 static int _parse_text_string(CborValue *it, char *dst, size_t *len);
+/**
+ * @brief Parse CBOR encoded string into dst
+ */
+static int _parse_text_string_u8len(CborValue *it, char *dst, uint8_t *len);
 
 /**
  * @brief Parse CBOR encoded int into num
@@ -852,8 +861,8 @@ int fido2_ctap_cbor_parse_get_assertion_req(ctap_get_assertion_req_t *req,
         case CTAP_CBOR_GA_REQ_RP_ID:
             DEBUG("ctap_cbor: parse rp_id \n");
             req->rp_id_len = CTAP_DOMAIN_NAME_MAX_SIZE;
-            ret = _parse_text_string(&map, (char *)req->rp_id,
-                                     (size_t *)&req->rp_id_len);
+            ret = _parse_text_string_u8len(&map, (char *)req->rp_id,
+                                           &req->rp_id_len);
             required_parsed++;
             break;
         case CTAP_CBOR_GA_REQ_CLIENT_DATA_HASH:
@@ -866,7 +875,7 @@ int fido2_ctap_cbor_parse_get_assertion_req(ctap_get_assertion_req_t *req,
         case CTAP_CBOR_GA_REQ_ALLOW_LIST:
             DEBUG("ctap_cbor: parse allow_list \n");
             ret = _parse_allow_list(&map, req->allow_list,
-                                    (size_t *)&req->allow_list_len);
+                                    &req->allow_list_len);
             break;
         case CTAP_CBOR_GA_REQ_EXTENSIONS:
             /* todo: implement once extensions are supported */
@@ -1286,13 +1295,13 @@ static int _parse_entity(CborValue *it, void *entity, entity_type_t type)
                 ctap_user_ent_t *user = (ctap_user_ent_t *)entity;
 
                 user->id_len = CTAP_USER_ID_MAX_SIZE;
-                ret = _parse_byte_array(&map, user->id, (size_t *)&user->id_len);
+                ret = _parse_byte_array_u8len(&map, user->id, &user->id_len);
             }
             else {
                 ctap_rp_ent_t *rp = (ctap_rp_ent_t *)entity;
 
                 rp->id_len = CTAP_DOMAIN_NAME_MAX_SIZE;
-                ret = _parse_text_string(&map, (char *)rp->id, (size_t *)&rp->id_len);
+                ret = _parse_text_string_u8len(&map, (char *)rp->id, &rp->id_len);
             }
 
             if (ret != CTAP2_OK) {
@@ -1549,9 +1558,12 @@ static int _parse_options(CborValue *it, ctap_options_t *options)
 }
 
 static int _parse_allow_list(CborValue *it, ctap_cred_desc_alt_t *allow_list,
-                             size_t *allow_list_len)
+                             uint8_t *allow_list_len)
 {
-    return _parse_exclude_list(it, allow_list, allow_list_len);
+    size_t len2 = *allow_list_len;
+    int retval = _parse_exclude_list(it, allow_list, &len2);
+    *allow_list_len = (uint8_t)len2;
+    return retval;
 }
 
 static int _parse_exclude_list(CborValue *it, ctap_cred_desc_alt_t *exclude_list,
@@ -1701,6 +1713,14 @@ static int _parse_byte_array(CborValue *it, uint8_t *dst, size_t *len)
     return CTAP2_OK;
 }
 
+static int _parse_byte_array_u8len(CborValue *it, uint8_t *dst, uint8_t *len)
+{
+    size_t len2 = *len;
+    int retval = _parse_byte_array(it, dst, &len2);
+    *len = (uint8_t)len2;
+    return retval;
+}
+
 static int _parse_text_string(CborValue *it, char *dst, size_t *len)
 {
     int type;
@@ -1719,6 +1739,14 @@ static int _parse_text_string(CborValue *it, char *dst, size_t *len)
     dst[*len] = 0;
 
     return CTAP2_OK;
+}
+
+static int _parse_text_string_u8len(CborValue *it, char *dst, uint8_t *len)
+{
+    size_t len2 = *len;
+    int retval = _parse_text_string(it, dst, &len2);
+    *len = (uint8_t)len2;
+    return retval;
 }
 
 static int _parse_int(CborValue *it, int *num)
