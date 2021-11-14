@@ -56,6 +56,7 @@
 #ifndef DOSE_H
 #define DOSE_H
 
+#include "chunked_ringbuffer.h"
 #include "periph/uart.h"
 #include "periph/gpio.h"
 #include "net/netdev.h"
@@ -153,9 +154,9 @@ typedef struct {
     dose_state_t state;                     /**< Current state of the driver's state machine */
     mutex_t state_mtx;                      /**< Is unlocked every time a state is (re)entered */
     uint8_t recv_buf[DOSE_FRAME_LEN];       /**< Receive buffer for incoming frames */
-    size_t recv_buf_ptr;                    /**< Index of the next empty octet of the recveive buffer */
+    chunk_ringbuf_t rb;                     /**< Ringbuffer for RX frames */
 #if defined(MODULE_DOSE_WATCHDOG) || DOXYGEN
-    size_t recv_buf_ptr_last;               /**< Last value of recv_buf_ptr when the watchdog visited */
+    void *recv_buf_ptr_last;                /**< Last value of recv_buf_ptr when the watchdog visited */
 #endif
 #if !defined(MODULE_PERIPH_UART_RXSTART_IRQ) || DOXYGEN
     gpio_t sense_pin;                       /**< GPIO to sense for start bits on the UART's rx line */
