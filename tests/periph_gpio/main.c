@@ -25,6 +25,7 @@
 #include "shell.h"
 #include "benchmark.h"
 #include "periph/gpio.h"
+#include "ztimer.h"
 
 #define BENCH_RUNS_DEFAULT      (1000UL * 100)
 #define IRQ_TIMEOUT_US          (1000UL)
@@ -302,13 +303,13 @@ static int cmd_auto_test(int argc, char **argv)
     }
 
     gpio_set(pin_out);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US)) {
+    if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &lock, IRQ_TIMEOUT_US)) {
         puts("rising interrupt timeout");
         return -1;
     }
 
     gpio_clear(pin_out);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
+    if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &lock, IRQ_TIMEOUT_US) == 0) {
         puts("interrupt falsely generated on falling edge");
         return -1;
     }
@@ -320,13 +321,13 @@ static int cmd_auto_test(int argc, char **argv)
     }
 
     gpio_set(pin_out);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
+    if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &lock, IRQ_TIMEOUT_US) == 0) {
         puts("interrupt falsely generated on rising edge");
         return -1;
     }
 
     gpio_clear(pin_out);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US)) {
+    if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &lock, IRQ_TIMEOUT_US)) {
         puts("rising interrupt timeout");
         return -1;
     }
@@ -335,13 +336,13 @@ static int cmd_auto_test(int argc, char **argv)
     gpio_irq_disable(pin_in);
 
     gpio_set(pin_out);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
+    if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &lock, IRQ_TIMEOUT_US) == 0) {
         puts("interrupt falsely generated on rising edge while disabled");
         return -1;
     }
 
     gpio_clear(pin_out);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
+    if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &lock, IRQ_TIMEOUT_US) == 0) {
         puts("interrupt falsely generated while disabled");
         return -1;
     }
@@ -349,19 +350,19 @@ static int cmd_auto_test(int argc, char **argv)
     /* test IRQ enable */
 
     gpio_irq_enable(pin_in);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
+    if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &lock, IRQ_TIMEOUT_US) == 0) {
         puts("interrupt falsely generated after being re-enabled");
         return -1;
     }
 
     gpio_set(pin_out);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
+    if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &lock, IRQ_TIMEOUT_US) == 0) {
         puts("interrupt falsely generated on rising edge after re-enabled");
         return -1;
     }
 
     gpio_clear(pin_out);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US)) {
+    if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &lock, IRQ_TIMEOUT_US)) {
         puts("interrupt not re-enabled");
         return -1;
     }
