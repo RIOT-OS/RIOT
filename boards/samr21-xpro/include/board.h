@@ -37,6 +37,8 @@ extern "C" {
 #define XTIMER_CHAN         (0)
 /** @} */
 
+#define DOSE_TIMER_DEV      TIMER_DEV(0)
+
 /**
  * @name    ztimer configuration
  * @{

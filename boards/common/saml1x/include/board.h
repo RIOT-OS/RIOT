@@ -39,6 +39,8 @@ extern "C" {
 #endif
 /** @} */
 
+#define DOSE_TIMER_DEV      TIMER_DEV(1)
+
 /**
  * @name    LED pin definitions and handlers
  * @{

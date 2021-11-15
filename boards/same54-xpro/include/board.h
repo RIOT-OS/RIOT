@@ -38,6 +38,8 @@ extern "C" {
 #define AT24CXXX_PARAM_ADDR     (0x56)
 /** @} */
 
+#define DOSE_TIMER_DEV          TIMER_DEV(1)
+
 /**
  * @name    ATECC508A configuration
  * @{
