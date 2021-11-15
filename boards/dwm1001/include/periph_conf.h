@@ -46,8 +46,8 @@ static const spi_conf_t spi_config[] = {
     {
         .dev  = NRF_SPIM0,
         .sclk = GPIO_PIN(0, 4),
-        .mosi = GPIO_PIN(0, 5),
-        .miso = GPIO_PIN(0, 6),
+        .mosi = GPIO_PIN(0, 6),
+        .miso = GPIO_PIN(0, 7),
         .ppi = 0,
     },
     {   /* Connected to the DWM1001 UWB transceiver */
