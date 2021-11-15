@@ -264,8 +264,10 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
                 DEBUG("CDCACM: line coding not supported\n");
                 return -1;
             }
-            if ((state == USBUS_CONTROL_REQUEST_STATE_OUTDATA) &&
-                    (setup->length == sizeof(usb_req_cdcacm_coding_t))) {
+            if (setup->length != sizeof(usb_req_cdcacm_coding_t)) {
+                return -1; /* Incorrect amount of data expected */
+            }
+            if (state == USBUS_CONTROL_REQUEST_STATE_OUTDATA) {
                 size_t len = 0;
                 usb_req_cdcacm_coding_t *coding =
                     (usb_req_cdcacm_coding_t*)usbus_control_get_out_data(usbus,
