@@ -41,4 +41,12 @@ ifneq (,$(filter periph_rtc_mem,$(USEMODULE)))
   FEATURES_REQUIRED += periph_rtc
 endif
 
+ifneq (,$(filter periph_adc,$(FEATURES_USED)))
+  ifneq (,$(filter $(CPU_FAM),wl))
+    USEMODULE += ztimer
+    USEMODULE += ztimer_msec
+  endif
+endif
+
+
 include $(RIOTCPU)/cortexm_common/Makefile.dep
