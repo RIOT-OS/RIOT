@@ -8,7 +8,7 @@
 
 /**
  * @ingroup     cpu_riscv_common
- * @ingroup     drivers_periph_pm
+ * @ingroup     drivers_periph_flashpage
  * @{
  * @file
  * @brief       common periph/flashpage functions
