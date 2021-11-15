@@ -47,6 +47,10 @@ define board_unsatisfied_features
   undefine CPU_FAM
 
   include $(RIOTBASE)/Makefile.features
+  # always select provided architecture features
+  FEATURES_REQUIRED += $$(filter arch_%,$$(FEATURES_PROVIDED))
+  # always select CPU core features
+  FEATURES_REQUIRED += $$(filter cpu_core_%,$$(FEATURES_PROVIDED))
   # FEATURES_USED must be populated first in this case so that dependency
   # resolution can take optional features into account during the first pass.
   # Also: This allows us to skip resolution if already a missing feature is

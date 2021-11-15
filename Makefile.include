@@ -406,6 +406,11 @@ ifeq (1,$(TEST_KCONFIG))
   KCONFIG_PACKAGES := $(call lowercase,$(patsubst CONFIG_PACKAGE_%,%,$(filter CONFIG_PACKAGE_%,$(.VARIABLES))))
   USEPKG := $(KCONFIG_PACKAGES)
 else
+  # always select provided architecture features
+  FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
+  # always select CPU core features
+  FEATURES_REQUIRED += $(filter cpu_core_%,$(FEATURES_PROVIDED))
+
   # check if required features are provided and update $(FEATURES_USED)
   include $(RIOTMAKE)/features_check.inc.mk
 
