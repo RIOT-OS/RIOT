@@ -19,7 +19,9 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdio.h>
+#include <stdalign.h>
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
@@ -34,6 +36,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#include "architecture.h"
 #include "net/fib.h"
 #include "net/fib/table.h"
 
@@ -363,7 +366,8 @@ static int fib_signal_rp(fib_table_t *table, uint16_t type, uint8_t *dat,
                 }
             }
             else {
-                fib_sr_t *temp_sr = (fib_sr_t *)dat;
+                assert(HAS_ALIGNMENT_OF(dat, alignof(fib_sr_t)));
+                fib_sr_t *temp_sr = (fib_sr_t *)(uintptr_t)dat;
                 size_t dat_size_in_bits = temp_sr->sr_dest->address->address_size << 3;
                 if (universal_address_compare(table->prefix_rp[i],
                                               temp_sr->sr_dest->address->address,
