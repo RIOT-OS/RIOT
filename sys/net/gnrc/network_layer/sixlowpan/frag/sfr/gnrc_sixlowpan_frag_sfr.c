@@ -1401,7 +1401,7 @@ static int _resend_frag(clist_node_t *node, void *fbuf_ptr)
     cur_frag_size = _find_offset_and_copy_rest(data, &pkt, frag_size,
                                                frag_desc->offset);
     /* copy remaining packet snips */
-    cur_frag_size = _copy_pkt_to_frag(data, pkt, frag_size, cur_frag_size);
+    _copy_pkt_to_frag(data, pkt, frag_size, cur_frag_size);
     DEBUG("6lo sfr: resending fragment (retry: %u, tag: %u, X: %i, seq: %u, "
           "frag_size: %u, %s: %u)\n", frag_desc->retries,
           hdr->base.tag, sixlowpan_sfr_rfrag_ack_req(hdr),
