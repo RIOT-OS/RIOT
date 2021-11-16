@@ -786,9 +786,9 @@ static void IRAM_ATTR _esp_can_intr_handler(void *arg)
             DEBUG("%s error passive interrupt %d %d\n", __func__,
                   CAN.tx_error_counter_reg.byte,
                   CAN.rx_error_counter_reg.byte);
+            /* save the event */
+            dev->events |= ESP_CAN_EVENT_ERROR_PASSIVE;
         }
-        /* save the event */
-        dev->events |= ESP_CAN_EVENT_ERROR_PASSIVE;
     }
 
     /*
