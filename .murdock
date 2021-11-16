@@ -500,10 +500,10 @@ compile() {
         fi
     fi
 
+    # log some build stats
     if [ -d ${BINDIR} ]
     then
-        echo "-- build directory size: $(du -sh ${BINDIR} | cut -f1)"
-
+        echo "{\"build/\": $(du -s ${BINDIR} | cut -f1)}"
         # cleanup
         rm -rf ${BINDIR}
     fi
