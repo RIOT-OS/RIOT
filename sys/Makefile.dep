@@ -352,7 +352,7 @@ ifneq (,$(filter pthread,$(USEMODULE)))
 endif
 
 ifneq (,$(filter schedstatistics,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
   USEMODULE += sched_cb
 endif
 
