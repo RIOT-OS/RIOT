@@ -288,5 +288,8 @@ if __name__ == '__main__':
     if _args.clangd:
         _args.add_built_in_includes = True
         _args.add_libstdcxx_includes = True
-        _args.filter_out = ['-Wformat-truncation', '-Wformat-overflow', '-mno-thumb-interwork']
+        _args.filter_out = ['-Wformat-truncation', '-Wformat-overflow', '-mno-thumb-interwork',
+                            # Only even included for versions of GCC that support it
+                            '-malign-data=natural',
+                            ]
     generate_compile_commands(_args)
