@@ -21,6 +21,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#include <assert.h>
 #include <string.h>
 
 #include "esp_common.h"
@@ -95,8 +96,8 @@ void IRAM_ATTR _ets_to_xtimer_callback (void *arg)
 {
     struct _ets_to_xtimer* e2xt = (struct _ets_to_xtimer*)arg;
 
-    CHECK_PARAM (e2xt != NULL);
-    CHECK_PARAM (e2xt->ets_timer != NULL);
+    assert(arg != NULL);
+    assert(e2xt->ets_timer != NULL);
 
     irq_isr_enter();
 
@@ -116,7 +117,7 @@ void ets_timer_setfn(ETSTimer *ptimer, ETSTimerFunc *pfunc, void *parg)
 
     struct _ets_to_xtimer* e2xt = _ets_to_xtimer_get(ptimer);
 
-    CHECK_PARAM(e2xt != NULL);
+    assert(e2xt != NULL);
 
     e2xt->ets_timer->timer_func = pfunc;
     e2xt->ets_timer->timer_arg  = parg;
@@ -131,7 +132,7 @@ void ets_timer_done(ETSTimer *ptimer)
 
     struct _ets_to_xtimer* e2xt = _ets_to_xtimer_get(ptimer);
 
-    CHECK_PARAM(e2xt != NULL);
+    assert(e2xt != NULL);
 
     e2xt->ets_timer->timer_func = NULL;
     e2xt->ets_timer->timer_arg  = NULL;
@@ -143,8 +144,8 @@ void ets_timer_arm_us(ETSTimer *timer, uint32_t tmout, bool repeat)
 
     struct _ets_to_xtimer* e2xt = _ets_to_xtimer_get(timer);
 
-    CHECK_PARAM(e2xt != NULL);
-    CHECK_PARAM(e2xt->xtimer.callback != NULL);
+    assert(e2xt != NULL);
+    assert(e2xt->xtimer.callback != NULL);
 
     xtimer_set(&e2xt->xtimer, tmout);
 
@@ -163,7 +164,7 @@ void ets_timer_disarm(ETSTimer *timer)
 
     struct _ets_to_xtimer* e2xt = _ets_to_xtimer_get(timer);
 
-    CHECK_PARAM(e2xt != NULL);
+    assert(e2xt != NULL);
 
     xtimer_remove(&e2xt->xtimer);
 }
@@ -182,9 +183,9 @@ void os_timer_setfn(ETSTimer *ptimer, ETSTimerFunc *pfunction, void *parg)
                     __attribute__((alias("ets_timer_setfn")));
 void os_timer_disarm(ETSTimer *ptimer)
                     __attribute__((alias("ets_timer_disarm")));
-void os_timer_arm_us(ETSTimer *ptimer,uint32_t u_seconds,bool repeat_flag)
+void os_timer_arm_us(ETSTimer *ptimer, uint32_t u_seconds, bool repeat_flag)
                     __attribute__((alias("ets_timer_arm_us")));
-void os_timer_arm(ETSTimer *ptimer,uint32_t milliseconds,bool repeat_flag)
+void os_timer_arm(ETSTimer *ptimer, uint32_t milliseconds, bool repeat_flag)
                   __attribute__((alias("ets_timer_arm")));
 void os_timer_done(ETSTimer *ptimer)
                    __attribute__((alias("ets_timer_done")));

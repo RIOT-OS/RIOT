@@ -133,6 +133,7 @@ void pm_set(unsigned mode)
      * slow RTC memory is automatically activated when the .rtc.data section
      * is used to retain initialized data.
      */
+    /* cppcheck-suppress comparePointers */
     if (&_rtc_bss_rtc_end > &_rtc_bss_rtc_start) {
         esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_ON);
     }

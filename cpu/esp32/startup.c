@@ -131,15 +131,18 @@ NORETURN void IRAM call_start_cpu0 (void)
 
     /* Clear BSS. Please do not attempt to do any complex stuff */
     /* (like early logging) before this. */
+    /* cppcheck-suppress comparePointers */
     memset(&_bss_start, 0, (&_bss_end - &_bss_start) * sizeof(_bss_start));
 
     /* if we are not waking up from deep sleep, clear RTC bss */
     if (reset_reason != DEEPSLEEP_RESET) {
+        /* cppcheck-suppress comparePointers */
         memset(&_rtc_bss_start, 0, (&_rtc_bss_end - &_rtc_bss_start));
     }
 
     /* initialize RTC data after power on */
     if (reset_reason == POWERON_RESET || reset_reason == RTCWDT_RTC_RESET) {
+        /* cppcheck-suppress comparePointers */
         memset(&_rtc_bss_rtc_start, 0, (&_rtc_bss_rtc_end - &_rtc_bss_rtc_start));
     }
 
@@ -253,7 +256,7 @@ static void IRAM system_clk_init (void)
                                                set to 2 MHz and handled later */
     }
 
-    uint32_t freq_before = rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()) / MHZ ;
+    uint32_t freq_before = rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()) / MHZ;
 
     if (freq_before != CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ) {
         /* set configured CPU frequency */
