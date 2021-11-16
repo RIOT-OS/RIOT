@@ -13,13 +13,13 @@ the product selector tab, then click the `Export` button to download the Excel
 sheet (the default filename is `ProductsList.xlsx`).
 
 The available CPU lines are extracted from the
-`cpu/stm32/include/vendor/cmsis/<fam>/Include` directory. This means that the
+`${RIOTBASE}/build/stm32/cmsis/<fam>/Include` directory. This means that the
 headers of a given family are already fetched here. This can be done with the
 following `make` commands:
 
 ```
 $ cd $RIOTBASE
-$ RIOTBASE=$(pwd) RIOTTOOLS=$(pwd)/dist/tools CPU_FAM=<cpu_fam> make -C cpu/stm32/include/vendor
+$ RIOTBASE=$(pwd) RIOTTOOLS=$(pwd)/dist/tools CPU_FAM=<cpu_fam> make -f cpu/stm32/Makefile.cmsis
 ```
 
 `<cpu_fam>` can be any family in `f0`, `f1`, etc
@@ -42,7 +42,7 @@ a given family as follows:
 
 ```
 $ cd $RIOTBASE
-$ ./cpu/stm32/dist/kconfig/gen_kconfig.py <cpu_fam> --sheets <path-to-sheet>/ProductsList.xlsx
+$ ./cpu/stm32/dist/kconfig/gen_kconfig.py ${RIOTBASE}/build/stm32/cmsis/<fam>/Include <cpu_fam> --sheets <path-to-sheet>/ProductsList.xlsx
 ```
 
 The `--sheets` option can take several files. This allows to handle the L4 case
@@ -51,7 +51,7 @@ the command should be:
 
 ```
 $ cd $RIOTBASE
-$ ./cpu/stm32/dist/kconfig/gen_kconfig.py l4 --sheets <path-to-sheet>/L4ProductsList.xlsx <path-to-sheet>/L4+ProductsList.xlsx
+$ ./cpu/stm32/dist/kconfig/gen_kconfig.py ${RIOTBASE}/build/stm32/cmsis/l4/Include l4 --sheets <path-to-sheet>/L4ProductsList.xlsx <path-to-sheet>/L4+ProductsList.xlsx
 ```
 
 By default, if the `Kconfig.lines` and `Kconfig.models` files of a given family
@@ -64,9 +64,10 @@ Print the detailed usage with `--help`:
 
 ```
 $ ./cpu/stm32/dist/kconfig/gen_kconfig.py --help
-usage: gen_kconfig.py [-h] [--sheets SHEETS [SHEETS ...]] [--overwrite] [--quiet] cpu_fam
+usage: gen_kconfig.py [-h] [--sheets SHEETS [SHEETS ...]] [--overwrite] [--quiet] cmsis_dir cpu_fam
 
 positional arguments:
+  cmsis_dir             STM32 CMSIS directory
   cpu_fam               STM32 CPU Family
 
 optional arguments:

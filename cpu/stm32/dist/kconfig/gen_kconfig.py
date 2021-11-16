@@ -19,7 +19,6 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 RIOTBASE = os.getenv(
     "RIOTBASE", os.path.abspath(os.path.join(CURRENT_DIR, "../../../..")))
 STM32_KCONFIG_DIR = os.path.join(RIOTBASE, "cpu/stm32/kconfigs")
-STM32_VENDOR_DIR = os.path.join(RIOTBASE, "cpu/stm32/include/vendor/cmsis")
 MODEL_COLUMN = 1
 
 
@@ -43,11 +42,10 @@ def parse_sheet(cpu_fam, sheets):
     return sorted(models)
 
 
-def parse_cpu_lines(cpu_fam):
+def parse_cpu_lines(cmsis_dir, cpu_fam):
     """Return the list of available CPU lines."""
-    headers_dir = os.path.join(STM32_VENDOR_DIR, cpu_fam, "Include")
     cpu_lines = [
-        header[:-2].upper() for header in os.listdir(headers_dir)
+        header[:-2].upper() for header in os.listdir(cmsis_dir)
         if (
             header.startswith("stm32") and
             header != "stm32{}xx.h".format(cpu_fam)
@@ -141,7 +139,7 @@ def generate_kconfig(kconfig, context, overwrite, verbose):
 def main(args):
     """Main function."""
     models = parse_sheet(args.cpu_fam, args.sheets)
-    lines = parse_cpu_lines(args.cpu_fam)
+    lines = parse_cpu_lines(args.cmsis_dir, args.cpu_fam)
     context = get_context(args.cpu_fam, models, lines)
     if args.verbose:
         print("Generated kconfig files:\n")
@@ -150,6 +148,8 @@ def main(args):
 
 
 PARSER = argparse.ArgumentParser()
+PARSER.add_argument("cpu_fam",
+                    help="STM32 CMSIS directory")
 PARSER.add_argument("cpu_fam",
                     help="STM32 CPU Family")
 PARSER.add_argument("--sheets", "-s", nargs='+',

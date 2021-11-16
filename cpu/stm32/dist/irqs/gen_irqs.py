@@ -17,10 +17,6 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 RIOTBASE = os.getenv(
     "RIOTBASE", os.path.abspath(os.path.join(CURRENT_DIR, "../../../..")))
 STM32_INCLUDE_DIR = os.path.join(RIOTBASE, "cpu/stm32/include")
-STM32_CMSIS_INCLUDE_DIR = os.path.join(
-    RIOTBASE, STM32_INCLUDE_DIR, "vendor/cmsis/{}/Include/")
-STM32_CMSIS_HEADER = os.path.join(
-    RIOTBASE, STM32_CMSIS_INCLUDE_DIR, "{}.h")
 STM32_IRQS_DIR = os.path.join(
     RIOTBASE, STM32_INCLUDE_DIR, "irqs/{}/irqs.h")
 
@@ -49,9 +45,9 @@ extern "C" {{
 """
 
 
-def list_cpu_lines(cpu_fam):
+def list_cpu_lines(cmsis_dir, cpu_fam):
     """Returns the list CPU lines for a given family"""
-    headers = os.listdir(STM32_CMSIS_INCLUDE_DIR.format(cpu_fam))
+    headers = os.listdir(cmsis_dir)
     if "Templates" in headers:
         headers.remove("Templates")
     if "partition_stm32l5xx.h" in headers:
@@ -61,9 +57,9 @@ def list_cpu_lines(cpu_fam):
     return sorted([header.split(".")[0] for header in headers])
 
 
-def irq_numof(cpu_fam, cpu_line):
+def irq_numof(cmsis_dir, cpu_line):
     """Parse the CMSIS to get the list IRQs."""
-    cpu_line_cmsis = STM32_CMSIS_HEADER.format(cpu_fam, cpu_line)
+    cpu_line_cmsis = os.path.join(cmsis_dir, "{}.h".format(cpu_line))
 
     with open(cpu_line_cmsis, 'rb') as cmsis:
         cmsis_content = cmsis.readlines()
@@ -135,13 +131,13 @@ def generate_irqs(context):
 
 def main(args):
     """Main function."""
-    cpu_lines = list_cpu_lines(args.cpu_fam)
+    cpu_lines = list_cpu_lines(args.cmsis_dir, args.cpu_fam)
     context = {
         "cpu_fam": args.cpu_fam,
         "cpu_lines": [
             {
                 "line": cpu_line.upper().replace("X", "x"),
-                "irq_numof": irq_numof(args.cpu_fam, cpu_line),
+                "irq_numof": irq_numof(args.cmsis_dir, cpu_line),
             }
             for cpu_line in cpu_lines
         ]
@@ -150,6 +146,7 @@ def main(args):
 
 
 PARSER = argparse.ArgumentParser()
+PARSER.add_argument("cmsis_dir", help="CMSIS directory")
 PARSER.add_argument("cpu_fam", help="STM32 CPU Family")
 
 if __name__ == "__main__":
