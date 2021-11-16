@@ -9,8 +9,11 @@ If a security issue is discovered, please report it to security@riot-os.org.
 A response will be provided within one week.
 The issue will be tracked in the [security mailing list](mailto:security@riot-os.org).
 The original reporter will be included in the discussion of the issue.
-You can encrypt your report using gpg key id 44C6AE441172F88D3423E81F5F7964D0F4239033,
-also included at the bottom of this file.
+You can encrypt your report using gpg key id
+[44C6AE441172F88D3423E81F5F7964D0F4239033][security-gpg], also included at the
+bottom of this file.
+
+[security-gpg]: https://riot-os.org/assets/keys/security.asc
 
 ## Notification of a Vulnerability
 
