@@ -160,7 +160,8 @@ the only parts of compounded module names and only match against part of that na
 
 See `sys/ztimer/Makefile` for an example in code.
 
-`SUBMODULES` can also be true-pseudomodules.
+`SUBMODULES` can also be true-pseudomodules, or become one by conditionally excluding
+the source files by adding them to `SUBMODULES_NO_SRC`.
 
 # Helper tools
 
