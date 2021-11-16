@@ -172,6 +172,10 @@ static inline unsigned bitarithm_lsb(unsigned v)
 {
 /* Source: http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightMultLookup */
     extern const uint8_t MultiplyDeBruijnBitPosition[32];
+    /* cppcheck-suppress oppositeExpression
+     * (reason: `x & -x` is a bit twiddling idiom to extract the LSB; the
+     * check treats opposite arguments as indicator for poor copy-pasting
+     * as e.g. `x + -x` or `x & ~x` don't make sense. ) */
     return MultiplyDeBruijnBitPosition[((uint32_t)((v & -v) * 0x077CB531U)) >>
                                        27];
 }
@@ -216,6 +220,10 @@ static inline unsigned bitarithm_test_and_clear(unsigned state, uint8_t *index)
 #elif defined(BITARITHM_LSB_LOOKUP)
     /* Source: http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightMultLookup */
     extern const uint8_t MultiplyDeBruijnBitPosition[32];
+    /* cppcheck-suppress oppositeExpression
+     * (reason: `x & -x` is a bit twiddling idiom to extract the LSB; the
+     * check treats opposite arguments as indicator for poor copy-pasting
+     * as e.g. `x + -x` or `x & ~x` don't make sense. ) */
     uint32_t least_bit = state & -state;
     *index = MultiplyDeBruijnBitPosition[(least_bit * 0x077CB531U) >> 27];
     return state & ~least_bit;
