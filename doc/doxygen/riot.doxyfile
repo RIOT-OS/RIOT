@@ -825,7 +825,6 @@ EXCLUDE_SYMLINKS       = NO
 
 EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */board/*/periph_conf.h \
-                         */cpu/*/periph_cpu.h \
                          */cpu/atmega_common/include/sys/*.h \
                          */cpu/msp430_common/include/stdatomic.h \
                          */cpu/msp430_common/include/sys/*.h \
