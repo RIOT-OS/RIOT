@@ -1,0 +1,27 @@
+/**
+ * @defgroup    boards_stm32f746g-disco STM32F746G-DISCO
+ * @ingroup     boards
+ * @brief       Support for the STM32F746G-DISCO board.
+
+## Flashing the device
+
+The STM32F746G-DISCO board includes an on-board ST-LINK programmer and can be
+flashed using OpenOCD.
+The board can be flashed with:
+
+```
+make BOARD=stm32f746g-disco flash
+```
+
+and debug via GDB with
+```
+make BOARD=stm32f746g-disco debug
+```
+
+## Supported Toolchains
+
+For using the STM32F746G-DISCO board we recommend the usage of the
+[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
+toolchain.
+
+ */
