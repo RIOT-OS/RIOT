@@ -25,7 +25,7 @@
 
 #include <shell.h>
 #include <thread.h>
-#include <xtimer.h>
+#include <ztimer.h>
 
 #include "test_utils/interactive_sync.h"
 
@@ -44,10 +44,11 @@ static void *_thread_fn(void *arg)
         msg_t m1, m2;
         msg_receive(&m1);
         /* generate different loads per thead */
-        for (int i = 0; i < (10 * (next + 1)); ++i) {
-            _xtimer_now64();
+        for (int i = 0; i < (100 * (next + 1)); ++i) {
+            volatile uint32_t now = ztimer_now(ZTIMER_USEC);
+            (void)now;
         }
-        xtimer_usleep(XTIMER_BACKOFF * 10);
+        ztimer_sleep(ZTIMER_USEC, 100); /* Sleep for a bit */
         msg_send(&m2, pids[next]);
     }
 
@@ -65,7 +66,7 @@ int main(void)
                                 _thread_fn, (void *)i, "thread");
     }
     /* sleep for a second, so that `ps` shows some % on idle at the beginning */
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_SEC, 1);
 
     msg_t msg;
     msg_send(&msg, pids[0]);
