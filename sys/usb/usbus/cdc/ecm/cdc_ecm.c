@@ -307,15 +307,16 @@ static void _handle_rx_flush_ev(event_t *ev)
     _handle_rx_flush(cdcecm);
 }
 
-static void _store_frame_chunk(usbus_cdcecm_device_t *cdcecm)
+static void _store_frame_chunk(usbus_cdcecm_device_t *cdcecm, size_t len)
 {
     uint8_t *buf = cdcecm->ep_out->ep->buf;
-    size_t len = 0;
 
-    usbdev_ep_get(cdcecm->ep_out->ep, USBOPT_EP_AVAILABLE, &len,
-                  sizeof(size_t));
-    memcpy(cdcecm->in_buf + cdcecm->len, buf, len);
-    cdcecm->len += len;
+    /* Truncate if it exceeds the expected MTU size. */
+    /* TODO: Should be converted to an endpoint halt after #17090 is merged */
+    if (cdcecm->len + len < ETHERNET_FRAME_LEN) {
+        memcpy(cdcecm->in_buf + cdcecm->len, buf, len);
+        cdcecm->len += len;
+    }
     if (len < USBUS_CDCECM_EP_DATA_SIZE) {
         netdev_trigger_event_isr(&cdcecm->netdev);
     }
@@ -334,7 +335,7 @@ static void _transfer_handler(usbus_t *usbus, usbus_handler_t *handler,
         }
         size_t len = 0;
         usbdev_ep_get(ep, USBOPT_EP_AVAILABLE, &len, sizeof(size_t));
-        _store_frame_chunk(cdcecm);
+        _store_frame_chunk(cdcecm, len);
         if (len == USBUS_CDCECM_EP_DATA_SIZE) {
             usbdev_ep_ready(ep, 0);
         }
