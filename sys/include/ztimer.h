@@ -466,6 +466,22 @@ static inline ztimer_now_t ztimer_now(ztimer_clock_t *clock)
 }
 
 /**
+ * @brief   Get the time until a timer will trigger
+ *
+ * @param[in]   clock          ztimer clock to operate on
+ * @param[in]   timer          ztimer to messuers to
+ *
+ * @return  Current time until the @p timer is trigger in clock units
+ */
+static inline uint32_t ztimer_until(ztimer_clock_t *clock, ztimer_t *timer){
+#if ZTIMER_UNTIL_SAFTY_NET
+    if (!ztimer_is_set(clock,timer)){ return 0; }
+#endif
+    return timer->base.offset - (uint32_t) ztimer_now(clock);
+}
+
+
+/**
  * @brief Suspend the calling thread until the time (@p last_wakeup + @p period)
  *
  * This function can be used to create periodic wakeups.
