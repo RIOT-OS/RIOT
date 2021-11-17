@@ -66,10 +66,6 @@ ifneq (,$(filter periph_i2c,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter esp_spi_ram,$(DISABLE_MODULE)))
-  USEMODULE := $(filter-out esp_spi_ram,$(USEMODULE))
-endif
-
 ifneq (,$(filter esp_now esp_wifi esp_spi_ram,$(USEMODULE)))
   # the ESP-IDF heap has to be used if SPI RAM is used
   USEMODULE += esp_idf_heap
