@@ -53,6 +53,7 @@ rsource "Kconfig.picolibc"
 
 endmenu # Libc
 
+rsource "log/Kconfig"
 rsource "luid/Kconfig"
 rsource "malloc_thread_safe/Kconfig"
 rsource "matstat/Kconfig"
