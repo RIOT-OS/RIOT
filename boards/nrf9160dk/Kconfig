@@ -15,3 +15,6 @@ config BOARD_NRF9160DK
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+
+    # Put other features for this board (in alphabetical order)
+    select HAS_RIOTBOOT
