@@ -23,6 +23,10 @@
 #include "assert.h"
 #include "periph/flashpage.h"
 
+#ifndef NRF_NVMC
+#define NRF_NVMC NRF_NVMC_S
+#endif
+
 void flashpage_erase(unsigned page)
 {
     assert(page < (int)FLASHPAGE_NUMOF);
@@ -31,7 +35,14 @@ void flashpage_erase(unsigned page)
 
     /* erase given page */
     NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Een;
+#ifndef NRF_NVMC_S
     NRF_NVMC->ERASEPAGE = (uint32_t)page_addr;
+#else
+    /* NRF_NVMC->ERASEPAGE doesn't exist on nRF9160 family, the proper
+       way to erase a page is to write 0xFFFFFFFF in the first 32-bit
+       word of the page to erase it (see Chap 4.4.2 from nRF9160 datasheet ) */
+    *page_addr = UINT32_MAX;
+#endif
     while (NRF_NVMC->READY == 0) {}
 }
 
