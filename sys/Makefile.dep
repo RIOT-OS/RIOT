@@ -512,20 +512,22 @@ ifneq (,$(filter event_thread_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter event_timeout_ztimer,$(USEMODULE)))
-  USEMODULE += event_timeout
-endif
-
-ifneq (,$(filter event_periodic_timeout,$(USEMODULE)))
-  USEMODULE += event_timeout
-  USEMODULE += ztimer_periodic
+  USEMODULE += ztimer
 endif
 
 ifneq (,$(filter event_timeout,$(USEMODULE)))
   ifneq (,$(filter event_timeout_ztimer,$(USEMODULE)))
     USEMODULE += ztimer_usec
   else
-    USEMODULE += xtimer
+    ifeq (,$(filter ztimer_usec,$(USEMODULE)))
+      USEMODULE += xtimer
+    endif
   endif
+endif
+
+ifneq (,$(filter event_periodic_timeout,$(USEMODULE)))
+  USEMODULE += event_timeout
+  USEMODULE += ztimer_periodic
 endif
 
 ifneq (,$(filter event,$(USEMODULE)))

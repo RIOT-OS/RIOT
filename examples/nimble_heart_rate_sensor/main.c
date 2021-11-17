@@ -36,7 +36,7 @@
 
 #define HRS_FLAGS_DEFAULT       (0x01)      /* 16-bit BPM value */
 #define SENSOR_LOCATION         (0x02)      /* wrist sensor */
-#define UPDATE_INTERVAL         (250U * US_PER_MS)
+#define UPDATE_INTERVAL         (250U)
 #define BPM_MIN                 (80U)
 #define BPM_MAX                 (210U)
 #define BPM_STEP                (2)
@@ -287,7 +287,7 @@ int main(void)
     /* setup local event queue (for handling heart rate updates) */
     event_queue_init(&_eq);
     _update_evt.handler = _hr_update;
-    event_timeout_init(&_update_timeout_evt, &_eq, &_update_evt);
+    event_timeout_ztimer_init(&_update_timeout_evt, ZTIMER_MSEC, &_eq, &_update_evt);
 
     /* verify and add our custom services */
     res = ble_gatts_count_cfg(gatt_svr_svcs);
