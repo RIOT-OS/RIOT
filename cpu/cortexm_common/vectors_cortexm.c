@@ -108,6 +108,8 @@ void reset_handler_default(void)
     pre_startup();
 
 #ifdef DEVELHELP
+    /* cppcheck-suppress constVariable
+     * (top is modified by asm) */
     uint32_t *top;
     /* Fill stack space with canary values up until the current stack pointer */
     /* Read current stack pointer from CPU register */
@@ -119,11 +121,17 @@ void reset_handler_default(void)
 #endif
 
     /* load data section from flash to ram */
+    /* cppcheck-suppress comparePointers
+     * (addresses exported as symbols via linker script and look unrelated
+     * to cppcheck) */
     for (dst = &_srelocate; dst < &_erelocate; ) {
         *(dst++) = *(src++);
     }
 
     /* default bss section to zero */
+    /* cppcheck-suppress comparePointers
+     * (addresses exported as symbols via linker script and look unrelated
+     * to cppcheck) */
     for (dst = &_szero; dst < &_ezero; ) {
         *(dst++) = 0;
     }
@@ -140,6 +148,9 @@ void reset_handler_default(void)
         }
 
         /* zero-out low-power bss. */
+        /* cppcheck-suppress comparePointers
+         * (addresses exported as symbols via linker script and look unrelated
+         * to cppcheck) */
         for (dst = _sbackup_bss; dst < _ebackup_bss; dst++) {
             *dst = 0;
         }
@@ -222,7 +233,8 @@ static inline int _stack_size_left(uint32_t required)
     return ((int)((uint32_t)sp - (uint32_t)&_sstack) - required);
 }
 
-void hard_fault_handler(uint32_t* sp, uint32_t corrupted, uint32_t exc_return, uint32_t* r4_to_r11_stack);
+void hard_fault_handler(uint32_t* sp, uint32_t corrupted, uint32_t exc_return,
+                        uint32_t* r4_to_r11_stack);
 
 /* Trampoline function to save stack pointer before calling hard fault handler */
 __attribute__((naked)) void hard_fault_default(void)
@@ -289,7 +301,7 @@ __attribute__((naked)) void hard_fault_default(void)
           : [sram]   "r" ((uintptr_t)&_sram + HARDFAULT_HANDLER_REQUIRED_STACK_SPACE),
             [eram]   "r" (&_eram),
             [estack] "r" (&_estack)
-          : "r0","r4","r5","r6","r8","r9","r10","r11","lr"
+          : "r0", "r4", "r5", "r6", "r8", "r9", "r10", "r11", "lr"
     );
 }
 
@@ -302,7 +314,8 @@ __attribute__((naked)) void hard_fault_default(void)
 #define CPU_HAS_EXTENDED_FAULT_REGISTERS 1
 #endif
 
-__attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, uint32_t exc_return, uint32_t* r4_to_r11_stack)
+__attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, uint32_t exc_return,
+                                              uint32_t* r4_to_r11_stack)
 {
 #if CPU_HAS_EXTENDED_FAULT_REGISTERS
     static const uint32_t BFARVALID_MASK = (0x80 << SCB_CFSR_BUSFAULTSR_Pos);
@@ -328,11 +341,11 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
 
     /* Check if the ISR stack overflowed previously. Not possible to detect
      * after output may also have overflowed it. */
-    if(*(&_sstack) != STACK_CANARY_WORD) {
+    if (*(&_sstack) != STACK_CANARY_WORD) {
         puts("\nISR stack overflowed");
     }
     /* Sanity check stack pointer and give additional feedback about hard fault */
-    if(corrupted) {
+    if (corrupted) {
         puts("Stack pointer corrupted, reset to top of stack");
     }
     else {
@@ -403,7 +416,7 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
         puts("Attempting to reconstruct state for debugging...");
         printf("In GDB:\n  set $pc=0x%" PRIx32 "\n  frame 0\n  bt\n", pc);
         int stack_left = _stack_size_left(HARDFAULT_HANDLER_REQUIRED_STACK_SPACE);
-        if(stack_left < 0) {
+        if (stack_left < 0) {
             printf("\nISR stack overflowed by at least %d bytes.\n", (-1 * stack_left));
         }
         __asm__ volatile (
@@ -433,7 +446,7 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
             : [sp] "r" (sp),
               [orig_sp] "r" (orig_sp),
               [extra_stack] "r" (r4_to_r11_stack)
-            : "r0","r1","r2","r3","r12"
+            : "r0", "r1", "r2", "r3", "r12"
             );
     }
     __BKPT(1);
@@ -480,9 +493,9 @@ void dummy_handler_default(void)
 }
 
 /* Cortex-M common interrupt vectors */
-__attribute__((weak,alias("dummy_handler_default"))) void isr_svc(void);
-__attribute__((weak,alias("dummy_handler_default"))) void isr_pendsv(void);
-__attribute__((weak,alias("dummy_handler_default"))) void isr_systick(void);
+__attribute__((weak, alias("dummy_handler_default"))) void isr_svc(void);
+__attribute__((weak, alias("dummy_handler_default"))) void isr_pendsv(void);
+__attribute__((weak, alias("dummy_handler_default"))) void isr_systick(void);
 
 /* define Cortex-M base interrupt vectors
  * IRQ entries -9 to -6 inclusive (offsets 0x1c to 0x2c of cortexm_base_t)
