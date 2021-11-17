@@ -45,7 +45,11 @@ ifeq (1, $(SUBMODULES))
   BASE_MODULE ?= $(MODULE)
 
   # for each $(BASE_MODULE)_<name> in USEMODULE, add <name>.c to SRC
-  SRC += $(wildcard $(patsubst $(BASE_MODULE)_%,%.c,$(filter $(BASE_MODULE)_%,$(USEMODULE))))
+  # unless in SUBMODULES_NO_SRC
+  SRC += $(wildcard \
+            $(filter-out $(SUBMODULES_NO_SRC),\
+                $(patsubst $(BASE_MODULE)_%,%.c,\
+                    $(filter $(BASE_MODULE)_%,$(USEMODULE)))))
 
   # remove duplicates
   SRC := $(sort $(SRC))
