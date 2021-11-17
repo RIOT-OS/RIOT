@@ -191,6 +191,12 @@ def write_compile_command(state, compiler, src, flags, cdetails, path):
     arguments = [compiler, '-DRIOT_FILE_RELATIVE="' + os.path.join(cdetails.dir, src) + '"',
                  '-DRIOT_FILE_NOPATH="' + src + '"']
     arguments += flags
+    if '-c' in arguments:
+        # bindgen is unhappy with multiple -c (that would be created by the -c
+        # added later) and even with the -c showing up anywhere between other
+        # arguments.
+        assert arguments.count('-c') == 1, "Spurious duplicate -c arguments"
+        arguments.remove('-c')
     arguments += ['-MQ', obj, '-MD', '-MP', '-c', '-o', obj, src]
     entry = {
         'arguments': arguments,
