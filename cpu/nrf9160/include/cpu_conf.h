@@ -42,6 +42,21 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   (65U)   /**< nRF9160 specific IRQ count */
 /** @} */
 
+/**
+ * @name   Flash page configuration
+ * @{
+ */
+#define FLASHPAGE_SIZE              (4096U) /**< Size of a page in bytes */
+#define FLASHPAGE_NUMOF             (256U)  /**< Total number of flash pages */
+
+/* The minimum block size which can be written is 4B. However, the erase
+ * block is always FLASHPAGE_SIZE.
+ */
+#define FLASHPAGE_WRITE_BLOCK_SIZE      (4U) /**< Minimum block size */
+/* Writing should be always 4 bytes aligned */
+#define FLASHPAGE_WRITE_BLOCK_ALIGNMENT (4U) /**< Mandatory alignment */
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
