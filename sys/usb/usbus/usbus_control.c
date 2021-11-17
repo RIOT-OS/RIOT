@@ -257,18 +257,24 @@ static void _recv_setup(usbus_t *usbus, usbus_control_handler_t *handler)
 
     DEBUG("usbus_control: Received setup %x %x @ %d\n", pkt->type,
           pkt->request, pkt->length);
-
-    uint8_t destination = pkt->type & USB_SETUP_REQUEST_RECIPIENT_MASK;
     int res = 0;
-    switch (destination) {
-        case USB_SETUP_REQUEST_RECIPIENT_DEVICE:
-            res = _recv_dev_setup(usbus, pkt);
-            break;
-        case USB_SETUP_REQUEST_RECIPIENT_INTERFACE:
-            res = _recv_interface_setup(usbus, pkt);
-            break;
-        default:
-            DEBUG("usbus_control: Unhandled setup request\n");
+
+    /* If write and length is more than expected */
+    if (!(usb_setup_is_read(pkt)) && (handler->received_len > pkt->length)) {
+       res = -1; /* Stall */
+    }
+    else {
+        uint8_t destination = pkt->type & USB_SETUP_REQUEST_RECIPIENT_MASK;
+        switch (destination) {
+            case USB_SETUP_REQUEST_RECIPIENT_DEVICE:
+                res = _recv_dev_setup(usbus, pkt);
+                break;
+            case USB_SETUP_REQUEST_RECIPIENT_INTERFACE:
+                res = _recv_interface_setup(usbus, pkt);
+                break;
+            default:
+                DEBUG("usbus_control: Unhandled setup request\n");
+        }
     }
     if (res < 0) {
         /* Signal stall to indicate unsupported (USB 2.0 spec 9.6.2 */
