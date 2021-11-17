@@ -92,11 +92,6 @@ typedef enum {
     USBOPT_EP_STALL,
 
     /**
-     * @brief   (usbopt_enable_t) Signal data ready or not ready anymore
-     */
-    USBOPT_EP_READY,
-
-    /**
      * @brief   (size_t) Retrieve number of bytes available on endpoint.
      */
     USBOPT_EP_AVAILABLE,

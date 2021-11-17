@@ -69,14 +69,24 @@ typedef struct {
     size_t received_len;
 
     /**
-     * @brief EP0 OUT endpoint
+     * @brief EP0 OUT endpoint reference
      */
     usbdev_ep_t *out;
 
     /**
-     * @brief EP0 IN endpoint
+     * @brief EP0 IN endpoint reference
      */
     usbdev_ep_t *in;
+
+    /**
+     * @brief Host to device control request buffer
+     */
+    usbdev_ep_buf_t out_buf[CONFIG_USBUS_EP0_SIZE];
+
+    /**
+     * @brief Device to host control request buffer
+     */
+    usbdev_ep_buf_t in_buf[CONFIG_USBUS_EP0_SIZE];
 } usbus_control_handler_t;
 
 /**

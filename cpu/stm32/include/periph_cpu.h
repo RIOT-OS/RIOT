@@ -783,6 +783,16 @@ typedef struct {
 #endif
 
 /**
+ * @brief USBDEV buffers must be word aligned because of DMA restrictions
+ */
+#define USBDEV_CPU_DMA_ALIGNMENT       (4)
+
+/**
+ * @brief USBDEV buffer instantiation requirement
+ */
+#define USBDEV_CPU_DMA_REQUIREMENTS    __attribute__((aligned(USBDEV_CPU_DMA_ALIGNMENT)))
+
+/**
  * @brief USB OTG peripheral type.
  *
  * High speed peripheral is assumed to have DMA support available.

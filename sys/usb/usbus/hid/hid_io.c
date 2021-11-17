@@ -50,7 +50,7 @@ int usb_hid_io_read_timeout(void *buffer, size_t len, uint32_t timeout)
 void usb_hid_io_write(const void *buffer, size_t len)
 {
     assert(buffer);
-    uint8_t *buffer_ep = hid.ep_in->ep->buf;
+    uint8_t *buffer_ep = hid.in_buf;
     uint16_t max_size = hid.ep_in->maxpacketsize;
     size_t offset = 0;
 

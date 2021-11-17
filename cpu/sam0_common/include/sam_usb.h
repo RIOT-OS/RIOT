@@ -32,11 +32,6 @@ extern "C" {
 #endif
 
 /**
- * USB endpoint buffer space
- */
-#define SAM_USB_BUF_SPACE   USBDEV_EP_BUF_SPACE
-
-/**
  * Number of USB IN and OUT endpoints
  */
 #define SAM_USB_NUM_EP      USBDEV_NUM_ENDPOINTS
@@ -49,11 +44,6 @@ typedef struct {
     const sam0_common_usb_config_t *config;         /**< USB peripheral config   */
     UsbDeviceDescBank banks[2 * SAM_USB_NUM_EP];    /**< Device descriptor banks */
     usbdev_ep_t endpoints[2 * SAM_USB_NUM_EP];      /**< Endpoints               */
-    size_t used;                                    /**< Number of bytes from the
-                                                         buffer that are used    */
-    __attribute__ ((aligned(4)))
-    uint8_t buffer[SAM_USB_BUF_SPACE];              /**< Buffer space, must be
-                                                         32-bit aligned          */
     bool suspended;                                 /**< Suspend active          */
 } sam0_common_usb_t;
 

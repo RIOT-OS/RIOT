@@ -69,7 +69,7 @@ size_t usbus_control_slicer_put_bytes(usbus_t *usbus, const uint8_t *buf,
     size_t start_offset = bldr->cur - bldr->start + byte_offset;
     bldr->cur += len;
     bldr->len += byte_len;
-    memcpy(ep0->in->buf + start_offset, buf + byte_offset, byte_len);
+    memcpy(ep0->in_buf + start_offset, buf + byte_offset, byte_len);
     return byte_len;
 }
 
@@ -81,7 +81,7 @@ size_t usbus_control_slicer_put_char(usbus_t *usbus, char c)
 
     /* Only copy the char if it is within the window */
     if ((bldr->start <=  bldr->cur) && (bldr->cur < end)) {
-        uint8_t *pos = ep0->in->buf + bldr->cur - bldr->start;
+        uint8_t *pos = ep0->in_buf + bldr->cur - bldr->start;
         *pos = c;
         bldr->cur++;
         bldr->len++;
@@ -99,5 +99,5 @@ void usbus_control_slicer_ready(usbus_t *usbus)
 
     len = len < bldr->reqlen - bldr->start ? len : bldr->reqlen - bldr->start;
     bldr->transferred += len;
-    usbdev_ep_ready(ep0->in, len);
+    usbdev_ep_xmit(ep0->in, ep0->in_buf, len);
 }

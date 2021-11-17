@@ -77,6 +77,16 @@ struct usbus_hid_device {
     usbus_hid_cb_t cb;              /**< Callback for data handlers */
     event_t tx_ready;               /**< Transmit ready event */
     mutex_t in_lock;                /**< mutex used for locking hid send */
+
+    /**
+     * @brief Host to device data buffer
+     */
+    usbdev_ep_buf_t out_buf[CONFIG_USBUS_HID_INTERRUPT_EP_SIZE];
+
+    /**
+     * @brief Device to host data buffer
+     */
+    usbdev_ep_buf_t in_buf[CONFIG_USBUS_HID_INTERRUPT_EP_SIZE];
 };
 
 /**

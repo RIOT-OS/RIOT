@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#include "architecture.h"
 #include "cpu.h"
 #include "nrfusb.h"
 #include "periph/usbdev.h"
@@ -42,12 +43,12 @@ static nrfusb_t _usbdevs[NRF_USB_NUM_PERIPH];
 static void _init(usbdev_t *usbdev);
 static int _get(usbdev_t *usbdev, usbopt_t opt, void *value, size_t max_len);
 static int _set(usbdev_t *usbdev, usbopt_t opt, const void *value, size_t value_len);
-static usbdev_ep_t *_new_ep(usbdev_t *dev, usb_ep_type_t type, usb_ep_dir_t dir, size_t buf_len);
+static usbdev_ep_t *_new_ep(usbdev_t *dev, usb_ep_type_t type, usb_ep_dir_t dir, size_t len);
 static void _esr(usbdev_t *usbdev);
 static void _ep_init(usbdev_ep_t *ep);
 static int _ep_get(usbdev_ep_t *ep, usbopt_ep_t opt, void *value, size_t max_len);
 static int _ep_set(usbdev_ep_t *ep, usbopt_ep_t opt, const void *value, size_t value_len);
-static int _ep_ready(usbdev_ep_t *ep, size_t len);
+static int _ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len);
 static void _ep_esr(usbdev_ep_t *ep);
 
 static const usbdev_driver_t _driver = {
@@ -60,7 +61,7 @@ static const usbdev_driver_t _driver = {
     .ep_get = _ep_get,
     .ep_set = _ep_set,
     .ep_esr = _ep_esr,
-    .ready = _ep_ready,
+    .xmit = _ep_xmit,
 };
 
 static inline usbdev_ep_t *_get_ep_in(nrfusb_t *usbdev, unsigned num)
@@ -129,22 +130,10 @@ static void usb_detach(nrfusb_t *usbdev)
     usbdev->device->USBPULLUP = 0x00;
 }
 
-static void _ep_set_address(usbdev_ep_t *ep)
-{
-    nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
-
-    if (ep->dir == USB_EP_DIR_OUT) {
-        usbdev->device->EPOUT[ep->num].PTR = (uint32_t)ep->buf;
-    }
-    else {
-        usbdev->device->EPIN[ep->num].PTR = (uint32_t)ep->buf;
-    }
-}
-
 static void _copy_setup(usbdev_ep_t *ep)
 {
-    nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
-    usb_setup_t *setup = (usb_setup_t *)ep->buf;
+    nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
+    usb_setup_t *setup = (usb_setup_t*)(intptr_t)usbdev->device->EPOUT[0].PTR;
 
     setup->type = usbdev->device->BMREQUESTTYPE;
     setup->request = usbdev->device->BREQUEST;
@@ -157,17 +146,6 @@ static void _copy_setup(usbdev_ep_t *ep)
         DEBUG("nrfusb: set address call\n");
         usbdev->sstate = NRFUSB_SETUP_READY;
     }
-}
-
-static int _ep_set_size(usbdev_ep_t *ep)
-{
-    /* TODO: validate size */
-    nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
-
-    if (ep->dir == USB_EP_DIR_OUT) {
-        usbdev->device->EPOUT[ep->num].MAXCNT = (uint32_t)ep->len;
-    }
-    return 1;
 }
 
 static void _ep_enable(usbdev_ep_t *ep)
@@ -287,7 +265,6 @@ static void _init(usbdev_t *dev)
     nrfusb_t *usbdev = (nrfusb_t *)dev;
 
     poweron(usbdev);
-    usbdev->used = 0;
     usbdev->sstate = NRFUSB_SETUP_READY;
 
     /* Enable a set of interrupts */
@@ -350,9 +327,9 @@ static int _set(usbdev_t *dev, usbopt_t opt,
 static usbdev_ep_t *_new_ep(usbdev_t *dev,
                             usb_ep_type_t type,
                             usb_ep_dir_t dir,
-                            size_t buf_len)
+                            size_t len)
 {
-    nrfusb_t *usbdev = (nrfusb_t *)dev;
+    nrfusb_t *usbdev = (nrfusb_t*)dev;
     /* The IP supports all types for all endpoints */
     usbdev_ep_t *res = NULL;
 
@@ -374,23 +351,9 @@ static usbdev_ep_t *_new_ep(usbdev_t *dev,
     if (res) {
         res->dev = dev;
         res->dir = dir;
-        DEBUG("nrfusb: Allocated new ep (%d %s)\n",
-              res->num,
-              res->dir == USB_EP_DIR_OUT ? "OUT" : "IN");
-        if (usbdev->used + buf_len < NRF_USB_BUF_SPACE) {
-            res->buf = usbdev->buffer + usbdev->used;
-            res->len = buf_len;
-            if (_ep_set_size(res) < 0) {
-                return NULL;
-            }
-            usbdev->used += buf_len;
-            _ep_set_address(res);
-            res->type = type;
-            res->dev = dev;
-        }
-        else {
-            DEBUG("nrfusb: error allocating buffer space\n");
-        }
+        res->type = type;
+        res->len = len;
+        DEBUG("nrfusb: Allocated new ep (%d %s)\n", res->num, res->dir == USB_EP_DIR_OUT ? "OUT" : "IN");
     }
     return res;
 }
@@ -429,10 +392,8 @@ static void _ep_disable_irq(usbdev_ep_t *ep)
 
 static void _ep_init(usbdev_ep_t *ep)
 {
-    nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
+    nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
 
-    _ep_set_size(ep);
-    _ep_set_address(ep);
     if (ep->num == 0) {
         usbdev->device->EVENTS_EP0SETUP = 0;
     }
@@ -493,13 +454,6 @@ static int _ep_set(usbdev_ep_t *ep, usbopt_ep_t opt,
         _ep_set_stall(ep, *(usbopt_enable_t *)value);
         res = sizeof(usbopt_enable_t);
         break;
-    case USBOPT_EP_READY:
-        assert(value_len == sizeof(usbopt_enable_t));
-        if (*((usbopt_enable_t *)value)) {
-            _ep_ready(ep, 0);
-            res = sizeof(usbopt_enable_t);
-        }
-        break;
     default:
         DEBUG("Unhandled set call: 0x%x\n", opt);
         break;
@@ -507,9 +461,11 @@ static int _ep_set(usbdev_ep_t *ep, usbopt_ep_t opt,
     return res;
 }
 
-static int _ep0_ready(usbdev_ep_t *ep, size_t len)
+static int _ep0_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
 {
     nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
+    /* Assert the alignment required for the buffers */
+    assert(HAS_ALIGNMENT_OF(buf, USBDEV_CPU_DMA_ALIGNMENT));
 
     if (ep->dir == USB_EP_DIR_IN) {
         if (len == 0 && usbdev->sstate == NRFUSB_SETUP_WRITE) {
@@ -518,12 +474,14 @@ static int _ep0_ready(usbdev_ep_t *ep, size_t len)
             usbdev->sstate = NRFUSB_SETUP_ACKIN;
         }
         else {
-            usbdev->device->EPIN[0].PTR = (uint32_t)ep->buf;
+            usbdev->device->EPIN[0].PTR = (uint32_t)(intptr_t)buf;
             usbdev->device->EPIN[0].MAXCNT = (uint32_t)len;
             usbdev->device->TASKS_STARTEPIN[0] = 1;
         }
     }
     else {
+        usbdev->device->EPOUT[0].PTR = (uint32_t)(intptr_t)buf;
+        usbdev->device->EPOUT[0].MAXCNT = (uint32_t)len;
         /* USB_EP_DIR_OUT */
         if (usbdev->sstate == NRFUSB_SETUP_READ) {
             usbdev->device->TASKS_EP0STATUS = 1;
@@ -537,20 +495,23 @@ static int _ep0_ready(usbdev_ep_t *ep, size_t len)
     return len;
 }
 
-static int _ep_ready(usbdev_ep_t *ep, size_t len)
+static int _ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
 {
     nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
 
     if (ep->num == 0) {
         /* Endpoint 0 requires special handling as per datasheet sec 6.35.9 */
-        return _ep0_ready(ep, len);
+        return _ep0_xmit(ep, buf, len);
     }
     if (ep->dir == USB_EP_DIR_IN) {
-        usbdev->device->EPIN[ep->num].PTR = (uint32_t)ep->buf;
+        usbdev->device->EPIN[ep->num].PTR = (uint32_t)(intptr_t)buf;
         usbdev->device->EPIN[ep->num].MAXCNT = (uint32_t)len;
         _ep_dma_in(ep);
     }
     else {
+        /* Pre-Setup the EasyDMA settings */
+        usbdev->device->EPOUT[ep->num].PTR = (uint32_t)(intptr_t)buf;
+        usbdev->device->EPOUT[ep->num].MAXCNT = (uint32_t)(intptr_t)len;
         /* Write nonzero value to EPOUT to indicate ready */
         usbdev->device->SIZE.EPOUT[ep->num] = 1;
     }

@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#include "architecture.h"
 #include "bitarithm.h"
 #include "ztimer.h"
 #include "cpu.h"
@@ -101,7 +102,7 @@
 /* List of instantiated USB peripherals */
 static stm32_usb_otg_fshs_t _usbdevs[USBDEV_NUMOF] = { 0 };
 
-static usbdev_ep_t _out[_TOTAL_NUM_ENDPOINTS];
+static stm32_usb_otg_fshs_out_ep_t _out[_TOTAL_NUM_ENDPOINTS];
 static usbdev_ep_t _in[_TOTAL_NUM_ENDPOINTS];
 
 /* Forward declaration for the usb device driver */
@@ -418,7 +419,7 @@ static usbdev_ep_t *_get_ep(stm32_usb_otg_fshs_t *usbdev, unsigned num,
     if (num >= STM32_USB_OTG_FS_NUM_EP) {
         return NULL;
     }
-    return dir == USB_EP_DIR_IN ? &usbdev->in[num] : &usbdev->out[num];
+    return dir == USB_EP_DIR_IN ? &usbdev->in[num] : &usbdev->out[num].ep;
 }
 
 #if defined(DEVELHELP) && !defined(NDEBUG)
@@ -479,18 +480,8 @@ static void _configure_fifo(stm32_usb_otg_fshs_t *usbdev)
     usbdev->fifo_pos = (rx_size + STM32_USB_OTG_FIFO_MIN_WORD_SIZE);
 }
 
-size_t _round_up_to_multiple_of_four(size_t unaligned)
-{
-    size_t misalignment = unaligned & 0x03;
-    if (misalignment) {
-        unaligned += 4 - misalignment;
-    }
-
-    return unaligned;
-}
-
 static usbdev_ep_t *_usbdev_new_ep(usbdev_t *dev, usb_ep_type_t type,
-                                   usb_ep_dir_t dir, size_t buf_len)
+                                   usb_ep_dir_t dir, size_t len)
 {
     stm32_usb_otg_fshs_t *usbdev = (stm32_usb_otg_fshs_t *)dev;
     usbdev_ep_t *ep = NULL;
@@ -500,7 +491,7 @@ static usbdev_ep_t *_usbdev_new_ep(usbdev_t *dev, usb_ep_type_t type,
             ep = &usbdev->in[0];
         }
         else {
-            ep = &usbdev->out[0];
+            ep = &usbdev->out[0].ep;
         }
         ep->num = 0;
     }
@@ -516,17 +507,12 @@ static usbdev_ep_t *_usbdev_new_ep(usbdev_t *dev, usb_ep_type_t type,
     }
 
     if (ep && ep->type == USB_EP_TYPE_NONE) {
-        if (usbdev->occupied + buf_len < STM32_USB_OTG_BUF_SPACE) {
-            ep->buf = usbdev->buffer + usbdev->occupied;
-            ep->dir = dir;
-            ep->type = type;
-            ep->dev = dev;
-            ep->len = buf_len;
-            usbdev->occupied += buf_len;
-            usbdev->occupied = _round_up_to_multiple_of_four(usbdev->occupied);
-            if (ep->dir == USB_EP_DIR_IN && ep->num != 0) {
-                _configure_tx_fifo(usbdev, ep->num, ep->len);
-            }
+        ep->dir = dir;
+        ep->type = type;
+        ep->dev = dev;
+        ep->len = len;
+        if (ep->dir == USB_EP_DIR_IN && ep->num != 0) {
+            _configure_tx_fifo(usbdev, ep->num, ep->len);
         }
     }
     return ep;
@@ -922,10 +908,12 @@ static int _usbdev_ep_set(usbdev_ep_t *ep, usbopt_ep_t opt,
     return res;
 }
 
-static int _usbdev_ep_ready(usbdev_ep_t *ep, size_t len)
+static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
 {
     stm32_usb_otg_fshs_t *usbdev = (stm32_usb_otg_fshs_t *)ep->dev;
     const stm32_usb_otg_fshs_config_t *conf = usbdev->config;
+    /* Assert the alignment required for the buffers */
+    assert(HAS_ALIGNMENT_OF(buf, USBDEV_CPU_DMA_ALIGNMENT));
 
     if (ep->dir == USB_EP_DIR_IN) {
         /* Abort when the endpoint is not active, prevents hangs,
@@ -935,7 +923,7 @@ static int _usbdev_ep_ready(usbdev_ep_t *ep, size_t len)
         }
 
         if (_uses_dma(conf)) {
-            _in_regs(conf, ep->num)->DIEPDMA = (uint32_t)ep->buf;
+            _in_regs(conf, ep->num)->DIEPDMA = (uint32_t)(intptr_t)buf;
         }
 
         /* The order here is crucial (AFAIK), it is required to first set the
@@ -966,9 +954,10 @@ static int _usbdev_ep_ready(usbdev_ep_t *ep, size_t len)
         if (len > 0 && !_uses_dma(conf)) {
             /* The FIFO requires 32 bit word reads/writes */
             size_t words = (len + 3) / 4;
-            /* buffer is gets aligned in _usbdev_new_ep(). Use intermediate
+
+            /* buffer alignment is asserted above. Use intermediate
              * cast to uintptr_t to silence -Wcast-align*/
-            uint32_t *ep_buf = (uint32_t *)(uintptr_t)ep->buf;
+            uint32_t *ep_buf = (uint32_t *)(uintptr_t)buf;
             __O uint32_t *fifo = _tx_fifo(conf, ep->num);
             for (size_t i = 0; i < words; i++) {
                 fifo[i] = ep_buf[i];
@@ -983,7 +972,10 @@ static int _usbdev_ep_ready(usbdev_ep_t *ep, size_t len)
         }
 
         if (_uses_dma(conf)) {
-            _out_regs(conf, ep->num)->DOEPDMA = (uint32_t)ep->buf;
+            _out_regs(conf, ep->num)->DOEPDMA = (uint32_t)(intptr_t)buf;
+        }
+        else {
+            container_of(ep, stm32_usb_otg_fshs_out_ep_t, ep)->out_buf = buf;
         }
 
         /* Configure to receive one packet with ep->len as max length */
@@ -1012,9 +1004,9 @@ static void _copy_rxfifo(stm32_usb_otg_fshs_t *usbdev, uint8_t *buf, size_t len)
     }
 }
 
-static void _read_packet(usbdev_ep_t *ep)
+static void _read_packet(stm32_usb_otg_fshs_out_ep_t *st_ep)
 {
-    stm32_usb_otg_fshs_t *usbdev = (stm32_usb_otg_fshs_t *)ep->dev;
+    stm32_usb_otg_fshs_t *usbdev = (stm32_usb_otg_fshs_t *)st_ep->ep.dev;
     const stm32_usb_otg_fshs_config_t *conf = usbdev->config;
     /* Pop status from the receive fifo status register */
     uint32_t status = _global_regs(conf)->GRXSTSP;
@@ -1029,13 +1021,12 @@ static void _read_packet(usbdev_ep_t *ep)
      * complete status*/
     if (pkt_status == STM32_PKTSTS_DATA_UPDT ||
         pkt_status == STM32_PKTSTS_SETUP_UPDT) {
-        _copy_rxfifo(usbdev, ep->buf, len);
+        _copy_rxfifo(usbdev, st_ep->out_buf, len);
 #ifdef STM32_USB_OTG_CID_2x
         /* CID 2x doesn't signal SETUP_COMP on non-zero length packets, signal
          * the TR_COMPLETE event immediately */
-        if (ep->num == 0 && len) {
-            usbdev->usbdev.epcb(&usbdev->out[ep->num],
-                                USBDEV_EVENT_TR_COMPLETE);
+        if (st_ep->ep.num == 0 && len) {
+            usbdev->usbdev.epcb(&st_ep->ep, USBDEV_EVENT_TR_COMPLETE);
         }
 #endif  /* STM32_USB_OTG_CID_2x */
     }
@@ -1043,7 +1034,7 @@ static void _read_packet(usbdev_ep_t *ep)
      * status is skipped */
     else if (pkt_status == STM32_PKTSTS_XFER_COMP ||
              pkt_status == STM32_PKTSTS_SETUP_COMP) {
-        usbdev->usbdev.epcb(&usbdev->out[ep->num], USBDEV_EVENT_TR_COMPLETE);
+        usbdev->usbdev.epcb(&st_ep->ep, USBDEV_EVENT_TR_COMPLETE);
     }
 }
 
@@ -1078,7 +1069,7 @@ static void _usbdev_ep_esr(usbdev_ep_t *ep)
         if ((_global_regs(conf)->GINTSTS & USB_OTG_GINTSTS_RXFLVL) &&
             (_global_regs(conf)->GRXSTSR & USB_OTG_GRXSTSP_EPNUM_Msk) == ep->num &&
              !_uses_dma(conf)) {
-            _read_packet(ep);
+            _read_packet(container_of(ep, stm32_usb_otg_fshs_out_ep_t, ep));
         }
         /* Transfer complete seems only reliable when used with DMA */
         else if (_out_regs(conf, ep->num)->DOEPINT & USB_OTG_DOEPINT_XFRC) {
@@ -1102,7 +1093,7 @@ static void _isr_ep(stm32_usb_otg_fshs_t *usbdev)
     if (active_ep) {
         unsigned epnum = bitarithm_lsb(active_ep);
         if (epnum >= STM32_USB_OTG_REG_EP_OUT_OFFSET) {
-            usbdev->usbdev.epcb(&usbdev->out[epnum - STM32_USB_OTG_REG_EP_OUT_OFFSET],
+            usbdev->usbdev.epcb(&usbdev->out[epnum - STM32_USB_OTG_REG_EP_OUT_OFFSET].ep,
                                 USBDEV_EVENT_ESR);
         }
         else {
@@ -1121,7 +1112,7 @@ void _isr_common(stm32_usb_otg_fshs_t *usbdev)
         if (status & USB_OTG_GINTSTS_RXFLVL) {
             unsigned epnum = _global_regs(conf)->GRXSTSR &
                              USB_OTG_GRXSTSP_EPNUM_Msk;
-            usbdev->usbdev.epcb(&usbdev->out[epnum], USBDEV_EVENT_ESR);
+            usbdev->usbdev.epcb(&usbdev->out[epnum].ep, USBDEV_EVENT_ESR);
         }
         else if (_global_regs(conf)->GINTSTS &
                  (USB_OTG_GINTSTS_OEPINT | USB_OTG_GINTSTS_IEPINT)) {
@@ -1166,5 +1157,5 @@ const usbdev_driver_t driver = {
     .ep_get = _usbdev_ep_get,
     .ep_set = _usbdev_ep_set,
     .ep_esr = _usbdev_ep_esr,
-    .ready = _usbdev_ep_ready,
+    .xmit = _usbdev_ep_xmit,
 };
