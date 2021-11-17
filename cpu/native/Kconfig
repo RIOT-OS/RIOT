@@ -90,3 +90,4 @@ rsource "backtrace/Kconfig"
 endmenu # Native modules
 
 rsource "periph/Kconfig"
+rsource "vfs/Kconfig"
