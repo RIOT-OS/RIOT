@@ -75,11 +75,6 @@ ifneq (,$(filter mtd,$(USEMODULE)))
   USEMODULE += esp_idf_spi_flash
 endif
 
-ifneq (,$(filter ndn-riot,$(USEPKG)))
-  USEMODULE += crypto
-  USEMODULE += cipher_modes
-endif
-
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
   USEMODULE += rtt_rtc
 endif
