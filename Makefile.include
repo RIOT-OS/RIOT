@@ -401,7 +401,9 @@ include $(RIOTMAKE)/kconfig.mk
 
 # For testing, use TEST_KCONFIG as a switch between Makefile.dep and Kconfig
 ifeq (1,$(TEST_KCONFIG))
-  $(info === [ATTENTION] Testing Kconfig dependency modelling ===)
+  ifneq ($(RIOT_CI_BUILD),1)
+    $(info === [ATTENTION] Testing Kconfig dependency modelling ===)
+  endif
   KCONFIG_MODULES := $(call lowercase,$(patsubst CONFIG_MODULE_%,%,$(filter CONFIG_MODULE_%,$(.VARIABLES))))
   USEMODULE := $(KCONFIG_MODULES)
   KCONFIG_PACKAGES := $(call lowercase,$(patsubst CONFIG_PACKAGE_%,%,$(filter CONFIG_PACKAGE_%,$(.VARIABLES))))
