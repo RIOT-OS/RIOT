@@ -182,6 +182,7 @@ static void _get_page(uintptr_t addr)
 {
     uart_write_byte(RIOTBOOT_UART_DEV, RIOTBOOT_STAT_OK);
     uint32_t page = flashpage_page((void *)addr);
+
     uart_write(RIOTBOOT_UART_DEV, (void *)&page, sizeof(page));
 }
 

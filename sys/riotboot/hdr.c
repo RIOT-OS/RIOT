@@ -59,6 +59,7 @@ int riotboot_hdr_validate(const riotboot_hdr_t *riotboot_hdr)
 
     int res = riotboot_hdr_checksum(riotboot_hdr) ==
               riotboot_hdr->chksum ? 0 : -1;
+
     if (res) {
         LOG_INFO("%s: riotboot_hdr checksum invalid\n", __func__);
     }
