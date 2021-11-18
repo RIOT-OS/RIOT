@@ -15,6 +15,12 @@ config MODULE_ILI9341
     select MODULE_ZTIMER
     select MODULE_ZTIMER_MSEC
 
+config HAVE_ILI9341
+    bool
+    select MODULE_ILI9341 if MODULE_DISP_DEV
+    help
+      Indicates that an ILI9341 display is present.
+
 menuconfig KCONFIG_USEMODULE_ILI9341
     bool "Configure ILI9341 driver"
     depends on USEMODULE_ILI9341
