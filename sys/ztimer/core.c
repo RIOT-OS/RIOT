@@ -40,6 +40,7 @@ static void _add_entry_to_list(ztimer_clock_t *clock, ztimer_base_t *entry);
 static void _del_entry_from_list(ztimer_clock_t *clock, ztimer_base_t *entry);
 static void _ztimer_update(ztimer_clock_t *clock);
 static void _ztimer_print(const ztimer_clock_t *clock);
+static void _ztimer_update_head_offset(ztimer_clock_t *clock);
 
 #ifdef MODULE_ZTIMER_EXTEND
 static inline uint32_t _min_u32(uint32_t a, uint32_t b)
@@ -72,7 +73,7 @@ void ztimer_remove(ztimer_clock_t *clock, ztimer_t *timer)
     unsigned state = irq_disable();
 
     if (_is_set(clock, timer)) {
-        ztimer_update_head_offset(clock);
+        _ztimer_update_head_offset(clock);
         _del_entry_from_list(clock, &timer->base);
 
         _ztimer_update(clock);
@@ -88,7 +89,7 @@ void ztimer_set(ztimer_clock_t *clock, ztimer_t *timer, uint32_t val)
 
     unsigned state = irq_disable();
 
-    ztimer_update_head_offset(clock);
+    _ztimer_update_head_offset(clock);
     if (_is_set(clock, timer)) {
         _del_entry_from_list(clock, &timer->base);
     }
@@ -186,7 +187,7 @@ ztimer_now_t _ztimer_now_extend(ztimer_clock_t *clock)
 }
 #endif /* MODULE_ZTIMER_EXTEND */
 
-void ztimer_update_head_offset(ztimer_clock_t *clock)
+static void _ztimer_update_head_offset(ztimer_clock_t *clock)
 {
     uint32_t old_base = clock->list.offset;
     uint32_t now = ztimer_now(clock);
@@ -195,7 +196,7 @@ void ztimer_update_head_offset(ztimer_clock_t *clock)
     ztimer_base_t *entry = clock->list.next;
 
     DEBUG(
-        "clock %p: ztimer_update_head_offset(): diff=%" PRIu32 " old head %p\n",
+        "clock %p: _ztimer_update_head_offset(): diff=%" PRIu32 " old head %p\n",
         (void *)clock, diff, (void *)entry);
     if (entry) {
         do {
@@ -215,7 +216,7 @@ void ztimer_update_head_offset(ztimer_clock_t *clock)
             }
         } while (diff && entry);
         DEBUG(
-            "ztimer %p: ztimer_update_head_offset(): now=%" PRIu32 " new head %p",
+            "ztimer %p: _ztimer_update_head_offset(): now=%" PRIu32 " new head %p",
             (void *)clock, now, (void *)entry);
         if (entry) {
             DEBUG(" offset %" PRIu32 "\n", entry->offset);
@@ -374,7 +375,7 @@ void ztimer_handler(ztimer_clock_t *clock)
         if (!entry) {
             /* See if any more alarms expired during callback processing */
             /* This reduces the number of implicit calls to clock->ops->now() */
-            ztimer_update_head_offset(clock);
+            _ztimer_update_head_offset(clock);
             entry = _now_next(clock);
         }
     }
