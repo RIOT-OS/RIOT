@@ -93,12 +93,6 @@ ifneq (1, $(RIOTBOOT_BUILD))
   FEATURES_OPTIONAL += periph_pm
 endif
 
-# always select provided architecture features
-FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
-
-# always select CPU core features
-FEATURES_REQUIRED += $(filter cpu_core_%,$(FEATURES_PROVIDED))
-
 # don't use idle thread if architecture has needed support
 FEATURES_OPTIONAL += no_idle_thread
 
