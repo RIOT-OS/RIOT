@@ -1,0 +1,30 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if TEST_KCONFIG
+
+config MODULE_ESP_RTC_TIMER_32K
+    bool
+    depends on HAS_ESP_RTC_TIMER_32K
+    default y if MODULE_PERIPH_RTC
+    help
+      Use RTC timer with external 32.768 kHz crystal as RTT.
+
+config MODULE_PERIPH_ADC_CTRL
+    bool
+    depends on HAS_PERIPH_ADC_CTRL
+    default y if MODULE_PERIPH_ADC || MODULE_PERIPH_DAC
+
+config MODULE_PERIPH_RTT_HW_SYS
+    bool
+    default y if MODULE_PERIPH_RTT
+
+config MODULE_PERIPH_RTT_HW_RTC
+    bool
+    default y if MODULE_PERIPH_RTT
+
+endif # TEST_KCONFIG
