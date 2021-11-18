@@ -114,6 +114,7 @@ typedef enum {
 #define DOSE_FLAG_RECV_BUF_DIRTY (BIT0)     /**< Receive buffer contains a complete unhandled frame */
 #define DOSE_FLAG_END_RECEIVED   (BIT1)     /**< END octet has been received */
 #define DOSE_FLAG_ESC_RECEIVED   (BIT2)     /**< ESC octet has been received */
+#define DOSE_FLAG_SEND_PENDING   (BIT3)     /**< A send operation is pending */
 /** @} */
 
 /**
