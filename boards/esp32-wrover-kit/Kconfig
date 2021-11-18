@@ -20,6 +20,7 @@ config BOARD_ESP32_WROVER_KIT
     select HAS_PERIPH_PWM
     select HAS_PERIPH_SPI
     select HAS_SDCARD_SPI
-    select MODULE_ESP_JTAG
+
+    select HAVE_ILI9341
 
 source "$(RIOTBOARD)/common/esp32/Kconfig"
