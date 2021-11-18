@@ -31,7 +31,10 @@
 #include <string.h>
 #include <inttypes.h>
 
-#define ROUND_UP(N, S) ((((N) + (S) - 1) / (S)) * (S))
+#define ROUND_UP(N, S) ((((N) + (S)-1) / (S)) * (S))
+
+/* number of used sd cards */
+#define SDCARD_SPI_NUM ARRAY_SIZE(sdcard_spi_params)
 
 static inline uint8_t _wait_for_r1(sdcard_spi_t *card, uint32_t retry_us);
 static inline void _send_dummy_byte(sdcard_spi_t *card);
@@ -45,9 +48,6 @@ static sd_rw_response_t _read_data_packet(sdcard_spi_t *card, uint8_t token, uin
 static sd_rw_response_t _write_data_packet(sdcard_spi_t *card, uint8_t token, const uint8_t *data,
                                            int size);
 
-/* number of used sd cards */
-#define SDCARD_SPI_NUM ARRAY_SIZE(sdcard_spi_params)
-
 /* Allocate memory for the device descriptors */
 sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
 
@@ -59,12 +59,20 @@ static int (*_dyn_spi_rxtx_byte)(sdcard_spi_t *card, uint8_t out, uint8_t *in);
 
 static inline uint32_t _deadline_from_interval(uint32_t interval)
 {
+# if IS_USED(MODULE_ZTIMER_USEC)
     return ztimer_now(ZTIMER_USEC) + interval;
+#else
+    return ztimer_now(ZTIMER_MSEC) * US_PER_MS + interval;
+#endif
 }
 
 static inline uint32_t _deadline_left(uint32_t deadline)
 {
+# if IS_USED(MODULE_ZTIMER_USEC)
     int32_t left = (int32_t)(deadline - ztimer_now(ZTIMER_USEC));
+#else
+    int32_t left = (int32_t)(deadline - ztimer_now(ZTIMER_MSEC) * US_PER_MS);
+#endif
 
     if (left < 0) {
         left = 0;
@@ -179,7 +187,6 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
             .miso = GPIO_IN_PU,
             .sclk = GPIO_OUT,
         };
-
         if ((spi_init_with_gpio_mode(card->params.spi_dev, &gpio_modes) == 0) &&
             (gpio_init(card->params.cs, GPIO_OUT) == 0) &&
             ((!gpio_is_valid(card->params.power)) ||
@@ -214,7 +221,7 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
 
         if (gpio_is_valid(card->params.power)) {
             gpio_write(card->params.power, card->params.power_act_high);
-            ztimer_sleep(ZTIMER_USEC, SD_CARD_WAIT_AFTER_POWER_UP_US);
+            ztimer_sleep(ZTIMER_MSEC, SD_CARD_WAIT_AFTER_POWER_UP_MS);
         }
 
         /* powersequence: perform at least 74 clockcycles sending dummy bytes with 0xFF,
@@ -520,7 +527,7 @@ uint8_t sdcard_spi_send_cmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t arg
     do {
         DEBUG(
             "sdcard_spi_send_cmd: CMD%02d (0x%08" PRIx32 ") (remaining retry time %" PRIu32 " usec)\n", sd_cmd_idx, argument,
-            (retry_timeout > ztimer_now(ZTIMER_USEC)) ? (uint32_t)(retry_timeout - ztimer_now(ZTIMER_USEC)) : 0);
+            _deadline_left(retry_timeout));
 
         if (!_wait_for_not_busy(card, SD_WAIT_FOR_NOT_BUSY_US)) {
             DEBUG("sdcard_spi_send_cmd: timeout while waiting for bus to be not busy!\n");
@@ -568,8 +575,9 @@ uint8_t sdcard_spi_send_acmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t ar
     uint8_t r1_resu;
 
     do {
-        DEBUG("sdcard_spi_send_acmd: CMD%02d (0x%08" PRIx32 ") (remaining retry time %" PRIu32 " usec)\n", sd_cmd_idx, argument,
-            (retry_timeout > ztimer_now(ZTIMER_USEC)) ? (uint32_t)(retry_timeout - ztimer_now(ZTIMER_USEC)) : 0);
+        DEBUG(
+            "sdcard_spi_send_acmd: CMD%02d (0x%08" PRIx32 ") (remaining retry time %" PRIu32 " usec)\n",
+            sd_cmd_idx, argument, _deadline_left(retry_timeout));
         r1_resu = sdcard_spi_send_cmd(card, SD_CMD_55, SD_CMD_NO_ARG, 0);
         if (R1_VALID(r1_resu) && !R1_ERROR(r1_resu)) {
             r1_resu = sdcard_spi_send_cmd(card, sd_cmd_idx, argument, 0);
