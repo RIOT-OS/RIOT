@@ -8,4 +8,3 @@
 config PACKAGE_NANOCBOR
     bool "NANOCBOR encoder and decoder library package"
     depends on TEST_KCONFIG
-    depends on HAS_ARCH_32BIT
