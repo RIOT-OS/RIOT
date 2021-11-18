@@ -137,10 +137,6 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
 
     usbus_enable_endpoint(hid->ep_out);
 
-    /* signal that INTERRUPT OUT is ready to receive data */
-    usbdev_ep_xmit(hid->ep_out->ep, hid->out_buf,
-                    CONFIG_USBUS_HID_INTERRUPT_EP_SIZE);
-
     usbus_add_interface(usbus, &hid->iface);
 }
 
@@ -195,6 +191,9 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
         }
         break;
     case USB_HID_REQUEST_SET_IDLE:
+        /* Wait for data from HOST */
+        usbdev_ep_xmit(hid->ep_out->ep, hid->out_buf,
+                       CONFIG_USBUS_HID_INTERRUPT_EP_SIZE);
         break;
     case USB_HID_REQUEST_SET_PROTOCOL:
         break;
