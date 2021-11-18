@@ -474,10 +474,28 @@ static inline ztimer_now_t ztimer_now(ztimer_clock_t *clock)
  * @return  Current time until the @p timer is trigger in clock units
  */
 static inline uint32_t ztimer_until(ztimer_clock_t *clock, ztimer_t *timer){
+    unsigned state = irq_disable();
 #if ZTIMER_UNTIL_SAFTY_NET
-    if (!ztimer_is_set(clock,timer)){ return 0; }
+    if (!ztimer_is_set(clock,timer)){
+        irq_restore(state);
+        return 0;
+    }
 #endif
-    return timer->base.offset - (uint32_t) ztimer_now(clock);
+    uint32_t sum = clock->list.offset;
+    ztimer_base_t * i = clock->list.next;
+    ztimer_base_t * timer_base = &timer->base;
+    for( ; i && i != timer_base; i = i->next){
+        sum += i->offset;
+    }
+    if (i == timer_base){
+        sum += i->offset;
+        irq_restore(state);
+        return sum - (uint32_t) ztimer_now(clock);
+    }
+    else{
+        irq_restore(state);
+        return 0;
+    }
 }
 
 
