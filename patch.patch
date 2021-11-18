@@ -1,0 +1,73 @@
+diff --git a/boards/dwm1001/include/board.h b/boards/dwm1001/include/board.h
+index 03ae755338..f45a992fa8 100644
+--- a/boards/dwm1001/include/board.h
++++ b/boards/dwm1001/include/board.h
+@@ -82,6 +82,18 @@ extern "C" {
+ #define DW1000_PARAM_INT_PIN        GPIO_PIN(0, 19)
+ /** @} */
+ 
++/**
++ * @name    SD Card device configuration
++ * @{
++ */
++#define SDCARD_SPI_PARAM_SPI         SPI_DEV(0)
++#define SDCARD_SPI_PARAM_CD          (GPIO_PIN(0, 26))
++#define SDCARD_SPI_PARAM_CS          (GPIO_PIN(0, 3))
++#define SDCARD_SPI_PARAM_CLK         (GPIO_PIN(0, 4))
++#define SDCARD_SPI_PARAM_MOSI        (GPIO_PIN(0, 6))
++#define SDCARD_SPI_PARAM_MISO        (GPIO_PIN(0, 7))
++/** @} */
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/drivers/sdcard_spi/sdcard_spi.c b/drivers/sdcard_spi/sdcard_spi.c
+index 7b2e1a75a0..43b5ebdfd4 100644
+--- a/drivers/sdcard_spi/sdcard_spi.c
++++ b/drivers/sdcard_spi/sdcard_spi.c
+@@ -17,7 +17,7 @@
+  *
+  * @}
+  */
+-#define ENABLE_DEBUG 0
++#define ENABLE_DEBUG 1
+ #include "debug.h"
+ #include "sdcard_spi_internal.h"
+ #include "sdcard_spi.h"
+diff --git a/examples/filesystem/Makefile b/examples/filesystem/Makefile
+index c7f490add6..9ad0e277ab 100644
+--- a/examples/filesystem/Makefile
++++ b/examples/filesystem/Makefile
+@@ -26,7 +26,7 @@ USEMODULE += ps
+ 
+ # Use MTD (flash layer)
+ USEMODULE += mtd
+-# USEMODULE += mtd_sdcard
++USEMODULE += mtd_sdcard
+ 
+ # Use VFS
+ USEMODULE += vfs
+@@ -35,9 +35,10 @@ DISABLE_MODULE += vfs_auto_mount
+ 
+ # Use a file system
+ # USEMODULE += littlefs
+-USEMODULE += littlefs2
++# USEMODULE += littlefs2
+ # USEMODULE += spiffs
+-# USEMODULE += fatfs_vfs
++USEMODULE += fatfs_vfs
++USEMODULE += fatfs_vfs_format
+ USEMODULE += constfs
+ # USEMODULE += devfs
+ 
+diff --git a/tests/driver_sdcard_spi/Makefile b/tests/driver_sdcard_spi/Makefile
+index a7f6f0895f..8615b9be1f 100644
+--- a/tests/driver_sdcard_spi/Makefile
++++ b/tests/driver_sdcard_spi/Makefile
+@@ -3,5 +3,6 @@ include ../Makefile.tests_common
+ USEMODULE += sdcard_spi
+ USEMODULE += fmt
+ USEMODULE += shell
++USEMODULE += shell_commands
+ 
+ include $(RIOTBASE)/Makefile.include

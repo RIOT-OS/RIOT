@@ -11840,7 +11840,7 @@ drivers/sdcard_spi/include/sdcard_spi_internal\.h:[0-9]+: warning: Member R1_VAL
 drivers/sdcard_spi/include/sdcard_spi_internal\.h:[0-9]+: warning: Member SD_ACMD_41_ARG_HC \(macro definition\) of file sdcard_spi_internal\.h is not documented\.
 drivers/sdcard_spi/include/sdcard_spi_internal\.h:[0-9]+: warning: Member SD_BLOCKS_FOR_REG_READ \(macro definition\) of file sdcard_spi_internal\.h is not documented\.
 drivers/sdcard_spi/include/sdcard_spi_internal\.h:[0-9]+: warning: Member SD_CARD_PREINIT_CLOCK_PERIOD_US \(macro definition\) of file sdcard_spi_internal\.h is not documented\.
-drivers/sdcard_spi/include/sdcard_spi_internal\.h:[0-9]+: warning: Member SD_CARD_WAIT_AFTER_POWER_UP_US \(macro definition\) of file sdcard_spi_internal\.h is not documented\.
+drivers/sdcard_spi/include/sdcard_spi_internal\.h:[0-9]+: warning: Member SD_CARD_WAIT_AFTER_POWER_UP_MS \(macro definition\) of file sdcard_spi_internal\.h is not documented\.
 drivers/sdcard_spi/include/sdcard_spi_internal\.h:[0-9]+: warning: Member SD_CMD_0 \(macro definition\) of file sdcard_spi_internal\.h is not documented\.
 drivers/sdcard_spi/include/sdcard_spi_internal\.h:[0-9]+: warning: Member SD_CMD_1 \(macro definition\) of file sdcard_spi_internal\.h is not documented\.
 drivers/sdcard_spi/include/sdcard_spi_internal\.h:[0-9]+: warning: Member SD_CMD_10 \(macro definition\) of file sdcard_spi_internal\.h is not documented\.
