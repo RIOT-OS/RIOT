@@ -113,3 +113,6 @@ filp
 
 # Ether (Scapy class name and means Ethernet in some parts of the code) => Either
 ether
+
+# crate (Rust's package format) => create
+crate
