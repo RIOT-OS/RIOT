@@ -59,3 +59,47 @@ config HAS_ARCH_ESP
 ## Common CPU symbols
 config CPU_ARCH
     default "xtensa" if CPU_ARCH_XTENSA
+
+config MODULE_ESP_COMMON
+    bool
+    depends on TEST_KCONFIG
+    depends on CPU_COMMON_ESP
+    default y
+    select MODULE_LOG # override default log implementation by default
+    select MODULE_PERIPH
+    select MODULE_ESP_IDF
+    help
+      Common code module for ESP SoCs.
+
+config MODULE_PERIPH_FLASH
+    bool
+    depends on TEST_KCONFIG
+    depends on CPU_COMMON_ESP
+    default y if MODULE_MTD
+    help
+        Low-level MTD flash driver implementation for ESP SoCs.
+
+if TEST_KCONFIG
+
+menu "ESP configurations"
+
+config MODULE_ESP_LOG_COLORED
+    bool
+    default y if MODULE_LOG_COLOR
+
+config MODULE_ESP_LOG_TAGGED
+    bool "Add additional information to the log output"
+    help
+        Adds the type of the message, the system time in ms and a tag (module
+        or function) to the output.
+
+config MODULE_ESP_LOG_STARTUP
+    bool "Add additional startup information to the log output"
+
+endmenu
+
+endif # TEST_KCONFIG
+
+rsource "freertos/Kconfig"
+rsource "periph/Kconfig"
+rsource "vendor/xtensa/Kconfig"

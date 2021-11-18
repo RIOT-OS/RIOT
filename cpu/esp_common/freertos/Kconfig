@@ -1,0 +1,20 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if TEST_KCONFIG && HAS_ARCH_ESP
+
+config MODULE_ESP_FREERTOS
+    bool
+    default y
+    help
+      FreeRTOS to RIOT-OS adaption module for ESP SoCs source code compatibility.
+
+config MODULE_ESP_FREERTOS_COMMON
+    bool
+    default MODULE_ESP_FREERTOS
+
+endif # TEST_KCONFIG && HAS_ARCH_ESP
