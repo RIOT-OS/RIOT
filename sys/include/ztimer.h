@@ -560,15 +560,6 @@ int ztimer_rmutex_lock_timeout(ztimer_clock_t *clock, rmutex_t *rmutex,
                                uint32_t timeout);
 
 /**
- * @brief   Update ztimer clock head list offset
- *
- * @internal
- *
- * @param[in]   clock  ztimer clock to work on
- */
-void ztimer_update_head_offset(ztimer_clock_t *clock);
-
-/**
  * @brief   Initialize the board-specific default ztimer configuration
  */
 void ztimer_init(void);
