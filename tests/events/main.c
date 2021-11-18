@@ -28,7 +28,7 @@
 #include "event.h"
 #include "event/timeout.h"
 #include "event/callback.h"
-#if IS_USED(MODULE_ZTIMER)
+#if IS_USED(MODULE_ZTIMER_USEC)
 #include "ztimer.h"
 #else
 #include "xtimer.h"
@@ -88,7 +88,7 @@ static void timed_callback(void *arg)
     order++;
     expect(order == 6);
     expect(arg == event_callback.arg);
-#if IS_USED(MODULE_ZTIMER)
+#if IS_USED(MODULE_ZTIMER_USEC)
     uint32_t now = ztimer_now(ZTIMER_USEC);
 #else
     uint32_t now = xtimer_now_usec();
@@ -186,7 +186,7 @@ int main(void)
 
     puts("posting timed callback with timeout 1sec");
     event_timeout_init(&event_timeout, &queue, (event_t *)&event_callback);
-#if IS_USED(MODULE_ZTIMER)
+#if IS_USED(MODULE_ZTIMER_USEC)
     before = ztimer_now(ZTIMER_USEC);
 #else
     before = xtimer_now_usec();
