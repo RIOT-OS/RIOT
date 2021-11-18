@@ -287,7 +287,7 @@ static void soft_uart_write_byte(soft_uart_t uart, uint8_t data)
     mutex_lock(&ctx->sync);
 }
 
-void soft_uart_write(uart_t uart, const uint8_t *data, size_t len)
+void soft_uart_write(soft_uart_t uart, const uint8_t *data, size_t len)
 {
     const soft_uart_conf_t *cfg = &soft_uart_config[uart];
     struct uart_ctx *ctx = &soft_uart_ctx[uart];

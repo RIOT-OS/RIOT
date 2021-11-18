@@ -69,14 +69,14 @@ extern "C" {
  * @brief   Define default ADC type identifier
  */
 #ifndef HAVE_ADC_T
-typedef unsigned int adc_t;
+typedef uint_fast8_t adc_t;
 #endif
 
 /**
  * @brief   Default ADC undefined value
  */
 #ifndef ADC_UNDEF
-#define ADC_UNDEF           (UINT_MAX)
+#define ADC_UNDEF           (UINT_FAST8_MAX)
 #endif
 
 /**

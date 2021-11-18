@@ -592,7 +592,7 @@ static int _esp_can_config(can_t *dev)
 
     /* route CAN interrupt source to CPU interrupt and enable it */
     intr_matrix_set(PRO_CPU_NUM, ETS_CAN_INTR_SOURCE, CPU_INUM_CAN);
-    xt_set_interrupt_handler(CPU_INUM_CAN, _esp_can_intr_handler, (void*)dev);
+    xt_set_interrupt_handler(CPU_INUM_CAN, _esp_can_intr_handler, (void*)(uintptr_t)dev);
     xt_ints_on(BIT(CPU_INUM_CAN));
 
     /* set bittiming from parameters as given in device data */
@@ -733,7 +733,7 @@ static int _esp_can_set_mode(can_t *dev, canopt_state_t state)
 
 static void IRAM_ATTR _esp_can_intr_handler(void *arg)
 {
-    can_t* dev = (can_t *)arg;
+    can_t* dev = (can_t *)(uintptr_t)arg;
 
     assert(arg);
 

@@ -683,7 +683,7 @@ static const uint32_t transfer_int_mask = I2C_TRANS_COMPLETE_INT_ENA
 
 void _i2c_transfer_timeout (void *arg)
 {
-    i2c_t dev = (i2c_t)arg;
+    i2c_t dev = (i2c_t)(uintptr_t)arg;
 
     /* reset the hardware if it I2C got stuck */
     _i2c_reset_hw(dev);
@@ -718,7 +718,7 @@ static void _i2c_transfer (i2c_t dev)
     /* set a timer for the case the I2C hardware gets stuck */
     xtimer_t i2c_timeout = {};
     i2c_timeout.callback = _i2c_transfer_timeout;
-    i2c_timeout.arg = (void*)dev;
+    i2c_timeout.arg = (void*)(uintptr_t)dev;
     xtimer_set(&i2c_timeout, I2C_TRANSFER_TIMEOUT);
 
     /* start execution of commands in command pipeline registers */

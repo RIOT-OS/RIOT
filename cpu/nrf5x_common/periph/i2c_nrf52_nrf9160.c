@@ -125,7 +125,7 @@ void i2c_init(i2c_t dev)
     /* configure dev clock speed */
     bus(dev)->FREQUENCY = i2c_config[dev].speed;
 
-    spi_twi_irq_register_i2c(bus(dev), i2c_isr_handler, (void *)dev);
+    spi_twi_irq_register_i2c(bus(dev), i2c_isr_handler, (void *)(uintptr_t)dev);
 
     /* We expect that the device was being acquired before
      * the i2c_init_master() function is called, so it should be enabled when
@@ -297,7 +297,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
 
 void i2c_isr_handler(void *arg)
 {
-    i2c_t dev = (i2c_t)arg;
+    i2c_t dev = (i2c_t)(uintptr_t)arg;
 
     /* Mask interrupts to ensure that they only trigger once */
     bus(dev)->INTENCLR = TWIM_INTEN_STOPPED_Msk | TWIM_INTEN_ERROR_Msk;

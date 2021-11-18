@@ -64,7 +64,7 @@ extern "C" {
  * @brief   Define default DAC type identifier
  */
 #ifndef HAVE_DAC_T
-typedef unsigned int dac_t;
+typedef uint_fast8_t dac_t;
 #endif
 
 /**
@@ -79,7 +79,7 @@ enum {
  * @brief   Default DAC undefined value
  */
 #ifndef DAC_UNDEF
-#define DAC_UNDEF           (UINT_MAX)
+#define DAC_UNDEF           (UINT_FAST8_MAX)
 #endif
 
 /**

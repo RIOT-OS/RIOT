@@ -74,14 +74,14 @@ extern "C" {
  * @brief   Define default UART type identifier
  */
 #ifndef HAVE_UART_T
-typedef unsigned int uart_t;
+typedef uint_fast8_t uart_t;
 #endif
 
 /**
  * @brief   Default UART undefined value
  */
 #ifndef UART_UNDEF
-#define UART_UNDEF          (UINT_MAX)
+#define UART_UNDEF          (UINT_FAST8_MAX)
 #endif
 
 /**

@@ -26,17 +26,17 @@
 #include "periph/qdec.h"
 #include "xtimer.h"
 
-void handler(void *arg)
+static void handler(void *arg)
 {
-    qdec_t qdec = (qdec_t)arg;
+    qdec_t qdec = (qdec_t)(uintptr_t)arg;
     printf("QDEC %u counter overflow : reset counter\n", qdec);
     qdec_read_and_reset(QDEC_DEV(qdec));
 }
 
 int main(void)
 {
-    uint32_t i = 0;
-    int32_t value = 0;
+    unsigned i;
+    int32_t value;
     puts("Welcome into Quadrature Decoder (QDEC) test program.");
     puts("This program will count pulses on all available QDEC channels");
     puts("Written for nucleo-f401re, you have to plug signals A and B as follow :");
@@ -45,7 +45,7 @@ int main(void)
     puts("Quadrature decoding mode is set to X4 : counting on all edges on both signals");
 
     for (i = 0; i < QDEC_NUMOF; i++) {
-        int32_t error = qdec_init(QDEC_DEV(i), QDEC_X4, handler, (void *)i);
+        int32_t error = qdec_init(QDEC_DEV(i), QDEC_X4, handler, (void *)(uintptr_t)i);
         if (error) {
             fprintf(stderr,"Not supported mode !\n");
             return error;

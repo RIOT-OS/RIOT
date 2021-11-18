@@ -37,7 +37,7 @@ static struct {
     uint8_t data_mask;      /**< mask applied to the data register */
 } isr_ctx[UART_NUMOF];
 
-static inline void _uart_isr(uart_t uart);
+static inline void _uart_isr(unsigned uart);
 
 static inline USART_Type *dev(uart_t uart)
 {
