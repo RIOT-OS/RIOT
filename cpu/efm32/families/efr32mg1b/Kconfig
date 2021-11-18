@@ -11,6 +11,14 @@ config CPU_FAM_EFR32MG1B
     select CPU_EFM32_SERIES1
     select HAS_CORTEXM_MPU
 
+config MODULE_CPU_EFR32MG1B
+    bool
+    depends on CPU_FAM_EFR32MG1B
+    depends on TEST_KCONFIG
+    default y
+    help
+        EFR32MG1B family-specific code.
+
 ## CPU Models
 config CPU_MODEL_EFR32MG1B232F256GM48
     bool

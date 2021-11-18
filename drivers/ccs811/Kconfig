@@ -26,3 +26,9 @@ config MODULE_CCS811_FULL
             - data ready and threshold interrupt handling
             - compensate gas readings using an external sensor
             - manual baseline handling
+
+config HAVE_CCS811
+    bool
+    select MODULE_CCS811 if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a ccs811 sensor is present.

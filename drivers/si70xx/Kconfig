@@ -5,36 +5,55 @@
 # directory for more details.
 #
 
-if TEST_KCONFIG
-
-choice
-    bool "Si7006/13/20/21 temperature and humidity sensors"
-    optional
-    depends on HAS_PERIPH_I2C
-    depends on TEST_KCONFIG
-
-config MODULE_SI7006
-    bool "SI7006"
-    select MODULE_SI70XX
-
-config MODULE_SI7013
-    bool "SI7013"
-    select MODULE_SI70XX
-
-config MODULE_SI7020
-    bool "SI7020"
-    select MODULE_SI70XX
-
-config MODULE_SI7021
-    bool "SI7021"
-    select MODULE_SI70XX
-
-endchoice
-
 config MODULE_SI70XX
-    bool
+    bool "Si7006/13/20/21 temperature and humidity sensors"
+    depends on TEST_KCONFIG
     depends on HAS_PERIPH_I2C
     select MODULE_PERIPH_I2C
     select MODULE_XTIMER
 
-endif # TEST_KCONFIG
+choice
+    bool "Sensor variant"
+    depends on MODULE_SI70XX
+    default MODULE_SI7006 if HAVE_SI7006
+    default MODULE_SI7013 if HAVE_SI7013
+    default MODULE_SI7020 if HAVE_SI7020
+    default MODULE_SI7021 if HAVE_SI7021
+
+config MODULE_SI7006
+    bool "SI7006"
+
+config MODULE_SI7013
+    bool "SI7013"
+
+config MODULE_SI7020
+    bool "SI7020"
+
+config MODULE_SI7021
+    bool "SI7021"
+
+endchoice
+
+config HAVE_SI7006
+    bool
+    select MODULE_SI70XX if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a si7006 sensor is present.
+
+config HAVE_SI7013
+    bool
+    select MODULE_SI70XX if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a si7013 sensor is present.
+
+config HAVE_SI7020
+    bool
+    select MODULE_SI70XX if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a si7020 sensor is present.
+
+config HAVE_SI7021
+    bool
+    select MODULE_SI70XX if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a si7021 sensor is present.

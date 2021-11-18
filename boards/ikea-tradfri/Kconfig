@@ -20,3 +20,6 @@ config BOARD_IKEA_TRADFRI
     select HAS_PERIPH_UART_MODECFG
     select HAS_EFM32_CORETEMP
     select HAS_RIOTBOOT
+
+    select HAVE_SAUL_GPIO
+    select HAVE_MTD_SPI_NOR

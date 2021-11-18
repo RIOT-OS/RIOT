@@ -5,19 +5,25 @@
 # directory for more details.
 #
 
-choice
+menuconfig MODULE_BMX280
     bool "BMx280 Temperature, pressure and humidity sensors"
-    optional
     depends on TEST_KCONFIG
     help
         The driver supports both BME280 and BMP280 connected either via SPI or
         I2C bus. Select one combination.
 
+choice
+    bool "Sensor variant"
+    depends on MODULE_BMX280
+    default MODULE_BME280_I2C if HAVE_BME280_I2C
+    default MODULE_BME280_SPI if HAVE_BME280_SPI
+    default MODULE_BMP280_I2C if HAVE_BMP280_I2C
+    default MODULE_BMP280_SPI if HAVE_BMP280_SPI
+
 config MODULE_BME280_I2C
     bool "BME280 on I2C"
     depends on HAS_PERIPH_I2C
     select MODULE_PERIPH_I2C
-    select MODULE_BMX280
 
 config MODULE_BME280_SPI
     bool "BME280 on SPI"
@@ -25,13 +31,11 @@ config MODULE_BME280_SPI
     depends on HAS_PERIPH_GPIO
     select MODULE_PERIPH_SPI
     select MODULE_PERIPH_GPIO
-    select MODULE_BMX280
 
 config MODULE_BMP280_I2C
     bool "BMP280 on I2C"
     depends on HAS_PERIPH_I2C
     select MODULE_PERIPH_I2C
-    select MODULE_BMX280
 
 config MODULE_BMP280_SPI
     bool "BMP280 on SPI"
@@ -39,10 +43,29 @@ config MODULE_BMP280_SPI
     depends on HAS_PERIPH_GPIO
     select MODULE_PERIPH_SPI
     select MODULE_PERIPH_GPIO
-    select MODULE_BMX280
 
 endchoice
 
-config MODULE_BMX280
+config HAVE_BME280_I2C
     bool
-    depends on TEST_KCONFIG
+    select MODULE_BMX280 if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a bme280 is present on the I2C bus.
+
+config HAVE_BME280_SPI
+    bool
+    select MODULE_BMX280 if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a bme280 is present on the SPI bus.
+
+config HAVE_BMP280_I2C
+    bool
+    select MODULE_BMX280 if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a bmp280 is present on the I2C bus.
+
+config HAVE_BMP280_SPI
+    bool
+    select MODULE_BMX280 if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a bmp280 is present on the SPI bus.
