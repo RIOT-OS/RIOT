@@ -65,11 +65,13 @@ config CPU_CORE_CORTEX_M0
     bool
     select CPU_ARCH_ARMV6M
     select CPU_CORE_CORTEX_M
+    select HAS_RUST_TARGET
 
 config CPU_CORE_CORTEX_M0PLUS
     bool
     select CPU_ARCH_ARMV6M
     select CPU_CORE_CORTEX_M
+    select HAS_RUST_TARGET
 
 config CPU_CORE_CORTEX_M23
     bool

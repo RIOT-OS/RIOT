@@ -23,10 +23,10 @@ endif
 # the `rust_target` feature to esnure things are checked properly.
 ifeq ($(CPU_CORE),cortex-m0)
   CPU_ARCH := armv6m
-  #RUST_TARGET = thumbv6m-none-eabi
+  RUST_TARGET = thumbv6m-none-eabi
 else ifeq ($(CPU_CORE),cortex-m0plus)
   CPU_ARCH := armv6m
-  #RUST_TARGET = thumbv6m-none-eabi
+  RUST_TARGET = thumbv6m-none-eabi
 else ifeq ($(CPU_CORE),cortex-m23)
   CPU_ARCH := armv8m
 else ifeq ($(CPU_CORE),cortex-m3)
