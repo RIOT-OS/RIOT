@@ -10,7 +10,6 @@ config CPU_MODEL_ATMEGA1281
     bool
     select CPU_FAM_ATMEGA128
     select HAS_ATMEGA_PCINT1
-    select HAS_ATMEGA_PCINT2
     select HAS_CPU_ATMEGA1281
 
 ## Definition of specific features
