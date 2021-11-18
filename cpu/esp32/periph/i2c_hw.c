@@ -703,6 +703,10 @@ static void _i2c_transfer (i2c_t dev)
     #if FIFO_USED
     /* reset RX FIFO queue */
     _i2c_hw[dev].regs->fifo_conf.rx_fifo_rst = 1;
+    /* cppcheck-suppress redundantAssignment
+     * Likely due to cppcheck not being able to located all headers, it misses
+     * the volatile qualifier. The assignments are to trigger a reset, but
+     * look like dead writes to tools unaware of volatile */
     _i2c_hw[dev].regs->fifo_conf.rx_fifo_rst = 0;
     #endif
 
@@ -733,6 +737,10 @@ static void _i2c_transfer (i2c_t dev)
     #if FIFO_USED
     /* reset TX FIFO queue */
     _i2c_hw[dev].regs->fifo_conf.tx_fifo_rst = 1;
+    /* cppcheck-suppress redundantAssignment
+     * Likely due to cppcheck not being able to located all headers, it misses
+     * the volatile qualifier. The assignments are to trigger a reset, but
+     * look like dead writes to tools unaware of volatile */
     _i2c_hw[dev].regs->fifo_conf.tx_fifo_rst = 0;
     #endif
 
