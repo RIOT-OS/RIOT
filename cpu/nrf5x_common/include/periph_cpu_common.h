@@ -189,6 +189,17 @@ typedef enum {
 /** @} */
 
 /**
+ * @brief Quadrature decoder configuration struct
+ */
+typedef struct {
+    gpio_t a_pin;          /**< GPIO Pin for phase A */
+    gpio_t b_pin;          /**< GPIO Pin for phase B */
+    gpio_t led_pin;        /**< LED GPIO, GPIO_UNDEF to disable */
+    uint8_t sample_period; /**< Sample period used, e.g. QDEC_SAMPLEPER_SAMPLEPER_128us */
+    bool debounce_filter;  /**< Enable/disable debounce filter */
+} qdec_conf_t;
+
+/**
  * @brief Retrieve the exti(GPIOTE) channel associated with a gpio
  *
  * @param   pin     GPIO pin to retrieve the channel for
