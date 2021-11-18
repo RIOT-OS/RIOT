@@ -14,7 +14,7 @@
  * @brief       Implementation of the Differentially Operated Serial Ethernet driver
  *
  * @author      Juergen Fitschen <me@jue.yt>
- *
+ *              Benjamin Valentin <benjamin.valentin@ml-pa.com>
  * @}
  */
 
@@ -154,12 +154,7 @@ static void _dose_watchdog_cb(void *arg, int chan)
                 break;
             }
 
-            if (ctx->flags & DOSE_FLAG_RECV_BUF_DIRTY) {
-                break;
-            }
-
-            /* fall-through */
-        case DOSE_STATE_BLOCKED:
+            DEBUG_PUTS("timeout");
             state(&_dose_base[i], DOSE_SIGNAL_XTIMER);
             break;
         default:
@@ -167,53 +162,18 @@ static void _dose_watchdog_cb(void *arg, int chan)
         }
     }
 }
-
-static inline void _set_random_backoff(dose_t *ctx)
-{
-    (void) ctx;
-}
-
 #else
 static inline void _watchdog_start(void) {}
 static inline void _watchdog_stop(void) {}
-static inline void _set_random_backoff(dose_t *ctx)
-{
-    uint32_t backoff;
-
-    /* The timeout will bring us back into IDLE state by a random time.
-     * If we entered this state from RECV state, the random time lays
-     * in the interval [1 * timeout, 2 * timeout]. If we came from
-     * SEND state, a time in the interval [2 * timeout, 3 * timeout]
-     * will be picked. This ensures that responding nodes get preferred
-     * bus access and sending nodes do not overwhelm listening nodes. */
-    if (ctx->state == DOSE_STATE_SEND) {
-        backoff = random_uint32_range(2 * ctx->timeout_base, 3 * ctx->timeout_base);
-    }
-    else {
-        backoff = random_uint32_range(1 * ctx->timeout_base, 2 * ctx->timeout_base);
-    }
-    xtimer_set(&ctx->timeout, backoff);
-}
 #endif
 
 static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal)
 {
     (void) signal;
+    uint32_t backoff;
 
-    if (ctx->state == DOSE_STATE_RECV) {
-        /* We got here from RECV state. The driver's thread has to look
-         * if this frame should be processed. By queuing NETDEV_EVENT_ISR,
-         * the netif thread will call _isr at some time. */
-        SETBIT(ctx->flags, DOSE_FLAG_RECV_BUF_DIRTY);
-        netdev_trigger_event_isr(&ctx->netdev);
-    } else if (ctx->state == DOSE_STATE_INIT) {
-        _watchdog_start();
-    }
-
-    /* Enable interrupt for start bit sensing */
-    _enable_sense(ctx);
-
-    _set_random_backoff(ctx);
+    backoff = random_uint32_range(1 * ctx->timeout_base, 2 * ctx->timeout_base);
+    xtimer_set(&ctx->timeout, backoff);
 
     return DOSE_SIGNAL_NONE;
 }
@@ -224,6 +184,25 @@ static dose_signal_t state_transit_idle(dose_t *ctx, dose_signal_t signal)
     (void) signal;
 
     _watchdog_stop();
+
+    if (ctx->state == DOSE_STATE_RECV) {
+        bool dirty = ctx->flags & DOSE_FLAG_RECV_BUF_DIRTY;
+        bool done  = ctx->flags & DOSE_FLAG_END_RECEIVED;
+
+        if (crb_end_chunk(&ctx->rb, !dirty && done)) {
+            netdev_trigger_event_isr(&ctx->netdev);
+        }
+
+        clear_recv_buf(ctx);
+    }
+
+    /* Enable interrupt for start bit sensing */
+    _enable_sense(ctx);
+
+    /* Execute pending send */
+    if (ctx->flags & DOSE_FLAG_SEND_PENDING) {
+        return DOSE_SIGNAL_SEND;
+    }
 
     return DOSE_SIGNAL_NONE;
 }
@@ -277,7 +256,6 @@ static dose_signal_t state_transit_send(dose_t *ctx, dose_signal_t signal)
     if (ctx->state != DOSE_STATE_SEND) {
         /* Disable RX Start IRQs during the transmission. */
         _disable_sense(ctx);
-        _watchdog_start();
     }
 
     /* Don't trace any END octets ... the timeout or the END signal
@@ -286,6 +264,7 @@ static dose_signal_t state_transit_send(dose_t *ctx, dose_signal_t signal)
 #ifndef MODULE_PERIPH_UART_COLLISION
     xtimer_set(&ctx->timeout, ctx->timeout_base);
 #endif
+
     return DOSE_SIGNAL_NONE;
 }
 
@@ -301,16 +280,16 @@ static void state(dose_t *ctx, dose_signal_t signal)
          * last 4 bits of a uint8_t, they can be added together and hence
          * be checked together. */
         switch (ctx->state + signal) {
-            case DOSE_STATE_INIT + DOSE_SIGNAL_INIT:
-            case DOSE_STATE_RECV + DOSE_SIGNAL_END:
-            case DOSE_STATE_RECV + DOSE_SIGNAL_XTIMER:
-            case DOSE_STATE_SEND + DOSE_SIGNAL_END:
-            case DOSE_STATE_SEND + DOSE_SIGNAL_XTIMER:
+            case DOSE_STATE_IDLE + DOSE_SIGNAL_SEND:
                 signal = state_transit_blocked(ctx, signal);
                 ctx->state = DOSE_STATE_BLOCKED;
                 break;
 
-            case DOSE_STATE_BLOCKED + DOSE_SIGNAL_XTIMER:
+            case DOSE_STATE_SEND + DOSE_SIGNAL_END:
+            case DOSE_STATE_SEND + DOSE_SIGNAL_XTIMER:
+            case DOSE_STATE_INIT + DOSE_SIGNAL_INIT:
+            case DOSE_STATE_RECV + DOSE_SIGNAL_END:
+            case DOSE_STATE_RECV + DOSE_SIGNAL_XTIMER:
                 signal = state_transit_idle(ctx, signal);
                 ctx->state = DOSE_STATE_IDLE;
                 break;
@@ -324,14 +303,14 @@ static void state(dose_t *ctx, dose_signal_t signal)
                 ctx->state = DOSE_STATE_RECV;
                 break;
 
-            case DOSE_STATE_IDLE + DOSE_SIGNAL_SEND:
+            case DOSE_STATE_BLOCKED + DOSE_SIGNAL_XTIMER:
             case DOSE_STATE_SEND + DOSE_SIGNAL_UART:
                 signal = state_transit_send(ctx, signal);
                 ctx->state = DOSE_STATE_SEND;
                 break;
 
             default:
-                DEBUG("dose state(): unexpected state transition (STATE=0x%02d SIGNAL=0x%02d)\n", ctx->state, signal);
+                DEBUG("dose state(): unexpected state transition (STATE=0x%02x SIGNAL=0x%02x)\n", ctx->state, signal);
                 signal = DOSE_SIGNAL_NONE;
         }
     } while (signal != DOSE_SIGNAL_NONE);
@@ -360,7 +339,14 @@ static void _isr_xtimer(void *arg)
 {
     dose_t *dev = arg;
 
-    state(dev, DOSE_SIGNAL_XTIMER);
+    switch (dev->state) {
+    case DOSE_STATE_BLOCKED:
+    case DOSE_STATE_SEND:
+        state(dev, DOSE_SIGNAL_XTIMER);
+        break;
+    default:
+        ;
+    }
 }
 
 static void clear_recv_buf(dose_t *ctx)
@@ -538,11 +524,13 @@ send:
     crc = 0xffff;
     pktlen = 0;
 
-    /* Switch to state SEND */
-    do {
-        wait_for_state(ctx, DOSE_STATE_IDLE);
-        state(ctx, DOSE_SIGNAL_SEND);
-    } while (wait_for_state(ctx, DOSE_STATE_ANY) != DOSE_STATE_SEND);
+    /* Indicate intention to send */
+    SETBIT(ctx->flags, DOSE_FLAG_SEND_PENDING);
+    state(ctx, DOSE_SIGNAL_SEND);
+
+    /* Wait for transition to SEND state */
+    wait_for_state(ctx, DOSE_STATE_SEND);
+    CLRBIT(ctx->flags, DOSE_FLAG_SEND_PENDING);
 
     _send_start(ctx);
 
