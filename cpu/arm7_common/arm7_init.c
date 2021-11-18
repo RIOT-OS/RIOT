@@ -64,6 +64,9 @@ static inline void _init_data(void)
 
     dst = &__stack_usr_start;
     end = &__stack_end;
+    /* cppcheck-suppress comparePointers
+     * (addresses exported as symbols via linker script and look unrelated
+     * to cppcheck) */
     while (dst < end) {
         *(dst++) = STACK_CANARY_WORD;
     }
@@ -74,6 +77,9 @@ static inline void _init_data(void)
     dst = &_srelocate;
     end = &_erelocate;
 
+    /* cppcheck-suppress comparePointers
+     * (addresses exported as symbols via linker script and look unrelated
+     * to cppcheck) */
     while (dst < end) {
         *dst++ = *src++;
     }
@@ -82,6 +88,9 @@ static inline void _init_data(void)
     dst = &_szero;
     end = &_ezero;
 
+    /* cppcheck-suppress comparePointers
+     * (addresses exported as symbols via linker script and look unrelated
+     * to cppcheck) */
     while (dst < end) {
         *dst++ = 0;
     }
@@ -97,6 +106,9 @@ static inline void _init_data(void)
     dst = _sbackup_data;
     end = _ebackup_data;
 
+    /* cppcheck-suppress comparePointers
+     * (addresses exported as symbols via linker script and look unrelated
+     * to cppcheck) */
     while (dst < end) {
         *dst++ = *src++;
     }
@@ -105,6 +117,9 @@ static inline void _init_data(void)
     dst = _sbackup_bss;
     end = _ebackup_bss;
 
+    /* cppcheck-suppress comparePointers
+     * (addresses exported as symbols via linker script and look unrelated
+     * to cppcheck) */
     while (dst < end) {
         *dst++ = 0;
     }
