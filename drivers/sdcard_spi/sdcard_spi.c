@@ -68,6 +68,21 @@ static inline int _hw_spi_rxtx_byte(sdcard_spi_t *card, uint8_t out, uint8_t *in
 /* function pointer to switch to hw spi mode after init sequence */
 static int (*_dyn_spi_rxtx_byte)(sdcard_spi_t *card, uint8_t out, uint8_t *in);
 
+static inline uint32_t _deadline_from_interval(uint32_t interval)
+{
+    return ztimer_now(ZTIMER_USEC) + interval;
+}
+
+static inline uint32_t _deadline_left(uint32_t deadline)
+{
+    int32_t left = (int32_t)(deadline - ztimer_now(ZTIMER_USEC));
+
+    if (left < 0) {
+        left = 0;
+    }
+    return left;
+}
+
 int sdcard_spi_init(sdcard_spi_t *card, const sdcard_spi_params_t *params)
 {
     sd_init_fsm_state_t state = SD_INIT_START;
@@ -209,7 +224,7 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
 
     case SD_INIT_SEND_ACMD41_HCS:
         DEBUG("SD_INIT_SEND_ACMD41_HCS\n");
-        const uint32_t acmd41_hcs_retry_timeout = ztimer_now(ZTIMER_USEC) + INIT_CMD_RETRY_US;
+        uint32_t acmd41_hcs_retry_timeout = _deadline_from_interval(INIT_CMD_RETRY_US);
         do {
             uint8_t acmd41hcs_r1 = sdcard_spi_send_acmd(card, SD_CMD_41, SD_ACMD_41_ARG_HC, 0);
             if (R1_VALID(acmd41hcs_r1) && !R1_ERROR(acmd41hcs_r1) &&
@@ -217,14 +232,13 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
                 DEBUG("ACMD41: [OK]\n");
                 return SD_INIT_SEND_CMD58;
             }
-        } while (((uint32_t)INIT_CMD_RETRY_US > 0) &&
-                 (ztimer_now(ZTIMER_USEC) < acmd41_hcs_retry_timeout));
+        } while (INIT_CMD_RETRY_US && _deadline_left(acmd41_hcs_retry_timeout));
         _unselect_card_spi(card);
         return SD_INIT_CARD_UNKNOWN;
 
     case SD_INIT_SEND_ACMD41:
         DEBUG("SD_INIT_SEND_ACMD41\n");
-        const uint32_t acmd41_retry_timeout = ztimer_now(ZTIMER_USEC) + INIT_CMD_RETRY_US;
+        int32_t acmd41_retry_timeout = _deadline_from_interval(INIT_CMD_RETRY_US);
         do {
             uint8_t acmd41_r1 = sdcard_spi_send_acmd(card, SD_CMD_41, SD_CMD_NO_ARG, 0);
             if (R1_VALID(acmd41_r1) && !R1_ERROR(acmd41_r1) && !R1_IDLE_BIT_SET(acmd41_r1)) {
@@ -233,7 +247,7 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
                 card->card_type = SD_V1;
                 return SD_INIT_SEND_CMD16;
             }
-        } while (((uint32_t)INIT_CMD_RETRY_US > 0) && (ztimer_now(ZTIMER_USEC) < acmd41_retry_timeout));
+        } while (INIT_CMD_RETRY_US && _deadline_left(acmd41_retry_timeout));
 
         DEBUG("ACMD41: [ERROR]\n");
         return SD_INIT_SEND_CMD1;
@@ -346,7 +360,7 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
 
 static inline bool _wait_for_token(sdcard_spi_t *card, uint8_t token, uint32_t retry_us)
 {
-    const uint32_t retry_timeout = ztimer_now(ZTIMER_USEC) + retry_us;
+    uint32_t retry_timeout = _deadline_from_interval(retry_us);
 
     do {
         uint8_t read_byte = 0;
@@ -360,7 +374,7 @@ static inline bool _wait_for_token(sdcard_spi_t *card, uint8_t token, uint32_t r
             DEBUG("_wait_for_token: [NO MATCH] (0x%02x)\n", read_byte);
         }
 
-    } while ((retry_us > 0) && (ztimer_now(ZTIMER_USEC) < retry_timeout));
+    } while (retry_us && _deadline_left(retry_timeout));
 
     return false;
 }
@@ -379,7 +393,7 @@ static inline void _send_dummy_byte(sdcard_spi_t *card)
 
 static inline bool _wait_for_not_busy(sdcard_spi_t *card, uint32_t retry_us)
 {
-    const uint32_t retry_timeout = ztimer_now(ZTIMER_USEC) + retry_us;
+    uint32_t retry_timeout = _deadline_from_interval(retry_us);
 
     do {
         uint8_t read_byte;
@@ -397,7 +411,7 @@ static inline bool _wait_for_not_busy(sdcard_spi_t *card, uint32_t retry_us)
             return false;
         }
 
-    } while ((retry_us > 0) && (ztimer_now(ZTIMER_USEC) < retry_timeout));
+    } while (retry_us && _deadline_left(retry_timeout));
 
     DEBUG("_wait_for_not_busy: [FAILED]\n");
     return false;
@@ -423,7 +437,7 @@ static uint8_t _crc_7(const uint8_t *data, int n)
 uint8_t sdcard_spi_send_cmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t argument,
                             uint32_t retry_us)
 {
-    const uint32_t retry_timeout = ztimer_now(ZTIMER_USEC) + retry_us;
+    uint32_t retry_timeout = _deadline_from_interval(retry_us);
 
     uint8_t r1_resu;
     uint8_t cmd_data[6];
@@ -440,7 +454,7 @@ uint8_t sdcard_spi_send_cmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t arg
     do {
         DEBUG(
             "sdcard_spi_send_cmd: CMD%02d (0x%08" PRIx32 ") (remaining retry time %" PRIu32 " usec)\n", sd_cmd_idx, argument,
-            (retry_timeout > ztimer_now(ZTIMER_USEC)) ? (retry_timeout - ztimer_now(ZTIMER_USEC)) : 0);
+            (retry_timeout > ztimer_now(ZTIMER_USEC)) ? (uint32_t)(retry_timeout - ztimer_now(ZTIMER_USEC)) : 0);
 
         if (!_wait_for_not_busy(card, SD_WAIT_FOR_NOT_BUSY_US)) {
             DEBUG("sdcard_spi_send_cmd: timeout while waiting for bus to be not busy!\n");
@@ -475,7 +489,7 @@ uint8_t sdcard_spi_send_cmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t arg
             r1_resu = SD_INVALID_R1_RESPONSE;
         }
 
-    } while ((retry_us > 0) && (ztimer_now(ZTIMER_USEC) < retry_timeout));
+    } while (retry_us && _deadline_left(retry_timeout));
 
     return r1_resu;
 }
@@ -483,14 +497,13 @@ uint8_t sdcard_spi_send_cmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t arg
 uint8_t sdcard_spi_send_acmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t argument,
                              uint32_t retry_us)
 {
-    const uint32_t retry_timeout = ztimer_now(ZTIMER_USEC) + retry_us;
+    uint32_t retry_timeout = _deadline_from_interval(retry_us);
 
     uint8_t r1_resu;
 
     do {
-        DEBUG(
-            "sdcard_spi_send_acmd: CMD%02d (0x%08" PRIx32 ") (remaining retry time %" PRIu32 " usec)\n", sd_cmd_idx, argument,
-            (retry_timeout > ztimer_now(ZTIMER_USEC)) ? (retry_timeout - ztimer_now(ZTIMER_USEC)) : 0);
+        DEBUG("sdcard_spi_send_acmd: CMD%02d (0x%08" PRIx32 ") (remaining retry time %" PRIu32 " usec)\n", sd_cmd_idx, argument,
+            (retry_timeout > ztimer_now(ZTIMER_USEC)) ? (uint32_t)(retry_timeout - ztimer_now(ZTIMER_USEC)) : 0);
         r1_resu = sdcard_spi_send_cmd(card, SD_CMD_55, SD_CMD_NO_ARG, 0);
         if (R1_VALID(r1_resu) && !R1_ERROR(r1_resu)) {
             r1_resu = sdcard_spi_send_cmd(card, sd_cmd_idx, argument, 0);
@@ -506,7 +519,7 @@ uint8_t sdcard_spi_send_acmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t ar
             DEBUG("CMD55: [ERROR / NO RESPONSE]\n");
         }
 
-    } while ((retry_us > 0) && (ztimer_now(ZTIMER_USEC) < retry_timeout));
+    } while (retry_us && _deadline_left(retry_timeout));
 
     DEBUG("sdcard_spi_send_acmd: [TIMEOUT]\n");
     return r1_resu;
@@ -514,7 +527,7 @@ uint8_t sdcard_spi_send_acmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t ar
 
 static inline uint8_t _wait_for_r1(sdcard_spi_t *card, uint32_t retry_us)
 {
-    const uint32_t retry_timeout = ztimer_now(ZTIMER_USEC) + retry_us;
+    uint32_t retry_timeout = _deadline_from_interval(retry_us);
 
     uint8_t r1;
 
@@ -532,7 +545,7 @@ static inline uint8_t _wait_for_r1(sdcard_spi_t *card, uint32_t retry_us)
             return r1;
         }
 
-    } while ((retry_us > 0) && (ztimer_now(ZTIMER_USEC) < retry_timeout));
+    } while (retry_us && _deadline_left(retry_timeout));
 
     DEBUG("_wait_for_r1: [TIMEOUT]\n");
     return r1;
