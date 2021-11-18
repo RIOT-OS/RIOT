@@ -9,9 +9,12 @@ USEMODULE += esp_idf
 USEMODULE += log
 USEMODULE += periph
 USEMODULE += periph_hwrng
-USEMODULE += periph_flash
 USEMODULE += periph_uart
 USEMODULE += random
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += periph_flash
+endif
 
 ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
   USEMODULE += stdio_uart
