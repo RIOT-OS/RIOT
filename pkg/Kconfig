@@ -55,6 +55,7 @@ rsource "umorse/Kconfig"
 rsource "utensor/Kconfig"
 rsource "uwb-core/Kconfig"
 rsource "uwb-dw1000/Kconfig"
+rsource "uzlib/Kconfig"
 rsource "wakaama/Kconfig"
 rsource "yxml/Kconfig"
 

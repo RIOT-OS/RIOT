@@ -53,6 +53,7 @@ tests/driver_u*
 tests/driver_v*
 tests/periph_*
 tests/pkg_elk
+tests/pkg_uzlib
 tests/prng_*
 tests/xtimer_*
 tests/ztimer_*
