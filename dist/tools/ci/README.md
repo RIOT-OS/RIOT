@@ -86,6 +86,49 @@ finish annotations.
 to attach the actual annotations to your PR. You don't need to call it from
 within your test if you are adding that test to [static_tests.sh].
 
+Checking if Fast CI Runs are Sufficient
+---------------------------------------
+
+The script `can_fast_ci_run.py` checks if a given change set a PR contains
+justifies a full CI run, or whether only building certain apps or all apps for
+certain boards is sufficient and which those are. The script will return with
+exit code 0 if a fast CI run is sufficient and yield a JSON containing the
+apps which need to be rebuild (for all boards) and the list of boards for which
+all apps need to be rebuild.
+
+### Usage
+
+1. Pull the current upstream state into a branch (default: `master`)
+2. Create a temporary branch that contains the PR either rebased on top of the
+   upstream state or merged into the upstream state
+3. Check out the branch containing the state of upstream + your PR
+4. Run `./dist/tools/ci/can_fast_ci_run.py`
+
+#### Options
+
+- If the script is not launched in the RIOT repository root, provide a path
+  to the repo root via `--riotbase` parameter
+- If the upstream state is not in `master`, the `--upstreambranch` parameter
+  can be used to specify it (or a commit of the current upstream state)
+- If the script opts for a full rebuild, the passing `--explain` will result
+  in the script explaining its reasoning
+- To inspect the classification of changed files, the `--debug` switch will
+  print it out
+
+#### Gotchas
+
+- If the script is not launched in a branch that contains all changes of the
+  upstream branch, the diff set will be too large.
+- The script relies on the presence of a `Makefile` to detect the path of
+  modules. If changed files have no parent directory containing a `Makefile`
+  (e.g. because a module was deleted), the classification will fail. This
+  results in a full CI run, but this is the desired behavior anyway.
+- Right now, any change in a module that is not a board, or in any package, will
+  result in a full CI run. Maybe the KConfig migration will make it easier to
+  get efficiently get a full list of applications depending on any given module,
+  so that fast CI runs can also be performed when modules and/or packages are
+  changed.
+
 [static_tests.sh]: ./static_tests.sh
 [Github annotations]: https://github.blog/2018-12-14-introducing-check-runs-and-annotations/
 [github_annotate.sh]: ./github_annotate.sh
