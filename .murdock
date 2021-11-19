@@ -8,6 +8,8 @@
 : ${TEST_BOARDS_LLVM_COMPILE:=""}
 
 : ${TEST_KCONFIG_BOARDS_AVAILABLE:="
+cc1352-launchpad
+cc2650-launchpad
 dwm1001
 hifive1
 native
