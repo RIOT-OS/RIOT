@@ -129,34 +129,33 @@
  * ```
  * BOARD=lora-e5-dev make -C bootloaders/riotboot_serial/ flash
  * ```
-
-Once the riotboot bootloader is loaded then `riotboot_serial` can be used to
-program the device:
-
-```
-BOARD=lora-e5-dev make -C bootloaders/riotboot_serial/ flash
-```
-
-You can then flash the board with the `riotboot_serial` programmer. Note that the
-boards reset button needs to be held down while the `connecting [-]` shows. e.g.:
-
-```
-  # hold reset button
-  $ PROGRAMMER=riotboot_serial BOARD=lora-e5-dev make -C tests/rng/ flash
-  ...
-  connecting [-]
-  # release reset button
-  connected. [/]
-  ...
-  erasing pages 2031618 to 2031627
-  1: unknown record type 4
-  ...
-  0x2550: 16 bytes
-  ...
-  # exists
-
-```
-
+ *
+ * Once the riotboot bootloader is loaded then `riotboot_serial` can be used to
+ * program the device:
+ *
+ * ```
+ * BOARD=lora-e5-dev make -C bootloaders/riotboot_serial/ flash
+ * ```
+ *
+ * You can then flash the board with the `riotboot_serial` programmer. Note that the
+ * boards reset button needs to be held down while the `connecting [-]` shows. e.g.:
+ *
+ * ```
+ *   # hold reset button
+ *   $ PROGRAMMER=riotboot_serial BOARD=lora-e5-dev make -C tests/rng/ flash
+ *   ...
+ *   connecting [-]
+ *   # release reset button
+ *   connected. [/]
+ *   ...
+ *   erasing pages 2031618 to 2031627
+ *   1: unknown record type 4
+ *   ...
+ *   0x2550: 16 bytes
+ *   ...
+ *   Done Flashing
+ * ```
+ *
  * ### Serial connection
  *
  * The default serial connection is through the USB-C port mapping to PB7 (RX) and
