@@ -29,7 +29,7 @@ endif
 ifneq (,$(filter lpc2387,$(USEMODULE)))
   SRC += sc_heap.c
 endif
-ifneq (,$(filter random,$(USEMODULE)))
+ifneq (,$(filter random_cmd,$(USEMODULE)))
   SRC += sc_random.c
 endif
 ifneq (,$(filter at30tse75x,$(USEMODULE)))
