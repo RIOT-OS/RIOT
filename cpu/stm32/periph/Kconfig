@@ -17,6 +17,11 @@ config MODULE_PERIPH_UART_NONBLOCKING
     depends on MODULE_PERIPH_UART
     select MODULE_TSRB
 
+
+config MODULE_PERIPH_UART_RS485
+    depends on HAS_PERIPH_UART_RS485
+    depends on MODULE_PERIPH_UART
+
 config MODULE_PERIPH_CAN
     bool
     depends on HAS_PERIPH_CAN

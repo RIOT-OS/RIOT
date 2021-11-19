@@ -32,6 +32,10 @@ config MODULE_PERIPH_UART_NONBLOCKING
     bool "Non-blocking support"
     depends on HAS_PERIPH_UART_NONBLOCKING
 
+config MODULE_PERIPH_UART_RS485
+    bool "RS-485 UART support"
+    depends on HAS_PERIPH_UART_RS485
+
 config MODULE_PERIPH_UART_RXSTART_IRQ
     bool "Enable Start Condition Interrupt"
     depends on HAS_PERIPH_UART_RXSTART_IRQ
