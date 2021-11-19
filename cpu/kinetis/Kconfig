@@ -12,6 +12,15 @@ config CPU_COMMON_KINETIS
     select HAS_PERIPH_GPIO_IRQ
     select HAS_PERIPH_PM
 
+    # enable kinetis periph drivers if available
+    imply MODULE_PERIPH_ICS
+    imply MODULE_PERIPH_MCG
+    imply MODULE_PERIPH_MCG_LITE
+    imply MODULE_PERIPH_WDOG
+
+    select MODULE_CORE_THREAD_FLAGS if MODULE_PERIPH_I2C
+    select MODULE_PERIPH_TIMER if MODULE_PERIPH_RTT && HAS_PERIPH_TIMER
+
 config CPU_FAM_EA
     bool
     select CPU_COMMON_KINETIS
@@ -162,3 +171,5 @@ config CPU
     default "kinetis" if CPU_COMMON_KINETIS
 
 source "$(RIOTCPU)/cortexm_common/Kconfig"
+
+rsource "periph/Kconfig"
