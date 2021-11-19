@@ -377,7 +377,7 @@ int _sc_dfplayer(int argc, char **argv)
     }
 
     if (!strcmp("files", argv[pos])) {
-        if (++pos != argc) {
+        if ((pos + 1) != argc) {
             print_str("Error: Expected no parameter for argument \"files\"\n");
             return 1;
         }
