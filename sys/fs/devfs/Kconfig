@@ -1,0 +1,32 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_DEVFS
+    bool "DevFS support"
+    depends on MODULE_VFS
+    help
+        This file system implementation allows devices to register file names
+        for easier access to device drivers from shell commands etc. The idea is
+        similar to the /dev directory on Unix.
+
+if MODULE_DEVFS
+
+config MODULE_DEVFS_HWRNG
+    bool "Add HWRNG device"
+    depends on HAS_PERIPH_HWRNG
+    select MODULE_PERIPH_HWRNG
+    help
+      Adds the hardware random number generator (HWRNG) as a device
+      (/dev/hwrng).
+
+config MODULE_DEVFS_RANDOM
+    bool "Add random device"
+    select MODULE_RANDOM
+    help
+      Adds a device to generate random (/dev/urandom).
+
+endif # MODULE_DEVFS
