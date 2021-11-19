@@ -1,4 +1,4 @@
-RIOTBOOT_SERIAL := $(RIOTTOOLS)/riotboot_serial/riotboot_serial
+RIOTBOOT_SERIAL := $(RIOTTOOLS)/riotboot_serial/bin/riotboot_serial
 
 FLASHER   ?= $(RIOTBOOT_SERIAL)
 FLASHFILE ?= $(HEXFILE)
