@@ -18,8 +18,6 @@ RIOTBASE = os.getenv(
     "RIOTBASE", os.path.abspath(os.path.join(CURRENT_DIR, "../../../..")))
 STM32_VECTORS_DIR = os.path.join(RIOTBASE, "cpu/stm32/vectors")
 STM32_VENDOR_DIR = os.path.join(RIOTBASE, "cpu/stm32/include/vendor")
-STM32_CMSIS_FILE = os.path.join(
-    RIOTBASE, STM32_VENDOR_DIR, "cmsis/{}/Include/{}.h")
 
 VECTORS_FORMAT = """
 /*
@@ -47,9 +45,8 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {{
 """
 
 
-def parse_cmsis(cpu_line):
+def parse_cmsis(cmsis_dir, cpu_line):
     """Parse the CMSIS to get the list IRQs."""
-    cpu_fam = cpu_line[5:7]
     if cpu_line == "STM32F030x4":
         # STM32F030x4 is provided in the RIOT codebase in a different location
         cpu_line_cmsis = os.path.join(
@@ -59,8 +56,9 @@ def parse_cmsis(cpu_line):
         cpu_line_cmsis = os.path.join(
             STM32_VENDOR_DIR, "{}_cm4.h".format(cpu_line.lower()))
     else:
-        cpu_line_cmsis = STM32_CMSIS_FILE.format(
-            cpu_fam.lower(), cpu_line.lower())
+        cpu_line_cmsis = os.path.join(
+            "{}/{}.h".format(cmsis_dir, cpu_line.lower())
+        )
 
     with open(cpu_line_cmsis, 'rb') as cmsis:
         cmsis_content = cmsis.readlines()
@@ -137,11 +135,12 @@ def generate_vectors(context):
 
 def main(args):
     """Main function."""
-    context = parse_cmsis(args.cpu_line)
+    context = parse_cmsis(args.cmsis_dir, args.cpu_line)
     generate_vectors(context)
 
 
 PARSER = argparse.ArgumentParser()
+PARSER.add_argument("cmsis_dir", help="CMSIS directory")
 PARSER.add_argument("cpu_line", help="STM32 CPU line")
 
 if __name__ == "__main__":
