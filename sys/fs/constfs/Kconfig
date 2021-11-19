@@ -5,5 +5,7 @@
 # directory for more details.
 #
 
-rsource "constfs/Kconfig"
-rsource "devfs/Kconfig"
+config MODULE_CONSTFS
+    bool "ConstFS support"
+    help
+      ConstFS static file system.
