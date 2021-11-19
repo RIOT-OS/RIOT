@@ -3,6 +3,7 @@ CPU_MODEL = stm32f469ni
 
 # MCU peripherals (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_dac
 FEATURES_PROVIDED += periph_dma
 FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_rtc

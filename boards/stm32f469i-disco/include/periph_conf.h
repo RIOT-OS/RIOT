@@ -241,6 +241,23 @@ static const adc_conf_t adc_config[] = {
 #define ADC_NUMOF   ARRAY_SIZE(adc_config)
 /** @} */
 
+/**
+ * @brief DAC configuration
+ * @{
+ */
+static const dac_conf_t dac_config[] = {
+    {GPIO_PIN(PORT_A, 4), .chan = 0},
+    {GPIO_PIN(PORT_A, 5), .chan = 1},
+};
+/** @}*/
+
+/**
+ * @brief Number of DACs
+ * @{
+ */
+#define DAC_NUMOF   ARRAY_SIZE(dac_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
