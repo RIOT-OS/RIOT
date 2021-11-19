@@ -14,6 +14,7 @@ config CPU_FAM_WL
     select HAS_PERIPH_FLASHPAGE
     select HAS_PERIPH_FLASHPAGE_PAGEWISE
     select HAS_PERIPH_RTC_MEM
+    select HAS_PERIPH_UART_RS485 # from https://www.st.com/resource/en/reference_manual/rm0453-stm32wl5x-advanced-armbased-32bit-mcus-with-subghz-radio-solution-stmicroelectronics.pdf section 35.5.20
     select HAS_PERIPH_WDT
     select HAS_BOOTLOADER_STM32
 

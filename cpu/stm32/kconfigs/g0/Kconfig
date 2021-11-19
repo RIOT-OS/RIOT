@@ -13,6 +13,7 @@ config CPU_FAM_G0
     select HAS_PERIPH_FLASHPAGE
     select HAS_PERIPH_FLASHPAGE_PAGEWISE
     select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_PERIPH_UART_RS485 # from https://www.st.com/resource/en/reference_manual/rm0444-stm32g0x1-advanced-armbased-32bit-mcus-stmicroelectronics.pdf section 33.5.20
     select HAS_PERIPH_WDT
     select HAS_BOOTLOADER_STM32
 
