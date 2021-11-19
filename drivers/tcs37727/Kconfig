@@ -12,6 +12,12 @@ config MODULE_TCS37727
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
 
+config HAVE_TCS37727
+    bool
+    select MODULE_TCS37727 if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a tcs37727 rgb light sensor is present.
+
 menuconfig KCONFIG_USEMODULE_TCS37727
     bool "Configure TCS37727 driver"
     depends on USEMODULE_TCS37727
