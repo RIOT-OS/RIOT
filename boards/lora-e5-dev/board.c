@@ -28,6 +28,15 @@
 #include "sx126x.h"
 #endif
 
+#if IS_USED(MODULE_USB_BOARD_RESET)
+#include "usb_board_reset.h"
+static inline void _reset_to_bootloader(void *arg)
+{
+    (void)arg;
+    usb_board_reset_in_bootloader();
+}
+#endif
+
 void board_init(void)
 {
     /* initialization of on-board LEDs */
@@ -36,12 +45,17 @@ void board_init(void)
     LED0_OFF;
 #endif
 
-    if(IS_ACTIVE(CONFIG_LORA_E5_DEV_ENABLE_3P3V)) {
+#if IS_USED(MODULE_USB_BOARD_RESET)
+    gpio_init_int(STM32_BOOTLOADER_BTN_PIN, STM32_BOOTLOADER_BTN_MODE,
+                  GPIO_FALLING, _reset_to_bootloader, NULL);
+#endif
+
+    if (IS_ACTIVE(CONFIG_LORA_E5_DEV_ENABLE_3P3V)) {
         gpio_init(LORA_E5_DEV_3P3V_ENABLE_PIN, GPIO_OUT);
         gpio_set(LORA_E5_DEV_3P3V_ENABLE_PIN);
     }
 
-    if(IS_ACTIVE(CONFIG_LORA_E5_DEV_ENABLE_5V)) {
+    if (IS_ACTIVE(CONFIG_LORA_E5_DEV_ENABLE_5V)) {
         gpio_init(LORA_E5_DEV_5V_ENABLE_PIN, GPIO_OUT);
         gpio_set(LORA_E5_DEV_5V_ENABLE_PIN);
     }
@@ -62,7 +76,7 @@ void board_init(void)
  */
 void lora_e5_dev_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mode)
 {
-    (void) dev;
+    (void)dev;
     switch (rf_mode) {
     case SX126X_RF_MODE_RX:
         gpio_set(FE_CTRL1);

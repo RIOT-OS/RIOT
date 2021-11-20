@@ -47,9 +47,9 @@
  *
  * 3 Buttons:
  *
- * | NAME   | BOOT     | D0        | RESET |
- * |:------ |:---------|:--------- |:----- |
- * | Pin    | PA0 (IN) | PB13 (IN) | NRST  |
+ * | NAME   | BOOT           | D0        | RESET |
+ * |:------ |:---------------|:--------- |:----- |
+ * | Pin    | STM32 BOOT MODE| PB13 (IN) | NRST  |
  *
  * 1 LED:
  *
@@ -90,6 +90,13 @@
  *   $ STM32_Programmer_CLI --connect port=swd --readunprotect
  * ```
  *
+ * Alternatively if `STM32_PROGRAMMER_CLI_PATH` is set in your environment and
+ * an stlink is connected you can do:
+ *
+ * ```
+ *   STM32_PROGRAMMER_CLI_RESET_FLAGS="--connect port=swd  --readunprotect" STM32_PROGRAMMER_CLI_MODE=STM32_STLINK PROGRAMMER=stm32programmer BOARD=lora-e5-dev make reset
+ * ```
+ *
  * #### Programming with an external ST-LINK
  *
  * Since there is no ST-LINK programmer on the board an external one
@@ -117,6 +124,18 @@
  * BOARD=lora-e5-dev make flash
  * ```
  *
+ * #### Programming with STM32 UART bootloader
+ *
+ * By default the BOARD can be put into STM32 bootloader mode by pressing the
+ * `boot` button. With this the BOARD can be programmer through the USART2 pins,
+ * so TX2 (PA2), and RX2 (PA3). For this an external FTDI device will be needed
+ * and the serial port specified.
+ *
+ * ```
+ *  PROG_DEV=/dev/ttyUSBx PROGRAMMER=stm32programmer BOARD=lora-e5-dev make flash
+ * ```
+ *
+ * _NOTE_: the STM32 UART booloader can not reset the BOARD
  * ### Serial connection
  *
  * The default serial connection is through the USB-C port mapping to PB7 (RX) and

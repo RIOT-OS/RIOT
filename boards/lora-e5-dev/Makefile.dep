@@ -8,3 +8,8 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
   USEMODULE += lm75a
 endif
+ifeq (,$(filter riotboot_reset,$(USEMODULE)))
+  USEMODULE += bootloader_stm32
+  USEMODULE += usb_board_reset
+  FEATURES_REQUIRED += periph_gpio_irq
+endif

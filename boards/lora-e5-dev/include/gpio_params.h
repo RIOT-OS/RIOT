@@ -40,15 +40,9 @@ static const  saul_gpio_params_t saul_gpio_params[] =
     },
 #endif
     {
-        .name = "Button(B1 Boot)",
+        .name = "Button(B1 D0)",
         .pin  = BTN0_PIN,
         .mode = BTN0_MODE,
-        .flags = SAUL_GPIO_INVERTED,
-    },
-    {
-        .name = "Button(B2 D0)",
-        .pin  = BTN1_PIN,
-        .mode = BTN1_MODE,
         .flags = SAUL_GPIO_INVERTED,
     },
 };

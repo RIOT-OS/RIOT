@@ -67,10 +67,16 @@ extern void lora_e5_dev_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mo
  * @name    User button
  * @{
  */
-#define BTN0_PIN            GPIO_PIN(PORT_B, 13)
+#define BTN0_PIN            GPIO_PIN(PORT_A, 0)
 #define BTN0_MODE           GPIO_IN_PU
-#define BTN1_PIN            GPIO_PIN(PORT_A, 0)
-#define BTN1_MODE           GPIO_IN_PU
+/** @} */
+
+/**
+ * @name    Boot Pin
+ * @{
+ */
+#define STM32_BOOTLOADER_BTN_PIN            GPIO_PIN(PORT_B, 13)
+#define STM32_BOOTLOADER_BTN_MODE           GPIO_IN_PU
 /** @} */
 
 /**
