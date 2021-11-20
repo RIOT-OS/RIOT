@@ -35,8 +35,6 @@ int main(void)
 {
     dht_t dev;
     int16_t temp, hum;
-    char temp_s[10];
-    char hum_s[10];
 
     puts("DHT temperature and humidity sensor test application\n");
 
@@ -57,13 +55,8 @@ int main(void)
             continue;
         }
 
-        size_t n = fmt_s16_dfp(temp_s, temp, -1);
-        temp_s[n] = '\0';
-        n = fmt_s16_dfp(hum_s, hum, -1);
-        hum_s[n] = '\0';
-
-        printf("DHT values - temp: %s°C - relative humidity: %s%%\n",
-                temp_s, hum_s);
+        printf("DHT values - temp: %d.%d°C - relative humidity: %d.%d%%\n",
+               temp/10, temp%10, hum/10, hum%10);
 
         xtimer_usleep(DELAY);
     }
