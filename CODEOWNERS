@@ -82,6 +82,7 @@
 /drivers/ccs811/                            @gschorcht
 /drivers/enc28j60/                          @haukepetersen
 /drivers/dcf77/                             @daexel
+/drivers/dht/                               @wosym
 /drivers/dose/                              @jue89
 /drivers/ds18/                              @leandrolanzieri
 /drivers/itg320x/                           @gschorcht
@@ -141,6 +142,7 @@
 /tests/                                     @smlng @leandrolanzieri @aabadie @MichelRottleuthner @fjmolinas
 /tests/candev/                              @wosym
 /tests/driver_bq2429x/                      @jeandudey
+/tests/driver_dht/                          @wosym
 /tests/gnrc*                                @miri64
 /tests/lwip*                                @miri64
 /tests/slip/                                @miri64
