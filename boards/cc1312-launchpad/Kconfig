@@ -17,3 +17,5 @@ config BOARD_CC1312_LAUNCHPAD
     select HAS_PERIPH_GPIO_IRQ
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+
+    select HAVE_SAUL_GPIO
