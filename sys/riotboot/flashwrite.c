@@ -190,6 +190,7 @@ int riotboot_flashwrite_invalidate(int slot)
        write the whole header to avoid running in memory alignment issues
        with FLASHPAGE_WRITE_BLOCK_SIZE */
     riotboot_hdr_t tmp_hdr;
+
     memset(&tmp_hdr, (~FLASHPAGE_ERASE_STATE), sizeof(riotboot_hdr_t));
 
     flashpage_write((void *)riotboot_slot_get_hdr(slot), &tmp_hdr,

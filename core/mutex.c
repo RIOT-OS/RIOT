@@ -49,6 +49,7 @@ static inline __attribute__((always_inline)) void _block(mutex_t *mutex,
                                                          unsigned irq_state)
 {
     thread_t *me = thread_get_active();
+
     /* Fail visibly even if a blocking action is called from somewhere where
      * it's subtly not allowed, eg. board_init */
     assert(me != NULL);

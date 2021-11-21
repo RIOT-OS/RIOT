@@ -18,13 +18,14 @@
 
 #ifndef ATOMIC_UTILS_ARCH_H
 #define ATOMIC_UTILS_ARCH_H
-#ifndef DOXYGEN
 
 #include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#ifndef DOXYGEN
 
 /* clang provides no built-in atomic access to regular variables */
 #ifndef __clang__
@@ -65,12 +66,13 @@ static inline void atomic_store_u32(volatile uint32_t *dest, uint32_t val)
     __atomic_store_4(dest, val, __ATOMIC_SEQ_CST);
 }
 
-#endif /* __clang__ */
+#endif  /* __clang__ */
+
+#endif  /* DOXYGEN */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* DOXYGEN */
 #endif /* ATOMIC_UTILS_ARCH_H */
 /** @} */
