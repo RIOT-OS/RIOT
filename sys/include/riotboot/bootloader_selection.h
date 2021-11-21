@@ -68,6 +68,18 @@ extern "C" {
 #define BTN_BOOTLOADER_INVERTED true
 #endif
 
+/** @brief LED pin for bootloader indication
+ *
+ * This pin (typically connected to a LED) will be toggled while the bootloader is active.
+ * It can be used to communicate the current bootloader state to the user.
+ */
+#if !defined(LED_BOOTLOADER_PIN) && defined(LED0_PIN) && !defined(LED_BOOTLOADER_NONE) || DOXYGEN
+#define LED_BOOTLOADER_PIN      LED0_PIN
+#define LED_BOOTLOADER_ON       LED0_ON     /**< Turn the bootloader LED on  */
+#define LED_BOOTLOADER_OFF      LED0_OFF    /**< Turn the bootloader LED off */
+#define LED_BOOTLOADER_TOGGLE   LED0_TOGGLE /**< Toggle the bootloader LED   */
+#endif
+
 #ifdef __cplusplus
 }
 #endif

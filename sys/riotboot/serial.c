@@ -69,6 +69,18 @@ static inline bool _boot_pin(void)
 #endif
 }
 
+static inline void _boot_led_toggle(void)
+{
+#ifdef LED_BOOTLOADER_PIN
+    static unsigned count = RIOTBOOT_DELAY / 10;
+
+    if (--count == 0) {
+        count = RIOTBOOT_DELAY / 10;
+        LED_BOOTLOADER_TOGGLE;
+    }
+#endif
+}
+
 /* send 'hello' byte until we get enter bootloader byte or timeout */
 static bool _bootdelay(unsigned tries, volatile bool *boot_default)
 {
@@ -88,6 +100,7 @@ static bool _bootdelay(unsigned tries, volatile bool *boot_default)
         if (_boot_pin()) {
             return false;
         }
+        _boot_led_toggle();
     }
 
     return *boot_default;
@@ -238,6 +251,10 @@ int riotboot_serial_loader(void)
 #ifdef BTN_BOOTLOADER_PIN
     gpio_init(BTN_BOOTLOADER_PIN, BTN_BOOTLOADER_MODE);
 #endif
+#ifdef LED_BOOTLOADER_PIN
+    gpio_init(LED_BOOTLOADER_PIN, GPIO_OUT);
+    LED_BOOTLOADER_OFF;
+#endif
 
     uart_init(RIOTBOOT_UART_DEV, RIOTBOOT_UART_BAUDRATE,
               _uart_rx_cmd, (void *)&reading);
@@ -246,6 +263,10 @@ int riotboot_serial_loader(void)
     if (_bootdelay(RIOTBOOT_DELAY, &reading)) {
         return -1;
     }
+
+#ifdef LED_BOOTLOADER_ON
+    LED_BOOTLOADER_ON;
+#endif
 
     while (1) {
 
