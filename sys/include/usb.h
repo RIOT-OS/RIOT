@@ -153,6 +153,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief USB peripheral setting to indicate remote wakeup capability.
+ */
+#ifndef CONFIG_USB_REM_WAKEUP
+#define CONFIG_USB_REM_WAKEUP   (0)
+#endif
+
+/**
  * @brief USB device max power draw in mA, between 0 and 500mA
  */
 #ifndef CONFIG_USB_MAX_POWER
