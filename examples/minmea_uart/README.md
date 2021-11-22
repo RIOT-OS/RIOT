@@ -71,3 +71,6 @@ Success: UART_DEV(2) RX: [$GPGSV,3,1,10,20,78,331,45,01,59,235,47,22,41,069,,13,
 
 More NMEA sentences are available [here](https://www.satsleuth.com/GPS_NMEA_sentences.aspx).
 
+## Misc
+
+* [GNSS modules](https://github.com/CampusIoT/orbimote/blob/master/gnss_modules.md)
