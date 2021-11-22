@@ -86,7 +86,7 @@ extern int _gnrc_icmpv6_ping(int argc, char **argv);
 #endif
 #endif
 
-#ifdef MODULE_RANDOM
+#ifdef MODULE_RANDOM_CMD
 extern int _random_init(int argc, char **argv);
 extern int _random_get(int argc, char **argv);
 #endif
@@ -250,7 +250,7 @@ const shell_command_t _shell_command_list[] = {
     { "ping", "Alias for ping6", _gnrc_icmpv6_ping },
 #endif
 #endif
-#ifdef MODULE_RANDOM
+#ifdef MODULE_RANDOM_CMD
     { "random_init", "initializes the PRNG", _random_init },
     { "random_get", "returns 32 bit of pseudo randomness", _random_get },
 #endif

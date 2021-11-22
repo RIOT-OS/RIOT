@@ -119,6 +119,7 @@ PSEUDOMODULES += printf_float
 PSEUDOMODULES += prng
 PSEUDOMODULES += prng_%
 PSEUDOMODULES += fortuna_reseed
+PSEUDOMODULES += random_cmd
 PSEUDOMODULES += riotboot_%
 PSEUDOMODULES += rtt_cmd
 PSEUDOMODULES += saul_adc
