@@ -94,12 +94,22 @@ ifneq (,$(filter nimble_autoconn,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/autoconn/include
 endif
 
+
 ifneq (,$(filter nimble_adv_ext,$(USEMODULE)))
   CFLAGS += -DMYNEWT_VAL_BLE_EXT_ADV=1
   CFLAGS += -DMYNEWT_VAL_BLE_LL_EXT_ADV_AUX_PTR_CNT=2
+  CFLAGS += -DMYNEWT_VAL_BLE_LL_SCAN_AUX_SEGMENT_CNT=1
   ifneq (,$(filter nimble_controller,$(USEMODULE)))
     CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_LL_EXT_ADV=1
   endif
+  NIMBLE_ADVERTISING_INSTANCES ?= 0
+  ifneq (,$(filter nimble_netif,$(USEMODULE)))
+    ifneq (,$(filter nimble_autoadv,$(USEMODULE)))
+      NIMBLE_ADVERTISING_INSTANCES = 1
+      CFLAGS += -DCONFIG_NIMBLE_AUTO_ADV_INST=1
+    endif
+  endif
+  CFLAGS += -DMYNEWT_VAL_BLE_MULTI_ADV_INSTANCES=$(NIMBLE_ADVERTISING_INSTANCES)
 endif
 
 ifneq (,$(filter nimble_netif,$(USEMODULE)))

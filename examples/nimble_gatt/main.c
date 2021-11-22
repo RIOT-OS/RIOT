@@ -288,7 +288,7 @@ int main(void)
     ble_gatts_start();
 
     /* start to advertise this node */
-    nimble_autoadv_start();
+    nimble_autoadv_start(NULL);
 
     return 0;
 }

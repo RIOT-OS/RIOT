@@ -41,6 +41,11 @@
 #include "nimble_statconn.h"
 #endif
 
+#ifdef MODULE_NIMBLE_AUTOADV
+#include "nimble_autoadv_params.h"
+#include "nimble_autoadv.h"
+#endif
+
 #if defined(MODULE_NIMBLE_AUTOCONN) && !defined(MODULE_NIMBLE_AUTOCONN_NOAUTOINIT)
 #include "nimble_autoconn.h"
 #include "nimble_autoconn_params.h"
@@ -184,8 +189,7 @@ void nimble_riot_init(void)
 #endif
 
 #ifdef MODULE_NIMBLE_AUTOADV
-    extern void nimble_autoadv_init(void);
-    nimble_autoadv_init();
+    nimble_autoadv_init(&nimble_autoadv_cfg);
 #endif
 
 #ifdef MODULE_NIMBLE_RPBLE
