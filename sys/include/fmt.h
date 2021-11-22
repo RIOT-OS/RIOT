@@ -18,7 +18,14 @@
  * integers, even when the C library was built without support for 64 bit
  * formatting (newlib-nano).
  *
- * \note The print functions in this library do not buffer any output.
+ * @note The fmt functions expect their `out` parameter to hold the entire output.
+ *       This *MUST* be ensured by the caller.
+ *
+ * @note Each fmt function will not write anything to `out` if it is `NULL`, but
+ *       still return the number of bytes that would have been written.
+ *       This can be used to ensure the `out` buffer is large enough.
+ *
+ * @note The print functions in this library do not buffer any output.
  * Mixing calls to standard @c printf from stdio.h with the @c print_xxx
  * functions in fmt, especially on the same output line, may cause garbled
  * output.
