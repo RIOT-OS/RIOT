@@ -330,9 +330,6 @@ do_flash() {
             exit $RETVAL
         fi
     fi
-    if [ -z "${OPENOCD_SKIP_VERIFY}" ]; then
-        OPENOCD_VERIFY="-c 'verify_image \"${IMAGE_FILE}\" ${IMAGE_OFFSET}'"
-    fi
 
     # In case of binary file, IMAGE_OFFSET should include the flash base address
     # This allows flashing normal binary files without env configuration
@@ -342,6 +339,10 @@ do_flash() {
         echo "Binfile detected, adding ROM base address: ${FLASH_ADDR}"
         IMAGE_TYPE=bin
         IMAGE_OFFSET=$(printf "0x%08x\n" "$((${IMAGE_OFFSET} + ${FLASH_ADDR}))")
+    fi
+
+    if [ -z "${OPENOCD_SKIP_VERIFY}" ]; then
+        OPENOCD_VERIFY="-c 'verify_image \"${IMAGE_FILE}\" ${IMAGE_OFFSET}'"
     fi
 
     if [ "${IMAGE_OFFSET}" != "0" ]; then
