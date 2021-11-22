@@ -194,7 +194,7 @@ typedef struct {
  */
 struct gnrc_netif_ops {
     /**
-     * @brief   Initializes network interface.
+     * @brief   Initializes and registers network interface.
      *
      * @pre `netif != NULL`
      *
@@ -207,7 +207,8 @@ struct gnrc_netif_ops {
      * gnrc_netif_default_init() if you do not need any special initialization.
      * If you do need special initialization, it is recommended to call @ref
      * gnrc_netif_default_init() at the start of the custom initialization
-     * function set here.
+     * function set here. This function MUST call @ref netif_register if the
+     * initialization is successful.
      *
      * @return 0 if the initialization of the device or MAC layer was
      * successful
@@ -538,7 +539,8 @@ static inline int gnrc_netif_ipv6_group_leave(const gnrc_netif_t *netif,
 /**
  * @brief   Default operation for gnrc_netif_ops_t::init()
  *
- * @note    Can also be used to be called *before* a custom operation.
+ * @note    Can also be used to be called *before* a custom operation. This
+ *          function calls @ref netif_register internally.
  *
  * @param[in] netif     The network interface.
  */
