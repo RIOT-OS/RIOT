@@ -30,7 +30,7 @@ start_radvd() {
 usage() {
     echo "usage: $0 [options]" >&2
     echo "Options:" >&2
-    echo "   -c <tap-device> <prefix>: Start radvd on <tap-device>, advertising <prefix>" >&2
+    echo "   -c <interface> <prefix>: Start radvd on <interface>, advertising <prefix>" >&2
     echo "   -d, --delete:             Stop radvd" >&2
 }
 
