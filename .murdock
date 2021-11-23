@@ -8,6 +8,7 @@
 : ${TEST_BOARDS_LLVM_COMPILE:=""}
 
 : ${TEST_KCONFIG_BOARDS_AVAILABLE:="
+arduino-due
 arduino-leonardo
 arduino-mega2560
 arduino-nano
