@@ -37,7 +37,7 @@
  * ~~~~~~~~
  *
  * In this case, the source and the build directory are the same (currently,
- * this applies to the micropython and openthread packages).
+ * this only applies to the micropython package).
  *
  * Porting an external library
  * ===========================

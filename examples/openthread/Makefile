@@ -43,7 +43,7 @@ OPENTHREAD_TYPE ?= ftd
 USEMODULE += openthread-$(OPENTHREAD_TYPE)
 
 # Comment the following line in order to disable the OpenThread CLI
-USEMODULE += openthread-cli
+USEMODULE += openthread-cli-$(OPENTHREAD_TYPE)
 
 USEMODULE += netdev_default
 
