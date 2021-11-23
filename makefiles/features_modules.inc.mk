@@ -14,6 +14,7 @@ ifneq (,$(filter periph_init, $(USEMODULE)))
   PERIPH_IGNORE_MODULES := \
     periph_init% \
     periph_common \
+    periph_rtc_ms \
     periph_rtc_rtt \
     periph_clic \
     periph_coretimer \
@@ -68,3 +69,6 @@ USEMODULE += $(filter efm32_coretemp, $(FEATURES_USED))
 
 # if LC filter(s) is attached to the CPUs voltage regulator, use it
 USEMODULE += $(filter vdd_lc_filter_%,$(FEATURES_USED))
+
+# select arduino_pwm pseudomodule if the corresponding feature is used
+USEMODULE += $(filter arduino_pwm, $(FEATURES_USED))

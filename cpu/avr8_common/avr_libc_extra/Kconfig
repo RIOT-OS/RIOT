@@ -5,6 +5,10 @@
 # directory for more details.
 #
 
-config PACKAGE_NANOCBOR
-    bool "NANOCBOR encoder and decoder library package"
+config MODULE_AVR_LIBC_EXTRA
+    bool
     depends on TEST_KCONFIG
+    depends on CPU_ARCH_AVR8
+    default y
+    help
+        AVR libc RIOT-specific support code.

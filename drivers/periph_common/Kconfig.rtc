@@ -5,15 +5,25 @@
 # directory for more details.
 #
 
-config MODULE_PERIPH_RTC
+menuconfig MODULE_PERIPH_RTC
     bool "RTC peripheral driver"
     depends on HAS_PERIPH_RTC
     select MODULE_PERIPH_COMMON
 
+if MODULE_PERIPH_RTC
+
 config MODULE_PERIPH_INIT_RTC
     bool "Auto initialize RTC peripheral"
     default y if MODULE_PERIPH_INIT
-    depends on MODULE_PERIPH_RTC
+
+config MODULE_PERIPH_RTC_MS
+    bool "Support for time with sub-second component"
+    depends on HAS_PERIPH_RTC_MS
+    help
+        Provides an interface to access the RTC time with a sub-second
+        component.
+
+endif #MODULE_PERIPH_RTC
 
 config MODULE_PERIPH_RTC_MEM
     bool "Low-Power RTC Memory"

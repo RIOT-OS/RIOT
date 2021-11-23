@@ -5,8 +5,13 @@
 # directory for more details.
 #
 
+comment "AT30TSE75X temperature sensor select by default for the current platform"
+    depends on MODULE_AT30TSE75X && MODULE_SAUL_DEFAULT && HAVE_AT30TSE75X
+
 config MODULE_AT30TSE75X
-    bool "AT30TSE75X temperature sensor"
+    bool
+    prompt "AT30TSE75X temperature sensor" if !(MODULE_SAUL_DEFAULT && HAVE_AT30TSE75X)
+    default (MODULE_SAUL_DEFAULT && HAVE_AT30TSE75X)
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
@@ -14,3 +19,8 @@ config MODULE_AT30TSE75X
     select MODULE_ZTIMER_USEC
     help
         AT30TSE75x temperature sensor with serial EEPROM.
+
+config HAVE_AT30TSE75X
+    bool
+    help
+        Indicates that a AT30TSE75x sensor is present on the board.

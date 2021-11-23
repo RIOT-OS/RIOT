@@ -56,7 +56,7 @@ static const char *_states[] = {
 static void _print_error(int retval)
 {
     print_str("Error: ");
-#ifdef DFPLAYER_NO_STRERROR
+#ifdef CONFIG_DFPLAYER_NO_STRERROR
     print_s32_dec(retval);
 #else
     print_str(strerror(-retval));
@@ -377,7 +377,7 @@ int _sc_dfplayer(int argc, char **argv)
     }
 
     if (!strcmp("files", argv[pos])) {
-        if (++pos != argc) {
+        if ((pos + 1) != argc) {
             print_str("Error: Expected no parameter for argument \"files\"\n");
             return 1;
         }

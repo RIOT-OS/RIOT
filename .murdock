@@ -8,11 +8,19 @@
 : ${TEST_BOARDS_LLVM_COMPILE:=""}
 
 : ${TEST_KCONFIG_BOARDS_AVAILABLE:="
+arduino-leonardo
+arduino-mega2560
+arduino-nano
+atxmega-a1-xplained
+atxmega-a3bu-xplained
+avr-rss2
 cc1352-launchpad
 cc2650-launchpad
+derfmega128
 dwm1001
 hifive1
 mbed_lpc1768
+mega-xplained
 native
 nrf52840dk
 nucleo-f072rb
@@ -34,6 +42,7 @@ seeedstudio-gd32
 slstk3400a
 sltb001a
 slwstk6220a
+waspmote-pro
 "}
 
 : ${TEST_KCONFIG_ENFORCE_APP_GROUPS:="

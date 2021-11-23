@@ -1,0 +1,71 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if TEST_KCONFIG && CPU_COMMON_ATMEGA
+
+config MODULE_ATMEGA_COMMON_PERIPH
+    bool
+    default y
+    help
+        Common ATmega peripheral drivers.
+
+config MODULE_ATMEGA_PCINT
+    bool
+    depends on HAS_ATMEGA_PCINT0 || HAS_ATMEGA_PCINT1 || HAS_ATMEGA_PCINT2 || HAS_ATMEGA_PCINT3
+    help
+      Say y to enable all the present Pin Change Interrupt banks.
+
+config MODULE_ATMEGA_PCINT0
+    bool
+    depends on HAS_ATMEGA_PCINT0
+    default MODULE_ATMEGA_PCINT
+    help
+        Say y to enable PIC bank 0.
+
+config MODULE_ATMEGA_PCINT1
+    bool
+    depends on HAS_ATMEGA_PCINT1
+    default MODULE_ATMEGA_PCINT
+    help
+        Say y to enable PIC bank 1.
+
+config MODULE_ATMEGA_PCINT2
+    bool
+    depends on HAS_ATMEGA_PCINT2
+    default MODULE_ATMEGA_PCINT
+    help
+        Say y to enable PIC bank 2.
+
+config MODULE_ATMEGA_PCINT3
+    bool
+    depends on HAS_ATMEGA_PCINT3
+    default MODULE_ATMEGA_PCINT
+    help
+        Say y to enable PIC bank 3.
+
+endif # TEST_KCONFIG && CPU_COMMON_ATMEGA
+
+## Declaration of specific features
+config HAS_ATMEGA_PCINT0
+    bool
+    help
+        Indicates that the Pin Change Interrupt bank 0 is present.
+
+config HAS_ATMEGA_PCINT1
+    bool
+    help
+        Indicates that the Pin Change Interrupt bank 1 is present.
+
+config HAS_ATMEGA_PCINT2
+    bool
+    help
+        Indicates that the Pin Change Interrupt bank 2 is present.
+
+config HAS_ATMEGA_PCINT3
+    bool
+    help
+        Indicates that the Pin Change Interrupt bank 3 is present.

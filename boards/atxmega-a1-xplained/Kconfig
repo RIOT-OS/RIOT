@@ -18,3 +18,6 @@ config BOARD_ATXMEGA_A1_XPLAINED
     select HAS_PERIPH_UART
 
     select HAVE_SAUL_GPIO
+    select MODULE_BOARDS_COMMON_ATXMEGA if TEST_KCONFIG
+
+source "$(RIOTBOARD)/common/atxmega/Kconfig"

@@ -38,6 +38,7 @@ export RIOTPKG               # For overriding RIOT's pkg directory
 export RIOTTOOLS             # Location of host machine tools
 export RIOTPROJECT           # Top level git root of the project being built, or PWD if not a git repository
 export RIOTMAKE              # Location of all supplemental Makefiles (such as this file)
+export RIOTKCONFIG           # Location of all supplemental Kconfig files
 export BINDIRBASE            # This is the folder where the application should be built in. For each BOARD a different subfolder is used.
 export BINDIR                # This is the folder where the application should be built in.
 export BUILD_DIR             # This is the base folder to store common build files and artifacts, e.g. test results.

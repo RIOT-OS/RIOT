@@ -10,7 +10,6 @@ config MODULE_ARDUINO_SKETCHES
 
 menuconfig MODULE_ARDUINO
     bool "Arduino support"
-    imply MODULE_ARDUINO_PWM
     imply MODULE_PERIPH_ADC
     imply MODULE_PERIPH_I2C
     imply MODULE_PERIPH_SPI

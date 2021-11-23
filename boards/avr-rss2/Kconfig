@@ -18,3 +18,12 @@ config BOARD_AVR_RSS2
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+
+    select MODULE_BOARDS_COMMON_ATMEGA if TEST_KCONFIG
+    select MODULE_ATMEGA_PCINT0 if TEST_KCONFIG
+    select HAVE_SAUL_GPIO
+    select HAVE_BME280_I2C
+    select HAVE_AT24MAC
+
+
+source "$(RIOTBOARD)/common/atmega/Kconfig"

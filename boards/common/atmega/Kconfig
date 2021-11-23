@@ -5,6 +5,8 @@
 # directory for more details.
 #
 
-config PACKAGE_NANOCBOR
-    bool "NANOCBOR encoder and decoder library package"
+config MODULE_BOARDS_COMMON_ATMEGA
+    bool
     depends on TEST_KCONFIG
+    help
+        Common code of ATmega boards.

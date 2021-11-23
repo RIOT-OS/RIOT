@@ -1,16 +1,8 @@
-ifneq (,$(filter cortex-m23 cortex-m0%,$(CPU_CORE)))
-  QDSA_IMPL ?= arm
-else
-  ifneq (,$(filter arch_avr8,$(FEATURES_USED)))
-    QDSA_IMPL ?= avr
-  else
-    QDSA_IMPL ?= cref
-  endif
-endif
+PSEUDOMODULES += qdsa_impl_arm
+PSEUDOMODULES += qdsa_impl_avr
+PSEUDOMODULES += qdsa_impl_cref
 
-export QDSA_IMPL
-
-INCLUDES += -I$(PKGDIRBASE)/qdsa/$(QDSA_IMPL)
+INCLUDES += -I$(PKGDIRBASE)/qdsa/$(patsubst qdsa_impl_%,%,$(filter qdsa_impl_%,$(USEMODULE)))
 
 ifeq (cortex-m0plus,$(CPU_CORE))
   # There are problems with the LLVM assembler and the Cortex-M0+ instruction

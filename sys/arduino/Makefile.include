@@ -24,3 +24,5 @@ INCLUDES += -I$(RIOTBASE)/sys/arduino/include
 # package, which is __horrible__ out of date. However, we cannot simply ignore
 # all Ubuntu users and instead simply manually enable C++11 support
 CXXEXFLAGS += -std=c++11
+
+PSEUDOMODULES += arduino_pwm

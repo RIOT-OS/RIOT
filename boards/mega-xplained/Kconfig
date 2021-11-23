@@ -18,3 +18,9 @@ config BOARD_MEGA_XPLAINED
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+
+    select MODULE_BOARDS_COMMON_ATMEGA if TEST_KCONFIG
+    select HAVE_SAUL_ADC
+    select HAVE_SAUL_GPIO
+
+source "$(RIOTBOARD)/common/atmega/Kconfig"
