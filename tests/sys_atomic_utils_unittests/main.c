@@ -51,6 +51,10 @@ static void test_load_store(void)
     uint64_t u64 = 42;
     atomic_store_u64(&u64, 0x1337133713371337);
     TEST_ASSERT_EQUAL_INT(atomic_load_u64(&u64), 0x1337133713371337);
+
+    void *ptr = NULL;
+    atomic_store_ptr(&ptr, &u64);
+    TEST_ASSERT(atomic_load_ptr(&ptr) == (void *)&u64);
 }
 
 static void test_fetch_op_u8(fetch_op_u8_t atomic_op, fetch_op_u8_t op)

@@ -236,6 +236,33 @@ static inline uint32_t atomic_load_u32(const volatile uint32_t *var);
  * @return  The value stored in @p var
  */
 static inline uint64_t atomic_load_u64(const volatile uint64_t *var);
+
+/**
+ * @brief   Load an `uintptr_t` atomically
+ *
+ * @param[in]       var     Variable to load atomically
+ * @return  The value stored in @p var
+ */
+static inline uintptr_t atomic_load_uintptr(const volatile uintptr_t *var) {
+    if (sizeof(uintptr_t) == 2) {
+        return atomic_load_u16((const volatile uint16_t *)var);
+    }
+    else if (sizeof(uintptr_t) == 4) {
+        return atomic_load_u32((const volatile uint32_t *)(uintptr_t)var);
+    }
+    else {
+        return atomic_load_u64((const volatile uint64_t *)(uintptr_t)var);
+    }
+}
+/**
+ * @brief   Load an `void *` atomically
+ *
+ * @param[in]       ptr_addr    Address to the pointer to load
+ * @return  Value of the loaded pointer
+ */
+static inline void * atomic_load_ptr(void **ptr_addr) {
+    return (void *)atomic_load_uintptr((const volatile uintptr_t *)ptr_addr);
+}
 /** @} */
 
 /**
@@ -266,6 +293,34 @@ static inline void atomic_store_u32(volatile uint32_t *dest, uint32_t val);
  * @param[in]       val     Value to write
  */
 static inline void atomic_store_u64(volatile uint64_t *dest, uint64_t val);
+
+/**
+ * @brief   Store an `uintptr_t` atomically
+ *
+ * @param[out]      dest    Location to atomically write the new value to
+ * @param[in]       val     Value to write
+ */
+static inline void atomic_store_uintptr(volatile uintptr_t *dest, uintptr_t val)
+{
+    if (sizeof(uintptr_t) == 2) {
+        atomic_store_u16((volatile uint16_t *)dest, (uint16_t)val);
+    }
+    else if (sizeof(uintptr_t) == 4) {
+        atomic_store_u32((volatile uint32_t *)(uintptr_t)dest, (uint32_t)val);
+    }
+    else {
+        atomic_store_u64((volatile uint64_t *)(uintptr_t)dest, (uint64_t)val);
+    }
+}
+/**
+ * @brief   Store an `void *` atomically
+ *
+ * @param[out]      dest    Location to atomically write the new value to
+ * @param[in]       val     Value to write
+ */
+static inline void atomic_store_ptr(void **dest, const void *val) {
+    atomic_store_uintptr((volatile uintptr_t *)dest, (uintptr_t)val);
+}
 /** @} */
 
 /**
