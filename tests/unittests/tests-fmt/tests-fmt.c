@@ -738,6 +738,15 @@ static void test_fmt_s32_dfp(void)
     out[act_len] = '\0';
     TEST_ASSERT_EQUAL_STRING("-0.0000001", (char *)out);
 
+    val = -1;
+    fpp = -24;
+    len = fmt_s32_dfp(NULL, val, fpp);
+    TEST_ASSERT_EQUAL_INT(3 - fpp, len);
+    act_len = fmt_s32_dfp(out, val, fpp);
+    TEST_ASSERT_EQUAL_INT(3 - fpp, act_len);
+    out[act_len] = '\0';
+    TEST_ASSERT_EQUAL_STRING("-0.000000000000000000000001", (char *)out);
+
     /* check that the buffer was not overflowed */
     TEST_ASSERT_EQUAL_STRING("z", &out[28]);
 }

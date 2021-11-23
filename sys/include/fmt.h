@@ -18,7 +18,14 @@
  * integers, even when the C library was built without support for 64 bit
  * formatting (newlib-nano).
  *
- * \note The print functions in this library do not buffer any output.
+ * @note The fmt functions expect their `out` parameter to hold the entire output.
+ *       This *MUST* be ensured by the caller.
+ *
+ * @note Each fmt function will not write anything to `out` if it is `NULL`, but
+ *       still return the number of bytes that would have been written.
+ *       This can be used to ensure the `out` buffer is large enough.
+ *
+ * @note The print functions in this library do not buffer any output.
  * Mixing calls to standard @c printf from stdio.h with the @c print_xxx
  * functions in fmt, especially on the same output line, may cause garbled
  * output.
@@ -287,39 +294,30 @@ size_t fmt_s16_dec(char *out, int16_t val);
  *
  * @param[out] out          Pointer to the output buffer, or NULL
  * @param[in]  val          Fixed point value
- * @param[in]  fp_digits    Number of digits after the decimal point, MUST be
- *                          >= -7
+ * @param[in]  scale        Scale value
  *
  * @return      Length of the resulting string
  */
-size_t fmt_s16_dfp(char *out, int16_t val, int fp_digits);
+size_t fmt_s16_dfp(char *out, int16_t val, int scale);
 
 /**
  * @brief Convert 32-bit fixed point number to a decimal string
  *
- * The input for this function is a signed 32-bit integer holding the fixed
- * point value as well as an integer defining the position of the decimal point.
- * This value is used to shift the decimal point to the right (positive value
- * of @p fp_digits) or to the left (negative value of @p fp_digits).
+ * This multiplies a 32bit signed number by 10^(scale) before formatting.
  *
- * Will add a leading "-" if @p val is negative.
+ * The resulting string will always be padded with zeros after the decimal point.
  *
- * The resulting string will always be patted with zeros after the decimal point.
- *
- * For example: if @p val is -3548 and @p fp_digits is -2, the resulting string
- * will be "-35.48". The same value for @p val with @p fp_digits of 2 will
- * result in "-354800".
- *
- * @pre fp_digits > -8 (TENMAP_SIZE)
+ * For example: if @p val is -35648 and @p scale is -2, the resulting
+ * string will be "-352.48"( -35648*10^-2). The same value for @p val with
+ * @p scale of 2 will result in "-3524800" (-35648*10^2).
  *
  * @param[out] out          Pointer to the output buffer, or NULL
  * @param[in]  val          Fixed point value
- * @param[in]  fp_digits    Number of digits after the decimal point, MUST be
- *                          >= -7
+ * @param[in]  scale        Scale value
  *
  * @return      Length of the resulting string
  */
-size_t fmt_s32_dfp(char *out, int32_t val, int fp_digits);
+size_t fmt_s32_dfp(char *out, int32_t val, int scale);
 
 /**
  * @brief Format float to string
