@@ -10,8 +10,8 @@ comment "AT24MAC unique ID chip enabled as default EUI-48/64 provider"
 
 config MODULE_AT24MAC
     bool
-    prompt "AT24MAC unique ID chip" if !(MODULE_EUI_PROVIDER && HAVE_AT24MAC)
-    default (MODULE_EUI_PROVIDER && HAVE_AT24MAC)
+    prompt "AT24MAC unique ID chip" if !((MODULE_EUI_PROVIDER || MODULE_MTD) && HAVE_AT24MAC)
+    default ((MODULE_EUI_PROVIDER || MODULE_MTD) && HAVE_AT24MAC)
     select MODULE_AT24CXXX
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
