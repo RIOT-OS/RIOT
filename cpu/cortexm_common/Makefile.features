@@ -29,11 +29,13 @@ else ifeq ($(CPU_CORE),cortex-m0plus)
   RUST_TARGET = thumbv6m-none-eabi
 else ifeq ($(CPU_CORE),cortex-m23)
   CPU_ARCH := armv8m
+  #RUST_TARGET = thumbv8m.base-none-eabi
 else ifeq ($(CPU_CORE),cortex-m3)
   CPU_ARCH := armv7m
   RUST_TARGET = thumbv7m-none-eabi
 else ifeq ($(CPU_CORE),cortex-m33)
   CPU_ARCH := armv8m
+  #RUST_TARGET = thumbv8m.main-none-eabi
 else ifeq ($(CPU_CORE),cortex-m4)
   CPU_ARCH := armv7m
   RUST_TARGET = thumbv7em-none-eabi
