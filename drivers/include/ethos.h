@@ -89,11 +89,8 @@ typedef struct {
     uint8_t remote_mac_addr[6]; /**< this device's MAC address */
     tsrb_t inbuf;           /**< ringbuffer for incoming data */
     line_state_t state;     /**< Line status variable */
-    size_t framesize;       /**< size of currently incoming frame */
     unsigned frametype;     /**< type of currently incoming frame */
-    size_t last_framesize;  /**< size of last completed frame */
     mutex_t out_mutex;      /**< mutex used for locking concurrent sends */
-    bool accept_new;        /**< incoming frame can be stored or not */
 } ethos_t;
 
 /**
@@ -127,6 +124,8 @@ void ethos_setup(ethos_t *dev, const ethos_params_t *params, uint8_t index,
  * @brief   Send frame over serial port using ethos' framing
  *
  * This is used by e.g., stdio over ethos to send text frames.
+ *
+ * @note    Uses mutexes to synchronize sending multiple frames so it should not be called from ISR.
  *
  * @param[in]   dev         handle of the device to initialize
  * @param[in]   data        ptr to data to be sent
