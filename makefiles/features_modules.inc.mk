@@ -18,7 +18,8 @@ ifneq (,$(filter periph_init, $(USEMODULE)))
     periph_rtc_rtt \
     periph_clic \
     periph_coretimer \
-    periph_plic
+    periph_plic \
+    periph_spi_on_qspi
     #
   PERIPH_MODULES := $(filter-out $(PERIPH_IGNORE_MODULES),\
                                  $(filter periph_%,$(USEMODULE)))
