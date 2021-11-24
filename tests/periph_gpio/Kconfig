@@ -10,4 +10,5 @@ config APPLICATION
     default y
     imply MODULE_PERIPH_GPIO_IRQ
     imply MODULE_PERIPH_GPIO_FAST_READ
+    imply MODULE_PERIPH_GPIO_TAMPER_WAKE
     depends on TEST_KCONFIG
