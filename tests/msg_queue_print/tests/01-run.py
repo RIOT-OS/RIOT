@@ -14,9 +14,8 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect("No message queue")
-    child.expect(r"Message queue of thread \d+\r\n")
-    child.expect_exact('size: 8 (avail: 0)')
+    child.expect("No messages or no message queue")
+    child.expect("No messages or no message queue")
     child.expect(r"Message queue of thread \d+\r\n")
     child.expect_exact('size: 8 (avail: 8)')
     if os.environ.get('BOARD') == 'native':

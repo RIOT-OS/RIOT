@@ -362,9 +362,9 @@ int msg_reply_int(msg_t *m, msg_t *reply);
  * @brief Check how many messages are available in the message queue
  *
  * @return Number of messages available in our queue on success
- * @return -1, if no caller's message queue is initialized
+ * @return 0, if no caller's message queue is initialized
  */
-int msg_avail(void);
+unsigned msg_avail(void);
 
 /**
  * @brief Initialize the current thread's message queue.
