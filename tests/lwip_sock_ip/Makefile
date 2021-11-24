@@ -1,6 +1,7 @@
 include ../Makefile.tests_common
 
 LWIP_IPV4 ?= 0
+LWIP_IPV6 ?= 1
 AUX_LOCAL ?= 1
 
 ifneq (0, $(LWIP_IPV4))
@@ -8,9 +9,6 @@ ifneq (0, $(LWIP_IPV4))
   USEMODULE += lwip_arp
   USEMODULE += lwip_ipv4
   CFLAGS += -DETHARP_SUPPORT_STATIC_ENTRIES=1
-  LWIP_IPV6 ?= 0
-else
-  LWIP_IPV6 ?= 1
 endif
 
 ifneq (0, $(LWIP_IPV6))
