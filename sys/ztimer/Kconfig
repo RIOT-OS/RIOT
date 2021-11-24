@@ -171,13 +171,10 @@ config MODULE_ZTIMER
 
 if MODULE_ZTIMER
 
-# TODO: only use MODULE_ZTIMER_AUTO_INIT, for now we try to get the same modules
-# as the Makefile dependency resolution. See sys/ztimer/Makefile.dep for more
-# info on why two modules are used.
 config MODULE_AUTO_INIT_ZTIMER
     bool "Auto initialize ztimer"
     depends on MODULE_AUTO_INIT
-    select MODULE_ZTIMER_AUTO_INIT
+    select MODULE_ZTIMER_INIT
     default y
 
 config MODULE_ZTIMER_NOW64
@@ -194,7 +191,7 @@ config MODULE_ZTIMER_MOCK
         manually fired to simulate different scenarios and test the ztimer
         implementation using this as a backing timer.
 
-config MODULE_ZTIMER_AUTO_INIT
+config MODULE_ZTIMER_INIT
     bool
 
 config MODULE_ZTIMER_CORE
