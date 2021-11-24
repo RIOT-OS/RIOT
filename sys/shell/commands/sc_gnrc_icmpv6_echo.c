@@ -127,9 +127,7 @@ finish:
     xtimer_remove(&data.sched_timer);
     res = _finish(&data);
     gnrc_netreg_unregister(GNRC_NETTYPE_ICMPV6, &data.netreg);
-    for (unsigned i = 0;
-         i < (unsigned)msg_avail();
-         i++) {
+    while (msg_avail() > 0) {
         msg_t msg;
 
         /* remove all remaining messages (likely caused by duplicates) */
