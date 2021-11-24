@@ -398,14 +398,12 @@ static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6, uint32_t no
         if (rssi != GNRC_NETIF_HDR_NO_RSSI) {
             printf(" rssi=%"PRId16" dBm", rssi);
         }
-        if (data->datalen >= sizeof(uint32_t)) {
-            printf(" time=%lu.%03lu ms", (long unsigned)triptime / 1000,
-                   (long unsigned)triptime % 1000);
-        }
-
         /* we can only calculate RTT (triptime) if payload was large enough for
            a TX timestamp */
         if (data->datalen >= sizeof(uint32_t)) {
+            printf(" time=%lu.%03lu ms", (long unsigned)triptime / 1000,
+                   (long unsigned)triptime % 1000);
+
             data->tsum += triptime;
             if (triptime < data->tmin) {
                 data->tmin = triptime;
