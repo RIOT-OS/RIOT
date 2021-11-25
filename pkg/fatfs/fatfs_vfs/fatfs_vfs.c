@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <inttypes.h>
@@ -26,7 +27,6 @@
 
 #include "fs/fatfs.h"
 
-#include "kernel_defines.h" /* needed for BUILD_BUG_ON */
 #include "time.h"
 
 #define ENABLE_DEBUG 0
@@ -50,8 +50,10 @@ static int _mount(vfs_mount_t *mountp)
 {
     /* if one of the lines below fail to compile you probably need to adjust
        vfs buffer sizes ;) */
-    BUILD_BUG_ON(VFS_DIR_BUFFER_SIZE < sizeof(DIR));
-    BUILD_BUG_ON(VFS_FILE_BUFFER_SIZE < sizeof(fatfs_file_desc_t));
+    static_assert(VFS_DIR_BUFFER_SIZE >= sizeof(DIR),
+                  "DIR must fit into VFS_DIR_BUFFER_SIZE");
+    static_assert(VFS_FILE_BUFFER_SIZE >= sizeof(fatfs_file_desc_t),
+                  "fatfs_file_desc_t must fit into VFS_FILE_BUFFER_SIZE");
 
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)mountp->private_data;
 
