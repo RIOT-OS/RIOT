@@ -197,6 +197,11 @@
  *              if if these are missing it will use same basic timer
  *              as ZTIMER_USEC does.
  *
+ * If `periph_rtt` is required with direct access by another MODULE or
+ * application, `ztimer_periph_rtt_auto_select` can be disabled to avoid automatic
+ * selection of `ztimer_periph_rtt` as a backend for ZTIMER_SEC and ZTIMER_MSEC.
+ * i.e.: `DISABLE_MODULE += ztimer_periph_rtt_auto_select`.
+ *
  * These pointers are defined in `ztimer.h` and can be used like this:
  *
  *     ztimer_now(ZTIMER_USEC);

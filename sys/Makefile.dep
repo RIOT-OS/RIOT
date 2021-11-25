@@ -745,7 +745,7 @@ ifneq (,$(filter suit_%,$(USEMODULE)))
 endif
 
 # include ztimer dependencies
-ifneq (,$(filter ztimer% %ztimer,$(USEMODULE)))
+ifneq (,$(filter-out ztimer_periph_rtt_auto_select,$(filter ztimer% %ztimer,$(USEMODULE))))
   include $(RIOTBASE)/sys/ztimer/Makefile.dep
 endif
 
