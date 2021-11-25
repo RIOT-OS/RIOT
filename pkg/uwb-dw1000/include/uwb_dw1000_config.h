@@ -199,10 +199,11 @@ extern "C" {
 #endif
 
 /**
- * @brief   Default MAC FrameFilter (0x0000 = no filter)
+ * @brief   Default MAC FrameFilter (0x00ff = frame filtering enabled, all frames
+ *          matching PANID and destination address accepted)
  */
 #ifndef DW1000_FRAME_FILTER_DEFAULT
-#define DW1000_FRAME_FILTER_DEFAULT     0x0000
+#define DW1000_FRAME_FILTER_DEFAULT     0x00ff
 #endif
 
 /**

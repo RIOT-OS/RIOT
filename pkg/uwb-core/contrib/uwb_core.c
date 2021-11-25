@@ -19,43 +19,37 @@
 
 #include "thread.h"
 #include "event.h"
-#include "event/callback.h"
 #include "uwb_core.h"
 
-#include "os/os_cputime.h"
-#include "hal/hal_timer.h"
-
-#ifndef UWB_CORE_STACKSIZE
-#define UWB_CORE_STACKSIZE  (THREAD_STACKSIZE_LARGE)
-#endif
-#ifndef UWB_CORE_PRIO
-#define UWB_CORE_PRIO       (THREAD_PRIORITY_MAIN - 5)
-#endif
-
-static char _stack_uwb_core[UWB_CORE_STACKSIZE];
-
+#if !IS_USED(MODULE_UWB_CORE_EVENT_THREAD)
 static event_queue_t _queue;
-
+static char _stack_uwb_core[UWB_CORE_STACKSIZE];
 static void *_uwb_core_thread(void *arg)
 {
     (void)arg;
-
     event_queue_init(&_queue);
     event_loop(&_queue);
     /* never reached */
     return NULL;
 }
+#endif
 
 event_queue_t *uwb_core_get_eventq(void)
 {
+#if !IS_USED(MODULE_UWB_CORE_EVENT_THREAD)
     return &_queue;
+#else
+    return UWB_CORE_EVENT_THREAD_QUEUE;
+#endif
 }
 
 void uwb_core_riot_init(void)
 {
+#if !IS_USED(MODULE_UWB_CORE_EVENT_THREAD)
     thread_create(_stack_uwb_core, sizeof(_stack_uwb_core),
                   UWB_CORE_PRIO,
                   THREAD_CREATE_STACKTEST,
                   _uwb_core_thread, NULL,
-                  "uwb_core");
+                  "uwb_core_event");
+#endif
 }

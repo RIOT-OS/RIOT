@@ -30,6 +30,10 @@ ifneq (,$(filter uwb-core_dpl,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter uwb-core_event_thread,$(USEMODULE)))
+  USEMODULE += event_thread
+endif
+
 # Some stdlib functions used by the pkg are not in avr-gcc
 FEATURES_BLACKLIST += arch_avr8
 # uwb-core has specific compilation sources when compiling kernel
