@@ -32,3 +32,9 @@ config MMA8X5X_I2C_ADDRESS
         Default value corresponds to SA0 connected to VCC.
 
 endif # KCONFIG_USEMODULE_MMA8X5X
+
+config HAVE_MMA8X5X
+    bool
+    select MODULE_MMA8X5X if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a MMA8x5x is present
