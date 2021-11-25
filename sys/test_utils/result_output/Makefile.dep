@@ -3,7 +3,7 @@ test_utils_result_output_check \
 test_utils_result_output_json \
 test_utils_result_output_txt
 
-USED_TURO_OUTPUT_FORMAT := $(filter test_utils_result_output_%,$(USEMODULE))
+USED_TURO_OUTPUT_FORMAT := $(sort $(filter test_utils_result_output_%,$(USEMODULE)))
 
 ifeq (0,$(words $(USED_TURO_OUTPUT_FORMAT)))
   USEMODULE += test_utils_result_output_json
