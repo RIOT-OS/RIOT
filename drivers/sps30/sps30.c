@@ -104,7 +104,7 @@ static inline void _cpy_add_crc(uint8_t *data, size_t len, uint8_t *crcd_data)
  * @return       true if all CRCs are valid
  * @return       false if at least one CRC is invalid
  */
-static inline bool _cpy_check_crc(uint8_t *data, size_t len, uint8_t *crcd_data)
+static inline bool _cpy_check_crc(uint8_t *data, size_t len, const uint8_t *crcd_data)
 {
     for (size_t elem = 0; elem < len / 2; elem++) {
         int idx = (elem << 1);
