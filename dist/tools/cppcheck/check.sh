@@ -80,7 +80,10 @@ if github_annotate_is_on; then
         DETAILS="${DETAILS}     * (reason: <your reason why you think this is "
         DETAILS="${DETAILS}a false positive>) */\n"
 
-        if echo "${SEVERITY}" | grep -q "\<error\>"; then
+        # contributors get confused if CI errors (i.e. non-zero result), but outputs only warnings
+        # => make all warnings errors on non-zero output. Otherwise, use severity level of output
+        # to determine annotation type.
+        if [ ${RESULT} -ne 0 ] || echo "${SEVERITY}" | grep -q "\<error\>"; then
             github_annotate_error "${FILE}" "${LINENUM}" "${DETAILS}"
         else
             github_annotate_warning "${FILE}" "${LINENUM}" "${DETAILS}"
