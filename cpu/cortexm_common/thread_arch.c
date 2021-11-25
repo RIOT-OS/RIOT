@@ -259,10 +259,12 @@ int thread_isr_stack_usage(void)
 {
     uint32_t *ptr = &_sstack;
 
-    while(((*ptr) == STACK_CANARY_WORD) && (ptr < &_estack)) {
+    /* cppcheck-suppress comparePointers */
+    while (((*ptr) == STACK_CANARY_WORD) && (ptr < &_estack)) {
         ++ptr;
     }
 
+    /* cppcheck-suppress comparePointers */
     ptrdiff_t num_used_words = &_estack - ptr;
     return num_used_words * sizeof(*ptr);
 }
