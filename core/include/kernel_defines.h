@@ -133,14 +133,6 @@ extern "C" {
 #endif
 
 /**
- * @def         ALIGN_OF(T)
- * @brief       Calculate the minimal alignment for type T.
- * @param[in]   T   Type to examine
- * @returns     The minimal alignment of T.
- */
-#define ALIGN_OF(T) (offsetof(struct { char c; T t; }, t))
-
-/**
  * @def         BUILD_BUG_ON(condition)
  * @brief       Forces a compilation error if condition is true.
  *              This trick is only needed if the condition can't be evaluated
