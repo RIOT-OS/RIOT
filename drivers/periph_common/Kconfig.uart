@@ -51,4 +51,13 @@ config MODULE_PERIPH_INIT_LPUART
     depends on MODULE_PERIPH_LPUART
     default y if MODULE_PERIPH_INIT
 
+config MODULE_PERIPH_UART_HW_FC
+    bool
+    depends on HAS_PERIPH_UART_HW_FC
+
+config MODULE_PERIPH_INIT_UART_HW_FC
+    bool
+    depends on MODULE_PERIPH_UART_HW_FC
+    default y if MODULE_PERIPH_INIT
+
 endif # MODULE_PERIPH_UART
