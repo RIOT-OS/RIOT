@@ -103,14 +103,12 @@ static void poweroff(lpc23xx_i2c_t *i2c)
     }
 }
 
-int i2c_acquire(i2c_t dev)
+void i2c_acquire(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
     mutex_lock(&ctx[dev].lock);
     poweron(i2c_config[dev].dev);
-
-    return 0;
 }
 
 void i2c_release(i2c_t dev)
@@ -332,6 +330,8 @@ static void irq_handler(i2c_t dev)
     }
 
     /* clear interrupt flag */
+    /* cppcheck-suppress redundantAssignment
+     * (reason: writing 1 to volatile register to clear the interrupt) */
     i2c->CONCLR = I2CONCLR_SIC;
 }
 

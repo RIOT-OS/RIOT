@@ -126,12 +126,11 @@ void i2c_init(i2c_t devnum)
     I2C->MTPR = MTPR_TPR_100KHZ;
 }
 
-int i2c_acquire(i2c_t dev)
+void i2c_acquire(i2c_t dev)
 {
     (void)dev;
     assert(dev < I2C_NUMOF);
     mutex_lock(&_lock);
-    return 0;
 }
 
 void i2c_release(i2c_t dev)
