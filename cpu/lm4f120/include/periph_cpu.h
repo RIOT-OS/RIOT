@@ -178,7 +178,7 @@ typedef enum {
     SPI_MODE_0 = SSI_FRF_MOTO_MODE_0,       /**< CPOL=0, CPHA=0 */
     SPI_MODE_1 = SSI_FRF_MOTO_MODE_1,       /**< CPOL=0, CPHA=1 */
     SPI_MODE_2 = SSI_FRF_MOTO_MODE_2,       /**< CPOL=1, CPHA=0 */
-    SPI_MODE_3 = SSI_FRF_MOTO_MODE_0,       /**< CPOL=1, CPHA=1 */
+    SPI_MODE_3 = SSI_FRF_MOTO_MODE_3,       /**< CPOL=1, CPHA=1 */
 } spi_mode_t;
 /** @} */
 #endif /* ndef DOXYGEN */
