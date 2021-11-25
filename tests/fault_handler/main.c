@@ -36,11 +36,14 @@
 int main(void)
 {
     puts("Fault handler test application");
-    printf("This application will crash by attempting to write to address 0x%08x\n", FORBIDDEN_ADDRESS);
+    printf("This application will crash by attempting to write to address 0x%08x\n",
+        FORBIDDEN_ADDRESS);
     puts("Waiting 1 second before crashing...");
     xtimer_usleep(1000000lu);
     puts("Write to forbidden address " PRINT_MACRO(FORBIDDEN_ADDRESS));
+    /* cppcheck-suppress nullPointer */
     *((volatile unsigned int *) FORBIDDEN_ADDRESS) = 12345u;
+    /* cppcheck-suppress nullPointer */
     unsigned int readback = *((volatile unsigned int *) FORBIDDEN_ADDRESS);
     printf("readback: 0x%08x\n", readback);
     puts("We did not expect the application to survive the previous write.");
@@ -48,6 +51,6 @@ int main(void)
     puts(PRINT_MACRO(INVALID_INSTRUCTION));
     INVALID_INSTRUCTION;
     puts("Failed to crash the program, hanging...");
-    while(1) {}
+    while (1) {}
     return 0;
 }
