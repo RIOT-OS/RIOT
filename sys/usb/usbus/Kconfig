@@ -4,9 +4,30 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+
+menuconfig MODULE_USBUS
+    bool "USB Unified Stack (USBUS)"
+    depends on TEST_KCONFIG
+    depends on HAS_PERIPH_USBDEV || MODULE_USBDEV_MOCK
+    select MODULE_CORE_THREAD_FLAGS
+    select MODULE_EVENT
+    select MODULE_LUID
+    select MODULE_FMT
+    select MODULE_PERIPH_USBDEV if HAS_PERIPH_USBDEV && !MODULE_USBDEV_MOCK
+
+if MODULE_USBUS
+
+config MODULE_AUTO_INIT_USBUS
+    bool "Auto initialize USBUS"
+    depends on MODULE_AUTO_INIT
+    default y
+
+endif # MODULE_USBUS
+
 menuconfig KCONFIG_USEMODULE_USBUS
     bool "Configure USB Unified Stack (USBUS)"
     depends on USEMODULE_USBUS
+    depends on KCONFIG_USB
     help
         Configure the USBUS module via Kconfig.
 
@@ -42,7 +63,8 @@ config USBUS_EP0_SIZE_64
 
 endchoice
 
+endif # KCONFIG_USEMODULE_USBUS
+
 rsource "cdc/Kconfig"
 rsource "dfu/Kconfig"
-
-endif # KCONFIG_USEMODULE_USBUS
+rsource "hid/Kconfig"

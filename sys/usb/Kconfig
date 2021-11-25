@@ -108,5 +108,6 @@ config USB_SERIAL_BYTE_LENGTH
 comment "WARNING: The serial string is empty!"
     depends on USB_SERIAL_STR = "" && USB_CUSTOM_SERIAL_STR
 
-rsource "usbus/Kconfig"
 endif # KCONFIG_USB
+
+rsource "usbus/Kconfig"
