@@ -223,7 +223,8 @@ int sps30_read_measurement(const sps30_t *dev, sps30_data_t *data)
 {
     /* This compile time check is needed to ensure the below method used for
        endianness conversion will work as expected */
-    BUILD_BUG_ON(sizeof(sps30_data_t) != (sizeof(float) * 10));
+    static_assert(sizeof(sps30_data_t) == (sizeof(float) * 10),
+                  "sps30_data_t must be sized 10 floats");
     assert(dev && data);
 
     /* The target buffer is also used for storing the raw data temporarily */
