@@ -117,9 +117,7 @@ int mpu9x50_set_accel_power(mpu9x50_t *dev, mpu9x50_pwr_t pwr_conf)
     }
 
     /* Acquire exclusive access */
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
 
     /* Read current power management 2 configuration */
     i2c_read_reg(DEV_I2C, DEV_ADDR, MPU9X50_PWR_MGMT_2_REG, &pwr_2_setting, 0);
@@ -158,9 +156,7 @@ int mpu9x50_set_gyro_power(mpu9x50_t *dev, mpu9x50_pwr_t pwr_conf)
     }
 
     /* Acquire exclusive access */
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
 
     /* Read current power management 2 configuration */
     i2c_read_reg(DEV_I2C, DEV_ADDR, MPU9X50_PWR_MGMT_2_REG, &pwr_2_setting, 0);
@@ -206,9 +202,7 @@ int mpu9x50_set_compass_power(mpu9x50_t *dev, mpu9x50_pwr_t pwr_conf)
     }
 
     /* Acquire exclusive access */
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
 
     /* Read current user control configuration */
     i2c_read_reg(DEV_I2C, DEV_ADDR, MPU9X50_USER_CTRL_REG, &usr_ctrl_setting, 0);
@@ -266,9 +260,7 @@ int mpu9x50_read_gyro(const mpu9x50_t *dev, mpu9x50_results_t *output)
     }
 
     /* Acquire exclusive access */
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
     /* Read raw data */
     i2c_read_regs(DEV_I2C, DEV_ADDR, MPU9X50_GYRO_START_REG, data, 6, 0);
     /* Release the bus */
@@ -309,9 +301,7 @@ int mpu9x50_read_accel(const mpu9x50_t *dev, mpu9x50_results_t *output)
     }
 
     /* Acquire exclusive access */
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
     /* Read raw data */
     i2c_read_regs(DEV_I2C, DEV_ADDR, MPU9X50_ACCEL_START_REG, data, 6, 0);
     /* Release the bus */
@@ -333,9 +323,7 @@ int mpu9x50_read_compass(const mpu9x50_t *dev, mpu9x50_results_t *output)
     uint8_t data[6];
 
     /* Acquire exclusive access */
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
     /* Read raw data */
     i2c_read_regs(DEV_I2C, DEV_ADDR, MPU9X50_EXT_SENS_DATA_START_REG, data, 6, 0);
     /* Release the bus */
@@ -366,9 +354,7 @@ int mpu9x50_read_temperature(const mpu9x50_t *dev, int32_t *output)
     uint16_t data;
 
     /* Acquire exclusive access */
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
     /* Read raw temperature value */
     i2c_read_regs(DEV_I2C, DEV_ADDR, MPU9X50_TEMP_START_REG, &data, 2, 0);
     /* Release the bus */
@@ -392,9 +378,7 @@ int mpu9x50_set_gyro_fsr(mpu9x50_t *dev, mpu9x50_gyro_ranges_t fsr)
         case MPU9X50_GYRO_FSR_500DPS:
         case MPU9X50_GYRO_FSR_1000DPS:
         case MPU9X50_GYRO_FSR_2000DPS:
-            if (i2c_acquire(DEV_I2C)) {
-                return -1;
-            }
+            i2c_acquire(DEV_I2C);
             i2c_write_reg(DEV_I2C, DEV_ADDR,
                     MPU9X50_GYRO_CFG_REG, (fsr << 3), 0);
             i2c_release(DEV_I2C);
@@ -418,9 +402,7 @@ int mpu9x50_set_accel_fsr(mpu9x50_t *dev, mpu9x50_accel_ranges_t fsr)
         case MPU9X50_ACCEL_FSR_4G:
         case MPU9X50_ACCEL_FSR_8G:
         case MPU9X50_ACCEL_FSR_16G:
-            if (i2c_acquire(DEV_I2C)) {
-                return -1;
-            }
+            i2c_acquire(DEV_I2C);
             i2c_write_reg(DEV_I2C, DEV_ADDR,
                     MPU9X50_ACCEL_CFG_REG, (fsr << 3), 0);
             i2c_release(DEV_I2C);
@@ -447,9 +429,7 @@ int mpu9x50_set_sample_rate(mpu9x50_t *dev, uint16_t rate)
     /* Compute divider to achieve desired sample rate and write to rate div register */
     divider = (1000 / rate - 1);
 
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
     i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_RATE_DIV_REG, divider, 0);
 
     /* Store configured sample rate */
@@ -477,9 +457,7 @@ int mpu9x50_set_compass_sample_rate(mpu9x50_t *dev, uint8_t rate)
     /* Compute divider to achieve desired sample rate and write to slave ctrl register */
     divider = (dev->conf.sample_rate / rate - 1);
 
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
     i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_SLAVE4_CTRL_REG, divider, 0);
     i2c_release(DEV_I2C);
 

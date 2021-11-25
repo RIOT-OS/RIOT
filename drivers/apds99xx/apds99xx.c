@@ -466,10 +466,7 @@ static int _reg_read(const apds99xx_t *dev, uint8_t reg, uint8_t *data, uint16_t
     assert(data != NULL);
     assert(len != 0);
 
-    if (i2c_acquire(dev->params.dev)) {
-        DEBUG_DEV("could not acquire I2C bus", dev);
-        return -APDS99XX_ERROR_I2C;
-    }
+    i2c_acquire(dev->params.dev);
     int res = i2c_read_regs(dev->params.dev, APDS99XX_I2C_ADDRESS, reg, data, len, 0);
     i2c_release(dev->params.dev);
 
@@ -499,16 +496,15 @@ static int _reg_write(const apds99xx_t *dev, uint8_t reg, uint8_t *data, uint16_
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         printf("[apds99xx] %s i2c dev=%d addr=%02x: write to reg 0x%02x: ",
                __func__, dev->params.dev, APDS99XX_I2C_ADDRESS, reg);
-        for (uint16_t i = 0; i < len; i++) {
-            printf("%02x ", data[i]);
+        if (data && len) {
+            for (uint16_t i = 0; i < len; i++) {
+                printf("%02x ", data[i]);
+            }
         }
         printf("\n");
     }
 
-    if (i2c_acquire(dev->params.dev)) {
-        DEBUG_DEV("could not acquire I2C bus", dev);
-        return -APDS99XX_ERROR_I2C;
-    }
+    i2c_acquire(dev->params.dev);
 
     int res;
 

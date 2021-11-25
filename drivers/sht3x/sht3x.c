@@ -283,16 +283,12 @@ static int _send_command(sht3x_dev_t* dev, uint16_t cmd)
 {
     ASSERT_PARAM (dev != NULL);
 
-    int res = SHT3X_OK;
+    int res;
 
     uint8_t data[2] = { cmd >> 8, cmd & 0xff };
     DEBUG_DEV("send command 0x%02x%02x", dev, data[0], data[1]);
 
-    if (i2c_acquire(dev->i2c_dev) != 0) {
-        DEBUG_DEV ("could not acquire I2C bus", dev);
-        return -SHT3X_ERROR_I2C;
-    }
-
+    i2c_acquire(dev->i2c_dev);
     res = i2c_write_bytes(dev->i2c_dev, dev->i2c_addr, (const void*)data, 2, 0);
     i2c_release(dev->i2c_dev);
 
@@ -307,13 +303,9 @@ static int _send_command(sht3x_dev_t* dev, uint16_t cmd)
 
 static int _read_data(sht3x_dev_t* dev, uint8_t *data, uint8_t len)
 {
-    int res = SHT3X_OK;
+    int res;
 
-    if (i2c_acquire(dev->i2c_dev) != 0) {
-        DEBUG_DEV ("could not acquire I2C bus", dev);
-        return -SHT3X_ERROR_I2C;
-    }
-
+    i2c_acquire(dev->i2c_dev);
     res = i2c_read_bytes(dev->i2c_dev, dev->i2c_addr, (void*)data, len, 0);
     i2c_release(dev->i2c_dev);
 

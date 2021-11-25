@@ -46,9 +46,7 @@ int hsc_init(hsc_t *dev, const hsc_params_t *params)
     uint8_t buf[HSC_FULL_DATA_LENGTH];
 
     /* Acquire exclusive access */
-    if (i2c_acquire(DEV_I2C)) {
-        return -ENODEV;
-    }
+    i2c_acquire(DEV_I2C);
 
     if (i2c_read_bytes(DEV_I2C, DEV_ADDR, buf, sizeof(buf), 0) < 0) {
         i2c_release(DEV_I2C);
@@ -120,9 +118,7 @@ static int _read_ut(const hsc_t *dev, int32_t *output)
     uint8_t buf[HSC_FULL_DATA_LENGTH];
 
     /* Acquire exclusive access */
-    if (i2c_acquire(DEV_I2C)) {
-        return -ENODEV;
-    }
+    i2c_acquire(DEV_I2C);
 
     if (i2c_read_bytes(DEV_I2C, DEV_ADDR, buf, sizeof(buf), 0) < 0) {
         i2c_release(DEV_I2C);
@@ -144,9 +140,7 @@ static int _read_up(const hsc_t *dev, int32_t *output)
     uint8_t buf[HSC_FULL_DATA_LENGTH];
 
     /* Acquire exclusive access */
-    if (i2c_acquire(DEV_I2C)) {
-        return -ENODEV;
-    }
+    i2c_acquire(DEV_I2C);
 
     if (i2c_read_bytes(DEV_I2C, DEV_ADDR, buf, sizeof(buf), 0) < 0) {
         i2c_release(DEV_I2C);

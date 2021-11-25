@@ -292,10 +292,7 @@ static int _read(const pca9685_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
     DEBUG_DEV("reg=%02x data=%p len=%"PRIu32"", dev, reg, data, len);
 
     /* acquire the I2C device */
-    if (i2c_acquire(dev->params.i2c_dev)) {
-        DEBUG_DEV("could not acquire I2C bus", dev);
-        return -PCA9685_ERROR_I2C;
-    }
+    i2c_acquire(dev->params.i2c_dev);
 
     if (i2c_read_regs(dev->params.i2c_dev,
                       dev->params.i2c_addr, reg, data, len, 0) != 0) {
@@ -313,10 +310,7 @@ static int _write(const pca9685_t *dev, uint8_t reg, const uint8_t *data, uint32
 {
     DEBUG_DEV("reg=%02x data=%p len=%"PRIu32"", dev, reg, data, len);
 
-    if (i2c_acquire(dev->params.i2c_dev)) {
-        DEBUG_DEV("could not acquire I2C bus", dev);
-        return -PCA9685_ERROR_I2C;
-    }
+    i2c_acquire(dev->params.i2c_dev);
 
     if (i2c_write_regs(dev->params.i2c_dev,
                        dev->params.i2c_addr, reg, data, len, 0) != 0) {

@@ -66,9 +66,7 @@ int lm75_init(lm75_t *dev, const lm75_params_t *params) {
     uint8_t config = (params->shutdown_mode) | (params->tm_mode << 1) \
                    | (params->polarity << 2) | (params->fault_q << 3);
 
-    if (i2c_acquire(I2C_BUS) != 0) {
-        return LM75_ERROR_I2C;
-    }
+    i2c_acquire(I2C_BUS);
 
     /* read the device ID register of the TMP1075 sensor to confirm it is a TMP1075 */
     if (IS_USED(MODULE_TMP1075) && (dev->lm75_params.res == &tmp1075_properties)) {
@@ -112,9 +110,7 @@ int lm75_init(lm75_t *dev, const lm75_params_t *params) {
 int lm75_get_temperature_raw(lm75_t *dev, int *temperature) {
 
     int16_t temp;
-    if (i2c_acquire(I2C_BUS) != 0) {
-        return LM75_ERROR_I2C;
-    }
+    i2c_acquire(I2C_BUS);
     /* read the temperature register */
     if (i2c_read_regs(I2C_BUS, I2C_ADDR, LM75_TEMP_REG, &temp, 2, 0) != 0) {
         i2c_release(I2C_BUS);
@@ -184,9 +180,7 @@ int lm75_set_temp_limits(lm75_t *dev, int temp_hyst, int temp_os, gpio_cb_t cb, 
     temp_os_short   = temp_os_short << dev->lm75_params.res->os_shift;
     temp_os_short   = ntohs(temp_os_short);
 
-    if (i2c_acquire(I2C_BUS) != 0) {
-        return LM75_ERROR_I2C;
-    }
+    i2c_acquire(I2C_BUS);
 
     if (i2c_write_regs(I2C_BUS, I2C_ADDR, LM75_THYST_REG, &temp_hyst_short, 2, 0) != 0) {
         i2c_release(I2C_BUS);
@@ -207,9 +201,7 @@ int lm75_set_temp_limits(lm75_t *dev, int temp_hyst, int temp_os, gpio_cb_t cb, 
 int lm75_get_os_temp(lm75_t *dev, int *temperature) {
 
     int16_t temp;
-    if (i2c_acquire(I2C_BUS) != 0) {
-        return LM75_ERROR_I2C;
-    }
+    i2c_acquire(I2C_BUS);
     /* read the temperature register */
     if (i2c_read_regs(I2C_BUS, I2C_ADDR, LM75_TOS_REG, &temp, 2, 0) != 0) {
         i2c_release(I2C_BUS);
@@ -230,9 +222,7 @@ int lm75_get_os_temp(lm75_t *dev, int *temperature) {
 int lm75_get_hyst_temp(lm75_t *dev, int *temperature) {
 
     int16_t temp;
-    if (i2c_acquire(I2C_BUS) != 0) {
-        return LM75_ERROR_I2C;
-    }
+    i2c_acquire(I2C_BUS);
 
     /* read the temperature register */
     if (i2c_read_regs(I2C_BUS, I2C_ADDR, LM75_THYST_REG, &temp, 2, 0) != 0) {
@@ -260,9 +250,7 @@ int lm75_get_os_pin(lm75_t *dev, bool *os_pin_state) {
 
 int lm75_poweroff(lm75_t *dev) {
 
-    if (i2c_acquire(I2C_BUS) != 0) {
-        return LM75_ERROR_I2C;
-    }
+    i2c_acquire(I2C_BUS);
 
     uint8_t config;
 
@@ -291,9 +279,7 @@ int lm75_poweroff(lm75_t *dev) {
 
 int lm75_poweron(lm75_t *dev) {
 
-    if (i2c_acquire(I2C_BUS) != 0) {
-        return LM75_ERROR_I2C;
-    }
+    i2c_acquire(I2C_BUS);
 
     uint8_t config;
     if (i2c_read_reg(I2C_BUS, I2C_ADDR, LM75_CONF_REG, &config, 0) != 0) {
@@ -328,9 +314,7 @@ int tmp1075_one_shot(lm75_t *dev) {
     }
 
     else {
-        if (i2c_acquire(I2C_BUS) != 0) {
-            return LM75_ERROR_I2C;
-        }
+       i2c_acquire(I2C_BUS);
 
         uint8_t config;
         if (i2c_read_reg(I2C_BUS, I2C_ADDR, LM75_CONF_REG, &config, 0) != 0) {

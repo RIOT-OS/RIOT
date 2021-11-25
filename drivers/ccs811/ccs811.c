@@ -482,12 +482,9 @@ static int _reg_read(const ccs811_t *dev, uint8_t reg, uint8_t *data, uint32_t l
     DEBUG_DEV("read %"PRIu32" bytes from sensor registers starting at addr %02x",
               dev, len, reg);
 
-    int res = CCS811_OK;
+    int res;
 
-    if (i2c_acquire(dev->params.i2c_dev) != CCS811_OK) {
-        DEBUG_DEV("could not acquire I2C bus", dev);
-        return -CCS811_ERROR_I2C;
-    }
+    i2c_acquire(dev->params.i2c_dev);
 
 #if MODULE_CCS811_FULL
     if (gpio_is_valid(dev->params.wake_pin)) {
@@ -545,10 +542,7 @@ static int _reg_write(const ccs811_t *dev, uint8_t reg, uint8_t *data, uint32_t 
         printf("\n");
     }
 
-    if (i2c_acquire(dev->params.i2c_dev)) {
-        DEBUG_DEV("could not acquire I2C bus", dev);
-        return -CCS811_ERROR_I2C;
-    }
+    i2c_acquire(dev->params.i2c_dev);
 
 #if MODULE_CCS811_FULL
     if (gpio_is_valid(dev->params.wake_pin)) {
