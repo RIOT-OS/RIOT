@@ -21,7 +21,7 @@
 #include <stdio.h>
 DEFINE_FFF_GLOBALS
 FAKE_VALUE_FUNC(int, i2c_read_bytes, i2c_t, uint16_t, void *, size_t, uint8_t)
-FAKE_VALUE_FUNC(int, i2c_acquire, i2c_t)
+FAKE_VOID_FUNC(i2c_acquire, i2c_t)
 FAKE_VOID_FUNC(i2c_release, i2c_t)
 
 int test_i2c_basic(void *buffer, size_t len);
@@ -35,14 +35,10 @@ const uint8_t flags = 0;
 
 int test_i2c_basic(void *buffer, size_t len)
 {
-    int acquire_return_val;
     int read_return_val;
     int failure = 0;
 
-    acquire_return_val = i2c_acquire(device);
-    if (acquire_return_val != 0) {
-        failure = 1;
-    }
+    i2c_acquire(device);
     read_return_val = i2c_read_bytes(device, address, buffer, len, flags);
     if (read_return_val != 0) {
         failure = 1;
@@ -70,7 +66,6 @@ int main(void)
     puts("Testing fff");
     /* Set fake implementation / return values of the mocks */
     i2c_read_bytes_fake.custom_fake = read_fake_impl;
-    i2c_acquire_fake.return_val = 0;
     /* Run function under test */
     basic_test_return_val = test_i2c_basic(buffer, fake_read_len);
     /* Assert correct interaction of the function under test with the mocked API */

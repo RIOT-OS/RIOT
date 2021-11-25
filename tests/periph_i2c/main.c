@@ -129,7 +129,6 @@ static int _print_i2c_error(int res)
 
 int cmd_i2c_acquire(int argc, char **argv)
 {
-    int res;
     int dev;
 
     dev = _check_param(argc, argv, 1, 1, "DEV");
@@ -138,12 +137,10 @@ int cmd_i2c_acquire(int argc, char **argv)
     }
 
     printf("Command: i2c_acquire(%i)\n", dev);
-    res = i2c_acquire(dev);
-    if (res == I2C_ACK) {
-        printf("Success: i2c_%i acquired\n", dev);
-        return 0;
-    }
-    return _print_i2c_error(res);
+    i2c_acquire(dev);
+
+    printf("Success: i2c_%i acquired\n", dev);
+    return 0;
 }
 
 int cmd_i2c_release(int argc, char **argv)
