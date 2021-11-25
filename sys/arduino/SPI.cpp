@@ -66,8 +66,10 @@ SPISettings::SPISettings(uint32_t clock_hz, uint8_t bitOrder, uint8_t dataMode)
 
 SPIClass::SPIClass(spi_t spi_dev)
 {
-    /* Check if default SPI interface is valid */
-    BUILD_BUG_ON(ARDUINO_SPI_INTERFACE >= SPI_NUMOF);
+    /* Check if default SPI interface is valid. Casting to int to avoid
+     * bogus type-limits warning here. */
+    static_assert((int)ARDUINO_SPI_INTERFACE <= (int)SPI_NUMOF,
+                  "spi_dev out of bounds");
     this->spi_dev = spi_dev;
     this->settings = SPISettings();
     this->is_transaction = false;
