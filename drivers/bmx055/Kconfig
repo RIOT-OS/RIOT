@@ -52,5 +52,6 @@ endif # KCONFIG_USEMODULE_BMX055
 
 config HAVE_BMX055
     bool
+    select MODULE_BMX055 if MODULE_SAUL_DEFAULT
     help
         Indicates that a BMX055 9-axis sensor is present.
