@@ -18,14 +18,13 @@
  * @}
  */
 
+#include <assert.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <string.h>
 
 #include "fs/littlefs2_fs.h"
-
-#include "kernel_defines.h"
 
 #define ENABLE_DEBUG 0
 #include <debug.h>
@@ -176,8 +175,10 @@ static int _mount(vfs_mount_t *mountp)
 {
     /* if one of the lines below fail to compile you probably need to adjust
        vfs buffer sizes ;) */
-    BUILD_BUG_ON(VFS_DIR_BUFFER_SIZE < sizeof(lfs_dir_t));
-    BUILD_BUG_ON(VFS_FILE_BUFFER_SIZE < sizeof(lfs_file_t));
+    static_assert(VFS_DIR_BUFFER_SIZE >= sizeof(lfs_dir_t),
+                  "lfs_dir_t must fit in VFS_DIR_BUFFER_SIZE");
+    static_assert(VFS_FILE_BUFFER_SIZE >= sizeof(lfs_file_t),
+                  "lfs_file_t must fit in VFS_FILE_BUFFER_SIZE");
 
     littlefs2_desc_t *fs = mountp->private_data;
 
