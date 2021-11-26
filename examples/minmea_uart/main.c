@@ -342,6 +342,27 @@ static void sleep_test(int num, uart_t uart)
     puts("[OK]");
 }
 
+static int cmd_sleep_test(int argc, char **argv)
+{
+    int dev;
+
+    if (argc < 2) {
+        printf("usage: %s <dev>\n", argv[0]);
+        return 1;
+    }
+    /* parse parameters */
+    dev = parse_dev(argv[1]);
+    if (dev < 0) {
+        return 1;
+    }
+
+    /* also test if poweron() and poweroff() work (or at least don't break
+     * anything) */
+    sleep_test(dev, UART_DEV(dev));
+
+    return 0;
+}
+
 static int cmd_init(int argc, char **argv)
 {
     int dev, res;
@@ -372,7 +393,7 @@ static int cmd_init(int argc, char **argv)
 
     /* also test if poweron() and poweroff() work (or at least don't break
      * anything) */
-    sleep_test(dev, UART_DEV(dev));
+    //sleep_test(dev, UART_DEV(dev));
 
     return 0;
 }
@@ -500,6 +521,7 @@ static const shell_command_t shell_commands[] = {
     { "mode", "Setup data bits, stop bits and parity for a given UART device", cmd_mode },
 #endif
     { "send", "Send a string through given UART device", cmd_send },
+    { "sleep_test", "Sleep test of a given UART device", cmd_sleep_test },
     { "test", "Run an automated test on a UART with RX and TX connected", cmd_test },
     { NULL, NULL, NULL }
 };
