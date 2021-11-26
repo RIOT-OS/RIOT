@@ -7,6 +7,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     calliope-mini \
     cc2650-launchpad \
     cc2650stk \
+    calliope-mini \
     hifive1 \
     i-nucleo-lrwan1 \
     im880b \

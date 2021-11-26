@@ -15,4 +15,6 @@ config BOARD_NRF51DONGLE
     select HAS_PERIPH_UART
     select HAS_PERIPH_UART_HW_FC
 
+    select MODULE_PERIPH_UART_HW_FC if TEST_KCONFIG && HAS_PERIPH_UART_HW_FC
+
 source "$(RIOTBOARD)/common/nrf51/Kconfig"
