@@ -12,6 +12,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     blackpill \
     bluepill \
     bluepill-stm32f030c8 \
+    calliope-mini \
     derfmega128 \
     hifive1 \
     hifive1b \

@@ -7,6 +7,7 @@ BOARD_PROVIDES_NETIF := \
     avr-rss2 \
     b-l072z-lrwan1 \
     cc2538dk \
+    calliope-mini \
     derfmega128 \
     derfmega256 \
     dwm1001 \
