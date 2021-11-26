@@ -130,6 +130,14 @@ static inline unsigned int tsrb_free(const tsrb_t *rb)
 int tsrb_get_one(tsrb_t *rb);
 
 /**
+ * @brief       Get a byte from ringbuffer, without removing it
+ * @param[in]   rb  Ringbuffer to operate on
+ * @return      >=0 byte that has been read
+ * @return      -1  if no byte available
+ */
+int tsrb_peek_one(tsrb_t *rb);
+
+/**
  * @brief       Get bytes from ringbuffer
  * @param[in]   rb  Ringbuffer to operate on
  * @param[out]  dst buffer to write to
@@ -137,6 +145,15 @@ int tsrb_get_one(tsrb_t *rb);
  * @return      nr of bytes written to @p dst
  */
 int tsrb_get(tsrb_t *rb, uint8_t *dst, size_t n);
+
+/**
+ * @brief       Get bytes from ringbuffer, without removing them
+ * @param[in]   rb  Ringbuffer to operate on
+ * @param[out]  dst buffer to write to
+ * @param[in]   n   max number of bytes to write to @p dst
+ * @return      nr of bytes written to @p dst
+ */
+int tsrb_peek(tsrb_t *rb, uint8_t *dst, size_t n);
 
 /**
  * @brief       Drop bytes from ringbuffer
