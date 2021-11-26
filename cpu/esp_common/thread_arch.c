@@ -352,6 +352,7 @@ void thread_isr_stack_init(void)
     uintptr_t *stackmax = (uintptr_t *)(uintptr_t)sp;
     uintptr_t *stackp = (uintptr_t *)(uintptr_t)&port_IntStack;
 
+    /* cppcheck-suppress comparePointers */
     while (stackp < stackmax) {
         *stackp = (uintptr_t) stackp;
         stackp++;

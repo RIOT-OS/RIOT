@@ -185,6 +185,7 @@ void heap_stats(void)
     extern char _sheap;     /* defined in linker script */
     extern char _eheap;     /* defined in linker script */
 
+    /* cppcheck-suppress comparePointers */
     long int heap_size = &_eheap - &_sheap;
     struct mallinfo minfo = mallinfo();
 

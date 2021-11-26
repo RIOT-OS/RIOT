@@ -97,6 +97,7 @@ void IRAM_ATTR _lock_init(_lock_t *lock)
         memset(mtx, 0, sizeof(mutex_t));
         *lock = (_lock_t)mtx;
     }
+    /* cppcheck-suppress memleak; mtx is stored in lock */
 }
 
 void IRAM_ATTR _lock_init_recursive(_lock_t *lock)
@@ -128,6 +129,7 @@ void IRAM_ATTR _lock_init_recursive(_lock_t *lock)
         memset(rmtx, 0, sizeof(rmutex_t));
         *lock = (_lock_t)rmtx;
     }
+    /* cppcheck-suppress memleak; rmtx is stored in lock */
 }
 
 void IRAM_ATTR _lock_close(_lock_t *lock)
@@ -257,7 +259,7 @@ void IRAM_ATTR _lock_release_recursive(_lock_t *lock)
 #ifdef MODULE_ESP_IDF_HEAP
 
 #define heap_caps_malloc_default(s)         heap_caps_malloc(s, MALLOC_CAP_DEFAULT)
-#define heap_caps_realloc_default(p,s)      heap_caps_realloc(p, s, MALLOC_CAP_DEFAULT)
+#define heap_caps_realloc_default(p, s)     heap_caps_realloc(p, s, MALLOC_CAP_DEFAULT)
 
 void* IRAM_ATTR __wrap__malloc_r(struct _reent *r, size_t size)
 {
@@ -362,6 +364,7 @@ extern uint8_t _eheap3;
 unsigned int IRAM_ATTR get_free_heap_size(void)
 {
     struct mallinfo minfo = mallinfo();
+    /* cppcheck-suppress comparePointers */
     unsigned int heap_size = &_eheap - &_sheap;
 #if NUM_HEAPS > 1
     heap_size += &_eheap1 - &_sheap1;

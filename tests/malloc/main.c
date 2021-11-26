@@ -120,7 +120,7 @@ int main(void)
 #pragma GCC diagnostic ignored "-Walloc-size-larger-than="
 #endif
     /* test if an overflow is correctly detected by calloc(): the size below overflows by 1 byte */
-    /* cppcheck-suppress leakReturnValNotUsed (should return NULL, so nothing to free anyway) */
+    /* cppcheck-suppress leakReturnValNotUsed; (should return NULL, so nothing to free anyway) */
     expect(NULL == calloc(SIZE_MAX / 16 + 1, 16));
 #pragma GCC diagnostic pop
 
