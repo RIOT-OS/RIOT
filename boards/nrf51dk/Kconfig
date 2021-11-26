@@ -18,4 +18,8 @@ config BOARD_NRF51DK
     select HAS_PERIPH_UART_HW_FC
     select HAS_VDD_LC_FILTER_REG1
 
+    select HAVE_SAUL_GPIO
+
+    select MODULE_PERIPH_UART_HW_FC if TEST_KCONFIG && HAS_PERIPH_UART_HW_FC
+
 source "$(RIOTBOARD)/common/nrf51/Kconfig"
