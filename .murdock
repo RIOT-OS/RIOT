@@ -126,6 +126,20 @@ get_supported_kconfig_board_app() {
     return 1
 }
 
+kconfig_module_packages_diff() {
+    local board=$1
+    local appdir=$2
+
+    make clean --no-print-directory -C ${appdir} BOARD=${board}
+    mmp=$(make --no-print-directory info-modules info-packages -C ${appdir} BOARD=${board})
+
+    make clean --no-print-directory -C ${appdir} BOARD=${board}
+    kmp=$(TEST_KCONFIG=1 make --no-print-directory info-modules info-packages -C ${appdir} BOARD=${board})
+
+
+    bash -c "diff <(echo \"${mmp}\") <(echo \"${kmp}\")"
+}
+
 check_label() {
     local label="${1}"
     [ -z "${CI_PULL_LABELS}" ] && return 1
@@ -357,6 +371,7 @@ compile() {
         if [ ${kconfig_test_hash} != ${test_hash} ]; then
             echo "Hashes of binaries with and without Kconfig mismatch for ${appdir}";
             echo "Please check that all used modules are modelled in Kconfig and enabled";
+            kconfig_module_packages_diff ${board} ${appdir}
             RES=1
         fi
     fi
