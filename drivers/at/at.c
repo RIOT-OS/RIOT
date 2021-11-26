@@ -24,6 +24,14 @@
 #define AT_PRINT_INCOMING (0)
 #endif
 
+#ifdef MODULE_AT_URC
+static int _check_urc(clist_node_t *node, void *arg);
+#endif
+
+#ifndef MAX_LINE_LENGTH
+#define MAX_LINE_LENGTH     128
+#endif
+
 #if defined(MODULE_AT_URC_ISR_LOW)
 #define AT_EVENT_PRIO EVENT_PRIO_LOW
 #elif defined(MODULE_AT_URC_ISR_MEDIUM)
@@ -74,6 +82,48 @@ int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)
     dev->awaiting_response = true;
 #endif
 
+#ifdef MODULE_AT_URC
+    /* Check for emitted URC */
+    if (bytes) {
+        char c;
+        int res;
+        uint8_t _tmp[MAX_LINE_LENGTH];
+        while (!isrpipe_peek_one_timeout(&dev->isrpipe, (uint8_t *)&c, timeout)) {
+            if (c == *bytes) {
+                break; /* Peeked byte matches expected one, break here */
+            }
+            else {
+                if (strncmp((char *)&c, AT_RECV_EOL_1, 1) == 0 || strncmp((char *)&c, AT_RECV_EOL_2, 1) == 0) {
+                    DEBUG("%s: peeked: \"%c\" is an EOL char, skipping the empty line\n", __func__, c);
+
+                    res = at_readline(dev, (char *)_tmp, sizeof(_tmp), false, timeout);
+                    if (res) {
+                        DEBUG("%s: unexpected error case, res: %d, _tmp: %s\n", __func__, res, _tmp);
+                        return -1; /* Unexpected error case, return immediately */
+                    }
+                }
+                else if (c == AT_URC_FIRST_CHAR) {
+                    DEBUG("%s: peeked: \"%c\" doesn't match expected: \"%c\", but possibly a URC is to be received\n", __func__, c, *bytes);
+
+                    res = at_readline(dev, (char *)_tmp, sizeof(_tmp), false, timeout);
+                    if (res > 0) {
+                        DEBUG("%s: trying to match %s to a subscribed urc string\n", __func__, _tmp);
+                        clist_foreach(&dev->urc_list, _check_urc, _tmp);
+                        /* Now we don't break here, as there might be other URCs written in the pipe -just before the expected bytes- */
+                    }
+                    else {
+                        DEBUG("%s: unexpected error case, res: %d, _tmp: %s\n", __func__, res, _tmp);
+                        return -1; /* Unexpected error case, return immediately */
+                    }
+                }
+                else {
+                    DEBUG("%s: peeked: \"%c\" neither matches expected: \"%c\" nor a URC beginning char\n", __func__, c, *bytes);
+                    return -1;
+                }
+            }
+        }
+    }
+#endif
     while (*bytes) {
         char c;
         if ((res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)&c, 1, timeout)) == 1) {
@@ -169,10 +219,11 @@ int at_recv_bytes_until_string(at_dev_t *dev, const char *string,
 
 int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
 {
-    size_t cmdlen = strlen(command);
+    size_t cmdlen = strlen(command) + AT_SEND_EOL_LEN;
+    char _tmp[cmdlen + 1]; /* including '\0' char */
 
-    uart_write(dev->uart, (const uint8_t *)command, cmdlen);
-    uart_write(dev->uart, (const uint8_t *)CONFIG_AT_SEND_EOL, AT_SEND_EOL_LEN);
+    sprintf(_tmp, "%s%s", command, CONFIG_AT_SEND_EOL);
+    uart_write(dev->uart, (const uint8_t *)_tmp, cmdlen);
 
     if (AT_SEND_ECHO) {
         if (at_expect_bytes(dev, command, timeout)) {
@@ -189,7 +240,7 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
 
 void at_drain(at_dev_t *dev)
 {
-    uint8_t _tmp[16];
+    uint8_t _tmp[MAX_LINE_LENGTH];
     int res;
 
 #if IS_USED(MODULE_AT_URC_ISR)
@@ -198,7 +249,15 @@ void at_drain(at_dev_t *dev)
 
     do {
         /* consider no character within 10ms "drained" */
+#ifdef MODULE_AT_URC
+        /* Check for URCs while draining isrpipe */
+        res = at_readline(dev, (char *)_tmp, sizeof(_tmp), true, 10000U);
+        if (res > 0 && _tmp[0] == '+') {
+            clist_foreach(&dev->urc_list, _check_urc, _tmp);
+        }
+#else
         res = isrpipe_read_timeout(&dev->isrpipe, _tmp, sizeof(_tmp), 10000U);
+#endif
     } while (res > 0);
 
 #if IS_USED(MODULE_AT_URC_ISR)
@@ -211,6 +270,7 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command,
 {
     ssize_t res;
 
+    xtimer_usleep(AT_CMD_DELAY);
     at_drain(dev);
 
     res = at_send_cmd(dev, command, timeout);
@@ -238,6 +298,7 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
     size_t bytes_left = len - 1;
     char *pos = resp_buf;
 
+    xtimer_usleep(AT_CMD_DELAY);
     at_drain(dev);
 
     res = at_send_cmd(dev, command, timeout);
@@ -301,12 +362,14 @@ out:
 
 int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout)
 {
-    unsigned cmdlen = strlen(command);
+    size_t cmdlen = strlen(command) + AT_SEND_EOL_LEN;
+    char _tmp[cmdlen + 1]; /* including '\0' char */
 
+    xtimer_usleep(AT_CMD_DELAY);
     at_drain(dev);
 
-    uart_write(dev->uart, (const uint8_t *)command, cmdlen);
-    uart_write(dev->uart, (const uint8_t *)CONFIG_AT_SEND_EOL, AT_SEND_EOL_LEN);
+    sprintf(_tmp, "%s%s", command, CONFIG_AT_SEND_EOL);
+    uart_write(dev->uart, (const uint8_t *)_tmp, cmdlen);
 
     if (at_expect_bytes(dev, command, timeout)) {
         return -1;

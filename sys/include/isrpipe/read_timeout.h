@@ -47,6 +47,18 @@ extern "C" {
 int isrpipe_read_timeout(isrpipe_t *isrpipe, uint8_t *buf, size_t count, uint32_t timeout);
 
 /**
+ * @brief   Peek one byte from isrpipe (with timeout, blocking)
+ *
+ * @param[in]   isrpipe    isrpipe object to operate on
+ * @param[in]   buf        buffer to write to
+ * @param[in]   timeout    timeout in microseconds
+ *
+ * @returns     0 on success
+ * @returns     -ETIMEDOUT on timeout
+ */
+int isrpipe_peek_one_timeout(isrpipe_t *isrpipe, uint8_t *buffer, uint32_t timeout);
+
+/**
  * @brief   Read data from isrpipe (with timeout, blocking, wait until all read)
  *
  * This function is like @ref isrpipe_read_timeout, but will only return on

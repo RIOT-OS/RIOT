@@ -76,6 +76,17 @@ int isrpipe_write_one(isrpipe_t *isrpipe, uint8_t c);
  */
 int isrpipe_read(isrpipe_t *isrpipe, uint8_t *buf, size_t count);
 
+/**
+ * @brief   Peek one byte from isrpipe
+ *
+ * @param[in]   isrpipe    isrpipe object to operate on
+ * @param[in]   buf        buffer to write to
+ *
+ * @returns     0 on success
+ * @returns     < 0 on error
+ */
+int isrpipe_peek_one(isrpipe_t *isrpipe, uint8_t *buf);
+
 #ifdef __cplusplus
 }
 #endif

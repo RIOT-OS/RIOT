@@ -46,3 +46,9 @@ int isrpipe_read(isrpipe_t *isrpipe, uint8_t *buffer, size_t count)
     }
     return res;
 }
+
+int isrpipe_peek_one(isrpipe_t *isrpipe, uint8_t *buffer)
+{
+    return tsrb_peek_one(&isrpipe->tsrb, buffer);
+}
+
