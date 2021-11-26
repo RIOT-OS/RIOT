@@ -2,7 +2,7 @@
 
 simple application for reading and parse NMEA sentences for a GNSS module connected to one UART
 
-> This application is mainly based on `tests/periph_uart` test.
+> The source code of this application is mainly based on `tests/periph_uart` test.
 
 
 ```bash
@@ -70,6 +70,17 @@ Success: UART_DEV(2) RX: [$GPGSV,3,1,10,20,78,331,45,01,59,235,47,22,41,069,,13,
 ```
 
 More NMEA sentences are available [here](https://www.satsleuth.com/GPS_NMEA_sentences.aspx).
+
+
+## Test
+
+| BOARD         | GNSS Module           | UART (RX,TX)    | Params   | Comment                                   |
+|---------------|-----------------------|-----------------|----------|-------------------------------------------|
+| lora-e5-dev   | Grove GPS model SIM28 | 1 (RX1, TX1)    | 9600 8N1 | STDIO_UART_BAUDRATE should be set to 9600 |
+| p-nucleo-wb55 |                       | 1 (PA3, PA2)    | 9600 8N1 |                                           |
+| nucleo-f446re |                       | 1 (???, ???)    | 9600 8N1 |                                           |
+
+
 
 ## Misc
 
