@@ -1,6 +1,9 @@
 # name of your application
 APPLICATION = minmea_uart
 
+# This has to be the absolute path to the RIOT base directory:
+RIOTBASE ?= $(CURDIR)/../..
+
 # Use the Seeedstudio LoRa E5 Dev or Mini board by default:
 BOARD ?= lora-e5-dev
 
@@ -14,7 +17,7 @@ USEMODULE += xtimer
 
 USEPKG += minmea
 USEMODULE += fmt
-#USEMODULE += printf_float
+# USEMODULE += printf_float
 
 #CFLAGS += -DISR_STACKSIZE=2048U
 
