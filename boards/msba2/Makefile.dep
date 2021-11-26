@@ -8,9 +8,7 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += sht11
 endif
 
-# default to mtd_mci if no other MTD backend is selected
+# default to mtd_mci
 ifneq (,$(filter mtd,$(USEMODULE)))
-  ifeq (,$(filter mtd_%,$(USEMODULE)))
-    USEMODULE += mtd_mci
-  endif
+  USEMODULE += mtd_mci
 endif
