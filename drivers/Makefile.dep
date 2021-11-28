@@ -215,6 +215,10 @@ ifneq (,$(filter vcnl40%0,$(USEMODULE)))
   USEMODULE += vcnl40x0
 endif
 
+ifneq (,$(filter vl6180x_%,$(USEMODULE)))
+  USEMODULE += vl6180x
+endif
+
 ifneq (,$(filter ws281x_%,$(USEMODULE)))
   USEMODULE += ws281x
 endif
