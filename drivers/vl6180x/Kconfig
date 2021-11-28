@@ -1,0 +1,211 @@
+# Copyright (c) 2021 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_VL6180X
+    bool "VL6180X Ranging and Ambient Light Sensing (ALS) module"
+    depends on TEST_KCONFIG
+    depends on HAS_PERIPH_I2C
+    select MODULE_PERIPH_I2C
+    select MODULE_ZTIMER_MSEC
+    help
+        Driver for the ST VL6180X Ranging and Ambient Light Sensing (ALS) module
+
+if MODULE_VL6180X
+
+config MODULE_VL6180X_RNG
+    bool "Ranging enabled"
+
+config VL6180X_RNG_MAX_TIME
+    int "Ranging maximum convergence time [ms]"
+    range 1 63
+    default 50
+    depends on MODULE_VL6180X_RNG
+
+config MODULE_VL6180X_ALS
+    bool "Ambient light sensing (ALS) enabled"
+
+if MODULE_VL6180X_ALS
+
+config VL6180X_ALS_INT_TIME
+    int "ALS integration time [ms]"
+    range 0 511
+    default 100
+
+choice VL6180X_ALS_GAIN
+    bool "ALS analogue light channel gain"
+    default VL6180X_ALS_GAIN_1
+
+config VL6180X_ALS_GAIN_1
+    bool "ALS gain setting 1 (actual analogue gain of 1.01)"
+config VL6180X_ALS_GAIN_1_25
+    bool "ALS gain setting 1.25 (actual analogue gain of 1.28)"
+config VL6180X_ALS_GAIN_1_67
+    bool "ALS gain setting 1.67 (actual analogue gain of 1.72)"
+config VL6180X_ALS_GAIN_2_5
+    bool "ALS gain setting 2.5 (actual analogue gain of 2.60)"
+config VL6180X_ALS_GAIN_5
+    bool "ALS gain setting 5 (actual analogue gain of 5.21)"
+config VL6180X_ALS_GAIN_10
+    bool "ALS gain setting 10 (actual analogue gain of 10.32)"
+config VL6180X_ALS_GAIN_20
+    bool "ALS gain setting 20 (actual analogue gain of 20)"
+config VL6180X_ALS_GAIN_40
+    bool "ALS gain setting 40 (actual analogue gain of 40)"
+
+endchoice
+
+config VL6180X_ALS_LUX_RES
+    int "ALS lux resolution [lux/count*1000]"
+    range 1 320
+    default 320
+    help
+        ALS lux resolution is used to convert count values from ambient
+        light sensing to lux values. It is specified as lux/count*1000.
+        The factory calibrated lux resolution is 0.32 lux/count.
+
+endif # MODULE_VL6180X_ALS
+
+config VL6180X_MEAS_PERIOD
+    int "Measurement period in continuous mode [10 ms]"
+    range 0 255
+    default 20
+    help
+        The measurement period is defined as multiple of 10 ms. It is used for
+        both range measurements and ambient light sensing (ALS) in
+        continuous mode.
+        The measurement period also controls the measurement mode used after
+        sensor initialization. If the measurement period is 0, the single-shot
+        mode is used for both the range and ALS measurements, and functions
+        vl6180x_rng_start_single and vl6180x_als_start_single have to be used
+        to start a single measurement. Otherwise the continuous mode is
+        used for both measurements which are started immediatly after sensor
+        initialization.
+
+config MODULE_VL6180X_IRQ
+    bool "Support for interrupts"
+    depends on HAS_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_GPIO_IRQ
+    help
+        Interrupts can be used either when new sensor data are ready to be
+        read or when sensor values exceed configured thresholds.
+        If interrupt handling is enabled, the interrupt signal
+        (sensor pin GPIO1) has to be connected to a MCU GPIO pin which
+        has to be defined in the board definition by VL6180X_PARAM_INT_PIN.
+
+if MODULE_VL6180X_IRQ
+
+choice
+    bool "Ranging interrupt mode"
+    depends on MODULE_VL6180X_RNG
+    default VL6180X_RNG_INT_DRDY
+    help
+        Interrupt defines the interrupt that is enabled for ranging.
+
+config VL6180X_RNG_INT_DRDY
+    bool "Data Ready"
+    help
+        Interrupt is triggered when new ranging data are ready to be read
+
+config VL6180X_RNG_INT_LOW
+    bool "Level Low"
+    help
+        Interrupt is triggered when ranging values are below lower threshold
+
+config VL6180X_RNG_INT_HIGH
+    bool "Level High"
+    help
+        Interrupt is triggered when ranging values are above upper threshold
+
+config VL6180X_RNG_INT_OUT
+    bool "Out of Window"
+    help
+        Interrupt is triggered when ranging values are below the lower
+        threshold or above the upper threshold (out of threshold window)
+
+endchoice
+
+config VL6180X_RNG_THRESH_LOW
+    int "Ranging lower threshold [mm]"
+    depends on VL6180X_RNG_INT_LOW || VL6180X_RNG_INT_OUT
+    range 0 255
+    default 20
+    help
+        Interrupt is triggered when ranging values are below this threshold
+
+config VL6180X_RNG_THRESH_HIGH
+    int "Ranging upper threshold [mm]"
+    depends on VL6180X_RNG_INT_HIGH || VL6180X_RNG_INT_OUT
+    range 0 255
+    default 90
+    help
+        Interrupt is triggered when ranging values are above this threshold
+
+choice
+    bool "ALS interrupt mode"
+    depends on MODULE_VL6180X_ALS
+    default VL6180X_ALS_INT_DRDY
+    help
+        Interrupt defines the interrupt that is enabled for ALS.
+
+config VL6180X_ALS_INT_DRDY
+    bool "Data Ready"
+    help
+        Interrupt is triggered when new ALS data are ready to be read
+
+config VL6180X_ALS_INT_LOW
+    bool "Level Low"
+    help
+        Interrupt is triggered when ALS values are below lower threshold
+
+config VL6180X_ALS_INT_HIGH
+    bool "Level High"
+    help
+        Interrupt is triggered when ALS values are above upper threshold
+
+config VL6180X_ALS_INT_OUT
+    bool "Out of Window"
+    help
+        Interrupt is triggered when ALS values are below the lower
+        threshold or above the upper threshold (out of threshold window)
+
+endchoice
+
+config VL6180X_ALS_THRESH_LOW
+    int "ALS lower threshold [counts]"
+    depends on VL6180X_ALS_INT_LOW || VL6180X_ALS_INT_OUT
+    range 0 65535
+    default 50
+    help
+        Interrupt is triggered when ALS values are below this threshold
+
+config VL6180X_ALS_THRESH_HIGH
+    int "ALS upper threshold [counts]"
+    depends on VL6180X_ALS_INT_HIGH || VL6180X_ALS_INT_OUT
+    range 0 65535
+    default 2000
+    help
+        Interrupt is triggered when ALS values are above this threshold
+
+endif # MODULE_VL6180X_IRQ
+
+config MODULE_VL6180X_SHUTDOWN
+    bool "Support for power-down and power-up"
+    depends on HAS_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO
+    help
+        Enable the power-down and power-up functions. If power-down and
+        power-up functions are enabled by module, the shutdown signal
+        (sensor pin GPIO0/CE) has to be connected to a MCU GPIO pin which
+        has to be defined in the board definition by VL6180X_PARAM_SHUTDOWN_PIN.
+
+config MODULE_VL6180X_CONFIG
+    bool "Configuration of the sensor at runtime"
+    help
+        Enables the functions that can be used to reconfigure the sensor at
+        runtime.
+
+endif # MODULE_VL6180X
