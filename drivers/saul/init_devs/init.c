@@ -335,4 +335,8 @@ void saul_init_devs(void)
         extern void auto_init_veml6070(void);
         auto_init_veml6070();
     }
+    if (IS_USED(MODULE_VL6180X)) {
+        extern void auto_init_vl6180x(void);
+        auto_init_vl6180x();
+    }
 }
