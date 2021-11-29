@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Inria
+# Copyright (c) 2021 Inria
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
@@ -114,6 +114,18 @@ config CPU_MODEL_STM32G473ME
     bool
     select CPU_LINE_STM32G473XX
 
+config CPU_MODEL_STM32G473PB
+    bool
+    select CPU_LINE_STM32G473XX
+
+config CPU_MODEL_STM32G473PC
+    bool
+    select CPU_LINE_STM32G473XX
+
+config CPU_MODEL_STM32G473PE
+    bool
+    select CPU_LINE_STM32G473XX
+
 config CPU_MODEL_STM32G473QB
     bool
     select CPU_LINE_STM32G473XX
@@ -174,6 +186,18 @@ config CPU_MODEL_STM32G474ME
     bool
     select CPU_LINE_STM32G474XX
 
+config CPU_MODEL_STM32G474PB
+    bool
+    select CPU_LINE_STM32G474XX
+
+config CPU_MODEL_STM32G474PC
+    bool
+    select CPU_LINE_STM32G474XX
+
+config CPU_MODEL_STM32G474PE
+    bool
+    select CPU_LINE_STM32G474XX
+
 config CPU_MODEL_STM32G474QB
     bool
     select CPU_LINE_STM32G474XX
@@ -218,6 +242,10 @@ config CPU_MODEL_STM32G483ME
     bool
     select CPU_LINE_STM32G483XX
 
+config CPU_MODEL_STM32G483PE
+    bool
+    select CPU_LINE_STM32G483XX
+
 config CPU_MODEL_STM32G483QE
     bool
     select CPU_LINE_STM32G483XX
@@ -238,6 +266,10 @@ config CPU_MODEL_STM32G484ME
     bool
     select CPU_LINE_STM32G484XX
 
+config CPU_MODEL_STM32G484PE
+    bool
+    select CPU_LINE_STM32G484XX
+
 config CPU_MODEL_STM32G484QE
     bool
     select CPU_LINE_STM32G484XX
@@ -249,6 +281,66 @@ config CPU_MODEL_STM32G484RE
 config CPU_MODEL_STM32G484VE
     bool
     select CPU_LINE_STM32G484XX
+
+config CPU_MODEL_STM32G491CC
+    bool
+    select CPU_LINE_STM32G491XX
+
+config CPU_MODEL_STM32G491CE
+    bool
+    select CPU_LINE_STM32G491XX
+
+config CPU_MODEL_STM32G491KC
+    bool
+    select CPU_LINE_STM32G491XX
+
+config CPU_MODEL_STM32G491KE
+    bool
+    select CPU_LINE_STM32G491XX
+
+config CPU_MODEL_STM32G491MC
+    bool
+    select CPU_LINE_STM32G491XX
+
+config CPU_MODEL_STM32G491ME
+    bool
+    select CPU_LINE_STM32G491XX
+
+config CPU_MODEL_STM32G491RC
+    bool
+    select CPU_LINE_STM32G491XX
+
+config CPU_MODEL_STM32G491RE
+    bool
+    select CPU_LINE_STM32G491XX
+
+config CPU_MODEL_STM32G491VC
+    bool
+    select CPU_LINE_STM32G491XX
+
+config CPU_MODEL_STM32G491VE
+    bool
+    select CPU_LINE_STM32G491XX
+
+config CPU_MODEL_STM32G4A1CE
+    bool
+    select CPU_LINE_STM32G4A1XX
+
+config CPU_MODEL_STM32G4A1KE
+    bool
+    select CPU_LINE_STM32G4A1XX
+
+config CPU_MODEL_STM32G4A1ME
+    bool
+    select CPU_LINE_STM32G4A1XX
+
+config CPU_MODEL_STM32G4A1RE
+    bool
+    select CPU_LINE_STM32G4A1XX
+
+config CPU_MODEL_STM32G4A1VE
+    bool
+    select CPU_LINE_STM32G4A1XX
 
 
 # Configure CPU model
@@ -279,6 +371,9 @@ config CPU_MODEL
     default "stm32g473mb" if CPU_MODEL_STM32G473MB
     default "stm32g473mc" if CPU_MODEL_STM32G473MC
     default "stm32g473me" if CPU_MODEL_STM32G473ME
+    default "stm32g473pb" if CPU_MODEL_STM32G473PB
+    default "stm32g473pc" if CPU_MODEL_STM32G473PC
+    default "stm32g473pe" if CPU_MODEL_STM32G473PE
     default "stm32g473qb" if CPU_MODEL_STM32G473QB
     default "stm32g473qc" if CPU_MODEL_STM32G473QC
     default "stm32g473qe" if CPU_MODEL_STM32G473QE
@@ -294,6 +389,9 @@ config CPU_MODEL
     default "stm32g474mb" if CPU_MODEL_STM32G474MB
     default "stm32g474mc" if CPU_MODEL_STM32G474MC
     default "stm32g474me" if CPU_MODEL_STM32G474ME
+    default "stm32g474pb" if CPU_MODEL_STM32G474PB
+    default "stm32g474pc" if CPU_MODEL_STM32G474PC
+    default "stm32g474pe" if CPU_MODEL_STM32G474PE
     default "stm32g474qb" if CPU_MODEL_STM32G474QB
     default "stm32g474qc" if CPU_MODEL_STM32G474QC
     default "stm32g474qe" if CPU_MODEL_STM32G474QE
@@ -305,11 +403,28 @@ config CPU_MODEL
     default "stm32g474ve" if CPU_MODEL_STM32G474VE
     default "stm32g483ce" if CPU_MODEL_STM32G483CE
     default "stm32g483me" if CPU_MODEL_STM32G483ME
+    default "stm32g483pe" if CPU_MODEL_STM32G483PE
     default "stm32g483qe" if CPU_MODEL_STM32G483QE
     default "stm32g483re" if CPU_MODEL_STM32G483RE
     default "stm32g483ve" if CPU_MODEL_STM32G483VE
     default "stm32g484ce" if CPU_MODEL_STM32G484CE
     default "stm32g484me" if CPU_MODEL_STM32G484ME
+    default "stm32g484pe" if CPU_MODEL_STM32G484PE
     default "stm32g484qe" if CPU_MODEL_STM32G484QE
     default "stm32g484re" if CPU_MODEL_STM32G484RE
     default "stm32g484ve" if CPU_MODEL_STM32G484VE
+    default "stm32g491cc" if CPU_MODEL_STM32G491CC
+    default "stm32g491ce" if CPU_MODEL_STM32G491CE
+    default "stm32g491kc" if CPU_MODEL_STM32G491KC
+    default "stm32g491ke" if CPU_MODEL_STM32G491KE
+    default "stm32g491mc" if CPU_MODEL_STM32G491MC
+    default "stm32g491me" if CPU_MODEL_STM32G491ME
+    default "stm32g491rc" if CPU_MODEL_STM32G491RC
+    default "stm32g491re" if CPU_MODEL_STM32G491RE
+    default "stm32g491vc" if CPU_MODEL_STM32G491VC
+    default "stm32g491ve" if CPU_MODEL_STM32G491VE
+    default "stm32g4a1ce" if CPU_MODEL_STM32G4A1CE
+    default "stm32g4a1ke" if CPU_MODEL_STM32G4A1KE
+    default "stm32g4a1me" if CPU_MODEL_STM32G4A1ME
+    default "stm32g4a1re" if CPU_MODEL_STM32G4A1RE
+    default "stm32g4a1ve" if CPU_MODEL_STM32G4A1VE

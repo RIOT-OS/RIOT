@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Inria
+# Copyright (c) 2021 Inria
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
@@ -35,6 +35,14 @@ config CPU_LINE_STM32G483XX
     select CPU_FAM_G4
 
 config CPU_LINE_STM32G484XX
+    bool
+    select CPU_FAM_G4
+
+config CPU_LINE_STM32G491XX
+    bool
+    select CPU_FAM_G4
+
+config CPU_LINE_STM32G4A1XX
     bool
     select CPU_FAM_G4
 
