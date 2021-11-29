@@ -16,7 +16,7 @@ def test_ping6():
     si = riotctrl_shell.gnrc.GNRCICMPv6Echo(rc)
     res = si.ping6("::1", interval=100)
     # mock just returns last input
-    assert "ping6" in res
+    assert "ping" in res
     assert " ::1 " in res
     assert " -i 100 " in res
 
