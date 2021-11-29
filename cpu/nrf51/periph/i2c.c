@@ -132,12 +132,11 @@ void i2c_init(i2c_t dev)
     i2c(dev)->ENABLE = TWI_ENABLE_ENABLE_Enabled;
 }
 
-int i2c_acquire(i2c_t dev)
+void i2c_acquire(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
     mutex_lock(&locks[dev]);
-    return 0;
 }
 
 void i2c_release(i2c_t dev)

@@ -18,6 +18,7 @@
  *
  * @}
  */
+#include <assert.h>
 #include <errno.h>
 
 #include "cpu.h"
@@ -74,10 +75,7 @@ void i2c_init(i2c_t i2c)
 {
     uint8_t baudrate;
 
-    if (i2c >= I2C_NUMOF) {
-        DEBUG("[i2c] init: dev is invalid.\n");
-        return;
-    }
+    assert((unsigned)i2c < I2C_NUMOF);
 
     baudrate = _i2c_calc_baud(i2c);
     if (baudrate == 0) {
@@ -97,12 +95,14 @@ void i2c_init(i2c_t i2c)
 
 void i2c_init_pins(i2c_t i2c)
 {
+    assert((unsigned)i2c < I2C_NUMOF);
     gpio_init(i2c_config[i2c].sda_pin, GPIO_OPC_WRD_AND_PULL);
     gpio_init(i2c_config[i2c].scl_pin, GPIO_OPC_WRD_AND_PULL);
 }
 
-int i2c_acquire(i2c_t i2c)
+void i2c_acquire(i2c_t i2c)
 {
+    assert((unsigned)i2c < I2C_NUMOF);
     DEBUG("acquire\n");
     pm_block(3);
     mutex_lock(&i2c_ctx[i2c].locks);
@@ -113,12 +113,11 @@ int i2c_acquire(i2c_t i2c)
                            | TWI_MASTER_WIEN_bm
                            | TWI_MASTER_ENABLE_bm;
     dev(i2c)->MASTER.STATUS = TWI_MASTER_BUSSTATE_IDLE_gc;
-
-    return 0;
 }
 
 void i2c_release(i2c_t i2c)
 {
+    assert((unsigned)i2c < I2C_NUMOF);
     dev(i2c)->MASTER.CTRLA = 0;
     pm_periph_disable(i2c_config[i2c].pwr);
     mutex_unlock(&i2c_ctx[i2c].locks);
@@ -129,6 +128,8 @@ void i2c_release(i2c_t i2c)
 static int _i2c_transaction(i2c_t i2c, uint16_t addr, const void *data,
                             size_t len, uint8_t flags, bool is_read)
 {
+    assert((unsigned)i2c < I2C_NUMOF);
+
     if (flags & I2C_ADDR10) {
         DEBUG("[i2c] xfer: no 10 bit address support.\n");
         return -EOPNOTSUPP;
@@ -238,6 +239,8 @@ static inline void _i2c_read_handler(int i2c)
  */
 static inline void isr_handler(int i2c)
 {
+    assert((unsigned)i2c < I2C_NUMOF);
+
     avr8_enter_isr();
 
     int8_t const m_status = dev(i2c)->MASTER.STATUS;

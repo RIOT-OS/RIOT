@@ -135,7 +135,7 @@ static void _i2c_init(I2C_TypeDef *i2c, uint32_t timing)
     i2c->CR1 |= I2C_CR1_PE;
 }
 
-int i2c_acquire(i2c_t dev)
+void i2c_acquire(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
@@ -145,8 +145,6 @@ int i2c_acquire(i2c_t dev)
 
     /* enable device */
     i2c_config[dev].dev->CR1 |= I2C_CR1_PE;
-
-    return 0;
 }
 
 void i2c_release(i2c_t dev)

@@ -276,11 +276,12 @@ gpio_t i2c_pin_scl(i2c_t dev);
  * In case the I2C device is busy, this function will block until the bus is
  * free again.
  *
- * @param[in] dev           I2C device to access
+ * @pre     Given device is valid, otherwise an assertion blows up
+ *          (if assertions are enabled).
  *
- * @return                  0 on success, -1 on error
+ * @param[in] dev           I2C device to access
  */
-int i2c_acquire(i2c_t dev);
+void i2c_acquire(i2c_t dev);
 
 /**
  * @brief   Release the given I2C device to be used by others

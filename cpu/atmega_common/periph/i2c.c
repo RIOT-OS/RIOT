@@ -22,11 +22,12 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdint.h>
 #include <errno.h>
+
 #include "cpu.h"
 #include "mutex.h"
-#include "assert.h"
 #include "periph/i2c.h"
 #include "periph_conf.h"
 
@@ -219,12 +220,11 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
     return 0;
 }
 
-int i2c_acquire(i2c_t dev)
+void i2c_acquire(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
     mutex_lock(&locks[dev]);
-    return 0;
 }
 
 void i2c_release(i2c_t dev)

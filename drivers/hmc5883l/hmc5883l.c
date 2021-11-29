@@ -234,11 +234,7 @@ static int _reg_read(const hmc5883l_t *dev, uint8_t reg, uint8_t *data, uint16_t
     DEBUG_DEV("read %d byte from sensor registers starting at addr 0x%02x",
               dev, len, reg);
 
-    if (i2c_acquire(dev->dev)) {
-        DEBUG_DEV("could not acquire I2C bus", dev);
-        return HMC5883L_ERROR_I2C;
-    }
-
+    i2c_acquire(dev->dev);
     int res = i2c_read_regs(dev->dev, HMC5883L_I2C_ADDRESS, reg, data, len, 0);
     i2c_release(dev->dev);
 
@@ -275,11 +271,7 @@ static int _reg_write(const hmc5883l_t *dev, uint8_t reg, uint8_t data)
         printf("\n");
     }
 
-    if (i2c_acquire(dev->dev)) {
-        DEBUG_DEV("could not acquire I2C bus", dev);
-        return HMC5883L_ERROR_I2C;
-    }
-
+    i2c_acquire(dev->dev);
     int res = i2c_write_regs(dev->dev, HMC5883L_I2C_ADDRESS, reg, &data, 1, 0);
     i2c_release(dev->dev);
 

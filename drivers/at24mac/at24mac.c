@@ -54,10 +54,7 @@ static int _read_reg(at24mac_t dev, uint8_t reg, void *dst, size_t size)
         return -ENOTSUP;
     }
 
-    res = i2c_acquire(params->i2c_dev);
-    if (res) {
-        return res;
-    }
+    i2c_acquire(params->i2c_dev);
 
     res = i2c_read_regs(params->i2c_dev, params->i2c_addr,
                         reg, dst, size, 0);

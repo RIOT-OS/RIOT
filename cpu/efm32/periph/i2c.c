@@ -142,15 +142,15 @@ void i2c_init(i2c_t dev)
     I2C_Enable(i2c_config[dev].dev, true);
 }
 
-int i2c_acquire(i2c_t dev)
+void i2c_acquire(i2c_t dev)
 {
+    assert(dev < I2C_NUMOF);
+
     /* acquire lock */
     mutex_lock(&i2c_lock[dev]);
 
     /* power peripheral */
     CMU_ClockEnable(i2c_config[dev].cmu, true);
-
-    return 0;
 }
 
 void i2c_release(i2c_t dev)

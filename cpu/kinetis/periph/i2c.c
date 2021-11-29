@@ -106,12 +106,11 @@ typedef struct {
 
 static i2c_state_t i2c_state[I2C_NUMOF];
 
-int i2c_acquire(i2c_t dev)
+void i2c_acquire(i2c_t dev)
 {
     assert((unsigned)dev < I2C_NUMOF);
     mutex_lock(&i2c_state[dev].mtx);
     i2c_state[dev].pid = thread_getpid();
-    return 0;
 }
 
 void i2c_release(i2c_t dev)

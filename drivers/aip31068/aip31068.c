@@ -398,9 +398,7 @@ static int _device_write(aip31068_t* dev, uint8_t *data, uint8_t len)
 {
     i2c_t i2c_dev = dev->params.i2c_dev;
 
-    if (i2c_acquire(i2c_dev) != 0) {
-        return -1;
-    }
+    i2c_acquire(i2c_dev);
 
     int rc = i2c_write_bytes(i2c_dev, dev->params.i2c_addr, data, len, 0);
 

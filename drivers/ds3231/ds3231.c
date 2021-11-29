@@ -96,8 +96,8 @@ static int _read(const ds3231_t *dev, uint8_t reg, uint8_t *buf, size_t len,
 {
     int res;
 
-    if (acquire && i2c_acquire(dev->bus)) {
-        return -EIO;
+    if (acquire) {
+        i2c_acquire(dev->bus);
     }
     res = i2c_read_regs(dev->bus, DS3231_I2C_ADDR, reg, buf, len, 0);
     if (res < 0) {
@@ -113,8 +113,8 @@ static int _read(const ds3231_t *dev, uint8_t reg, uint8_t *buf, size_t len,
 static int _write(const ds3231_t *dev, uint8_t reg, uint8_t *buf, size_t len,
                   int acquire, int release)
 {
-    if (acquire && i2c_acquire(dev->bus)) {
-        return -EIO;
+    if (acquire) {
+        i2c_acquire(dev->bus);
     }
     if (i2c_write_regs(dev->bus, DS3231_I2C_ADDR, reg, buf, len, 0) < 0) {
         i2c_release(dev->bus);

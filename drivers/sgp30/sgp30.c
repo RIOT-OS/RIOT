@@ -97,10 +97,7 @@ static int _rx_tx_data(sgp30_t *dev, uint16_t cmd, uint8_t *data,
 {
     int res = 0;
 
-    if (i2c_acquire(dev->params.i2c_dev) != 0) {
-        DEBUG("[sgp30]: could not acquire I2C bus %d\n", dev->params.i2c_dev);
-        return -1;
-    }
+    i2c_acquire(dev->params.i2c_dev);
 
     uint8_t frame_cmd[sizeof(cmd) + len];
     frame_cmd[0] = cmd >> 8;

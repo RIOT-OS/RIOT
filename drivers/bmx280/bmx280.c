@@ -81,9 +81,7 @@ static int _read_burst(const bmx280_t *dev, uint8_t reg, void *buf, size_t len)
 
 static inline int _acquire(const bmx280_t *dev)
 {
-    if (i2c_acquire(BUS) != 0) {
-        return BMX280_ERR_BUS;
-    }
+    i2c_acquire(BUS);
     return BMX280_OK;
 }
 

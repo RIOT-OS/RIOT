@@ -59,10 +59,7 @@ int _i2c_scan(int argc, char **argv)
     }
 
     printf("Scanning I2C device %s...\n", argv[1]);
-    if (i2c_acquire(dev)){
-        puts("Failed to acquire I2C device");
-        return -1;
-    }
+    i2c_acquire(dev);
 
     puts(
         "addr not ack'ed = \"-\", addr ack'ed = \"X\", addr reserved = \"R\", error = \"E\"\n"

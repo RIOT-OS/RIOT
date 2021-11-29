@@ -195,9 +195,7 @@ int at24cxxx_init(at24cxxx_t *dev, const at24cxxx_params_t *params)
         at24cxxx_disable_write_protect(dev);
     }
     /* Check I2C bus once */
-    if (i2c_acquire(DEV_I2C_BUS)) {
-        return -AT24CXXX_I2C_ERROR;
-    }
+    i2c_acquire(DEV_I2C_BUS);
     i2c_release(DEV_I2C_BUS);
     return AT24CXXX_OK;
 }

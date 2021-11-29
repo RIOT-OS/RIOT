@@ -46,15 +46,14 @@ int bh1900nux_read(const bh1900nux_t *dev, int16_t *temp)
 
     /* Read raw sensor value */
     DEBUG("[bh1900nux] read temperature\n");
-    ret = i2c_acquire(dev->i2c);
-    if (ret < 0) {
-        return BH1900NUX_ERR_I2C;
-    }
+
+    i2c_acquire(dev->i2c);
     ret = i2c_read_regs(dev->i2c, dev->addr, BH1900NUX_REG_ADDR, &raw, sizeof(raw), 0);
+    i2c_release(dev->i2c);
+
     if (ret < 0) {
         return ret;
     }
-    i2c_release(dev->i2c);
 
     /* Calculate temperature */
     raw = (int16_t) ntohs(raw) >> 4;

@@ -105,7 +105,8 @@ static int _init_bus(const lis2dh12_t *dev)
 
 static int _acquire(const lis2dh12_t *dev)
 {
-    return i2c_acquire(BUS);
+    i2c_acquire(BUS);
+    return BUS_OK;
 }
 
 static void _release(const lis2dh12_t *dev)

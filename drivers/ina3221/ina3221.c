@@ -58,9 +58,7 @@
  */
 static int _read_reg(const ina3221_t *dev, uint8_t reg, uint16_t *out)
 {
-    if (i2c_acquire(dev->params.i2c)) {
-        return -EIO;
-    }
+    i2c_acquire(dev->params.i2c);
     int status = i2c_read_regs(dev->params.i2c, dev->params.addr, reg, out,
                                INA3221_REG_LEN, 0);
     i2c_release(dev->params.i2c);
@@ -87,9 +85,7 @@ static int _read_reg(const ina3221_t *dev, uint8_t reg, uint16_t *out)
 static int _write_reg(const ina3221_t *dev, uint8_t reg, uint16_t in)
 {
     in = htons(in);
-    if (i2c_acquire(dev->params.i2c)) {
-        return -EIO;
-    }
+    i2c_acquire(dev->params.i2c);
     int status = i2c_write_regs(dev->params.i2c, dev->params.addr, reg, &in,
                                 INA3221_REG_LEN, 0);
     i2c_release(dev->params.i2c);

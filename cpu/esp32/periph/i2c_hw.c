@@ -145,7 +145,7 @@ static inline void _i2c_delay (uint32_t delay);
 
 void i2c_init(i2c_t dev)
 {
-    CHECK_PARAM (dev < I2C_NUMOF)
+    assert(dev < I2C_NUMOF);
 
     if (i2c_config[dev].speed == I2C_SPEED_FAST_PLUS ||
         i2c_config[dev].speed == I2C_SPEED_HIGH) {
@@ -156,7 +156,7 @@ void i2c_init(i2c_t dev)
 
     mutex_init(&_i2c_bus[dev].lock);
 
-    i2c_acquire (dev);
+    i2c_acquire(dev);
 
     _i2c_bus[dev].cmd = 0;
     _i2c_bus[dev].data = 0;
@@ -262,20 +262,17 @@ void i2c_init(i2c_t dev)
     xt_set_interrupt_handler(CPU_INUM_I2C, _i2c_intr_handler, NULL);
     xt_ints_on(BIT(CPU_INUM_I2C));
 
-    i2c_release (dev);
-
-    return;
+    i2c_release(dev);
 }
 
-int i2c_acquire(i2c_t dev)
+void i2c_acquire(i2c_t dev)
 {
     DEBUG ("%s\n", __func__);
 
-    CHECK_PARAM_RET (dev < I2C_NUMOF, -1)
+    assert(dev < I2C_NUMOF);
 
     mutex_lock(&_i2c_bus[dev].lock);
     _i2c_reset_hw(dev);
-    return 0;
 }
 
 void i2c_release(i2c_t dev)
@@ -358,9 +355,9 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t fla
     DEBUG ("%s dev=%u addr=%02x data=%p len=%d flags=%01x\n",
            __func__, dev, addr, data, len, flags);
 
-    CHECK_PARAM_RET (dev < I2C_NUMOF, -EINVAL);
-    CHECK_PARAM_RET (len > 0, -EINVAL);
-    CHECK_PARAM_RET (data != NULL, -EINVAL);
+    assert(dev < I2C_NUMOF);
+    assert(len > 0);
+    assert(data != NULL);
 
     /*  if I2C_NOSTART is not set, START condition and ADDR is used */
     if (!(flags & I2C_NOSTART)) {
@@ -445,9 +442,9 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len, uint
     DEBUG ("%s dev=%u addr=%02x data=%p len=%d flags=%01x\n",
            __func__, dev, addr, data, len, flags);
 
-    CHECK_PARAM_RET (dev < I2C_NUMOF, -EINVAL);
-    CHECK_PARAM_RET (len > 0, -EINVAL);
-    CHECK_PARAM_RET (data != NULL, -EINVAL);
+    assert(dev < I2C_NUMOF);
+    assert(len > 0);
+    assert(data != NULL);
 
     /*  if I2C_NOSTART is not set, START condition and ADDR is used */
     if (!(flags & I2C_NOSTART)) {
