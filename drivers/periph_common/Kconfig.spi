@@ -20,6 +20,10 @@ config MODULE_PERIPH_SPI_RECONFIGURE
     bool "Pin reconfiguration support"
     depends on HAS_PERIPH_SPI_RECONFIGURE
 
+config MODULE_PERIPH_SPI_ON_QSPI
+    bool "Use QSPI peripherial in SPI mode"
+    depends on HAS_PERIPH_SPI_ON_QSPI
+
 config MODULE_PERIPH_SPI_GPIO_MODE
     bool "Support initializing SPI pins with adapted GPIO modes"
     depends on HAS_PERIPH_SPI_GPIO_MODE

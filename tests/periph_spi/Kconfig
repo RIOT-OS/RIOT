@@ -9,4 +9,5 @@ config APPLICATION
     bool
     default y
     imply MODULE_PERIPH_SPI_RECONFIGURE
+    imply MODULE_PERIPH_SPI_ON_QSPI
     depends on TEST_KCONFIG
