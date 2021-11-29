@@ -113,7 +113,7 @@ For instance, if you use the [`gnrc_networking`](https://github.com/RIOT-OS/RIOT
 ping it from your machine with:
 
 ```
-> ping6 2001:db8:0:1234:0:567:8:1
+> ping 2001:db8:0:1234:0:567:8:1
 ```
 
 Just replace this address by your mote's address.
@@ -140,7 +140,7 @@ You can check your ULA on your PC with `ifconfig` Linux command.
 On this example, such address can be pinged from 6lo motes:
 
 ```
-> ping6 fd00:dead:beef::1
+> ping fd00:dead:beef::1
 ```
 
 Thus far, IPv6 communication with between your PC and your motes is enabled.
@@ -228,7 +228,7 @@ Now, you should be able to ping your nodes.
 Use the global address starting by your prefix, on our case `2001:db8::`:
 
 ```
-> ping6 2001:db8:0:1234:0:567:8:1
+> ping 2001:db8:0:1234:0:567:8:1
 ```
 
 # gnrc_networking_border_router with SLIP

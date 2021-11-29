@@ -137,7 +137,7 @@ Here the global IPv6 is `2001:db8::7b7e:3255:1313:8d96`.
 **The address will be different according to your device and the chosen prefix**.
 In this case the RIOT node can be reached from the host using its global address:
 
-    $ ping6 2001:db8::7b7e:3255:1313:8d96
+    $ ping 2001:db8::7b7e:3255:1313:8d96
 
 _NOTE_: when using BLE the connection might take a little longer, and you might not
 see the global address right away. But the global address will always consist of the
@@ -224,7 +224,7 @@ command:
 
 - You should now be able to ping the device
 
-      $ ping6 fe80::e4dd:e0ff:fe8f:7365%bt0
+      $ ping fe80::e4dd:e0ff:fe8f:7365%bt0
 
 - **optional**: follow the guide for distributing a routable Prefix in
   [README.ipv6-over-ble.md](../../pkg/nimble/README.ipv6-over-ble.md).

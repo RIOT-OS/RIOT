@@ -119,7 +119,7 @@ You should also be able to ping your RIOT node. The devices link local address
 is also printed when running `ble info` on your RIOT device.
 
     # Substitute the actual device address,
-    ping6 fe80::uuvv:wwff:fexx:yyzz%bt0
+    ping fe80::uuvv:wwff:fexx:yyzz%bt0
 
 Now everything should be fine :-)
 
@@ -176,4 +176,4 @@ prefix assigned. Simply verify with `ifconfig` on the RIOT node.
 Also you should be able to ping the RIOT node from Linux:
 
     # make sure to use the actual devices address here...
-    ping6 -I bt0 2001:db8::uuvv:wwff:fexx:yyzz
+    ping -I bt0 2001:db8::uuvv:wwff:fexx:yyzz

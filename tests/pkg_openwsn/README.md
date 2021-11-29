@@ -289,7 +289,7 @@ on local boards:
 Once DAOs are received you can ping nodes in the network from your host:
 
 ```
-$ ping6 -s 40 -i 5 bbbb:0:0:0:2ab5:fc65:106b:1114
+$ ping -s 40 -i 5 bbbb:0:0:0:2ab5:fc65:106b:1114
 PING bbbb:0:0:0:2ab5:fc65:106b:1114(bbbb::2ab5:fc65:106b:1114) 40 data bytes
 48 bytes from bbbb::2ab5:fc65:106b:1114: icmp_seq=1 ttl=64 time=1064 ms
 48 bytes from bbbb::2ab5:fc65:106b:1114: icmp_seq=2 ttl=64 time=2111 ms

@@ -263,7 +263,7 @@ int main(void)
     puts("Type 'help' to get started. Have a look at the README.md for more"
          "information.");
 
-    /* the main thread needs a msg queue to be able to run `ping6`*/
+    /* the main thread needs a msg queue to be able to run `ping`*/
     msg_init_queue(queue, ARRAY_SIZE(queue));
 
     /* initialize our subscription buffers */

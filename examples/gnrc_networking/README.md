@@ -49,7 +49,7 @@ RIOT console and run `ifconfig`:
 Copy the link-local address of the RIOT node (prefixed with `fe80`) and
 try to ping it **from the Linux node**:
 
-    ping6 fe80::ccf5:e1ff:fec5:f75a%tap0
+    ping fe80::ccf5:e1ff:fec5:f75a%tap0
 
 Note that the interface on which to send the ping needs to be appended
 to the IPv6 address, `%tap0` in the above example. When talking to the

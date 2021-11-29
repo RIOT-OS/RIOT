@@ -19,7 +19,7 @@ USEMODULE += asymcute
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-# For testing we also include the ping6 command and some stats
+# For testing we also include the ping command and some stats
 USEMODULE += gnrc_icmpv6_echo
 
 # Comment this out to disable code in RIOT that does safety checking
