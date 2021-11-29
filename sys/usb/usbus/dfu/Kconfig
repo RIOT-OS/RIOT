@@ -8,6 +8,7 @@
 menuconfig KCONFIG_USEMODULE_USBUS_DFU
     bool "Configure USBUS DFU"
     depends on USEMODULE_USBUS_DFU
+    depends on KCONFIG_USEMODULE_USBUS
     help
         Configure the USBUS DFU module via Kconfig.
 

@@ -7,6 +7,7 @@
 menuconfig KCONFIG_USEMODULE_USBUS_CDC_ECM
     bool "Configure USBUS CDC ECM"
     depends on USEMODULE_USBUS_CDC_ECM
+    depends on KCONFIG_USEMODULE_USBUS
     help
         Configure the USBUS CDC ECM module via Kconfig.
 
