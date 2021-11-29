@@ -148,7 +148,7 @@ def main(args):
 
 
 PARSER = argparse.ArgumentParser()
-PARSER.add_argument("cpu_fam",
+PARSER.add_argument("cmsis_dir",
                     help="STM32 CMSIS directory")
 PARSER.add_argument("cpu_fam",
                     help="STM32 CPU Family")
