@@ -37,4 +37,6 @@ config HAS_CPU_NRF9160
     help
         Indicates that the current cpu is 'nrf9160'.
 
-source "$(RIOTCPU)/cortexm_common/Kconfig"
+rsource "vectors/Kconfig"
+
+source "$(RIOTCPU)/nrf5x_common/Kconfig"
