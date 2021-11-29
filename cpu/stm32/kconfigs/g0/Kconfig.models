@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Inria
+# Copyright (c) 2021 Inria
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
@@ -134,6 +134,90 @@ config CPU_MODEL_STM32G041Y8
     bool
     select CPU_LINE_STM32G041XX
 
+config CPU_MODEL_STM32G050C6
+    bool
+    select CPU_LINE_STM32G050XX
+
+config CPU_MODEL_STM32G050C8
+    bool
+    select CPU_LINE_STM32G050XX
+
+config CPU_MODEL_STM32G050F6
+    bool
+    select CPU_LINE_STM32G050XX
+
+config CPU_MODEL_STM32G050K6
+    bool
+    select CPU_LINE_STM32G050XX
+
+config CPU_MODEL_STM32G050K8
+    bool
+    select CPU_LINE_STM32G050XX
+
+config CPU_MODEL_STM32G051C6
+    bool
+    select CPU_LINE_STM32G051XX
+
+config CPU_MODEL_STM32G051C8
+    bool
+    select CPU_LINE_STM32G051XX
+
+config CPU_MODEL_STM32G051F6
+    bool
+    select CPU_LINE_STM32G051XX
+
+config CPU_MODEL_STM32G051F8
+    bool
+    select CPU_LINE_STM32G051XX
+
+config CPU_MODEL_STM32G051G6
+    bool
+    select CPU_LINE_STM32G051XX
+
+config CPU_MODEL_STM32G051G8
+    bool
+    select CPU_LINE_STM32G051XX
+
+config CPU_MODEL_STM32G051K6
+    bool
+    select CPU_LINE_STM32G051XX
+
+config CPU_MODEL_STM32G051K8
+    bool
+    select CPU_LINE_STM32G051XX
+
+config CPU_MODEL_STM32G061C6
+    bool
+    select CPU_LINE_STM32G061XX
+
+config CPU_MODEL_STM32G061C8
+    bool
+    select CPU_LINE_STM32G061XX
+
+config CPU_MODEL_STM32G061F6
+    bool
+    select CPU_LINE_STM32G061XX
+
+config CPU_MODEL_STM32G061F8
+    bool
+    select CPU_LINE_STM32G061XX
+
+config CPU_MODEL_STM32G061G6
+    bool
+    select CPU_LINE_STM32G061XX
+
+config CPU_MODEL_STM32G061G8
+    bool
+    select CPU_LINE_STM32G061XX
+
+config CPU_MODEL_STM32G061K6
+    bool
+    select CPU_LINE_STM32G061XX
+
+config CPU_MODEL_STM32G061K8
+    bool
+    select CPU_LINE_STM32G061XX
+
 config CPU_MODEL_STM32G070CB
     bool
     select CPU_LINE_STM32G070XX
@@ -202,6 +286,122 @@ config CPU_MODEL_STM32G081RB
     bool
     select CPU_LINE_STM32G081XX
 
+config CPU_MODEL_STM32G0B0CE
+    bool
+    select CPU_LINE_STM32G0B0XX
+
+config CPU_MODEL_STM32G0B0KE
+    bool
+    select CPU_LINE_STM32G0B0XX
+
+config CPU_MODEL_STM32G0B0RE
+    bool
+    select CPU_LINE_STM32G0B0XX
+
+config CPU_MODEL_STM32G0B0VE
+    bool
+    select CPU_LINE_STM32G0B0XX
+
+config CPU_MODEL_STM32G0B1CB
+    bool
+    select CPU_LINE_STM32G0B1XX
+
+config CPU_MODEL_STM32G0B1CC
+    bool
+    select CPU_LINE_STM32G0B1XX
+
+config CPU_MODEL_STM32G0B1CE
+    bool
+    select CPU_LINE_STM32G0B1XX
+
+config CPU_MODEL_STM32G0B1KB
+    bool
+    select CPU_LINE_STM32G0B1XX
+
+config CPU_MODEL_STM32G0B1KC
+    bool
+    select CPU_LINE_STM32G0B1XX
+
+config CPU_MODEL_STM32G0B1KE
+    bool
+    select CPU_LINE_STM32G0B1XX
+
+config CPU_MODEL_STM32G0B1MB
+    bool
+    select CPU_LINE_STM32G0B1XX
+
+config CPU_MODEL_STM32G0B1MC
+    bool
+    select CPU_LINE_STM32G0B1XX
+
+config CPU_MODEL_STM32G0B1ME
+    bool
+    select CPU_LINE_STM32G0B1XX
+
+config CPU_MODEL_STM32G0B1RB
+    bool
+    select CPU_LINE_STM32G0B1XX
+
+config CPU_MODEL_STM32G0B1RC
+    bool
+    select CPU_LINE_STM32G0B1XX
+
+config CPU_MODEL_STM32G0B1RE
+    bool
+    select CPU_LINE_STM32G0B1XX
+
+config CPU_MODEL_STM32G0B1VB
+    bool
+    select CPU_LINE_STM32G0B1XX
+
+config CPU_MODEL_STM32G0B1VC
+    bool
+    select CPU_LINE_STM32G0B1XX
+
+config CPU_MODEL_STM32G0B1VE
+    bool
+    select CPU_LINE_STM32G0B1XX
+
+config CPU_MODEL_STM32G0C1CC
+    bool
+    select CPU_LINE_STM32G0C1XX
+
+config CPU_MODEL_STM32G0C1CE
+    bool
+    select CPU_LINE_STM32G0C1XX
+
+config CPU_MODEL_STM32G0C1KC
+    bool
+    select CPU_LINE_STM32G0C1XX
+
+config CPU_MODEL_STM32G0C1KE
+    bool
+    select CPU_LINE_STM32G0C1XX
+
+config CPU_MODEL_STM32G0C1MC
+    bool
+    select CPU_LINE_STM32G0C1XX
+
+config CPU_MODEL_STM32G0C1ME
+    bool
+    select CPU_LINE_STM32G0C1XX
+
+config CPU_MODEL_STM32G0C1RC
+    bool
+    select CPU_LINE_STM32G0C1XX
+
+config CPU_MODEL_STM32G0C1RE
+    bool
+    select CPU_LINE_STM32G0C1XX
+
+config CPU_MODEL_STM32G0C1VC
+    bool
+    select CPU_LINE_STM32G0C1XX
+
+config CPU_MODEL_STM32G0C1VE
+    bool
+    select CPU_LINE_STM32G0C1XX
+
 
 # Configure CPU model
 config CPU_MODEL
@@ -236,6 +436,27 @@ config CPU_MODEL
     default "stm32g041k6" if CPU_MODEL_STM32G041K6
     default "stm32g041k8" if CPU_MODEL_STM32G041K8
     default "stm32g041y8" if CPU_MODEL_STM32G041Y8
+    default "stm32g050c6" if CPU_MODEL_STM32G050C6
+    default "stm32g050c8" if CPU_MODEL_STM32G050C8
+    default "stm32g050f6" if CPU_MODEL_STM32G050F6
+    default "stm32g050k6" if CPU_MODEL_STM32G050K6
+    default "stm32g050k8" if CPU_MODEL_STM32G050K8
+    default "stm32g051c6" if CPU_MODEL_STM32G051C6
+    default "stm32g051c8" if CPU_MODEL_STM32G051C8
+    default "stm32g051f6" if CPU_MODEL_STM32G051F6
+    default "stm32g051f8" if CPU_MODEL_STM32G051F8
+    default "stm32g051g6" if CPU_MODEL_STM32G051G6
+    default "stm32g051g8" if CPU_MODEL_STM32G051G8
+    default "stm32g051k6" if CPU_MODEL_STM32G051K6
+    default "stm32g051k8" if CPU_MODEL_STM32G051K8
+    default "stm32g061c6" if CPU_MODEL_STM32G061C6
+    default "stm32g061c8" if CPU_MODEL_STM32G061C8
+    default "stm32g061f6" if CPU_MODEL_STM32G061F6
+    default "stm32g061f8" if CPU_MODEL_STM32G061F8
+    default "stm32g061g6" if CPU_MODEL_STM32G061G6
+    default "stm32g061g8" if CPU_MODEL_STM32G061G8
+    default "stm32g061k6" if CPU_MODEL_STM32G061K6
+    default "stm32g061k8" if CPU_MODEL_STM32G061K8
     default "stm32g070cb" if CPU_MODEL_STM32G070CB
     default "stm32g070kb" if CPU_MODEL_STM32G070KB
     default "stm32g070rb" if CPU_MODEL_STM32G070RB
@@ -253,3 +474,32 @@ config CPU_MODEL
     default "stm32g081gb" if CPU_MODEL_STM32G081GB
     default "stm32g081kb" if CPU_MODEL_STM32G081KB
     default "stm32g081rb" if CPU_MODEL_STM32G081RB
+    default "stm32g0b0ce" if CPU_MODEL_STM32G0B0CE
+    default "stm32g0b0ke" if CPU_MODEL_STM32G0B0KE
+    default "stm32g0b0re" if CPU_MODEL_STM32G0B0RE
+    default "stm32g0b0ve" if CPU_MODEL_STM32G0B0VE
+    default "stm32g0b1cb" if CPU_MODEL_STM32G0B1CB
+    default "stm32g0b1cc" if CPU_MODEL_STM32G0B1CC
+    default "stm32g0b1ce" if CPU_MODEL_STM32G0B1CE
+    default "stm32g0b1kb" if CPU_MODEL_STM32G0B1KB
+    default "stm32g0b1kc" if CPU_MODEL_STM32G0B1KC
+    default "stm32g0b1ke" if CPU_MODEL_STM32G0B1KE
+    default "stm32g0b1mb" if CPU_MODEL_STM32G0B1MB
+    default "stm32g0b1mc" if CPU_MODEL_STM32G0B1MC
+    default "stm32g0b1me" if CPU_MODEL_STM32G0B1ME
+    default "stm32g0b1rb" if CPU_MODEL_STM32G0B1RB
+    default "stm32g0b1rc" if CPU_MODEL_STM32G0B1RC
+    default "stm32g0b1re" if CPU_MODEL_STM32G0B1RE
+    default "stm32g0b1vb" if CPU_MODEL_STM32G0B1VB
+    default "stm32g0b1vc" if CPU_MODEL_STM32G0B1VC
+    default "stm32g0b1ve" if CPU_MODEL_STM32G0B1VE
+    default "stm32g0c1cc" if CPU_MODEL_STM32G0C1CC
+    default "stm32g0c1ce" if CPU_MODEL_STM32G0C1CE
+    default "stm32g0c1kc" if CPU_MODEL_STM32G0C1KC
+    default "stm32g0c1ke" if CPU_MODEL_STM32G0C1KE
+    default "stm32g0c1mc" if CPU_MODEL_STM32G0C1MC
+    default "stm32g0c1me" if CPU_MODEL_STM32G0C1ME
+    default "stm32g0c1rc" if CPU_MODEL_STM32G0C1RC
+    default "stm32g0c1re" if CPU_MODEL_STM32G0C1RE
+    default "stm32g0c1vc" if CPU_MODEL_STM32G0C1VC
+    default "stm32g0c1ve" if CPU_MODEL_STM32G0C1VE
