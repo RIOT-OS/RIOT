@@ -6,6 +6,27 @@
 # directory for more details.
 #
 
+config MODULE_MSP430_COMMON
+    bool
+    default y if CPU_CORE_MSP430
+    depends on TEST_KCONFIG
+    imply MODULE_NEWLIB_NANO
+    select MODULE_MALLOC_THREAD_SAFE
+    help
+        Common code for MSP430 cores.
+
+config MODULE_MSP430_COMMON_PERIPH
+    bool
+    default y if CPU_CORE_MSP430
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH
+    help
+        Common peripheral code for MSP430 cores.
+
+choice LIBC_IMPLEMENTATION
+    default MODULE_NEWLIB
+endchoice
+
 config CPU_ARCH_MSP430
     bool
     select HAS_ARCH_16BIT
@@ -15,7 +36,6 @@ config CPU_ARCH_MSP430
     select HAS_PERIPH_FLASHPAGE_PAGEWISE
     select HAS_NEWLIB
     select HAS_PERIPH_PM
-    select MODULE_MALLOC_THREAD_SAFE if TEST_KCONFIG
 
 config CPU_CORE_MSP430
     bool

@@ -49,6 +49,7 @@ slstk3400a
 sltb001a
 slwstk6220a
 waspmote-pro
+z1
 "}
 
 : ${TEST_KCONFIG_ENFORCE_APP_GROUPS:="
