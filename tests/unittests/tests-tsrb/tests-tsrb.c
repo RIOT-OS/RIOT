@@ -37,6 +37,20 @@ static void tear_down(void)
     tsrb_init(&_tsrb, _tsrb_buffer, BUFFER_SIZE);
 }
 
+static void test_clear(void)
+{
+    TEST_ASSERT_EQUAL_INT(0, tsrb_avail(&_tsrb));
+
+    for (int i = 0; i < BUFFER_SIZE; i++) {
+        TEST_ASSERT_EQUAL_INT(0, tsrb_add_one(&_tsrb, TEST_INPUT));
+        TEST_ASSERT_EQUAL_INT(i + 1, tsrb_avail(&_tsrb));
+    }
+
+    tsrb_clear(&_tsrb);
+
+    TEST_ASSERT_EQUAL_INT(0, tsrb_avail(&_tsrb));
+}
+
 static void test_empty(void)
 {
     TEST_ASSERT_EQUAL_INT(1, tsrb_empty(&_tsrb));
@@ -202,6 +216,7 @@ static void test_add(void)
 static Test *tests_tsrb_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
+        new_TestFixture(test_clear),
         new_TestFixture(test_empty),
         new_TestFixture(test_avail),
         new_TestFixture(test_full),
