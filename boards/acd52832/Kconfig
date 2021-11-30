@@ -16,4 +16,6 @@ config BOARD_ACD52832
     select HAS_PERIPH_SPI
     select HAS_PERIPH_UART
 
-source "$(RIOTBOARD)/common/nrf52/Kconfig"
+    select HAVE_SAUL_GPIO
+
+source "$(RIOTBOARD)/common/nrf52xxxdk/Kconfig"

@@ -12,8 +12,20 @@ config BOARD_COMMON_PARTICLE_MESH
     select HAS_PERIPH_PWM
     select HAS_PERIPH_SPI
     select HAS_PERIPH_UART
+    select HAS_PERIPH_UART_HW_FC
     select HAS_PERIPH_USBDEV
     select HAS_HIGHLEVEL_STDIO
     select HAS_VDD_LC_FILTER_REG1
+
+    select HAVE_SAUL_GPIO
+    select HAVE_SAUL_PWM
+
+    select MODULE_BOARDS_COMMON_PARTICLE_MESH if TEST_KCONFIG
+
+config MODULE_BOARDS_COMMON_PARTICLE_MESH
+    bool
+    depends on TEST_KCONFIG
+    help
+       Common code for particle-mesh boards
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

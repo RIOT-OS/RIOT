@@ -17,4 +17,7 @@ config BOARD_NRF52840_MDK_DONGLE
     select HAS_PERIPH_USBDEV
     select HAS_HIGHLEVEL_STDIO
 
+    select HAVE_SAUL_GPIO
+    select HAVE_SAUL_PWM
+
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

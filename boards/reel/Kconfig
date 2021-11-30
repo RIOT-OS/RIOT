@@ -18,4 +18,7 @@ config BOARD_REEL
     select HAS_PERIPH_USBDEV
     select HAS_VDD_LC_FILTER_REG1
 
+    select HAVE_MMA8X5X
+    select HAVE_SAUL_GPIO
+
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

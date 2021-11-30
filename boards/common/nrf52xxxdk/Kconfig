@@ -17,6 +17,8 @@ config BOARDS_COMMON_NRF52XXXDK
 
 config MODULE_BOARDS_COMMON_NRF52XXXDK
     bool
-    default y
+    depends on TEST_KCONFIG
+    help
+      Common code for boards based on nrf52xxxdk.
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"
