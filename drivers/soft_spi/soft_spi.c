@@ -154,7 +154,7 @@ static inline uint8_t _transfer_one_byte(soft_spi_t bus, uint8_t out)
         uint8_t bit = out >> 7;
         gpio_write(soft_spi_config[bus].mosi_pin, bit);
 
-        xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
+        xtimer_usleep(soft_spi_config[bus].soft_spi_clk);
         gpio_toggle(soft_spi_config[bus].clk_pin);
 
         out <<= 1; /*shift transfer register*/
@@ -162,7 +162,7 @@ static inline uint8_t _transfer_one_byte(soft_spi_t bus, uint8_t out)
         bit = gpio_read(soft_spi_config[bus].miso_pin);
         out = bit ? (out | 0x01) : (out & 0xfe); /*set or delete bit 0*/
 
-        xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
+        xtimer_usleep(soft_spi_config[bus].soft_spi_clk);
         --i;
         if (i > 0) {
             gpio_toggle(soft_spi_config[bus].clk_pin);
@@ -172,7 +172,7 @@ static inline uint8_t _transfer_one_byte(soft_spi_t bus, uint8_t out)
     if (SOFT_SPI_MODE_0 == soft_spi_config[bus].soft_spi_mode ||
         SOFT_SPI_MODE_2 == soft_spi_config[bus].soft_spi_mode) {
         /* CPHA = 0 */
-        xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
+        xtimer_usleep(soft_spi_config[bus].soft_spi_clk);
         gpio_toggle(soft_spi_config[bus].clk_pin);
     }
 

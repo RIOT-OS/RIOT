@@ -14,7 +14,7 @@
  * This module provides a software implemented Serial Peripheral Interface bus.
  * It is intended to be used in situation where hardware spi is not available.
  * The signatures of the functions are similar to the functions declared in spi.h
- * The clock speed is approximated by using xtimer_nanosleep.
+ * The clock speed is approximated by using xtimer_usleep.
  * Currently only the use of MOSI in master mode is implemented. Therefore receiving
  * data from a slave is currently not possible.
  * @{
@@ -116,9 +116,9 @@ typedef enum {
  * delay between two clock edges.
  */
 typedef enum {
-    SOFT_SPI_CLK_100KHZ = 5000,     /**< drive the SPI bus with less than 100kHz */
-    SOFT_SPI_CLK_400KHZ = 1250,     /**< drive the SPI bus with less than 400kHz */
-    SOFT_SPI_CLK_DEFAULT = 0,       /**< drive the SPI bus with maximum speed possible */
+    SOFT_SPI_CLK_100KHZ = 5,     /**< drive the SPI bus with less than 100kHz */
+    SOFT_SPI_CLK_1MHZ   = 1,     /**< drive the SPI bus with less than 1MHz */
+    SOFT_SPI_CLK_DEFAULT = 0,    /**< drive the SPI bus with maximum speed possible */
 } soft_spi_clk_t;
 
 /**
