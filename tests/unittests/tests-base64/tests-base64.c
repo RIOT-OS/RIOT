@@ -414,7 +414,11 @@ static void test_base64_11_urlsafe_encode_int(void)
     unsigned char expected_encoding[] = "-RAAAA";
 
     size_t base64_out_size = 0;
-    char base64_out[sizeof(expected_encoding)];
+
+    /* Up to two = signs are suppressed in urlsafe encoding at the end, but
+     * still written in the implementation. Just allocate 2 bytes more as worst
+     * case */
+    char base64_out[sizeof(expected_encoding) + 2];
 
     /*
     * @Note:
