@@ -1,6 +1,9 @@
 #!/bin/sh
 
-: ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
+#APPS="examples/hello-world"
+#BOARDS="samr21-xpro"
+
+#: ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
 
 # temporarily disabling llvm builds until https://github.com/RIOT-OS/RIOT/pull/15595
 # is in
@@ -329,6 +332,7 @@ compile() {
         exit 1
     }
 
+    date
     # set build directory. CI ensures only one build at a time in $(pwd).
     export BINDIR="$(pwd)/build"
     export PKGDIRBASE="${BINDIR}/pkg"
@@ -338,6 +342,7 @@ compile() {
 
     print_worker
 
+    date
     # sanity checks
     [ $# -ne 2 ] && error "$0: compile: invalid parameters (expected \$appdir \$board:\$toolchain)"
     [ ! -d "$appdir" ] && error "$0: compile: error: application directory \"$appdir\" doesn't exist"
@@ -349,6 +354,7 @@ compile() {
 
     should_check_kconfig_hash=0
 
+    date
     if get_supported_kconfig_board_app "${board}" "${appdir}"; then
         should_check_kconfig_hash=1
         BOARD=${board} make -C${appdir} clean
@@ -363,11 +369,13 @@ compile() {
         fi
     fi
 
+    date
     # compile without Kconfig
     CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
         make -C${appdir} clean all test-input-hash -j${JOBS:-4}
     RES=$?
 
+    date
     test_hash=$(test_hash_calc "$BINDIR")
 
     if [ ${should_check_kconfig_hash} != 0 ]; then
@@ -379,6 +387,7 @@ compile() {
         fi
     fi
 
+    date
     # run tests
     if [ $RES -eq 0 ]; then
         if [ $RUN_TESTS -eq 1 -o "$board" = "native" ]; then
@@ -400,6 +409,7 @@ compile() {
         fi
     fi
 
+    date
     if [ -d ${BINDIR} ]
     then
         echo "-- build directory size: $(du -sh ${BINDIR} | cut -f1)"
@@ -407,6 +417,7 @@ compile() {
         # cleanup
         rm -rf ${BINDIR}
     fi
+    date
 
     return $RES
 }
@@ -486,6 +497,16 @@ get_non_compile_jobs() {
 get_jobs() {
     get_non_compile_jobs
     get_compile_jobs
+}
+
+gitcache_test() {
+    date
+    git cache clone https://github.com/RIOT-OS/RIOT 8794b357a1a6a7bcbf396ea2ab0e419cebcefc17 R1
+    date
+    git cache clone https://github.com/RIOT-OS/RIOT 8794b357a1a6a7bcbf396ea2ab0e419cebcefc17 R2
+    date
+    git cache clone https://github.com/RIOT-OS/RIOT 8794b357a1a6a7bcbf396ea2ab0e419cebcefc17 R3
+    date
 }
 
 $*
