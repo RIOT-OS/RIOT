@@ -1,5 +1,5 @@
 ifneq (,$(filter saul_default,$(USEMODULE)))
-  USEMODULE += lis2dh12
+  USEMODULE += lis2dh12_i2c
   USEMODULE += hts221
   USEMODULE += lps22hb
 endif
