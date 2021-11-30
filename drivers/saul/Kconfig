@@ -24,13 +24,16 @@ config MODULE_SAUL_ADC
     bool "SAUL wrapper for direct access to analog pins"
     depends on HAS_PERIPH_ADC
     select MODULE_PERIPH_ADC
-    default y if HAVE_SAUL_ADC
 
 config MODULE_SAUL_GPIO
     bool "SAUL wrapper for direct access to GPIO pins"
     depends on HAS_PERIPH_GPIO
     select MODULE_PERIPH_GPIO
-    default y if HAVE_SAUL_GPIO
+
+config MODULE_SAUL_PWM
+    bool "SAUL wrapper PWM enabled GPIO pins"
+    depends on HAS_PERIPH_PWM
+    select MODULE_PERIPH_PWM
 
 config MODULE_SAUL_NRF_TEMPERATURE
     bool "SAUL wrapper for direct access to the temperature peripheral"
@@ -50,10 +53,18 @@ endif # MODULE_SAUL
 
 config HAVE_SAUL_ADC
     bool
+    select MODULE_SAUL_ADC if MODULE_SAUL_DEFAULT
     help
         Indicates that configuration for ADC access via SAUL is available.
 
 config HAVE_SAUL_GPIO
     bool
+    select MODULE_SAUL_GPIO if MODULE_SAUL_DEFAULT
     help
         Indicates that configuration for GPIO access via SAUL is available.
+
+config HAVE_SAUL_PWM
+    bool
+    select MODULE_SAUL_PWM if MODULE_SAUL_DEFAULT
+    help
+        Indicates that configuration for PWM access via SAUL is available.
