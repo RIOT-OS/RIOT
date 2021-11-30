@@ -34,17 +34,19 @@ startswith() {
 
 add() {
     local repo="$1"
+    local name="$(_remote_name $repo)"
 
-    _locked "$GIT_CACHE_DIR/$name.addlock" _add "$repo"
+    _locked "$GIT_CACHE_DIR/$name.addlock" _add "$repo" "$name"
 }
 
 _add() {
     local repo="$1"
-    local name="$(_remote_name $repo)"
+    local name="$2"
 
     if ! is_cached "$repo"; then
         git_cache remote add "$name" "$repo"
-        git_cache config --add remote.${name}.fetch "+refs/tags/*:refs/tags/${name}/*"
+        git_cache config remote.$name.fetch "refs/heads/*:refs/heads/cache/$name/*"
+        git_cache config --add remote.$name.fetch "refs/tags/*:refs/tags/cache/$name/*"
     else
         echo "git-cache: $url already in cache"
     fi
@@ -85,7 +87,7 @@ update() {
 
     for remote in $REMOTES; do
         echo "git-cache: updating remote $remote"
-        _locked "$GIT_CACHE_DIR/$remote.lock" git_cache --namespace $remote fetch $Q -n $remote
+        _locked "$GIT_CACHE_DIR/$remote.lock" git_cache fetch $Q -n $remote
     done
 }
 
@@ -124,6 +126,15 @@ _check_commit() {
     git_cache cat-file -e ${1}^{commit} 2>/dev/null
 }
 
+_check_ref() {
+    test -n "$(git_cache show-ref ${1})" 2>/dev/null
+}
+
+is_tag() {
+    test -n "$(git -C ${1} tag -l ${2})" 2>/dev/null
+}
+
+
 _remote_name() {
     echo "$*" | git hash-object --stdin
 }
@@ -138,11 +149,9 @@ _check_tag_or_commit() {
     local REMOTE_NAME=$2
 
     if _check_commit $SHA1 ; then
-        local tag=commit$SHA1-$$
-        git_cache tag $tag $SHA1 2> /dev/null || true # ignore possibly already existing tag
-        echo "$tag"
-    elif _tag_to_sha1 ${REMOTE_NAME}/$SHA1 > /dev/null; then
-        echo "${REMOTE_NAME}/$SHA1"
+        echo "$SHA1"
+    elif _check_ref cache/${REMOTE_NAME}/$SHA1 ; then
+        echo "cache/${REMOTE_NAME}/$SHA1"
     fi
 }
 
@@ -153,6 +162,13 @@ clone() {
     local TARGET_PATH="${3}"
 
     [ -z "$TARGET_PATH" ] && TARGET_PATH="$(basename $REMOTE)"
+
+    [ -d "$TARGET_PATH" ] && {
+        [ -n "$(ls -A ${TARGET_PATH})" ] && {
+            echo "git-cache: target folder \"$TARGET_PATH\" exists and is non-empty."
+            exit 1
+        }
+    }
 
     # make sure git won't ask for credentials
     export GIT_TERMINAL_PROMPT=0
@@ -168,49 +184,32 @@ clone() {
             pull=1
         fi
 
-        if [ $pull -eq 0 ]; then
-            local tag="$(_check_tag_or_commit $SHA1 $REMOTE_NAME)"
-            if [ -z "$tag" ]; then
-                # commit / tag not in cache, try updating repo
-                update "$REMOTE"
-                tag="$(_check_tag_or_commit $SHA1 $REMOTE_NAME)"
-            fi
-        else
-            local tag="remotes/$REMOTE_NAME/master"
-            if [ -z "$(_tag_to_sha1 $tag)" ]; then
-                update "$REMOTE"
-            fi
-            tag="$(_check_tag_or_commit $(_tag_to_sha1 $tag) $REMOTE_NAME)"
-            if [ -z "$tag" ]; then
-                echo "git-cache: cannot checkout master branch of $REMOTE"
-                false
-            fi
+        local tag="$(_check_tag_or_commit $SHA1 $REMOTE_NAME)"
+        if [ -z "$tag" ]; then
+            # commit / tag not in cache, try updating repo
+            update "$REMOTE"
+            tag="$(_check_tag_or_commit $SHA1 $REMOTE_NAME)"
         fi
 
         if [ -n "$tag" ]; then
-            echo "git-cache: cloning from cache. tag=$tag"
-            git -c advice.detachedHead=false clone $Q --reference "${GIT_CACHE_DIR}" --shared "${GIT_CACHE_DIR}" "${TARGET_PATH}" --branch $tag
+            echo "git-cache: cloning from cache. branch/tag/commit=$tag"
+            git init $Q "${TARGET_PATH}"
+            echo "${GIT_CACHE_DIR}/objects" > "${TARGET_PATH}/.git/objects/info/alternates"
+            git -C "${TARGET_PATH}" remote add cache "${GIT_CACHE_DIR}"
+            git -C "${TARGET_PATH}" config remote.cache.fetch "refs/heads/cache/$REMOTE_NAME/*:refs/remotes/cache/*"
+            git -C "${TARGET_PATH}" config --add remote.cache.fetch "refs/tags/cache/$REMOTE_NAME/*:refs/tags/*"
+            git -C "${TARGET_PATH}" fetch $Q --no-tags cache
 
-            # rename tags from <remote-hash>/* to *
-            git -C "${TARGET_PATH}" fetch $Q origin "refs/tags/${REMOTE_NAME}/*:refs/tags/*"
-
-            # remove all commit* and <remote-hash>/* tags
-            git -C "${TARGET_PATH}" tag -l \
-                | grep -P '(^[a-f0-9]{40}/|^commit[a-f0-9]{40}(-\d+)?$)' \
-                | xargs git -C "${TARGET_PATH}" tag -d > /dev/null
-
-            # cleanup possibly created helper tag
-            case $tag in
-                commit*)
-                    git_cache tag -d $tag 2>&1 > /dev/null || true
-                    ;;
-            esac
-
-
-            if [ $pull -eq 1 ]; then
-                git -C "${TARGET_PATH}" fetch $Q $REMOTE $SHA1:$SHA1
-                git -C "${TARGET_PATH}" checkout $Q $SHA1
+            if startswith $tag cache/${REMOTE_NAME}/; then
+                if is_tag "${TARGET_PATH}" $SHA1; then
+                    git -C "${TARGET_PATH}" checkout $Q --detach $SHA1
+                else
+                    git -C "${TARGET_PATH}" checkout $Q -b $SHA1 cache/$SHA1
+                fi
+            else
+                    git -C "${TARGET_PATH}" checkout $Q --detach $SHA1
             fi
+
         else
             echo "git-cache: trying checkout from source"
             git clone $Q --reference "${GIT_CACHE_DIR}" --shared "${REMOTE}" "${TARGET_PATH}"
