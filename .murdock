@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#APPS="examples/hello-world"
+APPS="examples/hello-world"
 #BOARDS="samr21-xpro"
 
 #: ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
