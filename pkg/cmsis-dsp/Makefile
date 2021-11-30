@@ -1,6 +1,6 @@
 PKG_NAME=cmsis-dsp
 PKG_URL=https://github.com/ARM-software/CMSIS_5
-PKG_VERSION=5.4.0
+PKG_VERSION=0b521765067ac87b142cd96b5f578ffb399090cc # 5.4.0
 PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk

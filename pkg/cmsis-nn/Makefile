@@ -1,6 +1,6 @@
 PKG_NAME=cmsis-nn
 PKG_URL=https://github.com/ARM-software/CMSIS_5
-PKG_VERSION=5.6.0
+PKG_VERSION=b5f0603d6a584d1724d952fd8b0737458b90d62b # 5.6.0
 PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
