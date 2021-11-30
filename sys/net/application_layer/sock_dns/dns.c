@@ -16,6 +16,7 @@
  */
 
 #include <errno.h>
+#include <string.h>
 
 #include "net/dns.h"
 #include "net/dns/msg.h"
