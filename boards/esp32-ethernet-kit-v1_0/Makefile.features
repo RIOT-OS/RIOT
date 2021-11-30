@@ -15,4 +15,3 @@ endif
 
 # unique features provided by the board
 FEATURES_PROVIDED += esp_jtag
-FEATURES_PROVIDED += esp_spi_ram
