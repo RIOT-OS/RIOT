@@ -1,5 +1,7 @@
 #!/bin/sh
 
+APPS="examples/hello-world examples/default"
+
 : ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
 
 # temporarily disabling llvm builds until https://github.com/RIOT-OS/RIOT/pull/15595
