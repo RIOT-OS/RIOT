@@ -76,12 +76,6 @@ config HAS_ESP_SPI_RAM
         Indicates that an external RAM is connected via the FSPI interface in
         the board.
 
-config HAS_ESP_WIFI_ENTERPRISE
-    bool
-    help
-        Indicates that the platform supports WPA2 enterprise mode for the WiFi
-        interface.
-
 config HAS_PERIPH_ADC_CTRL
     bool
     help

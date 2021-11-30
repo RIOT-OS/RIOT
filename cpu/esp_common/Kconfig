@@ -56,6 +56,12 @@ config HAS_ARCH_ESP
     help
         Indicates that an 'ESP' architecture is being used.
 
+config HAS_ESP_WIFI_ENTERPRISE
+    bool
+    help
+        Indicates that the platform supports WPA2 enterprise mode for the WiFi
+        interface.
+
 ## Common CPU symbols
 config CPU_ARCH
     default "xtensa" if CPU_ARCH_XTENSA
