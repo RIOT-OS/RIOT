@@ -176,6 +176,10 @@ static inline void xtimer_usleep64(uint64_t microseconds);
 /**
  * @brief Stop execution of a thread for some time
  *
+ * @deprecated This function is deprecated as no XTIMER backend is currently
+ *             configured to run at more than 1 MHz, making nanoseconds accuracy
+ *             impossible to achieve.
+ *
  * Don't expect nanosecond accuracy. As of now, this function just calls
  * xtimer_usleep(nanoseconds/1000).
  *
