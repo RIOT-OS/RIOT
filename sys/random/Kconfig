@@ -17,7 +17,7 @@ choice RANDOM_IMPLEMENTATION
     bool "PRNG Implementation"
     depends on TEST_KCONFIG
     default MODULE_PRNG_HWRNG if HAS_PERIPH_HWRNG
-    default MODULE_PRNG_TINYMT32
+    default MODULE_PRNG_MUSL_LCG
 
 menuconfig MODULE_PRNG_FORTUNA
     bool "Fortuna"

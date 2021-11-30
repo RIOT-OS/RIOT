@@ -42,7 +42,7 @@ endif
 ifneq (,$(filter random,$(USEMODULE)))
   # select default prng if no prng is selected
   ifeq (,$(filter prng_%,$(USEMODULE)))
-    USEMODULE += prng_tinymt32
+    USEMODULE += prng_musl_lcg
   endif
 endif
 
