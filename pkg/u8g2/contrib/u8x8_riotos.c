@@ -103,7 +103,8 @@ uint8_t u8x8_gpio_and_delay_riotos(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, v
             xtimer_usleep(arg_int * 10);
             break;
         case U8X8_MSG_DELAY_100NANO:
-            xtimer_nanosleep(arg_int * 100);
+             /* not used in upstream so approximating to 1us should be fine */
+            xtimer_usleep(1);
             break;
         case U8X8_MSG_GPIO_CS:
             if (u8x8_riot_ptr != NULL && gpio_is_valid(u8x8_riot_ptr->pin_cs)) {
