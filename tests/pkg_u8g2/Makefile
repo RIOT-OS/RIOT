@@ -1,6 +1,7 @@
 include ../Makefile.tests_common
 
-USEMODULE += xtimer
+USEMODULE += ztimer
+USEMODULE += ztimer_usec
 
 USEPKG += u8g2
 
