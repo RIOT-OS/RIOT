@@ -833,6 +833,19 @@ typedef struct {
 } stm32_usb_otg_fshs_config_t;
 
 /**
+ * @brief stm32 USB device FS configuration
+ */
+typedef struct {
+    uintptr_t *base_addr;           /**< USB peripheral base address */
+    uint32_t rcc_mask;              /**< bit in clock enable register */
+    uint8_t irqn;                   /**< IRQ channel */
+    uint8_t apb;                    /**< APB bus */
+    gpio_t dm;                      /**< Data- gpio */
+    gpio_t dp;                      /**< Data+ gpio */
+    gpio_af_t af;                   /**< Alternative function */
+} stm32_usbdev_fs_config_t;
+
+/**
  * @brief   Get the actual bus clock frequency for the APB buses
  *
  * @param[in] bus       target APBx bus

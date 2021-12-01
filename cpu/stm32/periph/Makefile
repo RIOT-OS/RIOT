@@ -49,6 +49,15 @@ ifneq (,$(filter periph_rtt,$(USEMODULE)))
   endif
 endif
 
+# Select the correct implementation for `periph_usbdev`
+ifneq (,$(filter periph_usbdev,$(USEMODULE)))
+  ifeq (wb,$(CPU_FAM))
+    SRC += usbdev_fs.c
+  else
+    SRC += usbdev_otg.c
+  endif
+endif
+
 # flashpage and eeprom periph implementations share flash lock/unlock functions
 # defined in flash_common.c
 ifneq (,$(filter periph_flashpage periph_eeprom,$(USEMODULE)))
