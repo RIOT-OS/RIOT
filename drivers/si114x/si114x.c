@@ -24,7 +24,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "periph/i2c.h"
 
@@ -50,7 +50,7 @@ int8_t si114x_init(si114x_t *dev, const si114x_params_t *params)
     dev->params = *params;
 
     /* wait before sensor is ready */
-    xtimer_usleep(SI114X_STARTUP_TIME);
+    ztimer_sleep(ZTIMER_MSEC, SI114X_STARTUP_TIME_MS);
 
     /* acquire exclusive access */
     i2c_acquire(DEV_I2C);
@@ -178,12 +178,12 @@ void _reset(si114x_t *dev)
     /* perform RESET command */
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
                   SI114X_REG_COMMAND, SI114X_RESET, 0);
-    xtimer_usleep(SI114X_WAIT_10MS);
+    ztimer_sleep(ZTIMER_MSEC, SI114X_WAIT_10MS);
 
     /* write HW_KEY for proper operation */
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
                   SI114X_REG_HW_KEY, SI114X_INIT_VALUE, 0);
-    xtimer_usleep(SI114X_WAIT_10MS);
+    ztimer_sleep(ZTIMER_MSEC, SI114X_WAIT_10MS);
 }
 
 void _initialize(si114x_t *dev)

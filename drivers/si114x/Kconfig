@@ -31,6 +31,7 @@ config MODULE_SI114X
     bool
     depends on HAS_PERIPH_I2C
     select MODULE_PERIPH_I2C
-    select MODULE_XTIMER
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
 
 endif # TEST_KCONFIG
