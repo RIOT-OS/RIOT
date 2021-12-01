@@ -21,11 +21,9 @@ include $(RIOTCPU)/esp_common/Makefile.include
 TARGET_ARCH_ESP32 ?= xtensa-esp32-elf
 TARGET_ARCH ?= $(TARGET_ARCH_ESP32)
 
-PSEUDOMODULES += esp_eth_hw
 PSEUDOMODULES += esp_gdbstub
 PSEUDOMODULES += esp_hw_counter
 PSEUDOMODULES += esp_i2c_hw
-PSEUDOMODULES += esp_idf_newlib
 PSEUDOMODULES += esp_jtag
 PSEUDOMODULES += esp_rtc_timer_32k
 PSEUDOMODULES += esp_spi_ram
