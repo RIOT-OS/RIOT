@@ -37,6 +37,7 @@
 #define TNAME               "cord_ep"
 
 #define UPDATE_TIMEOUT      (0xe537)
+#define EP_REGISTER         (0xe538)
 
 #define TIMEOUT_US          ((uint64_t)(CONFIG_CORD_UPDATE_INTERVAL * US_PER_SEC))
 
@@ -44,13 +45,16 @@ static char _stack[STACKSIZE];
 
 static xtimer_t _timer;
 static kernel_pid_t _runner_pid;
-static msg_t _msg;
+static msg_t _update_msg;
+static msg_t _reg_msg;
+static sock_udp_ep_t *_rd_addr;
+static char *_rd_regif;
 
 static cord_ep_standalone_cb_t _cb = NULL;
 
 static void _set_timer(void)
 {
-    xtimer_set_msg64(&_timer, TIMEOUT_US, &_msg, _runner_pid);
+    xtimer_set_msg64(&_timer, TIMEOUT_US, &_update_msg, _runner_pid);
 }
 
 static void _notify(cord_ep_standalone_event_t event)
@@ -67,10 +71,20 @@ static void *_reg_runner(void *arg)
 
     /* prepare context and message */
     _runner_pid = thread_getpid();
-    _msg.type = UPDATE_TIMEOUT;
+    _update_msg.type = UPDATE_TIMEOUT;
+    _reg_msg.type = EP_REGISTER;
 
     while (1) {
         msg_receive(&in);
+        if (in.type == EP_REGISTER) {
+            if (cord_ep_register(_rd_addr, _rd_regif) == CORD_EP_OK) {
+                _set_timer();
+                _notify(CORD_EP_REGISTERED);
+            }
+            else {
+                _notify(CORD_EP_DEREGISTERED);
+            }
+        }
         if (in.type == UPDATE_TIMEOUT) {
             if (cord_ep_update() == CORD_EP_OK) {
                 _set_timer();
@@ -99,9 +113,18 @@ void cord_ep_standalone_signal(bool connected)
     if (connected) {
         _set_timer();
         _notify(CORD_EP_REGISTERED);
-    } else {
+    }
+    else {
         _notify(CORD_EP_DEREGISTERED);
     }
+}
+
+void cord_ep_standalone_register(sock_udp_ep_t *remote, char *regif)
+{
+    assert(remote);
+    _rd_addr = remote;
+    _rd_regif = regif;
+    msg_send(&_reg_msg, _runner_pid);
 }
 
 void cord_ep_standalone_reg_cb(cord_ep_standalone_cb_t cb)

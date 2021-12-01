@@ -71,6 +71,26 @@ void cord_ep_standalone_run(void);
 void cord_ep_standalone_reg_cb(cord_ep_standalone_cb_t cb);
 
 /**
+ * @brief   Provide the RD address and initiate EP registration
+ *
+ *
+ * This is a fire and forget version of cord_ep_register().
+ * It returns immediately.
+ * The background thread attempts to register to the given RD address.
+ * The success status can be obtained by the registered calback function.
+ *
+ * @see cord_ep_register()
+ *
+ * @pre                     @p remote != NULL
+ *
+ * @param[in] remote    remote endpoint of the target RD
+ * @param[in] regif     registration interface resource of the RD, it will be
+ *                      discovered automatically when set to NULL
+ *
+ */
+void cord_ep_standalone_register(sock_udp_ep_t *remote, char *regif);
+
+/**
  * @brief   Signal the cord_ep thread about connection status change
  *
  * @note    This function should not be called by a user, but it is called from
