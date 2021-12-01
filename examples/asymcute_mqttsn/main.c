@@ -44,7 +44,7 @@
 #define TOPIC_BUF_NUMOF     (8U + SUB_CTX_NUMOF)
 #endif
 
-/* needed for the `ping6` shell command */
+/* needed for the `ping` shell command */
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 

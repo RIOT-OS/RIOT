@@ -69,7 +69,7 @@ int main(void)
     nimble_rpble_eventcb(_on_rpble_event);
 
     /* we need a message queue for the thread running the shell in order to
-     * receive potentially fast incoming networking packets (ping6) */
+     * receive potentially fast incoming networking packets (ping) */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
     /* start shell */

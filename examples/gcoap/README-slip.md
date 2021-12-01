@@ -62,6 +62,6 @@ Finally, set the BR as the RPL DAG root.
 
 Ping the TUN interface from the router mote, via the BR:
 
-    ping6 bbbb::1
+    ping bbbb::1
 
 [1]: https://github.com/RIOT-OS/RIOT/tree/master/examples/gnrc_border_router    "SLIP instructions"

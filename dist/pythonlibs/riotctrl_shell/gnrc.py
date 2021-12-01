@@ -532,7 +532,7 @@ class GNRCICMPv6Echo(ShellInteraction):
         async_=False,
     ):
         cmd = (
-            "ping6 {hostname} -c {count} -i {interval} "
+            "ping {hostname} -c {count} -i {interval} "
             "-s {packet_size} -W {timeout}".format(
                 hostname=hostname,
                 count=count,
