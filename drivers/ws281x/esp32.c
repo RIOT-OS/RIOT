@@ -27,7 +27,6 @@
 #include "ws281x_params.h"
 #include "ws281x_constants.h"
 #include "periph_cpu.h"
-#include "xtimer.h"
 #include "xtensa/core-macros.h"
 #include "soc/rtc.h"
 
