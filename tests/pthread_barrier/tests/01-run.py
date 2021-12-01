@@ -9,7 +9,7 @@ def testfunc(child):
     children = int(child.match.group(1))
     iterations = int(child.match.group(2))
     for i in range(children):
-        child.expect(f'Start {i + 1}')
+        child.expect('Start {}'.format(i + 1))
     for _ in range(iterations):
         sleeps = []
         for _ in range(children):

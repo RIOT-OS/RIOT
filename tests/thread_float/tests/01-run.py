@@ -73,7 +73,7 @@ def testfunc(child):
         if (count_first_thread >= MIN_PRINTS) and (count_second_thread >= MIN_PRINTS):
             break
 
-    msg = f"Either t1 or t3 printed less than {MIN_PRINTS} times within 100 messages"
+    msg = "Either t1 or t3 printed less than {} times within 100 messages".format(MIN_PRINTS)
     assert (count_first_thread >= MIN_PRINTS) and (count_second_thread >= MIN_PRINTS), msg
 
 
