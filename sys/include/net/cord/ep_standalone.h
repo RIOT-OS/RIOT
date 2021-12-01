@@ -77,7 +77,7 @@ void cord_ep_standalone_reg_cb(cord_ep_standalone_cb_t cb);
  * This is a fire and forget version of cord_ep_register().
  * It returns immediately.
  * The background thread attempts to register to the given RD address.
- * The success status can be obtained by the registered calback function.
+ * The success status can be obtained by the registered callback function.
  *
  * @see cord_ep_register()
  *
