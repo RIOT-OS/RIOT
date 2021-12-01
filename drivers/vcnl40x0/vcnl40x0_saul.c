@@ -24,7 +24,6 @@
 #include "saul.h"
 #include "vcnl40x0.h"
 #include "vcnl40x0_params.h"
-#include "xtimer.h"
 
 static int read_proximity(const void *dev, phydat_t *res)
 {
