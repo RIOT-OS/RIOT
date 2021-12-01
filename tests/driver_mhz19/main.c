@@ -30,7 +30,7 @@
 #endif
 
 #include <stdio.h>
-#include "xtimer.h"
+#include "ztimer.h"
 #include "mhz19.h"
 #include "mhz19_params.h"
 
@@ -79,7 +79,7 @@ int main(void)
         printf("CO2: %d ppm\n", ppm);
 
         /* sleep between measurements */
-        xtimer_sleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1000);
     }
 
     return 0;

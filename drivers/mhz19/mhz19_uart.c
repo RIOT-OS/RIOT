@@ -24,7 +24,7 @@
 
 #include "mhz19.h"
 #include "mhz19_params.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "mutex.h"
 
 #define ENABLE_DEBUG 0
@@ -137,7 +137,7 @@ static void mhz19_cmd(mhz19_t *dev, const uint8_t *in)
     uart_write(dev->params->uart, in, MHZ19_BUF_SIZE + 1);
 
     /* Add some delay after executing command */
-    xtimer_msleep(MHZ19_TIMEOUT_CMD);
+    ztimer_sleep(ZTIMER_MSEC, MHZ19_TIMEOUT_CMD);
 
     /* Unlock concurrency guard mutex */
     mutex_unlock(&dev->mutex);
@@ -165,10 +165,10 @@ static void mhz19_xmit(mhz19_t *dev, const uint8_t *in)
 
     /* By locking the same mutex another time, this thread blocks until
      * the UART ISR received all bytes and unlocks the mutex. If that does not
-     * happen, then xtimer_mutex_lock_timeout unlocks the mutex after as well
+     * happen, then ztimer_mutex_lock_timeout unlocks the mutex after as well
      * after the timeout expired.
      */
-    xtimer_mutex_lock_timeout(&dev->sync, MHZ19_TIMEOUT_CMD * US_PER_MS);
+    ztimer_mutex_lock_timeout(ZTIMER_MSEC, &dev->sync, MHZ19_TIMEOUT_CMD);
 
     /* Unlock synchronization for next transmission */
     mutex_unlock(&dev->sync);

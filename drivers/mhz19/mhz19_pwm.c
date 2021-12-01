@@ -22,7 +22,7 @@
 
 #include "mhz19.h"
 #include "mhz19_params.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "mutex.h"
 
 #define ENABLE_DEBUG 0
@@ -61,26 +61,26 @@ int mhz19_get_ppm(mhz19_t *dev, int16_t *ppm)
     DEBUG("%s: Waiting for high level to end\n", __func__);
     while (gpio_read(dev->pin) && timeout) {
         timeout--;
-        xtimer_msleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1);
     }
 
     DEBUG("%s: Waiting for initial rising edge\n", __func__);
     while (!gpio_read(dev->pin) && timeout) {
         timeout--;
-        xtimer_msleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1);
     }
 
-    start = xtimer_now_usec() / US_PER_MS;
+    start = ztimer_now(ZTIMER_MSEC);
     DEBUG("%s: Waiting for falling edge\n", __func__);
     while (gpio_read(dev->pin) && timeout) {
         timeout--;
-        xtimer_msleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1);
     }
-    middle = xtimer_now_usec() / US_PER_MS;
+    middle = ztimer_now(ZTIMER_MSEC);
     DEBUG("%s: Waiting for rising edge\n", __func__);
     while (!gpio_read(dev->pin) && timeout) {
         timeout--;
-        xtimer_msleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1);
     }
 
     /* If we waited too long for flanks, something went wrong */
@@ -88,7 +88,7 @@ int mhz19_get_ppm(mhz19_t *dev, int16_t *ppm)
         DEBUG("%s: Measurement timed out\n", __func__);
         return MHZ19_ERR_TIMEOUT;
     }
-    end = xtimer_now_usec() / US_PER_MS;
+    end = ztimer_now(ZTIMER_MSEC);
 
     th = (middle - start);
     tl = (end - middle);

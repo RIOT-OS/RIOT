@@ -1,6 +1,7 @@
 include ../Makefile.tests_common
 
-USEMODULE += xtimer
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
 
 # set default device parameters in case they are undefined
 TEST_MODE ?= 1
