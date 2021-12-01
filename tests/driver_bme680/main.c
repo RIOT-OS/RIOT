@@ -25,15 +25,16 @@
 #include "bme680.h"
 #include "bme680_params.h"
 #include "mutex.h"
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 
-#define BME680_TEST_PERIOD_US   (5 * US_PER_SEC)
+#define BME680_TEST_PERIOD_MS   (5 * MS_PER_SEC)    /* 5s */
 
-xtimer_t timer;
+ztimer_t timer;
 
 static void _timer_cb(void *arg)
 {
-    xtimer_set(&timer, BME680_TEST_PERIOD_US);
+    ztimer_set(ZTIMER_MSEC, &timer, BME680_TEST_PERIOD_MS);
     mutex_unlock(arg);
 }
 
@@ -64,7 +65,7 @@ int main(void)
 
     timer.callback = _timer_cb;
     timer.arg = &timer_mtx;
-    xtimer_set(&timer, BME680_TEST_PERIOD_US);
+    ztimer_set(ZTIMER_MSEC, &timer, BME680_TEST_PERIOD_MS);
 
     while (1)
     {
@@ -76,7 +77,7 @@ int main(void)
             /* get the duration for the measurement */
             int duration = bme680_get_duration(&dev[i]);
             /* wait for the duration */
-            xtimer_msleep(duration);
+            ztimer_sleep(ZTIMER_MSEC, duration);
             /* read the data */
             int res = bme680_get_data(&dev[i], &data);
 
