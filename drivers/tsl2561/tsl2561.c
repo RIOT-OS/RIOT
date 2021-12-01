@@ -25,7 +25,7 @@
 #include "tsl2561.h"
 #include "tsl2561_internals.h"
 #include "periph/i2c.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG        0
 #include "debug.h"
@@ -220,16 +220,16 @@ static void _read_data(const tsl2561_t *dev, uint16_t *full, uint16_t *ir)
 
     /* Wait integration time in ms for ADC to complete */
     switch (DEV_INTEGRATION) {
-        case TSL2561_INTEGRATIONTIME_13MS:
-            xtimer_usleep(13700);
+        case TSL2561_INTEGRATIONTIME_13MS: /* 13700us */
+            ztimer_sleep(ZTIMER_MSEC, 14);
             break;
 
         case TSL2561_INTEGRATIONTIME_101MS:
-            xtimer_usleep(101000);
+            ztimer_sleep(ZTIMER_MSEC, 101);
             break;
 
         default: /* TSL2561_INTEGRATIONTIME_402MS */
-            xtimer_usleep(402000);
+            ztimer_sleep(ZTIMER_MSEC, 402);
             break;
     }
 

@@ -21,13 +21,12 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 #include "board.h"
 
 #include "tsl2561.h"
 #include "tsl2561_params.h"
-
-#define SLEEP_1S   (1 * 1000 * 1000u) /* 1 second delay between printf */
 
 int main(void)
 {
@@ -58,7 +57,7 @@ int main(void)
                "\n+-------------------------------------+\n",
                (int)tsl2561_read_illuminance(&dev));
 
-        xtimer_usleep(SLEEP_1S);
+        ztimer_sleep(ZTIMER_MSEC, MS_PER_SEC); /* 1s delay */
     }
 
     return 0;
