@@ -2,6 +2,8 @@
 @defgroup    boards_pic32-wifire Digilent PIC32 WiFire
 @ingroup     boards
 @brief       Support for the Digilent PIC32 WiFire
+@deprecated  Will not be available after the 2022.07 release. This includes
+             all MIPS based boards and cpus.
 
 ## Overview
 

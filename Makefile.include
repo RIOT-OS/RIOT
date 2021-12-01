@@ -392,6 +392,12 @@ INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBAS
 # process provided features
 include $(RIOTBASE)/Makefile.features
 
+ifneq ($(RIOT_CI_BUILD),1)
+  # Warn about used deprecated boards
+  include $(RIOTMAKE)/deprecated_boards.inc.mk
+  include $(RIOTMAKE)/deprecated_cpus.inc.mk
+endif
+
 # mandatory includes!
 include $(RIOTMAKE)/pseudomodules.inc.mk
 include $(RIOTMAKE)/defaultmodules.inc.mk

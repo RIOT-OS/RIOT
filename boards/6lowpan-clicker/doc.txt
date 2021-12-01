@@ -2,6 +2,8 @@
 @defgroup    boards_6lowpan-clicker MikroE 6LoWPAN Clicker
 @ingroup     boards
 @brief       Support for the MikroE 6LoWPAN Clicker
+@deprecated  Will not be available after the 2022.07 release. This includes
+             all MIPS based boards and cpus.
 
 ## Overview
 
