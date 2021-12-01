@@ -23,7 +23,6 @@
 
 #include "saul.h"
 #include "sds011.h"
-#include "xtimer.h"
 
 static int _read(const void *dev, phydat_t *res)
 {

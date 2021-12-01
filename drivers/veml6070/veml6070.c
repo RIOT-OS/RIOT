@@ -24,7 +24,6 @@
 #include "veml6070.h"
 #include "veml6070_params.h"
 #include "periph/i2c.h"
-#include "xtimer.h"
 
 #define ENABLE_DEBUG        0
 #include "debug.h"

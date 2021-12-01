@@ -28,7 +28,7 @@
 #include "ws281x_params.h"
 #include "ws281x_constants.h"
 #include "periph_cpu.h"
-#include "xtimer.h"
+
 /*
  * Data encoding according to the datasheets of the WS2812 and the SK6812:
  * - Encoding of zero bit:

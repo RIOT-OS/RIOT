@@ -29,7 +29,6 @@
 #include "periph/gpio.h"
 #include "periph/uart.h"
 #include "thread.h"
-#include "xtimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
