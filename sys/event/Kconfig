@@ -55,7 +55,7 @@ choice EVENT_TIMEOUT_IMPLEMENTATION
 config EVENT_TIMEOUT_ON_ZTIMER
     bool "Use ztimer as backend"
     select MODULE_EVENT_TIMEOUT_ZTIMER
-    select MODULE_ZTIMER_USEC
+    select ZTIMER_USEC
 
 config EVENT_TIMEOUT_ON_XTIMER
     bool "Use xtimer as backend"

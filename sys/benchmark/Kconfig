@@ -8,5 +8,5 @@
 config MODULE_BENCHMARK
     bool "Simple benchmarks support"
     select MODULE_ZTIMER
-    select MODULE_ZTIMER_USEC
+    select ZTIMER_USEC
     depends on TEST_KCONFIG
