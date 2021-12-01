@@ -54,7 +54,8 @@
 #include "periph/spi.h"
 #endif
 
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 
 #include "ucg.h"
 #include "ucg_riotos.h"
@@ -139,7 +140,7 @@ int main(void)
         screen = (screen + 1) % 3;
 
         /* sleep a little */
-        xtimer_sleep(1);
+        ztimer_sleep(ZTIMER_USEC, US_PER_SEC);
     }
 
     return 0;

@@ -23,7 +23,7 @@
 
 #include "ucg_riotos.h"
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifdef MODULE_PERIPH_SPI
 #include "periph/spi.h"
@@ -98,7 +98,7 @@ int16_t ucg_com_hw_spi_riotos(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *da
             spi_release(dev);
             break;
         case UCG_COM_MSG_DELAY:
-            xtimer_usleep(arg);
+            ztimer_sleep(ZTIMER_USEC, arg);
             break;
         case UCG_COM_MSG_CHANGE_RESET_LINE:
             if (ucg_riot_ptr != NULL && gpio_is_valid(ucg_riot_ptr->pin_reset)) {
