@@ -14,6 +14,8 @@ ifneq (,$(filter periph_init, $(USEMODULE)))
   PERIPH_IGNORE_MODULES := \
     periph_init% \
     periph_common \
+    periph_flexcomm \
+    periph_gpio_mux \
     periph_rtc_ms \
     periph_rtc_rtt \
     periph_clic \

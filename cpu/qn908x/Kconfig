@@ -19,6 +19,12 @@ config CPU_FAM_QN908X
     select HAS_PERIPH_WDT
     select HAS_PERIPH_WDT_CB
 
+    select MODULE_VENDOR if TEST_KCONFIG
+    # The clock functionality is used by most modules, including cpu.c even when
+    # no peripheral module is being used.
+    select MODULE_VENDOR_FSL_CLOCK if TEST_KCONFIG
+    select MODULE_PERIPH_GPIO_MUX if TEST_KCONFIG
+
 ## CPU Models
 # For cpus QN9080CHN (revision C) and QN9080DHN (revision D)
 config CPU_MODEL_QN9080XHN
@@ -50,5 +56,7 @@ config HAS_CPU_QN908X
 
 # Other cpu configuration
 rsource "Kconfig.clk"
+rsource "periph/Kconfig"
+rsource "vendor/Kconfig"
 
 source "$(RIOTCPU)/cortexm_common/Kconfig"
