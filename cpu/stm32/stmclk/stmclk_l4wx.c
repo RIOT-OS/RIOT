@@ -347,8 +347,8 @@
 #define CLOCK48MHZ_SELECT           (0)
 #endif
 
-/* Only periph_hwrng requires 48MHz for the moment */
-#if IS_USED(MODULE_PERIPH_HWRNG)
+/* periph_hwrng and periph_usbdev require a 48MHz clock source */
+#if IS_USED(MODULE_PERIPH_HWRNG) || IS_USED(MODULE_PERIPH_USBDEV)
 #if !IS_ACTIVE(CLOCK48MHZ_USE_PLLQ) && !IS_ACTIVE(CLOCK48MHZ_USE_MSI)
 #error "No 48MHz clock source available, HWRNG cannot work"
 #endif

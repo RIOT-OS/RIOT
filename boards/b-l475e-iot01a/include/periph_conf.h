@@ -27,6 +27,7 @@
 #include "periph_cpu.h"
 #include "clk_conf.h"
 #include "cfg_rtt_default.h"
+#include "cfg_usb_otg_fs.h"
 
 #ifdef __cplusplus
 extern "C" {
