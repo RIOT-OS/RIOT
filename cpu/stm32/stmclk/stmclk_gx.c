@@ -71,6 +71,10 @@
 #define RCC_CFGR_SW_HSE             (RCC_CFGR_SW_0)
 #define RCC_CFGR_SW_PLL             (RCC_CFGR_SW_1)
 
+#define RCC_CFGR_SWS_HSI            (0)
+#define RCC_CFGR_SWS_HSE            (RCC_CFGR_SWS_0)
+#define RCC_CFGR_SWS_PLL            (RCC_CFGR_SWS_1)
+
 #if CONFIG_CLOCK_HSISYS_DIV == 1
 #define CLOCK_HSI_DIV               (0)
 #elif CONFIG_CLOCK_HSISYS_DIV == 2

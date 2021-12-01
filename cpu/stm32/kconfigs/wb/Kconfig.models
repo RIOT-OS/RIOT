@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Inria
+# Copyright (c) 2021 Inria
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
@@ -10,6 +10,14 @@
 # See cpu/stm32/dist/kconfig/README.md for details
 
 # CPU models
+config CPU_MODEL_STM32WB10CC
+    bool
+    select CPU_LINE_STM32WB10XX
+
+config CPU_MODEL_STM32WB15CC
+    bool
+    select CPU_LINE_STM32WB15XX
+
 config CPU_MODEL_STM32WB30CE
     bool
     select CPU_LINE_STM32WB30XX
@@ -66,9 +74,15 @@ config CPU_MODEL_STM32WB55VY
     bool
     select CPU_LINE_STM32WB55XX
 
+config CPU_MODEL_STM32WB5MMG
+    bool
+    select CPU_LINE_STM32WB5MXX
+
 
 # Configure CPU model
 config CPU_MODEL
+    default "stm32wb10cc" if CPU_MODEL_STM32WB10CC
+    default "stm32wb15cc" if CPU_MODEL_STM32WB15CC
     default "stm32wb30ce" if CPU_MODEL_STM32WB30CE
     default "stm32wb35cc" if CPU_MODEL_STM32WB35CC
     default "stm32wb35ce" if CPU_MODEL_STM32WB35CE
@@ -83,3 +97,4 @@ config CPU_MODEL
     default "stm32wb55ve" if CPU_MODEL_STM32WB55VE
     default "stm32wb55vg" if CPU_MODEL_STM32WB55VG
     default "stm32wb55vy" if CPU_MODEL_STM32WB55VY
+    default "stm32wb5mmg" if CPU_MODEL_STM32WB5MMG
