@@ -17,6 +17,8 @@ config CPU_FAM_LPC23XX
     select HAS_PERIPH_TIMER_PERIODIC
     select HAS_PERIPH_RTC_MS
 
+    select MODULE_BITFIELD if TEST_KCONFIG
+
 ## CPU Models
 config CPU_MODEL_LPC2387
     bool

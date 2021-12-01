@@ -67,10 +67,12 @@ static vfs_mount_t _test_vfs_mount = {
 /* provide mtd devices for use within diskio layer of fatfs */
 mtd_dev_t *fatfs_mtd_devs[FF_VOLUMES];
 
-#ifdef MODULE_MTD_NATIVE
-/* mtd device for native is provided in boards/native/board_init.c */
+#if defined(MODULE_MTD_NATIVE) || defined(MODULE_MTD_MCI)
+/* mtd devices are provided in the board's board_init.c*/
 extern mtd_dev_t *mtd0;
-#elif MODULE_MTD_SDCARD
+#endif
+
+#if defined(MODULE_MTD_SDCARD)
 #define SDCARD_SPI_NUM ARRAY_SIZE(sdcard_spi_params)
 extern sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
 mtd_sdcard_t mtd_sdcard_devs[SDCARD_SPI_NUM];
@@ -407,7 +409,9 @@ int main(void)
 
 #if defined(MODULE_MTD_NATIVE) || defined(MODULE_MTD_MCI)
     fatfs_mtd_devs[fatfs.vol_idx] = mtd0;
-#else
+#endif
+
+#if defined(MODULE_MTD_SDCARD)
     fatfs_mtd_devs[fatfs.vol_idx] = mtd1;
 #endif
 

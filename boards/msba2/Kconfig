@@ -18,3 +18,7 @@ config BOARD_MSBA2
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+
+    select HAVE_LTC4150
+    select HAVE_SHT11
+    select HAVE_MTD_SPI_MCI

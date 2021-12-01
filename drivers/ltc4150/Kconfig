@@ -16,3 +16,9 @@ config MODULE_LTC4150
     help
         Driver for the Linear Tech LTC4150 Coulomb Counter (a.k.a. battery
         gauge sensor or power consumption sensor).
+
+config HAVE_LTC4150
+    bool
+    select MODULE_LTC4150 if MODULE_SAUL_DEFAULT
+    help
+      Indicates that an ltc4150 coulomb counter is present.
