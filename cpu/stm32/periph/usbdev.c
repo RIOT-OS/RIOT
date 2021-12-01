@@ -616,6 +616,11 @@ static void _usbdev_init(usbdev_t *dev)
     stm32_usb_otg_fshs_t *usbdev = (stm32_usb_otg_fshs_t *)dev;
     const stm32_usb_otg_fshs_config_t *conf = usbdev->config;
 
+#if defined(PWR_CR2_USV) /* on L4 */
+    /* Validate USB Supply */
+    PWR->CR2 |= PWR_CR2_USV;
+#endif
+
     /* Enable the clock to the peripheral */
     periph_clk_en(conf->ahb, conf->rcc_mask);
 
