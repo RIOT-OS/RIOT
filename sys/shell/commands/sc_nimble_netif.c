@@ -42,11 +42,12 @@
 #if !IS_USED(MODULE_NIMBLE_AUTOCONN) && !IS_USED(MODULE_NIMBLE_STATCONN)
 static const char *_name_to_connect = NULL;
 
-static void _scan_for_name(uint8_t type, const ble_addr_t *addr, int8_t rssi,
+static void _scan_for_name(uint8_t type, const ble_addr_t *addr,
+                           const nimble_scanner_info_t *info,
                            const uint8_t *ad, size_t ad_len)
 {
     (void)type;
-    (void)rssi;
+    (void)info;
     int res;
     bluetil_ad_t adstruct;
 
