@@ -330,13 +330,16 @@
 /* Configure 48MHz clock source */
 #define CLOCK_PLLQ                  ((CLOCK_PLL_SRC / CONFIG_CLOCK_PLL_M) * CONFIG_CLOCK_PLL_N) / CONFIG_CLOCK_PLL_Q
 
-#if CLOCK_PLLQ == MHZ(48) && !defined(CPU_FAM_STM32WL)
+#if defined(CPU_FAM_STM32WB)
+#define CLOCK48MHZ_USE_HSI48        1
+#elif CLOCK_PLLQ == MHZ(48) && !defined(CPU_FAM_STM32WL)
 #define CLOCK48MHZ_USE_PLLQ         1
 #elif CONFIG_CLOCK_MSI == MHZ(48) && !defined(CPU_FAM_STM32WL)
 #define CLOCK48MHZ_USE_MSI          1
 #else
 #define CLOCK48MHZ_USE_PLLQ         0
 #define CLOCK48MHZ_USE_MSI          0
+#define CLOCK48MHZ_USE_HSI48        0
 #endif
 
 #if IS_ACTIVE(CLOCK48MHZ_USE_PLLQ)
@@ -349,7 +352,8 @@
 
 /* periph_hwrng and periph_usbdev require a 48MHz clock source */
 #if IS_USED(MODULE_PERIPH_HWRNG) || IS_USED(MODULE_PERIPH_USBDEV)
-#if !IS_ACTIVE(CLOCK48MHZ_USE_PLLQ) && !IS_ACTIVE(CLOCK48MHZ_USE_MSI)
+#if !IS_ACTIVE(CLOCK48MHZ_USE_PLLQ) && !IS_ACTIVE(CLOCK48MHZ_USE_MSI) && \
+    !IS_ACTIVE(CLOCK48MHZ_USE_HSI48)
 #error "No 48MHz clock source available, HWRNG cannot work"
 #endif
 #define CLOCK_ENABLE_48MHZ          1
@@ -397,6 +401,15 @@
 #define CLOCK_ENABLE_HSI            1
 #else
 #define CLOCK_ENABLE_HSI            0
+#endif
+
+/* Check if HSI48 is required:
+  - When used as 48MHz source
+*/
+#if IS_ACTIVE(CLOCK48MHZ_USE_HSI48)
+#define CLOCK_ENABLE_HSI48          1
+#else
+#define CLOCK_ENABLE_HSI48          0
 #endif
 
 /* Check whether LSE must be enabled */
@@ -544,6 +557,13 @@ void stmclk_init_sysclk(void)
         RCC->CFGR &= ~RCC_CFGR_SW;
     }
 
+    if (IS_ACTIVE(CLOCK_ENABLE_HSI48)) {
+#if defined(RCC_CRRCR_HSI48ON)
+        RCC->CRRCR |= RCC_CRRCR_HSI48ON;
+        while (!(RCC->CRRCR & RCC_CRRCR_HSI48RDY)) {}
+#endif
+    }
+
     /* Configure the system clock (SYSCLK) */
     if (IS_ACTIVE(CONFIG_USE_CLOCK_HSE)) {
         /* Select HSE as system clock */
@@ -642,6 +662,11 @@ void stmclk_init_sysclk(void)
         gpio_init(GPIO_PIN(PORT_A, 8), GPIO_OUT);
         gpio_init_af(GPIO_PIN(PORT_A, 8), GPIO_AF0);
     }
+
+#if IS_USED(MODULE_PERIPH_USBDEV) && defined(RCC_APB1RSTR1_USBRST)
+    RCC->APB1RSTR1 |= RCC_APB1RSTR1_USBRST;
+    RCC->APB1RSTR1 &= ~RCC_APB1RSTR1_USBRST;
+#endif
 
     irq_restore(is);
 }

@@ -52,6 +52,8 @@ extern "C" {
 #define STM32_USB_OTG_CID_1x        /**< USB OTG FS version 0x00001200 */
 #elif defined(USB_OTG_GCCFG_VBDEN)
 #define STM32_USB_OTG_CID_2x        /**< USB OTG FS version 0x00002000 */
+#elif defined(USB)
+#define STM32_USB_FS_CID_1x         /**< USB FS version 0x00001200 */
 #else
 #error Unknown USB peripheral version
 #endif
@@ -129,6 +131,17 @@ typedef struct {
     stm32_usb_otg_fshs_out_ep_t *out;           /**< Out endpoints */
     bool suspend;                               /**< Suspend status */
 } stm32_usb_otg_fshs_t;
+
+/**
+ * @brief stm32 USB Device FS only peripheral device context
+ */
+typedef struct {
+    usbdev_t usbdev;                            /**< Inherited usbdev struct */
+    const stm32_usbdev_fs_config_t *config;     /**< USB peripheral config   */
+    usbdev_ep_t *in;                            /**< In endpoints */
+    usbdev_ep_t *out;                           /**< Out endpoints */
+    size_t used;                                /**< Bytes used by usbdev stack */
+} stm32_usbdev_fs_t;
 
 #ifdef __cplusplus
 }
