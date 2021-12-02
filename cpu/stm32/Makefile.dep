@@ -24,7 +24,8 @@ ifneq (,$(filter stm32_eth,$(USEMODULE)))
   FEATURES_REQUIRED += periph_eth
   USEMODULE += netdev_eth
   USEMODULE += iolist
-  USEMODULE += xtimer
+  USEMODULE += ztimer
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter periph_can,$(FEATURES_USED)))
@@ -42,7 +43,7 @@ ifneq (,$(filter periph_rtc_mem,$(USEMODULE)))
 endif
 
 ifneq (,$(filter periph_adc,$(FEATURES_USED)))
-  ifneq (,$(filter $(CPU_FAM),wl))
+  ifneq (,$(filter f3 l4 wl, $(CPU_FAM)))
     USEMODULE += ztimer
     USEMODULE += ztimer_msec
   endif
