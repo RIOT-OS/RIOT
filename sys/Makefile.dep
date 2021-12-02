@@ -525,8 +525,8 @@ ifneq (,$(filter event_timeout,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter event_periodic_timeout,$(USEMODULE)))
-  USEMODULE += event_timeout
+ifneq (,$(filter event_periodic,$(USEMODULE)))
+  USEMODULE += event_timeout_ztimer
   USEMODULE += ztimer_periodic
 endif
 
