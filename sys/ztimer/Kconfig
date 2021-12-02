@@ -10,6 +10,12 @@ menu "ztimer - High level timer abstraction layer"
 config ZTIMER_CUSTOM_BACKEND_CONFIGURATION
     bool "Override default backend selection"
 
+config MODULE_ZTIMER_NO_PERIPH_RTT
+    bool "Disable ztimer_periph_rtt auto-inclusion"
+    help
+        This module disables the auto-inclusion of ztimer_periph_rtt as a backend
+        for ztimer_msec and ztimer_sec.
+
 menu "Backends"
     visible if ZTIMER_CUSTOM_BACKEND_CONFIGURATION
 
@@ -56,7 +62,7 @@ config MODULE_ZTIMER_MSEC
 choice
     bool "Backend"
     depends on MODULE_ZTIMER_MSEC
-    default ZTIMER_MSEC_BACKEND_RTT
+    default ZTIMER_MSEC_BACKEND_RTT if !MODULE_ZTIMER_NO_PERIPH_RTT
 
 config ZTIMER_MSEC_BACKEND_TIMER
     bool "Timer"
@@ -85,7 +91,7 @@ config ZTIMER_SEC_BACKEND_TIMER
 config ZTIMER_SEC_BACKEND_RTT
     bool "RTT"
     depends on HAS_PERIPH_RTT
-    select MODULE_ZTIMER_PERIPH_RTT
+    select MODULE_ZTIMER_PERIPH_RTT if !MODULE_ZTIMER_NO_PERIPH_RTT
 
 config ZTIMER_SEC_BACKEND_RTC
     bool "RTC"
