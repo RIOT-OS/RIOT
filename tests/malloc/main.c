@@ -84,7 +84,7 @@ static void free_memory(struct node *head)
 
     while (head) {
         if (head->ptr) {
-            if (total > CHUNK_SIZE) {
+            if (total >= CHUNK_SIZE) {
                 total -= CHUNK_SIZE;
                 freed++;
             }
