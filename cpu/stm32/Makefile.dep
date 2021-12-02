@@ -24,7 +24,8 @@ ifneq (,$(filter stm32_eth,$(USEMODULE)))
   FEATURES_REQUIRED += periph_eth
   USEMODULE += netdev_eth
   USEMODULE += iolist
-  USEMODULE += xtimer
+  USEMODULE += ztimer
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter periph_can,$(FEATURES_USED)))

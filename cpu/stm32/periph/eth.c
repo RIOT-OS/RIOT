@@ -38,10 +38,10 @@
 #define ENABLE_DEBUG_VERBOSE    0
 #include "debug.h"
 
-#include "xtimer.h"
-#define STM32_ETH_LINK_UP_TIMEOUT_US    (1UL * US_PER_SEC)
+#include "ztimer.h"
+#define STM32_ETH_LINK_UP_TIMEOUT_MS    (1UL * MS_PER_SEC)
 
-static xtimer_t _link_status_timer;
+static ztimer_t _link_status_timer;
 
 /* Set the value of the divider with the clock configured */
 #if !defined(CLOCK_CORECLOCK) || CLOCK_CORECLOCK < (20000000U)
@@ -322,7 +322,7 @@ static void _timer_cb(void *arg)
         dev->event_callback(dev, NETDEV_EVENT_ISR);
     }
 
-    xtimer_set(&_link_status_timer, STM32_ETH_LINK_UP_TIMEOUT_US);
+    ztimer_set(ZTIMER_MSEC, &_link_status_timer, STM32_ETH_LINK_UP_TIMEOUT_MS);
 }
 
 static bool _phy_can_negotiate(void)
@@ -411,7 +411,7 @@ static int stm32_eth_init(netdev_t *netdev)
     if (IS_USED(MODULE_STM32_ETH_LINK_UP)) {
         _link_status_timer.callback = _timer_cb;
         _link_status_timer.arg = netdev;
-        xtimer_set(&_link_status_timer, STM32_ETH_LINK_UP_TIMEOUT_US);
+        ztimer_set(ZTIMER_MSEC, &_link_status_timer, STM32_ETH_LINK_UP_TIMEOUT_MS);
     }
 
     /* The PTP clock is initialized prior to the netdevs and will have already
