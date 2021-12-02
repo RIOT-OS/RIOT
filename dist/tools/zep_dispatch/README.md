@@ -44,3 +44,103 @@ refer to the file `example.topo` for an example.
 There can only be as many nodes connected to the dispatcher as have been named in
 the topology file.
 Any additional nodes that try to connect will be ignored.
+
+Network visualization
+---------------------
+
+It is possible to generate a graph of the current simulated network by executing the
+
+    make graph
+
+target. This sends a USR1 signal to the `zep_dispatch` process to generate a graph in
+Graphviz format.
+
+
+### Foren6
+
+For real-time visualization of the (RPL) network, the [Foren6](https://cetic.github.io/foren6/)
+tool can be used.
+
+Support for ZEP dispatcher is currently only available through [a fork](https://github.com/benpicco/foren6).
+
+#### Foren6 setup
+
+Start `foren6` with the `make run` target and in the 'Manage Sources' menu, add a ZEP sniffer:
+
+![](https://user-images.githubusercontent.com/1301112/134354399-7010ad73-044d-4ffa-ad99-61a6838af268.png)
+
+The 'target' field takes a hostname:port combination, but you can leave it blank. In that case the default `[::1]:17754` will be used.
+
+#### Foren6 usage
+
+Foren6 will connect to a running ZEP dispatcher. If the dispatcher started after Foren6 or
+if the dispatcher was restarted, you have to re-connect by stopping the current capture ('Stop' button)
+and starting it again ('Start' button).
+
+You should see a view of the DODAG with all nodes in the network as they send packets.
+
+![](https://user-images.githubusercontent.com/1301112/144511776-3a2d7072-8162-40dc-911f-dfe476d01112.png)
+
+#### RIOT setup
+
+A proper simulated network will need a border router and some mesh nodes.
+The `gnrc_border_router` and `gnrc_networking` can serve as a starting point for those.
+
+By default the border router example will start the ZEP dispatcher with a flat topology, that is
+each node is connected to every other node.
+This makes for a very boring topology where no RPL is needed.
+
+To run the ZEP dispatcher with a custom topology, simply run it before the `gnrc_border_router`
+example. You can use the `make run` target which will default to the `example.topo` topology.
+This can be changed with the `TOPOLOGY` environment variable.
+
+Next, start the border router example with RPL enabled:
+
+    USEMODULE=gnrc_rpl make -C examples/gnrc_border_router all term
+
+Verify that the border router got a prefix on it's downstream interface with `ifconfig`.
+
+```
+Iface  7  HWaddr: 36:DE  Channel: 26  NID: 0x23
+          Long HWaddr: BE:92:89:04:D7:B4:B6:DE
+          L2-PDU:102  MTU:1280  HL:64  RTR
+          RTR_ADV  6LO  IPHC
+          Source address length: 8
+          Link type: wireless
+          inet6 addr: fe80::bc92:8904:d7b4:b6de  scope: link  VAL
+     -->  inet6 addr: 2001:db8::bc92:8904:d7b4:b6de  scope: global  VAL
+          inet6 group: ff02::2
+          inet6 group: ff02::1
+          inet6 group: ff02::1:ffb4:b6de
+          inet6 group: ff02::1a
+
+Iface  6  HWaddr: 7A:37:FC:7D:1A:AF
+          L2-PDU:1500  MTU:1500  HL:64  RTR
+          Source address length: 6
+          Link type: wired
+          inet6 addr: fe80::7837:fcff:fe7d:1aaf  scope: link  VAL
+          inet6 addr: fe80::2  scope: link  VAL
+          inet6 group: ff02::2
+          inet6 group: ff02::1
+          inet6 group: ff02::1:ff7d:1aaf
+          inet6 group: ff02::1:ff00:2
+```
+
+Now start as many `gnrc_networking` nodes as you have mesh nodes defined in your topology file:
+
+    USE_ZEP=1 make -C examples/gnrc_networking all term
+    USE_ZEP=1 make -C examples/gnrc_networking all term
+    …
+
+The node should be able to join the DODAG as you can verify with the `rpl` command:
+
+```
+instance table:	[X]
+parent table:	[X]	[ ]	[ ]
+
+instance [0 | Iface: 7 | mop: 2 | ocp: 0 | mhri: 256 | mri 0]
+	dodag [2001:db8::bc92:8904:d7b4:b6de | R: 768 | OP: Router | PIO: on | TR(I=[8,20], k=10, c=119)]
+		parent [addr: fe80::6467:2e89:b035:d51f | rank: 512]
+```
+
+This should also be visible in Foren6.
