@@ -73,7 +73,8 @@ ifneq (,$(filter rtt_cmd,$(USEMODULE)))
 endif
 
 ifneq (,$(filter trace,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter ssp,$(USEMODULE)))
