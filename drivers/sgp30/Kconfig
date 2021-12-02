@@ -13,7 +13,7 @@ config MODULE_SGP30
     select MODULE_PERIPH_I2C
     select MODULE_ZTIMER
     select MODULE_ZTIMER_PERIPH_TIMER
-    select MODULE_ZTIMER_USEC
+    select ZTIMER_USEC
 
 config MODULE_SGP30_STRICT
     bool "Strict reading period"

@@ -49,11 +49,11 @@ menu "Clocks"
 config ZTIMER_USEC
     bool "Microseconds"
     select MODULE_ZTIMER_USEC
+    select MODULE_ZTIMER_PERIPH_TIMER
     select MODULE_ZTIMER
 
 config MODULE_ZTIMER_USEC
     bool
-    select MODULE_ZTIMER_PERIPH_TIMER
 
 config MODULE_ZTIMER_MSEC
     bool "Milliseconds"
@@ -141,7 +141,7 @@ menu "xtimer and evtimer compatibility"
 
 choice
     bool "xtimer compatibility"
-    depends on MODULE_XTIMER && MODULE_ZTIMER
+    depends on MODULE_XTIMER && MODULE_ZTIMER && MODULE_ZTIMER_PERIPH_TIMER
 
 config MODULE_XTIMER_ON_ZTIMER
     bool "ztimer_usec as timer backend for xtimer"

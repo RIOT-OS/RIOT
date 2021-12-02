@@ -12,7 +12,7 @@ menuconfig MODULE_SM_PWM_01C
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
     select MODULE_ZTIMER
-    select MODULE_ZTIMER_USEC
+    select ZTIMER_USEC
     select MODULE_ZTIMER_PERIPH_TIMER
 
 config MODULE_SM_PWM_01C_MA
