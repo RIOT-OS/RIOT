@@ -201,6 +201,11 @@ void topology_send(const topology_t *t, int sock,
                    const struct sockaddr_in6 *src_addr,
                    void *buffer, size_t len)
 {
+    if (t->has_sniffer) {
+        sendto(sock, buffer, len, 0,
+               (struct sockaddr *)&t->sniffer_addr, sizeof(t->sniffer_addr));
+    }
+
     for (list_node_t *edge = t->edges.next; edge; edge = edge->next) {
         struct edge *super = container_of(edge, struct edge, next);
 
@@ -276,4 +281,19 @@ bool topology_add(topology_t *t, const uint8_t *mac, uint8_t mac_len,
     empty->mac_len = mac_len;
 
     return true;
+}
+
+void topology_set_sniffer(topology_t *t, struct sockaddr_in6 *addr)
+{
+    if (t->has_sniffer) {
+        return;
+    }
+
+    char addr_str[INET6_ADDRSTRLEN];
+    getnameinfo((struct sockaddr*)addr, sizeof(*addr),
+                addr_str, sizeof(addr_str), 0, 0, NI_NUMERICHOST);
+    printf("adding sniffer %s\n", addr_str);
+
+    memcpy(&t->sniffer_addr, addr, sizeof(t->sniffer_addr));
+    t->has_sniffer = true;
 }
