@@ -42,11 +42,12 @@
 #if !IS_USED(MODULE_NIMBLE_AUTOCONN) && !IS_USED(MODULE_NIMBLE_STATCONN)
 static const char *_name_to_connect = NULL;
 
-static void _scan_for_name(uint8_t type, const ble_addr_t *addr, int8_t rssi,
+static void _scan_for_name(uint8_t type, const ble_addr_t *addr,
+                           const nimble_scanner_info_t *info,
                            const uint8_t *ad, size_t ad_len)
 {
     (void)type;
-    (void)rssi;
+    (void)info;
     int res;
     bluetil_ad_t adstruct;
 
@@ -398,13 +399,6 @@ static void _cmd_update(int handle, int itvl, int timeout)
     }
 }
 
-static void _on_echo_rsp(uint16_t gap_handle, uint32_t rtt, struct os_mbuf *om)
-{
-    int handle = nimble_netif_conn_get_by_gaphandle(gap_handle);
-    printf("ECHO_RSP handle:%i rtt:%u size:%u\n",
-           handle, (unsigned)rtt, (unsigned)OS_MBUF_PKTLEN(om));
-}
-
 static int _ishelp(char *argv)
 {
     return memcmp(argv, "help", 4) == 0;
@@ -425,9 +419,9 @@ int _nimble_netif_handler(int argc, char **argv)
 {
     if ((argc == 1) || _ishelp(argv[1])) {
 #if !IS_USED(MODULE_NIMBLE_AUTOCONN) && !IS_USED(MODULE_NIMBLE_STATCONN)
-        printf("usage: %s [help|info|adv|scan|connect|close|update|chanmap|ping]\n", argv[0]);
+        printf("usage: %s [help|info|adv|scan|connect|close|update|chanmap]\n", argv[0]);
 #else
-        printf("usage: %s [help|info|close|update|chanmap|ping]\n", argv[0]);
+        printf("usage: %s [help|info|close|update|chanmap]\n", argv[0]);
 #endif
         return 0;
     }
@@ -549,21 +543,6 @@ int _nimble_netif_handler(int argc, char **argv)
                                                 NIMBLE_NETIF_GAP_CONNECTED);
         }
         return 0;
-    }
-    else if ((memcmp(argv[1], "ping", 4) == 0)) {
-        if ((argc < 3) || _ishelp(argv[2])) {
-            printf("usage: %s %s <handle>\n", argv[0], argv[1]);
-            return 0;
-        }
-
-        int handle = atoi(argv[2]);
-        char *data = (argc > 3) ? argv[3] : NULL;
-        uint16_t data_len = (data != NULL) ? (uint16_t)strlen(data) : 0;
-
-        int res = nimble_netif_l2cap_ping(handle, _on_echo_rsp, data, data_len);
-        if (res != 0) {
-            printf("err: unable to send ping (%i)\n", res);
-        }
     }
     else {
         printf("unable to parse the command. Use '%s help' for more help\n",

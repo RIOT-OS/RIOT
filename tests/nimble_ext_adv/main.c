@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Freie Universität Berlin
+ * Copyright (C) 2021 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     examples
+ * @ingroup     tests
  * @{
  *
  * @file
- * @brief       Example for using NimBLE as a BLE scanner
+ * @brief       Test application for build testing NimBLE extended advertising
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
@@ -34,7 +34,7 @@
 #define DEFAULT_SCAN_INTERVAL_MS    30
 
 /* default scan duration (1s) */
-#define DEFAULT_DURATION_MS        (1 * MS_PER_SEC)
+#define DEFAULT_DURATION_MS         (1 * MS_PER_SEC)
 
 int _cmd_scan(int argc, char **argv)
 {
@@ -42,7 +42,6 @@ int _cmd_scan(int argc, char **argv)
 
     if ((argc == 2) && (memcmp(argv[1], "help", 4) == 0)) {
         printf("usage: %s [timeout in ms]\n", argv[0]);
-
         return 0;
     }
     if (argc >= 2) {

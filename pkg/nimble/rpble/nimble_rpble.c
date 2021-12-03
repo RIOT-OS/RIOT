@@ -111,11 +111,12 @@ static void _children_accept(void)
     assert(res == 0);
 }
 
-static void _on_scan_evt(uint8_t type,
-                         const ble_addr_t *addr, int8_t rssi,
+static void _on_scan_evt(uint8_t type, const ble_addr_t *addr,
+                         const nimble_scanner_info_t *info,
                          const uint8_t *ad, size_t ad_len)
 {
     int res;
+    (void)info;
 
     /* filter out all non-connectible advertisements */
     if (type != BLE_HCI_ADV_RPT_EVTYPE_ADV_IND) {
@@ -300,11 +301,10 @@ int nimble_rpble_param_update(const nimble_rpble_cfg_t *cfg)
     nimble_netif_eventcb(_on_netif_evt);
 
     /* configure scanner */
-    struct ble_gap_disc_params scan_params = { 0 };
-    scan_params.itvl =  BLE_GAP_SCAN_ITVL_MS(cfg->scan_itvl_ms);
-    scan_params.window = BLE_GAP_SCAN_WIN_MS(cfg->scan_win_ms);
-    scan_params.passive = 1;
-    scan_params.filter_duplicates = 1;
+    nimble_scanner_cfg_t scan_params = { 0 };
+    scan_params.itvl_ms = cfg->scan_itvl_ms;
+    scan_params.win_ms = cfg->scan_win_ms;
+    scan_params.flags = (NIMBLE_SCANNER_PASSIVE | NIMBLE_SCANNER_FILTER_DUPS);
     nimble_scanner_init(&scan_params, _on_scan_evt);
 
     /* start to look for parents */
