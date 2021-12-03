@@ -143,13 +143,7 @@ int adc_init(adc_t line)
     if (!(dev(line)->CR & ADC_CR_ADEN)) {
         /* Enable ADC internal voltage regulator and wait for startup period */
         dev(line)->CR |= ADC_CR_ADVREGEN;
-#if IS_USED(MODULE_ZTIMER_USEC)
-        ztimer_sleep(ZTIMER_USEC, ADC_T_ADCVREG_STUP_US);
-#else
-        /* to avoid using ZTIMER_USEC unless already included round up the
-           internal voltage regulator start up to 1ms */
-        ztimer_sleep(ZTIMER_MSEC, 1);
-#endif
+        ztimer_sleep_usecs_relaxed(ADC_T_ADCVREG_STUP_US);
 
         if (dev(line)->DIFSEL & (1 << adc_config[line].chan)) {
             /* Configure calibration for differential inputs */
