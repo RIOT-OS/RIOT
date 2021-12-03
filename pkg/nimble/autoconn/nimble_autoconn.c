@@ -131,10 +131,11 @@ static int _filter_uuid(const bluetil_ad_t *ad)
     return 0;
 }
 
-static void _on_scan_evt(uint8_t type, const ble_addr_t *addr, int8_t rssi,
+static void _on_scan_evt(uint8_t type, const ble_addr_t *addr,
+                         const nimble_scanner_info_t *info,
                          const uint8_t *ad_buf, size_t ad_len)
 {
-    (void)rssi;
+    (void)info;
 
     /* we are only interested in ADV_IND packets, the rest can be dropped right
      * away */
@@ -296,13 +297,10 @@ int nimble_autoconn_update(const nimble_autoconn_params_t *params,
     conn_update_params.max_ce_len = 0;
 
     /* calculate the used scan parameters */
-    struct ble_gap_disc_params scan_params;
-    scan_params.itvl = BLE_GAP_SCAN_ITVL_MS(params->scan_itvl);
-    scan_params.window = BLE_GAP_SCAN_WIN_MS(params->scan_win);
-    scan_params.filter_policy = 0;
-    scan_params.limited = 0;
-    scan_params.passive = 0;
-    scan_params.filter_duplicates = 1;
+    nimble_scanner_cfg_t scan_params;
+    scan_params.itvl_ms = params->scan_itvl;
+    scan_params.win_ms = params->scan_win;
+    scan_params.flags = NIMBLE_SCANNER_FILTER_DUPS;
 
     /* set the advertising parameters used */
     _adv_params.conn_mode = BLE_GAP_CONN_MODE_UND;
