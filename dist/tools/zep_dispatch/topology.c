@@ -285,14 +285,14 @@ bool topology_add(topology_t *t, const uint8_t *mac, uint8_t mac_len,
 
 void topology_set_sniffer(topology_t *t, struct sockaddr_in6 *addr)
 {
-    if (t->has_sniffer) {
-        return;
-    }
-
     char addr_str[INET6_ADDRSTRLEN];
     getnameinfo((struct sockaddr*)addr, sizeof(*addr),
                 addr_str, sizeof(addr_str), 0, 0, NI_NUMERICHOST);
-    printf("adding sniffer %s\n", addr_str);
+    if (t->has_sniffer) {
+        printf("replace sniffer with %s\n", addr_str);
+    } else {
+        printf("adding sniffer %s\n", addr_str);
+    }
 
     memcpy(&t->sniffer_addr, addr, sizeof(t->sniffer_addr));
     t->has_sniffer = true;
