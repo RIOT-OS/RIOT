@@ -5,4 +5,8 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += lps331ap
 endif
 
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += mtd_spi_nor
+endif
+
 USEMODULE += boards_common_iotlab

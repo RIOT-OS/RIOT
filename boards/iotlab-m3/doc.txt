@@ -33,7 +33,7 @@
 
 | Device            | ID            | Supported     | Comments              |
 |:----------------- |:------------- |:------------- |:--------------------- |
-| MCU               | [STM23F103REY](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/reference_manual/CD00171190.pdf) | partly    | Energy saving modes not fully utilized |
+| MCU               | [STM32F103REY](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/reference_manual/CD00171190.pdf) | partly    | Energy saving modes not fully utilized |
 | Low-level driver  | GPIO          | yes           |                       |
 |                   | PWM           | no            | periph config missing |
 |                   | UART          | yes           |                       |
@@ -48,6 +48,7 @@
 | Gyroscope         | LSM303DLHC    | yes           |                       |
 | Pressure Sensor   | LPS331AP      | yes           |                       |
 | Light Sensor      | ISL29020      | yes           |                       |
+| SPI Flash         | N25Q128       | yes           |                       |
 
 ## Toolchains
 
