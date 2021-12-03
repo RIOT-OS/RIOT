@@ -155,6 +155,10 @@ ifneq (,$(filter slipdev_%,$(USEMODULE)))
   USEMODULE += slipdev
 endif
 
+ifneq (,$(filter stmpe811_%,$(USEMODULE)))
+  USEMODULE += stmpe811
+endif
+
 ifneq (,$(filter sx126%,$(USEMODULE)))
   USEMODULE += sx126x
 endif

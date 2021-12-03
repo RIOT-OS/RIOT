@@ -103,6 +103,15 @@ extern "C" {
 #define STMPE811_SYS_CTRL2_TS_OFF                   (1 << 3)    /**< Disable Temperature sensor */
 /** @} */
 
+/* @name    SPI_CFG register bitfields
+ * @{
+ */
+#define STMPE811_SPI_CFG_SPI_CLK_MOD0               (1 << 0)    /**< SCAD/A0 pin during power-up reset */
+#define STMPE811_SPI_CFG_SPI_CLK_MOD1               (1 << 1)    /**< SCAD/A0 pin during power-up reset */
+#define STMPE811_SPI_CFG_AUTO_INCR                  (1 << 2)    /**< SPI transactions internal autoincrement */
+/** @} */
+
+
 /* @name    INT_CTRL register bitfields
  * @{
  */
