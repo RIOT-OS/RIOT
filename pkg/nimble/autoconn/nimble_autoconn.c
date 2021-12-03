@@ -300,7 +300,9 @@ int nimble_autoconn_update(const nimble_autoconn_params_t *params,
     nimble_scanner_cfg_t scan_params;
     scan_params.itvl_ms = params->scan_itvl;
     scan_params.win_ms = params->scan_win;
-    scan_params.flags = NIMBLE_SCANNER_FILTER_DUPS;
+    scan_params.flags = NIMBLE_SCANNER_PASSIVE
+                        | NIMBLE_SCANNER_FILTER_DUPS
+                        | NIMBLE_SCANNER_PHY_1M;
 
     /* set the advertising parameters used */
     _adv_params.conn_mode = BLE_GAP_CONN_MODE_UND;
