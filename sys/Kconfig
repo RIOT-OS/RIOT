@@ -79,6 +79,7 @@ rsource "timex/Kconfig"
 rsource "tsrb/Kconfig"
 rsource "uri_parser/Kconfig"
 rsource "usb/Kconfig"
+rsource "vfs/Kconfig"
 rsource "xtimer/Kconfig"
 rsource "ztimer/Kconfig"
 
