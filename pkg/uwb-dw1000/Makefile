@@ -5,14 +5,15 @@ PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-CFLAGS += -Wno-enum-compare
 CFLAGS += -Wno-address-of-packed-member
+CFLAGS += -Wno-cast-align
+CFLAGS += -Wno-enum-compare
 CFLAGS += -Wno-enum-conversion
 CFLAGS += -Wno-maybe-uninitialized
 CFLAGS += -Wno-missing-braces
 CFLAGS += -Wno-missing-declarations
-CFLAGS += -Wno-sign-compare
 CFLAGS += -Wno-return-type
+CFLAGS += -Wno-sign-compare
 CFLAGS += -Wno-unused-but-set-variable
 CFLAGS += -Wno-unused-function
 CFLAGS += -Wno-unused-parameter

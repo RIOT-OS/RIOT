@@ -301,7 +301,7 @@ void gnrc_pktbuf_stats(void)
 #ifdef TEST_SUITES
 bool gnrc_pktbuf_is_empty(void)
 {
-    return (_first_unused == (_unused_t *)gnrc_pktbuf_static_buf) &&
+    return ((uintptr_t)_first_unused == (uintptr_t)gnrc_pktbuf_static_buf) &&
            (_first_unused->size == sizeof(_pktbuf_buf));
 }
 

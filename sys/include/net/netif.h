@@ -84,7 +84,7 @@ typedef struct {
  * @return next network interface.
  * @return NULL, if there is no interface after @p last
  */
-netif_t *netif_iter(netif_t *last);
+netif_t *netif_iter(const netif_t *last);
 
 /**
  * @brief   Gets name of an interface

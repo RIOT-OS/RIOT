@@ -11,10 +11,18 @@ include $(RIOTBASE)/pkg/pkg.mk
 CMAKE_MINIMAL_VERSION = 3.6.0
 
 CFLAGS += $(INCLUDES)
-CFLAGS += -Wno-missing-field-initializers -Wno-unused-function
-CFLAGS += -Wno-type-limits -Wno-strict-aliasing -Wno-unused-variable -DATCA_HAL_I2C
-CFLAGS += -Wno-unused-parameter -Wno-sign-compare -Wno-overflow -Wno-pointer-to-int-cast
+CFLAGS += -DATCA_HAL_I2C
+CFLAGS += -Wno-cast-align
 CFLAGS += -Wno-char-subscripts
+CFLAGS += -Wno-missing-field-initializers
+CFLAGS += -Wno-overflow
+CFLAGS += -Wno-pointer-to-int-cast
+CFLAGS += -Wno-sign-compare
+CFLAGS += -Wno-strict-aliasing
+CFLAGS += -Wno-type-limits
+CFLAGS += -Wno-unused-function
+CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wno-unused-variable
 
 TOOLCHAIN_FILE=$(PKG_SOURCE_DIR)/xcompile-toolchain.cmake
 

@@ -8,5 +8,7 @@ include $(RIOTBASE)/pkg/pkg.mk
 # Disable 'ISO C99 doesn’t support unnamed structs/unions [-Werror=pedantic]'
 CFLAGS += -Wno-pedantic
 
+CFLAGS += -Wno-cast-align
+
 all:
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)

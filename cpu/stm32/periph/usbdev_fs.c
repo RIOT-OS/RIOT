@@ -64,7 +64,7 @@ const usbdev_driver_t driver;
 
 static USB_TypeDef *_global_regs(const stm32_usbdev_fs_config_t *conf)
 {
-    return (USB_TypeDef*)conf->base_addr;
+    return (USB_TypeDef *)conf->base_addr;
 }
 
 /* Endpoint Buffer Descriptor */

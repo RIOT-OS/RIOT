@@ -1,0 +1,25 @@
+From c9a4e05071aabfcc2dae7e3e5b5772806c28f86c Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Sun, 7 Nov 2021 15:22:12 +0100
+Subject: [PATCH] Inclue/arm_math.h: silence -Wcast-align
+
+---
+ CMSIS/DSP/Include/arm_math.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMSIS/DSP/Include/arm_math.h b/CMSIS/DSP/Include/arm_math.h
+index 6af24bab5..897623e6e 100644
+--- a/CMSIS/DSP/Include/arm_math.h
++++ b/CMSIS/DSP/Include/arm_math.h
+@@ -482,7 +482,7 @@ extern "C"
+ #endif
+ 
+ #define __SIMD32(addr)        (*(__SIMD32_TYPE **) & (addr))
+-#define __SIMD32_CONST(addr)  ((__SIMD32_TYPE *)(addr))
++#define __SIMD32_CONST(addr)  ((__SIMD32_TYPE *)(uintptr_t)(addr))
+ #define _SIMD32_OFFSET(addr)  (*(__SIMD32_TYPE *)  (addr))
+ #define __SIMD64(addr)        (*(int64_t **) & (addr))
+ 
+-- 
+2.33.1
+

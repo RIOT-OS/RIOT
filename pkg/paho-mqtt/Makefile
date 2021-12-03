@@ -3,6 +3,8 @@ PKG_URL = https://github.com/eclipse/paho.mqtt.embedded-c.git
 PKG_VERSION = 29ab2aa29c5e47794284376d7f8386cfd54c3eed
 PKG_LICENSE = EDL
 
+CFLAGS += -Wno-cast-align
+
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:

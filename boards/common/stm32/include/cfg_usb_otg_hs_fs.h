@@ -36,7 +36,7 @@ extern "C" {
  */
 static const stm32_usb_otg_fshs_config_t stm32_usb_otg_fshs_config[] = {
     {
-        .periph   = (uint8_t *)USB_OTG_HS_PERIPH_BASE,
+        .periph   = USB_OTG_HS_PERIPH_BASE,
         .rcc_mask = RCC_AHB1ENR_OTGHSEN,
         .phy      = STM32_USB_OTG_PHY_BUILTIN,
         .type     = STM32_USB_OTG_HS,

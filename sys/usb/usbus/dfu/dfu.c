@@ -116,7 +116,7 @@ void usbus_dfu_init(usbus_t *usbus, usbus_dfu_device_t *handler, unsigned mode)
 
 static void _init(usbus_t *usbus, usbus_handler_t *handler)
 {
-    usbus_dfu_device_t *dfu = (usbus_dfu_device_t*) handler;
+    usbus_dfu_device_t *dfu = container_of(handler, usbus_dfu_device_t, handler_ctrl);
     /* Set up descriptor generators */
     dfu->dfu_descr.next = NULL;
     dfu->dfu_descr.funcs = &_dfu_descriptor;
@@ -257,7 +257,7 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
     (void)usbus;
     (void)state;
 
-    usbus_dfu_device_t *dfu = (usbus_dfu_device_t *)handler;
+    usbus_dfu_device_t *dfu = container_of(handler, usbus_dfu_device_t, handler_ctrl);
     DEBUG("DFU: Request: 0x%x\n", setup->request);
 
     /* Process DFU class request */

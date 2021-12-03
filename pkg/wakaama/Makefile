@@ -5,6 +5,8 @@ PKG_LICENSE=EDL-1.0,EPL-1.0
 
 include $(RIOTBASE)/pkg/pkg.mk
 
+CFLAGS += -Wno-cast-align
+
 # some variable seem uninitialized to gcc with -Og but are not
 # https://gcc.gnu.org/bugzilla/buglist.cgi?quicksearch=may%20be%20used%20uninitialized
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=42145

@@ -5,5 +5,7 @@ PKG_LICENSE = CC0-1.0
 
 include $(RIOTBASE)/pkg/pkg.mk
 
+CFLAGS += -Wno-cast-align
+
 all:
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(CURDIR)/Makefile.$(PKG_NAME)

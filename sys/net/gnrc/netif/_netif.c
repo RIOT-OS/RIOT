@@ -18,6 +18,7 @@
 #include <string.h>
 
 #include "fmt.h"
+#include "kernel_defines.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif/internal.h"
 
@@ -25,7 +26,7 @@
 
 int netif_get_name(netif_t *iface, char *name)
 {
-    gnrc_netif_t *netif = (gnrc_netif_t*) iface;
+    gnrc_netif_t *netif = container_of(iface, gnrc_netif_t, netif);
 
     int res = 0;
     res += fmt_u16_dec(&name[res], netif->pid);
@@ -33,10 +34,10 @@ int netif_get_name(netif_t *iface, char *name)
     return res;
 }
 
-int16_t netif_get_id(const netif_t *netif)
+int16_t netif_get_id(const netif_t *iface)
 {
-    const gnrc_netif_t *iface = (const gnrc_netif_t*)netif;
-    return iface->pid;
+    const gnrc_netif_t *netif = container_of(iface, gnrc_netif_t, netif);
+    return netif->pid;
 }
 
 netif_t *netif_get_by_id(int16_t id)
@@ -44,18 +45,18 @@ netif_t *netif_get_by_id(int16_t id)
     return &gnrc_netif_get_by_pid((kernel_pid_t)id)->netif;
 }
 
-int netif_get_opt(netif_t *netif, netopt_t opt, uint16_t context,
+int netif_get_opt(netif_t *iface, netopt_t opt, uint16_t context,
                   void *value, size_t max_len)
 {
-    gnrc_netif_t *iface = (gnrc_netif_t*) netif;
-    return gnrc_netapi_get(iface->pid, opt, context, value, max_len);
+    const gnrc_netif_t *netif = container_of(iface, gnrc_netif_t, netif);
+    return gnrc_netapi_get(netif->pid, opt, context, value, max_len);
 }
 
-int netif_set_opt(netif_t *netif, netopt_t opt, uint16_t context,
+int netif_set_opt(netif_t *iface, netopt_t opt, uint16_t context,
                   void *value, size_t value_len)
 {
-    gnrc_netif_t *iface = (gnrc_netif_t*) netif;
-    return gnrc_netapi_set(iface->pid, opt, context, value, value_len);
+    const gnrc_netif_t *netif = container_of(iface, gnrc_netif_t, netif);
+    return gnrc_netapi_set(netif->pid, opt, context, value, value_len);
 }
 
 /** @} */

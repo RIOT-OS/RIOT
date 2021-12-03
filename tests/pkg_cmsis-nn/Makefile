@@ -21,3 +21,6 @@ BOARD_WHITELIST := \
   #
 
 include $(RIOTBASE)/Makefile.include
+
+# TODO: Get rid of this flag
+CFLAGS += -Wno-cast-align

@@ -37,6 +37,15 @@ extern scheduler_vars_t scheduler_mock_vars;
 
 extern void sock_udp_init(void);
 
+static uint8_t *_get_udp_checksum(OpenQueueEntry_t *pkt)
+{
+    /* Using uintptr_t as intermediate cast to silence -Wcast-align. Since the
+     * end result is of type `uint8_t *` (which has an alignment of 1 byte),
+     * no unaligned memory accesses will occur here
+     */
+    return (uint8_t * )&(((udp_ht *)(uintptr_t)pkt->payload)->checksum);
+}
+
 bool _inject_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
                     uint16_t src_port, uint16_t dst_port,
                     void *data, size_t data_len, uint16_t netif)
@@ -76,9 +85,7 @@ bool _inject_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
     packetfunctions_htons(pkt->l4_sourcePortORicmpv6Type, &(pkt->payload[0]));
     packetfunctions_htons(pkt->l4_destination_port, &(pkt->payload[2]));
     packetfunctions_htons(pkt->length, &(pkt->payload[4]));
-    packetfunctions_calculateChecksum(pkt,
-                                      (uint8_t * )&(((udp_ht *)pkt->payload)->
-                                                    checksum));
+    packetfunctions_calculateChecksum(pkt, _get_udp_checksum(pkt));
 
     /* set ID to match destination */
     open_addr_t addr;

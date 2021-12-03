@@ -355,10 +355,17 @@ static int _fstat(vfs_file_t *filp, struct stat *buf)
     return spiffs_err_to_errno(ret);
 }
 
+static spiffs_DIR * _get_spifs_dir(vfs_DIR *dirp)
+{
+    /* the private buffer is part of a union that also contains a
+     * void pointer, hence, it is naturally aligned */
+    return (spiffs_DIR *)(uintptr_t)&dirp->private_data.buffer[0];
+}
+
 static int _opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path)
 {
     spiffs_desc_t *fs_desc = dirp->mp->private_data;
-    spiffs_DIR *d = (spiffs_DIR *)&dirp->private_data.buffer[0];
+    spiffs_DIR *d = _get_spifs_dir(dirp);
     (void) abs_path;
 
     spiffs_DIR *res = SPIFFS_opendir(&fs_desc->fs, dirname, d);
@@ -371,7 +378,7 @@ static int _opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path)
 
 static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
 {
-    spiffs_DIR *d = (spiffs_DIR *)&dirp->private_data.buffer[0];
+    spiffs_DIR *d = _get_spifs_dir(dirp);
     struct spiffs_dirent e;
     struct spiffs_dirent *ret;
 
@@ -396,7 +403,7 @@ static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
 
 static int _closedir(vfs_DIR *dirp)
 {
-    spiffs_DIR *d = (spiffs_DIR *)&dirp->private_data.buffer[0];
+    spiffs_DIR *d = _get_spifs_dir(dirp);
 
     return spiffs_err_to_errno(SPIFFS_closedir(d));
 }

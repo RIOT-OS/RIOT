@@ -268,7 +268,7 @@ void candev_stm32_set_pins(can_t *dev, gpio_t tx_pin, gpio_t rx_pin)
 
 static int _init(candev_t *candev)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
     int res = 0;
 
     _can[get_channel(dev->conf->can)] = dev;
@@ -389,7 +389,7 @@ static inline void set_bit_timing(can_t *dev)
 
 static int _send(candev_t *candev, const struct can_frame *frame)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
     CAN_TypeDef *can = dev->conf->can;
     int mailbox = 0;
 
@@ -430,7 +430,7 @@ static int _send(candev_t *candev, const struct can_frame *frame)
 
 static int _abort(candev_t *candev, const struct can_frame *frame)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
     CAN_TypeDef *can = dev->conf->can;
     int mailbox = 0;
 
@@ -496,7 +496,7 @@ static int read_frame(can_t *dev, struct can_frame *frame, int mailbox)
 
 static void _isr(candev_t *candev)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     if (dev->isr_flags.isr_tx) {
         tx_isr(dev);
@@ -749,7 +749,7 @@ static int _sleep(can_t *dev)
 
 static int _set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
     CAN_TypeDef *can = dev->conf->can;
     int res = 0;
     can_mode_t mode;
@@ -827,7 +827,7 @@ static int _set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
 
 static int _get(candev_t *candev, canopt_t opt, void *value, size_t max_len)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
     CAN_TypeDef *can = dev->conf->can;
     int res = 0;
 
@@ -916,7 +916,7 @@ static int _get(candev_t *candev, canopt_t opt, void *value, size_t max_len)
 
 static int _set_filter(candev_t *candev, const struct can_filter *filter)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     DEBUG("_set_filter: dev=%p, filter=0x%" PRIx32 "\n", (void *)candev, filter->can_id);
 
@@ -942,7 +942,7 @@ static int _set_filter(candev_t *candev, const struct can_filter *filter)
 
 static int _remove_filter(candev_t *candev, const struct can_filter *filter)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     int first_filter = get_first_filter(dev);
     int last_filter = first_filter + get_nb_filter(dev);
