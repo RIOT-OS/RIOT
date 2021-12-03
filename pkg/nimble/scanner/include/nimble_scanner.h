@@ -159,7 +159,8 @@ static inline bool nimble_scanner_is_active(void)
  *
  *          If there is an active scanning process, it will be restarted.
  *
- * @param[in]  duration_ms  duration of scanning procedure in ms
+ * @param[in]  duration_ms  duration of scanning procedure in ms, set to
+ *                          BLE_HS_FOREVER to scan without time limit
  */
 void nimble_scanner_set_scan_duration(int32_t duration_ms);
 
