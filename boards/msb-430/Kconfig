@@ -18,4 +18,6 @@ config BOARD_MSB_430
     select HAS_PERIPH_UART
     select BOARD_COMMON_MSB_430
 
+    select HAVE_SHT11
+
 source "$(RIOTBOARD)/common/msb-430/Kconfig"
