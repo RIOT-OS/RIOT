@@ -836,7 +836,7 @@ typedef struct {
  * @brief stm32 USB device FS configuration
  */
 typedef struct {
-    uintptr_t *base_addr;           /**< USB peripheral base address */
+    uintptr_t base_addr;            /**< USB peripheral base address */
     uint32_t rcc_mask;              /**< bit in clock enable register */
     uint8_t irqn;                   /**< IRQ channel */
     uint8_t apb;                    /**< APB bus */
