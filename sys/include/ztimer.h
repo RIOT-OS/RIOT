@@ -268,6 +268,7 @@
 #include "msg.h"
 #include "mutex.h"
 #include "rmutex.h"
+#include "timex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -786,6 +787,119 @@ extern ztimer_clock_t *const ZTIMER_USEC_BASE;
  *
  */
 extern ztimer_clock_t *const ZTIMER_MSEC_BASE;
+
+/**
+ * @name    Convenience functions to sleep with auto-clock selection
+ * @{
+ */
+/**
+ * @brief   Internal function to sleep on a higher frequency clock for a
+ *          duration specified as lower frequency ticks without overflowing
+ * @param[in,out]   clock       Higher frequency clock to sleep on
+ * @param[in]       time        Time to sleep in lower frequency clock ticks
+ * @param[in]       scale       Each tick in @p time corresponds to @p scale
+ *                              ticks of @p clock
+ */
+static inline void _ztimer_sleep_scale_up(ztimer_clock_t *clock, uint32_t time,
+                                          uint32_t scale)
+{
+    const uint32_t max_sleep = UINT32_MAX / scale;
+
+    while (time > max_sleep) {
+        ztimer_sleep(clock, max_sleep * scale);
+        time -= max_sleep;
+    }
+
+    ztimer_sleep(clock, time * scale);
+}
+
+/**
+ * @brief   Internal function to sleep on a lower frequency clock for a
+ *          duration specified as higher frequency ticks with rounding up
+ * @param[in,out]   clock       Lower frequency clock to sleep on
+ * @param[in]       time        Time to sleep in higher frequency clock ticks
+ * @param[in]       scale       Each tick of @p clock corresponds to @p scale
+ *                              ticks of the unit @p time is given in
+ */
+static inline void _ztimer_sleep_scale_down(ztimer_clock_t *clock,
+                                            uint32_t time,
+                                            uint32_t scale)
+{
+    ztimer_sleep(clock, (time + scale - 1) / scale);
+}
+
+/**
+ * @brief       Sleep at least for the given amount of microseconds with relaxed
+ *              requirements
+ * @param[in]   usecs       Number of microseconds to sleep
+ *
+ * The actual resolution can be in the order of μs or ms, depending on the used
+ * module set. Like the regular @ref ztimer_sleep this still provides the
+ * guarantee that the sleep will be at least as long as specified (within the
+ * bounds of conversion errors, clock drift, etc.).
+ *
+ * @warning     Take into account that a sleep could be up two 2 ms longer than
+ *              asked for even in absence of other load on the system.
+ */
+static inline void ztimer_sleep_usecs_relaxed(uint32_t usecs)
+{
+    if (IS_USED(MODULE_ZTIMER_USEC)) {
+        ztimer_sleep(ZTIMER_USEC, usecs);
+    }
+    else {
+        _ztimer_sleep_scale_down(ZTIMER_MSEC, usecs, US_PER_MS);
+    }
+}
+
+/**
+ * @brief       Sleep for the given amount of milliseconds using the most
+ *              suitable clock available
+ * @param[in]   msecs       Number of milliseconds to sleep
+ *
+ * Like the regular @ref ztimer_sleep this still provides the guarantee that the
+ * sleep will be at least as long as specified (within the bounds of conversion
+ * errors, clock drift, etc.).
+
+ * @warning     Take into account that sleep might block low power modes for the
+ *              duration of the sleep if no suitable low power clock is
+ *              available.
+ */
+static inline void ztimer_sleep_msecs_relaxed(uint32_t msecs)
+{
+    if (IS_USED(MODULE_ZTIMER_MSEC)) {
+        ztimer_sleep(ZTIMER_MSEC, msecs);
+    }
+    else {
+        _ztimer_sleep_scale_up(ZTIMER_USEC, msecs, US_PER_MS);
+    }
+}
+
+/**
+ * @brief       Sleep for the given amount of seconds using the most
+ *              suitable clock available
+ * @param[in]   secs        Number of seconds to sleep
+ *
+ * Like the regular @ref ztimer_sleep this still provides the guarantee that the
+ * sleep will be at least as long as specified (within the bounds of conversion
+ * errors, clock drift, etc.).
+ *
+ * @warning     Take into account that sleep might block low power modes for the
+ *              duration of the sleep if no suitable low power clock is
+ *              available.
+ */
+static inline void ztimer_sleep_secs_relaxed(uint32_t secs)
+{
+    if (IS_USED(MODULE_ZTIMER_SEC)) {
+        ztimer_sleep(ZTIMER_SEC, secs);
+    }
+    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+        _ztimer_sleep_scale_up(ZTIMER_MSEC, secs, MS_PER_SEC);
+    }
+    else {
+        _ztimer_sleep_scale_up(ZTIMER_USEC, secs, US_PER_SEC);
+    }
+}
+/** @} */
 
 #ifdef __cplusplus
 }
