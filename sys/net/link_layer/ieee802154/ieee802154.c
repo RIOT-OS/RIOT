@@ -182,7 +182,8 @@ int ieee802154_get_src(const uint8_t *mhr, uint8_t *src, le_uint16_t *src_pan)
 
     tmp = mhr[1] & IEEE802154_FCF_SRC_ADDR_MASK;
     if (tmp != IEEE802154_FCF_SRC_ADDR_VOID) {
-        if (!(mhr[0] & IEEE802154_FCF_PAN_COMP)) {
+        if (!(mhr[0] & IEEE802154_FCF_PAN_COMP) &&
+            (tmp != IEEE802154_FCF_SRC_ADDR_RESV)) {
             src_pan->u8[0] = mhr[offset++];
             src_pan->u8[1] = mhr[offset++];
         }
