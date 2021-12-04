@@ -144,8 +144,7 @@ int ccs811_init (ccs811_t *dev, const ccs811_params_t *params);
  *
  * @note
  * - If the function is called and no new data are available, the function
- *   returns the results of the last measurement and the error code
- *   #CCS811_ERROR_NO_NEW_DATA.
+ *   returns the results of the last measurement.
  * - The data-ready status function #ccs811_data_ready or the data-ready
  *   interrupt (#CCS811_INT_DATA_READY) can be used to determine whether
  *   new data are available.
@@ -160,8 +159,6 @@ int ccs811_init (ccs811_t *dev, const ccs811_params_t *params);
  * @param[out] raw_v    Voltage across the sensor measured (0..1023 = 1.65 V)
  *
  * @retval  CCS811_OK                on success and new data are returned
- * @retval  CCS811_ERROR_NO_NEW_DATA when no new data are available and last
- *                                   measurement results are returned.
  * @retval  CCS811_ERROR_*           otherwise, see #ccs811_error_codes_t.
  */
 int ccs811_read_iaq (const ccs811_t *dev,

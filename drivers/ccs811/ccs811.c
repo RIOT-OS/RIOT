@@ -300,15 +300,6 @@ int ccs811_read_iaq(const ccs811_t *dev,
         return _error_code(dev, data[CCS811_ALG_DATA_ERROR_ID]);
     }
 
-    /*
-     * check whether new data are ready to read; if not, latest values read
-     * from sensor are used and error code CCS811_ERROR_NO_NEW_DATA is returned
-     */
-    if (!(data[CCS811_ALG_DATA_STATUS] & CCS811_STATUS_DATA_RDY)) {
-        DEBUG_DEV("no new data", dev);
-        res = -CCS811_ERROR_NO_NEW_DATA;
-    }
-
     /* if *iaq* is not NULL return IAQ sensor values */
     if (iaq_tvoc) {
         *iaq_tvoc  = data[CCS811_ALG_DATA_TVOC_HB] << 8;
