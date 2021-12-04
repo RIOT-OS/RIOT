@@ -69,6 +69,7 @@
 #include "sched.h"
 #include "clist.h"
 #include "mtd.h"
+#include "xfa.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -228,6 +229,36 @@ extern "C" {
  * @brief Used with vfs_bind to bind to any available fd number
  */
 #define VFS_ANY_FD (-1)
+
+/**
+ * @brief Helper macro for VFS_AUTO_MOUNT
+ *
+ * @param[in] mtd   MTD device to use for filesystem
+ */
+#define VFS_MTD(mtd) { .dev = &mtd.base }
+
+/**
+ * @brief Define an automatic mountpoint
+ *
+ * @param[in] type  file system type
+ *                  Can be littlefs, littlefs2, spiffs or fatfs
+ *
+ *                  Internally, file systems supporting this must name their
+ *                  @ref vfs_file_system_t `${TYPE}_file_system`, and must use
+ *                  a type named `${TYPE}_desc_t` for their private data
+ * @param[in] mtd   file system backed device configuration
+ * @param[in] path  Mount path
+ * @param[in] idx   Unique index of the mount point
+ */
+#define VFS_AUTO_MOUNT(type, mtd, path, idx)        \
+    static type ## _desc_t fs_desc_ ## idx = mtd;   \
+                                                    \
+    XFA(vfs_mountpoints_xfa, 0)                     \
+    vfs_mount_t _mount_mtd_ ## idx = {              \
+        .fs = &type ## _file_system,                \
+        .mount_point = path,                        \
+        .private_data = &fs_desc_ ## idx,           \
+    }
 
 /* Forward declarations */
 /**
