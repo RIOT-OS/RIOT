@@ -1,0 +1,11 @@
+# include variants of PCF857X drivers as pseudo modules
+PSEUDOMODULES += pcf8574
+PSEUDOMODULES += pcf8574a
+PSEUDOMODULES += pcf8575
+PSEUDOMODULES += pcf857x_irq
+PSEUDOMODULES += pcf857x_irq_low
+PSEUDOMODULES += pcf857x_irq_medium
+PSEUDOMODULES += pcf857x_irq_highest
+
+USEMODULE_INCLUDES_pcf857x := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_pcf857x)

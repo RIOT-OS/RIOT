@@ -1,0 +1,65 @@
+# Copyright (c) 2021 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_PCF857X
+    bool "PCF857x Remote I/O Expander for I2C Bus"
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_I2C
+    help
+        Driver for Texas Instruments PCF857X I2C I/O expanders.
+        The driver supports the PCF8574, PCF8574A, and PCF8575 variants.
+        Select the variants used by your application.
+
+if MODULE_PCF857X
+
+config MODULE_PCF8574
+    bool "PCF8574  Remote  8-Bit I/O is used"
+
+config MODULE_PCF8574A
+    bool "PCF8574A Remote  8-Bit I/O is used"
+
+config MODULE_PCF8575
+    bool "PCF8575  Remote 16-Bit I/O is used"
+    default y
+
+config MODULE_PCF857X_IRQ
+    bool "Interrupt support for PCF857x I/O Expander pins"
+    depends on MODULE_PCF857X
+    depends on HAS_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_GPIO_IRQ
+    select MODULE_EVENT
+    select MODULE_EVENT_THREAD
+    help
+        To use the IRQs the MODULE_EVENT_THREAD symbol should be set.
+
+choice
+    bool "Thread priority"
+    depends on MODULE_PCF857X_IRQ
+    default MODULE_PCF857X_IRQ_MEDIUM
+    help
+        To process IRQs an event thread is used. The MODULE_EVENT_THREAD
+        symbol should be set. Choose a priority for the thread that
+        processes the IRQs. The default is medium priority.
+
+config MODULE_PCF857X_IRQ_LOW
+    bool "Low"
+    select MODULE_EVENT_THREAD_LOW
+
+config MODULE_PCF857X_IRQ_MEDIUM
+    bool "Medium"
+    select MODULE_EVENT_THREAD_MEDIUM
+
+config MODULE_PCF857X_IRQ_HIGHEST
+    bool "Highest"
+    select MODULE_EVENT_THREAD_HIGHEST
+
+endchoice
+
+endif # MODULE_PCF857X
