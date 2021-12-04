@@ -35,6 +35,8 @@
 static int fatfs_err_to_errno(int32_t err);
 static void _fatfs_time_to_timespec(WORD fdate, WORD ftime, time_t *time);
 
+mtd_dev_t *fatfs_mtd_devs[FF_VOLUMES];
+
 /**
  * @brief Concatenate drive number and path into the buffer provided by fs_desc
  *
@@ -44,6 +46,25 @@ static void _build_abs_path(fatfs_desc_t *fs_desc, const char *name)
 {
     snprintf(fs_desc->abs_path_str_buff, FATFS_MAX_ABS_PATH_SIZE, "%u:/%s",
              fs_desc->vol_idx, name);
+}
+
+static int _init(vfs_mount_t *mountp)
+{
+    fatfs_desc_t *fs_desc = mountp->private_data;
+
+    for (unsigned i = 0; i < ARRAY_SIZE(fatfs_mtd_devs); ++i) {
+        if (fatfs_mtd_devs[i] == fs_desc->dev) {
+            /* already initialized */
+            return 0;
+        }
+        if (fatfs_mtd_devs[i] == NULL) {
+            fatfs_mtd_devs[i] = fs_desc->dev;
+            fs_desc->vol_idx = i;
+            return 0;
+        }
+    }
+
+    return -1;
 }
 
 static int _mount(vfs_mount_t *mountp)
@@ -56,6 +77,11 @@ static int _mount(vfs_mount_t *mountp)
                   "fatfs_file_desc_t must fit into VFS_FILE_BUFFER_SIZE");
 
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)mountp->private_data;
+
+    if (_init(mountp)) {
+        DEBUG("can't find free slot in fatfs_mtd_devs\n");
+        return -ENOMEM;
+    }
 
     _build_abs_path(fs_desc, "");
 

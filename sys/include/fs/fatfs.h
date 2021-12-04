@@ -54,6 +54,7 @@ extern "C" {
  */
 typedef struct fatfs_desc {
     FATFS fat_fs;       /**< FatFs work area needed for each volume */
+    mtd_dev_t *dev;     /**< MTD device to use */
     uint8_t vol_idx;    /**< low level device that is used by FatFs */
 
     /** most FatFs file operations need an absolute path. This buffer provides

@@ -54,18 +54,13 @@ static const char test_txt[]  = "the test file content 123 abc";
 static const char test_txt2[] = "another text";
 static const char test_txt3[] = "hello world for vfs";
 
-static fatfs_desc_t fatfs = {
-    .vol_idx = 0
-};
+static fatfs_desc_t fatfs;
 
 static vfs_mount_t _test_vfs_mount = {
     .mount_point = MNT_PATH,
     .fs = &fatfs_file_system,
     .private_data = (void *)&fatfs,
 };
-
-/* provide mtd devices for use within diskio layer of fatfs */
-mtd_dev_t *fatfs_mtd_devs[FF_VOLUMES];
 
 #if defined(MODULE_MTD_NATIVE) || defined(MODULE_MTD_MCI)
 /* mtd devices are provided in the board's board_init.c*/
@@ -402,17 +397,16 @@ int main(void)
         mtd_sdcard_devs[i].base.driver = &mtd_sdcard_driver;
         mtd_sdcard_devs[i].sd_card = &sdcard_spi_devs[i];
         mtd_sdcard_devs[i].params = &sdcard_spi_params[i];
-        fatfs_mtd_devs[i] = &mtd_sdcard_devs[i].base;
         mtd_init(&mtd_sdcard_devs[i].base);
     }
 #endif
 
 #if defined(MODULE_MTD_NATIVE) || defined(MODULE_MTD_MCI)
-    fatfs_mtd_devs[fatfs.vol_idx] = mtd0;
+    fatfs.dev = mtd0;
 #endif
 
 #if defined(MODULE_MTD_SDCARD)
-    fatfs_mtd_devs[fatfs.vol_idx] = mtd_sdcard;
+    fatfs.dev = mtd_sdcard;
 #endif
 
     printf("Tests for FatFs over VFS - test results will be printed "
