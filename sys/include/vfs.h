@@ -68,6 +68,7 @@
 
 #include "sched.h"
 #include "clist.h"
+#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -249,6 +250,11 @@ typedef struct vfs_file_system_ops vfs_file_system_ops_t;
  */
 /* not struct vfs_mount because of name collision with the function */
 typedef struct vfs_mount_struct vfs_mount_t;
+
+/**
+ * @brief   MTD driver for VFS
+ */
+extern const vfs_file_ops_t mtd_vfs_ops;
 
 /**
  * @brief A file system driver
