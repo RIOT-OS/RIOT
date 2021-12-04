@@ -59,3 +59,8 @@ $(RIOTTOOLS)/uf2/uf2conv.py: $(RIOTTOOLS)/uf2/Makefile
 	@echo "[INFO] uf2conv.py not found - fetching it from GitHub now"
 	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/uf2
 	@echo "[INFO] uf2conv.py successfully fetched!"
+
+$(RIOTTOOLS)/elf2uf2/elf2uf2: $(RIOTTOOLS)/elf2uf2/Makefile
+	@echo "[INFO] elf2uf2 not found - fetching it from GitHub now"
+	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/elf2uf2
+	@echo "[INFO] elf2uf2 successfully fetched!"
