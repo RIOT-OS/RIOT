@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "clk.h"
 #include "atmega_gpio.h"
 #include "ws281x.h"
 #include "ws281x_params.h"
@@ -94,114 +95,122 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
         mask_off = port_state & ~(1 << atmega_pin_num(dev->params.pin));
     }
 
-#if (CLOCK_CORECLOCK >= 7500000U) && (CLOCK_CORECLOCK <= 8500000U)
-    const uint8_t port_num = atmega_port_num(dev->params.pin);
-    switch (port_num) {
-        case PORT_B:
-            while (pos < end) {
-                uint8_t cnt = 8;
-                uint8_t data = *pos;
-                while (cnt > 0) {
-                    __asm__ volatile(                       /* Cycles | 1 | 0 */
-                        "out    %[port], %[on]"     "\n\t"  /* 1      | x | x */
-                        "sbrs   %[data], 7"         "\n\t"  /* 1      | x | x */
-                        "out    %[port], %[off]"    "\n\t"  /* 1      | - | x */
-                        "rjmp   .+0"                "\n\t"  /* 2      | x | x */
-                        "out    %[port], %[off]"    "\n\t"  /* 1      | x | x */
-                        /* Total CPU cycles for high period:
-                         * 5 cycles for bit 1, 2 cycles for bit 0 */
-                        : [data]    "+r" (data)
-                        : [port]    "I" (_SFR_IO_ADDR(PORTB)),
-                          [on]      "r" (mask_on),
-                          [off]     "r" (mask_off)
-                    );
-                    cnt--;
-                    data <<= 1;
+    if (coreclk() >= 7500000U && coreclk() <= 8500000U) {
+        const uint8_t port_num = atmega_port_num(dev->params.pin);
+        switch (port_num) {
+            case PORT_B:
+                while (pos < end) {
+                    uint8_t cnt = 8;
+                    uint8_t data = *pos;
+                    while (cnt > 0) {
+                        __asm__ volatile(                       /* Cycles | 1 | 0 */
+                            "out    %[port], %[on]"     "\n\t"  /* 1      | x | x */
+                            "sbrs   %[data], 7"         "\n\t"  /* 1      | x | x */
+                            "out    %[port], %[off]"    "\n\t"  /* 1      | - | x */
+                            "rjmp   .+0"                "\n\t"  /* 2      | x | x */
+                            "out    %[port], %[off]"    "\n\t"  /* 1      | x | x */
+                            /* Total CPU cycles for high period:
+                             * 5 cycles for bit 1, 2 cycles for bit 0 */
+                            : [data]    "+r" (data)
+                            : [port]    "I" (_SFR_IO_ADDR(PORTB)),
+                              [on]      "r" (mask_on),
+                              [off]     "r" (mask_off)
+                        );
+                        cnt--;
+                        data <<= 1;
+                    }
+                    pos++;
                 }
-                pos++;
-            }
-            break;
-        case PORT_C:
-            while (pos < end) {
-                uint8_t cnt = 8;
-                uint8_t data = *pos;
-                while (cnt > 0) {
-                    __asm__ volatile(                       /* Cycles | 1 | 0 */
-                        "out    %[port], %[on]"     "\n\t"  /* 1      | x | x */
-                        "sbrs   %[data], 7"         "\n\t"  /* 1      | x | x */
-                        "out    %[port], %[off]"    "\n\t"  /* 1      | - | x */
-                        "rjmp   .+0"                "\n\t"  /* 2      | x | x */
-                        "out    %[port], %[off]"    "\n\t"  /* 1      | x | x */
-                        /* Total CPU cycles for high period:
-                         * 5 cycles for bit 1, 2 cycles for bit 0 */
-                        : [data]    "+r" (data)
-                        : [port]    "I" (_SFR_IO_ADDR(PORTC)),
-                          [on]      "r" (mask_on),
-                          [off]     "r" (mask_off)
-                    );
-                    cnt--;
-                    data <<= 1;
+                break;
+#ifdef PORT_C
+            case PORT_C:
+                while (pos < end) {
+                    uint8_t cnt = 8;
+                    uint8_t data = *pos;
+                    while (cnt > 0) {
+                        __asm__ volatile(                       /* Cycles | 1 | 0 */
+                            "out    %[port], %[on]"     "\n\t"  /* 1      | x | x */
+                            "sbrs   %[data], 7"         "\n\t"  /* 1      | x | x */
+                            "out    %[port], %[off]"    "\n\t"  /* 1      | - | x */
+                            "rjmp   .+0"                "\n\t"  /* 2      | x | x */
+                            "out    %[port], %[off]"    "\n\t"  /* 1      | x | x */
+                            /* Total CPU cycles for high period:
+                             * 5 cycles for bit 1, 2 cycles for bit 0 */
+                            : [data]    "+r" (data)
+                            : [port]    "I" (_SFR_IO_ADDR(PORTC)),
+                              [on]      "r" (mask_on),
+                              [off]     "r" (mask_off)
+                        );
+                        cnt--;
+                        data <<= 1;
+                    }
+                    pos++;
                 }
-                pos++;
-            }
-            break;
-        case PORT_D:
-            while (pos < end) {
-                uint8_t cnt = 8;
-                uint8_t data = *pos;
-                while (cnt > 0) {
-                    __asm__ volatile(                       /* Cycles | 1 | 0 */
-                        "out    %[port], %[on]"     "\n\t"  /* 1      | x | x */
-                        "sbrs   %[data], 7"         "\n\t"  /* 1      | x | x */
-                        "out    %[port], %[off]"    "\n\t"  /* 1      | - | x */
-                        "rjmp   .+0"                "\n\t"  /* 2      | x | x */
-                        "out    %[port], %[off]"    "\n\t"  /* 1      | x | x */
-                        /* Total CPU cycles for high period:
-                         * 5 cycles for bit 1, 2 cycles for bit 0 */
-                        : [data]    "+r" (data)
-                        : [port]    "I" (_SFR_IO_ADDR(PORTD)),
-                          [on]      "r" (mask_on),
-                          [off]     "r" (mask_off)
-                    );
-                    cnt--;
-                    data <<= 1;
-                }
-                pos++;
-            }
-            break;
-        default:
-            assert(0);
-            break;
-    }
-#elif (CLOCK_CORECLOCK >= 15500000U) && (CLOCK_CORECLOCK <= 16500000U)
-    while (pos < end) {
-        uint8_t cnt = 8;
-        uint8_t data = *pos;
-        while (cnt > 0) {
-            __asm__ volatile(                       /* CPU Cycles | 1 | 0 */
-                "st     %a[port], %[on]"    "\n\t"  /* 2          | x | x */
-                "sbrc   %[data], 7"         "\n\t"  /* 1          | x | x */
-                "rjmp   .+0"                "\n\t"  /* 2          | x | - */
-                "sbrc   %[data], 7"         "\n\t"  /* 1          | x | x */
-                "rjmp   .+0"                "\n\t"  /* 2          | x | - */
-                "sbrc   %[data], 7"         "\n\t"  /* 1          | x | x */
-                "nop"                       "\n\t"  /* 1          | x | - */
-                "st     %a[port], %[off]"   "\n\t"  /* 2          | x | x */
-                /* Total CPU cycles for high period:
-                 * 10 cycles for bit 1, 5 cycles for bit 0 */
-                : [data]    "+r" (data)
-                : [on]      "r" (mask_on),
-                  [port]    "e" (port_addr),
-                  [off]     "r" (mask_off)
-            );
-            cnt--;
-            data <<= 1;
-        }
-        pos++;
-    }
-#else
-#error "No low level WS281x implementation for ATmega CPUs for your CPU clock"
+                break;
 #endif
+            case PORT_D:
+                while (pos < end) {
+                    uint8_t cnt = 8;
+                    uint8_t data = *pos;
+                    while (cnt > 0) {
+                        __asm__ volatile(                       /* Cycles | 1 | 0 */
+                            "out    %[port], %[on]"     "\n\t"  /* 1      | x | x */
+                            "sbrs   %[data], 7"         "\n\t"  /* 1      | x | x */
+                            "out    %[port], %[off]"    "\n\t"  /* 1      | - | x */
+                            "rjmp   .+0"                "\n\t"  /* 2      | x | x */
+                            "out    %[port], %[off]"    "\n\t"  /* 1      | x | x */
+                            /* Total CPU cycles for high period:
+                             * 5 cycles for bit 1, 2 cycles for bit 0 */
+                            : [data]    "+r" (data)
+                            : [port]    "I" (_SFR_IO_ADDR(PORTD)),
+                              [on]      "r" (mask_on),
+                              [off]     "r" (mask_off)
+                        );
+                        cnt--;
+                        data <<= 1;
+                    }
+                    pos++;
+                }
+                break;
+            default:
+                assert(0);
+                break;
+        }
+    }
+    else if (coreclk() >= 15500000U && coreclk() <= 16500000U) {
+        while (pos < end) {
+            uint8_t cnt = 8;
+            uint8_t data = *pos;
+            while (cnt > 0) {
+                __asm__ volatile(                       /* CPU Cycles | 1 | 0 */
+                    "st     %a[port], %[on]"    "\n\t"  /* 2          | x | x */
+                    "sbrc   %[data], 7"         "\n\t"  /* 1          | x | x */
+                    "rjmp   .+0"                "\n\t"  /* 2          | x | - */
+                    "sbrc   %[data], 7"         "\n\t"  /* 1          | x | x */
+                    "rjmp   .+0"                "\n\t"  /* 2          | x | - */
+                    "sbrc   %[data], 7"         "\n\t"  /* 1          | x | x */
+                    "nop"                       "\n\t"  /* 1          | x | - */
+                    "st     %a[port], %[off]"   "\n\t"  /* 2          | x | x */
+                    /* Total CPU cycles for high period:
+                     * 10 cycles for bit 1, 5 cycles for bit 0 */
+                    : [data]    "+r" (data)
+                    : [on]      "r" (mask_on),
+                      [port]    "e" (port_addr),
+                      [off]     "r" (mask_off)
+                );
+                cnt--;
+                data <<= 1;
+            }
+            pos++;
+        }
+    }
+    else {
+        /* No low level WS281x implementation for ATmega CPUs for the used CPU
+         * clock. Abusing the linker to give a compile time error instead of
+         * emitting a broken firmware */
+        extern void clock_frequency_is_not_supported_by_ws281x_driver(void);
+        clock_frequency_is_not_supported_by_ws281x_driver();
+    }
 }
 
 int ws281x_init(ws281x_t *dev, const ws281x_params_t *params)
