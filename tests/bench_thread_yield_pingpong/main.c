@@ -21,6 +21,7 @@
 #include <stdio.h>
 
 #include "macros/units.h"
+#include "clk.h"
 #include "thread.h"
 #include "xtimer.h"
 
@@ -73,10 +74,8 @@ int main(void)
     }
 
     printf("{ \"result\" : %"PRIu32, n);
-#ifdef CLOCK_CORECLOCK
     printf(", \"ticks\" : %"PRIu32,
-           (uint32_t)((TEST_DURATION/US_PER_MS) * (CLOCK_CORECLOCK/KHZ(1)))/n);
-#endif
+           (uint32_t)((TEST_DURATION/US_PER_MS) * (coreclk()/KHZ(1)))/n);
     puts(" }");
 
     return 0;
