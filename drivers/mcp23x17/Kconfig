@@ -1,0 +1,69 @@
+# Copyright (c) 2021 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_MCP23X17
+    bool "MCP23017/MCP23S17 I/O Expander"
+    depends on HAS_PERIPH_GPIO
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_GPIO
+    help
+        Driver for Microchip Microchip MCP23x17 I/O expanders.
+        The driver supports the MCP23017 and MC23S17 variants.
+
+if MODULE_MCP23X17
+
+config MODULE_MCP23X17_I2C
+    bool "MCP23017 with I2C interface is used"
+    depends on HAS_PERIPH_I2C
+    select MODULE_PERIPH_I2C
+
+config MODULE_MCP23X17_SPI
+    bool "MCP23S17 with SPI interface is used"
+    depends on HAS_PERIPH_SPI
+    select MODULE_PERIPH_SPI
+
+config MODULE_MCP23X17_IRQ
+    bool "Interrupt support for MCP23x17 I/O Expander pins"
+    depends on HAS_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_GPIO_IRQ
+    select MODULE_EVENT
+    select MODULE_EVENT_THREAD
+    help
+        To use the IRQs the MODULE_EVENT_THREAD symbol should be set.
+
+choice
+    bool "Thread priority"
+    depends on MODULE_MCP23X17_IRQ
+    default MODULE_MCP23X17_IRQ_MEDIUM
+    help
+        To process IRQs an event thread is used. The MODULE_EVENT_THREAD
+        symbol should be set. Choose a priority for the thread that
+        processes the IRQs. The default is medium priority.
+
+config MODULE_MCP23X17_IRQ_MEDIUM
+    bool "Medium"
+    select MODULE_EVENT_THREAD_MEDIUM
+    help
+        Use event thread with medium priority for interrupt handling.
+
+config MODULE_MCP23X17_IRQ_HIGHEST
+    bool "Highest"
+    select MODULE_EVENT_THREAD_HIGHEST
+    help
+        Use event thread with highest priority for interrupt handling.
+
+endchoice
+
+config MODULE_MCP23X17_RESET
+    bool "RESET pin used"
+    help
+        If the RESET pin is used, a hardware reset is executed when the
+        expander device is initialized. The RESET pin of the MCP23x17 I/O
+        Expanderhas to be connected to a MCU pin that has to be defined
+        by hardware configuration parameters.
+
+endif # MODULE_MCP23X17
