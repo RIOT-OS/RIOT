@@ -1,0 +1,38 @@
+FEATURES_REQUIRED += periph_gpio
+
+ifneq (,$(filter mcp23s17,$(USEMODULE)))
+  USEMODULE += mcp23x17_spi
+endif
+
+ifneq (,$(filter mcp23017,$(USEMODULE)))
+  USEMODULE += mcp23x17_i2c
+endif
+
+ifneq (,$(filter mcp23x17_i2c,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
+ifneq (,$(filter mcp23x17_spi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
+endif
+
+_MCP23X17_IRQ_MODULE := $(filter mcp23x17_irq_%,$(USEMODULE))
+ifneq (,$(_MCP23X17_IRQ_MODULE))
+  # pull in the correspondant event_thread_<priority> module
+  USEMODULE += $(_MCP23X17_IRQ_MODULE:mcp23x17_irq_%=event_thread_%)
+  USEMODULE += mcp23x17_irq
+else
+  ifneq (,$(filter mcp23x17_irq,$(USEMODULE)))
+    # pull in the event_thread_medium module by default if mcp23x17_irq is used.
+    USEMODULE += mcp23x17_irq_medium
+  endif
+endif
+
+ifneq (,$(filter mcp23x17_irq,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+endif
+
+ifneq (,$(filter mcp23x17_reset,$(USEMODULE)))
+  USEMODULE += ztimer
+  USEMODULE += ztimer_msec
+endif
