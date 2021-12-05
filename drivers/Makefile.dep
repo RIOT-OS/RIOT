@@ -120,6 +120,10 @@ ifneq (,$(filter mrf24j40m%,$(USEMODULE)))
   USEMODULE += mrf24j40
 endif
 
+ifneq (,$(filter mcp23%17 mcp23x17_%,$(USEMODULE)))
+  USEMODULE += mcp23x17
+endif
+
 ifneq (,$(filter mtd_%,$(USEMODULE)))
   USEMODULE += mtd
 endif
