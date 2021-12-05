@@ -17,13 +17,14 @@
  * @}
  */
 
+#include "clk.h"
 #include "cpu.h"
 #include "periph_conf.h"
 
 #include "vendor/prci_driver.h"
 
 #if IS_ACTIVE(CONFIG_USE_CLOCK_HFROSC) || IS_ACTIVE(CONFIG_USE_CLOCK_HFROSC_PLL)
-static uint32_t _cpu_frequency = 0;
+uint32_t cpu_coreclk = 0;
 #endif
 
 void fe310_clock_init(void)
@@ -92,21 +93,10 @@ void fe310_clock_init(void)
         /* Don't use PLL clock source */
         PRCI_REG(PRCI_PLLCFG) &= ~PLL_SEL(PLL_SEL_PLL);
     }
-}
 
-uint32_t cpu_freq(void)
-{
 #if IS_ACTIVE(CONFIG_USE_CLOCK_HFROSC) || IS_ACTIVE(CONFIG_USE_CLOCK_HFROSC_PLL)
-    /* Clock frequency with HFROSC cannot be determined precisely from
-       settings */
-    /* If not done already, estimate the CPU frequency */
-    if (_cpu_frequency == 0) {
-        /* Ignore the first run (for icache reasons) */
-        _cpu_frequency = PRCI_measure_mcycle_freq(3000, RTC_FREQ);
-        _cpu_frequency = PRCI_measure_mcycle_freq(3000, RTC_FREQ);
-    }
-    return _cpu_frequency;
-#else
-    return CLOCK_CORECLOCK;
+    /* Ignore the first run (for icache reasons) */
+    cpu_coreclk = PRCI_measure_mcycle_freq(3000, RTC_FREQ);
+    cpu_coreclk = PRCI_measure_mcycle_freq(3000, RTC_FREQ);
 #endif
 }

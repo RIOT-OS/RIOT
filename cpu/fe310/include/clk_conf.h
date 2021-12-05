@@ -113,7 +113,7 @@ extern "C" {
 
 /*
    When using HFROSC input clock, the core clock cannot be computed from settings,
-   call cpu_freq() to get the configured CPU frequency.
+   in this case, coreclk() returns the configured CPU frequency.
  */
 #ifndef CONFIG_CLOCK_DESIRED_FREQUENCY
 #define CONFIG_CLOCK_DESIRED_FREQUENCY     MHZ(320)
