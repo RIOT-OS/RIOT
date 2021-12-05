@@ -19,9 +19,3 @@ QUIET ?= 1
 FEATURES_OPTIONAL += periph_timer
 
 include $(RIOTBASE)/Makefile.include
-
-ifeq (native,$(BOARD))
-  # For the native board, CLOCK_CORECLOCK is undefined. But we need
-  # a valid number to get the example compiled
-  CFLAGS += -DCLOCK_CORECLOCK=1000000000
-endif
