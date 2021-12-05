@@ -123,7 +123,7 @@ extern "C" {
 #define MCP23X17_SAUL_GPIO_PARAMS { \
                                         .dev = 0, \
                                         .gpio = { \
-                                            .name = "PA0 Input", \
+                                            .name = "MCP23x17_0 PA0 Input", \
                                             .pin = MCP23X17_GPIO_PIN(0, 0), \
                                             .mode = GPIO_IN, \
                                             .flags = 0, \
@@ -132,7 +132,7 @@ extern "C" {
                                  { \
                                         .dev = 0, \
                                         .gpio = { \
-                                            .name = "PB5 Output", \
+                                            .name = "MCP23x17_0 PB5 Output", \
                                             .pin = MCP23X17_GPIO_PIN(1, 5), \
                                             .mode = GPIO_OUT, \
                                             .flags = SAUL_GPIO_INIT_CLEAR, \

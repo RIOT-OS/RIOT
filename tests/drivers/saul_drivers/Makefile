@@ -34,6 +34,9 @@ endif
 ifneq (,$(filter lpsxxx,$(DRIVERS)))
   USEMODULE += lps22hh
 endif
+ifneq (,$(filter mcp23x17,$(DRIVERS)))
+  USEMODULE += mcp23x17_i2c
+endif
 ifneq (,$(filter mhz19,$(DRIVERS)))
   USEMODULE += mhz19_uart
 endif
