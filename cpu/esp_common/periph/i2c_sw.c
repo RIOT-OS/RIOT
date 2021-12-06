@@ -210,6 +210,16 @@ void i2c_init(i2c_t dev)
         gpio_init(_i2c_bus[dev].sda, GPIO_IN_OD_PU)) {
         return;
     }
+
+    /* clear the bus by sending 10 clock pulses while SDA is LOW */
+    gpio_set(i2c_config[dev].scl);
+    gpio_set(i2c_config[dev].sda);
+    gpio_clear(i2c_config[dev].sda);
+    for (int i = 0; i < 20; i++) {
+        gpio_toggle(i2c_config[dev].scl);
+    }
+    gpio_set(i2c_config[dev].sda);
+
 #else /* MCU_ESP32 */
     /*
      * Due to critical timing required by the I2C software implementation,
@@ -226,8 +236,8 @@ void i2c_init(i2c_t dev)
      * When I2C_CLOCK_STRETCH is 0 (disabled), SCL is instead an always driven
      * output GPIO with no pull-up.
      */
-    if (gpio_init(_i2c_bus[dev].scl, I2C_CLOCK_STRETCH ? GPIO_IN_PU : GPIO_OUT)
-        || gpio_init(_i2c_bus[dev].sda, GPIO_IN_PU)) {
+    if (gpio_init(_i2c_bus[dev].scl, I2C_CLOCK_STRETCH ? GPIO_IN_PU : GPIO_OUT) ||
+        gpio_init(_i2c_bus[dev].sda, GPIO_IN_PU)) {
         return;
     }
 #endif /* MCU_ESP32 */
