@@ -8,11 +8,8 @@ USEMODULE += shell_commands
 USEMODULE += nimble_scanner
 USEMODULE += nimble_scanlist
 USEMODULE += nimble_adv_ext
-USEMODULE += nimble_phy_2mbit
-
-ifneq (,$(filter nrf52840dk nrf52840dongle,$(BOARD)))
-  USEMODULE += nimble_phy_coded
-endif
+FEATURES_OPTIONAL += ble_phy_2mbit
+FEATURES_OPTIONAL += ble_phy_coded
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
