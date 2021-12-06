@@ -159,19 +159,19 @@ static int _be(uint8_t role, const uint8_t *addr)
     slot_t *s = _get_addr(addr);
     if (s != NULL) {
         mutex_unlock(&_lock);
-        return NIMBLE_STATCONN_INUSE;
+        return -EALREADY;
     }
     s = _get_state(UNUSED);
     if (s == NULL) {
         mutex_unlock(&_lock);
-        return NIMBLE_STATCONN_NOSLOT;
+        return -ENOMEM;
     }
 
     s->state = (role | PENDING);
     memcpy(s->addr, addr, BLE_ADDR_LEN);
     mutex_unlock(&_lock);
     _activate(role);
-    return NIMBLE_STATCONN_OK;
+    return 0;
 }
 
 void nimble_statconn_init(void)
@@ -226,7 +226,7 @@ int nimble_statconn_rm(const uint8_t *addr)
     slot_t *s = _get_addr(addr);
     if (s == NULL) {
         mutex_unlock(&_lock);
-        return NIMBLE_STATCONN_NOTCONN;
+        return -ENOTCONN;
     }
     uint8_t role = (s->state & ROLE_M) ? ROLE_M : ROLE_S;
 
@@ -242,5 +242,5 @@ int nimble_statconn_rm(const uint8_t *addr)
         _activate(ROLE_S);
     }
 
-    return NIMBLE_STATCONN_OK;
+    return 0;
 }
