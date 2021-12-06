@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include "event.h"
 #if IS_USED(MODULE_UWB_CORE_EVENT_THREAD)
-#include "event/thread"
+#include "event/thread.h"
 #endif
 
 #ifdef __cplusplus
