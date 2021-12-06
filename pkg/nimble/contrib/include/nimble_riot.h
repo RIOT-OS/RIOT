@@ -70,6 +70,20 @@ extern "C" {
 #endif
 
 /**
+ * @brief   BLE PHY modes
+ */
+typedef enum {
+    NIMBLE_PHY_INVALID,         /**< PHY mode invalid */
+    NIMBLE_PHY_1M,              /**< legacy 1Mbit PHY mode (always supported) */
+#if IS_USED(MODULE_NIMBLE_PHY_2MBIT)
+    NIMBLE_PHY_2M,              /**< 2Mbit PHY mode */
+#endif
+#if IS_USED(MODULE_NIMBLE_PHY_CODED)
+    NIMBLE_PHY_CODED,           /**< Coded (long range) PHY mode */
+#endif
+} nimble_phy_t;
+
+/**
  * @brief   Export our own address type for later usage
  */
 extern uint8_t nimble_riot_own_addr_type;
