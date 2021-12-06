@@ -76,6 +76,7 @@ tests/periph_*
 tests/pkg_elk
 tests/pkg_uzlib
 tests/prng_*
+tests/trace
 tests/xtimer_*
 tests/ztimer_*
 examples/hello-world

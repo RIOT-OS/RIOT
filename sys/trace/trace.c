@@ -23,7 +23,7 @@
 #include <stdio.h>
 
 #include "irq.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifndef CONFIG_TRACE_BUFSIZE
 #define CONFIG_TRACE_BUFSIZE 512
@@ -42,7 +42,7 @@ void trace(uint32_t val)
     unsigned state = irq_disable();
 
     tracebuf[tracebuf_pos % CONFIG_TRACE_BUFSIZE] =
-        (tracebuf_entry_t){ .time = xtimer_now_usec(), .val = val };
+        (tracebuf_entry_t){ .time = ztimer_now(ZTIMER_USEC), .val = val };
     tracebuf_pos++;
     irq_restore(state);
 }
