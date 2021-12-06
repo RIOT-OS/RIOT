@@ -23,6 +23,7 @@
 #include <limits.h>
 
 #include "eagle_soc.h"
+#include "cpu_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
