@@ -22,7 +22,7 @@
 #include "mtd_native.h"
 
 mtd_native_dev_t mtd0_dev = {
-    .dev = {
+    .base = {
         .driver = &native_flash_driver,
         .sector_count = MTD_SECTOR_NUM,
         .pages_per_sector = MTD_SECTOR_SIZE / MTD_PAGE_SIZE,
@@ -31,7 +31,7 @@ mtd_native_dev_t mtd0_dev = {
     .fname = MTD_NATIVE_FILENAME,
 };
 
-mtd_dev_t *mtd0 = (mtd_dev_t *)&mtd0_dev;
+mtd_dev_t *mtd0 = &mtd0_dev.base;
 #endif
 
 #ifdef MODULE_VFS

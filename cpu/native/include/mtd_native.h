@@ -28,7 +28,7 @@ extern "C" {
 
 /** mtd native descriptor */
 typedef struct mtd_native_dev {
-    mtd_dev_t dev;      /**< mtd generic device */
+    mtd_dev_t base;     /**< mtd generic device */
     const char *fname;  /**< filename to use for memory emulation */
 } mtd_native_dev_t;
 
