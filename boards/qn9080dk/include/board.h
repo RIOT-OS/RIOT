@@ -29,16 +29,6 @@ extern "C" {
 #endif
 
 /**
- * @name    Clock configuration
- * @{
- */
-#ifndef CLOCK_CORECLOCK
-/* Using 32MHz internal oscillator as default clock source */
-#define CLOCK_CORECLOCK     (32000000ul)
-#endif
-/** @} */
-
-/**
  * @name    LED configuration
  * @{
  */

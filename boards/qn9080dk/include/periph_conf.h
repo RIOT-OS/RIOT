@@ -21,12 +21,23 @@
 
 #include <stdint.h>
 
+#include "macros/units.h"
 #include "cpu.h"
 #include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @name    Clock configuration
+ * @{
+ */
+#ifndef CLOCK_CORECLOCK
+/* Using 32MHz internal oscillator as default clock source */
+#define CLOCK_CORECLOCK     MHZ(32)     /**< System core clock frequency in Hz */
+#endif
+/** @} */
 
 /**
  * @name ADC configuration
