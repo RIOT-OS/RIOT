@@ -8,6 +8,7 @@
 : ${TEST_BOARDS_LLVM_COMPILE:=""}
 
 : ${TEST_KCONFIG_BOARDS_AVAILABLE:="
+adafruit-itsybitsy-m4
 arduino-due
 arduino-leonardo
 arduino-mega2560
