@@ -39,7 +39,7 @@ int _nimble_statconn_handler(int argc, char **argv)
     }
 
     if (strncmp(argv[1], "addm", 4) == 0) {
-        if (nimble_statconn_add_master(addr) == NIMBLE_STATCONN_OK) {
+        if (nimble_statconn_add_master(addr) == 0) {
             puts("success: connecting to peer as slave");
         }
         else {
@@ -47,7 +47,7 @@ int _nimble_statconn_handler(int argc, char **argv)
         }
     }
     else if (strncmp(argv[1], "adds", 4) == 0) {
-        if (nimble_statconn_add_slave(addr) == NIMBLE_STATCONN_OK) {
+        if (nimble_statconn_add_slave(addr) == 0) {
             puts("success: connecting to peer as master");
         }
         else {
@@ -55,7 +55,7 @@ int _nimble_statconn_handler(int argc, char **argv)
         }
     }
     else if (strncmp(argv[1], "rm", 2) == 0) {
-        if (nimble_statconn_rm(addr) == NIMBLE_STATCONN_OK) {
+        if (nimble_statconn_rm(addr) == 0) {
             puts("success: closed connection to peer");
         }
         else {
