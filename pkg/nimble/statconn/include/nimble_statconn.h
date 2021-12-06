@@ -50,6 +50,7 @@
 #ifndef NIMBLE_STATCONN_H
 #define NIMBLE_STATCONN_H
 
+#include <errno.h>
 #include <stdint.h>
 
 #include "nimble_netif.h"
@@ -113,16 +114,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Return codes used by the statconn module
- */
-enum {
-    NIMBLE_STATCONN_OK      =  0,   /**< all groovy */
-    NIMBLE_STATCONN_NOSLOT  = -1,   /**< no more connection slot available */
-    NIMBLE_STATCONN_NOTCONN = -2,   /**< given address is not managed */
-    NIMBLE_STATCONN_INUSE   = -3,   /**< given peer is already managed */
-};
-
-/**
  * @brief   Initialize the statconn module
  *
  * @warning This function **must** only be called once. Typically this is done
@@ -148,9 +139,9 @@ void nimble_statconn_eventcb(nimble_netif_eventcb_t cb);
  *
  * @param[in] addr      BLE address of the peer
  *
- * @return  NIMBLE_STATCONN_OK if peer was successfully added
- * @return  NIMBLE_STATCONN_INUSE if the peer address is already in use
- * @return  NIMBLE_STATCONN_NOSLOT if no empty connection slot is available
+ * @return  0 if peer was successfully added
+ * @return  -EALREADY if the peer address is already in use
+ * @return  -ENOMEM if no empty connection slot is available
  */
 int nimble_statconn_add_master(const uint8_t *addr);
 
@@ -159,9 +150,9 @@ int nimble_statconn_add_master(const uint8_t *addr);
  *
  * @param[in] addr      BLE address of the peer
  *
- * @return  NIMBLE_STATCONN_OK if peer was successfully added
- * @return  NIMBLE_STATCONN_INUSE if the peer address is already in use
- * @return  NIMBLE_STATCONN_NOSLOT if no empty connection slot is available
+ * @return  0 if peer was successfully added
+ * @return  -EALREADY if the peer address is already in use
+ * @return  -ENOMEM if no empty connection slot is available
  */
 int nimble_statconn_add_slave(const uint8_t *addr);
 
@@ -170,8 +161,8 @@ int nimble_statconn_add_slave(const uint8_t *addr);
  *
  * @param[in] addr      BLE address of the peer
  *
- * @return  NIMBLE_STATCONN_OK if peer was successfully removed
- * @return  NIMBLE_STATCONN_NOTCONN if given address is not managed
+ * @return  0 if peer was successfully removed
+ * @return  -ENOTCONN if given address is not managed
  */
 int nimble_statconn_rm(const uint8_t *addr);
 
