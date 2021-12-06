@@ -65,6 +65,10 @@ ifneq (,$(filter nimble_autoadv,$(USEMODULE)))
   USEMODULE += bluetil_ad
 endif
 
+ifneq (,$(filter nimble_autoconn_ext,$(USEMODULE)))
+  USEMODULE += nimble_netif_ext
+endif
+
 ifneq (,$(filter nimble_autoconn_%,$(USEMODULE)))
   USEMODULE += nimble_autoconn
 endif
