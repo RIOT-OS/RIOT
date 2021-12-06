@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Freie Universität Berlin
+ * Copyright (C) 2019-2021 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -69,6 +69,13 @@ extern "C" {
 #define NIMBLE_RPBLE_EVAL_ITVL_MAX_MS   13000U
 #endif
 
+/**
+ * @brief   Default BLE PHY mode used by rpble
+ */
+#ifndef NIMBLE_RPBLE_PHY_MODE
+#define NIMBLE_RPBLE_PHY_MODE           NIMBLE_PHY_1M
+#endif
+
 #ifndef NIMBLE_RPBLE_PARAMS
 #define NIMBLE_RPBLE_PARAMS                                   \
     { .scan_itvl_ms         = NIMBLE_RPBLE_SCAN_ITVL_MS,      \
@@ -81,6 +88,7 @@ extern "C" {
       .conn_itvl_max_ms     = NIMBLE_RPBLE_CONN_ITVL_MAX_MS,  \
       .conn_latency         = NIMBLE_RPBLE_CONN_LATENCY,      \
       .conn_super_to_ms     = NIMBLE_RPBLE_CONN_SUPER_TO_MS,  \
+      .phy_mode             = NIMBLE_RPBLE_PHY_MODE,          \
       .eval_itvl_min_ms     = NIMBLE_RPBLE_EVAL_ITVL_MIN_MS,  \
       .eval_itvl_max_ms     = NIMBLE_RPBLE_EVAL_ITVL_MAX_MS }
 #endif

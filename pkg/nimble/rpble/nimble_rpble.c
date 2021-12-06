@@ -50,9 +50,8 @@
 #define POS_FREE_SLOTS      22
 
 /* keep the timing parameters for connections and advertisements */
-static struct ble_gap_adv_params _adv_params = { 0 };
-static struct ble_gap_conn_params _conn_params = { 0 };
-static uint32_t _conn_scan_to;      /* in ms */
+static nimble_netif_accept_cfg_t _accept_params;
+static nimble_netif_connect_cfg_t _conn_params;
 
 /* local RPL context */
 static nimble_rpble_ctx_t _local_rpl_ctx;
@@ -107,7 +106,7 @@ static void _children_accept(void)
     assert(res == BLUETIL_AD_OK);
 
     /* start advertising this node */
-    res = nimble_netif_accept(ad.buf, ad.pos, &_adv_params);
+    res = nimble_netif_accept(ad.buf, ad.pos, &_accept_params);
     assert(res == 0);
 }
 
@@ -118,10 +117,17 @@ static void _on_scan_evt(uint8_t type, const ble_addr_t *addr,
     int res;
     (void)info;
 
+#if IS_USED(MODULE_NIMBLE_RPBLE_EXT)
+    if ((type != (NIMBLE_SCANNER_EXT_ADV | BLE_HCI_ADV_CONN_MASK)) ||
+        (info->status != BLE_GAP_EXT_ADV_DATA_STATUS_COMPLETE)) {
+        return;
+    }
+#else
     /* filter out all non-connectible advertisements */
     if (type != BLE_HCI_ADV_RPT_EVTYPE_ADV_IND) {
         return;
     }
+#endif
 
     /* check if scanned node does actually speak rpble */
     bluetil_ad_data_t sd_field;
@@ -199,7 +205,7 @@ static void _parent_connect(struct ble_npl_event *ev)
     }
 
     /* try to connect to parent */
-    int res = nimble_netif_connect(&_psel.addr, &_conn_params, _conn_scan_to);
+    int res = nimble_netif_connect(&_psel.addr, &_conn_params);
     if (res < 0) {
         _parent_find();
         return;
@@ -283,19 +289,36 @@ int nimble_rpble_param_update(const nimble_rpble_cfg_t *cfg)
                                         cfg->eval_itvl_max_ms);
     ble_npl_time_ms_to_ticks(itvl, &_eval_itvl);
 
-    _adv_params.conn_mode = BLE_GAP_CONN_MODE_UND;
-    _adv_params.disc_mode = BLE_GAP_DISC_MODE_GEN;
-    _adv_params.itvl_min = BLE_GAP_ADV_ITVL_MS(cfg->adv_itvl_ms);
-    _adv_params.itvl_max = _adv_params.itvl_min;
+    /* accept parameter extraction */
+    memset(&_accept_params, 0, sizeof(_accept_params));
+#if IS_USED(MODULE_NIMBLE_RPBLE_EXT)
+    _accept_params.flags = 0;
+    _accept_params.primary_phy = cfg->phy_mode;
+    _accept_params.secondary_phy = cfg->phy_mode;
+#else
+    _accept_params.flags = NIMBLE_NETIF_FLAG_LEGACY;
+    _accept_params.primary_phy = NIMBLE_PHY_1M;
+    _accept_params.secondary_phy = NIMBLE_PHY_1M;
+#endif
+    _accept_params.adv_itvl_ms = cfg->adv_itvl_ms;
+    _accept_params.timeout_ms = BLE_HS_FOREVER;
+    _accept_params.own_addr_type = nimble_riot_own_addr_type;
 
-    _conn_params.scan_itvl = BLE_GAP_SCAN_ITVL_MS(cfg->conn_scan_itvl_ms);
-    _conn_params.scan_window = BLE_GAP_SCAN_WIN_MS(cfg->conn_scan_win_ms);
-    _conn_params.latency = cfg->conn_latency;
-    _conn_params.supervision_timeout =
-                        BLE_GAP_SUPERVISION_TIMEOUT_MS(cfg->conn_super_to_ms);
-    _conn_params.itvl_min = BLE_GAP_CONN_ITVL_MS(cfg->conn_itvl_min_ms);
-    _conn_params.itvl_max = BLE_GAP_CONN_ITVL_MS(cfg->conn_itvl_max_ms);
-    _conn_scan_to = cfg->conn_scan_to_ms;
+    /* connection parameter extraction */
+    memset(&_conn_params, 0, sizeof(_conn_params));
+    _conn_params.scan_itvl_ms = cfg->conn_scan_itvl_ms;
+    _conn_params.scan_window_ms = cfg->conn_scan_win_ms;
+    _conn_params.conn_itvl_min_ms = cfg->conn_itvl_min_ms;
+    _conn_params.conn_itvl_max_ms = cfg->conn_itvl_max_ms;
+    _conn_params.conn_supervision_timeout_ms = cfg->conn_super_to_ms;
+    _conn_params.conn_slave_latency = cfg->conn_latency;
+    _conn_params.timeout_ms = cfg->conn_scan_to_ms;
+#if IS_USED(MODULE_NIMBLE_RPBLE_EXT)
+    _conn_params.phy_mode = cfg->phy_mode;
+#else
+    _conn_params.phy_mode = NIMBLE_PHY_1M;
+#endif
+    _conn_params.own_addr_type = nimble_riot_own_addr_type;
 
     /* register event callback */
     nimble_netif_eventcb(_on_netif_evt);
@@ -304,9 +327,18 @@ int nimble_rpble_param_update(const nimble_rpble_cfg_t *cfg)
     nimble_scanner_cfg_t scan_params = { 0 };
     scan_params.itvl_ms = cfg->scan_itvl_ms;
     scan_params.win_ms = cfg->scan_win_ms;
-    scan_params.flags = NIMBLE_SCANNER_PASSIVE
-                        | NIMBLE_SCANNER_FILTER_DUPS
-                        | NIMBLE_SCANNER_PHY_1M;
+    scan_params.flags = (NIMBLE_SCANNER_PASSIVE | NIMBLE_SCANNER_FILTER_DUPS);
+
+#if IS_USED(MODULE_NIMBLE_RPBLE_EXT) && IS_USED(MODULE_NIMBLE_PHY_CODED)
+    if (cfg->phy_mode == NIMBLE_PHY_CODED) {
+        scan_params.flags |= NIMBLE_SCANNER_PHY_CODED;
+    }
+    else {
+        scan_params.flags |= NIMBLE_SCANNER_PHY_1M;
+    }
+#else
+    scan_params.flags |= NIMBLE_SCANNER_PHY_1M;
+#endif
     nimble_scanner_init(&scan_params, _on_scan_evt);
 
     /* start to look for parents */

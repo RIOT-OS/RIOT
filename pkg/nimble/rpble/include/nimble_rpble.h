@@ -113,6 +113,7 @@ typedef struct {
     uint16_t conn_latency;      /**< used slave latency for parent connection */
     uint32_t conn_super_to_ms;  /**< used supervision timeout for parent
                                  *   connection, in ms */
+    nimble_phy_t phy_mode;      /**< BLE PHY mode to use */
     uint32_t eval_itvl_min_ms;  /**< amount of time a node searches for
                                  *   potential parents, lower bound in ms */
     uint32_t eval_itvl_max_ms;  /**< amount of time a node searches for

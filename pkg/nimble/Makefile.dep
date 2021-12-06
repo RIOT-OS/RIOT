@@ -84,6 +84,11 @@ ifneq (,$(filter nimble_phy_coded,$(USEMODULE)))
   FEATURES_REQUIRED += ble_phy_coded
 endif
 
+ifneq (,$(filter nimble_rpble_ext,$(USEMODULE)))
+  USEMODULE += nimble_rpble
+  USEMODULE += nimble_netif_ext
+endif
+
 ifneq (,$(filter nimble_rpble,$(USEMODULE)))
   USEMODULE += gnrc_rpl
   USEMODULE += nimble_netif
