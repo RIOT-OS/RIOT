@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Freie Universität Berlin
+ * Copyright (C) 2018-2021 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -54,6 +54,8 @@
 #ifndef NIMBLE_NETIF_PRIO
 #define NIMBLE_NETIF_PRIO       GNRC_NETIF_PRIO
 #endif
+
+#define EXT_ADV_INST            0
 
 /* thread flag used for signaling transmit readiness */
 #define FLAG_TX_UNSTALLED       (1u << 13)
@@ -543,10 +545,14 @@ static int _on_gap_slave_evt(struct ble_gap_event *event, void *arg)
             /* nothing to do here */
             break;
         case BLE_GAP_EVENT_ADV_COMPLETE: {
-            uint8_t addr[BLE_ADDR_LEN];
-            nimble_netif_conn_free(handle, addr);
-            _notify(handle, NIMBLE_NETIF_ACCEPT_STOP, addr);
+            if (conn->state == NIMBLE_NETIF_ADV) {
+                uint8_t addr[BLE_ADDR_LEN];
+                nimble_netif_conn_free(handle, addr);
+                _notify(handle, NIMBLE_NETIF_ACCEPT_STOP, addr);
+            }
         }
+        case BLE_GAP_EVENT_PHY_UPDATE_COMPLETE:
+            break;
         default:
             break;
     }
@@ -577,14 +583,10 @@ void nimble_netif_eventcb(nimble_netif_eventcb_t cb)
 }
 
 int nimble_netif_connect(const ble_addr_t *addr,
-                         struct ble_gap_conn_params *conn_params,
-                         uint32_t timeout)
+                         const nimble_netif_connect_cfg_t *params)
 {
     assert(addr);
-    assert(_eventcb);
-
-    uint16_t itvl_min = 0;
-    uint16_t itvl_max = 0;
+    assert(params);
 
     /* the netif_conn module expects addresses in network byte order */
     uint8_t addrn[BLE_ADDR_LEN];
@@ -602,33 +604,63 @@ int nimble_netif_connect(const ble_addr_t *addr,
         return -ENOMEM;
     }
 
-    if ((conn_params != NULL)
-        && (conn_params->itvl_min != conn_params->itvl_max)) {
-        /* we need to save the min/max intervals in order to restore them
-         * later on */
-        itvl_min = conn_params->itvl_min;
-        itvl_max = conn_params->itvl_max;
-
-        uint16_t itvl = nimble_netif_conn_gen_itvl(itvl_min, itvl_max);
-        if (itvl == 0) {
-            return -ECANCELED;
-        }
-        conn_params->itvl_min = itvl;
-        conn_params->itvl_max = itvl;
+    /* generate connection interval */
+    uint16_t itvl = params->conn_itvl_min_ms;
+    if (params->conn_itvl_min_ms < params->conn_itvl_max_ms) {
+        itvl = nimble_netif_conn_gen_itvl(params->conn_itvl_min_ms,
+                                          params->conn_itvl_max_ms);
+    }
+    if (itvl == 0) {
+        nimble_netif_conn_free(handle, NULL);
+        return -ECANCELED;
     }
 
-    int res = ble_gap_connect(nimble_riot_own_addr_type, addr, timeout,
-                              conn_params, _on_gap_master_evt, (void *)handle);
-    assert(res == 0);
-    (void)res;
+    struct ble_gap_conn_params p = {
+        .scan_itvl = BLE_GAP_SCAN_ITVL_MS(params->scan_itvl_ms),
+        .scan_window = BLE_GAP_SCAN_WIN_MS(params->scan_window_ms),
+        .itvl_min = BLE_GAP_CONN_ITVL_MS(itvl),
+        .itvl_max = BLE_GAP_CONN_ITVL_MS(itvl),
+        .latency = params->conn_slave_latency,
+        .supervision_timeout = BLE_GAP_SUPERVISION_TIMEOUT_MS(
+                                        params->conn_supervision_timeout_ms),
+        .min_ce_len = 0,
+        .max_ce_len = 0,
+    };
 
-    if (itvl_min != itvl_max) {
-        conn_params->itvl_min = itvl_min;
-        conn_params->itvl_max = itvl_max;
+#if MYNEWT_VAL_BLE_EXT_ADV
+    uint8_t phy_mask;
+    if (params->phy_mode == NIMBLE_PHY_1M) {
+        phy_mask = BLE_GAP_LE_PHY_1M_MASK;
+    }
+#if IS_USED(MODULE_NIMBLE_PHY_2MBIT)
+    else if (params->phy_mode == NIMBLE_PHY_2M) {
+        phy_mask = (BLE_GAP_LE_PHY_1M_MASK | BLE_GAP_LE_PHY_2M_MASK);
+    }
+#endif
+#if IS_USED(MODULE_NIMBLE_PHY_CODED)
+    else if (params->phy_mode == NIMBLE_PHY_CODED) {
+        phy_mask = BLE_GAP_LE_PHY_CODED_MASK;
+    }
+#endif
+    else {
+        return -EINVAL;
+    }
+
+    int res = ble_gap_ext_connect(params->own_addr_type, addr,
+                                  params->timeout_ms, phy_mask, &p, &p, &p,
+                                  _on_gap_master_evt, (void *)handle);
+#else
+    uint32_t timeout = (params->timeout_ms == 0) ? BLE_HS_FOREVER
+                                                 : params->timeout_ms;
+    int res = ble_gap_connect(params->own_addr_type, addr,
+                              timeout, &p,
+                              _on_gap_master_evt, (void *)handle);
+#endif
+    if (res != 0) {
+        return -EIO;
     }
 
     _notify(handle, NIMBLE_NETIF_INIT_MASTER, addrn);
-
     return handle;
 }
 
@@ -642,23 +674,42 @@ int nimble_netif_close(int handle)
         return -ENOTCONN;
     }
 
-    int res = ble_gap_terminate(ble_l2cap_get_conn_handle(conn->coc),
-                                BLE_ERR_REM_USER_CONN_TERM);
-    assert(res == 0);
-    (void)res;
+    int res = ble_gap_terminate(conn->gaphandle, BLE_ERR_REM_USER_CONN_TERM);
+    if (res != 0) {
+        return -EIO;
+    }
 
     return 0;
 }
 
-static int _accept(const uint8_t *ad, size_t ad_len, const ble_addr_t *addr,
-                   uint32_t timeout,
-                   const struct ble_gap_adv_params *adv_params)
+#if MYNEWT_VAL_BLE_EXT_ADV
+static int _get_phy_hci(uint8_t mode)
 {
-    assert(adv_params);
+    switch (mode) {
+        case NIMBLE_PHY_1M:
+            return BLE_HCI_LE_PHY_1M;
+#if IS_USED(MODULE_NIMBLE_PHY_2MBIT)
+        case NIMBLE_PHY_2M:
+            return BLE_HCI_LE_PHY_2M;
+#endif
+#if IS_USED(MODULE_NIMBLE_PHY_CODED)
+        case NIMBLE_PHY_CODED:
+            return BLE_HCI_LE_PHY_CODED;
+#endif
+        default:
+            return -1;
+    }
+}
+#endif
 
+static int _accept(const uint8_t *ad, size_t ad_len, const ble_addr_t *addr,
+                   const nimble_netif_accept_cfg_t *params)
+{
     int handle;
     int res;
     (void)res;
+
+    assert(params);
 
     /* allocate a connection context for incoming connections */
     handle = nimble_netif_conn_start_adv();
@@ -666,39 +717,125 @@ static int _accept(const uint8_t *ad, size_t ad_len, const ble_addr_t *addr,
         return handle;
     }
 
-    /* set advertisement data */
-    if (ad != NULL) {
-        res = ble_gap_adv_set_data(ad, (int)ad_len);
-        assert(res == 0);
-    }
     /* remember address if applicable */
     if (addr) {
         nimble_netif_conn_t *conn = nimble_netif_conn_get(handle);
         bluetil_addr_swapped_cp(addr->val, conn->addr);
     }
 
-    /* remember context and start advertising */
-    res = ble_gap_adv_start(nimble_riot_own_addr_type, addr, timeout,
-                            adv_params, _on_gap_slave_evt, (void *)handle);
-    assert(res == 0);
+#if MYNEWT_VAL_BLE_EXT_ADV
+    struct ble_gap_ext_adv_params p;
+    memset(&p, 0, sizeof(p));
+
+    /* figure out PHY modes */
+    int phy_pri = _get_phy_hci(params->primary_phy);
+    int phy_sec = _get_phy_hci(params->secondary_phy);
+    if ((phy_pri < 0) || (phy_sec < 0)) {
+        nimble_netif_conn_free(handle, NULL);
+        return -EINVAL;
+    }
+    /* the 2M PHY is not allowed as primary phy, we need to used the 1M PHY
+     * instead. This is for convenience so uses may define 2M as primary PHY */
+    if (phy_pri == BLE_HCI_LE_PHY_2M) {
+        phy_pri = BLE_HCI_LE_PHY_1M;
+    }
+
+    if (addr != NULL) {
+        p.directed = 1;
+        memcpy(&p.peer, addr, sizeof(p.peer));
+        if (params->flags & NIMBLE_NETIF_FLAG_HD_MODE) {
+            p.high_duty_directed = 1;
+        }
+    }
+    else {
+        p.connectable = 1;
+    }
+    if (params->flags & NIMBLE_NETIF_FLAG_LEGACY) {
+        p.legacy_pdu = 1;
+        /* legacy connectable PDUs are always scannable */
+        p.scannable = 1;
+    }
+    p.itvl_min = BLE_GAP_ADV_ITVL_MS(params->adv_itvl_ms);
+    p.itvl_max = BLE_GAP_ADV_ITVL_MS(params->adv_itvl_ms);
+    p.channel_map = params->channel_map;
+    p.own_addr_type = params->own_addr_type;
+    p.primary_phy = (uint8_t)phy_pri;
+    p.secondary_phy = (uint8_t)phy_sec;
+    p.tx_power = params->tx_power;
+
+    res = ble_gap_ext_adv_configure(EXT_ADV_INST, &p, NULL,
+                                    _on_gap_slave_evt, (void *)handle);
+    if (res != 0) {
+        nimble_netif_conn_free(handle, NULL);
+        return -EINVAL;
+    }
+
+    if (ad != NULL) {
+        struct os_mbuf *data = os_msys_get_pkthdr(ad_len, 0);
+        if (data == NULL) {
+            nimble_netif_conn_free(handle, NULL);
+            return -ENOMEM;
+        }
+        res = os_mbuf_append(data, ad, ad_len);
+        if (res != 0) {
+            os_mbuf_free_chain(data);
+            nimble_netif_conn_free(handle, NULL);
+            return -ENOMEM;
+        }
+        res = ble_gap_ext_adv_set_data(EXT_ADV_INST, data);
+        assert(res == 0);
+    }
+    res = ble_gap_ext_adv_start(EXT_ADV_INST, params->timeout_ms / 10, 0);
+#else
+    uint8_t mode = (addr != NULL) ? BLE_GAP_CONN_MODE_DIR
+                                  : BLE_GAP_CONN_MODE_UND;
+    struct ble_gap_adv_params p = {
+        .conn_mode = mode,
+        .disc_mode = BLE_GAP_DISC_MODE_GEN,
+        .itvl_min = BLE_GAP_ADV_ITVL_MS(params->adv_itvl_ms),
+        .itvl_max = BLE_GAP_ADV_ITVL_MS(params->adv_itvl_ms),
+        .channel_map = params->channel_map,
+        .filter_policy = 0,
+        .high_duty_cycle = (params->flags & NIMBLE_NETIF_FLAG_HD_MODE) ? 1 : 0,
+    };
+
+    /* set advertisement data, if applicable */
+    if (ad != NULL) {
+        res = ble_gap_adv_set_data(ad, (int)ad_len);
+        if (res != 0) {
+            nimble_netif_conn_free(handle, NULL);
+            return -EINVAL;
+        }
+    }
+
+    /* start advertising */
+    uint32_t timeout = (params->timeout_ms == 0) ? BLE_HS_FOREVER
+                                                 : params->timeout_ms;
+    res = ble_gap_adv_start(params->own_addr_type, addr, timeout,
+                            &p, _on_gap_slave_evt, (void *)handle);
+#endif
+    if (res != 0) {
+        nimble_netif_conn_free(handle, NULL);
+        return -ECANCELED;
+    }
 
     _notify(handle, NIMBLE_NETIF_ACCEPTING, _netif.l2addr);
-
     return 0;
 }
 
 int nimble_netif_accept(const uint8_t *ad, size_t ad_len,
-                        const struct ble_gap_adv_params *adv_params)
+                        const nimble_netif_accept_cfg_t *params)
 {
     assert(ad != NULL);
     assert(ad_len > 0);
-    return _accept(ad, ad_len, NULL, BLE_HS_FOREVER, adv_params);
+    return _accept(ad, ad_len, NULL, params);
 }
 
-int nimble_netif_accept_direct(const ble_addr_t *addr, uint32_t timeout,
-                              const struct ble_gap_adv_params *adv_params)
+int nimble_netif_accept_direct(const ble_addr_t *addr,
+                               const nimble_netif_accept_cfg_t *params)
 {
-    return _accept(NULL, 0, addr, timeout, adv_params);
+    assert(addr);
+    return _accept(NULL, 0, addr, params);
 }
 
 int nimble_netif_accept_stop(void)
@@ -708,9 +845,15 @@ int nimble_netif_accept_stop(void)
         return -EALREADY;
     }
 
-    int res = ble_gap_adv_stop();
-    assert(res == 0);
-    (void)res;
+    int res;
+#if MYNEWT_VAL_BLE_EXT_ADV
+    res = ble_gap_ext_adv_stop(EXT_ADV_INST);
+#else
+    res = ble_gap_adv_stop();
+#endif
+    if (res != 0) {
+        return -EIO;
+    }
     nimble_netif_conn_free(handle, NULL);
     _notify(handle, NIMBLE_NETIF_ACCEPT_STOP, _netif.l2addr);
 

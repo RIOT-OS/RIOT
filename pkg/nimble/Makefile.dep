@@ -97,10 +97,20 @@ ifneq (,$(filter nimble_scanlist,$(USEMODULE)))
   USEMODULE += ztimer_usec
 endif
 
+ifneq (,$(filter nimble_statconn_ext,$(USEMODULE)))
+  USEMODULE += nimble_statconn
+  USEMODULE += nimble_netif_ext
+endif
+
 ifneq (,$(filter nimble_statconn,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += nimble_netif
   USEMODULE += nimble_addr
+endif
+
+ifneq (,$(filter nimble_netif_ext,$(USEMODULE)))
+  USEMODULE += nimble_netif
+  USEMODULE += nimble_adv_ext
 endif
 
 ifneq (,$(filter nimble_netif,$(USEMODULE)))

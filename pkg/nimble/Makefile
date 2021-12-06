@@ -23,7 +23,7 @@ else
   CFLAGS += -Wno-unused-but-set-variable
 endif
 
-IGNORE := nimble_autoconn_% nimble_phy_% nimble_adv_ext
+IGNORE := nimble_autoconn_% nimble_phy_% nimble_%_ext
 SUBMODS := $(filter-out $(IGNORE),$(filter nimble_%,$(USEMODULE)))
 
 .PHONY: all

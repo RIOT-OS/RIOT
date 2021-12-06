@@ -109,6 +109,7 @@ PSEUDOMODULES += netstats_rpl
 PSEUDOMODULES += nimble
 PSEUDOMODULES += nimble_adv_ext
 PSEUDOMODULES += nimble_autoconn_%
+PSEUDOMODULES += nimble_netif_ext
 PSEUDOMODULES += nimble_phy_coded
 PSEUDOMODULES += nimble_phy_2mbit
 PSEUDOMODULES += newlib
