@@ -114,6 +114,21 @@ extern "C" {
 #endif
 
 /**
+ * @brief   BLE PHY mode used by statconn. This value is only used if statconn
+ *          is used in its extended mode (module `nimble_statconn_ext`)
+ */
+#ifndef NIMBLE_STATCONN_PHY_MODE
+#define NIMBLE_STATCONN_PHY_MODE            NIMBLE_PHY_1M
+#endif
+
+/**
+ * @brief   Statconn connection parameters
+ */
+typedef struct {
+    nimble_phy_t phy_mode;          /**< BLE PHY mode used for the connection */
+} nimble_statconn_cfg_t;
+
+/**
  * @brief   Initialize the statconn module
  *
  * @warning This function **must** only be called once. Typically this is done
@@ -138,23 +153,31 @@ void nimble_statconn_eventcb(nimble_netif_eventcb_t cb);
  * connection by that master.
  *
  * @param[in] addr      BLE address of the peer
+ * @param[in] cfg       additional connection parameters, set to NULL to apply
+ *                      default values
  *
  * @return  0 if peer was successfully added
  * @return  -EALREADY if the peer address is already in use
  * @return  -ENOMEM if no empty connection slot is available
+ * @return  -EINVAL if invalid configuration parameters are given
  */
-int nimble_statconn_add_master(const uint8_t *addr);
+int nimble_statconn_add_master(const uint8_t *addr,
+                               const nimble_statconn_cfg_t *cfg);
 
 /**
  * @brief   Connect to a peer (slave) with a given address as master
  *
  * @param[in] addr      BLE address of the peer
+ * @param[in] cfg       additional connection parameters, set to NULL to apply
+ *                      default values
  *
  * @return  0 if peer was successfully added
  * @return  -EALREADY if the peer address is already in use
  * @return  -ENOMEM if no empty connection slot is available
+ * @return  -EINVAL if invalid configuration parameters are given
  */
-int nimble_statconn_add_slave(const uint8_t *addr);
+int nimble_statconn_add_slave(const uint8_t *addr,
+                              const nimble_statconn_cfg_t *cfg);
 
 /**
  * @brief   Remove the connection to the given peer
