@@ -12,6 +12,15 @@ USEMODULE += nimble_riot_contrib
 # RIOT port
 USEMODULE += nimble_porting_nimble
 
+# Pull in dependencies based on used features
+ifneq (,$(filter ble_phy_coded,$(FEATURES_USED)))
+  USEMODULE += nimble_phy_coded
+endif
+
+ifneq (,$(filter ble_phy_2mbit,$(FEATURES_USED)))
+  USEMODULE += nimble_phy_2mbit
+endif
+
 # NOTE: this dependency depends on inclusion order, for it to work properly
 # mynewt-core should be selected as nimble backend as early as possible,
 # i.e. at the application level.
@@ -65,10 +74,6 @@ ifneq (,$(filter nimble_autoconn,$(USEMODULE)))
   USEMODULE += nimble_netif
   USEMODULE += nimble_scanner
   USEMODULE += bluetil_ad
-endif
-
-ifneq (,$(filter nimble_phy_%,$(USEMODULE)))
-  USEMODULE += nimble_adv_ext
 endif
 
 ifneq (,$(filter nimble_phy_2mbit,$(USEMODULE)))

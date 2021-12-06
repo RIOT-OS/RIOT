@@ -26,6 +26,14 @@ ifneq (,$(filter nimble_controller,$(USEMODULE)))
   ifneq (,$(filter nimble_drivers_nrf5x,$(USEMODULE)))
     INCLUDES += $(NIMIBASE)/nimble/drivers/$(CPU_FAM)/include
   endif
+
+  # Enable additional PHY modes if requested by the build
+  ifneq (,$(filter ble_phy_2mbit,$(FEATURES_USED)))
+    CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_LE_2M_PHY=1
+  endif
+  ifneq (,$(filter ble_phy_coded,$(FEATURES_USED)))
+    CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_LE_CODED_PHY=1
+  endif
 endif
 
 # include nimble host headers
@@ -91,18 +99,6 @@ ifneq (,$(filter nimble_adv_ext,$(USEMODULE)))
   CFLAGS += -DMYNEWT_VAL_BLE_LL_EXT_ADV_AUX_PTR_CNT=2
   ifneq (,$(filter nimble_controller,$(USEMODULE)))
     CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_LL_EXT_ADV=1
-  endif
-endif
-
-ifneq (,$(filter nimble_phy_2mbit,$(USEMODULE)))
-  ifneq (,$(filter nimble_controller,$(USEMODULE)))
-    CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_LE_2M_PHY=1
-  endif
-endif
-
-ifneq (,$(filter nimble_phy_coded,$(USEMODULE)))
-  ifneq (,$(filter nimble_controller,$(USEMODULE)))
-    CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_LE_CODED_PHY=1
   endif
 endif
 
