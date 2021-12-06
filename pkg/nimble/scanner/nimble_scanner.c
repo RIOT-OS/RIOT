@@ -103,13 +103,16 @@ int nimble_scanner_start(void)
         const struct ble_gap_ext_disc_params *coded =
             (_scan_flags & NIMBLE_SCANNER_PHY_CODED) ? &_scan_params : NULL;
 
+        int32_t dur = (_scan_duration == BLE_HS_FOREVER) ? 0
+                                                         : _scan_duration / 10;
+
         int res = ble_gap_ext_disc(nimble_riot_own_addr_type,
-                                   _scan_duration / 10, 0, dups,
+                                   dur, 0, dups,
                                    BLE_HCI_SCAN_FILT_NO_WL, limited,
                                    uncoded, coded,
                                    _on_scan_evt, NULL);
 #else
-        int res = ble_gap_disc(nimble_riot_own_addr_type, 0,
+        int res = ble_gap_disc(nimble_riot_own_addr_type, _scan_duration,
                                &_scan_params, _on_scan_evt, NULL);
 #endif
         if (res != 0) {

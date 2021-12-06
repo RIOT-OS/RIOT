@@ -304,7 +304,9 @@ int nimble_rpble_param_update(const nimble_rpble_cfg_t *cfg)
     nimble_scanner_cfg_t scan_params = { 0 };
     scan_params.itvl_ms = cfg->scan_itvl_ms;
     scan_params.win_ms = cfg->scan_win_ms;
-    scan_params.flags = (NIMBLE_SCANNER_PASSIVE | NIMBLE_SCANNER_FILTER_DUPS);
+    scan_params.flags = NIMBLE_SCANNER_PASSIVE
+                        | NIMBLE_SCANNER_FILTER_DUPS
+                        | NIMBLE_SCANNER_PHY_1M;
     nimble_scanner_init(&scan_params, _on_scan_evt);
 
     /* start to look for parents */
