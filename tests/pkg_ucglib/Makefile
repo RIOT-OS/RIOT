@@ -20,6 +20,7 @@ endif
 
 # features depend on output type
 ifeq ($(TEST_OUTPUT),2)
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN=48*1024
   USEMODULE += ucglib_sdl
 endif
 
