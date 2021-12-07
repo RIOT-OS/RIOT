@@ -72,7 +72,7 @@ ifneq (,$(filter esp_now,$(USEMODULE)))
   ARCHIVES += -lespnow -lmesh
 endif
 
-ifneq (,$(filter cpp,$(FEATURES_USED)))
+ifneq (,$(filter cpp,$(USEMODULE)))
   ARCHIVES += -lstdc++
 endif
 
