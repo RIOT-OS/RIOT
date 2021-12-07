@@ -60,27 +60,6 @@ static const gpio_t arduino_pinmap[] = {
     ARDUINO_PIN_22,
     ARDUINO_PIN_23,
     ARDUINO_PIN_24,
-    ARDUINO_PIN_25,
-    ARDUINO_PIN_26,
-    ARDUINO_PIN_27,
-    ARDUINO_PIN_28,
-    ARDUINO_PIN_29,
-    ARDUINO_PIN_30,
-    ARDUINO_PIN_31,
-    ARDUINO_PIN_32,
-    ARDUINO_PIN_33,
-    ARDUINO_PIN_34,
-    ARDUINO_PIN_35,
-    ARDUINO_PIN_36,
-    ARDUINO_PIN_37,
-    ARDUINO_PIN_38,
-    ARDUINO_PIN_39,
-    ARDUINO_PIN_40,
-    ARDUINO_PIN_41,
-    ARDUINO_PIN_42,
-    ARDUINO_PIN_43,
-    ARDUINO_PIN_44,
-    ARDUINO_PIN_45,
 };
 
 /**
@@ -93,7 +72,7 @@ static const adc_t arduino_analog_map[] = {
     ARDUINO_A3,
     ARDUINO_A4,
     ARDUINO_A5,
-    ARDUINO_A6,
+    ADC_UNDEF,
     ARDUINO_A7,
 };
 
