@@ -57,9 +57,9 @@ static int mqtt_read(struct Network *n, unsigned char *buf, int len,
 
     if (IS_USED(MODULE_LWIP)) {
         /* As LWIP doesn't support packet reading byte per byte and
-        * PAHO MQTT reads like that to decode it on the fly,
-        * we read TSRB_MAX_SIZE at once and keep them in a ring buffer.
-        */
+         * PAHO MQTT reads like that to decode it on the fly,
+         * we read TSRB_MAX_SIZE at once and keep them in a ring buffer.
+         */
         _buf = _temp_buf;
         _len = TSRB_MAX_SIZE;
         _timeout = 0;
