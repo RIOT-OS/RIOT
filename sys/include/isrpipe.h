@@ -55,15 +55,27 @@ typedef struct {
 void isrpipe_init(isrpipe_t *isrpipe, uint8_t *buf, size_t bufsize);
 
 /**
- * @brief   Put one character into the isrpipe's buffer
+ * @brief   Put one byte into the isrpipe's buffer
  *
- * @param[in]   isrpipe     isrpipe object to initialize
- * @param[in]   c           character to add to isrpipe buffer
+ * @param[in]   isrpipe     isrpipe object to operate on
+ * @param[in]   c           byte to add to isrpipe buffer
  *
- * @returns     0 if character could be added
+ * @returns     0 if byte could be added
  * @returns     -1 if buffer was full
  */
 int isrpipe_write_one(isrpipe_t *isrpipe, uint8_t c);
+
+/**
+ * @brief   Put number of bytes into the isrpipe's buffer
+ *
+ * @param[in]   isrpipe     isrpipe object to operate on
+ * @param[in]   buf         bytes to add to isrpipe buffer
+ * @param[in]   n           number of bytes to add from buf to isrpipe's buffer
+ *
+ * @returns     number of bytes that could be added
+ * @returns     -1 if buffer was full
+ */
+int isrpipe_write(isrpipe_t *isrpipe, const uint8_t *buf, size_t n);
 
 /**
  * @brief   Read data from isrpipe (blocking)
