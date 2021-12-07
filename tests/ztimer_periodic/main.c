@@ -41,7 +41,7 @@ static const char *_names[] = { "ZTIMER_MSEC", "ZTIMER_USEC" };
 static uint32_t _intervals[] = { 100, 10000 };
 static uint32_t _max_offsets[] = { 2, 100 };
 
-static int callback(void *arg)
+static bool callback(void *arg)
 {
     _times[_count] = ztimer_now(arg);
 
@@ -58,7 +58,7 @@ static int callback(void *arg)
         mutex_unlock(&_mutex);
     }
 
-    return (_count == REPEAT);
+    return _count < REPEAT;
 }
 
 int main(void)

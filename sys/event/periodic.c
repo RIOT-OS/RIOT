@@ -22,7 +22,7 @@
 #include "ztimer/periodic.h"
 #include "event/periodic.h"
 
-static int _event_periodic_callback(void *arg)
+static bool _event_periodic_callback(void *arg)
 {
     event_periodic_t *event_periodic = (event_periodic_t *)arg;
 
