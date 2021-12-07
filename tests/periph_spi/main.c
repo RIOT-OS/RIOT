@@ -24,7 +24,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "shell.h"
 #include "periph/spi.h"
 #include "schedstatistics.h"
@@ -85,18 +85,15 @@ static void _sched_statistics_trigger(void)
     sched_statistics_cb(thread_getpid(), thread_getpid());
 }
 
-static xtimer_ticks32_t _sched_ticks(void)
+static uint32_t _sched_us(void)
 {
     _sched_statistics_trigger();
-    xtimer_ticks32_t runtime_ticks = {
-        .ticks32 = sched_pidlist[thread_getpid()].runtime_ticks
-    };
-    return runtime_ticks;
+    return sched_pidlist[thread_getpid()].runtime_us;
 }
 
-static uint32_t _xtimer_diff_usec(xtimer_ticks32_t stop, xtimer_ticks32_t start)
+static uint32_t _ztimer_diff_usec(uint32_t stop, uint32_t start)
 {
-    return xtimer_usec_from_ticks(xtimer_diff(stop, start));
+    return stop - start;
 }
 
 void print_bytes(char* title, uint8_t* data, size_t len)
@@ -266,7 +263,7 @@ int cmd_bench(int argc, char **argv)
     (void)argv;
 
     uint32_t start, stop;
-    xtimer_ticks32_t sched_start, sched_stop;
+    uint32_t sched_start, sched_stop;
     uint32_t sched_diff_us;
     uint32_t sum = 0;
     uint32_t sched_sum = 0;
@@ -288,231 +285,231 @@ int cmd_bench(int argc, char **argv)
     puts("### Test\t\t\t\tTransfer time\tuser time\n");
 
     /* 1 - write 1000 times 1 byte */
-    sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    sched_start = _sched_us();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         in = spi_transfer_byte(spiconf.dev, spiconf.cs, false, out);
         (void)in;
     }
-    stop = xtimer_now_usec();
-    sched_stop = _sched_ticks();
-    sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
+    stop = ztimer_now(ZTIMER_USEC);
+    sched_stop = _sched_us();
+    sched_diff_us = _ztimer_diff_usec(sched_stop, sched_start);
     printf(" 1 - write %i times %i byte:", BENCH_REDOS, 1);
     printf("\t\t\t%"PRIu32"\t%"PRIu32"\n", (stop - start), sched_diff_us);
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
     /* 2 - write 1000 times 2 byte */
-    sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    sched_start = _sched_us();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_bytes(spiconf.dev, spiconf.cs, false,
                            bench_wbuf, NULL, BENCH_SMALL);
     }
-    stop = xtimer_now_usec();
-    sched_stop = _sched_ticks();
-    sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
+    stop = ztimer_now(ZTIMER_USEC);
+    sched_stop = _sched_us();
+    sched_diff_us = _ztimer_diff_usec(sched_stop, sched_start);
     printf(" 2 - write %i times %i byte:", BENCH_REDOS, BENCH_SMALL);
     printf("\t\t\t%"PRIu32"\t%"PRIu32"\n", (stop - start), sched_diff_us);
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
     /* 3 - write 1000 times 100 byte */
-    sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    sched_start = _sched_us();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_bytes(spiconf.dev, spiconf.cs, false,
                            bench_wbuf, NULL, BENCH_LARGE);
     }
-    stop = xtimer_now_usec();
-    sched_stop = _sched_ticks();
-    sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
+    stop = ztimer_now(ZTIMER_USEC);
+    sched_stop = _sched_us();
+    sched_diff_us = _ztimer_diff_usec(sched_stop, sched_start);
     printf(" 3 - write %i times %i byte:", BENCH_REDOS, BENCH_LARGE);
     printf("\t\t%"PRIu32"\t%"PRIu32"\n", (stop - start), sched_diff_us);
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
     /* 4 - write 1000 times 1 byte to register */
-    sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    sched_start = _sched_us();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         in = spi_transfer_reg(spiconf.dev, spiconf.cs, BENCH_REGADDR, out);
         (void)in;
     }
-    stop = xtimer_now_usec();
-    sched_stop = _sched_ticks();
-    sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
+    stop = ztimer_now(ZTIMER_USEC);
+    sched_stop = _sched_us();
+    sched_diff_us = _ztimer_diff_usec(sched_stop, sched_start);
     printf(" 4 - write %i times %i byte to register:", BENCH_REDOS, 1);
     printf("\t%"PRIu32"\t%"PRIu32"\n", (stop - start), sched_diff_us);
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
     /* 5 - write 1000 times 2 byte to register */
-    sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    sched_start = _sched_us();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_regs(spiconf.dev, spiconf.cs, BENCH_REGADDR,
                           bench_wbuf, NULL, BENCH_SMALL);
     }
-    stop = xtimer_now_usec();
-    sched_stop = _sched_ticks();
-    sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
+    stop = ztimer_now(ZTIMER_USEC);
+    sched_stop = _sched_us();
+    sched_diff_us = _ztimer_diff_usec(sched_stop, sched_start);
     printf(" 5 - write %i times %i byte to register:", BENCH_REDOS, BENCH_SMALL);
     printf("\t%"PRIu32"\t%"PRIu32"\n", (stop - start), sched_diff_us);
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
     /* 6 - write 1000 times 100 byte to register */
-    sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    sched_start = _sched_us();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_regs(spiconf.dev, spiconf.cs, BENCH_REGADDR,
                           bench_wbuf, NULL, BENCH_LARGE);
     }
-    stop = xtimer_now_usec();
-    sched_stop = _sched_ticks();
-    sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
+    stop = ztimer_now(ZTIMER_USEC);
+    sched_stop = _sched_us();
+    sched_diff_us = _ztimer_diff_usec(sched_stop, sched_start);
     printf(" 6 - write %i times %i byte to register:", BENCH_REDOS, BENCH_LARGE);
     printf("\t%"PRIu32"\t%"PRIu32"\n", (stop - start), sched_diff_us);
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
     /* 7 - read 1000 times 2 byte */
-    sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    sched_start = _sched_us();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_bytes(spiconf.dev, spiconf.cs, false,
                            NULL, bench_rbuf, BENCH_SMALL);
     }
-    stop = xtimer_now_usec();
-    sched_stop = _sched_ticks();
-    sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
+    stop = ztimer_now(ZTIMER_USEC);
+    sched_stop = _sched_us();
+    sched_diff_us = _ztimer_diff_usec(sched_stop, sched_start);
     printf(" 7 - read %i times %i byte:", BENCH_REDOS, BENCH_SMALL);
     printf("\t\t\t%"PRIu32"\t%"PRIu32"\n", (stop - start), sched_diff_us);
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
     /* 8 - read 1000 times 100 byte */
-    sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    sched_start = _sched_us();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_bytes(spiconf.dev, spiconf.cs, false,
                            NULL, bench_rbuf, BENCH_LARGE);
     }
-    stop = xtimer_now_usec();
-    sched_stop = _sched_ticks();
-    sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
+    stop = ztimer_now(ZTIMER_USEC);
+    sched_stop = _sched_us();
+    sched_diff_us = _ztimer_diff_usec(sched_stop, sched_start);
     printf(" 8 - read %i times %i byte:", BENCH_REDOS, BENCH_LARGE);
     printf("\t\t%"PRIu32"\t%"PRIu32"\n", (stop - start), sched_diff_us);
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
     /* 9 - read 1000 times 2 byte from register */
-    sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    sched_start = _sched_us();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_regs(spiconf.dev, spiconf.cs, BENCH_REGADDR,
                           NULL, bench_rbuf, BENCH_SMALL);
     }
-    stop = xtimer_now_usec();
-    sched_stop = _sched_ticks();
-    sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
+    stop = ztimer_now(ZTIMER_USEC);
+    sched_stop = _sched_us();
+    sched_diff_us = _ztimer_diff_usec(sched_stop, sched_start);
     printf(" 9 - read %i times %i byte from register:", BENCH_REDOS, BENCH_SMALL);
     printf("\t%"PRIu32"\t%"PRIu32"\n", (stop - start), sched_diff_us);
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
     /* 10 - read 1000 times 100 byte from register */
-    sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    sched_start = _sched_us();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_regs(spiconf.dev, spiconf.cs, BENCH_REGADDR,
                           NULL, bench_rbuf, BENCH_LARGE);
     }
-    stop = xtimer_now_usec();
-    sched_stop = _sched_ticks();
-    sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
+    stop = ztimer_now(ZTIMER_USEC);
+    sched_stop = _sched_us();
+    sched_diff_us = _ztimer_diff_usec(sched_stop, sched_start);
     printf("10 - read %i times %i byte from register:", BENCH_REDOS, BENCH_LARGE);
     printf("\t%"PRIu32"\t%"PRIu32"\n", (stop - start), sched_diff_us);
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
     /* 11 - transfer 1000 times 2 byte */
-    sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    sched_start = _sched_us();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_bytes(spiconf.dev, spiconf.cs, false,
                            bench_wbuf, bench_rbuf, BENCH_SMALL);
     }
-    stop = xtimer_now_usec();
-    sched_stop = _sched_ticks();
-    sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
+    stop = ztimer_now(ZTIMER_USEC);
+    sched_stop = _sched_us();
+    sched_diff_us = _ztimer_diff_usec(sched_stop, sched_start);
     printf("11 - transfer %i times %i byte:", BENCH_REDOS, BENCH_SMALL);
     printf("\t\t%"PRIu32"\t%"PRIu32"\n", (stop - start), sched_diff_us);
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
     /* 12 - transfer 1000 times 100 byte */
-    sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    sched_start = _sched_us();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_bytes(spiconf.dev, spiconf.cs, false,
                            bench_wbuf, bench_rbuf, BENCH_LARGE);
     }
-    stop = xtimer_now_usec();
-    sched_stop = _sched_ticks();
-    sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
+    stop = ztimer_now(ZTIMER_USEC);
+    sched_stop = _sched_us();
+    sched_diff_us = _ztimer_diff_usec(sched_stop, sched_start);
     printf("12 - transfer %i times %i byte:", BENCH_REDOS, BENCH_LARGE);
     printf("\t\t%"PRIu32"\t%"PRIu32"\n", (stop - start), sched_diff_us);
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
     /* 13 - transfer 1000 times 2 byte from/to register */
-    sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    sched_start = _sched_us();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_regs(spiconf.dev, spiconf.cs, BENCH_REGADDR,
                           bench_wbuf, bench_rbuf, BENCH_SMALL);
     }
-    stop = xtimer_now_usec();
-    sched_stop = _sched_ticks();
-    sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
+    stop = ztimer_now(ZTIMER_USEC);
+    sched_stop = _sched_us();
+    sched_diff_us = _ztimer_diff_usec(sched_stop, sched_start);
     printf("13 - transfer %i times %i byte to register:", BENCH_REDOS, BENCH_SMALL);
     printf("\t%"PRIu32"\t%"PRIu32"\n", (stop - start), sched_diff_us);
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
     /* 14 - transfer 1000 times 100 byte from/to register */
-    sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    sched_start = _sched_us();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_transfer_regs(spiconf.dev, spiconf.cs, BENCH_REGADDR,
                           bench_wbuf, bench_rbuf, BENCH_LARGE);
     }
-    stop = xtimer_now_usec();
-    sched_stop = _sched_ticks();
-    sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
+    stop = ztimer_now(ZTIMER_USEC);
+    sched_stop = _sched_us();
+    sched_diff_us = _ztimer_diff_usec(sched_stop, sched_start);
     printf("14 - transfer %i times %i byte to register:", BENCH_REDOS, BENCH_LARGE);
     printf("%"PRIu32"\t%"PRIu32"\n", (stop - start), sched_diff_us);
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
     /* 15 - release & acquire the bus 1000 times */
-    sched_start = _sched_ticks();
-    start = xtimer_now_usec();
+    sched_start = _sched_us();
+    start = ztimer_now(ZTIMER_USEC);
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_release(spiconf.dev);
         spi_acquire(spiconf.dev, spiconf.cs, spiconf.mode, spiconf.clk);
     }
-    stop = xtimer_now_usec();
-    sched_stop = _sched_ticks();
-    sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
+    stop = ztimer_now(ZTIMER_USEC);
+    sched_stop = _sched_us();
+    sched_diff_us = _ztimer_diff_usec(sched_stop, sched_start);
     printf("15 - acquire/release %i times:\t\t", BENCH_REDOS);
     printf("%"PRIu32"\t%"PRIu32"\n", (stop - start), sched_diff_us);
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_SEC, 1);
 
     printf("-- - SUM:\t\t\t\t\t%"PRIu32"\t%"PRIu32"\n", sum, sched_sum);
 
@@ -546,19 +543,19 @@ int cmd_spi_gpio(int argc, char **argv)
     gpio_init(miso_pin, GPIO_OUT);
     gpio_init(mosi_pin, GPIO_OUT);
 
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_SEC, 1);
 
     printf("Command: gpio_set()\n");
     gpio_set(miso_pin);
     gpio_set(mosi_pin);
 
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_SEC, 1);
 
     printf("Command: gpio_clear()\n");
     gpio_clear(miso_pin);
     gpio_clear(mosi_pin);
 
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_SEC, 1);
 
     printf("Command: spi_init_pins(%i)\n", dev);
     spi_init_pins(dev);

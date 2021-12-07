@@ -24,7 +24,7 @@
 #include "sched.h"
 #include "schedstatistics.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 /**
  * When core_idle_thread is not active, the KERNEL_PID_UNDEF is used to track
@@ -34,12 +34,12 @@ schedstat_t sched_pidlist[KERNEL_PID_LAST + 1];
 
 void sched_statistics_cb(kernel_pid_t active_thread, kernel_pid_t next_thread)
 {
-    uint32_t now = xtimer_now().ticks32;
+    uint32_t now = ztimer_now(ZTIMER_USEC);
 
     /* Update active thread stats */
     if (!IS_USED(MODULE_CORE_IDLE_THREAD) || active_thread != KERNEL_PID_UNDEF) {
         schedstat_t *active_stat = &sched_pidlist[active_thread];
-        active_stat->runtime_ticks += now - active_stat->laststart;
+        active_stat->runtime_us += now - active_stat->laststart;
     }
 
     /* Update next_thread stats */
@@ -55,7 +55,7 @@ void init_schedstatistics(void)
     /* Init laststart for the thread starting schedstatistics since the callback
        wasn't registered when it was first scheduled */
     schedstat_t *active_stat = &sched_pidlist[thread_getpid()];
-    active_stat->laststart = xtimer_now().ticks32;
+    active_stat->laststart = ztimer_now(ZTIMER_USEC);
     active_stat->schedules = 1;
     sched_register_cb(sched_statistics_cb);
 }
