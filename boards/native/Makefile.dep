@@ -14,11 +14,4 @@ ifneq (,$(filter periph_can,$(FEATURES_USED)))
   endif
 endif
 
-ifneq (,$(filter socket_zep,$(USEMODULE)))
-  USEMODULE += iolist
-  USEMODULE += netdev_ieee802154
-  USEMODULE += checksum
-  USEMODULE += random
-endif
-
 USEMODULE += native_drivers

@@ -19,6 +19,7 @@
 
 #include "socket_zep.h"
 #include "socket_zep_params.h"
+#include "net/netdev/ieee802154_submac.h"
 
 #include "lwip_init_devs.h"
 
@@ -29,12 +30,18 @@
 
 static struct netif netif[NETIF_SOCKET_ZEP_NUMOF];
 static socket_zep_t socket_zep_devs[NETIF_SOCKET_ZEP_NUMOF];
+static netdev_ieee802154_submac_t socket_zep_netdev[SOCKET_ZEP_MAX];
 
 static void auto_init_socket_zep(void)
 {
     for (unsigned i = 0; i < NETIF_SOCKET_ZEP_NUMOF; i++) {
-        socket_zep_setup(&socket_zep_devs[i], &socket_zep_params[i], i);
-        if (lwip_add_6lowpan(&netif[i], &socket_zep_devs[i].netdev.netdev) == NULL) {
+        netdev_register(&socket_zep_netdev[i].dev.netdev, NETDEV_SOCKET_ZEP, i);
+        netdev_ieee802154_submac_init(&socket_zep_netdev[i]);
+        socket_zep_hal_setup(&socket_zep_devs[i], &socket_zep_netdev[i].submac.dev);
+
+        socket_zep_setup(&socket_zep_devs[i], &socket_zep_params[i]);
+
+        if (lwip_add_6lowpan(&netif[i], &socket_zep_netdev[i].dev.netdev) == NULL) {
             DEBUG("Could not add socket_zep device\n");
             return;
         }

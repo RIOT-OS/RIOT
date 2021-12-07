@@ -6,6 +6,7 @@ TERMFLAGS ?= -z "0.0.0.0:17755,localhost:17754"
 
 USEMODULE += socket_zep
 USEMODULE += auto_init_gnrc_netif
+USEMODULE += netdev
 USEMODULE += gnrc
 USEMODULE += gnrc_netif_ieee802154
 USEMODULE += gnrc_pktdump

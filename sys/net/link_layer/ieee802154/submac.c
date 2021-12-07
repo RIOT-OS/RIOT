@@ -406,6 +406,10 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
         return -EBUSY;
     }
 
+    if (iolist == NULL) {
+        return 0;
+    }
+
     uint8_t *buf = iolist->iol_base;
     bool cnf = buf[0] & IEEE802154_FCF_ACK_REQ;
 

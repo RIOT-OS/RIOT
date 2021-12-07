@@ -8,6 +8,7 @@ TEST_ON_CI_BLACKLIST += native
 
 USEMODULE += od
 USEMODULE += socket_zep
+USEMODULE += netdev
 
 TERMFLAGS ?= -z [::1]:17754
 

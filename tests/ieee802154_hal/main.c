@@ -248,6 +248,9 @@ static ieee802154_dev_t *_reg_callback(ieee802154_dev_type_t type, void *opaque)
         case IEEE802154_DEV_TYPE_NRF802154:
             printf("nrf52840");
             break;
+        case IEEE802154_DEV_TYPE_SOCKET_ZEP:
+            printf("socket_zep");
+            break;
     }
 
     puts(".");

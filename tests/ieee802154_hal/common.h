@@ -19,9 +19,15 @@
 #define COMMON_H
 
 #include "net/ieee802154/radio.h"
+#if IS_USED(MODULE_SOCKET_ZEP)
+#include "socket_zep_params.h"
+#else
+#define SOCKET_ZEP_MAX  0
+#endif
 
 #define RADIOS_NUMOF IS_USED(MODULE_CC2538_RF) + \
-                     IS_USED(MODULE_NRF802154)
+                     IS_USED(MODULE_NRF802154) + \
+                     SOCKET_ZEP_MAX
 
 #if RADIOS_NUMOF == 0
 #error "Radio is not supported"
@@ -39,6 +45,7 @@ extern "C" {
 typedef enum {
     IEEE802154_DEV_TYPE_CC2538_RF,
     IEEE802154_DEV_TYPE_NRF802154,
+    IEEE802154_DEV_TYPE_SOCKET_ZEP,
 } ieee802154_dev_type_t;
 
 typedef ieee802154_dev_t* (*ieee802154_dev_cb_t)(ieee802154_dev_type_t type,

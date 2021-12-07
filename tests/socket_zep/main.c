@@ -24,6 +24,7 @@
 
 #include "byteorder.h"
 #include "net/ieee802154.h"
+#include "net/netdev/ieee802154_submac.h"
 #include "sched.h"
 #include "socket_zep.h"
 #include "socket_zep_params.h"
@@ -40,6 +41,7 @@
 static uint8_t _recvbuf[RECVBUF_SIZE];
 static msg_t _msg_queue[MSG_QUEUE_SIZE];
 static socket_zep_t _dev;
+static netdev_ieee802154_submac_t _socket_zep_netdev;
 static kernel_pid_t _main_pid;
 
 static void _event_cb(netdev_t *dev, netdev_event_t event);
@@ -48,11 +50,14 @@ static void _print_info(netdev_t *netdev);
 static void test_init(void)
 {
     const socket_zep_params_t *p = &socket_zep_params[0];
-    netdev_t *netdev = &_dev.netdev.netdev;
+    netdev_t *netdev = &_socket_zep_netdev.dev.netdev;
 
     printf("Initializing socket ZEP with (local: [%s]:%s, remote: [%s]:%s)\n",
            p->local_addr, p->local_port, p->remote_addr, p->remote_port);
-    socket_zep_setup(&_dev, p, 0);
+    netdev_register(&_socket_zep_netdev.dev.netdev, NETDEV_SOCKET_ZEP, 0);
+    netdev_ieee802154_submac_init(&_socket_zep_netdev);
+    socket_zep_hal_setup(&_dev, &_socket_zep_netdev.submac.dev);
+    socket_zep_setup(&_dev, p);
     netdev->event_callback = _event_cb;
     expect(netdev->driver->init(netdev) >= 0);
     _print_info(netdev);
@@ -60,7 +65,7 @@ static void test_init(void)
 
 static void test_send__iolist_NULL(void)
 {
-    netdev_t *netdev = &_dev.netdev.netdev;
+    netdev_t *netdev = &_socket_zep_netdev.dev.netdev;
 
     puts("Send zero-length packet");
     int res = netdev->driver->send(netdev, NULL);
@@ -77,11 +82,11 @@ static void test_send__iolist_not_NULL(void)
 
     iolist[0].iol_next = &iolist[1];
 
-    netdev_t *netdev = &_dev.netdev.netdev;
+    netdev_t *netdev = &_socket_zep_netdev.dev.netdev;
 
     puts("Send 'Hello\\0World\\0'");
-    int res =  netdev->driver->send(netdev, iolist);
-    expect((res < 0) || (res == (sizeof("Hello")) + sizeof("World")));
+    int res = netdev->driver->send(netdev, iolist);
+    expect((res < 0) || (res == 0));
     if ((res < 0) && (errno == ECONNREFUSED)) {
         puts("No remote socket exists (use scripts in `tests/` to have proper tests)");
     }
@@ -91,7 +96,7 @@ static void test_recv(void)
 {
     puts("Waiting for an incoming message (use `make test`)");
     while (1) {
-        netdev_t *netdev = &_dev.netdev.netdev;
+        netdev_t *netdev = &_socket_zep_netdev.dev.netdev;
         msg_t msg;
 
         msg_receive(&msg);
