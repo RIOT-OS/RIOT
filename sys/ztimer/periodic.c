@@ -43,10 +43,13 @@ static void _ztimer_periodic_reset(ztimer_periodic_t *timer, ztimer_now_t now)
 static void _ztimer_periodic_callback(void *arg)
 {
     ztimer_periodic_t *timer = arg;
-    ztimer_now_t now = ztimer_now(timer->clock);
 
     if (timer->callback(timer->arg) == ZTIMER_PERIODIC_KEEP_GOING) {
+        ztimer_now_t now = ztimer_now(timer->clock);
         _ztimer_periodic_reset(timer, now);
+    }
+    else {
+        timer->last = timer->last + timer->interval;
     }
 }
 

@@ -72,8 +72,14 @@ static void callback_4times(void *arg)
         printf("trigger %d of periodic timeout, elapsed time: %" PRIu32 " us\n",
                *count, elapsed);
     }
-    if (*count == 4) {
+    if (*count == 2) {
+        puts("stop periodic event");
         event_periodic_stop(&event_periodic);
+        puts("resume periodic event, 2 triggers remaining");
+        event_periodic_start(&event_periodic, EVENT_TIMEOUT_TIME);
+        before = event_periodic.timer.last;
+    }
+    if (*count == 4) {
         mutex_unlock(&lock);
     }
     else if (*count > 4) {
@@ -103,6 +109,7 @@ int main(void)
     puts("posting periodic timed callback with timeout 1sec");
     event_periodic_init(&event_periodic, ZTIMER_USEC, EVENT_PRIO_MEDIUM,
                         &event_4times.super);
+    event_periodic_set_count(&event_periodic, 4);
     event_periodic_start(&event_periodic, EVENT_TIMEOUT_TIME);
     before = event_periodic.timer.last;
     puts("waiting for periodic callback to be triggered 4 times");
