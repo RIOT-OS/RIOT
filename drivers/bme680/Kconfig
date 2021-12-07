@@ -9,7 +9,8 @@ menuconfig MODULE_BME680
     bool "BME680 Temperature/Humidity/Pressure/Gas sensor"
     depends on TEST_KCONFIG
     select PACKAGE_DRIVER_BME680
-    select MODULE_XTIMER if MODULE_SAUL
+    select MODULE_ZTIMER if MODULE_SAUL
+    select MODULE_ZTIMER_MSEC if MODULE_SAUL
 
 if MODULE_BME680
 

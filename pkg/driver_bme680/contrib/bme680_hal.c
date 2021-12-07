@@ -33,7 +33,7 @@
 #include "periph/spi.h"
 #endif
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifndef BME680_SPI_SPEED
 #define BME680_SPI_SPEED    (SPI_CLK_1MHZ)
@@ -45,7 +45,7 @@
 
 void bme680_ms_sleep(uint32_t msleep)
 {
-    xtimer_msleep(msleep);
+    ztimer_sleep(ZTIMER_MSEC, msleep);
 }
 
 #ifdef MODULE_PERIPH_I2C

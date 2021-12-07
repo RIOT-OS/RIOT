@@ -9,6 +9,8 @@ config PACKAGE_DRIVER_BME680
     bool "BME680 sensor driver package"
     depends on TEST_KCONFIG
     select MODULE_DRIVER_BME680_CONTRIB
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
 
 config MODULE_DRIVER_BME680_CONTRIB
     bool
