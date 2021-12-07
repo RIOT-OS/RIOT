@@ -62,6 +62,10 @@
 
 #include "logo.h"
 
+#if TEST_OUTPUT == TEST_OUTPUT_SDL
+int ucg_sdl_get_key(void);
+#endif
+
 int main(void)
 {
     uint32_t screen = 0;
