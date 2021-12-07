@@ -138,15 +138,15 @@ int NetworkConnect(Network *n, char *addr_ip, int port)
         /* ipvN_addr_from_str modifies input buffer */
         strncpy(_local_ip, addr_ip, sizeof(_local_ip));
 
-#if defined(MODULE_GNRC)
-        char *iface = ipv6_addr_split_iface(_local_ip);
-        if ((!iface) && (gnrc_netif_numof() == 1)) {
-            remote.netif = gnrc_netif_iter(NULL)->pid;
+        if (IS_USED(MODULE_GNRC)) {
+            char *iface = ipv6_addr_split_iface(_local_ip);
+            if ((!iface) && (gnrc_netif_numof() == 1)) {
+                remote.netif = gnrc_netif_iter(NULL)->pid;
+            }
+            else if (iface) {
+                remote.netif = atoi(iface);
+            }
         }
-        else if (iface) {
-            remote.netif = atoi(iface);
-        }
-#endif
 
         if (ipv6_addr_from_str((ipv6_addr_t *)&remote.addr, _local_ip)) {
             remote.port = port;
