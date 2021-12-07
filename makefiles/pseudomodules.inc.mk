@@ -165,7 +165,9 @@ PSEUDOMODULES += wakaama_objects_%
 PSEUDOMODULES += wifi_enterprise
 PSEUDOMODULES += xtimer_on_ztimer
 PSEUDOMODULES += zptr
-PSEUDOMODULES += ztimer%
+PSEUDOMODULES += ztimer
+PSEUDOMODULES += ztimer_%
+PSEUDOMODULES += ztimer64_%
 
 # ztimer's main module is called "ztimer_core"
 NO_PSEUDOMODULES += ztimer_core

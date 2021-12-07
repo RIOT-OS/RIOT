@@ -746,8 +746,13 @@ ifneq (,$(filter suit_%,$(USEMODULE)))
 endif
 
 # include ztimer dependencies
-ifneq (,$(filter ztimer% %ztimer,$(USEMODULE)))
+ifneq (,$(filter ztimer ztimer_% %ztimer,$(USEMODULE)))
   include $(RIOTBASE)/sys/ztimer/Makefile.dep
+endif
+
+# include ztimer64 dependencies
+ifneq (,$(filter ztimer64%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/ztimer64/Makefile.dep
 endif
 
 ifneq (,$(filter evtimer,$(USEMODULE)))
