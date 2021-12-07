@@ -14,4 +14,9 @@ ifneq (,$(filter periph_uart periph_i2c periph_spi,$(USEMODULE)))
   USEMODULE += periph_flexcomm
 endif
 
+ifneq (,$(filter periph_adc,$(USEMODULE)))
+  USEMODULE += ztimer
+  USEMODULE += ztimer_usec
+endif
+
 include $(RIOTCPU)/cortexm_common/Makefile.dep
