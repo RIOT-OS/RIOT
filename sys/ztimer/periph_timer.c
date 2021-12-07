@@ -24,6 +24,17 @@
 #include "irq.h"
 #include "ztimer/periph_timer.h"
 
+#ifndef ZTIMER_PERIPH_TIMER_OFFSET
+/* This can be used for testing. E.g.,
+ *
+ *     CFLAGS="-DZTIMER_PERIPH_TIMER_OFFSET=4000000000LU" make ...
+ *
+ * The value will be added to every lower level timer read.
+ * @note this breaks if the low-level timer doesn't have 32bit width!
+ */
+#define ZTIMER_PERIPH_TIMER_OFFSET 0LU
+#endif
+
 static void _ztimer_periph_timer_set(ztimer_clock_t *clock, uint32_t val)
 {
     ztimer_periph_timer_t *ztimer_periph = (ztimer_periph_timer_t *)clock;
@@ -51,7 +62,7 @@ static uint32_t _ztimer_periph_timer_now(ztimer_clock_t *clock)
 {
     ztimer_periph_timer_t *ztimer_periph = (ztimer_periph_timer_t *)clock;
 
-    return timer_read(ztimer_periph->dev);
+    return timer_read(ztimer_periph->dev) + ZTIMER_PERIPH_TIMER_OFFSET;
 }
 
 static void _ztimer_periph_timer_cancel(ztimer_clock_t *clock)
