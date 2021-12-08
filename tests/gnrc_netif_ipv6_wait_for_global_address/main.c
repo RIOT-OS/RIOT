@@ -27,7 +27,7 @@
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/raw.h"
 #include "net/netdev_test.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define TEST_NETIF_NUMOF    2
 #define TEST_NETIF_PRIO     3
@@ -54,7 +54,7 @@ static void tear_down(void)
 
 static void *_adder_thread(void *netif)
 {
-    xtimer_msleep(10);
+    ztimer_sleep(ZTIMER_MSEC, 10);
     gnrc_netif_ipv6_addr_add(netif, &_test_addr, 64,
                              GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
     return NULL;
@@ -74,16 +74,16 @@ static void _assert_wait_blocks(gnrc_netif_t *add_netif,
                                 gnrc_netif_t *wait_netif,
                                 bool success)
 {
-    uint32_t now = xtimer_now_usec();
+    uint32_t now = ztimer_now(ZTIMER_MSEC);
     uint32_t timeout = 20;
 
     _add_delayed_addr(add_netif);
     TEST_ASSERT(gnrc_netif_ipv6_wait_for_global_address(wait_netif,
                                                         timeout) == success);
     if (success) {
-        TEST_ASSERT(((xtimer_now_usec() - now) / US_PER_MS) < timeout);
+        TEST_ASSERT((ztimer_now(ZTIMER_MSEC) - now) < timeout);
     } else {
-        TEST_ASSERT(((xtimer_now_usec() - now) / US_PER_MS) >= timeout);
+        TEST_ASSERT((ztimer_now(ZTIMER_MSEC) - now) >= timeout);
     }
 }
 
