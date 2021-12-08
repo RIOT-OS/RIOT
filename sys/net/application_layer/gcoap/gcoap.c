@@ -206,7 +206,7 @@ static void _on_sock_dtls_evt(sock_dtls_t *sock, sock_async_flags_t type, void *
         } else if (prev_state == NO_SPACE) {
             /* No space in session management. Should not happen. If it occurs,
             we lost track of sessions */
-            DEBUG("gcoap: no space in session management. We lost track of sessions!")
+            DEBUG("gcoap: no space in session management. We lost track of sessions!");
             sock_dtls_session_destroy(sock, &socket.ctx_dtls_session);
         }
 
@@ -993,7 +993,7 @@ static ssize_t _tl_authenticate(gcoap_socket_t *sock, const sock_udp_ep_t *remot
         return 0;
     }
     if (session_state == NO_SPACE) {
-        DEBUG("gcoap: no space in dsm\n")
+        DEBUG("gcoap: no space in dsm\n");
         return -ENOTCONN;
     }
 

@@ -67,7 +67,7 @@ dsm_state_t dsm_store(sock_dtls_t *sock, sock_dtls_session_t *session,
 
     /* no existing session found */
     if (res == 0) {
-        DEBUG("dsm: no existing session found, storing as new session\n")
+        DEBUG("dsm: no existing session found, storing as new session\n");
         sock_dtls_session_get_udp_ep(session, &ep);
         sock_dtls_session_set_udp_ep(&session_slot->session, &ep);
         session_slot->sock = sock;
@@ -76,7 +76,7 @@ dsm_state_t dsm_store(sock_dtls_t *sock, sock_dtls_session_t *session,
 
     /* existing session found and session should be restored */
     if (res == 1 && restore) {
-        DEBUG("dsm: existing session found, restoring\n")
+        DEBUG("dsm: existing session found, restoring\n");
         memcpy(session, &session_slot->session, sizeof(sock_dtls_session_t));
     }
     session_slot->last_used_sec = (uint32_t)(xtimer_now_usec64() / US_PER_SEC);
