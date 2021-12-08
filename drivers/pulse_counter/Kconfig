@@ -12,3 +12,9 @@ config MODULE_PULSE_COUNTER
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
+
+config HAVE_PULSE_COUNTER
+    bool
+    select MODULE_PULSE_COUNTER if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a pulse counter is present.
