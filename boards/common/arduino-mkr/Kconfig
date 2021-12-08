@@ -19,3 +19,13 @@ config BOARD_COMMON_ARDUINO_MKR
     select HAS_ARDUINO
     select HAS_ARDUINO_PWM
     select HAS_HIGHLEVEL_STDIO
+
+    select HAVE_SAUL_GPIO
+
+config MODULE_BOARDS_COMMON_ARDUINO-MKR
+    bool
+    depends on TEST_KCONFIG
+    help
+        Common code for arduino-mkr type of boards.
+
+source "$(RIOTBOARD)/common/samdx1-arduino-bootloader/Kconfig"
