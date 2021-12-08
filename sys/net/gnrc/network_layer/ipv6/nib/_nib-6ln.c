@@ -250,16 +250,17 @@ _nib_abr_entry_t *_handle_abro(const sixlowpan_nd_opt_abr_t *abro)
     if (abr != NULL) {
         uint32_t abro_version = sixlowpan_nd_opt_abr_get_version(abro);
         uint16_t ltime = byteorder_ntohs(abro->ltime);
+        /* correct for default value */
+        ltime = (ltime == 0) ? SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT : ltime;
+
+        uint32_t ltime_ms = MS_PER_SEC * SEC_PER_MIN * ltime;
 
         if (abr->version >= abro_version) {
             abr->version = abro_version;
-            abr->valid_until = evtimer_now_min() + ltime;
+            abr->valid_until_ms = evtimer_now_msec() + ltime_ms;
         }
-        /* correct for default value */
-        ltime = (ltime == 0) ? SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT : ltime;
         _evtimer_add(abr, GNRC_IPV6_NIB_ABR_TIMEOUT, &abr->timeout,
-                     /* UINT16_MAX min < UINT32_MAX ms so no risk of overflow */
-                     MS_PER_SEC * SEC_PER_MIN * ltime);
+                     ltime_ms);
     }
     return abr;
 }
