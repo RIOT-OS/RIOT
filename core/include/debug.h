@@ -94,7 +94,7 @@ extern "C" {
  *
  * @note Another name for ::DEBUG_PRINT
  */
-#define DEBUG(...) if (ENABLE_DEBUG) { DEBUG_PRINT(__VA_ARGS__); }
+#define DEBUG(...) do { if (ENABLE_DEBUG) { DEBUG_PRINT(__VA_ARGS__); } } while (0)
 
 /**
  * @def DEBUG_PUTS
@@ -102,7 +102,7 @@ extern "C" {
  * @brief Print debug information to stdout using puts(), so no stack size
  *        restrictions do apply.
  */
-#define DEBUG_PUTS(str) if (ENABLE_DEBUG) { puts(str); }
+#define DEBUG_PUTS(str) do { if (ENABLE_DEBUG) { puts(str); } } while (0)
 /** @} */
 
 /**
