@@ -92,12 +92,12 @@ static inline __attribute__((always_inline)) void irq_restore(
 /**
  * @brief See if the current context is inside an ISR
  */
-static inline __attribute__((always_inline)) int irq_is_in(void)
+static inline __attribute__((always_inline)) bool irq_is_in(void)
 {
     return riscv_in_isr;
 }
 
-static inline __attribute__((always_inline)) int irq_is_enabled(void)
+static inline __attribute__((always_inline)) bool irq_is_enabled(void)
 {
     unsigned state;
 

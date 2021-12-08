@@ -27,6 +27,7 @@
 #ifndef IRQ_ARCH_H
 #define IRQ_ARCH_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -97,7 +98,7 @@ __attribute__((always_inline)) static inline void irq_restore(unsigned int _stat
 /**
  * @brief See if the current context is inside an ISR
  */
-__attribute__((always_inline)) static inline int irq_is_in(void)
+__attribute__((always_inline)) static inline bool irq_is_in(void)
 {
     uint8_t state = avr8_get_state();
     return (state & AVR8_STATE_FLAG_ISR);
@@ -106,7 +107,7 @@ __attribute__((always_inline)) static inline int irq_is_in(void)
 /**
  * @brief Test if interrupts are currently enabled
  */
-__attribute__((always_inline)) static inline int irq_is_enabled(void)
+__attribute__((always_inline)) static inline bool irq_is_enabled(void)
 {
     uint8_t mask;
     __asm__ volatile(

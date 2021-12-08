@@ -94,7 +94,7 @@ void IRAM irq_restore(unsigned int state)
 /**
  * @brief See if the current context is inside an ISR
  */
-int IRAM irq_is_in(void)
+bool IRAM irq_is_in(void)
 {
     DEBUG("irq_interrupt_nesting = %d\n", irq_interrupt_nesting);
     return irq_interrupt_nesting;
@@ -103,7 +103,7 @@ int IRAM irq_is_in(void)
 /**
  * @brief Test if IRQs are currently enabled
  */
-int IRAM irq_is_enabled(void)
+bool IRAM irq_is_enabled(void)
 {
     uint32_t reg;
 
