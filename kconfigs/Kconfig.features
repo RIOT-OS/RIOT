@@ -323,6 +323,11 @@ config HAS_PERIPH_UART
     help
         Indicates that an UART peripheral is present.
 
+config HAS_PERIPH_UART_COLLISION
+    bool
+    help
+        Indicates that the UART peripheral supports hardware collision detection.
+
 config HAS_PERIPH_UART_HW_FC
     bool
     help

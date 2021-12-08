@@ -2,4 +2,8 @@ CPU_CORE = cortex-m0plus
 
 FEATURES_PROVIDED += periph_gpio_fast_read
 
+ifeq (,$(filter samd20%,$(CPU_MODEL)))
+  FEATURES_PROVIDED += periph_uart_collision
+endif
+
 -include $(RIOTCPU)/sam0_common/Makefile.features
