@@ -19,7 +19,7 @@
  */
 
 #include <string.h>
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "si70xx_internals.h"
 #include "si70xx.h"
@@ -162,7 +162,7 @@ int si70xx_init(si70xx_t *dev, const si70xx_params_t *params)
     i2c_release(SI70XX_I2C);
 
     /* sensor is ready after at most 25 ms */
-    xtimer_msleep(25);
+    ztimer_sleep(ZTIMER_MSEC, 25);
 
     DEBUG("[DEBUG] Device initialized with success.\n");
     return SI70XX_OK;

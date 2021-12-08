@@ -5,4 +5,7 @@ SI70XX_VARIANT ?= si7021
 
 USEMODULE += $(SI70XX_VARIANT)
 
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
+
 include $(RIOTBASE)/Makefile.include
