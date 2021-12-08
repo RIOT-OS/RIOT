@@ -49,6 +49,11 @@ void auto_init(void)
         extern void init_schedstatistics(void);
         init_schedstatistics();
     }
+    if (IS_USED(MODULE_SCHED_ROUND_ROBIN)) {
+        LOG_DEBUG("Auto init sched_round_robin.\n");
+        extern void sched_round_robin_init(void);
+        sched_round_robin_init();
+    }
     if (IS_USED(MODULE_DUMMY_THREAD)) {
         extern void dummy_thread_create(void);
         dummy_thread_create();

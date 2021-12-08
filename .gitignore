@@ -9,8 +9,9 @@ doc/doxygen/man
 doc/doxygen/*.log
 doc/doxygen/*.db
 doc/doxygen/*.tmp
-# Built binaries
-*bin
+# bin (e.g.:build directory) and .bin files
+bin
+*.bin
 # Build directory
 /build
 # AFL findings
