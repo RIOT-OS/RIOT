@@ -41,8 +41,8 @@
 #include "fmt.h"
 #include "log.h"
 #include "sched.h"
-#if IS_USED(MODULE_XTIMER) || IS_USED(MODULE_ZTIMER_XTIMER_COMPAT)
-#include "xtimer.h"
+#if IS_USED(MODULE_ZTIMER)
+#include "ztimer.h"
 #endif
 
 #include "net/gnrc/netif.h"
@@ -1370,7 +1370,7 @@ bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
     /* wait for global address */
     msg_t m;
     while (!has_global) {
-        if (xtimer_msg_receive_timeout(&m, timeout_ms * US_PER_MS) < 0) {
+        if (ztimer_msg_receive_timeout(ZTIMER_MSEC, &m, timeout_ms) < 0) {
             DEBUG_PUTS("gnrc_netif: timeout waiting for prefix");
             break;
         }
@@ -1867,7 +1867,7 @@ static void *_gnrc_netif_thread(void *args)
     /* now let rest of GNRC use the interface */
     gnrc_netif_release(netif);
 #if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
-    xtimer_ticks32_t last_wakeup = xtimer_now();
+    uint32_t last_wakeup = ztimer_now(ZTIMER_USEC);
 #endif
 
     while (1) {
@@ -1893,13 +1893,14 @@ static void *_gnrc_netif_thread(void *args)
                 DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
                 _send(netif, msg.content.ptr, false);
 #if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
-                xtimer_periodic_wakeup(
+                ztimer_periodic_wakeup(
+                        ZTIMER_USEC,
                         &last_wakeup,
                         CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
                     );
                 /* override last_wakeup in case last_wakeup +
                  * CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US was in the past */
-                last_wakeup = xtimer_now();
+                last_wakeup = ztimer_now(ZTIMER_USEC);
 #endif
                 break;
             case GNRC_NETAPI_MSG_TYPE_SET:
