@@ -18,4 +18,6 @@ config BOARD_FEATHER_NRF52840
     select HAS_PERIPH_USBDEV
     select HAS_HIGHLEVEL_STDIO
 
+    select HAVE_SAUL_GPIO
+
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

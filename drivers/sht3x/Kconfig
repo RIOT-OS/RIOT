@@ -12,3 +12,9 @@ config MODULE_SHT3X
     select MODULE_PERIPH_I2C
     select MODULE_CHECKSUM
     select MODULE_XTIMER
+
+config HAVE_SHT3X
+    bool
+    select MODULE_SHT3X if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a SHT30/SHT31/SHT35 sensor is present.

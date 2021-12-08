@@ -18,5 +18,7 @@ config BOARD_MICROBIT_V2
     select HAS_PERIPH_UART
     select HAS_VDD_LC_FILTER_REG1
 
+    select HAVE_SAUL_GPIO
+
 source "$(RIOTBOARD)/common/microbit/Kconfig"
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

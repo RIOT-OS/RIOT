@@ -9,6 +9,6 @@ ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
   USEMODULE += stdio_rtt
 endif
 
-USEMODULE += boards_common_nrf52xxdk
+USEMODULE += boards_common_nrf52xxxdk
 
 include $(RIOTBOARD)/common/nrf52/Makefile.dep

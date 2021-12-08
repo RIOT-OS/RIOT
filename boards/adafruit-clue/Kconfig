@@ -18,4 +18,11 @@ config BOARD_ADAFRUIT_CLUE
     select HAS_PERIPH_USBDEV
     select HAS_HIGHLEVEL_STDIO
 
+    select HAVE_APDS9960
+    select HAVE_BMP280_I2C
+    select HAVE_ILI9341
+    select HAVE_LIS3MDL
+    select HAVE_SAUL_GPIO
+    select HAVE_SHT3X
+
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

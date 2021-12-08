@@ -11,3 +11,9 @@ config MODULE_LIS3MDL
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
     select MODULE_XTIMER
+
+config HAVE_LIS3MDL
+    bool
+    select MODULE_LIS3MDL if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a lismdl sensor is present.

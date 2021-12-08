@@ -1,4 +1,4 @@
-USEMODULE += boards_common_nrf52xxdk
+USEMODULE += boards_common_nrf52xxxdk
 
 ifneq (,$(filter mtd,$(USEMODULE)))
   USEMODULE += mtd_spi_nor

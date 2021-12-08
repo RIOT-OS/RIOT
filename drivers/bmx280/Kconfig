@@ -78,5 +78,6 @@ config HAVE_BMP280_SPI
 
 config HAVE_BMX280
     bool
+    select MODULE_BMX280 if MODULE_SAUL_DEFAULT
     help
         Indicates that a bmx280 sensor is present.

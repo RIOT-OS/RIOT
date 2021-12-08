@@ -15,8 +15,10 @@ config BOARDS_COMMON_NRF52XXXDK
 
     select HAVE_SAUL_GPIO
 
-config MODULE_BOARDS_COMMON_NRF52XXDK
+config MODULE_BOARDS_COMMON_NRF52XXXDK
     bool
-    default y
+    depends on TEST_KCONFIG
+    help
+      Common code for boards based on nrf52xxxdk.
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

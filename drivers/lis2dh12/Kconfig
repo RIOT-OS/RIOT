@@ -5,20 +5,18 @@
 # directory for more details.
 #
 
-config HAVE_LIS2DH12
+config MODULE_LIS2DH12
     bool
-    select MODULE_LIS2DH12 if MODULE_SAUL_DEFAULT
-    help
-        Indicates that a lisdh12 is present
-
-menuconfig MODULE_LIS2DH12
-    bool "LIS2DH12 Accelerometer"
+    prompt "LIS2DH12 Accelerometer" if !(MODULE_SAUL_DEFAULT && HAVE_LIS2DH12)
+    default (MODULE_SAUL_DEFAULT && HAVE_LIS2DH12)
     depends on TEST_KCONFIG
 
 if MODULE_LIS2DH12
 
 choice
     bool "Device interface"
+    default MODULE_LIS2DH12_I2C if HAVE_LIS2DH12_I2C
+    default MODULE_LIS2DH12_SPI if HAVE_LIS2DH12_SPI
 
 config MODULE_LIS2DH12_I2C
     bool "I2C"
@@ -40,3 +38,21 @@ config MODULE_LIS2DH12_INT
     select MODULE_PERIPH_GPIO_IRQ
 
 endif # MODULE_LIS2DH12
+
+config HAVE_LIS2DH12
+    bool
+    select MODULE_LIS2DH12 if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a LIS2DH12 Accelerometer is present.
+
+config HAVE_LIS2DH12_I2C
+    bool
+    select HAVE_LIS2DH12
+    help
+      Indicates that a LIS2DH12 Accelerometer on the I2C bus is present.
+
+config HAVE_LIS2DH12_SPI
+    bool
+    select HAVE_LIS2DH12
+    help
+      Indicates that a LIS2DH12 Accelerometer on the SPI bus is present.

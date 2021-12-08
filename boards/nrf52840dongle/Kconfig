@@ -21,4 +21,8 @@ config BOARD_NRF52840DONGLE
     select HAS_VDD_LC_FILTER_REG0
     select HAS_VDD_LC_FILTER_REG1
 
+    select HAVE_SAUL_GPIO
+    select HAVE_SAUL_PWM
+    select HAVE_SAUL_NRF_VDDH
+
 source "$(RIOTBOARD)/common/nrf52/Kconfig"
