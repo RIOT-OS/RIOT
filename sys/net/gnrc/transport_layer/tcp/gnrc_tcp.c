@@ -141,7 +141,7 @@ int gnrc_tcp_ep_init(gnrc_tcp_ep_t *ep, int family, const uint8_t *addr, size_t 
     TCP_DEBUG_ENTER;
 #ifdef MODULE_GNRC_IPV6
     if (family != AF_INET6) {
-        TCP_DEBUG_ERROR("-EAFNOSUPPORT: Parameter family is not AF_INET6.")
+        TCP_DEBUG_ERROR("-EAFNOSUPPORT: Parameter family is not AF_INET6.");
         TCP_DEBUG_LEAVE;
         return -EAFNOSUPPORT;
     }
@@ -153,7 +153,7 @@ int gnrc_tcp_ep_init(gnrc_tcp_ep_t *ep, int family, const uint8_t *addr, size_t 
         memcpy(ep->addr.ipv6, addr, sizeof(ipv6_addr_t));
     }
     else {
-        TCP_DEBUG_ERROR("-EINVAL: Parameter addr is invalid.")
+        TCP_DEBUG_ERROR("-EINVAL: Parameter addr is invalid.");
         TCP_DEBUG_LEAVE;
         return -EINVAL;
     }
@@ -161,7 +161,7 @@ int gnrc_tcp_ep_init(gnrc_tcp_ep_t *ep, int family, const uint8_t *addr, size_t 
     /* Suppress Compiler Warnings */
     (void) addr;
     (void) addr_size;
-    TCP_DEBUG_ERROR("-EAFNOSUPPORT: No network layer configured.")
+    TCP_DEBUG_ERROR("-EAFNOSUPPORT: No network layer configured.");
     TCP_DEBUG_LEAVE;
     return -EAFNOSUPPORT;
 #endif
