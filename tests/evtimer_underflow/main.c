@@ -23,6 +23,7 @@
 #include "evtimer_msg.h"
 #include "thread.h"
 #include "msg.h"
+#include "xtimer.h"
 
 #define WORKER_MSG_QUEUE_SIZE   (8)
 
@@ -45,7 +46,7 @@ static evtimer_msg_event_t events[] = {
 /* This thread will print the drift to stdout once per second */
 void *worker_thread(void *arg)
 {
-    (void) arg;
+    (void)arg;
 
     msg_init_queue(worker_msg_queue, WORKER_MSG_QUEUE_SIZE);
     while (1) {
@@ -58,6 +59,11 @@ void *worker_thread(void *arg)
     }
 }
 
+void sleep_msec(uint16_t t)
+{
+    xtimer_msleep(t);
+}
+
 int main(void)
 {
     evtimer_init_msg(&evtimer);
@@ -67,9 +73,11 @@ int main(void)
                                      THREAD_PRIORITY_MAIN - 1,
                                      THREAD_CREATE_STACKTEST,
                                      worker_thread, NULL, "worker");
+
     while (1) {
         for (unsigned i = 0; i < NEVENTS; i++) {
             evtimer_add_msg(&evtimer, &events[i], pid);
+            sleep_msec(10);
         }
     }
 }
