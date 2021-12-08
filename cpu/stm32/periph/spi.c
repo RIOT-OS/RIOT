@@ -192,7 +192,7 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
 }
 
 #ifdef MODULE_PERIPH_SPI_GPIO_MODE
-int spi_init_with_gpio_mode(spi_t bus, spi_gpio_mode_t mode)
+int spi_init_with_gpio_mode(spi_t bus, const spi_gpio_mode_t* mode)
 {
     assert(bus < SPI_NUMOF);
 
@@ -203,17 +203,17 @@ int spi_init_with_gpio_mode(spi_t bus, spi_gpio_mode_t mode)
     return ret;
 #else
     if (gpio_is_valid(spi_config[bus].mosi_pin)) {
-        ret += gpio_init(spi_config[bus].mosi_pin, mode.mosi);
+        ret += gpio_init(spi_config[bus].mosi_pin, mode->mosi);
         gpio_init_af(spi_config[bus].mosi_pin, spi_config[bus].mosi_af);
     }
 
     if (gpio_is_valid(spi_config[bus].miso_pin)) {
-        ret += gpio_init(spi_config[bus].miso_pin, mode.miso);
+        ret += gpio_init(spi_config[bus].miso_pin, mode->miso);
         gpio_init_af(spi_config[bus].miso_pin, spi_config[bus].miso_af);
     }
 
     if (gpio_is_valid(spi_config[bus].sclk_pin)) {
-        ret += gpio_init(spi_config[bus].sclk_pin, mode.sclk);
+        ret += gpio_init(spi_config[bus].sclk_pin, mode->sclk);
         gpio_init_af(spi_config[bus].sclk_pin, spi_config[bus].sclk_af);
     }
     return ret;

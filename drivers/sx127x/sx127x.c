@@ -350,7 +350,7 @@ static int _init_spi(sx127x_t *dev)
         .miso = (SX127X_DIO_PULL_MODE),
         .sclk = (GPIO_OUT | SX127X_DIO_PULL_MODE),
     };
-    res += spi_init_with_gpio_mode(dev->params.spi, gpio_modes);
+    res += spi_init_with_gpio_mode(dev->params.spi, &gpio_modes);
 #endif
 
     if (res != SPI_OK) {
