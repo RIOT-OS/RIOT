@@ -17,5 +17,5 @@ FEATURES_PROVIDED += periph_usbdev
 # This configuration enables modules that are only available when using Kconfig
 # module modelling
 ifeq (1, $(TEST_KCONFIG))
-  KCONFIG_BOARD_CONFIG += $(BOARDDIR)/adafruit-itsybitsy-m4.config
+  KCONFIG_ADD_CONFIG += $(RIOTBOARD)/common/samdx1-arduino-bootloader/samdx1-arduino-bootloader.config
 endif

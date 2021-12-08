@@ -15,3 +15,4 @@ config BOARD_WEMOS_ZERO
     select HAS_HIGHLEVEL_STDIO
 
 source "$(RIOTBOARD)/common/arduino-zero/Kconfig"
+source "$(RIOTBOARD)/common/samdx1-arduino-bootloader/Kconfig"
