@@ -119,7 +119,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     /* set prescaler */
     dev(tim)->PSC = (((periph_apb_clk(timer_config[tim].bus) * 2) / freq) - 1);
     DEBUG("[timer]: %" PRIu32 "/%lu =  %" PRIu16 "\n",
-          periph_apb_clk(timer_config[tim].bus), freq, dev(tim)->PSC)
+          periph_apb_clk(timer_config[tim].bus), freq, dev(tim)->PSC);
 
     /* generate an update event to apply our configuration */
     dev(tim)->SWEVG = TIMER0_SWEVG_UPG_Msk;
