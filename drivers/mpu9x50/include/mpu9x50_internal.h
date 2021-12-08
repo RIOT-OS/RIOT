@@ -43,10 +43,10 @@ extern "C" {
  * @name    Sleep times in microseconds
  * @{
  */
-#define MPU9X50_COMP_MODE_SLEEP_US  (1000)
-#define MPU9X50_BYPASS_SLEEP_US     (3000)
-#define MPU9X50_PWR_CHANGE_SLEEP_US (50000)
-#define MPU9X50_RESET_SLEEP_US      (100000)
+#define MPU9X50_COMP_MODE_SLEEP_MS  (1)     /**< 1ms sleep for comp mode */
+#define MPU9X50_BYPASS_SLEEP_MS     (3)     /**< 3ms sleep for bypass */
+#define MPU9X50_PWR_CHANGE_SLEEP_MS (50)    /**< 50ms sleep to change power */
+#define MPU9X50_RESET_SLEEP_MS      (100)   /**< 100ms sleep during driver reset */
 /** @} */
 
 /**

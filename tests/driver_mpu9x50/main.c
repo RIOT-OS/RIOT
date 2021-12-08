@@ -23,13 +23,12 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 #include "board.h"
 
 #include "mpu9x50.h"
 #include "mpu9x50_params.h"
-
-#define SLEEP_USEC   (1000 * 1000u)
 
 int main(void)
 {
@@ -92,7 +91,7 @@ int main(void)
         printf("Temperature [milli deg] : %"PRId32"\n", temperature);
         printf("\n+-------------------------------------+\n");
 
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_MSEC, MS_PER_SEC);  /* 1s delay */
     }
 
     return 0;
