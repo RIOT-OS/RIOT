@@ -16,3 +16,13 @@ config BOARD_COMMON_SODAQ
     select HAS_PERIPH_USBDEV
     select HAS_ARDUINO
     select HAS_HIGHLEVEL_STDIO
+
+    select HAVE_SAUL_GPIO
+
+config MODULE_BOARDS_COMMON_SODAQ
+    bool
+    depends on TEST_KCONFIG
+    help
+        Common code for Sodaq boards.
+
+source "$(RIOTBOARD)/common/samdx1-arduino-bootloader/Kconfig"
