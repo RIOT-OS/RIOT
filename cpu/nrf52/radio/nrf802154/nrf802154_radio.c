@@ -573,7 +573,7 @@ void isr_radio(void)
              * ID 204, "Switching between TX and RX causes unwanted emissions")
              */
             _disable();
-            DEBUG("[nrf52840] TX ACK done.")
+            DEBUG("[nrf52840] TX ACK done.");
             _set_ifs_timer(false);
             break;
         default:
