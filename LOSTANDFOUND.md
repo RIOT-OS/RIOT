@@ -42,7 +42,7 @@ This way, their names are never removed from the RIOT repository.
 
 # Removed Features
 
-### pkg/libcoap [d83d08f0995a88f399e70a7d07b44dd780082436]
+### pkg/libcoap [e89eebc6bfba61f8f81ed078deff4050941ff3be]
 
 Author:
 - Martine Lenders <mlenders@inf.fu-berlin.de>
