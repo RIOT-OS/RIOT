@@ -41,7 +41,7 @@ extern "C" {
  * to avoid not printing of debug in interrupts
  */
 #ifndef THREAD_STACKSIZE_IDLE
-#ifdef MODULE_XTIMER
+#if MODULE_XTIMER || MODULE_ZTIMER64
 /* xtimer's 64 bit arithmetic doesn't perform well on 8 bit archs. In order to
  * prevent a stack overflow when an timer triggers while the idle thread is
  * running, we have to increase the stack size then
