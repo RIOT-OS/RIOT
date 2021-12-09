@@ -306,7 +306,7 @@ static int _set_var(const char *var, size_t var_len,
     char prefix = '\0', sep = '\0';
 
     if ((var == NULL) || (var_len == 0)) {
-        DEBUG("ut_process: zero-length variable found\n")
+        DEBUG("ut_process: zero-length variable found\n");
         return -EINVAL;
     }
     value = _find_var(var, var_len, vars, vars_len);
