@@ -32,6 +32,7 @@ extern "C" {
 #include "periph/gpio.h"
 #include "stdbool.h"
 #include "sdcard_spi.h"
+#include "timex.h"
 
 /* number of clocks that should be applied to the card on init
    before taking further actions (see sd spec. 6.4.1.1 Power Up Time of Card) */
