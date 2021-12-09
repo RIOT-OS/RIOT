@@ -9,4 +9,4 @@ config MODULE_MCI
     bool "LPC23XX Multimedia Card Interface (MCI) driver"
     depends on CPU_FAM_LPC23XX
     depends on TEST_KCONFIG
-    select MODULE_XTIMER
+    select ZTIMER_USEC

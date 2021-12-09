@@ -16,7 +16,8 @@
 #include <string.h>
 #include "cpu.h"
 #include "VIC.h"
-#include "xtimer.h"
+#include "ztimer.h"
+#include "timex.h"
 #include "diskio.h"
 
 #define ENABLE_DEBUG 0
@@ -319,7 +320,7 @@ static void power_on(void)
     MCI_POWER = 0x01;                   /* Power on */
 
     //for (Timer[0] = 10; Timer[0]; ) ; /* 10ms */
-    xtimer_usleep(1000);
+    ztimer_sleep(ZTIMER_USEC, 1 * US_PER_MS);
 
     MCI_POWER = 0x03;                   /* Enable signals */
 }
@@ -400,12 +401,12 @@ static int send_cmd(unsigned int idx, unsigned long arg, unsigned int rt, unsign
     MCI_COMMAND = mc;               /* Initiate command transaction */
 
     //Timer[1] = 100;
-    uint32_t timerstart = xtimer_now_usec();
+    uint32_t timerstart = ztimer_now(ZTIMER_USEC);
 
     while (1) {                     /* Wait for end of the cmd/resp transaction */
 
         //if (!Timer[1]) return 0;
-        if ((xtimer_now_usec() - timerstart) > 10000) {
+        if ((ztimer_now(ZTIMER_USEC) - timerstart) > 10 * US_PER_MS) {
             return 0;
         }
 
@@ -459,10 +460,10 @@ static int wait_ready(unsigned short tmr)
 {
     unsigned long rc;
 
-    uint32_t stoppoll = xtimer_now_usec() + tmr * US_PER_MS;
+    uint32_t stoppoll = ztimer_now(ZTIMER_USEC) + tmr * US_PER_MS;
     bool bBreak = false;
 
-    while (xtimer_now_usec() < stoppoll/*Timer[0]*/) {
+    while (ztimer_now(ZTIMER_USEC) < stoppoll/*Timer[0]*/) {
         if (send_cmd(CMD13, (unsigned long) CardRCA << 16, 1, &rc) && ((rc & 0x01E00) == 0x00800)) {
             bBreak = true;
             break;
@@ -509,12 +510,12 @@ diskio_sta_t mci_initialize(void)
 
     power_off();
 
-    xtimer_usleep(1000);
+    ztimer_sleep(ZTIMER_USEC, 1 * US_PER_MS);
 
     power_on();                             /* Force socket power on */
     MCI_CLOCK = 0x100 | (PCLK / MCLK_ID / 2 - 1);   /* Set MCICLK = MCLK_ID */
     //for (Timer[0] = 2; Timer[0]; );
-    xtimer_usleep(250);
+    ztimer_sleep(ZTIMER_USEC, 250);
 
     send_cmd(CMD0, 0, 0, resp);             /* Enter idle state */
     CardRCA = 0;
@@ -522,7 +523,7 @@ diskio_sta_t mci_initialize(void)
     /*---- Card is 'idle' state ----*/
 
     /* Initialization timeout of 1000 msec */
-    uint32_t start = xtimer_now_usec();
+    uint32_t start = ztimer_now(ZTIMER_USEC);
 
     /* SDC Ver2 */
     if (send_cmd(CMD8, 0x1AA, 1, resp) && (resp[0] & 0xFFF) == 0x1AA) {
@@ -532,7 +533,7 @@ diskio_sta_t mci_initialize(void)
         do {
             /* Wait while card is busy state (use ACMD41 with HCS bit) */
             /* This loop will take a time. Insert wai_tsk(1) here for multitask envilonment. */
-            if (xtimer_now_usec() > (start + 1000000/* !Timer[0] */)) {
+            if (ztimer_now(ZTIMER_USEC) > (start + 1 * US_PER_SEC /* !Timer[0] */)) {
                 DEBUG("%s, %d: Timeout #1\n", RIOT_FILE_RELATIVE, __LINE__);
                 goto di_fail;
             }
@@ -558,9 +559,9 @@ diskio_sta_t mci_initialize(void)
             DEBUG("%s, %d: %lX\n", RIOT_FILE_RELATIVE, __LINE__, resp[0]);
 
             /* This loop will take a time. Insert wai_tsk(1) here for multitask envilonment. */
-            if (xtimer_now_usec() > (start + 1000000/* !Timer[0] */)) {
-                DEBUG("now: %" PRIu32 ", started at: %" PRIu32 "\n",
-                      xtimer_now_usec(), start);
+            if (ztimer_now(ZTIMER_USEC) > (start + 1 * US_PER_SEC/* !Timer[0] */)) {
+                DEBUG("now: %" PRIu32 "us, started at: %" PRIu32 "\n",
+                      (uint32_t) ztimer_now(ZTIMER_USEC), start);
                 DEBUG("%s, %d: Timeout #2\n", RIOT_FILE_RELATIVE, __LINE__);
                 goto di_fail;
             }
