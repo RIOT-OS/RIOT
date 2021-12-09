@@ -27,7 +27,7 @@
 #include <string.h>
 
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "ccs811.h"
 #include "ccs811_params.h"
@@ -54,7 +54,7 @@ int main(void)
 
         /* wait and check for for new data every 10 ms */
         while (ccs811_data_ready (&sensor) != CCS811_OK) {
-            xtimer_usleep(10000);
+            ztimer_sleep(ZTIMER_USEC, 10000);
         }
 
         /* read the data and print them on success */

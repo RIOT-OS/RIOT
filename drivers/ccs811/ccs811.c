@@ -19,7 +19,7 @@
 #include <stdlib.h>
 
 #include "log.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "ccs811_regs.h"
 #include "ccs811.h"
@@ -82,11 +82,11 @@ int ccs811_init(ccs811_t *dev, const ccs811_params_t *params)
         /* enable low active reset signal */
         gpio_clear(dev->params.reset_pin);
         /* t_RESET (reset impuls) has to be at least 20 us, we wait 1 ms */
-        xtimer_usleep(1000);
+        ztimer_sleep(ZTIMER_USEC, 1000);
         /* disable low active reset signal */
         gpio_set(dev->params.reset_pin);
         /* t_START after reset is 1 ms, we wait 1 further ms */
-        xtimer_usleep(1000);
+        ztimer_sleep(ZTIMER_USEC, 1000);
     }
 
     if (gpio_is_valid(dev->params.wake_pin) &&
@@ -112,7 +112,7 @@ int ccs811_init(ccs811_t *dev, const ccs811_params_t *params)
     uint8_t status;
 
     /* wait 100 ms after the reset */
-    xtimer_usleep(100000);
+    ztimer_sleep(ZTIMER_USEC, 100000);
 
     /* get the status to check whether sensor is in bootloader mode */
     if (_reg_read(dev, CCS811_REG_STATUS, &status, 1) != CCS811_OK) {
@@ -139,7 +139,7 @@ int ccs811_init(ccs811_t *dev, const ccs811_params_t *params)
         }
 
         /* wait 100 ms after starting the app */
-        xtimer_usleep(100000);
+        ztimer_sleep(ZTIMER_USEC, 100000);
 
         /* get the status to check whether sensor switched to application mode */
         if (_reg_read(dev, CCS811_REG_STATUS, &status, 1) != CCS811_OK) {
@@ -482,7 +482,7 @@ static int _reg_read(const ccs811_t *dev, uint8_t reg, uint8_t *data, uint32_t l
         /* wake the sensor with low active WAKE signal */
         gpio_clear(dev->params.wake_pin);
         /* t_WAKE is 50 us */
-        xtimer_usleep(50);
+        ztimer_sleep(ZTIMER_USEC, 50);
     }
 #endif
 
@@ -494,7 +494,7 @@ static int _reg_read(const ccs811_t *dev, uint8_t reg, uint8_t *data, uint32_t l
         /* let the sensor enter to sleep mode */
         gpio_set(dev->params.wake_pin);
         /* minimum t_DWAKE is 20 us */
-        xtimer_usleep(20);
+        ztimer_sleep(ZTIMER_USEC, 20);
     }
 #endif
 
@@ -540,7 +540,7 @@ static int _reg_write(const ccs811_t *dev, uint8_t reg, uint8_t *data, uint32_t 
         /* wake the sensor with low active WAKE signal */
         gpio_clear(dev->params.wake_pin);
         /* t_WAKE is 50 us */
-        xtimer_usleep(50);
+        ztimer_sleep(ZTIMER_USEC, 50);
     }
 #endif
 
@@ -557,7 +557,7 @@ static int _reg_write(const ccs811_t *dev, uint8_t reg, uint8_t *data, uint32_t 
         /* let the sensor enter to sleep mode */
         gpio_set(dev->params.wake_pin);
         /* minimum t_DWAKE is 20 us */
-        xtimer_usleep(20);
+        ztimer_sleep(ZTIMER_USEC, 20);
     }
 #endif
 

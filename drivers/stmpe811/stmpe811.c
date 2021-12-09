@@ -20,7 +20,7 @@
 
 #include <inttypes.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #if IS_USED(MODULE_STMPE811_SPI)
 #include "periph/spi.h"
 #else
@@ -135,13 +135,13 @@ static int _soft_reset(const stmpe811_t *dev)
         DEBUG("[stmpe811] soft reset: cannot write soft reset bit to SYS_CTRL1 register\n");
         return -EPROTO;
     }
-    xtimer_msleep(10);
+    ztimer_sleep(ZTIMER_MSEC, 10);
 
     if (_write_reg(dev, STMPE811_SYS_CTRL1, 0) < 0) {
         DEBUG("[stmpe811] soft reset: cannot clear SYS_CTRL1 register\n");
         return -EPROTO;
     }
-    xtimer_msleep(2);
+    ztimer_sleep(ZTIMER_MSEC, 2);
 
     return 0;
 }
