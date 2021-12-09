@@ -34,7 +34,7 @@ The following parameters are defined for ESP-NOW nodes.
 
 Parameter | Default | Description
 :---------|:--------|:-----------
-ESP_NOW_SCAN_PERIOD | 10000000UL | Defines the period in us at which an node scans for other nodes in its range. The default period is 10 s.
+ESP_NOW_SCAN_PERIOD_MS | 10000UL | Defines the period in ms at which an node scans for other nodes in its range. The default period is 10 s.
 ESP_NOW_SOFT_AP_PASS | "ThisistheRIOTporttoESP" | Defines the passphrase as clear text (max. 64 chars) that is used for the SoftAP interface of ESP-NOW nodes. It has to be same for all nodes in one network.
 ESP_NOW_CHANNEL | 6 | Defines the channel that is used as the broadcast medium by all nodes together.
 ESP_NOW_KEY | NULL | Defines a key that is used for encrypted communication between nodes. If it is NULL, encryption is disabled. The key has to be of type ```uint8_t[16]``` and has to be exactly 16 bytes long.

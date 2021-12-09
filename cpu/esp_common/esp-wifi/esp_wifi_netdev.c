@@ -25,7 +25,6 @@
 #include "net/ethernet.h"
 #include "net/netdev/eth.h"
 #include "od.h"
-#include "xtimer.h"
 
 #include "esp_common.h"
 #include "esp_attr.h"
@@ -49,6 +48,7 @@
 #include "esp_wifi_netdev.h"
 
 #include "log.h"
+#include "board.h"
 
 #define ESP_WIFI_DEBUG(f, ...) \
         DEBUG("[esp_wifi] %s: " f "\n", __func__, ## __VA_ARGS__)

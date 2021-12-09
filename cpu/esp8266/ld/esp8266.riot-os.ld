@@ -242,7 +242,7 @@ SECTIONS
     *freertos/*(.literal .text .literal.* .text.*)
     *freertos_common/*(.literal .text .literal.* .text.*)
     *periph/*(.literal .text .literal.* .text.*)
-    *xtimer/*(.literal .text .literal.* .text.*)
+    *ztimer/*(.literal .text .literal.* .text.*)
 
     *libhal.a:clock.o(.literal .text .literal.* .text.*)
     *libhal.a:int_asm--set_intclear.o(.literal .text .literal.* .text.*)

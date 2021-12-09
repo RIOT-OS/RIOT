@@ -32,7 +32,8 @@
 #include "net/ethernet.h"
 #include "net/netdev/eth.h"
 
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 
 #include "esp_common.h"
 #include "esp_attr.h"
@@ -43,6 +44,7 @@
 
 #include "esp32/esp_event_loop.h"
 
+#include "board.h"
 #if !defined(EMAC_PHY_SMI_MDC_PIN) || !defined(EMAC_PHY_SMI_MDIO_PIN)
 #error Board definition does not provide EMAC configuration
 #endif
@@ -50,7 +52,7 @@
 #define SYSTEM_EVENT_ETH_RX_DONE    (SYSTEM_EVENT_MAX + 1)
 #define SYSTEM_EVENT_ETH_TX_DONE    (SYSTEM_EVENT_MAX + 2)
 
-#define EMAC_PHY_CLOCK_DELAY        (500 * USEC_PER_MSEC) /* given in us */
+#define EMAC_PHY_CLOCK_DELAY_MS     (500)
 
 #ifdef EMAC_PHY_LAN8720
 #include "eth_phy/phy_lan8720.h"
@@ -130,7 +132,7 @@ static void _esp_eth_phy_power_enable_gpio(bool enable)
     gpio_init(EMAC_PHY_POWER_PIN, GPIO_OUT);
     gpio_write(EMAC_PHY_POWER_PIN, enable);
 
-    xtimer_usleep (USEC_PER_MSEC);
+    ztimer_sleep(ZTIMER_MSEC, 1);
 
     if (enable) {
         EMAC_ETHERNET_PHY_CONFIG.phy_power_enable(true);
@@ -171,7 +173,7 @@ static int _esp_eth_init(netdev_t *netdev)
      * after activating clock logic it can take some time before we can
      * enable EMAC
      */
-    xtimer_usleep (EMAC_PHY_CLOCK_DELAY);
+    ztimer_sleep(ZTIMER_MSEC, EMAC_PHY_CLOCK_DELAY_MS);
 
     if (ret == ESP_OK && (ret = esp_eth_enable()) != ESP_OK) {
         LOG_TAG_ERROR("esp_eth", "enable failed");

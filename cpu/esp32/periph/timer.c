@@ -40,7 +40,6 @@
 #include "esp_common.h"
 #include "irq_arch.h"
 #include "syscalls.h"
-#include "xtimer.h"
 
 #define RTC_PLL_480M    480 /* PLL with 480 MHz at maximum */
 #define RTC_PLL_320M    320 /* PLL with 480 MHz at maximum */
@@ -74,6 +73,7 @@
 #define HW_TIMER_CLK_DIV      (rtc_clk_apb_freq_get() / 1000000)
 #define HW_TIMER_CORRECTION   (RTC_PLL_320M / CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ)
 #define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION << 1, 5))
+#define HW_TIMER_FREQUENCY    (1000000UL) /* only 1MHz is supported */
 
 struct hw_timer_regs_t {
     /* see Technical Reference, section 17.4 */
@@ -198,7 +198,7 @@ int timer_init (tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
           __func__, dev, freq, cb, arg);
 
     CHECK_PARAM_RET (dev  <  HW_TIMER_NUMOF, -1);
-    CHECK_PARAM_RET (freq == XTIMER_HZ_BASE, -1);
+    CHECK_PARAM_RET (freq == HW_TIMER_FREQUENCY, -1);
     CHECK_PARAM_RET (cb   != NULL, -1);
 
     if (timers[dev].initialized) {
@@ -367,6 +367,7 @@ void IRAM timer_stop(tim_t dev)
 #define HW_TIMER_DELTA_MAX    0x00ffffff  /* in us */
 #define HW_TIMER_DELTA_MASK   0x00ffffff
 #define HW_TIMER_DELTA_RSHIFT 24
+#define HW_TIMER_FREQUENCY    (1000000UL) /* only 1MHz is supported */
 
 #define HW_TIMER_CORRECTION   (RTC_PLL_480M / CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ)
 #define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION, 5))
@@ -442,7 +443,7 @@ int timer_init (tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     DEBUG("%s dev=%u freq=%u cb=%p arg=%p\n", __func__, dev, freq, cb, arg);
 
     CHECK_PARAM_RET (dev  <  HW_TIMER_NUMOF, -1);
-    CHECK_PARAM_RET (freq == XTIMER_HZ_BASE, -1);
+    CHECK_PARAM_RET (freq == HW_TIMER_FREQUENCY, -1);
     CHECK_PARAM_RET (cb   != NULL, -1);
 
     if (timers[dev].initialized) {

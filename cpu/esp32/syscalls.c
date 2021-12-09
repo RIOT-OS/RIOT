@@ -182,7 +182,7 @@ uint32_t system_get_time(void)
 
 uint32_t system_get_time_ms(void)
 {
-    return system_get_time_64() / USEC_PER_MSEC;
+    return system_get_time_64() / US_PER_MS;
 }
 
 uint64_t system_get_time_64(void)
