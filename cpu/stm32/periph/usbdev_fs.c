@@ -24,7 +24,6 @@
 #include <errno.h>
 
 #include "bitarithm.h"
-#include "xtimer.h"
 #include "cpu.h"
 #include "cpu_conf.h"
 #include "periph/pm.h"
