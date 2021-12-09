@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 USEMODULE += nrf24l01p
 
 # set default device parameters in case they are undefined
