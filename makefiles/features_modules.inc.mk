@@ -17,6 +17,8 @@ ifneq (,$(filter periph_init, $(USEMODULE)))
     periph_flexcomm \
     periph_gpio_mux \
     periph_rtc_ms \
+    periph_mcg \
+    periph_wdog \
     periph_rtc_rtt \
     periph_clic \
     periph_coretimer \

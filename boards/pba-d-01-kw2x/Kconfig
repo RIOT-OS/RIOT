@@ -19,3 +19,11 @@ config BOARD_PBA_D_01_KW2X
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
     select HAS_RIOTBOOT
+
+    select HAVE_SAUL_GPIO
+    select HAVE_HDC1000
+    select HAVE_MAG3110
+    select HAVE_MMA8X5X
+    select HAVE_MPL3115A2
+    select HAVE_TCS37727
+    select HAVE_TMP006

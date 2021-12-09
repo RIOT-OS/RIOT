@@ -14,4 +14,7 @@ config BOARD_FRDM_KW41Z
     select HAS_PERIPH_SPI
     select BOARD_COMMON_KW41Z
 
+    select MODULE_BOARDS_COMMON_KW41Z if TEST_KCONFIG
+    select HAVE_FXOS8700
+
 source "$(RIOTBOARD)/common/kw41z/Kconfig"

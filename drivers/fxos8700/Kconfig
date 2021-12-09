@@ -13,6 +13,12 @@ config MODULE_FXOS8700
     select MODULE_PERIPH_I2C
     select MODULE_XTIMER
 
+config HAVE_FXOS8700
+    bool
+    select MODULE_FXOS8700 if MODULE_SAUL_DEFAULT
+    help
+      Indicates that an fxos8700 accelerometer/magnetometer is present.
+
 menuconfig KCONFIG_USEMODULE_FXOS8700
     bool "Configure FXOS8700 driver"
     depends on USEMODULE_FXOS8700
