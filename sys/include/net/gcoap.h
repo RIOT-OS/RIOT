@@ -405,7 +405,7 @@
 #include "net/sock/dtls.h"
 #endif
 #include "net/nanocoap.h"
-#include "xtimer.h"
+#include "timex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -433,8 +433,8 @@ extern "C" {
 /**
  * @brief   Timeout for the DTLS handshake process. Set to 0 for infinite time
  */
-#ifndef CONFIG_GCOAP_DTLS_HANDSHAKE_TIMEOUT_USEC
-#define CONFIG_GCOAP_DTLS_HANDSHAKE_TIMEOUT_USEC    (3 * US_PER_SEC)
+#ifndef CONFIG_GCOAP_DTLS_HANDSHAKE_TIMEOUT_MSEC
+#define CONFIG_GCOAP_DTLS_HANDSHAKE_TIMEOUT_MSEC    (3 * MS_PER_SEC)
 #endif
 
 /**
@@ -450,8 +450,8 @@ extern "C" {
  * @brief   Timeout for freeing up a session when minimum number of available
  *          sessions is not given.
  */
-#ifndef CONFIG_GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_USEC
-#define CONFIG_GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_USEC  (15 * US_PER_SEC)
+#ifndef CONFIG_GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_MSEC
+#define CONFIG_GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_MSEC  (15 * MS_PER_SEC)
 #endif
 
 /**
@@ -538,12 +538,12 @@ extern "C" {
 
 /**
  * @ingroup net_gcoap_conf
- * @brief   Default time to wait for a non-confirmable response [in usec]
+ * @brief   Default time to wait for a non-confirmable response [in msec]
  *
  * Set to 0 to disable timeout.
  */
-#ifndef CONFIG_GCOAP_NON_TIMEOUT
-#define CONFIG_GCOAP_NON_TIMEOUT       (5000000U)
+#ifndef CONFIG_GCOAP_NON_TIMEOUT_MSEC
+#define CONFIG_GCOAP_NON_TIMEOUT_MSEC       (5000U)
 #endif
 
 /**

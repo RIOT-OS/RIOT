@@ -120,7 +120,8 @@ static void test_ztimer_convert_muldiv64_set_speedup(void)
     TEST_ASSERT_EQUAL_INT(4294968LU, ztimer_now(&zmock.super));
 
     /* convert has overflowed ((2000 + 4294966000) % 2**32 = 704U)*/
-    TEST_ASSERT_EQUAL_INT(704LU, ztimer_now(z));
+    /* cast in case ztimer_now_t is uint64_t */
+    TEST_ASSERT_EQUAL_INT(704LU, (uint32_t) ztimer_now(z));
 
     /* assert t hasn't triggered yet */
     TEST_ASSERT_EQUAL_INT(0, val);
@@ -180,21 +181,24 @@ static void test_ztimer_convert_muldiv64_set_slowdown(void)
     ztimer_set(z, &t, 4294968);
 
     ztimer_mock_advance(&zmock, UINT32_MAX);
-    TEST_ASSERT_EQUAL_INT(999, ztimer_now(&zmock.super));
+    /* cast in case ztimer_now_t is uint64_t */
+    TEST_ASSERT_EQUAL_INT(999, (uint32_t) ztimer_now(&zmock.super));
 
     /* ztimer_now(z) is now at (UINT32_MAX + 1000)/1000) == 4294968 */
     TEST_ASSERT_EQUAL_INT(4294968, ztimer_now(z));
     TEST_ASSERT_EQUAL_INT(0, val);
 
     ztimer_mock_advance(&zmock, 704);
-    TEST_ASSERT_EQUAL_INT(1703, ztimer_now(&zmock.super));
+    /* cast in case ztimer_now_t is uint64_t */
+    TEST_ASSERT_EQUAL_INT(1703, (uint32_t) ztimer_now(&zmock.super));
     TEST_ASSERT_EQUAL_INT(4294969, ztimer_now(z));
 
     /* assert that this has not triggered yet. */
     TEST_ASSERT_EQUAL_INT(0, val);
 
     ztimer_mock_advance(&zmock, 1);
-    TEST_ASSERT_EQUAL_INT(1704, ztimer_now(&zmock.super));
+    /* cast in case ztimer_now_t is uint64_t */
+    TEST_ASSERT_EQUAL_INT(1704, (uint32_t) ztimer_now(&zmock.super));
     TEST_ASSERT_EQUAL_INT(4294969, ztimer_now(z));
     TEST_ASSERT_EQUAL_INT(1, val);
     val = 0;

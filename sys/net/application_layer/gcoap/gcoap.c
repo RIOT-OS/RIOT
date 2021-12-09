@@ -32,6 +32,7 @@
 #include "mutex.h"
 #include "random.h"
 #include "thread.h"
+#include "ztimer.h"
 
 #if IS_USED(MODULE_GCOAP_DTLS)
 #include "net/sock/dtls.h"
@@ -187,7 +188,7 @@ static void _on_sock_dtls_evt(sock_dtls_t *sock, sock_async_flags_t type, void *
     if (type & SOCK_ASYNC_CONN_RECV) {
         ssize_t res = sock_dtls_recv(sock, &socket.ctx_dtls_session,
                             _listen_buf, sizeof(_listen_buf),
-                            CONFIG_GCOAP_DTLS_HANDSHAKE_TIMEOUT_USEC);
+                            CONFIG_GCOAP_DTLS_HANDSHAKE_TIMEOUT_MSEC);
         if (res != -SOCK_DTLS_HANDSHAKE) {
             DEBUG("gcoap: could not establish DTLS session: %zd\n", res);
             sock_dtls_session_destroy(sock, &socket.ctx_dtls_session);
@@ -214,10 +215,10 @@ static void _on_sock_dtls_evt(sock_dtls_t *sock, sock_async_flags_t type, void *
         uint8_t minimum_free = CONFIG_GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS;
         if (dsm_get_num_available_slots() < minimum_free)
         {
-            uint32_t timeout = CONFIG_GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_USEC;
+            uint32_t timeout = CONFIG_GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_MSEC;
             event_callback_init(&_dtls_session_free_up_tmout_cb,
                                 _dtls_free_up_session, NULL);
-            event_timeout_init(&_dtls_session_free_up_tmout, &_queue,
+            event_timeout_ztimer_init(&_dtls_session_free_up_tmout, ZTIMER_MSEC, &_queue,
                                &_dtls_session_free_up_tmout_cb.super);
             event_timeout_set(&_dtls_session_free_up_tmout, timeout);
         }
@@ -471,9 +472,9 @@ static void _on_resp_timeout(void *arg) {
 #else
         unsigned i        = CONFIG_COAP_MAX_RETRANSMIT - memo->send_limit;
 #endif
-        uint32_t timeout  = ((uint32_t)CONFIG_COAP_ACK_TIMEOUT << i) * US_PER_SEC;
+        uint32_t timeout  = ((uint32_t)CONFIG_COAP_ACK_TIMEOUT << i) * MS_PER_SEC;
 #if CONFIG_COAP_RANDOM_FACTOR_1000 > 1000
-        uint32_t end = ((uint32_t)TIMEOUT_RANGE_END << i) * US_PER_SEC;
+        uint32_t end = ((uint32_t)TIMEOUT_RANGE_END << i) * MS_PER_SEC;
         timeout = random_uint32_range(timeout, end);
 #endif
         event_timeout_set(&memo->resp_evt_tmout, timeout);
@@ -1009,12 +1010,12 @@ static ssize_t _tl_authenticate(gcoap_socket_t *sock, const sock_udp_ep_t *remot
     msg_t msg;
     bool is_timed_out = false;
     do {
-        uint32_t start = xtimer_now_usec();
-        res = xtimer_msg_receive_timeout(&msg, timeout);
+        uint32_t start = ztimer_now(ZTIMER_MSEC);
+        res = ztimer_msg_receive_timeout(ZTIMER_MSEC, &msg, timeout);
 
         /* ensure whole timeout time for the case we receive other messages than DTLS_EVENT_CONNECTED */
         if (timeout != SOCK_NO_TIMEOUT) {
-            uint32_t diff = (xtimer_now_usec() - start);
+            uint32_t diff = (ztimer_now(ZTIMER_MSEC) - start);
             timeout = (diff > timeout) ? 0: timeout - diff;
             is_timed_out = (res < 0) || (timeout == 0);
         }
@@ -1157,9 +1158,9 @@ ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
             }
             if (memo->msg.data.pdu_buf) {
                 memo->send_limit  = CONFIG_COAP_MAX_RETRANSMIT;
-                timeout           = (uint32_t)CONFIG_COAP_ACK_TIMEOUT * US_PER_SEC;
+                timeout           = (uint32_t)CONFIG_COAP_ACK_TIMEOUT * MS_PER_SEC;
 #if CONFIG_COAP_RANDOM_FACTOR_1000 > 1000
-                timeout = random_uint32_range(timeout, TIMEOUT_RANGE_END * US_PER_SEC);
+                timeout = random_uint32_range(timeout, TIMEOUT_RANGE_END * MS_PER_SEC);
 #endif
                 memo->state = GCOAP_MEMO_RETRANSMIT;
             }
@@ -1172,7 +1173,7 @@ ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
         case COAP_TYPE_NON:
             memo->send_limit = GCOAP_SEND_LIMIT_NON;
             memcpy(&memo->msg.hdr_buf[0], buf, GCOAP_HEADER_MAXLEN);
-            timeout = CONFIG_GCOAP_NON_TIMEOUT;
+            timeout = CONFIG_GCOAP_NON_TIMEOUT_MSEC;
             break;
         default:
             memo->state = GCOAP_MEMO_UNUSED;
@@ -1190,14 +1191,14 @@ ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
 
     _tl_init_coap_socket(&socket);
     if (IS_USED(MODULE_GCOAP_DTLS) && socket.type == GCOAP_SOCKET_TYPE_DTLS) {
-        res = _tl_authenticate(&socket, remote, CONFIG_GCOAP_DTLS_HANDSHAKE_TIMEOUT_USEC);
+        res = _tl_authenticate(&socket, remote, CONFIG_GCOAP_DTLS_HANDSHAKE_TIMEOUT_MSEC);
     }
 
     /* set response timeout; may be zero for non-confirmable */
     if (memo != NULL && res == 0) {
         if (timeout > 0) {
             event_callback_init(&memo->resp_tmout_cb, _on_resp_timeout, memo);
-            event_timeout_init(&memo->resp_evt_tmout, &_queue,
+            event_timeout_ztimer_init(&memo->resp_evt_tmout, ZTIMER_MSEC, &_queue,
                                &memo->resp_tmout_cb.super);
             event_timeout_set(&memo->resp_evt_tmout, timeout);
         }
@@ -1239,7 +1240,7 @@ int gcoap_resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code)
 
     if (coap_get_observe(pdu) == COAP_OBS_REGISTER) {
         /* generate initial notification value */
-        uint32_t now       = xtimer_now_usec();
+        uint32_t now       = ztimer_now(ZTIMER_USEC);
         pdu->observe_value = (now >> GCOAP_OBS_TICK_EXPONENT) & 0xFFFFFF;
         coap_opt_add_uint(pdu, COAP_OPT_OBSERVE, pdu->observe_value);
     }
@@ -1266,7 +1267,7 @@ int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     if (hdrlen > 0) {
         coap_pkt_init(pdu, buf, len, hdrlen);
 
-        uint32_t now       = xtimer_now_usec();
+        uint32_t now       = ztimer_now(ZTIMER_USEC);
         pdu->observe_value = (now >> GCOAP_OBS_TICK_EXPONENT) & 0xFFFFFF;
         coap_opt_add_uint(pdu, COAP_OPT_OBSERVE, pdu->observe_value);
 
