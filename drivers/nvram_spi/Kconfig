@@ -11,4 +11,4 @@ config MODULE_NVRAM_SPI
     depends on TEST_KCONFIG
     select MODULE_NVRAM
     select MODULE_PERIPH_SPI
-    select MODULE_XTIMER
+    select ZTIMER_USEC

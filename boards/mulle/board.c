@@ -28,7 +28,8 @@
 #include "periph/spi.h"
 #include "nvram-spi.h"
 #include "nvram.h"
-#include "xtimer.h"
+#include "ztimer.h"
+#include "timex.h"
 #include "vfs.h"
 #include "fs/devfs.h"
 #include "mtd_spi_nor.h"
@@ -115,7 +116,7 @@ void board_init(void)
 
 
     /* NVRAM requires xtimer for timing */
-    xtimer_init();
+    ztimer_init();
 
     /* Initialize NVRAM */
     status = mulle_nvram_init();
