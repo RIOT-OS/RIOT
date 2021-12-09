@@ -32,15 +32,15 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define _TIMEOUT_TX_MSG_TYPE    (0x8000)
 #define _TIMEOUT_RX_MSG_TYPE    (0x8001)
 #define _CLOSE_CONN_MSG_TYPE    (0x8002)
 #define _TIMEOUT_MSG_VALUE      (0xABCDEFAB)
 
-#ifndef CONN_CAN_ISOTP_TIMEOUT_TX_CONF
-#define CONN_CAN_ISOTP_TIMEOUT_TX_CONF (10 * US_PER_SEC)
+#ifndef CONN_CAN_ISOTP_TIMEOUT_TX_CONF_US
+#define CONN_CAN_ISOTP_TIMEOUT_TX_CONF_US   (10 * US_PER_SEC)
 #endif
 
 static inline int try_put_msg(conn_can_isotp_t *conn, msg_t *msg)
@@ -169,10 +169,10 @@ int conn_can_isotp_send(conn_can_isotp_t *conn, const void *buf, size_t size, in
         return isotp_send(&conn->isotp, buf, size, flags);
     }
     else {
-        xtimer_t timer;
+        ztimer_t timer;
         timer.callback = _tx_conf_timeout;
         timer.arg = conn;
-        xtimer_set(&timer, CONN_CAN_ISOTP_TIMEOUT_TX_CONF);
+        ztimer_set(ZTIMER_USEC, &timer, CONN_CAN_ISOTP_TIMEOUT_TX_CONF_US);
 
         ret = isotp_send(&conn->isotp, buf, size, flags);
 
@@ -192,7 +192,7 @@ int conn_can_isotp_send(conn_can_isotp_t *conn, const void *buf, size_t size, in
                     break;
                 }
 #endif
-                xtimer_remove(&timer);
+                ztimer_remove(ZTIMER_USEC, &timer);
                 return ret;
             case _TIMEOUT_TX_MSG_TYPE:
                 return -ETIMEDOUT;
@@ -246,11 +246,11 @@ int conn_can_isotp_recv(conn_can_isotp_t *conn, void *buf, size_t size, uint32_t
     }
 #endif
 
-    xtimer_t timer;
+    ztimer_t timer;
     if (timeout != 0) {
         timer.callback = _rx_timeout;
         timer.arg = conn;
-        xtimer_set(&timer, timeout);
+        ztimer_set(ZTIMER_USEC, &timer, timeout);
     }
 
     msg_t msg;
@@ -270,7 +270,7 @@ int conn_can_isotp_recv(conn_can_isotp_t *conn, void *buf, size_t size, uint32_t
             }
 #endif
             if (timeout != 0) {
-                xtimer_remove(&timer);
+                ztimer_remove(ZTIMER_USEC, &timer);
             }
             if (snip->size <= size) {
                 memcpy(buf, snip->data, snip->size);
@@ -296,7 +296,7 @@ int conn_can_isotp_recv(conn_can_isotp_t *conn, void *buf, size_t size, uint32_t
             if ((msg.content.ptr == conn) || (msg.content.ptr == conn->master)) {
 #endif
                 if (timeout != 0) {
-                    xtimer_remove(&timer);
+                    ztimer_remove(ZTIMER_USEC, &timer);
                 }
                 return -ECONNABORTED;
 #ifdef MODULE_CONN_CAN_ISOTP_MULTI
@@ -306,7 +306,7 @@ int conn_can_isotp_recv(conn_can_isotp_t *conn, void *buf, size_t size, uint32_t
         default:
             DEBUG("conn_can_isotp_recv: unexpected msg %x\n", msg.type);
             if (timeout != 0) {
-                xtimer_remove(&timer);
+                ztimer_remove(ZTIMER_USEC, &timer);
             }
             ret = -EINTR;
             return ret;
@@ -383,11 +383,11 @@ int conn_can_isotp_select(conn_can_isotp_slave_t **conn, conn_can_isotp_t *maste
 
     int ret;
 
-    xtimer_t timer;
+    ztimer_t timer;
     if (timeout != 0) {
         timer.callback = _rx_timeout;
         timer.arg = master;
-        xtimer_set(&timer, timeout);
+        ztimer_set(ZTIMER_USEC, &timer, timeout);
     }
 
     msg_t msg;
@@ -396,7 +396,7 @@ int conn_can_isotp_select(conn_can_isotp_slave_t **conn, conn_can_isotp_t *maste
     mbox_get(&master->mbox, &msg);
 
     if (timeout != 0) {
-        xtimer_remove(&timer);
+        ztimer_remove(ZTIMER_USEC, &timer);
     }
     switch (msg.type) {
     case CAN_MSG_RX_INDICATION:

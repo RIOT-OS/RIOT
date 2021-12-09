@@ -28,15 +28,15 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define _TIMEOUT_TX_MSG_TYPE    (0x8000)
 #define _TIMEOUT_RX_MSG_TYPE    (0x8001)
 #define _CLOSE_CONN_MSG_TYPE    (0x8002)
 #define _TIMEOUT_MSG_VALUE      (0xABCDEFAB)
 
-#ifndef CONN_CAN_RAW_TIMEOUT_TX_CONF
-#define CONN_CAN_RAW_TIMEOUT_TX_CONF (1 * US_PER_SEC)
+#ifndef CONN_CAN_ISOTP_TIMEOUT_TX_CONF_US
+#define CONN_CAN_ISOTP_TIMEOUT_TX_CONF_US   (1 * US_PER_SEC)
 #endif
 
 int conn_can_raw_create(conn_can_raw_t *conn, struct can_filter *filter, size_t count,
@@ -146,14 +146,14 @@ int conn_can_raw_send(conn_can_raw_t *conn, const struct can_frame *frame, int f
         }
     }
     else {
-        xtimer_t timer;
+        ztimer_t timer;
         timer.callback = _tx_conf_timeout;
         timer.arg = conn;
-        xtimer_set(&timer, CONN_CAN_RAW_TIMEOUT_TX_CONF);
+        ztimer_set(ZTIMER_USEC, &timer, CONN_CAN_ISOTP_TIMEOUT_TX_CONF_US);
 
         handle = raw_can_send_mbox(conn->ifnum, frame, &conn->mbox);
         if (handle < 0) {
-            xtimer_remove(&timer);
+            ztimer_remove(ZTIMER_USEC, &timer);
             return handle;
         }
 
@@ -161,7 +161,7 @@ int conn_can_raw_send(conn_can_raw_t *conn, const struct can_frame *frame, int f
         int timeout = 5;
         while (1) {
             mbox_get(&conn->mbox, &msg);
-            xtimer_remove(&timer);
+            ztimer_remove(ZTIMER_USEC, &timer);
             switch (msg.type) {
             case CAN_MSG_TX_ERROR:
                 return -EIO;
@@ -186,7 +186,7 @@ int conn_can_raw_send(conn_can_raw_t *conn, const struct can_frame *frame, int f
                 if (!timeout--) {
                     return -EINTR;
                 }
-                xtimer_set(&timer, CONN_CAN_RAW_TIMEOUT_TX_CONF);
+                ztimer_set(ZTIMER_USEC, &timer, CONN_CAN_ISOTP_TIMEOUT_TX_CONF_US);
                 break;
             }
         }
@@ -216,12 +216,12 @@ int conn_can_raw_recv(conn_can_raw_t *conn, struct can_frame *frame, uint32_t ti
 
     assert(frame != NULL);
 
-    xtimer_t timer;
+    ztimer_t timer;
 
     if (timeout != 0) {
         timer.callback = _rx_timeout;
         timer.arg = conn;
-        xtimer_set(&timer, timeout);
+        ztimer_set(ZTIMER_USEC, &timer, timeout);
     }
 
     int ret;
@@ -230,7 +230,7 @@ int conn_can_raw_recv(conn_can_raw_t *conn, struct can_frame *frame, uint32_t ti
 
     mbox_get(&conn->mbox, &msg);
     if (timeout != 0) {
-        xtimer_remove(&timer);
+        ztimer_remove(ZTIMER_USEC, &timer);
     }
     switch (msg.type) {
     case CAN_MSG_RX_INDICATION:
