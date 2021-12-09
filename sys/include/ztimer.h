@@ -68,6 +68,23 @@
  * ```
  *
  *
+ * # ztimer best practices
+ *
+ * 1. Don't use ZTIMER_USEC unless the increased resolution is really needed.
+ *    ZTIMER_USEC will, on most platforms, prevent low-power sleep modes.
+ *
+ * 2. Clear ztimer_t structs before use. Example:
+ *
+ *        ztimer_t foo = { 0 };
+ *
+ *    This ensures ztimer knows the timer is not already set, possibly preventing
+ *    an unnecessary full ztimer list traversal.
+ *    (ztimer will ensure that a removed timer is sufficiently cleared.)
+ *
+ * 3. Don't compare ztimer_now() values from different clocks. The clocks are
+ *    almost certainly not synchronized.
+ *
+ *
  * # Design
  *
  * ## clocks, virtual timers, chaining
