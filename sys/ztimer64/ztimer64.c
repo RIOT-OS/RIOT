@@ -128,6 +128,9 @@ static int _add_entry_to_list(ztimer64_clock_t *clock, ztimer64_base_t *entry)
 static int _del_entry_from_list(ztimer64_clock_t *clock, ztimer64_base_t *entry)
 {
     DEBUG("_del_entry_from_list()\n");
+    if (!clock->first) {
+        return 0;
+    }
     assert(_is_set((ztimer64_t *)entry));
     if (clock->first == entry) {
         /* special case: removing first entry */
