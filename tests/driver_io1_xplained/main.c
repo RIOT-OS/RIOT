@@ -21,7 +21,8 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 #include "board.h"
 
 #include "periph/gpio.h"
@@ -31,7 +32,7 @@
 #include "io1_xplained.h"
 #include "io1_xplained_params.h"
 
-#define DELAY_1S   (1U) /* 1 seconds delay between each test */
+#define DELAY_1S   (1U * MS_PER_SEC) /* 1 seconds delay between each test */
 
 static io1_xplained_t dev;
 
@@ -71,12 +72,12 @@ int main(void)
                "+-------------------------------------+\n",
                (int)temperature,
                (unsigned)((temperature - (int)temperature) * 1000));
-        xtimer_sleep(DELAY_1S);
+        ztimer_sleep(ZTIMER_MSEC, DELAY_1S);
 
         /* Card detect pin is inverted */
         if (!gpio_read(IO1_SDCARD_SPI_PARAM_DETECT)) {
             _sd_card_cid();
-            xtimer_sleep(DELAY_1S);
+            ztimer_sleep(ZTIMER_MSEC, DELAY_1S);
         }
 
         uint16_t light;
@@ -84,23 +85,23 @@ int main(void)
         printf("Light level: %i\n"
                "+-------------------------------------+\n",
                light);
-        xtimer_sleep(DELAY_1S);
+        ztimer_sleep(ZTIMER_MSEC, DELAY_1S);
 
         /* set led */
         gpio_set(IO1_LED_PIN);
-        xtimer_sleep(DELAY_1S);
+        ztimer_sleep(ZTIMER_MSEC, DELAY_1S);
 
         /* clear led */
         gpio_clear(IO1_LED_PIN);
-        xtimer_sleep(DELAY_1S);
+        ztimer_sleep(ZTIMER_MSEC, DELAY_1S);
 
         /* toggle led */
         gpio_toggle(IO1_LED_PIN);
-        xtimer_sleep(DELAY_1S);
+        ztimer_sleep(ZTIMER_MSEC, DELAY_1S);
 
         /* toggle led again */
         gpio_toggle(IO1_LED_PIN);
-        xtimer_sleep(DELAY_1S);
+        ztimer_sleep(ZTIMER_MSEC, DELAY_1S);
     }
 
     return 0;
