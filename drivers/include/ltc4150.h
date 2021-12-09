@@ -66,7 +66,6 @@
 
 #include "mutex.h"
 #include "periph/gpio.h"
-#include "xtimer.h"
 
 #ifdef __cplusplus
 extern "C" {
