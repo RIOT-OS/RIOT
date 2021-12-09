@@ -17,7 +17,7 @@ USEMODULE += auto_init_gnrc_rpl
 # configure and use Nimble
 USEMODULE += bluetil_addr
 USEMODULE += nimble_rpble
-NIMBLE_MAX_CONN := 3
+NIMBLE_MAX_CONN = 3
 
 DEVELHELP = 0
 
