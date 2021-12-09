@@ -257,7 +257,7 @@ static int mtd_spi_read_jedec_id(const mtd_spi_nor_t *dev, mtd_jedec_id_t *out)
     uint8_t bank = 0;
     while (buffer[bank] == JEDEC_NEXT_BANK) {
         if (++bank == JEDEC_BANK_MAX) {
-            DEBUG_PUTS("mtd_spi_read_jedec_id: bank out of bounds\n")
+            DEBUG_PUTS("mtd_spi_read_jedec_id: bank out of bounds\n");
             return -1;
         }
     }

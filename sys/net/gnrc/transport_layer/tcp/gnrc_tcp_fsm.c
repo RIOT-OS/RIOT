@@ -208,7 +208,7 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, _gnrc_tcp_fsm_state_t state)
                     /* Check if given port number is in use: return error */
                     if (_is_local_port_in_use(tcb->local_port)) {
                         mutex_unlock(&list->lock);
-                        TCP_DEBUG_ERROR("-EADDRINUSE: Port already used.")
+                        TCP_DEBUG_ERROR("-EADDRINUSE: Port already used.");
                         TCP_DEBUG_LEAVE;
                         return -EADDRINUSE;
                     }

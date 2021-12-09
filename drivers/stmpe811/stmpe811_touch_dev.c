@@ -66,7 +66,7 @@ uint8_t _stmpe811_touches(const touch_dev_t *touch_dev, touch_t *touches, size_t
         touches[0].x = pos.y;
         touches[0].y = dev->params.xmax - pos.x;
 
-        DEBUG("X: %i, Y: %i\n", touches[0].x, touches[0].y)
+        DEBUG("X: %i, Y: %i\n", touches[0].x, touches[0].y);
     }
 
     return ret;
