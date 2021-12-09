@@ -198,6 +198,24 @@ static void test_ztimer64_checkpoint(void)
     TEST_ASSERT_EQUAL_INT(2 * ZTIMER64_CHECKPOINT_INTERVAL + UINT32_MAX, now64);
 }
 
+static void test_ztimer64_set_uninitialized(void)
+{
+    /* regression test for setting an uninitialized ztimer64 on an empty clock */
+    ztimer_mock_t zmock;
+    ztimer_clock_t *z = &zmock.super;
+    ztimer64_clock_t z64mock;
+    ztimer64_clock_t *z64 = &z64mock;
+
+    memset(&zmock, '\0', sizeof(ztimer_mock_t));
+    memset(&z64mock, '\0', sizeof(ztimer64_clock_t));
+    /* ztimer base clock is already extended to 32bit */
+    ztimer_mock_init(&zmock, 32);
+    ztimer64_clock_init(z64, z);
+
+    ztimer64_t timer = { .base.target = 1 };
+    ztimer64_set(z64, &timer, 0);
+}
+
 Test *tests_ztimer64_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -206,6 +224,7 @@ Test *tests_ztimer64_tests(void)
         new_TestFixture(test_ztimer64_set_0),
         new_TestFixture(test_ztimer64_set_at),
         new_TestFixture(test_ztimer64_checkpoint),
+        new_TestFixture(test_ztimer64_set_uninitialized),
     };
 
     EMB_UNIT_TESTCALLER(ztimer64_tests, setup, NULL, fixtures);
