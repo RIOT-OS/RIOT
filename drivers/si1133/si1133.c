@@ -24,7 +24,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 
 #include "periph/i2c.h"
 
@@ -86,7 +87,7 @@ static int _si1133_run_command(si1133_t *dev, uint8_t command)
 
     if (command == SI1133_CMD_FORCE) {
         /* Wait for the expected force acquisition time. */
-        xtimer_usleep(_si1133_force_time_us(dev));
+        ztimer_sleep(ZTIMER_USEC, _si1133_force_time_us(dev));
     }
 
     if (command == SI1133_CMD_RESET_SW) {
@@ -94,7 +95,7 @@ static int _si1133_run_command(si1133_t *dev, uint8_t command)
         dev->cmd_counter = 0x0f;
         /* Reset command puts the device in "Initialization Mode" which requires
          * us to wait until the device is ready. */
-        xtimer_msleep(SI1133_STARTUP_TIME_MS);
+        ztimer_sleep(ZTIMER_USEC, SI1133_STARTUP_TIME_MS * US_PER_MS);
     }
     else if (command == SI1133_CMD_RESET_CMD_CTR) {
         /* The reset cmd_counter command, well, resets it to 0. */
@@ -106,7 +107,7 @@ static int _si1133_run_command(si1133_t *dev, uint8_t command)
     }
 
     uint8_t new_cmd_ctr;
-    xtimer_ticks32_t start_time;
+    ztimer_now_t start_time;
     bool retry = false;
     while (1) {
         ret = i2c_read_reg(dev->i2c_dev, dev->address, SI1133_REG_RESPONSE0,
@@ -142,22 +143,21 @@ static int _si1133_run_command(si1133_t *dev, uint8_t command)
         }
         /* The command didn't yet finish in this case so it should be in running
          * state and we need to retry the loop with a timeout. This avoids
-         * calling xtimer for commands that are immediate. */
+         * calling ztimer for commands that are immediate. */
         if (retry) {
-            if (xtimer_usec_from_ticks(xtimer_diff(xtimer_now(), start_time))
-                > SI1133_COMMAND_TIMEOUT_USEC) {
+            if (ztimer_now(ZTIMER_USEC) - start_time > SI1133_COMMAND_TIMEOUT_USEC) {
                 DEBUG("[si1133] Command 0x%.2x timeout.\n", (unsigned)command);
                 return SI1133_ERR_LOGIC;
             }
         }
         else {
             retry = true;
-            start_time = xtimer_now();
+            start_time = ztimer_now(ZTIMER_USEC);
         }
     }
     if (retry) {
         DEBUG("[si1133] Command overtime: %" PRIu32 " us.\n",
-              xtimer_usec_from_ticks(xtimer_diff(xtimer_now(), start_time)));
+              ztimer_now(ZTIMER_USEC) - start_time);
     }
     return SI1133_OK;
 }
@@ -320,7 +320,7 @@ si1133_ret_code_t si1133_init(si1133_t *dev, const si1133_params_t *params)
     /* After leaving "Off Mode" the SI1133 enters an "Initialization Mode" for
      * a period of time in which it can't be reached over I2C. After this time
      * the device will be in Standby Mode. */
-    xtimer_msleep(SI1133_STARTUP_TIME_MS);
+    ztimer_sleep(ZTIMER_USEC, SI1133_STARTUP_TIME_MS * US_PER_MS);
 
     i2c_acquire(params->i2c_dev);
 
