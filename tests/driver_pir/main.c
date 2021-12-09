@@ -23,7 +23,8 @@
 #include <stdio.h>
 
 #include "thread.h"
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 #include "pir.h"
 #include "pir_params.h"
 
@@ -76,7 +77,7 @@ int main(void)
     while (1) {
         printf("Status: %s\n", pir_get_status(&dev) == PIR_STATUS_INACTIVE ?
                "inactive" : "active");
-        xtimer_usleep(1000 * 1000);
+        ztimer_sleep(ZTIMER_USEC, 1 * US_PER_SEC);
     }
 #else
    thread_create(
