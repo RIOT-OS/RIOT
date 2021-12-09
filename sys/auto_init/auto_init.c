@@ -33,6 +33,11 @@ void auto_init(void)
         void ztimer_init(void);
         ztimer_init();
     }
+    if (IS_USED(MODULE_AUTO_INIT_ZTIMER64)) {
+        LOG_DEBUG("Auto init ztimer64.\n");
+        void ztimer64_init(void);
+        ztimer64_init();
+    }
     if (IS_USED(MODULE_AUTO_INIT_XTIMER) &&
         !IS_USED(MODULE_ZTIMER_XTIMER_COMPAT)) {
         LOG_DEBUG("Auto init xtimer.\n");

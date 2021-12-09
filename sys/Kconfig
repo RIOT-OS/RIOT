@@ -84,6 +84,7 @@ rsource "usb_board_reset/Kconfig"
 rsource "vfs/Kconfig"
 rsource "xtimer/Kconfig"
 rsource "ztimer/Kconfig"
+rsource "ztimer64/Kconfig"
 
 config MODULE_CPP
     bool "Use CPP compiler"
