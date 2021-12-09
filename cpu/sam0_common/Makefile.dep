@@ -12,7 +12,6 @@ USEMODULE += sam0_common_periph
 ifneq (,$(filter sam0_eth,$(USEMODULE)))
   USEMODULE += netdev_eth
   USEMODULE += netopt
-  USEMODULE += xtimer
   USEMODULE += iolist
   FEATURES_REQUIRED += periph_eth
 endif
