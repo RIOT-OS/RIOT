@@ -6,7 +6,14 @@
 #
 
 config MODULE_LSM303DLHC
-    bool "LSM303DLHC 3D accelerometer/magnetometer"
+    bool
+    prompt "LSM303DLHC 3D accelerometer/magnetometer" if !(MODULE_SAUL_DEFAULT && HAVE_LSM303DLHC)
+    default y if (MODULE_SAUL_DEFAULT && HAVE_LSM303DLHC)
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
+
+config HAVE_LSM303DLHC
+    bool
+    help
+        Indicates that a lsm303dlhc sensor is present.
