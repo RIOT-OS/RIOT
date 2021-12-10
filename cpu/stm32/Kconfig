@@ -34,6 +34,11 @@ config HAS_BOOTLOADER_STM32
     help
         Indicates that the stm32 bootloader is being used.
 
+config MODULE_BOOTLOADER_STM32
+    bool "STM32 DFU/UART/SPI bootloader"
+    depends on HAS_BOOTLOADER_STM32
+    depends on TEST_KCONFIG
+
 orsource "kconfigs/Kconfig.clk"
 orsource "kconfigs/*/Kconfig"
 orsource "kconfigs/*/Kconfig.lines"
