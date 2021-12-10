@@ -22,7 +22,7 @@
 
 #include "assert.h"
 #include "kernel_defines.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "mutex.h"
 #include "pn532.h"
 #include "periph/gpio.h"
@@ -63,8 +63,8 @@
 
 /* Constants and magic numbers */
 #define MIFARE_CLASSIC_BLOCK_SIZE   (16)
-#define RESET_TOGGLE_SLEEP          (400000)
-#define RESET_BACKOFF               (10000)
+#define RESET_TOGGLE_SLEEP_MS       (400)
+#define RESET_BACKOFF_MS            (10)
 #define HOST_TO_PN532               (0xD4)
 #define PN532_TO_HOST               (0xD5)
 #define SPI_DATA_WRITE              (0x80)
@@ -104,9 +104,9 @@ void pn532_reset(const pn532_t *dev)
 
     DEBUG("pn532: reset\n");
     gpio_clear(dev->conf->reset);
-    xtimer_usleep(RESET_TOGGLE_SLEEP);
+    ztimer_sleep(ZTIMER_MSEC, RESET_TOGGLE_SLEEP_MS);
     gpio_set(dev->conf->reset);
-    xtimer_usleep(RESET_BACKOFF);
+    ztimer_sleep(ZTIMER_MSEC, RESET_BACKOFF_MS);
 }
 
 int pn532_init(pn532_t *dev, const pn532_params_t *params, pn532_mode_t mode)

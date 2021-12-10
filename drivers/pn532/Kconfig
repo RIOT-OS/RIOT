@@ -26,6 +26,8 @@ config MODULE_PN532
     bool
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
 
 endmenu # PN532 NFC reader
 
