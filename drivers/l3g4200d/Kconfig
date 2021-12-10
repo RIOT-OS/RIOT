@@ -7,10 +7,17 @@
 #
 
 config MODULE_L3G4200D
-    bool "L3G4200D gyroscope"
+    bool
+    prompt "L3G4200D gyroscope" if !(MODULE_SAUL_DEFAULT && HAVE_L3G4200D)
+    default y if (MODULE_SAUL_DEFAULT && HAVE_L3G4200D)
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
+
+config HAVE_L3G4200D
+    bool
+    help
+        Indicates that a l3g4200d sensor is present.
 
 menuconfig KCONFIG_USEMODULE_L3G4200D
     bool "Configure L3G4200D driver"
