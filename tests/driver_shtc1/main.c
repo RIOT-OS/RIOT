@@ -21,10 +21,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "timex.h"
+#include "ztimer.h"
+#include "fmt.h"
 #include "shtc1.h"
 #include "shtc1_params.h"
-#include "xtimer.h"
-#include "fmt.h"
 
 int main(void)
 {
@@ -55,7 +56,7 @@ int main(void)
         printf("Temperature [°C]: %s\n", str_temp);
         printf("  Humidity [%%rH]: %s\n", str_hum);
 
-        xtimer_sleep(2);
+        ztimer_sleep(ZTIMER_MSEC, 2 * MS_PER_SEC);
     }
     return 0;
 }
