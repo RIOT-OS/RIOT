@@ -41,7 +41,7 @@ config MODULE_SAUL_NRF_TEMPERATURE
     select MODULE_PERIPH_TEMPERATURE
 
 config MODULE_AUTO_INIT_SAUL
-    bool "Auto initialize the SAUL sybsystem"
+    bool "Auto initialize the SAUL subsystem"
     depends on MODULE_AUTO_INIT
     select MODULE_SAUL_INIT_DEVS
     default y
