@@ -278,6 +278,7 @@ Author(s):
 Reason for removal:
 - Hardware not available so can't be tested
 
+[d83d08f0995a88f399e70a7d07b44dd780082436]: https://github.com/RIOT-OS/RIOT/commit/d83d08f0995a88f399e70a7d07b44dd780082436
 [cdc252ab7bd4161cc046bf93a3e55995704b24d4]: https://github.com/RIOT-OS/RIOT/commit/cdc252ab7bd4161cc046bf93a3e55995704b24d4
 [ed3887ac5c1e95308c2827bce3cdca8b0f146c22]: https://github.com/RIOT-OS/RIOT/commit/ed3887ac5c1e95308c2827bce3cdca8b0f146c22
 [0e2a62078850e1ecc74db2db4d639cf2d8fb96d3]: https://github.com/RIOT-OS/RIOT/commit/0e2a62078850e1ecc74db2db4d639cf2d8fb96d3
