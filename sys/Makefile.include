@@ -102,6 +102,10 @@ ifneq (,$(filter riotboot,$(FEATURES_USED)))
   include $(RIOTBASE)/sys/riotboot/Makefile.include
 endif
 
+ifneq (,$(filter riotboot_vfs,$(USEMODULE)))
+  include $(RIOTBASE)/sys/riotboot/Makefile.include
+endif
+
 ifneq (,$(filter skald, $(USEMODULE)))
   include $(RIOTBASE)/sys/net/ble/skald/Makefile.include
 endif

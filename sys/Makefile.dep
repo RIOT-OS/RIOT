@@ -787,6 +787,19 @@ ifneq (,$(filter riotboot_serial, $(USEMODULE)))
   USEMODULE += checksum
 endif
 
+ifneq (,$(filter riotboot_vfs, $(USEMODULE)))
+  USEMODULE += riotboot
+  USEMODULE += vfs
+  USEMODULE += vfs_util
+  FEATURES_REQUIRED += periph_flashpage
+  # cpu_get_image_baseaddr() only implemented on Cortex-M
+  FEATURES_REQUIRED += cpu_core_cortexm
+
+  ifneq (1, $(RIOTBOOT_BUILD))
+    ROM_OFFSET = $(RIOTBOOT_LEN)
+  endif
+endif
+
 ifneq (,$(filter riotboot_reset, $(USEMODULE)))
   USEMODULE += riotboot
   USEMODULE += usb_board_reset
