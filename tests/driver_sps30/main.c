@@ -18,15 +18,16 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 #include "sps30.h"
 #include "sps30_params.h"
 
-#define TEST_START_DELAY_S          (2U)
-#define SENSOR_RESET_DELAY_S        (10U)
-#define SENSOR_STARTUP_DELAY_S      (10U)
-#define SENSOR_SLEEP_WAKE_DELAY_S   (5U)
-#define POLL_FOR_READY_S            (1U)
+#define TEST_START_DELAY_MS         (2 * MS_PER_SEC)
+#define SENSOR_RESET_DELAY_MS       (10 * MS_PER_SEC)
+#define SENSOR_STARTUP_DELAY_MS     (10 * MS_PER_SEC)
+#define SENSOR_SLEEP_WAKE_DELAY_MS  (5 * MS_PER_SEC)
+#define POLL_FOR_READY_MS           (1 * MS_PER_SEC)
 #define NUM_OF_MEASUREMENTS         (10U)
 
 #define TYPE_MC_STR  "MC PM"
@@ -62,7 +63,7 @@ int main(void)
     bool error = false;
     unsigned cnt = NUM_OF_MEASUREMENTS;
 
-    xtimer_sleep(TEST_START_DELAY_S);
+    ztimer_sleep(ZTIMER_MSEC, TEST_START_DELAY_MS);
 
     puts("SPS30 test application\n");
 
@@ -87,7 +88,7 @@ int main(void)
     error |= _print_error("start_fan_clean", ec);
 
     /* wait long enough for the fan clean to be done and the fan to settle */
-    xtimer_sleep(2 * SPS30_FAN_CLEAN_S);
+    ztimer_sleep(ZTIMER_MSEC, 2 * SPS30_FAN_CLEAN_S);
 
     /* read the currently set value from the sensor */
     ec = sps30_read_ac_interval(&dev, &ci);
@@ -101,23 +102,23 @@ int main(void)
     ec = sps30_reset(&dev);
     error |= _print_error("reset", ec);
 
-    xtimer_sleep(SENSOR_RESET_DELAY_S);
+    ztimer_sleep(ZTIMER_MSEC, SENSOR_RESET_DELAY_MS);
 
     /* Put the sensor in sleep */
     ec = sps30_sleep(&dev);
     error |= _print_error("sleep", ec);
-    xtimer_sleep(SENSOR_SLEEP_WAKE_DELAY_S);
+    ztimer_sleep(ZTIMER_MSEC, SENSOR_SLEEP_WAKE_DELAY_MS);
 
     /* Wake-up the sensor */
     ec = sps30_wakeup(&dev);
     error |= _print_error("wake-up", ec);
-    xtimer_sleep(SENSOR_SLEEP_WAKE_DELAY_S);
+    ztimer_sleep(ZTIMER_MSEC, SENSOR_SLEEP_WAKE_DELAY_MS);
 
     /* start the sensor again again... */
     ec = sps30_start_measurement(&dev);
     error |= _print_error("start_measurement", ec);
 
-    xtimer_sleep(SENSOR_STARTUP_DELAY_S);
+    ztimer_sleep(ZTIMER_MSEC, SENSOR_STARTUP_DELAY_MS);
 
     ec = sps30_read_ac_interval(&dev, &ci);
     error |= _print_error("read_ac_interval", ec);
@@ -141,7 +142,7 @@ int main(void)
                 cnt--; /* if errors happen, stop after NUM_OF_MEASUREMENTS */
             }
             /* try again after some time */
-            xtimer_sleep(POLL_FOR_READY_S);
+            ztimer_sleep(ZTIMER_MSEC, POLL_FOR_READY_MS);
             continue;
         }
 
