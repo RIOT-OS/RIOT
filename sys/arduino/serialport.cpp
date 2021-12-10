@@ -24,6 +24,7 @@ extern "C" {
 
 #include "fmt.h"
 #include "irq.h"
+#include "stdio_base.h"
 }
 
 #include "serialport.hpp"
@@ -41,19 +42,21 @@ SerialPort::SerialPort(uart_t dev)
 
 int SerialPort::available(void)
 {
-    return (int)rx_buf.avail;
+    return stdio_avail();
 }
 
 void SerialPort::begin(long baudrate)
 {
+    stdio_init();
     /* this clears the contents of the ringbuffer... */
-    ringbuffer_init(&rx_buf, rx_mem, SERIAL_RX_BUFSIZE);
-    uart_init(dev, (uint32_t)baudrate, rx_cb, (void *)&rx_buf);
+    stdio_clear();
+    (void)baudrate; // FIXME Should we use the baudrate, somehow?
 }
 
 void SerialPort::end(void)
 {
-    uart_poweroff(dev);
+    // XXX Should we switch off the stdio backend?
+    //uart_poweroff(dev);
 }
 
 size_t SerialPort::print(int val)
@@ -249,31 +252,32 @@ size_t SerialPort::println(void)
 
 int SerialPort::read(void)
 {
-    int res = -1;
-
-    irq_disable();
-    if (rx_buf.avail > 0) {
-        res = ringbuffer_get_one(&rx_buf);
+    if (stdio_avail()) {
+        char c;
+        ssize_t n = stdio_read((void*)&c, 1);
+        if (n != 1) {
+            return -1;
+        }
+        return c;
     }
-    irq_enable();
 
-    return res;
+    return -1;
 }
 
 int SerialPort::write(int val)
 {
-    uart_write(dev, (uint8_t *)&val, 1);
+    stdio_write((const void*)&val, 1);
     return 1;
 }
 
 int SerialPort::write(const char *str)
 {
-    uart_write(dev, (uint8_t *)str, strlen(str));
+    stdio_write((const void*)str, strlen(str));
     return strlen(str);
 }
 
 int SerialPort::write(char *buf, int len)
 {
-    uart_write(dev, (uint8_t *)buf, len);
+    stdio_write((const void*)buf, len);
     return len;
 }

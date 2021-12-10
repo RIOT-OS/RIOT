@@ -35,6 +35,18 @@ extern "C" {
 void stdio_init(void);
 
 /**
+ * @brief Get number of bytes available for reading.
+ *
+ * @return nr of available bytes
+ */
+int stdio_avail(void);
+
+/**
+ * @brief Clear the input buffer
+ */
+void stdio_clear(void);
+
+/**
  * @brief read @p len bytes from stdio uart into @p buffer
  *
  * @param[out]  buffer  buffer to read into

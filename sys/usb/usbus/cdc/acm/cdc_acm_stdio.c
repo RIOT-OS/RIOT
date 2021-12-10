@@ -51,6 +51,16 @@ void stdio_init(void)
 #endif
 }
 
+int stdio_avail(void)
+{
+    return tsrb_avail(&_cdc_stdio_isrpipe.tsrb);
+}
+
+void stdio_clear(void)
+{
+    tsrb_clear(&_cdc_stdio_isrpipe.tsrb);
+}
+
 ssize_t stdio_read(void* buffer, size_t len)
 {
     (void)buffer;
