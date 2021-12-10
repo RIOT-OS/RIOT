@@ -10,7 +10,6 @@ config MODULE_LIS3MDL
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
-    select MODULE_XTIMER
 
 config HAVE_LIS3MDL
     bool
