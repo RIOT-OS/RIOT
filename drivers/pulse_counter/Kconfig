@@ -12,4 +12,3 @@ config MODULE_PULSE_COUNTER
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
-    select MODULE_XTIMER
