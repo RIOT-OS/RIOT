@@ -74,6 +74,9 @@ static WDOG_WinSel_TypeDef _get_illegal_window(uint32_t min_time, uint32_t calcu
 
 static void _init(uint32_t min_time, uint32_t max_time, bool warn)
 {
+    /* avoid compilation errors when NDEBUG is defined */
+    (void)min_time;
+    (void)max_time;
 #ifndef MODULE_PERIPH_WDT_CB
     (void)warn;
 #endif
