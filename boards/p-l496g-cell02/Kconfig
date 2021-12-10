@@ -26,4 +26,6 @@ config BOARD_P_L496G_CELL02
     # Clock configuration
     select BOARD_HAS_LSE
 
+    select HAVE_SAUL_GPIO
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"

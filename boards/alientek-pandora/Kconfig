@@ -25,4 +25,6 @@ config BOARD_ALIENTEK_PANDORA
     # Clock configuration
     select BOARD_HAS_LSE
 
+    select HAVE_SAUL_GPIO
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"

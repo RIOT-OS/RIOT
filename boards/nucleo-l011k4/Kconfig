@@ -22,5 +22,7 @@ config BOARD_NUCLEO_L011K4
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+    # Force picolibc to reduce ROM usage as per the makefile.dep
+    select MODULE_PICOLIBC if TEST_KCONFIG && HAS_PICOLIBC
 
 source "$(RIOTBOARD)/common/nucleo32/Kconfig"

@@ -21,9 +21,13 @@ config BOARD_UBLOX_C030_U201
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+    select HAS_PERIPH_UART_HW_FC
 
     # Clock configuration
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
+
+    select HAVE_SAUL_GPIO
+    select MODULE_PERIPH_UART_HW_FC if TEST_KCONFIG && HAS_PERIPH_UART_HW_FC
 
 source "$(RIOTBOARD)/common/stm32/Kconfig"

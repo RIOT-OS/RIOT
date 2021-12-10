@@ -22,4 +22,13 @@ config BOARD_COMMON_BLXXXPILL
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
 
+    select HAVE_SAUL_GPIO
+
+config MODULE_BOARDS_COMMON_BLXXXPILL
+    bool
+    depends on TEST_KCONFIG
+    help
+       Common code of bluepill or blackpill boards
+
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"
