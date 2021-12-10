@@ -63,7 +63,10 @@ files. Two files will be sources of configuration during the generation of the
 final header file: `app.config` and `user.config`, which should be placed
 inside the application's folder. `app.config` sets default configuration
 values for the particular application, the user can override them by setting
-them in `user.config`.
+them in `user.config`. Additionally, further `.config` files can be added to
+the variable `KCONFIG_ADD_CONFIG`, which will be applied _after_ default CPU and
+board configurations, `app.config` and `user.config`. This means that they will
+have priority.
 
 Let's say that the `SOCK_UTIL_SCHEME_MAXLEN` symbol in `sock_util` module needs
 to be configured. The `user.config` file could look like:
@@ -456,6 +459,34 @@ config BOARD_SAMR21_XPRO
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV
     select HAS_RIOTBOOT
+```
+
+### Default configurations
+
+Boards, common board directories, CPUs and common CPU directories may need to
+override default configuration values. Visible configuration symbols are
+configurable by the user and show on the menuconfig interface. `.config` files
+are used to set their values. To allow multiple sources of `.config` files,
+there are two Makefile variables developers should use: `KCONFIG_CPU_CONFIG` for
+sources added by the CPU or common CPU directories, and `KCONFIG_BOARD_CONFIG`
+for sources added by the board or common board directories. This ensures the
+correct priority of the configurations.
+
+Currently the `Makefile.features` infrastructure is used to populate the
+configuration sources. As the order in which `.config` files are merged matters,
+configuration sources should be ordered from more generic to more specific.
+Because board's `Makefile.features` is included before CPU's `Makefile.features`
+it is important to utilize two different lists of configuration sources. For
+instance, if `cpu/cortexm_common` adds its configuration, `cpu/stm32` should add
+its configuration after it, and `boards/stm32f769i-disco` after it.
+
+```Makefile
+include $(RIOTCPU)/cortexm_common/Makefile.features
+
+# Add stm32 configs after including cortexm_common so stm32 takes precedence
+ifeq (1, $(TEST_KCONFIG))
+  KCONFIG_CPU_CONFIG += $(RIOTCPU)/stm32/stm32.config
+endif
 ```
 
 ## Summary of reserved Kconfig prefixes
