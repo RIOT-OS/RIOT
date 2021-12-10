@@ -354,6 +354,14 @@ extern "C" {
 #define AUTO_INIT_PRIO_MOD_DOCK_DNS                     1550
 #endif
 
+/**
+ * @brief   Remove RIOTBOOT canary after successful boot
+ *          This must always be the last step
+ */
+#ifndef AUTO_INIT_PRIO_RIOTBOOT_VFS
+#define AUTO_INIT_PRIO_RIOTBOOT_VFS                     9999
+#endif
+
 #ifdef __cplusplus
 }
 #endif
