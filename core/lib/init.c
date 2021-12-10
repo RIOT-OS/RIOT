@@ -89,10 +89,16 @@ void kernel_init(void)
                       idle_thread, NULL, "idle");
     }
 
-    thread_create(main_stack, sizeof(main_stack),
-                  THREAD_PRIORITY_MAIN,
-                  THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
-                  main_trampoline, NULL, "main");
+    if (IS_USED(MODULE_CORE_THREAD)) {
+        thread_create(main_stack, sizeof(main_stack),
+                      THREAD_PRIORITY_MAIN,
+                      THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                      main_trampoline, NULL, "main");
+    }
+    else {
+        irq_enable();
+        main_trampoline(NULL);
+    }
 
     cpu_switch_context_exit();
 }

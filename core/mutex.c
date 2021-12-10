@@ -33,6 +33,8 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#if MAXTHREADS > 1
+
 /**
  * @brief   Block waiting for a locked mutex
  * @pre     IRQs are disabled
@@ -226,3 +228,7 @@ int mutex_trylock_ffi(mutex_t *mutex)
 {
     return mutex_trylock(mutex);
 }
+
+#else /* MAXTHREADS < 2 */
+typedef int dont_be_pedantic;
+#endif

@@ -249,7 +249,31 @@ static inline int mutex_trylock(mutex_t *mutex)
  *
  * @post    The mutex @p is locked and held by the calling thread.
  */
+#if (MAXTHREADS > 1) || DOXYGEN
 void mutex_lock(mutex_t *mutex);
+#else
+/**
+ * @brief   dummy implementation for when no scheduler is used
+ */
+static inline void mutex_lock(mutex_t *mutex)
+{
+    /* (ab)use next pointer as lock variable */
+    volatile uintptr_t *lock = (void *)&mutex->queue.next;
+
+    /* spin until lock is released (e.g. by interrupt).
+     *
+     * Note: since only the numbers 0 and 1 are ever stored in lock, this
+     * read does not need to be atomic here - even while a concurrent write
+     * is performed on lock, a read will still either yield 0 or 1 (so the old
+     * or new value, which both is fine), even if the lock is read out byte-wise
+     * (e.g. on AVR).
+     */
+    while (*lock) {}
+
+    /* set lock variable */
+    *lock = 1;
+}
+#endif
 
 /**
  * @brief   Locks a mutex, blocking. This function can be canceled.
@@ -284,7 +308,18 @@ int mutex_lock_cancelable(mutex_cancel_t *mc);
  * @note    It is safe to unlock a mutex held by a different thread.
  * @note    It is safe to call this function from IRQ context.
  */
+#if (MAXTHREADS > 1) || DOXYGEN
 void mutex_unlock(mutex_t *mutex);
+#else
+/**
+ * @brief   dummy implementation for when no scheduler is used
+ */
+static inline void mutex_unlock(mutex_t *mutex)
+{
+    /* (ab)use next pointer as lock variable */
+    mutex->queue.next = NULL;
+}
+#endif
 
 /**
  * @brief   Unlocks the mutex and sends the current thread to sleep
