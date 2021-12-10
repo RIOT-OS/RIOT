@@ -53,6 +53,29 @@ sltb001a
 slwstk6220a
 waspmote-pro
 z1
+
+
+alientek-pandora
+blackpill
+bluepill-128kib
+bluepill-stm32f030c8
+bluepill
+iotlab-a8-m3
+iotlab-m3
+lobaro-lorabox
+olimexino-stm32
+p-l496g-cell02
+stm32f429i-disco
+stm32f769i-disco
+stm32f723e-disco
+stm32l0538-disco
+stm32l476g-disco
+stm32mp157c-dk2
+ublox-c030-u201
+weact-f401cc
+weact-f401ce
+weact-f411ce
+ublox-c030-u201
 "}
 
 : ${TEST_KCONFIG_ENFORCE_APP_GROUPS:="
@@ -124,7 +147,6 @@ fi
 get_supported_kconfig_board_app() {
     local board=$1
     local appdir=$2
-
     if is_in_list "${board}" "${TEST_KCONFIG_BOARDS_AVAILABLE}"; then
         if is_in_list "${appdir}" "${TEST_KCONFIG_ENFORCE_APP_GROUPS}"; then
             return 0
@@ -228,7 +250,7 @@ _greplist() {
 # get list of all app directories
 get_apps() {
     make -f makefiles/app_dirs.inc.mk info-applications \
-        | $(_greplist $APPS) | sort
+        | $(_greplist $APPS) | $(_greplist examples/hello-world tests/mtd_mapper tests/saul) | sort
 }
 
 # take app dir as parameter, print all boards that are supported
@@ -282,7 +304,7 @@ get_app_board_toolchain_pairs() {
         do
             echo $prefix $appdir $board:$toolchain
         done
-    done | $(_greplist $BOARDS)
+    done | $(_greplist $BOARDS) | $(_greplist alientek-pandora blackpill bluepill-128kib bluepill-stm32f030c8 bluepill iotlab-a8-m3 iotlab-m3 lobaro-lorabox olimexino-stm32 p-l496g-cell02 stm32f429i-disco stm32f769i-disco stm32f723e-disco stm32l0538-disco stm32l476g-disco stm32mp157c-dk2 ublox-c030-u201 weact-f401cc weact-f401ce weact-f411ce ublox-c030-u201)
 }
 
 # use dwqc to create full "appdir board toolchain" compile job list
@@ -379,8 +401,10 @@ compile() {
 
     if [ ${should_check_kconfig_hash} != 0 ]; then
         if [ ${kconfig_test_hash} != ${test_hash} ]; then
-            echo "Hashes of binaries with and without Kconfig mismatch for ${appdir}";
+            tput setaf 1
+            echo "Hashes of binaries with and without Kconfig mismatch for ${appdir} with ${board}";
             echo "Please check that all used modules are modelled in Kconfig and enabled";
+            tput sgr0
             kconfig_module_packages_diff ${board} ${appdir}
             RES=1
         fi
