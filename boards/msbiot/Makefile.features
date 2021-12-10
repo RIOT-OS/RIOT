@@ -12,4 +12,4 @@ FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 
 # msbiot provides a custom default Kconfig clock configuration
-KCONFIG_ADD_CONFIG += $(RIOTBOARD)/msbiot/clock.config
+KCONFIG_BOARD_CONFIG += $(RIOTBOARD)/msbiot/clock.config

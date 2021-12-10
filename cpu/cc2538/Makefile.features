@@ -19,5 +19,5 @@ include $(RIOTCPU)/cortexm_common/Makefile.features
 # This configuration enables modules that are only available when using Kconfig
 # module modelling
 ifeq (1, $(TEST_KCONFIG))
-  KCONFIG_ADD_CONFIG += $(RIOTCPU)/cc2538/cc2538.config
+  KCONFIG_CPU_CONFIG += $(RIOTCPU)/cc2538/cc2538.config
 endif
