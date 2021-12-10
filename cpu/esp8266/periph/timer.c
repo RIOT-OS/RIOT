@@ -382,7 +382,7 @@ void IRAM os_timer_handler (void* arg)
 
 int timer_init (tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
-    DEBUG("%s dev=%u freq=%lu cb=%p arg=%p\n", __func__, dev, freq, cb, arg);
+    DEBUG("%s dev=%u freq=%u cb=%p arg=%p\n", __func__, dev, freq, cb, arg);
 
     CHECK_PARAM_RET (dev  <  OS_TIMER_NUMOF, -1);
     CHECK_PARAM_RET (freq == XTIMER_HZ_BASE, -1);
