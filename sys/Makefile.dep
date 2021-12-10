@@ -559,6 +559,10 @@ ifneq (,$(filter vfs_default,$(USEMODULE)))
   DEFAULT_MODULE += vfs_auto_mount
 endif
 
+ifneq (,$(filter vfs_util,$(USEMODULE)))
+  USEMODULE += vfs
+endif
+
 ifneq (,$(filter vfs,$(USEMODULE)))
   USEMODULE += posix_headers
   ifeq (native, $(BOARD))
