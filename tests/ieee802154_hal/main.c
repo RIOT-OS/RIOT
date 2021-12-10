@@ -18,7 +18,6 @@
  * @}
  */
 
-#include <assert.h>
 #include <stdio.h>
 #include <strings.h>
 
@@ -35,6 +34,7 @@
 #include "shell.h"
 #include "shell_commands.h"
 
+#include "test_utils/expect.h"
 #include "xtimer.h"
 
 #define SYMBOL_TIME (16U) /**< 16 us */
@@ -168,7 +168,7 @@ static void _tx_finish_handler(event_t *event)
 
     (void) event;
     /* The TX_DONE event indicates it's safe to call the confirm counterpart */
-    assert(ieee802154_radio_confirm_transmit(&_radio[0], &tx_info) >= 0);
+    expect(ieee802154_radio_confirm_transmit(&_radio[0], &tx_info) >= 0);
 
     if (!ieee802154_radio_has_irq_ack_timeout(&_radio[0]) && !ieee802154_radio_has_frame_retrans(&_radio[0])) {
         /* This is just to show how the MAC layer would handle ACKs... */
@@ -281,7 +281,7 @@ static int _init(void)
     /* Since the device was already initialized, turn on the radio.
      * The transceiver state will be "TRX_OFF" */
     res = ieee802154_radio_request_on(&_radio[0]);
-    assert(res >= 0);
+    expect(res >= 0);
     while(ieee802154_radio_confirm_on(&_radio[0]) == -EAGAIN) {}
 
     ieee802154_radio_set_frame_filter_mode(&_radio[0], IEEE802154_FILTER_ACCEPT);
@@ -291,25 +291,25 @@ static int _init(void)
     /* Set all IEEE addresses */
     res = ieee802154_radio_config_addr_filter(&_radio[0],
                                         IEEE802154_AF_SHORT_ADDR, &short_addr);
-    assert(res >= 0);
+    expect(res >= 0);
     res = ieee802154_radio_config_addr_filter(&_radio[0],
                                         IEEE802154_AF_EXT_ADDR, &ext_addr);
-    assert(res >= 0);
+    expect(res >= 0);
     res = ieee802154_radio_config_addr_filter(&_radio[0],
                                         IEEE802154_AF_PANID, &panid);
-    assert(res >= 0);
+    expect(res >= 0);
 
     /* Set PHY configuration */
     ieee802154_phy_conf_t conf = {.channel=CONFIG_IEEE802154_DEFAULT_CHANNEL, .page=CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE, .pow=CONFIG_IEEE802154_DEFAULT_TXPOWER};
 
     res = ieee802154_radio_config_phy(&_radio[0], &conf);
-    assert(res >= 0);
+    expect(res >= 0);
 
     /* ieee802154_radio_set_cca_mode*/
     res = ieee802154_radio_set_cca_mode(&_radio[0], IEEE802154_CCA_MODE_ED_THRESHOLD);
-    assert(res >= 0);
+    expect(res >= 0);
     res = ieee802154_radio_set_cca_threshold(&_radio[0], CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
-    assert(res >= 0);
+    expect(res >= 0);
 
     /* Set the transceiver state to RX_ON in order to receive packets */
     _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
@@ -367,7 +367,7 @@ int _cca(int argc, char **argv)
     }
     mutex_lock(&lock);
     int res = ieee802154_radio_confirm_cca(&_radio[0]);
-    assert(res >= 0);
+    expect(res >= 0);
 
     if (res > 0) {
         puts("CLEAR");
@@ -394,7 +394,7 @@ static inline void _set_trx_state(int state, bool verbose)
         a = xtimer_now();
         if(res != 0) {
             printf("%i != 0 \n", res);
-            assert(false);
+            expect(false);
         }
     }
 
@@ -402,7 +402,7 @@ static inline void _set_trx_state(int state, bool verbose)
     if (verbose) {
         if (res != 0) {
             printf("%i != 0 \n", res);
-            assert(false);
+            expect(false);
         }
         uint32_t secs = xtimer_usec_from_ticks(xtimer_diff(xtimer_now(), a));
         printf("\tTransition took %" PRIu32 " usecs\n", secs);
