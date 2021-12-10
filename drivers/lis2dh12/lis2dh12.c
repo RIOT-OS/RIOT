@@ -23,7 +23,7 @@
 #include "byteorder.h"
 #include "mutex.h"
 #include "timex.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "lis2dh12.h"
 #include "lis2dh12_internal.h"
@@ -595,8 +595,8 @@ int lis2dh12_read_temperature(const lis2dh12_t *dev, int16_t *temp)
     if (!_read(dev, REG_TEMP_CFG_REG)) {
         uint8_t odr = _read(dev, REG_CTRL_REG1) >> 4;
         _write(dev, REG_TEMP_CFG_REG, LIS2DH12_TEMP_CFG_REG_ENABLE);
-        if (IS_USED(MODULE_XTIMER)) {
-            xtimer_msleep(MS_PER_SEC / hz_per_dr[odr]);
+        if (IS_USED(MODULE_ZTIMER)) {
+            ztimer_sleep(ZTIMER_MSEC, MS_PER_SEC / hz_per_dr[odr]);
         }
     }
 
