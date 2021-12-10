@@ -9,8 +9,9 @@
 menuconfig MODULE_LPSXXX
     bool
     prompt "LPSXXX Pressure Sensors" if !(MODULE_SAUL_DEFAULT && HAVE_LPSXXX)
-    depends on HAS_PERIPH_I2C
+    default y if (MODULE_SAUL_DEFAULT && HAVE_LPSXXX)
     depends on TEST_KCONFIG
+    depends on HAS_PERIPH_I2C
     select MODULE_PERIPH_I2C
     help
         Device driver for the LPSXXX pressure sensor family
@@ -18,18 +19,19 @@ menuconfig MODULE_LPSXXX
 
 if MODULE_LPSXXX
 
-choice LPSXXX_VARIANT
-    bool "Model"
-    default MODULE_LPS331AP if HAVE_LPS331AP
-    default MODULE_LPS22HB if HAVE_LPS22HB
-    default MODULE_LPS22HH if HAVE_LPS22HH
-    default MODULE_LPS25HB if HAVE_LPS25HB
+choice
+    bool "sensor variant"
+    default MODULE_LPS331AP if HAS_LPS331AP
+    default MODULE_LPS22HB if HAS_LPS22HB
+    default MODULE_LPS22HH if HAS_LPS22HH
+    default MODULE_LPS25HB if HAS_LPS25HB
     help
         Device driver for the LPSXXX pressure sensor family
         (LPS331AP/LPS25HB/LPS22HB/LPS22HH). Select a model.
 
 config MODULE_LPS331AP
     bool "LPS331AP"
+
 config MODULE_LPS22HB
     bool "LPS22HB"
 
@@ -65,7 +67,6 @@ endif # KCONFIG_USEMODULE_LPSXXX
 
 config HAVE_LPSXXX
     bool
-    select MODULE_LPSXXX if MODULE_SAUL_DEFAULT
 
 config HAVE_LPS331AP
     bool
