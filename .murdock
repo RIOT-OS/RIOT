@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# uncomment and change this to limit builds, e.g.,
+#export BOARDS="samr21-xpro native"
+# and / or
+#export APPS="examples/hello-world tests/unittests"
+
 : ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
 
 # temporarily disabling llvm builds until https://github.com/RIOT-OS/RIOT/pull/15595
