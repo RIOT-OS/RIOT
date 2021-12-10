@@ -99,5 +99,7 @@ ifneq (,$(filter ztimer_msec ztimer_sec,$(USEMODULE)))
     else
       USEMODULE += ztimer_periph_timer
     endif
+  else
+    USEMODULE += ztimer_periph_timer
   endif
 endif
