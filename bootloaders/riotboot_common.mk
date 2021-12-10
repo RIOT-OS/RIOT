@@ -21,6 +21,9 @@ USEMODULE += stdio_null
 # RIOT codebase
 RIOTBASE ?= $(CURDIR)/../..
 
+# Do not include reset to bootloader functions
+FEATURES_BLACKLIST += board_bootloader_pin
+
 include $(RIOTBASE)/Makefile.include
 
 # limit riotboot bootloader size

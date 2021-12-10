@@ -8,3 +8,9 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
   USEMODULE += lm75a
 endif
+FEATURES_OPTIONAL += board_bootloader_pin
+ifneq (,$(filter board_bootloader_pin,$(USEMODULE)))
+  USEMODULE += riotboot_reset
+  USEMODULE += usb_board_reset
+  FEATURES_REQUIRED += periph_gpio_irq
+endif

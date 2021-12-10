@@ -47,9 +47,9 @@
  *
  * 3 Buttons:
  *
- * | NAME   | BOOT     | D0        | RESET |
- * |:------ |:---------|:--------- |:----- |
- * | Pin    | PA0 (IN) | PB13 (IN) | NRST  |
+ * | NAME   | BOOT            | D0        | RESET |
+ * |:------ |:----------------|:--------- |:----- |
+ * | Pin    | Bootloader Mode | PB13 (IN) | NRST  |
  *
  * 1 LED:
  *

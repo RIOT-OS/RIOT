@@ -28,8 +28,28 @@
 #include "sx126x.h"
 #endif
 
+#if IS_USED(MODULE_BOARD_BOOTLOADER_PIN)
+#include "usb_board_reset.h"
+static inline void _reset_to_bootloader(void *arg)
+{
+    (void)arg;
+    usb_board_reset_in_bootloader();
+}
+#endif
+
 void board_init(void)
 {
+    /* initialization of on-board LEDs */
+#ifdef AUTO_INIT_LED0
+    gpio_init(LED0_PIN, GPIO_OUT);
+    LED0_ON;
+#endif
+
+#if IS_USED(MODULE_BOARD_BOOTLOADER_PIN)
+    gpio_init_int(BTN_BOOTLOADER_PIN, BTN_BOOTLOADER_MODE,
+                  GPIO_FALLING, _reset_to_bootloader, NULL);
+#endif
+
     if(IS_ACTIVE(CONFIG_LORA_E5_DEV_ENABLE_3P3V)) {
         gpio_init(LORA_E5_DEV_3P3V_ENABLE_PIN, GPIO_OUT);
         gpio_set(LORA_E5_DEV_3P3V_ENABLE_PIN);
