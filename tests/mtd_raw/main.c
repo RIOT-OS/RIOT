@@ -18,7 +18,6 @@
  * @}
  */
 
-#include <assert.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -30,6 +29,7 @@
 #include "shell.h"
 #include "board.h"
 #include "macros/units.h"
+#include "test_utils/expect.h"
 
 #ifndef MTD_NUMOF
 #ifdef MTD_0
@@ -401,48 +401,49 @@ static int cmd_test(int argc, char **argv)
 
     /* write dummy data to sectors */
     memset(buffer, 0x23, dev->page_size);
-    assert(mtd_write_page_raw(dev, buffer, page_0, 0, page_size) == 0);
-    assert(mtd_write_page_raw(dev, buffer, page_1, 0, page_size) == 0);
+    expect(mtd_write_page_raw(dev, buffer, page_0, 0, page_size) == 0);
+    expect(mtd_write_page_raw(dev, buffer, page_1, 0, page_size) == 0);
 
     /* erase two sectors and check if they have been erased */
-    assert(mtd_erase_sector(dev, sector, 2) == 0);
-    assert(mtd_read_page(dev, buffer, page_0, 0, page_size) == 0);
-    assert(mem_is_all_set(buffer, 0xFF, page_size) || mem_is_all_set(buffer, 0x00, page_size));
-    assert(mtd_read_page(dev, buffer, page_1, 0, page_size) == 0);
-    assert(mem_is_all_set(buffer, 0xFF, page_size) || mem_is_all_set(buffer, 0x00, page_size));
+    expect(mtd_erase_sector(dev, sector, 2) == 0);
+    expect(mtd_read_page(dev, buffer, page_0, 0, page_size) == 0);
+    expect(mem_is_all_set(buffer, 0xFF, page_size) || mem_is_all_set(buffer, 0x00, page_size));
+    expect(mtd_read_page(dev, buffer, page_1, 0, page_size) == 0);
+    expect(mem_is_all_set(buffer, 0xFF, page_size) || mem_is_all_set(buffer, 0x00, page_size));
 
     /* write test data & read it back */
     const char test_str[] = "0123456789";
     uint32_t offset = 5;
-    assert(mtd_write_page_raw(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
-    assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
-    assert(memcmp(test_str, buffer, sizeof(test_str)) == 0);
+
+    expect(mtd_write_page_raw(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
+    expect(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
+    expect(memcmp(test_str, buffer, sizeof(test_str)) == 0);
 
     /* write across page boundary */
     offset = page_size - sizeof(test_str) / 2;
-    assert(mtd_write_page_raw(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
-    assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
-    assert(memcmp(test_str, buffer, sizeof(test_str)) == 0);
+    expect(mtd_write_page_raw(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
+    expect(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
+    expect(memcmp(test_str, buffer, sizeof(test_str)) == 0);
 
     /* write across sector boundary */
     offset = page_size - sizeof(test_str) / 2
            + (dev->pages_per_sector - 1) * page_size;
-    assert(mtd_write_page_raw(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
-    assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
-    assert(memcmp(test_str, buffer, sizeof(test_str)) == 0);
+    expect(mtd_write_page_raw(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
+    expect(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
+    expect(memcmp(test_str, buffer, sizeof(test_str)) == 0);
 
     /* overwrite first test string, rely on MTD for read-modify-write */
     const char test_str_2[] = "Hello World!";
     offset = 5;
-    assert(mtd_write_page(dev, test_str_2, page_0, offset, sizeof(test_str_2)) == 0);
-    assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str_2)) == 0);
-    assert(memcmp(test_str_2, buffer, sizeof(test_str_2)) == 0);
+    expect(mtd_write_page(dev, test_str_2, page_0, offset, sizeof(test_str_2)) == 0);
+    expect(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str_2)) == 0);
+    expect(memcmp(test_str_2, buffer, sizeof(test_str_2)) == 0);
 
     /* test write_page across sectors */
     offset = dev->pages_per_sector * dev->page_size - 2;
-    assert(mtd_write_page(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
-    assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
-    assert(memcmp(test_str, buffer, sizeof(test_str)) == 0);
+    expect(mtd_write_page(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
+    expect(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
+    expect(memcmp(test_str, buffer, sizeof(test_str)) == 0);
 
     puts("[SUCCESS]");
 
