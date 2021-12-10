@@ -35,6 +35,9 @@ endif
 ifneq (,$(filter random_cmd,$(USEMODULE)))
   SRC += sc_random.c
 endif
+ifneq (,$(filter riotboot_vfs,$(USEMODULE)))
+  SRC += sc_riotboot_vfs.c
+endif
 ifneq (,$(filter at30tse75x,$(USEMODULE)))
     SRC += sc_at30tse75x.c
 endif
