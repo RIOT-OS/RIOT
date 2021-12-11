@@ -1,0 +1,35 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_ATWINC15X0
+    bool "ATWINC15x0 WiFi module"
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_GPIO_IRQ
+    depends on HAS_PERIPH_SPI
+    depends on TEST_KCONFIG
+    select PACKAGE_DRIVER_ATWINC15X0
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_SPI
+    select MODULE_NETDEV_ETH
+    select MODULE_ZTIMER_MSEC
+
+if MODULE_ATWINC15X0
+
+config WIFI_SSID
+    string "WiFi SSID"
+    default "my_ssid"
+    help
+        SSID of the AP to be used.
+
+config WIFI_PASS
+    string "WiFi passphrase"
+    default "my_pass"
+    help
+        Passphrase used for the AP as clear text (max. 64 chars).
+
+endif # MODULE_ATWINC15X0
