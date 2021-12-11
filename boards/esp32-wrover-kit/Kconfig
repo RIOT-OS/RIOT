@@ -14,12 +14,13 @@ config BOARD_ESP32_WROVER_KIT
     select CPU_MODEL_ESP32_WROVER
     select HAS_ARDUINO
     select HAS_ESP_RTC_TIMER_32K
-    select HAS_ESP_SPI_RAM
+    select HAS_ESP_JTAG
     select HAS_PERIPH_ADC
     select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM
     select HAS_PERIPH_SPI
     select HAS_SDCARD_SPI
-    select MODULE_ESP_JTAG
+
+    select HAVE_ILI9341
 
 source "$(RIOTBOARD)/common/esp32/Kconfig"

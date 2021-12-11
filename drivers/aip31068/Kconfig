@@ -11,6 +11,3 @@ config MODULE_AIP31068
     depends on TEST_KCONFIG
     select MODULE_XTIMER
     select MODULE_PERIPH_I2C
-# necessary to fix driver initialization on esp32
-# TODO: move this to ESP32
-    select MODULE_ESP_I2C_HW if CPU_ESP32

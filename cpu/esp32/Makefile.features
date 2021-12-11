@@ -11,3 +11,13 @@ FEATURES_PROVIDED += periph_rtc
 FEATURES_PROVIDED += periph_rtt
 FEATURES_PROVIDED += periph_rtt_set_counter
 FEATURES_PROVIDED += periph_rtt_overflow
+
+ifneq (,$(filter esp32-wrover%,$(CPU_MODEL)))
+  FEATURES_PROVIDED += esp_spi_ram
+endif
+
+# This configuration enables modules that are only available when using Kconfig
+# module modelling
+ifeq (1, $(TEST_KCONFIG))
+  KCONFIG_ADD_CONFIG += $(RIOTCPU)/esp32/esp32.config
+endif

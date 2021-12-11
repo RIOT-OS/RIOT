@@ -18,8 +18,6 @@
  * @}
  */
 
-#if MODULE_MTD
-
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
@@ -568,5 +566,3 @@ static int _flash_power (mtd_dev_t *dev, enum mtd_power_state power)
 
     return -ENOTSUP;
 }
-
-#endif /* MODULE_MTD */

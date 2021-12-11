@@ -9,9 +9,12 @@ USEMODULE += esp_idf
 USEMODULE += log
 USEMODULE += periph
 USEMODULE += periph_hwrng
-USEMODULE += periph_flash
 USEMODULE += periph_uart
 USEMODULE += random
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += periph_flash
+endif
 
 ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
   USEMODULE += stdio_uart
@@ -81,11 +84,4 @@ endif
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   USEMODULE += netopt
   USEMODULE += xtimer
-endif
-
-ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
-  LINKFLAGS += -Wl,-wrap,_malloc_r
-  LINKFLAGS += -Wl,-wrap,_calloc_r
-  LINKFLAGS += -Wl,-wrap,_realloc_r
-  LINKFLAGS += -Wl,-wrap,_free_r
 endif

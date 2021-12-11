@@ -10,3 +10,14 @@ config BOARD_COMMON_ESP32
     select HAS_PERIPH_GPIO_IRQ
     select HAS_PERIPH_UART
     select HAS_PERIPH_UART_MODECFG
+
+    select HAVE_SAUL_GPIO
+
+config MODULE_BOARDS_COMMON_ESP32
+    bool
+    depends on TEST_KCONFIG
+    depends on BOARD_COMMON_ESP32
+    depends on HAS_ARCH_ESP32
+    default y
+    help
+      Common ESP32 boards code.

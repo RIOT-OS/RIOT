@@ -66,22 +66,17 @@ ifneq (,$(filter periph_i2c,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter esp_spi_ram,$(DISABLE_MODULE)))
-  USEMODULE := $(filter-out esp_spi_ram,$(USEMODULE))
-endif
-
 ifneq (,$(filter esp_now esp_wifi esp_spi_ram,$(USEMODULE)))
   # the ESP-IDF heap has to be used if SPI RAM is used
   USEMODULE += esp_idf_heap
 endif
 
-ifneq (,$(filter mtd,$(USEMODULE)))
-  USEMODULE += esp_idf_spi_flash
+ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
+  FEATURES_REQUIRED += esp_spi_ram
 endif
 
-ifneq (,$(filter ndn-riot,$(USEPKG)))
-  USEMODULE += crypto
-  USEMODULE += cipher_modes
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += esp_idf_spi_flash
 endif
 
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
@@ -99,4 +94,8 @@ endif
 
 ifneq (,$(filter shell,$(USEMODULE)))
   USEMODULE += ps
+endif
+
+ifneq (,$(filter esp_jtag,$(USEMODULE)))
+  FEATURES_REQUIRED += esp_jtag
 endif

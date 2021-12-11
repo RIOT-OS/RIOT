@@ -21,6 +21,14 @@ config CPU_FAM_ESP32
     select HAS_PERIPH_RTT_SET_COUNTER
     select HAS_PERIPH_RTT_OVERFLOW
 
+    select MODULE_PERIPH_RTT if HAS_PERIPH_RTT && MODULE_PM_LAYERED
+    select MODULE_RTT_RTC if HAS_PERIPH_RTT && MODULE_PERIPH_RTC
+    select MODULE_PS if MODULE_SHELL
+    select MODULE_ESP_IDF_DRIVER if TEST_KCONFIG
+    select MODULE_ESP_IDF_ESP32 if TEST_KCONFIG
+    select MODULE_ESP_IDF_SOC if TEST_KCONFIG
+    imply MODULE_NEWLIB_NANO
+
 ## CPU Models
 config CPU_MODEL_ESP32_WROOM_32
     bool
@@ -29,14 +37,17 @@ config CPU_MODEL_ESP32_WROOM_32
 config CPU_MODEL_ESP32_WROVER
     bool
     select CPU_FAM_ESP32
+    select HAS_ESP_SPI_RAM
 
 config CPU_MODEL_ESP32_WROVER_B
     bool
     select CPU_FAM_ESP32
+    select HAS_ESP_SPI_RAM
 
 config CPU_MODEL_ESP32_WROVER_E
     bool
     select CPU_FAM_ESP32
+    select HAS_ESP_SPI_RAM
 
 config CPU_MODEL_ESP32_D0WD
     bool
@@ -65,16 +76,15 @@ config HAS_ESP_SPI_RAM
         Indicates that an external RAM is connected via the FSPI interface in
         the board.
 
-config HAS_ESP_WIFI_ENTERPRISE
-    bool
-    help
-        Indicates that the platform supports WPA2 enterprise mode for the WiFi
-        interface.
-
 config HAS_PERIPH_ADC_CTRL
     bool
     help
         Indicates that an ESP32 ADC controller peripheral is present.
+
+config HAS_ESP_SPI_RAM
+    bool
+    help
+        Indicates that the a RAM is present on the SPI bus.
 
 ## Common CPU symbols
 config CPU_CORE
@@ -93,4 +103,24 @@ config CPU_MODEL
 config CPU
     default "esp32" if CPU_FAM_ESP32
 
+menu "ESP32 configurations"
+    depends on TEST_KCONFIG
+    depends on HAS_ARCH_ESP32
+
+config MODULE_ESP_SPI_RAM
+    bool "SPI RAM support"
+    select MODULE_ESP_IDF_HEAP
+    depends on HAS_ESP_SPI_RAM
+    select MODULE_ESP_IDF_HEAP
+    help
+      Say y to use external SPI RAM connected through the FSPI interface.
+
+config MODULE_ESP_JTAG
+    bool "Enable JTAG debugging interface"
+    depends on HAS_ESP_JTAG
+
+endmenu
+
+rsource "periph/Kconfig"
+rsource "vendor/esp-idf/Kconfig"
 source "$(RIOTCPU)/esp_common/Kconfig"

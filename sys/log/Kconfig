@@ -5,28 +5,32 @@
 # directory for more details.
 #
 
-
-menuconfig MODULE_LOG
+choice
   bool "Logging system override"
+  optional
   depends on TEST_KCONFIG
   help
     Say y to override the default logging functions. For more information see
     core/include/log.h.
 
-choice LOG_BACKEND
-    bool "Implementation"
-    depends on MODULE_LOG
-
 config MODULE_LOG_COLOR
     bool "Colored output"
+    select MODULE_LOG
     help
       Implements a logging module with colored output.
 
 config MODULE_LOG_PRINTFNOFORMAT
     bool "puts-based log"
+    select MODULE_LOG
     help
       Logging is implemented using puts instead of printf. Use it where printf
       might be too heavy. This also serves as an example for logging
       implementation.
 
 endchoice
+
+config MODULE_LOG
+    bool
+    help
+        Modules that override the default log implementation shoul select this.
+        For more information see core/include/log.h.

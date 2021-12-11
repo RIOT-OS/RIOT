@@ -19,4 +19,6 @@ config BOARD_ESP32_HELTEC_LORA32_V2
     select HAS_PERIPH_PWM
     select HAS_PERIPH_SPI
 
+    select HAVE_SX1276
+
 source "$(RIOTBOARD)/common/esp32/Kconfig"

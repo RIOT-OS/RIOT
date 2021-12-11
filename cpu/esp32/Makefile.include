@@ -48,10 +48,6 @@ ifneq (,$(filter esp_eth,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/ethernet/include
 endif
 
-ifneq (,$(filter esp_jtag,$(USEMODULE)))
-  FEATURES_REQUIRED += esp_jtag
-endif
-
 CFLAGS += -DSDK_NOT_USED -DCONFIG_FREERTOS_UNICORE=1 -DESP_PLATFORM
 CFLAGS += -DLOG_TAG_IN_BRACKETS
 
@@ -74,7 +70,7 @@ ifneq (,$(filter esp_now,$(USEMODULE)))
   ARCHIVES += -lespnow -lmesh
 endif
 
-ifneq (,$(filter cpp,$(FEATURES_USED)))
+ifneq (,$(filter cpp,$(USEMODULE)))
   ARCHIVES += -lstdc++
 endif
 
