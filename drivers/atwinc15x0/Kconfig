@@ -5,8 +5,10 @@
 # directory for more details.
 #
 
-config MODULE_ATWINC15X0
-    bool "ATWINC15x0 WiFi module"
+menuconfig MODULE_ATWINC15X0
+    bool
+    prompt "ATWINC15x0 WiFi module" if !(MODULE_NETDEV_DEFAULT && HAVE_ATWINC15X0)
+    default (MODULE_NETDEV_DEFAULT && HAVE_ATWINC15X0)
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_GPIO_IRQ
     depends on HAS_PERIPH_SPI
@@ -33,3 +35,9 @@ config WIFI_PASS
         Passphrase used for the AP as clear text (max. 64 chars).
 
 endif # MODULE_ATWINC15X0
+
+config HAVE_ATWINC15X0
+    bool
+    help
+      Indicates that a ATWINC15x0 module is present.
+
