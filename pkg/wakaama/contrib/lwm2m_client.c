@@ -170,6 +170,8 @@ static void *_lwm2m_client_run(void *arg)
 
         sock_udp_ep_t local;
         int res = sock_udp_get_local(&_client_data->sock, &local);
+        /* avoid compilation errors if NDEBUG is enabled */
+        (void)res;
         assert(res >= 0);
         DEBUG("Waiting for UDP packet on port: %d\n", local.port);
         rcv_len = sock_udp_recv(&_client_data->sock, rcv_buf, sizeof(rcv_buf),

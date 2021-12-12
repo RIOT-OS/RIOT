@@ -28,13 +28,13 @@
  * @}
  */
 
-#include <assert.h>
 #include <stdint.h>
 #include <stdatomic.h>
 #include <stdio.h>
 #include <limits.h>
 
 #include "bitarithm.h"
+#include "test_utils/expect.h"
 #include "xtimer.h"
 
 #define TIMEOUT_S (5ul)
@@ -116,8 +116,8 @@ static void run_test_test_and_clear(void)
     xtimer_set(&xtimer, TIMEOUT);
 
     do {
-        assert(do_test_and_clear(TEST_AND_CLEAR_TEST_MASK_0) == TEST_AND_CLEAR_TEST_MASK_0);
-        assert(do_test_and_clear(TEST_AND_CLEAR_TEST_MASK_1) == TEST_AND_CLEAR_TEST_MASK_1);
+        expect(do_test_and_clear(TEST_AND_CLEAR_TEST_MASK_0) == TEST_AND_CLEAR_TEST_MASK_0);
+        expect(do_test_and_clear(TEST_AND_CLEAR_TEST_MASK_1) == TEST_AND_CLEAR_TEST_MASK_1);
         ++count;
     } while (atomic_load(&done) == false);
 

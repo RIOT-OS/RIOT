@@ -395,18 +395,18 @@ static void test_sock_ip_recv_buf__success(void)
                                          .family = AF_INET6 };
     void *data = NULL, *ctx = NULL;
 
-    assert(0 == sock_ip_create(&_sock, &local, &remote, _TEST_PROTO,
+    expect(0 == sock_ip_create(&_sock, &local, &remote, _TEST_PROTO,
                                SOCK_FLAGS_REUSE_EP));
-    assert(_inject_packet(&src_addr, &dst_addr, _TEST_PROTO, "ABCD",
+    expect(_inject_packet(&src_addr, &dst_addr, _TEST_PROTO, "ABCD",
                           sizeof("ABCD"), _TEST_NETIF));
-    assert(sizeof("ABCD") == sock_ip_recv_buf(&_sock, &data, &ctx, SOCK_NO_TIMEOUT,
+    expect(sizeof("ABCD") == sock_ip_recv_buf(&_sock, &data, &ctx, SOCK_NO_TIMEOUT,
                                               NULL));
-    assert(data != NULL);
-    assert(ctx != NULL);
-    assert(0 == sock_ip_recv_buf(&_sock, &data, &ctx, SOCK_NO_TIMEOUT, NULL));
-    assert(data == NULL);
-    assert(ctx == NULL);
-    assert(_check_net());
+    expect(data != NULL);
+    expect(ctx != NULL);
+    expect(0 == sock_ip_recv_buf(&_sock, &data, &ctx, SOCK_NO_TIMEOUT, NULL));
+    expect(data == NULL);
+    expect(ctx == NULL);
+    expect(_check_net());
 }
 
 static void test_sock_ip_send__EAFNOSUPPORT_INET(void)

@@ -86,7 +86,7 @@ static int netdev_get_device_type(netdev_t *dev, void *value, size_t max_len)
     (void)dev;
     const uint16_t type_ipv6 = NETDEV_TYPE_ETHERNET;
     const uint16_t type_6lo = NETDEV_TYPE_IEEE802154;
-    assert(max_len == sizeof(uint16_t));
+    expect(max_len == sizeof(uint16_t));
     if (IS_USED(MODULE_NETDEV_IEEE802154)) {
         memcpy(value, &type_6lo, sizeof(type_6lo));
     }
@@ -101,7 +101,7 @@ static int netdev_get_max_pdu_size(netdev_t *dev, void *value, size_t max_len)
     (void)dev;
     const uint16_t pdu_size_ethernet = 1500;
     const uint16_t pdu_size_6lo = 32;
-    assert(max_len == sizeof(uint16_t));
+    expect(max_len == sizeof(uint16_t));
     if (IS_USED(MODULE_NETDEV_IEEE802154)) {
         memcpy(value, &pdu_size_6lo, sizeof(pdu_size_6lo));
     }
@@ -120,7 +120,7 @@ static int netdev_get_proto(netdev_t *dev, void *value, size_t max_len)
 #else
         GNRC_NETTYPE_IPV6;
 #endif
-    assert(max_len == sizeof(proto));
+    expect(max_len == sizeof(proto));
     memcpy(value, &proto, sizeof(proto));
     return sizeof(proto);
 }
@@ -135,7 +135,7 @@ static int netdev_get_address(netdev_t *dev, void *value, size_t max_len)
         0x13, 0x37, 0xac, 0xdc, 0xbe, 0xef
 #endif
     };
-    assert(max_len >= sizeof(addr));
+    expect(max_len >= sizeof(addr));
     memcpy(value, addr, sizeof(addr));
     return sizeof(addr);
 }
@@ -147,7 +147,7 @@ static int netdev_get_address_long(netdev_t *dev, void *value, size_t max_len)
     if (!IS_USED(MODULE_NETDEV_IEEE802154)) {
         return -ENOTSUP;
     }
-    assert(max_len >= sizeof(addr));
+    expect(max_len >= sizeof(addr));
     memcpy(value, addr, sizeof(addr));
     return sizeof(addr);
 }
@@ -159,7 +159,7 @@ static int netdev_get_src_len(netdev_t *dev, void *value, size_t max_len)
     if (!IS_USED(MODULE_NETDEV_IEEE802154)) {
         return -ENOTSUP;
     }
-    assert(max_len == sizeof(src_len));
+    expect(max_len == sizeof(src_len));
     memcpy(value, &src_len, sizeof(src_len));
     return sizeof(src_len);
 }

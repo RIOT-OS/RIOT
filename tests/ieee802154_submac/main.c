@@ -18,7 +18,6 @@
  * @}
  */
 
-#include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -33,6 +32,7 @@
 #include "net/ieee802154.h"
 #include "net/netdev/ieee802154_submac.h"
 #include "net/l2util.h"
+#include "test_utils/expect.h"
 #include "ztimer.h"
 
 #include "common.h"

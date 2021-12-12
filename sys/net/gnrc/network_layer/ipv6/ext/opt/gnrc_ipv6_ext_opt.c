@@ -51,6 +51,7 @@ static bool _multicast_dst(gnrc_pktsnip_t *pkt)
 gnrc_pktsnip_t *gnrc_ipv6_ext_opt_process(gnrc_pktsnip_t *pkt,
                                           uint8_t protnum)
 {
+    (void)protnum;
     assert(pkt != NULL);
     assert((protnum == PROTNUM_IPV6_EXT_HOPOPT) ||
            (protnum == PROTNUM_IPV6_EXT_DST));

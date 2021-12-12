@@ -60,7 +60,11 @@ void wdt_stop(void)
 
 void wdt_setup_reboot(uint32_t min_time, uint32_t max_time)
 {
-   /* assert timings */
+    /* avoid compilation errors when NDEBUG is defined */
+    (void)min_time;
+    (void)max_time;
+
+    /* assert timings */
     assert(min_time == 0);
     assert(max_time > NWDT_TIME_LOWER_LIMIT ||
            max_time < NWDT_TIME_UPPER_LIMIT);

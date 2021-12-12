@@ -29,6 +29,7 @@ static int _dev_init(netdev_t *netdev)
 
 static int _dev_get_device_type(netdev_t *netdev, void *value, size_t max_len)
 {
+    (void)max_len;
     assert(max_len == sizeof(uint16_t));
     (void)netdev;
 
