@@ -73,6 +73,8 @@ endif
 # 4KB are currently enough, set it to 16KB if USB-DFU is used
 ifneq (,$(filter usbus_dfu,$(USEMODULE)))
   RIOTBOOT_LEN ?= 0x4000
+else ifneq (,$(filter riotboot_vfs,$(USEMODULE)))
+  RIOTBOOT_LEN ?= 0x8000
 else
   RIOTBOOT_LEN ?= 0x1000
 endif
