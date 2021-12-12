@@ -1,0 +1,78 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_VL53L1X
+    bool "VL53L1X Time-of-Flight (ToF) ranging sensor"
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_GPIO_IRQ
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_I2C
+    select MODULE_ZTIMER_MSEC
+
+if MODULE_VL53L1X
+
+choice
+    bool "Driver variant"
+    default MODULE_VL53L1X_STD
+
+config MODULE_VL53L1X_BASIC
+    bool "Basic functionality"
+    help
+        This is the smallest driver variant that only provides some basic
+        functions such as the distance measurement and the data-ready interrupt.
+
+config MODULE_VL53L1X_STD
+    bool "Standard functionality"
+    help
+        This driver variant is a compromise of size and functionality. It
+        provides the application with most functionality of the sensor. The
+        driver can be used when memory requirements are important and most
+        of the functionality should be used.
+
+config MODULE_VL53L1X_ST_API
+    bool "Full functionality using the ST VL53L1X Full API"
+    help
+        This driver variant uses ST STSW-IMG007 VL53L1X API as package. In
+        this case, the driver is simply a wrapper for the API which provides
+        a driver interface that is compatible with other driver variants.
+        Additionally, it provides access to the complete functionality
+        of the sensor by using API functions directly. This is for example
+        necessary to configure and use threshold interrupts, or to calibrate
+        the sensor.
+
+endchoice
+
+choice
+    bool "Distance mode"
+    default VL53L1X_DIST_LONG
+    depends on MODULE_VL53L1X_STD || MODULE_VL53L1X_ST_API
+
+    config VL53L1X_DIST_SHORT
+        bool "Short - up to 1.3 m"
+    config VL53L1X_DIST_MEDIUM
+        bool "Medium - up to 2 m"
+    config VL53L1X_DIST_LONG
+        bool "Long - up to 4 m"
+
+endchoice
+
+config VL53L1X_PARAM_TIMING_BUDGET
+    int "Timing budget [us]"
+    default 50000
+    range 20000 1000000
+    depends on MODULE_VL53L1X_STD || MODULE_VL53L1X_ST_API
+
+config VL53L1X_PARAM_PERIOD
+    int "Inter-measurement period [ms]"
+    default 100
+    range 20 1000
+    depends on MODULE_VL53L1X_STD || MODULE_VL53L1X_ST_API
+
+endif # MODULE_VL53L1X
