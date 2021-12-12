@@ -20,6 +20,8 @@
 
 #include <assert.h>
 
+#include "ztimer.h"
+
 #include "ad7746.h"
 #include "ad7746_params.h"
 #include "ad7746_internal.h"
@@ -29,8 +31,6 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-#include "xtimer.h"
 
 #define DEV (dev->params.i2c)
 #define ADDR (dev->params.addr)
@@ -382,7 +382,7 @@ static int _read_voltage_temp(ad7746_t *dev, int *value, ad7746_vt_mode_t mode)
         /* if a mode change is needed wait for a conversion cycle and flush
          * the first sample in order to get a stable output. Took from the Linux
          * driver implementation */
-        xtimer_msleep(_vt_sr_times[dev->params.vt_sample_rate]);
+        ztimer_sleep(ZTIMER_MSEC, _vt_sr_times[dev->params.vt_sample_rate]);
         _read_raw_ch(dev, AD7746_READ_VT_CH, &raw);
     }
 

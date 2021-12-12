@@ -23,7 +23,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
-#include "xtimer.h"
 #include "fmt.h"
 #include "thread.h"
 #include "shell.h"

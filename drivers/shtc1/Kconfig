@@ -11,4 +11,3 @@ config MODULE_SHTC1
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
     select MODULE_CHECKSUM
-    select MODULE_XTIMER

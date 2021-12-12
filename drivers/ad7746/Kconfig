@@ -10,5 +10,7 @@ config MODULE_AD7746
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
     help
         AD7746 Capacitance-to-digital converter with temperature sensor driver.

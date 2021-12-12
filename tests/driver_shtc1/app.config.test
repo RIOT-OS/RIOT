@@ -2,3 +2,5 @@
 # application configuration. This is only needed during migration.
 CONFIG_MODULE_FMT=y
 CONFIG_MODULE_SHTC1=y
+CONFIG_MODULE_ZTIMER=y
+CONFIG_MODULE_ZTIMER_MSEC=y

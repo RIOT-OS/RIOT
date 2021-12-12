@@ -15,5 +15,3 @@ endif
 ifneq (,$(filter ws281x_atmega,$(USEMODULE)))
   FEATURES_REQUIRED += cpu_core_atmega
 endif
-
-USEMODULE += xtimer

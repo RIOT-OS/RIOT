@@ -22,7 +22,7 @@
 
 #include "pn532.h"
 #include "pn532_params.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define LOG_LEVEL LOG_INFO
 #include "log.h"
@@ -53,7 +53,7 @@ int main(void)
         LOG_INFO("init error %d\n", ret);
     }
 
-    xtimer_usleep(200000);
+    ztimer_sleep(ZTIMER_MSEC, 200);
     LOG_INFO("awake\n");
 
     uint32_t fwver;
@@ -65,7 +65,7 @@ int main(void)
 
     while (1) {
         /* Delay not to be always polling the interface */
-        xtimer_usleep(250000UL);
+        ztimer_sleep(ZTIMER_MSEC, 250);
 
         ret = pn532_get_passive_iso14443a(&pn532, &card, 0x50);
         if (ret < 0) {

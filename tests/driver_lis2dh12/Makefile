@@ -4,7 +4,8 @@ include ../Makefile.tests_common
 DRIVER ?= lis2dh12_spi
 
 USEMODULE += fmt
-USEMODULE += xtimer
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += $(DRIVER)
