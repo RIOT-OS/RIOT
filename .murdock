@@ -5,6 +5,7 @@
 # and / or
 #export APPS="examples/hello-world tests/unittests"
 
+#
 : ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
 
 # temporarily disabling llvm builds until https://github.com/RIOT-OS/RIOT/pull/15595
@@ -100,6 +101,9 @@ export CFLAGS_DBG=""
 export DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
 export ENABLE_TEST_CACHE=${ENABLE_TEST_CACHE:-1}
 export MURDOCK_REDIS_HOST=${MURDOCK_REDIS_HOST:-127.0.0.1}
+NIGHTLY=${NIGHTLY:-0}
+RUN_TESTS=${RUN_TESTS:-${NIGHTLY}}
+FULL_BUILD=${FULL_BUILD:-${NIGHTLY}}
 
 # This is a work around for a bug in CCACHE which interacts very badly with
 # some features of RIOT and of murdock. The result is that ccache is
@@ -118,15 +122,15 @@ export MURDOCK_REDIS_HOST=${MURDOCK_REDIS_HOST:-127.0.0.1}
 # It is only the combination of these three factors which causes this bug.
 export OPTIONAL_CFLAGS_BLACKLIST="-gz"
 
-NIGHTLY=${NIGHTLY:-0}
-RUN_TESTS=${RUN_TESTS:-${NIGHTLY}}
-
 DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS -E ENABLE_TEST_CACHE
-         -E TEST_HASH -E CI_PULL_LABELS -EPKG_USE_MIRROR"
+         -E TEST_HASH -E CI_PULL_LABELS -ECI_BASE_BRANCH -ECI_BASE_COMMIT
+         -EPKG_USE_MIRROR -EAPPS_CHANGED -EBOARDS_CHANGED -ESTATIC_TESTS"
 
 if [ ${NIGHTLY} -eq 1 ]; then
     export PKG_USE_MIRROR=0
 fi
+
+CFCR_ARGS="--upstreambranch ${CI_BASE_COMMIT}"
 
 get_supported_kconfig_board_app() {
     local board=$1
@@ -242,7 +246,35 @@ get_apps() {
 # Only print for boards in $BOARDS.
 get_supported_boards() {
     local appdir=$1
+    local only_changed=0
+
+    if [ -n "$APPS_CHANGED" ]; then
+        if is_in_list "$appdir" "${APPS_CHANGED}"; then
+            # this app has changed -> build for all boards
+            true
+        else
+            # this is not a changed app -> build for changed boards
+            only_changed=1
+        fi
+    else
+        if [ -n "$BOARDS_CHANGED" ]; then
+            echo d
+            # no changed apps, some changed boards -> build for changed boards
+            only_changed=1
+        else
+            # no changed apps list, no changed boards list -> build all boards
+            true
+        fi
+    fi
+
+    if [ $only_changed -eq 1 ]; then
+        BOARDS_=${BOARDS}
+        export BOARDS="$BOARDS_CHANGED"
+    fi
+
     local boards="$(make --no-print-directory -C$appdir info-boards-supported 2>/dev/null || echo broken)"
+
+    export BOARDS="${BOARDS_}"
 
     if [ "$boards" = broken ]; then
         echo "makefile_broken"
@@ -295,7 +327,10 @@ get_app_board_toolchain_pairs() {
 # use dwqc to create full "appdir board toolchain" compile job list
 get_compile_jobs() {
     check_label "CI: skip compile test" && return
+    update_changed_modules || return
+
     get_apps | \
+        maybe_filter_changed_apps | \
         dwqc ${DWQ_ENV} -s \
         ${DWQ_JOBID:+--subjob} \
         "$0 get_app_board_toolchain_pairs \${1} $0 compile"
@@ -486,15 +521,114 @@ run_test() {
     return $RES
 }
 
+basename_list () {
+    for path in $*; do
+        basename $path
+    done
+}
+
+# calls out to can_fast_ci_run.py.
+#
+# returns 1 if nothing should be built.
+# or, returns 0, potentially meddling with BOARDS, APPS, BOARDS_CHANGED, APPS_CHANGED.
+update_changed_modules() {
+    # early out if there's no base commit info
+    if [ -z "${CI_BASE_COMMIT}" ]; then
+        exit 0
+    fi
+
+    # early out if a full build is requested
+    if [ $FULL_BUILD -eq 1 ]; then
+        return 0
+    fi
+
+    # if these are set, just build what's requested.
+    if [ -n "$BOARDS" -o -n "$APPS" ]; then
+        return 0
+    fi
+
+    # do full build if requested by label
+    check_label "CI: full build" && return 0
+
+    # call out to can_fast_ci_run.py
+    # that script will output e.g.,
+    #    APPS_CHANGED="foo/bar foo/barfoo"
+    #    BOARDS_CHANGED="foo/bar foo/barfoo"
+    # just eval that output, so we set those variables directly in this shell.
+    eval $(dist/tools/ci/can_fast_ci_run.py \
+        ${CFCR_ARGS} \
+        --changed-boards --changed-apps \
+        2>/dev/null || echo CFCR_ERROR=1)
+
+    # if this errors, it means we cannot skip any builds.
+    if [ -n "$CFCR_ERROR" ]; then
+        return 0
+    fi
+
+    # if can_fast_ci_run exits 0 but doesn't output any changed apps or boards,
+    # it means we can skip all compile jobs.
+    if [ -z "$APPS_CHANGED" -a -z "$BOARDS_CHANGED" ]; then
+        return 1
+    fi
+
+    # can_fast_ci_run.py outputs "board/fooboard", but the rest of this script
+    # expects a board name without leading "board/".
+    if [ -n "$BOARDS_CHANGED" ]; then
+        export BOARDS_CHANGED="$(basename_list $BOARDS_CHANGED)"
+    fi
+
+    # if no board has changed, filter by just setting APPS.
+    # same for apps -> BOARDS.
+    if [ -z "$APPS_CHANGED" -a -n "$BOARDS_CHANGED" ]; then
+        export BOARDS="$(echo $BOARDS_CHANGED | $(_greplist ${BOARDS}))"
+        unset BOARDS_CHANGED
+    elif [ -n "$APPS_CHANGED" -a -z "$BOARDS_CHANGED" ]; then
+        export APPS="$(echo $APPS_CHANGED | $(_greplist ${APPS}))"
+        unset APPS_CHANGED
+    fi
+
+    export APPS_CHANGED
+    export BOARDS_CHANGED
+}
+
+maybe_filter_changed_apps() {
+    # if no boards have changes, only a subset of the apps need to be built.
+    # else, all apps need to be passed, as they'll need to be built for
+    # the changed boards.
+    if [ -n "$BOARDS_CHANGED" ]; then
+        cat
+    else
+        $(_greplist $APPS_CHANGED)
+    fi
+}
+
 # execute static tests
 static_tests() {
     print_worker
-    ./dist/tools/ci/static_tests.sh
+    build_filter_status
+
+    [ "$STATIC_TESTS" = "1" ] && \
+        ./dist/tools/ci/static_tests.sh
+    true
+}
+
+build_filter_status() {
+    echo "--- can_fast_ci_run:"
+    dist/tools/ci/can_fast_ci_run.py ${CFCR_ARGS} --explain --json --changed-boards --changed-apps
+    if [ -n "$MURDOCK_TEST_CHANGE_FILTER" ]; then
+        echo MURDOCK_TEST_CHANGE_FILTER=$MURDOCK_TEST_CHANGE_FILTER
+    fi
+
+    echo ""
+    update_changed_modules
+
+    if [ -n "$CFCR_ERROR" ]; then
+        echo "-- can_fast_ci_run.py exited non-zero"
+    fi
 }
 
 get_non_compile_jobs() {
-    [ "$STATIC_TESTS" = "1" ] && \
-        echo "$0 static_tests"
+    echo "$0 static_tests"
 }
 
 get_jobs() {

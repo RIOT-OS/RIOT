@@ -183,6 +183,16 @@ if __name__ == "__main__":
                         help="Use given paths as RIOT's base path (instead of pwd)")
     parser.add_argument("--upstreambranch", default="master",
                         help="The branch / commit containing the upstream state")
+
+    parser.add_argument("--changed-boards", action="store_true",
+                        help="list all boards for all apps should be rebuilt")
+
+    parser.add_argument("--changed-apps", action="store_true",
+                        help="list all apps that should be built for all boards")
+
+    parser.add_argument("--json", action="store_true",
+                        help="json dump changed boards / apps")
+
     args = parser.parse_args()
     try:
         change_set = classify_changes(riotbase=args.riotbase, upstream_branch=args.upstreambranch)
@@ -201,7 +211,11 @@ if __name__ == "__main__":
     if "ci-murdock" in change_set.other:
         if args.explain:
             print_err("Murdock related changes require a full CI run")
-        sys.exit(1)
+
+        # only exit/error if MURDOCK_TEST_CHANGE_FILTER is not set.
+        # useful for testing.
+        if not os.environ.get("MURDOCK_TEST_CHANGE_FILTER"):
+            sys.exit(1)
 
     if "public-headers" in change_set.other:
         if args.explain:
@@ -218,8 +232,19 @@ if __name__ == "__main__":
             print_err("Currently changing packages require a full CI run")
         sys.exit(1)
 
-    result = {
-        "apps": sorted(change_set.apps.keys()),
-        "boards": sorted(change_set.boards.keys())
-    }
-    sys.stdout.write(json.dumps(result, indent=2))
+    if args.json or args.changed_boards or args.changed_apps:
+        result = {
+            "apps": sorted(change_set.apps.keys()),
+            "boards": sorted(change_set.boards.keys())
+        }
+
+    if args.json:
+        print(json.dumps(result, indent=2))
+
+    if args.changed_boards:
+        changed_boards = " ".join(result.get("boards", []))
+        print(f"BOARDS_CHANGED=\"{changed_boards}\"")
+
+    if args.changed_apps:
+        changed_apps = " ".join(result.get("apps", []))
+        print(f"APPS_CHANGED=\"{changed_apps}\"")
