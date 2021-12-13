@@ -20,6 +20,8 @@ USEMODULE += sock_ip
 USEMODULE += gnrc_ipv6
 USEMODULE += ps
 
+USEMODULE += xtimer
+
 CFLAGS += -DTEST_SUITES
 
 include $(RIOTBASE)/Makefile.include
