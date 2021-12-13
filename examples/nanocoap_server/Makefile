@@ -19,6 +19,8 @@ USEMODULE += gnrc_icmpv6_echo
 
 USEMODULE += nanocoap_sock
 
+USEMODULE += xtimer
+
 # include this for nicely formatting the returned internal value
 USEMODULE += fmt
 
