@@ -219,11 +219,12 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
     if (channel == 0) {
         if (flags & TIM_FLAG_RESET_ON_MATCH) {
             /* enable CTC mode */
-            ctx[tim].dev->CRB |= (1 << 3);
+            ctx[tim].mode |= (1 << 3);
         } else {
             /* disable CTC mode */
-            ctx[tim].dev->CRB &= (1 << 3);
+            ctx[tim].mode &= (1 << 3);
         }
+        ctx[tim].dev->CRB = ctx[tim].mode;
     } else {
         assert((flags & TIM_FLAG_RESET_ON_MATCH) == 0);
         res = -1;
