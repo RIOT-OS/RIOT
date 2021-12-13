@@ -41,8 +41,8 @@ static gnrc_netreg_entry_t server =
                         GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
                                                    KERNEL_PID_UNDEF);
 
-static void send(char *addr_str, const char *port_str, const void *data, size_t num,
-                 unsigned int delay)
+static void send(const char *addr_str, const char *port_str,
+                 const char *data, size_t num, unsigned int delay)
 {
     netif_t *netif;
     uint16_t port;
@@ -113,7 +113,7 @@ static void send(char *addr_str, const char *port_str, const void *data, size_t 
     }
 }
 
-static void start_server(char *port_str)
+static void start_server(const char *port_str)
 {
     uint16_t port;
 
