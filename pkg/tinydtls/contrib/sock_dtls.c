@@ -22,6 +22,7 @@
 #include "log.h"
 #include "net/sock/dtls.h"
 #include "net/credman.h"
+#include "xtimer.h"
 
 #if SOCK_HAS_ASYNC
 #include "net/sock/async.h"
