@@ -41,8 +41,8 @@ static gnrc_netreg_entry_t server =
                         GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
                                                    KERNEL_PID_UNDEF);
 
-static void send(const char *addr_str, const char *port_str,
-                 const char *data, size_t num, unsigned int delay)
+static void _send(const char *addr_str, const char *port_str,
+                  const char *data, size_t num, unsigned int delay)
 {
     netif_t *netif;
     uint16_t port;
@@ -113,7 +113,7 @@ static void send(const char *addr_str, const char *port_str,
     }
 }
 
-static void start_server(const char *port_str)
+static void _start_server(const char *port_str)
 {
     uint16_t port;
 
@@ -136,7 +136,7 @@ static void start_server(const char *port_str)
     printf("Success: started UDP server on port %" PRIu16 "\n", port);
 }
 
-static void stop_server(void)
+static void _stop_server(void)
 {
     /* check if server is running at all */
     if (server.target.pid == KERNEL_PID_UNDEF) {
@@ -175,7 +175,7 @@ int _gnrc_udp_cmd(int argc, char **argv)
         if (argc > 6) {
             delay = atoi(argv[6]);
         }
-        send(argv[2], argv[3], argv[4], num, delay);
+        _send(argv[2], argv[3], argv[4], num, delay);
     }
     else if (strcmp(argv[1], "server") == 0) {
         if (argc < 3) {
@@ -187,10 +187,10 @@ int _gnrc_udp_cmd(int argc, char **argv)
                 printf("usage %s server start <port>\n", argv[0]);
                 return 1;
             }
-            start_server(argv[3]);
+            _start_server(argv[3]);
         }
         else if (strcmp(argv[2], "stop") == 0) {
-            stop_server();
+            _stop_server();
         }
         else {
             puts("error: invalid command");
