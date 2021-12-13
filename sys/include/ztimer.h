@@ -381,8 +381,11 @@ void ztimer_handler(ztimer_clock_t *clock);
  * @param[in]   clock       ztimer clock to operate on
  * @param[in]   timer       timer entry to set
  * @param[in]   val         timer target (relative ticks from now)
+ *
+ * @return The value of @ref ztimer_now() that @p timer was set against
+ *         (`now() + @p val = absolute trigger time`).
  */
-void ztimer_set(ztimer_clock_t *clock, ztimer_t *timer, uint32_t val);
+uint32_t ztimer_set(ztimer_clock_t *clock, ztimer_t *timer, uint32_t val);
 
 /**
  * @brief   Check if a timer is currently active

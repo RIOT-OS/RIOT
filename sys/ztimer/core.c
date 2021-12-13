@@ -40,7 +40,7 @@ static void _add_entry_to_list(ztimer_clock_t *clock, ztimer_base_t *entry);
 static void _del_entry_from_list(ztimer_clock_t *clock, ztimer_base_t *entry);
 static void _ztimer_update(ztimer_clock_t *clock);
 static void _ztimer_print(const ztimer_clock_t *clock);
-static void _ztimer_update_head_offset(ztimer_clock_t *clock);
+static uint32_t _ztimer_update_head_offset(ztimer_clock_t *clock);
 
 #ifdef MODULE_ZTIMER_EXTEND
 static inline uint32_t _min_u32(uint32_t a, uint32_t b)
@@ -82,14 +82,15 @@ void ztimer_remove(ztimer_clock_t *clock, ztimer_t *timer)
     irq_restore(state);
 }
 
-void ztimer_set(ztimer_clock_t *clock, ztimer_t *timer, uint32_t val)
+uint32_t ztimer_set(ztimer_clock_t *clock, ztimer_t *timer, uint32_t val)
 {
     DEBUG("ztimer_set(): %p: set %p at %" PRIu32 " offset %" PRIu32 "\n",
           (void *)clock, (void *)timer, clock->ops->now(clock), val);
 
     unsigned state = irq_disable();
 
-    _ztimer_update_head_offset(clock);
+    uint32_t now = _ztimer_update_head_offset(clock);
+
     if (_is_set(clock, timer)) {
         _del_entry_from_list(clock, &timer->base);
     }
@@ -115,6 +116,7 @@ void ztimer_set(ztimer_clock_t *clock, ztimer_t *timer, uint32_t val)
     }
 
     irq_restore(state);
+    return now;
 }
 
 static void _add_entry_to_list(ztimer_clock_t *clock, ztimer_base_t *entry)
@@ -187,7 +189,7 @@ ztimer_now_t _ztimer_now_extend(ztimer_clock_t *clock)
 }
 #endif /* MODULE_ZTIMER_EXTEND */
 
-static void _ztimer_update_head_offset(ztimer_clock_t *clock)
+static uint32_t _ztimer_update_head_offset(ztimer_clock_t *clock)
 {
     uint32_t old_base = clock->list.offset;
     uint32_t now = ztimer_now(clock);
@@ -227,6 +229,7 @@ static void _ztimer_update_head_offset(ztimer_clock_t *clock)
     }
 
     clock->list.offset = now;
+    return now;
 }
 
 static void _del_entry_from_list(ztimer_clock_t *clock, ztimer_base_t *entry)
