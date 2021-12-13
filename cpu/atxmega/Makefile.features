@@ -17,5 +17,5 @@ FEATURES_PROVIDED += periph_timer periph_timer_periodic
 # Add atxmega configurations. This configuration enables modules that are only available when
 # using Kconfig module modelling
 ifeq (1, $(TEST_KCONFIG))
-  KCONFIG_ADD_CONFIG += $(RIOTCPU)/atxmega/atxmega.config
+  KCONFIG_CPU_CONFIG += $(RIOTCPU)/atxmega/atxmega.config
 endif
