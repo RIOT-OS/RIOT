@@ -18,6 +18,7 @@
  */
 
 #include <stdio.h>
+#include <errno.h>
 
 #include "irq.h"
 #include "os/os_sem.h"
@@ -31,11 +32,19 @@ os_error_t os_sem_init(struct os_sem *sem, uint16_t tokens)
 os_error_t os_sem_release(struct os_sem *sem)
 {
     int ret = sema_post(&sem->sema);
+
     return (ret) ? OS_ERROR : OS_OK;
 }
 
 os_error_t os_sem_pend(struct os_sem *sem, os_time_t timeout)
 {
-    int ret = sema_wait_timed_ztimer(&sem->sema, ZTIMER_MSEC, timeout);
-    return (ret) ? OS_ERROR : OS_OK;
+    int ret;
+
+    if (timeout == OS_TIMEOUT_NEVER) {
+        ret = sema_wait(&sem->sema);
+    }
+    else {
+        ret = sema_wait_timed_ztimer(&sem->sema, ZTIMER_MSEC, timeout);
+    }
+    return ret == 0 ? OS_OK : ret == -ETIMEDOUT ? OS_TIMEOUT: OS_ERROR;
 }
