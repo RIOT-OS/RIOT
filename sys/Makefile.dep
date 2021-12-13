@@ -745,6 +745,7 @@ endif
 
 ifneq (,$(filter suit_transport_coap, $(USEMODULE)))
   USEMODULE += nanocoap_sock
+  USEMODULE += xtimer
   USEMODULE += sock_util
 endif
 
