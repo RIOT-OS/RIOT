@@ -33,7 +33,7 @@
 #include "log.h"
 #include "net/netdev/eth.h"
 #include "od.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG        0
 #define ENABLE_DEBUG_DUMP   0
@@ -42,9 +42,9 @@
 #define ATWINC15X0_MAC_STR          "%02x:%02x:%02x:%02x:%02x:%02x"
 #define ATWINC15X0_MAC_STR_ARG(m)   m[0], m[1], m[2], m[3], m[4], m[5]
 
-#define ATWINC15X0_WAIT_TIME        (1 * US_PER_MS)
-#define ATWINC15X0_WAIT_TIMEOUT     (20)
-#define ATWINC15X0_WAIT_RECONNECT   (5 * US_PER_SEC)
+#define ATWINC15X0_WAIT_TIME_MS         (1)
+#define ATWINC15X0_WAIT_TIMEOUT         (20)
+#define ATWINC15X0_WAIT_RECONNECT_MS    (5000)
 
 /* Forward function declarations */
 static void _atwinc15x0_wifi_cb(uint8_t event, void *msg);
@@ -184,7 +184,7 @@ static void _atwinc15x0_wifi_cb(uint8_t type, void *msg)
                     atwinc15x0->netdev.event_callback(&atwinc15x0->netdev,
                                                       NETDEV_EVENT_LINK_DOWN);
                     /* wait and try to reconnect */
-                    xtimer_usleep(ATWINC15X0_WAIT_RECONNECT);
+                    ztimer_sleep(ZTIMER_MSEC, ATWINC15X0_WAIT_RECONNECT_MS);
                     _atwinc15x0_connect();
                     break;
                 case M2M_WIFI_CONNECTED:
@@ -381,7 +381,7 @@ static int _atwinc15x0_get(netdev_t *netdev, netopt_t opt, void *val,
             /* wait for the response with a given timeout */
             unsigned int _rssi_info_time_out = ATWINC15X0_WAIT_TIMEOUT;
             while (!_rssi_info_ready && _rssi_info_time_out--) {
-                xtimer_usleep(ATWINC15X0_WAIT_TIME);
+                ztimer_sleep(ZTIMER_MSEC, ATWINC15X0_WAIT_TIME_MS);
             }
             /* return the RSSI */
             *((int8_t *)val) = dev->rssi;
