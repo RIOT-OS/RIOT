@@ -95,12 +95,9 @@ static void _set_timer(evtimer_t *evtimer)
     evtimer_event_t *next_event = evtimer->events;
 
 #if IS_USED(MODULE_EVTIMER_ON_ZTIMER)
-    evtimer->base = ztimer_now(ZTIMER_MSEC);
-
+    evtimer->base = ztimer_set(ZTIMER_MSEC, &evtimer->timer, next_event->offset);
     DEBUG("evtimer: now=%" PRIu32 " ms setting ztimer to %" PRIu32 " ms\n",
           evtimer->base, next_event->offset);
-
-    ztimer_set(ZTIMER_MSEC, &evtimer->timer, next_event->offset);
 #else
     uint64_t offset_us = (uint64_t)next_event->offset * US_PER_MS;
 
