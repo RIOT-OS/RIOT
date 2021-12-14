@@ -14,15 +14,13 @@
 #ifndef DOXYGEN
 
 #include "freertos/FreeRTOS.h"
-#include "xtimer.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef void* TimerHandle_t;
-
-#define TimerCallbackFunction_t  xtimer_callback_t
+typedef void (*TimerCallbackFunction_t)(void*);
 #define tmrTIMER_CALLBACK        TimerCallbackFunction_t
 
 TimerHandle_t xTimerCreate (const char * const pcTimerName,

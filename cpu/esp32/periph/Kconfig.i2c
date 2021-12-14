@@ -21,7 +21,8 @@ config MODULE_ESP_I2C_SW
 config MODULE_ESP_I2C_HW
     bool "Hardware"
     select MODULE_CORE_THREAD_FLAGS
-    select MODULE_XTIMER
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
     select MODULE_PERIPH_I2C_HW
 
 endchoice

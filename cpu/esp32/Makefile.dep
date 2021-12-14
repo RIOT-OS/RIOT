@@ -16,7 +16,7 @@ ifneq (,$(filter esp_eth,$(USEMODULE)))
   USEMODULE += esp_idf_eth_phy
   USEMODULE += netdev_eth
   USEMODULE += netopt
-  USEMODULE += xtimer
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
@@ -55,7 +55,7 @@ endif
 ifneq (,$(filter periph_i2c,$(USEMODULE)))
   ifneq (,$(filter esp_i2c_hw,$(USEMODULE)))
     USEMODULE += core_thread_flags
-    USEMODULE += xtimer
+    USEMODULE += ztimer_msec
     USEMODULE += periph_i2c_hw
   else
     # PLEASE NOTE: because of the very poor and faulty hardware implementation

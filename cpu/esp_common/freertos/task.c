@@ -21,7 +21,10 @@
 #include "log.h"
 #include "syscalls.h"
 #include "thread.h"
-#include "xtimer.h"
+#if defined(MODULE_ESP_WIFI_ANY) || defined(MODULE_ESP_ETH)
+#include "ztimer.h"
+#endif
+#include "timex.h"
 
 #ifdef MCU_ESP32
 #include "soc/soc.h"
@@ -134,14 +137,14 @@ void vTaskDelay( const TickType_t xTicksToDelay )
 {
     DEBUG("%s xTicksToDelay=%d\n", __func__, xTicksToDelay);
 #if defined(MODULE_ESP_WIFI_ANY)
-    uint64_t us = xTicksToDelay * MHZ / xPortGetTickRateHz();
-    xtimer_usleep(us);
+     uint64_t ms = xTicksToDelay * MS_PER_SEC / xPortGetTickRateHz();
+     ztimer_sleep(ZTIMER_MSEC, ms);
 #endif
 }
 
 TickType_t xTaskGetTickCount (void)
 {
-    return system_get_time() / USEC_PER_MSEC / portTICK_PERIOD_MS;
+    return system_get_time() / US_PER_MS / portTICK_PERIOD_MS;
 }
 
 void vTaskEnterCritical( portMUX_TYPE *mux )
