@@ -66,6 +66,7 @@ export DOCKER_ENV_VARS += \
   SCANBUILD_OUTPUTDIR \
   SIZE \
   TOOLCHAIN \
+  TEST_KCONFIG \
   UNDEF \
   #
 
