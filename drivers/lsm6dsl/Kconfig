@@ -6,9 +6,16 @@
 #
 
 config MODULE_LSM6DSL
-    bool "LSM6DSL 3D accelerometer/gyroscope"
+    bool
+    prompt "LSM6DSL 3D accelerometer/gyroscope" if !(MODULE_SAUL_DEFAULT && HAVE_LSM6DSL)
+    default y if (MODULE_SAUL_DEFAULT && HAVE_LSM6DSL)
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
     select MODULE_ZTIMER
     select MODULE_ZTIMER_MSEC
+
+config HAVE_LSM6DSL
+    bool
+    help
+        Indicates that a lsm6dsl sensor is present.
