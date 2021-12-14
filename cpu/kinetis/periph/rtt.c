@@ -31,7 +31,7 @@
 #include "debug.h"
 
 static rtt_cb_t alarm_cb = NULL;       /**< callback called from RTC alarm */
-static void *alarm_arg;                /**< argument passed to the callback */
+static void *alarm_arg = NULL;         /**< argument passed to the callback */
 static uint32_t alarm_value = 0;
 
 static void _rtt_cb(void *arg, int channel)
@@ -46,7 +46,6 @@ static void _rtt_cb(void *arg, int channel)
 void rtt_init(void)
 {
     timer_init(RTT_DEV, RTT_FREQUENCY, _rtt_cb, NULL);
-    alarm_value = 0;
 }
 
 uint32_t rtt_get_counter(void)
@@ -60,7 +59,7 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     alarm_arg = arg;
     alarm_cb = cb;
     alarm_value = alarm;
-    timer_set_absolute(RTT_DEV, 0, alarm % RTT_MAX_VALUE);
+    timer_set_absolute(RTT_DEV, 0, alarm & RTT_MAX_VALUE);
     irq_restore(state);
 }
 
@@ -71,7 +70,11 @@ uint32_t rtt_get_alarm(void)
 
 void rtt_clear_alarm(void)
 {
+    unsigned state = irq_disable();
+    alarm_cb = NULL;
+    alarm_arg = NULL;
     timer_clear(RTT_DEV, 0);
+    irq_restore(state);
 }
 
 void rtt_poweron(void)
