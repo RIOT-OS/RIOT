@@ -24,6 +24,8 @@ atxmega-a3bu-xplained
 avr-rss2
 avsextrem
 bastwan
+bluepill
+b-l475e-iot01a
 cc1352-launchpad
 cc2650-launchpad
 derfmega128
@@ -46,6 +48,7 @@ nucleo-f429zi
 nucleo-f767zi
 nucleo-g071rb
 nucleo-g474re
+nucleo-l011k4
 nucleo-l073rz
 nucleo-l152re
 nucleo-l433rc
@@ -59,7 +62,9 @@ seeedstudio-gd32
 slstk3400a
 sltb001a
 slwstk6220a
+stm32f723e-disco
 waspmote-pro
+weact-f401ce
 z1
 "}
 
@@ -135,7 +140,6 @@ CFCR_ARGS="--upstreambranch ${CI_BASE_COMMIT}"
 get_supported_kconfig_board_app() {
     local board=$1
     local appdir=$2
-
     if is_in_list "${board}" "${TEST_KCONFIG_BOARDS_AVAILABLE}"; then
         if is_in_list "${appdir}" "${TEST_KCONFIG_ENFORCE_APP_GROUPS}"; then
             return 0
@@ -421,7 +425,7 @@ compile() {
 
     if [ ${should_check_kconfig_hash} != 0 ]; then
         if [ ${kconfig_test_hash} != ${test_hash} ]; then
-            echo "Hashes of binaries with and without Kconfig mismatch for ${appdir}";
+            echo "Hashes of binaries with and without Kconfig mismatch for ${appdir} with ${board}";
             echo "Please check that all used modules are modelled in Kconfig and enabled";
             kconfig_module_packages_diff ${board} ${appdir}
             RES=1
