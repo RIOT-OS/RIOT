@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_common_nrf52
+ * @ingroup     boards_common_nrf52xxxdk
  * @{
  *
  * @file
@@ -28,40 +28,10 @@ extern "C" {
 #endif
 
 /**
- * @brief    LED configuration
+ * @brief    Button configuration
  */
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
-    {
-        .name  = "LED 1",
-        .pin   = LED0_PIN,
-        .mode  = GPIO_OUT,
-        .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
-    },
-#ifdef LED1_PIN
-    {
-        .name  = "LED 2",
-        .pin   = LED1_PIN,
-        .mode  = GPIO_OUT,
-        .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
-    },
-#endif
-#ifdef LED2_PIN
-    {
-        .name  = "LED 3",
-        .pin   = LED2_PIN,
-        .mode  = GPIO_OUT,
-        .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
-    },
-#endif
-#ifdef LED3_PIN
-    {
-        .name  = "LED 4",
-        .pin   = LED3_PIN,
-        .mode  = GPIO_OUT,
-        .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
-    },
-#endif
 #ifdef BTN0_PIN
     {
         .name  = "Button 1",

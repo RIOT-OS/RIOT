@@ -38,6 +38,7 @@ extern "C" {
  * @{
  */
 static const pwm_conf_t pwm_config[] = {
+    /* Beware: Keep pwm_params.h in sync with the definitions here */
     { NRF_PWM0, {
         /* configure LED0 as PWM */
 #ifdef LED0_PIN
