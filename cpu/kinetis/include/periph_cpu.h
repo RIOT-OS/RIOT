@@ -500,7 +500,7 @@ enum {
 #ifndef RTT_FREQUENCY
 #define RTT_FREQUENCY       RTT_MAX_FREQUENCY
 #endif
-#if IS_USED(PERIPH_RTT)
+#if IS_USED(MODULE_PERIPH_RTT)
 /* On kinetis periph_rtt is built on top on an LPTIMER so if used it
    will conflict with xtimer, if a LPTIMER backend and RTT are needed
    consider using ztimer */
