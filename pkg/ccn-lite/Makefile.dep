@@ -4,3 +4,5 @@ USEMODULE += evtimer
 USEMODULE += random
 USEMODULE += timex
 USEMODULE += posix_headers
+USEMODULE += ztimer64_usec
+USEMODULE += div

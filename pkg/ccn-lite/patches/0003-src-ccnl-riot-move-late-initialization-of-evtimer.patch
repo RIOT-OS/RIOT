@@ -1,0 +1,32 @@
+From 21139f10cbc2b7f2613503e9013f3b861ea74889 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 10 Dec 2021 16:53:41 +0100
+Subject: [PATCH 2/2] src/ccnl-riot: move late initialization of evtimer
+
+---
+ src/ccnl-riot/src/ccn-lite-riot.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/ccnl-riot/src/ccn-lite-riot.c b/src/ccnl-riot/src/ccn-lite-riot.c
+index 678e8301..fde0a441 100644
+--- a/src/ccnl-riot/src/ccn-lite-riot.c
++++ b/src/ccnl-riot/src/ccn-lite-riot.c
+@@ -360,7 +360,6 @@ void
+     char *spref;
+ 
+     msg_init_queue(_msg_queue, CCNL_QUEUE_SIZE);
+-    evtimer_init_msg(&ccnl_evtimer);
+     struct ccnl_relay_s *ccnl = (struct ccnl_relay_s*) arg;
+ 
+     while(!ccnl->halt_flag) {
+@@ -449,6 +448,7 @@ void
+ kernel_pid_t
+ ccnl_start(void)
+ {
++    evtimer_init_msg(&ccnl_evtimer);
+     loopback_face = ccnl_get_face_or_create(&ccnl_relay, -1, NULL, 0);
+     loopback_face->flags |= CCNL_FACE_FLAGS_STATIC;
+ 
+-- 
+2.30.2
+
