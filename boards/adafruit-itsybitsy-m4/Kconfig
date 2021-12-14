@@ -23,7 +23,6 @@ config BOARD_ADAFRUIT_ITSYBITSY_M4
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV
     select HAVE_SAUL_GPIO
-    select MODULE_USB_BOARD_RESET if MODULE_STDIO_CDC_ACM
 
     select HAVE_MTD_SPI_NOR
     # This specific board requires SPI_ON_QSPI for the MTD_SPI_NOR
