@@ -82,7 +82,7 @@ config MODULE_ZTIMER_SEC
 choice
     bool "Backend"
     depends on MODULE_ZTIMER_SEC
-    default ZTIMER_SEC_BACKEND_RTT
+    default ZTIMER_SEC_BACKEND_RTT if !MODULE_ZTIMER_NO_PERIPH_RTT
 
 config ZTIMER_SEC_BACKEND_TIMER
     bool "Timer"
@@ -91,7 +91,7 @@ config ZTIMER_SEC_BACKEND_TIMER
 config ZTIMER_SEC_BACKEND_RTT
     bool "RTT"
     depends on HAS_PERIPH_RTT
-    select MODULE_ZTIMER_PERIPH_RTT if !MODULE_ZTIMER_NO_PERIPH_RTT
+    select MODULE_ZTIMER_PERIPH_RTT
 
 config ZTIMER_SEC_BACKEND_RTC
     bool "RTC"
