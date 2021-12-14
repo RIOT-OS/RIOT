@@ -1,1 +1,2 @@
 DEFAULT_MODULE += pm_layered
+USEMODULE += ztimer_no_periph_rtt
