@@ -32,4 +32,6 @@ config BOARD_B_L072Z_LRWAN1
     # Clock configuration
     select BOARD_HAS_LSE
 
+    select HAVE_SAUL_GPIO
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"

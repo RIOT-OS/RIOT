@@ -25,4 +25,7 @@ config BOARD_STM32F3DISCOVERY
     # Clock configuration
     select BOARD_HAS_HSE
 
+    select HAVE_SAUL_GPIO
+    select HAVE_LSM303DLHC
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"

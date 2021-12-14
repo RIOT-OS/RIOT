@@ -13,5 +13,6 @@ config BOARD_BLUEPILL_128KIB
     default y
     select BOARD_COMMON_BLXXXPILL
     select CPU_MODEL_STM32F103CB
+    select MODULE_BOARDS_COMMON_BLXXXPILL if TEST_KCONFIG
 
 source "$(RIOTBOARD)/common/blxxxpill/Kconfig"

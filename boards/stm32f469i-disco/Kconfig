@@ -22,4 +22,6 @@ config BOARD_STM32F469I_DISCO
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
 
+    select HAVE_SAUL_GPIO
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"
