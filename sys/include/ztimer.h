@@ -465,6 +465,9 @@ ztimer_now_t _ztimer_now_extend(ztimer_clock_t *clock);
 /**
  * @brief   Get the current time from a clock
  *
+ * @warning don't compare ztimer_now() values from different clocks. The
+ *          clocks are almost certainly not synchronized.
+ *
  * @param[in]   clock          ztimer clock to operate on
  *
  * @return  Current count on @p clock
