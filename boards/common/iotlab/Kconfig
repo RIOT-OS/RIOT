@@ -22,4 +22,14 @@ config BOARD_COMMON_IOTLAB
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
 
+    select HAVE_SAUL_GPIO
+    select HAVE_L3G4200D
+    select HAVE_LSM303DLHC
+
+config MODULE_BOARDS_COMMON_IOTLAB
+    bool
+    depends on TEST_KCONFIG
+    help
+       Common code of iotlab based boards
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"

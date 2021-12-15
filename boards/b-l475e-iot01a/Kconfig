@@ -30,4 +30,10 @@ config BOARD_B_L475E_IOT01A
     # Clock configuration
     select BOARD_HAS_LSE
 
+    select HAVE_SAUL_GPIO
+    select HAVE_HTS221
+    select HAVE_LIS3MDL
+    select HAVE_LPS22HB
+    select HAVE_LSM6DSL
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"

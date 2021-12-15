@@ -5,7 +5,7 @@
 # directory for more details.
 #
 
-config BOARD_COMMON_WEACT_F41XCX
+config BOARD_COMMON_WEACT_F4X1CX
     bool
     # Put defined MCU peripherals here (in alphabetical order)
     select HAS_PERIPH_ADC
@@ -21,5 +21,14 @@ config BOARD_COMMON_WEACT_F41XCX
     # Clock configuration
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
+
+    select HAVE_SAUL_GPIO
+    select HAVE_MTD_SPI_NOR
+
+config MODULE_BOARDS_COMMON_WEACT-F4X1CX
+    bool
+    depends on TEST_KCONFIG
+    help
+       Common code of weact based boards
 
 source "$(RIOTBOARD)/common/stm32/Kconfig"

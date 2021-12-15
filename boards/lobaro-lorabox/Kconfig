@@ -24,4 +24,6 @@ config BOARD_LOBARO_LORABOX
     # Clock configuration
     select BOARD_HAS_LSE
 
+    select HAVE_SAUL_GPIO
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"

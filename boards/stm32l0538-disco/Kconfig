@@ -19,4 +19,6 @@ config BOARD_STM32L0538_DISCO
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
 
+    select HAVE_SAUL_GPIO
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"

@@ -21,3 +21,5 @@ config BOARD_BLUEPILL_STM32F030C8
     select HAS_PERIPH_UART
     select HAS_PERIPH_SPI
     select HAS_PERIPH_RTC
+
+    select HAVE_SAUL_GPIO

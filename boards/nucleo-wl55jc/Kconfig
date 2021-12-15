@@ -26,4 +26,6 @@ config BOARD_NUCLEO_WL55JC
     select HAS_ARDUINO
     select HAS_RIOTBOOT
 
+    select MODULE_PERIPH_LPUART if MODULE_STDIO_UART && HAS_PERIPH_LPUART
+
 source "$(RIOTBOARD)/common/nucleo64/Kconfig"

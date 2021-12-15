@@ -8,6 +8,7 @@ config MODULE_CORTEXM_COMMON
     bool
     default y if CPU_CORE_CORTEX_M
     depends on TEST_KCONFIG
+    imply MODULE_NEWLIB_NANO
     select MODULE_PERIPH
     select MODULE_MALLOC_THREAD_SAFE if TEST_KCONFIG
     help
@@ -141,3 +142,8 @@ config MODULE_MPU_STACK_GUARD
 endmenu # Cortex-M
 
 rsource "periph/Kconfig"
+
+choice LIBC_IMPLEMENTATION
+    default MODULE_NEWLIB
+    default MODULE_PICOLIBC
+endchoice

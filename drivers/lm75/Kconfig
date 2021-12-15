@@ -1,23 +1,50 @@
-choice
-    bool "LM75A/TMP1075 temperature sensors"
-    optional
+menuconfig MODULE_LM75
+    bool
+    prompt "LM75A/TMP1075 Temperatire Sensors" if !(MODULE_SAUL_DEFAULT && HAVE_LM75)
+    default y if (MODULE_SAUL_DEFAULT && HAVE_LM75)
+    depends on TEST_KCONFIG
     depends on HAS_PERIPH_I2C
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_I2C
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO_IRQ
+
+if MODULE_LM75
+
+choice
+    bool "sensor variant"
+    default MODULE_LM75A if HAVE_LM75A
+    default MODULE_TMP1075 if HAVE_TMP1075
     help
         Only the LM75A and TMP1075 temperature sensors are supported at the time.
 
 config MODULE_LM75A
     bool "LM75A temperature sensor"
-    select MODULE_LM75
 
 config MODULE_TMP1075
     bool "TMP1075 extended driver"
-    select MODULE_LM75
 
 endchoice
 
-config MODULE_LM75
+endif # MODULE_LM75
+
+config HAVE_LM75
     bool
-    depends on HAS_PERIPH_I2C
+    help
+        Indicates that a lm75a/tmp1075 sensor is present.
+
+config HAVE_LM75A
+    bool
+    select HAVE_LM75
+    help
+        Indicates that a lm75a sensor is present.
+
+config HAVE_TMP1075
+    bool
+    select HAVE_LM75
+    help
+        Indicates that a tmp1075 sensor is present.
 
 menuconfig KCONFIG_USEMODULE_LM75
     bool "Configure LM75 driver"

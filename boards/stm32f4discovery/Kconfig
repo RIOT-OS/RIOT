@@ -31,6 +31,8 @@ config BOARD_STM32F4DISCOVERY
     # Clock configuration
     select BOARD_HAS_HSE
 
+    select HAVE_SAUL_GPIO
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"
 
 config ERROR_MODULES_CONFLICT
