@@ -1,4 +1,5 @@
-USEMODULE += xtimer
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
 
 ifneq (,$(filter mhz19_pwm,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio

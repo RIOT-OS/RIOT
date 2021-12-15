@@ -15,14 +15,16 @@ config MODULE_MHZ19_UART
     depends on HAS_PERIPH_UART
     select MODULE_PERIPH_UART
     select MODULE_MHZ19
-    select MODULE_XTIMER
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
 
 config MODULE_MHZ19_PWM
     bool "MH-Z19 over PWM"
     depends on HAS_PERIPH_GPIO
     select MODULE_PERIPH_GPIO
     select MODULE_MHZ19
-    select MODULE_XTIMER
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
 
 config MODULE_MHZ19
     bool
