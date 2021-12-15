@@ -51,8 +51,8 @@ def print_change_set_section(name, contents):
         print_err(category)
         print_err("-" * len(category))
         print_err("")
-        for file in sorted(contents[category]):
-            print_err("- {}".format(file))
+        for filename in sorted(contents[category]):
+            print_err("- {}".format(filename))
         print_err("")
 
 
@@ -68,49 +68,49 @@ class ChangeSet:
         self.pkgs = {}
         self._riotbase = os.path.normpath(riotbase)
 
-    def __add_module(self, dest, file):
-        module = os.path.dirname(file)
+    def _add_module(self, dest, filename):
+        module = os.path.dirname(filename)
         while module != "":
             makefile = os.path.join(self._riotbase, module, "Makefile")
             if os.path.isfile(makefile) or module in EXCEPTION_MODULES:
                 if module in dest:
-                    dest[module].append(file)
+                    dest[module].append(filename)
                 else:
-                    dest[module] = [file]
+                    dest[module] = [filename]
                 return
             module = os.path.dirname(module)
-        raise Exception("Module containing file \"{}\" not found".format(file))
+        raise Exception("Module containing file \"{}\" not found".format(filename))
 
-    def add_file(self, file):
+    def add_file(self, filename):
         """
         Add the given file to the change set
         """
         # normalize path
-        file = os.path.normpath(file)
-        if file.startswith('./'):
-            file = file[2:]
+        filename = os.path.normpath(filename)
+        if filename.startswith('./'):
+            filename = filename[2:]
         # turn path into path relative to riotbase, if needed
-        if file.startswith(self._riotbase):
-            file = file[len(self._riotbase):]
+        if filename.startswith(self._riotbase):
+            filename = filename[len(self._riotbase):]
 
         for regex, name in OTHER_CLASSIFIERS:
-            if regex.match(file):
+            if regex.match(filename):
                 if name in self.other:
-                    self.other[name].append(file)
+                    self.other[name].append(filename)
                 else:
-                    self.other[name] = [file]
+                    self.other[name] = [filename]
                 return
 
-        if REGEX_MODULE.match(file):
-            self.__add_module(self.modules, file)
-        elif REGEX_PKG.match(file):
-            self.__add_module(self.pkgs, file)
-        elif REGEX_BOARD.match(file):
-            self.__add_module(self.boards, file)
-        elif REGEX_APP.match(file):
-            self.__add_module(self.apps, file)
+        if REGEX_MODULE.match(filename):
+            self._add_module(self.modules, filename)
+        elif REGEX_PKG.match(filename):
+            self._add_module(self.pkgs, filename)
+        elif REGEX_BOARD.match(filename):
+            self._add_module(self.boards, filename)
+        elif REGEX_APP.match(filename):
+            self._add_module(self.apps, filename)
         else:
-            raise Exception("File \"{}\" doesn't match any known category".format(file))
+            raise Exception("File \"{}\" doesn't match any known category".format(filename))
 
     def print_files_and_classifications(self):
         """
@@ -163,11 +163,10 @@ def classify_changes(riotbase=None, upstream_branch="master"):
 
             match = REGEX_GIT_DIFF_SINGLE_FILE.match(line)
             if match:
-                file = match.group(1)
+                filename = match.group(1)
 
-                if only_comment_change(file, upstream_branch) is False:
-                    change_set.add_file(file)
-
+                if only_comment_change(filename, upstream_branch) is False:
+                    change_set.add_file(filename)
                 continue
 
             raise Exception("Failed to parse \"{}\"".format(line))
