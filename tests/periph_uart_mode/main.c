@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "clk.h"
 #include "board.h"
 #include "periph/uart.h"
 #include "periph_conf.h"
@@ -69,7 +70,8 @@ static void _delay(void)
          * compilers would detect that the loop is only wasting CPU cycles and
          * optimize it out - but here the wasting of CPU cycles is desired.
          */
-        for (volatile uint32_t i = 0; i < CLOCK_CORECLOCK / 20; i++) { }
+        uint32_t loops = coreclk() / 20;
+        for (volatile uint32_t i = 0; i < loops; i++) { }
     }
 }
 

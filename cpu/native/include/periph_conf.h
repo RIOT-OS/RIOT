@@ -16,8 +16,19 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include "macros/units.h"
+
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+/**
+ * @brief   System core clock in Hz
+ *
+ *  1GHz is an arbitrary value used for compatibility with other platforms.
+ */
+#ifndef CLOCK_CORECLOCK
+#define CLOCK_CORECLOCK     GHZ(1)
 #endif
 
 /**

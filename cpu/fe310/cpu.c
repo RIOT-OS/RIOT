@@ -17,6 +17,7 @@
  * @}
  */
 
+#include "clk.h"
 #include "cpu.h"
 #include "periph/init.h"
 #include "periph_conf.h"
@@ -80,7 +81,7 @@ void flash_init(void)
      * by the following formula (Fin is processor/tile-link clock):
      *    Fsck = Fin/(2(div + 1))
      */
-    uint32_t freq = cpu_freq();
+    uint32_t freq = coreclk();
     uint32_t sckdiv = (freq - 1) / (MAX_FLASH_FREQ * 2);
 
     if (sckdiv > SCKDIV_SAFE) {

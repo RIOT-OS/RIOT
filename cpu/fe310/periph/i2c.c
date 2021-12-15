@@ -23,6 +23,7 @@
 #include <assert.h>
 #include <errno.h>
 
+#include "clk.h"
 #include "cpu.h"
 #include "mutex.h"
 
@@ -69,7 +70,7 @@ void i2c_init(i2c_t dev)
 
     /* Compute prescale: presc = (CORE_CLOCK / (5 * I2C_SPEED)) - 1 */
     uint16_t presc =
-        ((uint16_t)(cpu_freq() / 1000) /
+        ((uint16_t)(coreclk() / 1000) /
          (5 * _fe310_i2c_speed[i2c_config[dev].speed])) - 1;
 
     DEBUG("[i2c] init: computed prescale: %i (0x%02X|0x%02X)\n", presc,

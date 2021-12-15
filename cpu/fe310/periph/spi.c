@@ -24,6 +24,7 @@
 
 #include <assert.h>
 
+#include "clk.h"
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/spi.h"
@@ -62,7 +63,7 @@ void spi_init(spi_t dev)
     mutex_init(&lock);
 
     for (uint8_t i = 0; i < SPI_CLK_NUMOF; ++i) {
-        _spi_clks_config[i] = SPI_DIV_UP(cpu_freq(), 2 * _spi_clks[i]) - 1;
+        _spi_clks_config[i] = SPI_DIV_UP(coreclk(), 2 * _spi_clks[i]) - 1;
     }
 
     /* trigger pin initialization */

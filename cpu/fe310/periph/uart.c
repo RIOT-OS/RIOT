@@ -22,6 +22,7 @@
 #include <assert.h>
 #include <inttypes.h>
 
+#include "clk.h"
 #include "irq.h"
 #include "cpu.h"
 #include "periph/uart.h"
@@ -87,7 +88,7 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     uart_poweron(dev);
 
     /* Calculate baudrate divisor given current CPU clk rate */
-    uartDiv = cpu_freq() / baudrate;
+    uartDiv = coreclk() / baudrate;
 
     /* Enable UART 8-N-1 at given baudrate */
     _REG32(uart_config[dev].addr, UART_REG_DIV) = uartDiv;

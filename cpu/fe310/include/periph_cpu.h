@@ -175,13 +175,6 @@ typedef struct {
  */
 void fe310_clock_init(void);
 
-/**
- * @brief   Get and eventually compute the current CPU core clock frequency
- *
- * @return  the cpu core clock frequency in Hz
- */
-uint32_t cpu_freq(void);
-
 /** @} */
 
 #ifdef __cplusplus

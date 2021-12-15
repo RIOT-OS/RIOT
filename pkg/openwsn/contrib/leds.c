@@ -23,6 +23,7 @@
 #include "leds.h"
 #include "openwsn_leds.h"
 
+#include "clk.h"
 #include "board.h"
 #include "periph/gpio.h"
 
@@ -86,7 +87,8 @@ static void _blink_checked(gpio_t pin)
         /* toggle for ~10s if ztimer is used */
         for (uint8_t i = 0; i < 100; i++) {
             _toggle_checked(pin);
-            for (uint32_t i = 0; i < (CLOCK_CORECLOCK / 50); i++) {
+            uint32_t runs = coreclk() / 50;
+            for (uint32_t i = 0; i < runs; i++) {
                 /* Make sure for loop is not optimized out */
                 __asm__ ("");
             }
