@@ -9,5 +9,5 @@
 /**
  * @defgroup  cpp11-compat  C++11 wrapper for RIOT
  * @brief     drop in replacement to enable C++11-like thread, mutex and condition_variable
- * @ingroup   sys
+ * @ingroup   cpp
  */
