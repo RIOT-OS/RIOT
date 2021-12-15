@@ -24,7 +24,11 @@
 #include "saul_reg.h"
 #include "phydat.h"
 
-void temperature_read(int16_t *temp)
+/**
+ * @brief   Read the temperature in E-02 °C
+ * @return  The measured temperature in E-02 °C (e.g. 1825 would mean 18.25 °C)
+ */
+static int16_t temperature_read(void)
 {
     /* Start temperature measurement task */
     NRF_TEMP->TASKS_START = 1;
@@ -32,22 +36,24 @@ void temperature_read(int16_t *temp)
     /* Wait for temperature measurement to be ready */
     while (!NRF_TEMP->EVENTS_DATARDY); /* takes 36us according to manual */
 
-    /* temperature is in 0.25°C step, so just divide by 4 */
-    *temp = (int16_t)NRF_TEMP->TEMP >> 2;
+    /* temperature is in 0.25°C step, multiply by 25 to convert to E-02 °C */
+    int32_t temp = NRF_TEMP->TEMP * 25;
 
     /* Clear data ready bit and stop temperature measurement task */
     NRF_TEMP->EVENTS_DATARDY = 0;
     NRF_TEMP->TASKS_STOP = 1;
+
+    return temp;
 }
 
 static int _read_temperature(const void *dev, phydat_t *res)
 {
-    (void) dev;
-    temperature_read(&res->val[0]);
+    (void)dev;
+    res->val[0] = temperature_read();
     res->val[1] = 0;
     res->val[2] = 0;
     res->unit = UNIT_TEMP_C;
-    res->scale = 0;
+    res->scale = -2;
     return 1;
 }
 
