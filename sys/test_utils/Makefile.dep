@@ -8,4 +8,5 @@ ifneq (,$(filter benchmark_udp,$(USEMODULE)))
   USEMODULE += netutils
   USEMODULE += sema_inv
   USEMODULE += sock_udp
+  USEMODULE += xtimer
 endif

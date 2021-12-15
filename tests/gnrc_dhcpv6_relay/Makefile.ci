@@ -10,7 +10,10 @@ BOARD_INSUFFICIENT_MEMORY := \
     atxmega-a3bu-xplained \
     bluepill-stm32f030c8 \
     derfmega128 \
+    hifive1 \
+    hifive1b \
     i-nucleo-lrwan1 \
+    im880b \
     mega-xplained \
     microduino-corerf \
     msb-430 \

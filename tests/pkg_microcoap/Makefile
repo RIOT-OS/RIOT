@@ -11,6 +11,8 @@ USEMODULE += gnrc_icmpv6_echo
 
 USEMODULE += sock_udp
 
+USEMODULE += xtimer
+
 USEPKG += microcoap
 
 # include this for printing IP addresses

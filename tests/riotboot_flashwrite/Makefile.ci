@@ -16,8 +16,10 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f334r8 \
     nucleo-g070rb \
     nucleo-g071rb \
+    nucleo-g431rb \
     nucleo-l031k6 \
     nucleo-l053r8 \
+    nucleo-l412kb \
     saml10-xpro \
     saml11-xpro \
     slstk3400a \

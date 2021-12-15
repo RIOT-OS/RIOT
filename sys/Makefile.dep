@@ -154,6 +154,7 @@ endif
 
 ifneq (,$(filter uhcpc,$(USEMODULE)))
   USEMODULE += posix_inet
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter netdev_tap,$(USEMODULE)))
@@ -744,6 +745,7 @@ endif
 
 ifneq (,$(filter suit_transport_coap, $(USEMODULE)))
   USEMODULE += nanocoap_sock
+  USEMODULE += xtimer
   USEMODULE += sock_util
 endif
 

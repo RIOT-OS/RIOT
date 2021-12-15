@@ -20,6 +20,8 @@ USEMODULE += gnrc_sock_check_reuse
 USEMODULE += sock_udp
 USEMODULE += gnrc_ipv6
 USEMODULE += ps
+USEMODULE += xtimer
+
 
 CFLAGS += -DTEST_SUITES
 

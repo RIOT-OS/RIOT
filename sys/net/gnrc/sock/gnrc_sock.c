@@ -26,7 +26,9 @@
 #include "net/gnrc/tx_sync.h"
 #include "net/udp.h"
 #include "utlist.h"
+#ifdef MODULE_XTIMER
 #include "xtimer.h"
+#endif
 
 #include "sock_types.h"
 #include "gnrc_sock_internal.h"
