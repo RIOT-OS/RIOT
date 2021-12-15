@@ -99,6 +99,45 @@ examples/hello-world
 tests/ieee802154_hal
 "}
 
+# This list prevents boards from being tested by the TEST_KCONFIG_TEST_ALLOWLIST
+# This should only be used for boards that require a lot of work, such as,
+# requiring modelling of a clock tree.
+# As a rule of thumb, only add boards here if there are not differences in
+# modules or packages.
+# Eventually this list will be removed...
+: ${TEST_KCONFIG_BOARD_BLOCKLIST:="
+6lowpan-clicker
+esp32-wrover-kit
+esp8266-esp-12x
+esp8266-olimex-mod
+esp8266-sparkfun-thing
+limifrog-v1
+lora-e5-dev
+msbiot
+msb-430h
+nucleo-l011k4
+nucleo-wl55jc
+omote
+openmote-b
+pic32-wifire
+pyboard
+remote-pa
+samd10-xmini
+stk3200
+stm32f030f4-demo
+stm32f3discovery
+stm32mp157c-dk2
+"}
+
+# This list will force all boards that are not in the TEST_KCONFIG_BOARD_BLOCKLIST
+# to be tested on the apps. The purpose is to prevent new boards from skipping
+# the kconfig implementations.
+: ${TEST_KCONFIG_TEST_ALLOWLIST:="
+examples/hello-world
+tests/saul
+tests/mtd_mapper
+"}
+
 : ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/driver_at86rf2xx_aes"}
 
 export RIOT_CI_BUILD=1
@@ -142,6 +181,12 @@ CFCR_ARGS="--upstreambranch ${CI_BASE_COMMIT}"
 get_supported_kconfig_board_app() {
     local board=$1
     local appdir=$2
+    if is_in_list "${board}" "${TEST_KCONFIG_BOARD_BLOCKLIST}"; then
+        return 1
+    fi
+    if is_in_list "${appdir}" "${TEST_KCONFIG_TEST_ALLOWLIST}"; then
+        return 0
+    fi
     if is_in_list "${board}" "${TEST_KCONFIG_BOARDS_AVAILABLE}"; then
         if is_in_list "${appdir}" "${TEST_KCONFIG_ENFORCE_APP_GROUPS}"; then
             return 0
