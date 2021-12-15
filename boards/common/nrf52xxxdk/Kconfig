@@ -14,11 +14,12 @@ config BOARDS_COMMON_NRF52XXXDK
     select HAS_VDD_LC_FILTER_REG1
 
     select HAVE_SAUL_GPIO
+    select HAVE_SAUL_PWM
 
 config MODULE_BOARDS_COMMON_NRF52XXXDK
     bool
     depends on TEST_KCONFIG
     help
-      Common code for boards based on nrf52xxxdk.
+        Common code for boards based on nrf52xxxdk.
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"
