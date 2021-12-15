@@ -365,6 +365,9 @@ struct ztimer_clock {
 
 /**
  * @brief   main ztimer callback handler
+ *
+ * This gets called by clock implementations, and must only be called by them
+ * with interrupts disabled.
  */
 void ztimer_handler(ztimer_clock_t *clock);
 
