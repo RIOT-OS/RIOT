@@ -18,8 +18,9 @@
  * @}
  */
 
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "board.h"
 #include "macros/units.h"
@@ -57,6 +58,10 @@
 #define MAX_CHANNELS    (10)
 #endif
 
+#ifndef ITERATIONS
+#define ITERATIONS 3
+#endif
+
 static unsigned count[MAX_CHANNELS];
 
 static void cb(void *arg, int chan)
@@ -75,11 +80,12 @@ static void cb(void *arg, int chan)
 
 static const char* _print_ok(int chan, bool *succeeded)
 {
-    if (chan == 0 && count[chan] > 0) {
-        return "OK";
+    if (chan == 0) {
+        if (count[chan] > 0) {
+            return "OK";
+        }
     }
-
-    if (chan > 0 && count[chan] == 0) {
+    else if (count[chan] == 0) {
         return "OK";
     }
 
@@ -89,7 +95,7 @@ static const char* _print_ok(int chan, bool *succeeded)
 
 int main(void)
 {
-    mutex_t lock = MUTEX_INIT_LOCKED;
+    mutex_t lock = MUTEX_INIT;
     const unsigned long timer_hz = XTIMER_HZ;
     const unsigned steps = (CYCLE_MS * timer_hz) / 1000;
 
@@ -100,25 +106,42 @@ int main(void)
     expect(timer_init(TIMER_CYCL, timer_hz, cb, &lock) == 0);
 
     puts("TEST START");
-
-    /* Only the first channel should trigger and reset the counter */
-    /* If subsequent channels trigger this is an error. */
-    unsigned channel_numof = 1;
-    for(unsigned i = 1; i < MAX_CHANNELS; i++) {
-        if(!timer_set_periodic(TIMER_CYCL, i, (1 + i) * steps, TIM_FLAG_RESET_ON_SET)) {
-            channel_numof = i;
-            break;
-        }
-    }
-    timer_set_periodic(TIMER_CYCL, 0, steps, TIM_FLAG_RESET_ON_MATCH);
-
-    mutex_lock(&lock);
-
-    puts("\nCycles:");
-
     bool succeeded = true;
-    for (unsigned i = 0; i < channel_numof; ++i) {
-        printf("channel %u = %02u\t[%s]\n", i, count[i], _print_ok(i, &succeeded));
+    unsigned channel_numof = 1;
+
+    for (unsigned iter = 0; iter < ITERATIONS; iter++) {
+        printf("Running iteration %u of %u\n", iter + 1, (unsigned)ITERATIONS);
+        lock = (mutex_t)MUTEX_INIT_LOCKED;
+        memset(count, 0x00, sizeof(count));
+
+        /* Only the first channel should trigger and reset the counter */
+        /* If subsequent channels trigger this is an error. */
+        for (unsigned chan = 1; chan < MAX_CHANNELS; chan++) {
+            if (!timer_set_periodic(TIMER_CYCL, chan, (1 + chan) * steps,
+                                    TIM_FLAG_RESET_ON_SET))
+                {
+                channel_numof = chan;
+                break;
+            }
+        }
+
+        if (iter == 0) {
+            /* configure timer on first iterations */
+            timer_set_periodic(TIMER_CYCL, 0, steps, TIM_FLAG_RESET_ON_MATCH);
+        }
+        else {
+            /* resume timer on subsequent iterations */
+            timer_start(TIMER_CYCL);
+        }
+
+        mutex_lock(&lock);
+
+        puts("\nCycles:");
+
+        for (unsigned i = 0; i < channel_numof; ++i) {
+            printf("channel %u = %02u\t[%s]\n",
+                   i, count[i], _print_ok(i, &succeeded));
+        }
     }
 
     if (succeeded) {
