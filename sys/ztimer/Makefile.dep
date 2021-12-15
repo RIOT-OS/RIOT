@@ -12,15 +12,26 @@ ifneq (,$(filter ztimer,$(USEMODULE)))
 endif
 
 # unless ztimer_xtimer_compat is used, make xtimer use ztimer_usec as backend.
-ifneq (,$(filter ztimer_periph_timer,$(USEMODULE)))
-  ifneq  (,$(filter xtimer,$(USEMODULE)))
-    ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+ifneq (,$(filter ztimer,$(USEMODULE)))
+  ifneq (,$(filter xtimer,$(USEMODULE)))
+    ifeq (,$(filter ztimer_xtimer_compat ztimer64_xtimer_compat,$(USEMODULE)))
       USEMODULE += xtimer_on_ztimer
+    else
+      USEMODULE += div
     endif
   endif
   ifneq (,$(filter evtimer,$(USEMODULE)))
     USEMODULE += evtimer_on_ztimer
   endif
+endif
+
+ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+  USEMODULE += ztimer_usec
+endif
+
+ifneq (,$(filter ztimer64_xtimer_compat,$(USEMODULE)))
+  USEMODULE += ztimer64_usec
+  USEMODULE += ztimer_xtimer_compat
 endif
 
 # make xtimer use ztimer_usec as low level timer
@@ -31,13 +42,6 @@ endif
 # make evtimer use ztimer_msec as low level timer
 ifneq (,$(filter evtimer_on_ztimer,$(USEMODULE)))
   USEMODULE += ztimer_msec
-endif
-
-# "ztimer_xtimer_compat" is a wrapper of the xtimer API on ztimer_used
-# (it is currently incomplete). Unless doing testing, use "xtimer_on_ztimer".
-ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-  USEMODULE += div
-  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter ztimer_%,$(USEMODULE)))

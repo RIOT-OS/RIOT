@@ -798,7 +798,8 @@ ifneq (,$(filter xtimer,$(USEMODULE)))
       # will use *ztimer_usec as low-level timer*
     endif
   else
-  # ztimer_xtimer_compat is used, all of *xtimer's API will be mapped on ztimer.*
+    # ztimer_xtimer_compat is used, all of *xtimer's API will be mapped on ztimer
+    # or ztimer64 *
   endif
 endif
 

@@ -9,9 +9,8 @@ menuconfig MODULE_XTIMER
     bool "xtimer"
     depends on HAS_PERIPH_TIMER
     depends on TEST_KCONFIG
-
     # use timer peripheral unless ztimer compatibility module is used
-    select MODULE_PERIPH_TIMER if HAS_PERIPH_TIMER && !MODULE_XTIMER_ON_ZTIMER && !MODULE_ZTIMER_XTIMER_COMPAT
+    select MODULE_PERIPH_TIMER if HAS_PERIPH_TIMER && !MODULE_XTIMER_ON_ZTIMER && !MODULE_ZTIMER_XTIMER_COMPAT && !MODULE_ZTIMER64_XTIMER_COMPAT
 
     select MODULE_DIV if !MODULE_ZTIMER_XTIMER_COMPAT
     help
