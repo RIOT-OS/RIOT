@@ -18,6 +18,10 @@ menuconfig MODULE_EVENT
 
 if MODULE_EVENT
 
+config MODULE_EVENT_PERIODIC
+    bool "Provides functionality to trigger periodic events"
+    depends on MODULE_EVENT_TIMEOUT_ZTIMER
+
 config MODULE_EVENT_CALLBACK
     bool "Support for callback-with-argument event type"
 
