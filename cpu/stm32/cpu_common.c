@@ -37,15 +37,17 @@ static const uint8_t apbmul[] = {
 #if (CLOCK_APB1 < CLOCK_CORECLOCK)
     [APB1] = 2,
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32G0)
+    defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32G4) || \
+    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
+    defined(CPU_FAM_STM32WL)
     [APB12] = 2,
 #endif
 #else
     [APB1] = 1,
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32G0)
+    defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32G4) || \
+    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
+    defined(CPU_FAM_STM32WL)
     [APB12] = 1,
 #endif
 #endif
@@ -79,7 +81,7 @@ void periph_clk_en(bus_t bus, uint32_t mask)
         case APB1:
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32WL)
+    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WL)
             RCC->APB1ENR1 |= mask;
 #elif defined(CPU_FAM_STM32G0)
             RCC->APBENR1 |= mask;
@@ -98,14 +100,14 @@ void periph_clk_en(bus_t bus, uint32_t mask)
 #endif
             break;
 #endif
-#if defined(CPU_FAM_STM32WL)
+#if defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32U5)
         case APB3:
             RCC->APB3ENR |= mask;
             break;
 #endif
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32WL)
+    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WL)
         case APB12:
             RCC->APB1ENR2 |= mask;
             break;
@@ -129,15 +131,25 @@ void periph_clk_en(bus_t bus, uint32_t mask)
 #elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
       defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F7) || \
       defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
-      defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WL)
+      defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
+      defined(CPU_FAM_STM32WL)
         case AHB1:
             RCC->AHB1ENR |= mask;
             break;
 /* STM32F410 RCC doesn't provide AHB2 and AHB3 */
 #if !defined(CPU_LINE_STM32F410Rx)
         case AHB2:
+#if defined(CPU_FAM_STM32U5)
+            RCC->AHB2ENR1 |= mask;
+#else
             RCC->AHB2ENR |= mask;
+#endif
             break;
+#if defined(CPU_FAM_STM32U5)
+        case AHB22:
+            RCC->AHB2ENR2 |= mask;
+            break;
+#endif
         case AHB3:
             RCC->AHB3ENR |= mask;
             break;
@@ -162,7 +174,7 @@ void periph_clk_dis(bus_t bus, uint32_t mask)
         case APB1:
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32WL)
+    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WL)
             RCC->APB1ENR1 &= ~(mask);
 #elif defined(CPU_FAM_STM32G0)
             RCC->APBENR1 &= ~(mask);
@@ -182,14 +194,14 @@ void periph_clk_dis(bus_t bus, uint32_t mask)
 #endif
             break;
 #endif
-#if defined(CPU_FAM_STM32WL)
+#if defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32U5)
         case APB3:
             RCC->APB3ENR &= ~(mask);
             break;
 #endif
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32WL)
+    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WL)
         case APB12:
             RCC->APB1ENR2 &= ~(mask);
             break;
@@ -213,15 +225,25 @@ void periph_clk_dis(bus_t bus, uint32_t mask)
 #elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
       defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F7) || \
       defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
-      defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WL)
+      defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
+      defined(CPU_FAM_STM32WL)
         case AHB1:
             RCC->AHB1ENR &= ~(mask);
             break;
 /* STM32F410 RCC doesn't provide AHB2 and AHB3 */
 #if !defined(CPU_LINE_STM32F410Rx)
         case AHB2:
+#if defined(CPU_FAM_STM32U5)
+            RCC->AHB2ENR1 &= ~(mask);
+#else
             RCC->AHB2ENR &= ~(mask);
+#endif
             break;
+#if defined(CPU_FAM_STM32U5)
+        case AHB22:
+            RCC->AHB2ENR2 &= ~(mask);
+            break;
+#endif
         case AHB3:
             RCC->AHB3ENR &= ~(mask);
             break;
@@ -239,25 +261,34 @@ void periph_clk_dis(bus_t bus, uint32_t mask)
 }
 
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32G4) || \
-    defined(CPU_FAM_STM32L5)
+    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5)
 void periph_lpclk_en(bus_t bus, uint32_t mask)
 {
     switch (bus) {
         case APB1:
             RCC->APB1SMENR1 |= mask;
             break;
-        case APB2:
-            RCC->APB2SMENR |= mask;
-            break;
         case APB12:
             RCC->APB1SMENR2 |= mask;
+            break;
+        case APB2:
+            RCC->APB2SMENR |= mask;
             break;
         case AHB1:
             RCC->AHB1SMENR |= mask;
             break;
         case AHB2:
+#if defined(CPU_FAM_STM32U5)
+            RCC->AHB2SMENR1 |= mask;
+#else
             RCC->AHB2SMENR |= mask;
+#endif
             break;
+#if defined(CPU_FAM_STM32U5)
+        case AHB22:
+            RCC->AHB2SMENR2 |= mask;
+            break;
+#endif
         case AHB3:
             RCC->AHB3SMENR |= mask;
             break;
@@ -273,18 +304,27 @@ void periph_lpclk_dis(bus_t bus, uint32_t mask)
         case APB1:
             RCC->APB1SMENR1 &= ~(mask);
             break;
-        case APB2:
-            RCC->APB2SMENR &= ~(mask);
-            break;
         case APB12:
             RCC->APB1SMENR2 &= ~(mask);
+            break;
+        case APB2:
+            RCC->APB2SMENR &= ~(mask);
             break;
         case AHB1:
             RCC->AHB1SMENR &= ~(mask);
             break;
         case AHB2:
+#if defined(CPU_FAM_STM32U5)
+            RCC->AHB2SMENR1 &= ~(mask);
+#else
             RCC->AHB2SMENR &= ~(mask);
+#endif
             break;
+#if defined(CPU_FAM_STM32U5)
+        case AHB22:
+            RCC->AHB2SMENR2 &= ~(mask);
+            break;
+#endif
         case AHB3:
             RCC->AHB3SMENR &= ~(mask);
             break;

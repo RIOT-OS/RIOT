@@ -45,6 +45,8 @@ void hwrng_read(void *buf, unsigned int num)
     periph_clk_en(AHB, RCC_AHBENR_RNGEN);
 #elif defined(CPU_FAM_STM32WB)
     periph_clk_en(AHB3, RCC_AHB3ENR_RNGEN);
+#elif defined(CPU_FAM_STM32U5)
+    periph_clk_en(AHB2, RCC_AHB2ENR1_RNGEN);
 #else
     periph_clk_en(AHB2, RCC_AHB2ENR_RNGEN);
 #endif
@@ -71,6 +73,8 @@ void hwrng_read(void *buf, unsigned int num)
     periph_clk_dis(AHB, RCC_AHBENR_RNGEN);
 #elif defined(CPU_FAM_STM32WB)
     periph_clk_dis(AHB3, RCC_AHB3ENR_RNGEN);
+#elif defined(CPU_FAM_STM32U5)
+    periph_clk_dis(AHB2, RCC_AHB2ENR1_RNGEN);
 #else
     periph_clk_dis(AHB2, RCC_AHB2ENR_RNGEN);
 #endif

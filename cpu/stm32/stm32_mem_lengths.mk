@@ -266,6 +266,12 @@ else ifeq ($(STM32_TYPE), L)
       RAM_LEN = 256K
     endif
   endif
+else ifeq ($(STM32_TYPE), U)
+  ifeq ($(STM32_FAMILY), 5)
+    ifneq (, $(filter $(STM32_MODEL2), 7 8))
+      RAM_LEN = 768K
+    endif
+  endif
 else ifeq ($(STM32_TYPE), W)
   ifeq ($(STM32_FAMILY), B)
     ifeq ($(STM32_MODEL), B55)

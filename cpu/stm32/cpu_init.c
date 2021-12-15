@@ -336,7 +336,9 @@ void cpu_init(void)
     /* initialize the Cortex-M core */
     cortexm_init();
     /* enable PWR module */
-#if !defined(CPU_FAM_STM32WB) && !defined(CPU_FAM_STM32MP1) &&  \
+#if defined(CPU_FAM_STM32U5)
+    periph_clk_en(AHB3, RCC_AHB3ENR_PWREN);
+#elif !defined(CPU_FAM_STM32WB) && !defined(CPU_FAM_STM32MP1) &&  \
     !defined(CPU_FAM_STM32WL)
     periph_clk_en(APB1, BIT_APB_PWREN);
 #endif
