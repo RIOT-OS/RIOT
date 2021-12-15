@@ -17,6 +17,7 @@
 adafruit-itsybitsy-m4
 arduino-due
 arduino-leonardo
+arduino-mkrzero
 arduino-mega2560
 arduino-nano
 atxmega-a1-xplained
@@ -32,6 +33,7 @@ derfmega128
 dwm1001
 esp32-heltec-lora32-v2
 esp8266-esp-12x
+hamilton
 hifive1
 mbed_lpc1768
 mega-xplained

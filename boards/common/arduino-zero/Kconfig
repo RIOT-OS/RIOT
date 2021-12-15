@@ -18,3 +18,12 @@ config BOARD_COMMON_ARDUINO_ZERO
     select HAS_PERIPH_USBDEV
     select HAS_ARDUINO
     select HAS_ARDUINO_PWM
+
+    select HAVE_SAUL_GPIO
+
+config MODULE_BOARDS_COMMON_ARDUINO_ZERO
+    bool
+    depends on TEST_KCONFIG
+    default y
+    help
+        Common code for arduino-zero type of boards.

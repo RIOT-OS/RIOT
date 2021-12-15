@@ -10,3 +10,4 @@ config APPLICATION
     default y
     imply MODULE_PERIPH_RTC_MEM
     imply MODULE_PERIPH_RTC_MS
+    imply MODULE_ZTIMER_NO_PERIPH_RTT

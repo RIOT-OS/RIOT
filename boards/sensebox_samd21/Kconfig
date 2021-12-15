@@ -20,3 +20,7 @@ config BOARD_SENSEBOX_SAMD21
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV
     select HAS_HIGHLEVEL_STDIO
+
+    select HAVE_SAUL_GPIO
+
+source "$(RIOTBOARD)/common/samdx1-arduino-bootloader/Kconfig"
