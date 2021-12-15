@@ -791,6 +791,10 @@ endif
 
 # handle xtimer's deps. Needs to be done *after* ztimer
 ifneq (,$(filter xtimer,$(USEMODULE)))
+  # for testing
+  ifneq (1,$(FORCE_XTIMER))
+    USEMODULE += ztimer_xtimer_compat
+  endif
   ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
     # xtimer is used, ztimer xtimer wrapper is not
     DEFAULT_MODULE += auto_init_xtimer
