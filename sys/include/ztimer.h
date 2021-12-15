@@ -408,8 +408,14 @@ unsigned ztimer_is_set(const ztimer_clock_t *clock, const ztimer_t *timer);
  *
  * @param[in]   clock       ztimer clock to operate on
  * @param[in]   timer       timer entry to remove
+ *
+ * @retval  true    The timer was removed (and thus its callback neither was nor
+ *                  will be called by ztimer).
+ * @retval  false   The timer fired previously or is not set on the @p clock
+ *                  at all.
+ *
  */
-void ztimer_remove(ztimer_clock_t *clock, ztimer_t *timer);
+bool ztimer_remove(ztimer_clock_t *clock, ztimer_t *timer);
 
 /**
  * @brief   Post a message after a delay
