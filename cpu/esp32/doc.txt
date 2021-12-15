@@ -851,7 +851,7 @@ Beside the I2C hardware implementation, a I2C bit-banging protocol software impl
 used. This implementation allows bus speeds up to 1 Mbps (`I2C_SPEED_FAST_PLUS`). It can be
 activated by adding
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-USEMODULE += esp_i2c_hw
+USEMODULE += esp_i2c_sw
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 to application's makefile. The Disadvantage of the software implementation is that it uses busy
 waiting.

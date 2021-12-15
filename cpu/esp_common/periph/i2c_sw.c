@@ -105,18 +105,23 @@ static _i2c_bus_t _i2c_bus[I2C_NUMOF] = {};
 #pragma GCC optimize ("O2")
 
 #ifdef MCU_ESP32
-static const uint32_t _i2c_delays[][3] =
+static const uint32_t _i2c_delays[][5] =
 {
     /* values specify one half-period and are only valid for -O2 option     */
     /* value = [period - 0.25 us (240 MHz) / 0.5us(160MHz) / 1.0us(80MHz)]  */
     /*         * cycles per second / 2                                      */
     /* 1 us = 16 cycles (80 MHz) / 32 cycles (160 MHz) / 48 cycles (240)    */
-    /* values for             80,  160,  240 MHz                            */
-    [I2C_SPEED_LOW]       = {790, 1590, 2390}, /*   10 kbps (period 100 us) */
-    [I2C_SPEED_NORMAL]    = { 70,  150,  230}, /*  100 kbps (period 10 us)  */
-    [I2C_SPEED_FAST]      = { 11,   31,   51}, /*  400 kbps (period 2.5 us) */
-    [I2C_SPEED_FAST_PLUS] = {  0,    7,   15}, /*    1 Mbps (period 1 us)   */
-    [I2C_SPEED_HIGH]      = {  0,    0,    0}  /*  3.4 Mbps (period 0.3 us) not working */
+    /* max clock speeds    2 MHz CPU clock:  19 kHz                         */
+    /*                    40 MHz CPU clock: 308 kHz                         */
+    /*                    80 MHz CPU clock: 516 kHz                         */
+    /*                   160 MHz CPU clock: 727 kHz                         */
+    /*                   240 MHz CPU clock: 784 kHz                         */
+    /* values for             80,  160,  240,  2,  40 MHz                   */
+    [I2C_SPEED_LOW]       = {790, 1590, 2390, 10, 390 }, /*  10 kbps (period 100 us) */
+    [I2C_SPEED_NORMAL]    = { 70,  150,  230,  0,  30 }, /* 100 kbps (period 10 us)  */
+    [I2C_SPEED_FAST]      = { 11,   31,   51,  0,   0 }, /* 400 kbps (period 2.5 us) */
+    [I2C_SPEED_FAST_PLUS] = {  0,    0,    0,  0,   0 }, /*   1 Mbps (period 1 us)   */
+    [I2C_SPEED_HIGH]      = {  0,    0,    0,  0,   0 }  /* 3.4 Mbps (period 0.3 us) not working */
 };
 #else /* MCU_ESP32 */
 static const uint32_t _i2c_delays[][2] =
@@ -158,10 +163,8 @@ void i2c_init(i2c_t dev)
     assert(dev < I2C_NUMOF_MAX);
     assert(dev < I2C_NUMOF);
 
-    if (i2c_config[dev].speed == I2C_SPEED_HIGH) {
-        LOG_TAG_INFO("i2c", "I2C_SPEED_HIGH is not supported\n");
-        return;
-    }
+    /* clock speeds up to 1 MHz are supported */
+    assert(i2c_config[dev].speed <= I2C_SPEED_FAST_PLUS);
 
     mutex_init(&_i2c_bus[dev].lock);
 
@@ -179,6 +182,8 @@ void i2c_init(i2c_t dev)
         case 160: _i2c_bus[dev].delay = _i2c_delays[_i2c_bus[dev].speed][1]; break;
 #ifdef MCU_ESP32
         case 240: _i2c_bus[dev].delay = _i2c_delays[_i2c_bus[dev].speed][2]; break;
+        case   2: _i2c_bus[dev].delay = _i2c_delays[_i2c_bus[dev].speed][3]; break;
+        case  40: _i2c_bus[dev].delay = _i2c_delays[_i2c_bus[dev].speed][4]; break;
 #endif
         default : LOG_TAG_INFO("i2c", "I2C software implementation is not "
                                "supported for this CPU frequency: %d MHz\n",
