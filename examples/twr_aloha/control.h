@@ -24,26 +24,81 @@
 extern "C" {
 #endif
 
-#include "timex.h"
+#include "uwb/uwb.h"
+#include "uwb/uwb_ftypes.h"
 
 /**
- * @brief Anchor address
+ * @brief   Block after a request is sent
  */
-#ifndef ANCHOR_ADDRESS
-#define ANCHOR_ADDRESS      0x1234
+#ifndef CONFIG_TWR_SHELL_BLOCKING
+#define CONFIG_TWR_SHELL_BLOCKING       1
 #endif
 
 /**
- * @brief Range request period
+ * @brief   Minimum idle time to enable putting the radio to sleep
  */
-#ifndef RANGE_REQUEST_T_MS
-#define RANGE_REQUEST_T_MS      (40)
+#ifndef CONFIG_TWR_MIN_IDLE_SLEEP_MS
+#define CONFIG_TWR_MIN_IDLE_SLEEP_MS    20
 #endif
 
 /**
- * @brief Starts ranging
+ * @brief   uwb rng data structure
  */
-void init_ranging(void);
+typedef struct uwb_core_rng_data_t {
+#if IS_USED(MODULE_UWB_CORE_RNG_TRX_INFO)
+    float tof;              /**< range request time of flight */
+    float los;              /**< range request line of sight estimation [0..1] */
+    float fppl;             /**< range request first path phase loss */
+#endif
+    uint32_t time;          /**< range request timestamp ms */
+    int32_t d_cm;           /**< range request range estimation (cm) */
+    uint16_t src;           /**< source short address */
+    uint16_t dest;          /**< destination short address */
+#if IS_USED(MODULE_UWB_CORE_RNG_TRX_INFO)
+    int16_t rssi;           /**< range request rssi */
+#endif
+} uwb_core_rng_data_t;
+
+/**
+ * @brief TWR algorithms
+ */
+typedef enum {
+    TWR_PROTOCOL_NONE   = 0,
+    TWR_PROTOCOL_SS     = UWB_DATA_CODE_SS_TWR,     /**< single sided twr */
+    TWR_PROTOCOL_SS_ACK = UWB_DATA_CODE_SS_TWR_ACK, /**< single sided twr with
+                                                         hw ACK as response */
+    TWR_PROTOCOL_SS_EXT = UWB_DATA_CODE_SS_TWR_EXT, /**< single sided twr with
+                                                         extended frames */
+    TWR_PROTOCOL_DS     = UWB_DATA_CODE_DS_TWR,     /**< double sided twr */
+    TWR_PROTOCOL_DS_ACK = UWB_DATA_CODE_DS_TWR_EXT, /**< double sided twr with
+                                                         extended frames */
+} twr_protocol_t;
+
+/**
+ * @brief   Initialize the uwb_rng wrapper
+ */
+void uwb_core_rng_init(void);
+
+/**
+ * @brief   Listen for rng requests
+ */
+void uwb_core_rng_listen_enable(void);
+
+/**
+ * @brief   Do not listen for rng requests
+ */
+void uwb_core_rng_listen_disable(void);
+
+/**
+ * @brief   Start performing range requests
+ *
+ * @param[in]   addr        short address of destination
+ * @param[in]   proto       twr protocol to use
+ * @param[in]   interval    interval between requests in ms
+ * @param[in]   count       number of requests to perform
+ */
+void uwb_core_rng_start(uint16_t addr, twr_protocol_t proto, uint32_t interval,
+                        uint32_t count);
 
 #ifdef __cplusplus
 }

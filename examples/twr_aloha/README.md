@@ -2,67 +2,147 @@
 
 This example allows testing different two-way ranging algorithms between
 two boards supporting a dw1000 device. This makes use of the uwb-core
-pkg. This example is based on the twr-aloha example in
-[uwb-apps](https://github.com/Decawave/uwb-apps/tree/master/apps/twr_aloha).
+pkg.
+
+
+#### IoT-LAB Setup
+
+IoT-LAB can be used to test the application.
+
+##### Prerequisites
+
+1. Install iotlab-cli tools
+
+    - `pip install iotlabcli`
+
+2. Create an iotlab account
+
+    - https://www.iot-lab.info/testbed/signup
+
+3. Authenticate:
+
+```shell
+$ iotlab-auth --user <username> --password <password>
+```
+
+##### Launch an Experiment
+
+1. Submit a 60 minutes experiment with 2 dwm1001 boards:
+
+```shell
+$ iotlab-experiment submit -n "twr-aloha" -d 60 -l 2,archi=dwm1001:dw1000+site=saclay
+```
+
+2. Wait for the experiment to be in the Running state:
+
+```shell
+$ iotlab-experiment wait --timeout 30 --cancel-on-timeout
+```
+
+**Note:** If the command above returns the message `Timeout reached, cancelling experiment <exp_id>`, try to re-submit your experiment later.
+
+3. Get the experiment nodes list:
+
+```shell
+$ iotlab-experiment  --jmespath="items[*].network_address | sort(@)" get --nodes
+[
+    "dwm1001-1.saclay.iot-lab.info",
+    "dwm1001-10.saclay.iot-lab.info"
+]
+```
+
+When flashing the devices set `IOTLAB_NODE` to one of the above values, e.g. for
+the firs node: `IOTLAB_NODE=dwm1001-2.saclay.iot-lab.info`.
+
+##### Free up the resources
+
+You are done with the experiment, so stop your experiment to free up the
+devices:
+
+```shell
+$ iotlab-experiment stop
+```
 
 ### Setup
 
-1. Flash one node as the tag (Default configuration)
+1. In two separate terminals flash two nodes and open a serial connection to the
+board, prefix with IOTLAB_NODE if using IoT-LAB
 
-    $ make -C examples/twr_aloha/ flash term
-
-2. Flash the second node as an anchor
-
-    $ DW1000_ROLE=0x4 make -C examples/twr_aloha/ flash term
-
-3. On the tag node begin ranging, you will see ranging estimations where
-the "raz" field is "range" in meters.
-
-```
- main(): This is RIOT! (Version: 2020.10-devel-1384-g5b7ad-wip/uwb-dw1000)
- pkg uwb-dw1000 + uwb-core test application
- {"utime": 49412,"exec": "/home/francisco/workspace/RIOT/examples/twr_aloha/control.c"}
- {"device_id"="deca0130","panid="DECA","addr"="1303","part_id"="cad11303","lot_id"="402c188"}
- {"utime": 49412,"msg": "frame_duration = 201 usec"}
- {"utime": 49412,"msg": "SHR_duration = 139 usec"}
- {"utime": 49412,"msg": "holdoff = 821 usec"}
- Node role: TAG
- {"utime": 120995,"c": 274,"uid": 4867,"ouid": 4660,"raz": [0.766359],"los": [1.000000]}
-> range start
- range start
- Start ranging
- {"utime": 5214098,"c": 274,"uid": 4867,"ouid": 4660,"raz": [0.778875],"los": [1.000000]}
- {"utime": 5232368,"c": 274,"uid": 4867,"ouid": 4660,"raz": [0.777146],"los": [1.000000]}
- {"utime": 5250631,"c": 274,"uid": 4867,"ouid": 4660,"raz": [0.796009],"los": [1.000000]}
- {"utime": 5268894,"c": 274,"uid": 4867,"ouid": 4660,"raz": [0.756952],"los": [1.000000]}
- {"utime": 5287157,"c": 274,"uid": 4867,"ouid": 4660,"raz": [0.787994],"los": [1.000000]}
+```shell
+$ make -C examples/twr_aloha/ flash term -j
+$ make -C examples/twr_aloha/ flash term -j
 ```
 
-4. Trying different ranging algorithms
+1. On at least one node enable listening and get its short address
 
-The algorithm used for ranging is selected by modifying the `mode` variable
-in the uwb_ev_cb function in main.c. If multiple modes are enabled it will switch among them.
+```shell
+> twr lst on
+[twr]: start listening
+> ifconfig
+Iface  3        HWaddr: C8:0C  NID: DE:CA
 
-To use only one algorithm, compile as follows:
+                Long HWaddr: 08:2B:31:07:CC:52:C8:0C
+```
 
-    $ UWB_TWR_ALGORITHM_ONLY_ONE=UWB_DATA_CODE_SS_TWR make -C examples/twr_aloha/ flash term
+1. On the second node send a request to neighbors short address:
 
-The different algorithm options are:
+```shell
+>twr req C8:0C
+[twr]: start ranging
+```
 
-- UWB_DATA_CODE_SS_TWR
-- UWB_DATA_CODE_SS_TWR_EXT
-- UWB_DATA_CODE_SS_TWR_ACK
-- UWB_DATA_CODE_DS_TWR
-- UWB_DATA_CODE_DS_TWR_EXT
+Both nodes should show the ranging result:
 
-### Notes
+```shell
+> {"t": 55158, "src": "02:A1", "dst": "C8:0C", "d_cm": 39}
+```
 
-The application example fixes the `short_address` of the anchor to
-`ANCHOR_ADDRESS`, by default `0x1234`. All tags will send ranging requests
-to that address.
+By default `twr-ss` (Single-Sided Two-Way-Ranging) is used, try using different
+protocols, check the ones available with `help` command:
 
-This value can be overridden with a `CFLAG += -DANCHOR_ADDRESS=$(VALUE)`.
+```shell
+> twr req --help
+Usage:
+        twr req <short_addr> [-p <proto>] [-c <count>] [-h][-i <ms interval>]
+        - short_addr: short address of request destination
+        - count: number of requests (default: 1)
+        - ms interval: wait interval milliseconds between requests(default: 1000)
+        - proto: twr protocol (ss|ss-ext|ss-ack|ds|ds-ext, default: ss)
+        twr lst on: start listening for ranging requests
+        twr lst off: stop listening for ranging requests
+```
 
-Ranging request are sent every 40ms, this value can also be overridden
-by changing the default value of `RANGE_REQUEST_T_US`, e.g:
-`CFLAG += -DRANGE_REQUEST_T_US=10000` to set it at 10ms.
+1. Perform range requests with different intervals, protocols etc...
+
+```shell
+> twr req C8:0C -c 5 -i 10
+[twr]: start ranging
+{"t": 251588, "src": "02:A1", "dst": "C8:0C", "d_cm": 38}
+{"t": 251600, "src": "02:A1", "dst": "C8:0C", "d_cm": 37}
+{"t": 251610, "src": "02:A1", "dst": "C8:0C", "d_cm": 38}
+{"t": 251620, "src": "02:A1", "dst": "C8:0C", "d_cm": 37}
+```
+
+```shell
+> twr req C8:0C -c 5 -i 10 -p ds
+[twr]: start ranging
+{"t": 312513, "src": "C8:0C", "dst": "02:A1", "d_cm": 36}
+{"t": 312525, "src": "C8:0C", "dst": "02:A1", "d_cm": 37}
+{"t": 312535, "src": "C8:0C", "dst": "02:A1", "d_cm": 35}
+{"t": 312545, "src": "C8:0C", "dst": "02:A1", "d_cm": 35}
+```
+
+### Automatic Test
+
+Pre-Requisites:
+
+- `pip install rioctrl pyserial`
+
+A basic automatic test for the provided shell is included, run with:
+
+```shell
+$ make -C examples/twr_aloha flash test
+```
+
+The application provides a `ShellInteraction` that can be used for
+scripting UWB experiments or testing.
