@@ -15,6 +15,12 @@ INCLUDES += -I$(PKGDIRBASE)/uwb-core/hw/drivers/uwb/include/ \
             #
 
 PSEUDOMODULES += uwb-core_dpl
+PSEUDOMODULES += uwb-core_rng_trx_info
 
 DIRS += $(RIOTPKG)/uwb-core/contrib \
         #
+
+ifneq (,$(filter uwb-core_uwb_rng_trx_info,$(USEMODULE)))
+ # Enable RX diagnostics
+ CFLAGS += -DDW1000_RX_DIAGNOSTIC=1
+endif

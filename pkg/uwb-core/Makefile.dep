@@ -3,7 +3,6 @@ USEMODULE += uwb-core_contrib
 
 DEFAULT_MODULE += auto_init_uwb-core
 
-USEMODULE += fmt
 
 FEATURES_REQUIRED += periph_gpio_irq
 FEATURES_REQUIRED += periph_spi
@@ -15,7 +14,6 @@ endif
 ifneq (,$(filter uwb-core_rng,$(USEMODULE)))
   USEMODULE += uwb-core_rng_math
   USEMODULE += uwb-core_dsp
-  USEMODULE += uwb-core_uwb_json
 endif
 
 ifneq (,$(filter uwb-core_uwbcfg,$(USEMODULE)))
@@ -34,6 +32,9 @@ ifneq (,$(filter uwb-core_event_thread,$(USEMODULE)))
   USEMODULE += event_thread
 endif
 
+ifneq (,$(filter uwb-core_rng_json,$(USEMODULE)))
+  USEMODULE += fmt
+endif
 # Some stdlib functions used by the pkg are not in avr-gcc
 FEATURES_BLACKLIST += arch_avr8
 # uwb-core has specific compilation sources when compiling kernel
