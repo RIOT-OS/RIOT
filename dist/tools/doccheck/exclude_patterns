@@ -14592,3 +14592,54 @@ drivers/sx126x/include/sx126x_params\.h:[0-9]+: warning: Member SX126X_PARAM_TX_
 drivers/sx126x/include/sx126x_params\.h:[0-9]+: warning: Member SX126X_TX_PA_MODE \(macro definition\) of file sx126x_params\.h is not documented\.
 boards/lora\-e5\-dev/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/lora\-e5\-dev/include/periph_conf\.h:[0-9]+: warning: Member adc_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/b\-u585i\-iot02a/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/b\-u585i\-iot02a/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/b\-u585i\-iot02a/include/periph_conf\.h:[0-9]+: warning: Member UART_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/b\-u585i\-iot02a/include/periph_conf\.h:[0-9]+: warning: Member UART_2_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/b\-u585i\-iot02a/include/periph_conf\.h:[0-9]+: warning: Member UART_3_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/b\-u585i\-iot02a/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/b\-u585i\-iot02a/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/b\-u585i\-iot02a/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/b\-u585i\-iot02a/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/b\-u585i\-iot02a/include/periph_conf\.h:[0-9]+: warning: Member I2C_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/b\-u585i\-iot02a/include/periph_conf\.h:[0-9]+: warning: Member I2C_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/b\-u585i\-iot02a/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/b\-u585i\-iot02a/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+	boards/b\-u585i\-iot02a/include/periph_conf\.h
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member LED0_PIN \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member LED0_MASK \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member LED0_ON \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member LED0_OFF \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member LED0_TOGGLE \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member LED1_PIN \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member LED1_MASK \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member LED1_ON \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member LED1_OFF \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member LED1_TOGGLE \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member LED2_PIN \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member LED2_MASK \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member LED2_ON \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member LED2_OFF \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member LED2_TOGGLE \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member BTN0_PIN \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member BTN0_MODE \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member HTS221_PARAM_I2C \(macro definition\) of file board\.h is not documented\.
+boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member LPSXXX_PARAM_I2C \(macro definition\) of file board\.h is not documented\.
+	boards/b\-u585i\-iot02a/include/board\.h
+cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_SRC_MSI \(macro definition\) of file cfg_clock_default\.h is not documented\.
+cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_SRC_HSE \(macro definition\) of file cfg_clock_default\.h is not documented\.
+cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_SRC_HSI \(macro definition\) of file cfg_clock_default\.h is not documented\.
+cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CLOCK_PLL_SRC \(macro definition\) of file cfg_clock_default\.h is not documented\.
+cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_M \(macro definition\) of file cfg_clock_default\.h is not documented\.
+cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_N \(macro definition\) of file cfg_clock_default\.h is not documented\.
+cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_Q \(macro definition\) of file cfg_clock_default\.h is not documented\.
+cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_R \(macro definition\) of file cfg_clock_default\.h is not documented\.
+cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CLOCK_AHB \(macro definition\) of file cfg_clock_default\.h is not documented\.
+cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_APB1_DIV \(macro definition\) of file cfg_clock_default\.h is not documented\.
+cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CLOCK_APB1 \(macro definition\) of file cfg_clock_default\.h is not documented\.
+cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_APB2_DIV \(macro definition\) of file cfg_clock_default\.h is not documented\.
+cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CLOCK_APB2 \(macro definition\) of file cfg_clock_default\.h is not documented\.
+cpu/stm32/include/clk/cfg_clock_common_lx_u5_wx\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file cfg_clock_common_lx_u5_wx\.h is not documented\.
+cpu/stm32/include/clk/cfg_clock_common_lx_u5_wx\.h:[0-9]+: warning: Member CLOCK_HSI \(macro definition\) of file cfg_clock_common_lx_u5_wx\.h is not documented\.
+cpu/stm32/include/clk/cfg_clock_common_lx_u5_wx\.h:[0-9]+: warning: Member CONFIG_CLOCK_MSI \(macro definition\) of file cfg_clock_common_lx_u5_wx\.h is not documented\.
+cpu/stm32/include/clk/cfg_clock_common_lx_u5_wx\.h:[0-9]+: warning: Member CONFIG_USE_CLOCK_PLL \(macro definition\) of file cfg_clock_common_lx_u5_wx\.h is not documented\.
