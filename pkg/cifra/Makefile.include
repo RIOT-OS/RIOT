@@ -1,2 +1,4 @@
 INCLUDES += -I$(PKGDIRBASE)/cifra/src
 INCLUDES += -I$(PKGDIRBASE)/cifra/src/ext
+
+CFLAGS += -DFULL_FAT_ASSERT
