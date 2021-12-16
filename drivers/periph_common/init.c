@@ -23,6 +23,7 @@
 #define USB_H_USER_IS_RIOT_INTERNAL
 
 #include "kernel_defines.h"
+#include "periph_conf.h"
 #include "periph_cpu.h"
 
 #ifdef MODULE_PERIPH_INIT
@@ -124,6 +125,11 @@ void periph_init(void)
     for (int i = 0; i < (int)PIO_NUMOF; i++) {
         pio_init(PIO_DEV(i));
     }
+#if defined(MODULE_PERIPH_INIT_I2C) && defined(PIO_I2C_NUMOF)
+    for (unsigned i = 0; i < PIO_I2C_NUMOF; i++) {
+        i2c_init(I2C_DEV(I2C_NUMOF + i));
+    }
+#endif
     pio_start_programs();
 #endif
 

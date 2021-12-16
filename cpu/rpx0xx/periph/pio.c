@@ -28,6 +28,7 @@
 #include "bitarithm.h"
 #include "io_reg.h"
 #include "pio/pio.h"
+#include "periph/pio/i2c.h"
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -141,6 +142,9 @@ void pio_init(pio_t pio)
 
 void pio_start_programs(void)
 {
+    if (IS_USED(MODULE_PIO_AUTOSTART_I2C)) {
+        pio_i2c_start_programs();
+    }
 }
 
 pio_sm_t pio_sm_lock(pio_t pio)

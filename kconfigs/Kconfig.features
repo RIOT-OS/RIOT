@@ -465,6 +465,11 @@ config HAS_PICOLIBC
     help
         Indicates that the picolibc C library is available for the platform.
 
+config HAS_PIO_I2C
+    bool
+    help
+        Indicates that there is a PIO program to provide emulated I2C
+
 config HAS_NEWLIB
     bool
     help
