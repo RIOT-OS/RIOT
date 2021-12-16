@@ -9,6 +9,7 @@
 
 import os
 import re
+import select
 import socket
 import sys
 import subprocess
@@ -232,21 +233,23 @@ def testfunc(child):
     res = socket.getaddrinfo(lladdr + "%" + tap, DEFAULT_MQTT_PORT)
     sockaddr = res[0][4]
     sock.bind(sockaddr)
+    sock.listen(1)
 
     child.sendline("con {} {}".format(sockaddr[0], sockaddr[1]))
     child.expect_exact("success: connecting to {}".format(sockaddr[0]))
 
-    sock.listen(1)
-    conn, addr = sock.accept()
-    sock.close()
+    readable = select.select([sock], [], [])[0]
+    if sock in readable:
+        conn, addr = sock.accept()
+        sock.close()
 
-    server = MQTTServer(child, sock=conn)
-    try:
-        res = server.run()
-    finally:
-        server.stop()
-        conn.close()
-        print(res)
+        server = MQTTServer(child, sock=conn)
+        try:
+            res = server.run()
+        finally:
+            server.stop()
+            conn.close()
+            print(res)
 
 
 if __name__ == "__main__":

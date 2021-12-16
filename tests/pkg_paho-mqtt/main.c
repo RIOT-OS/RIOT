@@ -113,8 +113,6 @@ static int _con(int argc, char **argv)
     char *remote_ip = argv[1];
 
     printf("success: connecting to %s\n", argv[1]);
-    /* wait for test script to listen on broker port */
-    ztimer_sleep(ZTIMER_MSEC, 2000);
 
     int ret = -1;
 
