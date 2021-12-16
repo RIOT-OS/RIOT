@@ -54,3 +54,8 @@ CFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) $(CFLAGS_LINK)
 ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
 # export linker flags
 LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT) -nostartfiles -Wl,--gc-sections -static -lgcc
+
+# Platform triple as used by Rust
+RUST_TARGET = riscv32imac-unknown-none-elf
+# Workaround for https://github.com/rust-lang/rust-bindgen/issues/1555
+CARGO_EXTRACFLAGS += --target=riscv32

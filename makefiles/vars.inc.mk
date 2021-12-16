@@ -6,6 +6,7 @@ export QQ                    # as Q, but be more quiet
 export QUIET                 # The parameter to use whether to show verbose makefile commands or not.
 
 export OS                    # The operating system of the build host
+export OS_ARCH               # The build host's hardware architecture
 
 export APPLICATION           # The application, set in the Makefile which is run by the user.
 export APPLICATION_MODULE    # The application module name.
@@ -41,6 +42,7 @@ export RIOTMAKE              # Location of all supplemental Makefiles (such as t
 export RIOTKCONFIG           # Location of all supplemental Kconfig files
 export BINDIRBASE            # This is the folder where the application should be built in. For each BOARD a different subfolder is used.
 export BINDIR                # This is the folder where the application should be built in.
+export CARGO_TARGET_DIR      # This is the folder where Rust parts of the application should be built in.
 export BUILD_DIR             # This is the base folder to store common build files and artifacts, e.g. test results.
 export APPDIR                # The base folder containing the application
 export PKGDIRBASE            # The base folder for building packages

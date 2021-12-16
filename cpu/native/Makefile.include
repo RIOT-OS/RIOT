@@ -10,3 +10,8 @@ ifneq (,$(filter periph_can,$(USEMODULE)))
 endif
 
 TOOLCHAINS_SUPPORTED = gnu llvm afl
+
+# Platform triple as used by Rust
+ifeq ($(OS) $(OS_ARCH),Linux x86_64)
+  RUST_TARGET = i686-unknown-linux-gnu
+endif
