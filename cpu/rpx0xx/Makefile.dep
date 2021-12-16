@@ -1,1 +1,5 @@
+ifneq (,$(filter pio_%,$(USEMODULE)))
+  USEMODULE += periph_pio
+endif
+
 include $(RIOTCPU)/cortexm_common/Makefile.dep

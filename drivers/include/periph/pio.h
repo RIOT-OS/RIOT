@@ -44,7 +44,7 @@
 #ifndef PERIPH_PIO_H
 #define PERIPH_PIO_H
 
-#include "periph_conf.h"
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {

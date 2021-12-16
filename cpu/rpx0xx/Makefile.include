@@ -19,3 +19,7 @@ PROGRAMMER ?= elf2uf2
 OPENOCD_DEBUG_ADAPTER   ?= dap
 
 include $(RIOTMAKE)/arch/cortexm.inc.mk
+
+ifneq (,$(filter periph_pio pio_%,$(USEMODULE)))
+  include $(RIOTMAKE)/tools/pioasm.inc.mk
+endif

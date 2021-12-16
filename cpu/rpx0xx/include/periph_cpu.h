@@ -432,6 +432,15 @@ typedef struct {
 } timer_conf_t;
 
 /**
+ * @brief   PIO configuration type
+ */
+typedef struct {
+    PIO0_Type *dev;                 /**< PIO device */
+    IRQn_Type irqn0;                /**< PIO IRQ0 interrupt number */
+    IRQn_Type irqn1;                /**< PIO IRQ1 interrupt number */
+} pio_conf_t;
+
+/**
  * @brief   Get the PAD control register for the given GPIO pin as word
  *
  * Note: Only perform 32-bit writes to I/O registers.

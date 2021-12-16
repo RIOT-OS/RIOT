@@ -277,6 +277,12 @@ config HAS_PERIPH_CLIC
     help
         Indicates that a RISC-V Core-local Interrupt Controller (CLIC) peripheral is present.
 
+config HAS_PERIPH_PIO
+    bool
+    help
+        Indicates that Programmable IO (PIO) is supported by the CPU
+
+
 config HAS_PERIPH_PLIC
     bool
     help
