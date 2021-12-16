@@ -64,6 +64,11 @@ config HAS_CPU_ESP32
     help
         Indicates that the current CPU is 'esp32'.
 
+config HAS_ESP_ETH
+    bool
+    help
+        Indicates that an ESP Ethernet interface is present.
+
 config HAS_ESP_RTC_TIMER_32K
     bool
     help
