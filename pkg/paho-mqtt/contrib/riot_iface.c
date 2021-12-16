@@ -39,6 +39,8 @@
 #define TSRB_MAX_SIZE       (1024)
 #endif
 
+/* The subsequent static variables are only used by the lwip
+ * network stack and will be garbage collected if GNRC is used */
 static uint8_t buffer[TSRB_MAX_SIZE];
 static uint8_t _temp_buf[TSRB_MAX_SIZE];
 static tsrb_t tsrb_lwip_tcp;
