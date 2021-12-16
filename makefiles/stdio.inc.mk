@@ -24,9 +24,8 @@ ifneq (,$(filter stdio_rtt,$(USEMODULE)))
 endif
 
 ifneq (,$(filter stdio_ethos,$(USEMODULE)))
-  USEMODULE += ethos
+  USEMODULE += ethos_stdio
   USEMODULE += stdin
-  USEMODULE += stdio_uart
 endif
 
 ifneq (,$(filter stdin,$(USEMODULE)))
