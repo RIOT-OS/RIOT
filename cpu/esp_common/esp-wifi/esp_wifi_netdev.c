@@ -919,13 +919,13 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     }
 
 #if defined(MCU_ESP8266) || defined(MODULE_ESP_WIFI_AP)
-#ifdef ESP_WIFI_AP_PREFIX
+#if IS_ACTIVE(ESP_WIFI_SSID_DYNAMIC)
     uint8_t mac[ETHERNET_ADDR_LEN];
     esp_wifi_get_mac(ESP_MAC_WIFI_SOFTAP, mac);
-    sprintf((char*)wifi_config_ap.ap.ssid, "%s%02x%02x%02x%02x%02x%02x",
-            ESP_WIFI_AP_PREFIX, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    sprintf((char*)wifi_config_ap.ap.ssid, "%s_%02x%02x%02x%02x%02x%02x",
+            ESP_WIFI_SSID, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     wifi_config_ap.ap.ssid_len = strlen((char*)wifi_config_ap.ap.ssid);
-#endif /* ESP_WIFI_AP_PREFIX */
+#endif /* IS_ACTIVE(ESP_WIFI_SSID_DYNAMIC) */
     /* set the SoftAP configuration */
     result = esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config_ap);
     if (result != ESP_OK) {
