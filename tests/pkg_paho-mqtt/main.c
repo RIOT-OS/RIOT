@@ -215,7 +215,7 @@ static int _pub(int argc, char **argv)
     }
     else {
         printf("success: published message '%s' to topic '%s' with QoS %d\n",
-               (char *)message.payload, argv[1], (int)message.qos);
+               argv[2], argv[1], (int)qos);
     }
 
     return rc;
@@ -239,11 +239,11 @@ static int _sub(int argc, char **argv)
         return -1;
     }
 
-    if (strlen(argv[1]) > MAX_LEN_TOPIC) {
+    if (strlen(argv[1]) + 1 > MAX_LEN_TOPIC) {
         printf("error: not subscribing, topic too long %s\n", argv[1]);
         return -1;
     }
-    strncpy(_topic_to_subscribe[topic_cnt], argv[1], strlen(argv[1]));
+    strncpy(_topic_to_subscribe[topic_cnt], argv[1], MAX_LEN_TOPIC);
 
     printf("success: subscribing to %s\n", _topic_to_subscribe[topic_cnt]);
     int ret = MQTTSubscribe(&client, _topic_to_subscribe[topic_cnt], qos,
