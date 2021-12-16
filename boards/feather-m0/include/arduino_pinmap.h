@@ -37,13 +37,8 @@ extern "C" {
 
 #define ARDUINO_PIN_0           GPIO_PIN(PA, 11) /**< D0 (RX) */
 #define ARDUINO_PIN_1           GPIO_PIN(PA, 10) /**< D1 (TX) */
-#define ARDUINO_PIN_2           GPIO_UNDEF       /**< D2 */
-#define ARDUINO_PIN_3           GPIO_UNDEF       /**< D3 */
-#define ARDUINO_PIN_4           GPIO_UNDEF       /**< D4 */
 #define ARDUINO_PIN_5           GPIO_PIN(PA, 15) /**< D5 */
 #define ARDUINO_PIN_6           GPIO_PIN(PA, 20) /**< D6 */
-#define ARDUINO_PIN_7           GPIO_UNDEF       /**< D7 */
-#define ARDUINO_PIN_8           GPIO_UNDEF       /**< D8 */
 #define ARDUINO_PIN_9           GPIO_PIN(PA, 7)  /**< D9 */
 #define ARDUINO_PIN_10          GPIO_PIN(PA, 18) /**< D10 */
 #define ARDUINO_PIN_11          GPIO_PIN(PA, 16) /**< D11 */
@@ -60,6 +55,38 @@ extern "C" {
 #define ARDUINO_PIN_22          GPIO_PIN(PA, 12) /**< D22 (SPI MISO) */
 #define ARDUINO_PIN_23          GPIO_PIN(PB, 10) /**< D23 (SPI MOSI) */
 #define ARDUINO_PIN_24          GPIO_PIN(PB, 11) /**< D24 (SPI SCK) */
+
+#if defined(BOARD_FEATHER_M0_WIFI)
+#define ARDUINO_PIN_2           GPIO_PIN(PA, 14) /**< D2 (WINC_CHIP_EN) */
+#define ARDUINO_PIN_3           GPIO_UNDEF       /**< D3 */
+#define ARDUINO_PIN_4           GPIO_PIN(PA, 8)  /**< D4 (WINC_RST) */
+#define ARDUINO_PIN_7           GPIO_PIN(PA, 21) /**< D7 (WINC_IRQ) */
+#define ARDUINO_PIN_8           GPIO_PIN(PA, 6)  /**< D8 (WINC_CS) */
+#elif defined(BOARD_FEATHER_M0_LORA)
+#define ARDUINO_PIN_2           GPIO_UNDEF       /**< D2 */
+#define ARDUINO_PIN_3           GPIO_PIN(PA, 9)  /**< D3 (LORA_IRQ) */
+#define ARDUINO_PIN_4           GPIO_PIN(PA, 8)  /**< D4 (LORA_RST) */
+#define ARDUINO_PIN_7           GPIO_UNDEF       /**< D7 */
+#define ARDUINO_PIN_8           GPIO_PIN(PA, 6)  /**< D8 (LORA_CS) */
+#elif defined(BOARD_FEATHER_M0_BLE)
+#define ARDUINO_PIN_2           GPIO_UNDEF       /**< D2 */
+#define ARDUINO_PIN_3           GPIO_UNDEF       /**< D3 */
+#define ARDUINO_PIN_4           GPIO_PIN(PA, 8)  /**< D4 (BLE_SWDIO/RST) */
+#define ARDUINO_PIN_7           GPIO_PIN(PA, 21) /**< D7 (BLE_IRQ) */
+#define ARDUINO_PIN_8           GPIO_PIN(PA, 6)  /**< D8 (BLE_CS) */
+#elif defined(BOARD_FEATHER_M0_LOGGER)
+#define ARDUINO_PIN_2           GPIO_UNDEF       /**< D2 */
+#define ARDUINO_PIN_3           GPIO_UNDEF       /**< D3 */
+#define ARDUINO_PIN_4           GPIO_PIN(PA, 8)  /**< D4 (SD CS) */
+#define ARDUINO_PIN_7           GPIO_PIN(PA, 21) /**< D7 (SD CD) */
+#define ARDUINO_PIN_8           GPIO_PIN(PA, 6)  /**< D8 (Green LED) */
+#else
+#define ARDUINO_PIN_2           GPIO_UNDEF       /**< D2 */
+#define ARDUINO_PIN_3           GPIO_UNDEF       /**< D3 */
+#define ARDUINO_PIN_4           GPIO_UNDEF       /**< D4 */
+#define ARDUINO_PIN_7           GPIO_UNDEF       /**< D7 */
+#define ARDUINO_PIN_8           GPIO_UNDEF       /**< D8 */
+#endif
 
 #define ARDUINO_PIN_A0          ARDUINO_PIN_14   /**< A0 */
 #define ARDUINO_PIN_A1          ARDUINO_PIN_15   /**< A1 */
