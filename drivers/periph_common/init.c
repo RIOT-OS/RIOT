@@ -53,6 +53,9 @@
 #ifdef MODULE_PERIPH_INIT_VBAT
 #include "periph/vbat.h"
 #endif
+#ifdef MODULE_PERIPH_INIT_PIO
+#include "periph/pio.h"
+#endif
 #endif /* MODULE_PERIPH_INIT */
 
 void periph_init(void)
@@ -115,6 +118,13 @@ void periph_init(void)
 
 #if defined(MODULE_PERIPH_INIT_VBAT)
     vbat_init();
+#endif
+
+#ifdef MODULE_PERIPH_INIT_PIO
+    for (int i = 0; i < (int)PIO_NUMOF; i++) {
+        pio_init(PIO_DEV(i));
+    }
+    pio_start_programs();
 #endif
 
 #endif /* MODULE_PERIPH_INIT */
