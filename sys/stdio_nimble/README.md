@@ -50,6 +50,8 @@ USEMODULE += nimble_autoadv
 USEMODULE += stdio_nimble
 ```
 
+**NOTE:** You can also have a look at `tests/shell_ble`.
+
 - Flash
 
 `$ make -C tests/shell -j clean all flash`

@@ -32,6 +32,8 @@ EXPECTED_PS = (
 RIOT_TERMINAL = os.environ.get('RIOT_TERMINAL')
 CLEANTERMS = {"socat"}
 
+TESTRUNNER_SHELL_SKIP_REBOOT = bool(int(os.environ.get('TESTRUNNER_SHELL_SKIP_REBOOT') or 0))
+
 # In native we are directly executing the binary (no terminal program). We must
 # therefore use Ctrl-V (DLE or "data link escape") before Ctrl-C to send a
 # literal ETX instead of SIGINT.
@@ -220,6 +222,10 @@ def testfunc(child):
 
     # loop other defined commands and expected output
     for cmd, expected in CMDS:
+
+        if cmd == "reboot" and TESTRUNNER_SHELL_SKIP_REBOOT:
+            continue
+
         check_cmd(child, cmd, expected)
 
     if RIOT_TERMINAL in CLEANTERMS:
