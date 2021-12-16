@@ -81,11 +81,6 @@ config HAS_PERIPH_ADC_CTRL
     help
         Indicates that an ESP32 ADC controller peripheral is present.
 
-config HAS_ESP_SPI_RAM
-    bool
-    help
-        Indicates that the a RAM is present on the SPI bus.
-
 ## Common CPU symbols
 config CPU_CORE
     default "xtensa-lx6" if CPU_CORE_XTENSA_LX6
