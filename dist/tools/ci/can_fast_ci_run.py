@@ -35,6 +35,8 @@ REGEX_APP = re.compile(r"^(bootloaders|examples|fuzzing|tests)\/")
 
 EXCEPTION_MODULES = {"boards/common/nrf52"}
 
+FILE_EXTENSIONS_FOR_COMMENTS = [".c", ".h", ".hpp", ".cpp"]
+
 print_err = partial(print, file=sys.stderr)
 
 
@@ -174,26 +176,38 @@ def classify_changes(riotbase=None, upstream_branch="master"):
     return change_set
 
 
-def get_hash_without_comments(file, ref):
-    result = subprocess.run(
-        f"git show {ref}:{file} | gcc -fpreprocessed -dD -E -P - | md5sum",
-        shell=True,
-        capture_output=True,
-        check=True,
-    )
+def get_hash_without_comments(filename, ref):
+    """Call a subprocess command to get the hash of a file without comments."""
+    try:
+        result = subprocess.run(
+            f"git show {ref}:{filename} | gcc -fpreprocessed -dD -E -P - | md5sum",
+            shell=True,
+            capture_output=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError as exc:
+        print_err(
+            f"Cannot compute hash without comments for file '{filename}' on "
+            f"ref '{ref}' (exception: {exc})"
+        )
+        return
     return result.stdout
 
 
-def only_comment_change(file, upstream_branch):
-    try:
-        if file[-2:] in {".c", ".h"}:
-            hash_a = get_hash_without_comments(file, "HEAD")
-            hash_b = get_hash_without_comments(file, upstream_branch)
-            return hash_a == hash_b
-    except Exception:
-        pass
+def only_comment_change(filename, upstream_branch):
+    """Check if the change on a file is only a comment change."""
+    if os.path.splitext(filename) not in FILE_EXTENSIONS_FOR_COMMENTS:
+        return False
 
-    return False
+    hash_head = get_hash_without_comments(filename, "HEAD")
+    if hash_head is None:
+        return False
+
+    hash_upstream_branch = get_hash_without_comments(filename, upstream_branch)
+    if hash_upstream_branch is None:
+        return False
+
+    return hash_head == hash_upstream_branch
 
 
 if __name__ == "__main__":
