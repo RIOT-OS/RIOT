@@ -164,12 +164,37 @@ def classify_changes(riotbase=None, upstream_branch="master"):
             match = REGEX_GIT_DIFF_SINGLE_FILE.match(line)
             if match:
                 file = match.group(1)
-                change_set.add_file(file)
+
+                if only_comment_change(file, upstream_branch) is False:
+                    change_set.add_file(file)
+
                 continue
 
             raise Exception("Failed to parse \"{}\"".format(line))
 
     return change_set
+
+
+def get_hash_without_comments(file, ref):
+    result = subprocess.run(
+        f"git show {ref}:{file} | gcc -fpreprocessed -dD -E -P - | md5sum",
+        shell=True,
+        capture_output=True,
+        check=True,
+    )
+    return result.stdout
+
+
+def only_comment_change(file, upstream_branch):
+    try:
+        if file[-2:] in {".c", ".h"}:
+            hash_a = get_hash_without_comments(file, "HEAD")
+            hash_b = get_hash_without_comments(file, upstream_branch)
+            return hash_a == hash_b
+    except Exception:
+        pass
+
+    return False
 
 
 if __name__ == "__main__":
