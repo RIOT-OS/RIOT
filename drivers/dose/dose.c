@@ -52,6 +52,9 @@ static int _init(netdev_t *dev);
 static void _poweron(dose_t *dev);
 static void _poweroff(dose_t *dev, dose_state_t sleep_state);
 
+/* smallest possible xtimer timeout */
+static const xtimer_ticks32_t xtimer_min_timeout = {.ticks32 = XTIMER_BACKOFF};
+
 static uint16_t crc16_update(uint16_t crc, uint8_t octet)
 {
     crc = (uint8_t)(crc >> 8) | (crc << 8);
@@ -172,7 +175,8 @@ static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal)
     (void) signal;
     uint32_t backoff;
 
-    backoff = random_uint32_range(1 * ctx->timeout_base, 2 * ctx->timeout_base);
+    backoff = random_uint32_range(xtimer_usec_from_ticks(xtimer_min_timeout),
+                                  2 * ctx->timeout_base);
     xtimer_set(&ctx->timeout, backoff);
 
     return DOSE_SIGNAL_NONE;
@@ -737,8 +741,6 @@ static const netdev_driver_t netdev_driver_dose = {
 
 void dose_setup(dose_t *ctx, const dose_params_t *params, uint8_t index)
 {
-    static const xtimer_ticks32_t min_timeout = {.ticks32 = XTIMER_BACKOFF};
-
     ctx->netdev.driver = &netdev_driver_dose;
 
     mutex_init(&ctx->state_mtx);
@@ -766,8 +768,8 @@ void dose_setup(dose_t *ctx, const dose_params_t *params, uint8_t index)
      * 8 data bits + 1 start bit + 1 stop bit per byte.
      */
     ctx->timeout_base = CONFIG_DOSE_TIMEOUT_BYTES * 10UL * US_PER_SEC / params->baudrate;
-    if (ctx->timeout_base < xtimer_usec_from_ticks(min_timeout)) {
-        ctx->timeout_base = xtimer_usec_from_ticks(min_timeout);
+    if (ctx->timeout_base < xtimer_usec_from_ticks(xtimer_min_timeout)) {
+        ctx->timeout_base = xtimer_usec_from_ticks(xtimer_min_timeout);
     }
     DEBUG("dose timeout set to %" PRIu32 " µs\n", ctx->timeout_base);
     ctx->timeout.callback = _isr_xtimer;
