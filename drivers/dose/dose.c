@@ -340,6 +340,9 @@ static void _isr_xtimer(void *arg)
     dose_t *dev = arg;
 
     switch (dev->state) {
+#ifndef MODULE_DOSE_WATCHDOG
+    case DOSE_STATE_RECV:
+#endif
     case DOSE_STATE_BLOCKED:
     case DOSE_STATE_SEND:
         state(dev, DOSE_SIGNAL_XTIMER);
