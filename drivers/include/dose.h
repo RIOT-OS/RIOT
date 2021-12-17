@@ -137,7 +137,7 @@ typedef enum {
  *  Fallback to idle if the remote side died within a transaction.
  */
 #ifndef CONFIG_DOSE_TIMEOUT_BYTES
-#define CONFIG_DOSE_TIMEOUT_BYTES       (16)
+#define CONFIG_DOSE_TIMEOUT_BYTES       (50)
 #endif
 /** @} */
 
