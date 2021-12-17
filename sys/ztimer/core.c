@@ -373,20 +373,23 @@ void ztimer_handler(ztimer_clock_t *clock)
     }
 #endif
 
-    clock->list.offset += clock->list.next->offset;
-    clock->list.next->offset = 0;
+    if (clock->list.next) {
+        clock->list.offset += clock->list.next->offset;
+        clock->list.next->offset = 0;
 
-    ztimer_t *entry = _now_next(clock);
-    while (entry) {
-        DEBUG("ztimer_handler(): trigger %p->%p at %" PRIu32 "\n",
-              (void *)entry, (void *)entry->base.next, clock->ops->now(clock));
-        entry->callback(entry->arg);
-        entry = _now_next(clock);
-        if (!entry) {
-            /* See if any more alarms expired during callback processing */
-            /* This reduces the number of implicit calls to clock->ops->now() */
-            _ztimer_update_head_offset(clock);
+        ztimer_t *entry = _now_next(clock);
+        while (entry) {
+            DEBUG("ztimer_handler(): trigger %p->%p at %" PRIu32 "\n",
+                  (void *)entry, (void *)entry->base.next, clock->ops->now(
+                      clock));
+            entry->callback(entry->arg);
             entry = _now_next(clock);
+            if (!entry) {
+                /* See if any more alarms expired during callback processing */
+                /* This reduces the number of implicit calls to clock->ops->now() */
+                _ztimer_update_head_offset(clock);
+                entry = _now_next(clock);
+            }
         }
     }
 
