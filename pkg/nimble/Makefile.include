@@ -135,6 +135,17 @@ ifneq (,$(filter nimble_netif,$(USEMODULE)))
     CFLAGS += -DMYNEWT_VAL_BLE_LL_CONN_INIT_SLOTS=1
     CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_DATA_LEN_EXT=1
   endif
+else
+  ifneq (,$(filter stdio_nimble,$(USEMODULE)))
+    # the maximum fragment size that we can receive. For maximum efficiency this
+    # should be equal to the maximum configured link layer packet size.
+    # WARNING: this value MUST never be larger than MYNEWT_VAL_BLE_LL_MAX_PKT_SIZE
+    CFLAGS += -DMYNEWT_VAL_BLE_L2CAP_COC_MPS=251
+
+    # in order to fit a 251 byte COC data segment into a single mbuf buffer, the
+    # used block size must be at least 297 byte (251 data + 48 overhead)
+    CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_SIZE="(MYNEWT_VAL_BLE_L2CAP_COC_MPS + 48)"
+  endif
 endif
 
 ifneq (,$(filter nimble_rpble,$(USEMODULE)))
