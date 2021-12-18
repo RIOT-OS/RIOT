@@ -49,7 +49,7 @@
  * @ingroup cpu_esp_common_conf
  */
 #ifndef ESP_NOW_SCAN_PERIOD_MS
-#define ESP_NOW_SCAN_PERIOD_MS     (10000UL)
+#define ESP_NOW_SCAN_PERIOD_MS  (10000UL)
 #endif
 
 /**
@@ -57,7 +57,7 @@
  * @ingroup cpu_esp_common_conf
  */
 #ifndef ESP_NOW_SOFT_AP_PASS
-#define ESP_NOW_SOFT_AP_PASS    "ThisistheRIOTporttoESP"
+#define ESP_NOW_SOFT_AP_PASS    "This is RIOT-OS"
 #endif
 
 /**
