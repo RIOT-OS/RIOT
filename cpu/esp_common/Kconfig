@@ -90,6 +90,17 @@ config MODULE_PERIPH_FLASH
 if TEST_KCONFIG
 
 menu "ESP configurations"
+    depends on HAS_ARCH_ESP
+
+    menu "Network devices"
+
+        config ESP_ETH_NETDEV
+            bool "ESP Ethernet interface used"
+            depends on HAS_ESP_ETH
+            default y if TEST_KCONFIG && MODULE_NETDEV_DEFAULT
+            select MODULE_ESP_ETH
+
+    endmenu
 
 config MODULE_ESP_LOG_COLORED
     bool

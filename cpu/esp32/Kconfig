@@ -126,6 +126,16 @@ config MODULE_ESP_JTAG
 
 endmenu
 
+# ESP32 specific module dependencies
+config MODULE_ESP_ETH
+    bool
+    depends on HAS_ARCH_ESP32
+    select MODULE_ESP_IDF_ETH
+    select MODULE_ESP_IDF_ETH_PHY
+    select MODULE_NETDEV_ETH
+    select MODULE_NETOPT
+    select MODULE_ZTIMER_MSEC
+
 rsource "periph/Kconfig"
 rsource "vendor/esp-idf/Kconfig"
 source "$(RIOTCPU)/esp_common/Kconfig"
