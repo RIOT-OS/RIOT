@@ -68,18 +68,6 @@ extern "C" {
 #define ARDUINO_PIN_4           GPIO_PIN(PA, 8)  /**< D4 (LORA_RST) */
 #define ARDUINO_PIN_7           GPIO_UNDEF       /**< D7 */
 #define ARDUINO_PIN_8           GPIO_PIN(PA, 6)  /**< D8 (LORA_CS) */
-#elif defined(BOARD_FEATHER_M0_BLE)
-#define ARDUINO_PIN_2           GPIO_UNDEF       /**< D2 */
-#define ARDUINO_PIN_3           GPIO_UNDEF       /**< D3 */
-#define ARDUINO_PIN_4           GPIO_PIN(PA, 8)  /**< D4 (BLE_SWDIO/RST) */
-#define ARDUINO_PIN_7           GPIO_PIN(PA, 21) /**< D7 (BLE_IRQ) */
-#define ARDUINO_PIN_8           GPIO_PIN(PA, 6)  /**< D8 (BLE_CS) */
-#elif defined(BOARD_FEATHER_M0_LOGGER)
-#define ARDUINO_PIN_2           GPIO_UNDEF       /**< D2 */
-#define ARDUINO_PIN_3           GPIO_UNDEF       /**< D3 */
-#define ARDUINO_PIN_4           GPIO_PIN(PA, 8)  /**< D4 (SD CS) */
-#define ARDUINO_PIN_7           GPIO_PIN(PA, 21) /**< D7 (SD CD) */
-#define ARDUINO_PIN_8           GPIO_PIN(PA, 6)  /**< D8 (Green LED) */
 #else
 #define ARDUINO_PIN_2           GPIO_UNDEF       /**< D2 */
 #define ARDUINO_PIN_3           GPIO_UNDEF       /**< D3 */
