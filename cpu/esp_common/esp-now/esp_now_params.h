@@ -44,25 +44,38 @@
 #endif
 
 /**
- * @brief   Period in milliseconds at which an ESP-NOW node scans for other
- *          ESP-NOW nodes in its range.
+ * @brief   Scan interval for peer nodes in ms.
  * @ingroup cpu_esp_common_conf
+ *
+ * Each node searches for other nodes in its range with the defined interval.
  */
 #ifndef ESP_NOW_SCAN_PERIOD_MS
 #define ESP_NOW_SCAN_PERIOD_MS  (10000UL)
 #endif
 
 /**
- * @brief   Passphrase used for the SoftAP interface of for all ESP-NOW nodes.
+ * @brief   Passphrase used for the SoftAP interface for all ESP-NOW nodes.
  * @ingroup cpu_esp_common_conf
+ *
+ * The passphrase is used for the SoftAP interface of ESP-NOW nodes. It
+ * is defined as a string with a maximum of 64 characters and must be the
+ * same for all nodes in the network.
  */
 #ifndef ESP_NOW_SOFT_AP_PASS
 #define ESP_NOW_SOFT_AP_PASS    "This is RIOT-OS"
 #endif
 
 /**
- * @brief   Channel used as broadcast medium by all ESP-NOW nodes together
+ * @brief   Channel used for ESP-NOW in the 2.4 GHz band
  * @ingroup cpu_esp_common_conf
+ *
+ * The channel is in the range of 1 to 13. If ESP-NOW is used together with
+ * an infrastructure WiFi network (module `esp_wifi` or `esp_wifi_enterprise`),
+ * e.g. to realize a border router, the channel must be the same as used by
+ * the AP of the infrastructure WiFi.
+ *
+ * @note In some regions not all 13 channels may be used for regulatory
+ * reasons. Select a channel that is allowed in your region.
  */
 #ifndef ESP_NOW_CHANNEL
 #define ESP_NOW_CHANNEL         (6)
