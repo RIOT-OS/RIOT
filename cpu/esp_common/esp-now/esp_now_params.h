@@ -69,20 +69,25 @@
 #endif
 
 /**
- * @brief   Key used for the communication between ESP-NOW nodes
+ * @brief   128-bit key used for encrypted communication
  * @ingroup cpu_esp_common_conf
  *
  * The key has to be defined to enable encrypted communication between ESP-NOW
- * nodes. The key has to be of type *uint8_t [16]* and has to be exactly
- * 16 bytes long. If the key is NULL (the default) communication is not
- * encrypted.
+ * nodes. The key is 16 bytes long and is defined by a string of 8-bit hex
+ * values separated by spaces, for example:
+ * ```
+ * "0f 1e 2d 3c 4b 5a 69 78 87 96 a5 b4 c3 d2 e1 f0"
+ * ```
+ * An empty string for this parameter means that the encryption is not used.
+ * If less than 16 bytes are defined by the string, the remaining bytes of
+ * the key are filled with 0.
  *
- * Please note: If encrypted communication is used, a maximum of 6 nodes can
- * communicate with each other, while in unencrypted mode, up to 20 nodes can
- * communicate.
+ * @note:   If encrypted communication is used, a maximum of 6 nodes can
+ *          communicate with each other, while in unencrypted mode, up to
+ *          20 nodes can communicate.
  */
 #ifndef ESP_NOW_KEY
-#define ESP_NOW_KEY             (NULL)
+#define ESP_NOW_KEY             ""
 #endif
 
 /** @} */
@@ -103,7 +108,8 @@
  */
 typedef struct
 {
-    const uint8_t* key;      /**< key of type uint8_t [16] or NULL (no encryption) */
+    const char* key;         /**< Key string with 16 hex values separated by
+                                  spaces, empty string means no encryption */
     uint32_t scan_period;    /**< Period at which the node scans for other nodes */
     const char* softap_pass; /**< Passphrase used for the SoftAP interface */
     uint8_t channel;         /**< Channel used for ESP-NOW nodes */
