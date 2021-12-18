@@ -1,0 +1,54 @@
+# Copyright (c) 2021 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menuconfig ESP_NOW_NETDEV
+    bool "ESP NOW interface used"
+    depends on HAS_ESP_NOW
+    default y if TEST_KCONFIG && MODULE_NETDEV_DEFAULT && !ESP_ETH_NETDEV && !MODULE_LWIP
+    select MODULE_ESP_NOW
+
+if ESP_NOW_NETDEV
+    config ESP_NOW_SOFT_AP_PASS
+        string "ESP-NOW Passphrase used by all ESP-NOW nodes"
+        default "This is RIOT-OS"
+        help
+            The passphrase is used for the SoftAP interface of ESP-NOW
+            nodes. It is defined as a clear text string with a maximum
+            of 64 characters and must be the same for all ESP-NOW nodes
+            in the network.
+
+    config ESP_NOW_CHANNEL
+        int "ESP-NOW Channel for ESP-NOW in the 2.4 GHz band"
+        default 6
+        range 1 13
+        help
+            The channel is in the range of 1 to 13. In some regions
+            not all 13 channels may be used for regulatory reasons.
+            Select a channel that is allowed in your region.
+            If ESP-NOW is used together with an infrastructure WiFi
+            network, e.g. to realize a border router, the channel must
+            be the same as used by the AP of the infrastructure WiFi.
+
+    config ESP_NOW_SCAN_PERIOD_MS
+        int "ESP-NOW Scan interval [ms]"
+        default 10000
+        help
+            Each node searches for other nodes in its range with the
+            defined interval.
+
+    config ESP_NOW_KEY
+        string "ESP-NOW 128-bit key used for encrypted communication"
+        default ""
+        help
+            The key has to be defined to enable encrypted communication
+            between ESP-NOW nodes. The key is 16 bytes long and is
+            defined by a string of 8-bit hex values separated by spaces,
+            for example: "0f 1e 2d 3c 4b 5a 69 78 87 96 a5 b4 c3 d2 e1 f0"
+            An empty string for this parameter means that the encryption
+            is not used. If less than 16 bytes are defined by the string,
+            the remaining bytes of the key are filled with 0.
+
+endif # ESP_NOW_NETDEV

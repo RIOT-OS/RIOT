@@ -50,8 +50,12 @@
  * Each node searches for other nodes in its range with the defined interval.
  */
 #ifndef ESP_NOW_SCAN_PERIOD_MS
+#ifndef CONFIG_ESP_NOW_SCAN_PERIOD_MS
 #define ESP_NOW_SCAN_PERIOD_MS  (10000UL)
-#endif
+#else /* CONFIG_ESP_NOW_SCAN_PERIOD_MS */
+#define ESP_NOW_SCAN_PERIOD_MS  CONFIG_ESP_NOW_SCAN_PERIOD_MS
+#endif /* CONFIG_ESP_NOW_SCAN_PERIOD_MS */
+#endif /* ESP_NOW_SCAN_PERIOD_MS */
 
 /**
  * @brief   Passphrase used for the SoftAP interface for all ESP-NOW nodes.
@@ -62,8 +66,12 @@
  * must be the same for all ESP-NOW nodes in the network.
  */
 #ifndef ESP_NOW_SOFT_AP_PASS
+#ifndef CONFIG_ESP_NOW_SOFT_AP_PASS
 #define ESP_NOW_SOFT_AP_PASS    "This is RIOT-OS"
-#endif
+#else /* CONFIG_ESP_NOW_SOFT_AP_PASS */
+#define ESP_NOW_SOFT_AP_PASS    CONFIG_ESP_NOW_SOFT_AP_PASS
+#endif /* CONFIG_ESP_NOW_SOFT_AP_PASS */
+#endif /* ESP_NOW_SOFT_AP_PASS */
 
 /**
  * @brief   Channel used for ESP-NOW in the 2.4 GHz band
@@ -78,8 +86,12 @@
  *          reasons. Select a channel that is allowed in your region.
  */
 #ifndef ESP_NOW_CHANNEL
+#ifndef CONFIG_ESP_NOW_CHANNEL
 #define ESP_NOW_CHANNEL         (6)
-#endif
+#else /* CONFIG_ESP_NOW_CHANNEL */
+#define ESP_NOW_CHANNEL         CONFIG_ESP_NOW_CHANNEL
+#endif /* CONFIG_ESP_NOW_CHANNEL */
+#endif /* #ifndef ESP_NOW_CHANNEL */
 
 /**
  * @brief   128-bit key used for encrypted communication
@@ -100,8 +112,12 @@
  *          20 nodes can communicate.
  */
 #ifndef ESP_NOW_KEY
+#ifndef CONFIG_ESP_NOW_KEY
 #define ESP_NOW_KEY             ""
-#endif
+#else /* CONFIG_ESP_NOW_KEY*/
+#define ESP_NOW_KEY             CONFIG_ESP_NOW_KEY
+#endif /* CONFIG_ESP_NOW_KEY*/
+#endif /* ESP_NOW_KEY */
 
 /** @} */
 
@@ -119,8 +135,7 @@
 /**
  * @brief   Struct holding all parameters needed for device initialization.
  */
-typedef struct
-{
+typedef struct {
     const char* key;         /**< Key string with 16 hex values separated by
                                   spaces, empty string means no encryption */
     uint32_t scan_period;    /**< Period at which the node scans for other nodes */

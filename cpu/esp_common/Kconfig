@@ -100,7 +100,17 @@ menu "ESP configurations"
             default y if TEST_KCONFIG && MODULE_NETDEV_DEFAULT
             select MODULE_ESP_ETH
 
+        rsource "Kconfig.netdev.esp_now"
     endmenu
+
+config MODULE_ESP_NOW
+    bool
+    select MODULE_ESP_WIFI_ANY # MODULE_ESP_WIFI_ANY has MCU specific dependencies
+
+config MODULE_ESP_WIFI_ANY
+    bool
+    select MODULE_NETOPT
+    select MODULE_ZTIMER_MSEC
 
 config MODULE_ESP_LOG_COLORED
     bool
