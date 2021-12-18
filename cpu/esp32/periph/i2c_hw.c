@@ -47,6 +47,7 @@
 #include "cpu.h"
 #include "log.h"
 #include "mutex.h"
+#include "macros/units.h"
 #include "periph_conf.h"
 #include "periph/gpio.h"
 #include "periph/i2c.h"
@@ -68,9 +69,6 @@
 #include "xtensa/xtensa_api.h"
 
 #if defined(I2C0_SPEED) || defined(I2C1_SPEED)
-
-#undef  I2C_CLK_FREQ
-#define I2C_CLK_FREQ   rtc_clk_apb_freq_get() /* APB_CLK is used */
 
 /* operation codes used for commands */
 #define I2C_CMD_RSTART 0
@@ -147,12 +145,9 @@ void i2c_init(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
-    if (i2c_config[dev].speed == I2C_SPEED_FAST_PLUS ||
-        i2c_config[dev].speed == I2C_SPEED_HIGH) {
-        LOG_TAG_INFO("i2c", "I2C_SPEED_FAST_PLUS and I2C_SPEED_HIGH "
-                     "are not supported\n");
-        return;
-    }
+    /* According to the Technical Reference Manual, only FAST mode is supported,
+     * but FAST PLUS mode seems to work also. */
+    assert(i2c_config[dev].speed <= I2C_SPEED_FAST_PLUS);
 
     mutex_init(&_i2c_bus[dev].lock);
 
@@ -182,38 +177,64 @@ void i2c_init(i2c_t dev)
 
     /* determine the half period of clock in APB clock cycles */
     uint32_t half_period = 0;
+    uint32_t apb_clk = rtc_clk_apb_freq_get();
 
-    switch (_i2c_bus[dev].speed) {
-        case I2C_SPEED_LOW:
-            /* 10 kbps (period 100 us) */
-            half_period = (I2C_CLK_FREQ / 10000) >> 1;
-            break;
+    if (apb_clk == MHZ(2)) {
+        /* CPU clock frequency of 2 MHz requires special handling */
+        switch (_i2c_bus[dev].speed) {
+            case I2C_SPEED_LOW:
+                /* 10 kbps (period 100 us) */
+                half_period = 95;
+                break;
 
-        case I2C_SPEED_NORMAL:
-            /* 100 kbps (period 10 us) */
-            half_period = (I2C_CLK_FREQ / 100000) >> 1;
-            half_period = half_period * 95 / 100; /* correction factor */
-            break;
+            case I2C_SPEED_NORMAL:
+                /* 100 kbps (period 10 us) */
+                /* NOTE: Correct value for half_period would be 6 to produce a
+                 *       100 kHz clock. However, a value of at least 18 is
+                 *       necessary to work correctly which corresponds to a
+                 *       I2C clock speed of 30 kHz.
+                 */
+                half_period = 18;
+                break;
 
-        case I2C_SPEED_FAST:
-            /* 400 kbps (period 2.5 us) */
-            half_period = (I2C_CLK_FREQ / 400000) >> 1;
-            half_period = half_period * 82 / 100; /* correction factor */
-            break;
+            default:
+                LOG_TAG_ERROR("i2c", "I2C clock speed not supported in "
+                                     "hardware with CPU clock 2 MHz, use the "
+                                     "software implementation instead\n");
+                assert(0);
+        }
+    }
+    else {
+        switch (_i2c_bus[dev].speed) {
+            case I2C_SPEED_LOW:
+                /* 10 kbps (period 100 us) */
+                half_period = (apb_clk / 10000) >> 1;
+                break;
 
-        case I2C_SPEED_FAST_PLUS:
-            /* 1 Mbps (period 1 us) not working */
-            half_period = (I2C_CLK_FREQ / 1000000) >> 1;
-            break;
+            case I2C_SPEED_NORMAL:
+                /* 100 kbps (period 10 us) */
+                half_period = (apb_clk / 100000) >> 1;
+                break;
 
-        case I2C_SPEED_HIGH:
-            /* 3.4 Mbps (period 0.3 us) not working */
-            half_period = (I2C_CLK_FREQ / 3400000) >> 1;
-            break;
+            case I2C_SPEED_FAST:
+                /* 400 kbps (period 2.5 us) */
+                half_period = (apb_clk / 400000) >> 1;
+                break;
 
-        default:
-            LOG_TAG_ERROR("i2c", "Invalid speed value in %s\n", __func__);
-            return;
+            case I2C_SPEED_FAST_PLUS:
+                /* 1 Mbps (period 1 us) */
+                half_period = (apb_clk / 1000000) >> 1;
+                break;
+
+            case I2C_SPEED_HIGH:
+                /* 3.4 Mbps (period 0.3 us) not working */
+                half_period = (apb_clk / 3400000) >> 1;
+                break;
+
+            default:
+                LOG_TAG_ERROR("i2c", "Invalid speed value in %s\n", __func__);
+                assert(0);
+        }
     }
 
     /* set an timeout which is at least 16 times of half cycle */

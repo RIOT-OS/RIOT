@@ -28,6 +28,7 @@
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/spi.h"
+#include "macros/units.h"
 
 #include "esp_attr.h"
 #include "gpio_arch.h"
@@ -43,6 +44,7 @@
 #include "soc/gpio_sig_map.h"
 #include "soc/gpio_struct.h"
 #include "soc/io_mux_reg.h"
+#include "soc/rtc.h"
 #include "soc/spi_reg.h"
 #include "soc/spi_struct.h"
 
@@ -333,6 +335,23 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
     uint32_t spi_clkdiv_pre;
     uint32_t spi_clkcnt_N;
 
+#ifdef MCU_ESP32
+    uint32_t apb_clk = rtc_clk_apb_freq_get();
+    spi_clkcnt_N = 2;
+    switch (clk) {
+        case SPI_CLK_10MHZ:  spi_clkdiv_pre = apb_clk / MHZ(10) / 2;
+                             break;
+        case SPI_CLK_5MHZ:   spi_clkdiv_pre = apb_clk / MHZ(5) / 2;
+                             break;
+        case SPI_CLK_1MHZ:   spi_clkdiv_pre = apb_clk / MHZ(1) / 2;
+                             break;
+        case SPI_CLK_400KHZ: spi_clkdiv_pre = apb_clk / KHZ(400) / 2;
+                             break;
+        case SPI_CLK_100KHZ: /* fallthrough intentionally */
+        default: spi_clkdiv_pre = apb_clk / KHZ(100) / 2;
+    }
+    assert(spi_clkdiv_pre > 0);
+#else
     switch (clk) {
         case SPI_CLK_10MHZ:  spi_clkdiv_pre = 2;    /* predivides 80 MHz to 40 MHz */
                              spi_clkcnt_N = 4;      /* 4 cycles results into 10 MHz */
@@ -352,6 +371,7 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
         default: spi_clkdiv_pre = 20;   /* predivides 80 MHz to 4 MHz */
                  spi_clkcnt_N = 40;     /* 20 cycles results into 100 kHz */
     }
+#endif
 
     /* register values are set to deviders-1 */
     spi_clkdiv_pre--;
