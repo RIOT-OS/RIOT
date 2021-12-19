@@ -23,3 +23,8 @@ endif
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
   USEMODULE += rtt_rtc
 endif
+
+ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
+  # avoid that ztimer_periph_rtt is used as backend
+  USEMODULE += ztimer_no_periph_rtt
+endif
