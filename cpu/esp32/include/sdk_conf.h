@@ -29,15 +29,34 @@ extern "C" {
 #endif
 
 /**
-* @name    Clock configuration
-* @{
-*/
+ * @name    Clock configuration
+ * @{
+ */
+
+#ifndef DOXYGEN
+/* Mapping of Kconfig defines to the respective enumeration values */
+#if CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_2
+#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   2
+#elif CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_40
+#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   40
+#elif CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_80
+#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   80
+#elif CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_160
+#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   160
+#elif CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_240
+#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   240
+#endif
+#endif
+
 /**
  * @brief   Defines the CPU frequency [values = 2, 40, 80, 160 and 240]
  */
 #ifndef CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ
 #define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   80
 #endif
+/**
+ * @brief   Mapping configured ESP32 default clock to CLOCK_CORECLOCK define
+ */
 #define CLOCK_CORECLOCK     (1000000UL * CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ)
 /** @} */
 
@@ -58,16 +77,6 @@ extern "C" {
  */
 #ifndef CONFIG_LOG_DEFAULT_LEVEL
 #define CONFIG_LOG_DEFAULT_LEVEL    LOG_LEVEL
-#endif
-
-/**
- * ESP32 specific configuration
- *
- * CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ can be overridden by an application
- * specific SDK configuration file.
- */
-#ifndef CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ
-#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ       80
 #endif
 
 /**
