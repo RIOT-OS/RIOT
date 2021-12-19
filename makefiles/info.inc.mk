@@ -88,6 +88,8 @@ info-build:
 	@echo -e 'CXXUWFLAGS:$(patsubst %, \n\t%, $(CXXUWFLAGS))'
 	@echo -e 'CXXEXFLAGS:$(patsubst %, \n\t%, $(CXXEXFLAGS))'
 	@echo ''
+	@echo 'RUST_TARGET: $(RUST_TARGET)'
+	@echo ''
 	@echo 'LINK:    $(LINK)'
 	@echo -e 'LINKFLAGS:$(patsubst %, \n\t%, $(LINKFLAGS))'
 	@echo ''
