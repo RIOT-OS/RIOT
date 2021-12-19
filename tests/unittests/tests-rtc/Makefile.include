@@ -1,6 +1,6 @@
 CFLAGS += -DRTC_NORMALIZE_COMPAT=1
 
-USEMODULE += periph_rtc_common
+USEMODULE += rtc_utils
 
 # AVR/ATmega uses `int8_t` for `struct tm` which leads to integer overflows
 # in these tests

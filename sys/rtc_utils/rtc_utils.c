@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     drivers_periph_rtc
+ * @ingroup     sys_rtc_utils
  * @{
  *
  * @file
- * @brief       common RTC function fallback implementations
+ * @brief       common RTC helper functions
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  *

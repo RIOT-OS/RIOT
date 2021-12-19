@@ -51,6 +51,11 @@ ifneq (,$(filter periph_%, $(USEMODULE)))
   USEMODULE += periph_common
 endif
 
+# include rtc_utils if periph_rtc is used
+ifneq (,$(filter periph_rtc, $(USEMODULE)))
+  USEMODULE += rtc_utils
+endif
+
 # select cortexm_svc pseudomodule if the corresponding feature is used
 USEMODULE += $(filter cortexm_svc, $(FEATURES_USED))
 
