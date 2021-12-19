@@ -58,8 +58,8 @@
  * @ingroup cpu_esp_common_conf
  *
  * The passphrase is used for the SoftAP interface of ESP-NOW nodes. It
- * is defined as a string with a maximum of 64 characters and must be the
- * same for all nodes in the network.
+ * is defined as a clear text string with a maximum of 64 characters and
+ * must be the same for all ESP-NOW nodes in the network.
  */
 #ifndef ESP_NOW_SOFT_AP_PASS
 #define ESP_NOW_SOFT_AP_PASS    "This is RIOT-OS"
@@ -70,12 +70,12 @@
  * @ingroup cpu_esp_common_conf
  *
  * The channel is in the range of 1 to 13. If ESP-NOW is used together with
- * an infrastructure WiFi network (module `esp_wifi` or `esp_wifi_enterprise`),
+ * an infrastructure WiFi network (@ref esp_common_wifi_network_interface),
  * e.g. to realize a border router, the channel must be the same as used by
  * the AP of the infrastructure WiFi.
  *
- * @note In some regions not all 13 channels may be used for regulatory
- * reasons. Select a channel that is allowed in your region.
+ * @note    In some regions not all 13 channels may be used for regulatory
+ *          reasons. Select a channel that is allowed in your region.
  */
 #ifndef ESP_NOW_CHANNEL
 #define ESP_NOW_CHANNEL         (6)

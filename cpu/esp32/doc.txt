@@ -1421,12 +1421,15 @@ make -C examples/gnrc_networking BOARD=...
 
 @note
 - Module `esp_wifi` is not enabled automatically when module
-`netdev_default` is used.
-- Leave 'ESP_WIFI_PASS' undefined to connect to an open WiFi access point.
-- The Wifi network interface (module `esp_wifi`) and the
-[ESP-NOW network interface](#esp32_esp_now_network_interface) (module `esp_now`)
-can be used simultaneously, for example, to realize a border router for
-a mesh network which uses ESP-NOW.
+  `netdev_default` is used.
+- Leave `#ESP_WIFI_PASS` undefined to connect to an open WiFi access point.
+- The @ref esp32_wifi_network_interface (module `esp_wifi`) and
+  the @ref esp32_esp_now_network_interface (module `esp_now`) can be used
+  simultaneously, for example, to realize a border router for a mesh network
+  which uses ESP-NOW.
+  In this case the ESP-NOW interface must use the same channel as the AP of the
+  infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
+  the channel of the AP asvalue for the parameter `#ESP_NOW_CHANNEL`.
 
 [Back to table of contents](#esp32_toc)
 
@@ -1478,22 +1481,22 @@ make -C examples/gnrc_networking BOARD=...
 
 @note
 - Since there is no possibility to add the CA certificate to the RIOT image,
-the verification of the AP certificate is not yet supported.
+  the verification of the AP certificate is not yet supported.
 - Module `esp_wifi_enterprise` is not enabled automatically when module
-`netdev_default` is used.
-- The Wifi network interface (module `esp_wifi_enterprise`) and the
-[ESP-NOW network interface](#esp32_esp_now_network_interface) (module `esp_now`)
-can be used simultaneously, for example, to realize a border router for
-a mesh network which uses ESP-NOW.
-In this case the ESP-NOW interface must use the same channel as the AP of the
-infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
-the channel of the AP as value for the parameter 'ESP_NOW_CHANNEL'.
+  `netdev_default` is used.
+- The @ref esp32_wifi_network_interface (module `esp_wifi_enterprise`) and
+  the @ref esp32_esp_now_network_interface (module `esp_now`) can be used
+  simultaneously, for example, to realize a border router for a mesh network
+  which uses ESP-NOW.
+  In this case the ESP-NOW interface must use the same channel as the AP of the
+  infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
+  the channel of the AP as value for the parameter `#ESP_NOW_CHANNEL`.
 
 [Back to table of contents](#esp32_toc)
 
 ## WiFi SoftAP Network Interface {#esp32_wifi_ap_network_interface}
 
-The RIOT port for the ESP32 supports a `netdev` interface for the ESP32 WiFi
+The RIOT port for the ESP SoCs  supports a `netdev` interface for the ESP WiFi
 SoftAP mode. Module `esp_wifi_ap` has to be enabled to use it.
 
 The following parameters can be configured:
@@ -1512,11 +1515,11 @@ Parameter                 | Default                   | Description
 
 </center><br>
 
-[1] If no password is provided, the interface will be "open", otherwise it
-    uses WPA2-PSK authentication mode.<br>
-[2] If #ESP_WIFI_SSID_DYNAMIC is set to 1, a dynamic SSID is generated for the
-    SoftAP by extending the defined SSID (`ESP_WIFI_SSID`) with the MAC address
-    of the SoftAP interface used, e.g.: `RIOT_AP_aabbccddeeff`
+1. If no password is provided, the interface will be "open", otherwise it
+   uses WPA2-PSK authentication mode.<br>
+2. If `#ESP_WIFI_SSID_DYNAMIC` is set to 1, a dynamic SSID is generated for the
+   SoftAP by extending the defined SSID (`#ESP_WIFI_SSID`) with the MAC address
+   of the SoftAP interface used, e.g.: `RIOT_AP_aabbccddeeff`
 
 These configuration parameter definitions, as well as enabling the `esp_wifi_ap`
 module, can be done either in the makefile of the project or at make command
@@ -1532,7 +1535,7 @@ make -C examples/gnrc_networking BOARD=...
 - The `esp_wifi_ap` module is not used by default when `netdev_default` is used.
 - Supports open and WPA2-PSK authentication modes.
 - The ESP-NOW network interface and the WiFi SoftAP network interface can not
-be used simultaneously.
+  be used simultaneously.
 
 @warning
 The SoftAP may or may not be at all reliable sometimes, this is a known
@@ -1541,8 +1544,8 @@ The problem is that the AP doesn't cache multicast data for connected
 stations, and if stations connected to the AP are power save enabled,
 they may experience multicast packet loss. This affects RIOT, because
 NDP relies on multicast packets to work correctly.
-Refer to the SDK documentation from Espressif on
-[AP Sleep](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/wifi.html#ap-sleep)
+Refer to the SDK documentation from Espressif on [AP Sleep]
+(https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/wifi.html#ap-sleep)
 for more information.
 
 [Back to table of contents](#esp32_toc)
@@ -1618,7 +1621,7 @@ Parameter               | Default        | Description
   realize a border router for a mesh network which uses ESP-NOW.
   In this case, the ESP-NOW interface must use the same channel as the AP of
   the infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled
-  with the channel of the AP as the value for the #ESP_NOW_CHANNEL parameter.
+  with the channel of the AP as the value for the `#ESP_NOW_CHANNEL` parameter.
 
 [Back to table of contents](#esp32_toc)
 

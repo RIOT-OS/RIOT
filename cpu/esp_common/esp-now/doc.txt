@@ -7,13 +7,15 @@
  */
 
 /**
- * @defgroup    cpu_esp_common_esp_now ESP-NOW netdev interface
+ * @defgroup    cpu_esp_common_esp_now ESP-NOW Network Interface
  * @ingroup     cpu_esp_common
  * @ingroup     cpu_esp32
  * @ingroup     cpu_esp8266
  * @brief       WiFi based ESP-NOW network device driver
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
+
+# ESP-NOW network interface {#esp_common_esp_now_network_interface}
 
 This module realizes a netdev interface using Espressif's ESP-NOW technology
 which uses the built-in WiFi module.
@@ -44,8 +46,7 @@ is the concatenation of the prefix `RIOT_ESP_` with the MAC address of its
 SoftAP WiFi interface. The driver periodically scans all visible ESP nodes.
 
 The following configuration parameters are defined for ESP-NOW nodes.
-These parameters can be overridden by [application-specific board configurations]
-(#esp8266_application_specific_board_configuration).
+These parameters can be overridden by application-specific board configurations.
 
 <center>
 
@@ -81,12 +82,12 @@ Parameter               | Default        | Description
 - If encrypted communication is used, a maximum of 6 nodes can
   communicate with each other, while in unencrypted mode, up to
   20 nodes can communicate.<br>
-- ESP-NOW network interface (module `esp_now`) and the
-  [Wifi network interface](#esp8266_wifi_network_interface) (module `esp_wifi`)
-  can be used simultaneously, for example, to
-  realize a border router for a mesh network which uses ESP-NOW.
-  In this case, the ESP-NOW interface must use the same channel as the AP of
-  the infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled
-  with the channel of the AP as the value for the #ESP_NOW_CHANNEL parameter.
+- The @ref esp_common_esp_now_network_interface (module `esp_now`) and
+  the @ref esp_common_wifi_network_interface (module `esp_wifi`) can be used
+  simultaneously, for example, to realize a border router for a mesh network
+  which uses ESP-NOW.
+  In this case the ESP-NOW interface must use the same channel as the AP of the
+  infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
+  the channel of the AP asvalue for the parameter `#ESP_NOW_CHANNEL`.
 
  */
