@@ -72,7 +72,44 @@
 #define ESP_WIFI_PASS       "ThisistheRIOTporttoESP"
 #endif
 
-#if defined(MODULE_ESP_WIFI_AP) || defined(DOXYGEN)
+#if defined(MODULE_ESP_WIFI_ENTERPRISE) || defined(DOXYGEN)
+
+/**
+ * @brief   Optional anonymous identity for WPA2 Enterprise Mode authentication
+ *
+ * Optional anonymous identity is used in phase 1 (outer) EAP authentication.
+ * If it is not defined, the user name `#ESP_WIFI_EAP_USER` defined for
+ * phase 2 (inner) EAP authentication is used as identity in phase 1.
+ *
+ * @note    The identity in phase 1 (outer) authentication is sent as plain
+ *          text with no encryption.
+ */
+#ifndef ESP_WIFI_EAP_ID
+#define ESP_WIFI_EAP_ID         ""
+#endif
+
+/**
+ * @brief   User name for WPA2 Enterprise Mode authentication
+ *
+ * The user name as required for phase 2 (inner) EAP authentication to identify
+ * the user.
+ */
+#ifndef ESP_WIFI_EAP_USER
+#define ESP_WIFI_EAP_USER       "user"
+#endif
+
+/**
+ * @brief   Password for WPA2 Enterprise Mode authentication
+ *
+ * The password required for phase 2 (inner) EAP authentication.
+ */
+#ifndef ESP_WIFI_EAP_PASS
+#define ESP_WIFI_EAP_PASS       "pass"
+#endif
+
+#endif /* defined(MODULE_ESP_WIFI_ENTERPRISE) || defined(DOXYGEN) */
+
+#if defined(ESP_WIFI_AP) || defined(DOXYGEN)
 
 /**
  * @brief   Use dynamic SSID for the SoftAP in SoftAP mode
