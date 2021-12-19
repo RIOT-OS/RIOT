@@ -56,9 +56,12 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   User button
+ * @name    User button pin configuration
+ * @{
  */
-#define BTN_B1_PIN          GPIO_PIN(PORT_C, 13)
+#define BTN0_PIN            GPIO_PIN(PORT_C, 13)    /**< User button pin */
+#define BTN0_MODE           GPIO_IN                 /**< User button pin mode */
+/** @} */
 
 /**
  * @name    si7034 temperature sensor configuration

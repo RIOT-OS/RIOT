@@ -47,9 +47,12 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   User button
+ * @name    User button pin configuration
+ * @{
  */
-#define BTN_B1_PIN          GPIO_PIN(PORT_C, 13)
+#define BTN0_PIN            GPIO_PIN(PORT_C, 13)    /**< User button pin */
+#define BTN0_MODE           GPIO_IN_PU              /**< User button pin mode */
+/** @} */
 
 /**
  * @name    HTS221 temperature/humidity sensor configuration
