@@ -4,5 +4,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega328p \
     atmega328p-xplained-mini \
-    nucleo-l011k4:gnu \
+    nucleo-l011k4 \
     #
