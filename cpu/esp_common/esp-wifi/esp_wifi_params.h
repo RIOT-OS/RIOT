@@ -51,7 +51,7 @@
 /**
  * @brief   Passphrase used for the AP as clear text (max. 64 chars).
  */
-#ifndef ESP_WIFI_PASS
+#ifdef DOXYGEN
 #define ESP_WIFI_PASS       "ThisistheRIOTporttoESP"
 #endif
 
