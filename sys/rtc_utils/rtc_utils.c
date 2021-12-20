@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "periph/rtc.h"
+#include "timex.h"
 
 #ifndef RTC_NORMALIZE_COMPAT
 #define RTC_NORMALIZE_COMPAT (0)
@@ -258,3 +259,23 @@ bool rtc_tm_valid(const struct tm *t)
     rtc_tm_normalize(&norm);
     return rtc_tm_compare(t, &norm) == 0;
 }
+
+#ifdef MODULE_PERIPH_RTC_SETTER_CALLBACK
+int rtc_set_time_with_callback(struct tm *time)
+{
+    struct tm tm_before;
+    uint16_t ms_before = 0;
+#ifdef MODULE_PERIPH_RTC_MS
+    rtc_get_time_ms(&tm_before, &ms_before);
+#else
+    rtc_get_time(&tm_before);
+#endif
+
+    /* assumption: sub-second fraction is reset in implementation */
+    int result = rtc_set_time(time);
+
+    rtc_setter_callback(&tm_before, ms_before * US_PER_MS, time, 0);
+
+    return result;
+}
+#endif /* MODULE_PERIPH_RTC_SETTER_CALLBACK */
