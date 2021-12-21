@@ -273,7 +273,8 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
 {
     uint8_t *data_ptr = data;
     struct pbuf *buf;
-    ssize_t offset = 0, res = 0;
+    ssize_t recvd = 0;
+    ssize_t res = 0;
 
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
     if (sock->base.conn == NULL) {
@@ -338,12 +339,12 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
         }
         buf_len = buf->tot_len - sock->last_offset;
         copylen = (buf_len > max_len) ? (uint16_t)max_len : buf_len;
-        pbuf_copy_partial(buf, data_ptr + offset, copylen, sock->last_offset);
-        offset += copylen;
+        pbuf_copy_partial(buf, data_ptr + recvd, copylen, sock->last_offset);
+        recvd += copylen;
         max_len -= copylen; /* should be 0 at minimum due to copylen setting above */
 
         if (max_len == 0) {
-            res = offset;   /* in case offset == 0 */
+            res = recvd;   /* in case recvd == 0 */
         }
 
         /* post-process buf */
@@ -364,9 +365,11 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
             }
         }
     }
-    if (offset > 0) {
-        res = offset;   /* we received data so return it */
+
+    if (recvd > 0) {
+        res = recvd;   /* we received data so return it */
     }
+
     /* unset flags */
 #if LWIP_SO_RCVTIMEO
     netconn_set_recvtimeout(sock->base.conn, 0);
