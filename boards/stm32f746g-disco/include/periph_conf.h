@@ -173,6 +173,62 @@ static const eth_conf_t eth_config = {
 #define ETH_DMA_ISR        isr_dma2_stream0
 /** @} */
 
+/**
+ * @name LTDC configuration
+ * @{
+ */
+/** LTDC static configuration struct */
+static const ltdc_conf_t ltdc_config = {
+    .bus        = APB2,
+    .rcc_mask   = RCC_APB2ENR_LTDCEN,
+    .clk_pin    = { .pin = GPIO_PIN(PORT_I, 14), .af = GPIO_AF14, },
+    .de_pin     = { .pin = GPIO_PIN(PORT_K, 7), .af = GPIO_AF14, },
+    .hsync_pin  = { .pin = GPIO_PIN(PORT_I, 10), .af = GPIO_AF14, },
+    .vsync_pin  = { .pin = GPIO_PIN(PORT_I, 9), .af = GPIO_AF14, },
+    .r_pin      = {
+        { .pin = GPIO_PIN(PORT_I, 15), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_J, 0), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_J, 1), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_J, 2), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_J, 3), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_J, 4), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_J, 5), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_J, 6), .af = GPIO_AF14, },
+    },
+    .g_pin      = {
+        { .pin = GPIO_PIN(PORT_J, 7), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_J, 8), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_J, 9), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_J, 10), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_J, 11), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_K, 0), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_K, 1), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_K, 2), .af = GPIO_AF14, },
+    },
+    .b_pin      = {
+        { .pin = GPIO_PIN(PORT_E, 4), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_J, 13), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_J, 14), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_J, 15), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_G, 12), .af = GPIO_AF9, },
+        { .pin = GPIO_PIN(PORT_K, 4), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_K, 5), .af = GPIO_AF14, },
+        { .pin = GPIO_PIN(PORT_K, 6), .af = GPIO_AF14, },
+    },
+    /* values below come from STM32CubeF7 code and differ from the typical
+     * values mentioned in the RK043FN48H datasheet. Both sets of values work
+     * with the display.
+     * See the discussion in https://community.st.com/s/question/0D50X0000BOvdWP/how-to-set-displays-parameters-
+     */
+    .hsync      = 41,
+    .vsync      = 10,
+    .hbp        = 13,
+    .hfp        = 32,
+    .vbp        = 2,
+    .vfp        = 2,
+};
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
