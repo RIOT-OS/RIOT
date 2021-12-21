@@ -473,32 +473,33 @@ static inline ztimer_now_t ztimer_now(ztimer_clock_t *clock)
  *
  * @return  Current time until the @p timer is trigger in clock units
  */
-static inline uint32_t ztimer_until(ztimer_clock_t *clock, ztimer_t *timer){
+static inline uint32_t ztimer_until(ztimer_clock_t *clock, ztimer_t *timer)
+{
     unsigned state = irq_disable();
+
 #if ZTIMER_UNTIL_SAFTY_NET
-    if (!ztimer_is_set(clock,timer)){
+    if (!ztimer_is_set(clock, timer)){
         irq_restore(state);
         return 0;
     }
 #endif
     uint32_t sum = clock->list.offset;
-    ztimer_base_t * i = clock->list.next;
-    ztimer_base_t * timer_base = &timer->base;
-    for( ; i && i != timer_base; i = i->next){
+    ztimer_base_t *i = clock->list.next;
+    ztimer_base_t *timer_base = &timer->base;
+    for ( ; i && i != timer_base; i = i->next) {
         sum += i->offset;
     }
-    if (i == timer_base){
+    if (i == timer_base) {
         sum += i->offset;
         irq_restore(state);
-        uint32_t now = (uint32_t) ztimer_now(clock);
+        uint32_t now = (uint32_t)ztimer_now(clock);
         return (sum > now)?(sum - now):0;
     }
-    else{
+    else {
         irq_restore(state);
         return 0;
     }
 }
-
 
 /**
  * @brief Suspend the calling thread until the time (@p last_wakeup + @p period)
