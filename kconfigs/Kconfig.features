@@ -206,6 +206,11 @@ config HAS_PERIPH_LPUART
     help
         Indicates that a low-power UART peripheral is present.
 
+config HAS_PERIPH_LTDC
+    bool
+    help
+        Indicates that a LTDC peripheral is present.
+
 config HAS_PERIPH_MCG
     bool
     help
