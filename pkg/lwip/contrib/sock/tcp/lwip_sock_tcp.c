@@ -277,6 +277,9 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
     ssize_t res = 0;
 
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
+
+    ssize_t recv_left = (max_len <= SSIZE_MAX) ? (ssize_t)max_len : SSIZE_MAX;
+
     if (sock->base.conn == NULL) {
         return -ENOTCONN;
     }
@@ -301,7 +304,7 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
         return -EAGAIN;
     }
 
-    while (max_len > 0) {
+    while (recv_left > 0) {
         uint16_t copylen, buf_len;
         if (sock->last_buf != NULL) {
             buf = sock->last_buf;
@@ -338,12 +341,12 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
             sock->last_buf = buf;
         }
         buf_len = buf->tot_len - sock->last_offset;
-        copylen = (buf_len > max_len) ? (uint16_t)max_len : buf_len;
+        copylen = (buf_len > recv_left) ? (uint16_t)recv_left : buf_len;
         pbuf_copy_partial(buf, data_ptr + recvd, copylen, sock->last_offset);
         recvd += copylen;
-        max_len -= copylen; /* should be 0 at minimum due to copylen setting above */
+        recv_left -= copylen; /* should be 0 at minimum due to copylen setting above */
 
-        if (max_len == 0) {
+        if (recv_left == 0) {
             res = recvd;   /* in case recvd == 0 */
         }
 
