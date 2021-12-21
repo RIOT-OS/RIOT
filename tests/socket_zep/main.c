@@ -63,18 +63,6 @@ static void test_init(void)
     _print_info(netdev);
 }
 
-static void test_send__iolist_NULL(void)
-{
-    netdev_t *netdev = &_socket_zep_netdev.dev.netdev;
-
-    puts("Send zero-length packet");
-    int res = netdev->driver->send(netdev, NULL);
-    expect((res < 0) || (res == 0));
-    if ((res < 0) && (errno == ECONNREFUSED)) {
-        puts("No remote socket exists (use scripts in `tests/` to have proper tests)");
-    }
-}
-
 static void test_send__iolist_not_NULL(void)
 {
     iolist_t iolist[] = { { .iol_base = "Hello", .iol_len = sizeof("Hello") },
@@ -116,7 +104,6 @@ int main(void)
     _main_pid = thread_getpid();
 
     test_init();
-    test_send__iolist_NULL();
     test_send__iolist_not_NULL();
     test_recv();    /* does not return */
     puts("ALL TESTS SUCCESSFUL");
@@ -131,7 +118,7 @@ static void _recv(netdev_t *dev)
 
     expect(exp_len >= 0);
     expect(((unsigned)exp_len) <= sizeof(_recvbuf));
-    data_len = dev->driver->recv(dev, _recvbuf, sizeof(_recvbuf), &rx_info);
+    data_len = dev->driver->recv(dev, _recvbuf, exp_len, &rx_info);
     if (data_len < 0) {
         puts("Received invalid packet");
     }
