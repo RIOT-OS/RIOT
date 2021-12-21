@@ -16,6 +16,13 @@
  */
 
 /**
+ * @defgroup cpp C++
+ * @brief    C++ Support in RIOT-OS
+ *
+ * This group contains all C++ related modules for easier reference.
+ */
+
+/**
  * @defgroup utils Utilities
  * @brief Utilities and helper functionality
  *

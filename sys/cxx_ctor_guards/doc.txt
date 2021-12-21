@@ -1,6 +1,6 @@
 /**
 @defgroup   sys_cxx_ctor_guards     C++ constructor guards for static instances
-@ingroup    sys
+@ingroup    cpp
 @brief      C++ constructor guards for thread-safe initialization of static
             instances
 

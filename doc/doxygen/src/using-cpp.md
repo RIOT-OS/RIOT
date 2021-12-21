@@ -40,11 +40,13 @@ RIOT Modules in C++                                              {#cpp-in-riot}
 RIOT modules should be written in C, so that boards/platforms without or partial
 C++ support can still use these modules. However, external modules, packages,
 and modules that require C++ support anyway (e.g. the Arduino compatibility
-features) can be written in C++. These modules/packages have to depend on the
+features) can be written in C++. Also, some modules might be designed as
+compatibility layer for C++ or provide convenient access to RIOT-OS' features
+using C++ APIs.  These modules/packages have to depend on the
 `cpp` feature (`FEATURES_REQUIRED += cpp`) and possibly the `libstdcpp`
 feature using their `Makefile.dep`.
 
 See Also                                                            {#see-also}
 ========
 
-@ref sys_c11_atomics_cpp_compat, @ref cpp11-compat
+Reference @ref cpp for a list of C++ modules.
