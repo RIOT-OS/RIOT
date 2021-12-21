@@ -53,7 +53,12 @@ MAYBE_INLINE unsigned irq_disable(void);
  *          interpreted as a boolean value. The actual value is only
  *          significant for irq_restore().
  *
- * @see     irq_restore
+ * @warning This function is here primarily for internal use, and for
+ *          compatibility with the Arduino environment (which lacks the
+ *          "disable / restore" concept. Enabling interrupts when a different
+ *          component disabled them can easily cause unintended behavior there.
+ *
+ *          Use @ref irq_restore instead.
  */
 MAYBE_INLINE unsigned irq_enable(void);
 
@@ -63,7 +68,6 @@ MAYBE_INLINE unsigned irq_enable(void);
  *
  * @param[in] state   state to restore
  *
- * @see     irq_enable
  * @see     irq_disable
  */
 MAYBE_INLINE void irq_restore(unsigned state);

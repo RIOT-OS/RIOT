@@ -168,12 +168,12 @@ int motor_set(const motor_driver_t motor_driver, uint8_t motor_id, \
     int32_t pwm_duty_cycle_abs = pwm_duty_cycle;
     pwm_duty_cycle_abs *= (pwm_duty_cycle < 0) ? -1 : 1;
 
-    irq_disable();
+    unsigned irqstate = irq_disable();
     gpio_write(dev->gpio_dir0, gpio_dir0_value);
     gpio_write(dev->gpio_dir1_or_brake, gpio_dir1_or_brake_value);
     pwm_set(motor_driver_conf->pwm_dev, dev->pwm_channel, \
             (uint16_t)pwm_duty_cycle_abs);
-    irq_enable();
+    irq_restore(irqstate);
 
     motor_driver_cb_t cb = motor_driver_conf->cb;
     if (cb) {
@@ -233,11 +233,11 @@ int motor_brake(const motor_driver_t motor_driver, uint8_t motor_id)
         goto motor_brake_err;
     }
 
-    irq_disable();
+    unsigned irqstate = irq_disable();
     gpio_write(dev->gpio_dir0, gpio_dir0_value);
     gpio_write(dev->gpio_dir1_or_brake, gpio_dir1_or_brake_value);
     pwm_set(motor_driver_conf->pwm_dev, dev->pwm_channel, 0);
-    irq_enable();
+    irq_restore(irqstate);
 
     return 0;
 
