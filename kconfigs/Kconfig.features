@@ -208,6 +208,7 @@ config HAS_PERIPH_LPUART
 
 config HAS_PERIPH_LTDC
     bool
+    select MODULE_PERIPH_LTDC if MODULE_DISP_DEV
     help
         Indicates that a LTDC peripheral is present.
 

@@ -28,6 +28,10 @@
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
+#if IS_USED(MODULE_DISP_DEV)
+#include "disp_dev.h"
+#endif
+
 #define ENABLE_DEBUG        0
 #include "debug.h"
 
@@ -206,3 +210,46 @@ void ltdc_fill(uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2, const uint16_
 
     LTDC->SRCR = LTDC_SRCR_IMR;
 }
+
+#if IS_USED(MODULE_DISP_DEV)
+static void _ltdc_map(const disp_dev_t *disp_dev, uint16_t x1, uint16_t x2,
+                  uint16_t y1, uint16_t y2, const uint16_t *color)
+{
+    (void)disp_dev;
+    ltdc_map(x1, x2, y1, y2, color);
+}
+
+static uint16_t _ltdc_height(const disp_dev_t *disp_dev)
+{
+    (void)disp_dev;
+    return LCD_SCREEN_HEIGHT;
+}
+
+static uint16_t _ltdc_width(const disp_dev_t *disp_dev)
+{
+    (void)disp_dev;
+
+    return LCD_SCREEN_WIDTH;
+}
+
+static uint8_t _ltdc_color_depth(const disp_dev_t *disp_dev)
+{
+    (void)disp_dev;
+    return 16;
+}
+
+static void _ltdc_set_invert(const disp_dev_t *disp_dev, bool invert)
+{
+    (void)disp_dev;
+    (void)invert;
+}
+
+const disp_dev_driver_t stm32_ltdc_disp_dev_driver = {
+    .map            = _ltdc_map,
+    .height         = _ltdc_height,
+    .width          = _ltdc_width,
+    .color_depth    = _ltdc_color_depth,
+    .set_invert     = _ltdc_set_invert,
+};
+
+#endif
