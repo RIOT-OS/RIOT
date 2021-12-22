@@ -293,7 +293,6 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
 ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
                       uint32_t timeout)
 {
-    uint8_t *data_ptr = data;
     struct pbuf *buf;
     ssize_t recvd = 0;
     ssize_t res = 0;
@@ -364,7 +363,7 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
         }
         buf_len = buf->tot_len - sock->last_offset;
         copylen = (buf_len > recv_left) ? (uint16_t)recv_left : buf_len;
-        pbuf_copy_partial(buf, data_ptr + recvd, copylen, sock->last_offset);
+        pbuf_copy_partial(buf, (uint8_t*)data + recvd, copylen, sock->last_offset);
         recvd += copylen;
         recv_left -= copylen; /* should be 0 at minimum due to copylen setting above */
 
