@@ -29,6 +29,10 @@ void auto_init_screen(void)
             extern void auto_init_ili9341(void);
             auto_init_ili9341();
         }
+        if (IS_USED(MODULE_PERIPH_LTDC)) {
+            extern void auto_init_periph_ltdc(void);
+            auto_init_periph_ltdc();
+        }
     }
 
     if (IS_USED(MODULE_TOUCH_DEV)) {
