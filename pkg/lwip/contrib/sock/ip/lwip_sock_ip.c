@@ -48,6 +48,7 @@ int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
         netconn_set_callback_arg(sock->base.conn, &sock->base);
 #endif
     }
+
     return res;
 }
 
@@ -88,6 +89,7 @@ static uint16_t _ip4_addr_to_netif(const ip4_addr_p_t *addr)
             }
         }
     }
+
     return SOCK_ADDR_ANY_NETIF;
 }
 #endif
@@ -111,6 +113,7 @@ static uint16_t _ip6_addr_to_netif(const ip6_addr_p_t *_addr)
         }
         UNLOCK_TCPIP_CORE();
     }
+
     return SOCK_ADDR_ANY_NETIF;
 }
 #endif
@@ -168,8 +171,10 @@ static int _parse_iphdr(struct netbuf *buf, void **data, void **ctx,
             netbuf_delete(buf);
             return -EPROTO;
     }
+
     *data = data_ptr;
     *ctx = buf;
+
     return (ssize_t)data_len;
 }
 
@@ -196,6 +201,7 @@ ssize_t sock_ip_recv_aux(sock_ip_t *sock, void *data, size_t max_len,
         ptr += res;
         ret += res;
     }
+
     return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
 }
 
@@ -209,6 +215,7 @@ ssize_t sock_ip_recv_buf_aux(sock_ip_t *sock, void **data, void **ctx,
 
     assert((sock != NULL) && (data != NULL) && (ctx != NULL));
     buf = *ctx;
+
     if (buf != NULL) {
         if (netbuf_next(buf) == -1) {
             *data = NULL;
@@ -221,17 +228,22 @@ ssize_t sock_ip_recv_buf_aux(sock_ip_t *sock, void **data, void **ctx,
             return buf->ptr->len;
         }
     }
+
     if ((res = lwip_sock_recv(sock->base.conn, timeout, &buf)) < 0) {
         return res;
     }
+
     sock_ip_ep_t *local = NULL;
+
 #if IS_USED(MODULE_SOCK_AUX_LOCAL)
     if (aux != NULL) {
         local = &aux->local;
         aux->flags &= ~(SOCK_AUX_GET_LOCAL);
     }
 #endif
+
     res = _parse_iphdr(buf, data, ctx, remote, local);
+
     return res;
 }
 
@@ -242,6 +254,7 @@ ssize_t sock_ip_send_aux(sock_ip_t *sock, const void *data, size_t len,
     (void)aux;
     assert((sock != NULL) || (remote != NULL));
     assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
+
     return lwip_sock_send(sock ? sock->base.conn : NULL, data, len, proto,
                           (struct _sock_tl_ep *)remote, NETCONN_RAW);
 }
