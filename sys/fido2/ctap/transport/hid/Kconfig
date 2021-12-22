@@ -4,13 +4,16 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-menuconfig KCONFIG_USEMODULE_FIDO2_CTAP_TRANSPORT_HID
-    bool "FIDO2 CTAP TRANSPORT HID"
-    depends on USEMODULE_FIDO2_CTAP_TRANSPORT_HID
+menuconfig MODULE_FIDO2_CTAP_TRANSPORT_HID
+    bool "FIDO2 CTAP transport HID"
+    depends on MODULE_FIDO2_CTAP_TRANSPORT
+    depends on TEST_KCONFIG
+    select MODULE_ISRPIPE
+    select MODULE_USBUS_HID
     help
         Configure a FIDO2 CTAP authenticator via KConfig.
 
-if KCONFIG_USEMODULE_FIDO2_CTAP_TRANSPORT_HID
+if MODULE_FIDO2_CTAP_TRANSPORT_HID
 
 config FIDO2_CTAP_TRANSPORT_HID_TRANSACTION_TIMEOUT
     int "CTAPHID Transaction timeout in milliseconds"
@@ -20,4 +23,4 @@ config FIDO2_CTAP_TRANSPORT_HID_TRANSACTION_TIMEOUT
         of time to prevent the authenticator from being locked by a
         stalling application.
 
-endif # KCONFIG_USEMODULE_FIDO2_CTAP_TRANSPORT_HID
+endif # MODULE_FIDO2_CTAP_TRANSPORT_HID
