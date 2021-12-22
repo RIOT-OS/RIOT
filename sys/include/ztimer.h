@@ -468,38 +468,16 @@ static inline ztimer_now_t ztimer_now(ztimer_clock_t *clock)
 /**
  * @brief   Get the time until a timer will trigger
  *
- * @param[in]   clock          ztimer clock to operate on
- * @param[in]   timer          ztimer to messuers to
+ *          O(n): iterate over all timers active on the clock until timer is reached.
+ *          n: being the timers active on the clock that are earlier to trigger
+ *             than the timer this is measuring to
  *
- * @return  Current time until the @p timer is trigger in clock units
+ * @param[in]   clock          ztimer clock to operate on
+ * @param[in]   timer          ztimer to measure
+ *
+ * @return  Current time until the @p timer will be triggered in clock units
  */
-static inline uint32_t ztimer_until(ztimer_clock_t *clock, ztimer_t *timer)
-{
-    unsigned state = irq_disable();
-
-#if ZTIMER_UNTIL_SAFTY_NET
-    if (!ztimer_is_set(clock, timer)){
-        irq_restore(state);
-        return 0;
-    }
-#endif
-    uint32_t sum = clock->list.offset;
-    ztimer_base_t *i = clock->list.next;
-    ztimer_base_t *timer_base = &timer->base;
-    for ( ; i && i != timer_base; i = i->next) {
-        sum += i->offset;
-    }
-    if (i == timer_base) {
-        sum += i->offset;
-        irq_restore(state);
-        uint32_t now = (uint32_t)ztimer_now(clock);
-        return (sum > now)?(sum - now):0;
-    }
-    else {
-        irq_restore(state);
-        return 0;
-    }
-}
+uint32_t ztimer_until(ztimer_clock_t *clock, ztimer_t *timer);
 
 /**
  * @brief Suspend the calling thread until the time (@p last_wakeup + @p period)
