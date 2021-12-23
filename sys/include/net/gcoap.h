@@ -71,7 +71,7 @@
  * Here is the expected sequence for a callback function:
  *
  * Read request completely and parse request payload, if any. Use the
- * coap_pkt_t _payload_ and _payload_len_ attributes.
+ * function gcoap_pkt_get_payload() for that.
  *
  * If there is a payload, follow the steps below.
  *
@@ -80,10 +80,9 @@
  *    coap_opt_add_format() for Content-Format of the payload. Options *must*
  *    be written in order by option number (see "CoAP option numbers" in
  *    [CoAP defines](group__net__coap.html)).
- * -# Call coap_opt_finish() to complete the PDU metadata. Retain the returned
+ * -# Call gcoap_opt_finish() to complete the PDU metadata. Retain the returned
  *    metadata length.
- * -# Write the response payload, starting at the updated _payload_ pointer
- *    in the coap_pkt_t, for up to _payload_len_ bytes.
+ * -# Write the response payload using gcoap_pkt_set_payload().
  * -# Return the sum of the metadata length and payload length. If some error
  *    has occurred, return a negative errno code from the handler, and gcoap
  *    will send a server error (5.00).
@@ -112,21 +111,20 @@
  *
  * Here is the expected sequence to prepare and send a request:
  *
- * Allocate a buffer and a coap_pkt_t for the request.
+ * Allocate a buffer and a gcoap_pkt_t for the request.
  *
  * If there is a payload, follow the steps below.
  *
  * -# Call gcoap_req_init() to initialize the request.
- * -# Optionally, mark the request confirmable by calling coap_hdr_set_type()
+ * -# Optionally, mark the request confirmable by calling gcoap_pkt_set_type()
  *    with COAP_TYPE_CON.
- * -# Use the coap_opt_add_xxx() functions to include any Options beyond
+ * -# Use the gcoap_opt_add_xxx() functions to include any Options beyond
  *    Uri-Path, which was added in the first step. Options *must* be written
  *    in order by option number (see "CoAP option numbers" in
  *    [CoAP defines](group__net__coap.html)).
- * -# Call coap_opt_finish() to complete the PDU metadata. Retain the returned
+ * -# Call gcoap_opt_finish() to complete the PDU metadata. Retain the returned
  *    metadata length.
- * -# Write the request payload, starting at the updated _payload_ pointer
- *    in the coap_pkt_t, for up to _payload_len_ bytes.
+ * -# Write the request payload, using gcoap_pkt_set_payload().
  *
  * If no payload, call only gcoap_request() to write the full request. If you
  * need to add Options, follow the first four steps in the list above instead.
@@ -146,8 +144,8 @@
  * -# Test for a server response or timeout in the `state` field of the `memo`
  *    callback parameter (`memo->state`). See the GCOAP_MEMO... constants.
  * -# Test the response with coap_get_code_class() and coap_get_code_detail().
- * -# Test the response payload with the coap_pkt_t _payload_len_ and
- *    _content_type_ attributes.
+ * -# Test the response payload with the gcoap_pkt_get_payload() and
+ *    gcoap_pkt_opt_get_content_format() functions.
  * -# Read the payload, if any.
  *
  * ## Observe Server Operation
@@ -651,6 +649,11 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   CoAP PDU parsing context structure (gCoAP version)
+ */
+typedef coap_pkt_t gcoap_pkt_t;
+
+/**
  * @brief   Context information required to write a resource link
  */
 typedef struct {
@@ -1058,12 +1061,12 @@ sock_dtls_t *gcoap_get_sock_dtls(void);
  * @name    Buffer manipulation
  * @{
  */
-static inline void *gcoap_pkt_get_buf(coap_pkt_t *pdu)
+static inline void *gcoap_pkt_get_buf(gcoap_pkt_t *pdu)
 {
     return pdu->hdr;
 }
 
-static inline void gcoap_pkt_set_buf(coap_pkt_t *pdu, void *buf)
+static inline void gcoap_pkt_set_buf(gcoap_pkt_t *pdu, void *buf)
 {
     pdu->hdr = buf;
 }
@@ -1073,7 +1076,7 @@ static inline void gcoap_pkt_set_buf(coap_pkt_t *pdu, void *buf)
  * @name    Header manipulation
  * @{
  */
-static inline int gcoap_pkt_parse(coap_pkt_t *pdu, uint8_t *buf, size_t len)
+static inline int gcoap_pkt_parse(gcoap_pkt_t *pdu, uint8_t *buf, size_t len)
 {
     return coap_parse(pdu, buf, len);
 }
@@ -1084,63 +1087,63 @@ static inline ssize_t gcoap_pkt_build_hdr(uint8_t *buf, unsigned type, uint8_t *
     return coap_build_hdr((coap_hdr_t *)buf, type, token, token_len, code, id);
 }
 
-static inline void gcoap_pkt_init(coap_pkt_t *pdu, uint8_t *buf, size_t buf_len, size_t hdr_len)
+static inline void gcoap_pkt_init(gcoap_pkt_t *pdu, uint8_t *buf, size_t buf_len, size_t hdr_len)
 {
     coap_pkt_init(pdu, buf, buf_len, hdr_len);
 }
 
-static inline unsigned gcoap_pkt_get_type(coap_pkt_t *pdu)
+static inline unsigned gcoap_pkt_get_type(gcoap_pkt_t *pdu)
 {
     return coap_get_type(pdu);
 }
 
-static inline void gcoap_pkt_set_type(coap_pkt_t *pdu, unsigned type)
+static inline void gcoap_pkt_set_type(gcoap_pkt_t *pdu, unsigned type)
 {
     coap_hdr_set_type(pdu->hdr, type);
 }
 
-static inline void gcoap_pkt_set_token_len(coap_pkt_t *pdu, uint8_t token_len)
+static inline void gcoap_pkt_set_token_len(gcoap_pkt_t *pdu, uint8_t token_len)
 {
     coap_set_token_len(pdu, token_len);
 }
 
-static inline unsigned gcoap_pkt_get_code_raw(coap_pkt_t *pdu)
+static inline unsigned gcoap_pkt_get_code_raw(gcoap_pkt_t *pdu)
 {
     return coap_get_code_raw(pdu);
 }
 
-static inline unsigned gcoap_pkt_get_code_class(coap_pkt_t *pdu)
+static inline unsigned gcoap_pkt_get_code_class(gcoap_pkt_t *pdu)
 {
     return coap_get_code_class(pdu);
 }
 
-static inline unsigned gcoap_pkt_get_code_detail(coap_pkt_t *pdu)
+static inline unsigned gcoap_pkt_get_code_detail(gcoap_pkt_t *pdu)
 {
     return coap_get_code_detail(pdu);
 }
 
-static inline void gcoap_pkt_set_code_raw(coap_pkt_t *pdu, uint8_t code)
+static inline void gcoap_pkt_set_code_raw(gcoap_pkt_t *pdu, uint8_t code)
 {
     coap_hdr_set_code(pdu->hdr, code);
 }
 
-static inline coap_method_flags_t gcoap_pkt_get_method_flag(coap_pkt_t *pdu)
+static inline coap_method_flags_t gcoap_pkt_get_method_flag(gcoap_pkt_t *pdu)
 {
     assert(coap_get_code_class(pdu) == COAP_CLASS_REQ);
     return coap_method2flag(coap_get_code_detail(pdu));
 }
 
-static inline uint16_t gcoap_pkt_get_id(coap_pkt_t *pdu)
+static inline uint16_t gcoap_pkt_get_id(gcoap_pkt_t *pdu)
 {
     return coap_get_id(pdu);
 }
 
-static inline bool gcoap_pkt_has_id(coap_pkt_t *pdu, uint16_t id)
+static inline bool gcoap_pkt_has_id(gcoap_pkt_t *pdu, uint16_t id)
 {
     return coap_get_id(pdu) == id;
 }
 
-static inline ssize_t gcoap_pkt_get_token(coap_pkt_t *pdu, uint8_t *token)
+static inline ssize_t gcoap_pkt_get_token(gcoap_pkt_t *pdu, uint8_t *token)
 {
     ssize_t res = coap_get_token_len(pdu);
     if (res > 0) {
@@ -1149,17 +1152,17 @@ static inline ssize_t gcoap_pkt_get_token(coap_pkt_t *pdu, uint8_t *token)
     return res;
 }
 
-static inline bool gcoap_pkt_has_token(coap_pkt_t *pdu, const uint8_t *token, size_t token_len)
+static inline bool gcoap_pkt_has_token(gcoap_pkt_t *pdu, const uint8_t *token, size_t token_len)
 {
     return (coap_get_token_len(pdu) == token_len) && (memcmp(pdu->token, token, token_len) == 0);
 }
 
-static inline unsigned gcoap_pkt_get_total_hdr_len(const coap_pkt_t *pkt)
+static inline unsigned gcoap_pkt_get_total_hdr_len(const gcoap_pkt_t *pkt)
 {
     return coap_get_total_hdr_len(pkt);
 }
 
-static inline uint8_t *gcoap_pkt_data_ptr(coap_pkt_t *pdu)
+static inline uint8_t *gcoap_pkt_data_ptr(gcoap_pkt_t *pdu)
 {
     return ((uint8_t *)pdu->hdr) + sizeof(coap_hdr_t);
 }
@@ -1172,111 +1175,111 @@ static inline uint8_t *gcoap_pkt_data_ptr(coap_pkt_t *pdu)
  * @ref net_coap_opt "option numbers" added.
  * @{
  */
-static inline int gcoap_pkt_opt_get_uint(coap_pkt_t *pdu, uint16_t optnum, uint32_t *value)
+static inline int gcoap_pkt_opt_get_uint(gcoap_pkt_t *pdu, uint16_t optnum, uint32_t *value)
 {
     return coap_opt_get_uint(pdu, optnum, value);
 }
 
-static inline ssize_t gcoap_pkt_opt_add_uint(coap_pkt_t *pdu, uint16_t optnum, uint32_t value)
+static inline ssize_t gcoap_pkt_opt_add_uint(gcoap_pkt_t *pdu, uint16_t optnum, uint32_t value)
 {
     return coap_opt_add_uint(pdu, optnum, value);
 }
 
-static inline int gcoap_pkt_opt_get_str(const coap_pkt_t *pdu, uint16_t optnum,
+static inline int gcoap_pkt_opt_get_str(const gcoap_pkt_t *pdu, uint16_t optnum,
                                         uint8_t *str, size_t max_len, char separator)
 {
     return coap_opt_get_string(pdu, optnum, str, max_len, separator);
 }
 
-static inline ssize_t coap_opt_add_str(coap_pkt_t *pdu, uint16_t optnum, const char *str,
+static inline ssize_t coap_opt_add_str(gcoap_pkt_t *pdu, uint16_t optnum, const char *str,
                                        size_t str_len, char separator)
 {
     return coap_opt_add_chars(pdu, optnum, str, str_len, separator);
 }
 
-static inline ssize_t gcoap_pkt_opt_get_opaque(coap_pkt_t *pdu, uint16_t optnum, uint8_t **val)
+static inline ssize_t gcoap_pkt_opt_get_opaque(gcoap_pkt_t *pdu, uint16_t optnum, uint8_t **val)
 {
     return coap_opt_get_opaque(pdu, optnum, val);
 }
 
-static inline ssize_t gcoap_pkt_opt_add_opaque(coap_pkt_t *pdu, uint16_t optnum, const uint8_t *val,
+static inline ssize_t gcoap_pkt_opt_add_opaque(gcoap_pkt_t *pdu, uint16_t optnum, const uint8_t *val,
                                                size_t val_len)
 {
     return coap_opt_add_opaque(pdu, optnum, val, val_len);
 }
 
-static inline bool gcoap_pkt_has_observe(coap_pkt_t *pdu)
+static inline bool gcoap_pkt_has_observe(gcoap_pkt_t *pdu)
 {
     return coap_has_observe(pdu);
 }
 
-static inline void gcoap_pkt_clear_observe(coap_pkt_t *pdu)
+static inline void gcoap_pkt_clear_observe(gcoap_pkt_t *pdu)
 {
     coap_clear_observe(pdu);
 }
 
-static inline uint32_t gcoap_pkt_get_observe(coap_pkt_t *pdu)
+static inline uint32_t gcoap_pkt_get_observe(gcoap_pkt_t *pdu)
 {
     return coap_get_observe(pdu);
 }
 
-static inline ssize_t gcoap_pkt_opt_add_observe(coap_pkt_t *pdu, uint32_t observe_value)
+static inline ssize_t gcoap_pkt_opt_add_observe(gcoap_pkt_t *pdu, uint32_t observe_value)
 {
     pdu->observe_value = observe_value & 0xFFFFFF;
     return coap_opt_add_uint(pdu, COAP_OPT_OBSERVE, pdu->observe_value);
 }
 
-static inline ssize_t gcoap_pkt_opt_get_location_path(const coap_pkt_t *pdu, char *path,
+static inline ssize_t gcoap_pkt_opt_get_location_path(const gcoap_pkt_t *pdu, char *path,
                                                       size_t max_len)
 {
     return coap_get_location_path(pdu, (uint8_t *)path, max_len);
 }
 
-static inline ssize_t gcoap_pkt_opt_add_location_path(coap_pkt_t *pdu, const char *path,
+static inline ssize_t gcoap_pkt_opt_add_location_path(gcoap_pkt_t *pdu, const char *path,
                                                       size_t path_len)
 {
     return coap_opt_add_chars(pdu, COAP_OPT_LOCATION_PATH, path, path_len, '/');
 }
 
-static inline ssize_t gcoap_pkt_opt_get_uri_path(const coap_pkt_t *pkt, char *path)
+static inline ssize_t gcoap_pkt_opt_get_uri_path(const gcoap_pkt_t *pkt, char *path)
 {
     return coap_get_uri_path(pkt, (uint8_t *)path);
 }
 
-static inline ssize_t gcoap_pkt_opt_add_uri_path(coap_pkt_t *pkt, const char *path, size_t path_len)
+static inline ssize_t gcoap_pkt_opt_add_uri_path(gcoap_pkt_t *pkt, const char *path, size_t path_len)
 {
     return coap_opt_add_uri_path_buffer(pkt, path, path_len);
 }
 
-static inline unsigned gcoap_pkt_opt_get_content_format(coap_pkt_t *pdu)
+static inline unsigned gcoap_pkt_opt_get_content_format(gcoap_pkt_t *pdu)
 {
     return coap_get_content_type(pdu);
 }
 
-static inline ssize_t gcoap_pkt_opt_add_content_format(coap_pkt_t *pdu, uint16_t format)
+static inline ssize_t gcoap_pkt_opt_add_content_format(gcoap_pkt_t *pdu, uint16_t format)
 {
     return coap_opt_add_format(pdu, format);
 }
 
-static inline ssize_t gcoap_pkt_opt_get_uri_query(const coap_pkt_t *pdu, char *query,
+static inline ssize_t gcoap_pkt_opt_get_uri_query(const gcoap_pkt_t *pdu, char *query,
                                                   size_t max_len)
 {
     return coap_opt_get_string(pdu, COAP_OPT_URI_QUERY, (uint8_t *)query, max_len, '&');
 }
 
-static inline ssize_t gcoap_pkt_opt_add_uri_query(coap_pkt_t *pdu, const char *key, size_t key_len,
+static inline ssize_t gcoap_pkt_opt_add_uri_query(gcoap_pkt_t *pdu, const char *key, size_t key_len,
                                                   const char *value, size_t value_len)
 {
     return coap_opt_add_uri_query2(pdu, key, key_len, value, value_len);
 }
 
-static inline ssize_t gcoap_pkt_opt_add_uri_query_str(coap_pkt_t *pdu, const char *key,
+static inline ssize_t gcoap_pkt_opt_add_uri_query_str(gcoap_pkt_t *pdu, const char *key,
                                                       const char *value)
 {
     return coap_opt_add_uri_query(pdu, key, value);
 }
 
-static inline unsigned gcoap_pkt_opt_get_accept(coap_pkt_t *pdu)
+static inline unsigned gcoap_pkt_opt_get_accept(gcoap_pkt_t *pdu)
 {
     uint32_t ret;
 
@@ -1286,37 +1289,37 @@ static inline unsigned gcoap_pkt_opt_get_accept(coap_pkt_t *pdu)
     return ret;
 }
 
-static inline ssize_t gcoap_pkt_opt_add_accept(coap_pkt_t *pdu, uint16_t format)
+static inline ssize_t gcoap_pkt_opt_add_accept(gcoap_pkt_t *pdu, uint16_t format)
 {
     return coap_opt_add_accept(pdu, format);
 }
 
-static inline int gcoap_pkt_opt_get_block1(coap_pkt_t *pdu, coap_block1_t *block)
+static inline int gcoap_pkt_opt_get_block1(gcoap_pkt_t *pdu, coap_block1_t *block)
 {
     return coap_get_block1(pdu, block);
 }
 
-static inline ssize_t gcoap_pkt_opt_add_block1(coap_pkt_t *pdu, coap_block1_t *block)
+static inline ssize_t gcoap_pkt_opt_add_block1(gcoap_pkt_t *pdu, coap_block1_t *block)
 {
     return coap_opt_add_block1_control(pdu, block);
 }
 
-static inline int gcoap_pkt_opt_get_block2(coap_pkt_t *pdu, coap_block1_t *block)
+static inline int gcoap_pkt_opt_get_block2(gcoap_pkt_t *pdu, coap_block1_t *block)
 {
     return coap_get_block2(pdu, block);
 }
 
-static inline ssize_t gcoap_pkt_opt_add_block2(coap_pkt_t *pdu, coap_block1_t *block)
+static inline ssize_t gcoap_pkt_opt_add_block2(gcoap_pkt_t *pdu, coap_block1_t *block)
 {
     return coap_opt_add_block2_control(pdu, block);
 }
 
-static inline ssize_t gcoap_pkt_opt_get_proxy_uri(coap_pkt_t *pdu, char **uri)
+static inline ssize_t gcoap_pkt_opt_get_proxy_uri(gcoap_pkt_t *pdu, char **uri)
 {
     return coap_get_proxy_uri(pdu, uri);
 }
 
-static inline ssize_t gcoap_pkt_opt_add_proxy_uri(coap_pkt_t *pdu, const char *uri)
+static inline ssize_t gcoap_pkt_opt_add_proxy_uri(gcoap_pkt_t *pdu, const char *uri)
 {
     return coap_opt_add_proxy_uri(pdu, uri);
 }
@@ -1326,18 +1329,20 @@ static inline ssize_t gcoap_pkt_opt_add_proxy_uri(coap_pkt_t *pdu, const char *u
  * @name Payload manipulation
  * @{
  */
-static inline ssize_t gcoap_pkt_finish(coap_pkt_t *pdu)
+static inline ssize_t gcoap_pkt_finish(gcoap_pkt_t *pdu)
 {
     return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 }
 
-static inline ssize_t gcoap_pkt_get_payload(coap_pkt_t *pdu, uint8_t **payload)
+static inline ssize_t gcoap_pkt_get_payload(gcoap_pkt_t *pdu, uint8_t **payload)
 {
-    *payload = pdu->payload;
+    if (payload) {
+        *payload = pdu->payload;
+    }
     return pdu->payload_len;
 }
 
-static inline ssize_t gcoap_pkt_set_payload(coap_pkt_t *pdu, uint8_t *payload, size_t payload_len)
+static inline ssize_t gcoap_pkt_set_payload(gcoap_pkt_t *pdu, uint8_t *payload, size_t payload_len)
 {
     ssize_t res = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
     if ((res < 0) || (pdu->payload_len < payload_len)) {
