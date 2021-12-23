@@ -1058,14 +1058,14 @@ sock_dtls_t *gcoap_get_sock_dtls(void);
  * @name    Buffer manipulation
  * @{
  */
-static inline uint8_t *gcoap_pkt_get_buf(coap_pkt_t *pdu)
+static inline void *gcoap_pkt_get_buf(coap_pkt_t *pdu)
 {
-    return (uint8_t *)pdu->hdr;
+    return pdu->hdr;
 }
 
-static inline void gcoap_pkt_set_buf(coap_pkt_t *pdu, uint8_t *buf)
+static inline void gcoap_pkt_set_buf(coap_pkt_t *pdu, void *buf)
 {
-    pdu->hdr = (coap_hdr_t *)buf;
+    pdu->hdr = buf;
 }
 /** @} */
 
@@ -1151,7 +1151,7 @@ static inline ssize_t gcoap_pkt_get_token(coap_pkt_t *pdu, uint8_t *token)
 
 static inline bool gcoap_pkt_has_token(coap_pkt_t *pdu, const uint8_t *token, size_t token_len)
 {
-    return (coap_get_token_len(pdu) == token_len) && (memcmp(pdu, token, token_len) == 0);
+    return (coap_get_token_len(pdu) == token_len) && (memcmp(pdu->token, token, token_len) == 0);
 }
 
 static inline unsigned gcoap_pkt_get_total_hdr_len(const coap_pkt_t *pkt)
