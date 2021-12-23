@@ -8,6 +8,7 @@
 
 /**
  * @defgroup    boards_common_microbit Common microbit LED handling
+ * @ingroup     boards_common
  * @{
  *
  * @file
