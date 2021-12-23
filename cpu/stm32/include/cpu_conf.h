@@ -67,6 +67,7 @@
 #elif CPU_FAM_STM32U5
 #include "stm32u5xx.h"
 #include "irqs/u5/irqs.h"
+#define NUM_HEAPS   2
 #elif CPU_FAM_STM32WB
 #include "stm32wbxx.h"
 #include "irqs/wb/irqs.h"

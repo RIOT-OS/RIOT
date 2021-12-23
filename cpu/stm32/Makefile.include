@@ -61,6 +61,9 @@ info-stm32:
 ifneq (,$(CCMRAM_LEN))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ccmram_length=$(CCMRAM_LEN)
 endif
+ifneq (,$(SRAM4_LEN))
+  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_sram4_length=$(SRAM4_LEN)
+endif
 
 VECTORS_O ?= $(BINDIR)/stm32_vectors/$(CPU_LINE).o
 VECTORS_FILE = $(RIOTCPU)/stm32/vectors/$(CPU_LINE).c
