@@ -5,11 +5,4 @@
 # directory for more details.
 #
 
-config APPLICATION
-    bool
-    default y
-    imply MODULE_ATWINC15X0
-    imply DRIVER_NETDEV_COMMON
-    depends on TEST_KCONFIG
-
-rsource "../driver_netdev_common/Kconfig.netdev"
+rsource "../driver_netdev_common/Kconfig"

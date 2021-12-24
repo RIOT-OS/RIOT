@@ -1,0 +1,4 @@
+# this file enables modules defined in Kconfig. Do not use this file for
+# application configuration. This is only needed during migration.
+CONFIG_DRIVER_NETDEV_COMMON=y
+CONFIG_MODULE_ATWINC15X0=y
