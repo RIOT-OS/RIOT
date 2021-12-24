@@ -5,10 +5,25 @@
 # directory for more details.
 #
 
-config APPLICATION
+config DRIVER_NETDEV_COMMON
     bool
-    default y
-    select DRIVER_NETDEV_COMMON
-    depends on TEST_KCONFIG
+    default y if TEST_KCONFIG
 
-rsource "Kconfig.netdev"
+    # Modules to include:
+    select MODULE_SHELL
+    select MODULE_SHELL_COMMANDS
+    select MODULE_PS
+
+    # gnrc is a meta module including all required, basic gnrc networking modules
+    select MODULE_GNRC
+
+    # automatically initialize the network interface
+    select MODULE_AUTO_INIT_GNRC_NETIF
+
+    # shell command to send L2 packets with a simple string
+    select MODULE_GNRC_TXTSND
+
+    # the application dumps received packets to stdout
+    select MODULE_GNRC_PKTDUMP
+
+    # TODO: parameters defined in default-radio-settings.inc.mk
