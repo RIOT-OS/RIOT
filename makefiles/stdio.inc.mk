@@ -17,6 +17,7 @@ endif
 ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
   USEMODULE += usbus_cdc_acm
   USEMODULE += isrpipe
+  USEMODULE += stdio_available
 endif
 
 ifneq (,$(filter stdio_rtt,$(USEMODULE)))

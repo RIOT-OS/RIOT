@@ -58,5 +58,6 @@ config MODULE_STDIO_CDC_ACM
     bool "CDC ACM"
     depends on MODULE_USBUS_CDC_ACM
     select MODULE_ISRPIPE
+    select MODULE_STDIO_AVAILABLE
 
 endchoice
