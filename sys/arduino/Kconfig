@@ -34,3 +34,8 @@ config MODULE_ARDUINO_PWM
     depends on MODULE_ARDUINO
     depends on TEST_KCONFIG
     select MODULE_PERIPH_PWM
+
+config MODULE_ARDUINO_SERIAL_STDIO
+    bool "Use STDIO as Serial"
+    depends on MODULE_ARDUINO
+    depends on TEST_KCONFIG

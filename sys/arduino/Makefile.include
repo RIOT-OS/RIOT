@@ -26,3 +26,4 @@ INCLUDES += -I$(RIOTBASE)/sys/arduino/include
 CXXEXFLAGS += -std=c++11
 
 PSEUDOMODULES += arduino_pwm
+PSEUDOMODULES += arduino_serial_stdio

@@ -22,8 +22,14 @@ extern "C" {
 #include <string.h>
 #include <stdio.h>
 
+#include "assert.h"
 #include "fmt.h"
 #include "irq.h"
+#include "kernel_defines.h"
+
+#if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+#include "stdio_base.h"
+#endif
 }
 
 #include "serialport.hpp"
@@ -36,11 +42,23 @@ void rx_cb(void *arg, uint8_t c)
 
 SerialPort::SerialPort(uart_t dev)
 {
+#if !IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+    assert(dev != UART_UNDEF);
+#endif
     this->dev = dev;
 }
 
 int SerialPort::available(void)
 {
+#if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+    if (this->dev == UART_UNDEF) {
+#if IS_USED(MODULE_STDIO_AVAILABLE)
+        return stdio_available();
+#else /* IS_USED(MODULE_STDIO_AVAILABLE) */
+        return 0;
+#endif /* IS_USED(MODULE_STDIO_AVAILABLE) */
+    }
+#endif /* IS_USED(MODULE_ARDUINO_SERIAL_STDIO) */
     return (int)rx_buf.avail;
 }
 
@@ -48,11 +66,21 @@ void SerialPort::begin(long baudrate)
 {
     /* this clears the contents of the ringbuffer... */
     ringbuffer_init(&rx_buf, rx_mem, SERIAL_RX_BUFSIZE);
+#if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+    if (this->dev == UART_UNDEF) {
+        return;
+    }
+#endif
     uart_init(dev, (uint32_t)baudrate, rx_cb, (void *)&rx_buf);
 }
 
 void SerialPort::end(void)
 {
+#if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+    if (this->dev == UART_UNDEF) {
+        return;
+    }
+#endif
     uart_poweroff(dev);
 }
 
@@ -252,6 +280,16 @@ int SerialPort::read(void)
     int res = -1;
 
     irq_disable();
+#if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+    if (this->dev == UART_UNDEF) {
+        char chr;
+        if (this->available()) {
+            res = (stdio_read((void *)&chr, 1) == 1) ? chr : -1;
+        }
+        irq_enable();
+        return res;
+    }
+#endif
     if (rx_buf.avail > 0) {
         res = ringbuffer_get_one(&rx_buf);
     }
@@ -262,18 +300,36 @@ int SerialPort::read(void)
 
 int SerialPort::write(int val)
 {
+#if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+    if (this->dev == UART_UNDEF) {
+        stdio_write((const void *)&val, 1);
+        return 1;
+    }
+#endif
     uart_write(dev, (uint8_t *)&val, 1);
     return 1;
 }
 
 int SerialPort::write(const char *str)
 {
+#if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+    if (this->dev == UART_UNDEF) {
+        stdio_write((const void *)str, strlen(str));
+        return strlen(str);
+    }
+#endif
     uart_write(dev, (uint8_t *)str, strlen(str));
     return strlen(str);
 }
 
 int SerialPort::write(char *buf, int len)
 {
+#if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+    if (this->dev == UART_UNDEF) {
+        stdio_write((const void *)buf, len);
+        return len;
+    }
+#endif
     uart_write(dev, (uint8_t *)buf, len);
     return len;
 }
