@@ -37,6 +37,7 @@ endif
 ifneq (,$(filter stdio_uart_rx,$(USEMODULE)))
   USEMODULE += isrpipe
   USEMODULE += stdio_uart
+  USEMODULE += stdio_available
 endif
 
 ifneq (,$(filter stdio_uart,$(USEMODULE)))

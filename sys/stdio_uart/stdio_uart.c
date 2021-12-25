@@ -67,6 +67,13 @@ void stdio_init(void)
 #endif
 }
 
+#if IS_USED(MODULE_STDIO_AVAILABLE)
+int stdio_available(void)
+{
+    return tsrb_avail(&stdio_uart_isrpipe.tsrb);
+}
+#endif
+
 ssize_t stdio_read(void* buffer, size_t count)
 {
 #ifdef MODULE_STDIO_UART_RX
