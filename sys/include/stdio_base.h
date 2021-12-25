@@ -25,6 +25,8 @@
 
 #include <unistd.h>
 
+#include "kernel_defines.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -33,6 +35,18 @@ extern "C" {
  * @brief initialize the module
  */
 void stdio_init(void);
+
+#if IS_USED(MODULE_STDIO_AVAILABLE) || DOXYGEN
+/**
+ * @brief   Get the number of bytes available for reading from stdio.
+ *
+ * @warning This function is only available if the implementation supports
+ *          it and the @c stdio_available module is enabled.
+ *
+ * @return  number of available bytes
+ */
+int stdio_available(void);
+#endif
 
 /**
  * @brief read @p len bytes from stdio uart into @p buffer

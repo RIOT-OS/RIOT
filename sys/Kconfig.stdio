@@ -53,6 +53,11 @@ config MODULE_STDIO_UART_RX
     help
         Reception when using UART-based STDIO needs to be enabled.
 
+config MODULE_STDIO_AVAILABLE
+    bool
+    help
+        Indicates that the implementation supports function stdio_available
+
 config MODULE_PRINTF_FLOAT
     bool "Float support in printf"
 
