@@ -10,6 +10,9 @@ ifneq (,$(filter arduino,$(USEMODULE)))
   USEMODULE += fmt
   USEMODULE += ztimer_usec
   USEMODULE += ztimer_msec
+  ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
+    USEMODULE += arduino_serial_stdio
+  endif
 endif
 
 ifneq (,$(filter arduino_pwm,$(FEATURES_USED)))

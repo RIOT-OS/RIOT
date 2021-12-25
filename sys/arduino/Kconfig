@@ -39,3 +39,4 @@ config MODULE_ARDUINO_SERIAL_STDIO
     bool "Use STDIO as Serial"
     depends on MODULE_ARDUINO
     depends on TEST_KCONFIG
+    default y if MODULE_STDIO_CDC_ACM
