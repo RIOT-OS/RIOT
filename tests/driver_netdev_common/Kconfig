@@ -27,3 +27,91 @@ config DRIVER_NETDEV_COMMON
     select MODULE_GNRC_PKTDUMP
 
     # TODO: parameters defined in default-radio-settings.inc.mk
+
+# the following is just for testing and is removed before merge
+
+config MODULE_NETOPT
+    bool
+
+config MODULE_NETDEV
+    bool
+
+config MODULE_NETDEV_REGISTER
+    bool
+
+config MODULE_NETDEV_ETH
+    bool
+    select MODULE_EUI_PROVIDER
+    select MODULE_NETDEV
+    select MODULE_NETDEV_REGISTER if !MODULE_GNRC_NETIF_SINGLE
+
+config MODULE_AUTO_INIT_GNRC_NETIF
+    bool
+
+config MODULE_AUTO_INIT_GNRC_PKTBUF
+    bool
+
+config MODULE_AUTO_INIT_GNRC_PKTDUMP
+    bool
+
+config MODULE_GNRC
+    bool
+    select MODULE_GNRC_NETAPI
+    select MODULE_GNRC_NETIF_ETHERNET if MODULE_NETDEV_ETH
+    select MODULE_GNRC_NETREG
+    select MODULE_GNRC_NETIF
+    select MODULE_GNRC_NETIF_HDR
+    select MODULE_GNRC_PKTBUF
+
+config MODULE_GNRC_NETAPI
+    bool
+
+config MODULE_GNRC_NETREG
+    bool
+
+config MODULE_GNRC_NETIF
+    bool
+    select MODULE_NETIF
+    select MODULE_L2UTIL
+    select MODULE_FMT
+
+config MODULE_GNRC_NETIF_ETHERNET
+    bool
+    select MODULE_NETIF
+
+config MODULE_GNRC_NETIF_HDR
+    bool
+
+config MODULE_GNRC_NETIF_INIT_DEVS
+    bool
+    default y if MODULE_AUTO_INIT_GNRC_NETIF
+
+config MODULE_GNRC_PKT
+    bool
+
+config MODULE_GNRC_PKTBUF
+    bool
+    select MODULE_GNRC_PKTBUF_STATIC
+    select MODULE_AUTO_INIT_GNRC_PKTBUF
+    select MODULE_GNRC_PKT
+
+config MODULE_GNRC_PKTBUF_STATIC
+    bool
+
+config MODULE_GNRC_PKTDUMP
+    bool
+    select MODULE_AUTO_INIT_GNRC_PKTDUMP
+    select MODULE_OD
+    select MODULE_GNRC_PKTBUF
+
+config MODULE_GNRC_TXTSND
+    bool
+
+config MODULE_L2UTIL
+    bool
+
+config MODULE_NETIF
+    bool
+
+config MODULE_OD
+    bool
