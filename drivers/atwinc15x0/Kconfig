@@ -28,15 +28,26 @@ if MODULE_ATWINC15X0
 
 config WIFI_SSID
     string "WiFi SSID"
-    default "my_ssid"
+    default "RIOT_AP"
     help
-        SSID of the AP to be used.
+        SSID of the AP to be used. The SSID must not contain more
+        than 32 characters.
+
+config WIFI_USE_WPA2
+        bool "Use WPA2 authentication"
+        default n
+        help
+            Specify whether WPA2 authentication is used to connect to the
+            AP. If WPA2 authentication is enabled, the passphrase has to be
+            defined.
 
 config WIFI_PASS
-    string "WiFi passphrase"
-    default "my_pass"
-    help
-        Passphrase used for the AP as clear text (max. 64 chars).
+        string "Passphrase for WPA2 Personal Mode authentication"
+        depends on WIFI_USE_WPA2
+        default "This is RIOT-OS"
+        help
+            The passphrase is defined as a clear text string with a maximum
+            of 64 characters. It is used for WPA2 personal mode authentication.
 
 endif # MODULE_ATWINC15X0
 

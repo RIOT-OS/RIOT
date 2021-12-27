@@ -29,23 +29,21 @@ extern "C" {
  * @brief   SSID of the AP to be used.
  */
 #ifndef WIFI_SSID
-#ifdef CONFIG_WIFI_SSID
-#define WIFI_SSID       CONFIG_WIFI_SSID
-#else /* CONFIG_WIFI_SSID */
+#ifndef CONFIG_WIFI_SSID
 #define WIFI_SSID       "RIOT_AP"
+#else /* CONFIG_WIFI_SSID */
+#define WIFI_SSID       CONFIG_WIFI_SSID
 #endif /* CONFIG_WIFI_SSID */
 #endif /* WIFI_SSID */
 
 /**
  * @brief   Passphrase used for the AP as clear text (max. 64 chars).
  */
-#ifndef WIFI_PASS
-#ifdef CONFIG_WIFI_PATH
-#define WIFI_PASS       CONFIG_WIFI_PATH
-#else /* CONFIG_WIFI_PATH */
+#if DOXYGEN
 #define WIFI_PASS       "This is RIOT-OS"
-#endif /* CONFIG_WIFI_PATH */
-#endif /* WIFI_PASS */
+#elif defined(CONFIG_WIFI_PASS)
+#define WIFI_PASS       CONFIG_WIFI_PASS
+#endif
 
 /**
  * @name    Set default configuration parameters
