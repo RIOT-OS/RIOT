@@ -27,6 +27,8 @@ extern "C" {
 
 /**
  * @brief   SSID of the AP to be used.
+ *
+ * The SSID must not contain more than 32 characters.
  */
 #ifndef WIFI_SSID
 #ifndef CONFIG_WIFI_SSID
@@ -38,6 +40,12 @@ extern "C" {
 
 /**
  * @brief   Passphrase used for the AP as clear text (max. 64 chars).
+ *
+ * The passphrase is defined as a clear text string with a maximum
+ * of 64 characters. It is used for WPA2 personal mode authentication.
+ *
+ * If passphrase is not defined, an "open" AP without WPA2 authentication is
+ * used.
  */
 #if DOXYGEN
 #define WIFI_PASS       "This is RIOT-OS"
