@@ -52,6 +52,10 @@ ifneq (,$(filter ethos_%,$(USEMODULE)))
   USEMODULE += ethos
 endif
 
+ifneq (,$(filter ft6% ft5% ft3%,$(USEMODULE)))
+  USEMODULE += ft5x06
+endif
+
 ifneq (,$(filter hmc5883l_%,$(USEMODULE)))
   USEMODULE += hmc5883l
 endif

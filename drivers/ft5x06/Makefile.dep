@@ -1,0 +1,5 @@
+FEATURES_REQUIRED += periph_gpio_irq
+FEATURES_REQUIRED += periph_i2c
+
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
