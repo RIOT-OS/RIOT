@@ -41,6 +41,10 @@ void auto_init_screen(void)
             extern void auto_init_stmpe811(void);
             auto_init_stmpe811();
         }
+        if (IS_USED(MODULE_FT5X06)) {
+            extern void auto_init_ft5x06(void);
+            auto_init_ft5x06();
+        }
     }
 
     if (IS_USED(MODULE_LVGL)) {
