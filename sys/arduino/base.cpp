@@ -32,6 +32,7 @@ extern "C" {
 
 void pinMode(int pin, int mode)
 {
+    assert(gpio_is_valid(arduino_pinmap[pin]));
     gpio_mode_t m = GPIO_OUT;
 
     if (mode == INPUT) {
@@ -46,11 +47,13 @@ void pinMode(int pin, int mode)
 
 void digitalWrite(int pin, int state)
 {
+    assert(gpio_is_valid(arduino_pinmap[pin]));
     gpio_write(arduino_pinmap[pin], state);
 }
 
 int digitalRead(int pin)
 {
+    assert(gpio_is_valid(arduino_pinmap[pin]));
     if (gpio_read(arduino_pinmap[pin])) {
         return HIGH;
     }
