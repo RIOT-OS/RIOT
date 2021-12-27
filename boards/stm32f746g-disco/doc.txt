@@ -28,7 +28,7 @@ Current hardware support:
 | USB OTG FS | X |  |
 | USB OTG HS | - |  |
 | TFT LCD | X |  |
-| Capacitive touch screen | - | |
+| Capacitive touch screen | X | |
 | User microphones | - | |
 | External Quad-SPI Flash | - | |
 | External SDRAM | - | |
