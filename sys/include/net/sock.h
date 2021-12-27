@@ -319,6 +319,12 @@ enum {
      * @ref sock_dtls_aux_tx_t::local.
      */
     SOCK_AUX_SET_LOCAL = (1LU << 3),
+    /**
+     * @brief   Just peek data and keep it for later use
+     *
+     * @note    Currently only supported for lwIP!
+     */
+    SOCK_AUX_PEEK = (1LU << 4),
 };
 
 /**

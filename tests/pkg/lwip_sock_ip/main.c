@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
+ * Copyright (C) 2021 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +14,7 @@
  * @brief       Test for raw IP socks
  *
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
+ * @author      Hendrik van Essen <hendrik.ve@fu-berlin.de>
  * @}
  */
 
@@ -348,6 +349,34 @@ static void test_sock_ip_recv_buf4__success(void)
     expect(0 == sock_ip_recv_buf(&_sock, &data, &ctx, SOCK_NO_TIMEOUT, NULL));
     expect(data == NULL);
     expect(ctx == NULL);
+    expect(_check_net());
+}
+
+static void test_sock_ip_peek4__success(void)
+{
+    static const sock_ip_ep_t local = { .family = AF_INET };
+    static const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+                                         .family = AF_INET };
+    sock_ip_aux_rx_t aux = { .flags = SOCK_AUX_PEEK };
+
+    expect(0 == sock_ip_create(&_sock, &local, &remote, _TEST_PROTO,
+                               SOCK_FLAGS_REUSE_EP));
+    expect(_inject_4packet(_TEST_ADDR4_REMOTE, _TEST_ADDR4_LOCAL, _TEST_PROTO, "ABCD",
+                           sizeof("ABCD"), _TEST_NETIF));
+
+    for (ssize_t i = 1; i <= (ssize_t)sizeof("ABCD"); i++) {
+        expect(aux.flags & SOCK_AUX_PEEK);
+        expect(i == sock_ip_recv_aux(&_sock, _test_buffer, i, 0, NULL, &aux));
+        expect(!(aux.flags & SOCK_AUX_PEEK));
+        aux.flags = SOCK_AUX_PEEK;
+    }
+
+    expect(sizeof("ABCD") == sock_ip_recv(&_sock, _test_buffer,
+                                          sizeof(_test_buffer), 0, NULL));
+
+    expect(-EAGAIN == sock_ip_recv(&_sock, _test_buffer, sizeof(_test_buffer),
+                                   0, NULL));
+
     expect(_check_net());
 }
 
@@ -922,6 +951,36 @@ static void test_sock_ip_recv_buf6__success(void)
     expect(_check_net());
 }
 
+static void test_sock_ip_peek6__success(void)
+{
+    static const ipv6_addr_t src_addr = { .u8 = _TEST_ADDR6_REMOTE };
+    static const ipv6_addr_t dst_addr = { .u8 = _TEST_ADDR6_LOCAL };
+    static const sock_ip_ep_t local = { .family = AF_INET6 };
+    static const sock_ip_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR6_REMOTE },
+                                         .family = AF_INET6 };
+    sock_ip_aux_rx_t aux = { .flags = SOCK_AUX_PEEK };
+
+    expect(0 == sock_ip_create(&_sock, &local, &remote, _TEST_PROTO,
+                               SOCK_FLAGS_REUSE_EP));
+    expect(_inject_6packet(&src_addr, &dst_addr, _TEST_PROTO, "ABCD",
+                           sizeof("ABCD"), _TEST_NETIF));
+
+    for (ssize_t i = 1; i <= (ssize_t)sizeof("ABCD"); i++) {
+        expect(aux.flags & SOCK_AUX_PEEK);
+        expect(i == sock_ip_recv_aux(&_sock, _test_buffer, i, 0, NULL, &aux));
+        expect(!(aux.flags & SOCK_AUX_PEEK));
+        aux.flags = SOCK_AUX_PEEK;
+    }
+
+    expect(sizeof("ABCD") == sock_ip_recv(&_sock, _test_buffer,
+                                          sizeof(_test_buffer), 0, NULL));
+
+    expect(-EAGAIN == sock_ip_recv(&_sock, _test_buffer, sizeof(_test_buffer),
+                                   0, NULL));
+
+    expect(_check_net());
+}
+
 static void test_sock_ip_send6__EAFNOSUPPORT(void)
 {
     static const sock_ip_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR6_REMOTE },
@@ -1220,6 +1279,7 @@ int main(void)
     CALL(test_sock_ip_recv4__non_blocking());
     CALL(test_sock_ip_recv4__aux());
     CALL(test_sock_ip_recv_buf4__success());
+    CALL(test_sock_ip_peek4__success());
     _prepare_send_checks();
     CALL(test_sock_ip_send4__EAFNOSUPPORT());
     CALL(test_sock_ip_send4__EINVAL_addr());
@@ -1266,6 +1326,7 @@ int main(void)
     CALL(test_sock_ip_recv6__non_blocking());
     CALL(test_sock_ip_recv6__aux());
     CALL(test_sock_ip_recv_buf6__success());
+    CALL(test_sock_ip_peek6__success());
     _prepare_send_checks();
     CALL(test_sock_ip_send6__EAFNOSUPPORT());
     CALL(test_sock_ip_send6__EINVAL_addr());
