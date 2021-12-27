@@ -335,7 +335,7 @@ get_supported_boards() {
     for board in $boards
     do
         echo $board
-    done | $(_greplist $BOARDS)
+    done | $(_greplist $BOARDS) | sed 's/esp8266-esp-12x//' | sed 's/esp8266-olimex-mod//' | sed 's/esp8266-sparkfun-thing//'
 }
 
 get_supported_toolchains() {
