@@ -303,6 +303,12 @@ enum {
      * @ref sock_dtls_aux_rx_t::rssi.
      */
     SOCK_AUX_GET_RSSI = (1LU << 2),
+    /**
+     * @brief   Just peek data and keep it for later use
+     *
+     * @note    Currently only supported for lwIP!
+     */
+    SOCK_AUX_PEEK = (1LU << 3),
 };
 
 /**
