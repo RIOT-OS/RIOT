@@ -319,6 +319,13 @@ void stdio_init(void)
                          _send_stdout, NULL);
 }
 
+#if IS_USED(MODULE_STDIO_AVAILABLE)
+int stdio_available(void)
+{
+    return tsrb_avail(&_isrpipe_stdin.tsrb);
+}
+#endif
+
 ssize_t stdio_read(void *buffer, size_t count)
 {
     /* blocks until at least one character was read */

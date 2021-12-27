@@ -31,6 +31,7 @@ ifneq (,$(filter stdio_ethos,$(USEMODULE)))
 endif
 
 ifneq (,$(filter stdio_nimble,$(USEMODULE)))
+  USEMODULE += stdio_available
   USEPKG += nimble
   USEMODULE += tsrb
   USEMODULE += isrpipe
