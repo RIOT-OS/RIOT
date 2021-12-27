@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # uncomment and change this to limit builds, e.g.,
-#export BOARDS="samr21-xpro native"
+export BOARDS="esp8266-olimex-mod"
 # and / or
 #export APPS="examples/hello-world tests/unittests"
 
@@ -335,7 +335,7 @@ get_supported_boards() {
     for board in $boards
     do
         echo $board
-    done | $(_greplist $BOARDS) | sed 's/esp8266-esp-12x//' | sed 's/esp8266-olimex-mod//' | sed 's/esp8266-sparkfun-thing//'
+    done | $(_greplist $BOARDS) 
 }
 
 get_supported_toolchains() {
