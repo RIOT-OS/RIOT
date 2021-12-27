@@ -90,6 +90,9 @@ struct lwip_sock_base {
  */
 struct sock_ip {
     lwip_sock_base_t base;          /**< parent class */
+    mutex_t mutex;                  /**< Mutex to protect the sock */
+    struct netbuf *last_buf;        /**< Last received data */
+    bool peek_buf_avail;            /**< Whether there is a buffer left from a previous peek operation */
 };
 
 /**
