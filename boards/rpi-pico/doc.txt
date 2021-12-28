@@ -114,7 +114,7 @@ make BOARD=rpi-pico PROGRAMMER=jlink flash
 
 ## Accesing RIOT shell
 
-This board's default access to RIOT shell is via UART (UART0 TX - pin 1, UART0 RX - pin 2). 
+This board's default access to RIOT shell is via UART (UART0 TX - pin 1, UART0 RX - pin 2).
 
 The default baud rate is 115 200.
 
