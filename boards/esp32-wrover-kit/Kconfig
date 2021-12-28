@@ -21,6 +21,19 @@ config BOARD_ESP32_WROVER_KIT
     select HAS_PERIPH_SPI
     select HAS_SDCARD_SPI
 
-    select HAVE_ILI9341
+    select HAVE_ILI9341 if !MODULE_ESP32_WROVER_KIT_CAMERA
+
+menu "ESP32 WROVER-KIT options"
+    depends on TEST_KCONFIG
+    depends on BOARD_ESP32_WROVER_KIT
+
+    config MODULE_ESP32_WROVER_KIT_CAMERA
+        bool "OV7670 Camera Interface used"
+        help
+            ESP-WROVER-KIT has a separate OV7670 camera interface. If it is
+            used a number of GPIOs and other peripherals are not available.
+            Select whether the camera interface is used.
+
+endmenu
 
 source "$(RIOTBOARD)/common/esp32/Kconfig"

@@ -11,13 +11,6 @@ config BOARD
 config BOARD_ESP32_ETHERNET_KIT_V1_0
     bool
     default y
-    select BOARD_COMMON_ESP32
-    select CPU_MODEL_ESP32_WROVER_B
-    select HAS_ESP_JTAG
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_ETH
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_SPI if !MODULE_ESP_JTAG
+    select BOARD_ESP32_ETHERNET_KIT
 
-source "$(RIOTBOARD)/common/esp32/Kconfig"
+rsource "Kconfig.esp32-ethernet-kit"

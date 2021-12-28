@@ -65,7 +65,7 @@
 static esp_now_netdev_t _esp_now_dev = { 0 };
 static const netdev_driver_t _esp_now_driver;
 
-static bool _esp_now_add_peer(const uint8_t* bssid, uint8_t channel, const uint8_t* key)
+static bool _esp_now_add_peer(const uint8_t* bssid, uint8_t channel, const char* key)
 {
     if (esp_now_is_peer_exist(bssid)) {
         return false;
@@ -77,7 +77,30 @@ static bool _esp_now_add_peer(const uint8_t* bssid, uint8_t channel, const uint8
     peer.channel = channel;
     peer.ifidx = ESP_IF_WIFI_AP;
 
-    if (esp_now_params.key) {
+    if (esp_now_params.key && strlen(esp_now_params.key)) {
+        const char *key = esp_now_params.key;
+        const char *end = key + strlen(key);
+        char *next;
+        long int byte;
+        int i = 0;
+
+        memset(peer.lmk, 0, ESP_NOW_KEY_LEN);
+
+        while ((key < end) && (i < ESP_NOW_KEY_LEN)) {
+            byte = strtol(key, &next, 16);
+            key = next;
+            peer.lmk[i] = byte;
+            i++;
+        }
+
+        DEBUG("esp_now_key: "
+              "%02x %02x %02x %02x %02x %02x %02x %02x "
+              "%02x %02x %02x %02x %02x %02x %02x %02x\n",
+              peer.lmk[0], peer.lmk[1], peer.lmk[2], peer.lmk[3],
+              peer.lmk[4], peer.lmk[5], peer.lmk[6], peer.lmk[7],
+              peer.lmk[8], peer.lmk[9], peer.lmk[10], peer.lmk[11],
+              peer.lmk[12], peer.lmk[13], peer.lmk[14], peer.lmk[15]);
+
         peer.encrypt = true;
         memcpy(peer.lmk, esp_now_params.key, ESP_NOW_KEY_LEN);
     }
@@ -271,7 +294,7 @@ static void IRAM_ATTR esp_now_send_cb(const uint8_t *mac, esp_now_send_status_t 
  */
 static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *event)
 {
-    switch(event->event_id) {
+    switch (event->event_id) {
         case SYSTEM_EVENT_STA_START:
             DEBUG("%s WiFi started\n", __func__);
             break;

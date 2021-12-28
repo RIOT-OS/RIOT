@@ -139,7 +139,8 @@ static struct pbuf *_esp_wifi_pbuf_alloc(size_t size)
 
     /* initialize pbuf data structure */
     pb->next = NULL;
-    pb->payload = (void *)LL_ALIGN((uint8_t *)pb + sizeof(struct pbuf) + PBUF_LINK_ENCAPSULATION_HLEN);
+    pb->payload = (void *)LL_ALIGN((uint8_t *)pb + sizeof(struct pbuf)
+                                                 + PBUF_LINK_ENCAPSULATION_HLEN);
     pb->tot_len = size;
     pb->len = size;
     pb->type = PBUF_RAM;
@@ -925,6 +926,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     sprintf((char*)wifi_config_ap.ap.ssid, "%s_%02x%02x%02x%02x%02x%02x",
             ESP_WIFI_SSID, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     wifi_config_ap.ap.ssid_len = strlen((char*)wifi_config_ap.ap.ssid);
+    assert(wifi_config_ap.ap.ssid_len <= MAX_SSID_LEN);
 #endif /* IS_ACTIVE(ESP_WIFI_SSID_DYNAMIC) */
     /* set the SoftAP configuration */
     result = esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config_ap);
@@ -948,22 +950,19 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
 #if defined(MODULE_ESP_WIFI_ENTERPRISE) && !defined(MODULE_ESP_WIFI_AP)
 
     esp_wpa2_config_t wifi_config_wpa2 = WPA2_CONFIG_INIT_DEFAULT();
-#ifdef ESP_WIFI_EAP_ID
-    esp_wifi_sta_wpa2_ent_set_identity((const unsigned char *)ESP_WIFI_EAP_ID,
-                                       strlen(ESP_WIFI_EAP_ID));
-#endif /* ESP_WIFI_EAP_ID */
-#if defined(ESP_WIFI_EAP_USER) && defined(ESP_WIFI_EAP_PASS)
+    if (strlen(ESP_WIFI_EAP_ID)) {
+        esp_wifi_sta_wpa2_ent_set_identity((const unsigned char *)ESP_WIFI_EAP_ID,
+                                           strlen(ESP_WIFI_EAP_ID));
+    }
+
     ESP_WIFI_DEBUG("eap_user=%s eap_pass=%s\n",
                    ESP_WIFI_EAP_USER, ESP_WIFI_EAP_PASS);
     esp_wifi_sta_wpa2_ent_set_username((const unsigned char *)ESP_WIFI_EAP_USER,
                                        strlen(ESP_WIFI_EAP_USER));
     esp_wifi_sta_wpa2_ent_set_password((const unsigned char *)ESP_WIFI_EAP_PASS,
                                        strlen(ESP_WIFI_EAP_PASS));
-#else /* defined(ESP_WIFI_EAP_USER) && defined(ESP_WIFI_EAP_PASS) */
-#error ESP_WIFI_EAP_USER and ESP_WIFI_EAP_PASS have to define the user name \
-       and the password for EAP phase 2 authentication in esp_wifi_enterprise
-#endif /* defined(ESP_WIFI_EAP_USER) && defined(ESP_WIFI_EAP_PASS) */
     esp_wifi_sta_wpa2_ent_enable(&wifi_config_wpa2);
+
 #endif /* defined(MODULE_ESP_WIFI_ENTERPRISE) && !defined(MODULE_ESP_WIFI_AP) */
 
     /* start the WiFi driver */

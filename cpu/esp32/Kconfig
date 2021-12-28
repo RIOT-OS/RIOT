@@ -64,6 +64,11 @@ config HAS_CPU_ESP32
     help
         Indicates that the current CPU is 'esp32'.
 
+config HAS_ESP_ETH
+    bool
+    help
+        Indicates that an ESP Ethernet interface is present.
+
 config HAS_ESP_RTC_TIMER_32K
     bool
     help
@@ -120,6 +125,31 @@ config MODULE_ESP_JTAG
     depends on HAS_ESP_JTAG
 
 endmenu
+
+# ESP32 specific module dependencies
+config MODULE_ESP_ETH
+    bool
+    depends on HAS_ARCH_ESP32
+    select MODULE_ESP_IDF_ETH
+    select MODULE_ESP_IDF_ETH_PHY
+    select MODULE_NETDEV_ETH
+    select MODULE_NETOPT
+    select MODULE_ZTIMER_MSEC
+
+config MODULE_ESP_WIFI_ANY
+    bool
+    depends on HAS_ARCH_ESP32
+    select MODULE_ESP_IDF_HEAP
+    select MODULE_ESP_IDF_NVS_FLASH
+    select MODULE_ESP_IDF_WPA_SUPPLICANT_CRYPTO
+    select MODULE_ESP_IDF_WPA_SUPPLICANT_PORT
+
+config MODULE_ESP_WIFI_ENTERPRISE
+    bool
+    depends on HAS_ARCH_ESP32
+    select MODULE_ESP_IDF_WPA_SUPPLICANT_WPA2_EAP_PEER
+    select MODULE_ESP_IDF_WPA_SUPPLICANT_WPA2_TLS
+    select MODULE_ESP_IDF_WPA_SUPPLICANT_WPA2_UTILS
 
 rsource "periph/Kconfig"
 rsource "vendor/esp-idf/Kconfig"

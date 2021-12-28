@@ -1,4 +1,5 @@
 # Copyright (c) 2020 HAW Hamburg
+#               2021 Gunar Schorcht
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
@@ -67,6 +68,7 @@ config CPU
 
 source "$(RIOTCPU)/esp_common/Kconfig"
 
+# ESP8266 specific module dependencies
 config MODULE_ESP_I2C_SW
     bool
     default y if MODULE_PERIPH_I2C

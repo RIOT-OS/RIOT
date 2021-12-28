@@ -1,4 +1,5 @@
 # Copyright (c) 2020 HAW Hamburg
+#               2021 Gunar Schorcht
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
@@ -25,11 +26,26 @@ config CPU_COMMON_ESP
     select HAS_SSP
 
 ## Declaration of specific features
+config HAS_ARCH_ESP
+    bool
+    help
+        Indicates that an 'ESP' architecture is being used.
+
+config HAS_ESP_JTAG
+    bool
+    help
+        Indicates that a JTAG interface is present.
+
 config HAS_ESP_SPIFFS
     bool
     help
         Indicates that a Serial Peripheral Interface Flash File System can be
         used.
+
+config HAS_ESP_NOW
+    bool
+    help
+        Indicates that an ESP-NOW compatible radio is present.
 
 config HAS_ESP_WIFI
     bool
@@ -40,21 +56,6 @@ config HAS_ESP_WIFI_AP
     bool
     help
         Indicates that ESP WiFi SoftAP support is present.
-
-config HAS_ESP_NOW
-    bool
-    help
-        Indicates that an ESP NOW-compatible radio is present.
-
-config HAS_ESP_JTAG
-    bool
-    help
-        Indicates that a JTAG interface is present.
-
-config HAS_ARCH_ESP
-    bool
-    help
-        Indicates that an 'ESP' architecture is being used.
 
 config HAS_ESP_WIFI_ENTERPRISE
     bool
@@ -71,9 +72,10 @@ config MODULE_ESP_COMMON
     depends on TEST_KCONFIG
     depends on CPU_COMMON_ESP
     default y
+    select MODULE_ESP_IDF
     select MODULE_LOG # override default log implementation by default
     select MODULE_PERIPH
-    select MODULE_ESP_IDF
+
     help
       Common code module for ESP SoCs.
 
@@ -88,6 +90,36 @@ config MODULE_PERIPH_FLASH
 if TEST_KCONFIG
 
 menu "ESP configurations"
+    depends on HAS_ARCH_ESP
+
+    menu "Network devices"
+
+        config ESP_ETH_NETDEV
+            bool "ESP Ethernet interface used"
+            depends on HAS_ESP_ETH
+            default y if TEST_KCONFIG && MODULE_NETDEV_DEFAULT
+            select MODULE_ESP_ETH
+
+        rsource "Kconfig.netdev.esp_now"
+        rsource "Kconfig.netdev.esp_wifi"
+
+    endmenu
+
+config MODULE_ESP_NOW
+    bool
+    select MODULE_ESP_WIFI_ANY # MODULE_ESP_WIFI_ANY has MCU specific dependencies
+
+config MODULE_ESP_WIFI
+    bool
+    select MODULE_ESP_WIFI_ANY
+    select MODULE_ESP_WIFI_ENTERPRISE if ESP_WIFI_NETDEV_ENTERPRISE_MODE
+    select MODULE_ESP_WIFI_AP if ESP_WIFI_NETDEV_SOFTAP_MODE
+    select MODULE_NETDEV_ETH
+
+config MODULE_ESP_WIFI_ANY
+    bool
+    select MODULE_NETOPT
+    select MODULE_ZTIMER_MSEC
 
 config MODULE_ESP_LOG_COLORED
     bool
