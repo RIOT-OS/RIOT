@@ -112,7 +112,7 @@ but limited to educational purposes. Afterwards run:
 make BOARD=rpi-pico PROGRAMMER=jlink flash
 ```
 
-## Accesing RIOT shell
+## Accessing RIOT shell
 
 This board's default access to RIOT shell is via UART (UART0 TX - pin 1, UART0 RX - pin 2).
 
