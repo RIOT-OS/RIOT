@@ -144,6 +144,13 @@ config MODULE_ESP_WIFI_ANY
     select MODULE_ESP_IDF_WPA_SUPPLICANT_CRYPTO
     select MODULE_ESP_IDF_WPA_SUPPLICANT_PORT
 
+config MODULE_ESP_WIFI_ENTERPRISE
+    bool
+    depends on HAS_ARCH_ESP32
+    select MODULE_ESP_IDF_WPA_SUPPLICANT_WPA2_EAP_PEER
+    select MODULE_ESP_IDF_WPA_SUPPLICANT_WPA2_TLS
+    select MODULE_ESP_IDF_WPA_SUPPLICANT_WPA2_UTILS
+
 rsource "periph/Kconfig"
 rsource "vendor/esp-idf/Kconfig"
 source "$(RIOTCPU)/esp_common/Kconfig"

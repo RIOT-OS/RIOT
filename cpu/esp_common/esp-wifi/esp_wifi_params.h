@@ -53,8 +53,12 @@
  * The SSID must not contain more than 32 characters.
  */
 #ifndef ESP_WIFI_SSID
+#ifndef CONFIG_ESP_WIFI_SSID
 #define ESP_WIFI_SSID       "RIOT_AP"
-#endif
+#else /* CONFIG_ESP_WIFI_SSID */
+#define ESP_WIFI_SSID       CONFIG_ESP_WIFI_SSID
+#endif /* CONFIG_ESP_WIFI_SSID */
+#endif /* ESP_WIFI_SSID */
 
 /**
  * @brief   Passphrase for WPA2 Personal Mode authentication
@@ -68,11 +72,13 @@
  * used in station mode or the SoftAP interface is "open" in SoftAP mode.
  * Otherwise WPA2-PSK authentication mode is used in both modes.
  */
-#ifdef DOXYGEN
-#define ESP_WIFI_PASS       "ThisistheRIOTporttoESP"
+#if DOXYGEN
+#define ESP_WIFI_PASS       "This is RIOT-OS"
+#elif defined(CONFIG_ESP_WIFI_PASS)
+#define ESP_WIFI_PASS       CONFIG_ESP_WIFI_PASS
 #endif
 
-#if defined(MODULE_ESP_WIFI_ENTERPRISE) || defined(DOXYGEN)
+#if defined(MODULE_ESP_WIFI_AP) || defined(DOXYGEN)
 
 /**
  * @brief   Optional anonymous identity for WPA2 Enterprise Mode authentication
@@ -85,8 +91,12 @@
  *          text with no encryption.
  */
 #ifndef ESP_WIFI_EAP_ID
+#ifndef CONFIG_ESP_WIFI_EAP_ID
 #define ESP_WIFI_EAP_ID         ""
-#endif
+#else /* CONFIG_ESP_WIFI_EAP_ID */
+#define ESP_WIFI_EAP_ID         CONFIG_ESP_WIFI_EAP_ID
+#endif /* CONFIG_ESP_WIFI_EAP_ID */
+#endif /* ESP_WIFI_EAP_ID */
 
 /**
  * @brief   User name for WPA2 Enterprise Mode authentication
@@ -95,8 +105,12 @@
  * the user.
  */
 #ifndef ESP_WIFI_EAP_USER
+#ifndef CONFIG_ESP_WIFI_EAP_USER
 #define ESP_WIFI_EAP_USER       "user"
-#endif
+#else /* CONFIG_ESP_WIFI_EAP_USER */
+#define ESP_WIFI_EAP_USER       CONFIG_ESP_WIFI_EAP_USER
+#endif /* CONFIG_ESP_WIFI_EAP_USER */
+#endif /* ESP_WIFI_EAP_USER */
 
 /**
  * @brief   Password for WPA2 Enterprise Mode authentication
@@ -104,10 +118,14 @@
  * The password required for phase 2 (inner) EAP authentication.
  */
 #ifndef ESP_WIFI_EAP_PASS
+#ifndef CONFIG_ESP_WIFI_EAP_PASS
 #define ESP_WIFI_EAP_PASS       "pass"
-#endif
+#else /* CONFIG_ESP_WIFI_EAP_PASS */
+#define ESP_WIFI_EAP_PASS       CONFIG_ESP_WIFI_EAP_PASS
+#endif /* CONFIG_ESP_WIFI_EAP_PASS */
+#endif /* ESP_WIFI_EAP_PASS */
 
-#endif /* defined(MODULE_ESP_WIFI_ENTERPRISE) || defined(DOXYGEN) */
+#endif /* defined(MODULE_ESP_WIFI_AP) || defined(DOXYGEN) */
 
 #if defined(ESP_WIFI_AP) || defined(DOXYGEN)
 
@@ -119,29 +137,45 @@
  * interface used, e.g.: `RIOT_AP_aabbccddeeff`
  */
 #ifndef ESP_WIFI_SSID_DYNAMIC
+#ifndef CONFIG_ESP_WIFI_SSID_DYNAMIC
 #define ESP_WIFI_SSID_DYNAMIC   0
-#endif
+#else /* CONFIG_ESP_WIFI_SSID_DYNAMIC */
+#define ESP_WIFI_SSID_DYNAMIC   CONFIG_ESP_WIFI_SSID_DYNAMIC
+#endif /* CONFIG_ESP_WIFI_SSID_DYNAMIC */
+#endif /* ESP_WIFI_SSID_DYNAMIC */
 
 /**
  * @brief   Whether SoftAP SSID should be hidden.
  */
 #ifndef ESP_WIFI_SSID_HIDDEN
-#define ESP_WIFI_SSID_HIDDEN (0)
-#endif
+#ifndef CONFIG_ESP_WIFI_SSID_HIDDEN
+#define ESP_WIFI_SSID_HIDDEN    (0)
+#else /* CONFIG_ESP_WIFI_SSID_HIDDEN */
+#define ESP_WIFI_SSID_HIDDEN    CONFIG_ESP_WIFI_SSID_HIDDEN
+#endif /* CONFIG_ESP_WIFI_SSID_HIDDEN */
+#endif /* ESP_WIFI_SSID_HIDDEN */
 
 /**
  * @brief   WiFi SoftAP maximum connections (max. 4).
  */
 #ifndef ESP_WIFI_MAX_CONN
-#define ESP_WIFI_MAX_CONN    (4)
-#endif
+#ifndef CONFIG_ESP_WIFI_MAX_CONN
+#define ESP_WIFI_MAX_CONN       (4)
+#else /* CONFIG_ESP_WIFI_MAX_CONN */
+#define ESP_WIFI_MAX_CONN       CONFIG_ESP_WIFI_MAX_CONN
+#endif /* CONFIG_ESP_WIFI_MAX_CONN */
+#endif /* ESP_WIFI_MAX_CONN */
 
 /**
  * @brief   WiFi SoftAP beacon interval, in milliseconds.
  */
 #ifndef ESP_WIFI_BEACON_INTERVAL
+#ifndef CONFIG_ESP_WIFI_BEACON_INTERVAL
 #define ESP_WIFI_BEACON_INTERVAL (100)
-#endif
+#else /* CONFIG_ESP_WIFI_BEACON_INTERVAL */
+#define ESP_WIFI_BEACON_INTERVAL CONFIG_ESP_WIFI_BEACON_INTERVAL
+#endif /* CONFIG_ESP_WIFI_BEACON_INTERVAL */
+#endif /* ESP_WIFI_BEACON_INTERVAL */
 
 #endif /* defined(ESP_WIFI_AP) || defined(DOXYGEN) */
 

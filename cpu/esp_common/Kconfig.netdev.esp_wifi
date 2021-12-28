@@ -1,0 +1,118 @@
+# Copyright (c) 2021 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menuconfig ESP_WIFI_NETDEV
+    bool "ESP WiFi interface used"
+    depends on HAS_ESP_WIFI
+    default y if TEST_KCONFIG && MODULE_NETDEV_DEFAULT && !ESP_ETH_NETDEV && MODULE_LWIP
+    select MODULE_ESP_WIFI
+
+if ESP_WIFI_NETDEV
+
+    choice
+        bool "Mode"
+        default ESP_WIFI_NETDEV_PERSONAL_MODE
+
+        config ESP_WIFI_NETDEV_PERSONAL_MODE
+            bool "WPA2 Personal Mode"
+            help
+                Indicates that the WiFi interface is used in
+                WPA2 Personal Mode.
+
+        config ESP_WIFI_NETDEV_ENTERPRISE_MODE
+            bool "WPA2 Enterprise Mode"
+            depends on HAS_ESP_WIFI_ENTERPRISE
+            help
+                Indicates that the WiFi interface is used in
+                WPA2 Enterprise Mode with IEEE 802.1X/EAP authentication.
+
+        config ESP_WIFI_NETDEV_SOFTAP_MODE
+            bool "SoftAP Mode"
+            help
+                Indicates that the WiFi interface is used in
+                SoftAP mode.
+    endchoice
+
+    config ESP_WIFI_SSID
+        string "SSID"
+        default "RIOT_AP"
+        help
+            In station mode, the SSID is used to define the AP to which
+            the node should connect. In SoftAP mode, the SSID is used as a
+            static SSID or as prefix for dynamic SSID generation.
+            The SSID must not contain more than 32 characters.
+
+    config ESP_WIFI_USE_WPA2
+        bool "Use WPA2 authentication"
+        depends on ESP_WIFI_NETDEV_PERSONAL_MODE || ESP_WIFI_NETDEV_SOFTAP_MODE
+        default y
+        help
+            Specify whether WPA2 authentication is used to connect to the
+            AP or to the SoftAP network interface in SoftAP mode. If WPA2
+            authentication is enabled, the passphrase has to be defined.
+            Otherwise an "open" AP without WPA2 authentication is used in
+            station mode or the SoftAP interface is "open" in SoftAP mode.
+
+    config ESP_WIFI_PASS
+        string "Passphrase for WPA2 Personal Mode authentication"
+        depends on ESP_WIFI_USE_WPA2
+        default "This is RIOT-OS"
+        help
+            The passphrase is defined as a clear text string with a maximum
+            of 64 characters. It is used for WPA2 personal mode authentication
+            in station mode and the SoftAP network interface in SoftAP mode.
+
+if ESP_WIFI_NETDEV_SOFTAP_MODE
+
+    config ESP_WIFI_SSID_DYNAMIC
+        bool "Dynamic SSID is used"
+        help
+            If set, a dynamic SSID is generated for the SoftAP by extending
+            the defined SSID with the MAC address of the SoftAP interface used,
+            e.g.: RIOT_AP_aabbccddeeff
+
+    config ESP_WIFI_SSID_HIDDEN
+        bool "SSID should be hidden"
+        default n
+        help
+            Select to define that the SoftAP SSID should be hidden.
+
+    config ESP_WIFI_MAX_CONN
+        int "Maximum number of connecttions"
+        default 4
+
+    config ESP_WIFI_BEACON_INTERVAL
+        int "Beacon intervall [ms]"
+        default 100
+
+endif # ESP_WIFI_NETDEV_SOFTAP_MODE
+
+if ESP_WIFI_NETDEV_ENTERPRISE_MODE
+
+    config ESP_WIFI_EAP_ID
+        string "Anonymous identity (optional)"
+        help
+            Optional anonymous identity used in phase 1 (outer) EAP
+            authentication. If it is not defined, the user name as defined
+            for phase 2 (inner) EAP authentication is used. Please note
+            that the identity in phase 1 (outer) authentication is
+            sent as plain text with no encryption.
+
+    config ESP_WIFI_EAP_USER
+        string "User name"
+        help
+            Specify the user name required for phase 2 (inner) EAP
+            authentication to identify the user.
+
+    config ESP_WIFI_EAP_PASS
+        string "Password"
+        help
+            Specify the password required for phase 2 (inner) EAP
+            authentication.
+
+endif # ESP_WIFI_NETDEV_ENTERPRISE_MODE
+
+endif # ESP_WIFI_NETDEV

@@ -101,11 +101,20 @@ menu "ESP configurations"
             select MODULE_ESP_ETH
 
         rsource "Kconfig.netdev.esp_now"
+        rsource "Kconfig.netdev.esp_wifi"
+
     endmenu
 
 config MODULE_ESP_NOW
     bool
     select MODULE_ESP_WIFI_ANY # MODULE_ESP_WIFI_ANY has MCU specific dependencies
+
+config MODULE_ESP_WIFI
+    bool
+    select MODULE_ESP_WIFI_ANY
+    select MODULE_ESP_WIFI_ENTERPRISE if ESP_WIFI_NETDEV_ENTERPRISE_MODE
+    select MODULE_ESP_WIFI_AP if ESP_WIFI_NETDEV_SOFTAP_MODE
+    select MODULE_NETDEV_ETH
 
 config MODULE_ESP_WIFI_ANY
     bool
