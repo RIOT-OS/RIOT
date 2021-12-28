@@ -112,6 +112,20 @@ but limited to educational purposes. Afterwards run:
 make BOARD=rpi-pico PROGRAMMER=jlink flash
 ```
 
+## Accesing RIOT shell
+
+This board's default access to RIOT shell is via UART (UART0 TX - pin 1, UART0 RX - pin 2). 
+
+The default baud rate is 115 200.
+
+The simplest way to connect to the shell is the execution of the command:
+
+```
+make BOARD=rpi-pico term
+```
+
+@warning Raspberry Pi Pico board is not 5V tolerant. Use voltage divider or logic level shifter when connecting to 5V UART.
+
 ## On-Chip Debugging
 
 There are currently (June 2021) few hardware options for debugging the Raspberry Pi Pico:
