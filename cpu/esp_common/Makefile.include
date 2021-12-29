@@ -160,9 +160,3 @@ $(BINDIR)/partitions.csv: $(FLASHFILE)
 
 $(BINDIR)/partitions.bin: $(PARTITION_TABLE_CSV)
 	$(Q)python3 $(RIOTTOOLS)/esptools/gen_esp32part.py --verify $< $@
-
-# Convert .elf and .csv to .bin files at build time, but make them available for
-# tests at flash time. These can't be added to FLASHDEPS because they depend on
-# on ELFFILE and would trigger a rebuild with "flash-only".
-BUILD_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin
-TEST_EXTRA_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin
