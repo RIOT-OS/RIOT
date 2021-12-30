@@ -3,6 +3,8 @@
 include $(RIOTCPU)/esp_common/Makefile.dep
 
 USEPKG += esp32_sdk
+USEPKG += esp32_sdk_libs
+
 USEMODULE += esp_idf_driver
 USEMODULE += esp_idf_esp32
 USEMODULE += esp_idf_soc
