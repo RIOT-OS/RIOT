@@ -482,6 +482,11 @@ void IRAM_ATTR esp_restart_noos(void)
     }
 }
 
+const char* esp_get_idf_version(void)
+{
+    return IDF_VER;
+}
+
 /*
  * source: /path/to/esp-idf/components/wpa_supplicant/port/os_xtensa.c
  */
