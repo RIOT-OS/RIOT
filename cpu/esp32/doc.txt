@@ -53,7 +53,7 @@
     4. [ESP-NOW Network Interface](#esp32_esp_now_network_interface)
     5. [Other Network Devices](#esp32_other_network_devices)
 10. [Application-Specific Configurations](#esp32_application_specific_configurations)
-    1. [Make Variable `CONFIGS`](#esp32_config_make_variable)
+    1. [Make Variable `CFLAGS`](#esp32_config_make_variable)
     2. [Application-Specific Board Configuration](#esp32_application_specific_board_configuration)
     3. [Application-Specific Driver Configuration](#esp32_application_specific_driver_configuration)
 11. [Debugging](#esp32_debugging)
@@ -63,16 +63,18 @@
 
 # Overview {#esp32_overview}
 
-*RIOT-Xtensa-ESP* is a bare metal implementation of *RIOT-OS* for *ESP32* SOCs which supports most
-features of RIOT-OS. The peripheral SPI and I2C interfaces allow to connect all external hardware
-modules supported by RIOT-OS, such as sensors and actuators. SPI interface can also be used to
-connect external IEEE802.15.4 modules to integrate ESP32 boards into a GNRC network.
+The **RIOT port for Xtensa-ESP** is a bare metal implementation of **RIOT-OS**
+for **ESP32** SOCs which supports most features of RIOT-OS. The peripheral
+SPI and I2C interfaces allow to connect all external hardware modules supported
+by RIOT-OS, such as sensors and actuators. SPI interface can also be used
+to connect external IEEE802.15.4 modules to integrate ESP32 boards into a GNRC network.
 
-Although the port does not use the official *ESP-IDF* (Espresso IoT Development Framework) SDK, it
-must be installed for compilation. The reason is that the port uses most of the
-*ESP32 SOC definitions* provided by the ESP-IDF header files. In addition, it needs the hardware
-abstraction library (libhal), and the *ESP32 WiFi stack binary* libraries which are part of the
-ESP-IDF SDK.
+Although the port does not use the official **ESP-IDF** (Espresso IoT
+Development Framework) SDK, it must be installed for compilation. The reason
+is that the port uses most of the **ESP32 SOC definitions** provided by the
+ESP-IDF header files. In addition, it needs the hardware abstraction library
+(`libhal.a`), and the **ESP32 WiFi stack binary** libraries which are part
+of the ESP-IDF SDK.
 
 [Back to table of contents](#esp32_toc)
 
@@ -83,7 +85,7 @@ port in alphabetical order.
 
 <center>
 
-Parameter                               | Short Description                                                 | Type*
+Parameter                               | Short Description                                                 | Type[1]
 ----------------------------------------|-------------------------------------------------------------------|------
 [ADC_GPIOS](#esp32_adc_channels)        | GPIOs that can be used as ADC channels                            | m
 [CAN_TX](#esp32_can_interfaces)         | GPIO used as CAN transceiver TX signal                            | o
@@ -114,7 +116,7 @@ Parameter                               | Short Description                     
 
 </center>
 
-**Type:* m - mandatory, o - optional
+1. **Type**: m - mandatory, o - optional
 
 The following table gives a short reference  in alphabetical order of modules
 that can be enabled/disabled by board configurations and/or application's
@@ -230,10 +232,10 @@ The RIOT-OS for ESP32 SoCs supports the following features at the moment:
 
 The implementation of RIOT-OS for ESP32 SOCs has the following limitations at the moment:
 
-- Only *one core* (the PRO CPU) is used because RIOT does not support running multiple threads
+- Only **one core** (the PRO CPU) is used because RIOT does not support running multiple threads
   simultaneously.
-- *Bluetooth* cannot be used at the moment.
-- *Flash encryption* is not yet supported.
+- **Bluetooth** cannot be used at the moment.
+- **Flash encryption** is not yet supported.
 
 [Back to table of contents](#esp32_toc)
 
@@ -241,14 +243,15 @@ The implementation of RIOT-OS for ESP32 SOCs has the following limitations at th
 
 Following software components are required for compilation:
 
-- *Xtensa GCC* compiler suite for ESP32
-- *ESP-IDF* SDK which includes all ESP32 SOC definitions, basic libraries and the hardware
-  abstraction library *`libhal.a`*
+- **Xtensa GCC** compiler suite for ESP32
+- **ESP-IDF** SDK which includes all ESP32 SoC definitions, basic libraries and the hardware
+  abstraction library `libhal.a`
+- Modified version of ESP flash programmer tool **`esptool.py`**
 
 There are two options to install the Toolchain:
 
-- *riotdocker* image, see section [RIOT Docker Toolchain (riotdocker)](#esp32_riot_docker_toolchain)
-- *manual installation*, see section [Manual Toolchain Installation](#esp32_manual_toolchain_installation)
+- **riotdocker** image, see section [RIOT Docker Toolchain (riotdocker)](#esp32_riot_docker_toolchain)
+- **manual installation**, see section [Manual Toolchain Installation](#esp32_manual_toolchain_installation)
 
 [Back to table of contents](#esp32_toc)
 
@@ -273,9 +276,9 @@ BUILD_IN_DOCKER=1 make BOARD=... flash
 
 Using RIOT Docker requires at least the following software:
 
-- *`Docker`* container virtualization software
-- RIOT Docker (*`riotdocker`*) image
-- ESP flash programmer tool *`esptool.py`*
+- **Docker** container virtualization software `docker`
+- RIOT Docker (**`riotdocker`**) image
+- ESP flash programmer tool **`esptool.py`**
 
 For information about installing Docker on your host, refer to the appropriate manuals for your
 operating system. For example, the easiest way to install Docker on the Ubuntu/Debian system is:
@@ -429,7 +432,7 @@ export ESP32_SDK_DIR=$HOME/esp/esp-idf
 
 [Back to table of contents](#esp32_toc)
 
-### Installation of `esptool.py` (ESP flash programmer tool) {#esp32_installation_of_esptool}
+### Installation of esptool.py (ESP flash programmer tool) {#esp32_installation_of_esptool}
 
 The RIOT port does not work with the `esptool.py` ESP flasher program
 available on [GitHub](https://github.com/espressif/esptool) or
@@ -496,10 +499,10 @@ The compilation process can be controlled by a number of variables for the make 
 
 Option      | Values                | Default       | Description
 ------------|-----------------------|---------------|------------
-CONFIGS     | string                | empty         | Override default board and driver configurations, see section [Application-Specific Configurations](#esp32_application_specific_configurations).
-FLASH_MODE  | dout, dio, qout, qio  | dout          | Set the flash mode, see section [Flash Modes](#esp32_flash_modes)
-PORT        | /dev/tty*             | /dev/ttyUSB0  | Set the port for flashing the firmware.
-QEMU        | 0, 1                  | 0             | Generate an image for QEMU, see section [QEMU Mode and GDB](#esp32_qemu_mode_and_gdb).
+`CFLAGS`    | string                | empty         | Override default board and driver configurations, see section [Application-Specific Configurations](#esp32_application_specific_configurations).
+`FLASH_MODE`| dout, dio, qout, qio  | dout          | Set the flash mode, see section [Flash Modes](#esp32_flash_modes)
+`PORT`      | `/dev/tty*`           | `/dev/ttyUSB0`| Set the port for flashing the firmware.
+`QEMU`      | 0, 1                  | 0             | Generate an image for QEMU, see section [QEMU Mode and GDB](#esp32_qemu_mode_and_gdb).
 
 </center><br>
 
@@ -525,7 +528,7 @@ esp_wifi            | Enable the built-in WiFi module as `netdev` network device
 esp_wifi_ap         | Enable the built-in WiFi SoftAP module as `netdev` network device, see section [WiFi SoftAP Network Interface](#esp32_wifi_ap_network_interface).
 esp_wifi_enterprise | Enable the built-in WiFi module as `netdev` network device in WPA2 enterprise mode, see section [WiFi Network Interface](#esp32_wifi_network_interface).
 
-</center>
+</center><br>
 
 For example, to activate a SPIFFS drive in on-board flash memory, the makefile of application has
 simply to add the `esp_spiffs` module to `USEMODULE` make variable:
@@ -671,9 +674,9 @@ GPIO39 | In     | yes       | -         | SENSOR_VN             | -
 
 </center>
 
-*ADC:* these pins can be used as ADC inputs<br>
-*RTC:* these pins are RTC GPIOs and can be used in deep-sleep mode<br>
-*PU/PD:* these pins have software configurable pull-up/pull-down functionality.<br>
+<b>ADC:</b> these pins can be used as ADC inputs<br>
+<b>RTC:</b> these pins are RTC GPIOs and can be used in deep-sleep mode<br>
+<b>PU/PD:</b> these pins have software configurable pull-up/pull-down functionality.<br>
 
 @note GPIOs that can be used as ADC channels are also available as low power digital inputs/outputs
       in deep sleep mode.
@@ -687,7 +690,7 @@ GPIO0 | GPIO2 | Mode
 1     | X     | boot in FLASH mode to boot the firmware from flash (default mode)
 0     | 0     | boot in UART mode for flashing the firmware
 
-</center>
+</center><br>
 
 @note GPIO2 becomes the SPI MISO signal for boards that use the HSPI interface as SD-Card interface
       in 4-bit SD mode. On these boards all signals of the SD-Card interface are pulled up. Because
@@ -704,8 +707,8 @@ Hall sensors, touch sensors and a temperature sensor or can be connected with ce
 Integrated sensors are disabled in RIOT's implementation and are not accessible. Thus, up to 18
 GPIOs, can be used as ADC inputs:
 
-- ADC1 supports 8 channels: GPIOs 32-39
-- ADC2 supports 10 channels: GPIOs 0, 2, 4, 12-15, 25-27
+- **ADC1** supports 8 channels: GPIOs 32-39
+- **ADC2** supports 10 channels: GPIOs 0, 2, 4, 12-15, 25-27
 
 These GPIOs are realized by the RTC unit and are therefore also called RTC GPIOs or RTCIO GPIOs.
 
@@ -715,7 +718,7 @@ These GPIOs are realized by the RTC unit and are therefore also called RTC GPIOs
 - ADC2 is used by the WiFi module. The GPIOs connected to ADC2 are therefore not
   available as ADC channels if the modules `esp_wifi` or `esp_now` are used.
 
-The GPIOs that can be used as ADC channels for a given board are defined by the *`ADC_GPIOS`*
+The GPIOs that can be used as ADC channels for a given board are defined by the `#ADC_GPIOS`
 macro in the board-specific peripheral configuration. This configuration can be changed by
 [application-specific configurations](#esp32_application_specific_configurations).
 
@@ -725,18 +728,18 @@ Example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The order of the listed GPIOs determines the mapping between the RIOT's ADC lines and the GPIOs. The
-maximum number of GPIOs in the list is `ADC_NUMOF_MAX` which is defined to be 16.
+maximum number of GPIOs in the list is `#ADC_NUMOF_MAX` which is defined to be 16.
 
-*`ADC_NUMOF`* is determined automatically from `ADC_GPIOS` list and must not be changed.
+`#ADC_NUMOF` is determined automatically from `#ADC_GPIOS` list and must not be changed.
 
 @note
-- `ADC_GPIOS` must be defined even if there are no GPIOs that could be used as ADC channels on
+- `#ADC_GPIOS` must be defined even if there are no GPIOs that could be used as ADC channels on
   the board. In this case, an empty list hast to be defined which just contains the curly braces.
 - As long as the GPIOs listed in ADC_GPIOS are not initialized as ADC channels with the
-  `adc_init` function, they can be used for other purposes.
+  `#adc_init` function, they can be used for other purposes.
 
 For each ADC line, an attenuation of the input signal can be defined separately with the
-`adc_set_attenuation`function.
+`#adc_set_attenuation` function.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
 extern int adc_set_attenuation(adc_t line, adc_attenuation_t atten);
@@ -756,10 +759,10 @@ Attenuation     | Voltage Range     | Symbol
  6 dB           | 0 ... 2.2V        | ADC_ATTENUATION_6_DB
 11 dB (default) | 0 ... 3.3V        | ADC_ATTENUATION_11_DB
 
-</center>
+</center><br>
 
 @note The reference voltage Vref can vary from device to device in the range of 1.0V and 1.2V. The
-      Vref of a device can be read with the `adc_vref_to_gpio25` function at GPIO 25.<br>
+      Vref of a device can be read with the `#adc_vref_to_gpio25` function at GPIO 25.<br>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
 extern int adc_vref_to_gpio25 (void);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -767,7 +770,7 @@ extern int adc_vref_to_gpio25 (void);
 For that purpose GPIO25 is initialized automatically as ADC channel and is connected internally to
 Vref to measure the current voltage. Once the initialization is finished and the function returns
 with success, the current voltage can be read from GPIO25. The results of the ADC input can then be
-adjusted accordingly. The `adc_vref_to_gpio25` function can be used to determine the current
+adjusted accordingly. The `#adc_vref_to_gpio25` function can be used to determine the current
 voltage at ESP32.
 
 [Back to table of contents](#esp32_toc)
@@ -776,9 +779,9 @@ voltage at ESP32.
 
 ESP32 supports 2 DAC lines at GPIO25 and GPIO26. These DACs have a width of 8 bits and produce
 voltages in the range from 0 V to 3.3 V (VDD_A). The 16 bits DAC values given as parameter of
-function *dac_set* are down-scaled to 8 bit.
+function `#dac_set` are down-scaled to 8 bit.
 
-The GPIOs that can be used as DAC channels for a given board are defined by the *`DAC_GPIOS`*
+The GPIOs that can be used as DAC channels for a given board are defined by the `#DAC_GPIOS`
 macro in the board-specific peripheral configuration. This configuration can be changed by
 [application-specific configurations](#esp32_application_specific_configurations).
 
@@ -788,15 +791,15 @@ Example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The order of the listed GPIOs determines the mapping between the RIOT's DAC lines and the GPIOs. The
-maximum number of GPIOs in the list is `DAC_NUMOF_MAX` which is defined to be 16.
+maximum number of GPIOs in the list is `#DAC_NUMOF_MAX` which is defined to be 16.
 
-*`DAC_NUMOF`* is determined automatically from `DAC_GPIOS` list and must not be changed.
+`#DAC_NUMOF` is determined automatically from `#DAC_GPIOS` list and must not be changed.
 
 @note
-- `DAC_GPIOS` must be defined even if there are no GPIOs that could be used as DAC channels on
+- `#DAC_GPIOS` must be defined even if there are no GPIOs that could be used as DAC channels on
   the board. In this case, an empty list hast to be defined which just contains the curly braces.
-- As long as the GPIOs listed in `DAC_GPIOS` are not initialized as DAC channels with the
-  `dac_init` function, they can be used for other purposes.
+- As long as the GPIOs listed in `#DAC_GPIOS` are not initialized as DAC channels with the
+  `#dac_init` function, they can be used for other purposes.
 
 [Back to table of contents](#esp32_toc)
 
@@ -805,11 +808,11 @@ maximum number of GPIOs in the list is `DAC_NUMOF_MAX` which is defined to be 16
 The ESP32 has two built-in I2C hardware interfaces that support I2C bus speed up to 400 kbps
 (`I2C_SPEED_FAST`).
 
-The board-specific configuration of the I2C interface *`I2C_DEV(n)`* requires the definition of
+The board-specific configuration of the I2C interface `I2C_DEV(n)` requires the definition of
 
-- *`I2Cn_SPEED`*, the bus speed,
-- *`I2Cn_SCL`*, the GPIO used as SCL signal, and
-- *`I2Cn_SDA`*, the GPIO used as SDA signal,
+- `I2Cn_SPEED`, the bus speed,
+- `I2Cn_SCL`, the GPIO used as SCL signal, and
+- `I2Cn_SDA`, the GPIO used as SDA signal,
 
 where `n` can be 0 or 1. If they are not defined, the I2C interface `I2C_DEV(n)` is not used.
 
@@ -827,7 +830,7 @@ Example:
 @note The configuration of the I2C interfaces `I2C_DEV(n)` must be in continuous ascending order
       of n.
 
-*`I2C_NUMOF`* is determined automatically from board-specific peripheral definitions of
+`#I2C_NUMOF` is determined automatically from board-specific peripheral definitions of
 `I2Cn_SPEED`, `I2Cn_SCK`, and `I2Cn_SDA`.
 
 The following table shows the default configuration of I2C interfaces used for a large number of
@@ -836,19 +839,19 @@ boards. It can be changed by
 
 <center>
 
-Device          |Signal|Pin     |Symbol          |Remarks
-:---------------|:-----|:-------|:---------------|:----------------
- I2C_DEV(0)     | SCL  | GPIO22 | `I2C0_SCL` | -
- I2C_DEV(0)     | SDA  | GPIO21 | `I2C0_SDA` | -
+Device          |Signal|Pin     |Symbol       |Remarks
+:---------------|:-----|:-------|:------------|:----------------
+ I2C_DEV(0)     | SCL  | GPIO22 | `#I2C0_SCL` | -
+ I2C_DEV(0)     | SDA  | GPIO21 | `#I2C0_SDA` | -
 
-</center>
+</center><br>
 
 @note The GPIOs listed in the configuration are only initialized as I2C signals when the
       `periph_i2c` module is used. Otherwise they are not allocated and can be used for other
       purposes.
 
 Beside the I2C hardware implementation, a I2C bit-banging protocol software implementation can be
-used. This implementation allows bus speeds up to 1 Mbps (`I2C_SPEED_FAST_PLUS`). It can be
+used. This implementation allows bus speeds up to 1 Mbps (`#I2C_SPEED_FAST_PLUS`). It can be
 activated by adding
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE += esp_i2c_sw
@@ -875,10 +878,10 @@ controller only supports resolutions of powers of two.
 
 ESP32 has 2 MCPWM modules, each with up to 6 channels (`PWM_CHANNEL_NUM_DEV_MAX`). Thus, the
 maximum number of PWM devices is 2 and the maximum total number of PWM channels is 12. These 2 MCPWM
-devices are used as RIOT PWM devices `PWM_DEV(0)` and `PWM_DEV(1)`.
+devices are used as RIOT PWM devices `#PWM_DEV(0)` and `#PWM_DEV(1)`.
 
 The GPIOs that can be used as PWM channels of RIOT's PWM devices are defined by the
-*`PWM0_GPIOS`* and *`PWM1_GPIOS`* macros in the board-specific peripheral configuration.
+`#PWM0_GPIOS` and `PWM1_GPIOS` macros in the board-specific peripheral configuration.
 This configuration can be changed by
 [application specific configurations](#esp32_application_specific_configurations).
 
@@ -891,15 +894,15 @@ Example:
 The order of the listed GPIOs determines the mapping between RIOT's PWM channels and the GPIOs.
 Board definitions usually declare a number of GPIOs as PWM channels.
 
-@note The definition of `PWM0_GPIOS` and `PWM1_GPIOS` can be omitted or empty. In the latter
+@note The definition of `#PWM0_GPIOS` and `PWM1_GPIOS` can be omitted or empty. In the latter
       case, they must at least contain the curly braces. The corresponding PWM device can not be
       used in this case.
 
-*`PWM_NUMOF`* is determined automatically from the PWM0_GPIOS and PWM1_GPIOS definitions and
+`#PWM_NUMOF` is determined automatically from the `#PWM0_GPIOS` and `PWM1_GPIOS` definitions and
 must not be changed.
 
-@note As long as the GPIOs listed in `PWM0_GPIOS` and `PMW1_GPIOS` are not initialized as
-      PWM channels with the `pwm_init` function, they are not allocated and can be used other
+@note As long as the GPIOs listed in `#PWM0_GPIOS` and `PMW1_GPIOS` are not initialized as
+      PWM channels with the `#pwm_init` function, they are not allocated and can be used other
       purposes.
 
 [Back to table of contents](#esp32_toc)
@@ -909,27 +912,27 @@ must not be changed.
 ESP32 integrates four SPI controllers:
 
 - controller SPI0 is reserved for caching the flash memory
-- controller SPI1 is reserved for interface *`FSPI`* to external memories like flash and PSRAM
-- controller SPI2 realizes interface *`HSPI`* that can be used for peripherals
-- controller SPI3 realizes interface *`VSPI`* that can be used for peripherals
+- controller SPI1 is reserved for interface `FSPI` to external memories like flash and PSRAM
+- controller SPI2 realizes interface `HSPI` that can be used for peripherals
+- controller SPI3 realizes interface `VSPI` that can be used for peripherals
 
 Thus, a maximum of two SPI controllers can be used as peripheral interfaces:
 
-- *`VSPI`*
-- *`HSPI`*
+- `VSPI`
+- `HSPI`
 
 All SPI interfaces could be used in quad SPI mode, but RIOT's low level device driver doesn't
 support it.
 
-The board-specific configuration of the SPI interface *`SPI_DEV(n)`* requires the definition of
+The board-specific configuration of the SPI interface `SPI_DEV(n)` requires the definition of
 
-- *`SPIn_CTRL`*, the SPI controller which is used for `SPI_DEV(n)`, can be `VSPI` or
+- `SPIn_CTRL`, the SPI controller which is used for `SPI_DEV(n)`, can be `VSPI` or
   `HSPI`,
-- *`SPIn_SCK`*, the GPIO used as clock signal for `SPI_DEV(n)`,
-- *`SPIn_MISO`*, the GPIO used as MISO signal for `SPI_DEV(n)`,
-- *`SPIn_MOSI`*, the GPIO used as MOSI signal for `SPI_DEV(n)`, and
-- *`SPIn_CS0`*, the GPIO used as CS signal for `SPI_DEV(n)` when the cs parameter in
-  spi_acquire is `GPIO_UNDEF`,
+- `SPIn_SCK`, the GPIO used as clock signal for `SPI_DEV(n)`,
+- `SPIn_MISO`, the GPIO used as MISO signal for `SPI_DEV(n)`,
+- `SPIn_MOSI`, the GPIO used as MOSI signal for `SPI_DEV(n)`, and
+- `SPIn_CS0`, the GPIO used as CS signal for `SPI_DEV(n)` when the cs parameter in
+  spi_acquire is `#GPIO_UNDEF`,
 
 where `n` can be 0 or 1. If they are not defined, the SPI interface `SPI_DEV(n)` is not
 used.
@@ -957,11 +960,11 @@ The pin configuration of `VSPI` interface and the `HSPI` interface can be change
   continuous ascending order of `n`.
 - The order in which the interfaces `VSPI` and `HSPI` are used doesn't
   matter. For example, while one board may only use the `HSPI` interface as
-  `SPI_DEV(0)`, another board may use the `VSPI` interface as
-  `SPI_DEV(0)` and the `HSPI` interface as `SPI_DEV(1)`.
+  `#SPI_DEV(0)`, another board may use the `VSPI` interface as
+  `#SPI_DEV(0)` and the `HSPI` interface as `SPI_DEV(1)`.
 - The GPIOs listed in the configuration are first initialized as SPI signals
   when the corresponding SPI interface is used by calling either the
-  `spi_init_cs` function or the `spi_acquire` function. That is, they
+  `#spi_init_cs` function or the `#spi_acquire` function. That is, they
   are not allocated as SPI signals before and can be used for other purposes as
   long as the SPI interface is not used.
 - GPIO2 becomes the MISO signal in SPI mode on boards that use the HSPI as the
@@ -969,7 +972,7 @@ The pin configuration of `VSPI` interface and the `HSPI` interface can be change
   functionality of the GPIO2, it can be necessary to either press the **Boot**
   button, remove the SD card or remove the peripheral hardware to flash RIOT.
 
-*`SPI_NUMOF`* is determined automatically from the board-specific
+`#SPI_NUMOF` is determined automatically from the board-specific
 peripheral definitions of `SPI_DEV(n)`.
 
 The following table shows the pin configuration used for most boards, even
@@ -977,24 +980,24 @@ though it **can vary** from board to board.
 
 <center>
 
-Device|Signal|Pin     |Symbol         | Remarks
-:-----|:----:|:-------|:-------------:|:---------------------------
-VSPI  | SCK  | GPIO18 |`SPI0_SCK` | can be used for peripherals
-VSPI  | MISO | GPIO19 |`SPI0_MISO`| can be used for peripherals
-VSPI  | MOSI | GPIO23 |`SPI0_MOSI`| can be used for peripherals
-VSPI  | CS0  | GPIO18 |`SPI0_CS0` | can be used for peripherals
-HSPI  | SCK  | GPIO14 |`SPI1_SCK` | can be used for peripherals
-HSPI  | MISO | GPIO12 |`SPI1_MISO`| can be used for peripherals
-HSPI  | MOSI | GPIO13 |`SPI1_MOSI`| can be used for peripherals
-HSPI  | CS0  | GPIO15 |`SPI1_CS0` | can be used for peripherals
-FSPI  | SCK  | GPIO6  |-              | reserved for flash and PSRAM
-FSPI  | CMD  | GPIO11 |-              | reserved for flash and PSRAM
-FSPI  | SD0  | GPIO7  |-              | reserved for flash and PSRAM
-FSPI  | SD1  | GPIO8  |-              | reserved for flash and PSRAM
-FSPI  | SD2  | GPIO9  |-              | reserved for flash and PSRAM (only in `qio` or `qout` mode)
-FSPI  | SD3  | GPIO10 |-              | reserved for flash and PSRAM (only in `qio` or `qout` mode)
+Device|Signal|Pin     |Symbol       | Remarks
+:-----|:----:|:-------|:-----------:|:---------------------------
+VSPI  | SCK  | GPIO18 |`#SPI0_SCK`  | can be used for peripherals
+VSPI  | MISO | GPIO19 |`#SPI0_MISO` | can be used for peripherals
+VSPI  | MOSI | GPIO23 |`#SPI0_MOSI` | can be used for peripherals
+VSPI  | CS0  | GPIO18 |`#SPI0_CS0`  | can be used for peripherals
+HSPI  | SCK  | GPIO14 |`#SPI1_SCK`  | can be used for peripherals
+HSPI  | MISO | GPIO12 |`#SPI1_MISO` | can be used for peripherals
+HSPI  | MOSI | GPIO13 |`#SPI1_MOSI` | can be used for peripherals
+HSPI  | CS0  | GPIO15 |`#SPI1_CS0`  | can be used for peripherals
+FSPI  | SCK  | GPIO6  |-            | reserved for flash and PSRAM
+FSPI  | CMD  | GPIO11 |-            | reserved for flash and PSRAM
+FSPI  | SD0  | GPIO7  |-            | reserved for flash and PSRAM
+FSPI  | SD1  | GPIO8  |-            | reserved for flash and PSRAM
+FSPI  | SD2  | GPIO9  |-            | reserved for flash and PSRAM (only in `qio` or `qout` mode)
+FSPI  | SD3  | GPIO10 |-            | reserved for flash and PSRAM (only in `qio` or `qout` mode)
 
-</center>
+</center><br>
 
 Some boards use the HSPI as SD-Card interface (SDIO) in 4-bit SD mode.
 
@@ -1007,7 +1010,7 @@ HSPI  | GPIO2  | DAT0          | MISO
 HSPI  | GPIO4  | DAT1          | -
 HSPI  | GPIO12 | DAT2          | -
 HSPI  | GPIO13 | DAT3          | MOSI
-</center>
+</center><br>
 
 On these boards, all these signals are pulled up. This may cause flashing
 problems due to the bootstrap function of the GPIO2 pin, see section
@@ -1019,11 +1022,11 @@ problems due to the bootstrap function of the GPIO2 pin, see section
 
 There are two different implementations for hardware timers.
 
-- *Timer Module implementation* It provides 4 high-speed timers, where 1 timer
-  is used for system time. The remaining *3 timer devices* with *1 channel*
+- **Timer Module implementation** It provides 4 high-speed timers, where 1 timer
+  is used for system time. The remaining **3 timer devices** with **1 channel**
   each can be used as RIOT timer devices with a clock rate of 1 MHz.
-- *Counter implementation* It uses CCOUNT/CCOMPARE registers to implement *2
-  timer devices* with *1 channel* each and a clock rate of 1 MHz.
+- **Counter implementation** It uses CCOUNT/CCOMPARE registers to implement **2
+  timer devices** with **1 channel** each and a clock rate of 1 MHz.
 
 By default, the hardware timer module is used. To use the hardware counter
 implementation, add
@@ -1065,18 +1068,18 @@ when the feature `periph_rtc` is used.
 
 ## UART Interfaces {#esp32_uart_interfaces}
 
-ESP32 supports up to three UART devices. `UART_DEV(0)` has a fixed pin
+ESP32 supports up to three UART devices. `#UART_DEV(0)` has a fixed pin
 configuration and is always available. All ESP32 boards use it as standard
 configuration for the console.
 
-The pin configuration of `UART_DEV(1)` and `UART_DEV(2)` are defined in board specific peripheral configuration by
+The pin configuration of `#UART_DEV(1)` and `#UART_DEV(2)` are defined in board specific peripheral configuration by
 
-- *`UARTn_TXD`*, the GPIO used as TxD signal, and
-- *`UARTn_RXD`*, the GPIO used as RxD signal,
+- `UARTn_TXD`, the GPIO used as TxD signal, and
+- `UARTn_RXD`, the GPIO used as RxD signal,
 
 where `n` can be 2 or 3. If they are not defined, the UART interface UART_DEV(n) is not used.
 
-*`UART_NUMOF`* is determined automatically from the board-specific
+#UART_NUMOF is determined automatically from the board-specific
 peripheral definitions of `UARTn_TXD` and `UARTn_RXD` and must not be
 changed.
 
@@ -1084,14 +1087,14 @@ The following default pin configuration of UART interfaces as used by a most
 boards can be overridden by the application, see section [Application-Specific
 Configurations](#esp32_application_specific_configurations).
 
-Device      |Signal|Pin     |Symbol         |Remarks
-:-----------|:-----|:-------|:--------------|:----------------
-UART_DEV(0) | TxD  | GPIO1  |`UART0_TXD`| cannot be changed
-UART_DEV(0) | RxD  | GPIO3  |`UART0_RXD`| cannot be changed
-UART_DEV(1) | TxD  | GPIO10 |`UART1_TXD`| optional, can be overridden
-UART_DEV(1) | RxD  | GPIO9  |`UART1_RXD`| optional, can be overridden
-UART_DEV(2) | TxD  | GPIO17 |`UART2_TXD`| optional, can be overridden
-UART_DEV(2) | RxD  | GPIO16 |`UART2_RXD`| optional, can be overridden
+Device      |Signal|Pin     |Symbol      |Remarks
+:-----------|:-----|:-------|:-----------|:----------------
+UART_DEV(0) | TxD  | GPIO1  |`#UART0_TXD`| cannot be changed
+UART_DEV(0) | RxD  | GPIO3  |`#UART0_RXD`| cannot be changed
+UART_DEV(1) | TxD  | GPIO10 |`#UART1_TXD`| optional, can be overridden
+UART_DEV(1) | RxD  | GPIO9  |`#UART1_RXD`| optional, can be overridden
+UART_DEV(2) | TxD  | GPIO17 |`UART2_TXD` | optional, can be overridden
+UART_DEV(2) | RxD  | GPIO16 |`UART2_RXD` | optional, can be overridden
 
 Example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
@@ -1131,8 +1134,8 @@ for detailed information about the CAN controller and its programming.
 The pin configuration of the CAN transceiver interface is usually defined
 in board specific peripheral configuration by
 
-- *`CAN_TX`*, the GPIO used as TX transceiver signal, and
-- *`CAN_RX`*, the GPIO used as RX transceiver signal.
+- `#CAN_TX`, the GPIO used as TX transceiver signal, and
+- `#CAN_RX`, the GPIO used as RX transceiver signal.
 
 If the pin configuration is not defined, the following default configuration
 is used which can be overridden by the application, see section
@@ -1180,7 +1183,7 @@ Since the peripherals are not working during _Light-sleep_/_Deep-sleep_, the
 CPU cannot be woken up by internal interrupt sources such as timers. Therefore,
 RIOT's layered power management can't select them as idle power mode. They are
 therefore blocked for normal operation. The application has to select them
-explicitly using the `pm_set` function. RIOT's layered power management
+explicitly using the `#pm_set` function. RIOT's layered power management
 can only select either _Modem-sleep_ or _Active_ as the lowest unblocked mode.
 
 But also in _Modem-sleep_ or _Active_ mode, the lowest possible power level
@@ -1196,7 +1199,7 @@ _Modem-sleep_ mode and _Active_ mode are the default operating modes
 dependent on whether the WiFi interface is used. They are selected
 automatically by the system.
 
-To enter the _Light-sleep_ or the _Deep-sleep_ mode, function `pm_set` has
+To enter the _Light-sleep_ or the _Deep-sleep_ mode, function `#pm_set` has
 to be used with the according mode `ESP_PM_LIGHT_SLEEP` or `ESP_PM_DEEP_SLEEP`
 as parameter. To exit from these modes, several wake-up sources can be used.
 
@@ -1206,7 +1209,7 @@ as parameter. To exit from these modes, several wake-up sources can be used.
 
 Possible wake-up sources for the _Light-sleep_ mode are:
 
-- RTC timer (set the RTC timer alarm using `rtc_set` before calling `pm_set`)
+- RTC timer (set the RTC timer alarm using `#rtc_set_alarm` before calling `#pm_set`)
 - GPIOs that are configured as input with enabled interrupt
 - RxD signal of UART0 and/or UART1 (configured with `ESP_PM_WUP_UART0` and
   `ESP_PM_WUP_UART1`)
@@ -1216,7 +1219,7 @@ is not possible to use timers like `periph_timer` or `ztimer` as wake-up source.
 
 @warning
 Since only level interrupts are supported in _Light-sleep_ mode,
-defined edge interrupts of type `GPIO_RISING` and `GPIO_FALLING` are
+defined edge interrupts of type `#GPIO_RISING` and `#GPIO_FALLING` are
 implicitly mapped to `GPIO_HIGH`  and `GPIO_LOW`, respectively, when
 entering _Light-sleep_ mode.
 
@@ -1226,7 +1229,7 @@ entering _Light-sleep_ mode.
 
 Possible Wake-up sources for the _Deep-sleep_ mode are:
 
-- RTC timer (set the RTC timer alarm using `rtc_set` before calling `pm_set`)
+- RTC timer (set the RTC timer alarm using `#rtc_set_alarm` before calling `#pm_set`)
 - RTC GPIOs (configured by `ESP_PM_WUP_PINS` and `ESP_PM_WUP_LEVEL`)
 
 @note RTC GPIOs are the GPIOs that are realized by the RTC unit and can also
@@ -1250,8 +1253,9 @@ ESP_PM_WUP_LEVEL | ESP_PM_WUP_PINS_ANY_HIGH | Deep  | Level for wake-up pins to 
 ESP_PM_WUP_UART0 | disabled                 | Light | Positive UART0 RxD signal edges to wake-up
 ESP_PM_WUP_UART1 | disabled                 | Light | Positive UART1 RxD signal edges to wake-up
 
-</center>
+</center><br>
 
+@note
 - If `ESP_PM_GPIO_HOLD` is defined, GPIOs hold their last output level
   when entering _Deep-sleep_ mode. Please note that only RTC GPIOs
   can hold their output value in _Deep-sleep_ mode.
@@ -1354,20 +1358,27 @@ Please refer file `$RIOTBASE/tests/unittests/test-spiffs/tests-spiffs.c` for mor
 
 ESP32 provides different built-in possibilities to realize network devices:
 
-- *EMAC*, an Ethernet MAC implementation (requires an external PHY module)
-- *ESP WiFi*, usual AP-based wireless LAN
-- *ESP-NOW*, a WiFi based AP-less and connectionless peer to peer communication protocol
-- *ESP-MESH*, a WiFi based mesh technology (not yet supported)
+- **EMAC**, an Ethernet MAC implementation (requires an external PHY module)
+- **ESP WiFi**, usual AP-based wireless LAN
+- **ESP-NOW**, a WiFi based AP-less and connectionless peer to peer communication protocol
+- **ESP-MESH**, a WiFi based mesh technology (not yet supported)
 
 [Back to table of contents](#esp32_toc)
 
 ## Ethernet MAC Network Interface {#esp32_ethernet_network_interface}
 
-ESP32 provides an *Ethernet MAC layer module (EMAC)* according to the IEEE 802.3 standard which can be used together with an external physical layer chip (PHY) to realize a 100/10 Mbps Ethernet interface. Supported PHY chips are the Microchip LAN8710/LAN8720, the IC Plus 101G, and the Texas Instruments TLK110.
+ESP32 provides an **Ethernet MAC layer module (EMAC)** according to the
+IEEE 802.3 standard which can be used together with an external physical
+layer chip (PHY) to realize a 100/10 Mbps Ethernet interface. Supported PHY
+chips are the Microchip LAN8710/LAN8720, the IC Plus 101G, and the Texas
+Instruments TLK110.
 
-The RIOT port for ESP32 realizes with module `esp_eth` a `netdev` driver for the EMAC which uses RIOT's standard Ethernet interface.
+The RIOT port for ESP32 realizes with module `esp_eth` a `netdev` driver for
+the EMAC which uses RIOT's standard Ethernet interface.
 
-If the board has one of the supported PHY layer chips connected to the ESP32, the `esp_eth` module should be enabled by default in board's `Makefile.dep` when module `netdev_default` is used.
+If the board has one of the supported PHY layer chips connected to the ESP32,
+the `esp_eth` module should be enabled by default in board's `Makefile.dep`
+when module `netdev_default` is used.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ifneq (,$(filter netdev_default,$(USEMODULE)))
     USEMODULE += esp_eth
@@ -1407,7 +1418,7 @@ Parameter           | Default                   | Description
 #ESP_WIFI_PASS      | -                         | Passphrase used for the AP as clear text (max. 64 chars).
 #ESP_WIFI_STACKSIZE | #THREAD_STACKSIZE_DEFAULT | Stack size used for the WiFi netdev driver thread.
 
-</center>
+</center><br>
 
 These configuration parameter definitions, as well as enabling the `esp_wifi`
 module, can be done either in the makefile of the project or at make command
@@ -1514,7 +1525,7 @@ Parameter                 | Default                   | Description
 
 [1] If no password is provided, the interface will be "open", otherwise it
     uses WPA2-PSK authentication mode.<br>
-[2] If #ESP_WIFI_SSID_DYNAMIC is set to 1, a dynamic SSID is generated for the
+[2] If `#ESP_WIFI_SSID_DYNAMIC` is set to 1, a dynamic SSID is generated for the
     SoftAP by extending the defined SSID (`ESP_WIFI_SSID`) with the MAC address
     of the SoftAP interface used, e.g.: `RIOT_AP_aabbccddeeff`
 
@@ -1584,7 +1595,7 @@ ESP_NOW_SOFT_AP_PASS    | "ThisistheRIOTporttoESP"  | Defines the passphrase as 
 ESP_NOW_CHANNEL         | 6                         | Defines the channel that is used as the broadcast medium by all nodes together.
 ESP_NOW_KEY             | NULL                      | Defines a key that is used for encrypted communication between nodes. If it is NULL, encryption is disabled. The key has to be of type `uint8_t[16]` and has to be exactly 16 bytes long.
 
-</center>
+</center><br>
 
 @note The ESP-NOW network interface (module `esp_now`) and the
 [Wifi network interface](#esp32_wifi_network_interface) (module `esp_wifi` or `esp_wifi_enterprise`)
@@ -1657,7 +1668,7 @@ documentation for the GPIOs recommended for the ENC28J60.
 
 @note The reset signal of the ENC28J60 based network device can be connected
 with the ESP32 RESET/EN pin  which is broken out on most boards. This keeps the
-GPIO free defined by `ENC28J60_PARAM_RESET` free for other purposes.
+GPIO free defined by `#ENC28J60_PARAM_RESET` free for other purposes.
 
 [Back to table of contents](#esp32_toc)
 
@@ -1706,7 +1717,7 @@ To override default board configurations, simply create an application-specific
 board configuration file `$APPDIR/board.h` in the source directory
 `$APPDIR` of the application and add the definitions to be overridden. To
 force the preprocessor to include board's original `board.h` after that,
-add the `include_next` preprocessor directive as the *last* line.
+add the `include_next` preprocessor directive as the **last** line.
 
 For example to override the default definition of the GPIOs that are used as
 PWM channels, the application-specific board configuration file
@@ -1719,9 +1730,9 @@ PWM channels, the application-specific board configuration file
 #include_next "board.h"
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It is important to ensure that the application-specific board configuration
-`$APPDIR/board.h` is included first. Insert the following line as the
-*first* line to the application makefile `$APPDIR/Makefile`.
+It is important to ensure that the application-specific board
+configuration `$APPDIR/board.h` is included first. Insert the following
+line as the **first** line to the application makefile `$APPDIR/Makefile`.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 INCLUDES += -I$(APPDIR)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1750,7 +1761,7 @@ purpose just create an application-specific driver parameter file
 `$APPDIR/<device>_params.h` in the source directory `$APPDIR` of the
 application and add the definitions to be overridden. To force the preprocessor
 to include driver's original `<device>_params.h` after that, add the
-`include_next` preprocessor directive as the *last* line.
+`include_next` preprocessor directive as the **last** line.
 
 For example, to override a GPIO used for LIS3DH sensor, the
 application-specific driver parameter file `$APPDIR/<device>_params.h`
