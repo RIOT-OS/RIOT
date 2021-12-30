@@ -1,12 +1,3 @@
-# check some environment variables first
-ifndef ESP32_SDK_DIR
-  $(info ESP32_SDK_DIR should be defined as /path/to/esp-idf directory)
-  $(info ESP32_SDK_DIR is set by default to /opt/esp/esp-idf)
-  export ESP32_SDK_DIR=/opt/esp/esp-idf
-endif
-
-ESP_SDK_DIR = $(ESP32_SDK_DIR)
-
 # ESP32 specific flashing options
 FLASH_CHIP  = esp32
 FLASH_MODE ?= dout
