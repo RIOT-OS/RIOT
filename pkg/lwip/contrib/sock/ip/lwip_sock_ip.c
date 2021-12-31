@@ -51,6 +51,7 @@ int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
         sock->peek_buf_avail = false;
 
 #if IS_ACTIVE(SOCK_HAS_ASYNC)
+        sock->base.async_cb.gen = NULL;
         netconn_set_callback_arg(sock->base.conn, &sock->base);
 #endif
         mutex_unlock(&(sock->mutex));
