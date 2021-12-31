@@ -1,0 +1,38 @@
+From f71eab1c0ba9510a106444bda578a90a8d9188a4 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Fri, 31 Dec 2021 09:51:30 +0100
+Subject: [PATCH 1/1] remove libbootloader_support.a from ld script
+
+---
+ .../bootloader/subproject/main/esp32.bootloader.ld | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/components/bootloader/subproject/main/esp32.bootloader.ld b/components/bootloader/subproject/main/esp32.bootloader.ld
+index 2c5778c39c..f71dc5d26a 100644
+--- a/components/bootloader/subproject/main/esp32.bootloader.ld
++++ b/components/bootloader/subproject/main/esp32.bootloader.ld
+@@ -34,14 +34,14 @@ SECTIONS
+     _text_start = ABSOLUTE(.);
+     *(.stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
+      *(.iram1 .iram1.*) /* catch stray IRAM_ATTR */
+-    *liblog.a:(.literal .text .literal.* .text.*)
++    *components/log/log.o(.literal .text .literal.* .text.*)
+     *libgcc.a:(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_utility.o(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:esp_image_format.o(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_random.o(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_flash.o(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:flash_partitions.o(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_sha.o(.literal .text .literal.* .text.*)
++    *components/bootloader_support/src/bootloader_utility.o(.literal .text .literal.* .text.*)
++    *components/bootloader_support/src/esp_image_format.o(.literal .text .literal.* .text.*)
++    *components/bootloader_support/src/bootloader_random.o(.literal .text .literal.* .text.*)
++    *components/bootloader_support/src/bootloader_flash.o(.literal .text .literal.* .text.*)
++    *components/bootloader_support/src/flash_partitions.o(.literal .text .literal.* .text.*)
++    *components/bootloader_support/src/bootloader_sha.o(.literal .text .literal.* .text.*)
+     *(.fini.literal)
+     *(.fini)
+     *(.gnu.version)
+-- 
+2.17.1
+
