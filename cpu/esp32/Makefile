@@ -8,6 +8,10 @@ DIRS += $(RIOTCPU)/esp_common
 DIRS += periph
 DIRS += vendor
 
+ifneq (, $(filter esp_bootloader, $(USEMODULE)))
+    DIRS += bootloader
+endif
+
 ifneq (, $(filter esp_eth, $(USEMODULE)))
     DIRS += esp-eth
 endif

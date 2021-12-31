@@ -1,3 +1,5 @@
+ifneq ($(CPU),esp32)
+
 ifneq (,$(filter esp_log_colored,$(USEMODULE)))
   BOOTLOADER_COLOR = _colors
 endif
@@ -7,7 +9,7 @@ endif
 # Full path to the bootloader binary. In the ESP32 case this is set by the
 # esp_bootloader module.
 BOOTLOADER_BIN ?= $(RIOTCPU)/$(CPU)/bin/bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
-BOOTLOADER_BIN = bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
+endif
 
 ESPTOOL ?= $(RIOTTOOLS)/esptool/esptool.py
 

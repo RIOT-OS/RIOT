@@ -12,6 +12,7 @@ include $(RIOTCPU)/esp_common/Makefile.include
 TARGET_ARCH_ESP32 ?= xtensa-esp32-elf
 TARGET_ARCH ?= $(TARGET_ARCH_ESP32)
 
+PSEUDOMODULES += esp_bootloader
 PSEUDOMODULES += esp_gdbstub
 PSEUDOMODULES += esp_hw_counter
 PSEUDOMODULES += esp_i2c_hw
@@ -58,11 +59,16 @@ ifneq (,$(filter cpp,$(USEMODULE)))
   ARCHIVES += -lstdc++
 endif
 
+ifneq (,$(filter esp_bootloader,$(USEMODULE)))
+  # Bootloader file used by esptool.inc.mk
+  BOOTLOADER_BIN ?= $(BINDIR)/esp_bootloader/bootloader.bin
+endif
+
 ifneq (,$(filter esp_jtag,$(USEMODULE)))
   PROGRAMMERS_SUPPORTED += openocd
   PARTITION_POS = 0x8000
   OPENOCD_PRE_FLASH_CMDS = -c 'echo "Installing Bootloader at $(BOOTLOADER_POS)"' \
-    -c 'flash write_image erase "$(RIOTCPU)/$(CPU)/bin/bootloader.bin" $(BOOTLOADER_POS) bin' \
+    -c 'flash write_image erase "$(BOOTLOADER_BIN)" $(BOOTLOADER_POS) bin' \
     -c 'echo "Installing partition table at $(PARTITION_POS)"' \
     -c 'flash write_image erase "$(BINDIR)/partitions.bin" $(PARTITION_POS) bin'
   IMAGE_OFFSET = 0x10000
@@ -71,3 +77,5 @@ ifneq (,$(filter esp_jtag,$(USEMODULE)))
   # Without resets debug target fails with 'Target not examined yet'
   OPENOCD_DBG_EXTRA_CMD += -c 'reset halt'
 endif
+
+$(BOOTLOADER_BIN):
