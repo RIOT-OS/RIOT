@@ -4,5 +4,9 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
 
+ifneq (,$(filter touch_dev,$(USEMODULE)))
+  USEMODULE += ft6x06
+endif
+
 # TODO: remove the stdin dependency
 USEMODULE += stdin
