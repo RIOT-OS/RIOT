@@ -143,11 +143,11 @@ void dhcpv6_client_auto_init(void)
 static void *_thread(void *args)
 {
     (void)args;
-    event_queue_t event_queue;
-    event_queue_init(&event_queue);
-    dhcpv6_client_init(&event_queue, SOCK_ADDR_ANY_NETIF);
+    event_queue_t auto_init_event_queue;
+    event_queue_init(&auto_init_event_queue);
+    dhcpv6_client_init(&auto_init_event_queue, SOCK_ADDR_ANY_NETIF);
     dhcpv6_client_start();
-    event_loop(&event_queue);   /* never returns */
+    event_loop(&auto_init_event_queue); /* never returns */
     return NULL;
 }
 #endif /* MODULE_AUTO_INIT_DHCPV6_CLIENT */
@@ -174,9 +174,9 @@ void _initialize_ia_na(uint16_t netif)
        interfaces if DHCP IA_NA is enabled. Otherwise
        use the specific interface ID. */
     if (netif == SOCK_ADDR_ANY_NETIF) {
-        netif_t* netif = NULL;
-        while ((netif = netif_iter(netif))) {
-            int16_t netif_id = netif_get_id(netif);
+        netif_t* current_netif = NULL;
+        while ((current_netif = netif_iter(current_netif))) {
+            int16_t netif_id = netif_get_id(current_netif);
             if (netif_id < 0) {
                 continue;
             }
