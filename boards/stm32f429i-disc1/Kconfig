@@ -29,5 +29,7 @@ config BOARD_STM32F429I_DISC1
     select BOARD_HAS_LSE
 
     select HAVE_SAUL_GPIO
+    select HAVE_ILI9341
+    select HAVE_STMPE811_I2C
 
 source "$(RIOTBOARD)/common/stm32/Kconfig"
