@@ -15,6 +15,18 @@ config MODULE_STMPE811
     select MODULE_ZTIMER
     select MODULE_ZTIMER_MSEC
 
+config HAVE_STMPE811_I2C
+    bool
+    select MODULE_STMPE811_I2C if MODULE_TOUCH_DEV
+    help
+      Indicates that an STMPE811 over I2C touch panel is present.
+
+config HAVE_STMPE811_SPI
+    bool
+    select MODULE_STMPE811_SPI if MODULE_TOUCH_DEV
+    help
+      Indicates that an STMPE811 over SPI touch panel is present.
+
 choice
     bool "STMPE811 Touchscreen Controller"
     optional
