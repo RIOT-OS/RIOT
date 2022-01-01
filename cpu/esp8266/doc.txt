@@ -46,8 +46,8 @@
 
 # Overview {#esp8266_overview}
 
-<b>RIOT-Xtensa-ESP</b> is a bare metal implementation of <b>RIOT-OS</b> for
-<b>ESP8266 / ESP8285</b> SOCs which supports most features of RIOT-OS. The
+The **RIOT port for Xtensa-ESP** is a bare metal implementation of **RIOT-OS**
+for **ESP8266 / ESP8285** SOCs which supports most features of RIOT-OS. The
 peripheral SPI and I2C interfaces allow to connect all external hardware
 modules supported by RIOT-OS, such as sensors and actuators. SPI interface
 can also be used to connect external IEEE802.15.4 modules to integrate
@@ -65,11 +65,11 @@ make flash BOARD=esp8266-esp-12x -C tests/shell ...
 For more information about the `make` command variables and specific compile
 options, see section [Compile Options](#esp8266_compile_options).
 
-Although the port does not use the official <b>ESP8266 RTOS SDK</b> directly,
+Although the port does not use the official **ESP8266 RTOS SDK** directly,
 it must be installed for compilation. The reason is that the port uses most of
-the <b>ESP8266 SOC definitions</b> provided by SDK header files. In addition,
-it needs the hardware abstraction library (libhal), and <b>ESP8266 WiFi stack
-binary</b> libraries which are part of the SDK.
+the **ESP8266 SOC definitions** provided by SDK header files. In addition,
+it needs the hardware abstraction library (libhal), and **ESP8266 WiFi stack
+binary** libraries which are part of the SDK.
 
 [Back to table of contents](#esp8266_toc)
 
@@ -89,20 +89,20 @@ parameters used by the ESP8266 port in alphabetical order.
 
 <center>
 
-Parameter | Short Description                      | Type*
-----------|----------------------------------------|------
-[I2C0_SPEED](#esp8266_i2c_interfaces)| Bus speed of I2C_DEV(0)         | o
-[I2C0_SCL](#esp8266_i2c_interfaces)  | GPIO used as SCL for I2C_DEV(0) | o
-[I2C0_SDA](#esp8266_i2c_interfaces)  | GPIO used as SCL for I2C_DEV(0) | o
-[I2C1_SPEED](#esp8266_i2c_interfaces)| Bus speed of I2C_DEV(1)         | o
-[I2C1_SCL](#esp8266_i2c_interfaces)  | GPIO used as SCL for I2C_DEV(1) | o
-[I2C1_SDA](#esp8266_i2c_interfaces)  | GPIO used as SCL for I2C_DEV(1) | o
-[PWM0_GPIOS](#esp8266_pwm_channels)  | GPIOs that can be used at channels of PWM_DEV(0) | o
-[SPI0_CS0](#esp8266_spi_interfaces)  | GPIO used as default CS for SPI_DEV(0) | o
+Parameter                            | Short Description                             | Type[1]
+-------------------------------------|-----------------------------------------------|--------
+[I2C0_SPEED](#esp8266_i2c_interfaces)| Bus speed of I2C_DEV(0)                       | o
+[I2C0_SCL](#esp8266_i2c_interfaces)  | GPIO used as SCL for I2C_DEV(0)               | o
+[I2C0_SDA](#esp8266_i2c_interfaces)  | GPIO used as SCL for I2C_DEV(0)               | o
+[I2C1_SPEED](#esp8266_i2c_interfaces)| Bus speed of I2C_DEV(1)                       | o
+[I2C1_SCL](#esp8266_i2c_interfaces)  | GPIO used as SCL for I2C_DEV(1)               | o
+[I2C1_SDA](#esp8266_i2c_interfaces)  | GPIO used as SCL for I2C_DEV(1)               | o
+[PWM0_GPIOS](#esp8266_pwm_channels)  | GPIOs that can be used as PWM_DEV(0) channels | o
+[SPI0_CS0](#esp8266_spi_interfaces)  | GPIO used as default CS for SPI_DEV(0)        | o
 
 </center>
 
-<b>*Type:</b> m - mandatory, o - optional
+1. **Type:** m - mandatory, o - optional
 
 The following table gives a short reference  in alphabetical order of modules that can be enabled/disabled by board configurations and/or application's makefile using `USEMODULE` and `DISABLE_MODULE`.
 
@@ -155,16 +155,16 @@ described below.
 
 The following software components are required for compilation:
 
-- <b>Xtensa GCC</b> compiler suite for ESP8266
-- Modified <b>ESP8266 RTOS SDK</b> which includes all SOC definitions and
+- **Xtensa GCC** compiler suite for ESP8266
+- Modified **ESP8266 RTOS SDK** which includes all SOC definitions and
   some binary libraries
-- Modified version of ESP flash programmer tool <b>`esptool.py`</b>
+- Modified version of ESP flash programmer tool **`esptool.py`**
 
 There are two options to install the toolchain:
 
-- using RIOT Docker (<b>riotdocker</b>), see section
+- using RIOT Docker (**riotdocker**), see section
   [RIOT Docker Toolchain (riotdocker)](#esp8266_riot_docker_toolchain)
-- <b>manual installation</b>, see section [Manual Toolchain Installation](#esp8266_manual_toolchain_installation)
+- **manual installation**, see section [Manual Toolchain Installation](#esp8266_manual_toolchain_installation)
 
 In both cases, the ESP flash programmer tool `esptool.py` is required,
 see section [Installation of `esptool.py`](#esp8266_installation_of_esptool).
@@ -194,9 +194,9 @@ BUILD_IN_DOCKER=1 make BOARD=... flash
 
 Using RIOT Docker requires at least the following software components:
 
-- <b>Docker</b> container virtualization software
-- RIOT Docker image (<b>`riotdocker`</b>)
-- ESP flash programmer tool <b>`esptool.py`</b>
+- **Docker** container virtualization software
+- RIOT Docker image (**`riotdocker`**)
+- ESP flash programmer tool **`esptool.py`**
 
 For information about installing Docker on your host, refer to the appropriate
 manuals for your operating system. The easiest way to install Docker on an
@@ -347,7 +347,7 @@ package at build-time and there is no need to install it separately.
 
 [Back to table of contents](#esp8266_toc)
 
-### Installation of `esptool.py` (ESP flash programmer tool) {#esp8266_installation_of_esptool}
+### Installation of esptool.py (ESP flash programmer tool) {#esp8266_installation_of_esptool}
 
 The RIOT port does not work with the `esptool.py` ESP flasher program
 available on [GitHub](https://github.com/espressif/esptool) or
@@ -547,17 +547,17 @@ interface is fixed as shown in following table.
 
 <center>
 
-Signal     | Pin
------------|-------
-#SPI0_MISO | GPIO12
-#SPI0_MOSI | GPIO13
-#SPI0_SCK  | GPIO14
-#SPI0_CS0  | GPIOn with n = 0, 2, 4, 5, 15, 16 (additionally 9, 10 in DOUT flash mode)
+Signal       | Pin
+-------------|-------
+`#SPI0_MISO` | GPIO12
+`#SPI0_MOSI` | GPIO13
+`#SPI0_SCK`  | GPIO14
+`#SPI0_CS0`  | GPIOn with n = 0, 2, 4, 5, 15, 16 (additionally 9, 10 in DOUT flash mode)
 
 </center>
 
 The only pin definition that can be overridden by an application-specific
-board configuration is the CS signal defined by #SPI0_CS0.
+board configuration is the CS signal defined by `#SPI0_CS0`.
 
 When the SPI is enabled using module `periph_spi`, these GPIOs cannot be
 used for any other purpose. GPIOs 0, 2, 4, 5, 15, and 16 can be used as CS
@@ -571,14 +571,14 @@ CS signal.
 
 Since the ESP8266 does not or only partially support the I2C in hardware,
 I2C interfaces are realized as **bit-banging protocol in software**. The
-maximum usable bus speed is therefore #I2C_SPEED_FAST_PLUS. The maximum
-number of buses that can be defined is 2, #I2C_DEV(0) and #I2C_DEV(1).
+maximum usable bus speed is therefore `#I2C_SPEED_FAST_PLUS`. The maximum
+number of buses that can be defined is 2, `#I2C_DEV(0)` and `#I2C_DEV(1)`.
 
-GPIO pins (#I2C0_SCL, #I2C0_SDA and/or `I2C1_SCL`, `I2C1_SDA`)
+GPIO pins (`#I2C0_SCL`, `#I2C0_SDA` and/or `I2C1_SCL`, `I2C1_SDA`)
 have to be defined in the board-specific peripheral configuration in
 `$BOARD/periph_conf.h`. Furthermore, the default I2C bus speed (#I2C0_SPEED
 and/or `I2C1_SPEED`) that is used for I2C bus(ses) has to be defined. The
-number of configured buses #I2C_NUMOF is then determined automatically
+number of configured buses `#I2C_NUMOF` is then determined automatically
 from these definitions.
 
 In the following example, only one I2C bus is defined:
@@ -616,17 +616,17 @@ implementation is 10 us or 100.000 PWM clock cycles per second. Therefore,
 the product of frequency and resolution should not be greater than 100.000.
 Otherwise the frequency is scaled down automatically.
 
-The GPIOs that can be used as channels of the PWM device #PWM_DEV(0) are
-defined by #PWM0_GPIOS. By default, all GPIOs that are not used as I2C, SPI,
+The GPIOs that can be used as channels of the PWM device `#PWM_DEV(0)` are
+defined by `#PWM0_GPIOS`. By default, all GPIOs that are not used as I2C, SPI,
 or UART signals are defined as PWM channels in board definition. As long as
-these channels are not initialized with function #pwm_init, they can be used as
+these channels are not initialized with function `#pwm_init`, they can be used as
 normal GPIOs for other purposes. Even if they are already initialized, but
 have a duty cycle value of 0 can be used as output GPIOs for other purposes.
-GPIOs in #PWM0_GPIOS that are used for other purposes, e.g., I2C or SPI, are
+GPIOs in `#PWM0_GPIOS` that are used for other purposes, e.g., I2C or SPI, are
 no longer available as PWM channels.
 
 To define other GPIOs as PWM channels, just overwrite the definition of
-#PWM0_GPIOS in an
+`#PWM0_GPIOS` in an
 [application-specific board configuration](#esp8266_application_specific_board_configuration)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
@@ -655,7 +655,7 @@ you'll need to use the hardware timer with only one timer channel.
 ## SPIFFS Device {#esp8266_spiffs_device}
 
 If SPIFFS module is enabled (`USEMODULE += esp_spiffs`), the implemented
-MTD system drive #mtd0 for the on-board SPI flash memory is used together
+MTD system drive `#mtd0` for the on-board SPI flash memory is used together
 with modules `spiffs` and `vfs` to realize a persistent file system.
 
 For this purpose, the flash memory is formatted as SPIFFS starting at the
@@ -670,7 +670,7 @@ flash_size - 5 * 4096 - 512 kByte
 
 Please refer file `$RIOTBASE/tests/unittests/test-spiffs/tests-spiffs.c`
 for more information on how to use SPIFFS and VFS together with a MTD
-device #mtd0 alias `MTD_0`.
+device `#mtd0` alias `MTD_0`.
 
 [Back to table of contents](#esp8266_toc)
 
@@ -691,8 +691,8 @@ RTC is not yet implemented.
 
 ESP8266 provides different built-in possibilities to realize network devices:
 
-- <b>ESP WiFi</b>, usual AP-based wireless LAN (not yet supported)
-- <b>ESP-NOW</b>, a WiFi based AP-less and connectionless peer to
+- **ESP WiFi**, usual AP-based wireless LAN (not yet supported)
+- **ESP-NOW**, a WiFi based AP-less and connectionless peer to
   peer communication protocol
 
 [Back to table of contents](#esp8266_toc)
@@ -886,13 +886,13 @@ parameters for ESP8266 boards:
 
 <center>
 
-Parameter               | Default      | Remarks
-------------------------|--------------|----------------------------
-#MRF24J40_PARAM_SPI     | SPI_DEV(0)   | fixed, see section [SPI Interfaces](#esp8266_spi_interfaces)
-#MRF24J40_PARAM_SPI_CLK | SPI_CLK_1MHZ | fixed
-#MRF24J40_PARAM_CS      | GPIO16       | can be overridden
-#MRF24J40_PARAM_INT     | GPIO0        | can be overridden
-#MRF24J40_PARAM_RESET   | GPIO2        | can be overridden
+Parameter                | Default         | Remarks
+-------------------------|-----------------|----------------------------
+`#MRF24J40_PARAM_SPI`    | `#SPI_DEV(0)`   | fixed, see section [SPI Interfaces](#esp8266_spi_interfaces)
+`#MRF24J40_PARAM_SPI_CLK`| `#SPI_CLK_1MHZ` | fixed
+`#MRF24J40_PARAM_CS`     | `GPIO16`        | can be overridden
+`#MRF24J40_PARAM_INT`    | `GPIO0`         | can be overridden
+`#MRF24J40_PARAM_RESET`  | `GPIO2`         | can be overridden
 
 </center><br>
 
@@ -914,12 +914,12 @@ The `enc28j60` driver module uses the following preconfigured interface paramete
 
 <center>
 
-Parameter             | Default      | Remarks
-----------------------|--------------|----------------------------
-#ENC28J60_PARAM_SPI   | SPI_DEV(0)   | fixed, see section [SPI Interfaces](#esp8266_spi_interfaces)
-#ENC28J60_PARAM_CS    | GPIO4        | can be overridden
-#ENC28J60_PARAM_INT   | GPIO9        | can be overridden
-#ENC28J60_PARAM_RESET | GPIO10       | can be overridden
+Parameter              | Default       | Remarks
+-----------------------|---------------|----------------------------
+`#ENC28J60_PARAM_SPI`  | `#SPI_DEV(0)` | fixed, see section [SPI Interfaces](#esp8266_spi_interfaces)
+`#ENC28J60_PARAM_CS`   | `GPIO4`       | can be overridden
+`#ENC28J60_PARAM_INT`  | `GPIO9`       | can be overriddn
+`#ENC28J60_PARAM_RESET`| `GPIO10`      | can be overridden
 
 </center>
 
@@ -944,10 +944,10 @@ parameters for ESP8266 boards:
 
 <center>
 
-Parameter               | Default     | Remarks
-------------------------|-------------|----------------------------
-#SDCARD_SPI_PARAM_SPI   | #SPI_DEV(0) | fix, see section [SPI Interfaces](#esp8266_spi_interfaces)
-#SDCARD_SPI_PARAM_CS    | #SPI0_CS0   | can be overridden
+Parameter              | Default      | Remarks
+-----------------------|--------------|----------------------------
+`#SDCARD_SPI_PARAM_SPI`| `#SPI_DEV(0)`| fix, see section [SPI Interfaces](#esp8266_spi_interfaces)
+`#SDCARD_SPI_PARAM_CS` | `#SPI0_CS0`  | can be overridden
 
 </center>
 
@@ -980,7 +980,7 @@ application-specific board configuration file `$APPDIR/board.h` in
 the source directory `$APPDIR` of the application and add the
 definitions to be overridden. To force the preprocessor to include
 board's original `board.h` after that, add the `include_next`
-preprocessor directive as the <b>last</b> line.
+preprocessor directive as the **last** line.
 
 For example to override the default definition of the GPIOs that are
 used as PWM channels, the application-specific board configuration
@@ -995,7 +995,7 @@ file `$APPDIR/board.h` could look like the following:
 
 It is important to ensure that the application-specific board
 configuration `$APPDIR/board.h` is included first. Insert the following
-line as the <b>first</b> line to the application makefile `$APPDIR/Makefile`.
+line as the **first** line to the application makefile `$APPDIR/Makefile`.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 INCLUDES += -I$(APPDIR)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1024,7 +1024,7 @@ purpose just create an application-specific driver parameter file
 `$APPDIR/<device>_params.h` in the source directory `$APPDIR` of the
 application and add the definitions to be overridden. To force the
 preprocessor to include driver's original `<device>_params.h` after
-that, add the `include_next` preprocessor directive as the <b>last</b> line.
+that, add the `include_next` preprocessor directive as the **last** line.
 
 For example, to override a GPIO used for LIS3DH sensor, the
 application-specific driver parameter file `$APPDIR/<device>_params.h`
@@ -1039,7 +1039,7 @@ could look like the following:
 
 It is important to ensure that the application-specific driver parameter
 file `$APPDIR/<device>_params.h` is included first. Insert the following
-line as the <b>first</b> line to the application makefile `$APPDIR/Makefile`.
+line as the **first** line to the application makefile `$APPDIR/Makefile`.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 INCLUDES += -I$(APPDIR)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
