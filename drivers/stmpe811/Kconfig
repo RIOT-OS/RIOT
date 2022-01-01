@@ -9,13 +9,11 @@ config MODULE_STMPE811
     bool
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_GPIO_IRQ
-    depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
     select MODULE_ZTIMER
     select MODULE_ZTIMER_MSEC
-    depends on TEST_KCONFIG
 
 choice
     bool "STMPE811 Touchscreen Controller"
