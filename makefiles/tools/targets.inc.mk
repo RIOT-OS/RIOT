@@ -64,3 +64,8 @@ $(RIOTTOOLS)/elf2uf2/elf2uf2: $(RIOTTOOLS)/elf2uf2/Makefile
 	@echo "[INFO] elf2uf2 not found - fetching it from GitHub now"
 	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/elf2uf2
 	@echo "[INFO] elf2uf2 successfully fetched!"
+
+$(RIOTTOOLS)/pioasm/pioasm: $(RIOTTOOLS)/pioasm/Makefile
+	@echo "[INFO] pioasm not found - fetching it from GitHub now"
+	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/pioasm
+	@echo "[INFO] pioasm successfully fetched!"
