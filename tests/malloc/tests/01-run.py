@@ -11,7 +11,7 @@ from testrunner import run
 
 # For BOARD's with large amount of RAM allocating all chunks takes longer
 # than 10s
-ALLOCATION_TIMEOUT = 20
+ALLOCATION_TIMEOUT = 30
 FREE_TIMEOUT = ALLOCATION_TIMEOUT
 
 

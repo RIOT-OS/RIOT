@@ -1,0 +1,120 @@
+# Copyright (c) 2021 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU models
+config CPU_MODEL_STM32U575AG
+    bool
+    select CPU_LINE_STM32U575XX
+
+config CPU_MODEL_STM32U575AI
+    bool
+    select CPU_LINE_STM32U575XX
+
+config CPU_MODEL_STM32U575CG
+    bool
+    select CPU_LINE_STM32U575XX
+
+config CPU_MODEL_STM32U575CI
+    bool
+    select CPU_LINE_STM32U575XX
+
+config CPU_MODEL_STM32U575OG
+    bool
+    select CPU_LINE_STM32U575XX
+
+config CPU_MODEL_STM32U575OI
+    bool
+    select CPU_LINE_STM32U575XX
+
+config CPU_MODEL_STM32U575QG
+    bool
+    select CPU_LINE_STM32U575XX
+
+config CPU_MODEL_STM32U575QI
+    bool
+    select CPU_LINE_STM32U575XX
+
+config CPU_MODEL_STM32U575RG
+    bool
+    select CPU_LINE_STM32U575XX
+
+config CPU_MODEL_STM32U575RI
+    bool
+    select CPU_LINE_STM32U575XX
+
+config CPU_MODEL_STM32U575VG
+    bool
+    select CPU_LINE_STM32U575XX
+
+config CPU_MODEL_STM32U575VI
+    bool
+    select CPU_LINE_STM32U575XX
+
+config CPU_MODEL_STM32U575ZG
+    bool
+    select CPU_LINE_STM32U575XX
+
+config CPU_MODEL_STM32U575ZI
+    bool
+    select CPU_LINE_STM32U575XX
+
+config CPU_MODEL_STM32U585AI
+    bool
+    select CPU_LINE_STM32U585XX
+
+config CPU_MODEL_STM32U585CI
+    bool
+    select CPU_LINE_STM32U585XX
+
+config CPU_MODEL_STM32U585OI
+    bool
+    select CPU_LINE_STM32U585XX
+
+config CPU_MODEL_STM32U585QI
+    bool
+    select CPU_LINE_STM32U585XX
+
+config CPU_MODEL_STM32U585RI
+    bool
+    select CPU_LINE_STM32U585XX
+
+config CPU_MODEL_STM32U585VI
+    bool
+    select CPU_LINE_STM32U585XX
+
+config CPU_MODEL_STM32U585ZI
+    bool
+    select CPU_LINE_STM32U585XX
+
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32u575ag" if CPU_MODEL_STM32U575AG
+    default "stm32u575ai" if CPU_MODEL_STM32U575AI
+    default "stm32u575cg" if CPU_MODEL_STM32U575CG
+    default "stm32u575ci" if CPU_MODEL_STM32U575CI
+    default "stm32u575og" if CPU_MODEL_STM32U575OG
+    default "stm32u575oi" if CPU_MODEL_STM32U575OI
+    default "stm32u575qg" if CPU_MODEL_STM32U575QG
+    default "stm32u575qi" if CPU_MODEL_STM32U575QI
+    default "stm32u575rg" if CPU_MODEL_STM32U575RG
+    default "stm32u575ri" if CPU_MODEL_STM32U575RI
+    default "stm32u575vg" if CPU_MODEL_STM32U575VG
+    default "stm32u575vi" if CPU_MODEL_STM32U575VI
+    default "stm32u575zg" if CPU_MODEL_STM32U575ZG
+    default "stm32u575zi" if CPU_MODEL_STM32U575ZI
+    default "stm32u585ai" if CPU_MODEL_STM32U585AI
+    default "stm32u585ci" if CPU_MODEL_STM32U585CI
+    default "stm32u585oi" if CPU_MODEL_STM32U585OI
+    default "stm32u585qi" if CPU_MODEL_STM32U585QI
+    default "stm32u585ri" if CPU_MODEL_STM32U585RI
+    default "stm32u585vi" if CPU_MODEL_STM32U585VI
+    default "stm32u585zi" if CPU_MODEL_STM32U585ZI

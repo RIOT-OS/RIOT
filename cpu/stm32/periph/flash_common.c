@@ -31,13 +31,19 @@
 #define CNTRL_REG              (FLASH->PECR)
 #define CNTRL_REG_LOCK         (FLASH_PECR_PELOCK)
 #define KEY_REG                (FLASH->PEKEYR)
-#elif defined(CPU_FAM_STM32L5)
+#elif defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5)
 #define FLASH_KEY1             ((uint32_t)0x45670123)
 #define FLASH_KEY2             ((uint32_t)0xCDEF89AB)
 #define CNTRL_REG              (FLASH->NSCR)
+#if defined(CPU_FAM_STM32U5)
+#define CNTRL_REG_LOCK         (FLASH_NSCR_LOCK)
+#define KEY_REG                (FLASH->NSKEYR)
+#define FLASH_SR_EOP           (FLASH_NSSR_EOP)
+#else
 #define CNTRL_REG_LOCK         (FLASH_NSCR_NSLOCK)
 #define KEY_REG                (FLASH->NSKEYR)
 #define FLASH_SR_EOP           (FLASH_NSSR_NSEOP)
+#endif
 #else
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
@@ -57,6 +63,9 @@
 
 #if defined(CPU_FAM_STM32L5)
 #define FLASH_SR_BSY            (FLASH_NSSR_NSBSY)
+#define FLASH_SR_REG            (FLASH->NSSR)
+#elif defined(CPU_FAM_STM32U5)
+#define FLASH_SR_BSY            (FLASH_NSSR_BSY)
 #define FLASH_SR_REG            (FLASH->NSSR)
 #else
 #define FLASH_SR_REG            (FLASH->SR)

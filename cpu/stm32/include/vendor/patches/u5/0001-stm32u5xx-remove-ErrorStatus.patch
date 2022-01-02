@@ -1,0 +1,40 @@
+From 872855adef525260f3f2f16c6525810a2dafe055 Mon Sep 17 00:00:00 2001
+From: Alexandre Abadie <alexandre.abadie@inria.fr>
+Date: Mon, 13 Dec 2021 14:48:19 +0100
+Subject: [PATCH 1/1] stm32u5xx: remove ErrorStatus
+
+---
+ Include/stm32u5xx.h | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/Include/stm32u5xx.h b/Include/stm32u5xx.h
+index e9c3cd8..5d58d36 100644
+--- a/Include/stm32u5xx.h
++++ b/Include/stm32u5xx.h
+@@ -8,8 +8,8 @@
+   *          is using in the C source code, usually in main.c. This file contains:
+   *           - Configuration section that allows to select:
+   *              - The STM32U5xx device used in the target application
+-  *              - To use or not the peripheral’s drivers in application code(i.e.
+-  *                code will be based on direct access to peripheral’s registers
++  *              - To use or not the peripheralï¿½s drivers in application code(i.e.
++  *                code will be based on direct access to peripheralï¿½s registers
+   *                rather than drivers API), this option is controlled by
+   *                "#define USE_HAL_DRIVER"
+   *
+@@ -121,12 +121,6 @@ typedef enum
+ } FunctionalState;
+ #define IS_FUNCTIONAL_STATE(STATE) (((STATE) == DISABLE) || ((STATE) == ENABLE))
+ 
+-typedef enum
+-{
+-  SUCCESS = 0,
+-  ERROR = !SUCCESS
+-} ErrorStatus;
+-
+ /**
+   * @}
+   */
+-- 
+2.32.0
+

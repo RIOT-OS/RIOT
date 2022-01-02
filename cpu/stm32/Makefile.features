@@ -12,12 +12,12 @@ FEATURES_PROVIDED += periph_rtt_overflow
 FEATURES_PROVIDED += periph_uart_modecfg
 FEATURES_PROVIDED += periph_uart_nonblocking
 
-ifneq (,$(filter $(CPU_FAM),f0 f1 f3 g0 g4 l0 l1 l4 l5 wb wl))
+ifneq (,$(filter $(CPU_FAM),f0 f1 f3 g0 g4 l0 l1 l4 l5 u5 wb wl))
   FEATURES_PROVIDED += periph_flashpage
   FEATURES_PROVIDED += periph_flashpage_pagewise
 endif
 
-ifneq (,$(filter $(CPU_FAM),f0 f2 f3 f4 f7 l0 l1 l4 l5 wb wl))
+ifneq (,$(filter $(CPU_FAM),f0 f2 f3 f4 f7 l0 l1 l4 l5 u5 wb wl))
   CPU_MODELS_WITHOUT_RTC_BKPR += stm32f030% stm32f070%
   ifeq (,$(filter $(CPU_MODELS_WITHOUT_RTC_BKPR),$(CPU_MODEL)))
     FEATURES_PROVIDED += periph_rtc_mem
@@ -41,7 +41,7 @@ endif
 
 # Not all F4 and L0 parts implement a RNG.
 CPU_MODELS_WITHOUT_HWRNG = stm32f401% stm32f411% stm32f446% stm32l031% stm32l011%
-ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l0 l4 l5 wb))
+ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l0 l4 l5 u5 wb))
   ifeq (,$(filter $(CPU_MODELS_WITHOUT_HWRNG),$(CPU_MODEL)))
     FEATURES_PROVIDED += periph_hwrng
   endif
