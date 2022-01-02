@@ -21,7 +21,7 @@
 #include "log.h"
 #include "periph/gpio.h"
 #include "periph/i2c.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "cst816s.h"
 #include "cst816s_internal.h"
@@ -55,9 +55,9 @@ static void _cst816s_reset(const cst816s_t *dev)
     /* Reset, sleep durations based on
      * https://github.com/lupyuen/hynitron_i2c_cst0xxse/blob/master/cst0xx_core.c#L1078-L1085 */
     gpio_clear(dev->params->reset);
-    xtimer_usleep(CST816S_RESET_DURATION_LOW);
+    ztimer_sleep(ZTIMER_MSEC, CST816S_RESET_DURATION_LOW_MS);
     gpio_set(dev->params->reset);
-    xtimer_usleep(CST816S_RESET_DURATION_HIGH);
+    ztimer_sleep(ZTIMER_MSEC, CST816S_RESET_DURATION_HIGH_MS);
 }
 
 int cst816s_read(const cst816s_t *dev, cst816s_touch_data_t *data)
