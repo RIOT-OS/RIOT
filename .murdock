@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # uncomment and change this to limit builds, e.g.,
-#export BOARDS="samr21-xpro native"
+export BOARDS="esp32-ethernet-kit-v1_0 esp32-mh-et-live-minikit esp32-wemos-lolin-d32-pro esp32-ethernet-kit-v1_1 esp32-olimex-evb esp32-wroom-32 esp32-ethernet-kit-v1_2 esp32-ttgo-t-beam esp32-wrover-kit esp32-heltec-lora32-v2"
 # and / or
 #export APPS="examples/hello-world tests/unittests"
 
