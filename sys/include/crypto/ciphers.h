@@ -104,6 +104,7 @@ typedef struct cipher_interface_st {
                    uint8_t *plain_block);
 } cipher_interface_t;
 
+/** Pointer type to BlockCipher-Interface for the Cipher-Algorithms */
 typedef const cipher_interface_t *cipher_id_t;
 
 /**

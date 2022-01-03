@@ -45,7 +45,7 @@ typedef enum {
  * The registered callback function is executed in the context of the dedicated
  * standalone RD endpoint's thread.
  *
- * @param[in] t         type of event
+ * @param[in] event     type of event
  */
 typedef void(*cord_ep_standalone_cb_t)(cord_ep_standalone_event_t event);
 

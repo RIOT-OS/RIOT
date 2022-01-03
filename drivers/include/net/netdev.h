@@ -289,7 +289,8 @@ typedef struct netdev netdev_t;
 /**
  * @brief   Event callback for signaling event to upper layers
  *
- * @param[in] type          type of the event
+ * @param[in] dev           pointer to the device descriptor
+ * @param[in] event         type of the event
  */
 typedef void (*netdev_event_cb_t)(netdev_t *dev, netdev_event_t event);
 
