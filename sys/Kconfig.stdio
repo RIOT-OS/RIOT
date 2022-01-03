@@ -49,9 +49,15 @@ config MODULE_STDIO_UART_RX
     bool
     depends on MODULE_STDIO_UART
     select MODULE_ISRPIPE
+    select MODULE_STDIO_AVAILABLE
     default y if MODULE_STDIN
     help
         Reception when using UART-based STDIO needs to be enabled.
+
+config MODULE_STDIO_AVAILABLE
+    bool
+    help
+        Indicates that the implementation supports function stdio_available
 
 config MODULE_PRINTF_FLOAT
     bool "Float support in printf"
