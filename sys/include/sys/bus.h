@@ -55,6 +55,11 @@ typedef enum {
 } sys_bus_power_event_t;
 
 /**
+ * @brief Indicates positive or negative out-of-range event
+ */
+#define RTC_EVENT_OUT_OF_RANGE INT32_MIN
+
+/**
  * @brief RTC Bus Events
  */
 typedef enum {
