@@ -1,0 +1,24 @@
+From 0bc3004057327195bff710cd85961f97dfe4a38f Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sun, 2 Jan 2022 13:58:33 +0100
+Subject: [PATCH 2/3] add_F_for_string_literals
+
+---
+ Adafruit_Sensor.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Adafruit_Sensor.cpp b/Adafruit_Sensor.cpp
+index 2a4513e..5b82a10 100644
+--- a/Adafruit_Sensor.cpp
++++ b/Adafruit_Sensor.cpp
+@@ -1,5 +1,7 @@
+ #include "Adafruit_Sensor.h"
+ 
++#define F(string_literal)       (string_literal)
++
+ /**************************************************************************/
+ /*!
+     @brief  Prints sensor information to serial console
+-- 
+2.17.1
+

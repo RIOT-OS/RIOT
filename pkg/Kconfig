@@ -6,6 +6,7 @@
 #
 menu "Packages"
 
+rsource "arduino_adafruit_sensor/Kconfig"
 rsource "arduino_sdi_12/Kconfig"
 rsource "c25519/Kconfig"
 rsource "cayenne-lpp/Kconfig"

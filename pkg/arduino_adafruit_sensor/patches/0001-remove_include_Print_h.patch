@@ -1,0 +1,24 @@
+From 66fe43c08e09331b1810a37c7b0edbedc212f871 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sun, 2 Jan 2022 12:38:18 +0100
+Subject: [PATCH 1/3] remove_include_Print_h
+
+---
+ Adafruit_Sensor.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Adafruit_Sensor.h b/Adafruit_Sensor.h
+index 087eda5..77b70e1 100755
+--- a/Adafruit_Sensor.h
++++ b/Adafruit_Sensor.h
+@@ -24,7 +24,6 @@
+ #include <stdint.h>
+ #elif ARDUINO >= 100
+ #include "Arduino.h"
+-#include "Print.h"
+ #else
+ #include "WProgram.h"
+ #endif
+-- 
+2.17.1
+
