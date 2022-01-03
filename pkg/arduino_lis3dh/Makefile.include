@@ -1,7 +1,4 @@
-FEATURES_REQUIRED += periph_i2c
-FEATURES_REQUIRED += periph_spi
+PSEUDOMODULES += arduino_lis3dh_i2c
+PSEUDOMODULES += arduino_lis3dh_spi
 
 INCLUDES += -I$(PKGDIRBASE)/arduino_lis3dh
-INCLUDES += -I$(RIOTPKG)/arduino_lis3dh/Adafruit_Sensor
-
-CXXEXFLAGS += -std=c++11
