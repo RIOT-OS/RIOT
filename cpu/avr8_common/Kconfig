@@ -14,6 +14,8 @@ config CPU_ARCH_AVR8
     select MODULE_MALLOC_THREAD_SAFE if TEST_KCONFIG
     # static C++ constructors need guards for thread safe initialization
     select MODULE_CXX_CTOR_GUARDS if MODULE_CPP
+    # new and delete operators needed
+    select MODULE_CPP_NEW_DELETE if MODULE_CPP
 
 ## Common CPU symbols
 config CPU_ARCH
