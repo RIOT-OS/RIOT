@@ -23,6 +23,9 @@ config BOARD_P_L496G_CELL02
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV
 
+    # Put other features for this board (in alphabetical order)
+    select HAS_RIOTBOOT
+
     # Clock configuration
     select BOARD_HAS_LSE
 
