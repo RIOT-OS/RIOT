@@ -9,4 +9,5 @@ config APPLICATION
     bool
     default y
     depends on HAS_BACKUP_RAM
+    depends on HAS_PERIPH_RTC
     depends on TEST_KCONFIG
