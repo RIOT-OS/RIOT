@@ -1,0 +1,7 @@
+/**
+ * @defgroup pkg_arduino_lsm9ds0 Arduino driver package Adafruit LSM9DS0 breakout
+ * @ingroup  pkg
+ * @brief    Arduino driver package for the Adafruit Accelerometer + Gyro +
+ *           Magnetometer 9-DOF breakout module with the ST LSM9DS0 sensor
+ * @see      https://github.com/adafruit/Adafruit_LSM9DS0_Library
+ */

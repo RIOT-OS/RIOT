@@ -1,0 +1,5 @@
+# both interfaces are implemented by the driver
+FEATURES_REQUIRED += periph_i2c
+FEATURES_REQUIRED += periph_spi
+
+USEPKG += arduino_adafruit_sensor
