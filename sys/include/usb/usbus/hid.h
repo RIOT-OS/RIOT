@@ -114,13 +114,6 @@ void usbus_hid_init(usbus_t *usbus, usbus_hid_device_t *hid,
 size_t usbus_hid_submit(usbus_hid_device_t *hid, const uint8_t *buf,
                         size_t len);
 
-/**
- * @brief Flush the buffer to the USB host
- *
- * @param[in]   hid      USBUS HID handler context
- */
-void usbus_hid_flush(usbus_hid_device_t *hid);
-
 #ifdef __cplusplus
 }
 #endif
