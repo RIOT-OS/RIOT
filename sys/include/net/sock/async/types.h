@@ -154,7 +154,7 @@ typedef struct sock_udp sock_udp_t;     /**< forward declare for async */
  * @param[in] arg   Argument provided when setting the callback using
  *                  @ref sock_udp_set_cb(). May be NULL.
  */
-typedef void (*sock_udp_cb_t)(sock_udp_t *sock, sock_async_flags_t type,
+typedef void (*sock_udp_cb_t)(sock_udp_t *sock, sock_async_flags_t flags,
                               void *arg);
 #endif  /* defined(MODULE_SOCK_UDP) || defined(DOXYGEN) */
 
