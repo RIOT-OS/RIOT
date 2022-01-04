@@ -39,7 +39,7 @@ static const spi_conf_t spi_config[] = {
         .mosi_pin = GPIO_PIN(PORT_B, 1),
         .miso_pin = GPIO_PIN(PORT_B, 3),
         .sck_pin  = GPIO_PIN(PORT_B, 2),
-        .cs_pin   = GPIO_UNDEF
+        .cs_pin   = SPI_CS_UNDEF,
     },
     {
         .num      = 1,

@@ -221,6 +221,21 @@ typedef enum {
 #endif
 
 /**
+ * @brief   Define value for unused CS line
+ */
+#define SPI_CS_UNDEF        (GPIO_UNDEF)
+
+#ifndef DOXYGEN
+/**
+ * @brief   Overwrite the default spi_cs_t type definition
+ * @{
+ */
+#define HAVE_SPI_CS_T
+typedef uint32_t spi_cs_t;
+/** @} */
+#endif
+
+/**
  * @name   Override SPI mode settings
  * @{
  */
@@ -282,7 +297,7 @@ typedef struct {
     gpio_t mosi_pin;        /**< pin used for MOSI */
     gpio_t miso_pin;        /**< pin used for MISO */
     gpio_t sck_pin;         /**< pin used for SCK */
-    gpio_t cs_pin;          /**< pin used for CS */
+    spi_cs_t cs_pin;        /**< pin used for CS */
 } spi_conf_t;
 /** @} */
 
