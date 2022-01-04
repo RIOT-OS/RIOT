@@ -30,6 +30,7 @@
 
 #include "cpu.h"
 #include "mutex.h"
+#include "periph/gpio.h"
 #include "periph/spi.h"
 
 #define ENABLE_DEBUG        0
@@ -135,8 +136,7 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
         gpio_init((gpio_t)cs, GPIO_OUT);
     }
     else {
-        if ((cs >= SPI_HWCS_NUMOF) ||
-            (spi_config[bus].pin_cs[cs] == GPIO_UNDEF)) {
+        if ((cs >= SPI_HWCS_NUMOF) || !gpio_is_valid(spi_config[bus].pin_cs[cs])) {
             return SPI_NOCS;
         }
         gpio_init_port(spi_config[bus].pin_cs[cs], spi_config[bus].pcr);

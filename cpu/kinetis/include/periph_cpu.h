@@ -116,6 +116,21 @@ typedef uint16_t gpio_t;
 #define SPI_HWCS_NUMOF      (5)
 
 /**
+ * @brief   Define value for unused CS line
+ */
+#define SPI_CS_UNDEF        (GPIO_UNDEF)
+
+#ifndef DOXYGEN
+/**
+ * @brief   Overwrite the default spi_cs_t type definition
+ * @{
+ */
+#define HAVE_SPI_CS_T
+typedef uint32_t spi_cs_t;
+/** @} */
+#endif
+
+/**
  * @name    This CPU makes use of the following shared SPI functions
  * @{
  */
@@ -454,7 +469,7 @@ typedef struct {
     gpio_t pin_miso;                    /**< MISO pin used */
     gpio_t pin_mosi;                    /**< MOSI pin used */
     gpio_t pin_clk;                     /**< CLK pin used */
-    gpio_t pin_cs[SPI_HWCS_NUMOF];      /**< pins used for HW cs lines */
+    spi_cs_t pin_cs[SPI_HWCS_NUMOF];    /**< pins used for HW cs lines */
 #ifdef KINETIS_HAVE_PCR
     gpio_pcr_t pcr;                     /**< alternate pin function values */
 #endif /* KINETIS_HAVE_PCR */
