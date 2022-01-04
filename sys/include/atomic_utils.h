@@ -139,6 +139,8 @@
 #include <stdint.h>
 
 #include "irq.h"
+#include "sched.h"
+
 #include "atomic_utils_arch.h"
 
 #ifdef __cplusplus
@@ -263,6 +265,16 @@ static inline uintptr_t atomic_load_uintptr(const volatile uintptr_t *var) {
 static inline void * atomic_load_ptr(void **ptr_addr) {
     return (void *)atomic_load_uintptr((const volatile uintptr_t *)ptr_addr);
 }
+/**
+ * @brief   Load an `kernel_pid_t` atomically
+ *
+ * @param[in]       var     Variable to load atomically
+ * @return  The value stored in @p var
+ */
+static inline kernel_pid_t atomic_load_kernel_pid(const volatile kernel_pid_t *var)
+{
+    return atomic_load_u16((const volatile uint16_t *)var);
+}
 /** @} */
 
 /**
@@ -320,6 +332,17 @@ static inline void atomic_store_uintptr(volatile uintptr_t *dest, uintptr_t val)
  */
 static inline void atomic_store_ptr(void **dest, const void *val) {
     atomic_store_uintptr((volatile uintptr_t *)dest, (uintptr_t)val);
+}
+/**
+ * @brief   Store an `kernel_pid_t` atomically
+ *
+ * @param[out]      dest    Location to atomically write the new value to
+ * @param[in]       val     Value to write
+ */
+static inline void atomic_store_kernel_pid(volatile kernel_pid_t *dest,
+                                           kernel_pid_t val)
+{
+    atomic_store_u16((volatile uint16_t *)dest, (uint16_t)val);
 }
 /** @} */
 
