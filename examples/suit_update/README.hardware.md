@@ -663,5 +663,5 @@ To run the test,
 - run the test:
 
 ```
-    $ make -C examples/suit_update test
+    $ make -C examples/suit_update test-with-config
 ```
