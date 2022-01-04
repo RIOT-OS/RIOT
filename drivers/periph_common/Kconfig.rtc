@@ -9,6 +9,7 @@ menuconfig MODULE_PERIPH_RTC
     bool "RTC peripheral driver"
     depends on HAS_PERIPH_RTC
     select MODULE_PERIPH_COMMON
+    select MODULE_RTC_UTILS
 
 if MODULE_PERIPH_RTC
 

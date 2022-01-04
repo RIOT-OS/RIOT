@@ -24,8 +24,6 @@
 #include "periph/i2c.h"
 #include "byteorder.h"
 
-#ifdef I2C_NUMOF
-
 #ifdef PERIPH_I2C_NEED_READ_REG
 int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
                  void *data, uint8_t flags)
@@ -103,5 +101,3 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
     return i2c_write_bytes(dev, addr, data, len, flags | I2C_NOSTART);
 }
 #endif /* PERIPH_I2C_NEED_WRITE_REGS */
-
-#endif /* I2C_NUMOF */
