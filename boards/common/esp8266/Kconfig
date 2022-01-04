@@ -8,13 +8,10 @@ config BOARD_COMMON_ESP8266
     bool
     select HAS_ARDUINO
     select HAS_PERIPH_ADC
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_GPIO_IRQ
     select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM
     select HAS_PERIPH_SPI
     select HAS_PERIPH_UART
-    select HAS_PERIPH_UART_MODECFG
 
     select HAVE_SAUL_GPIO
 
