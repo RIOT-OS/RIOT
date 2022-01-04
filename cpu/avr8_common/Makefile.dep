@@ -18,3 +18,8 @@ endif
 ifneq (,$(filter cpp,$(FEATURES_USED)))
   USEMODULE += cxx_ctor_guards
 endif
+
+# new and delete operators needed
+ifneq (,$(filter cpp,$(FEATURES_USED)))
+  USEMODULE += cpp_new_delete
+endif
