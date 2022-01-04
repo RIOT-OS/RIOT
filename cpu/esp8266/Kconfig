@@ -61,6 +61,22 @@ config CPU_MODEL
 config CPU
     default "esp8266" if CPU_FAM_ESP8266
 
+menu "ESP8266 specific configurations"
+    depends on TEST_KCONFIG
+    depends on HAS_ARCH_ESP8266
+
+    choice
+        bool "CPU clock frequency"
+        default ESP8266_CPU_FREQUENCY_80
+
+        config ESP8266_CPU_FREQUENCY_80
+            bool "80 MHz"
+        config ESP8266_CPU_FREQUENCY_160
+            bool "160 MHz"
+    endchoice
+
+endmenu
+
 source "$(RIOTCPU)/esp_common/Kconfig"
 
 config MODULE_ESP_I2C_SW

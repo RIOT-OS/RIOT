@@ -1,4 +1,5 @@
 # Copyright (c) 2020 HAW Hamburg
+#               2021 Gunar Schorcht
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
@@ -77,11 +78,6 @@ config HAS_PERIPH_ADC_CTRL
     help
         Indicates that an ESP32 ADC controller peripheral is present.
 
-config HAS_ESP_SPI_RAM
-    bool
-    help
-        Indicates that the a RAM is present on the SPI bus.
-
 ## Common CPU symbols
 config CPU_CORE
     default "xtensa-lx6" if CPU_CORE_XTENSA_LX6
@@ -99,21 +95,36 @@ config CPU_MODEL
 config CPU
     default "esp32" if CPU_FAM_ESP32
 
-menu "ESP32 configurations"
+menu "ESP32 specific configurations"
     depends on TEST_KCONFIG
     depends on HAS_ARCH_ESP32
 
-config MODULE_ESP_SPI_RAM
-    bool "SPI RAM support"
-    select MODULE_ESP_IDF_HEAP
-    depends on HAS_ESP_SPI_RAM
-    select MODULE_ESP_IDF_HEAP
-    help
-      Say y to use external SPI RAM connected through the FSPI interface.
+    choice
+        bool "CPU clock frequency"
+        default ESP32_DEFAULT_CPU_FREQ_MHZ_80
 
-config MODULE_ESP_JTAG
-    bool "Enable JTAG debugging interface"
-    depends on HAS_ESP_JTAG
+        config ESP32_DEFAULT_CPU_FREQ_MHZ_2
+            bool "2 MHz"
+        config ESP32_DEFAULT_CPU_FREQ_MHZ_40
+            bool "40 MHz"
+        config ESP32_DEFAULT_CPU_FREQ_MHZ_80
+            bool "80 MHz"
+        config ESP32_DEFAULT_CPU_FREQ_MHZ_160
+            bool "160 MHz"
+        config ESP32_DEFAULT_CPU_FREQ_MHZ_240
+            bool "240 MHz"
+    endchoice
+
+    config MODULE_ESP_SPI_RAM
+        bool "SPI RAM support"
+        depends on HAS_ESP_SPI_RAM
+        select MODULE_ESP_IDF_HEAP
+        help
+            Say y to use external SPI RAM connected through the FSPI interface.
+
+    config MODULE_ESP_JTAG
+        bool "Enable JTAG debugging interface"
+        depends on HAS_ESP_JTAG
 
 endmenu
 
