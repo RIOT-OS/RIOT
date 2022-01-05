@@ -19,8 +19,8 @@
  * to the riotboot_dfu application that isn't written in C++ and not included
  * from anywhere else either, but still here for consistency (and because
  * otherwise the checks complain) */
-#ifndef BOOTLOADER_SELECTION_H
-#define BOOTLOADER_SELECTION_H
+#ifndef RIOTBOOT_BOOTLOADER_SELECTION_H
+#define RIOTBOOT_BOOTLOADER_SELECTION_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,10 +68,22 @@ extern "C" {
 #define BTN_BOOTLOADER_INVERTED true
 #endif
 
+/** @brief LED pin for bootloader indication
+ *
+ * This pin (typically connected to a LED) will be toggled while the bootloader is active.
+ * It can be used to communicate the current bootloader state to the user.
+ */
+#if !defined(LED_BOOTLOADER_PIN) && defined(LED0_PIN) && !defined(LED_BOOTLOADER_NONE) || DOXYGEN
+#define LED_BOOTLOADER_PIN      LED0_PIN
+#define LED_BOOTLOADER_ON       LED0_ON     /**< Turn the bootloader LED on  */
+#define LED_BOOTLOADER_OFF      LED0_OFF    /**< Turn the bootloader LED off */
+#define LED_BOOTLOADER_TOGGLE   LED0_TOGGLE /**< Toggle the bootloader LED   */
+#endif
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* BOOTLOADER_SELECTION_H */
+#endif /* RIOTBOOT_BOOTLOADER_SELECTION_H */
 
 /** @} */

@@ -28,7 +28,7 @@
 #include "riotboot/usb_dfu.h"
 #include "ztimer.h"
 
-#include "bootloader_selection.h"
+#include "riotboot/bootloader_selection.h"
 
 #ifdef BTN_BOOTLOADER_PIN
 #include "periph/gpio.h"

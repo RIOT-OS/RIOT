@@ -23,11 +23,13 @@
 
 #include "stdio_uart.h"
 #include "periph/uart.h"
+#include "periph/gpio.h"
 #include "periph/flashpage.h"
 #include "unaligned.h"
 #include "checksum/crc8.h"
 #include "riotboot/serial.h"
 #include "riotboot/magic.h"
+#include "riotboot/bootloader_selection.h"
 
 #include "board.h"
 
@@ -53,6 +55,32 @@ static inline void uart_write_byte(uart_t uart, uint8_t data)
     uart_write(uart, &data, 1);
 }
 
+static inline bool _boot_pin(void)
+{
+#ifdef BTN_BOOTLOADER_PIN
+    if (BTN_BOOTLOADER_INVERTED) {
+        return !gpio_read(BTN_BOOTLOADER_PIN);
+    }
+    else {
+        return gpio_read(BTN_BOOTLOADER_PIN);
+    }
+#else
+    return false;
+#endif
+}
+
+static inline void _boot_led_toggle(void)
+{
+#ifdef LED_BOOTLOADER_PIN
+    static unsigned count = RIOTBOOT_DELAY / 10;
+
+    if (--count == 0) {
+        count = RIOTBOOT_DELAY / 10;
+        LED_BOOTLOADER_TOGGLE;
+    }
+#endif
+}
+
 /* send 'hello' byte until we get enter bootloader byte or timeout */
 static bool _bootdelay(unsigned tries, volatile bool *boot_default)
 {
@@ -69,6 +97,10 @@ static bool _bootdelay(unsigned tries, volatile bool *boot_default)
 
     while (--tries && *boot_default) {
         uart_write_byte(RIOTBOOT_UART_DEV, 0);
+        if (_boot_pin()) {
+            return false;
+        }
+        _boot_led_toggle();
     }
 
     return *boot_default;
@@ -180,9 +212,9 @@ error:
 
 static void _get_page(uintptr_t addr)
 {
-    uart_write_byte(RIOTBOOT_UART_DEV, RIOTBOOT_STAT_OK);
     uint32_t page = flashpage_page((void *)addr);
 
+    uart_write_byte(RIOTBOOT_UART_DEV, RIOTBOOT_STAT_OK);
     uart_write(RIOTBOOT_UART_DEV, (void *)&page, sizeof(page));
 }
 
@@ -216,6 +248,14 @@ int riotboot_serial_loader(void)
 {
     volatile bool reading = true;
 
+#ifdef BTN_BOOTLOADER_PIN
+    gpio_init(BTN_BOOTLOADER_PIN, BTN_BOOTLOADER_MODE);
+#endif
+#ifdef LED_BOOTLOADER_PIN
+    gpio_init(LED_BOOTLOADER_PIN, GPIO_OUT);
+    LED_BOOTLOADER_OFF;
+#endif
+
     uart_init(RIOTBOOT_UART_DEV, RIOTBOOT_UART_BAUDRATE,
               _uart_rx_cmd, (void *)&reading);
 
@@ -223,6 +263,10 @@ int riotboot_serial_loader(void)
     if (_bootdelay(RIOTBOOT_DELAY, &reading)) {
         return -1;
     }
+
+#ifdef LED_BOOTLOADER_ON
+    LED_BOOTLOADER_ON;
+#endif
 
     while (1) {
 
