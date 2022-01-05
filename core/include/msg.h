@@ -15,9 +15,20 @@
  * ========
  * IPC messages consist of a sender PID, a type, and some content. The sender
  * PID will be set by the IPC internally and is not required to be set by the
- * user. The type helps the receiver to multiplex different message types and
- * should be set to a system-wide unique value. The content can either be
- * provided as a 32-bit integer or a pointer.
+ * user. The type helps the receiver to multiplex different message types.
+ * The content can either be provided as a 32-bit integer or a pointer.
+ *
+ * Some message types are predefined; for example, @ref
+ * GNRC_NETAPI_MSG_TYPE_RCV & co are defined. These are fixed in the sense that
+ * registering for a particular set of messages (for the above, e.g. @ref
+ * gnrc_netreg_register) will use these message types. Threads that do nothing
+ * to receive such messages can safely use the same numbers for other purposes.
+ * The predefined types use non-conflicting ranges (e.g. `0x02NN`) to avoid
+ * ruling out simultaneous use of different components in the same thread.
+ *
+ * In general, threads may consider it an error to send them a message they did
+ * not request. Best practice is to log (but otherwise ignore) unexpected
+ * messages.
  *
  * Blocking vs non-blocking
  * ========================
