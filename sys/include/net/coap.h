@@ -183,16 +183,16 @@ extern "C" {
  * @{
  */
 /**
- * @brief    Timeout in seconds for a response to a confirmable request
+ * @brief    Timeout in milliseconds for a response to a confirmable request
  *
  * This value is for the response to the *initial* confirmable message. The
  * timeout doubles for subsequent retries. To avoid synchronization of resends
  * across hosts, the actual timeout is chosen randomly between
- * @ref CONFIG_COAP_ACK_TIMEOUT and
- * (@ref CONFIG_COAP_ACK_TIMEOUT * @ref CONFIG_COAP_RANDOM_FACTOR_1000 / 1000).
+ * @ref CONFIG_COAP_ACK_TIMEOUT_MS and
+ * (@ref CONFIG_COAP_ACK_TIMEOUT_MS * @ref CONFIG_COAP_RANDOM_FACTOR_1000 / 1000).
  */
-#ifndef CONFIG_COAP_ACK_TIMEOUT
-#define CONFIG_COAP_ACK_TIMEOUT        (2U)
+#ifndef CONFIG_COAP_ACK_TIMEOUT_MS
+#define CONFIG_COAP_ACK_TIMEOUT_MS     (2000U)
 #endif
 
 /**
@@ -202,7 +202,7 @@ extern "C" {
  * ([RFC 7252, section 4.2](https://tools.ietf.org/html/rfc7252#section-4.2))
  * multiplied by 1000, to avoid floating point arithmetic.
  *
- * See @ref CONFIG_COAP_ACK_TIMEOUT
+ * See @ref CONFIG_COAP_ACK_TIMEOUT_MS
  */
 #ifndef CONFIG_COAP_RANDOM_FACTOR_1000
 #define CONFIG_COAP_RANDOM_FACTOR_1000      (1500)

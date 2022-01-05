@@ -531,7 +531,7 @@ extern "C" {
  * In normal operations the timeout between retransmissions doubles. When
  * CONFIG_GCOAP_NO_RETRANS_BACKOFF is defined this doubling does not happen.
  *
- * @see CONFIG_COAP_ACK_TIMEOUT
+ * @see CONFIG_COAP_ACK_TIMEOUT_MS
  */
 #define CONFIG_GCOAP_NO_RETRANS_BACKOFF
 #endif

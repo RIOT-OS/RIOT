@@ -49,7 +49,7 @@ ssize_t nanocoap_request(sock_udp_t *sock, coap_pkt_t *pkt, size_t len)
 
     /* TODO: timeout random between between ACK_TIMEOUT and (ACK_TIMEOUT *
      * ACK_RANDOM_FACTOR) */
-    uint32_t timeout = CONFIG_COAP_ACK_TIMEOUT * US_PER_SEC;
+    uint32_t timeout = CONFIG_COAP_ACK_TIMEOUT_MS * US_PER_MS;
 
     /* add 1 for initial transmit */
     unsigned tries_left = CONFIG_COAP_MAX_RETRANSMIT + 1;
