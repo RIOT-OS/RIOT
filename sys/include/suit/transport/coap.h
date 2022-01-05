@@ -137,6 +137,7 @@ typedef enum {
  *
  * @param[in]   url        url pointer to source path
  * @param[in]   blksize    sender suggested SZX for the COAP block request
+ * @param[in]   work_buf   Work buffer, must be NANOCOAP_BLOCKWISE_BUF(blksize) bytes
  * @param[in]   callback   callback to be executed on each received block
  * @param[in]   arg        optional function arguments
  *
@@ -145,7 +146,7 @@ typedef enum {
  * @returns      0         on success
  */
 int suit_coap_get_blockwise_url(const char *url,
-                               coap_blksize_t blksize,
+                               coap_blksize_t blksize, void *work_buf,
                                coap_blockwise_cb_t callback, void *arg);
 
 /**

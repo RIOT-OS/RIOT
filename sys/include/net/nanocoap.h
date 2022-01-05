@@ -151,6 +151,21 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief    Maximum length of a CoAP header for a blockwise message
+ */
+#ifndef CONFIG_NANOCOAP_BLOCK_HEADER_MAX
+#define CONFIG_NANOCOAP_BLOCK_HEADER_MAX   (64)
+#endif
+
+/**
+ * @brief    Work buffer size for blockwise operation
+ *
+ * @param[in] blksize   CoAP blocksize
+ */
+#define NANOCOAP_BLOCKWISE_BUF(blksize)    (CONFIG_NANOCOAP_BLOCK_HEADER_MAX \
+                                           + (0x1 << (blksize + 4)))
+
+/**
  * @name coap_opt_finish() flag parameter values
  *
  * Directs packet/buffer updates when user finishes adding options

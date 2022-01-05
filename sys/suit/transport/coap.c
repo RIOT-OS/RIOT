@@ -144,14 +144,13 @@ static int _fetch_block(coap_pkt_t *pkt, uint8_t *buf, sock_udp_t *sock,
     pktpos += coap_build_hdr(pkt->hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET,
                              num);
     pktpos += coap_opt_put_uri_pathquery(pktpos, &lastonum, path);
-    pktpos +=
-        coap_opt_put_uint(pktpos, lastonum, COAP_OPT_BLOCK2,
-                          (num << 4) | blksize);
+    pktpos += coap_opt_put_uint(pktpos, lastonum, COAP_OPT_BLOCK2,
+                                (num << 4) | blksize);
 
     pkt->payload = pktpos;
     pkt->payload_len = 0;
 
-    int res = nanocoap_request(sock, pkt, 64 + (0x1 << (blksize + 4)));
+    int res = nanocoap_request(sock, pkt, NANOCOAP_BLOCKWISE_BUF(blksize));
     if (res < 0) {
         return res;
     }
@@ -166,11 +165,9 @@ static int _fetch_block(coap_pkt_t *pkt, uint8_t *buf, sock_udp_t *sock,
 }
 
 int suit_coap_get_blockwise(sock_udp_ep_t *remote, const char *path,
-                            coap_blksize_t blksize,
+                            coap_blksize_t blksize, void *buf,
                             coap_blockwise_cb_t callback, void *arg)
 {
-    /* mmmmh dynamically sized array */
-    uint8_t buf[64 + (0x1 << (blksize + 4))];
     sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
     coap_pkt_t pkt;
 
@@ -218,7 +215,7 @@ out:
 }
 
 int suit_coap_get_blockwise_url(const char *url,
-                                coap_blksize_t blksize,
+                                coap_blksize_t blksize, void *buf,
                                 coap_blockwise_cb_t callback, void *arg)
 {
     char hostport[CONFIG_SOCK_HOSTPORT_MAXLEN];
@@ -244,7 +241,7 @@ int suit_coap_get_blockwise_url(const char *url,
         remote.port = COAP_PORT;
     }
 
-    return suit_coap_get_blockwise(&remote, urlpath, blksize, callback, arg);
+    return suit_coap_get_blockwise(&remote, urlpath, blksize, buf, callback, arg);
 }
 
 typedef struct {
@@ -273,20 +270,20 @@ static int _2buf(void *arg, size_t offset, uint8_t *buf, size_t len, int more)
     }
 }
 
-ssize_t suit_coap_get_blockwise_url_buf(const char *url,
-                                        coap_blksize_t blksize,
-                                        uint8_t *buf, size_t len)
+static ssize_t suit_coap_get_blockwise_url_buf(const char *url,
+                                               coap_blksize_t blksize, void *work_buf,
+                                               uint8_t *buf, size_t len)
 {
     _buf_t _buf = { .ptr = buf, .len = len };
-    int res = suit_coap_get_blockwise_url(url, blksize, _2buf, &_buf);
+    int res = suit_coap_get_blockwise_url(url, blksize, work_buf, _2buf, &_buf);
 
     return (res < 0) ? (ssize_t)res : (ssize_t)_buf.offset;
 }
 
-static void _suit_handle_url(const char *url)
+static void _suit_handle_url(const char *url, coap_blksize_t blksize, void *work_buf)
 {
     LOG_INFO("suit_coap: downloading \"%s\"\n", url);
-    ssize_t size = suit_coap_get_blockwise_url_buf(url, CONFIG_SUIT_COAP_BLOCKSIZE,
+    ssize_t size = suit_coap_get_blockwise_url_buf(url, blksize, work_buf,
                                                    _manifest_buf,
                                                    SUIT_MANIFEST_BUFSIZE);
     if (size >= 0) {
@@ -375,6 +372,8 @@ static void *_suit_coap_thread(void *arg)
 {
     (void)arg;
 
+    uint8_t buffer[NANOCOAP_BLOCKWISE_BUF(CONFIG_SUIT_COAP_BLOCKSIZE)];
+
     LOG_INFO("suit_coap: started.\n");
     msg_t msg_queue[4];
     msg_init_queue(msg_queue, 4);
@@ -388,7 +387,7 @@ static void *_suit_coap_thread(void *arg)
         switch (m.content.value) {
             case SUIT_MSG_TRIGGER:
                 LOG_INFO("suit_coap: trigger received\n");
-                _suit_handle_url(_url);
+                _suit_handle_url(_url, CONFIG_SUIT_COAP_BLOCKSIZE, buffer);
                 break;
             default:
                 LOG_WARNING("suit_coap: warning: unhandled msg\n");
