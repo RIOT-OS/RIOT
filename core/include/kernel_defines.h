@@ -133,18 +133,6 @@ extern "C" {
 #endif
 
 /**
- * @def         BUILD_BUG_ON(condition)
- * @brief       Forces a compilation error if condition is true.
- *              This trick is only needed if the condition can't be evaluated
- *              before compile time (i.e. sizeof(sometype_t) < 42 )
- *              For more details on this see for example:
- *              https://git.kernel.org/pub/scm/linux/kernel/git/stable/
- *              linux-stable.git/tree/include/linux/bug.h
- * @param[in]   condition  A condition that will be evaluated at compile time
- */
-#define BUILD_BUG_ON(condition) ((void)sizeof(char[1 - 2 * !!(condition)]))
-
-/**
  * @def         IS_ACTIVE(macro)
  * @brief       Allows to verify a macro definition outside the preprocessor.
  *
