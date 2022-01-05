@@ -101,6 +101,19 @@ extern "C" {
  * @see xtimer_set_timeout_flag
  */
 #define THREAD_FLAG_TIMEOUT         (1u << 14)
+
+/**
+ * @brief Comprehensive set of all predefined flags
+ *
+ * This bit mask is set for all thread flag bits that are predefined in RIOT.
+ * Flags within this set may be set on a thread by the operating system without
+ * the thread soliciting them (though not all are; for example, @ref
+ * THREAD_FLAG_TIMEOUT is not).
+ *
+ * When using custom flags, asserting that they are not in this set can help
+ * avoid conflict with future additions to the predefined flags.
+ */
+#define THREAD_FLAG_PREDEFINED_MASK (THREAD_FLAG_MSG_WAITING | THREAD_FLAG_TIMEOUT)
 /** @} */
 
 /**
