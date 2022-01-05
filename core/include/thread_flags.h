@@ -39,7 +39,7 @@
  * Usually, if it is only of interest that an event occurred, but not how many
  * of them, thread flags should be considered.
  *
- * Note that some flags (currently the three most significant bits) are used by
+ * Note that some flags (currently the two most significant bits) are used by
  * core functions and should not be set by the user. They can be waited for.
  *
  * This API is optional and must be enabled by adding "core_thread_flags" to USEMODULE.
