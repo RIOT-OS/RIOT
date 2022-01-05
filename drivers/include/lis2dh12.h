@@ -37,6 +37,7 @@
 #define LIS2DH12_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "saul.h"
 #include "lis2dh12_registers.h"
