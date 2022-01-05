@@ -31,35 +31,48 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local, sock_udp_ep_t *remote, size_t len)
+int nanocoap_connect(sock_udp_t *sock, sock_udp_ep_t *local, sock_udp_ep_t *remote)
 {
-    ssize_t res;
-    size_t pdu_len = (pkt->payload - (uint8_t *)pkt->hdr) + pkt->payload_len;
-    uint8_t *buf = (uint8_t*)pkt->hdr;
-    sock_udp_t sock;
-
     if (!remote->port) {
         remote->port = COAP_PORT;
     }
 
-    res = sock_udp_create(&sock, local, remote, 0);
-    if (res < 0) {
-        return res;
-    }
+    return sock_udp_create(sock, local, remote, 0);
+}
+
+ssize_t nanocoap_request(sock_udp_t *sock, coap_pkt_t *pkt, size_t len)
+{
+    ssize_t res = -EAGAIN;
+    size_t pdu_len = (pkt->payload - (uint8_t *)pkt->hdr) + pkt->payload_len;
+    uint8_t *buf = (uint8_t*)pkt->hdr;
+    uint32_t id = coap_get_id(pkt);
 
     /* TODO: timeout random between between ACK_TIMEOUT and (ACK_TIMEOUT *
      * ACK_RANDOM_FACTOR) */
     uint32_t timeout = CONFIG_COAP_ACK_TIMEOUT * US_PER_SEC;
-    unsigned tries_left = CONFIG_COAP_MAX_RETRANSMIT + 1;  /* add 1 for initial transmit */
-    while (tries_left) {
 
-        res = sock_udp_send(&sock, buf, pdu_len, NULL);
-        if (res <= 0) {
-            DEBUG("nanocoap: error sending coap request, %d\n", (int)res);
+    /* add 1 for initial transmit */
+    unsigned tries_left = CONFIG_COAP_MAX_RETRANSMIT + 1;
+
+    /* check if we expect a reply */
+    bool confirmable = coap_get_type(pkt) == COAP_TYPE_CON;
+
+    while (tries_left) {
+        if (res == -EAGAIN) {
+            res = sock_udp_send(sock, buf, pdu_len, NULL);
+            if (res <= 0) {
+                DEBUG("nanocoap: error sending coap request, %d\n", (int)res);
+                break;
+            }
+        }
+
+        /* return if no response is expected */
+        if (!confirmable) {
+            pkt->payload_len = 0;
             break;
         }
 
-        res = sock_udp_recv(&sock, buf, len, timeout, NULL);
+        res = sock_udp_recv(sock, buf, len, timeout, NULL);
         if (res <= 0) {
             if (res == -ETIMEDOUT) {
                 DEBUG("nanocoap: timeout\n");
@@ -68,8 +81,13 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local, sock_udp_ep_t *r
                 tries_left--;
                 if (!tries_left) {
                     DEBUG("nanocoap: maximum retries reached\n");
+                    break;
                 }
-                continue;
+                else {
+                    timeout *= 2;
+                    res = -EAGAIN;
+                    continue;
+                }
             }
             DEBUG("nanocoap: error receiving coap response, %d\n", (int)res);
             break;
@@ -79,28 +97,31 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local, sock_udp_ep_t *r
                 DEBUG("nanocoap: error parsing packet\n");
                 res = -EBADMSG;
             }
+            else if (coap_get_id(pkt) != id) {
+                res = -EBADMSG;
+                continue;
+            }
+
             break;
         }
     }
 
-    sock_udp_close(&sock);
-
     return res;
 }
 
-ssize_t nanocoap_get(sock_udp_ep_t *remote, const char *path, uint8_t *buf, size_t len)
+ssize_t nanocoap_get(sock_udp_t *sock, const char *path, void *buf, size_t len)
 {
     ssize_t res;
     coap_pkt_t pkt;
     uint8_t *pktpos = buf;
 
-    pkt.hdr = (coap_hdr_t*)buf;
+    pkt.hdr = buf;
     pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET, 1);
     pktpos += coap_opt_put_uri_path(pktpos, 0, path);
     pkt.payload = pktpos;
     pkt.payload_len = 0;
 
-    res = nanocoap_request(&pkt, NULL, remote, len);
+    res = nanocoap_request(sock, &pkt, len);
     if (res < 0) {
         return res;
     }
