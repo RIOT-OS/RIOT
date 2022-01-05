@@ -1,1 +1,1 @@
-include $(RIOTBASE)/Makefile.base
+include $(RIOTMAKE)/driver_with_touch_dev.mk
