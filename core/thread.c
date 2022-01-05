@@ -19,6 +19,7 @@
  */
 
 #include <errno.h>
+#include <stdalign.h>
 #include <stdio.h>
 #ifdef PICOLIBC_TLS
 #include <picotls.h>
@@ -205,9 +206,9 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
 #endif
 
     /* align the stack on a 16/32bit boundary */
-    uintptr_t misalignment = (uintptr_t)stack % ALIGN_OF(void *);
+    uintptr_t misalignment = (uintptr_t)stack % alignof(void *);
     if (misalignment) {
-        misalignment = ALIGN_OF(void *) - misalignment;
+        misalignment = alignof(void *) - misalignment;
         stack += misalignment;
         stacksize -= misalignment;
     }
@@ -216,7 +217,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     stacksize -= sizeof(thread_t);
 
     /* round down the stacksize to a multiple of thread_t alignments (usually 16/32bit) */
-    stacksize -= stacksize % ALIGN_OF(thread_t);
+    stacksize -= stacksize % alignof(thread_t);
 
     if (stacksize < 0) {
         DEBUG("thread_create: stacksize is too small!\n");
