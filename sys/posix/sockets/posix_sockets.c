@@ -1036,8 +1036,7 @@ static ssize_t socket_sendto(socket_t *s, const void *buffer, size_t length,
             return -1;
         }
 #endif
-        /* bind implicitly */
-        if ((res = _bind_connect(s, NULL, 0)) < 0) {
+        if ((res = _bind_connect(s, address, address_len)) < 0) {
             return res;
         }
     }
