@@ -55,12 +55,10 @@ const saul_driver_t sm_pwm_01c_saul_driver_mc_pm_10 = {
     .read = read_mc_pm_10,
     .write = saul_notsup,
     .type = SAUL_SENSE_PM,
-    .subtype = SAUL_SENSE_PM_10,
 };
 
 const saul_driver_t sm_pwm_01c_saul_driver_mc_pm_2p5 = {
     .read = read_mc_pm_2p5,
     .write = saul_notsup,
     .type = SAUL_SENSE_PM,
-    .subtype = SAUL_SENSE_PM_2p5,
 };
