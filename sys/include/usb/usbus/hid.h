@@ -102,18 +102,6 @@ void usbus_hid_init(usbus_t *usbus, usbus_hid_device_t *hid,
                     usbus_hid_cb_t cb, const uint8_t *report_desc,
                     size_t report_desc_size);
 
-/**
- * @brief Submit bytes to the HID handler
- *
- * @param[in]   hid         USBUS HID handler context
- * @param[in]   buf         buffer to submit
- * @param[in]   len         length of the submitted buffer
- *
- * @return                  Number of bytes added to the HID ring buffer
- */
-size_t usbus_hid_submit(usbus_hid_device_t *hid, const uint8_t *buf,
-                        size_t len);
-
 #ifdef __cplusplus
 }
 #endif
