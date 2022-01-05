@@ -41,6 +41,9 @@
  *
  * Note that some flags (currently the two most significant bits) are used by
  * core functions and should not be set by the user. They can be waited for.
+ * Unlike @ref core_msg "messages" (which are only ever sent when requested),
+ * these flags can be set unprompted. (For example, @ref THREAD_FLAG_MSG_WAITING
+ * is set on a thread automatically with every message sent there).
  *
  * This API is optional and must be enabled by adding "core_thread_flags" to USEMODULE.
  *
