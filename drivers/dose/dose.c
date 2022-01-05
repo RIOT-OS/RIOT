@@ -24,6 +24,7 @@
 #include "dose.h"
 #include "random.h"
 #include "irq.h"
+#include "periph/timer.h"
 
 #include "net/eui_provider.h"
 #include "net/netdev/eth.h"
