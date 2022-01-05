@@ -110,7 +110,7 @@ static void dispatch_loop(int sock, dispatch_cb_t dispatch, void *ctx)
 }
 
 static topology_t topology;
-static const char *graphviz_file;
+static const char *graphviz_file = "example.gv";
 static void _info_handler(int signal)
 {
     if (signal != SIGUSR1) {

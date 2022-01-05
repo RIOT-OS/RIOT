@@ -75,3 +75,7 @@ jobs:
       uses: aabadie/riot-action@v1
       with:
         cmd: make -C dist/tools/riotboot_serial
+    - name: Build ZEP dispatcher & topology generator
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/zep_dispatch
