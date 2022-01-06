@@ -1,3 +1,1 @@
-MODULE = l3g4200d
-
-include $(RIOTBASE)/Makefile.base
+include $(RIOTMAKE)/driver_with_saul.mk

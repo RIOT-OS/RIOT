@@ -1,3 +1,1 @@
-MODULE = lsm303dlhc
-
-include $(RIOTBASE)/Makefile.base
+include $(RIOTMAKE)/driver_with_saul.mk

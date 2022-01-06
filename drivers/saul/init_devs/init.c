@@ -251,13 +251,13 @@ void saul_init_devs(void)
         extern void auto_init_scd30(void);
         auto_init_scd30();
     }
-    if (IS_USED(MODULE_SHT2X)) {
-        extern void auto_init_sht2x(void);
-        auto_init_sht2x();
-    }
     if (IS_USED(MODULE_SDP3X)) {
         extern void auto_init_sdp3x(void);
         auto_init_sdp3x();
+    }
+    if (IS_USED(MODULE_SDS011)) {
+        extern void auto_init_sds011(void);
+        auto_init_sds011();
     }
     if (IS_USED(MODULE_SEESAW_SOIL)) {
         extern void auto_init_seesaw_soil(void);
@@ -267,6 +267,10 @@ void saul_init_devs(void)
         extern void auto_init_sgp30(void);
         auto_init_sgp30();
     }
+    if (IS_USED(MODULE_SHT2X)) {
+        extern void auto_init_sht2x(void);
+        auto_init_sht2x();
+    }
     if (IS_USED(MODULE_SHT3X)) {
         extern void auto_init_sht3x(void);
         auto_init_sht3x();
@@ -274,10 +278,6 @@ void saul_init_devs(void)
     if (IS_USED(MODULE_SHTC1)) {
         extern void auto_init_shtc1(void);
         auto_init_shtc1();
-    }
-    if (IS_USED(MODULE_SDS011)) {
-        extern void auto_init_sds011(void);
-        auto_init_sds011();
     }
     if (IS_USED(MODULE_SI1133)) {
         extern void auto_init_si1133(void);

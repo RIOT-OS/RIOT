@@ -1,3 +1,1 @@
-MODULE = ina2xx
-
-include $(RIOTBASE)/Makefile.base
+include $(RIOTMAKE)/driver_with_saul.mk

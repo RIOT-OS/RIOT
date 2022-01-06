@@ -27,11 +27,14 @@
  */
 static hm330x_t hm330x_devs[HM330X_NUMOF];
 
-#if IS_ACTIVE(MODULE_SAUL)
 /**
  * @brief   Number of logical saul devices per physical sensor
  */
+#if IS_USED(MODULE_HM3302)
 #define HM330X_SAUL_DEV_NUM      (6)
+#else
+#define HM330X_SAUL_DEV_NUM      (3)
+#endif
 
 /**
  * @brief   Memory for the SAUL registry entries
@@ -50,17 +53,16 @@ static saul_reg_t saul_entries[HM330X_NUMOF * HM330X_SAUL_DEV_NUM];
 extern const saul_driver_t hm330x_saul_driver_mc_pm_1;
 extern const saul_driver_t hm330x_saul_driver_mc_pm_2p5;
 extern const saul_driver_t hm330x_saul_driver_mc_pm_10;
+#if IS_USED(MODULE_HM3302)
 extern const saul_driver_t hm330x_saul_driver_nc_pm_1;
 extern const saul_driver_t hm330x_saul_driver_nc_pm_2p5;
 extern const saul_driver_t hm330x_saul_driver_nc_pm_10;
-/** @} */
 #endif
+/** @} */
 
 void auto_init_hm330x(void)
 {
-#if IS_ACTIVE(MODULE_SAUL)
     assert(HM330X_INFO_NUM == HM330X_NUMOF);
-#endif
 
     for (unsigned int i = 0; i < HM330X_NUMOF; i++) {
         LOG_DEBUG("[auto_init_saul] initializing hm330x #%u\n", i);
@@ -70,19 +72,19 @@ void auto_init_hm330x(void)
                       i);
             continue;
         }
-    #if IS_ACTIVE(MODULE_SAUL)
         saul_entries[(i * HM330X_SAUL_DEV_NUM)].driver = &hm330x_saul_driver_mc_pm_1;
         saul_entries[(i * HM330X_SAUL_DEV_NUM) + 1].driver = &hm330x_saul_driver_mc_pm_2p5;
         saul_entries[(i * HM330X_SAUL_DEV_NUM) + 2].driver = &hm330x_saul_driver_mc_pm_10;
+#if IS_USED(MODULE_HM3302)
         saul_entries[(i * HM330X_SAUL_DEV_NUM) + 3].driver = &hm330x_saul_driver_nc_pm_1;
         saul_entries[(i * HM330X_SAUL_DEV_NUM) + 4].driver = &hm330x_saul_driver_nc_pm_2p5;
         saul_entries[(i * HM330X_SAUL_DEV_NUM) + 5].driver = &hm330x_saul_driver_nc_pm_10;
+#endif
         /* the physical device is the same for all logical SAUL instances */
         for (unsigned x = 0; x < HM330X_SAUL_DEV_NUM; x++) {
             saul_entries[i * HM330X_SAUL_DEV_NUM + x].dev = &(hm330x_devs[i]);
             saul_entries[i * HM330X_SAUL_DEV_NUM + x].name = hm330x_saul_info[i].name;
             saul_reg_add(&saul_entries[i * HM330X_SAUL_DEV_NUM + x]);
         }
-    #endif
     }
 }
