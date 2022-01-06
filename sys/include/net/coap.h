@@ -233,6 +233,19 @@ extern "C" {
 #define COAP_BLOCKWISE_SZX_MAX  (7)
 /** @} */
 
+/**
+ * @brief Coap block-wise-transfer size SZX
+ */
+typedef enum {
+    COAP_BLOCKSIZE_16 = 0,
+    COAP_BLOCKSIZE_32,
+    COAP_BLOCKSIZE_64,
+    COAP_BLOCKSIZE_128,
+    COAP_BLOCKSIZE_256,
+    COAP_BLOCKSIZE_512,
+    COAP_BLOCKSIZE_1024,
+} coap_blksize_t;
+
 #ifdef __cplusplus
 }
 #endif

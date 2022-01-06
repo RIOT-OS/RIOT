@@ -25,6 +25,7 @@
 #include <stdio.h>
 
 #include "net/nanocoap_sock.h"
+#include "net/sock/util.h"
 #include "net/sock/udp.h"
 #include "timex.h"
 
@@ -137,6 +138,108 @@ ssize_t nanocoap_get(sock_udp_t *sock, const char *path, void *buf, size_t len)
             res = pkt.payload_len;
         }
     }
+    return res;
+}
+
+static int _fetch_block(coap_pkt_t *pkt, uint8_t *buf, sock_udp_t *sock,
+                        const char *path, coap_blksize_t blksize, size_t num)
+{
+    uint8_t *pktpos = buf;
+    uint16_t lastonum = 0;
+
+    pkt->hdr = (coap_hdr_t *)buf;
+
+    pktpos += coap_build_hdr(pkt->hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET,
+                             num);
+    pktpos += coap_opt_put_uri_pathquery(pktpos, &lastonum, path);
+    pktpos += coap_opt_put_uint(pktpos, lastonum, COAP_OPT_BLOCK2,
+                                (num << 4) | blksize);
+
+    pkt->payload = pktpos;
+    pkt->payload_len = 0;
+
+    int res = nanocoap_request(sock, pkt, NANOCOAP_BLOCKWISE_BUF(blksize));
+    if (res < 0) {
+        return res;
+    }
+
+    res = coap_get_code(pkt);
+    DEBUG("code=%i\n", res);
+    if (res != 205) {
+        return -res;
+    }
+
+    return 0;
+}
+
+int nanocoap_get_blockwise(sock_udp_t *sock, const char *path,
+                           coap_blksize_t blksize, void *buf,
+                           coap_blockwise_cb_t callback, void *arg)
+{
+    coap_pkt_t pkt;
+    coap_block1_t block2;
+
+    size_t num = 0;
+    do {
+        DEBUG("fetching block %u\n", (unsigned)num);
+        int res = _fetch_block(&pkt, buf, sock, path, blksize, num);
+        if (res) {
+            DEBUG("error fetching block: %d\n", res);
+            return -1;
+        }
+
+        /* no block option in response - direcly use paylaod */
+        if (!coap_get_block2(&pkt, &block2)) {
+            block2.more = 0;
+            block2.offset = 0;
+        }
+
+        res = callback(arg, block2.offset, pkt.payload, pkt.payload_len,
+                       block2.more);
+        if (res) {
+            DEBUG("callback %d != 0, aborting.\n", res);
+            return res;
+        }
+
+        num += 1;
+    } while (block2.more == 1);
+
+    return 0;
+}
+
+int nanocoap_get_blockwise_url(const char *url,
+                               coap_blksize_t blksize, void *buf,
+                               coap_blockwise_cb_t callback, void *arg)
+{
+    char hostport[CONFIG_SOCK_HOSTPORT_MAXLEN];
+    char urlpath[CONFIG_SOCK_URLPATH_MAXLEN];
+    sock_udp_ep_t remote;
+    sock_udp_t sock;
+    int res;
+
+    if (strncmp(url, "coap://", 7)) {
+        DEBUG("nanocoap: URL doesn't start with \"coap://\"\n");
+        return -EINVAL;
+    }
+
+    if (sock_urlsplit(url, hostport, urlpath) < 0) {
+        DEBUG("nanocoap: invalid URL\n");
+        return -EINVAL;
+    }
+
+    if (sock_udp_str2ep(&remote, hostport) < 0) {
+        DEBUG("nanocoap: invalid URL\n");
+        return -EINVAL;
+    }
+
+    res = nanocoap_connect(&sock, NULL, &remote);
+    if (res) {
+        return res;
+    }
+
+    res = nanocoap_get_blockwise(&sock, urlpath, blksize, buf, callback, arg);
+    nanocoap_close(&sock);
+
     return res;
 }
 

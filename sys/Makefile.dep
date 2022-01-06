@@ -590,6 +590,7 @@ endif
 
 ifneq (,$(filter nanocoap_sock,$(USEMODULE)))
   USEMODULE += sock_udp
+  USEMODULE += sock_util
 endif
 
 ifneq (,$(filter nanocoap_%,$(USEMODULE)))

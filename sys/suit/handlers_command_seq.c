@@ -37,6 +37,7 @@
 
 #ifdef MODULE_SUIT_TRANSPORT_COAP
 #include "suit/transport/coap.h"
+#include "net/nanocoap_sock.h"
 #endif
 #include "suit/transport/mock.h"
 
@@ -359,9 +360,9 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
 #ifdef MODULE_SUIT_TRANSPORT_COAP
     else if (strncmp(manifest->urlbuf, "coap://", 7) == 0) {
         uint8_t buffer[NANOCOAP_BLOCKWISE_BUF(CONFIG_SUIT_COAP_BLOCKSIZE)];
-        res = suit_coap_get_blockwise_url(manifest->urlbuf, CONFIG_SUIT_COAP_BLOCKSIZE,
-                                          buffer, suit_storage_helper,
-                                          manifest);
+        res = nanocoap_get_blockwise_url(manifest->urlbuf, CONFIG_SUIT_COAP_BLOCKSIZE,
+                                         buffer, suit_storage_helper,
+                                         manifest);
     }
 #endif
 #ifdef MODULE_SUIT_TRANSPORT_MOCK
