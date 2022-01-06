@@ -164,28 +164,18 @@ static int _fetch_block(coap_pkt_t *pkt, uint8_t *buf, sock_udp_t *sock,
     return 0;
 }
 
-int suit_coap_get_blockwise(sock_udp_ep_t *remote, const char *path,
+int suit_coap_get_blockwise(sock_udp_t *sock, const char *path,
                             coap_blksize_t blksize, void *buf,
                             coap_blockwise_cb_t callback, void *arg)
 {
-    sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
     coap_pkt_t pkt;
 
-    /* HACK: use random local port */
-    local.port = 0x8000 + (xtimer_now_usec() % 0XFFF);
-
-    sock_udp_t sock;
-    int res = sock_udp_create(&sock, &local, remote, 0);
-    if (res < 0) {
-        return res;
-    }
-
-    int more = 1;
+    int res, more = 1;
     size_t num = 0;
     res = -1;
     while (more == 1) {
         DEBUG("fetching block %u\n", (unsigned)num);
-        res = _fetch_block(&pkt, buf, &sock, path, blksize, num);
+        res = _fetch_block(&pkt, buf, sock, path, blksize, num);
         DEBUG("res=%i\n", res);
 
         if (!res) {
@@ -208,9 +198,7 @@ int suit_coap_get_blockwise(sock_udp_ep_t *remote, const char *path,
 
         num += 1;
     }
-
 out:
-    sock_udp_close(&sock);
     return res;
 }
 
@@ -221,6 +209,8 @@ int suit_coap_get_blockwise_url(const char *url,
     char hostport[CONFIG_SOCK_HOSTPORT_MAXLEN];
     char urlpath[CONFIG_SOCK_URLPATH_MAXLEN];
     sock_udp_ep_t remote;
+    sock_udp_t sock;
+    int res;
 
     if (strncmp(url, "coap://", 7)) {
         LOG_INFO("suit: URL doesn't start with \"coap://\"\n");
@@ -237,11 +227,15 @@ int suit_coap_get_blockwise_url(const char *url,
         return -EINVAL;
     }
 
-    if (!remote.port) {
-        remote.port = COAP_PORT;
+    res = nanocoap_connect(&sock, NULL, &remote);
+    if (res) {
+        return res;
     }
 
-    return suit_coap_get_blockwise(&remote, urlpath, blksize, buf, callback, arg);
+    res = suit_coap_get_blockwise(&sock, urlpath, blksize, buf, callback, arg);
+    nanocoap_close(&sock);
+
+    return res;
 }
 
 typedef struct {
