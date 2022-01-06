@@ -215,9 +215,9 @@ DWORD get_fattime(void)
     uint8_t minute = time.tm_min;           /* bit 10:5 minute (0..59) */
     uint8_t second = (time.tm_sec / 2);     /* bit 4:0 second/2 (0..29) */
 
-    return year << FATFS_DISKIO_FATTIME_YEAR_OFFS |
-           month << FATFS_DISKIO_FATTIME_MON_OFFS |
-           day_of_month << FATFS_DISKIO_FATTIME_DAY_OFFS |
+    return (DWORD)year << FATFS_DISKIO_FATTIME_YEAR_OFFS |
+           (DWORD)month << FATFS_DISKIO_FATTIME_MON_OFFS |
+           (DWORD)day_of_month << FATFS_DISKIO_FATTIME_DAY_OFFS |
            hour << FATFS_DISKIO_FATTIME_HH_OFFS |
            minute << FATFS_DISKIO_FATTIME_MM_OFFS |
            second;
