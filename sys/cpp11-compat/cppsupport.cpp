@@ -106,22 +106,6 @@ void __verbose_terminate_handler()
      Elegant Invention
  */
 
-void* operator new(std::size_t size) {
-    return std::malloc(size);
-}
-
-void* operator new[](std::size_t size) {
-    return std::malloc(size);
-}
-
-void operator delete(void* ptr) noexcept {
-    std::free(ptr);
-}
-
-void operator delete[](void* ptr) noexcept {
-    std::free(ptr);
-}
-
 /* Optionally you can override the 'nothrow' versions as well.
    This is useful if you want to catch failed allocs with your
    own debug code, or keep track of heap usage for example,

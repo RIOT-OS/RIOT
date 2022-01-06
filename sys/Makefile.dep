@@ -337,6 +337,7 @@ ifneq (,$(filter log_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
+  USEMODULE += cpp_new_delete
   USEMODULE += xtimer
   USEMODULE += timex
   FEATURES_REQUIRED += cpp
