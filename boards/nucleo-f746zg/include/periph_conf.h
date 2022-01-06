@@ -175,7 +175,7 @@ static const spi_conf_t spi_config[] = {
 #endif
         .miso_pin = GPIO_PIN(PORT_A, 6),
         .sclk_pin = GPIO_PIN(PORT_A, 5),
-        .cs_pin   = GPIO_UNDEF,
+        .cs_pin   = SPI_CS_UNDEF,
         .mosi_af  = GPIO_AF5,
         .miso_af  = GPIO_AF5,
         .sclk_af  = GPIO_AF5,
@@ -194,7 +194,7 @@ static const spi_conf_t spi_config[] = {
         .mosi_pin = GPIO_PIN(PORT_E, 6),
         .miso_pin = GPIO_PIN(PORT_E, 5),
         .sclk_pin = GPIO_PIN(PORT_E, 2),
-        .cs_pin   = GPIO_UNDEF,
+        .cs_pin   = SPI_CS_UNDEF,
         .mosi_af  = GPIO_AF5,
         .miso_af  = GPIO_AF5,
         .sclk_af  = GPIO_AF5,
