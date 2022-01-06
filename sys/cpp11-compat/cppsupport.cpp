@@ -27,15 +27,6 @@ extern "C" {
 }
 
 /**
- * @brief DSO handle
- *
- * This symbol is used by dynamic shared objects to identify them, but it is
- * somehow pulled in as a dependency by the compiler-generated global (static)
- * constructor code.
- */
-void *__dso_handle __attribute__((weak)) = NULL;
-
-/**
  * @brief Definition of a pure virtual function
  *
  * Calling this function is an error.
