@@ -1,3 +1,1 @@
 INCLUDES += -I$(PKGDIRBASE)/arduino_api/api
-
-CXXEXFLAGS += -std=c++11
