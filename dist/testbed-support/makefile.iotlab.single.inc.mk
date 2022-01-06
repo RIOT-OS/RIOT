@@ -48,12 +48,6 @@ ifeq (,$(IOTLAB_NODE))
   $(error)
 endif
 
-ifeq (auto-ssh,$(IOTLAB_NODE))
-  $(info $(COLOR_YELLOW)IOTLAB_NODE=auto-ssh is deprecated and will be removed after \
-         2010.07 is released, use IOTLAB_NODE=auto instead$(COLOR_RESET))
-  override IOTLAB_NODE := auto
-endif
-
 IOTLAB_AUTH ?= $(HOME)/.iotlabrc
 IOTLAB_USER ?= $(shell cut -f1 -d: $(IOTLAB_AUTH))
 
