@@ -40,7 +40,7 @@ static inline void __set_cpsr(unsigned val)
     __asm__ volatile(" msr  cpsr, %0" : /* no outputs */ : "r"(val) : "memory");
 }
 
-static inline int irq_is_in(void)
+static inline bool irq_is_in(void)
 {
     int retval;
     __asm__ volatile(" mrs  %0, cpsr" : "=r"(retval) : /* no inputs */ : "memory");
@@ -70,7 +70,7 @@ static inline __attribute__((always_inline)) unsigned irq_enable(void)
     return _cpsr;
 }
 
-static inline __attribute__((always_inline)) int irq_is_enabled(void)
+static inline __attribute__((always_inline)) bool irq_is_enabled(void)
 {
     return !(__get_cpsr() & IRQ_MASK);
 }

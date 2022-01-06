@@ -227,12 +227,12 @@ void irq_restore(unsigned state)
     return;
 }
 
-int irq_is_enabled(void)
+bool irq_is_enabled(void)
 {
     return native_interrupts_enabled;
 }
 
-int irq_is_in(void)
+bool irq_is_in(void)
 {
     DEBUG("irq_is_in: %i\n", _native_in_isr);
     return _native_in_isr;

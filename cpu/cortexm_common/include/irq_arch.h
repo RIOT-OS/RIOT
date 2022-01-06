@@ -19,6 +19,7 @@
 #ifndef IRQ_ARCH_H
 #define IRQ_ARCH_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include "cpu_conf.h"
 
@@ -61,7 +62,7 @@ static inline __attribute__((always_inline)) void irq_restore(
 /**
  * @brief See if IRQs are currently enabled
  */
-static inline __attribute__((always_inline)) int irq_is_enabled(void)
+static inline __attribute__((always_inline)) bool irq_is_enabled(void)
 {
     /* so far, all existing Cortex-M are only using the least significant bit
      * in the PRIMARK register. If ever any other bit is used for different
@@ -72,7 +73,7 @@ static inline __attribute__((always_inline)) int irq_is_enabled(void)
 /**
  * @brief See if the current context is inside an ISR
  */
-static inline __attribute__((always_inline)) int irq_is_in(void)
+static inline __attribute__((always_inline)) bool irq_is_in(void)
 {
     return (__get_IPSR() & 0xFF);
 }

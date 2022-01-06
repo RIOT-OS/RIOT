@@ -78,16 +78,16 @@ MAYBE_INLINE void irq_restore(unsigned state);
  * @warning Use this function from thread context only. When used in interrupt
  *          context the returned state may be incorrect.
  *
- * @return  0 (false) if IRQs are currently disabled
- * @return  != 0 (true) if IRQs are currently enabled
+ * @return  false if IRQs are currently disabled
+ * @return  true if IRQs are currently enabled
  */
-MAYBE_INLINE int irq_is_enabled(void);
+MAYBE_INLINE bool irq_is_enabled(void);
 
 /**
  * @brief   Check whether called from interrupt service routine
  * @return  true, if in interrupt service routine, false if not
  */
-MAYBE_INLINE int irq_is_in(void);
+MAYBE_INLINE bool irq_is_in(void);
 
 #ifdef IRQ_API_INLINED
 #include "irq_arch.h"
