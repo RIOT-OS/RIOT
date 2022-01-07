@@ -1,0 +1,34 @@
+From a69fe71eb8e915db21bda6879ce0f8b768e5982d Mon Sep 17 00:00:00 2001
+From: Alexandre Abadie <alexandre.abadie@inria.fr>
+Date: Fri, 7 Jan 2022 17:20:46 +0100
+Subject: [PATCH] replace deprecated CIPHER_AES_128 by CIPHER_AES
+
+---
+ encoding/data.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/encoding/data.c b/encoding/data.c
+index 6abf186..afebde4 100644
+--- a/encoding/data.c
++++ b/encoding/data.c
+@@ -437,7 +437,7 @@ ndn_shared_block_t* ndn_data_encrypt_with_ccm(ndn_block_t* name,
+ 
+     // Initiate cipher
+     cipher_t cipher;
+-    if (cipher_init(&cipher, CIPHER_AES_128, key, key_len) < 0) {
++    if (cipher_init(&cipher, CIPHER_AES, key, key_len) < 0) {
+         DEBUG("ndn_encoding: cannot init ccm cipher for encryption\n");
+         return NULL;
+     }
+@@ -1027,7 +1027,7 @@ ndn_shared_block_t* ndn_data_decrypt_with_ccm(ndn_block_t* block,
+ 
+     // Initiate cipher
+     cipher_t cipher;
+-    if (cipher_init(&cipher, CIPHER_AES_128, key, key_len) < 0) {
++    if (cipher_init(&cipher, CIPHER_AES, key, key_len) < 0) {
+         DEBUG("ndn_encoding: cannot init ccm cipher for decryption\n");
+         return NULL;
+     }
+-- 
+2.32.0
+
