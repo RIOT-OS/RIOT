@@ -108,14 +108,6 @@ typedef struct cipher_interface_st {
 typedef const cipher_interface_t *cipher_id_t;
 
 /**
- * @brief AES_128 cipher id
- *
- * @deprecated Use @ref CIPHER_AES instead. Will be removed after 2021.07
- * release.
- */
-extern const cipher_id_t CIPHER_AES_128;
-
-/**
  * @brief AES cipher id
  */
 extern const cipher_id_t CIPHER_AES;

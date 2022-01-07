@@ -72,7 +72,6 @@ static const cipher_interface_t aes_interface = {
     aes_decrypt
 };
 
-const cipher_id_t CIPHER_AES_128 = &aes_interface;
 const cipher_id_t CIPHER_AES = &aes_interface;
 
 static const u32 Te0[256] = {

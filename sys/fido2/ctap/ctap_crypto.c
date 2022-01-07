@@ -196,7 +196,7 @@ int fido2_ctap_crypto_aes_ccm_enc(uint8_t *out, size_t out_len,
     cipher_t cipher;
     int ret;
 
-    ret = cipher_init(&cipher, CIPHER_AES_128, key, key_len);
+    ret = cipher_init(&cipher, CIPHER_AES, key, key_len);
 
     if (ret != 1) {
         return CTAP1_ERR_OTHER;
