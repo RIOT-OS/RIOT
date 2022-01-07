@@ -67,24 +67,6 @@ extern "C" {
 #define CONFIG_SHELL_NO_PROMPT 0
 #endif
 
-/**
- * @brief Set to 1 to disable shell's echo
- * @deprecated This has been replaced by @ref CONFIG_SHELL_NO_ECHO and will be
- *             removed after release 2021.07.
- */
-#ifndef SHELL_NO_ECHO
-#define SHELL_NO_ECHO CONFIG_SHELL_NO_ECHO
-#endif
-
-/**
- * @brief Set to 1 to disable shell's prompt
- * @deprecated This has been replaced by @ref CONFIG_SHELL_NO_PROMPT and will be
- *             removed after release 2021.07.
- */
-#ifndef SHELL_NO_PROMPT
-#define SHELL_NO_PROMPT CONFIG_SHELL_NO_PROMPT
-#endif
-
 /** @} */
 
 /**
