@@ -56,8 +56,19 @@ int lwip_sock_get_addr(struct netconn *conn, struct _sock_tl_ep *ep, u8_t local)
 #if defined(MODULE_LWIP_SOCK_UDP) || defined(MODULE_LWIP_SOCK_IP)
 int lwip_sock_recv(struct netconn *conn, uint32_t timeout, struct netbuf **buf);
 #endif
-ssize_t lwip_sock_send(struct netconn *conn, const void *data, size_t len,
-                       int proto, const struct _sock_tl_ep *remote, int type);
+ssize_t lwip_sock_sendv(struct netconn *conn, const sock_tx_snip_t *snips,
+                        int proto, const struct _sock_tl_ep *remote, int type);
+static inline ssize_t lwip_sock_send(struct netconn *conn,
+                                     const void *data, size_t len,
+                                     int proto, const struct _sock_tl_ep *remote, int type)
+{
+    sock_tx_snip_t snip = {
+        .data = data,
+        .len  = len,
+    };
+
+    return lwip_sock_sendv(conn, &snip, proto, remote, type);
+}
 /**
  * @}
  */

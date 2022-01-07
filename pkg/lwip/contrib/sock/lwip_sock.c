@@ -573,14 +573,15 @@ int lwip_sock_recv(struct netconn *conn, uint32_t timeout, struct netbuf **buf)
 }
 #endif /* defined(MODULE_LWIP_SOCK_UDP) || defined(MODULE_LWIP_SOCK_IP) */
 
-ssize_t lwip_sock_send(struct netconn *conn, const void *data, size_t len,
-                       int proto, const struct _sock_tl_ep *remote, int type)
+ssize_t lwip_sock_sendv(struct netconn *conn, const sock_tx_snip_t *snips,
+                        int proto, const struct _sock_tl_ep *remote, int type)
 {
     ip_addr_t remote_addr;
     struct netconn *tmp;
-    struct netbuf *buf;
+    struct netbuf *buf = NULL;
+    size_t payload_len = 0;
     int res;
-    err_t err;
+    err_t err= ERR_OK;
     u16_t remote_port = 0;
 
 #if LWIP_IPV6
@@ -597,12 +598,22 @@ ssize_t lwip_sock_send(struct netconn *conn, const void *data, size_t len,
         }
     }
 
-    buf = netbuf_new();
-    if ((buf == NULL) || (netbuf_alloc(buf, len) == NULL) ||
-        (netbuf_take(buf, data, len) != ERR_OK)) {
-        netbuf_delete(buf);
-        return -ENOMEM;
+    for (const sock_tx_snip_t *snip = snips; snip != NULL; snip = snip->next) {
+        struct netbuf *tail = netbuf_new();
+        if ((tail == NULL) || (netbuf_alloc(tail, snip->len) == NULL) ||
+            (netbuf_take(tail, snip->data, snip->len) != ERR_OK)) {
+            netbuf_delete(tail);
+            netbuf_delete(buf);
+            return -ENOMEM;
+        }
+        payload_len += snip->len;
+        if (buf) {
+            netbuf_chain(buf, tail);
+        } else {
+            buf = tail;
+        }
     }
+
     if ((conn == NULL) && (remote != NULL)) {
         if ((res = _create(type, proto, 0, &tmp)) < 0) {
             netbuf_delete(buf);
@@ -625,13 +636,19 @@ ssize_t lwip_sock_send(struct netconn *conn, const void *data, size_t len,
         netbuf_delete(buf);
         return -ENOTCONN;
     }
-    res = len;  /* set for non-TCP calls */
+    res = payload_len;  /* set for non-TCP calls */
     if (remote != NULL) {
         err = netconn_sendto(tmp, buf, &remote_addr, remote_port);
     }
 #if LWIP_TCP
     else if (tmp->type & NETCONN_TCP) {
-        err = netconn_write_partly(tmp, data, len, 0, (size_t *)(&res));
+        while (snips) {
+            err = netconn_write_partly(tmp, snips->data, snips->len, 0, (size_t *)(&res));
+            if (err != ERR_OK) {
+                break;
+            }
+            snips = snips->next;
+        }
     }
 #endif /* LWIP_TCP */
     else {
