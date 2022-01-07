@@ -118,17 +118,6 @@ static int _read_burst(const stmpe811_t *dev, uint8_t reg, void *buf, size_t len
 }
 #endif /* bus mode selection */
 
-static void _gpio_irq(void *arg)
-{
-    const stmpe811_t *dev = (const stmpe811_t *)arg;
-
-    assert(dev);
-
-    if (dev->cb) {
-        dev->cb(dev->cb_arg);
-    }
-}
-
 static int _soft_reset(const stmpe811_t *dev)
 {
     if (_write_reg(dev, STMPE811_SYS_CTRL1, STMPE811_SYS_CTRL1_SOFT_RESET ) < 0) {
@@ -191,8 +180,6 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t *params, stmpe811_eve
                   void *arg)
 {
     dev->params = *params;
-    dev->cb = cb;
-    dev->cb_arg = arg;
     dev->prev_x = 0;
     dev->prev_y = 0;
 
@@ -295,7 +282,7 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t *params, stmpe811_eve
 
     if (gpio_is_valid(dev->params.int_pin)) {
         DEBUG("[stmpe811] init: configuring touchscreen interrupt\n");
-        gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_FALLING, _gpio_irq, dev);
+        gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_FALLING, cb, arg);
 
         /* Enable touchscreen interrupt */
         ret += _write_reg(dev, STMPE811_INT_EN, STMPE811_INT_EN_TOUCH_DET);
