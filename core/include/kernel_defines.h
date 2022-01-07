@@ -236,6 +236,27 @@ extern "C" {
 #define DECLARE_CONSTANT(identifier, const_expr) \
     WITHOUT_PEDANTIC(enum { identifier = const_expr };)
 
+#if DOXYGEN
+/**
+ * @brief   Check if given variable / expression is detected as compile time
+ *          constant
+ * @note    This might return 0 on compile time constant expressions if the
+ *          compiler is not able to prove the constness at the given level
+ *          of optimization.
+ * @details This will return 0 if the used compiler does not support this
+ * @warning This is intended for internal use only
+ *
+ * This allows providing two different implementations in C, with one being
+ * more efficient if constant folding is used.
+ */
+#define IS_CT_CONSTANT(expr) <IMPLEMENTATION>
+#elif defined(__GNUC__)
+/* both clang and gcc (which both define __GNUC__) support this */
+#define IS_CT_CONSTANT(expr) __builtin_constant_p(expr)
+#else
+#define IS_CT_CONSTANT(expr) 0
+#endif
+
 /**
  * @cond INTERNAL
  */

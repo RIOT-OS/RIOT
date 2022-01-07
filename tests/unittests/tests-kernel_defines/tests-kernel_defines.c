@@ -77,12 +77,36 @@ static void test_declare_constant(void)
     static_assert(sizeof(test_array) == 3, "test_array should be 3 bytes long");
 }
 
+#ifdef BOARD_NATIVE
+/* native compiles with -Og, which does not automatically inline functions.
+ * We just turn the function into a macro to get the test also passing on
+ * native */
+#define magic_computation(...) (unsigned)(42U * 3.14159 / 1337U)
+#else
+static unsigned magic_computation(void)
+{
+    return (unsigned)(42U * 3.14159 / 1337U);
+}
+#endif
+
+static void test_is_compile_time_constant(void)
+{
+    /* These test might fail on non-GCC-non-clang compilers. We don't support
+     * any of those (yet), but this test might need adaption in the future */
+    unsigned actual_constant = magic_computation();
+    volatile unsigned not_a_constant = actual_constant;
+
+    TEST_ASSERT(IS_CT_CONSTANT(actual_constant));
+    TEST_ASSERT(!IS_CT_CONSTANT(not_a_constant));
+}
+
 Test *tests_kernel_defines_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_kernel_version),
         new_TestFixture(test_index_of),
         new_TestFixture(test_declare_constant),
+        new_TestFixture(test_is_compile_time_constant),
     };
 
     EMB_UNIT_TESTCALLER(kernel_defines_tests, NULL, NULL, fixtures);
