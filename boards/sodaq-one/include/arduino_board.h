@@ -34,7 +34,9 @@ extern "C" {
 /**
  * @brief   On-board serial port mapping
  */
-#define ARDUINO_UART_DEV         UART_DEV(0)
+#ifndef ARDUINO_UART_DEV
+#define ARDUINO_UART_DEV    UART_UNDEF
+#endif
 
 /**
  * @brief   Look-up table for the Arduino's digital pins

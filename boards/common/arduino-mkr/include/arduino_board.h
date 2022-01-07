@@ -29,6 +29,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief   On-board serial port mapping, stdio is used for Serial
+ */
+#ifndef ARDUINO_UART_DEV
+#define ARDUINO_UART_DEV    UART_UNDEF
+#endif
+
+/**
  * @brief   Look-up table for the Arduino's digital pins
  */
 static const gpio_t arduino_pinmap[] = {
