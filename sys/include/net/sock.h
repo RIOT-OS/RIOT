@@ -103,6 +103,7 @@
 #define NET_SOCK_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -314,6 +315,40 @@ enum {
  *          to store the flags.
  */
 typedef uint8_t sock_aux_flags_t;
+
+/**
+ * @brief   sock TX snip forward declaration
+ */
+typedef struct sock_tx_snip sock_tx_snip_t;
+
+/**
+ * @brief   A data chunk for TX
+ */
+struct sock_tx_snip {
+    sock_tx_snip_t *next; /**< ptr to next list entry */
+    const void *data;     /**< ptr to this list entries data */
+    size_t len;           /**< size of data pointed to by ptr */
+};
+
+/**
+ * @brief   Calculates the total size of the buffers chained together
+ *          as @ref sock_tx_snip
+ *
+ * @param[in]   head    First element of the list
+ *
+ * @return  Sum of `len` of all elements of the list
+ */
+static inline size_t sock_tx_snip_len(const sock_tx_snip_t *head)
+{
+    size_t payload = 0;
+
+    while (head) {
+        payload += head->len;
+        head = head->next;
+    }
+
+    return payload;
+}
 
 #ifdef __cplusplus
 }
