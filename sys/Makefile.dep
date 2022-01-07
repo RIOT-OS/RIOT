@@ -384,7 +384,10 @@ endif
 
 ifneq (,$(filter posix_netdb,$(USEMODULE)))
   USEMODULE += posix_inet
-  USEMODULE += sock_dns
+
+  ifeq (,$(filter sock_dns_mock,$(USEMODULE)))
+    USEMODULE += sock_dns
+  endif
 endif
 
 ifneq (,$(filter posix_inet,$(USEMODULE)))
