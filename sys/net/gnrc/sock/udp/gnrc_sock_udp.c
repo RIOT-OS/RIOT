@@ -278,19 +278,19 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
     return res;
 }
 
-ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
-                          const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux)
+ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
+                           const sock_tx_snip_t *snips,
+                           const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux)
 {
     (void)aux;
     int res;
-    gnrc_pktsnip_t *payload, *pkt;
+    gnrc_pktsnip_t *pkt, *payload = NULL;
     uint16_t src_port = 0, dst_port;
     sock_ip_ep_t local;
     sock_udp_ep_t remote_cpy;
     sock_ip_ep_t *rem;
 
     assert((sock != NULL) || (remote != NULL));
-    assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
 
     if (remote != NULL) {
         if (remote->port == 0) {
@@ -363,9 +363,13 @@ ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
         return -EINVAL;
     }
     /* generate payload and header snips */
-    payload = gnrc_pktbuf_add(NULL, (void *)data, len, GNRC_NETTYPE_UNDEF);
-    if (payload == NULL) {
-        return -ENOMEM;
+    while (snips) {
+        res = gnrc_pktbuf_add_tail(&payload, snips->data, snips->len, GNRC_NETTYPE_UNDEF);
+        if (res) {
+            gnrc_pktbuf_release(payload);
+            return res;
+        }
+        snips = snips->next;
     }
     pkt = gnrc_udp_hdr_build(payload, src_port, dst_port);
     if (pkt == NULL) {
