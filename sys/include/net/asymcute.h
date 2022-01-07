@@ -79,16 +79,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Default buffer size for Asymcute client (as exponent of 2^n)
- *
- * @deprecated Use @ref CONFIG_ASYMCUTE_BUFSIZE instead. Will be removed after
- * 2021.04 release.
- */
-#ifndef CONFIG_ASYMCUTE_BUFSIZE_EXP
-#define CONFIG_ASYMCUTE_BUFSIZE_EXP     (7U)
-#endif
-
-/**
  * @brief   Default buffer size used for receive and request buffers
  */
 #ifndef CONFIG_ASYMCUTE_BUFSIZE
