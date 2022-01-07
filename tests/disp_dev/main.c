@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 
+#include "board.h"
 #include "disp_dev.h"
 
 #include "riot_logo.h"
@@ -30,7 +31,11 @@
 #include "ili9341.h"
 #endif
 
+#ifdef LCD_SCREEN_WIDTH
+#define DISPLAY_BUFFER_MAX_SIZE (LCD_SCREEN_WIDTH)
+#else
 #define DISPLAY_BUFFER_MAX_SIZE (320)
+#endif
 static uint16_t display_buffer[DISPLAY_BUFFER_MAX_SIZE] = { 0 };
 
 int main(void)

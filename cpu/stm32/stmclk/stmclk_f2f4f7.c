@@ -92,6 +92,13 @@
 #error No suitable 48MHz found, USB will not work
 #endif
 
+/* PLLSAI is enabled when LTDC is used */
+#if IS_USED(MODULE_PERIPH_LTDC)
+#define CLOCK_REQUIRE_PLLSAIR       1
+#else
+#define CLOCK_REQUIRE_PLLSAIR       0
+#endif
+
 /* PLLI2S configuration: the following parameters configure a 48MHz I2S clock
    with HSE (8MHz) or HSI (16MHz) as PLL input clock */
 #ifndef CONFIG_CLOCK_PLLI2S_M
@@ -175,7 +182,7 @@
 #define CONFIG_CLOCK_PLLSAI_Q       (8)     /* SAI clock, 48MHz by default */
 #endif
 #ifndef CONFIG_CLOCK_PLLSAI_R
-#define CONFIG_CLOCK_PLLSAI_R       (8)     /* LCD clock, 48MHz by default */
+#define CONFIG_CLOCK_PLLSAI_R       (4)     /* LCD clock, 48MHz by default */
 #endif
 
 #if defined(RCC_PLLSAICFGR_PLLSAIM_Pos)
@@ -455,7 +462,7 @@
 #endif
 
 /* Check whether PLLSAI must be enabled */
-#if IS_ACTIVE(CLOCK_REQUIRE_PLLSAIP)
+#if IS_ACTIVE(CLOCK_REQUIRE_PLLSAIP) || IS_ACTIVE(CLOCK_REQUIRE_PLLSAIR)
 #define CLOCK_ENABLE_PLLSAI             1
 #else
 #define CLOCK_ENABLE_PLLSAI             0
@@ -553,6 +560,20 @@ void stmclk_init_sysclk(void)
         RCC->PLLI2SCFGR = (CONFIG_PLLI2S_SRC | PLLI2S_M | PLLI2S_N | PLLI2S_P | PLLI2S_Q | PLLI2S_R);
         RCC->CR |= (RCC_CR_PLLI2SON);
         while (!(RCC->CR & RCC_CR_PLLI2SRDY)) {}
+    }
+#endif
+
+#if defined(RCC_DCKCFGR1_PLLSAIDIVR)
+    if (IS_USED(MODULE_PERIPH_LTDC)) {
+        RCC->DCKCFGR1 &= ~RCC_DCKCFGR1_PLLSAIDIVR;
+        RCC->DCKCFGR1 |= RCC_DCKCFGR1_PLLSAIDIVR_0; /* Divide by 4 */
+    }
+#endif
+
+#if defined(RCC_DCKCFGR_PLLSAIDIVR)
+    if (IS_USED(MODULE_PERIPH_LTDC)) {
+        RCC->DCKCFGR &= ~RCC_DCKCFGR_PLLSAIDIVR;
+        RCC->DCKCFGR |= RCC_DCKCFGR_PLLSAIDIVR_0; /* Divide by 4 */
     }
 #endif
 

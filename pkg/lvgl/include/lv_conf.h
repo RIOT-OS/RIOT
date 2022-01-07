@@ -22,6 +22,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include "kernel_defines.h"
 #include "lvgl_riot_conf.h"
 
 /*====================
@@ -50,7 +51,11 @@ extern "C" {
 /* Swap the 2 bytes of RGB565 color.
  * Useful if the display has a 8 bit interface (e.g. SPI)*/
 #ifndef LV_COLOR_16_SWAP
+#if IS_USED(MODULE_ILI9341)
 #define LV_COLOR_16_SWAP   1
+#else
+#define LV_COLOR_16_SWAP   0
+#endif
 #endif
 
 /* 1: Enable screen transparency.

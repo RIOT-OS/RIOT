@@ -42,7 +42,11 @@ static uint8_t qr0[qrcodegen_BUFFER_LEN_FOR_VERSION(ENCODER_VERSION)];
 static uint8_t buffer[qrcodegen_BUFFER_LEN_FOR_VERSION(ENCODER_VERSION)];
 
 #ifdef MODULE_DISP_DEV
+#ifdef LCD_SCREEN_WIDTH
+#define DISPLAY_BUFFER_MAX_SIZE (LCD_SCREEN_WIDTH)
+#else
 #define DISPLAY_BUFFER_MAX_SIZE (320)
+#endif
 static uint16_t display_buffer[DISPLAY_BUFFER_MAX_SIZE] = { 0 };
 #endif
 

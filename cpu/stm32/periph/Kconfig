@@ -34,3 +34,9 @@ config MODULE_PERIPH_ADC
     select MODULE_ZTIMER if HAS_CPU_STM32F3 || HAS_CPU_STM32L4 || HAS_CPU_STM32WL
     select MODULE_ZTIMER_MSEC if HAS_CPU_STM32F3 || HAS_CPU_STM32L4 || HAS_CPU_STM32WL
     select MODULE_PERIPH_COMMON
+
+config MODULE_PERIPH_LTDC
+    bool "LTDC peripheral driver"
+    depends on HAS_PERIPH_LTDC
+    help
+        STM32 LCD-TFT Display controller
