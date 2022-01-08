@@ -53,29 +53,6 @@ int saul_reg_add(saul_reg_t *dev)
     return 0;
 }
 
-int saul_reg_rm(saul_reg_t *dev)
-{
-    saul_reg_t *tmp = saul_reg;
-
-    if (saul_reg == NULL || dev == NULL) {
-        return -ENODEV;
-    }
-    if (saul_reg == dev) {
-        saul_reg = dev->next;
-        return 0;
-    }
-    while (tmp->next && (tmp->next != dev)) {
-        tmp = tmp->next;
-    }
-    if (tmp->next == dev) {
-        tmp->next = dev->next;
-    }
-    else {
-        return -ENODEV;
-    }
-    return 0;
-}
-
 saul_reg_t *saul_reg_find_nth(int pos)
 {
     saul_reg_t *tmp = saul_reg;
