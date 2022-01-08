@@ -166,52 +166,6 @@ static void test_reg_find_type_and_name(void)
     TEST_ASSERT_NULL(dev);
 }
 
-static void test_reg_rm(void)
-{
-    int res;
-
-    TEST_ASSERT_EQUAL_INT(5, count());
-    TEST_ASSERT_EQUAL_STRING("S0", saul_reg->name);
-    TEST_ASSERT_EQUAL_STRING("S3", last()->name);
-
-    res = saul_reg_rm(&s3b);
-    TEST_ASSERT_EQUAL_INT(0, res);
-    TEST_ASSERT_EQUAL_INT(4, count());
-    TEST_ASSERT_EQUAL_STRING("S0", saul_reg->name);
-    TEST_ASSERT_EQUAL_STRING("S3", last()->name);
-
-    res = saul_reg_rm(&s3a);
-    TEST_ASSERT_EQUAL_INT(0, res);
-    TEST_ASSERT_EQUAL_INT(3, count());
-    TEST_ASSERT_EQUAL_STRING("S0", saul_reg->name);
-    TEST_ASSERT_EQUAL_STRING("S2", last()->name);
-
-    res = saul_reg_rm(&s1);
-    TEST_ASSERT_EQUAL_INT(0, res);
-    TEST_ASSERT_EQUAL_INT(2, count());
-    TEST_ASSERT_EQUAL_STRING("S0", saul_reg->name);
-    TEST_ASSERT_EQUAL_STRING("S2", last()->name);
-
-    res = saul_reg_rm(&s1);
-    TEST_ASSERT_EQUAL_INT(-ENODEV, res);
-
-    res = saul_reg_rm(NULL);
-    TEST_ASSERT_EQUAL_INT(-ENODEV, res);
-
-    TEST_ASSERT_EQUAL_INT(2, count());
-
-    res = saul_reg_rm(&s0);
-    TEST_ASSERT_EQUAL_INT(0, res);
-    TEST_ASSERT_EQUAL_INT(1, count());
-    TEST_ASSERT_EQUAL_STRING("S2", saul_reg->name);
-    TEST_ASSERT_EQUAL_STRING("S2", last()->name);
-
-    res = saul_reg_rm(&s2);
-    TEST_ASSERT_EQUAL_INT(0, res);
-    TEST_ASSERT_EQUAL_INT(0, count());
-    TEST_ASSERT_NULL(saul_reg);
-}
-
 Test *tests_saul_reg_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -221,7 +175,6 @@ Test *tests_saul_reg_tests(void)
         new_TestFixture(test_reg_find_type),
         new_TestFixture(test_reg_find_name),
         new_TestFixture(test_reg_find_type_and_name),
-        new_TestFixture(test_reg_rm)
     };
 
     EMB_UNIT_TESTCALLER(pkt_tests, NULL, NULL, fixtures);
