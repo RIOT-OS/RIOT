@@ -261,6 +261,9 @@ size_t usbus_fmt_descriptor_conf(usbus_t *usbus)
     if (CONFIG_USB_SELF_POWERED) {
         conf.attributes |= USB_CONF_ATTR_SELF_POWERED;
     }
+    if (CONFIG_USB_REM_WAKEUP) {
+        conf.attributes |= USB_CONF_ATTR_REM_WAKEUP;
+    }
     /* TODO: upper bound */
     /* USB max power is reported in increments of 2 mA */
     conf.max_power = CONFIG_USB_MAX_POWER / 2;
@@ -286,6 +289,7 @@ size_t usbus_fmt_descriptor_dev(usbus_t *usbus)
     desc.max_packet_size = CONFIG_USBUS_EP0_SIZE;
     desc.vendor_id = CONFIG_USB_VID;
     desc.product_id = CONFIG_USB_PID;
+    desc.bcd_device = CONFIG_USB_PRODUCT_BCDVERSION;
     desc.manufacturer_idx = usbus->manuf.idx;
     desc.product_idx = usbus->product.idx;
     desc.serial_idx = usbus->serial.idx;
