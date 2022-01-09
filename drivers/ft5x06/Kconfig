@@ -1,0 +1,109 @@
+# Copyright (c) 2021 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config MODULE_FT5X06
+    bool "FT5X06 touch panel driver"
+    depends on TEST_KCONFIG
+    depends on HAS_PERIPH_GPIO_IRQ
+    depends on HAS_PERIPH_I2C
+    select MODULE_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_I2C
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
+
+config MODULE_FT5606
+    bool "FT5606 touch panel driver"
+    select MODULE_FT5X06
+
+config MODULE_FT5X16
+    bool "FT5X16 touch panel driver"
+    select MODULE_FT5X06
+
+config MODULE_FT6X06
+    bool "FT6X06 touch panel driver"
+    select MODULE_FT5X06
+
+config MODULE_FT6X36
+    bool "FT6X36 touch panel driver"
+    select MODULE_FT5X06
+
+config MODULE_FT5X06I
+    bool "FT5X06I touch panel driver"
+    select MODULE_FT5X06
+
+config MODULE_FT5336
+    bool "FT5336 touch panel driver"
+    select MODULE_FT5X06
+
+config MODULE_FT3316
+    bool "FT3316 touch panel driver"
+    select MODULE_FT5X06
+
+config MODULE_FT5436I
+    bool "FT5436I touch panel driver"
+    select MODULE_FT5X06
+
+config MODULE_FT5336I
+    bool "FT5336I touch panel driver"
+    select MODULE_FT5X06
+
+config MODULE_FT5X46
+    bool "FT5X46 touch panel driver"
+    select MODULE_FT5X06
+
+config HAVE_FT5606
+    bool
+    select MODULE_FT5606 if MODULE_TOUCH_DEV
+    help
+      Indicates that an FT5606 touch panel is present.
+
+config HAVE_FT5X16
+    bool
+    select MODULE_FT5X16 if MODULE_TOUCH_DEV
+    help
+      Indicates that an FT5X16 touch panel is present.
+
+config HAVE_FT6X06
+    bool
+    select MODULE_FT6X06 if MODULE_TOUCH_DEV
+    help
+      Indicates that an FT6X06 touch panel is present.
+
+config HAVE_FT6X36
+    bool
+    select MODULE_FT6X36 if MODULE_TOUCH_DEV
+    help
+      Indicates that an FT6X36 touch panel is present.
+
+config HAVE_FT5X06I
+    bool
+    select MODULE_FT5X06I if MODULE_TOUCH_DEV
+    help
+      Indicates that an FT5X06I touch panel is present.
+
+config HAVE_FT5336
+    bool
+    select MODULE_FT5336 if MODULE_TOUCH_DEV
+    help
+      Indicates that an FT5336 touch panel is present.
+
+config HAVE_FT3316
+    bool
+    select MODULE_FT3316 if MODULE_TOUCH_DEV
+    help
+      Indicates that an FT3316 touch panel is present.
+
+config HAVE_FT5436I
+    bool
+    select MODULE_FT5436I if MODULE_TOUCH_DEV
+    help
+      Indicates that an FT5436I touch panel is present.
+
+config HAVE_FT5X46
+    bool
+    select MODULE_FT5X46 if MODULE_TOUCH_DEV
+    help
+      Indicates that an FT5X46 touch panel is present.

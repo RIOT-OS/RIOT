@@ -155,10 +155,34 @@ static const i2c_conf_t i2c_config[] = {
         .bus            = APB1,
         .rcc_mask       = RCC_APB1ENR_I2C2EN,
         .irqn           = I2C2_ER_IRQn,
-    }
+    },
+    {   /* Connected to touchscreen controller */
+        .dev            = I2C3,
+        .speed          = I2C_SPEED_NORMAL,
+        .scl_pin        = GPIO_PIN(PORT_A, 8),
+        .sda_pin        = GPIO_PIN(PORT_H, 8),
+        .scl_af         = GPIO_AF4,
+        .sda_af         = GPIO_AF4,
+        .bus            = APB1,
+        .rcc_mask       = RCC_APB1ENR_I2C3EN,
+        .irqn           = I2C3_ER_IRQn,
+    },
+    {
+        .dev            = I2C1,
+        .speed          = I2C_SPEED_NORMAL,
+        .scl_pin        = GPIO_PIN(PORT_B, 8),
+        .sda_pin        = GPIO_PIN(PORT_B, 9),
+        .scl_af         = GPIO_AF4,
+        .sda_af         = GPIO_AF4,
+        .bus            = APB1,
+        .rcc_mask       = RCC_APB1ENR_I2C1EN,
+        .irqn           = I2C1_ER_IRQn,
+    },
 };
 
 #define I2C_0_ISR           isr_i2c2_er
+#define I2C_1_ISR           isr_i2c3_er
+#define I2C_2_ISR           isr_i2c1_er
 
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */

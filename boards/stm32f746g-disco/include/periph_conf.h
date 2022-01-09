@@ -36,7 +36,6 @@
 
 #include "periph_cpu.h"
 #include "clk_conf.h"
-#include "cfg_i2c1_pb8_pb9.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"
 #include "cfg_usb_otg_fs.h"
@@ -145,6 +144,41 @@ static const spi_conf_t spi_config[] = {
 };
 
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
+/** @} */
+
+/**
+ * @name I2C configuration
+ * @{
+ */
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev            = I2C1,
+        .speed          = I2C_SPEED_NORMAL,
+        .scl_pin        = GPIO_PIN(PORT_B, 8),
+        .sda_pin        = GPIO_PIN(PORT_B, 9),
+        .scl_af         = GPIO_AF4,
+        .sda_af         = GPIO_AF4,
+        .bus            = APB1,
+        .rcc_mask       = RCC_APB1ENR_I2C1EN,
+        .irqn           = I2C1_ER_IRQn,
+    },
+    {
+        .dev            = I2C3,
+        .speed          = I2C_SPEED_NORMAL,
+        .scl_pin        = GPIO_PIN(PORT_H, 7),
+        .sda_pin        = GPIO_PIN(PORT_H, 8),
+        .scl_af         = GPIO_AF4,
+        .sda_af         = GPIO_AF4,
+        .bus            = APB1,
+        .rcc_mask       = RCC_APB1ENR_I2C3EN,
+        .irqn           = I2C3_ER_IRQn,
+    },
+};
+
+#define I2C_0_ISR           isr_i2c1_er
+#define I2C_1_ISR           isr_i2c3_er
+
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
 /**

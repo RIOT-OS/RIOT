@@ -66,6 +66,16 @@ extern "C" {
 /** @} */
 
 /**
+ * @name FT5X06 touch panel configuration
+ * @{
+ */
+#define FT5X06_PARAM_I2C_DEV            I2C_DEV(1)              /**< I2C device */
+#define FT5X06_PARAM_INT_PIN            GPIO_PIN(PORT_I, 13)    /**< Interrupt pin */
+#define FT5X06_PARAM_XMAX               (480)                   /**< Max width */
+#define FT5X06_PARAM_YMAX               (272)                   /**< Max height */
+/** @} */
+
+/**
  * @brief   Initialize board specific hardware
  */
 void board_init(void);
