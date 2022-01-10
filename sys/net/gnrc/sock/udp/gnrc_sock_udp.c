@@ -289,6 +289,7 @@ ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
     sock_ip_ep_t local;
     sock_udp_ep_t remote_cpy;
     sock_ip_ep_t *rem;
+    uint8_t *payload_buf;
 
     assert((sock != NULL) || (remote != NULL));
 
@@ -362,15 +363,21 @@ ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
     else if (local.family != rem->family) {
         return -EINVAL;
     }
-    /* generate payload and header snips */
+
+    /* allocate snip for payload */
+    payload = gnrc_pktbuf_add(NULL, NULL, sock_tx_snip_len(snips), GNRC_NETTYPE_UNDEF);
+    if (payload == NULL) {
+        return -ENOMEM;
+    }
+
+    /* copy payload data into payload snip */
+    payload_buf = payload->data;
     while (snips) {
-        res = gnrc_pktbuf_add_tail(&payload, snips->data, snips->len, GNRC_NETTYPE_UNDEF);
-        if (res) {
-            gnrc_pktbuf_release(payload);
-            return res;
-        }
+        memcpy(payload_buf, snips->data, snips->len);
+        payload_buf += snips->len;
         snips = snips->next;
     }
+
     pkt = gnrc_udp_hdr_build(payload, src_port, dst_port);
     if (pkt == NULL) {
         gnrc_pktbuf_release(payload);
