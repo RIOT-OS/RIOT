@@ -32,7 +32,7 @@ extern "C" {
  * @brief   Received LoRa packet status information
  */
 typedef struct {
-    uint8_t rssi;           /**< RSSI of a received packet */
+    int16_t rssi;           /**< RSSI of a received packet */
     int8_t snr;             /**< S/N ratio */
 } netdev_lora_rx_info_t;
 
