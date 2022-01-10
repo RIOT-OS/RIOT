@@ -90,23 +90,20 @@ static void _hal_radio_cb(ieee802154_dev_t *dev, ieee802154_trx_ev_t status)
     switch (status) {
     case IEEE802154_RADIO_CONFIRM_TX_DONE:
         ieee802154_radio_confirm_transmit(openwsn_radio.dev, NULL);
-        ieee802154_radio_request_set_trx_state(openwsn_radio.dev,
-                                               IEEE802154_TRX_STATE_TRX_OFF);
-        while (ieee802154_radio_confirm_set_trx_state(openwsn_radio.dev) == -EAGAIN) {}
+        ieee802154_radio_request_set_idle(openwsn_radio.dev, true);
+        while (ieee802154_radio_confirm_set_idle(openwsn_radio.dev) == -EAGAIN) {}
         openwsn_radio.endFrame_cb(_txrx_event_capture_time);
         break;
     case IEEE802154_RADIO_INDICATION_CRC_ERROR:
         _valid_crc = false;
-        ieee802154_radio_request_set_trx_state(openwsn_radio.dev,
-                                               IEEE802154_TRX_STATE_TRX_OFF);
-        while (ieee802154_radio_confirm_set_trx_state(openwsn_radio.dev) == -EAGAIN) {}
+        ieee802154_radio_request_set_idle(openwsn_radio.dev, true);
+        while (ieee802154_radio_confirm_set_idle(openwsn_radio.dev) == -EAGAIN) {}
         openwsn_radio.endFrame_cb(_txrx_event_capture_time);
         break;
     case IEEE802154_RADIO_INDICATION_RX_DONE:
         _valid_crc = true;
-        ieee802154_radio_request_set_trx_state(openwsn_radio.dev,
-                                               IEEE802154_TRX_STATE_TRX_OFF);
-        while (ieee802154_radio_confirm_set_trx_state(openwsn_radio.dev) == -EAGAIN) {}
+        ieee802154_radio_request_set_idle(openwsn_radio.dev, true);
+        while (ieee802154_radio_confirm_set_idle(openwsn_radio.dev) == -EAGAIN) {}
         openwsn_radio.endFrame_cb(_txrx_event_capture_time);
         break;
     case IEEE802154_RADIO_INDICATION_TX_START:
@@ -202,9 +199,8 @@ void radio_rfOn(void)
     /* If the radio is still not in TRX_OFF state, spin */
     while (ieee802154_radio_confirm_on(openwsn_radio.dev) == -EAGAIN) {}
     /* HACK: cc2538 does not implement on() correctly, remove when it does*/
-    ieee802154_radio_request_set_trx_state(openwsn_radio.dev,
-                                           IEEE802154_TRX_STATE_TRX_OFF);
-    while (ieee802154_radio_confirm_set_trx_state(openwsn_radio.dev) == -EAGAIN) {}
+    ieee802154_radio_request_set_idle(openwsn_radio.dev, true);
+    while (ieee802154_radio_confirm_set_idle(openwsn_radio.dev) == -EAGAIN) {}
 }
 
 void radio_rfOff(void)
@@ -212,18 +208,16 @@ void radio_rfOff(void)
     /* radio_rfOff is called in the middle of a slot and is not always
        followed by an `radio_rfOn`, so don't call `ieee802154_radio_off`
        and only send the radio to `TrxOFF` instead */
-    int ret = ieee802154_radio_request_set_trx_state(openwsn_radio.dev,
-                                                     IEEE802154_TRX_STATE_TRX_OFF);
+    int ret = ieee802154_radio_request_set_idle(openwsn_radio.dev, true);
 
     if (ret) {
-        LOG_ERROR("[openwsn/radio]: request_set_trx_state failed %s\n",
+        LOG_ERROR("[openwsn/radio]: request_set_idle failed %s\n",
                   __FUNCTION__);
     }
     else {
         debugpins_radio_clr();
         leds_radio_off();
-        while (ieee802154_radio_confirm_set_trx_state(openwsn_radio.dev) ==
-               -EAGAIN) {}
+        while (ieee802154_radio_confirm_set_idle(openwsn_radio.dev) == -EAGAIN) {}
     }
 
 }
@@ -244,15 +238,14 @@ void radio_loadPacket(uint8_t *packet, uint16_t len)
 
 void radio_txEnable(void)
 {
-    int ret = ieee802154_radio_request_set_trx_state(openwsn_radio.dev,
-                                                     IEEE802154_TRX_STATE_TX_ON);
+    int ret = ieee802154_radio_request_set_idle(openwsn_radio.dev, true);
 
     if (ret) {
-        LOG_ERROR("[openwsn/radio]: request_set_trx_state failed %s\n",
+        LOG_ERROR("[openwsn/radio]: request_set_idle failed %s\n",
                   __FUNCTION__);
     }
     else {
-        while (ieee802154_radio_confirm_set_trx_state(openwsn_radio.dev) ==
+        while (ieee802154_radio_confirm_set_idle(openwsn_radio.dev) ==
                -EAGAIN) {}
         debugpins_radio_set();
         leds_radio_on();
@@ -264,7 +257,7 @@ void radio_txNow(void)
     int ret = ieee802154_radio_request_transmit(openwsn_radio.dev);
 
     if (ret) {
-        LOG_ERROR("[openwsn/radio]: request_set_trx_state failed %s\n",
+        LOG_ERROR("[openwsn/radio]: request_transmit failed %s\n",
                   __FUNCTION__);
     }
     else {
@@ -280,15 +273,14 @@ void radio_txNow(void)
 
 void radio_rxEnable(void)
 {
-    int ret = ieee802154_radio_request_set_trx_state(openwsn_radio.dev,
-                                                     IEEE802154_TRX_STATE_TRX_OFF);
+    int ret = ieee802154_radio_request_set_idle(openwsn_radio.dev, true);
 
     if (ret) {
-        LOG_ERROR("[openwsn/radio]: request_set_trx_state failed %s\n",
+        LOG_ERROR("[openwsn/radio]: request_set_idle failed %s\n",
                   __FUNCTION__);
     }
     else {
-        while (ieee802154_radio_confirm_set_trx_state(openwsn_radio.dev) ==
+        while (ieee802154_radio_confirm_set_idle(openwsn_radio.dev) ==
                -EAGAIN) {}
         debugpins_radio_set();
         leds_radio_on();
@@ -297,16 +289,14 @@ void radio_rxEnable(void)
 
 void radio_rxNow(void)
 {
-    int ret = ieee802154_radio_request_set_trx_state(openwsn_radio.dev,
-                                                     IEEE802154_TRX_STATE_RX_ON);
+    int ret = ieee802154_radio_request_set_rx(openwsn_radio.dev);
 
     if (ret) {
-        LOG_ERROR("[openwsn/radio]: request_set_trx_state failed %s\n",
+        LOG_ERROR("[openwsn/radio]: request_set_rx failed %s\n",
                   __FUNCTION__);
     }
     else {
-        while (ieee802154_radio_confirm_set_trx_state(openwsn_radio.dev) ==
-               -EAGAIN) {}
+        while (ieee802154_radio_confirm_set_rx(openwsn_radio.dev) == -EAGAIN) {}
     }
 }
 

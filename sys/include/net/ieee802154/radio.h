@@ -33,6 +33,7 @@ extern "C" {
 #include "byteorder.h"
 #include "net/eui64.h"
 #include "net/ieee802154.h"
+#include "errno.h"
 
 /**
  * @brief Forward declaration of the radio ops structure.
@@ -50,7 +51,7 @@ typedef enum {
      *
      * The device supports sending with CSMA-CA and retransmissions.  If the
      * CSMA-CA fails, the device reports a @ref TX_STATUS_MEDIUM_BUSY when
-     * calling @ref ieee802154_radio_ops::confirm_transmit. In case CSMA-CA
+     * calling @ref ieee802154_radio_confirm_transmit. In case CSMA-CA
      * succeeds and the ACK frame is expected, the
      * device reports a @ref TX_STATUS_SUCCESS if the ACK frame is received
      * during any retransmission attempt. Otherwise, it reports a @ref
@@ -68,7 +69,7 @@ typedef enum {
      * The device supports performing CSMA-CA before transmitting a frame.  If
      * CSMA-CA procedure succeeds, the device sends the frame and reports a
      * @ref TX_STATUS_SUCCESS when calling @ref
-     * ieee802154_radio_ops::confirm_transmit. If it fails, the device reports
+     * ieee802154_radio_confirm_transmit. If it fails, the device reports
      * @ref TX_STATUS_MEDIUM_BUSY.
      */
     IEEE802154_CAP_AUTO_CSMA            = BIT1,
@@ -78,7 +79,7 @@ typedef enum {
      * The device will automatically attempt to receive and handle the ACK
      * frame if expected.
      * If the ACK frame is not received, the device reports @ref
-     * TX_STATUS_NO_ACK when calling @ref ieee802154_radio_ops::confirm_transmit.
+     * TX_STATUS_NO_ACK when calling @ref ieee802154_radio_confirm_transmit.
      * Otherwise, it reports @ref TX_STATUS_SUCCESS.
      *
      * The ACK frame is not indicated to the upper layer.
@@ -157,18 +158,6 @@ typedef enum {
      * set if the source address matches one from the table.
      */
     IEEE802154_CAP_SRC_ADDR_MATCH       = BIT18,
-    /**
-     * @brief the device stays in RX_ON on @ref
-     * IEEE802154_RADIO_INDICATION_RX_DONE or @ref
-     * IEEE802154_RADIO_INDICATION_CRC_ERROR
-     *
-     * Radios that provide this feature don't need to call @ref
-     * ieee802154_radio_request_set_trx_state on after receiving a frame, in
-     * case more frames are expected. This does not affect Framebuffer
-     * protection (e.g a radio might still be listening but its framebuffer is
-     * locked because the upper layer didn't call @ref ieee802154_radio_read)
-     */
-    IEEE802154_CAP_RX_CONTINUOUS        = BIT19,
 } ieee802154_rf_caps_t;
 
 /**
@@ -221,24 +210,6 @@ typedef enum {
 } ieee802154_tx_status_t;
 
 /**
- * @brief IEEE802.15.4 transceiver states (not to confuse with device states)
- */
-typedef enum {
-    /**
-     * @brief the transceiver state is off
-     */
-    IEEE802154_TRX_STATE_TRX_OFF,
-    /**
-     * @brief the transceiver is ready to receive/receiving frames
-     */
-    IEEE802154_TRX_STATE_RX_ON,
-    /**
-     * @brief the transceiver is ready to transmit/transmitting a frame
-     */
-    IEEE802154_TRX_STATE_TX_ON,
-} ieee802154_trx_state_t;
-
-/**
  * @brief IEEE802.15.4 Radio HAL events
  *
  * To follow the IEEE802.15.4 convention, an event that responds to a Request
@@ -255,12 +226,13 @@ typedef enum {
     /**
      * @brief the transceiver received a frame with an invalid crc.
      *
-     * The transceiver might not stay in @ref IEEE802154_TRX_STATE_RX_ON
-     * after receiving an invalid CRC. Therefore the upper layer must
-     * set the transceiver state (@ref ieee802154_radio_ops::request_set_trx_state).
-     * e.g.: @ref IEEE802154_TRX_STATE_TRX_OFF or @ref IEEE802154_TRX_STATE_TX_ON
-     * to stop listening or @ref IEEE802154_TRX_STATE_RX_ON to keep
-     * listening.
+     * @note some radios won't flush the framebuffer on reception of a frame
+     * with invalid CRC. Therefore it's required to call @ref
+     * ieee802154_radio_read.
+     *
+     * @note since the behavior of radios after frame reception is undefined,
+     * the upper layer should set the transceiver state to IDLE as soon as
+     * possible before calling @ref ieee802154_radio_read
      */
     IEEE802154_RADIO_INDICATION_CRC_ERROR,
 
@@ -287,7 +259,11 @@ typedef enum {
      * The transceiver might be in a "FB Lock" state where no more frames are
      * received. This is done in order to avoid overwriting the Frame Buffer
      * with new frame arrivals.  In order to leave this state, the upper layer
-     * must call @ref ieee802154_radio_ops::read.
+     * must call @ref ieee802154_radio_read
+     *
+     * @note since the behavior of radios after frame reception is undefined,
+     * the upper layer should set the transceiver state to IDLE as soon as
+     * possible before calling @ref ieee802154_radio_read
      */
     IEEE802154_RADIO_INDICATION_RX_DONE,
 
@@ -297,7 +273,7 @@ typedef enum {
      *
      * This event is present if radio has @ref IEEE802154_CAP_IRQ_TX_DONE cap.
      * The upper layer should immediately call @ref
-     * ieee802154_radio_ops::confirm_transmit when on this event.
+     * ieee802154_radio_confirm_transmit when on this event.
      */
     IEEE802154_RADIO_CONFIRM_TX_DONE,
     /**
@@ -484,6 +460,30 @@ typedef struct {
 } ieee802154_phy_conf_t;
 
 /**
+ * @brief IEEE 802.15.4 radio operations
+ */
+typedef enum {
+    /**
+     * @brief Transmission of a preloaded frame.
+     */
+    IEEE802154_HAL_OP_TRANSMIT,
+    /**
+     * @brief Set the transceiver state to RX.
+     */
+    IEEE802154_HAL_OP_SET_RX,
+    /**
+     * @brief Set the transceiver state to IDLE (RX off).
+     */
+    IEEE802154_HAL_OP_SET_IDLE,
+    /**
+     * @brief Request Clear Channel Assessment
+     */
+    IEEE802154_HAL_OP_CCA,
+
+    /* add more as needed (e.g Energy Scanning, transmit slotted ACK) */
+} ieee802154_hal_op_t;
+
+/**
  * @brief Radio ops struct declaration
  */
 struct ieee802154_radio_ops {
@@ -510,48 +510,6 @@ struct ieee802154_radio_ops {
     int (*write)(ieee802154_dev_t *dev, const iolist_t *psdu);
 
     /**
-     * @brief Request the transmission of a preloaded frame
-     *
-     * @ref ieee802154_radio_ops::confirm_transmit MUST be used to finish the
-     * transmission.
-     *
-     * @pre the PHY state is @ref IEEE802154_TRX_STATE_TX_ON and the frame
-     *      is already in the framebuffer.
-     *
-     * @param[in] dev IEEE802.15.4 device descriptor
-     *
-     * @return 0 on success
-     * @return negative errno on error
-     */
-    int (*request_transmit)(ieee802154_dev_t *dev);
-
-    /**
-     * @brief Confirmation function for @ref ieee802154_radio_ops::request_transmit.
-     *
-     * This function must be called to finish the transmission procedure and
-     * get the transmission status. This function should be called on @ref
-     * IEEE802154_RADIO_CONFIRM_TX_DONE. If no interrupt is available, this
-     * function can be polled.
-     *
-     * @pre the device is on
-     * @pre call to @ref ieee802154_radio_ops::request_transmit was successful.
-     *
-     * @post the state is @ref IEEE802154_TRX_STATE_TX_ON.
-     *
-     * @param[in] dev IEEE802.15.4 device descriptor
-     * @param[out] info the TX information. Pass NULL
-     * if the information is not needed. If the radio supports AutoCCA, the
-     * status should indicate transmission done or channel busy. If the radio
-     * supports frame retransmissions, the status should indicate if medium
-     * was busy, no ACK was received or transmission succeeded.
-     *
-     * @return 0 on success
-     * @return -EAGAIN if the transmission has not finished yet.
-     * @return negative errno on error
-     */
-    int (*confirm_transmit)(ieee802154_dev_t *dev, ieee802154_tx_info_t *info);
-
-    /**
      * @brief Get the length of the received PSDU frame.
      *
      * @pre the device is on
@@ -572,8 +530,8 @@ struct ieee802154_radio_ops {
      * This function reads the received frame from the internal framebuffer.
      * It should try to copy the received PSDU frame into @p buf. The FCS
      * field will **not** be copied and its size **not** be taken into account
-     * for the return value. If the radio provides any kind of framebuffer protection,
-     * this function should release it.
+     * for the return value. If the radio provides any kind of framebuffer
+     * protection, this function should release it.
      *
      * @post Don't call this function if there was no reception event
      * (either @ref IEEE802154_RADIO_INDICATION_RX_DONE or @ref
@@ -597,8 +555,7 @@ struct ieee802154_radio_ops {
      *
      * When this function returns, the radio shall be off.
      *
-     * @post the device is off (and thus, the transceiver state is @ref
-     * IEEE802154_TRX_STATE_TRX_OFF)
+     * @post the device is off
      *
      * @return 0 on success
      * @return negative errno on error
@@ -625,7 +582,7 @@ struct ieee802154_radio_ops {
      *
      * @pre call to @ref ieee802154_radio_ops::request_on was successful.
      *
-     * @post the transceiver state is @ref IEEE802154_TRX_STATE_TRX_OFF
+     * @post the transceiver state is IDLE
      * During boot or in case the radio doesn't support @ref
      * IEEE802154_CAP_REG_RETENTION when @ref off was called, the
      * Physical Information Base will be undefined. Thus, take into
@@ -649,74 +606,37 @@ struct ieee802154_radio_ops {
     int (*confirm_on)(ieee802154_dev_t *dev);
 
     /**
-     * @brief Request a PHY state change
+     * @brief   Request a radio operation.
      *
-     * @note @ref ieee802154_radio_ops::confirm_set_trx_state MUST be used to
-     * finish the state transition. Also, setting the state to
-     * @ref IEEE802154_TRX_STATE_RX_ON flushes the RX FIFO.
-     *
-     * @pre the device is on
+     * This functions is used to request a radio operation. See @ref
+     * ieee802154_hal_op_t for a list of available operations.
      *
      * @param[in] dev IEEE802.15.4 device descriptor
-     * @param[in] state the new state
+     * @param[in] op operation to be executed
+     * @param[in] ctx operation specific context
      *
-     * @return 0 on success
-     * @return -EBUSY if the transceiver is busy
-     * @return negative number on error
+     * @return status of the request
+     *
+     * @retval 0 on success
+     * @retval negative errno on error
      */
-    int (*request_set_trx_state)(ieee802154_dev_t *dev,
-                                 ieee802154_trx_state_t state);
+    int (*request_op)(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx);
 
     /**
-     * @brief Confirmation function for @ref
-     * ieee802154_radio_ops::request_set_trx_state
+     * @brief   Confirmation function for @ref ieee802154_radio_ops::request_op
      *
-     * @pre call to @ref ieee802154_radio_ops::request_set_trx_state was
-     * successful.
+     * This function must be called to finish a given @ref ieee802154_hal_op_t.
      *
      * @param[in] dev IEEE802.15.4 device descriptor
+     * @param[in] op operation to be confirmed
+     * @param[in] ctx operation specific context
      *
-     * @return 0 if the state transition was successful
-     * @return -EAGAIN if the transition has not finished yet
-     * @return negative errno on error
+     * @return status of the request
+     *
+     * @retval 0 on success
+     * @retval negative errno on error
      */
-    int (*confirm_set_trx_state)(ieee802154_dev_t *dev);
-
-    /**
-     * @brief Request Stand-Alone Clear Channel Assessment
-     *
-     * @pre the state is @ref IEEE802154_TRX_STATE_RX_ON
-     *
-     * @note @ref ieee802154_radio_ops::confirm_cca MUST be used to
-     * finish the CCA procedure and get the channel status.
-     *
-     * @param[in] dev IEEE802.15.4 device descriptor
-     *
-     * @post the state is @ref IEEE802154_TRX_STATE_RX_ON
-     *
-     * @return 0 if request was OK
-     * @return -EAGAIN if the request cannot be performed immediately.
-     * @return negative errno on error
-     */
-    int (*request_cca)(ieee802154_dev_t *dev);
-
-    /**
-     * @brief Confirmation function for @ref ieee802154_radio_ops::request_cca
-     *
-     * This function must be called to finish the CCA procedure.  This
-     * function should be called on @ref IEEE802154_RADIO_CONFIRM_CCA,
-     * If no interrupt is available, this function can be polled.
-     *
-     * @pre call to @ref ieee802154_radio_ops::request_cca was successful.
-     *
-     * @param[in] dev IEEE802.15.4 device descriptor
-     *
-     * @return positive number if the channel is clear
-     * @return 0 if the channel is busy
-     * @return -EAGAIN if the CCA procedure hasn't finished.
-     * @return negative errno on error
-     */
-    int (*confirm_cca)(ieee802154_dev_t *dev);
+    int (*confirm_op)(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx);
 
     /**
      * @brief Set the threshold for the Energy Detection (first mode of CCA)
@@ -757,7 +677,7 @@ struct ieee802154_radio_ops {
      * function should return -EINVAL
      *
      * @pre the device is on
-     * @pre the transceiver state is @ref IEEE802154_TRX_STATE_TRX_OFF
+     * @pre the transceiver state is IDLE.
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] conf the PHY configuration
@@ -795,7 +715,7 @@ struct ieee802154_radio_ops {
      * @param[in] retries number of CSMA-CA retries. If @p retries < 0,
      *                    retransmissions with CSMA-CA MUST be disabled.
      *                    If @p retries == 0, the @ref
-     *                    ieee802154_radio_ops::request_transmit function is
+     *                    ieee802154_radio_request_transmit function is
      *                    equivalent to CCA send.
      *
      * @return 0 on success
@@ -871,29 +791,58 @@ static inline int ieee802154_radio_write(ieee802154_dev_t *dev, const iolist_t *
 }
 
 /**
- * @brief Shortcut to @ref ieee802154_radio_ops::request_transmit
+ * @brief Transmit a preloaded frame
  *
- * @param[in] dev IEEE802.15.4 device descriptor
+ * This functions calls ieee802154_radio_ops::request_op with @ref
+ * IEEE802154_HAL_OP_TRANSMIT and NULL context.
  *
- * @return result of @ref ieee802154_radio_ops::request_transmit
+ * @pre The upper layer should have called set the transceiver to IDLE (see
+ * @ref ieee802154_radio_set_idle) and the frame is already in the framebuffer
+ * (@ref ieee802154_radio_ops_t::write).
+ * @pre the device is on
+ *
+ * @note @ref ieee802154_radio_confirm_transmit MUST be used to
+ * finish the transmission.
+ *
+ * @return result of @ref ieee802154_radio_request_transmit
+ *
+ * @retval 0 on success
+ * @retval negative errno on error
  */
 static inline int ieee802154_radio_request_transmit(ieee802154_dev_t *dev)
 {
-    return dev->driver->request_transmit(dev);
+    return dev->driver->request_op(dev, IEEE802154_HAL_OP_TRANSMIT, NULL);
 }
 
 /**
- * @brief Shortcut to @ref ieee802154_radio_ops::confirm_transmit
+ * @brief Confirmation function for @ref ieee802154_radio_request_transmit
+ * This function must be called to finish the transmission procedure and
+ * get the transmission status. This function should be called on @ref
+ * IEEE802154_RADIO_CONFIRM_TX_DONE. If no interrupt is available, this
+ * function can be polled.
+ *
+ * This functions calls ieee802154_radio_ops::confirm_op with @ref
+ * IEEE802154_HAL_OP_TRANSMIT and sets the context to @p info.
+ *
+ * @pre the device is on
+ * @pre call to @ref ieee802154_radio_request_transmit was successful.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
- * @param[out] info the TX information
+ * @param[out] info the TX information. Pass NULL
+ * if the information is not needed. If the radio supports AutoCCA, the
+ * status should indicate transmission done or channel busy. If the radio
+ * supports frame retransmissions, the status should indicate if medium
+ * was busy, no ACK was received or transmission succeeded.
  *
- * @return result of @ref ieee802154_radio_ops::confirm_transmit
+ * @retval whether the transmission finished or not
+ *
+ * @return 0 if the transmission finished
+ * @return -EAGAIN otherwise
  */
 static inline int ieee802154_radio_confirm_transmit(ieee802154_dev_t *dev,
                                                     ieee802154_tx_info_t *info)
 {
-    return dev->driver->confirm_transmit(dev, info);
+    return dev->driver->confirm_op(dev, IEEE802154_HAL_OP_TRANSMIT, info);
 }
 
 /**
@@ -958,7 +907,7 @@ static inline int ieee802154_radio_set_cca_mode(ieee802154_dev_t *dev,
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::config_phy
  *
- * @pre the transceiver state is @ref IEEE802154_TRX_STATE_TRX_OFF
+ * @pre the transceiver state is IDLE.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  * @param[in] conf the PHY configuration
@@ -994,7 +943,7 @@ static inline int ieee802154_radio_config_src_address_match(ieee802154_dev_t *de
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
- * @post the transceiver state is @ref IEEE802154_TRX_STATE_TRX_OFF
+ * @post the transceiver state is IDLE.
  *
  * @return result of @ref ieee802154_radio_ops::off
  */
@@ -1101,53 +1050,226 @@ static inline int ieee802154_radio_confirm_on(ieee802154_dev_t *dev)
 }
 
 /**
- * @brief Shortcut to @ref ieee802154_radio_ops::request_set_trx_state
+ * @brief Request the transceiver state to IDLE.
+ *
+ * During IDLE, the radio won't be able to receive frames but it's still
+ * responsive to other HAL functions.
+ *
+ * This functions calls ieee802154_radio_ops::request_op with @ref
+ * IEEE802154_HAL_OP_SET_IDLE and sets the context to @p force
+ *
+ * @pre the device is on
+ *
+ * @note @ref ieee802154_radio_confirm_set_idle MUST be used to
+ * finish the state transition.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
- * @param[in] state the new state
+ * @param[in] force whether the state transition should be forced or not. If
+ *                  forced, the transceiver aborts any ongoing operation.
  *
- * @return result of @ref ieee802154_radio_ops::request_set_trx_state
+ * @return status of the request
+ *
+ * @retval 0 on success
+ * @retval negative errno on error
  */
-static inline int ieee802154_radio_request_set_trx_state(ieee802154_dev_t *dev,
-                                                         ieee802154_trx_state_t state)
+static inline int ieee802154_radio_request_set_idle(ieee802154_dev_t *dev, bool force)
 {
-    return dev->driver->request_set_trx_state(dev, state);
+    return dev->driver->request_op(dev, IEEE802154_HAL_OP_SET_IDLE, &force);
 }
 
 /**
- * @brief Shortcut to @ref ieee802154_radio_ops::confirm_set_trx_state
+ * @brief Confirmation function for @ref ieee802154_radio_request_set_idle
+ *
+ * @pre call to @ref ieee802154_radio_request_set_idle was successful.
+ * @pre the device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
- * @return result of @ref ieee802154_radio_ops::confirm_set_trx_state
+ * @return whether the state transition finished or not
+ *
+ * @return 0 if the transition finished
+ * @return -EAGAIN otherwise.
  */
-static inline int ieee802154_radio_confirm_set_trx_state(ieee802154_dev_t *dev)
+static inline int ieee802154_radio_confirm_set_idle(ieee802154_dev_t *dev)
 {
-    return dev->driver->confirm_set_trx_state(dev);
+    return dev->driver->confirm_op(dev, IEEE802154_HAL_OP_SET_IDLE, NULL);
 }
 
 /**
- * @brief Shortcut to @ref ieee802154_radio_ops::request_cca
+ * @brief Request the transceiver state to RX.
+ *
+ * During RX, the radio will listen to incoming frames
+ *
+ * This functions calls ieee802154_radio_ops::request_op with @ref
+ * IEEE802154_HAL_OP_SET_RX and NULL context.
+ *
+ * @pre the device is on
+ *
+ * @note @ref ieee802154_radio_confirm_set_rx MUST be used to
+ * finish the state transition.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
- * @return result of @ref ieee802154_radio_ops::request_cca
+ * @return status of the request
+ *
+ * @retval 0 on success
+ * @retval negative errno on error
+ */
+static inline int ieee802154_radio_request_set_rx(ieee802154_dev_t *dev)
+{
+    return dev->driver->request_op(dev, IEEE802154_HAL_OP_SET_RX, NULL);
+}
+
+/**
+ * @brief Confirmation function for @ref ieee802154_radio_request_set_rx
+ *
+ * @pre call to @ref ieee802154_radio_request_set_rx was successful.
+ * @pre the device is on
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return whether the state transition finished or not
+ *
+ * @return 0 if the transition finished
+ * @return -EAGAIN otherwise.
+ */
+static inline int ieee802154_radio_confirm_set_rx(ieee802154_dev_t *dev)
+{
+    return dev->driver->confirm_op(dev, IEEE802154_HAL_OP_SET_RX, NULL);
+}
+
+/**
+ * @brief Set transceiver state to IDLE (blocking)
+ *
+ * This function will internally call @ref ieee802154_radio_request_set_idle
+ * and poll @ref ieee802154_radio_confirm_set_idle.
+ *
+ * @pre the device is on
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ * @param[in] force whether the state transition should be forced or not. If
+ *                  forced, the transceiver aborts any ongoing operation.
+ *
+ * @return result of the state transition
+ *
+ * @retval 0 on success
+ * @retval negative errno on error
+ */
+static inline int ieee802154_radio_set_idle(ieee802154_dev_t *dev, bool force)
+{
+    int res = ieee802154_radio_request_set_idle(dev, force);
+    if (res < 0) {
+        return res;
+    }
+    while (ieee802154_radio_confirm_set_idle(dev) == -EAGAIN) {}
+
+    return 0;
+}
+
+/**
+ * @brief Set transceiver state to RX (blocking)
+ *
+ * This function will internally call @ref ieee802154_radio_request_set_rx
+ * and poll @ref ieee802154_radio_confirm_set_rx.
+ *
+ * @pre the device is on
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return result of the state transition
+ *
+ * @retval 0 on success
+ * @retval negative errno on error
+ */
+static inline int ieee802154_radio_set_rx(ieee802154_dev_t *dev)
+{
+    int res = ieee802154_radio_request_set_rx(dev);
+    if (res < 0) {
+        return res;
+    }
+    while (ieee802154_radio_confirm_set_rx(dev) == -EAGAIN) {}
+
+    return 0;
+}
+
+/**
+ * @brief Request Stand-Alone Clear Channel Assessment
+ *
+ * This functions calls ieee802154_radio_ops::request_op with @ref
+ * IEEE802154_HAL_OP_CCA and NULL context.
+ *
+ * @pre the device is on
+ *
+ * @note @ref ieee802154_radio_confirm_cca MUST be used to
+ * finish the CCA procedure and get the channel status.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return 0 on success
+ * @return negative errno on error
  */
 static inline int ieee802154_radio_request_cca(ieee802154_dev_t *dev)
 {
-    return dev->driver->request_cca(dev);
+    return dev->driver->request_op(dev, IEEE802154_HAL_OP_CCA, NULL);
 }
 
 /**
- * @brief Shortcut to @ref ieee802154_radio_ops::confirm_cca
+ * @brief Shortcut to @ref ieee802154_radio_confirm_cca
+ *
+ * This function must be called to finish the CCA procedure.  This
+ * function should be called on @ref IEEE802154_RADIO_CONFIRM_CCA,
+ * If no interrupt is available, this function can be polled.
+ *
+ * This functions calls ieee802154_radio_ops::request_op with @ref
+ * IEEE802154_HAL_OP_CCA and sets the context to a boolean where the result
+ * of the CCA should be store. Setting it to true means the channel is clear.
+ *
+ * @pre call to @ref ieee802154_radio_request_cca was successful.
+ * @pre the device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
- * @return result of @ref ieee802154_radio_ops::confirm_cca
+ * @return status of the CCA procedure
+ *
+ * @retval positive number if the channel is clear
+ * @retval 0 if the channel is busy
+ * @retval -EAGAIN if the CCA procedure hasn't finished.
  */
 static inline int ieee802154_radio_confirm_cca(ieee802154_dev_t *dev)
 {
-    return dev->driver->confirm_cca(dev);
+    bool clear;
+    int res = dev->driver->confirm_op(dev, IEEE802154_HAL_OP_CCA, &clear);
+    if (res < 0) {
+        return res;
+    }
+    return clear;
+}
+
+/**
+ * @brief Perform a Clear Channel Assessment (blocking)
+ *
+ * This function will internally call @ref ieee802154_radio_request_cca
+ * and poll @ref ieee802154_radio_confirm_cca.
+ *
+ * @pre the device is on
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return status of the CCA
+ *
+ * @retval positive number if the channel is clear
+ * @retval 0 if the channel is busy
+ * @retval negative errno on error
+ */
+static inline int ieee802154_radio_cca(ieee802154_dev_t *dev)
+{
+    int res = ieee802154_radio_request_cca(dev);
+    if (res < 0) {
+        return res;
+    }
+    while (ieee802154_radio_confirm_cca(dev) == -EAGAIN) {}
+
+    return 0;
 }
 
 /**
@@ -1421,22 +1543,6 @@ static inline bool ieee802154_radio_has_phy_mr_fsk(ieee802154_dev_t *dev)
 static inline uint32_t ieee802154_radio_get_phy_modes(ieee802154_dev_t *dev)
 {
     return (dev->driver->caps & IEEE802154_RF_CAPS_PHY_MASK);
-}
-
-/**
- * @brief Check whether the radio stays in RX_ON after @ref
- *        IEEE802154_RADIO_INDICATION_RX_DONE or @ref
- *        IEEE802154_RADIO_INDICATION_CRC_ERROR events (see @ref
- *        IEEE802154_CAP_RX_CONTINUOUS)
- *
- * @param[in] dev IEEE802.15.4 device descriptor
- *
- * @return true if the device stays in RX_ON state
- * @return false otherwise
- */
-static inline bool ieee802154_radio_has_rx_continuous(ieee802154_dev_t *dev)
-{
-    return (dev->driver->caps & IEEE802154_CAP_RX_CONTINUOUS);
 }
 
 /**

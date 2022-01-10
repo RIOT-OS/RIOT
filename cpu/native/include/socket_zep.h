@@ -105,7 +105,7 @@ typedef struct {
      */
     uint8_t addr_long[IEEE802154_LONG_ADDRESS_LEN];
     ieee802154_filter_mode_t filter_mode;   /**< frame filter mode */
-    ieee802154_trx_state_t state;           /**< radio state */
+    bool rx;                                /**< whether the radio is listening for packets */
     bool send_hello;                        /**< send HELLO packet on connect */
 } socket_zep_t;
 

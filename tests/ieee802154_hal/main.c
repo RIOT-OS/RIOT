@@ -39,16 +39,24 @@
 
 #define SYMBOL_TIME (16U) /**< 16 us */
 #define ACK_TIMEOUT_TIME (40 * SYMBOL_TIME)
+#define TX_RX_TURNAROUND (12 * SYMBOL_TIME)
+
+/* the CC2538 takes 193 us to put the transceiver in RX_ON, which officially
+ * violates the official TX<->RX turnaround time (192 us for O-QPSK).
+ * However, the radio is able to pick up the preamble of a frame even if the
+ * first symbol is lost. We add a tolerance of half a symbol to the
+ * TX_RX_TURNAROUND in order to be sure the TX<->RX measurement test doesn't
+ * fail
+ */
+#define MAX_TX_RX_TURNAROUND (TX_RX_TURNAROUND + (SYMBOL_TIME >> 1))
+
 #define IEEE802154_LONG_ADDRESS_LEN_STR_MAX \
     (sizeof("00:00:00:00:00:00:00:00"))
-
-static inline void _set_trx_state(int state, bool verbose);
 
 static uint8_t buffer[127];
 static xtimer_t timer_ack;
 static mutex_t lock;
 
-static const char *str_states[3]= {"TRX_OFF", "RX", "TX"};
 static eui64_t ext_addr;
 static network_uint16_t short_addr;
 static uint8_t seq;
@@ -105,10 +113,13 @@ void _crc_error_handler(event_t *event)
     (void) event;
     puts("Frame with invalid CRC received");
     ieee802154_dev_t* dev = &_radio[0];
-    if (!ieee802154_radio_has_rx_continuous(dev)) {
-        /* switch back to RX_ON state */
-        _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
-    }
+    /* Force transition to IDLE before calling the read function */
+    ieee802154_radio_set_idle(dev, true);
+
+    /* We are not interested in the content of the frame */
+    ieee802154_radio_read(dev, NULL, 0, NULL);
+
+    ieee802154_radio_set_rx(dev);
 }
 
 static event_t _crc_error_event = {
@@ -121,6 +132,9 @@ void _rx_done_handler(event_t *event)
     ieee802154_rx_info_t info;
     ieee802154_dev_t* dev = &_radio[0];
 
+    /* Force transition to IDLE before calling the read function */
+    ieee802154_radio_set_idle(dev, true);
+
     /* Read packet from internal framebuffer
      *
      * NOTE: It's possible to call `ieee802154_radio_len` to retrieve the packet
@@ -132,10 +146,7 @@ void _rx_done_handler(event_t *event)
         _print_packet(size, info.lqi, info.rssi);
     }
 
-    if (!ieee802154_radio_has_rx_continuous(dev)) {
-        /* switch back to RX_ON state */
-        _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
-    }
+    ieee802154_radio_set_rx(dev);
 }
 
 static event_t _rx_done_event = {
@@ -172,7 +183,7 @@ static void _tx_finish_handler(event_t *event)
 
     if (!ieee802154_radio_has_irq_ack_timeout(&_radio[0]) && !ieee802154_radio_has_frame_retrans(&_radio[0])) {
         /* This is just to show how the MAC layer would handle ACKs... */
-        _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
+        ieee802154_radio_set_rx(&_radio[0]);
         xtimer_set(&timer_ack, ACK_TIMEOUT_TIME);
     }
 
@@ -206,17 +217,17 @@ static event_t _tx_finish_ev = {
 
 static void _send(iolist_t *pkt)
 {
-    /* Request a state change to TX_ON */
-    if (ieee802154_radio_request_set_trx_state(&_radio[0], IEEE802154_TRX_STATE_TX_ON) < 0) {
+    /* Request a state change to IDLE */
+    if (ieee802154_radio_request_set_idle(&_radio[0], false) < 0) {
         puts("Couldn't send frame");
         return;
     }
 
-    /* Write the packet to the radio */
+    /* Write the packet to the radio while the radio is transitioning to IDLE */
     ieee802154_radio_write(&_radio[0], pkt);
 
     /* Block until the radio confirms the state change */
-    while(ieee802154_radio_confirm_set_trx_state(&_radio[0]) == -EAGAIN);
+    while(ieee802154_radio_confirm_set_idle(&_radio[0]) == -EAGAIN);
 
     /* Set the frame filter to receive ACKs */
     ieee802154_radio_set_frame_filter_mode(&_radio[0], IEEE802154_FILTER_ACK_ONLY);
@@ -312,7 +323,7 @@ static int _init(void)
     expect(res >= 0);
 
     /* Set the transceiver state to RX_ON in order to receive packets */
-    _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
+    ieee802154_radio_set_rx(&_radio[0]);
     return 0;
 }
 
@@ -379,56 +390,37 @@ int _cca(int argc, char **argv)
     return 0;
 }
 
-static inline void _set_trx_state(int state, bool verbose)
-{
-    xtimer_ticks32_t a;
-    int res;
-
-    /* Under certain conditions (internal house-keeping or sending ACK frames
-     * back) the radio could indicate it's busy. Therefore, busy loop until
-     * the radio doesn't report BUSY
-     */
-    while((res = ieee802154_radio_request_set_trx_state(&_radio[0], state)) == -EBUSY) {}
-
-    if (verbose) {
-        a = xtimer_now();
-        if(res != 0) {
-            printf("%i != 0 \n", res);
-            expect(false);
-        }
-    }
-
-    while ((res = ieee802154_radio_confirm_set_trx_state(&_radio[0])) == -EAGAIN) {}
-    if (verbose) {
-        if (res != 0) {
-            printf("%i != 0 \n", res);
-            expect(false);
-        }
-        uint32_t secs = xtimer_usec_from_ticks(xtimer_diff(xtimer_now(), a));
-        printf("\tTransition took %" PRIu32 " usecs\n", secs);
-    }
-}
-
 int _test_states(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
-    for (int i=0; i<3;i++) {
-        printf("Setting state to: %s\n", str_states[i]);
-        _set_trx_state(i, true);
-        for (int j=0; j<3; j++) {
-            if (i == j) {
-                continue;
-            }
-            printf("%s-> %s\n", str_states[i], str_states[j]);
-            _set_trx_state(j, true);
-            printf("%s-> %s\n", str_states[j], str_states[i]);
-            _set_trx_state(i, true);
-        }
-        puts("");
-    }
+    uint32_t usecs;
+    int res;
+    xtimer_ticks32_t a;
 
-    _set_trx_state(IEEE802154_TRX_STATE_RX_ON, true);
+    /* Force transition to IDLE */
+    res = ieee802154_radio_set_idle(&_radio[0], true);
+    assert(res == 0);
+
+    printf("Testing TX<->RX transition time: ");
+    a = xtimer_now();
+    res = ieee802154_radio_set_rx(&_radio[0]);
+    assert(res == 0);
+    usecs = xtimer_usec_from_ticks(xtimer_diff(xtimer_now(), a));
+    printf("%" PRIu32 " us (%s)\n", usecs, usecs > MAX_TX_RX_TURNAROUND
+                                           ? "FAIL"
+                                           : "PASS");
+
+    printf("Testing RX<->TX transition time");
+    a = xtimer_now();
+    res = ieee802154_radio_set_idle(&_radio[0], true);
+    assert(res == 0);
+    usecs = xtimer_usec_from_ticks(xtimer_diff(xtimer_now(), a));
+    printf("%" PRIu32 " us (%s)\n", usecs, usecs > MAX_TX_RX_TURNAROUND
+                                           ? "FAIL"
+                                           : "PASS");
+
+    ieee802154_radio_set_rx(&_radio[0]);
 
     return 0;
 }
@@ -518,8 +510,9 @@ int config_phy(int argc, char **argv)
         puts("Wrong channel configuration (11 <= channel <= 26).");
         return 1;
     }
-    _set_trx_state(IEEE802154_TRX_STATE_TRX_OFF, false);
+
     ieee802154_dev_t *dev = &_radio[0];
+    ieee802154_radio_set_idle(dev, true);
     ieee802154_phy_conf_t conf = {.phy_mode=phy_mode, .channel=channel, .page=0, .pow=tx_pow};
     if (ieee802154_radio_config_phy(dev, &conf) < 0) {
         puts("Channel or TX power settings not supported");
@@ -529,7 +522,7 @@ int config_phy(int argc, char **argv)
         res = 0;
     }
 
-    _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
+    ieee802154_radio_set_rx(dev);
 
     return res;
 }

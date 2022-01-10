@@ -239,7 +239,7 @@ static void _socket_isr(int fd, void *arg)
 
     DEBUG("socket_zep::_socket_isr: bytes on %d\n", fd);
 
-    if (zepdev->state == IEEE802154_TRX_STATE_RX_ON) {
+    if (zepdev->rx) {
         dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
     } else {
         /* discard frame */
@@ -319,19 +319,6 @@ static int _set_cca_mode(ieee802154_dev_t *dev, ieee802154_cca_mode_t mode)
     return 0;
 }
 
-static int _request_cca(ieee802154_dev_t *dev)
-{
-    (void) dev;
-    return 0;
-}
-
-static int _confirm_cca(ieee802154_dev_t *dev)
-{
-    (void) dev;
-    assert(false);
-    return 0;
-}
-
 static int _set_cca_threshold(ieee802154_dev_t *dev, int8_t threshold)
 {
     (void) dev;
@@ -390,19 +377,6 @@ static int _set_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_
 {
     socket_zep_t *zepdev = dev->priv;
     zepdev->filter_mode = mode;
-    return 0;
-}
-
-static int _request_set_trx_state(ieee802154_dev_t *dev, ieee802154_trx_state_t state)
-{
-    socket_zep_t *zepdev = dev->priv;
-    zepdev->state = state;
-    return 0;
-}
-
-static int _confirm_set_trx_state(ieee802154_dev_t *dev)
-{
-    (void) dev;
     return 0;
 }
 
@@ -584,26 +558,68 @@ out:
     return res;
 }
 
+static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
+{
+    socket_zep_t *zepdev = dev->priv;
+    int res = -ENOTSUP;
+    (void) ctx;
+
+    switch (op) {
+    case IEEE802154_HAL_OP_TRANSMIT:
+        res = _request_transmit(dev);
+        break;
+    case IEEE802154_HAL_OP_SET_RX:
+        zepdev->rx = true;
+        res = 0;
+        break;
+    case IEEE802154_HAL_OP_SET_IDLE:
+        zepdev->rx = false;
+        res = 0;
+        break;
+    case IEEE802154_HAL_OP_CCA:
+        res = -ENOTSUP;
+        break;
+    }
+
+    return res;
+}
+
+
+static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
+{
+    int res = -EAGAIN;
+    switch (op) {
+    case IEEE802154_HAL_OP_TRANSMIT:
+        res = _confirm_transmit(dev, ctx);
+        break;
+    case IEEE802154_HAL_OP_SET_RX:
+    case IEEE802154_HAL_OP_SET_IDLE:
+        res = 0;
+        break;
+    case IEEE802154_HAL_OP_CCA:
+        /* This shouldn't happen! */
+        assert(false);
+        break;
+    }
+
+    return res;
+}
+
 static const ieee802154_radio_ops_t socket_zep_rf_ops = {
     .caps = IEEE802154_CAP_24_GHZ
           | IEEE802154_CAP_AUTO_CSMA
           | IEEE802154_CAP_IRQ_TX_DONE
           | IEEE802154_CAP_IRQ_TX_START
-          | IEEE802154_CAP_PHY_OQPSK
-          | IEEE802154_CAP_RX_CONTINUOUS,
+          | IEEE802154_CAP_PHY_OQPSK,
 
     .write = _write,
     .read = _read,
-    .request_transmit = _request_transmit,
-    .confirm_transmit = _confirm_transmit,
+    .request_op = _request_op,
+    .confirm_op = _confirm_op,
     .len = _len,
     .off = _off,
     .request_on = _request_on,
     .confirm_on = _confirm_on,
-    .request_set_trx_state = _request_set_trx_state,
-    .confirm_set_trx_state = _confirm_set_trx_state,
-    .request_cca = _request_cca,
-    .confirm_cca = _confirm_cca,
     .set_cca_threshold = _set_cca_threshold,
     .set_cca_mode = _set_cca_mode,
     .config_phy = _config_phy,
