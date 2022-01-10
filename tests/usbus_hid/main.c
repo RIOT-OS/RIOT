@@ -30,22 +30,22 @@
    (version 20190130) section 8.1.8.2
  */
 static const uint8_t report_desc_ctap[] = {
-    0x06, 0xD0, 0xF1,   /* HID_UsagePage ( FIDO_USAGE_PAGE ) */
-    0x09, 0x01,         /* HID_Usage ( FIDO_USAGE_CTAPHID ) */
-    0xA1, 0x01,         /* HID_Collection ( HID_Application ) */
-    0x09, 0x20,         /* HID_Usage ( FIDO_USAGE_DATA_IN ) */
-    0x15, 0x00,         /* HID_LogicalMin ( 0 ) */
-    0x26, 0xFF, 0x00,   /* HID_LogicalMaxS ( 0xff ) */
-    0x75, 0x08,         /* HID_ReportSize ( 8 ) */
-    0x95, 0x40,         /* HID_ReportCount ( HID_INPUT_REPORT_BYTES ) */
-    0x81, 0x02,         /* HID_Input ( HID_Data | HID_Absolute | HID_Variable ) */
-    0x09, 0x21,         /* HID_Usage ( FIDO_USAGE_DATA_OUT ) */
-    0x15, 0x00,         /* HID_LogicalMin ( 0 ) */
-    0x26, 0xFF, 0x00,   /* HID_LogicalMaxS ( 0xff ) */
-    0x75, 0x08,         /* HID_ReportSize ( 8 ) */
-    0x95, 0x40,         /* HID_ReportCount ( HID_OUTPUT_REPORT_BYTES ) */
-    0x91, 0x02,         /* HID_Output ( HID_Data | HID_Absolute | HID_Variable ) */
-    0xC0,               /* HID_EndCollection */
+    USB_HID_USAGE_PAGE16(USB_HID_USAGE_FIDO),
+    USB_HID_USAGE(USB_HID_USAGE_FIDO_U2F_AUTHENTICATOR_DEVICE),
+    USB_HID_COLLECTION(USB_HID_COLLECTION_APPLICATION),
+        USB_HID_USAGE(USB_HID_USAGE_FIDO_INPUT_REPORT_DATA),
+        USB_HID_LOGICAL_MIN8(0),
+        USB_HID_LOGICAL_MAX16(255),
+        USB_HID_REPORT_SIZE(8),
+        USB_HID_REPORT_COUNT(CONFIG_USBUS_HID_INTERRUPT_EP_SIZE),
+        USB_HID_INPUT(0x02),
+        USB_HID_USAGE(USB_HID_USAGE_FIDO_OUTPUT_REPORT_DATA),
+        USB_HID_LOGICAL_MIN8(0),
+        USB_HID_LOGICAL_MAX16(255),
+        USB_HID_REPORT_SIZE(8),
+        USB_HID_REPORT_COUNT(CONFIG_USBUS_HID_INTERRUPT_EP_SIZE),
+        USB_HID_OUTPUT(0x02),
+    USB_HID_END_COLLECTION,
 };
 
 static usbus_t usbus;
