@@ -372,7 +372,7 @@ static int _atwinc15x0_get(netdev_t *netdev, netopt_t opt, void *val,
             return sizeof(uint16_t);
 
         case NETOPT_RSSI:
-            assert(max_len == sizeof(int8_t));
+            assert(max_len == sizeof(int16_t));
             _rssi_info_ready = false;
             /* trigger the request current RSSI (asynchronous function) */
             if (m2m_wifi_req_curr_rssi() != M2M_SUCCESS) {
@@ -384,8 +384,8 @@ static int _atwinc15x0_get(netdev_t *netdev, netopt_t opt, void *val,
                 ztimer_sleep(ZTIMER_MSEC, ATWINC15X0_WAIT_TIME_MS);
             }
             /* return the RSSI */
-            *((int8_t *)val) = dev->rssi;
-            return sizeof(int8_t);
+            *((int16_t *)val) = dev->rssi;
+            return sizeof(int16_t);
 
         default:
             return netdev_eth_get(netdev, opt, val, max_len);
