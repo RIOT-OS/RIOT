@@ -665,6 +665,11 @@ static_tests() {
 
 build_filter_status() {
     echo "--- can_fast_ci_run:"
+    if [ $FULL_BUILD -eq 1 ]; then
+        echo "--- doing full build."
+        return
+    fi
+
     dist/tools/ci/can_fast_ci_run.py ${CFCR_ARGS} --explain --json --changed-boards --changed-apps
     if [ -n "$MURDOCK_TEST_CHANGE_FILTER" ]; then
         echo MURDOCK_TEST_CHANGE_FILTER=$MURDOCK_TEST_CHANGE_FILTER
