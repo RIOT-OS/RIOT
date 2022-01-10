@@ -640,13 +640,7 @@ ssize_t lwip_sock_sendv(struct netconn *conn, const sock_tx_snip_t *snips,
     }
 #if LWIP_TCP
     else if (tmp->type & NETCONN_TCP) {
-        while (snips) {
-            err = netconn_write_partly(tmp, snips->data, snips->len, 0, (size_t *)(&res));
-            if (err != ERR_OK) {
-                break;
-            }
-            snips = snips->next;
-        }
+        err = netconn_write_partly(tmp, buf->p->payload, buf->p->len, 0, (size_t *)(&res));
     }
 #endif /* LWIP_TCP */
     else {
