@@ -216,7 +216,7 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
 }
 
 ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
-                           sock_tx_snip_t *snips,
+                           const sock_tx_snip_t *snips,
                            const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux)
 {
     (void)aux;
