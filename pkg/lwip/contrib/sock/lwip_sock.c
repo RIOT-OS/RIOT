@@ -598,20 +598,18 @@ ssize_t lwip_sock_sendv(struct netconn *conn, const sock_tx_snip_t *snips,
         }
     }
 
+    buf = netbuf_new();
+    if (netbuf_alloc(buf, sock_tx_snip_len(snips)) == NULL) {
+        netbuf_delete(buf);
+        return -ENOMEM;
+    }
+
     for (const sock_tx_snip_t *snip = snips; snip != NULL; snip = snip->next) {
-        struct netbuf *tail = netbuf_new();
-        if ((tail == NULL) || (netbuf_alloc(tail, snip->len) == NULL) ||
-            (netbuf_take(tail, snip->data, snip->len) != ERR_OK)) {
-            netbuf_delete(tail);
+        if (pbuf_take_at(buf->p, snip->data, snip->len, payload_len) != ERR_OK) {
             netbuf_delete(buf);
             return -ENOMEM;
         }
         payload_len += snip->len;
-        if (buf) {
-            netbuf_chain(buf, tail);
-        } else {
-            buf = tail;
-        }
     }
 
     if ((conn == NULL) && (remote != NULL)) {
