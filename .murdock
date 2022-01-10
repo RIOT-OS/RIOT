@@ -117,9 +117,6 @@ esp8266-olimex-mod
 
 msbiot
 pyboard
-
-lora-e5-dev
-nucleo-wl55jc
 "}
 
 # This list will force all boards that are not in the TEST_KCONFIG_BOARD_BLOCKLIST
