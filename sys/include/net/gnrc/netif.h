@@ -194,21 +194,27 @@ typedef struct {
  */
 struct gnrc_netif_ops {
     /**
-     * @brief   Initializes network interface beyond the default settings
+     * @brief   Initializes and registers network interface.
      *
      * @pre `netif != NULL`
      *
      * @param[in] netif The network interface.
      *
-     * This is called after the network device's initial configuration, right
-     * before the interface's thread starts receiving messages. It is not
-     * necessary to lock the interface's mutex gnrc_netif_t::mutex, since it is
-     * already locked. Set to @ref gnrc_netif_default_init() if you do not need
-     * any special initialization. If you do need special initialization, it is
-     * recommended to call @ref gnrc_netif_default_init() at the start of the
-     * custom initialization function set here.
+     * This function should init the device driver or MAC underlying MAC layer.
+     * This is called right before the interface's thread starts receiving
+     * messages. It is not necessary to lock the interface's mutex
+     * gnrc_netif_t::mutex, since it is already locked. Set to @ref
+     * gnrc_netif_default_init() if you do not need any special initialization.
+     * If you do need special initialization, it is recommended to call @ref
+     * gnrc_netif_default_init() at the start of the custom initialization
+     * function set here. This function MUST call @ref netif_register if the
+     * initialization is successful.
+     *
+     * @return 0 if the initialization of the device or MAC layer was
+     * successful
+     * @return negative errno on error.
      */
-    void (*init)(gnrc_netif_t *netif);
+    int (*init)(gnrc_netif_t *netif);
 
     /**
      * @brief   Send a @ref net_gnrc_pkt "packet" over the network interface
@@ -533,11 +539,12 @@ static inline int gnrc_netif_ipv6_group_leave(const gnrc_netif_t *netif,
 /**
  * @brief   Default operation for gnrc_netif_ops_t::init()
  *
- * @note    Can also be used to be called *before* a custom operation.
+ * @note    Can also be used to be called *before* a custom operation. This
+ *          function calls @ref netif_register internally.
  *
  * @param[in] netif     The network interface.
  */
-void gnrc_netif_default_init(gnrc_netif_t *netif);
+int gnrc_netif_default_init(gnrc_netif_t *netif);
 
 /**
  * @brief   Default operation for gnrc_netif_ops_t::get()

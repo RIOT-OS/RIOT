@@ -1577,8 +1577,18 @@ static void _test_options(gnrc_netif_t *netif)
 }
 #endif /* DEVELHELP */
 
-void gnrc_netif_default_init(gnrc_netif_t *netif)
+int gnrc_netif_default_init(gnrc_netif_t *netif)
 {
+    netdev_t *dev = netif->dev;
+    /* register the event callback with the device driver */
+    dev->event_callback = _event_cb;
+    dev->context = netif;
+    int res = dev->driver->init(dev);
+    if (res < 0) {
+        return res;
+    }
+    netif_register(&netif->netif);
+    _check_netdev_capabilities(dev);
     _init_from_device(netif);
 #ifdef DEVELHELP
     _test_options(netif);
@@ -1590,6 +1600,7 @@ void gnrc_netif_default_init(gnrc_netif_t *netif)
 #ifdef MODULE_GNRC_IPV6_NIB
     gnrc_ipv6_nib_init_iface(netif);
 #endif
+    return 0;
 }
 
 static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back);
@@ -1828,7 +1839,6 @@ static void *_gnrc_netif_thread(void *args)
     DEBUG("gnrc_netif: starting thread %i\n", thread_getpid());
     netif = ctx->netif;
     gnrc_netif_acquire(netif);
-    dev = netif->dev;
     netif->pid = thread_getpid();
 
 #if IS_USED(MODULE_GNRC_NETIF_EVENTS)
@@ -1839,20 +1849,15 @@ static void *_gnrc_netif_thread(void *args)
 
     /* setup the link-layer's message queue */
     msg_init_queue(msg_queue, GNRC_NETIF_MSG_QUEUE_SIZE);
-    /* register the event callback with the device driver */
-    dev->event_callback = _event_cb;
-    dev->context = netif;
     /* initialize low-level driver */
-    ctx->result = dev->driver->init(dev);
+    ctx->result = netif->ops->init(netif);
     /* signal that driver init is done */
     mutex_unlock(&ctx->init_done);
     if (ctx->result < 0) {
-        LOG_ERROR("gnrc_netif: netdev init failed: %d\n", ctx->result);
+        LOG_ERROR("gnrc_netif: init failed: %d\n", ctx->result);
         return NULL;
     }
-    netif_register(&netif->netif);
-    _check_netdev_capabilities(dev);
-    netif->ops->init(netif);
+    dev = netif->dev;
 #if DEVELHELP
     assert(options_tested);
 #endif
