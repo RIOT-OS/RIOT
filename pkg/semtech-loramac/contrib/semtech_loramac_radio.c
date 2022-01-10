@@ -205,8 +205,8 @@ void SX127XStartCad(void)
 int16_t SX127XRssi(RadioModems_t modem)
 {
     (void)modem;
-    int8_t rssi;
-    loramac_netdev_ptr->driver->get(loramac_netdev_ptr, NETOPT_RSSI, &rssi, sizeof(int8_t));
+    int16_t rssi;
+    loramac_netdev_ptr->driver->get(loramac_netdev_ptr, NETOPT_RSSI, &rssi, sizeof(int16_t));
     return rssi;
 }
 
