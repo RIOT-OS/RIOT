@@ -25,6 +25,10 @@ config BOARD_LORA_E5_DEV
     # Put other features for this board (in alphabetical order)
     select HAS_RIOTBOOT
 
+    # Clock configuration
+    select BOARD_HAS_HSE
+    select BOARD_HAS_LSE
+
     select HAVE_SAUL_GPIO
     select HAVE_LM75A
 
@@ -35,3 +39,5 @@ config LORA_E5_DEV_ENABLE_3P3V
 config LORA_E5_DEV_ENABLE_5V
     bool "LoRa-E5 Development Kit - Enable 5V output"
     default y
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"
