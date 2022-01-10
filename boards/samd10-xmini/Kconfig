@@ -20,3 +20,9 @@ config BOARD_SAMD10_XMINI
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+    select HAVE_SAUL_GPIO
+
+choice LIBC_IMPLEMENTATION
+    # Use Picolibc to reduce ROM usage
+    default MODULE_PICOLIBC
+endchoice
