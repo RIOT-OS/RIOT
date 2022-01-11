@@ -99,20 +99,6 @@ extern "C" {
 #endif
 
 /**
- * @brief Enable/disable the expected echo after an AT command is sent.
- *
- * @deprecated Use inverse @ref CONFIG_AT_SEND_SKIP_ECHO instead.
- * Will be removed after 2021.01 release.
- */
-#ifndef AT_SEND_ECHO
-#if IS_ACTIVE(CONFIG_AT_SEND_SKIP_ECHO)
-#define AT_SEND_ECHO 0
-#else
-#define AT_SEND_ECHO 1
-#endif
-#endif
-
-/**
  * @brief 1st end of line character received (S3 aka CR character for a modem).
  */
 #ifndef AT_RECV_EOL_1
