@@ -52,13 +52,14 @@ void *sender_thread(void *arg)
     return NULL;
 }
 
+static msg_t _msg_q[1];
+
 int main(void)
 {
     msg_t msg;
     p_recv = thread_getpid();
 
-    msg_t msg_q[1];
-    msg_init_queue(msg_q, 1);
+    msg_init_queue(_msg_q, 1);
 
     p_send = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN - 1,
                        THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,

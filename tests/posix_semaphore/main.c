@@ -129,10 +129,11 @@ static void test1(void)
     puts("first: end");
 }
 
+static msg_t _sema_thread_queue[SEMAPHORE_MSG_QUEUE_SIZE];
+
 static void *priority_sema_thread(void *name)
 {
-    msg_t msg_queue[SEMAPHORE_MSG_QUEUE_SIZE];
-    msg_init_queue(msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
+    msg_init_queue(_sema_thread_queue, SEMAPHORE_MSG_QUEUE_SIZE);
     sem_wait(&s1);
     printf("Thread '%s' woke up.\n", (const char *) name);
     return NULL;
@@ -176,11 +177,12 @@ void test2(void)
     }
 }
 
+static msg_t _one_two_queue[SEMAPHORE_MSG_QUEUE_SIZE];
+
 static void *test3_one_two_thread(void *arg)
 {
-    msg_t msg_queue[SEMAPHORE_MSG_QUEUE_SIZE];
     (void)arg;
-    msg_init_queue(msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
+    msg_init_queue(_one_two_queue, SEMAPHORE_MSG_QUEUE_SIZE);
     sem_wait(&s1);
     puts("Thread 1 woke up after waiting for s1.");
     sem_wait(&s2);
@@ -188,11 +190,12 @@ static void *test3_one_two_thread(void *arg)
     return NULL;
 }
 
+static msg_t _two_one_queue[SEMAPHORE_MSG_QUEUE_SIZE];
+
 static void *test3_two_one_thread(void *arg)
 {
-    msg_t msg_queue[SEMAPHORE_MSG_QUEUE_SIZE];
     (void)arg;
-    msg_init_queue(msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
+    msg_init_queue(_two_one_queue, SEMAPHORE_MSG_QUEUE_SIZE);
     sem_wait(&s2);
     puts("Thread 2 woke up after waiting for s2.");
     sem_wait(&s1);
