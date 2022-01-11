@@ -1,0 +1,182 @@
+From a22d62b524c624ce4ec16f690439d3b737e69bac Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=2E=20David=20Ib=C3=A1=C3=B1ez?= <jdavid.ibp@gmail.com>
+Date: Tue, 11 Jan 2022 13:09:40 +0100
+Subject: [PATCH 3/3] RIOT: Fix for SAMD boards
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Using RIOT's API it works, tested with the feather-m0 board, otherwise
+it hangs.
+
+Signed-off-by: J. David Ibáñez <jdavid.ibp@gmail.com>
+---
+ src/SDI12.cpp        |  4 +--
+ src/SDI12_boards.cpp | 58 --------------------------------------------
+ src/SDI12_boards.h   | 45 ----------------------------------
+ 3 files changed, 1 insertion(+), 106 deletions(-)
+
+diff --git src/SDI12.cpp src/SDI12.cpp
+index 257eb5a..cd8b25c 100644
+--- src/SDI12.cpp
++++ src/SDI12.cpp
+@@ -244,7 +244,6 @@ SDI12::~SDI12() {
+   setState(SDI12_DISABLED);
+   if (isActive()) { _activeObject = NULL; }
+   // Set the timer prescalers back to original values
+-  // NOTE:  This does NOT reset SAMD board pre-scalers!
+   sdi12timer.resetSDI12TimerPrescale();
+ }
+ 
+@@ -266,7 +265,6 @@ void SDI12::end() {
+   setState(SDI12_DISABLED);
+   _activeObject = NULL;
+   // Set the timer prescalers back to original values
+-  // NOTE:  This does NOT reset SAMD board pre-scalers!
+   sdi12timer.resetSDI12TimerPrescale();
+ }
+ 
+@@ -323,7 +321,7 @@ uint8_t SDI12::parity_even_bit(uint8_t v) {
+ 
+ // a helper function to switch pin interrupts on or off
+ void SDI12::setPinInterrupts(bool enable) {
+-#if defined(ARDUINO_ARCH_SAMD) || defined(ESP32) || defined(ESP8266)
++#if defined(ESP32) || defined(ESP8266)
+   // Merely need to attach the interrupt function to the pin
+   if (enable) attachInterrupt(digitalPinToInterrupt(_dataPin), handleInterrupt, CHANGE);
+   // Merely need to detach the interrupt function from the pin
+diff --git src/SDI12_boards.cpp src/SDI12_boards.cpp
+index 2159eee..177da96 100644
+--- src/SDI12_boards.cpp
++++ src/SDI12_boards.cpp
+@@ -204,64 +204,6 @@ void SDI12Timer::resetSDI12TimerPrescale(void) {
+ #endif
+ 
+ 
+-// Arduino Zero other SAMD21 boards
+-//
+-#elif defined(ARDUINO_SAMD_ZERO) || defined(ARDUINO_ARCH_SAMD) || \
+-  defined(__SAMD21G18A__) || defined(__SAMD21J18A__) || defined(__SAMD21E18A__)
+-
+-void SDI12Timer::configSDI12TimerPrescale(void) {
+-  // Select generic clock generator 4 (Arduino core uses 0, 1, and 3.  RTCZero uses 2)
+-  // Many examples use clock generator 4.. consider yourself warned!
+-  // I would use a higher clock number, but some of the cores don't include them for
+-  // some reason
+-  REG_GCLK_GENDIV = GCLK_GENDIV_ID(4) |  // Select Generic Clock Generator 4
+-    GCLK_GENDIV_DIV(3);                  // Divide the clock source by divisor 3
+-  while (GCLK->STATUS.bit.SYNCBUSY) {}   // Wait for synchronization
+-
+-
+-  // Write the generic clock generator 4 configuration
+-  REG_GCLK_GENCTRL = (GCLK_GENCTRL_ID(4) |        // Select GCLK4
+-                      GCLK_GENCTRL_SRC_DFLL48M |  // Select the 48MHz clock source
+-                      GCLK_GENCTRL_IDC |     // Set the duty cycle to 50/50 HIGH/LOW
+-                      GCLK_GENCTRL_GENEN) &  // Enable the generic clock clontrol
+-    ~GCLK_GENCTRL_RUNSTDBY &                 // Do NOT run in stand by
+-    ~GCLK_GENCTRL_DIVSEL;  // Divide clock source by GENDIV.DIV: 48MHz/3=16MHz
+-                           // ^^ & ~ for DIVSEL because not not divided
+-  while (GCLK->STATUS.bit.SYNCBUSY) {}  // Wait for synchronization
+-
+-  // Feed GCLK4 to TC3 (also feeds to TCC2, the two must have the same source)
+-  // TC3 (and TCC2) seem to be free, so I'm using them
+-  // TC4 is used by Tone, TC5 is tied to the same clock as TC4
+-  // TC6 and TC7 are not available on all boards
+-  REG_GCLK_CLKCTRL = GCLK_CLKCTRL_GEN_GCLK4 |  // Select Generic Clock Generator 4
+-    GCLK_CLKCTRL_CLKEN |                       // Enable the generic clock generator
+-    GCLK_CLKCTRL_ID_TCC2_TC3;  // Feed the Generic Clock Generator 4 to TCC2 and TC3
+-  while (GCLK->STATUS.bit.SYNCBUSY) {}  // Wait for synchronization
+-
+-  REG_TC3_CTRLA |=
+-    TC_CTRLA_PRESCALER_DIV1024 |  // Set prescaler to 1024, 16MHz/1024 = 15.625kHz
+-    TC_CTRLA_WAVEGEN_NFRQ |       // Put the timer TC3 into normal frequency (NFRQ) mode
+-    TC_CTRLA_MODE_COUNT8 |        // Put the timer TC3 into 8-bit mode
+-    TC_CTRLA_ENABLE;              // Enable TC3
+-  while (TC3->COUNT16.STATUS.bit.SYNCBUSY) {}  // Wait for synchronization
+-}
+-// NOT resetting the SAMD timer settings
+-void SDI12Timer::resetSDI12TimerPrescale(void) {
+-  // Disable TCx
+-  TC3->COUNT16.CTRLA.reg &= ~TC_CTRLA_ENABLE;
+-  while (TC3->COUNT16.STATUS.bit.SYNCBUSY) {}
+-
+-  // Reset TCx
+-  TC3->COUNT16.CTRLA.reg = TC_CTRLA_SWRST;
+-  while (TC3->COUNT16.STATUS.bit.SYNCBUSY) {}
+-  while (TC3->COUNT16.CTRLA.bit.SWRST) {}
+-
+-  // Disable generic clock generator
+-  REG_GCLK_GENCTRL = GCLK_GENCTRL_ID(4) &  // Select GCLK4
+-    ~GCLK_GENCTRL_GENEN;                   // Disable the generic clock control
+-  while (GCLK->STATUS.bit.SYNCBUSY) {}     // Wait for synchronization
+-}
+-
+ // Espressif ESP32/ESP8266 boards
+ //
+ #elif defined(ESP32) || defined(ESP8266)
+diff --git src/SDI12_boards.h src/SDI12_boards.h
+index ff0e69e..a86bc79 100644
+--- src/SDI12_boards.h
++++ src/SDI12_boards.h
+@@ -50,10 +50,6 @@ class SDI12Timer {
+   /**
+    * @brief Reset the processor timer prescaler to whatever it was prior to being
+    * adjusted for this library.
+-   *
+-   * @note The prescaler is *NOT* set back to initial values for SAMD boards!  On those
+-   * processors, generic clock generator 4 will remain configured for SDI-12 until it is
+-   * reset outside of this library.
+    */
+   void resetSDI12TimerPrescale(void);
+ 
+@@ -303,47 +299,6 @@ class SDI12Timer {
+ #endif
+ 
+ 
+-// Arduino Zero other SAMD21 boards
+-//
+-#elif defined(ARDUINO_SAMD_ZERO) || defined(ARDUINO_ARCH_SAMD) || \
+-  defined(__SAMD21G18A__) || defined(__SAMD21J18A__) || defined(__SAMD21E18A__)
+-
+-/**
+- * @brief A string description of the timer to use
+- */
+-#define TIMER_IN_USE_STR "GCLK4-TC3"
+-/**
+- * @brief The c macro name for the assembly timer to use
+- */
+-#define TCNTX REG_TC3_COUNT8_COUNT  // Using Timer 3 with generic clock 4
+-
+-/**
+- * @brief A string description of the prescaler in use.
+- */
+-#define PRESCALE_IN_USE_STR "3x1024"
+-/**
+- * @brief The number of "ticks" of the timer that occur within the timing of one bit at
+- * the SDI-12 baud rate of 1200 bits/second.
+- *
+- * 48MHz / 3 pre-prescaler = 16MHz
+- * 16MHz / 1024 prescaler = 15624 'ticks'/sec = 64 µs / 'tick'
+- * (1 sec/1200 bits) * (1 tick/64 µs) = 13.0208 ticks/bit
+- */
+-#define TICKS_PER_BIT 13
+-/**
+- * @brief The number of "ticks" of the timer per SDI-12 bit, shifted by 2^10.
+- *
+- * 1/(13.0208 ticks/bit) * 2^10 = 78.6432
+- */
+-#define BITS_PER_TICK_Q10 79
+-/**
+- * @brief A "fudge factor" to get the Rx to work well.   It mostly works to ensure that
+- * uneven tick increments get rounded up.
+- *
+- * @see https://github.com/SlashDevin/NeoSWSerial/pull/13
+- */
+-#define RX_WINDOW_FUDGE 2
+-
+ // Espressif ESP32/ESP8266 boards
+ //
+ #elif defined(ESP32) || defined(ESP8266)
+-- 
+2.34.1
+
