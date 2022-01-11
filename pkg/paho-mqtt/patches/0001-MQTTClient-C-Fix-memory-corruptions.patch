@@ -1,0 +1,45 @@
+From 0148520c6190f09f34a05f48b258e1e897e24efa Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Tue, 11 Jan 2022 11:21:31 +0100
+Subject: [PATCH] MQTTClient-C: Fix memory corruptions
+
+This fixes instances where a pointer to an enum (possibly sized one
+byte) is casted to a pointer to int (which is at least two and in most
+cases four bytes in size). As result, out-of-bounds memory accesses
+are bound to happen.
+
+This was detected by GCC 11.2.0 with -Wstringop-overflow.
+---
+ MQTTClient-C/src/MQTTClient.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/MQTTClient-C/src/MQTTClient.c b/MQTTClient-C/src/MQTTClient.c
+index bd24dff..578a9cc 100755
+--- a/MQTTClient-C/src/MQTTClient.c
++++ b/MQTTClient-C/src/MQTTClient.c
+@@ -532,7 +532,8 @@ int MQTTSubscribeWithResults(MQTTClient* c, const char* topicFilter, enum QoS qo
+     TimerInit(&timer);
+     TimerCountdownMS(&timer, c->command_timeout_ms);
+ 
+-    len = MQTTSerialize_subscribe(c->buf, c->buf_size, 0, getNextPacketId(c), 1, &topic, (int*)&qos);
++    int _qos = qos;
++    len = MQTTSerialize_subscribe(c->buf, c->buf_size, 0, getNextPacketId(c), 1, &topic, &_qos);
+     if (len <= 0)
+         goto exit;
+     if ((rc = sendPacket(c, len, &timer)) != SUCCESS) // send the subscribe packet
+@@ -542,8 +543,11 @@ int MQTTSubscribeWithResults(MQTTClient* c, const char* topicFilter, enum QoS qo
+     {
+         int count = 0;
+         unsigned short mypacketid;
++        int grantedQoS = QOS0;
++        int retval = MQTTDeserialize_suback(&mypacketid, 1, &count, &grantedQoS, c->readbuf, c->readbuf_size);
++        data->grantedQoS = grantedQoS;
+         data->grantedQoS = QOS0;
+-        if (MQTTDeserialize_suback(&mypacketid, 1, &count, (int*)&data->grantedQoS, c->readbuf, c->readbuf_size) == 1)
++        if (retval == 1)
+         {
+             if (data->grantedQoS != 0x80)
+                 rc = MQTTSetMessageHandler(c, topicFilter, messageHandler);
+-- 
+2.34.1
+
