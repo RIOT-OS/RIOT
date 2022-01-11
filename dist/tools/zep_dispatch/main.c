@@ -51,7 +51,7 @@ static void _send_flat(void *ctx, void *buffer, size_t len,
             /* remove client if sending fails */
         }
         else if (sendto(sock, buffer, len, 0, (struct sockaddr *)addr, sizeof(*addr)) < 0) {
-            inet_ntop(AF_INET6, &addr->sin6_addr, addr_str, INET6_ADDRSTRLEN);
+            inet_ntop(src_addr->sin6_family, &addr->sin6_addr, addr_str, INET6_ADDRSTRLEN);
             printf("removing [%s]:%d\n", addr_str, ntohs(addr->sin6_port));
             prev->next = n->next;
             free(n);
@@ -63,7 +63,7 @@ static void _send_flat(void *ctx, void *buffer, size_t len,
 
     /* if the client new, add it to the broadcast list */
     if (!known_node) {
-        inet_ntop(AF_INET6, &src_addr->sin6_addr, addr_str, INET6_ADDRSTRLEN);
+        inet_ntop(src_addr->sin6_family, &src_addr->sin6_addr, addr_str, INET6_ADDRSTRLEN);
         printf("adding [%s]:%d\n", addr_str, ntohs(src_addr->sin6_port));
         zep_client_t *client = malloc(sizeof(zep_client_t));
         memcpy(&client->addr, src_addr, sizeof(*src_addr));
@@ -101,7 +101,7 @@ static void dispatch_loop(int sock, dispatch_cb_t dispatch, void *ctx)
         ssize_t bytes_in = recvfrom(sock, buffer, sizeof(buffer), 0,
                                     (struct sockaddr *)&src_addr, &addr_len);
 
-        if (bytes_in <= 0 || addr_len != sizeof(src_addr)) {
+        if (bytes_in <= 0) {
             continue;
         }
 
@@ -190,7 +190,7 @@ int main(int argc, char **argv)
     }
 
     struct addrinfo hint = {
-        .ai_family   = AF_INET6,
+        .ai_family   = AF_UNSPEC,
         .ai_socktype = SOCK_DGRAM,
         .ai_protocol = IPPROTO_UDP,
         .ai_flags    = AI_NUMERICHOST,
