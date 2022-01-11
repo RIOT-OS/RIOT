@@ -1,7 +1,7 @@
 From e5a4be53f1bdc4a3c435ad7a35f2d6333277837e Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?J=2E=20David=20Ib=C3=A1=C3=B1ez?= <jdavid.ibp@gmail.com>
 Date: Tue, 3 Aug 2021 12:19:19 +0200
-Subject: [PATCH 2/2] Integration with RIOT, to support other boards
+Subject: [PATCH 2/3] Integration with RIOT, to support other boards
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -108,5 +108,5 @@ index a2a533e..ff0e69e 100644
  };
  
 -- 
-2.32.0
+2.34.1
 
