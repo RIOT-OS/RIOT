@@ -79,6 +79,28 @@ The wrappers are [documented together with riot-sys and some of the examples].
 [I2CDevice]: https://rustdoc.etonomy.org/riot_wrappers/i2c/struct.I2CDevice.html
 [corresponding embedded-hal I2C traits]: https://rustdoc.etonomy.org/embedded_hal/blocking/i2c/index.html
 
+Library components in Rust
+--------------------------
+
+It is possible to use Rust in different modules than the application itself.
+
+Such modules are usually pseudomodules (although they may be mixed with C in regular modules as well).
+They always depend on the `rust_riotmodules` module / crate,
+which collects all enabled modules into a single crate by means of optional features.
+
+If the application is not written in Rust,
+that then depends on `rust_riotmodules_standalone`,
+which adds a panic handler and serves as a root crate.
+
+If the application is written in Rust,
+`rust_riotmodules` needs to be added as a dependency of the application.
+(This helps deduplicate between application and library code,
+and also avoids symbol name clashes).
+This is done by adding a dependency on the local `rust_riotmodules` crate (which is a no-op when no such modules are enabled),
+and placing an `extern crate rust_riotmodules;` statement in the code.
+(The latter is needed even after most `extern crate` was abolished in 2018,
+because crates depended on but not used otherwise are usually not linked in).
+
 Toolchain {#toolchain}
 ---------
 
