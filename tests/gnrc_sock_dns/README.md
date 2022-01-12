@@ -2,7 +2,27 @@
 
 This folder contains a test application for RIOT's sock-based DNS client.
 
-# How to test with native
+## Testing via test script
+
+### Requirements
+
+Scapy must be installed on the system to run the python test script.
+
+    $ pip3 install scapy
+
+Setup up a tap interface:
+
+    $ sudo ip tuntap add dev tap0 mode tap user $(id -u -n)
+    $ sudo ip a a 2001:db8::1/64 dev tap0
+    $ sudo ip link set up dev tap0
+
+### Execution
+
+Run the automated test with
+
+    $ make flash test-with-config
+
+## Testing manually with native
 
 Setup up a tap interface:
 
@@ -14,19 +34,30 @@ Start dnsmasq (in another console):
 
     $ sudo dnsmasq -d -2 -z -i tap0 -q --no-resolv \
         --dhcp-range=::1,constructor:tap0,ra-only \
-        --host-record=example.org,10.0.0.1,2001:db8::1
+        --host-record=testdomain.riot,1.2.3.4,1:2:3:4:5:6:7:8
 
-(NetworkManager is known to start an interfering dnsmasq instance. It needs to
-be stopped before this test.)
+If the above command fails with the following message
+
+    dnsmasq: failed to create listening socket for port 53: Address already in use
+
+you can check which program is already running with
+
+    $ sudo ss -lp "sport = :domain"
+
+Probably it will be `systemd-resolved`. You can stop the service with
+
+    $ sudo systemctl stop systemd-resolved
+
+Afterwards you can retry the `dnsmasq` command from above.
 
 Then run the test application
 
-    $ make term
+    $ make flash term
 
-Now use the RIOT shell to configure the DNS server and query `example.org`
+Now use the RIOT shell to configure the DNS server and query `testdomain.riot`
 
     > dns server 2001:db8::1
     > dns server
     DNS server: [2001:db8::1]:53
-    > dns query example.org
-    example.org resolves to 2001:db8::1
+    > dns query testdomain.riot
+    testdomain.riot resolves to 1:2:3:4:5:6:7:8
