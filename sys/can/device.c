@@ -22,6 +22,7 @@
 #include <errno.h>
 
 #include "thread.h"
+#include "ztimer.h"
 #include "can/device.h"
 #include "can/common.h"
 #include "can/pkt.h"
@@ -146,7 +147,7 @@ static int power_down(candev_dev_t *candev_dev)
     }
 
 #ifdef MODULE_CAN_PM
-    xtimer_remove(&candev_dev->pm_timer);
+    ztimer_remove(ZTIMER_USEC, &candev_dev->pm_timer);
     candev_dev->last_pm_update = 0;
 #endif
 
@@ -171,15 +172,15 @@ static void pm_reset(candev_dev_t *candev_dev, uint32_t value)
 
     if (value == 0) {
         candev_dev->last_pm_value = 0;
-        xtimer_remove(&candev_dev->pm_timer);
+        ztimer_remove(ZTIMER_USEC, &candev_dev->pm_timer);
         return;
     }
 
     if (candev_dev->last_pm_update == 0 ||
-            value > (candev_dev->last_pm_value - (xtimer_now_usec() - candev_dev->last_pm_update))) {
+            value > (candev_dev->last_pm_value - (ztimer_now(ZTIMER_USEC) - candev_dev->last_pm_update))) {
         candev_dev->last_pm_value = value;
-        candev_dev->last_pm_update = xtimer_now_usec();
-        xtimer_set(&candev_dev->pm_timer, value);
+        candev_dev->last_pm_update = ztimer_now(ZTIMER_USEC);
+        ztimer_set(ZTIMER_USEC, &candev_dev->pm_timer, value);
     }
 }
 #endif

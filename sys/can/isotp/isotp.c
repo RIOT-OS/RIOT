@@ -29,6 +29,7 @@
 #include "thread.h"
 #include "mutex.h"
 #include "timex.h"
+#include "ztimer.h"
 #include "utlist.h"
 
 #define ENABLE_DEBUG 0
@@ -196,7 +197,7 @@ static int _isotp_rcv_fc(struct isotp *isotp, struct can_frame *frame, int ae)
         return 0;
     }
 
-    xtimer_remove(&isotp->tx_timer);
+    ztimer_remove(ZTIMER_USEC, &isotp->tx_timer);
 
     if (frame->can_dlc < ae + FC_CONTENT_SZ) {
         /* Invalid length */
@@ -230,7 +231,7 @@ static int _isotp_rcv_fc(struct isotp *isotp, struct can_frame *frame, int ae)
         isotp->tx_wft = 0;
         isotp->tx.bs = 0;
         isotp->tx.state = ISOTP_SENDING_NEXT_CF;
-        xtimer_set(&isotp->tx_timer, isotp->tx_gap);
+        ztimer_set(ZTIMER_USEC, &isotp->tx_timer, isotp->tx_gap);
         break;
 
     case ISOTP_FC_WT:
@@ -240,7 +241,7 @@ static int _isotp_rcv_fc(struct isotp *isotp, struct can_frame *frame, int ae)
             return 1;
         }
         /* BS and STmin shall be ignored */
-        xtimer_set(&isotp->tx_timer, CAN_ISOTP_TIMEOUT_N_Bs);
+        ztimer_set(ZTIMER_USEC, &isotp->tx_timer, CAN_ISOTP_TIMEOUT_N_Bs);
         break;
 
     case ISOTP_FC_OVFLW:
@@ -257,7 +258,7 @@ static int _isotp_rcv_fc(struct isotp *isotp, struct can_frame *frame, int ae)
 
 static int _isotp_rcv_sf(struct isotp *isotp, struct can_frame *frame, int ae)
 {
-    xtimer_remove(&isotp->rx_timer);
+    ztimer_remove(ZTIMER_USEC, &isotp->rx_timer);
     isotp->rx.state = ISOTP_IDLE;
 
     int len = (frame->data[ae] & 0x0F);
@@ -341,7 +342,7 @@ static int _isotp_rcv_cf(struct isotp *isotp, struct can_frame *frame, int ae)
         return 1;
     }
 
-    xtimer_remove(&isotp->rx_timer);
+    ztimer_remove(ZTIMER_USEC, &isotp->rx_timer);
 
     if ((frame->data[ae] & 0x0F) != isotp->rx.sn) {
         DEBUG("_isotp_rcv_cf: wrong seq number %d, expected %d\n", frame->data[ae] & 0x0F, isotp->rx.sn);
@@ -380,7 +381,7 @@ static int _isotp_rcv_cf(struct isotp *isotp, struct can_frame *frame, int ae)
     DEBUG("_isotp_rcv_cf: rxfc.bs=%" PRIx8 " rx.bs=%" PRIx8 "\n", isotp->rxfc.bs, isotp->rx.bs);
 
     if (!isotp->rxfc.bs || (++isotp->rx.bs < isotp->rxfc.bs)) {
-        xtimer_set(&isotp->rx_timer, CAN_ISOTP_TIMEOUT_N_Cr);
+        ztimer_set(ZTIMER_USEC, &isotp->rx_timer, CAN_ISOTP_TIMEOUT_N_Cr);
         return 0;
     }
 
@@ -456,7 +457,7 @@ static int _isotp_send_fc(struct isotp *isotp, int ae, uint8_t status)
         DEBUG("\n");
     }
 
-    xtimer_set(&isotp->rx_timer, CAN_ISOTP_TIMEOUT_N_Ar);
+    ztimer_set(ZTIMER_USEC, &isotp->rx_timer, CAN_ISOTP_TIMEOUT_N_Ar);
     isotp->rx.tx_handle = raw_can_send(isotp->entry.ifnum, &fc, isotp_pid);
 
     if (isotp->rx.tx_handle >= 0) {
@@ -464,7 +465,7 @@ static int _isotp_send_fc(struct isotp *isotp, int ae, uint8_t status)
     }
     else {
         isotp->rx.state = ISOTP_IDLE;
-        xtimer_remove(&isotp->rx_timer);
+        ztimer_remove(ZTIMER_USEC, &isotp->rx_timer);
         return isotp->rx.tx_handle;
     }
 }
@@ -555,7 +556,7 @@ static void _isotp_tx_timeout_task(struct isotp *isotp)
 
 static void _isotp_tx_tx_conf(struct isotp *isotp)
 {
-    xtimer_remove(&isotp->tx_timer);
+    ztimer_remove(ZTIMER_USEC, &isotp->tx_timer);
     isotp->tx.tx_handle = 0;
 
     DEBUG("_isotp_tx_tx_conf: state=%d\n", isotp->tx.state);
@@ -568,7 +569,7 @@ static void _isotp_tx_tx_conf(struct isotp *isotp)
 
     case ISOTP_SENDING_FF:
         isotp->tx.state = ISOTP_WAIT_FC;
-        xtimer_set(&isotp->tx_timer, CAN_ISOTP_TIMEOUT_N_Bs);
+        ztimer_set(ZTIMER_USEC, &isotp->tx_timer, CAN_ISOTP_TIMEOUT_N_Bs);
         break;
 
     case ISOTP_SENDING_CF:
@@ -582,12 +583,12 @@ static void _isotp_tx_tx_conf(struct isotp *isotp)
         if (isotp->txfc.bs && (isotp->tx.bs >= isotp->txfc.bs)) {
             /* wait for FC */
             isotp->tx.state = ISOTP_WAIT_FC;
-            xtimer_set(&isotp->tx_timer, CAN_ISOTP_TIMEOUT_N_Bs);
+            ztimer_set(ZTIMER_USEC, &isotp->tx_timer, CAN_ISOTP_TIMEOUT_N_Bs);
             break;
         }
 
         isotp->tx.state = ISOTP_SENDING_NEXT_CF;
-        xtimer_set(&isotp->tx_timer, isotp->tx_gap);
+        ztimer_set(ZTIMER_USEC, &isotp->tx_timer, isotp->tx_gap);
         break;
     }
 }
@@ -611,7 +612,7 @@ static void _isotp_rx_timeout_task(struct isotp *isotp)
 
 static void _isotp_rx_tx_conf(struct isotp *isotp)
 {
-    xtimer_remove(&isotp->rx_timer);
+    ztimer_remove(ZTIMER_USEC, &isotp->rx_timer);
     isotp->rx.tx_handle = 0;
 
     DEBUG("_isotp_rx_tx_conf: state=%d\n", isotp->rx.state);
@@ -619,18 +620,18 @@ static void _isotp_rx_tx_conf(struct isotp *isotp)
     switch (isotp->rx.state) {
     case ISOTP_SENDING_FC:
         isotp->rx.state = ISOTP_WAIT_CF;
-        xtimer_set(&isotp->rx_timer, CAN_ISOTP_TIMEOUT_N_Cr);
+        ztimer_set(ZTIMER_USEC, &isotp->rx_timer, CAN_ISOTP_TIMEOUT_N_Cr);
         break;
     }
 }
 
 static int _isotp_tx_send(struct isotp *isotp, struct can_frame *frame)
 {
-    xtimer_set(&isotp->tx_timer, CAN_ISOTP_TIMEOUT_N_As);
+    ztimer_set(ZTIMER_USEC, &isotp->tx_timer, CAN_ISOTP_TIMEOUT_N_As);
     isotp->tx.tx_handle = raw_can_send(isotp->entry.ifnum, frame, isotp_pid);
     DEBUG("isotp_send: FF/SF/CF sent handle=%d\n", isotp->tx.tx_handle);
     if (isotp->tx.tx_handle < 0) {
-        xtimer_remove(&isotp->tx_timer);
+        ztimer_remove(ZTIMER_USEC, &isotp->tx_timer);
         isotp->tx.state = ISOTP_IDLE;
         return _isotp_dispatch_tx(isotp, isotp->tx.tx_handle);
     }
@@ -868,7 +869,7 @@ int isotp_release(struct isotp *isotp)
         .can_mask = 0xFFFFFFFF,
     };
     raw_can_unsubscribe_rx(isotp->entry.ifnum, &filter, isotp_pid, isotp);
-    xtimer_remove(&isotp->rx_timer);
+    ztimer_remove(ZTIMER_USEC, &isotp->rx_timer);
 
     if (isotp->rx.snip) {
         DEBUG("isotp_release: freeing rx buf\n");
@@ -878,7 +879,7 @@ int isotp_release(struct isotp *isotp)
     isotp->rx.state = ISOTP_IDLE;
     isotp->entry.target.pid = KERNEL_PID_UNDEF;
 
-    xtimer_remove(&isotp->tx_timer);
+    ztimer_remove(ZTIMER_USEC, &isotp->tx_timer);
 
     mutex_lock(&lock);
     LL_DELETE(isotp_list, isotp);

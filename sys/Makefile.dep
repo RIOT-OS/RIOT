@@ -408,14 +408,16 @@ ifneq (,$(filter can,$(USEMODULE)))
 endif
 
 ifneq (,$(filter can_isotp,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer
+  USEMODULE += ztimer_usec
   USEMODULE += gnrc_pktbuf
 endif
 
 ifneq (,$(filter conn_can,$(USEMODULE)))
   USEMODULE += can
   USEMODULE += can_mbox
-  USEMODULE += xtimer
+  USEMODULE += ztimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter entropy_source_%,$(USEMODULE)))
