@@ -65,8 +65,10 @@ and a full release of the crate is done after the changing PR is merged.
 
 * Functions are moved between static inline and linked.
 
-  For the functions themselves, this is caught automatically because `riot-sys`
-  presents a unified view on symbols produced from linked and static functions.
+  For the functions themselves,
+  they should be added to `riot-sys`'s list of `toplevel_from_inline` functions.
+  That list ensures that both inline and non-inline versions of the functions are presented as toplevel items --
+  typically because they're inline in some platforms or versions, and not others.
   If any such function takes a struct (even through a pointer), that struct's type changes.
   The `inline_cast` function can be used to transmute the pointers with some safety checks.
 
