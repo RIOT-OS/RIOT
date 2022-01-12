@@ -19,12 +19,15 @@ else
   TERMPROG ?= sudo $(RIOTTOOLS)/ethos/ethos
   TERMFLAGS ?= $(TAP) $(PORT) $(ETHOS_BAUDRATE)
 endif
+
 USEMODULE += auto_init_gnrc_netif
 
 USEMODULE += shell
 USEMODULE += shell_commands
 
 USEMODULE += posix_inet
+USEMODULE += ipv4_addr
+USEMODULE += ipv6_addr
 
 LOW_MEMORY_BOARDS := nucleo-f334r8 msb-430 msb-430h
 

@@ -54,10 +54,20 @@ Then run the test application
 
     $ make flash term
 
-Now use the RIOT shell to configure the DNS server and query `testdomain.riot`
+## Shell commands
 
-    > dns server 2001:db8::1
+Set up a DNS server:
+
+    > dns server <4 or 6 (IPv4/IPv6)> <DNS server addr> [DNS server port]
+
+Query an IP for a domain name:
+
+    > dns request <0, 4 or 6 (Unspecified/IPv4/IPv6)> <name>
+
+Examples:
+
+    > dns server 6 2001:db8::1
     > dns server
     DNS server: [2001:db8::1]:53
-    > dns query testdomain.riot
+    > dns query 6 testdomain.riot
     testdomain.riot resolves to 1:2:3:4:5:6:7:8

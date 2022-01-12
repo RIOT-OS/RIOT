@@ -125,13 +125,13 @@ def get_host_lladdr(tap):
 
 
 def dns_server(child, server, port=53):
-    child.sendline("dns server {} {:d}".format(server, port))
+    child.sendline("dns server 6 {} {:d}".format(server, port))
     child.sendline("dns server")
     child.expect(r"DNS server: \[{}\]:{:d}".format(server, port))
 
 
 def successful_dns_query(child, name, exp_addr=None):
-    child.sendline("dns query {}".format(name))
+    child.sendline("dns query 0 {}".format(name))
     res = child.expect(["error resolving {}".format(name),
                         "{} resolves to {}".format(name, exp_addr)],
                        timeout=3)
