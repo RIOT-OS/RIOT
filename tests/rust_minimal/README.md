@@ -19,6 +19,10 @@ and then, Rust is sometimes stricter than C when it comes to APIs
 
 The general strategy for addressing build failures resulting from this is:
 
+<!-- The alternative strategy, of course,
+is to @-mention known Rust users in the issue
+and ask them to update the Rust side... -->
+
 * Identify what breaks.
 
 * Update the `riot-sys` and `riot-wrappers` crates as necessary
@@ -30,6 +34,8 @@ The general strategy for addressing build failures resulting from this is:
 
 * Update the examples to use the new versions in a separate PR that just does
   `cargo update` in the examples, and consequentally contains only Cargo.lock changes.
+
+  These updates can be full releases or merely git updates (see below).
 
   Such a PR should be easy to get ACKed, as "CI says GO" is usually suffient for them.
 
@@ -46,7 +52,7 @@ a major release of creates is done,
 their new versions should have a `.0-alpha.0`  or similar release.
 and a full release of the crate is done after the changing PR is merged.
 
-Common failure modes are:
+## Common failure modes
 
 * Primitive types changed.
 
@@ -77,6 +83,79 @@ Common failure modes are:
   That file needs to be vetted for visible use of atomics,
   and added to that list.
 
-<!-- The alternative strategy, of course,
-is to @-mention known Rust users in the issue
-and ask them to update the Rust side... -->
+## Updating strategy
+
+Depending on the time frames and people involved,
+adjustments to `riot-sys` or `-wrappers` can happen in either of two forms:
+
+* Cargo releases.
+
+  This is the preferred update path:
+  The change is made and tested locally,
+  PR'd to the upstream [riot-sys] or [riot-wrappers] repository.
+
+  After a release to crates.io has been made with these changes
+  (which can often happen right after merging if explicitly requested in the PR),
+  the change to RIOT that does the `cargo update` on all the tracked `Cargo.lock` files can happen.
+  When that is merged, the breaking PR can rebase onto that and pass CI.
+
+* Switching to the local forks.
+
+  When in a hurry,
+  especially when a breaking change has slipped the CI's attention,
+  it can be preferable not to go through the full release dance,
+  but go for a hot fix.
+
+  Follow this procedure:
+
+  * At the pkgmirror fork of the crate that needs changing
+    (<https://github.com/RIOT-OS-pkgmirror/riot-sys> or <https://github.com/RIOT-OS-pkgmirror/riot-wrappers>),
+    start from the point currently indicated by the Cargo.lock files.
+    This is typically a tag matching the released version.
+    It may be necessary to pull updates into the mirror from upstream.
+
+  * Make the necessary adjustments in a branch on that repository.
+
+  * Add lines like these to the Rust examples and tests:
+
+    ```
+    [patch.crates-io]
+    riot-wrappers = { git = "https://github.com/RIOT-OS-pkgmirror/riot-wrappers", branch = "my-branch-name" }
+    ```
+
+  * Run `cargo update`, and commit the change Cargo.lock and Cargo.toml files.
+
+    This commit should still preferably be in a **separate RIOT PR**
+    and not bundled up with the main PR.
+    This ensures that the change on the Rust side works both before and after the change on the C side.
+
+  * Rebase the breaking PR onto the PR updating the Cargo files
+    (unless this is a situation recovering from breakage on the master branch,
+    merging the Cargo PR already fixes everything).
+
+  * To enable switching back to released versions,
+    file a PR with the changes upstream.
+
+    Once a release has been made that includes the changes,
+    the crates.io patch can be removed in a new change that increments the crate version dependency.
+
+## When things work locally but not on CI / Docker
+
+Occasionally,
+it might happen that after a `cargo update`,
+docker builds (including those in CI) fail.
+
+This can be due to a dependency with nightly features requiring a newer nightly version than riotdocker ships.
+
+In that case, suitable steps are:
+
+* On the short term, keep the offending crate at a known-good version, for example like:
+
+  `cargo update --precise 0.2.4 -p cstr_core`
+
+* For the long term fix, change the pinned Rust nightly version
+  in the `--default-toolchain` line of [riotbuild's Dockerfile].
+
+[riot-sys]: https://gitlab.com/etonomy/riot-sys/
+[riot-wrappers]: https://gitlab.com/etonomy/riot-wrappers/
+[riotbuild's Dockerfile]: https://github.com/RIOT-OS/riotdocker/blob/master/riotbuild/Dockerfile
