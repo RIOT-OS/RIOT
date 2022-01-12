@@ -23,11 +23,10 @@ Then run the test application
 
     $ make term
 
-Now use the RIOT shell to configure the DNS server and request `example.org`
-from it
+Now use the RIOT shell to configure the DNS server and query `example.org`
 
     > dns server 2001:db8::1
     > dns server
     DNS server: [2001:db8::1]:53
-    > dns request example.org
+    > dns query example.org
     example.org resolves to 2001:db8::1

@@ -32,7 +32,7 @@ static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 static int _dns(int argc, char **argv);
 
 static const shell_command_t _shell_commands[] = {
-    { "dns", "configures and requests a DNS server", _dns },
+    { "dns", "configures and queries a DNS server", _dns },
     { NULL, NULL, NULL },
 };
 static char _shell_buffer[SHELL_DEFAULT_BUFSIZE];
@@ -40,7 +40,7 @@ static char _shell_buffer[SHELL_DEFAULT_BUFSIZE];
 static void _usage(char *cmd)
 {
     printf("usage: %s server <DNS server addr> <DNS server port>\n", cmd);
-    printf("       %s request <name>\n", cmd);
+    printf("       %s query <name>\n", cmd);
 }
 
 static int _dns_server(int argc, char **argv)
@@ -70,7 +70,7 @@ static int _dns_server(int argc, char **argv)
     return 0;
 }
 
-static int _dns_request(char **argv)
+static int _dns_query(char **argv)
 {
     uint8_t addr[16] = {0};
     int res = sock_dns_query(argv[2], addr, AF_UNSPEC);
@@ -94,8 +94,8 @@ static int _dns(int argc, char **argv)
     if ((argc > 1) && (strcmp(argv[1], "server") == 0)) {
         return _dns_server(argc, argv);
     }
-    else if ((argc > 2) && (strcmp(argv[1], "request") == 0)) {
-        return _dns_request(argv);
+    else if ((argc > 2) && (strcmp(argv[1], "query") == 0)) {
+        return _dns_query(argv);
     }
     else {
         _usage(argv[0]);
