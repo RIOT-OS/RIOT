@@ -34,10 +34,6 @@
 #include "net/eui_provider.h"
 #include "net/ethernet.h"
 
-#ifdef USE_ETHOS_FOR_STDIO
-#error USE_ETHOS_FOR_STDIO is deprecated, use USEMODULE+=stdio_ethos instead
-#endif
-
 #ifdef MODULE_ETHOS_STDIO
 #include "stdio_uart.h"
 #include "isrpipe.h"
