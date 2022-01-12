@@ -19,19 +19,16 @@
  * @}
  */
 
-#include <stdint.h>
-#include <stdbool.h>
 #include <errno.h>
-#include "kernel_init.h"
-#include "thread.h"
+#include <stdbool.h>
+#include <stdint.h>
+
+#include "auto_init.h"
 #include "irq.h"
+#include "kernel_init.h"
 #include "log.h"
-
 #include "periph/pm.h"
-
-#ifdef MODULE_AUTO_INIT
-#include <auto_init.h>
-#endif
+#include "thread.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -47,9 +44,9 @@ static void *main_trampoline(void *arg)
 {
     (void)arg;
 
-#ifdef MODULE_AUTO_INIT
-    auto_init();
-#endif
+    if (IS_USED(MODULE_AUTO_INIT)) {
+        auto_init();
+    }
 
     if (!IS_ACTIVE(CONFIG_SKIP_BOOT_MSG)) {
         LOG_INFO(CONFIG_BOOT_MSG_STRING "\n");
