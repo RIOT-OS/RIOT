@@ -283,13 +283,13 @@ def testfunc(child):
         dns_server(child, lladdr, SERVER_PORT)
 
         def run(func):
+            print(func.__name__)
+
             if child.logfile == sys.stdout:
-                print(func.__name__)
                 func(child)
             else:
                 try:
                     func(child)
-                    print(".", end="", flush=True)
                 except Exception as e:
                     print("FAILED")
                     raise e
