@@ -354,6 +354,7 @@ checksum = "7e476c64197665c3725621f0ac3f9e5209aa5e889e02a08b1daf5f16dc5fd952"
 dependencies = [
  "atomic-polyfill",
  "hash32",
+ "serde",
  "spin",
  "stable_deref_trait",
 ]
@@ -368,10 +369,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "hex-noalloc"
-version = "0.3.2-post1"
+name = "hex"
+version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "58c0cd4ee9378ce1919b8b8da4e80ce6b9205ec21f5a667b61a6dbb867c31d09"
+checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "humantime"
@@ -534,7 +535,7 @@ checksum = "f497285884f3fcff424ffc933e56d7cbca511def0c9831a7f9b5f6153e3cc89b"
 [[package]]
 name = "riot-coap-handler-demos"
 version = "0.1.0"
-source = "git+https://gitlab.com/etonomy/riot-module-examples/#31acf76fb82620f65977887ee49df31f69499691"
+source = "git+https://gitlab.com/etonomy/riot-module-examples/#db25c179dd511ae2556d0ef652432450f9c4283d"
 dependencies = [
  "coap-handler",
  "coap-handler-implementations",
@@ -552,9 +553,9 @@ dependencies = [
 
 [[package]]
 name = "riot-sys"
-version = "0.6.1"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e35c754473e4db3e9007a3bdde8eca06d125b3830cd2daf9f22d74650ae7eef5"
+checksum = "889195e055f656e7b3048617db8813a9caf4df00e23b8c5e8375e785564942fb"
 dependencies = [
  "bindgen",
  "c2rust-asm-casts",
@@ -569,12 +570,11 @@ dependencies = [
 
 [[package]]
 name = "riot-wrappers"
-version = "0.7.12"
+version = "0.7.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7d2a58881cb42bc4dc71d32ddcc748d405fcf75bf1a87dd3c1fde8cd35ca35fe"
+checksum = "ecde0e587e141c251babde59dc484574f49d2562823936c70cc55de0af1ba442"
 dependencies = [
  "bare-metal 1.0.0",
- "byteorder",
  "coap-handler",
  "coap-message",
  "coap-numbers",
@@ -582,7 +582,7 @@ dependencies = [
  "embedded-graphics",
  "embedded-hal",
  "heapless",
- "hex-noalloc",
+ "hex",
  "mutex-trait",
  "nb 0.1.3",
  "num-traits",
