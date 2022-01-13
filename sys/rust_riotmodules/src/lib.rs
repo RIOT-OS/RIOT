@@ -5,3 +5,6 @@
 // to be pulled in because they are not used on the laguage level.
 
 // This list should be as auto-generated / -maintained as the one in Cargo.toml
+
+#[cfg(feature = "riot-module-lsm303agr")]
+extern crate riot_module_lsm303agr;

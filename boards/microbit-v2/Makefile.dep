@@ -1,2 +1,6 @@
 include $(RIOTBOARD)/common/microbit/Makefile.dep
 include $(RIOTBOARD)/common/nrf52/Makefile.dep
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += lsm303agr
+endif
