@@ -117,6 +117,22 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath);
 int sock_tl_str2ep(struct _sock_tl_ep *ep_out, const char *str);
 
 /**
+ * @brief   Convert string to common IP-based transport layer endpoint
+ *          If the `sock_dns` module is used, this will do a DNS lookup
+ *          if @p str is not an IP address.
+ *
+ * Takes eg., "riot-os.org:1234" and converts it into the corresponding
+ * endpoint structure.
+ *
+ * @param[out]  ep_out  endpoint structure to fill
+ * @param[in]   str     string to read from
+ *
+ * @returns     0 on success
+ * @returns     <0 otherwise
+ */
+int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str);
+
+/**
  * @brief    Convert string to TCP endpoint
  *
  * Takes eg., "[2001:db8::1]:1234" and converts it into the corresponding UDP

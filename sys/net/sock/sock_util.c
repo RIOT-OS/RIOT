@@ -28,6 +28,9 @@
 
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
+#ifdef MODULE_SOCK_DNS
+#include "net/sock/dns.h"
+#endif
 
 #ifdef MODULE_FMT
 #include "fmt.h"
@@ -252,6 +255,45 @@ int sock_tl_str2ep(struct _sock_tl_ep *ep_out, const char *str)
 #endif
 
     return -EINVAL;
+}
+
+int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str)
+{
+    int res = sock_tl_str2ep(ep_out, str);
+    if (res == 0) {
+        return 0;
+    }
+
+#if defined(MODULE_SOCK_DNS)
+    char hostbuf[CONFIG_SOCK_HOSTPORT_MAXLEN];
+    const char *host;
+    char *hostend = strchr(str, ':');
+    if (hostend == NULL) {
+        host = str;
+        ep_out->port = 0;
+    } else {
+        size_t host_len = hostend - str;
+        if (host_len >= sizeof(hostbuf)) {
+            return -EINVAL;
+        }
+        memcpy(hostbuf, str, host_len);
+        hostbuf[host_len] = 0;
+        host = hostbuf;
+        ep_out->port = atoi(hostend + 1);;
+    }
+
+    switch (sock_dns_query(host, &ep_out->addr, AF_UNSPEC)) {
+    case 4:
+        ep_out->family = AF_INET;
+        return 0;
+    case 16:
+        ep_out->family = AF_INET6;
+        return 0;
+    default:
+        return -EINVAL;
+    }
+#endif
+    return res;
 }
 
 bool sock_tl_ep_equal(const struct _sock_tl_ep *a,
