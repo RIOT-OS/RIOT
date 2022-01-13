@@ -1,34 +1,59 @@
 include ../Makefile.tests_common
 
-WIFI_SSID ?= "WIFI_SSID"
-WIFI_PASS ?= "WIFI_PASS"
+RIOTBASE ?= $(CURDIR)/../..
+
+export TAP ?= tap0
 
 USEMODULE += sock_dns
-
-USEMODULE += shell
-USEMODULE += shell_commands
 
 USEMODULE += lwip
 USEMODULE += lwip_netdev
 
-USEMODULE += ipv4_addr
 USEMODULE += lwip_arp
 USEMODULE += lwip_ipv4
 USEMODULE += lwip_dhcp_auto
 CFLAGS += -DETHARP_SUPPORT_STATIC_ENTRIES=1
 
-USEMODULE += ipv6_addr
 USEMODULE += lwip_ipv6
 USEMODULE += lwip_ipv6_autoconfig
 
-# The test requires some setup (active internet connection) so it cannot
-# currently be run
+# use Ethernet as link-layer protocol
+ifeq (native,$(BOARD))
+  TERMFLAGS ?= $(TAP)
+else
+  ETHOS_BAUDRATE ?= 115200
+  CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE)
+  TERMDEPS += ethos
+  TERMPROG ?= sudo $(RIOTTOOLS)/ethos/ethos
+  TERMFLAGS ?= $(TAP) $(PORT) $(ETHOS_BAUDRATE)
+endif
+
+USEMODULE += shell
+USEMODULE += shell_commands
+
+USEMODULE += posix_inet
+USEMODULE += ipv4_addr
+USEMODULE += ipv6_addr
+
+LOW_MEMORY_BOARDS := nucleo-f334r8 msb-430 msb-430h
+
+# The test requires some setup and to be run as root
+# So it cannot currently be run
 TEST_ON_CI_BLACKLIST += all
+
+.PHONY: ethos
+
+ethos:
+	$(Q)env -u CC -u CFLAGS $(MAKE) -C $(RIOTTOOLS)/ethos
 
 include $(RIOTBASE)/Makefile.include
 
-# needs to be put after "include $(RIOTBASE)/Makefile.include"
-ifneq (,$(filter arch_esp,$(FEATURES_USED)))
-  CFLAGS += -DESP_WIFI_SSID=\"$(WIFI_SSID)\"
-  CFLAGS += -DESP_WIFI_PASS=\"$(WIFI_PASS)\"
+ifeq ($(BOARD),$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
+# Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
+  ifndef CONFIG_GNRC_PKTBUF_SIZE
+    CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=512
+  endif
+    CFLAGS += -DCONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF=2 \
+              -DGNRC_NETIF_IPV6_GROUPS_NUMOF=2 -DCONFIG_GNRC_IPV6_NIB_NUMOF=1 \
+              -DCONFIG_GNRC_IPV6_NIB_OFFL_NUMOF=1
 endif

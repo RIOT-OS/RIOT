@@ -1,9 +1,1 @@
-# Put board specific dependencies here
-
-ifneq (,$(filter arch_esp,$(FEATURES_USED)))
-  USEMODULE += esp_wifi
-endif
-
-ifeq ($(BOARD),native)
-  USEMODULE += netdev_default
-endif
+../gnrc_sock_dns/Makefile.board.dep

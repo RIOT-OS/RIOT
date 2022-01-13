@@ -1,0 +1,1 @@
+../../gnrc_sock_dns/tests-with-config/01-run.py
