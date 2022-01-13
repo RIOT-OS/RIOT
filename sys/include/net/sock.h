@@ -322,7 +322,8 @@ enum {
     /**
      * @brief   Just peek data and keep it for later use
      *
-     * @note    Currently only supported for lwIP!
+     * @note    Select module `sock_aux_peek` and a compatible network stack
+     *          to use this. Currently only supported for lwIP!
      */
     SOCK_AUX_PEEK = (1LU << 4),
 };

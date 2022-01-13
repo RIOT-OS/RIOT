@@ -316,6 +316,7 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += vfs
   USEMODULE += posix_headers
+  USEMODULE += sock_aux_peek
 endif
 
 ifneq (,$(filter md5sum ,$(USEMODULE)))

@@ -305,6 +305,8 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
+#include "kernel_defines.h"
+
 /* net/sock/async/types.h included by net/sock.h needs to re-typedef the
  * `sock_tcp_t` and `sock_tcp_queue_t` to prevent cyclic includes */
 #if defined (__clang__)
@@ -520,7 +522,7 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
 ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
                       uint32_t timeout);
 
-#ifdef MODULE_LWIP
+#if IS_USED(MODULE_SOCK_AUX_PEEK) || defined(DOXYGEN)
 /**
  * @brief   Peeks data from an established TCP stream
  *
@@ -556,7 +558,7 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
  */
 ssize_t sock_tcp_peek(sock_tcp_t *sock, void *data, size_t max_len,
                       uint32_t timeout);
-#endif /* MODULE_LWIP */
+#endif /* IS_USED(MODULE_SOCK_AUX_PEEK) || defined(DOXYGEN) */
 
 /**
  * @brief   Writes data to an established TCP stream

@@ -355,7 +355,8 @@ int listen(int socket, int backlog);
  *                          to by the buffer argument.
  * @param[in] flags         Specifies the type of message reception. Support
  *                          for values other than 0 is not implemented yet, but
- *                          when using lwIP, the MSG_PEEK flag is available.
+ *                          when using `lwIP` and `sock_aux_peek`, the `MSG_PEEK`
+ *                          flag is available.
  * @param[out] address      A null pointer, or points to a sockaddr structure
  *                          in which the sending address is to be stored. The
  *                          length and format of the address depend on the

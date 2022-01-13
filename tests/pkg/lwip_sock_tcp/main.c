@@ -485,6 +485,7 @@ static void test_tcp_read4__success_non_blocking(void)
     expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
 }
 
+#if IS_USED(MODULE_SOCK_AUX_PEEK)
 static void test_tcp_peek4__success(void)
 {
     static const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
@@ -520,6 +521,7 @@ static void test_tcp_peek4__success(void)
 
     expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
 }
+#endif /* IS_USED(MODULE_SOCK_AUX_PEEK) */
 
 /* ENOTCONN not applicable since lwIP always tries to send */
 
@@ -954,6 +956,7 @@ static void test_tcp_read6__success_non_blocking(void)
     expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
 }
 
+#if IS_USED(MODULE_SOCK_AUX_PEEK)
 static void test_tcp_peek6__success(void)
 {
     static const sock_tcp_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR6_REMOTE },
@@ -989,6 +992,7 @@ static void test_tcp_peek6__success(void)
 
     expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
 }
+#endif /* IS_USED(MODULE_SOCK_AUX_PEEK) */
 
 /* ENOTCONN not applicable since lwIP always tries to send */
 
@@ -1086,7 +1090,9 @@ int main(void)
     CALL(test_tcp_read4__success());
     CALL(test_tcp_read4__success_with_timeout());
     CALL(test_tcp_read4__success_non_blocking());
+#if IS_USED(MODULE_SOCK_AUX_PEEK)
     CALL(test_tcp_peek4__success());
+#endif
     /* ECONNABORTED can't be tested in this setup */
     /* ENOTCONN not applicable since lwIP always tries to send */
     CALL(test_tcp_write4__ENOTCONN());
@@ -1130,7 +1136,9 @@ int main(void)
     CALL(test_tcp_read6__success());
     CALL(test_tcp_read6__success_with_timeout());
     CALL(test_tcp_read6__success_non_blocking());
+#if IS_USED(MODULE_SOCK_AUX_PEEK)
     CALL(test_tcp_peek6__success());
+#endif
     /* ECONNABORTED can't be tested in this setup */
     /* ENOTCONN not applicable since lwIP always tries to send */
     CALL(test_tcp_write6__ENOTCONN());

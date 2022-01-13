@@ -298,6 +298,10 @@ static ssize_t _tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
     ssize_t recvd = 0;
     ssize_t res = 0;
 
+    if (!IS_USED(MODULE_SOCK_AUX_PEEK)) {
+        peek = false;
+    }
+
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
 
     ssize_t recv_left = (max_len <= SSIZE_MAX) ? (ssize_t)max_len : SSIZE_MAX;
@@ -417,7 +421,7 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
     return _tcp_read(sock, data, max_len, timeout, false);
 }
 
-#ifdef MODULE_LWIP
+#if IS_USED(MODULE_SOCK_AUX_PEEK)
 ssize_t sock_tcp_peek(sock_tcp_t *sock, void *data, size_t max_len,
                       uint32_t timeout)
 {

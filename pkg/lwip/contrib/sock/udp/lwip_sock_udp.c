@@ -43,8 +43,11 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
         mutex_init(&(sock->mutex));
         mutex_lock(&(sock->mutex));
         sock->base.conn = tmp;
-        sock->last_buf = NULL;
-        sock->peek_buf_avail = false;
+
+        if (IS_USED(MODULE_SOCK_AUX_PEEK)) {
+            sock->last_buf = NULL;
+            sock->peek_buf_avail = false;
+        }
 
 #if IS_ACTIVE(SOCK_HAS_ASYNC)
         sock->base.async_cb.gen = NULL;
@@ -91,7 +94,9 @@ ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
 
     bool peek = false;
     if (aux != NULL) {
-        peek = aux->flags & SOCK_AUX_PEEK;
+        if (IS_USED(MODULE_SOCK_AUX_PEEK)) {
+            peek = aux->flags & SOCK_AUX_PEEK;
+        }
     }
 
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
@@ -126,7 +131,9 @@ ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
     }
 
     if (aux != NULL) {
-        aux->flags &= ~(SOCK_AUX_PEEK);
+        if (IS_USED(MODULE_SOCK_AUX_PEEK)) {
+            aux->flags &= ~(SOCK_AUX_PEEK);
+        }
     }
 
     return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
@@ -143,8 +150,10 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
 
     bool peek = false;
     if (aux != NULL) {
-        peek = aux->flags & SOCK_AUX_PEEK;
-        aux->flags &= ~(SOCK_AUX_PEEK);
+        if (IS_USED(MODULE_SOCK_AUX_PEEK)) {
+            peek = aux->flags & SOCK_AUX_PEEK;
+            aux->flags &= ~(SOCK_AUX_PEEK);
+        }
     }
 
     buf = sock->last_buf;
@@ -162,7 +171,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
         if (netbuf_next(buf) == -1) { /* check for next part in chain */
             /* this is the last part of the chain (and maybe also the first) */
 
-            if (sock->peek_buf_avail) { /* first element in the chain */
+            if (sock->peek_buf_avail && IS_USED(MODULE_SOCK_AUX_PEEK)) { /* first element in the chain */
                 /* return data from buffer fetched from sock */
                 sock->peek_buf_avail = false;
                 *ctx = buf;
