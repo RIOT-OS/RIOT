@@ -43,8 +43,11 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
         mutex_init(&(sock->mutex));
         mutex_lock(&(sock->mutex));
         sock->base.conn = tmp;
-        sock->last_buf = NULL;
-        sock->peek_buf_avail = false;
+
+        if (IS_USED(MODULE_SOCK_PEEK)) {
+            sock->last_buf = NULL;
+            sock->peek_buf_avail = false;
+        }
 
 #if IS_ACTIVE(SOCK_HAS_ASYNC)
         sock->base.async_cb.gen = NULL;
@@ -90,7 +93,7 @@ ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
     bool nobufs = false;
 
     bool peek = false;
-    if (aux != NULL) {
+    if ((aux != NULL) && IS_USED(MODULE_SOCK_PEEK)) {
         peek = aux->flags & SOCK_AUX_PEEK;
     }
 
@@ -104,7 +107,7 @@ ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
             ret = max_len;
             nobufs = true;
 
-            if (peek) {
+            if (peek && IS_USED(MODULE_SOCK_PEEK)) {
                 res = max_len;
                 nobufs = false;
             }
@@ -132,7 +135,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
     assert((sock != NULL) && (data != NULL) && (ctx != NULL));
 
     bool peek = false;
-    if (aux != NULL) {
+    if ((aux != NULL) && IS_USED(MODULE_SOCK_PEEK)) {
         peek = aux->flags & SOCK_AUX_PEEK;
     }
 
@@ -151,7 +154,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
         if (netbuf_next(buf) == -1) { /* check for next part in chain */
             /* this is the last part of the chain (and maybe also the first) */
 
-            if (sock->peek_buf_avail) { /* first element in the chain */
+            if (sock->peek_buf_avail && IS_USED(MODULE_SOCK_PEEK)) { /* first element in the chain */
                 /* return data from buffer fetched from sock */
                 sock->peek_buf_avail = false;
                 *ctx = buf;
@@ -163,7 +166,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
                 return res;
             }
             else {
-                if (peek) {
+                if (peek && IS_USED(MODULE_SOCK_PEEK)) {
                     /* reset to the original starting point for later use and finish */
                     netbuf_first(buf);
                     sock->peek_buf_avail = true;

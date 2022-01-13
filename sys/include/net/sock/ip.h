@@ -274,6 +274,8 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
+#include "kernel_defines.h"
+
 /* net/sock/async/types.h included by net/sock.h needs to re-typedef the
  * `sock_ip_t` to prevent cyclic includes */
 #if defined (__clang__)
@@ -528,7 +530,7 @@ static inline ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
     return sock_ip_recv_aux(sock, data, max_len, timeout, remote, NULL);
 }
 
-#ifdef MODULE_LWIP
+#if IS_USED(MODULE_SOCK_PEEK) || defined(DOXYGEN)
 /**
  * @brief   Peeks bytes from a message over IPv4/IPv6 from remote end point. If
  *          no data is available then an attempt is made to receive new data first.
@@ -569,7 +571,7 @@ static inline ssize_t sock_ip_peek(sock_ip_t *sock, void *data, size_t max_len,
 
     return sock_ip_recv_aux(sock, data, max_len, timeout, remote, &flags);
 }
-#endif /* MODULE_LWIP */
+#endif /* IS_USED(MODULE_SOCK_PEEK) || defined(DOXYGEN) */
 
 /**
  * @brief   Provides stack-internal buffer space containing an IPv4/IPv6
@@ -668,7 +670,7 @@ static inline ssize_t sock_ip_recv_buf(sock_ip_t *sock,
     return sock_ip_recv_buf_aux(sock, data, buf_ctx, timeout, remote, NULL);
 }
 
-#ifdef MODULE_LWIP
+#if IS_USED(MODULE_SOCK_PEEK) || defined(DOXYGEN)
 /**
  * @brief   Provides stack-internal buffer space containing an IPv4/IPv6
  *          message from remote end point
@@ -722,7 +724,7 @@ static inline ssize_t sock_ip_peek_buf(sock_ip_t *sock,
 
     return sock_ip_recv_buf_aux(sock, data, buf_ctx, timeout, remote, &flags);
 }
-#endif /* MODULE_LWIP */
+#endif /* IS_USED(MODULE_SOCK_PEEK) || defined(DOXYGEN) */
 
 /**
  * @brief   Sends a message over IPv4/IPv6 to remote end point

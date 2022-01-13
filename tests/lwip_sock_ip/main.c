@@ -352,6 +352,7 @@ static void test_sock_ip_recv_buf4__success(void)
     expect(_check_net());
 }
 
+#if IS_USED(MODULE_SOCK_PEEK)
 static void test_sock_ip_peek4__success(void)
 {
     static const sock_ip_ep_t local = { .family = AF_INET };
@@ -375,6 +376,7 @@ static void test_sock_ip_peek4__success(void)
 
     expect(_check_net());
 }
+#endif /* IS_USED(MODULE_SOCK_PEEK) */
 
 static void test_sock_ip_send4__EAFNOSUPPORT(void)
 {
@@ -947,6 +949,7 @@ static void test_sock_ip_recv_buf6__success(void)
     expect(_check_net());
 }
 
+#if IS_USED(MODULE_SOCK_PEEK)
 static void test_sock_ip_peek6__success(void)
 {
     static const ipv6_addr_t src_addr = { .u8 = _TEST_ADDR6_REMOTE };
@@ -972,6 +975,7 @@ static void test_sock_ip_peek6__success(void)
 
     expect(_check_net());
 }
+#endif /* IS_USED(MODULE_SOCK_PEEK) */
 
 static void test_sock_ip_send6__EAFNOSUPPORT(void)
 {
@@ -1271,7 +1275,9 @@ int main(void)
     CALL(test_sock_ip_recv4__non_blocking());
     CALL(test_sock_ip_recv4__aux());
     CALL(test_sock_ip_recv_buf4__success());
+#if IS_USED(MODULE_SOCK_PEEK)
     CALL(test_sock_ip_peek4__success());
+#endif
     _prepare_send_checks();
     CALL(test_sock_ip_send4__EAFNOSUPPORT());
     CALL(test_sock_ip_send4__EINVAL_addr());
@@ -1318,7 +1324,9 @@ int main(void)
     CALL(test_sock_ip_recv6__non_blocking());
     CALL(test_sock_ip_recv6__aux());
     CALL(test_sock_ip_recv_buf6__success());
+#if IS_USED(MODULE_SOCK_PEEK)
     CALL(test_sock_ip_peek6__success());
+#endif
     _prepare_send_checks();
     CALL(test_sock_ip_send6__EAFNOSUPPORT());
     CALL(test_sock_ip_send6__EINVAL_addr());

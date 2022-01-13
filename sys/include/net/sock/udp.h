@@ -274,6 +274,8 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
+#include "kernel_defines.h"
+
 /* net/sock/async/types.h included by net/sock.h needs to re-typedef the
  * `sock_ip_t` to prevent cyclic includes */
 #if defined (__clang__)
@@ -523,7 +525,7 @@ static inline ssize_t sock_udp_recv(sock_udp_t *sock,
     return sock_udp_recv_aux(sock, data, max_len, timeout, remote, NULL);
 }
 
-#ifdef MODULE_LWIP
+#if IS_USED(MODULE_SOCK_PEEK) || defined(DOXYGEN)
 /**
  * @brief   Peeks bytes from a UDP message from a remote end point. If no data
  *          is available then an attempt is made to receive new data first.
@@ -565,7 +567,7 @@ static inline ssize_t sock_udp_peek(sock_udp_t *sock,
 
     return sock_udp_recv_aux(sock, data, max_len, timeout, remote, &flags);
 }
-#endif /* MODULE_LWIP */
+#endif /* IS_USED(MODULE_SOCK_PEEK) || defined(DOXYGEN) */
 
 /**
  * @brief   Provides stack-internal buffer space containing a UDP message from
@@ -665,7 +667,7 @@ static inline ssize_t sock_udp_recv_buf(sock_udp_t *sock,
     return sock_udp_recv_buf_aux(sock, data, buf_ctx, timeout, remote, NULL);
 }
 
-#ifdef MODULE_LWIP
+#if IS_USED(MODULE_SOCK_PEEK) || defined(DOXYGEN)
 /**
  * @brief   Provides stack-internal buffer space containing a UDP message from
  *          a remote end point
@@ -720,7 +722,7 @@ static inline ssize_t sock_udp_peek_buf(sock_udp_t *sock,
 
     return sock_udp_recv_buf_aux(sock, data, buf_ctx, timeout, remote, &flags);
 }
-#endif /* MODULE_LWIP */
+#endif /* IS_USED(MODULE_SOCK_PEEK) || defined(DOXYGEN) */
 
 /**
  * @brief   Sends a UDP message to remote end point with non-continous payload
