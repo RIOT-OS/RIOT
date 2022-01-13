@@ -5,28 +5,21 @@ This tests the `sock_ip` port of lwIP. There is no network device needed since
 a [virtual device](http://doc.riot-os.org/group__sys__netdev__test.html) is
 provided at the backend.
 
-These tests test both IPv4 and IPv6 capabilities. They can be activated by
-the `LWIP_IPV4` and `LWIP_IPV6` environment variables to a non-zero value.
-IPv6 is activated by default:
+These tests test both IPv4 and IPv6 capabilities. They can be deactivated
+individually by the `LWIP_IPV4` and `LWIP_IPV6` environment variables by setting
+them to zero.
 
-```sh
-make all test
-# or
-LWIP_IPV6=1 make all test
-```
+By default both IPv4 and IPv6 are tested.
 
-To just test IPv4 set the `LWIP_IPV4` to a non-zero value (IPv6 will be
-deactivated automatically):
+    $ make all test
 
-```sh
-LWIP_IPV4=1 make all test
-```
+To test only IPv4 run:
 
-To test both set the `LWIP_IPV4` and `LWIP_IPV6` to a non-zero value:
+    $ LWIP_IPV6=0 make all test
 
-```sh
-LWIP_IPV4=1 LWIP_IPV6=1 make all test
-```
+To test only IPv6 run:
+
+    $ LWIP_IPV4=0 make all test
 
 Since lwIP uses a lot of macro magic to activate/deactivate these capabilities
 it is advisable to **test all three configurations individually** (just IPv4,

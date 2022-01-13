@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-LWIP_IPV4 ?= 0
+LWIP_IPV4 ?= 1
 LWIP_IPV6 ?= 1
 AUX_LOCAL ?= 1
 
