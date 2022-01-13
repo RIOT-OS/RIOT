@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2018 Freie Universität Berlin
+# Copyright (C) 2022 Freie Universität Berlin
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
@@ -30,11 +30,52 @@ DNS_RR_TYPE_AAAA_DLEN = 16
 DNS_MSG_COMP_MASK = b"\xc0"
 
 
-TEST_NAME = "example.org"
-TEST_A_DATA = "10.0.0.1"
-TEST_AAAA_DATA = "2001:db8::1"
-TEST_QDCOUNT = 2
+TEST_NAME = "testdomain.riot"
+TEST_A_DATA = "1.2.3.4"
+TEST_AAAA_DATA = "1:2:3:4:5:6:7:8"
 TEST_ANCOUNT = 2
+
+
+def _validate_packet_AF_UNSPEC(p):
+    assert(p is not None)
+    assert(p[DNS].qr == 0)
+    assert(p[DNS].opcode == 0)
+    # has two queries
+    assert(p[DNS].qdcount == 2)
+    qdcount = p[DNS].qdcount
+    # both for TEST_NAME
+    assert(p[DNS].qd[0].qname == TEST_NAME.encode("utf-8") + b".")
+    assert(p[DNS].qd[1].qname == TEST_NAME.encode("utf-8") + b".")
+    assert(any(p[DNS].qd[i].qtype == DNS_RR_TYPE_A
+               for i in range(qdcount)))    # one is A
+    assert(any(p[DNS].qd[i].qtype == DNS_RR_TYPE_AAAA
+               for i in range(qdcount)))    # one is AAAA
+
+
+def _validate_packet_AF_INET(p):
+    assert(p is not None)
+    assert(p[DNS].qr == 0)
+    assert(p[DNS].opcode == 0)
+    # has two queries
+    assert(p[DNS].qdcount == 1)
+    qdcount = p[DNS].qdcount
+    # both for TEST_NAME
+    assert(p[DNS].qd[0].qname == TEST_NAME.encode("utf-8") + b".")
+    assert(all(p[DNS].qd[i].qtype == DNS_RR_TYPE_A
+               for i in range(qdcount)))    # all are A
+
+
+def _validate_packet_AF_INET6(p):
+    assert(p is not None)
+    assert(p[DNS].qr == 0)
+    assert(p[DNS].opcode == 0)
+    # has two queries
+    assert(p[DNS].qdcount == 1)
+    qdcount = p[DNS].qdcount
+    # both for TEST_NAME
+    assert(p[DNS].qd[0].qname == TEST_NAME.encode("utf-8") + b".")
+    assert(all(p[DNS].qd[i].qtype == DNS_RR_TYPE_AAAA
+               for i in range(qdcount)))    # all are AAAA
 
 
 class Server(threading.Thread):
@@ -52,6 +93,8 @@ class Server(threading.Thread):
         self.stopped = False
         self.enter_loop = threading.Event()
 
+    validator_func = _validate_packet_AF_UNSPEC
+
     def run(self):
         while True:
             self.enter_loop.wait()
@@ -61,19 +104,7 @@ class Server(threading.Thread):
             p, remote = self.socket.recvfrom(1500)
             p = DNS(raw(p))
             # check received packet for correctness
-            assert(p is not None)
-            assert(p[DNS].qr == 0)
-            assert(p[DNS].opcode == 0)
-            # has two queries
-            assert(p[DNS].qdcount == TEST_QDCOUNT)
-            qdcount = p[DNS].qdcount
-            # both for TEST_NAME
-            assert(p[DNS].qd[0].qname == TEST_NAME.encode("utf-8") + b".")
-            assert(p[DNS].qd[1].qname == TEST_NAME.encode("utf-8") + b".")
-            assert(any(p[DNS].qd[i].qtype == DNS_RR_TYPE_A
-                       for i in range(qdcount)))    # one is A
-            assert(any(p[DNS].qd[i].qtype == DNS_RR_TYPE_AAAA
-                       for i in range(qdcount)))    # one is AAAA
+            self.validator_func(p)
             if self.reply is not None:
                 self.socket.sendto(raw(self.reply), remote)
                 self.reply = None
@@ -130,16 +161,32 @@ def dns_server(child, server, port=53):
     child.expect(r"DNS server: \[{}\]:{:d}".format(server, port))
 
 
-def successful_dns_query(child, name, exp_addr=None):
-    child.sendline("dns query 0 {}".format(name))
+def _successful_dns_query(child, ipv, name, exp_addr=None):
+
+    assert(ipv == 0 or ipv == 4 or ipv == 6)
+
+    child.sendline("dns query {:d} {}".format(ipv, name))
     res = child.expect(["error resolving {}".format(name),
                         "{} resolves to {}".format(name, exp_addr)],
                        timeout=3)
-    return ((res > 0) and (exp_addr is not None))
+    return (res > 0) and (exp_addr is not None)
+
+
+def successful_dns_query_AF_UNSPEC(child, name, exp_addr=None):
+    return _successful_dns_query(child, 0, name, exp_addr)
+
+
+def successful_dns_query_AF_INET(child, name, exp_addr=None):
+    return _successful_dns_query(child, 4, name, exp_addr)
+
+
+def successful_dns_query_AF_INET6(child, name, exp_addr=None):
+    return _successful_dns_query(child, 6, name, exp_addr)
 
 
 def test_success(child):
-    server.listen(DNS(qr=1, qdcount=TEST_QDCOUNT, ancount=TEST_ANCOUNT,
+
+    server.listen(DNS(qr=1, qdcount=2, ancount=TEST_ANCOUNT,
                       qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
                           DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A)),
                       an=(DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_AAAA,
@@ -147,24 +194,43 @@ def test_success(child):
                                 rdata=TEST_AAAA_DATA) /
                           DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_A,
                                 rdlen=DNS_RR_TYPE_A_DLEN, rdata=TEST_A_DATA))))
-    assert(successful_dns_query(child, TEST_NAME, TEST_AAAA_DATA))
+    server.validator_func = _validate_packet_AF_UNSPEC
+    assert(successful_dns_query_AF_UNSPEC(child, TEST_NAME, TEST_AAAA_DATA))
+
+    server.listen(DNS(qr=1, qdcount=1, ancount=TEST_ANCOUNT,
+                      qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A)),
+                      an=(DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_A,
+                                rdlen=DNS_RR_TYPE_A_DLEN, rdata=TEST_A_DATA))))
+    server.validator_func = _validate_packet_AF_INET
+    assert(successful_dns_query_AF_INET(child, TEST_NAME, TEST_A_DATA))
+
+    server.listen(DNS(qr=1, qdcount=1, ancount=TEST_ANCOUNT,
+                      qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA)),
+                      an=(DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_AAAA,
+                                rdlen=DNS_RR_TYPE_AAAA_DLEN,
+                                rdata=TEST_AAAA_DATA))))
+    server.validator_func = _validate_packet_AF_INET6
+    assert(successful_dns_query_AF_INET6(child, TEST_NAME, TEST_AAAA_DATA))
+
+    # reset to AF_UNSPEC for the rest of the test
+    server.validator_func = _validate_packet_AF_UNSPEC
 
 
 def test_timeout(child):
     # listen but send no reply
     server.listen()
-    assert(not successful_dns_query(child, TEST_NAME, TEST_AAAA_DATA))
+    assert(not successful_dns_query_AF_UNSPEC(child, TEST_NAME, TEST_AAAA_DATA))
 
 
 def test_too_short_response(child):
     server.listen(Raw(b"\x00\x00\x81\x00"))
-    assert(not successful_dns_query(child, TEST_NAME))
+    assert(not successful_dns_query_AF_UNSPEC(child, TEST_NAME))
 
 
 def test_qdcount_too_large1(child):
     # as reported in https://github.com/RIOT-OS/RIOT/issues/10739
     server.listen(base64.b64decode("AACEAwkmAAAAAAAAKioqKioqKioqKioqKioqKioqKio="))
-    assert(not successful_dns_query(child, TEST_NAME))
+    assert(not successful_dns_query_AF_UNSPEC(child, TEST_NAME))
 
 
 def test_qdcount_too_large2(child):
@@ -176,11 +242,11 @@ def test_qdcount_too_large2(child):
                                 rdata=TEST_AAAA_DATA) /
                           DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_A,
                                 rdlen=DNS_RR_TYPE_A_DLEN, rdata=TEST_A_DATA))))
-    assert(not successful_dns_query(child, TEST_NAME))
+    assert(not successful_dns_query_AF_UNSPEC(child, TEST_NAME))
 
 
 def test_ancount_too_large1(child):
-    server.listen(DNS(qr=1, qdcount=TEST_QDCOUNT, ancount=2714,
+    server.listen(DNS(qr=1, qdcount=2, ancount=2714,
                       qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
                           DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A)),
                       an=(DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_AAAA,
@@ -188,42 +254,42 @@ def test_ancount_too_large1(child):
                                 rdata=TEST_AAAA_DATA) /
                           DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_A,
                                 rdlen=DNS_RR_TYPE_A_DLEN, rdata=TEST_A_DATA))))
-    assert(not successful_dns_query(child, TEST_NAME, TEST_AAAA_DATA))
+    assert(not successful_dns_query_AF_UNSPEC(child, TEST_NAME, TEST_AAAA_DATA))
 
 
 def test_ancount_too_large2(child):
-    server.listen(DNS(qr=1, qdcount=TEST_QDCOUNT, ancount=19888,
+    server.listen(DNS(qr=1, qdcount=2, ancount=19888,
                       qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
                           DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A)),
                       an="\0"))
-    assert(not successful_dns_query(child, TEST_NAME))
+    assert(not successful_dns_query_AF_UNSPEC(child, TEST_NAME))
 
 
 def test_bad_compressed_message_query(child):
     server.listen(DNS(qr=1, qdcount=1, ancount=1,
                       qd=DNS_MSG_COMP_MASK))
-    assert(not successful_dns_query(child, TEST_NAME))
+    assert(not successful_dns_query_AF_UNSPEC(child, TEST_NAME))
 
 
 def test_bad_compressed_message_answer(child):
-    server.listen(DNS(qr=1, qdcount=TEST_QDCOUNT, ancount=TEST_ANCOUNT,
+    server.listen(DNS(qr=1, qdcount=2, ancount=TEST_ANCOUNT,
                       qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
                           DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A)),
                       an=DNS_MSG_COMP_MASK))
-    assert(not successful_dns_query(child, TEST_NAME))
+    assert(not successful_dns_query_AF_UNSPEC(child, TEST_NAME))
 
 
 def test_malformed_hostname_query(child):
-    server.listen(DNS(qr=1, qdcount=TEST_QDCOUNT, ancount=0,
+    server.listen(DNS(qr=1, qdcount=2, ancount=0,
                       qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
                           # need to use byte string here to induce wrong label
                           # lengths
                           b"\xafexample\x03org\x00\x00\x1c\x00\x01")))
-    assert(not successful_dns_query(child, TEST_NAME))
+    assert(not successful_dns_query_AF_UNSPEC(child, TEST_NAME))
 
 
 def test_malformed_hostname_answer(child):
-    server.listen(DNS(qr=1, qdcount=TEST_QDCOUNT, ancount=TEST_ANCOUNT,
+    server.listen(DNS(qr=1, qdcount=2, ancount=TEST_ANCOUNT,
                       qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
                           DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A)),
                       # need to use byte string here to induce wrong label
@@ -232,22 +298,22 @@ def test_malformed_hostname_answer(child):
                           b"\x20\x01\x0d\xb8\x00\x00\x00\x00\x00\x00\x00\x00\x00"
                           b"\x00\x00\x01" /
                           DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A))))
-    assert(not successful_dns_query(child, TEST_NAME))
+    assert(not successful_dns_query_AF_UNSPEC(child, TEST_NAME))
 
 
 def test_addrlen_too_large(child):
-    server.listen(DNS(qr=1, qdcount=TEST_QDCOUNT, ancount=TEST_ANCOUNT,
+    server.listen(DNS(qr=1, qdcount=2, ancount=TEST_ANCOUNT,
                       qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
                           DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A)),
                       an=(DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_AAAA,
                                 rdlen=18549, rdata=TEST_AAAA_DATA) /
                           DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_A,
                                 rdlen=DNS_RR_TYPE_A_DLEN, rdata=TEST_A_DATA))))
-    assert(not successful_dns_query(child, TEST_NAME, TEST_AAAA_DATA))
+    assert(not successful_dns_query_AF_UNSPEC(child, TEST_NAME, TEST_AAAA_DATA))
 
 
 def test_addrlen_wrong_ip6(child):
-    server.listen(DNS(qr=1, qdcount=TEST_QDCOUNT, ancount=TEST_ANCOUNT,
+    server.listen(DNS(qr=1, qdcount=2, ancount=TEST_ANCOUNT,
                       qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
                           DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A)),
                       an=(DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_AAAA,
@@ -255,11 +321,11 @@ def test_addrlen_wrong_ip6(child):
                                 rdata=(TEST_AAAA_DATA)) /
                           DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_A,
                                 rdlen=DNS_RR_TYPE_A_DLEN, rdata=TEST_A_DATA))))
-    assert(not successful_dns_query(child, TEST_NAME, TEST_AAAA_DATA))
+    assert(not successful_dns_query_AF_UNSPEC(child, TEST_NAME, TEST_AAAA_DATA))
 
 
 def test_addrlen_wrong_ip4(child):
-    server.listen(DNS(qr=1, qdcount=TEST_QDCOUNT, ancount=TEST_ANCOUNT,
+    server.listen(DNS(qr=1, qdcount=2, ancount=TEST_ANCOUNT,
                       qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
                           DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A)),
                       an=(DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_A,
@@ -267,7 +333,7 @@ def test_addrlen_wrong_ip4(child):
                           DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_AAAA,
                                 rdlen=DNS_RR_TYPE_AAAA_DLEN,
                                 rdata=TEST_AAAA_DATA))))
-    assert(not successful_dns_query(child, TEST_NAME, TEST_AAAA_DATA))
+    assert(not successful_dns_query_AF_UNSPEC(child, TEST_NAME, TEST_AAAA_DATA))
 
 
 def testfunc(child):
