@@ -107,6 +107,9 @@ ifneq (,$(filter skald, $(USEMODULE)))
 endif
 
 ifneq (,$(filter sock sock_%,$(USEMODULE)))
+  ifneq (,$(filter ipv4,$(USEMODULE)))
+    CFLAGS += -DSOCK_HAS_IPV4
+  endif
   ifneq (,$(filter ipv6,$(USEMODULE)))
     CFLAGS += -DSOCK_HAS_IPV6
   endif
