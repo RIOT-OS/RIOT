@@ -131,3 +131,18 @@ $ cargo +nightly-2019-12-05 install --path c2rust
 [cargo]: https://doc.rust-lang.org/cargo/
 [**rustup**, installed as described on its website]: https://rustup.rs/
 [introduction post]: https://immunant.com/blog/2019/08/introduction-to-c2rust/
+
+Maintenance
+-----------
+
+The riot-sys and riot-wrappers crates are currently maintained outside of the RIOT project,
+primarily for practical historical reasons
+(all their CI has been set up on GitLab in the organization it was developed in).
+
+As Rust is stricter in APIs than C is
+(for example, it is a breaking change to start returning an integer where previously void has been returned).
+Dealing with this,
+and other aspects of maintenance of the crates,
+is described in [the `rust_minimal` test's README].
+
+[the `rust_minimal` test's README]: (https://github.com/RIOT-OS/RIOT/blob/master/tests/rust_minimal/README.md).
