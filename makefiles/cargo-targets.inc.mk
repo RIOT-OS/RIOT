@@ -11,7 +11,9 @@ CARGO_COMPILE_COMMANDS_FLAGS = --clang
 $(CARGO_COMPILE_COMMANDS): $(BUILDDEPS)
 	$(Q)DIRS="$(DIRS)" APPLICATION_BLOBS="$(BLOBS)" \
 	  "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk compile-commands
+	@# replacement addresses https://github.com/rust-lang/rust-bindgen/issues/1555
 	$(Q)$(RIOTTOOLS)/compile_commands/compile_commands.py $(CARGO_COMPILE_COMMANDS_FLAGS) $(BINDIR) \
+	  | sed 's/"riscv-none-embed"/"riscv32"/g' \
 	  | $(LAZYSPONGE) $@
 
 
