@@ -241,6 +241,11 @@ DOCKER_APPDIR = $(DOCKER_RIOTPROJECT)/$(BUILDRELPATH)
 # Directory mapping in docker and directories environment variable configuration
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume,$(ETC_LOCALTIME),/etc/localtime,ro)
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume,$(RIOTBASE),$(DOCKER_RIOTBASE))
+# Selective components of Cargo to ensure crates are not re-downloaded (and
+# subsequently rebuilt) on every run. Not using all of ~/.cargo as ~/.cargo/bin
+# would be run by Cargo and that'd be very weird.
+DOCKER_VOLUMES_AND_ENV += $(call docker_volume,$(HOME)/.cargo/registry,$(DOCKER_BUILD_ROOT)/.cargo/registry)
+DOCKER_VOLUMES_AND_ENV += $(call docker_volume,$(HOME)/.cargo/git,$(DOCKER_BUILD_ROOT)/.cargo/git)
 DOCKER_VOLUMES_AND_ENV += -e 'RIOTBASE=$(DOCKER_RIOTBASE)'
 DOCKER_VOLUMES_AND_ENV += -e 'CCACHE_BASEDIR=$(DOCKER_RIOTBASE)'
 
