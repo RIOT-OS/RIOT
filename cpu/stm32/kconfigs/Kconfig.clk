@@ -56,7 +56,7 @@ config CUSTOM_PLL_PARAMS
     bool "Configure PLL parameters"
     depends on USE_CLOCK_PLL
 
-if CPU_FAM_F2 || CPU_FAM_F4 || CPU_FAM_F7 || CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
+if CPU_FAM_F2 || CPU_FAM_F4 || CPU_FAM_F7 || CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB || CPU_FAM_MP1
 config CLOCK_PLL_M
     int "M: PLLIN division factor" if CUSTOM_PLL_PARAMS
     default 4 if CPU_FAM_F2 || CPU_FAM_F4 || CPU_FAM_F7
@@ -65,7 +65,7 @@ config CLOCK_PLL_M
     default 4 if CPU_FAM_G4
     default 6 if (CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB) && CLOCK_PLL_SRC_MSI
     default 4 if CPU_FAM_WB && CLOCK_PLL_SRC_HSE
-    default 2 if CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
+    default 2 if CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB || CPU_FAM_MP1
     range 1 8 if CPU_FAM_G0 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
     range 1 16 if CPU_FAM_G4
 
@@ -90,12 +90,15 @@ config CLOCK_PLL_N
     default 27 if CPU_FAM_L5
     default 20 if CPU_FAM_G0 || CPU_FAM_L4
     default 85 if CPU_FAM_G4
+    default 52 if CPU_FAM_MP1 && BOARD_HAS_HSE
+    default 78 if CPU_FAM_MP1
     range 8 86 if CPU_FAM_G0 || CPU_FAM_L4 || CPU_FAM_L5
     range 50 432 if CPU_FAM_F2 || CPU_FAM_F4 || CPU_FAM_F7
     range 8 127 if CPU_FAM_G4
     range 6 127 if CPU_FAM_WB
+    range 4 512 if CPU_FAM_MP1
 
-if CPU_FAM_F2 || CPU_FAM_F4 || CPU_FAM_F7
+if CPU_FAM_F2 || CPU_FAM_F4 || CPU_FAM_F7 || CPU_FAM_MP1
 choice
 bool "Main PLL division factor (PLLP) for main system clock" if CUSTOM_PLL_PARAMS
 default PLL_P_DIV_4 if CPU_FAM_F4 && CLOCK_MAX_84MHZ
@@ -117,6 +120,7 @@ endchoice
 
 config CLOCK_PLL_P
     int
+    default 3 if CPU_FAM_MP1
     default 2 if PLL_P_DIV_2
     default 4 if PLL_P_DIV_4
     default 6 if PLL_P_DIV_6
@@ -129,18 +133,20 @@ config CLOCK_PLL_Q
     default 4 if CPU_FAM_F4 && CLOCK_MAX_100MHZ
     default 7 if CPU_FAM_F4 && CLOCK_MAX_180MHZ && (MODULE_PERIPH_USBDEV || USEMODULE_PERIPH_USBDEV)
     default 9 if CPU_FAM_F7
+    default 13 if CPU_FAM_MP1
     default 8
     range 2 15
-endif  # CPU_FAM_F2 || CPU_FAM_F4 || CPU_FAM_F7
+endif  # CPU_FAM_F2 || CPU_FAM_F4 || CPU_FAM_F7 || CPU_FAM_MP1
 
-if CPU_FAM_G0 || CPU_FAM_WB
+if CPU_FAM_G0 || CPU_FAM_WB || CPU_FAM_MP1
 config CLOCK_PLL_R
     int "Q: VCO division factor" if CUSTOM_PLL_PARAMS
     default 2 if CPU_FAM_WB
+    default 3 if CPU_FAM_MP1
     default 6 if BOARD_HAS_HSE
     default 5
     range 2 8
-endif  # CPU_FAM_G0 || CPU_FAM_WB
+endif  # CPU_FAM_G0 || CPU_FAM_WB || CPU_FAM_MP1
 
 if CPU_FAM_G4 || CPU_FAM_L4 || CPU_FAM_L5
 choice
@@ -169,7 +175,7 @@ config CLOCK_PLL_R
     default 8 if PLL_R_DIV_8
 endif  # CPU_FAM_G4 || CPU_FAM_L4 || CPU_FAM_L5
 
-endif  # CPU_FAM_F2 || CPU_FAM_F4 || CPU_FAM_F7 || CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
+endif  # CPU_FAM_F2 || CPU_FAM_F4 || CPU_FAM_F7 || CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB || CPU_FAM_MP1
 
 if CPU_FAM_F0 || CPU_FAM_F1 || CPU_FAM_F3
 config CLOCK_PLL_PREDIV
@@ -368,7 +374,7 @@ endif  # CPU_FAM_L0 || CPU_FAM_L1 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
 choice
 bool "APB1 prescaler (division factor of HCLK to produce PCLK1)"
 default CLOCK_APB1_DIV_4 if CPU_FAM_F2 || (CPU_FAM_F4 && CLOCK_MAX_180MHZ) || CPU_FAM_F7 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_U5 || CPU_FAM_WB
-default CLOCK_APB1_DIV_2 if CPU_FAM_F1 || CPU_FAM_F3 || CPU_FAM_F4
+default CLOCK_APB1_DIV_2 if CPU_FAM_F1 || CPU_FAM_F3 || CPU_FAM_F4 || CPU_FAM_MP1
 default CLOCK_APB1_DIV_1
 
 config CLOCK_APB1_DIV_1
@@ -399,7 +405,7 @@ config CLOCK_APB1_DIV
 choice
 bool "APB2 prescaler (division factor of HCLK to produce PCLK2)"
 depends on !CPU_FAM_G0 && !CPU_FAM_F0
-default CLOCK_APB2_DIV_2 if CPU_FAM_F2 || (CPU_FAM_F4 && CLOCK_MAX_180MHZ) || CPU_FAM_F7 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_U5 || CPU_FAM_WB
+default CLOCK_APB2_DIV_2 if CPU_FAM_F2 || (CPU_FAM_F4 && CLOCK_MAX_180MHZ) || CPU_FAM_F7 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_U5 || CPU_FAM_WB || CPU_FAM_MP1
 default CLOCK_APB2_DIV_1
 
 config CLOCK_APB2_DIV_1
