@@ -1,0 +1,138 @@
+# Copyright (C) 2021_ML!PA Consulting GmbH
+
+menuconfig KCONFIG_USEMODULE_MBEDTLS_TEST
+    bool "Configure mbedtls flags used for this test"
+    help
+        Configure mbedtls flags used for this test using Kconfig
+
+if KCONFIG_USEMODULE_MBEDTLS_TEST
+
+config MBEDTLS_SSL_TLS_C
+    bool "Enable the generic SSL/TLS code."
+    default y
+
+config MBEDTLS_CIPHER_C
+    bool "Enable the generic cipher layer"
+    default y
+
+config MBEDTLS_SSL_SERVER_NAME_INDICATION
+    bool "Enable server name indication"
+    default y
+
+config MBEDTLS_MD_C
+    bool "Enable the generic message digets layer"
+    default y
+
+config MBEDTLS_SSL_PROTO_TLS1_2
+    bool "Specify TLS V1.2"
+    default y
+
+config MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
+    bool "Enable ECDHE ECDSA key exchange"
+    default y
+
+config MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
+    bool "Enable ECDHE RSA key exchange"
+    default y
+
+config MBEDTLS_RSA_C
+    bool "Enable RSA public key cryptosystem"
+    default y
+
+config MBEDTLS_X509_CRT_PARSE_C
+    bool "Enable X.509 certificate parsing"
+    default y
+
+config MBEDTLS_X509_USE_C
+    bool "Enable X.509 core for certificates usage"
+    default y
+
+config MBEDTLS_PEM_PARSE_C
+    bool "Enable PEM decoding/parsing"
+    default y
+
+config MBEDTLS_BASE64_C
+    bool "Enable base64 decoding"
+    default y
+
+config MBEDTLS_PKCS1_V15
+    bool "Enable  support for PKCS1 v1.5 encoding"
+    default y
+
+config MBEDTLS_BIGNUM_C
+    bool "Enable the multi-precision integer"
+    default y
+
+config MBEDTLS_OID_C
+    bool "Enable the OID database"
+    default y
+
+config MBEDTLS_ASN1_PARSE_C
+    bool "Enable the generic ASN1 parser"
+    default y
+
+config MBEDTLS_PK_PARSE_C
+    bool "Enable the generic public key parser"
+    default y
+
+config MBEDTLS_PK_C
+    bool "Enable the generic public key layer"
+    default y
+
+config MBEDTLS_SSL_CLI_C
+    bool "Enable the SSL/TLS client"
+    default y
+
+config MBEDTLS_AES_C
+    bool "Enable the AES block cipher"
+    default y
+
+config MBEDTLS_NET_C
+    bool "Enable networking layer"
+    default y
+
+config MBEDTLS_CTR_DRBG_C
+    bool "Enable the CTR_DRBG AES-based random generator"
+    default y
+
+config MBEDTLS_ECDH_C
+    bool "Enable the elliptic curve Diffie-Hellman library"
+    default y
+
+config MBEDTLS_ECDSA_C
+    bool "Enable the elliptic curve DSA library"
+    default y
+
+config MBEDTLS_ECP_C
+    bool "Enable the elliptic curve over GF(p) library"
+    default y
+
+config MBEDTLS_ECP_DP_SECP521R1_ENABLED
+    bool "Enable specific curves within the Elliptic Curve"
+    default y
+
+config MBEDTLS_ECP_DP_SECP192R1_ENABLED
+    bool "Enable specific curves within the Elliptic Curve"
+    default y
+
+config MBEDTLS_ASN1_WRITE_C
+    bool "Enable the generic ASN1 writer"
+    default y
+
+config MBEDTLS_DHM_C
+    bool "Enable the Diffie-Hellman-Merkle module"
+    default y
+
+config MBEDTLS_GCM_C
+    bool "Enable the Galois/Counter Mode (GCM)"
+    default y
+
+config MBEDTLS_PLATFORM_C
+    bool "Enable the platform abstraction layer"
+    default y
+
+config MBEDTLS_DEBUG_C
+    bool "Enable debug messages"
+    default y
+
+endif #KCONFIG_USEMODULE_MBEDTLS_TEST
