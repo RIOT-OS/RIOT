@@ -177,17 +177,11 @@ extern "C" {
 #define CONFIG_LORA_FIXED_HEADER_LEN_MODE_DEFAULT
 #endif
 
-/** @brief Enable/disable payload CRC, optional
- *
- * @deprecated Use inverse `CONFIG_LORA_PAYLOAD_CRC_OFF_DEFAULT` instead.
- * Will be removed after 2021.04 release.
+/**
+* @brief    Enable/disable payload CRC, optional
 */
-#ifndef LORA_PAYLOAD_CRC_ON_DEFAULT
-#if IS_ACTIVE(CONFIG_LORA_PAYLOAD_CRC_OFF_DEFAULT)
-#define LORA_PAYLOAD_CRC_ON_DEFAULT                 (false)
-#else
-#define LORA_PAYLOAD_CRC_ON_DEFAULT                 (true)
-#endif
+#ifdef DOXYGEN
+#define CONFIG_LORA_PAYLOAD_CRC_OFF_DEFAULT
 #endif
 
 /** @brief Configure payload length
