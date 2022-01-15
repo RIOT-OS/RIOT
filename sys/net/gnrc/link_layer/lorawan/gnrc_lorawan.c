@@ -92,8 +92,8 @@ void gnrc_lorawan_reset(gnrc_lorawan_t *mac)
 
     dev->driver->set(dev, NETOPT_CODING_RATE, &cr, sizeof(cr));
 
-    uint8_t syncword = LORAMAC_DEFAULT_PUBLIC_NETWORK ? LORA_SYNCWORD_PUBLIC
-                                                      : LORA_SYNCWORD_PRIVATE;
+    uint8_t syncword = IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_PRIVATE_NETWORK) ? LORA_SYNCWORD_PRIVATE
+                                                                         : LORA_SYNCWORD_PUBLIC;
 
     dev->driver->set(dev, NETOPT_SYNCWORD, &syncword, sizeof(syncword));
 
