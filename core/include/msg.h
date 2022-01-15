@@ -375,6 +375,9 @@ unsigned msg_avail(void);
  *                  not be NULL.
  * @param[in] num   Number of ``msg_t`` structures in array.
  *                  **MUST BE POWER OF TWO!**
+ *
+ * If array resides on the stack, the containing stack frame must never be
+ * left, not even if it is the current thread's entry function.
  */
 void msg_init_queue(msg_t *array, int num);
 
