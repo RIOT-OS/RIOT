@@ -585,7 +585,7 @@ basename_list () {
 update_changed_modules() {
     # early out if there's no base commit info
     if [ -z "${CI_BASE_COMMIT}" ]; then
-        exit 0
+        return 0
     fi
 
     # early out if a full build is requested
