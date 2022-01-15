@@ -41,8 +41,8 @@ extern "C" {
 typedef struct {
     ipv6_addr_t addr;       /**< The address of the border router */
     uint32_t version;       /**< last received version */
-    uint32_t valid_until;   /**< timestamp (in minutes) until which the
-                             *   information is valid */
+    uint32_t valid_until_ms;   /**< timestamp (in ms) until which the information is valid
+                                *   (needs resolution in minutes an 16 bits of them)*/
 } gnrc_ipv6_nib_abr_t;
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C) || defined(DOXYGEN)
@@ -116,7 +116,7 @@ bool gnrc_ipv6_nib_abr_iter(void **state, gnrc_ipv6_nib_abr_t *abr);
  */
 static inline uint32_t gnrc_ipv6_nib_abr_valid_offset(const gnrc_ipv6_nib_abr_t *abr)
 {
-    return abr->valid_until - evtimer_now_min();
+    return (abr->valid_until_ms - evtimer_now_msec()) / ( MS_PER_SEC * SEC_PER_MIN);
 }
 #endif
 

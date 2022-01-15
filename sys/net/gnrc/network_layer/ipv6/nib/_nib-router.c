@@ -137,6 +137,11 @@ static gnrc_pktsnip_t *_offl_to_pio(_nib_offl_entry_t *offl,
     return pio;
 }
 
+static inline uint16_t _nib_abr_entry_valid_offset(const _nib_abr_entry_t *abr)
+{
+    return (abr->valid_until_ms - evtimer_now_msec()) / ( MS_PER_SEC * SEC_PER_MIN);
+}
+
 static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
                                        _nib_abr_entry_t *abr)
 {
@@ -165,7 +170,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_DNS */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
-    uint16_t ltime;
+    uint16_t ltime_min;
     gnrc_pktsnip_t *abro;
 
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
@@ -191,11 +196,11 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
             }
         }
     }
-    ltime = (gnrc_netif_is_6lbr(netif)) ?
-            (SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT) :
-            (abr->valid_until - evtimer_now_min());
-    (void)ltime;    /* gnrc_sixlowpan_nd_opt_abr_build might evaluate to NOP */
-    abro = gnrc_sixlowpan_nd_opt_abr_build(abr->version, ltime, &abr->addr,
+    ltime_min = (gnrc_netif_is_6lbr(netif)) ?
+                (SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT) :
+                _nib_abr_entry_valid_offset(abr);
+    (void)ltime_min;    /* gnrc_sixlowpan_nd_opt_abr_build might evaluate to NOP */
+    abro = gnrc_sixlowpan_nd_opt_abr_build(abr->version, ltime_min, &abr->addr,
                                            ext_opts);
     if (abro == NULL) {
         DEBUG("nib: No space left in packet buffer. Not adding ABRO\n");

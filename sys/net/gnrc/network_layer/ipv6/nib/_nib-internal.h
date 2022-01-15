@@ -228,8 +228,8 @@ typedef struct {
     ipv6_addr_t addr;               /**< The address of the border router */
     uint32_t version;               /**< last received version of the info of
                                      *   the _nib_abr_entry_t::addr */
-    uint32_t valid_until;           /**< timestamp (in minutes) until which
-                                     *   information is valid */
+    uint32_t valid_until_ms;        /**< timestamp (in ms) until which information is valid
+                                     *   (needs resolution in minutes an 16 bits of them)*/
     evtimer_msg_event_t timeout;    /**< timeout of the information */
     /**
      * @brief   Bitfield marking the prefixes in the NIB's off-link entries
