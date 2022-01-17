@@ -132,7 +132,7 @@ static void sx126x_init_default_config(sx126x_t *dev)
     sx126x_set_lora_mod_params(dev, &dev->mod_params);
 
     dev->pkt_params.pld_len_in_bytes = 0;
-    dev->pkt_params.crc_is_on = LORA_PAYLOAD_CRC_ON_DEFAULT;
+    dev->pkt_params.crc_is_on = !IS_ACTIVE(CONFIG_LORA_PAYLOAD_CRC_OFF_DEFAULT);
     dev->pkt_params.header_type = (
         IS_ACTIVE(CONFIG_LORA_FIXED_HEADER_LEN_MODE_DEFAULT) ? true : false
         );
