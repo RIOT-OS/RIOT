@@ -5,34 +5,4 @@ endif
 # Sets up configuration for openocd
 USEMODULE += esp_jtag
 
-# if compiled in CI, optional modules are selected for compile tests
-ifneq (,$(RIOT_CI_BUILD))
-  USEMODULE += esp_idf_heap
-  USEMODULE += esp_log_startup
-  USEMODULE += esp_log_tagged
-  USEMODULE += esp_qemu
-  USEMODULE += esp_spi_ram
-
-  ifneq (,$(filter periph_i2c,$(USEMODULE)))
-    USEMODULE += esp_i2c_hw
-  endif
-
-  ifneq (,$(filter periph_timer,$(USEMODULE)))
-    USEMODULE += esp_hw_counter
-  endif
-
-  ifneq (,$(filter netdev_default,$(USEMODULE)))
-    # if netdev_default is used, we use gnrc modules that are enabled
-    # in different examples to use different esp_wifi modules
-    ifneq (,$(filter gnrc_netif_single,$(USEMODULE)))
-      # if gnrc_netif_single module is enabled, esp_wifi_enterprise is used
-      USEMODULE += esp_wifi_enterprise
-    else
-      # in all other case esp_wifi_ap is enabled
-      USEMODULE += esp_wifi_ap
-    endif
-  endif
-
-endif
-
 include $(RIOTBOARD)/common/esp32/Makefile.dep
