@@ -1,0 +1,1 @@
+include $(RIOTBOARD)/esp32-wrover-kit/Makefile.features

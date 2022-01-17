@@ -1,0 +1,30 @@
+# This must be a different name than 'board' as it is implemented by 'esp32-wrover-kit'
+USEMODULE += board_esp32-ci
+
+USEMODULE += esp_idf_heap
+USEMODULE += esp_log_startup
+USEMODULE += esp_log_tagged
+USEMODULE += esp_qemu
+USEMODULE += esp_spi_ram
+
+ifneq (,$(filter periph_i2c,$(USEMODULE)))
+  USEMODULE += esp_i2c_hw
+endif
+
+ifneq (,$(filter periph_timer,$(USEMODULE)))
+  USEMODULE += esp_hw_counter
+endif
+
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  # if netdev_default is used, we use gnrc modules that are enabled
+  # in different examples to use different esp_wifi modules
+  ifneq (,$(filter gnrc_netif_single,$(USEMODULE)))
+    # if gnrc_netif_single module is enabled, esp_wifi_enterprise is used
+    USEMODULE += esp_wifi_enterprise
+  else
+    # in all other case esp_wifi_ap is enabled
+    USEMODULE += esp_wifi_ap
+  endif
+endif
+
+include $(RIOTBOARD)/esp32-wrover-kit/Makefile.dep
