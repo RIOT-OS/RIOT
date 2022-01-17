@@ -451,6 +451,12 @@ ifneq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
   USEMODULE += gnrc_pktbuf # make MODULE_GNRC_PKTBUF macro available for all implementations
 endif
 
+ifneq (,$(filter gnrc_pktbuf_cmd,$(USEMODULE)))
+  ifneq (,$(filter gnrc_pktbuf_static,$(USEMODULE)))
+    USEMODULE += od
+  endif
+endif
+
 ifneq (,$(filter gnrc_netif_%,$(USEMODULE)))
   USEMODULE += gnrc_netif
 endif

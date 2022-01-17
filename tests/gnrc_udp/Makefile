@@ -8,7 +8,6 @@ USEMODULE += gnrc_pktbuf_cmd
 USEMODULE += gnrc_udp
 USEMODULE += gnrc_rpl
 USEMODULE += auto_init_gnrc_rpl
-USEMODULE += od
 USEMODULE += gnrc_icmpv6_echo
 USEMODULE += shell
 USEMODULE += shell_commands
