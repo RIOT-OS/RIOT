@@ -45,6 +45,12 @@ OPTIONAL_CFLAGS += -Wold-style-definition
 CXXUWFLAGS += -std=%
 CXXUWFLAGS += -Wstrict-prototypes -Wold-style-definition
 
+ifeq ($(filter -std=%,$(CXXEXFLAGS)),)
+  ifeq ($(shell $(CC) -std=c++14 -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+    CXXEXFLAGS += -std=c++14
+  endif
+endif
+
 ifeq ($(LTO),1)
   $(warning Building with Link-Time-Optimizations is currently an experimental feature. Expect broken binaries.)
   LTOFLAGS = -flto

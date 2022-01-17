@@ -11,7 +11,3 @@ ifeq (llvm,$(TOOLCHAIN))
   CXXEXFLAGS += -Wno-unused-variable
   CXXEXFLAGS += -Wno-shift-count-negative
 endif
-
-ifneq (native,$(BOARD))
-  CXXEXFLAGS += -std=c++11
-endif

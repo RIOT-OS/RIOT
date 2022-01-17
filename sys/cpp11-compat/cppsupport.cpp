@@ -119,4 +119,18 @@ void operator delete[](void* ptr, const std::nothrow_t&) noexcept {
     std::free(ptr);
 }
 
+/* end of tinynew.cpp */
+
+/* additional delete operators required by C++14 */
+
+void operator delete (void* ptr, std::size_t,
+                      const std::nothrow_t&) noexcept {
+    std::free(ptr);
+}
+
+void operator delete[] (void* ptr, std::size_t,
+                        const std::nothrow_t&) noexcept {
+    std::free(ptr);
+}
+
 /** @} */

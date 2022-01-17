@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include <stdlib.h>
@@ -35,6 +37,14 @@ void operator delete(void *ptr) {
     free(ptr);
 }
 
+void operator delete(void *ptr, size_t) noexcept {
+    free(ptr);
+}
+
 void operator delete[](void *ptr) {
+    free(ptr);
+}
+
+void operator delete [](void *ptr, size_t) noexcept {
     free(ptr);
 }
