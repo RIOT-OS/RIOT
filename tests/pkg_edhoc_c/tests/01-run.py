@@ -48,21 +48,24 @@ LAKE_WG_EDHOC_TV_34900_OSCORE_SALT = \
     "0x8e 0x44 0x92 0x10 0xe0 0x3b 0xc2 0x9d"
 
 
-def get_ipv6_addr(child):
+def get_ipv6_addr_and_netif(child):
     child.expect_exact('>')
     child.sendline('ifconfig')
+    # Get device local address
+    child.expect(r"Iface\s+(?P<netif>\d+)\s+")
+    netif = child.match.group("netif")
     # Get device local address
     child.expect(
         r"inet6\s+addr:\s+(?P<lladdr>[0-9a-fA-F:]+:[A-Fa-f:0-9]+)"
         "  scope: link  VAL"
     )
-
-    return child.match.group("lladdr").lower()
+    addr = child.match.group("lladdr").lower()
+    return addr, netif
 
 
 def testfunc(child):
-    child.sendline("init handshake {} {}".format(
-        get_ipv6_addr(child), COAP_PORT))
+    addr, netif = get_ipv6_addr_and_netif(child)
+    child.sendline("init handshake {}%{} {}".format(addr, netif, COAP_PORT))
     child.expect_exact("[initiator]: sending msg1 (37 bytes):")
     for line in LAKE_WG_EDHOC_TV_34900_MSG1.split('\n'):
         child.expect_exact(line)
