@@ -27,7 +27,7 @@ BOARD_BLACKLIST :=  arduino-duemilanove \
                     z1 \
                     #
 
-CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(5*THREAD_STACKSIZE_DEFAULT\)
+CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(6*THREAD_STACKSIZE_DEFAULT\)
 
 USEPKG += relic
 USEMODULE += embunit
