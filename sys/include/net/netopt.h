@@ -772,7 +772,7 @@ typedef enum {
     NETOPT_LINK_CHECK,
 
     /**
-     * @brief (int8_t) Received Signal Strength Indicator (RSSI)
+     * @brief (int16_t) Received Signal Strength Indicator (RSSI)
      *
      * The RSSI is an indicator for the received field strength in wireless
      * channels. It is often represented as the ratio of received power to
