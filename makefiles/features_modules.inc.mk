@@ -52,7 +52,7 @@ ifneq (,$(filter periph_%, $(USEMODULE)))
 endif
 
 # include rtc_utils if periph_rtc is used
-ifneq (,$(filter periph_rtc, $(USEMODULE)))
+ifneq (,$(filter periph_rtc,$(USEMODULE)))
   USEMODULE += rtc_utils
 endif
 

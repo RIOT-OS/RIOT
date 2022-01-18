@@ -10,5 +10,6 @@ config MODULE_RTT_RTC
     depends on HAS_PERIPH_RTT
     depends on TEST_KCONFIG
     select MODULE_PERIPH_RTT
+    select MODULE_RTC_UTILS
     help
         Basic RTC implementation based on a RTT.
