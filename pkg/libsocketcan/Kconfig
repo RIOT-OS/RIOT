@@ -1,0 +1,10 @@
+# Copyright (c) ML!PA Consulting GmbH
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config PACKAGE_LIBSOCKETCAN
+    bool "libsocketcan2 32bit for native Linux builds"
+    depends on BOARD_NATIVE
