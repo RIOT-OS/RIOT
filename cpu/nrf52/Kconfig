@@ -17,6 +17,7 @@ config CPU_FAM_NRF52
     select HAS_CORTEXM_MPU
     select HAS_CPU_NRF52
     select HAS_PERIPH_I2C_RECONFIGURE
+    select HAS_PERIPH_SPI_GPIO_MODE
 
 ## CPU Models
 config CPU_MODEL_NRF52805XXAA

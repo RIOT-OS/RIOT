@@ -14,6 +14,7 @@ config CPU_FAM_NRF9160
     select HAS_PERIPH_GPIO_IRQ
     select HAS_PERIPH_TIMER_PERIODIC
     select HAS_PERIPH_UART_MODECFG
+    select HAS_PERIPH_SPI_GPIO_MODE
 
 ## CPU Models
 config CPU_MODEL_NRF9160
@@ -38,5 +39,6 @@ config HAS_CPU_NRF9160
         Indicates that the current cpu is 'nrf9160'.
 
 rsource "vectors/Kconfig"
+rsource "periph/Kconfig"
 
 source "$(RIOTCPU)/nrf5x_common/Kconfig"
