@@ -92,7 +92,7 @@ uint32_t rtt_get_counter(void)
 void rtt_set_counter(uint32_t counter)
 {
     rtt_alarm -= rtt_offset;
-    rtt_offset = _rtt_get_counter() + counter;
+    rtt_offset = _rtt_get_counter() - counter;
     rtt_alarm += rtt_offset;
 
     /* re-set the overflow callback */
