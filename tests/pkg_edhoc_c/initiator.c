@@ -59,44 +59,50 @@ struct tc_sha256_state_struct _sha_i;
 static uint8_t _method;
 static uint8_t _suite;
 
-static ssize_t _send(coap_pkt_t *pkt, size_t len, char *addr_str, uint16_t port)
+static int _parse_ipv6_addr(char *addr_str, ipv6_addr_t *addr, uint16_t *netif)
 {
-    ipv6_addr_t addr;
-    sock_udp_ep_t remote;
-
-    remote.family = AF_INET6;
-    remote.port = port;
-
     /* parse for interface */
     char *iface = ipv6_addr_split_iface(addr_str);
+
     if (!iface) {
         if (gnrc_netif_numof() == 1) {
             /* assign the single interface found in gnrc_netif_numof() */
-            remote.netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
+            *netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
         }
         else {
-            remote.netif = SOCK_ADDR_ANY_NETIF;
+            *netif = SOCK_ADDR_ANY_NETIF;
         }
     }
     else {
         int pid = atoi(iface);
         if (gnrc_netif_get_by_pid(pid) == NULL) {
             puts("[initiator]: interface not valid");
-            return 0;
+            return -1;
         }
-        remote.netif = pid;
+        *netif = pid;
     }
 
     /* parse destination address */
-    if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
+    if (ipv6_addr_from_str(addr, addr_str) == NULL) {
         puts("[initiator]: unable to parse destination address");
-        return 0;
+        return -1;
     }
-    if ((remote.netif == SOCK_ADDR_ANY_NETIF) && ipv6_addr_is_link_local(&addr)) {
+    if ((*netif == SOCK_ADDR_ANY_NETIF) && ipv6_addr_is_link_local(addr)) {
         puts("[initiator]: must specify interface for link local target");
-        return 0;
+        return -1;
     }
-    memcpy(&remote.addr.ipv6[0], &addr.u8[0], sizeof(addr.u8));
+
+    return 0;
+}
+
+static ssize_t _send(coap_pkt_t *pkt, size_t len, ipv6_addr_t *addr, uint16_t netif, uint16_t port)
+{
+    sock_udp_ep_t remote;
+
+    remote.family = AF_INET6;
+    remote.port = port;
+    remote.netif = netif;
+    memcpy(&remote.addr.ipv6[0], addr->u8, sizeof(addr->u8));
 
     return nanocoap_request(pkt, NULL, &remote, len);
 }
@@ -112,6 +118,7 @@ static ssize_t _build_coap_pkt(coap_pkt_t *pkt, uint8_t *buf, ssize_t buflen,
     /* build header, confirmed message always post */
     ssize_t hdrlen = coap_build_hdr(pkt->hdr, COAP_TYPE_CON, token,
                                     sizeof(token), COAP_METHOD_POST, 1);
+
     coap_pkt_init(pkt, buf, buflen, hdrlen);
     coap_opt_add_string(pkt, COAP_OPT_URI_PATH, "/.well-known/edhoc", '/');
     coap_opt_add_uint(pkt, COAP_OPT_CONTENT_FORMAT, COAP_FORMAT_OCTET);
@@ -143,14 +150,21 @@ int _handshake_cmd(int argc, char **argv)
         port = atoi(argv[2]);
     }
 
+    /* parse address */
+    uint16_t netif;
+    ipv6_addr_t addr;
+    if (_parse_ipv6_addr(argv[1], &addr, &netif)) {
+        return -1;
+    }
+
     /* reset state */
     _ctx.state = EDHOC_WAITING;
 
     if ((msg_len = edhoc_create_msg1(&_ctx, corr, _method, _suite, msg, sizeof(msg))) > 0) {
-        printf("[initiator]: sending msg1 (%d bytes):\n", (int) msg_len);
+        printf("[initiator]: sending msg1 (%d bytes):\n", (int)msg_len);
         print_bstr(msg, msg_len);
         _build_coap_pkt(&pkt, buf, sizeof(buf), msg, msg_len);
-        len = _send(&pkt, COAP_BUF_SIZE, argv[1], port);
+        len = _send(&pkt, COAP_BUF_SIZE, &addr, netif, port);
     }
     else {
         puts("[initiator]: failed to create msg1");
@@ -165,10 +179,10 @@ int _handshake_cmd(int argc, char **argv)
     print_bstr(pkt.payload, pkt.payload_len);
 
     if ((msg_len = edhoc_create_msg3(&_ctx, pkt.payload, pkt.payload_len, msg, sizeof(msg))) > 0) {
-        printf("[initiator]: sending msg3 (%d bytes):\n", (int) msg_len);
+        printf("[initiator]: sending msg3 (%d bytes):\n", (int)msg_len);
         print_bstr(msg, msg_len);
         _build_coap_pkt(&pkt, buf, sizeof(buf), msg, msg_len);
-        len = _send(&pkt, COAP_BUF_SIZE, argv[1], port);
+        len = _send(&pkt, COAP_BUF_SIZE, &addr, netif, port);
     }
     else {
         puts("[initiator]: failed to create msg3");
