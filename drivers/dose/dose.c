@@ -66,6 +66,14 @@ static uint16_t crc16_update(uint16_t crc, uint8_t octet)
     return crc;
 }
 
+static void _crc_cb(void *ctx, uint8_t *data, size_t len)
+{
+    uint16_t *crc = ctx;
+    for (uint8_t *end = data + len; data != end; ++data) {
+        *crc = crc16_update(*crc, *data);
+    }
+}
+
 static void _init_standby(dose_t *ctx, const dose_params_t *params)
 {
     ctx->standby_pin = params->standby_pin;
@@ -145,8 +153,8 @@ static void _dose_watchdog_cb(void *arg, int chan)
 
         switch (ctx->state) {
         case DOSE_STATE_RECV:
-            if (ctx->recv_buf_ptr_last != ctx->recv_buf_ptr) {
-                ctx->recv_buf_ptr_last = ctx->recv_buf_ptr;
+            if (ctx->recv_buf_ptr_last != ctx->rb.cur) {
+                ctx->recv_buf_ptr_last = ctx->rb.cur;
                 break;
             }
 
@@ -194,11 +202,17 @@ static dose_signal_t state_transit_idle(dose_t *ctx, dose_signal_t signal)
     _watchdog_stop();
 
     if (ctx->state == DOSE_STATE_RECV) {
+        bool dirty = ctx->flags & DOSE_FLAG_RECV_BUF_DIRTY;
+        bool done  = ctx->flags & DOSE_FLAG_END_RECEIVED;
+
         /* We got here from RECV state. The driver's thread has to look
          * if this frame should be processed. By queuing NETDEV_EVENT_ISR,
          * the netif thread will call _isr at some time. */
-        SETBIT(ctx->flags, DOSE_FLAG_RECV_BUF_DIRTY);
-        netdev_trigger_event_isr(&ctx->netdev);
+        if (crb_end_chunk(&ctx->rb, !dirty && done)) {
+            netdev_trigger_event_isr(&ctx->netdev);
+        }
+
+        clear_recv_buf(ctx);
     }
 
     /* Enable interrupt for start bit sensing */
@@ -221,11 +235,13 @@ static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal)
          * anymore. Disable RX Start IRQs during the transmission. */
         _disable_sense(ctx);
         _watchdog_start();
+        crb_start_chunk(&ctx->rb);
     }
 
     if (signal == DOSE_SIGNAL_UART) {
         /* We received a new octet */
-        int esc = (ctx->flags & DOSE_FLAG_ESC_RECEIVED);
+        bool esc   = ctx->flags & DOSE_FLAG_ESC_RECEIVED;
+        bool dirty = ctx->flags & DOSE_FLAG_RECV_BUF_DIRTY;
         if (!esc && ctx->uart_octet == DOSE_OCTET_ESC) {
             SETBIT(ctx->flags, DOSE_FLAG_ESC_RECEIVED);
         }
@@ -237,12 +253,9 @@ static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal)
             if (esc) {
                 CLRBIT(ctx->flags, DOSE_FLAG_ESC_RECEIVED);
             }
-            /* Since the dirty flag is set after the RECV state is left,
-             * it indicates that the receive buffer contains unprocessed data
-             * from a previously received frame. Thus, we just ignore new data. */
-            if (!(ctx->flags & DOSE_FLAG_RECV_BUF_DIRTY)
-                && ctx->recv_buf_ptr < DOSE_FRAME_LEN) {
-                ctx->recv_buf[ctx->recv_buf_ptr++] = ctx->uart_octet;
+
+            if (!dirty && !crb_add_byte(&ctx->rb, ctx->uart_octet)) {
+                SETBIT(ctx->flags, DOSE_FLAG_RECV_BUF_DIRTY);
             }
         }
     }
@@ -362,9 +375,8 @@ static void clear_recv_buf(dose_t *ctx)
 {
     unsigned irq_state = irq_disable();
 
-    ctx->recv_buf_ptr = 0;
 #ifdef MODULE_DOSE_WATCHDOG
-    ctx->recv_buf_ptr_last = -1;
+    ctx->recv_buf_ptr_last = NULL;
 #endif
     CLRBIT(ctx->flags, DOSE_FLAG_RECV_BUF_DIRTY);
     CLRBIT(ctx->flags, DOSE_FLAG_END_RECEIVED);
@@ -374,58 +386,39 @@ static void clear_recv_buf(dose_t *ctx)
 
 static void _isr(netdev_t *netdev)
 {
+    uint8_t dst[ETHERNET_ADDR_LEN];
     dose_t *ctx = container_of(netdev, dose_t, netdev);
-    unsigned irq_state;
-    int dirty, end;
-
-    /* Get current flags atomically */
-    irq_state = irq_disable();
-    dirty = (ctx->flags & DOSE_FLAG_RECV_BUF_DIRTY);
-    end = (ctx->flags & DOSE_FLAG_END_RECEIVED);
-    irq_restore(irq_state);
-
-    /* If the receive buffer does not contain any data just abort ... */
-    if (!dirty) {
-        DEBUG("dose _isr(): no frame -> drop\n");
-        return;
-    }
-
-    /* If we haven't received a valid END octet just drop the incomplete frame. */
-    if (!end) {
-        DEBUG("dose _isr(): incomplete frame -> drop\n");
-        clear_recv_buf(ctx);
-        return;
-    }
-
-    /* The set dirty flag prevents recv_buf or recv_buf_ptr from being
-     * touched in ISR context. Thus, it is safe to work with them without
-     * IRQs being disabled or mutexes being locked. */
+    size_t len;
 
     /* Check for minimum length of an Ethernet packet */
-    if (ctx->recv_buf_ptr < sizeof(ethernet_hdr_t) + DOSE_FRAME_CRC_LEN) {
+    if (!crb_get_chunk_size(&ctx->rb, &len) ||
+        len < sizeof(ethernet_hdr_t) + DOSE_FRAME_CRC_LEN) {
         DEBUG("dose _isr(): frame too short -> drop\n");
-        clear_recv_buf(ctx);
+        crb_consume_chunk(&ctx->rb, NULL, 0);
         return;
     }
 
     /* Check the dst mac addr if the iface is not in promiscuous mode */
     if (!(ctx->opts & DOSE_OPT_PROMISCUOUS)) {
-        ethernet_hdr_t *hdr = (ethernet_hdr_t *) ctx->recv_buf;
-        if ((hdr->dst[0] & 0x1) == 0 && memcmp(hdr->dst, ctx->mac_addr.uint8, ETHERNET_ADDR_LEN) != 0) {
+
+        /* get destination address - length of RX frame has ben checked before */
+        crb_peek_bytes(&ctx->rb, dst, offsetof(ethernet_hdr_t, dst), sizeof(dst));
+
+        /* destination has to be either broadcast or our address */
+        if ((dst[0] & 0x1) == 0 && memcmp(dst, ctx->mac_addr.uint8, ETHERNET_ADDR_LEN) != 0) {
             DEBUG("dose _isr(): dst mac not matching -> drop\n");
-            clear_recv_buf(ctx);
+            crb_consume_chunk(&ctx->rb, NULL, 0);
             return;
         }
     }
 
     /* Check the CRC */
     uint16_t crc = 0xffff;
-    for (size_t i = 0; i < ctx->recv_buf_ptr; i++) {
-        crc = crc16_update(crc, ctx->recv_buf[i]);
-    }
+    crb_chunk_foreach(&ctx->rb, _crc_cb, &crc);
+
     if (crc != 0x0000) {
         DEBUG("dose _isr(): wrong crc 0x%04x -> drop\n", crc);
-        clear_recv_buf(ctx);
+        crb_consume_chunk(&ctx->rb, NULL, 0);
         return;
     }
 
@@ -440,27 +433,20 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
 
     (void)info;
 
-    size_t pktlen = ctx->recv_buf_ptr - DOSE_FRAME_CRC_LEN;
     if (!buf && !len) {
+        size_t pktlen;
         /* Return the amount of received bytes */
-        return pktlen;
+        if (crb_get_chunk_size(&ctx->rb, &pktlen)) {
+            return pktlen - DOSE_FRAME_CRC_LEN;
+        } else {
+            return 0;
+        }
     }
-    else if (!buf && len) {
-        /* The user drops the packet */
-        clear_recv_buf(ctx);
-        return pktlen;
-    }
-    else if (len < pktlen) {
-        /* The provided buffer is too small! */
-        DEBUG("dose _recv(): receive buffer too small\n");
-        clear_recv_buf(ctx);
+
+    if (crb_consume_chunk(&ctx->rb, buf, len)) {
+        return len;
+    } else {
         return -1;
-    }
-    else {
-        /* Copy the packet to the provided buffer. */
-        memcpy(buf, ctx->recv_buf, pktlen);
-        clear_recv_buf(ctx);
-        return pktlen;
     }
 }
 
@@ -748,9 +734,9 @@ static int _init(netdev_t *dev)
     /* Set state machine to defaults */
     irq_state = irq_disable();
     ctx->opts = 0;
-    ctx->recv_buf_ptr = 0;
     ctx->flags = 0;
     ctx->state = DOSE_STATE_INIT;
+    crb_init(&ctx->rb, ctx->recv_buf, sizeof(ctx->recv_buf));
     irq_restore(irq_state);
 
     state(ctx, DOSE_SIGNAL_INIT);
