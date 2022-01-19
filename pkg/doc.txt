@@ -13,12 +13,10 @@
  * Using packages
  * ==============
  * To add a package to the list of compiled modules you have to add it to the
- * `USEPKG` macro in your application's Makefile. If the package provides
- * header files you might need to update the `INCLUDE` macro, too:
+ * `USEPKG` macro in your application's Makefile:
  *
  * ~~~~~~~~ {.mk}
  * USEPKG += <pkg_name>
- * INCLUDE += $(RIOTPKG)/<pkg_name>/...
  * ~~~~~~~~
  *
  * When the package can be built out-of-source, the source code of external
@@ -52,6 +50,14 @@
  *    apply the patch and how to build the package as a RIOT module.
  *    A rough template for several methods of acquiring a package is provided in
  *    `pkg/Makefile.git` and `pkg/Makefile.http`.
+ *
+ * If your port or the package provide header files, you need to update the
+ * `INCLUDES` variable in the package's `Makefile.include`:
+ *
+ * ~~~~~~~~ {.mk}
+ * INCLUDES += -I$(RIOTPKG)/<pkg_name>/include # headers provided by the port
+ * INCLUDES += -I$(PKGDIRBASE)/<pkg_name> # headers provided by the package
+ * ~~~~~~~~
  *
  * Patch files can be included in a `patches` directory in the package dir.
  * These are applied to the upstream package to make it build with RIOT.
