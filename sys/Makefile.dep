@@ -839,8 +839,6 @@ ifneq (,$(filter fido2_ctap,$(USEMODULE)))
   USEPKG += tinycbor
   USEPKG += micro-ecc
 
-  INCLUDE += $(RIOTPKG)/tinycbor
-
   USEMODULE += mtd_flashpage
   USEMODULE += mtd_write_page
   USEMODULE += ztimer_msec
