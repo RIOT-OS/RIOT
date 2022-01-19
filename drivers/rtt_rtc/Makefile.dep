@@ -2,3 +2,5 @@
 ifeq (,$(UNIT_TESTS))
   FEATURES_REQUIRED += periph_rtt
 endif
+
+USEMODULE += rtc_utils
