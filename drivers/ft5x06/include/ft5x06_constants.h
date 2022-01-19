@@ -30,23 +30,27 @@ extern "C" {
  * @{
  */
 #define FT5X06_I2C_DEFAULT_ADDRESS                  (0x38)
-#if IS_USED(MODULE_FT6X06) || IS_USED(MODULE_FT6X36)
-#define FT5X06_VENDOR_ID                            (0xcd)
-#else
+
+/**
+ * @brief Vendor ID for FT6X06 and FT6X36 models.
+ */
+#define FT6XX6_VENDOR_ID                            (0xcd)
+
+/**
+ * @brief Vendor ID for FT5606, FT5X16, FT5X06I, FT5336, FT3316, FT5436I, FT5336I, FT5X46 models.
+ */
 #define FT5X06_VENDOR_ID                            (0x51)
-#endif
-#if IS_USED(MODULE_FT6X06) || IS_USED(MODULE_FT6X36)
-#define FT5X06_TOUCHES_COUNT_MAX                    (2)
-#else
+
+/**
+ * @brief Maximum touches count for FT6X06 and FT6X36 models.
+ */
+#define FT6XX6_TOUCHES_COUNT_MAX                    (2)
+
+/**
+ * @brief Maximum touches count for FT5606, FT5X16, FT5X06I, FT5336, FT3316, FT5436I, FT5336I,
+ * FT5X46 models.
+ */
 #define FT5X06_TOUCHES_COUNT_MAX                    (5)
-#endif
-#if IS_USED(MODULE_FT6X06) || IS_USED(MODULE_FT6X36) || IS_USED(MODULE_FT5336) || \
-    IS_USED(MODULE_FT3316) || IS_USED(MODULE_FT5436I) || IS_USED(MODULE_FT5336I) || \
-    IS_USED(MODULE_FT5X46)
-#define FT5X06_AUTO_CALIB_NEEDED                    0
-#else
-#define FT5X06_AUTO_CALIB_NEEDED                    1
-#endif
 /** @} */
 
 /**

@@ -26,6 +26,7 @@
 #include "periph/gpio.h"
 
 #include "ft5x06.h"
+#include "ft5x06_internal.h"
 #include "ft5x06_touch_dev.h"
 
 #define ENABLE_DEBUG 0
@@ -56,7 +57,7 @@ uint8_t _ft5x06_touches(const touch_dev_t *touch_dev, touch_t *touches, size_t l
     ft5x06_read_touch_count(dev, &ret);
 
     if (ret && touches != NULL) {
-        assert(len <= FT5X06_TOUCHES_COUNT_MAX);
+        assert(len <= ft5x06_get_touches_count_max(dev));
         ft5x06_read_touch_positions(dev, (ft5x06_touch_position_t *)touches, len);
     }
 

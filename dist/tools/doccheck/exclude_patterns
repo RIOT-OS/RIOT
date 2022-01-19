@@ -14705,3 +14705,4 @@ drivers/ft5x06/include/ft5x06_constants\.h:[0-9]+: warning: Member FT5X06_G_MODE
 drivers/ft5x06/include/ft5x06_constants\.h:[0-9]+: warning: Member FT5X06_G_MODE_INTERRUPT_SHIFT \(macro definition\) of file ft5x06_constants\.h is not documented\.
 drivers/ft5x06/include/ft5x06_constants\.h:[0-9]+: warning: Member FT5X06_G_MODE_INTERRUPT_POLLING \(macro definition\) of file ft5x06_constants\.h is not documented\.
 drivers/ft5x06/include/ft5x06_constants\.h:[0-9]+: warning: Member FT5X06_G_MODE_INTERRUPT_TRIGGER \(macro definition\) of file ft5x06_constants\.h is not documented\.
+drivers/ft5x06/include/ft5x06_params\.h:[0-9]+: warning: Member FT5X06_PARAM_TYPE \(macro definition\) of file ft5x06_params\.h is not documented\.

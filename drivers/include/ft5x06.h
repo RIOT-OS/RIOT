@@ -61,6 +61,23 @@ typedef enum {
 } ft5x06_touch_gesture_t;
 
 /**
+ * @brief  Device type
+ */
+typedef enum {
+    FT5X06_TYPE_FT5X06,                 /**< FT5X06 */
+    FT5X06_TYPE_FT5606,                 /**< FT5606 */
+    FT5X06_TYPE_FT5X16,                 /**< FT5X16 */
+    FT5X06_TYPE_FT6X06,                 /**< FT6X06 */
+    FT5X06_TYPE_FT6X36,                 /**< FT6X36 */
+    FT5X06_TYPE_FT5X06I,                /**< FT5X06I */
+    FT5X06_TYPE_FT5336,                 /**< FT5336 */
+    FT5X06_TYPE_FT3316,                 /**< FT3316 */
+    FT5X06_TYPE_FT5436I,                /**< FT5436I */
+    FT5X06_TYPE_FT5336I,                /**< FT5336I */
+    FT5X06_TYPE_FT5X46,                 /**< FT5X46 */
+} ft5x06_type_t;
+
+/**
  * @brief   Signature of the touch event callback triggered from interrupt
  *
  * @param[in] arg           optional context for the callback
@@ -76,6 +93,7 @@ typedef struct {
     gpio_t int_pin;         /**< Touch screen interrupt pin */
     uint16_t xmax;          /**< Touch screen max X position */
     uint16_t ymax;          /**< Touch screen max Y position */
+    ft5x06_type_t type;     /**< Device type */
 } ft5x06_params_t;
 
 /**
