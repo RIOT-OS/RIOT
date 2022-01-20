@@ -93,12 +93,38 @@
 #ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_TX_PER_PERIOD
 #define CONFIG_GNRC_IPV6_AUTO_SUBNETS_TX_PER_PERIOD (3)
 #endif
+
 /**
  * @brief How long to wait for other routers annoucements before resending
  *        or creating subnets when the retry counter is exhausted
  */
 #ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_TIMEOUT_MS
 #define CONFIG_GNRC_IPV6_AUTO_SUBNETS_TIMEOUT_MS    (50)
+#endif
+
+/**
+ * @brief How many bits of a new prefix have to match the old prefix
+ *        for it to be considered for replacement.
+ *
+ *        Set this if you want to join multiple subnets at the same time.
+ *
+ *        If you use `gnrc_ipv6_auto_subnets` instead of `gnrc_ipv6_auto_subnets_simple`
+ *        make sure to also set CONFIG_GNRC_IPV6_AUTO_SUBNETS_NUMOF accordingly.
+ */
+#ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_FIX_LEN
+#define CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_FIX_LEN (0)
+#endif
+
+/**
+ * @brief Number of subnets that can be configured.
+ *
+ *        This is not needed when using the `gnrc_ipv6_auto_subnets_simple` module.
+ *
+ *        If this is set to any number higher than 1, make sure to also configure
+ *        CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_FIX_LEN to suit your setup.
+ */
+#ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_NUMOF
+#define CONFIG_GNRC_IPV6_AUTO_SUBNETS_NUMOF         (1)
 #endif
 
 #define SERVER_THREAD_STACKSIZE                     (THREAD_STACKSIZE_DEFAULT)
@@ -122,7 +148,8 @@ typedef struct __attribute__((packed)) {
 
 /* keep a copy of PIO information in memory */
 static gnrc_netif_t *_upstream;
-static ndp_opt_pi_t _pio_cache;
+static ndp_opt_pi_t _pio_cache[CONFIG_GNRC_IPV6_AUTO_SUBNETS_NUMOF];
+static mutex_t _pio_cache_lock;
 
 static char auto_subnets_stack[SERVER_THREAD_STACKSIZE];
 static msg_t server_queue[SERVER_MSG_QUEUE_SIZE];
@@ -133,6 +160,23 @@ static uint8_t l2addrs[CONFIG_GNRC_IPV6_AUTO_SUBNETS_PEERS_MAX]
 
 /* PID of the event thread */
 static kernel_pid_t _server_pid;
+
+static bool _store_pio(const ndp_opt_pi_t *pio)
+{
+    mutex_lock(&_pio_cache_lock);
+
+    for (unsigned i = 0; i < ARRAY_SIZE(_pio_cache); ++i) {
+        if (_pio_cache[i].len == 0) {
+            _pio_cache[i] = *pio;
+
+            mutex_unlock(&_pio_cache_lock);
+            return true;
+        }
+    }
+
+    mutex_unlock(&_pio_cache_lock);
+    return false;
+}
 
 static int _send_udp(gnrc_netif_t *netif, const ipv6_addr_t *addr,
                      uint16_t port, const void *data, size_t len)
@@ -218,7 +262,7 @@ static bool _remove_old_prefix(gnrc_netif_t *netif,
     gnrc_pktsnip_t *tmp;
     void *state = NULL;
     ipv6_addr_t old_pfx;
-    uint8_t old_pfx_len = 0;
+    uint8_t old_pfx_len = CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_FIX_LEN;
 
     /* iterate prefix list to see if the prefix already exists */
     while (gnrc_ipv6_nib_pl_iter(netif->pid, &state, &entry)) {
@@ -237,7 +281,7 @@ static bool _remove_old_prefix(gnrc_netif_t *netif,
     }
 
     /* no prefix found */
-    if (old_pfx_len == 0) {
+    if (old_pfx_len == CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_FIX_LEN) {
         return false;
     }
 
@@ -345,7 +389,10 @@ void gnrc_ipv6_nib_rtr_adv_pio_cb(gnrc_netif_t *upstream, const ndp_opt_pi_t *pi
 #else
 
     /* store PIO information for later use */
-    _pio_cache = *pio;
+    if (!_store_pio(pio)) {
+        DEBUG("auto_subnets: no space left in PIO cache, increase CONFIG_GNRC_IPV6_AUTO_SUBNETS_NUMOF\n");
+        return;
+    }
     _upstream  = upstream;
 
     /* start advertising by sending timeout message to the server thread */
@@ -501,6 +548,25 @@ static void _send_announce(uint8_t local_subnets, xtimer_t *timer, msg_t *msg)
     DEBUG("auto_subnets: announce sent, next timeout in %" PRIu32 " µs\n", timeout_us);
 }
 
+static void _process_pio_cache(uint8_t subnets, uint8_t idx_start, gnrc_netif_t *upstream)
+{
+    mutex_lock(&_pio_cache_lock);
+
+    for (unsigned i = 0; i < ARRAY_SIZE(_pio_cache); ++i) {
+        if (!_pio_cache[i].len) {
+            continue;
+        }
+
+        /* use PIO for prefix configuration */
+        _configure_subnets(subnets, idx_start, upstream, &_pio_cache[i]);
+
+        /* invalidate entry */
+        _pio_cache[i].len = 0;
+    }
+
+    mutex_unlock(&_pio_cache_lock);
+}
+
 static void *_eventloop(void *arg)
 {
     (void)arg;
@@ -539,7 +605,7 @@ static void *_eventloop(void *arg)
                 _send_announce(local_subnets, &timeout_timer, &timeout_msg);
             } else {
                 /* config round done, configure subnets */
-                _configure_subnets(subnets, idx_start, _upstream, &_pio_cache);
+                _process_pio_cache(subnets, idx_start, _upstream);
 
                 /* start a new round of counting */
                 tx_period = CONFIG_GNRC_IPV6_AUTO_SUBNETS_TX_PER_PERIOD;
