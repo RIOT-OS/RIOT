@@ -444,7 +444,7 @@ const char *thread_getname(kernel_pid_t pid);
  *
  * Only works if the thread was created with the flag THREAD_CREATE_STACKTEST.
  *
- * @param[in] stack the stack you want to measure. Try `thread_get_active()->stack_start`
+ * @param[in] stack the stack you want to measure. Try `thread_get_stackstart(thread_get_active())`
  *
  * @return          the amount of unused space of the thread's stack
  */
