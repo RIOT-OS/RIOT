@@ -18,8 +18,12 @@
  * @}
  */
 
+#include <stdlib.h>
+#include <sys/lock.h>
 #include <sys/unistd.h>
+#include <sys/time.h>
 
+#include "div.h"
 #include "esp/common_macros.h"
 #include "irq_arch.h"
 #include "periph_cpu.h"
@@ -88,6 +92,55 @@ void _abort(void)
 void _exit_r(struct _reent *r, int status)
 {
     _exit(status);
+}
+
+#if !IS_USED(MODULE_VFS)
+int _fcntl_r(struct _reent *r, int fd, int cmd, int arg)
+                              __attribute__((weak,alias("_no_sys_func")));
+#endif
+
+#ifndef CLOCK_REALTIME
+#define CLOCK_REALTIME (clockid_t)1
+#endif
+
+#ifndef CLOCK_MONOTONIC
+#define CLOCK_MONOTONIC (clockid_t)4
+#endif
+
+int clock_gettime_r(struct _reent *r, clockid_t clock_id, struct timespec *tp)
+{
+   if (tp == NULL) {
+        r->_errno = EINVAL;
+        return -1;
+    }
+
+    struct timeval tv;
+    uint64_t now = 0;
+
+    switch (clock_id) {
+    case CLOCK_REALTIME:
+        if (_gettimeofday_r(r, &tv, NULL))  {
+            return -1;
+        }
+        tp->tv_sec = tv.tv_sec;
+        tp->tv_nsec = tv.tv_usec * NS_PER_US;
+        break;
+    case CLOCK_MONOTONIC:
+        now = system_get_time_64();
+        tp->tv_sec = div_u64_by_1000000(now);
+        tp->tv_nsec = (now - (tp->tv_sec * US_PER_SEC)) * NS_PER_US;
+        break;
+    default:
+        r->_errno = EINVAL;
+        return -1;
+    }
+
+    return 0;
+}
+
+int clock_gettime(clockid_t clock_id, struct timespec *tp)
+{
+    return clock_gettime_r(_GLOBAL_REENT, clock_id, tp);
 }
 
 static int _no_sys_func(struct _reent *r)
