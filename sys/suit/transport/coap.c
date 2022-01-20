@@ -104,11 +104,10 @@ static inline void _print_download_progress(suit_manifest_t *manifest,
 
 static kernel_pid_t _suit_coap_pid;
 
-ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
-                             void *context)
+ssize_t coap_subtree_handler(coap_pkt_t *pkt, coap_build_pkt_t *response, void *ctx)
 {
-    coap_resource_subtree_t *subtree = context;
-    return coap_tree_handler(pkt, buf, len, subtree->resources,
+    coap_resource_subtree_t *subtree = ctx;
+    return coap_tree_handler(pkt, response, subtree->resources,
                              subtree->resources_numof);
 }
 
@@ -292,16 +291,16 @@ void suit_coap_run(void)
                   _suit_coap_thread, NULL, "suit_coap");
 }
 
-static ssize_t _version_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
+static ssize_t _version_handler(coap_pkt_t *pkt, coap_build_pkt_t *response,
                                 void *context)
 {
     (void)context;
-    return coap_reply_simple(pkt, COAP_CODE_205, buf, len,
+    return coap_reply_simple(pkt, COAP_CODE_205, response,
                              COAP_FORMAT_TEXT, (uint8_t *)"NONE", 4);
 }
 
 #ifdef MODULE_RIOTBOOT_SLOT
-static ssize_t _slot_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
+static ssize_t _slot_handler(coap_pkt_t *pkt, coap_build_pkt_t *response,
                              void *context)
 {
     /* context is passed either as NULL or 0x1 for /active or /inactive */
@@ -314,12 +313,12 @@ static ssize_t _slot_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
         c += riotboot_slot_current();
     }
 
-    return coap_reply_simple(pkt, COAP_CODE_205, buf, len,
+    return coap_reply_simple(pkt, COAP_CODE_205, response,
                              COAP_FORMAT_TEXT, (uint8_t *)&c, 1);
 }
 #endif
 
-static ssize_t _trigger_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
+static ssize_t _trigger_handler(coap_pkt_t *pkt, coap_build_pkt_t *response,
                                 void *context)
 {
     (void)context;
@@ -339,7 +338,7 @@ static ssize_t _trigger_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
         code = COAP_CODE_REQUEST_ENTITY_INCOMPLETE;
     }
 
-    return coap_reply_simple(pkt, code, buf, len,
+    return coap_reply_simple(pkt, code, response,
                              COAP_FORMAT_NONE, NULL, 0);
 }
 

@@ -300,12 +300,17 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
         }
         else if (res > 0) {
             coap_pkt_t pkt;
+            coap_build_pkt_t response;
+
             if (coap_parse(&pkt, (uint8_t *)buf, res) < 0) {
                 DEBUG("error parsing packet\n");
                 continue;
             }
-            if ((res = coap_handle_req(&pkt, buf, bufsize)) > 0) {
-                sock_udp_send(&sock, buf, res, &remote);
+
+            coap_init_response(&pkt, &response, buf, bufsize);
+            if ((res = coap_handle_req(&pkt, &response)) >= 0) {
+                size_t pkt_len = (uintptr_t)response.cur - (uintptr_t)response.hdr;
+                sock_udp_send(&sock, buf, pkt_len, &remote);
             }
             else {
                 DEBUG("error handling request %d\n", (int)res);

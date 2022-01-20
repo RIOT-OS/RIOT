@@ -70,17 +70,13 @@ void suit_coap_run(void);
 /**
  * @brief   Coap subtree handler
  *
- * @param[in,out]   pkt     Packet struct containing the request. Is reused for
- *                          the response
- * @param[in]       buf     Buffer to write reply to
- * @param[in]       len     Total length of the buffer associated with the
- *                          request
- * @param[in]       buf     Buffer to write reply to
+ * @param[in,out]   pkt     Packet struct containing the request.
+ * @param[out]      rsp     Packet struct used for the response
+ * @param[in]       ctx     Subtree context
  *
  * @returns     ssize_t     Size of the reply
  */
-ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf,
-                             size_t len, void *context);
+ssize_t coap_subtree_handler(coap_pkt_t *pkt, coap_build_pkt_t *rsp, void *context);
 
 /**
  * @brief   Type for CoAP resource subtrees

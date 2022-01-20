@@ -22,62 +22,57 @@ static const uint8_t block2_intro[] = "This is RIOT (Version: ";
 static const uint8_t block2_board[] = " running on a ";
 static const uint8_t block2_mcu[] = " board with a ";
 
-static ssize_t _echo_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _echo_handler(coap_pkt_t *pkt, coap_build_pkt_t *response, void *context)
 {
     (void)context;
     char uri[CONFIG_NANOCOAP_URI_MAX];
 
     if (coap_get_uri_path(pkt, (uint8_t *)uri) <= 0) {
-        return coap_reply_simple(pkt, COAP_CODE_INTERNAL_SERVER_ERROR, buf,
-                                 len, COAP_FORMAT_TEXT, NULL, 0);
+        return coap_reply_simple(pkt, COAP_CODE_INTERNAL_SERVER_ERROR, response,
+                                 COAP_FORMAT_TEXT, NULL, 0);
     }
     char *sub_uri = uri + strlen("/echo/");
     size_t sub_uri_len = strlen(sub_uri);
-    return coap_reply_simple(pkt, COAP_CODE_CONTENT, buf, len, COAP_FORMAT_TEXT,
+    return coap_reply_simple(pkt, COAP_CODE_CONTENT, response, COAP_FORMAT_TEXT,
                              (uint8_t *)sub_uri, sub_uri_len);
 }
 
-static ssize_t _riot_board_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _riot_board_handler(coap_pkt_t *pkt, coap_build_pkt_t *response, void *context)
 {
     (void)context;
-    return coap_reply_simple(pkt, COAP_CODE_205, buf, len,
-            COAP_FORMAT_TEXT, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
+    return coap_reply_simple(pkt, COAP_CODE_205, response, COAP_FORMAT_TEXT,
+                             RIOT_BOARD, strlen(RIOT_BOARD));
 }
 
-static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _riot_block2_handler(coap_pkt_t *pkt, coap_build_pkt_t *response, void *context)
 {
     (void)context;
     coap_block_slicer_t slicer;
     coap_block2_init(pkt, &slicer);
-    uint8_t *payload = buf + coap_get_total_hdr_len(pkt);
 
-    uint8_t *bufpos = payload;
-
-    bufpos += coap_put_option_ct(bufpos, 0, COAP_FORMAT_TEXT);
-    bufpos += coap_opt_put_block2(bufpos, COAP_OPT_CONTENT_FORMAT, &slicer, 1);
-    *bufpos++ = 0xff;
+    response->cur += coap_put_option_ct(response->cur, 0, COAP_FORMAT_TEXT);
+    response->cur += coap_opt_put_block2(response->cur, COAP_OPT_CONTENT_FORMAT, &slicer, 1);
+    *response->cur++ = 0xff;
 
     /* Add actual content */
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, block2_intro, sizeof(block2_intro)-1);
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_VERSION, strlen(RIOT_VERSION));
-    bufpos += coap_blockwise_put_char(&slicer, bufpos, ')');
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, block2_board, sizeof(block2_board)-1);
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, block2_mcu, sizeof(block2_mcu)-1);
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_MCU, strlen(RIOT_MCU));
+    response->cur += coap_blockwise_put_bytes(&slicer, response->cur, block2_intro, sizeof(block2_intro)-1);
+    response->cur += coap_blockwise_put_bytes(&slicer, response->cur, (uint8_t*)RIOT_VERSION, strlen(RIOT_VERSION));
+    response->cur += coap_blockwise_put_char(&slicer, response->cur, ')');
+    response->cur += coap_blockwise_put_bytes(&slicer, response->cur, block2_board, sizeof(block2_board)-1);
+    response->cur += coap_blockwise_put_bytes(&slicer, response->cur, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
+    response->cur += coap_blockwise_put_bytes(&slicer, response->cur, block2_mcu, sizeof(block2_mcu)-1);
+    response->cur += coap_blockwise_put_bytes(&slicer, response->cur, (uint8_t*)RIOT_MCU, strlen(RIOT_MCU));
     /* To demonstrate individual chars */
-    bufpos += coap_blockwise_put_char(&slicer, bufpos, ' ');
-    bufpos += coap_blockwise_put_char(&slicer, bufpos, 'M');
-    bufpos += coap_blockwise_put_char(&slicer, bufpos, 'C');
-    bufpos += coap_blockwise_put_char(&slicer, bufpos, 'U');
-    bufpos += coap_blockwise_put_char(&slicer, bufpos, '.');
+    response->cur += coap_blockwise_put_char(&slicer, response->cur, ' ');
+    response->cur += coap_blockwise_put_char(&slicer, response->cur, 'M');
+    response->cur += coap_blockwise_put_char(&slicer, response->cur, 'C');
+    response->cur += coap_blockwise_put_char(&slicer, response->cur, 'U');
+    response->cur += coap_blockwise_put_char(&slicer, response->cur, '.');
 
-    unsigned payload_len = bufpos - payload;
-    return coap_block2_build_reply(pkt, COAP_CODE_205,
-                                   buf, len, payload_len, &slicer);
+    return coap_block2_build_reply(pkt, COAP_CODE_205, response, &slicer);
 }
 
-static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _riot_value_handler(coap_pkt_t *pkt, coap_build_pkt_t *response, void *context)
 {
     (void) context;
 
@@ -108,11 +103,10 @@ static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, vo
         }
     }
 
-    return coap_reply_simple(pkt, code, buf, len,
-            COAP_FORMAT_TEXT, (uint8_t*)rsp, p);
+    return coap_reply_simple(pkt, code, response, COAP_FORMAT_TEXT, (uint8_t*)rsp, p);
 }
 
-ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, void *context)
+ssize_t _sha256_handler(coap_pkt_t* pkt, coap_build_pkt_t *response, void *context)
 {
     (void)context;
 
@@ -149,7 +143,7 @@ ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, void *context
         result_len = SHA256_DIGEST_LENGTH * 2;
     }
 
-    ssize_t reply_len = coap_build_reply(pkt, result, buf, len, 0);
+    ssize_t reply_len = coap_build_reply(pkt, result, response);
     uint8_t *pkt_pos = (uint8_t*)pkt->hdr + reply_len;
     if (blockwise) {
         pkt_pos += coap_opt_put_block1_control(pkt_pos, 0, &block1);
