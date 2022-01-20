@@ -214,7 +214,7 @@ char * os_readfile(const char *name, size_t *len);
 #endif
 
 #ifndef os_bzero
-#define os_bzero(s, n) bzero(s, n)
+#define os_bzero(s, n) memset(s, 0, n)
 #endif
 
 

@@ -355,7 +355,7 @@ void* IRAM_ATTR __wrap__calloc_r(struct _reent *r, size_t count, size_t size)
     }
     void *result = heap_caps_malloc_default(size_total);
     if (result) {
-        bzero(result, size_total);
+        memset(result, 0, size_total);
     }
     return result;
 }
