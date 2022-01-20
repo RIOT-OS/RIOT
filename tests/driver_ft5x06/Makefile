@@ -1,7 +1,6 @@
 BOARD ?= stm32f746g-disco
 include ../Makefile.tests_common
 
-DRIVER ?= ft5336
-USEMODULE += $(DRIVER)
+USEMODULE += ft5x06
 
 include $(RIOTBASE)/Makefile.include
