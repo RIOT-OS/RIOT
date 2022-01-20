@@ -336,6 +336,10 @@ static NORETURN void IRAM system_init (void)
     /* initialize stdio */
     stdio_init();
 
+    /* disable buffering in stdio */
+    setvbuf(_stdout_r(_REENT), NULL, _IONBF, 0);
+    setvbuf(_stderr_r(_REENT), NULL, _IONBF, 0);
+
     /* trigger static peripheral initialization */
     periph_init();
 
