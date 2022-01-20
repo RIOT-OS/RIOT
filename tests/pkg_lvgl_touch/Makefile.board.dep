@@ -1,0 +1,5 @@
+ifeq (native,$(BOARD))
+  USEPKG += lv_drivers
+  USEMODULE += lv_drivers_display_monitor
+  USEMODULE += lv_drivers_indev_mouse
+endif

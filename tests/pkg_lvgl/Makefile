@@ -9,7 +9,7 @@ USEMODULE += lvgl_contrib
 
 # SDL requires more stack
 ifeq (native,$(BOARD))
-  CFLAGS += -DTHREAD_STACKSIZE_MAIN=48*1024
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN=64*1024
 else
   CFLAGS += -DTHREAD_STACKSIZE_MAIN=2048
 endif
