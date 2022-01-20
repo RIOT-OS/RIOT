@@ -58,7 +58,7 @@ static wc_Sha256 _sha_r;
 struct tc_sha256_state_struct _sha_r;
 #endif
 
-ssize_t _edhoc_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+ssize_t _edhoc_handler(coap_pkt_t *pkt, coap_rsp_pkt_t *response, void *context)
 {
     (void)context;
     ssize_t msg_len = 0;
@@ -76,19 +76,19 @@ ssize_t _edhoc_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
                  edhoc_create_msg2(&_ctx, pkt->payload, pkt->payload_len, msg, sizeof(msg))) >= 0) {
             printf("[responder]: sending msg2 (%d bytes):\n", (int) msg_len);
             print_bstr(msg, msg_len);
-            msg_len = coap_reply_simple(pkt, COAP_CODE_204, buf, len, COAP_FORMAT_OCTET, msg,
+            msg_len = coap_reply_simple(pkt, COAP_CODE_204, response, COAP_FORMAT_OCTET, msg,
                                         msg_len);
         }
         else {
             puts("[responder]: failed to create msg2");
-            coap_reply_simple(pkt, COAP_CODE_404, buf, len, COAP_FORMAT_TEXT, NULL, 0);
+            coap_reply_simple(pkt, COAP_CODE_404, response, COAP_FORMAT_TEXT, NULL, 0);
             return -1;
         }
     }
     else if (_ctx.state == EDHOC_SENT_MESSAGE_2) {
         puts("[responder]: finalize exchange");
         edhoc_resp_finalize(&_ctx, pkt->payload, pkt->payload_len, false, NULL, 0);
-        msg_len = coap_reply_simple(pkt, COAP_CODE_204, buf, len, COAP_FORMAT_OCTET, NULL, 0);
+        msg_len = coap_reply_simple(pkt, COAP_CODE_204, response, COAP_FORMAT_OCTET, NULL, 0);
     }
 
     if (_ctx.state == EDHOC_FINALIZED) {

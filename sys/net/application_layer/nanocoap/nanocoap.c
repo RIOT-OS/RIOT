@@ -392,7 +392,7 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, unsign
     return (blkopt & 0x8) ? 1 : 0;
 }
 
-ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len)
+ssize_t coap_handle_req(coap_pkt_t *pkt, coap_rsp_pkt_t *response)
 {
     if (coap_get_code_class(pkt) != COAP_REQ) {
         DEBUG("coap_handle_req(): not a request.\n");
@@ -400,14 +400,12 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
     }
 
     if (pkt->hdr->code == 0) {
-        return coap_build_reply(pkt, COAP_CODE_EMPTY, resp_buf, resp_buf_len, 0);
+        return coap_build_reply(pkt, COAP_CODE_EMPTY, response);
     }
-    return coap_tree_handler(pkt, resp_buf, resp_buf_len, coap_resources,
-                             coap_resources_numof);
+    return coap_tree_handler(pkt, response, coap_resources, coap_resources_numof);
 }
 
-ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
-                          unsigned resp_buf_len,
+ssize_t coap_tree_handler(coap_pkt_t *pkt, coap_rsp_pkt_t *response,
                           const coap_resource_t *resources,
                           size_t resources_numof)
 {
@@ -433,47 +431,43 @@ ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
             break;
         }
         else {
-            return resource->handler(pkt, resp_buf, resp_buf_len, resource->context);
+            return resource->handler(pkt, response, resource->context);
         }
     }
 
-    return coap_build_reply(pkt, COAP_CODE_404, resp_buf, resp_buf_len, 0);
+    return coap_build_reply(pkt, COAP_CODE_404, response);
 }
 
 ssize_t coap_reply_simple(coap_pkt_t *pkt,
                           unsigned code,
-                          uint8_t *buf, size_t len,
+                          coap_rsp_pkt_t *response,
                           unsigned ct,
-                          const uint8_t *payload, uint8_t payload_len)
+                          const void *payload, uint8_t payload_len)
 {
-    uint8_t *payload_start = buf + coap_get_total_hdr_len(pkt);
-    uint8_t *bufpos = payload_start;
+    coap_build_reply(pkt, code, response);
 
-    if (payload_len) {
-        bufpos += coap_put_option_ct(bufpos, 0, ct);
-        *bufpos++ = 0xff;
+    if (payload_len == 0) {
+        return 0;
     }
 
-    ssize_t res = coap_build_reply(pkt, code, buf, len,
-                                   bufpos - payload_start + payload_len);
+    assert(payload);
 
-    if (payload_len && (res > 0)) {
-        assert(payload);
-        memcpy(bufpos, payload, payload_len);
-    }
+    response->cur += coap_put_option_ct(response->cur, 0, ct);
+    *response->cur++ = 0xff;
 
-    return res;
-}
-
-ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
-                         uint8_t *rbuf, unsigned rlen, unsigned payload_len)
-{
-    unsigned tkl = coap_get_token_len(pkt);
-    unsigned len = sizeof(coap_hdr_t) + tkl;
-
-    if ((len + payload_len) > rlen) {
+    if (response->cur + payload_len >= response->end) {
         return -ENOSPC;
     }
+
+    memcpy(response->cur, payload, payload_len);
+    response->cur += payload_len;
+
+    return 0;
+}
+
+ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code, coap_rsp_pkt_t *response)
+{
+    unsigned tkl = coap_get_token_len(pkt);
 
     /* if code is COAP_CODE_EMPTY (zero), assume Reset (RST) type */
     unsigned type = COAP_TYPE_RST;
@@ -486,14 +480,11 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
         }
     }
 
-    coap_build_hdr((coap_hdr_t *)rbuf, type, pkt->token, tkl, code,
-                   ntohs(pkt->hdr->id));
-    coap_hdr_set_type((coap_hdr_t *)rbuf, type);
-    coap_hdr_set_code((coap_hdr_t *)rbuf, code);
+    coap_build_hdr(response->hdr, type, pkt->token, tkl, code, ntohs(pkt->hdr->id));
+    coap_hdr_set_type(response->hdr, type);
+    coap_hdr_set_code(response->hdr, code);
 
-    len += payload_len;
-
-    return len;
+    return 0;
 }
 
 ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, uint8_t *token, size_t token_len, unsigned code, uint16_t id)
@@ -1041,15 +1032,15 @@ bool coap_block_finish(coap_block_slicer_t *slicer, uint16_t option)
 }
 
 ssize_t coap_block2_build_reply(coap_pkt_t *pkt, unsigned code,
-                                uint8_t *rbuf, unsigned rlen, unsigned payload_len,
+                                coap_rsp_pkt_t *response,
                                 coap_block_slicer_t *slicer)
 {
     /* Check if the generated data filled the requested block */
     if (slicer->cur < slicer->start) {
-        return coap_build_reply(pkt, COAP_CODE_BAD_OPTION, rbuf, rlen, 0);
+        return coap_build_reply(pkt, COAP_CODE_BAD_OPTION, response);
     }
     coap_block2_finish(slicer);
-    return coap_build_reply(pkt, code, rbuf, rlen, payload_len);
+    return coap_build_reply(pkt, code, response);
 }
 
 size_t coap_blockwise_put_char(coap_block_slicer_t *slicer, uint8_t *bufpos, char c)
@@ -1093,33 +1084,29 @@ size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
     return str_len;
 }
 
-ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, uint8_t *buf, \
-                                             size_t len, void *context)
+ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, coap_rsp_pkt_t *response,
+                                             void *context)
 {
     (void)context;
     coap_block_slicer_t slicer;
     coap_block2_init(pkt, &slicer);
-    uint8_t *payload = buf + coap_get_total_hdr_len(pkt);
-    uint8_t *bufpos = payload;
-    bufpos += coap_put_option_ct(bufpos, 0, COAP_FORMAT_LINK);
-    bufpos += coap_opt_put_block2(bufpos, COAP_OPT_CONTENT_FORMAT, &slicer, 1);
 
-    *bufpos++ = 0xff;
+    response->cur += coap_put_option_ct(response->cur, 0, COAP_FORMAT_LINK);
+    response->cur += coap_opt_put_block2(response->cur, COAP_OPT_CONTENT_FORMAT, &slicer, 1);
+    *response->cur++ = 0xff;
 
     for (unsigned i = 0; i < coap_resources_numof; i++) {
         if (i) {
-            bufpos += coap_blockwise_put_char(&slicer, bufpos, ',');
+            response->cur += coap_blockwise_put_char(&slicer, response->cur, ',');
         }
-        bufpos += coap_blockwise_put_char(&slicer, bufpos, '<');
+        response->cur += coap_blockwise_put_char(&slicer, response->cur, '<');
         unsigned url_len = strlen(coap_resources[i].path);
-        bufpos += coap_blockwise_put_bytes(&slicer, bufpos,
+        response->cur += coap_blockwise_put_bytes(&slicer, response->cur,
                 (uint8_t*)coap_resources[i].path, url_len);
-        bufpos += coap_blockwise_put_char(&slicer, bufpos, '>');
+        response->cur += coap_blockwise_put_char(&slicer, response->cur, '>');
     }
 
-    unsigned payload_len = bufpos - payload;
-    return coap_block2_build_reply(pkt, COAP_CODE_205, buf, len, payload_len,
-                                   &slicer);
+    return coap_block2_build_reply(pkt, COAP_CODE_205, response, &slicer);
 }
 
 unsigned coap_get_len(coap_pkt_t *pkt)

@@ -195,6 +195,15 @@ typedef struct {
 } coap_pkt_t;
 
 /**
+ * @brief   CoAP response context structure
+ */
+typedef struct {
+    coap_hdr_t *hdr;                                  /**< pointer to raw packet   */
+    uint8_t *cur;                                     /**< current write position  */
+    uint8_t *end;                                     /**< end of the tx buffer    */
+} coap_rsp_pkt_t;
+
+/**
  * @brief   Resource handler type
  *
  * Functions that implement this must be prepared to be called multiple times
@@ -208,7 +217,7 @@ typedef struct {
  * For POST, PATCH and other non-idempotent methods, this is an additional
  * requirement introduced by the contract of this type.
  */
-typedef ssize_t (*coap_handler_t)(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context);
+typedef ssize_t (*coap_handler_t)(coap_pkt_t *pkt, coap_rsp_pkt_t *rsp, void *context);
 
 /**
  * @brief   Method flag type
@@ -426,6 +435,23 @@ static inline void coap_hdr_set_type(coap_hdr_t *hdr, unsigned type)
 
     hdr->ver_t_tkl &= ~0x30;
     hdr->ver_t_tkl |= type << 4;
+}
+
+/**
+ * @brief   Initialize a CoAP response to an incoming packet
+ *
+ * @param[in]   pkt      packet to respond to
+ * @param[out]  response the uninitialized response packet
+ * @param[in]   buf      buffer for the response packet
+ * @param[in]   size     size of the response buffer
+ */
+static inline void coap_init_response(const coap_pkt_t *pkt,
+                                      coap_rsp_pkt_t *response,
+                                      void *buf, size_t size)
+{
+    response->hdr = buf;
+    response->end = (uint8_t *)buf + size;
+    response->cur = (uint8_t *)buf + coap_get_total_hdr_len(pkt);
 }
 /**@}*/
 
@@ -1532,16 +1558,14 @@ static inline size_t coap_put_option_ct(uint8_t *buf, uint16_t lastonum,
  *
  * @param[in]   pkt         packet to reply to
  * @param[in]   code        reply code (e.g., COAP_CODE_204)
- * @param[out]  rbuf        buffer to write reply to
- * @param[in]   rlen        size of @p rbuf
- * @param[in]   payload_len length of payload
+ * @param[out]  response    context to write reply to
  * @param[in]   slicer      slicer to use
  *
  * @returns     size of reply packet on success
  * @returns     <0 on error
  */
 ssize_t coap_block2_build_reply(coap_pkt_t *pkt, unsigned code,
-                                uint8_t *rbuf, unsigned rlen, unsigned payload_len,
+                                coap_rsp_pkt_t *response,
                                 coap_block_slicer_t *slicer);
 
 /**
@@ -1574,31 +1598,26 @@ ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, uint8_t *token,
  *
  * @param[in]   pkt         packet to reply to
  * @param[in]   code        reply code (e.g., COAP_CODE_204)
- * @param[out]  rbuf        buffer to write reply to
- * @param[in]   rlen        size of @p rbuf
- * @param[in]   payload_len length of payload
+ * @param[out]  response    context to write reply to
  *
  * @returns     size of reply packet on success
  * @returns     <0 on error
- * @returns     -ENOSPC if @p rbuf too small
  */
-ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
-                         uint8_t *rbuf, unsigned rlen, unsigned payload_len);
+ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code, coap_rsp_pkt_t *response);
 
 /**
  * @brief   Handle incoming CoAP request
  *
  * This function will find the correct handler, call it and write the reply
- * into @p resp_buf.
+ * into @p response.
  *
  * @param[in]   pkt             pointer to (parsed) CoAP packet
- * @param[out]  resp_buf        buffer for response
- * @param[in]   resp_buf_len    size of response buffer
+ * @param[out]  response        buffer context for response
  *
  * @returns     size of reply packet on success
  * @returns     <0 on error
  */
-ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len);
+ssize_t coap_handle_req(coap_pkt_t *pkt, coap_rsp_pkt_t *response);
 
 /**
  * @brief   Pass a coap request to a matching handler
@@ -1607,16 +1626,14 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
  * the handler.
  *
  * @param[in]   pkt             pointer to (parsed) CoAP packet
- * @param[out]  resp_buf        buffer for response
- * @param[in]   resp_buf_len    size of response buffer
+ * @param[out]  response        buffer context for response
  * @param[in]   resources       Array of coap endpoint resources
  * @param[in]   resources_numof length of the coap endpoint resources
  *
  * @returns     size of the reply packet on success
  * @returns     <0 on error
  */
-ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
-                          unsigned resp_buf_len,
+ssize_t coap_tree_handler(coap_pkt_t *pkt, coap_rsp_pkt_t *response,
                           const coap_resource_t *resources,
                           size_t resources_numof);
 
@@ -1732,8 +1749,7 @@ ssize_t coap_payload_put_char(coap_pkt_t *pkt, char c);
  *
  * @param[in]   pkt         packet to reply to
  * @param[in]   code        reply code (e.g., COAP_CODE_204)
- * @param[out]  buf         buffer to write reply to
- * @param[in]   len         size of @p buf
+ * @param[out]  response    response packet
  * @param[in]   ct          content type of payload
  * @param[in]   payload     ptr to payload
  * @param[in]   payload_len length of payload
@@ -1744,16 +1760,16 @@ ssize_t coap_payload_put_char(coap_pkt_t *pkt, char c);
  */
 ssize_t coap_reply_simple(coap_pkt_t *pkt,
                           unsigned code,
-                          uint8_t *buf, size_t len,
+                          coap_rsp_pkt_t *response,
                           unsigned ct,
-                          const uint8_t *payload, uint8_t payload_len);
+                          const void *payload, uint8_t payload_len);
 
 /**
  * @brief   Reference to the default .well-known/core handler defined by the
  *          application
  */
 extern ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, \
-                                                    uint8_t *buf, size_t len,
+                                                    coap_rsp_pkt_t *response,
                                                     void *context);
 /**@}*/
 

@@ -15,7 +15,7 @@
 
 static riotboot_flashwrite_t _writer;
 
-ssize_t _flashwrite_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, void *context)
+ssize_t _flashwrite_handler(coap_pkt_t* pkt, coap_rsp_pkt_t *response, void *context)
 {
     riotboot_flashwrite_t *writer = context;
 
@@ -65,7 +65,7 @@ ssize_t _flashwrite_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, void *con
         riotboot_flashwrite_finish(writer);
     }
 
-    ssize_t reply_len = coap_build_reply(pkt, result, buf, len, 0);
+    ssize_t reply_len = coap_build_reply(pkt, result, response);
     uint8_t *pkt_pos = (uint8_t*)pkt->hdr + reply_len;
     pkt_pos += coap_put_block1_ok(pkt_pos, &block1, 0);
 

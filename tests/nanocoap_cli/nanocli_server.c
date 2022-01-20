@@ -59,11 +59,15 @@ static int _nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize,
         }
         else {
             coap_pkt_t pkt;
+            coap_rsp_pkt_t response;
+
             if (coap_parse(&pkt, (uint8_t *)buf, res) < 0) {
                 DEBUG("nanocoap: error parsing packet\n");
                 continue;
             }
-            if ((res = coap_handle_req(&pkt, buf, bufsize)) > 0) {
+
+            coap_init_response(&pkt, &response, buf, bufsize);
+            if ((res = coap_handle_req(&pkt, &response)) >= 0) {
                 res = sock_udp_send(&sock, buf, res, &remote);
             }
         }

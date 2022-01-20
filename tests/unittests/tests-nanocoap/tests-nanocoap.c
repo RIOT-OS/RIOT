@@ -501,11 +501,14 @@ static void test_nanocoap__server_reply_simple(void)
 {
     uint8_t buf[_BUF_SIZE];
     coap_pkt_t pkt;
+    coap_rsp_pkt_t response;
     char *payload = "0";
 
     int res = _read_riot_value_req(&pkt, &buf[0]);
 
-    coap_reply_simple(&pkt, COAP_CODE_CONTENT, buf, _BUF_SIZE,
+    coap_init_response(&pkt, &response, buf, sizeof(buf));
+
+    coap_reply_simple(&pkt, COAP_CODE_CONTENT, &response,
                       COAP_FORMAT_TEXT, (uint8_t *)payload, 1);
 
     TEST_ASSERT_EQUAL_INT(0, res);
@@ -551,11 +554,14 @@ static void test_nanocoap__server_reply_simple_con(void)
 {
     uint8_t buf[_BUF_SIZE];
     coap_pkt_t pkt;
+    coap_rsp_pkt_t response;
     char *payload = "0";
 
     _read_riot_value_req_con(&pkt, &buf[0]);
 
-    coap_reply_simple(&pkt, COAP_CODE_CONTENT, buf, _BUF_SIZE,
+    coap_init_response(&pkt, &response, buf, sizeof(buf));
+
+    coap_reply_simple(&pkt, COAP_CODE_CONTENT, &response,
                       COAP_FORMAT_TEXT, (uint8_t *)payload, 1);
 
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_ACK, coap_get_type(&pkt));

@@ -31,7 +31,7 @@
 /* internal value that can be read/written via CoAP */
 static uint8_t internal_value = 0;
 
-static ssize_t _value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _value_handler(coap_pkt_t *pkt, coap_rsp_pkt_t *response, void *context)
 {
     (void) context;
 
@@ -67,8 +67,8 @@ static ssize_t _value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *c
         code = COAP_CODE_METHOD_NOT_ALLOWED;
     }
 
-    return coap_reply_simple(pkt, code, buf, len,
-            COAP_FORMAT_TEXT, (uint8_t*)rsp, p);
+    return coap_reply_simple(pkt, code, response,
+                             COAP_FORMAT_TEXT, rsp, p);
 }
 
 /* must be sorted by path (ASCII order) */
