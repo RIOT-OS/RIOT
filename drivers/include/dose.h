@@ -45,6 +45,24 @@
  * octet) and retransmissions are scheduled. The frames are appended with a
  * CRC16 to protect the system from transmission errors.
  *
+ * A note on high data rates
+ * =========================
+ *
+ * When using high UART data rates (1 MBit/s and above) per-byte overhead
+ * becomes significant.
+ * A major factor here is setting (software) timers which are used to catch
+ * error conditions.
+ * To speed up the TX path it is therefore recommended to implement hardware
+ * collision detection (if available) to avoid the need for setting a timeout
+ * for each byte transmitted.
+ *
+ * To speed up the more critical RX path, enable the `dose_watchdog` module.
+ * This requires a dedicated hardware timer `DOSE_TIMER_DEV` to be configured
+ * in e.g. `board.h`.
+ * The timer is shared between all DOSE interfaces and will periodically check
+ * if any interface does not make progress with receiving a frame (payload
+ * marker did not advance between two timer periods) and abort the RX process.
+ *
  * @{
  *
  * @file
@@ -137,12 +155,24 @@ typedef enum {
  *  Fallback to idle if the remote side died within a transaction.
  */
 #ifndef CONFIG_DOSE_TIMEOUT_BYTES
-#define CONFIG_DOSE_TIMEOUT_BYTES       (50)
+#define CONFIG_DOSE_TIMEOUT_BYTES   (50)
 #endif
 /** @} */
 
 #define DOSE_FRAME_CRC_LEN          (2)     /**< CRC16 is used */
 #define DOSE_FRAME_LEN (ETHERNET_FRAME_LEN + DOSE_FRAME_CRC_LEN) /**< dose frame length */
+
+/**
+ * @brief   Hardware timer to use with the `dose_watchdog` module.
+ *
+ *          This will be used to detect RX timeout instead of xtimer to speed up
+ *          the RX path when high data rates / less CPU overhead is required.
+ */
+#if DOXYGEN
+#define DOSE_TIMER_DEV              TIMER_DEV(…)
+#elif !defined(DOSE_TIMER_DEV) && IS_ACTIVE(MODULE_DOSE_WATCHDOG)
+#error "DOSE_TIMER_DEV needs to be set by the board"
+#endif
 
 /**
  * @brief   DOSE netdev device
