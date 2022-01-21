@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <stddef.h>
+#include <stdlib.h>
 #include <sys/lock.h>
 #include <sys/param.h>
 #include "esp_attr.h"

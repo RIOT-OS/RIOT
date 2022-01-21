@@ -11,6 +11,7 @@ PRE_INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/wpa_supplicant/port/include
 PRE_INCLUDES += -I$(ESP32_SDK_DIR)/components/wpa_supplicant/include
 PRE_INCLUDES += -I$(ESP32_SDK_DIR)/components/wpa_supplicant/port/include
 CFLAGS += -D__ets__ -DESPRESSIF_USE -DESP32_IDF_CODE=1
+CFLAGS += -Wno-implicit-fallthrough
 
 include $(RIOTCPU)/$(CPU)/Makefile.include
 

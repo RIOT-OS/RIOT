@@ -411,8 +411,8 @@ wifi_osi_funcs_t g_wifi_osi_funcs = {
     ._version = ESP_WIFI_OS_ADAPTER_VERSION,
     ._set_isr = set_isr_wrapper,
 #ifdef RIOT_VERSION
-    ._ints_on = (void (*)(unsigned int))xt_ints_on,
-    ._ints_off = (void (*)(unsigned int))xt_ints_off,
+    ._ints_on = (void *)xt_ints_on,
+    ._ints_off = (void *)xt_ints_off,
 #else
     ._ints_on = xt_ints_on,
     ._ints_off = xt_ints_off,

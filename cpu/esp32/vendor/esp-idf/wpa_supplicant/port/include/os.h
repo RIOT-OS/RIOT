@@ -26,6 +26,7 @@ extern "C" {
 
 #include "esp_types.h"
 #include <string.h>
+#include <strings.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "esp_err.h"
@@ -221,6 +222,7 @@ char * os_readfile(const char *name, size_t *len);
 #ifdef _MSC_VER
 #define os_strdup(s) _strdup(s)
 #else
+char *strdup(const char *s);
 #define os_strdup(s) strdup(s)
 #endif
 #endif

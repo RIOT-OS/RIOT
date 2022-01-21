@@ -119,8 +119,8 @@ static struct syscall_stub_table s_stub_table =
     ._calloc_r = &_calloc_r,
     ._sbrk_r = &_sbrk_r,
 
-    ._system_r = (int (*)(struct _reent *, const char*))&_no_sys_func,
-    ._raise_r = (void (*)(struct _reent *))&_no_sys_func,
+    ._system_r = (void *)&_no_sys_func,
+    ._raise_r = (void *)&_no_sys_func,
     ._abort = &_abort,
     ._exit_r = &_exit_r,
     ._getpid_r = &_getpid_r,
@@ -137,8 +137,8 @@ static struct syscall_stub_table s_stub_table =
     ._write_r = (int (*)(struct _reent *r, int, const void *, int))&_write_r,
     ._read_r = (int (*)(struct _reent *r, int, void *, int))&_read_r,
     ._unlink_r = &_unlink_r,
-    ._link_r = (int (*)(struct _reent *r, const char*, const char*))&_no_sys_func,
-    ._rename_r = (int (*)(struct _reent *r, const char*, const char*))&_no_sys_func,
+    ._link_r = (void *)&_no_sys_func,
+    ._rename_r = (void *)&_no_sys_func,
 
     ._lock_init = &_lock_init,
     ._lock_init_recursive = &_lock_init_recursive,
@@ -184,7 +184,7 @@ uint32_t system_get_time_ms(void)
     return system_get_time_64() / US_PER_MS;
 }
 
-uint64_t system_get_time_64(void)
+int64_t system_get_time_64(void)
 {
     uint64_t  ret;
     /* latch 64 bit timer value before read */

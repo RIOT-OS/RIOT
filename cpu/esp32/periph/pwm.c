@@ -82,14 +82,6 @@ struct _pwm_hw_t {
     const gpio_t* gpios;        /* GPIOs used as channel outputs */
 };
 
-#ifdef PWM0_GPIOS
-static const gpio_t _pwm_channel_gpios_0[] = PWM0_GPIOS;
-#endif
-
-#ifdef PWM1_GPIOS
-static const gpio_t _pwm_channel_gpios_1[] = PWM1_GPIOS;
-#endif
-
 /* static configuration of PWM devices */
 static const struct _pwm_hw_t _pwm_hw[] =
 {
