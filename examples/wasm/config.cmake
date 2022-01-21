@@ -19,3 +19,6 @@
 # set (WAMR_APP_THREAD_STACK_SIZE_MAX ${WAMR_APP_THREAD_STACK_SIZE_MAX})  #set maximum thread stack size
 # set (WAMR_BUILD_CUSTOM_NAME_SECTION 1) #enable Custom name section
 # set (WAMR_BUILD_TAIL_CALL 1) #enable Tail call
+
+# the builtin wamr libc is enabled by default
+# set (WAMR_BUILD_LIBC_BUILTIN 0) #disable builtin libc
