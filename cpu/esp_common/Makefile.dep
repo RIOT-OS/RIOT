@@ -25,7 +25,10 @@ USEMODULE += xtensa
 # Features used by ESP*
 
 FEATURES_REQUIRED += newlib
-FEATURES_REQUIRED += cpp # Vendor code uses C++
+
+ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
+  FEATURES_REQUIRED += cpp
+endif
 
 ifneq (,$(filter esp_wifi_ap,$(USEMODULE)))
   FEATURES_REQUIRED += esp_wifi_ap
