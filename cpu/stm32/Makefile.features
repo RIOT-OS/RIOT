@@ -24,6 +24,16 @@ ifneq (,$(filter $(CPU_FAM),f0 f2 f3 f4 f7 l0 l1 l4 l5 u5 wb wl))
   endif
 endif
 
+STM32_WITH_BKPRAM = stm32f205% stm32f207% stm32f215% stm32f217% \
+                    stm32f405% stm32f407% stm32f415% stm32f417% \
+                    stm32f427% stm32f429% stm32f437% stm32f439% \
+                    stm32f446% stm32f469% stm32f479% \
+                    stm32f7% \
+                    stm32u5%
+ifneq (,$(filter $(STM32_WITH_BKPRAM),$(CPU_MODEL)))
+  FEATURES_PROVIDED += backup_ram
+endif
+
 # The f2, f4 and f7 do not support the pagewise api
 ifneq (,$(filter $(CPU_FAM),f2 f4 f7))
   FEATURES_PROVIDED += periph_flashpage

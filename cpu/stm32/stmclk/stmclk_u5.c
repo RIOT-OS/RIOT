@@ -246,6 +246,11 @@ void stmclk_init_sysclk(void)
     /* Wait Until the Voltage Regulator is ready */
     while (!(PWR->VOSR & PWR_VOSR_VOSRDY)) {}
 
+    /* Backup RAM retention in Standby and VBAT modes:
+       This bit can be written only when the regulator is LDO,
+       which must be configured before switching to SMPS */
+    PWR->BDCR1 |= PWR_BDCR1_BREN;
+
     /* Switch to SMPS regulator instead of LDO */
     PWR->CR3 |= PWR_CR3_REGSEL;
     while (!(PWR->SVMSR & PWR_SVMSR_REGS)) {}

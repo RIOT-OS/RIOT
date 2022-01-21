@@ -115,5 +115,14 @@ void stmclk_dbp_unlock(void)
 
 void stmclk_dbp_lock(void)
 {
-    PWR->REG_PWR_CR &= ~(BIT_CR_DBP);
+    if (!IS_ACTIVE(CPU_HAS_BACKUP_RAM)) {
+/*  The DBP must be unlocked all the time, if we modify
+    backup RAM content by comfortable BACKUP_RAM variables */
+        PWR->REG_PWR_CR &= ~(BIT_CR_DBP);
+    }
+}
+
+bool stmclk_dbp_is_locked(void)
+{
+    return !(PWR->REG_PWR_CR & BIT_CR_DBP);
 }

@@ -22,6 +22,8 @@
 #ifndef STMCLK_H
 #define STMCLK_H
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -83,6 +85,14 @@ void stmclk_dbp_unlock(void);
  * @brief   Lock write access to backup control domain
  */
 void stmclk_dbp_lock(void);
+
+/**
+ * @brief   Check whether write access to the backup domain is locked
+ *
+ * @retval  true: locked
+ * @retval  false: unlocked
+ */
+bool stmclk_dbp_is_locked(void);
 
 #ifdef __cplusplus
 }

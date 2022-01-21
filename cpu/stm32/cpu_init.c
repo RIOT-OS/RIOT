@@ -372,3 +372,43 @@ void cpu_init(void)
         _wlx5xx_init_subghz_debug_pins();
     }
 }
+
+void backup_ram_init(void)
+{
+/* see reference manual "Battery backup domain" */
+#if defined(RCC_APB1ENR_PWREN)
+    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
+#elif defined(RCC_APBENR1_PWREN)
+    periph_clk_en(APB1, RCC_APBENR1_PWREN);
+#elif defined(RCC_APB1ENR1_PWREN)
+    periph_clk_en(APB1, RCC_APB1ENR1_PWREN);
+#elif defined(RCC_AHB3ENR_PWREN)
+    periph_clk_en(AHB3, RCC_AHB3ENR_PWREN);
+#endif
+    stmclk_dbp_unlock();
+#if defined(RCC_AHB1ENR_BKPSRAMEN)
+    periph_clk_en(AHB1, RCC_AHB1ENR_BKPSRAMEN);
+#endif
+}
+
+#ifndef BACKUP_RAM_MAGIC
+#define BACKUP_RAM_MAGIC    {'R', 'I', 'O', 'T'}
+#endif
+
+bool cpu_woke_from_backup(void)
+{
+#if IS_ACTIVE(CPU_HAS_BACKUP_RAM)
+    static const char _signature[] BACKUP_RAM_DATA = BACKUP_RAM_MAGIC;
+    /* switch off regulator to save power */
+#ifndef RIOTBOOT
+    pm_backup_regulator_off();
+#endif
+    for (unsigned i = 0; i < sizeof(_signature); i++) {
+        if (_signature[i] != ((char[])BACKUP_RAM_MAGIC)[i]) {
+            return false;
+        }
+    }
+    return true;
+#endif /* CPU_HAS_BACKUP_RAM */
+    return false;
+}

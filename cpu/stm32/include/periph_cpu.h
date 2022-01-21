@@ -58,6 +58,7 @@
 #include "periph/wl/periph_cpu.h"
 #endif
 
+#include "periph/cpu_backup_ram.h"
 #include "periph/cpu_common.h"
 #include "periph/cpu_dma.h"
 #include "periph/cpu_eth.h"
