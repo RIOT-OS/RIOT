@@ -1,5 +1,4 @@
 USEMODULE += sema
 
-#WAMR supports "X86_32/64", "AARCH64", "ARM", "THUMB", "MIPS" and "XTENSA"
-#no 8/16 Bit TODO: might need to blacklist more
-FEATURES_BLACKLIST += arch_8bit arch_16bit
+#WAMR supports "X86_32/64", "AARCH64", "ARM", "THUMB", "MIPS", "XTENSA" and RISCV
+FEATURES_REQUIRED_ANY += arch_native|arch_arm|arch_mips32r2|arch_esp32|arch_riscv

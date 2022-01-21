@@ -28,9 +28,15 @@ RIOT_INCLUDES = $(filter-out -%,$(subst -I,,$(INCLUDES)))
 #no msp430, no AVR support for now
 
 ifeq ($(CPU),native)
-#$(CPU) is defined for every CPU
-#everyone build on x86_32
+ifeq ($(findstring x86,$(OS_ARCH)),x86)
   WAMR_BUILD_TARGET = X86_32
+endif
+ifeq ($(findstring arm,$(OS_ARCH)),arm)
+  WAMR_BUILD_TARGET = ARM
+endif
+ifeq ($(findstring aarch,$(OS_ARCH)),aarch)
+  WAMR_BUILD_TARGET = ARM
+endif
 else ifeq ($(findstring arm,$(CPU_ARCH)),arm)
   WAMR_BUILD_TARGET = THUMB
 else ifeq ($(CPU_ARCH),mips32r2)
@@ -39,6 +45,8 @@ else ifeq ($(CPU_ARCH),xtensa)
   WAMR_BUILD_TARGET = XTENSA
 else ifeq ($(CPU_ARCH),rv32)
   WAMR_BUILD_TARGET = RISCV32
+else
+  $(error "WASM is not supported for architecture $(CPU_ARCH)")
 endif
 
 ifeq ($(QUIET),0)
@@ -57,6 +65,7 @@ WAMR_CMAKE_FLAGS += "-DRIOT_INCLUDES=$(RIOT_INCLUDES)"\
                      -DCMAKE_SYSTEM_PROCESSOR="$(MCPU)" \
                      -DCMAKE_C_COMPILER=$(CC) \
                      -DCMAKE_C_COMPILER_WORKS=TRUE \
+                     #
 
 all: $(BINDIR)/libwamr.a
 
@@ -71,6 +80,7 @@ $(PKG_BUILD_DIR)/Makefile: $(PKG_PREPARED) print_build_target
 
 print_build_target:
 	@echo PKG_VERSION: $(PKG_VERSION)
+	@echo native OS_ARCH: $(OS_ARCH)
 	@echo CPU_ARCH: $(CPU_ARCH)
 	@echo CPU: $(CPU)
 	@echo CFLAGS: $(CFLAGS)
