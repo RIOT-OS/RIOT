@@ -22,49 +22,54 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "control.h"
 #include "uwb/uwb.h"
 #include "uwb_rng/uwb_rng.h"
-#include "dpl/dpl.h"
-#include "control.h"
 
-#include "shell_commands.h"
-#include "shell.h"
+#include "mutex.h"
+#include "timex.h"
+#include "fmt.h"
+#include "test_utils/result_output.h"
+#include "event/callback.h"
+#include "event/periodic.h"
 
-static struct dpl_callout _rng_req_callout;
-static uint8_t _ranging_enabled_flag;
-static struct dpl_event _slot_event;
+#include "net/ieee802154.h"
+#include "net/l2util.h"
+
+#define IEEE802154_SHORT_ADDRESS_LEN_STR_MAX \
+    (sizeof("00:00"))
+
+/* setup timeout to the maximum value */
+#define UWB_CORE_RNG_RX_TIMEOUT             0xfffff
 
 /* forward declaration */
-static void _slot_complete_cb(struct dpl_event *ev);
 static bool _complete_cb(struct uwb_dev *inst, struct uwb_mac_interface *cbs);
 static bool _rx_timeout_cb(struct uwb_dev *inst, struct uwb_mac_interface *cbs);
 
-static int _range_cli_cmd(int argc, char **argv)
-{
-    (void)argc;
+/* currently there can only be one so lets just keep a pointer to it */
+struct uwb_rng_instance *_rng;
+struct uwb_dev *_udev;
 
-    if (!strcmp(argv[1], "start")) {
-        printf("Start ranging\n");
-        dpl_callout_reset(&_rng_req_callout, RANGE_REQUEST_T_MS);
-        _ranging_enabled_flag = 1;
-    }
-    else if (!strcmp(argv[1], "stop")) {
-        printf("Stop ranging\n");
-        dpl_callout_stop(&_rng_req_callout);
-        _ranging_enabled_flag = 0;
-    }
-    else {
-        puts("Usage:");
-        puts("\trange start: to start ranging");
-        puts("\trange stop:  to stop  ranging");
-    }
+/* forward declaration */
+static void _rng_listen(void *arg);
+static void _rng_request(void *arg);
+static event_callback_t _rng_listen_event = EVENT_CALLBACK_INIT(_rng_listen, NULL);
 
-    return 0;
-}
+#define TWR_STATUS_INITIATOR      (1 << 0)
+#define TWR_STATUS_RESPONDER      (1 << 1)
+static uint8_t _status;
 
-static const shell_command_t shell_commands[] = {
-    { "range", "Control command", _range_cli_cmd },
-    { NULL, NULL, NULL }
+typedef struct uwb_core_rng_event {
+    event_callback_t event;     /**< the event callback */
+    event_periodic_t periodic;  /**< the periodic event struct */
+    twr_protocol_t proto;       /**< protocol to use */
+    uint16_t addr;              /**< dest short address */
+} uwb_core_rng_event_t;
+
+static uwb_core_rng_event_t _rng_request_event = {
+    .event = EVENT_CALLBACK_INIT(_rng_request, &_rng_request_event),
+    .addr = 0xffff,
+    .proto = TWR_PROTOCOL_SS,
 };
 
 /* Structure of extension callbacks common for mac layer */
@@ -73,6 +78,45 @@ static struct uwb_mac_interface _uwb_mac_cbs = (struct uwb_mac_interface){
     .complete_cb = _complete_cb,
     .rx_timeout_cb = _rx_timeout_cb,
 };
+
+/* callback to offload printing */
+static void _print_rng_data_cb(void *arg)
+{
+    uwb_core_rng_data_t *rng_data = (uwb_core_rng_data_t *)arg;
+    turo_t ctx;
+
+    char addr_str[IEEE802154_SHORT_ADDRESS_LEN_STR_MAX];
+    uint8_t buffer[IEEE802154_SHORT_ADDRESS_LEN];
+
+    turo_init(&ctx);
+    turo_dict_open(&ctx);
+    turo_dict_key(&ctx, "t");
+    turo_u32(&ctx, rng_data->time);
+    turo_dict_key(&ctx, "src");
+    byteorder_htobebufs(buffer, rng_data->src);
+    l2util_addr_to_str(buffer, IEEE802154_SHORT_ADDRESS_LEN, addr_str);
+    turo_string(&ctx, addr_str);
+    turo_dict_key(&ctx, "dst");
+    byteorder_htobebufs(buffer, rng_data->dest);
+    l2util_addr_to_str(buffer, IEEE802154_SHORT_ADDRESS_LEN, addr_str);
+    turo_string(&ctx, addr_str);
+    turo_dict_key(&ctx, "d_cm");
+    turo_s32(&ctx, rng_data->d_cm);
+#if IS_USED(MODULE_UWB_CORE_RNG_TRX_INFO)
+    turo_dict_key(&ctx, "tof");
+    turo_float(&ctx, rng_data->tof);
+    turo_dict_key(&ctx, "los");
+    turo_float(&ctx, rng_data->los);
+    turo_dict_key(&ctx, "rssi");
+    turo_float(&ctx, rng_data->rssi);
+#endif
+    turo_dict_close(&ctx);
+    print_str("\n");
+}
+
+static uwb_core_rng_data_t _rng_data;
+static event_callback_t _print_rng_data_event = EVENT_CALLBACK_INIT(
+    _print_rng_data_cb, &_rng_data);
 
 /**
  * @brief Range request complete callback.
@@ -99,19 +143,44 @@ static struct uwb_mac_interface _uwb_mac_cbs = (struct uwb_mac_interface){
 static bool _complete_cb(struct uwb_dev *inst, struct uwb_mac_interface *cbs)
 {
     (void)cbs;
-
     if (inst->fctrl != FCNTL_IEEE_RANGE_16 &&
         inst->fctrl != (FCNTL_IEEE_RANGE_16 | UWB_FCTRL_ACK_REQUESTED)) {
+        /* on completion of a range request setup an event to keep listening */
+        event_post(uwb_core_get_eventq(), &_rng_listen_event.super);
         return false;
     }
-    /* on completion of a range request setup an event to keep listening,
-       if is anchor */
-    dpl_eventq_put(dpl_eventq_dflt_get(), &_slot_event);
+    /* get received frame */
+    struct uwb_rng_instance *rng = (struct uwb_rng_instance *)cbs->inst_ptr;
+
+    rng->idx_current = (rng->idx) % rng->nframes;
+    twr_frame_t *frame = rng->frames[rng->idx_current];
+    /* parse data*/
+    uwb_core_rng_data_t data;
+
+    data.src = frame->src_address;
+    data.dest = frame->dst_address;
+    data.time = ztimer_now(ZTIMER_MSEC);
+    float range_f =
+        uwb_rng_tof_to_meters(uwb_rng_twr_to_tof(rng, rng->idx_current));
+
+    /* convert from float meters to cm */
+    data.d_cm = ((int32_t)(range_f * 100));
+#if IS_USED(MODULE_UWB_CORE_RNG_TRX_INFO)
+    data.rssi = (int16_t)uwb_calc_rssi(inst, inst->rxdiag);
+    data.fppl = uwb_calc_fppl(inst, inst->rxdiag);
+    data.tof = uwb_rng_twr_to_tof(rng, rng->idx_current);
+    data.los = uwb_estimate_los(rng->dev_inst, data.rssi, data.fppl);
+#endif
+    /* offload range data printing */
+    memcpy(&_rng_data, &data, sizeof(uwb_core_rng_data_t));
+    event_post(uwb_core_get_eventq(), &_print_rng_data_event.super);
+    /* on completion of a range request setup an event to keep listening */
+    event_post(uwb_core_get_eventq(), &_rng_listen_event.super);
     return true;
 }
 
 /**
- * @brief API for receive timeout callback.
+ * @brief   API for receive timeout callback.
  *
  * @param[in] inst  Pointer to struct uwb_dev.
  * @param[in] cbs   Pointer to struct uwb_mac_interface.
@@ -120,131 +189,103 @@ static bool _complete_cb(struct uwb_dev *inst, struct uwb_mac_interface *cbs)
  */
 static bool _rx_timeout_cb(struct uwb_dev *inst, struct uwb_mac_interface *cbs)
 {
-    struct uwb_rng_instance *rng = (struct uwb_rng_instance *)cbs->inst_ptr;
-
-    if (inst->role & UWB_ROLE_ANCHOR) {
-        /* Restart receiver */
-        uwb_phy_forcetrxoff(inst);
-        uwb_rng_listen(rng, 0xfffff, UWB_NONBLOCKING);
-    }
+    (void)inst;
+    (void)cbs;
+    event_post(uwb_core_get_eventq(), &_rng_listen_event.super);
     return true;
 }
 
 /**
- * @brief In the example this function represents the event context
- * processing of the received range request which has been offloaded from
- * ISR context to an event queue.
+ * @brief   An event callback to update the remaining listening time
  */
-static void _slot_complete_cb(struct dpl_event *ev)
+static void _rng_listen(void *arg)
 {
-    assert(ev != NULL);
+    (void)arg;
 
-    struct uwb_rng_instance *rng = (struct uwb_rng_instance *)
-        dpl_event_get_arg(ev);
-    struct uwb_dev *inst = rng->dev_inst;
-
-    if (inst->role & UWB_ROLE_ANCHOR) {
-        uwb_rng_listen(rng, 0xfffff, UWB_NONBLOCKING);
+    if (!ztimer_is_set(ZTIMER_MSEC, &_rng_request_event.periodic.timer.timer)) {
+        _status &= ~TWR_STATUS_INITIATOR;
     }
+    if (_status && TWR_STATUS_RESPONDER) {
+        /* wake up if needed */
+        if (_udev->status.sleeping) {
+            uwb_wakeup(_udev);
+        }
+        /* start listening */
+        if (dpl_sem_get_count(&_rng->sem) == 1) {
+            uwb_rng_listen(_rng, UWB_CORE_RNG_RX_TIMEOUT, UWB_NONBLOCKING);
+        }
+    }
+    else {
+        /* go to sleep if possible */
+        if (_rng_request_event.periodic.timer.interval > CONFIG_TWR_MIN_IDLE_SLEEP_MS ||
+            !(_status && TWR_STATUS_INITIATOR)) {
+            uwb_sleep_config(_udev);
+            uwb_enter_sleep(_udev);
+        }
+    }
+}
+
+void uwb_core_rng_listen_enable(void)
+{
+    _status |= TWR_STATUS_RESPONDER;
+    /* post event to start listening */
+    event_post(uwb_core_get_eventq(), &_rng_listen_event.super);
+}
+
+void uwb_core_rng_listen_disable(void)
+{
+    _status &= ~TWR_STATUS_RESPONDER;
 }
 
 /**
- * @brief An event callback to send range request every RANGE_REQUEST_T_MS.
- * On every request it will switch the used ranging algorithm.
+ * @brief   An event callback to send a range request
  */
-static void uwb_ev_cb(struct dpl_event *ev)
+static void _rng_request(void *arg)
 {
-    struct uwb_rng_instance *rng = (struct uwb_rng_instance *)ev->ev.arg;
-    struct uwb_dev *inst = rng->dev_inst;
+    uwb_core_rng_event_t *event = (uwb_core_rng_event_t *)arg;
 
-    if (inst->role & UWB_ROLE_ANCHOR) {
-        if (dpl_sem_get_count(&rng->sem) == 1) {
-            uwb_rng_listen(rng, 0xfffff, UWB_NONBLOCKING);
-        }
+    /* wake up if needed */
+    if (_udev->status.sleeping) {
+        uwb_wakeup(_udev);
     }
-    else {
-        int mode_v[8] = { 0 }, mode_i = 0, mode = -1;
-        static int last_used_mode = 0;
-        if (IS_USED(MODULE_UWB_CORE_TWR_SS)) {
-            mode_v[mode_i++] = UWB_DATA_CODE_SS_TWR;
-        }
-        if (IS_USED(MODULE_UWB_CORE_TWR_SS_ACK)) {
-            mode_v[mode_i++] = UWB_DATA_CODE_SS_TWR_ACK;
-        }
-        if (IS_USED(MODULE_UWB_CORE_TWR_SS_EXT)) {
-            mode_v[mode_i++] = UWB_DATA_CODE_SS_TWR_EXT;
-        }
-        if (IS_USED(MODULE_UWB_CORE_TWR_DS)) {
-            mode_v[mode_i++] = UWB_DATA_CODE_DS_TWR;
-        }
-        if (IS_USED(MODULE_UWB_CORE_TWR_DS_EXT)) {
-            mode_v[mode_i++] = UWB_DATA_CODE_DS_TWR_EXT;
-        }
-        if (++last_used_mode >= mode_i) {
-            last_used_mode = 0;
-        }
-        mode = mode_v[last_used_mode];
-#ifdef UWB_TWR_ALGORITHM_ONLY_ONE
-        mode = UWB_TWR_ALGORITHM_ONLY_ONE;
-#endif
-        if (mode > 0) {
-            uwb_rng_request(rng, ANCHOR_ADDRESS, mode);
-        }
+    /* force transition to trxoff instead of waiting for rng_listen operations
+       to finish */
+    if (dpl_sem_get_count(&_rng->sem) == 0) {
+        uwb_phy_forcetrxoff(_udev);
     }
 
-    /* reset the callback if ranging is enabled */
-    if (_ranging_enabled_flag) {
-        dpl_callout_reset(&_rng_req_callout, RANGE_REQUEST_T_MS);
-    }
+   uwb_rng_request(_rng, event->addr, (uwb_dataframe_code_t)event->proto);
 }
 
-void init_ranging(void)
+void uwb_core_rng_start(uint16_t addr, twr_protocol_t proto, uint32_t interval,
+                        uint32_t count)
 {
-    struct uwb_dev *udev = uwb_dev_idx_lookup(0);
-    struct uwb_rng_instance *rng =
-        (struct uwb_rng_instance *)uwb_mac_find_cb_inst_ptr(udev, UWBEXT_RNG);
+    event_periodic_stop(&_rng_request_event.periodic);
 
-    assert(rng);
+    _rng_request_event.proto = proto;
+    _rng_request_event.addr = addr;
 
+    _status |= TWR_STATUS_INITIATOR;
+
+    event_periodic_set_count(&_rng_request_event.periodic, count);
+    event_periodic_start(&_rng_request_event.periodic, interval);
+}
+
+void uwb_core_rng_init(void)
+{
+    _udev = uwb_dev_idx_lookup(0);
+    _rng = (struct uwb_rng_instance *)uwb_mac_find_cb_inst_ptr(_udev, UWBEXT_RNG);
+    assert(_rng);
     /* set up local mac callbacks */
-    _uwb_mac_cbs.inst_ptr = rng;
-    uwb_mac_append_interface(udev, &_uwb_mac_cbs);
-
-    uint32_t utime = ztimer_now(ZTIMER_USEC);
-
-    printf("{\"utime\": %" PRIu32 ",\"exec\": \"%s\"}\n", utime, __FILE__);
-    printf("{\"device_id\"=\"%" PRIx32 "\"", udev->device_id);
-    printf(",\"panid=\"%X\"", udev->pan_id);
-    printf(",\"addr\"=\"%X\"", udev->uid);
-    printf(",\"part_id\"=\"%" PRIx32 "\"",
-              (uint32_t)(udev->euid & 0xffffffff));
-    printf(",\"lot_id\"=\"%" PRIx32 "\"}\n", (uint32_t)(udev->euid >> 32));
-    printf("{\"utime\": %"PRIu32",\"msg\": \"frame_duration = %d usec\"}\n",
-              utime, uwb_phy_frame_duration(udev, sizeof(twr_frame_final_t)));
-    printf("{\"utime\": %"PRIu32",\"msg\": \"SHR_duration = %d usec\"}\n",
-              utime, uwb_phy_SHR_duration(udev));
-    printf("{\"utime\": %"PRIu32",\"msg\": \"holdoff = %d usec\"}\n", utime,
-              (uint16_t)ceilf(uwb_dwt_usecs_to_usecs(rng->config.
-                                                     tx_holdoff_delay)));
-
-    dpl_callout_init(&_rng_req_callout, dpl_eventq_dflt_get(),
-                     uwb_ev_cb, rng);
-    dpl_callout_reset(&_rng_req_callout, RANGE_REQUEST_T_MS);
-    dpl_event_init(&_slot_event, _slot_complete_cb, rng);
-
-    if ((udev->role & UWB_ROLE_ANCHOR)) {
-        printf("Node role: ANCHOR \n");
-        udev->my_short_address = ANCHOR_ADDRESS;
-        uwb_set_uid(udev, udev->my_short_address);
-        /* anchor starts listening by default */
-        _ranging_enabled_flag = 1;
-    }
-    else {
-        _ranging_enabled_flag = 0;
-        printf("Node role: TAG \n");
-    }
-
-    /* define buffer to be used by the shell */
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    _uwb_mac_cbs.inst_ptr = _rng;
+    uwb_mac_append_interface(_udev, &_uwb_mac_cbs);
+    /* init request periodic event */
+    event_periodic_init(&_rng_request_event.periodic, ZTIMER_MSEC,
+                        uwb_core_get_eventq(), &_rng_request_event.event.super);
+    /* set initial status */
+    _status = 0;
+    /* got to sleep on boot */
+    struct uwb_dev*_udev = uwb_dev_idx_lookup(0);
+    uwb_sleep_config(_udev);
+    uwb_enter_sleep(_udev);
 }

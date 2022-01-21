@@ -59,10 +59,10 @@ config MODULE_UWB-CORE_RNG
     bool "uwb-core ranging module"
     select MODULE_UWB-CORE_RNG_MATH
     select MODULE_UWB-CORE_DSP
-    select MODULE_UWB-CORE_UWB_JSON
 
 config MODULE_UWB-CORE_UWB_JSON
     bool "uwb-core JSON utilities"
+    select MODULE_FMT
 
 config MODULE_UWB-CORE_DSP
     bool "uwb-core DSP module"
@@ -76,9 +76,12 @@ config MODULE_UWB-CORE_UWBCFG
 
 config MODULE_UWB-CORE_EVENT_THREAD
     bool "Use event-thread loop as uwb-core's event loop"
-    select MODULE_UWB-CORE_CONFIG
+    select MODULE_EVENT_THREAD
 
 config MODULE_UWB-CORE_CONFIG
     bool
+
+config MODULE_UWB-CORE_TRX_INFO
+    bool "Enable uwb-core diagnostic data: rssi, tof, los"
 
 endif # PACKAGE_UWB-CORE
