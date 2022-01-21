@@ -36,6 +36,14 @@ CFLAGS += -DSDK_NOT_USED -DCONFIG_FREERTOS_UNICORE=1 -DESP_PLATFORM
 CFLAGS += -DLOG_TAG_IN_BRACKETS
 CFLAGS += -D_CONST=const
 
+ifneq (,$(filter pthread,$(USEMODULE)))
+  # The toolchain provides POSIX type definitions for pthread which
+  # conflicts with that in RIOT. With the following CFLAGS/CXXFLAGS skip
+  # the inclusion of the types shipped by the toolchain.
+  CFLAGS += -D_SYS__PTHREADTYPES_H_
+  CXXFLAGS += -D_SYS__PTHREADTYPES_H_
+endif
+
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld/
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.common.ld
