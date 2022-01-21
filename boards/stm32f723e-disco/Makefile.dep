@@ -5,7 +5,7 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
 endif
 
 ifneq (,$(filter touch_dev,$(USEMODULE)))
-  USEMODULE += ft6x06
+  USEMODULE += ft5x06
 endif
 
 # TODO: remove the stdin dependency

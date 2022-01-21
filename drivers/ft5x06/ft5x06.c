@@ -27,6 +27,7 @@
 #include "ztimer.h"
 
 #include "ft5x06.h"
+#include "ft5x06_internal.h"
 #include "ft5x06_constants.h"
 #include "ft5x06_params.h"
 
@@ -53,15 +54,24 @@ int ft5x06_init(ft5x06_t *dev, const ft5x06_params_t *params, ft5x06_event_cb_t 
         return -EPROTO;
     }
 
-    if (vendor_id != FT5X06_VENDOR_ID) {
+    uint8_t expected_id;
+    if (dev->params.type == FT5X06_TYPE_FT6X06 || dev->params.type == FT5X06_TYPE_FT6X36) {
+        expected_id = FT6XX6_VENDOR_ID;
+    }
+    else {
+        expected_id = FT5X06_VENDOR_ID;
+    }
+
+    if (expected_id != vendor_id) {
         DEBUG("[ft5x06] init: invalid vendor ID: '0x%02x' (expected: 0x%02x)\n",
-                vendor_id, FT5X06_VENDOR_ID);
+                vendor_id, expected_id);
         i2c_release(FT5X06_BUS);
         return -ENODEV;
     }
 
     /* Auto-calibrate if needed */
-    if (IS_ACTIVE(FT5X06_AUTO_CALIB_NEEDED)) {
+    if (dev->params.type == FT5X06_TYPE_FT5606|| dev->params.type == FT5X06_TYPE_FT5X16 ||
+        dev->params.type == FT5X06_TYPE_FT5X06I) {
         DEBUG("[ft5x06] init: enable device auto-calibration\n");
         i2c_write_reg(FT5X06_BUS, FT5X06_ADDR, FT5X06_G_AUTO_CLB_MODE_REG, 0, 0);
     }
@@ -81,11 +91,9 @@ int ft5x06_init(ft5x06_t *dev, const ft5x06_params_t *params, ft5x06_event_cb_t 
 static const uint8_t touch_reg_map[FT5X06_TOUCHES_COUNT_MAX] = {
     FT5X06_TOUCH1_XH_REG,
     FT5X06_TOUCH2_XH_REG,
-#if FT5X06_TOUCHES_COUNT_MAX > 2
     FT5X06_TOUCH3_XH_REG,
     FT5X06_TOUCH4_XH_REG,
     FT5X06_TOUCH5_XH_REG,
-#endif
 };
 
 int ft5x06_read_touch_positions(const ft5x06_t *dev, ft5x06_touch_position_t *positions, size_t len)
@@ -113,7 +121,7 @@ int ft5x06_read_touch_count(const ft5x06_t *dev, uint8_t *count)
     i2c_release(FT5X06_BUS);
     *count &= FT5X06_TD_STATUS_MASK;
 
-    if (*count > FT5X06_TOUCHES_COUNT_MAX) {
+    if (*count > ft5x06_get_touches_count_max(dev)) {
         *count = 0;
     }
 

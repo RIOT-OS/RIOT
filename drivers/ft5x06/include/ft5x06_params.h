@@ -49,6 +49,9 @@ extern "C" {
 #ifndef FT5X06_PARAM_YMAX
 #define FT5X06_PARAM_YMAX               (272U)
 #endif
+#ifndef FT5X06_PARAM_TYPE
+#define FT5X06_PARAM_TYPE               FT5X06_TYPE_FT5336
+#endif
 
 #define FT5X06_PARAMS   {               \
     .i2c = FT5X06_PARAM_I2C_DEV,        \
@@ -56,6 +59,7 @@ extern "C" {
     .int_pin = FT5X06_PARAM_INT_PIN,    \
     .xmax = FT5X06_PARAM_XMAX,          \
     .ymax = FT5X06_PARAM_YMAX,          \
+    .type = FT5X06_PARAM_TYPE           \
 }
 /**@}*/
 

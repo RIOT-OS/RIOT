@@ -11,5 +11,5 @@ ifneq (,$(filter disp_dev,$(USEMODULE)))
 endif
 
 ifneq (,$(filter touch_dev,$(USEMODULE)))
-  USEMODULE += ft5336
+  USEMODULE += ft5x06
 endif
