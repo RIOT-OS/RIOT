@@ -25,13 +25,13 @@
 /*
  * A test set of dummy resources. The resource handlers are set to NULL.
  */
-static const coap_resource_t resources[] = {
+static const gcoap_resource_t resources[] = {
     { .path = "/act/switch", .methods = (COAP_GET | COAP_POST) },
     { .path = "/sensor/temp", .methods = (COAP_GET) },
     { .path = "/test/info/all", .methods = (COAP_GET) },
 };
 
-static const coap_resource_t resources_second[] = {
+static const gcoap_resource_t resources_second[] = {
     { .path = "/second/part", .methods = (COAP_GET)},
 };
 

@@ -29,12 +29,12 @@ static uint8_t proxy_req_buf[CONFIG_GCOAP_PDU_BUF_SIZE];
 static client_ep_t _client_eps[CONFIG_GCOAP_REQ_WAITING_MAX];
 
 static int _request_matcher_forward_proxy(gcoap_listener_t *listener,
-                                          const coap_resource_t **resource,
+                                          const gcoap_resource_t **resource,
                                           coap_pkt_t *pdu);
 static ssize_t _forward_proxy_handler(coap_pkt_t* pdu, uint8_t *buf,
                                       size_t len, void *ctx);
 
-const coap_resource_t forward_proxy_resources[] = {
+const gcoap_resource_t forward_proxy_resources[] = {
     { "/", COAP_IGNORE, _forward_proxy_handler, NULL },
 };
 
@@ -73,7 +73,7 @@ static void _free_client_ep(client_ep_t *cep)
 }
 
 static int _request_matcher_forward_proxy(gcoap_listener_t *listener,
-                                          const coap_resource_t **resource,
+                                          const gcoap_resource_t **resource,
                                           coap_pkt_t *pdu)
 {
     (void) listener;
