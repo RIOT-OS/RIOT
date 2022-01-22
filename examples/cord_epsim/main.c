@@ -57,14 +57,14 @@ static ssize_t handler_text(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx
     return text_resp(pdu, buf, len, (char *)ctx, COAP_FORMAT_TEXT);
 }
 
-static const coap_resource_t resources[] = {
+static const gcoap_resource_t resources[] = {
     { "/riot/bar",  COAP_GET, handler_text, "foo" },
     { "/riot/foo",  COAP_GET, handler_text, "bar" },
     { "/riot/info", COAP_GET, handler_info, NULL }
 };
 
 static gcoap_listener_t listener = {
-    .resources     = &resources[0],
+    .resources     = resources,
     .resources_len = ARRAY_SIZE(resources),
     .next          = NULL
 };

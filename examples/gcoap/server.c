@@ -56,13 +56,13 @@ static const credman_credential_t credential = {
 };
 #endif
 
-static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
+static ssize_t _encode_link(const gcoap_resource_t *resource, char *buf,
                             size_t maxlen, coap_link_encoder_ctx_t *context);
 static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 
 /* CoAP resources. Must be sorted by path (ASCII order). */
-static const coap_resource_t _resources[] = {
+static const gcoap_resource_t _resources[] = {
     { "/cli/stats", COAP_GET | COAP_PUT, _stats_handler, NULL },
     { "/riot/board", COAP_GET, _riot_board_handler, NULL },
 };
@@ -83,7 +83,7 @@ static gcoap_listener_t _listener = {
 
 
 /* Adds link format params to resource list */
-static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
+static ssize_t _encode_link(const gcoap_resource_t *resource, char *buf,
                             size_t maxlen, coap_link_encoder_ctx_t *context) {
     ssize_t res = gcoap_encode_link(resource, buf, maxlen, context);
     if (res > 0) {

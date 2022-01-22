@@ -68,16 +68,16 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *pdu,
                            const sock_udp_ep_t *remote, bool by_mid);
 static int _find_resource(gcoap_socket_type_t tl_type,
                           coap_pkt_t *pdu,
-                          const coap_resource_t **resource_ptr,
+                          const gcoap_resource_t **resource_ptr,
                           gcoap_listener_t **listener_ptr);
 static int _find_observer(sock_udp_ep_t **observer, sock_udp_ep_t *remote);
 static int _find_obs_memo(gcoap_observe_memo_t **memo, sock_udp_ep_t *remote,
                                                        coap_pkt_t *pdu);
 static void _find_obs_memo_resource(gcoap_observe_memo_t **memo,
-                                   const coap_resource_t *resource);
+                                   const gcoap_resource_t *resource);
 
 static int _request_matcher_default(gcoap_listener_t *listener,
-                                    const coap_resource_t **resource,
+                                    const gcoap_resource_t **resource,
                                     coap_pkt_t *pdu);
 
 #if IS_USED(MODULE_GCOAP_DTLS)
@@ -86,7 +86,7 @@ static void _dtls_free_up_session(void *arg);
 #endif
 
 /* Internal variables */
-const coap_resource_t _default_resources[] = {
+const gcoap_resource_t _default_resources[] = {
     { "/.well-known/core", COAP_GET, _well_known_core_handler, NULL },
 };
 
@@ -534,7 +534,7 @@ static void _cease_retransmission(gcoap_request_memo_t *memo) {
 static size_t _handle_req(gcoap_socket_t *sock, coap_pkt_t *pdu, uint8_t *buf,
                           size_t len, sock_udp_ep_t *remote)
 {
-    const coap_resource_t *resource     = NULL;
+    const gcoap_resource_t *resource    = NULL;
     gcoap_listener_t *listener          = NULL;
     sock_udp_ep_t *observer             = NULL;
     gcoap_observe_memo_t *memo          = NULL;
@@ -644,7 +644,7 @@ static size_t _handle_req(gcoap_socket_t *sock, coap_pkt_t *pdu, uint8_t *buf,
 }
 
 static int _request_matcher_default(gcoap_listener_t *listener,
-                                    const coap_resource_t **resource,
+                                    const gcoap_resource_t **resource,
                                     coap_pkt_t *pdu)
 {
     uint8_t uri[CONFIG_NANOCOAP_URI_MAX];
@@ -663,7 +663,7 @@ static int _request_matcher_default(gcoap_listener_t *listener,
     for (size_t i = 0; i < listener->resources_len; i++) {
         *resource = &listener->resources[i];
 
-        int res = coap_match_path(*resource, uri);
+        int res = coap_match_path((coap_resource_t *)*resource, uri);
 
         /* URI mismatch */
         if (res > 0) {
@@ -704,7 +704,7 @@ static int _request_matcher_default(gcoap_listener_t *listener,
  */
 static int _find_resource(gcoap_socket_type_t tl_type,
                           coap_pkt_t *pdu,
-                          const coap_resource_t **resource_ptr,
+                          const gcoap_resource_t **resource_ptr,
                           gcoap_listener_t **listener_ptr)
 {
     int ret = GCOAP_RESOURCE_NO_PATH;
@@ -713,7 +713,7 @@ static int _find_resource(gcoap_socket_type_t tl_type,
     gcoap_listener_t *listener = _coap_state.listeners;
 
     while (listener) {
-        const coap_resource_t *resource;
+        const gcoap_resource_t *resource;
         int res;
 
         /* only makes sense to check if non-UDP transports are supported,
@@ -925,7 +925,7 @@ static int _find_obs_memo(gcoap_observe_memo_t **memo, sock_udp_ep_t *remote,
  * resource[in] -- Resource to match
  */
 static void _find_obs_memo_resource(gcoap_observe_memo_t **memo,
-                                   const coap_resource_t *resource)
+                                   const gcoap_resource_t *resource)
 {
     *memo = NULL;
     for (int i = 0; i < CONFIG_GCOAP_OBS_REGISTRATIONS_MAX; i++) {
@@ -1292,7 +1292,7 @@ int gcoap_resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code)
 }
 
 int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
-                                                  const coap_resource_t *resource)
+                                                  const gcoap_resource_t *resource)
 {
     gcoap_observe_memo_t *memo = NULL;
 
@@ -1323,7 +1323,7 @@ int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 }
 
 size_t gcoap_obs_send(const uint8_t *buf, size_t len,
-                      const coap_resource_t *resource)
+                      const gcoap_resource_t *resource)
 {
     gcoap_observe_memo_t *memo = NULL;
     _find_obs_memo_resource(&memo, resource);
@@ -1403,7 +1403,7 @@ int gcoap_get_resource_list_tl(void *buf, size_t maxlen, uint8_t cf,
     return (int)pos;
 }
 
-ssize_t gcoap_encode_link(const coap_resource_t *resource, char *buf,
+ssize_t gcoap_encode_link(const gcoap_resource_t *resource, char *buf,
                           size_t maxlen, coap_link_encoder_ctx_t *context)
 {
     size_t path_len = strlen(resource->path);

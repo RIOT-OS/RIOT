@@ -75,14 +75,14 @@ static ssize_t _handler_info(coap_pkt_t *pdu,
     return resp_len + slen;
 }
 
-static const coap_resource_t _resources[] = {
+static const gcoap_resource_t _resources[] = {
     { "/node/info",  COAP_GET, _handler_info, NULL },
     { "/sense/hum",  COAP_GET, _handler_dummy, NULL },
     { "/sense/temp", COAP_GET, _handler_dummy, NULL }
 };
 
 static gcoap_listener_t _listener = {
-    .resources     = (coap_resource_t *)&_resources[0],
+    .resources     = _resources,
     .resources_len = ARRAY_SIZE(_resources),
     .next          = NULL
 };
