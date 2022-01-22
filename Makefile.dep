@@ -20,7 +20,7 @@ include $(RIOTBASE)/drivers/Makefile.dep
 -include $(sort $(USEMODULE:%=$(RIOTBASE)/drivers/%/Makefile.dep))
 
 # pull dependencies from packages
--include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
+-include $(PKG_PATHS:%=%Makefile.dep)
 
 ifneq (,$(filter mpu_stack_guard,$(USEMODULE)))
   FEATURES_REQUIRED += cortexm_mpu

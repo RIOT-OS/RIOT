@@ -45,6 +45,7 @@ export BINDIR                # This is the folder where the application should b
 export CARGO_TARGET_DIR      # This is the folder where Rust parts of the application should be built in.
 export BUILD_DIR             # This is the base folder to store common build files and artifacts, e.g. test results.
 export APPDIR                # The base folder containing the application
+export PKG_PATHS             # List of absolute paths where packages of $(USEPKG) can be found
 export PKGDIRBASE            # The base folder for building packages
 
 export PYTHONPATH            # Python default search path for module filesi, with RIOT specific packages
