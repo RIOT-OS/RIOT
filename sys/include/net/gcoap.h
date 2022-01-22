@@ -48,7 +48,7 @@
  * this by uncommenting the appropriate lines in gcoap's make file.
  *
  * gcoap allows an application to specify a collection of request resource paths
- * it wants to be notified about. Create an array of resources (coap_resource_t
+ * it wants to be notified about. Create an array of resources (gcoap_resource_t
  * structs) ordered by the resource path, specifically the ASCII encoding of
  * the path characters (digit and capital precede lower case). Use
  * gcoap_register_listener() at application startup to pass in these resources,
@@ -650,6 +650,32 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Resource handler type
+ *
+ * Functions that implement this must be prepared to be called multiple times
+ * for the same request, as the server implementations do not perform message
+ * deduplication. That optimization is [described in the CoAP
+ * specification](https://tools.ietf.org/html/rfc7252#section-4.5).
+ *
+ * This should be trivial for requests of the GET, PUT, DELETE, FETCH and
+ * iPATCH methods, as they are defined as idempotent methods in CoAP.
+ *
+ * For POST, PATCH and other non-idempotent methods, this is an additional
+ * requirement introduced by the contract of this type.
+ */
+typedef ssize_t (*gcoap_handler_t)(coap_pkt_t *pkt, uint8_t *rbuf, size_t rlen, void *context);
+
+/**
+ * @brief   Type for CoAP resource entry
+ */
+typedef struct {
+    const char *path;               /**< URI path of resource               */
+    coap_method_flags_t methods;    /**< OR'ed methods this resource allows */
+    gcoap_handler_t handler;        /**< ptr to resource handler            */
+    void *context;                  /**< ptr to user defined context data   */
+} gcoap_resource_t;
+
+/**
  * @brief   Context information required to write a resource link
  */
 typedef struct {
@@ -670,7 +696,7 @@ typedef struct {
  * @return  count of bytes written to @p buf (or writable if @p buf is null)
  * @return  -1 on error
  */
-typedef ssize_t (*gcoap_link_encoder_t)(const coap_resource_t *resource, char *buf,
+typedef ssize_t (*gcoap_link_encoder_t)(const gcoap_resource_t *resource, char *buf,
                                         size_t maxlen, coap_link_encoder_ctx_t *context);
 
 /**
@@ -701,14 +727,14 @@ typedef struct gcoap_listener gcoap_listener_t;
  * @return  GCOAP_RESOURCE_ERROR      on processing failure of the request
  */
 typedef int (*gcoap_request_matcher_t)(gcoap_listener_t *listener,
-                                       const coap_resource_t **resource,
+                                       const gcoap_resource_t **resource,
                                        const coap_pkt_t *pdu);
 
 /**
  * @brief   A modular collection of resources for a server
  */
 struct gcoap_listener {
-    const coap_resource_t *resources;   /**< First element in the array of
+    const gcoap_resource_t *resources;   /**< First element in the array of
                                          *   resources; must order alphabetically */
     size_t resources_len;               /**< Length of array */
     gcoap_link_encoder_t link_encoder;  /**< Writes a link for a resource */
@@ -775,7 +801,7 @@ struct gcoap_request_memo {
  */
 typedef struct {
     sock_udp_ep_t *observer;            /**< Client endpoint; unused if null */
-    const coap_resource_t *resource;    /**< Entity being observed */
+    const gcoap_resource_t *resource;    /**< Entity being observed */
     uint8_t token[GCOAP_TOKENLEN_MAX];  /**< Client token for notifications */
     unsigned token_len;                 /**< Actual length of token attribute */
 } gcoap_observe_memo_t;
@@ -971,7 +997,7 @@ static inline ssize_t gcoap_response(coap_pkt_t *pdu, uint8_t *buf,
  * @return  GCOAP_OBS_INIT_UNUSED if no observer for resource
  */
 int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
-                   const coap_resource_t *resource);
+                   const gcoap_resource_t *resource);
 
 /**
  * @brief   Sends a buffer containing a CoAP Observe notification to the
@@ -987,7 +1013,7 @@ int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  * @return  0 if cannot send
  */
 size_t gcoap_obs_send(const uint8_t *buf, size_t len,
-                      const coap_resource_t *resource);
+                      const gcoap_resource_t *resource);
 
 /**
  * @brief   Provides important operational statistics
@@ -1031,7 +1057,7 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf);
  * @return  count of bytes written to @p buf (or writable if @p buf is null)
  * @return  -1 on error
  */
-ssize_t gcoap_encode_link(const coap_resource_t *resource, char *buf,
+ssize_t gcoap_encode_link(const gcoap_resource_t *resource, char *buf,
                           size_t maxlen, coap_link_encoder_ctx_t *context);
 
 #if IS_USED(MODULE_GCOAP_DTLS) || defined(DOXYGEN)
