@@ -31,6 +31,12 @@
 #define MAX_ADC_SPEED           (12000000U)
 
 /**
+ * @brief   Maximum sampling time for each channel (480 cycles)
+ *          T_CONV[µs] = (RESOLUTION[bits] + SMP[cycles]) / CLOCK_SPEED[MHz]
+ */
+#define MAX_ADC_SMP             (7u)
+
+/**
  * @brief   Default VBAT undefined value
  */
 #ifndef VBAT_ADC
@@ -93,7 +99,15 @@ int adc_init(adc_t line)
         }
     }
     ADC->CCR = ((clk_div / 2) - 1) << 16;
-
+    /* set sampling time to the maximum */
+    if (adc_config[line].chan >= 10) {
+        dev(line)->SMPR1 &= ~(MAX_ADC_SMP << (3 * (adc_config[line].chan - 10)));
+        dev(line)->SMPR1 |= MAX_ADC_SMP << (3 * (adc_config[line].chan - 10));
+    }
+    else {
+        dev(line)->SMPR1 &= ~(MAX_ADC_SMP << (3 * adc_config[line].chan));
+        dev(line)->SMPR2 |= MAX_ADC_SMP << (3 * adc_config[line].chan);
+    }
     /* free the device again */
     done(line);
     return 0;
