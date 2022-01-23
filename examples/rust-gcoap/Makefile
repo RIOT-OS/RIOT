@@ -19,8 +19,12 @@ USEMODULE += ztimer_usec
 USEMODULE += ztimer_msec
 USEMODULE += ztimer_sec
 
+# for the "vfs" feature of riot-coap-handler-demos (and vfs.c)
 USEMODULE += vfs
 USEMODULE += constfs
+
+# for the "saul" feature of riot-coap-handler-demos
+USEMODULE += saul_default
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
