@@ -9,4 +9,4 @@ resolver = "2"
 crate-type = ["staticlib"]
 
 [dependencies]
-riot-wrappers = "0.7"
+riot-wrappers = { version = "0.7", features = [ "set_panic_handler" ] }
