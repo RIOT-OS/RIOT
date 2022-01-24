@@ -95,6 +95,44 @@ gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, const void *data, size_t s
                                 gnrc_nettype_t type);
 
 /**
+ * @brief   Adds a new gnrc_pktsnip_t and its packet to the packet buffer.
+ *          The new snip is appended at the end of the current packet snip list.
+ *
+ * @warning **Do not** change the fields of the gnrc_pktsnip_t created by this
+ *          function externally. This will most likely create memory leaks or
+ *          not allowed memory access.
+ *
+ * @pre size < CONFIG_GNRC_PKTBUF_SIZE
+ *
+ * @param[in] head      Pointer to gnrc_pktsnip_t in the packet.
+ *                      Can point to NULL, then it will contain the new head on
+ *                      success.
+ * @param[in] data      Data of the new gnrc_pktsnip_t. If @p data is NULL no data
+ *                      will be inserted into `result`.
+ * @param[in] size      Length of @p data. If this value is 0 the
+ *                      gnrc_pktsnip::data field of the newly created snip will
+ *                      be NULL.
+ * @param[in] type      Protocol type of the gnrc_pktsnip_t.
+ *
+ * @return  0 on success
+ * @return  -ENOMEM, if no space is left in the packet buffer.
+ */
+static inline int gnrc_pktbuf_add_tail(gnrc_pktsnip_t **head,
+                                       const void *data, size_t size,
+                                       gnrc_nettype_t type)
+{
+    gnrc_pktsnip_t *snip = gnrc_pktbuf_add(NULL, data, size, type);
+
+    if (snip == NULL) {
+        return -ENOMEM;
+    }
+
+    *head = gnrc_pkt_append(*head, snip);
+
+    return 0;
+}
+
+/**
  * @brief   Marks the first @p size bytes in a received packet with a new
  *          packet snip that is appended to the packet.
  *
