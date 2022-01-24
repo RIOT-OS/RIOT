@@ -593,11 +593,11 @@ int lis2dh12_read_temperature(const lis2dh12_t *dev, int16_t *temp)
 
     /* enable temperature sensor */
     if (!_read(dev, REG_TEMP_CFG_REG)) {
-        uint8_t odr = _read(dev, REG_CTRL_REG1) >> 4;
         _write(dev, REG_TEMP_CFG_REG, LIS2DH12_TEMP_CFG_REG_ENABLE);
-        if (IS_USED(MODULE_ZTIMER)) {
-            ztimer_sleep(ZTIMER_MSEC, MS_PER_SEC / hz_per_dr[odr]);
-        }
+#if IS_USED(MODULE_ZTIMER_MSEC)
+        uint8_t odr = _read(dev, REG_CTRL_REG1) >> 4;
+        ztimer_sleep(ZTIMER_MSEC, MS_PER_SEC / hz_per_dr[odr]);
+#endif
     }
 
     _read_burst(dev, REG_OUT_TEMP_L, bytes, sizeof(bytes));
