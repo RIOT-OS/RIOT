@@ -823,14 +823,14 @@ void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
  * parts that are outside the current block2 request.
  *
  * @param[in]   slicer      slicer to use
- * @param[in]   bufpos      pointer to the current payload buffer position
+ * @param[out]  pkt         destination packet
  * @param[in]   c           byte array to copy
  * @param[in]   len         length of the byte array
  *
  * @returns     Number of bytes written to @p bufpos
  */
-size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
-                                const uint8_t *c, size_t len);
+size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, coap_build_pkt_t *pkt,
+                                const void *c, size_t len);
 
 /**
  * @brief Add a single character to a block2 reply.
@@ -840,12 +840,12 @@ size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
  * when the character is outside the current block2 request.
  *
  * @param[in]   slicer      slicer to use
- * @param[in]   bufpos      pointer to the current payload buffer position
+ * @param[out]  pkt         destination packet
  * @param[in]   c           character to write
  *
  * @returns     Number of bytes written to @p bufpos
  */
-size_t coap_blockwise_put_char(coap_block_slicer_t *slicer, uint8_t *bufpos, char c);
+size_t coap_blockwise_put_char(coap_block_slicer_t *slicer, coap_build_pkt_t *pkt, char c);
 
 /**
  * @brief    Block option getter
