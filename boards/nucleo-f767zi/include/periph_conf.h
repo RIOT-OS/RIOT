@@ -198,12 +198,12 @@ static const eth_conf_t eth_config = {
  * @{
  */
 static const adc_conf_t adc_config[] = {
-        {GPIO_PIN(PORT_A, 3), 0, 0},
-        {GPIO_PIN(PORT_C, 0), 0, 1},
-        {GPIO_PIN(PORT_C, 3), 0, 4},
-        {GPIO_PIN(PORT_F, 3), 0, 8},
-        {GPIO_PIN(PORT_F, 5), 0, 11},
-        {GPIO_PIN(PORT_F, 10), 0, 10},
+        {GPIO_PIN(PORT_A, 3), 2, 3},
+        {GPIO_PIN(PORT_C, 0), 2, 10},
+        {GPIO_PIN(PORT_C, 3), 2, 13},
+        {GPIO_PIN(PORT_F, 3), 2, 9},
+        {GPIO_PIN(PORT_F, 5), 2, 15},
+        {GPIO_PIN(PORT_F, 10), 2, 8},
 };
 
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
