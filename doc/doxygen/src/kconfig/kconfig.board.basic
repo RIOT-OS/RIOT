@@ -1,0 +1,10 @@
+config BOARD_<BOARD_THAT_HAS_MODULE_HARDWARE_2>
+    bool
+    default y
+    select BOARD_COMMON_<BOARD_THAT_HAS_MODULE_HARDWARE_2>
+    ...
+    select HAS_FOO
+    select HAS_BAR
+
+    # One of the multiple Variants can be used
+    select HAVE_<MY_MODULE>

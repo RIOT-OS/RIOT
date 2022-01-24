@@ -1,0 +1,7 @@
+menuconfig MODULE_<MY_MODULE>
+    bool "This is <MY_MODULE>"
+
+config HAVE_<MY_MODULE>
+    bool
+    help
+      Indicates that <MY_MODULE> is present.

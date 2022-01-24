@@ -1,0 +1,19 @@
+config BOARD_<BOARD_THAT_HAS_MODULE_HARDWARE>
+    bool
+    default y
+    select BOARD_COMMON_<BOARD_THAT_HAS_MODULE_HARDWARE>
+    ...
+    select HAS_FOO
+    select HAS_BAR
+
+# One of the multiple variants can be used
+    select HAVE_<MY_MODULE>_<VARIANT_1>
+    select HAVE_<MY_MODULE>_<VARIANT_2>
+
+# Override default priority to use <VARIANT_2>
+choice <MY_MODULE>_VARIANT
+    bool "Variants"
+    default MODULE_<MY_MODULE>_<VARIANT_2> if HAVE_<MY_MODULE>_<VARIANT_2>
+    default MODULE_<MY_MODULE>_<VARIANT_1> if HAVE_<MY_MODULE>_<VARIANT_1>
+    help
+        Only one variant can be selected.
