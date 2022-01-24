@@ -1043,11 +1043,11 @@ ssize_t coap_block2_build_reply(coap_pkt_t *pkt, unsigned code,
     return coap_build_reply(pkt, code, response);
 }
 
-size_t coap_blockwise_put_char(coap_block_slicer_t *slicer, uint8_t *bufpos, char c)
+size_t coap_blockwise_put_char(coap_block_slicer_t *slicer, coap_rsp_pkt_t *pkt, char c)
 {
     /* Only copy the char if it is within the window */
     if ((slicer->start <= slicer->cur) && (slicer->cur < slicer->end)) {
-        *bufpos = c;
+        *pkt->cur++ = c;
         slicer->cur++;
         return 1;
     }
@@ -1055,8 +1055,8 @@ size_t coap_blockwise_put_char(coap_block_slicer_t *slicer, uint8_t *bufpos, cha
     return 0;
 }
 
-size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
-                                const uint8_t *c, size_t len)
+size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, coap_rsp_pkt_t *pkt,
+                                const void *c, size_t len)
 {
     size_t str_len = 0;    /* Length of the string to copy */
 
@@ -1079,8 +1079,10 @@ size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
     }
 
     /* Only copy the relevant part of the string to the buffer */
-    memcpy(bufpos, c + str_offset, str_len);
+    memcpy(pkt->cur, (const uint8_t *)c + str_offset, str_len);
     slicer->cur += len;
+    pkt->cur += str_len;
+
     return str_len;
 }
 
@@ -1097,13 +1099,12 @@ ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, coap_rsp_pkt_t *re
 
     for (unsigned i = 0; i < coap_resources_numof; i++) {
         if (i) {
-            response->cur += coap_blockwise_put_char(&slicer, response->cur, ',');
+            coap_blockwise_put_char(&slicer, response, ',');
         }
-        response->cur += coap_blockwise_put_char(&slicer, response->cur, '<');
         unsigned url_len = strlen(coap_resources[i].path);
-        response->cur += coap_blockwise_put_bytes(&slicer, response->cur,
-                (uint8_t*)coap_resources[i].path, url_len);
-        response->cur += coap_blockwise_put_char(&slicer, response->cur, '>');
+        coap_blockwise_put_char(&slicer, response, '<');
+        coap_blockwise_put_bytes(&slicer, response, coap_resources[i].path, url_len);
+        coap_blockwise_put_char(&slicer, response, '>');
     }
 
     return coap_block2_build_reply(pkt, COAP_CODE_205, response, &slicer);

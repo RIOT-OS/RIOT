@@ -54,19 +54,19 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pkt, coap_rsp_pkt_t *response, v
     *response->cur++ = 0xff;
 
     /* Add actual content */
-    response->cur += coap_blockwise_put_bytes(&slicer, response->cur, block2_intro, sizeof(block2_intro)-1);
-    response->cur += coap_blockwise_put_bytes(&slicer, response->cur, (uint8_t*)RIOT_VERSION, strlen(RIOT_VERSION));
-    response->cur += coap_blockwise_put_char(&slicer, response->cur, ')');
-    response->cur += coap_blockwise_put_bytes(&slicer, response->cur, block2_board, sizeof(block2_board)-1);
-    response->cur += coap_blockwise_put_bytes(&slicer, response->cur, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
-    response->cur += coap_blockwise_put_bytes(&slicer, response->cur, block2_mcu, sizeof(block2_mcu)-1);
-    response->cur += coap_blockwise_put_bytes(&slicer, response->cur, (uint8_t*)RIOT_MCU, strlen(RIOT_MCU));
+    coap_blockwise_put_bytes(&slicer, response, block2_intro, sizeof(block2_intro)-1);
+    coap_blockwise_put_bytes(&slicer, response, (uint8_t*)RIOT_VERSION, strlen(RIOT_VERSION));
+    coap_blockwise_put_char(&slicer, response, ')');
+    coap_blockwise_put_bytes(&slicer, response, block2_board, sizeof(block2_board)-1);
+    coap_blockwise_put_bytes(&slicer, response, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
+    coap_blockwise_put_bytes(&slicer, response, block2_mcu, sizeof(block2_mcu)-1);
+    coap_blockwise_put_bytes(&slicer, response, (uint8_t*)RIOT_MCU, strlen(RIOT_MCU));
     /* To demonstrate individual chars */
-    response->cur += coap_blockwise_put_char(&slicer, response->cur, ' ');
-    response->cur += coap_blockwise_put_char(&slicer, response->cur, 'M');
-    response->cur += coap_blockwise_put_char(&slicer, response->cur, 'C');
-    response->cur += coap_blockwise_put_char(&slicer, response->cur, 'U');
-    response->cur += coap_blockwise_put_char(&slicer, response->cur, '.');
+    coap_blockwise_put_char(&slicer, response, ' ');
+    coap_blockwise_put_char(&slicer, response, 'M');
+    coap_blockwise_put_char(&slicer, response, 'C');
+    coap_blockwise_put_char(&slicer, response, 'U');
+    coap_blockwise_put_char(&slicer, response, '.');
 
     return coap_block2_build_reply(pkt, COAP_CODE_205, response, &slicer);
 }
