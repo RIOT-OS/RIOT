@@ -90,7 +90,6 @@ kernel_pid_t pid_high;
 
 int main(void)
 {
-    xtimer_init();
     mutex_init(&res_mtx);
     puts("This is a scheduling test for Priority Inversion");
 
