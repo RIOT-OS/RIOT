@@ -13,4 +13,7 @@ endif
 ifneq (,$(filter usbus_hid,$(USEMODULE)))
     DIRS += hid
 endif
+ifneq (,$(filter usbus_msc,$(USEMODULE)))
+    DIRS += msc
+endif
 include $(RIOTBASE)/Makefile.base
