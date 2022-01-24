@@ -131,7 +131,7 @@ void ztimer64_set_timeout_flag_at(ztimer64_clock_t *clock, ztimer64_t *t,
     t->callback = _set_timeout_flag_callback;
     t->arg = thread_get_active();
     thread_flags_clear(THREAD_FLAG_TIMEOUT);
-    ztimer64_set(clock, t, target);
+    ztimer64_set_at(clock, t, target);
 }
 #endif
 
