@@ -4,6 +4,7 @@ include ../Makefile.tests_common
 DISABLE_MODULE += test_utils_interactive_sync
 
 USEMODULE += touch_dev
-USEMODULE += xtimer
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
 
 include $(RIOTBASE)/Makefile.include
