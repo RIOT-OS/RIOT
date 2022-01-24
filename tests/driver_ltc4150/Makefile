@@ -4,6 +4,7 @@ BOARD ?= msba2
 
 USEMODULE += fmt_table
 USEMODULE += ltc4150
+USEMODULE += ztimer_usec
 
 include $(RIOTBASE)/Makefile.include
 

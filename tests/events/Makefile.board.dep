@@ -1,0 +1,7 @@
+# mulle will always select ztimer through requiring nvram_spi module
+# because of order of inclusion 'make' depency resolution will still select
+# xtimer while 'Kconfig' wont, so early require 'ztimer_usec'
+# for 'make' to avoid this
+ifneq (,$(filter mulle,$(BOARD)))
+  USEMODULE += ztimer_usec
+endif

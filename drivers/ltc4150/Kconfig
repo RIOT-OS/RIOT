@@ -12,7 +12,7 @@ config MODULE_LTC4150
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
-    select MODULE_XTIMER
+    select ZTIMER64_USEC
     help
         Driver for the Linear Tech LTC4150 Coulomb Counter (a.k.a. battery
         gauge sensor or power consumption sensor).

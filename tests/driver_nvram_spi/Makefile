@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += nvram_spi
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # set default device parameters in case they are undefined
 TEST_NVRAM_SPI_DEV           ?= SPI_DEV\(0\)
