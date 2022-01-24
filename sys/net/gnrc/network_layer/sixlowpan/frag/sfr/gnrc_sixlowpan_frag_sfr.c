@@ -84,7 +84,7 @@ static char addr_str[GNRC_NETIF_HDR_L2ADDR_PRINT_LEN];
 #endif  /* MODULE_GNRC_IPV6_NIB */
 
 static evtimer_msg_t _arq_timer;
-static xtimer_t _if_gap_timer = { .offset = 0, .long_offset = 0 };
+static xtimer_t _if_gap_timer = { 0 };
 static msg_t _if_gap_msg = { .type = GNRC_SIXLOWPAN_FRAG_SFR_INTER_FRAG_GAP_MSG };
 static uint32_t _last_frame_sent = 0U;
 
@@ -1481,8 +1481,7 @@ static void _sched_next_frame(void)
 {
     if (CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US > 0) {
         int state = irq_disable();  /* make timer check atomic */
-        bool already_set = (_if_gap_timer.offset ||
-                            _if_gap_timer.long_offset);
+        bool already_set = xtimer_is_set(&_if_gap_timer);
 
         irq_restore(state);
         if (!already_set) {
