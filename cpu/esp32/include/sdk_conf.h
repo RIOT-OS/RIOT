@@ -29,6 +29,15 @@ extern "C" {
 #endif
 
 /**
+ * @brief   SDK version number
+ *
+ * Determined with `git describe --tags` in `$ESP32_SDK_DIR`
+ */
+#if !defined(IDF_VER) || DOXYGEN
+#include "esp32_idf_version.h"
+#endif
+
+/**
  * @name    Clock configuration
  * @{
  */

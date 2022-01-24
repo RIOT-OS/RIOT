@@ -1,0 +1,13 @@
+# Directory with the SDK source checkout. Some modules in the cpu/esp32 use
+# internal parts of the SDK and for that they need access to the
+# ESP32_SDK_DIR path.
+export ESP32_SDK_DIR = $(PKGDIRBASE)/esp32_sdk
+
+# Directory where we built the modified libraries and headers.
+ESP32_SDK_BUILD_DIR ?= $(ESP32_SDK_DIR)/build-libs
+
+# Modified binary libraries are built here in the Makefile.
+LINKFLAGS += -L$(ESP32_SDK_BUILD_DIR)
+
+# esp32_sdk_libs doesn't generate any .a
+PSEUDOMODULES += esp32_sdk_libs

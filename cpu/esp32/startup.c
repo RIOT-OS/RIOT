@@ -156,6 +156,9 @@ NORETURN void IRAM call_start_cpu0 (void)
         ets_printf("%02x", cpu_id[i]);
     }
     ets_printf("\n");
+
+    extern char* esp_get_idf_version(void);
+    LOG_STARTUP("ESP-IDF SDK Version %s\n\n", esp_get_idf_version());
 #endif
 
     if (reset_reason == DEEPSLEEP_RESET) {

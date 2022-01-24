@@ -408,31 +408,13 @@ export PATH=$PATH:$HOME/esp/xtensa-esp32-elf/bin
 
 [Back to table of contents](#esp32_toc)
 
-### Installation of ESP-IDF (Espressif IoT Development Framework) {#esp32_installation_of_esp_idf}
+### ESP-IDF (Espressif IoT Development Framework) {#esp32_installation_of_esp_idf}
 
-ESP-IDF, the official SDK from Espressif, can be downloaded and installed as GIT repository.
+RIOT-OS uses the ESP-IDF, the official SDK from Espressif, as part of the
+build. It is downloaded as a package at build-time and there is no need to
+install it separately.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cd $HOME/esp
-git clone https://github.com/espressif/esp-idf.git
-cd esp-idf
-git checkout f198339ec09e90666150672884535802304d23ec
-git submodule init
-git submodule update
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-@note Please take care to checkout correct branches which were used for the port. Newer versions
-      might also work but were not tested.
-
-Since we only use a few header files, ESP-IDF does not need to be compiled in any way. To use the
-installed ESP-IDF, just set the variable `ESP32_SDK_DIR` accordingly.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-export ESP32_SDK_DIR=$HOME/esp/esp-idf
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-[Back to table of contents](#esp32_toc)
-
-### Installation of esptool.py (ESP flash programmer tool) {#esp32_installation_of_esptool}
+### Installation of `esptool.py` (ESP flash programmer tool) {#esp32_installation_of_esptool}
 
 The RIOT port does not work with the `esptool.py` ESP flasher program
 available on [GitHub](https://github.com/espressif/esptool) or

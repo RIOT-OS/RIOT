@@ -1,12 +1,3 @@
-# check some environment variables first
-ifndef ESP32_SDK_DIR
-  $(info ESP32_SDK_DIR should be defined as /path/to/esp-idf directory)
-  $(info ESP32_SDK_DIR is set by default to /opt/esp/esp-idf)
-  export ESP32_SDK_DIR=/opt/esp/esp-idf
-endif
-
-ESP_SDK_DIR = $(ESP32_SDK_DIR)
-
 # ESP32 specific flashing options
 FLASH_CHIP  = esp32
 FLASH_MODE ?= dout
@@ -35,17 +26,10 @@ INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/esp32
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/heap
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/spi_flash
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/tcpip_adapter
-INCLUDES += -I$(ESP32_SDK_DIR)/components/
-INCLUDES += -I$(ESP32_SDK_DIR)/components/driver/include
-INCLUDES += -I$(ESP32_SDK_DIR)/components/esp32/include
-INCLUDES += -I$(ESP32_SDK_DIR)/components/heap/include
-INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/esp32/include
-INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)
 
 ifneq (,$(filter esp_eth,$(USEMODULE)))
   INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/ethernet
-  INCLUDES += -I$(ESP32_SDK_DIR)/components/ethernet/include
 endif
 
 CFLAGS += -DSDK_NOT_USED -DCONFIG_FREERTOS_UNICORE=1 -DESP_PLATFORM
