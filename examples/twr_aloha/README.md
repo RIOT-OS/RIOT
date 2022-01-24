@@ -141,7 +141,7 @@ Pre-Requisites:
 A basic automatic test for the provided shell is included, run with:
 
 ```shell
-$ make -C examples/twr_aloha flash test
+$ make -C examples/twr_aloha flash test-with-config
 ```
 
 The application provides a `ShellInteraction` that can be used for
