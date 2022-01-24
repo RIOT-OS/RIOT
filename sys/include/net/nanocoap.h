@@ -201,6 +201,9 @@ typedef struct {
     coap_hdr_t *hdr;                                  /**< pointer to raw packet   */
     uint8_t *cur;                                     /**< current write position  */
     uint8_t *end;                                     /**< end of the tx buffer    */
+    const void *payload;                              /**< payload pointer, may be */
+                                                      /*   outside header buffer   */
+    uint16_t payload_len;                             /**< size of the payload     */
 } coap_rsp_pkt_t;
 
 /**
@@ -452,6 +455,7 @@ static inline void coap_init_response(const coap_pkt_t *pkt,
     response->hdr = buf;
     response->end = (uint8_t *)buf + size;
     response->cur = (uint8_t *)buf + coap_get_total_hdr_len(pkt);
+    response->payload_len = 0;
 }
 /**@}*/
 
@@ -767,9 +771,26 @@ void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
  * @param[in]   c           byte array to copy
  * @param[in]   len         length of the byte array
  *
- * @returns     Number of bytes written to @p bufpos
+ * @returns     Number of bytes written to @p pkt
  */
 size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, coap_rsp_pkt_t *pkt,
+                                const void *c, size_t len);
+
+/**
+ * @brief Reference a byte array to a block2 reply.
+ *
+ * This function is used to refernce an array of bytes to a CoAP block2 reply. it
+ * checks which parts of the string should be added to the reply and ignores
+ * parts that are outside the current block2 request.
+ *
+ * @param[in]   slicer      slicer to use
+ * @param[out]  pkt         destination packet
+ * @param[in]   c           byte array to reference
+ * @param[in]   len         length of the byte array
+ *
+ * @returns     Number of payload bytes
+ */
+size_t coap_blockwise_ref_bytes(coap_block_slicer_t *slicer, coap_rsp_pkt_t *pkt,
                                 const void *c, size_t len);
 
 /**
@@ -783,7 +804,7 @@ size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, coap_rsp_pkt_t *pkt
  * @param[out]  pkt         destination packet
  * @param[in]   c           character to write
  *
- * @returns     Number of bytes written to @p bufpos
+ * @returns     Number of bytes written to @p pkt
  */
 size_t coap_blockwise_put_char(coap_block_slicer_t *slicer, coap_rsp_pkt_t *pkt, char c);
 

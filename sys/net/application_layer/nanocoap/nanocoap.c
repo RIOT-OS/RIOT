@@ -459,8 +459,8 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
         return -ENOSPC;
     }
 
-    memcpy(response->cur, payload, payload_len);
-    response->cur += payload_len;
+    response->payload = payload;
+    response->payload_len = payload_len;
 
     return 0;
 }
@@ -1055,8 +1055,8 @@ size_t coap_blockwise_put_char(coap_block_slicer_t *slicer, coap_rsp_pkt_t *pkt,
     return 0;
 }
 
-size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, coap_rsp_pkt_t *pkt,
-                                const void *c, size_t len)
+static size_t _blockwise_put_bytes_ref(coap_block_slicer_t *slicer, const void **buf,
+                                       const void *c, size_t len)
 {
     size_t str_len = 0;    /* Length of the string to copy */
 
@@ -1079,8 +1079,29 @@ size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, coap_rsp_pkt_t *pkt
     }
 
     /* Only copy the relevant part of the string to the buffer */
-    memcpy(pkt->cur, (const uint8_t *)c + str_offset, str_len);
+    *buf = (uint8_t *)c + str_offset;
     slicer->cur += len;
+
+    return str_len;
+}
+
+size_t coap_blockwise_ref_bytes(coap_block_slicer_t *slicer, coap_rsp_pkt_t *pkt,
+                                const void *c, size_t len)
+{
+    assert(pkt->payload_len == 0);
+
+    size_t str_len = _blockwise_put_bytes_ref(slicer, &pkt->payload, c, len);
+    pkt->payload_len = str_len;
+
+    return str_len;
+}
+
+size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, coap_rsp_pkt_t *pkt,
+                                const void *c, size_t len)
+{
+    const void *buf;
+    size_t str_len = _blockwise_put_bytes_ref(slicer, &buf, c, len);
+    memcpy(pkt->cur, buf, str_len);
     pkt->cur += str_len;
 
     return str_len;
