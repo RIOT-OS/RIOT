@@ -28,6 +28,7 @@
 
 #include "net/eui_provider.h"
 #include "net/netdev/eth.h"
+#include "timex.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -40,7 +41,7 @@ static dose_signal_t state_transit_send(dose_t *ctx, dose_signal_t signal);
 static void state(dose_t *ctx, dose_signal_t src);
 static void _isr_uart(void *arg, uint8_t c);
 static void _isr_gpio(void *arg);
-static void _isr_xtimer(void *arg);
+static void _isr_ztimer(void *arg);
 static void clear_recv_buf(dose_t *ctx);
 static void _isr(netdev_t *netdev);
 static int _recv(netdev_t *dev, void *buf, size_t len, void *info);
@@ -52,9 +53,6 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t len);
 static int _init(netdev_t *dev);
 static void _poweron(dose_t *dev);
 static void _poweroff(dose_t *dev, dose_state_t sleep_state);
-
-/* smallest possible xtimer timeout */
-static const xtimer_ticks32_t xtimer_min_timeout = {.ticks32 = XTIMER_BACKOFF};
 
 static uint16_t crc16_update(uint16_t crc, uint8_t octet)
 {
@@ -163,7 +161,7 @@ static void _dose_watchdog_cb(void *arg, int chan)
             }
 
             DEBUG_PUTS("timeout");
-            state(&_dose_base[i], DOSE_SIGNAL_XTIMER);
+            state(&_dose_base[i], DOSE_SIGNAL_ZTIMER);
             break;
         default:
             break;
@@ -187,9 +185,8 @@ static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal)
     (void) signal;
     uint32_t backoff;
 
-    backoff = random_uint32_range(xtimer_usec_from_ticks(xtimer_min_timeout),
-                                  2 * ctx->timeout_base);
-    xtimer_set(&ctx->timeout, backoff);
+    backoff = random_uint32_range(0, 2 * ctx->timeout_base);
+    ztimer_set(ZTIMER_USEC, &ctx->timeout, backoff);
 
     return DOSE_SIGNAL_NONE;
 }
@@ -262,7 +259,7 @@ static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal)
 
     if (rc == DOSE_SIGNAL_NONE && !IS_ACTIVE(MODULE_DOSE_WATCHDOG)) {
         /* No signal is returned. We stay in the RECV state. */
-        xtimer_set(&ctx->timeout, ctx->timeout_base);
+        ztimer_set(ZTIMER_USEC, &ctx->timeout, ctx->timeout_base);
     }
 
     return rc;
@@ -281,7 +278,7 @@ static dose_signal_t state_transit_send(dose_t *ctx, dose_signal_t signal)
      * will bring us back to the BLOCKED state after _send has emitted
      * its last octet. */
 #ifndef MODULE_PERIPH_UART_COLLISION
-    xtimer_set(&ctx->timeout, ctx->timeout_base);
+    ztimer_set(ZTIMER_USEC, &ctx->timeout, ctx->timeout_base);
 #endif
 
     return DOSE_SIGNAL_NONE;
@@ -305,10 +302,10 @@ static void state(dose_t *ctx, dose_signal_t signal)
                 break;
 
             case DOSE_STATE_SEND + DOSE_SIGNAL_END:
-            case DOSE_STATE_SEND + DOSE_SIGNAL_XTIMER:
+            case DOSE_STATE_SEND + DOSE_SIGNAL_ZTIMER:
             case DOSE_STATE_INIT + DOSE_SIGNAL_INIT:
             case DOSE_STATE_RECV + DOSE_SIGNAL_END:
-            case DOSE_STATE_RECV + DOSE_SIGNAL_XTIMER:
+            case DOSE_STATE_RECV + DOSE_SIGNAL_ZTIMER:
                 signal = state_transit_idle(ctx, signal);
                 ctx->state = DOSE_STATE_IDLE;
                 break;
@@ -322,7 +319,7 @@ static void state(dose_t *ctx, dose_signal_t signal)
                 ctx->state = DOSE_STATE_RECV;
                 break;
 
-            case DOSE_STATE_BLOCKED + DOSE_SIGNAL_XTIMER:
+            case DOSE_STATE_BLOCKED + DOSE_SIGNAL_ZTIMER:
             case DOSE_STATE_SEND + DOSE_SIGNAL_UART:
                 signal = state_transit_send(ctx, signal);
                 ctx->state = DOSE_STATE_SEND;
@@ -354,7 +351,7 @@ static void _isr_gpio(void *arg)
     state(dev, DOSE_SIGNAL_GPIO);
 }
 
-static void _isr_xtimer(void *arg)
+static void _isr_ztimer(void *arg)
 {
     dose_t *dev = arg;
 
@@ -364,7 +361,7 @@ static void _isr_xtimer(void *arg)
 #endif
     case DOSE_STATE_BLOCKED:
     case DOSE_STATE_SEND:
-        state(dev, DOSE_SIGNAL_XTIMER);
+        state(dev, DOSE_SIGNAL_ZTIMER);
         break;
     default:
         ;
@@ -516,7 +513,7 @@ static inline void _send_done(dose_t *ctx, bool collision)
 #ifdef MODULE_PERIPH_UART_COLLISION
     uart_collision_detect_disable(ctx->uart);
     if (collision) {
-        state(ctx, DOSE_SIGNAL_XTIMER);
+        state(ctx, DOSE_SIGNAL_ZTIMER);
     }
 #else
     (void)ctx;
@@ -775,18 +772,12 @@ void dose_setup(dose_t *ctx, const dose_params_t *params, uint8_t index)
           );
 
     /* The timeout base is the minimal timeout base used for this driver.
-     * We have to ensure it is above the XTIMER_BACKOFF. Otherwise state
-     * transitions are triggered from another state transition setting up the
-     * timeout.
      * To calculate how long it takes to transfer one byte we assume
      * 8 data bits + 1 start bit + 1 stop bit per byte.
      */
     ctx->timeout_base = CONFIG_DOSE_TIMEOUT_BYTES * 10UL * US_PER_SEC / params->baudrate;
-    if (ctx->timeout_base < xtimer_usec_from_ticks(xtimer_min_timeout)) {
-        ctx->timeout_base = xtimer_usec_from_ticks(xtimer_min_timeout);
-    }
     DEBUG("dose timeout set to %" PRIu32 " µs\n", ctx->timeout_base);
-    ctx->timeout.callback = _isr_xtimer;
+    ctx->timeout.callback = _isr_ztimer;
     ctx->timeout.arg = ctx;
 
 #ifdef MODULE_DOSE_WATCHDOG
