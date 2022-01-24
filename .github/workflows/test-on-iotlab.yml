@@ -49,6 +49,10 @@ jobs:
             iotlab:
               archi: nrf52840dk:multi
               site: saclay
+          - riot: dwm1001
+            iotlab:
+              archi: dwm1001:dw1000
+              site: saclay
           - riot: nrf52832-mdk
             iotlab:
               archi: nrf52832mdk:ble
