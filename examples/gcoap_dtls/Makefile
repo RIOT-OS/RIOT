@@ -12,12 +12,22 @@ RIOTBASE ?= $(CURDIR)/../..
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += netdev_default
-USEMODULE += auto_init_gnrc_netif
-# Specify the mandatory networking modules
-USEMODULE += gnrc_ipv6_default
+
+# use GNRC by default
+LWIP ?= 0
+
+ifeq (0,$(LWIP))
+  USEMODULE += auto_init_gnrc_netif
+  # Specify the mandatory networking modules
+  USEMODULE += gnrc_ipv6_default
+  # Additional networking modules that can be dropped if not needed
+  USEMODULE += gnrc_icmpv6_echo
+else
+  USEMODULE += lwip_ipv6
+  USEMODULE += lwip_netdev
+endif
+
 USEMODULE += gcoap
-# Additional networking modules that can be dropped if not needed
-USEMODULE += gnrc_icmpv6_echo
 
 # Required by gcoap example
 USEMODULE += od
@@ -39,16 +49,16 @@ QUIET ?= 1
 # Enables DTLS-secured CoAP messaging
 GCOAP_ENABLE_DTLS ?= 1
 ifeq (1,$(GCOAP_ENABLE_DTLS))
-	# Required by DTLS. Currently, only tinyDTLS is supported by sock_dtls.
-	USEPKG += tinydtls
-	USEMODULE += sock_dtls
-	USEMODULE += tinydtls_sock_dtls
-	USEMODULE += gcoap_dtls
-	# tinydtls needs crypto secure PRNG
-	USEMODULE += prng_sha1prng
+  # Required by DTLS. Currently, only tinyDTLS is supported by sock_dtls.
+  USEPKG += tinydtls
+  USEMODULE += sock_dtls
+  USEMODULE += tinydtls_sock_dtls
+  USEMODULE += gcoap_dtls
+  # tinydtls needs crypto secure PRNG
+  USEMODULE += prng_sha1prng
 
-	# Maximum number of DTLS sessions
-	CFLAGS += -DDTLS_PEER_MAX=1
+  # Maximum number of DTLS sessions
+  CFLAGS += -DDTLS_PEER_MAX=1
 endif
 
 # Instead of simulating an Ethernet connection, we can also simulate
