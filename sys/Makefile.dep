@@ -220,6 +220,9 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   ifeq (,$(filter newlib_syscalls_%,$(USEMODULE)))
     USEMODULE += newlib_syscalls_default
   endif
+  ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
+    USEMODULE += div
+  endif
 endif
 
 ifneq (,$(filter posix_select,$(USEMODULE)))

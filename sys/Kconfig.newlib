@@ -17,6 +17,7 @@ config MODULE_NEWLIB_SYSCALLS_DEFAULT
     bool
     default y
     depends on !HAVE_CUSTOM_NEWLIB_SYSCALLS
+    select MODULE_DIV
     help
         Default implementation of newlib system calls.
 
