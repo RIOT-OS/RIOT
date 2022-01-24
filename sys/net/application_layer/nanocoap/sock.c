@@ -149,8 +149,19 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
 
             coap_init_response(&pkt, &response, buf, bufsize);
             if ((res = coap_handle_req(&pkt, &response)) >= 0) {
-                size_t pkt_len = (uintptr_t)response.cur - (uintptr_t)response.hdr;
-                sock_udp_send(&sock, buf, pkt_len, &remote);
+
+                sock_tx_snip_t _data = {
+                    .data = response.payload,
+                    .len  = response.payload_len,
+                };
+
+                sock_tx_snip_t _header = {
+                    .next = &_data,
+                    .data = response.hdr,
+                    .len  = (uintptr_t)response.cur - (uintptr_t)response.hdr,
+                };
+
+                res = sock_udp_sendv(&sock, &_header, &remote);
             }
             else {
                 DEBUG("error handling request %d\n", (int)res);
