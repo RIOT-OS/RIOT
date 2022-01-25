@@ -2,4 +2,4 @@
 # application configuration. This is only needed during migration.
 CONFIG_MODULE_PERIPH_UART=y
 CONFIG_MODULE_PERIPH_UART_NONBLOCKING=y
-CONFIG_MODULE_XTIMER=y
+CONFIG_ZTIMER_USEC=y
