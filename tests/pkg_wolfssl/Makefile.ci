@@ -18,6 +18,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     slstk3400a \
     spark-core \
     stk3200 \
+    spark-core \
     stm32f030f4-demo \
     stm32f0discovery \
     stm32g0316-disco \
