@@ -290,7 +290,7 @@ inline static uint32_t get_ccount(void)
 static IRAM_ATTR __attribute__((noinline)) void get_call_stack(void **callers)
 {
     const int offset = 2; // Caller is 2 stack frames deeper than we care about
-    bzero(callers, sizeof(void *) * STACK_DEPTH);
+    memset(callers, 0, sizeof(void *) * STACK_DEPTH);
     TEST_STACK(0);
     TEST_STACK(1);
     TEST_STACK(2);

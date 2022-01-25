@@ -252,6 +252,77 @@ void IRAM_ATTR _lock_release_recursive(_lock_t *lock)
     rmutex_unlock((rmutex_t*)*lock);
 }
 
+#if defined(_RETARGETABLE_LOCKING)
+
+/* check whether `struct __lock` is large enough to hold a recursive mutex */
+static_assert(sizeof(struct __lock) >= sizeof(rmutex_t),
+              "struct __lock is too small to hold a recursive mutex of type rmutex_t");
+
+/* definition of locks required by the newlib if retargetable locking is used */
+struct __lock __lock___sinit_recursive_mutex;
+struct __lock __lock___sfp_recursive_mutex;
+struct __lock __lock___atexit_recursive_mutex;
+struct __lock __lock___at_quick_exit_mutex;
+struct __lock __lock___malloc_recursive_mutex;
+struct __lock __lock___env_recursive_mutex;
+struct __lock __lock___tz_mutex;
+struct __lock __lock___dd_hash_mutex;
+struct __lock __lock___arc4random_mutex;
+
+/* map newlib's `__retarget_*` functions to the existing `_lock_*` functions */
+
+void __retarget_lock_init(_LOCK_T *lock)
+{
+    _lock_init(lock);
+}
+
+extern void __retarget_lock_init_recursive(_LOCK_T *lock)
+{
+    _lock_init_recursive(lock);
+}
+
+void __retarget_lock_close(_LOCK_T lock)
+{
+    _lock_close(&lock);
+}
+
+void __retarget_lock_close_recursive(_LOCK_T lock)
+{
+    _lock_close_recursive(&lock);
+}
+
+void __retarget_lock_acquire(_LOCK_T lock)
+{
+    _lock_acquire(&lock);
+}
+
+void __retarget_lock_acquire_recursive(_LOCK_T lock)
+{
+    _lock_acquire_recursive(&lock);
+}
+
+int __retarget_lock_try_acquire(_LOCK_T lock)
+{
+    return _lock_try_acquire(&lock);
+}
+
+int __retarget_lock_try_acquire_recursive(_LOCK_T lock)
+{
+    return _lock_try_acquire_recursive(&lock);
+}
+
+void __retarget_lock_release(_LOCK_T lock)
+{
+    _lock_release(&lock);
+}
+
+void __retarget_lock_release_recursive(_LOCK_T lock)
+{
+    _lock_release(&lock);
+}
+
+#endif /* _RETARGETABLE_LOCKING */
+
 /**
  * @name Memory allocation functions
  */
@@ -284,7 +355,7 @@ void* IRAM_ATTR __wrap__calloc_r(struct _reent *r, size_t count, size_t size)
     }
     void *result = heap_caps_malloc_default(size_total);
     if (result) {
-        bzero(result, size_total);
+        memset(result, 0, size_total);
     }
     return result;
 }
