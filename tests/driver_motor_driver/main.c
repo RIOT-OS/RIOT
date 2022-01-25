@@ -112,8 +112,6 @@ void motion_control(void)
 
 int main(void)
 {
-    xtimer_init();
-
     motion_control();
 
     return 0;
