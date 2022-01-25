@@ -652,9 +652,7 @@ desired module. If there are unmet dependencies when the default module
 is enabled, the module will silently not be selected. For this reason,
 we recommend against using this pattern, unless a silent lack of
 selection is necessary. The behaviour is similar to an `imply` without
-the issue of getting stuck or missing prompt. This is a generic example
-of [the module](kconfig.module.forced_defaults), and the
-[board](kconfig.board.basic)
+the issue of getting stuck or missing prompt.
 
 This is a generic example of [the
 module](kconfig.module.preferred_defaults), and the
