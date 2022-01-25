@@ -45,6 +45,7 @@ _phydat_test_t _test_vector[] =
     { .dim = 1, .dat = { .val = { 12345 }, .unit = UNIT_V, .scale = 6 } },
     { .dim = 1, .dat = { .val = { 12345 }, .unit = UNIT_W, .scale = 7 } },
     { .dim = 1, .dat = { .val = { 12345 }, .unit = UNIT_GS, .scale = -1 } },
+    { .dim = 3, .dat = { .val = { 123, 456, 789 }, .unit = UNIT_T, .scale = -9 } },
     { .dim = 1, .dat = { .val = { 12345 }, .unit = UNIT_DBM, .scale = -3 } },
     { .dim = 1, .dat = { .val = { 12345 }, .unit = UNIT_COULOMB, .scale = 0 } },
     { .dim = 1, .dat = { .val = { 12345 }, .unit = UNIT_F, .scale = -6 } },

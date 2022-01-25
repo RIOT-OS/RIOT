@@ -212,6 +212,7 @@ static void test_unitstr__success(void)
     TEST_ASSERT_EQUAL_STRING("W", phydat_unit_to_str_verbose(UNIT_W));
     TEST_ASSERT_EQUAL_STRING("dBm", phydat_unit_to_str_verbose(UNIT_DBM));
     TEST_ASSERT_EQUAL_STRING("Gs", phydat_unit_to_str_verbose(UNIT_GS));
+    TEST_ASSERT_EQUAL_STRING("T", phydat_unit_to_str_verbose(UNIT_T));
     TEST_ASSERT_EQUAL_STRING("Bar", phydat_unit_to_str_verbose(UNIT_BAR));
     TEST_ASSERT_EQUAL_STRING("Pa", phydat_unit_to_str_verbose(UNIT_PA));
     TEST_ASSERT_EQUAL_STRING("permille", phydat_unit_to_str_verbose(UNIT_PERMILL));

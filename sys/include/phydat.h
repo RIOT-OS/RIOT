@@ -97,6 +97,7 @@ enum {
     UNIT_V,         /**< Volts */
     UNIT_W,         /**< Watt */
     UNIT_GS,        /**< gauss */
+    UNIT_T,         /**< Tesla */
     UNIT_DBM,       /**< decibel-milliwatts */
     UNIT_COULOMB,   /**< coulomb */
     UNIT_F,         /**< Farad */
