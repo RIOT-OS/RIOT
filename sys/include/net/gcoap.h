@@ -702,7 +702,7 @@ typedef struct gcoap_listener gcoap_listener_t;
  */
 typedef int (*gcoap_request_matcher_t)(gcoap_listener_t *listener,
                                        const coap_resource_t **resource,
-                                       const coap_pkt_t *pdu);
+                                       coap_pkt_t *pdu);
 
 /**
  * @brief   A modular collection of resources for a server

@@ -86,6 +86,7 @@
 #include <unistd.h>
 
 #ifdef RIOT_VERSION
+#include "bitfield.h"
 #include "byteorder.h"
 #include "net/coap.h"
 #else
@@ -204,6 +205,7 @@ typedef struct {
     uint16_t payload_len;                             /**< length of payload       */
     uint16_t options_len;                             /**< length of options array */
     coap_optpos_t options[CONFIG_NANOCOAP_NOPTS_MAX]; /**< option offset array     */
+    BITFIELD(opt_crit, CONFIG_NANOCOAP_NOPTS_MAX);    /**< unhandled critical option */
 #ifdef MODULE_GCOAP
     uint32_t observe_value;                           /**< observe value           */
 #endif
@@ -462,8 +464,30 @@ static inline void coap_hdr_set_type(coap_hdr_t *hdr, unsigned type)
  * @name    Functions -- Options Read
  *
  * Read options from a parsed packet.
+ *
+ * Packets accessed through @ref coap_find_option or any of the `coap_opt_get_*` functions
+ * track their access in bit field created at parsing time to enable checking for critical
+ * options in @ref coap_has_unprocessed_critical_options.
+ * These functions thus have a side effect, and code that calls them on critical options
+ * needs to ensure that failure to process the accessed option is propagated into failure
+ * to process the message.
+ * For example, a server helper that tries to read the If-None-Match option (which is critical)
+ * and finds it to be longer than it can process must not return as if no If-None-Match option
+ * was present, as it has already triggered the side effect of marking the option as processed.
  */
 /**@{*/
+
+/**
+ * @brief   Get pointer to an option field by type
+ *
+ * @param[in]   pkt     packet to work on
+ * @param[in]   opt_num the option number to search for
+ *
+ * @returns     pointer to the option data
+ *              NULL if option number was not found
+ */
+uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num);
+
 /**
  * @brief   Get content type from packet
  *
@@ -486,7 +510,7 @@ unsigned coap_get_content_type(coap_pkt_t *pkt);
  * @return      -ENOSPC if option length is greater than 4 octets
  * @return      -EBADMSG if option value is invalid
  */
-int coap_opt_get_uint(const coap_pkt_t *pkt, uint16_t optnum, uint32_t *value);
+int coap_opt_get_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t *value);
 
 /**
  * @brief   Read a full option as null terminated string into the target buffer
@@ -505,7 +529,7 @@ int coap_opt_get_uint(const coap_pkt_t *pkt, uint16_t optnum, uint32_t *value);
  * @return      -ENOSPC if the complete option does not fit into @p target
  * @return      nr of bytes written to @p target (including '\0')
  */
-ssize_t coap_opt_get_string(const coap_pkt_t *pkt, uint16_t optnum,
+ssize_t coap_opt_get_string(coap_pkt_t *pkt, uint16_t optnum,
                             uint8_t *target, size_t max_len, char separator);
 
 /**
@@ -523,7 +547,7 @@ ssize_t coap_opt_get_string(const coap_pkt_t *pkt, uint16_t optnum,
  * @returns     -ENOSPC     if URI option is larger than @p max_len
  * @returns     nr of bytes written to @p target (including '\0')
  */
-static inline ssize_t coap_get_location_path(const coap_pkt_t *pkt,
+static inline ssize_t coap_get_location_path(coap_pkt_t *pkt,
                                              uint8_t *target, size_t max_len)
 {
     return coap_opt_get_string(pkt, COAP_OPT_LOCATION_PATH,
@@ -545,7 +569,7 @@ static inline ssize_t coap_get_location_path(const coap_pkt_t *pkt,
  * @returns     -ENOSPC     if URI option is larger than @p max_len
  * @returns     nr of bytes written to @p target (including '\0')
  */
-static inline ssize_t coap_get_location_query(const coap_pkt_t *pkt,
+static inline ssize_t coap_get_location_query(coap_pkt_t *pkt,
                                               uint8_t *target, size_t max_len)
 {
     return coap_opt_get_string(pkt, COAP_OPT_LOCATION_QUERY,
@@ -566,7 +590,7 @@ static inline ssize_t coap_get_location_query(const coap_pkt_t *pkt,
  * @returns     -ENOSPC     if URI option is larger than CONFIG_NANOCOAP_URI_MAX
  * @returns     nr of bytes written to @p target (including '\0')
  */
-static inline ssize_t coap_get_uri_path(const coap_pkt_t *pkt, uint8_t *target)
+static inline ssize_t coap_get_uri_path(coap_pkt_t *pkt, uint8_t *target)
 {
     return coap_opt_get_string(pkt, COAP_OPT_URI_PATH, target,
                                CONFIG_NANOCOAP_URI_MAX, '/');
@@ -586,7 +610,7 @@ static inline ssize_t coap_get_uri_path(const coap_pkt_t *pkt, uint8_t *target)
  * @returns     -ENOSPC     if URI option is larger than CONFIG_NANOCOAP_URI_MAX
  * @returns     nr of bytes written to @p target (including '\0')
  */
-static inline ssize_t coap_get_uri_query(const coap_pkt_t *pkt, uint8_t *target)
+static inline ssize_t coap_get_uri_query(coap_pkt_t *pkt, uint8_t *target)
 {
     return coap_opt_get_string(pkt, COAP_OPT_URI_QUERY, target,
                                CONFIG_NANOCOAP_URI_MAX, '&');
@@ -640,7 +664,7 @@ ssize_t coap_opt_get_next(const coap_pkt_t *pkt, coap_optpos_t *opt,
  * @return        -ENOENT if option not found
  * @return        -EINVAL if option cannot be parsed
  */
-ssize_t coap_opt_get_opaque(const coap_pkt_t *pkt, unsigned opt_num, uint8_t **value);
+ssize_t coap_opt_get_opaque(coap_pkt_t *pkt, unsigned opt_num, uint8_t **value);
 /**@}*/
 
 /**
@@ -655,7 +679,7 @@ ssize_t coap_opt_get_opaque(const coap_pkt_t *pkt, unsigned opt_num, uint8_t **v
  * @return      -ENOENT if Proxy-Uri option not found
  * @return      -EINVAL if Proxy-Uri option cannot be parsed
  */
-static inline ssize_t coap_get_proxy_uri(const coap_pkt_t *pkt, char **target)
+static inline ssize_t coap_get_proxy_uri(coap_pkt_t *pkt, char **target)
 {
     return coap_opt_get_opaque(pkt, COAP_OPT_PROXY_URI, (uint8_t **)target);
 }
@@ -859,6 +883,25 @@ static inline int coap_get_block2(coap_pkt_t *pkt, coap_block1_t *block)
  * @returns     1 if more flag is set
  */
 int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, unsigned *szx);
+
+/**
+ * @brief    Check whether any of the packet's options that are critical
+ *
+ * (i.e must be understood by the receiver, indicated by a 1 in the option number's least
+ * significant bit) were not accessed since the packet was parsed.)
+ *
+ * Call this in a server on requests after all their option processing has happened,
+ * and stop processing the request if it returns true, returning a 4.02 Bad Option response.
+ *
+ * Call this in a client when receiving a response before acting on it;
+ * consider the response unprocessable if it returns true.
+ *
+ * @param[in]   pkt     pkt to work on
+ *
+ * @returns true if any of the options marked as critical at parse time have not been accessed.
+ * @returns false if there are no critical options, or all have been accessed.
+ */
+bool coap_has_unprocessed_critical_options(const coap_pkt_t *pkt);
 
 /**
  * @brief   Helper to decode SZX value to size in bytes

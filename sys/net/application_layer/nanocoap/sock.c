@@ -188,10 +188,14 @@ int nanocoap_get_blockwise(sock_udp_t *sock, const char *path,
             return -1;
         }
 
-        /* no block option in response - direcly use paylaod */
+        /* no block option in response - directly use paylaod */
         if (!coap_get_block2(&pkt, &block2)) {
             block2.more = 0;
             block2.offset = 0;
+        }
+
+        if (coap_has_unprocessed_critical_options(&pkt)) {
+            return -ENOTSUP;
         }
 
         res = callback(arg, block2.offset, pkt.payload, pkt.payload_len,
