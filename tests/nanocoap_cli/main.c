@@ -29,11 +29,13 @@
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 extern int nanotest_client_cmd(int argc, char **argv);
+extern int nanotest_client_url_cmd(int argc, char **argv);
 extern int nanotest_server_cmd(int argc, char **argv);
 static int _list_all_inet6(int argc, char **argv);
 
 static const shell_command_t shell_commands[] = {
     { "client", "CoAP client", nanotest_client_cmd },
+    { "url", "CoAP client URL request", nanotest_client_url_cmd },
     { "server", "CoAP server", nanotest_server_cmd },
     { "inet6", "IPv6 addresses", _list_all_inet6 },
     { NULL, NULL, NULL }
