@@ -13357,6 +13357,7 @@ drivers/sx127x/include/sx127x_registers\.h:[0-9]+: warning: Member SX127X_RNG_RE
 drivers/sx127x/include/sx127x_registers\.h:[0-9]+: warning: Member SX127X_RNG_REG_MODEM_CONFIG2 \(macro definition\) of file sx127x_registers\.h is not documented\.
 drivers/sx127x/include/sx127x_registers\.h:[0-9]+: warning: Member VERSION_SX1272 \(macro definition\) of file sx127x_registers\.h is not documented\.
 drivers/sx127x/include/sx127x_registers\.h:[0-9]+: warning: Member VERSION_SX1276 \(macro definition\) of file sx127x_registers\.h is not documented\.
+drivers/sx127x/include/sx127x_registers\.h:[0-9]+: warning: Member VERSION_SX1276_WLR089 \(macro definition\) of file sx127x_registers\.h is not documented\.
 drivers/tcs37727/include/tcs37727\-internal\.h:[0-9]+: warning: Member B_COEF_IF \(macro definition\) of file tcs37727\-internal\.h is not documented\.
 drivers/tcs37727/include/tcs37727\-internal\.h:[0-9]+: warning: Member CT_COEF_IF \(macro definition\) of file tcs37727\-internal\.h is not documented\.
 drivers/tcs37727/include/tcs37727\-internal\.h:[0-9]+: warning: Member CT_OFFSET_IF \(macro definition\) of file tcs37727\-internal\.h is not documented\.

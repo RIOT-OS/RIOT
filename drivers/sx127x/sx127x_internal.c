@@ -53,7 +53,7 @@ int sx127x_check_version(const sx127x_t *dev)
     }
     DEBUG("[sx127x] SX1272 transceiver detected\n");
 #else /* MODULE_SX1276) */
-    if (version != VERSION_SX1276) {
+    if (version != VERSION_SX1276 && version != VERSION_SX1276_WLR089) {
         DEBUG("[sx127x] sx1276 test failed, invalid version number: %d\n",
               version);
         return -1;
