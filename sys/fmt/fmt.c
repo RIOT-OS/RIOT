@@ -31,6 +31,7 @@
 ssize_t write(int fildes, const void *buf, size_t nbyte);
 #endif
 
+#include "kernel_defines.h"
 #include "fmt.h"
 
 static const char _hex_chars[16] = "0123456789ABCDEF";
