@@ -19,6 +19,7 @@
 #include "embUnit.h"
 
 #include "net/gnrc/netif.h"
+#include "net/sock/util.h"
 #include "net/utils.h"
 
 static gnrc_netif_t dummy_netif[2];
@@ -187,6 +188,55 @@ Test *tests_netutils_ipv4_tests(void)
     return (Test *)&ipv4_addr_tests;
 }
 
+static void test_sock_tl_name2ep__ip_if_port(void)
+{
+    static const ipv6_addr_t a = { {
+            0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
+        }
+    };
+    struct _sock_tl_ep ep;
+
+    int res = sock_tl_name2ep(&ep, "[fe80::f8f9:fafb:fcfd:feff%1]:1234");
+    TEST_ASSERT_EQUAL_INT(res, 0);
+    TEST_ASSERT_EQUAL_INT(AF_INET6, ep.family);
+    TEST_ASSERT_EQUAL_INT(1234, ep.port);
+    TEST_ASSERT_EQUAL_INT(1, ep.netif);
+    TEST_ASSERT(ipv6_addr_equal(&a, (ipv6_addr_t *)&ep.addr.ipv6));
+}
+
+static void test_sock_tl_name2ep__name_port(void)
+{
+    static const ipv6_addr_t a = { {
+            0x26, 0x06, 0x28, 0x00, 0x02, 0x20, 0x00, 0x01,
+            0x02, 0x48, 0x18, 0x93, 0x25, 0xc8, 0x19, 0x46
+        }
+    };
+    struct _sock_tl_ep ep;
+
+    int res = sock_tl_name2ep(&ep, "example.com:1234");
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(AF_INET6, ep.family);
+    TEST_ASSERT_EQUAL_INT(1234, ep.port);
+    TEST_ASSERT(ipv6_addr_equal(&a, (ipv6_addr_t *)&ep.addr.ipv6));
+}
+
+static void test_sock_tl_name2ep__name_only(void)
+{
+    static const ipv6_addr_t a = { {
+            0x26, 0x06, 0x28, 0x00, 0x02, 0x20, 0x00, 0x01,
+            0x02, 0x48, 0x18, 0x93, 0x25, 0xc8, 0x19, 0x46
+        }
+    };
+    struct _sock_tl_ep ep;
+
+    int res = sock_tl_name2ep(&ep, "example.com");
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(AF_INET6, ep.family);
+    TEST_ASSERT_EQUAL_INT(0, ep.port);
+    TEST_ASSERT(ipv6_addr_equal(&a, (ipv6_addr_t *)&ep.addr.ipv6));
+}
+
 Test *tests_netutils_ipv6_tests(void)
 {
     for (unsigned i = 0; i < ARRAY_SIZE(dummy_netif); ++i) {
@@ -205,6 +255,9 @@ Test *tests_netutils_ipv6_tests(void)
         new_TestFixture(test_ipv6_addr_from_str__invalid_interface),
         new_TestFixture(test_ipv6_addr_from_str__success4),
         new_TestFixture(test_ipv6_addr_from_str__success5),
+        new_TestFixture(test_sock_tl_name2ep__ip_if_port),
+        new_TestFixture(test_sock_tl_name2ep__name_port),
+        new_TestFixture(test_sock_tl_name2ep__name_only),
     };
 
     EMB_UNIT_TESTCALLER(ipv6_addr_tests, NULL, NULL, fixtures);
