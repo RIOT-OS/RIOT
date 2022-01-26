@@ -42,6 +42,7 @@
 #include "irq.h"
 #include "mutex.h"
 #include "pm_layered.h"
+#include "panic.h"
 
 #include "periph/i2c.h"
 #include "periph/gpio.h"
