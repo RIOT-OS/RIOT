@@ -33,6 +33,10 @@ jobs:
       fail-fast: false
       matrix:
         boards:
+          - riot: dwm1001
+            iotlab:
+              archi: dwm1001:dw1000
+              site: saclay
           - riot: iotlab-m3
             iotlab:
               archi: m3:at86rf231
@@ -49,18 +53,22 @@ jobs:
             iotlab:
               archi: nrf52840dk:multi
               site: saclay
-          - riot: dwm1001
-            iotlab:
-              archi: dwm1001:dw1000
-              site: saclay
           - riot: nrf52832-mdk
             iotlab:
               archi: nrf52832mdk:ble
               site: saclay
+          - riot: nucleo-wl55jc
+            iotlab:
+              archi: nucleo-wl55jc:stm32wl
+              site: grenoble
           - riot: samr21-xpro
             iotlab:
               archi: samr21:at86rf233
               site: saclay
+          - riot: samr34-xpro
+            iotlab:
+              archi: samr34:sx1276
+              site: grenoble
           - riot: b-l072z-lrwan1
             iotlab:
               archi: st-lrwan1:sx1276
