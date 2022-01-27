@@ -102,11 +102,10 @@ int thread_isr_stack_usage(void)
     return -1;
 }
 
-static inline void *align_stack(void *stack_start, int *stacksize)
+static inline void *align_stack(uintptr_t start, int *stacksize)
 {
     const size_t alignment = sizeof(uintptr_t);
     const uintptr_t align_mask = alignment - 1;
-    uintptr_t start = (uintptr_t)stack_start;
     size_t unalignment = (start & align_mask)
                          ? (alignment - (start & align_mask)) : 0;
     start += unalignment;
@@ -117,10 +116,9 @@ static inline void *align_stack(void *stack_start, int *stacksize)
 
 char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stacksize)
 {
-    char *stk;
     ucontext_t *p;
 
-    stack_start = align_stack(stack_start, &stacksize);
+    stack_start = align_stack((uintptr_t)stack_start, &stacksize);
 
     VALGRIND_STACK_REGISTER(stack_start, (char *)stack_start + stacksize);
     VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
@@ -128,18 +126,16 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
 
     DEBUG("thread_stack_init\n");
 
-    stk = stack_start;
-
     /* Use intermediate cast to uintptr_t to silence -Wcast-align. The stack
      * is aligned to word size above. */
-    p = (ucontext_t *)(uintptr_t)(stk + (stacksize - sizeof(ucontext_t)));
+    p = (ucontext_t *)(uintptr_t)((uint8_t *)stack_start + (stacksize - sizeof(ucontext_t)));
     stacksize -= sizeof(ucontext_t);
 
     if (getcontext(p) == -1) {
         err(EXIT_FAILURE, "thread_stack_init: getcontext");
     }
 
-    p->uc_stack.ss_sp = stk;
+    p->uc_stack.ss_sp = stack_start;
     p->uc_stack.ss_size = stacksize;
     p->uc_stack.ss_flags = 0;
     p->uc_link = &end_context;
