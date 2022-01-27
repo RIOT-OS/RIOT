@@ -23,6 +23,7 @@
 
 #include "assert.h"
 #include "architecture.h"
+#include "kernel_defines.h"
 
 /* On all but 8bit architectures, at least one of the following should be
  * misaligned */
