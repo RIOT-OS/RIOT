@@ -59,9 +59,11 @@ extern "C" {
  * @{
  **/
 #define SX127X_PARAM_SPI                SPI_DEV(0)
+#if defined(BOARD_FEATHER_M0_LORA)
 #define SX127X_PARAM_SPI_NSS            GPIO_PIN(PA, 6)
 #define SX127X_PARAM_RESET              GPIO_PIN(PA, 8)
 #define SX127X_PARAM_DIO0               GPIO_PIN(PA, 9)
+#endif
 #define SX127X_PARAM_DIO1               GPIO_UNDEF
 #define SX127X_PARAM_DIO2               GPIO_UNDEF
 #define SX127X_PARAM_DIO3               GPIO_UNDEF
