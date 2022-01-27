@@ -288,8 +288,7 @@ if __name__ == '__main__':
                         help='Drop the given flag, if present (repeatable)')
     parser.add_argument('--clangd', default=False, action='store_const', const=True,
                         help='Shorthand for --add-built-in-includes --add-libstdxx-includes ' +
-                             '--filter-out=-Wformat-truncation --filter-out=-Wformat-overflow ' +
-                             '--filter-out=-mno-thumb-interwork')
+                             'and some CFLAG adjustments throughy --filter-out')
     _args = parser.parse_args()
     if _args.clangd:
         _args.add_built_in_includes = True
@@ -297,5 +296,7 @@ if __name__ == '__main__':
         _args.filter_out = ['-Wformat-truncation', '-Wformat-overflow', '-mno-thumb-interwork',
                             # Only even included for versions of GCC that support it
                             '-malign-data=natural',
+                            # Only supported starting with clang 11
+                            '-msmall-data-limit=8',
                             ]
     generate_compile_commands(_args)
