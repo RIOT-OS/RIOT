@@ -1,10 +1,10 @@
-## @defgroup pseudomodules Pseudomodules
-## @brief Modules without dedicated files
+## @defgroup pseudomodules Generic pseudomodules
+## @brief Modules influencing general RIOT behavior
 ##
 ## These are implemented in other modules or core components,
 ## and serve to enable certain functionality.
 ##
-## Pseudomodules are used instead of plain defines (that would be set using `CFLAGS += -DMODULE_NAME`)
+## Here, pseudomodules are used instead of plain defines (that would be set using `CFLAGS += -DMODULE_NAME`)
 ## because they can participate in dependency resolution:
 ## they can pull in other modules.
 ##
@@ -13,6 +13,10 @@
 ##
 ## The list of documented pseudomodules is not comprehensive by far;
 ## @ref makefiles/pseudomodules.inc.mk lists all that are not defined inside their main modules.
+## Not all modules listed there are "generic" pseudomodules;
+## some are merely optional components of a particular subsystem and should be documented there.
+##
+## See also <a href="creating-modules.html#pseudomodules">the documentation on pseudomodules in general</a>.
 ##
 ## @{
 
