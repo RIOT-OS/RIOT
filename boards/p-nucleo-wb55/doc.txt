@@ -1,6 +1,6 @@
 /**
 @defgroup    boards_p-nucleo-wb55 STM32 p-nucleo-wb55
-@ingroup     boards_common_nucleo
+@ingroup     boards
 @brief       Support for the STM32 p-nucleo-wb55
 
 Hardware
@@ -45,11 +45,7 @@ Flashing the device
 -------------------
 
 The ST p-nucleo-wb55 board includes an on-board ST-LINK programmer and can be
-flashed using OpenOCD.
-
-@note The latest release of OpenOCD doesn't contain support for this board,
-so a recent development version must be built from source to be able to flash
-this board.
+flashed using OpenOCD (use version 0.11.0 at least).
 
 To flash this board, just use the following command:
 
@@ -102,8 +98,8 @@ Implementation Status
 |                  | RTC               | yes     |         |
 |                  | RNG               | yes     |         |
 |                  | Timer             | yes     | TIM2    |
-|                  | WDT               | no      |         |
-|                  | USB               | no      |         |
+|                  | WDT               | yes     |         |
+|                  | USB               | yes     |         |
 |                  | PWM               | no      |         |
 |                  | AES               | no      |         |
 
