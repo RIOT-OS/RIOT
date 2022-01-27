@@ -98,8 +98,8 @@ Implementation Status
 |                  | RTC               | yes     |         |
 |                  | RNG               | yes     |         |
 |                  | Timer             | yes     | TIM2    |
-|                  | WDT               | no      |         |
-|                  | USB               | no      |         |
+|                  | WDT               | yes     |         |
+|                  | USB               | yes     |         |
 |                  | PWM               | no      |         |
 |                  | AES               | no      |         |
 
