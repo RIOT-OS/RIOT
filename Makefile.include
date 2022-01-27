@@ -386,6 +386,17 @@ ifneq (,$(IOTLAB_NODE))
   PROGRAMMER ?= iotlab
   # iotlab uses ELFFILE by default for flashing boards.
   FLASHFILE ?= $(ELFFILE)
+  # RIOT_CI_BUILD disables the build of BINFILE which is required for flashing
+  # on IoT-LAB
+  ifeq (1,$(RIOT_CI_BUILD))
+    BUILD_FILES += $(BINFILE)
+  endif
+  # Disable IOTLAB_NODE if inside Docker to avoid including the
+  # iotlab.single.inc.mk file which is useless there: it's only useful for
+  # flashing and this is done outside of Docker.
+  ifeq (1,$(INSIDE_DOCKER))
+    IOTLAB_NODE :=
+  endif
 endif
 
 # Add standard include directories
