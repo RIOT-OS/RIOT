@@ -558,6 +558,7 @@ extern "C" {
 /* Version */
 #define SX127X_REG_VERSION                                           (0x42)
 #define VERSION_SX1276                                               (0x12)
+#define VERSION_SX1276_WLR089                                        (0x13)
 #define VERSION_SX1272                                               (0x22)
 
 /* Additional settings */
