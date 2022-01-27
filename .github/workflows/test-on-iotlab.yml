@@ -57,10 +57,18 @@ jobs:
             iotlab:
               archi: nrf52832mdk:ble
               site: saclay
+          - riot: nucleo-wl55jc
+            iotlab:
+              archi: nucleo-wl55jc:stm32wl
+              site: grenoble
           - riot: samr21-xpro
             iotlab:
               archi: samr21:at86rf233
               site: saclay
+          - riot: samr34-xpro
+            iotlab:
+              archi: samr34:sx1276
+              site: grenoble
           - riot: b-l072z-lrwan1
             iotlab:
               archi: st-lrwan1:sx1276
