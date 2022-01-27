@@ -41,7 +41,8 @@
  * The following list of what `DEVELHELP=1` enables is not comprehensive, but
  * should give a rough impression of what to expect:
  *
- * * Many runtime checks are enabled (stack overflow protection, warnings when
+ * * Many runtime checks are enabled (stack overflow protection by means of
+ *   @ref pseudomodule_mpu_stack_guard or @ref SCHED_TEST_STACK, warnings when
  *   sending messages to invalid PIDs, …), some of which just log errors to
  *   stdout, some even halt the system.
  * * Some structures contain additional information, e.g. threads store their

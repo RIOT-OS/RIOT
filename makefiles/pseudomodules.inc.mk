@@ -1,6 +1,38 @@
+## @defgroup pseudomodules Generic pseudomodules
+## @brief Modules influencing general RIOT behavior
+##
+## These are implemented in other modules or core components,
+## and serve to enable certain functionality.
+##
+## Here, pseudomodules are used instead of plain defines (that would be set using `CFLAGS += -DMODULE_NAME`)
+## because they can participate in dependency resolution:
+## they can pull in other modules.
+##
+## Pseudomodules are often enabled automatically through module dependencies,
+## but can also be enabled manually by stating `USEMODULE += module_name` in the Makefile.
+##
+## The list of documented pseudomodules is not comprehensive by far;
+## @ref makefiles/pseudomodules.inc.mk lists all that are not defined inside their main modules.
+## Not all modules listed there are "generic" pseudomodules;
+## some are merely optional components of a particular subsystem and should be documented there.
+##
+## See also <a href="creating-modules.html#pseudomodules">the documentation on pseudomodules in general</a>.
+##
+## @{
+
 PSEUDOMODULES += atomic_utils
 PSEUDOMODULES += base64url
+
+## @defgroup pseudomodule_board_software_reset board_software_reset
+## @brief Use any software-only reset button on the board to reboot
+##
+## Some boards have reset buttons that are not wired to the MCU's reset line,
+## but merely are configured to cause a reset by convention.
+##
+## If this module is active, the button will be configured thusly (and then not
+## be advertised in any other capacity, e.g. through @ref sys_auto_init_saul).
 PSEUDOMODULES += board_software_reset
+
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
@@ -87,8 +119,21 @@ PSEUDOMODULES += log
 PSEUDOMODULES += log_printfnoformat
 PSEUDOMODULES += log_color
 PSEUDOMODULES += lora
+
+## @defgroup pseudomodule_mpu_stack_guard mpu_stack_guard
+## @brief MPU based stack guard
+##
+## When this module is active (which it is by default on supported MCUs),
+## the Memory Protection Unit will be configured to detect stack overflows.
 PSEUDOMODULES += mpu_stack_guard
+
+## @defgroup pseudomodule_mpu_noexec_ram mpu_noexec_ram
+## @brief Mark RAM as non-executable using the MPU
+##
+## Mark the RAM non executable.
+## This is a protection mechanism which makes exploitation of buffer overflows significantly harder.
 PSEUDOMODULES += mpu_noexec_ram
+
 PSEUDOMODULES += mtd_write_page
 PSEUDOMODULES += nanocoap_%
 PSEUDOMODULES += netdev_default
@@ -214,3 +259,5 @@ NO_PSEUDOMODULES += auto_init_usbus
 NO_PSEUDOMODULES += auto_init_screen
 
 # Packages and drivers may also add modules to PSEUDOMODULES in their `Makefile.include`.
+
+## @}
