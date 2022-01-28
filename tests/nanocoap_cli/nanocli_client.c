@@ -33,8 +33,6 @@ static ssize_t _send(coap_pkt_t *pkt, size_t len, char *addr_str, char *port_str
 {
     ipv6_addr_t addr;
     sock_udp_ep_t remote;
-    sock_udp_t sock;
-    ssize_t res;
 
     remote.family = AF_INET6;
 
@@ -76,11 +74,7 @@ static ssize_t _send(coap_pkt_t *pkt, size_t len, char *addr_str, char *port_str
         return 0;
     }
 
-    nanocoap_connect(&sock, NULL, &remote);
-    res = nanocoap_request(&sock, pkt, len);
-    nanocoap_close(&sock);
-
-    return res;
+    return nanocoap_request(pkt, NULL, &remote, len);
 }
 
 int nanotest_client_cmd(int argc, char **argv)

@@ -98,19 +98,13 @@ static int _parse_ipv6_addr(char *addr_str, ipv6_addr_t *addr, uint16_t *netif)
 static ssize_t _send(coap_pkt_t *pkt, size_t len, ipv6_addr_t *addr, uint16_t netif, uint16_t port)
 {
     sock_udp_ep_t remote;
-    sock_udp_t sock;
-    ssize_t res;
 
     remote.family = AF_INET6;
     remote.port = port;
     remote.netif = netif;
     memcpy(&remote.addr.ipv6[0], addr->u8, sizeof(addr->u8));
 
-    nanocoap_connect(&sock, NULL, &remote);
-    res = nanocoap_request(&sock, pkt, len);
-    nanocoap_close(&sock);
-
-    return res;
+    return nanocoap_request(pkt, NULL, &remote, len);
 }
 
 static ssize_t _build_coap_pkt(coap_pkt_t *pkt, uint8_t *buf, ssize_t buflen,
