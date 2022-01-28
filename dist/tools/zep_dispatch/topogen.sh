@@ -16,11 +16,11 @@ else
     CRESET=
 fi
 
-WIDTH=100
-HEIGHT=100
-RANGE=30
-VARIANCE=15
-NUM=10
+WIDTH=100	# X dimension of the simulated world
+HEIGHT=100	# Y dimension of the simulated world
+RANGE=30	# base node radio range
+VARIANCE=15	# random offset to radio range
+NUM=10		# number of nodes
 
 echo "writing to $FILE"
 
