@@ -41,7 +41,7 @@ int nanocoap_connect(sock_udp_t *sock, sock_udp_ep_t *local, sock_udp_ep_t *remo
     return sock_udp_create(sock, local, remote, 0);
 }
 
-ssize_t nanocoap_request(sock_udp_t *sock, coap_pkt_t *pkt, size_t len)
+ssize_t nanocoap_sock_request(sock_udp_t *sock, coap_pkt_t *pkt, size_t len)
 {
     ssize_t res = -EAGAIN;
     size_t pdu_len = (pkt->payload - (uint8_t *)pkt->hdr) + pkt->payload_len;
@@ -110,6 +110,23 @@ ssize_t nanocoap_request(sock_udp_t *sock, coap_pkt_t *pkt, size_t len)
     return res;
 }
 
+ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local,
+                         sock_udp_ep_t *remote, size_t len)
+{
+    int res;
+    sock_udp_t sock;
+
+    res = nanocoap_connect(&sock, local, remote);
+    if (res) {
+        return res;
+    }
+
+    res = nanocoap_sock_request(&sock, pkt, len);
+    nanocoap_close(&sock);
+
+    return res;
+}
+
 ssize_t nanocoap_get(sock_udp_t *sock, const char *path, void *buf, size_t len)
 {
     ssize_t res;
@@ -122,7 +139,7 @@ ssize_t nanocoap_get(sock_udp_t *sock, const char *path, void *buf, size_t len)
     pkt.payload = pktpos;
     pkt.payload_len = 0;
 
-    res = nanocoap_request(sock, &pkt, len);
+    res = nanocoap_sock_request(sock, &pkt, len);
     if (res < 0) {
         return res;
     }
@@ -158,7 +175,7 @@ static int _fetch_block(coap_pkt_t *pkt, uint8_t *buf, sock_udp_t *sock,
     pkt->payload = pktpos;
     pkt->payload_len = 0;
 
-    int res = nanocoap_request(sock, pkt, NANOCOAP_BLOCKWISE_BUF(blksize));
+    int res = nanocoap_sock_request(sock, pkt, NANOCOAP_BLOCKWISE_BUF(blksize));
     if (res < 0) {
         return res;
     }

@@ -245,7 +245,23 @@ int nanocoap_get_blockwise_url(const char *url,
  * @returns     length of response on success
  * @returns     <0 on error
  */
-ssize_t nanocoap_request(sock_udp_t *sock, coap_pkt_t *pkt, size_t len);
+ssize_t nanocoap_sock_request(sock_udp_t *sock, coap_pkt_t *pkt, size_t len);
+
+/**
+ * @brief   Simple synchronous CoAP request
+ *
+ * @param[in,out]   pkt     Packet struct containing the request. Is reused for
+ *                          the response
+ * @param[in]       local   Local UDP endpoint, may be NULL
+ * @param[in]       remote  remote UDP endpoint
+ * @param[in]       len     Total length of the buffer associated with the
+ *                          request
+ *
+ * @returns     length of response on success
+ * @returns     <0 on error
+ */
+ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local,
+                         sock_udp_ep_t *remote, size_t len);
 
 #ifdef __cplusplus
 }
