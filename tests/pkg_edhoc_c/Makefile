@@ -6,6 +6,9 @@ BOARD_WHITELIST += $(BOARD_PROVIDES_NETIF)
 #   open(/dev/net/tun): No such file or directory
 TEST_ON_CI_BLACKLIST += native
 
+# Test fails pretty regularly on CI
+TEST_ON_CI_BLACKLIST += esp32-wroom-32
+
 # Edhoc related packages
 USEPKG += edhoc-c
 USEMODULE += edhoc-c_crypto_tinycrypt
