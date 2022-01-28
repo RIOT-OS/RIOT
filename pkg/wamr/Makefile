@@ -13,7 +13,7 @@ PKG_CUSTOM_PREPARED = CHECK_VERSION
 include $(RIOTBASE)/pkg/pkg.mk
 
 #less Wall TODO: get things fixed upstream
-CFLAGS :=  $(filter-out -pedantic, $(CFLAGS))
+CFLAGS :=  $(filter-out -Wcast-align, $(CFLAGS))
 CFLAGS :=  $(filter-out -Werror, $(CFLAGS))
 CFLAGS += -Wno-format
 CFLAGS += -Wno-strict-prototypes
