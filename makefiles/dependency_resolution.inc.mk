@@ -37,6 +37,16 @@ ifneq ($(OLD_STATE),$(NEW_STATE))
 else
   # Include late allowing them to have been disabled during dependency resolution
   DEFAULT_MODULE += auto_init periph_init
+  DEFAULT_MODULE += periph_init_leds
+  DEFAULT_MODULE += periph_init_led0
+  DEFAULT_MODULE += periph_init_led1
+  DEFAULT_MODULE += periph_init_led2
+  DEFAULT_MODULE += periph_init_led3
+  DEFAULT_MODULE += periph_init_led4
+  DEFAULT_MODULE += periph_init_led5
+  DEFAULT_MODULE += periph_init_led6
+  DEFAULT_MODULE += periph_init_led7
+
   USEMODULE += $(filter-out $(DISABLE_MODULE),auto_init periph_init)
 
   # If module auto_init is not used, silently disable all of its submodules
