@@ -187,6 +187,10 @@ extern int _i2c_scan(int argc, char **argv);
 extern int _loramac_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_NICE
+extern int _sc_nice(int argc, char **argv);
+#endif
+
 #ifdef MODULE_NIMBLE_NETIF
 extern int _nimble_netif_handler(int argc, char **argv);
 #endif
@@ -266,6 +270,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_GNRC_IPV6_NIB
     {"nib", "Configure neighbor information base", _gnrc_ipv6_nib},
+#endif
+#ifdef MODULE_NICE
+    {"nice", "Change priority of an active thread", _sc_nice},
 #endif
 #ifdef MODULE_NETSTATS_NEIGHBOR
     {"neigh", "Show neighbor statistics", _netstats_nb},

@@ -14,6 +14,9 @@ endif
 ifneq (,$(filter mci,$(USEMODULE)))
   SRC += sc_disk.c
 endif
+ifneq (,$(filter nice,$(USEMODULE)))
+  SRC += sc_nice.c
+endif
 ifneq (,$(filter periph_pm,$(USEMODULE)))
   SRC += sc_pm.c
 endif

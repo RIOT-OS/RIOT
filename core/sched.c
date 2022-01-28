@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +15,7 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -86,21 +87,21 @@ static void (*sched_cb)(kernel_pid_t active_thread,
  * and readout away, switching between the two orders depending on the CLZ
  * instruction availability
  */
-static inline void _set_runqueue_bit(thread_t *process)
+static inline void _set_runqueue_bit(uint8_t priority)
 {
 #if defined(BITARITHM_HAS_CLZ)
-    runqueue_bitcache |= BIT31 >> process->priority;
+    runqueue_bitcache |= BIT31 >> priority;
 #else
-    runqueue_bitcache |= 1 << process->priority;
+    runqueue_bitcache |= 1 << priority;
 #endif
 }
 
-static inline void _clear_runqueue_bit(thread_t *process)
+static inline void _clear_runqueue_bit(uint8_t priority)
 {
 #if defined(BITARITHM_HAS_CLZ)
-    runqueue_bitcache &= ~(BIT31 >> process->priority);
+    runqueue_bitcache &= ~(BIT31 >> priority);
 #else
-    runqueue_bitcache &= ~(1 << process->priority);
+    runqueue_bitcache &= ~(1 << priority);
 #endif
 }
 
@@ -218,41 +219,54 @@ thread_t *__attribute__((used)) sched_run(void)
     return next_thread;
 }
 
+/* Note: Forcing the compiler to inline this function will reduce .text for applications
+ *       not linking in sched_change_priority(), which benefits the vast majority of apps.
+ */
+static inline __attribute__((always_inline)) void _runqueue_push(thread_t *thread, uint8_t priority)
+{
+    DEBUG("sched_set_status: adding thread %" PRIkernel_pid " to runqueue %" PRIu8 ".\n",
+          thread->pid, priority);
+    clist_rpush(&sched_runqueues[priority], &(thread->rq_entry));
+    _set_runqueue_bit(priority);
+
+    /* some thread entered a runqueue
+     * if it is the active runqueue
+     * inform the runqueue_change callback */
+#if (IS_USED(MODULE_SCHED_RUNQ_CALLBACK))
+    thread_t *active_thread = thread_get_active();
+    if (active_thread && active_thread->priority == priority) {
+        sched_runq_callback(priority);
+    }
+#endif
+}
+
+/* Note: Forcing the compiler to inline this function will reduce .text for applications
+ *       not linking in sched_change_priority(), which benefits the vast majority of apps.
+ */
+static inline __attribute__((always_inline)) void _runqueue_pop(thread_t *thread)
+{
+    DEBUG("sched_set_status: removing thread %" PRIkernel_pid " from runqueue %" PRIu8 ".\n",
+          thread->pid, thread->priority);
+    clist_lpop(&sched_runqueues[thread->priority]);
+
+    if (!sched_runqueues[thread->priority].next) {
+        _clear_runqueue_bit(thread->priority);
+#if (IS_USED(MODULE_SCHED_RUNQ_CALLBACK))
+        sched_runq_callback(thread->priority);
+#endif
+    }
+}
+
 void sched_set_status(thread_t *process, thread_status_t status)
 {
     if (status >= STATUS_ON_RUNQUEUE) {
         if (!(process->status >= STATUS_ON_RUNQUEUE)) {
-            DEBUG(
-                "sched_set_status: adding thread %" PRIkernel_pid " to runqueue %" PRIu8 ".\n",
-                process->pid, process->priority);
-            clist_rpush(&sched_runqueues[process->priority],
-                        &(process->rq_entry));
-            _set_runqueue_bit(process);
-
-            /* some thread entered a runqueue
-             * if it is the active runqueue
-             * inform the runqueue_change callback */
-#if (IS_USED(MODULE_SCHED_RUNQ_CALLBACK))
-            thread_t *active_thread = thread_get_active();
-            if (active_thread && active_thread->priority == process->priority) {
-                sched_runq_callback(process->priority);
-            }
-#endif
+            _runqueue_push(process, process->priority);
         }
     }
     else {
         if (process->status >= STATUS_ON_RUNQUEUE) {
-            DEBUG(
-                "sched_set_status: removing thread %" PRIkernel_pid " from runqueue %" PRIu8 ".\n",
-                process->pid, process->priority);
-            clist_lpop(&sched_runqueues[process->priority]);
-
-            if (!sched_runqueues[process->priority].next) {
-                _clear_runqueue_bit(process);
-#if (IS_USED(MODULE_SCHED_RUNQ_CALLBACK))
-                sched_runq_callback(process->priority);
-#endif
-            }
+            _runqueue_pop(process);
         }
     }
 
@@ -306,3 +320,40 @@ void sched_register_cb(void (*callback)(kernel_pid_t, kernel_pid_t))
     sched_cb = callback;
 }
 #endif
+
+void sched_change_priority(thread_t *thread, uint8_t priority)
+{
+    assert(thread && (priority < SCHED_PRIO_LEVELS));
+
+    if (thread->priority == priority) {
+        return;
+    }
+
+    unsigned irq_state = irq_disable();
+
+    if (thread_is_active(thread)) {
+        _runqueue_pop(thread);
+        _runqueue_push(thread, priority);
+    }
+    thread->priority = priority;
+
+    irq_restore(irq_state);
+
+    thread_t *active = thread_get_active();
+
+    if ((active == thread)
+        || ((active != NULL) && (active->priority > priority) && thread_is_active(thread))
+        ) {
+        /* If the change in priority would result in a different decision of
+         * the scheduler, we need to yield to make sure the change in priority
+         * takes effect immediately. This can be due to one of the following:
+         *
+         * 1) The priority of the thread currently running has been reduced
+         *    (higher numeric value), so that other threads now have priority
+         *    over the currently running.
+         * 2) The priority of a pending thread has been increased (lower numeric value) so that it
+         *    now has priority over the running thread.
+         */
+        thread_yield_higher();
+    }
+}
