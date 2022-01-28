@@ -23,6 +23,8 @@
  */
 #include <assert.h>
 #include <stdint.h>
+/* stdio.h needs to be included before inttypes.h (newlibc) */
+#include <stdio.h>
 #include <inttypes.h>
 
 #include "ztimer64.h"
@@ -294,9 +296,7 @@ void ztimer64_clock_print(const ztimer64_clock_t *clock)
     const ztimer64_base_t *entry = clock->first;
 
     while (entry) {
-        printf("0x%08x:%" PRIu64 "\n", (unsigned)entry,
-               entry->target);
-
+        printf("0x%08x:%" PRIu64 "\n", (unsigned)entry, entry->target);
         entry = entry->next;
     }
     puts("");
