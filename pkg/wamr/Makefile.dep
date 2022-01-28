@@ -1,4 +1,7 @@
 USEMODULE += sema
+USEMODULE += ztimer64_msec
+USEMODULE += ztimer_usec
+
 
 #WAMR supports "X86_32/64", "AARCH64", "ARM", "THUMB", "MIPS", "XTENSA" and RISCV
 FEATURES_REQUIRED_ANY += arch_native|arch_arm|arch_mips32r2|arch_esp32|arch_riscv

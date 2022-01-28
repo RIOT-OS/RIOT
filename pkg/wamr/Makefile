@@ -1,10 +1,10 @@
 PKG_NAME=wamr
 PKG_URL=https://github.com/bytecodealliance/wasm-micro-runtime.git
-PKG_BLEADING?=1
 ifeq ($(PKG_BLEADING),1)
   PKG_VERSION=main
 else
-  PKG_VERSION=8fd89bd415db73281c8fbd53de1c2726f35b5ddb
+  PKG_VERSION=770ca8c90c8803f934bf681cd29949b7fb5291a3
+  #main 2022-01-28
 endif
 PKG_LICENSE=Apache-2.0
 
@@ -14,6 +14,7 @@ include $(RIOTBASE)/pkg/pkg.mk
 
 #less Wall TODO: get things fixed upstream
 CFLAGS :=  $(filter-out -pedantic, $(CFLAGS))
+CFLAGS :=  $(filter-out -Werror, $(CFLAGS))
 CFLAGS += -Wno-format
 CFLAGS += -Wno-strict-prototypes
 CFLAGS += -Wno-old-style-definition
@@ -86,6 +87,8 @@ print_build_target:
 	@echo CFLAGS: $(CFLAGS)
 	@echo WAMR_BUILD_TARGET: $(WAMR_BUILD_TARGET)
 	@echo WAMR_CONFIG: $(WAMR_CONFIG)
+	@echo RIOT_INCLUDES: $(RIOT_INCLUDES)
+
 
 CHECK_VERSION:
 	test -f $(PKG_DOWNLOADED) && (test `cat $(PKG_DOWNLOADED)` = $(PKG_VERSION) || rm $(PKG_DOWNLOADED));true
