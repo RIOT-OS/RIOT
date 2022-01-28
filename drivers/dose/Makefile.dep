@@ -12,4 +12,4 @@ USEMODULE += eui_provider
 USEMODULE += iolist
 USEMODULE += netdev_eth
 USEMODULE += random
-USEMODULE += xtimer
+USEMODULE += ztimer_usec

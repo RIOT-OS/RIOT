@@ -82,7 +82,7 @@
 #include "net/eui48.h"
 #include "bitarithm.h"
 #include "mutex.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -120,7 +120,7 @@ typedef enum {
     DOSE_SIGNAL_INIT   = 0x10,    /**< Init the state machine */
     DOSE_SIGNAL_GPIO   = 0x20,    /**< Sense GPIO detected a falling edge */
     DOSE_SIGNAL_UART   = 0x30,    /**< Octet has been received */
-    DOSE_SIGNAL_XTIMER = 0x40,    /**< Timer timed out */
+    DOSE_SIGNAL_ZTIMER = 0x40,    /**< Timer timed out */
     DOSE_SIGNAL_SEND   = 0x50,    /**< Enter send state */
     DOSE_SIGNAL_END    = 0x60     /**< Leave send state */
 } dose_signal_t;
@@ -165,7 +165,7 @@ typedef enum {
 /**
  * @brief   Hardware timer to use with the `dose_watchdog` module.
  *
- *          This will be used to detect RX timeout instead of xtimer to speed up
+ *          This will be used to detect RX timeout instead of ztimer to speed up
  *          the RX path when high data rates / less CPU overhead is required.
  */
 #if DOXYGEN
@@ -197,7 +197,7 @@ typedef struct {
     gpio_t sense_pin;                       /**< GPIO to sense for start bits on the UART's rx line */
 #endif
     gpio_t standby_pin;                     /**< GPIO to put the CAN transceiver in standby mode */
-    xtimer_t timeout;                       /**< Timeout timer ensuring always to get back to IDLE state */
+    ztimer_t timeout;                       /**< Timeout timer ensuring always to get back to IDLE state */
     uint32_t timeout_base;                  /**< Base timeout in us */
     uart_t uart;                            /**< UART device to use */
     uint8_t uart_octet;                     /**< Last received octet */
