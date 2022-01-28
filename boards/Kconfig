@@ -15,3 +15,66 @@ config MODULE_BOARD
     depends on TEST_KCONFIG
     help
         Module which holds all board-specific files.
+
+config MODULE_AUTO_INIT_LEDS
+    bool
+    default y
+    depends on TEST_KCONFIG
+    help
+        Enable auto initalization of board leds
+
+config MODULE_AUTO_INIT_LED0
+    bool
+    default y
+    depends on TEST_KCONFIG
+    help
+        Enable auto initalization of LED0 if present
+
+config MODULE_AUTO_INIT_LED1
+    bool
+    default y
+    depends on TEST_KCONFIG
+    help
+        Enable auto initalization of LED1 if present
+
+config MODULE_AUTO_INIT_LED2
+    bool
+    default y
+    depends on TEST_KCONFIG
+    help
+        Enable auto initalization of LED2 if present
+
+config MODULE_AUTO_INIT_LED3
+    bool
+    default y
+    depends on TEST_KCONFIG
+    help
+        Enable auto initalization of LED3 if present
+
+config MODULE_AUTO_INIT_LED4
+    bool
+    default y
+    depends on TEST_KCONFIG
+    help
+        Enable auto initalization of LED4 if present
+
+config MODULE_AUTO_INIT_LED5
+    bool
+    default y
+    depends on TEST_KCONFIG
+    help
+        Enable auto initalization of LED5 if present
+
+config MODULE_AUTO_INIT_LED6
+    bool
+    default y
+    depends on TEST_KCONFIG
+    help
+        Enable auto initalization of LED6 if present
+
+config MODULE_AUTO_INIT_LED7
+    bool
+    default y
+    depends on TEST_KCONFIG
+    help
+        Enable auto initalization of LED7 if present

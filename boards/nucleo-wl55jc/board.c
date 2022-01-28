@@ -26,9 +26,6 @@
 
 void board_init(void)
 {
-    /* initialize the CPU */
-    board_common_nucleo_init();
-
     if (IS_USED(MODULE_SX126X_STM32WL)) {
         /* Initialize the GPIO control for RF 3-port switch (SP3T) */
         gpio_init(FE_CTRL1, GPIO_OUT);

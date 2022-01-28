@@ -38,10 +38,4 @@ mtd_dev_t *mtd0 = &_mtd_mci;
 
 void board_init(void)
 {
-    /* LEDS */
-    FIO3DIR |= LED0_MASK;
-    FIO3DIR |= LED1_MASK;
-
-    LED0_OFF;
-    LED0_OFF;
 }

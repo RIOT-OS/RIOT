@@ -24,9 +24,6 @@
 
 void board_init(void)
 {
-    /* initialize the board's LED */
-    gpio_init(LED0_PIN, GPIO_OUT);
-    LED0_OFF;
 
     /* disable bootloader's USB */
     RCC->APB1ENR &= ~RCC_APB1ENR_USBEN;

@@ -29,13 +29,8 @@
 #include "sx127x_params.h"
 #endif
 
-void led_init(void);
-
 void board_init(void)
 {
-    /* initialize the boards LEDs */
-    led_init();
-
     /* initialize board specific pins for LoRa */
 #ifdef MODULE_SX127X
     gpio_init(TCXO_PWR_PIN, GPIO_OUT);
@@ -43,15 +38,4 @@ void board_init(void)
     gpio_init(TX_OUTPUT_SEL_PIN, GPIO_OUT);
     gpio_write(TX_OUTPUT_SEL_PIN, !SX127X_PARAM_PASELECT);
 #endif /* USEMODULE_SX127X */
-}
-
-/**
- * @brief Initialize the boards on-board LED
- */
-void led_init(void)
-{
-    gpio_init(LED0_PIN, GPIO_OUT);
-    gpio_set(LED0_PIN); /* gpio is inverted => clear */
-    gpio_init(LED1_PIN, GPIO_OUT);
-    gpio_set(LED1_PIN); /* gpio is inverted => clear */
 }

@@ -7,4 +7,5 @@ endif
 ifneq (,$(filter sx126x_stm32wl,$(USEMODULE)))
   USEMODULE += sx126x_rf_switch
 endif
-include $(RIOTBOARD)/common/nucleo/Makefile.dep
+
+include $(RIOTBOARD)/common/nucleo64/Makefile.dep

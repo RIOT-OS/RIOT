@@ -36,4 +36,7 @@ config BOARD_B_L475E_IOT01A
     select HAVE_LPS22HB
     select HAVE_LSM6DSL
 
+config MODULE_PERIPH_INIT_LED0
+    default n if MODULE_PERIPH_SPI
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"

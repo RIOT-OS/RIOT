@@ -55,12 +55,6 @@ mtd_dev_t *mtd0 = (mtd_dev_t *)&ikea_tradfri_nor_dev;
 
 void board_init(void)
 {
-#ifndef RIOTBOOT
-    /* initialize the LEDs */
-    gpio_init(LED0_PIN, GPIO_OUT);
-    gpio_init(LED1_PIN, GPIO_OUT);
-#endif
-
 #ifdef MODULE_MTD
     /* enable NOR flash (only on the ICC-1-A) */
     if (gpio_is_valid(IKEA_TRADFRI_NOR_EN)) {

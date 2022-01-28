@@ -28,25 +28,6 @@
  * @}
  */
 
-#include "board.h"
-#include "board_nucleo.h"
-#include "periph/gpio.h"
-
-void board_common_nucleo_init(void)
-{
-    /* initialization of on-board LEDs
-     * NOTE: LED0 must be explicitly enabled as it is also used for SPI_DEV(0) */
-#ifdef AUTO_INIT_LED0
-    gpio_init(LED0_PIN, GPIO_OUT);
-#endif
-#ifdef LED1_PIN
-    gpio_init(LED1_PIN, GPIO_OUT);
-#endif
-#ifdef LED2_PIN
-    gpio_init(LED2_PIN, GPIO_OUT);
-#endif
-}
-
 /*
  * Allow overwriting board_init if common implementation doesn't work.
  * If at link time another implementation of board_init() not marked as weak
@@ -54,5 +35,4 @@ void board_common_nucleo_init(void)
  */
 void __attribute__((weak)) board_init(void)
 {
-    board_common_nucleo_init();
 }

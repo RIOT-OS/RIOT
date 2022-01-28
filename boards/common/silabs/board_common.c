@@ -42,10 +42,6 @@ void board_common_init(void)
     bc_init();
 #endif
 
-    /* initialize the LEDs */
-    gpio_init(LED0_PIN, GPIO_OUT);
-    gpio_init(LED1_PIN, GPIO_OUT);
-
     /* initialize the push buttons */
     gpio_init(PB0_PIN, GPIO_IN);
     gpio_init(PB1_PIN, GPIO_IN);

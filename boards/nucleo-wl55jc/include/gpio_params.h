@@ -33,13 +33,11 @@ extern "C" {
  */
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
-#ifdef AUTO_INIT_LED0
     {
         .name = "LED(blue)",
         .pin = LED0_PIN,
         .mode = GPIO_OUT
     },
-#endif
     {
         .name = "LED(green)",
         .pin = LED1_PIN,

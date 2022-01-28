@@ -26,7 +26,6 @@ static inline void leds_init(void);
 
 void board_init(void)
 {
-    /* initialize the boards LEDs */
     leds_init();
 }
 
@@ -38,10 +37,6 @@ void board_init(void)
  */
 static inline void leds_init(void)
 {
-    gpio_init(LED0_PIN, GPIO_OUT);
-    gpio_init(LED1_PIN, GPIO_OUT);
-    gpio_init(LED2_PIN, GPIO_OUT);
-
     /* Shoot rainbows */
     LED_RAINBOW();
 }

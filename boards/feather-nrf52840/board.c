@@ -20,12 +20,6 @@
 
 void board_init(void)
 {
-    /* initialize the boards LEDs */
-    gpio_init(LED0_PIN, GPIO_OUT);
-    gpio_clear(LED0_PIN);
-    gpio_init(LED1_PIN, GPIO_OUT);
-    gpio_clear(LED1_PIN);
-
 }
 
 /** @} */

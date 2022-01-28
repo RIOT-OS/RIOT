@@ -32,7 +32,7 @@ extern "C" {
  */
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
-#ifdef AUTO_INIT_LED0
+#ifdef MODULE_PERIPH_INIT_LED0
     {
         .name = "LED(green)",
         .pin = LED0_PIN,

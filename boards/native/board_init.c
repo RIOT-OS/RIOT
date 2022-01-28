@@ -78,8 +78,5 @@ VFS_AUTO_MOUNT(fatfs, VFS_MTD(mtd0_dev), "/nvm", 0);
  */
 void board_init(void)
 {
-    LED0_OFF;
-    LED1_ON;
-
     puts("RIOT native board initialized.");
 }
