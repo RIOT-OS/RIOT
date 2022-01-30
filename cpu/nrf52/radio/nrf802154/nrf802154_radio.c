@@ -259,6 +259,7 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
     int radio_state = NRF_RADIO->STATE;
     switch (op) {
     case IEEE802154_HAL_OP_TRANSMIT:
+        info = ctx;
         eagain = (state != STATE_IDLE
             && state != STATE_CCA_BUSY && NRF_RADIO->STATE != RADIO_STATE_STATE_Disabled);
 
