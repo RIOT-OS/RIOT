@@ -97,8 +97,8 @@ compile-commands: | $(DIRS:%=COMPILE-COMMANDS--%)
 	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,TARGET_ARCH: $(TARGET_ARCH))
 	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,TARGET_ARCH_LLVM: $(TARGET_ARCH_LLVM))
 
-# include makefile snippets for packages in $(USEPKG) that modify GENSRC:
--include $(USEPKG:%=$(RIOTPKG)/%/Makefile.gensrc)
+# include makefile snippets for packages in $(PKG_PATHS) that modify GENSRC:
+-include $(PKG_PATHS:%=%Makefile.gensrc)
 
 GENOBJC     := $(GENSRC:%.c=%.o)
 OBJC_LTO    := $(SRC:%.c=$(BINDIR)/$(MODULE)/%.o)

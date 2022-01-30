@@ -20,7 +20,9 @@ ESP_SDK_LIBS = $(addprefix $(ESP8266_SDK_BUILD_DIR)/, $(ESP_SDK_COMPONENT_LIBS))
 
 all: $(ESP_SDK_LIBS) $(ESP8266_SDK_BUILD_DIR)/esp8266_idf_version.h
 
-$(ESP8266_SDK_BUILD_DIR):
+$(PKG_PREPARED): $(ESP8266_SDK_BUILD_DIR)
+
+$(ESP8266_SDK_BUILD_DIR): $(PKG_PATCHED)
 	$(Q)mkdir -p $(ESP8266_SDK_BUILD_DIR)
 
 # Set the SDK version from the SDK hash/tag. For example "v3.1-51-g913a06a9".

@@ -6,6 +6,10 @@
 EXTERNAL_MODULE_PATHS := $(sort $(foreach dir,$(EXTERNAL_MODULE_DIRS),\
   $(foreach mod,$(USEMODULE),$(dir $(wildcard $(dir)/$(mod)/Makefile)))))
 
+# Locate used packages in $(RIOTPKG).
+PKG_PATHS := $(sort $(foreach dir,$(RIOTPKG),\
+  $(foreach pkg,$(USEPKG),$(dir $(wildcard $(dir)/$(pkg)/Makefile)))))
+
 # Back up current state to detect changes
 OLD_STATE := $(USEMODULE) $(USEPKG) $(FEATURES_USED)
 

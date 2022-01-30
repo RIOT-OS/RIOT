@@ -427,6 +427,10 @@ ifeq (1,$(TEST_KCONFIG))
   USEMODULE := $(KCONFIG_MODULES)
   KCONFIG_PACKAGES := $(call lowercase,$(patsubst CONFIG_PACKAGE_%,%,$(filter CONFIG_PACKAGE_%,$(.VARIABLES))))
   USEPKG := $(KCONFIG_PACKAGES)
+
+  # Locate used packages in $(RIOTPKG).
+  PKG_PATHS := $(sort $(foreach dir,$(RIOTPKG),\
+    $(foreach pkg,$(USEPKG),$(dir $(wildcard $(dir)/$(pkg)/Makefile)))))
 else
   # always select provided architecture features
   FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
@@ -570,8 +574,8 @@ include $(RIOTBASE)/sys/Makefile.include
 # include Makefile.includes of each driver modules if they exist
 -include $(USEMODULE:%=$(RIOTBASE)/drivers/%/Makefile.include)
 
-# include Makefile.includes for packages in $(USEPKG)
--include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
+# include Makefile.includes for packages in $(PKG_PATHS)
+-include $(PKG_PATHS:%=%Makefile.include)
 
 # include external modules configuration
 -include $(EXTERNAL_MODULE_PATHS:%=%/Makefile.include)
@@ -771,31 +775,30 @@ endif
 # The `clean` needs to be serialized before everything else.
 all $(BASELIBS) $(ARCHIVES) $(BUILDDEPS) ..in-docker-container: | $(CLEAN)
 
-.PHONY: pkg-prepare pkg-build pkg-build-%
+.PHONY: pkg-prepare pkg-build
 pkg-prepare:
-	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i prepare ; done
+	-@$(foreach dir,$(PKG_PATHS),"$(MAKE)" -C $(dir) prepare $(NEWLINE))
 
-pkg-build: $(USEPKG:%=pkg-build-%)
-pkg-build-%: $(BUILDDEPS)
-	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$*
+pkg-build: $(BUILDDEPS)
+	$(foreach dir,$(PKG_PATHS),$(QQ)"$(MAKE)" -C $(dir) $(NEWLINE))
 
 clean:
 ifndef MAKE_RESTARTS
-	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i clean ; done
+	-@$(foreach dir,$(PKG_PATHS),"$(MAKE)" -C $(dir) clean $(NEWLINE))
 	-@rm -rf $(BINDIR)
 	-@rm -rf $(SCANBUILD_OUTPUTDIR)
 endif
 
 # Remove intermediates, but keep the .elf, .hex and .map etc.
 clean-intermediates:
-	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
+	-@$(foreach dir,$(PKG_PATHS),"$(MAKE)" -C $(dir) distclean $(NEWLINE))
 	-@rm -rf $(BINDIR)/*.a $(BINDIR)/*/
 
 clean-pkg:
-	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
+	-@$(foreach dir,$(PKG_PATHS),"$(MAKE)" -C $(dir) distclean $(NEWLINE))
 
 distclean:
-	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
+	-@$(foreach dir,$(PKG_PATHS),"$(MAKE)" -C $(dir) distclean $(NEWLINE))
 	-@rm -rf $(BINDIRBASE)
 
 # Include PROGRAMMER_FLASH/PROGRAMMER_RESET variables
