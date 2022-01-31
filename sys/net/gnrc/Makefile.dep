@@ -246,8 +246,10 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))
   USEMODULE += gnrc_ipv6
   USEMODULE += gnrc_sixlowpan
-  USEMODULE += gnrc_sixlowpan_ctx
   USEMODULE += gnrc_sixlowpan_iphc_nhc
+  ifeq (,$(filter gnrc_sixlowpan_no_ctx,$(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan_ctx
+  endif
 endif
 
 ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))

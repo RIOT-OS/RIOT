@@ -75,6 +75,7 @@ typedef struct {
     uint16_t ltime;
 } gnrc_sixlowpan_ctx_t;
 
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_CTX) || DOXYGEN
 /**
  * @brief   Gets a context matching the given IPv6 address best with its prefix.
  *
@@ -94,6 +95,19 @@ gnrc_sixlowpan_ctx_t *gnrc_sixlowpan_ctx_lookup_addr(const ipv6_addr_t *addr);
  * @return  NULL if there is no such context.
  */
 gnrc_sixlowpan_ctx_t *gnrc_sixlowpan_ctx_lookup_id(uint8_t id);
+#else
+static inline gnrc_sixlowpan_ctx_t *gnrc_sixlowpan_ctx_lookup_addr(const ipv6_addr_t *addr)
+{
+    (void)addr;
+    return NULL;
+}
+
+static inline gnrc_sixlowpan_ctx_t *gnrc_sixlowpan_ctx_lookup_id(uint8_t id)
+{
+    (void)id;
+    return NULL;
+}
+#endif /* IS_USED(MODULE_GNRC_SIXLOWPAN_CTX) */
 
 /**
  * @brief   Updates (or adds if currently not registered) a context

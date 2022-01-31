@@ -307,7 +307,7 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
         bf_set(abr->ctxs, cid);
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
-#else   /* MODULE_GNRC_SIXLOWPAN_CTX */
+#elif IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C) /* MODULE_GNRC_SIXLOWPAN_CTX */
     (void)abr;
 #endif  /* MODULE_GNRC_SIXLOWPAN_CTX */
     return ltime * SEC_PER_MIN * MS_PER_SEC;
