@@ -49,6 +49,7 @@ EXTERNAL_BOARD_DIRS             ?=
 RIOTMAKE                        ?= $(RIOTBASE)/makefiles
 RIOTKCONFIG                     ?= $(RIOTBASE)/kconfigs
 RIOTPKG                         ?= $(RIOTBASE)/pkg
+EXTERNAL_PKG_DIRS               ?=
 RIOTTOOLS                       ?= $(RIOTBASE)/dist/tools
 RIOTPROJECT                     ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 BUILD_DIR                       ?= $(RIOTBASE)/build
@@ -98,6 +99,9 @@ ifeq ($(INSIDE_DOCKER),0)
   ifeq ($(origin EXTERNAL_MODULE_DIRS),command line)
     $(error EXTERNAL_MODULE_DIRS must be passed as environment variable, and not as command line argument)
   endif
+  ifeq ($(origin EXTERNAL_PKG_DIRS),command line)
+    $(error EXTERNAL_PKG_DIRS must be passed as environment variable, and not as command line argument)
+  endif
 endif
 
 # Deprecation of configuring 'RIOTBOARD'
@@ -141,6 +145,9 @@ EXTERNAL_BOARD_DIRS             := $(foreach dir,\
                                              $(abspath $(dir)))
 EXTERNAL_MODULE_DIRS            := $(foreach dir,\
                                              $(EXTERNAL_MODULE_DIRS),\
+                                             $(abspath $(dir)))
+EXTERNAL_PKG_DIRS               := $(foreach dir,\
+                                             $(EXTERNAL_PKG_DIRS),\
                                              $(abspath $(dir)))
 
 # Ensure that all directories are set and don't contain spaces.
@@ -428,8 +435,9 @@ ifeq (1,$(TEST_KCONFIG))
   KCONFIG_PACKAGES := $(call lowercase,$(patsubst CONFIG_PACKAGE_%,%,$(filter CONFIG_PACKAGE_%,$(.VARIABLES))))
   USEPKG := $(KCONFIG_PACKAGES)
 
-  # Locate used packages in $(RIOTPKG).
-  PKG_PATHS := $(sort $(foreach dir,$(RIOTPKG),\
+  # Locate used packages in $(RIOTPKG) or $(EXTERNAL_PKG_DIRS).
+  PKGDIRS := $(RIOTPKG) $(EXTERNAL_PKG_DIRS)
+  PKG_PATHS := $(sort $(foreach dir,$(PKGDIRS),\
     $(foreach pkg,$(USEPKG),$(dir $(wildcard $(dir)/$(pkg)/Makefile)))))
 
   EXTERNAL_MODULE_PATHS := $(dir $(EXTERNAL_MODULE_KCONFIGS))

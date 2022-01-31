@@ -27,7 +27,10 @@ export KCONFIG_AUTOHEADER_HEADER
 export KCONFIG_GENERATED_DEPENDENCIES = $(GENERATED_DIR)/Kconfig.dep
 
 # This file will contain external module configurations
-export KCONFIG_EXTERNAL_CONFIGS = $(GENERATED_DIR)/Kconfig.external_modules
+export KCONFIG_EXTERNAL_MODULE_CONFIGS = $(GENERATED_DIR)/Kconfig.external_modules
+
+# This file will contain external package configurations
+export KCONFIG_EXTERNAL_PKG_CONFIGS = $(GENERATED_DIR)/Kconfig.external_pkgs
 
 # Add configurations that only work when running the Kconfig test so far,
 # because they activate modules.
@@ -183,8 +186,8 @@ EXTERNAL_MODULE_KCONFIGS ?= $(sort $(foreach dir,$(EXTERNAL_MODULE_DIRS),\
                               $(wildcard $(dir)/*/Kconfig)))
 # Build a Kconfig file that source all external modules configuration
 # files. Every EXTERNAL_MODULE_DIRS with a Kconfig file is written to
-# KCONFIG_EXTERNAL_CONFIGS as 'osource dir/Kconfig'
-$(KCONFIG_EXTERNAL_CONFIGS): FORCE | $(GENERATED_DIR)
+# KCONFIG_EXTERNAL_MODULE_CONFIGS as 'osource dir/Kconfig'
+$(KCONFIG_EXTERNAL_MODULE_CONFIGS): FORCE | $(GENERATED_DIR)
 	$(Q)\
 	if [ -n "$(EXTERNAL_MODULE_KCONFIGS)" ] ; then  \
 		printf "%s\n" $(EXTERNAL_MODULE_KCONFIGS) \
@@ -192,6 +195,24 @@ $(KCONFIG_EXTERNAL_CONFIGS): FORCE | $(GENERATED_DIR)
 		| $(LAZYSPONGE) $(LAZYSPONGE_FLAGS) $@ ; \
 	else \
 		printf "# no external modules" \
+		| $(LAZYSPONGE) $(LAZYSPONGE_FLAGS) $@ ; \
+	fi
+
+# All directories in EXTERNAL_PKG_DIRS which have a subdirectory containing a
+# Kconfig file.
+EXTERNAL_PKG_KCONFIGS ?= $(sort $(foreach dir,$(EXTERNAL_PKG_DIRS),\
+                              $(wildcard $(dir)/*/Kconfig)))
+# Build a Kconfig file that sources all external packages configuration
+# files. Every directory with a Kconfig file is written to KCONFIG_PKG_CONFIGS
+# as 'osource dir/Kconfig'
+$(KCONFIG_EXTERNAL_PKG_CONFIGS): FORCE | $(GENERATED_DIR)
+	$(Q)\
+	if [ -n "$(EXTERNAL_PKG_KCONFIGS)" ] ; then  \
+		printf "%s\n" $(EXTERNAL_PKG_KCONFIGS) \
+		| awk '{ printf "osource \"%s\"\n", $$0 }' \
+		| $(LAZYSPONGE) $(LAZYSPONGE_FLAGS) $@ ; \
+	else \
+		printf "# no external packages" \
 		| $(LAZYSPONGE) $(LAZYSPONGE_FLAGS) $@ ; \
 	fi
 
@@ -211,7 +232,7 @@ GENERATED_DIR_DEP := $(if $(CLEAN),,|) $(GENERATED_DIR)
 # Generates a .config file by merging multiple sources specified in
 # MERGE_SOURCES. This will also generate KCONFIG_OUT_DEP with the list of used
 # Kconfig files.
-$(KCONFIG_OUT_CONFIG): $(KCONFIG_EXTERNAL_CONFIGS)
+$(KCONFIG_OUT_CONFIG): $(KCONFIG_EXTERNAL_MODULE_CONFIGS) $(KCONFIG_EXTERNAL_PKG_CONFIGS)
 $(KCONFIG_OUT_CONFIG): $(GENERATED_DEPENDENCIES_DEP) $(GENCONFIG) $(MERGE_SOURCES) $(GENERATED_DIR_DEP)
 	$(Q) $(GENCONFIG) \
 	  --config-out=$(KCONFIG_OUT_CONFIG) \
