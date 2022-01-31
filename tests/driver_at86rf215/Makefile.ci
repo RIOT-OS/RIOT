@@ -31,4 +31,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     telosb \
     waspmote-pro \
     zigduino \
+    z1
     #

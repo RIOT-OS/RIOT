@@ -137,6 +137,7 @@ ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += l2util
   USEMODULE += fmt
+  USEMODULE += ztimer_msec
   ifneq (,$(filter netdev_ieee802154_submac,$(USEMODULE)))
     USEMODULE += gnrc_netif_pktq
   endif
