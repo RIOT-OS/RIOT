@@ -144,3 +144,20 @@ instance [0 | Iface: 7 | mop: 2 | ocp: 0 | mhri: 256 | mri 0]
 ```
 
 This should also be visible in Foren6.
+
+Topology generation
+-------------------
+
+To generate a random topology use the `topogen.sh` script.
+This will randomly distribute *N* nodes on on a *W* × *H* map.
+Each node has a radio range *R* ± *V* where *V* is a random variance that can also be set to 0.
+
+The further away a node is from a sending node, the higher the packet loss probability.
+Nodes outside the sending radius have a zero probability of receiving a packet.
+
+If you have `gnuplot` installed this will also generate a plot of the resulting node distribution:
+
+![example topology](https://gist.githubusercontent.com/benpicco/6fd6f7c79a30cbbc41c3a65e53ed3682/raw/33afb859b65d949238129096858d14e2319fb5fb/network.topo.svg)
+
+A light color means that a node only has a one-way connection to the network, gray means a node is
+entirely isolated.
