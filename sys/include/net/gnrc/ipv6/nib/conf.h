@@ -213,7 +213,7 @@ extern "C" {
  * @see [RFC 6775, section 8.1](https://tools.ietf.org/html/rfc6775#section-8.1)
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C
-#if CONFIG_GNRC_IPV6_NIB_6LR
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR) && IS_USED(MODULE_GNRC_SIXLOWPAN_CTX)
 #define CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C             1
 #else
 #define CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C             0
