@@ -1,5 +1,7 @@
 # Kconfig in RIOT                                           {#kconfig-in-riot}
 
+[test](board_basic_kconfig.md)
+
 [TOC]
 
 The objective of using Kconfig in RIOT is to configure software modules at
@@ -609,8 +611,8 @@ allow the creation of tools that can accurately describe board
 capabitlities, it is recommended to include the `HAVE_*` in and
 configure all boards that contain the driver to select the `HAVE_*`.
 
-This is a generic example of [the module](kconfig.module.basic), and the
-[board](kconfig.board.basic)
+This is a generic example of [the module](module_basic.kconfig), and the
+[board](board_basic.kconfig)
 
 Other examples include:
 - None yet...
@@ -631,8 +633,8 @@ menuconfig` with unmet dependencies would result in not being able to
 select the default module. Generally failing loudly is preferred.
 
 This is a generic example of [the
-module](kconfig.module.forced_defaults), and the
-[board](kconfig.board.basic)
+module](module_forced_defaults.kconfig), and the
+[board](board_basic.kconfig)
 
 Other examples include:
 - ADS101X
@@ -655,8 +657,8 @@ selection is necessary. The behaviour is similar to an `imply` without
 the issue of getting stuck or missing prompt.
 
 This is a generic example of [the
-module](kconfig.module.preferred_defaults), and the
-[board](kconfig.board.basic)
+module](module_preferred_defaults.kconfig), and the
+[board](board_basic.kconfig)
 
 Other examples include:
 - None yet...
@@ -672,8 +674,8 @@ or SPI, only one communication method can be used at any given time.
 Though having a name after the `choice` is not required, it is
 recommended for futureproofing and doesn't cost anything.
 
-This is a generic example of [the module](kconfig.module.with_variants),
-and the [board](kconfig.board.variant)
+This is a generic example of [the module](module_with_variants.kconfig),
+and the [board](board_variant.kconfig)
 
 Other examples include:
 - BMX280
@@ -687,8 +689,8 @@ result in the module being hidden from `make menuconfig`. This means a
 comment is not necessary, nor is selecting in the `HAVE_*`.
 
 This is a generic example of [the
-module](kconfig.module.defaults_with_variants), and the
-[board](kconfig.board.variant)
+module](module_defaults_with_variants.kconfig), and the
+[board](board_variant.kconfig)
 
 Other examples include:
 - HM330X
@@ -704,8 +706,8 @@ override default order of the module.
 
 
 This is a generic example of [the
-module](kconfig.module.defaults_with_variants), and the
-[board](kconfig.board.override_variant)
+module](module_defaults_with_variants.kconfig), and the
+[board](board_override_variant.kconfig)
 
 Other examples include:
 - libc_implementation
