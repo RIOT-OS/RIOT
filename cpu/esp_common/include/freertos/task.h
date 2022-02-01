@@ -51,7 +51,10 @@ BaseType_t xTaskCreatePinnedToCore(TaskFunction_t pvTaskCode,
                                    const BaseType_t xCoreID);
 
 void vTaskDelete(TaskHandle_t xTaskToDelete);
+void vTaskSuspend(TaskHandle_t xTaskToSuspend);
+void vTaskResume(TaskHandle_t xTaskToResume);
 void vTaskDelay(const TickType_t xTicksToDelay);
+void vTaskSuspendAll(void);
 
 TaskHandle_t xTaskGetCurrentTaskHandle(void);
 
@@ -59,6 +62,12 @@ void vTaskEnterCritical(portMUX_TYPE *mux);
 void vTaskExitCritical(portMUX_TYPE *mux);
 
 TickType_t xTaskGetTickCount(void);
+
+BaseType_t xTaskNotifyGive(TaskHandle_t xTaskToNotify);
+void vTaskNotifyGiveFromISR(TaskHandle_t xTaskToNotify,
+                            BaseType_t *pxHigherPriorityTaskWoken);
+uint32_t ulTaskNotifyTake(BaseType_t xClearCountOnExit,
+                          TickType_t xTicksToWait);
 
 #ifdef __cplusplus
 }

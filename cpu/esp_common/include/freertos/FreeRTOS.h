@@ -19,6 +19,7 @@
 extern "C" {
 #endif
 
+#define configTASK_NOTIFICATION_ARRAY_ENTRIES   1
 #define configMAX_PRIORITIES    SCHED_PRIO_LEVELS
 
 #ifndef configASSERT
@@ -33,10 +34,15 @@ extern "C" {
 #define BaseType_t              portBASE_TYPE
 #define UBaseType_t             unsigned portBASE_TYPE
 
+#define pdMS_TO_TICKS(ms)       ((TickType_t)(ms / portTICK_PERIOD_MS))
+
 typedef uint32_t TickType_t;
 
 uint32_t xPortGetTickRateHz(void);
 BaseType_t xPortInIsrContext(void);
+
+UBaseType_t xPortSetInterruptMaskFromISR(void);
+void vPortClearInterruptMaskFromISR(UBaseType_t state);
 
 /*
  * PLEASE NOTE: Following definitions were copied directly from the FreeRTOS

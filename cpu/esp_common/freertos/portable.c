@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2021 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -29,6 +29,22 @@ BaseType_t xPortInIsrContext(void)
 {
     /* is working on single core in that way */
     return irq_is_in();
+}
+
+UBaseType_t xPortSetInterruptMaskFromISR(void)
+{
+    UBaseType_t state = irq_disable();
+    return state;
+}
+
+void vPortClearInterruptMaskFromISR(UBaseType_t state)
+{
+    irq_restore(state);
+}
+
+bool xPortCanYield(void)
+{
+    return irq_is_enabled();
 }
 
 #endif /* DOXYGEN */
