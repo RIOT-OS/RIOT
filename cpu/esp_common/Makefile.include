@@ -78,7 +78,7 @@ CFLAGS += $(if $(findstring qio,$(FLASH_MODE)),-DFLASH_MODE_QIO=1)
 CFLAGS += $(if $(findstring dio,$(FLASH_MODE)),-DFLASH_MODE_DIO=1)
 CFLAGS += $(if $(findstring dout,$(FLASH_MODE)),-DFLASH_MODE_DOUT=1)
 
-ARCHIVES += -lhal -lg -lc
+ARCHIVES += -lg -lc
 
 LINKFLAGS += $(CFLAGS_OPT) $(CFLAGS_DBG)
 #ifneq ($(CPU),esp8266)
