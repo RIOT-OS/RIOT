@@ -24,6 +24,8 @@
 #include "kernel_defines.h"
 #include "external_module_1.h"
 #include "external_module_2.h"
+#include "external_pkg_1.h"
+#include "external_pkg_2.h"
 
 int main(void)
 {
@@ -35,6 +37,9 @@ int main(void)
 
     puts(CONFIG_EXTERNAL_MODULE_1_MESSAGE);
     puts(CONFIG_EXTERNAL_MODULE_2_MESSAGE);
+
+    puts(CONFIG_EXTERNAL_PKG_1_MESSAGE);
+    puts(CONFIG_EXTERNAL_PKG_2_MESSAGE);
 
     return 0;
 }
