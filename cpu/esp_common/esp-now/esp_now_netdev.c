@@ -28,14 +28,18 @@
 
 #include "esp_common.h"
 #include "esp_attr.h"
+#ifdef MCU_ESP8266
 #include "esp_event_loop.h"
+#else
+#include "esp_event.h"
+#endif
 #include "esp_now.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "irq_arch.h"
 #include "od.h"
 
-#include "nvs_flash/include/nvs_flash.h"
+#include "nvs_flash.h"
 
 #include "esp_now_params.h"
 #include "esp_now_netdev.h"
