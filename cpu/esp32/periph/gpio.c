@@ -33,6 +33,7 @@
 #include "soc/gpio_sig_map.h"
 #include "soc/gpio_struct.h"
 #include "soc/io_mux_reg.h"
+#include "soc/rtc_cntl_reg.h"
 #include "soc/rtc_io_reg.h"
 #include "soc/rtc_io_struct.h"
 #include "xtensa/xtensa_api.h"
@@ -167,24 +168,24 @@ struct _rtc_gpio_t {
 
 /* Table of RTCIO GPIO pins information */
 static const struct _rtc_gpio_t _rtc_gpios[] = {
-    {  0, RTC_IO_SENSOR_PADS_REG, 27, 32, 32, 32 }, /* rtc0 (gpio36) SENSOR_VP/SENSE 1 */
-    {  1, RTC_IO_SENSOR_PADS_REG, 26, 32, 32, 32 }, /* rtc1 (gpio37) SENSOR_CAPP/SENSE 2 */
-    {  2, RTC_IO_SENSOR_PADS_REG, 25, 32, 32, 32 }, /* rtc2 (gpio38) SENSOR_CAPN/SENSE 3 */
-    {  3, RTC_IO_SENSOR_PADS_REG, 24, 32, 32, 32 }, /* rtc3 (gpio39) SENSOR_VN/SENSE 4*/
-    {  4, RTC_IO_ADC_PAD_REG, 29, 32, 32, 32 },     /* rtc4 (gpio34) VDET_1/ADC1 */
-    {  5, RTC_IO_ADC_PAD_REG, 28, 32, 32, 32 },     /* rtc5 (gpio35) VDET_2/ADC2 */
-    {  6, RTC_IO_PAD_DAC1_REG, 17, 27, 28, 30 },    /* rtc6 (gpio25) DAC1 */
-    {  7, RTC_IO_PAD_DAC2_REG, 17, 27, 28, 30 },    /* rtc7 (gpio26) DAC1 */
-    {  8, RTC_IO_XTAL_32K_PAD_REG, 18, 27, 28, 30 },/* rtc8 (gpio33) XTAL_32K_N */
-    {  9, RTC_IO_XTAL_32K_PAD_REG, 17, 22, 23, 25 },/* rtc9 (gpio32) XTAL_32K_P */
-    { 10, RTC_IO_TOUCH_PAD0_REG, 19, 27, 28, 29 },  /* rtc10 (gpio4) TOUCH0 */
-    { 11, RTC_IO_TOUCH_PAD1_REG, 19, 27, 28, 29 },  /* rtc11 (gpio0) TOUCH1 */
-    { 12, RTC_IO_TOUCH_PAD2_REG, 19, 27, 28, 29 },  /* rtc12 (gpio2) TOUCH2 */
-    { 13, RTC_IO_TOUCH_PAD3_REG, 19, 27, 28, 29 },  /* rtc13 (gpio15) TOUCH3 */
-    { 14, RTC_IO_TOUCH_PAD4_REG, 19, 27, 28, 29 },  /* rtc14 (gpio13) TOUCH4 */
-    { 15, RTC_IO_TOUCH_PAD5_REG, 19, 27, 28, 29 },  /* rtc15 (gpio12) TOUCH5 */
-    { 16, RTC_IO_TOUCH_PAD6_REG, 19, 27, 28, 29 },  /* rtc16 (gpio14) TOUCH6 */
-    { 17, RTC_IO_TOUCH_PAD7_REG, 19, 27, 28, 29 }   /* rtc17 (gpio27) TOUCH7 */
+    {  0, RTC_IO_SENSOR_PADS_REG, 27, 32, 32, 32 },  /* rtc0 (gpio36) SENSOR_VP/SENSE 1 */
+    {  1, RTC_IO_SENSOR_PADS_REG, 26, 32, 32, 32 },  /* rtc1 (gpio37) SENSOR_CAPP/SENSE 2 */
+    {  2, RTC_IO_SENSOR_PADS_REG, 25, 32, 32, 32 },  /* rtc2 (gpio38) SENSOR_CAPN/SENSE 3 */
+    {  3, RTC_IO_SENSOR_PADS_REG, 24, 32, 32, 32 },  /* rtc3 (gpio39) SENSOR_VN/SENSE 4*/
+    {  4, RTC_IO_ADC_PAD_REG, 29, 32, 32, 32 },      /* rtc4 (gpio34) VDET_1/ADC1 */
+    {  5, RTC_IO_ADC_PAD_REG, 28, 32, 32, 32 },      /* rtc5 (gpio35) VDET_2/ADC2 */
+    {  6, RTC_IO_PAD_DAC1_REG, 17, 27, 28, 30 },     /* rtc6 (gpio25) DAC1 */
+    {  7, RTC_IO_PAD_DAC2_REG, 17, 27, 28, 30 },     /* rtc7 (gpio26) DAC1 */
+    {  8, RTC_IO_XTAL_32K_PAD_REG, 18, 27, 28, 30 }, /* rtc8 (gpio33) XTAL_32K_N */
+    {  9, RTC_IO_XTAL_32K_PAD_REG, 17, 22, 23, 25 }, /* rtc9 (gpio32) XTAL_32K_P */
+    { 10, RTC_IO_TOUCH_PAD0_REG, 19, 27, 28, 29 },   /* rtc10 (gpio4) TOUCH0 */
+    { 11, RTC_IO_TOUCH_PAD1_REG, 19, 27, 28, 29 },   /* rtc11 (gpio0) TOUCH1 */
+    { 12, RTC_IO_TOUCH_PAD2_REG, 19, 27, 28, 29 },   /* rtc12 (gpio2) TOUCH2 */
+    { 13, RTC_IO_TOUCH_PAD3_REG, 19, 27, 28, 29 },   /* rtc13 (gpio15) TOUCH3 */
+    { 14, RTC_IO_TOUCH_PAD4_REG, 19, 27, 28, 29 },   /* rtc14 (gpio13) TOUCH4 */
+    { 15, RTC_IO_TOUCH_PAD5_REG, 19, 27, 28, 29 },   /* rtc15 (gpio12) TOUCH5 */
+    { 16, RTC_IO_TOUCH_PAD6_REG, 19, 27, 28, 29 },   /* rtc16 (gpio14) TOUCH6 */
+    { 17, RTC_IO_TOUCH_PAD7_REG, 19, 27, 28, 29 }    /* rtc17 (gpio27) TOUCH7 */
 };
 
 /* Table of the usage type of each GPIO pin */
@@ -529,43 +530,9 @@ const char* gpio_get_pin_usage_str(gpio_t pin)
     return _gpio_pin_usage_str[_gpio_pin_usage[((pin < GPIO_PIN_NUMOF) ? pin : _NOT_EXIST)]];
 }
 
-void gpio_pullup_dis (gpio_t pin)
-{
-    CHECK_PARAM(pin < GPIO_PIN_NUMOF);
-
-    const struct _rtc_gpio_t* rtc = (_gpio_to_rtc[pin] != -1) ?
-                                     &_rtc_gpios[_gpio_to_rtc[pin]] : NULL;
-
-    REG_CLR_BIT(_gpio_to_iomux_reg[pin], FUN_PU);
-    if (rtc) {
-        REG_CLR_BIT(rtc->reg, BIT(rtc->pullup));
-    }
-}
-
 int8_t gpio_is_rtcio (gpio_t pin)
 {
     return _gpio_to_rtc[pin];
-}
-
-int gpio_set_direction(gpio_t pin, gpio_mode_t mode)
-{
-    /* TODO implementation, for the moment we simply initialize the GPIO */
-    return gpio_init(pin, mode);
-}
-
-int gpio_set_drive_capability(gpio_t pin, gpio_drive_strength_t drive)
-{
-    assert(pin < GPIO_PIN_NUMOF);
-    assert(pin < GPIO34);
-
-    const struct _rtc_gpio_t* rtc = (_gpio_to_rtc[pin] != -1) ?
-                                     &_rtc_gpios[_gpio_to_rtc[pin]] : NULL;
-
-    SET_PERI_REG_BITS(_gpio_to_iomux_reg, FUN_DRV_V, drive, FUN_DRV_S);
-    if (rtc) {
-        SET_PERI_REG_BITS(rtc->reg, 0x3, drive, rtc->drive);
-    }
-    return 0;
 }
 
 #if MODULE_PERIPH_GPIO_IRQ
@@ -582,6 +549,7 @@ void gpio_pm_sleep_enter(unsigned mode)
      * sleep.
      */
 #ifdef ESP_PM_GPIO_HOLD
+    SET_PERI_REG_BITS(RTC_CNTL_HOLD_FORCE_REG, 0x3FFFF, 0x3FFFF, 0);
     esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
 #else
     if (mode == ESP_PM_LIGHT_SLEEP) {
