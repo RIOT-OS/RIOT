@@ -82,10 +82,18 @@ struct _pwm_hw_t {
     const gpio_t* gpios;        /* GPIOs used as channel outputs */
 };
 
+#ifdef PWM0_GPIOS
+static const gpio_t _pwm_channel_gpios_0[] = PWM0_GPIOS;
+#endif
+
+#ifdef PWM1_GPIOS
+static const gpio_t _pwm_channel_gpios_1[] = PWM1_GPIOS;
+#endif
+
 /* static configuration of PWM devices */
 static const struct _pwm_hw_t _pwm_hw[] =
 {
-    #ifdef PWM0_GPIOS
+#ifdef PWM0_GPIOS
     {
         .regs = &MCPWM0,
         .mod = PERIPH_PWM0_MODULE,
@@ -94,8 +102,8 @@ static const struct _pwm_hw_t _pwm_hw[] =
         .gpio_num = ARRAY_SIZE(pwm0_channels),
         .gpios = pwm0_channels,
     },
-    #endif
-    #ifdef PWM1_GPIOS
+#endif
+#ifdef PWM1_GPIOS
     {
         .regs = &MCPWM1,
         .mod = PERIPH_PWM1_MODULE,
@@ -104,7 +112,7 @@ static const struct _pwm_hw_t _pwm_hw[] =
         .gpio_num = ARRAY_SIZE(pwm1_channels),
         .gpios = pwm1_channels,
     },
-    #endif
+#endif
 };
 
 /* data structure dynamic channel configuration */
