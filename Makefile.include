@@ -431,6 +431,8 @@ ifeq (1,$(TEST_KCONFIG))
   # Locate used packages in $(RIOTPKG).
   PKG_PATHS := $(sort $(foreach dir,$(RIOTPKG),\
     $(foreach pkg,$(USEPKG),$(dir $(wildcard $(dir)/$(pkg)/Makefile)))))
+
+  EXTERNAL_MODULE_PATHS := $(dir $(EXTERNAL_MODULE_KCONFIGS))
 else
   # always select provided architecture features
   FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
