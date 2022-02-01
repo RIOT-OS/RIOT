@@ -28,7 +28,6 @@
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/spi.h"
-#include "macros/units.h"
 
 #include "esp_attr.h"
 #include "gpio_arch.h"
@@ -57,6 +56,8 @@
 #define SPI_DOUTDIN (BIT(0))
 
 #endif /* MCU_ESP32 */
+
+#define KHZ (1000)
 
 #define SPI_BLOCK_SIZE  64  /* number of bytes per SPI transfer */
 
@@ -339,16 +340,16 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
     uint32_t apb_clk = rtc_clk_apb_freq_get();
     spi_clkcnt_N = 2;
     switch (clk) {
-        case SPI_CLK_10MHZ:  spi_clkdiv_pre = apb_clk / MHZ(10) / 2;
+        case SPI_CLK_10MHZ:  spi_clkdiv_pre = apb_clk / (10 * MHZ) / 2;
                              break;
-        case SPI_CLK_5MHZ:   spi_clkdiv_pre = apb_clk / MHZ(5) / 2;
+        case SPI_CLK_5MHZ:   spi_clkdiv_pre = apb_clk / (5 * MHZ) / 2;
                              break;
-        case SPI_CLK_1MHZ:   spi_clkdiv_pre = apb_clk / MHZ(1) / 2;
+        case SPI_CLK_1MHZ:   spi_clkdiv_pre = apb_clk / MHZ / 2;
                              break;
-        case SPI_CLK_400KHZ: spi_clkdiv_pre = apb_clk / KHZ(400) / 2;
+        case SPI_CLK_400KHZ: spi_clkdiv_pre = apb_clk / (400 * KHZ) / 2;
                              break;
         case SPI_CLK_100KHZ: /* fallthrough intentionally */
-        default: spi_clkdiv_pre = apb_clk / KHZ(100) / 2;
+        default: spi_clkdiv_pre = apb_clk / (100 * KHZ) / 2;
     }
     assert(spi_clkdiv_pre > 0);
 #else

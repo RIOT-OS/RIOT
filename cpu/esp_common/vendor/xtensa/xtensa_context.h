@@ -58,6 +58,7 @@ extern "C" {
   Macros that help define structures for both C and assembler.
 -------------------------------------------------------------------------------
 */
+#ifndef STRUCT_BEGIN
 #if defined(_ASMLANGUAGE) || defined(__ASSEMBLER__)
 
 #define STRUCT_BEGIN            .pushsection .text; .struct 0
@@ -73,7 +74,7 @@ extern "C" {
 #define STRUCT_END(sname)       } sname;
 
 #endif //_ASMLANGUAGE || __ASSEMBLER__
-
+#endif
 
 /*
 -------------------------------------------------------------------------------

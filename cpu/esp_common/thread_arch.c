@@ -63,14 +63,16 @@
 #include "esp_attr.h"
 #include "esp/xtensa_ops.h"
 #include "rom/ets_sys.h"
-#include "xtensa/xtensa_context.h"
 
 #ifdef MCU_ESP32
+#include "soc/dport_access.h"
 #include "soc/dport_reg.h"
 #else /* MCU_ESP32 */
 #include "esp8266/rom_functions.h"
 #include "sdk/sdk.h"
 #endif /* MCU_ESP32 */
+
+#include "xtensa/xtensa_context.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
