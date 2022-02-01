@@ -53,7 +53,7 @@
   * two timer groups TMG0 and TMG1 with 2 timers each
   *
   * TMG0, timer 0 is used for system time in us and is therefore not
-  * available as low level timer. Timers have only one channel. Timer device
+  * available as low level timer. Timers have only one channel. Timer devices
   * are mapped to hardware timer as following:
   *
   *     0 -> TMG0 timer 1
