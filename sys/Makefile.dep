@@ -843,7 +843,6 @@ ifneq (,$(filter fido2_ctap,$(USEMODULE)))
   USEMODULE += ztimer_msec
   USEMODULE += event
   USEMODULE += event_timeout
-  USEMODULE += prng_sha256prng
   USEMODULE += cipher_modes
   USEMODULE += crypto_aes_256
   USEMODULE += hashes
