@@ -1,0 +1,31 @@
+# FlashDB is only supported by 32 bit architectures
+FEATURES_REQUIRED += arch_32bit
+
+ifneq (,$(filter flashdb_tsdb,$(USEMODULE)))
+  CFLAGS += -DFDB_USING_TSDB
+endif
+
+ifneq (,$(filter flashdb_kvdb_auto_update,$(USEMODULE)))
+  CFLAGS += -DFDB_KV_AUTO_UPDATE
+  USEMODULE += flashdb_kvdb
+endif
+
+ifneq (,$(filter flashdb_kvdb,$(USEMODULE)))
+  CFLAGS += -DFDB_USING_KVDB
+endif
+
+ifneq (,$(filter flashdb_vfs,$(USEMODULE)))
+  USEMODULE += vfs
+endif
+
+ifneq (,$(filter flashdb_mtd,$(USEMODULE)))
+  CFLAGS += -DFDB_USING_FAL_MODE
+  USEMODULE += flashdb_fal
+  USEMODULE += mtd
+else
+  ifeq (native, $(BOARD))
+    CFLAGS += -DFDB_USING_FILE_POSIX_MODE
+  else
+    CFLAGS += -DFDB_USING_FILE_LIBC_MODE
+  endif
+endif
