@@ -1,11 +1,15 @@
+ifneq ($(CPU),esp32)
+
 ifneq (,$(filter esp_log_colored,$(USEMODULE)))
   BOOTLOADER_COLOR = _colors
 endif
 ifneq (,$(filter esp_log_startup,$(USEMODULE)))
   BOOTLOADER_INFO = _info
 endif
-
-BOOTLOADER_BIN = bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
+# Full path to the bootloader binary. In the ESP32 case this is set by the
+# esp_bootloader module.
+BOOTLOADER_BIN ?= $(RIOTCPU)/$(CPU)/bin/bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
+endif
 
 ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool.py
 
@@ -20,7 +24,7 @@ else
   FFLAGS += --chip $(FLASH_CHIP) --port $(PROG_DEV) --baud $(PROGRAMMER_SPEED)
   FFLAGS += --before default_reset write_flash -z
   FFLAGS += --flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ)
-  FFLAGS += $(BOOTLOADER_POS) $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN)
+  FFLAGS += $(BOOTLOADER_POS) $(BOOTLOADER_BIN)
   FFLAGS += 0x8000 $(BINDIR)/partitions.bin
   FFLAGS += 0x10000 $(FLASHFILE)
 endif
@@ -45,7 +49,7 @@ else
 	$(Q)dd if=/dev/zero bs=1M count=$(FLASH_SIZE) | \
 	  tr "\\000" "\\377" > tmp.bin && cat tmp.bin | \
 		head -c $$(($(BOOTLOADER_POS))) | \
-		cat - $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN) tmp.bin | \
+		cat - $(BOOTLOADER_BIN) tmp.bin | \
 		head -c $$((0x8000)) | \
 		cat - $(BINDIR)/partitions.bin tmp.bin | \
 		head -c $$((0x10000)) | \

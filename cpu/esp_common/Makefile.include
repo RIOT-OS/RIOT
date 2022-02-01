@@ -132,8 +132,8 @@ $(ELFFILE).bin: $(ELFFILE)
 # Convert .elf and .csv to .bin files at build time, but make them available for
 # tests at flash time. These can't be added to FLASHDEPS because they depend on
 # on ELFFILE and would trigger a rebuild with "flash-only".
-BUILD_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin
-TEST_EXTRA_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin
+BUILD_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin $(BOOTLOADER_BIN)
+TEST_EXTRA_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin $(BOOTLOADER_BIN)
 
 # Default partition table with no OTA. Can be replaced with a custom partition
 # table setting PARTITION_TABLE_CSV.
