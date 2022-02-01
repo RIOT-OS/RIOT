@@ -178,6 +178,20 @@ get_supported_kconfig_board_app() {
     if is_in_list "${board}" "${TEST_KCONFIG_BOARD_BLOCKLIST}"; then
         return 1
     fi
+
+    # On nightlies run all possible kconfig tests on all boards
+    # Normally we don't want to do this as it adds quite a bit to build time
+    # and the subset of boards we are testing for are pretty good at catching
+    # any bugs...
+    # This will be over one day, I promise.
+    if [ ${NIGHTLY} -eq 1 ]; then
+        if is_in_list "${appdir}" "${TEST_KCONFIG_ENFORCE_APP_GROUPS}"; then
+            return 0
+        fi
+        if [ -f "${appdir}/app.config.test" ]; then
+            return 0
+        fi
+    fi
     if is_in_list "${appdir}" "${TEST_KCONFIG_TEST_ALLOWLIST}"; then
         return 0
     fi
