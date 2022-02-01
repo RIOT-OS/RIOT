@@ -1,0 +1,25 @@
+From 5907e2e9a98e73b303eac29781b100d988f9575b Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Tue, 8 Mar 2022 11:36:33 +0100
+Subject: [PATCH 13/17] newlib: add sys/uio.h from toolchain
+
+---
+ components/newlib/platform_include/sys/uio.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/components/newlib/platform_include/sys/uio.h b/components/newlib/platform_include/sys/uio.h
+index 3ff3eba8716..388fed3d663 100644
+--- a/components/newlib/platform_include/sys/uio.h
++++ b/components/newlib/platform_include/sys/uio.h
+@@ -6,6 +6,8 @@
+ 
+ #pragma once
+ 
++#include_next <sys/uio.h>
++
+ #include <stdint.h>
+ #include <sys/types.h>
+ 
+-- 
+2.17.1
+

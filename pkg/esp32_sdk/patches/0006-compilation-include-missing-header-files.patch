@@ -1,0 +1,63 @@
+From 4e3d386bf242431a375c7dbac8661c7e1c8f31ed Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sun, 30 Jan 2022 08:16:15 +0100
+Subject: [PATCH 06/12] compilation: include missing header files
+
+---
+ components/efuse/src/esp_efuse_api.c                 | 1 +
+ components/esp_hw_support/regi2c_ctrl.c              | 1 +
+ components/esp_hw_support/sleep_modes.c              | 1 +
+ components/nvs_flash/src/nvs_encrypted_partition.cpp | 1 +
+ 4 files changed, 4 insertions(+)
+
+diff --git a/components/efuse/src/esp_efuse_api.c b/components/efuse/src/esp_efuse_api.c
+index a89205fc82..1b90deaf3d 100644
+--- a/components/efuse/src/esp_efuse_api.c
++++ b/components/efuse/src/esp_efuse_api.c
+@@ -19,6 +19,7 @@ const static char *TAG = "efuse";
+ #else
+ #include "freertos/FreeRTOS.h"
+ #include "freertos/task.h"
++#include <string.h>
+ #include <sys/lock.h>
+ static _lock_t s_efuse_lock;
+ #define EFUSE_LOCK_ACQUIRE_RECURSIVE() _lock_acquire_recursive(&s_efuse_lock)
+diff --git a/components/esp_hw_support/regi2c_ctrl.c b/components/esp_hw_support/regi2c_ctrl.c
+index 4ffe67175f..0cb2f5e12f 100644
+--- a/components/esp_hw_support/regi2c_ctrl.c
++++ b/components/esp_hw_support/regi2c_ctrl.c
+@@ -4,6 +4,7 @@
+  * SPDX-License-Identifier: Apache-2.0
+  */
+ 
++#include "esp_attr.h"
+ #include "regi2c_ctrl.h"
+ #include <stdint.h>
+ #include <freertos/FreeRTOS.h>
+diff --git a/components/esp_hw_support/sleep_modes.c b/components/esp_hw_support/sleep_modes.c
+index c192bf4d47..0728f1b92a 100644
+--- a/components/esp_hw_support/sleep_modes.c
++++ b/components/esp_hw_support/sleep_modes.c
+@@ -26,6 +26,7 @@
+ #include "driver/uart.h"
+ 
+ #include "soc/cpu.h"
++#include "soc/soc_memory_types.h"
+ #include "soc/rtc.h"
+ #include "soc/soc_caps.h"
+ 
+diff --git a/components/nvs_flash/src/nvs_encrypted_partition.cpp b/components/nvs_flash/src/nvs_encrypted_partition.cpp
+index 26e8a3314d..4de077b94a 100644
+--- a/components/nvs_flash/src/nvs_encrypted_partition.cpp
++++ b/components/nvs_flash/src/nvs_encrypted_partition.cpp
+@@ -13,6 +13,7 @@
+ // limitations under the License.
+ 
+ #include <cstring>
++#include "nvs.hpp"
+ #include "nvs_encrypted_partition.hpp"
+ #include "nvs_types.hpp"
+ 
+-- 
+2.17.1
+

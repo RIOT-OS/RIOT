@@ -1,0 +1,83 @@
+From b3025f4b66cfb9d46a8199e0c85e137741262c86 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sun, 30 Jan 2022 08:15:16 +0100
+Subject: [PATCH 03/12] wpa_supplicant: declare variables in header files as
+ extern
+
+The definition of variables in header files lead to multiple defined symbols if these header files are included multiple times. Variables in header files are therefore declared as extern.
+---
+ .../esp_supplicant/include/esp_wpa.h          |  4 +--
+ components/wpa_supplicant/src/eap_peer/eap.h  | 36 +++++++++----------
+ 2 files changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/components/wpa_supplicant/esp_supplicant/include/esp_wpa.h b/components/wpa_supplicant/esp_supplicant/include/esp_wpa.h
+index f448b737c7..cdfd7abcd4 100644
+--- a/components/wpa_supplicant/esp_supplicant/include/esp_wpa.h
++++ b/components/wpa_supplicant/esp_supplicant/include/esp_wpa.h
+@@ -42,9 +42,9 @@ extern "C" {
+   * @{
+   */
+ /* Crypto callback functions */
+-const wpa_crypto_funcs_t g_wifi_default_wpa_crypto_funcs;
++extern const wpa_crypto_funcs_t g_wifi_default_wpa_crypto_funcs;
+ /* Mesh crypto callback functions */
+-const mesh_crypto_funcs_t g_wifi_default_mesh_crypto_funcs;
++extern const mesh_crypto_funcs_t g_wifi_default_mesh_crypto_funcs;
+ 
+ /**
+   * @brief     Supplicant initialization
+diff --git a/components/wpa_supplicant/src/eap_peer/eap.h b/components/wpa_supplicant/src/eap_peer/eap.h
+index 9c488031ad..e664acc4c7 100644
+--- a/components/wpa_supplicant/src/eap_peer/eap.h
++++ b/components/wpa_supplicant/src/eap_peer/eap.h
+@@ -19,29 +19,29 @@ struct eap_method_type {
+ 	EapType method;
+ };
+ 
+-u8 *g_wpa_anonymous_identity;
+-int g_wpa_anonymous_identity_len;
+-u8 *g_wpa_username;
+-int g_wpa_username_len;
+-const u8 *g_wpa_client_cert;
+-int g_wpa_client_cert_len;
+-const u8 *g_wpa_private_key;
+-int g_wpa_private_key_len;
+-const u8 *g_wpa_private_key_passwd;
+-int g_wpa_private_key_passwd_len;
++extern u8 *g_wpa_anonymous_identity;
++extern int g_wpa_anonymous_identity_len;
++extern u8 *g_wpa_username;
++extern int g_wpa_username_len;
++extern const u8 *g_wpa_client_cert;
++extern int g_wpa_client_cert_len;
++extern const u8 *g_wpa_private_key;
++extern int g_wpa_private_key_len;
++extern const u8 *g_wpa_private_key_passwd;
++extern int g_wpa_private_key_passwd_len;
+ 
+-const u8 *g_wpa_ca_cert;
+-int g_wpa_ca_cert_len;
++extern const u8 *g_wpa_ca_cert;
++extern int g_wpa_ca_cert_len;
+ 
+-u8 *g_wpa_password;
+-int g_wpa_password_len;
++extern u8 *g_wpa_password;
++extern int g_wpa_password_len;
+ 
+-u8 *g_wpa_new_password;
+-int g_wpa_new_password_len;
++extern u8 *g_wpa_new_password;
++extern int g_wpa_new_password_len;
+ 
+-char *g_wpa_ttls_phase2_type;
++extern char *g_wpa_ttls_phase2_type;
+ 
+-bool g_wpa_suiteb_certification;
++extern bool g_wpa_suiteb_certification;
+ 
+ const u8 * eap_get_eapKeyData(struct eap_sm *sm, size_t *len);
+ void eap_deinit_prev_method(struct eap_sm *sm, const char *txt);
+-- 
+2.17.1
+
