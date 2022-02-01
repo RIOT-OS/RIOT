@@ -35,7 +35,7 @@
 #endif
 
 #include "periph/gpio.h"
-#include "sdk_conf.h"
+#include "sdkconfig.h"
 
 #if MODULE_MTD
 #include "mtd.h"
