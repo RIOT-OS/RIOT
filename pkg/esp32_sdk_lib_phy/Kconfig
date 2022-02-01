@@ -5,9 +5,9 @@
 # directory for more details.
 #
 
-config PACKAGE_ESP32_SDK_LIBS
-    bool "ESP32 SDK libraries for the ESP32 MCU support"
+config PACKAGE_ESP32_SDK_LIB_PHY
+    bool "ESP32 SDK libraries for the ESP32 SoC support"
     depends on TEST_KCONFIG
     depends on HAS_ARCH_ESP32
     help
-        Vendor SDK libraries for ESP32 MCU support by Espressif
+        Vendor SDK libraries for ESP32 SoC support by Espressif
