@@ -17,9 +17,7 @@
  *
  * @}
  */
-
-#include <stdlib.h>
-#include <sys/lock.h>
+#include <stdint.h>
 #include <sys/unistd.h>
 #include <sys/time.h>
 
@@ -29,16 +27,16 @@
 #include "periph_cpu.h"
 #include "periph/pm.h"
 #include "syscalls.h"
+#include "sys/lock.h"
 #include "timex.h"
 
-#include "macros/units.h"
 #include "rom/ets_sys.h"
 #include "rom/libc_stubs.h"
 #include "soc/rtc.h"
 #include "soc/rtc_cntl_struct.h"
 #include "soc/timer_group_reg.h"
 #include "soc/timer_group_struct.h"
-#include "sdk_conf.h"
+#include "sdkconfig.h"
 #include "xtensa/xtensa_api.h"
 
 #ifdef MODULE_ESP_IDF_HEAP
@@ -48,16 +46,13 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifdef MODULE_ESP_IDF_HEAP
+#if IS_USED(MODULE_ESP_IDF_HEAP)
 
 /* if module esp_idf_heap is used, this function has to be defined for ESP32 */
 unsigned int get_free_heap_size(void)
 {
     return heap_caps_get_free_size(MALLOC_CAP_DEFAULT);
 }
-
-/* alias for compatibility with espressif/wifi_libs */
-uint32_t esp_get_free_heap_size( void ) __attribute__((alias("get_free_heap_size")));
 
 /* this function is platform specific if module esp_idf_heap is used */
 void heap_stats(void)
@@ -76,7 +71,7 @@ void heap_stats(void)
                _alloc + _free, _alloc, _free);
 }
 
-#endif /* MODULE_ESP_IDF_HEAP */
+#endif /* IS_USED(MODULE_ESP_IDF_HEAP) */
 
 /**
  * @name Other system functions
@@ -154,7 +149,7 @@ extern int _printf_float(struct _reent *rptr,
                          void *pdata,
                          FILE * fp,
                          int (*pfunc) (struct _reent *, FILE *,
-                                       _CONST char *, size_t len),
+                                       const char *, size_t len),
                          va_list * ap);
 
 extern int _scanf_float(struct _reent *rptr,
@@ -172,8 +167,8 @@ static struct syscall_stub_table s_stub_table =
     ._calloc_r = &_calloc_r,
     ._sbrk_r = &_sbrk_r,
 
-    ._system_r = (void *)&_no_sys_func,
-    ._raise_r = (void *)&_no_sys_func,
+    ._system_r = (void*)&_no_sys_func,
+    ._raise_r = (void*)&_no_sys_func,
     ._abort = &_abort,
     ._exit_r = &_exit_r,
     ._getpid_r = &_getpid_r,
@@ -190,8 +185,8 @@ static struct syscall_stub_table s_stub_table =
     ._write_r = (int (*)(struct _reent *r, int, const void *, int))&_write_r,
     ._read_r = (int (*)(struct _reent *r, int, void *, int))&_read_r,
     ._unlink_r = &_unlink_r,
-    ._link_r = (void *)&_no_sys_func,
-    ._rename_r = (void *)&_no_sys_func,
+    ._link_r = (void*)&_no_sys_func,
+    ._rename_r = (void*)&_no_sys_func,
 
     ._lock_init = &_lock_init,
     ._lock_init_recursive = &_lock_init_recursive,
@@ -204,19 +199,19 @@ static struct syscall_stub_table s_stub_table =
     ._lock_release = &_lock_release,
     ._lock_release_recursive = &_lock_release_recursive,
 
-    #if CONFIG_NEWLIB_NANO_FORMAT
+#if CONFIG_NEWLIB_NANO_FORMAT
     ._printf_float = &_printf_float,
     ._scanf_float = &_scanf_float,
-    #else /* CONFIG_NEWLIB_NANO_FORMAT */
+#else /* CONFIG_NEWLIB_NANO_FORMAT */
     ._printf_float = NULL,
     ._scanf_float = NULL,
-    #endif /* CONFIG_NEWLIB_NANO_FORMAT */
+#endif /* CONFIG_NEWLIB_NANO_FORMAT */
 };
 
 void IRAM syscalls_init_arch(void)
 {
     /* enable the system timer in us (TMG0 is enabled by default) */
-    TIMER_SYSTEM.config.divider = rtc_clk_apb_freq_get() / MHZ(1);
+    TIMER_SYSTEM.config.divider = rtc_clk_apb_freq_get() / MHZ;
     TIMER_SYSTEM.config.autoreload = 0;
     TIMER_SYSTEM.config.enable = 1;
 
@@ -247,9 +242,6 @@ int64_t system_get_time_64(void)
     ret += ((uint64_t)TIMER_SYSTEM.cnt_high) << 32;
     return ret;
 }
-
-/* alias for compatibility with espressif/wifi_libs */
-int64_t esp_timer_get_time(void) __attribute__((alias("system_get_time_64")));
 
 static IRAM void system_wdt_int_handler(void *arg)
 {

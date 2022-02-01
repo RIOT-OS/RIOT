@@ -19,17 +19,22 @@
  * @}
  */
 
+/* RIOT headers have to be included before ESP-IDF headers! */
 #include "cpu.h"
-#include "esp_attr.h"
 #include "esp/common_macros.h"
-#include "esp_sleep.h"
 #include "irq_arch.h"
 #include "log.h"
 #include "periph/rtt.h"
 #include "rtt_arch.h"
-#include "soc/timer_group_struct.h"
 #include "syscalls.h"
 #include "timex.h"
+
+/* ESP-IDF headers */
+#include "esp_attr.h"
+#include "esp_sleep.h"
+#include "rom/ets_sys.h"
+#include "soc/timer_group_struct.h"
+#include "xtensa/xtensa_api.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"

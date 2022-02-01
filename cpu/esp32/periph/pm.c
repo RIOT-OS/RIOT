@@ -18,20 +18,22 @@
  * @}
  */
 
-#define ENABLE_DEBUG 0
-#include "debug.h"
-
+/* RIOT headers have to be included before ESP-IDF headers! */
 #include "esp_attr.h"
-#include "esp_sleep.h"
 #include "gpio_arch.h"
+#include "periph/rtc.h"
 #include "rtt_arch.h"
 #include "syscalls.h"
 
-#include "periph/rtc.h"
+/* ESP-IDF headers */
+#include "esp_sleep.h"
 #include "rom/rtc.h"
 #include "rom/uart.h"
 #include "soc/rtc.h"
 #include "soc/rtc_cntl_reg.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 extern void rtt_save_counter(void);
 extern void rtt_restore_counter(void);
@@ -101,7 +103,7 @@ void pm_reboot(void)
     software_reset();
 }
 
-#ifndef MODULE_PM_LAYERED
+#if !IS_USED(MODULE_PM_LAYERED)
 
 void pm_set_lowest(void)
 {
