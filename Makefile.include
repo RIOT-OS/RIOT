@@ -578,7 +578,7 @@ include $(RIOTBASE)/sys/Makefile.include
 -include $(PKG_PATHS:%=%Makefile.include)
 
 # include external modules configuration
--include $(EXTERNAL_MODULE_PATHS:%=%/Makefile.include)
+-include $(EXTERNAL_MODULE_PATHS:%=%Makefile.include)
 
 # Deduplicate includes without sorting them
 # see https://stackoverflow.com/questions/16144115/makefile-remove-duplicate-words-without-sorting
