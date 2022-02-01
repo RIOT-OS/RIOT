@@ -383,6 +383,19 @@ void* IRAM_ATTR __wrap__calloc_r(struct _reent *r, size_t nmemb, size_t size)
 
 /* for compatibility with ESP-IDF heap functions */
 
+#ifndef MCU_ESP8266
+void* heap_caps_malloc(size_t size, uint32_t caps, const char *file, size_t line)
+                       __attribute__((alias("_heap_caps_malloc")));
+void* heap_caps_calloc(size_t n, size_t size, uint32_t caps, const char *file, size_t line)
+                       __attribute__((alias("_heap_caps_calloc")));
+void* heap_caps_realloc(void *ptr, size_t size, uint32_t caps, const char *file, size_t line)
+                        __attribute__((alias("_heap_caps_realloc")));
+void *heap_caps_zalloc(size_t size, uint32_t caps, const char *file, size_t line)
+                       __attribute__((alias("_heap_caps_zalloc")));
+void heap_caps_free(void *ptr, const char *file, size_t line)
+                    __attribute__((alias("_heap_caps_free")));
+#endif
+
 void* _heap_caps_malloc(size_t size, uint32_t caps, const char *file, size_t line)
 {
     (void)caps;
@@ -451,6 +464,7 @@ unsigned int IRAM_ATTR get_free_heap_size(void)
 
 /* alias for compatibility with espressif/wifi_libs */
 uint32_t esp_get_free_heap_size( void ) __attribute__((alias("get_free_heap_size")));
+uint32_t esp_get_free_internal_heap_size( void ) __attribute__((alias("get_free_heap_size")));
 
 #endif /* MODULE_ESP_IDF_HEAP */
 
