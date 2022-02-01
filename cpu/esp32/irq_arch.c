@@ -19,9 +19,8 @@
  */
 
 #include "irq_arch.h"
-
 #include "esp_err.h"
-#include "rom/ets_sys.h"
+#include "esp32/rom/ets_sys.h"
 #include "soc/dport_reg.h"
 #include "xtensa/xtensa_api.h"
 
@@ -36,7 +35,7 @@ struct _irq_alloc_table_t {
 static const struct _irq_alloc_table_t _irq_alloc_table[] = {
     { ETS_FROM_CPU_INTR0_SOURCE, CPU_INUM_SOFTWARE },
     { ETS_TG0_WDT_LEVEL_INTR_SOURCE, CPU_INUM_WDT },
-    { ETS_TG0_T0_LEVEL_INTR_SOURCE, CPU_INUM_RTC },
+    { ETS_TG0_LACT_LEVEL_INTR_SOURCE, CPU_INUM_RTC },
     { ETS_TG0_T1_LEVEL_INTR_SOURCE, CPU_INUM_TIMER },
     { ETS_TG1_T0_LEVEL_INTR_SOURCE, CPU_INUM_TIMER },
     { ETS_TG1_T1_LEVEL_INTR_SOURCE, CPU_INUM_TIMER },
@@ -48,7 +47,8 @@ static const struct _irq_alloc_table_t _irq_alloc_table[] = {
     { ETS_I2C_EXT0_INTR_SOURCE, CPU_INUM_I2C },
     { ETS_I2C_EXT1_INTR_SOURCE, CPU_INUM_I2C },
     { ETS_ETH_MAC_INTR_SOURCE, CPU_INUM_ETH },
-    { ETS_CAN_INTR_SOURCE, CPU_INUM_CAN }
+    { ETS_CAN_INTR_SOURCE, CPU_INUM_CAN },
+    { ETS_TIMER2_INTR_SOURCE, CPU_INUM_FRC2 },
 };
 
 typedef void (*intr_handler_t)(void *arg);
@@ -56,18 +56,36 @@ typedef void (*intr_handler_t)(void *arg);
 #define IRQ_ALLOC_TABLE_SIZE ARRAY_SIZE(_irq_alloc_table)
 #define ESP_INTR_FLAG_INTRDISABLED    (1<<11)
 
+typedef unsigned intr_handle_t;
+
+esp_err_t esp_intr_enable(intr_handle_t handle)
+{
+    assert(handle < IRQ_ALLOC_TABLE_SIZE);
+    const struct _irq_alloc_table_t *entry = &_irq_alloc_table[handle];
+    xt_ints_on(BIT(entry->intr));
+    return ESP_OK;
+}
+
+esp_err_t esp_intr_disable(intr_handle_t handle)
+{
+    assert(handle < IRQ_ALLOC_TABLE_SIZE);
+    const struct _irq_alloc_table_t *entry = &_irq_alloc_table[handle];
+    xt_ints_off(BIT(entry->intr));
+    return ESP_OK;
+}
+
 /**
  * @brief Emulates the according ESP-IDF function
  *
  * This function provides a compatible interface to the ESP-IDF function for
  * source code compatibility. In difference to ESP-IDF it uses a fix interrupt
- * assignment scheme based on a very limited number peripheral interrupt
+ * assignment scheme based on a very limited number of peripheral interrupt
  * signals.
  *
  * TODO free allocation scheme as in ESP-IDF
  */
 esp_err_t esp_intr_alloc(int source, int flags, intr_handler_t handler,
-                         void *arg, void *ret_handle)
+                         void *arg, intr_handle_t *ret_handle)
 {
     unsigned i;
     for (i = 0; i < IRQ_ALLOC_TABLE_SIZE; i++) {
@@ -91,5 +109,14 @@ esp_err_t esp_intr_alloc(int source, int flags, intr_handler_t handler,
         xt_ints_on(BIT(_irq_alloc_table[i].intr));
     }
 
+    if (ret_handle) {
+        *((intr_handle_t *)ret_handle) = i;
+    }
+
     return ESP_OK;
+}
+
+esp_err_t esp_intr_free(intr_handle_t handle)
+{
+    return esp_intr_disable(handle);
 }
