@@ -1,7 +1,7 @@
 PKG_NAME=tinycbor
 PKG_URL=https://github.com/intel/tinycbor
-# Tinycbor v0.5.3
-PKG_VERSION=755f9ef932f9830a63a712fd2ac971d838b131f1
+# Tinycbor v0.6.0
+PKG_VERSION=d393c16f3eb30d0c47e6f9d92db62272f0ec4dc7
 PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
