@@ -27,4 +27,7 @@ config BOARD_MSBIOT
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
 
+    select HAVE_MPU9150
+    select HAVE_SAUL_GPIO
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"

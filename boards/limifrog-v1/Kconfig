@@ -19,4 +19,6 @@ config BOARD_LIMIFROG_V1
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
 
+    select HAVE_LIS3MDL
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"
