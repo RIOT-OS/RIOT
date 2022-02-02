@@ -359,6 +359,13 @@ void ztimer_init(void)
         }
     }
 
+#  if MODULE_ZTIMER_ONDEMAND
+    /* configure 'adjust_clock_start' */
+    if (CONFIG_ZTIMER_USEC_ADJUST_CLOCK_START) {
+        ZTIMER_USEC->adjust_clock_start = CONFIG_ZTIMER_USEC_ADJUST_CLOCK_START;
+    }
+#  endif
+
     /* calculate or set 'adjust_set' */
     if (CONFIG_ZTIMER_USEC_ADJUST_SET) {
         ZTIMER_USEC->adjust_set = CONFIG_ZTIMER_USEC_ADJUST_SET;

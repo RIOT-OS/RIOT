@@ -388,6 +388,9 @@ struct ztimer_clock {
     uint16_t adjust_sleep;          /**< will be subtracted on every sleep(),
                                          in addition to adjust_set          */
 #if MODULE_ZTIMER_ONDEMAND || DOXYGEN
+    uint16_t adjust_clock_start;    /**< will be subtracted on every set(),
+                                         if the underlying periph is in
+                                         stopped state                      */
     uint16_t users;                 /**< user count of this clock */
 #endif
 #if MODULE_ZTIMER_EXTEND || MODULE_ZTIMER_NOW64 || DOXYGEN
@@ -715,11 +718,13 @@ void ztimer_sleep(ztimer_clock_t *clock, uint32_t duration);
  */
 static inline void ztimer_spin(ztimer_clock_t *clock, uint32_t duration)
 {
+    ztimer_acquire(clock);
     uint32_t end = ztimer_now(clock) + duration;
 
     /* Rely on integer overflow. `end - now` will be smaller than `duration`,
      * counting down, until it underflows to UINT32_MAX. Loop ends then. */
     while ((end - ztimer_now(clock)) <= duration) {}
+    ztimer_release(clock);
 }
 
 /**

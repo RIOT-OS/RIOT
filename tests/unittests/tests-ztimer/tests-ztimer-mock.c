@@ -199,6 +199,10 @@ static void test_ztimer_mock_set16(void)
     ztimer_clock_t *z = &zmock.super;
 
     ztimer_mock_init(&zmock, 16);
+
+    /* make sure ztimer stays turned on */
+    ztimer_acquire(z);
+
     uint32_t now = ztimer_now(z);
     TEST_ASSERT_EQUAL_INT(0, now);
 

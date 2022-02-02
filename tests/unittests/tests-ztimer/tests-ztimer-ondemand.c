@@ -93,12 +93,67 @@ static void test_ztimer_ondemand_acquire_release_extend(void)
     TEST_ASSERT_EQUAL_INT(0, zmock.armed);
 }
 
+#define HAS_BEEN_EXEC (1)
+
+static void _set_cb(void *arg)
+{
+    int *val = arg;
+    *val = HAS_BEEN_EXEC;
+}
+
+static void test_ztimer_ondemand_timers(void)
+{
+    ztimer_mock_t zmock;
+    ztimer_clock_t *z = &zmock.super;
+
+    ztimer_mock_init(&zmock, 32);
+    z->adjust_clock_start = 10;
+
+    /* set first timer */
+    int a_arg = 0;
+    ztimer_t a = {.callback = _set_cb, .arg = &a_arg};
+    const uint32_t a_val = 100;
+    ztimer_set(z, &a, a_val);
+    TEST_ASSERT_EQUAL_INT(a_val - z->adjust_clock_start, zmock.target);
+    TEST_ASSERT_EQUAL_INT(1, zmock.running);
+    TEST_ASSERT_EQUAL_INT(1, zmock.armed);
+
+    /* set second timer */
+    int b_arg = 0;
+    ztimer_t b = {.callback = _set_cb, .arg = &b_arg};
+    const uint32_t b_val = 200;
+    uint32_t diff = zmock.target;
+    ztimer_set(z, &b, b_val);
+
+    /* let the first timer fire */
+    ztimer_mock_advance(&zmock, zmock.target);
+    TEST_ASSERT_EQUAL_INT(HAS_BEEN_EXEC, a_arg);
+    TEST_ASSERT_EQUAL_INT(b_val - diff, zmock.target);
+    TEST_ASSERT_EQUAL_INT(1, zmock.running);
+    TEST_ASSERT_EQUAL_INT(1, zmock.armed);
+
+    /* let the second timer fire -> no users left! */
+    ztimer_mock_advance(&zmock, zmock.target);
+    TEST_ASSERT_EQUAL_INT(HAS_BEEN_EXEC, b_arg);
+    TEST_ASSERT_EQUAL_INT(0, zmock.running);
+    TEST_ASSERT_EQUAL_INT(0, zmock.armed);
+
+    /* set and remove timer */
+    ztimer_set(z, &a, a_val);
+    TEST_ASSERT_EQUAL_INT(1, zmock.running);
+    TEST_ASSERT_EQUAL_INT(1, zmock.armed);
+    ztimer_remove(z, &a);
+    TEST_ASSERT_EQUAL_INT(0, zmock.running);
+    TEST_ASSERT_EQUAL_INT(0, zmock.armed);
+}
+
 Test *tests_ztimer_ondemand_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_ztimer_ondemand_acquire_release),
         new_TestFixture(test_ztimer_ondemand_acquire_ops_unsupported),
         new_TestFixture(test_ztimer_ondemand_acquire_release_extend),
+        new_TestFixture(test_ztimer_ondemand_timers),
     };
 
     EMB_UNIT_TESTCALLER(ztimer_tests, NULL, NULL, fixtures);
