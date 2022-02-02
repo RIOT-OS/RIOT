@@ -103,7 +103,12 @@ void ztimer_convert_frac_init(ztimer_convert_frac_t *self,
     ztimer_convert_frac_compute_scale(self, freq_self, freq_lower);
     if (freq_self < freq_lower) {
         self->super.super.max_value = frac_scale(&self->scale_now, UINT32_MAX);
+#if !MODULE_ZTIMER_ONDEMAND
+        /* extend lower clock only if the ondemand driver isn't selected
+         * otherwise, the clock extension will be called with the first
+         * ztimer_acquire() call */
         ztimer_init_extend(&self->super.super);
+#endif
     }
     else {
         DEBUG("ztimer_convert_frac_init: rounding up val:%" PRIu32 "\n",

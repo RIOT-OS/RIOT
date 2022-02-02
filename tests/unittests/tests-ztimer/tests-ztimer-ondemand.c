@@ -17,6 +17,7 @@
 
 #include "ztimer.h"
 #include "ztimer/mock.h"
+#include "ztimer/convert_frac.h"
 
 #include "embUnit/embUnit.h"
 
@@ -147,6 +148,33 @@ static void test_ztimer_ondemand_timers(void)
     TEST_ASSERT_EQUAL_INT(0, zmock.armed);
 }
 
+static void test_ztimer_ondemand_timers_converted(void)
+{
+    ztimer_mock_t zmock;
+    ztimer_convert_frac_t zc;
+    ztimer_clock_t *z = &zc.super.super;
+
+    /* the base timer must be extended */
+    ztimer_mock_init(&zmock, 24);
+    const uint32_t factor = 10;
+    ztimer_convert_frac_init(&zc, &zmock.super, 1, factor);
+
+    z->adjust_clock_start = 10;
+
+    int a_arg = 0;
+    ztimer_t a = {.callback = _set_cb, .arg = &a_arg};
+    const uint32_t a_val = 100;
+    ztimer_set(z, &a, a_val);
+    TEST_ASSERT_EQUAL_INT((a_val - z->adjust_clock_start) * factor, zmock.target);
+    TEST_ASSERT_EQUAL_INT(1, zmock.running);
+    TEST_ASSERT_EQUAL_INT(1, zmock.armed);
+
+    ztimer_mock_advance(&zmock, zmock.target);
+    TEST_ASSERT_EQUAL_INT(HAS_BEEN_EXEC, a_arg);
+    TEST_ASSERT_EQUAL_INT(0, zmock.running);
+    TEST_ASSERT_EQUAL_INT(0, zmock.armed);
+}
+
 Test *tests_ztimer_ondemand_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -154,6 +182,7 @@ Test *tests_ztimer_ondemand_tests(void)
         new_TestFixture(test_ztimer_ondemand_acquire_ops_unsupported),
         new_TestFixture(test_ztimer_ondemand_acquire_release_extend),
         new_TestFixture(test_ztimer_ondemand_timers),
+        new_TestFixture(test_ztimer_ondemand_timers_converted),
     };
 
     EMB_UNIT_TESTCALLER(ztimer_tests, NULL, NULL, fixtures);
