@@ -21,6 +21,7 @@
 #include <assert.h>
 #include <string.h>
 
+#include "board.h"
 #include "dose.h"
 #include "random.h"
 #include "irq.h"
@@ -32,6 +33,10 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+#if !defined(DOSE_TIMER_DEV) && IS_ACTIVE(MODULE_DOSE_WATCHDOG)
+#error "DOSE_TIMER_DEV needs to be set by the board"
+#endif
 
 static uint16_t crc16_update(uint16_t crc, uint8_t octet);
 static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal);
