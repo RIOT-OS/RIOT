@@ -228,6 +228,12 @@ config MODULE_ZTIMER_MOCK
         manually fired to simulate different scenarios and test the ztimer
         implementation using this as a backing timer.
 
+config MODULE_ZTIMER_ONDEMAND
+    bool "Run ztimer clocks only on demand"
+    help
+        This ztimer extensions keeps track of ztimer users and may disable
+        underlying peripherals if not users are requiring a ztimer clock.
+
 config MODULE_ZTIMER_INIT
     bool
 
