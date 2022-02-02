@@ -361,6 +361,20 @@ typedef struct {
      * @param   clock       ztimer clock to cancel a pending alarm, if any
      */
     void (*cancel)(ztimer_clock_t *clock);
+
+#if MODULE_ZTIMER_ONDEMAND || DOXYGEN
+    /**
+     * @brief   Starts the underlying timer
+     * @param   clock       ztimer clock to start
+     */
+    void (*start)(ztimer_clock_t *clock);
+
+    /**
+     * @brief   Stops the underlying timer
+     * @param   clock       ztimer clock to stop
+     */
+    void (*stop)(ztimer_clock_t *clock);
+#endif
 } ztimer_ops_t;
 
 /**
@@ -373,6 +387,9 @@ struct ztimer_clock {
     uint16_t adjust_set;            /**< will be subtracted on every set()  */
     uint16_t adjust_sleep;          /**< will be subtracted on every sleep(),
                                          in addition to adjust_set          */
+#if MODULE_ZTIMER_ONDEMAND || DOXYGEN
+    uint16_t users;                 /**< user count of this clock */
+#endif
 #if MODULE_ZTIMER_EXTEND || MODULE_ZTIMER_NOW64 || DOXYGEN
     /* values used for checkpointed intervals and 32bit extension */
     uint32_t max_value;             /**< maximum relative timer value       */
@@ -394,6 +411,47 @@ struct ztimer_clock {
 void ztimer_handler(ztimer_clock_t *clock);
 
 /* User API */
+/**
+ * @brief   Acquire a clock
+ *
+ * This will indicate the the underlying clock is required to be running.
+ * If time differences are measured using @ref ztimer_now this will make
+ * sure ztimer won't turn of the clock source.
+ *
+ * @param[in]   clock       ztimer clock to operate on
+ *
+ * @return true if this was the first acquisition on this this clock
+ */
+#if MODULE_ZTIMER_ONDEMAND || DOXYGEN
+bool ztimer_acquire(ztimer_clock_t *clock);
+#else
+static inline bool ztimer_acquire(ztimer_clock_t *clock)
+{
+    (void) clock;
+    return false;
+}
+#endif
+
+/**
+ * @brief   Release a clock
+ *
+ * This will indicate the the underlying clock isn't required to be running
+ * anymore and may be turned off.
+ *
+ * @param[in]   clock       ztimer clock to operate on
+ *
+ * @return true if this was the last clock user
+ */
+#if MODULE_ZTIMER_ONDEMAND || DOXYGEN
+bool ztimer_release(ztimer_clock_t *clock);
+#else
+static inline bool ztimer_release(ztimer_clock_t *clock)
+{
+    (void) clock;
+    return false;
+}
+#endif
+
 /**
  * @brief   Set a timer on a clock
  *
@@ -512,14 +570,18 @@ ztimer_now_t _ztimer_now_extend(ztimer_clock_t *clock);
  * * Two values can only be compared when the clock has been continuously
  *   active between the first and the second reading.
  *
- *   A clock is guaranteed to be active from the time any timer is set (the
- *   first opportunity to get a "now" value from it is the return value of @ref
- *   ztimer_set) until the time the timer's callback returns. The clock also
- *   stays active when timers are set back-to-back (which is the case when the
- *   first timer's callback sets the second timer), or when they overlap (which
- *   can be known by starting the second timer and afterwards observing that
- *   @ref ztimer_is_set or @ref ztimer_remove returns true in a low-priority
- *   context).
+ *   Calling @ref ztimer_acquire before using `ztimer_now()` is the preferred
+ *   way to guarantee that a clock is continuously active. Make sure to call
+ *   the corresponding @ref ztimer_release after the last `ztimer_now()` call.
+ *
+ *   A clock is also guaranteed to be active from the time any timer is set
+ *   (the first opportunity to get a "now" value from it is the return value of
+ *   @ref ztimer_set) until the time the timer's callback returns. The clock
+ *   also stays active when timers are set back-to-back (which is the case when
+ *   the first timer's callback sets the second timer), or when they overlap
+ *   (which can be known by starting the second timer and afterwards observing
+ *   that @ref ztimer_is_set or @ref ztimer_remove returns true in a
+ *   low-priority context).
  *
  *   In contrast, the clock is not guaranteed to be active if a timer is
  *   removed and then a second one is started (even if the thread does not

@@ -37,6 +37,10 @@ ifneq (,$(filter ztimer_%,$(USEMODULE)))
   USEMODULE += ztimer_extend
 endif
 
+ifneq (,$(filter ztimer_ondemand_%,$(USEMODULE)))
+  USEMODULE += ztimer_ondemand
+endif
+
 ifneq (,$(filter ztimer_convert_%,$(USEMODULE)))
   USEMODULE += ztimer_convert
 endif

@@ -49,6 +49,68 @@ static inline uint32_t _min_u32(uint32_t a, uint32_t b)
 }
 #endif
 
+#if MODULE_ZTIMER_ONDEMAND
+static bool _ztimer_acquire(ztimer_clock_t *clock)
+{
+    bool first_clock_user = false;
+    unsigned state = irq_disable();
+
+    DEBUG("ztimer_acquire(): %p: %" PRIu16 " user(s)\n",
+          (void *)clock, clock->users + 1);
+
+    if (clock->users++ == 0) {
+        if (clock->ops->start) {
+            clock->ops->start(clock);
+        }
+
+        first_clock_user = true;
+    }
+
+    irq_restore(state);
+
+    return first_clock_user;
+}
+
+bool ztimer_acquire(ztimer_clock_t *clock)
+{
+    bool first_clock_user = _ztimer_acquire(clock);
+
+    if (first_clock_user) {
+        /* if the clock just has been enabled, make sure to set possibly
+         * required checkpoints for clock extension */
+        _ztimer_update(clock);
+    }
+
+    return first_clock_user;
+}
+
+bool ztimer_release(ztimer_clock_t *clock)
+{
+    bool no_clock_user_left = false;
+    unsigned state = irq_disable();
+
+    assert(clock->users > 0);
+
+    DEBUG("ztimer_release(): %p: %" PRIu16 " user(s)\n",
+          (void *)clock, clock->users - 1);
+
+    if (--clock->users == 0) {
+        /* make sure the timer isn't armed before turning off */
+        clock->ops->cancel(clock);
+
+        if (clock->ops->stop) {
+            clock->ops->stop(clock);
+        }
+
+        no_clock_user_left = true;
+    }
+
+    irq_restore(state);
+
+    return no_clock_user_left;
+}
+#endif /* MODULE_ZTIMER_ONDEMAND */
+
 static unsigned _is_set(const ztimer_clock_t *clock, const ztimer_t *t)
 {
     if (!clock->list.next) {
