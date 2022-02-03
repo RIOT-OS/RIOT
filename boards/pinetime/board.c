@@ -43,7 +43,6 @@ static const mtd_spi_nor_params_t _pinetime_nor_params = {
     .cs = PINETIME_NOR_SPI_CS,
     .wp = GPIO_UNDEF,
     .hold = GPIO_UNDEF,
-    .addr_width = 3,
 };
 
 static mtd_spi_nor_t pinetime_nor_dev = {

@@ -444,6 +444,20 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
     return 0;
 }
 
+static void _set_addr_width(mtd_dev_t *mtd)
+{
+    mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
+
+    uint32_t flash_size = mtd->pages_per_sector * mtd->page_size
+                        * mtd->sector_count;
+
+    if (flash_size > 0xFFFFFF) {
+        dev->addr_width = 4;
+    } else {
+        dev->addr_width = 3;
+    }
+}
+
 static int mtd_spi_nor_init(mtd_dev_t *mtd)
 {
     DEBUG("mtd_spi_nor_init: %p\n", (void *)mtd);
@@ -451,9 +465,6 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
 
     DEBUG("mtd_spi_nor_init: -> spi: %lx, cs: %lx, opcodes: %p\n",
           (unsigned long)_get_spi(dev), (unsigned long)dev->params->cs, (void *)dev->params->opcode);
-
-    /* verify configuration */
-    assert(dev->params->addr_width <= 4);
 
     /* CS, WP, Hold */
     _init_pins(dev);
@@ -476,17 +487,10 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
 
     /* derive density from JEDEC ID  */
     if (mtd->sector_count == 0) {
-        uint32_t flash_size = mtd_spi_nor_get_size(&dev->jedec_id);
-        mtd->sector_count = flash_size
+        mtd->sector_count = mtd_spi_nor_get_size(&dev->jedec_id)
                           / (mtd->pages_per_sector * mtd->page_size);
-        if (flash_size > 0xFFFFFF) {
-            dev->addr_width = 4;
-        } else {
-            dev->addr_width = 3;
-        }
-    } else {
-        dev->addr_width = dev->params->addr_width;
     }
+    _set_addr_width(mtd);
 
     DEBUG("mtd_spi_nor_init: %" PRIu32 " bytes "
           "(%" PRIu32 " sectors, %" PRIu32 " bytes/sector, "
@@ -496,7 +500,7 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
           mtd->sector_count, mtd->pages_per_sector * mtd->page_size,
           mtd->pages_per_sector * mtd->sector_count,
           mtd->pages_per_sector, mtd->page_size);
-    DEBUG("mtd_spi_nor_init: Using %u byte addresses\n", dev->params->addr_width);
+    DEBUG("mtd_spi_nor_init: Using %u byte addresses\n", dev->addr_width);
 
     uint8_t status;
     mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));

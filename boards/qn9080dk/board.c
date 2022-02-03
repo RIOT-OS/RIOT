@@ -43,7 +43,6 @@ static const mtd_spi_nor_params_t _mtd_nor_params = {
     .cs   = SPI_HWCS(0),  /* GPIO(PORT_A, 3) is used for HWCS(0) on FC2 */
     .wp   = GPIO_UNDEF,
     .hold = GPIO_UNDEF,
-    .addr_width = 3,  /* 24-bit addresses */
 };
 
 static mtd_spi_nor_t mtd_nor_dev = {

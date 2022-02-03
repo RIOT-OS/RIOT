@@ -40,7 +40,6 @@ static const mtd_spi_nor_params_t _mtd_nor_params = {
     .cs   = GPIO_PIN(PORT_A, 11),
     .wp   = GPIO_PIN(PORT_C, 6),
     .hold = GPIO_PIN(PORT_C, 9),
-    .addr_width = 3,
 };
 
 static mtd_spi_nor_t mtd_nor_dev = {
