@@ -91,7 +91,7 @@ static void mtd_spi_release(const mtd_spi_nor_t *dev)
 static inline uint8_t* _be_addr(const mtd_spi_nor_t *dev, uint32_t *addr)
 {
     *addr = htonl(*addr);
-    return &((uint8_t*)addr)[4 - dev->params->addr_width];
+    return &((uint8_t*)addr)[4 - dev->addr_width];
 }
 
 /**
@@ -114,7 +114,7 @@ static void mtd_spi_cmd_addr_read(const mtd_spi_nor_t *dev, uint8_t opcode,
 
     if (IS_ACTIVE(ENABLE_TRACE)) {
         TRACE("mtd_spi_cmd_addr_read: addr:");
-        for (unsigned int i = 0; i < dev->params->addr_width; ++i) {
+        for (unsigned int i = 0; i < dev->addr_width; ++i) {
             TRACE(" %02x", addr_buf[i]);
         }
         TRACE("\n");
@@ -123,7 +123,7 @@ static void mtd_spi_cmd_addr_read(const mtd_spi_nor_t *dev, uint8_t opcode,
     /* Send opcode followed by address */
     spi_transfer_byte(_get_spi(dev), dev->params->cs, true, opcode);
     spi_transfer_bytes(_get_spi(dev), dev->params->cs, true,
-                       (char *)addr_buf, NULL, dev->params->addr_width);
+                       (char *)addr_buf, NULL, dev->addr_width);
 
     /* Read data */
     spi_transfer_bytes(_get_spi(dev), dev->params->cs, false,
@@ -150,7 +150,7 @@ static void mtd_spi_cmd_addr_write(const mtd_spi_nor_t *dev, uint8_t opcode,
 
     if (IS_ACTIVE(ENABLE_TRACE)) {
         TRACE("mtd_spi_cmd_addr_write: addr:");
-        for (unsigned int i = 0; i < dev->params->addr_width; ++i) {
+        for (unsigned int i = 0; i < dev->addr_width; ++i) {
             TRACE(" %02x", addr_buf[i]);
         }
         TRACE("\n");
@@ -162,7 +162,7 @@ static void mtd_spi_cmd_addr_write(const mtd_spi_nor_t *dev, uint8_t opcode,
     /* only keep CS asserted when there is data that follows */
     bool cont = (count > 0);
     spi_transfer_bytes(_get_spi(dev), dev->params->cs, cont,
-                       (char *)addr_buf, NULL, dev->params->addr_width);
+                       (char *)addr_buf, NULL, dev->addr_width);
 
     /* Write data */
     if (cont) {
@@ -401,6 +401,12 @@ static void _init_pins(mtd_spi_nor_t *dev)
     }
 }
 
+static void _enable_32bit_addr(mtd_spi_nor_t *dev)
+{
+    mtd_spi_cmd(dev, dev->params->opcode->wren);
+    mtd_spi_cmd(dev, SFLASH_CMD_4_BYTE_ADDR);
+}
+
 static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
 {
     mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
@@ -424,9 +430,8 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
             }
 #endif
             /* enable 32 bit address mode */
-            if (dev->params->addr_width == 4) {
-                mtd_spi_cmd(dev, dev->params->opcode->wren);
-                mtd_spi_cmd(dev, SFLASH_CMD_4_BYTE_ADDR);
+            if (dev->addr_width == 4) {
+                _enable_32bit_addr(dev);
             }
 
             break;
@@ -448,7 +453,6 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
           (unsigned long)_get_spi(dev), (unsigned long)dev->params->cs, (void *)dev->params->opcode);
 
     /* verify configuration */
-    assert(dev->params->addr_width > 0);
     assert(dev->params->addr_width <= 4);
 
     /* CS, WP, Hold */
@@ -472,8 +476,16 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
 
     /* derive density from JEDEC ID  */
     if (mtd->sector_count == 0) {
-        mtd->sector_count = mtd_spi_nor_get_size(&dev->jedec_id)
+        uint32_t flash_size = mtd_spi_nor_get_size(&dev->jedec_id);
+        mtd->sector_count = flash_size
                           / (mtd->pages_per_sector * mtd->page_size);
+        if (flash_size > 0xFFFFFF) {
+            dev->addr_width = 4;
+        } else {
+            dev->addr_width = 3;
+        }
+    } else {
+        dev->addr_width = dev->params->addr_width;
     }
 
     DEBUG("mtd_spi_nor_init: %" PRIu32 " bytes "
@@ -489,6 +501,11 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     uint8_t status;
     mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
     DEBUG("mtd_spi_nor_init: device status = 0x%02x\n", (unsigned int)status);
+
+    /* enable 32 bit address mode */
+    if (dev->addr_width == 4) {
+        _enable_32bit_addr(dev);
+    }
 
     /* Global Block-Protection Unlock */
     mtd_spi_cmd(dev, dev->params->opcode->wren);
