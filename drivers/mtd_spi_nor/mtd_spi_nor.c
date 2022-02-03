@@ -45,6 +45,8 @@
 #define SFLASH_CMD_4_BYTE_ADDR (0xB7)   /**< enable 32 bit addressing */
 #define SFLASH_CMD_3_BYTE_ADDR (0xE9)   /**< enable 24 bit addressing */
 
+#define SFLASH_CMD_ULBPR       (0x98)   /**< Global Block Protection Unlock */
+
 #define MTD_64K             (65536ul)
 #define MTD_64K_ADDR_MASK   (0xFFFF)
 #define MTD_32K             (32768ul)
@@ -66,6 +68,7 @@
 
 typedef enum {
     SPI_NOR_JEDEC_ATMEL = 0x1F | JEDEC_BANK(1),
+    SPI_NOR_JEDEC_MICROCHIP = 0xBF | JEDEC_BANK(1),
 } jedec_manuf_t;
 /** @} */
 
@@ -303,6 +306,28 @@ static uint32_t mtd_spi_nor_get_size(const mtd_jedec_id_t *id)
         (id->device[1] & ~0x3) == 0) {
         return (0x1F & id->device[0]) * MBIT_AS_BYTES;
     }
+    if (mtd_spi_manuf_match(id, SPI_NOR_JEDEC_MICROCHIP)) {
+        switch (id->device[1]) {
+        case 0x12:  /* SST26VF020A */
+        case 0x8c:  /* SST25VF020B */
+            return 2 * MBIT_AS_BYTES;
+        case 0x54:  /* SST26WF040B */
+        case 0x8d:  /* SST25VF040B */
+            return 4 * MBIT_AS_BYTES;
+        case 0x58:  /* SST26WF080B */
+        case 0x8e:  /* SST25VF080B */
+            return 8 * MBIT_AS_BYTES;
+        case 0x1:   /* SST26VF016  */
+        case 0x41:  /* SST26VF016B */
+            return 16 * MBIT_AS_BYTES;
+        case 0x2:   /* SST26VF032  */
+        case 0x42:  /* SST26VF032B */
+            return 32 * MBIT_AS_BYTES;
+        case 0x43:  /* SST26VF064B */
+        case 0x53:  /* SST26WF064C */
+            return 64 * MBIT_AS_BYTES;
+        }
+    }
 
     /* everyone else seems to use device ID 2 for density */
     return 1 << id->device[1];
@@ -463,9 +488,13 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
 
     uint8_t status;
     mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
-    mtd_spi_release(dev);
-
     DEBUG("mtd_spi_nor_init: device status = 0x%02x\n", (unsigned int)status);
+
+    /* Global Block-Protection Unlock */
+    mtd_spi_cmd(dev, dev->params->opcode->wren);
+    mtd_spi_cmd(dev, SFLASH_CMD_ULBPR);
+
+    mtd_spi_release(dev);
 
     /* check whether page size and sector size are powers of two (most chips' are)
      * and compute the number of shifts needed to get the page and sector addresses
