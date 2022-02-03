@@ -39,6 +39,8 @@ extern "C" {
 #ifndef CONFIG_CLOCK_PLL_M
 #if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(12))
 #define CONFIG_CLOCK_PLL_M              (12)
+#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(16))
+#define CONFIG_CLOCK_PLL_M              (16)
 #else
 #define CONFIG_CLOCK_PLL_M              (4)
 #endif
@@ -51,7 +53,8 @@ extern "C" {
      defined(CPU_LINE_STM32F437xx) || defined(CPU_LINE_STM32F439xx))
 #if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(8))
 #define CONFIG_CLOCK_PLL_N              (168)
-#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(12))
+#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(12) || \
+    (CLOCK_HSE == MHZ(16)))
 #define CONFIG_CLOCK_PLL_N              (336)
 #else
 #define CONFIG_CLOCK_PLL_N              (84)
@@ -59,7 +62,8 @@ extern "C" {
 #else
 #if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(8))
 #define CONFIG_CLOCK_PLL_N              (180)
-#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(12))
+#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(12) || \
+    (CLOCK_HSE == MHZ(16)))
 #define CONFIG_CLOCK_PLL_N              (360)
 #else
 #define CONFIG_CLOCK_PLL_N              (90)
