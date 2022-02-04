@@ -243,6 +243,13 @@ config MODULE_ZTIMER_ONDEMAND_TIMER
         Turn off the underlying Timer peripheral if related ztimer clocks
         have no users.
 
+config MODULE_ZTIMER_ONDEMAND_RTT
+    bool "Run RTT only on demand"
+    depends on MODULE_ZTIMER_PERIPH_RTT
+    help
+        Turn off the underlying RTT peripheral if related ztimer clocks
+        have no users.
+
 config MODULE_ZTIMER_ONDEMAND_RTC
     bool "Run RTC only on demand"
     depends on MODULE_ZTIMER_PERIPH_RTC
