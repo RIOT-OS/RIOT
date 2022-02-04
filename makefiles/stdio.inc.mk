@@ -2,6 +2,7 @@ STDIO_MODULES = \
   slipdev_stdio \
   stdio_cdc_acm \
   stdio_ethos \
+  stdio_nimble \
   stdio_null \
   stdio_rtt \
   stdio_semihosting \
@@ -27,6 +28,18 @@ endif
 ifneq (,$(filter stdio_ethos,$(USEMODULE)))
   USEMODULE += ethos_stdio
   USEMODULE += stdin
+endif
+
+ifneq (,$(filter stdio_nimble,$(USEMODULE)))
+  USEMODULE += stdio_available
+  USEPKG += nimble
+  USEMODULE += tsrb
+  USEMODULE += isrpipe
+  USEMODULE += nimble_svc_gap
+  USEMODULE += nimble_svc_gatt
+  ifneq (,$(filter stdio_nimble_debug,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_uart
+  endif
 endif
 
 ifneq (,$(filter stdin,$(USEMODULE)))

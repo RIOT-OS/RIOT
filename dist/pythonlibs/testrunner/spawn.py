@@ -39,7 +39,13 @@ TEST_INTERACTIVE_DELAY = int(os.environ.get('TEST_INTERACTIVE_DELAY') or 1)
 # By default never reset after the terminal is open unless explicitly requested
 # through an environment variable.
 TESTRUNNER_RESET_AFTER_TERM = int(os.environ.get('TESTRUNNER_RESET_AFTER_TERM')
-                                  or '0')
+                                  or 0)
+
+# When running e.g. tests/shell_ble we don't want to reset the board, because
+# then ble-serial would terminate and the created virtual serial port would get
+# lost. By default the board is reset before the test starts.
+TESTRUNNER_RESET_BOARD_ON_STARTUP = \
+    int(os.environ.get('TESTRUNNER_RESET_BOARD_ON_STARTUP') or 1)
 
 MAKE = os.environ.get('MAKE', 'make')
 
@@ -70,7 +76,8 @@ def find_exc_origin(exc_info):
 def setup_child(timeout=10, spawnclass=pexpect.spawnu, env=None, logfile=None):
     # Some boards can't be reset after a terminal is open. Therefore reset
     # before `cleanterm`.
-    _reset_board(env)
+    if TESTRUNNER_RESET_BOARD_ON_STARTUP:
+        _reset_board(env)
 
     # on platforms exposing UART over USB, wait a little before connecting to
     # the serial terminal. This gives time for stdio to be ready.
