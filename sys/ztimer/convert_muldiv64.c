@@ -98,6 +98,10 @@ static const ztimer_ops_t _ztimer_convert_muldiv64_ops = {
     .set = _ztimer_convert_muldiv64_set,
     .now = _ztimer_convert_muldiv64_now,
     .cancel = ztimer_convert_cancel,
+#if MODULE_ZTIMER_ONDEMAND
+    .start = ztimer_convert_start,
+    .stop = ztimer_convert_stop,
+#endif
 };
 
 void ztimer_convert_muldiv64_init(

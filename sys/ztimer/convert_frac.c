@@ -74,6 +74,10 @@ static const ztimer_ops_t ztimer_convert_frac_ops = {
     .set = ztimer_convert_frac_op_set,
     .now = ztimer_convert_frac_op_now,
     .cancel = ztimer_convert_cancel,
+#if MODULE_ZTIMER_ONDEMAND
+    .start = ztimer_convert_start,
+    .stop = ztimer_convert_stop,
+#endif
 };
 
 static void ztimer_convert_frac_compute_scale(ztimer_convert_frac_t *self,
