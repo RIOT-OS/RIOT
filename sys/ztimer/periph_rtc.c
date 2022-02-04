@@ -138,10 +138,28 @@ static void _ztimer_periph_rtc_cancel(ztimer_clock_t *clock)
     rtc_clear_alarm();
 }
 
+#if MODULE_ZTIMER_ONDEMAND_RTC
+static void _ztimer_periph_rtc_start(ztimer_clock_t *clock)
+{
+    (void)clock;
+    rtc_poweron();
+}
+
+static void _ztimer_periph_rtc_stop(ztimer_clock_t *clock)
+{
+    (void)clock;
+    rtc_poweroff();
+}
+#endif /* MODULE_ZTIMER_ONDEMAND_RTC */
+
 static const ztimer_ops_t _ztimer_periph_rtc_ops = {
     .set = _ztimer_periph_rtc_set,
     .now = _ztimer_periph_rtc_now,
     .cancel = _ztimer_periph_rtc_cancel,
+#if MODULE_ZTIMER_ONDEMAND_RTC
+    .start = _ztimer_periph_rtc_start,
+    .stop = _ztimer_periph_rtc_stop,
+#endif
 };
 
 void ztimer_periph_rtc_init(ztimer_periph_rtc_t *clock)
@@ -149,5 +167,10 @@ void ztimer_periph_rtc_init(ztimer_periph_rtc_t *clock)
     clock->ops = &_ztimer_periph_rtc_ops;
     clock->max_value = UINT32_MAX;
     rtc_init();
+
+#if MODULE_ZTIMER_ONDEMAND_RTC
+    rtc_poweroff();
+#else
     rtc_poweron();
+#endif
 }
