@@ -31,7 +31,9 @@ cc1352-launchpad
 cc2650-launchpad
 derfmega128
 dwm1001
+esp32-ci
 esp32-heltec-lora32-v2
+esp8266-ci
 esp8266-esp-12x
 hamilton
 hifive1
@@ -88,6 +90,7 @@ tests/driver_s*
 tests/driver_t*
 tests/driver_u*
 tests/driver_v*
+tests/external_board_dirs
 tests/periph_*
 tests/pkg_elk
 tests/pkg_uzlib
