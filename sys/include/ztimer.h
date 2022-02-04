@@ -659,12 +659,18 @@ ztimer_now_t _ztimer_now_extend(ztimer_clock_t *clock);
  *          unrelated components are altered that change the systems's power
  *          management behavior.
  *
+ * @warning Make sure to call @ref ztimer_acquire(@p clock) before fetching
+ *          the clock's current time.
+ *
  * @param[in]   clock          ztimer clock to operate on
  *
  * @return  Current count on @p clock
  */
 static inline ztimer_now_t ztimer_now(ztimer_clock_t *clock)
 {
+#if MODULE_ZTIMER_ONDEMAND_STRICT
+    assert(clock->users > 0);
+#endif
 #if MODULE_ZTIMER_NOW64
     if (1) {
 #elif MODULE_ZTIMER_EXTEND
@@ -692,6 +698,10 @@ static inline ztimer_now_t ztimer_now(ztimer_clock_t *clock)
  *
  * If the time (@p last_wakeup + @p period) has already passed, the function
  * sets @p last_wakeup to @p last_wakeup + @p period and returns immediately.
+ *
+ * @warning Make sure to call @ref ztimer_acquire(@p clock) before making use
+ *          of @ref ztimer_periodic_wakeup. After usage
+ *          @ref ztimer_release(@p clock) should be called.
  *
  * @param[in]   clock           ztimer clock to operate on
  * @param[in]   last_wakeup     base time stamp for the wakeup

@@ -236,6 +236,11 @@ menuconfig MODULE_ZTIMER_ONDEMAND
 
 if MODULE_ZTIMER_ONDEMAND
 
+config MODULE_ZTIMER_ONDEMAND_STRICT
+    bool "Strict ztimer on demand"
+    help
+        Enforce ztimer clocks to be running before calling ztimer_now().
+
 config MODULE_ZTIMER_ONDEMAND_TIMER
     bool "Run Timer only on demand"
     depends on MODULE_ZTIMER_PERIPH_TIMER
