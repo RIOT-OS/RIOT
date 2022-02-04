@@ -7,7 +7,7 @@
 
 if TEST_KCONFIG
 
-choice
+choice ESP32_I2C_IMPLEMENTATION
     bool "I2C implementation"
     depends on MODULE_PERIPH_I2C
     help
