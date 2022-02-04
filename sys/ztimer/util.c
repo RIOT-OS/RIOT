@@ -23,6 +23,7 @@
 #include <assert.h>
 #include <errno.h>
 
+#include "atomic_utils.h"
 #include "irq.h"
 #include "mutex.h"
 #include "rmutex.h"
@@ -190,8 +191,7 @@ int ztimer_rmutex_lock_timeout(ztimer_clock_t *clock, rmutex_t *rmutex,
         return 0;
     }
     if (ztimer_mutex_lock_timeout(clock, &rmutex->mutex, timeout) == 0) {
-        atomic_store_explicit(&rmutex->owner,
-                              thread_getpid(), memory_order_relaxed);
+        atomic_store_kernel_pid(&rmutex->owner, thread_getpid());
         rmutex->refcount++;
         return 0;
     }
