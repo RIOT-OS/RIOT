@@ -100,9 +100,12 @@ int nimble_scanner_start(void)
         uint8_t limited = (_scan_flags & NIMBLE_SCANNER_LIMITED) ? 1 : 0;
         const struct ble_gap_ext_disc_params *uncoded =
             (_scan_flags & NIMBLE_SCANNER_PHY_1M) ? &_scan_params : NULL;
+#if IS_USED(MODULE_NIMBLE_PHY_CODED)
         const struct ble_gap_ext_disc_params *coded =
             (_scan_flags & NIMBLE_SCANNER_PHY_CODED) ? &_scan_params : NULL;
-
+#else
+        const struct ble_gap_ext_disc_params *coded = NULL;
+#endif
         int32_t dur = (_scan_duration == BLE_HS_FOREVER) ? 0
                                                          : _scan_duration / 10;
 

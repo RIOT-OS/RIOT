@@ -44,6 +44,9 @@
 typedef struct {
     uint8_t addr[BLE_ADDR_LEN];     /**< peer addr, network byte order */
     uint8_t state;                  /**< internal state */
+#if IS_USED(MODULE_NIMBLE_STATCONN_EXT)
+    nimble_phy_t phy_mode;          /**< PHY mode used by this slot */
+#endif
 } slot_t;
 
 static const uint8_t _ad[2] = { BLE_GAP_AD_FLAGS, BLUETIL_AD_FLAGS_DEFAULT };
@@ -51,9 +54,8 @@ static const uint8_t _ad[2] = { BLE_GAP_AD_FLAGS, BLUETIL_AD_FLAGS_DEFAULT };
 static mutex_t _lock = MUTEX_INIT;
 static slot_t _slots[NIMBLE_NETIF_MAX_CONN];
 
-static struct ble_gap_adv_params _adv_params;
-static struct ble_gap_conn_params _conn_params;
-static uint32_t _conn_timeout;
+static nimble_netif_accept_cfg_t _accept_params;
+static nimble_netif_connect_cfg_t _conn_params;
 
 static nimble_netif_eventcb_t _eventcb = NULL;
 
@@ -87,10 +89,17 @@ static void _activate(uint8_t role)
         peer.type = BLE_ADDR_RANDOM;
         bluetil_addr_swapped_cp(slot->addr, peer.val);
         /* try to (re)open the connection */
-        nimble_netif_connect(&peer, &_conn_params, _conn_timeout);
+#if IS_USED(MODULE_NIMBLE_STATCONN_EXT)
+        _conn_params.phy_mode = slot->phy_mode;
+#endif
+        nimble_netif_connect(&peer, &_conn_params);
     }
     else if (slot && (role == ROLE_S)) {
-        nimble_netif_accept(_ad, sizeof(_ad), &_adv_params);
+#if IS_USED(MODULE_NIMBLE_STATCONN_EXT)
+        _accept_params.primary_phy = slot->phy_mode;
+        _accept_params.secondary_phy = slot->phy_mode;
+#endif
+        nimble_netif_accept(_ad, sizeof(_ad), &_accept_params);
     }
     mutex_unlock(&_lock);
 }
@@ -153,7 +162,8 @@ static void _on_netif_evt(int handle, nimble_netif_event_t event,
     }
 }
 
-static int _be(uint8_t role, const uint8_t *addr)
+static int _be(uint8_t role, const uint8_t *addr,
+               const nimble_statconn_cfg_t *cfg)
 {
     mutex_lock(&_lock);
     slot_t *s = _get_addr(addr);
@@ -170,6 +180,18 @@ static int _be(uint8_t role, const uint8_t *addr)
     s->state = (role | PENDING);
     memcpy(s->addr, addr, BLE_ADDR_LEN);
     mutex_unlock(&_lock);
+
+#if IS_USED(MODULE_NIMBLE_STATCONN_EXT)
+    if (cfg != NULL) {
+        s->phy_mode = cfg->phy_mode;
+    }
+    else {
+        s->phy_mode = NIMBLE_STATCONN_PHY_MODE;
+    }
+#else
+    (void)cfg;
+#endif
+
     _activate(role);
     return 0;
 }
@@ -179,27 +201,31 @@ void nimble_statconn_init(void)
     memset(_slots, 0, sizeof(_slots));
 
     /* set the advertising parameters used */
-    _adv_params.conn_mode = BLE_GAP_CONN_MODE_UND;
-    _adv_params.disc_mode = BLE_GAP_DISC_MODE_GEN;
-    _adv_params.itvl_min = BLE_GAP_ADV_ITVL_MS(NIMBLE_STATCONN_ADV_ITVL_MS);
-    _adv_params.itvl_max = _adv_params.itvl_min;
-    _adv_params.channel_map = 0;
-    _adv_params.filter_policy = 0;
-    _adv_params.high_duty_cycle = 0;
+    memset(&_accept_params, 0, sizeof(_accept_params));
+#if IS_USED(MODULE_NIMBLE_STATCONN_EXT)
+    _accept_params.flags = 0;
+#else
+    _accept_params.flags = NIMBLE_NETIF_FLAG_LEGACY;
+    _accept_params.primary_phy = NIMBLE_PHY_1M;
+    _accept_params.secondary_phy = NIMBLE_PHY_1M;
+#endif
+    _accept_params.adv_itvl_ms = NIMBLE_STATCONN_ADV_ITVL_MS;
+    _accept_params.timeout_ms = BLE_HS_FOREVER;
+    _accept_params.own_addr_type = nimble_riot_own_addr_type;
 
     /* set connection parameters */
-    _conn_params.scan_itvl = BLE_GAP_SCAN_ITVL_MS(NIMBLE_STATCONN_CONN_WIN_MS);
-    _conn_params.scan_window = _conn_params.scan_itvl;
-    _conn_params.latency = NIMBLE_STATCONN_CONN_LATENCY;
-    _conn_params.supervision_timeout = BLE_GAP_SUPERVISION_TIMEOUT_MS(
-                                               NIMBLE_STATCONN_CONN_SUPERTO_MS);
-    _conn_params.itvl_min = BLE_GAP_CONN_ITVL_MS(
-                                            NIMBLE_STATCONN_CONN_ITVL_MIN_MS);
-    _conn_params.itvl_max = BLE_GAP_CONN_ITVL_MS(
-                                            NIMBLE_STATCONN_CONN_ITVL_MAX_MS);
-    _conn_params.min_ce_len = 0;
-    _conn_params.max_ce_len = 0;
-    _conn_timeout = NIMBLE_STATCONN_CONN_TIMEOUT_MS;
+    memset(&_conn_params, 0, sizeof(_conn_params));
+#if !IS_USED(MODULE_NIMBLE_AUTOCONN_EXT)
+    _conn_params.phy_mode = NIMBLE_PHY_1M;
+#endif
+    _conn_params.scan_itvl_ms = NIMBLE_STATCONN_CONN_WIN_MS;
+    _conn_params.scan_window_ms = NIMBLE_STATCONN_CONN_WIN_MS;
+    _conn_params.conn_itvl_min_ms = NIMBLE_STATCONN_CONN_ITVL_MIN_MS;
+    _conn_params.conn_itvl_max_ms = NIMBLE_STATCONN_CONN_ITVL_MAX_MS;
+    _conn_params.conn_supervision_timeout_ms = NIMBLE_STATCONN_CONN_SUPERTO_MS;
+    _conn_params.conn_slave_latency = NIMBLE_STATCONN_CONN_LATENCY;
+    _conn_params.timeout_ms = NIMBLE_STATCONN_CONN_TIMEOUT_MS;
+    _conn_params.own_addr_type = nimble_riot_own_addr_type;
 
     /* register our event callback */
     nimble_netif_eventcb(_on_netif_evt);
@@ -210,14 +236,16 @@ void nimble_statconn_eventcb(nimble_netif_eventcb_t cb)
     _eventcb = cb;
 }
 
-int nimble_statconn_add_master(const uint8_t *addr)
+int nimble_statconn_add_master(const uint8_t *addr,
+                               const nimble_statconn_cfg_t *cfg)
 {
-    return _be(ROLE_S, addr);
+    return _be(ROLE_S, addr, cfg);
 }
 
-int nimble_statconn_add_slave(const uint8_t *addr)
+int nimble_statconn_add_slave(const uint8_t *addr,
+                              const nimble_statconn_cfg_t *cfg)
 {
-    return _be(ROLE_M, addr);
+    return _be(ROLE_M, addr, cfg);
 }
 
 int nimble_statconn_rm(const uint8_t *addr)

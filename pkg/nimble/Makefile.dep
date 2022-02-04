@@ -12,6 +12,15 @@ USEMODULE += nimble_riot_contrib
 # RIOT port
 USEMODULE += nimble_porting_nimble
 
+# Pull in dependencies based on used features
+ifneq (,$(filter ble_phy_coded,$(FEATURES_USED)))
+  USEMODULE += nimble_phy_coded
+endif
+
+ifneq (,$(filter ble_phy_2mbit,$(FEATURES_USED)))
+  USEMODULE += nimble_phy_2mbit
+endif
+
 # NOTE: this dependency depends on inclusion order, for it to work properly
 # mynewt-core should be selected as nimble backend as early as possible,
 # i.e. at the application level.
@@ -56,6 +65,10 @@ ifneq (,$(filter nimble_autoadv,$(USEMODULE)))
   USEMODULE += bluetil_ad
 endif
 
+ifneq (,$(filter nimble_autoconn_ext,$(USEMODULE)))
+  USEMODULE += nimble_netif_ext
+endif
+
 ifneq (,$(filter nimble_autoconn_%,$(USEMODULE)))
   USEMODULE += nimble_autoconn
 endif
@@ -67,16 +80,17 @@ ifneq (,$(filter nimble_autoconn,$(USEMODULE)))
   USEMODULE += bluetil_ad
 endif
 
-ifneq (,$(filter nimble_phy_%,$(USEMODULE)))
-  USEMODULE += nimble_adv_ext
-endif
-
 ifneq (,$(filter nimble_phy_2mbit,$(USEMODULE)))
   FEATURES_REQUIRED += ble_phy_2mbit
 endif
 
 ifneq (,$(filter nimble_phy_coded,$(USEMODULE)))
   FEATURES_REQUIRED += ble_phy_coded
+endif
+
+ifneq (,$(filter nimble_rpble_ext,$(USEMODULE)))
+  USEMODULE += nimble_rpble
+  USEMODULE += nimble_netif_ext
 endif
 
 ifneq (,$(filter nimble_rpble,$(USEMODULE)))
@@ -92,10 +106,20 @@ ifneq (,$(filter nimble_scanlist,$(USEMODULE)))
   USEMODULE += ztimer_usec
 endif
 
+ifneq (,$(filter nimble_statconn_ext,$(USEMODULE)))
+  USEMODULE += nimble_statconn
+  USEMODULE += nimble_netif_ext
+endif
+
 ifneq (,$(filter nimble_statconn,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += nimble_netif
   USEMODULE += nimble_addr
+endif
+
+ifneq (,$(filter nimble_netif_ext,$(USEMODULE)))
+  USEMODULE += nimble_netif
+  USEMODULE += nimble_adv_ext
 endif
 
 ifneq (,$(filter nimble_netif,$(USEMODULE)))

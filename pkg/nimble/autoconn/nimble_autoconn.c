@@ -55,9 +55,8 @@ static volatile uint8_t _enabled = 0;
 static bluetil_ad_t _ad;
 static uint8_t _ad_buf[BLE_HS_ADV_MAX_SZ];
 
-static struct ble_gap_adv_params _adv_params;
-static struct ble_gap_conn_params _conn_params;
-static uint32_t _conn_timeout;
+static nimble_netif_accept_cfg_t _accept_params;
+static nimble_netif_connect_cfg_t _conn_params;
 
 static struct ble_npl_callout _state_evt;
 static ble_npl_time_t _timeout_adv_period;
@@ -77,7 +76,7 @@ static void _on_state_change(struct ble_npl_event *ev)
         /* stop scanning */
         nimble_scanner_stop();
         /* start advertising/accepting */
-        int res = nimble_netif_accept(_ad.buf, _ad.pos, &_adv_params);
+        int res = nimble_netif_accept(_ad.buf, _ad.pos, &_accept_params);
         assert((res == 0) || (res == -ENOMEM));
         (void)res;
 
@@ -137,11 +136,18 @@ static void _on_scan_evt(uint8_t type, const ble_addr_t *addr,
 {
     (void)info;
 
+#if IS_USED(MODULE_NIMBLE_AUTOCONN_EXT)
+    if ((type != (NIMBLE_SCANNER_EXT_ADV | BLE_HCI_ADV_CONN_MASK)) ||
+        (info->status != BLE_GAP_EXT_ADV_DATA_STATUS_COMPLETE)) {
+        return;
+    }
+#else
     /* we are only interested in ADV_IND packets, the rest can be dropped right
      * away */
     if (type != BLE_HCI_ADV_RPT_EVTYPE_ADV_IND) {
         return;
     }
+#endif
 
     bluetil_ad_t ad = {
         .buf  = (uint8_t *)ad_buf,
@@ -157,7 +163,7 @@ static void _on_scan_evt(uint8_t type, const ble_addr_t *addr,
         nimble_scanner_stop();
         DEBUG("[autoconn] SCAN success, initiating connection\n");
         _state = STATE_CONN;
-        int res = nimble_netif_connect(addr, &_conn_params, _conn_timeout);
+        int res = nimble_netif_connect(addr, &_conn_params);
         assert(res >= 0);
         (void)res;
     }
@@ -271,47 +277,66 @@ int nimble_autoconn_update(const nimble_autoconn_params_t *params,
     }
 
     /* scan and advertising period configuration */
-    ble_npl_time_ms_to_ticks(params->period_adv, &_timeout_adv_period);
-    ble_npl_time_ms_to_ticks(params->period_scan, &_timeout_scan_period);
-    ble_npl_time_ms_to_ticks(params->period_jitter, &_period_jitter);
+    ble_npl_time_ms_to_ticks(params->period_adv_ms, &_timeout_adv_period);
+    ble_npl_time_ms_to_ticks(params->period_scan_ms, &_timeout_scan_period);
+    ble_npl_time_ms_to_ticks(params->period_jitter_ms, &_period_jitter);
 
     /* populate the connection parameters */
-    _conn_params.scan_itvl = BLE_GAP_SCAN_ITVL_MS(params->scan_win);
-    _conn_params.scan_window = _conn_params.scan_itvl;
-    _conn_params.itvl_min = BLE_GAP_CONN_ITVL_MS(params->conn_itvl_min);
-    _conn_params.itvl_max = BLE_GAP_CONN_ITVL_MS(params->conn_itvl_max);
-    _conn_params.latency = 0;
-    _conn_params.supervision_timeout = BLE_GAP_SUPERVISION_TIMEOUT_MS(
-                                                         params->conn_super_to);
-    _conn_params.min_ce_len = 0;
-    _conn_params.max_ce_len = 0;
-    _conn_timeout = params->conn_timeout;
+    memset(&_conn_params, 0, sizeof(_conn_params));
+    _conn_params.scan_itvl_ms = params->scan_itvl_ms;
+    _conn_params.scan_window_ms = params->scan_win_ms;
+    _conn_params.conn_itvl_min_ms = params->conn_itvl_min_ms;
+    _conn_params.conn_itvl_max_ms = params->conn_itvl_max_ms;
+    _conn_params.conn_supervision_timeout_ms = params->conn_super_to_ms;
+    _conn_params.conn_slave_latency = params->conn_latency;
+    _conn_params.timeout_ms = params->conn_timeout_ms;
+#if IS_USED(MODULE_NIMBLE_AUTOCONN_EXT)
+    _conn_params.phy_mode = params->phy_mode;
+#else
+    _conn_params.phy_mode = NIMBLE_PHY_1M;
+#endif
+    _conn_params.own_addr_type = nimble_riot_own_addr_type;
 
     /* we use the same values to updated existing connections */
     struct ble_gap_upd_params conn_update_params;
-    conn_update_params.itvl_min = _conn_params.itvl_min;
-    conn_update_params.itvl_max = _conn_params.itvl_max;
-    conn_update_params.latency = _conn_params.latency;
-    conn_update_params.supervision_timeout = _conn_params.supervision_timeout;
+    conn_update_params.itvl_min = BLE_GAP_CONN_ITVL_MS(params->conn_itvl_min_ms);
+    conn_update_params.itvl_max = BLE_GAP_CONN_ITVL_MS(params->conn_itvl_max_ms);
+    conn_update_params.latency = params->conn_latency;
+    conn_update_params.supervision_timeout =
+                        BLE_GAP_SUPERVISION_TIMEOUT_MS(params->conn_super_to_ms);
     conn_update_params.min_ce_len = 0;
     conn_update_params.max_ce_len = 0;
 
     /* calculate the used scan parameters */
     nimble_scanner_cfg_t scan_params;
-    scan_params.itvl_ms = params->scan_itvl;
-    scan_params.win_ms = params->scan_win;
-    scan_params.flags = NIMBLE_SCANNER_PASSIVE
-                        | NIMBLE_SCANNER_FILTER_DUPS
-                        | NIMBLE_SCANNER_PHY_1M;
+    scan_params.itvl_ms = params->scan_itvl_ms;
+    scan_params.win_ms = params->scan_win_ms;
+    scan_params.flags = (NIMBLE_SCANNER_PASSIVE | NIMBLE_SCANNER_FILTER_DUPS);
+#if IS_USED(MODULE_NIMBLE_AUTOCONN_EXT) && IS_USED(MODULE_NIMBLE_PHY_CODED)
+    if (params->phy_mode == NIMBLE_PHY_CODED) {
+        scan_params.flags |= NIMBLE_SCANNER_PHY_CODED;
+    }
+    else {
+        scan_params.flags |= NIMBLE_SCANNER_PHY_1M;
+    }
+#else
+    scan_params.flags |= NIMBLE_SCANNER_PHY_1M;
+#endif
 
     /* set the advertising parameters used */
-    _adv_params.conn_mode = BLE_GAP_CONN_MODE_UND;
-    _adv_params.disc_mode = BLE_GAP_DISC_MODE_GEN;
-    _adv_params.itvl_min = BLE_GAP_ADV_ITVL_MS(params->adv_itvl);
-    _adv_params.itvl_max = _adv_params.itvl_min;
-    _adv_params.channel_map = 0;
-    _adv_params.filter_policy = 0;
-    _adv_params.high_duty_cycle = 0;
+    memset(&_accept_params, 0, sizeof(_accept_params));
+#if IS_USED(MODULE_NIMBLE_AUTOCONN_EXT)
+    _accept_params.flags = 0;
+    _accept_params.primary_phy = params->phy_mode;
+    _accept_params.secondary_phy = params->phy_mode;
+#else
+    _accept_params.flags = NIMBLE_NETIF_FLAG_LEGACY;
+    _accept_params.primary_phy = NIMBLE_PHY_1M;
+    _accept_params.secondary_phy = NIMBLE_PHY_1M;
+#endif
+    _accept_params.adv_itvl_ms = params->adv_itvl_ms;
+    _accept_params.timeout_ms = BLE_HS_FOREVER;
+    _accept_params.own_addr_type = nimble_riot_own_addr_type;
 
     /* initialize the advertising data that will be used */
     if (adlen > 0) {

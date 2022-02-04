@@ -64,24 +64,32 @@ extern "C" {
 #define NIMBLE_AUTOCONN_CONN_SVTO_MS        (2500U)         /* 2.5s */
 #endif
 
+/**
+ * @brief   Default BLE PHY mode used by autoconn
+ */
+#ifndef NIMBLE_AUTOCONN_PHY_MODE
+#define NIMBLE_AUTOCONN_PHY_MODE            NIMBLE_PHY_1M
+#endif
+
 #ifndef NIMBLE_AUTOCONN_NODE_ID
 #define NIMBLE_AUTOCONN_NODE_ID             "RIOT-autoconn"
 #endif
 
 #ifndef NIMBLE_AUTOCONN_PARAMS
 #define NIMBLE_AUTOCONN_PARAMS                           \
-    { .period_scan   = NIMBLE_AUTOCONN_PERIOD_SCAN_MS,   \
-      .period_adv    = NIMBLE_AUTOCONN_PERIOD_ADV_MS,    \
-      .period_jitter = NIMBLE_AUTOCONN_PERIOD_JITTER_MS, \
-      .adv_itvl      = NIMBLE_AUTOCONN_ADV_ITVL_MS,      \
-      .scan_itvl     = NIMBLE_AUTOCONN_SCAN_ITVL_MS,     \
-      .scan_win      = NIMBLE_AUTOCONN_SCAN_WIN_MS,      \
-      .conn_timeout  = NIMBLE_AUTOCONN_CONN_TIMEOUT_MS,  \
-      .conn_itvl_min = NIMBLE_AUTOCONN_CONN_ITVL_MIN_MS, \
-      .conn_itvl_max = NIMBLE_AUTOCONN_CONN_ITVL_MAX_MS, \
-      .conn_latency  = NIMBLE_AUTOCONN_CONN_LATENCY,     \
-      .conn_super_to = NIMBLE_AUTOCONN_CONN_SVTO_MS,     \
-      .node_id       = NIMBLE_AUTOCONN_NODE_ID, }
+    { .period_scan_ms   = NIMBLE_AUTOCONN_PERIOD_SCAN_MS,   \
+      .period_adv_ms    = NIMBLE_AUTOCONN_PERIOD_ADV_MS,    \
+      .period_jitter_ms = NIMBLE_AUTOCONN_PERIOD_JITTER_MS, \
+      .adv_itvl_ms      = NIMBLE_AUTOCONN_ADV_ITVL_MS,      \
+      .scan_itvl_ms     = NIMBLE_AUTOCONN_SCAN_ITVL_MS,     \
+      .scan_win_ms      = NIMBLE_AUTOCONN_SCAN_WIN_MS,      \
+      .conn_timeout_ms  = NIMBLE_AUTOCONN_CONN_TIMEOUT_MS,  \
+      .conn_itvl_min_ms = NIMBLE_AUTOCONN_CONN_ITVL_MIN_MS, \
+      .conn_itvl_max_ms = NIMBLE_AUTOCONN_CONN_ITVL_MAX_MS, \
+      .conn_latency     = NIMBLE_AUTOCONN_CONN_LATENCY,     \
+      .conn_super_to_ms = NIMBLE_AUTOCONN_CONN_SVTO_MS,     \
+      .phy_mode         = NIMBLE_AUTOCONN_PHY_MODE,         \
+      .node_id          = NIMBLE_AUTOCONN_NODE_ID, }
 #endif
 /**@}*/
 

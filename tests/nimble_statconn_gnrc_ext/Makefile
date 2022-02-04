@@ -7,20 +7,17 @@ USEMODULE += shell_commands
 USEMODULE += ps
 
 # Include GNRC and RPL
-USEMODULE += gnrc_netif_single
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_router_default
-USEMODULE += gnrc_icmpv6_echo
-USEMODULE += gnrc_rpl
 USEMODULE += auto_init_gnrc_rpl
+USEMODULE += gnrc_rpl
+USEMODULE += gnrc_icmpv6_echo
 
-# configure and use Nimble
-USEMODULE += bluetil_addr
-USEMODULE += nimble_rpble
-NIMBLE_MAX_CONN = 3
+# Setup Nimble
+USEMODULE += nimble_statconn_ext
+FEATURES_OPTIONAL += ble_phy_2mbit
+FEATURES_OPTIONAL += ble_phy_coded
 
-DEVELHELP = 0
-
-TEST_ON_CI_WHITELIST += nrf52dk
+TEST_ON_CI_WHITELIST += nrf52dk nrf52840dk
 
 include $(RIOTBASE)/Makefile.include

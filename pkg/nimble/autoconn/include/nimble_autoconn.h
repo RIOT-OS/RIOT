@@ -131,29 +131,31 @@ enum {
  */
 typedef struct {
     /** amount of time spend in scanning mode [in ms] */
-    uint32_t period_scan;
+    uint32_t period_scan_ms;
     /** amount of time spend in advertising mode [in ms] */
-    uint32_t period_adv;
+    uint32_t period_adv_ms;
     /** a random value from 0 to this value is added to the duration of each
      *  scanning and advertising period [in ms] */
-    uint32_t period_jitter;
+    uint32_t period_jitter_ms;
     /** advertising interval used when in advertising mode [in ms] */
-    uint32_t adv_itvl;
+    uint32_t adv_itvl_ms;
     /** scan interval applied while in scanning state [in ms] */
-    uint32_t scan_itvl;
+    uint32_t scan_itvl_ms;
     /** scan window applied while in scanning state [in ms] */
-    uint32_t scan_win;
+    uint32_t scan_win_ms;
     /** opening a new connection is aborted after this time [in ms] */
-    uint32_t conn_timeout;
+    uint32_t conn_timeout_ms;
     /** connection interval used when opening a new connection, lower bound.
      *  [in ms] */
-    uint32_t conn_itvl_min;
+    uint32_t conn_itvl_min_ms;
     /** connection interval, upper bound [in ms] */
-    uint32_t conn_itvl_max;
-    /** slave latency used for new connections [in ms] */
+    uint32_t conn_itvl_max_ms;
+    /** slave latency used for new connections */
     uint16_t conn_latency;
     /** supervision timeout used for new connections [in ms] */
-    uint32_t conn_super_to;
+    uint32_t conn_super_to_ms;
+    /** BLE PHY mode to use */
+    nimble_phy_t phy_mode;
     /** node ID included in the advertising data, may be NULL */
     const char *node_id;
 } nimble_autoconn_params_t;
