@@ -170,8 +170,6 @@ typedef enum {
  */
 #if DOXYGEN
 #define DOSE_TIMER_DEV              TIMER_DEV(…)
-#elif !defined(DOSE_TIMER_DEV) && IS_ACTIVE(MODULE_DOSE_WATCHDOG)
-#error "DOSE_TIMER_DEV needs to be set by the board"
 #endif
 
 /**
