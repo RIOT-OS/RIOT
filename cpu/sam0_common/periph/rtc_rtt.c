@@ -122,12 +122,29 @@ static void _wait_syncbusy(void)
     }
 }
 
+__attribute__((unused)) static void _enable_continuous_read(void)
+{
+    #ifdef RTC_READREQ_RCONT
+    /* Re-enable Continuous Read as this bit is cleared by hardware
+       when we write in a write synchronized register */
+        RTC->MODE0.READREQ.bit.RCONT = 1;
+        RTC->MODE0.READREQ.bit.RREQ = 1;
+        _wait_syncbusy();
+    #endif
+}
+
 #if defined(MODULE_PERIPH_RTC) || defined(MODULE_PERIPH_RTT)
 static void _read_req(void)
 {
-#ifdef RTC_READREQ_RREQ
-    RTC->MODE0.READREQ.reg = RTC_READREQ_RREQ;
+#if defined (RTC_READREQ_RREQ)
+    if (RTC->MODE0.READREQ.bit.RCONT) {
+        return;
+    }
+    else {
+        _enable_continuous_read();
+    }
 #endif
+
     _wait_syncbusy();
 }
 #endif
@@ -175,6 +192,7 @@ static inline void _rtt_reset(void)
 {
 #ifdef RTC_MODE0_CTRL_SWRST
     RTC->MODE0.CTRL.reg = RTC_MODE0_CTRL_SWRST;
+    _wait_syncbusy();
     while (RTC->MODE0.CTRL.bit.SWRST) {}
 #else
     RTC->MODE0.CTRLA.reg = RTC_MODE2_CTRLA_SWRST;
@@ -405,6 +423,7 @@ void rtt_init(void)
                         | RTC_MODE0_PRESCALER;
 #endif
     _wait_syncbusy();
+    _enable_continuous_read();
 
     /* initially clear flag */
     RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_CMP0
@@ -709,6 +728,7 @@ void rtt_set_counter(uint32_t count)
 {
     RTC->MODE0.COUNT.reg = count;
     _wait_syncbusy();
+    _enable_continuous_read();
 }
 
 uint32_t rtt_get_alarm(void)
@@ -743,9 +763,9 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
 
     /* set COMP register */
     RTC->MODE0.COMP[0].reg = alarm;
+    _wait_syncbusy();
 
-    /* enable compare interrupt and clear flag */
-    RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_CMP0;
+    /* enable compare interrupt */
     RTC->MODE0.INTENSET.reg = RTC_MODE0_INTENSET_CMP0;
 
     /* block power mode if callback function is present */
