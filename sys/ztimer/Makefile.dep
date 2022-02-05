@@ -77,7 +77,7 @@ endif
 # the counter is read, this propagates and leads to timing errors
 # on ztimer_msec that are higher than > +-1msec.
 # The same goes for the fe310 rtt.
-ifneq (,$(filter samd21 fe310,$(CPU)))
+ifneq (,$(filter sam3 fe310,$(CPU)))
   USEMODULE += ztimer_no_periph_rtt
 endif
 
