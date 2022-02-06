@@ -40,7 +40,6 @@ static const mtd_spi_nor_params_t _nrf52840dk_nor_params = {
     .cs = NRF52840DK_NOR_SPI_CS,
     .wp = GPIO_UNDEF,
     .hold = GPIO_UNDEF,
-    .addr_width = 3,
 };
 
 static mtd_spi_nor_t nrf52840dk_nor_dev = {

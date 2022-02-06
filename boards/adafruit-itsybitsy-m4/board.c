@@ -40,7 +40,6 @@ static const mtd_spi_nor_params_t _samd51_nor_params = {
     .cs   = SAM0_QSPI_PIN_CS,
     .wp   = SAM0_QSPI_PIN_DATA_2,
     .hold = SAM0_QSPI_PIN_DATA_3,
-    .addr_width = 3,
 };
 
 static mtd_spi_nor_t samd51_nor_dev = {

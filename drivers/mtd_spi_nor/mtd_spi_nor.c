@@ -45,6 +45,8 @@
 #define SFLASH_CMD_4_BYTE_ADDR (0xB7)   /**< enable 32 bit addressing */
 #define SFLASH_CMD_3_BYTE_ADDR (0xE9)   /**< enable 24 bit addressing */
 
+#define SFLASH_CMD_ULBPR       (0x98)   /**< Global Block Protection Unlock */
+
 #define MTD_64K             (65536ul)
 #define MTD_64K_ADDR_MASK   (0xFFFF)
 #define MTD_32K             (32768ul)
@@ -66,6 +68,7 @@
 
 typedef enum {
     SPI_NOR_JEDEC_ATMEL = 0x1F | JEDEC_BANK(1),
+    SPI_NOR_JEDEC_MICROCHIP = 0xBF | JEDEC_BANK(1),
 } jedec_manuf_t;
 /** @} */
 
@@ -88,7 +91,7 @@ static void mtd_spi_release(const mtd_spi_nor_t *dev)
 static inline uint8_t* _be_addr(const mtd_spi_nor_t *dev, uint32_t *addr)
 {
     *addr = htonl(*addr);
-    return &((uint8_t*)addr)[4 - dev->params->addr_width];
+    return &((uint8_t*)addr)[4 - dev->addr_width];
 }
 
 /**
@@ -111,7 +114,7 @@ static void mtd_spi_cmd_addr_read(const mtd_spi_nor_t *dev, uint8_t opcode,
 
     if (IS_ACTIVE(ENABLE_TRACE)) {
         TRACE("mtd_spi_cmd_addr_read: addr:");
-        for (unsigned int i = 0; i < dev->params->addr_width; ++i) {
+        for (unsigned int i = 0; i < dev->addr_width; ++i) {
             TRACE(" %02x", addr_buf[i]);
         }
         TRACE("\n");
@@ -120,7 +123,7 @@ static void mtd_spi_cmd_addr_read(const mtd_spi_nor_t *dev, uint8_t opcode,
     /* Send opcode followed by address */
     spi_transfer_byte(_get_spi(dev), dev->params->cs, true, opcode);
     spi_transfer_bytes(_get_spi(dev), dev->params->cs, true,
-                       (char *)addr_buf, NULL, dev->params->addr_width);
+                       (char *)addr_buf, NULL, dev->addr_width);
 
     /* Read data */
     spi_transfer_bytes(_get_spi(dev), dev->params->cs, false,
@@ -147,7 +150,7 @@ static void mtd_spi_cmd_addr_write(const mtd_spi_nor_t *dev, uint8_t opcode,
 
     if (IS_ACTIVE(ENABLE_TRACE)) {
         TRACE("mtd_spi_cmd_addr_write: addr:");
-        for (unsigned int i = 0; i < dev->params->addr_width; ++i) {
+        for (unsigned int i = 0; i < dev->addr_width; ++i) {
             TRACE(" %02x", addr_buf[i]);
         }
         TRACE("\n");
@@ -159,7 +162,7 @@ static void mtd_spi_cmd_addr_write(const mtd_spi_nor_t *dev, uint8_t opcode,
     /* only keep CS asserted when there is data that follows */
     bool cont = (count > 0);
     spi_transfer_bytes(_get_spi(dev), dev->params->cs, cont,
-                       (char *)addr_buf, NULL, dev->params->addr_width);
+                       (char *)addr_buf, NULL, dev->addr_width);
 
     /* Write data */
     if (cont) {
@@ -303,6 +306,28 @@ static uint32_t mtd_spi_nor_get_size(const mtd_jedec_id_t *id)
         (id->device[1] & ~0x3) == 0) {
         return (0x1F & id->device[0]) * MBIT_AS_BYTES;
     }
+    if (mtd_spi_manuf_match(id, SPI_NOR_JEDEC_MICROCHIP)) {
+        switch (id->device[1]) {
+        case 0x12:  /* SST26VF020A */
+        case 0x8c:  /* SST25VF020B */
+            return 2 * MBIT_AS_BYTES;
+        case 0x54:  /* SST26WF040B */
+        case 0x8d:  /* SST25VF040B */
+            return 4 * MBIT_AS_BYTES;
+        case 0x58:  /* SST26WF080B */
+        case 0x8e:  /* SST25VF080B */
+            return 8 * MBIT_AS_BYTES;
+        case 0x1:   /* SST26VF016  */
+        case 0x41:  /* SST26VF016B */
+            return 16 * MBIT_AS_BYTES;
+        case 0x2:   /* SST26VF032  */
+        case 0x42:  /* SST26VF032B */
+            return 32 * MBIT_AS_BYTES;
+        case 0x43:  /* SST26VF064B */
+        case 0x53:  /* SST26WF064C */
+            return 64 * MBIT_AS_BYTES;
+        }
+    }
 
     /* everyone else seems to use device ID 2 for density */
     return 1 << id->device[1];
@@ -376,6 +401,12 @@ static void _init_pins(mtd_spi_nor_t *dev)
     }
 }
 
+static void _enable_32bit_addr(mtd_spi_nor_t *dev)
+{
+    mtd_spi_cmd(dev, dev->params->opcode->wren);
+    mtd_spi_cmd(dev, SFLASH_CMD_4_BYTE_ADDR);
+}
+
 static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
 {
     mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
@@ -399,9 +430,8 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
             }
 #endif
             /* enable 32 bit address mode */
-            if (dev->params->addr_width == 4) {
-                mtd_spi_cmd(dev, dev->params->opcode->wren);
-                mtd_spi_cmd(dev, SFLASH_CMD_4_BYTE_ADDR);
+            if (dev->addr_width == 4) {
+                _enable_32bit_addr(dev);
             }
 
             break;
@@ -414,6 +444,20 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
     return 0;
 }
 
+static void _set_addr_width(mtd_dev_t *mtd)
+{
+    mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
+
+    uint32_t flash_size = mtd->pages_per_sector * mtd->page_size
+                        * mtd->sector_count;
+
+    if (flash_size > 0xFFFFFF) {
+        dev->addr_width = 4;
+    } else {
+        dev->addr_width = 3;
+    }
+}
+
 static int mtd_spi_nor_init(mtd_dev_t *mtd)
 {
     DEBUG("mtd_spi_nor_init: %p\n", (void *)mtd);
@@ -421,10 +465,6 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
 
     DEBUG("mtd_spi_nor_init: -> spi: %lx, cs: %lx, opcodes: %p\n",
           (unsigned long)_get_spi(dev), (unsigned long)dev->params->cs, (void *)dev->params->opcode);
-
-    /* verify configuration */
-    assert(dev->params->addr_width > 0);
-    assert(dev->params->addr_width <= 4);
 
     /* CS, WP, Hold */
     _init_pins(dev);
@@ -450,6 +490,7 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
         mtd->sector_count = mtd_spi_nor_get_size(&dev->jedec_id)
                           / (mtd->pages_per_sector * mtd->page_size);
     }
+    _set_addr_width(mtd);
 
     DEBUG("mtd_spi_nor_init: %" PRIu32 " bytes "
           "(%" PRIu32 " sectors, %" PRIu32 " bytes/sector, "
@@ -459,13 +500,22 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
           mtd->sector_count, mtd->pages_per_sector * mtd->page_size,
           mtd->pages_per_sector * mtd->sector_count,
           mtd->pages_per_sector, mtd->page_size);
-    DEBUG("mtd_spi_nor_init: Using %u byte addresses\n", dev->params->addr_width);
+    DEBUG("mtd_spi_nor_init: Using %u byte addresses\n", dev->addr_width);
 
     uint8_t status;
     mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
-    mtd_spi_release(dev);
-
     DEBUG("mtd_spi_nor_init: device status = 0x%02x\n", (unsigned int)status);
+
+    /* enable 32 bit address mode */
+    if (dev->addr_width == 4) {
+        _enable_32bit_addr(dev);
+    }
+
+    /* Global Block-Protection Unlock */
+    mtd_spi_cmd(dev, dev->params->opcode->wren);
+    mtd_spi_cmd(dev, SFLASH_CMD_ULBPR);
+
+    mtd_spi_release(dev);
 
     /* check whether page size and sector size are powers of two (most chips' are)
      * and compute the number of shifts needed to get the page and sector addresses

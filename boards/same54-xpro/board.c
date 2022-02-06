@@ -24,7 +24,7 @@
 #include "timex.h"
 
 #ifdef MODULE_MTD
-/* N25Q256A */
+/* N25Q256A or SST26VF064B */
 static const mtd_spi_nor_params_t _same54_nor_params = {
     .opcode = &mtd_spi_nor_opcode_default,
     .wait_chip_erase = 240 * US_PER_SEC,
@@ -38,7 +38,6 @@ static const mtd_spi_nor_params_t _same54_nor_params = {
     .cs   = SAM0_QSPI_PIN_CS,
     .wp   = SAM0_QSPI_PIN_DATA_2,
     .hold = SAM0_QSPI_PIN_DATA_3,
-    .addr_width = 4,
 };
 
 static mtd_spi_nor_t same54_nor_dev = {

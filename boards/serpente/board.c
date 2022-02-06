@@ -41,7 +41,6 @@ static const mtd_spi_nor_params_t _serpente_nor_params = {
     .cs = SERPENTE_NOR_SPI_CS,
     .wp = GPIO_UNDEF,
     .hold = GPIO_UNDEF,
-    .addr_width = 3,
 };
 
 static mtd_spi_nor_t serpente_nor_dev = {
