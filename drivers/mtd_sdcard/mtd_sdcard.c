@@ -138,21 +138,40 @@ static int mtd_sdcard_write_page(mtd_dev_t *dev, const void *buff, uint32_t page
     return size;
 }
 
-static int mtd_sdcard_erase(mtd_dev_t *dev,
-                            uint32_t addr,
-                            uint32_t size)
+static int mtd_sdcard_erase_sector(mtd_dev_t *dev, uint32_t sector, uint32_t count)
 {
-    DEBUG("mtd_sdcard_erase: addr:%" PRIu32 " size:%" PRIu32 "\n", addr, size);
-    (void)dev;
-    (void)addr;
-    (void)size;
+#if IS_ACTIVE(CONFIG_MTD_SDCARD_ERASE) && IS_USED(MODULE_MTD_WRITE_PAGE)
+    mtd_sdcard_t *mtd_sd = (mtd_sdcard_t*)dev;
 
-    if (!IS_ACTIVE(CONFIG_MTD_SDCARD_ERASE)) {
-        return 0;
+    DEBUG("mtd_sdcard_erase_sector: sector: %" PRIu32 " count: %" PRIu32 "\n",
+          sector, count);
+
+    if (dev->work_area == NULL) {
+        DEBUG("mtd_sdcard_erase_sector: no work area\n");
+        return -ENOTSUP;
     }
-    else {
-        return -ENOTSUP; /* explicit erase currently not supported */
+    memset(dev->work_area, 0, SD_HC_BLOCK_SIZE);
+    while (count) {
+        sd_rw_response_t err;
+        sdcard_spi_write_blocks(mtd_sd->sd_card, sector,
+                                dev->work_area, SD_HC_BLOCK_SIZE,
+                                1, &err);
+        if (err != SD_RW_OK) {
+            printf("err: %d\n", err);
+            return -EIO;
+        }
+        --count;
+        ++sector;
     }
+#else
+    (void)dev;
+    (void)sector;
+    (void)count;
+    if (IS_ACTIVE(CONFIG_MTD_SDCARD_ERASE)) {
+        return -ENOTSUP;
+    }
+#endif
+    return 0;
 }
 
 static int mtd_sdcard_power(mtd_dev_t *dev, enum mtd_power_state power)
@@ -199,6 +218,6 @@ const mtd_desc_t mtd_sdcard_driver = {
     .read_page = mtd_sdcard_read_page,
     .write = mtd_sdcard_write,
     .write_page = mtd_sdcard_write_page,
-    .erase = mtd_sdcard_erase,
+    .erase_sector = mtd_sdcard_erase_sector,
     .power = mtd_sdcard_power,
 };

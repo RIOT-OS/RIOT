@@ -55,7 +55,8 @@ typedef struct {
  *          the sector first.
  *          Attention: an erase call will therefore NOT touch the content,
  *          so enable this feature to ensure overriding the data.
- *          This feature is currently not supported.
+ *
+ *          This feature requires the `mtd_write_page` module.
  */
 #ifdef DOXYGEN
 #define CONFIG_MTD_SDCARD_ERASE
