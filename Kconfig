@@ -34,8 +34,12 @@ rsource "sys/Kconfig"
 rsource "pkg/Kconfig"
 
 menu "External Modules"
-osource "$(KCONFIG_EXTERNAL_CONFIGS)"
+osource "$(KCONFIG_EXTERNAL_MODULE_CONFIGS)"
 endmenu # External Modules
+
+menu "External Packages"
+osource "$(KCONFIG_EXTERNAL_PKG_CONFIGS)"
+endmenu # External Packages
 
 comment "RIOT is in a migration phase."
 comment "Some configuration options may not be here. Use CFLAGS instead."
