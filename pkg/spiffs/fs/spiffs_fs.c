@@ -332,6 +332,15 @@ static off_t _lseek(vfs_file_t *filp, off_t off, int whence)
     return spiffs_err_to_errno(SPIFFS_lseek(&fs_desc->fs, filp->private_data.value, off, s_whence));
 }
 
+static int _fsync(vfs_file_t *filp)
+{
+    spiffs_desc_t *fs_desc = filp->mp->private_data;
+
+    int ret = SPIFFS_fflush(&fs_desc->fs, filp->private_data.value);
+
+    return spiffs_err_to_errno(ret);
+}
+
 static int _fstat(vfs_file_t *filp, struct stat *buf)
 {
     spiffs_desc_t *fs_desc = filp->mp->private_data;
@@ -514,6 +523,7 @@ static const vfs_file_ops_t spiffs_file_ops = {
     .write = _write,
     .lseek = _lseek,
     .fstat = _fstat,
+    .fsync = _fsync,
 };
 
 static const vfs_dir_ops_t spiffs_dir_ops = {

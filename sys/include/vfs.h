@@ -440,6 +440,17 @@ struct vfs_file_ops {
      * @return <0 on error
      */
     ssize_t (*write) (vfs_file_t *filp, const void *src, size_t nbytes);
+
+    /**
+     * @brief Synchronize a file on storage
+     *        Any pending writes are written out to storage.
+     *
+     * @param[in]  filp     pointer to open file
+     *
+     * @return 0 on success
+     * @return <0 on error
+     */
+    int (*fsync) (vfs_file_t *filp);
 };
 
 /**
@@ -738,6 +749,17 @@ ssize_t vfs_read(int fd, void *dest, size_t count);
  * @return <0 on error
  */
 ssize_t vfs_write(int fd, const void *src, size_t count);
+
+/**
+ * @brief Synchronize a file on storage
+ *        Any pending writes are written out to storage.
+ *
+ * @param[in]  fd       fd number obtained from vfs_open
+ *
+ * @return 0 on success
+ * @return <0 on error
+ */
+int vfs_fsync(int fd);
 
 /**
  * @brief Open a directory for reading with readdir
