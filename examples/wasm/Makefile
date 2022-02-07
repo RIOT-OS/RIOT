@@ -25,7 +25,7 @@ QUIET ?= 1
 
 all: hello.wasm
 
-hello.wasm: wasm_sample/hello.c
+hello.wasm: wasm_sample/hello.c wasm_sample/Makefile
 	make -C wasm_sample hello.wasm
 	mv wasm_sample/hello.wasm .
 

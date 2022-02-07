@@ -1,19 +1,24 @@
 #sometimes there might not be a wasm-ld (Ubuntu:focal)
 #lets check if we can find a specific version
 
-ifneq ($(shell (command -v wasm-ld)),)
+#this is a kind of crazy which from
+#https://www.gnu.org/software/make/manual/html_node/Call-Function.html#Call-Function
+#see https://github.com/RIOT-OS/RIOT/pull/16806 and /16807 and /16776 for why
+search_fn = $(firstword $(wildcard $(addsuffix /$(1),$(subst :, ,$(PATH)))))
+
+ifneq ($(call search_fn,wasm-ld),)
   WASM-LD ?= wasm-ld
   else
-    ifneq ($(shell (command -v wasm-ld-11)),)
+    ifneq ($(call search_fn,wasm-ld-11),)
     LLVM_VERSION := 11
     else
-      ifneq ($(shell (command -v wasm-ld-10)),)
+      ifneq ($(call search_fn,wasm-ld-10),)
       LLVM_VERSION := 10
       else
-        ifneq ($(shell (command -v wasm-ld-9)),)
+        ifneq ($(call search_fn,wasm-ld-9),)
         LLVM_VERSION := 9
         else
-          ifneq ($(shell (command -v wasm-ld-8)),)
+          ifneq ($(call search_fn,wasm-ld-8),)
           LLVM_VERSION := 8
           endif
       endif
@@ -30,7 +35,10 @@ else
   CLANGPP ?= clang++
 endif
 
-WASM-LD ?= echo "!! NO wasm-ld(-VERSION) found !!"; false
+ifeq ($(WASM-LD),)
+  WASM-LD ?= echo "!! NO wasm-ld(-VERSION) found !!"; false
+  COPY_HELLO := YES
+endif
 
 LINK_FLAGS := -z stack-size=4096 \
 		--export main \
@@ -94,5 +102,16 @@ COMPILE_FLAGS := -Wall \
 
 %.wat: %.wasm Makefile
 	wasm2wat -o $@ $<
+
+ifeq ($(COPY_HELLO),YES)
+hello.wasm: hello_prebuild.wasm
+	@echo "!! NO wasm-ld(-VERSION) found  !!"
+	@echo "!! copying hello_prebuild.wasm !! "
+	cp hello_prebuild.wasm hello.wasm
+else
+hello_prebuild.wasm: hello.wasm
+	cp hello.wasm hello_prebuild.wasm
+endif
+
 
 .PHONY: FORCE
