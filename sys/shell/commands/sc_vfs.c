@@ -517,7 +517,10 @@ int _ls_handler(int argc, char **argv)
     unsigned int nfiles = 0;
 
     while (1) {
+        char path_name[2 * (VFS_NAME_MAX + 1)];
         vfs_dirent_t entry;
+        struct stat stat;
+
         res = vfs_readdir(&dir, &entry);
         if (res < 0) {
             _errno_string(res, (char *)buf, sizeof(buf));
@@ -533,8 +536,15 @@ int _ls_handler(int argc, char **argv)
             /* end of stream */
             break;
         }
-        printf("%s\n", entry.d_name);
-        ++nfiles;
+
+        snprintf(path_name, sizeof(path_name), "%s/%s", path, entry.d_name);
+        vfs_stat(path_name, &stat);
+        if (stat.st_mode & S_IFDIR) {
+            printf("%s/\n", entry.d_name);
+        } else if (stat.st_mode & S_IFREG) {
+            printf("%s\t%lu B\n", entry.d_name, stat.st_size);
+            ++nfiles;
+        }
     }
     if (ret == 0) {
         printf("total %u files\n", nfiles);
