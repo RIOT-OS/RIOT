@@ -120,7 +120,6 @@ pyboard
 
 lora-e5-dev
 nucleo-wl55jc
-stm32mp157c-dk2
 "}
 
 # This list will force all boards that are not in the TEST_KCONFIG_BOARD_BLOCKLIST
