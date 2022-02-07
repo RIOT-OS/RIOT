@@ -383,6 +383,22 @@ static off_t _lseek(vfs_file_t *filp, off_t off, int whence)
     return littlefs_err_to_errno(ret);
 }
 
+static int _fsync(vfs_file_t *filp)
+{
+    littlefs2_desc_t *fs = filp->mp->private_data;
+    lfs_file_t *fp = _get_lfs_file(filp);
+
+    mutex_lock(&fs->lock);
+
+    DEBUG("littlefs: fsync: filp=%p, fp=%p\n",
+          (void *)filp, (void *)fp);
+
+    int ret = lfs_file_sync(&fs->fs, fp);
+    mutex_unlock(&fs->lock);
+
+    return littlefs_err_to_errno(ret);
+}
+
 static int _stat(vfs_mount_t *mountp, const char *restrict path, struct stat *restrict buf)
 {
     littlefs2_desc_t *fs = mountp->private_data;
@@ -525,6 +541,7 @@ static const vfs_file_ops_t littlefs_file_ops = {
     .read = _read,
     .write = _write,
     .lseek = _lseek,
+    .fsync = _fsync,
 };
 
 static const vfs_dir_ops_t littlefs_dir_ops = {
