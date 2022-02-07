@@ -219,6 +219,19 @@ static ssize_t _write(vfs_file_t *filp, const void *src, size_t nbytes)
     return (ssize_t)bw;
 }
 
+static int _fsync(vfs_file_t *filp)
+{
+    fatfs_file_desc_t *fd = _get_fatfs_file_desc(filp);
+
+    FRESULT res = f_sync(&fd->file);
+
+    if (res != FR_OK) {
+        return fatfs_err_to_errno(res);
+    }
+
+    return 0;
+}
+
 static ssize_t _read(vfs_file_t *filp, void *dest, size_t nbytes)
 {
     fatfs_file_desc_t *fd = _get_fatfs_file_desc(filp);
@@ -469,6 +482,7 @@ static const vfs_file_ops_t fatfs_file_ops = {
     .write = _write,
     .lseek = _lseek,
     .fstat = _fstat,
+    .fsync = _fsync,
 };
 
 static const vfs_dir_ops_t fatfs_dir_ops = {
