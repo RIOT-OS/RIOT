@@ -132,7 +132,7 @@ sure that `radvd` is installed on your Linux host.
 
 As a first step, we need to enable IPv6 forwarding in Linux:
 
-    sudo echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
+    sudo sysctl -w net.ipv6.conf.all.forwarding=1
 
 Next, we configure `radvd` (`etc/radvc.conf`) by using a configuration like
 this:
