@@ -28,7 +28,8 @@
 /**
  * @brief   MTD device descriptor initialized with flash-page driver
  */
-static mtd_dev_t _mtd_dev = MTD_FLASHPAGE_INIT_VAL(CTAP_FLASH_PAGES_PER_SECTOR);
+static mtd_flashpage_t _mtd_flash_dev = MTD_FLASHPAGE_INIT_VAL(CTAP_FLASH_PAGES_PER_SECTOR);
+static mtd_dev_t *_mtd_dev = &_mtd_flash_dev.base;
 
 /**
  * @brief   Max amount of resident keys that can be stored
@@ -49,7 +50,7 @@ int fido2_ctap_mem_init(void)
 {
     int ret;
 
-    ret = mtd_init(&_mtd_dev);
+    ret = mtd_init(_mtd_dev);
 
     if (ret < 0) {
         return ret;
@@ -64,7 +65,7 @@ int fido2_ctap_mem_init(void)
 
 static unsigned _amount_of_flashpages(void)
 {
-    return _mtd_dev.sector_count * _mtd_dev.pages_per_sector;
+    return _mtd_dev->sector_count * _mtd_dev->pages_per_sector;
 }
 
 int fido2_ctap_mem_read(void *buf, uint32_t page, uint32_t offset, uint32_t len)
@@ -73,7 +74,7 @@ int fido2_ctap_mem_read(void *buf, uint32_t page, uint32_t offset, uint32_t len)
 
     int ret;
 
-    ret = mtd_read_page(&_mtd_dev, buf, page, offset, len);
+    ret = mtd_read_page(_mtd_dev, buf, page, offset, len);
 
     if (ret < 0) {
         return CTAP1_ERR_OTHER;
@@ -89,14 +90,14 @@ int fido2_ctap_mem_write(const void *buf, uint32_t page, uint32_t offset, uint32
     int ret;
 
     if (!_flash_is_erased(page, offset, len)) {
-        ret = mtd_write_page(&_mtd_dev, buf, page, offset, len);
+        ret = mtd_write_page(_mtd_dev, buf, page, offset, len);
 
         if (ret < 0) {
             return CTAP1_ERR_OTHER;
         }
     }
     else {
-        ret = mtd_write_page_raw(&_mtd_dev, buf, page, offset, len);
+        ret = mtd_write_page_raw(_mtd_dev, buf, page, offset, len);
 
         if (ret < 0) {
             return CTAP1_ERR_OTHER;
