@@ -26,7 +26,7 @@
 void benchmark_print_time(uint32_t time, unsigned long runs, const char *name)
 {
     uint32_t full = (time / runs);
-    uint32_t div  = (time - (full * runs)) / (runs / 1000);
+    uint32_t div  = (time - (full * runs)) * 1000 / runs;
 
     uint32_t per_sec = (uint32_t)(((uint64_t)US_PER_SEC * runs) / time);
 
