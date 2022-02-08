@@ -71,7 +71,7 @@ typedef struct {
 } custom_event_t;
 
 static custom_event_t custom_event = { .super.handler = custom_callback, .text = "CUSTOM CALLBACK" };
-static event_callback_t event_callback = EVENT_CALLBACK_INIT(timed_callback, 0x12345678);
+static event_callback_t* event_callback_ptr;
 static event_callback_t noevent_callback = EVENT_CALLBACK_INIT(forbidden_callback, 0);
 
 static void custom_callback(event_t *event)
@@ -87,7 +87,7 @@ static void timed_callback(void *arg)
 {
     order++;
     expect(order == 6);
-    expect(arg == event_callback.arg);
+    expect(arg == event_callback_ptr->arg);
 #if IS_USED(MODULE_ZTIMER_USEC)
     uint32_t now = ztimer_now(ZTIMER_USEC);
 #else
@@ -149,6 +149,11 @@ static void *claiming_thread(void *arg)
 int main(void)
 {
     puts("[START] event test application.\n");
+
+    /* initialize an event callback */
+    event_callback_t event_callback;
+    event_callback_ptr = &event_callback;
+    event_callback_init(&event_callback, timed_callback, (void*)0x12345678);
 
     /* test creation of delayed claiming of a detached event queue */
     event_queue_t dqs[DELAYED_QUEUES_NUMOF] = {
