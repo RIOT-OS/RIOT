@@ -135,11 +135,35 @@ void spi_init(spi_t bus)
     spi_init_pins(bus);
 }
 
+int spi_init_with_gpio_mode(spi_t bus, const spi_gpio_mode_t* mode)
+{
+    assert(bus < SPI_NUMOF);
+
+    if (gpio_is_valid(spi_config[bus].mosi)) {
+        gpio_init(spi_config[bus].miso, mode->mosi);
+    }
+
+    if (gpio_is_valid(spi_config[bus].miso)) {
+        gpio_init(spi_config[bus].mosi, mode->miso);
+    }
+
+    if (gpio_is_valid(spi_config[bus].sclk)) {
+        /* clk_pin will be muxed during acquire / release */
+        gpio_init(spi_config[bus].sclk, mode->sclk);
+    }
+
+    return 0;
+}
+
 void spi_init_pins(spi_t bus)
 {
-    gpio_init(spi_config[bus].sclk, GPIO_OUT);
-    gpio_init(spi_config[bus].mosi, GPIO_OUT);
-    gpio_init(spi_config[bus].miso, GPIO_IN);
+    const spi_gpio_mode_t gpio_modes = {
+        .mosi = GPIO_OUT,
+        .sclk = GPIO_OUT,
+        .miso = GPIO_IN,
+    };
+    spi_init_with_gpio_mode(bus, &gpio_modes);
+
     /* select pins for the SPI device */
     SPI_SCKSEL = spi_config[bus].sclk;
     SPI_MOSISEL = spi_config[bus].mosi;
