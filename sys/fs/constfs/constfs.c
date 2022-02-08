@@ -282,7 +282,8 @@ static int constfs_readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
     if (fp->path == NULL) {
         return -EIO;
     }
-    size_t len = strnlen(fp->path, VFS_NAME_MAX + 1);
+    const char *filename = fp->path[0] == '/' ? fp->path + 1 : fp->path;
+    size_t len = strnlen(filename, VFS_NAME_MAX + 1);
     if (len > VFS_NAME_MAX) {
         /* name does not fit in vfs_dirent_t buffer */
         /* skipping past the broken entry */
@@ -291,7 +292,7 @@ static int constfs_readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
         return -EAGAIN;
     }
     /* copy the string, including terminating null */
-    memcpy(&entry->d_name[0], fp->path, len + 1);
+    memcpy(&entry->d_name[0], filename, len + 1);
     entry->d_ino = filenum;
     ++filenum;
     dirp->private_data.value = filenum;
