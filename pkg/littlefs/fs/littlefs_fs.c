@@ -493,8 +493,7 @@ static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
     int ret = lfs_dir_read(&fs->fs, dir, &info);
     if (ret >= 0) {
         entry->d_ino = info.type;
-        entry->d_name[0] = '/';
-        strncpy(entry->d_name + 1, info.name, VFS_NAME_MAX - 1);
+        strncpy(entry->d_name, info.name, VFS_NAME_MAX - 1);
     }
 
     mutex_unlock(&fs->lock);

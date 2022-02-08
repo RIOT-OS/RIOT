@@ -288,8 +288,8 @@ static void tests_littlefs_readdir(void)
     int nb_files = 0;
     do {
         res = vfs_readdir(&dirp, &entry);
-        if (res == 1 && (strcmp("/test0.txt", &(entry.d_name[0])) == 0 ||
-                         strcmp("/test1.txt", &(entry.d_name[0])) == 0)) {
+        if (res == 1 && (strcmp("test0.txt", &(entry.d_name[0])) == 0 ||
+                         strcmp("test1.txt", &(entry.d_name[0])) == 0)) {
             nb_files++;
         }
     } while (res == 1);
@@ -305,7 +305,7 @@ static void tests_littlefs_readdir(void)
     nb_files = 0;
     do {
         res = vfs_readdir(&dirp, &entry);
-        if (res == 1 && strcmp("/test2.txt", &(entry.d_name[0])) == 0) {
+        if (res == 1 && strcmp("test2.txt", &(entry.d_name[0])) == 0) {
             nb_files++;
         }
     } while (res == 1);
