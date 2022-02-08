@@ -18,6 +18,7 @@ void _event_callback_handler(event_t *event)
 
 void event_callback_init(event_callback_t *event_callback, void (callback)(void *), void *arg)
 {
+    memset(event_callback, 0, sizeof(*event_callback));
     event_callback->super.handler = _event_callback_handler;
     event_callback->callback = callback;
     event_callback->arg = arg;
