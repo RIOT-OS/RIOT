@@ -15,6 +15,7 @@ FEATURES_PROVIDED += periph_i2c_reconfigure
 FEATURES_PROVIDED += periph_rtt_set_counter
 FEATURES_PROVIDED += periph_rtt_overflow
 FEATURES_PROVIDED += periph_spi_reconfigure
+FEATURES_PROVIDED += periph_spi_gpio_mode
 FEATURES_PROVIDED += periph_timer_periodic # implements timer_set_periodic()
 FEATURES_PROVIDED += periph_uart_modecfg
 FEATURES_PROVIDED += periph_uart_nonblocking
