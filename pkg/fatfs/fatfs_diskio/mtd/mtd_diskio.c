@@ -71,8 +71,18 @@ DSTATUS disk_initialize(BYTE pdrv)
         return STA_NOINIT;
     }
 
-    return (mtd_init(fatfs_mtd_devs[pdrv]) == 0) ? FATFS_DISKIO_DSTASTUS_OK
-                                                 : STA_NOINIT;
+    if (mtd_init(fatfs_mtd_devs[pdrv])) {
+        return STA_NOINIT;
+    }
+
+    uint32_t sector_size = fatfs_mtd_devs[pdrv]->page_size
+                         * fatfs_mtd_devs[pdrv]->pages_per_sector;
+    if (sector_size > FF_MAX_SS) {
+        assert(0);
+        return STA_NOINIT;
+    }
+
+    return FATFS_DISKIO_DSTASTUS_OK;
 }
 
 /**
