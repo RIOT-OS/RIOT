@@ -544,6 +544,8 @@ int _ls_handler(int argc, char **argv)
         } else if (stat.st_mode & S_IFREG) {
             printf("%s\t%lu B\n", entry.d_name, stat.st_size);
             ++nfiles;
+        } else {
+            printf("%s\n", entry.d_name);
         }
     }
     if (ret == 0) {
