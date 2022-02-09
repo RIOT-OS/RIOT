@@ -311,6 +311,13 @@ static inline void xtimer_set64(xtimer_t *timer, uint64_t offset_us);
 void xtimer_remove(xtimer_t *timer);
 
 /**
+ * @brief state if an xtimer is currently set (waiting to be expired)
+ *
+ * @param[in] timer ptr to timer structure to work on
+ */
+static inline bool xtimer_is_set(const xtimer_t *timer);
+
+/**
  * @brief Convert microseconds to xtimer ticks
  *
  * @param[in] usec  microseconds
