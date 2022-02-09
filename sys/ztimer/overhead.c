@@ -35,7 +35,7 @@ static void _callback(void *arg)
     *callback_arg->val = ztimer_now(callback_arg->clock);
 }
 
-int32_t ztimer_overhead(ztimer_clock_t *clock, uint32_t base)
+int32_t ztimer_overhead_set(ztimer_clock_t *clock, uint32_t base)
 {
     volatile uint32_t after = 0;
     uint32_t pre;
@@ -46,5 +46,15 @@ int32_t ztimer_overhead(ztimer_clock_t *clock, uint32_t base)
     pre = ztimer_now(clock);
     ztimer_set(clock, &t, base);
     while (!after) {}
+    return after - pre - base;
+}
+
+int32_t ztimer_overhead_sleep(ztimer_clock_t *clock, uint32_t base)
+{
+    uint32_t pre = ztimer_now(clock);
+
+    ztimer_sleep(clock, base);
+    uint32_t after = ztimer_now(clock);
+
     return after - pre - base;
 }

@@ -160,6 +160,17 @@ extern "C" {
 #define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   0
 #endif
 
+/**
+ * @brief   Some MCUs clocks need some warm-up time during which timing is
+ *          inaccurate. This can be a hindrance when using the @ref
+ *          pseudomodule_ztimer_auto_adjust module.
+ *
+ * @warning This value will increase the boards start-up time
+ */
+#ifndef CONFIG_ZTIMER_AUTO_ADJUST_SETTLE
+#define CONFIG_ZTIMER_AUTO_ADJUST_SETTLE    0
+#endif
+
 #ifdef __cplusplus
 }
 #endif
