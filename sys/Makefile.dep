@@ -88,10 +88,6 @@ ifneq (,$(filter base64url,$(USEMODULE)))
   USEMODULE += base64
 endif
 
-ifneq (,$(filter auto_init_saul,$(USEMODULE)))
-  USEMODULE += saul_init_devs
-endif
-
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += xtimer
@@ -119,10 +115,6 @@ ifneq (,$(filter dhcpv6_relay,$(USEMODULE)))
   USEMODULE += event
   USEMODULE += sock_async_event
   USEMODULE += sock_udp
-endif
-
-ifneq (,$(filter auto_init_dhcpv6_relay,$(USEMODULE)))
-  USEMODULE += dhcpv6_relay
 endif
 
 ifneq (,$(filter dns_%,$(USEMODULE)))
