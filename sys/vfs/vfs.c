@@ -42,6 +42,16 @@
 #endif
 
 /**
+ * @brief Automatic mountpoints
+ */
+XFA_INIT(vfs_mount_t, vfs_mountpoints_xfa);
+
+/**
+ * @brief Number of automatic mountpoints
+ */
+#define MOUNTPOINTS_NUMOF XFA_LEN(vfs_mount_t, vfs_mountpoints_xfa)
+
+/**
  * @internal
  * @brief Array of all currently open files
  *
@@ -1035,6 +1045,29 @@ int vfs_sysop_stat_from_fstat(vfs_mount_t *mountp, const char *restrict path, st
     err = f_op->fstat(&opened, buf);
     f_op->close(&opened);
     return err;
+}
+
+void auto_init_vfs(void)
+{
+    for (unsigned i = 0; i < MOUNTPOINTS_NUMOF; ++i) {
+        DEBUG("vfs%u: mounting as '%s'\n", i, vfs_mountpoints_xfa[i].mount_point);
+        int res = vfs_mount(&vfs_mountpoints_xfa[i]);
+        if (res) {
+            if (IS_ACTIVE(MODULE_VFS_AUTO_FORMAT)) {
+                DEBUG("vfs%u: formatting…\n", i);
+                res = vfs_format(&vfs_mountpoints_xfa[i]);
+                if (res) {
+                    DEBUG("vfs%u: format: error %d\n", i, res);
+                    continue;
+                }
+                res = vfs_mount(&vfs_mountpoints_xfa[i]);
+            }
+
+            if (res) {
+                DEBUG("vfs%u mount: error %d\n", i, res);
+            }
+        }
+    }
 }
 
 /** @} */

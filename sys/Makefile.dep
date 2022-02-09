@@ -499,6 +499,7 @@ ifneq (,$(filter vfs,$(USEMODULE)))
   ifeq (native, $(BOARD))
     USEMODULE += native_vfs
   endif
+  DEFAULT_MODULE += vfs_auto_mount
 endif
 
 ifneq (,$(filter sock_async_event,$(USEMODULE)))

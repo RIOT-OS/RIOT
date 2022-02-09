@@ -154,6 +154,11 @@ void auto_init(void)
         extern void auto_init_devfs(void);
         auto_init_devfs();
     }
+    if (IS_USED(MODULE_VFS_AUTO_MOUNT)) {
+        LOG_DEBUG("Mounting filesystems.\n");
+        extern void auto_init_vfs(void);
+        auto_init_vfs();
+    }
     if (IS_USED(MODULE_AUTO_INIT_GNRC_IPV6_NIB)) {
         LOG_DEBUG("Auto init gnrc_ipv6_nib.\n");
         extern void gnrc_ipv6_nib_init(void);

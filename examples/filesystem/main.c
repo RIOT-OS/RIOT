@@ -45,8 +45,8 @@ static mtd_sdcard_t mtd_sdcard_dev = {
     .sd_card = &sdcard_spi_devs[0],
     .params = &sdcard_spi_params[0],
 };
-static mtd_dev_t *mtd0 = (mtd_dev_t*)&mtd_sdcard_dev;
-#define MTD_0 mtd0
+static mtd_dev_t *mtd_sdcard = (mtd_dev_t*)&mtd_sdcard_dev;
+#define MTD_0 mtd_sdcard
 #endif
 
 /* Flash mount point */
@@ -110,9 +110,6 @@ static spiffs_desc_t fs_desc = {
  * as for littlefs, some fields can be changed if needed,
  * this example focus on basic usage, i.e. entire memory used */
 static fatfs_desc_t fs_desc;
-
-/* provide mtd devices for use within diskio layer of fatfs */
-mtd_dev_t *fatfs_mtd_devs[FF_VOLUMES];
 
 /* fatfs driver will be used */
 #define FS_DRIVER fatfs_file_system
@@ -311,12 +308,12 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS) || defined(MODULE_LITTLEFS2))
+#if defined(MTD_0) && \
+   (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS) || \
+    defined(MODULE_LITTLEFS2) || defined(MODULE_FATFS_VFS))
     /* spiffs and littlefs need a mtd pointer
      * by default the whole memory is used */
     fs_desc.dev = MTD_0;
-#elif defined(MTD_0) && defined(MODULE_FATFS_VFS)
-    fatfs_mtd_devs[fs_desc.vol_idx] = MTD_0;
 #endif
     int res = vfs_mount(&const_mount);
     if (res < 0) {

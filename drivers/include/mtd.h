@@ -24,9 +24,6 @@
 #define MTD_H
 
 #include <stdint.h>
-#if MODULE_VFS
-#include "vfs.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -396,13 +393,6 @@ int mtd_erase_sector(mtd_dev_t *mtd, uint32_t sector, uint32_t num);
  * @return -EIO if I/O error occurred
  */
 int mtd_power(mtd_dev_t *mtd, enum mtd_power_state power);
-
-#if defined(MODULE_VFS) || defined(DOXYGEN)
-/**
- * @brief   MTD driver for VFS
- */
-extern const vfs_file_ops_t mtd_vfs_ops;
-#endif
 
 #ifdef __cplusplus
 }
