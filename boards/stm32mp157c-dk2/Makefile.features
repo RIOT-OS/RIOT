@@ -5,3 +5,9 @@ CPU_MODEL = stm32mp157cac
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
+
+# This configuration enables modules that are only available when using Kconfig
+# module modelling
+ifeq (1, $(TEST_KCONFIG))
+  KCONFIG_BOARD_CONFIG += $(BOARDDIR)/$(BOARD).config
+endif
