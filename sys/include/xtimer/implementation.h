@@ -324,6 +324,11 @@ static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b)
     return (a.ticks64 < b.ticks64);
 }
 
+static inline bool xtimer_is_set(const xtimer_t *timer)
+{
+    return timer->offset || timer->long_offset;
+}
+
 #endif /* !defined(DOXYGEN) */
 
 #ifdef __cplusplus
