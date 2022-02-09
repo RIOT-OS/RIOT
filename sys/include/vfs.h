@@ -98,8 +98,15 @@ extern "C" {
  * @{
  */
 #ifdef MODULE_FATFS_VFS
+#include "ffconf.h"
+#if FF_FS_TINY
+#define _FATFS_FILE_CACHE               (0)
+#else
+#define _FATFS_FILE_CACHE               FF_MAX_SS
+#endif
+
 #define FATFS_VFS_DIR_BUFFER_SIZE       (44)
-#define FATFS_VFS_FILE_BUFFER_SIZE      (72)
+#define FATFS_VFS_FILE_BUFFER_SIZE      (72 + _FATFS_FILE_CACHE)
 #else
 #define FATFS_VFS_DIR_BUFFER_SIZE       (1)
 #define FATFS_VFS_FILE_BUFFER_SIZE      (1)
