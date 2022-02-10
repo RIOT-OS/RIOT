@@ -27,4 +27,8 @@ config MODULE_PERIPH_RTT_HW_RTC
     bool
     default y if MODULE_PERIPH_RTT
 
+config MODULE_ESP_HW_COUNTER
+    bool "Use hardware counter"
+    depends on MODULE_PERIPH_TIMER
+
 endif # TEST_KCONFIG

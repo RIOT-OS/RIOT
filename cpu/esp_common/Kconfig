@@ -111,6 +111,9 @@ config MODULE_ESP_LOG_STARTUP
 
 endmenu
 
+config MODULE_ESP_QEMU
+    bool "Simulate ESP with QEMU"
+
 endif # TEST_KCONFIG
 
 rsource "freertos/Kconfig"
