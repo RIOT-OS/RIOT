@@ -210,7 +210,7 @@ static inline gnrc_pktsnip_t *gnrc_pkt_prepend(gnrc_pktsnip_t *pkt,
 static inline gnrc_pktsnip_t *gnrc_pkt_delete(gnrc_pktsnip_t *pkt,
                                               gnrc_pktsnip_t *snip)
 {
-    list_node_t list = { .next = (list_node_t *)pkt };
+    list_node_t list = { (list_node_t *)pkt };
 
     list_remove(&list, (list_node_t *)snip);
     return (gnrc_pktsnip_t *)list.next;
