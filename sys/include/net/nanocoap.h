@@ -888,7 +888,7 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, unsign
  * @brief    Check whether any of the packet's options that are critical
  *
  * (i.e must be understood by the receiver, indicated by a 1 in the option number's least
- * significant bit) were not accessed since the packet was parsed.)
+ * significant bit) were not accessed since the packet was parsed.
  *
  * Call this in a server on requests after all their option processing has happened,
  * and stop processing the request if it returns true, returning a 4.02 Bad Option response.
