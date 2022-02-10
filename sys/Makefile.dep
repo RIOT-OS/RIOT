@@ -115,6 +115,7 @@ ifneq (,$(filter dhcpv6_client,$(USEMODULE)))
 endif
 
 ifneq (,$(filter dhcpv6_relay,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_dhcpv6_relay
   USEMODULE += event
   USEMODULE += sock_async_event
   USEMODULE += sock_udp
