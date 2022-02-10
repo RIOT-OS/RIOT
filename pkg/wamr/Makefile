@@ -36,10 +36,9 @@ ifeq ($(findstring arm,$(OS_ARCH)),arm)
   WAMR_BUILD_TARGET = ARM
 endif
 ifeq ($(findstring aarch,$(OS_ARCH)),aarch)
+  #using 32Bit arm on native aarch
   WAMR_BUILD_TARGET = ARM
 endif
-else ifeq ($(findstring armv4,$(CPU_ARCH)),armv4)
-  WAMR_BUILD_TARGET = ARM
 else ifeq ($(findstring arm,$(CPU_ARCH)),arm)
   WAMR_BUILD_TARGET = THUMB
 else ifeq ($(CPU_ARCH),mips32r2)
