@@ -122,6 +122,31 @@ static int _umount(vfs_mount_t *mountp)
     return fatfs_err_to_errno(res);
 }
 
+static int _statvfs(vfs_mount_t *mountp, const char *restrict path, struct statvfs *restrict buf)
+{
+    (void)path;
+    fatfs_desc_t *fs_desc = (fatfs_desc_t *)mountp->private_data;
+    mtd_dev_t *mtd = fs_desc->dev;
+    DWORD nclst;
+    FATFS *fs;
+
+    int res = f_getfree(fs_desc->abs_path_str_buff, &nclst, &fs);
+    if (res != FR_OK) {
+        return fatfs_err_to_errno(res);
+    }
+
+    unsigned sector_size = mtd->page_size * mtd->pages_per_sector;
+
+    buf->f_bsize  = fs->csize * sector_size;
+    buf->f_frsize = fs->csize * sector_size;
+    buf->f_blocks = mtd->sector_count / fs->csize;
+    buf->f_bfree  = nclst;
+    buf->f_bavail = nclst;
+    buf->f_namemax = FF_USE_LFN ? FF_LFN_BUF : FF_SFN_BUF;
+
+    return 0;
+}
+
 static int _unlink(vfs_mount_t *mountp, const char *name)
 {
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)mountp->private_data;
@@ -499,6 +524,7 @@ static const vfs_file_system_ops_t fatfs_fs_ops = {
     .mkdir = _mkdir,
     .rmdir = _rmdir,
     .stat = vfs_sysop_stat_from_fstat,
+    .statvfs = _statvfs,
 };
 
 static const vfs_file_ops_t fatfs_file_ops = {
