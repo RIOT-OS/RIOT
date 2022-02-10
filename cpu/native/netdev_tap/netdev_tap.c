@@ -290,10 +290,11 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     return res;
 }
 
-void netdev_tap_setup(netdev_tap_t *dev, const netdev_tap_params_t *params) {
+void netdev_tap_setup(netdev_tap_t *dev, const netdev_tap_params_t *params, int index) {
     dev->netdev.driver = &netdev_driver_tap;
     strncpy(dev->tap_name, *(params->tap_name), IFNAMSIZ - 1);
     dev->tap_name[IFNAMSIZ - 1] = '\0';
+    netdev_register(&dev->netdev, NETDEV_TAP, index);
 }
 
 static void _tap_isr(int fd, void *arg) {
