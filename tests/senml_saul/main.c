@@ -39,7 +39,7 @@ void test_senml_encode(void)
     fmt_bytes_hex(result, cbor_buf, len);
 
     /* Compare hex result */
-    TEST_ASSERT_EQUAL_INT(2 * len, sizeof expect - 1);
+    TEST_ASSERT_EQUAL_INT(2 * len, sizeof(expect) - 1);
     TEST_ASSERT_EQUAL_INT(0, strncmp(expect, result, len));
 }
 
