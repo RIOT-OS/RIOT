@@ -61,6 +61,11 @@ static mtd_at24cxxx_t at24mac_dev = {
     .params = at24cxxx_params,
 };
 mtd_dev_t *mtd1 = (mtd_dev_t *)&at24mac_dev;
+
+#ifdef MODULE_VFS_DEFAULT
+#include "fs/littlefs2_fs.h"
+VFS_AUTO_MOUNT(littlefs2, VFS_MTD(same54_nor_dev), "/nvm", 0);
+#endif
 #endif /* MODULE_MTD */
 
 void board_init(void)

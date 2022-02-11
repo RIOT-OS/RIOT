@@ -16,3 +16,9 @@ endif
 ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += sam0_eth
 endif
+
+# default to using littlefs2 on the external flash
+ifneq (,$(filter vfs_default,$(USEMODULE)))
+  USEPKG += littlefs2
+  USEMODULE += mtd
+endif
