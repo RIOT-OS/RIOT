@@ -217,8 +217,39 @@ PSEUDOMODULES += suit_transport_%
 PSEUDOMODULES += suit_storage_%
 PSEUDOMODULES += sys_bus_%
 PSEUDOMODULES += vdd_lc_filter_%
+## @defgroup pseudomodule_vfs_auto_format vfs_auto_format
+## @brief Format mount points at startup unless they can be mounted
+##
+## When this module is active, mount points configured through the @ref
+## pseudomodule_vfs_auto_mount module that can not be mounted at startup are
+## formatted and, if that operation is successful, attempted to mount again.
+##
+## Beware that this may be a harmful procedure in case a bug that corrupts a
+## filesystem coincides with a bug that sends the device into a reboot loop.
 PSEUDOMODULES += vfs_auto_format
+
+## @defgroup pseudomodule_vfs_auto_mount vfs_auto_mount
+## @brief Mount file systems at startup
+##
+## When this module is active, mount points specified through
+## @ref VFS_AUTO_MOUNT are mounted at their designated mount points at startup.
+## These mount points can be specified by the application, or are provided by
+## some boards if the @ref pseudomodule_vfs_default module is active.
 PSEUDOMODULES += vfs_auto_mount
+
+## @defgroup pseudomodule_vfs_default vfs_default
+## @brief Enable default assignments of a board's devices to VFS mount points
+##
+## When this module is active, boards with additional flash storage will
+## automatically mount (and possibly format, if @ref
+## pseudomodule_vfs_auto_format is enabled) their flash devices with a file
+## system that is common for that board (or at least common for this board
+## within RIOT).
+##
+## Boards will generally mount to `/nvm` unless they have several storage
+## backends.
+PSEUDOMODULES += vfs_default
+
 PSEUDOMODULES += wakaama_objects_%
 PSEUDOMODULES += wifi_enterprise
 PSEUDOMODULES += xtimer_on_ztimer
