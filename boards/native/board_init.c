@@ -49,25 +49,25 @@ mtd_dev_t *mtd0 = &mtd0_dev.base;
 #if defined(MODULE_LITTLEFS)
 
 #include "fs/littlefs_fs.h"
-VFS_AUTO_MOUNT(littlefs, VFS_MTD(mtd0_dev), "/", 0);
+VFS_AUTO_MOUNT(littlefs, VFS_MTD(mtd0_dev), "/nvm", 0);
 
 /* littlefs2 support */
 #elif defined(MODULE_LITTLEFS2)
 
 #include "fs/littlefs2_fs.h"
-VFS_AUTO_MOUNT(littlefs2, VFS_MTD(mtd0_dev), "/", 0);
+VFS_AUTO_MOUNT(littlefs2, VFS_MTD(mtd0_dev), "/nvm", 0);
 
 /* spiffs support */
 #elif defined(MODULE_SPIFFS)
 
 #include "fs/spiffs_fs.h"
-VFS_AUTO_MOUNT(spiffs, VFS_MTD(mtd0_dev), "/", 0);
+VFS_AUTO_MOUNT(spiffs, VFS_MTD(mtd0_dev), "/nvm", 0);
 
 /* FAT support */
 #elif defined(MODULE_FATFS_VFS)
 
 #include "fs/fatfs.h"
-VFS_AUTO_MOUNT(fatfs, VFS_MTD(mtd0_dev), "/", 0);
+VFS_AUTO_MOUNT(fatfs, VFS_MTD(mtd0_dev), "/nvm", 0);
 
 #endif
 #endif /* MODULE_VFS */
