@@ -38,7 +38,7 @@ void auto_init_netdev_tap(void)
         LOG_DEBUG("[auto_init_netif] initializing netdev_tap #%u on TAP %s\n",
                   i, *(p->tap_name));
 
-        netdev_tap_setup(&netdev_tap[i], p);
+        netdev_tap_setup(&netdev_tap[i], p, i);
         gnrc_netif_ethernet_create(&_netif[i], _netdev_eth_stack[i], TAP_MAC_STACKSIZE,
                                    TAP_MAC_PRIO, "gnrc_netdev_tap",
                                    &netdev_tap[i].netdev);
