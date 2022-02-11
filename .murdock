@@ -110,17 +110,9 @@ tests/ieee802154_hal
 # modules or packages.
 # Eventually this list will be removed...
 #
-# msbiot and pyboard are on the list as kconfig tunes the pll due to different
-# HSE values from the standard, this is not the case in makefile.
 : ${TEST_KCONFIG_BOARD_BLOCKLIST:="
 6lowpan-clicker
 pic32-wifire
-
-esp32-wrover-kit
-esp8266-olimex-mod
-
-msbiot
-pyboard
 "}
 
 # This list will force all boards that are not in the TEST_KCONFIG_BOARD_BLOCKLIST

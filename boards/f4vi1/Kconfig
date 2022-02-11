@@ -21,4 +21,11 @@ config BOARD_F4VI1
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
 
+config CLOCK_PLL_M
+    default 16
+
+config CLOCK_PLL_N
+    default 336 if MODULE_PERIPH_USBDEV && TEST_KCONFIG
+    default 360
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"
