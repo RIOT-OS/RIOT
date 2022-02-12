@@ -21,10 +21,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#include <string.h>
-#include <stdio.h>
-
-#include "assert.h"
 #include "kernel_defines.h"
 #include "cpu.h"
 #include "irq.h"
