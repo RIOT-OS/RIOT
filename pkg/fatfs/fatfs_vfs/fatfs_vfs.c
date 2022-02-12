@@ -307,8 +307,6 @@ static int _fstat(vfs_file_t *filp, struct stat *buf)
     FILINFO fi;
     FRESULT res;
 
-    memset(buf, 0, sizeof(*buf));
-
     res = f_stat(fs_desc->abs_path_str_buff, &fi);
 
     if (res != FR_OK) {

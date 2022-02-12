@@ -328,7 +328,6 @@ static int socket_close(vfs_file_t *filp)
 static inline int socket_fstat(vfs_file_t *filp, struct stat *buf)
 {
     (void)filp;
-    memset(buf, 0, sizeof(struct stat));
     buf->st_mode |= (S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO);
     buf->st_blksize = SOCKET_BLKSIZE;
     return 0;
