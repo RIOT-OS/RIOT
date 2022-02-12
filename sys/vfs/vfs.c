@@ -127,7 +127,7 @@ static inline int _init_fd(int fd, const vfs_file_ops_t *f_op, vfs_mount_t *moun
  * @return mount index on success
  * @return <0 on error
  */
-static inline int _find_mount(vfs_mount_t **mountpp, const char *name, const char **rel_path);
+static int _find_mount(vfs_mount_t **mountpp, const char *name, const char **rel_path);
 
 /**
  * @internal
@@ -964,7 +964,7 @@ static inline int _init_fd(int fd, const vfs_file_ops_t *f_op, vfs_mount_t *moun
     return fd;
 }
 
-static inline int _find_mount(vfs_mount_t **mountpp, const char *name, const char **rel_path)
+static int _find_mount(vfs_mount_t **mountpp, const char *name, const char **rel_path)
 {
     size_t longest_match = 0;
     size_t name_len = strlen(name);
@@ -1074,4 +1074,8 @@ void auto_init_vfs(void)
     }
 }
 
+clist_node_t *vfs_get_mounts(void)
+{
+    return _vfs_mounts_list.next;
+}
 /** @} */

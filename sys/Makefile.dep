@@ -494,6 +494,10 @@ ifneq (,$(filter constfs,$(USEMODULE)))
   USEMODULE += vfs
 endif
 
+ifneq (,$(filter mountfs,$(USEMODULE)))
+  USEMODULE += vfs
+endif
+
 ifneq (,$(filter devfs,$(USEMODULE)))
   USEMODULE += vfs
 endif

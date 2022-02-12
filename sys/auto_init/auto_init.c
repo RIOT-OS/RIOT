@@ -154,6 +154,11 @@ void auto_init(void)
         extern void auto_init_devfs(void);
         auto_init_devfs();
     }
+    if (IS_USED(MODULE_MOUNTFS)) {
+        LOG_DEBUG("Mounting /.\n");
+        extern void auto_init_mountfs(void);
+        auto_init_mountfs();
+    }
     if (IS_USED(MODULE_VFS_AUTO_MOUNT)) {
         LOG_DEBUG("Mounting filesystems.\n");
         extern void auto_init_vfs(void);

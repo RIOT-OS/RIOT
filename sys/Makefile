@@ -14,6 +14,9 @@ endif
 ifneq (,$(filter constfs,$(USEMODULE)))
   DIRS += fs/constfs
 endif
+ifneq (,$(filter mountfs,$(USEMODULE)))
+  DIRS += fs/mountfs
+endif
 ifneq (,$(filter cord_common,$(USEMODULE)))
   DIRS += net/application_layer/cord/common
 endif
