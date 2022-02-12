@@ -396,6 +396,7 @@ static int _fsync(vfs_file_t *filp)
 static int _stat(vfs_mount_t *mountp, const char *restrict path, struct stat *restrict buf)
 {
     littlefs_desc_t *fs = mountp->private_data;
+    memset(buf, 0, sizeof(*buf));
 
     mutex_lock(&fs->lock);
 
@@ -432,6 +433,7 @@ static int _statvfs(vfs_mount_t *mountp, const char *restrict path, struct statv
 {
     (void)path;
     littlefs_desc_t *fs = mountp->private_data;
+    memset(buf, 0, sizeof(*buf));
 
     mutex_lock(&fs->lock);
 
