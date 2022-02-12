@@ -67,7 +67,7 @@ static int getpage(const char *str)
     return page;
 }
 
-#ifdef FLASHPAGE_SIZE
+#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
 static void dumpchar(uint8_t mem)
 {
     if (mem >= ' ' && mem <= '~') {
@@ -131,7 +131,7 @@ static int cmd_info(int argc, char **argv)
     return 0;
 }
 
-#ifdef FLASHPAGE_SIZE
+#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
 static int cmd_dump(int argc, char **argv)
 {
     int page;
@@ -271,7 +271,7 @@ static int cmd_erase(int argc, char **argv)
     return 0;
 }
 
-#ifdef FLASHPAGE_SIZE
+#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
 static int cmd_edit(int argc, char **argv)
 {
     int offset;
@@ -297,9 +297,7 @@ static int cmd_edit(int argc, char **argv)
 
     return 0;
 }
-#endif
 
-#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
 static int cmd_test(int argc, char **argv)
 {
     int page;
