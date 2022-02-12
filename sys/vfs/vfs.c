@@ -200,6 +200,7 @@ int vfs_fstat(int fd, struct stat *buf)
         /* driver does not implement fstat() */
         return -EINVAL;
     }
+    memset(buf, 0, sizeof(*buf));
     return filp->f_op->fstat(filp, buf);
 }
 
@@ -214,6 +215,7 @@ int vfs_fstatvfs(int fd, struct statvfs *buf)
         return res;
     }
     vfs_file_t *filp = &_vfs_open_files[fd];
+    memset(buf, 0, sizeof(*buf));
     if (filp->mp->fs->fs_op->fstatvfs == NULL) {
         /* file system driver does not implement fstatvfs() */
         if (filp->mp->fs->fs_op->statvfs != NULL) {
@@ -753,6 +755,7 @@ int vfs_stat(const char *restrict path, struct stat *restrict buf)
         atomic_fetch_sub(&mountp->open_files, 1);
         return -EPERM;
     }
+    memset(buf, 0, sizeof(*buf));
     res = mountp->fs->fs_op->stat(mountp, rel_path, buf);
     /* remember to decrement the open_files count */
     atomic_fetch_sub(&mountp->open_files, 1);
@@ -782,6 +785,7 @@ int vfs_statvfs(const char *restrict path, struct statvfs *restrict buf)
         atomic_fetch_sub(&mountp->open_files, 1);
         return -EPERM;
     }
+    memset(buf, 0, sizeof(*buf));
     res = mountp->fs->fs_op->statvfs(mountp, rel_path, buf);
     /* remember to decrement the open_files count */
     atomic_fetch_sub(&mountp->open_files, 1);
@@ -1042,6 +1046,7 @@ int vfs_sysop_stat_from_fstat(vfs_mount_t *mountp, const char *restrict path, st
     if (err < 0) {
         return err;
     }
+    memset(buf, 0, sizeof(*buf));
     err = f_op->fstat(&opened, buf);
     f_op->close(&opened);
     return err;
