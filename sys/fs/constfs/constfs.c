@@ -144,7 +144,6 @@ static int constfs_statvfs(vfs_mount_t *mountp, const char *restrict path, struc
     }
     constfs_t *fs = mountp->private_data;
     /* clear out the stat buffer first */
-    memset(buf, 0, sizeof(*buf));
     buf->f_bsize = sizeof(uint8_t); /* block size */
     buf->f_frsize = sizeof(uint8_t); /* fundamental block size */
     fsblkcnt_t f_blocks = 0;
@@ -309,8 +308,7 @@ static int constfs_closedir(vfs_DIR *dirp)
 
 static void _constfs_write_stat(const constfs_file_t *fp, struct stat *restrict buf)
 {
-    /* clear out the stat buffer first */
-    memset(buf, 0, sizeof(*buf));
+    /* buffer is cleared by vfs already */
     buf->st_nlink = 1;
     buf->st_mode = S_IFREG | S_IRUSR | S_IRGRP | S_IROTH;
     buf->st_size = fp->size;

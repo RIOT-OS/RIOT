@@ -1046,7 +1046,6 @@ int vfs_sysop_stat_from_fstat(vfs_mount_t *mountp, const char *restrict path, st
     if (err < 0) {
         return err;
     }
-    memset(buf, 0, sizeof(*buf));
     err = f_op->fstat(&opened, buf);
     f_op->close(&opened);
     return err;
