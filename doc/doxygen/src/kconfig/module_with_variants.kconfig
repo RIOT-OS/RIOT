@@ -1,53 +1,50 @@
-menuconfig MODULE_<MY_MODULE>
-    bool "This is <MY_MODULE>"
+menuconfig MODULE_MY_MODULE
+    bool "This is MY_MODULE"
 
-if MODULE_<MY_MODULE>
+if MODULE_MY_MODULE
 
-choice <MY_MODULE>_VARIANT
+choice MY_MODULE_VARIANT
     bool "Variants"
-    default MODULE_<MY_MODULE>_<VARIANT_1> if HAVE_<MY_MODULE>_<VARIANT_1>
-    default MODULE_<MY_MODULE>_<VARIANT_2> if HAVE_<MY_MODULE>_<VARIANT_2>
-    ...
-    default MODULE_<MY_MODULE>_<VARIANT_n> if HAVE_<MY_MODULE>_<VARIANT_n>
+    default MODULE_MY_MODULE_VARIANT_1 if HAVE_MY_MODULE_VARIANT_1
+    default MODULE_MY_MODULE_VARIANT_2 if HAVE_MY_MODULE_VARIANT_2
+
+    default MODULE_MY_MODULE_VARIANT_n if HAVE_MY_MODULE_VARIANT_n
     help
         Only one variant can be selected.
 
-config MODULE_<MY_MODULE>_<VARIANT_1>
-    bool "<MY_MODULE> with <VARIANT_1>"
+config MODULE_MY_MODULE_VARIANT_1
+    bool "MY_MODULE with VARIANT_1"
 
-config MODULE_<MY_MODULE>_<VARIANT_2>
-    bool "<MY_MODULE> with <VARIANT_2>"
+config MODULE_MY_MODULE_VARIANT_2
+    bool "MY_MODULE with VARIANT_2"
 
-...
 
-config MODULE_<MY_MODULE>_<VARIANT_n>
-    bool "<MY_MODULE> with <VARIANT_n>"
+config MODULE_MY_MODULE_VARIANT_n
+    bool "MY_MODULE with VARIANT_n"
 
 endchoice
 
-endif # MODULE_<MY_MODULE>
+endif # MODULE_MY_MODULE
 
-config HAVE_<MY_MODULE>
+config HAVE_MY_MODULE
     bool
     help
-      Indicates that <MY_MODULE> is present.
+      Indicates that MY_MODULE is present.
 
-config HAVE_<MY_MODULE>_<VARIANT_1>
+config HAVE_MY_MODULE_VARIANT_1
     bool
-    select HAVE_<MY_MODULE>
+    select HAVE_MY_MODULE
     help
-      Indicates that <MY_MODULE> is <VARIANT_1>.
+      Indicates that MY_MODULE is VARIANT_1.
 
-config HAVE_<MY_MODULE>_<VARIANT_2>
+config HAVE_MY_MODULE_VARIANT_2
     bool
-    select HAVE_<MY_MODULE>
+    select HAVE_MY_MODULE
     help
-      Indicates that <MY_MODULE> is <VARIANT_2>.
+      Indicates that MY_MODULE is VARIANT_2.
 
-...
-
-config HAVE_<MY_MODULE>_<VARIANT_n>
+config HAVE_MY_MODULE_VARIANT_n
     bool
-    select HAVE_<MY_MODULE>
+    select HAVE_MY_MODULE
     help
-      Indicates that <MY_MODULE> is <VARIANT_n>.
+      Indicates that MY_MODULE is VARIANT_n.
