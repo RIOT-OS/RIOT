@@ -35,14 +35,26 @@ NEW_STATE := $(USEMODULE) $(USEPKG) $(FEATURES_USED)
 ifneq ($(OLD_STATE),$(NEW_STATE))
   include $(RIOTMAKE)/dependency_resolution.inc.mk
 else
+  # Include late allowing them to have been disabled during dependency resolution
+  DEFAULT_MODULE += auto_init periph_init
+  USEMODULE += $(filter-out $(DISABLE_MODULE),auto_init periph_init)
+
   # If module auto_init is not used, silently disable all of its submodules
   ifeq (,$(filter auto_init,$(USEMODULE)))
     DISABLE_MODULE += auto_init_%
   endif
 
-  # add default modules again, as $(DEFAULT_MODULE) might have been extended
-  # during dependency processing
+  # If module periph_init is not used, silently disable all of its submodules
+  ifeq (,$(filter periph_init,$(USEMODULE)))
+    DISABLE_MODULE += periph_init_%
+  endif
+
+  # Add default modules again, as $(DEFAULT_MODULE) might have been extended
+  # during dependency resolution
   USEMODULE += $(filter-out $(DISABLE_MODULE),$(DEFAULT_MODULE))
+
+  # Include eventual dependencies for default modules
+  include $(RIOTMAKE)/default_modules.deps.mk
 
   # Sort and de-duplicate used modules and default modules for readability
   USEMODULE := $(sort $(USEMODULE))

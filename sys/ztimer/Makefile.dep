@@ -7,9 +7,6 @@ ifneq (,$(filter ztimer,$(USEMODULE)))
   USEMODULE += ztimer_core
   USEMODULE += ztimer_convert_frac
   USEMODULE += ztimer_convert_shift
-  ifneq (,$(filter auto_init_ztimer,$(USEMODULE)))
-    USEMODULE += ztimer_init
-  endif
   DEFAULT_MODULE += auto_init_ztimer
   DEFAULT_MODULE += ztimer_init
 endif
