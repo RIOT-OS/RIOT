@@ -37,11 +37,13 @@ extern "C" {
 /** @brief number of clocks that should be applied to the card on init before
  * taking further actions (see sd spec. 6.4.1.1 Power Up Time of Card) */
 #define SD_POWERSEQUENCE_CLOCK_COUNT   74
-/** @brief Round up number of bytes to send on power up */
+/** @brief round up number of bytes to send on power up */
 #define SD_POWERSEQUENCE_BYTE_COUNT    ((SD_POWERSEQUENCE_CLOCK_COUNT + 7) / 8)
 
-#define SD_CARD_PREINIT_CLOCK_PERIOD_US 10 /* used to generate 100 kHz clock in init phase */
-#define SD_CARD_WAIT_AFTER_POWER_UP_MS  1  /* wait time after power up */
+/** @brief used to generate 100 kHz clock in init phase */
+#define SD_CARD_PREINIT_CLOCK_PERIOD_US 10
+/** @brief wait time after power up */
+#define SD_CARD_WAIT_AFTER_POWER_UP_MS
 
 /* R1 response bits (see sd spec. 7.3.2.1 Format R1) */
 #define SD_R1_RESPONSE_PARAM_ERROR       (1<<6)
