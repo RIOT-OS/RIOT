@@ -54,8 +54,13 @@ sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
 /* CRC-7 (polynomial: x^7 + x^3 + 1) LSB of CRC-7 in a 8-bit variable is always 1*/
 static uint8_t _crc_7(const uint8_t *data, int n);
 
+#if IS_USED(MODULE_PERIPH_SPI_GPIO_MODE)
 /* function pointer to switch to hw spi mode after init sequence */
 static int (*_dyn_spi_rxtx_byte)(sdcard_spi_t *card, uint8_t out, uint8_t *in);
+#else
+static inline int _hw_spi_rxtx_byte(sdcard_spi_t *card, uint8_t out, uint8_t *in);
+#define _dyn_spi_rxtx_byte _hw_spi_rxtx_byte
+#endif
 
 static inline uint32_t _deadline_from_interval(uint32_t interval)
 {
@@ -193,7 +198,7 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
              (gpio_init(card->params.power, GPIO_OUT) == 0))) {
             DEBUG("gpio_init(): [OK]\n");
             /* always use hw-spi */
-            _dyn_spi_rxtx_byte = &_hw_spi_rxtx_byte;
+            _dyn_spi_rxtx_byte = _hw_spi_rxtx_byte;
 
             return SD_INIT_SPI_POWER_SEQ;
         }
@@ -207,7 +212,7 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
 
             DEBUG("gpio_init(): [OK]\n");
             /* use soft-spi to perform init command to allow use of internal pull-ups on miso */
-            _dyn_spi_rxtx_byte = &_sw_spi_rxtx_byte;
+            _dyn_spi_rxtx_byte = _sw_spi_rxtx_byte;
 
             return SD_INIT_SPI_POWER_SEQ;
         }
@@ -224,13 +229,13 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
             ztimer_sleep(ZTIMER_MSEC, SD_CARD_WAIT_AFTER_POWER_UP_MS);
         }
 
-        /* powersequence: perform at least 74 clockcycles sending dummy bytes with 0xFF,
-           (same as same clock cycles with mosi_pin being high) */
+        /* powersequence: send 10 dummy 0xFF, (same as same clock cycles with
+           mosi_pin being high) for 74 cycles */
         _select_card_spi(card, SPI_CLK_100KHZ, IS_USED(MODULE_PERIPH_SPI_GPIO_MODE));
         /* dont select card for power up sequence */
         gpio_set(card->params.cs);
         uint8_t dummy;
-        for (int i = 0; i < SD_POWERSEQUENCE_CLOCK_COUNT; i += 1) {
+        for (int i = 0; i < SD_POWERSEQUENCE_BYTE_COUNT; i += 1) {
             _dyn_spi_rxtx_byte(card, SD_CARD_DUMMY_BYTE, &dummy);
         }
         _unselect_card_spi(card, IS_USED(MODULE_PERIPH_SPI_GPIO_MODE));
@@ -249,7 +254,7 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
             /* give control over SPI pins back to HW SPI device */
             spi_init_pins(card->params.spi_dev);
             /* switch to HW SPI since SD card is now in real SPI mode */
-            _dyn_spi_rxtx_byte = &_hw_spi_rxtx_byte;
+            _dyn_spi_rxtx_byte = _hw_spi_rxtx_byte;
 #endif
             DEBUG("CMD0: [OK]\n");
             return SD_INIT_ENABLE_CRC;
