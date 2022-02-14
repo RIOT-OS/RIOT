@@ -14,4 +14,10 @@ ifneq (,$(filter periph_can,$(FEATURES_USED)))
   endif
 endif
 
+# default to using littlefs2 on the virtual flash
+ifneq (,$(filter vfs_default,$(USEMODULE)))
+  USEPKG += littlefs2
+  USEMODULE += mtd
+endif
+
 USEMODULE += native_drivers
