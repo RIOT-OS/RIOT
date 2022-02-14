@@ -32,6 +32,7 @@
  * 2.1b: else: convert from ZTIMER_USEC
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Karl Fessel <kfessel>
  *
  * @}
  */
@@ -73,6 +74,12 @@
 #  define ZTIMER_TIMER_FREQ CONFIG_ZTIMER_USEC_BASE_FREQ
 #endif
 
+#if MODULE_ZTIMER_PERIPH_LPTIMER
+#  define ZTIMER_LPTIMER      _ztimer_periph_timer_lp
+#  define ZTIMER_LPTIMER_CLK  _ztimer_periph_timer_lp.super
+#  define ZTIMER_LPTIMER_FREQ CONFIG_ZTIMER_LPTIMER_FREQ
+#endif
+
 #if MODULE_ZTIMER_PERIPH_RTT
 #  define ZTIMER_RTT      _ztimer_periph_timer_rtt
 #  define ZTIMER_RTT_CLK  _ztimer_periph_timer_rtt
@@ -101,11 +108,23 @@
 #  endif
 #endif
 
-/* ZTIMER_MSEC prefers ZTIMER_RTT (ztimer_periph_rtt)
- * if it is available and runs at a frequency > 1kHz
- * if not it falls back to use the basic timer */
+/* ZTIMER_MSEC uses one of in order of preference:
+ * - ZTIMER_LPTIMER (ztimer_periph_lptimer)
+ *      if it is available and running at a frequency > 1kHz
+ * - ZTIMER_RTT (ztimer_periph_rtt)
+ *      if it is available and running at a frequency > 1kHz,
+ * if there is neither of those it falls back to use the basic timer
+ * if that is available (there should be a basic timer with all boards)*/
 #if MODULE_ZTIMER_MSEC
-#  if defined(ZTIMER_RTT) && ZTIMER_RTT_FREQ >= FREQ_1KHZ
+#  if defined(ZTIMER_LPTIMER) && ZTIMER_LPTIMER_FREQ >= FREQ_1KHZ
+#    define ZTIMER_MSEC_LPTIMER 1
+#    ifndef INIT_ZTIMER_LPTIMER
+#      define INIT_ZTIMER_LPTIMER 1
+#    endif
+#    if ZTIMER_LPTIMER_FREQ != FREQ_1KHZ
+#      define ZTIMER_MSEC_CONVERT_LOWER_FREQ ZTIMER_LPTIMER_FREQ
+#    endif
+#  elif defined(ZTIMER_RTT) && ZTIMER_RTT_FREQ >= FREQ_1KHZ
 #    define ZTIMER_MSEC_RTT 1
 #    ifndef INIT_ZTIMER_RTT
 #      define INIT_ZTIMER_RTT 1
@@ -122,16 +141,32 @@
 #  endif
 #endif
 
-/* ZTIMER_SEC prefers ZTIMER_RTT (ztimer_periph_rtt) if it is available
- * if not it prefers ZTIMER_RTC (ztimer_periph_rtc) if it is available
- * if not it falls back to use the basic timer */
+/* ZTIMER_SEC uses one of in order of preference:
+ * - ZTIMER_LPTIMER (ztimer_periph_lptimer)
+ *      if it is available and running at a frequency > 1Hz
+ * - ZTIMER_RTT (ztimer_periph_rtt)
+ *      if it is available and running at a frequency > 1Hz,
+ * - ZTIMER_RTC (ztimer_periph_rtc)
+ *      if it is available (this should be avoided)
+ * if there is neither of those it falls back to use the basic timer
+ * if that is available (there should be a basic timer with all boards)*/
 #if MODULE_ZTIMER_SEC
-#  ifdef ZTIMER_RTT
+#  if defined(ZTIMER_LPTIMER) && ZTIMER_LPTIMER_FREQ >= FREQ_1HZ
+#    define ZTIMER_SEC_LPTIMER 1
+#    ifndef INIT_ZTIMER_LPTIMER
+#      define INIT_ZTIMER_LPTIMER 1
+#    endif
+#    if ZTIMER_LPTIMER_FREQ != FREQ_1HZ
+#      define ZTIMER_SEC_CONVERT_LOWER_FREQ ZTIMER_LPTIMER_FREQ
+#    endif
+#  elif defined(ZTIMER_RTT)
 #    define ZTIMER_SEC_RTT
 #    ifndef INIT_ZTIMER_RTT
 #      define INIT_ZTIMER_RTT 1
 #    endif
+#    if ZTIMER_RTT_FREQ != FREQ_1HZ
 #    define ZTIMER_SEC_CONVERT_LOWER_FREQ ZTIMER_RTT_FREQ
+#    endif
 #  elif defined(ZTIMER_RTC)
 #    define ZTIMER_SEC_RTC
 #    ifndef INIT_ZTIMER_RTC
@@ -152,6 +187,10 @@
 static ztimer_periph_timer_t ZTIMER_TIMER = {
     .min = CONFIG_ZTIMER_USEC_MIN
 };
+#endif
+
+#if INIT_ZTIMER_LPTIMER
+static ztimer_periph_timer_t ZTIMER_LPTIMER = {};
 #endif
 
 #if INIT_ZTIMER_RTT
@@ -186,6 +225,8 @@ ztimer_clock_t *const ZTIMER_USEC = &_ztimer_convert_frac_usec.super.super;
 ztimer_clock_t *const ZTIMER_MSEC_BASE = &ZTIMER_RTT_CLK;
 #  elif defined(ZTIMER_MSEC_TIMER)
 ztimer_clock_t *const ZTIMER_MSEC_BASE = &ZTIMER_TIMER_CLK;
+#  elif defined(ZTIMER_MSEC_LPTIMER)
+ztimer_clock_t *const ZTIMER_MSEC_BASE = &ZTIMER_LPTIMER_CLK;
 #  else
 #    error No suitable ZTIMER_MSEC config. No rtt or basic timer?
 #  endif
@@ -193,18 +234,19 @@ ztimer_clock_t *const ZTIMER_MSEC_BASE = &ZTIMER_TIMER_CLK;
 static ztimer_convert_frac_t _ztimer_convert_frac_msec;
 ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_convert_frac_msec.super.super;
 #  else
-ztimer_clock_t *const ZTIMER_MSEC = &ZTIMER_RTT_CLK;
+ztimer_clock_t *const ZTIMER_MSEC = ZTIMER_MSEC_BASE;
 #   endif
 #endif
 
 #if MODULE_ZTIMER_SEC
 #  ifdef ZTIMER_SEC_RTC
 ztimer_clock_t *const ZTIMER_SEC_BASE = &ZTIMER_RTC_CLK;
-ztimer_clock_t *const ZTIMER_SEC = &ZTIMER_RTC_CLK;
 #  elif defined(ZTIMER_SEC_RTT)
 ztimer_clock_t *const ZTIMER_SEC_BASE = &ZTIMER_RTT_CLK;
 #  elif defined(ZTIMER_SEC_TIMER)
 ztimer_clock_t *const ZTIMER_SEC_BASE = &ZTIMER_TIMER_CLK;
+#  elif defined(ZTIMER_SEC_LPTIMER)
+ztimer_clock_t *const ZTIMER_SEC_BASE = &ZTIMER_LPTIMER_CLK;
 #  else
 #    error No suitable ZTIMER_SEC config. No rtc, rtt or basic timer?
 #  endif
@@ -212,6 +254,8 @@ ztimer_clock_t *const ZTIMER_SEC_BASE = &ZTIMER_TIMER_CLK;
 #  ifdef ZTIMER_SEC_CONVERT_LOWER_FREQ
 static ztimer_convert_frac_t _ztimer_convert_frac_sec;
 ztimer_clock_t *const ZTIMER_SEC = &_ztimer_convert_frac_sec.super.super;
+#  else
+ztimer_clock_t *const ZTIMER_SEC = ZTIMER_SEC_BASE;
 #  endif
 #endif
 
@@ -252,6 +296,20 @@ void ztimer_init(void)
     LOG_DEBUG("ztimer_init(): ZTIMER_TIMER setting block_pm_mode to %i\n",
               CONFIG_ZTIMER_TIMER_BLOCK_PM_MODE);
     ZTIMER_TIMER_CLK.block_pm_mode = CONFIG_ZTIMER_TIMER_BLOCK_PM_MODE;
+#  endif
+#endif
+
+#if INIT_ZTIMER_LPTIMER
+    LOG_DEBUG(
+        "ztimer_init(): ZTIMER_LPTIMER using periph timer %u, freq %lu, width %u\n",
+        CONFIG_ZTIMER_LPTIMER_DEV, ZTIMER_LPTIMER_FREQ,
+        CONFIG_ZTIMER_LPTIMER_WIDTH);
+    ztimer_periph_timer_init(&ZTIMER_LPTIMER, CONFIG_ZTIMER_LPTIMER_DEV,
+                             ZTIMER_LPTIMER_FREQ, WIDTH_TO_MAXVAL(CONFIG_ZTIMER_LPTIMER_WIDTH));
+#  ifdef MODULE_PM_LAYERED
+    LOG_DEBUG("ztimer_init(): ZTIMER_LPTIMER setting block_pm_mode to %i\n",
+              CONFIG_ZTIMER_LPTIMER_BLOCK_PM_MODE);
+    ZTIMER_LPTIMER_CLK.block_pm_mode = CONFIG_ZTIMER_LPTIMER_BLOCK_PM_MODE;
 #  endif
 #endif
 
