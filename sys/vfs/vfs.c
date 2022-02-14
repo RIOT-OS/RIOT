@@ -1051,27 +1051,48 @@ int vfs_sysop_stat_from_fstat(vfs_mount_t *mountp, const char *restrict path, st
     return err;
 }
 
+static int _auto_mount(vfs_mount_t *mountp, unsigned i)
+{
+    (void) i;
+    DEBUG("vfs%u: mounting as '%s'\n", i, mountp->mount_point);
+    int res = vfs_mount(mountp);
+    if (res == 0) {
+        return 0;
+    }
+
+    if (IS_ACTIVE(MODULE_VFS_AUTO_FORMAT)) {
+        DEBUG("vfs%u: formatting…\n", i);
+        res = vfs_format(mountp);
+        if (res) {
+            DEBUG("vfs%u: format: error %d\n", i, res);
+            return res;
+        }
+        res = vfs_mount(mountp);
+    }
+
+    if (res) {
+        DEBUG("vfs%u mount: error %d\n", i, res);
+    }
+
+    return res;
+}
+
 void auto_init_vfs(void)
 {
     for (unsigned i = 0; i < MOUNTPOINTS_NUMOF; ++i) {
-        DEBUG("vfs%u: mounting as '%s'\n", i, vfs_mountpoints_xfa[i].mount_point);
-        int res = vfs_mount(&vfs_mountpoints_xfa[i]);
-        if (res) {
-            if (IS_ACTIVE(MODULE_VFS_AUTO_FORMAT)) {
-                DEBUG("vfs%u: formatting…\n", i);
-                res = vfs_format(&vfs_mountpoints_xfa[i]);
-                if (res) {
-                    DEBUG("vfs%u: format: error %d\n", i, res);
-                    continue;
-                }
-                res = vfs_mount(&vfs_mountpoints_xfa[i]);
-            }
+        _auto_mount(&vfs_mountpoints_xfa[i], i);
+    }
+}
 
-            if (res) {
-                DEBUG("vfs%u mount: error %d\n", i, res);
-            }
+int vfs_mount_by_path(const char *path)
+{
+    for (unsigned i = 0; i < MOUNTPOINTS_NUMOF; ++i) {
+        if (strcmp(path, vfs_mountpoints_xfa[i].mount_point) == 0) {
+            return _auto_mount(&vfs_mountpoints_xfa[i], i);
         }
     }
+
+    return -ENOENT;
 }
 
 /** @} */
