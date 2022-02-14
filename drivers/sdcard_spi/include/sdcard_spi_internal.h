@@ -34,10 +34,10 @@ extern "C" {
 #include "sdcard_spi.h"
 #include "timex.h"
 
-/* number of clocks that should be applied to the card on init
-   before taking further actions (see sd spec. 6.4.1.1 Power Up Time of Card) */
+/** @brief number of clocks that should be applied to the card on init before
+ * taking further actions (see sd spec. 6.4.1.1 Power Up Time of Card) */
 #define SD_POWERSEQUENCE_CLOCK_COUNT   74
-/* round up number of bytes to send on power up */
+/** @brief Round up number of bytes to send on power up */
 #define SD_POWERSEQUENCE_BYTE_COUNT    ((SD_POWERSEQUENCE_CLOCK_COUNT + 7) / 8)
 
 #define SD_CARD_PREINIT_CLOCK_PERIOD_US 10 /* used to generate 100 kHz clock in init phase */
