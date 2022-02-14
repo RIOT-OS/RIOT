@@ -236,7 +236,7 @@ void nimble_autoadv_start(ble_addr_t *addr)
 #endif
 }
 
-int static _ble_gap_stop(void)
+static int _ble_gap_stop(void)
 {
 #if MYNEWT_VAL_BLE_EXT_ADV
     if (ble_gap_ext_adv_active(CONFIG_NIMBLE_AUTOADV_INSTANCE)) {

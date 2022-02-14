@@ -23,7 +23,7 @@ else
   CFLAGS += -Wno-unused-but-set-variable
 endif
 
-IGNORE := nimble_autoconn_% nimble_phy_% nimble_%_ext
+IGNORE := nimble_autoconn_% nimble_phy_% nimble_%_ext nimble_autoadv%
 SUBMODS := $(filter-out $(IGNORE),$(filter nimble_%,$(USEMODULE)))
 
 .PHONY: all
@@ -73,9 +73,6 @@ nimble_drivers_nrf5x:
 # additional, RIOT specific nimble modules
 nimble_addr:
 	$(QQ)"$(MAKE)" -C $(TDIR)/addr/
-
-nimble_autoadv:
-	$(QQ)"$(MAKE)" -C $(TDIR)/autoadv
 
 nimble_autoconn:
 	$(QQ)"$(MAKE)" -C $(TDIR)/autoconn
