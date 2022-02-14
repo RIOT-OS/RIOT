@@ -158,7 +158,7 @@ int _gnrc_udp_cmd(int argc, char **argv)
 
     if (strcmp(argv[1], "send") == 0) {
         uint32_t num = 1;
-        uint32_t delay = 1000000;
+        uint32_t delay;
         if (argc < 5) {
 #if IS_USED(MODULE_ZTIMER_MSEC)
             printf("usage: %s send "
@@ -174,6 +174,8 @@ int _gnrc_udp_cmd(int argc, char **argv)
         }
         if (argc > 6) {
             delay = atoi(argv[6]);
+        } else {
+            delay = IS_USED(MODULE_ZTIMER_MSEC) ? 1000 : 1000000;
         }
         _send(argv[2], argv[3], argv[4], num, delay);
     }
