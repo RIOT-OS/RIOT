@@ -37,6 +37,12 @@ export KCONFIG_EXTERNAL_PKG_CONFIGS = $(GENERATED_DIR)/Kconfig.external_pkgs
 ifeq (1,$(TEST_KCONFIG))
   # This file will contain application default configurations
   KCONFIG_APP_CONFIG = $(APPDIR)/app.config.test
+  # This configuration enables modules that are only available when using Kconfig
+  # module modelling
+  # Bring in all board specific configurations if present
+  ifneq (,$(wildcard $(BOARDDIR)/$(BOARD).config))
+    KCONFIG_BOARD_CONFIG += $(BOARDDIR)/$(BOARD).config
+  endif
 else
   # This file will contain application default configurations
   KCONFIG_APP_CONFIG = $(APPDIR)/app.config
