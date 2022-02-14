@@ -12,7 +12,11 @@
 # As are these (if we need them at all)
 
 :riot-members a foaf:Group;
-  foaf:member user:daniel-k. #, ..., ...
+  foaf:member user:daniel-k, user:chrysn .#, ..., ...
 
-user:daniel-k foaf:account <https://github.com/daniel-k>.
-user:chrysn foaf:account <https://github.com/chrysn>.
+# These could also be identified with <https://github.com/${USER}>, but a) see
+# the "but" in the foaf:OnlineAccount definition, and b) makes it needlessly
+# hard to extract the user names in a simple query.
+
+user:daniel-k foaf:account [ foaf:accountServiceHomepage <https://github.com/>; foaf:accountName "daniel-k" ].
+user:chrysn foaf:account [ foaf:accountServiceHomepage <https://github.com/>; foaf:accountName "chrysn" ].
