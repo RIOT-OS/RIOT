@@ -40,5 +40,6 @@ USEMODULE += littlefs2
 # USEMODULE += fatfs_vfs
 USEMODULE += constfs
 # USEMODULE += devfs
+USEMODULE += mountfs
 
 include $(RIOTBASE)/Makefile.include
