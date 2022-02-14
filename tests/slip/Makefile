@@ -13,8 +13,8 @@ SLIP_UART     ?= "UART_NUMOF-1"
 SLIP_BAUDRATE ?= 115200
 
 # export slip parameters
-CFLAGS += -DSLIP_UART="UART_DEV($(SLIP_UART))"
-CFLAGS += -DSLIP_BAUDRATE=$(SLIP_BAUDRATE)
+CFLAGS += -DSLIPDEV_PARAM_UART="UART_DEV($(SLIP_UART))"
+CFLAGS += -DSLIPDEV_PARAM_BAUDRATE=$(SLIP_BAUDRATE)
 
 # add current directory to the include path. Putting it in CFLAGS will make
 # it go to the beginning, before the standard includes.

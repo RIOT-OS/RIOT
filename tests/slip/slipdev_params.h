@@ -27,8 +27,8 @@ extern "C" {
 
 static slipdev_params_t slipdev_params[] = {
     {
-        .uart = SLIP_UART,
-        .baudrate = SLIP_BAUDRATE,
+        .uart = SLIPDEV_PARAM_UART,
+        .baudrate = SLIPDEV_PARAM_BAUDRATE,
     },
 };
 
