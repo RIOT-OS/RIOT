@@ -60,7 +60,7 @@ static void _send(const char *addr_str, const char *port_str,
         return;
     }
 
-    for (unsigned int i = 0; i < num; i++) {
+    while (num--) {
         gnrc_pktsnip_t *payload, *udp, *ip;
         unsigned payload_size;
         /* allocate payload */
@@ -105,11 +105,13 @@ static void _send(const char *addr_str, const char *port_str,
          * => use temporary variable for output */
         printf("Success: sent %u byte(s) to [%s]:%u\n", payload_size, addr_str,
                port);
+        if (num) {
 #if IS_USED(MODULE_ZTIMER_MSEC)
-        ztimer_sleep(ZTIMER_MSEC, delay);
+            ztimer_sleep(ZTIMER_MSEC, delay);
 #else
-        xtimer_usleep(delay);
+            xtimer_usleep(delay);
 #endif
+        }
     }
 }
 
