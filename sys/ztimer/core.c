@@ -411,14 +411,15 @@ uint32_t ztimer_until(ztimer_clock_t *clock, ztimer_t *timer)
 {
     unsigned state = irq_disable();
 
-    if (!_is_set(clock, timer)){
+    if (!_is_set(clock, timer)) {
         irq_restore(state);
         return 0;
     }
     uint32_t sum = clock->list.offset;
     ztimer_base_t *i = clock->list.next;
     ztimer_base_t *timer_base = &timer->base;
-    while ( i && i != timer_base ) {
+
+    while (i && i != timer_base) {
         sum += i->offset;
         i = i->next;
     }
