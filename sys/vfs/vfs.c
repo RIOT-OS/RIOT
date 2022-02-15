@@ -896,10 +896,11 @@ const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur)
             /* empty list */
             return NULL;
         }
+        node = node->next;
     }
     else {
         node = cur->list_entry.next;
-        if (node == _vfs_mounts_list.next) {
+        if (node == _vfs_mounts_list.next->next) {
             return NULL;
         }
     }
