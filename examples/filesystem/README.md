@@ -91,8 +91,6 @@ riot_fatfs_disk.img
 
 ```
 CFLAGS += -DMTD_NATIVE_FILENAME=\"riot_fatfs_disk.img\"
-CFLAGS += -DMTD_PAGE_SIZE=512
-CFLAGS += -DMTD_SECTOR_SIZE=512
 CFLAGS += -DMTD_SECTOR_NUM=262144
 ```
 
