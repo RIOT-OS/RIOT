@@ -304,7 +304,7 @@ struct vfs_mount_struct {
     const vfs_file_system_t *fs; /**< The file system driver for the mount point */
     const char *mount_point;     /**< Mount point, e.g. "/mnt/cdrom" */
     size_t mount_point_len;      /**< Length of mount_point string (set by vfs_mount) */
-    atomic_int open_files;       /**< Number of currently open files */
+    atomic_int open_files;       /**< Number of currently open files and directories */
     void *private_data;          /**< File system driver private data, implementation defined */
 };
 
@@ -889,7 +889,7 @@ int vfs_rename(const char *from_path, const char *to_path);
 /**
  * @brief Unmount a mounted file system
  *
- * This will fail if there are any open files on the mounted file system
+ * This will fail if there are any open files or directories on the mounted file system
  *
  * @param[in]  mountp    pointer to the mount structure of the file system to unmount
  *
