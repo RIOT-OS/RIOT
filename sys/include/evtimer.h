@@ -135,21 +135,6 @@ static inline uint32_t evtimer_now_msec(void)
 #endif
 }
 
-/**
- * @brief   Return the current system time in minutes
- *
- * @deprecated wrongly placed convenience function, that
- *             may not work as expected with ztimer (32 bit)
- */
-static inline uint32_t evtimer_now_min(void)
-{
-#if IS_USED(MODULE_EVTIMER_ON_ZTIMER)
-    return ztimer_now(ZTIMER_MSEC) / (MS_PER_SEC * SEC_PER_MIN);
-#else
-    return xtimer_now_usec64() / (US_PER_SEC * SEC_PER_MIN);
-#endif
-}
-
 #ifdef __cplusplus
 }
 #endif
