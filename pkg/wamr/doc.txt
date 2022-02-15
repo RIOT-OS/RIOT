@@ -50,22 +50,37 @@
  * Most options (e.g. WASI) are not supported in RIOT since they have OS requirements,
  * that are no yet fulfilled.
  *
- * ## Details
+ * ## Usage Details
  *
  * WAMR should be used using the functions provided by the WAMR project their API-headers
- * can be found in `<RIOT>/build/pkg/wamr/core/iwasm/include/`.
- * See the example in `examples/wasm` there are currently no riot specialities provided.
+ * they can be found in `<RIOT>/build/pkg/wamr/core/iwasm/include/`.
+ * pkg/wamr adds no RIOT specific API to that.
  * For simple usages like in the example `iwasm.c` in `examples/wasm` might be useful and
- * if used should be copied in case.
+ * if used should be copied and adapt to the application need.
  *
  * While WebAssembly does not define a set native functions. WAMR provides its own builtin-libc.
  * Other native functions may be provided by registering native_api to WAMR.
  * @see https://github.com/bytecodealliance/wasm-micro-runtime/blob/main/doc/export_native_api.md
+ *
+ * ### Why is there no RIOT specific API?
+ *
+ * many use cases more complex than: take that Bytecode and run its main would require
+ * a application specific usage pattern of the WAMR-API
+ * (memory setup, function search, parameter, module-loading/unloading)
+ * the WAMR-API does this well and they provide a second wasm-c-api compatible API.
+ *
+ * `iwasm.c` might therefore be a good starting point (copy) but it is no good
+ * generic interface to WAMR. Making it good and generic would lead to the API
+ * provided by WAMR.
  *
  * ## Upstream Documentation
  *
  * @see https://github.com/bytecodealliance/wasm-micro-runtime/blob/main/README.md
  * @see https://github.com/bytecodealliance/wasm-micro-runtime/tree/main/doc
  * @see https://github.com/bytecodealliance/wasm-micro-runtime/wiki
+ *
+ * @see https://github.com/WebAssembly/wasm-c-api
+ * Include Headers:
+ * @see https://github.com/bytecodealliance/wasm-micro-runtime/blob/main/core/iwasm/include/
  *
  */
