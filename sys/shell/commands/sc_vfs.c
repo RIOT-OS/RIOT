@@ -34,6 +34,16 @@
 #define SHELL_VFS_BUFSIZE 256
 static uint8_t _shell_vfs_data_buffer[SHELL_VFS_BUFSIZE];
 
+/**
+ * @brief Auto-Mount array
+ */
+XFA_USE_CONST(vfs_mount_t, vfs_mountpoints_xfa);
+
+/**
+ * @brief Number of automatic mountpoints
+ */
+#define MOUNTPOINTS_NUMOF XFA_LEN(vfs_mount_t, vfs_mountpoints_xfa)
+
 static void _ls_usage(char **argv)
 {
     printf("%s <path>\n", argv[0]);
@@ -49,6 +59,9 @@ static void _vfs_usage(char **argv)
     printf("%s mv <src> <dest>\n", argv[0]);
     printf("%s rm <file>\n", argv[0]);
     printf("%s df [path]\n", argv[0]);
+    if (MOUNTPOINTS_NUMOF > 0) {
+        printf("%s mount [path]\n", argv[0]);
+    }
     puts("r: Read [bytes] bytes at [offset] in file <path>");
     puts("w: Write (<a>: append, <o> overwrite) <ascii> or <hex> string <data> in file <path>");
     puts("ls: list files in <path>");
@@ -133,6 +146,19 @@ static int _df_handler(int argc, char **argv)
         }
     }
     return 0;
+}
+
+static int _mount_handler(int argc, char **argv)
+{
+    if (argc < 2) {
+        printf("usage: %s [path]\n", argv[0]);
+        puts("mount pre-configured mount point");
+        return -1;
+    }
+
+    int res = vfs_mount_by_path(argv[1]);
+    puts(strerror(res));
+    return res;
 }
 
 static int _read_handler(int argc, char **argv)
@@ -588,6 +614,9 @@ int _vfs_handler(int argc, char **argv)
     }
     else if (strcmp(argv[1], "df") == 0) {
         return _df_handler(argc - 1, &argv[1]);
+    }
+    else if (MOUNTPOINTS_NUMOF > 0 && strcmp(argv[1], "mount") == 0) {
+        return _mount_handler(argc - 1, &argv[1]);
     }
     else {
         printf("vfs: unsupported sub-command \"%s\"\n", argv[1]);
