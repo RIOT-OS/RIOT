@@ -20,7 +20,9 @@ include $(RIOTMAKE)/tools/kconfiglib.inc.mk
 export KCONFIG_GENERATED_DEPENDENCIES
 
 # This file will contain external module configurations
-export KCONFIG_EXTERNAL_CONFIGS
+export KCONFIG_EXTERNAL_MODULE_CONFIGS
+# This file will contain external package configurations
+export KCONFIG_EXTERNAL_PKG_CONFIGS
 
 # replicate the QUIET logic as in Makefile.include
 QUIET ?= 1
