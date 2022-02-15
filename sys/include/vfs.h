@@ -65,6 +65,7 @@
 #include <sys/stat.h> /* for struct stat */
 #include <sys/types.h> /* for off_t etc. */
 #include <sys/statvfs.h> /* for struct statvfs */
+#include <mutex.h> /* for vfs_mount_mutex */
 
 #include "sched.h"
 #include "clist.h"
@@ -286,6 +287,23 @@ typedef struct vfs_mount_struct vfs_mount_t;
  * @brief   MTD driver for VFS
  */
 extern const vfs_file_ops_t mtd_vfs_ops;
+
+/**
+ * @brief   Mutex around the global mount table
+ *
+ * This mutex is used to ensure orderly access to the list of file systems
+ * currently mounted. File system operations (not only mounting / unmounting
+ * but also access to files) require exclusive access to this, and block until
+ * it is available.
+ *
+ * Consequently, non-VFS users should only need this rarely, and must not hold
+ * it for long -- in particular, any file system operation performed while this
+ * is held may deadlock.
+ *
+ * The only currently known use case is holding this lock while iterating
+ * through @ref vfs_iterate_mounts.
+ */
+extern mutex_t vfs_mount_mutex = MUTEX_INIT;
 
 /**
  * @brief A file system driver
@@ -1001,6 +1019,13 @@ int vfs_normalize_path(char *buf, const char *path, size_t buflen);
  *
  * @attention Not thread safe! Do not mix calls to this function with other
  * calls which modify the mount table, such as vfs_mount() and vfs_umount()
+ *
+ * Thread safe use is possible by keeping @ref vfs_mount_mutex locked. Beware
+ * that while the lock is kept, no file system operations will succeed, so the
+ * lock has to be released (and iteration restarted) if anything is to be
+ * actually done with the entry other than accessing its mount_point or file
+ * system driver. (Both @ref vfs_statvfs nor @ref vfs_opendir would deadlock if
+ * the lock is held).
  *
  * Set @p cur to @c NULL to start from the beginning
  *

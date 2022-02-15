@@ -24,7 +24,6 @@
 #include <unistd.h> /* for STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO */
 
 #include "vfs.h"
-#include "mutex.h"
 #include "thread.h"
 #include "sched.h"
 #include "clist.h"
@@ -140,8 +139,10 @@ static inline int _find_mount(vfs_mount_t **mountpp, const char *name, const cha
  */
 static inline int _fd_is_valid(int fd);
 
-static mutex_t _mount_mutex = MUTEX_INIT;
+mutex_t vfs_mount_mutex = MUTEX_INIT;
 static mutex_t _open_mutex = MUTEX_INIT;
+
+#define _mount_mutex vfs_mount_mutex
 
 int vfs_close(int fd)
 {
