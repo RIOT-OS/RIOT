@@ -22,6 +22,9 @@ if NRF5X_RADIO
 
 choice NRF5X_RADIO_BACKEND
     bool "nrf5x radio backend"
+    default MODULE_NRF802154 if HAS_RADIO_NRF802154
+    default MODULE_NRFBLE if HAS_RADIO_NRFBLE
+    default MODULE_NRFBLE if HAS_RADIO_NRFMIN
 
 config MODULE_NRF802154
     bool "Implementation of the IEEE 802.15.4 for nRF52 radio"
