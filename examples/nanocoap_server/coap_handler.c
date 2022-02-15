@@ -13,6 +13,7 @@
 #include "fmt.h"
 #include "net/nanocoap.h"
 #include "hashes/sha256.h"
+#include "kernel_defines.h"
 
 /* internal value that can be read/written via CoAP */
 static uint8_t internal_value = 0;

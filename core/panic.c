@@ -21,10 +21,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#include <string.h>
-#include <stdio.h>
-
-#include "assert.h"
 #include "kernel_defines.h"
 #include "cpu.h"
 #include "irq.h"
@@ -42,8 +38,6 @@
 #if defined(DEVELHELP) && defined(MODULE_USB_BOARD_RESET)
 #include "usb_board_reset.h"
 #endif
-
-const char assert_crash_message[] = "FAILED ASSERTION.";
 
 /* flag preventing "recursive crash printing loop" */
 static int crashed = 0;

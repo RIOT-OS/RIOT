@@ -22,8 +22,6 @@
 #ifndef ASSERT_H
 #define ASSERT_H
 
-#include "panic.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -51,9 +49,21 @@ extern "C" {
 #endif
 
 /**
- * @brief   the string that is passed to panic in case of a failing assertion
+ * @def __NORETURN
+ * @brief hidden (__) NORETURN definition
+ * @internal
+ *
+ * Duplicating the definitions of kernel_defines.h as these are unsuitable for
+ * system header files like the assert.h.
+ * kernel_defines.h would define symbols that are not reserved.
  */
-extern const char assert_crash_message[];
+#ifndef __NORETURN
+#ifdef __GNUC__
+#define __NORETURN __attribute__((noreturn))
+#else /*__GNUC__*/
+#define __NORETURN
+#endif /*__GNUC__*/
+#endif /*__NORETURN*/
 
 #ifdef NDEBUG
 #define assert(ignore)((void)0)
@@ -68,8 +78,7 @@ extern const char assert_crash_message[];
  * @param[in] file  The file name of the file the assertion failed in
  * @param[in] line  The code line of @p file the assertion failed in
  */
-NORETURN void _assert_failure(const char *file, unsigned line);
-
+__NORETURN void _assert_failure(const char *file, unsigned line);
 /**
  * @brief    abort the program if assertion is false
  *
@@ -103,10 +112,10 @@ NORETURN void _assert_failure(const char *file, unsigned line);
  */
 #define assert(cond) ((cond) ? (void)0 :  _assert_failure(RIOT_FILE_RELATIVE, \
                                                           __LINE__))
-#else
-#define assert(cond) ((cond) ? (void)0 : core_panic(PANIC_ASSERT_FAIL, \
-                                                    assert_crash_message))
-#endif
+#else /* DEBUG_ASSERT_VERBOSE */
+__NORETURN void _assert_panic(void);
+#define assert(cond) ((cond) ? (void)0 : _assert_panic())
+#endif /* DEBUG_ASSERT_VERBOSE */
 
 #if !defined __cplusplus
 #if __STDC_VERSION__ >= 201112L
