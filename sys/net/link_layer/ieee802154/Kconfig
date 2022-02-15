@@ -6,7 +6,7 @@
 
 menuconfig IEEE802154
     bool
-    prompt "Enable IEEE 802.15.4 support" !(HAVE_IEEE802154_RADIO && MODULE_NETDEV_DEFAULT)
+    prompt "Enable IEEE 802.15.4 support" if !(HAVE_IEEE802154_RADIO && MODULE_NETDEV_DEFAULT)
     default y if HAVE_IEEE802154_RADIO && MODULE_NETDEV_DEFAULT
     depends on TEST_KCONFIG
 
