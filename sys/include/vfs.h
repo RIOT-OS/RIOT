@@ -1008,6 +1008,35 @@ int vfs_normalize_path(char *buf, const char *path, size_t buflen);
 const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur);
 
 /**
+ * @brief Iterate through all mounted file systems by their root directories
+ *
+ * Unlike @ref vfs_iterate_mounts, this is thread safe, and allows thread safe
+ * access to the mount point's stats through @ref vfs_dstatvfs. If mounts or
+ * unmounts happen while iterating, this is guaranteed to report all file
+ * systems that stayed mounted, and may report any that are transiently
+ * mounted. Note that the volume being reported can not be unmounted as @p dir
+ * is an open directory.
+ *
+ * Zero-initialize @p dir to start. As long as @c true is returned, @p dir is a
+ * valid directory on which the user can call @ref vfs_readdir or @ref
+ * vfs_dstatvfs (or even peek at its `.mp` if they dare ignore the warning in
+ * @ref vfs_DIR).
+ *
+ * Users MUST NOT call @ref vfs_closedir if they intend to keep iterating, but
+ * MUST call it when aborting iteration.
+ *
+ * Note that this requires all enumerated file systems to support the `opendir`
+ * @ref vfs_dir_ops; any file system that does not support that will
+ * prematurely terminate the mount point enumeration.
+ *
+ * @param[inout]  dir     The root directory of the discovered mount point
+ *
+ * @return     @c true if another file system is mounted; @p dir then contains an open directory.
+ * @return     @c false if the file system list is exhausted; @p dir is uninitialized then.
+ */
+bool vfs_iterate_mount_dirs(vfs_DIR *dir);
+
+/**
  * @brief   Get information about the file for internal purposes
  *
  * @attention   Not thread safe! Do not modify any of the fields in the returned

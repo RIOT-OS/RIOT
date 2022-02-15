@@ -522,7 +522,7 @@ int vfs_mount(vfs_mount_t *mountp)
             }
         }
     }
-    /* insert last in list */
+    /* Insert last in list. This property is relied on by vfs_iterate_mount_dirs. */
     clist_rpush(&_vfs_mounts_list, &mountp->list_entry);
     mutex_unlock(&_mount_mutex);
     DEBUG("vfs_mount: mount done\n");
@@ -905,6 +905,51 @@ const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur)
         }
     }
     return container_of(node, vfs_mount_t, list_entry);
+}
+
+/* General implementation note: This heavily relies on the produced opened dir
+ * to lock keep the underlying mount point from closing. */
+bool vfs_iterate_mount_dirs(vfs_DIR *dir)
+{
+    /* This is NULL after the prescribed initialization, or a valid (and
+     * locked) mount point otherwise */
+    vfs_mount_t *last_mp = dir->mp;
+
+    /* This is technically violating vfs_iterate_mounts' API, as that says no
+     * mounts or unmounts on the chain while iterating. However, as we know
+     * that the current dir's mount point is still on, the equivalent procedure
+     * of starting a new round of `vfs_iterate_mounts` from NULL and calling it
+     * until it produces `last_mp` (all while holding _mount_mutex) would leave
+     * us with the very same situation as if we started iteration with last_mp.
+     *
+     * On the cast discarding const: vfs_iterate_mounts's type is more for
+     * public use */
+    vfs_mount_t *next = (vfs_mount_t *)vfs_iterate_mounts(last_mp);
+    if (next == NULL) {
+        /* Ignoring errors, can't help with them */
+        vfs_closedir(dir);
+        return false;
+    }
+
+    /* Even if we held the mutex up to here (see above comment on the fiction
+     * of acquiring it, iterating to where we are, and releasing it again),
+     * we'd need to let go of it now to actually open the directory. This
+     * temporary count ensures that the file system will stick around for the
+     * directory open step that follows immediately */
+    atomic_fetch_add(&next->open_files, 1);
+
+    /* Ignoring errors, can't help with them */
+    vfs_closedir(dir);
+
+    int err = vfs_opendir(dir, next->mount_point);
+    /* No matter the success, the open_files lock has done its duty */
+    atomic_fetch_sub(&next->open_files, 1);
+
+    if (err != 0) {
+        DEBUG("vfs_iterate_mount opendir erred: vfs_opendir(\"%s\") = %d\n", next->mount_point, err);
+        return false;
+    }
+    return true;
 }
 
 const vfs_file_t *vfs_file_get(int fd)
