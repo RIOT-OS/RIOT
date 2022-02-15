@@ -43,8 +43,8 @@ config HAVE_IEEE802154_RADIO_HAL
         At least one device provides an IEEE 802.15.4 Radio HAL implementation
 
 config HAVE_NETDEV_IEEE802154
-    select HAVE_IEEE802154_RADIO
     bool
+    select HAVE_IEEE802154_RADIO
     help
         At least one device provides an IEEE 802.15.4 Netdev driver
         implementation
