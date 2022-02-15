@@ -1014,8 +1014,8 @@ const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur);
  * access to the mount point's stats through @ref vfs_dstatvfs. If mounts or
  * unmounts happen while iterating, this is guaranteed to report all file
  * systems that stayed mounted, and may report any that are transiently
- * mounted. Note that the volume being reported can not be unmounted as @p dir
- * is an open directory.
+ * mounted for up to as often as they are (re)mounted. Note that the volume
+ * being reported can not be unmounted as @p dir is an open directory.
  *
  * Zero-initialize @p dir to start. As long as @c true is returned, @p dir is a
  * valid directory on which the user can call @ref vfs_readdir or @ref
