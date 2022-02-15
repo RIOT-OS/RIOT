@@ -50,10 +50,13 @@ extern "C" {
 
 /**
  * @def __NORETURN
+ * @brief hidden (__) NORETURN definition
  * @internal
+ *
  * Duplicating the definitions of kernel_defines.h as these are unsuitable for
  * system header files like the assert.h.
- * kernel_defines.h would define symbols that are not reserved. */
+ * kernel_defines.h would define symbols that are not reserved.
+ */
 #ifndef __NORETURN
 #ifdef __GNUC__
 #define __NORETURN __attribute__((noreturn))
