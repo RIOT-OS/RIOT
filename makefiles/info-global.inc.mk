@@ -64,7 +64,7 @@ define board_unsatisfied_features
     BOARDS_WITH_MISSING_FEATURES += $$(BOARD)
   else
     # add default modules
-    include $(RIOTMAKE)/defaultmodules.inc.mk
+    include $(RIOTMAKE)/defaultmodules_regular.inc.mk
     USEMODULE += $$(filter-out $$(DISABLE_MODULE),$$(DEFAULT_MODULE))
 
     include $(RIOTMAKE)/dependency_resolution.inc.mk
