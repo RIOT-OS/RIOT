@@ -223,6 +223,20 @@ int vfs_fstatvfs(int fd, struct statvfs *buf)
     return filp->mp->fs->fs_op->statvfs(filp->mp, "/", buf);
 }
 
+int vfs_dstatvfs(vfs_DIR *dirp, struct statvfs *buf)
+{
+    DEBUG("vfs_dstatvfs: %p, %p\n", (void*)dirp, (void *)buf);
+    if (buf == NULL) {
+        return -EFAULT;
+    }
+    memset(buf, 0, sizeof(*buf));
+    if (dirp->mp->fs->fs_op->statvfs == NULL) {
+        /* file system driver does not implement statvfs() */
+        return -EINVAL;
+    }
+    return dirp->mp->fs->fs_op->statvfs(dirp->mp, "/", buf);
+}
+
 off_t vfs_lseek(int fd, off_t off, int whence)
 {
     DEBUG("vfs_lseek: %d, %ld, %d\n", fd, (long)off, whence);

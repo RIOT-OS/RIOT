@@ -716,6 +716,17 @@ int vfs_fstat(int fd, struct stat *buf);
 int vfs_fstatvfs(int fd, struct statvfs *buf);
 
 /**
+ * @brief Get file system status of the file system containing an open directory
+ *
+ * @param[in]  dirp     pointer to open directory
+ * @param[out] buf      pointer to statvfs struct to fill
+ *
+ * @return 0 on success
+ * @return <0 on error
+ */
+int vfs_dstatvfs(vfs_DIR *dirp, struct statvfs *buf);
+
+/**
  * @brief Seek to position in file
  *
  * @p whence determines the function of the seek and should be set to one of
