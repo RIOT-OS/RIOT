@@ -216,15 +216,11 @@ int vfs_fstatvfs(int fd, struct statvfs *buf)
     }
     vfs_file_t *filp = &_vfs_open_files[fd];
     memset(buf, 0, sizeof(*buf));
-    if (filp->mp->fs->fs_op->fstatvfs == NULL) {
-        /* file system driver does not implement fstatvfs() */
-        if (filp->mp->fs->fs_op->statvfs != NULL) {
-            /* Fall back to statvfs */
-            return filp->mp->fs->fs_op->statvfs(filp->mp, "/", buf);
-        }
+    if (filp->mp->fs->fs_op->statvfs == NULL) {
+        /* file system driver does not implement statvfs() */
         return -EINVAL;
     }
-    return filp->mp->fs->fs_op->fstatvfs(filp->mp, filp, buf);
+    return filp->mp->fs->fs_op->statvfs(filp->mp, "/", buf);
 }
 
 off_t vfs_lseek(int fd, off_t off, int whence)

@@ -660,23 +660,6 @@ struct vfs_file_system_ops {
      * @return <0 on error
      */
     int (*statvfs) (vfs_mount_t *mountp, const char *restrict path, struct statvfs *restrict buf);
-
-    /**
-     * @brief Get file system status of an open file
-     *
-     * @p path is only passed for consistency against the POSIX statvfs function.
-     * @c vfs_statvfs calls this function only when it has determined that
-     * @p path belongs to this file system. @p path is a file system relative
-     * path and does not necessarily name an existing file.
-     *
-     * @param[in]  mountp  file system mount to operate on
-     * @param[in]  filp    pointer to an open file on the file system being queried
-     * @param[out] buf     pointer to statvfs struct to fill
-     *
-     * @return 0 on success
-     * @return <0 on error
-     */
-    int (*fstatvfs) (vfs_mount_t *mountp, vfs_file_t *filp, struct statvfs *buf);
 };
 
 /**
