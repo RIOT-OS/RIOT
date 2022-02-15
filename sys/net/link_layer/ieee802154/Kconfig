@@ -4,12 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-menuconfig FEATURE_IEEE802154
-    bool "Enable IEEE 802.15.4 support"
-    depends on TEST_KCONFIG
+menuconfig IEEE802154
+    bool
+    prompt "Enable IEEE 802.15.4 support" !(HAVE_IEEE802154_RADIO && MODULE_NETDEV_DEFAULT)
     default y if HAVE_IEEE802154_RADIO && MODULE_NETDEV_DEFAULT
+    depends on TEST_KCONFIG
 
-if FEATURE_IEEE802154
+if IEEE802154
 
 config MODULE_IEEE802154
     bool "IEEE 802.15.4 helpers"
@@ -20,7 +21,6 @@ config MODULE_IEEE802154_SECURITY
     bool "IEEE 802.15.4 security"
     select MODULE_CRYPTO
     select MODULE_CIPHER_MODES
-    depends on TEST_KCONFIG
     depends on FEATURE_IEEE802154
     help
         IEEE 802.15.4 security interface
@@ -30,7 +30,6 @@ config MODULE_IEEE802154_SUBMAC
     select MODULE_XTIMER
     select MODULE_RANDOM
     depends on FEATURE_IEEE802154
-    depends on TEST_KCONFIG
     help
         This module defines a common layer for handling the lower part of the
         IEEE 802.15.4 MAC layer.
