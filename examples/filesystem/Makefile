@@ -36,6 +36,7 @@ USEMODULE += vfs
 USEMODULE += littlefs2
 # USEMODULE += spiffs
 # USEMODULE += fatfs_vfs
+# USEMODULE += fatfs_vfs_format
 USEMODULE += constfs
 # USEMODULE += devfs
 
