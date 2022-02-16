@@ -41,6 +41,28 @@ extern "C" {
 /** 0:mount on first file access, 1 mount in f_mount() call */
 #define FATFS_MOUNT_OPT       (1)
 
+/** FAT filesystem type that a file system should be formatted in by vfs_format() */
+#ifndef CONFIG_FATFS_FORMAT_TYPE
+#if FF_FS_EXFAT
+#define CONFIG_FATFS_FORMAT_TYPE    FM_EXFAT
+#else
+#define CONFIG_FATFS_FORMAT_TYPE    FM_ANY
+#endif
+#endif
+
+/**
+ * @brief Statically allocate work buffer for format operation
+ *
+ * This will statically allocate 512 bytes as the work buffer for
+ * the format operation.
+ *
+ * If this is set to 0, dynamic allocation (malloc) will be used
+ * instead and format will fail if not enough memory is available.
+ */
+#ifndef CONFIG_FATFS_FORMAT_ALLOC_STATIC
+#define CONFIG_FATFS_FORMAT_ALLOC_STATIC    0
+#endif
+
 /**
  * @brief Size of path buffer for absolute paths
  *

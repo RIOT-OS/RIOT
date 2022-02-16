@@ -4,6 +4,9 @@ USEMODULE += fatfs_vfs
 FEATURES_OPTIONAL += periph_rtc
 FEATURES_REQUIRED += periph_spi
 
+# remove this if you don't want to format your SD card
+USEMODULE += fatfs_vfs_format
+
 FATFS_IMAGE_FILE_SIZE_MIB ?= 128
 
 ifeq ($(BOARD),native)
