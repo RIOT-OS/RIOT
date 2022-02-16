@@ -14,6 +14,42 @@
  *
  * Generic memory technology device interface
  *
+ * Unlike the @ref drivers_periph_flashpage, this is device driver based (i.e.
+ * all functions take a @ref mtd_dev_t as a first argument), so that SPI based
+ * EEPROMs (e.g. @ref drivers_mtd_at25xxx "AT25xxx") can be accessed the same
+ * way as @ref drivers_mtd_flashpage "internal flash" or @ref
+ * drivers_mtd_sdcard "SD cards"), all inside the same application.
+ *
+ * MTD devices expose a block based erase and write interface. In that, they
+ * are the distinct from block devices (like hard disks) on which individual
+ * bytes can be overridden. The [Linux MTD FAQ](http://www.linux-mtd.infradead.org/faq/general.html)
+ * has a convenient comparison (beware though of terminology differences
+ * outlined below). They can be erased (with some granularity, often wearing
+ * out the erased area a bit), and erased areas can be written to (sometimes
+ * multiple times).
+ *
+ * MTD devices are described in terms of sectors, pages and feature flags:
+ *
+ * * A **sector** is the device's erase unit. Calls to @ref mtd_erase need to
+ *   work in alignment with this number (commonly somewhere around 1kiB).
+ *
+ *   (Note that this corresponse to the term "page" as used in the flashpage
+ *   API, and the term "eraseblock" in Linux's MTD).
+ *
+ * * A **page** is the largest a device can write in one transfer.
+ *
+ *   Applications rarely need to deal with this; it offers no guarantees on
+ *   atomicity, but writing within a page is generally faster than across page
+ *   boundaries.
+ *
+ *   Pages are a subdivision of sectors.
+ *
+ * * The device's **flags** indicate features, eg. whether a memory location
+ *   can be overwritten without erasing it first.
+ *
+ * Note that some properties of the backend are currently not advertised to the
+ * user (see the documentation of @ref mtd_write).
+ *
  * @file
  *
  * @author      Aurelien Gonce <aurelien.gonce@altran.com>
@@ -51,6 +87,9 @@ typedef struct mtd_desc mtd_desc_t;
 
 /**
  * @brief   MTD device descriptor
+ *
+ * See the @ref drivers_mtd "module level documentation" for details on the
+ * field semantics.
  */
 typedef struct {
     const mtd_desc_t *driver;  /**< MTD driver */
@@ -58,12 +97,18 @@ typedef struct {
     uint32_t pages_per_sector; /**< Number of pages by sector in the MTD */
     uint32_t page_size;        /**< Size of the pages in the MTD */
 #if defined(MODULE_MTD_WRITE_PAGE) || DOXYGEN
-    void *work_area;           /**< sector-sized buffer */
+    void *work_area;           /**< sector-sized buffer (only present when @ref mtd_write_page is enabled) */
 #endif
 } mtd_dev_t;
 
 /**
  * @brief   MTD driver can write any data to the storage without erasing it first.
+ *
+ * If this is set, a write completely overrides the previous values.
+ *
+ * Its absence makes no statement on whether or not writes to memory areas that
+ * have been written to previously are allowed, and if so, whether previously
+ * written bits should be written again or not written.
  */
 #define MTD_DRIVER_FLAG_DIRECT_WRITE    (1 << 0)
 
