@@ -205,6 +205,7 @@ SECTIONS
     *(COMMON)
     . = ALIGN(4);
   } >ram AT>ram :ram
+  PROVIDE( __bss_end = . );
 
   .noinit (NOLOAD) :
   {

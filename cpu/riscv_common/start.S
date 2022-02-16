@@ -41,9 +41,10 @@ _start_real:
     bltu a1, a2, 1b
 2:
 
+
     /* Clear bss section */
     la a0, __bss_start
-    la a1, _end
+    la a1, __bss_end
     bgeu a0, a1, 2f
 1:
     sw zero, (a0)
