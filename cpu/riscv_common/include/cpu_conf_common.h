@@ -38,6 +38,11 @@
 /** @} */
 
 /**
+ * @brief   Attribute for memory sections required by SRAM PUF
+ */
+#define PUF_SRAM_ATTRIBUTES __attribute__((used, section(".noinit")))
+
+/**
  * @brief   Declare the heap_stats function as available
  */
 #define HAVE_HEAP_STATS

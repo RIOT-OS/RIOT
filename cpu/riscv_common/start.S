@@ -27,6 +27,10 @@ _start_real:
 .option pop
     la sp, _sp
 
+#ifdef MODULE_PUF_SRAM
+    /* PUF */
+    call riscv_puf_sram_init
+#endif
 
     /* Load data section */
     la a0, _data_lma
