@@ -206,6 +206,16 @@ SECTIONS
     . = ALIGN(4);
   } >ram AT>ram :ram
 
+  .noinit (NOLOAD) :
+  {
+      __noinit_begin__ = .;
+
+      *(.noinit .noinit.*)
+
+        . = ALIGN(4) ;
+      __noinit_end__ = .;
+  } >ram AT>ram :ram
+
   . = ALIGN(8);
   PROVIDE( _end = . );
   PROVIDE( end = . );
