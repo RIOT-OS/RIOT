@@ -470,7 +470,7 @@ void errx(int eval, const char *fmt, ...)
 
 int getpid(void)
 {
-    warnx("not implemented");
+    warnx("getpid(): not implemented");
     return -1;
 }
 
