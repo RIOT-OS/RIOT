@@ -998,6 +998,9 @@ int vfs_normalize_path(char *buf, const char *path, size_t buflen);
  *
  * Set @p cur to @c NULL to start from the beginning
  *
+ * @deprecated This will become an internal-only function after the 2022.04
+ *   release, use @ref vfs_iterate_mount_dirs instead.
+ *
  * @param[in]  cur  current iterator value
  *
  * @return     Pointer to next mounted file system in list after @p cur
