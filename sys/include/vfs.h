@@ -998,8 +998,6 @@ int vfs_normalize_path(char *buf, const char *path, size_t buflen);
  *
  * Set @p cur to @c NULL to start from the beginning
  *
- * @see @c sc_vfs.c (@c df command) for a usage example
- *
  * @param[in]  cur  current iterator value
  *
  * @return     Pointer to next mounted file system in list after @p cur
@@ -1028,6 +1026,8 @@ const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur);
  * Note that this requires all enumerated file systems to support the `opendir`
  * @ref vfs_dir_ops; any file system that does not support that will
  * prematurely terminate the mount point enumeration.
+ *
+ * @see @c sc_vfs.c (@c df command) for a usage example
  *
  * @param[inout]  dir     The root directory of the discovered mount point
  *

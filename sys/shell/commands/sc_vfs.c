@@ -102,11 +102,11 @@ static int _errno_string(int err, char *buf, size_t buflen)
 }
 #undef _case_snprintf_errno_name
 
-static void _print_df(const char *path)
+static void _print_df(vfs_DIR *dir)
 {
     struct statvfs buf;
-    int res = vfs_statvfs(path, &buf);
-    printf("%-16s ", path);
+    int res = vfs_dstatvfs(dir, &buf);
+    printf("%-16s ", dir->mp->mount_point);
     if (res < 0) {
         char err[16];
         _errno_string(res, err, sizeof(err));
@@ -123,13 +123,24 @@ static int _df_handler(int argc, char **argv)
     puts("Mountpoint              Total         Used    Available     Capacity");
     if (argc > 1) {
         const char *path = argv[1];
-        _print_df(path);
+        /* Opening a directory just to statfs is somewhat odd, but it is the
+         * easiest to support with a single _print_df function */
+        vfs_DIR dir;
+        int res = vfs_opendir(&dir, path);
+        if (res == 0) {
+            _print_df(&dir);
+            vfs_closedir(&dir);
+        } else {
+            char err[16];
+            _errno_string(res, err, sizeof(err));
+            printf("Failed to open `%s`: %s\n", path, err);
+        }
     }
     else {
         /* Iterate through all mount points */
-        const vfs_mount_t *it = NULL;
-        while ((it = vfs_iterate_mounts(it)) != NULL) {
-            _print_df(it->mount_point);
+        vfs_DIR it = { 0 };
+        while (vfs_iterate_mount_dirs(&it)) {
+            _print_df(&it);
         }
     }
     return 0;
