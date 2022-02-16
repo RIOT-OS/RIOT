@@ -872,6 +872,21 @@ int vfs_format(vfs_mount_t *mountp);
 int vfs_mount(vfs_mount_t *mountp);
 
 /**
+ * @brief Mount a file system with a pre-configured mount path
+ *
+ * @note This assumes mount points have been configured with @ref VFS_AUTO_MOUNT.
+ *
+ * @warning If the @ref pseudomodule_vfs_auto_format is used a format attempt will
+ * be made if the mount fails.
+ *
+ * @param[in]  path     Path of the pre-configured mount point
+ *
+ * @return 0 on success
+ * @return <0 on error
+ */
+int vfs_mount_by_path(const char *path);
+
+/**
  * @brief Rename a file
  *
  * The file @p from_path will be renamed to @p to_path
