@@ -113,4 +113,6 @@ class KeaServer(base.DHCPv6Server):
                 # workaround: Arch does not create that directory on first
                 # install
                 os.makedirs("/var/run/kea/")
+        # workaround: Ubuntu does not create that directory automatically
+        os.makedirs("/run/kea/", exist_ok=True)
         super().run()
