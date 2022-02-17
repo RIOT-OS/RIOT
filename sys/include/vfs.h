@@ -304,7 +304,7 @@ struct vfs_mount_struct {
     const vfs_file_system_t *fs; /**< The file system driver for the mount point */
     const char *mount_point;     /**< Mount point, e.g. "/mnt/cdrom" */
     size_t mount_point_len;      /**< Length of mount_point string (set by vfs_mount) */
-    atomic_int open_files;       /**< Number of currently open files */
+    atomic_int open_files;       /**< Number of currently open files and directories */
     void *private_data;          /**< File system driver private data, implementation defined */
 };
 
@@ -660,23 +660,6 @@ struct vfs_file_system_ops {
      * @return <0 on error
      */
     int (*statvfs) (vfs_mount_t *mountp, const char *restrict path, struct statvfs *restrict buf);
-
-    /**
-     * @brief Get file system status of an open file
-     *
-     * @p path is only passed for consistency against the POSIX statvfs function.
-     * @c vfs_statvfs calls this function only when it has determined that
-     * @p path belongs to this file system. @p path is a file system relative
-     * path and does not necessarily name an existing file.
-     *
-     * @param[in]  mountp  file system mount to operate on
-     * @param[in]  filp    pointer to an open file on the file system being queried
-     * @param[out] buf     pointer to statvfs struct to fill
-     *
-     * @return 0 on success
-     * @return <0 on error
-     */
-    int (*fstatvfs) (vfs_mount_t *mountp, vfs_file_t *filp, struct statvfs *buf);
 };
 
 /**
@@ -731,6 +714,17 @@ int vfs_fstat(int fd, struct stat *buf);
  * @return <0 on error
  */
 int vfs_fstatvfs(int fd, struct statvfs *buf);
+
+/**
+ * @brief Get file system status of the file system containing an open directory
+ *
+ * @param[in]  dirp     pointer to open directory
+ * @param[out] buf      pointer to statvfs struct to fill
+ *
+ * @return 0 on success
+ * @return <0 on error
+ */
+int vfs_dstatvfs(vfs_DIR *dirp, struct statvfs *buf);
 
 /**
  * @brief Seek to position in file
@@ -904,7 +898,7 @@ int vfs_rename(const char *from_path, const char *to_path);
 /**
  * @brief Unmount a mounted file system
  *
- * This will fail if there are any open files on the mounted file system
+ * This will fail if there are any open files or directories on the mounted file system
  *
  * @param[in]  mountp    pointer to the mount structure of the file system to unmount
  *
@@ -1019,7 +1013,8 @@ int vfs_normalize_path(char *buf, const char *path, size_t buflen);
  *
  * Set @p cur to @c NULL to start from the beginning
  *
- * @see @c sc_vfs.c (@c df command) for a usage example
+ * @deprecated This will become an internal-only function after the 2022.04
+ *   release, use @ref vfs_iterate_mount_dirs instead.
  *
  * @param[in]  cur  current iterator value
  *
@@ -1027,6 +1022,37 @@ int vfs_normalize_path(char *buf, const char *path, size_t buflen);
  * @return     NULL if @p cur is the last element in the list
  */
 const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur);
+
+/**
+ * @brief Iterate through all mounted file systems by their root directories
+ *
+ * Unlike @ref vfs_iterate_mounts, this is thread safe, and allows thread safe
+ * access to the mount point's stats through @ref vfs_dstatvfs. If mounts or
+ * unmounts happen while iterating, this is guaranteed to report all file
+ * systems that stayed mounted, and may report any that are transiently
+ * mounted for up to as often as they are (re)mounted. Note that the volume
+ * being reported can not be unmounted as @p dir is an open directory.
+ *
+ * Zero-initialize @p dir to start. As long as @c true is returned, @p dir is a
+ * valid directory on which the user can call @ref vfs_readdir or @ref
+ * vfs_dstatvfs (or even peek at its `.mp` if they dare ignore the warning in
+ * @ref vfs_DIR).
+ *
+ * Users MUST NOT call @ref vfs_closedir if they intend to keep iterating, but
+ * MUST call it when aborting iteration.
+ *
+ * Note that this requires all enumerated file systems to support the `opendir`
+ * @ref vfs_dir_ops; any file system that does not support that will
+ * prematurely terminate the mount point enumeration.
+ *
+ * @see @c sc_vfs.c (@c df command) for a usage example
+ *
+ * @param[inout]  dir     The root directory of the discovered mount point
+ *
+ * @return     @c true if another file system is mounted; @p dir then contains an open directory.
+ * @return     @c false if the file system list is exhausted; @p dir is uninitialized then.
+ */
+bool vfs_iterate_mount_dirs(vfs_DIR *dir);
 
 /**
  * @brief   Get information about the file for internal purposes
