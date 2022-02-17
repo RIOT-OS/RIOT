@@ -426,8 +426,8 @@ uint32_t ztimer_until(ztimer_clock_t *clock, ztimer_t *timer)
     if (i == timer_base) {
         sum += i->offset;
         irq_restore(state);
-        uint32_t now = (uint32_t)ztimer_now(clock);
-        return (sum > now) ? (sum - now) : 0;
+        uint32_t elapsed = (uint32_t)ztimer_now(clock) - clock->list.offset;
+        return (sum > elapsed) ? (sum - elapsed) : 0;
     }
     else {
         irq_restore(state);
