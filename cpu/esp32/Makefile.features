@@ -7,6 +7,7 @@ include $(RIOTCPU)/esp_common/Makefile.features
 FEATURES_PROVIDED += arch_esp32
 FEATURES_PROVIDED += esp_wifi_enterprise
 FEATURES_PROVIDED += periph_adc_ctrl
+FEATURES_PROVIDED += puf_sram
 
 ifneq (,$(filter esp32-wrover%,$(CPU_MODEL)))
   FEATURES_PROVIDED += esp_spi_ram
