@@ -21,13 +21,17 @@ ifneq (,$(filter vfs_default,$(USEMODULE)))
 endif
 
 ifneq (,$(filter disp_dev,$(USEMODULE)))
-  USEPKG += lv_drivers
-  USEMODULE += lv_drivers_display_monitor
+  ifneq (,$(filter lvgl,$(USEPKG)))
+    USEPKG += lv_drivers
+    USEMODULE += lv_drivers_display_monitor
+  endif
 endif
 
 ifneq (,$(filter touch_dev,$(USEMODULE)))
-  USEPKG += lv_drivers
-  USEMODULE += lv_drivers_indev_mouse
+  ifneq (,$(filter lvgl,$(USEPKG)))
+    USEPKG += lv_drivers
+    USEMODULE += lv_drivers_indev_mouse
+  endif
 endif
 
 USEMODULE += native_drivers
