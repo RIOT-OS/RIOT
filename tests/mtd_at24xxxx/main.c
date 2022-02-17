@@ -16,16 +16,16 @@
 
 #include "embUnit.h"
 
-#include "mtd_at24cxxx.h"
-#include "at24cxxx_params.h"
+#include "mtd_at24xxxx.h"
+#include "at24xxxx_params.h"
 
 #define MTD_DEV             (&(_mtd.base))
 #define TEST_ADDRESS        (uint16_t)((MTD_DEV->sector_count - 1) * \
                             MTD_DEV->page_size)
 
-static at24cxxx_t _at24cxxx;
-static mtd_at24cxxx_t _mtd = MTD_AT24CXXX_INIT(&_at24cxxx,
-                                               &at24cxxx_params[0]);
+static at24xxxx_t _at24xxxx;
+static mtd_at24xxxx_t _mtd = MTD_AT24XXXX_INIT(&_at24xxxx,
+                                               &at24xxxx_params[0]);
 
 static void setup(void)
 {
@@ -56,7 +56,7 @@ static void test_mtd_erase(void)
 static void test_mtd_write_erase(void)
 {
     uint8_t buf_empty[] = {0, 0, 0};
-    const char buf[] = "MTD_AT24CXXX_TEST_WRITE_ERASE";
+    const char buf[] = "MTD_AT24XXXX_TEST_WRITE_ERASE";
 
     char buf_read[sizeof(buf) + sizeof(buf_empty)];
     memset(buf_read, 0, sizeof(buf_read));
@@ -78,7 +78,7 @@ static void test_mtd_write_erase(void)
 static void test_mtd_write_read(void)
 {
     uint8_t buf_empty[] = {0, 0, 0};
-    const char buf[] = "MTD_AT24CXXX_TEST_WRITE_READ";
+    const char buf[] = "MTD_AT24XXXX_TEST_WRITE_READ";
 
     char buf_read[sizeof(buf) + sizeof(buf_empty)];
     memset(buf_read, 0, sizeof(buf_read));
@@ -98,7 +98,7 @@ static void test_mtd_write_read(void)
     TEST_ASSERT_EQUAL_INT(0, ret);
 }
 
-Test *tests_mtd_at24cxxx_tests(void)
+Test *tests_mtd_at24xxxx_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_mtd_init),
@@ -107,15 +107,15 @@ Test *tests_mtd_at24cxxx_tests(void)
         new_TestFixture(test_mtd_write_read),
     };
 
-    EMB_UNIT_TESTCALLER(mtd_at24cxxx_tests, setup, teardown, fixtures);
+    EMB_UNIT_TESTCALLER(mtd_at24xxxx_tests, setup, teardown, fixtures);
 
-    return (Test *)&mtd_at24cxxx_tests;
+    return (Test *)&mtd_at24xxxx_tests;
 }
 
 int main(void)
 {
     TESTS_START();
-    TESTS_RUN(tests_mtd_at24cxxx_tests());
+    TESTS_RUN(tests_mtd_at24xxxx_tests());
     TESTS_END();
     return 0;
 }

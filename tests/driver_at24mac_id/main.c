@@ -19,16 +19,16 @@
  */
 
 #include <stdio.h>
-#include "at24mac.h"
+#include "at24mac_id.h"
 
 static int test_get_eui48(void)
 {
-    if (at24mac_get_type(0) != AT24MAC4XX) {
+    if (at24mac_id_get_type(0) != AT24MAC4XX) {
         return 0;
     }
 
     eui48_t e48;
-    if (at24mac_get_eui48(0, &e48) != 0) {
+    if (at24mac_id_get_eui48(0, &e48) != 0) {
         puts("[FAILED]");
         return 1;
     }
@@ -44,12 +44,12 @@ static int test_get_eui48(void)
 
 static int test_get_eui64(void)
 {
-    if (at24mac_get_type(0) != AT24MAC6XX) {
+    if (at24mac_id_get_type(0) != AT24MAC6XX) {
         return 0;
     }
 
     eui64_t e64;
-    if (at24mac_get_eui64(0, &e64) != 0) {
+    if (at24mac_id_get_eui64(0, &e64) != 0) {
         puts("[FAILED]");
         return 1;
     }
@@ -66,7 +66,7 @@ static int test_get_eui64(void)
 static int test_get_id128(void)
 {
     uint8_t id[AT24MAC_ID_LEN];
-    if (at24mac_get_id128(0, &id) != 0) {
+    if (at24mac_id_get_id128(0, &id) != 0) {
         puts("[FAILED]");
         return 1;
     }

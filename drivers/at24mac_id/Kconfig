@@ -5,18 +5,10 @@
 # directory for more details.
 #
 
-comment "AT24MAC unique ID chip enabled as default EUI-48/64 provider"
-    depends on MODULE_EUI_PROVIDER && HAVE_AT24MAC && MODULE_AT24MAC
-
-config MODULE_AT24MAC
+config MODULE_AT24MAC_ID
     bool
-    prompt "AT24MAC unique ID chip" if !((MODULE_EUI_PROVIDER || MODULE_MTD) && HAVE_AT24MAC)
-    default ((MODULE_EUI_PROVIDER || MODULE_MTD) && HAVE_AT24MAC)
-    select MODULE_AT24CXXX
+    prompt "AT24MAC unique ID chip" if !(MODULE_EUI_PROVIDER && HAVE_AT24MAC)
+    default (MODULE_EUI_PROVIDER && HAVE_AT24MAC)
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
-
-config HAVE_AT24MAC
-    bool
-    help
-       Indicates that an AT24MAC unique ID chip is present.
+    select MODULE_PERIPH_I2C

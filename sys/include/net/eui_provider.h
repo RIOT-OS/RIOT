@@ -17,7 +17,7 @@
  * An EUI provider provides an Extended Unique Identifier, that is
  * a hardware address for a network device.
  *
- * A board may have an EEPROM with a unique ID (e.g. @ref drivers_at24mac) that is used
+ * A board may have an EEPROM with a unique ID (e.g. @ref drivers_at24mac_id) that is used
  * to store an address, a unique address is stored in a config
  * area of the board's flash during production, etc.
  *

@@ -31,11 +31,11 @@ extern "C" {
  * @name    AT24MAC402 configuration
  * @{
  */
-#define AT24MAC_PARAM_I2C_DEV   I2C_DEV(1)
-#define AT24MAC_PARAM_I2C_ADDR  (0x5E)
-#define AT24MAC_PARAM_TYPE      AT24MAC4XX
-#define AT24CXXX_PARAM_I2C      I2C_DEV(1)
-#define AT24CXXX_PARAM_ADDR     (0x56)
+#define AT24MAC_ID_PARAM_I2C_DEV   I2C_DEV(1)
+#define AT24MAC_ID_PARAM_I2C_ADDR  (0x5E)
+#define AT24MAC_ID_PARAM_TYPE      AT24MAC4XX
+#define AT24XXXX_PARAM_I2C      I2C_DEV(1)
+#define AT24XXXX_PARAM_ADDR     (0x56)
 /** @} */
 
 /**

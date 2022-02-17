@@ -1,5 +1,5 @@
-ifneq (,$(filter mtd_at24cxxx,$(USEMODULE)))
-  USEMODULE += at24cxxx
+ifneq (,$(filter mtd_at24xxxx,$(USEMODULE)))
+  USEMODULE += at24xxxx
 endif
 
 ifneq (,$(filter mtd_at25xxx,$(USEMODULE)))

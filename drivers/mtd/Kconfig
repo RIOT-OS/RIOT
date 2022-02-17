@@ -5,13 +5,6 @@
 # directory for more details.
 #
 
-config HAVE_MTD_AT24CXXX
-    bool
-    depends on MODULE_AT24CXXX
-    imply MODULE_MTD_AT24CXXX if MODULE_MTD
-    help
-        Indicates that a at24cxxx EEPROM MTD is present
-
 config HAVE_MTD_AT25XXX
     bool
     depends on MODULE_AT25XXX
@@ -69,9 +62,9 @@ config MODULE_MTD_NATIVE
     bool "MTD native driver"
     depends on NATIVE_OS_LINUX
 
-config MODULE_MTD_AT24CXXX
-    bool "MTD implementation for AT24CXXX"
-    depends on MODULE_AT24CXXX
+config MODULE_MTD_AT24XXXX
+    bool "MTD implementation for AT24XXXX"
+    depends on MODULE_AT24XXXX
 
 config MODULE_MTD_AT25XXX
     bool "MTD implementation for AT25XXX"

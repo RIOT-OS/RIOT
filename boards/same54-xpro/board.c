@@ -50,15 +50,15 @@ static mtd_spi_nor_t same54_nor_dev = {
 };
 mtd_dev_t *mtd0 = (mtd_dev_t *)&same54_nor_dev;
 
-#include "mtd_at24cxxx.h"
-#include "at24cxxx_params.h"
-static at24cxxx_t at24cxxx_dev;
-static mtd_at24cxxx_t at24mac_dev = {
+#include "mtd_at24xxxx.h"
+#include "at24xxxx_params.h"
+static at24xxxx_t at24xxxx_dev;
+static mtd_at24xxxx_t at24mac_dev = {
     .base = {
-        .driver = &mtd_at24cxxx_driver,
+        .driver = &mtd_at24xxxx_driver,
     },
-    .at24cxxx_eeprom = &at24cxxx_dev,
-    .params = at24cxxx_params,
+    .at24xxxx_eeprom = &at24xxxx_dev,
+    .params = at24xxxx_params,
 };
 mtd_dev_t *mtd1 = (mtd_dev_t *)&at24mac_dev;
 

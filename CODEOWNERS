@@ -72,7 +72,7 @@
 /dist/tools/dhcpv6-pd_ia/                   @miri64
 
 /drivers/ad7746/                            @leandrolanzieri
-/drivers/at24mac/                           @benpicco
+/drivers/at24mac_id/                        @benpicco
 /drivers/at86rf215/                         @benpicco
 /drivers/at86rf2xx/                         @daniel-k @Hyungsin @jia200x @smlng @miri64
 /drivers/bh1900nux/                         @wosym

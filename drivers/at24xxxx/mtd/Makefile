@@ -1,7 +1,7 @@
-MODULE := mtd_at24cxxx
-BASE_MODULE := at24cxxx
+MODULE := mtd_at24xxxx
+BASE_MODULE := at24xxxx
 
-# at24cxxx_mtd files
+# at24xxxx_mtd files
 SRC := mtd.c
 
 # enable submodules

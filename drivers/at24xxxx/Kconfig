@@ -5,64 +5,145 @@
 # directory for more details.
 #
 
-choice
-    bool "AT24CXXX EEPROM"
+menuconfig MODULE_AT24XXXX
+    bool
+    prompt "AT24XXXX EEPROM" if !(MODULE_MTD && HAVE_AT24XXXX)
+    default MODULE_MTD && HAVE_AT24XXXX
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+    select MODULE_XTIMER
+
+choice AT24XXXX_VARIANT
+    bool "Variants"
+    depends on MODULE_AT24XXXX
     optional
+    default MODULE_AT24C01 if HAVE_AT24C01
+    default MODULE_AT24C02 if HAVE_AT24C02
+    default MODULE_AT24C04 if HAVE_AT24C04
+    default MODULE_AT24C08A if HAVE_AT24C08A
+    default MODULE_AT24C16A if HAVE_AT24C16A
+    default MODULE_AT24C32 if HAVE_AT24C32
+    default MODULE_AT24C64 if HAVE_AT24C64
+    default MODULE_AT24C128 if HAVE_AT24C128
+    default MODULE_AT24C256 if HAVE_AT24C256
+    default MODULE_AT24C512 if HAVE_AT24C512
+    default MODULE_AT24C1024 if HAVE_AT24C1024
+    default MODULE_AT24MAC if HAVE_AT24MAC
     help
         This driver supports the multiple models, select one.
 
 config MODULE_AT24C01
     bool "AT24C01"
-    select MODULE_AT24CXXX
 
 config MODULE_AT24C02
     bool "AT24C02"
-    select MODULE_AT24CXXX
 
 config MODULE_AT24C04
     bool "AT24C04"
-    select MODULE_AT24CXXX
 
 config MODULE_AT24C08A
     bool "AT24C08A"
-    select MODULE_AT24CXXX
 
 config MODULE_AT24C16A
     bool "AT24C16A"
-    select MODULE_AT24CXXX
 
 config MODULE_AT24C32
     bool "AT24C32"
-    select MODULE_AT24CXXX
 
 config MODULE_AT24C64
     bool "AT24C64"
-    select MODULE_AT24CXXX
 
 config MODULE_AT24C128
     bool "AT24C128"
-    select MODULE_AT24CXXX
 
 config MODULE_AT24C256
     bool "AT24C256"
-    select MODULE_AT24CXXX
 
 config MODULE_AT24C512
     bool "AT24C512"
-    select MODULE_AT24CXXX
 
 config MODULE_AT24C1024
     bool "AT24C1024"
-    select MODULE_AT24CXXX
+
+config MODULE_AT24MAC
+    bool "AT24MAC"
 
 endchoice
 
-config MODULE_AT24CXXX
+config HAVE_AT24XXXX
     bool
-    depends on HAS_PERIPH_I2C
-    depends on TEST_KCONFIG
-    select HAVE_MTD_AT24CXXX
-    select MODULE_PERIPH_I2C
-    select MODULE_XTIMER
+    help
+        Indicates that the AT24XXXX EEPROM is present.
+
+config HAVE_AT24C01
+    bool
+    select HAVE_AT24XXXX
+    help
+        Indicates that the AT24C01 is present.
+
+config HAVE_AT24C02
+    bool
+    select HAVE_AT24XXXX
+    help
+        Indicates that the AT24C02 is present.
+
+config HAVE_AT24C04
+    bool
+    select HAVE_AT24XXXX
+    help
+        Indicates that the AT24C04 is present.
+
+config HAVE_AT24C08A
+    bool
+    select HAVE_AT24XXXX
+    help
+        Indicates that the AT24C08A is present.
+
+config HAVE_AT24C16A
+    bool
+    select HAVE_AT24XXXX
+    help
+        Indicates that the AT24C16A is present.
+
+config HAVE_AT24C32
+    bool
+    select HAVE_AT24XXXX
+    help
+        Indicates that the AT24C32 is present.
+
+config HAVE_AT24C64
+    bool
+    select HAVE_AT24XXXX
+    help
+        Indicates that the AT24C64 is present.
+
+config HAVE_AT24C128
+    bool
+    select HAVE_AT24XXXX
+    help
+        Indicates that the  AT24C128 is present.
+
+config HAVE_AT24C256
+    bool
+    select HAVE_AT24XXXX
+    help
+        Indicates that the  AT24C256 is present.
+
+config HAVE_AT24C512
+    bool
+    select HAVE_AT24XXXX
+    help
+        Indicates that the  AT24C512 is present.
+
+config HAVE_AT24C1024
+    bool
+    select HAVE_AT24XXXX
+    help
+        Indicates that the AT24C1024 is present.
+
+config HAVE_AT24MAC
+    bool
+    select HAVE_AT24XXXX
+    help
+        Indicates that the AT24MAC is present.

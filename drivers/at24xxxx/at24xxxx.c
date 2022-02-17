@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     drivers_at24cxxx
+ * @ingroup     drivers_at24xxxx
  * @{
  *
  * @file
- * @brief       Device driver implementation for at24cxxx EEPROM units.
+ * @brief       Device driver implementation for at24xxxx EEPROM units.
  *
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  * @}
@@ -24,8 +24,8 @@
 #include "assert.h"
 #include "xtimer.h"
 
-#include "at24cxxx_defines.h"
-#include "at24cxxx.h"
+#include "at24xxxx_defines.h"
+#include "at24xxxx.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -64,15 +64,15 @@
  */
 #define DEV_MAX_POLLS                   (dev->params.max_polls)
 
-#ifndef AT24CXXX_SET_BUF_SIZE
+#ifndef AT24XXXX_SET_BUF_SIZE
 /**
  * @brief  Adjust to configure buffer size
  */
-#define AT24CXXX_SET_BUF_SIZE           (32U)
+#define AT24XXXX_SET_BUF_SIZE           (32U)
 #endif
 
 static
-int _read(const at24cxxx_t *dev, uint32_t pos, void *data, size_t len)
+int _read(const at24xxxx_t *dev, uint32_t pos, void *data, size_t len)
 {
     int check;
     uint8_t polls = DEV_MAX_POLLS;
@@ -98,14 +98,14 @@ int _read(const at24cxxx_t *dev, uint32_t pos, void *data, size_t len)
         if (--polls == 0) {
             break;
         }
-        xtimer_usleep(AT24CXXX_POLL_DELAY_US);
+        xtimer_usleep(AT24XXXX_POLL_DELAY_US);
     }
-    DEBUG("[at24cxxx] i2c_read_regs(): %d; polls: %d\n", check, polls);
+    DEBUG("[at24xxxx] i2c_read_regs(): %d; polls: %d\n", check, polls);
     return check;
 }
 
 static
-int _write_page(const at24cxxx_t *dev, uint32_t pos, const void *data, size_t len)
+int _write_page(const at24xxxx_t *dev, uint32_t pos, const void *data, size_t len)
 {
     int check;
     uint8_t polls = DEV_MAX_POLLS;
@@ -132,16 +132,16 @@ int _write_page(const at24cxxx_t *dev, uint32_t pos, const void *data, size_t le
         if (--polls == 0) {
             break;
         }
-        xtimer_usleep(AT24CXXX_POLL_DELAY_US);
+        xtimer_usleep(AT24XXXX_POLL_DELAY_US);
     }
 
-    DEBUG("[at24cxxx] i2c_write_regs(): %d; polls: %d\n", check, polls);
+    DEBUG("[at24xxxx] i2c_write_regs(): %d; polls: %d\n", check, polls);
 
     return check;
 }
 
 static
-int _write(const at24cxxx_t *dev, uint32_t pos, const void *data, size_t len)
+int _write(const at24xxxx_t *dev, uint32_t pos, const void *data, size_t len)
 {
     int check = 0;
     const uint8_t *cdata = ((const uint8_t *)data);
@@ -164,10 +164,10 @@ int _write(const at24cxxx_t *dev, uint32_t pos, const void *data, size_t len)
 }
 
 static
-int _set(const at24cxxx_t *dev, uint32_t pos, uint8_t val, size_t len)
+int _set(const at24xxxx_t *dev, uint32_t pos, uint8_t val, size_t len)
 {
     int check;
-    uint8_t set_buffer[AT24CXXX_SET_BUF_SIZE];
+    uint8_t set_buffer[AT24XXXX_SET_BUF_SIZE];
 
     memset(set_buffer, val, sizeof(set_buffer));
     while (len) {
@@ -184,7 +184,7 @@ int _set(const at24cxxx_t *dev, uint32_t pos, uint8_t val, size_t len)
     return check;
 }
 
-int at24cxxx_init(at24cxxx_t *dev, const at24cxxx_params_t *params)
+int at24xxxx_init(at24xxxx_t *dev, const at24xxxx_params_t *params)
 {
     if (!dev || !params) {
         return -EINVAL;
@@ -192,15 +192,15 @@ int at24cxxx_init(at24cxxx_t *dev, const at24cxxx_params_t *params)
     dev->params = *params;
     if (gpio_is_valid(DEV_PIN_WP)) {
         gpio_init(DEV_PIN_WP, GPIO_OUT);
-        at24cxxx_disable_write_protect(dev);
+        at24xxxx_disable_write_protect(dev);
     }
     /* Check I2C bus once */
     i2c_acquire(DEV_I2C_BUS);
     i2c_release(DEV_I2C_BUS);
-    return AT24CXXX_OK;
+    return AT24XXXX_OK;
 }
 
-int at24cxxx_read_byte(const at24cxxx_t *dev, uint32_t pos, void *dest)
+int at24xxxx_read_byte(const at24xxxx_t *dev, uint32_t pos, void *dest)
 {
     if (pos >= DEV_EEPROM_SIZE) {
         return -ERANGE;
@@ -212,14 +212,14 @@ int at24cxxx_read_byte(const at24cxxx_t *dev, uint32_t pos, void *dest)
     return check;
 }
 
-int at24cxxx_read(const at24cxxx_t *dev, uint32_t pos, void *data,
+int at24xxxx_read(const at24xxxx_t *dev, uint32_t pos, void *data,
                       size_t len)
 {
     if (pos + len > DEV_EEPROM_SIZE) {
         return -ERANGE;
     }
 
-    int check = AT24CXXX_OK;
+    int check = AT24XXXX_OK;
     if (len) {
         i2c_acquire(DEV_I2C_BUS);
         check = _read(dev, pos, data, len);
@@ -228,7 +228,7 @@ int at24cxxx_read(const at24cxxx_t *dev, uint32_t pos, void *data,
     return check;
 }
 
-int at24cxxx_write_byte(const at24cxxx_t *dev, uint32_t pos, uint8_t data)
+int at24xxxx_write_byte(const at24xxxx_t *dev, uint32_t pos, uint8_t data)
 {
     if (pos >= DEV_EEPROM_SIZE) {
         return -ERANGE;
@@ -240,14 +240,14 @@ int at24cxxx_write_byte(const at24cxxx_t *dev, uint32_t pos, uint8_t data)
     return check;
 }
 
-int at24cxxx_write(const at24cxxx_t *dev, uint32_t pos, const void *data,
+int at24xxxx_write(const at24xxxx_t *dev, uint32_t pos, const void *data,
                        size_t len)
 {
     if (pos + len > DEV_EEPROM_SIZE) {
         return -ERANGE;
     }
 
-    int check = AT24CXXX_OK;
+    int check = AT24XXXX_OK;
     if (len) {
         i2c_acquire(DEV_I2C_BUS);
         check = _write(dev, pos, data, len);
@@ -256,7 +256,7 @@ int at24cxxx_write(const at24cxxx_t *dev, uint32_t pos, const void *data,
     return check;
 }
 
-int at24cxxx_write_page(const at24cxxx_t *dev, uint32_t page, uint32_t offset,
+int at24xxxx_write_page(const at24xxxx_t *dev, uint32_t page, uint32_t offset,
                         const void *data, size_t len)
 {
     int check;
@@ -274,14 +274,14 @@ int at24cxxx_write_page(const at24cxxx_t *dev, uint32_t page, uint32_t offset,
     return check ? check : (int) len;
 }
 
-int at24cxxx_set(const at24cxxx_t *dev, uint32_t pos, uint8_t val,
+int at24xxxx_set(const at24xxxx_t *dev, uint32_t pos, uint8_t val,
                      size_t len)
 {
     if (pos + len > DEV_EEPROM_SIZE) {
         return -ERANGE;
     }
 
-    int check = AT24CXXX_OK;
+    int check = AT24XXXX_OK;
     if (len) {
         i2c_acquire(DEV_I2C_BUS);
         check = _set(dev, pos, val, len);
@@ -290,30 +290,30 @@ int at24cxxx_set(const at24cxxx_t *dev, uint32_t pos, uint8_t val,
     return check;
 }
 
-int at24cxxx_clear(const at24cxxx_t *dev, uint32_t pos, size_t len)
+int at24xxxx_clear(const at24xxxx_t *dev, uint32_t pos, size_t len)
 {
-    return at24cxxx_set(dev, pos, AT24CXXX_CLEAR_BYTE, len);
+    return at24xxxx_set(dev, pos, AT24XXXX_CLEAR_BYTE, len);
 }
 
-int at24cxxx_erase(const at24cxxx_t *dev)
+int at24xxxx_erase(const at24xxxx_t *dev)
 {
-    return at24cxxx_clear(dev, 0, DEV_EEPROM_SIZE);
+    return at24xxxx_clear(dev, 0, DEV_EEPROM_SIZE);
 }
 
-int at24cxxx_enable_write_protect(const at24cxxx_t *dev)
+int at24xxxx_enable_write_protect(const at24xxxx_t *dev)
 {
     if (!gpio_is_valid(DEV_PIN_WP)) {
         return -ENOTSUP;
     }
     gpio_set(DEV_PIN_WP);
-    return AT24CXXX_OK;
+    return AT24XXXX_OK;
 }
 
-int at24cxxx_disable_write_protect(const at24cxxx_t *dev)
+int at24xxxx_disable_write_protect(const at24xxxx_t *dev)
 {
     if (!gpio_is_valid(DEV_PIN_WP)) {
         return -ENOTSUP;
     }
     gpio_clear(DEV_PIN_WP);
-    return AT24CXXX_OK;
+    return AT24XXXX_OK;
 }

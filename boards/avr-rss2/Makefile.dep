@@ -4,11 +4,11 @@ USEMODULE += boards_common_atmega
 USEMODULE += atmega_pcint0
 
 ifneq (,$(filter eui_provider,$(USEMODULE)))
-  USEMODULE += at24mac
+  USEMODULE += at24mac_id
 endif
 
 ifneq (,$(filter mtd,$(USEMODULE)))
-  USEMODULE += mtd_at24cxxx at24mac
+  USEMODULE += mtd_at24xxxx at24mac
 endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))

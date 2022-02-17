@@ -18,7 +18,7 @@
 #ifndef EUI_PROVIDER_PARAMS_H
 #define EUI_PROVIDER_PARAMS_H
 
-#include "at24mac.h"
+#include "at24mac_id.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,7 +29,7 @@ extern "C" {
  */
 static inline int _at24mac_get_eui64(uint8_t index, eui64_t *addr)
 {
-    return at24mac_get_eui64(index, addr);
+    return at24mac_id_get_eui64(index, addr);
 }
 
 /**

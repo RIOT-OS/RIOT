@@ -7,97 +7,97 @@
  */
 
 /**
- * @ingroup     drivers_at24cxxx
+ * @ingroup     drivers_at24xxxx
  * @{
  *
  * @file
- * @brief       Default configuration for AT24CXXX
+ * @brief       Default configuration for AT24XXXX
  *
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
 
-#ifndef AT24CXXX_PARAMS_H
-#define AT24CXXX_PARAMS_H
+#ifndef AT24XXXX_PARAMS_H
+#define AT24XXXX_PARAMS_H
 
 #include "board.h"
 #include "periph/gpio.h"
-#include "at24cxxx_defines.h"
+#include "at24xxxx_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @name    Set default configuration parameters for the AT24CXXX driver
+ * @name    Set default configuration parameters for the AT24XXXX driver
  * @{
  */
-#ifndef AT24CXXX_PARAM_I2C
+#ifndef AT24XXXX_PARAM_I2C
 /**
  * @brief  I2C bus the EEPROM is connected to
  */
-#define AT24CXXX_PARAM_I2C              (I2C_DEV(0))
+#define AT24XXXX_PARAM_I2C              (I2C_DEV(0))
 #endif
-#ifndef AT24CXXX_PARAM_ADDR
+#ifndef AT24XXXX_PARAM_ADDR
 /**
  * @brief   I2C address of the EEPROM device
  */
-#define AT24CXXX_PARAM_ADDR             (AT24CXXX_DEF_DEV_ADDR)
+#define AT24XXXX_PARAM_ADDR             (AT24XXXX_DEF_DEV_ADDR)
 #endif
-#ifndef AT24CXXX_PARAM_PIN_WP
+#ifndef AT24XXXX_PARAM_PIN_WP
 /**
  * @brief   EEPROM write protect pin
  */
-#define AT24CXXX_PARAM_PIN_WP           (GPIO_UNDEF)
+#define AT24XXXX_PARAM_PIN_WP           (GPIO_UNDEF)
 #endif
-#ifndef AT24CXXX_PARAM_EEPROM_SIZE
+#ifndef AT24XXXX_PARAM_EEPROM_SIZE
 /**
  * @brief   EEPROM size
  */
-#define AT24CXXX_PARAM_EEPROM_SIZE      (AT24CXXX_EEPROM_SIZE)
+#define AT24XXXX_PARAM_EEPROM_SIZE      (AT24XXXX_EEPROM_SIZE)
 #endif
-#ifndef AT24CXXX_PARAM_PAGE_SIZE
+#ifndef AT24XXXX_PARAM_PAGE_SIZE
 /**
  * @brief   Page size
  */
-#define AT24CXXX_PARAM_PAGE_SIZE        (AT24CXXX_PAGE_SIZE)
+#define AT24XXXX_PARAM_PAGE_SIZE        (AT24XXXX_PAGE_SIZE)
 #endif
-#ifndef AT24CXXX_PARAM_MAX_POLLS
+#ifndef AT24XXXX_PARAM_MAX_POLLS
 /**
  * @brief   Maximum poll poll
  */
-#define AT24CXXX_PARAM_MAX_POLLS        (AT24CXXX_MAX_POLLS)
+#define AT24XXXX_PARAM_MAX_POLLS        (AT24XXXX_MAX_POLLS)
 #endif
-#ifndef AT24CXXX_PARAMS
+#ifndef AT24XXXX_PARAMS
 /**
  * @brief   Default device configuration parameters
  */
-#define AT24CXXX_PARAMS                {            \
-    .i2c = AT24CXXX_PARAM_I2C,                      \
-    .pin_wp = AT24CXXX_PARAM_PIN_WP,                \
-    .eeprom_size = AT24CXXX_PARAM_EEPROM_SIZE,      \
-    .dev_addr = AT24CXXX_PARAM_ADDR,                \
-    .page_size = AT24CXXX_PARAM_PAGE_SIZE,          \
-    .max_polls = AT24CXXX_PARAM_MAX_POLLS           \
+#define AT24XXXX_PARAMS                {            \
+    .i2c = AT24XXXX_PARAM_I2C,                      \
+    .pin_wp = AT24XXXX_PARAM_PIN_WP,                \
+    .eeprom_size = AT24XXXX_PARAM_EEPROM_SIZE,      \
+    .dev_addr = AT24XXXX_PARAM_ADDR,                \
+    .page_size = AT24XXXX_PARAM_PAGE_SIZE,          \
+    .max_polls = AT24XXXX_PARAM_MAX_POLLS           \
 }
 #endif
 /** @} */
 
 /**
- * @brief Number of configured AT24CXXX EEPROM devices
+ * @brief Number of configured AT24XXXX EEPROM devices
  */
-#define AT24CXXX_NUMOF ARRAY_SIZE(at24cxxx_params)
+#define AT24XXXX_NUMOF ARRAY_SIZE(at24xxxx_params)
 
 /**
- * @brief   AT24CXXX configuration
+ * @brief   AT24XXXX configuration
  */
-static const at24cxxx_params_t at24cxxx_params[] =
+static const at24xxxx_params_t at24xxxx_params[] =
 {
-    AT24CXXX_PARAMS
+    AT24XXXX_PARAMS
 };
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* AT24CXXX_PARAMS_H */
+#endif /* AT24XXXX_PARAMS_H */
 /** @} */

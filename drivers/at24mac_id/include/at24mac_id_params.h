@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     drivers_at24mac
+ * @ingroup     drivers_at24mac_id
  *
  * @{
  * @file
@@ -16,11 +16,11 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-#ifndef AT24MAC_PARAMS_H
-#define AT24MAC_PARAMS_H
+#ifndef AT24MAC_ID_PARAMS_H
+#define AT24MAC_ID_PARAMS_H
 
 #include "board.h"
-#include "at24mac.h"
+#include "at24mac_id.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,34 +30,34 @@ extern "C" {
  * @name    Set default configuration parameters for AT24Mac driver
  * @{
  */
-#ifndef AT24MAC_PARAM_I2C_DEV
-#define AT24MAC_PARAM_I2C_DEV       I2C_DEV(0)
+#ifndef AT24MAC_ID_PARAM_I2C_DEV
+#define AT24MAC_ID_PARAM_I2C_DEV    I2C_DEV(0)
 #endif
-#ifndef AT24MAC_PARAM_I2C_ADDR
-#define AT24MAC_PARAM_I2C_ADDR      (0x58)
+#ifndef AT24MAC_ID_PARAM_I2C_ADDR
+#define AT24MAC_ID_PARAM_I2C_ADDR   (0x58)
 #endif
-#ifndef AT24MAC_PARAM_TYPE
-#define AT24MAC_PARAM_TYPE          (AT24MAC6XX)
+#ifndef AT24MAC_ID_PARAM_TYPE
+#define AT24MAC_ID_PARAM_TYPE       (AT24MAC6XX)
 #endif
 
-#ifndef AT24MAC_PARAMS
-#define AT24MAC_PARAMS              { .i2c_dev      = AT24MAC_PARAM_I2C_DEV, \
-                                      .i2c_addr     = AT24MAC_PARAM_I2C_ADDR,\
-                                      .type         = AT24MAC_PARAM_TYPE     }
+#ifndef AT24MAC_ID_PARAMS
+#define AT24MAC_ID_PARAMS           { .i2c_dev  = AT24MAC_ID_PARAM_I2C_DEV, \
+                                      .i2c_addr = AT24MAC_ID_PARAM_I2C_ADDR,\
+                                      .type     = AT24MAC_ID_PARAM_TYPE     }
 #endif
 /**@}*/
 
 /**
  * @brief   Configuration for AT24MACs
  */
-static const at24mac_params_t at24mac_params[] =
+static const at24mac_id_params_t at24mac_id_params[] =
 {
-    AT24MAC_PARAMS
+    AT24MAC_ID_PARAMS
 };
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* AT24MAC_PARAMS_H */
+#endif /* AT24MAC_ID_PARAMS_H */
 /** @} */

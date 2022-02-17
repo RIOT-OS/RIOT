@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief    AT24CXXX test application
+ * @brief    AT24XXXX test application
  *
  * Tested with bluepill and AT24C256
  *
@@ -24,78 +24,78 @@
 
 #include "xtimer.h"
 
-#include "at24cxxx.h"
-#include "at24cxxx_params.h"
+#include "at24xxxx.h"
+#include "at24xxxx_params.h"
 
-#ifndef AT24CXXX_ERASE
-#define AT24CXXX_ERASE          (0)
+#ifndef AT24XXXX_ERASE
+#define AT24XXXX_ERASE          (0)
 #endif
 
 #define WRITE_BYTE_POSITION     (12U)
 #define WRITE_BYTE_CHARACTER    'A'
 
-#define WRITE_POSITION          (AT24CXXX_EEPROM_SIZE - \
-                                3 * AT24CXXX_PAGE_SIZE - 4)
+#define WRITE_POSITION          (AT24XXXX_EEPROM_SIZE - \
+                                3 * AT24XXXX_PAGE_SIZE - 4)
 #define WRITE_CHARACTERS        { 'B', 'E', 'E', 'R', '4', \
                                 'F', 'R', 'E', 'E', '\0' }
 
-#define SET_POSITION            (AT24CXXX_EEPROM_SIZE - \
-                                7 * AT24CXXX_PAGE_SIZE - 4)
+#define SET_POSITION            (AT24XXXX_EEPROM_SIZE - \
+                                7 * AT24XXXX_PAGE_SIZE - 4)
 #define SET_CHARACTER           'G'
 #define SET_LEN                 (20U)
 
 int main(void)
 {
-    puts("Starting tests for module at24cxxx");
+    puts("Starting tests for module at24xxxx");
 
-    at24cxxx_t at24cxxx_dev;
+    at24xxxx_t at24xxxx_dev;
     int check;
 
-    printf("EEPROM size: %u byte\n", AT24CXXX_EEPROM_SIZE);
-    printf("Page size  : %u byte\n", AT24CXXX_PAGE_SIZE);
+    printf("EEPROM size: %u byte\n", AT24XXXX_EEPROM_SIZE);
+    printf("Page size  : %u byte\n", AT24XXXX_PAGE_SIZE);
 
     /* Test: Init */
-    check = at24cxxx_init(&at24cxxx_dev, &at24cxxx_params[0]);
-    if (check != AT24CXXX_OK) {
-        printf("[FAILURE] at24cxxx_init: (%d)\n", check);
+    check = at24xxxx_init(&at24xxxx_dev, &at24xxxx_params[0]);
+    if (check != AT24XXXX_OK) {
+        printf("[FAILURE] at24xxxx_init: (%d)\n", check);
         return 1;
     }
     else {
-        puts("[SUCCESS] at24cxxx_init");
+        puts("[SUCCESS] at24xxxx_init");
     }
 
     /* erase EEPROM to exclude side effects from prior test runs */
-#if AT24CXXX_ERASE
-    check = at24cxxx_erase(&at24cxxx_dev);
-    if (check != AT24CXXX_OK) {
-        printf("[FAILURE] at24cxxx_erase: %d (EEPROM size = %" PRId32 ")\n",
-               check, at24cxxx_dev.params.eeprom_size);
+#if AT24XXXX_ERASE
+    check = at24xxxx_erase(&at24xxxx_dev);
+    if (check != AT24XXXX_OK) {
+        printf("[FAILURE] at24xxxx_erase: %d (EEPROM size = %" PRId32 ")\n",
+               check, at24xxxx_dev.params.eeprom_size);
         return 1;
     }
     else {
-        puts("[SUCCESS] at24cxxx_erase");
+        puts("[SUCCESS] at24xxxx_erase");
     }
 #endif
 
     /* Test: Write/Read Byte */
-    check = at24cxxx_write_byte(&at24cxxx_dev, WRITE_BYTE_POSITION,
+    check = at24xxxx_write_byte(&at24xxxx_dev, WRITE_BYTE_POSITION,
                                 WRITE_BYTE_CHARACTER);
-    if (check != AT24CXXX_OK) {
-        printf("[FAILURE] at24cxxx_write_byte: %d\n", check);
+    if (check != AT24XXXX_OK) {
+        printf("[FAILURE] at24xxxx_write_byte: %d\n", check);
         return 1;
     }
     else {
-        puts("[SUCCESS] at24cxxx_write_byte");
+        puts("[SUCCESS] at24xxxx_write_byte");
     }
 
     uint8_t c;
-    check = at24cxxx_read_byte(&at24cxxx_dev, WRITE_BYTE_POSITION, &c);
+    check = at24xxxx_read_byte(&at24xxxx_dev, WRITE_BYTE_POSITION, &c);
     if (check < 0) {
-        printf("[FAILURE] at24cxxx_read_byte: %d\n", check);
+        printf("[FAILURE] at24xxxx_read_byte: %d\n", check);
         return 1;
     }
     else {
-        puts("[SUCCESS] at24cxxx_read_byte");
+        puts("[SUCCESS] at24xxxx_read_byte");
     }
 
     if (c != WRITE_BYTE_CHARACTER) {
@@ -110,28 +110,28 @@ int main(void)
     /* Test: Write */
     uint8_t expected_write_data[] = WRITE_CHARACTERS;
 
-    check = at24cxxx_write(&at24cxxx_dev, WRITE_POSITION, expected_write_data,
+    check = at24xxxx_write(&at24xxxx_dev, WRITE_POSITION, expected_write_data,
                          sizeof(expected_write_data));
-    if (check != AT24CXXX_OK) {
-        printf("[FAILURE] at24cxxx_write: %d (size = %zu)\n", check,
+    if (check != AT24XXXX_OK) {
+        printf("[FAILURE] at24xxxx_write: %d (size = %zu)\n", check,
                sizeof(expected_write_data));
         return 1;
     }
     else {
-        puts("[SUCCESS] at24cxxx_write");
+        puts("[SUCCESS] at24xxxx_write");
     }
 
     /* Test: Read */
     uint8_t actual_write_data[sizeof(expected_write_data)];
 
-    check = at24cxxx_read(&at24cxxx_dev, WRITE_POSITION, actual_write_data,
+    check = at24xxxx_read(&at24xxxx_dev, WRITE_POSITION, actual_write_data,
                         sizeof(actual_write_data));
-    if (check != AT24CXXX_OK) {
-        printf("[FAILURE] at24cxxx_read: %d\n", check);
+    if (check != AT24XXXX_OK) {
+        printf("[FAILURE] at24xxxx_read: %d\n", check);
         return 1;
     }
     else {
-        puts("[SUCCESS] at24cxxx_read");
+        puts("[SUCCESS] at24xxxx_read");
     }
 
     if (memcmp(actual_write_data, expected_write_data,
@@ -150,18 +150,18 @@ int main(void)
 
     uint8_t actual_set_data[sizeof(expected_set_data)];
 
-    check = at24cxxx_set(&at24cxxx_dev, SET_POSITION, SET_CHARACTER, SET_LEN);
-    if (check != AT24CXXX_OK) {
-        printf("[FAILURE] at24cxxx_set: %d (size = %u)\n", check, SET_LEN);
+    check = at24xxxx_set(&at24xxxx_dev, SET_POSITION, SET_CHARACTER, SET_LEN);
+    if (check != AT24XXXX_OK) {
+        printf("[FAILURE] at24xxxx_set: %d (size = %u)\n", check, SET_LEN);
         return 1;
     }
     else {
-        puts("[SUCCESS] at24cxxx_set");
+        puts("[SUCCESS] at24xxxx_set");
     }
 
-    check = at24cxxx_read(&at24cxxx_dev, SET_POSITION,
+    check = at24xxxx_read(&at24xxxx_dev, SET_POSITION,
                           actual_set_data, SET_LEN);
-    if (check != AT24CXXX_OK) {
+    if (check != AT24XXXX_OK) {
         printf("[FAILURE] set/read: %d\n", check);
         return 1;
     }
@@ -174,7 +174,7 @@ int main(void)
         puts("[SUCCESS] set/read");
     }
 
-    puts("Finished tests for module at24cxxx");
+    puts("Finished tests for module at24xxxx");
 
     return 0;
 }
