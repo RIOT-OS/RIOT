@@ -472,10 +472,14 @@ static inline ztimer_now_t ztimer_now(ztimer_clock_t *clock)
  *          n: being the timers active on the clock that are earlier to trigger
  *             than the timer this is measuring to
  *
+ * @pre  The timer should be set on clock, see return 0.
+ *
  * @param[in]   clock          ztimer clock to operate on
  * @param[in]   timer          ztimer to measure
  *
  * @return  Current time until the @p timer will be triggered in clock units
+ * @return  0 if the timer is due to trigger now, or has already triggered or
+ *            is not set (removed / never set / triggered).
  */
 uint32_t ztimer_until(ztimer_clock_t *clock, ztimer_t *timer);
 
