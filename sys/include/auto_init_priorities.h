@@ -273,14 +273,18 @@ typedef void (*auto_init_fn)(void);
  */
 #define AUTO_INIT_PRIO_ZTIMER                               AUTO_INIT_PRIO_1    /**< Module priority of ztimer within its group */
 #define AUTO_INIT_PRIO_XTIMER                               AUTO_INIT_PRIO_2    /**< Module priority of xtimer within its group */
-#define AUTO_INIT_PRIO_MOD_ZTIMER                           AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_TIMERS, AUTO_INIT_PRIO_ZTIMER) /**< Priority of ztimer */
-#define AUTO_INIT_PRIO_MOD_XTIMER                           AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_TIMERS, AUTO_INIT_PRIO_XTIMER) /**< Priority of xtimer */
+#define AUTO_INIT_PRIO_ZTIMER64                             AUTO_INIT_PRIO_3    /**< Module priority of ztimer64 within its group */
+#define AUTO_INIT_PRIO_MOD_ZTIMER                           AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_TIMERS, AUTO_INIT_PRIO_ZTIMER)     /**< Priority of ztimer */
+#define AUTO_INIT_PRIO_MOD_XTIMER                           AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_TIMERS, AUTO_INIT_PRIO_XTIMER)     /**< Priority of xtimer */
+#define AUTO_INIT_PRIO_MOD_ZTIMER64                         AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_TIMERS, AUTO_INIT_PRIO_ZTIMER64)   /**< Priority of ztimer64 */
 
 #define AUTO_INIT_PRIO_RANDOM                               AUTO_INIT_PRIO_1    /**< Module priority of random within its group */
 #define AUTO_INIT_PRIO_MOD_RANDOM                           AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_RNG, AUTO_INIT_PRIO_RANDOM)    /**< Priority of random */
 
 #define AUTO_INIT_PRIO_SCHEDSTATISTICS                      AUTO_INIT_PRIO_1    /**< Module priority of schedstatistics within its group */
+#define AUTO_INIT_PRIO_SCHED_ROUND_ROBIN                    AUTO_INIT_PRIO_2    /**< Module priority of round robin scheduling within its group */
 #define AUTO_INIT_PRIO_MOD_SCHEDSTATISTICS                  AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_SCHEDULING, AUTO_INIT_PRIO_SCHEDSTATISTICS)    /**< Priority of schedstatistics */
+#define AUTO_INIT_PRIO_MOD_SCHED_ROUND_ROBIN                AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_SCHEDULING, AUTO_INIT_PRIO_SCHED_ROUND_ROBIN)  /**< Priority of round robin scheduling */
 
 #define AUTO_INIT_PRIO_EVENT_THREAD                         AUTO_INIT_PRIO_1    /**< Module priority of event thread within its group */
 #define AUTO_INIT_PRIO_SYS_BUS                              AUTO_INIT_PRIO_2    /**< Module priority of sys bus within its group */
@@ -292,9 +296,11 @@ typedef void (*auto_init_fn)(void);
 #define AUTO_INIT_PRIO_SOCK_DTLS                            AUTO_INIT_PRIO_1    /**< Module priority of DTLS sockets within its group */
 #define AUTO_INIT_PRIO_DSM                                  AUTO_INIT_PRIO_2    /**< Module priority of DSM within its group */
 #define AUTO_INIT_PRIO_CRYPTOAUTHLIB                        AUTO_INIT_PRIO_3    /**< Module priority of crypthauthlib within its group */
+#define AUTO_INIT_PRIO_MBEDTLS                              AUTO_INIT_PRIO_4    /**< Module priority of mbed TLS */
 #define AUTO_INIT_PRIO_MOD_SOCK_DTLS                        AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_SECURITY, AUTO_INIT_PRIO_SOCK_DTLS)        /**< Priority of DTLS sockets */
 #define AUTO_INIT_PRIO_MOD_DSM                              AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_SECURITY, AUTO_INIT_PRIO_DSM)              /**< Priority of DSM */
 #define AUTO_INIT_PRIO_MOD_CRYPTOAUTHLIB                    AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_SECURITY, AUTO_INIT_PRIO_CRYPTOAUTHLIB)    /**< Priority of cryptauthlib */
+#define AUTO_INIT_PRIO_MOD_MBEDTLS                          AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_SECURITY, AUTO_INIT_PRIO_MBEDTLS)          /**< Priority of mbed TLS */
 
 #define AUTO_INIT_PRIO_USB                                  AUTO_INIT_PRIO_1    /**< Module priority of USB within its group */
 #define AUTO_INIT_PRIO_CAN                                  AUTO_INIT_PRIO_2    /**< Module priority of CAN within its group */
@@ -305,7 +311,9 @@ typedef void (*auto_init_fn)(void);
 #define AUTO_INIT_PRIO_MOD_MCI                              AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_STORAGE, AUTO_INIT_PRIO_MOD_MCI)   /**< Priority of MSI */
 
 #define AUTO_INIT_PRIO_DEVFS                                AUTO_INIT_PRIO_1    /**< Module priority of DEVFS within its group */
+#define AUTO_INIT_PRIO_VFS                                  AUTO_INIT_PRIO_2    /**< Module priority of VFS within its group */
 #define AUTO_INIT_PRIO_MOD_DEVFS                            AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_FILESYSTEM, AUTO_INIT_PRIO_DEVFS)  /**< Priority of DEVFS */
+#define AUTO_INIT_PRIO_MOD_VFS                              AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_FILESYSTEM, AUTO_INIT_PRIO_VFS)    /**< Priority of VFS */
 
 #define AUTO_INIT_PRIO_GNRC_PKTBUF                          AUTO_INIT_PRIO_1    /**< Module priority of GNRC pktbuf within its group */
 #define AUTO_INIT_PRIO_GNRC_NETIF                           AUTO_INIT_PRIO_2    /**< Module priority of GNRC netif within its group */
