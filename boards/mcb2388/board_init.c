@@ -31,6 +31,13 @@ static mtd_dev_t _mtd_mci = { .driver = &mtd_mci_driver };
 mtd_dev_t *mtd0 = &_mtd_mci;
 #endif
 
+void led_init(void)
+{
+    /* LEDs */
+    FIO2DIR |= LED0_MASK | LED1_MASK | LED2_MASK | LED3_MASK \
+            |  LED4_MASK | LED5_MASK | LED6_MASK | LED7_MASK;
+}
+
 void board_init(void)
 {
 }
