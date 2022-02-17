@@ -122,7 +122,22 @@ typedef void (*auto_init_fn)(void);
     CONCAT(group, CONCAT(module, CONCAT(AUTO_INIT_PRIO_BEFORE, prio)))
 
 /**
- * @name Module priority levels from highest to lowest
+ * @name    Numeric group priority prefixes of top level groups
+ * @experimental
+ * @{
+ */
+#define AUTO_INIT_PRIO_GP_CPU                               101     /**< CPU group priority */
+#define AUTO_INIT_PRIO_GP_BOARD                             102     /**< Board group priority */
+#define AUTO_INIT_PRIO_GP_CORE                              103     /**< Core group priority */
+#define AUTO_INIT_PRIO_GP_DRIVERS                           104     /**< Drivers group priority */
+#define AUTO_INIT_PRIO_GP_FILESYSTEM                        105     /**< Filesystem group priority */
+#define AUTO_INIT_PRIO_GP_NETWORK                           106     /**< Network group priority */
+#define AUTO_INIT_PRIO_GP_TEST                              109     /**< Test group priority */
+/** @} */
+
+/**
+ * @name    Priority levels from highest to lowest used for subgrouping
+ *          and enumeration
  * @experimental
  * @{
  */
@@ -229,30 +244,26 @@ typedef void (*auto_init_fn)(void);
 /** @} */
 
 /**
- * @name Priorities of RIOT auto-init groups
+ * @name    Priorities of RIOT auto-init groups, which must be within one top level group
  * @experimental
  * @{
  */
-#define AUTO_INIT_PRIO_GP_CORE                              AUTO_INIT_PRIO_1    /**< Core group priority */
-#define AUTO_INIT_PRIO_GP_TIMERS                            AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_CORE, AUTO_INIT_PRIO_1)    /**< Timers group priority */
-#define AUTO_INIT_PRIO_GP_RNG                               AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_CORE, AUTO_INIT_PRIO_2)    /**< RNG group priority */
-#define AUTO_INIT_PRIO_GP_SCHEDULING                        AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_CORE, AUTO_INIT_PRIO_3)    /**< Scheduling group priority */
-#define AUTO_INIT_PRIO_GP_EVENTS_AND_MESSAGING              AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_CORE, AUTO_INIT_PRIO_4)    /**< Events and messaging group priority */
-#define AUTO_INIT_PRIO_GP_SECURITY                          AUTO_INIT_PRIO_2    /**< Security group priority */
-#define AUTO_INIT_PRIO_GP_BUS                               AUTO_INIT_PRIO_3    /**< Bus group priority */
-#define AUTO_INIT_PRIO_GP_STORAGE                           AUTO_INIT_PRIO_4    /**< Storage group priority */
-#define AUTO_INIT_PRIO_GP_FILESYSTEM                        AUTO_INIT_PRIO_5    /**< Filesystem group priority */
-#define AUTO_INIT_PRIO_GP_INTERFACES                        AUTO_INIT_PRIO_6    /**< Interfaces group priority */
-#define AUTO_INIT_PRIO_GP_NETWORK                           AUTO_INIT_PRIO_7    /**< Network group priority */
-#define AUTO_INIT_PRIO_GP_NETWORK_STACK_GNRC                AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_NETWORK, AUTO_INIT_PRIO_1) /**< GNRC network stack group priority */
-#define AUTO_INIT_PRIO_GP_NETWORK_STACK_LWIP                AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_NETWORK, AUTO_INIT_PRIO_2) /**< LWIP network stack group priority */
-#define AUTO_INIT_PRIO_GP_NETWORK_STACK_OPENTHREAD          AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_NETWORK, AUTO_INIT_PRIO_3) /**< Openthread network stack group priority */
-#define AUTO_INIT_PRIO_GP_NETWORK_STACK_OPENWSN             AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_NETWORK, AUTO_INIT_PRIO_4) /**< Openwsn network stack group priority */
-#define AUTO_INIT_PRIO_GP_NETWORK_APPLICATION               AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_NETWORK, AUTO_INIT_PRIO_5) /**< Network applications group priority */
-#define AUTO_INIT_PRIO_GP_SENSORS_AND_ACTUATORS             AUTO_INIT_PRIO_8    /**< Sensors and Actuators group priority */
-#define AUTO_INIT_PRIO_GP_MULTIMEDIA                        AUTO_INIT_PRIO_9    /**< Multimedia group priority */
-#define AUTO_INIT_PRIO_GP_SCREENS                           AUTO_INIT_PRIO_10   /**< Screens group priority */
-#define AUTO_INIT_PRIO_GP_TEST                              AUTO_INIT_PRIO_98   /**< Test group priority */
+#define AUTO_INIT_PRIO_GP_TIMERS                            AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_CORE, AUTO_INIT_PRIO_1)        /**< Timers group priority */
+#define AUTO_INIT_PRIO_GP_RNG                               AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_CORE, AUTO_INIT_PRIO_2)        /**< RNG group priority */
+#define AUTO_INIT_PRIO_GP_SCHEDULING                        AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_CORE, AUTO_INIT_PRIO_3)        /**< Scheduling group priority */
+#define AUTO_INIT_PRIO_GP_EVENTS_AND_MESSAGING              AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_CORE, AUTO_INIT_PRIO_4)        /**< Events and messaging group priority */
+#define AUTO_INIT_PRIO_GP_SECURITY                          AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_CORE, AUTO_INIT_PRIO_5)        /**< Security group priority */
+#define AUTO_INIT_PRIO_GP_BUS                               AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_CORE, AUTO_INIT_PRIO_6)        /**< Bus group priority */
+#define AUTO_INIT_PRIO_GP_STORAGE                           AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_DRIVERS, AUTO_INIT_PRIO_1)     /**< Storage group priority */
+#define AUTO_INIT_PRIO_GP_SCREENS                           AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_DRIVERS, AUTO_INIT_PRIO_2)     /**< Screens group priority */
+#define AUTO_INIT_PRIO_GP_MULTIMEDIA                        AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_DRIVERS, AUTO_INIT_PRIO_3)     /**< Multimedia group priority */
+#define AUTO_INIT_PRIO_GP_SENSORS_AND_ACTUATORS             AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_DRIVERS, AUTO_INIT_PRIO_4)     /**< Sensors and Actuators group priority */
+#define AUTO_INIT_PRIO_GP_INTERFACES                        AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_DRIVERS, AUTO_INIT_PRIO_5)     /**< Interfaces group priority */
+#define AUTO_INIT_PRIO_GP_NETWORK_STACK_GNRC                AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_NETWORK, AUTO_INIT_PRIO_1)     /**< GNRC network stack group priority */
+#define AUTO_INIT_PRIO_GP_NETWORK_STACK_LWIP                AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_NETWORK, AUTO_INIT_PRIO_2)     /**< LWIP network stack group priority */
+#define AUTO_INIT_PRIO_GP_NETWORK_STACK_OPENTHREAD          AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_NETWORK, AUTO_INIT_PRIO_3)     /**< Openthread network stack group priority */
+#define AUTO_INIT_PRIO_GP_NETWORK_STACK_OPENWSN             AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_NETWORK, AUTO_INIT_PRIO_4)     /**< Openwsn network stack group priority */
+#define AUTO_INIT_PRIO_GP_NETWORK_APPLICATION               AUTO_INIT_PRIO_ADD(AUTO_INIT_PRIO_GP_NETWORK, AUTO_INIT_PRIO_5)     /**< Network applications group priority */
 /** @} */
 
 /**
