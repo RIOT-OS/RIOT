@@ -21,6 +21,17 @@
 #include "cpu_conf_common.h"
 #include "periph_cpu_common.h"
 
+#ifdef MODULE_PUF_SRAM
+#include "puf_sram.h"
+
+extern unsigned _sheap;
+
+void riscv_puf_sram_init(void)
+{
+    puf_sram_init((uint8_t *)&_sheap, SEED_RAM_LEN);
+}
+#endif /* MODULE_PUF_SRAM */
+
 void riscv_fpu_init(void)
 {
     /* Enable FPU if present */
