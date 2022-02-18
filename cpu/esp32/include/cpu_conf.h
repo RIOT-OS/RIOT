@@ -56,6 +56,11 @@ extern "C" {
  */
 #define NUM_HEAPS (4)
 
+/**
+ * @brief   Attribute for memory sections required by SRAM PUF
+ */
+#define PUF_SRAM_ATTRIBUTES __attribute__((used, section(".noinit")))
+
 #ifdef __cplusplus
 }
 #endif
