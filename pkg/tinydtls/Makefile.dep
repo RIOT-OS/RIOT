@@ -12,4 +12,5 @@ FEATURES_REQUIRED += arch_32bit
 
 ifneq (,$(filter sock_dtls,$(USEMODULE)))
   USEMODULE += tinydtls_sock_dtls
+  USEMODULE += ztimer_usec
 endif
