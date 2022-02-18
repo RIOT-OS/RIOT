@@ -25,11 +25,4 @@
 
 void board_init(void)
 {
-    /* initialize the boards LEDs */
-    /* NOTE: LED0 must be explicitly enabled as it is also used for SPI_DEV(0) */
-#ifdef AUTO_INIT_LED0
-    gpio_init(LED0_PIN, GPIO_OUT);
-#endif
-    gpio_init(LED1_PIN, GPIO_OUT);
-    gpio_init(LED2_PIN, GPIO_OUT);
 }

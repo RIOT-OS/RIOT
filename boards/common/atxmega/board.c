@@ -21,17 +21,6 @@
 #include "board.h"
 #include "cpu.h"
 
-#ifdef LED_PORT
-void __attribute__((weak)) led_init(void)
-{
-    LED_PORT.DIR = LED_PORT_MASK;
-    LED_PORT.OUT = LED_PORT_MASK;
-}
-#endif
-
 void __attribute__((weak)) board_init(void)
 {
-#ifdef LED_PORT
-    led_init();
-#endif
 }

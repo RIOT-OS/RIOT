@@ -19,14 +19,7 @@
  */
 
 #include "board.h"
-#include "cpu.h"
-#include "periph/gpio.h"
-
-void led_init(void);
 
 void __attribute__((weak)) board_init(void)
 {
-#ifdef LED0_ON
-    led_init();
-#endif
 }

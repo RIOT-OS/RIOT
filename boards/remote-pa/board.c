@@ -28,10 +28,6 @@ static inline void rf_switch_init(void);
 
 void board_init(void)
 {
-    /* initialize the boards LEDs */
-    gpio_init(LED0_PIN, GPIO_OUT);
-    gpio_init(LED1_PIN, GPIO_OUT);
-    gpio_init(LED2_PIN, GPIO_OUT);
 
 
     /* initialize the 2.4GHz RF switch */

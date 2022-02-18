@@ -32,13 +32,11 @@ extern "C" {
  */
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
-#ifdef AUTO_INIT_LED0
     {
         .name = "LED(red)",
         .pin = LED0_PIN,
         .mode = GPIO_OUT
     },
-#endif
     {
         .name = "Button(B1 Boot)",
         .pin  = BTN0_PIN,

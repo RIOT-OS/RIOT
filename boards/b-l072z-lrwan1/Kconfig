@@ -34,4 +34,7 @@ config BOARD_B_L072Z_LRWAN1
 
     select HAVE_SAUL_GPIO
 
+config MODULE_PERIPH_INIT_LED0
+    default n if MODULE_PERIPH_SPI
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"

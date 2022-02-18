@@ -55,15 +55,6 @@ extern void lora_e5_dev_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mo
 /** @} */
 
 /**
- * @brief   Lora-E5-Dev always use LED0, as there is no dual use of its pin
- * @{
- */
-#ifndef AUTO_INIT_LED0
-#define AUTO_INIT_LED0
-#endif
-/** @} */
-
-/**
  * @name    User button
  * @{
  */

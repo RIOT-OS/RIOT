@@ -25,4 +25,7 @@ config BOARD_B_U585I_IOT02A
     select HAVE_HTS221
     select HAVE_LPS22HH
 
+config MODULE_PERIPH_INIT_LED0
+    default n if MODULE_PERIPH_SPI
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"

@@ -24,15 +24,6 @@
 
 void board_init(void)
 {
-    /* initialize the boards LEDs */
-    gpio_init(LED0_PIN, GPIO_OUT);
-    gpio_init(LED1_PIN, GPIO_OUT);
-    gpio_init(LED2_PIN, GPIO_OUT);
-    gpio_init(LED3_PIN, GPIO_OUT);
-    gpio_set(LED0_PIN);
-    gpio_set(LED1_PIN);
-    gpio_set(LED2_PIN);
-    gpio_set(LED3_PIN);
 
     /* disable systick interrupt, set by the spark bootloader */
     SysTick->CTRL = 0;

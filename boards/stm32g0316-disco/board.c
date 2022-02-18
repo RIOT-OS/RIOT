@@ -24,8 +24,6 @@
 
 void board_init(void)
 {
-    gpio_init(LED0_PIN, LED0_MODE);
-    gpio_set(LED0_PIN);
 
     gpio_init(BTN0_PIN, BTN0_MODE);
 }

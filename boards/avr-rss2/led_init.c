@@ -25,5 +25,5 @@ void led_init(void)
     /* Ports Pins as Output */
     LED_PORT_DDR |= LED1_MASK | LED0_MASK;
     /* All LEDs OFF */
-    LED_PORT |= (LED1_MASK | LED0_MASK);
+    LED_PORT |= LED1_MASK | LED0_MASK;
 }

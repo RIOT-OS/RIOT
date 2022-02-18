@@ -24,9 +24,6 @@
 
 void board_init(void)
 {
-    /* initialize and turn off LEDs */
-    LED0_OFF;
-    gpio_init(LED0_PIN, GPIO_OUT);
 
     /* enable OSCERCLK output on PTB3 */
 #if PTB3_OUTPUT_OSCERCLK

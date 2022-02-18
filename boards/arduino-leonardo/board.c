@@ -19,11 +19,7 @@
  */
 
 #include "board.h"
-#include "cpu.h"
-
-void led_init(void);
 
 void board_init(void)
 {
-    led_init();
 }

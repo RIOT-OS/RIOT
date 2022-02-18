@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 
-#ifndef AUTO_INIT_LED0
+#ifndef MODULE_PERIPH_INIT_LED0
 #define SAUL_GPIO_NUMOF (0U)
 #else
 /**
@@ -40,7 +40,7 @@ static const  saul_gpio_params_t saul_gpio_params[] =
         .mode = GPIO_OUT
     }
 };
-#endif /* AUTO_INIT_LED0 */
+#endif /* MODULE_PERIPH_INIT_LED0 */
 
 #ifdef __cplusplus
 }

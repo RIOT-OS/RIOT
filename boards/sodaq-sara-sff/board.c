@@ -44,12 +44,9 @@ void board_init(void)
 
     /* Initialize the output ports for the LEDs */
     LED_RED_OFF;
-    gpio_init(LED_RED_PIN, GPIO_OUT);
 
     LED_BLUE_OFF;
-    gpio_init(LED_BLUE_PIN, GPIO_OUT);
 
     LED_GREEN_OFF;
-    gpio_init(LED_GREEN_PIN, GPIO_OUT);
 
 }

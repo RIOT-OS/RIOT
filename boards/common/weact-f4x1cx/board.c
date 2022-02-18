@@ -56,6 +56,4 @@ mtd_dev_t *mtd0 = (mtd_dev_t *)&weact_nor_dev;
 
 void board_init(void)
 {
-    gpio_init(LED0_PIN, GPIO_OUT);
-    LED0_OFF;
 }

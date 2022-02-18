@@ -61,9 +61,6 @@ mtd_dev_t *mtd0 = (mtd_dev_t *)&mtd_nor_dev;
 void board_init(void)
 {
     /* Initialize LEDs and Buttons. */
-    gpio_init(LED_RED_PIN, GPIO_OUT);
-    gpio_init(LED_GREEN_PIN, GPIO_OUT);
-    gpio_init(LED_BLUE_PIN, GPIO_OUT);
     gpio_init(BTN1_PIN, BTN1_MODE);
     gpio_init(BTN2_PIN, BTN2_MODE);
 

@@ -37,9 +37,6 @@ void board_antenna_config(uint8_t antenna)
 
 void board_init(void)
 {
-    /* initialize the on-board LED */
-    gpio_init(LED0_PIN, GPIO_OUT);
-    LED0_OFF;
 
     /* initialize the on-board antenna switch */
     if (IS_USED(MODULE_AT86RF233)) {

@@ -1327,7 +1327,7 @@ boards/common/nucleo144/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUIN
 boards/common/nucleo144/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A4 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/common/nucleo144/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A5 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/common/nucleo144/include/arduino_pinmap\.h:[0-9]+: warning: end of file with unbalanced grouping commands
-boards/common/nucleo144/include/board\.h:[0-9]+: warning: Member AUTO_INIT_LED0 \(macro definition\) of group boards_common_nucleo144 is not documented\.
+boards/common/nucleo144/include/board\.h:[0-9]+: warning: Member PERIPH_INIT_LED0 \(macro definition\) of group boards_common_nucleo144 is not documented\.
 boards/common/nucleo144/include/board\.h:[0-9]+: warning: Member BTN0_MODE \(macro definition\) of group boards_common_nucleo144 is not documented\.
 boards/common/nucleo144/include/board\.h:[0-9]+: warning: Member BTN0_PIN \(macro definition\) of group boards_common_nucleo144 is not documented\.
 boards/common/nucleo144/include/board\.h:[0-9]+: warning: Member LED0_MASK \(macro definition\) of group boards_common_nucleo144 is not documented\.

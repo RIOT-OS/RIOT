@@ -22,6 +22,5 @@
 
 void board_init(void)
 {
-    gpio_init(LED0_PIN, GPIO_OUT);
     gpio_init(EN3V3_PIN, GPIO_OUT);
 }

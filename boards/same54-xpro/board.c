@@ -70,11 +70,6 @@ VFS_AUTO_MOUNT(littlefs2, VFS_MTD(same54_nor_dev), "/nvm", 0);
 
 void board_init(void)
 {
-    /* initialize the on-board LED */
-    gpio_init(LED0_PIN, GPIO_OUT);
-    LED0_OFF;
-
     /* initialize the on-board button */
     gpio_init(BTN0_PIN, BTN0_MODE);
-
 }

@@ -1,4 +1,5 @@
 ifneq (,$(filter stdio_uart,$(USEMODULE)))
   FEATURES_REQUIRED += periph_lpuart
 endif
-include $(RIOTBOARD)/common/nucleo/Makefile.dep
+
+include $(RIOTBOARD)/common/nucleo64/Makefile.dep

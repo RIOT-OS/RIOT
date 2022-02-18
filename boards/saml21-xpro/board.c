@@ -21,25 +21,8 @@
  * @}
  */
 
-#include <stdio.h>
-
 #include "board.h"
-#include "cpu.h"
-#include "periph/gpio.h"
-
-void led_init(void);
 
 void board_init(void)
 {
-    /* initialize the boards LEDs */
-    led_init();
-}
-
-/**
- * @brief Initialize the boards on-board LED
- */
-void led_init(void)
-{
-    gpio_init(LED0_PIN, GPIO_OUT);
-    LED0_OFF;
 }
