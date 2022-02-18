@@ -22,11 +22,8 @@
 #include "cpu.h"
 #include "fancy_leds.h"
 
-static inline void leds_init(void);
-
 void board_init(void)
 {
-    leds_init();
 }
 
 /**
@@ -35,7 +32,7 @@ void board_init(void)
  * The LED initialization is hard-coded in this function. As the LED (RGB) are
  * soldered onto the board they are fixed to their CPU pins.
  */
-static inline void leds_init(void)
+void led_init(void)
 {
     /* Shoot rainbows */
     LED_RAINBOW();
