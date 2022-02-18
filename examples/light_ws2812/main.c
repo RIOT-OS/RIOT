@@ -30,7 +30,7 @@ int main(void)
 {
     puts("Generated RIOT application: 'light_ws2812'");
     random_init(SEED);
-    while(1) {
+    while (1) {
         for (uint8_t idx = 0; idx < NUM_LEDS; idx++) {
             leds[idx] = (uint8_t)random_uint32();
         }
