@@ -712,7 +712,7 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
         case COAP_FORMAT_DNS_MESSAGE:
         case COAP_FORMAT_NONE:
             context->res = dns_msg_parse_reply(data, data_len, family,
-                                               context->addr_out);
+                                               context->addr_out, NULL);
             if ((ENABLE_DEBUG) && (context->res < 0)) {
                 DEBUG("gcoap_dns: Unable to parse DNS reply: %d\n",
                       context->res);

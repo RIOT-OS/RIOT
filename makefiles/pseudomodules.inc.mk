@@ -215,6 +215,7 @@ PSEUDOMODULES += sock_async
 PSEUDOMODULES += sock_aux_local
 PSEUDOMODULES += sock_aux_rssi
 PSEUDOMODULES += sock_aux_timestamp
+PSEUDOMODULES += sock_dns_cache
 PSEUDOMODULES += sock_dtls
 PSEUDOMODULES += sock_ip
 PSEUDOMODULES += sock_tcp

@@ -602,6 +602,12 @@ ifneq (,$(filter sock_dns,$(USEMODULE)))
   USEMODULE += posix_headers
 endif
 
+ifneq (,$(filter sock_dns_cache,$(USEMODULE)))
+  USEMODULE += sock_dns
+  USEMODULE += ztimer_msec
+  USEMODULE += checksum
+endif
+
 ifneq (,$(filter sock_util,$(USEMODULE)))
   USEMODULE += posix_inet
   USEMODULE += fmt
