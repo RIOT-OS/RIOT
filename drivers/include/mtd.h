@@ -22,7 +22,7 @@
  *
  * MTD devices expose a block based erase and write interface. In that, they
  * are the distinct from block devices (like hard disks) on which individual
- * bytes can be overridden. The [Linux MTD FAQ](http://www.linux-mtd.infradead.org/faq/general.html)
+ * bytes can be overwritten. The [Linux MTD FAQ](http://www.linux-mtd.infradead.org/faq/general.html)
  * has a convenient comparison (beware though of terminology differences
  * outlined below). They can be erased (with some granularity, often wearing
  * out the erased area a bit), and erased areas can be written to (sometimes
