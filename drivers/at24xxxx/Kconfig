@@ -67,6 +67,10 @@ config MODULE_AT24C1024
 
 config MODULE_AT24MAC
     bool "AT24MAC"
+# To keep functionality the same for external boards we are adding the
+# at24mac_id, even though it can be use independently.
+# This should be removed as of 2022.07 release.
+    select MODULE_AT24MAC_ID
 
 endchoice
 

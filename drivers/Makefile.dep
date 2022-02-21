@@ -18,6 +18,11 @@ ifneq (,$(filter at24%,$(USEMODULE)))
   endif
   ifneq (,$(filter at24mac,$(USEMODULE)))
     USEMODULE += at24xxxx
+# To keep functionality the same for external boards we are adding the
+# at24mac_id, even though it can be use independently.
+# This should be removed as of 2022.07 release.
+    USEMODULE += at24mac_id
+    DEPRECATED_MODULES += at24mac
   endif
 endif
 

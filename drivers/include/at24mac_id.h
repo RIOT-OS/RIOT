@@ -15,6 +15,11 @@
  * @file
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ *
+ * @deprecated  This functionality has been split from the old at24mac module.
+ *              Previously the at24mac has included both the eeprom functions
+ *              and the id functions. As of the 2022.07 release, they will be
+ *              split into separate functions.
  */
 
 #ifndef AT24MAC_ID_H
