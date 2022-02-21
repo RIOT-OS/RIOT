@@ -571,6 +571,11 @@ ifneq (,$(filter gcoap_dtls,$(USEMODULE)))
   USEMODULE += event_timeout_ztimer
 endif
 
+ifneq (,$(filter dsm,$(USEMODULE)))
+  USEMODULE += sock_dtls
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter gcoap,$(USEMODULE)))
   USEMODULE += nanocoap
   USEMODULE += sock_async_event
