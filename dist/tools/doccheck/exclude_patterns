@@ -8529,10 +8529,10 @@ drivers/apa102/include/apa102_params\.h:[0-9]+: warning: Member APA102_PARAM_CLK
 drivers/apa102/include/apa102_params\.h:[0-9]+: warning: Member APA102_PARAM_DATA_PIN \(macro definition\) of file apa102_params\.h is not documented\.
 drivers/apds99xx/include/apds99xx_params\.h:[0-9]+: warning: Member APDS99XX_PARAMS \(macro definition\) of file apds99xx_params\.h is not documented\.
 drivers/apds99xx/include/apds99xx_params\.h:[0-9]+: warning: Member APDS99XX_SAUL_INFO \(macro definition\) of file apds99xx_params\.h is not documented\.
-drivers/at24mac/include/at24mac_params\.h:[0-9]+: warning: Member AT24MAC_ID_PARAMS \(macro definition\) of file at24mac_params\.h is not documented\.
-drivers/at24mac/include/at24mac_params\.h:[0-9]+: warning: Member AT24MAC_ID_PARAM_I2C_ADDR \(macro definition\) of file at24mac_params\.h is not documented\.
-drivers/at24mac/include/at24mac_params\.h:[0-9]+: warning: Member AT24MAC_ID_PARAM_I2C_DEV \(macro definition\) of file at24mac_params\.h is not documented\.
-drivers/at24mac/include/at24mac_params\.h:[0-9]+: warning: Member AT24MAC_ID_PARAM_TYPE \(macro definition\) of file at24mac_params\.h is not documented\.
+drivers/at24mac/include/at24mac_id_params\.h:[0-9]+: warning: Member AT24MAC_ID_PARAMS \(macro definition\) of file at24mac_params\.h is not documented\.
+drivers/at24mac/include/at24mac_id_params\.h:[0-9]+: warning: Member AT24MAC_ID_PARAM_I2C_ADDR \(macro definition\) of file at24mac_params\.h is not documented\.
+drivers/at24mac/include/at24mac_id_params\.h:[0-9]+: warning: Member AT24MAC_ID_PARAM_I2C_DEV \(macro definition\) of file at24mac_params\.h is not documented\.
+drivers/at24mac/include/at24mac_id_params\.h:[0-9]+: warning: Member AT24MAC_ID_PARAM_TYPE \(macro definition\) of file at24mac_params\.h is not documented\.
 drivers/at25xxx/include/at25xxx_params\.h:[0-9]+: warning: Member AT25XXX_PARAMS \(macro definition\) of file at25xxx_params\.h is not documented\.
 drivers/at25xxx/include/at25xxx_params\.h:[0-9]+: warning: Member AT25XXX_PARAM_ADDR_LEN \(macro definition\) of file at25xxx_params\.h is not documented\.
 drivers/at25xxx/include/at25xxx_params\.h:[0-9]+: warning: Member AT25XXX_PARAM_CS \(macro definition\) of file at25xxx_params\.h is not documented\.
