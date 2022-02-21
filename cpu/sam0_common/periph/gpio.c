@@ -274,11 +274,47 @@ static bool _rtc_irq_enabled(void)
     return false;
 }
 
+static int _set_extwake(gpio_t pin, bool on)
+{
+#ifdef REG_RSTC_WKEN
+    uint8_t idx = _pin_pos(pin);
+
+    /* PA0 - PA7 are EXTWAKE pins */
+    if ((idx > 7) || (_port(pin) != _port(GPIO_PIN(PA, 0)))) {
+        return -1;
+    }
+
+    if (on) {
+        RSTC->WKEN.reg |= 1 << idx;
+    } else {
+        RSTC->WKEN.reg &= ~(1 << idx);
+    }
+
+    return idx;
+#else
+    (void)pin;
+    (void)on;
+    return -1;
+#endif
+}
+
 static void _init_rtc_pin(gpio_t pin, gpio_flank_t flank)
 {
     if (IS_ACTIVE(MODULE_PERIPH_GPIO_TAMPER_WAKE)) {
         rtc_tamper_register(pin, flank);
     }
+#ifdef REG_RSTC_WKEN
+    int idx = _set_extwake(pin, true);
+    if (idx < 0) {
+        return;
+    }
+
+    if (flank == GPIO_RISING) {
+        RSTC->WKPOL.reg |= 1 << idx;
+    } else {
+        RSTC->WKPOL.reg &= ~(1 << idx);
+    }
+#endif
 }
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
@@ -418,10 +454,13 @@ void gpio_irq_enable(gpio_t pin)
     }
 
     /* clear stale interrupt */
-    _EIC->INTFLAG.reg = (1 << exti);
+    _EIC->INTFLAG.reg = 1 << exti;
 
     /* enable interrupt */
-    _EIC->INTENSET.reg = (1 << exti);
+    _EIC->INTENSET.reg = 1 << exti;
+
+    /* enable wake from deep sleep */
+    _set_extwake(pin, true);
 }
 
 void gpio_irq_disable(gpio_t pin)
@@ -430,7 +469,12 @@ void gpio_irq_disable(gpio_t pin)
     if (exti == -1) {
         return;
     }
-    _EIC->INTENCLR.reg = (1 << exti);
+
+    /* disable interrupt */
+    _EIC->INTENCLR.reg = 1 << exti;
+
+    /* disable wake from deep sleep */
+    _set_extwake(pin, false);
 }
 
 #if defined(CPU_COMMON_SAML1X)
