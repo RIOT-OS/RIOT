@@ -96,9 +96,11 @@ static const adc_conf_t adc_config[] = {
     { GPIO_PIN(PORT_C, 2), 12 },
     { GPIO_PIN(PORT_C, 3), 13 },
     { GPIO_PIN(PORT_C, 4), 14 },
-    { GPIO_PIN(PORT_C, 5), 15 }
+    { GPIO_PIN(PORT_C, 5), 15 },
+    { GPIO_UNDEF, 18 }, /* VBAT */
 };
 
+#define VBAT_ADC            ADC_LINE(6) /**< VBAT ADC line */
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 

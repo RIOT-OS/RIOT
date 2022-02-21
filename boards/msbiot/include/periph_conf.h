@@ -105,9 +105,11 @@ static const pwm_conf_t pwm_config[] = {
  */
 static const adc_conf_t adc_config[] = {
     {GPIO_PIN(PORT_B, 0), 0, 8},
-    {GPIO_PIN(PORT_B, 1), 0, 9}
+    {GPIO_PIN(PORT_B, 1), 0, 9},
+    {GPIO_UNDEF, 0, 18}, /* VBAT */
 };
 
+#define VBAT_ADC            ADC_LINE(2) /**< VBAT ADC line */
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 

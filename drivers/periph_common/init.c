@@ -50,6 +50,9 @@
 #ifdef MODULE_PERIPH_INIT_PTP
 #include "periph/ptp.h"
 #endif
+#ifdef MODULE_PERIPH_INIT_VBAT
+#include "periph/vbat.h"
+#endif
 #endif /* MODULE_PERIPH_INIT */
 
 void periph_init(void)
@@ -103,6 +106,10 @@ void periph_init(void)
 
 #if defined(MODULE_PERIPH_INIT_PTP)
     ptp_init();
+#endif
+
+#if defined(MODULE_PERIPH_INIT_VBAT)
+    vbat_init();
 #endif
 
 #endif /* MODULE_PERIPH_INIT */

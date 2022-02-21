@@ -24,11 +24,19 @@
 #include "mutex.h"
 #include "periph/adc.h"
 #include "periph_conf.h"
+#include "periph/vbat.h"
 
 /**
  * @brief   Maximum allowed ADC clock speed
  */
 #define MAX_ADC_SPEED           (12000000U)
+
+/**
+ * @brief   Default VBAT undefined value
+ */
+#ifndef VBAT_ADC
+#define VBAT_ADC    ADC_UNDEF
+#endif
 
 /**
  * @brief   Allocate locks for all three available ADC devices
@@ -73,7 +81,9 @@ int adc_init(adc_t line)
     prep(line);
 
     /* configure the pin */
-    gpio_init_analog(adc_config[line].pin);
+    if (adc_config[line].pin != GPIO_UNDEF) {
+        gpio_init_analog(adc_config[line].pin);
+    }
     /* set clock prescaler to get the maximal possible ADC clock value */
     for (clk_div = 2; clk_div < 8; clk_div += 2) {
         if ((CLOCK_CORECLOCK / clk_div) <= MAX_ADC_SPEED) {
@@ -84,17 +94,6 @@ int adc_init(adc_t line)
 
     /* enable the ADC module */
     dev(line)->CR2 = ADC_CR2_ADON;
-
-    /* check if this channel is an internal ADC channel, if so
-     * enable the internal temperature and Vref */
-    if (adc_config[line].chan == 16 || adc_config[line].chan == 17) {
-        /* check if the internal channels are configured to use ADC1 */
-        if (dev(line) != ADC1) {
-            return -3;
-        }
-
-        ADC->CCR |= ADC_CCR_TSVREFE;
-    }
 
     /* free the device again */
     done(line);
@@ -112,7 +111,15 @@ int32_t adc_sample(adc_t line, adc_res_t res)
 
     /* lock and power on the ADC device  */
     prep(line);
-
+    /* check if this is the VBAT line or another internal ADC channel */
+    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+        vbat_enable();
+    }
+    else if (dev(line) == ADC1) {
+        if (adc_config[line].chan == 16 || adc_config[line].chan == 17) {
+            ADC->CCR |= ADC_CCR_TSVREFE;
+        }
+    }
     /* set resolution and conversion channel */
     dev(line)->CR1 = res;
     dev(line)->SQR3 = adc_config[line].chan;
@@ -121,7 +128,15 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     while (!(dev(line)->SR & ADC_SR_EOC)) {}
     /* finally read sample and reset the STRT bit in the status register */
     sample = (int)dev(line)->DR;
-
+    /* check if this is the VBAT line or another internal ADC channel */
+    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+        vbat_disable();
+    }
+    else if (dev(line) == ADC1) {
+        if (adc_config[line].chan == 16 || adc_config[line].chan == 17) {
+            ADC->CCR &= ~ADC_CCR_TSVREFE;
+        }
+    }
     /* power off and unlock device again */
     done(line);
 

@@ -227,7 +227,7 @@ static const pwm_conf_t pwm_config[] = {
  * @name ADC configuration
  *
  * Not all ADCs are configured, by now, only the 6 ones available
- * on the Arduino(R) connector A0-A5
+ * on the Arduino(R) connector A0-A5 and internal VBAT ADC channel.
  * @{
  */
 static const adc_conf_t adc_config[] = {
@@ -237,7 +237,10 @@ static const adc_conf_t adc_config[] = {
     {GPIO_PIN(PORT_C, 4), 2, 14},
     {GPIO_PIN(PORT_C, 5), 2, 15},
     {GPIO_PIN(PORT_A, 4), 2, 4},
+    {GPIO_UNDEF, 0, 18}, /* VBAT */
 };
+
+#define VBAT_ADC    ADC_LINE(6) /**< VBAT ADC line */
 #define ADC_NUMOF   ARRAY_SIZE(adc_config)
 /** @} */
 

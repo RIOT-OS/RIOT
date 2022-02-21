@@ -369,6 +369,11 @@ config HAS_PERIPH_USBDEV
     help
         Indicates that an USBDEV peripheral is present.
 
+config HAS_PERIPH_VBAT
+    bool
+    help
+        Indicates that backup battery monitoring is supported
+
 config HAS_PERIPH_WDT
     bool
     help
