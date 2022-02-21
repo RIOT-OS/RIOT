@@ -21,40 +21,10 @@
 #include "periph/gpio.h"
 #include "kernel_defines.h"
 
-#define LED_INIT(x) do {                                    \
-                        gpio_init(LED##x##_PIN, GPIO_OUT);  \
-                        LED##x##_OFF;                       \
-                    } while (0)
-
-__attribute__((__weak__))
-void board_init(void)
-{
-    if (!IS_USED(MODULE_PERIPH_GPIO)) {
-        return;
-    }
-
-#ifdef LED0_PIN
-    LED_INIT(0);
-#endif
-#ifdef LED1_PIN
-    LED_INIT(1);
-#endif
-#ifdef LED2_PIN
-    LED_INIT(2);
-#endif
-#ifdef LED3_PIN
-    LED_INIT(3);
-#endif
-#ifdef LED4_PIN
-    LED_INIT(4);
-#endif
-#ifdef LED5_PIN
-    LED_INIT(5);
-#endif
-#ifdef LED6_PIN
-    LED_INIT(6);
-#endif
-#ifdef LED7_PIN
-    LED_INIT(7);
-#endif
-}
+/*
+ * Allow overwriting board_init if common implementation doesn't work.
+ * If at link time another implementation of board_init() not marked as weak
+ * ((a.k.a. a strong symbol) is present, it will be linked in instead.
+ */
+void __attribute__((weak)) board_init(void)
+{}

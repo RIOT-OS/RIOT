@@ -22,10 +22,6 @@
 #include "cpu.h"
 #include "fancy_leds.h"
 
-void board_init(void)
-{
-}
-
 /**
  * @brief Initialize the boards on-board LEDs
  *
