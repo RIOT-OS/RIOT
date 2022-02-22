@@ -38,11 +38,6 @@ extern "C" {
 
 #define BTN0_PIN            GPIO_PIN(PORT_A, 0)
 #define BTN0_MODE           GPIO_IN
-/**
- * @brief   Initialize board specific hardware
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif
