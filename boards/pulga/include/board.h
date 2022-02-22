@@ -31,17 +31,14 @@ extern "C" {
  * @name    LED pin configuration
  * @{
  */
-#define LED0_PIN            GPIO_PIN(0, 13)
-#define LED1_PIN            GPIO_PIN(0, 14)
-#define LED2_PIN            GPIO_PIN(0, 15)
-#define LED3_PIN            GPIO_PIN(0, 16)
+/* FIXME: all LEDs are on by default. */
+#define LED0_PIN            GPIO_PIN(1, 13)
+#define LED1_PIN            GPIO_PIN(1, 14)
 
-#define LED_PORT            (NRF_P0)
-#define LED0_MASK           (1 << 13)
-#define LED1_MASK           (1 << 14)
-#define LED2_MASK           (1 << 15)
-#define LED3_MASK           (1 << 16)
-#define LED_MASK            (LED0_MASK | LED1_MASK | LED2_MASK | LED3_MASK)
+#define LED_PORT            (NRF_P0) /* XXX: maybe use NRF_P1? and change 0 to 1 below? */
+#define LED0_MASK           (0 << 13)
+#define LED1_MASK           (0 << 14)
+#define LED_MASK            (LED0_MASK | LED1_MASK)
 
 #define LED0_ON             (LED_PORT->OUTCLR = LED0_MASK)
 #define LED0_OFF            (LED_PORT->OUTSET = LED0_MASK)
@@ -50,14 +47,6 @@ extern "C" {
 #define LED1_ON             (LED_PORT->OUTCLR = LED1_MASK)
 #define LED1_OFF            (LED_PORT->OUTSET = LED1_MASK)
 #define LED1_TOGGLE         (LED_PORT->OUT   ^= LED1_MASK)
-
-#define LED2_ON             (LED_PORT->OUTCLR = LED2_MASK)
-#define LED2_OFF            (LED_PORT->OUTSET = LED2_MASK)
-#define LED2_TOGGLE         (LED_PORT->OUT   ^= LED2_MASK)
-
-#define LED3_ON             (LED_PORT->OUTCLR = LED3_MASK)
-#define LED3_OFF            (LED_PORT->OUTSET = LED3_MASK)
-#define LED3_TOGGLE         (LED_PORT->OUT   ^= LED3_MASK)
 /** @} */
 
 /**
@@ -66,6 +55,7 @@ extern "C" {
  * A Macronix MX25R6435F is present on the board
  * @{
  */
+/* XXX: comment out since there is no flash anymore in Pulga X V1.0
 #define NRF52840DK_NOR_PAGE_SIZE          (256)
 #define NRF52840DK_NOR_PAGES_PER_SECTOR   (16)
 #define NRF52840DK_NOR_SECTOR_COUNT       (2048)
@@ -74,6 +64,7 @@ extern "C" {
 #define NRF52840DK_NOR_SPI_CLK            SPI_CLK_10MHZ
 #define NRF52840DK_NOR_SPI_CS             GPIO_PIN(0, 17)
 #define NRF52840DK_NOR_SPI_MODE           SPI_MODE_0
+*/
 /** @} */
 
 /** Default MTD device */
@@ -86,14 +77,10 @@ extern mtd_dev_t *mtd0;
  * @name    Button pin configuration
  * @{
  */
-#define BTN0_PIN            GPIO_PIN(0, 11)
+#define BTN0_PIN            GPIO_PIN(1, 11)
 #define BTN0_MODE           GPIO_IN_PU
-#define BTN1_PIN            GPIO_PIN(0, 12)
+#define BTN1_PIN            GPIO_PIN(1, 12)
 #define BTN1_MODE           GPIO_IN_PU
-#define BTN2_PIN            GPIO_PIN(0, 24)
-#define BTN2_MODE           GPIO_IN_PU
-#define BTN3_PIN            GPIO_PIN(0, 25)
-#define BTN3_MODE           GPIO_IN_PU
 /** @} */
 
 #ifdef __cplusplus

@@ -37,7 +37,7 @@ static const spi_conf_t spi_config[] = {
         .sclk = GPIO_PIN(0, 8),
         .mosi = GPIO_PIN(0, 4),
         .miso = GPIO_PIN(0, 6),
-    }/*, FIXME: apparently, the second SPI is not routed in Pulga X V1.0
+    }/*, XXX: apparently, the second SPI is not routed in Pulga X V1.0
     {
         .dev  = NRF_SPIM2,
         .sclk = GPIO_PIN(0, 22),
@@ -63,7 +63,7 @@ static const uart_conf_t uart_config[] = {
 #endif
         .irqn       = UARTE0_UART0_IRQn,
     }
-    /*, FIXME: actually, I don't know how to configure this, so I'll just comment it out.
+    /*, XXX: actually, I don't know how to configure this, so I'll just comment it out.
     {  Mapped to Arduino D0/D1 pins
         .dev        = NRF_UARTE1,
         .rx_pin     = GPIO_PIN(1,1),
