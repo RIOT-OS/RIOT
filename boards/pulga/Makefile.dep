@@ -1,0 +1,7 @@
+USEMODULE += boards_common_nrf52xxxdk
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += mtd_spi_nor
+endif
+
+include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.dep
