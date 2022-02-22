@@ -1,1 +1,7 @@
-USEMODULE += at24cxxx
+# Deprecated functionality, the eeprom should be independent of the id.
+# Should be removed in the 2022.07 release.
+USEMODULE += at24mac_eeprom
+
+ifneq (,$(filter at24mac_eeprom,$(USEMODULE)))
+    USEMODULE += at24cxxx
+endif

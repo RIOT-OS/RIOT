@@ -1,3 +1,4 @@
+PSEUDOMODULES += at24mac_eeprom
 PSEUDOMODULES += at24c%
 # handle at24cxxx being a distinct module
 NO_PSEUDOMODULES += at24cxxx
