@@ -34,16 +34,16 @@ extern "C" {
 static const spi_conf_t spi_config[] = {
     {
         .dev  = NRF_SPIM0,
-        .sclk = GPIO_PIN(1, 15),
-        .mosi = GPIO_PIN(1, 13),
-        .miso = GPIO_PIN(1, 14),
-    },
+        .sclk = GPIO_PIN(0, 8),
+        .mosi = GPIO_PIN(0, 4),
+        .miso = GPIO_PIN(0, 6),
+    }/*, FIXME: apparently, the second SPI is not routed in Pulga X V1.0
     {
         .dev  = NRF_SPIM2,
-        .sclk = GPIO_PIN(0, 19),
-        .mosi = GPIO_PIN(0, 20),
-        .miso = GPIO_PIN(0, 21),
-    }
+        .sclk = GPIO_PIN(0, 22),
+        .mosi = GPIO_PIN(0, 17),
+        .miso = GPIO_PIN(0, 20),
+    }*/
 };
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
@@ -55,15 +55,16 @@ static const spi_conf_t spi_config[] = {
 static const uart_conf_t uart_config[] = {
     { /* Mapped to USB virtual COM port */
         .dev        = NRF_UARTE0,
-        .rx_pin     = GPIO_PIN(0,8),
-        .tx_pin     = GPIO_PIN(0,6),
+        .rx_pin     = GPIO_PIN(0,25), // TODO: how to configure this from application?
+        .tx_pin     = GPIO_PIN(0,28), // TODO: how to configure this from application?
 #ifdef MODULE_PERIPH_UART_HW_FC
         .rts_pin    = GPIO_UNDEF,
         .cts_pin    = GPIO_UNDEF,
 #endif
         .irqn       = UARTE0_UART0_IRQn,
-    },
-    { /* Mapped to Arduino D0/D1 pins */
+    }
+    /*, FIXME: actually, I don't know how to configure this, so I'll just comment it out.
+    {  Mapped to Arduino D0/D1 pins
         .dev        = NRF_UARTE1,
         .rx_pin     = GPIO_PIN(1,1),
         .tx_pin     = GPIO_PIN(1,2),
@@ -72,7 +73,7 @@ static const uart_conf_t uart_config[] = {
         .cts_pin    = GPIO_UNDEF,
 #endif
         .irqn       = UARTE1_IRQn,
-    },
+    },*/
 };
 
 #define UART_0_ISR          (isr_uart0)
