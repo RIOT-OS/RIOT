@@ -31,7 +31,7 @@
 #include "net/utils.h"
 #include "timex.h"
 #include "utlist.h"
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if IS_USED(MODULE_ZTIMER)
 #include "ztimer.h"
 #else
 #include "xtimer.h"
@@ -60,7 +60,7 @@ static void _send(const char *addr_str, const char *port_str,
         return;
     }
 
-    for (unsigned int i = 0; i < num; i++) {
+    while (num--) {
         gnrc_pktsnip_t *payload, *udp, *ip;
         unsigned payload_size;
         /* allocate payload */
@@ -105,11 +105,15 @@ static void _send(const char *addr_str, const char *port_str,
          * => use temporary variable for output */
         printf("Success: sent %u byte(s) to [%s]:%u\n", payload_size, addr_str,
                port);
-#if IS_USED(MODULE_ZTIMER_MSEC)
-        ztimer_sleep(ZTIMER_MSEC, delay);
-#else
-        xtimer_usleep(delay);
+        if (num) {
+#if IS_USED(MODULE_ZTIMER_USEC)
+            ztimer_sleep(ZTIMER_USEC, delay);
+#elif IS_USED(MODULE_XTIMER)
+            xtimer_usleep(delay);
+#elif IS_USED(MODULE_ZTIMER_MSEC)
+            ztimer_sleep(ZTIMER_MSEC, (delay + US_PER_MS - 1) / US_PER_MS);
 #endif
+        }
     }
 }
 
@@ -158,15 +162,10 @@ int _gnrc_udp_cmd(int argc, char **argv)
 
     if (strcmp(argv[1], "send") == 0) {
         uint32_t num = 1;
-        uint32_t delay = 1000000;
+        uint32_t delay;
         if (argc < 5) {
-#if IS_USED(MODULE_ZTIMER_MSEC)
-            printf("usage: %s send "
-                   "<addr> <port> <data> [<num> [<delay in ms>]]\n", argv[0]);
-#else
             printf("usage: %s send "
                    "<addr> <port> <data> [<num> [<delay in us>]]\n", argv[0]);
-#endif
             return 1;
         }
         if (argc > 5) {
@@ -174,6 +173,8 @@ int _gnrc_udp_cmd(int argc, char **argv)
         }
         if (argc > 6) {
             delay = atoi(argv[6]);
+        } else {
+            delay = US_PER_SEC;
         }
         _send(argv[2], argv[3], argv[4], num, delay);
     }
