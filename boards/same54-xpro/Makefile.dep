@@ -9,7 +9,8 @@ endif
 ifneq (,$(filter mtd,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi_on_qspi
   USEMODULE += mtd_spi_nor
-  USEMODULE += mtd_at24cxxx at24mac
+  USEMODULE += mtd_at24cxxx
+  USEMODULE += at24mac_eeprom
   USEMODULE += sam0_sdhc
 endif
 

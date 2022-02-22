@@ -8,7 +8,7 @@ ifneq (,$(filter eui_provider,$(USEMODULE)))
 endif
 
 ifneq (,$(filter mtd,$(USEMODULE)))
-  USEMODULE += mtd_at24cxxx at24mac
+  USEMODULE += mtd_at24cxxx at24mac_eeprom
 endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
