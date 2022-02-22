@@ -460,6 +460,8 @@ else
   include $(RIOTMAKE)/dependency_resolution.inc.mk
 endif
 
+include $(RIOTMAKE)/deprecated_modules.inc.mk
+
 # Include Board and CPU configuration
 INCLUDES += $(addprefix -I,$(wildcard $(BOARDDIR)/include))
 include $(BOARDDIR)/Makefile.include

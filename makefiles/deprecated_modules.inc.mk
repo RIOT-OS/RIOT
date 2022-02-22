@@ -1,5 +1,6 @@
 # Add deprecated modules here
-# Keep this list ALPHABETICALLY SORTED!!!!111elven
+# Keep this list ALPHABETICALLY SORTED!!!!
+DEPRECATED_MODULES += at24mac
 DEPRECATED_MODULES += event_thread_lowest
 DEPRECATED_MODULES += gnrc_netdev_default
 DEPRECATED_MODULES += gnrc_pktbuf_cmd # use shell_cmd_gnrc_pktbuf instead
@@ -14,3 +15,15 @@ DEPRECATED_MODULES += shell_commands # use shell_cmds_default instead
 DEPRECATED_MODULES += sha1sum # use shell_cmd_sha1sum instead
 DEPRECATED_MODULES += sha256sum # use shell_cmd_sha256sum instead
 DEPRECATED_MODULES += ztimer_now64
+
+# Warn about used deprecated modules
+DEPRECATED_MODULES_USED := $(sort $(filter $(DEPRECATED_MODULES),$(USEMODULE)))
+ifneq (,$(DEPRECATED_MODULES_USED))
+  $(shell $(COLOR_ECHO) "$(COLOR_RED)Deprecated modules are in use:$(COLOR_RESET)"\
+                        "$(DEPRECATED_MODULES_USED)" 1>&2)
+  ifneq (,$(filter at24mac,$(DEPRECATED_MODULES_USED)))
+    $(shell $(COLOR_ECHO) "As of 2022.07 the at24mac module will only "\
+                          "be id functionality, if eeprom is needed, "\
+                          "use at24mac_eeprom." 1>&2)
+  endif
+endif
