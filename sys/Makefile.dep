@@ -274,7 +274,6 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += vfs
   USEMODULE += posix_headers
-  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter shell,$(USEMODULE)))
