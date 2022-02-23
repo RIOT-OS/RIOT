@@ -14,9 +14,3 @@ FEATURES_PROVIDED += periph_usbdev
 
 # Put other features for this board (in alphabetical order)
 FEATURES_PROVIDED += riotboot
-
-# This configuration enables modules that are only available when using Kconfig
-# module modelling
-ifeq (1, $(TEST_KCONFIG))
-  KCONFIG_BOARD_CONFIG += $(BOARDDIR)/yarm.config
-endif

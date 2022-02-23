@@ -25,9 +25,6 @@
 
 void board_init(void)
 {
-    /* initialize the boards LEDs */
-    gpio_init(LED0_PIN, GPIO_OUT); /* Red LED */
-
     /* initialize the screen backlight, turn it off by default */
     gpio_init(BACKLIGHT_PIN, GPIO_OUT);
     gpio_clear(BACKLIGHT_PIN);

@@ -63,6 +63,10 @@
 #include "periph_cpu.h"
 #include "tools.h"
 
+#ifdef MODULE_PUF_SRAM
+#include "puf_sram.h"
+#endif
+
 #ifdef MODULE_STDIO_UART
 #include "stdio_uart.h"
 #endif
@@ -128,6 +132,10 @@ NORETURN void IRAM call_start_cpu0 (void)
     if (reset_reason == RTCWDT_SYS_RESET || reset_reason == TG0WDT_SYS_RESET) {
         esp_panic_wdt_stop();
     }
+
+#ifdef MODULE_PUF_SRAM
+    puf_sram_init((uint8_t *)&_sheap, SEED_RAM_LEN);
+#endif
 
     /* Clear BSS. Please do not attempt to do any complex stuff */
     /* (like early logging) before this. */
@@ -364,6 +372,7 @@ static NORETURN void IRAM system_init (void)
     #endif
 
     /* initialize the board */
+    extern void board_init(void);
     board_init();
 
     /* route a software interrupt source to CPU as trigger for thread yields */

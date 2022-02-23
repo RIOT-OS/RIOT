@@ -22,6 +22,7 @@
 
 #define USB_H_USER_IS_RIOT_INTERNAL
 
+#include "kernel_defines.h"
 #include "periph_cpu.h"
 
 #ifdef MODULE_PERIPH_INIT
@@ -49,11 +50,19 @@
 #ifdef MODULE_PERIPH_INIT_PTP
 #include "periph/ptp.h"
 #endif
+#ifdef MODULE_PERIPH_INIT_VBAT
+#include "periph/vbat.h"
+#endif
 #endif /* MODULE_PERIPH_INIT */
 
 void periph_init(void)
 {
 #ifdef MODULE_PERIPH_INIT
+    /* initialize leds */
+    if (IS_USED(MODULE_PERIPH_INIT_LEDS)) {
+        extern void led_init(void);
+        led_init();
+    }
     /* initialize configured I2C devices */
 #ifdef MODULE_PERIPH_INIT_I2C
     for (unsigned i = 0; i < I2C_NUMOF; i++) {
@@ -97,6 +106,10 @@ void periph_init(void)
 
 #if defined(MODULE_PERIPH_INIT_PTP)
     ptp_init();
+#endif
+
+#if defined(MODULE_PERIPH_INIT_VBAT)
+    vbat_init();
 #endif
 
 #endif /* MODULE_PERIPH_INIT */

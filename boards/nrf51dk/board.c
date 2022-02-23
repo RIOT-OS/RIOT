@@ -23,20 +23,9 @@
 
 void board_init(void)
 {
-    /* initialize the board LEDs, set pins as output and turn LEDs off */
-    gpio_init(LED0_PIN, GPIO_OUT);
-    gpio_init(LED1_PIN, GPIO_OUT);
-    gpio_init(LED2_PIN, GPIO_OUT);
-    gpio_init(LED3_PIN, GPIO_OUT);
-    gpio_set(LED0_PIN);
-    gpio_set(LED1_PIN);
-    gpio_set(LED2_PIN);
-    gpio_set(LED3_PIN);
-
     /* initialize the board buttons */
     gpio_init(BTN0_PIN, BTN0_MODE);
     gpio_init(BTN1_PIN, BTN1_MODE);
     gpio_init(BTN2_PIN, BTN2_MODE);
     gpio_init(BTN3_PIN, BTN3_MODE);
-
 }

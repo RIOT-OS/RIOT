@@ -15,9 +15,3 @@ FEATURES_PROVIDED += esp_rtc_timer_32k
 FEATURES_PROVIDED += esp_jtag
 
 FEATURES_PROVIDED += arduino
-
-# This configuration enables modules that are only available when using Kconfig
-# module modelling
-ifeq (1, $(TEST_KCONFIG))
-  KCONFIG_BOARD_CONFIG += $(BOARDDIR)/esp32-wrover-kit.config
-endif

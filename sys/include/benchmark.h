@@ -41,15 +41,15 @@ extern "C" {
  * @param[in] runs      number of times to run @p func
  * @param[in] func      function call to benchmark
  */
-#define BENCHMARK_FUNC(name, runs, func)                    \
-    {                                                           \
+#define BENCHMARK_FUNC(name, runs, func)                        \
+    do {                                                        \
         uint32_t _benchmark_time = ztimer_now(ZTIMER_USEC);     \
         for (unsigned long i = 0; i < runs; i++) {              \
             func;                                               \
         }                                                       \
         _benchmark_time = (ztimer_now(ZTIMER_USEC) - _benchmark_time);\
         benchmark_print_time(_benchmark_time, runs, name);      \
-    }
+    } while (0)
 
 /**
  * @brief   Output the given time as well as the time per run on STDIO

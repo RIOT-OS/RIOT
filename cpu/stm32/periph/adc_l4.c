@@ -25,6 +25,7 @@
 #include "mutex.h"
 #include "periph/adc.h"
 #include "periph_conf.h"
+#include "periph/vbat.h"
 #include "ztimer.h"
 
 /**
@@ -53,6 +54,13 @@
 /* The sampling time can be specified for each channel over SMPR1 and SMPR2.
    This specifies the first channel that goes to SMPR2 instead of SMPR1. */
 #define ADC_SMPR2_FIRST_CHAN (10)
+#endif
+
+/**
+ * @brief   Default VBAT undefined value
+ */
+#ifndef VBAT_ADC
+#define VBAT_ADC    ADC_UNDEF
 #endif
 
 /**
@@ -122,8 +130,9 @@ int adc_init(adc_t line)
     }
 
     /* configure the pin */
-    gpio_init_analog(adc_config[line].pin);
-
+    if (adc_config[line].pin != GPIO_UNDEF) {
+        gpio_init_analog(adc_config[line].pin);
+    }
 #if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L475VG)
     /* On STM32L475xx/476xx/486xx devices, before any conversion of an input channel coming
        from GPIO pads, it is necessary to configure the corresponding GPIOx_ASCR register in
@@ -192,6 +201,11 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     /* lock and power on the ADC device  */
     prep(line);
 
+    /* check if this is the VBAT line */
+    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+        vbat_enable();
+    }
+
     /* first clear resolution */
     dev(line)->CFGR &= ~(ADC_CFGR_RES);
 
@@ -207,6 +221,11 @@ int32_t adc_sample(adc_t line, adc_res_t res)
 
     /* read the sample */
     sample = (int)dev(line)->DR;
+
+    /* check if this is the VBAT line */
+    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+        vbat_disable();
+    }
 
     /* free the device again */
     done(line);

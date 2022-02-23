@@ -55,6 +55,17 @@ extern "C" {
 #define ETHOS_BAUDRATE STDIO_UART_BAUDRATE
 #endif
 /** @} */
+#else
+#ifndef ETHOS_UART
+#if IS_USED(MODULE_USBUS_CDC_ACM)
+#define ETHOS_UART     UART_DEV(0)
+#else
+#define ETHOS_UART     UART_DEV(1)
+#endif
+#endif
+#ifndef ETHOS_BAUDRATE
+#define ETHOS_BAUDRATE 115200
+#endif
 #endif
 
 /**

@@ -62,6 +62,7 @@ PSEUDOMODULES += event_timeout
 PSEUDOMODULES += event_timeout_ztimer
 PSEUDOMODULES += evtimer_mbox
 PSEUDOMODULES += evtimer_on_ztimer
+PSEUDOMODULES += fatfs_vfs_format
 PSEUDOMODULES += fmt_%
 PSEUDOMODULES += gcoap_dtls
 PSEUDOMODULES += fido2_tests
@@ -186,6 +187,9 @@ PSEUDOMODULES += scanf_float
 PSEUDOMODULES += sched_cb
 PSEUDOMODULES += sched_runq_callback
 PSEUDOMODULES += semtech_loramac_rx
+PSEUDOMODULES += senml_cbor
+PSEUDOMODULES += senml_phydat
+PSEUDOMODULES += senml_saul
 PSEUDOMODULES += shell_hooks
 PSEUDOMODULES += slipdev_stdio
 PSEUDOMODULES += slipdev_l2addr
@@ -214,8 +218,39 @@ PSEUDOMODULES += suit_transport_%
 PSEUDOMODULES += suit_storage_%
 PSEUDOMODULES += sys_bus_%
 PSEUDOMODULES += vdd_lc_filter_%
+## @defgroup pseudomodule_vfs_auto_format vfs_auto_format
+## @brief Format mount points at startup unless they can be mounted
+##
+## When this module is active, mount points configured through the @ref
+## pseudomodule_vfs_auto_mount module that can not be mounted at startup are
+## formatted and, if that operation is successful, attempted to mount again.
+##
+## Beware that this may be a harmful procedure in case a bug that corrupts a
+## filesystem coincides with a bug that sends the device into a reboot loop.
 PSEUDOMODULES += vfs_auto_format
+
+## @defgroup pseudomodule_vfs_auto_mount vfs_auto_mount
+## @brief Mount file systems at startup
+##
+## When this module is active, mount points specified through
+## @ref VFS_AUTO_MOUNT are mounted at their designated mount points at startup.
+## These mount points can be specified by the application, or are provided by
+## some boards if the @ref pseudomodule_vfs_default module is active.
 PSEUDOMODULES += vfs_auto_mount
+
+## @defgroup pseudomodule_vfs_default vfs_default
+## @brief Enable default assignments of a board's devices to VFS mount points
+##
+## When this module is active, boards with additional flash storage will
+## automatically mount (and possibly format, if @ref
+## pseudomodule_vfs_auto_format is enabled) their flash devices with a file
+## system that is common for that board (or at least common for this board
+## within RIOT).
+##
+## Boards will generally mount to `/nvm` unless they have several storage
+## backends.
+PSEUDOMODULES += vfs_default
+
 PSEUDOMODULES += wakaama_objects_%
 PSEUDOMODULES += wifi_enterprise
 PSEUDOMODULES += xtimer_on_ztimer
@@ -223,6 +258,20 @@ PSEUDOMODULES += zptr
 PSEUDOMODULES += ztimer
 PSEUDOMODULES += ztimer_%
 PSEUDOMODULES += ztimer64_%
+
+## @defgroup pseudomodule_ztimer_auto_adjust ztimer_auto_adjust
+## @brief A module to set on init ztimer->adjust_sleep/adjust_set values
+##
+## When this module is active, then on init if no CONFIG_ZTIMER_USEC_ADJUST_%
+## values are set for the BOARD correction values adjust_sleep and adjust_set
+## will be calculated in set for the required clocks.
+##
+## Note that some BOARDs clocks require a startup time to get accuarate values,
+## a configurable @ref CONFIG_ZTIMER_AUTO_ADJUST_SETTLE value can be set for this.
+##
+## Alternatively CONFIG_ZTIMER_USEC_ADJUST_% values can be set in the BOARDs
+## configuration header board.h. These can be found out by running tests/ztimer_overhead
+PSEUDOMODULES += ztimer_auto_adjust
 
 # ztimer's main module is called "ztimer_core"
 NO_PSEUDOMODULES += ztimer_core

@@ -11,6 +11,10 @@
  * @ingroup     drivers_storage
  * @brief       Driver for internal flash devices implementing flashpage interface
  *
+ * The MTD device created by @ref MTD_FLASHPAGE_INIT_VAL spans the complete
+ * accessible flash page memory. To expose merely an area of that as a single
+ * MTD partition, the @ref drivers_mtd_mapper can be used.
+ *
  * @{
  *
  * @file

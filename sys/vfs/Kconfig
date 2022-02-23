@@ -10,10 +10,14 @@ config MODULE_VFS
     depends on TEST_KCONFIG
     select MODULE_POSIX_HEADERS
 
+config MODULE_VFS_DEFAULT
+    bool "Use default (board specific) file systems and mount points"
+    depends on MODULE_VFS
+    imply MODULE_VFS_AUTO_MOUNT
+
 config MODULE_VFS_AUTO_MOUNT
     bool "Automatically mount configured file systems"
     depends on MODULE_VFS
-    default y
 
 config MODULE_VFS_AUTO_FORMAT
     bool "Automatically format configured file systems if mount fails"

@@ -27,6 +27,10 @@ _start_real:
 .option pop
     la sp, _sp
 
+#ifdef MODULE_PUF_SRAM
+    /* PUF */
+    call riscv_puf_sram_init
+#endif
 
     /* Load data section */
     la a0, _data_lma
@@ -41,9 +45,10 @@ _start_real:
     bltu a1, a2, 1b
 2:
 
+
     /* Clear bss section */
     la a0, __bss_start
-    la a1, _end
+    la a1, __bss_end
     bgeu a0, a1, 2f
 1:
     sw zero, (a0)

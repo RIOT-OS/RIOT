@@ -10,32 +10,30 @@ PERIPH_FEATURES := $(filter periph_%,$(FEATURES_USED))
 USEMODULE += $(PERIPH_FEATURES)
 
 # Add all USED periph_% init modules unless they are blacklisted
-ifneq (,$(filter periph_init, $(USEMODULE)))
-  PERIPH_IGNORE_MODULES := \
-    periph_init% \
-    periph_common \
-    periph_flexcomm \
-    periph_gpio_mux \
-    periph_i2c_hw \
-    periph_i2c_sw \
-    periph_rtc_ms \
-    periph_mcg \
-    periph_wdog \
-    periph_flash \
-    periph_rtc_rtt \
-    periph_rtt_hw_rtc \
-    periph_rtt_hw_sys \
-    periph_clic \
-    periph_coretimer \
-    periph_plic \
-    periph_spi_on_qspi
-    #
-  PERIPH_MODULES := $(filter-out $(PERIPH_IGNORE_MODULES),\
-                                 $(filter periph_%,$(USEMODULE)))
-  # Use simple expansion to avoid USEMODULE referencing itself
-  PERIPH_INIT_MODULES := $(subst periph_,periph_init_,$(PERIPH_MODULES))
-  DEFAULT_MODULE += $(PERIPH_INIT_MODULES)
-endif
+PERIPH_IGNORE_MODULES := \
+  periph_init% \
+  periph_common \
+  periph_flexcomm \
+  periph_gpio_mux \
+  periph_i2c_hw \
+  periph_i2c_sw \
+  periph_rtc_ms \
+  periph_mcg \
+  periph_wdog \
+  periph_flash \
+  periph_rtc_rtt \
+  periph_rtt_hw_rtc \
+  periph_rtt_hw_sys \
+  periph_clic \
+  periph_coretimer \
+  periph_plic \
+  periph_spi_on_qspi
+  #
+PERIPH_MODULES := $(filter-out $(PERIPH_IGNORE_MODULES),\
+                               $(filter periph_%,$(USEMODULE)))
+# Use simple expansion to avoid USEMODULE referencing itself
+PERIPH_INIT_MODULES := $(subst periph_,periph_init_,$(PERIPH_MODULES))
+DEFAULT_MODULE += $(PERIPH_INIT_MODULES)
 
 # select cpu_check_address pseudomodule if the corresponding feature is used
 USEMODULE += $(filter cpu_check_address, $(FEATURES_USED))

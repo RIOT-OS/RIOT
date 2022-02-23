@@ -38,6 +38,7 @@
 #include "periph_cpu.h"
 #include "periph/init.h"
 #include "periph/gpio.h"
+#include "periph/vbat.h"
 #include "board.h"
 #include "pm_layered.h"
 
@@ -395,14 +396,29 @@ void backup_ram_init(void)
 #define BACKUP_RAM_MAGIC    {'R', 'I', 'O', 'T'}
 #endif
 
-bool cpu_woke_from_backup(void)
-{
+static inline bool _backup_battery_connected(void) {
+#if IS_USED(MODULE_PERIPH_VBAT)
+    vbat_init(); /* early use of VBAT requires init() */
+    return !vbat_is_empty();
+#endif
+    return false;
+}
+
+bool cpu_woke_from_backup(void) {
 #if IS_ACTIVE(CPU_HAS_BACKUP_RAM)
     static const char _signature[] BACKUP_RAM_DATA = BACKUP_RAM_MAGIC;
-    /* switch off regulator to save power */
+    if (_backup_battery_connected()) {
+        /* in case the board has a backup battery the regulator must be on
+        to mitigate (unexpected) outage of VDD, so RTC register and
+        backup domain register contents are not lost */
+        pm_backup_regulator_on();
+    }
+    else {
 #ifndef RIOTBOOT
-    pm_backup_regulator_off();
+        /* switch off regulator to save power */
+        pm_backup_regulator_off();
 #endif
+    }
     for (unsigned i = 0; i < sizeof(_signature); i++) {
         if (_signature[i] != ((char[])BACKUP_RAM_MAGIC)[i]) {
             return false;

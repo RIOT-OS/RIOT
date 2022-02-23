@@ -60,10 +60,18 @@ void _native_LED_RED_TOGGLE(void);
  * @{
  */
 #ifndef MTD_PAGE_SIZE
+#ifdef MODULE_FATFS
+#define MTD_PAGE_SIZE           (512)
+#else
 #define MTD_PAGE_SIZE           (256)
 #endif
+#endif
 #ifndef MTD_SECTOR_SIZE
+#ifdef MODULE_FATFS
+#define MTD_SECTOR_SIZE         (512)
+#else
 #define MTD_SECTOR_SIZE         (4096)
+#endif
 #endif
 #ifndef MTD_SECTOR_NUM
 #define MTD_SECTOR_NUM          (2048)

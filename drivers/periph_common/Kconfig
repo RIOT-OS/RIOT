@@ -115,6 +115,7 @@ config MODULE_PERIPH_INIT_QDEC
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_QDEC
 
+rsource "Kconfig.leds"
 rsource "Kconfig.rtc"
 
 config MODULE_PERIPH_RTT
@@ -169,4 +170,5 @@ config HAVE_SHARED_PERIPH_RTT_PERIPH_RTC
         only one can be selected.
 
 rsource "Kconfig.timer"
+rsource "Kconfig.vbat"
 rsource "Kconfig.wdt"

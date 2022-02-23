@@ -136,6 +136,41 @@ extern "C" {
 #  endif
 #endif
 
+/**
+ * @brief   An offset for ZTIMER_USEC allowing to compensate for the offset
+ *          of @ref ztimer_set(). It can be measured with @ref ztimer_overhead_set()
+ *
+ *          This value should be configured in the board.h.
+ *
+ */
+#ifndef CONFIG_ZTIMER_USEC_ADJUST_SET
+#define CONFIG_ZTIMER_USEC_ADJUST_SET     0
+#endif
+
+/**
+ * @brief   An offset for ZTIMER_USEC allowing to compentsate for the offset
+ *          of @ref ztimer_sleep().
+ *
+ * @note    As internally @ref ztimer_sleep() uses @ref ztimer_set()
+ *          @ref CONFIG_ZTIMER_USEC_ADJUST_SET should be tuned before.
+ *
+ *          This value should be configured in the board.h.
+ */
+#ifndef CONFIG_ZTIMER_USEC_ADJUST_SLEEP
+#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   0
+#endif
+
+/**
+ * @brief   Some MCUs clocks need some warm-up time during which timing is
+ *          inaccurate. This can be a hindrance when using the @ref
+ *          pseudomodule_ztimer_auto_adjust module.
+ *
+ * @warning This value will increase the boards start-up time
+ */
+#ifndef CONFIG_ZTIMER_AUTO_ADJUST_SETTLE
+#define CONFIG_ZTIMER_AUTO_ADJUST_SETTLE    0
+#endif
+
 #ifdef __cplusplus
 }
 #endif

@@ -15,12 +15,6 @@ extern void dummy(void);
 
 void board_init(void)
 {
-    /* Turn off all LED's */
-    gpio_init(LED1_PIN, GPIO_OUT);
-    gpio_init(LED2_PIN, GPIO_OUT);
-    LED1_OFF;
-    LED2_OFF;
-
     /* Stop the linker from throwing away the PIC32 config register settings */
     dummy();
 }

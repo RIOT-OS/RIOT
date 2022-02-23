@@ -54,6 +54,9 @@ extern "C" {
  */
 /**
  * @brief   Maximum number of prefix leases to be stored
+ *
+ *          Should be equal to the number of downstream interfaces
+ *          that are to be configured via DHCPv6
  */
 #ifndef CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX
 #define CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX (1U)

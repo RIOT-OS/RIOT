@@ -69,6 +69,7 @@ static bool _is_busy(at86rf215_t *dev)
     return false;
 }
 
+__attribute__((unused))
 static uint8_t _get_best_match(const uint8_t *array, uint8_t len, uint8_t val)
 {
     uint8_t res = 0;

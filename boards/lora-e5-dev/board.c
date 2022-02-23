@@ -30,12 +30,6 @@
 
 void board_init(void)
 {
-    /* initialization of on-board LEDs */
-#ifdef AUTO_INIT_LED0
-    gpio_init(LED0_PIN, GPIO_OUT);
-    LED0_OFF;
-#endif
-
     if(IS_ACTIVE(CONFIG_LORA_E5_DEV_ENABLE_3P3V)) {
         gpio_init(LORA_E5_DEV_3P3V_ENABLE_PIN, GPIO_OUT);
         gpio_set(LORA_E5_DEV_3P3V_ENABLE_PIN);

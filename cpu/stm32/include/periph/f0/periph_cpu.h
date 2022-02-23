@@ -61,6 +61,15 @@ typedef enum {
     ADC_RES_16BIT = (0xff)          /**< not applicable */
 } adc_res_t;
 /** @} */
+
+/**
+ * @name   Constants for internal VBAT ADC line
+ * @{
+ */
+#define VBAT_ADC_RES        ADC_RES_12BIT
+#define VBAT_ADC_MAX        4095
+/** @} */
+
 #endif /* ndef DOXYGEN */
 
 #ifdef __cplusplus

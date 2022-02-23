@@ -93,10 +93,6 @@ void board_init(void)
 {
     int status;
 
-    /* initialize the boards LEDs */
-    gpio_init(LED0_PIN, GPIO_OUT);
-    gpio_init(LED1_PIN, GPIO_OUT);
-    gpio_init(LED2_PIN, GPIO_OUT);
 
     /* Initialize power control pins */
     power_pins_init();

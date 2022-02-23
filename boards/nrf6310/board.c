@@ -23,10 +23,9 @@
 #include "board.h"
 #include "cpu.h"
 
-void board_init(void)
+void led_init(void)
 {
     /* initialize and turn off on-board LEDs */
-    NRF_GPIO->DIRSET = (LED0_MASK | LED1_MASK | LED2_MASK);
-    NRF_GPIO->OUTSET = (LED0_MASK | LED1_MASK | LED2_MASK);
-
+    NRF_GPIO->DIRSET = LED0_MASK | LED1_MASK | LED2_MASK;
+    NRF_GPIO->OUTSET = LED0_MASK | LED1_MASK | LED2_MASK;
 }

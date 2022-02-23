@@ -236,9 +236,11 @@ static const spi_conf_t spi_config[] = {
  */
 static const adc_conf_t adc_config[] = {
     {GPIO_PIN(PORT_A, 3), 0, 3},
-    {GPIO_PIN(PORT_C, 0), 1, 0}
+    {GPIO_PIN(PORT_C, 0), 1, 0},
+    {GPIO_UNDEF, 0, 18}, /* VBAT */
 };
 
+#define VBAT_ADC            ADC_LINE(2) /**< VBAT ADC line */
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 

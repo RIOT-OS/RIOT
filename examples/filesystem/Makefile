@@ -30,14 +30,13 @@ USEMODULE += mtd
 
 # Use VFS
 USEMODULE += vfs
-# the example demonstrates manual file system mounting, disable auto-mount
-DISABLE_MODULE += vfs_auto_mount
 
 # Use a file system
 # USEMODULE += littlefs
 USEMODULE += littlefs2
 # USEMODULE += spiffs
 # USEMODULE += fatfs_vfs
+# USEMODULE += fatfs_vfs_format
 USEMODULE += constfs
 # USEMODULE += devfs
 

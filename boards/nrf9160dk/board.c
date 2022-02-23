@@ -24,14 +24,6 @@
 
 void board_init(void)
 {
-    gpio_init(LED0_PIN, GPIO_OUT);
-    gpio_clear(LED0_PIN);
-    gpio_init(LED1_PIN, GPIO_OUT);
-    gpio_clear(LED1_PIN);
-    gpio_init(LED2_PIN, GPIO_OUT);
-    gpio_clear(LED2_PIN);
-    gpio_init(LED3_PIN, GPIO_OUT);
-    gpio_clear(LED3_PIN);
 
     gpio_init(BTN0_PIN, BTN0_MODE);
     gpio_init(BTN1_PIN, BTN1_MODE);

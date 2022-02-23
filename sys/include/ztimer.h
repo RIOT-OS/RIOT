@@ -474,8 +474,103 @@ ztimer_now_t _ztimer_now_extend(ztimer_clock_t *clock);
 /**
  * @brief   Get the current time from a clock
  *
- * @warning don't compare ztimer_now() values from different clocks. The
- *          clocks are almost certainly not synchronized.
+ * There are several caveats to consider when using values returned by
+ * `ztimer_now()` (or comparing those values to results of @ref ztimer_set,
+ * which are compatible unless MODULE_ZTMIER_NOW64 is in use):
+ *
+ * * A single value has no meaning of its own. Meaningful results are only ever
+ *   produced when subtracting values from each other (in the wrapping fashion
+ *   implied by the use of unsigned integers in C).
+ *
+ *   For example, even though it may be the case in some scenarios, the value
+ *   does **not** indicate time since system startup.
+ *
+ * * Only values obtained from the same clock can be compared.
+ *
+ * * Two values can only be compared when the clock has been continuously
+ *   active between the first and the second reading.
+ *
+ *   A clock is guaranteed to be active from the time any timer is set (the
+ *   first opportunity to get a "now" value from it is the return value of @ref
+ *   ztimer_set) until the time the timer's callback returns. The clock also
+ *   stays active when timers are set back-to-back (which is the case when the
+ *   first timer's callback sets the second timer), or when they overlap (which
+ *   can be known by starting the second timer and afterwards observing that
+ *   @ref ztimer_is_set or @ref ztimer_remove returns true in a low-priority
+ *   context).
+ *
+ *   In contrast, the clock is not guaranteed to be active if a timer is
+ *   removed and then a second one is started (even if the thread does not
+ *   block between these events), or when an expiring timer wakes up a thread
+ *   that then sets the second timer.
+ *
+ *   If the clock was active, then the difference between the second value and
+ *   the first is then the elapsed time in the clock's unit, **modulo 2³²
+ *   ticks** (or 2⁶⁴ when using the ZTIMER_NOW64 module).
+ *
+ * * A difference between two values (calculated in the usual wrapping way) is
+ *   guaranteed to be exactly the elapsed time (not just modulo 2³²) if there
+ *   exists a single timer that is continuously set while both
+ *   readings are taken (which in particular means that the clock was
+ *   continuously active), **and** the timer is observed to be still set when
+ *   after the second reading an execution context with lower priority than the
+ *   ZTimer interrupt has run. (In particular, this is the case in a thread
+ *   context when interrupts are enabled).
+ *
+ *   For example, this sequence of events will return usable values:
+ *
+ *   * In a thread, a timer is set.
+ *   * Some interrupt fires, and `start = ztimer_now(ZTIMER_MSEC)` is set in
+ *     the handler.
+ *   * The interrupt fires again, and `duration = start -
+ *     ztimer_now(ZTIMER_MSEC)` is stored.
+ *   * Back in the thread context, @ref ztimer_remove on the timer returns
+ *     true.
+ *
+ *     Only now, `duration` can be known to be a duration in milliseconds.
+ *
+ *   (By comparison, if the timer were removed right inside the second
+ *   interrupt, then duration might either be correct, or it might be 5
+ *   milliseconds when really 2³² + 5 milliseconds have elapsed)
+ *
+ *   The requirement of the execution contexts can be **dispensed with, if**
+ *   the set timer is shorter than the wrap-around time of the clock by at
+ *   least the maximum duration the full system is allowed to spend between
+ *   interrupt servicing opportunities. That time varies by setup, but an
+ *   upper bound of 1 minute is conservative enough for system modules to use.
+ *
+ *   For example, this sequence of events will also return usable values:
+ *
+ *   * A mutex is locked, and a timer is set to unlock it on the millisecond
+ *     timer after 1 hour. (This is way less than the wrap-around time of
+ *     around 50 days).
+ *   * The return value of setting the timer is noted as start time.
+ *   * Some interrupt fires, and `ztimer_now()` is taken. Then (still inside
+ *     the ISR), @ref mutex_trylock is used to test for whether the interrupt
+ *     is still locked (indicating that the timer has not been processed). If
+ *     locking failed, the difference is valid and can be used immediately.
+ *     Otherwise, the mutex needs to be freed again, and the difference is
+ *     discarded (it can be stored as "longer than 1 hour").
+ *
+ * * To compare two values T1 and T2 without additional knowledge (eg. of a
+ *   maximum time difference between them), it has to be known which value was
+ *   read earlier, so that the earlier can be subtracted from the later.
+ *
+ *   If that is not known, an easy solution is to store a base value T0 inside
+ *   the same single-timer window as T1 and T2, and then compare (T2 - T0) and
+ *   (T1 - T0) to see which of the events occurred earlier.
+ *
+ * The above criteria are conservative API guarantees of `ztimer_now`. There
+ * can be additional properties of a system that allow additional usage
+ * patterns; these need to be evaluated case-by-case. (For example, a ZTimer
+ * backed by a timer that never stops might be comparable even without a
+ * running timer.)
+ *
+ * @warning All the above need to be considered before using the results of
+ *          this function. Not considering them may give results that appear to
+ *          be valid, but that can change without prior warning, e.g. when
+ *          unrelated components are altered that change the systems's power
+ *          management behavior.
  *
  * @param[in]   clock          ztimer clock to operate on
  *

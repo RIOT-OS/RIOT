@@ -22,6 +22,14 @@
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/adc.h"
+#include "periph/vbat.h"
+
+/**
+ * @brief   Default VBAT undefined value
+ */
+#ifndef VBAT_ADC
+#define VBAT_ADC    ADC_UNDEF
+#endif
 
 /**
  * @brief   Allocate lock for the ADC device
@@ -62,7 +70,9 @@ int adc_init(adc_t line)
     /* lock and power on the device */
     prep();
     /* configure the pin */
-    gpio_init_analog(adc_config[line].pin);
+    if (adc_config[line].pin != GPIO_UNDEF) {
+        gpio_init_analog(adc_config[line].pin);
+    }
     /* reset configuration */
     ADC1->CFGR2 = 0;
     /* enable device */
@@ -86,7 +96,10 @@ int32_t adc_sample(adc_t line,  adc_res_t res)
 
     /* lock and power on the ADC device  */
     prep();
-
+    /* check if this is the VBAT line */
+    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+        vbat_enable();
+    }
     /* set resolution and channel */
     ADC1->CFGR1 = res;
     ADC1->CHSELR = (1 << adc_config[line].chan);
@@ -95,7 +108,10 @@ int32_t adc_sample(adc_t line,  adc_res_t res)
     while (!(ADC1->ISR & ADC_ISR_EOC)) {}
     /* read result */
     sample = (int)ADC1->DR;
-
+    /* check if this is the VBAT line */
+    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+        vbat_disable();
+    }
     /* unlock and power off device again */
     done();
 

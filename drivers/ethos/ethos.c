@@ -89,10 +89,12 @@ static void _fail_frame(ethos_t *dev)
             tsrb_add_one(&dev->inbuf, ETHOS_FRAME_DELIMITER);
             break;
         case ETHOS_FRAME_TYPE_TEXT:
+#ifdef MODULE_ETHOS_STDIO
             tsrb_clear(&ethos_stdio_isrpipe.tsrb);
             /* signal to handler thread that frame is at an end (makes handler thread to
              * truncate frame) */
             isrpipe_write_one(&ethos_stdio_isrpipe, ETHOS_FRAME_DELIMITER);
+#endif
             break;
         case ETHOS_FRAME_TYPE_ERRORED:
             return;

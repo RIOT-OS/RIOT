@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /** @brief Version number */
 #define UTLIST_VERSION 1.9.9
+#include <stddef.h>
 
 #include <assert.h>
 

@@ -39,6 +39,7 @@
 #include "cpu.h"
 #include "mutex.h"
 #include "byteorder.h"
+#include "panic.h"
 
 #include "cpu_conf_stm32_common.h"
 

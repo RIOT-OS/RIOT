@@ -20,6 +20,7 @@
 
 #include <assert.h>
 
+#include "board.h"
 #include "atomic_utils.h"
 #include "irq.h"
 #include "periph/pm.h"

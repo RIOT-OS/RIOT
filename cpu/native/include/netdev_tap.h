@@ -59,8 +59,10 @@ typedef struct {
  *
  * @param dev       the preallocated netdev_tap device handle to setup
  * @param params    initialization parameters
+ * @param index     Index of @p params in a global parameter struct array.
+ *                  If initialized manually, pass a unique identifier instead.
  */
-void netdev_tap_setup(netdev_tap_t *dev, const netdev_tap_params_t *params);
+void netdev_tap_setup(netdev_tap_t *dev, const netdev_tap_params_t *params, int index);
 
 #ifdef __cplusplus
 }

@@ -1,0 +1,18 @@
+USEMODULE += esp_log_tagged
+USEMODULE += esp_log_startup
+USEMODULE += esp_qemu
+
+ifneq (,$(filter periph_timer,$(USEMODULE)))
+  USEMODULE += esp_sw_timer
+endif
+
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  # if netdev_default is used, we use gnrc modules that are enabled
+  # in different examples to use different esp_wifi modules
+  ifeq (,$(filter gnrc_netif_single,$(USEMODULE)))
+    # if gnrc_netif_single module is not enabled, esp_wifi_ap is used
+    USEMODULE += esp_wifi_ap
+  endif
+endif
+
+include $(RIOTBOARD)/esp8266-olimex-mod/Makefile.dep

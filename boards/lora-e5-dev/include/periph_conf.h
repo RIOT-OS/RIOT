@@ -160,8 +160,10 @@ static const i2c_conf_t i2c_config[] = {
 static const adc_conf_t adc_config[] = {
     { GPIO_PIN(PORT_B, 3), 2 },
     { GPIO_PIN(PORT_B, 4), 3 },
+    { GPIO_UNDEF, 14 }, /* VBAT */
 };
 
+#define VBAT_ADC            ADC_LINE(2) /**< VBAT ADC line */
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 

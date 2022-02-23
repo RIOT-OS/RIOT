@@ -1,3 +1,5 @@
+include $(RIOTCPU)/sam0_common/sam0_info.mk
+
 ifneq (,$(filter saml21%a,$(CPU_MODEL)))
   CFLAGS += -DCPU_SAML21A
 endif
@@ -13,9 +15,15 @@ endif
 
 CFLAGS += -DCPU_COMMON_SAML21
 
-ifneq (,$(filter saml21j18b saml21j18a samr30g18a samr34j18b,$(CPU_MODEL)))
-  BACKUP_RAM_ADDR = 0x30000000
-  BACKUP_RAM_LEN  = 0x2000
+BACKUP_RAM_ADDR = 0x30000000
+ifeq (18, $(SAM0_DENSITY))
+  BACKUP_RAM_LEN  = 0x2000  # 8k
+else ifeq (17, $(SAM0_DENSITY))
+  BACKUP_RAM_LEN  = 0x2000  # 8k
+else ifeq (16, $(SAM0_DENSITY))
+  BACKUP_RAM_LEN  = 0x1000  # 4k
+else ifeq (15, $(SAM0_DENSITY))
+  BACKUP_RAM_LEN  =  0x800  # 2k
 endif
 
 include $(RIOTCPU)/sam0_common/Makefile.include

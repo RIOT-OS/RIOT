@@ -4,7 +4,7 @@ RIOTBASE ?= $(CURDIR)/../..
 
 export TAP ?= tap0
 
-USEMODULE += auto_init_dhcpv6_relay
+USEMODULE += dhcpv6_relay
 USEMODULE += event_thread
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_netif_single          # Only one interface used and it makes

@@ -15,3 +15,10 @@ config MODULE_BOARD
     depends on TEST_KCONFIG
     help
         Module which holds all board-specific files.
+
+config MODULE_BOARD_COMMON_INIT
+    bool
+    default y
+    depends on TEST_KCONFIG
+    help
+        Common board initialization module

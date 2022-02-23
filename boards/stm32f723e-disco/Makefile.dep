@@ -8,5 +8,10 @@ ifneq (,$(filter touch_dev,$(USEMODULE)))
   USEMODULE += ft5x06
 endif
 
+ifneq (,$(filter periph_spi,$(USEMODULE)))
+  # The LED pin is also used for SPI
+  DISABLE_MODULE += periph_init_led0
+endif
+
 # TODO: remove the stdin dependency
 USEMODULE += stdin

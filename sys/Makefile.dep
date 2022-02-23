@@ -88,10 +88,6 @@ ifneq (,$(filter base64url,$(USEMODULE)))
   USEMODULE += base64
 endif
 
-ifneq (,$(filter auto_init_saul,$(USEMODULE)))
-  USEMODULE += saul_init_devs
-endif
-
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += xtimer
@@ -115,13 +111,10 @@ ifneq (,$(filter dhcpv6_client,$(USEMODULE)))
 endif
 
 ifneq (,$(filter dhcpv6_relay,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_dhcpv6_relay
   USEMODULE += event
   USEMODULE += sock_async_event
   USEMODULE += sock_udp
-endif
-
-ifneq (,$(filter auto_init_dhcpv6_relay,$(USEMODULE)))
-  USEMODULE += dhcpv6_relay
 endif
 
 ifneq (,$(filter dns_%,$(USEMODULE)))
@@ -386,6 +379,10 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_reg
 endif
 
+ifneq (,$(filter senml%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/senml/Makefile.dep
+endif
+
 ifneq (,$(filter phydat,$(USEMODULE)))
   USEMODULE += fmt
 endif
@@ -494,12 +491,16 @@ ifneq (,$(filter devfs,$(USEMODULE)))
   USEMODULE += vfs
 endif
 
+ifneq (,$(filter vfs_default,$(USEMODULE)))
+  USEMODULE += vfs
+  DEFAULT_MODULE += vfs_auto_mount
+endif
+
 ifneq (,$(filter vfs,$(USEMODULE)))
   USEMODULE += posix_headers
   ifeq (native, $(BOARD))
     USEMODULE += native_vfs
   endif
-  DEFAULT_MODULE += vfs_auto_mount
 endif
 
 ifneq (,$(filter sock_async_event,$(USEMODULE)))
@@ -538,17 +539,8 @@ ifneq (,$(filter event_timeout_ztimer,$(USEMODULE)))
 endif
 
 ifneq (,$(filter event_timeout,$(USEMODULE)))
-  ifneq (,$(filter event_timeout_ztimer,$(USEMODULE)))
-    USEMODULE += ztimer_usec
-  else
-    ifeq (,$(filter ztimer_usec,$(USEMODULE)))
-      USEMODULE += xtimer
-    endif
-  endif
-endif
-
-ifneq (,$(filter event_periodic,$(USEMODULE)))
   USEMODULE += event_timeout_ztimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter event,$(USEMODULE)))
@@ -568,6 +560,11 @@ ifneq (,$(filter gcoap_dtls,$(USEMODULE)))
   USEMODULE += ztimer_usec
   USEMODULE += event_thread
   USEMODULE += event_timeout_ztimer
+endif
+
+ifneq (,$(filter dsm,$(USEMODULE)))
+  USEMODULE += sock_dtls
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter gcoap,$(USEMODULE)))

@@ -1,9 +1,4 @@
-DEFAULT_MODULE += board cpu core core_init core_msg core_panic sys
-
-DEFAULT_MODULE += auto_init
-
-# Initialize all used peripherals by default
-DEFAULT_MODULE += periph_init
+DEFAULT_MODULE += board board_common_init cpu core core_init core_msg core_panic sys
 
 # Include potentially added default modules by the board
 -include $(BOARDDIR)/Makefile.default

@@ -173,6 +173,9 @@ def check_config_symbols(kconf):
                 if rng is not None:
                     msg = "   Check that the value is in the correct range:"
                     msg += "[{} - {}] {}\n".format(rng[0], rng[1], rng[2])
+            elif not sym.visibility:
+                msg = "   The symbol is not visible, either it is not "
+                msg += "configurable or its prompt is hidden."
 
             log_error(msg)
 

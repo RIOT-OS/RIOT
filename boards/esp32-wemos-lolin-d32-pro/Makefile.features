@@ -11,9 +11,3 @@ FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_spi
 
 FEATURES_PROVIDED += arduino
-
-# This configuration enables modules that are only available when using Kconfig
-# module modelling
-ifeq (1, $(TEST_KCONFIG))
-  KCONFIG_ADD_CONFIG += $(BOARDDIR)/esp32-wemos-lolin-d32-pro.config
-endif

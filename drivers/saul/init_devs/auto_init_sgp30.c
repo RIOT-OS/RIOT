@@ -16,9 +16,7 @@
 
 #include "assert.h"
 #include "log.h"
-#if IS_USED(MODULE_SAUL)
 #include "saul_reg.h"
-#endif
 
 #include "sgp30.h"
 #include "sgp30_params.h"
@@ -28,7 +26,6 @@
  */
 static sgp30_t sgp30_devs[SGP30_NUM];
 
-#if IS_USED(MODULE_SAUL)
 /**
  * @brief   Memory for the SAUL registry entries
  */
@@ -41,7 +38,6 @@ static saul_reg_t saul_entries[SGP30_NUM * 2];
 extern const saul_driver_t sgp30_saul_driver_eco2;
 extern const saul_driver_t sgp30_saul_driver_tvoc;
 /** @} */
-#endif
 
 void auto_init_sgp30(void)
 {
@@ -55,7 +51,6 @@ void auto_init_sgp30(void)
             continue;
         }
 
-#if IS_USED(MODULE_SAUL)
         /* eCO2 */
         saul_entries[(i * 2)].dev = &(sgp30_devs[i]);
         saul_entries[(i * 2)].name = sgp30_saul_info[i].name;
@@ -69,6 +64,5 @@ void auto_init_sgp30(void)
         /* register to saul */
         saul_reg_add(&(saul_entries[(i * 2)]));
         saul_reg_add(&(saul_entries[(i * 2) + 1]));
-#endif
     }
 }

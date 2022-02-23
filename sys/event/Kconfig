@@ -20,7 +20,6 @@ if MODULE_EVENT
 
 config MODULE_EVENT_PERIODIC
     bool "Provides functionality to trigger periodic events"
-    depends on MODULE_EVENT_TIMEOUT_ZTIMER
 
 config MODULE_EVENT_CALLBACK
     bool "Support for callback-with-argument event type"
@@ -49,24 +48,7 @@ config MODULE_EVENT_TIMEOUT_ZTIMER
 
 config MODULE_EVENT_TIMEOUT
     bool "Legacy API, support for triggering events after timeout"
-
-if MODULE_EVENT_TIMEOUT
-
-choice EVENT_TIMEOUT_IMPLEMENTATION
-    bool "Event Timeout Implementation"
-    default EVENT_TIMEOUT_ON_XTIMER
-
-config EVENT_TIMEOUT_ON_ZTIMER
-    bool "Use ztimer as backend"
     select MODULE_EVENT_TIMEOUT_ZTIMER
     select ZTIMER_USEC
-
-config EVENT_TIMEOUT_ON_XTIMER
-    bool "Use xtimer as backend"
-    select MODULE_XTIMER if !ZTIMER_USEC
-
-endchoice # EVENT_TIMEOUT_IMPLEMENTATION
-
-endif # MODULE_EVENT_TIMEOUT
 
 endif # MODULE_EVENT

@@ -21,6 +21,7 @@
 #define NET_GNRC_IPV6_NIB_PL_H
 
 #include <stdint.h>
+#include <kernel_defines.h>
 
 #if IS_USED(MODULE_EVTIMER)
 #include "evtimer.h"

@@ -31,7 +31,7 @@ extern "C" {
  */
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
-#ifdef AUTO_INIT_LED0
+#ifdef MODULE_PERIPH_INIT_LED0
     /* The LED pin is also used for SPI, so we enable it
        only if explicitly wanted by the user */
     {

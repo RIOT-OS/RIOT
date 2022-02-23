@@ -227,7 +227,6 @@ static int _statvfs(vfs_mount_t *mountp, const char *restrict path, struct statv
         return -EFAULT;
     }
     spiffs_desc_t *fs_desc = mountp->private_data;
-    memset(buf, 0, sizeof(*buf));
 
     uint32_t total;
     uint32_t used;
@@ -346,8 +345,6 @@ static int _fstat(vfs_file_t *filp, struct stat *buf)
     spiffs_desc_t *fs_desc = filp->mp->private_data;
     spiffs_stat stat;
     s32_t ret;
-
-    memset(buf, 0, sizeof(*buf));
 
     ret = SPIFFS_fstat(&fs_desc->fs, filp->private_data.value, &stat);
 
