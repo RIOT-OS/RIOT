@@ -28,6 +28,7 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+#include <string.h>
 
 const char *cst816s_gesture_str[] = {
     [CST816S_GESTURE_NONE]         = "none",
@@ -64,10 +65,18 @@ int cst816s_read(const cst816s_t *dev, cst816s_touch_data_t *data)
 {
     uint8_t buf[9]; /* 3 bytes "header" and 6 bytes touch info */
 
+    DEBUG("cst i2c %d\n", dev->params->i2c_dev);
+#if 1
     i2c_acquire(dev->params->i2c_dev);
     int res = i2c_read_regs(dev->params->i2c_dev, dev->params->i2c_addr,
                             0, buf, sizeof(buf), 0);
     i2c_release(dev->params->i2c_dev);
+# else
+    int res=0;
+    (void) dev;
+
+    memset(buf,0,sizeof(buf));
+#endif
 
     if (res < 0) {
         return res;
@@ -88,6 +97,8 @@ int cst816s_init(cst816s_t *dev, const cst816s_params_t *params,
     dev->params = params;
     dev->cb = cb;
     dev->cb_arg = arg;
+
+    DEBUG("cst i2c=%d\n", dev->params->i2c_dev);
 
     if (dev->params->reset != GPIO_UNDEF) {
         gpio_init(dev->params->reset, GPIO_OUT);

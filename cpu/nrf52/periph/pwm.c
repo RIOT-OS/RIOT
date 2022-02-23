@@ -59,11 +59,13 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     /* check if given device is valid */
     if ((pwm >= PWM_NUMOF) || (res > MAX_RES)) {
+        DEBUG("-PWM parm pwm/res\n");
         return 0;
     }
 
     /* check if pwm mode is supported */
     if ((mode != PWM_RIGHT) && (mode != PWM_LEFT)) {
+        DEBUG("-PWM parm mode\n");
         return 0;
     }
 
@@ -74,15 +76,18 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     /* calculate the needed frequency, for center modes we need double */
     uint32_t real_clk;
     uint32_t clk = (freq * res);
+    DEBUG("PWM clk=%ld\n", clk);
     /* match to best fitting prescaler */
     for (uint8_t i = 0; i < (MAX_PRESCALER + 1); i++) {
         real_clk = (PERIPH_CLOCK >> i);
+        DEBUG("PWM real_clk=%ld\n", real_clk);
         if (((real_clk - (real_clk / F_DEV)) < clk) &&
             ((real_clk + (real_clk / F_DEV)) > clk)) {
             dev(pwm)->PRESCALER = i;
             break;
         }
         if (i == MAX_PRESCALER) {
+            DEBUG("-PWM MAX_PRESCALER\n");
             return 0;
         }
     }
