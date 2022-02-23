@@ -19,9 +19,6 @@ extern void dummy(void);
 
 void board_init(void)
 {
-    /* Turn off all LED's */
-
-
     /* Stop the linker from throwing away the PIC32 config register settings */
     dummy();
 }
