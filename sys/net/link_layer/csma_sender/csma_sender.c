@@ -22,8 +22,13 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <inttypes.h>
+#include <kernel_defines.h>
 
+#if IS_USED(MODULE_ZTIMER_USEC)
+#include "ztimer/xtimer_compat.h"
+#else
 #include "xtimer.h"
+#endif
 #include "random.h"
 #include "net/netdev.h"
 #include "net/netopt.h"

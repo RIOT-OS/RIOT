@@ -99,7 +99,7 @@ endif
 
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   USEMODULE += random
-  USEMODULE += xtimer
+  USEMODULE += xztimer_fallback
 endif
 
 ifneq (,$(filter dhcpv6_%,$(USEMODULE)))
