@@ -37,7 +37,7 @@ extern "C" {
 #include "periph/i2c.h"
 
 /**
- * @defgroup drivers_lpsxxx_config     LPS331AP/LPS25HB/LPS22HB driver compile configuration
+ * @defgroup drivers_lpsxxx_config     LPS331AP/LPS25HB/LPS22HB/LPS22HH/LPS22CH driver compile configuration
  * @ingroup config_drivers_sensors
  * @{
  */
@@ -81,7 +81,7 @@ typedef enum {
     LPSXXX_RATE_25HZ = 3,       /**< sample with 25Hz, default */
     LPSXXX_RATE_50HZ = 4,       /**< sample with 50Hz */
     LPSXXX_RATE_75HZ = 5        /**< sample with 75Hz */
-#elif MODULE_LPS22HH
+#elif MODULE_LPS22HH || MODULE_LPS22CH
     LPSXXX_RATE_10HZ = 2,       /**< sample with 10Hz */
     LPSXXX_RATE_25HZ = 3,       /**< sample with 25Hz, default */
     LPSXXX_RATE_50HZ = 4,       /**< sample with 50Hz */
@@ -96,7 +96,7 @@ typedef enum {
  */
 #if MODULE_LPS331AP || MODULE_LPS25HB
 #define LPSXXX_DEFAULT_RATE     (LPSXXX_RATE_7HZ)
-#else /* MODULE_LPS22HB || MODULE_LPS22HH */
+#else /* MODULE_LPS22HB || MODULE_LPS22HH  || MODULE_LPS22CH */
 #define LPSXXX_DEFAULT_RATE     (LPSXXX_RATE_25HZ)
 #endif
 
