@@ -26,7 +26,7 @@
 #include "cst816s.h"
 #include "cst816s_internal.h"
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG 1
 #include "debug.h"
 #include <string.h>
 
@@ -68,9 +68,13 @@ int cst816s_read(const cst816s_t *dev, cst816s_touch_data_t *data)
     DEBUG("cst i2c %d\n", dev->params->i2c_dev);
 #if 1
     i2c_acquire(dev->params->i2c_dev);
+    DEBUG("cst acquire\n");
+    DEBUG("cst to read %d, 0x%02x, %d\n", dev->params->i2c_dev, dev->params->i2c_addr, sizeof(buf));
     int res = i2c_read_regs(dev->params->i2c_dev, dev->params->i2c_addr,
                             0, buf, sizeof(buf), 0);
+    DEBUG("cst i2c_read=%d\n", res);
     i2c_release(dev->params->i2c_dev);
+    DEBUG("cst release\n");
 # else
     int res=0;
     (void) dev;
