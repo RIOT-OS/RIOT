@@ -12,7 +12,7 @@
 #include "net/af.h"
 #include "net/sock/udp.h"
 #include "net/uhcp.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 /**
  * @brief Request prefix from uhcp server
@@ -51,7 +51,7 @@ void uhcp_client(uhcp_iface_t iface)
         res = sock_udp_recv(&sock, buf, sizeof(buf), 10U*US_PER_SEC, &remote);
         if (res > 0) {
             uhcp_handle_udp(buf, res, remote.addr.ipv6, remote.port, iface);
-            xtimer_sleep(60);
+            ztimer_sleep(ZTIMER_MSEC, 60 * MS_PER_SEC);
         }
         else {
             LOG_ERROR("uhcp_client(): no reply received\n");
