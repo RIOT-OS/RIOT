@@ -167,7 +167,7 @@ endif
 
 ifneq (,$(filter uhcpc,$(USEMODULE)))
   USEMODULE += posix_inet
-  USEMODULE += xtimer
+  USEMODULE += xztimer_fallback
 endif
 
 ifneq (,$(filter netdev_tap,$(USEMODULE)))
