@@ -22,8 +22,13 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <inttypes.h>
+#include <kernel_defines.h>
 
+#if IS_USED(MODULE_ZTIMER_USEC)
+#include "ztimer/xtimer_compat.h"
+#else
 #include "xtimer.h"
+#endif
 #include "random.h"
 #include "net/netdev.h"
 #include "net/netopt.h"
@@ -152,7 +157,7 @@ int csma_sender_csma_ca_send(netdev_t *dev, iolist_t *iolist,
 
     /* if we arrive here, then we must perform the CSMA/CA procedure
        ourselves by software */
-    random_init(_xtimer_now());
+    random_init(xtimer_now_usec());
     DEBUG("csma: Starting software CSMA/CA....\n");
 
     int nb = 0, be = conf->min_be;
