@@ -4842,6 +4842,9 @@ boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\
 boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/samd21\-xpro/include/board\.h:[0-9]+: warning: Member MTD_0 \(macro definition\) of file board\.h is not documented\.
+boards/samd21\-xpro/include/board\.h:[0-9]+: warning: Member MTD_NUMOF \(macro definition\) of file board\.h is not documented\.
+boards/samd21\-xpro/include/board\.h:[0-9]+: warning: Member mtd0 \(variable\) of file board\.h is not documented\.
 boards/samd21\-xpro/include/board\.h:[0-9]+: warning: Member BTN0_MODE \(macro definition\) of file board\.h is not documented\.
 boards/samd21\-xpro/include/board\.h:[0-9]+: warning: Member BTN0_PIN \(macro definition\) of file board\.h is not documented\.
 boards/samd21\-xpro/include/board\.h:[0-9]+: warning: Member BTN0_PORT \(macro definition\) of file board\.h is not documented\.

@@ -26,6 +26,7 @@
 #include "cpu.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
+#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,6 +61,15 @@ extern "C" {
 #define BTN0_PORT           PORT->Group[PA]
 #define BTN0_PIN            GPIO_PIN(PA, 15)
 #define BTN0_MODE           GPIO_IN_PU
+/** @} */
+
+/**
+ * @name MTD configuration
+ * @{
+ */
+extern mtd_dev_t *mtd0;
+#define MTD_0       mtd0
+#define MTD_NUMOF   1
 /** @} */
 
 #ifdef __cplusplus
