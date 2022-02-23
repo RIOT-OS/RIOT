@@ -26,7 +26,6 @@
 /* make sure to overwrite potentially conflicting XTIMER_WIDTH definition from
  * board.h by eagerly including it */
 #include "board.h"
-#include "div.h"
 #include "timex.h"
 #ifdef MODULE_CORE_MSG
 #include "msg.h"
@@ -177,14 +176,6 @@ static inline void xtimer_periodic_wakeup(xtimer_ticks32_t *last_wakeup,
     ztimer_periodic_wakeup(ZTIMER_USEC, last_wakeup, period);
 }
 
-static inline void xtimer_now_timex(timex_t *out)
-{
-    uint32_t now = xtimer_now_usec();
-
-    out->seconds = div_u64_by_1000000(now);
-    out->microseconds = now - (out->seconds * US_PER_SEC);
-}
-
 static inline int xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout)
 {
     return ztimer_msg_receive_timeout(ZTIMER_USEC, msg, timeout);
@@ -260,6 +251,7 @@ static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b)
 
    xtimer_ticks64_t xtimer_now64(void);
    uint64_t xtimer_now_usec64(void):
+   void xtimer_now_timex(timex_t *out)
    void xtimer_set64(xtimer_t *timer, uint64_t offset_us);
    void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset,
                                        kernel_pid_t pid);
