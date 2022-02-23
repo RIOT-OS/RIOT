@@ -32,7 +32,11 @@
 #include "net/nanocoap_sock.h"
 #include "thread.h"
 #include "periph/pm.h"
+#if IS_USED(MODULE_ZTIMER_USEC)
+#include "ztimer/xtimer_compat.h"
+#else
 #include "xtimer.h"
+#endif
 
 #include "suit/transport/coap.h"
 #include "net/sock/util.h"
