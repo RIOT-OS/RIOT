@@ -122,7 +122,7 @@ and needs some patches applied:
 ```shell
 $ rustup install nightly-2019-12-05
 $ rustup component add --toolchain nightly-2019-12-05 rustfmt rustc-dev
-$ cargo +nightly-2019-12-05 install c2rust
+$ cargo +nightly-2019-12-05 install --locked c2rust
 $ git clone https://github.com/chrysn-pull-requests/c2rust -b for-riot
 $ cd c2rust
 $ cargo +nightly-2019-12-05 install --locked --path c2rust
