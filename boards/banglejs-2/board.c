@@ -30,7 +30,9 @@
 
 #include "cst816s.h"
 
-char touch_ev=0;
+// #define ENABLE_TOUCH
+
+//char touch_ev=0;
 #ifdef ENABLE_TOUCH
 cst816s_t _input_dev;
 cst816s_touch_data_t tdata;
@@ -88,9 +90,6 @@ void board_init(void)
     pwm_set(PWM_DEV(1), 0, 50); // 50% duty cylce @ 125kHz for EXTCOM ?
     pwm_poweron(PWM_DEV(1));
     
-    // init I2C buses
-    i2c_init(I2C_DEV(0));
-
     // init ADC
     adc_init(1); // battery voltage monitor
 
