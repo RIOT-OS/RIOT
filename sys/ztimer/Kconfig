@@ -183,6 +183,10 @@ config MODULE_AUTO_INIT_ZTIMER
     select MODULE_ZTIMER_INIT
     default y
 
+config MODULE_ZTIMER_AUTO_ADJUST
+    bool "Auto adjust ztimer set and sleep values"
+    select MODULE_ZTIMER_OVERHEAD
+
 config MODULE_ZTIMER_NOW64
     bool "Use a 64-bits result for ztimer_now()"
 

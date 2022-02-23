@@ -43,6 +43,7 @@
 #include "ztimer/convert_frac.h"
 #include "ztimer/convert_shift.h"
 #include "ztimer/convert_muldiv64.h"
+#include "ztimer/overhead.h"
 #include "ztimer/periph_timer.h"
 #include "ztimer/periph_rtt.h"
 #include "ztimer/periph_rtc.h"
@@ -212,6 +213,29 @@ ztimer_clock_t *const ZTIMER_SEC = &_ztimer_convert_frac_sec.super.super;
 #  endif
 #endif
 
+#if IS_USED(MODULE_ZTIMER_USEC)
+#ifndef CONFIG_ZTIMER_AUTO_ADJUST_BASE_ITVL
+#define CONFIG_ZTIMER_AUTO_ADJUST_BASE_ITVL     1000
+#endif
+#ifndef CONFIG_ZTIMER_AUTO_ADJUST_ITER
+#define CONFIG_ZTIMER_AUTO_ADJUST_ITER          100
+#endif
+
+static void _ztimer_usec_overhead(unsigned samples, unsigned base, uint16_t *adjust_value,
+                                  int32_t (*overhead_fn)(ztimer_clock_t *clock, uint32_t base))
+{
+    int32_t min = INT32_MAX;
+
+    for (unsigned i = 0; i < samples; i++) {
+        int32_t overhead = overhead_fn(ZTIMER_USEC, base);
+        if (overhead < min) {
+            min = overhead;
+        }
+    }
+    *adjust_value = min;
+}
+#endif
+
 void ztimer_init(void)
 {
 /* Step 4: initialize used ztimer-periphery */
@@ -266,16 +290,42 @@ void ztimer_init(void)
 #  else
     LOG_DEBUG("ztimer_init(): ZTIMER_USEC without conversion\n");
 #  endif
-#  ifdef CONFIG_ZTIMER_USEC_ADJUST_SET
-    LOG_DEBUG("ztimer_init(): ZTIMER_USEC setting adjust_set value to %i\n",
-              CONFIG_ZTIMER_USEC_ADJUST_SET );
-    ZTIMER_USEC->adjust_set = CONFIG_ZTIMER_USEC_ADJUST_SET;
-#  endif
-#  ifdef CONFIG_ZTIMER_USEC_ADJUST_SLEEP
-    LOG_DEBUG("ztimer_init(): ZTIMER_USEC setting adjust_sleep value to %i\n",
-              CONFIG_ZTIMER_USEC_ADJUST_SLEEP );
-    ZTIMER_USEC->adjust_sleep = CONFIG_ZTIMER_USEC_ADJUST_SLEEP;
-#  endif
+
+    /* warm-up time if set and needed */
+    if (IS_USED(MODULE_ZTIMER_AUTO_ADJUST) &&
+        !(CONFIG_ZTIMER_USEC_ADJUST_SET && CONFIG_ZTIMER_USEC_ADJUST_SLEEP)) {
+        if (CONFIG_ZTIMER_AUTO_ADJUST_SETTLE) {
+            ztimer_sleep(ZTIMER_USEC, CONFIG_ZTIMER_AUTO_ADJUST_SETTLE);
+        }
+    }
+
+    /* calculate or set 'adjust_set' */
+    if (CONFIG_ZTIMER_USEC_ADJUST_SET) {
+        ZTIMER_USEC->adjust_set = CONFIG_ZTIMER_USEC_ADJUST_SET;
+    }
+    else if (IS_USED(MODULE_ZTIMER_AUTO_ADJUST)) {
+        _ztimer_usec_overhead(CONFIG_ZTIMER_AUTO_ADJUST_ITER, CONFIG_ZTIMER_AUTO_ADJUST_BASE_ITVL,
+                              &ZTIMER_USEC->adjust_set, ztimer_overhead_set);
+    }
+    if (ZTIMER_USEC->adjust_set) {
+        LOG_DEBUG("ztimer_init(): ZTIMER_USEC setting adjust_set value to %i\n",
+                  ZTIMER_USEC->adjust_set);
+    }
+
+    /* calculate or set 'adjust_sleep' */
+    if (CONFIG_ZTIMER_USEC_ADJUST_SLEEP) {
+        ZTIMER_USEC->adjust_sleep = CONFIG_ZTIMER_USEC_ADJUST_SLEEP;
+    }
+    else if (IS_USED(MODULE_ZTIMER_AUTO_ADJUST)) {
+        _ztimer_usec_overhead(CONFIG_ZTIMER_AUTO_ADJUST_ITER,
+                              CONFIG_ZTIMER_AUTO_ADJUST_BASE_ITVL, &ZTIMER_USEC->adjust_sleep,
+                              ztimer_overhead_sleep);
+    }
+
+    if (ZTIMER_USEC->adjust_sleep) {
+        LOG_DEBUG("ztimer_init(): ZTIMER_USEC setting adjust_sleep value to %i\n",
+                  ZTIMER_USEC->adjust_sleep);
+    }
 #endif
 
 #if MODULE_ZTIMER_MSEC
