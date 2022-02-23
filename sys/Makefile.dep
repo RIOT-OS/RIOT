@@ -543,10 +543,6 @@ ifneq (,$(filter event_timeout,$(USEMODULE)))
   USEMODULE += ztimer_usec
 endif
 
-ifneq (,$(filter event_periodic,$(USEMODULE)))
-  USEMODULE += event_timeout_ztimer
-endif
-
 ifneq (,$(filter event,$(USEMODULE)))
   USEMODULE += core_thread_flags
 endif
