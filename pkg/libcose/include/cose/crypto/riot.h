@@ -32,6 +32,14 @@ extern "C" {
 #endif
 
 /**
+ * @name list of provided algorithms
+ *
+ * @{
+ */
+#define HAVE_ALGO_CHACHA20POLY1305
+/** @} */
+
+/**
  * @brief   Initialize libCOSE RIOT crypto backend
  *
  * @note    Automatically called if 'auto_init_libcose_crypt_riot' is included
