@@ -99,7 +99,6 @@
 #define NET_GNRC_IPV6_H
 
 #include "sched.h"
-#include "net/gnrc.h"
 #include "thread.h"
 
 #include "net/ipv6.h"

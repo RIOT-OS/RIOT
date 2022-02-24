@@ -20,6 +20,7 @@
 #include "net/gnrc/ndp.h"
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/netif/internal.h"
+#include "net/gnrc/netreg.h"
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
 #include "net/gnrc/sixlowpan/nd.h"
 #endif  /* MODULE_GNRC_SIXLOWPAN_ND */
