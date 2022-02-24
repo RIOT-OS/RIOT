@@ -92,6 +92,13 @@ Test *tests_core_ringbuffer_tests(void);
  */
 Test *tests_core_xfa_tests(void);
 
+/**
+ * @brief   Generates tests for macros
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_core_macros_tests(void);
+
 #ifdef __cplusplus
 }
 #endif

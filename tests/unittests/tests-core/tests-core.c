@@ -19,4 +19,5 @@ void tests_core(void)
     TESTS_RUN(tests_core_byteorder_tests());
     TESTS_RUN(tests_core_ringbuffer_tests());
     TESTS_RUN(tests_core_xfa_tests());
+    TESTS_RUN(tests_core_macros_tests());
 }
