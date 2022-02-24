@@ -47,15 +47,6 @@ static cose_sign_dec_t verify;
 static cose_signature_t signature1, signature2;
 static cose_key_t signer1, signer2;
 
-#if defined(MODULE_LIBCOSE_CRYPT_HACL) || defined(MODULE_LIBCOSE_CRYPT_MONOCYPHER)
-static unsigned char symmkey[COSE_CRYPTO_AEAD_CHACHA20POLY1305_KEYBYTES];
-static uint8_t nonce[COSE_CRYPTO_AEAD_CHACHA20POLY1305_NONCEBYTES] = { 0 };
-static cose_key_t symm;
-static cose_encrypt_t test_encrypt;
-static cose_encrypt_dec_t test_decrypt;
-static cose_recp_dec_t test_derecp;
-#endif
-
 /* COSE sign buffer */
 static uint8_t buf[2048];
 /* Signature Verification buffer */
@@ -185,45 +176,11 @@ static void test_libcose_02(void)
                                            sizeof(vbuf)));
 }
 
-#if defined(MODULE_LIBCOSE_CRYPT_HACL) || defined(MODULE_LIBCOSE_CRYPT_MONOCYPHER)
-/* Untagged 1 encrypt test with chacha20poly1305*/
-static void test_libcose_03(void)
-{
-    cose_key_init(&symm);
-    cose_encrypt_init(&test_encrypt, 0);
-
-    cose_crypto_keygen(symmkey, sizeof(symmkey), COSE_ALGO_CHACHA20POLY1305);
-    cose_key_set_kid(&symm, (uint8_t *)kid, sizeof(kid) - 1);
-    cose_key_set_keys(&symm, 0, COSE_ALGO_CHACHA20POLY1305, NULL, NULL,
-                      symmkey);
-
-    cose_encrypt_add_recipient(&test_encrypt, &symm);
-    cose_encrypt_set_payload(&test_encrypt, payload, sizeof(payload) - 1);
-    cose_encrypt_set_algo(&test_encrypt, COSE_ALGO_DIRECT);
-
-    uint8_t *out = NULL;
-    ssize_t len = cose_encrypt_encode(&test_encrypt, buf, sizeof(buf), nonce,
-                                      &out);
-    TEST_ASSERT(len > 0);
-    TEST_ASSERT_EQUAL_INT(0, cose_encrypt_decode(&test_decrypt, out, len));
-    size_t plaintext_len = 0;
-    cose_encrypt_recp_iter(&test_decrypt, &test_derecp);
-    TEST_ASSERT_EQUAL_INT(0,
-                          cose_encrypt_decrypt(&test_decrypt, &test_derecp,
-                                               &symm, buf, sizeof(buf),
-                                               vbuf, &plaintext_len));
-    TEST_ASSERT_EQUAL_INT( sizeof(payload) - 1, plaintext_len);
-}
-#endif
-
 Test *tests_libcose(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_libcose_01),
         new_TestFixture(test_libcose_02),
-#if defined(MODULE_LIBCOSE_CRYPT_HACL) || defined(MODULE_LIBCOSE_CRYPT_MONOCYPHER)
-        new_TestFixture(test_libcose_03),
-#endif
     };
 
     EMB_UNIT_TESTCALLER(libcose_tests, setUp, NULL, fixtures);
