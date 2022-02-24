@@ -55,25 +55,29 @@ static const spi_conf_t spi_config[] = {
 static const uart_conf_t uart_config[] = {
     { /* Mapped to USB virtual COM port */
         .dev        = NRF_UARTE0,
+	// default pins
         .rx_pin     = GPIO_PIN(0,25), // TODO: how to configure this from application?
         .tx_pin     = GPIO_PIN(0,28), // TODO: how to configure this from application?
+        // CMSS Pulga Battery pins
+        //.rx_pin     = GPIO_PIN(0,25),
+        //.tx_pin     = GPIO_PIN(0,31),
 #ifdef MODULE_PERIPH_UART_HW_FC
         .rts_pin    = GPIO_UNDEF,
         .cts_pin    = GPIO_UNDEF,
 #endif
         .irqn       = UARTE0_UART0_IRQn,
-    }
-    /*, XXX: actually, I don't know how to configure this, so I'll just comment it out.
-    {  Mapped to Arduino D0/D1 pins
+    },
+    {
         .dev        = NRF_UARTE1,
-        .rx_pin     = GPIO_PIN(1,1),
-        .tx_pin     = GPIO_PIN(1,2),
+        // GPS Base pins
+        .rx_pin     = GPIO_PIN(0,7),
+        .tx_pin     = GPIO_PIN(0,5),
 #ifdef MODULE_PERIPH_UART_HW_FC
         .rts_pin    = GPIO_UNDEF,
         .cts_pin    = GPIO_UNDEF,
 #endif
         .irqn       = UARTE1_IRQn,
-    },*/
+    },
 };
 
 #define UART_0_ISR          (isr_uart0)
