@@ -7,23 +7,23 @@
  */
 
 /**
- * @ingroup     drivers_shtc1
+ * @ingroup     drivers_shtcx
  *
  * @{
  *
  * @file
- * @brief       Default parameters for the SHTC1 Temperature and humidity sensor
+ * @brief       Default parameters for the SHTCX Temperature and humidity sensor
  *
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  */
 
-#ifndef SHTC1_PARAMS_H
-#define SHTC1_PARAMS_H
+#ifndef SHTCX_PARAMS_H
+#define SHTCX_PARAMS_H
 
 #include "board.h"
-#include "shtc1.h"
-#include "shtc1_regs.h"
+#include "shtcx.h"
+#include "shtcx_regs.h"
 #include "saul_reg.h"
 
 #ifdef __cplusplus
@@ -31,44 +31,45 @@ extern "C" {
 #endif
 
 /**
- * @name    Default configuration parameters for SHTC1 sensors
+ * @name    Default configuration parameters for SHTCX sensors
  * @{
  */
-#ifndef SHTC1_PARAM_I2C_DEV
-#define SHTC1_PARAM_I2C_DEV        (I2C_DEV(0))
+#ifndef SHTCX_PARAM_I2C_DEV
+#define SHTCX_PARAM_I2C_DEV        (I2C_DEV(0))      /**< Default I2C BUS used */
 #endif
-#ifndef SHTC1_PARAM_I2C_ADDR
-#define SHTC1_PARAM_I2C_ADDR       SHTC1_I2C_ADDRESS
+#ifndef SHTCX_PARAM_I2C_ADDR
+#define SHTCX_PARAM_I2C_ADDR       SHTCX_I2C_ADDRESS /**< I2C Address */
 #endif
 
-#ifndef SHTC1_PARAMS
-#define SHTC1_PARAMS           { .i2c_dev = SHTC1_PARAM_I2C_DEV, \
-                                 .i2c_addr = SHTC1_PARAM_I2C_ADDR }
+#ifndef SHTCX_PARAMS
+#define SHTCX_PARAMS               { .i2c_dev  = SHTCX_PARAM_I2C_DEV, \
+                                     .i2c_addr = SHTCX_PARAM_I2C_ADDR }
 #endif
-#ifndef SHTC1_SAUL_INFO
-#define SHTC1_SAUL_INFO             { .name = "shtc1 temperature" }, \
-                                    { .name = "shtc1 humidity" }
+#ifndef SHTCX_SAUL_INFO
+#define SHTCX_SAUL_INFO            { .name = "shtcx temperature" }, \
+                                   { .name = "shtcx humidity" }
 #endif
 /** @} */
 
 /**
- * @brief   Allocation of SHTC1 configuration
+ * @brief   Allocation of SHTCX configuration
  */
-static const shtc1_params_t shtc1_params[] =
+static const shtcx_params_t shtcx_params[] =
 {
-    SHTC1_PARAMS
+    SHTCX_PARAMS
 };
 
 /**
  * @brief   Configure SAUL registry entries
  */
-static const saul_reg_info_t shtc1_saul_info[] =
+static const saul_reg_info_t shtcx_saul_info[] =
 {
-    SHTC1_SAUL_INFO
+    SHTCX_SAUL_INFO
 };
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* SHTC1_PARAMS_H */
+#endif /* SHTCX_PARAMS_H */
 /** @} */

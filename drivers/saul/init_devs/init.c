@@ -139,7 +139,7 @@ void saul_init_devs(void)
         extern void auto_init_ina2xx(void);
         auto_init_ina2xx();
     }
-    if (IS_USED(MODULE_INA3221)) {
+    if (IS_USED(MODUE_INA3221)) {
         extern void auto_init_ina3221(void);
         auto_init_ina3221();
     }
@@ -279,9 +279,9 @@ void saul_init_devs(void)
         extern void auto_init_sht3x(void);
         auto_init_sht3x();
     }
-    if (IS_USED(MODULE_SHTC1)) {
-        extern void auto_init_shtc1(void);
-        auto_init_shtc1();
+    if (IS_USED(MODULE_SHTCX)) {
+        extern void auto_init_shtcx(void);
+        auto_init_shtcx();
     }
     if (IS_USED(MODULE_SI1133)) {
         extern void auto_init_si1133(void);
