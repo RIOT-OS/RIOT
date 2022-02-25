@@ -10,7 +10,7 @@
  * @{
  *
  * @file
- * @brief       Test application for the SHTC1 temperature and humidity sensor
+ * @brief       Test application for the SHTCX temperature and humidity sensor
  *
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
@@ -24,12 +24,12 @@
 #include "timex.h"
 #include "ztimer.h"
 #include "fmt.h"
-#include "shtc1.h"
-#include "shtc1_params.h"
+#include "shtcx.h"
+#include "shtcx_params.h"
 
 int main(void)
 {
-    shtc1_t dev;
+    shtcx_t dev;
     int16_t temp;
     uint16_t hum;
 
@@ -37,15 +37,15 @@ int main(void)
     char str_hum[8];
     size_t len;
 
-    puts("SHTC1 test application\n");
+    puts("SHTCX test application\n");
 
-    if ((shtc1_init(&dev, &shtc1_params[0])) != SHTC1_OK) {
+    if ((shtcx_init(&dev, &shtcx_params[0])) != SHTCX_OK) {
         puts("can't initialize the sensor");
         return -1;
     }
-    puts("SHTC1 initialized\n");
+    puts("SHTCX initialized\n");
     while (1) {
-        if (shtc1_read(&dev, &hum, &temp) == SHTC1_OK) {
+        if (shtcx_read(&dev, &hum, &temp) == SHTCX_OK) {
             len = fmt_s16_dfp(str_temp, temp, -2);
             str_temp[len] = '\0';
 
