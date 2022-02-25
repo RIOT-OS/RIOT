@@ -142,16 +142,16 @@ static inline void xtimer_tsleep32(xtimer_ticks32_t ticks)
     xtimer_usleep(xtimer_usec_from_ticks(ticks));
 }
 
-static inline uint64_t xtimer_tsleep64(xtimer_ticks64_t ticks)
+static inline void xtimer_tsleep64(xtimer_ticks64_t ticks)
 {
     const uint32_t max_sleep = UINT32_MAX;
     uint64_t time = xtimer_usec_from_ticks64(ticks);
 
     while (time > max_sleep) {
-        xtimer_usleep(clock, max_sleep);
+        xtimer_usleep(max_sleep);
         time -= max_sleep;
     }
-    xtimer_usleep(clock, time);
+    xtimer_usleep(time);
 }
 
 static inline void xtimer_set(xtimer_t *timer, uint32_t offset)
