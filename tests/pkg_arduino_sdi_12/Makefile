@@ -1,3 +1,5 @@
+BOARD ?= nucleo-f767zi
+
 include ../Makefile.tests_common
 
 USEPKG += arduino_sdi_12
