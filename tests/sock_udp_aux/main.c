@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "thread.h"
 #include "fmt.h"
 #include "net/sock/udp.h"
 #include "shell.h"
