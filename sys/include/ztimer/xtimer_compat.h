@@ -54,9 +54,28 @@ extern "C" {
 #define XTIMER_WIDTH    (32)
 #define XTIMER_MASK     (0)
 
+/**
+ * a default XTIMER_BACKOFF value, this is not used by ztimer, but other code
+ * uses this value to set timers
+ */
+
+#ifndef XTIMER_BACKOFF
+#define XTIMER_BACKOFF  1
+#endif
+
 typedef ztimer_t xtimer_t;
 typedef uint32_t xtimer_ticks32_t;
 typedef uint64_t xtimer_ticks64_t;
+
+static inline void xtimer_init(void)
+{
+    ztimer_init();
+}
+
+static inline bool xtimer_is_set(const xtimer_t *timer)
+{
+    return ztimer_is_set(ZTIMER_USEC, timer);
+}
 
 static inline xtimer_ticks32_t xtimer_ticks(uint32_t ticks)
 {
@@ -191,6 +210,16 @@ static inline int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us)
 {
     assert(us <= UINT32_MAX);
     if (ztimer_mutex_lock_timeout(ZTIMER_USEC, mutex, (uint32_t)us)) {
+        /* Impedance matching required: Convert -ECANCELED error code to -1: */
+        return -1;
+    }
+    return 0;
+}
+
+static inline int xtimer_rmutex_lock_timeout(rmutex_t *rmutex, uint64_t us)
+{
+    assert(us <= UINT32_MAX);
+    if (ztimer_rmutex_lock_timeout(ZTIMER_USEC, rmutex, us)) {
         /* Impedance matching required: Convert -ECANCELED error code to -1: */
         return -1;
     }
