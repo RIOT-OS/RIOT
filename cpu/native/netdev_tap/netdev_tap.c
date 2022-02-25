@@ -94,6 +94,12 @@ static inline int _set_promiscuous(netdev_t *netdev, int value)
     return value;
 }
 
+static inline int _get_wired(netdev_t *netdev)
+{
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
+    return dev->wired;
+}
+
 static inline void _isr(netdev_t *netdev)
 {
     if (netdev->event_callback) {
@@ -123,6 +129,16 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
         case NETOPT_PROMISCUOUSMODE:
             *((bool*)value) = (bool)_get_promiscuous(dev);
             res = sizeof(bool);
+            break;
+        case NETOPT_IS_WIRED:
+            if (!_get_wired(dev)) {
+                res = -ENOTSUP;
+            } else {
+                if (value) {
+                    *((bool*)value) = true;
+                }
+                res = sizeof(bool);
+            }
             break;
         default:
             res = netdev_eth_get(dev, opt, value, max_len);
@@ -294,6 +310,7 @@ void netdev_tap_setup(netdev_tap_t *dev, const netdev_tap_params_t *params, int 
     dev->netdev.driver = &netdev_driver_tap;
     strncpy(dev->tap_name, *(params->tap_name), IFNAMSIZ - 1);
     dev->tap_name[IFNAMSIZ - 1] = '\0';
+    dev->wired = params->wired;
     netdev_register(&dev->netdev, NETDEV_TAP, index);
 }
 

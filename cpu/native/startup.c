@@ -655,6 +655,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
 #ifdef MODULE_NETDEV_TAP
     for (int i = 0; i < NETDEV_TAP_MAX; i++) {
         netdev_tap_params[i].tap_name = &argv[optind + i];
+        netdev_tap_params[i].wired = true;
     }
 #endif
 
