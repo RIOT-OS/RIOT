@@ -24,6 +24,7 @@
 #include "net/sntp.h"
 #include "net/ntp_packet.h"
 #include "net/af.h"
+#include "net/gnrc/netif.h"
 #include "net/ipv6/addr.h"
 #include "timex.h"
 
