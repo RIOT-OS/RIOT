@@ -38,6 +38,7 @@ INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/include/$(CPU)
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_timer/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/$(CPU)/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/platform_port/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/heap/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/log/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/newlib/platform_include
