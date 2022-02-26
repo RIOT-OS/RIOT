@@ -35,6 +35,10 @@ void auto_init_netdev_tap(void)
     for (unsigned i = 0; i < NETDEV_TAP_MAX; i++) {
         const netdev_tap_params_t *p = &netdev_tap_params[i];
 
+        if (p->tap_name == NULL) {
+            continue;
+        }
+
         LOG_DEBUG("[auto_init_netif] initializing netdev_tap #%u on TAP %s\n",
                   i, *(p->tap_name));
 

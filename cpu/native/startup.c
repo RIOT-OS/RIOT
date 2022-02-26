@@ -478,6 +478,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
     int c, opt_idx = 0, uart = 0;
 #ifdef MODULE_NETDEV_TAP
     unsigned taps = 0;
+    memset(netdev_tap_params, 0, sizeof(netdev_tap_params));
 #endif
 #ifdef MODULE_SOCKET_ZEP
     unsigned zeps = 0;
@@ -599,14 +600,6 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
                 break;
         }
     }
-#ifdef MODULE_NETDEV_TAP
-    for (unsigned i = 0; i < NETDEV_TAP_MAX - taps; i++) {
-        if (argv[optind + i] == NULL) {
-            /* no tap parameter left */
-            usage_exit(EXIT_FAILURE);
-        }
-    }
-#endif
 #ifdef MODULE_SOCKET_ZEP
     if (zeps != SOCKET_ZEP_MAX) {
         /* not enough ZEPs given */
@@ -672,6 +665,9 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
     native_interrupt_init();
 #ifdef MODULE_NETDEV_TAP
     for (unsigned i = 0; taps < NETDEV_TAP_MAX; ++taps, ++i) {
+        if (argv[optind + i] == NULL) {
+            break;
+        }
         netdev_tap_params[taps].tap_name = &argv[optind + i];
         netdev_tap_params[taps].wired = true;
     }
