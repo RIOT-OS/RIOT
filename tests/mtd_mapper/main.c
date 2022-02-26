@@ -37,6 +37,9 @@
 #ifndef PAGE_SIZE
 #define PAGE_SIZE 64
 #endif
+#ifndef WRITE_SIZE
+#define WRITE_SIZE 4
+#endif
 
 #define MEMORY_PAGE_COUNT    PAGE_PER_SECTOR * SECTOR_COUNT
 
@@ -180,6 +183,7 @@ static mtd_dev_t dev = {
     .sector_count = SECTOR_COUNT,
     .pages_per_sector = PAGE_PER_SECTOR,
     .page_size = PAGE_SIZE,
+    .write_size = WRITE_SIZE,
 };
 
 static mtd_mapper_parent_t _parent = MTD_PARENT_INIT(&dev);
@@ -190,6 +194,7 @@ static mtd_mapper_region_t _region_a = {
         .sector_count = SECTOR_COUNT / 2,
         .pages_per_sector = PAGE_PER_SECTOR,
         .page_size = PAGE_SIZE,
+        .write_size = WRITE_SIZE,
     },
     .parent = &_parent,
     .sector = 0,
@@ -201,6 +206,7 @@ static mtd_mapper_region_t _region_b = {
         .sector_count = SECTOR_COUNT / 2,
         .pages_per_sector = PAGE_PER_SECTOR,
         .page_size = PAGE_SIZE,
+        .write_size = WRITE_SIZE,
     },
     .parent = &_parent,
     .sector = SECTOR_COUNT / 2,
