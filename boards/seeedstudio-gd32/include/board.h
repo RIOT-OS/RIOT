@@ -35,11 +35,6 @@ extern "C" {
 #define XTIMER_WIDTH                (16)
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

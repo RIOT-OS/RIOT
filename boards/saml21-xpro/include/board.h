@@ -49,11 +49,6 @@ extern "C" {
 #define BTN0_MODE           GPIO_IN_PU
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

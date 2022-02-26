@@ -83,11 +83,6 @@ extern "C" {
 #define LSM6DSL_PARAM_ADDR  (0x6A)
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

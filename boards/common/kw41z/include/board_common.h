@@ -31,11 +31,6 @@ extern "C"
 {
 #endif
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and standard I/O
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

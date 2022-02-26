@@ -51,6 +51,11 @@ extern "C" {
  */
 void kernel_init(void);
 
+/**
+ * @brief   Initialize board specific hardware
+ */
+void board_init(void);
+
 #ifdef __cplusplus
 }
 #endif
