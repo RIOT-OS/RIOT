@@ -41,6 +41,7 @@ static int _mtd_at24cxxx_init(mtd_dev_t *mtd)
     mtd->pages_per_sector = 1;
     mtd->sector_count = DEV(mtd)->params.eeprom_size /
                         DEV(mtd)->params.page_size;
+    mtd->write_size = 1;
     return 0;
 }
 
