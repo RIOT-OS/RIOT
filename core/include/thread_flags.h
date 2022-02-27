@@ -39,8 +39,11 @@
  * Usually, if it is only of interest that an event occurred, but not how many
  * of them, thread flags should be considered.
  *
- * Note that some flags (currently the three most significant bits) are used by
+ * Note that some flags (currently the two most significant bits) are used by
  * core functions and should not be set by the user. They can be waited for.
+ * Unlike @ref core_msg "messages" (which are only ever sent when requested),
+ * these flags can be set unprompted. (For example, @ref THREAD_FLAG_MSG_WAITING
+ * is set on a thread automatically with every message sent there).
  *
  * This API is optional and must be enabled by adding "core_thread_flags" to USEMODULE.
  *
@@ -98,6 +101,19 @@ extern "C" {
  * @see xtimer_set_timeout_flag
  */
 #define THREAD_FLAG_TIMEOUT         (1u << 14)
+
+/**
+ * @brief Comprehensive set of all predefined flags
+ *
+ * This bit mask is set for all thread flag bits that are predefined in RIOT.
+ * Flags within this set may be set on a thread by the operating system without
+ * the thread soliciting them (though not all are; for example, @ref
+ * THREAD_FLAG_TIMEOUT is not).
+ *
+ * When using custom flags, asserting that they are not in this set can help
+ * avoid conflict with future additions to the predefined flags.
+ */
+#define THREAD_FLAG_PREDEFINED_MASK (THREAD_FLAG_MSG_WAITING | THREAD_FLAG_TIMEOUT)
 /** @} */
 
 /**
