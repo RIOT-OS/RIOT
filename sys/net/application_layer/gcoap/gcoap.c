@@ -47,7 +47,7 @@
 #define NO_IMMEDIATE_REPLY (-1)
 
 /* End of the range to pick a random timeout */
-#define TIMEOUT_RANGE_END (CONFIG_COAP_ACK_TIMEOUT * CONFIG_COAP_RANDOM_FACTOR_1000 / 1000)
+#define TIMEOUT_RANGE_END (CONFIG_COAP_ACK_TIMEOUT_MS * CONFIG_COAP_RANDOM_FACTOR_1000 / 1000)
 
 /* Internal functions */
 static void *_event_loop(void *arg);
@@ -66,7 +66,7 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 static void _expire_request(gcoap_request_memo_t *memo);
 static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *pdu,
                            const sock_udp_ep_t *remote, bool by_mid);
-static int _find_resource(const coap_pkt_t *pdu,
+static int _find_resource(coap_pkt_t *pdu,
                           const coap_resource_t **resource_ptr,
                           gcoap_listener_t **listener_ptr);
 static int _find_observer(sock_udp_ep_t **observer, sock_udp_ep_t *remote);
@@ -77,7 +77,7 @@ static void _find_obs_memo_resource(gcoap_observe_memo_t **memo,
 
 static int _request_matcher_default(gcoap_listener_t *listener,
                                     const coap_resource_t **resource,
-                                    const coap_pkt_t *pdu);
+                                    coap_pkt_t *pdu);
 
 #if IS_USED(MODULE_GCOAP_DTLS)
 static void _on_sock_dtls_evt(sock_dtls_t *sock, sock_async_flags_t type, void *arg);
@@ -472,9 +472,9 @@ static void _on_resp_timeout(void *arg) {
 #else
         unsigned i        = CONFIG_COAP_MAX_RETRANSMIT - memo->send_limit;
 #endif
-        uint32_t timeout  = ((uint32_t)CONFIG_COAP_ACK_TIMEOUT << i) * MS_PER_SEC;
+        uint32_t timeout  = (uint32_t)CONFIG_COAP_ACK_TIMEOUT_MS << i;
 #if CONFIG_COAP_RANDOM_FACTOR_1000 > 1000
-        uint32_t end = ((uint32_t)TIMEOUT_RANGE_END << i) * MS_PER_SEC;
+        uint32_t end = (uint32_t)TIMEOUT_RANGE_END << i;
         timeout = random_uint32_range(timeout, end);
 #endif
         event_timeout_set(&memo->resp_evt_tmout, timeout);
@@ -538,7 +538,7 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     gcoap_observe_memo_t *memo          = NULL;
     gcoap_observe_memo_t *resource_memo = NULL;
 
-    switch (_find_resource((const coap_pkt_t *)pdu, &resource, &listener)) {
+    switch (_find_resource(pdu, &resource, &listener)) {
         case GCOAP_RESOURCE_WRONG_METHOD:
             return gcoap_response(pdu, buf, len, COAP_CODE_METHOD_NOT_ALLOWED);
         case GCOAP_RESOURCE_NO_PATH:
@@ -640,7 +640,7 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 
 static int _request_matcher_default(gcoap_listener_t *listener,
                                     const coap_resource_t **resource,
-                                    const coap_pkt_t *pdu)
+                                    coap_pkt_t *pdu)
 {
     uint8_t uri[CONFIG_NANOCOAP_URI_MAX];
     int ret = GCOAP_RESOURCE_NO_PATH;
@@ -696,7 +696,7 @@ static int _request_matcher_default(gcoap_listener_t *listener,
  *        code didn't match and `GCOAP_RESOURCE_NO_PATH` if no matching
  *        resource was found.
  */
-static int _find_resource(const coap_pkt_t *pdu,
+static int _find_resource(coap_pkt_t *pdu,
                           const coap_resource_t **resource_ptr,
                           gcoap_listener_t **listener_ptr)
 {
@@ -1158,9 +1158,9 @@ ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
             }
             if (memo->msg.data.pdu_buf) {
                 memo->send_limit  = CONFIG_COAP_MAX_RETRANSMIT;
-                timeout           = (uint32_t)CONFIG_COAP_ACK_TIMEOUT * MS_PER_SEC;
+                timeout           = (uint32_t)CONFIG_COAP_ACK_TIMEOUT_MS;
 #if CONFIG_COAP_RANDOM_FACTOR_1000 > 1000
-                timeout = random_uint32_range(timeout, TIMEOUT_RANGE_END * MS_PER_SEC);
+                timeout = random_uint32_range(timeout, TIMEOUT_RANGE_END);
 #endif
                 memo->state = GCOAP_MEMO_RETRANSMIT;
             }

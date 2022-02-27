@@ -531,7 +531,7 @@ extern "C" {
  * In normal operations the timeout between retransmissions doubles. When
  * CONFIG_GCOAP_NO_RETRANS_BACKOFF is defined this doubling does not happen.
  *
- * @see CONFIG_COAP_ACK_TIMEOUT
+ * @see CONFIG_COAP_ACK_TIMEOUT_MS
  */
 #define CONFIG_GCOAP_NO_RETRANS_BACKOFF
 #endif
@@ -702,7 +702,7 @@ typedef struct gcoap_listener gcoap_listener_t;
  */
 typedef int (*gcoap_request_matcher_t)(gcoap_listener_t *listener,
                                        const coap_resource_t **resource,
-                                       const coap_pkt_t *pdu);
+                                       coap_pkt_t *pdu);
 
 /**
  * @brief   A modular collection of resources for a server
