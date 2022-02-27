@@ -20,6 +20,7 @@ if KCONFIG_COAP
 
 config COAP_ACK_TIMEOUT_MS
     int "Timeout in milliseconds for a response to a confirmable request"
+    default 1000 if RFC_RELAXED_PARAMS
     default 2000
     help
         This value is for the response to the initial confirmable message. The

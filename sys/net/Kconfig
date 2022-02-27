@@ -22,4 +22,7 @@ config RFC_RELAXED_PARAMS
         Allow RIOT-OS's default values for network parameters to deviate in
         some places from values various RFCs recommend to better suit constrained
         devices.
+
+        In particular, setting this influences COAP_ACK_TIMEOUT_MS.
+
 endmenu # Networking
