@@ -1,0 +1,31 @@
+/**
+@defgroup pkg_lvgl7 LittlevGL - Open-Source Embedded GUI Library
+@ingroup  pkg
+@brief    LittlevGL package for RIOT
+
+@see      https://github.com/littlevgl/lvgl
+@deprecated  LVGL v7 Will not be available after the 2022.04, please migrate to
+             LVGL v8.
+
+## Configuration options
+
+The package can be configured with using several variables. These variables can
+either be configured using CFLAGS or using Kconfig (via `make menuconfig`).
+LVGL_TASK_THREAD_PRIO cannot be configured via Kconfig.
+
+### Engine settings
+
+- `CONFIG_LVGL_INACTIVITY_PERIOD_MS`: maximum inactivity period before going to sleep in ms.
+  (default: 5s)
+- `CONFIG_LVGL_TASK_HANDLER_DELAY_MS`: delay between lvgl task handle call in us.
+  (default: 5ms)
+- `LVGL_TASK_THREAD_PRIO`: lvgl task handler thread priority.
+  (default: THREAD_PRIORITY_MAIN - 1)
+
+Example of command line for changing the max activity period to 5s:
+
+```
+CFLAGS=-DCONFIG_LVGL_ACTIVITY_PERIOD=5000 make -C tests/pkg_lvgl
+```
+
+ */
