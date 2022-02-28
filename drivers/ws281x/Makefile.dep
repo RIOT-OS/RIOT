@@ -1,4 +1,4 @@
-FEATURES_REQUIRED_ANY += cpu_core_atmega|arch_esp32|arch_native
+FEATURES_REQUIRED_ANY += cpu_core_atmega|arch_esp32|arch_native|arch_arm
 
 ifeq (,$(filter ws281x_%,$(USEMODULE)))
   ifneq (,$(filter cpu_core_atmega,$(FEATURES_USED)))
@@ -9,6 +9,10 @@ ifeq (,$(filter ws281x_%,$(USEMODULE)))
   endif
   ifneq (,$(filter arch_esp32,$(FEATURES_USED)))
     USEMODULE += ws281x_esp32
+  endif
+  ifneq (,$(filter arch_arm,$(FEATURES_USED)))
+    USEMODULE += ws281x_arm
+    USEPKG += light_ws2812
   endif
 endif
 

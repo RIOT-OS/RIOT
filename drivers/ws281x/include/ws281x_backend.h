@@ -51,6 +51,15 @@ extern "C" {
 #endif
 /** @} */
 
+
+/**
+ * @name    Properties of the ARM backend.
+ * @{
+ */
+#ifdef MODULE_WS281X_ARM
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
