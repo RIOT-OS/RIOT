@@ -1,0 +1,20 @@
+INCLUDES += -I$(PKGDIRBASE)/lv_drivers \
+            -I$(RIOTBASE)/pkg/lv_drivers/include \
+            #
+
+# Don't use relative includes in lv_drivers, already set in LVGL package
+# CFLAGS += -DLV_CONF_INCLUDE_SIMPLE
+
+# lv_drivers module is not a concrete module, so declare it as a pseudomodule
+PSEUDOMODULES += lv_drivers
+
+ifneq (,$(filter lv_drivers_sdl,$(USEMODULE)))
+  SDL_LINKFLAGS = $(call memoized,SDL_LINKFLAGS,$(shell sdl2-config --libs))
+  LINKFLAGS += $(SDL_LINKFLAGS)
+  SDL_CFLAGS = $(call memoized,SDL_CFLAGS,$(shell sdl2-config --cflags))
+  CFLAGS += $(SDL_CFLAGS)
+  # add SDL to the include path
+  SDL_INCLUDE_PATH = $(call memoized,SDL_INCLUDE_PATH,$(shell \
+    sdl2-config --cflags | tr ' ' '\n' | grep '^-I' | cut -c3- | head -n1))
+  CFLAGS += -DSDL_INCLUDE_PATH="<$(SDL_INCLUDE_PATH)/SDL.h>"
+endif
