@@ -1,4 +1,5 @@
-BOARD ?= samr21-xpro
+BOARD ?= nucleo-f767zi
+
 include ../Makefile.tests_common
 
 USEMODULE += mpu_stack_guard
