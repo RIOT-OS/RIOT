@@ -73,7 +73,7 @@ static const dw1000_dev_instance_t dw1000_instance_config_default = {
                 .preambleLength = DW1000_TX_PREAM_LEN_DEFAULT,
             },
             .txrf={
-                .PGdly = DW1000_CHANNEL_DEFAULT,
+                .PGdly = DW1000_TX_PGDELAY_DEFAULT,
                 .BOOSTNORM = dw1000_power_value(DW1000_txrf_config_9db, 2.5),
                 .BOOSTP500 = dw1000_power_value(DW1000_txrf_config_9db, 2.5),
                 .BOOSTP250 = dw1000_power_value(DW1000_txrf_config_9db, 2.5),
