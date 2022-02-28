@@ -182,12 +182,12 @@ static inline void bf_inv(uint8_t out[], const uint8_t a[], size_t len)
  * This function can be used to record e.g., empty entries in an array.
  *
  * @param[in,out] field The bitfield
- * @param[in]     size  The size of the bitfield
+ * @param[in]     len   The number of bits in the bitfield to consider
  *
  * @return      number of bit that was set
  * @return      -1 if no bit was unset
  */
-int bf_get_unset(uint8_t field[], int size);
+int bf_get_unset(uint8_t field[], size_t len);
 
 #ifdef __cplusplus
 }
