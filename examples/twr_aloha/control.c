@@ -205,7 +205,7 @@ static void _rng_listen(void *arg)
     if (!ztimer_is_set(ZTIMER_MSEC, &_rng_request_event.periodic.timer.timer)) {
         _status &= ~TWR_STATUS_INITIATOR;
     }
-    if (_status && TWR_STATUS_RESPONDER) {
+    if (_status & TWR_STATUS_RESPONDER) {
         /* wake up if needed */
         if (_udev->status.sleeping) {
             uwb_wakeup(_udev);
@@ -217,8 +217,7 @@ static void _rng_listen(void *arg)
     }
     else {
         /* go to sleep if possible */
-        if (_rng_request_event.periodic.timer.interval > CONFIG_TWR_MIN_IDLE_SLEEP_MS ||
-            !(_status && TWR_STATUS_INITIATOR)) {
+        if (_rng_request_event.periodic.timer.interval > CONFIG_TWR_MIN_IDLE_SLEEP_MS) {
             uwb_sleep_config(_udev);
             uwb_enter_sleep(_udev);
         }
@@ -254,7 +253,7 @@ static void _rng_request(void *arg)
         uwb_phy_forcetrxoff(_udev);
     }
 
-   uwb_rng_request(_rng, event->addr, (uwb_dataframe_code_t)event->proto);
+    uwb_rng_request(_rng, event->addr, (uwb_dataframe_code_t)event->proto);
 }
 
 void uwb_core_rng_start(uint16_t addr, twr_protocol_t proto, uint32_t interval,
@@ -285,7 +284,8 @@ void uwb_core_rng_init(void)
     /* set initial status */
     _status = 0;
     /* got to sleep on boot */
-    struct uwb_dev*_udev = uwb_dev_idx_lookup(0);
+    struct uwb_dev *_udev = uwb_dev_idx_lookup(0);
+
     uwb_sleep_config(_udev);
     uwb_enter_sleep(_udev);
 }
