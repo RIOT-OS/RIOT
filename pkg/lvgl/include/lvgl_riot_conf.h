@@ -19,7 +19,11 @@
 #ifndef LVGL_RIOT_CONF_H
 #define LVGL_RIOT_CONF_H
 
+#include "kernel_defines.h"
 #include "board.h"
+#if IS_USED(MODULE_LV_DRIVERS_SDL)
+#include "lv_drv_conf.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

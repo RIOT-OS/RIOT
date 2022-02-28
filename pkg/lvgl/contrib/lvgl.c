@@ -31,6 +31,13 @@
 
 #include "screen_dev.h"
 
+#if IS_USED(MODULE_LV_DRIVERS_INDEV_MOUSE)
+#include "indev/mouse.h"
+#endif
+#if IS_USED(MODULE_LV_DRIVERS_SDL)
+#include "sdl/sdl.h"
+#endif
+
 #ifndef LVGL_COLOR_BUF_SIZE
 #define LVGL_COLOR_BUF_SIZE                 (LV_HOR_RES_MAX * 10)
 #endif
@@ -52,12 +59,13 @@ static kernel_pid_t _task_thread_pid;
 static lv_disp_draw_buf_t disp_buf;
 static lv_color_t draw_buf[LVGL_COLOR_BUF_SIZE];
 
-static screen_dev_t *_screen_dev = NULL;
 static lv_disp_drv_t disp_drv;
 #if IS_USED(MODULE_TOUCH_DEV)
 static lv_indev_drv_t indev_drv;
 #endif
 
+#if !IS_USED(MODULE_LV_DRIVERS_SDL)
+static screen_dev_t *_screen_dev = NULL;
 static void _disp_map(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p)
 {
     if (!_screen_dev->display) {
@@ -75,8 +83,9 @@ static void _disp_map(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *col
 
     lv_disp_flush_ready(drv);
 }
+#endif
 
-#if IS_USED(MODULE_TOUCH_DEV)
+#if IS_USED(MODULE_TOUCH_DEV) && !IS_USED(MODULE_LV_DRIVERS_SDL)
 /* adapted from https://github.com/lvgl/lvgl/tree/v6.1.2#add-littlevgl-to-your-project */
 static void _touch_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 {
@@ -113,28 +122,48 @@ static void _touch_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 void lvgl_init(screen_dev_t *screen_dev)
 {
     lv_init();
+
+#if !IS_USED(MODULE_LV_DRIVERS_SDL)
     _screen_dev = screen_dev;
     assert(screen_dev->display);
+#else
+    (void)screen_dev;
+#endif
 
     lv_disp_draw_buf_init(&disp_buf, draw_buf, NULL, LVGL_COLOR_BUF_SIZE);
 
     lv_disp_drv_init(&disp_drv);
     disp_drv.draw_buf = &disp_buf;
+#if IS_USED(MODULE_LV_DRIVERS_SDL)
+    /* Use SDL driver which creates window on PC's monitor to simulate a display */
+    sdl_init();
+    /* Used when `LV_VDB_SIZE != 0` in lv_conf.h (buffered drawing) */
+    disp_drv.flush_cb = sdl_display_flush;
+#else
     disp_drv.flush_cb = _disp_map;
     /* Configure horizontal and vertical resolutions based on the
        underlying display device parameters */
     disp_drv.hor_res = disp_dev_width(screen_dev->display);
     disp_drv.ver_res = disp_dev_height(screen_dev->display);
+#endif
 
     lv_disp_drv_register(&disp_drv);
 
 #if IS_USED(MODULE_TOUCH_DEV)
+#if IS_USED(MODULE_LV_DRIVERS_SDL)
+    /* Add the mouse as input device, use SDL driver which reads the PC's mouse */
+    lv_indev_drv_init(&indev_drv);
+    indev_drv.type = LV_INDEV_TYPE_POINTER;
+    indev_drv.read_cb = sdl_mouse_read;
+    lv_indev_drv_register(&indev_drv);
+#else
     if (screen_dev->touch) {
         lv_indev_drv_init(&indev_drv);
         indev_drv.type = LV_INDEV_TYPE_POINTER;
         indev_drv.read_cb = _touch_read;
         lv_indev_drv_register(&indev_drv);
     }
+#endif
 #endif
 }
 
