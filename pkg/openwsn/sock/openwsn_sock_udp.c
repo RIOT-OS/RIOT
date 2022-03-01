@@ -215,12 +215,15 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
     return 0;
 }
 
-ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
-                          const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux)
+ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
+                           const iolist_t *snips,
+                           const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux)
 {
     (void)aux;
     OpenQueueEntry_t *pkt;
     open_addr_t dst_addr, src_addr;
+    size_t payload_len = 0;
+    uint8_t *payload_dst;
 
     memset(&dst_addr, 0, sizeof(open_addr_t));
     memset(&src_addr, 0, sizeof(open_addr_t));
@@ -228,7 +231,6 @@ ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
 
     /* asserts for sock_udp_send "pre" */
     assert((sock != NULL) || (remote != NULL));
-    assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
 
     /* check remote */
     if (remote != NULL) {
@@ -302,19 +304,29 @@ ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
     pkt->l4_destination_port = dst_port;
     pkt->l4_sourcePortORicmpv6Type = src_port;
 
+    /* calculate payload size */
+    payload_len = iolist_size(snips);
+
     /* set payload */
-    if (packetfunctions_reserveHeader(&pkt, len)) {
+    if (packetfunctions_reserveHeader(&pkt, payload_len)) {
         openqueue_freePacketBuffer(pkt);
         return -ENOMEM;
     }
-    memcpy(pkt->payload, data, len);
+
+    /* copy payload into packet */
+    payload_dst = pkt->payload;
+    while (snips) {
+        memcpy(payload_dst, snips->iol_base, snips->iol_len);
+        payload_dst += snips->iol_len;
+        snips = snips->iol_next;
+    }
     pkt->l4_payload = pkt->payload;
     pkt->l4_length = pkt->length;
 
     /* push task to scheduler send */
     scheduler_push_task(_sock_transmit_internal, TASKPRIO_UDP);
 
-    return len;
+    return payload_len;
 }
 
 void sock_udp_close(sock_udp_t *sock)

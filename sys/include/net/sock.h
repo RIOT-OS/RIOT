@@ -103,6 +103,8 @@
 #define NET_SOCK_H
 
 #include <stdint.h>
+#include <stddef.h>
+#include "iolist.h"
 
 #ifdef __cplusplus
 extern "C" {

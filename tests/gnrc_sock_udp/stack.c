@@ -29,6 +29,7 @@
 
 static msg_t _msg_queue[_MSG_QUEUE_SIZE];
 static gnrc_netreg_entry_t _udp_handler;
+static char _rx_buf[32];
 
 void _net_init(void)
 {
@@ -130,9 +131,11 @@ bool _check_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
                    void *data, size_t data_len, uint16_t iface,
                    bool random_src_port)
 {
-    gnrc_pktsnip_t *pkt, *ipv6, *udp;
+    gnrc_pktsnip_t *pkt, *ipv6, *udp, *payload;
     ipv6_hdr_t *ipv6_hdr;
     udp_hdr_t *udp_hdr;
+    size_t payload_len;
+    char *payload_buf;
     msg_t msg;
 
     msg_receive(&msg);
@@ -164,12 +167,22 @@ bool _check_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
         return _res(pkt, false);
     }
     udp_hdr = udp->data;
+
+    payload = udp->next;
+    payload_buf = _rx_buf;
+    while (payload) {
+        memcpy(payload_buf, payload->data, payload->size);
+        payload_buf += payload->size;
+        payload = payload->next;
+    }
+    payload_len = payload_buf - _rx_buf;
+
     return _res(pkt, (memcmp(src, &ipv6_hdr->src, sizeof(ipv6_addr_t)) == 0) &&
                 (memcmp(dst, &ipv6_hdr->dst, sizeof(ipv6_addr_t)) == 0) &&
                 (ipv6_hdr->nh == PROTNUM_UDP) &&
                 (random_src_port || (src_port == byteorder_ntohs(udp_hdr->src_port))) &&
                 (dst_port == byteorder_ntohs(udp_hdr->dst_port)) &&
                 (udp->next != NULL) &&
-                (data_len == udp->next->size) &&
-                (memcmp(data, udp->next->data, data_len) == 0));
+                (data_len ==payload_len ) &&
+                (memcmp(data, _rx_buf, data_len) == 0));
 }

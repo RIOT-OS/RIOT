@@ -163,18 +163,17 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
     return (ssize_t)buf->ptr->len;
 }
 
-ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
-                          const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux)
+ssize_t sock_udp_sendv_aux(sock_udp_t *sock, const iolist_t *snips,
+                           const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux)
 {
     (void)aux;
     assert((sock != NULL) || (remote != NULL));
-    assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
 
     if ((remote != NULL) && (remote->port == 0)) {
         return -EINVAL;
     }
-    return lwip_sock_send((sock) ? sock->base.conn : NULL, data, len, 0,
-                          (struct _sock_tl_ep *)remote, NETCONN_UDP);
+    return lwip_sock_sendv((sock) ? sock->base.conn : NULL, snips, 0,
+                           (struct _sock_tl_ep *)remote, NETCONN_UDP);
 }
 
 #ifdef SOCK_HAS_ASYNC

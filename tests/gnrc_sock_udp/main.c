@@ -629,6 +629,37 @@ static void test_sock_udp_send__socketed(void)
     expect(_check_net());
 }
 
+static void test_sock_udp_sendv__socketed(void)
+{
+    static const ipv6_addr_t src_addr = { .u8 = _TEST_ADDR_LOCAL };
+    static const ipv6_addr_t dst_addr = { .u8 = _TEST_ADDR_REMOTE };
+    static const sock_udp_ep_t local = { .addr = { .ipv6 = _TEST_ADDR_LOCAL },
+                                         .family = AF_INET6,
+                                         .netif = _TEST_NETIF,
+                                         .port = _TEST_PORT_LOCAL };
+    static const sock_udp_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR_REMOTE },
+                                          .family = AF_INET6,
+                                          .port = _TEST_PORT_REMOTE };
+    const iolist_t tail = {
+        .iol_base = "EFGH",
+        .iol_len  = sizeof("EFGH"),
+    };
+
+    const iolist_t head = {
+        .iol_next = (void *)&tail,
+        .iol_base = "ABCD",
+        .iol_len  = sizeof("ABCD") - 1,
+    };
+
+    expect(0 == sock_udp_create(&_sock, &local, &remote, SOCK_FLAGS_REUSE_EP));
+    expect(sizeof("ABCDEFGH") == sock_udp_sendv(&_sock, &head, NULL));
+    expect(_check_packet(&src_addr, &dst_addr, _TEST_PORT_LOCAL,
+                         _TEST_PORT_REMOTE, "ABCDEFGH", sizeof("ABCDEFGH"),
+                         _TEST_NETIF, false));
+    xtimer_usleep(1000);    /* let GNRC stack finish */
+    expect(_check_net());
+}
+
 static void test_sock_udp_send__socketed_other_remote(void)
 {
     static const ipv6_addr_t src_addr = { .u8 = _TEST_ADDR_LOCAL };
@@ -808,6 +839,7 @@ int main(void)
     CALL(test_sock_udp_send__socketed_no_netif());
     CALL(test_sock_udp_send__socketed_no_local());
     CALL(test_sock_udp_send__socketed());
+    CALL(test_sock_udp_sendv__socketed());
     CALL(test_sock_udp_send__socketed_other_remote());
     CALL(test_sock_udp_send__unsocketed_no_local_no_netif());
     CALL(test_sock_udp_send__unsocketed_no_netif());

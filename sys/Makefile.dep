@@ -137,6 +137,10 @@ ifneq (,$(filter sntp,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter sock_%,$(USEMODULE)))
+  USEMODULE += iolist
+endif
+
 ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += random
