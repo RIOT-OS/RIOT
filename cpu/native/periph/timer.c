@@ -105,7 +105,7 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     return 0;
 }
 
-static void do_timer_set(tim_t dev, unsigned int offset, bool periodic)
+static void do_timer_set(unsigned int offset, bool periodic)
 {
     DEBUG("%s\n", __func__);
 
@@ -121,8 +121,6 @@ static void do_timer_set(tim_t dev, unsigned int offset, bool periodic)
     }
 
     DEBUG("timer_set(): setting %lu.%06lu\n", itv.it_value.tv_sec, itv.it_value.tv_usec);
-
-    timer_start(dev);
 }
 
 int timer_set(tim_t dev, int channel, unsigned int offset)
@@ -137,7 +135,8 @@ int timer_set(tim_t dev, int channel, unsigned int offset)
         offset = NATIVE_TIMER_MIN_RES;
     }
 
-    do_timer_set(dev, offset, false);
+    do_timer_set(offset, false);
+    timer_start(dev);
 
     return 0;
 }
@@ -156,7 +155,11 @@ int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags
         return -1;
     }
 
-    do_timer_set(dev, value, true);
+    do_timer_set(value, true);
+
+    if (!(flags & TIM_FLAG_SET_STOPPED)) {
+        timer_start(dev);
+    }
 
     return 0;
 }
@@ -165,7 +168,8 @@ int timer_clear(tim_t dev, int channel)
 {
     (void)channel;
 
-    do_timer_set(dev, 0, false);
+    do_timer_set(0, false);
+    timer_start(dev);
 
     return 0;
 }
