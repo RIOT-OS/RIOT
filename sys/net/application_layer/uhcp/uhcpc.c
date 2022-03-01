@@ -12,7 +12,11 @@
 #include "net/af.h"
 #include "net/sock/udp.h"
 #include "net/uhcp.h"
+#if IS_USED(MODULE_ZTIMER_USEC)
+#include "ztimer/xtimer_compat.h"
+#else
 #include "xtimer.h"
+#endif
 
 /**
  * @brief Request prefix from uhcp server

@@ -18,7 +18,11 @@
 
 #include "thread_flags.h"
 #include "vfs.h"
+#if IS_USED(MODULE_ZTIMER_USEC)
+#include "ztimer/xtimer_compat.h"
+#else
 #include "xtimer.h"
+#endif
 
 #if IS_USED(MODULE_POSIX_SOCKETS)
 extern bool posix_socket_is(int fd);
