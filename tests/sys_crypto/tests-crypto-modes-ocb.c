@@ -401,7 +401,11 @@ static void test_crypto_modes_ocb_decrypt(void)
 
 static void test_crypto_modes_ocb_bad_parameter_values(void)
 {
-    uint8_t key[16], auth_data[1], nonce[16], input[16], output[32];
+    uint8_t key[16] = {0};
+    uint8_t auth_data[1] = {0};
+    uint8_t nonce[16] = {0};
+    uint8_t input[16] = {0};
+    uint8_t output[32] = {0};
     cipher_t cipher;
 
     cipher_init(&cipher, CIPHER_AES, key, 16);
