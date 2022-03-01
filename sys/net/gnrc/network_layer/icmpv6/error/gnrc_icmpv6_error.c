@@ -15,6 +15,7 @@
 #include <assert.h>
 
 #include "net/ipv6.h"
+#include "net/gnrc/netreg.h"
 #include "net/gnrc/icmpv6.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/pktbuf.h"

@@ -268,6 +268,7 @@
 #ifndef NET_SOCK_UDP_H
 #define NET_SOCK_UDP_H
 
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/types.h>

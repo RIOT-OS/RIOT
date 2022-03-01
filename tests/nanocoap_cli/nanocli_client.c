@@ -24,9 +24,12 @@
 #include <string.h>
 
 #include "net/coap.h"
+#include "net/gnrc/netif.h"
+#include "net/ipv6.h"
 #include "net/nanocoap.h"
 #include "net/nanocoap_sock.h"
 #include "net/sock/udp.h"
+
 #include "od.h"
 
 static ssize_t _send(coap_pkt_t *pkt, size_t len, char *addr_str, char *port_str)

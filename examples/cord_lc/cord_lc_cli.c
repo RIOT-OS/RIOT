@@ -23,6 +23,7 @@
 
 #include "net/cord/config.h"
 #include "net/cord/lc.h"
+#include "net/gnrc/netif.h"
 #include "net/gcoap.h"
 #include "net/sock/util.h"
 
