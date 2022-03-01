@@ -1,0 +1,25 @@
+ifneq (,$(filter xtimer,$(USEMODULE)))
+  ifeq (,$(filter xtimer_on%,$(USEMODULE)))
+    USEMODULE += xtimer_ztimer_compat
+endif
+
+ifneq (,$(filter xtimer_on_periph_timer,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_xtimer
+  FEATURES_REQUIRED += periph_timer
+  USEMODULE += div
+endif
+
+# make xtimer use ztimer_usec as low level timer
+ifneq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_xtimer
+  USEMODULE += ztimer_usec
+endif
+
+ifneq (,$(filter xtimer_ztimer_compat,$(USEMODULE)))
+  USEMODULE += ztimer_usec
+endif
+
+ifneq (,$(filter xtimer_ztimer64_compat,$(USEMODULE)))
+  USEMODULE += ztimer64_usec
+  USEMODULE += xtimer_ztimer_compat
+endif
