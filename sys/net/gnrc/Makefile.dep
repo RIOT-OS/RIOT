@@ -20,6 +20,10 @@ ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
   USEMODULE += gnrc_nettype_gomach
   USEMODULE += random
   USEMODULE += xtimer
+  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+    # requires 64bit timestamps
+    USEMODULE += ztimer64_xtimer_compat
+  endif
   USEMODULE += gnrc_mac
   FEATURES_REQUIRED += periph_rtt
 endif

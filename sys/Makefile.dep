@@ -135,6 +135,10 @@ endif
 ifneq (,$(filter sntp,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += xtimer
+  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+    # requires 64bit ftimestamps
+    USEMODULE += ztimer64_xtimer_compat
+  endif
 endif
 
 ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
@@ -222,6 +226,10 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   endif
   ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
     USEMODULE += div
+    ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+      # requires 64bit timestamps when using xtimer
+      USEMODULE += ztimer64_xtimer_compat
+    endif
   endif
 endif
 
@@ -320,6 +328,13 @@ ifneq (,$(filter sema_inv,$(USEMODULE)))
   USEMODULE += atomic_utils
 endif
 
+ifneq (,$(filter sema,$(USEMODULE)))
+  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+    # sema_timed required 64bit
+    USEMODULE += ztimer64_xtimer_compat
+  endif
+endif
+
 ifneq (,$(filter luid,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_cpuid
 endif
@@ -327,6 +342,9 @@ endif
 ifneq (,$(filter fib,$(USEMODULE)))
   USEMODULE += universal_address
   USEMODULE += xtimer
+  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+    USEMODULE += ztimer64_xtimer_compat
+  endif
   USEMODULE += posix_headers
 endif
 
@@ -341,6 +359,10 @@ ifneq (,$(filter cpp11-compat,$(USEMODULE)))
   USEMODULE += timex
   FEATURES_REQUIRED += cpp
   FEATURES_REQUIRED += libstdcpp
+  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+    # requires 64bit for syscalls
+    USEMODULE += ztimer64_xtimer_compat
+  endif
 endif
 
 ifneq (,$(filter netstats_%, $(USEMODULE)))
@@ -355,6 +377,10 @@ endif
 ifneq (,$(filter pthread,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += timex
+  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+    # requires 64bit ftimestamps
+    USEMODULE += ztimer64_xtimer_compat
+  endif
 endif
 
 ifneq (,$(filter schedstatistics,$(USEMODULE)))
@@ -568,6 +594,10 @@ endif
 ifneq (,$(filter dsm,$(USEMODULE)))
   USEMODULE += sock_dtls
   USEMODULE += xtimer
+  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+    # requires 64bit timestamps when using xtimer
+    USEMODULE += ztimer64_xtimer_compat
+  endif
 endif
 
 ifneq (,$(filter gcoap,$(USEMODULE)))
@@ -628,6 +658,10 @@ ifneq (,$(filter cord_lc cord_ep,$(USEMODULE)))
   USEMODULE += cord_common
   ifneq (,$(filter shell_commands,$(USEMODULE)))
     USEMODULE += sock_util
+  endif
+  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+    # requires 64bit timestamps when using xtimer
+    USEMODULE += ztimer64_xtimer_compat
   endif
 endif
 

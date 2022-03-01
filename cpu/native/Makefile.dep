@@ -40,6 +40,11 @@ ifneq (,$(filter socket_zep,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+  # requires 64bit for syscalls
+  USEMODULE += ztimer64_xtimer_compat
+endif
+
 USEMODULE += periph
 
 # UART is needed by startup.c
