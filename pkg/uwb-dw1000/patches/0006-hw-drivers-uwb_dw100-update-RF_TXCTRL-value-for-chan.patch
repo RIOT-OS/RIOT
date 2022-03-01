@@ -1,0 +1,25 @@
+From 76861326a7762b45b7da1dc53e6169b5b158f067 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Tue, 1 Mar 2022 14:50:01 +0100
+Subject: [PATCH 6/6] hw/drivers/uwb_dw100: update RF_TXCTRL value for channel
+ 5
+
+---
+ hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_regs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_regs.h b/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_regs.h
+index c27c695..64808cc 100644
+--- a/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_regs.h
++++ b/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_regs.h
+@@ -1001,7 +1001,7 @@ extern "C" {
+ #define RF_TXCTRL_CH2           0x00045CA0UL    /* 32-bit value to program to Sub-Register 0x28:0C � RF_TXCTRL */
+ #define RF_TXCTRL_CH3           0x00086CC0UL    /* 32-bit value to program to Sub-Register 0x28:0C � RF_TXCTRL */
+ #define RF_TXCTRL_CH4           0x00045C80UL    /* 32-bit value to program to Sub-Register 0x28:0C � RF_TXCTRL */
+-#define RF_TXCTRL_CH5           0x001E3FE0UL    /* 32-bit value to program to Sub-Register 0x28:0C � RF_TXCTRL */
++#define RF_TXCTRL_CH5           0x001E3FE3UL    /* 32-bit value to program to Sub-Register 0x28:0C � RF_TXCTRL */
+ #define RF_TXCTRL_CH7           0x001E7DE0UL    /* 32-bit value to program to Sub-Register 0x28:0C � RF_TXCTRL */
+
+ /* offset from TX_CAL_ID in bytes */
+--
+2.32.0
