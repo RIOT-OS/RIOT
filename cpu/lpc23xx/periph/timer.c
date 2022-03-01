@@ -208,6 +208,7 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
         return -1;
     }
 
+    bool stop = flags & TIM_FLAG_SET_STOPPED;
     lpc23xx_timer_t *dev = get_dev(tim);
 
     if (flags & TIM_FLAG_RESET_ON_SET) {
@@ -218,7 +219,12 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
          * (reason: TCR is volatile control register.
                     Bit 2 will put the timer into Reset
                     Bit 1 will control if the timer is running) */
-        dev->TCR = 1;
+        if (!stop) {
+            dev->TCR = 1;
+        }
+    } else if (stop) {
+        /* stop the timer */
+        dev->TCR = 0;
     }
 
     clear_oneshot(tim, channel);
