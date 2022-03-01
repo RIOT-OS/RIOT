@@ -183,6 +183,9 @@ int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags
     if (channel < 0 || channel >= timer_config[dev].ch_numof) {
         return -EINVAL;
     }
+    if (flags & TIM_FLAG_SET_STOPPED) {
+        timer_stop(dev);
+    }
     if (flags & TIM_FLAG_RESET_ON_SET) {
         _timer_reset(dev);
     }
