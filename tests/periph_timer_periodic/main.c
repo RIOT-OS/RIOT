@@ -93,6 +93,18 @@ static const char* _print_ok(int chan, bool *succeeded)
     return "ERROR";
 }
 
+static void _cb_set_stopped(void *arg, int chan)
+{
+    (void)chan;
+
+    bool *succeeded = arg;
+
+    *succeeded = false;
+    puts("TIM_FLAG_SET_STOPPED failed");
+
+    timer_stop(TIMER_CYCL);
+}
+
 int main(void)
 {
     mutex_t lock = MUTEX_INIT;
@@ -143,6 +155,12 @@ int main(void)
                    i, count[i], _print_ok(i, &succeeded));
         }
     }
+
+    expect(timer_init(TIMER_CYCL, timer_hz, _cb_set_stopped, &succeeded) == 0);
+    timer_set_periodic(TIMER_CYCL, 0, 25, TIM_FLAG_RESET_ON_SET | TIM_FLAG_SET_STOPPED);
+
+    /* busy wait */
+    for (volatile uint32_t i = 0; i < CLOCK_CORECLOCK / 10; ++i) {}
 
     if (succeeded) {
         puts("TEST SUCCEEDED");
