@@ -13,3 +13,7 @@ endif
 ifneq (,$(filter auto_init_saul,$(USEMODULE)))
   USEMODULE += saul_init_devs
 endif
+
+ifneq (,$(filter xtimer_on_periph_timer,$(USEMODULE)))
+  USEMODULE += div
+endif

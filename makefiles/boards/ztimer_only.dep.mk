@@ -7,5 +7,6 @@
 ifneq (,$(filter xtimer,$(USEMODULE)))
   ifeq (,$(filter ztimer_xtimer_compat ztimer64_xtimer_compat,$(USEMODULE)))
     USEMODULE += xtimer_on_ztimer
+    USEMODULE += ztimer_usec
   endif
 endif

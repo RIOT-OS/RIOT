@@ -12,7 +12,7 @@ menu "ztimer64 - High level timer abstraction layer"
 # still selecting ztimer_usec.
 config ZTIMER64_USEC
     bool "Microseconds 64bit Timer"
-    select ZTIMER_USEC
+    select MODULE_ZTIMER_USEC
     select MODULE_ZTIMER64
     select MODULE_ZTIMER64_USEC
 

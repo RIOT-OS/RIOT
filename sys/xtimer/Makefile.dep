@@ -1,14 +1,36 @@
-ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-  # xtimer is used, ztimer xtimer wrapper is not
-  DEFAULT_MODULE += auto_init_xtimer
-  USEMODULE += div
-  ifeq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
-    # ztimer is not used, so use *periph_timer as low-level timer*.
-    FEATURES_REQUIRED += periph_timer
-  else
-    # will use *ztimer_usec as low-level timer*
+DEFAULT_MODULE += auto_init_xtimer
+# In whatever combination of backends periph_timer will be required
+# - xtimer_on_ztimer -> ztimer_usec -> ztimer_periph_timer -> periph_timer
+# - xtimer_on_periph_timer -> periph_timer
+# - ztimer_xtimer_compat -> ztimer_usec -> ztimer_periph_timer -> periph_timer
+# But requesting it here allows us to select `xtimer_on_periph_timer` only
+# at the end of dependency resolution if `ztimer_periph_timer` was not selected
+# without having an ifeq dependency that would be subject to dependency inclusion
+# order issues, this way xtimer_on_periph_timer can be turned into a DEFAULT_MODULE
+# that can be disabled if ztimer_periph_timer
+FEATURES_REQUIRED += periph_timer
+DEFAULT_MODULE += xtimer_on_periph_timer
+
+# To avoid inclusion order changing dependencies this dependency is commented out
+# but it models xtimer_on_periph_timer dependency explicitly, see comment above
+# for more details
+# ifneq (,$(filter xtimer_on_periph_timer,$(USEMODULE)))
+  # USEMODULE += div
+  # FEATURES_REQUIRED += periph_timer
+# endif
+
+ifneq (,$(filter ztimer_periph_timer,$(USEMODULE)))
+  DISABLE_MODULE += xtimer_on_periph_timer
+  ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+    USEMODULE += xtimer_on_ztimer
   endif
-else
-  # ztimer_xtimer_compat is used, all of *xtimer's API will be mapped on ztimer
-  # or ztimer64 *
+endif
+
+ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+  DISABLE_MODULE += auto_init_xtimer
+endif
+
+# make xtimer use ztimer_usec as low level timer
+ifneq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
+  USEMODULE += ztimer_periph_timer
 endif

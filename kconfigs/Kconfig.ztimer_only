@@ -7,8 +7,7 @@
 config HAVE_ZTIMER_ONLY
     bool
     default y
-    select MODULE_ZTIMER if MODULE_XTIMER
-    select MODULE_ZTIMER_PERIPH_TIMER if MODULE_XTIMER
+    select MODULE_ZTIMER_USEC if MODULE_XTIMER
     help
         Indicates that the board cannot generate a clock frequency suitable for
         xtimer and requires ztimer for conversion. ztimer is used as backend.

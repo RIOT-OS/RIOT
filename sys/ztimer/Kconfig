@@ -38,22 +38,14 @@ config MODULE_ZTIMER_PERIPH_TIMER
     bool "Timer peripheral"
     depends on HAS_PERIPH_TIMER
     select MODULE_PERIPH_TIMER
-
 endmenu # Backends
 
 menu "Clocks"
 
-# TODO: this extra indirection in the entry point for ztimer_usec is required
-# to allow xtimer compatibility modules to depend on ztimer being there while
-# still selecting ztimer_usec.
-config ZTIMER_USEC
-    bool "Microseconds"
-    select MODULE_ZTIMER_USEC
-    select MODULE_ZTIMER_PERIPH_TIMER
-    select MODULE_ZTIMER
-
 config MODULE_ZTIMER_USEC
-    bool
+    bool "Microseconds"
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_PERIPH_TIMER
 
 config MODULE_ZTIMER_MSEC
     bool "Milliseconds"
@@ -136,44 +128,13 @@ config MODULE_ZTIMER_CONVERT
 
 endmenu # Frequency conversion
 
-
-menu "xtimer and evtimer compatibility"
-
-choice
-    bool "xtimer compatibility"
-    depends on MODULE_XTIMER && MODULE_ZTIMER
-
-config MODULE_XTIMER_ON_ZTIMER
-    bool "ztimer_usec as timer backend for xtimer"
-    select MODULE_ZTIMER_USEC
-    select MODULE_ZTIMER_PERIPH_TIMER
-
-config MODULE_ZTIMER_XTIMER_COMPAT
-    bool "map xtimer calls to ztimer"
-    select MODULE_DIV
-    select MODULE_ZTIMER_USEC
-    help
-        This is a wrapper of xtimer API on ztimer_usec and is currently
-        incomplete. Unless doing testing, use xtimer on ztimer.
-
-comment "The ztimer xtimer compatibility module is incomplete, consider using MODULE_ZTIMER64_XTIMER_COMPAT instead."
-    depends on MODULE_ZTIMER_XTIMER_COMPAT
-
-endchoice
-
-config MODULE_ZTIMER64_XTIMER_COMPAT
-    bool "map xtimer calls to ztimer64"
-    select MODULE_DIV
-    select MODULE_ZTIMER64
-    select MODULE_ZTIMER64_USEC
-    help
-        This is a wrapper of xtimer API on ztimer64_usec.
+menu "evtimer compatibility"
 
 config MODULE_EVTIMER_ON_ZTIMER
     bool "Use ztimer_msec as timer backend for evtimer"
     depends on MODULE_ZTIMER_MSEC
 
-endmenu # xtimer compatibility
+endmenu # evtimer compatibility
 
 config MODULE_ZTIMER
     bool
