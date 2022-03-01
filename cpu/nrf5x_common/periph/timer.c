@@ -114,6 +114,9 @@ int timer_set_periodic(tim_t tim, int chan, unsigned int value, uint8_t flags)
         return -1;
     }
 
+    /* stop timer to avoid race condition */
+    dev(tim)->TASKS_STOP = 1;
+
     ctx[tim].flags |= (1 << chan);
     ctx[tim].is_periodic |= (1 << chan);
     dev(tim)->CC[chan] = value;
@@ -125,7 +128,10 @@ int timer_set_periodic(tim_t tim, int chan, unsigned int value, uint8_t flags)
     }
     dev(tim)->INTENSET = (TIMER_INTENSET_COMPARE0_Msk << chan);
 
-    dev(tim)->TASKS_START = 1;
+    /* re-start timer */
+    if (!(flags & TIM_FLAG_SET_STOPPED)) {
+        dev(tim)->TASKS_START = 1;
+    }
 
     return 0;
 }
