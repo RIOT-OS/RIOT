@@ -65,7 +65,6 @@ struct timer_msg msg_d = { .interval = (TEST_INTERVAL * 2) };
 void *slacker_thread(void *arg)
 {
     (void) arg;
-    timex_t now;
 
     LOG_DEBUG("run thread %" PRIkernel_pid "\n", thread_getpid());
 
@@ -77,7 +76,6 @@ void *slacker_thread(void *arg)
         msg_t m;
         msg_receive(&m);
         struct timer_msg *tmsg = m.content.ptr;
-        xtimer_now_timex(&now);
         xtimer_usleep(TEST_MSG_RX_USLEEP);
 
         tmsg->msg.type = 12345;
