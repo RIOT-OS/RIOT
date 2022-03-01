@@ -339,6 +339,16 @@ ifneq (,$(filter sema_inv,$(USEMODULE)))
   USEMODULE += atomic_utils
 endif
 
+ifneq (,$(filter sema,$(USEMODULE)))
+  USEMODULE += ztimer
+endif
+
+ifneq (,$(filter sema_deprecated,$(USEMODULE)))
+  USEMODULE += sema
+  USEMODULE += ztimer64
+  USEMODULE += ztimer64_usec
+endif
+
 ifneq (,$(filter telnet,$(USEMODULE)))
   USEMODULE += pipe
   USEMODULE += sock_tcp
