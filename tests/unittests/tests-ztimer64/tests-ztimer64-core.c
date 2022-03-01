@@ -216,6 +216,28 @@ static void test_ztimer64_set_uninitialized(void)
     ztimer64_set(z64, &timer, 0);
 }
 
+static void test_ztimer64_remove_clear(void)
+{
+    /* regression test, testing if a removed timer passes `!(is_set(t)` */
+    ztimer_mock_t zmock;
+    ztimer_clock_t *z = &zmock.super;
+    ztimer64_clock_t z64mock;
+    ztimer64_clock_t *z64 = &z64mock;
+
+    memset(&zmock, '\0', sizeof(ztimer_mock_t));
+    memset(&z64mock, '\0', sizeof(ztimer64_clock_t));
+    /* ztimer base clock is already extended to 32bit */
+    ztimer_mock_init(&zmock, 32);
+    ztimer64_clock_init(z64, z);
+
+    ztimer64_t timer = { .base.target = 1 };
+
+    ztimer64_set(z64, &timer, 100000000LLU);
+    TEST_ASSERT(ztimer64_is_set(&timer));
+    ztimer64_remove(z64, &timer);
+    TEST_ASSERT(!ztimer64_is_set(&timer));
+}
+
 Test *tests_ztimer64_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -225,6 +247,7 @@ Test *tests_ztimer64_tests(void)
         new_TestFixture(test_ztimer64_set_at),
         new_TestFixture(test_ztimer64_checkpoint),
         new_TestFixture(test_ztimer64_set_uninitialized),
+        new_TestFixture(test_ztimer64_remove_clear),
     };
 
     EMB_UNIT_TESTCALLER(ztimer64_tests, setup, NULL, fixtures);

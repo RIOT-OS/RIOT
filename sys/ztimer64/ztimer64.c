@@ -127,6 +127,12 @@ static int _add_entry_to_list(ztimer64_clock_t *clock, ztimer64_base_t *entry)
     }
 }
 
+static void _clear(ztimer64_base_t *entry)
+{
+    entry->next = NULL;
+    entry->target = 0;
+}
+
 static int _del_entry_from_list(ztimer64_clock_t *clock, ztimer64_base_t *entry)
 {
     DEBUG("_del_entry_from_list()\n");
@@ -137,7 +143,7 @@ static int _del_entry_from_list(ztimer64_clock_t *clock, ztimer64_base_t *entry)
     if (clock->first == entry) {
         /* special case: removing first entry */
         clock->first = entry->next;
-        entry->next = 0;
+        _clear(entry);
         return 1;
     }
     else {
@@ -151,7 +157,7 @@ static int _del_entry_from_list(ztimer64_clock_t *clock, ztimer64_base_t *entry)
             pos = pos->next;
         }
 
-        entry->next = 0;
+        _clear(entry);
 
         return 0;
     }
@@ -238,9 +244,9 @@ void ztimer64_handler(void *arg)
             ztimer64_t *timer = (ztimer64_t *)clock->first;
             /* remove timer from list */
             clock->first = clock->first->next;
+
             /* clear timer struct so it can be re-set */
-            timer->base.next = NULL;
-            timer->base.target = 0;
+            _clear(&timer->base);
 
             /* shoot callback */
             timer->callback(timer->arg);
