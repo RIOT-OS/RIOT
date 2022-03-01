@@ -134,27 +134,21 @@ static int _del_entry_from_list(ztimer64_clock_t *clock, ztimer64_base_t *entry)
         return 0;
     }
     assert(_is_set((ztimer64_t *)entry));
-    if (clock->first == entry) {
-        /* special case: removing first entry */
-        clock->first = entry->next;
-        entry->next = 0;
-        return 1;
-    }
-    else {
-        ztimer64_base_t *pos = clock->first;
+    int res = 1;
+    ztimer64_base_t **pos = &clock->first;
 
-        while (pos->next) {
-            if (pos->next == entry) {
-                pos->next = entry->next;
-                break;
-            }
-            pos = pos->next;
+    while (*pos) {
+        if (*pos == entry) {
+            *pos = entry->next;
+            break;
         }
-
-        entry->next = 0;
-
-        return 0;
+        *pos = (*pos)->next;
+        res = 0;
     }
+
+    entry->next = 0;
+
+    return res;
 }
 
 uint64_t ztimer64_now(ztimer64_clock_t *clock)
