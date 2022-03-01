@@ -820,6 +820,9 @@ ifneq (,$(filter evtimer,$(USEMODULE)))
     USEMODULE += ztimer_msec
   else
     USEMODULE += xtimer
+    ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+      USEMODULE += evtimer_on_ztimer
+    endif
   endif
 endif
 
