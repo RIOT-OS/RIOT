@@ -11,4 +11,6 @@ FEATURES_REQUIRED += cpu_samd5x # TODO: complete with other SAM0 CPUs that have 
 
 INCLUDES += -I$(APPDIR)
 
+SHOULD_RUN_KCONFIG ?=
+
 include $(RIOTBASE)/Makefile.include
