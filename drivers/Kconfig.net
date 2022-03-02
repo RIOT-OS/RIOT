@@ -5,6 +5,9 @@
 # directory for more details.
 
 menu "Network Device Drivers"
+
+rsource "netdev/Kconfig"
+
 rsource "at86rf215/Kconfig"
 rsource "ata8520e/Kconfig"
 rsource "can_trx/Kconfig"

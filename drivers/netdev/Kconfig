@@ -1,13 +1,17 @@
 # Copyright (c) 2022 Otto-von-Guericke-Universität Magdeburg
+#               2022 HAW Hamburg
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-menu "Network Device Drivers"
+if TEST_KCONFIG
 
 config MODULE_NETDEV_DEFAULT
     bool "Enable default network devices on the platform"
+    help
+        Say y to enable the drivers for the default network devices present on
+        your platform.
 
 menu "IEEE 802.15.4 Device Drivers"
     visible if MODULE_NETDEV_IEEE802154
@@ -17,4 +21,24 @@ config MODULE_NETDEV_IEEE802154_RX_TIMESTAMP
 
 endmenu # IEEE 802.15.4 Device Drivers
 
-endmenu # Network Device Drivers
+config MODULE_NETDEV
+    bool
+    select MODULE_EUI_PROVIDER
+    help
+        Network device driver API. Netdev is a generic low-level network
+        interface that provides a uniform API for network stacks to interact
+        with network device drivers.
+
+config MODULE_NETDEV_ETH
+    bool
+    select MODULE_NETDEV
+    select MODULE_NETDEV_REGISTER
+    help
+        Common code for netdev ethernet drivers.
+
+config MODULE_NETDEV_REGISTER
+    bool
+    help
+        Network device registration.
+
+endif # TEST_KCONFIG
