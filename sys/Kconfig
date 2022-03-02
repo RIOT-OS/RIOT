@@ -49,8 +49,14 @@ config MODULE_NEWLIB
 config MODULE_PICOLIBC
     bool "Picolibc"
     depends on HAS_PICOLIBC
-
 endchoice
+
+config MODULE_LIBC_GETTIMEOFDAY
+    bool
+    select MODULE_XTIMER
+    select MODULE_ZTIMER64_XTIMER_COMPAT if MODULE_ZTIMER_XTIMER_COMPAT
+    help
+        Support for gettimeofday()
 
 rsource "Kconfig.newlib"
 rsource "Kconfig.picolibc"

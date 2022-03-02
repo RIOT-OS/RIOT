@@ -242,9 +242,12 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   endif
   ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
     USEMODULE += div
-    ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-      # requires 64bit timestamps when using xtimer
-      USEMODULE += ztimer64_xtimer_compat
+    ifneq (,$(filter libc_gettimeofday,$(USEMODULE)))
+      USEMODULE += xtimer
+      ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+        # requires 64bit timestamps
+        USEMODULE += ztimer64_xtimer_compat
+      endif
     endif
   endif
 endif
