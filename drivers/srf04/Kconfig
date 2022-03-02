@@ -13,3 +13,8 @@ config MODULE_SRF04
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
     select MODULE_XTIMER
+
+config HAVE_SRF04
+    bool
+    help
+      Indicates that a SRF04 ultrasonic range finder is present.
