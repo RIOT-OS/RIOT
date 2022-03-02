@@ -10,12 +10,12 @@ config MODULE_EDBG_EUI
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
-    default y if MODULE_EUI_PROVIDER && HAVE_EDBG_EUI
     help
         Driver for getting a unique ID from the Atmel Embedded Debugger.
 
 config HAVE_EDBG_EUI
     bool
+    select MODULE_EDBG_EUI if MODULE_EUI_PROVIDER
     help
         Indicates that the Atmel Embedded Debugeger EUI is available on the
         platform.
