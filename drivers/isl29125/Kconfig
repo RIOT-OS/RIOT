@@ -14,3 +14,8 @@ config MODULE_ISL29125
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_I2C
+
+config HAVE_ISL29125
+    bool
+    help
+        Indicates that a ISL29125 RGB light sensor is present.
