@@ -15,3 +15,9 @@ config MODULE_PH_OEM
     select MODULE_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_I2C
     select MODULE_XTIMER
+
+config HAVE_PH_OEM
+    bool
+    select MODULE_PH_OEM if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a Atlas Scientific pH OEM sensor is present.
