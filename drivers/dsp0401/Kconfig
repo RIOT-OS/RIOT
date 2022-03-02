@@ -14,3 +14,8 @@ config MODULE_DSP0401
     select MODULE_PERIPH_PWM
     select MODULE_ZTIMER
     select ZTIMER_USEC
+
+config HAVE_DSP0401
+    bool
+    help
+        Indicates that a DSP0401 alphanumeric display clock is present.
