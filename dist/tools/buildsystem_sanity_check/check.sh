@@ -344,6 +344,7 @@ check_no_riot_config() {
     pathspec+=('**/Makefile*')
     pathspec+=('**/*.mk')
     pathspec+=(':!makefiles/kconfig.mk')
+    pathspec+=(':!makefiles/docker.inc.mk')
     git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message "Don't push RIOT_CONFIG_* definitions upstream. Rather define configuration via Kconfig"
 }
