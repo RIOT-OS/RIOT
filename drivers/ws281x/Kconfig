@@ -25,3 +25,8 @@ config MODULE_WS281X_VT100
 config MODULE_WS281X_ESP32
     bool
     depends on HAS_ARCH_ESP32
+
+config HAVE_WS281X
+    bool
+    help
+      Indicates that a WS2812/SK6812 RGB LED sensor is present.
