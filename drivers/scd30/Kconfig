@@ -12,3 +12,9 @@ config MODULE_SCD30
     select MODULE_PERIPH_I2C
     select MODULE_CHECKSUM
     select MODULE_XTIMER
+
+config HAVE_SCD30
+    bool
+    select MODULE_SCD30 if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a SCD30 CO2, temperature and humidity sensor is present.
