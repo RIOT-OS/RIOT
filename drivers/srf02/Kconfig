@@ -11,3 +11,8 @@ config MODULE_SRF02
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
     select MODULE_XTIMER
+
+config HAVE_SRF02
+    bool
+    help
+      Indicates that a SRF02 ultrasonic range sensor is present.
