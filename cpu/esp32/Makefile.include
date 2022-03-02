@@ -5,6 +5,8 @@ FLASH_FREQ  = 40m   # DO NOT CHANGE
 FLASH_SIZE ?= 4
 BOOTLOADER_POS = 0x1000
 
+ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool_v3.2.py
+
 include $(RIOTCPU)/esp_common/Makefile.include
 
 # regular Makefile

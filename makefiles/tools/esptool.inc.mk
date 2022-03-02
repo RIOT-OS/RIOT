@@ -28,6 +28,20 @@ endif
 .PHONY: esp-qemu
 
 esp-qemu:
+ifneq (,$(filter esp32,$(CPU_FAM)))
+	$(Q)echo \
+		"--flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ) " \
+		"--flash_size $(FLASH_SIZE)MB" \
+		"$(BOOTLOADER_POS) $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN)" \
+		"0x8000 $(BINDIR)/partitions.bin" \
+		"0x10000 $(FLASHFILE)" > $(BINDIR)/qemu_flash_args
+	$(Q)$(ESPTOOL) \
+		--chip esp32 merge_bin \
+		--fill-flash-size 4MB \
+		-o $(BINDIR)/qemu_flash_image.bin @$(BINDIR)/qemu_flash_args
+	$(Q)cp $(RIOTCPU)/$(CPU)/bin/rom_0x3ff90000_0x00010000.bin $(BINDIR)/rom1.bin
+	$(Q)cp $(RIOTCPU)/$(CPU)/bin/rom_0x40000000_0x000c2000.bin $(BINDIR)/rom.bin
+else
 	$(Q)dd if=/dev/zero bs=1M count=$(FLASH_SIZE) | \
 	  tr "\\000" "\\377" > tmp.bin && cat tmp.bin | \
 		head -c $$(($(BOOTLOADER_POS))) | \
@@ -37,9 +51,6 @@ esp-qemu:
 		head -c $$((0x10000)) | \
 		cat - $(FLASHFILE) tmp.bin | \
 		head -c $(FLASH_SIZE)MB > $(BINDIR)/$(CPU)flash.bin && rm tmp.bin
-ifeq (esp32,$(CPU_FAM))
-	$(Q)cp $(RIOTCPU)/$(CPU)/bin/rom_0x3ff90000_0x00010000.bin $(BINDIR)/rom1.bin
-	$(Q)cp $(RIOTCPU)/$(CPU)/bin/rom_0x40000000_0x000c2000.bin $(BINDIR)/rom.bin
 endif
 
 # reset tool configuration
