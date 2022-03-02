@@ -11,7 +11,6 @@ config MODULE_BMX055
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
-    default y if HAVE_BMX055 && MODULE_SAUL_DEFAULT
 
 menuconfig KCONFIG_USEMODULE_BMX055
     bool "Configure BMX055 driver"
