@@ -19,4 +19,6 @@ endif
 
 INCLUDES += -I$(APPDIR)
 
+SHOULD_RUN_KCONFIG ?=
+
 include $(RIOTBASE)/Makefile.include
