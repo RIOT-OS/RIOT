@@ -9,8 +9,20 @@ config MODULE_IO1_XPLAINED
     bool "Atmel IO1 Xplained Extension board"
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_ADC
-    depends on MODULE_AT30TSE75X
-    depends on MODULE_SDCARD_SPI
+    depends on HAS_PERIPH_I2C
+    depends on HAS_PERIPH_SPI
     depends on TEST_KCONFIG
-    select MODULE_PERIPH_GPIO
+
     select MODULE_PERIPH_ADC
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_I2C
+    select MODULE_PERIPH_SPI
+    select MODULE_SDCARD_SPI
+    select MODULE_AT30TSE75X
+
+
+config HAVE_IO1_XPLAINED
+    bool
+    select MODULE_IO1_XPLAINED if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a Atmel IO1 Xplained Extension board is present.
