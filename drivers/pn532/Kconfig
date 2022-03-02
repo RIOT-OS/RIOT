@@ -6,32 +6,50 @@
 # directory for more details.
 #
 
-if TEST_KCONFIG && HAS_PERIPH_GPIO && HAS_PERIPH_GPIO_IRQ
-
-menu "PN532 NFC reader"
-
-config MODULE_PN532_I2C
-    bool "PN532 with I2C support"
-    depends on HAS_PERIPH_I2C
-    select MODULE_PERIPH_I2C
-    select MODULE_PN532
-
-config MODULE_PN532_SPI
-    bool "PN532 with SPI support"
-    depends on HAS_PERIPH_SPI
-    select MODULE_PERIPH_SPI
-    select MODULE_PN532
-
-config MODULE_PN532
+menuconfig MODULE_PN532
     bool
+    prompt "PN532 NFC reader" if !(MODULE_SAUL_DEFAULT && HAVE_PN532)
+    default (MODULE_SAUL_DEFAULT && HAVE_PN532)
+    depends on TEST_KCONFIG
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
     select MODULE_ZTIMER
     select MODULE_ZTIMER_MSEC
 
-endmenu # PN532 NFC reader
+if MODULE_PN532
 
-endif # TEST_KCONFIG && HAS_PERIPH_GPIO && HAS_PERIPH_GPIO_IRQ
+config MODULE_PN532_I2C
+    bool "PN532 with I2C support"
+    default HAVE_PN532_I2C
+    depends on HAS_PERIPH_I2C
+    select MODULE_PERIPH_I2C
+
+config MODULE_PN532_SPI
+    bool "PN532 with SPI support"
+    default HAVE_PN532_SPI
+    depends on HAS_PERIPH_SPI
+    select MODULE_PERIPH_SPI
+
+endif # MODULE_PN532
+
+config HAVE_PN532
+    bool
+    help
+      Indicates that a PN532 NFC reader is present.
+
+config HAVE_PN532_I2C
+    bool
+    select HAVE_PN532
+    help
+      Indicates that a PN532 NFC reader is present on the i2c bus.
+
+config HAVE_PN532_SPI
+    bool
+    select HAVE_PN532
+    help
+      Indicates that a PN532 NFC reader is present on the spi bus.
 
 menuconfig KCONFIG_USEMODULE_PN532
     bool "Configure PN532 driver"
