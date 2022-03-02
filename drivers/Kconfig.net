@@ -29,4 +29,5 @@ rsource "sx126x/Kconfig"
 rsource "sx127x/Kconfig"
 rsource "sx1280/Kconfig"
 rsource "tja1042/Kconfig"
+rsource "w5100/Kconfig"
 endmenu # Network Device Drivers
