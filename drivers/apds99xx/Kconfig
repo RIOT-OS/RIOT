@@ -8,6 +8,7 @@
 menuconfig MODULE_APDS99XX
     bool
     prompt "APDS99xx Broadcom Sensors" if !(MODULE_SAUL_DEFAULT && HAVE_APDS99XX)
+    default MODULE_SAUL_DEFAULT && HAVE_APDS99XX
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
@@ -28,7 +29,7 @@ menuconfig MODULE_APDS99XX
 if MODULE_APDS99XX
 
 choice APDS99XX_VARIANT
-    bool "Model"
+    bool "Variants"
     default MODULE_APDS9900 if HAVE_APDS9900
     default MODULE_APDS9901 if HAVE_APDS9901
     default MODULE_APDS9930 if HAVE_APDS9930
@@ -55,17 +56,15 @@ config MODULE_APDS9960
 
 endchoice
 
-endif # MODULE_APDS99XX
-
 config MODULE_APDS99XX_FULL
     bool "APDS99XX Full functionalities"
-    depends on MODULE_APDS99XX
     depends on HAS_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_GPIO_IRQ
 
+endif # MODULE_APDS99XX
+
 config HAVE_APDS99XX
     bool
-    select MODULE_APDS99XX if MODULE_SAUL_DEFAULT
     help
         Indicates that a apds99xx sensor is present.
 
