@@ -16,8 +16,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#if defined(MODULE_ESP_ETH) && defined(MODULE_GNRC_NETIF_ETHERNET)
-
 #include "esp_eth_params.h"
 #include "esp_eth_netdev.h"
 #include "net/gnrc/netif/ethernet.h"
@@ -39,10 +37,4 @@ void auto_init_esp_eth(void)
     gnrc_netif_ethernet_create(&_netif, _esp_eth_stack, ESP_ETH_STACKSIZE, ESP_ETH_PRIO,
                                "netif-esp-eth", &_esp_eth_dev.netdev);
 }
-
-#else /* defined(MODULE_ESP_ETH) && defined(MODULE_GNRC_NETIF_ETHERNET) */
-
-typedef int dont_be_pedantic;
-
-#endif /* defined(MODULE_ESP_ETH) && defined(MODULE_GNRC_NETIF_ETHERNET) */
 /**@}*/
