@@ -14,7 +14,7 @@ menuconfig MODULE_SHT1X
     select MODULE_PERIPH_GPIO
     select MODULE_XTIMER
 
-choice
+choice SHT1X_VARIANT
     bool "Select sensor variant"
     depends on MODULE_SHT1X
     default MODULE_SHT10 if HAVE_SHT10
