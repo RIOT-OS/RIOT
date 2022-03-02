@@ -210,6 +210,7 @@ PSEUDOMODULES += stdio_cdc_acm
 PSEUDOMODULES += stdio_ethos
 PSEUDOMODULES += stdio_nimble_debug
 PSEUDOMODULES += stdio_uart_rx
+PSEUDOMODULES += stdio_telnet
 PSEUDOMODULES += stm32_eth
 PSEUDOMODULES += stm32_eth_auto
 PSEUDOMODULES += stm32_eth_link_up

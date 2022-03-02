@@ -21,3 +21,9 @@ rsource "asymcute/Kconfig"
 rsource "emcute/Kconfig"
 
 endmenu # MQTT-SN
+
+menu "Telnet"
+
+rsource "telnet/Kconfig"
+
+endmenu # Telnet

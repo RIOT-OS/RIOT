@@ -305,6 +305,12 @@ void auto_init(void)
         gnrc_ipv6_auto_subnets_init();
     }
 
+    if (IS_USED(MODULE_AUTO_INIT_TELNET)) {
+        LOG_DEBUG("auto_init TELNET server\n");
+        extern void telnet_server_start(void);
+        telnet_server_start();
+    }
+
     if (IS_USED(MODULE_AUTO_INIT_MULTIMEDIA)) {
         LOG_DEBUG("auto_init MULTIMEDIA\n");
         if (IS_USED(MODULE_DFPLAYER)) {
