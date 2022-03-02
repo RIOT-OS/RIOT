@@ -13,6 +13,12 @@ config MODULE_SPS30
     select MODULE_CHECKSUM
     select MODULE_PERIPH_I2C
 
+config HAVE_SPS30
+    bool
+    select MODULE_SPS30 if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a SPS30 Particulate Matter Sensor is present.
+
 menuconfig KCONFIG_USEMODULE_SPS30
     bool "Configure SPS30 driver"
     depends on USEMODULE_SPS30
