@@ -208,6 +208,13 @@ typedef struct {
     BITFIELD(opt_crit, CONFIG_NANOCOAP_NOPTS_MAX);    /**< unhandled critical option */
 #ifdef MODULE_GCOAP
     uint32_t observe_value;                           /**< observe value           */
+    /**
+     * @brief   transport the packet was received over
+     * @see     @ref gcoap_socket_type_t for values.
+     * @note    @ref gcoap_socket_type_t can not be used, as this would
+     *          cyclically include the @ref net_gcoap header.
+     */
+    uint32_t tl_type;
 #endif
 } coap_pkt_t;
 
