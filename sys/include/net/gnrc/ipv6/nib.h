@@ -391,13 +391,16 @@ void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type);
  *                      router.
  */
 void gnrc_ipv6_nib_change_rtr_adv_iface(gnrc_netif_t *netif, bool enable);
-#else
-/**
- * @brief   Optimization to NOP for non-routers
- */
-#define gnrc_ipv6_nib_change_rtr_adv_iface(netif, enable) \
-    (void)netif; (void)enable
 #endif
+
+#if !defined(DOXYGEN)
+#if !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
+static inline void
+gnrc_ipv6_nib_change_rtr_adv_iface(gnrc_netif_t *netif, bool enable) {
+    (void)netif; (void)enable;
+}
+#endif /* !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER) */
+#endif /* !defined(DOXYGEN) */
 
 #ifdef __cplusplus
 }
