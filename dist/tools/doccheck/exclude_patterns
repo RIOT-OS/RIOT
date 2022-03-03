@@ -14887,3 +14887,7 @@ pkg/lvgl7/include/lvgl_riot_conf\.h:[0-9]+: warning: Member LV_TICK_CUSTOM \(mac
 pkg/lvgl7/include/lvgl_riot_conf\.h:[0-9]+: warning: Member LV_TICK_CUSTOM_INCLUDE \(macro definition\) of file lvgl_riot_conf\.h is not documented\.
 pkg/lvgl7/include/lvgl_riot_conf\.h:[0-9]+: warning: Member LV_TICK_CUSTOM_SYS_TIME_EXPR \(macro definition\) of file lvgl_riot_conf\.h is not documented\.
 pkg/lvgl7/include/lvgl_riot_conf\.h:[0-9]+: warning: Member lv_coord_t \(typedef\) of file lvgl_riot_conf\.h is not documented\.
+drivers/encx24j600/include/encx24j600_params\.h:[0-9]+: warning: Member ENCX24J600_PARAM_SPI \(macro definition\) of file encx24j600_params\.h is not documented\.
+drivers/encx24j600/include/encx24j600_params\.h:[0-9]+: warning: Member ENCX24J600_PARAM_CS \(macro definition\) of file encx24j600_params\.h is not documented\.
+drivers/encx24j600/include/encx24j600_params\.h:[0-9]+: warning: Member ENCX24J600_PARAM_INT \(macro definition\) of file encx24j600_params\.h is not documented\.
+drivers/encx24j600/include/encx24j600_params\.h:[0-9]+: warning: Member ENCX24J600_PARAMS \(macro definition\) of file encx24j600_params\.h is not documented\.
