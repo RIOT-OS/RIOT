@@ -864,7 +864,7 @@ cleanterm: $(TERMDEPS)
 	$(TERMPROG) $(TERMFLAGS) $(TERMTEE)
 
 list-ttys:
-	$(Q)$(RIOTTOOLS)/usb-serial/list-ttys.sh
+	$(Q)$(RIOTTOOLS)/usb-serial/ttys.py
 
 doc:
 	$(MAKE) -BC $(RIOTBASE) doc

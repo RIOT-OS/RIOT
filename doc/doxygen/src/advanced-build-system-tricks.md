@@ -210,7 +210,7 @@ The following Make snippet is used:
         JLINK_SERIAL ?= $(BOARD_SERIAL)
 
         # Use the existing script to grab the matching /dev/ttyACM* device
-        PORT_LINUX ?= $(firstword $(shell $(RIOTTOOLS)/usb-serial/find-tty.sh $(SERIAL)))
+        PORT ?= $(shell $(RIOTTOOLS)/usb-serial/ttys.py --most-recent --format path --serial $(SERIAL))
       endif
     endif
 ~~~~~~~~~~~~~~~~~~~
@@ -221,14 +221,32 @@ the debugger hardware. With the `make list-ttys` it is reported as the 'serial':
 
 ~~~~~~~~~~~~~~~~~~~
 $ make list-ttys
-/sys/bus/usb/devices/1-1.4.4: Atmel Corp. EDBG CMSIS-DAP, serial: 'ATML2127031800008360', tty(s): ttyACM1
-/sys/bus/usb/devices/1-1.4.3: SEGGER J-Link, serial: '000683806234', tty(s): ttyACM0
+path         | driver  | vendor                   | model                                | model_db              | serial                   | ctime
+-------------|---------|--------------------------|--------------------------------------|-----------------------|--------------------------|---------
+/dev/ttyUSB0 | cp210x  | Silicon Labs             | CP2102 USB to UART Bridge Controller | CP210x UART Bridge    | 0001                     | 15:58:13
+/dev/ttyACM1 | cdc_acm | STMicroelectronics       | STM32 STLink                         | ST-LINK/V2.1          | 0671FF535155878281151932 | 15:58:04
+/dev/ttyACM3 | cdc_acm | Arduino (www.arduino.cc) | EOS High Power                       | Mega ADK R3 (CDC ACM) | 75230313733351110120     | 15:59:57
+/dev/ttyACM2 | cdc_acm | SEGGER                   | J-Link                               | J-Link                | 000683475134             | 12:41:36
 ~~~~~~~~~~~~~~~~~~~
 
 When the above make snippet is included as `RIOT_MAKEFILES_GLOBAL_PRE`, the
 serial number of the USB device is automatically set if the used board is
 included in the script. This will then ensure that the board debugger is used
-for flashing and the board serial device is used when starting the serial console.
+for flashing and the board serial device is used when starting the serial
+console.
+
+It supports command line parameters to filter by vendor name, model name, serial
+number, or driver. In addition, the `--most-recent` argument will only print the
+most recently added interface (out of those matching the filtering by vendor,
+model, etc.). The `--format path` argument will result in only the device path
+being printed for convenient use in scripts.
+
+Handling multiple boards: Simplest approach            {#multiple-boards-simple}
+===========================================
+
+Passing `MOST_RECENT_PORT=1` as environment variable or as parameter to
+make will result in the most recently connected board being preferred over the
+default PORT for the selected board.
 
 Analyze dependency resolution                   {#analyze-depedency-resolution}
 =============================
