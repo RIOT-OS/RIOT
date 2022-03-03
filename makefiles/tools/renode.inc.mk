@@ -6,6 +6,10 @@ RENODE_BOARD_CONFIG ?= $(BOARDDIR)/dist/board.resc
 FLASHFILE ?= $(ELFFILE)
 EMULATORDEPS += $(RENODE_BOARD_CONFIG)
 
+ifeq (,$(RUNTIME_TMP_DIR))
+  RUNTIME_TMP_DIR := $(shell mktemp -td riot_$(APPLICATION)_$(BOARD).XXXXX)
+endif
+
 # Use renode interactive commands to specify the image file and board config
 RENODE_CONFIG_FLAGS += -e "set image_file '$(RENODE_IMAGE_FILE)'"
 RENODE_CONFIG_FLAGS += -e "include @$(RENODE_BOARD_CONFIG)"
@@ -44,17 +48,18 @@ PORT = $(EMULATOR_SERIAL_PORT)
 RIOT_TERMPROG := $(TERMPROG)
 RIOT_TERMFLAGS := $(TERMFLAGS)
 TERMPROG := $(RIOTTOOLS)/emulator/term.sh
-TERMFLAGS := $(RIOT_EMULATOR) $(BOARD) $(APPDIR) $(RIOT_TERMPROG) '$(RIOT_TERMFLAGS)' $(EMULATOR_SERIAL_PORT)
+TERMFLAGS := $(RIOT_EMULATOR) $(BOARD) $(APPDIR) $(RIOT_TERMPROG) '$(RIOT_TERMFLAGS)' $(EMULATOR_SERIAL_PORT) $(RUNTIME_TMP_DIR)
 
 # Configure the debugger
 GDB_PORT ?= 3333
+GDB_REMOTE ?= :$(GDB_PORT)
 RENODE_DEBUG_FLAGS += $(RENODE_CONFIG_FLAGS)
 RENODE_DEBUG_FLAGS += -e "machine StartGdbServer $(GDB_PORT) true"
 
 DEBUGSERVER ?= $(EMULATOR)
 DEBUGSERVER_FLAGS ?= $(RENODE_DEBUG_FLAGS)
 
-DEBUGGER_FLAGS ?= $(BOARD) $(APPDIR) $(ELFFILE) $(GDB_PORT) "-ex \"monitor start\""
+DEBUGGER_FLAGS ?= $(BOARD) $(APPDIR) $(ELFFILE) $(GDB_REMOTE) $(RUNTIME_TMP_DIR) "-ex \"monitor start\""
 DEBUGGER ?= $(RIOTTOOLS)/emulator/debug.sh
 
 # No flasher available with renode emulator
