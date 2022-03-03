@@ -44,11 +44,10 @@ typedef struct {
 /**
  * @brief Setup SAM0 Ethernet peripheral
  *
- * @param[in] dev   Pointer to the SAM0 Ethernet netdev struct
+ * @param[in] dev   Pointer to the netdev struct
  *
  */
-
-void sam0_eth_netdev_setup(sam0_eth_netdev_t* dev);
+void sam0_eth_setup(netdev_t* dev);
 
 #ifdef __cplusplus
 }
