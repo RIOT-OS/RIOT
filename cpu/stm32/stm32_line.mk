@@ -113,7 +113,13 @@ ifeq (L,$(STM32_TYPE))
   endif
   ifeq (1,$(STM32_FAMILY))  # STM32L1
     ifneq (,$(filter $(STM32_MODEL), 100 151 152 162))
-      ifneq (,$(filter $(STM32_ROMSIZE), C))
+      ifneq (,$(filter $(STM32_ROMSIZE), 6))
+        ifneq (,$(filter $(STM32_RAMMOD), _A))
+          CPU_LINE = STM32L$(STM32_MODEL)xBA
+        else
+          CPU_LINE = STM32L$(STM32_MODEL)xB
+        endif
+      else ifneq (,$(filter $(STM32_ROMSIZE), C))
         CPU_LINE = STM32L$(STM32_MODEL)xC
       else ifneq (,$(filter $(STM32_ROMSIZE), B))
         ifneq (,$(filter $(STM32_RAMMOD), _A))
