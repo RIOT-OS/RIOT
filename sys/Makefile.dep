@@ -858,6 +858,13 @@ ifneq (,$(filter evtimer,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter xztimer_fallback,$(USEMODULE)))
+  USEMODULE := $(filter-out xztimer_fallback,$(USEMODULE))
+  ifeq (,$(filter ztimer_usec,$(USEMODULE)))
+    USEMODULE += xtimer
+  endif
+endif
+
 # handle xtimer's deps. Needs to be done *after* ztimer
 ifneq (,$(filter xtimer,$(USEMODULE)))
   include $(RIOTBASE)/sys/xtimer/Makefile.dep
