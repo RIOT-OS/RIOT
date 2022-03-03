@@ -100,6 +100,11 @@ void uwb_core_rng_listen_disable(void);
 void uwb_core_rng_start(uint16_t addr, twr_protocol_t proto, uint32_t interval,
                         uint32_t count);
 
+/**
+ * @brief   Returns remaining rng requests
+ */
+uint32_t uwb_core_rng_req_remaining(void);
+
 #ifdef __cplusplus
 }
 #endif

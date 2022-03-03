@@ -289,3 +289,9 @@ void uwb_core_rng_init(void)
     uwb_sleep_config(_udev);
     uwb_enter_sleep(_udev);
 }
+
+uint32_t uwb_core_rng_req_remaining(void)
+{
+    /* doesn't matter if its not atomic */
+    return _rng_request_event.periodic.count;
+}

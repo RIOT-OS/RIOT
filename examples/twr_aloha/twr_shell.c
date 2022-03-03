@@ -181,7 +181,11 @@ int _twr_handler(int argc, char **argv)
         puts("[twr]: start ranging");
         uwb_core_rng_start(short_addr, proto, interval_ms, count);
         if (IS_ACTIVE(CONFIG_TWR_SHELL_BLOCKING)) {
-            ztimer_sleep(ZTIMER_MSEC, interval_ms * (count + 1));
+            while (uwb_core_rng_req_remaining()) {
+                ztimer_sleep(ZTIMER_MSEC, interval_ms);
+            }
+            /* some time to finish up */
+            ztimer_sleep(ZTIMER_MSEC, 100 + interval_ms);
         }
         return 0;
     }
