@@ -83,11 +83,9 @@ So far, in RIOT, only the @ref boards_microbit board is supported with qemu.
 
 ## Configuration
 
-The QEMU emulated serial port is exposed on a local TCP server, redirected to a
+The QEMU emulated serial port is exposed on a local Unix socket, redirected to a
 local PTY file (using [socat](http://www.dest-unreach.org/socat/)). This makes
-it possible to open the PTY file a regular serial port.
-To allow multiple emulated sessions in parallel, the TCP port of the TCP server
-can be configured using the `QEMU_SERIAL_TCP_PORT`. The default value is 5555.
+it possible to open the PTY file in a regular serial port.
 
 # Renode
 
