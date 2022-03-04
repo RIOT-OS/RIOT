@@ -552,6 +552,19 @@ static void test_ipv6_addr_match_prefix_same_pointer(void)
     TEST_ASSERT_EQUAL_INT(128, ipv6_addr_match_prefix(&a, &a));
 }
 
+static void test_ipv6_addr_init(void)
+{
+    ipv6_addr_t a = { {
+            0xff, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
+        },
+    };
+    ipv6_addr_t b;
+    ipv6_addr_init(&b, 0xff02000000000000ULL, 0x1);
+
+    TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(&a, &b));
+}
+
 static void test_ipv6_addr_init_prefix(void)
 {
     ipv6_addr_t a = { {
@@ -1129,6 +1142,7 @@ Test *tests_ipv6_addr_tests(void)
         new_TestFixture(test_ipv6_addr_match_prefix_match_127),
         new_TestFixture(test_ipv6_addr_match_prefix_match_128),
         new_TestFixture(test_ipv6_addr_match_prefix_same_pointer),
+        new_TestFixture(test_ipv6_addr_init),
         new_TestFixture(test_ipv6_addr_init_prefix),
         new_TestFixture(test_ipv6_addr_init_iid),
         new_TestFixture(test_ipv6_addr_set_unspecified),

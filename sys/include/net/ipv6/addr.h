@@ -532,6 +532,19 @@ uint8_t ipv6_addr_match_prefix(const ipv6_addr_t *a, const ipv6_addr_t *b);
 void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix, uint8_t bits);
 
 /**
+ * @brief   Sets IPv6 address @p out with a given prefix and interface ID
+ *
+ * @param[out]  out     Address to initialize
+ * @param[in]   prefix  Prefix in host byte order
+ * @param[in]   iid     Interface ID in host byte order
+ */
+static inline void ipv6_addr_init(ipv6_addr_t *out, uint64_t prefix, uint64_t iid)
+{
+    out->u64[0] = byteorder_htonll(prefix);
+    out->u64[1] = byteorder_htonll(iid);
+}
+
+/**
  * @brief   Sets the last @p bits of IPv6 address @p out to @p iid.
  *          Leading bits of @p out stay untouched.
  *
