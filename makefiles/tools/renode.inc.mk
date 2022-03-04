@@ -6,8 +6,8 @@ RENODE_BOARD_CONFIG ?= $(BOARDDIR)/dist/board.resc
 FLASHFILE ?= $(ELFFILE)
 EMULATORDEPS += $(RENODE_BOARD_CONFIG)
 
-ifeq (,$(RUNTIME_TMP_DIR))
-  RUNTIME_TMP_DIR := $(shell mktemp -td riot_$(APPLICATION)_$(BOARD).XXXXX)
+ifeq (,$(EMULATOR_TMP_DIR))
+  EMULATOR_TMP_DIR := $(shell mktemp -td riot_$(APPLICATION)_$(BOARD).XXXXX)
 endif
 
 # Use renode interactive commands to specify the image file and board config
@@ -35,7 +35,7 @@ endif
 
 # Configure local serial port
 RENODE_SYSBUS_UART ?= sysbus.uart0
-EMULATOR_SERIAL_PORT ?= /tmp/riot_$(APPLICATION)_$(BOARD)_uart
+EMULATOR_SERIAL_PORT ?= $(EMULATOR_TMP_DIR)/uart
 RENODE_CONFIG_FLAGS += -e "emulation CreateUartPtyTerminal \"term\" \"$(EMULATOR_SERIAL_PORT)\" true"
 RENODE_CONFIG_FLAGS += -e "connector Connect $(RENODE_SYSBUS_UART) term"
 
@@ -48,7 +48,7 @@ PORT = $(EMULATOR_SERIAL_PORT)
 RIOT_TERMPROG := $(TERMPROG)
 RIOT_TERMFLAGS := $(TERMFLAGS)
 TERMPROG := $(RIOTTOOLS)/emulator/term.sh
-TERMFLAGS := $(RIOT_EMULATOR) $(BOARD) $(APPDIR) $(RIOT_TERMPROG) '$(RIOT_TERMFLAGS)' $(EMULATOR_SERIAL_PORT) $(RUNTIME_TMP_DIR)
+TERMFLAGS := $(RIOT_EMULATOR) $(BOARD) $(APPDIR) $(RIOT_TERMPROG) '$(RIOT_TERMFLAGS)' $(EMULATOR_SERIAL_PORT) $(EMULATOR_TMP_DIR)
 
 # Configure the debugger
 GDB_PORT ?= 3333
@@ -59,7 +59,7 @@ RENODE_DEBUG_FLAGS += -e "machine StartGdbServer $(GDB_PORT) true"
 DEBUGSERVER ?= $(EMULATOR)
 DEBUGSERVER_FLAGS ?= $(RENODE_DEBUG_FLAGS)
 
-DEBUGGER_FLAGS ?= $(BOARD) $(APPDIR) $(ELFFILE) $(GDB_REMOTE) $(RUNTIME_TMP_DIR) "-ex \"monitor start\""
+DEBUGGER_FLAGS ?= $(BOARD) $(APPDIR) $(ELFFILE) $(GDB_REMOTE) $(EMULATOR_TMP_DIR) "-ex \"monitor start\""
 DEBUGGER ?= $(RIOTTOOLS)/emulator/debug.sh
 
 # No flasher available with renode emulator
