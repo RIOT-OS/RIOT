@@ -14,7 +14,7 @@
 BOARD=$1
 APPDIR=$2
 ELFFILE=$3
-RUNTIME_TMP_DIR=$5
+EMULATOR_TMP_DIR=$5
 
 # GDB command, usually a separate command for each platform (e.g. arm-none-eabi-gdb)
 : ${GDB:=gdb-multiarch}
@@ -31,7 +31,7 @@ RUNTIME_TMP_DIR=$5
 : ${DBG_FLAGS:=${DBG_DEFAULT_FLAGS} ${DBG_CUSTOM_FLAGS}}
 
 # temporary file that contains the emulator pid
-EMULATOR_PIDFILE="${RUNTIME_TMP_DIR}/emulator_pid"
+EMULATOR_PIDFILE="${EMULATOR_TMP_DIR}/emulator_pid"
 # will be called by trap
 cleanup() {
     kill "$(cat ${EMULATOR_PIDFILE})"
@@ -47,7 +47,7 @@ trap '' INT
 sh -c "\
     GDB_REMOTE=${GDB_REMOTE} \
     EMULATE=1 \
-    RUNTIME_TMP_DIR=${RUNTIME_TMP_DIR} \
+    EMULATOR_TMP_DIR=${EMULATOR_TMP_DIR} \
     EMULATOR_PIDFILE=${EMULATOR_PIDFILE} \
     BOARD=${BOARD} \
     make -C ${APPDIR} debug-server & \
