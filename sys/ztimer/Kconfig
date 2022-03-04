@@ -166,7 +166,6 @@ config MODULE_ZTIMER64_XTIMER_COMPAT
     select MODULE_DIV
     select MODULE_ZTIMER64
     select MODULE_ZTIMER64_USEC
-    depends on MODULE_ZTIMER_XTIMER_COMPAT
     help
         This is a wrapper of xtimer API on ztimer64_usec.
 
