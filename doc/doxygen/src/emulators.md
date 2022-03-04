@@ -58,9 +58,9 @@ $ EMULATE=1 make BOARD=<board> -C <test application directory> all test
 
 The `EMULATOR_SERIAL_PORT` variable can be used to specify a custom serial port
 on the host running the emulator.
-The default value is built based on the board and application names:
-`/tmp/riot_$(APPLICATION)_$(BOARD)_uart`.
-This variable is useful to allow several emulated sessions of the same
+The default value is built based on a random temporary directory:
+`$(RUNTIME_TMP_DIR)/uart`.
+The randomness of this variable allows several emulated sessions of the same
 application with the same board to run in parallel.
 
 # Qemu
