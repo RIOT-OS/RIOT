@@ -29,7 +29,7 @@
 #include "shell.h"
 #include "thread.h"
 #include "test_utils/expect.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifdef MODULE_SOCK_IP
 static char sock_inbuf[SOCK_INBUF_SIZE];
@@ -57,20 +57,26 @@ static void _ip_recv(sock_ip_t *sock, sock_async_flags_t flags, void *arg)
 
             printf("Received IP data from ");
             switch (src.family) {
-#if IS_USED(MODULE_LWIP_IPV4)
                 case AF_INET:
+#if IS_USED(MODULE_LWIP_IPV4)
                     printf("[%s]:\n",
                            ipv4_addr_to_str(addrstr,
                                             (ipv4_addr_t *)&src.addr.ipv4,
                                             sizeof(addrstr)));
                     break;
+#else
+                    printf("unsupported protocol IPV4\n");
+                    break;
 #endif
-#if IS_USED(MODULE_LWIP_IPV6)
                 case AF_INET6:
+#if IS_USED(MODULE_LWIP_IPV6)
                     printf("[%s]:\n",
                            ipv6_addr_to_str(addrstr,
                                             (ipv6_addr_t *)&src.addr.ipv6,
                                             sizeof(addrstr)));
+                    break;
+#else
+                    printf("unsupported protocol IPV6\n");
                     break;
 #endif
                 default:
@@ -154,7 +160,7 @@ static int ip_send(char *addr_str, char *port_str, char *data, unsigned int num,
                    (dst.family == AF_INET6) ? "IPv6" : "IPv4",
                    addr_str, protocol);
         }
-        xtimer_usleep(delay);
+        ztimer_sleep(ZTIMER_USEC, delay);
     }
     return 0;
 }

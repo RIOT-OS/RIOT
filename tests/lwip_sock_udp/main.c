@@ -25,7 +25,7 @@
 
 #include "net/sock/udp.h"
 #include "test_utils/expect.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "constants.h"
 #include "stack.h"
@@ -525,7 +525,7 @@ static void test_sock_udp_send4__socketed_no_local_no_netif(void)
                                            NULL));
     expect(_check_4packet(0, _TEST_ADDR4_REMOTE, 0, _TEST_PORT_REMOTE,
                           "ABCD", sizeof("ABCD"), SOCK_ADDR_ANY_NETIF, true));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -544,7 +544,7 @@ static void test_sock_udp_send4__socketed_no_netif(void)
     expect(_check_4packet(_TEST_ADDR4_LOCAL, _TEST_ADDR4_REMOTE, _TEST_PORT_LOCAL,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                           SOCK_ADDR_ANY_NETIF, false));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -561,7 +561,7 @@ static void test_sock_udp_send4__socketed_no_local(void)
     expect(_check_4packet(0, _TEST_ADDR4_REMOTE, 0,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"), _TEST_NETIF,
                           true));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -581,7 +581,7 @@ static void test_sock_udp_send4__socketed(void)
     expect(_check_4packet(_TEST_ADDR4_LOCAL, _TEST_ADDR4_REMOTE, _TEST_PORT_LOCAL,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                           _TEST_NETIF, false));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -604,7 +604,7 @@ static void test_sock_udp_send4__socketed_other_remote(void)
     expect(_check_4packet(_TEST_ADDR4_LOCAL, _TEST_ADDR4_REMOTE, _TEST_PORT_LOCAL,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                           _TEST_NETIF, false));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -620,7 +620,7 @@ static void test_sock_udp_send4__unsocketed_no_local_no_netif(void)
     expect(_check_4packet(0, _TEST_ADDR4_REMOTE, 0,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                           SOCK_ADDR_ANY_NETIF, true));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -639,7 +639,7 @@ static void test_sock_udp_send4__unsocketed_no_netif(void)
     expect(_check_4packet(_TEST_ADDR4_LOCAL, _TEST_ADDR4_REMOTE, _TEST_PORT_LOCAL,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                           SOCK_ADDR_ANY_NETIF, false));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -656,7 +656,7 @@ static void test_sock_udp_send4__unsocketed_no_local(void)
     expect(_check_4packet(0, _TEST_ADDR4_REMOTE, 0,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"), _TEST_NETIF,
                           true));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -676,7 +676,7 @@ static void test_sock_udp_send4__unsocketed(void)
     expect(_check_4packet(_TEST_ADDR4_LOCAL, _TEST_ADDR4_REMOTE, _TEST_PORT_LOCAL,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                           _TEST_NETIF, false));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -691,7 +691,7 @@ static void test_sock_udp_send4__no_sock_no_netif(void)
     expect(_check_4packet(0, _TEST_ADDR4_REMOTE, 0,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                           SOCK_ADDR_ANY_NETIF, true));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -707,7 +707,7 @@ static void test_sock_udp_send4__no_sock(void)
     expect(_check_4packet(0, _TEST_ADDR4_REMOTE, 0,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                           _TEST_NETIF, true));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 #endif /* MODULE_LWIP_IPV4 */
@@ -1223,7 +1223,7 @@ static void test_sock_udp_send6__socketed_no_local_no_netif(void)
     expect(_check_6packet(&ipv6_addr_unspecified, &dst_addr, 0,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                           SOCK_ADDR_ANY_NETIF, true));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -1244,7 +1244,7 @@ static void test_sock_udp_send6__socketed_no_netif(void)
     expect(_check_6packet(&src_addr, &dst_addr, _TEST_PORT_LOCAL,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                           SOCK_ADDR_ANY_NETIF, false));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -1262,7 +1262,7 @@ static void test_sock_udp_send6__socketed_no_local(void)
     expect(_check_6packet(&ipv6_addr_unspecified, &dst_addr, 0,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"), _TEST_NETIF,
                           true));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -1284,7 +1284,7 @@ static void test_sock_udp_send6__socketed(void)
     expect(_check_6packet(&src_addr, &dst_addr, _TEST_PORT_LOCAL,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                           _TEST_NETIF, false));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -1316,7 +1316,7 @@ static void test_sock_udp_sendv6__socketed(void)
     expect(_check_6packet(&src_addr, &dst_addr, _TEST_PORT_LOCAL,
                          _TEST_PORT_REMOTE, "ABCDEFGH", sizeof("ABCDEFGH"),
                          _TEST_NETIF, false));
-    xtimer_usleep(1000);    /* let GNRC stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let GNRC stack finish */
     expect(_check_net());
 }
 
@@ -1341,7 +1341,7 @@ static void test_sock_udp_send6__socketed_other_remote(void)
     expect(_check_6packet(&src_addr, &dst_addr, _TEST_PORT_LOCAL,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                           _TEST_NETIF, false));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -1358,7 +1358,7 @@ static void test_sock_udp_send6__unsocketed_no_local_no_netif(void)
     expect(_check_6packet(&ipv6_addr_unspecified, &dst_addr, 0,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                           SOCK_ADDR_ANY_NETIF, true));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -1379,7 +1379,7 @@ static void test_sock_udp_send6__unsocketed_no_netif(void)
     expect(_check_6packet(&src_addr, &dst_addr, _TEST_PORT_LOCAL,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                           SOCK_ADDR_ANY_NETIF, false));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -1397,7 +1397,7 @@ static void test_sock_udp_send6__unsocketed_no_local(void)
     expect(_check_6packet(&ipv6_addr_unspecified, &dst_addr, 0,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"), _TEST_NETIF,
                           true));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -1419,7 +1419,7 @@ static void test_sock_udp_send6__unsocketed(void)
     expect(_check_6packet(&src_addr, &dst_addr, _TEST_PORT_LOCAL,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                           _TEST_NETIF, false));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -1435,7 +1435,7 @@ static void test_sock_udp_send6__no_sock_no_netif(void)
     expect(_check_6packet(&ipv6_addr_unspecified, &dst_addr, 0,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                           SOCK_ADDR_ANY_NETIF, true));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 
@@ -1452,7 +1452,7 @@ static void test_sock_udp_send6__no_sock(void)
     expect(_check_6packet(&ipv6_addr_unspecified, &dst_addr, 0,
                           _TEST_PORT_REMOTE, "ABCD", sizeof("ABCD"),
                           _TEST_NETIF, true));
-    xtimer_usleep(1000);    /* let lwIP stack finish */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* let lwIP stack finish */
     expect(_check_net());
 }
 #endif /* MODULE_LWIP_IPV6 */
