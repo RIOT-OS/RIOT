@@ -874,6 +874,7 @@ ifneq (,$(filter fido2_ctap_%,$(USEMODULE)))
   USEMODULE += fido2_ctap_transport
   USEMODULE += fido2_ctap
   ifneq (,$(filter fido2_ctap_transport_hid,$(USEMODULE)))
+      USEMODULE += ztimer64_msec
       USEMODULE += usbus_hid
       DISABLE_MODULE += auto_init_usbus
   endif
@@ -891,7 +892,7 @@ ifneq (,$(filter fido2_ctap,$(USEMODULE)))
   USEMODULE += mtd_write_page
   USEMODULE += ztimer_msec
   USEMODULE += event
-  USEMODULE += event_timeout
+  USEMODULE += event_timeout_ztimer
   USEMODULE += cipher_modes
   USEMODULE += crypto_aes_256
   USEMODULE += hashes
