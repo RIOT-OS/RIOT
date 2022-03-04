@@ -35,7 +35,7 @@ endif
 
 # Configure local serial port
 RENODE_SYSBUS_UART ?= sysbus.uart0
-EMULATOR_SERIAL_PORT ?= /tmp/riot_$(APPLICATION)_$(BOARD)_uart
+EMULATOR_SERIAL_PORT ?= $(RUNTIME_TMP_DIR)/uart
 RENODE_CONFIG_FLAGS += -e "emulation CreateUartPtyTerminal \"term\" \"$(EMULATOR_SERIAL_PORT)\" true"
 RENODE_CONFIG_FLAGS += -e "connector Connect $(RENODE_SYSBUS_UART) term"
 
