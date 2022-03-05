@@ -227,21 +227,55 @@ void _set_nud_state(gnrc_netif_t *netif, _nib_onl_entry_t *nbr,
  * @return  false, if @p entry is not in a reachable state.
  */
 bool _is_reachable(_nib_onl_entry_t *entry);
-#else   /* CONFIG_GNRC_IPV6_NIB_ARSM || defined(DOXYGEN) */
-#define _handle_snd_ns(ctx)                         (void)ctx
-#define _handle_state_timeout(ctx)                  (void)ctx
-#define _probe_nbr(nbr, reset)                      (void)nbr; (void)reset
-#define _init_iface_arsm(netif)                     (void)netif
-#define _handle_adv_l2(netif, nce, icmpv6, tl2ao)   (void)netif; (void)nce; \
-                                                    (void)icmpv6; (void)tl2ao
-#define _recalc_reach_time(netif)                   (void)netif
-#define _set_reachable(netif, nce)                  (void)netif; (void)nce
-#define _init_iface_arsm(netif)                     (void)netif
-
-#define _get_nud_state(nbr)                 (GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNMANAGED)
-#define _set_nud_state(netif, nce, state)   (void)netif; (void)nbr; (void)state
-#define _is_reachable(entry)                (true)
 #endif  /* CONFIG_GNRC_IPV6_NIB_ARSM || defined(DOXYGEN) */
+
+#if !defined(DOXYGEN)
+#if !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
+static inline void
+_handle_snd_ns(_nib_onl_entry_t *nbr) {
+    (void)nbr;
+}
+static inline void
+_handle_state_timeout(_nib_onl_entry_t *nbr) {
+    (void)nbr;
+}
+static inline void
+_probe_nbr(_nib_onl_entry_t *nbr, bool reset) {
+    (void)nbr; (void)reset;
+}
+static inline void
+_init_iface_arsm(gnrc_netif_t *netif) {
+    (void)netif;
+}
+static inline void
+_handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
+               const icmpv6_hdr_t *icmpv6, const ndp_opt_t *tl2ao) {
+    (void)netif; (void)nce; (void)icmpv6; (void)tl2ao;
+}
+static inline void
+_recalc_reach_time(gnrc_netif_ipv6_t *netif) {
+    (void)netif;
+}
+static inline void
+_set_reachable(gnrc_netif_t *netif, _nib_onl_entry_t *nce) {
+    (void)netif; (void)nce;
+}
+static inline uint16_t
+_get_nud_state(_nib_onl_entry_t *nbr) {
+    (void)nbr;
+    return GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNMANAGED;
+}
+static inline void
+_set_nud_state(gnrc_netif_t *netif, _nib_onl_entry_t *nbr, uint16_t state) {
+    (void)netif; (void)nbr; (void)state;
+}
+static inline bool
+_is_reachable(_nib_onl_entry_t *entry) {
+    (void)entry;
+    return true;
+}
+#endif /* !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM) */
+#endif /* !defined(DOXYGEN) */
 
 #ifdef __cplusplus
 }
