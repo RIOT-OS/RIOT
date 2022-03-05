@@ -114,7 +114,6 @@ static int _write(struct dtls_context_t *ctx, session_t *session, uint8_t *buf, 
     sock_udp_ep_t remote;
 
     _session_to_ep(session, &remote);
-    remote.family = AF_INET6;
 
     ssize_t res = sock_udp_send(sock->udp_sock, buf, len, &remote);
 
@@ -529,15 +528,20 @@ int sock_dtls_session_init(sock_dtls_t *sock, const sock_udp_ep_t *ep,
     if (!sock->udp_sock || (sock_udp_get_local(sock->udp_sock, &local) < 0)) {
         return -EADDRNOTAVAIL;
     }
+
     if (ep->port == 0) {
         return -EINVAL;
     }
+
     switch (ep->family) {
+#ifdef SOCK_HAS_IPV4
     case AF_INET:
- #if IS_ACTIVE(SOCK_HAS_IPV6)
-    case AF_INET6:
- #endif
         break;
+#endif
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
+        break;
+#endif
     default:
         return -EINVAL;
     }
@@ -812,24 +816,55 @@ void sock_dtls_init(void)
 static void _ep_to_session(const sock_udp_ep_t *ep, session_t *session)
 {
     dtls_session_init(session);
+    session->addr.family = ep->family;
     session->addr.port = ep->port;
 
-    if (ipv6_addr_is_link_local((ipv6_addr_t *)ep->addr.ipv6)) {
-        /* set ifindex for link-local addresses */
-        session->ifindex = ep->netif;
-    }
-    else {
+    switch (ep->family) {
+#ifdef SOCK_HAS_IPV4
+    case AF_INET:
         session->ifindex = SOCK_ADDR_ANY_NETIF;
+        memcpy(&session->addr.ipv4, &ep->addr.ipv4, sizeof(session->addr.ipv4));
+        break;
+#endif
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
+        if (ipv6_addr_is_link_local((ipv6_addr_t *)ep->addr.ipv6)) {
+            /* set ifindex for link-local addresses */
+            session->ifindex = ep->netif;
+        }
+        else {
+            session->ifindex = SOCK_ADDR_ANY_NETIF;
+        }
+        memcpy(&session->addr.ipv6, &ep->addr.ipv6, sizeof(session->addr.ipv6));
+        break;
+#endif
+    default:
+        assert(0);
+        return;
     }
-    memcpy(&session->addr.addr, &ep->addr.ipv6, sizeof(session->addr.addr));
 }
 
 static void _session_to_ep(const session_t *session, sock_udp_ep_t *ep)
 {
     ep->port = session->addr.port;
     ep->netif = session->ifindex;
-    ep->family = AF_INET6;
-    memcpy(&ep->addr.ipv6, &session->addr.addr, sizeof(ep->addr.ipv6));
+    ep->family = session->addr.family;
+
+    switch (session->addr.family) {
+#ifdef SOCK_HAS_IPV4
+    case AF_INET:
+        memcpy(&ep->addr.ipv4, &session->addr.ipv4, sizeof(ep->addr.ipv4));
+        break;
+#endif
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
+        memcpy(&ep->addr.ipv6, &session->addr.ipv6, sizeof(ep->addr.ipv6));
+        break;
+#endif
+    default:
+        /* addr_family is actually ok to be 0 when coming from _copy_buffer */
+        return;
+    }
 }
 
 static inline uint32_t _update_timeout(uint32_t start, uint32_t timeout)
