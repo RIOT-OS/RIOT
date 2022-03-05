@@ -14,6 +14,7 @@
  *
  * @author  Aiman Ismail <muhammadaimanbin.ismail@haw-hamburg.de>
  * @author  Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
+ * @author  Hendrik van Essen <hendrik.ve@fu-berlin.de>
  */
 
 #include <assert.h>
@@ -89,10 +90,8 @@ typedef struct ecdsa_key_assignment {
 static ecdsa_key_assignment_t _ecdsa_keys[CONFIG_DTLS_CREDENTIALS_MAX];
 #endif
 
-static int _read(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
-                 size_t len)
+static int _read(struct dtls_context_t *ctx, session_t *session, uint8_t *buf, size_t len)
 {
-    (void)session;
     sock_dtls_t *sock = dtls_get_app_data(ctx);
 
     DEBUG("sock_dtls: decrypted message arrived\n");
@@ -109,8 +108,7 @@ static int _read(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
     return len;
 }
 
-static int _write(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
-                  size_t len)
+static int _write(struct dtls_context_t *ctx, session_t *session, uint8_t *buf, size_t len)
 {
     sock_dtls_t *sock = (sock_dtls_t *)dtls_get_app_data(ctx);
     sock_udp_ep_t remote;
@@ -129,9 +127,6 @@ static int _write(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
 static int _event(struct dtls_context_t *ctx, session_t *session,
                   dtls_alert_level_t level, unsigned short code)
 {
-    (void)level;
-    (void)session;
-
     sock_dtls_t *sock = dtls_get_app_data(ctx);
     msg_t msg = { .type = code, .content.ptr = session };
 
@@ -310,7 +305,6 @@ static int _get_psk_info(struct dtls_context_t *ctx, const session_t *session,
 static int _get_ecdsa_key(struct dtls_context_t *ctx, const session_t *session,
                           const dtls_ecdsa_key_t **result)
 {
-    (void)session;
     int ret = CREDMAN_ERROR;
     sock_dtls_t *sock = (sock_dtls_t *)dtls_get_app_data(ctx);
     sock_udp_ep_t ep;
