@@ -145,7 +145,19 @@ static void *_event_loop(void *arg)
 
     sock_udp_ep_t local;
     memset(&local, 0, sizeof(sock_udp_ep_t));
+
+#if defined(SOCK_HAS_IPV4) && defined(SOCK_HAS_IPV6)
+#error "Due to limitations in the gcoap API it is currently not possible to use a dual stack setup"
+#endif
+
+#ifdef SOCK_HAS_IPV4
+    local.family = AF_INET;
+#endif
+
+#ifdef SOCK_HAS_IPV6
     local.family = AF_INET6;
+#endif
+
     local.netif  = SOCK_ADDR_ANY_NETIF;
     if (IS_USED(MODULE_GCOAP_DTLS)) {
         local.port = CONFIG_GCOAPS_PORT;
