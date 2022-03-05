@@ -430,10 +430,10 @@ void _nib_nc_set_reachable(_nib_onl_entry_t *node);
  */
 static inline _nib_onl_entry_t *_nib_dad_add(const ipv6_addr_t *addr)
 {
-    assert(addr != NULL);
+    assert(addr);
     _nib_onl_entry_t *node = _nib_onl_alloc(addr, 0);
 
-    if (node != NULL) {
+    if (node) {
         node->mode |= (_DAD);
     }
     return node;
@@ -590,7 +590,7 @@ static inline _nib_offl_entry_t *_nib_offl_add(const ipv6_addr_t *next_hop,
 {
     _nib_offl_entry_t *nib_offl = _nib_offl_alloc(next_hop, iface, pfx, pfx_len);
 
-    if (nib_offl != NULL) {
+    if (nib_offl) {
         nib_offl->mode |= mode;
     }
     return nib_offl;
@@ -607,7 +607,7 @@ static inline void _nib_offl_remove(_nib_offl_entry_t *nib_offl, uint8_t mode)
     _nib_offl_clear(nib_offl);
 }
 
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DC) || DOXYGEN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DC) || defined(DOXYGEN)
 /**
  * @brief   Creates or gets an existing destination cache entry by its addresses
  *
@@ -628,7 +628,7 @@ static inline _nib_offl_entry_t *_nib_dc_add(const ipv6_addr_t *next_hop,
                                              unsigned iface,
                                              const ipv6_addr_t *dst)
 {
-    assert((next_hop != NULL) && (dst != NULL));
+    assert(next_hop && dst);
     return _nib_offl_add(next_hop, iface, dst, IPV6_ADDR_BIT_LEN, _DC);
 }
 
@@ -846,7 +846,7 @@ uint32_t _evtimer_lookup(const void *ctx, uint16_t type);
 static inline void _evtimer_add(void *ctx, int16_t type,
                                 evtimer_msg_event_t *event, uint32_t offset)
 {
-#ifdef MODULE_GNRC_IPV6
+#if IS_USED(MODULE_GNRC_IPV6)
     kernel_pid_t target_pid = gnrc_ipv6_pid;
 #else
     kernel_pid_t target_pid = KERNEL_PID_LAST;  /* just for testing */

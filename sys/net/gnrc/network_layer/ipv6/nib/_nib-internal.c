@@ -51,8 +51,26 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 evtimer_msg_t _nib_evtimer;
 
 static void _override_node(const ipv6_addr_t *addr, unsigned iface,
-                           _nib_onl_entry_t *node);
-static inline bool _node_unreachable(_nib_onl_entry_t *node);
+                           _nib_onl_entry_t *node)
+{
+    _nib_onl_clear(node);
+    if (addr) {
+        node->ipv6 = *addr;
+    }
+    _nib_onl_set_if(node, iface);
+}
+
+static inline bool _node_unreachable(_nib_onl_entry_t *node)
+{
+    switch (node->info & GNRC_IPV6_NIB_NC_INFO_NUD_STATE_MASK) {
+        case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE:
+        /* Falls through. */
+        case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE:
+            return true;
+        default:
+            return false;
+    }
+}
 
 void _nib_init(void)
 {
@@ -83,8 +101,8 @@ void _nib_release(void)
 static inline bool _addr_equals(const ipv6_addr_t *addr,
                                 const _nib_onl_entry_t *node)
 {
-    return (addr == NULL) || ipv6_addr_is_unspecified(&node->ipv6) ||
-           (ipv6_addr_equal(addr, &node->ipv6));
+    return !addr || ipv6_addr_is_unspecified(&node->ipv6) ||
+           ipv6_addr_equal(addr, &node->ipv6);
 }
 
 _nib_onl_entry_t *_nib_onl_alloc(const ipv6_addr_t *addr, unsigned iface)
@@ -92,8 +110,8 @@ _nib_onl_entry_t *_nib_onl_alloc(const ipv6_addr_t *addr, unsigned iface)
     _nib_onl_entry_t *node = NULL;
 
     DEBUG("nib: Allocating on-link node entry (addr = %s, iface = %u)\n",
-          (addr == NULL) ? "NULL" : ipv6_addr_to_str(addr_str, addr,
-                                                     sizeof(addr_str)), iface);
+          !addr ? "NULL" : ipv6_addr_to_str(addr_str, addr,
+                                            sizeof(addr_str)), iface);
     for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
         _nib_onl_entry_t *tmp = &_nodes[i];
 
@@ -103,12 +121,12 @@ _nib_onl_entry_t *_nib_onl_alloc(const ipv6_addr_t *addr, unsigned iface)
             node = tmp;
             break;
         }
-        if ((node == NULL) && (tmp->mode == _EMPTY)) {
+        if (!node && (tmp->mode == _EMPTY)) {
             DEBUG("  using %p\n", (void *)node);
             node = tmp;
         }
     }
-    if (node != NULL) {
+    if (node) {
         _override_node(addr, iface, node);
     }
     else {
@@ -134,7 +152,7 @@ static inline _nib_onl_entry_t *_cache_out_onl_entry(const ipv6_addr_t *addr,
 
     DEBUG("nib: Searching for replaceable entries (addr = %s, iface = %u)\n",
           ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)), iface);
-    if (tmp == NULL) {
+    if (!tmp) {
         return NULL;
     }
     do {
@@ -159,12 +177,12 @@ static inline _nib_onl_entry_t *_cache_out_onl_entry(const ipv6_addr_t *addr,
          * newly created NCE or in case entry becomes garbage collectible
          * again */
         clist_rpush(&_next_removable, (clist_node_t *)tmp);
-        if (res == NULL) {
+        if (!res) {
             /* no new entry created yet, get next entry in FIFO */
             tmp = (_nib_onl_entry_t *)clist_lpop(&_next_removable);
         }
-    } while ((tmp != first) && (res == NULL));
-    if (res == NULL) {
+    } while ((tmp != first) && !res);
+    if (!res) {
         /* we did not find any removable entry => requeue current one */
         clist_rpush(&_next_removable, (clist_node_t *)tmp);
     }
@@ -174,13 +192,13 @@ static inline _nib_onl_entry_t *_cache_out_onl_entry(const ipv6_addr_t *addr,
 _nib_onl_entry_t *_nib_nc_add(const ipv6_addr_t *addr, unsigned iface,
                               uint16_t cstate)
 {
-    assert(addr != NULL);
+    assert(addr);
     cstate &= GNRC_IPV6_NIB_NC_INFO_NUD_STATE_MASK;
     assert(cstate != GNRC_IPV6_NIB_NC_INFO_NUD_STATE_DELAY);
     assert(cstate != GNRC_IPV6_NIB_NC_INFO_NUD_STATE_PROBE);
     assert(cstate != GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE);
     _nib_onl_entry_t *node = _nib_onl_alloc(addr, iface);
-    if (node == NULL) {
+    if (!node) {
         return _cache_out_onl_entry(addr, iface, cstate);
     }
     DEBUG("nib: Adding to neighbor cache (addr = %s, iface = %u)\n",
@@ -191,7 +209,7 @@ _nib_onl_entry_t *_nib_nc_add(const ipv6_addr_t *addr, unsigned iface,
         node->info |= cstate;
         node->mode |= _NC;
     }
-    if (node->next == NULL) {
+    if (!node->next) {
         DEBUG("nib: queueing (addr = %s, iface = %u) for potential removal\n",
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)), iface);
         /* add to next removable list, if not already in it */
@@ -216,7 +234,7 @@ _nib_onl_entry_t *_nib_onl_iter(const _nib_onl_entry_t *last)
 
 _nib_onl_entry_t *_nib_onl_get(const ipv6_addr_t *addr, unsigned iface)
 {
-    assert(addr != NULL);
+    assert(addr);
     DEBUG("nib: Getting on-link node entry (addr = %s, iface = %u)\n",
           ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)), iface);
     for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
@@ -245,7 +263,7 @@ void _nib_nc_set_reachable(_nib_onl_entry_t *node)
     node->info |= GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE;
 #ifdef TEST_SUITES
     /* exit early for unittests */
-    if (netif == NULL) {
+    if (!netif) {
         return;
     }
 #endif  /* TEST_SUITES */
@@ -276,15 +294,13 @@ void _nib_nc_remove(_nib_onl_entry_t *node)
     evtimer_del((evtimer_t *)&_nib_evtimer, &node->addr_reg_timeout.event);
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LR */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
-    gnrc_pktqueue_t *tmp;
-    for (gnrc_pktqueue_t *ptr = node->pktqueue;
-         (ptr != NULL) && (tmp = (ptr->next), 1);
-         ptr = tmp) {
+    for (gnrc_pktqueue_t *ptr = node->pktqueue; ptr;) {
+        gnrc_pktqueue_t *tmp = ptr->next;
         gnrc_pktqueue_t *entry = gnrc_pktqueue_remove(&node->pktqueue, ptr);
-        gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR,
-                                       entry->pkt);
+        gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR, entry->pkt);
         gnrc_pktbuf_release_error(entry->pkt, EHOSTUNREACH);
         entry->pkt = NULL;
+        ptr = tmp;
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
     /* remove from cache-out procedure */
@@ -312,15 +328,14 @@ static inline int _get_l2addr_from_ipv6(const gnrc_netif_t *netif,
 
 void _nib_nc_get(const _nib_onl_entry_t *node, gnrc_ipv6_nib_nc_t *nce)
 {
-    assert((node != NULL) && (nce != NULL));
-    memcpy(&nce->ipv6, &node->ipv6, sizeof(nce->ipv6));
+    assert(node && nce);
+    nce->ipv6 = node->ipv6;
     nce->info = node->info;
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     if (ipv6_addr_is_link_local(&nce->ipv6)) {
         gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(node));
-        assert(netif != NULL);
-        (void)netif;    /* flag-checkers might evaluate just to constants */
+        assert(netif);
         if (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_rtr(netif) &&
             (_get_l2addr_from_ipv6(netif, node, nce) >= 0)) {
             return;
@@ -332,7 +347,7 @@ void _nib_nc_get(const _nib_onl_entry_t *node, gnrc_ipv6_nib_nc_t *nce)
 #else   /* CONFIG_GNRC_IPV6_NIB_ARSM */
     gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(node));
     assert(ipv6_addr_is_link_local(&nce->ipv6));
-    assert(netif != NULL);
+    assert(netif);
     _get_l2addr_from_ipv6(netif, node, nce);
 #endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
 }
@@ -348,7 +363,7 @@ _nib_dr_entry_t *_nib_drl_add(const ipv6_addr_t *router_addr, unsigned iface)
         _nib_dr_entry_t *tmp = &_def_routers[i];
         _nib_onl_entry_t *tmp_node = tmp->next_hop;
 
-        if ((tmp_node != NULL) &&
+        if (tmp_node &&
             (_nib_onl_get_if(tmp_node) == iface) &&
             (ipv6_addr_equal(router_addr, &tmp_node->ipv6))) {
             /* exact match */
@@ -356,15 +371,15 @@ _nib_dr_entry_t *_nib_drl_add(const ipv6_addr_t *router_addr, unsigned iface)
             tmp_node->mode |= _DRL;
             return tmp;
         }
-        if ((def_router == NULL) && (tmp_node == NULL)) {
+        if (!def_router && !tmp_node) {
             def_router = tmp;
         }
     }
-    if (def_router != NULL) {
+    if (def_router) {
         DEBUG("  using %p\n", (void *)def_router);
         def_router->next_hop = _nib_onl_alloc(router_addr, iface);
 
-        if (def_router->next_hop == NULL) {
+        if (!def_router->next_hop) {
             return NULL;
         }
         _override_node(router_addr, iface, def_router->next_hop);
@@ -375,7 +390,7 @@ _nib_dr_entry_t *_nib_drl_add(const ipv6_addr_t *router_addr, unsigned iface)
 
 void _nib_drl_remove(_nib_dr_entry_t *nib_dr)
 {
-    if (nib_dr->next_hop != NULL) {
+    if (nib_dr->next_hop) {
         nib_dr->next_hop->mode &= ~(_DRL);
         _nib_onl_clear(nib_dr->next_hop);
         memset(nib_dr, 0, sizeof(_nib_dr_entry_t));
@@ -391,7 +406,7 @@ _nib_dr_entry_t *_nib_drl_iter(const _nib_dr_entry_t *last)
          def_router < (_def_routers + CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF);
          def_router++) {
         _nib_onl_entry_t *node = def_router->next_hop;
-        if ((node != NULL) && (node->mode != _EMPTY)) {
+        if (node && (node->mode != _EMPTY)) {
             /* const modifier provided to assure internal consistency.
              * Can now be discarded. */
             return (_nib_dr_entry_t *)def_router;
@@ -402,15 +417,14 @@ _nib_dr_entry_t *_nib_drl_iter(const _nib_dr_entry_t *last)
 
 _nib_dr_entry_t *_nib_drl_get(const ipv6_addr_t *router_addr, unsigned iface)
 {
-    assert((router_addr != NULL) || (iface != 0));
+    assert(router_addr || (iface != 0));
     for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
         _nib_dr_entry_t *def_router = &_def_routers[i];
         _nib_onl_entry_t *node = def_router->next_hop;
 
-        if ((node != NULL) &&
-            ((iface == 0) || (_nib_onl_get_if(node) == iface)) &&
-            ((router_addr == NULL) ||
-             ipv6_addr_equal(router_addr, &node->ipv6))) {
+        if (node &&
+            ((iface == 0) || _nib_onl_get_if(node) == iface) &&
+            (!router_addr || ipv6_addr_equal(router_addr, &node->ipv6))) {
             /* It is linked to the default router list so it *should* be set */
             assert(node->mode & _DRL);
             return def_router;
@@ -425,27 +439,25 @@ _nib_dr_entry_t *_nib_drl_get_dr(void)
 
     /* if there is already a default router selected or
      * its reachability is not suspect */
-    if (!((_prime_def_router == NULL) ||
-          (_node_unreachable(_prime_def_router->next_hop)))) {
+    if (_prime_def_router && !_node_unreachable(_prime_def_router->next_hop)) {
         /* take it */
         return _prime_def_router;
     }
     /* else search next reachable router */
     do {
-        ptr = _nib_drl_iter(ptr);
         /* if there is no reachable router */
-        if (ptr == NULL) {
+        if (!(ptr = _nib_drl_iter(ptr))) {
             _nib_dr_entry_t *next = _nib_drl_iter(_prime_def_router);
             /* if first time called or last selected router is last in
              * router list */
-            if ((_prime_def_router == NULL) || (next == NULL)) {
+            if (!_prime_def_router || !next) {
                 /* wrap around to first (potentially unreachable) route
                  * to trigger NUD for it */
                 _prime_def_router = _nib_drl_iter(NULL);
             }
             /* there is another default router, choose it regardless of
              * reachability to potentially trigger NUD for it */
-            else if (next != NULL) {
+            else if (next) {
                 _prime_def_router = next;
             }
             return _prime_def_router;
@@ -457,13 +469,13 @@ _nib_dr_entry_t *_nib_drl_get_dr(void)
 
 void _nib_drl_ft_get(const _nib_dr_entry_t *drl, gnrc_ipv6_nib_ft_t *fte)
 {
-    assert((drl != NULL) && (drl->next_hop != NULL) && (fte != NULL));
+    assert(drl && drl->next_hop && fte);
     ipv6_addr_set_unspecified(&fte->dst);
     fte->dst_len = 0;
     fte->primary = ((drl == _prime_def_router) &&
-                    !((_prime_def_router == NULL) ||
-                      (_node_unreachable(_prime_def_router->next_hop))));
-    memcpy(&fte->next_hop, &drl->next_hop->ipv6, sizeof(fte->next_hop));
+                    _prime_def_router &&
+                    !_node_unreachable(_prime_def_router->next_hop));
+    fte->next_hop = drl->next_hop->ipv6;
     fte->iface = _nib_onl_get_if(drl->next_hop);
 }
 
@@ -472,12 +484,12 @@ _nib_offl_entry_t *_nib_offl_alloc(const ipv6_addr_t *next_hop, unsigned iface,
 {
     _nib_offl_entry_t *dst = NULL;
 
-    assert((pfx != NULL) && (!ipv6_addr_is_unspecified(pfx)) &&
+    assert(pfx && !ipv6_addr_is_unspecified(pfx) &&
            (pfx_len > 0) && (pfx_len <= 128));
     DEBUG("nib: Allocating off-link-entry entry "
           "(next_hop = %s, iface = %u, ",
-          (next_hop == NULL) ? "NULL" : ipv6_addr_to_str(addr_str, next_hop,
-                                                         sizeof(addr_str)),
+          !next_hop ? "NULL" : ipv6_addr_to_str(addr_str, next_hop,
+                                                sizeof(addr_str)),
           iface);
     DEBUG("pfx = %s/%u)\n", ipv6_addr_to_str(addr_str, pfx,
                                              sizeof(addr_str)), pfx_len);
@@ -486,27 +498,27 @@ _nib_offl_entry_t *_nib_offl_alloc(const ipv6_addr_t *next_hop, unsigned iface,
         _nib_onl_entry_t *tmp_node = tmp->next_hop;
 
         if ((tmp->pfx_len == pfx_len) &&                /* prefix length matches and */
-            (tmp_node != NULL) &&                       /* there is a next hop that */
+            tmp_node &&                                 /* there is a next hop that */
             (_nib_onl_get_if(tmp_node) == iface) &&     /* has a matching interface and */
             _addr_equals(next_hop, tmp_node) &&         /* equal address to next_hop, also */
             (ipv6_addr_match_prefix(&tmp->pfx, pfx) >= pfx_len)) {  /* the prefix matches */
             /* exact match (or next hop address was previously unset) */
             DEBUG("  %p is an exact match\n", (void *)tmp);
-            if (next_hop != NULL) {
-                memcpy(&tmp_node->ipv6, next_hop, sizeof(tmp_node->ipv6));
+            if (next_hop) {
+                tmp_node->ipv6 = *next_hop;
             }
             tmp->next_hop->mode |= _DST;
             return tmp;
         }
-        if ((dst == NULL) && (tmp_node == NULL)) {
+        if (!dst && !tmp_node) {
             dst = tmp;
         }
     }
-    if (dst != NULL) {
+    if (dst) {
         DEBUG("  using %p\n", (void *)dst);
         dst->next_hop = _nib_onl_alloc(next_hop, iface);
 
-        if (dst->next_hop == NULL) {
+        if (!dst->next_hop) {
             memset(dst, 0, sizeof(_nib_offl_entry_t));
             return NULL;
         }
@@ -537,7 +549,7 @@ static inline bool _in_abrs(const _nib_abr_entry_t *abr)
 
 void _nib_offl_clear(_nib_offl_entry_t *dst)
 {
-    if (dst->next_hop != NULL) {
+    if (dst->next_hop) {
         _nib_offl_entry_t *ptr;
         for (ptr = _dsts; _in_dsts(ptr); ptr++) {
             /* there is another dst pointing to next-hop => only remove dst */
@@ -604,8 +616,8 @@ static _nib_offl_entry_t *_nib_offl_get_match(const ipv6_addr_t *dst)
 
 void _nib_ft_get(const _nib_offl_entry_t *dst, gnrc_ipv6_nib_ft_t *fte)
 {
-    assert((dst != NULL) && (dst->next_hop != NULL) && (fte != NULL));
-    memcpy(&fte->dst, &dst->pfx, sizeof(dst->pfx));
+    assert(dst && dst->next_hop && fte);
+    fte->dst = dst->pfx;
     fte->dst_len = dst->pfx_len;
     fte->primary = 0;
     fte->iface = _nib_onl_get_if(dst->next_hop);
@@ -613,28 +625,27 @@ void _nib_ft_get(const _nib_offl_entry_t *dst, gnrc_ipv6_nib_ft_t *fte)
         ipv6_addr_set_unspecified(&fte->next_hop);
     }
     else {
-        memcpy(&fte->next_hop, &dst->next_hop->ipv6, sizeof(dst->next_hop->ipv6));
+        fte->next_hop = dst->next_hop->ipv6;
     }
 }
 
 int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
                    gnrc_ipv6_nib_ft_t *fte)
 {
-    assert((dst != NULL) && (fte != NULL));
+    assert(dst && fte);
     DEBUG("nib: get route %s for packet %p\n",
           ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)),
           (void *)pkt);
     _nib_offl_entry_t *offl = _nib_offl_get_match(dst);
 
-    if ((offl == NULL) ||
+    if (!offl ||
         /* give default route precedence over off-link PLEs */
         ((offl->mode == _PL) && !(offl->flags & _PFX_ON_LINK))) {
         _nib_dr_entry_t *router = _nib_drl_get_dr();
 
-        if ((router == NULL) && (offl == NULL)) {
+        if (!router && !offl) {
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
             gnrc_netif_t *ptr = NULL;
-
             while ((ptr = gnrc_netif_iter(ptr))) {
                 _call_route_info_cb(ptr,
                                     GNRC_IPV6_NIB_ROUTE_INFO_TYPE_RRQ,
@@ -645,7 +656,7 @@ int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
 #endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
             return -ENETUNREACH;
         }
-        else if (router != NULL) {
+        else if (router) {
             DEBUG("nib: prefer default router %s%%%u over prefix list entry\n",
                   ipv6_addr_to_str(addr_str, &router->next_hop->ipv6,
                                    sizeof(addr_str)),
@@ -687,9 +698,7 @@ void _nib_offl_remove_prefix(_nib_offl_entry_t *pfx)
     evtimer_del(&_nib_evtimer, &pfx->pfx_timeout.event);
 
     /* get interface associated with prefix */
-    netif = gnrc_netif_get_by_pid(_nib_onl_get_if(pfx->next_hop));
-
-    if (netif != NULL) {
+    if ((netif = gnrc_netif_get_by_pid(_nib_onl_get_if(pfx->next_hop)))) {
         uint8_t best_match_len = pfx->pfx_len;
         ipv6_addr_t *best_match = NULL;
 
@@ -701,9 +710,8 @@ void _nib_offl_remove_prefix(_nib_offl_entry_t *pfx)
                 best_match = &netif->ipv6.addrs[i];
             }
         }
-        if (best_match != NULL) {
-            gnrc_netif_ipv6_addr_remove_internal(netif,
-                                                 best_match);
+        if (best_match) {
+            gnrc_netif_ipv6_addr_remove_internal(netif, best_match);
         }
     }
 
@@ -716,7 +724,7 @@ _nib_abr_entry_t *_nib_abr_add(const ipv6_addr_t *addr)
 {
     _nib_abr_entry_t *abr = NULL;
 
-    assert(addr != NULL);
+    assert(addr);
     DEBUG("nib: Allocating authoritative border router entry (addr = %s)\n",
           ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
     for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_ABR_NUMOF; i++) {
@@ -727,13 +735,13 @@ _nib_abr_entry_t *_nib_abr_add(const ipv6_addr_t *addr)
             DEBUG("  %p is an exact match\n", (void *)tmp);
             return tmp;
         }
-        if ((abr == NULL) && (ipv6_addr_is_unspecified(&tmp->addr))) {
+        if (!abr && ipv6_addr_is_unspecified(&tmp->addr)) {
             abr = tmp;
         }
     }
-    if (abr != NULL) {
+    if (abr) {
         DEBUG("  using %p\n", (void *)abr);
-        memcpy(&abr->addr, addr, sizeof(abr->addr));
+        abr->addr = *addr;
     }
     else {
         DEBUG("  NIB full\n");
@@ -743,7 +751,7 @@ _nib_abr_entry_t *_nib_abr_add(const ipv6_addr_t *addr)
 
 void _nib_abr_remove(const ipv6_addr_t *addr)
 {
-    assert(addr != NULL);
+    assert(addr);
     DEBUG("nib: Removing border router %s\n", ipv6_addr_to_str(addr_str, addr,
                                                                sizeof(addr_str)));
     for (_nib_abr_entry_t *abr = _abrs; _in_abrs(abr); abr++) {
@@ -767,7 +775,7 @@ void _nib_abr_remove(const ipv6_addr_t *addr)
 
 void _nib_abr_add_pfx(_nib_abr_entry_t *abr, const _nib_offl_entry_t *offl)
 {
-    assert((abr != NULL) && (offl != NULL) && (offl->mode & _PL));
+    assert(abr && offl && (offl->mode & _PL));
     unsigned idx = _idx_dsts(offl);
 
     DEBUG("nib: Prefix %s/%u ",
@@ -783,8 +791,7 @@ void _nib_abr_add_pfx(_nib_abr_entry_t *abr, const _nib_offl_entry_t *offl)
 _nib_offl_entry_t *_nib_abr_iter_pfx(const _nib_abr_entry_t *abr,
                                      const _nib_offl_entry_t *last)
 {
-    if ((last == NULL) ||
-        (_idx_dsts(last) < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF)) {
+    if (!last || (_idx_dsts(last) < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF)) {
         /* we don't change `ptr`, so dropping const qualifier for now is okay */
         _nib_offl_entry_t *ptr = (_nib_offl_entry_t *)last;
 
@@ -821,7 +828,7 @@ _nib_offl_entry_t *_nib_pl_add(unsigned iface,
 {
     _nib_offl_entry_t *dst = _nib_offl_add(NULL, iface, pfx, pfx_len, _PL);
 
-    if (dst == NULL) {
+    if (!dst) {
         return NULL;
     }
     assert(valid_ltime >= pref_ltime);
@@ -833,7 +840,7 @@ _nib_offl_entry_t *_nib_pl_add(unsigned iface,
             /* ignore capped of preferred lifetimes from sec to ms conversion */
             if (pref_ltime < (UINT32_MAX - 1)) {
                 /* prevent pref_ltime from becoming UINT32_MAX */
-                if (((pref_ltime + now) == UINT32_MAX) && (now != 0)) {
+                if ((pref_ltime + now) == UINT32_MAX) {
                     pref_ltime++;
                 }
                 pref_ltime += now;
@@ -853,38 +860,16 @@ _nib_offl_entry_t *_nib_pl_add(unsigned iface,
     return dst;
 }
 
-static void _override_node(const ipv6_addr_t *addr, unsigned iface,
-                           _nib_onl_entry_t *node)
-{
-    _nib_onl_clear(node);
-    if (addr != NULL) {
-        memcpy(&node->ipv6, addr, sizeof(node->ipv6));
-    }
-    _nib_onl_set_if(node, iface);
-}
-
-static inline bool _node_unreachable(_nib_onl_entry_t *node)
-{
-    switch (node->info & GNRC_IPV6_NIB_NC_INFO_NUD_STATE_MASK) {
-        case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE:
-        /* Falls through. */
-        case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE:
-            return true;
-        default:
-            return false;
-    }
-}
-
 uint32_t _evtimer_lookup(const void *ctx, uint16_t type)
 {
     evtimer_msg_event_t *event = (evtimer_msg_event_t *)_nib_evtimer.events;
     uint32_t offset = 0;
 
     DEBUG("nib: lookup ctx = %p, type = %04x\n", (void *)ctx, type);
-    while (event != NULL) {
+    while (event) {
         offset += event->event.offset;
         if ((event->msg.type == type) &&
-            ((ctx == NULL) || (event->msg.content.ptr == ctx))) {
+            (!ctx || (event->msg.content.ptr == ctx))) {
             return offset;
         }
         event = (evtimer_msg_event_t *)event->event.next;
