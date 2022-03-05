@@ -74,8 +74,8 @@ static inline void _call_route_info_cb(gnrc_netif_t *netif, unsigned type,
                                        const ipv6_addr_t *ctx_addr,
                                        const void *ctx)
 {
-    assert(netif != NULL);
-    if (netif->ipv6.route_info_cb != NULL) {
+    assert(netif);
+    if (netif->ipv6.route_info_cb) {
         netif->ipv6.route_info_cb(type, ctx_addr, ctx);
     }
 }
@@ -128,22 +128,42 @@ void _snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst,
  */
 void _snd_rtr_advs_drop_pfx(gnrc_netif_t *netif, const ipv6_addr_t *dst,
                             _nib_offl_entry_t *pfx);
-#else  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
-#define _init_iface_router(netif)                       (void)netif
-#define _call_route_info_cb(netif, type, ctx_addr, ctx) (void)netif; \
-                                                        (void)type; \
-                                                        (void)ctx_addr; \
-                                                        (void)ctx
-#define _handle_reply_rs(host)                          (void)host
-#define _handle_snd_mc_ra(netif)                        (void)netif
-#define _set_rtr_adv(netif)                             (void)netif
-#define _snd_rtr_advs(netif, dst, final)                (void)netif; \
-                                                        (void)dst; \
-                                                        (void)final
-#define _snd_rtr_advs_drop_pfx(netif, dst, pfx)         (void)netif; \
-                                                        (void)dst; \
-                                                        (void)pfx;
-#endif /* CONFIG_GNRC_IPV6_NIB_ROUTER */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
+
+#if !defined(DOXYGEN)
+#if !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
+static inline void
+_init_iface_router(gnrc_netif_t *netif) {
+    (void)netif;
+}
+static inline void
+_call_route_info_cb(gnrc_netif_t *netif, unsigned type,
+                    const ipv6_addr_t *ctx_addr, const void *ctx) {
+    (void)netif; (void)type; (void)ctx_addr; (void)ctx;
+}
+static inline void
+_handle_reply_rs(_nib_onl_entry_t *host) {
+    (void)host;
+}
+static inline void
+_handle_snd_mc_ra(gnrc_netif_t *netif) {
+    (void)netif;
+}
+static inline void
+_set_rtr_adv(gnrc_netif_t *netif) {
+    (void)netif;
+}
+static inline void
+_snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst, bool final) {
+    (void)netif; (void)dst; (void)final;
+}
+static inline void
+_snd_rtr_advs_drop_pfx(gnrc_netif_t *netif, const ipv6_addr_t *dst,
+                       _nib_offl_entry_t *pfx) {
+    (void)netif; (void)dst; (void)pfx;
+}
+#endif /* !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER) */
+#endif /* !defined(DOXYGEN) */
 
 #ifdef __cplusplus
 }
