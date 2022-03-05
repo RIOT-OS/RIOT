@@ -20,10 +20,8 @@
 #include "log.h"
 #include "debug.h"
 #include "encx24j600.h"
+#include "encx24j600_params.h"
 #include "net/gnrc/netif/ethernet.h"
-
-static encx24j600_t encx24j600;
-static gnrc_netif_t _netif;
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
@@ -35,24 +33,37 @@ static gnrc_netif_t _netif;
 #endif
 
 /**
+ * @brief   Find out how many of these devices are present
+ */
+#define ENCX24J600_NUM    ARRAY_SIZE(encx24j600_params)
+
+/**
+ * @brief Allocate device descriptors.
+ */
+static encx24j600_t encx24j600[ENCX24J600_NUM];
+
+/**
+ * @brief Allocate GNRC interfaces.
+ */
+static gnrc_netif_t _netif[ENCX24J600_NUM];
+
+/**
  * @brief   Stacks for the MAC layer threads
  */
-static char _netdev_eth_stack[ENCX24J600_MAC_STACKSIZE];
+static char _netdev_eth_stack[ENCX24J600_NUM][ENCX24J600_MAC_STACKSIZE];
 
 void auto_init_encx24j600(void)
 {
-    LOG_DEBUG("[auto_init_netif] initializing encx24j600 #0\n");
+    for (unsigned i = 0; i < ENCX24J600_NUM; i++) {
+        LOG_DEBUG("[auto_init_netif] initializing encx24j600 #%u\n", i);
 
-    /* setup netdev device */
-    encx24j600_params_t p;
-    p.spi       = ENCX24J600_SPI;
-    p.cs_pin    = ENCX24J600_CS;
-    p.int_pin   = ENCX24J600_INT;
-    encx24j600_setup(&encx24j600, &p);
+        /* setup netdev device */
+        encx24j600_setup(&encx24j600[i], &encx24j600_params[i]);
 
-    /* initialize netdev<->gnrc adapter state */
-    gnrc_netif_ethernet_create(&_netif, _netdev_eth_stack, ENCX24J600_MAC_STACKSIZE,
-                               ENCX24J600_MAC_PRIO, "encx24j600",
-                               &encx24j600.netdev);
+        /* initialize netdev<->gnrc adapter state */
+        gnrc_netif_ethernet_create(&_netif[i], _netdev_eth_stack[i], ENCX24J600_MAC_STACKSIZE,
+                                   ENCX24J600_MAC_PRIO, "encx24j600",
+                                   &encx24j600[i].netdev);
+    }
 }
 /** @} */
