@@ -24,7 +24,7 @@ endif
 
 # The configuration for socket overrides Sock
 ifeq (,$(filter posix_sockets,$(USEMODULE)))
-  CFLAGS += -DWITH_RIOT_GNRC
+  CFLAGS += -DWITH_RIOT_SOCK
 endif
 
 # Default cipher suite when not using Kconfig
