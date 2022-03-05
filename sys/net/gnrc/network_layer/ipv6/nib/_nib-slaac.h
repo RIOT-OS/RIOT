@@ -42,10 +42,8 @@ extern "C" {
  */
 void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
                           uint8_t pfx_len);
-#else   /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
-#define _auto_configure_addr(netif, pfx, pfx_len) \
-    (void)netif; (void)pfx; (void)pfx_len;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
+
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || defined(DOXYGEN)
 /**
  * @brief   Removes a tentative address from the interface and tries to
@@ -69,12 +67,33 @@ void _handle_dad(const ipv6_addr_t *addr);
  * @param[in] addr  A TENTATIVE address.
  */
 void _handle_valid_addr(const ipv6_addr_t *addr);
-#else   /* CONFIG_GNRC_IPV6_NIB_SLAAC */
-#define _remove_tentative_addr(netif, addr) \
-    (void)netif; (void)addr
-#define _handle_dad(addr)           (void)addr
-#define _handle_valid_addr(addr)    (void)addr
 #endif  /* CONFIG_GNRC_IPV6_NIB_SLAAC */
+
+#if !defined(DOXYGEN)
+#if !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) && \
+    !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
+static inline void
+_auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+                     uint8_t pfx_len) {
+    (void)netif; (void)pfx; (void)pfx_len;
+}
+#endif /* !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) &&
+          !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) */
+#if !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
+static inline void
+_remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr) {
+    (void)netif; (void)addr;
+}
+static inline void
+_handle_dad(const ipv6_addr_t *addr) {
+    (void)addr;
+}
+static inline void
+_handle_valid_addr(const ipv6_addr_t *addr) {
+    (void)addr;
+}
+#endif /* !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) */
+#endif /* !defined(DOXYGEN) */
 
 #ifdef __cplusplus
 }
