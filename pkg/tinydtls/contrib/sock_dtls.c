@@ -114,7 +114,6 @@ static int _write(struct dtls_context_t *ctx, session_t *session, uint8_t *buf, 
     sock_udp_ep_t remote;
 
     _session_to_ep(session, &remote);
-    remote.family = AF_INET6;
 
     ssize_t res = sock_udp_send(sock->udp_sock, buf, len, &remote);
     if (res < 0) {
@@ -130,15 +129,15 @@ static int _event(struct dtls_context_t *ctx, session_t *session,
     msg_t msg = { .type = code, .content.ptr = session };
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         switch (code) {
-            case DTLS_EVENT_CONNECT:
-                DEBUG("sock_dtls: event connect\n");
-                break;
-            case DTLS_EVENT_CONNECTED:
-                DEBUG("sock_dtls: event connected\n");
-                break;
-            case DTLS_EVENT_RENEGOTIATE:
-                DEBUG("sock_dtls: event renegotiate\n");
-                break;
+        case DTLS_EVENT_CONNECT:
+            DEBUG("sock_dtls: event connect\n");
+            break;
+        case DTLS_EVENT_CONNECTED:
+            DEBUG("sock_dtls: event connected\n");
+            break;
+        case DTLS_EVENT_RENEGOTIATE:
+            DEBUG("sock_dtls: event renegotiate\n");
+            break;
         }
     }
     if (!level && (code != DTLS_EVENT_CONNECT)) {
@@ -523,17 +522,22 @@ int sock_dtls_session_init(sock_dtls_t *sock, const sock_udp_ep_t *ep,
     if (!sock->udp_sock || (sock_udp_get_local(sock->udp_sock, &local) < 0)) {
         return -EADDRNOTAVAIL;
     }
+
     if (ep->port == 0) {
         return -EINVAL;
     }
+
     switch (ep->family) {
-        case AF_INET:
- #if IS_ACTIVE(SOCK_HAS_IPV6)
-        case AF_INET6:
- #endif
-            break;
-        default:
-            return -EINVAL;
+#ifdef SOCK_HAS_IPV4
+    case AF_INET:
+        break;
+#endif
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
+        break;
+#endif
+    default:
+        return -EINVAL;
     }
 
     /* prepare the remote party to connect to */
@@ -806,24 +810,65 @@ void sock_dtls_init(void)
 static void _ep_to_session(const sock_udp_ep_t *ep, session_t *session)
 {
     session->port = ep->port;
-    session->size = sizeof(ipv6_addr_t) +       /* addr */
+    session->addr_family = ep->family;
+
+#if defined(SOCK_HAS_IPV4) && defined(SOCK_HAS_IPV6)
+    assert(sizeof(session->addr) == sizeof(ipv6_addr_t));
+#elif defined(SOCK_HAS_IPV4)
+    assert(sizeof(session->addr) == sizeof(ipv4_addr_t));
+#else
+    assert(sizeof(session->addr) == sizeof(ipv6_addr_t));
+#endif
+
+    session->size = sizeof(session->addr) +     /* addr */
                     sizeof(unsigned short);     /* port */
-    if (ipv6_addr_is_link_local((ipv6_addr_t *)ep->addr.ipv6)) {
-        /* set ifindex for link-local addresses */
-        session->ifindex = ep->netif;
-    }
-    else {
+
+    switch (ep->family) {
+#ifdef SOCK_HAS_IPV4
+    case AF_INET:
         session->ifindex = SOCK_ADDR_ANY_NETIF;
+        memcpy(&session->addr, &ep->addr.ipv4, sizeof(ipv4_addr_t));
+        break;
+#endif
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
+        if (ipv6_addr_is_link_local((ipv6_addr_t *)ep->addr.ipv6)) {
+            /* set ifindex for link-local addresses */
+            session->ifindex = ep->netif;
+        }
+        else {
+            session->ifindex = SOCK_ADDR_ANY_NETIF;
+        }
+        memcpy(&session->addr, &ep->addr.ipv6, sizeof(ipv6_addr_t));
+        break;
+#endif
+    default:
+        assert(0);
+        return;
     }
-    memcpy(&session->addr, &ep->addr.ipv6, sizeof(ipv6_addr_t));
 }
 
 static void _session_to_ep(const session_t *session, sock_udp_ep_t *ep)
 {
     ep->port = session->port;
     ep->netif = session->ifindex;
-    ep->family = AF_INET6;
-    memcpy(&ep->addr.ipv6, &session->addr, sizeof(ipv6_addr_t));
+    ep->family = session->addr_family;
+
+    switch (session->addr_family) {
+#ifdef SOCK_HAS_IPV4
+    case AF_INET:
+        memcpy(&ep->addr.ipv4, &session->addr, sizeof(ipv4_addr_t));
+        break;
+#endif
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
+        memcpy(&ep->addr.ipv6, &session->addr, sizeof(ipv6_addr_t));
+        break;
+#endif
+    default:
+        /* addr_family is actually ok to be 0 when coming from _copy_buffer */
+        return;
+    }
 }
 
 static inline uint32_t _update_timeout(uint32_t start, uint32_t timeout)
