@@ -12,9 +12,40 @@ RIOTBASE ?= $(CURDIR)/../..
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += netdev_default
-USEMODULE += auto_init_gnrc_netif
-# Specify the mandatory networking modules
-USEMODULE += gnrc_ipv6_default
+
+# use GNRC by default
+LWIP_IPV4 ?= 0
+LWIP_IPV6 ?= 0
+
+ifeq (,$(filter 1, $(LWIP_IPV4) $(LWIP_IPV6)))
+  USEMODULE += auto_init_gnrc_netif
+  # Specify the mandatory networking modules
+  USEMODULE += gnrc_ipv6_default
+  # Additional networking modules that can be dropped if not needed
+  USEMODULE += gnrc_icmpv6_echo
+else
+  USEMODULE += lwip_netdev
+
+  ifneq (0,$(LWIP_IPV4))
+    USEMODULE += ipv4_addr
+
+    USEMODULE += lwip_arp
+    USEMODULE += lwip_ipv4
+    USEMODULE += lwip_dhcp_auto
+    CFLAGS += -DETHARP_SUPPORT_STATIC_ENTRIES=1
+
+    # not included when using IPv4-only, but required by CoAP
+    USEMODULE += random
+  endif
+
+  ifneq (0,$(LWIP_IPV6))
+    USEMODULE += ipv6_addr
+
+    USEMODULE += lwip_ipv6
+    USEMODULE += lwip_ipv6_autoconfig
+  endif
+endif
+
 USEMODULE += gcoap
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
