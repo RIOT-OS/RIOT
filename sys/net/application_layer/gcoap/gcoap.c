@@ -159,7 +159,17 @@ static void *_event_loop(void *arg)
 
     sock_udp_ep_t local;
     memset(&local, 0, sizeof(sock_udp_ep_t));
+
+    /* FIXME: Once the problems with IPv4/IPv6 dual stack use in RIOT are fixed, adapt these lines
+     *        (and e.g. use AF_UNSPEC) */
+#ifdef SOCK_HAS_IPV4
+    local.family = AF_INET;
+#endif
+
+#ifdef SOCK_HAS_IPV6
     local.family = AF_INET6;
+#endif
+
     local.netif  = SOCK_ADDR_ANY_NETIF;
     local.port = CONFIG_GCOAP_PORT;
     int res = sock_udp_create(&_sock_udp, &local, NULL, 0);
@@ -828,8 +838,20 @@ static int _find_resource(gcoap_socket_type_t tl_type,
 
 static bool _memo_ep_is_multicast(const gcoap_request_memo_t *memo)
 {
-    return memo->remote_ep.family == AF_INET6 &&
-           ipv6_addr_is_multicast((const ipv6_addr_t *)&memo->remote_ep.addr.ipv6);
+    switch (memo->remote_ep.family) {
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
+        return ipv6_addr_is_multicast((const ipv6_addr_t *)&memo->remote_ep.addr.ipv6);
+#endif
+#ifdef SOCK_HAS_IPV4
+    case AF_INET:
+        return ipv4_addr_is_multicast((const ipv4_addr_t *)&memo->remote_ep.addr.ipv4);
+#endif
+    default:
+        assert(0);
+    }
+
+    return false;
 }
 
 /*

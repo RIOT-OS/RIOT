@@ -141,18 +141,47 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
     }
 }
 
-static bool _parse_endpoint(sock_udp_ep_t *remote,
-                            const char *addr_str, const char *port_str)
+static bool _parse_endpoint(sock_udp_ep_t *remote, const char *addr_str, const char *port_str)
 {
-    netif_t *netif;
+    bool is_ipv4 = false;
+    bool is_ipv6 = false;
 
-    /* parse hostname */
-    if (netutils_get_ipv6((ipv6_addr_t *)&remote->addr, &netif, addr_str) < 0) {
+    if (IS_ACTIVE(SOCK_HAS_IPV6)) {
+        netif_t *netif;
+        /* IPv6 might contain '.', but IPv4 cannot contain ':' */
+        if (strstr(addr_str, ":") != NULL) {
+
+            /* parse hostname */
+            if (netutils_get_ipv6((ipv6_addr_t *)&remote->addr, &netif, addr_str) < 0) {
+                puts("gcoap_cli: unable to parse destination ipv6 address");
+                return false;
+            }
+
+            is_ipv6 = true;
+            remote->netif = netif ? netif_get_id(netif) : SOCK_ADDR_ANY_NETIF;
+            remote->family = AF_INET6;
+        }
+    }
+
+    if (IS_ACTIVE(SOCK_HAS_IPV4)) {
+        if (!is_ipv6 && strstr(addr_str, ".") != NULL) { /* IPv4 */
+
+            /* parse hostname */
+            if (netutils_get_ipv4((ipv4_addr_t *)&remote->addr, addr_str) < 0) {
+                puts("gcoap_cli: unable to parse destination ipv4 address");
+                return false;
+            }
+
+            is_ipv4 = true;
+            remote->netif = SOCK_ADDR_ANY_NETIF;
+            remote->family = AF_INET;
+        }
+    }
+
+    if (!is_ipv4 && !is_ipv6) {
         puts("gcoap_cli: unable to parse destination address");
         return false;
     }
-    remote->netif = netif ? netif_get_id(netif) : SOCK_ADDR_ANY_NETIF;
-    remote->family = AF_INET6;
 
     /* parse port */
     remote->port = atoi(port_str);
@@ -223,12 +252,34 @@ int gcoap_cli_cmd(int argc, char **argv)
         printf("CoAP open requests: %u\n", open_reqs);
         printf("Configured Proxy: ");
         if (_proxied) {
+#ifdef SOCK_HAS_IPV6
             char addrstr[IPV6_ADDR_MAX_STR_LEN];
-            printf("[%s]:%u\n",
-                   ipv6_addr_to_str(addrstr,
-                                    (ipv6_addr_t *) &_proxy_remote.addr.ipv6,
-                                    sizeof(addrstr)),
-                   _proxy_remote.port);
+#else
+            char addrstr[IPV4_ADDR_MAX_STR_LEN];
+#endif
+
+            switch (_proxy_remote.family) {
+#ifdef SOCK_HAS_IPV4
+            case AF_INET:
+                printf("%s:%u\n",
+                       ipv4_addr_to_str(addrstr,
+                                        (ipv4_addr_t *) &_proxy_remote.addr.ipv4,
+                                        sizeof(addrstr)),
+                       _proxy_remote.port);
+                break;
+#endif
+#ifdef SOCK_HAS_IPV6
+            case AF_INET6:
+                printf("[%s]:%u\n",
+                       ipv6_addr_to_str(addrstr,
+                                        (ipv6_addr_t *) &_proxy_remote.addr.ipv6,
+                                        sizeof(addrstr)),
+                       _proxy_remote.port);
+                break;
+#endif
+            default:
+                assert(0);
+            }
         }
         else {
             puts("None");
@@ -249,7 +300,15 @@ int gcoap_cli_cmd(int argc, char **argv)
             _proxied = false;
             return 0;
         }
-        printf("usage: %s proxy set <addr>[%%iface] <port>\n", argv[0]);
+
+        if (IS_ACTIVE(SOCK_HAS_IPV4)) {
+            printf("usage: %s proxy set <IPv4 addr> <port>\n", argv[0]);
+        }
+
+        if (IS_ACTIVE(SOCK_HAS_IPV6)) {
+            printf("usage: %s proxy set <IPv6 addr>[%%iface] <port>\n", argv[0]);
+        }
+
         printf("       %s proxy unset\n", argv[0]);
         return 1;
     }
@@ -287,7 +346,14 @@ int gcoap_cli_cmd(int argc, char **argv)
         }
 
         if (_proxied) {
-            uri_len = snprintf(proxy_uri, 64, "coap://[%s]:%s%s", argv[apos], argv[apos+1], uri);
+            /* IPv6 might contain '.', but IPv4 cannot contain ':' */
+            if (strstr(argv[apos], ":") != NULL) {
+                uri_len = snprintf(proxy_uri, 64, "coap://[%s]:%s%s",
+                                   argv[apos], argv[apos+1], uri);
+            }
+            else {
+                uri_len = snprintf(proxy_uri, 64, "coap://%s:%s%s", argv[apos], argv[apos+1], uri);
+            }
             uri = proxy_uri;
 
             gcoap_req_init(&pdu, &buf[0], CONFIG_GCOAP_PDU_BUF_SIZE, code_pos, NULL);
@@ -338,9 +404,18 @@ int gcoap_cli_cmd(int argc, char **argv)
         return 0;
     }
     else {
-        printf("usage: %s <get|post|put> [-c] <addr>[%%iface] <port> <path> [data]\n",
-               argv[0]);
-        printf("       %s ping <addr>[%%iface] <port>\n", argv[0]);
+        if (IS_ACTIVE(SOCK_HAS_IPV4)) {
+            printf("usage: %s <get|post|put> [-c] <IPv4 addr> <port> <path> [data]\n",
+                   argv[0]);
+            printf("       %s ping <IPv4 addr> <port>\n", argv[0]);
+        }
+
+        if (IS_ACTIVE(SOCK_HAS_IPV6)) {
+            printf("usage: %s <get|post|put> [-c] <IPv6 addr>[%%iface] <port> <path> [data]\n",
+                   argv[0]);
+            printf("       %s ping <IPv6 addr>[%%iface] <port>\n", argv[0]);
+        }
+
         printf("Options\n");
         printf("    -c  Send confirmably (defaults to non-confirmable)\n");
         return 1;
