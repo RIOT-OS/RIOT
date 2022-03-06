@@ -21,6 +21,8 @@
 #ifndef NET_GNRC_IPV6_NIB_ABR_H
 #define NET_GNRC_IPV6_NIB_ABR_H
 
+#include <errno.h>
+#include <stdbool.h>
 #include <kernel_defines.h>
 
 /* prevent cascading include error to xtimer if it is not compiled in or not
@@ -65,9 +67,6 @@ int gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr);
  * @param[in] addr  The address of an authoritative border router.
  */
 void gnrc_ipv6_nib_abr_del(const ipv6_addr_t *addr);
-#else   /* CONFIG_GNRC_IPV6_NIB_6LBR || defined(DOXYGEN) */
-#define gnrc_ipv6_nib_abr_add(addr)     (-ENOTSUP)
-#define gnrc_ipv6_nib_abr_del(addr)     (void)(addr)
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LBR || defined(DOXYGEN) */
 
 /**
@@ -128,12 +127,34 @@ static inline uint32_t gnrc_ipv6_nib_abr_valid_offset(const gnrc_ipv6_nib_abr_t 
  * @param[in] abr   An authoritative border router list entry
  */
 void gnrc_ipv6_nib_abr_print(gnrc_ipv6_nib_abr_t *abr);
-#else   /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C || defined(DOXYGEN) */
-#define gnrc_ipv6_nib_abr_add(addr)         (-ENOTSUP)
-#define gnrc_ipv6_nib_abr_del(addr)         (void)(addr)
-#define gnrc_ipv6_nib_abr_iter(state, abr)  (false)
-#define gnrc_ipv6_nib_abr_print(abr)        (void)(abr)
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C || defined(DOXYGEN) */
+
+#if !defined(DOXYGEN)
+#if !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C) || \
+    !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)
+static inline int
+gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr) {
+    (void)addr;
+    return -ENOTSUP;
+}
+static inline void
+gnrc_ipv6_nib_abr_del(const ipv6_addr_t *addr) {
+    (void)addr;
+}
+#endif /* !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C) ||
+          !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) */
+#if !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
+static inline bool
+gnrc_ipv6_nib_abr_iter(void **state, gnrc_ipv6_nib_abr_t *abr) {
+    (void)state; (void)abr;
+    return false;
+}
+static inline void
+gnrc_ipv6_nib_abr_print(gnrc_ipv6_nib_abr_t *abr) {
+    (void)abr;
+}
+#endif /* !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C) */
+#endif /* !defined(DOXYGEN) */
 
 #ifdef __cplusplus
 }

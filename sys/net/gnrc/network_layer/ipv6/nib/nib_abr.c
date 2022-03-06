@@ -31,9 +31,9 @@ int gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr)
     _nib_offl_entry_t *offl = NULL;
     gnrc_netif_t *netif = gnrc_netif_get_by_ipv6_addr(addr);
 
-    assert(netif != NULL);
+    assert(netif);
     _nib_acquire();
-    if ((abr = _nib_abr_add(addr)) == NULL) {
+    if (!(abr = _nib_abr_add(addr))) {
         _nib_release();
         return -ENOMEM;
     }
@@ -51,7 +51,7 @@ int gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr)
     }
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX    /* included optionally for NIB testing */
     for (uint8_t id = 0; id < GNRC_SIXLOWPAN_CTX_SIZE; id++) {
-        if (gnrc_sixlowpan_ctx_lookup_id(id) != NULL) {
+        if (gnrc_sixlowpan_ctx_lookup_id(id)) {
             bf_set(abr->ctxs, id);
         }
     }
@@ -73,7 +73,7 @@ bool gnrc_ipv6_nib_abr_iter(void **state, gnrc_ipv6_nib_abr_t *entry)
     _nib_abr_entry_t *abr = *state;
 
     _nib_acquire();
-    while ((abr = _nib_abr_iter(abr)) != NULL) {
+    while ((abr = _nib_abr_iter(abr))) {
         if (!ipv6_addr_is_unspecified(&abr->addr)) {
             memcpy(&entry->addr, &abr->addr, sizeof(entry->addr));
             entry->version = abr->version;
