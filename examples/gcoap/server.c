@@ -75,6 +75,7 @@ static const char *_link_params[] = {
 static gcoap_listener_t _listener = {
     &_resources[0],
     ARRAY_SIZE(_resources),
+    GCOAP_SOCKET_TYPE_UNDEF,
     _encode_link,
     NULL,
     NULL

@@ -26,6 +26,7 @@
 #include <inttypes.h>
 
 #include "timex.h"
+#include "net/gnrc/netif.h"
 #include "net/sock/udp.h"
 #include "tinydtls_keys.h"
 

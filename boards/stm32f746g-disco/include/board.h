@@ -76,11 +76,6 @@ extern "C" {
 #define FT5X06_PARAM_TYPE               FT5X06_TYPE_FT5336      /**< Device type */
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

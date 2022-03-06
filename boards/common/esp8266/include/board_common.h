@@ -114,15 +114,6 @@ extern mtd_dev_t *mtd0;
 #endif /* defined(MODULE_SPIFFS) || defined(DOXYGEN) */
 
 /**
- * @brief Initialize board specific hardware
- *
- * Since all features of ESP8266 boards are provided by the MCU, almost all
- * initializations are done during the CPU initialization that is called from
- * boot loader.
- */
-void board_init (void);
-
-/**
   * @brief Print the board configuration in a human readable format
   */
 void board_print_config (void);

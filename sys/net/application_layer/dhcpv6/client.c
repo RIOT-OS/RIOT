@@ -22,6 +22,7 @@
 #include "kernel_defines.h"
 #include "net/dhcpv6/client.h"
 #include "net/dhcpv6.h"
+#include "net/netif.h"
 #include "net/sock/udp.h"
 #include "random.h"
 #include "timex.h"

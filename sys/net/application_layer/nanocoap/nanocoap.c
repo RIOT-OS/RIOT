@@ -68,6 +68,7 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
 
     pkt->payload = NULL;
     pkt->payload_len = 0;
+    memset(pkt->opt_crit, 0, sizeof(pkt->opt_crit));
 
     if (len < sizeof(coap_hdr_t)) {
         DEBUG("msg too short\n");
@@ -126,6 +127,10 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
                     return -ENOMEM;
                 }
 
+                /* check if option is critical */
+                if (option_nr & 1) {
+                    bf_set(pkt->opt_crit, option_count);
+                }
                 optpos->opt_num = option_nr;
                 optpos->offset = (uintptr_t)option_start - (uintptr_t)hdr;
                 DEBUG("optpos option_nr=%u %u\n", (unsigned)option_nr, (unsigned)optpos->offset);
@@ -176,13 +181,15 @@ int coap_match_path(const coap_resource_t *resource, uint8_t *uri)
     return res;
 }
 
-uint8_t *coap_find_option(const coap_pkt_t *pkt, unsigned opt_num)
+uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num)
 {
     const coap_optpos_t *optpos = pkt->options;
     unsigned opt_count = pkt->options_len;
 
     while (opt_count--) {
         if (optpos->opt_num == opt_num) {
+            unsigned idx = index_of(pkt->options, optpos);
+            bf_unset(pkt->opt_crit, idx);
             return (uint8_t*)pkt->hdr + optpos->offset;
         }
         optpos++;
@@ -219,7 +226,7 @@ static uint8_t *_parse_option(const coap_pkt_t *pkt,
     return pkt_pos;
 }
 
-ssize_t coap_opt_get_opaque(const coap_pkt_t *pkt, unsigned opt_num, uint8_t **value)
+ssize_t coap_opt_get_opaque(coap_pkt_t *pkt, unsigned opt_num, uint8_t **value)
 {
     uint8_t *start = coap_find_option(pkt, opt_num);
     if (!start) {
@@ -237,7 +244,7 @@ ssize_t coap_opt_get_opaque(const coap_pkt_t *pkt, unsigned opt_num, uint8_t **v
     return len;
 }
 
-int coap_opt_get_uint(const coap_pkt_t *pkt, uint16_t opt_num, uint32_t *target)
+int coap_opt_get_uint(coap_pkt_t *pkt, uint16_t opt_num, uint32_t *target)
 {
     assert(target);
 
@@ -262,7 +269,7 @@ int coap_opt_get_uint(const coap_pkt_t *pkt, uint16_t opt_num, uint32_t *target)
     return -ENOENT;
 }
 
-uint8_t *coap_iterate_option(const coap_pkt_t *pkt, uint8_t **optpos,
+uint8_t *coap_iterate_option(coap_pkt_t *pkt, uint8_t **optpos,
                              int *opt_len, int first)
 {
     uint8_t *data_start;
@@ -325,7 +332,7 @@ ssize_t coap_opt_get_next(const coap_pkt_t *pkt, coap_optpos_t *opt,
     return len;
 }
 
-ssize_t coap_opt_get_string(const coap_pkt_t *pkt, uint16_t optnum,
+ssize_t coap_opt_get_string(coap_pkt_t *pkt, uint16_t optnum,
                             uint8_t *target, size_t max_len, char separator)
 {
     assert(pkt && target && (max_len > 1));
@@ -390,6 +397,17 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, unsign
     *szx = blkopt & COAP_BLOCKWISE_SZX_MASK;
 
     return (blkopt & 0x8) ? 1 : 0;
+}
+
+bool coap_has_unprocessed_critical_options(const coap_pkt_t *pkt)
+{
+    for (unsigned i = 0; i < sizeof(pkt->opt_crit); ++i){
+        if (pkt->opt_crit[i]) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len)

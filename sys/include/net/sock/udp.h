@@ -268,6 +268,7 @@
 #ifndef NET_SOCK_UDP_H
 #define NET_SOCK_UDP_H
 
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -605,6 +606,43 @@ static inline ssize_t sock_udp_recv_buf(sock_udp_t *sock,
 }
 
 /**
+ * @brief   Sends a UDP message to remote end point with non-continous payload
+ *
+ * @pre `((sock != NULL || remote != NULL))`
+ *
+ * @param[in] sock      A UDP sock object. May be `NULL`.
+ *                      A sensible local end point should be selected by the
+ *                      implementation in that case.
+ * @param[in] snips     List of payload chunks, will be processed in order.
+ *                      May be `NULL`.
+ * @param[in] remote    Remote end point for the sent data.
+ *                      May be `NULL`, if @p sock has a remote end point.
+ *                      sock_udp_ep_t::family may be AF_UNSPEC, if local
+ *                      end point of @p sock provides this information.
+ *                      sock_udp_ep_t::port may not be 0.
+ * @param[out] aux      Auxiliary data about the transmission.
+ *                      May be `NULL`, if it is not required by the application.
+ *
+ * @return  The number of bytes sent on success.
+ * @return  -EADDRINUSE, if `sock` has no local end-point or was `NULL` and the
+ *          pool of available ephemeral ports is depleted.
+ * @return  -EAFNOSUPPORT, if `remote != NULL` and sock_udp_ep_t::family of
+ *          @p remote is != AF_UNSPEC and not supported.
+ * @return  -EHOSTUNREACH, if @p remote or remote end point of @p sock is not
+ *          reachable.
+ * @return  -EINVAL, if sock_udp_ep_t::addr of @p remote is an invalid address.
+ * @return  -EINVAL, if sock_udp_ep_t::netif of @p remote is not a valid
+ *          interface or contradicts the given local interface (i.e.
+ *          neither the local end point of `sock` nor remote are assigned to
+ *          `SOCK_ADDR_ANY_NETIF` but are nevertheless different.
+ * @return  -EINVAL, if sock_udp_ep_t::port of @p remote is 0.
+ * @return  -ENOMEM, if no memory was available to send @p data.
+ * @return  -ENOTCONN, if `remote == NULL`, but @p sock has no remote end point.
+ */
+ssize_t sock_udp_sendv_aux(sock_udp_t *sock, const iolist_t *snips,
+                           const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux);
+
+/**
  * @brief   Sends a UDP message to remote end point
  *
  * @pre `((sock != NULL || remote != NULL)) && (if (len != 0): (data != NULL))`
@@ -639,8 +677,18 @@ static inline ssize_t sock_udp_recv_buf(sock_udp_t *sock,
  * @return  -ENOMEM, if no memory was available to send @p data.
  * @return  -ENOTCONN, if `remote == NULL`, but @p sock has no remote end point.
  */
-ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
-                          const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux);
+static inline ssize_t sock_udp_send_aux(sock_udp_t *sock,
+                                        const void *data, size_t len,
+                                        const sock_udp_ep_t *remote,
+                                        sock_udp_aux_tx_t *aux)
+{
+    const iolist_t snip = {
+        .iol_base = (void *)data,
+        .iol_len  = len,
+    };
+
+    return sock_udp_sendv_aux(sock, &snip, remote, aux);
+}
 
 /**
  * @brief   Sends a UDP message to remote end point
@@ -680,6 +728,45 @@ static inline ssize_t sock_udp_send(sock_udp_t *sock,
                                     const sock_udp_ep_t *remote)
 {
     return sock_udp_send_aux(sock, data, len, remote, NULL);
+}
+
+/**
+ * @brief   Sends a UDP message to remote end point with non-continous payload
+ *
+ * @pre `((sock != NULL || remote != NULL))`
+ *
+ * @param[in] sock      A UDP sock object. May be `NULL`.
+ *                      A sensible local end point should be selected by the
+ *                      implementation in that case.
+ * @param[in] snips     List of payload chunks, will be processed in order.
+ *                      May be `NULL`.
+ * @param[in] remote    Remote end point for the sent data.
+ *                      May be `NULL`, if @p sock has a remote end point.
+ *                      sock_udp_ep_t::family may be AF_UNSPEC, if local
+ *                      end point of @p sock provides this information.
+ *                      sock_udp_ep_t::port may not be 0.
+ *
+ * @return  The number of bytes sent on success.
+ * @return  -EADDRINUSE, if `sock` has no local end-point or was `NULL` and the
+ *          pool of available ephemeral ports is depleted.
+ * @return  -EAFNOSUPPORT, if `remote != NULL` and sock_udp_ep_t::family of
+ *          @p remote is != AF_UNSPEC and not supported.
+ * @return  -EHOSTUNREACH, if @p remote or remote end point of @p sock is not
+ *          reachable.
+ * @return  -EINVAL, if sock_udp_ep_t::addr of @p remote is an invalid address.
+ * @return  -EINVAL, if sock_udp_ep_t::netif of @p remote is not a valid
+ *          interface or contradicts the given local interface (i.e.
+ *          neither the local end point of `sock` nor remote are assigned to
+ *          `SOCK_ADDR_ANY_NETIF` but are nevertheless different.
+ * @return  -EINVAL, if sock_udp_ep_t::port of @p remote is 0.
+ * @return  -ENOMEM, if no memory was available to send @p data.
+ * @return  -ENOTCONN, if `remote == NULL`, but @p sock has no remote end point.
+ */
+static inline ssize_t sock_udp_sendv(sock_udp_t *sock,
+                                     const iolist_t *snips,
+                                     const sock_udp_ep_t *remote)
+{
+    return sock_udp_sendv_aux(sock, snips, remote, NULL);
 }
 
 #include "sock_types.h"

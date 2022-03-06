@@ -39,12 +39,13 @@
 #include "sched.h"
 #include "rmutex.h"
 
-#ifdef MODULE_ZTIMER_XTIMER_COMPAT
+#if IS_USED(MODULE_ZTIMER64_XTIMER_COMPAT)
+#include "ztimer64/xtimer_compat.h"
+#elif IS_USED(MODULE_ZTIMER_XTIMER_COMPAT)
 #include "ztimer/xtimer_compat.h"
 #else
-
 #include "board.h"
-#ifndef MODULE_XTIMER_ON_ZTIMER
+#if !IS_USED(MODULE_XTIMER_ON_ZTIMER)
 #include "periph_conf.h"
 #endif
 

@@ -25,10 +25,11 @@
 
 #include "disp_dev.h"
 
-static void btn_event_cb(lv_obj_t * btn, lv_event_t event)
+
+static void btn_event_cb(lv_event_t *event)
 {
-    (void)btn;
-    if (event == LV_EVENT_CLICKED) {
+    lv_event_code_t code = lv_event_get_code(event);
+    if (code == LV_EVENT_CLICKED) {
         puts("Button clicked!");
     }
 }
@@ -39,7 +40,7 @@ int main(void)
     disp_dev_backlight_on();
 
     /* Add a button to the current screen */
-    lv_obj_t * btn = lv_btn_create(lv_scr_act(), NULL);
+    lv_obj_t *btn = lv_btn_create(lv_scr_act());
 
     /* Set the button position and size */
     lv_coord_t x_size = 100;
@@ -50,11 +51,12 @@ int main(void)
     lv_obj_set_size(btn, 100, 50);
 
     /*Assign a callback to the button*/
-    lv_obj_set_event_cb(btn, btn_event_cb);
+    lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_ALL, NULL);
 
     /* Add a label to the button */
-    lv_obj_t * label = lv_label_create(btn, NULL);
+    lv_obj_t *label = lv_label_create(btn);
     lv_label_set_text(label, "Click me");
+    lv_obj_center(label);
 
     lvgl_run();
 

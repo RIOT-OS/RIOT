@@ -7,7 +7,7 @@ endif
 
 BOOTLOADER_BIN = bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
 
-ESPTOOL ?= $(RIOTTOOLS)/esptool/esptool.py
+ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool.py
 
 # flasher configuration
 ifneq (,$(filter esp_qemu,$(USEMODULE)))
@@ -43,5 +43,5 @@ ifeq (esp32,$(CPU_FAM))
 endif
 
 # reset tool configuration
-RESET ?= $(RIOTTOOLS)/esptool/espreset.py
+RESET ?= $(RIOTTOOLS)/esptools/espreset.py
 RESET_FLAGS ?= --port $(PROG_DEV)

@@ -31,32 +31,48 @@
 
 #include "screen_dev.h"
 
+#if IS_USED(MODULE_LV_DRIVERS_INDEV_MOUSE)
+#include "indev/mouse.h"
+#endif
+#if IS_USED(MODULE_LV_DRIVERS_SDL)
+#include "sdl/sdl.h"
+#endif
+
 #ifndef LVGL_COLOR_BUF_SIZE
-#define LVGL_COLOR_BUF_SIZE         (LV_HOR_RES_MAX * 5)
+#define LVGL_COLOR_BUF_SIZE                 (LV_HOR_RES_MAX * 10)
 #endif
 
 #ifndef CONFIG_LVGL_INACTIVITY_PERIOD_MS
-#define CONFIG_LVGL_INACTIVITY_PERIOD_MS   (5 * MS_PER_SEC)    /* 5s */
+#define CONFIG_LVGL_INACTIVITY_PERIOD_MS    (5 * MS_PER_SEC)    /* 5s */
 #endif
 
 #ifndef CONFIG_LVGL_TASK_HANDLER_DELAY_MS
-#define CONFIG_LVGL_TASK_HANDLER_DELAY_MS  (5)                 /* 5ms */
+#define CONFIG_LVGL_TASK_HANDLER_DELAY_MS   (5)                 /* 5ms */
 #endif
 
 #ifndef LVGL_THREAD_FLAG
-#define LVGL_THREAD_FLAG            (1 << 7)
+#define LVGL_THREAD_FLAG                    (1 << 7)
 #endif
 
 static kernel_pid_t _task_thread_pid;
 
-static lv_disp_buf_t disp_buf;
-static lv_color_t buf[LVGL_COLOR_BUF_SIZE];
+static lv_disp_draw_buf_t disp_buf;
+static lv_color_t draw_buf[LVGL_COLOR_BUF_SIZE];
 
+static lv_disp_drv_t disp_drv;
+#if IS_USED(MODULE_TOUCH_DEV)
+static lv_indev_drv_t indev_drv;
+#endif
+
+#if !IS_USED(MODULE_LV_DRIVERS_SDL)
 static screen_dev_t *_screen_dev = NULL;
-
 static void _disp_map(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p)
 {
     if (!_screen_dev->display) {
+        return;
+    }
+
+    if (!area) {
         return;
     }
 
@@ -67,13 +83,18 @@ static void _disp_map(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *col
 
     lv_disp_flush_ready(drv);
 }
+#endif
 
-#if IS_USED(MODULE_TOUCH_DEV)
+#if IS_USED(MODULE_TOUCH_DEV) && !IS_USED(MODULE_LV_DRIVERS_SDL)
 /* adapted from https://github.com/lvgl/lvgl/tree/v6.1.2#add-littlevgl-to-your-project */
-static bool _touch_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
+static void _touch_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 {
     if (!_screen_dev->touch) {
-        return false;
+        return;
+    }
+
+    if (!data) {
+        return;
     }
 
     (void)indev_driver;
@@ -94,36 +115,55 @@ static bool _touch_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
     data->point.x = last_x;
     data->point.y = last_y;
 
-    return false;
+    return;
 }
 #endif
 
 void lvgl_init(screen_dev_t *screen_dev)
 {
     lv_init();
+
+#if !IS_USED(MODULE_LV_DRIVERS_SDL)
     _screen_dev = screen_dev;
     assert(screen_dev->display);
+#else
+    (void)screen_dev;
+#endif
 
-    lv_disp_drv_t disp_drv;
+    lv_disp_draw_buf_init(&disp_buf, draw_buf, NULL, LVGL_COLOR_BUF_SIZE);
+
     lv_disp_drv_init(&disp_drv);
+    disp_drv.draw_buf = &disp_buf;
+#if IS_USED(MODULE_LV_DRIVERS_SDL)
+    /* Use SDL driver which creates window on PC's monitor to simulate a display */
+    sdl_init();
+    /* Used when `LV_VDB_SIZE != 0` in lv_conf.h (buffered drawing) */
+    disp_drv.flush_cb = sdl_display_flush;
+#else
+    disp_drv.flush_cb = _disp_map;
     /* Configure horizontal and vertical resolutions based on the
        underlying display device parameters */
     disp_drv.hor_res = disp_dev_width(screen_dev->display);
     disp_drv.ver_res = disp_dev_height(screen_dev->display);
+#endif
 
-    disp_drv.flush_cb = _disp_map;
-    disp_drv.buffer = &disp_buf;
     lv_disp_drv_register(&disp_drv);
-    lv_disp_buf_init(&disp_buf, buf, NULL, LVGL_COLOR_BUF_SIZE);
 
 #if IS_USED(MODULE_TOUCH_DEV)
+#if IS_USED(MODULE_LV_DRIVERS_SDL)
+    /* Add the mouse as input device, use SDL driver which reads the PC's mouse */
+    lv_indev_drv_init(&indev_drv);
+    indev_drv.type = LV_INDEV_TYPE_POINTER;
+    indev_drv.read_cb = sdl_mouse_read;
+    lv_indev_drv_register(&indev_drv);
+#else
     if (screen_dev->touch) {
-        lv_indev_drv_t indev_drv;
         lv_indev_drv_init(&indev_drv);
         indev_drv.type = LV_INDEV_TYPE_POINTER;
         indev_drv.read_cb = _touch_read;
         lv_indev_drv_register(&indev_drv);
     }
+#endif
 #endif
 }
 
@@ -131,18 +171,15 @@ void lvgl_run(void)
 {
     _task_thread_pid = thread_getpid();
 
-    lv_task_handler();
-
     while (1) {
         /* Normal operation (no sleep) in < CONFIG_LVGL_INACTIVITY_PERIOD_MS msec
            inactivity */
         if (lv_disp_get_inactive_time(NULL) < CONFIG_LVGL_INACTIVITY_PERIOD_MS) {
-            lv_task_handler();
+            lv_timer_handler();
         }
         else {
             /* Block after LVGL_ACTIVITY_PERIOD msec inactivity */
             thread_flags_wait_one(LVGL_THREAD_FLAG);
-
             /* trigger an activity so the task handler is called on the next loop */
             lv_disp_trig_activity(NULL);
         }

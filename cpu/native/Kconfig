@@ -25,6 +25,7 @@ config CPU_ARCH_NATIVE
 
     # needed modules
     select MODULE_PERIPH if TEST_KCONFIG
+    select MODULE_ZTIMER64_XTIMER_COMPAT if MODULE_ZTIMER_XTIMER_COMPAT
 
 config CPU_CORE_NATIVE
     bool

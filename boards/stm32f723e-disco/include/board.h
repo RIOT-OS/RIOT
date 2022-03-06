@@ -71,11 +71,6 @@ extern "C" {
 #define FT5X06_PARAM_TYPE               FT5X06_TYPE_FT6X06      /**< Device type */
 /** @} */
 
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

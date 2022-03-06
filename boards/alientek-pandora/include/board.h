@@ -71,11 +71,6 @@ extern "C" {
 #define BTN2_MODE           GPIO_IN_PD          /**< Button 2 mode   */
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

@@ -1,4 +1,4 @@
-BOARD ?= atxmega_a1u_xpro
+BOARD ?= atxmega-a1u-xpro
 
 include ../Makefile.tests_common
 

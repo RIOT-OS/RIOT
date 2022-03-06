@@ -85,11 +85,6 @@ extern "C" {
 #define BTN3_MODE           GPIO_IN         /**< BTN3 default mode */
 /** @} */
 
-/**
- * @brief   Initialize the platform
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

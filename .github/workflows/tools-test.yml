@@ -24,6 +24,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install tox
         python -m pip install kconfiglib
+        sudo apt-get update
         sudo apt-get install gcc-multilib
     - name: Test backport_pr
       run: cd dist/tools/backport_pr && tox
