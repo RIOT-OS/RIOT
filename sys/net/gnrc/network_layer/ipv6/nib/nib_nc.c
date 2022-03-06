@@ -30,17 +30,17 @@ int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
 {
     _nib_onl_entry_t *node;
 
-    assert(ipv6 != NULL);
+    assert(ipv6);
     assert(l2addr_len <= CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN);
     assert((iface > KERNEL_PID_UNDEF) && (iface <= KERNEL_PID_LAST));
     _nib_acquire();
     node = _nib_nc_add(ipv6, iface, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNMANAGED);
-    if (node == NULL) {
+    if (!node) {
         _nib_release();
         return -ENOMEM;
     }
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
-    if ((l2addr != NULL) && (l2addr_len > 0)) {
+    if (l2addr && (l2addr_len > 0)) {
         memcpy(node->l2addr, l2addr, l2addr_len);
     }
     node->l2addr_len = l2addr_len;
@@ -64,7 +64,7 @@ void gnrc_ipv6_nib_nc_del(const ipv6_addr_t *ipv6, unsigned iface)
     _nib_onl_entry_t *node = NULL;
 
     _nib_acquire();
-    while ((node = _nib_onl_iter(node)) != NULL) {
+    while ((node = _nib_onl_iter(node))) {
         if ((_nib_onl_get_if(node) == iface) &&
             ipv6_addr_equal(ipv6, &node->ipv6)) {
             _nib_nc_remove(node);
@@ -79,7 +79,7 @@ void gnrc_ipv6_nib_nc_mark_reachable(const ipv6_addr_t *ipv6)
     _nib_onl_entry_t *node = NULL;
 
     _nib_acquire();
-    while ((node = _nib_onl_iter(node)) != NULL) {
+    while ((node = _nib_onl_iter(node))) {
         if ((node->mode & _NC) && ipv6_addr_equal(ipv6, &node->ipv6)) {
             /* only set reachable if not unmanaged */
             if ((node->info & GNRC_IPV6_NIB_NC_INFO_NUD_STATE_MASK)) {
@@ -97,7 +97,7 @@ bool gnrc_ipv6_nib_nc_iter(unsigned iface, void **state,
     _nib_onl_entry_t *node = *state;
 
     _nib_acquire();
-    while ((node = _nib_onl_iter(node)) != NULL) {
+    while ((node = _nib_onl_iter(node))) {
         if ((node->mode & _NC) &&
             ((iface == 0) || (_nib_onl_get_if(node) == iface))) {
             _nib_nc_get(node, entry);
