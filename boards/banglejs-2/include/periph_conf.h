@@ -60,7 +60,7 @@ static const spi_conf_t spi_config[] = {
  */
 static const i2c_conf_t i2c_config[] = {
     {
-        .dev = NRF_TWIM1,
+        .dev = NRF_TWIM0,
         .scl = GPIO_PIN(1, 2),
         .sda = GPIO_PIN(1, 1),
         .speed = I2C_SPEED_FAST
