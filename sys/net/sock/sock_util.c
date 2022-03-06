@@ -43,28 +43,25 @@ int sock_tl_ep_fmt(const struct _sock_tl_ep *endpoint,
     *addr_str = '\0';
 
     switch (endpoint->family) {
-        case AF_INET:
-            {
-                addr_ptr = (void*)&endpoint->addr.ipv4;
-                break;
-            }
-#if defined(SOCK_HAS_IPV6)
-        case AF_INET6:
-            {
-                addr_ptr = (void*)&endpoint->addr.ipv6;
-                break;
-            }
-#endif /* else fall through */
-        default:
-            return -ENOTSUP;
+#ifdef SOCK_HAS_IPV4
+    case AF_INET:
+        addr_ptr = &endpoint->addr.ipv4;
+        break;
+#endif
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
+        addr_ptr = &endpoint->addr.ipv6;
+        break;
+#endif
+    default:
+        return -ENOTSUP;
     }
 
     if (!inet_ntop(endpoint->family, addr_ptr, addr_str, INET6_ADDRSTRLEN)) {
         return 0;
     }
 
-#if defined(SOCK_HAS_IPV6)
-    if ((endpoint->family == AF_INET6) && endpoint->netif) {
+    if (IS_ACTIVE(SOCK_HAS_IPV6) && (endpoint->family == AF_INET6) && endpoint->netif) {
 #ifdef MODULE_FMT
         char *tmp = addr_str + strlen(addr_str);
         *tmp++ = '%';
@@ -240,17 +237,21 @@ int sock_tl_str2ep(struct _sock_tl_ep *ep_out, const char *str)
     hostbuf[hostlen] = '\0';
 
     if (!brackets_flag) {
+#ifdef SOCK_HAS_IPV4
         if (inet_pton(AF_INET, hostbuf, &ep_out->addr.ipv4) == 1) {
             ep_out->family = AF_INET;
             return 0;
         }
+#endif
     }
-#if defined(SOCK_HAS_IPV6)
+
+#ifdef SOCK_HAS_IPV6
     if (inet_pton(AF_INET6, hostbuf, ep_out->addr.ipv6) == 1) {
         ep_out->family = AF_INET6;
         return 0;
     }
 #endif
+
     return -EINVAL;
 }
 
@@ -266,14 +267,15 @@ bool sock_tl_ep_equal(const struct _sock_tl_ep *a,
 
     /* compare addresses */
     switch (a->family) {
-#ifdef SOCK_HAS_IPV6
-        case AF_INET6:
-            return (memcmp(a->addr.ipv6, b->addr.ipv6, 16) == 0);
-
+#ifdef SOCK_HAS_IPV4
+    case AF_INET:
+        return memcmp(a->addr.ipv4, b->addr.ipv4, 4) == 0;
 #endif
-        case AF_INET:
-            return (memcmp(a->addr.ipv4, b->addr.ipv4, 4) == 0);
-        default:
-            return false;
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
+        return memcmp(a->addr.ipv6, b->addr.ipv6, 16) == 0;
+#endif
+    default:
+        return false;
     }
 }
