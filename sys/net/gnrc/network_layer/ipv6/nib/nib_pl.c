@@ -33,7 +33,7 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
     _nib_offl_entry_t *dst;
     ipv6_addr_t tmp = IPV6_ADDR_UNSPECIFIED;
 
-    assert((pfx != NULL));
+    assert(pfx);
     if (pfx_len > IPV6_ADDR_BIT_LEN) {
         pfx_len = IPV6_ADDR_BIT_LEN;
     }
@@ -44,17 +44,15 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
         return -EINVAL;
     }
     _nib_acquire();
-    dst = _nib_pl_add(iface, pfx, pfx_len, valid_ltime,
-                      pref_ltime);
-    if (dst == NULL) {
+    if (!(dst = _nib_pl_add(iface, pfx, pfx_len, valid_ltime, pref_ltime))) {
         _nib_release();
         return -ENOMEM;
     }
-#ifdef MODULE_GNRC_NETIF
+#if IS_USED(MODULE_GNRC_NETIF)
     gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
     int idx;
 
-    if (netif == NULL) {
+    if (!netif) {
         _nib_release();
         return 0;
     }
@@ -85,7 +83,7 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
     gnrc_netif_release(netif);
 #endif  /* MODULE_GNRC_NETIF */
     _nib_release();
-#if defined(MODULE_GNRC_NETIF) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
+#if IS_USED(MODULE_GNRC_NETIF) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     /* update prefixes down-stream */
     _handle_snd_mc_ra(netif);
 #endif
@@ -97,10 +95,10 @@ void gnrc_ipv6_nib_pl_del(unsigned iface,
 {
     _nib_offl_entry_t *dst = NULL;
 
-    assert(pfx != NULL);
+    assert(pfx);
     _nib_acquire();
-    while ((dst = _nib_offl_iter(dst)) != NULL) {
-        assert(dst->next_hop != NULL);
+    while ((dst = _nib_offl_iter(dst))) {
+        assert(dst->next_hop);
         if ((pfx_len == dst->pfx_len) &&
             ((iface == 0) || (iface == _nib_onl_get_if(dst->next_hop))) &&
             (ipv6_addr_match_prefix(pfx, &dst->pfx) >= pfx_len)) {
@@ -127,9 +125,9 @@ bool gnrc_ipv6_nib_pl_iter(unsigned iface, void **state,
     _nib_offl_entry_t *dst = *state;
 
     _nib_acquire();
-    while ((dst = _nib_offl_iter(dst)) != NULL) {
+    while ((dst = _nib_offl_iter(dst))) {
         const _nib_onl_entry_t *node = dst->next_hop;
-        if ((node != NULL) && (dst->mode & _PL) &&
+        if (node && (dst->mode & _PL) &&
             ((iface == 0) || (_nib_onl_get_if(node) == iface))) {
             entry->pfx_len = dst->pfx_len;
             ipv6_addr_set_unspecified(&entry->pfx);
