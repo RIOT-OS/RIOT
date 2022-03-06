@@ -16,4 +16,10 @@ rsource "link_layer/Kconfig"
 rsource "lora/Kconfig"
 rsource "netif/Kconfig"
 
+config RFC_RELAXED_PARAMS
+    bool "Do not strictly adhere to parameters recommended in RFCs"
+    help
+        Allow RIOT-OS's default values for network parameters to deviate in
+        some places from values various RFCs recommend to better suit constrained
+        devices.
 endmenu # Networking
