@@ -16,6 +16,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "net/utils.h"
 #ifdef MODULE_SOCK_DNS
