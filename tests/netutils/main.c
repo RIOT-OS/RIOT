@@ -121,7 +121,73 @@ static void test_ipv6_addr_from_str__success5(void)
     TEST_ASSERT(ipv6_addr_equal(&a, &address));
 }
 
-Test *tests_netutils_tests(void)
+static void test_ipv4_addr_from_str__missing_parts(void)
+{
+    ipv4_addr_t address;
+
+    TEST_ASSERT_EQUAL_INT(netutils_get_ipv4(&address, "1"), -EINVAL);
+    TEST_ASSERT_EQUAL_INT(netutils_get_ipv4(&address, "1."), -EINVAL);
+    TEST_ASSERT_EQUAL_INT(netutils_get_ipv4(&address, "1.2"), -EINVAL);
+    TEST_ASSERT_EQUAL_INT(netutils_get_ipv4(&address, "1.2."), -EINVAL);
+    TEST_ASSERT_EQUAL_INT(netutils_get_ipv4(&address, "1.2.3"), -EINVAL);
+    TEST_ASSERT_EQUAL_INT(netutils_get_ipv4(&address, "1.2.3."), -EINVAL);
+}
+
+static void test_ipv4_addr_from_str__illegal_chars(void)
+{
+    ipv4_addr_t address;
+
+    TEST_ASSERT_EQUAL_INT(netutils_get_ipv4(&address, ":-D"), -ENOTSUP);
+}
+
+static void test_ipv4_addr_from_str__addr_NULL(void)
+{
+    ipv4_addr_t address;
+
+    TEST_ASSERT_EQUAL_INT(netutils_get_ipv4(&address, NULL), -EINVAL);
+}
+
+static void test_ipv4_addr_from_str__address_NULL(void)
+{
+    TEST_ASSERT_NULL(ipv4_addr_from_str(NULL, "1.2.3.4"));
+}
+
+static void test_ipv4_addr_from_str__success(void)
+{
+    static const ipv4_addr_t a = { { 0x01, 0x02, 0x03, 0x04 } };
+    ipv4_addr_t address;
+
+    TEST_ASSERT_EQUAL_INT(netutils_get_ipv4(&address, "1.2.3.4"), 0);
+    TEST_ASSERT(ipv4_addr_equal(&a, &address));
+}
+
+static void test_ipv4_addr_from_str__success2(void)
+{
+    static const ipv4_addr_t a = { { 0x5d, 0xb8, 0xd8, 0x22 } };
+    ipv4_addr_t address;
+
+    TEST_ASSERT_EQUAL_INT(netutils_get_ipv4(&address, "example.com"), 0);
+    TEST_ASSERT(ipv4_addr_equal(&a, &address));
+}
+
+Test *tests_netutils_ipv4_tests(void)
+{
+    EMB_UNIT_TESTFIXTURES(fixtures) {
+        /* IPv4 tests */
+        new_TestFixture(test_ipv4_addr_from_str__missing_parts),
+        new_TestFixture(test_ipv4_addr_from_str__illegal_chars),
+        new_TestFixture(test_ipv4_addr_from_str__addr_NULL),
+        new_TestFixture(test_ipv4_addr_from_str__address_NULL),
+        new_TestFixture(test_ipv4_addr_from_str__success),
+        new_TestFixture(test_ipv4_addr_from_str__success2),
+    };
+
+    EMB_UNIT_TESTCALLER(ipv4_addr_tests, NULL, NULL, fixtures);
+
+    return (Test *)&ipv4_addr_tests;
+}
+
+Test *tests_netutils_ipv6_tests(void)
 {
     for (unsigned i = 0; i < ARRAY_SIZE(dummy_netif); ++i) {
         netif_register(&dummy_netif[i].netif);
@@ -149,7 +215,8 @@ Test *tests_netutils_tests(void)
 int main(void)
 {
     TESTS_START();
-    TESTS_RUN(tests_netutils_tests());
+    TESTS_RUN(tests_netutils_ipv4_tests());
+    TESTS_RUN(tests_netutils_ipv6_tests());
     TESTS_END();
 
     return 0;
