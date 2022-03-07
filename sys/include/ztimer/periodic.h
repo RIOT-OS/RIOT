@@ -81,6 +81,11 @@ extern "C" {
 #define ZTIMER_PERIODIC_KEEP_GOING true
 
 /**
+ * @brief Type of callbacks in @ref ztimer_periodic_t "periodic timers"
+ */
+typedef bool (*ztimer_periodic_callback_t)(void *);
+
+/**
  * @brief   ztimer periodic structure
  */
 typedef struct {
@@ -88,7 +93,7 @@ typedef struct {
     ztimer_clock_t *clock;      /**< clock for this timer               */
     uint32_t interval;          /**< interval of this timer             */
     ztimer_now_t last;          /**< last trigger time                  */
-    bool (*callback)(void *);   /**< called on each trigger             */
+    ztimer_periodic_callback_t callback;   /**< called on each trigger             */
     void *arg;                  /**< argument for callback              */
 } ztimer_periodic_t;
 
