@@ -456,9 +456,9 @@ checksum = "f497285884f3fcff424ffc933e56d7cbca511def0c9831a7f9b5f6153e3cc89b"
 
 [[package]]
 name = "riot-sys"
-version = "0.7.2"
+version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0945e5819b4bf59e0af38998faab1846dc8e9f530b968ace030a66029acdfc69"
+checksum = "b2041eeef3e226f836d27cace1e6131f88a53b53df0ae62eb1cae060d9eb2a6e"
 dependencies = [
  "bindgen",
  "c2rust-asm-casts",
@@ -472,9 +472,9 @@ dependencies = [
 
 [[package]]
 name = "riot-wrappers"
-version = "0.7.17"
+version = "0.7.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b62946759a8042f516e6b395cc1183da6435e84fcd7a1cd4d9138c8e6a8820ec"
+checksum = "1fc2844134d2599d7a010382c659aa0713d9ddc845a3791bf48e2801e9f4c59f"
 dependencies = [
  "bare-metal 1.0.0",
  "cstr_core",
@@ -637,9 +637,9 @@ dependencies = [
 
 [[package]]
 name = "termcolor"
-version = "1.1.2"
+version = "1.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2dfed899f0eb03f32ee8c6a0aabdb8a7949659e3466561fc0adf54e26d88c5f4"
+checksum = "bab24d30b911b2376f3a13cc2cd443142f0c81dda04c118693e35b3835757755"
 dependencies = [
  "winapi-util",
 ]
