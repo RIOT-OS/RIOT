@@ -284,29 +284,49 @@ for ESP32 boards, see \ref esp32_riot.
 ## On-Chip Debugging with the Device {#esp32_wrover_kit_debugging}
 
 Since the USB bridge based on FDI FT2232HL provides a JTAG interface for
-debugging through an USB interface, using ESP-ROVER-KIT is the easiest and most
-convenient way for On-Chip debugging. Please refer the
-[ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/jtag-debugging/index.html)
-for details on how to setup and how to use ESP-WROVER-KIT and OpenOCD.
+debugging through an USB interface, using ESP-WROVER-Kit V3 is the easiest
+and most convenient way for On-Chip debugging. Please refer the
+[ESP-IDF Programming Guide]
+(https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/jtag-debugging/index.html)
+for details on how to setup and how to use ESP-WROVER-Kit V3 and OpenOCD.
 
-To use the JTAG interface, the `esp_jtag` module must be enabled.
+To use the JTAG interface, the `esp_jtag` module has to be enabled for
+compilation.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-USEMODULE+=esp_jtag make flash BOARD=esp32-wrover-kit ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To flash using OpenOCD, install the [openocd-esp32](https://github.com/espressif/openocd-esp32) fork.
-The OpenOCD configuration selected by default is for using JTAG via the FTDI chip.
-Export where openocd is located and then flash with PROGRAMMER set:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-export OPENOCD="~/openocd-esp32/src/openocd -s ~/openocd-esp32/tcl"
-PROGRAMMER=openocd USEMODULE+=esp_jtag make flash BOARD=esp32-wrover-kit
+USEMODULE=esp_jtag make flash BOARD=esp32-wrover-kit ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To start a debugging session (board will be reset, but not flashed):
+To flash and debug using OpenOCD, the precompiled version of OpenOCD for
+ESP32 has to be installed using the install script while being in RIOT's
+root directory, see also section [Using Local Toolchain Installation]
+(#esp32_local_toolchain_installation).
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-export OPENOCD="~/openocd-esp32/src/openocd -s ~/openocd-esp32/tcl"
-PROGRAMMER=openocd USEMODULE+=esp_jtag make debug BOARD=esp32-wrover-kit
+dist/tools/esptool/install.sh openocd
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before OpenOCD can then be used, the `PATH` variable has to be set correctly
+and the `OPENOCD` variable has to be exported using the following command.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+. dist/tools/esptool/export.sh openocd
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once the `PATH` variable and the `OPENOCD` variable are set, OpenOCD can be used
+
+- to flash the application using command
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  PROGRAMMER=openocd USEMODULE=esp_jtag make flash BOARD=esp32-wrover-kit ...
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- to start a debugging session (the board will be reset, but not flashed)
+  using command
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  PROGRAMMER=openocd USEMODULE=esp_jtag make debug BOARD=esp32-wrover-kit ...
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+by setting the `PROGRAMMER` variable to `openocd`.
+
+@note Even if the JTAG interface is used for debugging, the ESP32 standard
+method for flashing with `esptool.py` can still be used. In that case, the
+`flash` target is made without setting the `PROGRAMMER` variable.
 
 [Back to table of contents](#esp32_wrover_kit_toc)
 
