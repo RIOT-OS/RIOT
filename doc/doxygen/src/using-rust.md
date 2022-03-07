@@ -84,9 +84,19 @@ Toolchain {#toolchain}
 
 To install the necessary Rust components, it is easiest use [**rustup**, installed as described on its website].
 
-Using Rust on RIOT requires a nightly version of Rust,
+Using most of Rust on RIOT requires a nightly version of Rust,
 because some transpiled expressions for RIOT make use of unstable features,
 and because the RIOT wrappers use some unstable idioms.
+
+@note
+Building on stable is supported for some examples and platforms starting with Rust 1.59
+(e.g., the rust-hello-world on any ARM Cortex, but not yet on native).
+Try it out by adding `CARGO_CHANNEL=stable` to the project's Makefile;
+where it doesn't work, rustc will complain that "`#![feature]` may not be used on the stable release channel".
+
+@note
+A stable version of Rust is not currently provided with the Docker images;
+consequently, builds on stable are not tested as regularly as builds on nightly.
 
 Make sure you have both the nightly **toolchain**
 and the core library for the CPU (**target**) of your choice available:
