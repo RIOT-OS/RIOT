@@ -289,6 +289,11 @@ typedef struct ztimer_base ztimer_base_t;
 typedef struct ztimer_clock ztimer_clock_t;
 
 /**
+ * @brief Type of callbacks in @ref ztimer_t "timers"
+ */
+typedef void (*ztimer_callback_t)(void *arg);
+
+/**
  * @brief   Minimum information for each timer
  */
 struct ztimer_base {
@@ -310,7 +315,7 @@ typedef uint32_t ztimer_now_t;  /**< type for ztimer_now() result */
  */
 typedef struct {
     ztimer_base_t base;             /**< clock list entry */
-    void (*callback)(void *arg);    /**< timer callback function pointer */
+    ztimer_callback_t callback;     /**< timer callback function pointer */
     void *arg;                      /**< timer callback argument */
 } ztimer_t;
 
