@@ -246,7 +246,7 @@ ifneq (,$(filter posix_select,$(USEMODULE)))
   endif
   USEMODULE += core_thread_flags
   USEMODULE += posix_headers
-  USEMODULE += xtimer
+  USEMODULE += ztimer64_usec
 endif
 
 ifneq (,$(filter picolibc,$(USEMODULE)))
@@ -390,7 +390,7 @@ ifneq (,$(filter netstats_neighbor_%, $(USEMODULE)))
 endif
 
 ifneq (,$(filter pthread,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer64_usec
   USEMODULE += timex
   ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
     # requires 64bit ftimestamps
