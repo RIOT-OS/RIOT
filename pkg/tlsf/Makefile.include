@@ -7,3 +7,5 @@ endif
 
 PSEUDOMODULES += tlsf-malloc_newlib
 PSEUDOMODULES += tlsf-malloc_native
+
+CFLAGS += -Wno-cast-align
