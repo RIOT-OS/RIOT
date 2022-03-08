@@ -237,39 +237,44 @@ static int _gap_event_cb(struct ble_gap_event *event, void *arg)
     switch (event->type) {
 
     case BLE_GAP_EVENT_CONNECT:
-        _debug_printf("BLE_GAP_EVENT_CONNECT\n");
-        if (event->connect.status == 0) {
+        _debug_printf("BLE_GAP_EVENT_CONNECT handle: %d\n", event->connect.conn_handle);
+        if (event->connect.status == 0 && _conn_handle == 0) {
             _status = STDIO_NIMBLE_CONNECTED;
             if (CONFIG_STDIO_NIMBLE_CLEAR_BUFFER_ON_CONNECT) {
                 _purge_buffer();
             }
-            _conn_handle = event->connect.conn_handle;
         }
-        else {
+        else if (event->connect.conn_handle == _conn_handle) {
+            _conn_handle = 0;
             _status = STDIO_NIMBLE_DISCONNECTED;
         }
         break;
 
     case BLE_GAP_EVENT_DISCONNECT:
-        _debug_printf("BLE_GAP_EVENT_DISCONNECT\n");
-        _status = STDIO_NIMBLE_DISCONNECTED;
+        _debug_printf("BLE_GAP_EVENT_DISCONNECT %d\n", event->disconnect.conn.conn_handle);
+        if (event->disconnect.conn.conn_handle == _conn_handle) {
+            _status = STDIO_NIMBLE_DISCONNECTED;
+            _conn_handle = 0;
+        }
         break;
 
     case BLE_GAP_EVENT_SUBSCRIBE:
-        _debug_printf("BLE_GAP_EVENT_SUBSCRIBE\n");
+        _debug_printf("BLE_GAP_EVENT_SUBSCRIBE %d\n", event->subscribe.conn_handle);
         if (event->subscribe.attr_handle == _val_handle_stdout) {
             if (event->subscribe.cur_indicate == 1) {
                 _status = STDIO_NIMBLE_SUBSCRIBED;
+                _conn_handle = event->subscribe.conn_handle;
             }
             else {
                 _status = STDIO_NIMBLE_CONNECTED;
+                _conn_handle = 0;
             }
         }
         break;
 
     case BLE_GAP_EVENT_NOTIFY_TX:
-        _debug_printf("BLE_GAP_EVENT_NOTIFY_TX\n");
-        if (event->notify_tx.indication == 1) {
+        _debug_printf("BLE_GAP_EVENT_NOTIFY_TX %d\n", event->notify_tx.conn_handle);
+        if (event->notify_tx.indication == 1 && (event->notify_tx.conn_handle == _conn_handle)) {
             if (event->notify_tx.status == BLE_HS_EDONE) {
                 _status = STDIO_NIMBLE_SUBSCRIBED;
             }
@@ -356,9 +361,11 @@ ssize_t stdio_write(const void *buffer, size_t len)
 
     unsigned int consumed = tsrb_add(&_tsrb_stdout, buffer, len);
 
-    if (!ble_npl_callout_is_active(&_send_stdout_callout)) {
-        /* bootstrap callout */
-        ble_npl_callout_reset(&_send_stdout_callout, CALLOUT_TICKS_MS);
+    if (_status == STDIO_NIMBLE_SUBSCRIBED || _status == STDIO_NIMBLE_SENDING) {
+        if (!ble_npl_callout_is_active(&_send_stdout_callout)) {
+            /* bootstrap callout */
+            ble_npl_callout_reset(&_send_stdout_callout, CALLOUT_TICKS_MS);
+        }
     }
 
     return consumed;
