@@ -316,12 +316,8 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
 endif
 
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
-  USEMODULE += sema
-  USEMODULE += xtimer
-  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-    # requires sema_timed that requires 64bit
-    USEMODULE += ztimer64_xtimer_compat
-  endif
+  USEMODULE += sema_deprecated
+  USEMODULE += ztimer64_usec
   USEMODULE += posix_headers
 endif
 
