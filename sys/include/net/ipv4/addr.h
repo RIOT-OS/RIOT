@@ -52,7 +52,7 @@ typedef union {
  * @return  true, if @p a and @p b are equal
  * @return  false, otherwise.
  */
-static inline bool ipv4_addr_equal(ipv4_addr_t *a, ipv4_addr_t *b)
+static inline bool ipv4_addr_equal(const ipv4_addr_t *a, const ipv4_addr_t *b)
 {
     return (a->u32.u32 == b->u32.u32);
 }
