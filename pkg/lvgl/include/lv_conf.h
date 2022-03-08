@@ -66,9 +66,13 @@ extern "C" {
 #if LV_MEM_CUSTOM == 0
 /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
 #if IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW)
+#  ifndef LV_MEM_SIZE
 #  define LV_MEM_SIZE    (6U * 1024U)          /*[bytes]*/
+#  endif
 #else
+#  ifndef LV_MEM_SIZE
 #  define LV_MEM_SIZE    (5U * 1024U)          /*[bytes]*/
+#  endif
 #endif
 
 /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
