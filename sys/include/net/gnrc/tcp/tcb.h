@@ -21,10 +21,10 @@
 #define NET_GNRC_TCP_TCB_H
 
 #include <stdint.h>
-#include "kernel_types.h"
 #include "ringbuffer.h"
-#include "xtimer.h"
 #include "mutex.h"
+#include "evtimer_msg.h"
+#include "evtimer_mbox.h"
 #include "msg.h"
 #include "mbox.h"
 #include "net/gnrc/pkt.h"
@@ -39,14 +39,9 @@ extern "C" {
 #endif
 
 /**
- * @brief Size of the TCB mbox
- */
-#define GNRC_TCP_TCB_MBOX_SIZE (8U)
-
-/**
  * @brief Transmission control block of GNRC TCP.
  */
-typedef struct _transmission_control_block {
+typedef struct sock_tcp {
     uint8_t address_family;                   /**< Address Family of local_addr / peer_addr */
 #ifdef MODULE_GNRC_IPV6
     uint8_t local_addr[sizeof(ipv6_addr_t)];  /**< Local IP address */
@@ -72,17 +67,31 @@ typedef struct _transmission_control_block {
     int32_t srtt;          /**< Smoothed round trip time */
     int32_t rto;           /**< Retransmission timeout duration */
     uint8_t retries;       /**< Number of retransmissions */
-    xtimer_t tim_tout;     /**< Timer struct for timeouts */
-    msg_t msg_tout;        /**< Message, sent on timeouts */
-    gnrc_pktsnip_t *pkt_retransmit;   /**< Pointer to packet in "retransmit queue" */
-    msg_t mbox_raw[GNRC_TCP_TCB_MBOX_SIZE];   /**< Msg queue for mbox */
-    mbox_t mbox;             /**< TCB mbox for synchronization */
+    evtimer_msg_event_t event_retransmit; /**< Retransmission event */
+    evtimer_msg_event_t event_timeout;    /**< Timeout event */
+    evtimer_mbox_event_t event_misc;      /**< General purpose event */
+    gnrc_pktsnip_t *pkt_retransmit;       /**< Pointer to packet in "retransmit queue" */
+    mbox_t *mbox;            /**< TCB mbox for synchronization */
     uint8_t *rcv_buf_raw;    /**< Pointer to the receive buffer */
     ringbuffer_t rcv_buf;    /**< Receive buffer data structure */
     mutex_t fsm_lock;        /**< Mutex for FSM access synchronization */
     mutex_t function_lock;   /**< Mutex for function call synchronization */
-    struct _transmission_control_block *next;   /**< Pointer next TCB */
+    struct sock_tcp *next;   /**< Pointer next TCB */
 } gnrc_tcp_tcb_t;
+
+/**
+ * @brief Transmission control block queue.
+ */
+typedef struct sock_tcp_queue {
+    mutex_t lock;         /**< Mutex for access synchronization */
+    gnrc_tcp_tcb_t *tcbs; /**< Pointer to TCB sequence */
+    size_t tcbs_len;      /**< Number of TCBs behind member tcbs */
+} gnrc_tcp_tcb_queue_t;
+
+/**
+ * @brief Static initializer for type gnrc_tcp_tcb_queue_t
+ */
+#define GNRC_TCP_TCB_QUEUE_INIT   { MUTEX_INIT, NULL, 0 }
 
 #ifdef __cplusplus
 }

@@ -31,7 +31,9 @@ extern "C" {
 #endif
 
 /** Static initializer for mbox objects */
-#define MBOX_INIT(queue, queue_size) {{0}, {0}, CIB_INIT(queue_size), queue}
+#define MBOX_INIT(queue, queue_size) { \
+        { 0 }, { 0 }, CIB_INIT(queue_size), queue \
+}
 
 /**
  * @brief Mailbox struct definition
@@ -57,9 +59,11 @@ enum {
  * @param[in]   queue       array of msg_t used as queue
  * @param[in]   queue_size  number of msg_t objects in queue
  */
-static inline void mbox_init(mbox_t *mbox, msg_t *queue, unsigned int queue_size)
+static inline void mbox_init(mbox_t *mbox, msg_t *queue,
+                             unsigned int queue_size)
 {
     mbox_t m = MBOX_INIT(queue, queue_size);
+
     *mbox = m;
 }
 
@@ -153,6 +157,32 @@ static inline void mbox_get(mbox_t *mbox, msg_t *msg)
 static inline int mbox_try_get(mbox_t *mbox, msg_t *msg)
 {
     return _mbox_get(mbox, msg, NON_BLOCKING);
+}
+
+/**
+ * @brief Get mbox queue size (capacity)
+ *
+ * @param[in] mbox  ptr to mailbox to operate on
+ *
+ * @return  size of mbox queue (or 0 if there's no queue)
+ */
+static inline size_t mbox_size(mbox_t *mbox)
+{
+    return mbox->cib.mask ? mbox->cib.mask + 1 : 0;
+}
+
+/**
+ * @brief Get messages available in mbox
+ *
+ * Returns the number of messages that can be retrieved without blocking.
+ *
+ * @param[in] mbox  ptr to mailbox to operate on
+ *
+ * @return  number of available messages
+ */
+static inline size_t mbox_avail(mbox_t *mbox)
+{
+    return cib_avail(&mbox->cib);
 }
 
 #ifdef __cplusplus

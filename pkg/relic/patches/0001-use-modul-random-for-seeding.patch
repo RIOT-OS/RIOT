@@ -1,0 +1,28 @@
+From 14b985c86fd0f97b186adc445c224794c3c1b97b Mon Sep 17 00:00:00 2001
+From: maksim-ka <42pema1bif@hft-stuttgart.de>
+Date: Fri, 31 Jan 2020 15:15:46 +0100
+Subject: [PATCH 1/2] use modul random for seeding
+
+---
+ src/rand/relic_rand_core.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/rand/relic_rand_core.c b/src/rand/relic_rand_core.c
+index 10f8929f..804b4455 100644
+--- a/src/rand/relic_rand_core.c
++++ b/src/rand/relic_rand_core.c
+@@ -171,6 +171,11 @@ void rand_init(void) {
+ 		}
+ 	}
+ 
++#elif SEED == RIOTRND && defined(MODULE_RANDOM)
++
++    void random_bytes(uint8_t *buf, size_t size);
++	random_bytes(buf, RLC_RAND_SEED);
++
+ #endif
+ 
+ #endif /* RAND == UDEV */
+-- 
+2.33.1
+

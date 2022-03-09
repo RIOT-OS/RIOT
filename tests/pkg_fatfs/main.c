@@ -23,7 +23,6 @@
 #endif
 #include "mtd.h"
 #include "fatfs_diskio_mtd.h"
-#include "fatfs/ff.h"
 #include "shell.h"
 #include <string.h>
 #include <stdlib.h>
@@ -58,7 +57,7 @@ mtd_dev_t *fatfs_mtd_devs[1];
 #include "mtd_sdcard.h"
 #include "sdcard_spi_params.h"
 #define SDCARD_SPI_NUM ARRAY_SIZE(sdcard_spi_params)
-/* sdcard devs are provided by sys/auto_init/storage/auto_init_sdcard_spi.c */
+/* sdcard devs are provided by drivers/sdcard_spi/sdcard_spi.c */
 extern sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
 mtd_sdcard_t mtd_sdcard_devs[SDCARD_SPI_NUM];
 mtd_dev_t *fatfs_mtd_devs[SDCARD_SPI_NUM];
@@ -319,22 +318,22 @@ static int _ls(int argc, char **argv)
 static int _mkfs(int argc, char **argv)
 {
     int vol_idx;
-    BYTE opt;
+    MKFS_PARM opt = {0};
 
     if (argc == 3) {
         vol_idx = atoi(argv[1]);
 
         if (strcmp(argv[2], "fat") == 0) {
-            opt = FM_FAT;
+            opt.fmt = FM_FAT;
         }
         else if (strcmp(argv[2], "fat32") == 0) {
-            opt = FM_FAT32;
+            opt.fmt = FM_FAT32;
         }
         else if (strcmp(argv[2], "exfat") == 0) {
-            opt = FM_EXFAT;
+            opt.fmt = FM_EXFAT;
         }
         else {
-            opt = FM_ANY;
+            opt.fmt = FM_ANY;
         }
     }
     else {
@@ -353,8 +352,7 @@ static int _mkfs(int argc, char **argv)
 
     puts("formatting media...");
 
-    /* au = 0: use default allocation unit size depending on volume size */
-    FRESULT mkfs_resu = f_mkfs(volume_str, opt, 0,  work, sizeof(work));
+    FRESULT mkfs_resu = f_mkfs(volume_str, &opt, work, sizeof(work));
 
     if (mkfs_resu == FR_OK) {
         puts("[OK]");
@@ -399,7 +397,6 @@ int main(void)
            time.tm_sec);
     rtc_set_time(&time);
     #endif
-
 
     #if MODULE_MTD_NATIVE
     fatfs_mtd_devs[0] = mtd0;

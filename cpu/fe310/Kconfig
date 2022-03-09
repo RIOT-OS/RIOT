@@ -1,0 +1,57 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_FAM_FE310
+    bool
+    select CPU_CORE_RV32IMAC
+    select HAS_CPU_FE310
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_GPIO
+    select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_PM
+    select HAS_PERIPH_PLIC
+    select HAS_PERIPH_RTT_OVERFLOW
+    select HAS_PERIPH_RTT_SET_COUNTER
+    select HAS_PERIPH_WDT
+
+    select MODULE_PERIPH_PLIC if TEST_KCONFIG
+    select MODULE_PERIPH_CORETIMER if MODULE_PERIPH_TIMER && HAS_PERIPH_CORETIMER
+    select MODULE_PERIPH_RTT if MODULE_PERIPH_RTC && HAS_PERIPH_RTT
+    select MODULE_ZTIMER_NO_PERIPH_RTT if TEST_KCONFIG && MODULE_ZTIMER
+
+config CPU_MODEL_FE310_G000
+    bool
+    select CPU_FAM_FE310
+
+config CPU_MODEL_FE310_G002
+    bool
+    select CPU_FAM_FE310
+
+## Definition of specific features
+config HAS_CPU_FE310
+    bool
+    help
+        Indicates that a 'fe310' cpu is being used.
+
+config CPU_FAM
+    default "fe310" if CPU_FAM_FE310
+
+config CPU_MODEL
+    default "fe310_g000"  if CPU_MODEL_FE310_G000
+    default "fe310_g002"  if CPU_MODEL_FE310_G002
+
+config CPU
+    default "fe310" if CPU_FAM_FE310
+
+config CPU_CORE
+    default "rv32imac" if CPU_CORE_RV32IMAC
+
+rsource "Kconfig.clk"
+rsource "periph/Kconfig"
+rsource "vendor/Kconfig"
+
+source "$(RIOTCPU)/riscv_common/Kconfig"

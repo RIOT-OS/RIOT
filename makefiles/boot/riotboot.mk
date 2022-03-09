@@ -1,4 +1,5 @@
 ifneq (,$(filter riotboot,$(FEATURES_USED)))
+ifneq (1,$(RIOTBOOT_BUILD))
 
 .PHONY: riotboot/flash riotboot/flash-bootloader riotboot/flash-slot0 riotboot/flash-slot1 riotboot/bootloader/%
 
@@ -13,13 +14,9 @@ BINDIR_APP = $(BINDIR)/$(APPLICATION)
 #
 export SLOT0_OFFSET SLOT0_LEN SLOT1_OFFSET SLOT1_LEN
 
-# Mandatory APP_VER, set to epoch by default, or "0" for CI build
-ifeq (1, RIOT_CI_BUILD)
-  APP_VER ?= 0
-else
-  EPOCH := $(shell date +%s)
-  APP_VER ?= $(EPOCH)
-endif
+# Mandatory APP_VER, set to epoch by default
+EPOCH := $(shell date +%s)
+APP_VER ?= $(EPOCH)
 
 # Final target for slot 0 with riot_hdr
 SLOT0_RIOT_BIN = $(BINDIR_APP)-slot0.$(APP_VER).riot.bin
@@ -31,7 +28,7 @@ SLOT_RIOT_BINS = $(SLOT0_RIOT_BIN) $(SLOT1_RIOT_BIN)
 # This results in the equivalent to "make flash-only" for
 # "make riotboot/flash-slot[01]".
 ifneq (1, $(RIOTBOOT_SKIP_COMPILE))
-$(BINDIR_APP)-%.elf: $(BASELIBS)
+$(BINDIR_APP)-%.elf: $(BASELIBS) $(ARCHIVES)
 	$(Q)$(_LINK) -o $@
 endif
 
@@ -62,7 +59,7 @@ $(HEADER_TOOL): FORCE
 	@echo "compiling $@..."
 	$(Q)/usr/bin/env -i \
 		QUIET=$(QUIET) \
-		PATH=$(PATH) \
+		PATH="$(PATH)" \
 			$(MAKE) --no-print-directory -C $(HEADER_TOOL_DIR) all
 
 # Generate RIOT header and keep the original binary file
@@ -79,10 +76,16 @@ riotboot: $(SLOT_RIOT_BINS)
 
 # riotboot bootloader compile target
 riotboot/flash-bootloader: riotboot/bootloader/flash
-riotboot/bootloader/%:
+# IOTLAB_NODE is passed so that FLASHFILE is also set in the recursive make call
+# when PROGRAMMER=iotlab
+# avoid circular dependency against clean
+riotboot/bootloader/%: $$(if $$(filter riotboot/bootloader/clean,$$@),,$$(BUILDDEPS) pkg-prepare)
 	$(Q)/usr/bin/env -i \
-		QUIET=$(QUIET)\
-		PATH=$(PATH) BOARD=$(BOARD) DEBUG_ADAPTER_ID=$(DEBUG_ADAPTER_ID)\
+		QUIET=$(QUIET) PATH="$(PATH)"\
+		EXTERNAL_BOARD_DIRS="$(EXTERNAL_BOARD_DIRS)" BOARD=$(BOARD)\
+		DEBUG_ADAPTER_ID=$(DEBUG_ADAPTER_ID) \
+		IOTLAB_NODE=$(IOTLAB_NODE) \
+		PROGRAMMER=$(PROGRAMMER) PROGRAMMER_QUIET=$(PROGRAMMER_QUIET) \
 			$(MAKE) --no-print-directory -C $(RIOTBOOT_DIR) $*
 
 # Generate a binary file from the bootloader which fills all the
@@ -96,6 +99,7 @@ $(BOOTLOADER_BIN)/riotboot.extended.bin: $(BOOTLOADER_BIN)/riotboot.bin
 
 # Only call sub make if not already in riotboot
 ifneq ($(BOOTLOADER_BIN)/riotboot.bin,$(BINFILE))
+  clean: riotboot/bootloader/clean
   $(BOOTLOADER_BIN)/riotboot.bin: riotboot/bootloader/binfile
 endif
 
@@ -125,12 +129,14 @@ riotboot/flash-extended-slot0: $(RIOTBOOT_EXTENDED_BIN) $(FLASHDEPS)
 	$(flash-recipe)
 
 # Flashing rule for slot 0
+riotboot/flash-slot0: DFU_ALT=0
 riotboot/flash-slot0: export IMAGE_OFFSET=$(SLOT0_OFFSET)
 riotboot/flash-slot0: FLASHFILE=$(SLOT0_RIOT_BIN)
 riotboot/flash-slot0: $(SLOT0_RIOT_BIN) $(FLASHDEPS)
 	$(flash-recipe)
 
 # Flashing rule for slot 1
+riotboot/flash-slot1: DFU_ALT=1
 riotboot/flash-slot1: export IMAGE_OFFSET=$(SLOT1_OFFSET)
 riotboot/flash-slot1: FLASHFILE=$(SLOT1_RIOT_BIN)
 riotboot/flash-slot1: $(SLOT1_RIOT_BIN) $(FLASHDEPS)
@@ -149,8 +155,8 @@ riotboot/flash: riotboot/flash-slot0 riotboot/flash-bootloader
 FLASHFILE = $(RIOTBOOT_EXTENDED_BIN)
 
 # include suit targets
-ifneq (,$(filter suit_v4, $(USEMODULE)))
-  include $(RIOTMAKE)/suit.v4.inc.mk
+ifneq (,$(filter suit, $(USEMODULE)))
+  include $(RIOTMAKE)/suit.inc.mk
 endif
 
 else
@@ -158,4 +164,5 @@ riotboot:
 	$(Q)echo "error: riotboot feature not selected! (try FEATURES_REQUIRED += riotboot)"
 	$(Q)false
 
+endif # (1,$(RIOTBOOT_BUILD))
 endif # (,$(filter riotboot,$(FEATURES_USED)))

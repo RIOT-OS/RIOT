@@ -51,7 +51,6 @@ extern "C" {
  * @{
  */
 #define UART_NUMOF          (1U)
-#define UART_0_EN           (1U)
 
 #define UART_BASE           (USART_1)
 #define UART_IE             (SFR->IE2)
@@ -81,9 +80,9 @@ extern "C" {
 #define SPI_IE_TX_BIT       (1 << 7)
 #define SPI_ME              (SFR->ME1)
 #define SPI_ME_BIT          (1 << 6)
-#define SPI_PIN_MISO        GPIO_PIN(P3,2)
-#define SPI_PIN_MOSI        GPIO_PIN(P3,1)
-#define SPI_PIN_CLK         GPIO_PIN(P3,3)
+#define SPI_PIN_MISO        GPIO_PIN(P3, 2)
+#define SPI_PIN_MOSI        GPIO_PIN(P3, 1)
+#define SPI_PIN_CLK         GPIO_PIN(P3, 3)
 /** @} */
 
 #ifdef __cplusplus

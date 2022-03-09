@@ -88,6 +88,7 @@ extern "C" {
 #define NDP_OPT_PI                  (3)     /**< prefix information option */
 #define NDP_OPT_RH                  (4)     /**< redirected option */
 #define NDP_OPT_MTU                 (5)     /**< MTU option */
+#define NDP_OPT_RI                  (24)    /**< Route Information Option */
 #define NDP_OPT_RDNSS               (25)    /**< recursive DNS server option */
 #define NDP_OPT_AR                  (33)    /**< address registration option */
 #define NDP_OPT_6CTX                (34)    /**< 6LoWPAN context option */
@@ -101,6 +102,17 @@ extern "C" {
 #define NDP_OPT_PI_FLAGS_MASK       (0xc0)
 #define NDP_OPT_PI_FLAGS_L          (0x80)  /**< on-link */
 #define NDP_OPT_PI_FLAGS_A          (0x40)  /**< autonomous address configuration */
+/** @} */
+
+/**
+ * @{
+ * @name    Flags for route information option
+ */
+#define NDP_OPT_RI_FLAGS_MASK       (0x18)
+#define NDP_OPT_RI_FLAGS_PRF_NONE   (0x10)  /**< ignore preference */
+#define NDP_OPT_RI_FLAGS_PRF_NEG    (0x18)  /**< negative preference */
+#define NDP_OPT_RI_FLAGS_PRF_ZERO   (0x0)   /**< zero preference */
+#define NDP_OPT_RI_FLAGS_PRF_POS    (0x8)   /**< positive preference */
 /** @} */
 
 /**
@@ -307,6 +319,21 @@ typedef struct __attribute__((packed)) {
     network_uint32_t resv;          /**< reserved field */
     ipv6_addr_t prefix;             /**< prefix */
 } ndp_opt_pi_t;
+
+/**
+ * @brief   Route information option format
+ * @extends ndp_opt_t
+ *
+ * @see     [RFC 4191, section 2.3](https://tools.ietf.org/html/rfc4191#section-2.3)
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t type;                   /**< option type */
+    uint8_t len;                    /**< length in units of 8 octets */
+    uint8_t prefix_len;             /**< prefix length */
+    uint8_t flags;                  /**< flags */
+    network_uint32_t route_ltime;   /**< route lifetime */
+    ipv6_addr_t prefix;             /**< prefix */
+} ndp_opt_ri_t;
 
 /**
  * @brief   Redirected header option format

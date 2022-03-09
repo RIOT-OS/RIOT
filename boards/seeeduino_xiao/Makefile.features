@@ -1,0 +1,19 @@
+CPU = samd21
+CPU_MODEL = samd21g18a
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += highlevel_stdio
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_rtc
+FEATURES_PROVIDED += periph_rtt
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_usbdev
+
+# This configuration enables modules that are only available when using Kconfig
+# module modelling
+ifeq (1, $(TEST_KCONFIG))
+  KCONFIG_ADD_CONFIG += $(RIOTBOARD)/common/samdx1-arduino-bootloader/samdx1-arduino-bootloader.config
+endif

@@ -1,0 +1,46 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_PERIPH_RTC
+    bool "RTC peripheral driver"
+    depends on HAS_PERIPH_RTC
+    select MODULE_PERIPH_COMMON
+    select MODULE_RTC_UTILS
+
+if MODULE_PERIPH_RTC
+
+config MODULE_PERIPH_INIT_RTC
+    bool "Auto initialize RTC peripheral"
+    default y if MODULE_PERIPH_INIT
+
+config MODULE_PERIPH_RTC_MS
+    bool "Support for time with sub-second component"
+    depends on HAS_PERIPH_RTC_MS
+    help
+        Provides an interface to access the RTC time with a sub-second
+        component.
+
+endif #MODULE_PERIPH_RTC
+
+config MODULE_PERIPH_RTC_MEM
+    bool "Low-Power RTC Memory"
+    depends on HAS_PERIPH_RTC_MEM
+    help
+        Provides an interface to access low-power memory present on some RTCs.
+        This memory is retained even when the rest of the system is powered off.
+
+# TODO: this module is actually just an artifact from the way periph_init_%
+# modules are handled in Makefile. We need to define it to keep the list the
+# same for now. We should be able to remove it later on.
+
+config MODULE_PERIPH_INIT_RTC_MEM
+    bool
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_RTC_MEM
+
+# Include CPU specific configurations
+osource "$(RIOTCPU)/$(CPU)/periph/Kconfig.rtc"

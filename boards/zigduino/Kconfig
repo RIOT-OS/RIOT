@@ -1,0 +1,27 @@
+# Copyright (c) 2021 Benjamin Valentin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+
+config BOARD
+    default "zigduino" if BOARD_ZIGDUINO
+
+config BOARD_ZIGDUINO
+    bool
+    default y
+    select CPU_MODEL_ATMEGA128RFA1
+    select HAS_PERIPH_ADC
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_RTC
+    select HAS_PERIPH_RTT
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+
+    select MODULE_BOARDS_COMMON_ATMEGA if TEST_KCONFIG
+    select HAVE_SAUL_ADC
+    select HAVE_SAUL_GPIO
+
+source "$(RIOTBOARD)/common/atmega/Kconfig"

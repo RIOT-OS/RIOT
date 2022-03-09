@@ -1,0 +1,62 @@
+# Copyright (c) 2020 iosabi
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_FAM_QN908X
+    bool
+    select CPU_CORE_CORTEX_M4F
+    select HAS_CORTEXM_MPU
+    select HAS_CPU_QN908X
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_GPIO
+    select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_I2C_RECONFIGURE
+    select HAS_PERIPH_RTC
+    select HAS_PERIPH_SPI_RECONFIGURE
+    select HAS_PERIPH_WDT
+    select HAS_PERIPH_WDT_CB
+
+    select MODULE_VENDOR if TEST_KCONFIG
+    # The clock functionality is used by most modules, including cpu.c even when
+    # no peripheral module is being used.
+    select MODULE_VENDOR_FSL_CLOCK if TEST_KCONFIG
+    select MODULE_PERIPH_GPIO_MUX if TEST_KCONFIG
+
+## CPU Models
+# For cpus QN9080CHN (revision C) and QN9080DHN (revision D)
+config CPU_MODEL_QN9080XHN
+    bool
+    select CPU_FAM_QN908X
+
+# For the smaller package for the same die, with 28 GPIOs instead of 35.
+# cpus QN9083CUK (revision C) and QN9083DUK (revision D)
+config CPU_MODEL_QN9083XUK
+    bool
+    select CPU_FAM_QN908X
+
+## CPU common symbols
+config CPU_FAM
+    default "qn908x" if CPU_FAM_QN908X
+
+config CPU_MODEL
+    default "qn9080xhn" if CPU_MODEL_QN9080XHN
+    default "qn9083xhk" if CPU_MODEL_QN9083XUK
+
+config CPU
+    default "qn908x" if CPU_FAM_QN908X
+
+## Definition of specific features
+config HAS_CPU_QN908X
+    bool
+    help
+        Indicates that the current cpu is 'qn908x'.
+
+# Other cpu configuration
+rsource "Kconfig.clk"
+rsource "periph/Kconfig"
+rsource "vendor/Kconfig"
+
+source "$(RIOTCPU)/cortexm_common/Kconfig"

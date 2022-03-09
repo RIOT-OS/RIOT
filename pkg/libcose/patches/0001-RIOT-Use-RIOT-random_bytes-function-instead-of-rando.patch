@@ -67,20 +67,19 @@ index c24d751..3bdcabf 100644
  }
  #endif /* CRYPTO_HACL_INCLUDE_CHACHAPOLY */
 diff --git a/src/crypt/monocypher.c b/src/crypt/monocypher.c
-index 9e4dcbc..d1fcac1 100644
+index f3186f7..fd27839 100644
 --- a/src/crypt/monocypher.c
 +++ b/src/crypt/monocypher.c
-@@ -17,8 +17,7 @@
- #include <monocypher.h>
+@@ -19,7 +19,7 @@
  #include "cose/crypto.h"
  #include "cose/crypto/selectors.h"
--
+ 
 -extern void randombytes(uint8_t *target, uint64_t n);
 +#include "random.h"
+ static const uint8_t zero[32] = { 0 };
  
  #ifdef CRYPTO_MONOCYPHER_INCLUDE_CHACHAPOLY
- static uint32_t load32_le(const uint8_t *u)
-@@ -105,7 +104,7 @@ COSE_ssize_t cose_crypto_keygen_chachapoly(uint8_t *sk, size_t len)
+@@ -109,7 +109,7 @@ COSE_ssize_t cose_crypto_keygen_chachapoly(uint8_t *sk, size_t len)
      if (len < 64) {
          return COSE_ERR_NOMEM;
      }
@@ -89,14 +88,14 @@ index 9e4dcbc..d1fcac1 100644
      return 64;
  }
  #endif /* CRYPTO_MONOCYPHER_INCLUDE_CHACHAPOLY */
-@@ -133,7 +132,7 @@ static void _ed25519_clamp(uint8_t *key)
+@@ -137,7 +137,7 @@ static void _ed25519_clamp(uint8_t *key)
  
  void cose_crypto_keypair_ed25519(cose_key_t *key)
  {
 -    randombytes(key->d, COSE_CRYPTO_SIGN_ED25519_SECRETKEYBYTES);
 +    random_bytes(key->d, COSE_CRYPTO_SIGN_ED25519_SECRETKEYBYTES);
      _ed25519_clamp(key->d);
-     crypto_sign_public_key(key->x, key->d);
+     crypto_ed25519_public_key(key->x, key->d);
  }
 -- 
 2.21.0

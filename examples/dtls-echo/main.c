@@ -7,7 +7,6 @@
  * directory for more details.
  */
 
-
 /**
  * @ingroup     examples
  * @{

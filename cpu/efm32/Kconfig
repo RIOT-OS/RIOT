@@ -1,0 +1,57 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_COMMON_EFM32
+    bool
+    select HAS_ARCH_EFM32
+    select HAS_CPU_EFM32
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_PAGEWISE
+    select HAS_PERIPH_GPIO
+    select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_RTT_SET_COUNTER
+    select HAS_PERIPH_RTT_OVERFLOW
+    select HAS_PERIPH_WDT
+    select HAVE_SHARED_PERIPH_RTT_PERIPH_RTC
+
+    select PACKAGE_GECKO_SDK if TEST_KCONFIG
+    select PACKAGE_CMSIS-DSP if CPU_CORE_CORTEX_M0PLUS && TEST_KCONFIG
+
+config CPU_EFM32_SERIES0
+    bool
+
+config CPU_EFM32_SERIES1
+    bool
+    select HAS_PERIPH_WDT_CB
+
+## Definition of specific features
+config HAS_ARCH_EFM32
+    bool
+    help
+        Indicates that the 'efm32' architecture is being used.
+
+config HAS_CPU_EFM32
+    bool
+    help
+        Indicates that the CPU being used is an EFM32.
+
+## Common CPU symbols
+config CPU
+    default "efm32" if CPU_COMMON_EFM32
+
+config ERROR_MODULES_CONFLICT
+    default "On the EFM32, the RTC and RTT map to the same hardware peripheral." if MODULE_PERIPH_RTC && MODULE_PERIPH_RTT
+    depends on CPU_COMMON_EFM32
+
+menu "EFM32 drivers"
+rsource "drivers/coretemp/Kconfig"
+endmenu
+
+rsource "periph/Kconfig"
+
+orsource "families/*/Kconfig"
+source "$(RIOTCPU)/cortexm_common/Kconfig"

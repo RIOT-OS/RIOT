@@ -2,7 +2,9 @@ MODULE = wolfssl
 
 NO_AUTO_SRC = 1
 SUBMODULES += 1
-SUBMODULES_NOFORCE = 1
 
+ifeq (llvm,$(TOOLCHAIN))
+  CFLAGS += -Wno-unused-parameter
+endif
 
 include $(RIOTBASE)/Makefile.base

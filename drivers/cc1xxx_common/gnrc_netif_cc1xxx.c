@@ -26,9 +26,10 @@
 
 #include "assert.h"
 #include "net/gnrc.h"
+#include "luid.h"
 #include "cc1xxx_common.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define BCAST  (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)
@@ -96,7 +97,7 @@ static gnrc_pktsnip_t *cc1xxx_adpt_recv(gnrc_netif_t *netif)
     DEBUG("[cc1xxx-gnrc] recv: successfully parsed packet\n");
 
     /* and append the netif header */
-    LL_APPEND(payload, hdr);
+    payload = gnrc_pkt_append(payload, hdr);
 
 #ifdef MODULE_NETSTATS_L2
     netif->stats.rx_count++;
@@ -121,7 +122,6 @@ static int cc1xxx_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     size = gnrc_pkt_len(pkt->next);
     DEBUG("[cc1xxx-gnrc] send: payload of packet is %i\n", (int)size);
     netif_hdr = (gnrc_netif_hdr_t *)pkt->data;
-
 
     l2hdr.src_addr = cc1xxx_dev->addr;
     if (netif_hdr->flags & BCAST) {
@@ -166,10 +166,18 @@ static const gnrc_netif_ops_t cc1xxx_netif_ops = {
     .set = gnrc_netif_set_from_netdev,
 };
 
-gnrc_netif_t *gnrc_netif_cc1xxx_create(char *stack, int stacksize,
-                                       char priority, char *name,
-                                       netdev_t *dev)
+int gnrc_netif_cc1xxx_create(gnrc_netif_t *netif, char *stack, int stacksize,
+                             char priority, char *name, netdev_t *dev)
 {
-    return gnrc_netif_create(stack, stacksize, priority, name,
+    return gnrc_netif_create(netif, stack, stacksize, priority, name,
                              dev, &cc1xxx_netif_ops);
+}
+
+void __attribute__((weak)) cc1xxx_eui_get(const netdev_t *netdev, uint8_t *eui)
+{
+    (void)netdev;
+    do {
+        luid_get(eui, 1);
+    }
+    while (*eui == CC1XXX_BCAST_ADDR);
 }

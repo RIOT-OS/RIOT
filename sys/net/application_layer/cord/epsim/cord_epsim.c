@@ -55,7 +55,7 @@ int cord_epsim_register(const sock_udp_ep_t *rd_ep)
 
     /* build the initial CON packet */
     if (gcoap_req_init(&pkt, buf, sizeof(buf), COAP_METHOD_POST,
-                             "/.well-known/core") < 0) {
+                             "/.well-known/rd") < 0) {
         return CORD_EPSIM_ERROR;
     }
     /* make packet confirmable */
@@ -65,7 +65,7 @@ int cord_epsim_register(const sock_udp_ep_t *rd_ep)
         return CORD_EPSIM_ERROR;
     }
     /* finish, we don't have any payload */
-    ssize_t len = gcoap_finish(&pkt, 0, COAP_FORMAT_NONE);
+    ssize_t len = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
     _state = CORD_EPSIM_BUSY;
     if (gcoap_req_send(buf, len, rd_ep, _req_handler, NULL) == 0) {
         return CORD_EPSIM_ERROR;

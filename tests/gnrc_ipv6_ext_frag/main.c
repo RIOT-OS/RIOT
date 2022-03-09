@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -39,6 +40,7 @@
 #include "od.h"
 #include "random.h"
 #include "shell.h"
+#include "test_utils/expect.h"
 #include "xtimer.h"
 
 #define TEST_SAMPLE         "This is a test. Failure might sometimes be an " \
@@ -81,14 +83,10 @@ static int shell_test_cmd(int argc, char **argv);
 
 static netdev_test_t mock_netdev;
 static gnrc_netif_t *eth_netif, *mock_netif;
+static gnrc_netif_t _netif;
 static ipv6_addr_t *local_addr;
 static char mock_netif_stack[THREAD_STACKSIZE_DEFAULT];
 static char line_buf[SHELL_DEFAULT_BUFSIZE];
-static const shell_command_t shell_commands[] = {
-    { "udp", "send data over UDP and listen on UDP ports", udp_cmd },
-    { "test", "sends data according to a specified numeric test", shell_test_cmd },
-    { NULL, NULL, NULL }
-};
 
 static const ipv6_addr_t _src = { .u8 = TEST_SRC };
 static const ipv6_addr_t _dst = { .u8 = TEST_DST };
@@ -115,7 +113,7 @@ static void test_ipv6_ext_frag_rbuf_get(void)
     TEST_ASSERT_MESSAGE(&ipv6 == rbuf->ipv6, "IPv6 header is not the same");
 
     /* check that reassembly buffer never gets full */
-    for (unsigned i = 1; i < (2 * GNRC_IPV6_EXT_FRAG_RBUF_SIZE); i++) {
+    for (unsigned i = 1; i < (2 * CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_SIZE); i++) {
         rbuf = gnrc_ipv6_ext_frag_rbuf_get(
                 &ipv6, TEST_ID + i
             );
@@ -176,7 +174,7 @@ static void test_ipv6_ext_frag_rbuf_gc(void)
     TEST_ASSERT_NOT_NULL(rbuf->pkt);
     TEST_ASSERT_MESSAGE(pkt->data == rbuf->ipv6, "IPv6 header is not the same");
 
-    rbuf->arrival -= GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US;
+    rbuf->arrival -= CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US;
     gnrc_ipv6_ext_frag_rbuf_gc();
     TEST_ASSERT_NULL(rbuf->pkt);
     TEST_ASSERT_NULL(rbuf->ipv6);
@@ -304,7 +302,6 @@ static void test_ipv6_ext_frag_reass_out_of_order(void)
     gnrc_ipv6_ext_frag_rbuf_t *rbuf;
     gnrc_ipv6_ext_frag_limits_t *ptr;
 
-
     ipv6->nh = PROTNUM_IPV6_EXT_FRAG;
     ipv6->hl = TEST_HL;
     ipv6->len = byteorder_htons(pkt->size);
@@ -414,8 +411,7 @@ static void test_ipv6_ext_frag_reass_out_of_order_rbuf_full(void)
     gnrc_ipv6_ext_frag_limits_t *ptr;
     static const uint32_t foreign_id = TEST_ID + 44U;
 
-
-    TEST_ASSERT_EQUAL_INT(1, GNRC_IPV6_EXT_FRAG_RBUF_SIZE);
+    TEST_ASSERT_EQUAL_INT(1, CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_SIZE);
     /* prepare fragment from a from a foreign datagram */
     ipv6->nh = PROTNUM_IPV6_EXT_FRAG;
     ipv6->hl = TEST_HL;
@@ -547,7 +543,7 @@ static gnrc_pktsnip_t *_build_udp_packet(const ipv6_addr_t *dst,
     ipv6_hdr = hdr->data;
     ipv6_hdr->len = byteorder_htons(gnrc_pkt_len(payload));
     ipv6_hdr->nh = PROTNUM_UDP;
-    ipv6_hdr->hl = GNRC_NETIF_DEFAULT_HL;
+    ipv6_hdr->hl = CONFIG_GNRC_NETIF_DEFAULT_HL;
     gnrc_udp_calc_csum(payload, hdr);
     payload = hdr;
     hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
@@ -556,7 +552,7 @@ static gnrc_pktsnip_t *_build_udp_packet(const ipv6_addr_t *dst,
         return NULL;
     }
     netif_hdr = hdr->data;
-    netif_hdr->if_pid = eth_netif->pid;
+    gnrc_netif_hdr_set_netif(netif_hdr, eth_netif);
     netif_hdr->flags |= GNRC_NETIF_HDR_FLAGS_MULTICAST;
     hdr->next = payload;
     return hdr;
@@ -617,12 +613,35 @@ static int shell_test_cmd(int argc, char **argv)
     return 0;
 }
 
+static int send_test_pkt(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+    printf("Sending UDP test packets to port %u\n", TEST_PORT);
+    for (unsigned i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
+        if (ipv6_addr_is_link_local(&eth_netif->ipv6.addrs[i])) {
+            local_addr = &eth_netif->ipv6.addrs[i];
+        }
+    }
+    return 0;
+}
+
+static int unittests(int argc, char** argv)
+{
+    (void) argc;
+    (void) argv;
+
+    run_unittests();
+    return 0;
+}
+
 /* TODO: test if forwarded packet is not fragmented */
 
 static int mock_get_device_type(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
-    assert(max_len == sizeof(uint16_t));
+    expect(max_len == sizeof(uint16_t));
     *((uint16_t *)value) = NETDEV_TYPE_TEST;
     return sizeof(uint16_t);
 }
@@ -630,8 +649,8 @@ static int mock_get_device_type(netdev_t *dev, void *value, size_t max_len)
 static int mock_get_max_packet_size(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
-    assert(max_len == sizeof(uint16_t));
-    assert(eth_netif != NULL);
+    expect(max_len == sizeof(uint16_t));
+    expect(eth_netif != NULL);
     *((uint16_t *)value) = eth_netif->ipv6.mtu - 8;
     return sizeof(uint16_t);
 }
@@ -649,6 +668,14 @@ static int mock_send(netdev_t *dev, const iolist_t *iolist)
     return res;
 }
 
+static const shell_command_t shell_commands[] = {
+    { "udp", "send data over UDP and listen on UDP ports", udp_cmd },
+    { "unittests", "Runs unitest", unittests},
+    { "test", "sends data according to a specified numeric test", shell_test_cmd },
+    { "send-test-pkt", "start sendig UDP test packets to TEST_PORT", send_test_pkt },
+    { NULL, NULL, NULL }
+};
+
 int main(void)
 {
     eth_netif = gnrc_netif_iter(NULL);
@@ -659,17 +686,12 @@ int main(void)
     netdev_test_set_get_cb(&mock_netdev, NETOPT_MAX_PDU_SIZE,
                            mock_get_max_packet_size);
     netdev_test_set_send_cb(&mock_netdev, mock_send);
-    mock_netif = gnrc_netif_raw_create(mock_netif_stack,
-                                       sizeof(mock_netif_stack),
-                                       GNRC_NETIF_PRIO, "mock_netif",
-                                       (netdev_t *)&mock_netdev);
-    run_unittests();
-    printf("Sending UDP test packets to port %u\n", TEST_PORT);
-    for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
-        if (ipv6_addr_is_link_local(&eth_netif->ipv6.addrs[i])) {
-            local_addr = &eth_netif->ipv6.addrs[i];
-        }
-    }
+    int res = gnrc_netif_raw_create(&_netif, mock_netif_stack,
+                                    sizeof(mock_netif_stack),
+                                    GNRC_NETIF_PRIO, "mock_netif",
+                                    &mock_netdev.netdev.netdev);
+    mock_netif = &_netif;
+    expect(res == 0);
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }

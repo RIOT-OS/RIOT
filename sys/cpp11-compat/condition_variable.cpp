@@ -79,8 +79,8 @@ void condition_variable::notify_all() noexcept {
 
 void condition_variable::wait(unique_lock<mutex>& lock) noexcept {
   priority_queue_node_t n;
-  n.priority = sched_active_thread->priority;
-  n.data = sched_active_pid;
+  n.priority = thread_get_active()->priority;
+  n.data = thread_getpid();
   n.next = NULL;
   // the signaling thread may not hold the mutex, the queue is not thread safe
   unsigned old_state = irq_disable();
@@ -104,7 +104,7 @@ cv_status condition_variable::wait_until(unique_lock<mutex>& lock,
   timex_t before;
   xtimer_now_timex(&before);
   auto diff = timex_sub(timeout_time.native_handle(), before);
-  xtimer_set_wakeup(&timer, timex_uint64(diff), sched_active_pid);
+  xtimer_set_wakeup(&timer, timex_uint64(diff), thread_getpid());
   wait(lock);
   timex_t after;
   xtimer_now_timex(&after);

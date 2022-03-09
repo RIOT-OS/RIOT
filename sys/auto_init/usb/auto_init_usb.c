@@ -22,6 +22,10 @@
  * @}
  */
 
+#define USB_H_USER_IS_RIOT_INTERNAL
+
+#include <assert.h>
+
 #include "usb/usbus.h"
 
 #ifdef MODULE_USBUS_CDC_ECM
@@ -30,6 +34,10 @@ usbus_cdcecm_device_t cdcecm;
 #endif
 #ifdef MODULE_USBUS_CDC_ACM
 #include "usb/usbus/cdc/acm.h"
+#endif
+#ifdef MODULE_USBUS_DFU
+#include "usb/usbus/dfu.h"
+static usbus_dfu_device_t dfu;
 #endif
 
 static char _stack[USBUS_STACKSIZE];
@@ -52,6 +60,10 @@ void auto_init_usb(void)
 
 #ifdef MODULE_USBUS_CDC_ECM
     usbus_cdcecm_init(&usbus, &cdcecm);
+#endif
+
+#ifdef MODULE_USBUS_DFU
+    usbus_dfu_init(&usbus, &dfu, USB_DFU_PROTOCOL_RUNTIME_MODE);
 #endif
 
     /* Finally initialize USBUS thread */

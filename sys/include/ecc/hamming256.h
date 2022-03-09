@@ -24,7 +24,6 @@
 extern "C" {
 #endif
 
-
 /**  No bit errors were detected in the message */
 #define Hamming_ERROR_NONE 0
 
@@ -37,7 +36,6 @@ extern "C" {
 /** Multiple bits are incorrect in the data and they cannot be corrected. */
 #define Hamming_ERROR_MULTIPLEBITS      3
 
-
 /**
  *  @brief Computes 3-bytes hamming codes for a data block whose size is multiple of
  *  256 bytes. Each 256 bytes block gets its own code.
@@ -47,7 +45,6 @@ extern "C" {
  *  @param[out] code  Codes buffer.
  */
 void hamming_compute256x( const uint8_t *data, uint32_t size, uint8_t *code );
-
 
 /**
  *  @brief Verifies 3-bytes hamming codes for a data block whose size is multiple of
@@ -62,7 +59,6 @@ void hamming_compute256x( const uint8_t *data, uint32_t size, uint8_t *code );
  *  @param[in] code  Original codes.
  */
 uint8_t hamming_verify256x( uint8_t *data, uint32_t size, const uint8_t *code );
-
 
 #ifdef __cplusplus
 }

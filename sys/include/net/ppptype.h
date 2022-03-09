@@ -23,14 +23,12 @@
  *              </a>
  */
 
-
 #ifndef NET_PPPTYPE_H
 #define NET_PPPTYPE_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 #define PPPTYPE_IPV6           (0x0057)     /**< IPv6 packet in PPP*/
 #define PPPTYPE_IPV4           (0x0021)     /**< IPv4 packet in PPP */

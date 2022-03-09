@@ -18,13 +18,15 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "net/gnrc.h"
 #include "thread.h"
 #include "net/gnrc/netif.h"
 
 #include "nrfmin_gnrc.h"
 
-#define ENABLE_DEBUG            (0)
+#define ENABLE_DEBUG                0
 #include "debug.h"
 
 /**
@@ -49,6 +51,7 @@
  * @brief   Allocate the stack for the GNRC netdev thread to run in
  */
 static char stack[NRFMIN_GNRC_STACKSIZE];
+static gnrc_netif_t _netif;
 
 static int hdr_netif_to_nrfmin(nrfmin_hdr_t *nrfmin, gnrc_pktsnip_t *pkt)
 {
@@ -160,16 +163,12 @@ static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netif_t *dev)
     if (nrfmin->dst_addr == NRFMIN_ADDR_BCAST) {
         netif->flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
     }
-    netif->lqi = 0;
-    netif->rssi = 0;
     gnrc_netif_hdr_set_netif(netif, dev);
     pkt_snip->type = nrfmin->proto;
 
     /* finally: remove the nrfmin header and append the netif header */
     gnrc_pktbuf_remove_snip(pkt_snip, hdr_snip);
-    LL_APPEND(pkt_snip, netif_snip);
-
-    return pkt_snip;
+    return gnrc_pkt_append(pkt_snip, netif_snip);
 }
 
 static const gnrc_netif_ops_t gnrc_nrfmin_ops = {
@@ -184,6 +183,6 @@ void gnrc_nrfmin_init(void)
 {
     /* setup the NRFMIN driver */
     nrfmin_setup();
-    gnrc_netif_create(stack, sizeof(stack), NRFMIN_GNRC_THREAD_PRIO, "nrfmin",
-                      (netdev_t *)&nrfmin_dev, &gnrc_nrfmin_ops);
+    gnrc_netif_create(&_netif, stack, sizeof(stack), NRFMIN_GNRC_THREAD_PRIO, "nrfmin",
+                      &nrfmin_dev, &gnrc_nrfmin_ops);
 }

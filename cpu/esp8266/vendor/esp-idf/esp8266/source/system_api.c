@@ -50,7 +50,7 @@ esp_err_t esp_base_mac_addr_get(uint8_t *mac)
     uint8_t null_mac[6] = {0};
 
     if (memcmp(base_mac_addr, null_mac, 6) == 0) {
-        ESP_LOGI(TAG, "Base MAC address is not set, read default base MAC address from BLK0 of EFUSE");
+        ESP_LOGD(TAG, "Base MAC address is not set, read default base MAC address from BLK0 of EFUSE");
         return ESP_ERR_INVALID_MAC;
     }
 

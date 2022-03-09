@@ -19,8 +19,13 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+/* Add specific clock configuration (HSE, LSE) for this board here */
+#ifndef CONFIG_BOARD_HAS_LSE
+#define CONFIG_BOARD_HAS_LSE            1
+#endif
+
 #include "periph_cpu.h"
-#include "l0/cfg_clock_32_16_1.h"
+#include "clk_conf.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"
 
@@ -54,28 +59,8 @@ static const uart_conf_t uart_config[] = {
 
 /**
  * @name    SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 32000000Hz */
-        7,  /* -> 125000Hz */
-        5,  /* -> 500000Hz */
-        4,  /* -> 1000000Hz */
-        2,  /* -> 4000000Hz */
-        1   /* -> 8000000Hz */
-    },
-    {       /* for APB2 @ 32000000Hz */
-        7,  /* -> 125000Hz */
-        5,  /* -> 500000Hz */
-        4,  /* -> 1000000Hz */
-        2,  /* -> 4000000Hz */
-        1   /* -> 8000000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
         .dev      = SPI1, /* connected to SX1272 */

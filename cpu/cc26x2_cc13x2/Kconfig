@@ -1,0 +1,49 @@
+# Copyright (c) 2020 Locha Inc
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_FAM_CC13X2
+    bool
+    select CPU_COMMON_CC26XX_CC13XX
+    select CPU_FAM_CC13XX
+    select CPU_CORE_CORTEX_M4F
+    select HAS_CPU_CC26X2_CC13X2
+    select HAS_CORTEXM_MPU
+
+    select MODULE_CC26XX_CC13XX if TEST_KCONFIG
+
+## CPU Models
+config CPU_MODEL_CC1312R1F3
+    bool
+    select CPU_FAM_CC13X2
+
+config CPU_MODEL_CC1352R1
+    bool
+    select CPU_FAM_CC13X2
+
+config CPU_MODEL_CC1352P1
+    bool
+    select CPU_FAM_CC13X2
+
+## Definition of specific features
+config HAS_CPU_CC26X2_CC13X2
+    bool
+    help
+        Indicates that a 'cc26x2_cc13x2' cpu is being used.
+
+## Common CPU symbols
+config CPU_FAM
+    default "cc13x2" if CPU_FAM_CC13X2
+
+config CPU_MODEL
+    default "cc1312r1f3" if CPU_MODEL_CC1312R1F3
+    default "cc1352r1" if CPU_MODEL_CC1352R1
+    default "cc1352p1" if CPU_MODEL_CC1352P1
+
+config CPU
+    default "cc26x2_cc13x2"
+
+source "$(RIOTCPU)/cc26xx_cc13xx/Kconfig"

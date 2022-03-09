@@ -142,7 +142,6 @@ uint32_t dek_hash(const uint8_t *buf, size_t len);
  */
 uint32_t fnv_hash(const uint8_t *buf, size_t len);
 
-
 /**
  * @defgroup sys_hashes_rotating Rotating
  * @ingroup sys_hashes_non_crypto

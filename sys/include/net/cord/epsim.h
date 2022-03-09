@@ -15,7 +15,7 @@
  * This module is designed to provide nodes with the possibility to register
  * with resource directories without having to allocate a lot of resources. All
  * the user has to do, is to call the cord_epsim_register() function in periodic
- * intervals, depending on the value of the `CORD_LT` variable.
+ * intervals, depending on the value of the `CONFIG_CORD_LT` variable.
  *
  * @{
  *

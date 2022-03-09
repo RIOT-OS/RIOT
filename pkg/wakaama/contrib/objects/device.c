@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "kernel_defines.h"
 #include "liblwm2m.h"
 #include "objects/device.h"
 #include "lwm2m_client_config.h"
@@ -29,14 +30,14 @@ static bool reboot;
 
 /* Lookup table for static resources of device object */
 static const char *_static_resources[] = {
-    [LWM2M_RES_MANUFACTURER] = LWM2M_DEVICE_MANUFACTURER,
-    [LWM2M_RES_MODEL_NO]     = LWM2M_DEVICE_MODEL,
-    [LWM2M_RES_SERIAL]       = LWM2M_DEVICE_SERIAL,
-    [LWM2M_RES_FW_VER]       = LWM2M_DEVICE_FW_VERSION,
-    [LWM2M_RES_BINDINGS]     = LWM2M_DEVICE_BINDINGS,
-    [LWM2M_RES_TYPE]         = LWM2M_DEVICE_TYPE,
-    [LWM2M_RES_HW_VERSION]   = LWM2M_DEVICE_HW_VERSION,
-    [LWM2M_RES_SW_VERSION]   = LWM2M_DEVICE_SW_VERSION,
+    [LWM2M_RES_MANUFACTURER] = CONFIG_LWM2M_DEVICE_MANUFACTURER,
+    [LWM2M_RES_MODEL_NO]     = CONFIG_LWM2M_DEVICE_MODEL,
+    [LWM2M_RES_SERIAL]       = CONFIG_LWM2M_DEVICE_SERIAL,
+    [LWM2M_RES_FW_VER]       = CONFIG_LWM2M_DEVICE_FW_VERSION,
+    [LWM2M_RES_BINDINGS]     = CONFIG_LWM2M_DEVICE_BINDINGS,
+    [LWM2M_RES_TYPE]         = CONFIG_LWM2M_DEVICE_TYPE,
+    [LWM2M_RES_HW_VERSION]   = CONFIG_LWM2M_DEVICE_HW_VERSION,
+    [LWM2M_RES_SW_VERSION]   = CONFIG_LWM2M_DEVICE_SW_VERSION,
     [LWM2M_DEVICE_RESOURCES] = NULL
 };
 
@@ -77,7 +78,7 @@ static uint8_t prv_device_discover(uint16_t instance_id, int *num_dataP,
             LWM2M_RES_BINDINGS, LWM2M_RES_TYPE, LWM2M_RES_HW_VERSION,
             LWM2M_RES_SW_VERSION,
         };
-        int len = sizeof(res) / sizeof(uint16_t);
+        int len = ARRAY_SIZE(res);
 
         *data_arrayP = lwm2m_data_new(len);
         if (*data_arrayP == NULL) {
@@ -136,7 +137,7 @@ static uint8_t prv_device_read(uint16_t instance_id, int *num_dataP,
             LWM2M_RES_FW_VER,       LWM2M_RES_HW_VERSION, LWM2M_RES_SW_VERSION,
             LWM2M_RES_BINDINGS,     LWM2M_RES_TYPE,       LWM2M_RES_ERROR_CODE,
         };
-        int cnt = sizeof(resList) / sizeof(uint16_t);
+        int cnt = ARRAY_SIZE(resList);
         *data_arrayP = lwm2m_data_new(cnt);
         if (*data_arrayP == NULL) {
             result = COAP_500_INTERNAL_SERVER_ERROR;

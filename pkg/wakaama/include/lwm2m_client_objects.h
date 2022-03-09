@@ -86,7 +86,6 @@ lwm2m_object_t *lwm2m_client_get_device_object(
 lwm2m_object_t *lwm2m_client_get_acc_ctrl_object(
                         lwm2m_client_data_t *client_data);
 
-
 #ifdef __cplusplus
 }
 #endif

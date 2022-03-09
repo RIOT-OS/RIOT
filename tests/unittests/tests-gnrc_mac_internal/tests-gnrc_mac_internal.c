@@ -33,7 +33,7 @@ static void set_up(void)
  *        correctly queue the packet to the corresponded priority packet queue.
  *
  *        In case when the `gnrc_mac_tx_neighbor_t` structure is in used (indicated by
- *        by `GNRC_MAC_NEIGHBOR_COUNT != 0`), `test_gnrc_mac_queue_tx_packet()` successively
+ *        by `CONFIG_GNRC_MAC_NEIGHBOR_COUNT != 0`), `test_gnrc_mac_queue_tx_packet()` successively
  *        queues 4 packets, which are pkt1, pkt2, pkt3 and pkt_bcast, into a defined `tx`
  *        (type of `gnrc_mac_tx_t`). Pkt1, pkt2 have the same destination address of "0x76b6",
  *        , pkt3 is heading for "0x447e", while pkt_bcast is for broadcasting.
@@ -42,7 +42,7 @@ static void set_up(void)
  *        queued to `tx::neighbors[0]::queue`.
  *
  *        In case when the `gnrc_mac_tx_neighbor_t` structure is not in used (indicated by
- *        by `GNRC_MAC_NEIGHBOR_COUNT == 0`), `test_gnrc_mac_queue_tx_packet()` successively
+ *        by `CONFIG_GNRC_MAC_NEIGHBOR_COUNT == 0`), `test_gnrc_mac_queue_tx_packet()` successively
  *        queues 4 packets, which are pkt1, pkt2, pkt3 and pkt_bcast, into a defined `tx`
  *        (type of `gnrc_mac_tx_t`). Pkt1, pkt2 have the same destination address of "0x76b6",
  *        , pkt3 is heading for "0x447e", while pkt_bcast is for broadcasting.
@@ -63,7 +63,7 @@ static void test_gnrc_mac_queue_tx_packet(void)
     hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
     gnrc_pktsnip_t *pkt_bcast = gnrc_pktbuf_add(NULL, TEST_STRING12, sizeof(TEST_STRING12),
                                                 GNRC_NETTYPE_UNDEF);
-    LL_APPEND(hdr, pkt_bcast);
+    hdr = gnrc_pkt_append(hdr, pkt_bcast);
     pkt_bcast = hdr;
 
     netif_hdr = hdr->data;
@@ -72,13 +72,13 @@ static void test_gnrc_mac_queue_tx_packet(void)
     hdr = gnrc_netif_hdr_build(NULL, 0, dst_addr, 2);
     gnrc_pktsnip_t *pkt1 = gnrc_pktbuf_add(NULL, TEST_STRING4, sizeof(TEST_STRING4),
                                            GNRC_NETTYPE_UNDEF);
-    LL_APPEND(hdr, pkt1);
+    hdr = gnrc_pkt_append(hdr, pkt1);
     pkt1 = hdr;
 
     hdr = gnrc_netif_hdr_build(NULL, 0, dst_addr, 2);
     gnrc_pktsnip_t *pkt2 = gnrc_pktbuf_add(NULL, TEST_STRING8, sizeof(TEST_STRING8),
                                            GNRC_NETTYPE_UNDEF);
-    LL_APPEND(hdr, pkt2);
+    hdr = gnrc_pkt_append(hdr, pkt2);
     pkt2 = hdr;
 
     dst_addr[0] = 0x44;
@@ -87,10 +87,10 @@ static void test_gnrc_mac_queue_tx_packet(void)
     hdr = gnrc_netif_hdr_build(NULL, 0, dst_addr, 2);
     gnrc_pktsnip_t *pkt3 = gnrc_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16),
                                            GNRC_NETTYPE_UNDEF);
-    LL_APPEND(hdr, pkt3);
+    hdr = gnrc_pkt_append(hdr, pkt3);
     pkt3 = hdr;
 
-#if GNRC_MAC_NEIGHBOR_COUNT != 0
+#if CONFIG_GNRC_MAC_NEIGHBOR_COUNT != 0
 
     gnrc_pktsnip_t *pkt_head;
     TEST_ASSERT(gnrc_mac_queue_tx_packet(&tx,1,pkt1));
@@ -172,7 +172,7 @@ static void test_gnrc_mac_queue_tx_packet(void)
     TEST_ASSERT(0 == gnrc_priority_pktqueue_length(&tx.queue));
     TEST_ASSERT_EQUAL_STRING(TEST_STRING8, pkt_head->next->data);
 
-#endif /* GNRC_MAC_NEIGHBOR_COUNT != 0 */
+#endif /* CONFIG_GNRC_MAC_NEIGHBOR_COUNT != 0 */
 }
 #endif /* GNRC_MAC_TX_QUEUE_SIZE != 0 */
 

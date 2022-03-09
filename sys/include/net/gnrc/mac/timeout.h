@@ -21,6 +21,7 @@
 #ifndef NET_GNRC_MAC_TIMEOUT_H
 #define NET_GNRC_MAC_TIMEOUT_H
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdbool.h>
 

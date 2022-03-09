@@ -1,0 +1,4 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    slstk3400a \
+    stk3200 \
+    #

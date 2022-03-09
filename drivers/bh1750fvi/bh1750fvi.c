@@ -25,7 +25,7 @@
 #include "bh1750fvi.h"
 #include "bh1750fvi_internal.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 int bh1750fvi_init(bh1750fvi_t *dev, const bh1750fvi_params_t *params)

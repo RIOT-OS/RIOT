@@ -6,13 +6,11 @@
  * directory for more details.
  */
 
-
 #define TEST_RELIC_SHOW_OUTPUT (0) /**< set if encoded/decoded string is displayed */
 
 #if (TEST_RELIC_SHOW_OUTPUT == 1)
 #include <stdio.h>
 #endif
-#include <assert.h>
 #include <stdlib.h>
 
 #include "relic.h"
@@ -30,7 +28,7 @@ void print_mem(void *mem, int len) {
 static void setUp(void)
 {
     /* Initialize RELIC */
-    TEST_ASSERT_EQUAL_INT(STS_OK, core_init());
+    TEST_ASSERT_EQUAL_INT(RLC_OK, core_init());
 }
 
 static void tearDown(void)
@@ -46,18 +44,18 @@ static void tests_relic_ecdh(void)
     */
 
     /* Select an elliptic curve configuration */
-    if (ec_param_set_any() == STS_OK) {
+    if (ec_param_set_any() == RLC_OK) {
 #if (TEST_RELIC_SHOW_OUTPUT == 1)
         ec_param_print();
 #endif
 
         bn_t privateA;
         ec_t publicA;
-        uint8_t sharedKeyA[MD_LEN];
+        uint8_t sharedKeyA[RLC_MD_LEN];
 
         bn_t privateB;
         ec_t publicB;
-        uint8_t sharedKeyB[MD_LEN];
+        uint8_t sharedKeyB[RLC_MD_LEN];
 
         bn_null(privateA);
         ec_null(publicA);
@@ -72,7 +70,7 @@ static void tests_relic_ecdh(void)
         ec_new(publicB);
 
         /* User A generates private/public key pair */
-        TEST_ASSERT_EQUAL_INT(STS_OK, cp_ecdh_gen(privateA, publicA));
+        TEST_ASSERT_EQUAL_INT(RLC_OK, cp_ecdh_gen(privateA, publicA));
 
 #if (TEST_RELIC_SHOW_OUTPUT == 1)
         printf("User A\n");
@@ -85,7 +83,7 @@ static void tests_relic_ecdh(void)
 #endif
 
         /* User B generates private/public key pair */
-        TEST_ASSERT_EQUAL_INT(STS_OK, cp_ecdh_gen(privateB, publicB));
+        TEST_ASSERT_EQUAL_INT(RLC_OK, cp_ecdh_gen(privateB, publicB));
 
 #if (TEST_RELIC_SHOW_OUTPUT == 1)
         printf("User B\n");
@@ -100,23 +98,23 @@ static void tests_relic_ecdh(void)
         /* In a protocol you would exchange the public keys now */
 
         /* User A calculates shared secret */
-        TEST_ASSERT_EQUAL_INT(STS_OK, cp_ecdh_key(sharedKeyA, MD_LEN, privateA, publicB));
+        TEST_ASSERT_EQUAL_INT(RLC_OK, cp_ecdh_key(sharedKeyA, RLC_MD_LEN, privateA, publicB));
 
 #if (TEST_RELIC_SHOW_OUTPUT == 1)
         printf("\nshared key computed by user A: ");
-        print_mem(sharedKeyA, MD_LEN);
+        print_mem(sharedKeyA, RLC_MD_LEN);
 #endif
 
         /* User B calculates shared secret */
-        TEST_ASSERT_EQUAL_INT(STS_OK, cp_ecdh_key(sharedKeyB, MD_LEN, privateB, publicA));
+        TEST_ASSERT_EQUAL_INT(RLC_OK, cp_ecdh_key(sharedKeyB, RLC_MD_LEN, privateB, publicA));
 
 #if (TEST_RELIC_SHOW_OUTPUT == 1)
         printf("\nshared key computed by user B: ");
-        print_mem(sharedKeyB, MD_LEN);
+        print_mem(sharedKeyB, RLC_MD_LEN);
 #endif
 
         /* The secrets should be the same now */
-        TEST_ASSERT_EQUAL_INT(CMP_EQ, util_cmp_const(sharedKeyA, sharedKeyB, MD_LEN));
+        TEST_ASSERT_EQUAL_INT(RLC_EQ, util_cmp_const(sharedKeyA, sharedKeyB, RLC_MD_LEN));
 
         bn_free(privateA);
         ec_free(publicA);

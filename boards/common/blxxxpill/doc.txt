@@ -1,5 +1,5 @@
 /**
-@defgroup    boards_common_blxxxpill Common code for bluepill and blackpill
+@defgroup    boards_common_blxxxpill Blackpill and Bluepill common code
 @ingroup     boards_common
 @brief       Support for cheap stm32f103c8 based boards such as bluepill and blackpill.
 
@@ -15,8 +15,8 @@ There are also versions that only report to have 32 KiB, but actually have
 
 ## Hardware
 
-![bluepill](https://camo.githubusercontent.com/8df2fb54f87527bdd57fe007352d72c1f377d08f/687474703a2f2f77696b692e73746d33326475696e6f2e636f6d2f696d616765732f7468756d622f312f31392f53544d33325f426c75655f50696c6c5f746f702e6a70672f38303070782d53544d33325f426c75655f50696c6c5f746f702e6a7067)
-
+![bluepill]
+(https://camo.githubusercontent.com/6122268d77e4677a08d0e13e2e2aaf070a0a6a69/687474703a2f2f73312e62696c642e6d652f62696c6465722f3131303431372f38383135303232313438363837343334302e6a7067)
 ### MCU
 
 | MCU       | STM32F103C8               |
@@ -140,22 +140,18 @@ Try [eBay][eBay] or [AliExpress][AliExpress].
 
 ## Further reading
 
-* http://wiki.stm32duino.com/index.php?title=Blue_Pill
-* http://wiki.stm32duino.com/index.php?title=Maple_Mini#Clones
-* http://www.st.com/content/st_com/en/products/microcontrollers/stm32-32-bit-
-arm-cortex-mcus/stm32-mainstream-mcus/stm32f1-series/stm32f103/stm32f103c8.html
+- [Blue Pill Wiki](https://web.archive.org/web/20190428082446/http://wiki.stm32duino.com/index.php?title=Blue_Pill)
+- [Maple Mini Wiki](https://web.archive.org/web/20190428082446/http://wiki.stm32duino.com/index.php?title=Maple_Mini#Clones)
+- [STM32F103C8 Datasheet](http://www.st.com/content/st_com/en/products/microcontrollers/stm32-32-bit-arm-cortex-mcus/stm32-mainstream-mcus/stm32f1-series/stm32f103/stm32f103c8.html)
 
-[Datasheet]: http://www.st.com/content/ccc/resource/technical/document/datash
-eet/33/d4/6f/1d/df/0b/4c/6d/CD00161566.pdf/files/CD00161566.pdf/jcr:content/tran
-slations/en.CD00161566.pdf
+[Datasheet]: http://www.st.com/content/ccc/resource/technical/document/datasheet/33/d4/6f/1d/df/0b/4c/6d/CD00161566.pdf/files/CD00161566.pdf/jcr:content/translations/en.CD00161566.pdf
 [Flashsize]:
-http://wiki.stm32duino.com/index.php?title=Blue_Pill#128_KB_flash_on_C8_version
+https://web.archive.org/web/20190428082446/http://wiki.stm32duino.com/index.php?title=Blue_Pill#128_KB_flash_on_C8_version
 [eBay]: https://www.ebay.com/sch/i.html?_nkw=stm32f103c8
 [AliExpress]: https://www.aliexpress.com/wholesale?SearchText=STM32F103C8T6
 [OpenOCD]: https://github.com/RIOT-OS/RIOT/wiki/OpenOCD
 [USB]:
-http://wiki.stm32duino.com/index.php?title=Blue_Pill#Hardware_installation
+https://web.archive.org/web/20190428082446/http://wiki.stm32duino.com/index.php?title=Blue_Pill#Hardware_installation
 [imgTop]:
-http://wiki.stm32duino.com/images/thumb/1/19/STM32_Blue_Pill_top.jpg/800px-
-STM32_Blue_Pill_top.jpg
+https://web.archive.org/web/20190428082446/http://wiki.stm32duino.com/images/thumb/1/19/STM32_Blue_Pill_top.jpg/800px-STM32_Blue_Pill_top.jpg
  */

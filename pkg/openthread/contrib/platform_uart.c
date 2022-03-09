@@ -25,14 +25,27 @@
 #include "periph/uart.h"
 #include "openthread/platform/uart.h"
 #include "ot.h"
+#include "event.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define OPENTHREAD_SPINEL_FRAME_MARKER      (0x7e)
 
 static serial_msg_t gSerialMessage[OPENTHREAD_NUMBER_OF_SERIAL_BUFFER];
 static uint16_t frameLength = 0;
+
+static void _ev_serial_handler(event_t *event)
+{
+    (void) event;
+    /* Tell OpenThread about the reception of a CLI command */
+    otPlatUartReceived((uint8_t*)gSerialMessage[0].buf, gSerialMessage[0].length);
+    gSerialMessage[0].serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_FREE;
+}
+
+static event_t ev_serial = {
+    .handler = _ev_serial_handler
+};
 
 static void uart_handler(void* arg, char c) {
     (void)arg;
@@ -47,10 +60,7 @@ static void uart_handler(void* arg, char c) {
                 gSerialMessage[0].buf[frameLength] = c;
                 frameLength++;
                 gSerialMessage[0].length = frameLength;
-                msg_t msg;
-                msg.type = OPENTHREAD_SERIAL_MSG_TYPE_EVENT;
-                msg.content.ptr = &gSerialMessage[0];
-                msg_send_int(&msg, openthread_get_pid());
+                event_post(openthread_get_evq(), &ev_serial);
                 frameLength = 0;
             }
             break;
@@ -89,5 +99,10 @@ otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
     /* Tell OpenThread the sending of UART is done */
     otPlatUartSendDone();
 
+    return OT_ERROR_NONE;
+}
+
+otError otPlatUartFlush(void)
+{
     return OT_ERROR_NONE;
 }

@@ -1,0 +1,8 @@
+CFLAGS += \
+  -DCONFIG_BOARD_HAS_XTAL \
+  -DCONFIG_BOARD_HAS_XTAL32K \
+  -DCONFIG_BOARD_HAS_XTAL_32M \
+  #
+
+# Include default QN908x board config
+include $(RIOTBOARD)/common/qn908x/Makefile.include

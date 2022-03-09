@@ -1,0 +1,31 @@
+# Copyright (c) 2020 iosabi
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD
+    default "qn9080dk" if BOARD_QN9080DK
+
+config BOARD_QN9080DK
+    bool
+    default y
+    select BOARD_COMMON_QN908X
+    select CPU_MODEL_QN9080XHN
+
+    # Put defined MCU peripherals here (in alphabetical order)
+    select BOARD_HAS_XTAL32K
+    select BOARD_HAS_XTAL_32M
+    select HAS_PERIPH_ADC
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+    select HAS_PERIPH_UART_MODECFG
+
+    select HAVE_SAUL_GPIO
+    select HAVE_MMA8X5X
+    select HAVE_MTD_SPI_NOR
+
+source "$(RIOTBOARD)/common/qn908x/Kconfig"

@@ -1,0 +1,24 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config PACKAGE_U8G2
+    bool "U8g2 monochrome graphics library for LCDs"
+    depends on TEST_KCONFIG
+    depends on HAS_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_USEC
+    select MODULE_U8G2_RIOT
+    select MODULE_U8G2_CSRC
+
+config MODULE_U8G2_RIOT
+    bool
+    depends on TEST_KCONFIG
+
+config MODULE_U8G2_CSRC
+    bool
+    depends on TEST_KCONFIG

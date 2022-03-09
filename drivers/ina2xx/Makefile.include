@@ -1,0 +1,6 @@
+# include variants of INA2xx drivers as pseudo modules
+PSEUDOMODULES += ina219
+PSEUDOMODULES += ina220
+
+USEMODULE_INCLUDES_ina2xx := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_ina2xx)

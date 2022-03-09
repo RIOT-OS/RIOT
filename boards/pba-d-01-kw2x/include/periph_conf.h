@@ -88,7 +88,6 @@ static const clock_config_t clock_config = {
 #define PIT_BASECLOCK           (CLOCK_BUSCLOCK)
 #define PIT_ISR_0               isr_pit1
 #define PIT_ISR_1               isr_pit3
-#define LPTMR_ISR_0             isr_lptmr0
 /** @} */
 
 /**
@@ -173,7 +172,6 @@ static const pwm_conf_t pwm_config[] = {
 #define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
 
-
 /**
  * @name    SPI device configuration
  *
@@ -225,10 +223,10 @@ static const spi_conf_t spi_config[] = {
         .pin_clk  = GPIO_PIN(PORT_C, 5),
         .pin_cs   = {
             GPIO_PIN(PORT_C, 4),
-            GPIO_UNDEF,
-            GPIO_UNDEF,
-            GPIO_UNDEF,
-            GPIO_UNDEF
+            SPI_CS_UNDEF,
+            SPI_CS_UNDEF,
+            SPI_CS_UNDEF,
+            SPI_CS_UNDEF,
         },
         .pcr      = GPIO_AF_2,
         .simmask  = SIM_SCGC6_SPI0_MASK
@@ -240,10 +238,10 @@ static const spi_conf_t spi_config[] = {
         .pin_clk  = GPIO_PIN(PORT_B, 11),
         .pin_cs   = {
             GPIO_PIN(PORT_B, 10),
-            GPIO_UNDEF,
-            GPIO_UNDEF,
-            GPIO_UNDEF,
-            GPIO_UNDEF
+            SPI_CS_UNDEF,
+            SPI_CS_UNDEF,
+            SPI_CS_UNDEF,
+            SPI_CS_UNDEF,
         },
         .pcr      = GPIO_AF_2,
         .simmask  = SIM_SCGC6_SPI1_MASK
@@ -252,7 +250,6 @@ static const spi_conf_t spi_config[] = {
 
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
-
 
 /**
  * @name I2C configuration

@@ -1,0 +1,17 @@
+FEATURES_REQUIRED_ANY += cpu_core_atmega|arch_esp32|arch_native
+
+ifeq (,$(filter ws281x_%,$(USEMODULE)))
+  ifneq (,$(filter cpu_core_atmega,$(FEATURES_USED)))
+    USEMODULE += ws281x_atmega
+  endif
+  ifneq (,$(filter arch_native,$(FEATURES_USED)))
+    USEMODULE += ws281x_vt100
+  endif
+  ifneq (,$(filter arch_esp32,$(FEATURES_USED)))
+    USEMODULE += ws281x_esp32
+  endif
+endif
+
+ifneq (,$(filter ws281x_atmega,$(USEMODULE)))
+  FEATURES_REQUIRED += cpu_core_atmega
+endif

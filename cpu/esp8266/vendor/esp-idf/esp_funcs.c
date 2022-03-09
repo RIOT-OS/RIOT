@@ -18,7 +18,7 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #include <stdint.h>

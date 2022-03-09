@@ -746,7 +746,7 @@ typedef struct {
 /**
  * @brief   Result vector for accelerometer measurement
  */
-typedef struct __attribute__((packed))
+typedef struct
 {
     int16_t acc_x;          /**< Acceleration in the X direction in milli-G */
     int16_t acc_y;          /**< Acceleration in the Y direction in milli-G */

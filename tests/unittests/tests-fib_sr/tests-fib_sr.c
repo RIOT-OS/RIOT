@@ -77,7 +77,6 @@ static int _create_sr(const char *pre, size_t from, size_t to, fib_sr_t *sr, siz
     return 0;
 }
 
-
 /*
  * @brief create a new empty source route and check the parameters
  * It is expected to have a new source route with the given parameters
@@ -106,7 +105,7 @@ static void test_fib_sr_01_create_empty_sr(void)
      * Uncomment the following two lines if you want to test the temporal behaviour
      * @note this may fail since unittests are currently not thread-friendly
      */
-    //xtimer_usleep(5 * US_PER_MS);
+    //xtimer_msleep(5);
     //TEST_ASSERT(sr_lifetime<10000);
 
     fib_deinit(&test_fib_sr_table);
@@ -144,7 +143,7 @@ static void test_fib_sr_02_change_sr_parameters(void)
      * Uncomment the following three lines if you want to test the temporal behaviour
      * @note this may fail since unittests are currently not thread-friendly
      */
-    //xtimer_usleep(5 * US_PER_MS);
+    //xtimer_msleep(5);
     //TEST_ASSERT(sr_lifetime>10000);
     //TEST_ASSERT(sr_lifetime<20000);
 
@@ -184,7 +183,7 @@ static void test_fib_sr_03_read_sr_parameters(void)
      * @note this may fail since unittests are currently not thread-friendly
      */
     /*
-       xtimer_usleep(1 * US_PER_MS);
+       xtimer_msleep(1);
        TEST_ASSERT_EQUAL_INT(-ENOENT, fib_sr_read_head(&test_fib_sr_table, local_sourceroutes[0],
                                                     &sr_iface_id, &sr_flags,
                                                     &sr_lifetime)
@@ -207,7 +206,6 @@ static void test_fib_sr_04_create_and_delete_sr(void)
 
     /* test wrong parameter */
     TEST_ASSERT_EQUAL_INT(-EFAULT, fib_sr_delete(&test_fib_sr_table, NULL));
-
 
     TEST_ASSERT_EQUAL_INT(0, fib_sr_delete(&test_fib_sr_table, local_sourceroutes[0]));
 
@@ -344,7 +342,6 @@ static void test_fib_sr_06_create_sr_with_hops(void)
 
     fib_deinit(&test_fib_sr_table);
 }
-
 
 /*
  * @brief create a new source route with a number of hops on its path,
@@ -650,7 +647,6 @@ static void test_fib_sr_12_get_consecutive_sr(void)
                                                  (uint8_t *)&addr_nxt,
                                                  add_buf_size)
                           );
-
 
     /* Create SR1 Z5,.., Z7,XX  */
     TEST_ASSERT_EQUAL_INT(0, fib_sr_create(&test_fib_sr_table, &local_sourceroutes[2],

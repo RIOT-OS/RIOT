@@ -1,10 +1,14 @@
 USEMODULE += random
+USEMODULE += hashes
+USEMODULE += crypto_aes_128
 
 USEMODULE += semtech_loramac_contrib
 USEMODULE += semtech_loramac_mac
 USEMODULE += semtech_loramac_mac_region
 USEMODULE += semtech_loramac_crypto
 USEMODULE += semtech_loramac_arch
+
+USEMODULE += ztimer_msec
 
 # The build fails on MSP430 because the toolchain doesn't provide
 # EXIT_SUCCESS/EXIT_FAILURE macros

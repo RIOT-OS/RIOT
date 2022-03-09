@@ -1,0 +1,6 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += lis2dh12_spi
+endif
+
+# include common nrf52 dependencies
+include $(RIOTBOARD)/common/nrf52/Makefile.dep

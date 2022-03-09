@@ -146,7 +146,6 @@ static void test_vfs_null_fs_ops_fstatvfs(void)
     TEST_ASSERT_EQUAL_INT(-EINVAL, res);
 }
 
-
 Test *tests_vfs_null_file_system_ops_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {

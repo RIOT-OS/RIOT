@@ -1,0 +1,126 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_FAM_EFM32HG
+    bool
+    select CPU_CORE_CORTEX_M0PLUS
+    select CPU_COMMON_EFM32
+    select CPU_EFM32_SERIES0
+
+config MODULE_CPU_EFM32HG
+    bool
+    depends on CPU_FAM_EFM32HG
+    depends on TEST_KCONFIG
+    default y
+    help
+        EFM32HG family-specific code.
+
+## CPU Models
+config CPU_MODEL_EFM32HG210F32
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG322F32
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG110F64
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG350F64
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG310F64
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG222F64
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG308F32
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG321F64
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG309F32
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG108F32
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG222F32
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG310F32
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG322F64
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG110F32
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG350F32
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG210F64
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG309F64
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG108F64
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG321F32
+    bool
+    select CPU_FAM_EFM32HG
+
+config CPU_MODEL_EFM32HG308F64
+    bool
+    select CPU_FAM_EFM32HG
+
+## Common CPU symbols
+config CPU_FAM
+    default "efm32hg" if CPU_FAM_EFM32HG
+
+config CPU_MODEL
+    default "efm32hg210f32" if CPU_MODEL_EFM32HG210F32
+    default "efm32hg322f32" if CPU_MODEL_EFM32HG322F32
+    default "efm32hg110f64" if CPU_MODEL_EFM32HG110F64
+    default "efm32hg350f64" if CPU_MODEL_EFM32HG350F64
+    default "efm32hg310f64" if CPU_MODEL_EFM32HG310F64
+    default "efm32hg222f64" if CPU_MODEL_EFM32HG222F64
+    default "efm32hg308f32" if CPU_MODEL_EFM32HG308F32
+    default "efm32hg321f64" if CPU_MODEL_EFM32HG321F64
+    default "efm32hg309f32" if CPU_MODEL_EFM32HG309F32
+    default "efm32hg108f32" if CPU_MODEL_EFM32HG108F32
+    default "efm32hg222f32" if CPU_MODEL_EFM32HG222F32
+    default "efm32hg310f32" if CPU_MODEL_EFM32HG310F32
+    default "efm32hg322f64" if CPU_MODEL_EFM32HG322F64
+    default "efm32hg110f32" if CPU_MODEL_EFM32HG110F32
+    default "efm32hg350f32" if CPU_MODEL_EFM32HG350F32
+    default "efm32hg210f64" if CPU_MODEL_EFM32HG210F64
+    default "efm32hg309f64" if CPU_MODEL_EFM32HG309F64
+    default "efm32hg108f64" if CPU_MODEL_EFM32HG108F64
+    default "efm32hg321f32" if CPU_MODEL_EFM32HG321F32
+    default "efm32hg308f64" if CPU_MODEL_EFM32HG308F64

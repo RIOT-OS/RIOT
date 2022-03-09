@@ -21,7 +21,13 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+/* Add specific clock configuration (HSE, LSE) for this board here */
+#ifndef CONFIG_BOARD_HAS_LSE
+#define CONFIG_BOARD_HAS_LSE            1
+#endif
+
 #include "periph_cpu.h"
+#include "clk_conf.h"
 #include "cfg_i2c1_pb6_pb7.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"
@@ -29,50 +35,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name Clock system configuration
- * @{
- */
-/* 0: no external high speed crystal available
- * else: actual crystal frequency [in Hz] */
-#define CLOCK_HSE           (0)
-/* 0: no external low speed crystal available,
- * 1: external crystal available (always 32.768kHz) */
-#define CLOCK_LSE           (1)
-/* 0: enable MSI only if HSE isn't available
- * 1: always enable MSI (e.g. if USB or RNG is used)*/
-#define CLOCK_MSI_ENABLE    (1)
-/* 0: disable Hardware auto calibration with LSE
- * 1: enable Hardware auto calibration with LSE (PLL-mode)*/
-#define CLOCK_MSI_LSE_PLL   (1)
-/* give the target core clock (HCLK) frequency [in Hz], maximum: 80MHz */
-#define CLOCK_CORECLOCK     (80000000U)
-/* PLL configuration: make sure your values are legit!
- *
- * compute by: CORECLOCK = (((PLL_IN / M) * N) / R)
- * with:
- * PLL_IN:  input clock, HSE or MSI @ 48MHz
- * M:       pre-divider,  allowed range: [1:8]
- * N:       multiplier,   allowed range: [8:86]
- * R:       post-divider, allowed range: [2,4,6,8]
- *
- * Also the following constraints need to be met:
- * (PLL_IN / M)     -> [4MHz:16MHz]
- * (PLL_IN / M) * N -> [64MHz:344MHz]
- * CORECLOCK        -> 80MHz MAX!
- */
-#define CLOCK_PLL_M         (6)
-#define CLOCK_PLL_N         (20)
-#define CLOCK_PLL_R         (2)
-/* peripheral clock setup */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV4
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 4)
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV2
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 2)
-/** @} */
 
 /**
  * @name UART configuration
@@ -133,35 +95,15 @@ static const pwm_conf_t pwm_config[] = {
 
 /**
  * @name   SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 20000000Hz */
-        7,  /* -> 78125Hz */
-        5,  /* -> 312500Hz */
-        3,  /* -> 1250000Hz */
-        1,  /* -> 5000000Hz */
-        0   /* -> 10000000Hz */
-    },
-    {       /* for APB2 @ 40000000Hz */
-        7,  /* -> 156250Hz */
-        6,  /* -> 312500Hz */
-        4,  /* -> 1250000Hz */
-        2,  /* -> 5000000Hz */
-        1   /* -> 10000000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
         .dev      = SPI1,
         .mosi_pin = GPIO_PIN(PORT_B, 5),
         .miso_pin = GPIO_PIN(PORT_B, 4),
         .sclk_pin = GPIO_PIN(PORT_B, 3),
-        .cs_pin   = GPIO_UNDEF,
+        .cs_pin   = SPI_CS_UNDEF,
         .mosi_af  = GPIO_AF5,
         .miso_af  = GPIO_AF5,
         .sclk_af  = GPIO_AF5,

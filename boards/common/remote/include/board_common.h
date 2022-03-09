@@ -26,6 +26,7 @@
 #include "cpu.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
+#include "cc2538_eui_primary.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -82,11 +83,6 @@
 #define XTIMER_BACKOFF      (50)
 #define XTIMER_ISR_BACKOFF  (40)
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware
- */
-void board_init(void);
 
 #ifdef __cplusplus
 } /* end extern "C" */

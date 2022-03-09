@@ -1,0 +1,5 @@
+# include variants of mrf24j40 drivers as pseudo modules
+PSEUDOMODULES += mrf24j40m%
+
+USEMODULE_INCLUDES_mrf24j40 := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_mrf24j40)

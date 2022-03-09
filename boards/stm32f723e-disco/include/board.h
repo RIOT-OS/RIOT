@@ -60,11 +60,16 @@ extern "C" {
 #define BTN0_MODE           GPIO_IN
 /** @} */
 
-
 /**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ * @name FT5X06 touch panel configuration
+ * @{
  */
-void board_init(void);
+#define FT5X06_PARAM_I2C_DEV            I2C_DEV(1)              /**< I2C device */
+#define FT5X06_PARAM_INT_PIN            GPIO_PIN(PORT_I, 9)     /**< Interrupt pin */
+#define FT5X06_PARAM_XMAX               (240)                   /**< Max width */
+#define FT5X06_PARAM_YMAX               (240)                   /**< Max height */
+#define FT5X06_PARAM_TYPE               FT5X06_TYPE_FT6X06      /**< Device type */
+/** @} */
 
 #ifdef __cplusplus
 }

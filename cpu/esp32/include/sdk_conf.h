@@ -28,7 +28,34 @@
 extern "C" {
 #endif
 
-#include "board.h"
+/**
+ * @brief   SDK version number
+ *
+ * Determined with `git describe --tags` in `$ESP32_SDK_DIR`
+ */
+#if !defined(IDF_VER) || DOXYGEN
+#include "esp32_idf_version.h"
+#endif
+
+/**
+ * @name    Clock configuration
+ * @{
+ */
+
+#ifndef DOXYGEN
+/* Mapping of Kconfig defines to the respective enumeration values */
+#if CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_2
+#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   2
+#elif CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_40
+#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   40
+#elif CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_80
+#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   80
+#elif CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_160
+#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   160
+#elif CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_240
+#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   240
+#endif
+#endif
 
 /**
  * @brief   Defines the CPU frequency [values = 2, 40, 80, 160 and 240]
@@ -36,6 +63,11 @@ extern "C" {
 #ifndef CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ
 #define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   80
 #endif
+/**
+ * @brief   Mapping configured ESP32 default clock to CLOCK_CORECLOCK define
+ */
+#define CLOCK_CORECLOCK     (1000000UL * CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ)
+/** @} */
 
 /**
  * Default console configuration
@@ -59,25 +91,15 @@ extern "C" {
 /**
  * ESP32 specific configuration
  *
- * CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ can be overridden by an application
- * specific SDK configuration file.
- */
-#ifndef CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ
-#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ       80
-#endif
-
-/**
- * ESP32 specific configuration
- *
  * Main clock crystal frequency (MHz). Zero means to auto-configure.
  * This is configured at the board level, defaulting to 40.
  */
 #ifndef CONFIG_ESP32_XTAL_FREQ
-#define CONFIG_ESP32_XTAL_FREQ                  ESP32_XTAL_FREQ
+#define CONFIG_ESP32_XTAL_FREQ                  0
 #endif
 
 #define CONFIG_ESP32_RTC_XTAL_BOOTSTRAP_CYCLES  100
-#define CONFIG_ESP32_RTC_CLK_CAL_CYCLES         1024
+#define CONFIG_ESP32_RTC_CLK_CAL_CYCLES         (8 * 1024)
 
 /**
  * System specific configuration (DO NOT CHANGE)
@@ -89,7 +111,10 @@ extern "C" {
 #define CONFIG_SYSTEM_EVENT_TASK_STACK_SIZE     2048
 #define CONFIG_NUMBER_OF_UNIVERSAL_MAC_ADDRESS  4
 
-#define CONFIG_NEWLIB_NANO_FORMAT               0
+#ifdef MODULE_NEWLIB_NANO
+#define CONFIG_NEWLIB_NANO_FORMAT               1
+#endif
+#define CONFIG_ESP32_DEEP_SLEEP_WAKEUP_DELAY    2000
 
 /**
  * Bluetooth configuration (DO NOT CHANGE)
@@ -157,7 +182,9 @@ extern "C" {
 #define CONFIG_ESP32_WIFI_CSI_ENABLED           0
 #define CONFIG_ESP32_WIFI_TASK_PINNED_TO_CORE_0 1
 #define CONFIG_ESP32_WIFI_TASK_PINNED_TO_CORE_1 0
-#define CONFIG_ESP32_WIFI_NVS_ENABLED           0
+#if MODULE_ESP_IDF_NVS_ENABLED
+#define CONFIG_ESP32_WIFI_NVS_ENABLED           1
+#endif
 
 /**
  * PHY configuration
@@ -181,3 +208,4 @@ extern "C" {
 
 #endif /* DOXYGEN */
 #endif /* SDK_CONF_H */
+/** @} */

@@ -1,0 +1,121 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menuconfig MODULE_IEEE802154
+    bool "IEEE 802.15.4 support"
+    depends on TEST_KCONFIG
+
+if MODULE_IEEE802154
+
+config MODULE_IEEE802154_SECURITY
+    bool "IEEE 802.15.4 security"
+    select MODULE_CRYPTO
+    select MODULE_CIPHER_MODES
+    help
+        IEEE 802.15.4 security interface
+
+config MODULE_IEEE802154_SUBMAC
+    bool "IEEE 802.15.4 submac"
+    select MODULE_XTIMER
+    help
+        This module defines a common layer for handling the lower part of the IEEE 802.15.4 MAC layer.
+
+endif # MODULE_IEEE802154
+
+menuconfig KCONFIG_USEMODULE_IEEE802154
+    bool "Configure IEEE802.15.4"
+    depends on USEMODULE_IEEE802154
+    help
+        Configure IEEE802.15.4 module using Kconfig
+
+if KCONFIG_USEMODULE_IEEE802154
+
+    choice
+        bool "IEEE802.15.4 default PHY mode"
+        default IEEE802154_DEFAULT_PHY_OQPSK
+        help
+            IEEE802.15.4 default mode
+
+        config IEEE802154_DEFAULT_PHY_BPSK
+            bool "BPSK"
+            help
+                Binary Phase Shift Keying
+
+        config IEEE802154_DEFAULT_PHY_ASK
+            bool "ASK"
+            help
+                Amplitude-Shift Keying
+
+        config IEEE802154_DEFAULT_PHY_OQPSK
+            bool "O-QPSK"
+            help
+                Offset Quadrature Phase-Shift Keying
+
+        config IEEE802154_DEFAULT_PHY_MR_OQPSK
+            bool "MR-O-QPSK"
+            help
+                Multi-Rate Offset Quadrature Phase-Shift Keying
+
+        config IEEE802154_DEFAULT_PHY_MR_OFDM
+            bool "MR-OFDM"
+            help
+                Multi-Rate Orthogonal Frequency-Division Multiplexing
+
+        config IEEE802154_DEFAULT_PHY_MR_FSK
+            bool "MR-FSK"
+            help
+                Multi-Rate Frequency Shift Keying
+
+    endchoice # IEEE802.15.4 default PHY mode
+
+    config IEEE802154_DEFAULT_SUBGHZ_CHANNEL
+        int "IEEE802.15.4 default sub-GHZ channel"
+        default 5
+
+    config IEEE802154_DEFAULT_SUBGHZ_PAGE
+        int "IEEE802.15.4 default sub-GHZ page"
+        default 2
+
+    config IEEE802154_DEFAULT_CHANNEL
+        int "IEEE802.15.4 default channel"
+        default 26
+
+    config IEEE802154_DEFAULT_PANID
+        hex "IEEE802.15.4 default PANID"
+        default 0x0023
+        range 0x0 0xFFFF
+
+    config IEEE802154_DEFAULT_TXPOWER
+        int "IEEE802.15.4 default TX power (in dBm)"
+        default 0
+
+    config IEEE802154_DEFAULT_CSMA_CA_MIN
+        int "IEEE802.15.4 default CSMA-CA minimum backoff exponent"
+        default 3
+
+    config IEEE802154_DEFAULT_CSMA_CA_RETRIES
+        int "IEEE802.15.4 default CSMA-CA maximum number of retries"
+        default 4
+
+    config IEEE802154_DEFAULT_CSMA_CA_MAX
+        int "IEEE802.15.4 default CSMA-CA maximum backoff exponent"
+        default 5
+    config IEEE802154_AUTO_ACK_DISABLE
+        bool "Disable Auto ACK support" if !USEPKG_OPENWSN
+        default y if USEPKG_OPENWSN
+
+menuconfig KCONFIG_USEMODULE_IEEE802154_SECURITY
+    bool "Configure IEEE802.15.4 Security"
+    depends on USEMODULE_IEEE802154_SECURITY
+    help
+        Configure IEEE802.15.4 security module using Kconfig
+
+    config IEEE802154_SEC_DEFAULT_KEY
+        string "Default key to be used for encryption and decryption (>=16B)"
+        default "pizza_margherita"
+        depends on KCONFIG_USEMODULE_IEEE802154_SECURITY
+
+endif # KCONFIG_USEMODULE_IEEE802154

@@ -1,0 +1,5 @@
+INCLUDES += -I$(PKGDIRBASE)/uwb-dw1000/hw/drivers/uwb/uwb_dw1000/include \
+            -I$(RIOTPKG)/uwb-dw1000/include \
+            #
+
+DIRS += $(RIOTPKG)/uwb-dw1000/hal

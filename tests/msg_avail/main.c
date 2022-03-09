@@ -25,7 +25,6 @@
 
 #include "log.h"
 #include "msg.h"
-#include "test_utils/interactive_sync.h"
 
 #define MSG_QUEUE_LENGTH                (8)
 
@@ -33,8 +32,6 @@ msg_t msg_queue[MSG_QUEUE_LENGTH];
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
     msg_t msges[MSG_QUEUE_LENGTH];
 
     msg_init_queue(msg_queue, MSG_QUEUE_LENGTH);
@@ -42,7 +39,7 @@ int main(void)
     puts("[START]");
 
     /* add message to own queue */
-    for (int idx = 0; idx < MSG_QUEUE_LENGTH; ++idx) {
+    for (unsigned idx = 0; idx < MSG_QUEUE_LENGTH; ++idx) {
         msges[idx].type = idx;
         msg_send_to_self(msges + idx);
         LOG_INFO("+ add msg: %d\n", idx);
@@ -52,11 +49,11 @@ int main(void)
         }
     }
     /* receive available messages in queue */
-    for (int idx = msg_avail(); idx > 0; --idx) {
+    for (unsigned idx = msg_avail(); idx > 0; --idx) {
         msg_t msg;
         msg_receive(&msg);
         LOG_INFO("- got msg: %d\n", (MSG_QUEUE_LENGTH - idx));
-        if ((int)msg.type != (MSG_QUEUE_LENGTH - idx)
+        if (msg.type != (MSG_QUEUE_LENGTH - idx)
             || msg_avail() != idx - 1) {
             puts("[FAILED]");
             return 1;

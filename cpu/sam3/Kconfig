@@ -1,0 +1,38 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_FAM_SAM3
+    bool
+    select CPU_CORE_CORTEX_M3
+    select HAS_CORTEXM_MPU
+    select HAS_CPU_SAM3
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_HWRNG
+    select MODULE_ZTIMER_NO_PERIPH_RTT if TEST_KCONFIG && MODULE_ZTIMER
+
+## CPU Models
+config CPU_MODEL_SAM3X8E
+    bool
+    select CPU_FAM_SAM3
+
+## Declaration of specific features
+config HAS_CPU_SAM3
+    bool
+    help
+        Indicates that a 'sam3' cpu is being used.
+
+## Common CPU symbols
+config CPU_FAM
+    default "sam3" if CPU_FAM_SAM3
+
+config CPU_MODEL
+    default "sam3x8e" if CPU_MODEL_SAM3X8E
+
+config CPU
+    default "sam3" if CPU_FAM_SAM3
+
+source "$(RIOTCPU)/cortexm_common/Kconfig"

@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "assert.h"
+#include "test_utils/expect.h"
 #include "cn-cbor/cn-cbor.h"
 #include "embUnit.h"
 #include "fmt.h"
@@ -58,12 +58,10 @@ static cn_cbor_context ct =
 static void *cbor_calloc(size_t count, size_t size, void *memblock)
 {
     (void)count;
-    assert(count == 1); /* Count is always 1 with cn-cbor */
-    void *block = memarray_alloc(memblock);
-    if (block) {
-        memset(block, 0, size);
-    }
-    return block;
+    (void)size;
+    expect(count == 1); /* Count is always 1 with cn-cbor */
+    expect(size == sizeof(cn_cbor));
+    return memarray_calloc(memblock);
 }
 
 static void cbor_free(void *ptr, void *memblock)

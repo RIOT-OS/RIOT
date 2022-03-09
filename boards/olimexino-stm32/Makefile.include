@@ -1,0 +1,9 @@
+# we use shared STM32 configuration snippets
+INCLUDES += -I$(RIOTBASE)/boards/common/stm32/include
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyUSB0
+PROGRAMMER=stm32flash
+
+# Setup of programmer and serial is shared between STM32 based boards
+include $(RIOTMAKE)/boards/stm32.inc.mk

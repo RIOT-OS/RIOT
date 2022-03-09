@@ -1,0 +1,20 @@
+# Copyright (c) 2021 Mesotic SAS
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "nrf9160dk" if BOARD_NRF9160DK
+
+config BOARD_NRF9160DK
+    bool
+    default y
+    select CPU_MODEL_NRF9160
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+
+    # Put other features for this board (in alphabetical order)
+    select HAS_RIOTBOOT

@@ -1,0 +1,31 @@
+From ba0f5ceb2aeaa6c2aab5c20c79597d306d360900 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Thu, 4 Nov 2021 15:38:38 +0100
+Subject: [PATCH] porting/nimble: silence -Wcast-align
+
+---
+ porting/nimble/include/os/os_mbuf.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/porting/nimble/include/os/os_mbuf.h b/porting/nimble/include/os/os_mbuf.h
+index 771ea761..e5ca0617 100644
+--- a/porting/nimble/include/os/os_mbuf.h
++++ b/porting/nimble/include/os/os_mbuf.h
+@@ -132,12 +132,12 @@ struct os_mqueue {
+     ((__om)->om_pkthdr_len >= sizeof (struct os_mbuf_pkthdr))
+ 
+ /** Get a packet header pointer given an mbuf pointer */
+-#define OS_MBUF_PKTHDR(__om) ((struct os_mbuf_pkthdr *)     \
++#define OS_MBUF_PKTHDR(__om) ((struct os_mbuf_pkthdr *)(uintptr_t) \
+     ((uint8_t *)&(__om)->om_data + sizeof(struct os_mbuf)))
+ 
+ /** Given a mbuf packet header pointer, return a pointer to the mbuf */
+ #define OS_MBUF_PKTHDR_TO_MBUF(__hdr)   \
+-     (struct os_mbuf *)((uint8_t *)(__hdr) - sizeof(struct os_mbuf))
++     (struct os_mbuf *)(uintptr_t)((uint8_t *)(__hdr) - sizeof(struct os_mbuf))
+ 
+ /**
+  * Gets the length of an entire mbuf chain.  The specified mbuf must have a
+-- 
+2.33.1
+

@@ -1,0 +1,46 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_GNRC_MAC
+    bool "Configure GNRC MAC"
+    depends on USEMODULE_GNRC_MAC
+    help
+        Configure the GNRC MAC using Kconfig.
+
+if KCONFIG_USEMODULE_GNRC_MAC
+
+config GNRC_MAC_RX_QUEUE_SIZE_EXP
+    int "Exponent for the RX queue size (resulting in the queue size 2^n)"
+    default 3
+    help
+        As the queue size ALWAYS needs to be power of two, this option
+        represents the exponent of 2^n, which will be used as the size of the RX
+        queue for incoming packets.
+
+config GNRC_MAC_DISPATCH_BUFFER_SIZE_EXP
+    int "Exponent for the dispatch buffer size (resulting in the buffer size 2^n)"
+    default 3
+    help
+        As the buffer size ALWAYS needs to be power of two, this option
+        represents the exponent of 2^n, which will be used as the size of the
+        dispatch buffer for storing dispatching packets.
+
+config GNRC_MAC_NEIGHBOR_COUNT
+    int "Count of neighbor nodes in one-hop distance"
+    default 8
+
+config GNRC_MAC_TX_QUEUE_SIZE_EXP
+    int "Exponent for the TX queue size (resulting in the queue size 2^n)"
+    default 3
+    help
+        As the queue size ALWAYS needs to be power of two, this option
+        represents the exponent of 2^n, which will be used as the size of the TX
+        queue for transmission packets coming from higher layers.
+
+config GNRC_MAC_DISABLE_DUTYCYCLE_RECORD
+    bool "Disable MAC radio duty-cycle recording and displaying"
+
+endif # KCONFIG_USEMODULE_GNRC_MAC

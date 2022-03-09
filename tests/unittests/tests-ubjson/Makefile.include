@@ -1,4 +1,0 @@
-USEMODULE += ubjson
-USEMODULE += pipe
-
-CFLAGS += -Wno-error=deprecated-declarations

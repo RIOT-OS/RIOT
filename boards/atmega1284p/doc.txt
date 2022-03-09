@@ -11,7 +11,7 @@ it. (An ISP programmer will be needed to program it; or to program a bootloader
 to subsequently allow programming via UART.)
 
 ### MCU
-| MCU           | ATmega328p                             |
+| MCU           | ATmega1284p                            |
 |:------------- |:-------------------------------------- |
 | Family        | AVR/ATmega                             |
 | Vendor        | Microchip (previously Atmel)           |
@@ -46,10 +46,10 @@ fuse is set, so that the clock is divided down to 1MHz. By disabling the
 can be done with:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-avrdude -c dragon_isp -p m1284p -B 32 -U lfuse:w:0xc2:m
+avrdude -c atmelice -p m1284p -B 32 -U lfuse:w:0xc2:m
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-(Replace `dragon_isp` with the programmer you are using. The -B 32 might be
+(Replace `atmelice` with the programmer you are using. The -B 32 might be
 needed for some programmers to successfully communicate with ATmegas clocked at
 less than 2MHz. It will no longer be needed after disabling `CKDIV8`.)
 
@@ -80,8 +80,8 @@ needed. Connect the programmer as follows:
 | RESET    | 9/RESET        |
 | Ground   | 11/GND         |
 
-The tool `avrdude` needs to be installed. When using the AVR Dragon for
-programming, running
+The tool `avrdude` needs to be installed. When using the Atmel ICE for
+connected via JTAG for programming, running
 
     make BOARD=atmega1284p flash
 
@@ -97,5 +97,51 @@ Connect a TTL adapter with pins 14/RXD0 and 15/TXD0 an run
 
 Please note that the supply voltage should be compatible with the logic level of
 the TTL adapter. Usually everything between 3.3 V and 5 V should work.
+
+## On-Chip Debugging
+
+In order to debug the ATmega1284P, an compatible debugger is needed. The Atmel
+ICE is the ~~cheapest~~ least expensive option currently available. (But at
+least it can program and debug pretty much all Atmel AVR and ARM chips.)
+
+Once the Atmel ICE is correctly connected, the ATmega1284P has the JTAG
+interface enabled, and the required software is installed, debugging can be
+started using
+
+    make debug
+
+@note       If you are using a different debugger than the Atmel ICE, you have
+            to export the `AVR_DEBUGDEVICE` environment variable to the required
+            flag to pass to AVaRICE, e.g. when using the AVR Dragon you have to
+            export `AVR_DEBUGDEVICE=--dragon`. If the debug device is not
+            connected via USB, you also need to export `AVR_DEBUGINTERFACE` to
+            the correct value.
+
+#### Software Requirements
+
+In order to debug you'll need an GDB version with AVR support and
+[AVaRICE](http://avarice.sourceforge.net/). Note that AVaRICE sadly is not
+being actively maintained and the latest release will not compile on most
+systems. Thus, unless your distribution already ships a package of the SVN
+version of AVaRICE, you'll have to build the tool from source.
+
+### JTAG Pin Mapping
+
+| Pin Name  | Pin   | Signal    | Atmel ICE Pin     |
+|:----------|:------|:----------|:------------------|
+| PC5       | 27    | TDI       | JTAG-9            |
+| PC4       | 26    | TDO       | JTAG-3            |
+| PC3       | 25    | TMS       | JTAG-5            |
+| PC2       | 24    | TCK       | JTAG-1            |
+| VCC       | 10    | VTG       | JTAG-4            |
+| GND       | 11    | GND       | JTAG-2            |
+
+### Fuse Settings
+
+The `JTAGEN` fuse has to be set in order to use the JTAG interface. The JTAG
+pins will no longer be available as GPIOs when this fuse is set. With the
+default settings the MCUs are preprogrammed during manufacturing, the `JTAGEN`
+fuse is already set. So with a new and unused package, you're ready directly
+ready to go.
 
  */

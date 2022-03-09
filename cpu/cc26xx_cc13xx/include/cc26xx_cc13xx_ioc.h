@@ -31,14 +31,13 @@ extern "C" {
 #define MCU_IOC_BASE           (0x40081000) /**< IOC (MCU) base address */
 /** @} */
 
-
 /**
  * @brief obtain IOCFG-register for a DIO
  *
  * @param[in] dio_num DIO number (0-31)
  */
 typedef struct {
-    reg32_t CFG[32]; /**< config */
+    reg32_t CFG[32]; /**< Config */
 } cc26x0_ioc_regs_t;
 
 #define IOC ((cc26x0_ioc_regs_t *)(MCU_IOC_BASE)) /**< IOC register banks */
@@ -54,7 +53,7 @@ typedef struct {
 #define IOCFG_PORTID_AON_SCK            0x00000002  /**< AON SPI-S SCK */
 #define IOCFG_PORTID_AON_SDI            0x00000003  /**< AON SPI-S SDI */
 #define IOCFG_PORTID_AON_SDO            0x00000004  /**< AON SPI-S SDO */
-#endif //CPU_VARIANT_X0
+#endif /* CPU_VARIANT_X0 */
 
 #define IOCFG_PORTID_AON_CLK32K         0x00000007  /**< AON external 32kHz clock */
 #define IOCFG_PORTID_AUX_IO             0x00000008  /**< AUX IO */
@@ -142,35 +141,46 @@ typedef struct {
 #define IOCFG_HYST_ENABLE               0x40000000
 /** @} */
 
+/**
+ * @brief   AON_IOC registers
+ */
+typedef struct {
+    reg32_t IOSTRMIN; /**< IO Drive Strength Minimum */
+    reg32_t IOSTRMED; /**< IO Drive Strength Medium */
+    reg32_t IOSTRMAX; /**< IO Drive Strength Maximum */
+    reg32_t IOCLATCH; /**< IO Latch Control */
+    reg32_t CLK32KCTL; /**< SCLK_LF External Output Control */
+#ifdef CPU_VARIANT_X2
+    reg32_t TCKCTL; /**< TCK IO Pin Control */
+#endif
+} aon_ioc_regs_t;
 
-/** @ingroup cpu_specific_peripheral_memory_map
+/**
+ * @brief   AON_IOC register values
  * @{
  */
-#define AON_IOC_BASE            (PERIPH_BASE + 0x94000) /**< always-on-IOC base address */
+#define AON_IOC_IOCLATCH_EN   0x00000001
+#define AON_IOC_CLK32KCTL_OEN 0x00000001
 /** @} */
 
 /**
- * AON registers
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
  */
-typedef struct {
-    reg32_t IOSTRMIN; /**< IO drive strength minimum */
-    reg32_t IOSTRMED; /**< IO drive strength medium */
-    reg32_t IOSTRMAX; /**< IO drive strength maximum */
-    reg32_t IOCLATCH; /**< IO latch control */
-    reg32_t CLK32KCTL; /**< SCLK_LF external output control */
-} aon_regs_t;
+/**
+ * @brief   AON_IOC base address
+ */
+#define AON_IOC_BASE         (PERIPH_BASE + 0x94000)
+/** @} */
 
-#define AON                     ((aon_regs_t *) (AON_IOC_BASE)) /**< AON register bank */
-
-#define IOCLATCH_EN             0x00000001 /**< IO controlled by GPIO or peripheral; kept in AON otherwise */
-
-#define CLK32KCTL_OEN           0x00000001 /**< don't output SCLK_LF on DIOs with PORT_ID AON_CLK32K */
-
+/**
+ * @brief   AON_IOC register bank
+ */
+#define AON_IOC              ((aon_ioc_regs_t *) (AON_IOC_BASE))
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* CC26XX_CC13XX_IOC_H */
-
-/*@}*/
+/** @} */

@@ -23,7 +23,7 @@
 
 #include "lua_run.h"
 #include "lua_builtin.h"
-#include "repl.lua.h"
+#include "blob/repl.lua.h"
 
 /* The basic interpreter+repl needs about 13k ram AT Minimum but we need more
  * memory in order to do interesting stuff.
@@ -37,7 +37,6 @@ static char lua_memory[MAIN_LUA_MEM_SIZE] __attribute__ ((aligned(__BIGGEST_ALIG
 const struct lua_riot_builtin_lua _lua_riot_builtin_lua_table[] = {
     { "repl", repl_lua, sizeof(repl_lua) }
 };
-
 
 const struct lua_riot_builtin_lua *const lua_riot_builtin_lua_table = _lua_riot_builtin_lua_table;
 

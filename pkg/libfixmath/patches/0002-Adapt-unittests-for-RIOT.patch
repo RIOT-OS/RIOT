@@ -1,18 +1,18 @@
-From 00aa19d5a431e414008e1475421cae8704ad775a Mon Sep 17 00:00:00 2001
-From: Martine Lenders <mail@martine-lenders.eu>
-Date: Thu, 12 May 2016 15:08:39 +0200
-Subject: [PATCH] Adapt unittests for RIOT
+From 30484a41cc1ad29344583521ae9478f25206f05d Mon Sep 17 00:00:00 2001
+From: Alexandre Abadie <alexandre.abadie@inria.fr>
+Date: Wed, 27 Jan 2021 13:48:26 +0100
+Subject: [PATCH 2/2] Adapt unittests for RIOT
 
 ---
- unittests/fix16_exp_unittests.c    | 12 ++++++------
- unittests/fix16_macros_unittests.c |  6 +++---
- unittests/fix16_str_unittests.c    | 10 +++++-----
- unittests/fix16_unittests.c        | 30 +++++++++++++++---------------
- unittests/libfixmath-unittests.h   | 10 +++++-----
- 5 files changed, 34 insertions(+), 34 deletions(-)
+ unittests/fix16_exp_unittests.c    | 15 ++++++------
+ unittests/fix16_macros_unittests.c | 13 +++++-----
+ unittests/fix16_str_unittests.c    | 13 +++++-----
+ unittests/fix16_unittests.c        | 39 +++++++++++++++---------------
+ unittests/libfixmath-unittests.h   |  6 ++++-
+ 5 files changed, 47 insertions(+), 39 deletions(-)
 
 diff --git a/unittests/fix16_exp_unittests.c b/unittests/fix16_exp_unittests.c
-index afb6706..5b942bb 100644
+index afb6706..532f918 100644
 --- a/unittests/fix16_exp_unittests.c
 +++ b/unittests/fix16_exp_unittests.c
 @@ -2,11 +2,11 @@
@@ -47,7 +47,7 @@ index afb6706..5b942bb 100644
          printf("Average delta %0.4f%%\n", sum / count);
          
          TEST(max_delta < 1);
-@@ -111,14 +111,14 @@ int main()
+@@ -111,14 +111,15 @@ int main()
              count++;
          }
          
@@ -58,14 +58,16 @@ index afb6706..5b942bb 100644
          TEST(max_delta < 20);
      }
      
-     if (status != 0)
+-    if (status != 0)
 -    fprintf(stdout, "\n\nSome tests FAILED!\n");
-+    printf( "\n\nSome tests FAILED!\n");
++    if (status != 0) {
++        printf("\n\nSome tests FAILED!\n");
++    }
  
      return status;
  }
 diff --git a/unittests/fix16_macros_unittests.c b/unittests/fix16_macros_unittests.c
-index cdfcfaf..6141021 100644
+index cdfcfaf..2e7bc5c 100644
 --- a/unittests/fix16_macros_unittests.c
 +++ b/unittests/fix16_macros_unittests.c
 @@ -4,13 +4,13 @@
@@ -84,17 +86,24 @@ index cdfcfaf..6141021 100644
  {
    int status = 0;
  
-@@ -103,7 +103,7 @@ int main()
+@@ -101,10 +101,11 @@ int main()
+   DO_TEST(  -1,07143)
+   DO_TEST(  -1,07737)
    DO_TEST(  -0,22957)
-     
-   if (status != 0)
+-    
+-  if (status != 0)
 -    fprintf(stdout, "\n\nSome tests FAILED!\n");
-+    printf( "\n\nSome tests FAILED!\n");
-   
+-  
++
++  if (status != 0) {
++      printf("\n\nSome tests FAILED!\n");
++  }
++
    return status;
  }
+ 
 diff --git a/unittests/fix16_str_unittests.c b/unittests/fix16_str_unittests.c
-index 46da171..678bc3c 100644
+index 46da171..b1f811d 100644
 --- a/unittests/fix16_str_unittests.c
 +++ b/unittests/fix16_str_unittests.c
 @@ -3,9 +3,9 @@
@@ -126,29 +135,32 @@ index 46da171..678bc3c 100644
                  ok = false;
              }
          
-@@ -111,7 +111,7 @@ int main()
+@@ -110,8 +110,9 @@ int main()
+         TEST(ok);
      }
  
-     if (status != 0)
+-    if (status != 0)
 -        fprintf(stdout, "\n\nSome tests FAILED!\n");
-+        printf( "\n\nSome tests FAILED!\n");
++    if (status != 0) {
++        printf("\n\nSome tests FAILED!\n");
++    }
  
      return status;
  }
 diff --git a/unittests/fix16_unittests.c b/unittests/fix16_unittests.c
-index 9a301a1..b9fbf1a 100644
+index 51d8f61..265b637 100644
 --- a/unittests/fix16_unittests.c
 +++ b/unittests/fix16_unittests.c
-@@ -2,7 +2,7 @@
- #include <stdio.h>
+@@ -3,7 +3,7 @@
  #include <math.h>
  #include <stdbool.h>
+ #include "int64.h"
 -#include "unittests.h"
 +#include "libfixmath-unittests.h"
  
  const fix16_t testcases[] = {
    // Small numbers
-@@ -47,7 +47,7 @@ const fix16_t max_delta = 1;
+@@ -48,7 +48,7 @@ const fix16_t max_delta = 1;
  const fix16_t max_delta = 0;
  #endif
  
@@ -157,7 +169,7 @@ index 9a301a1..b9fbf1a 100644
  {
    int status = 0;
    
-@@ -101,7 +101,7 @@ int main()
+@@ -102,7 +102,7 @@ int main()
              #ifndef FIXMATH_NO_OVERFLOW
              if (result != fix16_overflow)
              {
@@ -166,7 +178,7 @@ index 9a301a1..b9fbf1a 100644
                failures++;
              }
              #endif
-@@ -109,8 +109,8 @@ int main()
+@@ -110,8 +110,8 @@ int main()
              continue;
            }
            
@@ -177,7 +189,7 @@ index 9a301a1..b9fbf1a 100644
            failures++;
          }
        }
-@@ -176,7 +176,7 @@ int main()
+@@ -177,7 +177,7 @@ int main()
              #ifndef FIXMATH_NO_OVERFLOW
              if (result != fix16_overflow)
              {
@@ -186,7 +198,7 @@ index 9a301a1..b9fbf1a 100644
                failures++;
              }
              #endif
-@@ -222,7 +222,7 @@ int main()
+@@ -223,7 +223,7 @@ int main()
              #ifndef FIXMATH_NO_OVERFLOW
              if (result != fix16_overflow)
              {
@@ -195,7 +207,7 @@ index 9a301a1..b9fbf1a 100644
                failures++;
              }
              #endif
-@@ -230,8 +230,8 @@ int main()
+@@ -231,8 +231,8 @@ int main()
              continue;
            }
            
@@ -206,7 +218,7 @@ index 9a301a1..b9fbf1a 100644
            failures++;
          }
        }
-@@ -268,7 +268,7 @@ int main()
+@@ -269,16 +269,16 @@ int main()
              #ifndef FIXMATH_NO_OVERFLOW
              if (result != fix16_overflow)
              {
@@ -215,18 +227,19 @@ index 9a301a1..b9fbf1a 100644
                failures++;
              }
              #endif
-@@ -276,8 +276,8 @@ int main()
+             // Legitimate overflow
              continue;
            }
-           
+-          
 -          printf("\n%d - %d = %d\n", a, b, result);
 -          printf("%f - %f = %d\n", fa, fb, fresult);
++
 +          printf("\n%ld - %ld = %ld\n", (long)a, (long)b, (long)result);
 +          printf("%f - %f = %ld\n", fa, fb, (long)fresult);
            failures++;
          }
        }
-@@ -321,8 +321,8 @@ int main()
+@@ -322,8 +322,8 @@ int main()
        
        if (delta(fresult, result) > max_delta)
        {
@@ -237,31 +250,35 @@ index 9a301a1..b9fbf1a 100644
          failures++;
        }
      }
-@@ -331,7 +331,7 @@ int main()
+@@ -383,9 +383,10 @@ int main()
+     TEST(fix16_lerp32(fix16_minimum, fix16_maximum, 0xffffffff) == (fix16_maximum - 1));
+     TEST(fix16_lerp32(-fix16_maximum, fix16_maximum, 0x80000000) == 0);
    }
-   
-   if (status != 0)
+-  
+-  if (status != 0)
 -    fprintf(stdout, "\n\nSome tests FAILED!\n");
-+    printf( "\n\nSome tests FAILED!\n");
-   
+-  
++
++  if (status != 0) {
++      printf( "\n\nSome tests FAILED!\n");
++  }
++
    return status;
  }
 diff --git a/unittests/libfixmath-unittests.h b/unittests/libfixmath-unittests.h
-index 57ad8f8..a3324bf 100644
+index 57ad8f8..cab51ca 100644
 --- a/unittests/libfixmath-unittests.h
 +++ b/unittests/libfixmath-unittests.h
-@@ -5,13 +5,13 @@
- #define STR2(x) STR(x)
- #define TEST(x) \
+@@ -7,7 +7,7 @@
      if (!(x)) { \
--        fflush(stdout); \
--        fflush(stderr); \
+         fflush(stdout); \
+         fflush(stderr); \
 -        fprintf(stderr, "\033[31;1mFAILED:\033[22;39m " __FILE__ ":" STR2(__LINE__) " " #x "\n"); \
-+        printf( "\033[31;1mFAILED:\033[22;39m " __FILE__ ":" STR2(__LINE__) " " #x "\n"); \
++        printf("\033[31;1mFAILED:\033[22;39m " RIOT_FILE_NOPATH ":" STR2(__LINE__) " " #x "\n"); \
          status = 1; \
      } else { \
--        fflush(stdout); \
--        fflush(stderr); \
+         fflush(stdout); \
+@@ -15,3 +15,7 @@
          printf("\033[32;1mOK:\033[22;39m " #x "\n"); \
      }
  
@@ -270,5 +287,5 @@ index 57ad8f8..a3324bf 100644
 +int fix16_str_unittests(void);
 +int fix16_unittests(void);
 -- 
-2.20.1
+2.27.0
 

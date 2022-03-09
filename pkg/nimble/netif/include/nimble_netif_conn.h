@@ -23,6 +23,7 @@
 #define NIMBLE_NETIF_CONN_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "nimble_netif.h"
 
@@ -41,6 +42,7 @@ extern "C" {
 typedef struct {
     struct ble_l2cap_chan *coc;     /**< l2cap context as exposed by NimBLE */
     uint16_t gaphandle;             /**< GAP handle exposed by NimBLE */
+    uint16_t itvl;                  /**< currently used connection interval */
     uint16_t state;                 /**< the current state of the context */
     uint8_t addr[BLE_ADDR_LEN];     /**< BLE address of connected peer
                                          (in network byte order) */
@@ -112,7 +114,6 @@ int nimble_netif_conn_get_by_addr(const uint8_t *addr);
  */
 int nimble_netif_conn_get_by_gaphandle(uint16_t gaphandle);
 
-
 /**
  * @brief   Iterate over all connection contexts that match the filter condition
  *
@@ -125,6 +126,20 @@ int nimble_netif_conn_get_by_gaphandle(uint16_t gaphandle);
  */
 void nimble_netif_conn_foreach(uint16_t filter,
                                nimble_netif_conn_iter_t cb, void *arg);
+
+/**
+ * @brief   Find the next context that matches the filter condition
+ *
+ * This function allows for iterating connection contexts in a non-blocking way.
+ *
+ * @param[in] handle        last used handle, set to NIMBLE_NETIF_CONN_INVALID
+                            to get the first matching entry
+ * @param[in] filter        filter mask
+ *
+ * @return  handle of the next matching connection context
+ * @return  NIMBLE_NETIF_CONN_INVALID if no matching context was found
+ */
+int nimble_netif_conn_get_next(int handle, uint16_t filter);
 
 /**
  * @brief   Count the number of connections contexts for which the given filter
@@ -152,14 +167,55 @@ int nimble_netif_conn_start_connection(const uint8_t *addr);
  *          connection
  *
  * @return  handle of the reserved context
- * @return  NIMBLE_NETIF_CONN_INVALID if no unused context was available
+ * @return  -EALREADY if already advertising
+ * @return  -ENOMEM if no memory slot is available
  */
 int nimble_netif_conn_start_adv(void);
 
 /**
  * @brief   Free the connection context with the given handle
  */
-void nimble_netif_conn_free(int handle);
+void nimble_netif_conn_free(int handle, uint8_t *addr);
+
+/**
+ * @brief   Get the used connection interval for the given connection handle
+ *
+ * @param[in] handle        connection handle
+ *
+ * @return  used connection interval in milliseconds on success
+ * @return  0 if unable to get connection interval
+ */
+uint16_t nimble_netif_conn_get_itvl_ms(int handle);
+
+/**
+ * @brief   Check if the given connection interval is used, taking the minimal
+ *          spacing as defined by NIMBLE_NETIF_CONN_ITVL_SPACING into account
+ *
+ * @param[in] itvl          connection interval to check, multiples of 1.25ms
+ * @param[in] skip_handle   do not compare against connection interval for this
+ *                          handle, set to NIMBLE_NETIF_CONN_INVALID to check
+ *                          all
+ *
+ * @return  true if given interval is used
+ * @return  false if given interval is not used
+ */
+bool nimble_netif_conn_itvl_used(uint16_t itvl, int skip_handle);
+
+/**
+ * @brief   Generate a pseudorandom connection interval from the given range
+ *
+ * If the NIMBLE_NETIF_CONN_ITVL_SPACING option is enabled, this function
+ * ensures that the generated connection interval is spaced at least
+ * NIMBLE_NETIF_CONN_ITVL_SPACING from the connection interval of each open
+ * BLE connection.
+ *
+ * @param[in] min           minimum connection interval
+ * @param[in] max           maximum connection interval
+ *
+ * @return  generated connection interval on success, multiples of 1.25ms
+ * @return  0 if no valid connection interval could be generated
+ */
+uint16_t nimble_netif_conn_gen_itvl(uint16_t min, uint16_t max);
 
 /**
  * @brief   Find the connection context with a given GAP handle and return a
@@ -202,6 +258,18 @@ static inline int nimble_netif_conn_connected(const uint8_t *addr)
     return (nimble_netif_conn_get_by_addr(addr) != NIMBLE_NETIF_CONN_INVALID);
 }
 
+/**
+ * @brief   Test if the given connection is (still) open
+ *
+ * @param[in] conn          Connection to test
+ *
+ * @return  != 0 if true
+ * @return  0 if false
+ */
+static inline int nimble_netif_conn_is_open(const nimble_netif_conn_t *conn)
+{
+    return (conn->coc != NULL);
+}
 
 /**
  * @brief   Convenience function to check if any context is currently in the

@@ -1,0 +1,116 @@
+CFLAGS += -DCPU_FAM_STM32$(call uppercase_and_underscore,$(CPU_FAM))
+
+# For stm32 cpu's we use the generic stm32.ld linker script
+LINKER_SCRIPT ?= stm32.ld
+
+# Include riotboot specific variables
+include $(RIOTCPU)/stm32/stm32_riotboot.mk
+
+# Compute ROM_LEN and RAM_LEN
+include $(RIOTCPU)/stm32/stm32_mem_lengths.mk
+KB := 1024
+ROM_LEN_K := $(shell echo $(ROM_LEN) | sed 's/K//')
+RAM_LEN_K := $(shell echo $(RAM_LEN) | sed 's/K//')
+
+ifneq (,$(filter w%,$(CPU_FAM)))
+  ifneq (,$(CPU2_RAM_LEN))
+    # adjust RAM_LEN and ROM_LEN according to CPU2 RAM_LEN and ROM_LEN
+    CPU2_RAM_LEN_K := $(shell echo $(CPU2_RAM_LEN) | sed 's/K//')
+    RAM_LEN := $(shell echo $$(( ($(RAM_LEN_K) - $(CPU2_RAM_LEN_K) ) * $(KB) )))
+  else
+    RAM_LEN := $(shell echo $$(( $(RAM_LEN_K) * $(KB) )) )
+  endif
+  ifneq (,$(CPU2_ROM_LEN))
+    CPU2_ROM_LEN_K := $(shell echo $(CPU2_ROM_LEN) | sed 's/K//')
+    FLASHSIZE := $(shell echo $$(( ($(ROM_LEN_K) - $(CPU2_ROM_LEN_K) )* $(KB) )) )
+    ROM_LEN := $(shell echo $$(( ($(ROM_LEN_K) - $(CPU2_ROM_LEN_K) ) ))K)
+  else
+    FLASHSIZE := $(shell echo $$(( $(ROM_LEN_K) * $(KB) )) )
+  endif
+else
+  FLASHSIZE := $(shell echo $$(( $(ROM_LEN_K) * $(KB) )) )
+  RAM_LEN := $(shell echo $$(( $(RAM_LEN_K) * $(KB) )) )
+endif
+
+# Get CPU_LINE_ variable
+include $(RIOTCPU)/stm32/stm32_line.mk
+CPU_LINE ?= $(shell echo $(CPU_MODEL) | cut -c -9 | tr 'a-z-' 'A-Z_')xx
+
+ifeq ($(CONFIG_RDP0),y)
+  CFLAGS += -DCONFIG_STM32_RDP=0
+endif
+ifeq ($(CONFIG_RDP1),y)
+  CFLAGS += -DCONFIG_STM32_RDP=1
+endif
+ifeq ($(CONFIG_RDP2),y)
+  CFLAGS += -DCONFIG_STM32_RDP=2
+endif
+
+# Set CFLAGS
+CFLAGS += -D$(CPU_LINE) -DCPU_LINE_$(CPU_LINE)
+CFLAGS += -DSTM32_FLASHSIZE=$(FLASHSIZE)U
+
+info-stm32:
+	@$(COLOR_ECHO) "CPU: $(CPU_MODEL)"
+	@$(COLOR_ECHO) "\tLine: $(CPU_LINE)"
+	@$(COLOR_ECHO) "\tPin count:\t$(STM32_PINS)"
+	@$(COLOR_ECHO) "\tROM size:\t$(ROM_LEN) ($(FLASHSIZE) Bytes)"
+	@$(COLOR_ECHO) "\tRAM size:\t$(RAM_LEN_K)KiB"
+
+
+ifneq (,$(CCMRAM_LEN))
+  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ccmram_length=$(CCMRAM_LEN)
+endif
+ifneq (,$(SRAM4_LEN))
+  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_sram4_length=$(SRAM4_LEN)
+endif
+
+VECTORS_O ?= $(BINDIR)/stm32_vectors/$(CPU_LINE).o
+VECTORS_FILE = $(RIOTCPU)/stm32/vectors/$(CPU_LINE).c
+BUILDDEPS += $(VECTORS_FILE)
+
+# CPU_LINE must be exported only when building the vectors object file since
+# the source filename to be built is built from the CPU_LINE content.
+$(call target-export-variables,$(VECTORS_O),CPU_LINE)
+
+# Add this define to skip the inclusion of the system_stm32xxxx.h header files
+# which are only used for STM32 system includes and not of interest for RIOT.
+CFLAGS += -D__SYSTEM_STM32$(call uppercase,$(CPU_FAM))XX_H
+
+ifneq (,$(filter STM32F030x4 STM32MP157Cxx,$(CPU_LINE)))
+  STM32CMSIS_INCLUDE_DIR = $(RIOTCPU)/stm32/include/vendor/cmsis/$(CPU_FAM)/Include
+else
+  STM32CMSIS_INCLUDE_DIR = $(RIOTBASE)/build/stm32/cmsis/$(CPU_FAM)/Include
+  STM32FAM_INCLUDE_FILE = $(STM32CMSIS_INCLUDE_DIR)/stm32$(CPU_FAM)xx.h
+  INCLUDES += -I$(STM32CMSIS_INCLUDE_DIR)
+endif
+
+# Fetch all CMSIS headers using the package mechanism. This rule is called all
+# the time to ensure it's correctly updated when versions in the packages are
+# updated.
+$(STM32FAM_INCLUDE_FILE): FORCE $(CLEAN)
+	$(Q)+$(MAKE) -f $(RIOTBASE)/cpu/stm32/Makefile.cmsis
+
+# The vectors source file requires the family headers to be fetched before since
+# it's generated from the CMSIS content
+$(VECTORS_FILE): $(STM32FAM_INCLUDE_FILE)
+	$(Q)$(RIOTBASE)/cpu/stm32/dist/irqs/gen_vectors.py $(STM32CMSIS_INCLUDE_DIR) $(CPU_LINE)
+
+ifeq (,$(filter STM32MP157Cxx STM32F030x4,$(CPU_LINE)))
+  # IRQs of STM32F030x4 and STM32MP157Cxx lines are not available in the CMSIS
+  # package so they are hardcoded in RIOTs codebase.
+  # For other lines, the IRQs are automatically generated once from the whole
+  # list of CMSIS headers available in a given family
+  STM32IRQS_INCLUDE_FILE = $(RIOTCPU)/stm32/include/irqs/$(CPU_FAM)/irqs.h
+  BUILDDEPS += $(STM32IRQS_INCLUDE_FILE)
+endif
+
+# The IRQ header for a given family requires the family headers to be fetched
+# before since it's generated from all CMSIS content of that family
+$(STM32IRQS_INCLUDE_FILE): $(STM32FAM_INCLUDE_FILE)
+	$(Q)$(RIOTBASE)/cpu/stm32/dist/irqs/gen_irqs.py $(STM32CMSIS_INCLUDE_DIR) $(CPU_FAM)
+
+# Include clock configuration directory
+INCLUDES += -I$(RIOTCPU)/stm32/include/clk
+
+include $(RIOTMAKE)/arch/cortexm.inc.mk

@@ -7,7 +7,6 @@
  * directory for more details.
  */
 
-
 /**
  * @file
  * @brief       avsextrem board initialization

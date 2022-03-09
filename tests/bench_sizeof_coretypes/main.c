@@ -25,7 +25,7 @@
 #include "cib.h"
 #include "clist.h"
 #include "panic.h"
-#include "kernel_types.h"
+#include "sched.h"
 #include "list.h"
 #include "mbox.h"
 #include "msg.h"
@@ -37,7 +37,6 @@
 #include "thread_flags.h"
 #endif
 #include "thread.h"
-
 
 #define P(NAME) printf("    tcb->%-11s            %3u     %3u\n", #NAME, \
                        (unsigned)sizeof(((thread_t *) 0)->NAME), \
@@ -102,7 +101,7 @@ int main(void)
     P(msg_queue);
     P(msg_array);
 #endif
-#if defined(DEVELHELP) || defined(SCHED_TEST_STACK) || defined(MODULE_MPU_STACK_GUARD)
+#if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) || defined(MODULE_MPU_STACK_GUARD)
     P(stack_start);
 #endif
 #ifdef DEVELHELP

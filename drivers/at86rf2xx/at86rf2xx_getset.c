@@ -31,7 +31,7 @@
 #include "at86rf2xx_registers.h"
 #include "periph/spi.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifdef MODULE_AT86RF212B
@@ -51,20 +51,6 @@ static const uint8_t dbm_to_tx_pow_915[] = { 0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x17,
                                              0x04, 0x03, 0x02, 0x01, 0x00, 0x86,
                                              0x40, 0x84, 0x83, 0x82, 0x80, 0xc1,
                                              0xc0 };
-static const int16_t rx_sens_to_dbm[] = { -110, -98, -94, -91, -88, -85, -82,
-                                          -79, -76, -73, -70, -67, -63, -60, -57,
-                                          -54 };
-static const uint8_t dbm_to_rx_sens[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                          0x01, 0x01, 0x01, 0x01, 0x02, 0x02,
-                                          0x02, 0x03, 0x03, 0x03, 0x04, 0x04,
-                                          0x04, 0x05, 0x05, 0x05, 0x06, 0x06,
-                                          0x06, 0x07, 0x07, 0x07, 0x08, 0x08,
-                                          0x08, 0x09, 0x09, 0x09, 0x0a, 0x0a,
-                                          0x0a, 0x0b, 0x0b, 0x0b, 0x0b, 0x0c,
-                                          0x0c, 0x0c, 0x0d, 0x0d, 0x0d, 0x0e,
-                                          0x0e, 0x0e, 0x0f };
-
 static int16_t _tx_pow_to_dbm_212b(uint8_t channel, uint8_t page, uint8_t reg)
 {
     if (page == 0 || page == 2) {
@@ -99,18 +85,6 @@ static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
                                          0x0e, 0x0d, 0x0d, 0x0d, 0x0c, 0x0c,
                                          0x0b, 0x0b, 0x0a, 0x09, 0x08, 0x07,
                                          0x06, 0x05, 0x03, 0x00 };
-static const int16_t rx_sens_to_dbm[] = { -101, -94, -91, -88, -85, -82, -79,
-                                          -76, -73, -70, -67, -64, -61, -58, -55,
-                                          -52 };
-static const uint8_t dbm_to_rx_sens[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                          0x00, 0x01, 0x01, 0x01, 0x02, 0x02,
-                                          0x02, 0x03, 0x03, 0x03, 0x04, 0x04,
-                                          0x04, 0x05, 0x05, 0x05, 0x06, 0x06,
-                                          0x06, 0x07, 0x07, 0x07, 0x08, 0x08,
-                                          0x08, 0x09, 0x09, 0x09, 0x0a, 0x0a,
-                                          0x0a, 0x0b, 0x0b, 0x0b, 0x0c, 0x0c,
-                                          0x0c, 0x0d, 0x0d, 0x0d, 0x0e, 0x0e,
-                                          0x0e, 0x0f };
 #else
 static const int16_t tx_pow_to_dbm[] = { 3, 3, 2, 2, 1, 1, 0,
                                          -1, -2, -3, -4, -5, -7, -9, -12, -17 };
@@ -118,18 +92,6 @@ static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
                                          0x0e, 0x0d, 0x0d, 0x0c, 0x0c, 0x0b,
                                          0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06,
                                          0x05, 0x03, 0x00 };
-static const int16_t rx_sens_to_dbm[] = { -101, -91, -88, -85, -82, -79, -76
-                                          -73, -70, -67, -64, -61, -58, -55, -52,
-                                          -49 };
-static const uint8_t dbm_to_rx_sens[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                          0x00, 0x00, 0x00, 0x00, 0x01, 0x01,
-                                          0x01, 0x02, 0x02, 0x02, 0x03, 0x03,
-                                          0x03, 0x04, 0x04, 0x04, 0x05, 0x05,
-                                          0x05, 0x06, 0x06, 0x06, 0x07, 0x07,
-                                          0x07, 0x08, 0x08, 0x08, 0x09, 0x09,
-                                          0x09, 0x0a, 0x0a, 0x0a, 0x0b, 0x0b,
-                                          0x0b, 0x0c, 0x0c, 0x0c, 0x0d, 0x0d,
-                                          0x0d, 0x0e, 0x0e, 0x0e, 0x0f };
 #endif
 
 void at86rf2xx_get_addr_short(const at86rf2xx_t *dev, network_uint16_t *addr)
@@ -210,6 +172,48 @@ void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page)
 #endif
 }
 
+uint8_t at86rf2xx_get_phy_mode(at86rf2xx_t *dev)
+{
+#ifdef MODULE_AT86RF212B
+    uint8_t ctrl2;
+    ctrl2 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
+    if (ctrl2 & AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK) {
+        return IEEE802154_PHY_OQPSK;
+    } else {
+        return IEEE802154_PHY_BPSK;
+    }
+#else
+    (void) dev;
+    return IEEE802154_PHY_OQPSK;
+#endif
+}
+
+int at86rf2xx_set_rate(at86rf2xx_t *dev, uint8_t rate)
+{
+    uint8_t ctrl2;
+
+    if (rate > 3) {
+        return -ERANGE;
+    }
+
+    ctrl2 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
+    ctrl2 &= ~AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_DATA_RATE;
+    ctrl2 |= rate;
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2, ctrl2);
+
+    return 0;
+}
+
+uint8_t at86rf2xx_get_rate(at86rf2xx_t *dev)
+{
+    uint8_t rate;
+
+    rate = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
+    rate &= AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_DATA_RATE;
+
+    return rate;
+}
+
 uint16_t at86rf2xx_get_pan(const at86rf2xx_t *dev)
 {
     return dev->netdev.pan;
@@ -217,7 +221,7 @@ uint16_t at86rf2xx_get_pan(const at86rf2xx_t *dev)
 
 void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan)
 {
-    le_uint16_t le_pan = byteorder_btols(byteorder_htons(pan));
+    le_uint16_t le_pan = byteorder_htols(pan);
 
     DEBUG("pan0: %u, pan1: %u\n", le_pan.u8[0], le_pan.u8[1]);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PAN_ID_0, le_pan.u8[0]);
@@ -262,27 +266,34 @@ void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower)
 #endif
 }
 
-int16_t at86rf2xx_get_rxsensitivity(const at86rf2xx_t *dev)
+int8_t at86rf2xx_get_rxsensitivity(const at86rf2xx_t *dev)
 {
     uint8_t rxsens = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN)
                      & AT86RF2XX_RX_SYN__RX_PDT_LEVEL;
-    return rx_sens_to_dbm[rxsens];
+    /* From datasheet (see below) */
+    return rxsens > 0 ? RSSI_BASE_VAL + ((rxsens - 1) * 3) : MIN_RX_SENSITIVITY;
 }
 
-void at86rf2xx_set_rxsensitivity(const at86rf2xx_t *dev, int16_t rxsens)
+void at86rf2xx_set_rxsensitivity(const at86rf2xx_t *dev, int8_t rxsens)
 {
-    rxsens += MIN_RX_SENSITIVITY;
-
-    if (rxsens < 0) {
-        rxsens = 0;
+    uint8_t hwval;
+    /* From datasheet, rxsens = @ref RSSI_BASE_VAL + (3 * (RX_PDT_LEVEL-1)).
+     * If rxsens < @ref RSSI_BASE_VAL, the RX sensitivity is equal to @ref
+     * MIN_RX_SENSITIVITY.
+     */
+    if (rxsens < RSSI_BASE_VAL) {
+        hwval = 0;
     }
-    else if (rxsens > MAX_RX_SENSITIVITY) {
-        rxsens = MAX_RX_SENSITIVITY;
+    else if (rxsens > RSSI_BASE_VAL + (3 * (AT86RF2XX_RX_SYN__RX_PDT_LEVEL)) - 1) {
+        hwval = AT86RF2XX_RX_SYN__RX_PDT_LEVEL;
+    }
+    else {
+        hwval = ((rxsens - RSSI_BASE_VAL + 3) / 3);
     }
 
     uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN);
     tmp &= ~(AT86RF2XX_RX_SYN__RX_PDT_LEVEL);
-    tmp |= (dbm_to_rx_sens[rxsens] & AT86RF2XX_RX_SYN__RX_PDT_LEVEL);
+    tmp |= (hwval & AT86RF2XX_RX_SYN__RX_PDT_LEVEL);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, tmp);
 }
 
@@ -435,14 +446,6 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
                           : (tmp |  AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK);
             at86rf2xx_reg_write(dev, AT86RF2XX_REG__CSMA_SEED_1, tmp);
             break;
-        case AT86RF2XX_OPT_TELL_RX_START:
-            DEBUG("[at86rf2xx] opt: %s SFD IRQ\n",
-                  (state ? "enable" : "disable"));
-            tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_MASK);
-            tmp = (state) ? (tmp |  AT86RF2XX_IRQ_STATUS_MASK__RX_START)
-                          : (tmp & ~AT86RF2XX_IRQ_STATUS_MASK__RX_START);
-            at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
-            break;
         case AT86RF2XX_OPT_ACK_PENDING:
             DEBUG("[at86rf2xx] opt: enabling pending ACKs\n");
             tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CSMA_SEED_1);
@@ -498,6 +501,8 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
         old_state = at86rf2xx_get_status(dev);
     } while (old_state == AT86RF2XX_STATE_BUSY_RX_AACK ||
              old_state == AT86RF2XX_STATE_BUSY_TX_ARET ||
+             old_state == AT86RF2XX_STATE_BUSY_RX      ||
+             old_state == AT86RF2XX_STATE_BUSY_TX      ||
              old_state == AT86RF2XX_STATE_IN_PROGRESS);
 
     if (state == AT86RF2XX_STATE_FORCE_TRX_OFF) {

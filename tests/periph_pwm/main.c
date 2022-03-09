@@ -39,7 +39,7 @@
 #define OSC_STEP        (10)
 #define OSC_MODE        PWM_LEFT
 #define OSC_FREQU       (1000U)
-#define OSC_STEPS       (1000U)
+#define OSC_STEPS       (256U)
 #define PWR_SLEEP       (1U)
 
 static uint32_t initiated;

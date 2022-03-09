@@ -27,6 +27,8 @@
 #include <stdint.h>
 #include <unistd.h>
 
+#include "net/dns/msg.h"
+
 #include "net/sock/udp.h"
 
 #ifdef __cplusplus
@@ -34,31 +36,13 @@ extern "C" {
 #endif
 
 /**
- * @brief DNS internal structure
- */
-typedef struct {
-    uint16_t id;        /**< read           */
-    uint16_t flags;     /**< DNS            */
-    uint16_t qdcount;   /**< RFC            */
-    uint16_t ancount;   /**< for            */
-    uint16_t nscount;   /**< detailed       */
-    uint16_t arcount;   /**< explanations   */
-    uint8_t payload[];  /**< !!             */
-} sock_dns_hdr_t;
-
-/**
  * @name DNS defines
  * @{
  */
-#define DNS_TYPE_A              (1)
-#define DNS_TYPE_AAAA           (28)
-#define DNS_CLASS_IN            (1)
-
 #define SOCK_DNS_PORT           (53)
 #define SOCK_DNS_RETRIES        (2)
 
-#define SOCK_DNS_MAX_NAME_LEN   (64U)       /* we're in embedded context. */
-#define SOCK_DNS_QUERYBUF_LEN   (sizeof(sock_dns_hdr_t) + 4 + SOCK_DNS_MAX_NAME_LEN)
+#define SOCK_DNS_MAX_NAME_LEN   (CONFIG_DNS_MSG_LEN - sizeof(dns_hdr_t) - 4)
 /** @} */
 
 /**
@@ -80,8 +64,8 @@ typedef struct {
  * @param[out]  addr_out        buffer to write result into
  * @param[in]   family          Either AF_INET, AF_INET6 or AF_UNSPEC
  *
- * @return      0 on success
- * @return      !=0 otherwise
+ * @return      the size of the resolved address on success
+ * @return      < 0 otherwise
  */
 int sock_dns_query(const char *domain_name, void *addr_out, int family);
 

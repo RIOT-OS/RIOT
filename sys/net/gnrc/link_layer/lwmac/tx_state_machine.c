@@ -19,6 +19,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "periph/rtt.h"
 #include "net/gnrc.h"
 #include "net/gnrc/lwmac/lwmac.h"
@@ -28,9 +30,6 @@
 #include "include/tx_state_machine.h"
 #include "include/lwmac_internal.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
 #ifndef LOG_LEVEL
 /**
  * @brief Default log level define
@@ -38,6 +37,9 @@
 #define LOG_LEVEL LOG_WARNING
 #endif
 #include "log.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 /**
  * @brief   Flag to track if send packet success
@@ -309,7 +311,8 @@ static uint8_t _packet_process_in_wait_for_wa(gnrc_netif_t *netif)
                                           wa_hdr->current_phase;
             }
             else {
-                netif->mac.tx.timestamp += RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US);
+                netif->mac.tx.timestamp +=
+                    RTT_US_TO_TICKS(CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US);
                 netif->mac.tx.timestamp -= wa_hdr->current_phase;
             }
 
@@ -324,7 +327,7 @@ static uint8_t _packet_process_in_wait_for_wa(gnrc_netif_t *netif)
             }
 
             if ((own_phase < RTT_US_TO_TICKS((3 * GNRC_LWMAC_WAKEUP_DURATION_US / 2))) ||
-                (own_phase > RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US -
+                (own_phase > RTT_US_TO_TICKS(CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US -
                                              (3 * GNRC_LWMAC_WAKEUP_DURATION_US / 2)))) {
                 gnrc_lwmac_set_phase_backoff(netif, true);
                 LOG_WARNING("WARNING: [LWMAC-tx] phase close\n");
@@ -384,7 +387,7 @@ static bool _send_data(gnrc_netif_t *netif)
 
     /* It's okay to retry sending DATA. Timing doesn't matter anymore and
      * destination is waiting for a certain amount of time. */
-    uint8_t csma_retries = GNRC_LWMAC_DATA_CSMA_RETRIES;
+    uint8_t csma_retries = CONFIG_GNRC_LWMAC_DATA_CSMA_RETRIES;
     netif->dev->driver->set(netif->dev, NETOPT_CSMA_RETRIES,
                             &csma_retries, sizeof(csma_retries));
 
@@ -507,7 +510,7 @@ void gnrc_lwmac_tx_stop(gnrc_netif_t *netif)
 
     /* Release packet in case of failure */
     if (netif->mac.tx.packet) {
-        if (netif->mac.tx.tx_retry_count >= GNRC_LWMAC_MAX_DATA_TX_RETRIES) {
+        if (netif->mac.tx.tx_retry_count >= CONFIG_GNRC_LWMAC_MAX_DATA_TX_RETRIES) {
             netif->mac.tx.tx_retry_count = 0;
             gnrc_pktbuf_release(netif->mac.tx.packet);
             netif->mac.tx.packet = NULL;
@@ -556,7 +559,7 @@ static bool _lwmac_tx_update(gnrc_netif_t *netif)
             if (gnrc_netif_hdr_get_flag(netif->mac.tx.packet) &
                 (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
                 /* Set CSMA retries as configured and enable */
-                uint8_t csma_retries = GNRC_LWMAC_BROADCAST_CSMA_RETRIES;
+                uint8_t csma_retries = CONFIG_GNRC_LWMAC_BROADCAST_CSMA_RETRIES;
                 netif->dev->driver->set(netif->dev, NETOPT_CSMA_RETRIES,
                                         &csma_retries, sizeof(csma_retries));
                 netif->mac.mac_info |= GNRC_NETIF_MAC_INFO_CSMA_ENABLED;
@@ -662,7 +665,8 @@ static bool _lwmac_tx_update(gnrc_netif_t *netif)
             netif->mac.tx.wr_sent++;
 
             /* Set timeout for next WR in case no WA will be received */
-            gnrc_lwmac_set_timeout(netif, GNRC_LWMAC_TIMEOUT_WR, GNRC_LWMAC_TIME_BETWEEN_WR_US);
+            gnrc_lwmac_set_timeout(netif, GNRC_LWMAC_TIMEOUT_WR,
+                                   CONFIG_GNRC_LWMAC_TIME_BETWEEN_WR_US);
 
             /* Debug WR timing */
             LOG_DEBUG("[LWMAC-tx] Destination phase was: %" PRIu32 "\n",
@@ -683,6 +687,7 @@ static bool _lwmac_tx_update(gnrc_netif_t *netif)
                 LOG_WARNING("WARNING: [LWMAC-tx] No response from destination\n");
                 netif->mac.tx.state = GNRC_LWMAC_TX_STATE_FAILED;
                 reschedule = true;
+                netif->mac.tx.preamble_fail_counts++;
                 break;
             }
 
@@ -733,6 +738,7 @@ static bool _lwmac_tx_update(gnrc_netif_t *netif)
             if (tx_info & GNRC_LWMAC_TX_SUCCESS) {
                 netif->mac.tx.state = GNRC_LWMAC_TX_STATE_SEND_DATA;
                 reschedule = true;
+                netif->mac.tx.preamble_fail_counts = 0;
                 break;
             }
             else {

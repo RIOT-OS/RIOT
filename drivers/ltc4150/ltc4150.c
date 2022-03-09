@@ -22,9 +22,10 @@
 #include <string.h>
 
 #include "ltc4150.h"
-#include "xtimer.h"
+#include "ztimer64.h"
+#include "timex.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static void pulse_cb(void *_dev)
@@ -33,7 +34,7 @@ static void pulse_cb(void *_dev)
     ltc4150_dir_t dir;
     ltc4150_dev_t *dev = _dev;
 
-    if ((dev->params.polarity == GPIO_UNDEF) ||
+    if ((!gpio_is_valid(dev->params.polarity)) ||
         (!gpio_read(dev->params.polarity))
         ) {
         dev->discharged++;
@@ -44,7 +45,7 @@ static void pulse_cb(void *_dev)
         dir = LTC4150_CHARGE;
     }
 
-    now = xtimer_now_usec64();
+    now = ztimer64_now(ZTIMER64_USEC);
 
     if (dev->params.recorders) {
         assert(dev->params.recorder_data);
@@ -66,7 +67,7 @@ int ltc4150_init(ltc4150_dev_t *dev, const ltc4150_params_t *params)
     memset(dev, 0, sizeof(ltc4150_dev_t));
     dev->params = *params;
 
-    if (dev->params.shutdown != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.shutdown)) {
         /* Activate LTC4150 */
         if (gpio_init(dev->params.shutdown, GPIO_OUT)) {
             DEBUG("[ltc4150] Failed to initialize shutdown pin");
@@ -75,7 +76,7 @@ int ltc4150_init(ltc4150_dev_t *dev, const ltc4150_params_t *params)
         gpio_set(dev->params.shutdown);
     }
 
-    if (dev->params.polarity != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.polarity)) {
         gpio_mode_t mode = (dev->params.flags & LTC4150_POL_EXT_PULL_UP) ?
                            GPIO_IN : GPIO_IN_PU;
         if (gpio_init(dev->params.polarity, mode)) {
@@ -101,7 +102,7 @@ int ltc4150_init(ltc4150_dev_t *dev, const ltc4150_params_t *params)
 
 int ltc4150_reset_counters(ltc4150_dev_t *dev)
 {
-    uint64_t now = xtimer_now_usec64();
+    uint64_t now = ztimer64_now(ZTIMER64_USEC);
 
     if (!dev) {
         return -EINVAL;
@@ -132,7 +133,7 @@ int ltc4150_shutdown(ltc4150_dev_t *dev)
 
     gpio_irq_disable(dev->params.interrupt);
 
-    if (dev->params.shutdown != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.shutdown)) {
         gpio_clear(dev->params.shutdown);
     }
 

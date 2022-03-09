@@ -4,3 +4,5 @@ USEMODULE += gnrc_ipv6
 USEMODULE += ipv4_addr
 USEMODULE += ipv6_addr
 USEMODULE += posix_headers
+# GNRC has no support for IPv4, still force it on for the unit test
+USEMODULE += ipv4

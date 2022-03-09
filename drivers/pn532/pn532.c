@@ -21,14 +21,15 @@
 #include <string.h>
 
 #include "assert.h"
-#include "xtimer.h"
+#include "kernel_defines.h"
+#include "ztimer.h"
 #include "mutex.h"
 #include "pn532.h"
 #include "periph/gpio.h"
 #include "periph/i2c.h"
 #include "periph/spi.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG                0
 #include "debug.h"
 
 #define PN532_I2C_ADDRESS           (0x24)
@@ -57,13 +58,13 @@
 #define BUFF_CMD_START              (6)
 #define BUFF_DATA_START             (BUFF_CMD_START + 1)
 #define RAPDU_DATA_BEGIN            (1)
-#define RAPDU_MAX_DATA_LEN          (PN532_BUFFER_LEN - BUFF_DATA_START - 5)
-#define CAPDU_MAX_DATA_LEN          (PN532_BUFFER_LEN - BUFF_DATA_START - 1)
+#define RAPDU_MAX_DATA_LEN          (CONFIG_PN532_BUFFER_LEN - BUFF_DATA_START - 5)
+#define CAPDU_MAX_DATA_LEN          (CONFIG_PN532_BUFFER_LEN - BUFF_DATA_START - 1)
 
 /* Constants and magic numbers */
 #define MIFARE_CLASSIC_BLOCK_SIZE   (16)
-#define RESET_TOGGLE_SLEEP          (400000)
-#define RESET_BACKOFF               (10000)
+#define RESET_TOGGLE_SLEEP_MS       (400)
+#define RESET_BACKOFF_MS            (10)
 #define HOST_TO_PN532               (0xD4)
 #define PN532_TO_HOST               (0xD5)
 #define SPI_DATA_WRITE              (0x80)
@@ -78,7 +79,7 @@
 /* Length for passive listings */
 #define LIST_PASSIVE_LEN_14443(num)   (num * 20)
 
-#if ENABLE_DEBUG
+#if IS_ACTIVE(ENABLE_DEBUG)
 #define PRINTBUFF printbuff
 static void printbuff(uint8_t *buff, unsigned len)
 {
@@ -103,9 +104,9 @@ void pn532_reset(const pn532_t *dev)
 
     DEBUG("pn532: reset\n");
     gpio_clear(dev->conf->reset);
-    xtimer_usleep(RESET_TOGGLE_SLEEP);
+    ztimer_sleep(ZTIMER_MSEC, RESET_TOGGLE_SLEEP_MS);
     gpio_set(dev->conf->reset);
-    xtimer_usleep(RESET_BACKOFF);
+    ztimer_sleep(ZTIMER_MSEC, RESET_BACKOFF_MS);
 }
 
 int pn532_init(pn532_t *dev, const pn532_params_t *params, pn532_mode_t mode)
@@ -121,7 +122,7 @@ int pn532_init(pn532_t *dev, const pn532_params_t *params, pn532_mode_t mode)
     gpio_set(dev->conf->reset);
     dev->mode = mode;
     if (mode == PN532_SPI) {
-#ifdef PN532_SUPPORT_SPI
+#if IS_USED(MODULE_PN532_SPI)
         /* we handle the CS line manually... */
         gpio_init(dev->conf->nss, GPIO_OUT);
         gpio_set(dev->conf->nss);
@@ -146,8 +147,8 @@ static uint8_t chksum(uint8_t *b, unsigned len)
     return c;
 }
 
-#ifdef PN532_SUPPORT_SPI
-static void reverse(char *buff, unsigned len)
+#if IS_USED(MODULE_PN532_SPI)
+static void reverse(uint8_t *buff, unsigned len)
 {
     while (len--) {
         buff[len] = (buff[len] & 0xF0) >> 4 | (buff[len] & 0x0F) << 4;
@@ -165,7 +166,7 @@ static int _write(const pn532_t *dev, uint8_t *buff, unsigned len)
     (void)len;
 
     switch (dev->mode) {
-#ifdef PN532_SUPPORT_I2C
+#if IS_USED(MODULE_PN532_I2C)
     case PN532_I2C:
         i2c_acquire(dev->conf->i2c);
         ret = i2c_write_bytes(dev->conf->i2c, PN532_I2C_ADDRESS, buff, len, 0);
@@ -175,7 +176,7 @@ static int _write(const pn532_t *dev, uint8_t *buff, unsigned len)
         i2c_release(dev->conf->i2c);
         break;
 #endif
-#ifdef PN532_SUPPORT_SPI
+#if IS_USED(MODULE_PN532_SPI)
     case PN532_SPI:
         spi_acquire(dev->conf->spi, SPI_CS_UNDEF, SPI_MODE, SPI_CLK);
         gpio_clear(dev->conf->nss);
@@ -204,7 +205,7 @@ static int _read(const pn532_t *dev, uint8_t *buff, unsigned len)
     (void)len;
 
     switch (dev->mode) {
-#ifdef PN532_SUPPORT_I2C
+#if IS_USED(MODULE_PN532_I2C)
     case PN532_I2C:
         i2c_acquire(dev->conf->i2c);
         /* len+1 for RDY after read is accepted */
@@ -215,7 +216,7 @@ static int _read(const pn532_t *dev, uint8_t *buff, unsigned len)
         i2c_release(dev->conf->i2c);
         break;
 #endif
-#ifdef PN532_SUPPORT_SPI
+#if IS_USED(MODULE_PN532_SPI)
     case PN532_SPI:
         spi_acquire(dev->conf->spi, SPI_CS_UNDEF, SPI_MODE, SPI_CLK);
         gpio_clear(dev->conf->nss);
@@ -383,7 +384,7 @@ static int send_rcv(pn532_t *dev, uint8_t *buff, unsigned sendl, unsigned recvl)
 int pn532_fw_version(pn532_t *dev, uint32_t *fw_ver)
 {
     unsigned ret = -1;
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START] = CMD_FIRMWARE_VERSION;
 
@@ -401,7 +402,7 @@ int pn532_fw_version(pn532_t *dev, uint32_t *fw_ver)
 int pn532_read_reg(pn532_t *dev, char *out, unsigned addr)
 {
     int ret = -1;
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START     ] = CMD_READ_REG;
     buff[BUFF_DATA_START    ] = (addr >> 8) & 0xff;
@@ -417,7 +418,7 @@ int pn532_read_reg(pn532_t *dev, char *out, unsigned addr)
 
 int pn532_write_reg(pn532_t *dev, unsigned addr, char val)
 {
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START     ] = CMD_WRITE_REG;
     buff[BUFF_DATA_START    ] = (addr >> 8) & 0xff;
@@ -448,7 +449,7 @@ static int _set_act_retries(pn532_t *dev, uint8_t *buff, unsigned max_retries)
 
 int pn532_sam_configuration(pn532_t *dev, pn532_sam_conf_mode_t mode, unsigned timeout)
 {
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START     ] = CMD_SAM_CONFIG;
     buff[BUFF_DATA_START    ] = (char)mode;
@@ -473,7 +474,7 @@ int pn532_get_passive_iso14443a(pn532_t *dev, nfc_iso14443a_t *out,
                                 unsigned max_retries)
 {
     int ret = -1;
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     if (_set_act_retries(dev, buff, max_retries) == 0) {
         ret = _list_passive_targets(dev, buff, PN532_BR_106_ISO_14443_A, 1,
@@ -513,7 +514,7 @@ int pn532_get_passive_iso14443a(pn532_t *dev, nfc_iso14443a_t *out,
 
 void pn532_deselect_passive(pn532_t *dev, unsigned target_id)
 {
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START ] = CMD_DESELECT;
     buff[BUFF_DATA_START] = target_id;
@@ -523,7 +524,7 @@ void pn532_deselect_passive(pn532_t *dev, unsigned target_id)
 
 void pn532_release_passive(pn532_t *dev, unsigned target_id)
 {
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START ] = CMD_RELEASE;
     buff[BUFF_DATA_START] = target_id;
@@ -535,7 +536,7 @@ int pn532_mifareclassic_authenticate(pn532_t *dev, nfc_iso14443a_t *card,
                                      pn532_mifare_key_t keyid, char *key, unsigned block)
 {
     int ret = -1;
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START     ] = CMD_DATA_EXCHANGE;
     buff[BUFF_DATA_START    ] = card->target;
@@ -567,7 +568,7 @@ int pn532_mifareclassic_write(pn532_t *dev, char *idata, nfc_iso14443a_t *card,
                               unsigned block)
 {
     int ret = -1;
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     if (card->auth) {
 
@@ -589,7 +590,7 @@ static int pn532_mifare_read(pn532_t *dev, char *odata, nfc_iso14443a_t *card,
                              unsigned block, unsigned len)
 {
     int ret = -1;
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START     ] = CMD_DATA_EXCHANGE;
     buff[BUFF_DATA_START    ] = card->target;
@@ -644,7 +645,7 @@ static int send_rcv_apdu(pn532_t *dev, uint8_t *buff, unsigned slen, unsigned rl
 int pn532_iso14443a_4_activate(pn532_t *dev, nfc_iso14443a_t *card)
 {
     int ret;
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     /* select app ndef tag */
     buff[BUFF_CMD_START      ] = CMD_DATA_EXCHANGE;
@@ -689,7 +690,7 @@ int pn532_iso14443a_4_read(pn532_t *dev, char *odata, nfc_iso14443a_t *card,
                            unsigned offset, char len)
 {
     int ret;
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START     ] = CMD_DATA_EXCHANGE;
     buff[BUFF_DATA_START    ] = card->target;

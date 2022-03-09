@@ -29,39 +29,44 @@
 
 #include "net/netdev.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
+ * @defgroup net_csma_sender_conf CSMA/CA helper compile configurations
+ * @ingroup config
+ * @{
+ */
+/**
  * @brief Default Minimal CSMA/CA Backoff Exponent
  */
-#ifndef CSMA_SENDER_MIN_BE_DEFAULT
-#define CSMA_SENDER_MIN_BE_DEFAULT          (3U)
+#ifndef CONFIG_CSMA_SENDER_MIN_BE_DEFAULT
+#define CONFIG_CSMA_SENDER_MIN_BE_DEFAULT          (3U)
 #endif
 
 /**
  * @brief Default Maximal CSMA/CA Backoff Exponent
  */
-#ifndef CSMA_SENDER_MAX_BE_DEFAULT
-#define CSMA_SENDER_MAX_BE_DEFAULT          (5U)
+#ifndef CONFIG_CSMA_SENDER_MAX_BE_DEFAULT
+#define CONFIG_CSMA_SENDER_MAX_BE_DEFAULT          (5U)
 #endif
 
 /**
  * @brief Default Maximal number of retries for sending
  *        a given packet with the CSMA/CA method
  */
-#ifndef CSMA_SENDER_MAX_BACKOFFS_DEFAULT
-#define CSMA_SENDER_MAX_BACKOFFS_DEFAULT    (4U)
+#ifndef CONFIG_CSMA_SENDER_MAX_BACKOFFS_DEFAULT
+#define CONFIG_CSMA_SENDER_MAX_BACKOFFS_DEFAULT    (4U)
 #endif
 
 /**
  * @brief CSMA/CA backoff period, in microseconds
  */
-#ifndef CSMA_SENDER_BACKOFF_PERIOD_UNIT
-#define CSMA_SENDER_BACKOFF_PERIOD_UNIT     (320U)
+#ifndef CONFIG_CSMA_SENDER_BACKOFF_PERIOD_UNIT
+#define CONFIG_CSMA_SENDER_BACKOFF_PERIOD_UNIT     (320U)
 #endif
+/** @} */
 
 /**
  * @brief   Configuration type for backoff
@@ -132,7 +137,6 @@ int csma_sender_csma_ca_send(netdev_t *dev, iolist_t *iolist,
  *                      to send the given data
  */
 int csma_sender_cca_send(netdev_t *dev, iolist_t *iolist);
-
 
 #ifdef __cplusplus
 }

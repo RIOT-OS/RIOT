@@ -26,6 +26,14 @@ default module in `Makefile.tests_common`. It can be disabled by setting in the
 application makefile `DISABLE_MODULE += test_utils_interactive_sync`. The python
 test script will adapt to it automatically.
 
+When using the `shell` module, `test_utils_interactive_sync` will use the shell
+itself to synchronize, and will not use `test_utils_interactive_sync();` function
+to synchronize. Some times you will want to synchronize before the start of the
+script and use `test_utils_interactive_sync();` function (e.g.:
+[tests/ps_schedstatistics](tests/ps_schedstatistics/main.c)). For these cases
+you can disable `test_utils_interactive_sync_shell` module in the application
+`Makefile`: `DISABLE_MODULE += test_utils_interactive_sync_shell`.
+
 
 Running automated tests
 -----------------------
@@ -85,6 +93,17 @@ pattern like `\r\n`, `\s`, `\)`, etc..
     child.expect(r'some string: (\d+) ,')
 ~~~
 
+Use expect() instead of assert()
+--------------------------------
+
+In order to make a test application functional in all cases, use `expect()`
+instead of `assert()`. The former works like the latter, but will still be
+compiled in if `NDEBUG` is defined. This is useful to keep a test application
+working even when compiling with -DNDEBUG, allowing for the code-under-test to
+be compiled with that flag.  Otherwise, the application would force compiling
+all tested code with assertions enabled.
+`expect()` is defined in the header `test_utils/expect.h`.
+
 Interaction through the uart
 ----------------------------
 
@@ -98,3 +117,22 @@ The expected behavior is verified with the test in `tests/test_tools`.
 Tests cannot rely on having on all boards and terminal programs:
 * unbuffered input
 * allowing sending special characters like `ctrl+c/ctrl+d`
+
+
+Running tests that require a preliminary manual configuration
+-------------------------------------------------------------
+
+Some tests need active monitoring or manual setup steps but still have some
+automated scripts. The test automation scripts are defined in the
+`<test_application>/tests-with-config/` folder.
+For running them, follow the setup or analysis documentation and use the
+`test-with-config` target.
+
+Running tests that require root privileges
+------------------------------------------
+
+Some tests require root privileges to launch their automated script. In this
+case, the test automation scripts are defined in the
+`<test_application>/tests-as-root/` folder.
+For running them, follow the setup or analysis documentation and use the
+`test-as-root` target.

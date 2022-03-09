@@ -1,0 +1,25 @@
+From 02e03cdd5e136d7907feb317eb8d4ccee9c472a3 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 24 Jul 2020 15:42:05 +0200
+Subject: [PATCH 09/11] inc/check_config: skip checking board, unused in RIOT
+
+---
+ inc/check_config.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/inc/check_config.h b/inc/check_config.h
+index d2f4c967..a1c03d03 100644
+--- a/inc/check_config.h
++++ b/inc/check_config.h
+@@ -17,7 +17,7 @@
+     !defined(IOTLAB_A8_M3) && \
+     !defined(SAMR21_XPRO) && \
+     !defined(NRF52840)
+-#error 'Board name must be specified to check for configuration errors'
++// #error 'Board name must be specified to check for configuration errors'
+ #endif
+ 
+ #if (defined(OPENMOTE_CC2538) || \
+-- 
+2.28.0
+

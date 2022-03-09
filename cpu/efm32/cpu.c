@@ -53,7 +53,7 @@
 
 #ifndef RIOTBOOT
 
-#ifdef _SILICON_LABS_32B_SERIES_1
+#if defined(DCDC_PRESENT) && DCDC_COUNT > 0
 /**
  * @brief   Initialize integrated DC-DC regulator
  */
@@ -99,9 +99,15 @@ static void clk_init(void)
         CMU_OscillatorEnable(cmuOsc_HFRCO, false, false);
     }
 
+#if defined(_SILICON_LABS_32B_SERIES_1)
+    /* disable LFRCO comparator chopping and dynamic element matching
+     * else LFRCO has too much jitter for LEUART > 1800 baud */
+    CMU->LFRCOCTRL &= ~(CMU_LFRCOCTRL_ENCHOP | CMU_LFRCOCTRL_ENDEM);
+#endif
+
     /* initialize LFXO with board-specific parameters before switching */
     if (CLOCK_LFA == cmuSelect_LFXO || CLOCK_LFB == cmuSelect_LFXO ||
-#ifdef _SILICON_LABS_32B_SERIES_1
+#if defined(_SILICON_LABS_32B_SERIES_1)
         CLOCK_LFE == cmuSelect_LFXO)
 #else
         false)
@@ -118,14 +124,14 @@ static void clk_init(void)
     /* set (and enable) the LFB clock source */
     CMU_ClockSelectSet(cmuClock_LFB, CLOCK_LFB);
 
-#ifdef _SILICON_LABS_32B_SERIES_1
+#if defined(_SILICON_LABS_32B_SERIES_1)
     /* set (and enable) the LFE clock source */
     CMU_ClockSelectSet(cmuClock_LFE, CLOCK_LFE);
 #endif
 
     /* disable the LFRCO if external crystal is used */
     if (CLOCK_LFA == cmuSelect_LFXO && CLOCK_LFB == cmuSelect_LFXO &&
-#ifdef _SILICON_LABS_32B_SERIES_1
+#if defined(_SILICON_LABS_32B_SERIES_1)
         CLOCK_LFE == cmuSelect_LFXO)
 #else
         true)
@@ -148,7 +154,7 @@ static void pm_init(void)
 
     EMU_EM23Init(&init_em23);
 
-#ifdef _SILICON_LABS_32B_SERIES_1
+#if defined(_SILICON_LABS_32B_SERIES_1)
     /* initialize EM4 */
     EMU_EM4Init_TypeDef init_em4 = EMU_EM4INIT;
 
@@ -170,7 +176,7 @@ void cpu_init(void)
 
 #ifndef RIOTBOOT
 
-#ifdef _SILICON_LABS_32B_SERIES_1
+#if defined(DCDC_PRESENT) && DCDC_COUNT > 0
     /* initialize dc-dc */
     dcdc_init();
 #endif

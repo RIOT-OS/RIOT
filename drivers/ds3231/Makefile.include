@@ -1,0 +1,5 @@
+# include variants of ds3231 drivers as pseudo modules
+PSEUDOMODULES += ds3231_int
+
+USEMODULE_INCLUDES_ds3231 := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_ds3231)

@@ -1,0 +1,15 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  USEMODULE += stm32_eth
+endif
+
+ifneq (,$(filter disp_dev,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_ltdc
+endif
+
+ifneq (,$(filter touch_dev,$(USEMODULE)))
+  USEMODULE += ft5x06
+endif

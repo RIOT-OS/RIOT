@@ -46,7 +46,7 @@ int main(void)
         puts("start measurement [ERROR]");
         return -1;
     }
-    xtimer_usleep(TMP00X_CONVERSION_TIME);
+    xtimer_usleep(CONFIG_TMP00X_CONVERSION_TIME);
     puts("[SUCCESS]\n");
 
     while (1) {
@@ -60,7 +60,7 @@ int main(void)
         else {
             puts("conversion in progress ... ");
         }
-        xtimer_usleep(TMP00X_CONVERSION_TIME);
+        xtimer_usleep(CONFIG_TMP00X_CONVERSION_TIME);
     }
 
     return 0;

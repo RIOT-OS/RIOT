@@ -1,0 +1,9 @@
+MODULE = tensorflow-lite-c
+
+CFLAGS += -Wno-strict-prototypes
+CFLAGS += -Wno-old-style-definition
+
+NO_AUTO_SRC = 1
+SRC = common.c
+
+include $(RIOTBASE)/Makefile.base

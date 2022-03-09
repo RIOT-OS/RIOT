@@ -1,0 +1,7 @@
+USEMODULE += ztimer
+USEMODULE += ztimer_usec
+
+FEATURES_REQUIRED += periph_gpio
+
+USEMODULE += u8g2_csrc_riot
+USEMODULE += u8g2_csrc

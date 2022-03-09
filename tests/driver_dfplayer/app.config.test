@@ -1,0 +1,12 @@
+# this file enables modules defined in Kconfig. Do not use this file for
+# application configuration. This is only needed during migration.
+CONFIG_MODULE_DFPLAYER=y
+
+# enable event thread in lowest priority
+CONFIG_MODULE_EVENT=y
+CONFIG_MODULE_EVENT_THREAD=y
+CONFIG_MODULE_EVENT_THREAD_LOWEST=y
+
+# enable shell with basic commands
+CONFIG_MODULE_SHELL=y
+CONFIG_MODULE_SHELL_COMMANDS=y

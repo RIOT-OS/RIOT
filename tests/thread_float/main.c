@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 OTA keys S.A.
+ *               2021 Otto-von-Guericke-Universität Magdeburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,11 +15,13 @@
  * @brief Thread test application
  *
  * @author Vincent Dupont <vincent@otakeys.com>
+ * @author Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  *
  * @}
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "thread.h"
 #include "msg.h"
@@ -44,46 +47,29 @@ static void timer_cb(void *arg)
     xtimer_set(&timer, OFFSET);
 }
 
-static void *thread1(void *arg)
+static void *thread_1_2_3(void *_arg)
 {
-    (void) arg;
-
+    const char *arg = _arg;
     float f, init;
 
-    printf("THREAD %" PRIkernel_pid " start\n", thread_getpid());
+    mutex_lock(&lock);
+    printf("THREAD %s start\n", arg);
+    mutex_unlock(&lock);
 
-    init = 1.0 * thread_getpid();
+    /* Use number at end of thread name, e.g. 3 for "t3", to seed the calculation */
+    init = 1.0 * (arg[strlen(arg) - 1] - '0');
     f = init;
 
     while (1) {
         for (unsigned long i = 0; i < 10000ul; i++) {
             f = f + 1.0 / f;
         }
-        mutex_lock(&lock);
-        printf("T(%" PRIkernel_pid "): %f\n", thread_getpid(), (double)f);
-        mutex_unlock(&lock);
-        init += 1.0;
-        f = init;
-    }
-    return NULL;
-}
-
-static void *thread2(void *arg)
-{
-    (void) arg;
-
-    float f, init;
-
-    printf("THREAD %" PRIkernel_pid " start\n", thread_getpid());
-
-    init = 1.0 * thread_getpid();
-    f = init;
-
-    while (1) {
-        for (unsigned long i = 0; i < 100000ul; i++) {
-            f = f + 1.0 / f;
+        /* only t1 and t3 should print */
+        if (strcmp("t2", arg) != 0) {
+            mutex_lock(&lock);
+            printf("%s: %f\n", arg, (double)f);
+            mutex_unlock(&lock);
         }
-        init += 1.0;
         f = init;
     }
     return NULL;
@@ -91,17 +77,19 @@ static void *thread2(void *arg)
 
 int main(void)
 {
+    const char *t1_name = "t1";
+    const char *t2_name = "t2";
+    const char *t3_name = "t3";
     p1 = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN + 1,
                        THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
-                       thread1, NULL, "nr1");
+                       thread_1_2_3, (void *)t1_name, t1_name);
     p2 = thread_create(t2_stack, sizeof(t2_stack), THREAD_PRIORITY_MAIN + 1,
                        THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
-                       thread2, NULL, "nr2");
+                       thread_1_2_3, (void *)t2_name, t2_name);
     p3 = thread_create(t3_stack, sizeof(t3_stack), THREAD_PRIORITY_MAIN + 1,
                        THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
-                       thread1, NULL, "nr3");
+                       thread_1_2_3, (void *)t3_name, t3_name);
     puts("THREADS CREATED\n");
-
 
     timer.callback = timer_cb;
     xtimer_set(&timer, OFFSET);

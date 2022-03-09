@@ -4,7 +4,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-mega2560 \
     arduino-uno \
     atmega328p \
-    chronos \
+    atmega328p-xplained-mini \
     i-nucleo-lrwan1 \
     msb-430 \
     msb-430h \
@@ -14,14 +14,18 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f302r8 \
     nucleo-f303k8 \
     nucleo-f334r8 \
+    nucleo-g070rb \
+    nucleo-g071rb \
+    nucleo-g431rb \
     nucleo-l031k6 \
     nucleo-l053r8 \
+    nucleo-l412kb \
     saml10-xpro \
     saml11-xpro \
+    slstk3400a \
+    stk3200 \
     stm32f0discovery \
     telosb \
     waspmote-pro \
-    wsn430-v1_3b \
-    wsn430-v1_4 \
     z1 \
     #

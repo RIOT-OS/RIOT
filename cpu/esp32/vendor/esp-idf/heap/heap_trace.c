@@ -290,7 +290,7 @@ inline static uint32_t get_ccount(void)
 static IRAM_ATTR __attribute__((noinline)) void get_call_stack(void **callers)
 {
     const int offset = 2; // Caller is 2 stack frames deeper than we care about
-    bzero(callers, sizeof(void *) * STACK_DEPTH);
+    memset(callers, 0, sizeof(void *) * STACK_DEPTH);
     TEST_STACK(0);
     TEST_STACK(1);
     TEST_STACK(2);
@@ -407,10 +407,13 @@ IRAM_ATTR void *__wrap_realloc(void *p, size_t size)
 
 IRAM_ATTR void *__wrap_calloc(size_t nmemb, size_t size)
 {
-    size = size * nmemb;
-    void *result = trace_malloc(size, 0, TRACE_MALLOC_DEFAULT);
+    size_t total_size;
+    if (__builtin_mul_overflow(nmemb, size, &total_size)) {
+        return NULL;
+    }
+    void *result = trace_malloc(total_size, 0, TRACE_MALLOC_DEFAULT);
     if (result != NULL) {
-        memset(result, 0, size);
+        memset(result, 0, total_size);
     }
     return result;
 }

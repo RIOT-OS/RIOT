@@ -65,7 +65,19 @@ static const uart_conf_t uart_config[] = {
  * @name    SPI configuration
  * @{
  */
-#define SPI_NUMOF           (1U)
+static const spi_conf_t spi_config[] = {
+    {
+        .dev = SPI0,
+        .pinsel_mosi = 3,
+        .pinsel_miso = 3,
+        .pinsel_clk  = 3,
+        .pinsel_msk_mosi = (BIT16 | BIT17),
+        .pinsel_msk_miso = (BIT14 | BIT15),
+        .pinsel_msk_clk  = (BIT8  | BIT9),
+    },
+};
+
+#define SPI_NUMOF           (1)
 /** @} */
 
 #ifdef __cplusplus

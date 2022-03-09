@@ -22,17 +22,17 @@
 #include "assert.h"
 #include "periph/i2c.h"
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "ads101x.h"
 #include "ads101x_params.h"
 #include "ads101x_regs.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifndef ADS101X_READ_DELAY
-#define ADS101X_READ_DELAY (8 * US_PER_MS)    /* Compatible with 128SPS */
+#ifndef ADS101X_READ_DELAY_MS
+#define ADS101X_READ_DELAY_MS           8   /* ompatible with 128SPS */
 #endif
 
 #define DEV (dev->params.i2c)
@@ -138,7 +138,7 @@ int ads101x_read_raw(const ads101x_t *dev, int16_t *raw)
     i2c_write_regs(DEV, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
 
     /* Wait for the sample to be acquired */
-    xtimer_usleep(ADS101X_READ_DELAY);
+    ztimer_sleep(ZTIMER_MSEC, ADS101X_READ_DELAY_MS);
 
     /* Read the sample */
     if (i2c_read_regs(DEV, ADDR, ADS101X_CONV_RES_ADDR, &regs, 2, 0x0) < 0) {
@@ -159,7 +159,7 @@ int ads101x_enable_alert(ads101x_alert_t *dev,
 {
     uint8_t regs[2];
 
-    if (dev->params.alert_pin == GPIO_UNDEF) {
+    if (!gpio_is_valid(dev->params.alert_pin)) {
         return ADS101X_OK;
     }
 

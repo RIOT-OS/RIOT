@@ -96,7 +96,7 @@ static void send(char *addr_str, char *port_str, char *data_len_str, unsigned in
             gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
 
             ((gnrc_netif_hdr_t *)netif->data)->if_pid = (kernel_pid_t)iface;
-            LL_PREPEND(ip, netif);
+            ip = gnrc_pkt_prepend(ip, netif);
         }
         /* send packet */
         if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL, ip)) {

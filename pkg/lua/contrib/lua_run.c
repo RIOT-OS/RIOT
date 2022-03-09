@@ -257,7 +257,6 @@ lua_riot_do_error:
     return status;
 }
 
-
 LUALIB_API int lua_riot_do_module(const char *modname, void *memory, size_t mem_size,
                                   uint16_t modmask, int *retval)
 {

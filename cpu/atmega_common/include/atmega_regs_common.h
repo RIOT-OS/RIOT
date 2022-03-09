@@ -113,7 +113,6 @@ typedef struct {
 #endif
 /** @} */
 
-
 /**
  * @brief    Peripheral register definitions and instances
  * @{
@@ -138,7 +137,6 @@ typedef struct {
 #define MEGA_UART3              ((mega_uart_t *)MEGA_UART3_BASE)
 #endif
 /** @} */
-
 
 #ifdef __cplusplus
 }

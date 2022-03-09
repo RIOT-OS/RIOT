@@ -19,7 +19,6 @@
 #include <string.h>
 #include <errno.h>
 
-#include "assert.h"
 #include "fmt.h"
 
 #include "net/loramac.h"
@@ -27,7 +26,7 @@
 #include "rn2xx3.h"
 #include "rn2xx3_internal.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static const char *mac = "mac";

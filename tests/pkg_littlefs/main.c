@@ -23,8 +23,11 @@
 
 #include "embUnit.h"
 
-/* Define MTD_0 in board.h to use the board mtd if any */
-#ifdef MTD_0
+/* Define MTD_0 in board.h to use the board mtd if any and if
+ * CONFIG_USE_HARDWARE_MTD is defined (add CFLAGS=-DCONFIG_USE_HARDWARE_MTD to
+ * the command line to enable it */
+#if defined(MTD_0) && IS_ACTIVE(CONFIG_USE_HARDWARE_MTD)
+#define USE_MTD_0
 #define _dev (MTD_0)
 #else
 /* Test mock object implementing a simple RAM-based mtd */
@@ -56,7 +59,7 @@ static int _read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
     }
     memcpy(buff, dummy_memory + addr, size);
 
-    return size;
+    return 0;
 }
 
 static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
@@ -71,7 +74,7 @@ static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size
     }
     memcpy(dummy_memory + addr, buff, size);
 
-    return size;
+    return 0;
 }
 
 static int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
@@ -285,8 +288,8 @@ static void tests_littlefs_readdir(void)
     int nb_files = 0;
     do {
         res = vfs_readdir(&dirp, &entry);
-        if (res == 1 && (strcmp("/test0.txt", &(entry.d_name[0])) == 0 ||
-                         strcmp("/test1.txt", &(entry.d_name[0])) == 0)) {
+        if (res == 1 && (strcmp("test0.txt", &(entry.d_name[0])) == 0 ||
+                         strcmp("test1.txt", &(entry.d_name[0])) == 0)) {
             nb_files++;
         }
     } while (res == 1);
@@ -302,7 +305,7 @@ static void tests_littlefs_readdir(void)
     nb_files = 0;
     do {
         res = vfs_readdir(&dirp, &entry);
-        if (res == 1 && strcmp("/test2.txt", &(entry.d_name[0])) == 0) {
+        if (res == 1 && strcmp("test2.txt", &(entry.d_name[0])) == 0) {
             nb_files++;
         }
     } while (res == 1);
@@ -404,7 +407,7 @@ static void tests_littlefs_statvfs(void)
 
 Test *tests_littlefs(void)
 {
-#ifndef MTD_0
+#ifndef USE_MTD_0
     memset(dummy_memory, 0xff, sizeof(dummy_memory));
 #endif
 

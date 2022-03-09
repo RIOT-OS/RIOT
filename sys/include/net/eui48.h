@@ -37,6 +37,49 @@ typedef struct {
 } eui48_t;
 
 /**
+ * @name EUI-48 bit flags contained in the first octet
+ *
+ * @see IEEE 802-2001 section 9.2
+ * @{
+ */
+
+/**
+ * @brief Locally administered address.
+ */
+#define EUI48_LOCAL_FLAG    0x02
+
+/**
+ * @brief Group type address.
+ */
+#define EUI48_GROUP_FLAG    0x01
+/** @} */
+
+/**
+ * @brief Set the locally administrated bit in the EUI-48 address.
+ *
+ * @see IEEE 802-2001 section 9.2
+ *
+ * @param   addr    ethernet address
+ */
+static inline void eui48_set_local(eui48_t *addr)
+{
+    addr->uint8[0] |= EUI48_LOCAL_FLAG;
+}
+
+/**
+ * @brief Clear the group address bit to signal the address as individual
+ * address
+ *
+ * @see IEEE 802-2001 section 9.2
+ *
+ * @param   addr    ethernet address
+ */
+static inline void eui48_clear_group(eui48_t *addr)
+{
+    addr->uint8[0] &= ~EUI48_GROUP_FLAG;
+}
+
+/**
  * @brief   Generates an EUI-64 from a 48-bit device address
  *
  * @see     [RFC 2464, section 4](https://tools.ietf.org/html/rfc2464#section-4)
@@ -57,22 +100,29 @@ static inline void eui48_to_eui64(eui64_t *eui64, const eui48_t *addr)
 }
 
 /**
- * @name EUI-48 bit flags contained in the first octet
+ * @brief   Generates an EUI-48 from a 64-bit device address
  *
- * @see IEEE 802-2001 section 9.2
- * @{
+ * @warning The resulting EUI-48 is not guaranteed to be unique
+ *          and, hence, marked as only locally unique.
+ *
+ * @param[out] eui48    the resulting EUI-48.
+ * @param[in]  addr     a 64-bit device address
  */
+static inline void eui64_to_eui48(eui48_t *eui48, const eui64_t *addr)
+{
+    /* Preserve vendor id */
+    eui48->uint8[0] = addr->uint8[0];
+    eui48->uint8[1] = addr->uint8[1];
+    eui48->uint8[2] = addr->uint8[2];
 
-/**
- * @brief Locally administered address.
- */
-#define EUI48_LOCAL_FLAG  0x02
+    /* Use most volatile bits */
+    eui48->uint8[3] = addr->uint8[5];
+    eui48->uint8[4] = addr->uint8[6];
+    eui48->uint8[5] = addr->uint8[7];
 
-/**
- * @brief Group type address.
- */
-#define EUI48_GROUP_FLAG        0x01
-/** @} */
+    /* EUI is only locally unique */
+    eui48_set_local(eui48);
+}
 
 /**
  * @brief   Generates an IPv6 interface identifier from a 48-bit device address
@@ -105,32 +155,6 @@ static inline void eui48_from_ipv6_iid(eui48_t *addr, const eui64_t *iid)
     addr->uint8[4] = iid->uint8[6];
     addr->uint8[5] = iid->uint8[7];
 }
-
-/**
- * @brief Set the locally administrated bit in the EUI-48 address.
- *
- * @see IEEE 802-2001 section 9.2
- *
- * @param   addr    ethernet address
- */
-static inline void eui48_set_local(eui48_t *addr)
-{
-    addr->uint8[0] |= EUI48_LOCAL_FLAG;
-}
-
-/**
- * @brief Clear the group address bit to signal the address as individual
- * address
- *
- * @see IEEE 802-2001 section 9.2
- *
- * @param   addr    ethernet address
- */
-static inline void eui48_clear_group(eui48_t *addr)
-{
-    addr->uint8[0] &= ~EUI48_GROUP_FLAG;
-}
-
 
 #ifdef __cplusplus
 }

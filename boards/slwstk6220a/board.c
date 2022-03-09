@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2015-2020 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,26 +11,28 @@
  * @{
  *
  * @file
- * @brief       Board specific implementations WSTK6220 board
+ * @brief       Board specific implementations SLWSTK6220A board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Bas Stottelaar <basstottelaar@gmail.com>
  *
  * @}
  */
 
 #include "board.h"
-#include "cpu.h"
+#include "board_common.h"
 #include "periph/gpio.h"
 
 void board_init(void)
 {
-    /* enable access to the evaluation board controller chip. Without this, the
-     * board controller does not forward the UART output to the USB port */
-    gpio_init(BC_PIN, GPIO_OUT);
-    gpio_set(BC_PIN);
-    /* initialize the boards LEDs */
-    gpio_init(LED0_PIN, GPIO_OUT);
-    gpio_init(LED1_PIN, GPIO_OUT);
-    /* initialize the CPU */
-    cpu_init();
+#ifndef RIOTBOOT
+    /* perform common board initialization */
+    board_common_init();
+
+#ifdef MODULE_SI7021
+    /* initialize the Si7021 sensor */
+    gpio_init(SI7021_EN_PIN, GPIO_OUT);
+    gpio_set(SI7021_EN_PIN);
+#endif
+#endif
 }

@@ -1,0 +1,23 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_FB
+    bool "Configure GNRC 6LoWPAN Fragmentation buffer"
+    depends on USEMODULE_GNRC_SIXLOWPAN_FRAG_FB
+    help
+        Configure GNRC 6LoWPAN Fragmentation buffer using Kconfig.
+
+if KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_FB
+
+config GNRC_SIXLOWPAN_FRAG_FB_SIZE
+    int "Number of datagrams that can be fragmented simultaneously"
+    default 4 if MODULE_GNRC_SIXLOWPAN_FRAG_SFR
+    default 1
+    help
+        This determines the number of @ref gnrc_sixlowpan_frag_fb_t instances
+        available.
+
+endif # KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_FB

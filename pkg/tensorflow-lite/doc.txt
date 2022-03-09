@@ -1,0 +1,7 @@
+/**
+ * @defgroup pkg_tensorflow-lite TensorFlow Lite
+ * @ingroup  pkg
+ * @brief    Provides a RIOT support for TensorFlow Lite AI library
+ *
+ * @see      https://www.tensorflow.org/lite/microcontrollers
+ */

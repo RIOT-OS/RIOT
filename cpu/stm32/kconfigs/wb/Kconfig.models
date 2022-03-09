@@ -1,0 +1,100 @@
+# Copyright (c) 2021 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU models
+config CPU_MODEL_STM32WB10CC
+    bool
+    select CPU_LINE_STM32WB10XX
+
+config CPU_MODEL_STM32WB15CC
+    bool
+    select CPU_LINE_STM32WB15XX
+
+config CPU_MODEL_STM32WB30CE
+    bool
+    select CPU_LINE_STM32WB30XX
+
+config CPU_MODEL_STM32WB35CC
+    bool
+    select CPU_LINE_STM32WB35XX
+
+config CPU_MODEL_STM32WB35CE
+    bool
+    select CPU_LINE_STM32WB35XX
+
+config CPU_MODEL_STM32WB50CG
+    bool
+    select CPU_LINE_STM32WB50XX
+
+config CPU_MODEL_STM32WB55CC
+    bool
+    select CPU_LINE_STM32WB55XX
+
+config CPU_MODEL_STM32WB55CE
+    bool
+    select CPU_LINE_STM32WB55XX
+
+config CPU_MODEL_STM32WB55CG
+    bool
+    select CPU_LINE_STM32WB55XX
+
+config CPU_MODEL_STM32WB55RC
+    bool
+    select CPU_LINE_STM32WB55XX
+
+config CPU_MODEL_STM32WB55RE
+    bool
+    select CPU_LINE_STM32WB55XX
+
+config CPU_MODEL_STM32WB55RG
+    bool
+    select CPU_LINE_STM32WB55XX
+
+config CPU_MODEL_STM32WB55VC
+    bool
+    select CPU_LINE_STM32WB55XX
+
+config CPU_MODEL_STM32WB55VE
+    bool
+    select CPU_LINE_STM32WB55XX
+
+config CPU_MODEL_STM32WB55VG
+    bool
+    select CPU_LINE_STM32WB55XX
+
+config CPU_MODEL_STM32WB55VY
+    bool
+    select CPU_LINE_STM32WB55XX
+
+config CPU_MODEL_STM32WB5MMG
+    bool
+    select CPU_LINE_STM32WB5MXX
+
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32wb10cc" if CPU_MODEL_STM32WB10CC
+    default "stm32wb15cc" if CPU_MODEL_STM32WB15CC
+    default "stm32wb30ce" if CPU_MODEL_STM32WB30CE
+    default "stm32wb35cc" if CPU_MODEL_STM32WB35CC
+    default "stm32wb35ce" if CPU_MODEL_STM32WB35CE
+    default "stm32wb50cg" if CPU_MODEL_STM32WB50CG
+    default "stm32wb55cc" if CPU_MODEL_STM32WB55CC
+    default "stm32wb55ce" if CPU_MODEL_STM32WB55CE
+    default "stm32wb55cg" if CPU_MODEL_STM32WB55CG
+    default "stm32wb55rc" if CPU_MODEL_STM32WB55RC
+    default "stm32wb55re" if CPU_MODEL_STM32WB55RE
+    default "stm32wb55rg" if CPU_MODEL_STM32WB55RG
+    default "stm32wb55vc" if CPU_MODEL_STM32WB55VC
+    default "stm32wb55ve" if CPU_MODEL_STM32WB55VE
+    default "stm32wb55vg" if CPU_MODEL_STM32WB55VG
+    default "stm32wb55vy" if CPU_MODEL_STM32WB55VY
+    default "stm32wb5mmg" if CPU_MODEL_STM32WB5MMG

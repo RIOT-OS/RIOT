@@ -47,10 +47,10 @@ extern "C" {
  * @name    Oversampling modes delays (micros)
  * @{
  */
-#define BMP180_ULTRALOWPOWER_DELAY    (5000UL)
-#define BMP180_STANDARD_DELAY         (8000UL)
-#define BMP180_HIGHRES_DELAY          (14000UL)
-#define BMP180_ULTRAHIGHRES_DELAY     (26000UL)
+#define BMP180_ULTRALOWPOWER_DELAY_MS (5UL)     /**< Ultra low power delay (ms) */
+#define BMP180_STANDARD_DELAY_MS      (8UL)     /**< Standard resolution delay (ms) */
+#define BMP180_HIGHRES_DELAY_MS       (14UL)    /**< High resolution delay (ms) */
+#define BMP180_ULTRAHIGHRES_DELAY_MS  (26UL)    /**< Ultra high resolution delay (ms) */
 /** @} */
 
 #ifdef __cplusplus

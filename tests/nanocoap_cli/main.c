@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include "msg.h"
 
-#include "kernel_types.h"
 #include "net/gnrc/netif.h"
 #include "net/ipv6/addr.h"
 #include "shell.h"
@@ -30,11 +29,13 @@
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 extern int nanotest_client_cmd(int argc, char **argv);
+extern int nanotest_client_url_cmd(int argc, char **argv);
 extern int nanotest_server_cmd(int argc, char **argv);
 static int _list_all_inet6(int argc, char **argv);
 
 static const shell_command_t shell_commands[] = {
     { "client", "CoAP client", nanotest_client_cmd },
+    { "url", "CoAP client URL request", nanotest_client_url_cmd },
     { "server", "CoAP server", nanotest_server_cmd },
     { "inet6", "IPv6 addresses", _list_all_inet6 },
     { NULL, NULL, NULL }
@@ -86,12 +87,12 @@ static int _list_all_inet6(int argc, char **argv)
     unsigned addr_qty = 0;
 
     while ((netif = gnrc_netif_iter(netif))) {
-        ipv6_addr_t ipv6_addrs[GNRC_NETIF_IPV6_ADDRS_NUMOF];
+        ipv6_addr_t ipv6_addrs[CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF];
 
         int res = gnrc_netapi_get(netif->pid, NETOPT_IPV6_ADDR, 0, ipv6_addrs,
                                   sizeof(ipv6_addrs));
         if (res >= 0) {
-            uint8_t ipv6_addrs_flags[GNRC_NETIF_IPV6_ADDRS_NUMOF];
+            uint8_t ipv6_addrs_flags[CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF];
 
             memset(ipv6_addrs_flags, 0, sizeof(ipv6_addrs_flags));
             /* assume it to succeed (otherwise array will stay 0) */

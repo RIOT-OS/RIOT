@@ -35,7 +35,7 @@ extern "C" {
 #define L3G4200D_PARAM_I2C          I2C_DEV(0)
 #endif
 #ifndef L3G4200D_PARAM_ADDR
-#define L3G4200D_PARAM_ADDR         (0x68)
+#define L3G4200D_PARAM_ADDR         (CONFIG_L3G4200D_DEFAULT_ADDRESS)
 #endif
 #ifndef L3G4200D_PARAM_INT1
 #define L3G4200D_PARAM_INT1         (GPIO_PIN(0, 0))

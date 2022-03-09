@@ -15,10 +15,6 @@ extern "C" {
 #define NATIVE_LITTLE_ENDIAN
 #endif
 
-#ifndef CPU_HAS_UNALIGNED_ACCESS
-#define HAVE_ALIGNED_ACCESS_REQUIRED
-#endif
-
 #ifdef __cplusplus
 }
 #endif

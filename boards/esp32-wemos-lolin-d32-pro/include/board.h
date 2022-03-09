@@ -29,10 +29,10 @@
  * configuration.
  *
  * For detailed information about the configuration of ESP32 boards, see
- * section \ref esp32_comm_periph "Common Peripherals".
+ * section \ref esp32_peripherals "Common Peripherals".
  *
  * @note
- * Most definitions can be overridden by an \ref esp32_app_spec_conf
+ * Most definitions can be overridden by an \ref esp32_application_specific_configurations
  * "application-specific board configuration".
  *
  * @file
@@ -43,10 +43,6 @@
 #define BOARD_H
 
 #include <stdint.h>
-
-#ifdef __cplusplus
- extern "C" {
-#endif
 
 /**
  * @name LED (on-board) configuration
@@ -73,12 +69,16 @@
 #endif
 /** @} */
 
+/* include common board definitions as last step */
+#include "board_common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-
-/* include common board definitions as last step */
-#include "board_common.h"
 
 #endif /* BOARD_H */
 /** @} */

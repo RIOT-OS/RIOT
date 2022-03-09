@@ -1,0 +1,33 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD
+    default "nucleo-f446re" if BOARD_NUCLEO_F446RE
+
+config BOARD_NUCLEO_F446RE
+    bool
+    default y
+    select BOARD_COMMON_NUCLEO64
+    select CPU_MODEL_STM32F446RE
+
+    # Put defined MCU peripherals here (in alphabetical order)
+    select HAS_PERIPH_ADC
+    select HAS_PERIPH_DMA
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_CAN
+    select HAS_PERIPH_PWM
+    select HAS_PERIPH_RTC
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+    select HAS_PERIPH_QDEC
+
+    # Various other features (if any)
+    select HAS_MOTOR_DRIVER
+    select HAS_RIOTBOOT
+
+source "$(RIOTBOARD)/common/nucleo64/Kconfig"

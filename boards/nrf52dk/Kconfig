@@ -1,0 +1,18 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "nrf52dk" if BOARD_NRF52DK
+
+config BOARD_NRF52DK
+    bool
+    default y
+    select BOARDS_COMMON_NRF52XXXDK
+    select CPU_MODEL_NRF52832XXAA
+
+    select MODULE_BOARDS_COMMON_NRF52XXXDK if TEST_KCONFIG
+
+source "$(RIOTBOARD)/common/nrf52xxxdk/Kconfig"

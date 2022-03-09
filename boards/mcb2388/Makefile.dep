@@ -1,0 +1,9 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_adc
+  USEMODULE += saul_gpio
+endif
+
+# default to mtd_mci
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += mtd_mci
+endif

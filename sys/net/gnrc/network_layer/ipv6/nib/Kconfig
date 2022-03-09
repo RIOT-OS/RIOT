@@ -1,0 +1,122 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_GNRC_IPV6_NIB
+    bool "Configure GNRC IPv6 NIB"
+
+if KCONFIG_USEMODULE_GNRC_IPV6_NIB
+
+config GNRC_IPV6_NIB_6LBR
+    bool "6LoWPAN border router features"
+    default y if USEMODULE_GNRC_IPV6_NIB_6LBR
+    help
+        Enable 6LoWPAN Border Router (6LBR) features.
+        @see https://tools.ietf.org/html/rfc6775#section-2
+
+config GNRC_IPV6_NIB_6LR
+    bool "6LoWPAN router features"
+    default y if USEMODULE_GNRC_IPV6_NIB_6LR || GNRC_IPV6_NIB_6LBR
+    help
+        Enable 6LoWPAN Router (6LR) features.
+        @see https://tools.ietf.org/html/rfc6775#section-2
+
+config GNRC_IPV6_NIB_6LN
+    bool "6LoWPAN node features"
+    default y if USEMODULE_GNRC_IPV6_NIB_6LN || GNRC_IPV6_NIB_6LR
+    help
+        Enable 6LoWPAN Node (6LN) features.
+        @see https://tools.ietf.org/html/rfc6775#section-2
+
+config GNRC_IPV6_NIB_ROUTER
+    bool "Router features"
+    default y if USEMODULE_GNRC_IPV6_NIB_ROUTER || GNRC_IPV6_NIB_6LR
+
+config GNRC_IPV6_NIB_SLAAC
+    bool "Stateless address auto-configuration"
+    default y if USEMODULE_GNRC_IPV6_NIB_6LBR
+    default n if USEMODULE_GNRC_IPV6_NIB_6LR || USEMODULE_GNRC_IPV6_NIB_6LN
+    default y
+
+config GNRC_IPV6_NIB_QUEUE_PKT
+    bool "Use packet queue with address resolution"
+    default n if USEMODULE_GNRC_IPV6_NIB_6LN || GNRC_IPV6_NIB_6LN
+    default y
+
+config GNRC_IPV6_NIB_ARSM
+    bool "Use classic NDP address resolution state-machine"
+    default y if USEMODULE_GNRC_IPV6_NIB_6LBR
+    default n if USEMODULE_GNRC_IPV6_NIB_6LN && !GNRC_IPV6_NIB_6LR
+    default y
+
+config GNRC_IPV6_NIB_DNS
+    bool "Support for DNS configuration options"
+    default y if USEMODULE_GNRC_IPV6_NIB_DNS
+
+config GNRC_IPV6_NIB_ADV_ROUTER
+    bool "Activate router advertising at interface start-up"
+    default y if GNRC_IPV6_NIB_ROUTER && (!GNRC_IPV6_NIB_6LR || GNRC_IPV6_NIB_6LBR)
+
+config GNRC_IPV6_NIB_DC
+    bool "Destination cache"
+
+config GNRC_IPV6_NIB_MULTIHOP_P6C
+    bool "Multihop prefix and 6LoWPAN context distribution"
+    default y if GNRC_IPV6_NIB_6LR
+
+config GNRC_IPV6_NIB_NO_RTR_SOL
+    bool "Disable router solicitations"
+    help
+        @warning Only set this if you know what you're doing.
+
+if GNRC_IPV6_NIB_NO_RTR_SOL
+comment "Disabling router solicitations will make your host have to wait longer"
+comment "for router advertisements. This option is only meant for testing and"
+comment "experimentation and should not be activated in production."
+endif
+
+config GNRC_IPV6_NIB_NUMOF
+    int "Number of entries in NIB"
+    default 16 if USEMODULE_GNRC_IPV6_NIB_6LBR
+    default 1 if USEMODULE_GNRC_IPV6_NIB_6LN && !GNRC_IPV6_NIB_6LR
+    default 4
+
+config GNRC_IPV6_NIB_REACH_TIME_RESET
+    int "Reset time for the reachability time (milliseconds)"
+    default 7200000
+    help
+        @see [RFC 4861, section 6.3.4](https://tools.ietf.org/html/rfc4861#section-6.3.4).
+
+config GNRC_IPV6_NIB_L2ADDR_MAX_LEN
+    int "Maximum link-layer address length (aligned)"
+    default 8
+
+config GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF
+    int "Number of default routers in the default router list"
+    default 1
+    help
+        @attention This number has direct influence on the maximum number of
+        neighbors and duplicate address detection table entries.
+
+config GNRC_IPV6_NIB_OFFL_NUMOF
+    int "Number of off-link entries in NIB"
+    default 8
+    help
+        @attention This number is equal to the maximum number of forwarding
+        table and prefix list entries in NIB.
+
+config GNRC_IPV6_NIB_ABR_NUMOF
+    int "Number of authoritative border router entries in NIB"
+    default 1
+    depends on GNRC_IPV6_NIB_MULTIHOP_P6C
+    help
+        @warning Behavior for >2 currently not specified or tested.
+
+if GNRC_IPV6_NIB_ABR_NUMOF > 2
+comment "Warning: Behavior for more than 2 Authoritative Border Router entries"
+comment "is currently not specified or tested."
+endif
+
+endif # KCONFIG_USEMODULE_GNRC_IPV6_NIB

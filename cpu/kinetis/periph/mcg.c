@@ -283,7 +283,6 @@ static void kinetis_mcg_set_fbe(void)
     current_mode = KINETIS_MCG_MODE_FBE;
 }
 
-
 /**
  * @brief Initialize the FLL Bypassed Low Power Internal Mode.
  *

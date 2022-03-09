@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 #include <inttypes.h>
@@ -25,7 +26,7 @@
 #include "periph/gpio.h"
 #include "periph/pwm.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define PWM_PS_MAX          (9U)
@@ -121,6 +122,10 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
 void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
 {
+#ifdef NDEBUG
+    (void)dev;
+    (void)channel;
+#endif
     assert((dev == 0) && (channel == 0));
 
     /*
@@ -192,6 +197,9 @@ void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
 
 uint8_t pwm_channels(pwm_t dev)
 {
+#ifdef NDEBUG
+    (void)dev;
+#endif
     assert(dev == 0);
     return 1;
 }

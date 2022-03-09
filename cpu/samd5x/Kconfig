@@ -1,0 +1,47 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_COMMON_SAMD5X
+    bool
+    select CPU_COMMON_SAM0
+    select CPU_CORE_CORTEX_M4F
+    select HAS_BACKUP_RAM
+    select HAS_CORTEXM_MPU
+    select HAS_CPU_SAMD5X
+    select HAS_PERIPH_DMA
+    select HAS_PERIPH_GPIO_TAMPER_WAKE
+    select HAS_PERIPH_HWRNG
+    select HAS_PERIPH_RTC_MEM
+    select HAS_PERIPH_UART_COLLISION
+    select HAS_PERIPH_SPI_ON_QSPI
+
+config CPU_FAM_SAMD51
+    bool
+    select CPU_COMMON_SAMD5X
+
+config CPU_FAM_SAME54
+    bool
+    select CPU_COMMON_SAMD5X
+
+## Declaration of specific features
+config HAS_CPU_SAMD5X
+    bool
+    help
+        Indicates that a SAMD5x/SAME5x cpu is being used.
+
+## CPU common symbols
+config CPU_FAM
+    default "samd51" if CPU_FAM_SAMD51
+    default "same54" if CPU_FAM_SAME54
+
+config CPU
+    default "samd5x" if CPU_COMMON_SAMD5X
+
+source "$(RIOTCPU)/samd5x/Kconfig.samd51"
+source "$(RIOTCPU)/samd5x/Kconfig.same54"
+
+source "$(RIOTCPU)/sam0_common/Kconfig"

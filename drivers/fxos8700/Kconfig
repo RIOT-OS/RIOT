@@ -1,0 +1,36 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#               2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_FXOS8700
+    bool "FXOS8700 3-axis accelerometer/magnetometer"
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+    select MODULE_XTIMER
+
+config HAVE_FXOS8700
+    bool
+    select MODULE_FXOS8700 if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a FXOS8700 accelerometer/magnetometer is present.
+
+menuconfig KCONFIG_USEMODULE_FXOS8700
+    bool "Configure FXOS8700 driver"
+    depends on USEMODULE_FXOS8700
+    help
+        Configure the FXOS8700 driver using Kconfig.
+
+if KCONFIG_USEMODULE_FXOS8700
+
+config FXOS8700_USE_ACC_RAW_VALUES
+    bool "Enable raw ADC readings"
+    help
+        Enable this to return raw ADC readings.
+        By default measurements are converted to mg.
+
+endif # KCONFIG_USEMODULE_FXOS8700

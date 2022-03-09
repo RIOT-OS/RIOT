@@ -29,6 +29,11 @@
 #include <string.h>
 #include "irq.h"
 
+/*
+ * uncrustify mis-formats the macros in this file, so disable it globally.
+ * begin{code-style-ignore}
+ */
+
 /* use gcc/clang implementation if available */
 #if defined(__GNUC__) \
     && (__GNUC__ > 4 || \
@@ -234,4 +239,5 @@ TEMPLATE_SYNC_OP_AND_FETCH_N(nand, &, 2, ~) /* __sync_nand_and_fetch_2 */
 TEMPLATE_SYNC_OP_AND_FETCH_N(nand, &, 4, ~) /* __sync_nand_and_fetch_4 */
 TEMPLATE_SYNC_OP_AND_FETCH_N(nand, &, 8, ~) /* __sync_nand_and_fetch_8 */
 #endif
+/* end{code-style-ignore} */
 /** @} */

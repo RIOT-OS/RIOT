@@ -1,0 +1,7 @@
+# Find the header file that should exist if the CPU is supported. Only headers
+# for supported boards are included, but to support another CPU, it should be
+# as easy as adding the header file only.
+EFM32_HEADER = $(wildcard $(RIOTCPU)/efm32/families/efr32mg1p/include/vendor/$(CPU_MODEL).h)
+
+# include vendor device headers
+INCLUDES += -I$(RIOTCPU)/efm32/families/efr32mg1p/include/vendor

@@ -2,6 +2,8 @@
  * @defgroup        cpu_mips_pic32_common Microchip MIPS common
  * @ingroup         cpu
  * @brief           Microchip MIPS common
+ * @deprecated Will not be available after the 2022.07 release. This includes
+               all MIPS based boards and cpus.
  *
  * This module contains all common code and definition to all Microchip MIPS
  * cpu families supported by RIOT: @ref cpu_mips_pic32mx, @ref cpu_mips_pic32mz.

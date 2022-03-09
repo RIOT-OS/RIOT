@@ -1,0 +1,1 @@
+INCLUDES += -I$(PKGDIRBASE)/driver_atwinc15x0/src

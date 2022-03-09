@@ -1,0 +1,82 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_FAM_EFM32PG1B
+    bool
+    select CPU_CORE_CORTEX_M4F
+    select CPU_COMMON_EFM32
+    select CPU_EFM32_SERIES1
+    select HAS_CORTEXM_MPU
+
+config MODULE_CPU_EFM32PG1B
+    bool
+    depends on CPU_FAM_EFM32PG1B
+    depends on TEST_KCONFIG
+    default y
+    help
+        EFM32PG1B family-specific code.
+
+## CPU Models
+config CPU_MODEL_EFM32PG1B200F256GM48
+    bool
+    select CPU_FAM_EFM32PG1B
+
+config CPU_MODEL_EFM32PG1B100F128IM32
+    bool
+    select CPU_FAM_EFM32PG1B
+
+config CPU_MODEL_EFM32PG1B200F256IM32
+    bool
+    select CPU_FAM_EFM32PG1B
+
+config CPU_MODEL_EFM32PG1B100F256IM32
+    bool
+    select CPU_FAM_EFM32PG1B
+
+config CPU_MODEL_EFM32PG1B200F128IM32
+    bool
+    select CPU_FAM_EFM32PG1B
+
+config CPU_MODEL_EFM32PG1B200F128GM48
+    bool
+    select CPU_FAM_EFM32PG1B
+
+config CPU_MODEL_EFM32PG1B200F128GM32
+    bool
+    select CPU_FAM_EFM32PG1B
+
+config CPU_MODEL_EFM32PG1B100F256GM32
+    bool
+    select CPU_FAM_EFM32PG1B
+
+config CPU_MODEL_EFM32PG1B200F256IM48
+    bool
+    select CPU_FAM_EFM32PG1B
+
+config CPU_MODEL_EFM32PG1B200F256GM32
+    bool
+    select CPU_FAM_EFM32PG1B
+
+config CPU_MODEL_EFM32PG1B100F128GM32
+    bool
+    select CPU_FAM_EFM32PG1B
+
+## Common CPU symbols
+config CPU_FAM
+    default "efm32pg1b" if CPU_FAM_EFM32PG1B
+
+config CPU_MODEL
+    default "efm32pg1b200f256gm48" if CPU_MODEL_EFM32PG1B200F256GM48
+    default "efm32pg1b100f128im32" if CPU_MODEL_EFM32PG1B100F128IM32
+    default "efm32pg1b200f256im32" if CPU_MODEL_EFM32PG1B200F256IM32
+    default "efm32pg1b100f256im32" if CPU_MODEL_EFM32PG1B100F256IM32
+    default "efm32pg1b200f128im32" if CPU_MODEL_EFM32PG1B200F128IM32
+    default "efm32pg1b200f128gm48" if CPU_MODEL_EFM32PG1B200F128GM48
+    default "efm32pg1b200f128gm32" if CPU_MODEL_EFM32PG1B200F128GM32
+    default "efm32pg1b100f256gm32" if CPU_MODEL_EFM32PG1B100F256GM32
+    default "efm32pg1b200f256im48" if CPU_MODEL_EFM32PG1B200F256IM48
+    default "efm32pg1b200f256gm32" if CPU_MODEL_EFM32PG1B200F256GM32
+    default "efm32pg1b100f128gm32" if CPU_MODEL_EFM32PG1B100F128GM32

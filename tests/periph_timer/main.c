@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "clk.h"
 #include "periph/timer.h"
 
 /**

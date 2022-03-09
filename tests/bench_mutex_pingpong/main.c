@@ -20,6 +20,8 @@
 
 #include <stdio.h>
 
+#include "macros/units.h"
+#include "clk.h"
 #include "mutex.h"
 #include "thread.h"
 #include "xtimer.h"
@@ -38,7 +40,6 @@ static void _timer_callback(void*arg)
 
     _flag = 1;
 }
-
 
 static void *_second_thread(void *arg)
 {
@@ -78,7 +79,10 @@ int main(void)
         n++;
     }
 
-    printf("{ \"result\" : %"PRIu32" }\n", n);
+    printf("{ \"result\" : %"PRIu32, n);
+    printf(", \"ticks\" : %"PRIu32,
+           (uint32_t)((TEST_DURATION/US_PER_MS) * (coreclk()/KHZ(1)))/n);
+    puts(" }");
 
     return 0;
 }

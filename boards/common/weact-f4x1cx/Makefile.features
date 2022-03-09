@@ -1,0 +1,23 @@
+CPU = stm32
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_pwm
+FEATURES_PROVIDED += periph_rtc
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_usbdev
+
+# Various other features (if any)
+FEATURES_PROVIDED += highlevel_stdio
+
+# weact-f4x1cx boards provide a custom default Kconfig clock configuration
+KCONFIG_BOARD_CONFIG += $(RIOTBOARD)/common/weact-f4x1cx/clock.config
+
+# This configuration enables modules that are only available when using Kconfig
+# module modelling
+ifeq (1, $(TEST_KCONFIG))
+  KCONFIG_BOARD_CONFIG += $(RIOTBOARD)/common/weact-f4x1cx/weact-f4x1cx.config
+endif

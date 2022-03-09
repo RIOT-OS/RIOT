@@ -1,0 +1,65 @@
+From ee9792298bffa657e016d64790a4489ad1ead80f Mon Sep 17 00:00:00 2001
+From: Lena Boeckmann <einhornhool@mobi31.inet.haw-hamburg.de>
+Date: Tue, 7 Jan 2020 14:37:10 +0100
+Subject: [PATCH 2/2] add defines and functions for riot usage
+
+---
+ test/cmd-processor.c | 15 ++++++++++++++-
+ test/cmd-processor.h |  1 +
+ 2 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/test/cmd-processor.c b/test/cmd-processor.c
+index 2be06a8..c450b2f 100644
+--- a/test/cmd-processor.c
++++ b/test/cmd-processor.c
+@@ -28,7 +28,7 @@
+ // Undefine the Unity FAIL macro so it doesn't conflict with the ASF definition
+ #undef FAIL
+
+-#if !defined(_WIN32) && !defined(__linux__) && !defined(__XC32__) && !defined(__APPLE__) && !defined(ESP32)
++#if !defined(_WIN32) && !defined(__linux__) && !defined(__XC32__) && !defined(__APPLE__) && !defined(ESP32) && !defined(RIOT_APPLICATION)
+ #ifdef ATMEL_START
+ #include "atmel_start.h"
+ #else
+@@ -155,6 +155,15 @@ int main(int argc, char* argv[])
+
+     return exit_code;
+ }
++#elif defined(RIOT_APPLICATION)
++#include <stdio.h>
++#include <stdlib.h>
++#include "cmd-processor.h"
++
++int atca_run_cmd(const char *command)
++{
++    return parse_cmd(command);
++}
+ #else
+ int processCmd(void)
+ {
+@@ -927,6 +936,10 @@ static ATCA_STATUS set_test_config(ATCADeviceType deviceType)
+     gCfg->atcai2c.bus = 1;
+     #endif
+
++    #ifdef MODULE_CRYPTOAUTHLIB_TEST
++    riot_switch_cfg(gCfg);
++    #endif
++
+     return ATCA_SUCCESS;
+ }
+
+diff --git a/test/cmd-processor.h b/test/cmd-processor.h
+index a8af58a..fe51b6a 100644
+--- a/test/cmd-processor.h
++++ b/test/cmd-processor.h
+@@ -52,6 +52,7 @@ typedef struct
+     fp_menu_handler fp_handler;
+ }t_menu_info;
+
++void riot_switch_cfg(ATCAIfaceCfg*);
+
+ int run_tests(int test);
+
+--
+2.23.0
+

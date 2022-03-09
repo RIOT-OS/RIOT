@@ -31,7 +31,7 @@
 #include "periph/i2c.h"
 #include "xtimer.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 /**
@@ -93,7 +93,7 @@ int sht2x_init(sht2x_t* dev, const sht2x_params_t* params)
         return SHT2X_ERR_I2C;
     }
     /* wait 15 ms for device to reset */
-    xtimer_usleep(15 * US_PER_MS);
+    xtimer_msleep(15);
 
     uint8_t userreg;
     uint8_t userreg2;
@@ -450,7 +450,7 @@ static void sleep_during_temp_measurement(sht2x_res_t res)
             amount_ms = 9;
             break;
     }
-    xtimer_usleep(amount_ms * US_PER_MS);
+    xtimer_msleep(amount_ms);
 }
 
 static void sleep_during_hum_measurement(sht2x_res_t resolution)
@@ -471,5 +471,5 @@ static void sleep_during_hum_measurement(sht2x_res_t resolution)
             amount_ms = 12;
             break;
     }
-    xtimer_usleep(amount_ms * US_PER_MS);
+    xtimer_msleep(amount_ms);
 }

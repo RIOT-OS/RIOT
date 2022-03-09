@@ -19,6 +19,7 @@
 #ifndef DS18_PARAMS_H
 #define DS18_PARAMS_H
 
+#include "board.h"
 #include "ds18.h"
 #include "saul_reg.h"
 

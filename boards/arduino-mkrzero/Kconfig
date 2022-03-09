@@ -1,0 +1,16 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "arduino-mkrzero" if BOARD_ARDUINO_MKRZERO
+
+config BOARD_ARDUINO_MKRZERO
+    bool
+    default y
+    select BOARD_COMMON_ARDUINO_MKR
+    select MODULE_BOARDS_COMMON_ARDUINO-MKR if TEST_KCONFIG
+
+source "$(RIOTBOARD)/common/arduino-mkr/Kconfig"

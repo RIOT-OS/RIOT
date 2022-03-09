@@ -5,7 +5,7 @@ endif
 #
 # enable second expansion of prerequisites.
 #
-# Doing that here enables it globally for all modules and the application.
+# Doing that here enables it globally for all modules
 #
 # See https://www.gnu.org/software/make/manual/html_node/Secondary-Expansion.html
 # for what it can be used for.
@@ -14,11 +14,13 @@ endif
 unexport DIRS
 DIRS := $(sort $(abspath $(DIRS)))
 
-MODULE ?= $(shell basename $(CURDIR))
+_MOD := $(shell basename $(CURDIR))
+MODULE ?= $(_MOD)
 
-.PHONY: all clean $(DIRS:%=ALL--%) $(DIRS:%=CLEAN--%)
+.PHONY: all clean $(DIRS:%=ALL--%) $(DIRS:%=CLEAN--%) $(MODULE).module \
+        compile-commands $(DIRS:%=COMPILE-COMMANDS--%) $(MODULE).cleanup
 
-all: $(BINDIR)/$(MODULE).a ..nothing
+all: $(MODULE).module ..nothing
 
 ..nothing:
 	@:
@@ -31,6 +33,9 @@ $(DIRS:%=ALL--%):
 $(DIRS:%=CLEAN--%):
 	$(QQ)"$(MAKE)" -C $(@:CLEAN--%=%) clean
 
+$(DIRS:%=COMPILE-COMMANDS--%):
+	$(QQ)"$(MAKE)" -C $(@:COMPILE-COMMANDS--%=%) compile-commands
+
 ## submodules
 ifeq (1, $(SUBMODULES))
   # don't use *.c as SRC if SRC is empty (e.g., no module selected)
@@ -40,19 +45,24 @@ ifeq (1, $(SUBMODULES))
   BASE_MODULE ?= $(MODULE)
 
   # for each $(BASE_MODULE)_<name> in USEMODULE, add <name>.c to SRC
-  SRC += $(patsubst $(BASE_MODULE)_%,%.c,$(filter $(BASE_MODULE)_%,$(USEMODULE)))
+  # unless in SUBMODULES_NO_SRC
+  SRC += $(wildcard \
+            $(filter-out $(SUBMODULES_NO_SRC),\
+                $(patsubst $(BASE_MODULE)_%,%.c,\
+                    $(filter $(BASE_MODULE)_%,$(USEMODULE)))))
 
-  # don't fail if a selected *.c file does not exist
-  ifeq (1, $(SUBMODULES_NOFORCE))
-    SRC := $(filter $(SRC), $(wildcard *.c))
-  endif
+  # remove duplicates
+  SRC := $(sort $(SRC))
 endif
+
+# By default consider C++ files has a .cpp extension
+SRCXXEXT ?= cpp
 
 ifeq ($(strip $(SRC))$(NO_AUTO_SRC),)
   SRC := $(filter-out $(SRC_NOLTO), $(wildcard *.c))
 endif
 ifeq ($(strip $(SRCXX))$(NO_AUTO_SRC),)
-  SRCXX := $(wildcard *.cpp)
+  SRCXX := $(filter-out $(SRCXXEXCLUDE),$(wildcard *.$(SRCXXEXT)))
 endif
 ifeq ($(strip $(ASMSRC))$(NO_AUTO_SRC),)
   ASMSRC := $(wildcard *.s)
@@ -61,14 +71,40 @@ ifeq ($(strip $(ASSMSRC))$(NO_AUTO_SRC),)
   ASSMSRC := $(wildcard *.S)
 endif
 
-# include makefile snippets for packages in $(USEPKG) that modify GENSRC:
--include $(USEPKG:%=$(RIOTPKG)/%/Makefile.gensrc)
+
+ifneq (,$(SRCXX))
+  ifeq (,$(filter cpp,$(USEMODULE)))
+    ifneq (1,$(TEST_KCONFIG))
+      $(error Found C++ source, but feature "cpp" is not used. Add "FEATURES_REQUIRED += cpp")
+    else
+      $(error Found C++ source, but "cpp" module is not used. Enable the MODULE_CPP in Kconfig)
+    endif
+  endif
+endif
+
+compile-commands: | $(DIRS:%=COMPILE-COMMANDS--%)
+	$(file >$(BINDIR)/$(MODULE)/compile_cmds.txt,SRC: $(sort $(SRC) $(SRC_NO_LTO)))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,SRC_NO_LTO: $(sort $(SRC_NO_LTO)))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,SRCXX: $(sort $(SRCXX)))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,CURDIR: $(CURDIR))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,CFLAGS: $(CFLAGS))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,LTOFLAGS: $(LTOFLAGS))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,INCLUDES: $(INCLUDES))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,CXXFLAGS: $(CXXFLAGS))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,CXXINCLUDES: $(CXXINCLUDES))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,CC: $(CC))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,CXX: $(CXX))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,TARGET_ARCH: $(TARGET_ARCH))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,TARGET_ARCH_LLVM: $(TARGET_ARCH_LLVM))
+
+# include makefile snippets for packages in $(PKG_PATHS) that modify GENSRC:
+-include $(PKG_PATHS:%=%Makefile.gensrc)
 
 GENOBJC     := $(GENSRC:%.c=%.o)
 OBJC_LTO    := $(SRC:%.c=$(BINDIR)/$(MODULE)/%.o)
 OBJC_NOLTO  := $(SRC_NOLTO:%.c=$(BINDIR)/$(MODULE)/%.o)
 OBJC        := $(OBJC_NOLTO) $(OBJC_LTO)
-OBJCXX      := $(SRCXX:%.cpp=$(BINDIR)/$(MODULE)/%.o)
+OBJCXX      := $(SRCXX:%.$(SRCXXEXT)=$(BINDIR)/$(MODULE)/%.o)
 ASMOBJ      := $(ASMSRC:%.s=$(BINDIR)/$(MODULE)/%.o)
 ASSMOBJ     := $(ASSMSRC:%.S=$(BINDIR)/$(MODULE)/%.o)
 
@@ -76,18 +112,25 @@ OBJ := $(OBJC) $(OBJCXX) $(ASMOBJ) $(ASSMOBJ) $(GENOBJC)
 DEP := $(OBJC:.o=.d) $(OBJCXX:.o=.d) $(ASSMOBJ:.o=.d)
 
 include $(RIOTMAKE)/blob.inc.mk
+include $(RIOTMAKE)/tools/fixdep.inc.mk
 
 $(BINDIR)/$(MODULE)/:
 	$(Q)mkdir -p $@
 
-$(BINDIR)/$(MODULE).a $(OBJ): | $(BINDIR)/$(MODULE)/
+OLD_OBJECTS = $(wildcard $(BINDIR)/$(MODULE)/*.o)
 
-# Build the archive from the output directory to create relative thin archives
-# This allows having them valid in and outside of docker
-$(BINDIR)/$(MODULE).a: $(OBJ) | $(DIRS:%=ALL--%)
-	@# Recreate archive to cleanup deleted/non selected source files objects
-	$(Q)$(RM) $@
-	$(Q)cd $(@D) && $(AR) $(ARFLAGS) $(@F) $(subst $(@D)/,,$^)
+# do not clean objects from bindist modules
+ifeq (,$(filter $(MODULE),$(BIN_USEMODULE)))
+  OBJECTS_TO_REMOVE = $(filter-out $(OBJ),$(OLD_OBJECTS))
+endif
+
+$(MODULE).module compile-commands $(OBJ): | $(BINDIR)/$(MODULE)/
+
+$(MODULE).module: $(OBJ) $(if $(OBJECTS_TO_REMOVE),$(MODULE).cleanup) | $(DIRS:%=ALL--%)
+
+$(MODULE).cleanup:
+	$(Q)# cleanup non selected source files objects
+	$(Q)$(RM) $(OBJECTS_TO_REMOVE)
 
 CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
 CCASFLAGS = $(filter-out $(CCASUWFLAGS), $(CFLAGS)) $(CCASEXFLAGS)
@@ -96,29 +139,48 @@ CCASFLAGS = $(filter-out $(CCASUWFLAGS), $(CFLAGS)) $(CCASEXFLAGS)
 
 $(OBJC_LTO): CFLAGS+=$(LTOFLAGS)
 
-$(OBJC): $(BINDIR)/$(MODULE)/%.o: %.c $(RIOTBUILD_CONFIG_HEADER_C)
+# Define dependencies for object files
+OBJ_DEPS += $(RIOTBUILD_CONFIG_HEADER_C)
+
+$(OBJC): $(BINDIR)/$(MODULE)/%.o: %.c $(OBJ_DEPS) | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
 	$(Q)$(CCACHE) $(CC) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
-		$(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
+		$(CFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
+ifneq (,$(SHOULD_RUN_KCONFIG))
+	$(Q)$(FIXDEP) $(@:.o=.d) $@ $(KCONFIG_SYNC_DIR) > $(@:.o=.tmp)
+	$(Q)mv $(@:.o=.tmp) $(@:.o=.d)
+endif
 
-$(GENOBJC): %.o: %.c $(RIOTBUILD_CONFIG_HEADER_C)
+$(GENOBJC): %.o: %.c $(OBJ_DEPS) | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
 	$(Q) $(CCACHE) $(CC) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$<)\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
-		$(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $<
+		$(CFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $<
+ifneq (,$(SHOULD_RUN_KCONFIG))
+	$(Q)$(FIXDEP) $(@:.o=.d) $@ $(KCONFIG_SYNC_DIR) > $(@:.o=.tmp)
+	$(Q)mv $(@:.o=.tmp) $(@:.o=.d)
+endif
 
-$(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.cpp $(RIOTBUILD_CONFIG_HEADER_C)
+$(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.$(SRCXXEXT) $(OBJ_DEPS) | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
 	$(Q)$(CCACHE) $(CXX) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
-		$(CXXFLAGS) $(CXXINCLUDES) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
+		$(CXXFLAGS) $(CXXINCLUDES) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
+ifneq (,$(SHOULD_RUN_KCONFIG))
+	$(Q)$(FIXDEP) $(@:.o=.d) $@ $(KCONFIG_SYNC_DIR) > $(@:.o=.tmp)
+	$(Q)mv $(@:.o=.tmp) $(@:.o=.d)
+endif
 
 $(ASMOBJ): $(BINDIR)/$(MODULE)/%.o: %.s
 	$(Q)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
 
-$(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S $(RIOTBUILD_CONFIG_HEADER_C)
-	$(Q)$(CCAS) $(CCASFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
+$(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S $(OBJ_DEPS) | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
+	$(Q)$(CCAS) $(CCASFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
+ifneq (,$(SHOULD_RUN_KCONFIG))
+	$(Q)$(FIXDEP) $(@:.o=.d) $@ $(KCONFIG_SYNC_DIR) > $(@:.o=.tmp)
+	$(Q)mv $(@:.o=.tmp) $(@:.o=.d)
+endif
 
 # pull in dependency info for *existing* .o files
 # deleted header files will be silently ignored

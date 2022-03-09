@@ -45,7 +45,7 @@
  *     while (1) {
  *         sock_tcp_t *sock;
  *
- *         if (sock_tcp_accept(&queue, &sock) < 0) {
+ *         if (sock_tcp_accept(&queue, &sock, SOCK_NO_TIMEOUT) < 0) {
  *             puts("Error accepting new sock");
  *         }
  *         else {
@@ -55,7 +55,7 @@
  *             while (read_res >= 0) {
  *                 read_res = sock_tcp_read(sock, &buf, sizeof(buf),
  *                                          SOCK_NO_TIMEOUT);
- *                 if (read_res < 0) {
+ *                 if (read_res <= 0) {
  *                     puts("Disconnected");
  *                     break;
  *                 }
@@ -76,7 +76,7 @@
  *             sock_tcp_disconnect(sock);
  *         }
  *     }
- *     sock_tcp_stop_listen(queue);
+ *     sock_tcp_stop_listen(&queue);
  *     return 0;
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -153,7 +153,7 @@
  *             while (read_res >= 0) {
  *                 read_res = sock_tcp_read(sock, &buf, sizeof(buf),
  *                                          SOCK_NO_TIMEOUT);
- *                 if (read_res < 0) {
+ *                 if (read_res <= 0) {
  *                     puts("Disconnected");
  *                     break;
  *                 }
@@ -216,7 +216,7 @@
  *     }
  *     else {
  *         if ((res = sock_tcp_read(&sock, &buf, sizeof(buf),
- *                                  SOCK_NO_TIMEOUT)) < 0) {
+ *                                  SOCK_NO_TIMEOUT)) <= 0) {
  *             puts("Disconnected");
  *         }
  *         printf("Read: \"");
@@ -271,7 +271,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  *     else {
  *         if ((res = sock_tcp_read(&sock, &buf, sizeof(buf),
- *                                  SOCK_NO_TIMEOUT)) < 0) {
+ *                                  SOCK_NO_TIMEOUT)) <= 0) {
  *             puts("Disconnected");
  *         }
  *         printf("Read: \"");
@@ -299,9 +299,17 @@
 #ifndef NET_SOCK_TCP_H
 #define NET_SOCK_TCP_H
 
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/types.h>
+
+/* net/sock/async/types.h included by net/sock.h needs to re-typedef the
+ * `sock_tcp_t` and `sock_tcp_queue_t` to prevent cyclic includes */
+#if defined (__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wtypedef-redefinition"
+#endif
 
 #include "net/sock.h"
 
@@ -326,6 +334,10 @@ typedef struct sock_tcp sock_tcp_t;
  *                          implementation-specific `sock_types.h`.
  */
 typedef struct sock_tcp_queue sock_tcp_queue_t;
+
+#if defined (__clang__)
+# pragma clang diagnostic pop
+#endif
 
 /**
  * @brief   Establishes a new TCP sock connection
@@ -494,7 +506,8 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
  * @note    Function may block.
  *
  * @return  The number of bytes read on success.
- * @return  0, if no read data is available, but everything is in order.
+ * @return  0, if no read data is available or the connection was orderly closed
+ *          by the remote host.
  * @return  -EAGAIN, if @p timeout is `0` and no data is available.
  * @return  -ECONNABORTED, if the connection is aborted while waiting for the
  *          next data.

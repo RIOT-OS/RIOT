@@ -1,0 +1,70 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_USBUS
+    bool "USB Unified Stack (USBUS)"
+    depends on TEST_KCONFIG
+    depends on HAS_PERIPH_USBDEV || MODULE_USBDEV_MOCK
+    select MODULE_CORE_THREAD_FLAGS
+    select MODULE_EVENT
+    select MODULE_LUID
+    select MODULE_FMT
+    select MODULE_PERIPH_USBDEV if HAS_PERIPH_USBDEV && !MODULE_USBDEV_MOCK
+
+if MODULE_USBUS
+
+config MODULE_AUTO_INIT_USBUS
+    bool "Auto initialize USBUS"
+    depends on MODULE_AUTO_INIT
+    default y
+
+endif # MODULE_USBUS
+
+menuconfig KCONFIG_USEMODULE_USBUS
+    bool "Configure USB Unified Stack (USBUS)"
+    depends on USEMODULE_USBUS
+    depends on KCONFIG_USB
+    help
+        Configure the USBUS module via Kconfig.
+
+if KCONFIG_USEMODULE_USBUS
+
+config USBUS_AUTO_ATTACH
+    bool "Auto attach"
+    default y
+    help
+        When set, the USBUS thread will automatically enable the USB pull-up
+        resistor after initializing the thread. This will signal to the host
+        that the USB peripheral is ready for use.
+
+choice
+    bool "Endpoint 0 buffer size"
+    default USBUS_EP0_SIZE_64
+    help
+        This configures the buffer size of the control endpoint. Unless you
+        transfer large amount of data often over the control endpoint, a minimal
+        size should be sufficient.
+
+config USBUS_EP0_SIZE_8
+    bool "8"
+
+config USBUS_EP0_SIZE_16
+    bool "16"
+
+config USBUS_EP0_SIZE_32
+    bool "32"
+
+config USBUS_EP0_SIZE_64
+    bool "64"
+
+endchoice
+
+endif # KCONFIG_USEMODULE_USBUS
+
+rsource "cdc/Kconfig"
+rsource "dfu/Kconfig"
+rsource "hid/Kconfig"

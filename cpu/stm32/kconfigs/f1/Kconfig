@@ -1,0 +1,32 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_FAM_F1
+    bool
+    select CLOCK_HAS_NO_MCO_PRE
+    select CPU_CORE_CORTEX_M3
+    select CPU_STM32
+    select HAS_BOOTLOADER_STM32
+    select HAS_CPU_STM32F1
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_PAGEWISE
+    select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_PERIPH_RTT_SET_COUNTER
+    select HAS_PERIPH_WDT
+    select HAVE_SHARED_PERIPH_RTT_PERIPH_RTC
+
+if CPU_FAM_F1
+
+config CPU_FAM
+    default "f1"
+
+endif # CPU_FAM_F1
+
+config HAS_CPU_STM32F1
+    bool
+    help
+        Indicates that the cpu being used belongs to the 'stm32f1' family.

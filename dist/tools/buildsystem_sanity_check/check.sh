@@ -15,6 +15,9 @@
 
 : "${RIOTBASE:="$(cd "$(dirname "$0")/../../../" || exit; pwd)"}"
 
+: "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
+. "${RIOTTOOLS}"/ci/github_annotate.sh
+
 SCRIPT_PATH=dist/tools/buildsystem_sanity_check/check.sh
 
 
@@ -31,7 +34,22 @@ prepend() {
 }
 
 error_with_message() {
-    tab_indent | prepend "${1}"
+    while read INPUT; do
+        if github_annotate_is_on; then
+            MESSAGE="${1}"
+            FILE=$(echo "${INPUT}" | cut -d: -f1)
+            LINE=$(echo "${INPUT}" | cut -d: -f2)
+            MATCH=$(echo "${INPUT}" | cut -d: -f3)
+            if [[ $var =~ ^[0-9]+$ ]] || [  -z "$MATCH" ]; then
+                # line is not provided in grep pattern
+                LINE=0
+            fi
+            github_annotate_error "$FILE" "$LINE" "$MESSAGE"
+        fi
+        # We need to generate non GitHub annotations for this script to fail.
+        # Also, the pure annotate output is not very helpful on its own ;-)
+        echo "${INPUT}" | tab_indent | prepend "${1}:"
+    done
 }
 
 
@@ -56,8 +74,24 @@ check_not_parsing_features() {
     # These two files contain sanity checks using FEATURES_ so are allowed
     pathspec+=(':!Makefile.include' ':!makefiles/info-global.inc.mk')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
-        | error_with_message 'Modules should not check the content of FEATURES_PROVIDED/_REQUIRED/OPTIONAL'
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message 'Modules should not check the content of FEATURES_PROVIDED/REQUIRED/OPTIONAL'
+}
+
+# Providing features for boards and CPUs should only be done in
+# Makefile.features
+check_providing_features_only_makefile_features() {
+    local patterns=()
+    local pathspec=()
+
+    patterns+=(-e '^[ ]*FEATURES_PROVIDED *+= *')
+
+    pathspec+=("*Makefile\.*")
+
+    pathspec+=(":!*Makefile.features")
+
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message 'Features should only be provided in Makefile.features files'
 }
 
 # Some variables do not need to be exported and even cause issues when being
@@ -74,15 +108,44 @@ UNEXPORTED_VARIABLES+=('RESET' 'RESETFLAGS')
 UNEXPORTED_VARIABLES+=('DEBUGGER' 'DEBUGGER_FLAGS')
 UNEXPORTED_VARIABLES+=('DEBUGSERVER' 'DEBUGSERVER_FLAGS')
 UNEXPORTED_VARIABLES+=('PREFLASHER' 'PREFFLAGS' 'FLASHDEPS')
-UNEXPORTED_VARIABLES+=('DEBUG_ADAPTER' 'DEBUG_ADAPTER_ID')
+UNEXPORTED_VARIABLES+=('OPENOCD_DEBUG_ADAPTER' 'DEBUG_ADAPTER_ID')
 UNEXPORTED_VARIABLES+=('PROGRAMMER_SERIAL')
 UNEXPORTED_VARIABLES+=('STLINK_VERSION')
 UNEXPORTED_VARIABLES+=('PORT_LINUX' 'PORT_DARWIN')
 UNEXPORTED_VARIABLES+=('PORT[ ?=:]' 'PORT$')
+UNEXPORTED_VARIABLES+=('LINKFLAGS' 'LINKER_SCRIPT')
+UNEXPORTED_VARIABLES+=('USEMODULE_INCLUDES')
+UNEXPORTED_VARIABLES+=('OPENOCD_ADAPTER_INIT')
+UNEXPORTED_VARIABLES+=('OPENOCD_CONFIG')
+UNEXPORTED_VARIABLES+=('OPENOCD_RESET_USE_CONNECT_ASSERT_SRST')
+UNEXPORTED_VARIABLES+=('OPENOCD_CMD_RESET_RUN')
+UNEXPORTED_VARIABLES+=('OPENOCD_PRE_FLASH_CMDS' 'OPENOCD_PRE_VERIFY_CMDS')
+UNEXPORTED_VARIABLES+=('OPENOCD_PRE_FLASH_CHECK_SCRIPT')
+UNEXPORTED_VARIABLES+=('PYOCD_FLASH_TARGET_TYPE')
+UNEXPORTED_VARIABLES+=('PYOCD_ADAPTER_INIT')
+UNEXPORTED_VARIABLES+=('JLINK_DEVICE' 'JLINK_IF')
+UNEXPORTED_VARIABLES+=('JLINK_PRE_FLASH' 'JLINK_RESET_FILE')
+UNEXPORTED_VARIABLES+=('GIT_CACHE' 'GIT_CACHE_DIR')
+UNEXPORTED_VARIABLES+=('LINKXX')
+UNEXPORTED_VARIABLES+=('APPDEPS' 'BUILDDEPS' 'DEBUGDEPS')
+UNEXPORTED_VARIABLES+=('EMULATOR' 'EMULATOR_FLAGS')
 
 EXPORTED_VARIABLES_ONLY_IN_VARS=()
 EXPORTED_VARIABLES_ONLY_IN_VARS+=('CPU_ARCH')
+EXPORTED_VARIABLES_ONLY_IN_VARS+=('CPU_CORE')
 EXPORTED_VARIABLES_ONLY_IN_VARS+=('CPU_FAM')
+EXPORTED_VARIABLES_ONLY_IN_VARS+=('NATIVEINCLUDES')
+EXPORTED_VARIABLES_ONLY_IN_VARS+=('UNDEF')
+EXPORTED_VARIABLES_ONLY_IN_VARS+=('USEMODULE')
+EXPORTED_VARIABLES_ONLY_IN_VARS+=('TARGET_ARCH')
+EXPORTED_VARIABLES_ONLY_IN_VARS+=('TOOLCHAIN')
+EXPORTED_VARIABLES_ONLY_IN_VARS+=('WERROR')
+EXPORTED_VARIABLES_ONLY_IN_VARS+=('WPEDANTIC')
+EXPORTED_VARIABLES_ONLY_IN_VARS+=('CC[ =]' 'CXX' 'CCAS')
+EXPORTED_VARIABLES_ONLY_IN_VARS+=('AR[ =]' 'RANLIB')
+EXPORTED_VARIABLES_ONLY_IN_VARS+=('AS' 'NM' 'SIZE' 'LINK')
+EXPORTED_VARIABLES_ONLY_IN_VARS+=('OBJDUMP' 'OBJCOPY')
+
 check_not_exporting_variables() {
     local patterns=()
     local pathspec=()
@@ -91,13 +154,14 @@ check_not_exporting_variables() {
         patterns+=(-e "export[[:blank:]]\+${variable}")
     done
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" \
-        | error_with_message 'Variables must not be exported:'
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" \
+        | error_with_message 'Variables must not be exported'
 
     # Some variables may still be exported in 'makefiles/vars.inc.mk' as the
     # only place that should export common variables
     pathspec+=('*')
     pathspec+=(':!makefiles/vars.inc.mk')
+    pathspec+=(':!**/Vagrantfile')
 
     patterns=()
     for variable in "${EXPORTED_VARIABLES_ONLY_IN_VARS[@]}"; do
@@ -106,8 +170,8 @@ check_not_exporting_variables() {
 
     # Only run if there are patterns, otherwise it matches everything
     if [ ${#patterns[@]} -ne 0 ]; then
-        git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
-            | error_with_message 'Variables must only be exported in `makefiles/vars.inc.mk`:'
+        git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
+            | error_with_message 'Variables must only be exported in `makefiles/vars.inc.mk`'
     fi
 }
 
@@ -126,8 +190,8 @@ check_deprecated_vars_patterns() {
     # Ignore this file when matching as it self matches
     pathspec+=(":!${SCRIPT_PATH}")
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
-        | error_with_message 'Deprecated variables or patterns:'
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message 'Deprecated variables or patterns'
 }
 
 # Makefile files cpu must not be included by the board anymore
@@ -142,7 +206,7 @@ check_board_do_not_include_cpu_features_dep() {
 
     pathspec+=('boards/')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
             | error_with_message 'Makefiles files from cpu must not be included by the board anymore'
 }
 
@@ -154,10 +218,11 @@ check_cpu_cpu_model_defined_in_makefile_features() {
     # With our without space and with or without ?=
     patterns+=(-e '^ *\(export\)\? *CPU \??\?=')
     patterns+=(-e '^ *\(export\)\? *CPU_MODEL \??\?=')
+    pathspec+=(':!**.md')
     pathspec+=(':!boards/**/Makefile.features')
     pathspec+=(':!cpu/**/Makefile.features')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
             | error_with_message 'CPU and CPU_MODEL definition must be done by board/BOARD/Makefile.features, board/common/**/Makefile.features or cpu/CPU/Makefile.features'
 }
 
@@ -170,7 +235,7 @@ check_not_setting_board_equal() {
 
     pathspec+=('**/Makefile')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message 'Applications Makefile should use "BOARD ?="'
 }
 
@@ -184,7 +249,7 @@ check_board_insufficient_memory_not_in_makefile() {
 
     pathspec+=('**/Makefile')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message 'Move BOARD_INSUFFICIENT_MEMORY to Makefile.ci'
 }
 
@@ -196,8 +261,9 @@ checks_tests_application_not_defined_in_makefile() {
     patterns+=(-e '^[[:space:]]*APPLICATION[[:space:]:+]=')
 
     pathspec+=('tests/**/Makefile')
+    pathspec+=(':!tests/external_board_native/Makefile')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message "Don't define APPLICATION in test Makefile"
 }
 
@@ -210,8 +276,77 @@ checks_develhelp_not_defined_via_cflags() {
 
     pathspec+=('**/Makefile')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message "Use DEVELHELP ?= 1 instead of using CFLAGS directly"
+}
+
+
+# Common code in boards should not use $(BOARD) to reference files
+check_files_in_boards_not_reference_board_var() {
+    local patterns=()
+    local pathspec=()
+
+    patterns+=(-e '/$(BOARD)/')
+
+    pathspec+=('boards/')
+    # boards/common/nrf52 uses a hack to resolve dependencies early
+    pathspec+=(':!boards/common/nrf52/Makefile.include')
+
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message 'Code in boards/ should not use $(BOARDS) to reference files since this breaks external BOARDS changing BOARDSDIR"'
+}
+
+check_no_pseudomodules_in_makefile_dep() {
+    local patterns=()
+    local pathspec=()
+
+    patterns+=(-e 'PSEUDOMODULES[\t ]*[+:]*=')
+
+    pathspec+=('**/Makefile.dep')
+
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message "Don't define PSEUDOMODULES in Makefile.dep"
+}
+
+check_no_usemodules_in_makefile_include() {
+    local patterns=()
+    local pathspec=()
+
+    patterns+=(-e 'USEMODULE[\t ]*[+:]*=')
+
+    pathspec+=('**/Makefile.include')
+    pathspec+=(':!Makefile.include')
+    pathspec+=(':!tests/**/Makefile.include')
+    pathspec+=(':!examples/**/Makefile.include')
+
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message "Don't include USEMODULE in Makefile.include"
+}
+
+check_no_pkg_source_local() {
+    local patterns=()
+    local pathspec=()
+
+    patterns+=(-e 'PKG_SOURCE_LOCAL')
+
+    pathspec+=('pkg/*/Makefile')
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message "Don't push PKG_SOURCE_LOCAL definitions upstream"
+}
+
+check_no_riot_config() {
+    local patterns=()
+    local pathspec=()
+
+    patterns+=(-e 'RIOT_CONFIG_.*')
+
+    pathspec+=('Makefile*')
+    pathspec+=('**/Makefile*')
+    pathspec+=('**/*.mk')
+    pathspec+=(':!makefiles/kconfig.mk')
+    pathspec+=(':!makefiles/docker.inc.mk')
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message "Don't push RIOT_CONFIG_* definitions upstream. Rather define configuration via Kconfig"
 }
 
 error_on_input() {
@@ -220,6 +355,7 @@ error_on_input() {
 
 all_checks() {
     check_not_parsing_features
+    check_providing_features_only_makefile_features
     check_not_exporting_variables
     check_deprecated_vars_patterns
     check_board_do_not_include_cpu_features_dep
@@ -228,6 +364,11 @@ all_checks() {
     check_board_insufficient_memory_not_in_makefile
     checks_tests_application_not_defined_in_makefile
     checks_develhelp_not_defined_via_cflags
+    check_files_in_boards_not_reference_board_var
+    check_no_pseudomodules_in_makefile_dep
+    check_no_usemodules_in_makefile_include
+    check_no_pkg_source_local
+    check_no_riot_config
 }
 
 main() {
@@ -237,5 +378,8 @@ main() {
 
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    github_annotate_setup
     main
+    github_annotate_teardown
+    github_annotate_report_last_run
 fi

@@ -1,0 +1,21 @@
+include $(RIOTCPU)/avr8_common/Makefile.features
+
+# common feature are defined in avr8_common/Makefile.features
+# Only add Additional features
+
+ifneq (,$(findstring a1,$(shell echo $(CPU_MODEL) | cut -c8-)))
+  FEATURES_PROVIDED += atxmega_ebi
+endif
+
+FEATURES_PROVIDED += cpu_core_atxmega
+FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_gpio periph_gpio_irq
+FEATURES_PROVIDED += periph_nvm
+FEATURES_PROVIDED += periph_pm
+FEATURES_PROVIDED += periph_timer periph_timer_periodic
+
+# Add atxmega configurations. This configuration enables modules that are only available when
+# using Kconfig module modelling
+ifeq (1, $(TEST_KCONFIG))
+  KCONFIG_CPU_CONFIG += $(RIOTCPU)/atxmega/atxmega.config
+endif

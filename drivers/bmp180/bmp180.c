@@ -25,9 +25,9 @@
 #include "bmp180_internals.h"
 #include "bmp180_params.h"
 #include "periph/i2c.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define DEV_I2C      (dev->params.i2c_dev)
@@ -65,7 +65,7 @@ int bmp180_init(bmp180_t *dev, const bmp180_params_t *params)
     }
 
     /* adding delay before reading calibration values to avoid timing issues */
-    xtimer_usleep(BMP180_ULTRALOWPOWER_DELAY);
+    ztimer_sleep(ZTIMER_MSEC, BMP180_ULTRALOWPOWER_DELAY_MS);
 
     uint8_t buffer[22] = {0};
     /* Read calibration values, using contiguous register addresses */
@@ -187,7 +187,7 @@ static int _read_ut(const bmp180_t *dev, int32_t *output)
     uint8_t ut[2] = {0};
     uint8_t control[2] = { BMP180_REGISTER_CONTROL, BMP180_TEMPERATURE_COMMAND };
     i2c_write_bytes(DEV_I2C, DEV_ADDR, control, 2, 0);
-    xtimer_usleep(BMP180_ULTRALOWPOWER_DELAY);
+    ztimer_sleep(ZTIMER_MSEC, BMP180_ULTRALOWPOWER_DELAY_MS);
     if (i2c_read_regs(DEV_I2C, DEV_ADDR, BMP180_REGISTER_DATA, ut, 2, 0) < 0) {
         DEBUG("[Error] Cannot read uncompensated temperature.\n");
         i2c_release(DEV_I2C);
@@ -209,19 +209,19 @@ static int _read_up(const bmp180_t *dev, int32_t *output)
     i2c_write_bytes(DEV_I2C, DEV_ADDR, control, 2, 0);
     switch (OVERSAMPLING) {
     case BMP180_ULTRALOWPOWER:
-        xtimer_usleep(BMP180_ULTRALOWPOWER_DELAY);
+        ztimer_sleep(ZTIMER_MSEC, BMP180_ULTRALOWPOWER_DELAY_MS);
         break;
     case BMP180_STANDARD:
-        xtimer_usleep(BMP180_STANDARD_DELAY);
+        ztimer_sleep(ZTIMER_MSEC, BMP180_STANDARD_DELAY_MS);
         break;
     case BMP180_HIGHRES:
-        xtimer_usleep(BMP180_HIGHRES_DELAY);
+        ztimer_sleep(ZTIMER_MSEC, BMP180_HIGHRES_DELAY_MS);
         break;
     case BMP180_ULTRAHIGHRES:
-        xtimer_usleep(BMP180_ULTRAHIGHRES_DELAY);
+        ztimer_sleep(ZTIMER_MSEC, BMP180_ULTRAHIGHRES_DELAY_MS);
         break;
     default:
-        xtimer_usleep(BMP180_ULTRALOWPOWER_DELAY);
+        ztimer_sleep(ZTIMER_MSEC, BMP180_ULTRALOWPOWER_DELAY_MS);
         break;
     }
     if (i2c_read_regs(DEV_I2C, DEV_ADDR, BMP180_REGISTER_DATA, up, 3, 0) < 0) {

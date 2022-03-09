@@ -2,17 +2,14 @@
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
-
-DEBUG_ADAPTER ?= dap
-
 # this board uses openocd with an HEXFILE
+PROGRAMMER ?= openocd
+PROGRAMMERS_SUPPORTED += openocd
 FLASHFILE ?= $(HEXFILE)
-include $(RIOTMAKE)/tools/openocd.inc.mk
+OPENOCD_DEBUG_ADAPTER ?= dap
 
 # generate image checksum from hex file
-export PRE_FLASH_CHECK_SCRIPT = lpc_checksum --format hex
+OPENOCD_PRE_FLASH_CHECK_SCRIPT = lpc_checksum --format hex
 
 # remap flash to address 0x0, otherwise it verifies the rom bootloader
-export OPENOCD_PRE_VERIFY_CMDS += '-c reset init'
+OPENOCD_PRE_VERIFY_CMDS += '-c reset init'

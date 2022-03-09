@@ -129,7 +129,6 @@ void *run(void *parameter)
     void* test_7_val = pthread_getspecific(new_key);
     printf("test_7_val: %p\n", test_7_val);
 
-
     return NULL;
 }
 

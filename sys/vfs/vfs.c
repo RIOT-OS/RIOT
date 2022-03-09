@@ -26,12 +26,13 @@
 #include "vfs.h"
 #include "mutex.h"
 #include "thread.h"
-#include "kernel_types.h"
+#include "sched.h"
 #include "clist.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
-#if ENABLE_DEBUG
+
+#if IS_ACTIVE(ENABLE_DEBUG)
 /* Since some of these functions are called by printf, we can't really call
  * printf from our functions or we end up in an infinite recursion. */
 #include <unistd.h> /* for STDOUT_FILENO */
@@ -39,6 +40,16 @@
 #else
 #define DEBUG_NOT_STDOUT(...)
 #endif
+
+/**
+ * @brief Automatic mountpoints
+ */
+XFA_INIT(vfs_mount_t, vfs_mountpoints_xfa);
+
+/**
+ * @brief Number of automatic mountpoints
+ */
+#define MOUNTPOINTS_NUMOF XFA_LEN(vfs_mount_t, vfs_mountpoints_xfa)
 
 /**
  * @internal
@@ -189,6 +200,7 @@ int vfs_fstat(int fd, struct stat *buf)
         /* driver does not implement fstat() */
         return -EINVAL;
     }
+    memset(buf, 0, sizeof(*buf));
     return filp->f_op->fstat(filp, buf);
 }
 
@@ -203,15 +215,26 @@ int vfs_fstatvfs(int fd, struct statvfs *buf)
         return res;
     }
     vfs_file_t *filp = &_vfs_open_files[fd];
-    if (filp->mp->fs->fs_op->fstatvfs == NULL) {
-        /* file system driver does not implement fstatvfs() */
-        if (filp->mp->fs->fs_op->statvfs != NULL) {
-            /* Fall back to statvfs */
-            return filp->mp->fs->fs_op->statvfs(filp->mp, "/", buf);
-        }
+    memset(buf, 0, sizeof(*buf));
+    if (filp->mp->fs->fs_op->statvfs == NULL) {
+        /* file system driver does not implement statvfs() */
         return -EINVAL;
     }
-    return filp->mp->fs->fs_op->fstatvfs(filp->mp, filp, buf);
+    return filp->mp->fs->fs_op->statvfs(filp->mp, "/", buf);
+}
+
+int vfs_dstatvfs(vfs_DIR *dirp, struct statvfs *buf)
+{
+    DEBUG("vfs_dstatvfs: %p, %p\n", (void*)dirp, (void *)buf);
+    if (buf == NULL) {
+        return -EFAULT;
+    }
+    memset(buf, 0, sizeof(*buf));
+    if (dirp->mp->fs->fs_op->statvfs == NULL) {
+        /* file system driver does not implement statvfs() */
+        return -EINVAL;
+    }
+    return dirp->mp->fs->fs_op->statvfs(dirp->mp, "/", buf);
 }
 
 off_t vfs_lseek(int fd, off_t off, int whence)
@@ -310,7 +333,6 @@ ssize_t vfs_read(int fd, void *dest, size_t count)
     return filp->f_op->read(filp, dest, count);
 }
 
-
 ssize_t vfs_write(int fd, const void *src, size_t count)
 {
     DEBUG_NOT_STDOUT(fd, "vfs_write: %d, %p, %lu\n", fd, src, (unsigned long)count);
@@ -331,6 +353,25 @@ ssize_t vfs_write(int fd, const void *src, size_t count)
         return -EINVAL;
     }
     return filp->f_op->write(filp, src, count);
+}
+
+int vfs_fsync(int fd)
+{
+    DEBUG_NOT_STDOUT(fd, "vfs_fsync: %d\n", fd);
+    int res = _fd_is_valid(fd);
+    if (res < 0) {
+        return res;
+    }
+    vfs_file_t *filp = &_vfs_open_files[fd];
+    if (((filp->flags & O_ACCMODE) != O_WRONLY) & ((filp->flags & O_ACCMODE) != O_RDWR)) {
+        /* File not open for writing */
+        return -EBADF;
+    }
+    if (filp->f_op->fsync == NULL) {
+        /* driver does not implement fsync() */
+        return -EINVAL;
+    }
+    return filp->f_op->fsync(filp);
 }
 
 int vfs_opendir(vfs_DIR *dirp, const char *dirname)
@@ -481,13 +522,12 @@ int vfs_mount(vfs_mount_t *mountp)
             }
         }
     }
-    /* insert last in list */
+    /* Insert last in list. This property is relied on by vfs_iterate_mount_dirs. */
     clist_rpush(&_vfs_mounts_list, &mountp->list_entry);
     mutex_unlock(&_mount_mutex);
     DEBUG("vfs_mount: mount done\n");
     return 0;
 }
-
 
 int vfs_umount(vfs_mount_t *mountp)
 {
@@ -725,6 +765,7 @@ int vfs_stat(const char *restrict path, struct stat *restrict buf)
         atomic_fetch_sub(&mountp->open_files, 1);
         return -EPERM;
     }
+    memset(buf, 0, sizeof(*buf));
     res = mountp->fs->fs_op->stat(mountp, rel_path, buf);
     /* remember to decrement the open_files count */
     atomic_fetch_sub(&mountp->open_files, 1);
@@ -754,6 +795,7 @@ int vfs_statvfs(const char *restrict path, struct statvfs *restrict buf)
         atomic_fetch_sub(&mountp->open_files, 1);
         return -EPERM;
     }
+    memset(buf, 0, sizeof(*buf));
     res = mountp->fs->fs_op->statvfs(mountp, rel_path, buf);
     /* remember to decrement the open_files count */
     atomic_fetch_sub(&mountp->open_files, 1);
@@ -854,14 +896,70 @@ const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur)
             /* empty list */
             return NULL;
         }
+        node = node->next;
     }
     else {
         node = cur->list_entry.next;
-        if (node == _vfs_mounts_list.next) {
+        if (node == _vfs_mounts_list.next->next) {
             return NULL;
         }
     }
     return container_of(node, vfs_mount_t, list_entry);
+}
+
+/* General implementation note: This heavily relies on the produced opened dir
+ * to lock keep the underlying mount point from closing. */
+bool vfs_iterate_mount_dirs(vfs_DIR *dir)
+{
+    /* This is NULL after the prescribed initialization, or a valid (and
+     * locked) mount point otherwise */
+    vfs_mount_t *last_mp = dir->mp;
+
+    /* This is technically violating vfs_iterate_mounts' API, as that says no
+     * mounts or unmounts on the chain while iterating. However, as we know
+     * that the current dir's mount point is still on, the equivalent procedure
+     * of starting a new round of `vfs_iterate_mounts` from NULL and calling it
+     * until it produces `last_mp` (all while holding _mount_mutex) would leave
+     * us with the very same situation as if we started iteration with last_mp.
+     *
+     * On the cast discarding const: vfs_iterate_mounts's type is more for
+     * public use */
+    vfs_mount_t *next = (vfs_mount_t *)vfs_iterate_mounts(last_mp);
+    if (next == NULL) {
+        /* Ignoring errors, can't help with them */
+        vfs_closedir(dir);
+        return false;
+    }
+
+    /* Even if we held the mutex up to here (see above comment on the fiction
+     * of acquiring it, iterating to where we are, and releasing it again),
+     * we'd need to let go of it now to actually open the directory. This
+     * temporary count ensures that the file system will stick around for the
+     * directory open step that follows immediately */
+    atomic_fetch_add(&next->open_files, 1);
+
+    /* Ignoring errors, can't help with them */
+    vfs_closedir(dir);
+
+    int err = vfs_opendir(dir, next->mount_point);
+    /* No matter the success, the open_files lock has done its duty */
+    atomic_fetch_sub(&next->open_files, 1);
+
+    if (err != 0) {
+        DEBUG("vfs_iterate_mount opendir erred: vfs_opendir(\"%s\") = %d\n", next->mount_point, err);
+        return false;
+    }
+    return true;
+}
+
+const vfs_file_t *vfs_file_get(int fd)
+{
+    if (_fd_is_valid(fd) == 0) {
+        return &_vfs_open_files[fd];
+    }
+    else {
+        return NULL;
+    }
 }
 
 static inline int _allocate_fd(int fd)
@@ -988,6 +1086,69 @@ static inline int _fd_is_valid(int fd)
         return -EBADF;
     }
     return 0;
+}
+
+int vfs_sysop_stat_from_fstat(vfs_mount_t *mountp, const char *restrict path, struct stat *restrict buf)
+{
+    const vfs_file_ops_t * f_op = mountp->fs->f_op;
+    vfs_file_t opened = {
+        .mp = mountp,
+        /* As per definition of the `vfsfile_ops::open` field */
+        .f_op = f_op,
+        .private_data = { .ptr = NULL },
+        .pos = 0,
+    };
+    int err = f_op->open(&opened, path, 0, 0, NULL);
+    if (err < 0) {
+        return err;
+    }
+    err = f_op->fstat(&opened, buf);
+    f_op->close(&opened);
+    return err;
+}
+
+static int _auto_mount(vfs_mount_t *mountp, unsigned i)
+{
+    (void) i;
+    DEBUG("vfs%u: mounting as '%s'\n", i, mountp->mount_point);
+    int res = vfs_mount(mountp);
+    if (res == 0) {
+        return 0;
+    }
+
+    if (IS_ACTIVE(MODULE_VFS_AUTO_FORMAT)) {
+        DEBUG("vfs%u: formatting…\n", i);
+        res = vfs_format(mountp);
+        if (res) {
+            DEBUG("vfs%u: format: error %d\n", i, res);
+            return res;
+        }
+        res = vfs_mount(mountp);
+    }
+
+    if (res) {
+        DEBUG("vfs%u mount: error %d\n", i, res);
+    }
+
+    return res;
+}
+
+void auto_init_vfs(void)
+{
+    for (unsigned i = 0; i < MOUNTPOINTS_NUMOF; ++i) {
+        _auto_mount(&vfs_mountpoints_xfa[i], i);
+    }
+}
+
+int vfs_mount_by_path(const char *path)
+{
+    for (unsigned i = 0; i < MOUNTPOINTS_NUMOF; ++i) {
+        if (strcmp(path, vfs_mountpoints_xfa[i].mount_point) == 0) {
+            return _auto_mount(&vfs_mountpoints_xfa[i], i);
+        }
+    }
+
+    return -ENOENT;
 }
 
 /** @} */

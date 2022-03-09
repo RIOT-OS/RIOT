@@ -1,0 +1,3 @@
+USEMODULE += ztimer_core
+USEMODULE += ztimer_mock
+USEMODULE += ztimer_convert_muldiv64

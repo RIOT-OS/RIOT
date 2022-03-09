@@ -1,0 +1,7 @@
+# include variants of the BME680 drivers as pseudo modules
+PSEUDOMODULES += bme680_i2c
+PSEUDOMODULES += bme680_spi
+PSEUDOMODULES += bme680_fp
+
+USEMODULE_INCLUDES_bme680 := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_bme680)

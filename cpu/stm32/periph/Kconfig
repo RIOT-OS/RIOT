@@ -1,0 +1,42 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_PERIPH
+    bool
+    default y
+    select MODULE_ZTIMER if MODULE_PERIPH_USBDEV
+    select MODULE_ZTIMER_MSEC if MODULE_PERIPH_USBDEV
+    help
+        stm32 common peripheral code.
+
+config MODULE_PERIPH_UART_NONBLOCKING
+    depends on HAS_PERIPH_UART_NONBLOCKING
+    depends on MODULE_PERIPH_UART
+    select MODULE_TSRB
+
+config MODULE_PERIPH_CAN
+    bool
+    depends on HAS_PERIPH_CAN
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_I2C
+    help
+        STM32 CAN peripheral controller.
+
+config MODULE_PERIPH_ADC
+    bool "ADC peripheral driver"
+    depends on HAS_PERIPH_ADC
+    select MODULE_ZTIMER if HAS_CPU_STM32F3 || HAS_CPU_STM32L4 || HAS_CPU_STM32WL
+    select MODULE_ZTIMER_MSEC if HAS_CPU_STM32F3 || HAS_CPU_STM32L4 || HAS_CPU_STM32WL
+    select MODULE_PERIPH_COMMON
+
+config MODULE_PERIPH_LTDC
+    bool "LTDC peripheral driver"
+    depends on HAS_PERIPH_LTDC
+    help
+        STM32 LCD-TFT Display controller

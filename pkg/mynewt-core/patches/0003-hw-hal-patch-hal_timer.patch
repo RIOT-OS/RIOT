@@ -1,0 +1,48 @@
+From fe5793956395153af816d3336db99850335f20f5 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 18 Jun 2021 12:24:27 +0200
+Subject: [PATCH 3/3] hw/hal: patch hal_timer
+
+NimBLE relies on mynewt-core specific timer initialization, this
+only affects nordic BOARDs. For other BOARDs use ZTIMER_MSEC_BASE,
+and therefore ztimer as the base timer.
+---
+ hw/hal/include/hal/hal_timer.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/hw/hal/include/hal/hal_timer.h b/hw/hal/include/hal/hal_timer.h
+index be41c6095..7d8de9fb4 100644
+--- a/hw/hal/include/hal/hal_timer.h
++++ b/hw/hal/include/hal/hal_timer.h
+@@ -31,6 +31,10 @@
+ #include <inttypes.h>
+ #include "os/queue.h"
+ 
++#if !defined(CPU_NRF52) && !defined(CPU_NRF51)
++#include "ztimer.h"
++#include "ztimer/config.h"
++#endif
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+@@ -49,6 +53,9 @@ typedef void (*hal_timer_cb)(void *arg);
+  * structure; the hal timer API should be used.
+  */
+ struct hal_timer {
++#if !defined(CPU_NRF52) && !defined(CPU_NRF51)
++    ztimer_t timer;
++#else
+     /** Internal platform specific pointer */
+     void                *bsp_timer;
+     /** Callback function */
+@@ -58,6 +65,7 @@ struct hal_timer {
+     /** Tick at which timer should expire */
+     uint32_t            expiry;
+     TAILQ_ENTRY(hal_timer) link;    /* Queue linked list structure */
++#endif
+ };
+ 
+ /**
+-- 
+2.28.0
+

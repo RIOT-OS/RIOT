@@ -1,10 +1,9 @@
 /***************************************************************************//**
  * @file
  * @brief EFR32MG12P_TIMER_CC register and bit field definitions
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib

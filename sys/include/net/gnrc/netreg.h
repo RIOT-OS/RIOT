@@ -23,7 +23,7 @@
 
 #include <inttypes.h>
 
-#include "kernel_types.h"
+#include "sched.h"
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/pkt.h"
 

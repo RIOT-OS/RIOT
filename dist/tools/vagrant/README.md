@@ -51,7 +51,7 @@ This feature allows you to conveniently develop code for RIOT with your preferre
 your host system and use the VM for compiling, flashing devices and running the native port of RIOT.
 
 ## Additional Information
-1. VirtualBox: For new boards it is necessary to add a usb filter (open VirtualBox, click on USB and add the new filter for your board). 
+1. VirtualBox: For new boards it is necessary to add a usb filter (open VirtualBox, click on USB and add the new filter for your board).
   * For Linux Guest Systems: For new boards it is necessary to add new udev rules in the Vagrant config (in `dist/tools/vagrant/udev_rules`) so that Vagrant can capture the device.
     The needed `vendor id` and `product id` can be obtained by running `vboxmanage list usbhost`.
   * For Linux Host Systems: Additionally, in order to allow USB access from within the guest system, the host system user

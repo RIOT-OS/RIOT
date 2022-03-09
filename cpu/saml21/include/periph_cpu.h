@@ -32,47 +32,23 @@ extern "C" {
 #define CPU_BACKUP_RAM_NOT_RETAINED (1)
 
 /**
- * @brief   Mapping of pins to EXTI lines, -1 means not EXTI possible
+ * @name    Power mode configuration
+ * @{
  */
-#if defined(CPU_MODEL_SAML21E18A) || defined(CPU_MODEL_SAML21E18B) || \
-    defined(CPU_MODEL_SAML21E17A) || defined(CPU_MODEL_SAML21E17B) || \
-    defined(CPU_MODEL_SAML21E16A) || defined(CPU_MODEL_SAML21E16B) || \
-    defined(CPU_MODEL_SAML21E15A) || defined(CPU_MODEL_SAML21E15B)
-static const int8_t exti_config[1][32] = {
-    { 0,  1,  2,  3,  4,  5,  6,  7, -1,  9, 10, 11, -1, -1, 14, 15,
-      0,  1,  2,  3, -1, -1,  6,  7, 12, 13, -1, 15, -1, -1, 10, 11},
+#define PM_NUM_MODES        (2)
+/** @} */
+
+/**
+ * @name   SAML21 GCLK definitions
+ * @{
+ */
+enum {
+    SAM0_GCLK_MAIN  = 0,                 /**< Main clock */
+    SAM0_GCLK_TIMER = 1,                 /**< 4/8MHz clock for timers */
+    SAM0_GCLK_32KHZ = 2,                 /**< 32 kHz clock */
+    SAM0_GCLK_48MHZ = 3,                 /**< 48MHz clock */
 };
-#else /* CPU_MODEL_SAML21E */
-static const int8_t exti_config[2][32] = {
-#if defined(CPU_MODEL_SAML21G18A) || defined(CPU_MODEL_SAML21G18B) || \
-    defined(CPU_MODEL_SAML21G17A) || defined(CPU_MODEL_SAML21G17B) || \
-    defined(CPU_MODEL_SAML21G16A) || defined(CPU_MODEL_SAML21G16B)
-    { 0,  1,  2,  3,  4,  5,  6,  7, -1,  9, 10, 11, 12, 13, 14, 15,
-      0,  1,  2,  3,  4,  5,  6,  7, 12, 13, -1, 15, -1, -1, 10, 11},
-    {-1, -1,  2,  3, -1, -1, -1, -1,  8,  9, 10, 11, -1, -1, -1, -1,
-     -1, -1, -1, -1, -1, -1,  6,  7, -1, -1, -1, -1, -1, -1, -1, -1},
-#elif defined(CPU_MODEL_SAML21J18A) || defined(CPU_MODEL_SAML21J18B) || \
-      defined(CPU_MODEL_SAML21J17A) || defined(CPU_MODEL_SAML21J17B) || \
-      defined(CPU_MODEL_SAML21J16A) || defined(CPU_MODEL_SAML21J16B)
-    { 0,  1,  2,  3,  4,  5,  6,  7, -1,  9, 10, 11, 12, 13, 14, 15,
-      0,  1,  2,  3,  4,  5,  6,  7, 12, 13, -1, 15, -1, -1, 10, 11},
-    { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-      0,  1, -1, -1, -1, -1,  6,  7, -1, -1, -1, -1, -1, -1, 14, 15},
-#elif defined(CPU_MODEL_SAMR30G18A) || defined(CPU_MODEL_SAMR34J18B)
-    { 0,  1, -1, -1,  4,  5,  6,  7, -1,  9, 10, 11, 12, 13, 14, 15,
-      0,  1,  2,  3,  4, -1,  6,  7, 12, 13, -1, 15,  8, -1, 10, 11},
-    { 0, -1,  2,  3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 15,
-      0,  1, -1, -1, -1, -1,  6,  7, -1, -1, -1, -1, -1, -1, 14, 15},
-#elif defined(CPU_MODEL_SAMR30E18A)
-    {-1, -1, -1, -1, -1, -1,  6,  7, -1,  9, 10, 11, -1, -1, 14, 15,
-      0,  1,  2,  3,  4, -1, -1, -1, 12, 13, -1, 15,  8, -1, 10, 11},
-    { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 15,
-      0,  1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 14, 15},
-#else
-    #error Please define a proper CPU_MODEL.
-#endif
-};
-#endif /* CPU_MODEL_SAML21E */
+/** @} */
 
 #ifndef DOXYGEN
 #define HAVE_ADC_RES_T
@@ -84,8 +60,55 @@ typedef enum {
     ADC_RES_14BIT = 0xfe,                       /**< not supported */
     ADC_RES_16BIT = 0xfd                        /**< not supported */
 } adc_res_t;
-/** @} */
 #endif /* ndef DOXYGEN */
+
+/**
+ * @brief   The MCU has a 12 bit DAC
+ */
+#define DAC_RES_BITS        (12)
+
+/**
+ * @brief   The MCU has two DAC outputs.
+ */
+#define DAC_NUMOF           (2)
+
+/**
+ * @name    Real time counter configuration
+ * @{
+ */
+#define RTT_MAX_VALUE       (0xffffffff)
+#define RTT_CLOCK_FREQUENCY (32768U)                      /* in Hz */
+#define RTT_MIN_FREQUENCY   (RTT_CLOCK_FREQUENCY / 512U)  /* in Hz */
+#define RTT_MAX_FREQUENCY   (RTT_CLOCK_FREQUENCY)         /* in Hz */
+/* determined by tests/ztimer_underflow */
+#define RTT_MIN_OFFSET      (8U)
+/** @} */
+
+/**
+ * @brief   NVM User Row Mapping - Dedicated Entries
+ *          Config values will be applied at power-on.
+ * @{
+ */
+struct sam0_aux_cfg_mapping {
+    uint64_t bootloader_size            :  3; /**< BOOTPROT: Bootloader Size            */
+    uint64_t reserved_0                 :  1; /**< Factory settings - do not change.    */
+    uint64_t eeprom_size                :  3; /**< one of eight different EEPROM sizes  */
+    uint64_t reserved_1                 :  1; /**< Factory settings - do not change.    */
+    uint64_t bod33_level                :  6; /**< BOD33 threshold level at power-on.   */
+    uint64_t bod33_enable               :  1; /**< BOD33 Enable at power-on.            */
+    uint64_t bod33_action               :  2; /**< BOD33 Action at power-on.            */
+    uint64_t reserved_2                 :  9; /**< Factory settings - do not change.    */
+    uint64_t wdt_enable                 :  1; /**< WDT Enable at power-on.              */
+    uint64_t wdt_always_on              :  1; /**< WDT Always-On at power-on.           */
+    uint64_t wdt_period                 :  4; /**< WDT Period at power-on.              */
+    uint64_t wdt_window                 :  4; /**< WDT Window at power-on.              */
+    uint64_t wdt_ewoffset               :  4; /**< WDT Early Warning Interrupt Offset   */
+    uint64_t wdt_window_enable          :  1; /**< WDT Window mode enabled on power-on  */
+    uint64_t bod33_hysteresis           :  1; /**< BOD33 Hysteresis configuration       */
+    uint64_t reserved_3                 :  6; /**< Factory settings - do not change.    */
+    uint64_t nvm_locks                  : 16; /**< NVM Region Lock Bits.                */
+};
+/** @} */
 
 #ifdef __cplusplus
 }

@@ -39,13 +39,20 @@ extern "C" {
 #include "periph/gpio.h"
 
 /**
- * @brief   ADS101x/111x default address
+ * @defgroup drivers_ads101x_config    ADS101 driver compile configuration
+ * @ingroup config_drivers_sensors
+ * @{
+ */
+
+/**
+ * @brief   Set ADS101x/111x default I2C address
  *
  * Address pin tied to: GND (0x48), Vcc (0x49), SDA (0x50), SCL (0x51)
  */
-#ifndef ADS101X_I2C_ADDRESS
-#define ADS101X_I2C_ADDRESS    (0x48)
+#ifndef CONFIG_ADS101X_I2C_ADDRESS
+#define CONFIG_ADS101X_I2C_ADDRESS    (0x48)
 #endif
+/** @} */
 
 /**
  * @brief   Named return values

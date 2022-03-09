@@ -1,0 +1,51 @@
+# Copyright (c) 2021 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU lines
+config CPU_LINE_STM32G431XX
+    bool
+    select CPU_FAM_G4
+
+config CPU_LINE_STM32G441XX
+    bool
+    select CPU_FAM_G4
+
+config CPU_LINE_STM32G471XX
+    bool
+    select CPU_FAM_G4
+
+config CPU_LINE_STM32G473XX
+    bool
+    select CPU_FAM_G4
+
+config CPU_LINE_STM32G474XX
+    bool
+    select CPU_FAM_G4
+
+config CPU_LINE_STM32G483XX
+    bool
+    select CPU_FAM_G4
+
+config CPU_LINE_STM32G484XX
+    bool
+    select CPU_FAM_G4
+
+config CPU_LINE_STM32G491XX
+    bool
+    select CPU_FAM_G4
+
+config CPU_LINE_STM32G4A1XX
+    bool
+    select CPU_FAM_G4
+
+config CPU_LINE_STM32GBK1CB
+    bool
+    select CPU_FAM_G4

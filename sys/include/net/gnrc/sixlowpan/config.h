@@ -9,7 +9,7 @@
 /**
  * @defgroup    net_gnrc_sixlowpan_config GNRC 6LoWPAN compile configurations
  * @ingroup     net_gnrc_sixlowpan
- * @ingroup     config
+ * @ingroup     net_gnrc_conf
  * @brief
  * @{
  *
@@ -21,6 +21,7 @@
 #ifndef NET_GNRC_SIXLOWPAN_CONFIG_H
 #define NET_GNRC_SIXLOWPAN_CONFIG_H
 
+#include "kernel_defines.h"
 #include "timex.h"
 
 #ifdef __cplusplus
@@ -42,10 +43,14 @@ extern "C" {
 #endif
 
 /**
- * @brief   Default message queue size to use for the 6LoWPAN thread.
+ * @brief   Default message queue size to use for the 6LoWPAN thread (as
+ *          exponent of 2^n).
+ *
+ * As the queue size ALWAYS needs to be power of two, this option represents the
+ * exponent of 2^n, which will be used as the size of the queue.
  */
-#ifndef GNRC_SIXLOWPAN_MSG_QUEUE_SIZE
-#define GNRC_SIXLOWPAN_MSG_QUEUE_SIZE       (8U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_MSG_QUEUE_SIZE_EXP
+#define CONFIG_GNRC_SIXLOWPAN_MSG_QUEUE_SIZE_EXP   (3U)
 #endif
 
 /**
@@ -57,8 +62,12 @@ extern "C" {
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag_fb](@ref net_gnrc_sixlowpan_frag_fb) module
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_FB_SIZE
-#define GNRC_SIXLOWPAN_FRAG_FB_SIZE         (1U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_FB_SIZE
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_FB_SIZE         (4U)
+#else   /* defined(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_FB_SIZE         (1U)
+#endif  /* defined(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
 #endif
 
 /**
@@ -67,8 +76,8 @@ extern "C" {
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag_rb](@ref net_gnrc_sixlowpan_frag_rb) module
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_SIZE
-#define GNRC_SIXLOWPAN_FRAG_RBUF_SIZE       (4U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE       (4U)
 #endif
 
 /**
@@ -77,24 +86,24 @@ extern "C" {
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag_rb](@ref net_gnrc_sixlowpan_frag_rb) module
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US
-#define GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US (3U * US_PER_SEC)
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US (3U * US_PER_SEC)
 #endif
 
 /**
- * @brief   Aggressively override reassembly buffer when full
+ * @brief   Do not override oldest datagram when reassembly buffer is full
  *
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag_rb](@ref net_gnrc_sixlowpan_frag_rb) module
  *
- * When set to a non-zero value this will cause the reassembly buffer to
- * override the oldest entry no matter what. When set to zero only the oldest
- * entry that is older than @ref GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US will be
- * overwritten (they will still timeout normally if reassembly buffer is not
- * full).
+ * When not set, it will cause the reassembly buffer to override the oldest
+ * entry when a fragment for a new datagram is received. When set, only the
+ * oldest entry that is older than @ref
+ * CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US will be overwritten (they will
+ * still timeout normally if reassembly buffer is not full).
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE
-#define GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE    (1)
+#ifdef DOXYGEN
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE
 #endif
 
 /**
@@ -108,8 +117,8 @@ extern "C" {
  * immediately. Use this value to prevent re-creation of a reassembly buffer
  * entry on late arriving link-layer duplicates.
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER
-#define GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER              (0U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER              (0U)
 #endif
 
 /**
@@ -126,8 +135,8 @@ extern "C" {
  *          provides capabilities to build the address registration option as a
  *          @ref gnrc_pktsnip_t
  */
-#ifndef GNRC_SIXLOWPAN_ND_AR_LTIME
-#define GNRC_SIXLOWPAN_ND_AR_LTIME          (15U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_ND_AR_LTIME
+#define CONFIG_GNRC_SIXLOWPAN_ND_AR_LTIME          (15U)
 #endif
 
 /**
@@ -138,16 +147,11 @@ extern "C" {
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag_vrb](@ref net_gnrc_sixlowpan_frag_vrb) module,
  *          but has also a direct influence on the number of available
- *          gnrc_sixlowpan_frag_rb_int_t entries (even when
- *          `gnrc_sixlowpan_frag_vrb` is not compiled in).
+ *          gnrc_sixlowpan_frag_rb_int_t entries.
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_VRB_SIZE
-#if defined(MODULE_GNRC_SIXLOWPAN_FRAG_VRB) || defined(DOXYGEN)
-#define GNRC_SIXLOWPAN_FRAG_VRB_SIZE        (16U)
-#else   /* defined(MODULE_GNRC_SIXLOWPAN_FRAG_VRB) || defined(DOXYGEN) */
-#define GNRC_SIXLOWPAN_FRAG_VRB_SIZE        (0U)
-#endif  /* defined(MODULE_GNRC_SIXLOWPAN_FRAG_VRB) || defined(DOXYGEN) */
-#endif  /* GNRC_SIXLOWPAN_FRAG_VRB_SIZE */
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE        (16U)
+#endif  /* CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE */
 
 /**
  * @brief   Timeout for a VRB entry in microseconds
@@ -157,22 +161,22 @@ extern "C" {
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag_vrb](@ref net_gnrc_sixlowpan_frag_vrb) module.
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US
-#define GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US  (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)
-#endif  /* GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US */
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US  (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)
+#endif  /* CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US */
 
 /**
  * @name Selective fragment recovery configuration
- * @see  [draft-ietf-6lo-fragment-recovery-07, section 7.1]
- *       (https://tools.ietf.org/html/draft-ietf-6lo-fragment-recovery-07#section-7.1)
+ * @see  [RFC 8931, section 7.1]
+ *       (https://tools.ietf.org/html/rfc8931#section-7.1)
  * @note Only applicable with gnrc_sixlowpan_frag_sfr module
  * @{
  */
 /**
  * @brief   Default minimum value for fragment size (MinFragmentSize)
  */
-#ifndef GNRC_SIXLOWPAN_SFR_MIN_FRAG_SIZE
-#define GNRC_SIXLOWPAN_SFR_MIN_FRAG_SIZE    (96U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_MIN_FRAG_SIZE
+#define CONFIG_GNRC_SIXLOWPAN_SFR_MIN_FRAG_SIZE     96U
 #endif
 
 /**
@@ -182,32 +186,37 @@ extern "C" {
  * the chances of buffer bloat and transmission loss. The value must be less
  * than 512 if the unit is defined for the PHY layer is the octet.
  */
-#ifndef GNRC_SIXLOWPAN_SFR_MAX_FRAG_SIZE
-#define GNRC_SIXLOWPAN_SFR_MAX_FRAG_SIZE    (112U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_MAX_FRAG_SIZE
+#define CONFIG_GNRC_SIXLOWPAN_SFR_MAX_FRAG_SIZE     112U
 #endif
 
 /**
  * @brief   Default value for fragment size that the sender should use to start
  *          with (OptFragmentSize)
+ *
+ * @pre     Must be inclusively between
+ *          @ref CONFIG_GNRC_SIXLOWPAN_SFR_MIN_FRAG_SIZE and
+ *          @ref CONFIG_GNRC_SIXLOWPAN_SFR_MAX_FRAG_SIZE
  */
-#ifndef GNRC_SIXLOWPAN_SFR_OPT_FRAG_SIZE
-#define GNRC_SIXLOWPAN_SFR_OPT_FRAG_SIZE    (GNRC_SIXLOWPAN_SFR_MAX_FRAG_SIZE)
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_OPT_FRAG_SIZE
+#define CONFIG_GNRC_SIXLOWPAN_SFR_OPT_FRAG_SIZE     CONFIG_GNRC_SIXLOWPAN_SFR_MAX_FRAG_SIZE
 #endif
 
 /**
  * @brief   Indicates whether the sender should react to ECN (UseECN)
  *
- * When the sender reacts to ECN its window size will vary between @ref
- * GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE and @ref GNRC_SIXLOWPAN_SFR_MAX_WIN_SIZE.
+ * When the sender reacts to Explicit Congestion Notification (ECN) its window
+ * size will vary between @ref CONFIG_GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE and @ref
+ * CONFIG_GNRC_SIXLOWPAN_SFR_MAX_WIN_SIZE.
  */
-#define GNRC_SIXLOWPAN_SFR_USE_ECN          (0U)
+#define CONFIG_GNRC_SIXLOWPAN_SFR_USE_ECN           0U
 
 /**
  * @brief   Default minimum value of window size that the sender can use
  *          (MinWindowSize)
  */
-#ifndef GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE
-#define GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE     (1U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE
+#define CONFIG_GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE      1U
 #endif
 
 /**
@@ -216,16 +225,20 @@ extern "C" {
  *
  * @warning **Must** be lesser than 32.
  */
-#ifndef GNRC_SIXLOWPAN_SFR_MAX_WIN_SIZE
-#define GNRC_SIXLOWPAN_SFR_MAX_WIN_SIZE     (16U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_MAX_WIN_SIZE
+#define CONFIG_GNRC_SIXLOWPAN_SFR_MAX_WIN_SIZE      16U
 #endif
 
 /**
  * @brief   Default value of window size that the sender should start with
  *          (OptWindowSize)
+ *
+ * @pre     Must be inclusively between
+ *          @ref CONFIG_GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE and
+ *          @ref CONFIG_GNRC_SIXLOWPAN_SFR_MAX_WIN_SIZE
  */
-#ifndef GNRC_SIXLOWPAN_SFR_OPT_WIN_SIZE
-#define GNRC_SIXLOWPAN_SFR_OPT_WIN_SIZE     (16U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_OPT_WIN_SIZE
+#define CONFIG_GNRC_SIXLOWPAN_SFR_OPT_WIN_SIZE      16U
 #endif
 
 /**
@@ -240,53 +253,62 @@ extern "C" {
  * ratio of air and memory in intermediate nodes that a particular datagram will
  * use.
  */
-#ifndef GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US
-#define GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US   (100U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US
+#define CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US    100U
 #endif
 
 /**
- * @brief   Default minimum amount of time in milliseconds a node should wait
- *          for an RFRAG Acknowledgment before it takes a next action
+ * @brief   Minimum RFRAG-ACK timeout in msec before a node takes a next action
  *          (MinARQTimeOut)
  */
-#ifndef GNRC_SIXLOWPAN_SFR_MIN_ARQ_TIMEOUT_MS
-#define GNRC_SIXLOWPAN_SFR_MIN_ARQ_TIMEOUT_MS   (350U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_MIN_ARQ_TIMEOUT_MS
+#define CONFIG_GNRC_SIXLOWPAN_SFR_MIN_ARQ_TIMEOUT_MS    350U
 #endif
 
 /**
- * @brief   Default maximum amount of time in milliseconds a node should wait
- *          for an RFRAG Acknowledgment before it takes a next action
+ * @brief   Maximum RFRAG-ACK timeout in msec before a node takes a next action
  *          (MaxARQTimeOut)
  */
-#ifndef GNRC_SIXLOWPAN_SFR_MAX_ARQ_TIMEOUT_MS
-#define GNRC_SIXLOWPAN_SFR_MAX_ARQ_TIMEOUT_MS   (700U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_MAX_ARQ_TIMEOUT_MS
+#define CONFIG_GNRC_SIXLOWPAN_SFR_MAX_ARQ_TIMEOUT_MS    700U
 #endif
 
 /**
- * @brief   Default starting point of the value of the amount of time in
- *          milliseconds that a sender should wait for an RFRAG Acknowledgment
- *          before it takes a next action (OptARQTimeOut)
+ * @brief   Default RFRAG-ACK timeout in msec before a node takes a next action
+ *          (OptARQTimeOut)
+ *
+ * @pre     Must be inclusively between
+ *          @ref CONFIG_GNRC_SIXLOWPAN_SFR_MIN_ARQ_TIMEOUT_MS and
+ *          @ref CONFIG_GNRC_SIXLOWPAN_SFR_MAX_ARQ_TIMEOUT_MS
  */
-#ifndef GNRC_SIXLOWPAN_SFR_OPT_ARQ_TIMEOUT_MS
-#define GNRC_SIXLOWPAN_SFR_OPT_ARQ_TIMEOUT_MS   (GNRC_SIXLOWPAN_SFR_MAX_ARQ_TIMEOUT_MS)
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_OPT_ARQ_TIMEOUT_MS
+#define CONFIG_GNRC_SIXLOWPAN_SFR_OPT_ARQ_TIMEOUT_MS \
+            CONFIG_GNRC_SIXLOWPAN_SFR_MAX_ARQ_TIMEOUT_MS
 #endif
 
 /**
  * @brief   The maximum number of retries for a particular fragment
  *          (MaxFragRetries)
  */
-#ifndef GNRC_SIXLOWPAN_SFR_FRAG_RETRIES
-#define GNRC_SIXLOWPAN_SFR_FRAG_RETRIES     (2U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_FRAG_RETRIES
+#define CONFIG_GNRC_SIXLOWPAN_SFR_FRAG_RETRIES          2U
 #endif
 
 /**
  * @brief   The maximum number of retries from scratch for a particular
  *          datagram (MaxDatagramRetries)
  */
-#ifndef GNRC_SIXLOWPAN_SFR_DG_RETRIES
-#define GNRC_SIXLOWPAN_SFR_DG_RETRIES       (0U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_DG_RETRIES
+#define CONFIG_GNRC_SIXLOWPAN_SFR_DG_RETRIES            0U
 #endif
 /** @} */
+
+/**
+ * @brief   Message queue size to use for the 6LoWPAN thread.
+ */
+#ifndef GNRC_SIXLOWPAN_MSG_QUEUE_SIZE
+#define GNRC_SIXLOWPAN_MSG_QUEUE_SIZE    (1 << CONFIG_GNRC_SIXLOWPAN_MSG_QUEUE_SIZE_EXP)
+#endif
 
 #ifdef __cplusplus
 }

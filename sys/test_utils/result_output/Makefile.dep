@@ -1,0 +1,27 @@
+TURO_OUTPUT_FORMAT := \
+test_utils_result_output_check \
+test_utils_result_output_json \
+test_utils_result_output_txt
+
+USED_TURO_OUTPUT_FORMAT := $(sort $(filter test_utils_result_output_%,$(USEMODULE)))
+
+ifeq (0,$(words $(USED_TURO_OUTPUT_FORMAT)))
+  USEMODULE += test_utils_result_output_json
+else ifeq (1,$(words $(USED_TURO_OUTPUT_FORMAT)))
+  ifeq (,$(filter $(USED_TURO_OUTPUT_FORMAT), $(TURO_OUTPUT_FORMAT)))
+    $(info Currently using: $(USED_TURO_OUTPUT_FORMAT))
+    $(error Please use one of: $(TURO_OUTPUT_FORMAT))
+  endif
+else
+  $(info Only one test_utils_result_output format can be used at a time.)
+  $(info Currently selecting: $(USED_TURO_OUTPUT_FORMAT))
+  $(error Please use one of: $(TURO_OUTPUT_FORMAT))
+endif
+
+TURO_OUTPUT_FORMAT_USES_FMT := \
+test_utils_result_output_json \
+test_utils_result_output_txt
+
+ifneq (,$(filter $(TURO_OUTPUT_FORMAT_USES_FMT),$(USEMODULE)))
+  USEMODULE += fmt
+endif

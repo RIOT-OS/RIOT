@@ -26,7 +26,7 @@
 #include <log.h>
 #include <motor_driver.h>
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include <debug.h>
 
 int motor_driver_init(motor_driver_t motor_driver)
@@ -51,21 +51,21 @@ int motor_driver_init(motor_driver_t motor_driver)
     }
 
     for (uint8_t i = 0; i < motor_driver_conf->nb_motors; i++) {
-        if ((motor_driver_conf->motors[i].gpio_dir0 != GPIO_UNDEF)
+        if (gpio_is_valid(motor_driver_conf->motors[i].gpio_dir0)
             && (gpio_init(motor_driver_conf->motors[i].gpio_dir0,
                           GPIO_OUT))) {
             err = EIO;
             LOG_ERROR("gpio_dir0 init failed\n");
             goto motor_init_err;
         }
-        if ((motor_driver_conf->motors[i].gpio_dir1_or_brake != GPIO_UNDEF)
+        if (gpio_is_valid(motor_driver_conf->motors[i].gpio_dir1_or_brake)
             && (gpio_init(motor_driver_conf->motors[i].gpio_dir1_or_brake,
                           GPIO_OUT))) {
             err = EIO;
             LOG_ERROR("gpio_dir1_or_brake init failed\n");
             goto motor_init_err;
         }
-        if (motor_driver_conf->motors[i].gpio_enable != GPIO_UNDEF) {
+        if (gpio_is_valid(motor_driver_conf->motors[i].gpio_enable)) {
             if (gpio_init(motor_driver_conf->motors[i].gpio_enable,
                           GPIO_OUT)) {
                 err = EIO;
@@ -105,8 +105,8 @@ int motor_set(const motor_driver_t motor_driver, uint8_t motor_id, \
 
     /* Two direction GPIO, handling brake */
     if (motor_driver_conf->mode == MOTOR_DRIVER_2_DIRS) {
-        if ((dev->gpio_dir0 == GPIO_UNDEF) || \
-            (dev->gpio_dir1_or_brake == GPIO_UNDEF)) {
+        if (!gpio_is_valid(dev->gpio_dir0) || \
+            !gpio_is_valid(dev->gpio_dir1_or_brake)) {
             err = ENODEV;
             goto motor_set_err;
         }
@@ -124,7 +124,7 @@ int motor_set(const motor_driver_t motor_driver, uint8_t motor_id, \
     }
     /* Single direction GPIO */
     else if (motor_driver_conf->mode == MOTOR_DRIVER_1_DIR) {
-        if (dev->gpio_dir0 == GPIO_UNDEF) {
+        if (!gpio_is_valid(dev->gpio_dir0)) {
             err = ENODEV;
             goto motor_set_err;
         }
@@ -141,8 +141,8 @@ int motor_set(const motor_driver_t motor_driver, uint8_t motor_id, \
     }
     /* Single direction GPIO and brake GPIO */
     else if (motor_driver_conf->mode == MOTOR_DRIVER_1_DIR_BRAKE) {
-        if ((dev->gpio_dir0 == GPIO_UNDEF) || \
-            (dev->gpio_dir1_or_brake == GPIO_UNDEF)) {
+        if (!gpio_is_valid(dev->gpio_dir0) || \
+            !gpio_is_valid(dev->gpio_dir1_or_brake)) {
             err = ENODEV;
             goto motor_set_err;
         }
@@ -168,12 +168,12 @@ int motor_set(const motor_driver_t motor_driver, uint8_t motor_id, \
     int32_t pwm_duty_cycle_abs = pwm_duty_cycle;
     pwm_duty_cycle_abs *= (pwm_duty_cycle < 0) ? -1 : 1;
 
-    irq_disable();
+    unsigned irqstate = irq_disable();
     gpio_write(dev->gpio_dir0, gpio_dir0_value);
     gpio_write(dev->gpio_dir1_or_brake, gpio_dir1_or_brake_value);
     pwm_set(motor_driver_conf->pwm_dev, dev->pwm_channel, \
             (uint16_t)pwm_duty_cycle_abs);
-    irq_enable();
+    irq_restore(irqstate);
 
     motor_driver_cb_t cb = motor_driver_conf->cb;
     if (cb) {
@@ -204,8 +204,8 @@ int motor_brake(const motor_driver_t motor_driver, uint8_t motor_id)
 
     /* Two direction GPIO, handling brake */
     if (motor_driver_conf->mode == MOTOR_DRIVER_2_DIRS) {
-        if ((dev->gpio_dir0 == GPIO_UNDEF) || \
-            (dev->gpio_dir1_or_brake == GPIO_UNDEF)) {
+        if (!gpio_is_valid(dev->gpio_dir0) || \
+            !gpio_is_valid(dev->gpio_dir1_or_brake)) {
             err = ENODEV;
             goto motor_brake_err;
         }
@@ -221,7 +221,7 @@ int motor_brake(const motor_driver_t motor_driver, uint8_t motor_id)
     }
     /* Single direction GPIO and brake GPIO */
     else if (motor_driver_conf->mode == MOTOR_DRIVER_1_DIR_BRAKE) {
-        if (dev->gpio_dir1_or_brake == GPIO_UNDEF) {
+        if (!gpio_is_valid(dev->gpio_dir1_or_brake)) {
             err = ENODEV;
             goto motor_brake_err;
         }
@@ -233,11 +233,11 @@ int motor_brake(const motor_driver_t motor_driver, uint8_t motor_id)
         goto motor_brake_err;
     }
 
-    irq_disable();
+    unsigned irqstate = irq_disable();
     gpio_write(dev->gpio_dir0, gpio_dir0_value);
     gpio_write(dev->gpio_dir1_or_brake, gpio_dir1_or_brake_value);
     pwm_set(motor_driver_conf->pwm_dev, dev->pwm_channel, 0);
-    irq_enable();
+    irq_restore(irqstate);
 
     return 0;
 
@@ -256,7 +256,7 @@ void motor_enable(const motor_driver_t motor_driver, uint8_t motor_id)
 
     const motor_t *dev = &motor_driver_conf->motors[motor_id];
 
-    assert(dev->gpio_enable != GPIO_UNDEF);
+    assert(gpio_is_valid(dev->gpio_enable));
 
     gpio_write(dev->gpio_enable, 1 ^ dev->gpio_enable_invert);
 }
@@ -272,7 +272,7 @@ void motor_disable(const motor_driver_t motor_driver, uint8_t motor_id)
 
     const motor_t *dev = &motor_driver_conf->motors[motor_id];
 
-    assert(dev->gpio_enable != GPIO_UNDEF);
+    assert(gpio_is_valid(dev->gpio_enable));
 
     gpio_write(dev->gpio_enable, dev->gpio_enable_invert);
 }

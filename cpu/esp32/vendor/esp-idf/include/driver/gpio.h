@@ -25,6 +25,7 @@ extern "C" {
 
 #define gpio_num_t          gpio_t
 #define gpio_pull_mode_t    uint32_t
+#define gpio_drive_cap_t    gpio_drive_strength_t
 
 #ifdef __cplusplus
 }

@@ -1,0 +1,9 @@
+FEATURES_REQUIRED += periph_gpio_irq
+
+ifneq (,$(filter cpu_core_atmega,$(FEATURES_USED)))
+  USEMODULE += atmega_pcint
+else
+  USEMODULE += cpp11-compat
+endif
+
+USEPKG += arduino_api

@@ -30,8 +30,6 @@ extern "C" {
 #include "net/netdev.h"
 #include "net/loramac.h"
 
-#include "sx127x.h"
-
 /**
  * @name    Definitions for messages exchanged between the MAC and call threads
  * @{
@@ -113,6 +111,7 @@ typedef struct {
  * @brief   Semtech LoRaMAC descriptor
  */
 typedef struct {
+    netdev_t *netdev;                            /**< pointer to internal radio device */
     mutex_t lock;                                /**< loramac access lock */
     uint8_t tx_pid;                              /**< pid of sender thread */
 #if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN

@@ -1,0 +1,4 @@
+# This must be a different name than 'board' as it is implemented by 'native'
+USEMODULE += board_nrf52840dk_qdec
+
+include $(RIOTBOARD)/nrf52840dk/Makefile.dep

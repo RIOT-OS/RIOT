@@ -1,0 +1,35 @@
+INCLUDES += -I$(PKGDIRBASE)/etl/include
+INCLUDES += -I$(RIOTPKG)/etl/config
+
+# There's nothing to build in this package, it's used as a header only library.
+# So it's declared as a pseudo-module
+PSEUDOMODULES += etl
+
+# Activate the usage of libstdcpp types and features if available
+# This prevents unnecessary reimplementations
+ifneq (,$(filter libstdcpp,$(FEATURES_USED)))
+  CXXEXFLAGS += -DFEATURE_LIBSTDCPP
+# Kconfig alternative
+else ifdef CONFIG_KCONFIG_HAS_LIBSTDCPP
+  CXXEXFLAGS += -DFEATURE_LIBSTDCPP
+endif
+
+# Some boards don't provide NAN or by default don't define limits like UINT8_MAX in CPP context
+# This activates the appropriate workarounds
+ifneq (,$(filter arch_avr8,$(FEATURES_USED)))
+  CXXEXFLAGS += -DNO_CPP_NAN_SUPPORT
+  CXXEXFLAGS += -D__STDC_LIMIT_MACROS
+else ifneq (,$(filter arch_riscv,$(FEATURES_USED)))
+  CXXEXFLAGS += -DNO_CPP_NAN_SUPPORT
+  CXXEXFLAGS += -D__STDC_LIMIT_MACROS
+# Kconfig alternatives
+else ifdef CONFIG_CPU_ARCH_AVR8
+  CXXEXFLAGS += -DNO_CPP_NAN_SUPPORT
+  CXXEXFLAGS += -D__STDC_LIMIT_MACROS
+else ifdef CONFIG_CPU_ARCH_RISCV
+  CXXEXFLAGS += -DNO_CPP_NAN_SUPPORT
+  CXXEXFLAGS += -D__STDC_LIMIT_MACROS
+endif
+
+# Some compilers generate this warning. Due to -Werror it prevents this header-only library from compiling when included
+CXXEXFLAGS += -Wno-unused-function

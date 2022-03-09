@@ -29,7 +29,7 @@
 #include "usb/descriptor.h"
 #include "usb/usbus.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**
@@ -146,7 +146,7 @@ static void _test_sequence(usbdev_mock_t *dev)
         case TESTPHASE_RESET:
             next_phase = TESTPHASE_REQ_DEV_INIT;
             DEBUG("[test]: Requesting device descriptor\n");
-            _build_conf_req(dev->out[0].ep.buf, 8); /* initial config request */
+            _build_conf_req(dev->out[0].buf, 8); /* initial config request */
             dev->req_len = 8;
             dev->out[0].state = EP_STATE_DATA_AVAILABLE;
             dev->out[0].available = 8;
@@ -157,7 +157,7 @@ static void _test_sequence(usbdev_mock_t *dev)
             DEBUG("[test]: validating device descriptor\n");
             TEST_ASSERT_EQUAL_INT(dev->in[0].available, 8);
             _validate_device_desc_init(
-                (usb_descriptor_device_t *)dev->in[0].buf_start);
+                (usb_descriptor_device_t *)dev->in[0].buf);
             /* Reset device */
             DEBUG("[test]: Signalling second USB reset condition\n");
             dev->usbdev.cb(&dev->usbdev, USBDEV_EVENT_RESET);
@@ -166,7 +166,7 @@ static void _test_sequence(usbdev_mock_t *dev)
         case TESTPHASE_RESET2:
             next_phase = TESTPHASE_SET_ADDRESS;
             DEBUG("[test]: Set USB address\n");
-            _build_set_addr(dev->out[0].ep.buf);
+            _build_set_addr(dev->out[0].buf);
             dev->req_len = 0;
             dev->out[0].state = EP_STATE_DATA_AVAILABLE;
             dev->out[0].available = 8;
@@ -175,8 +175,8 @@ static void _test_sequence(usbdev_mock_t *dev)
         case TESTPHASE_SET_ADDRESS:
             next_phase = TESTPHASE_REQ_DEV_FULL;
             DEBUG("[test]: Requesting full device descriptor\n");
-            _build_conf_req(dev->out[0].ep.buf,
-                            sizeof(usb_descriptor_device_t));                     /* initial config request */
+            _build_conf_req(dev->out[0].buf,
+                            sizeof(usb_descriptor_device_t));
             dev->req_len = sizeof(usb_descriptor_device_t);
             dev->out[0].state = EP_STATE_DATA_AVAILABLE;
             dev->out[0].available = sizeof(usb_setup_t);
@@ -187,7 +187,7 @@ static void _test_sequence(usbdev_mock_t *dev)
                                   sizeof(usb_descriptor_device_t));
             DEBUG("[test]: Validating full descriptor\n");
             _validate_device_desc_init(
-                (usb_descriptor_device_t *)dev->in[0].buf_start);
+                (usb_descriptor_device_t *)dev->in[0].buf);
 
             next_phase = TESTPHASE_FINAL;
             dev->usbdev.cb(&dev->usbdev, USBDEV_EVENT_ESR);
@@ -261,8 +261,6 @@ static void _handle_data(usbdev_mock_t *dev, usbdev_mock_ep_t *ep, size_t len)
         if (ep->available == dev->req_len) {
             DEBUG("[data]: Full data received from stack\n");
             req_phase = TEST_REQ_PHASE_OUTACK;
-            /* Reset buffer ptr to the start */
-            ep->ep.buf = ep->buf_start;
         }
         else {
             DEBUG("[data]: Expecting more data from stack: %u/%u\n",
@@ -274,7 +272,7 @@ static void _handle_data(usbdev_mock_t *dev, usbdev_mock_ep_t *ep, size_t len)
 
 static void _ep_esr_validation(usbdev_mock_t *dev, usbdev_mock_ep_t *ep)
 {
-    DEBUG("[ep esr]: Data available for stack: %u\n", ep->available);
+    DEBUG("[ep esr]: Data available for stack: %u\n", (unsigned)ep->available);
     if (req_phase == TEST_REQ_PHASE_IDLE) {
         DEBUG("[ep esr]: Done with the request\n");
         /* signal USBDEV_EVENT_ESR to call _test_sequence */

@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    sys_c11_atomics_cpp_compat C++ compatibility with C11 atomics
- * @ingroup     sys
+ * @ingroup     cpp
  * @brief       C++ compatibility of default C11 atomics types
  *
  * This module provides opaque `typedef`s for each standard C11 atomic type with
@@ -36,7 +36,9 @@
  * atomic_int foo = ATOMIC_VAR_INIT(42);
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
+#ifndef ATOMIC_VAR_INIT
 #define ATOMIC_VAR_INIT(x) { x }
+#endif
 
 /**
   * @brief Type with the same alignment and size as `atomic_bool`

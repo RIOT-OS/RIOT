@@ -1,0 +1,77 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menuconfig KCONFIG_USEMODULE_ENTROPY_SOURCE_ADC_NOISE
+    bool "Configure ADC Noise entropy source module"
+    depends on USEMODULE_ENTROPY_SOURCE_ADC_NOISE
+    help
+        Configure the ADC Noise entropy source using Kconfig.
+
+if KCONFIG_USEMODULE_ENTROPY_SOURCE_ADC_NOISE
+
+choice
+    bool "ADC default sampling resolution"
+    default ENTROPY_SOURCE_ADC_RES_10BIT
+    help
+        This parameter sets the ADC sampling resolution. Please note that not all
+        platforms support every value.
+
+config ENTROPY_SOURCE_ADC_RES_6BIT
+    bool "6 Bit"
+
+config ENTROPY_SOURCE_ADC_RES_8BIT
+    bool "8 Bit"
+
+config ENTROPY_SOURCE_ADC_RES_10BIT
+    bool "10 Bit"
+
+config ENTROPY_SOURCE_ADC_RES_12BIT
+    bool "12 Bit"
+
+config ENTROPY_SOURCE_ADC_RES_14BIT
+    bool "14 Bit"
+
+config ENTROPY_SOURCE_ADC_RES_16BIT
+    bool "16 Bit"
+
+endchoice
+
+config ENTROPY_SOURCE_ADC_LINE_NUM
+    int "ADC line"
+    range 0 16
+    default 0
+    help
+        The ADC line maps to an I/O pin. This number acts as index to an array
+        of predefined ADC devices that contain the pin definition. Typically,
+        the array is defined by a board in a periph_conf.h file. Please note that
+        a board is not required to specify a minimum number of lines.
+
+config ENTROPY_SOURCE_ADC_HMIN
+    int "Estimated entropy per sample [2^16 * bit/sample]"
+    range 1 524288
+    default 0
+    help
+        The entropy value needs to be estimated and evaluated thoroughly before
+        deployment! To avoid float, the entropy value per one byte sample needs
+        to be manually multiplied by 2^16 before configuring it (e.g., to
+        an entropy value of 1 bit/sample, a value of 1 * 65536 needs to be set) .
+        We default to zero which is an invalid configuration to enforce a
+        thoughtful investigation on the actual entropy properties.
+
+config ENTROPY_SOURCE_ADC_HEALTH_TEST
+    bool "Enable health test"
+    help
+        Health tests are performed on every sample, if enabled. Thus, they
+        slow down the entropy gathering process. Detected failures are reported by return
+        value but they do not stop execution.
+
+config ENTROPY_SOURCE_ADC_COND
+    bool "Enable conditioning"
+    help
+        Conditioning increases runtime of the entropy generation process. Currently, a von
+        Neumann extractor is involved which has an nondeterministic runtime.
+
+endif # KCONFIG_USEMODULE_ENTROPY_SOURCE_ADC_NOISE

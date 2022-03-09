@@ -42,7 +42,6 @@ static int dow(int year, int month, int day)
     return (year + year/4 - year/100 + year/400 + t[month-1] + day) % 7;
 }
 
-
 static int _parse_time(char **argv, struct tm *time)
 {
     short i;
@@ -161,7 +160,7 @@ int _rtc_handler(int argc, char **argv)
     else if (strncmp(argv[1], "poweroff", 8) == 0) {
         rtc_poweroff();
     }
-    else if (strncmp(argv[1], "clearalarm", 8) == 0) {
+    else if (strncmp(argv[1], "clearalarm", 10) == 0) {
         rtc_clear_alarm();
     }
     else if (strncmp(argv[1], "getalarm", 8) == 0) {

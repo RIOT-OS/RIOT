@@ -1,0 +1,38 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "esp32-ci" if BOARD_ESP32_CI
+
+config BOARD_ESP32_CI
+    bool
+    default y
+    select BOARD_COMMON_ESP32
+    select CPU_MODEL_ESP32_WROVER
+    select HAS_ARDUINO
+    select HAS_ESP_RTC_TIMER_32K
+    select HAS_ESP_JTAG
+    select HAS_PERIPH_ADC
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_PWM
+    select HAS_PERIPH_SPI
+    select HAS_SDCARD_SPI
+
+    select HAVE_ILI9341
+
+if TEST_KCONFIG
+
+choice ESP32_I2C_IMPLEMENTATION
+    default MODULE_ESP_I2C_HW
+endchoice
+
+config MODULE_ESP_HW_COUNTER
+    default y
+    depends on MODULE_PERIPH_TIMER
+
+endif # TEST_KCONFIG
+
+source "$(RIOTBOARD)/common/esp32/Kconfig"

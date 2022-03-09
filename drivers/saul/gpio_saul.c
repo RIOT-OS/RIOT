@@ -25,7 +25,6 @@
 #include "periph/gpio.h"
 #include "saul/periph.h"
 
-
 static int read(const void *dev, phydat_t *res)
 {
     const saul_gpio_params_t *p = (const saul_gpio_params_t *)dev;
@@ -33,8 +32,6 @@ static int read(const void *dev, phydat_t *res)
 
     res->val[0] = (gpio_read(p->pin)) ? !inverted : inverted;
 
-    res->val[1] = 0;
-    res->val[2] = 0;
     res->unit = UNIT_BOOL;
     res->scale = 0;
     return 1;

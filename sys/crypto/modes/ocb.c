@@ -25,7 +25,7 @@
 #define OCB_MODE_DECRYPT 2
 
 struct ocb_state {
-    cipher_t *cipher;
+    const cipher_t *cipher;
     uint8_t l_star[16];
     uint8_t l_zero[16];
     uint8_t l_dollar[16];
@@ -35,7 +35,7 @@ struct ocb_state {
 
 typedef struct ocb_state ocb_state_t;
 
-static void double_block(uint8_t source[16], uint8_t dest[16])
+static void double_block(const uint8_t source[16], uint8_t dest[16])
 {
     uint8_t msb = source[0] >> 7;
 
@@ -61,7 +61,7 @@ static size_t ntz(size_t n)
     return ret;
 }
 
-static void calculate_l_i(uint8_t l_zero[16], size_t i, uint8_t output[16])
+static void calculate_l_i(const uint8_t l_zero[16], size_t i, uint8_t output[16])
 {
     memcpy(output, l_zero, 16);
     while ((i--) > 0) {
@@ -69,7 +69,7 @@ static void calculate_l_i(uint8_t l_zero[16], size_t i, uint8_t output[16])
     }
 }
 
-static void xor_block(uint8_t block1[16], uint8_t block2[16],
+static void xor_block(const uint8_t block1[16], const uint8_t block2[16],
                       uint8_t output[16])
 {
     for (uint8_t i = 0; i < 16; ++i) {
@@ -78,7 +78,8 @@ static void xor_block(uint8_t block1[16], uint8_t block2[16],
 }
 
 static void processBlock(ocb_state_t *state, size_t blockNumber,
-                         uint8_t input[16], uint8_t output[16], uint8_t mode)
+                         const uint8_t input[16], uint8_t output[16],
+                         uint8_t mode)
 {
     /* Offset_i = Offset_{i-1} xor L_{ntz(i)} */
     uint8_t l_i[16];
@@ -106,7 +107,7 @@ static void processBlock(ocb_state_t *state, size_t blockNumber,
     }
 }
 
-static void hash(ocb_state_t *state, uint8_t *data, size_t data_len,
+static void hash(ocb_state_t *state, const uint8_t *data, size_t data_len,
                  uint8_t output[16])
 {
     /* Calculate the number of full blocks in data */
@@ -149,8 +150,9 @@ static void hash(ocb_state_t *state, uint8_t *data, size_t data_len,
     }
 }
 
-static void init_ocb(cipher_t *cipher, uint8_t tag_len, uint8_t *nonce,
-                     size_t nonce_len, ocb_state_t *state)
+static void init_ocb(const cipher_t *cipher, uint8_t tag_len,
+                     const uint8_t *nonce, size_t nonce_len,
+                     ocb_state_t *state)
 {
 
     state->cipher = cipher;
@@ -203,12 +205,12 @@ static void init_ocb(cipher_t *cipher, uint8_t tag_len, uint8_t *nonce,
     memset(state->checksum, 0, 16);
 }
 
-static int32_t run_ocb(cipher_t *cipher, uint8_t *auth_data,
-                       uint32_t auth_data_len,
-                       uint8_t tag[16], uint8_t tag_len, uint8_t *nonce,
-                       size_t nonce_len,
-                       uint8_t *input, size_t input_len, uint8_t *output,
-                       uint8_t mode)
+static int32_t run_ocb(const cipher_t *cipher,
+                       const uint8_t *auth_data, uint32_t auth_data_len,
+                       uint8_t tag[16], uint8_t tag_len,
+                       const uint8_t *nonce, size_t nonce_len,
+                       const uint8_t *input, size_t input_len,
+                       uint8_t *output, uint8_t mode)
 {
 
     /* OCB mode only works for ciphers of block length 16 */
@@ -288,10 +290,12 @@ static int32_t run_ocb(cipher_t *cipher, uint8_t *auth_data,
     return output_pos;
 }
 
-int32_t cipher_encrypt_ocb(cipher_t *cipher, uint8_t *auth_data,
-                           size_t auth_data_len,
-                           uint8_t tag_len, uint8_t *nonce, size_t nonce_len,
-                           uint8_t *input, size_t input_len, uint8_t *output)
+int32_t cipher_encrypt_ocb(const cipher_t *cipher,
+                           const uint8_t *auth_data, size_t auth_data_len,
+                           uint8_t tag_len,
+                           const uint8_t *nonce, size_t nonce_len,
+                           const uint8_t *input, size_t input_len,
+                           uint8_t *output)
 {
     uint8_t tag[16];
 
@@ -314,10 +318,12 @@ int32_t cipher_encrypt_ocb(cipher_t *cipher, uint8_t *auth_data,
     return (cipher_text_length + tag_len);
 }
 
-int32_t cipher_decrypt_ocb(cipher_t *cipher, uint8_t *auth_data,
-                           size_t auth_data_len,
-                           uint8_t tag_len, uint8_t *nonce, size_t nonce_len,
-                           uint8_t *input, size_t input_len, uint8_t *output)
+int32_t cipher_decrypt_ocb(const cipher_t *cipher,
+                           const uint8_t *auth_data, size_t auth_data_len,
+                           uint8_t tag_len,
+                           const uint8_t *nonce, size_t nonce_len,
+                           const uint8_t *input, size_t input_len,
+                           uint8_t *output)
 {
     if (input_len > (uint32_t)(INT32_MAX + tag_len)) {
         // We would not be able to return the proper output length for data this long

@@ -1,0 +1,3 @@
+# llvm compatibility requires yet to be released picolibc 1.4.7
+# Use picolibc when available
+FEATURES_OPTIONAL += picolibc

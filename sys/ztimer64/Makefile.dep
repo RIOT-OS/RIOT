@@ -1,0 +1,25 @@
+#
+# ztimer64 dependencies
+#
+USEMODULE += ztimer
+USEMODULE += ztimer64
+
+ifneq (,$(filter auto_init_ztimer64,$(USEMODULE)))
+  USEMODULE += ztimer64_init
+endif
+ifneq (,$(filter ztimer64_%,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_ztimer64
+  DEFAULT_MODULE += ztimer64_init
+endif
+
+ifneq (,$(filter ztimer64_usec,$(USEMODULE)))
+  USEMODULE += ztimer_usec
+endif
+
+ifneq (,$(filter ztimer64_msec,$(USEMODULE)))
+  USEMODULE += ztimer_msec
+endif
+
+ifneq (,$(filter ztimer64_sec,$(USEMODULE)))
+  USEMODULE += ztimer_sec
+endif

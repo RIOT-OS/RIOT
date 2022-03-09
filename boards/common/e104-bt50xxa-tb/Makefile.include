@@ -1,0 +1,6 @@
+# external programmer required
+OPENOCD_DEBUG_ADAPTER ?= jlink
+
+INCLUDES += -I$(RIOTBOARD)/common/e104-bt50xxa-tb/include
+
+include $(RIOTBOARD)/common/nrf52/Makefile.include

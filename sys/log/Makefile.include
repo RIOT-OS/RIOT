@@ -1,3 +1,15 @@
+# check that one, and only one log backend is being used
+USED_LOG_BACKENDS := $(sort $(filter log_%,$(USEMODULE)))
+
+ifeq (0,$(words $(USED_LOG_BACKENDS)))
+  $(error The log module is being used but no backend is provided.)
+else ifeq (1,$(words $(USED_LOG_BACKENDS)))
+  # only one backend is provided, this is correct
+else
+  $(info Only one log backend can be used at a time.)
+  $(error Currently selecting: $(USED_LOG_BACKENDS))
+endif
+
 ifneq (,$(filter log_printfnoformat,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/log/log_printfnoformat
 endif

@@ -19,7 +19,8 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "lpc2387.h"
+#include "lpc23xx.h"
+#include "mtd.h"
 #include "bitarithm.h"
 
 #ifdef __cplusplus
@@ -46,10 +47,13 @@ extern "C" {
 /** @} */
 
 /**
- * @name    xtimer tuning values
+ * @name MTD configuration
  * @{
  */
-#define XTIMER_OVERHEAD     7
+#ifdef MODULE_MTD_MCI
+extern mtd_dev_t *mtd0;
+#define MTD_0 mtd0
+#endif
 /** @} */
 
 #ifdef __cplusplus

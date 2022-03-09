@@ -13,7 +13,7 @@
  * This file contains board configurations that are valid for all ESP32.
  *
  * For detailed information about the configuration of ESP32 boards, see
- * section \ref esp32_comm_periph "Common Peripherals".
+ * section \ref esp32_peripherals "Common Peripherals".
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @file
@@ -30,13 +30,19 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#if MODULE_ARDUINO
 #include "arduino_pinmap.h"
+#endif
 
 #include "periph/gpio.h"
 #include "sdk_conf.h"
 
+#if MODULE_MTD
+#include "mtd.h"
+#endif
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -84,7 +90,6 @@
 #endif
 /** @} */
 
-
 /**
  * @name    STDIO configuration
  * @{
@@ -95,7 +100,6 @@
 #endif
 /** @} */
 
-
 #if MODULE_MTD || DOXYGEN
 /**
  * @name    MTD system drive configuration
@@ -103,13 +107,12 @@
  * Built-in SPI flash memory is used as MTD system drive.
  * @{
  */
-#include "mtd.h"
 
 /**
  * @brief   MTD drive start address in SPI flash memory
  *
  * Defines the start address of the MTD system device in the SPI
- * flash memory. It can be overridden by \ref esp32_app_spec_conf
+ * flash memory. It can be overridden by \ref esp32_application_specific_configurations
  * "application-specific board configuration"
  *
  * If the MTD start address is not defined or is 0, the first possible
@@ -129,7 +132,6 @@ extern mtd_dev_t *mtd0;
 /** @} */
 #endif /* MODULE_MTD || DOXYGEN */
 
-
 #if MODULE_SPIFFS || DOXYGEN
 /**
  * @name    SPIFFS configuration for the system MTD device
@@ -145,25 +147,38 @@ extern mtd_dev_t *mtd0;
 /** @} */
 #endif /* MODULE_SPIFFS || DOXYGEN */
 
-
 /**
- * @brief Initialize board specific hardware
+ * @brief Initialize the hardware that is common for all ESP32 boards.
  *
- * Since all features of ESP32 boards are provided by the SOC, almost all
- * initializations are done during the CPU initialization that is called from
- * boot loader.
+ * This function has to be called from the board specific `board_init` function.
  */
-void board_init (void);
+void board_init_common(void);
 
 /**
   * @brief Print the board configuration in a human readable format
   */
-void print_board_config (void);
+void print_board_config(void);
 
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
 
+#else /* ESP32_IDF_CODE */
+
+#ifndef DOXYGEN
+
+#ifdef __cplusplus
+extern "C"
+#endif
+
+/* declaration of `board_init_common` is required when compiling vendor code */
+extern void board_init_common(void);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* DOXYGEN */
 #endif /* ESP32_IDF_CODE */
 #endif /* BOARD_COMMON_H */
 /** @} */

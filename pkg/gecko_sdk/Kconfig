@@ -1,0 +1,30 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config PACKAGE_GECKO_SDK
+    bool "Vendor library for EFM/EFR/EZR32 MCUs"
+    depends on TEST_KCONFIG
+    help
+        Vendor library for EFM/EFR/EZR32 targets by Silicon Labs.
+        See: https://siliconlabs.github.io/Gecko_SDK_Doc/
+
+if PACKAGE_GECKO_SDK
+
+config MODULE_GECKO_SDK_EMLIB
+    bool
+    default y
+    help
+        EMLIB is a low-level peripheral support library that provides a unified
+        API for all EFM32, EZR32 and EFR32 MCUs and SoCs from Silicon Labs.
+
+config MODULE_GECKO_SDK_EMLIB_EXTRA
+    bool
+    default y
+    help
+        Extra utility methods from EMBLIB vendor library.
+
+endif # PACKAGE_GECKO_SDK

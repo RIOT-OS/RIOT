@@ -1,0 +1,17 @@
+CPU_MODEL = esp32-wrover
+
+# common board and CPU features
+include $(RIOTBOARD)/common/esp32/Makefile.features
+
+# additional features provided by the board
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_eth
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_pwm
+
+ifeq (,$(filter esp_jtag,$(USEMODULE)))
+  FEATURES_PROVIDED += periph_spi
+endif
+
+# unique features provided by the board
+FEATURES_PROVIDED += esp_jtag

@@ -58,7 +58,7 @@ export PATH=$PATH:/usr/local/avr8-gnu-toolchain-linux_x86/bin (32-bit)
 ```
 apt-get install avrdude
 ```
-For MacOS, there is a [HomeBrewpackage](https://formula.brew.sh/formula/avrdude#default)
+For MacOS, there is a [HomeBrewpackage](https://formulae.brew.sh/formula/avrdude#default)
 that can be installed with the command:
 ```
 brew install avrdude

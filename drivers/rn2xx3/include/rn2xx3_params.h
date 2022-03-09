@@ -19,6 +19,7 @@
 #ifndef RN2XX3_PARAMS_H
 #define RN2XX3_PARAMS_H
 
+#include "board.h"
 #include "rn2xx3.h"
 
 #ifdef __cplusplus

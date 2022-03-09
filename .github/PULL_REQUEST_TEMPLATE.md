@@ -2,7 +2,7 @@
 The RIOT community cares a lot about code quality.
 Therefore, before describing what your contribution is about, we would like
 you to make sure that your modifications are compliant with the RIOT
-coding conventions, see https://github.com/RIOT-OS/RIOT/wiki/Coding-conventions.
+coding conventions, see https://github.com/RIOT-OS/RIOT/blob/master/CODING_CONVENTIONS.md.
 -->
 
 ### Contribution description

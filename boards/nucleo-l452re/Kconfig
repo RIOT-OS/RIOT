@@ -1,0 +1,29 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD
+    default "nucleo-l452re" if BOARD_NUCLEO_L452RE
+
+config BOARD_NUCLEO_L452RE
+    bool
+    default y
+    select BOARD_COMMON_NUCLEO64
+    select CPU_MODEL_STM32L452RE
+
+    # Put defined MCU peripherals here (in alphabetical order)
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_PWM
+    select HAS_PERIPH_RTC
+    select HAS_PERIPH_RTT
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+
+    # Put other features for this board (in alphabetical order)
+    select HAS_RIOTBOOT
+
+source "$(RIOTBOARD)/common/nucleo64/Kconfig"

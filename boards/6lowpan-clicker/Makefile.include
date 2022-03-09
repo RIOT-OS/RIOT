@@ -1,0 +1,15 @@
+# use pic32prog by default to program this board
+PROGRAMMER ?= pic32prog
+PROGRAMMERS_SUPPORTED += pic32prog
+ifeq ($(PROGRAMMER),pic32prog)
+  # pic32prog
+  #
+  # For PICkit3:
+  #
+  # * Connect the chipKIT-Wi-Fire to USB
+  # * Connect the PICkit3 to ICSP holes
+  # * https://docs.creatordev.io/wifire/guides/wifire-programming/
+  # * The triangle `▶` goes into the port number 1 (a hole with a square around it)
+  #   opposite side of the JP1 ICSP text.
+  FLASHFILE ?= $(HEXFILE)
+endif

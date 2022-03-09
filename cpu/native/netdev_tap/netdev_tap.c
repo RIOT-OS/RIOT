@@ -61,7 +61,7 @@
 #include "netdev_tap.h"
 #include "net/netopt.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* netdev interface */
@@ -71,25 +71,25 @@ static int _recv(netdev_t *netdev, void *buf, size_t n, void *info);
 
 static inline void _get_mac_addr(netdev_t *netdev, uint8_t *dst)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
     memcpy(dst, dev->addr, ETHERNET_ADDR_LEN);
 }
 
 static inline void _set_mac_addr(netdev_t *netdev, const uint8_t *src)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
     memcpy(dev->addr, src, ETHERNET_ADDR_LEN);
 }
 
-static inline int _get_promiscous(netdev_t *netdev)
+static inline int _get_promiscuous(netdev_t *netdev)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
     return dev->promiscuous;
 }
 
-static inline int _set_promiscous(netdev_t *netdev, int value)
+static inline int _set_promiscuous(netdev_t *netdev, int value)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
     dev->promiscuous = value;
     return value;
 }
@@ -121,7 +121,7 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
             }
             break;
         case NETOPT_PROMISCUOUSMODE:
-            *((bool*)value) = (bool)_get_promiscous(dev);
+            *((bool*)value) = (bool)_get_promiscuous(dev);
             res = sizeof(bool);
             break;
         default:
@@ -144,7 +144,7 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len
             res = ETHERNET_ADDR_LEN;
             break;
         case NETOPT_PROMISCUOUSMODE:
-            _set_promiscous(dev, ((const bool *)value)[0]);
+            _set_promiscuous(dev, ((const bool *)value)[0]);
             res = sizeof(netopt_enable_t);
             break;
         default:
@@ -206,7 +206,7 @@ static void _continue_reading(netdev_tap_t *dev)
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
     (void)info;
 
     if (!buf) {
@@ -275,7 +275,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
 
     struct iovec iov[iolist_count(iolist)];
 
@@ -290,19 +290,21 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     return res;
 }
 
-void netdev_tap_setup(netdev_tap_t *dev, const netdev_tap_params_t *params) {
+void netdev_tap_setup(netdev_tap_t *dev, const netdev_tap_params_t *params, int index) {
     dev->netdev.driver = &netdev_driver_tap;
     strncpy(dev->tap_name, *(params->tap_name), IFNAMSIZ - 1);
     dev->tap_name[IFNAMSIZ - 1] = '\0';
+    netdev_register(&dev->netdev, NETDEV_TAP, index);
 }
 
 static void _tap_isr(int fd, void *arg) {
     (void) fd;
 
-    netdev_t *netdev = (netdev_t *)arg;
+    netdev_tap_t *dev = arg;
+    netdev_t *netdev = &dev->netdev;
 
     if (netdev->event_callback) {
-        netdev->event_callback(netdev, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr(netdev);
     }
     else {
         puts("netdev_tap: _isr: no event callback.");
@@ -313,7 +315,7 @@ static int _init(netdev_t *netdev)
 {
     DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
 
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
 
     /* check device parametrs */
     if (dev == NULL) {

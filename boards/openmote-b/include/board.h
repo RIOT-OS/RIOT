@@ -23,6 +23,7 @@
 
 #include "cpu.h"
 #include "periph/gpio.h"
+#include "cc2538_eui_primary.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -77,6 +78,52 @@
 /** @} */
 
 /**
+ * @name    RF CORE observable signals settings
+ * @{
+ */
+#define CONFIG_CC2538_RF_OBS_SIG_0_PCX  5   /* PC5 */
+#define CONFIG_CC2538_RF_OBS_SIG_1_PCX  6   /* PC6 */
+#define CONFIG_CC2538_RF_OBS_SIG_2_PCX  7   /* PC7 */
+/** @} */
+
+/**
+ * @name    OpenWSN leds configuration
+ *
+ * @note This configuration mimics the one done in OpenWSN-fw for the
+ *       same platform
+ * @{
+ */
+#define OPENWSN_LEDPIN_ERROR    LED0_PIN
+#define OPENWSN_LEDPIN_SYNC     LED1_PIN
+#define OPENWSN_LEDPIN_RADIO    LED3_PIN
+#define OPENWSN_LEDPIN_DEBUG    LED2_PIN
+/** @} */
+
+/**
+ * @name    OpenWSN debugpins configuration
+ *
+ * @note This configuration mimics the one done in OpenWSN-fw for the
+ *       same platform
+ * @{
+ */
+#define OPENWSN_DEBUGPIN_FRAME  GPIO_PIN(0, 7) /* A7 */
+#define OPENWSN_DEBUGPIN_ISR    GPIO_PIN(2, 3) /* C3 */
+#define OPENWSN_DEBUGPIN_SLOT   GPIO_PIN(1, 3) /* B3 */
+#define OPENWSN_DEBUGPIN_FSM    GPIO_PIN(1, 2) /* B2 */
+#define OPENWSN_DEBUGPIN_TASK   GPIO_PIN(1, 1) /* B1 */
+#define OPENWSN_DEBUGPIN_RADIO  GPIO_PIN(1, 0) /* B0 */
+
+/**
+ * @name    AT86RF215 configuration
+ * @{
+ */
+#define AT86RF215_PARAM_SPI        SPI_DEV(0)
+#define AT86RF215_PARAM_CS         GPIO_PIN(0, 3) /* A3 */
+#define AT86RF215_PARAM_INT        GPIO_PIN(3, 0) /* D0 */
+#define AT86RF215_PARAM_RESET      GPIO_PIN(3, 1) /* D1 */
+/** @} */
+
+/**
  * @name    xtimer configuration
  * @{
  */
@@ -99,11 +146,6 @@
 
 #define BOOT_PIN    GPIO_PIN(0, CCA_BACKDOOR_PORT_A_PIN) /**< BSL_BOOT Pin */
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 } /* end extern "C" */

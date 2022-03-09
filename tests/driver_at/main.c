@@ -124,7 +124,7 @@ static int send_recv_bytes(int argc, char **argv)
         return 1;
     }
 
-    sprintf(buffer, "%s%s", argv[1], AT_SEND_EOL);
+    sprintf(buffer, "%s%s", argv[1], CONFIG_AT_SEND_EOL);
     at_send_bytes(&at_dev, buffer, strlen(buffer));
 
     ssize_t len = at_recv_bytes(&at_dev, buffer, atoi(argv[2]), 10 * US_PER_SEC);
@@ -146,7 +146,7 @@ static int send_recv_bytes_until_string(int argc, char **argv)
         return 1;
     }
 
-    sprintf(buffer, "%s%s", argv[1], AT_SEND_EOL);
+    sprintf(buffer, "%s%s", argv[1], CONFIG_AT_SEND_EOL);
     at_send_bytes(&at_dev, buffer, strlen(buffer));
     memset(buffer, 0, sizeof(buffer));
 

@@ -1,0 +1,27 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig KCONFIG_USEMODULE_GNRC_SIXLOWPAN
+    bool "Configure GNRC 6LoWPAN"
+    depends on USEMODULE_GNRC_SIXLOWPAN
+    help
+        Configure GNRC 6LoWPAN module using Kconfig.
+
+if KCONFIG_USEMODULE_GNRC_SIXLOWPAN
+
+rsource "frag/Kconfig"
+rsource "nd/Kconfig"
+
+config GNRC_SIXLOWPAN_MSG_QUEUE_SIZE_EXP
+    int "Exponent for the message queue size for the 6LoWPAN thread (as 2^n)"
+    default 3
+    help
+        As the queue size ALWAYS needs to be power of two, this option
+        represents the exponent of 2^n, which will be used as the size of
+        the queue.
+
+endif # KCONFIG_USEMODULE_GNRC_SIXLOWPAN

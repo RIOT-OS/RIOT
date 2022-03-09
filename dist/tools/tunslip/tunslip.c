@@ -761,7 +761,6 @@ write_to_serial(int outfd, void *inbuf, int len)
     PROGRESS("t");
 }
 
-
 /*
  * Read from tun, write to slip.
  */

@@ -25,6 +25,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "kernel_defines.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/sixlowpan/config.h"
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
@@ -53,6 +54,13 @@ typedef struct {
      * @brief   Outgoing tag to gnrc_sixlowpan_frag_rb_base_t::dst
      */
     uint16_t out_tag;
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
+    int16_t offset_diff;    /**< offset change due to recompression */
+    /**
+     * @brief   Incoming interface to gnrc_sixlowpan_frag_rb_base_t::src
+     */
+    gnrc_netif_t *in_netif;
+#endif  /* IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
 } gnrc_sixlowpan_frag_vrb_t;
 
 /**
@@ -117,15 +125,32 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
         const uint8_t *src, size_t src_len, unsigned src_tag);
 
 /**
+ * @brief   Reverse VRB lookup
+ *
+ * @param[in] netif         Network interface the reverse label-switched packet
+ *                          came over
+ * @param[in] src           Link-layer source address of reverse label-switched
+ *                          packet.
+ * @param[in] src_len       Length of @p src.
+ * @param[in] tag           Tag of the reverse label-switched packet.
+ *
+ * @return  The VRB entry with `vrb->super.dst == src` and `vrb->out_tag == tag`.
+ * @return  NULL, if there is no entry in the VRB that has these values.
+ */
+gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_reverse(
+        const gnrc_netif_t *netif, const uint8_t *src, size_t src_len,
+        unsigned tag);
+
+/**
  * @brief   Removes an entry from the VRB
  *
  * @param[in] vrb   A VRB entry
  */
 static inline void gnrc_sixlowpan_frag_vrb_rm(gnrc_sixlowpan_frag_vrb_t *vrb)
 {
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG
-    gnrc_sixlowpan_frag_rb_base_rm(&vrb->super);
-#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG */
+    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_RB)) {
+        gnrc_sixlowpan_frag_rb_base_rm(&vrb->super);
+    }
     vrb->super.src_len = 0;
 }
 

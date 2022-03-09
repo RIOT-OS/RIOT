@@ -137,7 +137,7 @@
 
 #include <stdbool.h>
 
-#include "kernel_types.h"
+#include "sched.h"
 
 #include "net/gnrc/sixlowpan/config.h"
 #include "net/gnrc/sixlowpan/frag.h"

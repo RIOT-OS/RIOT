@@ -1,5 +1,9 @@
-ifneq (,$(filter gnrc_netdev_default netdev_default,$(USEMODULE)))
+ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += at86rf233
+endif
+
+ifneq (,$(filter eui_provider,$(USEMODULE)))
+  USEMODULE += edbg_eui
 endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))

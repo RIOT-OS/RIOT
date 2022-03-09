@@ -18,7 +18,6 @@
  * @}
  */
 
-
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -26,6 +25,8 @@
 
 #include "can/conn/raw.h"
 #include "can/raw.h"
+
+#include "timex.h"
 
 #define SC_CAN_MAX_FILTERS  10
 #define xstr(a) str(a)

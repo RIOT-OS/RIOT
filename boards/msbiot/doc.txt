@@ -101,7 +101,7 @@ automatically loaded when the pseudo module `netdev_default` is used.
 | Type                      | Sub-1GHz RF Transceiver                                           |
 | Vendor                    | Texas Instruments                                                 |
 | Datasheet                 | [Datasheet](http://www.ti.com/lit/ds/symlink/cc1101.pdf)          |
-| Errata Sheet              | [Errata Sheet](http://www.ti.com/lit/er/swrz020d/swrz020d.pdf)    |
+| Errata Sheet              | [Errata Sheet](https://www.ti.com/lit/er/swrz020e/swrz020e.pdf)   |
 | Other Technical Documents | [TI Webpage](http://www.ti.com/product/CC1101/technicaldocuments) |
 | Driver                    | @ref drivers_cc110x                                               |
 | SPI Device                | SPI1 (Mapped to SPI_0 in RIOT)                                    |
@@ -136,10 +136,10 @@ on the inclusion.
 |:------------------------- |:----------------------------------------------------------------- |
 | Type                      | 802.11b/g Wi-Fi Module                                            |
 | Vendor                    | Texas Instruments                                                 |
-| Datasheet                 | [Datasheet](http://www.ti.com/lit/ds/symlink/cc3000.pdf)          |
+| Datasheet                 | [Datasheet](https://web.archive.org/web/20171109015601/http://www.ti.com/lit/ds/symlink/cc3000.pdf) |
 | Errata Sheet              | [Errata Sheet](http://www.ti.com/lit/er/swrz044b/swrz044b.pdf)    |
-| Other Technical Documents | [TI Webpage](http://www.ti.com/product/CC3000/technicaldocuments) |
-| TI Wiki                   | [Wiki](http://processors.wiki.ti.com/index.php/CC3000)            |
+| Other Technical Documents | [TI Webpage](https://web.archive.org/web/20190825013529/http://www.ti.com/product/CC3000/technicaldocuments) |
+| TI Support Forum          | [WiFi Forum](https://e2e.ti.com/support/wireless-connectivity/wifi/f/968) |
 | Driver                    | [Pull Request](https://github.com/RIOT-OS/RIOT/pull/2603)         |
 | SPI Device                | SPI2 (Mapped to SPI_1 in RIOT)                                    |
 | SCL                       | PB10                                                              |
@@ -169,8 +169,8 @@ found [here](https://github.com/RIOT-OS/RIOT/tree/master/tests/driver_mpu9x50).
 |:--------------------- |:------------------------------------------------------------------------------------------------- |
 | Type                  | Nine-Axis MotionTracking Device (Gyro, Accel and Compass)                                         |
 | Vendor                | Invensense                                                                                        |
-| Product Specification | [Product Specification](http://www.invensense.com/mems/gyro/documents/PS-MPU-9150A-00v4_3.pdf)    |
-| Register Map          | [Register Map](http://www.invensense.com/mems/gyro/documents/RM-MPU-9150A-00v4_2.pdf)             |
+| Product Specification | [Product Specification](https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-9150-Datasheet.pdf)    |
+| Register Map          | [Register Map](https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-9150-Register-Map.pdf)             |
 | Driver                | @ref drivers_mpu9x50                                                                              |
 | I²C Device            | I2C1 (Mapped to I2C_0 in RIOT)                                                                    |
 | SCL                   | PB6                                                                                               |

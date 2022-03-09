@@ -27,15 +27,19 @@
 #error "Do not include this file directly! Use xtimer.h instead"
 #endif
 
+#ifdef MODULE_XTIMER_ON_ZTIMER
+#include "ztimer.h"
+#else
 #include "periph/timer.h"
+#endif
+
+#include "irq.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if XTIMER_MASK
-extern volatile uint32_t _xtimer_high_cnt;
-#endif
+extern volatile uint64_t _xtimer_current_time;
 
 /**
  * @brief IPC message type for xtimer msg callback
@@ -47,7 +51,12 @@ extern volatile uint32_t _xtimer_high_cnt;
  */
 static inline uint32_t _xtimer_lltimer_now(void)
 {
+#ifndef MODULE_XTIMER_ON_ZTIMER
     return timer_read(XTIMER_DEV);
+#else
+    return ztimer_now(ZTIMER_USEC);
+#endif
+
 }
 
 /**
@@ -66,22 +75,8 @@ static inline uint32_t _xtimer_lltimer_mask(uint32_t val)
  * @internal
  */
 
-uint64_t _xtimer_now64(void);
+uint32_t _xtimer_now(void);
 
-/**
- * @brief Sets the timer to the appropriate timer_list or list_head.
- *
- * @note    The target to set the timer to has to be at least bigger then the
- *          ticks needed to jump into the function and calculate '_xtimer_now()'.
- *          So that 'now' did not pass the target.
- *          This is crucial when using low CPU frequencies and/or when the
- *          '_xtimer_now()' call needs multiple xtimer ticks to evaluate.
- *
- * @param[in] timer   pointer to xtimer_t which is added to the list.
- * @param[in] target  Absolute target value in ticks.
- */
-int _xtimer_set_absolute(xtimer_t *timer, uint32_t target);
-void _xtimer_set(xtimer_t *timer, uint32_t offset);
 void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset);
 void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period);
 void _xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid);
@@ -109,24 +104,23 @@ void _xtimer_tsleep(uint32_t offset, uint32_t long_offset);
 #ifndef DOXYGEN
 /* Doxygen warns that these are undocumented, but the documentation can be found in xtimer.h */
 
-static inline uint32_t _xtimer_now(void)
+static inline uint64_t _xtimer_now64(void)
 {
+    uint32_t now, elapsed;
+
+    /* time sensitive since _xtimer_current_time is updated here */
+    unsigned state = irq_disable();
+    now = _xtimer_lltimer_now();
 #if XTIMER_MASK
-    uint32_t latched_high_cnt, now;
-
-    /* _high_cnt can change at any time, so check the value before
-     * and after reading the low-level timer. If it hasn't changed,
-     * then it can be safely applied to the timer count. */
-
-    do {
-        latched_high_cnt = _xtimer_high_cnt;
-        now = _xtimer_lltimer_now();
-    } while (_xtimer_high_cnt != latched_high_cnt);
-
-    return latched_high_cnt | now;
+    elapsed = _xtimer_lltimer_mask(now - _xtimer_lltimer_mask((uint32_t)_xtimer_current_time));
+    _xtimer_current_time += (uint64_t)elapsed;
 #else
-    return _xtimer_lltimer_now();
+    elapsed = now - ((uint32_t)_xtimer_current_time & 0xFFFFFFFF);
+    _xtimer_current_time += (uint64_t)elapsed;
 #endif
+    irq_restore(state);
+
+    return _xtimer_current_time;
 }
 
 static inline xtimer_ticks32_t xtimer_now(void)
@@ -177,6 +171,11 @@ static inline void xtimer_spin(xtimer_ticks32_t ticks) {
     _xtimer_spin(ticks.ticks32);
 }
 
+static inline void xtimer_msleep(uint32_t milliseconds)
+{
+    _xtimer_tsleep64(_xtimer_ticks_from_usec64(milliseconds * US_PER_MS));
+}
+
 static inline void xtimer_usleep(uint32_t microseconds)
 {
     _xtimer_tsleep32(_xtimer_ticks_from_usec(microseconds));
@@ -224,7 +223,7 @@ static inline void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_
 
 static inline void xtimer_set(xtimer_t *timer, uint32_t offset)
 {
-    _xtimer_set(timer, _xtimer_ticks_from_usec(offset));
+    _xtimer_set64(timer, _xtimer_ticks_from_usec(offset), 0);
 }
 
 static inline void xtimer_set64(xtimer_t *timer, uint64_t period_us)
@@ -323,6 +322,11 @@ static inline bool xtimer_less(xtimer_ticks32_t a, xtimer_ticks32_t b)
 static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b)
 {
     return (a.ticks64 < b.ticks64);
+}
+
+static inline bool xtimer_is_set(const xtimer_t *timer)
+{
+    return timer->offset || timer->long_offset;
 }
 
 #endif /* !defined(DOXYGEN) */

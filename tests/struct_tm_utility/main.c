@@ -49,7 +49,6 @@ bool proper_atoi(const char *a, int *i)
     return (a != end) && (*end == '\0');
 }
 
-
 static int cmd_days_in(int argc, char **argv)
 {
     int mon;

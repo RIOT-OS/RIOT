@@ -40,6 +40,13 @@
 extern "C" {
 #endif
 
+/**
+ * @brief The maximum number DTLS peers (i.e. sessions)
+ */
+#ifndef CONFIG_DTLS_PEER_MAX
+#define CONFIG_DTLS_PEER_MAX       (1)
+#endif
+
 #ifdef __cplusplus
 }
 #endif

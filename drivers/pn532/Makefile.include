@@ -1,0 +1,3 @@
+# include variants of the pn532 drivers as pseudo modules
+PSEUDOMODULES += pn532_i2c
+PSEUDOMODULES += pn532_spi

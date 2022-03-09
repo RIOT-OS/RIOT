@@ -1,0 +1,8 @@
+# For sam0 rtt conflicts with rtc, make will select only rtc because of
+# order of inclusion, but to resolve in the same way as Kconfig this also
+# selects ztimer_no_periph_rtt to select the same modules in Kconfig and make
+ifneq (,$(filter-out sam3,$(filter sam%,$(CPU))))
+  ifneq (,$(filter ztimer%,$(USEMODULE)))
+    USEMODULE += ztimer_no_periph_rtt
+  endif
+endif

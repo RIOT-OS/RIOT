@@ -1,0 +1,5 @@
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
+USEMODULE += paho-mqtt-contrib
+USEMODULE += paho-mqtt-packet
+USEMODULE += tsrb

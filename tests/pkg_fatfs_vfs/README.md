@@ -21,6 +21,8 @@ FAT) That implies it doesn't show any modifications in RIOT that you perform on
 your OS and the other way round. So always remember to mount/unmount correctly
 or your FS will probably get damaged.
 
+    make flash test-with-config
+
 # Real Hardware
 
 Currently the test defaults to sdcard_spi on real hardware. But generally any
@@ -30,3 +32,5 @@ storage device (e.g. your SD-card). To copy the image onto the card you can use
 something like `make image && dd if=bin/riot_fatfs_disk.img
 of=/dev/<your_sdcard>`. After that you can connect the card to your RIOT device
 and check the test output via terminal.
+
+    make flash test-with-config

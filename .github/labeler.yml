@@ -1,0 +1,156 @@
+"Area: arduino API":
+  - "sys/arduino/**/*"
+
+"Area: BLE":
+  - "pkg/nimble/**/*"
+  - "sys/net/ble/**/*"
+  - "sys/include/net/bluetil/**/*"
+  - "sys/include/net/skald/**/*"
+  - "sys/include/net/skald.h"
+
+"Area: boards":
+  - "boards/**/*"
+
+"Area: build system":
+  - "Makefile.*"
+  - "makefiles/**/*"
+  - "**/*.mk"
+
+"Area: CI":
+  - ".circleci/**/*"
+  - ".github/**/*.yml"
+  - ".murdock"
+
+"Area: CoAP":
+  - "sys/net/application_layer/*coap/**/*"
+  - "sys/include/net/*coap*/**/*"
+
+"Area: core":
+  - "core/**/*"
+
+"Area: cpu":
+  - "cpu/**/*"
+
+"Area: doc":
+  - "doc/**/*"
+  - "**/*.md"
+  - "**/*.txt"
+  - "**/*.cff"
+
+"Area: drivers":
+  - "drivers/**/*"
+
+"Area: examples":
+  - "examples/**/*"
+
+"Area: Kconfig":
+  - "dist/tools/kconfiglib/**/*"
+  - "makefiles/kconfig.mk"
+  - "kconfigs/*"
+  - "**/Kconfig"
+
+"Area: LoRa":
+  - "drivers/llcc68/**/*"
+  - "drivers/sx126x/**/*"
+  - "drivers/sx127x/**/*"
+  - "drivers/include/llcc68.h"
+  - "drivers/include/sx126x.h"
+  - "drivers/include/sx127x.h"
+  - "pkg/semtech-loramac/**/*"
+  - "sys/net/lora/**/*"
+  - "sys/net/gnrc/link_layer/lorawan/**/*"
+  - "sys/include/net/lorawan/**/*"
+  - "sys/include/net/gnrc/lorawan/**/*"
+  - "sys/include/net/gnrc/lorawan.h"
+  - "sys/include/net/lora.h"
+  - "sys/include/net/loramac.h"
+
+"Area: network":
+  - "sys/net/**/*"
+  - "sys/include/net/**/*"
+  - "pkg/lwip/**/*"
+  - "pkg/openthread/**/*"
+  - "pkg/openwsn/**/*"
+  - "pkg/paho-mqtt/**/*"
+
+"Area: OTA":
+  - "sys/suit/**/*"
+  - "sys/include/suit/**/*"
+  - "sys/include/suit.h"
+
+"Area: pkg":
+  - "pkg/**/*"
+
+"Area: SAUL":
+  - "drivers/saul/**/*"
+  - "drivers/include/saul/**/*"
+  - "drivers/include/saul.h"
+  - "sys/saul_reg/**/*"
+  - "sys/include/saul_reg.h"
+
+"Area: sys":
+  - "sys/**/*"
+
+"Area: tests":
+  - "tests/**/*"
+  - "fuzzing/**/*"
+  - "dist/pythonlibs/**/*"
+  - "makefiles/tests/**/*"
+
+"Area: timers":
+  - "sys/*timer/**/*"
+  - "sys/include/*timer/**/*"
+  - "sys/include/*timer.h"
+
+"Area: toolchain":
+  - "makefiles/toolchain/**/*"
+
+"Area: tools":
+  - "dist/tools/**/*"
+  - "dist/testbed-support/**/*"
+  - "makefiles/tools/**/*"
+
+"Area: USB":
+  - "sys/usb/**/*"
+  - "sys/include/usb/**/*"
+  - "sys/include/usb.h"
+
+"Platform: native":
+  - "boards/native/**/*"
+  - "cpu/native/**/*"
+
+"Platform: ARM":
+  - "cpu/arm7_common/**/*"
+  - "cpu/cortexm_common/**/*"
+  - "cpu/cc2*/**/*"
+  - "cpu/efm32/**/*"
+  - "cpu/kinetis/**/*"
+  - "cpu/lm4f120/**/*"
+  - "cpu/lpc*/**/*"
+  - "cpu/nrf5*/**/*"
+  - "cpu/qn908x/**/*"
+  - "cpu/sam*/**/*"
+  - "cpu/stellaris_common/**/*"
+  - "cpu/stm32/**/*"
+  - "makefiles/arch/cortexm.inc.mk"
+
+"Platform: AVR":
+  - "cpu/atmega*/**/*"
+  - "cpu/avr8_common/**/*"
+  - "makefiles/arch/avr8.inc.mk"
+
+"Platform: ESP":
+  - "cpu/esp*/**/*"
+
+"Platform: MIPS":
+  - "cpu/mips*/**/*"
+  - "makefiles/arch/mips.inc.mk"
+
+"Platform: MSP":
+  - "cpu/msp*/**/*"
+  - "makefiles/arch/msp430.inc.mk"
+
+"Platform: RISC-V":
+  - "cpu/riscv_common/**/*"
+  - "cpu/fe310/**/*"
+  - "makefiles/arch/riscv.inc.mk"

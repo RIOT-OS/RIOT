@@ -16,6 +16,9 @@
  * @}
  */
 
+#define USB_H_USER_IS_RIOT_INTERNAL
+
+#include <assert.h>
 #include <string.h>
 #include <stdio.h>
 #include "usb/descriptor.h"
@@ -199,8 +202,16 @@ static size_t _fmt_descriptors_iface_alts(usbus_t *usbus,
          alt = alt->next) {
         usb_descriptor_interface_t usb_iface;
         _fmt_descriptor_iface(iface, &usb_iface);
+        len += sizeof(usb_descriptor_interface_t);
         usb_iface.alternate_setting = alts++;
         usb_iface.num_endpoints = _num_endpoints_alt(alt);
+        if (alt->descr) {
+            usb_iface.idx = alt->descr->idx;
+        } else {
+            /* If there is no string descriptor for a given alt interface
+               set the index to 0 to advertise it */
+            usb_iface.idx = 0;
+        }
         usbus_control_slicer_put_bytes(usbus, (uint8_t *)&usb_iface,
                                        sizeof(usb_descriptor_interface_t));
         len += _fmt_descriptors_post(usbus, alt->descr_gen);
@@ -247,12 +258,15 @@ size_t usbus_fmt_descriptor_conf(usbus_t *usbus)
     conf.total_length = sizeof(usb_descriptor_configuration_t);
     conf.val = 1;
     conf.attributes = USB_CONF_ATTR_RESERVED;
-    if (USB_CONFIG_SELF_POWERED) {
+    if (CONFIG_USB_SELF_POWERED) {
         conf.attributes |= USB_CONF_ATTR_SELF_POWERED;
+    }
+    if (CONFIG_USB_REM_WAKEUP) {
+        conf.attributes |= USB_CONF_ATTR_REM_WAKEUP;
     }
     /* TODO: upper bound */
     /* USB max power is reported in increments of 2 mA */
-    conf.max_power = USB_CONFIG_MAX_POWER / 2;
+    conf.max_power = CONFIG_USB_MAX_POWER / 2;
     conf.num_interfaces = _num_ifaces(usbus);
     len += sizeof(usb_descriptor_configuration_t);
     conf.total_length = _gen_config_descriptor_size(usbus);
@@ -260,6 +274,7 @@ size_t usbus_fmt_descriptor_conf(usbus_t *usbus)
     usbus_control_slicer_put_bytes(usbus, (uint8_t *)&conf, sizeof(conf));
     len += _fmt_descriptors_post(usbus, usbus->descr_gen);
     len += _fmt_descriptors_ifaces(usbus);
+    assert(len == conf.total_length);
     return len;
 }
 
@@ -270,12 +285,14 @@ size_t usbus_fmt_descriptor_dev(usbus_t *usbus)
     memset(&desc, 0, sizeof(usb_descriptor_device_t));
     desc.length = sizeof(usb_descriptor_device_t);
     desc.type = USB_TYPE_DESCRIPTOR_DEVICE;
-    desc.bcd_usb = USB_CONFIG_SPEC_BCDVERSION;
-    desc.max_packet_size = USBUS_EP0_SIZE;
-    desc.vendor_id = USB_CONFIG_VID;
-    desc.product_id = USB_CONFIG_PID;
+    desc.bcd_usb = CONFIG_USB_SPEC_BCDVERSION;
+    desc.max_packet_size = CONFIG_USBUS_EP0_SIZE;
+    desc.vendor_id = CONFIG_USB_VID;
+    desc.product_id = CONFIG_USB_PID;
+    desc.bcd_device = CONFIG_USB_PRODUCT_BCDVERSION;
     desc.manufacturer_idx = usbus->manuf.idx;
     desc.product_idx = usbus->product.idx;
+    desc.serial_idx = usbus->serial.idx;
     /* USBUS supports only a single config at the moment */
     desc.num_configurations = 1;
     usbus_control_slicer_put_bytes(usbus, (uint8_t *)&desc,

@@ -1,0 +1,13 @@
+USEMODULE += rtt_rtc
+USEMODULE += ztimer_no_periph_rtt
+
+CFLAGS += -DMOCK_RTT_FREQUENCY=32
+CFLAGS += -DMOCK_RTT_MAX_VALUE=0xFFFF
+
+# mulle always enables periph_rtt.
+# This clashes with mock_rtt.
+BOARD_BLACKLIST := mulle
+
+# esp32 enables periph_rtc by default.
+# This clashes with rtt_rtc,
+FEATURES_BLACKLIST += arch_esp32

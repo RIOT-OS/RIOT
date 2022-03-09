@@ -15,6 +15,7 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include <assert.h>
 #include <errno.h>
 #include <string.h>
 
@@ -25,14 +26,13 @@
 #include "net/gnrc/udp.h"
 #include "net/sock/udp.h"
 #include "net/udp.h"
+#include "random.h"
 
 #include "gnrc_sock_internal.h"
 
 #ifdef MODULE_GNRC_SOCK_CHECK_REUSE
 static sock_udp_t *_udp_socks = NULL;
 #endif
-
-static uint16_t _dyn_port_next = 0;
 
 /**
  * @brief   Checks if a given UDP port is already used by another sock
@@ -66,17 +66,16 @@ static bool _dyn_port_used(uint16_t port)
 /**
  * @brief   returns a UDP port, and checks for reuse if required
  *
- * complies to RFC 6056, see https://tools.ietf.org/html/rfc6056#section-3.3.3
+ * implements "Another Simple Port Randomization Algorithm" as specified in
+ * RFC 6056, see https://tools.ietf.org/html/rfc6056#section-3.3.2
  */
 static uint16_t _get_dyn_port(sock_udp_t *sock)
 {
     unsigned count = GNRC_SOCK_DYN_PORTRANGE_NUM;
     do {
         uint16_t port = GNRC_SOCK_DYN_PORTRANGE_MIN +
-               (_dyn_port_next * GNRC_SOCK_DYN_PORTRANGE_OFF) % GNRC_SOCK_DYN_PORTRANGE_NUM;
-        _dyn_port_next++;
-        if ((sock == NULL) || (sock->flags & SOCK_FLAGS_REUSE_EP) ||
-                              !_dyn_port_used(port)) {
+               (random_uint32() % GNRC_SOCK_DYN_PORTRANGE_NUM);
+        if ((sock && (sock->flags & SOCK_FLAGS_REUSE_EP)) || !_dyn_port_used(port)) {
             return port;
         }
         --count;
@@ -175,26 +174,69 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *remote)
     return 0;
 }
 
-ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
-                      uint32_t timeout, sock_udp_ep_t *remote)
+ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
+                         uint32_t timeout, sock_udp_ep_t *remote,
+                         sock_udp_aux_rx_t *aux)
 {
+    void *pkt = NULL, *ctx = NULL;
+    uint8_t *ptr = data;
+    ssize_t res, ret = 0;
+    bool nobufs = false;
+
+    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    while ((res = sock_udp_recv_buf_aux(sock, &pkt, &ctx, timeout, remote,
+                                        aux)) > 0) {
+        if (res > (ssize_t)max_len) {
+            nobufs = true;
+            continue;
+        }
+        memcpy(ptr, pkt, res);
+        ptr += res;
+        ret += res;
+    }
+    return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
+}
+
+ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
+                              uint32_t timeout, sock_udp_ep_t *remote,
+                              sock_udp_aux_rx_t *aux)
+{
+    (void)aux;
     gnrc_pktsnip_t *pkt, *udp;
     udp_hdr_t *hdr;
     sock_ip_ep_t tmp;
     int res;
+    gnrc_sock_recv_aux_t _aux = { 0 };
 
-    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    assert((sock != NULL) && (data != NULL) && (buf_ctx != NULL));
+    if (*buf_ctx != NULL) {
+        *data = NULL;
+        gnrc_pktbuf_release(*buf_ctx);
+        *buf_ctx = NULL;
+        return 0;
+    }
     if (sock->local.family == AF_UNSPEC) {
         return -EADDRNOTAVAIL;
     }
     tmp.family = sock->local.family;
-    res = gnrc_sock_recv((gnrc_sock_reg_t *)sock, &pkt, timeout, &tmp);
+#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+    if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_LOCAL)) {
+        _aux.local = (sock_ip_ep_t *)&aux->local;
+    }
+#endif
+#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+    if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_TIMESTAMP)) {
+        _aux.timestamp = &aux->timestamp;
+    }
+#endif
+#if IS_USED(MODULE_SOCK_AUX_RSSI)
+    if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_RSSI)) {
+        _aux.rssi = &aux->rssi;
+    }
+#endif
+    res = gnrc_sock_recv((gnrc_sock_reg_t *)sock, &pkt, timeout, &tmp, &_aux);
     if (res < 0) {
         return res;
-    }
-    if (pkt->size > max_len) {
-        gnrc_pktbuf_release(pkt);
-        return -ENOBUFS;
     }
     udp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_UDP);
     assert(udp);
@@ -214,24 +256,42 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
         gnrc_pktbuf_release(pkt);
         return -EPROTO;
     }
-    memcpy(data, pkt->data, pkt->size);
+#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+    if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_LOCAL)) {
+        aux->flags &= ~SOCK_AUX_GET_LOCAL;
+        aux->local.port = sock->local.port;
+    }
+#endif
+#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+    if ((aux != NULL) && (_aux.flags & GNRC_SOCK_RECV_AUX_FLAG_TIMESTAMP)) {
+        aux->flags &= ~SOCK_AUX_GET_TIMESTAMP;
+    }
+#endif
+#if IS_USED(MODULE_SOCK_AUX_RSSI)
+    if ((aux != NULL) && (_aux.flags & GNRC_SOCK_RECV_AUX_FLAG_RSSI)) {
+        aux->flags &= ~SOCK_AUX_GET_RSSI;
+    }
+#endif
+    *data = pkt->data;
+    *buf_ctx = pkt;
     res = (int)pkt->size;
-    gnrc_pktbuf_release(pkt);
     return res;
 }
 
-ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
-                      const sock_udp_ep_t *remote)
+ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
+                           const iolist_t *snips,
+                           const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux)
 {
+    (void)aux;
     int res;
-    gnrc_pktsnip_t *payload, *pkt;
+    gnrc_pktsnip_t *pkt, *payload = NULL;
     uint16_t src_port = 0, dst_port;
     sock_ip_ep_t local;
     sock_udp_ep_t remote_cpy;
     sock_ip_ep_t *rem;
+    uint8_t *payload_buf;
 
     assert((sock != NULL) || (remote != NULL));
-    assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
 
     if (remote != NULL) {
         if (remote->port == 0) {
@@ -303,11 +363,21 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     else if (local.family != rem->family) {
         return -EINVAL;
     }
-    /* generate payload and header snips */
-    payload = gnrc_pktbuf_add(NULL, (void *)data, len, GNRC_NETTYPE_UNDEF);
+
+    /* allocate snip for payload */
+    payload = gnrc_pktbuf_add(NULL, NULL, iolist_size(snips), GNRC_NETTYPE_UNDEF);
     if (payload == NULL) {
         return -ENOMEM;
     }
+
+    /* copy payload data into payload snip */
+    payload_buf = payload->data;
+    while (snips) {
+        memcpy(payload_buf, snips->iol_base, snips->iol_len);
+        payload_buf += snips->iol_len;
+        snips = snips->iol_next;
+    }
+
     pkt = gnrc_udp_hdr_build(payload, src_port, dst_port);
     if (pkt == NULL) {
         gnrc_pktbuf_release(payload);
@@ -317,7 +387,28 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     if (res > 0) {
         res -= sizeof(udp_hdr_t);
     }
+#ifdef SOCK_HAS_ASYNC
+    if ((sock != NULL) && (sock->reg.async_cb.udp)) {
+        sock->reg.async_cb.udp(sock, SOCK_ASYNC_MSG_SENT,
+                               sock->reg.async_cb_arg);
+    }
+#endif  /* SOCK_HAS_ASYNC */
     return res;
 }
+
+#ifdef SOCK_HAS_ASYNC
+void sock_udp_set_cb(sock_udp_t *sock, sock_udp_cb_t cb, void *arg)
+{
+    sock->reg.async_cb_arg = arg;
+    sock->reg.async_cb.udp = cb;
+}
+
+#ifdef SOCK_HAS_ASYNC_CTX
+sock_async_ctx_t *sock_udp_get_async_ctx(sock_udp_t *sock)
+{
+    return &sock->reg.async_ctx;
+}
+#endif  /* SOCK_HAS_ASYNC_CTX */
+#endif  /* SOCK_HAS_ASYNC */
 
 /** @} */

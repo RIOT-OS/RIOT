@@ -106,7 +106,6 @@ typedef struct {
     lis3mdl_op_t op_mode;            /**< Operation mode */
 } lis3mdl_params_t;
 
-
 /**
  * @brief   Device descriptor for LIS3MDL sensor
  */

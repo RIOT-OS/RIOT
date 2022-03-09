@@ -2,6 +2,7 @@
  * Copyright (C) 2014-2017 Freie Universität Berlin
  *               2015 Jan Wagner <mail@jwagner.eu>
  *               2018 Inria
+ *               2020 Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -22,10 +23,12 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Jan Wagner <mail@jwagner.eu>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  * @}
  */
 
+#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -33,7 +36,7 @@
 #include "periph/uart.h"
 #include "periph/gpio.h"
 
-#ifdef CPU_MODEL_NRF52840XXAA
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
 #define UART_INVALID    (uart >= UART_NUMOF)
 #define REG_BAUDRATE    dev(uart)->BAUDRATE
 #define REG_CONFIG      dev(uart)->CONFIG
@@ -42,10 +45,10 @@
 #define UART_IRQN       uart_config[uart].irqn
 #define UART_PIN_RX     uart_config[uart].rx_pin
 #define UART_PIN_TX     uart_config[uart].tx_pin
+#ifdef MODULE_PERIPH_UART_HW_FC
 #define UART_PIN_RTS    uart_config[uart].rts_pin
 #define UART_PIN_CTS    uart_config[uart].cts_pin
-#define UART_HWFLOWCTRL (uart_config[uart].rts_pin != (uint8_t)GPIO_UNDEF && \
-                         uart_config[uart].cts_pin != (uint8_t)GPIO_UNDEF)
+#endif
 #define ISR_CTX         isr_ctx[uart]
 #define RAM_MASK        (0x20000000)
 
@@ -61,6 +64,17 @@
  */
 static uart_isr_ctx_t isr_ctx[UART_NUMOF];
 static uint8_t rx_buf[UART_NUMOF];
+
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+
+#include "tsrb.h"
+/**
+ * @brief   Allocate for tx ring buffers
+ */
+static uint8_t tx_buf[UART_NUMOF];
+static tsrb_t uart_tx_rb[UART_NUMOF];
+static uint8_t uart_tx_rb_buf[UART_NUMOF][UART_TXBUF_SIZE];
+#endif
 
 static inline NRF_UARTE_Type *dev(uart_t uart)
 {
@@ -82,8 +96,7 @@ static inline NRF_UARTE_Type *dev(uart_t uart)
  */
 static uart_isr_ctx_t isr_ctx;
 
-#endif  /* CPU_MODEL_NRF52840XXAA */
-
+#endif  /* !CPU_MODEL_NRF52832XXAA && !CPU_FAM_NRF51 */
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
@@ -113,33 +126,37 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     gpio_init(UART_PIN_TX, GPIO_OUT);
     PSEL_TXD = UART_PIN_TX;
 
-#ifdef CPU_MODEL_NRF52840XXAA
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
     /* enable HW-flow control if defined */
-    if (UART_HWFLOWCTRL) {
+ #ifdef MODULE_PERIPH_UART_HW_FC
         /* set pin mode for RTS and CTS pins */
+        if (UART_PIN_RTS != GPIO_UNDEF && UART_PIN_CTS != GPIO_UNDEF) {
+            gpio_init(UART_PIN_RTS, GPIO_OUT);
+            gpio_init(UART_PIN_CTS, GPIO_IN);
+            /* configure RTS and CTS pins to use */
+            dev(uart)->PSEL.RTS = UART_PIN_RTS;
+            dev(uart)->PSEL.CTS = UART_PIN_CTS;
+            REG_CONFIG |= UART_CONFIG_HWFC_Msk; /* enable HW flow control */
+        }
+#else
+        dev(uart)->PSEL.RTS = 0xffffffff;   /* pin disconnected */
+        dev(uart)->PSEL.CTS = 0xffffffff;   /* pin disconnected */
+#endif
+#else
+#ifdef MODULE_PERIPH_UART_HW_FC
+    /* set pin mode for RTS and CTS pins */
+    if (UART_PIN_RTS != GPIO_UNDEF && UART_PIN_CTS != GPIO_UNDEF) {
         gpio_init(UART_PIN_RTS, GPIO_OUT);
         gpio_init(UART_PIN_CTS, GPIO_IN);
         /* configure RTS and CTS pins to use */
-        dev(uart)->PSEL.RTS = UART_PIN_RTS;
-        dev(uart)->PSEL.CTS = UART_PIN_CTS;
-        REG_CONFIG |= UART_CONFIG_HWFC_Msk; /* enable HW flow control */
-    } else {
-        dev(uart)->PSEL.RTS = 0xffffffff;   /* pin disconnected */
-        dev(uart)->PSEL.CTS = 0xffffffff;   /* pin disconnected */
+        NRF_UART0->PSELRTS = UART_PIN_RTS;
+        NRF_UART0->PSELCTS = UART_PIN_CTS;
+        REG_CONFIG |= UART_CONFIG_HWFC_Msk;     /* enable HW flow control */
     }
 #else
-#if UART_HWFLOWCTRL
-    /* set pin mode for RTS and CTS pins */
-    gpio_init(UART_PIN_RTS, GPIO_OUT);
-    gpio_init(UART_PIN_CTS, GPIO_IN);
-    /* configure RTS and CTS pins to use */
-    NRF_UART0->PSELRTS = UART_PIN_RTS;
-    NRF_UART0->PSELCTS = UART_PIN_CTS;
-    REG_CONFIG |= UART_CONFIG_HWFC_Msk;     /* enable HW flow control */
-#else
-    NRF_UART0->PSELRTS = 0xffffffff;        /* pin disconnected */
-    NRF_UART0->PSELCTS = 0xffffffff;        /* pin disconnected */
-#endif
+        NRF_UART0->PSELRTS = 0xffffffff;        /* pin disconnected */
+        NRF_UART0->PSELCTS = 0xffffffff;        /* pin disconnected */
+#endif /* MODULE_PERIPH_UART_HW_FC */
 #endif
 
     /* select baudrate */
@@ -189,20 +206,28 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         case 921600:
             REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud921600;
             break;
+        case 1000000:
+            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud1M;
+            break;
         default:
             return UART_NOBAUD;
     }
 
     /* enable the UART device */
-#ifdef CPU_MODEL_NRF52840XXAA
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
     dev(uart)->ENABLE = UARTE_ENABLE_ENABLE_Enabled;
 #else
     NRF_UART0->ENABLE = UART_ENABLE_ENABLE_Enabled;
     NRF_UART0->TASKS_STARTTX = 1;
 #endif
 
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    /* set up the TX buffer */
+    tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
+#endif
+
     if (rx_cb) {
-#ifdef CPU_MODEL_NRF52840XXAA
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
         dev(uart)->RXD.MAXCNT = 1;
         dev(uart)->RXD.PTR = (uint32_t)&rx_buf[uart];
         dev(uart)->INTENSET = UARTE_INTENSET_ENDRX_Msk;
@@ -212,33 +237,71 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         NRF_UART0->INTENSET = UART_INTENSET_RXDRDY_Msk;
         NRF_UART0->TASKS_STARTRX = 1;
 #endif
-
-        /* enable global and receiving interrupt */
-        NVIC_EnableIRQ(UART_IRQN);
     }
 
+    if (rx_cb || IS_USED(MODULE_PERIPH_UART_NONBLOCKING)) {
+        NVIC_EnableIRQ(UART_IRQN);
+    }
     return UART_OK;
 }
 
-
-#ifdef CPU_MODEL_NRF52840XXAA /* nrf52840 (using EasyDMA) */
+/* nrf52840 || nrf52811 (using EasyDMA) */
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
 static void _write_buf(uart_t uart, const uint8_t *data, size_t len)
 {
-    /* reset endtx flag */
     dev(uart)->EVENTS_ENDTX = 0;
+    if (IS_USED(MODULE_PERIPH_UART_NONBLOCKING)) {
+        dev(uart)->INTENSET = UARTE_INTENSET_ENDTX_Msk;
+    }
     /* set data to transfer to DMA TX pointer */
     dev(uart)->TXD.PTR = (uint32_t)data;
     dev(uart)->TXD.MAXCNT = len;
     /* start transmission */
     dev(uart)->TASKS_STARTTX = 1;
     /* wait for the end of transmission */
-    while (dev(uart)->EVENTS_ENDTX == 0) {}
+    if (!IS_USED(MODULE_PERIPH_UART_NONBLOCKING)) {
+        while (dev(uart)->EVENTS_ENDTX == 0) {}
+    }
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     assert(uart < UART_NUMOF);
-
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    for (size_t i = 0; i < len; i++) {
+        /* in IRQ or interrupts disabled */
+        if (irq_is_in() || __get_PRIMASK()) {
+            if (tsrb_full(&uart_tx_rb[uart])) {
+                /* wait for end of ongoing transmission */
+                if (dev(uart)->EVENTS_TXSTARTED) {
+                    while (dev(uart)->EVENTS_ENDTX == 0) {}
+                    dev(uart)->EVENTS_TXSTARTED = 0;
+                }
+                /* free one spot in buffer */
+                tx_buf[uart] = tsrb_get_one(&uart_tx_rb[uart]);
+                _write_buf(uart, &tx_buf[uart], 1);
+            }
+            tsrb_add_one(&uart_tx_rb[uart], data[i]);
+        }
+        else {
+            /* if no transmission is ongoing and ring buffer is full
+               free up a spot in the buffer by sending one byte */
+            if (!dev(uart)->EVENTS_TXSTARTED && tsrb_full(&uart_tx_rb[uart])) {
+                tx_buf[uart] = tsrb_get_one(&uart_tx_rb[uart]);
+                _write_buf(uart, &tx_buf[uart], 1);
+            }
+            while (tsrb_add_one(&uart_tx_rb[uart], data[i]) < 0) {}
+        }
+    }
+    /* if no transmission is ongoing bootstrap the transmission process
+       by setting a single byte to be written */
+    if (!dev(uart)->EVENTS_TXSTARTED) {
+        if (!tsrb_empty(&uart_tx_rb[uart])) {
+            tx_buf[uart] = tsrb_get_one(&uart_tx_rb[uart]);
+            _write_buf(uart, &tx_buf[uart], 1);
+        }
+    }
+#else
     /* EasyDMA can only transfer data from RAM (see ref. manual, sec. 6.34.1).
      * So if the given `data` buffer resides in ROM, we need to copy it to RAM
      * before being able to transfer it. To make sure the stack does not
@@ -257,6 +320,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     else {
         _write_buf(uart, data, len);
     }
+#endif
 }
 
 void uart_poweron(uart_t uart)
@@ -264,7 +328,7 @@ void uart_poweron(uart_t uart)
     assert(uart < UART_NUMOF);
 
     if (isr_ctx[uart].rx_cb) {
-        NRF_UART0->TASKS_STARTRX = 1;
+        dev(uart)->TASKS_STARTRX = 1;
     }
 }
 
@@ -310,16 +374,28 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 
 static inline void irq_handler(uart_t uart)
 {
-    if (dev(uart)->EVENTS_ENDRX == 1) {
+    if (dev(uart)->EVENTS_ENDRX) {
         dev(uart)->EVENTS_ENDRX = 0;
 
         /* make sure we actually received new data */
-        if (dev(uart)->RXD.AMOUNT == 0) {
-            return;
+        if (dev(uart)->RXD.AMOUNT != 0) {
+            /* Process received byte */
+            isr_ctx[uart].rx_cb(isr_ctx[uart].arg, rx_buf[uart]);
         }
-        /* Process received byte */
-        isr_ctx[uart].rx_cb(isr_ctx[uart].arg, rx_buf[uart]);
     }
+
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    if (dev(uart)->EVENTS_ENDTX) {
+        /* reset flags and idsable ISR on EVENTS_ENDTX */
+        dev(uart)->EVENTS_ENDTX = 0;
+        dev(uart)->EVENTS_TXSTARTED = 0;
+        dev(uart)->INTENCLR = UARTE_INTENSET_ENDTX_Msk;
+        if (!tsrb_empty(&uart_tx_rb[uart])) {
+            tx_buf[uart] = tsrb_get_one(&uart_tx_rb[uart]);
+            _write_buf(uart, &tx_buf[uart], 1);
+        }
+    }
+#endif
 
     cortexm_isr_end();
 }
@@ -406,7 +482,7 @@ static inline void irq_handler(uart_t uart)
     cortexm_isr_end();
 }
 
-#endif /* CPU_MODEL_NRF52840XXAA */
+#endif  /* !CPU_MODEL_NRF52832XXAA && !CPU_FAM_NRF51 */
 
 #ifdef UART_0_ISR
 void UART_0_ISR(void)

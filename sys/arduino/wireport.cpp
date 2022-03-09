@@ -32,7 +32,7 @@ extern "C" {
 #include "panic.h"
 #include "periph/i2c.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define WIRE_PORT_OK                    (0)
@@ -101,13 +101,12 @@ uint8_t TwoWire::requestFrom(uint8_t addr, uint8_t size, uint8_t stop)
 
     uint8_t read = 0;
 
-    if (i2c_acquire(ARDUINO_I2C_DEV) == 0) {
-        if (i2c_read_bytes(ARDUINO_I2C_DEV, addr, rxBuffer, size,
-                           stop ? 0 : I2C_NOSTOP) == 0) {
-            read = size;
-        }
-        i2c_release(ARDUINO_I2C_DEV);
+    i2c_acquire(ARDUINO_I2C_DEV);
+    if (i2c_read_bytes(ARDUINO_I2C_DEV, addr, rxBuffer, size,
+                       stop ? 0 : I2C_NOSTOP) == 0) {
+        read = size;
     }
+    i2c_release(ARDUINO_I2C_DEV);
 
     rxBufferIndex = 0;
     rxBufferLength = read;
@@ -136,9 +135,7 @@ uint8_t TwoWire::endTransmission(uint8_t stop)
         return txError;
     }
 
-    if (i2c_acquire(ARDUINO_I2C_DEV) != 0) {
-        return WIRE_PORT_ERROR_OTHER;
-    }
+    i2c_acquire(ARDUINO_I2C_DEV);
 
     int res = i2c_write_bytes(ARDUINO_I2C_DEV,
                               txAddress, txBuffer, txBufferLength,

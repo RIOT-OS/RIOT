@@ -1,22 +1,41 @@
 FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_pm
 
-# HACK Do not define 'hwrng' if the board does not supports it
-# A whitelist on CPU_MODEL would be better but this information/variable is not
-# available yet.
-# TRNG driver is not implemented for 'CPU_MODEL == mkw41z512vht4'
-_KINETIS_BOARDS_WITHOUT_HWRNG += frdm-kw41z phynode-kw41z usb-kw41z
-# No HWRNG in MK20D7 devices
-_KINETIS_BOARDS_WITHOUT_HWRNG += teensy31
-ifneq (,$(filter-out $(_KINETIS_BOARDS_WITHOUT_HWRNG),$(BOARD)))
+# TRNG driver is not implemented for mkw41z models
+_KINETIS_CPU_MODELS_WITHOUT_HWRNG += mkw41z256vht4 mkw41z512vht4
+# TRNG driver is not implemented for kl43z models
+_KINETIS_CPU_MODELS_WITHOUT_HWRNG += mkl43z%
+# No HWRNG in mk20d7 devices
+_KINETIS_CPU_MODELS_WITHOUT_HWRNG += mk20dx256vlh7
+
+ifneq (,$(filter-out $(_KINETIS_CPU_MODELS_WITHOUT_HWRNG),$(CPU_MODEL)))
   FEATURES_PROVIDED += periph_hwrng
 endif
 
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_gpio_irq
-ifeq (EA,$(KINETIS_SERIES))
-FEATURES_PROVIDED += periph_ics
+
+# Parse parameters from CPU_MODEL using the kinetis-info.mk script in the same
+# directory as this Makefile.
+include $(LAST_MAKEFILEDIR)/kinetis-info.mk
+
+ifneq (,$(filter k w,$(CPU_FAM)))
+  FEATURES_PROVIDED += periph_flashpage
+  FEATURES_PROVIDED += periph_flashpage_pagewise
+endif
+
+ifeq (ea,$(CPU_FAM))
+  FEATURES_PROVIDED += periph_ics
+else ifeq (l,$(CPU_FAM))
+  FEATURES_PROVIDED += periph_mcg_lite
 else
-FEATURES_PROVIDED += periph_mcg
+  FEATURES_PROVIDED += periph_mcg
 endif
 
 include $(RIOTCPU)/cortexm_common/Makefile.features
+
+# This configuration enables modules that are only available when using Kconfig
+# module modelling
+ifeq (1, $(TEST_KCONFIG))
+  KCONFIG_CPU_CONFIG += $(RIOTCPU)/kinetis/kinetis.config
+endif

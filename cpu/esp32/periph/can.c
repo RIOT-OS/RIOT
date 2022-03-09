@@ -15,6 +15,7 @@
  * @{
  */
 
+#include <assert.h>
 #include <errno.h>
 #include <string.h>
 
@@ -40,7 +41,7 @@
 
 #include "xtensa/xtensa_api.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /** Common ESP CAN definitions */
@@ -148,7 +149,7 @@ static const struct can_bittiming_const bittiming_const = {
 
 static void _esp_can_isr(candev_t *candev)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     DEBUG("%s candev=%p\n", __func__, candev);
 
@@ -216,7 +217,7 @@ static void _esp_can_isr(candev_t *candev)
 
 static int _esp_can_init(candev_t *candev)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     DEBUG("%s candev=%p\n", __func__, candev);
 
@@ -233,7 +234,7 @@ static int _esp_can_init(candev_t *candev)
 
 static int _esp_can_send(candev_t *candev, const struct can_frame *frame)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     DEBUG("%s candev=%p frame=%p\n", __func__, candev, frame);
 
@@ -258,16 +259,27 @@ static int _esp_can_send(candev_t *candev, const struct can_frame *frame)
     esp_frame.rtr = (frame->can_id & CAN_RTR_FLAG);
     esp_frame.eff = (frame->can_id & CAN_EFF_FLAG);
 
+    /* esp_frame is a union that provides two views on the same memory: one
+     * tailored for efficient access and the other for readable code. Likely
+     * due to cppcheck not finding all headers it wrongly assumes that values
+     * are assigned but never read again (unreadVariable). But the union members
+     * are read via the aliases to the same memory. */
     if (esp_frame.eff) {
         uint32_t id = frame->can_id & CAN_EFF_MASK;
+        /* cppcheck-suppress unreadVariable */
         esp_frame.extended.id[0] = (id >> 21) & 0xff;
+        /* cppcheck-suppress unreadVariable */
         esp_frame.extended.id[1] = (id >> 13) & 0xff;
+        /* cppcheck-suppress unreadVariable */
         esp_frame.extended.id[2] = (id >> 5) & 0xff;
+        /* cppcheck-suppress unreadVariable */
         esp_frame.extended.id[3] = (id << 3) & 0xff;
     }
     else {
         uint32_t id = frame->can_id & CAN_SFF_MASK;
+        /* cppcheck-suppress unreadVariable */
         esp_frame.standard.id[0] = (id >> 3) & 0xff;
+        /* cppcheck-suppress unreadVariable */
         esp_frame.standard.id[1] = (id << 5) & 0xff;
     }
 
@@ -289,7 +301,7 @@ static int _esp_can_send(candev_t *candev, const struct can_frame *frame)
 
 static int _esp_can_set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     assert(dev);
     assert(value);
@@ -342,7 +354,7 @@ static int _esp_can_set(candev_t *candev, canopt_t opt, void *value, size_t valu
 
 static int _esp_can_get(candev_t *candev, canopt_t opt, void *value, size_t max_len)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     DEBUG("%s\n", __func__);
 
@@ -435,7 +447,7 @@ static int _esp_can_get(candev_t *candev, canopt_t opt, void *value, size_t max_
 
 static int _esp_can_abort(candev_t *candev, const struct can_frame *frame)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     DEBUG("%s candev=%p frame=%p\n", __func__, candev, frame);
 
@@ -453,7 +465,7 @@ static int _esp_can_abort(candev_t *candev, const struct can_frame *frame)
 
 static int _esp_can_set_filter(candev_t *candev, const struct can_filter *filter)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     DEBUG("%s candev=%p filter=%p\n", __func__, candev, filter);
 
@@ -490,7 +502,7 @@ static int _esp_can_set_filter(candev_t *candev, const struct can_filter *filter
 
 static int _esp_can_remove_filter(candev_t *candev, const struct can_filter *filter)
 {
-    can_t *dev = (can_t *)candev;
+    can_t *dev = container_of(candev, can_t, candev);
 
     DEBUG("%s candev=%p filter=%p\n", __func__, candev, filter);
 
@@ -580,7 +592,7 @@ static int _esp_can_config(can_t *dev)
 
     /* route CAN interrupt source to CPU interrupt and enable it */
     intr_matrix_set(PRO_CPU_NUM, ETS_CAN_INTR_SOURCE, CPU_INUM_CAN);
-    xt_set_interrupt_handler(CPU_INUM_CAN, _esp_can_intr_handler, (void*)dev);
+    xt_set_interrupt_handler(CPU_INUM_CAN, _esp_can_intr_handler, (void*)(uintptr_t)dev);
     xt_ints_on(BIT(CPU_INUM_CAN));
 
     /* set bittiming from parameters as given in device data */
@@ -721,7 +733,7 @@ static int _esp_can_set_mode(can_t *dev, canopt_state_t state)
 
 static void IRAM_ATTR _esp_can_intr_handler(void *arg)
 {
-    can_t* dev = (can_t *)arg;
+    can_t* dev = (can_t *)(uintptr_t)arg;
 
     assert(arg);
 
@@ -768,15 +780,15 @@ static void IRAM_ATTR _esp_can_intr_handler(void *arg)
 
     /* enter to / return from ERROR_PASSIVE state */
     if (int_reg.err_passive) {
-
         /* enter to the ERROR_PASSIVE state when one of the error counters is >= 128 */
         if (CAN.tx_error_counter_reg.byte >= ESP_CAN_ERROR_PASSIVE_LIMIT ||
-            CAN.rx_error_counter_reg.byte >= ESP_CAN_ERROR_PASSIVE_LIMIT)
+            CAN.rx_error_counter_reg.byte >= ESP_CAN_ERROR_PASSIVE_LIMIT) {
             DEBUG("%s error passive interrupt %d %d\n", __func__,
                   CAN.tx_error_counter_reg.byte,
                   CAN.rx_error_counter_reg.byte);
             /* save the event */
             dev->events |= ESP_CAN_EVENT_ERROR_PASSIVE;
+        }
     }
 
     /*
@@ -904,10 +916,17 @@ static void _esp_can_set_bittiming(can_t *dev)
     can_bus_tim_0_reg_t reg_0;
     can_bus_tim_1_reg_t reg_1;
 
+    /* Again cppcheck gets off rails due to missing concept of union (see
+     * explanation above), so we suppress false unreadVariable here */
+    /* cppcheck-suppress unreadVariable */
     reg_0.baud_rate_prescaler = (timing->brp / 2) - 1;
+    /* cppcheck-suppress unreadVariable */
     reg_0.sync_jump_width = timing->sjw - 1;
+    /* cppcheck-suppress unreadVariable */
     reg_1.time_seg_1 = (timing->prop_seg + timing->phase_seg1) - 1;
+    /* cppcheck-suppress unreadVariable */
     reg_1.time_seg_2 = timing->phase_seg2 - 1;
+    /* cppcheck-suppress unreadVariable */
     reg_1.sampling = 0;
 
     _esp_can_set_reset_mode();
@@ -954,7 +973,7 @@ void can_init(can_t *dev, const can_conf_t *conf)
 
 void can_print_config(void)
 {
-    ets_printf("\tCAN_DEV(0)\ttxd=%d rxd=%d\n", CAN_TX, CAN_RX);
+    printf("\tCAN_DEV(0)\ttxd=%d rxd=%d\n", CAN_TX, CAN_RX);
 }
 
 /**@}*/

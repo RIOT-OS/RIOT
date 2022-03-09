@@ -21,10 +21,8 @@
  * @}
  */
 
-
 #include "cpu.h"
 #include "board.h"
-#include "stdio_uart.h"
 
 static void z1_ports_init(void)
 {
@@ -198,14 +196,10 @@ void msp430_init_dco(void)
     BCSCTL3 = XCAP_1;     /* default value for LFXT1 capacitor and frequency */
 }
 
-
 /* "public" specific initialization function for the Zolertia Z1 hardware */
 
 void board_init(void)
 {
-    /* init CPU core */
-    msp430_cpu_init();
-
     /* disable watchdog timer */
     WDTCTL     =  WDTPW + WDTHOLD;
 
@@ -214,9 +208,6 @@ void board_init(void)
 
     /* initializes DCO */
     msp430_init_dco();
-
-    /* initialize STDIO */
-    stdio_init();
 
     /* enable interrupts */
     __bis_SR_register(GIE);

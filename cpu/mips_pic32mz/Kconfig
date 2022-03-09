@@ -1,0 +1,36 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_FAM_PIC32MZ
+    bool
+    select CPU_COMMON_MIPS_PIC32
+    select CPU_CORE_M5101
+    select HAS_CPU_MIPS_PIC32MZ
+    select HAS_PERIPH_HWRNG
+
+## CPU Models
+config CPU_MODEL_P32MZ2048EFG100
+    bool
+    select CPU_FAM_PIC32MZ
+
+## Declaration of specific features
+config HAS_CPU_MIPS_PIC32MZ
+    bool
+    help
+        Indicates that a 'mips_pic32mz' cpu is being used.
+
+## Common CPU symbols
+config CPU_FAM
+    default "pic32mz" if CPU_FAM_PIC32MZ
+
+config CPU_MODEL
+    default "p32mz2048efg100" if CPU_MODEL_P32MZ2048EFG100
+
+config CPU
+    default "mips_pic32mz" if CPU_FAM_PIC32MZ
+
+source "$(RIOTCPU)/mips_pic32_common/Kconfig"

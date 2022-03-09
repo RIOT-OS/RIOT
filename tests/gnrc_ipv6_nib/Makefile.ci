@@ -5,13 +5,18 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-nano \
     arduino-uno \
     atmega328p \
-    chronos \
+    atmega328p-xplained-mini \
+    msb-430 \
+    msb-430h \
     nucleo-f031k6 \
     nucleo-f042k6 \
+    nucleo-l011k4 \
     nucleo-l031k6 \
+    samd10-xmini \
+    stk3200 \
     stm32f030f4-demo \
+    stm32g0316-disco \
     telosb \
     waspmote-pro \
-    wsn430-v1_3b \
-    wsn430-v1_4 \
+    z1 \
     #

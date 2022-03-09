@@ -51,7 +51,7 @@ main() {
     local output_dir
 
     # No 'realpath' in mac by default…
-    output_dir=$(python -c 'import os.path; print(os.path.abspath("'"$1"'"))')
+    output_dir=$(python3 -c 'import os.path; print(os.path.abspath("'"$1"'"))')
 
     for app in $(applications)
     do

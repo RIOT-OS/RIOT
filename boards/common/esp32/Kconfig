@@ -1,0 +1,20 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD_COMMON_ESP32
+    bool
+    select HAS_PERIPH_UART
+
+    select HAVE_SAUL_GPIO
+
+config MODULE_BOARDS_COMMON_ESP32
+    bool
+    depends on TEST_KCONFIG
+    depends on BOARD_COMMON_ESP32
+    depends on HAS_ARCH_ESP32
+    default y
+    help
+      Common ESP32 boards code.

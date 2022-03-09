@@ -22,7 +22,7 @@
 #include "lsm303dlhc.h"
 #include "lsm303dlhc-internal.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 #include "debug.h"
 
 #define DEV_I2C         (dev->params.i2c)
@@ -42,15 +42,13 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, const lsm303dlhc_params_t *params)
     int res;
     uint8_t tmp;
 
+    DEBUG("lsm303dlhc init...");
     /* Acquire exclusive access to the bus. */
     i2c_acquire(DEV_I2C);
 
-    DEBUG("lsm303dlhc reboot...");
+    /* reboot sensor */
     res = i2c_write_reg(DEV_I2C, DEV_ACC_ADDR,
                         LSM303DLHC_REG_CTRL5_A, LSM303DLHC_REG_CTRL5_A_BOOT, 0);
-    /* Release the bus for other threads. */
-    i2c_release(DEV_I2C);
-    DEBUG("[OK]\n");
 
     /* configure accelerometer */
     /* enable all three axis and set sample rate */
@@ -58,7 +56,6 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, const lsm303dlhc_params_t *params)
           | LSM303DLHC_CTRL1_A_YEN
           | LSM303DLHC_CTRL1_A_ZEN
           | DEV_ACC_RATE);
-    i2c_acquire(DEV_I2C);
     res += i2c_write_reg(DEV_I2C, DEV_ACC_ADDR,
                          LSM303DLHC_REG_CTRL1_A, tmp, 0);
     /* update on read, MSB @ low address, scale and high-resolution */
@@ -85,6 +82,12 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, const lsm303dlhc_params_t *params)
     i2c_release(DEV_I2C);
     /* configure mag data ready pin */
     gpio_init(DEV_MAG_PIN, GPIO_IN);
+    if (IS_ACTIVE(ENABLE_DEBUG) && res == 0) {
+        DEBUG("[OK]\n");
+    }
+    else {
+        DEBUG("[Failed]\n");
+    }
 
     return (res < 0) ? -1 : 0;
 }

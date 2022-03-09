@@ -1,0 +1,95 @@
+/**
+@defgroup    boards_6lowpan-clicker MikroE 6LoWPAN Clicker
+@ingroup     boards
+@brief       Support for the MikroE 6LoWPAN Clicker
+@deprecated  Will not be available after the 2022.07 release. This includes
+             all MIPS based boards and cpus.
+
+## Overview
+
+The `6lowpan clicker` is an evaluation board by Mikroe featuring a
+PIC32MX470F512H, a 6lowpan radio (CA810) by Cascoda and a Mikrobus
+socket for expansion boards.
+
+More general information on the board and related documentation can be found
+[here](https://www.mikroe.com/clicker-6lowpan). Schematics for the board can be
+found in the [manual](https://download.mikroe.com/documents/starter-boards/clicker/6lowpan/6lowpan-clicker-manual-v100.pdf).
+
+## Hardware
+
+### MCU
+
+| MCU        | PIC32MX470F512H      |
+|:---------- |:-------------------- |
+| Family     | PIC32MX (MIPS M4K)   |
+| Vendor     | Microchip            |
+| RAM        | 128KiB               |
+| Flash      | 512KiB               |
+| Frequency  | 120MHz               |
+| FPU        | no                   |
+| Timers     | 5 (all 16-bit)       |
+| ADCs       | 1x 28-channel 10-bit |
+| USB 2.0    | 1                    |
+| UARTs      | 4                    |
+| SPIs       | 2                    |
+| I2Cs       | 2                    |
+| RTC        | yes                  |
+| RNG        | no                   |
+| Vcc        | 2.3V - 3.6V          |
+| Datasheet  | [Datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/PIC32MX330350370430450470_Datasheet_DS60001185H.pdf) |
+
+
+### User Interface
+
+2 Buttons:
+
+| NAME   |  T1  |  T2 |
+|:-----  |:---  |:--- |
+| Pin    | RE7  | RB0 |
+
+2 LEDs:
+
+| NAME  | LD1 | LD2 |
+| ----- | --- | --- |
+| Color | red | red |
+| Pin   | RB1 | RB2 |
+
+## Implementation Status
+
+| Device           | ID              | Supported | Comments               |
+|:---------------- |:--------------- |:--------- |:---------------------- |
+| MCU              | pic32mx470f512h | partly    |                        |
+| Low-level driver | GPIO            | partly    | gpio_irq not supported |
+|                  | ADC             | no        |                        |
+|                  | PWM             | no        |                        |
+|                  | UART            | yes       |                        |
+|                  | I2C             | no        |                        |
+|                  | SPI             | no        |                        |
+|                  | USB             | no        |                        |
+|                  | RTT             | no        |                        |
+|                  | RTC             | no        |                        |
+|                  | Timer           | no        |                        |
+
+## Using UART
+
+This board doesn't open an UART or serial interface through the USB
+automatically, and the USB device driver hasn't been implemented to RIOT.
+Therefore, to open an UART interface one has to connect a usb/ttl converter to
+the UART3 pins RF5 (RX) and RF4 (TX) available on the Mikrobus socket.
+
+## Flashing the device
+
+There are two ways to flash the MCU:
+  * Using MPLAB-IPE and a PICkit 3 (The RIOT build generates a hexfile
+    compatible with MPLAB-IPE)
+  * Using pic32prog and a PICkit 2 or a PICkit 3 (other devices might be
+    supported by pic32prog but were not tested). This is the preferred option
+    as it makes possible to flash the device using `make flash` command.
+
+## Supported Toolchains
+
+For using the 6lowpan-clicker board we strongly recommend the usage of the
+[Codescape GNU Tools](https://codescape.mips.com) toolchain.
+
+
+ */

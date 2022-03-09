@@ -1,16 +1,31 @@
+include $(RIOTCPU)/efm32/efm32-info.mk
 include $(RIOTCPU)/efm32/efm32-features.mk
+
+CPU_CORE = $(EFM32_ARCHITECTURE)
+
+# families without MPU
+ifeq (,$(filter efm32zg efm32hg, $(CPU_FAM)))
+  FEATURES_PROVIDED += cortexm_mpu
+endif
 
 FEATURES_PROVIDED += arch_efm32
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_flashpage
-FEATURES_PROVIDED += periph_flashpage_raw
+FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
+FEATURES_PROVIDED += periph_rtt_set_counter
+FEATURES_PROVIDED += periph_rtt_overflow
+FEATURES_PROVIDED += periph_wdt
 
 FEATURES_CONFLICT += periph_rtc:periph_rtt
 FEATURES_CONFLICT_MSG += "On the EFM32, the RTC and RTT map to the same hardware peripheral."
 
-ifeq (1,$(EFM32_TNRG))
+ifeq (1,$(EFM32_TRNG))
   FEATURES_PROVIDED += periph_hwrng
+endif
+
+ifeq (1,$(EFM32_SERIES))
+  FEATURES_PROVIDED += periph_wdt_cb
 endif
 
 ifeq (1,$(EFM32_LEUART_ENABLED))
@@ -18,3 +33,10 @@ ifeq (1,$(EFM32_LEUART_ENABLED))
 endif
 
 include $(RIOTCPU)/cortexm_common/Makefile.features
+
+# Add efm32 configurations after including cortexm_common so efm32 takes precendence
+# This configuration enables modules that are only available when using Kconfig
+# module modelling
+ifeq (1,$(TEST_KCONFIG))
+  KCONFIG_CPU_CONFIG += $(RIOTCPU)/efm32/efm32.config
+endif

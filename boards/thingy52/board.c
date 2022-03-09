@@ -34,6 +34,4 @@ void board_init(void)
     gpio_set(VDD_PWR_CTRL_PIN);
 #endif
 
-    /* initialize the CPU */
-    cpu_init();
 }

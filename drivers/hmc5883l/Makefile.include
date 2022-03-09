@@ -1,0 +1,5 @@
+# interrupt variant of the HMC5883L driver
+PSEUDOMODULES += hmc5883l_int
+
+USEMODULE_INCLUDES_hmc5883l := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_hmc5883l)

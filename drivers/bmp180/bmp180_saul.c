@@ -23,7 +23,6 @@
 
 #include "saul.h"
 #include "bmp180.h"
-#include "xtimer.h"
 
 static int read_temperature(const void *dev, phydat_t *res)
 {

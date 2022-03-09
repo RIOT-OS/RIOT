@@ -41,7 +41,7 @@ extern "C" {
  * @name    Configure connected MPU-9150 device
  * @{
  */
-#define MPU9150_PARAM_COMP_ADDR   (0x0E)            /**< I2C address of the MPU9150 */
+#define MPU9X50_PARAM_COMP_ADDR   (0x0E)            /**< I2C address of the MPU9150 */
 /** @} */
 
 /**
@@ -77,11 +77,6 @@ extern "C" {
 #define BUTTON0_PIN         GPIO_PIN(PORT_B, 13)    /**< Pin of left button */
 #define BUTTON1_PIN         GPIO_PIN(PORT_A, 0)     /**< Pin of right button */
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

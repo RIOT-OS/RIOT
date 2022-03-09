@@ -21,7 +21,6 @@
 #ifndef TEST_UTILS_INTERACTIVE_SYNC_H
 #define TEST_UTILS_INTERACTIVE_SYNC_H
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -32,8 +31,11 @@ extern "C" {
  * @details Wait for a 's' character to return
  *
  */
+#ifdef MODULE_TEST_UTILS_INTERACTIVE_SYNC
 void test_utils_interactive_sync(void);
-
+#else
+static inline void test_utils_interactive_sync(void) {}
+#endif
 
 #ifdef __cplusplus
 }

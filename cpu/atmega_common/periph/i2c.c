@@ -22,15 +22,16 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdint.h>
 #include <errno.h>
+
 #include "cpu.h"
 #include "mutex.h"
-#include "assert.h"
 #include "periph/i2c.h"
 #include "periph_conf.h"
 
-#define ENABLE_DEBUG      (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define MT_START            0x08
@@ -41,7 +42,6 @@
 
 #define ATMEGA_I2C_FLAG_WRITE      0
 #define ATMEGA_I2C_FLAG_READ       1
-
 
 /* static function definitions */
 static int _start(uint8_t address, uint8_t rw_flag);
@@ -135,6 +135,7 @@ void i2c_init(i2c_t dev)
 int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len,
                    uint8_t flags)
 {
+    (void)dev;
     assert(dev < I2C_NUMOF);
 
     /* Check for unsupported operations */
@@ -184,6 +185,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len,
 int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
                     uint8_t flags)
 {
+    (void)dev;
     assert(dev < I2C_NUMOF);
 
     /* Check for unsupported operations */
@@ -218,12 +220,11 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
     return 0;
 }
 
-int i2c_acquire(i2c_t dev)
+void i2c_acquire(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
     mutex_lock(&locks[dev]);
-    return 0;
 }
 
 void i2c_release(i2c_t dev)
@@ -264,7 +265,6 @@ static int _start(uint8_t address, uint8_t rw_flag)
         _stop();
         return -1;
     }
-
 
     /* Load ADDRESS and R/W Flag into TWDR Register.
      * Clear TWINT bit in TWCR to start transmission of ADDRESS */

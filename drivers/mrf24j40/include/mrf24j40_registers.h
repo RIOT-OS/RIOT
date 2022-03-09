@@ -25,7 +25,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @name    SPI access specifiers
  * @{

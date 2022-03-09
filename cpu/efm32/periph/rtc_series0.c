@@ -34,7 +34,7 @@
 typedef struct {
     rtc_alarm_cb_t alarm_cb;        /**< callback called from RTC interrupt */
     void *alarm_arg;                /**< argument passed to the callback */
-    time_t alarm;                   /**< scheduled alarm (may be deferred) */
+    uint32_t alarm;                 /**< scheduled alarm (may be deferred) */
     uint8_t overflows;              /**< number of overflows */
 } rtc_state_t;
 
@@ -95,7 +95,7 @@ void rtc_init(void)
 
 int rtc_set_time(struct tm *time)
 {
-    time_t timestamp = mktime(time);
+    time_t timestamp = rtc_mktime(time);
 
     rtc_state.overflows = (timestamp >> RTC_SHIFT_VALUE);
     RTC->CNT = timestamp & RTC_MAX_VALUE;
@@ -109,7 +109,7 @@ int rtc_get_time(struct tm *time)
 
     timestamp = timestamp + (rtc_state.overflows << RTC_SHIFT_VALUE);
 
-    gmtime_r((time_t *) &timestamp, time);
+    rtc_localtime(timestamp, time);
 
     return 0;
 }
@@ -118,7 +118,7 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
     rtc_state.alarm_cb = cb;
     rtc_state.alarm_arg = arg;
-    rtc_state.alarm = mktime(time);
+    rtc_state.alarm = rtc_mktime(time);
 
     /* alarm may not be in reach of current time, so defer if needed */
     _set_alarm();
@@ -128,7 +128,7 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 
 int rtc_get_alarm(struct tm *time)
 {
-    gmtime_r((time_t *) &rtc_state.alarm, time);
+    rtc_localtime(rtc_state.alarm, time);
 
     return 0;
 }

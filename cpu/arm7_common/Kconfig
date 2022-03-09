@@ -1,0 +1,55 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_ARCH_ARMV4T
+    bool
+    select HAS_ARCH_32BIT
+    select HAS_ARCH_ARM
+    select HAS_CPP
+    select HAS_LIBSTDCPP
+    select MODULE_MALLOC_THREAD_SAFE if TEST_KCONFIG
+    select MODULE_PERIPH if TEST_KCONFIG
+    imply MODULE_NEWLIB_NANO
+
+config CPU_CORE_ARM7TDMI_S
+    bool
+    select CPU_ARCH_ARMV4T
+    select HAS_ARCH_ARM7
+    select HAS_PERIPH_PM
+    select HAS_PUF_SRAM
+    select HAS_SSP
+
+## Declaration of specific features
+config HAS_ARCH_ARM7
+    bool
+    select HAS_NEWLIB
+    select HAS_PICOLIBC
+    help
+        Indicates that the core is part of the ARM7 group of cores.
+
+## Common CPU symbols
+config CPU_ARCH
+    default "armv4t" if CPU_ARCH_ARMV4T
+
+config CPU_CORE
+    default "arm7tdmi_s" if CPU_CORE_ARM7TDMI_S
+
+config MODULE_ARM7_COMMON
+    bool
+    depends on TEST_KCONFIG
+    depends on MODULE_NEWLIB || MODULE_PICOLIBC
+    depends on HAS_ARCH_ARM7
+    default y
+    help
+      Common arm7 code.
+
+rsource "periph/Kconfig"
+
+choice LIBC_IMPLEMENTATION
+    default MODULE_NEWLIB
+    default MODULE_PICOLIBC
+endchoice

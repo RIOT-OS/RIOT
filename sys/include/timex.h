@@ -7,7 +7,6 @@
  * directory for more details.
  */
 
-
 /**
  * @defgroup    sys_timex Timex
  * @brief       Timestamp representation, computation, and conversion
@@ -23,40 +22,11 @@
 
 #include <stdint.h>
 #include <inttypes.h>
+#include "time_units.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief The number of microseconds per second
- */
-#define US_PER_SEC (1000000U)
-
-/**
- * @brief The number of seconds per minute
- */
-#define SEC_PER_MIN  (60U)
-
-/**
- * @brief The number of centiseconds per second
- */
-#define CS_PER_SEC   (100U)
-
-/**
- * @brief The number of milliseconds per second
- */
-#define MS_PER_SEC   (1000U)
-
-/**
- * @brief The number of microseconds per millisecond
- */
-#define US_PER_MS  (1000U)
-
-/**
- * @brief The number of nanoseconds per microsecond
- */
-#define NS_PER_US  (1000U)
 
 /**
  * @brief The maximum length of the string representation of a timex timestamp

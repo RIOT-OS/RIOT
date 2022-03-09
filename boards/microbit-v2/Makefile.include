@@ -1,0 +1,15 @@
+# for this board, flash with OpenOCD by default. PyOCD is also supported.
+PROGRAMMER ?= openocd
+PROGRAMMERS_SUPPORTED += pyocd
+
+# The board is not recognized automatically by pyocd, so the CPU target
+# option is passed explicitly
+PYOCD_FLASH_TARGET_TYPE ?= -t $(CPU)
+OPENOCD_DEBUG_ADAPTER = dap
+
+ifneq (,$(filter microbit,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBOARD)/common/microbit/include
+endif
+
+# include nrf52 boards common configuration
+include $(RIOTBOARD)/common/nrf52/Makefile.include

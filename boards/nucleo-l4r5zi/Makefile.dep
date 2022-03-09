@@ -1,3 +1,4 @@
-FEATURES_REQUIRED += periph_lpuart
-
+ifneq (,$(filter stdio_uart,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_lpuart
+endif
 include $(RIOTBOARD)/common/nucleo/Makefile.dep

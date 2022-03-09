@@ -1,0 +1,26 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_ESP_IDF
+    bool
+    depends on TEST_KCONFIG
+    depends on HAS_ARCH_ESP32
+    default y
+    select MODULE_ESP_IDF_DRIVER
+    select MODULE_ESP_IDF_ESP32
+    select MODULE_ESP_IDF_SOC
+    help
+      Espressif IoT Development Framework.
+
+rsource "driver/Kconfig"
+rsource "esp32/Kconfig"
+rsource "ethernet/Kconfig"
+rsource "heap/Kconfig"
+rsource "nvs_flash/Kconfig"
+rsource "soc/Kconfig"
+rsource "spi_flash/Kconfig"
+rsource "wpa_supplicant/Kconfig"

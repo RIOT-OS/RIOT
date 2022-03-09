@@ -26,7 +26,6 @@
 #include <stdint.h>
 
 #include "mutex.h"
-#include "xtimer.h"
 #include "periph/uart.h"
 #include "periph/gpio.h"
 #include "net/netdev.h"
@@ -73,12 +72,12 @@ extern "C" {
 /**
  * @brief   Default PAN ID used after initialization
  */
-#define XBEE_DEFAULT_PANID          (IEEE802154_DEFAULT_PANID)
+#define XBEE_DEFAULT_PANID          (CONFIG_IEEE802154_DEFAULT_PANID)
 
 /**
  * @brief   Default channel used after initialization
  */
-#define XBEE_DEFAULT_CHANNEL        (IEEE802154_DEFAULT_CHANNEL)
+#define XBEE_DEFAULT_CHANNEL        (CONFIG_IEEE802154_DEFAULT_CHANNEL)
 
 /**
  * @name    Address flags

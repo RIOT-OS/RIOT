@@ -1,0 +1,28 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "adafruit-clue" if BOARD_ADAFRUIT_CLUE
+
+config BOARD_ADAFRUIT_CLUE
+    bool
+    default y
+    select BOARD_COMMON_NRF52
+    select CPU_MODEL_NRF52840XXAA
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_UART
+    select HAS_PERIPH_USBDEV
+    select HAS_HIGHLEVEL_STDIO
+
+    select HAVE_APDS9960
+    select HAVE_BMP280_I2C
+    select HAVE_ILI9341
+    select HAVE_LIS3MDL
+    select HAVE_SAUL_GPIO
+    select HAVE_SHT3X
+
+source "$(RIOTBOARD)/common/nrf52/Kconfig"

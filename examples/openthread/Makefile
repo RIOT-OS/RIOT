@@ -4,7 +4,24 @@ APPLICATION = openthread
 BOARD ?= samr21-xpro
 
 # These are the boards that OpenThread stack has been tested on
-BOARD_WHITELIST := samr21-xpro iotlab-m3 fox iotlab-a8-m3
+BOARD_WHITELIST := \
+                    samr21-xpro \
+                    iotlab-m3 \
+                    iotlab-a8-m3 \
+                    frdm-kw41z \
+                    openlabs-kw41z-mini-256kib \
+                    openlabs-kw41z-mini \
+                    phynode-kw41z \
+                    usb-kw41z \
+                    cc2538dk \
+                    remote-reva \
+                    remote-revb \
+                    omote \
+                    openmote-cc2538 \
+                    nrf52840dk \
+                    nrf52840-mdk \
+                    reel \
+                    #
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
@@ -26,7 +43,9 @@ OPENTHREAD_TYPE ?= ftd
 USEMODULE += openthread-$(OPENTHREAD_TYPE)
 
 # Comment the following line in order to disable the OpenThread CLI
-USEMODULE += openthread-cli
+USEMODULE += openthread-cli-$(OPENTHREAD_TYPE)
+
+USEMODULE += netdev_default
 
 #Define PANID, CHANNEL and UART_BAUDRATE used by default
 OPENTHREAD_PANID ?= 0xbeef
@@ -40,6 +59,9 @@ ifneq (,$(filter samr21-xpro,$(BOARD)))
 endif
 ifneq (,$(filter iotlab-m3 fox iotlab-a8-m3,$(BOARD)))
   DRIVER := at86rf231
+endif
+ifneq (,$(filter frdm-kw41z openlabs-kw41z-mini-256kib openlabs-kw41z-mini phynode-kw41z usb-kw41z,$(BOARD)))
+  DRIVER := kw41zrf
 endif
 
 USEMODULE += $(DRIVER)

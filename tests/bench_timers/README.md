@@ -79,7 +79,6 @@ a test for xtimer.
 The application will mix calls to the following xtimer functions:
 
  - `_xtimer_set`
- - `_xtimer_set_absolute`
  - `_xtimer_periodic_wakeup`
  - `_xtimer_spin`
 

@@ -128,8 +128,6 @@ is_sensible_string(const unsigned char *s, int len)
     return 1;
 }
 
-
-
 /*
  * Read from serial, when we have a packet write it to tun. No output
  * buffering, input buffered by stdio.
@@ -254,7 +252,6 @@ after_fread:
 unsigned char slip_buf[2000];
 int slip_end, slip_begin;
 
-
 void
 slip_send(int fd, unsigned char c)
 {
@@ -334,7 +331,6 @@ write_to_serial(int outfd, void *inbuf, int len)
     slip_send(outfd, SLIP_END);
     PROGRESS("t");
 }
-
 
 /*
  * Read from tun, write to slip.
@@ -628,7 +624,6 @@ main(int argc, char **argv)
             err(1, "unknown baudrate %d", baudrate);
             break;
     }
-
 
     if (siodev != NULL) {
         slipfd = devopen(siodev, O_RDWR | O_NONBLOCK);

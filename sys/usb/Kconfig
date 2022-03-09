@@ -1,0 +1,113 @@
+# Copyright (c) 2019 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USB
+    bool "Configure USB"
+    depends on USEMODULE_USBUS
+    help
+        Configure the USB peripheral via Kconfig.
+
+if KCONFIG_USB
+
+menu "Power management"
+
+config USB_MAX_POWER
+    int "Reported maximum power draw [mA]"
+    default 100
+    range 0 500
+
+config USB_SELF_POWERED
+    bool "Report as self-powered device"
+    help
+        When enabled, the device advertises itself as a self-powered device to
+        the host computer.
+
+endmenu # Power management
+
+choice
+    bool "USB specification version"
+
+config USB_SPEC_BCDVERSION_2_0
+    bool "USB v2.0"
+    help
+        The peripheral acts as an USB version 2.0 device.
+
+config USB_SPEC_BCDVERSION_1_1
+    bool "USB v1.1"
+    help
+        The peripheral acts as an USB version 1.1 device.
+
+endchoice
+
+config USB_PID
+    hex "Product ID"
+    range 0x0000 0xFFFF
+    default 0x7D01
+    help
+        You must provide your own PID.
+
+config USB_VID
+    hex "Vendor ID"
+    range 0x0000 0xFFFF
+    default 0x1209
+    help
+        You must provide your own VID.
+
+config USB_MANUF_STR
+    string "Manufacturer string"
+    default "RIOT-os.org"
+
+config USB_PRODUCT_STR
+    string "Product string"
+    default "USB device"
+
+config USB_CONFIGURATION_STR
+    string "Configuration string"
+    default "USB config"
+
+config USB_PRODUCT_BCDVERSION
+    hex "Device version"
+    default 0x0100
+    help
+        This is the version number of this peripheral. Not to be confused with
+        the USB version number.
+
+config USB_DEFAULT_LANGID
+    hex "Reported string Language ID"
+    default 0x0409
+    help
+        The default value is EN-US (0x0409).
+
+config USB_CUSTOM_SERIAL_STR
+    bool "Configure a custom USB serial string"
+
+config USB_SERIAL_STR
+    string "Serial string"
+    depends on USB_CUSTOM_SERIAL_STR
+    help
+        USB peripheral serial string
+
+        Compile-time value to override the serial string with. An LUID-based hex
+        string is generated when this value is not used.
+
+        This string does not have to be a number, but it must be unique between
+        devices with identical VID:PID combination.
+
+config USB_SERIAL_BYTE_LENGTH
+    int "USB peripheral serial string length"
+    depends on !USB_CUSTOM_SERIAL_STR
+    range 0 63
+    default 8
+    help
+        The length here is in bytes. The generated hex string is twice as many chars
+        in length due to conversion from bytes to hex chars.
+
+comment "WARNING: The serial string is empty!"
+    depends on USB_SERIAL_STR = "" && USB_CUSTOM_SERIAL_STR
+
+endif # KCONFIG_USB
+
+rsource "usbus/Kconfig"

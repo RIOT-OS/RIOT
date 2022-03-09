@@ -1,4 +1,6 @@
-#!/bin/sh -e
+#!/usr/bin/env bash
+
+set -e
 
 [ "$GIT_CACHE_VERBOSE" != "1" ] && Q=-q
 
@@ -256,7 +258,7 @@ usage() {
 ACTION=$1
 shift 1
 
-export GIT_CACHE_DIR=${GIT_CACHE_DIR:-${HOME}/.gitcache}
+GIT_CACHE_DIR=${GIT_CACHE_DIR:-${HOME}/.gitcache}
 
 case $ACTION in
     init)

@@ -1,0 +1,25 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menu "Network Device Drivers"
+rsource "at86rf215/Kconfig"
+rsource "ata8520e/Kconfig"
+rsource "can_trx/Kconfig"
+rsource "cc110x/Kconfig"
+rsource "$(RIOTCPU)/cc2538/radio/Kconfig"
+rsource "$(RIOTCPU)/nrf5x_common/radio/Kconfig.nrf5x"
+rsource "dose/Kconfig"
+rsource "mcp2515/Kconfig"
+rsource "mrf24j40/Kconfig"
+rsource "ncv7356/Kconfig"
+rsource "pn532/Kconfig"
+rsource "rn2xx3/Kconfig"
+rsource "slipdev/Kconfig"
+rsource "$(RIOTCPU)/native/socket_zep/Kconfig"
+rsource "sx126x/Kconfig"
+rsource "sx127x/Kconfig"
+rsource "tja1042/Kconfig"
+endmenu # Network Device Drivers

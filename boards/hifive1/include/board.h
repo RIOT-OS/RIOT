@@ -28,6 +28,13 @@ extern "C" {
 #endif
 
 /**
+ * @name    Xtimer configuration
+ * @{
+ */
+#define XTIMER_HZ                   (32768UL)
+/** @} */
+
+/**
  * @name    Macros for controlling the on-board LEDs
  * @{
  */
@@ -47,11 +54,6 @@ extern "C" {
 #define LED2_OFF            gpio_set(LED2_PIN)
 #define LED2_TOGGLE         gpio_toggle(LED2_PIN)
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 /**
  * @brief   Initialize the board clock to use PLL and faster SPI access.

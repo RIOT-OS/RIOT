@@ -38,6 +38,16 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    ztimer configuration
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_TYPE    ZTIMER_TYPE_PERIPH_TIMER
+#define CONFIG_ZTIMER_USEC_DEV     TIMER_DEV(1)
+/* timer_set() may underflow for values smaller than 9, set 10 as margin */
+#define CONFIG_ZTIMER_USEC_MIN     (10)
+/** @} */
+
+/**
  * @name    AT86RF233 configuration
  *
  * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
@@ -94,11 +104,6 @@ enum {
 #define RFCTL_ANTENNA_DEFAULT      RFCTL_ANTENNA_BOARD
 #endif
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 /**
  * @brief   Set antenna switch

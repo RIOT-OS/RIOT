@@ -1,23 +1,11 @@
+INCLUDES += -I$(RIOTBOARD)/common/msb-430/include
+
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
 
 # setup flash tool
-PROGRAMMER ?= olimex
-MSPDEBUGFLAGS += -j $(PROGRAMMER)
-ifeq ($(strip $(PROGRAMMER)),uif)
-  MSPDEBUGFLAGS += -d $(PROG_DEV)
-endif
-FLASHER ?= mspdebug
-FLASHFILE ?= $(HEXFILE)
-FFLAGS = $(MSPDEBUGFLAGS) "prog $(FLASHFILE)"
+PROGRAMMER ?= mspdebug
+MSPDEBUG_PROGRAMMER ?= olimex
 
-# setup debugger
-DEBUGSERVER = $(FLASHER)
-DEBUGSERVER_FLAGS = $(MSPDEBUGFLAGS) gdb
-DEBUGGER = $(PREFIX)gdb
-DEBUGGER_FLAGS = --tui --ex="target remote localhost:2000" --ex "monitor reset halt" --ex load -ex "monitor reset halt"  $(ELFFILE)
-
-INCLUDES += -I$(RIOTBOARD)/common/msb-430/include
+PROGRAMMERS_SUPPORTED += mspdebug

@@ -26,9 +26,10 @@ extern "C" {
 /* ************************************************************************** */
 /*   CMSIS DEFINITIONS FOR CC2538 */
 /* ************************************************************************** */
-/** @addtogroup CC2538_cmsis CMSIS Definitions */
-/*@{*/
-
+/**
+ * @addtogroup CC2538_cmsis CMSIS Definitions
+ * @{
+ */
 /** Interrupt Number Definition */
 typedef enum IRQn
 {
@@ -86,7 +87,8 @@ typedef enum IRQn
     PERIPH_COUNT_IRQn     = (MACTIMER_IRQn + 1) /**< Number of peripheral IDs */
 } IRQn_Type;
 
-/** @name Cortex-M3 core interrupt handlers
+/**
+ * @name Cortex-M3 core interrupt handlers
  * @{
  */
 void Reset_Handler(void);        /**< Reset handler */
@@ -113,26 +115,23 @@ void SysTick_Handler(void);      /**< SysTick handler */
 /**
  * @brief CMSIS includes
  */
-
 #include <core_cm3.h>
-
-/*@}*/
+/** @} */
 
 #define IEEE_ADDR_MSWORD            ( *(const uint32_t*)0x00280028 ) /**< Most-significant 32 bits of the IEEE address */
 #define IEEE_ADDR_LSWORD            ( *(const uint32_t*)0x0028002c ) /**< Least-significant 32 bits of the IEEE address */
 
 typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IEEE address */
 
-/** @addtogroup cpu_specific_Peripheral_memory_map
-  * @{
-  */
-
+/**
+ * @addtogroup cpu_specific_Peripheral_memory_map
+ * @{
+ */
 #define FLASH_BASE                  0x00200000 /**< FLASH base address */
 #define SRAM_BASE                   0x20000000 /**< SRAM base address */
 #define PERIPH_BASE                 0x40000000 /**< Peripheral base address */
 
 #define SRAM_BB_BASE                0x22000000 /**< SRAM base address in the bit-band region */
-
 /** @} */
 
 /** @name CC2538 Special Function Registers
@@ -798,15 +797,17 @@ typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IE
 #define CCTEST_USBCTRL              ( *(cc2538_reg_t*)0x44010050 ) /**< CCTEST USB PHY stand-by control */
 /** @} */
 
-#define XOSC32M_FREQ                32000000 /**< 32 MHz external oscillator/clock frequency */
-#define RCOSC16M_FREQ               16000000 /**< 16 MHz internal RC oscillator frequency */
+#define XOSC32M_FREQ                32000000U /**< 32 MHz external oscillator/clock frequency */
+#define RCOSC16M_FREQ               16000000U /**< 16 MHz internal RC oscillator frequency */
 
-#define CC2538_VTOR_ALIGN                512 /**< CC2538 Vector Table alignment */
+#define XOSC32K_FREQ                   32768U /**< 32 KHz external oscillator/clock frequency */
+#define RCOSC32K_FREQ                  32753U /**< 32 KHz internal RC oscillator frequency */
+
+#define CC2538_VTOR_ALIGN                 512 /**< CC2538 Vector Table alignment */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* CC2538_H */
-
-/*@}*/
+/** @} */

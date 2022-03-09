@@ -1,0 +1,8 @@
+USEMODULE += cc26xx_cc13xx
+# Module includes functions for SetupTrimDevice,
+# only supported on cc26x0 family (for now).
+ifneq (,$(findstring cc26x0,$(CPU_MODEL)))
+  USEMODULE += cc26x0_driverlib
+endif
+
+include ${RIOTCPU}/cc26xx_cc13xx/Makefile.dep

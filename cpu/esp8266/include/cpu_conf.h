@@ -22,10 +22,25 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#include "cpu_conf_common.h"
 #include "xtensa_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+/**
+* @name    Clock configuration
+* @{
+*/
+
+#ifndef DOXYGEN
+/* Mapping of Kconfig defines to the respective enumeration values */
+#if CONFIG_ESP8266_CPU_FREQUENCY_80
+#define ESP8266_CPU_FREQUENCY   80
+#elif CONFIG_ESP8266_CPU_FREQUENCY_160
+#define ESP8266_CPU_FREQUENCY   160
+#endif
 #endif
 
 /**
@@ -36,6 +51,12 @@ extern "C" {
 #ifndef ESP8266_CPU_FREQUENCY
 #define ESP8266_CPU_FREQUENCY   (80)
 #endif
+
+/**
+ * @brief   Mapping configured ESP8266 default clock to CLOCK_CORECLOCK define
+ */
+#define CLOCK_CORECLOCK         (1000000UL * ESP8266_CPU_FREQUENCY)
+/** @} */
 
 /**
  * @name   Stack size configurations
@@ -63,6 +84,10 @@ extern "C" {
 
 #ifndef ESP_NOW_STACKSIZE
 #define ESP_NOW_STACKSIZE             (2560)
+#endif
+
+#ifndef TCPIP_THREAD_STACKSIZE
+#define TCPIP_THREAD_STACKSIZE        (3072)
 #endif
 /** @} */
 

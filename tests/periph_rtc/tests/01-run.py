@@ -21,29 +21,24 @@ def testfunc(child):
     alarm_count = int(child.match.group(1))
     child.expect(r'  Setting clock to   ({})'.format(DATE_PATTERN))
     clock_set = child.match.group(1)
-    if BOARD == 'native':
-        child.expect(r'.*rtc_set_time: not implemented')
     child.expect(r'Clock value is now   ({})'.format(DATE_PATTERN))
     clock_value = child.match.group(1)
-    if BOARD != 'native':
-        # Set clock is not implemented for native board so no need to compare
-        # clock values
-        assert clock_set == clock_value
+    assert clock_set == clock_value
 
     child.expect(r'  Setting alarm to   ({})'.format(DATE_PATTERN))
     alarm_set = child.match.group(1)
-    if BOARD == 'native':
-        child.expect(r'.*rtc_set_alarm: not implemented')
     child.expect(r'   Alarm is set to   ({})'.format(DATE_PATTERN))
     alarm_value = child.match.group(1)
-    if BOARD != 'native':
-        # Set alarm is not implemented for native board so no need to compare
-        # alarm values
-        assert alarm_set == alarm_value
+    assert alarm_set == alarm_value
 
-    if BOARD != 'native':
-        for _ in range(alarm_count):
-            child.expect_exact('Alarm!')
+    child.expect(r"  Alarm cleared at   ({})".format(DATE_PATTERN))
+    child.expect(r"       No alarm at   ({})".format(DATE_PATTERN))
+    no_alarm_value = child.match.group(1)
+    assert alarm_value == no_alarm_value
+
+    child.expect(r"  Setting alarm to   ({})".format(DATE_PATTERN))
+    for _ in range(alarm_count):
+        child.expect_exact('Alarm!')
 
 
 if __name__ == "__main__":

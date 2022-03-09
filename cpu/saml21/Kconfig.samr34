@@ -1,0 +1,17 @@
+## CPU Models
+config CPU_MODEL_SAMR34J16B
+    bool
+    select CPU_FAM_SAMR34
+
+config CPU_MODEL_SAMR34J17B
+    bool
+    select CPU_FAM_SAMR34
+
+config CPU_MODEL_SAMR34J18B
+    bool
+    select CPU_FAM_SAMR34
+
+config CPU_MODEL
+    default "samr34j16b" if CPU_MODEL_SAMR34J16B
+    default "samr34j17b" if CPU_MODEL_SAMR34J17B
+    default "samr34j18b" if CPU_MODEL_SAMR34J18B

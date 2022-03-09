@@ -1,0 +1,23 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "nrf52840-mdk" if BOARD_NRF52840_MDK
+
+config BOARD_NRF52840_MDK
+    bool
+    default y
+    select CPU_MODEL_NRF52840XXAA
+    select BOARD_COMMON_NRF52
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_UART
+    select HAS_PERIPH_USBDEV
+    select HAS_VDD_LC_FILTER_REG1
+
+    select HAVE_SAUL_GPIO
+
+source "$(RIOTBOARD)/common/nrf52/Kconfig"

@@ -1,0 +1,510 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU models
+config CPU_MODEL_STM32L010C6
+    bool
+    select CPU_LINE_STM32L010X6
+
+config CPU_MODEL_STM32L010F4
+    bool
+    select CPU_LINE_STM32L010X4
+
+config CPU_MODEL_STM32L010K4
+    bool
+    select CPU_LINE_STM32L010X4
+
+config CPU_MODEL_STM32L010K8
+    bool
+    select CPU_LINE_STM32L010X8
+
+config CPU_MODEL_STM32L010R8
+    bool
+    select CPU_LINE_STM32L010X8
+
+config CPU_MODEL_STM32L010RB
+    bool
+    select CPU_LINE_STM32L010XB
+
+config CPU_MODEL_STM32L011D3
+    bool
+    select CPU_LINE_STM32L011XX
+
+config CPU_MODEL_STM32L011D4
+    bool
+    select CPU_LINE_STM32L011XX
+
+config CPU_MODEL_STM32L011E3
+    bool
+    select CPU_LINE_STM32L011XX
+
+config CPU_MODEL_STM32L011E4
+    bool
+    select CPU_LINE_STM32L011XX
+
+config CPU_MODEL_STM32L011F3
+    bool
+    select CPU_LINE_STM32L011XX
+
+config CPU_MODEL_STM32L011F4
+    bool
+    select CPU_LINE_STM32L011XX
+
+config CPU_MODEL_STM32L011G3
+    bool
+    select CPU_LINE_STM32L011XX
+
+config CPU_MODEL_STM32L011G4
+    bool
+    select CPU_LINE_STM32L011XX
+
+config CPU_MODEL_STM32L011K3
+    bool
+    select CPU_LINE_STM32L011XX
+
+config CPU_MODEL_STM32L011K4
+    bool
+    select CPU_LINE_STM32L011XX
+
+config CPU_MODEL_STM32L021D4
+    bool
+    select CPU_LINE_STM32L021XX
+
+config CPU_MODEL_STM32L021F4
+    bool
+    select CPU_LINE_STM32L021XX
+
+config CPU_MODEL_STM32L021G4
+    bool
+    select CPU_LINE_STM32L021XX
+
+config CPU_MODEL_STM32L021K4
+    bool
+    select CPU_LINE_STM32L021XX
+
+config CPU_MODEL_STM32L031C4
+    bool
+    select CPU_LINE_STM32L031XX
+
+config CPU_MODEL_STM32L031C6
+    bool
+    select CPU_LINE_STM32L031XX
+
+config CPU_MODEL_STM32L031E4
+    bool
+    select CPU_LINE_STM32L031XX
+
+config CPU_MODEL_STM32L031E6
+    bool
+    select CPU_LINE_STM32L031XX
+
+config CPU_MODEL_STM32L031F4
+    bool
+    select CPU_LINE_STM32L031XX
+
+config CPU_MODEL_STM32L031F6
+    bool
+    select CPU_LINE_STM32L031XX
+
+config CPU_MODEL_STM32L031G4
+    bool
+    select CPU_LINE_STM32L031XX
+
+config CPU_MODEL_STM32L031G6
+    bool
+    select CPU_LINE_STM32L031XX
+
+config CPU_MODEL_STM32L031K4
+    bool
+    select CPU_LINE_STM32L031XX
+
+config CPU_MODEL_STM32L031K6
+    bool
+    select CPU_LINE_STM32L031XX
+
+config CPU_MODEL_STM32L041C6
+    bool
+    select CPU_LINE_STM32L041XX
+
+config CPU_MODEL_STM32L041E6
+    bool
+    select CPU_LINE_STM32L041XX
+
+config CPU_MODEL_STM32L041F6
+    bool
+    select CPU_LINE_STM32L041XX
+
+config CPU_MODEL_STM32L041G6
+    bool
+    select CPU_LINE_STM32L041XX
+
+config CPU_MODEL_STM32L041K6
+    bool
+    select CPU_LINE_STM32L041XX
+
+config CPU_MODEL_STM32L051C6
+    bool
+    select CPU_LINE_STM32L051XX
+
+config CPU_MODEL_STM32L051C8
+    bool
+    select CPU_LINE_STM32L051XX
+
+config CPU_MODEL_STM32L051K6
+    bool
+    select CPU_LINE_STM32L051XX
+
+config CPU_MODEL_STM32L051K8
+    bool
+    select CPU_LINE_STM32L051XX
+
+config CPU_MODEL_STM32L051R6
+    bool
+    select CPU_LINE_STM32L051XX
+
+config CPU_MODEL_STM32L051R8
+    bool
+    select CPU_LINE_STM32L051XX
+
+config CPU_MODEL_STM32L051T6
+    bool
+    select CPU_LINE_STM32L051XX
+
+config CPU_MODEL_STM32L051T8
+    bool
+    select CPU_LINE_STM32L051XX
+
+config CPU_MODEL_STM32L052C6
+    bool
+    select CPU_LINE_STM32L052XX
+
+config CPU_MODEL_STM32L052C8
+    bool
+    select CPU_LINE_STM32L052XX
+
+config CPU_MODEL_STM32L052K6
+    bool
+    select CPU_LINE_STM32L052XX
+
+config CPU_MODEL_STM32L052K8
+    bool
+    select CPU_LINE_STM32L052XX
+
+config CPU_MODEL_STM32L052R6
+    bool
+    select CPU_LINE_STM32L052XX
+
+config CPU_MODEL_STM32L052R8
+    bool
+    select CPU_LINE_STM32L052XX
+
+config CPU_MODEL_STM32L052T6
+    bool
+    select CPU_LINE_STM32L052XX
+
+config CPU_MODEL_STM32L052T8
+    bool
+    select CPU_LINE_STM32L052XX
+
+config CPU_MODEL_STM32L053C6
+    bool
+    select CPU_LINE_STM32L053XX
+
+config CPU_MODEL_STM32L053C8
+    bool
+    select CPU_LINE_STM32L053XX
+
+config CPU_MODEL_STM32L053R6
+    bool
+    select CPU_LINE_STM32L053XX
+
+config CPU_MODEL_STM32L053R8
+    bool
+    select CPU_LINE_STM32L053XX
+
+config CPU_MODEL_STM32L062C8
+    bool
+    select CPU_LINE_STM32L062XX
+
+config CPU_MODEL_STM32L062K8
+    bool
+    select CPU_LINE_STM32L062XX
+
+config CPU_MODEL_STM32L063C8
+    bool
+    select CPU_LINE_STM32L063XX
+
+config CPU_MODEL_STM32L063R8
+    bool
+    select CPU_LINE_STM32L063XX
+
+config CPU_MODEL_STM32L071C8
+    bool
+    select CPU_LINE_STM32L071XX
+
+config CPU_MODEL_STM32L071CB
+    bool
+    select CPU_LINE_STM32L071XX
+
+config CPU_MODEL_STM32L071CZ
+    bool
+    select CPU_LINE_STM32L071XX
+
+config CPU_MODEL_STM32L071K8
+    bool
+    select CPU_LINE_STM32L071XX
+
+config CPU_MODEL_STM32L071KB
+    bool
+    select CPU_LINE_STM32L071XX
+
+config CPU_MODEL_STM32L071KZ
+    bool
+    select CPU_LINE_STM32L071XX
+
+config CPU_MODEL_STM32L071RB
+    bool
+    select CPU_LINE_STM32L071XX
+
+config CPU_MODEL_STM32L071RZ
+    bool
+    select CPU_LINE_STM32L071XX
+
+config CPU_MODEL_STM32L071V8
+    bool
+    select CPU_LINE_STM32L071XX
+
+config CPU_MODEL_STM32L071VB
+    bool
+    select CPU_LINE_STM32L071XX
+
+config CPU_MODEL_STM32L071VZ
+    bool
+    select CPU_LINE_STM32L071XX
+
+config CPU_MODEL_STM32L072CB
+    bool
+    select CPU_LINE_STM32L072XX
+
+config CPU_MODEL_STM32L072CZ
+    bool
+    select CPU_LINE_STM32L072XX
+
+config CPU_MODEL_STM32L072KB
+    bool
+    select CPU_LINE_STM32L072XX
+
+config CPU_MODEL_STM32L072KZ
+    bool
+    select CPU_LINE_STM32L072XX
+
+config CPU_MODEL_STM32L072RB
+    bool
+    select CPU_LINE_STM32L072XX
+
+config CPU_MODEL_STM32L072RZ
+    bool
+    select CPU_LINE_STM32L072XX
+
+config CPU_MODEL_STM32L072V8
+    bool
+    select CPU_LINE_STM32L072XX
+
+config CPU_MODEL_STM32L072VB
+    bool
+    select CPU_LINE_STM32L072XX
+
+config CPU_MODEL_STM32L072VZ
+    bool
+    select CPU_LINE_STM32L072XX
+
+config CPU_MODEL_STM32L073CB
+    bool
+    select CPU_LINE_STM32L073XX
+
+config CPU_MODEL_STM32L073CZ
+    bool
+    select CPU_LINE_STM32L073XX
+
+config CPU_MODEL_STM32L073RB
+    bool
+    select CPU_LINE_STM32L073XX
+
+config CPU_MODEL_STM32L073RZ
+    bool
+    select CPU_LINE_STM32L073XX
+
+config CPU_MODEL_STM32L073V8
+    bool
+    select CPU_LINE_STM32L073XX
+
+config CPU_MODEL_STM32L073VB
+    bool
+    select CPU_LINE_STM32L073XX
+
+config CPU_MODEL_STM32L073VZ
+    bool
+    select CPU_LINE_STM32L073XX
+
+config CPU_MODEL_STM32L081CB
+    bool
+    select CPU_LINE_STM32L081XX
+
+config CPU_MODEL_STM32L081CZ
+    bool
+    select CPU_LINE_STM32L081XX
+
+config CPU_MODEL_STM32L081KZ
+    bool
+    select CPU_LINE_STM32L081XX
+
+config CPU_MODEL_STM32L082CZ
+    bool
+    select CPU_LINE_STM32L082XX
+
+config CPU_MODEL_STM32L082KB
+    bool
+    select CPU_LINE_STM32L082XX
+
+config CPU_MODEL_STM32L082KZ
+    bool
+    select CPU_LINE_STM32L082XX
+
+config CPU_MODEL_STM32L083CB
+    bool
+    select CPU_LINE_STM32L083XX
+
+config CPU_MODEL_STM32L083CZ
+    bool
+    select CPU_LINE_STM32L083XX
+
+config CPU_MODEL_STM32L083RB
+    bool
+    select CPU_LINE_STM32L083XX
+
+config CPU_MODEL_STM32L083RZ
+    bool
+    select CPU_LINE_STM32L083XX
+
+config CPU_MODEL_STM32L083V8
+    bool
+    select CPU_LINE_STM32L083XX
+
+config CPU_MODEL_STM32L083VB
+    bool
+    select CPU_LINE_STM32L083XX
+
+config CPU_MODEL_STM32L083VZ
+    bool
+    select CPU_LINE_STM32L083XX
+
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32l010c6" if CPU_MODEL_STM32L010C6
+    default "stm32l010f4" if CPU_MODEL_STM32L010F4
+    default "stm32l010k4" if CPU_MODEL_STM32L010K4
+    default "stm32l010k8" if CPU_MODEL_STM32L010K8
+    default "stm32l010r8" if CPU_MODEL_STM32L010R8
+    default "stm32l010rb" if CPU_MODEL_STM32L010RB
+    default "stm32l011d3" if CPU_MODEL_STM32L011D3
+    default "stm32l011d4" if CPU_MODEL_STM32L011D4
+    default "stm32l011e3" if CPU_MODEL_STM32L011E3
+    default "stm32l011e4" if CPU_MODEL_STM32L011E4
+    default "stm32l011f3" if CPU_MODEL_STM32L011F3
+    default "stm32l011f4" if CPU_MODEL_STM32L011F4
+    default "stm32l011g3" if CPU_MODEL_STM32L011G3
+    default "stm32l011g4" if CPU_MODEL_STM32L011G4
+    default "stm32l011k3" if CPU_MODEL_STM32L011K3
+    default "stm32l011k4" if CPU_MODEL_STM32L011K4
+    default "stm32l021d4" if CPU_MODEL_STM32L021D4
+    default "stm32l021f4" if CPU_MODEL_STM32L021F4
+    default "stm32l021g4" if CPU_MODEL_STM32L021G4
+    default "stm32l021k4" if CPU_MODEL_STM32L021K4
+    default "stm32l031c4" if CPU_MODEL_STM32L031C4
+    default "stm32l031c6" if CPU_MODEL_STM32L031C6
+    default "stm32l031e4" if CPU_MODEL_STM32L031E4
+    default "stm32l031e6" if CPU_MODEL_STM32L031E6
+    default "stm32l031f4" if CPU_MODEL_STM32L031F4
+    default "stm32l031f6" if CPU_MODEL_STM32L031F6
+    default "stm32l031g4" if CPU_MODEL_STM32L031G4
+    default "stm32l031g6" if CPU_MODEL_STM32L031G6
+    default "stm32l031k4" if CPU_MODEL_STM32L031K4
+    default "stm32l031k6" if CPU_MODEL_STM32L031K6
+    default "stm32l041c6" if CPU_MODEL_STM32L041C6
+    default "stm32l041e6" if CPU_MODEL_STM32L041E6
+    default "stm32l041f6" if CPU_MODEL_STM32L041F6
+    default "stm32l041g6" if CPU_MODEL_STM32L041G6
+    default "stm32l041k6" if CPU_MODEL_STM32L041K6
+    default "stm32l051c6" if CPU_MODEL_STM32L051C6
+    default "stm32l051c8" if CPU_MODEL_STM32L051C8
+    default "stm32l051k6" if CPU_MODEL_STM32L051K6
+    default "stm32l051k8" if CPU_MODEL_STM32L051K8
+    default "stm32l051r6" if CPU_MODEL_STM32L051R6
+    default "stm32l051r8" if CPU_MODEL_STM32L051R8
+    default "stm32l051t6" if CPU_MODEL_STM32L051T6
+    default "stm32l051t8" if CPU_MODEL_STM32L051T8
+    default "stm32l052c6" if CPU_MODEL_STM32L052C6
+    default "stm32l052c8" if CPU_MODEL_STM32L052C8
+    default "stm32l052k6" if CPU_MODEL_STM32L052K6
+    default "stm32l052k8" if CPU_MODEL_STM32L052K8
+    default "stm32l052r6" if CPU_MODEL_STM32L052R6
+    default "stm32l052r8" if CPU_MODEL_STM32L052R8
+    default "stm32l052t6" if CPU_MODEL_STM32L052T6
+    default "stm32l052t8" if CPU_MODEL_STM32L052T8
+    default "stm32l053c6" if CPU_MODEL_STM32L053C6
+    default "stm32l053c8" if CPU_MODEL_STM32L053C8
+    default "stm32l053r6" if CPU_MODEL_STM32L053R6
+    default "stm32l053r8" if CPU_MODEL_STM32L053R8
+    default "stm32l062c8" if CPU_MODEL_STM32L062C8
+    default "stm32l062k8" if CPU_MODEL_STM32L062K8
+    default "stm32l063c8" if CPU_MODEL_STM32L063C8
+    default "stm32l063r8" if CPU_MODEL_STM32L063R8
+    default "stm32l071c8" if CPU_MODEL_STM32L071C8
+    default "stm32l071cb" if CPU_MODEL_STM32L071CB
+    default "stm32l071cz" if CPU_MODEL_STM32L071CZ
+    default "stm32l071k8" if CPU_MODEL_STM32L071K8
+    default "stm32l071kb" if CPU_MODEL_STM32L071KB
+    default "stm32l071kz" if CPU_MODEL_STM32L071KZ
+    default "stm32l071rb" if CPU_MODEL_STM32L071RB
+    default "stm32l071rz" if CPU_MODEL_STM32L071RZ
+    default "stm32l071v8" if CPU_MODEL_STM32L071V8
+    default "stm32l071vb" if CPU_MODEL_STM32L071VB
+    default "stm32l071vz" if CPU_MODEL_STM32L071VZ
+    default "stm32l072cb" if CPU_MODEL_STM32L072CB
+    default "stm32l072cz" if CPU_MODEL_STM32L072CZ
+    default "stm32l072kb" if CPU_MODEL_STM32L072KB
+    default "stm32l072kz" if CPU_MODEL_STM32L072KZ
+    default "stm32l072rb" if CPU_MODEL_STM32L072RB
+    default "stm32l072rz" if CPU_MODEL_STM32L072RZ
+    default "stm32l072v8" if CPU_MODEL_STM32L072V8
+    default "stm32l072vb" if CPU_MODEL_STM32L072VB
+    default "stm32l072vz" if CPU_MODEL_STM32L072VZ
+    default "stm32l073cb" if CPU_MODEL_STM32L073CB
+    default "stm32l073cz" if CPU_MODEL_STM32L073CZ
+    default "stm32l073rb" if CPU_MODEL_STM32L073RB
+    default "stm32l073rz" if CPU_MODEL_STM32L073RZ
+    default "stm32l073v8" if CPU_MODEL_STM32L073V8
+    default "stm32l073vb" if CPU_MODEL_STM32L073VB
+    default "stm32l073vz" if CPU_MODEL_STM32L073VZ
+    default "stm32l081cb" if CPU_MODEL_STM32L081CB
+    default "stm32l081cz" if CPU_MODEL_STM32L081CZ
+    default "stm32l081kz" if CPU_MODEL_STM32L081KZ
+    default "stm32l082cz" if CPU_MODEL_STM32L082CZ
+    default "stm32l082kb" if CPU_MODEL_STM32L082KB
+    default "stm32l082kz" if CPU_MODEL_STM32L082KZ
+    default "stm32l083cb" if CPU_MODEL_STM32L083CB
+    default "stm32l083cz" if CPU_MODEL_STM32L083CZ
+    default "stm32l083rb" if CPU_MODEL_STM32L083RB
+    default "stm32l083rz" if CPU_MODEL_STM32L083RZ
+    default "stm32l083v8" if CPU_MODEL_STM32L083V8
+    default "stm32l083vb" if CPU_MODEL_STM32L083VB
+    default "stm32l083vz" if CPU_MODEL_STM32L083VZ

@@ -20,7 +20,11 @@
 #ifndef NET_NETDEV_IEEE802154_H
 #define NET_NETDEV_IEEE802154_H
 
+#include "net/eui_provider.h"
 #include "net/ieee802154.h"
+#if IS_USED(MODULE_IEEE802154_SECURITY)
+#include "net/ieee802154_security.h"
+#endif
 #include "net/gnrc/nettype.h"
 #include "net/netopt.h"
 #include "net/netdev.h"
@@ -62,6 +66,13 @@ extern "C" {
 /**
  * @}
  */
+
+ /**
+ * @name    Flags for use in @ref netdev_ieee802154_rx_info::flags
+ * @{
+ */
+#define NETDEV_RX_IEEE802154_INFO_FLAG_TIMESTAMP       (0x01)  /**< Timestamp valid */
+/** @} */
 
 /**
  * @brief   Option parameter to be used with @ref NETOPT_CCA_MODE to set
@@ -115,13 +126,24 @@ typedef struct {
     uint8_t page;                           /**< channel page */
     uint16_t flags;                         /**< flags as defined above */
     int16_t txpower;                        /**< tx power in dBm */
+#if IS_USED(MODULE_IEEE802154_SECURITY) || defined(DOXYGEN)
+    ieee802154_sec_context_t sec_ctx;       /**< security context */
+#endif
     /** @} */
 } netdev_ieee802154_t;
 
 /**
  * @brief   Received packet status information for IEEE 802.15.4 radios
  */
-typedef struct netdev_radio_rx_info netdev_ieee802154_rx_info_t;
+typedef struct netdev_ieee802154_rx_info {
+    uint64_t timestamp;     /**< Timestamp value of a received frame in ns */
+    int16_t rssi;           /**< RSSI of a received frame in dBm */
+    uint8_t lqi;            /**< LQI of a received frame */
+    uint8_t flags;          /**< Flags e.g. used to mark other fields as valid */
+#if IS_USED(MODULE_SOCK_AUX_TIMESTAP)
+    uint64_t timestamp;     /**< Timestamp value of a received frame in ns */
+#endif
+} netdev_ieee802154_rx_info_t;
 
 /**
  * @brief   Reset function for ieee802154 common fields
@@ -132,7 +154,6 @@ typedef struct netdev_radio_rx_info netdev_ieee802154_rx_info_t;
  * @param[in]   dev     network device descriptor
  */
 void netdev_ieee802154_reset(netdev_ieee802154_t *dev);
-
 
 /**
  * @brief   Fallback function for netdev IEEE 802.15.4 devices' _get function
@@ -186,6 +207,9 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
  * this function is meant top be used by drivers that do not support address
  * filtering in hw
  *
+ * @deprecated  This function is currently deprecated and will be removed
+ * after Release 2022.01. Use @ref ieee802154_dst_filter instead.
+ *
  * @param[in] dev       network device descriptor
  * @param[in] mhr       mac header
  *
@@ -193,6 +217,25 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
  * @return 1            fails if packet is not for the device or pan
  */
 int netdev_ieee802154_dst_filter(netdev_ieee802154_t *dev, const uint8_t *mhr);
+
+/**
+ * @brief   Configure the hardware address of a IEEE 802.15.4 devices
+ *
+ * This will obtain a long and short address based on the netdev ID.
+ * The addresses is stored in the netdev's `long_addr` & `short_addr`.
+ * The caller must take care of writing them to the hardware.
+ *
+ * @pre the netdev registered itself with @see netdev_register
+ *
+ * @param[out]  dev     Netdev to configure
+ */
+static inline void netdev_ieee802154_setup(netdev_ieee802154_t *dev)
+{
+    /* generate EUI-64 and short address */
+    netdev_eui64_get(&dev->netdev, (eui64_t *)&dev->long_addr);
+    eui_short_from_eui64((eui64_t *)&dev->long_addr,
+                         (network_uint16_t *)&dev->short_addr);
+}
 
 #ifdef __cplusplus
 }

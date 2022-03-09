@@ -1,0 +1,26 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "atmega256rfr2-xpro" if BOARD_ATMEGA256RFR2_XPRO
+
+config BOARD_ATMEGA256RFR2_XPRO
+    bool
+    default y
+    select CPU_MODEL_ATMEGA256RFR2
+    select HAS_PERIPH_ADC
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_RTC
+    select HAS_PERIPH_RTT
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+
+    select HAVE_SAUL_GPIO
+    select HAVE_AT30TSE75X
+    select MODULE_BOARDS_COMMON_ATMEGA if TEST_KCONFIG
+
+source "$(RIOTBOARD)/common/atmega/Kconfig"

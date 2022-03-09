@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_hd44780 HD44780 LCD driver
- * @ingroup     drivers_actuators
+ * @ingroup     drivers_display
  * @brief       Driver for the Hitachi HD44780 LCD driver
  *
  * @note        The driver currently supports direct addressing, no I2C

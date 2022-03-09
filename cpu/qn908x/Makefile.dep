@@ -1,0 +1,22 @@
+# In some cases, peripheral modules use vendor provided driver modules such as
+# the vendor_fsl_clock. This file defines the dependencies between these periph
+# modules and the vendor modules.
+USEMODULE += vendor
+
+# The clock functionality is used by most modules, including cpu.c even when
+# no peripheral module is being used.
+USEMODULE += vendor_fsl_clock
+
+# All peripherals use gpio_mux.h
+USEMODULE += periph_gpio_mux
+
+ifneq (,$(filter periph_uart periph_i2c periph_spi,$(USEMODULE)))
+  USEMODULE += periph_flexcomm
+endif
+
+ifneq (,$(filter periph_adc,$(USEMODULE)))
+  USEMODULE += ztimer
+  USEMODULE += ztimer_usec
+endif
+
+include $(RIOTCPU)/cortexm_common/Makefile.dep

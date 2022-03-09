@@ -1,0 +1,15 @@
+USEMODULE += cc1xxx_common
+USEMODULE += luid
+USEMODULE += xtimer
+FEATURES_REQUIRED += periph_gpio
+FEATURES_REQUIRED += periph_gpio_irq
+FEATURES_REQUIRED += periph_spi
+
+ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan
+endif
+
+# default to 433 MHz operation
+ifeq (,$(filter cc110x_%mhz,$(USEMODULE)))
+  USEMODULE += cc110x_433mhz
+endif

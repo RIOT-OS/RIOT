@@ -21,7 +21,6 @@
 
 #include "saul.h"
 #include "tsl2561.h"
-#include "xtimer.h"
 
 static int read_illuminance(const void *dev, phydat_t *res)
 {

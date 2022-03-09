@@ -1,0 +1,2 @@
+USEMODULE += test_utils_result_output_check
+USEMODULE += test_utils_result_output

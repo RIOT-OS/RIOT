@@ -13,21 +13,21 @@
  * @file
  *
  * The test application demonstrates the use of the CCS811 and pseudomodule
- * ```ccs811_full``` using
+ * `ccs811_full` using
  *
- * - data-ready interrupt ```CCS811_INT_DATA_READY``` and
+ * - data-ready interrupt `CCS811_INT_DATA_READY` and
  * - default configuration parameters, that is, the measurement mode
- *   ```CCS811_MODE_1S``` with one measurement per second.
+ *   `CCS811_MODE_1S` with one measurement per second.
  *
  * The default configuration parameter for the interrupt pin has to be
  * overridden according to the hardware configuration by defining
- * ```CCS811_PARAM_INT_PIN``` before ```ccs811_params.h``` is included, e.g.,
+ * `CCS811_PARAM_INT_PIN` before `ccs811_params.h` is included, e.g.,
  * ```
  * #define CCS811_PARAM_INT_PIN     (GPIO_PIN(0, 7))
  * ```
  * or via the CFLAGS variable in the make command.
  * ```
- * CFLAGS="-DCCS811_PARAM_INT_PIN=\(GPIO_PIN\(0,7\)\)" make -C tests/driver_ccs811 BOARD=...
+ * CFLAGS="-DCCS811_PARAM_INT_PIN=GPIO_PIN\(0,7\)" make -C tests/driver_ccs811_full BOARD=...
  * ```
  */
 
@@ -35,7 +35,6 @@
 #include <string.h>
 
 #include "thread.h"
-#include "xtimer.h"
 
 #include "ccs811.h"
 #include "ccs811_params.h"
@@ -75,7 +74,7 @@ int main(void)
     }
 
     /* save the pid of main thread */
-    p_main = sched_active_pid;
+    p_main = thread_getpid();
 
     printf("\n+--------Starting Measurements--------+\n");
 
@@ -89,7 +88,7 @@ int main(void)
         msg_receive(&msg);
 
         /* read the data */
-        if (ccs811_read_iaq(&sensor, &tvoc, &eco2, 0, 0) != CCS811_OK) {
+        if (ccs811_read_iaq(&sensor, &tvoc, &eco2, 0, 0) == CCS811_OK) {
             /* print values */
             printf("TVOC [ppb]: %d\neCO2 [ppm]: %d\n", tvoc, eco2);
             puts("+-------------------------------------+");

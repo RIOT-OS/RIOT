@@ -1,0 +1,74 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU lines
+config CPU_LINE_STM32F301X8
+    bool
+    select CPU_FAM_F3
+
+config CPU_LINE_STM32F302X8
+    bool
+    select CPU_FAM_F3
+
+config CPU_LINE_STM32F302XC
+    bool
+    select CPU_FAM_F3
+    select CLOCK_HAS_NO_MCO_PRE
+
+config CPU_LINE_STM32F302XE
+    bool
+    select CPU_FAM_F3
+
+config CPU_LINE_STM32F303X8
+    bool
+    select CPU_FAM_F3
+
+config CPU_LINE_STM32F303XC
+    bool
+    select CPU_FAM_F3
+    select HAS_CORTEXM_MPU
+    select CLOCK_HAS_NO_MCO_PRE
+
+config CPU_LINE_STM32F303XE
+    bool
+    select CPU_FAM_F3
+    select HAS_CORTEXM_MPU
+
+config CPU_LINE_STM32F318XX
+    bool
+    select CPU_FAM_F3
+
+config CPU_LINE_STM32F328XX
+    bool
+    select CPU_FAM_F3
+
+config CPU_LINE_STM32F334X8
+    bool
+    select CPU_FAM_F3
+
+config CPU_LINE_STM32F358XX
+    bool
+    select CPU_FAM_F3
+    select CLOCK_HAS_NO_MCO_PRE
+
+config CPU_LINE_STM32F373XC
+    bool
+    select CPU_FAM_F3
+    select CLOCK_HAS_NO_MCO_PRE
+
+config CPU_LINE_STM32F378XX
+    bool
+    select CPU_FAM_F3
+    select CLOCK_HAS_NO_MCO_PRE
+
+config CPU_LINE_STM32F398XX
+    bool
+    select CPU_FAM_F3

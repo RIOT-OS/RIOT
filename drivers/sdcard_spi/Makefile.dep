@@ -1,0 +1,6 @@
+FEATURES_REQUIRED += periph_gpio
+FEATURES_REQUIRED += periph_spi
+FEATURES_OPTIONAL += periph_spi_reconfigure
+USEMODULE += checksum
+USEMODULE += ztimer
+USEMODULE += ztimer_usec

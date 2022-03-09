@@ -23,7 +23,7 @@
 #include "periph/spi.h"
 #include "lis3dh.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define SPI_MODE            SPI_MODE_3
@@ -130,7 +130,7 @@ int lis3dh_set_aux_adc(const lis3dh_t *dev, const uint8_t enable,
                        const uint8_t temperature)
 {
     return lis3dh_write_bits(dev, LIS3DH_REG_TEMP_CFG_REG,
-                             LIS3DH_TEMP_CFG_REG_ADC_PD_MASK,
+                             LIS3DH_TEMP_CFG_REG_ADC_PD_MASK | LIS3DH_TEMP_CFG_REG_TEMP_EN_MASK,
                              (enable ? LIS3DH_TEMP_CFG_REG_ADC_PD_MASK : 0) |
                              (temperature ? LIS3DH_TEMP_CFG_REG_TEMP_EN_MASK : 0));
 }
@@ -215,7 +215,6 @@ int lis3dh_get_fifo_level(const lis3dh_t *dev)
     level = (reg & LIS3DH_FIFO_SRC_REG_FSS_MASK) >> LIS3DH_FIFO_SRC_REG_FSS_SHIFT;
     return level;
 }
-
 
 /**
  * @brief Read sequential registers from the LIS3DH.

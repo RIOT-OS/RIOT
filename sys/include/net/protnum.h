@@ -26,7 +26,6 @@
 #ifndef NET_PROTNUM_H
 #define NET_PROTNUM_H
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

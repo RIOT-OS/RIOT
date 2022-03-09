@@ -1,0 +1,49 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: RIOT - The friendly Operating System for the IoT
+url: https://www.riot-os.org/
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Baccelli
+      given-names: Emmanuel
+    - family-names: Gündoğan
+      given-names: Cenk
+    - family-names: Hahm
+      given-names: Oliver
+    - family-names: Kietzmann
+      given-names: Peter
+    - family-names: Lenders
+      given-names: Martine S.
+    - family-names: Petersen
+      given-names: Hauke
+    - family-names: Schleiser
+      given-names: Kaspar
+    - family-names: Schmidt
+      given-names: Thomas C.
+    - family-names: Wählisch
+      given-names: Matthias
+  title: "RIOT: An Open Source Operating System for Low-End Embedded Devices in the IoT"
+  url: https://www.riot-os.org/assets/pdfs/riot-ieeeiotjournal-2018.pdf
+  journal: IEEE Internet of Things Journal
+  scope: "If you use this software, we prefer that you cite our paper as below."
+  publisher:
+    - name: IEEE
+  month: 3
+  year: 2018
+  volume: 5
+  issue: 6
+  pages: 4428-4440
+  doi: 10.1109/JIOT.2018.2815038
+  abstract: >
+    As the Internet of Things (IoT) emerges, compact operating systems (OSs) are
+    required on low-end devices to ease development and portability of IoT
+    applications. RIOT is a prominent free and open source OS in this space. In
+    this paper, we provide the first comprehensive overview of RIOT. We cover
+    the key components of interest to potential developers and users: the
+    kernel, hardware abstraction, and software modularity, both conceptually and
+    in practice for various example configurations. We explain operational
+    aspects like system boot-up, timers, power management, and the use of
+    networking. Finally, the relevant APIs as exposed by the OS are discussed
+    along with the larger ecosystem around RIOT, including development and open
+    source community aspects.

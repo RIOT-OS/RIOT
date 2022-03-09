@@ -35,11 +35,6 @@
 #include "periph/uart.h"
 #include "isrpipe.h"
 
-#ifdef MODULE_STDIO_ETHOS
-#include "ethos.h"
-extern ethos_t ethos;
-#endif
-
 #if MODULE_VFS
 #include "vfs.h"
 #endif
@@ -65,16 +60,19 @@ void stdio_init(void)
     arg = NULL;
 #endif
 
-#ifdef MODULE_STDIO_ETHOS
-    uart_init(ETHOS_UART, ETHOS_BAUDRATE, cb, arg);
-#else
     uart_init(STDIO_UART_DEV, STDIO_UART_BAUDRATE, cb, arg);
-#endif
 
 #if MODULE_VFS
     vfs_bind_stdio();
 #endif
 }
+
+#if IS_USED(MODULE_STDIO_AVAILABLE)
+int stdio_available(void)
+{
+    return tsrb_avail(&stdio_uart_isrpipe.tsrb);
+}
+#endif
 
 ssize_t stdio_read(void* buffer, size_t count)
 {
@@ -89,10 +87,6 @@ ssize_t stdio_read(void* buffer, size_t count)
 
 ssize_t stdio_write(const void* buffer, size_t len)
 {
-#ifdef MODULE_STDIO_ETHOS
-    ethos_send_frame(&ethos, (const uint8_t *)buffer, len, ETHOS_FRAME_TYPE_TEXT);
-#else
     uart_write(STDIO_UART_DEV, (const uint8_t *)buffer, len);
-#endif
     return len;
 }

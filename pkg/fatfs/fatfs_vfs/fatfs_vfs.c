@@ -18,23 +18,27 @@
  * @}
  */
 
-
+#include <assert.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <sys/stat.h> /* for struct stat */
+#include <stdlib.h>
 #include <string.h>
 
 #include "fs/fatfs.h"
 
-#include "kernel_defines.h" /* needed for BUILD_BUG_ON */
 #include "time.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include <debug.h>
+
+#define TEST_FATFS_MAX_VOL_STR_LEN 14 /* "-2147483648:/\0" */
 
 static int fatfs_err_to_errno(int32_t err);
 static void _fatfs_time_to_timespec(WORD fdate, WORD ftime, time_t *time);
+
+mtd_dev_t *fatfs_mtd_devs[FF_VOLUMES];
 
 /**
  * @brief Concatenate drive number and path into the buffer provided by fs_desc
@@ -47,14 +51,80 @@ static void _build_abs_path(fatfs_desc_t *fs_desc, const char *name)
              fs_desc->vol_idx, name);
 }
 
+static int _init(vfs_mount_t *mountp)
+{
+    fatfs_desc_t *fs_desc = mountp->private_data;
+
+    for (unsigned i = 0; i < ARRAY_SIZE(fatfs_mtd_devs); ++i) {
+        if (fatfs_mtd_devs[i] == fs_desc->dev) {
+            /* already initialized */
+            return 0;
+        }
+        if (fatfs_mtd_devs[i] == NULL) {
+            fatfs_mtd_devs[i] = fs_desc->dev;
+            fs_desc->vol_idx = i;
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
+#ifdef MODULE_FATFS_VFS_FORMAT
+static int _format(vfs_mount_t *mountp)
+{
+    fatfs_desc_t *fs_desc = mountp->private_data;
+    char volume_str[TEST_FATFS_MAX_VOL_STR_LEN];
+
+#if CONFIG_FATFS_FORMAT_ALLOC_STATIC
+    static BYTE work[FF_MAX_SS];
+    static mutex_t work_mtx;
+    mutex_lock(&work_mtx);
+#else
+    BYTE *work = malloc(FF_MAX_SS);
+    if (work == NULL) {
+        return -ENOMEM;
+    }
+#endif
+
+    /* make sure the volume has been initialized */
+    if (_init(mountp)) {
+        return -EINVAL;
+    }
+
+    const MKFS_PARM param = {
+        .fmt = CONFIG_FATFS_FORMAT_TYPE,
+    };
+
+    snprintf(volume_str, sizeof(volume_str), "%u:/", fs_desc->vol_idx);
+
+    FRESULT res = f_mkfs(volume_str, &param, work, FF_MAX_SS);
+
+#if CONFIG_FATFS_FORMAT_ALLOC_STATIC
+    mutex_unlock(&work_mtx);
+#else
+    free(work);
+#endif
+
+    return fatfs_err_to_errno(res);
+}
+#endif
+
 static int _mount(vfs_mount_t *mountp)
 {
     /* if one of the lines below fail to compile you probably need to adjust
        vfs buffer sizes ;) */
-    BUILD_BUG_ON(VFS_DIR_BUFFER_SIZE < sizeof(DIR));
-    BUILD_BUG_ON(VFS_FILE_BUFFER_SIZE < sizeof(fatfs_file_desc_t));
+    static_assert(VFS_DIR_BUFFER_SIZE >= sizeof(DIR),
+                  "DIR must fit into VFS_DIR_BUFFER_SIZE");
+    static_assert(VFS_FILE_BUFFER_SIZE >= sizeof(fatfs_file_desc_t),
+                  "fatfs_file_desc_t must fit into VFS_FILE_BUFFER_SIZE");
 
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)mountp->private_data;
+
+    if (_init(mountp)) {
+        DEBUG("can't find free slot in fatfs_mtd_devs\n");
+        return -ENOMEM;
+    }
 
     _build_abs_path(fs_desc, "");
 
@@ -95,6 +165,31 @@ static int _umount(vfs_mount_t *mountp)
     return fatfs_err_to_errno(res);
 }
 
+static int _statvfs(vfs_mount_t *mountp, const char *restrict path, struct statvfs *restrict buf)
+{
+    (void)path;
+    fatfs_desc_t *fs_desc = (fatfs_desc_t *)mountp->private_data;
+    mtd_dev_t *mtd = fs_desc->dev;
+    DWORD nclst;
+    FATFS *fs;
+
+    int res = f_getfree(fs_desc->abs_path_str_buff, &nclst, &fs);
+    if (res != FR_OK) {
+        return fatfs_err_to_errno(res);
+    }
+
+    unsigned sector_size = mtd->page_size * mtd->pages_per_sector;
+
+    buf->f_bsize  = fs->csize * sector_size;
+    buf->f_frsize = fs->csize * sector_size;
+    buf->f_blocks = mtd->sector_count / fs->csize;
+    buf->f_bfree  = nclst;
+    buf->f_bavail = nclst;
+    buf->f_namemax = FF_USE_LFN ? FF_LFN_BUF : FF_SFN_BUF;
+
+    return 0;
+}
+
 static int _unlink(vfs_mount_t *mountp, const char *name)
 {
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)mountp->private_data;
@@ -119,10 +214,17 @@ static int _rename(vfs_mount_t *mountp, const char *from_path,
                                        fatfs_abs_path_to));
 }
 
+static fatfs_file_desc_t * _get_fatfs_file_desc(vfs_file_t *f)
+{
+    /* the private buffer is part of a union that also contains a
+     * void pointer, hence, it is naturally aligned */
+    return (fatfs_file_desc_t *)(uintptr_t)f->private_data.buffer;
+}
+
 static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode,
                  const char *abs_path)
 {
-    fatfs_file_desc_t *fd = (fatfs_file_desc_t *)&filp->private_data.buffer[0];
+    fatfs_file_desc_t *fd = _get_fatfs_file_desc(filp);
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)filp->mp->private_data;
     _build_abs_path(fs_desc, name);
 
@@ -151,7 +253,12 @@ static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode,
         fatfs_flags |= FA_CREATE_ALWAYS;
     }
     if ((flags & O_CREAT) == O_CREAT) {
-        fatfs_flags |= FA_CREATE_NEW;
+        if ((flags & O_EXCL) == O_EXCL) {
+            fatfs_flags |= FA_CREATE_NEW;
+        }
+        else {
+            fatfs_flags |= FA_OPEN_ALWAYS;
+        }
     }
     else {
         fatfs_flags |= FA_OPEN_EXISTING;
@@ -175,7 +282,7 @@ static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode,
 
 static int _close(vfs_file_t *filp)
 {
-    fatfs_file_desc_t *fd = (fatfs_file_desc_t *)filp->private_data.buffer;
+    fatfs_file_desc_t *fd = _get_fatfs_file_desc(filp);
 
     DEBUG("fatfs_vfs.c: _close: private_data = %p\n", filp->mp->private_data);
 
@@ -193,7 +300,7 @@ static int _close(vfs_file_t *filp)
 
 static ssize_t _write(vfs_file_t *filp, const void *src, size_t nbytes)
 {
-    fatfs_file_desc_t *fd = (fatfs_file_desc_t *)filp->private_data.buffer;
+    fatfs_file_desc_t *fd = _get_fatfs_file_desc(filp);
 
     UINT bw;
 
@@ -206,14 +313,26 @@ static ssize_t _write(vfs_file_t *filp, const void *src, size_t nbytes)
     return (ssize_t)bw;
 }
 
+static int _fsync(vfs_file_t *filp)
+{
+    fatfs_file_desc_t *fd = _get_fatfs_file_desc(filp);
+
+    FRESULT res = f_sync(&fd->file);
+
+    if (res != FR_OK) {
+        return fatfs_err_to_errno(res);
+    }
+
+    return 0;
+}
+
 static ssize_t _read(vfs_file_t *filp, void *dest, size_t nbytes)
 {
-    fatfs_file_desc_t *fd = (fatfs_file_desc_t *)filp->private_data.buffer;
+    fatfs_file_desc_t *fd = _get_fatfs_file_desc(filp);
 
     UINT br;
 
     FRESULT res = f_read(&fd->file, dest, nbytes, &br);
-
 
     if (res != FR_OK) {
         return fatfs_err_to_errno(res);
@@ -224,7 +343,7 @@ static ssize_t _read(vfs_file_t *filp, void *dest, size_t nbytes)
 
 static off_t _lseek(vfs_file_t *filp, off_t off, int whence)
 {
-    fatfs_file_desc_t *fd = (fatfs_file_desc_t *)filp->private_data.buffer;
+    fatfs_file_desc_t *fd = _get_fatfs_file_desc(filp);
     FRESULT res;
     off_t new_pos = 0;
 
@@ -252,14 +371,9 @@ static off_t _lseek(vfs_file_t *filp, off_t off, int whence)
 
 static int _fstat(vfs_file_t *filp, struct stat *buf)
 {
-    fatfs_file_desc_t *fd = (fatfs_file_desc_t *)filp->private_data.buffer;
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)filp->mp->private_data;
     FILINFO fi;
     FRESULT res;
-
-    _build_abs_path(fs_desc, fd->fname);
-
-    memset(buf, 0, sizeof(*buf));
 
     res = f_stat(fs_desc->abs_path_str_buff, &fi);
 
@@ -294,9 +408,16 @@ static int _fstat(vfs_file_t *filp, struct stat *buf)
     return fatfs_err_to_errno(res);
 }
 
+static inline DIR * _get_DIR(vfs_DIR *d)
+{
+    /* the private buffer is part of a union that also contains a
+     * void pointer, hence, it is naturally aligned */
+    return (DIR *)(uintptr_t)d->private_data.buffer;
+}
+
 static int _opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path)
 {
-    DIR *dir = (DIR *)&dirp->private_data.buffer;
+    DIR *dir = _get_DIR(dirp);
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)dirp->mp->private_data;
     (void) abs_path;
 
@@ -307,7 +428,7 @@ static int _opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path)
 
 static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
 {
-    DIR *dir = (DIR *)&dirp->private_data.buffer[0];
+    DIR *dir = _get_DIR(dirp);
     FILINFO fi;
 
     FRESULT res = f_readdir(dir, &fi);
@@ -328,7 +449,7 @@ static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
 
 static int _closedir(vfs_DIR *dirp)
 {
-    DIR *dir = (DIR *)&dirp->private_data.buffer[0];
+    DIR *dir = _get_DIR(dirp);
 
     return fatfs_err_to_errno(f_closedir(dir));
 }
@@ -437,12 +558,17 @@ static int fatfs_err_to_errno(int32_t err)
 }
 
 static const vfs_file_system_ops_t fatfs_fs_ops = {
+#ifdef MODULE_FATFS_VFS_FORMAT
+    .format = _format,
+#endif
     .mount = _mount,
     .umount = _umount,
     .rename = _rename,
     .unlink = _unlink,
     .mkdir = _mkdir,
     .rmdir = _rmdir,
+    .stat = vfs_sysop_stat_from_fstat,
+    .statvfs = _statvfs,
 };
 
 static const vfs_file_ops_t fatfs_file_ops = {
@@ -452,6 +578,7 @@ static const vfs_file_ops_t fatfs_file_ops = {
     .write = _write,
     .lseek = _lseek,
     .fstat = _fstat,
+    .fsync = _fsync,
 };
 
 static const vfs_dir_ops_t fatfs_dir_ops = {

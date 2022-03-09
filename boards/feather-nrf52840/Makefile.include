@@ -1,0 +1,29 @@
+PROGRAMMER ?= uf2conv
+
+UF2CONV_FLAGS = -f 0xADA52840
+
+ifeq (uf2conv,$(PROGRAMMER))
+
+  # Using uf2conv implies using the UF2 bootloader
+  #
+  # It has a static MBR at the first 4k, and a 38k UF2 Bootloader at
+  # the end, leaving 972k for the application. This overwrites any SoftDevice,
+  # but that's what the minimal working example does as well.
+  ROM_OFFSET = 0x1000
+  ROM_LEN    = 0xf3000
+
+  # Driver can take some time to get mounted
+  PREFLASH_DELAY ?= 3
+  include $(RIOTMAKE)/tools/usb_board_reset.mk
+endif
+
+PROGRAMMERS_SUPPORTED += uf2conv
+
+# HACK: replicate dependency resolution in Makefile.dep, only works
+# if `USEMODULE` or `DEFAULT_MODULE` is set by the command line or in the
+# application Makefile.
+ifeq (,$(filter stdio_%,$(DISABLE_MODULE) $(USEMODULE)))
+  RIOT_TERMINAL ?= jlink
+endif
+
+include $(RIOTBOARD)/common/nrf52/Makefile.include

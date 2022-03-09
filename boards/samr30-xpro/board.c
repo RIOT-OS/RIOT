@@ -26,25 +26,23 @@
 #include "cpu.h"
 #include "periph/gpio.h"
 
-void led_init(void);
+void board_antenna_config(uint8_t antenna)
+{
+    if (antenna == RFCTL_ANTENNA_EXT){
+        gpio_clear(RFCTL1_PIN);
+        gpio_set(RFCTL2_PIN);
+    }
+    else if (antenna == RFCTL_ANTENNA_BOARD){
+        gpio_set(RFCTL1_PIN);
+        gpio_clear(RFCTL2_PIN);
+    }
+}
 
 void board_init(void)
 {
-    /* initialize the CPU */
-    cpu_init();
-
-    /* initialize the boards LEDs */
-    led_init();
-}
-
-
-/**
- * @brief Initialize the boards on-board LED
- */
-void led_init(void)
-{
-    gpio_init(LED0_PIN, GPIO_OUT);
-    gpio_set(LED0_PIN); /* gpio is inverted => clear */
-    gpio_init(LED1_PIN, GPIO_OUT);
-    gpio_set(LED1_PIN); /* gpio is inverted => clear */
+    /* initialize the on-board antenna switch */
+    gpio_init(RFCTL1_PIN, GPIO_OUT);
+    gpio_init(RFCTL2_PIN, GPIO_OUT);
+    /* set default antenna switch configuration */
+    board_antenna_config(RFCTL_ANTENNA_DEFAULT);
 }

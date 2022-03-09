@@ -21,7 +21,7 @@
 #include "crypto/helper.h"
 #include "crypto/modes/ctr.h"
 
-int cipher_encrypt_ctr(cipher_t *cipher, uint8_t nonce_counter[16],
+int cipher_encrypt_ctr(const cipher_t *cipher, uint8_t nonce_counter[16],
                        uint8_t nonce_len, const uint8_t *input, size_t length,
                        uint8_t *output)
 {
@@ -49,7 +49,7 @@ int cipher_encrypt_ctr(cipher_t *cipher, uint8_t nonce_counter[16],
     return offset;
 }
 
-int cipher_decrypt_ctr(cipher_t *cipher, uint8_t nonce_counter[16],
+int cipher_decrypt_ctr(const cipher_t *cipher, uint8_t nonce_counter[16],
                        uint8_t nonce_len, const uint8_t *input, size_t length,
                        uint8_t *output)
 {

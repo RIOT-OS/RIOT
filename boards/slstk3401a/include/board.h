@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 Freie Universität Berlin
+ * Copyright (C) 2015-2020 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -22,6 +22,7 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "periph/adc.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
 
@@ -32,11 +33,20 @@ extern "C" {
 /**
  * @name    Xtimer configuration
  *
- * The timer runs at 250 KHz to increase accuracy.
+ * The timer runs at 250 kHz to increase accuracy, or at 32.768 kHz if
+ * LETIMER is used.
  * @{
  */
+#if IS_ACTIVE(CONFIG_EFM32_XTIMER_USE_LETIMER)
+#define XTIMER_DEV          (TIMER_DEV(1))
+#define XTIMER_HZ           (32768UL)
+#define XTIMER_WIDTH        (16)
+#else
+#define XTIMER_DEV          (TIMER_DEV(0))
 #define XTIMER_HZ           (250000UL)
 #define XTIMER_WIDTH        (16)
+#endif
+#define XTIMER_CHAN         (0)
 /** @} */
 
 /**
@@ -78,6 +88,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Core temperature sensor configuration
+ *
+ * Connection to the on-chip temperature sensor.
+ * @{
+ */
+#define CORETEMP_ADC        ADC_LINE(0)
+/** @} */
+
+/**
  * @name    Display configuration
  *
  * Connection to the on-board Sharp Memory LCD (LS013B7DH03).
@@ -100,11 +119,6 @@ extern "C" {
 
 #define SI70XX_PARAM_I2C_DEV    SI7021_I2C
 /** @} */
-
-/**
- * @brief   Initialize the board (GPIO, sensors, clocks).
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

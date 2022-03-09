@@ -1,0 +1,8 @@
+FEATURES_REQUIRED += periph_gpio
+FEATURES_REQUIRED += periph_gpio_irq
+FEATURES_REQUIRED += periph_spi
+FEATURES_OPTIONAL += periph_spi_gpio_mode
+USEMODULE += iolist
+USEMODULE += ztimer_msec
+
+USEMODULE += lora

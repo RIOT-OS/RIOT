@@ -1,0 +1,38 @@
+$init_riot = <<-INIT_RIOT
+  # vim for xxd
+  pkg install -y bash git gmake gcc cmake afl afl++ \
+      python3 py38-pip py38-scipy py38-pycryptodome py38-cython py38-scapy \
+      vim
+  chsh -s /usr/local/bin/bash vagrant
+  if ! [ -d /home/vagrant/RIOT ]; then
+      git clone --recurse-submodules https://github.com/RIOT-OS/RIOT /home/vagrant/RIOT
+  fi
+  chown -R vagrant: /home/vagrant/RIOT
+  curl https://raw.githubusercontent.com/RIOT-OS/riotdocker/master/requirements.txt \
+      > /tmp/requirements.txt
+  su - vagrant -c "pip install --user -r /tmp/requirements.txt"
+  # install most current pexpect to prevent async bug
+  su - vagrant -c "pip install --upgrade --user pexpect"
+  grep -q "export MAKE=gmake" /home/vagrant/.profile || \
+      echo "export MAKE=gmake" >> /home/vagrant/.profile
+  grep -q "export LINK=gcc" /home/vagrant/.profile || \
+      echo "export LINK=gcc" >> /home/vagrant/.profile
+  grep -q "export CC=gcc" /home/vagrant/.profile || \
+      echo "export CC=gcc" >> /home/vagrant/.profile
+  grep -q 'export PATH=/home/vagrant/.local/bin:${PATH}' /home/vagrant/.profile || \
+      echo 'export PATH=/home/vagrant/.local/bin:${PATH}' >> /home/vagrant/.profile
+  # make gmake default make
+  if ! [ -h /home/vagrant/.local/bin/make ]; then
+      # might not be a symlink, so remove
+      rm  -f /home/vagrant/.local/bin/make
+      su - vagrant -c 'ln -s /usr/local/bin/gmake /home/vagrant/.local/bin/make'
+  fi
+INIT_RIOT
+
+Vagrant.configure("2") do |config|
+  config.vm.define "RIOT-FreeBSD"
+  config.vm.box = "freebsd/FreeBSD-12.1-STABLE"
+  config.disksize.size = '50GB'
+  config.vm.provision "shell",
+    inline: $init_riot
+end

@@ -20,10 +20,11 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 #include "pulse_counter_params.h"
 
-#define SLEEP_USEC  US_PER_SEC
+#define SLEEP_MS  MS_PER_SEC
 
 int main(void)
 {
@@ -45,7 +46,7 @@ int main(void)
         int16_t count = pulse_counter_read_with_reset(&dev);
         printf("pulse counter: %d\n", count);
 
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_MSEC, SLEEP_MS);
     }
 
     return 0;

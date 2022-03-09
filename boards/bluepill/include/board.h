@@ -13,7 +13,7 @@
  * This board can be bought very cheaply on sides like eBay or
  * AliExpress. Although the MCU nominally has 64 KiB ROM, most of them
  * have 128 KiB ROM. For more information see:
- * http://wiki.stm32duino.com/index.php?title=Blue_Pill
+ * https://web.archive.org/web/20190527040051/http://wiki.stm32duino.com/index.php?title=Blue_Pill
  *
  * @{
  *

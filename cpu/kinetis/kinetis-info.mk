@@ -31,18 +31,17 @@ export KINETIS_SPEED := $(word 11, $(KINETIS_INFO))
 
 ifeq ($(KINETIS_CORE), Z)
   # Cortex-M0+
-  CPU_ARCH = cortex-m0plus
-  CPU_FAMILY = klx
+  CPU_CORE = cortex-m0plus
 else ifeq ($(KINETIS_CORE), D)
   # Cortex-M4
-  CPU_ARCH = cortex-m4
-  CPU_FAMILY = kx
+  CPU_CORE = cortex-m4
 else ifeq ($(KINETIS_CORE), F)
   # Cortex-M4F or Cortex-M7
-  # TODO: Add floating point support
-  CPU_ARCH = cortex-m4
-  CPU_FAMILY = kx
+  CPU_CORE = cortex-m4f
 endif
+
+# For the rest of the build system we expose the series as family
+CPU_FAM = $(call lowercase,$(KINETIS_SERIES))
 
 # RAM sizes are a bit arbitrary, but are usually dependent on ROM size and core speed.
 # KINETIS_RAMSIZE is used inside a $(( )) shell arithmetic block, so it is OK to
@@ -104,6 +103,27 @@ ifeq ($(KINETIS_SERIES),K)
     # There seems to be a cap on SRAM_L at 64 kB across the whole K series
     KINETIS_SRAM_L_SIZE = 64
   endif
+else ifeq ($(KINETIS_SERIES),L)
+  ifeq ($(KINETIS_FAMILY),8)
+    # KL81, KL82
+    KINETIS_RAMSIZE = 96
+  else ifeq ($(KINETIS_SUBFAMILY),7)
+    # KL17, KL27
+    ifeq ($(KINETIS_ROMSIZE),256)
+      KINETIS_RAMSIZE = 32
+    else
+      KINETIS_RAMSIZE = $(KINETIS_ROMSIZE)/4
+    endif
+  else ifeq ($(KINETIS_FAMILY)$(KINETIS_SUBFAMILY),28)
+    # KL28
+    KINETIS_RAMSIZE = 128
+  else ifeq ($(KINETIS_FAMILY)$(KINETIS_SUBFAMILY),03)
+    # KL03
+    KINETIS_RAMSIZE = 2
+  else
+    KINETIS_RAMSIZE = $(KINETIS_ROMSIZE)/8
+  endif
+  KINETIS_SRAM_L_SIZE = $(KINETIS_RAMSIZE)/4
 else ifeq ($(KINETIS_SERIES),W)
   KINETIS_RAMSIZE = $(KINETIS_ROMSIZE)/8
   ifeq ($(KINETIS_CORE),D)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Bas Stottelaar <basstottelaar@gmail.com>
+ * Copyright (C) 2017-2020 Bas Stottelaar <basstottelaar@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -21,8 +21,11 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "periph/adc.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
+
+#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,11 +34,20 @@ extern "C" {
 /**
  * @name    Xtimer configuration
  *
- * The timer runs at 250 KHz to increase accuracy.
+ * The timer runs at 250 kHz to increase accuracy, or at 32.768 kHz if
+ * LETIMER is used.
  * @{
  */
+#if IS_ACTIVE(CONFIG_EFM32_XTIMER_USE_LETIMER)
+#define XTIMER_DEV          (TIMER_DEV(1))
+#define XTIMER_HZ           (32768UL)
+#define XTIMER_WIDTH        (16)
+#else
+#define XTIMER_DEV          (TIMER_DEV(0))
 #define XTIMER_HZ           (250000UL)
 #define XTIMER_WIDTH        (16)
+#endif
+#define XTIMER_CHAN         (0)
 /** @} */
 
 /**
@@ -59,9 +71,38 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Initialize the board (GPIO, sensors, clocks).
+ * @name    Core temperature sensor configuration
+ *
+ * Connection to the on-chip temperature sensor.
+ * @{
  */
-void board_init(void);
+#define CORETEMP_ADC        ADC_LINE(0)
+/** @} */
+
+/**
+ * @name    SPI NOR Flash hardware configuration
+ *
+ * The board has a IS25LQ020B flash chip (2MBit).
+ */
+/** @{ */
+#define IKEA_TRADFRI_NOR_PAGE_SIZE          (256)
+#define IKEA_TRADFRI_NOR_PAGES_PER_SECTOR   (16)
+#define IKEA_TRADFRI_NOR_SECTOR_COUNT       (64)
+#define IKEA_TRADFRI_NOR_FLAGS              (SPI_NOR_F_SECT_4K | SPI_NOR_F_SECT_32K)
+#define IKEA_TRADFRI_NOR_SPI_DEV            SPI_DEV(0)
+#define IKEA_TRADFRI_NOR_SPI_CLK            SPI_CLK_1MHZ
+#define IKEA_TRADFRI_NOR_SPI_CS             GPIO_PIN(PB, 11)
+#define IKEA_TRADFRI_NOR_SPI_MODE           SPI_MODE_0
+#define IKEA_TRADFRI_NOR_EN                 GPIO_PIN(PF, 3) /**< only on the ICC-1-A */
+/** @} */
+
+/**
+ * @name    MTD configuration
+ */
+/** @{ */
+extern mtd_dev_t *mtd0;
+#define MTD_0 mtd0
+/** @} */
 
 #ifdef __cplusplus
 }

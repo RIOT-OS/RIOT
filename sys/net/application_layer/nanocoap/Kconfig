@@ -1,0 +1,38 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# Nanocoap provides CoAP functionalities
+config USEMODULE_NANOCOAP
+    bool
+    select HAS_PROTOCOL_COAP
+
+menuconfig KCONFIG_USEMODULE_NANOCOAP
+    bool "Configure Nanocoap module"
+    depends on USEMODULE_NANOCOAP
+
+if KCONFIG_USEMODULE_NANOCOAP
+
+config NANOCOAP_NOPTS_MAX
+    int "Maximum number of options in a message"
+    default 16
+
+config NANOCOAP_URI_MAX
+    int "Maximum length of a resource path"
+    default 64
+    help
+        Maximum length of a resource path string read from or written to a
+        message.
+
+config NANOCOAP_BLOCK_SIZE_EXP_MAX
+    int "Maximum size for a blockwise fransfer (as exponent of 2^n)"
+    default 6
+
+config NANOCOAP_QS_MAX
+    int "Maximum length of a query string written to a message"
+    default 64
+
+endif # KCONFIG_USEMODULE_NANOCOAP

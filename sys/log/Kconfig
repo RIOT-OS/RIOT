@@ -1,0 +1,36 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+choice
+  bool "Logging system override"
+  optional
+  depends on TEST_KCONFIG
+  help
+    Say y to override the default logging functions. For more information see
+    core/include/log.h.
+
+config MODULE_LOG_COLOR
+    bool "Colored output"
+    select MODULE_LOG
+    help
+      Implements a logging module with colored output.
+
+config MODULE_LOG_PRINTFNOFORMAT
+    bool "puts-based log"
+    select MODULE_LOG
+    help
+      Logging is implemented using puts instead of printf. Use it where printf
+      might be too heavy. This also serves as an example for logging
+      implementation.
+
+endchoice
+
+config MODULE_LOG
+    bool
+    help
+        Modules that override the default log implementation shoul select this.
+        For more information see core/include/log.h.

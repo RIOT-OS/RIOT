@@ -40,8 +40,6 @@ typedef struct {
 } timer_arg_t;
 #endif
 
-
-
 #define TEST_TIME_S             (10LU)
 #define TEST_INTERVAL_MS        (100LU)
 #define TEST_TIMER_STACKSIZE    (THREAD_STACKSIZE_DEFAULT)
@@ -84,7 +82,6 @@ int main(void)
     uint32_t sleep_timer2 = TEST_SLEEP_TIME_2;
 #endif
     LOG_DEBUG("[INIT]\n");
-
 
     thread_create(stack_timer1, TEST_TIMER_STACKSIZE,
                   2, THREAD_CREATE_STACKTEST,

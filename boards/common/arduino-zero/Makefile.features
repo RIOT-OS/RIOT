@@ -1,0 +1,17 @@
+CPU = samd21
+CPU_MODEL ?= samd21g18a
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_pwm
+FEATURES_PROVIDED += periph_rtc
+FEATURES_PROVIDED += periph_rtt
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_usbdev
+
+# Various other features (if any)
+FEATURES_PROVIDED += arduino
+FEATURES_PROVIDED += arduino_pwm

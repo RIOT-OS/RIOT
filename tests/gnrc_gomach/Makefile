@@ -18,7 +18,7 @@ USEMODULE += saul_default
 # gnrc is a meta module including all required, basic gnrc networking modules
 USEMODULE += gnrc
 # use the default network interface for the board
-USEMODULE += gnrc_netdev_default
+USEMODULE += netdev_default
 # automatically initialize the network interface
 USEMODULE += auto_init_gnrc_netif
 # shell command to send L2 packets with a simple string
@@ -28,11 +28,14 @@ USEMODULE += gnrc_pktdump
 # Use GoMacH as the MAC protocol
 USEMODULE += gnrc_gomach
 
+include $(RIOTBASE)/Makefile.include
+
 # We use only the lower layers of the GNRC network stack, hence, we can
 # reduce the size of the packet buffer a bit
-CFLAGS += -DGNRC_PKTBUF_SIZE=1024
-
-include $(RIOTBASE)/Makefile.include
+# Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
+ifndef CONFIG_GNRC_PKTBUF_SIZE
+  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=1024
+endif
 
 # Set a custom channel if needed
 include $(RIOTMAKE)/default-radio-settings.inc.mk

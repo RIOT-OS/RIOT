@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include "matstat.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 void matstat_clear(matstat_state_t *state)

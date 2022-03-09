@@ -1,0 +1,12 @@
+MODULE = tensorflow-lite
+
+CXXEXFLAGS += -Wno-sign-compare
+CXXEXFLAGS += -Wno-strict-aliasing
+CXXEXFLAGS += -Wno-type-limits
+CXXEXFLAGS += -Wno-unused-parameter
+CXXEXFLAGS += -Wno-unused-variable
+
+SRCXXEXT = cc
+SRCXXEXCLUDE = $(wildcard *_test.$(SRCXXEXT))
+
+include $(RIOTBASE)/Makefile.base

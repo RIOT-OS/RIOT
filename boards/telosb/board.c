@@ -9,7 +9,6 @@
 
 #include "cpu.h"
 #include "board.h"
-#include "stdio_uart.h"
 
 void uart_init(void);
 
@@ -39,7 +38,6 @@ static void telosb_ports_init(void)
     P5SEL = 0x00;    /* Port5 Select: 00000000 = 0x00 */
     P5OUT = 0x70;    /* Port5 Output: 01110000 = 0x70 */
     P5DIR = 0x70;    /* Port5 Direction: 01110000 = 0x70 */
-
 
     P6SEL = 0xFF;    /* Port6 Select: 11111111 = 0xFF */
     P6OUT = 0x00;    /* Port6 Output: 00000000 = 0x00 */
@@ -110,20 +108,15 @@ void msp430_init_dco(void)
     BCSCTL1 &= ~(DIVA1 + DIVA0);          /* remove /8 divisor from ACLK again */
 }
 
-
 //=========================== public ==========================================
 
 void board_init(void)
 {
-    msp430_cpu_init();
     /* disable watchdog timer */
     WDTCTL     =  WDTPW + WDTHOLD;
 
     telosb_ports_init();
     msp430_init_dco();
-
-    /* initialize STDIO */
-    stdio_init();
 
     /* enable interrupts */
     __bis_SR_register(GIE);

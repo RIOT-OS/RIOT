@@ -54,7 +54,7 @@ extern "C" {
 
 #define ARDUINO_PIN_A4  GPIO21      /**< Arduino Uno pin A4 (SDA) */
 #define ARDUINO_PIN_A5  GPIO22      /**< Arduino Uno pin A5 (SCL) */
-/** @ */
+/** @} */
 
 #ifdef __cplusplus
 }

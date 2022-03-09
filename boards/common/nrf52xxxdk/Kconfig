@@ -1,0 +1,25 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARDS_COMMON_NRF52XXXDK
+    bool
+    select BOARD_COMMON_NRF52
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_PWM
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_UART
+    select HAS_VDD_LC_FILTER_REG1
+
+    select HAVE_SAUL_GPIO
+    select HAVE_SAUL_PWM
+
+config MODULE_BOARDS_COMMON_NRF52XXXDK
+    bool
+    depends on TEST_KCONFIG
+    help
+        Common code for boards based on nrf52xxxdk.
+
+source "$(RIOTBOARD)/common/nrf52/Kconfig"

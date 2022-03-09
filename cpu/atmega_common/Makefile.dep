@@ -1,6 +1,9 @@
 # tell the build system to build the atmega common files
 USEMODULE += atmega_common
 
+# peripheral drivers are linked into the final binary
+USEMODULE += atmega_common_periph
+
 # expand atmega_pcint module
 ifneq (,$(filter atmega_pcint,$(USEMODULE)))
   USEMODULE += atmega_pcint0
@@ -25,3 +28,5 @@ endif
 ifneq (,$(filter atmega_pcint3,$(USEMODULE)))
   FEATURES_REQUIRED += atmega_pcint3
 endif
+
+include $(RIOTCPU)/avr8_common/Makefile.dep

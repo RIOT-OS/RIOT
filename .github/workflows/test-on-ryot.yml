@@ -1,0 +1,105 @@
+---
+# Run 'compile_and_test_for_board.py' on connected boards.
+#
+# This workflow will run on a RYOT (Run Your Own Test) machine and launch
+# all tests on all boards currently connected to that machine. This
+# workflow relies on self-hosted runners, this means building and
+# flashing happens on the self-hosted runner (all in docker). An alternative
+# approach was used in https://github.com/RIOT-OS/RIOT/pull/14600, where
+# the RYOT machine was only used for remote flashing, this is a better
+# alternative if ssh access is possible.
+#
+# Documentation:
+#
+# * Setup a RYOT machine:
+#   https://github.com/fjmolinas/riot-ryot/blob/master/setup.md
+#
+# * Requirements (already filled by a RYOT machine):
+#   * Add one or more self-hosted runners:
+#     https://docs.github.com/en/actions/hosting-your-own-runners/adding-self-hosted-runners
+#   * All required flashing tools installed
+#   * udev rules that map all BOARD to /dev/riot/tty-$(BOARD), see
+#     http://riot-os.org/api/advanced-build-system-tricks.html#multiple-boards-udev
+#   * RIOT_MAKEFILES_GLOBAL_PRE that sets PORT and DEBUG_ADAPTER_ID for each
+#     BOARD
+#   * A list of connected BOARDs in JSON format so that fromJSON can be used
+#     to dynamically setup the matrix, e.g. make target providing this:
+#     https://github.com/fjmolinas/riot-ryot/blob/72fc9ad710a2219e942c5965a014e934822e9da5/template/conf/makefiles.pre#L19-L24
+# * RYOT: https://github.com/fjmolinas/riot-ryot
+
+name: test-on-ryot
+
+on:
+  # Schedule weekly runs Saturday at 00:00 on master
+  schedule:
+    - cron: '0 0 * * 6'
+  push:
+    # Run on all new release candidates
+    tags:
+      - '[0-9][0-9][0-9][0-9].[0-9][0-9]-RC[0-9]*'
+      - '[0-9][0-9][0-9][0-9].[0-9][0-9]'
+      - '[0-9][0-9][0-9][0-9].[0-9][0-9].*'
+env:
+  # self-hosted runners are started by a systemd which is not a "login" shell
+  # this means that no local environment variables are loaded (e.g. /etc/environment)
+  # when the runner is started. So explicitly set RIOT_MAKEFILES_GLOBAL_PRE
+  # to set PORT and DEBUG_ADAPTER_ID per BOARD
+  RIOT_MAKEFILES_GLOBAL_PRE: '/builds/conf/makefiles.pre'
+
+jobs:
+  connected_boards:
+    name: Get Connected Boards
+    runs-on: self-hosted
+    outputs:
+      boards: ${{ steps.ci-connected-boards.outputs.boards }}
+    steps:
+      # Get all currently connected boards if not passed through an input
+      - id: ci-connected-boards
+        run: echo "::set-output name=boards::$(make -C /builds/boards/ list-boards-json --no-print-directory)"
+
+  # Runs all tests on connected boards
+  compile_and_test_for_board:
+    name: ${{ matrix.board }}
+    runs-on: self-hosted
+    needs: connected_boards
+    # ci-riot-tribe has 8 cores, parallelism will depend on actually configured
+    # runners
+    strategy:
+      max-parallel: 7
+      fail-fast: false
+      matrix:
+        board: ${{ fromJson(needs.connected_boards.outputs.boards) }}
+    env:
+      BUILD_IN_DOCKER: 1
+      COMPILE_AND_TEST_FOR_BOARD: /builds/boards/RIOT/dist/tools/compile_and_test_for_board/compile_and_test_for_board.py
+      # args for compile_and_test_for_board script
+      COMPILE_AND_TEST_ARGS: --with-test-only --report-xml --incremental
+      # environment vars for compile_and_test_for_board script to pass
+      # USEMODULE and CFLAGS use:
+      #    DOCKER_ENVIRONMENT_CMDLINE=\'-e USEMODULE=<name>\'
+      #    DOCKER_ENVIRONMENT_CMDLINE=\'-e CFLAGS=-D<flag>\'
+      COMPILE_AND_TEST_VARS: ''
+      APPLICATIONS: ''
+      # Exclude 'tests/periph_timer_short_relative_set' since its expected
+      # to fail on most BOARDs
+      APPLICATIONS_EXCLUDE: 'tests/periph_timer_short_relative_set'
+    steps:
+      - name: Checkout RIOT
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.riot_version }}
+          # Make sure it runs git clean -xdff before fetching
+          clean: true
+      - name: Run compile_and_test_for_board.py
+        run: |
+          ${COMPILE_AND_TEST_VARS} ${COMPILE_AND_TEST_FOR_BOARD} . \
+            ${{ matrix.board }} results-${{ matrix.board }} \
+            ${COMPILE_AND_TEST_ARGS} \
+            --applications="${APPLICATIONS}" \
+            --applications-exclude="${APPLICATIONS_EXCLUDE}"
+      - name: Archive results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.board }}
+          path: results-${{ matrix.board }}

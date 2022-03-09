@@ -113,9 +113,9 @@ extern "C" {
  * @name    ADC NTC, light sensor, and filter lines
  * @{
  */
-#define NTC_OUTPUT             GPIO_PIN(PORT_A, 5)
-#define LIGHT_SENSOR_OUTPUT    GPIO_PIN(PORT_A, 6)
-#define FILTER_OUTPUT          GPIO_PIN(PORT_A, 7)
+#define NTC_OUTPUT             ADC_LINE(7)
+#define LIGHT_SENSOR_OUTPUT    ADC_LINE(6)
+#define FILTER_OUTPUT          ADC_LINE(5)
 /** @} */
 
 /**
@@ -124,11 +124,6 @@ extern "C" {
  */
 #define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

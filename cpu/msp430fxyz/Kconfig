@@ -1,0 +1,45 @@
+# Copyright (c) 2020 Freie Universität Berlin
+#               2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_FAM_MSP430F
+    bool
+    select CPU_CORE_MSP430
+    select HAS_CPU_MSP430FXYZ
+
+## CPU Models
+config CPU_MODEL_MSP430F1611
+    bool
+    select CPU_FAM_MSP430F
+
+config CPU_MODEL_MSP430F1612
+    bool
+    select CPU_FAM_MSP430F
+
+config CPU_MODEL_MSP430F2617
+    bool
+    select CPU_FAM_MSP430F
+
+## Definition of specific features
+config HAS_CPU_MSP430FXYZ
+    bool
+    help
+        Indicates that an 'msp430fxyz' cpu is being used.
+
+## Common CPU symbols
+config CPU_FAM
+    default "msp430f" if CPU_FAM_MSP430F
+
+config CPU_MODEL
+    default "msp430f1611" if CPU_MODEL_MSP430F1611
+    default "msp430f1612" if CPU_MODEL_MSP430F1612
+    default "msp430f2617" if CPU_MODEL_MSP430F2617
+
+config CPU
+    default "msp430fxyz" if CPU_FAM_MSP430F
+
+source "$(RIOTCPU)/msp430_common/Kconfig"

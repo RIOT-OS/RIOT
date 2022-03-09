@@ -1,0 +1,15 @@
+# peripheral drivers are linked into the final binary
+USEMODULE += atxmega_periph
+
+# All ATxmega based CPUs provide PM
+USEMODULE += pm_layered
+
+ifneq (,$(filter periph_cpuid,$(USEMODULE)))
+  USEMODULE += periph_nvm
+endif
+
+ifneq (,$(findstring a1,$(shell echo $(CPU_MODEL) | cut -c8-)))
+  USEMODULE += atxmega_ebi
+endif
+
+include $(RIOTCPU)/avr8_common/Makefile.dep

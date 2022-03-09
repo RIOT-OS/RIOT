@@ -1,0 +1,2 @@
+# lz4 cannot be built on 8bit and 16bit architectures
+FEATURES_BLACKLIST += arch_8bit arch_16bit

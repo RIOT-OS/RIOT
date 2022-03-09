@@ -1,8 +1,20 @@
-FEATURES_PROVIDED += arch_32bit
+CPU_FAM = esp32
+
+# MCU defined features that are provided independent on board definitions
+
+include $(RIOTCPU)/esp_common/Makefile.features
+
 FEATURES_PROVIDED += arch_esp32
-FEATURES_PROVIDED += cpp
-FEATURES_PROVIDED += periph_cpuid
-FEATURES_PROVIDED += periph_hwrng
-FEATURES_PROVIDED += periph_pm
-FEATURES_PROVIDED += periph_rtc
-FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += esp_wifi_enterprise
+FEATURES_PROVIDED += periph_adc_ctrl
+FEATURES_PROVIDED += puf_sram
+
+ifneq (,$(filter esp32-wrover%,$(CPU_MODEL)))
+  FEATURES_PROVIDED += esp_spi_ram
+endif
+
+# This configuration enables modules that are only available when using Kconfig
+# module modelling
+ifeq (1, $(TEST_KCONFIG))
+  KCONFIG_ADD_CONFIG += $(RIOTCPU)/esp32/esp32.config
+endif

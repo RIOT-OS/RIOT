@@ -2,10 +2,9 @@
  * @file
  * @brief CMSIS Cortex-M Peripheral Access Layer Header File
  *        for EFM32LG990F256
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -145,6 +144,30 @@ typedef enum IRQn{
 #define PART_NUMBER          "EFM32LG990F256" /**< Part Number */
 
 /** Memory Base addresses and limits */
+#define RAM_MEM_BASE         (0x20000000UL) /**< RAM base address  */
+#define RAM_MEM_SIZE         (0x40000UL)    /**< RAM available address space  */
+#define RAM_MEM_END          (0x2003FFFFUL) /**< RAM end address  */
+#define RAM_MEM_BITS         (0x18UL)       /**< RAM used bits  */
+#define EBI_CODE_MEM_BASE    (0x12000000UL) /**< EBI_CODE base address  */
+#define EBI_CODE_MEM_SIZE    (0xE000000UL)  /**< EBI_CODE available address space  */
+#define EBI_CODE_MEM_END     (0x1FFFFFFFUL) /**< EBI_CODE end address  */
+#define EBI_CODE_MEM_BITS    (0x28UL)       /**< EBI_CODE used bits  */
+#define USBC_MEM_BASE        (0x40100000UL) /**< USBC base address  */
+#define USBC_MEM_SIZE        (0x40000UL)    /**< USBC available address space  */
+#define USBC_MEM_END         (0x4013FFFFUL) /**< USBC end address  */
+#define USBC_MEM_BITS        (0x18UL)       /**< USBC used bits  */
+#define RAM_CODE_MEM_BASE    (0x10000000UL) /**< RAM_CODE base address  */
+#define RAM_CODE_MEM_SIZE    (0x20000UL)    /**< RAM_CODE available address space  */
+#define RAM_CODE_MEM_END     (0x1001FFFFUL) /**< RAM_CODE end address  */
+#define RAM_CODE_MEM_BITS    (0x17UL)       /**< RAM_CODE used bits  */
+#define PER_MEM_BASE         (0x40000000UL) /**< PER base address  */
+#define PER_MEM_SIZE         (0xE0000UL)    /**< PER available address space  */
+#define PER_MEM_END          (0x400DFFFFUL) /**< PER end address  */
+#define PER_MEM_BITS         (0x20UL)       /**< PER used bits  */
+#define EBI_MEM_BASE         (0x80000000UL) /**< EBI base address  */
+#define EBI_MEM_SIZE         (0x40000000UL) /**< EBI available address space  */
+#define EBI_MEM_END          (0xBFFFFFFFUL) /**< EBI end address  */
+#define EBI_MEM_BITS         (0x30UL)       /**< EBI used bits  */
 #define FLASH_MEM_BASE       (0x0UL)        /**< FLASH base address  */
 #define FLASH_MEM_SIZE       (0x10000000UL) /**< FLASH available address space  */
 #define FLASH_MEM_END        (0xFFFFFFFUL)  /**< FLASH end address  */
@@ -153,30 +176,6 @@ typedef enum IRQn{
 #define AES_MEM_SIZE         (0x400UL)      /**< AES available address space  */
 #define AES_MEM_END          (0x400E03FFUL) /**< AES end address  */
 #define AES_MEM_BITS         (0x10UL)       /**< AES used bits  */
-#define USBC_MEM_BASE        (0x40100000UL) /**< USBC base address  */
-#define USBC_MEM_SIZE        (0x40000UL)    /**< USBC available address space  */
-#define USBC_MEM_END         (0x4013FFFFUL) /**< USBC end address  */
-#define USBC_MEM_BITS        (0x18UL)       /**< USBC used bits  */
-#define EBI_CODE_MEM_BASE    (0x12000000UL) /**< EBI_CODE base address  */
-#define EBI_CODE_MEM_SIZE    (0xE000000UL)  /**< EBI_CODE available address space  */
-#define EBI_CODE_MEM_END     (0x1FFFFFFFUL) /**< EBI_CODE end address  */
-#define EBI_CODE_MEM_BITS    (0x28UL)       /**< EBI_CODE used bits  */
-#define PER_MEM_BASE         (0x40000000UL) /**< PER base address  */
-#define PER_MEM_SIZE         (0xE0000UL)    /**< PER available address space  */
-#define PER_MEM_END          (0x400DFFFFUL) /**< PER end address  */
-#define PER_MEM_BITS         (0x20UL)       /**< PER used bits  */
-#define RAM_MEM_BASE         (0x20000000UL) /**< RAM base address  */
-#define RAM_MEM_SIZE         (0x40000UL)    /**< RAM available address space  */
-#define RAM_MEM_END          (0x2003FFFFUL) /**< RAM end address  */
-#define RAM_MEM_BITS         (0x18UL)       /**< RAM used bits  */
-#define RAM_CODE_MEM_BASE    (0x10000000UL) /**< RAM_CODE base address  */
-#define RAM_CODE_MEM_SIZE    (0x20000UL)    /**< RAM_CODE available address space  */
-#define RAM_CODE_MEM_END     (0x1001FFFFUL) /**< RAM_CODE end address  */
-#define RAM_CODE_MEM_BITS    (0x17UL)       /**< RAM_CODE used bits  */
-#define EBI_MEM_BASE         (0x80000000UL) /**< EBI base address  */
-#define EBI_MEM_SIZE         (0x40000000UL) /**< EBI available address space  */
-#define EBI_MEM_END          (0xBFFFFFFFUL) /**< EBI end address  */
-#define EBI_MEM_BITS         (0x30UL)       /**< EBI used bits  */
 
 /** Bit banding area */
 #define BITBAND_PER_BASE     (0x42000000UL) /**< Peripheral Address Space bit-band area */

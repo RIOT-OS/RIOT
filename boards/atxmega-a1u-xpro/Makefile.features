@@ -1,0 +1,7 @@
+CPU_MODEL = atxmega128a1u
+
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_uart
+
+include $(RIOTBOARD)/common/atxmega/Makefile.features

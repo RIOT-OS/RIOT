@@ -1,0 +1,159 @@
+# Copyright (c) 2019 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_GCOAP
+    bool "Configure Gcoap"
+    depends on USEMODULE_GCOAP
+    help
+        Configure Gcoap module using Kconfig. If not set default values and
+        CFLAGS will be used.
+
+if KCONFIG_USEMODULE_GCOAP
+
+menu "DTLS options"
+config GCOAP_DTLS_CREDENTIAL_TAG
+    int "Credential tag"
+    default 5
+    range 0 65535
+    help
+        DTLS credential tag to determine, which credential to use for
+        authentication.
+
+config GCOAP_DTLS_HANDSHAKE_TIMEOUT_USEC
+    int "DTLS handshake timeout in microseconds"
+    default 4000000
+    help
+        Time, expressed in microseconds, that the DTLS send function waits for
+        a handshake process and the send process itself to complete.
+
+config GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS
+    int "Minimum number of available sessions"
+    default 1
+    help
+        Number of sessions that should be kept free. If the count of free
+        sessions falls below this threshold, oldest used sessions will be closed
+        after a timeout time.
+
+config GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_USEC
+    int "DTLS session slot automatic free up timeout in microseconds"
+    default 3000000
+    help
+        Time, expressed in microseconds. When the last session slot is occupied
+        this time indicates when a session will be freed up automatically.
+
+        Prevents that the server can be blocked by lack of available session
+        slots and not properly closed sessions.
+
+endmenu # DTLS options
+
+config GCOAP_PDU_BUF_SIZE
+    int "Request or response buffer size"
+    default 128
+    help
+        Size of the buffer used to build a CoAP request or response.
+
+menu "Observe options"
+
+config GCOAP_OBS_CLIENTS_MAX
+    int "Maximum number of Observe clients"
+    default 2
+
+config GCOAP_OBS_REGISTRATIONS_MAX
+    int "Maximum number of registrations for Observable resources"
+    default 2
+
+config GCOAP_OBS_VALUE_WIDTH
+    int "Width of the Observe option value for a notification"
+    default 3
+    range 1 3
+    help
+        This width, expressed in bytes, is used to determine the length of the
+        'tick' used to measure the time between observable changes to a
+        resource. A tick is expressed internally as GCOAP_OBS_TICK_EXPONENT,
+        which is the base 2 log value of the tick length in microseconds.
+
+        The canonical setting for the value is 3 (exponent 5), which results in
+        a tick length of 32 usec, per sec. 3.4, 4.4 of the RFC. Width 2
+        (exponent 16) results in a tick length of ~64 msec, and width 1
+        (exponent 24) results in a tick length of ~17 sec.
+
+        The tick length must be short enough so that the Observe value strictly
+        increases for each new notification. The purpose of the value is to
+        allow a client to detect message reordering withing the network latency
+        period (128 sec). For resources that change slowly, the reduced
+        message length is useful when packet size is limited.
+
+endmenu # Observe options
+
+menu "Timeouts and retries"
+
+config GCOAP_RECV_TIMEOUT
+    int "Incoming message timeout"
+    default 1000000
+    help
+        Time, expressed in microseconds, that the event loop waits for an
+        incoming CoAP message.
+
+config GCOAP_NON_TIMEOUT
+    int "Non-confirmable response timeout"
+    default 5000000
+    help
+        Time, expressed in microseconds, to wait for a non-confirmable
+        response. Set to 0 to disable timeout.
+
+config GCOAP_NO_RETRANS_BACKOFF
+    bool "Disable retransmission backoff"
+    help
+        In normal operations the timeout between retransmissions doubles.
+        When this option is selected the doubling does not happen, as the
+        retransmission backoff is disabled.
+
+config GCOAP_RESEND_BUFS_MAX
+    int "PDU buffers available for resending confirmable messages"
+    default 1
+
+endmenu # Timeouts and retries
+
+config GCOAP_MSG_QUEUE_SIZE
+    int "Message queue size"
+    default 4
+
+config GCOAP_PORT
+    int "Server port"
+    default 5683
+    help
+        Server port, the default is the one specified in RFC 7252.
+
+config GCOAPS_PORT
+    int "Secured server port"
+    default 5684
+    help
+        Server port for secured connections, the default is the one specified in
+        RFC 7252.
+
+config GCOAP_REQ_WAITING_MAX
+    int "Maximum awaiting requests"
+    default 2
+    help
+       Maximum amount of requests awaiting for a response.
+
+# defined in gcoap.h as GCOAP_TOKENLEN_MAX
+gcoap-tokenlen-max = 8
+
+config GCOAP_TOKENLEN
+    int "Token length"
+    default 2
+    range 0 $(gcoap-tokenlen-max)
+    help
+        Lenght for a token, expressed in bytes.
+
+config GCOAP_NO_AUTO_INIT
+    bool "Disable auto-initialization"
+    help
+        Disable gcoap startup during system auto init. If disabled,
+        gcoap_init() must be called by some other means.
+
+endif # KCONFIG_USEMODULE_GCOAP

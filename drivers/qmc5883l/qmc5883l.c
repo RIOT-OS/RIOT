@@ -32,9 +32,7 @@ static int _reg_read(const qmc5883l_t *dev, uint8_t reg,
                      uint8_t *val, int acquire, int release)
 {
     if (acquire) {
-        if (i2c_acquire(dev->i2c) != 0) {
-            return QMC5883L_BUSERR;
-        }
+        i2c_acquire(dev->i2c);
     }
     int res = i2c_read_reg(dev->i2c, ADDR, reg, val, 0);
     if ((release) || (res != 0)) {
@@ -47,9 +45,7 @@ static int _reg_write(const qmc5883l_t *dev, uint8_t reg,
                       uint8_t val, int acquire, int release)
 {
     if (acquire) {
-        if (i2c_acquire(dev->i2c) != 0) {
-            return QMC5883L_BUSERR;
-        }
+        i2c_acquire(dev->i2c);
     }
     int res = i2c_write_reg(dev->i2c, ADDR, reg, val, 0);
     if ((release) || (res != 0)) {
@@ -178,7 +174,7 @@ int qmc5883l_init_int(const qmc5883l_t *dev, gpio_cb_t cb, void *arg)
     assert(dev);
     assert(cb);
 
-    if (dev->pin_drdy == GPIO_UNDEF) {
+    if (!gpio_is_valid(dev->pin_drdy)) {
         return QMC5883L_NOCFG;
     }
     if (gpio_init_int(dev->pin_drdy, GPIO_IN, GPIO_RISING, cb, arg) != 0) {

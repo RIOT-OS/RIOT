@@ -1,0 +1,48 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_FAM_GD32V
+    bool
+    select CPU_CORE_RV32IMAC
+    select HAS_CPU_GD32V
+    select HAS_PERIPH_CLIC
+    select HAS_PERIPH_GPIO
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_PAGEWISE
+    select HAS_PERIPH_PM
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_TIMER_PERIODIC
+    select HAS_PERIPH_WDT
+
+    select MODULE_PERIPH_CLIC if TEST_KCONFIG
+    select MODULE_PERIPH_WDT if MODULE_PERIPH_PM && HAS_PERIPH_WDT
+
+config CPU_MODEL_GD32VF103VBT6
+    bool
+    select CPU_FAM_GD32V
+
+## Definition of specific features
+config HAS_CPU_GD32V
+    bool
+    help
+        Indicates that a 'gd32v' cpu is being used.
+
+config CPU_FAM
+    default "gd32v" if CPU_FAM_GD32V
+
+config CPU_MODEL
+    default "gd32vf103vbt6"  if CPU_MODEL_GD32VF103VBT6
+
+config CPU
+    default "gd32v" if CPU_FAM_GD32V
+
+config CPU_CORE
+    default "rv32imac" if CPU_CORE_RV32IMAC
+
+rsource "periph/Kconfig"
+
+source "$(RIOTCPU)/riscv_common/Kconfig"

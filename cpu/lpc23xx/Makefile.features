@@ -1,0 +1,15 @@
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += backup_ram
+FEATURES_PROVIDED += periph_dac
+FEATURES_PROVIDED += periph_flashpage
+FEATURES_PROVIDED += periph_gpio periph_gpio_irq
+FEATURES_PROVIDED += periph_timer_periodic
+FEATURES_PROVIDED += periph_rtc_ms
+
+include $(RIOTCPU)/arm7_common/Makefile.features
+
+# This configuration enables modules that are only available when using Kconfig
+# module modelling
+ifeq (1, $(TEST_KCONFIG))
+  KCONFIG_CPU_CONFIG += $(RIOTCPU)/lpc23xx/lpc23xx.config
+endif

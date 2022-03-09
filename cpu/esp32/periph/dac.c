@@ -31,7 +31,7 @@
 #include "soc/sens_reg.h"
 #include "soc/sens_struct.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* declaration of external functions */

@@ -1,0 +1,62 @@
+From 275a4d976ea9140076e2625a69e495aec60d2fe4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=2E=20David=20Ib=C3=A1=C3=B1ez?= <jdavid.ibp@gmail.com>
+Date: Thu, 7 Oct 2021 19:35:14 +0200
+Subject: [PATCH 1/3] Use RIOT's gpio to handle pin change interrupts
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: J. David Ibáñez <jdavid.ibp@gmail.com>
+---
+ src/SDI12.cpp | 8 +++++---
+ src/SDI12.h   | 4 ++--
+ 2 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git src/SDI12.cpp src/SDI12.cpp
+index c71e998..257eb5a 100644
+--- src/SDI12.cpp
++++ src/SDI12.cpp
+@@ -349,10 +349,11 @@ void SDI12::setPinInterrupts(bool enable) {
+     // We don't detach the function from the interrupt for AVR processors
+   }
+ #else
++  gpio_t pin = arduino_pinmap[_dataPin];
+   if (enable) {
+-    return;
++    gpio_init_int(pin, GPIO_IN, GPIO_BOTH, handleInterrupt, NULL);
+   } else {
+-    return;
++    gpio_irq_disable(pin);
+   }
+ #endif
+ }
+@@ -557,7 +558,8 @@ void ICACHE_RAM_ATTR SDI12::handleInterrupt() {
+   if (_activeObject) _activeObject->receiveISR();
+ }
+ #else
+-void SDI12::handleInterrupt() {
++void SDI12::handleInterrupt(void *arg) {
++  (void)arg;
+   if (_activeObject) _activeObject->receiveISR();
+ }
+ #endif
+diff --git src/SDI12.h src/SDI12.h
+index ec949e3..6469c7b 100644
+--- src/SDI12.h
++++ src/SDI12.h
+@@ -971,10 +971,10 @@ class SDI12 : public Stream {
+    *
+    * On espressif boards (ESP8266 and ESP32), the ISR must be stored in IRAM
+    */
+-  static void handleInterrupt();
++  static void handleInterrupt(void *arg = NULL);
+ 
+   /** on AVR boards, uncomment to use your own PCINT ISRs */
+-  // #define SDI12_EXTERNAL_PCINT
++  #define SDI12_EXTERNAL_PCINT
+   /**@}*/
+ };
+ 
+-- 
+2.34.1
+

@@ -34,10 +34,10 @@
 #define PERIPH_TIMER_H
 
 #include <limits.h>
+#include <stdint.h>
 
 #include "periph_cpu.h"
-/** @todo remove dev_enums.h include once all platforms are ported to the updated periph interface */
-#include "periph/dev_enums.h"
+#include "periph_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,7 +56,7 @@ extern "C" {
  * @brief   Default value for timer not defined
  */
 #ifndef TIMER_UNDEF
-#define TIMER_UNDEF         (UINT_MAX)
+#define TIMER_UNDEF         (UINT_FAST8_MAX)
 #endif
 
 /**
@@ -66,7 +66,27 @@ extern "C" {
  * and vendor device header.
  */
 #ifndef HAVE_TIMER_T
-typedef unsigned int tim_t;
+typedef uint_fast8_t tim_t;
+#endif
+
+/**
+ * @brief   Reset the timer when the set() function is called
+ *
+ * When set, calling the timer_set_periodic() function resets the timer count value.
+ */
+#ifndef TIM_FLAG_RESET_ON_SET
+#define TIM_FLAG_RESET_ON_SET   (0x01)
+#endif
+
+/**
+ * @brief   Reset the timer on match
+ *
+ * When set, a match on this channel will reset the timer count value.
+ * When set on multiple channels, only the channel with the lowest match value
+ * will be reached.
+ */
+#ifndef TIM_FLAG_RESET_ON_MATCH
+#define TIM_FLAG_RESET_ON_MATCH (0x02)
 #endif
 
 /**
@@ -107,7 +127,7 @@ typedef struct {
  * @return                  0 on success
  * @return                  -1 if speed not applicable or unknown device given
  */
-int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg);
+int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg);
 
 /**
  * @brief Set a given timer channel for the given timer device
@@ -128,6 +148,9 @@ int timer_set(tim_t dev, int channel, unsigned int timeout);
 /**
  * @brief Set an absolute timeout value for the given channel of the given timer
  *
+ * Timers that are less wide than `unsigned int` accept and truncate overflown
+ * values.
+ *
  * @param[in] dev           the timer device to set
  * @param[in] channel       the channel to set
  * @param[in] value         the absolute compare value when the callback will be
@@ -137,6 +160,26 @@ int timer_set(tim_t dev, int channel, unsigned int timeout);
  * @return                  -1 on error
  */
 int timer_set_absolute(tim_t dev, int channel, unsigned int value);
+
+/**
+ * @brief Set an absolute timeout value for the given channel of the given timer.
+ *        The timeout will be called periodically for each iteration.
+ *
+ * @note  Only one channel with `TIM_FLAG_RESET_ON_MATCH` can be active.
+ *        Some platforms (Atmel) only allow to use the first channel as TOP value.
+ *
+ * @note  Needs to be enabled with `FEATURES_REQUIRED += periph_timer_periodic`.
+ *
+ * @param[in] dev           the timer device to set
+ * @param[in] channel       the channel to set
+ * @param[in] value         the absolute compare value when the callback will be
+ *                          triggered
+ * @param[in] flags         options
+ *
+ * @return                  0 on success
+ * @return                  -1 on error
+ */
+int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags);
 
 /**
  * @brief Clear the given channel of the given timer device

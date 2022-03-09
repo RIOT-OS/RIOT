@@ -1,0 +1,9 @@
+ifneq (,$(filter test_utils_result_output_json,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBASE)/sys/test_utils/result_output/json
+endif
+ifneq (,$(filter test_utils_result_output_txt,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBASE)/sys/test_utils/result_output/txt
+endif
+ifneq (,$(filter test_utils_result_output_check,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBASE)/sys/test_utils/result_output/check
+endif

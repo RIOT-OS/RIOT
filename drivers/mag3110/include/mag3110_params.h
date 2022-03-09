@@ -36,7 +36,7 @@ extern "C" {
 #define MAG3110_PARAM_I2C       (I2C_DEV(0))
 #endif
 #ifndef MAG3110_PARAM_ADDR
-#define MAG3110_PARAM_ADDR      (MAG3110_I2C_ADDRESS)
+#define MAG3110_PARAM_ADDR      (CONFIG_MAG3110_I2C_ADDRESS)
 #endif
 #ifndef MAG3110_PARAM_OFFSET
 #define MAG3110_PARAM_OFFSET    { 0, 0, 0 }

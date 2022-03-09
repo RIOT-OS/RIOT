@@ -8,15 +8,17 @@ BOARD ?= nrf52dk
 RIOTBASE ?= $(CURDIR)/../..
 
 # Some RIOT modules needed for this example
-USEMODULE += event_timeout
+USEMODULE += event_timeout_ztimer
 
 # Include NimBLE
 USEPKG += nimble
 USEMODULE += nimble_svc_gap
 USEMODULE += nimble_svc_gatt
 
-# We also use the AD part of the BLE helper module
-USEMODULE += bluetil_ad
+# Use automated advertising
+USEMODULE += nimble_autoadv
+CFLAGS += -DNIMBLE_AUTOADV_DEVICE_NAME='"RIOT Heart Rate Sensor"'
+CFLAGS += -DNIMBLE_AUTOADV_START_MANUALLY=1
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the

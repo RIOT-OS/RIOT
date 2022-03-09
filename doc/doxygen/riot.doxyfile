@@ -32,7 +32,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           =
+PROJECT_NAME           = "RIOT OS"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -230,12 +230,6 @@ TAB_SIZE               = 4
 
 ALIASES                = experimental="@warning <strong class=\"text-danger\">This feature is experimental!</strong>\n"
 
-# This tag can be used to specify a number of word-keyword mappings (TCL only).
-# A mapping has the form "name=value". For example adding "class=itcl::class"
-# will allow you to use the command class in the itcl::class meaning.
-
-TCL_SUBST              =
-
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C sources
 # only. Doxygen will then generate output that is more tailored for C. For
 # instance, some of the names that are used will be different. The list of all
@@ -281,7 +275,9 @@ OPTIMIZE_OUTPUT_VHDL   = NO
 # Note that for custom extensions you also need to set FILE_PATTERNS otherwise
 # the files are not read by doxygen.
 
-EXTENSION_MAPPING      =
+# Python is close enough that we can have Makefile comments starting with `##`
+# that are both recognized by Doxygen and comments to Make
+EXTENSION_MAPPING      = mk=Python
 
 # If the MARKDOWN_SUPPORT tag is enabled then doxygen pre-processes all comments
 # according to the Markdown format, which allows for more readable
@@ -757,6 +753,7 @@ INPUT                  = ../../doc.txt \
                          ../../core \
                          ../../cpu \
                          ../../boards \
+                         ../../bootloaders \
                          ../../drivers \
                          ../../pkg \
                          ../../sys \
@@ -764,13 +761,21 @@ INPUT                  = ../../doc.txt \
                          src/mainpage.md \
                          src/creating-modules.md \
                          src/creating-an-application.md \
+                         src/porting-boards.md \
                          src/driver-guide.md \
                          src/getting-started.md \
                          ../../tests/README.md \
                          src/build-system-basics.md \
+                         src/kconfig/kconfig.md \
+                         src/using-cpp.md \
+                         src/using-rust.md \
                          src/advanced-build-system-tricks.md \
+                         src/debugging-aids.md \
+                         src/emulators.md \
+                         src/release-cycle.md \
                          src/changelog.md \
-                         ../../LOSTANDFOUND.md
+                         ../../LOSTANDFOUND.md \
+                         ../../makefiles/pseudomodules.inc.mk
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -854,7 +859,7 @@ EXCLUDE_SYMBOLS        = *CMSIS* \
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           =
+EXAMPLE_PATH           = ../../
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and
@@ -1021,13 +1026,6 @@ VERBATIM_HEADERS       = YES
 
 ALPHABETICAL_INDEX     = NO
 
-# The COLS_IN_ALPHA_INDEX tag can be used to specify the number of columns in
-# which the alphabetical index list will be split.
-# Minimum value: 1, maximum value: 20, default value: 5.
-# This tag requires that the tag ALPHABETICAL_INDEX is set to YES.
-
-COLS_IN_ALPHA_INDEX    = 5
-
 # In case all classes in a project start with a common prefix, all classes will
 # be put under the same header in the alphabetical index. The IGNORE_PREFIX tag
 # can be used to specify a prefix (or a list of prefixes) that should be ignored
@@ -1141,6 +1139,7 @@ HTML_EXTRA_FILES       = src/css/bootstrap.min.css \
                          src/js/doxy-jquery.js \
                          src/js/jquery.min.js \
                          src/js/jquery.powertip.min.js \
+                         src/js/jquery.scrollTo.min.js \
                          src/js/jquery.smartmenus.min.js \
                          src/js/jquery.smartmenus.bootstrap.min.js \
                          src/js/jquery-ui.min.js \
@@ -1651,7 +1650,7 @@ COMPACT_LATEX          = NO
 # The default value is: a4.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
-PAPER_TYPE             = a4wide
+PAPER_TYPE             = a4
 
 # The EXTRA_PACKAGES tag can be used to specify one or more LaTeX package names
 # that should be included in the LaTeX output. To get the times font for
@@ -2098,12 +2097,6 @@ EXTERNAL_GROUPS        = YES
 
 EXTERNAL_PAGES         = YES
 
-# The PERL_PATH should be the absolute path and name of the perl script
-# interpreter (i.e. the result of 'which perl').
-# The default file (with absolute path) is: /usr/bin/perl.
-
-PERL_PATH              = /usr/bin/perl
-
 #---------------------------------------------------------------------------
 # Configuration options related to the dot tool
 #---------------------------------------------------------------------------
@@ -2116,15 +2109,6 @@ PERL_PATH              = /usr/bin/perl
 # The default value is: YES.
 
 CLASS_DIAGRAMS         = NO
-
-# You can define message sequence charts within doxygen comments using the \msc
-# command. Doxygen will then run the mscgen tool (see:
-# http://www.mcternan.me.uk/mscgen/)) to produce the chart and insert it in the
-# documentation. The MSCGEN_PATH tag allows you to specify the directory where
-# the mscgen tool resides. If left empty the tool is assumed to be found in the
-# default search path.
-
-MSCGEN_PATH            =
 
 # You can include diagrams made with dia in doxygen documentation. Doxygen will
 # then run dia to produce the diagram and insert it in the documentation. The
@@ -2300,7 +2284,7 @@ DIRECTORY_GRAPH        = NO
 # The default value is: png.
 # This tag requires that the tag HAVE_DOT is set to YES.
 
-DOT_IMAGE_FORMAT       = png
+DOT_IMAGE_FORMAT       = svg
 
 # If DOT_IMAGE_FORMAT is set to svg, then this option can be set to YES to
 # enable generation of interactive SVG images that allow zooming and panning.
@@ -2325,7 +2309,7 @@ DOT_PATH               =
 # command).
 # This tag requires that the tag HAVE_DOT is set to YES.
 
-DOTFILE_DIRS           =
+DOTFILE_DIRS           = dot/
 
 # The MSCFILE_DIRS tag can be used to specify one or more directories that
 # contain msc files that are included in the documentation (see the \mscfile
@@ -2358,7 +2342,7 @@ PLANTUML_JAR_PATH      =
 # Minimum value: 0, maximum value: 10000, default value: 50.
 # This tag requires that the tag HAVE_DOT is set to YES.
 
-DOT_GRAPH_MAX_NODES    = 200
+DOT_GRAPH_MAX_NODES    = 275
 
 # The MAX_DOT_GRAPH_DEPTH tag can be used to set the maximum depth of the graphs
 # generated by dot. A depth value of 3 means that only nodes reachable from the

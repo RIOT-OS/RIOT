@@ -5,15 +5,12 @@ INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
-
 # st-flash
 FLASHER = st-flash
-DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+DEBUGGER = $(RIOTBOARD)/f4vi1/dist/debug.sh
 DEBUGSERVER = st-util
 
 # define st-flash parameters
 FLASHFILE ?= $(BINFILE)
 FFLAGS = write $(FLASHFILE) 0x8000000
-DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist/gdb.conf $(ELFFILE)
+DEBUGGER_FLAGS = $(RIOTBOARD)/f4vi1/dist/gdb.conf $(ELFFILE)

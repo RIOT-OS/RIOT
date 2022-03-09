@@ -7,6 +7,7 @@ from traceback import print_tb
 import pexpect
 
 BOARD = os.getenv('BOARD', 'stm32f4discovery')
+MAKE = os.environ.get('MAKE', 'make')
 
 
 def testfunc():
@@ -20,13 +21,13 @@ def testfunc():
         if exc.errno == os.errno.ENOENT:
             print("ABORTING TEST: {} seems to be missing.\n".format(cross_gcc))
     else:
-        child = pexpect.spawnu(['make'], env=os.environ)
+        child = pexpect.spawnu([MAKE], env=os.environ)
         child.logfile = sys.stdout
 
         try:
             if BOARD == 'stm32f4discovery':
                 child.expect_exact('\x1b[1;33mThe following features may conflict:'
-                                   '\x1b[0m \x1b[1;32mperiph_dac periph_spi\x1b[0m')
+                                   '\x1b[0m periph_dac periph_spi')
                 child.expect_exact('\x1b[1;33mRationale: '
                                    '\x1b[0mOn stm32f4discovery boards there are '
                                    'the same pins for the DAC and/or SPI_0.')

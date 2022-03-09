@@ -21,15 +21,16 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "vendor/hw_memmap.h"
 #include "vendor/hw_ssi.h"
 
 #include "cpu.h"
 #include "mutex.h"
-#include "assert.h"
 #include "periph/spi.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**
@@ -93,10 +94,11 @@ void spi_init_pins(spi_t bus)
     gpio_init_mux(spi_config[bus].miso_pin, OVERRIDE_DISABLE, GPIO_MUX_NONE, rxd);
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
+    assert((unsigned)bus < SPI_NUMOF);
     DEBUG("%s: bus=%u\n", __FUNCTION__, bus);
-    (void) cs;
+    (void)cs;
     /* lock the bus */
     mutex_lock(&locks[bus]);
     /* power on device */
@@ -107,8 +109,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     dev(bus)->CR0 = ((spi_clk_config[clk].scr << 8) | mode | SSI_CR0_DSS(8));
     /* enable SSI device */
     dev(bus)->CR1 = SSI_CR1_SSE;
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)
@@ -119,6 +119,14 @@ void spi_release(spi_t bus)
     poweroff(bus);
     /* and release lock... */
     mutex_unlock(&locks[bus]);
+}
+
+static uint8_t _trx(cc2538_ssi_t *dev, uint8_t in)
+{
+    while (!(dev->SR & SSI_SR_TNF)) {}
+    dev->DR = in;
+    while (!(dev->SR & SSI_SR_RNE)) {}
+    return dev->DR;
 }
 
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
@@ -136,37 +144,19 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     }
 
     if (!in_buf) {
-        for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SSI_SR_TNF)) {}
-            dev(bus)->DR = out_buf[i];
-        }
-        /* flush RX FIFO while busy*/
-        while ((dev(bus)->SR & SSI_SR_BSY)) {
-            dev(bus)->DR;
+        for (const void *end = out_buf + len; out_buf != end; ++out_buf) {
+            _trx(dev(bus), *out_buf);
         }
     }
     else if (!out_buf) {
-        size_t in_cnt = 0;
-        for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SSI_SR_TNF)) {}
-            dev(bus)->DR = 0;
-            while (!(dev(bus)->SR & SSI_SR_RNE)) {}
-            in_buf[in_cnt++] = dev(bus)->DR;
-        }
-        /* get remaining bytes */
-        while (dev(bus)->SR & SSI_SR_RNE) {
-            in_buf[in_cnt++] = dev(bus)->DR;
+        for (void *end = in_buf + len; in_buf != end; ++in_buf) {
+            *in_buf = _trx(dev(bus), 0);
         }
     }
     else {
-        for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SSI_SR_TNF)) {}
-            dev(bus)->DR = out_buf[i];
-            while (!(dev(bus)->SR & SSI_SR_RNE)) {}
-            in_buf[i] = dev(bus)->DR;
+        for (void *end = in_buf + len; in_buf != end; ++in_buf, ++out_buf) {
+            *in_buf = _trx(dev(bus), *out_buf);
         }
-        /* wait until no more busy */
-        while ((dev(bus)->SR & SSI_SR_BSY)) {}
     }
 
     if ((!cont) && (cs != SPI_CS_UNDEF)) {

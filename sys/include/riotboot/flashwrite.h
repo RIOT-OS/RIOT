@@ -41,6 +41,15 @@
  * 2. write image starting at second block
  * 3. write first block
  *
+ * When using raw mode is used with this module, the need to buffer a full
+ * flashpage page is removed, instead it must buffer two times the
+ * FLASHPAGE_WRITE_BLOCK_SIZE. One is used to buffer the current write block,
+ * the other buffers the first chunk (offset zero, page zero). This first
+ * chunk is written when finalizing the flash operation. The minimal size for
+ * RIOTBOOT_FLASHPAGE_BUFFER_SIZE is 4, at least the riotboot magic number must
+ * fit into this and FLASHPAGE_SIZE must be a multiple of
+ * RIOTBOOT_FLASHPAGE_BUFFER_SIZE
+ *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Koen Zandberg <koen@bergzand.net>
  *
@@ -58,13 +67,60 @@ extern "C" {
 #include "periph/flashpage.h"
 
 /**
+ * @brief Enable/disable raw writes to flash
+ */
+#ifndef CONFIG_RIOTBOOT_FLASHWRITE_RAW
+#define CONFIG_RIOTBOOT_FLASHWRITE_RAW  1
+#endif
+
+/**
+ * @brief Intermediate buffer size for firmware image data
+ */
+#if CONFIG_RIOTBOOT_FLASHWRITE_RAW
+
+#if (FLASHPAGE_WRITE_BLOCK_SIZE < 4)
+#define RIOTBOOT_FLASHPAGE_BUFFER_SIZE 4
+#else
+#define RIOTBOOT_FLASHPAGE_BUFFER_SIZE FLASHPAGE_WRITE_BLOCK_SIZE
+#endif
+
+#else /* CONFIG_RIOTBOOT_FLASHWRITE_RAW */
+
+#define RIOTBOOT_FLASHPAGE_BUFFER_SIZE FLASHPAGE_SIZE
+
+#endif /* !CONFIG_RIOTBOOT_FLASHWRITE_RAW */
+
+/**
+ * @brief Extra attributes required for the firmware intermediate buffer
+ */
+#define RIOTBOOT_FLASHPAGE_BUFFER_ATTRS \
+    __attribute__((aligned(FLASHPAGE_WRITE_BLOCK_ALIGNMENT)))
+
+/**
  * @brief   firmware update state structure
+ *
+ * @note    @ref FLASHPAGE_SIZE can be very large on some platforms, don't place
+ *          this struct on the stack or increase the thread stack size
+ *          accordingly.
  */
 typedef struct {
     int target_slot;                        /**< update targets this slot     */
     size_t offset;                          /**< update is at this position   */
     unsigned flashpage;                     /**< update is at this flashpage  */
-    uint8_t flashpage_buf[FLASHPAGE_SIZE];  /**< flash writing buffer         */
+
+    /**
+     * @brief flash writing buffer
+     */
+    uint8_t RIOTBOOT_FLASHPAGE_BUFFER_ATTRS
+        flashpage_buf[RIOTBOOT_FLASHPAGE_BUFFER_SIZE];
+#if CONFIG_RIOTBOOT_FLASHWRITE_RAW || DOXYGEN
+    /**
+     * @brief Buffer for the first chunk containing the checksum when using
+     *        FLASHWRITE_RAW
+     */
+    uint8_t RIOTBOOT_FLASHPAGE_BUFFER_ATTRS
+        firstblock_buf[RIOTBOOT_FLASHPAGE_BUFFER_SIZE];
+#endif
 } riotboot_flashwrite_t;
 
 /**
@@ -129,6 +185,14 @@ static inline int riotboot_flashwrite_init(riotboot_flashwrite_t *state,
  */
 int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
                                  const uint8_t *bytes, size_t len, bool more);
+/**
+ * @brief   Force flush the buffer onto the flash
+ *
+ * @param[in,out]   state   ptr to previously used update state
+ *
+ * @returns         0 on success, <0 otherwise
+ */
+int riotboot_flashwrite_flush(riotboot_flashwrite_t *state);
 
 /**
  * @brief   Finish a firmware update (raw version)
@@ -142,7 +206,7 @@ int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
  * @returns     0 on success, <0 otherwise
  */
 int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
-                               const uint8_t *bytes, size_t len);
+                                   const uint8_t *bytes, size_t len);
 
 /**
  * @brief   Finish a firmware update (riotboot version)
@@ -159,6 +223,32 @@ static inline int riotboot_flashwrite_finish(riotboot_flashwrite_t *state)
     return riotboot_flashwrite_finish_raw(state, (const uint8_t *)"RIOT",
                                           RIOTBOOT_FLASHWRITE_SKIPLEN);
 }
+
+/**
+ * @brief   Invalidate a slot header (riotboot version)
+ *
+ * This function invalidates the target slot.
+ *
+ * @note    If this function is called with only one valid slot,
+ *          the invalidation will fail in order to keep one valid
+ *          image to run after reboot
+ *
+ * @param[in]   slot       Target slot to invalidate
+ *
+ * @returns     0 on success, <0 otherwise
+ */
+int riotboot_flashwrite_invalidate(int slot);
+
+/**
+ * @brief   Invalidate the latest firmware version (riotboot version)
+ *
+ * This function invalidates the slot having the most recent firmware revision
+ *
+ * @note    This function requires two valid images to succeed
+ *
+ * @returns     0 on success, <0 otherwise
+ */
+int riotboot_flashwrite_invalidate_latest(void);
 
 /**
  * @brief       Get a slot's size

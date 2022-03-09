@@ -60,10 +60,18 @@ void _native_LED_RED_TOGGLE(void);
  * @{
  */
 #ifndef MTD_PAGE_SIZE
+#ifdef MODULE_FATFS
+#define MTD_PAGE_SIZE           (512)
+#else
 #define MTD_PAGE_SIZE           (256)
 #endif
+#endif
 #ifndef MTD_SECTOR_SIZE
+#ifdef MODULE_FATFS
+#define MTD_SECTOR_SIZE         (512)
+#else
 #define MTD_SECTOR_SIZE         (4096)
+#endif
 #endif
 #ifndef MTD_SECTOR_NUM
 #define MTD_SECTOR_NUM          (2048)
@@ -127,6 +135,7 @@ extern mtd_dev_t *mtd0;
 /** @} */
 #endif
 
+#if MODULE_PERIPH_QDEC
 /**
  * @brief Simulate QDEC on motor_set() calls
  *
@@ -181,6 +190,17 @@ static const motor_driver_config_t motor_driver_config[] = {
 };
 
 #define MOTOR_DRIVER_NUMOF           ARRAY_SIZE(motor_driver_config)
+/** @} */
+#endif
+
+/**
+ * @name    ztimer configuration
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_TYPE    ZTIMER_TYPE_PERIPH_TIMER
+#define CONFIG_ZTIMER_USEC_DEV     TIMER_DEV(0)
+/* on native, anything can happen... */
+#define CONFIG_ZTIMER_USEC_MIN     (64)
 /** @} */
 
 #endif /* __cplusplus */

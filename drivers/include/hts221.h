@@ -36,9 +36,7 @@ extern "C" {
 /**
  * @brief   Default I2C bus address (7 Bit) of HTS221 devices
  */
-#ifndef HTS221_I2C_ADDRESS
 #define HTS221_I2C_ADDRESS           (0x5F)
-#endif
 
 /**
  * @brief   Parameters needed for device initialization

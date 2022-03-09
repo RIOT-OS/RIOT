@@ -56,6 +56,7 @@
 #define PERIPH_ADC_H
 
 #include <limits.h>
+#include <stdint.h>
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
@@ -68,14 +69,14 @@ extern "C" {
  * @brief   Define default ADC type identifier
  */
 #ifndef HAVE_ADC_T
-typedef unsigned int adc_t;
+typedef uint_fast8_t adc_t;
 #endif
 
 /**
  * @brief   Default ADC undefined value
  */
 #ifndef ADC_UNDEF
-#define ADC_UNDEF           (UINT_MAX)
+#define ADC_UNDEF           (UINT_FAST8_MAX)
 #endif
 
 /**
@@ -125,7 +126,7 @@ int adc_init(adc_t line);
  * @return                  the sampled value on success
  * @return                  -1 if resolution is not applicable
  */
-int adc_sample(adc_t line, adc_res_t res);
+int32_t adc_sample(adc_t line, adc_res_t res);
 
 #ifdef __cplusplus
 }

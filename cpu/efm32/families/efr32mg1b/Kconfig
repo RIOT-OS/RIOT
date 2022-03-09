@@ -1,0 +1,102 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_FAM_EFR32MG1B
+    bool
+    select CPU_CORE_CORTEX_M4F
+    select CPU_COMMON_EFM32
+    select CPU_EFM32_SERIES1
+    select HAS_CORTEXM_MPU
+
+config MODULE_CPU_EFR32MG1B
+    bool
+    depends on CPU_FAM_EFR32MG1B
+    depends on TEST_KCONFIG
+    default y
+    help
+        EFR32MG1B family-specific code.
+
+## CPU Models
+config CPU_MODEL_EFR32MG1B232F256GM48
+    bool
+    select CPU_FAM_EFR32MG1B
+
+config CPU_MODEL_EFR32MG1B732F256IM32
+    bool
+    select CPU_FAM_EFR32MG1B
+
+config CPU_MODEL_EFR32MG1B231F256GM32
+    bool
+    select CPU_FAM_EFR32MG1B
+
+config CPU_MODEL_EFR32MG1B131F256GM32
+    bool
+    select CPU_FAM_EFR32MG1B
+
+config CPU_MODEL_EFR32MG1B132F256GM48
+    bool
+    select CPU_FAM_EFR32MG1B
+
+config CPU_MODEL_EFR32MG1B632F256GM32
+    bool
+    select CPU_FAM_EFR32MG1B
+
+config CPU_MODEL_EFR32MG1B132F256GM32
+    bool
+    select CPU_FAM_EFR32MG1B
+
+config CPU_MODEL_EFR32MG1B132F256GJ43
+    bool
+    select CPU_FAM_EFR32MG1B
+
+config CPU_MODEL_EFR32MG1B632F256IM32
+    bool
+    select CPU_FAM_EFR32MG1B
+
+config CPU_MODEL_EFR32MG1B131F256GM48
+    bool
+    select CPU_FAM_EFR32MG1B
+
+config CPU_MODEL_EFR32MG1B732F256GM32
+    bool
+    select CPU_FAM_EFR32MG1B
+
+config CPU_MODEL_EFR32MG1B231F256GM48
+    bool
+    select CPU_FAM_EFR32MG1B
+
+config CPU_MODEL_EFR32MG1B232F256IM48
+    bool
+    select CPU_FAM_EFR32MG1B
+
+config CPU_MODEL_EFR32MG1B232F256GJ43
+    bool
+    select CPU_FAM_EFR32MG1B
+
+config CPU_MODEL_EFR32MG1B232F256GM32
+    bool
+    select CPU_FAM_EFR32MG1B
+
+## Common CPU symbols
+config CPU_FAM
+    default "efr32mg1b" if CPU_FAM_EFR32MG1B
+
+config CPU_MODEL
+    default "efr32mg1b232f256gm48" if CPU_MODEL_EFR32MG1B232F256GM48
+    default "efr32mg1b732f256im32" if CPU_MODEL_EFR32MG1B732F256IM32
+    default "efr32mg1b231f256gm32" if CPU_MODEL_EFR32MG1B231F256GM32
+    default "efr32mg1b131f256gm32" if CPU_MODEL_EFR32MG1B131F256GM32
+    default "efr32mg1b132f256gm48" if CPU_MODEL_EFR32MG1B132F256GM48
+    default "efr32mg1b632f256gm32" if CPU_MODEL_EFR32MG1B632F256GM32
+    default "efr32mg1b132f256gm32" if CPU_MODEL_EFR32MG1B132F256GM32
+    default "efr32mg1b132f256gj43" if CPU_MODEL_EFR32MG1B132F256GJ43
+    default "efr32mg1b632f256im32" if CPU_MODEL_EFR32MG1B632F256IM32
+    default "efr32mg1b131f256gm48" if CPU_MODEL_EFR32MG1B131F256GM48
+    default "efr32mg1b732f256gm32" if CPU_MODEL_EFR32MG1B732F256GM32
+    default "efr32mg1b231f256gm48" if CPU_MODEL_EFR32MG1B231F256GM48
+    default "efr32mg1b232f256im48" if CPU_MODEL_EFR32MG1B232F256IM48
+    default "efr32mg1b232f256gj43" if CPU_MODEL_EFR32MG1B232F256GJ43
+    default "efr32mg1b232f256gm32" if CPU_MODEL_EFR32MG1B232F256GM32

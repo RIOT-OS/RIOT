@@ -22,8 +22,6 @@
 #ifndef LSM6DSL_INTERNAL_H
 #define LSM6DSL_INTERNAL_H
 
-#include "xtimer.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -159,9 +157,9 @@ extern "C" {
 #define LSM6DSL_TEMP_OFFSET                 (0x1900)
 
 /**
- * @brief 	Reboot wait interval in us (15ms)
+ * @brief 	Reboot wait interval in ms (15ms)
  */
-#define LSM6DSL_BOOT_WAIT                   (15 * US_PER_MS)
+#define LSM6DSL_BOOT_WAIT_MS                (15)
 
 #ifdef __cplusplus
 }

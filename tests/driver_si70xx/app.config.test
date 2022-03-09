@@ -1,0 +1,9 @@
+# this file enables modules defined in Kconfig. Do not use this file for
+# application configuration. This is only needed during migration.
+
+# This test should also work with Si7006, Si7013 and Si7020 variants.
+CONFIG_MODULE_SI70XX=y
+CONFIG_MODULE_SI7021=y
+
+CONFIG_MODULE_ZTIMER=y
+CONFIG_MODULE_ZTIMER_MSEC=y

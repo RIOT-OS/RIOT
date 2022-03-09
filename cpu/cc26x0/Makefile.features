@@ -1,1 +1,0 @@
--include $(RIOTCPU)/cc26xx_cc13xx/Makefile.features

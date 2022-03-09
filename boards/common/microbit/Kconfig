@@ -1,0 +1,11 @@
+# Copyright (c) 2021 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config MODULE_MICROBIT
+    bool "BBC micro:bit specific LED matrix handling"
+    select MODULE_ZTIMER
+    select ZTIMER_USEC
+    select MODULE_MINEPLEX

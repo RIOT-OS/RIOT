@@ -19,7 +19,6 @@
  * @}
  */
 
-
 #include <stdio.h>
 
 #include "cpu.h"
@@ -27,7 +26,7 @@
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define NUM_OF_PORT 6
@@ -94,7 +93,6 @@ typedef struct {
 
 static gpio_state_t gpio_config[NUM_OF_PORT][NUM_OF_PINS];
 #endif /* MODULE_PERIPH_GPIO_IRQ */
-
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
@@ -262,6 +260,10 @@ void gpio_irq_enable(gpio_t pin)
     const uint8_t pin_num = _pin_num(pin);
     const uint8_t pin_bit = 1<<pin_num;
 
+    /* clear stale interrupt */
+    ROM_GPIOPinIntClear(port_addr, pin_bit);
+
+    /* enable interrupt */
     HWREG(im_reg_addr) |= pin_bit;
 }
 

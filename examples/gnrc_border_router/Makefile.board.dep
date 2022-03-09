@@ -1,0 +1,19 @@
+# Put board specific dependencies here
+ifeq (,$(filter native,$(BOARD)))
+  ifeq (slip,$(UPLINK))
+    USEMODULE += slipdev_stdio
+  else ifeq (ethos,$(UPLINK))
+    USEMODULE += stdio_ethos
+  else ifeq (wifi,$(UPLINK))
+    ifneq (,$(filter esp32 esp8266,$(CPU)))
+      USEMODULE += esp_wifi
+      USEMODULE += esp_now
+    else
+      $(error Only esp32 and esp8266 are currently supported)
+    endif
+  endif
+else
+  USEMODULE += netdev_tap
+  USEMODULE += socket_zep
+  USEMODULE += socket_zep_hello
+endif

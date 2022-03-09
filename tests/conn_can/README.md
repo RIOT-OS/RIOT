@@ -22,21 +22,21 @@ sudo apt-get install libsocketcan-dev
 
 Alternatively, you can compile from source:
 ```
-wget http://www.pengutronix.de/software/libsocketcan/download/libsocketcan-0.0.10.tar.bz2
+wget http://www.pengutronix.de/software/libsocketcan/download/libsocketcan-0.0.11.tar.bz2
 
-$ sudo tar xvjf libsocketcan-0.0.10.tar.bz2
+$ tar xvjf libsocketcan-0.0.11.tar.bz2
 
-$ sudo rm -rf libsocketcan-0.0.10.tar.bz2
+$ rm -rf libsocketcan-0.0.11.tar.bz2
 
-$ sudo cd libsocketcan-0.0.10
+$ cd libsocketcan-0.0.11
 
-$ sudo ./configure
+$ ./configure
 
 compile in 32bits
 
 ./configure --build=i686-pc-linux-gnu "CFLAGS=-m32" "CXXFLAG
 
-$ sudo make
+$ make
 
 $ sudo make install
 
@@ -59,12 +59,24 @@ sudo ip link set vcan1 up
 Usage
 =====
 
+Adapt pin configuration in Makefile to match the used CAN transceiver (e.g. TJA1042_STB_PIN)
+
 Build, flash and start the application:
 ```
 export BOARD=your_board
 make
 make flash
 make term
+```
+
+To initialize a CAN transceiver device (trx_id = 0)
+```
+init 0
+```
+
+To set a CAN transceiver device's (trx_id = 0) mode to TRX_NORMAL_MODE
+```
+set_mode 0 0
 ```
 
 The CAN interfaces are registered at startup to the dll. The list of registered
@@ -77,6 +89,14 @@ To send a raw CAN frame, id 0x100 with 2 bytes of data 01 02 on interface 0:
 ```
 test_can send 0 100 01 02
 ```
+
+To send a raw CAN remote request frame, id 0x100 on interface 0 and datalenght 7:
+```
+test_can sendrtr 0 100 7
+```
+A remote request frame has a NULL payload but can have a specific data length code (DLC).
+Valid DLC val: 0..8
+
 
 Two threads are launched to enable receiving frames. To receive raw CAN frames,
 ids 0x100 and 0x500 with thread 0 on interface 1, with 10s timeout:

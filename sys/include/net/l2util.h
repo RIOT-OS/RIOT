@@ -133,6 +133,82 @@ int l2util_ipv6_iid_to_addr(int dev_type, const eui64_t *iid, uint8_t *addr);
 int l2util_ndp_addr_len_from_l2ao(int dev_type,
                                   const ndp_opt_t *opt);
 
+/**
+ * @brief   Converts an IPv6 multicast address to a multicast address
+ *          of the respective link layer.
+ *
+ * @pre There is enough allocated space in @p l2_group for an address for a
+ *      device of type @p dev_type (e.g. 6 bytes for an ethernet address).
+ *
+ * @param[in] dev_type      The network device type of the device @p l2_addr
+ *                          should be generated for.
+ * @param[in] ipv6_group    An IPv6 multicast address.
+ * @param[out] l2_group     A link layer multicast address
+ *
+ * @return  Length of @p l2_group in bytes
+ * @return  `-ENOTSUP` if link layer does not support multicast.
+ */
+int l2util_ipv6_group_to_l2_group(int dev_type,
+                                  const ipv6_addr_t *ipv6_group,
+                                  uint8_t *l2_group);
+
+/**
+ * @brief   Converts a hardware address to a human readable string.
+ *
+ * @details The format will be like `xx:xx:xx:xx` where `xx` are the bytes
+ *          of @p addr in hexadecimal representation.
+ *
+ * @pre `(out != NULL) && ((addr != NULL) || (addr_len == 0))`
+ * @pre @p out **MUST** have allocated at least 3 * @p addr_len bytes.
+ *
+ * @param[in] addr      A hardware address.
+ * @param[in] addr_len  Length of @p addr.
+ * @param[out] out      A string to store the output in. Must at least have
+ *                      3 * @p addr_len bytes allocated.
+ *
+ * @return  @p out.
+ */
+char *l2util_addr_to_str(const uint8_t *addr, size_t addr_len, char *out);
+
+/**
+ * @brief   Parses a string of colon-separated hexadecimals to a hardware
+ *          address.
+ *
+ * @details The input format must be like `xx:xx:xx:xx` where `xx` will be the
+ *          bytes of @p addr in hexadecimal representation.
+ *
+ * @pre `(out != NULL)`
+ * @pre @p out **MUST** have allocated at least
+ *      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes.
+ *
+ * @param[in] str       A string of colon-separated hexadecimals.
+ * @param[out] out      The resulting hardware address. Must at least have
+ *                      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes allocated.
+ *
+ * @return  Actual length of @p out on success.
+ * @return  0, on failure.
+ */
+size_t l2util_addr_from_str(const char *str, uint8_t *out);
+
+/**
+ * @brief   Checks if two l2 addresses are equal.
+ *
+ * @param[in] addr_a        First hardware address.
+ * @param[in] addr_a_len    Length of first hardware address.
+ * @param[in] addr_b        Second hardware address.
+ * @param[in] addr_b_len    Length of second hardware address.
+ *
+ * @return  true if the addresses match, false if not.
+ */
+static inline bool l2util_addr_equal(const uint8_t *addr_a, uint8_t addr_a_len,
+                                     const uint8_t *addr_b, uint8_t addr_b_len)
+{
+    if (addr_a_len != addr_b_len) {
+        return false;
+    }
+
+    return memcmp(addr_a, addr_b, addr_a_len) == 0;
+}
 
 #ifdef __cplusplus
 }

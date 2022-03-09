@@ -28,10 +28,10 @@ interface.
 | SPIs            | 2x USART                                 |
 | I2Cs            | 2x                                       |
 | Vcc             | 2.4V - 3.6V                              |
-| Datasheet       | [Datasheet](http://www.nxp.com/documents/data_sheet/LPC1768_66_65_64.pdf)|
+| Datasheet       | [Datasheet](https://www.nxp.com/docs/en/data-sheet/LPC1769_68_67_66_65_64_63.pdf)|
 | Manual          | [Manual](http://www.nxp.com/documents/user_manual/UM10360.pdf)|
 | Board Manual    | [Board Manual](http://www.seeedstudio.com/wiki/Arch_Pro)|
-| Board Schematic | [Board Schematic](http://www.seeedstudio.com/wiki/File:Arch_Pro_V1.0_Schematic.pdf)  |
+| Board Schematic | [Board Schematic](https://raw.githubusercontent.com/SeeedDocument/Arch_Pro/master/res/Arch_Pro_V1.0_Schematic.pdf)  |
 
 ### Pinout
 

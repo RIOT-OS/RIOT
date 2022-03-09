@@ -55,15 +55,25 @@ extern "C" {
  * @{
  */
 #if defined(MODULE_SI7006)
-#define SI70XX_ID                   (0x06)
+#define SI70XX_ID                   (6)
 #elif defined(MODULE_SI7013)
-#define SI70XX_ID                   (0x0D)
+#define SI70XX_ID                   (13)
 #elif defined(MODULE_SI7020)
-#define SI70XX_ID                   (0x14)
+#define SI70XX_ID                   (20)
 #elif defined(MODULE_SI7021)
-#define SI70XX_ID                   (0x15)
+#define SI70XX_ID                   (21)
+#elif defined(MODULE_SI7050)
+#define SI70XX_ID                   (50)
+#elif defined(MODULE_SI7051)
+#define SI70XX_ID                   (51)
+#elif defined(MODULE_SI7053)
+#define SI70XX_ID                   (53)
+#elif defined(MODULE_SI7054)
+#define SI70XX_ID                   (54)
+#elif defined(MODULE_SI7055)
+#define SI70XX_ID                   (55)
 #else
-#error "Please provide a valid Si70xx variant (Si7006/13/20/21)"
+#error "Please provide a valid Si70xx variant (Si7006/13/20/21/5X)"
 #endif
 
 #define SI70XX_REVISION_1           (0xFF)

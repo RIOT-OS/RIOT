@@ -1,0 +1,25 @@
+## CPU Models
+# XMEGA - B1
+config CPU_MODEL_XMEGA64B1
+    bool
+    select CPU_CORE_ATXMEGA_B1
+
+config CPU_MODEL_XMEGA128B1
+    bool
+    select CPU_CORE_ATXMEGA_B1
+
+# XMEGA - B3
+config CPU_MODEL_XMEGA64B3
+    bool
+    select CPU_CORE_ATXMEGA_B3
+
+config CPU_MODEL_XMEGA128B3
+    bool
+    select CPU_CORE_ATXMEGA_B3
+
+config CPU_MODEL
+    default "atxmega64b3"    if CPU_MODEL_XMEGA64B3
+    default "atxmega128b3"   if CPU_MODEL_XMEGA128B3
+
+    default "atxmega64b1"    if CPU_MODEL_XMEGA64B1
+    default "atxmega128b1"   if CPU_MODEL_XMEGA128B1

@@ -19,7 +19,8 @@
  */
 
 extern "C" {
-#include "xtimer.h"
+#include "assert.h"
+#include "ztimer.h"
 #include "periph/gpio.h"
 #include "periph/adc.h"
 #include "periph/pwm.h"
@@ -31,6 +32,7 @@ extern "C" {
 
 void pinMode(int pin, int mode)
 {
+    assert(gpio_is_valid(arduino_pinmap[pin]));
     gpio_mode_t m = GPIO_OUT;
 
     if (mode == INPUT) {
@@ -45,11 +47,13 @@ void pinMode(int pin, int mode)
 
 void digitalWrite(int pin, int state)
 {
+    assert(gpio_is_valid(arduino_pinmap[pin]));
     gpio_write(arduino_pinmap[pin], state);
 }
 
 int digitalRead(int pin)
 {
+    assert(gpio_is_valid(arduino_pinmap[pin]));
     if (gpio_read(arduino_pinmap[pin])) {
         return HIGH;
     }
@@ -60,22 +64,22 @@ int digitalRead(int pin)
 
 void delay(unsigned long msec)
 {
-    xtimer_usleep(msec * US_PER_MS);
+    ztimer_sleep(ZTIMER_MSEC, msec);
 }
 
 void delayMicroseconds(unsigned long usec)
 {
-    xtimer_usleep(usec);
+    ztimer_sleep(ZTIMER_USEC, usec);
 }
 
 unsigned long micros()
 {
-    return xtimer_now_usec();
+    return ztimer_now(ZTIMER_USEC);
 }
 
 unsigned long millis()
 {
-    return xtimer_now_usec64() / US_PER_MS;
+    return ztimer_now(ZTIMER_MSEC);
 }
 
 #if MODULE_PERIPH_ADC

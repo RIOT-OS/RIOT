@@ -1,0 +1,12 @@
+# Copyright (c) 2019 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+rsource "csma_sender/Kconfig"
+rsource "eui_provider/Kconfig"
+rsource "ieee802154/Kconfig"
+rsource "l2filter/Kconfig"
+rsource "l2util/Kconfig"
+rsource "Kconfig.lorawan"

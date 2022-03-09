@@ -30,23 +30,6 @@ extern "C" {
 #endif
 
 /**
- * @brief       A deprecated alias for @ref NETOPT_MAX_PDU_SIZE
- *
- * @deprecated  Please use @ref NETOPT_MAX_PDU_SIZE instead of
- *              `NETOPT_MAX_PACKET_SIZE`
- */
-#define NETOPT_MAX_PACKET_SIZE NETOPT_MAX_PDU_SIZE
-
-/**
- * @brief       A deprecated alias for @ref NETOPT_LINK
- *
- * @deprecated  Please use @ref NETOPT_LINK instead of
- *              `NETOPT_LINK_CONNECTED`. It will be removed after the
- *              2020.07 release at the latest.
- */
-#define NETOPT_LINK_CONNECTED NETOPT_LINK
-
-/**
  * @brief   Global list of configuration options available throughout the
  *          network stack, e.g. by netdev and netapi
  *
@@ -77,6 +60,7 @@ typedef enum {
      * Ethernet      | 6      | device MAC address
      * nrfmin        | 2      | device short address
      * CC110x        | 1      | device address
+     * NRF24L01+     | 5      | device address
      * LoRaWAN       | 4      | device address
      */
     NETOPT_ADDRESS,
@@ -120,10 +104,9 @@ typedef enum {
      *          RFC 4291, section 2.5.1
      *      </a>
      *
-     * @deprecated  Do not implement this in a network device. Other APIs
-     *              utilizing [netopt](@ref net_netopt) may still implement it.
-     *              Existing support of drivers will be dropped after the
-     *              2019.07 release.
+     * @note    Do not implement this in a network device driver. Other APIs
+     *          utilizing [netopt](@ref net_netopt) such as @ref net_gnrc_netif
+     *          or @ref net_netif may still implement it.
      *
      * The generation of the interface identifier is dependent on the link-layer.
      * Please refer to the appropriate IPv6 over `<link>` specification for
@@ -197,6 +180,22 @@ typedef enum {
      */
     NETOPT_MAX_PDU_SIZE,
     /**
+     * @brief   (uint16_t) protocol data unit size
+     *
+     * When set, fixes the number of bytes to be received. This is required for
+     * MAC layers with implicit header mode (no packet length information in
+     * PDDU) and predictable packet length (e.g LoRaWAN beacons). The device
+     * driver implementation should attempt to read exactly the expected number
+     * of bytes (possibly filling it up with garbage data if the payload is
+     * smaller).
+     *
+     * When get, returns the number of expected bytes for the next reception.
+     *
+     * In some MAC layers it will only be effective if used in conjunction with
+     * @ref NETOPT_FIXED_HEADER
+     */
+    NETOPT_PDU_SIZE,
+    /**
      * @brief   (@ref netopt_enable_t) frame preloading
      *
      * Preload frame data using gnrc_netdev_driver_t::send_data() or gnrc_netapi_send(),
@@ -242,37 +241,43 @@ typedef enum {
      */
     NETOPT_RAWMODE,
     /**
-     * @brief   (@ref netopt_enable_t) trigger interrupt at reception start
+     * @brief   (@ref netopt_enable_t) Used to check if the driver generates NETDEV_EVENT_RX_STARTED
+     *          events
      *
      * It is mostly triggered after the preamble is correctly received
      *
-     * @note not all transceivers may support this interrupt
+     * @warning This value is read-only and cannot be configured at run-time
      */
     NETOPT_RX_START_IRQ,
 
     /**
-     * @brief   (@ref netopt_enable_t) trigger interrupt after frame reception
+     * @brief   (@ref netopt_enable_t) Used to check if the driver generates
+     *          NETDEV_EVENT_RX_COMPLETE events
      *
      * This interrupt is triggered after a complete frame is received.
      *
-     * @note in case a transceiver does not support this interrupt, the event
-     *       may be triggered by the driver
+     * @note    In case a transceiver does not support this interrupt, the event
+     *          may be triggered by the driver
+     * @warning This value is read-only and cannot be configured at run-time
      */
     NETOPT_RX_END_IRQ,
 
     /**
-     * @brief   (@ref netopt_enable_t) trigger interrupt at transmission start
+     * @brief   (@ref netopt_enable_t) Used to check if the driver generates NETDEV_EVENT_TX_STARTED
+     *          events
      *
      * This interrupt is triggered when the transceiver starts to send out the
      * frame.
      *
-     * @note in case a transceiver does not support this interrupt, the event
-     *       may be triggered by the driver
+     * @note    In case a transceiver does not support this interrupt, the event
+     *          may be triggered by the driver
+     * @warning This value is read-only and cannot be configured at run-time
      */
     NETOPT_TX_START_IRQ,
 
     /**
-     * @brief   (@ref netopt_enable_t) trigger interrupt after frame transmission
+     * @brief   (@ref netopt_enable_t) Used to check if the driver generates
+     *          NETDEV_EVENT_TX_COMPLETE events
      *
      * This interrupt is triggered when the full frame has been transmitted.
      *
@@ -398,7 +403,8 @@ typedef enum {
     NETOPT_CCA_MODE,
 
     /**
-     * @brief   (@ref netstats_t*) get statistics about sent and received packets and data of the device or protocol
+     * @brief   (@ref netstats_t*) get statistics about sent and received packets and data of the
+     *          device or protocol
      *
      * Expects a pointer to a @ref netstats_t struct that will be pointed to
      * the corresponding @ref netstats_t of the module.
@@ -418,7 +424,8 @@ typedef enum {
     NETOPT_ENCRYPTION_KEY,
 
     /**
-     * @brief   (@ref netopt_rf_testmode_t) Test mode for the radio, e.g. for CE or FCC certification
+     * @brief   (@ref netopt_rf_testmode_t) Test mode for the radio, e.g. for CE or FCC
+     *          certification
      *
      * Get/set the test mode as type @ref netopt_rf_testmode_t or as uint8_t if
      * the radio supports other vendor specific test modes.
@@ -627,6 +634,20 @@ typedef enum {
     /**
      * @brief   (uint8_t) LoRaWAN TX application port
      * - LoRaWAN: between 1 and 223 (included)
+     *
+     * @deprecated  This option is deprecated and will be removed in the
+     *              2022.01 Release.
+     *              The port is encoded now as a one byte
+     *              destination address in a @ref net_gnrc_netif_hdr snip
+     *              prepended in the packet.
+     *              The user must take care of prepending the required snip
+     *              during transmission. On reception, the
+     *              snip is prepended automatically by the stack and shall be
+     *              consumed by the user.
+     *              During the deprecation period it is required to
+     *              compile with @ref
+     *              CONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR
+     *
      */
     NETOPT_LORAWAN_TX_PORT,
 
@@ -652,6 +673,63 @@ typedef enum {
     NETOPT_LORAWAN_MIN_RX_SYMBOL,
 
     /**
+     * @brief   (uint8_t) 802.15.4 PHY mode
+     */
+    NETOPT_IEEE802154_PHY,
+
+    /**
+     * @brief   (uint8_t) legacy O-QPSK proprietary mode
+     *          Allows to select higher data rates than standard 250 kbit/s
+     *          Not compatible across vendors, only use with radios of the same type.
+     */
+    NETOPT_OQPSK_RATE,
+
+    /**
+     * @brief   (uint8_t) MR-O-QPSK Chip Rate (kchip/s)
+     */
+    NETOPT_MR_OQPSK_CHIPS,
+
+    /**
+     * @brief   (uint8_t) MR-O-QPSK Rate Mode
+     */
+    NETOPT_MR_OQPSK_RATE,
+
+    /**
+     * @brief   (uint8_t) MR-OFDM PHY Option (Values: 1-4)
+     */
+    NETOPT_MR_OFDM_OPTION,
+
+    /**
+     * @brief   (uint8_t) MR-OFDM PHY Modulation and Coding Scheme (Values: 0-6)
+     */
+    NETOPT_MR_OFDM_MCS,
+
+    /**
+     * @brief   (uint8_t) MR-FSK PHY Modulation Index (x 64)
+     */
+    NETOPT_MR_FSK_MODULATION_INDEX,
+
+    /**
+     * @brief   (uint8_t) MR-FSK Modulation Order
+     */
+    NETOPT_MR_FSK_MODULATION_ORDER,
+
+    /**
+     * @brief   (uint8_t) MR-FSK PHY Symbol Rate (kHz)
+     */
+    NETOPT_MR_FSK_SRATE,
+
+    /**
+     * @brief   (uint8_t) MR-FSK PHY Forward Error Correction
+     */
+    NETOPT_MR_FSK_FEC,
+
+    /**
+     * @brief   (uint8_t) PHY Channel Spacing (kHz)
+     */
+    NETOPT_CHANNEL_SPACING,
+
+    /**
      * @brief   (uint8_t*) phy layer syncword
      */
     NETOPT_SYNCWORD,
@@ -664,7 +742,7 @@ typedef enum {
     NETOPT_RANDOM,
 
     /**
-     * @brief (uint8_t) Get or set the number of PHY symbols before assuming there's no data
+     * @brief (uint16_t) Get or set the number of PHY symbols before assuming there's no data
      */
     NETOPT_RX_SYMBOL_TIMEOUT,
 
@@ -693,6 +771,42 @@ typedef enum {
      */
     NETOPT_LINK_CHECK,
 
+    /**
+     * @brief (int16_t) Received Signal Strength Indicator (RSSI)
+     *
+     * The RSSI is an indicator for the received field strength in wireless
+     * channels. It is often represented as the ratio of received power to
+     * a given unit, for example milliwatts. With a device-dependent scaling
+     * factor, the RSSI value can be expressed as power level in the unit
+     * dBm or ASU (Arbitrary Strength Unit).
+     */
+    NETOPT_RSSI,
+
+    /**
+     * @brief (uint16_t) Set the battery monitor voltage (in mV).
+     *
+     * When set, a @ref SYS_BUS_POWER_EVENT_LOW_VOLTAGE event is generated
+     * on the SYS_BUS_POWER bus if the supply voltage falls below the set value.
+     *
+     * Set to 0 to disable battery monitoring.
+     */
+    NETOPT_BATMON,
+
+    /**
+     * @brief   (array of byte array) get link layer multicast groups as array
+     *          of byte arrays (length of each byte array corresponds to the
+     *          length of @ref NETOPT_ADDRESS) or join a link layer multicast
+     *          group as byte array on an interface
+     *
+     * When getting the option you can pass an array of byte arrays of any
+     * length greater than 0 to the getter. The array will be filled up to to
+     * its maximum and the remaining addresses on the interface will be ignored
+     */
+    NETOPT_L2_GROUP,
+    /**
+     * @brief   (array of byte arrays) Leave an link layer multicast group
+     */
+    NETOPT_L2_GROUP_LEAVE,
     /**
      * @brief   maximum number of options defined here.
      *

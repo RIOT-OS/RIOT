@@ -15,6 +15,12 @@
 
 #include "crypto/chacha20poly1305.h"
 
+/*
+ *  Example and Test Vector for AEAD_CHACHA20_POLY1305
+ *
+ *  https://tools.ietf.org/html/rfc7539#appendix-A
+ */
+
 /* ciphertext buffer */
 uint8_t ebuf[1024];
 /* Plaintext buffer */

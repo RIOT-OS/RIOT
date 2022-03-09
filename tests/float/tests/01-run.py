@@ -9,13 +9,10 @@
 import sys
 from testrunner import run
 
-# It takes 35 seconds on wsn430, so add some margin
-TIMEOUT = 45
-
 
 def testfunc(child):
     child.expect_exact("Testing floating point arithmetic...")
-    child.expect_exact("[SUCCESS]", timeout=TIMEOUT)
+    child.expect_exact("[SUCCESS]")
 
 
 if __name__ == "__main__":

@@ -1,30 +1,17 @@
 # Found by checking fuse settings (2048 words so 4KB)
 # https://www.microchip.com/DevelopmentTools/ProductDetails/atmega1284p-xpld
-BOOTLOADER_SIZE ?= 4K
-ROM_RESERVED ?= $(BOOTLOADER_SIZE)
+ATMEGA_BOOTLOADER_SIZE ?= 4K
 
-# For backward compatibility
-ifneq (,$(AVRDUDE_PORT))
-  $(warning Warning! AVRDUDE_PORT is deprecated use PROG_DEV)
-  PROG_DEV ?= $(AVRDUDE_PORT)
-endif
-
-# PROGRAMMER defaults to the external flasher Bus Pirate ISP using avrdude.
-PROGRAMMER  ?= buspirate
+# Avrdude programmer defaults to the external flasher Bus Pirate ISP.
+AVRDUDE_PROGRAMMER  ?= buspirate
 # set serial port for avrdude with buspirate
 ifeq ($(OS),Linux)
   PROG_DEV ?= /dev/ttyUSB0
 else ifeq ($(OS),Darwin)
   PROG_DEV ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 endif
-# avoid error if mcu signature doesn't match
-FFLAGS_EXTRA += -F
 
 # configure the terminal program
-PORT_LINUX  ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 BAUD        ?= 9600
-include $(RIOTMAKE)/tools/serial.inc.mk
 
-include $(RIOTMAKE)/tools/avrdude.inc.mk
 include $(RIOTBOARD)/common/atmega/Makefile.include

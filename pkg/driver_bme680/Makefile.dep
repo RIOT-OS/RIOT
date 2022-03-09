@@ -1,0 +1,3 @@
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
+USEMODULE += driver_bme680_contrib

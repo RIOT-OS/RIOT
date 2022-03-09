@@ -1,7 +1,7 @@
-From c414df012e8382df3ae078c6dda5554e6c505e31 Mon Sep 17 00:00:00 2001
+From 36d7747f18aeb02c317e6ab4dd5542071ad41842 Mon Sep 17 00:00:00 2001
 From: Juan Carrano <j.carrano@fu-berlin.de>
 Date: Mon, 7 May 2018 13:59:06 +0200
-Subject: [PATCH 4/8] Remove os.tmpname.
+Subject: [PATCH 4/7] Remove os.tmpname.
 
 It is a potential source of bugs, causes compiler warnings when building
 without POSIX, behaves differently under POSIX, and cannot be fixed.
@@ -91,5 +91,5 @@ index dd2bb378..69a5f531 100644
  };
  
 -- 
-2.17.1
+2.25.1
 

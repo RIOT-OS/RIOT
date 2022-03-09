@@ -1,0 +1,17 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config PACKAGE_GEMMLOWP
+    bool "General Matrix Multiplication package"
+    depends on TEST_KCONFIG
+    select MODULE_GEMMLOWP
+    help
+        A small self-contained low-precision GEMM library.
+
+config MODULE_GEMMLOWP
+    bool
+    depends on TEST_KCONFIG

@@ -1,0 +1,5 @@
+# include variants of sdp3x drivers as pseudo modules
+PSEUDOMODULES += sdp3x_irq
+
+USEMODULE_INCLUDES_sdp3x := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_sdp3x)

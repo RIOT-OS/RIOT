@@ -1,0 +1,13 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config MODULE_BOARDS_COMMON_SAMDX1-ARDUINO-BOOTLOADER
+    bool
+    default y if MODULE_STDIO_CDC_ACM
+    imply MODULE_USB_BOARD_RESET
+    depends on TEST_KCONFIG
+    help
+       Common code of samdx1 boards with an arduino bootloader

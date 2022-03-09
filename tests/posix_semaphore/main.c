@@ -32,8 +32,6 @@
 #include "thread.h"
 #include "xtimer.h"
 
-#include "test_utils/interactive_sync.h"
-
 #define SEMAPHORE_MSG_QUEUE_SIZE        (8)
 #define SEMAPHORE_TEST_THREADS          (5)
 static char test1_thread_stack[THREAD_STACKSIZE_MAIN];
@@ -80,8 +78,7 @@ static void test1(void)
     kernel_pid_t pid = thread_create(test1_thread_stack,
                                      sizeof(test1_thread_stack),
                                      THREAD_PRIORITY_MAIN - 1,
-                                     THREAD_CREATE_STACKTEST |
-                                     THREAD_CREATE_WOUT_YIELD,
+                                     THREAD_CREATE_STACKTEST,
                                      test1_second_thread,
                                      NULL,
                                      "second");
@@ -132,10 +129,11 @@ static void test1(void)
     puts("first: end");
 }
 
+static msg_t _sema_thread_queue[SEMAPHORE_MSG_QUEUE_SIZE];
+
 static void *priority_sema_thread(void *name)
 {
-    msg_t msg_queue[SEMAPHORE_MSG_QUEUE_SIZE];
-    msg_init_queue(msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
+    msg_init_queue(_sema_thread_queue, SEMAPHORE_MSG_QUEUE_SIZE);
     sem_wait(&s1);
     printf("Thread '%s' woke up.\n", (const char *) name);
     return NULL;
@@ -179,11 +177,12 @@ void test2(void)
     }
 }
 
+static msg_t _one_two_queue[SEMAPHORE_MSG_QUEUE_SIZE];
+
 static void *test3_one_two_thread(void *arg)
 {
-    msg_t msg_queue[SEMAPHORE_MSG_QUEUE_SIZE];
     (void)arg;
-    msg_init_queue(msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
+    msg_init_queue(_one_two_queue, SEMAPHORE_MSG_QUEUE_SIZE);
     sem_wait(&s1);
     puts("Thread 1 woke up after waiting for s1.");
     sem_wait(&s2);
@@ -191,11 +190,12 @@ static void *test3_one_two_thread(void *arg)
     return NULL;
 }
 
+static msg_t _two_one_queue[SEMAPHORE_MSG_QUEUE_SIZE];
+
 static void *test3_two_one_thread(void *arg)
 {
-    msg_t msg_queue[SEMAPHORE_MSG_QUEUE_SIZE];
     (void)arg;
-    msg_init_queue(msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
+    msg_init_queue(_two_one_queue, SEMAPHORE_MSG_QUEUE_SIZE);
     sem_wait(&s2);
     puts("Thread 2 woke up after waiting for s2.");
     sem_wait(&s1);
@@ -294,10 +294,7 @@ void test4(void)
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
     msg_init_queue(main_msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
-    xtimer_init();
     puts("######################### TEST1:");
     test1();
     puts("######################### TEST2:");

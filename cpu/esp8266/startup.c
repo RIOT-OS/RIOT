@@ -16,8 +16,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @}
  */
-#define ENABLE_DEBUG  0
-#include "debug.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -33,6 +31,7 @@
 
 #include "esp/common_macros.h"
 #include "esp_log.h"
+#include "esp_system.h"
 #include "exceptions.h"
 #include "stdio_base.h"
 #include "syscalls.h"
@@ -45,11 +44,22 @@
 #include "gdbstub.h"
 #endif
 
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
 /* external esp function declarations */
 extern uint32_t hwrand (void);
 
 void esp_riot_init(void)
 {
+    /* clear RTC bss data */
+    extern uint8_t _rtc_bss_start, _rtc_bss_end;
+    esp_reset_reason_t reset_reason = esp_reset_reason();
+    if (reset_reason != ESP_RST_DEEPSLEEP && reset_reason != ESP_RST_SW) {
+        /* cppcheck-suppress comparePointers */
+        memset(&_rtc_bss_start, 0, (&_rtc_bss_end - &_rtc_bss_start));
+    }
+
     /* enable cached read from flash */
     Cache_Read_Enable_New();
 
@@ -67,12 +77,13 @@ void esp_riot_init(void)
     }
 
     ets_printf("\n");
+#ifdef MODULE_ESP_LOG_STARTUP
     ets_printf("Starting ESP8266 CPU with ID: %08x\n", system_get_chip_id());
     ets_printf("ESP8266-RTOS-SDK Version %s\n\n", system_get_sdk_version());
     ets_printf("CPU clock frequency: %d MHz\n", system_get_cpu_freq());
     extern void heap_stats(void);
     heap_stats();
-    ets_printf("\n");
+#endif
 
     /* set exception handlers */
     init_exceptions ();
@@ -94,7 +105,9 @@ void esp_riot_init(void)
 #endif
 
     /* initialize stdio*/
+    extern int stdio_is_initialized;
     stdio_init();
+    stdio_is_initialized = 1;
 
     /* trigger static peripheral initialization */
     periph_init();
@@ -102,8 +115,13 @@ void esp_riot_init(void)
     /* trigger board initialization */
     board_init();
 
+#ifdef MODULE_ESP_LOG_STARTUP
     /* print the board config */
     board_print_config();
+#else
+    /* to have an empty line after the unreadable characters from ROM loader */
+    puts("");
+#endif
 
     /* initialize ESP system event loop */
     extern void esp_event_handler_init(void);

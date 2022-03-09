@@ -21,41 +21,40 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+/* This board provides an LSE */
+#ifndef CONFIG_BOARD_HAS_LSE
+#define CONFIG_BOARD_HAS_LSE    1
+#endif
+
+/* This board provides an HSE */
+#ifndef CONFIG_BOARD_HAS_HSE
+#define CONFIG_BOARD_HAS_HSE    1
+#endif
+
+/* The HSE provides a 12MHz clock */
+#define CLOCK_HSE               MHZ(12)
+
 #include "periph_cpu.h"
+#include "clk_conf.h"
+#include "cfg_usb_otg_fs.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @name    Clock settings
- *
- * @note    This is auto-generated from
- *          `cpu/stm32_common/dist/clk_conf/clk_conf.c`
+ * @name    DMA streams configuration
  * @{
  */
-/* give the target core clock (HCLK) frequency [in Hz],
- * maximum: 168MHz */
-#define CLOCK_CORECLOCK     (168000000U)
-/* 0: no external high speed crystal available
- * else: actual crystal frequency [in Hz] */
-#define CLOCK_HSE           (12000000U)
-/* 0: no external low speed crystal available,
- * 1: external crystal available (always 32.768kHz) */
-#define CLOCK_LSE           (1U)
-/* peripheral clock setup */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV4     /* max 42MHz */
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 4)
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV2     /* max 84MHz */
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 2)
+static const dma_conf_t dma_config[] = {
+    { .stream = 11 },   /* DMA2 Stream 3 - SPI1_TX */
+    { .stream = 10 },   /* DMA2 Stream 2 - SPI1_RX */
+};
 
-/* Main PLL factors */
-#define CLOCK_PLL_M          (6)
-#define CLOCK_PLL_N          (168)
-#define CLOCK_PLL_P          (2)
-#define CLOCK_PLL_Q          (7)
+#define DMA_0_ISR           isr_dma2_stream3
+#define DMA_1_ISR           isr_dma2_stream2
+
+#define DMA_NUMOF           ARRAY_SIZE(dma_config)
 /** @} */
 
 /**
@@ -92,8 +91,8 @@ static const uart_conf_t uart_config[] = {
         .bus        = APB2,
         .irqn       = USART1_IRQn,
 #ifdef MODULE_PERIPH_DMA
-        .dma        = 2,
-        .dma_chan   = 2
+        .dma        = DMA_STREAM_UNDEF,
+        .dma_chan   = UINT8_MAX,
 #endif
     },
 };
@@ -105,46 +104,26 @@ static const uart_conf_t uart_config[] = {
 
 /**
  * @name    SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 42000000Hz */
-        7,  /* -> 164062Hz */
-        6,  /* -> 328125Hz */
-        4,  /* -> 1312500Hz */
-        2,  /* -> 5250000Hz */
-        1   /* -> 10500000Hz */
-    },
-    {       /* for APB2 @ 84000000Hz */
-        7,  /* -> 328125Hz */
-        7,  /* -> 328125Hz */
-        5,  /* -> 1312500Hz */
-        3,  /* -> 5250000Hz */
-        2   /* -> 10500000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
-        .dev      = SPI1,
-        .mosi_pin = GPIO_PIN(PORT_A, 7),
-        .miso_pin = GPIO_PIN(PORT_A, 6),
-        .sclk_pin = GPIO_PIN(PORT_A, 5),
-        .cs_pin   = GPIO_UNDEF,
-        .mosi_af  = GPIO_AF5,
-        .miso_af  = GPIO_AF5,
-        .sclk_af  = GPIO_AF5,
-        .cs_af    = GPIO_AF5,
-        .rccmask  = RCC_APB2ENR_SPI1EN,
-        .apbbus   = APB2,
+        .dev            = SPI1,
+        .mosi_pin       = GPIO_PIN(PORT_A, 7),
+        .miso_pin       = GPIO_PIN(PORT_A, 6),
+        .sclk_pin       = GPIO_PIN(PORT_A, 5),
+        .cs_pin         = GPIO_UNDEF,
+        .mosi_af        = GPIO_AF5,
+        .miso_af        = GPIO_AF5,
+        .sclk_af        = GPIO_AF5,
+        .cs_af          = GPIO_AF5,
+        .rccmask        = RCC_APB2ENR_SPI1EN,
+        .apbbus         = APB2,
 #ifdef MODULE_PERIPH_DMA
-        .tx_dma   = 1,
-        .tx_dma_chan = 1,
-        .rx_dma   = 0,
-        .rx_dma_chan = 1,
+        .tx_dma         = 0,
+        .tx_dma_chan    = 3,
+        .rx_dma         = 1,
+        .rx_dma_chan    = 3,
 #endif
     }
 };

@@ -5,21 +5,23 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-nano \
     arduino-uno \
     atmega328p \
+    atmega328p-xplained-mini \
+    calliope-mini \
     cc2650stk \
-    chronos \
     maple-mini \
     mbed_lpc1768 \
     microbit \
-    msb-430 \
-    msb-430h \
     nrf51dongle \
     nrf6310 \
     nucleo-f031k6 \
     nucleo-f042k6 \
+    nucleo-l011k4 \
     opencm9-04 \
     pca10000 \
     pca10005 \
+    samd10-xmini \
     spark-core \
+    stk3200 \
     stm32f030f4-demo \
     stm32f0discovery \
     weio \

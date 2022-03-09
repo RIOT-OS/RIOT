@@ -33,6 +33,9 @@
  * clist_remove()       | O(n)    | remove and return node
  * clist_sort()         | O(NlogN)| sort list (stable)
  * clist_count()        | O(n)    | count the number of elements in a list
+ * clist_is_empty()     | O(1)    | returns true if the list contains no elements
+ * clist_exactly_one()  | O(1)    | returns true if the list contains one element
+ * clist_more_than_one()| O(1)    | returns true if the list contains more than one element
  *
  * clist can be used as a traditional list, a queue (FIFO) and a stack (LIFO) using
  * fast O(1) operations.
@@ -87,11 +90,12 @@
 #ifndef CLIST_H
 #define CLIST_H
 
+#include <stdbool.h>
 #include <stddef.h>
 #include "list.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -101,6 +105,20 @@
  *
  */
 typedef list_node_t clist_node_t;
+
+/**
+ * @brief Checks if *list is empty
+ *
+ * @note Complexity: O(1)
+ *
+ * @param[in]   list        Pointer to clist
+ *
+ * @returns     true if list contains no elements, false otherwise
+ */
+static inline bool clist_is_empty(const clist_node_t *list)
+{
+    return list->next == NULL;
+}
 
 /**
  * @brief Appends *new_node* at the end of *list
@@ -252,9 +270,11 @@ static inline clist_node_t *clist_rpop(clist_node_t *list)
  * @returns         predecessor of node if found
  * @returns         NULL if node is not a list member
  */
-static inline clist_node_t *clist_find_before(const clist_node_t *list, const clist_node_t *node)
+static inline clist_node_t *clist_find_before(const clist_node_t *list,
+                                              const clist_node_t *node)
 {
     clist_node_t *pos = list->next;
+
     if (!pos) {
         return NULL;
     }
@@ -280,9 +300,11 @@ static inline clist_node_t *clist_find_before(const clist_node_t *list, const cl
  * @returns         node if found
  * @returns         NULL if node is not a list member
  */
-static inline clist_node_t *clist_find(const clist_node_t *list, const clist_node_t *node)
+static inline clist_node_t *clist_find(const clist_node_t *list,
+                                       const clist_node_t *node)
 {
     clist_node_t *tmp = clist_find_before(list, node);
+
     if (tmp) {
         return tmp->next;
     }
@@ -339,9 +361,12 @@ static inline clist_node_t *clist_remove(clist_node_t *list, clist_node_t *node)
  * @returns         NULL on empty list or full traversal
  * @returns         node that caused @p func(node, arg) to exit non-zero
  */
-static inline clist_node_t *clist_foreach(clist_node_t *list, int(*func)(clist_node_t *, void *), void *arg)
+static inline clist_node_t *clist_foreach(clist_node_t *list, int (*func)(
+                                              clist_node_t *,
+                                              void *), void *arg)
 {
     clist_node_t *node = list->next;
+
     if (node) {
         do {
             node = node->next;
@@ -365,8 +390,8 @@ typedef int (*clist_cmp_func_t)(clist_node_t *a, clist_node_t *b);
  *
  * @internal
  *
- * @param[in]   list    ptr to first element of list
- * @param[in]   cmp     comparison function
+ * @param[in]   list_head   ptr to the first element inside a clist
+ * @param[in]   cmp         comparison function
  *
  * @returns     ptr to *last* element in list
  */
@@ -424,7 +449,7 @@ static inline void clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
 /**
  * @brief   Count the number of items in the given list
  *
- * @param[in]   list    ptr to the first element of the list
+ * @param[in]   list    ptr to the clist
  *
  * @return  the number of elements in the given list
  */
@@ -432,6 +457,7 @@ static inline size_t clist_count(clist_node_t *list)
 {
     clist_node_t *node = list->next;
     size_t cnt = 0;
+
     if (node) {
         do {
             node = node->next;
@@ -440,6 +466,34 @@ static inline size_t clist_count(clist_node_t *list)
     }
 
     return cnt;
+}
+
+/**
+ * @brief   Tells if a list has exactly one element
+ *
+ * @note    Complexity: O(1)
+ *
+ * @param[in]   list    Pointer to the clist
+ *
+ * @retval      true    If list has exactly one element
+ */
+static inline bool clist_exactly_one(clist_node_t *list)
+{
+    return !clist_is_empty(list) && (list->next == list->next->next);
+}
+
+/**
+ * @brief   Tells if a list has more than one element
+ *
+ * @note    Complexity: O(1)
+ *
+ * @param[in]   list    Pointer to the clist
+ *
+ * @retval      true    If list has more than one element
+ */
+static inline bool clist_more_than_one(clist_node_t *list)
+{
+    return !clist_is_empty(list) && (list->next != list->next->next);
 }
 
 #ifdef __cplusplus

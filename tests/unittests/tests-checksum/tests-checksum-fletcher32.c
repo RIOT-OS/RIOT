@@ -6,7 +6,10 @@
  * directory for more details.
  */
 
+#include <assert.h>
+#include <stdalign.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "embUnit/embUnit.h"
 
@@ -16,7 +19,7 @@
 
 /* String is longer than 359 so it checks the wrap-around property of
  * fletcher32 */
-static const unsigned char wrap_around_data[] =
+static const alignas(uint16_t) unsigned char wrap_around_data[] =
         "AD3Awn4kb6FtcsyE0RU25U7f55Yncn3LP3oEx9Gl4qr7iDW7I8L6Pbw9jNnh0sE4DmCKuc"
         "d1J8I34vn31W924y5GMS74vUrZQc08805aj4Tf66HgL1cO94os10V2s2GDQ825yNh9Yuq3"
         "QHcA60xl31rdA7WskVtCXI7ruH1A4qaR6Uk454hm401lLmv2cGWt5KTJmr93d3JsGaRRPs"
@@ -24,20 +27,21 @@ static const unsigned char wrap_around_data[] =
         "tLhgfET2gUGU65V3edSwADMqRttI9JPVz8JS37g5QZj4Ax56rU1u0m0K8YUs57UYG5645n"
         "byNy4yqxu7";
 
+static uint32_t _fletcher32(const uint8_t *buf, size_t len)
+{
+    return fletcher32((const uint16_t *)(uintptr_t)buf, len / 2);
+}
+
 static int calc_and_compare_checksum(const unsigned char *buf, size_t len,
                                      uint32_t expected)
 {
-    const uint16_t *buf16 = (const uint16_t *) buf;
-    size_t len16 = len/2;
-    uint32_t result = fletcher32(buf16, len16);
-
-    return result == expected;
+    return _fletcher32(buf, len) == expected;
 }
 
 static void test_checksum_fletcher32_empty(void)
 {
     /* the initial checksum value is 0xFFFFFFFF */
-    unsigned char buf[] = "";
+    alignas(uint16_t) unsigned char buf[] = "";
     uint32_t expect = 0xFFFFFFFF;
 
     TEST_ASSERT(calc_and_compare_checksum(buf, sizeof(buf) - 1, expect));
@@ -46,14 +50,14 @@ static void test_checksum_fletcher32_empty(void)
 static void test_checksum_fletcher32_0to1_undetected(void)
 {
     /* fletcher cannot distinguish between all 0 and all 1 segments */
-    unsigned char buf0[16] = {
+    alignas(uint16_t) unsigned char buf0[16] = {
         0xA1, 0xA1, 0xA1, 0xA1,
         0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00,
         0x1A, 0x1A, 0x1A, 0x1A,
     };
-    uint32_t expect = fletcher32((const uint16_t *) buf0, sizeof(buf0)/2);
-    unsigned char buf1[16] = {
+    uint32_t expect = _fletcher32(buf0, sizeof(buf0));
+    alignas(uint16_t) unsigned char buf1[16] = {
         0xA1, 0xA1, 0xA1, 0xA1,
         0xFF, 0xFF, 0xFF, 0xFF,
         0xFF, 0xFF, 0xFF, 0xFF,
@@ -66,7 +70,7 @@ static void test_checksum_fletcher32_0to1_undetected(void)
 static void test_checksum_fletcher32_atof(void)
 {
     /* XXX: not verified with external implementation yet */
-    unsigned char buf[] = "abcdef";
+    alignas(uint16_t) unsigned char buf[] = "abcdef";
     uint32_t expect = 0x56502d2a;
 
     TEST_ASSERT(calc_and_compare_checksum(buf, sizeof(buf) - 1, expect));

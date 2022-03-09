@@ -22,8 +22,6 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include "test_utils/interactive_sync.h"
-
 #include "xtimer.h"
 #include "fmt.h"
 
@@ -61,11 +59,7 @@ static void buf_fill(uint32_t *buf, int len)
 
 int main(void)
 {
-    xtimer_init();
-
     bloom_init(&bloom, BLOOM_BITS, bf, hashes, BLOOM_HASHF);
-
-    test_utils_interactive_sync();
 
     printf("Testing Bloom filter.\n\n");
     printf("m: %" PRIu32 " k: %" PRIu32 "\n\n", (uint32_t) bloom.m,
@@ -116,8 +110,7 @@ int main(void)
     double false_positive_rate = (double) in / (double) lenA;
     /* Use 'fmt/print_float' to work on all platforms (atmega)
      * Stdout should be flushed before to prevent garbled output. */
-#ifdef MODULE_NEWLIB
-    /* no fflush on msp430 */
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
     fflush(stdout);
 #endif
     print_float(false_positive_rate, 6);

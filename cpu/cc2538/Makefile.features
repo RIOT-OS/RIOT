@@ -1,7 +1,23 @@
+CPU_CORE = cortex-m3
+CPU_FAM = cc2538
+
 FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_flashpage
+FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_hwrng
+FEATURES_PROVIDED += periph_rtt_set_counter
 FEATURES_PROVIDED += periph_uart_modecfg
-FEATURES_PROVIDED += puf_sram
+FEATURES_PROVIDED += periph_uart_nonblocking
+FEATURES_PROVIDED += periph_rtt_overflow
+FEATURES_PROVIDED += periph_wdt
 
--include $(RIOTCPU)/cortexm_common/Makefile.features
+FEATURES_PROVIDED += cortexm_mpu
+
+include $(RIOTCPU)/cortexm_common/Makefile.features
+
+# This configuration enables modules that are only available when using Kconfig
+# module modelling
+ifeq (1, $(TEST_KCONFIG))
+  KCONFIG_CPU_CONFIG += $(RIOTCPU)/cc2538/cc2538.config
+endif

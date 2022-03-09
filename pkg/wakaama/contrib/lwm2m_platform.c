@@ -34,13 +34,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "tlsf.h"
 
 #include "lwm2m_platform.h"
 #include "lwm2m_client_config.h"
 
-static uint32_t _tlsf_heap[(LWM2M_TLSF_BUFFER / sizeof(uint32_t))];
+static uint32_t _tlsf_heap[(CONFIG_LWM2M_TLSF_BUFFER / sizeof(uint32_t))];
 static tlsf_t _tlsf;
 
 typedef struct {
@@ -103,7 +103,7 @@ int lwm2m_strncmp(const char *s1, const char *s2, size_t n)
 
 time_t lwm2m_gettime(void)
 {
-    return (time_t)(xtimer_now_usec64() / US_PER_SEC);
+    return (time_t)(ztimer_now(ZTIMER_SEC));
 }
 
 /* For clang we need to specify that the first argument will be a format string

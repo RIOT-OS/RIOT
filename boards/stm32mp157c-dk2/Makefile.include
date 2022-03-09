@@ -1,0 +1,13 @@
+# we use shared STM32 configuration snippets
+INCLUDES += -I$(RIOTBOARD)/common/stm32/include
+
+# this board has an on-board ST-link adapter
+OPENOCD_DEBUG_ADAPTER = stlink-dap
+OPENOCD_CORE = stm32mp15x.cm4
+GDB_PORT_CORE_OFFSET = 1
+
+FFLAGS ?= flashr $(FLASHFILE)
+DEBUGGER_FLAGS ?= debugr $(ELFFILE)
+
+# Setup of programmer and serial is shared between STM32 based boards
+include $(RIOTMAKE)/boards/stm32.inc.mk

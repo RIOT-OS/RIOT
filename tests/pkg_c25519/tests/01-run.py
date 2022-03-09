@@ -10,17 +10,16 @@
 import os
 import sys
 
+from testrunner import run_check_unittests
+from testrunner import TIMEOUT as DEFAULT_TIMEOUT
 
-def testfunc(child):
-    board = os.environ['BOARD']
-    # Increase timeout on "real" hardware
-    # 170 seconds on `arduino-mega2560`
-    timeout = 200 if board != 'native' else -1
-    child.expect(r"OK \(2 tests\)", timeout=timeout)
+
+BOARD = os.environ['BOARD']
+# Increase timeout on "real" hardware
+# 170 seconds on `arduino-mega2560`
+# ~300 seconds on `z1`
+TIMEOUT = 320 if BOARD != 'native' else DEFAULT_TIMEOUT
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ['RIOTBASE'],
-                                 'dist/tools/testrunner'))
-    from testrunner import run
-    sys.exit(run(testfunc))
+    sys.exit(run_check_unittests(timeout=TIMEOUT))

@@ -22,10 +22,14 @@
 #define KERNEL_DEFINES_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+
+/* uncrustify gets mightily confused by these macros... */
+/* begin{code-style-ignore} */
 
 /**
  * @def         container_of(PTR, TYPE, MEMBER)
@@ -44,20 +48,30 @@
 #   define container_of(PTR, TYPE, MEMBER) \
         (_Generic((PTR), \
             const __typeof__ (((TYPE *) 0)->MEMBER) *: \
-                ((TYPE *) ((char *) (PTR) - offsetof(TYPE, MEMBER))), \
+                ((TYPE *) ((uintptr_t) (PTR) - offsetof(TYPE, MEMBER))), \
             __typeof__ (((TYPE *) 0)->MEMBER) *: \
-                ((TYPE *) ((char *) (PTR) - offsetof(TYPE, MEMBER))) \
+                ((TYPE *) ((uintptr_t) (PTR) - offsetof(TYPE, MEMBER))) \
         ))
 #elif defined __GNUC__
 #   define container_of(PTR, TYPE, MEMBER) \
         (__extension__ ({ \
             __extension__ const __typeof__ (((TYPE *) 0)->MEMBER) *__m____ = (PTR); \
-            ((TYPE *) ((char *) __m____ - offsetof(TYPE, MEMBER))); \
+            ((TYPE *) ((uintptr_t) __m____ - offsetof(TYPE, MEMBER))); \
         }))
 #else
 #   define container_of(PTR, TYPE, MEMBER) \
         ((TYPE *) ((char *) (PTR) - offsetof(TYPE, MEMBER)))
 #endif
+
+/**
+ * @def         index_of(ARRAY, ELEMENT)
+ * @brief       Returns the index of a pointer to an array element.
+
+ * @param[in]   ARRAY    an array
+ * @param[in]   ELEMENT  pointer to an array element
+ * @return      Index of the element in the array
+ */
+#define index_of(ARRAY, ELEMENT) (((uintptr_t)(ELEMENT) - (uintptr_t)(ARRAY)) / sizeof((ARRAY)[0]))
 
 /**
  * @def NORETURN
@@ -119,26 +133,6 @@
 #endif
 
 /**
- * @def         ALIGN_OF(T)
- * @brief       Calculate the minimal alignment for type T.
- * @param[in]   T   Type to examine
- * @returns     The minimal alignment of T.
- */
-#define ALIGN_OF(T) (offsetof(struct { char c; T t; }, t))
-
-/**
- * @def         BUILD_BUG_ON(condition)
- * @brief       Forces a compilation error if condition is true.
- *              This trick is only needed if the condition can't be evaluated
- *              before compile time (i.e. sizeof(sometype_t) < 42 )
- *              For more details on this see for example:
- *              https://git.kernel.org/pub/scm/linux/kernel/git/stable/
- *              linux-stable.git/tree/include/linux/bug.h
- * @param[in]   condition  A condition that will be evaluated at compile time
- */
-#define BUILD_BUG_ON(condition) ((void)sizeof(char[1 - 2 * !!(condition)]))
-
-/**
  * @def         IS_ACTIVE(macro)
  * @brief       Allows to verify a macro definition outside the preprocessor.
  *
@@ -184,6 +178,86 @@
 #define IS_USED(module) IS_ACTIVE(module)
 
 /**
+ * @def         RIOT_VERSION_NUM(major, minor, patch, extra)
+ * @brief       Generates a 64 bit variable of a release version.
+ *              Comparisons to this only apply to released branches
+ *
+ *              To define @p extra add a file `EXTRAVERSION` to the RIOT root
+ *              with the content
+ *
+ *                  RIOT_EXTRAVERSION = <extra>
+ *
+ *              with `<extra>` being the number of your local version.
+ *              This can be useful if you are maintaining a downstream
+ *              release to base further work on.
+ *
+ * @warning     This is only intended to be used with external boards or
+ *              modules.
+ *              In-tree code must not make use of this macro.
+ *
+ * @param[in]   major   Mayor version of the release
+ * @param[in]   minor   Minor version of the release
+ * @param[in]   patch   Patch level of the release
+ * @param[in]   extra   Extra version, user defined
+ *
+ * @returns     A machine readable version variable
+ */
+#define RIOT_VERSION_NUM(major, minor, patch, extra)   \
+    (((0ULL + major) << 48) + ((0ULL + minor) << 32) + \
+     ((0ULL + patch) << 16) + (extra))
+
+/**
+ * @brief   Disable -Wpedantic for the argument, but restore diagnostic
+ *          settings afterwards
+ * @param   ...     The expression that -Wpendantic should not apply to
+ *
+ * @warning This is intended for internal use only
+ *
+ * This is particularly useful when declaring non-strictly conforming
+ * preprocessor macros, as the diagnostics need to be disabled where the
+ * macro is evaluated, not where the macro is declared.
+ */
+#define WITHOUT_PEDANTIC(...) \
+    _Pragma("GCC diagnostic push") \
+    _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
+    __VA_ARGS__ \
+    _Pragma("GCC diagnostic pop")
+
+/**
+ * @brief   Declare a constant named @p identifier as anonymous `enum` that has
+ *          the value @p const_expr
+ *
+ * @warning This is intended for internal use only
+ *
+ * This turns any expression that is constant and known at compile time into
+ * a formal compile time constant. This allows e.g. using non-formally but
+ * still constant expressions in `static_assert()`.
+ */
+#define DECLARE_CONSTANT(identifier, const_expr) \
+    WITHOUT_PEDANTIC(enum { identifier = const_expr };)
+
+#if DOXYGEN
+/**
+ * @brief   Check if given variable / expression is detected as compile time
+ *          constant
+ * @note    This might return 0 on compile time constant expressions if the
+ *          compiler is not able to prove the constness at the given level
+ *          of optimization.
+ * @details This will return 0 if the used compiler does not support this
+ * @warning This is intended for internal use only
+ *
+ * This allows providing two different implementations in C, with one being
+ * more efficient if constant folding is used.
+ */
+#define IS_CT_CONSTANT(expr) <IMPLEMENTATION>
+#elif defined(__GNUC__)
+/* both clang and gcc (which both define __GNUC__) support this */
+#define IS_CT_CONSTANT(expr) __builtin_constant_p(expr)
+#else
+#define IS_CT_CONSTANT(expr) 0
+#endif
+
+/**
  * @cond INTERNAL
  */
 /* Here a prefix "__PREFIX_WHEN_" is added to the macro. So if it was a 1 we
@@ -215,6 +289,8 @@
 /**
  * @endcond
  */
+
+/* end{code-style-ignore} */
 
 #ifdef __cplusplus
 }

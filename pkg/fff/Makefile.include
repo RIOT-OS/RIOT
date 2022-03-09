@@ -1,0 +1,5 @@
+INCLUDES += -I$(PKGDIRBASE)/fff
+
+# There's nothing to build in this package, it's used as a header only library.
+# So it's declared as a pseudo-module
+PSEUDOMODULES += fff

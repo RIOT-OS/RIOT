@@ -31,7 +31,7 @@ extern "C" {
  */
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
-#ifdef AUTO_INIT_LED0
+#ifdef MODULE_PERIPH_INIT_LED0
     /* The LED pin is also used for SPI, so we enable it
        only if explicitly wanted by the user */
     {
@@ -47,8 +47,8 @@ static const  saul_gpio_params_t saul_gpio_params[] =
     },
     {
         .name = "Button(B1 User)",
-        .pin = BTN_B1_PIN,
-        .mode = GPIO_IN_PU,
+        .pin = BTN0_PIN,
+        .mode = BTN0_MODE,
         .flags = SAUL_GPIO_INVERTED
     }
 };

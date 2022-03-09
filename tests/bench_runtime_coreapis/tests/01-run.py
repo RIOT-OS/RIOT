@@ -21,10 +21,11 @@ def testfunc(child):
     child.expect(BENCHMARK_REGEXP.format(func=r"mutex_init\(\)"))
     child.expect(BENCHMARK_REGEXP.format(func="mutex lock/unlock"), timeout=TIMEOUT)
     child.expect(BENCHMARK_REGEXP.format(func=r"thread_flags_set\(\)"))
+    child.expect(BENCHMARK_REGEXP.format(func=r"thread_flags_clear\(\)"))
     child.expect(BENCHMARK_REGEXP.format(func="thread flags set/wait any"), timeout=TIMEOUT)
     child.expect(BENCHMARK_REGEXP.format(func="thread flags set/wait all"), timeout=TIMEOUT)
     child.expect(BENCHMARK_REGEXP.format(func="thread flags set/wait one"), timeout=TIMEOUT)
-    child.expect(BENCHMARK_REGEXP.format(func=r"msg_try_receive\(\)"))
+    child.expect(BENCHMARK_REGEXP.format(func=r"msg_try_receive\(\)"), timeout=TIMEOUT)
     child.expect(BENCHMARK_REGEXP.format(func=r"msg_avail\(\)"))
     child.expect_exact('[SUCCESS]')
 

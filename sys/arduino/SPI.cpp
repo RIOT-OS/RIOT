@@ -28,6 +28,8 @@ extern "C" {
 
 SPISettings::SPISettings(uint32_t clock_hz, uint8_t bitOrder, uint8_t dataMode)
 {
+    (void)bitOrder;
+
     static const spi_clk_t clocks[] = {
         SPI_CLK_10MHZ, SPI_CLK_5MHZ, SPI_CLK_1MHZ, SPI_CLK_400KHZ
     };
@@ -37,19 +39,19 @@ SPISettings::SPISettings(uint32_t clock_hz, uint8_t bitOrder, uint8_t dataMode)
 
     assert(bitOrder == MSBFIRST);
     switch(dataMode) {
-        default:
-        case SPI_MODE0:
-            mode = SPI_MODE_0;
-            break;
-        case SPI_MODE1:
-            mode = SPI_MODE_1;
-            break;
-        case SPI_MODE2:
-            mode = SPI_MODE_2;
-            break;
-        case SPI_MODE3:
-            mode = SPI_MODE_3;
-            break;
+    default:
+    case SPI_MODE0:
+        mode = SPI_MODE_0;
+        break;
+    case SPI_MODE1:
+        mode = SPI_MODE_1;
+        break;
+    case SPI_MODE2:
+        mode = SPI_MODE_2;
+        break;
+    case SPI_MODE3:
+        mode = SPI_MODE_3;
+        break;
     }
 
     for (uint8_t i = 0; i < ARRAY_SIZE(steps); i++) {
@@ -64,8 +66,10 @@ SPISettings::SPISettings(uint32_t clock_hz, uint8_t bitOrder, uint8_t dataMode)
 
 SPIClass::SPIClass(spi_t spi_dev)
 {
-    /* Check if default SPI interface is valid */
-    BUILD_BUG_ON(ARDUINO_SPI_INTERFACE >= SPI_NUMOF);
+    /* Check if default SPI interface is valid. Casting to int to avoid
+     * bogus type-limits warning here. */
+    static_assert((int)ARDUINO_SPI_INTERFACE <= (int)SPI_NUMOF,
+                  "spi_dev out of bounds");
     this->spi_dev = spi_dev;
     this->settings = SPISettings();
     this->is_transaction = false;
@@ -76,17 +80,14 @@ void SPIClass::beginTransaction(SPISettings settings)
 {
     rmutex_lock(&mut);
     /* Call spi_acquire first to prevent data races */
-    int retval = spi_acquire(spi_dev, SPI_CS_UNDEF,
-                             settings.mode, settings.clock);
-    /* No support for exceptions (at least on AVR), resort to assert() */
-    assert(retval == SPI_OK);
+    spi_acquire(spi_dev, SPI_CS_UNDEF, settings.mode, settings.clock);
     is_transaction = true;
 }
 
 void SPIClass::endTransaction()
 {
-    spi_release(spi_dev);
     is_transaction = false;
+    spi_release(spi_dev);
     rmutex_unlock(&mut);
 }
 
@@ -95,10 +96,7 @@ void SPIClass::transfer(void *buf, size_t count)
     rmutex_lock(&mut);
 
     if (!is_transaction) {
-        int retval = spi_acquire(spi_dev, SPI_CS_UNDEF,
-                                 settings.mode, settings.clock);
-        /* No support for exceptions (at least on AVR), resort to assert() */
-        assert(retval == SPI_OK);
+        spi_acquire(spi_dev, SPI_CS_UNDEF, settings.mode, settings.clock);
     }
     spi_transfer_bytes(spi_dev, SPI_CS_UNDEF, false, buf, buf, count);
     if (!is_transaction) {
@@ -110,25 +108,26 @@ void SPIClass::transfer(void *buf, size_t count)
 
 void SPIClass::setBitOrder(uint8_t order)
 {
+    (void)order;
     assert(order == MSBFIRST);
 }
 
 void SPIClass::setDataMode(uint8_t dataMode)
 {
     switch(dataMode) {
-        default:
-        case SPI_MODE0:
-            settings.mode = SPI_MODE_0;
-            break;
-        case SPI_MODE1:
-            settings.mode = SPI_MODE_1;
-            break;
-        case SPI_MODE2:
-            settings.mode = SPI_MODE_2;
-            break;
-        case SPI_MODE3:
-            settings.mode = SPI_MODE_3;
-            break;
+    default:
+    case SPI_MODE0:
+        settings.mode = SPI_MODE_0;
+        break;
+    case SPI_MODE1:
+        settings.mode = SPI_MODE_1;
+        break;
+    case SPI_MODE2:
+        settings.mode = SPI_MODE_2;
+        break;
+    case SPI_MODE3:
+        settings.mode = SPI_MODE_3;
+        break;
     }
 }
 

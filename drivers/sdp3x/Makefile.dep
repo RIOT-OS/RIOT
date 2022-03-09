@@ -1,0 +1,7 @@
+FEATURES_REQUIRED += periph_i2c
+USEMODULE += checksum
+USEMODULE += xtimer
+
+ifneq (,$(filter sdp3x_irq,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+endif

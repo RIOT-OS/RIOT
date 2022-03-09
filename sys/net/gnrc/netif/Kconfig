@@ -1,0 +1,78 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_GNRC_NETIF
+    bool "Configure GNRC network interface"
+    depends on USEMODULE_GNRC_NETIF
+    help
+        Configure GNRC network interface using Kconfig.
+
+if KCONFIG_USEMODULE_GNRC_NETIF
+
+config GNRC_NETIF_MSG_QUEUE_SIZE_EXP
+    int "Exponent for the message queue size for network interface threads (as 2^n)"
+    default 4
+    help
+        As the queue size ALWAYS needs to be power of two, this option
+        represents the exponent of 2^n, which will be used as the size of
+        the queue.
+
+config GNRC_NETIF_IPV6_ADDRS_NUMOF
+    int "Maximum number of unicast and anycast addresses per interface"
+    default 3 if DHCPV6_CLIENT_ADDR_LEASE_MAX != 0
+    default 2
+    help
+        If you change this, please make sure that
+        @ref CONFIG_GNRC_NETIF_IPV6_GROUPS_NUMOF is also large enough to fit the
+        addresses' solicited nodes multicast addresses.
+        Default: 2 (1 link-local + 1 global address).
+
+config GNRC_NETIF_DEFAULT_HL
+    int "Default hop limit"
+    default 64
+
+config GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
+    int "Minimum wait time after a send operation"
+    default 0
+    help
+        This value is expressed in microseconds. It is purely meant as a debugging
+        feature to slow down a radios sending.
+
+config GNRC_NETIF_NONSTANDARD_6LO_MTU
+    bool "Enable usage of non standard MTU for 6LoWPAN network interfaces"
+    depends on USEMODULE_GNRC_NETIF_6LO
+    help
+        Enables the usage of non standard MTU for 6LoWPAN network interfaces.
+        This is non compliant with RFC 4944 and RFC 7668 and might not be
+        supported by other implementations.
+
+config GNRC_NETIF_PKTQ_POOL_SIZE
+    int "Packet queue pool size for all network interfaces"
+    depends on USEMODULE_GNRC_NETIF_PKTQ
+    default 16
+
+config GNRC_NETIF_PKTQ_TIMER_US
+    int "Time in microseconds for when to try to send a queued packet at the latest"
+    depends on USEMODULE_GNRC_NETIF_PKTQ
+    default 5000
+    help
+        Set to -1 to deactivate dequeing by timer. For this it has to be ensured
+        that none of the notifications by the driver are missed!
+
+config GNRC_NETIF_LORAWAN_NETIF_HDR
+    bool "Encode LoRaWAN port in GNRC netif header"
+    depends on USEMODULE_GNRC_LORAWAN
+    help
+        When set, GNRC Netif will interpret
+        the destination address of the GNRC netif header as
+        the LoRaWAN port. For downlinks, a GNRC netif header
+        with the received port in destination field will be
+        included in the first snip. From Release 2021.10 all
+        GNRC LoRaWAN packets will include the GNRC Netif
+        header. Therefore this parameter will be removed
+
+
+endif # KCONFIG_USEMODULE_GNRC_NETIF

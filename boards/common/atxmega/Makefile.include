@@ -1,0 +1,38 @@
+INCLUDES += -I$(RIOTBOARD)/common/atxmega/include
+
+# Use JTAG as default protocol for debugging
+DEBUGPROTO ?= -x
+FLASHFILE ?= $(ELFFILE)
+
+# Use avrdude programmer with Atmel ICE as default flash/debug system
+PROGRAMMER ?= avrdude
+AVRDUDE_PROGRAMMER ?= atmelice
+
+ifneq (,$(filter flash%,$(MAKECMDGOALS)))
+  FFLAGS_EXTRA ?= -e
+endif
+
+# If avrdude specific programmer is not set, set it based on the bootloader used
+ifeq (,$(AVRDUDE_PROGRAMMER))
+  FLASHFILE ?= $(BINFILE)
+
+  ifeq (stk500v2,$(BOOTLOADER))
+    AVRDUDE_PROGRAMMER = stk500v2
+    BOOTLOADER_SIZE ?= 4K
+    # Disable auto erase; erasing the flash is done implicitly by the bootloader
+    # and explicit erase is not supported
+    FFLAGS_EXTRA += -D
+  endif
+
+  ifeq (avr109,$(BOOTLOADER))
+    AVRDUDE_PROGRAMMER = avr109
+    BOOTLOADER_SIZE ?= 4K
+  endif
+
+  ifneq (,$(BOOTLOADER_BAUD))
+    FFLAGS_EXTRA += -b $(BOOTLOADER_BAUD)
+  endif
+endif
+
+BOOTLOADER_SIZE ?= 0
+ROM_RESERVED ?= $(BOOTLOADER_SIZE)

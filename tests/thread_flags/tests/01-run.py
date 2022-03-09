@@ -24,6 +24,8 @@ def testfunc(child):
     child.expect_exact("thread(): received flags: 0x0008")
     child.expect_exact("main: setting 100ms timeout...")
     child.expect("main: timeout triggered. time passed: [0-9]{6}us")
+    child.expect_exact("main: setting 100ms timeout (using uint64)...")
+    child.expect("main: timeout triggered. time passed: [0-9]{6}us")
     child.expect("SUCCESS")
 
 

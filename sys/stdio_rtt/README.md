@@ -32,7 +32,7 @@ your stdout bandwidth by lowering the poll interval. The default is 50ms.
 A choice of 5ms is good during printf-heavy debugging:
 
 ```
-CFLAGS += -DSTDIO_POLL_INTERVAL=5000U
+CFLAGS += -DSTDIO_POLL_INTERVAL_MS=5U
 ```
 
 SEGGER RTT supports stdin as well, and this is enabled by default. It requires

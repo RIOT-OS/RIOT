@@ -21,12 +21,14 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdint.h>
 
 #include "cpu.h"
+#include "bitarithm.h"
 #include "periph/gpio.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define MODE_NOTSUP         (0xff)
@@ -213,10 +215,19 @@ static inline void handle_isr(uint8_t port_num)
     port->IC             = 0x000000ff;
     port->IRQ_DETECT_ACK = (0xff << (port_num * GPIO_BITS_PER_PORT));
 
-    for (int i = 0; i < GPIO_BITS_PER_PORT; i++) {
-        if (state & (1 << i)) {
-            isr_ctx[port_num][i].cb(isr_ctx[port_num][i].arg);
-        }
+    /* If only one bit it is set in state (one GPIO pin caused an interrupt),
+     * don't loop over all 8 bits.
+     *
+     * Use clz to get the position of the first interrupt bit and clear it,
+     * looping only as many times as there are actual interrupts.
+     */
+
+    /* mask all non-GPIO bits */
+    state &= (1 << GPIO_BITS_PER_PORT) - 1;
+    uint8_t pin = 0;
+    while (state) {
+        state = bitarithm_test_and_clear(state, &pin);
+        isr_ctx[port_num][pin].cb(isr_ctx[port_num][pin].arg);
     }
 
     cortexm_isr_end();

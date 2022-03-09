@@ -31,7 +31,7 @@
 #include "periph/gpio.h"
 #include "periph/i2c.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* short cuts macros */
@@ -231,18 +231,17 @@ void i2c_init(i2c_t dev)
     DEBUG(" - I2C master status (0x%x).\n", _i2c_master_stat_get());
 }
 
-int i2c_acquire(i2c_t dev)
+void i2c_acquire(i2c_t dev)
 {
+    (void)dev;
+    assert(dev < I2C_NUMOF);
     DEBUG("%s\n", __FUNCTION__);
-    if (dev < I2C_NUMOF) {
-        mutex_lock(&lock);
-        return 0;
-    }
-    return -1;
+    mutex_lock(&lock);
 }
 
 void i2c_release(i2c_t dev)
 {
+    (void)dev;
     assert(dev < I2C_NUMOF);
     DEBUG("%s\n", __FUNCTION__);
     mutex_unlock(&lock);

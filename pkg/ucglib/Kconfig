@@ -1,0 +1,24 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config PACKAGE_UCGLIB
+    bool "UcgLib color graphics library for OLED and LCD displays"
+    depends on TEST_KCONFIG
+    depends on HAS_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_USEC
+    select MODULE_UCGLIB_RIOT
+    select MODULE_UCGLIB_CSRC
+
+config MODULE_UCGLIB_RIOT
+    bool
+    depends on TEST_KCONFIG
+
+config MODULE_UCGLIB_CSRC
+    bool
+    depends on TEST_KCONFIG

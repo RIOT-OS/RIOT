@@ -1,0 +1,31 @@
+From ef050fbfa95f5c32918db9afaab253ce5d2ab56d Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Tue, 14 Dec 2021 18:30:22 +0100
+Subject: [PATCH] kernel/os: silence -Wcast-align
+
+---
+ kernel/os/include/os/os_mbuf.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/kernel/os/include/os/os_mbuf.h b/kernel/os/include/os/os_mbuf.h
+index 53a16c5d2..4dada2352 100644
+--- a/kernel/os/include/os/os_mbuf.h
++++ b/kernel/os/include/os/os_mbuf.h
+@@ -133,12 +133,12 @@ struct os_mqueue {
+     ((__om)->om_pkthdr_len >= sizeof (struct os_mbuf_pkthdr))
+ 
+ /** Get a packet header pointer given an mbuf pointer */
+-#define OS_MBUF_PKTHDR(__om) ((struct os_mbuf_pkthdr *)     \
++#define OS_MBUF_PKTHDR(__om) ((struct os_mbuf_pkthdr *)(uintptr_t) \
+     ((uint8_t *)&(__om)->om_data + sizeof(struct os_mbuf)))
+ 
+ /** Given a mbuf packet header pointer, return a pointer to the mbuf */
+ #define OS_MBUF_PKTHDR_TO_MBUF(__hdr)   \
+-     (struct os_mbuf *)((uint8_t *)(__hdr) - sizeof(struct os_mbuf))
++     (struct os_mbuf *)(uintptr_t)((uint8_t *)(__hdr) - sizeof(struct os_mbuf))
+ 
+ /**
+  * Gets the length of an entire mbuf chain.  The specified mbuf must have a
+-- 
+2.30.2
+

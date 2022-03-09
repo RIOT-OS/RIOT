@@ -70,3 +70,4 @@ static const can_conf_t candev_conf[] = {
 #endif
 
 #endif /* CAN_PARAMS_H */
+/** @} */

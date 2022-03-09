@@ -1,0 +1,160 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_LORA
+    bool "LoRa PHY support"
+    depends on TEST_KCONFIG
+
+menuconfig KCONFIG_USEMODULE_LORA
+    bool "Configure LoRa PHY"
+    depends on USEMODULE_LORA
+    help
+        Configure LoRa PHY using Kconfig.
+
+if KCONFIG_USEMODULE_LORA
+
+config LORA_PREAMBLE_LENGTH_DEFAULT
+    int "Preamble length"
+    range 8 65537
+    default 8
+    help
+        Configure preamble used in LoRa frame. Each LoRa frame begins with a
+        preamble. It starts with a series of upchirps to cover the whole
+        frequency band of the particular channel assigned. The last two upchirps
+        encode the sync word. Sync word is used to differntiate between LoRa
+        transmissions that use the same frequency bands. The sync word is
+        followed by two and a quarter downchirps, for a duration of 2.25
+        symbols. The total duration of this preamble can be configured between
+        10.25 and 65,539.25 symbol hence the range 8 to 65537.
+
+config LORA_SYMBOL_TIMEOUT_DEFAULT
+    int "Symbol timeout period in symbols"
+    default 10
+    help
+        Configure symbol time out in terms of number of symbols. One symbol has
+        a length in time of (2^SF)/BW seconds.
+
+choice
+    bool "Channel bandwidth"
+    default LORA_BW_DEFAULT_125
+    help
+        Configure the channel bandwidth. Refer to country specific regulations
+        on channel usage to identify the correct bandwidth.
+
+config LORA_BW_DEFAULT_125
+    bool "125kHz"
+
+config LORA_BW_DEFAULT_250
+    bool "250kHz"
+
+config LORA_BW_DEFAULT_500
+    bool "500kHz"
+
+endchoice
+
+choice
+    bool "Spreading factor"
+    default LORA_SF_DEFAULT_SF7
+    help
+        Configure Spreading Factor (SF). SF denotes the amount of spreading code
+        applied to the original data signal. A larger SF increases the time on
+        air, which increases energy consumption, reduces the data rate, and
+        improves communication range. Each step up in spreading factor
+        effectively doubles the time on air to transmit the same amount of data.
+        Refer to country specific air time usage regulations before varying the
+        SF. To calculate air time refer https://www.loratools.nl/#/airtime .
+
+config LORA_SF_DEFAULT_SF6
+    bool "SF6"
+
+config LORA_SF_DEFAULT_SF7
+    bool "SF7"
+
+config LORA_SF_DEFAULT_SF8
+    bool "SF8"
+
+config LORA_SF_DEFAULT_SF9
+    bool "SF9"
+
+config LORA_SF_DEFAULT_SF10
+    bool "SF10"
+
+config LORA_SF_DEFAULT_SF11
+    bool "SF11"
+
+config LORA_SF_DEFAULT_SF12
+    bool "SF12"
+
+endchoice
+
+choice
+    bool "Coding rate"
+    default LORA_CR_DEFAULT_CR_4_5
+    help
+        Configure Coding rate (CR). CR denotes the implementation of forward
+        error correction (FEC). This may be done by encoding 4-bit data with
+        redundancies into 5-bit, 6-bit, 7-bit, or 8-bit. Coding Rate (CR) value
+        need to be adjusted according to conditions of the channel used for data
+        transmission. If there are too many interferences in the channel, then
+        it’s recommended to increase the value of CR. However, the rise in CR
+        value will also increase the duration for the transmission. Refer to
+        country specific air time usage regulations before varying the CR. To
+        calculate air time refer https://www.loratools.nl/#/airtime .
+
+config LORA_CR_DEFAULT_CR_4_5
+    bool "CR 4/5"
+
+config LORA_CR_DEFAULT_CR_4_6
+    bool "CR 4/6"
+
+config LORA_CR_DEFAULT_CR_4_7
+    bool "CR 4/7"
+
+config LORA_CR_DEFAULT_CR_4_8
+    bool "CR 4/8"
+
+endchoice
+
+config LORA_IQ_INVERTED_DEFAULT
+    bool "Enable inverted I/Q mode"
+    help
+        Enable this to invert the IQ signals used in RF modulation circuit. For
+        more information on I/Q modulation technique visit
+        http://www.ni.com/tutorial/4805/en/
+
+config LORA_FREQUENCY_HOPPING_DEFAULT
+    bool "Enable Frequency hopping spread spectrum (FHSS)"
+    help
+        Enabling Frequency hopping spread spectrum (FHSS) would imply that a
+        portion of each LoRa packet is transmitted on each hopping channel from
+        a look up table of frequencies managed by the host microcontroller.
+
+config LORA_FREQUENCY_HOPPING_PERIOD_DEFAULT
+    int "Frequency hopping period in symbols"
+    default 0
+    help
+        Configure the hopping period, in symbols, time which each transmission
+        will dwell in any given channel. One symbol has a length in time of
+        (2^SF)/BW seconds.
+
+config LORA_FIXED_HEADER_LEN_MODE_DEFAULT
+    bool "Enable fixed header length mode (implicit header)"
+    help
+        Enable fixed header length mode ( implicit header) to discard PHY header
+        (PHDR).
+
+config LORA_PAYLOAD_CRC_OFF_DEFAULT
+    bool "Disable payload CRC"
+
+config LORA_PAYLOAD_LENGTH_DEFAULT
+    int "Payload Length"
+    default 0
+    help
+        Configure the length of payload. The option is unused while using
+        explicit header mode as PHDR carries the length information.
+
+endif # KCONFIG_USEMODULE_LORA

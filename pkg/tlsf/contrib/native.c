@@ -110,7 +110,6 @@ ATTR_REALLOC void *realloc(void *ptr, size_t size)
     return result;
 }
 
-
 /**
  * Deallocate a block of data.
  */

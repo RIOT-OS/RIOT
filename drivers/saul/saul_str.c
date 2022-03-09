@@ -52,6 +52,7 @@ static const char *sensors[] = {
     [SAUL_SENSE_ID_DISTANCE]    = "SENSE_DISTANCE",
     [SAUL_SENSE_ID_CO2]         = "SENSE_CO2",
     [SAUL_SENSE_ID_TVOC]        = "SENSE_TVOC",
+    [SAUL_SENSE_ID_GAS]         = "SENSE_GAS",
     [SAUL_SENSE_ID_PROXIMITY]   = "SENSE_PROXIMITY",
     [SAUL_SENSE_ID_RSSI]        = "SENSE_RSSI",
     [SAUL_SENSE_ID_CHARGE]      = "SENSE_CHARGE",
@@ -62,6 +63,7 @@ static const char *sensors[] = {
     [SAUL_SENSE_ID_VOLTAGE]     = "SENSE_VOLTAGE",
     [SAUL_SENSE_ID_PH]          = "SENSE_PH",
     [SAUL_SENSE_ID_POWER]       = "SENSE_POWER",
+    [SAUL_SENSE_ID_SIZE]        = "SENSE_SIZE",
 };
 
 const char *saul_class_to_str(const uint8_t class_id)

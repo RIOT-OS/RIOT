@@ -22,6 +22,7 @@
 
 #include <limits.h>
 
+#include "macros/units.h"
 #include "periph_cpu_common.h"
 
 #ifdef __cplusplus
@@ -31,44 +32,49 @@ extern "C" {
 /**
  * @brief   DFLL runs at at fixed frequency of 48 MHz
  */
-#define SAM0_DFLL_FREQ_HZ       (48000000U)
+#define SAM0_DFLL_FREQ_HZ       MHZ(48)
+
+/**
+￼ * @brief   XOSC is used to generate a fixed frequency of 48 MHz
+￼ */
+#define SAM0_XOSC_FREQ_HZ       (XOSC0_FREQUENCY ? XOSC0_FREQUENCY : XOSC1_FREQUENCY)
 
 /**
  * @brief   DPLL must run with at least 96 MHz
  */
-#define SAM0_DPLL_FREQ_MIN_HZ   (96000000U)
+#define SAM0_DPLL_FREQ_MIN_HZ   MHZ(96)
 
 /**
  * @brief   DPLL frequency must not exceed 200 MHz
  */
-#define SAM0_DPLL_FREQ_MAX_HZ   (200000000U)
+#define SAM0_DPLL_FREQ_MAX_HZ   MHZ(20)
 
 /**
- * @brief   Mapping of pins to EXTI lines, -1 means not EXTI possible
+ * @name    Power mode configuration
+ * @{
  */
-static const int8_t exti_config[4][32] = {
-#ifdef CPU_MODEL_SAMD51J20A
-    { 0,  1,  2,  3,  4,  5,  6,  7, -1,  9, 10, 11, 12, 13, 14, 15,
-      0,  1,  2,  3,  4,  5,  6,  7,  8,  9, -1, 11, -1, -1, 14, 15 },
-    { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-      0,  1, -1, -1, -1, -1,  6,  7, -1, -1, -1, -1, -1, -1, 14, 15 },
-    {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-    {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-#elif CPU_MODEL_SAME54P20A
-    { 0,  1,  2,  3,  4,  5,  6,  7, -1,  9, 10, 11, 12, 13, 14, 15,
-      0,  1,  2,  3,  4,  5,  6,  7,  8,  9, -1, 11, -1, -1, 14, 15 },
-    { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-      0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 12, 13, 14, 15, 14, 15 },
-    { 0,  1,  2,  3,  4,  5,  6,  9, -1, -1, 10, 11, 12, 13, 14, 15,
-      0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, -1, 14, 15 },
-    { 0,  1, -1, -1, -1, -1, -1, -1,  3,  4,  5,  6,  7, -1, -1, -1,
-     -1, -1, -1, -1, 10, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }
-#else
-    #error Please define a proper CPU_MODEL.
-#endif
+#define PM_NUM_MODES        (3)
+/** @} */
+
+/**
+ * @name   SAMD5x GCLK definitions
+ * @{
+ */
+enum {
+    SAM0_GCLK_MAIN = 0,                 /**< 120 MHz main clock       */
+    SAM0_GCLK_32KHZ,                    /**< 32 kHz clock             */
+    SAM0_GCLK_TIMER,                    /**< 4-8 MHz clock for xTimer */
+    SAM0_GCLK_PERIPH,                   /**< 12-48 MHz (DFLL) clock   */
 };
+/** @} */
+
+/**
+ * @name   GCLK compatibility definitions
+ * @{
+ */
+#define SAM0_GCLK_8MHZ      SAM0_GCLK_TIMER
+#define SAM0_GCLK_48MHZ     SAM0_GCLK_PERIPH
+/** @} */
 
 /**
  * @brief   Override SPI hardware chip select macro
@@ -76,6 +82,95 @@ static const int8_t exti_config[4][32] = {
  * As of now, we do not support HW CS, so we always set it to a fixed value
  */
 #define SPI_HWCS(x)     (UINT_MAX - 1)
+
+#ifndef DOXYGEN
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = 0xff,                       /**< not supported */
+    ADC_RES_8BIT  = ADC_CTRLB_RESSEL_8BIT,      /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = ADC_CTRLB_RESSEL_10BIT,     /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = ADC_CTRLB_RESSEL_12BIT,     /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = 0xfe,                       /**< not supported */
+    ADC_RES_16BIT = 0xfd                        /**< not supported */
+} adc_res_t;
+#endif /* DOXYGEN */
+
+/**
+ * @brief   The MCU has a 12 bit DAC
+ */
+#define DAC_RES_BITS        (12)
+
+/**
+ * @brief   The MCU has two DAC outputs.
+ */
+#define DAC_NUMOF           (2)
+
+/**
+ * @name    Real time counter configuration
+ * @{
+ */
+#define RTT_MAX_VALUE       (0xffffffff)
+#define RTT_CLOCK_FREQUENCY (32768U)                      /* in Hz */
+#define RTT_MIN_FREQUENCY   (RTT_CLOCK_FREQUENCY / 1024U) /* in Hz */
+#define RTT_MAX_FREQUENCY   (RTT_CLOCK_FREQUENCY)         /* in Hz */
+/** @} */
+
+/**
+ * @brief   RTC input pins that can be used for tamper detection and
+ *          wake from Deep Sleep
+ */
+static const gpio_t rtc_tamper_pins[RTC_NUM_OF_TAMPERS] = {
+    GPIO_PIN(PB, 0), GPIO_PIN(PB, 2), GPIO_PIN(PA, 2),
+    GPIO_PIN(PC, 0), GPIO_PIN(PC, 1)
+};
+
+/**
+ * @brief   NVM User Page Mapping - Dedicated Entries
+ *          Config values will be applied at power-on.
+ */
+struct sam0_aux_cfg_mapping {
+    /* config word 0 */
+    uint32_t bod33_disable              :  1; /**< BOD33 Disable at power-on.           */
+    uint32_t bod33_level                :  8; /**< BOD33 threshold level at power-on.   */
+    uint32_t bod33_action               :  2; /**< BOD33 Action at power-on.            */
+    uint32_t bod33_hysteresis           :  4; /**< BOD33 Hysteresis configuration       */
+    const uint32_t bod12_calibration    : 11; /**< Factory settings - do not change.    */
+    uint32_t nvm_boot_size              :  4; /**< NVM Bootloader Size                  */
+    uint32_t reserved_0                 :  2; /**< Factory settings - do not change.    */
+    /* config word 1 */
+    uint32_t smart_eeprom_blocks        :  4; /**< NVM Blocks per SmartEEPROM sector    */
+    uint32_t smart_eeprom_page_size     :  3; /**< SmartEEPROM Page Size                */
+    uint32_t ram_eccdis                 :  1; /**< RAM ECC Disable                      */
+    uint32_t reserved_1                 :  8; /**< Factory settings - do not change.    */
+    uint32_t wdt_enable                 :  1; /**< WDT Enable at power-on.              */
+    uint32_t wdt_always_on              :  1; /**< WDT Always-On at power-on.           */
+    uint32_t wdt_period                 :  4; /**< WDT Period at power-on.              */
+    uint32_t wdt_window                 :  4; /**< WDT Window at power-on.              */
+    uint32_t wdt_ewoffset               :  4; /**< WDT Early Warning Interrupt Offset   */
+    uint32_t wdt_window_enable          :  1; /**< WDT Window mode enabled on power-on  */
+    uint32_t reserved_2                 :  1; /**< Factory settings - do not change.    */
+    /* config word 2 */
+    uint32_t nvm_locks;                       /**< NVM Region Lock Bits.                */
+    /* config word 3 */
+    uint32_t user_page;                       /**< User page                            */
+    /* config word 4 */
+    uint32_t reserved_3;                      /**< Factory settings - do not change.    */
+    /* config words 5,6,7 */
+    uint32_t user_pages[3];                   /**< User pages                           */
+};
+
+/**
+ * @name QSPI pins are fixed
+ * @{
+ */
+#define SAM0_QSPI_PIN_CLK       GPIO_PIN(PB, 10)    /**< Clock        */
+#define SAM0_QSPI_PIN_CS        GPIO_PIN(PB, 11)    /**< Chip Select  */
+#define SAM0_QSPI_PIN_DATA_0    GPIO_PIN(PA,  8)    /**< D0 / MOSI    */
+#define SAM0_QSPI_PIN_DATA_1    GPIO_PIN(PA,  9)    /**< D1 / MISO    */
+#define SAM0_QSPI_PIN_DATA_2    GPIO_PIN(PA, 10)    /**< D2 / WP      */
+#define SAM0_QSPI_PIN_DATA_3    GPIO_PIN(PA, 11)    /**< D3 / HOLD    */
+#define SAM0_QSPI_MUX           GPIO_MUX_H          /**< QSPI mux     */
+/** @} */
 
 #ifdef __cplusplus
 }

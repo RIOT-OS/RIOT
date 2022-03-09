@@ -30,6 +30,7 @@
  * - Gateway discovery process not implemented
  * - Last will feature not implemented
  * - No support for QoS level 2
+ * - No support for QoS level -1
  * - No support for wildcard characters in topic names when subscribing
  * - Actual granted QoS level on subscription is ignored
  *
@@ -58,89 +59,104 @@
 extern "C" {
 #endif
 
-#ifndef ASYMCUTE_BUFSIZE
+/**
+ * @defgroup net_asymcute_conf Asymcute (MQTT-SN Client) compile configurations
+ * @ingroup net_mqtt_conf
+ * @brief   Compile-time configuration options for Asymcute, an asynchronous
+ *          MQTT-SN implementation based on the OASIS MQTT-SN protocol. It
+ *          provides a flexible interface that allows users to issue any number
+ *          of concurrent requests to one or more different gateways
+ *          simultaneously.
+ * @{
+ */
+/**
+ * @brief   Default UDP port to listen on. Usage can be found in
+ *          examples/asymcute_mqttsn. Application code is expected to use this
+ *          macro to assign the default port.
+ */
+#ifndef CONFIG_ASYMCUTE_DEFAULT_PORT
+#define CONFIG_ASYMCUTE_DEFAULT_PORT    (1883U)
+#endif
+
 /**
  * @brief   Default buffer size used for receive and request buffers
  */
-#define ASYMCUTE_BUFSIZE            (128U)
+#ifndef CONFIG_ASYMCUTE_BUFSIZE
+#define CONFIG_ASYMCUTE_BUFSIZE         (128U)
 #endif
 
-#ifndef ASYMCUTE_HANDLER_PRIO
-/**
- * @brief   Default priority for Asymcute's handler thread
- */
-#define ASYMCUTE_HANDLER_PRIO       (THREAD_PRIORITY_MAIN - 2)
-#endif
-
-#ifndef ASYMCUTE_HANDLER_STACKSIZE
-/**
- * @brief   Default stack size for Asymcute's handler thread
- */
-#define ASYMCUTE_HANDLER_STACKSIZE  (THREAD_STACKSIZE_DEFAULT)
-#endif
-
-#ifndef ASYMCUTE_LISTENER_PRIO
-/**
- * @brief   Default priority for an Asymcute listener thread
- *
- * @note    Must be of higher priority than @ref ASYMCUTE_HANDLER_PRIO
- */
-#define ASYMCUTE_LISTENER_PRIO      (THREAD_PRIORITY_MAIN - 3)
-#endif
-
-#ifndef ASYMCUTE_LISTENER_STACKSIZE
-/**
- * @brief   Default stack size for an Asymcute listener thread
- */
-#define ASYMCUTE_LISTENER_STACKSIZE (THREAD_STACKSIZE_DEFAULT)
-#endif
-
-#ifndef ASYMCUTE_TOPIC_MAXLEN
 /**
  * @brief   Maximum topic length
  *
- * @note    Must be less than (256 - 8) AND less than (ASYMCUTE_BUFSIZE - 8).
+ * @note    Must be less than (256 - 8) AND less than ( @ref CONFIG_ASYMCUTE_BUFSIZE - 8).
  */
-#define ASYMCUTE_TOPIC_MAXLEN       (32U)
+#ifndef CONFIG_ASYMCUTE_TOPIC_MAXLEN
+#define CONFIG_ASYMCUTE_TOPIC_MAXLEN    (32U)
 #endif
 
-#ifndef ASYMCUTE_KEEPALIVE
 /**
  * @brief   Keep alive interval [in s] communicated to the gateway
  *
- * For the default value, see spec v1.2, section 7.2 -> T_WAIT: > 5 min
+ * Keep alive interval in seconds which is communicated to the gateway in the
+ * CONNECT message. For more information, see MQTT-SN Spec v1.2, section 5.4.4.
+ * For default values,see section 7.2 -> TWAIT: > 5 min.
  */
-#define ASYMCUTE_KEEPALIVE          (360)       /* -> 6 min*/
+#ifndef CONFIG_ASYMCUTE_KEEPALIVE
+#define CONFIG_ASYMCUTE_KEEPALIVE       (360)
 #endif
 
-#ifndef ASYMCUTE_KEEPALIVE_PING
 /**
  * @brief   Interval to use for sending periodic ping messages
  *
  * The default behavior of this implementation is to send ping messages as soon
  * as three quarters of the keep alive interval have passed.
  *
- * @note    Must be less than ASYMCUTE_KEEPALIVE
+ * @note    Must be less than @ref CONFIG_ASYMCUTE_KEEPALIVE
  */
-#define ASYMCUTE_KEEPALIVE_PING     ((ASYMCUTE_KEEPALIVE / 4) * 3)
+#ifndef CONFIG_ASYMCUTE_KEEPALIVE_PING
+#define CONFIG_ASYMCUTE_KEEPALIVE_PING  ((CONFIG_ASYMCUTE_KEEPALIVE / 4) * 3)
 #endif
 
-#ifndef ASYMCUTE_T_RETRY
 /**
  * @brief   Resend interval [in seconds]
  *
- * For the default value, see spec v1.2, section 7.2 -> T_RETRY: 10 to 15 sec
+ * Interval used for timing the retry messages which are sent when the expected
+ * reply from GW is not received. The retry timer is started by the client when
+ * the message is sent and stopped when the expected reply from GW is received.
+ * If the timer times out and the expected GW’s reply is not received, the
+ * client retransmits the message. For more information, see MQTT-SN Spec v1.2,
+ * section 6.13. For default values, see section 7.2 -> Tretry: 10 to 15 sec.
  */
-#define ASYMCUTE_T_RETRY            (10U)       /* -> 10 sec */
+#ifndef CONFIG_ASYMCUTE_T_RETRY
+#define CONFIG_ASYMCUTE_T_RETRY         (10U)
 #endif
 
-#ifndef ASYMCUTE_N_RETRY
 /**
  * @brief   Number of retransmissions until requests time out
  *
- * For the default value, see spec v1.2, section 7.2 -> N_RETRY: 3-5
+ * Maximum number of retransmissions in the event that the retry timer times
+ * out. After 'CONFIG_ASYMCUTE_N_RETRY' number of retransmissions, the client
+ * aborts the procedure and assumes that its MQTT-SN connection to the gateway
+ * is disconnected. For more information, see MQTT-SN Spec v1.2, section 6.13.
+ * For default values, see section 7.2 -> Nretry: 3-5.
  */
-#define ASYMCUTE_N_RETRY            (3U)
+#ifndef CONFIG_ASYMCUTE_N_RETRY
+#define CONFIG_ASYMCUTE_N_RETRY         (3U)
+#endif
+/** @} */
+
+#ifndef ASYMCUTE_HANDLER_PRIO
+/**
+ * @brief   Default priority for Asymcute's handler thread
+ */
+#define ASYMCUTE_HANDLER_PRIO           (THREAD_PRIORITY_MAIN - 2)
+#endif
+
+#ifndef ASYMCUTE_HANDLER_STACKSIZE
+/**
+ * @brief   Default stack size for Asymcute's handler thread
+ */
+#define ASYMCUTE_HANDLER_STACKSIZE      (THREAD_STACKSIZE_DEFAULT)
 #endif
 
 /**
@@ -154,6 +170,7 @@ enum {
     ASYMCUTE_BUSY       = -4,       /**< error: context already in use */
     ASYMCUTE_REGERR     = -5,       /**< error: registration invalid */
     ASYMCUTE_SUBERR     = -6,       /**< error: subscription invalid */
+    ASYMCUTE_SENDERR    = -7,       /**< error: unable to sent packet */
 };
 
 /**
@@ -241,7 +258,7 @@ struct asymcute_req {
     void *arg;                      /**< internally used additional state */
     event_callback_t to_evt;        /**< timeout event */
     event_timeout_t to_timer;       /**< timeout timer */
-    uint8_t data[ASYMCUTE_BUFSIZE]; /**< buffer holding the request's data */
+    uint8_t data[CONFIG_ASYMCUTE_BUFSIZE]; /**< buffer holding the request's data */
     size_t data_len;                /**< length of the request packet in byte */
     uint16_t msg_id;                /**< used message id for this request */
     uint8_t retry_cnt;              /**< retransmission counter */
@@ -253,7 +270,6 @@ struct asymcute_req {
 struct asymcute_con {
     mutex_t lock;                       /**< synchronization lock */
     sock_udp_t sock;                    /**< socket used by a connections */
-    sock_udp_ep_t server_ep;            /**< the gateway's UDP endpoint */
     asymcute_req_t *pending;            /**< list holding pending requests */
     asymcute_sub_t *subscriptions;      /**< list holding active subscriptions */
     asymcute_evt_cb_t user_cb;          /**< event callback provided by user */
@@ -263,7 +279,7 @@ struct asymcute_con {
                                          *   connection */
     uint8_t keepalive_retry_cnt;        /**< keep alive transmission counter */
     uint8_t state;                      /**< connection state */
-    uint8_t rxbuf[ASYMCUTE_BUFSIZE];    /**< connection specific receive buf */
+    uint8_t rxbuf[CONFIG_ASYMCUTE_BUFSIZE];    /**< connection specific receive buf */
     char cli_id[MQTTSN_CLI_ID_MAXLEN + 1];  /**< buffer to store client ID */
 };
 
@@ -272,7 +288,7 @@ struct asymcute_con {
  */
 struct asymcute_topic {
     asymcute_con_t *con;        /**< connection used for registration */
-    char name[ASYMCUTE_TOPIC_MAXLEN + 1];   /**< topic string (ACSII only) */
+    char name[CONFIG_ASYMCUTE_TOPIC_MAXLEN + 1];   /**< topic string (ACSII only) */
     uint8_t flags;              /**< normal, short, or pre-defined */
     uint16_t id;                /**< topic id */
 };
@@ -353,6 +369,34 @@ static inline bool asymcute_topic_is_reg(const asymcute_topic_t *topic)
 }
 
 /**
+ * @brief   Check if a given topic is a short topic
+ *
+ * @param[in] topic     topic to check
+ *
+ * @return  true if topic is a short topic
+ * @return  false if topic is not short topic
+ */
+static inline bool asymcute_topic_is_short(const asymcute_topic_t *topic)
+{
+    assert(topic);
+    return ((topic->flags & MQTTSN_TIT_SHORT) != 0);
+}
+
+/**
+ * @brief   Check if a given topic is a pre-defined topic
+ *
+ * @param[in] topic     topic to check
+ *
+ * @return  true if topic is pre-defined
+ * @return  false if topic is not pre-defined
+ */
+static inline bool asymcute_topic_is_predef(const asymcute_topic_t *topic)
+{
+    assert(topic);
+    return ((topic->flags & MQTTSN_TIT_PREDEF) != 0);
+}
+
+/**
  * @brief   Check if a given topic is initialized
  *
  * @param[in] topic     topic to check
@@ -402,25 +446,6 @@ int asymcute_topic_init(asymcute_topic_t *topic, const char *topic_name,
                         uint16_t topic_id);
 
 /**
- * @brief   Start a listener thread
- *
- * @note    Must have higher priority then the handler thread (defined by
- *          @ref ASYMCUTE_HANDLER_PRIO)
- *
- * @param[in] con       connection context to use for this connection
- * @param[in] stack     stack used to run the listener thread
- * @param[in] stacksize size of @p stack in bytes
- * @param[in] priority  priority of the listener thread created by this function
- * @param[in] callback  user callback for notification about connection related
- *                      events
- *
- * @return  ASYMCUTE_OK on success
- * @return  ASYMCUTE_BUSY if connection context is already in use
- */
-int asymcute_listener_run(asymcute_con_t *con, char *stack, size_t stacksize,
-                          char priority, asymcute_evt_cb_t callback);
-
-/**
  * @brief   Start the global Asymcute handler thread for processing timeouts and
  *          keep alive events
  *
@@ -447,16 +472,17 @@ bool asymcute_is_connected(const asymcute_con_t *con);
  * @param[in] cli_id    client ID to register with the gateway
  * @param[in] clean     set `true` to start a clean session
  * @param[in] will      last will (currently not implemented)
+ * @param[in] callback  user callback triggered on defined events
  *
  * @return  ASYMCUTE_OK if CONNECT message has been sent
  * @return  ASYMCUTE_NOTSUP if last will was given (temporary until implemented)
  * @return  ASYMCUTE_OVERFLOW if @p cli_id is larger than ASYMCUTE_ID_MAXLEN
- * @return  ASYMCUTE_GWERR if the connection is not in idle state
- * @return  ASYMCUTE_BUSY if the given request context is already in use
+ * @return  ASYMCUTE_GWERR if initializing the socket for the connection failed
+ * @return  ASYMCUTE_BUSY if the connection or the request context are in use
  */
 int asymcute_connect(asymcute_con_t *con, asymcute_req_t *req,
                      sock_udp_ep_t *server, const char *cli_id, bool clean,
-                     asymcute_will_t *will);
+                     asymcute_will_t *will, asymcute_evt_cb_t callback);
 
 /**
  * @brief   Close the given connection

@@ -1,5 +1,4 @@
 # export this module and its includes
-USEMODULE += boards_common_nucleo
 INCLUDES  += -I$(RIOTBOARD)/common/nucleo/include
 
 # we use shared STM32 configuration snippets

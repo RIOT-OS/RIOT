@@ -1,0 +1,21 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "acd52832" if BOARD_ACD52832
+
+config BOARD_ACD52832
+    bool
+    default y
+    select BOARD_COMMON_NRF52
+    select CPU_MODEL_NRF52832XXAA
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_UART
+
+    select HAVE_SAUL_GPIO
+
+source "$(RIOTBOARD)/common/nrf52xxxdk/Kconfig"

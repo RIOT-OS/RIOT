@@ -1,0 +1,23 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "thingy52" if BOARD_THINGY52
+
+config BOARD_THINGY52
+    bool
+    default y
+    select BOARD_COMMON_NRF52
+    select CPU_MODEL_NRF52832XXAA
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_UART
+    select HAS_VDD_LC_FILTER_REG1
+
+    select HAVE_LPS22HB
+    select HAVE_LIS2DH12_I2C
+    select HAVE_HTS221
+
+source "$(RIOTBOARD)/common/nrf52/Kconfig"

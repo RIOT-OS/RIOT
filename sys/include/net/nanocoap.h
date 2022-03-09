@@ -78,12 +78,15 @@
 #define NET_NANOCOAP_H
 
 #include <assert.h>
+#include <errno.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <string.h>
 #include <unistd.h>
 
 #ifdef RIOT_VERSION
+#include "bitfield.h"
 #include "byteorder.h"
 #include "net/coap.h"
 #else
@@ -123,32 +126,45 @@ extern "C" {
  * @{
  */
 /** @brief   Maximum number of Options in a message */
-#ifndef NANOCOAP_NOPTS_MAX
-#define NANOCOAP_NOPTS_MAX          (16)
+#ifndef CONFIG_NANOCOAP_NOPTS_MAX
+#define CONFIG_NANOCOAP_NOPTS_MAX          (16)
 #endif
 
 /**
  * @brief    Maximum length of a resource path string read from or written to
  *           a message
  */
-#ifndef NANOCOAP_URI_MAX
-#define NANOCOAP_URI_MAX            (64)
+#ifndef CONFIG_NANOCOAP_URI_MAX
+#define CONFIG_NANOCOAP_URI_MAX            (64)
 #endif
 
 /**
  * @brief    Maximum size for a blockwise transfer as a power of 2
  */
-#ifndef NANOCOAP_BLOCK_SIZE_EXP_MAX
-#define NANOCOAP_BLOCK_SIZE_EXP_MAX  (6)
+#ifndef CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX
+#define CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX  (6)
 #endif
 
-#if defined(MODULE_GCOAP) || defined(DOXYGEN)
 /** @brief   Maximum length of a query string written to a message */
-#ifndef NANOCOAP_QS_MAX
-#define NANOCOAP_QS_MAX             (64)
-#endif
+#ifndef CONFIG_NANOCOAP_QS_MAX
+#define CONFIG_NANOCOAP_QS_MAX             (64)
 #endif
 /** @} */
+
+/**
+ * @brief    Maximum length of a CoAP header for a blockwise message
+ */
+#ifndef CONFIG_NANOCOAP_BLOCK_HEADER_MAX
+#define CONFIG_NANOCOAP_BLOCK_HEADER_MAX   (64)
+#endif
+
+/**
+ * @brief    Work buffer size for blockwise operation
+ *
+ * @param[in] blksize   CoAP blocksize
+ */
+#define NANOCOAP_BLOCKWISE_BUF(blksize)    (CONFIG_NANOCOAP_BLOCK_HEADER_MAX \
+                                           + (0x1 << (blksize + 4)))
 
 /**
  * @name coap_opt_finish() flag parameter values
@@ -183,21 +199,54 @@ typedef struct {
  * @brief   CoAP PDU parsing context structure
  */
 typedef struct {
-    coap_hdr_t *hdr;                            /**< pointer to raw packet   */
-    uint8_t *token;                             /**< pointer to token        */
-    uint8_t *payload;                           /**< pointer to payload      */
-    uint16_t payload_len;                       /**< length of payload       */
-    uint16_t options_len;                       /**< length of options array */
-    coap_optpos_t options[NANOCOAP_NOPTS_MAX];  /**< option offset array     */
+    coap_hdr_t *hdr;                                  /**< pointer to raw packet   */
+    uint8_t *token;                                   /**< pointer to token        */
+    uint8_t *payload;                                 /**< pointer to payload      */
+    uint16_t payload_len;                             /**< length of payload       */
+    uint16_t options_len;                             /**< length of options array */
+    coap_optpos_t options[CONFIG_NANOCOAP_NOPTS_MAX]; /**< option offset array     */
+    BITFIELD(opt_crit, CONFIG_NANOCOAP_NOPTS_MAX);    /**< unhandled critical option */
 #ifdef MODULE_GCOAP
-    uint32_t observe_value;                     /**< observe value           */
+    uint32_t observe_value;                           /**< observe value           */
+    /**
+     * @brief   transport the packet was received over
+     * @see     @ref gcoap_socket_type_t for values.
+     * @note    @ref gcoap_socket_type_t can not be used, as this would
+     *          cyclically include the @ref net_gcoap header.
+     */
+    uint32_t tl_type;
 #endif
 } coap_pkt_t;
 
 /**
  * @brief   Resource handler type
+ *
+ * Functions that implement this must be prepared to be called multiple times
+ * for the same request, as the server implementations do not perform message
+ * deduplication. That optimization is [described in the CoAP
+ * specification](https://tools.ietf.org/html/rfc7252#section-4.5).
+ *
+ * This should be trivial for requests of the GET, PUT, DELETE, FETCH and
+ * iPATCH methods, as they are defined as idempotent methods in CoAP.
+ *
+ * For POST, PATCH and other non-idempotent methods, this is an additional
+ * requirement introduced by the contract of this type.
  */
 typedef ssize_t (*coap_handler_t)(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context);
+
+/**
+ * @brief   Coap blockwise request callback descriptor
+ *
+ * @param[in] arg      Pointer to be passed as arguments to the callback
+ * @param[in] offset   Offset of received data
+ * @param[in] buf      Pointer to the received data
+ * @param[in] len      Length of the received data
+ * @param[in] more     -1 for no option, 0 for last block, 1 for more blocks
+ *
+ * @returns    0       on success
+ * @returns   -1       on error
+ */
+typedef int (*coap_blockwise_cb_t)(void *arg, size_t offset, uint8_t *buf, size_t len, int more);
 
 /**
  * @brief   Method flag type
@@ -247,7 +296,6 @@ extern const coap_resource_t coap_resources[];
  */
 extern const unsigned coap_resources_numof;
 
-
 /**
  * @name    Functions -- Header Read/Write
  *
@@ -286,7 +334,7 @@ static inline unsigned coap_get_code_class(coap_pkt_t *pkt)
  *
  * @returns     message code detail
  */
-static inline unsigned coap_get_code_detail(coap_pkt_t *pkt)
+static inline unsigned coap_get_code_detail(const coap_pkt_t *pkt)
 {
     return pkt->hdr->code & 0x1f;
 }
@@ -419,13 +467,34 @@ static inline void coap_hdr_set_type(coap_hdr_t *hdr, unsigned type)
 }
 /**@}*/
 
-
 /**
  * @name    Functions -- Options Read
  *
  * Read options from a parsed packet.
+ *
+ * Packets accessed through @ref coap_find_option or any of the `coap_opt_get_*` functions
+ * track their access in bit field created at parsing time to enable checking for critical
+ * options in @ref coap_has_unprocessed_critical_options.
+ * These functions thus have a side effect, and code that calls them on critical options
+ * needs to ensure that failure to process the accessed option is propagated into failure
+ * to process the message.
+ * For example, a server helper that tries to read the If-None-Match option (which is critical)
+ * and finds it to be longer than it can process must not return as if no If-None-Match option
+ * was present, as it has already triggered the side effect of marking the option as processed.
  */
 /**@{*/
+
+/**
+ * @brief   Get pointer to an option field by type
+ *
+ * @param[in]   pkt     packet to work on
+ * @param[in]   opt_num the option number to search for
+ *
+ * @returns     pointer to the option data
+ *              NULL if option number was not found
+ */
+uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num);
+
 /**
  * @brief   Get content type from packet
  *
@@ -435,6 +504,20 @@ static inline void coap_hdr_set_type(coap_hdr_t *hdr, unsigned type)
  *              COAP_FORMAT_NONE otherwise
  */
 unsigned coap_get_content_type(coap_pkt_t *pkt);
+
+/**
+ * @brief   Get a uint32 option value
+ *
+ * @param[in]   pkt         packet to read from
+ * @param[in]   optnum      absolute option number
+ * @param[out]  value       the parsed option value
+ *
+ * @return      0 if the option was found and the value was parsed correctly
+ * @return      -ENOENT if the option was not found in @p pkt
+ * @return      -ENOSPC if option length is greater than 4 octets
+ * @return      -EBADMSG if option value is invalid
+ */
+int coap_opt_get_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t *value);
 
 /**
  * @brief   Read a full option as null terminated string into the target buffer
@@ -453,7 +536,7 @@ unsigned coap_get_content_type(coap_pkt_t *pkt);
  * @return      -ENOSPC if the complete option does not fit into @p target
  * @return      nr of bytes written to @p target (including '\0')
  */
-ssize_t coap_opt_get_string(const coap_pkt_t *pkt, uint16_t optnum,
+ssize_t coap_opt_get_string(coap_pkt_t *pkt, uint16_t optnum,
                             uint8_t *target, size_t max_len, char separator);
 
 /**
@@ -471,7 +554,7 @@ ssize_t coap_opt_get_string(const coap_pkt_t *pkt, uint16_t optnum,
  * @returns     -ENOSPC     if URI option is larger than @p max_len
  * @returns     nr of bytes written to @p target (including '\0')
  */
-static inline ssize_t coap_get_location_path(const coap_pkt_t *pkt,
+static inline ssize_t coap_get_location_path(coap_pkt_t *pkt,
                                              uint8_t *target, size_t max_len)
 {
     return coap_opt_get_string(pkt, COAP_OPT_LOCATION_PATH,
@@ -493,7 +576,7 @@ static inline ssize_t coap_get_location_path(const coap_pkt_t *pkt,
  * @returns     -ENOSPC     if URI option is larger than @p max_len
  * @returns     nr of bytes written to @p target (including '\0')
  */
-static inline ssize_t coap_get_location_query(const coap_pkt_t *pkt,
+static inline ssize_t coap_get_location_query(coap_pkt_t *pkt,
                                               uint8_t *target, size_t max_len)
 {
     return coap_opt_get_string(pkt, COAP_OPT_LOCATION_QUERY,
@@ -506,18 +589,18 @@ static inline ssize_t coap_get_location_query(const coap_pkt_t *pkt,
  * This function decodes the pkt's URI option into a "/"-separated and
  * '\0'-terminated string.
  *
- * Caller must ensure @p target can hold at least NANOCOAP_URI_MAX bytes!
+ * Caller must ensure @p target can hold at least CONFIG_NANOCOAP_URI_MAX bytes!
  *
  * @param[in]   pkt     pkt to work on
  * @param[out]  target  buffer for target URI
  *
- * @returns     -ENOSPC     if URI option is larger than NANOCOAP_URI_MAX
+ * @returns     -ENOSPC     if URI option is larger than CONFIG_NANOCOAP_URI_MAX
  * @returns     nr of bytes written to @p target (including '\0')
  */
-static inline ssize_t coap_get_uri_path(const coap_pkt_t *pkt, uint8_t *target)
+static inline ssize_t coap_get_uri_path(coap_pkt_t *pkt, uint8_t *target)
 {
     return coap_opt_get_string(pkt, COAP_OPT_URI_PATH, target,
-                               NANOCOAP_URI_MAX, '/');
+                               CONFIG_NANOCOAP_URI_MAX, '/');
 }
 
 /**
@@ -526,18 +609,18 @@ static inline ssize_t coap_get_uri_path(const coap_pkt_t *pkt, uint8_t *target)
  * This function decodes the pkt's URI_QUERY option into a "&"-separated and
  * '\0'-terminated string.
  *
- * Caller must ensure @p target can hold at least NANOCOAP_URI_MAX bytes!
+ * Caller must ensure @p target can hold at least CONFIG_NANOCOAP_URI_MAX bytes!
  *
  * @param[in]   pkt     pkt to work on
  * @param[out]  target  buffer for target URI
  *
- * @returns     -ENOSPC     if URI option is larger than NANOCOAP_URI_MAX
+ * @returns     -ENOSPC     if URI option is larger than CONFIG_NANOCOAP_URI_MAX
  * @returns     nr of bytes written to @p target (including '\0')
  */
-static inline ssize_t coap_get_uri_query(const coap_pkt_t *pkt, uint8_t *target)
+static inline ssize_t coap_get_uri_query(coap_pkt_t *pkt, uint8_t *target)
 {
     return coap_opt_get_string(pkt, COAP_OPT_URI_QUERY, target,
-                               NANOCOAP_URI_MAX, '&');
+                               CONFIG_NANOCOAP_URI_MAX, '&');
 }
 
 /**
@@ -591,6 +674,22 @@ ssize_t coap_opt_get_next(const coap_pkt_t *pkt, coap_optpos_t *opt,
 ssize_t coap_opt_get_opaque(coap_pkt_t *pkt, unsigned opt_num, uint8_t **value);
 /**@}*/
 
+/**
+ * @brief   Convenience function for getting the packet's Proxy-Uri option
+ *
+ * @param[in]   pkt     pkt to work on
+ * @param[out]  target  pointer to the PROXY_URI in @p pkt
+ *
+ * @pre     ((pkt != NULL) && (target != NULL))
+ *
+ * @return      length of the Proxy-Uri option
+ * @return      -ENOENT if Proxy-Uri option not found
+ * @return      -EINVAL if Proxy-Uri option cannot be parsed
+ */
+static inline ssize_t coap_get_proxy_uri(coap_pkt_t *pkt, char **target)
+{
+    return coap_opt_get_opaque(pkt, COAP_OPT_PROXY_URI, (uint8_t **)target);
+}
 
 /**
  * @name    Functions -- Options for Block
@@ -606,7 +705,7 @@ ssize_t coap_opt_get_opaque(coap_pkt_t *pkt, unsigned opt_num, uint8_t **value);
  * @param[in]    blknum     offset from the beginning of content, in terms of
                             @p blksize byte blocks
  * @param[in]    blksize    size of each block; must be a power of 2 between 16
- *                          and 2 raised to #NANOCOAP_BLOCK_SIZE_EXP_MAX
+ *                          and 2 raised to #CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX
  * @param[in]    more       more blocks? use 1 if yes; 0 if no or unknown
  */
 void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
@@ -623,8 +722,11 @@ void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
  *
  * @param[in]     slicer      Preallocated slicer struct to use
  * @param[in]     option      option number (block1 or block2)
+ *
+ * @return      true if the `more` bit is set in the block option
+ * @return      false if the `more` bit is not set the block option
  */
-void coap_block_finish(coap_block_slicer_t *slicer, uint16_t option);
+bool coap_block_finish(coap_block_slicer_t *slicer, uint16_t option);
 
 /**
  * @brief Finish a block1 request
@@ -636,10 +738,13 @@ void coap_block_finish(coap_block_slicer_t *slicer, uint16_t option);
  * function overwrites bytes in the packet rather than adding new.
  *
  * @param[in]     slicer      Preallocated slicer struct to use
+ *
+ * @return      true if the `more` bit is set in the block option
+ * @return      false if the `more` bit is not set the block option
  */
-static inline void coap_block1_finish(coap_block_slicer_t *slicer)
+static inline bool coap_block1_finish(coap_block_slicer_t *slicer)
 {
-    coap_block_finish(slicer, COAP_OPT_BLOCK1);
+    return coap_block_finish(slicer, COAP_OPT_BLOCK1);
 }
 
 /**
@@ -652,10 +757,13 @@ static inline void coap_block1_finish(coap_block_slicer_t *slicer)
  * function overwrites bytes in the packet rather than adding new.
  *
  * @param[in]     slicer      Preallocated slicer struct to use
+ *
+ * @return      true if the `more` bit is set in the block option
+ * @return      false if the `more` bit is not set the block option
  */
-static inline void coap_block2_finish(coap_block_slicer_t *slicer)
+static inline bool coap_block2_finish(coap_block_slicer_t *slicer)
 {
-    coap_block_finish(slicer, COAP_OPT_BLOCK2);
+    return coap_block_finish(slicer, COAP_OPT_BLOCK2);
 }
 
 /**
@@ -676,7 +784,7 @@ void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer);
  * @param[in]    blknum     offset from the beginning of content, in terms of
                             @p blksize byte blocks
  * @param[in]    blksize    size of each block; must be a power of 2 between 16
- *                          and 2 raised to #NANOCOAP_BLOCK_SIZE_EXP_MAX
+ *                          and 2 raised to #CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX
  */
 void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
                             size_t blksize);
@@ -784,6 +892,25 @@ static inline int coap_get_block2(coap_pkt_t *pkt, coap_block1_t *block)
 int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, unsigned *szx);
 
 /**
+ * @brief    Check whether any of the packet's options that are critical
+ *
+ * (i.e must be understood by the receiver, indicated by a 1 in the option number's least
+ * significant bit) were not accessed since the packet was parsed.
+ *
+ * Call this in a server on requests after all their option processing has happened,
+ * and stop processing the request if it returns true, returning a 4.02 Bad Option response.
+ *
+ * Call this in a client when receiving a response before acting on it;
+ * consider the response unprocessable if it returns true.
+ *
+ * @param[in]   pkt     pkt to work on
+ *
+ * @returns true if any of the options marked as critical at parse time have not been accessed.
+ * @returns false if there are no critical options, or all have been accessed.
+ */
+bool coap_has_unprocessed_critical_options(const coap_pkt_t *pkt);
+
+/**
  * @brief   Helper to decode SZX value to size in bytes
  *
  * @param[in]   szx     SZX value to decode
@@ -795,7 +922,6 @@ static inline unsigned coap_szx2size(unsigned szx)
     return (1 << (szx + 4));
 }
 /**@}*/
-
 
 /**
  * @name    Functions -- Options Write Packet API
@@ -930,6 +1056,24 @@ static inline ssize_t coap_opt_add_block2_control(coap_pkt_t *pkt, coap_block1_t
 }
 
 /**
+ * @brief   Append an Accept option to the pkt buffer
+ *
+ * @post pkt.payload advanced to first byte after option
+ * @post pkt.payload_len reduced by option length
+ *
+ * @param[in,out] pkt         pkt referencing target buffer
+ * @param[in]     format      COAP_FORMAT_xxx to accept
+ *
+ * @return        number of bytes written to buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or insufficient buffer space
+ */
+static inline ssize_t coap_opt_add_accept(coap_pkt_t *pkt, uint16_t format)
+{
+    return coap_opt_add_uint(pkt, COAP_OPT_ACCEPT, format);
+}
+
+/**
  * @brief   Append a Content-Format option to the pkt buffer
  *
  * @post pkt.payload advanced to first byte after option
@@ -965,6 +1109,85 @@ static inline ssize_t coap_opt_add_format(coap_pkt_t *pkt, uint16_t format)
 ssize_t coap_opt_add_opaque(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val, size_t val_len);
 
 /**
+ * @brief   Adds a single Uri-Query option in the form 'key=value' into pkt
+ *
+ *
+ * @param[in,out] pkt         Packet being built
+ * @param[in]     key         Key to add to the query string
+ * @param[in]     key_len     Length of @p key
+ * @param[in]     val         Value to assign to @p key (may be NULL)
+ * @param[in]     val_len     Length of @p val. 0 if @p val is NULL
+ *
+ * @pre     ((pkt != NULL) && (key != NULL) && (key_len > 0)
+ *              && ((val_len == 0) || ((val != NULL) && (val_len > 0))))
+ *
+ * @return        number of bytes written to pkt buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or pkt full
+ */
+ssize_t coap_opt_add_uri_query2(coap_pkt_t *pkt, const char *key, size_t key_len,
+                                const char *val, size_t val_len);
+
+/**
+ * @brief   Adds a single Uri-Query option in the form 'key=value' into pkt
+ *
+ * @note Use this only for null-terminated string. See @ref coap_opt_add_uri_query2()
+ *       for non null-terminated string.
+ *
+ * @param[in,out] pkt         Packet being built
+ * @param[in]     key         Key to add to the query string
+ * @param[in]     val         Value to assign to @p key (may be NULL)
+ *
+ * @pre     ((pkt != NULL) && (key != NULL))
+ *
+ * @return        number of bytes written to pkt buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or pkt full
+ */
+static inline ssize_t coap_opt_add_uri_query(coap_pkt_t *pkt, const char *key,
+                                             const char *val)
+{
+    return coap_opt_add_uri_query2(pkt, key, strlen(key), val, val ? strlen(val) : 0);
+}
+
+/**
+ * @brief   Adds a single Proxy-URI option into @p pkt
+ *
+ * @note @p uri must be a NULL-terminated absolute URI
+ *
+ * @param[in,out] pkt         Packet being built
+ * @param[in]     uri         absolute proxy URI
+ *
+ * @pre     ((pkt != NULL) && (uri != NULL))
+ *
+ * @return        number of bytes written to pkt buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or pkt full
+ */
+ssize_t coap_opt_add_proxy_uri(coap_pkt_t *pkt, const char *uri);
+
+/**
+ * @brief   Encode the given array of characters as option(s) into pkt
+ *
+ * Use separator to split array of characters into multiple options.
+ *
+ * @post pkt.payload advanced to first byte after option(s)
+ * @post pkt.payload_len reduced by option(s) length
+ *
+ * @param[in,out] pkt         pkt referencing target buffer
+ * @param[in]     optnum      option number to use
+ * @param[in]     chars       array of characters to encode as option
+ * @param[in]     chars_len   length of @p chars
+ * @param[in]     separator   character used in @p string to separate parts
+ *
+ * @return        number of bytes written to buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or insufficient buffer space
+ */
+ssize_t coap_opt_add_chars(coap_pkt_t *pkt, uint16_t optnum, const char *chars,
+                           size_t chars_len, char separator);
+
+/**
  * @brief   Encode the given string as option(s) into pkt
  *
  * Use separator to split string into multiple options.
@@ -981,7 +1204,52 @@ ssize_t coap_opt_add_opaque(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val
  * @return        <0 on error
  * @return        -ENOSPC if no available options or insufficient buffer space
  */
-ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string, char separator);
+static inline ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum,
+                                          const char *string, char separator)
+{
+    return coap_opt_add_chars(pkt, optnum, string, strlen(string), separator);
+}
+
+/**
+ * @brief   Adds one or multiple Uri-Path options in the form '/path' into pkt
+ *
+ * @note Use this only for null-terminated strings.
+ *
+ * @param[in,out] pkt         Packet being built
+ * @param[in]     path        `\0`-terminated resource (sub)path
+ *
+ * @pre     ((pkt != NULL) && (path != NULL))
+ *
+ * @return        number of bytes written to pkt buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or pkt full
+ */
+static inline ssize_t coap_opt_add_uri_path(coap_pkt_t *pkt, const char *path)
+{
+    return coap_opt_add_string(pkt, COAP_OPT_URI_PATH, path, '/');
+}
+
+/**
+ * @brief   Adds one or multiple Uri-Path options in the form '/path' into pkt
+ *
+ * @note Use this only for null-terminated strings.
+ *
+ * @param[in,out] pkt         Packet being built
+ * @param[in]     path        Resource (sub)path
+ * @param[in]     path_len    Length of @p path
+ *
+ * @pre     ((pkt != NULL) && (path != NULL))
+ *
+ * @return        number of bytes written to pkt buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or pkt full
+ */
+static inline ssize_t coap_opt_add_uri_path_buffer(coap_pkt_t *pkt,
+                                                   const char *path,
+                                                   size_t path_len)
+{
+    return coap_opt_add_chars(pkt, COAP_OPT_URI_PATH, path, path_len, '/');
+}
 
 /**
  * @brief   Finalizes options as required and prepares for payload
@@ -997,7 +1265,6 @@ ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string
  */
 ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags);
 /**@}*/
-
 
 /**
  * @name    Functions -- Options Write Buffer API
@@ -1126,12 +1393,32 @@ static inline size_t coap_opt_put_block2_control(uint8_t *buf, uint16_t lastonum
  *                          or 0 if first option
  * @param[in]   optnum      option number to use
  * @param[in]   string      string to encode as option
+ * @param[in]   len         length of the string
  * @param[in]   separator   character used in @p string to separate parts
  *
  * @return      number of bytes written to @p buf
  */
-size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
-                           const char *string, char separator);
+size_t coap_opt_put_string_with_len(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
+                                    const char *string, size_t len, char separator);
+/**
+ * @brief   Encode the given string as multi-part option into buffer
+ *
+ * @param[out]  buf         buffer to write to
+ * @param[in]   lastonum    number of previous option (for delta calculation),
+ *                          or 0 if first option
+ * @param[in]   optnum      option number to use
+ * @param[in]   string      string to encode as option
+ * @param[in]   separator   character used in @p string to separate parts
+ *
+ * @return      number of bytes written to @p buf
+ */
+static inline size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum,
+                                         uint16_t optnum,
+                                         const char *string, char separator)
+{
+    return coap_opt_put_string_with_len(buf, lastonum, optnum,
+                                        string, strlen(string), separator);
+}
 
 /**
  * @brief   Convenience function for inserting LOCATION_PATH option into buffer
@@ -1199,6 +1486,41 @@ static inline size_t coap_opt_put_uri_query(uint8_t *buf, uint16_t lastonum,
                                             const char *uri)
 {
     return coap_opt_put_string(buf, lastonum, COAP_OPT_URI_QUERY, uri, '&');
+}
+
+/**
+ * @brief   Convenience function for inserting URI_PATH and URI_QUERY into buffer
+ *          This function will automatically split path and query parameters.
+ *
+ * @param[out]  buf         buffer to write to
+ * @param[in,out] lastonum  number of previous option (for delta calculation),
+ *                          or 0 if first option
+ * @param[in]   uri         ptr into a source URI, to the first character after
+ *                          the authority component
+ *
+ * @returns     amount of bytes written to @p buf
+ *
+ * This function may produce two different options (Uri-Path and Uri-Query).
+ * Users that need to insert Content-Format, Max-Age or the currently
+ * unassigned option 13 need to split their URI themselves and call the
+ * respective helper functions.
+ */
+size_t coap_opt_put_uri_pathquery(uint8_t *buf, uint16_t *lastonum, const char *uri);
+
+/**
+ * @brief   Convenience function for inserting PROXY_URI option into buffer
+ *
+ * @param[out]  buf         buffer to write to
+ * @param[in]   lastonum    number of previous option (for delta calculation),
+ *                          or 0 if first option
+ * @param[in]   uri         ptr to source URI
+ *
+ * @returns     amount of bytes written to @p buf
+ */
+static inline size_t coap_opt_put_proxy_uri(uint8_t *buf, uint16_t lastonum,
+                                            const char *uri)
+{
+    return coap_opt_put_string(buf, lastonum, COAP_OPT_PROXY_URI, uri, '\0');
 }
 
 /**
@@ -1273,7 +1595,6 @@ static inline size_t coap_put_option_ct(uint8_t *buf, uint16_t lastonum,
     return coap_opt_put_uint(buf, lastonum, COAP_OPT_CONTENT_FORMAT, content_type);
 }
 /**@}*/
-
 
 /**
  * @name    Functions -- Messaging
@@ -1359,6 +1680,26 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
 ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len);
 
 /**
+ * @brief   Pass a coap request to a matching handler
+ *
+ * This function will try to find a matching handler in @p resources and call
+ * the handler.
+ *
+ * @param[in]   pkt             pointer to (parsed) CoAP packet
+ * @param[out]  resp_buf        buffer for response
+ * @param[in]   resp_buf_len    size of response buffer
+ * @param[in]   resources       Array of coap endpoint resources
+ * @param[in]   resources_numof length of the coap endpoint resources
+ *
+ * @returns     size of the reply packet on success
+ * @returns     <0 on error
+ */
+ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
+                          unsigned resp_buf_len,
+                          const coap_resource_t *resources,
+                          size_t resources_numof);
+
+/**
  * @brief   Convert message code (request method) into a corresponding bit field
  *
  * @param[in]   code    request code denoting the request method
@@ -1403,6 +1744,63 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len);
 void coap_pkt_init(coap_pkt_t *pkt, uint8_t *buf, size_t len, size_t header_len);
 
 /**
+ * @brief   Advance the payload pointer.
+ *
+ * @pre     You added @p len bytes of data to `pkt->payload`.
+ *
+ * You can add payload to a CoAP request by writing data directly to
+ * `pkt->payload`.
+ * This convenience function takes care of advancing the payload pointer
+ * afterwards.
+ *
+ * @param[out]   pkt        pkt to which payload was added
+ * @param[in]    len        length of payload
+ */
+static inline void coap_payload_advance_bytes(coap_pkt_t *pkt, size_t len)
+{
+    pkt->payload += len;
+    pkt->payload_len -= len;
+}
+
+/**
+ * @brief   Add payload data to the CoAP request.
+ *
+ * @pre     @ref coap_opt_finish must have been called before with
+ *               the @ref COAP_OPT_FINISH_PAYLOAD option.
+ *
+ * The function copies @p data into the payload buffer of @p pkt and
+ * advances the payload pointer.
+ *
+ * This is just a convenience function, you can also directly write
+ * to `pkt->payload` if you have a function that outputs payload to
+ * a buffer.
+ * In this case you should instead call @ref coap_payload_advance_bytes.
+ *
+ * @param[out]   pkt        pkt to add payload to
+ * @param[in]    data       payload data
+ * @param[in]    len        length of payload
+ *
+ * @returns      number of payload bytes added on success
+ * @returns      < 0 on error
+ */
+ssize_t coap_payload_put_bytes(coap_pkt_t *pkt, const void *data, size_t len);
+
+/**
+ * @brief Add a single character to the payload data of the CoAP request
+ *
+ * This function is used to add single characters to a CoAP payload data. It
+ * checks whether the character can be added to the buffer and ignores if the
+ * payload area is already exhausted.
+ *
+ * @param[out]   pkt        pkt to add payload to
+ * @param[in]    c          character to write
+ *
+ * @returns      number of payload bytes added on success (always one)
+ * @returns      < 0 on error
+ */
+ssize_t coap_payload_put_char(coap_pkt_t *pkt, char c);
+
+/**
  * @brief   Create CoAP reply (convenience function)
  *
  * This is a simple wrapper that allows for building CoAP replies for simple
@@ -1437,7 +1835,6 @@ extern ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, \
                                                     uint8_t *buf, size_t len,
                                                     void *context);
 /**@}*/
-
 
 /**
  * @brief   Checks if a CoAP resource path matches a given URI

@@ -111,6 +111,8 @@
 
 #include <stdint.h>
 
+#include "nimble_netif.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -129,24 +131,31 @@ enum {
  */
 typedef struct {
     /** amount of time spend in scanning mode [in ms] */
-    uint32_t period_scan;
+    uint32_t period_scan_ms;
     /** amount of time spend in advertising mode [in ms] */
-    uint32_t period_adv;
+    uint32_t period_adv_ms;
     /** a random value from 0 to this value is added to the duration of each
      *  scanning and advertising period [in ms] */
-    uint32_t period_jitter;
+    uint32_t period_jitter_ms;
     /** advertising interval used when in advertising mode [in ms] */
-    uint32_t adv_itvl;
+    uint32_t adv_itvl_ms;
     /** scan interval applied while in scanning state [in ms] */
-    uint32_t scan_itvl;
+    uint32_t scan_itvl_ms;
     /** scan window applied while in scanning state [in ms] */
-    uint32_t scan_win;
-    /** connection interval used when opening a new connection [in ms] */
-    uint32_t conn_itvl;
-    /** slave latency used for new connections [in ms] */
+    uint32_t scan_win_ms;
+    /** opening a new connection is aborted after this time [in ms] */
+    uint32_t conn_timeout_ms;
+    /** connection interval used when opening a new connection, lower bound.
+     *  [in ms] */
+    uint32_t conn_itvl_min_ms;
+    /** connection interval, upper bound [in ms] */
+    uint32_t conn_itvl_max_ms;
+    /** slave latency used for new connections */
     uint16_t conn_latency;
     /** supervision timeout used for new connections [in ms] */
-    uint32_t conn_super_to;
+    uint32_t conn_super_to_ms;
+    /** BLE PHY mode to use */
+    nimble_phy_t phy_mode;
     /** node ID included in the advertising data, may be NULL */
     const char *node_id;
 } nimble_autoconn_params_t;
@@ -167,6 +176,16 @@ typedef struct {
  */
 int nimble_autoconn_init(const nimble_autoconn_params_t *params,
                          const uint8_t *ad, size_t adlen);
+
+/**
+ * @brief   Register a callback that is called on netif events
+ *
+ * The registered callback function is a simple pass-through of nimble_netif
+ * events. The callback is executed in the context of NimBLE's host thread.
+ *
+ * @param[in] cb            event callback to register, may be NULL
+ */
+void nimble_autoconn_eventcb(nimble_netif_eventcb_t cb);
 
 /**
  * @brief   Update the used parameters (timing and node ID)

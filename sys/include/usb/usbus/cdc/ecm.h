@@ -43,22 +43,22 @@ extern "C" {
  * peripheral will report this to the host. This doesn't affect the actual
  * throughput, only what the peripheral reports to the host.
  */
-#ifndef USBUS_CDC_ECM_CONFIG_SPEED
-#define USBUS_CDC_ECM_CONFIG_SPEED  1000000
+#ifndef CONFIG_USBUS_CDC_ECM_CONFIG_SPEED
+#define CONFIG_USBUS_CDC_ECM_CONFIG_SPEED  1000000
 #endif
 
 /**
  * @brief Link download speed as reported by the peripheral
  */
-#ifndef USBUS_CDC_ECM_CONFIG_SPEED_DOWNSTREAM
-#define USBUS_CDC_ECM_CONFIG_SPEED_DOWNSTREAM USBUS_CDC_ECM_CONFIG_SPEED
+#ifndef CONFIG_USBUS_CDC_ECM_CONFIG_SPEED_DOWNSTREAM
+#define CONFIG_USBUS_CDC_ECM_CONFIG_SPEED_DOWNSTREAM CONFIG_USBUS_CDC_ECM_CONFIG_SPEED
 #endif
 
 /**
  * @brief Link upload speed as reported by the peripheral
  */
-#ifndef USBUS_CDC_ECM_CONFIG_SPEED_UPSTREAM
-#define USBUS_CDC_ECM_CONFIG_SPEED_UPSTREAM   USBUS_CDC_ECM_CONFIG_SPEED
+#ifndef CONFIG_USBUS_CDC_ECM_CONFIG_SPEED_UPSTREAM
+#define CONFIG_USBUS_CDC_ECM_CONFIG_SPEED_UPSTREAM   CONFIG_USBUS_CDC_ECM_CONFIG_SPEED
 #endif
 
 /**
@@ -106,12 +106,26 @@ typedef struct usbus_cdcecm_device {
     char mac_host[13];                      /**< host side's MAC address as string */
     usbus_string_t mac_str;                 /**< String context for the host side mac address */
     usbus_t *usbus;                         /**< Ptr to the USBUS context */
-    mutex_t out_lock;           /**< mutex used for locking netif/USBUS send */
-    size_t tx_len;              /**< Length of the current tx frame */
-    uint8_t in_buf[ETHERNET_FRAME_LEN]; /**< Buffer for the received frames */
+    mutex_t out_lock;                       /**< mutex used for locking netif/USBUS send */
+    size_t tx_len;                          /**< Length of the current tx frame */
     size_t len;                             /**< Length of the current rx frame */
-    usbus_cdcecm_notif_t notif;    /**< Startup message notification tracker */
-    unsigned active_iface;          /**< Current active data interface */
+    usbus_cdcecm_notif_t notif;             /**< Startup message notification tracker */
+    unsigned active_iface;                  /**< Current active data interface */
+
+    /**
+     * @brief Buffer for received frames from the host
+     */
+    usbdev_ep_buf_t data_out[ETHERNET_FRAME_LEN];
+
+    /**
+     * @brief Host in device out data buffer
+     */
+    usbdev_ep_buf_t data_in[USBUS_CDCECM_EP_DATA_SIZE];
+
+    /**
+     * @brief Host out device in control buffer
+     */
+    usbdev_ep_buf_t control_in[USBUS_CDCECM_EP_CTRL_SIZE];
 } usbus_cdcecm_device_t;
 
 /**

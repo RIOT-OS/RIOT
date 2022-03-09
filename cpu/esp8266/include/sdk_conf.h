@@ -38,7 +38,9 @@ extern "C" {
  *
  * Determined with `git describe --tags` in `$ESP8266_SDK_DIR`
  */
-#define IDF_VER     "v3.1-4-g08c234e"
+#if !defined(IDF_VER) || DOXYGEN
+#include "esp8266_idf_version.h"
+#endif
 
 /**
  * @name Default console configuration
@@ -61,6 +63,7 @@ extern "C" {
 
 #define CONFIG_TASK_WDT_PANIC
 #define CONFIG_TASK_WDT_TIMEOUT_S       (15)
+#define CONFIG_RESET_REASON             (1)
 
 #define CONFIG_WIFI_PPT_TASKSTACK_SIZE  (3584)
 #define CONFIG_MAIN_TASK_STACK_SIZE     (2048)
@@ -76,7 +79,6 @@ extern "C" {
 #define CONFIG_SCAN_AP_MAX              (32)
 
 #define CONFIG_USING_NEW_ETS_VPRINTF
-#define CONFIG_NEWLIB_STDOUT_LINE_ENDING_CRLF
 
 #ifdef __cplusplus
 }
@@ -84,3 +86,4 @@ extern "C" {
 
 #endif /* DOXYGEN */
 #endif /* SDK_CONF_H */
+/** @} */

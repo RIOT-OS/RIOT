@@ -121,7 +121,6 @@ seconds.
 
 ### RTC configuration example (for periph_conf.h) ###
 
-    #define RTC_NUMOF           (1U)
     #define RTC_DEV             RTC
     #define RTC_UNLOCK()        (SIM->SCGC6 |= (SIM_SCGC6_RTC_MASK))
 

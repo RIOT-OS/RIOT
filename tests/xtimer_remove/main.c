@@ -23,6 +23,7 @@
 #include "msg.h"
 #include "thread.h"
 #include "xtimer.h"
+#include "test_utils/expect.h"
 
 #define NUMOF (3U)
 
@@ -39,9 +40,11 @@ int main(void)
         for (unsigned int i = 0; i < NUMOF; i++) {
             msg[i].type = i;
             xtimer_set_msg(&timers[i], 100000*(i+1), &msg[i], me);
+            expect(xtimer_is_set(&timers[i]));
         }
 
         xtimer_remove(&timers[n]);
+        expect(!xtimer_is_set(&timers[n]));
 
         unsigned int num = NUMOF-1;
         while(num--) {

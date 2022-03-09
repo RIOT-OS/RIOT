@@ -26,8 +26,6 @@
 #include "sched.h"
 #include "thread.h"
 
-#include "test_utils/interactive_sync.h"
-
 char iqr_check_stack[THREAD_STACKSIZE_DEFAULT];
 
 static volatile uint8_t irq_occurred;
@@ -50,7 +48,7 @@ static void _thread_wake_wo_yield(kernel_pid_t pid)
 {
     unsigned old_state = irq_disable();
 
-    thread_t *other_thread = (thread_t *) thread_get(pid);
+    thread_t *other_thread = thread_get(pid);
 
     sched_set_status(other_thread, STATUS_RUNNING);
 
@@ -67,8 +65,6 @@ static void _spin(void)
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
     puts("Context swap race condition test application");
 
     kernel_pid_t pid;

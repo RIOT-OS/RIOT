@@ -1,0 +1,21 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "phynode-kw41z" if BOARD_PHYNODE_KW41Z
+
+config BOARD_PHYNODE_KW41Z
+    bool
+    default y
+    select BOARD_COMMON_KW41Z
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_SPI
+
+    select HAVE_CCS811
+    select HAVE_MMA8X5X
+    select HAVE_TCS37727
+
+source "$(RIOTBOARD)/common/kw41z/Kconfig"

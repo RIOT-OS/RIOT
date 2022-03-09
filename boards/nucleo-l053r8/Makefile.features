@@ -1,4 +1,4 @@
-CPU = stm32l0
+CPU = stm32
 CPU_MODEL = stm32l053r8
 
 # Put defined MCU peripherals here (in alphabetical order)

@@ -1,0 +1,8 @@
+# use JLink Segger RTT by default
+RIOT_TERMINAL ?= jlink
+
+# define pyocd as programmer to program with stlink
+PYOCD_FLASH_TARGET_TYPE ?= -t $(CPU)
+
+# use shared Makefile.include
+include $(RIOTBOARD)/common/nrf52/Makefile.include

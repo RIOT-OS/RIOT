@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdint.h>
 
 #include "cpu.h"
@@ -29,192 +30,143 @@
  */
 static uart_isr_ctx_t config[UART_NUMOF];
 
-static int init_base(uart_t uart, uint32_t baudrate);
+static inline void init_base(uart_t uart, uint32_t baudrate);
+
+/**
+ * @brief   Get the GPT register base for a timer
+ *
+ * @param[in] tim   index of the timer
+ *
+ * @return          base address
+ */
+static inline LPC_UART_TypeDef *dev(uart_t uart)
+{
+    assert(uart < UART_NUMOF);
+
+    return ((LPC_UART_TypeDef *)uart_config[uart].dev);
+}
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
-    int res = init_base(uart, baudrate);
-    if (res != UART_OK) {
-        return res;
-    }
+    assert(uart < UART_NUMOF);
+    init_base(uart, baudrate);
 
     /* save callbacks */
     config[uart].rx_cb = rx_cb;
     config[uart].arg = arg;
 
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-        /* configure and enable global device interrupts */
-        NVIC_SetPriority(UART_0_IRQ, UART_IRQ_PRIO);
-        NVIC_EnableIRQ(UART_0_IRQ);
-        /* enable RX interrupt */
-        UART_0_DEV->IER |= (1 << 0);
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-        /* configure and enable global device interrupts */
-        NVIC_SetPriority(UART_1_IRQ, UART_IRQ_PRIO);
-        NVIC_EnableIRQ(UART_1_IRQ);
-        /* enable RX interrupt */
-        UART_1_DEV->IER |= (1 << 0);
-            break;
-#endif
-    }
+    /* configure and enable global device interrupts */
+    NVIC_SetPriority(uart_config[uart].irq_rx, UART_IRQ_PRIO);
+    NVIC_EnableIRQ(uart_config[uart].irq_rx);
+    /* enable RX interrupt */
+    dev(uart)->IER |= (1 << 0);
 
     return UART_OK;
 }
 
-static int init_base(uart_t uart, uint32_t baudrate)
+static inline void init_base(uart_t uart, uint32_t baudrate)
 {
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            /* this implementation only supports 115200 baud */
-            if (baudrate != 115200) {
-                return UART_NOBAUD;
-            }
-
-            /* power on UART device and select peripheral clock */
-            UART_0_CLKEN();
-            UART_0_CLKSEL();
-            /* set mode to 8N1 and enable access to divisor latch */
-            UART_0_DEV->LCR = ((0x3 << 0) | (1 << 7));
-            /* set baud rate registers (fixed for now) */
-            UART_0_DEV->DLM = 0;
-            UART_0_DEV->DLL = 13;
-            /* enable FIFOs */
-            UART_0_DEV->FCR = 1;
-            /* select and configure the pin for RX */
-            UART_0_RX_PINSEL &= ~(0x3 << (UART_0_RX_PIN * 2));
-            UART_0_RX_PINSEL |= (UART_0_AF << (UART_0_RX_PIN * 2));
-            UART_0_RX_PINMODE &= ~(0x3 << (UART_0_RX_PIN * 2));
-            UART_0_RX_PINMODE |= (0x2 << (UART_0_RX_PIN * 2));
-            /* select and configure the pin for TX */
-            UART_0_TX_PINSEL &= ~(0x3 << (UART_0_TX_PIN * 2));
-            UART_0_TX_PINSEL |= (UART_0_AF << (UART_0_TX_PIN * 2));
-            UART_0_TX_PINMODE &= ~(0x3 << (UART_0_TX_PIN * 2));
-            UART_0_TX_PINMODE |= (0x2 << (UART_0_TX_PIN * 2));
-            /* disable access to divisor latch */
-            UART_0_DEV->LCR &= ~(1 << 7);
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            /* this implementation only supports 115200 baud */
-            if (baudrate != 115200) {
-                return UART_NOBAUD;
-            }
-
-            /* power on UART device and select peripheral clock */
-            UART_1_CLKEN();
-            UART_1_CLKSEL();
-            /* set mode to 8N1 and enable access to divisor latch */
-            UART_1_DEV->LCR = ((0x3 << 0) | (1 << 7));
-            /* set baud rate registers (fixed for now) */
-            UART_1_DEV->DLM = 0;
-            UART_1_DEV->DLL = 13;
-            /* enable FIFOs */
-            UART_1_DEV->FCR = 1;
-            /* select and configure the pin for RX */
-            UART_1_RX_PINSEL &= ~(0x3 << (UART_1_RX_PIN * 2));
-            UART_1_RX_PINSEL |= (UART_1_AF << (UART_1_RX_PIN * 2));
-            UART_1_RX_PINMODE &= ~(0x3 << (UART_1_RX_PIN * 2));
-            UART_1_RX_PINMODE |= (0x2 << (UART_1_RX_PIN * 2));
-            /* select and configure the pin for TX */
-            UART_1_TX_PINSEL &= ~(0x3 << (UART_1_TX_PIN * 2));
-            UART_1_TX_PINSEL |= (UART_1_AF << (UART_1_TX_PIN * 2));
-            UART_1_TX_PINMODE &= ~(0x3 << (UART_1_TX_PIN * 2));
-            UART_1_TX_PINMODE |= (0x2 << (UART_1_TX_PIN * 2));
-            /* disable access to divisor latch */
-            UART_1_DEV->LCR &= ~(1 << 7);
-            break;
-#endif
-        default:
-            return UART_NODEV;
+    /* Fixed baud rate. */
+    assert(baudrate == 115200);
+    assert(uart < UART_NUMOF);
+    (void) baudrate;
+    const uart_conf_t *cfg = &uart_config[uart];
+    /* The RX/TX must be together */
+    assert(cfg->pinsel_shift <= 27);
+    /* power on UART device and select peripheral clock */
+    LPC_SC->PCONP |= (1 << cfg->clk_offset);
+    if (cfg->clk_offset >= 16) {
+        LPC_SC->PCLKSEL1 &= ~((uint32_t)0x3 << ((cfg->clk_offset - 16) * 2));
     }
+    else {
+        LPC_SC->PCLKSEL0 &= ~((uint32_t)0x3 << (cfg->clk_offset * 2));
+    }
+    /* set mode to 8N1 and enable access to divisor latch */
+    dev(uart)->LCR = ((0x3 << 0) | (1 << 7));
+    /* set baud rate registers (fixed for now) */
+    dev(uart)->DLM = 0;
+    dev(uart)->DLL = 13;
+    /* enable FIFOs */
+    dev(uart)->FCR = 1;
 
-    return UART_OK;
+    /* Clear register for mux selection */
+    *(&LPC_PINCON->PINSEL0 + cfg->pinsel) &=
+            ~((uint32_t)0xF << (cfg->pinsel_shift * 2));
+    /* Select uart TX mux */
+    *(&LPC_PINCON->PINSEL0 + cfg->pinsel) |=
+            ((uint32_t)cfg->pinsel_af << (cfg->pinsel_shift * 2));
+    /* Select uart RX mux */
+    *(&LPC_PINCON->PINSEL0 + cfg->pinsel) |=
+            ((uint32_t)cfg->pinsel_af << (cfg->pinsel_shift * 2 + 2));
+    /* Clear modes for RX and TX pins */
+    *(&LPC_PINCON->PINMODE0 + cfg->pinsel) &=
+            ~((uint32_t)0xF << (cfg->pinsel_shift * 2));
+    /* Set TX mode */
+    *(&LPC_PINCON->PINMODE0 + cfg->pinsel) |=
+            ((uint32_t)0x2 << (cfg->pinsel_shift * 2));
+    /* Set RX mode */
+    *(&LPC_PINCON->PINMODE0 + cfg->pinsel) |=
+            ((uint32_t)0x2 << (cfg->pinsel_shift * 2 + 2));
+    /* disable access to divisor latch */
+    dev(uart)->LCR &= ~(1 << 7);
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    LPC_UART_TypeDef *dev = NULL;
-
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            dev = (LPC_UART_TypeDef *)UART_0_DEV;
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            dev = (LPC_UART_TypeDef *)UART_1_DEV;
-            break;
-#endif
-        default:
-            return;
-    }
-
-    if (dev) {
-        for (size_t i = 0; i < len; i++) {
-            while (!(dev->LSR & (1 << 5))) {}  /* wait for THRE bit to be set */
-            dev->THR = data[i];
-        }
+    assert(uart < UART_NUMOF);
+    for (size_t i = 0; i < len; i++) {
+        /* wait for THRE bit to be set */
+        while (!(dev(uart)->LSR & (1 << 5))) {}
+        dev(uart)->THR = data[i];
     }
 }
 
 void uart_poweron(uart_t uart)
 {
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            UART_0_CLKEN();
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            UART_1_CLKEN();
-            break;
-#endif
-    }
+    assert(uart < UART_NUMOF);
+    LPC_SC->PCONP |= (1 << uart_config[uart].clk_offset);
 }
 
 void uart_poweroff(uart_t uart)
 {
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            UART_0_CLKDIS();
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            UART_1_CLKDIS();
-            break;
-#endif
-    }
+    assert(uart < UART_NUMOF);
+    LPC_SC->PCONP &= ~(1 << uart_config[uart].clk_offset);
 }
 
-#if UART_0_EN
+static void irq_handler(uart_t uart)
+{
+    assert(uart < UART_NUMOF);
+    if (dev(uart)->LSR & (1 << 0)) {
+        uint8_t data = (uint8_t)dev(uart)->RBR;
+        config[uart].rx_cb(config[uart].arg, data);
+    }
+    cortexm_isr_end();
+}
+
+#ifdef UART_0_ISR
 void UART_0_ISR(void)
 {
-    if (UART_0_DEV->LSR & (1 << 0)) {       /* is RDR flag set? */
-        uint8_t data = (uint8_t)UART_0_DEV->RBR;
-        config[UART_0].rx_cb(config[UART_0].arg, data);
-    }
-    cortexm_isr_end();
+    irq_handler(UART_DEV(0));
 }
 #endif
 
-#if UART_1_EN
+#ifdef UART_1_ISR
 void UART_1_ISR(void)
 {
-    if (UART_1_DEV->LSR & (1 << 0)) {       /* is RDR flag set? */
-        uint8_t data = (uint8_t)UART_1_DEV->RBR;
-        config[UART_1].rx_cb(config[UART_1].arg, data);
-    }
-    cortexm_isr_end();
+    irq_handler(UART_DEV(1));
+}
+#endif
+
+#ifdef UART_2_ISR
+void UART_2_ISR(void)
+{
+    irq_handler(UART_DEV(2));
+}
+#endif
+
+#ifdef UART_3_ISR
+void UART_3_ISR(void)
+{
+    irq_handler(UART_DEV(3));
 }
 #endif

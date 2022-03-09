@@ -1,0 +1,16 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "feather-m0-wifi" if BOARD_FEATHER_M0_WIFI
+
+config BOARD_FEATHER_M0_WIFI
+    bool
+    default y
+    select BOARD_FEATHER_M0_BASE
+    select HAVE_ATWINC15X0
+
+source "$(RIOTBOARD)/feather-m0/Kconfig.feather-m0-base"

@@ -75,7 +75,7 @@ class TwoWire
     static uint8_t rxBufferIndex;   /**< index for RX buffer read */
     static uint8_t rxBufferLength;  /**< number of bytes in RX buffer */
 
-    static uint8_t txAddress;       /**< adress for transfer */
+    static uint8_t txAddress;       /**< address for transfer */
     static uint8_t txBuffer[];      /**< TX buffer */
     static uint8_t txBufferIndex;   /**< index for TX buffer write */
     static uint8_t txBufferLength;  /**< number of bytes in TX buffer */

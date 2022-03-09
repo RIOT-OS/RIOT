@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_esp8266
+ * @ingroup     cpu_esp_common
  * @{
  *
  * @file
@@ -19,7 +19,6 @@
  * fsblkcnt_t and fsfilcnt_t needed in statvfs.h and to avoid type conflicts
  * with pthread types from pthread module.
  */
-
 
 /* unified sys/types.h:
    start with sef's sysvi386 version.
@@ -309,7 +308,6 @@ typedef    struct _types_fd_set {
 #undef __MS_types__
 #undef _ST_INT32
 
-
 #ifndef __clockid_t_defined
 typedef _CLOCKID_T_ clockid_t;
 #define __clockid_t_defined
@@ -335,3 +333,4 @@ typedef long suseconds_t;
 
 #endif /* DOXYGEN */
 #endif /* SYS_TYPES_H */
+/** @} */

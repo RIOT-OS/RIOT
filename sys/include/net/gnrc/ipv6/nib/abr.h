@@ -21,6 +21,13 @@
 #ifndef NET_GNRC_IPV6_NIB_ABR_H
 #define NET_GNRC_IPV6_NIB_ABR_H
 
+#include <kernel_defines.h>
+
+/* prevent cascading include error to xtimer if it is not compiled in or not
+ * supported by board */
+#if IS_USED(MODULE_EVTIMER)
+#include "evtimer.h"
+#endif
 #include "net/ipv6/addr.h"
 #include "net/gnrc/ipv6/nib/conf.h"
 
@@ -34,12 +41,12 @@ extern "C" {
 typedef struct {
     ipv6_addr_t addr;       /**< The address of the border router */
     uint32_t version;       /**< last received version */
-    uint32_t valid_until;   /**< timestamp (in minutes) until which the
-                             *   information is valid */
+    uint32_t valid_until_ms;   /**< timestamp (in ms) until which the information is valid
+                                *   (needs resolution in minutes an 16 bits of them)*/
 } gnrc_ipv6_nib_abr_t;
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN)
-#if GNRC_IPV6_NIB_CONF_6LBR || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C) || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) || defined(DOXYGEN)
 /**
  * @brief   Adds the address of an authoritative border router to the NIB
  *
@@ -47,8 +54,8 @@ typedef struct {
  *
  * @return  0 on success.
  * @return  -ENOMEM, if no space is left in the neighbor cache.
- * @return  -ENOTSUP, if @ref GNRC_IPV6_NIB_CONF_6LBR or
- *          @ref GNRC_IPV6_NIB_CONF_MULTIHOP_P6C is not defined
+ * @return  -ENOTSUP, if @ref CONFIG_GNRC_IPV6_NIB_6LBR or
+ *          @ref CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C is not defined
  */
 int gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr);
 
@@ -58,10 +65,10 @@ int gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr);
  * @param[in] addr  The address of an authoritative border router.
  */
 void gnrc_ipv6_nib_abr_del(const ipv6_addr_t *addr);
-#else   /* GNRC_IPV6_NIB_CONF_6LBR || defined(DOXYGEN) */
+#else   /* CONFIG_GNRC_IPV6_NIB_6LBR || defined(DOXYGEN) */
 #define gnrc_ipv6_nib_abr_add(addr)     (-ENOTSUP)
 #define gnrc_ipv6_nib_abr_del(addr)     (void)(addr)
-#endif  /* GNRC_IPV6_NIB_CONF_6LBR || defined(DOXYGEN) */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LBR || defined(DOXYGEN) */
 
 /**
  * @brief   Iterates over all authoritative border router in the NIB
@@ -97,6 +104,22 @@ void gnrc_ipv6_nib_abr_del(const ipv6_addr_t *addr);
  */
 bool gnrc_ipv6_nib_abr_iter(void **state, gnrc_ipv6_nib_abr_t *abr);
 
+#if IS_USED(MODULE_EVTIMER) || defined(DOXYGEN)
+/**
+ * @brief   Provides the time in minutes for which the authoritative border
+ *          router entry is valid
+ *
+ * @param[in] abr   An authoritative border router entry.
+ *
+ * @return  The time in minutes for which the authoritative border router entry
+ *          is valid.
+ */
+static inline uint32_t gnrc_ipv6_nib_abr_valid_offset(const gnrc_ipv6_nib_abr_t *abr)
+{
+    return (abr->valid_until_ms - evtimer_now_msec()) / ( MS_PER_SEC * SEC_PER_MIN);
+}
+#endif
+
 /**
  * @brief   Prints an authoritative border router list entry
  *
@@ -105,12 +128,12 @@ bool gnrc_ipv6_nib_abr_iter(void **state, gnrc_ipv6_nib_abr_t *abr);
  * @param[in] abr   An authoritative border router list entry
  */
 void gnrc_ipv6_nib_abr_print(gnrc_ipv6_nib_abr_t *abr);
-#else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN) */
+#else   /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C || defined(DOXYGEN) */
 #define gnrc_ipv6_nib_abr_add(addr)         (-ENOTSUP)
 #define gnrc_ipv6_nib_abr_del(addr)         (void)(addr)
 #define gnrc_ipv6_nib_abr_iter(state, abr)  (false)
 #define gnrc_ipv6_nib_abr_print(abr)        (void)(abr)
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN) */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C || defined(DOXYGEN) */
 
 #ifdef __cplusplus
 }

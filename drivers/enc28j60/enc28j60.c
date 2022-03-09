@@ -21,18 +21,17 @@
 #include <errno.h>
 #include <string.h>
 
-#include "luid.h"
 #include "mutex.h"
 #include "xtimer.h"
 #include "assert.h"
 #include "net/ethernet.h"
-#include "net/eui48.h"
+#include "net/eui_provider.h"
 #include "net/netdev/eth.h"
 
 #include "enc28j60.h"
 #include "enc28j60_regs.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 #include "debug.h"
 
 #define SPI_BUS         (dev->p.spi)
@@ -83,7 +82,7 @@
  * @brief  Maximum transmission time
  *
  * The time in us that is required to send an Ethernet frame of maximum length
- * (Preamle + SFD + 1518 byte) at 10 Mbps in full duplex mode with a guard
+ * (Preamble + SFD + 1518 byte) at 10 Mbps in full duplex mode with a guard
  * period of 9,6 us. This time is used as time out for send operations.
  */
 #define MAX_TX_TIME                 (1230U)
@@ -253,8 +252,7 @@ static void on_int(void *arg)
     /* disable global interrupt enable bit to avoid losing interrupts */
     cmd_bfc((enc28j60_t *)arg, REG_EIE, -1, EIE_INTIE);
 
-    netdev_t *netdev = (netdev_t *)arg;
-    netdev->event_callback(arg, NETDEV_EVENT_ISR);
+    netdev_trigger_event_isr(arg);
 }
 
 static int nd_send(netdev_t *netdev, const iolist_t *iolist)
@@ -425,12 +423,11 @@ static int nd_init(netdev_t *netdev)
     cmd_wcr(dev, REG_B2_MABBIPG, 2, MABBIPG_FD);
     /* set non-back-to-back inter packet gap -> 0x12 is default */
     cmd_wcr(dev, REG_B2_MAIPGL, 2, MAIPGL_FD);
+
     /* set default MAC address */
-    uint8_t macbuf[ETHERNET_ADDR_LEN];
-    luid_get(macbuf, ETHERNET_ADDR_LEN);
-    eui48_set_local((eui48_t*)macbuf);      /* locally administered address */
-    eui48_clear_group((eui48_t*)macbuf);    /* unicast address */
-    mac_set(dev, macbuf);
+    eui48_t addr;
+    netdev_eui48_get(netdev, &addr);
+    mac_set(dev, addr.uint8);
 
     /* PHY configuration */
     cmd_w_phy(dev, REG_PHY_PHCON1, PHCON1_PDPXMD);
@@ -506,7 +503,7 @@ static int nd_get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             assert(max_len >= ETHERNET_ADDR_LEN);
             mac_get(dev, (uint8_t *)value);
             return ETHERNET_ADDR_LEN;
-        case NETOPT_LINK_CONNECTED:
+        case NETOPT_LINK:
             if (cmd_r_phy(dev, REG_PHY_PHSTAT2) & PHSTAT2_LSTAT) {
                 *((netopt_enable_t *)value) = NETOPT_ENABLE;
             }
@@ -542,10 +539,12 @@ static const netdev_driver_t netdev_driver_enc28j60 = {
     .set = nd_set,
 };
 
-void enc28j60_setup(enc28j60_t *dev, const enc28j60_params_t *params)
+void enc28j60_setup(enc28j60_t *dev, const enc28j60_params_t *params, uint8_t index)
 {
     dev->netdev.driver = &netdev_driver_enc28j60;
     dev->p = *params;
     mutex_init(&dev->lock);
     dev->tx_time = 0;
+
+    netdev_register(&dev->netdev, NETDEV_ENC28J60, index);
 }

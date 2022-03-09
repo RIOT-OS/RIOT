@@ -22,6 +22,10 @@
  * On many CPUs, certain power states might need to be blocked in rtt_init(), so
  * that it is ensured that the RTT will function properly while it is enabled.
  *
+ * @warning     This module will be automatically be used as a backend for
+ *              ZTIMER_SEC and ZTIMER_MSEC. If direct access to RTT is needed
+ *              then include `ztimer_no_periph_rtt` to avoid auto-selection,
+ *              i.e.: `USEMODULE += ztimer_no_periph_rtt`.
  * @{
  * @file
  * @brief       Low-level RTT (Real Time Timer) peripheral driver interface
@@ -42,9 +46,63 @@
 extern "C" {
 #endif
 
+/**
+ * @def     RTT_FREQUENCY
+ *
+ * @brief   The desired frequency for the RTT
+ */
+#ifdef DOXYGEN
+#define RTT_FREQUENCY
+#endif
+
+/**
+ * @def     RTT_MAX_VALUE
+ *
+ * @brief   The maximum value for the RTT counter, must be (2^n - 1)
+ *
+ */
+#ifdef DOXYGEN
+#define RTT_MAX_VALUE
+#endif
+
+/**
+ * @def     RTT_MIN_OFFSET
+ *
+ * @brief   The minimum offset to correctly set an rtt callback.
+ *
+ * If the callback is taking into account rtt_get_counter() then the rtt
+ * might advance right between the call to rtt_get_counter() and
+ * rtt_set_alarm(). If that happens with val==1, the alarm would be
+ * set to the current time, which would then underflow. To avoid this,
+ * the alarm should be set at least two ticks in the future.
+ *
+ * This value can vary depending on the platform.
+ *
+ */
+#ifndef RTT_MIN_OFFSET
+#define RTT_MIN_OFFSET (2U)
+#endif
+
+/* Allow mock-RTT for unit tests */
+#ifdef MOCK_RTT_FREQUENCY
+#undef RTT_FREQUENCY
+#define RTT_FREQUENCY MOCK_RTT_FREQUENCY
+#else
 #ifndef RTT_FREQUENCY
-#warning "RTT_FREQUENCY undefined. Set RTT_FREQUENCY to the number of ticks" \
+#warning "RTT_FREQUENCY undefined. Set RTT_FREQUENCY to the number of ticks " \
          "per second for the current architecture."
+#endif
+#endif
+
+/* Allow mock-RTT for unit tests */
+#ifdef MOCK_RTT_MAX_VALUE
+#undef RTT_MAX_VALUE
+#define RTT_MAX_VALUE MOCK_RTT_MAX_VALUE
+#else
+#ifndef RTT_MAX_VALUE
+#warning "RTT_MAX_VALUE is undefined. Set RTT_MAX_VALUE to the maximum value " \
+         "for the RTT counter, ensure it is (2^n - 1)."
+#endif
 #endif
 
 /**
@@ -52,35 +110,35 @@ extern "C" {
  * @param[in]   us      number of microseconds
  * @return              rtt ticks
  */
-#define RTT_US_TO_TICKS(us)     ((uint32_t)((uint64_t)(us) * RTT_FREQUENCY / 1000000UL))
+#define RTT_US_TO_TICKS(us)     (RTT_SEC_TO_TICKS(us) / 1000000UL)
 
 /**
  * @brief       Convert milliseconds to rtt ticks
  * @param[in]   ms      number of milliseconds
  * @return              rtt ticks
  */
-#define RTT_MS_TO_TICKS(ms)     ( RTT_US_TO_TICKS((ms) * 1000) )
+#define RTT_MS_TO_TICKS(ms)     (RTT_SEC_TO_TICKS(ms) / 1000UL)
 
 /**
  * @brief       Convert seconds to rtt ticks
  * @param[in]   sec     number of seconds
  * @return              rtt ticks
  */
-#define RTT_SEC_TO_TICKS(sec)   ( RTT_MS_TO_TICKS((sec) * 1000) )
+#define RTT_SEC_TO_TICKS(sec)   (sec * RTT_FREQUENCY)
 
 /**
  * @brief       Convert minutes to rtt ticks
  * @param[in]   min     number of minutes
  * @return              rtt ticks
  */
-#define RTT_MIN_TO_TICKS(min)   ( RTT_SEC_TO_TICKS((min) * 60) )
+#define RTT_MIN_TO_TICKS(min)   (RTT_SEC_TO_TICKS((min) * 60))
 
 /**
  * @brief       Convert rtt ticks to microseconds
  * @param[in]   ticks   rtt ticks
  * @return              number of microseconds
  */
-#define RTT_TICKS_TO_US(ticks)  ((uint32_t)((uint64_t)(ticks) * 1000000UL / RTT_FREQUENCY))
+#define RTT_TICKS_TO_US(ticks)  ((uint64_t)(ticks) * 1000000UL / RTT_FREQUENCY)
 
 /**
  * @brief       Convert rtt ticks to milliseconds
@@ -137,14 +195,16 @@ void rtt_clear_overflow_cb(void);
 uint32_t rtt_get_counter(void);
 
 /**
- * @brief Set the RTT counter to a specified value.
+ * @brief   Set the RTT counter to a specified value.
  *
  * @param[in] counter       The value to set the RTT to.
+ *
+ * @note    This function is only provided when the feature `periph_rtt_set_counter` is provided
  */
 void rtt_set_counter(uint32_t counter);
 
 /**
- * @brief Set an alarm for RTT to the specified value.
+ * @brief Set an alarm for RTT to the specified absolute target time.
  *
  * @param[in] alarm         The value to trigger an alarm when hit
  * @param[in] cb            Callback executed when alarm is hit

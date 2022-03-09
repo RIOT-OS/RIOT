@@ -27,14 +27,16 @@
 #include "tty_uart.h"
 
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
-/* Only manage SPI if it is part of the build */
 #include "spidev_linux.h"
 #endif
+#ifdef MODULE_PERIPH_GPIO_LINUX
+#include "gpiodev_linux.h"
+#endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
-void pm_set_lowest(void)
+static void _native_sleep(void)
 {
     _native_in_syscall++; /* no switching here */
     real_pause();
@@ -46,11 +48,28 @@ void pm_set_lowest(void)
     }
 }
 
+#if !defined(MODULE_PM_LAYERED)
+void pm_set_lowest(void)
+{
+    _native_sleep();
+}
+#endif
+
+void pm_set(unsigned mode)
+{
+    if (mode == 0) {
+        _native_sleep();
+    }
+}
+
 void pm_off(void)
 {
     puts("\nnative: exiting");
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
     spidev_linux_teardown();
+#endif
+#ifdef MODULE_PERIPH_GPIO_LINUX
+    gpio_linux_teardown();
 #endif
     real_exit(EXIT_SUCCESS);
 }
@@ -62,6 +81,9 @@ void pm_reboot(void)
     native_async_read_cleanup();
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
     spidev_linux_teardown();
+#endif
+#ifdef MODULE_PERIPH_GPIO_LINUX
+    gpio_linux_teardown();
 #endif
 
     if (real_execve(_native_argv[0], _native_argv, NULL) == -1) {

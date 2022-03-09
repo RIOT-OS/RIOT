@@ -1028,7 +1028,6 @@ const char* const B[10] = {"interbedded"
 ,"amplifier"
 };
 
-
 #ifdef __cplusplus
 }
 #endif

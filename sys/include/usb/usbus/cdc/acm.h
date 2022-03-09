@@ -38,19 +38,38 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup usbus_cdc_acm_conf USBUS CDC ACM compile time configurations
+ * @ingroup usb_conf
+ * @{
+ */
+/**
  * @brief Buffer size for STDIN and STDOUT data to and from USB when using
  *        the USBUS_CDC_ACM_STDIO module
  */
-#ifndef USBUS_CDC_ACM_STDIO_BUF_SIZE
-#define USBUS_CDC_ACM_STDIO_BUF_SIZE (128)
+#ifdef CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE_EXP
+#define CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE (1<<CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE_EXP)
+#endif
+#ifndef CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE
+#define CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE (128)
 #endif
 
 /**
  * @brief USB CDC ACM bulk endpoint size
  */
-#ifndef USBUS_CDC_ACM_BULK_EP_SIZE
-#define USBUS_CDC_ACM_BULK_EP_SIZE    (64)
+#if IS_ACTIVE(CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE_8)
+#define CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE     (8)
+#elif IS_ACTIVE(CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE_16)
+#define CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE    (16)
+#elif IS_ACTIVE(CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE_32)
+#define CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE    (32)
+#elif IS_ACTIVE(CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE_64)
+#define CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE    (64)
 #endif
+
+#ifndef CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE
+#define CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE    (64)
+#endif
+/** @} */
 
 /**
  * @brief USBUS CDC ACM interrupt endpoint size.
@@ -123,6 +142,16 @@ struct usbus_cdcacm_device {
     usbus_cdcacm_line_state_t state;    /**< Current line state              */
     event_t flush;                      /**< device2host forced flush event  */
     usb_req_cdcacm_coding_t coding;     /**< Current coding configuration    */
+
+    /**
+     * @brief Host to device data buffer
+     */
+    usbdev_ep_buf_t out_buf[CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE];
+
+    /**
+     * @brief Device to host data buffer
+     */
+    usbdev_ep_buf_t in_buf[CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE];
 };
 
 /**

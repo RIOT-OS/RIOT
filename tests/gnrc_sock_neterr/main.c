@@ -19,6 +19,8 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
+
 #include "msg.h"
 #include "net/sock/udp.h"
 

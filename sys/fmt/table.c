@@ -19,13 +19,13 @@
  * @}
  */
 
-#include <assert.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <unistd.h>
 #include <string.h>
 
 #include "fmt.h"
+#include "fmt_table.h"
 
 static const char fmt_table_spaces[16] = "                ";
 
@@ -44,6 +44,7 @@ static void print_pattern(const char *pat, size_t pat_size, size_t fill_size)
 {
     while (fill_size > pat_size) {
         print(pat, pat_size);
+        fill_size -= pat_size;
     }
 
     print(pat, fill_size);

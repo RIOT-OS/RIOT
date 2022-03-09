@@ -22,8 +22,8 @@
 #include "tests-pktqueue.h"
 
 #define PKT_INIT_ELEM(len, data, next) \
-    { (next), (data), (len), 1, GNRC_NETTYPE_UNDEF }
-#define PKT_INIT_ELEM_STATIC_DATA(data, next) PKT_INIT_ELEM(sizeof(data), data, next)
+    { (next), (void *)(data), (len), 1, GNRC_NETTYPE_UNDEF }
+#define PKT_INIT_ELEM_STATIC_DATA(data, next) PKT_INIT_ELEM(sizeof(data), (void *)(data), (next))
 #define PKTQUEUE_INIT_ELEM(pkt) { NULL, pkt }
 
 static gnrc_pktqueue_t *root;

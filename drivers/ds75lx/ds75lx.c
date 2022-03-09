@@ -27,7 +27,7 @@
 #include "ds75lx_params.h"
 #include "periph/i2c.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define DEV_I2C      (dev->params.i2c)
@@ -126,7 +126,7 @@ int ds75lx_wakeup(const ds75lx_t *dev)
 
     if (ret == DS75LX_OK) {
         /* Wait max conversion time (depends on resolution) */
-        xtimer_usleep((DS75LX_MAX_CONVERSION_TIME << dev->params.resolution) * US_PER_MS);
+        xtimer_msleep((DS75LX_MAX_CONVERSION_TIME << dev->params.resolution));
     }
 
     return ret;

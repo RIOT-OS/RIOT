@@ -35,7 +35,7 @@ static int read_charge(const void *_dev, phydat_t *res)
         res->scale = -3;
         res->unit = UNIT_COULOMB;
         temp[0] = temp[2] - temp[1];
-        int dim = (dev->params.polarity != GPIO_UNDEF) ? 3 : 1;
+        int dim = (gpio_is_valid(dev->params.polarity)) ? 3 : 1;
         phydat_fit(res, temp, (unsigned)dim);
         return dim;
     }

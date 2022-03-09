@@ -104,7 +104,6 @@ static void test_rgb_invert__success(void)
     TEST_ASSERT_EQUAL_INT(res.b, tmp.b);
 }
 
-
 static void test_rgb_complementary__success(void)
 {
     /* See example: https://helpx.adobe.com/illustrator/using/adjusting-colors.html */

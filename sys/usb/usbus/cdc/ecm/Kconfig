@@ -1,0 +1,44 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_USBUS_CDC_ECM
+    bool "Configure USBUS CDC ECM"
+    depends on USEMODULE_USBUS_CDC_ECM
+    depends on KCONFIG_USEMODULE_USBUS
+    help
+        Configure the USBUS CDC ECM module via Kconfig.
+
+if KCONFIG_USEMODULE_USBUS_CDC_ECM
+
+config USBUS_CDC_ECM_CONFIG_SPEED_IND
+    bool "Configure upload and download speeds independently"
+
+config USBUS_CDC_ECM_CONFIG_SPEED
+    int
+    prompt "Link throughput (bits/second)" if !USBUS_CDC_ECM_CONFIG_SPEED_IND
+    default 1000000
+    help
+        This defines a common up and down link throughput in bits/second. The
+        USB peripheral will report this to the host. This doesn't affect the
+        actual throughput, only what the peripheral reports to the host.
+
+config USBUS_CDC_ECM_CONFIG_SPEED_DOWNSTREAM
+    int
+    prompt "Link download speed (bits/second)" if USBUS_CDC_ECM_CONFIG_SPEED_IND
+    default USBUS_CDC_ECM_CONFIG_SPEED
+    help
+        This is the link download speed, defined in bits/second, that the USB
+        peripheral will report to the host.
+
+config USBUS_CDC_ECM_CONFIG_SPEED_UPSTREAM
+    int
+    prompt "Link upload speed (bits/second)" if USBUS_CDC_ECM_CONFIG_SPEED_IND
+    default USBUS_CDC_ECM_CONFIG_SPEED
+    help
+        This is the link upload speed, defined in bits/second, that the USB
+        peripheral will report to the host.
+
+endif # KCONFIG_USEMODULE_USBUS_CDC_ECM

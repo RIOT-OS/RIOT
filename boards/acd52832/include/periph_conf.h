@@ -54,10 +54,11 @@ extern "C" {
  */
 static const spi_conf_t spi_config[] = {
     {
-        .dev  = NRF_SPI0,
+        .dev  = NRF_SPIM0,
         .sclk = 4,
         .mosi = 3,
-        .miso = 13
+        .miso = 13,
+        .ppi = 0
     }
 };
 

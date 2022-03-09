@@ -110,7 +110,7 @@ static inline void log_write(unsigned level, const char *format, ...)
     va_end(args);
     printf(LOG_RESET_ANSI_COLOR_CODE);
 
-#ifdef MODULE_NEWLIB
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
     /* no fflush on msp430 */
     fflush(stdout);
 #endif

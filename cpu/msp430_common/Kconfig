@@ -1,0 +1,60 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#               2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_MSP430_COMMON
+    bool
+    default y if CPU_CORE_MSP430
+    depends on TEST_KCONFIG
+    imply MODULE_NEWLIB_NANO
+    select MODULE_MALLOC_THREAD_SAFE
+    help
+        Common code for MSP430 cores.
+
+config MODULE_MSP430_COMMON_PERIPH
+    bool
+    default y if CPU_CORE_MSP430
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH
+    help
+        Common peripheral code for MSP430 cores.
+
+choice LIBC_IMPLEMENTATION
+    default MODULE_NEWLIB
+endchoice
+
+config CPU_ARCH_MSP430
+    bool
+    select HAS_ARCH_16BIT
+    select HAS_ARCH_MSP430
+    select HAS_DBGPIN
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_PAGEWISE
+    select HAS_NEWLIB
+    select HAS_PERIPH_PM
+
+config CPU_CORE_MSP430
+    bool
+    select CPU_ARCH_MSP430
+
+## Common CPU symbols
+config CPU_ARCH
+    default "msp430" if CPU_ARCH_MSP430
+
+config CPU_CORE
+    default "msp430" if CPU_CORE_MSP430
+
+## Definition of specific features
+config HAS_ARCH_MSP430
+    bool
+    help
+        Indicates that the current architecture is MSP430.
+
+## Specific default configuration values
+config GNRC_PKTBUF_SIZE
+    default 2560
+    depends on KCONFIG_USEMODULE_GNRC_PKTBUF_STATIC

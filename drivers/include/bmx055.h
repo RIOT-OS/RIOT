@@ -36,12 +36,42 @@ extern "C" {
 #endif
 
 /**
- * @name   The sensors default I2C addresses
+ * @defgroup drivers_bmx055_config     BMX055 sensor driver compile configuration
+ * @ingroup config_drivers_sensors
  * @{
  */
-#define BMX055_MAG_ADDR_DEFAULT  (0x10U)
-#define BMX055_ACC_ADDR_DEFAULT  (0x18U)
-#define BMX055_GYRO_ADDR_DEFAULT (0x68U)
+/**
+ * @brief Magnetometer default address
+ *
+ * The address depends on the state of SDO1, SDO2 and CSB3 pins.
+ * For more information refer to the section 'Inter-Integrated
+ * Circuit (I²C)' in the datasheet.
+ */
+#ifndef CONFIG_BMX055_MAG_ADDR_DEFAULT
+#define CONFIG_BMX055_MAG_ADDR_DEFAULT  (0x10U)
+#endif
+
+/**
+ * @brief Accelerometer default address
+ *
+ * The address depends on the state of SDO1, SDO2 and CSB3 pins.
+ * For more information refer to the section 'Inter-Integrated
+ * Circuit (I²C)' in the datasheet.
+ */
+#ifndef CONFIG_BMX055_ACC_ADDR_DEFAULT
+#define CONFIG_BMX055_ACC_ADDR_DEFAULT  (0x18U)
+#endif
+
+/**
+ * @brief Gyroscope default address
+ *
+ * The address depends on the state of SDO1, SDO2 and CSB3 pins.
+ * For more information refer to the section 'Inter-Integrated
+ * Circuit (I²C)' in the datasheet.
+ */
+#ifndef CONFIG_BMX055_GYRO_ADDR_DEFAULT
+#define CONFIG_BMX055_GYRO_ADDR_DEFAULT (0x68U)
+#endif
 /** @} */
 
 /**

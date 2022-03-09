@@ -1,0 +1,17 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "slwstk6000b-slwrb4150a" if BOARD_SLWSTK6000B_SLWRB4150A
+
+config BOARD_SLWSTK6000B_SLWRB4150A
+    bool
+    default y
+    select CPU_MODEL_EFR32MG1P233F256GM48
+    select BOARD_COMMON_SLWSTK6000B
+    select MODULE_BOARD_COMMON_SLWSTK6000B if TEST_KCONFIG
+
+source "$(RIOTBOARD)/common/slwstk6000b/Kconfig"

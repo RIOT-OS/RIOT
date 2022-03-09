@@ -55,7 +55,6 @@ static inline void dynamixel_reader_init(dynamixel_reader_t *reader, const uint8
     reader->size = size;
 }
 
-
 /**
  * @brief Check if the packet is valid
  *

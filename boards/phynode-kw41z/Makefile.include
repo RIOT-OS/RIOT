@@ -2,12 +2,10 @@
 PROGRAMMER ?= openocd
 
 # dap debug adapter is required for openocd
-ifeq (openocd,$(PROGRAMMER))
-  DEBUG_ADAPTER = dap
-endif
+OPENOCD_DEBUG_ADAPTER = dap
 
 # Enable direct write to FCF (required for setting FOPT byte).
-export OPENOCD_PRE_FLASH_CMDS += "-c kinetis fcf_source write"
+OPENOCD_PRE_FLASH_CMDS += "-c kinetis fcf_source write"
 
 # Include default FRDM board config
 include $(RIOTBOARD)/common/kw41z/Makefile.include

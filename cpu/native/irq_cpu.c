@@ -40,7 +40,7 @@
 
 #include "native_internal.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 volatile int native_interrupts_enabled = 0;
@@ -100,7 +100,9 @@ void print_sigmasks(void)
             ucontext_t *p;
             printf("%s:\n", sched_threads[i]->name);
             //print_thread_sigmask(sched_threads[i]->sp);
-            p = (ucontext_t *)(sched_threads[i]->stack_start);
+            /* Use intermediate cast to uintptr_t to silence -Wcast-align.
+             * stacks are manually word aligned in thread_static_init() */
+            p = (ucontext_t *)(uintptr_t)(sched_threads[i]->stack_start);
             print_thread_sigmask(p);
             puts("");
         }
@@ -201,6 +203,11 @@ unsigned irq_enable(void)
 
     _native_syscall_leave();
 
+    if (_native_in_isr == 0 && sched_context_switch_request) {
+        DEBUG("irq_enable() deferred thread_yield_higher()\n");
+        thread_yield_higher();
+    }
+
     DEBUG("irq_enable(): return\n");
 
     return prev_state;
@@ -220,7 +227,12 @@ void irq_restore(unsigned state)
     return;
 }
 
-int irq_is_in(void)
+bool irq_is_enabled(void)
+{
+    return native_interrupts_enabled;
+}
+
+bool irq_is_in(void)
 {
     DEBUG("irq_is_in: %i\n", _native_in_isr);
     return _native_in_isr;
@@ -298,9 +310,9 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     if (context == NULL) {
         errx(EXIT_FAILURE, "native_isr_entry: context is null - unhandled");
     }
-    if (sched_active_thread == NULL) {
+    if (thread_get_active() == NULL) {
         _native_in_isr++;
-        warnx("native_isr_entry: sched_active_thread is null - unhandled");
+        warnx("native_isr_entry: thread_get_active() is null - unhandled");
         _native_in_isr--;
         return;
     }
@@ -325,7 +337,9 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     native_isr_context.uc_stack.ss_size = sizeof(__isr_stack);
     native_isr_context.uc_stack.ss_flags = 0;
     makecontext(&native_isr_context, native_irq_handler, 0);
-    _native_cur_ctx = (ucontext_t *)sched_active_thread->sp;
+    /* Use intermediate cast to uintptr_t to silence -Wcast-align.
+     * stacks are manually word aligned in thread_stack_init() */
+    _native_cur_ctx = (ucontext_t *)(uintptr_t)thread_get_active()->sp;
 
     DEBUG("\n\n\t\tnative_isr_entry: return to _native_sig_leave_tramp\n\n");
     /* disable interrupts in context */
@@ -540,7 +554,6 @@ void native_interrupt_init(void)
     if (sigaction(SIGINT, &sa, NULL)) {
         err(EXIT_FAILURE, "native_interrupt_init: sigaction");
     }
-
 
     puts("RIOT native interrupts/signals initialized.");
 }

@@ -20,6 +20,28 @@
 #include "fmt.h"
 #include "tests-fmt.h"
 
+static void test_fmt_is_x(void)
+{
+    const char *num = "123";
+    const char *hex = "0xabc";
+    const char *str = "muh";
+    char digit = '8';
+    char lower = 'a';
+    char upper = 'A';
+
+    TEST_ASSERT_EQUAL_INT(1, fmt_is_digit(digit));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_digit(lower));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_digit(upper));
+
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_upper(digit));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_upper(lower));
+    TEST_ASSERT_EQUAL_INT(1, fmt_is_upper(upper));
+
+    TEST_ASSERT_EQUAL_INT(1, fmt_is_number(num));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_number(hex));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_number(str));
+}
+
 static void test_fmt_byte_hex(void)
 {
     char out[8] = "zzzzzzz";
@@ -153,6 +175,9 @@ static void test_fmt_hex_bytes(void)
     bytes = fmt_hex_bytes(&val, "A");
     TEST_ASSERT_EQUAL_INT(0, val);
     TEST_ASSERT_EQUAL_INT(0, bytes);
+
+    bytes = fmt_hex_bytes(NULL, "ABCDEF");
+    TEST_ASSERT_EQUAL_INT(3, bytes);
 
     char hex2[3] = "00";
     uint8_t val1[1] = { 0 };
@@ -520,7 +545,6 @@ static void test_fmt_s16_dfp(void)
     out[act_len] = '\0';
     TEST_ASSERT_EQUAL_STRING("0.31987", (char *)out);
 
-
     val = -32768;
     fpp = -2;
     len = fmt_s16_dfp(NULL, val, fpp);
@@ -714,6 +738,15 @@ static void test_fmt_s32_dfp(void)
     out[act_len] = '\0';
     TEST_ASSERT_EQUAL_STRING("-0.0000001", (char *)out);
 
+    val = -1;
+    fpp = -24;
+    len = fmt_s32_dfp(NULL, val, fpp);
+    TEST_ASSERT_EQUAL_INT(3 - fpp, len);
+    act_len = fmt_s32_dfp(out, val, fpp);
+    TEST_ASSERT_EQUAL_INT(3 - fpp, act_len);
+    out[act_len] = '\0';
+    TEST_ASSERT_EQUAL_STRING("-0.000000000000000000000001", (char *)out);
+
     /* check that the buffer was not overflowed */
     TEST_ASSERT_EQUAL_STRING("z", &out[28]);
 }
@@ -825,6 +858,7 @@ static void test_fmt_lpad(void)
 Test *tests_fmt_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
+        new_TestFixture(test_fmt_is_x),
         new_TestFixture(test_fmt_byte_hex),
         new_TestFixture(test_fmt_bytes_hex),
         new_TestFixture(test_fmt_bytes_hex_reverse),

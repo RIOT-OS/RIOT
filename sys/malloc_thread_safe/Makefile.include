@@ -1,0 +1,2 @@
+# use the wrapper functions for malloc and friends to provide thread-safety
+LINKFLAGS += -Wl,-wrap=malloc -Wl,-wrap=calloc -Wl,-wrap=realloc -Wl,-wrap=free

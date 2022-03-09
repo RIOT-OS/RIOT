@@ -1,10 +1,9 @@
 /***************************************************************************//**
  * @file
  * @brief EFM32LG_ADC register and bit field definitions
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -263,16 +262,16 @@ typedef struct {
 #define _ADC_SINGLECTRL_INPUTSEL_SHIFT          8                                        /**< Shift value for ADC_INPUTSEL */
 #define _ADC_SINGLECTRL_INPUTSEL_MASK           0xF00UL                                  /**< Bit mask for ADC_INPUTSEL */
 #define _ADC_SINGLECTRL_INPUTSEL_DEFAULT        0x00000000UL                             /**< Mode DEFAULT for ADC_SINGLECTRL */
-#define _ADC_SINGLECTRL_INPUTSEL_CH0            0x00000000UL                             /**< Mode CH0 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_CH0CH1         0x00000000UL                             /**< Mode CH0CH1 for ADC_SINGLECTRL */
-#define _ADC_SINGLECTRL_INPUTSEL_CH1            0x00000001UL                             /**< Mode CH1 for ADC_SINGLECTRL */
+#define _ADC_SINGLECTRL_INPUTSEL_CH0            0x00000000UL                             /**< Mode CH0 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_CH2CH3         0x00000001UL                             /**< Mode CH2CH3 for ADC_SINGLECTRL */
-#define _ADC_SINGLECTRL_INPUTSEL_CH2            0x00000002UL                             /**< Mode CH2 for ADC_SINGLECTRL */
+#define _ADC_SINGLECTRL_INPUTSEL_CH1            0x00000001UL                             /**< Mode CH1 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_CH4CH5         0x00000002UL                             /**< Mode CH4CH5 for ADC_SINGLECTRL */
+#define _ADC_SINGLECTRL_INPUTSEL_CH2            0x00000002UL                             /**< Mode CH2 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_CH6CH7         0x00000003UL                             /**< Mode CH6CH7 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_CH3            0x00000003UL                             /**< Mode CH3 for ADC_SINGLECTRL */
-#define _ADC_SINGLECTRL_INPUTSEL_CH4            0x00000004UL                             /**< Mode CH4 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_DIFF0          0x00000004UL                             /**< Mode DIFF0 for ADC_SINGLECTRL */
+#define _ADC_SINGLECTRL_INPUTSEL_CH4            0x00000004UL                             /**< Mode CH4 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_CH5            0x00000005UL                             /**< Mode CH5 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_CH6            0x00000006UL                             /**< Mode CH6 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_CH7            0x00000007UL                             /**< Mode CH7 for ADC_SINGLECTRL */
@@ -284,16 +283,16 @@ typedef struct {
 #define _ADC_SINGLECTRL_INPUTSEL_DAC0OUT0       0x0000000DUL                             /**< Mode DAC0OUT0 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_DAC0OUT1       0x0000000EUL                             /**< Mode DAC0OUT1 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_DEFAULT         (_ADC_SINGLECTRL_INPUTSEL_DEFAULT << 8)  /**< Shifted mode DEFAULT for ADC_SINGLECTRL */
-#define ADC_SINGLECTRL_INPUTSEL_CH0             (_ADC_SINGLECTRL_INPUTSEL_CH0 << 8)      /**< Shifted mode CH0 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_CH0CH1          (_ADC_SINGLECTRL_INPUTSEL_CH0CH1 << 8)   /**< Shifted mode CH0CH1 for ADC_SINGLECTRL */
-#define ADC_SINGLECTRL_INPUTSEL_CH1             (_ADC_SINGLECTRL_INPUTSEL_CH1 << 8)      /**< Shifted mode CH1 for ADC_SINGLECTRL */
+#define ADC_SINGLECTRL_INPUTSEL_CH0             (_ADC_SINGLECTRL_INPUTSEL_CH0 << 8)      /**< Shifted mode CH0 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_CH2CH3          (_ADC_SINGLECTRL_INPUTSEL_CH2CH3 << 8)   /**< Shifted mode CH2CH3 for ADC_SINGLECTRL */
-#define ADC_SINGLECTRL_INPUTSEL_CH2             (_ADC_SINGLECTRL_INPUTSEL_CH2 << 8)      /**< Shifted mode CH2 for ADC_SINGLECTRL */
+#define ADC_SINGLECTRL_INPUTSEL_CH1             (_ADC_SINGLECTRL_INPUTSEL_CH1 << 8)      /**< Shifted mode CH1 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_CH4CH5          (_ADC_SINGLECTRL_INPUTSEL_CH4CH5 << 8)   /**< Shifted mode CH4CH5 for ADC_SINGLECTRL */
+#define ADC_SINGLECTRL_INPUTSEL_CH2             (_ADC_SINGLECTRL_INPUTSEL_CH2 << 8)      /**< Shifted mode CH2 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_CH6CH7          (_ADC_SINGLECTRL_INPUTSEL_CH6CH7 << 8)   /**< Shifted mode CH6CH7 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_CH3             (_ADC_SINGLECTRL_INPUTSEL_CH3 << 8)      /**< Shifted mode CH3 for ADC_SINGLECTRL */
-#define ADC_SINGLECTRL_INPUTSEL_CH4             (_ADC_SINGLECTRL_INPUTSEL_CH4 << 8)      /**< Shifted mode CH4 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_DIFF0           (_ADC_SINGLECTRL_INPUTSEL_DIFF0 << 8)    /**< Shifted mode DIFF0 for ADC_SINGLECTRL */
+#define ADC_SINGLECTRL_INPUTSEL_CH4             (_ADC_SINGLECTRL_INPUTSEL_CH4 << 8)      /**< Shifted mode CH4 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_CH5             (_ADC_SINGLECTRL_INPUTSEL_CH5 << 8)      /**< Shifted mode CH5 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_CH6             (_ADC_SINGLECTRL_INPUTSEL_CH6 << 8)      /**< Shifted mode CH6 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_CH7             (_ADC_SINGLECTRL_INPUTSEL_CH7 << 8)      /**< Shifted mode CH7 for ADC_SINGLECTRL */
@@ -415,12 +414,12 @@ typedef struct {
 #define _ADC_SCANCTRL_INPUTMASK_SHIFT           8                                      /**< Shift value for ADC_INPUTMASK */
 #define _ADC_SCANCTRL_INPUTMASK_MASK            0xFF00UL                               /**< Bit mask for ADC_INPUTMASK */
 #define _ADC_SCANCTRL_INPUTMASK_DEFAULT         0x00000000UL                           /**< Mode DEFAULT for ADC_SCANCTRL */
-#define _ADC_SCANCTRL_INPUTMASK_CH0             0x00000001UL                           /**< Mode CH0 for ADC_SCANCTRL */
 #define _ADC_SCANCTRL_INPUTMASK_CH0CH1          0x00000001UL                           /**< Mode CH0CH1 for ADC_SCANCTRL */
-#define _ADC_SCANCTRL_INPUTMASK_CH1             0x00000002UL                           /**< Mode CH1 for ADC_SCANCTRL */
+#define _ADC_SCANCTRL_INPUTMASK_CH0             0x00000001UL                           /**< Mode CH0 for ADC_SCANCTRL */
 #define _ADC_SCANCTRL_INPUTMASK_CH2CH3          0x00000002UL                           /**< Mode CH2CH3 for ADC_SCANCTRL */
-#define _ADC_SCANCTRL_INPUTMASK_CH2             0x00000004UL                           /**< Mode CH2 for ADC_SCANCTRL */
+#define _ADC_SCANCTRL_INPUTMASK_CH1             0x00000002UL                           /**< Mode CH1 for ADC_SCANCTRL */
 #define _ADC_SCANCTRL_INPUTMASK_CH4CH5          0x00000004UL                           /**< Mode CH4CH5 for ADC_SCANCTRL */
+#define _ADC_SCANCTRL_INPUTMASK_CH2             0x00000004UL                           /**< Mode CH2 for ADC_SCANCTRL */
 #define _ADC_SCANCTRL_INPUTMASK_CH6CH7          0x00000008UL                           /**< Mode CH6CH7 for ADC_SCANCTRL */
 #define _ADC_SCANCTRL_INPUTMASK_CH3             0x00000008UL                           /**< Mode CH3 for ADC_SCANCTRL */
 #define _ADC_SCANCTRL_INPUTMASK_CH4             0x00000010UL                           /**< Mode CH4 for ADC_SCANCTRL */
@@ -428,12 +427,12 @@ typedef struct {
 #define _ADC_SCANCTRL_INPUTMASK_CH6             0x00000040UL                           /**< Mode CH6 for ADC_SCANCTRL */
 #define _ADC_SCANCTRL_INPUTMASK_CH7             0x00000080UL                           /**< Mode CH7 for ADC_SCANCTRL */
 #define ADC_SCANCTRL_INPUTMASK_DEFAULT          (_ADC_SCANCTRL_INPUTMASK_DEFAULT << 8) /**< Shifted mode DEFAULT for ADC_SCANCTRL */
-#define ADC_SCANCTRL_INPUTMASK_CH0              (_ADC_SCANCTRL_INPUTMASK_CH0 << 8)     /**< Shifted mode CH0 for ADC_SCANCTRL */
 #define ADC_SCANCTRL_INPUTMASK_CH0CH1           (_ADC_SCANCTRL_INPUTMASK_CH0CH1 << 8)  /**< Shifted mode CH0CH1 for ADC_SCANCTRL */
-#define ADC_SCANCTRL_INPUTMASK_CH1              (_ADC_SCANCTRL_INPUTMASK_CH1 << 8)     /**< Shifted mode CH1 for ADC_SCANCTRL */
+#define ADC_SCANCTRL_INPUTMASK_CH0              (_ADC_SCANCTRL_INPUTMASK_CH0 << 8)     /**< Shifted mode CH0 for ADC_SCANCTRL */
 #define ADC_SCANCTRL_INPUTMASK_CH2CH3           (_ADC_SCANCTRL_INPUTMASK_CH2CH3 << 8)  /**< Shifted mode CH2CH3 for ADC_SCANCTRL */
-#define ADC_SCANCTRL_INPUTMASK_CH2              (_ADC_SCANCTRL_INPUTMASK_CH2 << 8)     /**< Shifted mode CH2 for ADC_SCANCTRL */
+#define ADC_SCANCTRL_INPUTMASK_CH1              (_ADC_SCANCTRL_INPUTMASK_CH1 << 8)     /**< Shifted mode CH1 for ADC_SCANCTRL */
 #define ADC_SCANCTRL_INPUTMASK_CH4CH5           (_ADC_SCANCTRL_INPUTMASK_CH4CH5 << 8)  /**< Shifted mode CH4CH5 for ADC_SCANCTRL */
+#define ADC_SCANCTRL_INPUTMASK_CH2              (_ADC_SCANCTRL_INPUTMASK_CH2 << 8)     /**< Shifted mode CH2 for ADC_SCANCTRL */
 #define ADC_SCANCTRL_INPUTMASK_CH6CH7           (_ADC_SCANCTRL_INPUTMASK_CH6CH7 << 8)  /**< Shifted mode CH6CH7 for ADC_SCANCTRL */
 #define ADC_SCANCTRL_INPUTMASK_CH3              (_ADC_SCANCTRL_INPUTMASK_CH3 << 8)     /**< Shifted mode CH3 for ADC_SCANCTRL */
 #define ADC_SCANCTRL_INPUTMASK_CH4              (_ADC_SCANCTRL_INPUTMASK_CH4 << 8)     /**< Shifted mode CH4 for ADC_SCANCTRL */

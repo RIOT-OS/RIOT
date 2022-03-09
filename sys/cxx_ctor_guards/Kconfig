@@ -1,0 +1,13 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_CXX_CTOR_GUARDS
+    bool "C++ constructor guards for static instances"
+    depends on TEST_KCONFIG
+    help
+        C++ constructor guards for thread-safe initialization of static instances.
+        Warning! this module is likely only compatible with g++.

@@ -16,7 +16,6 @@
  * @}
  */
 
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -31,7 +30,7 @@
 #include "openthread/platform/radio.h"
 #include "ot.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define RADIO_IEEE802154_FCS_LEN    (2U)
@@ -160,7 +159,7 @@ void recv_pkt(otInstance *aInstance, netdev_t *dev)
 
     /* Get RSSI from a radio driver. RSSI should be in [dBm] */
     Rssi = (int8_t)rx_info.rssi;
-    if (ENABLE_DEBUG) {
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
         DEBUG("Received message: len %d\n", (int) sReceiveFrame.mLength);
         for (int i = 0; i < sReceiveFrame.mLength; ++i) {
             DEBUG("%x ", sReceiveFrame.mPsdu[i]);
@@ -217,7 +216,7 @@ void otPlatRadioSetExtendedAddress(otInstance *aInstance, const otExtAddress *aE
     for (unsigned i = 0; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
         reversed_addr[i] = (uint8_t) ((uint8_t *)aExtAddress)[IEEE802154_LONG_ADDRESS_LEN - 1 - i];
     }
-    if (ENABLE_DEBUG) {
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
         for (unsigned i = 0; i < IEEE802154_LONG_ADDRESS_LEN; ++i) {
             DEBUG("%x ", (uint8_t) ((uint8_t *)reversed_addr)[i]);
         }
@@ -345,7 +344,7 @@ otError otPlatRadioTransmit(otInstance *aInstance, otRadioFrame *aPacket)
     };
 
     /*Set channel and power based on transmit frame */
-    if (ENABLE_DEBUG) {
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
         DEBUG("otPlatRadioTransmit->channel: %i, length %d\n",
               (int) aPacket->mChannel, (int)aPacket->mLength);
         for (size_t i = 0; i < aPacket->mLength; ++i) {

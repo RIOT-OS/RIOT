@@ -37,7 +37,7 @@
 #include "kw2xrf_getset.h"
 #include "kw2xrf_intern.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static void kw2xrf_set_address(kw2xrf_t *dev)
@@ -56,7 +56,7 @@ static void kw2xrf_set_address(kw2xrf_t *dev)
 
 void kw2xrf_setup(kw2xrf_t *dev, const kw2xrf_params_t *params)
 {
-    netdev_t *netdev = (netdev_t *)dev;
+    netdev_t *netdev = &dev->netdev.netdev;
 
     netdev->driver = &kw2xrf_driver;
     /* initialize device descriptor */
@@ -66,6 +66,10 @@ void kw2xrf_setup(kw2xrf_t *dev, const kw2xrf_params_t *params)
     dev->pending_tx = 0;
     kw2xrf_spi_init(dev);
     kw2xrf_set_power_mode(dev, KW2XRF_IDLE);
+    DEBUG("[kw2xrf] enabling RX/TX completion and start events");
+    kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2, MKW2XDM_PHY_CTRL2_RX_WMRK_MSK);
+    kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2, MKW2XDM_PHY_CTRL2_RXMSK);
+    kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2, MKW2XDM_PHY_CTRL2_TXMSK);
     DEBUG("[kw2xrf] setup finished\n");
 }
 

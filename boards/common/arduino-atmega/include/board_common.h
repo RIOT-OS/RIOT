@@ -106,6 +106,22 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    ztimer configuration values
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_TYPE     ZTIMER_TYPE_PERIPH_TIMER
+#define CONFIG_ZTIMER_USEC_DEV      (TIMER_DEV(0))
+#define CONFIG_ZTIMER_USEC_FREQ     (250000LU)
+#define CONFIG_ZTIMER_USEC_WIDTH    (16)
+#ifndef CONFIG_ZTIMER_USEC_ADJUST_SET
+#define CONFIG_ZTIMER_USEC_ADJUST_SET     (128)
+#endif
+#ifndef CONFIG_ZTIMER_USEC_ADJUST_SLEEP
+#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   (116)
+#endif
+/** @} */
+
+/**
  * @name    Configuration parameters for the W5100 driver
  * @{
  */
@@ -116,11 +132,6 @@ extern "C" {
 #define W5100_PARAM_EVT         (ARDUINO_PIN_2)
 #endif
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

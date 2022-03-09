@@ -64,7 +64,6 @@ extern "C" {
 #define AT30TSE75X_FRACTIONAL_BASE      (0.0625f)
 /** @} */
 
-
 /**
  * @name    AT30TSE75x configuration register
  *

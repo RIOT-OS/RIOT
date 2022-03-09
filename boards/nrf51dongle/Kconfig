@@ -1,0 +1,20 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "nrf51dongle" if BOARD_NRF51DONGLE
+
+config BOARD_NRF51DONGLE
+    bool
+    default y
+    select BOARD_COMMON_NRF51
+    select CPU_MODEL_NRF51X22XXAB
+    select HAS_PERIPH_UART
+    select HAS_PERIPH_UART_HW_FC
+
+    select MODULE_PERIPH_UART_HW_FC if TEST_KCONFIG && HAS_PERIPH_UART_HW_FC
+
+source "$(RIOTBOARD)/common/nrf51/Kconfig"

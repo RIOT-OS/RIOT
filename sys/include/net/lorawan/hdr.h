@@ -64,7 +64,7 @@ extern "C" {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * @see <a href="https://www.lora-alliance.org/portals/0/specs/LoRaWAN%20Specification%201R0.pdf">
+ * @see <a href="https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf">
  *          LoRaWAN spcefication, section 4
  *      </a>
  */
@@ -277,6 +277,10 @@ static inline uint8_t lorawan_hdr_get_frame_opts_len(lorawan_hdr_t *hdr)
 {
     return (hdr->fctrl & LORAWAN_HDR_FOPTS_LEN_MASK) >> LORAWAN_HDR_FOPTS_LEN_POS;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* NET_LORAWAN_HDR_H */
 /** @} */

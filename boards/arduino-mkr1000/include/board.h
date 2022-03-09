@@ -50,6 +50,18 @@ extern "C" {
 #define LED0_NAME           "LED(Green)"
 /** @} */
 
+/**
+ * @name    Board configuration for ATWINC15x0 WiFi netdev driver
+ * @{
+ */
+#define ATWINC15X0_PARAM_SPI            SPI_DEV(1)
+#define ATWINC15X0_PARAM_SSN_PIN        GPIO_PIN(0, 14)
+#define ATWINC15X0_PARAM_RESET_PIN      GPIO_PIN(0, 27)
+#define ATWINC15X0_PARAM_CHIP_EN_PIN    GPIO_PIN(0, 28)
+#define ATWINC15X0_PARAM_WAKE_PIN       GPIO_PIN(1, 8)
+#define ATWINC15X0_PARAM_IRQ_PIN        GPIO_PIN(1, 9)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

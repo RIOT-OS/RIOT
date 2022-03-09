@@ -17,6 +17,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <string.h>
 #include <limits.h>
 #include <errno.h>
@@ -25,7 +26,7 @@
 #include "can/pkt.h"
 #include "mutex.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define HANDLE_UNUSED 0

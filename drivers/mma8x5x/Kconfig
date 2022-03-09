@@ -1,0 +1,46 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#               2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_MMA8X5X
+    bool "MMA8x5x Accelerometer"
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+
+config HAVE_MMA8X5X
+    bool
+    select MODULE_MMA8X5X if MODULE_SAUL_DEFAULT
+    help
+      Indicates that an mma8x5x accelerometer is present.
+
+menuconfig KCONFIG_USEMODULE_MMA8X5X
+    bool "Configure MMA8X5X driver"
+    depends on USEMODULE_MMA8X5X
+    help
+        Configure the MMA8X5X driver using Kconfig.
+
+if KCONFIG_USEMODULE_MMA8X5X
+
+config MMA8X5X_I2C_ADDRESS
+    hex "Default I2C address"
+    range 0x1C 0x1D
+    default 0x1D
+    help
+        The address value depends on the state of SA0 Address Pin
+        in the case of MMA845x series sensors.
+        For more details refer Table 1 in datasheet
+        (MMA8451Q/MMA8452Q/MMA8453Q)
+        Default value corresponds to SA0 connected to VCC.
+
+endif # KCONFIG_USEMODULE_MMA8X5X
+
+config HAVE_MMA8X5X
+    bool
+    select MODULE_MMA8X5X if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a MMA8x5x is present

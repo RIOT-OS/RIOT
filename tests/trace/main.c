@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
+ * Copyright (C) 2020 Kaspar Schleiser <kaspar@schleiser.de>
+ *                    Freie Universität Berlin
+ *                    Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,20 +13,23 @@
  * @{
  *
  * @file
- * @brief       Tests od module.
+ * @brief       trace module test application
  *
- * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
+ * This test application tests basic functionality of `sys/trace`.
+ *
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */
-
-#include <stdio.h>
 
 #include "trace.h"
 
 int main(void)
 {
-    printf("TRACE_SIZE: %u\n", TRACE_SIZE);
-    trace_print();
+    trace(0);
+    trace(1);
+
+    trace_dump();
+
     return 0;
 }

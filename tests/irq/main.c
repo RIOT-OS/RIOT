@@ -48,7 +48,6 @@ void *busy_thread(void *arg)
     return NULL;
 }
 
-
 int main(void)
 {
     puts("START");

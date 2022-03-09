@@ -31,7 +31,6 @@
 #error "IRQ_PIN not defined"
 #endif
 
-
 #include <stdio.h>
 #include <stdint.h>
 #include <inttypes.h>
@@ -42,7 +41,7 @@
 #include "nrf24l01p_settings.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "shell.h"
 #include "shell_commands.h"
 #include "thread.h"
@@ -110,12 +109,13 @@ void print_register(char reg, int num_bytes)
 
 char rx_handler_stack[THREAD_STACKSIZE_MAIN];
 
+static msg_t _msg_q[1];
+
 /* RX handler that waits for a message from the ISR */
 void *nrf24l01p_rx_handler(void *arg)
 {
     (void)arg;
-    msg_t msg_q[1];
-    msg_init_queue(msg_q, 1);
+    msg_init_queue(_msg_q, 1);
     unsigned int pid = thread_getpid();
     char rx_buf[NRF24L01P_MAX_DATA_LENGTH];
 
@@ -231,7 +231,7 @@ int cmd_send(int argc, char **argv)
     /* trigger transmitting */
     nrf24l01p_transmit(&nrf24l01p_0);
     /* wait while data is pysically transmitted  */
-    xtimer_usleep(DELAY_DATA_ON_AIR);
+    ztimer_sleep(ZTIMER_USEC, DELAY_DATA_ON_AIR);
     /* get status of the transceiver */
     status = nrf24l01p_get_status(&nrf24l01p_0);
     if (status < 0) {

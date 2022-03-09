@@ -1,0 +1,2 @@
+# msp430 uses newlib by default
+DEFAULT_MODULE += newlib

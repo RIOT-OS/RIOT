@@ -22,7 +22,10 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-#include "periph_common.h"
+#include "periph_cpu.h"
+#include "cfg_clk_default.h"
+#include "cfg_timer_default.h"
+#include "cfg_uart_default.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -62,7 +65,7 @@ static const spi_conf_t spi_config[] = {
         .mosi_pin = GPIO_PIN(2, 7),
         .miso_pin = GPIO_PIN(0, 4),
         .sck_pin  = GPIO_PIN(1 ,5),
-        .cs_pin   = GPIO_UNDEF
+        .cs_pin   = SPI_CS_UNDEF,
     }
 };
 

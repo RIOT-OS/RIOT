@@ -1,10 +1,9 @@
 /***************************************************************************//**
  * @file
  * @brief EFR32MG1P_GPIO register and bit field definitions
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -1350,13 +1349,13 @@ typedef struct {
 #define _GPIO_LOCK_LOCKKEY_SHIFT                        0                                  /**< Shift value for GPIO_LOCKKEY */
 #define _GPIO_LOCK_LOCKKEY_MASK                         0xFFFFUL                           /**< Bit mask for GPIO_LOCKKEY */
 #define _GPIO_LOCK_LOCKKEY_DEFAULT                      0x00000000UL                       /**< Mode DEFAULT for GPIO_LOCK */
-#define _GPIO_LOCK_LOCKKEY_LOCK                         0x00000000UL                       /**< Mode LOCK for GPIO_LOCK */
 #define _GPIO_LOCK_LOCKKEY_UNLOCKED                     0x00000000UL                       /**< Mode UNLOCKED for GPIO_LOCK */
+#define _GPIO_LOCK_LOCKKEY_LOCK                         0x00000000UL                       /**< Mode LOCK for GPIO_LOCK */
 #define _GPIO_LOCK_LOCKKEY_LOCKED                       0x00000001UL                       /**< Mode LOCKED for GPIO_LOCK */
 #define _GPIO_LOCK_LOCKKEY_UNLOCK                       0x0000A534UL                       /**< Mode UNLOCK for GPIO_LOCK */
 #define GPIO_LOCK_LOCKKEY_DEFAULT                       (_GPIO_LOCK_LOCKKEY_DEFAULT << 0)  /**< Shifted mode DEFAULT for GPIO_LOCK */
-#define GPIO_LOCK_LOCKKEY_LOCK                          (_GPIO_LOCK_LOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for GPIO_LOCK */
 #define GPIO_LOCK_LOCKKEY_UNLOCKED                      (_GPIO_LOCK_LOCKKEY_UNLOCKED << 0) /**< Shifted mode UNLOCKED for GPIO_LOCK */
+#define GPIO_LOCK_LOCKKEY_LOCK                          (_GPIO_LOCK_LOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for GPIO_LOCK */
 #define GPIO_LOCK_LOCKKEY_LOCKED                        (_GPIO_LOCK_LOCKKEY_LOCKED << 0)   /**< Shifted mode LOCKED for GPIO_LOCK */
 #define GPIO_LOCK_LOCKKEY_UNLOCK                        (_GPIO_LOCK_LOCKKEY_UNLOCK << 0)   /**< Shifted mode UNLOCK for GPIO_LOCK */
 

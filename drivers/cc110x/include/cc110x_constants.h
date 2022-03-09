@@ -207,6 +207,27 @@ extern "C" {
 #define CC110X_REG_IOCFG0         0x02
 
 /**
+ * @brief   PKTCTRL1 configuration register
+ *
+ * This register contains multiple configuration settings.
+ *
+ * Layout:
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *  7 6 5 4 3 2 1 0
+ * +-+-+-+-+-+-+-+-+
+ * | PQT |U|C|S|ADR|
+ * +-+-+-+-+-+-+-+-+
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * - PQT (bits 7-5): Preabmle quality estimator threshold
+ * - U (bit 4): unused, always 0
+ * - C (bit 3): Auto-clear RX FIFO on CRC mismatch (if frame fits in FIFO)
+ * - S (bit 2): Append status
+ * - ADR (bits 1-0): Address check setting
+ */
+#define CC110X_REG_PKTCTRL1       0x07
+
+/**
  * @brief   Device address
  */
 #define CC110X_REG_ADDR           0x09
@@ -437,7 +458,6 @@ extern "C" {
  */
 #define CC110X_GDO_ON_PLL_IN_LOCK       0x0A
 
-
 /**
  * @brief   GDOx remains constantly LOW
  */
@@ -515,6 +535,44 @@ extern "C" {
  * @brief   Size of the RX and TX FIFO
  */
 #define CC110X_FIFO_SIZE                64
+
+/**
+ * @brief   Value of the bits 7-2 of the PKTCTRL1 configuration register used
+ *          in this driver
+ */
+#define CC110X_PKTCTRL1_VALUE           0x00
+
+/**
+ * @name    Possible address matching policies
+ *
+ * See page 73 in the data sheet. The policy should be combined with
+ * @ref CC110X_PKTCTRL1_VALUE via bitwise or. (Only modes compatible with the
+ * driver are defined.)
+ *
+ * @{
+ */
+/**
+ * @brief   Accept incoming frames regardless of address
+ */
+#define CC110X_PKTCTRL1_ADDR_ALL        0x00
+/**
+ * @brief   Accept frames with matching address or broadcast address
+ */
+#define CC110X_PKTCTRL1_ADDR_MATCH      0x02
+/**
+ * @brief   Bitmask to access address matching mode of the CC110x from the
+ *          PKTCTRL1 register
+ *
+ * Apply this using bitwise and to the value of the PKTCTRL1 register to get the
+ * address matching mode currently used.
+ */
+#define CC110X_PKTCTRL1_GET_ADDR_MODE   0x03
+/** @} */
+
+/**
+ * @brief   Time in micro seconds the CC110X takes to wake up from SLEEP state
+ */
+#define CC110X_WAKEUP_TIME_US           150
 
 #ifdef __cplusplus
 }

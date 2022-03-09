@@ -76,7 +76,6 @@ static inline bool feetech_reader_check_minsize(const feetech_reader_t *reader)
     return 5 < reader->size;
 }
 
-
 /**
  * @brief Check if the packet begins with 2 FEETECH_START bits
  *

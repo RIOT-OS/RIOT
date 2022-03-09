@@ -1,0 +1,12 @@
+FEATURES_REQUIRED += periph_gpio_irq
+
+ifneq (,$(filter stmpe811_spi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
+endif
+
+ifneq (,$(filter stmpe811_i2c,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
+USEMODULE += ztimer
+USEMODULE += ztimer_msec

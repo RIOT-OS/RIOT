@@ -1,0 +1,29 @@
+From 44bfee08fa5b31474704e2b451e3b866f4bcc671 Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Wed, 25 Aug 2021 18:40:48 +0200
+Subject: [PATCH] stm32wlxx: remove ErrorStatus
+
+---
+ Include/stm32wlxx.h | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/Include/stm32wlxx.h b/Include/stm32wlxx.h
+index 01e41ba..c241fd1 100644
+--- a/Include/stm32wlxx.h
++++ b/Include/stm32wlxx.h
+@@ -128,12 +128,6 @@ typedef enum
+ } FunctionalState;
+ #define IS_FUNCTIONAL_STATE(STATE) (((STATE) == DISABLE) || ((STATE) == ENABLE))
+ 
+-typedef enum
+-{
+-  ERROR = 0,
+-  SUCCESS = !ERROR
+-} ErrorStatus;
+-
+ /**
+   * @}
+   */
+-- 
+2.30.2
+

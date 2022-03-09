@@ -4,7 +4,8 @@
 #
 # This script is supposed to be called from RIOTs make system,
 # as it depends on certain environment variables. An OpenOCD
-# configuration file must be present in a the boards dist folder.
+# configuration file must be present in a the boards dist folder
+# or be given as "board/[...].cfg" to use an OpenOCD shipped configuration.
 #
 # Any extra command line arguments after the command name are passed on the
 # openocd command line after the configuration file name but before any other
@@ -12,8 +13,13 @@
 #
 # Global environment variables used:
 # OPENOCD:             OpenOCD command name, default: "openocd"
+#                      Care must be taken when specifying an OpenOCD version in
+#                      its build directory, as it does not look up its own
+#                      configuration files relative to the executable -- the
+#                      scripts directory needs to be passed in like this:
+#                      `OPENOCD="~/openocd/src/openocd -s ~/openocd/tcl"`.
 # OPENOCD_CONFIG:      OpenOCD configuration file name,
-#                      default: "${RIOTBOARD}/${BOARD}/dist/openocd.cfg"
+#                      default: "${BOARDSDIR}/${BOARD}/dist/openocd.cfg"
 #
 # The script supports the following actions:
 #
@@ -22,7 +28,7 @@
 #
 #               options:
 #               <image_file>:   Filename of the file that will be flashed
-#               PRE_FLASH_CHECK_SCRIPT: a command to run before flashing to
+#               OPENOCD_PRE_FLASH_CHECK_SCRIPT: a command to run before flashing to
 #               verify the integrity of the image to be flashed. <image_file> is
 #               passed as a command line argument to this command.
 #
@@ -45,6 +51,15 @@
 #               DBG:            debugger client command, default: 'gdb -q'
 #               TUI:            if TUI!=null, the -tui option will be used
 #
+# debugr:       debug <elfile>
+#               debug given file on the target but flash it first directly
+#               in RAM.
+#
+# flashr:       flash <image_file>
+#               flash given file to the target but directly in RAM.
+#
+#               See 'flash' command above for options
+#
 # debug-server: starts OpenOCD as GDB server, but does not connect to
 #               to it with any frontend. This might be useful when using
 #               IDEs.
@@ -61,12 +76,12 @@
 
 # Default GDB port, set to 0 to disable, required != 0 for debug and debug-server targets
 : ${GDB_PORT:=3333}
+# Default GDB port core offset
+: ${GDB_PORT_CORE_OFFSET:=0}
 # Default telnet port, set to 0 to disable
 : ${TELNET_PORT:=4444}
 # Default TCL port, set to 0 to disable
 : ${TCL_PORT:=6333}
-# Default path to OpenOCD configuration file
-: ${OPENOCD_CONFIG:=${RIOTBOARD}/${BOARD}/dist/openocd.cfg}
 # Default OpenOCD command
 : ${OPENOCD:=openocd}
 # Extra board initialization commands to pass to OpenOCD
@@ -82,7 +97,7 @@
 # Debugger client command, can be used to wrap GDB in a front-end
 : ${DBG:=${GDB}}
 # Default debugger flags,
-: ${DBG_DEFAULT_FLAGS:=-q -ex \"tar ext :${GDB_PORT}\"}
+: ${DBG_DEFAULT_FLAGS:=-q -ex \"tar ext :$(( GDB_PORT + GDB_PORT_CORE_OFFSET ))\"}
 # Extra debugger flags, added by the user
 : ${DBG_EXTRA_FLAGS:=}
 # Debugger flags, will be passed to sh -c, remember to escape any quotation signs.
@@ -92,8 +107,14 @@
 # the target when starting a debug session. 'reset halt' can also be used
 # depending on the type of target.
 : ${OPENOCD_DBG_START_CMD:=-c 'halt'}
+# Extra commands to add when using debug
+: ${OPENOCD_DBG_EXTRA_CMD:=}
 # command used to reset the board
 : ${OPENOCD_CMD_RESET_RUN:="-c 'reset run'"}
+# Select core on multi-core processors.
+: ${OPENOCD_CORE:=}
+# Set to any value to skip verifying after flashing.
+: ${OPENOCD_SKIP_VERIFY:=}
 # This is an optional offset to the base address that can be used to flash an
 # image in a different location than it is linked at. This feature can be useful
 # when flashing images for firmware swapping/remapping boot loaders.
@@ -129,7 +150,7 @@ fi
 # a couple of tests for certain configuration options
 #
 test_config() {
-    if [ ! -f "${OPENOCD_CONFIG}" ]; then
+    if [ ! -f "${OPENOCD_CONFIG}" ] && [[ ! "${OPENOCD_CONFIG}" == board/* ]] ; then
         echo "Error: Unable to locate OpenOCD configuration file"
         echo "       (${OPENOCD_CONFIG})"
         exit 1
@@ -213,6 +234,8 @@ _flash_list_raw() {
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_RESET_INIT} \
             -c 'init' \
+            -c 'targets' \
+            -c 'reset halt' \
             -c 'flash probe 0' \
             -c 'flash list' \
             -c 'shutdown'" 2>&1 && return
@@ -246,15 +269,12 @@ _flash_address() {
     _flash_list | awk "NR==${bank_num}"'{printf "0x%08x\n", $4}'
 }
 
-#
-# now comes the actual actions
-#
-do_flash() {
+do_flashr() {
     IMAGE_FILE=$1
     test_config
     test_imagefile
-    if [ -n "${PRE_FLASH_CHECK_SCRIPT}" ]; then
-        sh -c "${PRE_FLASH_CHECK_SCRIPT} '${IMAGE_FILE}'"
+    if [ -n "${OPENOCD_PRE_FLASH_CHECK_SCRIPT}" ]; then
+        sh -c "${OPENOCD_PRE_FLASH_CHECK_SCRIPT} '${IMAGE_FILE}'"
         RETVAL=$?
         if [ $RETVAL -ne 0 ]; then
             echo "pre-flash checks failed, status=$RETVAL"
@@ -286,12 +306,65 @@ do_flash() {
             -c 'telnet_port 0' \
             -c 'gdb_port 0' \
             -c 'init' \
+            -c 'targets ${OPENOCD_CORE}' \
+            -c 'reset' \
+            -c 'halt' \
+            -c 'load_image \"${IMAGE_FILE}\" ' \
+            -c 'resume ${START_ADDR}' \
+            -c 'shutdown'" &&
+    echo "'Done flashing"
+}
+
+#
+# now comes the actual actions
+#
+do_flash() {
+    IMAGE_FILE=$1
+    test_config
+    test_imagefile
+    if [ -n "${OPENOCD_PRE_FLASH_CHECK_SCRIPT}" ]; then
+        sh -c "${OPENOCD_PRE_FLASH_CHECK_SCRIPT} '${IMAGE_FILE}'"
+        RETVAL=$?
+        if [ $RETVAL -ne 0 ]; then
+            echo "pre-flash checks failed, status=$RETVAL"
+            exit $RETVAL
+        fi
+    fi
+
+    # In case of binary file, IMAGE_OFFSET should include the flash base address
+    # This allows flashing normal binary files without env configuration
+    if _is_binfile "${IMAGE_FILE}" "${IMAGE_TYPE}"; then
+        # hardwritten to use the first bank
+        FLASH_ADDR=$(_flash_address 1)
+        echo "Binfile detected, adding ROM base address: ${FLASH_ADDR}"
+        IMAGE_TYPE=bin
+        IMAGE_OFFSET=$(printf "0x%08x\n" "$((${IMAGE_OFFSET} + ${FLASH_ADDR}))")
+    fi
+
+    if [ -z "${OPENOCD_SKIP_VERIFY}" ]; then
+        OPENOCD_VERIFY="-c 'verify_image \"${IMAGE_FILE}\" ${IMAGE_OFFSET}'"
+    fi
+
+    if [ "${IMAGE_OFFSET}" != "0" ]; then
+        echo "Flashing with IMAGE_OFFSET: ${IMAGE_OFFSET}"
+    fi
+
+    # flash device
+    sh -c "${OPENOCD} \
+            ${OPENOCD_ADAPTER_INIT} \
+            -f '${OPENOCD_CONFIG}' \
+            ${OPENOCD_EXTRA_INIT} \
+            ${OPENOCD_EXTRA_RESET_INIT} \
+            -c 'tcl_port 0' \
+            -c 'telnet_port 0' \
+            -c 'gdb_port 0' \
+            -c 'init' \
             -c 'targets' \
             -c 'reset halt' \
             ${OPENOCD_PRE_FLASH_CMDS} \
             -c 'flash write_image erase \"${IMAGE_FILE}\" ${IMAGE_OFFSET} ${IMAGE_TYPE}' \
             ${OPENOCD_PRE_VERIFY_CMDS} \
-            -c 'verify_image \"${IMAGE_FILE}\" ${IMAGE_OFFSET}' \
+            ${OPENOCD_VERIFY} \
             -c 'reset run' \
             -c 'shutdown'" &&
     echo 'Done flashing'
@@ -323,7 +396,8 @@ do_debug() {
             -c 'telnet_port ${TELNET_PORT}' \
             -c 'gdb_port ${GDB_PORT}' \
             -c 'init' \
-            -c 'targets' \
+            ${OPENOCD_DBG_EXTRA_CMD} \
+            -c 'targets ${OPENOCD_CORE}' \
             ${OPENOCD_DBG_START_CMD} \
             -l /dev/null & \
             echo \$! > $OCD_PIDFILE" &
@@ -350,6 +424,7 @@ do_debugserver() {
             -c 'telnet_port ${TELNET_PORT}' \
             -c 'gdb_port ${GDB_PORT}' \
             -c 'init' \
+            ${OPENOCD_DBG_EXTRA_CMD} \
             -c 'targets' \
             -c 'halt'"
 }
@@ -380,6 +455,19 @@ case "${ACTION}" in
   flash)
     echo "### Flashing Target ###"
     do_flash "$@"
+    ;;
+  flashr)
+    START_ADDR=$(objdump -f $1 | sed '/^$/d' | tail -1 | grep -o "0x[0-9a-fA-F].*")
+    echo "### Flashing target RAM ###"
+        do_flashr "$@"
+    ;;
+  debugr)
+    START_ADDR=$(objdump -f $1 | sed '/^$/d' | tail -1 | grep -o "0x[0-9a-fA-F].*")
+    echo "Start address: $START_ADDR"
+    DBG_FLAGS="$DBG_FLAGS \
+        -ex 'load $1' \
+        "
+        do_debug "$@"
     ;;
   debug)
     echo "### Starting Debugging ###"

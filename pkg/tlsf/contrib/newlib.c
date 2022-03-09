@@ -30,7 +30,6 @@
 #include "tlsf-malloc.h"
 #include "tlsf-malloc-internal.h"
 
-
 /* TODO: Add defines for other compilers */
 #if defined(__GNUC__) && !defined(__clang__)    /* Clang supports __GNUC__ but
                                                  * not the alloc_size()
@@ -71,10 +70,14 @@ ATTR_MALLOCR void *_malloc_r(struct _reent *reent_ptr, size_t bytes)
  */
 ATTR_CALLOCR void *_calloc_r(struct _reent *reent_ptr, size_t count, size_t bytes)
 {
-    void *result = _malloc_r(reent_ptr, count * bytes);
+    size_t size_total;
+    if (__builtin_mul_overflow(count, bytes, &size_total)) {
+        return NULL;
+    }
+    void *result = _malloc_r(reent_ptr, size_total);
 
     if (result != NULL) {
-        memset(result, 0, count * bytes);
+        memset(result, 0, size_total);
     }
     return result;
 }

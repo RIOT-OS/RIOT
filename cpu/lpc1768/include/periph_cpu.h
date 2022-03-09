@@ -75,6 +75,18 @@ typedef enum {
  */
 #define PM_NUM_MODES    (2U)
 
+/**
+ * @brief   UART device configuration
+ */
+typedef struct {
+    LPC_UART_TypeDef *dev;  /**< pointer to the UART device */
+    uint8_t irq_rx;         /**< RX IRQ number */
+    uint8_t clk_offset;     /**< The offset of the periph in the clk sel */
+    uint8_t pinsel;         /**< PINSEL# of the RX and TX pin */
+    uint8_t pinsel_shift;   /**< TX/RX bitshift of the PINSEL# register */
+    uint8_t pinsel_af;      /**< Alternate function of the PINSEL# register */
+} uart_conf_t;
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,0 +1,21 @@
+RIOTBASE ?= $(CURDIR)/../..
+
+# Instrumend code with AFL by default
+TOOLCHAIN ?= afl
+
+# Automatically set application to a sensible default
+APPLICATION ?= fuzzing_$(notdir $(patsubst %/,%,$(CURDIR)))
+
+# Fuzzing is only supported on native
+BOARD ?= native
+FEATURES_REQUIRED += arch_native
+
+CFLAGS += -ggdb                # Make ASAN output more useful error messages
+CFLAGS += -D_FORTIFY_SOURCE=2  # Compiler hardening
+
+# Various utilitiy modules
+USEMODULE += fuzzing
+USEMODULE += ssp
+
+# Enable DEVELHELP by default
+DEVELHELP ?= 1

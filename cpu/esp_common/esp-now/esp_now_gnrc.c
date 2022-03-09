@@ -30,7 +30,7 @@
 #include "esp_now_gnrc.h"
 #include "net/gnrc/netif.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
@@ -97,7 +97,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
-    esp_now_netdev_t *esp_now = (esp_now_netdev_t*)dev;
+    esp_now_netdev_t *esp_now = container_of(dev, esp_now_netdev_t, netdev);
 
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
     if (bytes_expected <= 0) {
@@ -178,10 +178,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 
     gnrc_pktbuf_remove_snip(pkt, mac_hdr);
     gnrc_pktbuf_remove_snip(pkt, esp_hdr);
-    LL_APPEND(pkt, netif_hdr);
-
-    return pkt;
-
+    return gnrc_pkt_append(pkt, netif_hdr);
 err:
     gnrc_pktbuf_release(pkt);
     return NULL;
@@ -195,26 +192,27 @@ static const gnrc_netif_ops_t _esp_now_ops = {
     .set = gnrc_netif_set_from_netdev,
 };
 
-gnrc_netif_t *gnrc_netif_esp_now_create(char *stack, int stacksize, char priority,
-                                        char *name, netdev_t *dev)
+int gnrc_netif_esp_now_create(gnrc_netif_t *netif, char *stack, int stacksize, char priority,
+                              char *name, netdev_t *dev)
 {
-    return gnrc_netif_create(stack, stacksize, priority, name, dev, &_esp_now_ops);
+    return gnrc_netif_create(netif, stack, stacksize, priority, name, dev, &_esp_now_ops);
 }
 
 /* device thread stack */
 static char _esp_now_stack[ESP_NOW_STACKSIZE];
+static gnrc_netif_t _netif;
 
 void auto_init_esp_now(void)
 {
-    LOG_TAG_INFO("esp_now", "initializing ESP-NOW device\n");
+    LOG_TAG_DEBUG("esp_now", "initializing ESP-NOW device\n");
 
     esp_now_netdev_t *esp_now_dev = netdev_esp_now_setup();
     if (!esp_now_dev) {
         LOG_ERROR("[auto_init_netif] error initializing esp_now\n");
     } else {
-        gnrc_netif_esp_now_create(_esp_now_stack, sizeof(_esp_now_stack),
+        gnrc_netif_esp_now_create(&_netif, _esp_now_stack, sizeof(_esp_now_stack),
                                   ESP_NOW_PRIO,
-                                  "esp-now",
+                                  "netif-esp-now",
                                   &esp_now_dev->netdev);
     }
 }

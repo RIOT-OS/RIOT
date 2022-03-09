@@ -20,8 +20,10 @@
 #define PERIPH_CPU_H
 
 #include <stdint.h>
+#include <limits.h>
 
 #include "eagle_soc.h"
+#include "cpu_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -207,6 +209,25 @@ typedef struct {
 /** @} */
 
 /**
+ * @name    RNG configuration
+ * @{
+ */
+
+/**
+ * @brief   The address of the register for accessing the hardware RNG.
+ */
+#define RNG_DATA_REG_ADDR   (0x3ff20e44)
+/** @} */
+
+/**
+ * @name    RTT and RTC configuration
+ * @{
+ */
+#define RTT_FREQUENCY       (312500UL)
+#define RTT_MAX_VALUE       (0xFFFFFFFFUL)
+/** @} */
+
+/**
  * @name    SPI configuration
  *
  * ESP8266 has two SPI controllers:
@@ -283,7 +304,7 @@ typedef struct {
 /**
  * @brief   Maximum number of UART interfaces
  */
-#define UART_NUMOF_MAX  (1)
+#define UART_NUMOF_MAX  (2)
 /** @} */
 
 #ifdef __cplusplus

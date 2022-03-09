@@ -34,7 +34,7 @@ static void test_crypto_cipher_aes_encrypt(void)
     int err, cmp;
     uint8_t data[16] = { 0 };
 
-    err = cipher_init(&cipher, CIPHER_AES_128, TEST_KEY, 16);
+    err = cipher_init(&cipher, CIPHER_AES, TEST_KEY, 16);
     TEST_ASSERT_EQUAL_INT(1, err);
 
     err = cipher_encrypt(&cipher, TEST_INP, data);
@@ -50,7 +50,7 @@ static void test_crypto_cipher_aes_decrypt(void)
     int err, cmp;
     uint8_t data[16];
 
-    err = cipher_init(&cipher, CIPHER_AES_128, TEST_KEY, 16);
+    err = cipher_init(&cipher, CIPHER_AES, TEST_KEY, 16);
     TEST_ASSERT_EQUAL_INT(1, err);
 
     err = cipher_decrypt(&cipher, TEST_ENC_AES, data);
@@ -65,32 +65,13 @@ static void test_crypto_cipher_init_aes_key_length(void)
     cipher_t cipher;
     int err;
 
-    /* A keylength of 192 bit is not supported by the current implementation */
-    uint8_t unsupported_key_1[24];
-
+    /* A keylength of 64 bit is not supported by AES */
+    uint8_t unsupported_key_1[8];
     memset(unsupported_key_1, 0, sizeof(unsupported_key_1));
 
-    /* A keylength of 256 bit is not supported by the current implementation */
-    uint8_t unsupported_key_2[32];
-    memset(unsupported_key_2, 0, sizeof(unsupported_key_2));
-
-    /* A keylength of 64 bit is not supported by AES */
-    uint8_t unsupported_key_3[8];
-    memset(unsupported_key_3, 0, sizeof(unsupported_key_3));
-
     err =
-        cipher_init(&cipher, CIPHER_AES_128, unsupported_key_1,
+        cipher_init(&cipher, CIPHER_AES, unsupported_key_1,
                     sizeof(unsupported_key_1));
-    TEST_ASSERT_EQUAL_INT(CIPHER_ERR_INVALID_KEY_SIZE, err);
-
-    err =
-        cipher_init(&cipher, CIPHER_AES_128, unsupported_key_2,
-                    sizeof(unsupported_key_2));
-    TEST_ASSERT_EQUAL_INT(CIPHER_ERR_INVALID_KEY_SIZE, err);
-
-    err =
-        cipher_init(&cipher, CIPHER_AES_128, unsupported_key_3,
-                    sizeof(unsupported_key_3));
     TEST_ASSERT_EQUAL_INT(CIPHER_ERR_INVALID_KEY_SIZE, err);
 }
 

@@ -39,7 +39,8 @@ int main(void)
         int distance = srf04_get_distance(&dev);
         if (distance < SRF04_OK) {
             puts("Error: no valid data available");
-        } else {
+        }
+        else {
             printf("D: %d mm\n", distance);
         }
     }

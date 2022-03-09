@@ -11,9 +11,10 @@
  * @ingroup  sys
  * @brief RIOT Unittests based on the EmbUnit Framework
  *
- * @see http://embunit.sourceforge.net/embunit/
+ * @see https://sourceforge.net/projects/embunit
  *
  * @note Please refer to https://github.com/RIOT-OS/RIOT/wiki/Testing-RIOT
+ * @note If mocking would be helpful for your unit test, you can also have a look at @ref pkg_fff.
  *
  * @author Martine Lenders <mlenders@inf.fu-berlin.de>
  */

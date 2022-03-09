@@ -1,0 +1,29 @@
+From 4050cfd0d878fcfbd6e968eb53d82ba18b2393c0 Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Wed, 25 Aug 2021 16:19:00 +0200
+Subject: [PATCH] stm32f4xx: remove ErrorStatus
+
+---
+ Include/stm32f4xx.h | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/Include/stm32f4xx.h b/Include/stm32f4xx.h
+index 911183b..342fe97 100644
+--- a/Include/stm32f4xx.h
++++ b/Include/stm32f4xx.h
+@@ -211,12 +211,6 @@ typedef enum
+ } FunctionalState;
+ #define IS_FUNCTIONAL_STATE(STATE) (((STATE) == DISABLE) || ((STATE) == ENABLE))
+ 
+-typedef enum
+-{
+-  SUCCESS = 0U,
+-  ERROR = !SUCCESS
+-} ErrorStatus;
+-
+ /**
+   * @}
+   */
+-- 
+2.30.2
+

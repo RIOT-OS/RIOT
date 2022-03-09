@@ -90,11 +90,12 @@ extern "C" {
 #define BTN0_MODE           GPIO_IN
 /** @} */
 
-
 /**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ * @name LSM303DLHC magnetometer data ready pin
+ * @{
  */
-void board_init(void);
+#define LSM303DLHC_PARAM_MAG_PIN    GPIO_PIN(PORT_E, 2)
+/** @} */
 
 #ifdef __cplusplus
 }

@@ -22,9 +22,12 @@
 #include <string.h>
 
 #include "fmt.h"
+#include "timex.h"
+#include "ztimer.h"
+
 #include "rn2xx3_internal.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define RESP_TIMEOUT_SEC            (5U)
@@ -51,22 +54,21 @@ static bool _wait_reply(rn2xx3_t *dev, uint8_t timeout)
     dev->resp_size = 0;
     dev->resp_buf[0] = 0;
 
-    xtimer_ticks64_t sent_time = xtimer_now64();
+    ztimer_now_t sent_time = ztimer_now(ZTIMER_MSEC);
 
-    xtimer_t resp_timer;
+    ztimer_t resp_timer;
     resp_timer.callback = isr_resp_timeout;
     resp_timer.arg = dev;
 
-    xtimer_set(&resp_timer, (uint32_t)timeout * US_PER_SEC);
+    ztimer_set(ZTIMER_MSEC, &resp_timer, (uint32_t)timeout * MS_PER_SEC);
 
     /* wait for results */
     while ((!dev->resp_done) &&
-           xtimer_less(xtimer_diff32_64(xtimer_now64(), sent_time),
-                                        xtimer_ticks_from_usec(timeout * US_PER_SEC))) {
+        ((int32_t)(sent_time + (timeout * MS_PER_SEC) - ztimer_now(ZTIMER_MSEC)) > 0)) {
         mutex_lock(&(dev->resp_lock));
     }
 
-    xtimer_remove(&resp_timer);
+    ztimer_remove(ZTIMER_MSEC, &resp_timer);
 
     if (dev->resp_done == 0) {
         DEBUG("[rn2xx3] response timeout\n");
@@ -100,7 +102,7 @@ void rn2xx3_set_internal_state(rn2xx3_t *dev, uint8_t state)
         return;
     }
 
-    if (ENABLE_DEBUG) {
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
         printf("[rn2xx3] new state: ");
         switch(state) {
             case RN2XX3_INT_STATE_CMD:

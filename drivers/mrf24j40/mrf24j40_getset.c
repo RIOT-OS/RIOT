@@ -26,7 +26,7 @@
 #include "mrf24j40_registers.h"
 #include "xtimer.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* Values of RFCON3 - Address: 0x203
@@ -120,6 +120,15 @@ static const uint8_t RSSI_value[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
                                       0x25, 0x20, 0x1b, 0x17, 0x12, 0x0d, 0x09, 0x05, 0x02, 0x01, \
                                       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
+static void mrf24j40_baseband_reset(mrf24j40_t *dev)
+{
+    uint8_t softrst;
+
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_SOFTRST, MRF24J40_SOFTRST_RSTBB);
+    do {
+        softrst = mrf24j40_reg_read_short(dev, MRF24J40_REG_SOFTRST);
+    } while (softrst != 0);        /* wait until soft-reset has finished */
+}
 
 uint16_t mrf24j40_get_addr_short(mrf24j40_t *dev)
 {
@@ -147,24 +156,17 @@ void mrf24j40_set_addr_short(mrf24j40_t *dev, uint16_t addr)
                              naddr.u8[0]);
 }
 
-uint64_t mrf24j40_get_addr_long(mrf24j40_t *dev)
+void mrf24j40_get_addr_long(mrf24j40_t *dev, uint8_t *addr)
 {
-    network_uint64_t naddr;
-
     for (int i = 0; i < 8; i++) {
-        naddr.u8[7 - i] = mrf24j40_reg_read_short(dev, (MRF24J40_REG_EADR0 + i));
+        addr[7 - i] = mrf24j40_reg_read_short(dev, MRF24J40_REG_EADR0 + i);
     }
-    return naddr.u64;
 }
 
-void mrf24j40_set_addr_long(mrf24j40_t *dev, uint64_t addr)
+void mrf24j40_set_addr_long(mrf24j40_t *dev, const uint8_t *addr)
 {
-    network_uint64_t naddr;
-    naddr.u64 = addr;
-
     for (int i = 0; i < 8; i++) {
-        mrf24j40_reg_write_short(dev, (MRF24J40_REG_EADR0 + i),
-                                 (naddr.u8[7 - i]));
+        mrf24j40_reg_write_short(dev, MRF24J40_REG_EADR0 + i, addr[7 - i]);
     }
 }
 
@@ -172,7 +174,6 @@ uint8_t mrf24j40_get_chan(mrf24j40_t *dev)
 {
     return dev->netdev.chan;
 }
-
 
 void mrf24j40_set_chan(mrf24j40_t *dev, uint8_t channel)
 {
@@ -257,13 +258,12 @@ uint16_t mrf24j40_get_pan(mrf24j40_t *dev)
 
 void mrf24j40_set_pan(mrf24j40_t *dev, uint16_t pan)
 {
-    le_uint16_t le_pan = byteorder_btols(byteorder_htons(pan));
+    le_uint16_t le_pan = byteorder_htols(pan);
 
     DEBUG("pan0: %u, pan1: %u\n", le_pan.u8[0], le_pan.u8[1]);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_PANIDL, le_pan.u8[0]);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_PANIDH, le_pan.u8[1]);
 }
-
 
 int16_t mrf24j40_get_txpower(mrf24j40_t *dev)
 {
@@ -327,6 +327,32 @@ void mrf24j40_set_cca_threshold(mrf24j40_t *dev, int8_t value)
     }
 
     mrf24j40_reg_write_short(dev, MRF24J40_REG_CCAEDTH, RSSI_value[value]);
+}
+
+void mrf24j40_set_turbo(mrf24j40_t *dev, bool on)
+{
+    uint8_t tmp;
+    static const uint8_t cfg[2][2] = {
+        {0xD0, 0x80},   /* IEEE mode */
+        {0x30, 0x40}    /* Turbo mode */
+    };
+
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG0, on);
+
+    /* Set Preamble Search Energy Valid Threshold */
+    tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_BBREG3) & 0xF;
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG3, tmp | cfg[on][0]);
+
+    /* Set Carrier Sense Threshold */
+    tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_BBREG4) & 0x1F;
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG4, tmp | cfg[on][1]);
+
+    mrf24j40_baseband_reset(dev);
+}
+
+bool mrf24j40_get_turbo(mrf24j40_t *dev)
+{
+    return mrf24j40_reg_read_short(dev, MRF24J40_REG_BBREG0);
 }
 
 void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
@@ -412,7 +438,6 @@ void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state)
     uint8_t old_state;
 
     old_state = dev->state;
-
 
     if (state == old_state) {
         return;

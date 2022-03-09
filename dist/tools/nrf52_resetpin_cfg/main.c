@@ -97,7 +97,7 @@ int main(void)
         puts("\n\nPress any key (meaning send any char) to continue");
         getchar();
 
-        puts("Progamming the pin now...");
+        puts("Programming the pin now...");
         if ((NRF_UICR->PSELRESET[0] != RESET_VAL) ||
             (NRF_UICR->PSELRESET[1] != RESET_VAL)) {
             /* we can only erase all UICR registers at once, so we need to save

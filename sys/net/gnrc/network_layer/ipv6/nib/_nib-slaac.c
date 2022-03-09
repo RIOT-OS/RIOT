@@ -13,19 +13,21 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <kernel_defines.h>
 #include <stdbool.h>
 
 #include "log.h"
 #include "luid.h"
+#include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/netif/internal.h"
 
 #include "_nib-6ln.h"
 #include "_nib-arsm.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if GNRC_IPV6_NIB_CONF_6LN || GNRC_IPV6_NIB_CONF_SLAAC
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
@@ -35,11 +37,11 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
     int idx;
     uint8_t flags = GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE;
 
-#if !GNRC_IPV6_NIB_CONF_SLAAC
+#if !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
     if (!gnrc_netif_is_6ln(netif)) {
         LOG_WARNING("SLAAC not activated; will not auto-configure IPv6 address "
                          "for interface %u.\n"
-                    "    Use GNRC_IPV6_NIB_CONF_SLAAC=1 to activate.\n",
+                    "    Use CONFIG_GNRC_IPV6_NIB_SLAAC=1 to activate.\n",
                     netif->pid);
         return;
     }
@@ -51,9 +53,9 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
     DEBUG("nib: add address based on %s/%u automatically to interface %u\n",
           ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)),
           pfx_len, netif->pid);
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     bool new_address = false;
-#endif  /* GNRC_IPV6_NIB_CONF_6LN */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
     gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&addr.u64[1]);
     ipv6_addr_init_prefix(&addr, pfx, pfx_len);
     if ((idx = gnrc_netif_ipv6_addr_idx(netif, &addr)) < 0) {
@@ -63,12 +65,12 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
                   netif->pid);
             return;
         }
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
         new_address = true;
-#endif  /* GNRC_IPV6_NIB_CONF_6LN */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
     }
 
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     /* mark link-local addresses as valid on 6LN */
     if (gnrc_netif_is_6ln(netif) && ipv6_addr_is_link_local(pfx)) {
         /* don't do this beforehand or risk a deadlock:
@@ -77,20 +79,21 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
          *    locked here) */
         netif->ipv6.addrs_flags[idx] &= ~GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK;
         netif->ipv6.addrs_flags[idx] |= GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID;
+        gnrc_netif_ipv6_bus_post(netif, GNRC_IPV6_EVENT_ADDR_VALID, &netif->ipv6.addrs[idx]);
     }
-#endif  /* GNRC_IPV6_NIB_CONF_6LN */
-#if GNRC_IPV6_NIB_CONF_6LN
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     if (new_address && gnrc_netif_is_6ln(netif) &&
         !gnrc_netif_is_6lbr(netif)) {
         _handle_rereg_address(&netif->ipv6.addrs[idx]);
     }
-#else   /* GNRC_IPV6_NIB_CONF_6LN */
+#else   /* CONFIG_GNRC_IPV6_NIB_6LN */
     (void)idx;
-#endif  /* GNRC_IPV6_NIB_CONF_6LN */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
 }
-#endif  /* GNRC_IPV6_NIB_CONF_6LN || GNRC_IPV6_NIB_CONF_SLAAC */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
 
-#if GNRC_IPV6_NIB_CONF_SLAAC
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
 static bool _try_l2addr_reconfiguration(gnrc_netif_t *netif)
 {
     uint8_t hwaddr[GNRC_NETIF_L2ADDR_MAXLEN];
@@ -101,7 +104,7 @@ static bool _try_l2addr_reconfiguration(gnrc_netif_t *netif)
         return false;
     }
     luid_get(hwaddr, hwaddr_len);
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     if (hwaddr_len == IEEE802154_LONG_ADDRESS_LEN) {
         if (gnrc_netapi_set(netif->pid, NETOPT_ADDRESS_LONG, 0, hwaddr,
                             hwaddr_len) < 0) {
@@ -134,7 +137,7 @@ static bool _try_addr_reconfiguration(gnrc_netif_t *netif)
     gnrc_netif_acquire(netif);
     if (hwaddr_reconf) {
         if (remove_old) {
-            for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
+            for (unsigned i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
                 ipv6_addr_t *addr = &netif->ipv6.addrs[i];
                 if (addr->u64[1].u64 == orig_iid.uint64.u64) {
                     gnrc_netif_ipv6_addr_remove_internal(netif, addr);
@@ -159,10 +162,15 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
         /* Cannot use target address as personal address and can
          * not change hardware address to retry SLAAC => use purely
          * DHCPv6 instead */
-        /* TODO: implement IA_NA for DHCPv6 */
-        /* then => tgt_netif->aac_mode = GNRC_NETIF_AAC_DHCP; */
-        DEBUG("nib: would set interface %i to DHCPv6, "
-              "but is not implemented yet", netif->pid);
+        if (IS_USED(MODULE_DHCPV6_CLIENT_IA_NA)) {
+            netif->ipv6.aac_mode &= ~GNRC_NETIF_AAC_AUTO;
+            netif->ipv6.aac_mode |= GNRC_NETIF_AAC_DHCP;
+            dhcpv6_client_req_ia_na(netif->pid);
+        }
+        else {
+            DEBUG("nib: would set interface %i to DHCPv6, "
+                  "but DHCPv6 is not provided", netif->pid);
+        }
     }
 }
 
@@ -210,14 +218,15 @@ void _handle_valid_addr(const ipv6_addr_t *addr)
     if (idx >= 0) {
         netif->ipv6.addrs_flags[idx] &= ~GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK;
         netif->ipv6.addrs_flags[idx] |= GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID;
+        gnrc_netif_ipv6_bus_post(netif, GNRC_IPV6_EVENT_ADDR_VALID, &netif->ipv6.addrs[idx]);
     }
     if (netif != NULL) {
         /* was acquired in `_get_netif_state()` */
         gnrc_netif_release(netif);
     }
 }
-#else  /* GNRC_IPV6_NIB_CONF_SLAAC */
+#else  /* CONFIG_GNRC_IPV6_NIB_SLAAC */
 typedef int dont_be_pedantic;
-#endif /* GNRC_IPV6_NIB_CONF_SLAAC */
+#endif /* CONFIG_GNRC_IPV6_NIB_SLAAC */
 
 /** @} */

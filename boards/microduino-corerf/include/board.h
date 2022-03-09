@@ -31,7 +31,7 @@ extern "C" {
  * @{
  */
 #ifndef STDIO_UART_BAUDRATE
-#define STDIO_UART_BAUDRATE (57600U)       /**< Sets Baudrate for e.g. Shell */
+#define STDIO_UART_BAUDRATE (115200U)      /**< Sets Baudrate for e.g. Shell */
 #endif
 /** @} */
 
@@ -43,11 +43,6 @@ extern "C" {
 #define XTIMER_HZ           (250000UL)
 #define XTIMER_BACKOFF      (40)
 /** @} */
-
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and stdio
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

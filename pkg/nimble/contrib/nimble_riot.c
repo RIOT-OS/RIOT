@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "thread.h"
 #include "nimble_riot.h"
 
@@ -35,6 +37,10 @@
 #include "services/ipss/ble_svc_ipss.h"
 #endif
 
+#ifdef MODULE_NIMBLE_STATCONN
+#include "nimble_statconn.h"
+#endif
+
 #if defined(MODULE_NIMBLE_AUTOCONN) && !defined(MODULE_NIMBLE_AUTOCONN_NOAUTOINIT)
 #include "nimble_autoconn.h"
 #include "nimble_autoconn_params.h"
@@ -43,6 +49,12 @@
 #ifdef MODULE_NIMBLE_CONTROLLER
 #if defined(CPU_FAM_NRF52) || defined(CPU_FAM_NRF51)
 #include "nrf_clock.h"
+#endif
+#include "controller/ble_ll.h"
+
+#ifdef MODULE_NIMBLE_RPBLE
+#include "nimble_rpble.h"
+#include "nimble_rpble_params.h"
 #endif
 
 static char _stack_controller[NIMBLE_CONTROLLER_STACKSIZE];
@@ -75,6 +87,15 @@ static void *_host_thread(void *arg)
                   THREAD_CREATE_STACKTEST,
                   (thread_task_func_t)nimble_port_ll_task_func, NULL,
                   "nimble_ctrl");
+
+    /* XXX: seeding of the used PRNG is done when this function is called the
+     *      first time. However, this could potentially be in interrupt context,
+     *      leading to an malloc call in that context, breaking with the used
+     *      thread safe malloc wrapper in RIOT. So we better do this seeding in
+     *      a deterministic fashion right here.
+     *      -> this fix is temporary until a proper fix is merged to NimBLE
+     *         upstream */
+    ble_ll_rand();
 #endif
 
     nimble_port_run();
@@ -88,6 +109,21 @@ void nimble_riot_init(void)
 {
     int res;
     (void)res;
+
+#if !IS_USED(MODULE_MYNEWT_CORE) && IS_ACTIVE(NIMBLE_CFG_CONTROLLER)
+    /* in mynewt-nimble and uwb-core OS_CPUTIMER_TIMER_NUM == 5 is NRF_RTC0,
+       for nimble this must be used for the BLE stack and must go through
+       mynewt timer initialization for it to work properly. The RTC frequency
+       should be set to the highest possible value so, 32768Hz */
+    assert(MYNEWT_VAL_OS_CPUTIME_TIMER_NUM == 5);
+    assert(MYNEWT_VAL_OS_CPUTIME_FREQ == 32768);
+    int rc = hal_timer_init(MYNEWT_VAL_OS_CPUTIME_TIMER_NUM, NULL);
+    assert(rc == 0);
+    rc = hal_timer_config(MYNEWT_VAL_OS_CPUTIME_TIMER_NUM,
+                          MYNEWT_VAL_OS_CPUTIME_FREQ);
+    assert(rc == 0);
+    (void)rc;
+#endif
 
     /* and finally initialize and run the host */
     thread_create(_stack_host, sizeof(_stack_host),
@@ -127,6 +163,10 @@ void nimble_riot_init(void)
     ble_svc_ipss_init();
 #endif
 
+#ifdef MODULE_NIMBLE_STATCONN
+    nimble_statconn_init();
+#endif
+
 #if defined(MODULE_NIMBLE_AUTOCONN) && !defined(MODULE_NIMBLE_AUTOCONN_NOAUTOINIT)
     ble_gatts_start();
     /* CAUTION: this must be called after nimble_netif_init() and also only
@@ -134,5 +174,22 @@ void nimble_riot_init(void)
     res = nimble_autoconn_init(&nimble_autoconn_params, NULL, 0);
     assert(res == NIMBLE_AUTOCONN_OK);
     nimble_autoconn_enable();
+#endif
+
+#ifdef MODULE_STDIO_NIMBLE
+    extern void stdio_nimble_init(void);
+    /* stdio_nimble_init() needs to be called after nimble stack initialization
+     * and before nimble_autoadv_init() */
+    stdio_nimble_init();
+#endif
+
+#ifdef MODULE_NIMBLE_AUTOADV
+    extern void nimble_autoadv_init(void);
+    nimble_autoadv_init();
+#endif
+
+#ifdef MODULE_NIMBLE_RPBLE
+    res = nimble_rpble_init(&nimble_rpble_params);
+    assert(res == 0);
 #endif
 }

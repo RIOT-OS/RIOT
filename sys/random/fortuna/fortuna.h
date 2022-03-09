@@ -27,8 +27,14 @@
 #ifndef FORTUNA_H
 #define FORTUNA_H
 
-#include "xtimer.h"
 #include "mutex.h"
+#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+#if IS_USED(MODULE_ZTIMER_MSEC)
+#include "ztimer.h"
+#else
+#include "xtimer.h"
+#endif
+#endif
 
 #include "crypto/aes.h"
 #include "hashes/sha256.h"
@@ -55,7 +61,6 @@ extern "C" {
 #define FORTUNA_MIN_POOL_SIZE       (64U)
 #endif
 
-
 /**
  * @brief Definition of the seed file size used to initialize the PRNG. The
  *        default value of 64 bytes is suggested by section 9.6.1.
@@ -64,13 +69,17 @@ extern "C" {
 #define FORTUNA_SEED_SIZE           (64U)
 #endif
 
+#if IS_USED(MODULE_FORTUNA_RESEED) || DOXYGEN
 /**
  * @brief Reseed interval in us. After this interval, the PRNG must be
  *        reseeded. Per section 9.5.5, the recommended value is 100ms. Set to
  *        zero to disable this security feature.
+ *
+ * @note Requires `fortuna_reseed` module.
  */
-#ifndef FORTUNA_RESEED_INTERVAL
-#define FORTUNA_RESEED_INTERVAL     (0)
+#ifndef FORTUNA_RESEED_INTERVAL_MS
+#define FORTUNA_RESEED_INTERVAL_MS  100
+#endif
 #endif
 
 /**
@@ -139,11 +148,16 @@ typedef struct {
     fortuna_generator_t gen;
     fortuna_pool_t pools[FORTUNA_POOLS];
     uint32_t reseeds;
-#if FORTUNA_RESEED_INTERVAL > 0
-    uint64_t last_reseed;
-#endif
 #if FORTUNA_LOCK
     mutex_t lock;
+#endif
+#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+#if IS_USED(MODULE_ZTIMER_MSEC)
+    ztimer_t reseed_timer;
+#else
+    xtimer_t reseed_timer;
+#endif
+    uint8_t needs_reseed;
 #endif
 } fortuna_state_t;
 

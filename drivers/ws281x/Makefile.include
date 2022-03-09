@@ -1,0 +1,5 @@
+# implementations of ws281x_write as submodules of ws281x:
+PSEUDOMODULES += ws281x_%
+
+USEMODULE_INCLUDES_ws281x := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_ws281x)

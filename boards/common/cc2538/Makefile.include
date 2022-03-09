@@ -1,0 +1,22 @@
+# define the default flash-tool
+PROGRAMMER ?= cc2538-bsl
+
+# cc2538-bsl programmer is supported
+PROGRAMMERS_SUPPORTED += cc2538-bsl
+
+ifeq ($(PROGRAMMER),cc2538-bsl)
+  PROG_BAUD ?= 460800
+else ifeq ($(PROGRAMMER),jlink)
+  # Special flashing and reset scripts are required due to board hardware
+  FLASH_ADDR = 0x200000
+  JLINK_DEVICE = CC2538SF53
+  JLINK_IF = JTAG
+  JLINK_RESET_FILE = $(RIOTBOARD)/common/cc2538/dist/hw_reset.seg
+endif
+
+OFLAGS = --gap-fill 0xff
+FLASHFILE ?= $(BINFILE)
+OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
+
+# include common cc2538 includes
+INCLUDES += -I$(RIOTBOARD)/common/cc2538/include

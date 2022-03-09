@@ -18,8 +18,8 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdio.h>
-
 
 #include "mutex.h"
 #include "periph/adc.h"
@@ -33,7 +33,6 @@
 #define ADC_CLOCK_TARGET    (5000000)
 #endif
 #define PRESCALER           ((CLOCK_CORECLOCK / (2 * ADC_CLOCK_TARGET)) - 1)
-
 
 static mutex_t lock = MUTEX_INIT;
 
@@ -68,7 +67,7 @@ int adc_init(adc_t line)
     return 0;
 }
 
-int adc_sample(adc_t line, adc_res_t res)
+int32_t adc_sample(adc_t line, adc_res_t res)
 {
     assert(line < ADC_NUMOF);
 

@@ -1,0 +1,8 @@
+# include variants of lpsxxx drivers as pseudo modules
+PSEUDOMODULES += lps331ap
+PSEUDOMODULES += lps22hb
+PSEUDOMODULES += lps22hh
+PSEUDOMODULES += lps25hb
+
+USEMODULE_INCLUDES_lpsxxx := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_lpsxxx)

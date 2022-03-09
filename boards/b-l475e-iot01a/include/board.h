@@ -47,9 +47,12 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   User button
+ * @name    User button pin configuration
+ * @{
  */
-#define BTN_B1_PIN          GPIO_PIN(PORT_C, 13)
+#define BTN0_PIN            GPIO_PIN(PORT_C, 13)    /**< User button pin */
+#define BTN0_MODE           GPIO_IN_PU              /**< User button pin mode */
+/** @} */
 
 /**
  * @name    HTS221 temperature/humidity sensor configuration
@@ -79,11 +82,6 @@ extern "C" {
 #define LSM6DSL_PARAM_I2C   I2C_DEV(1)
 #define LSM6DSL_PARAM_ADDR  (0x6A)
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

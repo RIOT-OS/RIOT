@@ -27,6 +27,13 @@
 extern "C" {
 #endif
 
+/**
+ * @name    AT24MAC602 configuration
+ * @{
+ */
+#define AT24MAC_PARAM_I2C_DEV   I2C_DEV(0)
+#define AT24MAC_PARAM_TYPE      AT24MAC6XX
+/** @} */
 
 /**
  * @name   LED pin definitions and handlers
@@ -51,14 +58,12 @@ extern "C" {
 #define LED1_ON             (LED_PORT &= ~LED1_MASK)
 #define LED1_TOGGLE         (LED_PORT ^=  LED1_MASK)
 
-
 /**
  * @name    Usage of LED to turn on when a kernel panic occurs.
  * @{
  */
 #define LED_PANIC           LED0_ON
 /** @} */
-
 
 /**
  * @name DS18 pins  OW_BUS_0
@@ -98,15 +103,9 @@ extern "C" {
  * @name    User button configuration
  * @{
  */
-#define MODULE_ATMEGA_PCINT0
 #define BTN0_PIN            GPIO_PIN(PORT_B, 0)
 #define BTN0_MODE           GPIO_IN
 /** @} */
-
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

@@ -1,0 +1,17 @@
+menuconfig MODULE_SOCKET_ZEP
+    bool "Socket-based ZEP"
+    depends on CPU_MODEL_NATIVE
+    depends on TEST_KCONFIG
+    select MODULE_IOLIST
+    select MODULE_CHECKSUM
+    select MODULE_RANDOM
+    select MODULE_IEEE802154
+    help
+      UDP socket-based IEEE 802.15.4 device over ZEP
+
+config MODULE_SOCKET_ZEP_HELLO
+    bool "Send a dummy HELLO packet on startup"
+    depends on MODULE_SOCKET_ZEP
+    help
+      Say y to send a dummy HELLO packet on startup. This is used to make
+      dispatchers aware of the node.

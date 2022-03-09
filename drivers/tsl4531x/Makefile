@@ -1,3 +1,1 @@
-MODULE = tsl4531x
-
-include $(RIOTBASE)/Makefile.base
+include $(RIOTMAKE)/driver_with_saul.mk

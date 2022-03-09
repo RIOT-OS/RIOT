@@ -1,0 +1,17 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_USBUS_HID
+    bool "USB HID support"
+    depends on TEST_KCONFIG
+    depends on MODULE_USBUS
+    select MODULE_ISRPIPE_READ_TIMEOUT
+
+config USBUS_HID_INTERRUPT_EP_SIZE
+    int "Interrupt endpoint size in bytes"
+    default 64
+    depends on MODULE_USBUS_HID

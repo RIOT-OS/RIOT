@@ -12,7 +12,6 @@ CHECKED_IFDEF_PATHS = cc110x \
                       netdev_eth \
                       netdev_ieee802154 \
                       xbee \
-                      nordic_softdevice_ble \
                       nrfmin \
                       nimble_netif
 

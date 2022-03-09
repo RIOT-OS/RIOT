@@ -1,0 +1,98 @@
+# Copyright (c) 2020 Locha Inc
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_COMMON_CC26XX_CC13XX
+    bool
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_UART
+    select HAS_PERIPH_UART_MODECFG
+
+config CPU_FAM_CC13XX
+    bool
+
+menuconfig CC26XX_CC13XX_UPDATE_CCFG
+    bool "Update CCFG"
+    help
+        This includes the CCFG configuration in the binary for flashing
+        onto the micro-controller.
+
+        CCFG stands for Customer Configueration, it's different from the
+        FCFG which is the Factory Configuration of the device.
+
+if CC26XX_CC13XX_UPDATE_CCFG
+
+config CC26XX_CC13XX_FORCE_VDDR_HH
+    bool "Force VDDR high"
+    depends on CPU_FAM_CC13XX
+    help
+        Force VDDR high setting, enables higher output power but also higher
+        power consumption.
+
+        This is also called "boost mode".
+
+config CC26XX_CC13XX_GPRAM
+    bool "Enable GPRAM"
+    help
+        Enable GPRAM and use 8K VIMS RAM as GPRAM (instead of cache).
+
+        Notes:
+            - Enabling GPRAM disables CACHE and will reduce CPU execution speed
+            (up to 60%).
+            - GPRAM is 8KB in size and located at 0x11000000-0x11001FFF if
+            enabled.
+
+menuconfig CC26XX_CC13XX_ROM_BOOTLOADER
+    bool "Enable ROM bootloader"
+    help
+        Enables the ROM bootloader and the bootloader backdoor to
+        read/write flash memory using a serial interface.
+
+if CC26XX_CC13XX_ROM_BOOTLOADER
+
+choice
+    bool "Bootloader backdoor DIO level"
+    default CC26XX_CC13XX_BL_LEVEL_ACTIVE_HIGH
+    help
+        This configures the level need to enter the bootloader backdoor at boot
+        time.
+
+config CC26XX_CC13XX_BL_LEVEL_ACTIVE_HIGH
+    bool "Active high"
+
+config CC26XX_CC13XX_BL_LEVEL_ACTIVE_LOW
+    bool "Active low"
+
+endchoice
+
+config CC26XX_CC13XX_BL_PIN_EN
+    bool "Enable bootloader backdoor DIO"
+
+config CC26XX_CC13XX_BL_PIN
+    int "Bootloader backdoor DIO number"
+    range 0 31
+    depends on CC26XX_CC13XX_BL_PIN_EN
+    help
+        DIO (pin) number used to enter the bootloader backdoor at
+        boot time.
+
+endif # CC26XX_CC13XX_ROM_BOOTLOADER
+
+endif # CC26XX_CC13XX_UPDATE_CCFG
+
+source "$(RIOTCPU)/cortexm_common/Kconfig"
+
+config MODULE_CC26XX_CC13XX
+    bool
+    depends on TEST_KCONFIG
+    depends on CPU_COMMON_CC26XX_CC13XX
+    select MODULE_PERIPH_COMMON
+    select MODULE_CC26XX_CC13XX_PERIPH
+    default y
+    help
+      Common code for TI cc26xx/cc13xx family.
+
+rsource "periph/Kconfig"

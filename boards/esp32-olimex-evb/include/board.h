@@ -20,10 +20,10 @@
  * configuration.
  *
  * For detailed information about the configuration of ESP32 boards, see
- * section \ref esp32_comm_periph "Common Peripherals".
+ * section \ref esp32_peripherals "Common Peripherals".
  *
  * @note
- * Most definitions can be overridden by an \ref esp32_app_spec_conf
+ * Most definitions can be overridden by an \ref esp32_application_specific_configurations
  * "application-specific board configuration".
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
@@ -36,15 +36,35 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /**
  * @name    Button pin definitions
  * @{
  */
-#define BUTTON0_PIN     GPIO34
+
+/**
+ * @brief   Default button GPIO pin definition
+ */
+#define BTN0_PIN        GPIO34
+
+/**
+ * @brief   Default button GPIO mode definition
+ *
+ * Since the GPIO of the button is pulled up with an external resistor, the
+ * mode for the GPIO pin has to be GPIO_IN.
+ */
+#define BTN0_MODE       GPIO_IN
+
+/**
+ * @brief   Default interrupt flank definition for the button GPIO
+ */
+#ifndef BTN0_INT_FLANK
+#define BTN0_INT_FLANK  GPIO_FALLING
+#endif
+
+/**
+ * @brief   Definition for compatibility with previous versions
+ */
+#define BUTTON0_PIN     BTN0_PIN
 /** @} */
 
 /**
@@ -97,6 +117,10 @@ extern "C" {
 
 /* include common board definitions as last step */
 #include "board_common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifdef __cplusplus
 } /* end extern "C" */

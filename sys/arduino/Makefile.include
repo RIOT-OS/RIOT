@@ -1,23 +1,24 @@
 # Add Arduino sketches to the application as a module
 
 SKETCHES = $(wildcard $(APPDIR)/*.sketch)
+SKETCH_MODULE = arduino_sketches
 
 ifneq (,$(SKETCHES))
   # Define application sketches module, it will be generated into $(BINDIR)
-  SKETCH_MODULE     ?= arduino_sketches
   SKETCH_MODULE_DIR ?= $(BINDIR)/$(SKETCH_MODULE)
   include $(RIOTBASE)/sys/arduino/sketches.inc.mk
 
   # Depends on module
-  USEMODULE += $(SKETCH_MODULE)
   DIRS      += $(SKETCH_MODULE_DIR)
   BUILDDEPS += $(SKETCH_GENERATED_FILES)
+else
+  # arduino_sketches is now always included if arduino is, but if there
+  # are no sketches then no %.a will be present, so declare PSEUDOMODULE
+  PSEUDOMODULES += $(SKETCH_MODULE)
 endif
 
 # include the Arduino headers
 INCLUDES += -I$(RIOTBASE)/sys/arduino/include
 
-# Arduino provices C++11, which is not enabled by default in Ubuntu's avr-gcc
-# package, which is __horrible__ out of date. However, we cannot simply ignore
-# all Ubuntu users and instead simply manually enable C++11 support
-CXXEXFLAGS += -std=c++11
+PSEUDOMODULES += arduino_pwm
+PSEUDOMODULES += arduino_serial_stdio

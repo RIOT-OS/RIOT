@@ -18,11 +18,13 @@
  * @}
  */
 
+#include <inttypes.h>
+
 /*
  * WARNING! enable debugging will have timing side effects and can lead
  * to timer underflows, system crashes or system dead locks in worst case.
  */
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #include "periph/timer.h"
@@ -38,7 +40,6 @@
 #include "esp_common.h"
 #include "irq_arch.h"
 #include "syscalls.h"
-#include "xtimer.h"
 
 #define RTC_PLL_480M    480 /* PLL with 480 MHz at maximum */
 #define RTC_PLL_320M    320 /* PLL with 480 MHz at maximum */
@@ -72,6 +73,7 @@
 #define HW_TIMER_CLK_DIV      (rtc_clk_apb_freq_get() / 1000000)
 #define HW_TIMER_CORRECTION   (RTC_PLL_320M / CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ)
 #define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION << 1, 5))
+#define HW_TIMER_FREQUENCY    (1000000UL) /* only 1MHz is supported */
 
 struct hw_timer_regs_t {
     /* see Technical Reference, section 17.4 */
@@ -111,8 +113,8 @@ struct hw_timer_t {
 };
 
 struct hw_timer_hw_t {
-    struct hw_timer_regs_t* regs;     /* timer configuration regs */
-    struct hw_timer_ints_t* int_regs; /* timer interrupt regs */
+    volatile struct hw_timer_regs_t* regs;     /* timer configuration regs */
+    volatile struct hw_timer_ints_t* int_regs; /* timer interrupt regs */
     uint8_t int_mask;  /* timer interrupt bit mask in interrupt regs */
     uint8_t int_src;   /* timer interrupt source */
 };
@@ -140,14 +142,11 @@ static const struct hw_timer_hw_t timers_hw[HW_TIMER_NUMOF] =
     }
 };
 
-
 /** Latches the current counter value and return only the low part */
 static inline uint32_t timer_get_counter_lo(tim_t dev)
 {
-    /* we have to latch the current timer value */
+    /* latch the current timer value by writing any value to the update reg */
     timers_hw[dev].regs->UPDATE_REG = 0;
-    /* wait until instructions have been finished */
-    __asm__ volatile ("isync");
     /* read high and low part of counter */
     return timers_hw[dev].regs->LO_REG;
 }
@@ -159,10 +158,8 @@ static inline void timer_get_counter(tim_t dev, uint32_t* hi, uint32_t* lo)
     if (!hi || !lo) {
         return;
     }
-    /* we have to latch the current timer value */
+    /* latch the current timer value by writing any value to the update reg */
     timers_hw[dev].regs->UPDATE_REG = 0;
-    /* wait until instructions have been finished */
-    __asm__ volatile ("isync");
     /* read high and low part of counter */
     *hi = timers_hw[dev].regs->HI_REG;
     *lo = timers_hw[dev].regs->LO_REG;
@@ -195,12 +192,13 @@ void IRAM hw_timer_handler(void* arg)
     irq_isr_exit();
 }
 
-int timer_init (tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+int timer_init (tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
-    DEBUG("%s dev=%u freq=%lu cb=%p arg=%p\n", __func__, dev, freq, cb, arg);
+    DEBUG("%s dev=%u freq=%" PRIu32 " cb=%p arg=%p\n",
+          __func__, dev, freq, cb, arg);
 
     CHECK_PARAM_RET (dev  <  HW_TIMER_NUMOF, -1);
-    CHECK_PARAM_RET (freq == XTIMER_HZ_BASE, -1);
+    CHECK_PARAM_RET (freq == HW_TIMER_FREQUENCY, -1);
     CHECK_PARAM_RET (cb   != NULL, -1);
 
     if (timers[dev].initialized) {
@@ -278,7 +276,6 @@ int IRAM timer_set(tim_t dev, int chn, unsigned int delta)
 
     /* wait until instructions have been finished */
     timers_hw[dev].regs->CONFIG_REG.EN = 1;
-    __asm__ volatile ("isync");
 
     /* clear the bit in status and set the bit in interrupt enable */
     timers_hw[dev].int_regs->INT_CLR_REG |= timers_hw[dev].int_mask;
@@ -318,13 +315,14 @@ unsigned int IRAM timer_read(tim_t dev)
 {
     CHECK_PARAM_RET (dev < HW_TIMER_NUMOF, -1);
 
-    #if ENABLE_DEBUG
-    uint32_t count_lo = timer_get_counter_lo(dev);
-    DEBUG("%s %u\n", __func__, count_lo);
-    return count_lo;
-    #else
-    return timer_get_counter_lo(dev);
-    #endif
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        uint32_t count_lo = timer_get_counter_lo(dev);
+        DEBUG("%s %u\n", __func__, count_lo);
+        return count_lo;
+    }
+    else {
+        return timer_get_counter_lo(dev);
+    }
 }
 
 void IRAM timer_start(tim_t dev)
@@ -369,6 +367,7 @@ void IRAM timer_stop(tim_t dev)
 #define HW_TIMER_DELTA_MAX    0x00ffffff  /* in us */
 #define HW_TIMER_DELTA_MASK   0x00ffffff
 #define HW_TIMER_DELTA_RSHIFT 24
+#define HW_TIMER_FREQUENCY    (1000000UL) /* only 1MHz is supported */
 
 #define HW_TIMER_CORRECTION   (RTC_PLL_480M / CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ)
 #define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION, 5))
@@ -439,12 +438,12 @@ void IRAM hw_timer_handler(void* arg)
     irq_isr_exit();
 }
 
-int timer_init (tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+int timer_init (tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
-    DEBUG("%s dev=%u freq=%lu cb=%p arg=%p\n", __func__, dev, freq, cb, arg);
+    DEBUG("%s dev=%u freq=%u cb=%p arg=%p\n", __func__, dev, freq, cb, arg);
 
     CHECK_PARAM_RET (dev  <  HW_TIMER_NUMOF, -1);
-    CHECK_PARAM_RET (freq == XTIMER_HZ_BASE, -1);
+    CHECK_PARAM_RET (freq == HW_TIMER_FREQUENCY, -1);
     CHECK_PARAM_RET (cb   != NULL, -1);
 
     if (timers[dev].initialized) {
@@ -566,7 +565,6 @@ void IRAM timer_stop(tim_t dev)
 
     irq_restore (state);
 }
-
 
 static void IRAM __timer_channel_start (struct hw_timer_t* timer, struct hw_channel_t* channel)
 {

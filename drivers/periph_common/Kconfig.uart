@@ -1,0 +1,67 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_PERIPH_UART
+    bool "UART peripheral driver"
+    depends on HAS_PERIPH_UART
+    select MODULE_PERIPH_COMMON
+
+if MODULE_PERIPH_UART
+
+# TODO: the 'init' modules are actually just artifacts from the way
+# periph_init_% modules are handled in Makefile. We need to define them to keep
+# the list the same for now. We should be able to remove them later on.
+
+config MODULE_PERIPH_INIT_UART
+    bool "Auto initialize UART peripheral"
+    default y if MODULE_PERIPH_INIT
+
+config MODULE_PERIPH_UART_MODECFG
+    bool "Mode configuration support"
+    depends on HAS_PERIPH_UART_MODECFG
+
+config MODULE_PERIPH_LPUART
+    bool "Enable Low Power UART (LPUART)"
+    depends on HAS_PERIPH_LPUART
+
+config MODULE_PERIPH_UART_COLLISION
+    bool "Enable UART collision detection"
+    depends on HAS_PERIPH_UART_COLLISION
+
+config MODULE_PERIPH_UART_NONBLOCKING
+    bool "Non-blocking support"
+    depends on HAS_PERIPH_UART_NONBLOCKING
+
+config MODULE_PERIPH_UART_RXSTART_IRQ
+    bool "Enable Start Condition Interrupt"
+    depends on HAS_PERIPH_UART_RXSTART_IRQ
+
+config MODULE_PERIPH_INIT_UART_MODECFG
+    bool
+    depends on MODULE_PERIPH_UART_MODECFG
+    default y if MODULE_PERIPH_INIT
+
+config MODULE_PERIPH_INIT_UART_NONBLOCKING
+    bool
+    depends on MODULE_PERIPH_UART_NONBLOCKING
+    default y if MODULE_PERIPH_INIT
+
+config MODULE_PERIPH_INIT_LPUART
+    bool
+    depends on MODULE_PERIPH_LPUART
+    default y if MODULE_PERIPH_INIT
+
+config MODULE_PERIPH_UART_HW_FC
+    bool
+    depends on HAS_PERIPH_UART_HW_FC
+
+config MODULE_PERIPH_INIT_UART_HW_FC
+    bool
+    depends on MODULE_PERIPH_UART_HW_FC
+    default y if MODULE_PERIPH_INIT
+
+endif # MODULE_PERIPH_UART

@@ -1,0 +1,3 @@
+CPU_MODEL = samd21g18a
+
+include $(RIOTBOARD)/common/sodaq/Makefile.features

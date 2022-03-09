@@ -1,0 +1,80 @@
+' to generate SVG run plantuml -tsvg gnrc_ipv6_auto_subnets.puml
+@startuml
+<style>
+nwdiagDiagram {
+	network {
+		BackGroundColor #275a4b
+		LineColor	#3fa687
+		LineThickness	2.0
+	}
+
+	server {
+		BackGroundColor #275a4b
+		LineColor	#3fa687
+		FontColor	#white
+		LineThickness	2.0
+	}
+
+	arrow {
+		LineColor	#3fa687
+		LineThickness	2.0
+	}
+}
+</style>
+
+nwdiag {
+
+	network level1 {
+		address = "2001:db8::/60";
+
+		router_a [address = "2001:db8::<color:#8a8a8a>c8f4:13ff:fece:3f43", description = "1st level router #1"];
+		router_b [address = "2001:db8::<color:#8a8a8a>804b:fcff:feb6:43fb", description = "1st level router #2"];
+	}
+
+	network level2_1 {
+		address = "2001:db8:0:4::/62";
+		description = "level 2.1"
+
+		router_b [address = "2001:db8:0:4:<color:#8a8a8a>2ca3:9eff:fea9:68f7"];
+		router_e [address = "2001:db8:0:4:<color:#8a8a8a>5075:35ff:fefa:30bb", description = "2nd level router #3"];
+		router_f [address = "2001:db8:0:4:<color:#8a8a8a>14c4:7bff:fe63:c449", description = "2nd level router #4"];
+	}
+
+	network level2_2 {
+		address = "2001:db8:0:8::/62";
+		description = "level 2.2"
+
+		router_a [address = "2001:db8:0:8:<color:#8a8a8a>3c27:6dff:fe25:e95d"];
+		router_c [address = "2001:db8:0:8:<color:#8a8a8a>c8f4:13ff:fece:3f43", description = "2nd level router #1"];
+		router_d [address = "2001:db8:0:8:<color:#8a8a8a>a440:e4ff:fe55:a059", description = "2nd level router #2"];
+	}
+
+	network level3_1 {
+		address = "2001:db8:0:9::/64";
+		description = "level 3.1"
+
+		router_c [address = "2001:db8:0:9:<color:#8a8a8a>48f7:1cf:74cc:3f13"];
+	}
+
+	network level3_2 {
+		address = "2001:db8:0:a::/64";
+		description = "level 3.2"
+
+		router_d [address = "2001:db8:0:a:<color:#8a8a8a>a8d9:e1ff:feab:d543"];
+	}
+
+	network level3_3 {
+		address = "2001:db8:0:5::/64";
+		description = "level 3.3"
+
+		router_e [address = "2001:db8:0:5:<color:#8a8a8a>1848:79ff:fe20:cf59"];
+	}
+
+	network level3_4 {
+		address = "2001:db8:0:6::/64";
+		description = "level 3.4"
+
+		router_f [address = "2001:db8:0:6:<color:#8a8a8a>8cbf:adff:fef0:4092"];
+	}
+}
+@enduml

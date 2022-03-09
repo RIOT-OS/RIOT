@@ -1,0 +1,8 @@
+# this file enables modules defined in Kconfig. Do not use this file for
+# application configuration. This is only needed during migration.
+# enable ADC peripheral driver
+CONFIG_MODULE_PERIPH_ADC=y
+
+# enable xtimer to wake up periodically
+CONFIG_MODULE_ZTIMER=y
+CONFIG_MODULE_ZTIMER_MSEC=y

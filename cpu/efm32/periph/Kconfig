@@ -1,0 +1,56 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_PERIPH
+    bool
+    default y
+
+if MODULE_PERIPH
+
+config MODULE_PERIPH_WDT_SERIES0
+    bool
+    depends on CPU_EFM32_SERIES0
+    default MODULE_PERIPH_WDT
+    help
+        WDT driver implementation for EFM32 series 0.
+
+config MODULE_PERIPH_WDT_SERIES1
+    bool
+    depends on CPU_EFM32_SERIES1
+    default MODULE_PERIPH_WDT
+        help
+        WDT driver implementation for EFM32 series 1.
+
+config MODULE_PERIPH_RTC_SERIES0
+    bool
+    depends on CPU_EFM32_SERIES0
+    default MODULE_PERIPH_RTC
+    help
+        RTC driver implementation for EFM32 series 0.
+
+config MODULE_PERIPH_RTC_SERIES1
+    bool
+    depends on CPU_EFM32_SERIES1
+    default MODULE_PERIPH_RTC
+        help
+        RTC driver implementation for EFM32 series 1.
+
+config MODULE_PERIPH_RTT_SERIES0
+    bool
+    depends on CPU_EFM32_SERIES0
+    default MODULE_PERIPH_RTT
+    help
+        RTT driver implementation for EFM32 series 0.
+
+config MODULE_PERIPH_RTT_SERIES1
+    bool
+    depends on CPU_EFM32_SERIES1
+    default MODULE_PERIPH_RTT
+        help
+        RTT driver implementation for EFM32 series 1.
+
+endif # MODULE_PERIPH

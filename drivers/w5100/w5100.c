@@ -32,7 +32,7 @@
 #include "w5100.h"
 #include "w5100_regs.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define SPI_CONF            SPI_MODE_0
@@ -73,6 +73,7 @@ static void wreg(w5100_t *dev, uint16_t reg, uint8_t data)
 static uint16_t raddr(w5100_t *dev, uint16_t addr_high, uint16_t addr_low)
 {
     uint16_t res = (rreg(dev, addr_high) << 8);
+
     res |= rreg(dev, addr_low);
     return res;
 }
@@ -106,9 +107,7 @@ static void extint(void *arg)
 {
     w5100_t *dev = (w5100_t *)arg;
 
-    if (dev->nd.event_callback) {
-        dev->nd.event_callback(&dev->nd, NETDEV_EVENT_ISR);
-    }
+    netdev_trigger_event_isr(&dev->nd);
 }
 
 void w5100_setup(w5100_t *dev, const w5100_params_t *params)
@@ -145,7 +144,7 @@ static int init(netdev_t *netdev)
 
     /* reset the device */
     wreg(dev, REG_MODE, MODE_RESET);
-    while (rreg(dev, REG_MODE) & MODE_RESET) {};
+    while (rreg(dev, REG_MODE) & MODE_RESET) {}
 
     /* initialize the device, start with writing the MAC address */
     luid_get(hwaddr, ETHERNET_ADDR_LEN);
@@ -185,7 +184,7 @@ static uint16_t tx_upload(w5100_t *dev, uint16_t start, void *data, size_t len)
         size_t limit = ((S0_TX_BASE + S0_MEMSIZE) - start);
         wchunk(dev, start, data, limit);
         wchunk(dev, S0_TX_BASE, &((uint8_t *)data)[limit], len - limit);
-        return (S0_TX_BASE + limit);
+        return (S0_TX_BASE + len - limit);
     }
     else {
         wchunk(dev, start, data, len);
@@ -202,7 +201,8 @@ static int send(netdev_t *netdev, const iolist_t *iolist)
     /* get access to the SPI bus for the duration of this function */
     spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
 
-    uint16_t pos = raddr(dev, S0_TX_WR0, S0_TX_WR1);
+    uint16_t tx_wr = raddr(dev, S0_TX_WR0, S0_TX_WR1);
+    uint16_t pos = (tx_wr & S0_MASK) + S0_TX_BASE;
 
     /* the register is only set correctly after the first send pkt, so we need
      * this fix here */
@@ -216,11 +216,11 @@ static int send(netdev_t *netdev, const iolist_t *iolist)
         sum += len;
     }
 
-    waddr(dev, S0_TX_WR0, S0_TX_WR1, pos);
+    waddr(dev, S0_TX_WR0, S0_TX_WR1, tx_wr + sum);
 
     /* trigger the sending process */
     wreg(dev, S0_CR, CR_SEND_MAC);
-    while (!(rreg(dev, S0_IR) & IR_SEND_OK)) {};
+    while (!(rreg(dev, S0_IR) & IR_SEND_OK)) {}
     wreg(dev, S0_IR, IR_SEND_OK);
 
     DEBUG("[w5100] send: transferred %i byte (at 0x%04x)\n", sum, (int)pos);
@@ -259,10 +259,11 @@ static int recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
         /* find the size of the next packet in the RX buffer */
         uint16_t rp = raddr(dev, S0_RX_RD0, S0_RX_RD1);
         uint16_t psize = raddr(dev, (S0_RX_BASE + (rp & S0_MASK)),
-                                  (S0_RX_BASE + ((rp + 1) & S0_MASK)));
+                               (S0_RX_BASE + ((rp + 1) & S0_MASK)));
         len = psize - 2;
 
-        DEBUG("[w5100] recv: got packet of %i byte (at 0x%04x)\n", len, (int)rp);
+        DEBUG("[w5100] recv: got packet of %i byte (at 0x%04x)\n", len,
+              (int)rp);
 
         /* read the actual data into the given buffer if wanted */
         if (in_buf != NULL) {
@@ -323,16 +324,16 @@ static int get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
     int res = 0;
 
     switch (opt) {
-        case NETOPT_ADDRESS:
-            assert(max_len >= ETHERNET_ADDR_LEN);
-            spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
-            rchunk(dev, REG_SHAR0, value, ETHERNET_ADDR_LEN);
-            spi_release(dev->p.spi);
-            res = ETHERNET_ADDR_LEN;
-            break;
-        default:
-            res = netdev_eth_get(netdev, opt, value, max_len);
-            break;
+    case NETOPT_ADDRESS:
+        assert(max_len >= ETHERNET_ADDR_LEN);
+        spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
+        rchunk(dev, REG_SHAR0, value, ETHERNET_ADDR_LEN);
+        spi_release(dev->p.spi);
+        res = ETHERNET_ADDR_LEN;
+        break;
+    default:
+        res = netdev_eth_get(netdev, opt, value, max_len);
+        break;
     }
 
     return res;

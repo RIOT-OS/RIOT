@@ -19,6 +19,34 @@
  * USEMODULE += stdin
  * ```
  *
+ * @attention   Using STDIO over UART from interrupt context should be avoided,
+ *              except for debugging purposes
+ *
+ * For testing purposes and using STDIO within an ISR should mostly work good
+ * enough and for some platforms even reliable. Production code however should
+ * fully avoid any access to STDIO from interrupt context. Instead, e.g. an
+ * event could be posted to an @ref sys_event and the actual STDIO operation
+ * being deferred to thread context.
+ *
+ * Some reasons why STDIO over UART from ISR should be avoided:
+ * 1. UART is *slow* and the system easily remains in interrupt context for
+ *    unacceptable long time.
+ *     - E.g. sending 100 chars at 9600 baud will block the system for
+ *       100 milliseconds.
+ *     - Missed deadlines, lost interrupts, or watch dog timer resets can easily
+ *       be caused by this.
+ * 2. Even if DMA is used for UART, using STDIO within ISR can cause significant
+ *    delays: If the buffer is full, an UART implementation will be forced to
+ *    resort to synchronously send the data, rather than using DMA. This might
+ *    cause even more headache, as the available memory in the DMA buffer when
+ *    an ISR is triggered has to be assumed as randomly distributed. Thus,
+ *    hard to reproduce and indeterministic bugs can be the result.
+ * 3. If an ISR is triggered from a power saving mode, some peripherals or
+ *    clock domains might still be offline during that ISR; including the UART
+ *    peripheral. This is a valid implementation choice to allow time critical
+ *    low power scenarios being covered by RIOT. Thus, be prepared to
+ *    loose output when using STDIO from ISR.
+ *
  * @{
  * @file
  *

@@ -19,7 +19,6 @@
  * @}
  */
 
-#include <assert.h>
 #include <errno.h>
 
 #include "mutex.h"
@@ -33,7 +32,7 @@
 #include "net/eui64.h"
 #include "net/ethernet.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define SPI_CLK                 SPI_CLK_1MHZ
@@ -50,7 +49,7 @@
 #define TX_BUFFER_END           (RX_BUFFER_START)
 #define TX_BUFFER_START         (TX_BUFFER_END - TX_BUFFER_LEN)
 
-static void cmd(encx24j600_t *dev, char cmd);
+static void cmd(encx24j600_t *dev, uint8_t cmd);
 static void reg_set(encx24j600_t *dev, uint8_t reg, uint16_t value);
 static uint16_t reg_get(encx24j600_t *dev, uint8_t reg);
 static void reg_clear_bits(encx24j600_t *dev, uint8_t reg, uint16_t mask);
@@ -93,13 +92,13 @@ void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params)
 
 static void encx24j600_isr(void *arg)
 {
-    encx24j600_t *dev = (encx24j600_t *) arg;
+    encx24j600_t *dev = arg;
 
     /* disable interrupt line */
     gpio_irq_disable(dev->int_pin);
 
     /* call netdev hook */
-    dev->netdev.event_callback((netdev_t*) dev, NETDEV_EVENT_ISR);
+    netdev_trigger_event_isr(&dev->netdev);
 }
 
 static void _isr(netdev_t *netdev)
@@ -150,10 +149,10 @@ static inline void enc_spi_transfer(encx24j600_t *dev, char *out, char *in, int 
 
 static inline uint16_t reg_get(encx24j600_t *dev, uint8_t reg)
 {
-    char cmd[4] = { ENC_RCRU, reg, 0, 0 };
+    char cmd_buf[4] = { ENC_RCRU, reg, 0, 0 };
     char result[4];
 
-    enc_spi_transfer(dev, cmd, result, 4);
+    enc_spi_transfer(dev, cmd_buf, result, 4);
 
     return result[2] | (result[3] << 8);
 }
@@ -163,8 +162,8 @@ static void phy_reg_set(encx24j600_t *dev, uint8_t reg, uint16_t value) {
     reg_set(dev, ENC_MIWR, value);
 }
 
-static void cmd(encx24j600_t *dev, char cmd) {
-    spi_transfer_byte(dev->spi, dev->cs, false, (uint8_t)cmd);
+static void cmd(encx24j600_t *dev, uint8_t cmd) {
+    spi_transfer_byte(dev->spi, dev->cs, false, cmd);
 }
 
 static void cmdn(encx24j600_t *dev, uint8_t cmd, char *out, char *in, int len) {
@@ -174,20 +173,20 @@ static void cmdn(encx24j600_t *dev, uint8_t cmd, char *out, char *in, int len) {
 
 static void reg_set(encx24j600_t *dev, uint8_t reg, uint16_t value)
 {
-    char cmd[4] = { ENC_WCRU, reg, value, value >> 8 };
-    enc_spi_transfer(dev, cmd, NULL, 4);
+    char cmd_buf[4] = { ENC_WCRU, reg, value, value >> 8 };
+    enc_spi_transfer(dev, cmd_buf, NULL, 4);
 }
 
 static void reg_set_bits(encx24j600_t *dev, uint8_t reg, uint16_t mask)
 {
-    char cmd[4] = { ENC_BFSU, reg, mask, mask >> 8 };
-    enc_spi_transfer(dev, cmd, NULL, 4);
+    char cmd_buf[4] = { ENC_BFSU, reg, mask, mask >> 8 };
+    enc_spi_transfer(dev, cmd_buf, NULL, 4);
 }
 
 static void reg_clear_bits(encx24j600_t *dev, uint8_t reg, uint16_t mask)
 {
-    char cmd[4] = { ENC_BFCU, reg, mask, mask >> 8 };
-    enc_spi_transfer(dev, cmd, NULL, 4);
+    char cmd_buf[4] = { ENC_BFCU, reg, mask, mask >> 8 };
+    enc_spi_transfer(dev, cmd_buf, NULL, 4);
 }
 
 /*
@@ -327,13 +326,15 @@ static inline int _packets_available(encx24j600_t *dev)
 static void _get_mac_addr(netdev_t *encdev, uint8_t* buf)
 {
     encx24j600_t * dev = (encx24j600_t *) encdev;
-    uint16_t *addr = (uint16_t *) buf;
+    uint16_t addr[3];
 
     lock(dev);
 
     addr[0] = reg_get(dev, ENC_MAADR1);
     addr[1] = reg_get(dev, ENC_MAADR2);
     addr[2] = reg_get(dev, ENC_MAADR3);
+
+    memcpy(buf, addr, sizeof(addr));
 
     unlock(dev);
 }
@@ -351,7 +352,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     /* hdr.frame_len given by device contains 4 bytes checksum */
     size_t payload_len = hdr.frame_len - 4;
-
 
     if (buf) {
         if (payload_len > len) {
@@ -392,7 +392,7 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
                 res = ETHERNET_ADDR_LEN;
             }
             break;
-        case NETOPT_LINK_CONNECTED:
+        case NETOPT_LINK:
             {
                 encx24j600_t * encdev = (encx24j600_t *) dev;
                 lock(encdev);

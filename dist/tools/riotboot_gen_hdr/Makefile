@@ -11,7 +11,7 @@ RIOT_HDR_SRC := \
 
 RIOT_HDR_HDR := $(RIOT_INCLUDE)/riotboot/hdr.h \
 	$(RIOT_INCLUDE)/checksum/fletcher32.h \
-	$(RIOTBASE)/core/include/byteorder.h
+	$(RIOTBASE)/sys/include/byteorder.h
 
 GENHDR_SRC := $(COMMON_SRC) $(RIOT_HDR_SRC) \
 	main.c genhdr.c

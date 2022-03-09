@@ -44,13 +44,9 @@
 #define TOPIC_BUF_NUMOF     (8U + SUB_CTX_NUMOF)
 #endif
 
-/* needed for the `ping6` shell command */
+/* needed for the `ping` shell command */
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
-
-#define LISTENER_PRIO       (THREAD_PRIORITY_MAIN - 1)
-
-static char listener_stack[ASYMCUTE_LISTENER_STACKSIZE];
 
 static asymcute_con_t _connection;
 static asymcute_req_t _reqs[REQ_CTX_NUMOF];
@@ -89,51 +85,37 @@ static asymcute_sub_t *_find_sub(const char *name)
     return NULL;
 }
 
-static uint16_t _topic_parse_pre(const char *name)
+static uint16_t _parse_predef_id(const char *name)
 {
-    if (strncmp(name, "pre_", 4) == 0) {
-        return (uint16_t)atoi(&name[4]);
+    uint16_t id = 0;
+    if ((strlen(name) > 4) && (strncmp(name, "pre_", 4) == 0)) {
+        id = atoi(&name[4]);
     }
-    return 0;
+    return id;
 }
 
-static int _topic_init(asymcute_topic_t *t, const char *name)
+static asymcute_topic_t *_topic_init(asymcute_topic_t *t, const char *name)
 {
-    uint16_t id = _topic_parse_pre(name);
-
+    uint16_t id = _parse_predef_id(name);
     if (id != 0) {
         name = NULL;
     }
 
     if (asymcute_topic_init(t, name, id) != ASYMCUTE_OK) {
-        return 1;
+        return NULL;
     }
-    return 0;
+    return t;
 }
-
-static int _topic_find(asymcute_topic_t *t, const char *name)
+static asymcute_topic_t *_topic_find(const char *name)
 {
-    size_t len = strlen(name);
-    uint16_t id = _topic_parse_pre(name);
-
-    if ((id != 0) || (len == 2)) {
-        if (t) {
-            return _topic_init(t, name);
-        }
-        return 0;
-    }
-
-    /* need to find topic in list of registered ones */
+    uint16_t id = _parse_predef_id(name);
     for (unsigned i = 0; i < TOPIC_BUF_NUMOF; i++) {
-        if (asymcute_topic_is_reg(&_topics[i]) &&
+        if ((asymcute_topic_is_predef(&_topics[i]) && (id == _topics[i].id)) ||
             (strncmp(name, _topics[i].name, sizeof(_topics[i].name)) == 0)) {
-            if (t) {
-                *t = _topics[i];
-            }
-            return 0;
+            return &_topics[i];
         }
     }
-    return 1;
+    return NULL;
 }
 
 static void _topics_clear(void)
@@ -149,6 +131,18 @@ static asymcute_topic_t *_topic_get_free(void)
         }
     }
     return NULL;
+}
+
+static void _topic_print_info(const asymcute_topic_t *topic)
+{
+    printf(" id: %u, name: %s", (unsigned)topic->id, topic->name);
+    if (asymcute_topic_is_short(topic)) {
+        printf(" (SHORT)");
+    }
+    else if (asymcute_topic_is_predef(topic)) {
+        printf(" (PREDEF)");
+    }
+    puts("");
 }
 
 static void _topic_print_help(void)
@@ -257,7 +251,7 @@ static int _cmd_connect(int argc, char **argv)
         return 1;
     }
     if (ep.port == 0) {
-        ep.port = MQTTSN_DEFAULT_PORT;
+        ep.port = CONFIG_ASYMCUTE_DEFAULT_PORT;
     }
 
     /* get request context */
@@ -266,9 +260,10 @@ static int _cmd_connect(int argc, char **argv)
         return 1;
     }
 
-    if (asymcute_connect(&_connection, req, &ep, argv[1], true, NULL)
-        != ASYMCUTE_OK) {
-        puts("error: failed to issue CONNECT request");
+    int res = asymcute_connect(&_connection, req, &ep, argv[1],
+                               true, NULL, _on_con_evt);
+    if (res != ASYMCUTE_OK) {
+        printf("error: failed to issue CONNECT request (%i)\n", res);
         return 1;
     }
     return _ok(req);
@@ -285,8 +280,9 @@ static int _cmd_disconnect(int argc, char **argv)
         return 1;
     }
 
-    if (asymcute_disconnect(&_connection, req) != ASYMCUTE_OK) {
-        puts("error: failed to issue DISCONNECT request");
+    int res = asymcute_disconnect(&_connection, req);
+    if (res != ASYMCUTE_OK) {
+        printf("error: failed to issue DISCONNECT request (%i)\n", res);
         return 1;
     }
     return _ok(req);
@@ -300,35 +296,35 @@ static int _cmd_reg(int argc, char **argv)
         return 1;
     }
 
-    if (_topic_find(NULL, argv[1]) == 0) {
-        puts("success: topic already registered (or no registration needed)\n");
+    asymcute_topic_t *t = _topic_find(argv[1]);
+    if ((t != NULL) && (asymcute_topic_is_reg(t))) {
+        puts("success: topic already registered");
         return 0;
     }
 
-    /* find unused slot */
-    asymcute_topic_t *t = NULL;
-    for (unsigned i = 0; i < TOPIC_BUF_NUMOF; i++) {
-        if (!asymcute_topic_is_reg(&_topics[i])) {
-            t = &_topics[i];
-            break;
-        }
-    }
-    if (t == NULL) {
-        puts("error: no empty slot left for storing the topic\n");
+    /* get registration request context */
+    asymcute_req_t *req = _get_req_ctx();
+    if (req == NULL) {
+        puts("error: unable to allocate request context");
         return 1;
     }
 
-    /* send registration request */
-    asymcute_req_t *req = _get_req_ctx();
-    if (req == NULL) {
-        return 1;
+    /* find unused slot */
+    if (t == NULL) {
+        t = _topic_get_free();
+        if (t == NULL) {
+            puts("error: no empty slot left for storing the topic\n");
+            return 1;
+        }
+        if (_topic_init(t, argv[1]) == NULL) {
+            puts("error: unable to initialize topic");
+            return 1;
+        }
     }
-    if (_topic_init(t, argv[1]) != 0) {
-        puts("error: unable to initialize topic");
-        return 1;
-    }
-    if (asymcute_register(&_connection, req, t) != ASYMCUTE_OK) {
-        puts("error: unable to send REGISTER request\n");
+
+    int res = asymcute_register(&_connection, req, t);
+    if (res != ASYMCUTE_OK) {
+        printf("error: unable to send REGISTER request (%i)\n", res);
         return 1;
     }
     return _ok(req);
@@ -341,21 +337,18 @@ static int _cmd_unreg(int argc, char **argv)
         return 1;
     }
 
-    unsigned i = 0;
-    for (; i < TOPIC_BUF_NUMOF; i++) {
-        if (strcmp(argv[1], _topics[i].name) == 0) {
-            for (unsigned s = 0; s < SUB_CTX_NUMOF; s++) {
-                if (_subscriptions[i].topic == &_topics[i]) {
-                    puts("error: topic used in active subscription");
-                    return 1;
-                }
+    asymcute_topic_t *t = _topic_find(argv[1]);
+    if (t) {
+        for (unsigned s = 0; s < SUB_CTX_NUMOF; s++) {
+            if (_subscriptions[s].topic == t) {
+                puts("error: topic used in active subscription");
+                return 1;
             }
-            memset(&_topics[i], 0, sizeof(asymcute_topic_t));
-            puts("success: removed local entry for given topic");
-            break;
         }
+        asymcute_topic_reset(t);
+        puts("success: removed local entry for given topic");
     }
-    if (i == TOPIC_BUF_NUMOF) {
+    else {
         puts("error: unable to find topic in list of registered topics");
     }
 
@@ -370,13 +363,6 @@ static int _cmd_pub(int argc, char **argv)
         return 1;
     }
 
-    /* parse and register topic */
-    asymcute_topic_t t;
-    if (_topic_find(&t, argv[1]) != 0) {
-        puts("error: given topic is not registered");
-        return 1;
-    }
-
     /* parse QoS level */
     unsigned flags = 0;
     int qos = _qos_parse(argc, argv, 3, &flags);
@@ -388,14 +374,22 @@ static int _cmd_pub(int argc, char **argv)
     /* get request context */
     asymcute_req_t *req = _get_req_ctx();
     if (req == NULL) {
+        puts("error: unable to obtain request context");
+        return 1;
+    }
+
+    /* get topic */
+    asymcute_topic_t *t = _topic_find(argv[1]);
+    if (t == NULL) {
+        puts("error: given topic is not registered");
         return 1;
     }
 
     /* publish data */
     size_t len = strlen(argv[2]);
-    if (asymcute_publish(&_connection, req, &t, argv[2], len, flags) !=
-        ASYMCUTE_OK) {
-        puts("error: unable to send PUBLISH message");
+    int res = asymcute_publish(&_connection, req, t, argv[2], len, flags);
+    if (res != ASYMCUTE_OK) {
+        printf("error: unable to send PUBLISH message (%i)\n", res);
         return 1;
     }
     if (qos == 0) {
@@ -424,6 +418,7 @@ static int _cmd_sub(int argc, char **argv)
     /* get request context */
     asymcute_req_t *req = _get_req_ctx();
     if (req == NULL) {
+        puts("error: unable to obtain request context");
         return 1;
     }
 
@@ -434,23 +429,40 @@ static int _cmd_sub(int argc, char **argv)
         return 1;
     }
 
-    /* parse topic */
-    asymcute_topic_t *t = _topic_get_free();
+    /* parse topic, see if it exists, otherwise take empty topic */
+    asymcute_topic_t *t = _topic_find(argv[1]);
     if (t == NULL) {
-        puts("error: no free topic memory");
-        return 1;
+        puts("info: given topic does not exist, creating it now");
+        t = _topic_get_free();
+        if (t == NULL) {
+            puts("error: no free topic memory");
+            return 1;
+        }
+        if (_topic_init(t, argv[1]) == NULL) {
+            puts("error: unable to initialize topic");
+            return 1;
+        }
     }
-    if (_topic_init(t, argv[1]) != 0) {
-        puts("error: unable to initialize topic");
-        return 1;
+    else {
+        if (!asymcute_topic_is_reg(t)) {
+            puts("error: given topic is not registered\n");
+            return 1;
+        }
     }
 
-    printf("using req %p, sub %p\n", (void *)req, (void *)sub);
+    int res = asymcute_subscribe(&_connection, req, sub, t, _on_pub_evt,
+                                 NULL, flags);
+    if (res != ASYMCUTE_OK) {
+        if (!asymcute_topic_is_reg(t)) {
+            asymcute_topic_reset(t);
+        }
+        if (res == ASYMCUTE_SUBERR) {
+            puts("error: already subscribed to given topic");
+        }
+        else {
+            printf("error: unable to send SUBSCRIBE request (%i)\n", res);
+        }
 
-    if (asymcute_subscribe(&_connection, req, sub, t, _on_pub_evt, NULL, flags)
-        != ASYMCUTE_OK) {
-        asymcute_topic_reset(t);
-        puts("error: unable to send SUBSCRIBE request");
         return 1;
     }
 
@@ -478,8 +490,9 @@ static int _cmd_unsub(int argc, char **argv)
     }
 
     /* issue unsubscribe request */
-    if (asymcute_unsubscribe(&_connection, req, sub) != ASYMCUTE_OK) {
-        puts("error: unable to send UNSUBSCRIBE request");
+    int res = asymcute_unsubscribe(&_connection, req, sub);
+    if (res != ASYMCUTE_OK) {
+        printf("error: unable to send UNSUBSCRIBE request (%i)\n", res);
         return 1;
     }
 
@@ -496,8 +509,12 @@ static int _cmd_info(int argc, char **argv)
     for (unsigned i = 0; i < TOPIC_BUF_NUMOF; i++) {
         printf("topic #%2u - ", i);
         if (asymcute_topic_is_reg(&_topics[i])) {
-            printf("[registered] id: %u, name: %s\n",
-                    (unsigned)_topics[i].id, _topics[i].name);
+            printf("[registered] ");
+            _topic_print_info(&_topics[i]);
+        }
+        else if (asymcute_topic_is_init(&_topics[i])) {
+            printf("[initialized] ");
+            _topic_print_info(&_topics[i]);
         }
         else {
             puts("[unused]");
@@ -508,9 +525,8 @@ static int _cmd_info(int argc, char **argv)
     for (unsigned i = 0; i < SUB_CTX_NUMOF; i++) {
         printf("sub   #%2u - ", i);
         if (asymcute_sub_active(&_subscriptions[i])) {
-            printf("[subscribed] id: %u, name: %s\n",
-                   (unsigned)_subscriptions[i].topic->id,
-                   _subscriptions[i].topic->name);
+            printf("[subscribed]");
+            _topic_print_info(_subscriptions[i].topic);
         }
         else {
             puts("[unused]");
@@ -537,10 +553,6 @@ int main(void)
     puts("Asymcute MQTT-SN example application\n");
     puts("Type 'help' to get started and have a look at the README.md for more"
          "information.");
-
-    /* setup the connection context */
-    asymcute_listener_run(&_connection, listener_stack, sizeof(listener_stack),
-                          LISTENER_PRIO, _on_con_evt);
 
     /* we need a message queue for the thread running the shell in order to
      * receive potentially fast incoming networking packets */

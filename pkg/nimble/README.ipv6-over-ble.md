@@ -8,7 +8,7 @@ the moment and does suffer stability issues!
 
 **NOTE 2:** Currently, Linux does not support 6LoWPAN neighbor discovery (which
 RIOT uses per default with BLE), so RIOT needs to be compiled to use stateless
-address auto configuration (SLAAC) -> `CFLAGS=-DGNRC_IPV6_NIB_CONF_SLAAC=1`.
+address auto configuration (SLAAC) -> `CFLAGS=-DCONFIG_GNRC_IPV6_NIB_SLAAC=1`.
 
 ## Prerequisites
 
@@ -27,7 +27,7 @@ following:
 
 First, you compile and flash the `examples/gnrc_networking` application to your
 RIOT device. When doing this, make sure to enable SLAAC
-(`CFLAGS=-DGNRC_IPV6_NIB_CONF_SLAAC=1`), see note above.
+(`CFLAGS=-DCONFIG_GNRC_IPV6_NIB_SLAAC=1`), see note above.
 
 Once the firmware is running, you can verify it by typing
 
@@ -78,7 +78,7 @@ Next, we should verify that our Bluetooth device is configured properly:
     # Look for available HCI devices.
     hciconfig
 
-This should show us some information about the available Blutooth devices. If no
+This should show us some information about the available Bluetooth devices. If no
 device is listed here, something is wrong...
 
 
@@ -119,7 +119,7 @@ You should also be able to ping your RIOT node. The devices link local address
 is also printed when running `ble info` on your RIOT device.
 
     # Substitute the actual device address,
-    ping6 fe80::uuvv:wwff:fexx:yyzz%bt0
+    ping fe80::uuvv:wwff:fexx:yyzz%bt0
 
 Now everything should be fine :-)
 
@@ -132,7 +132,7 @@ sure that `radvd` is installed on your Linux host.
 
 As a first step, we need to enable IPv6 forwarding in Linux:
 
-    sudo echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
+    sudo sysctl -w net.ipv6.conf.all.forwarding=1
 
 Next, we configure `radvd` (`etc/radvc.conf`) by using a configuration like
 this:
@@ -176,4 +176,4 @@ prefix assigned. Simply verify with `ifconfig` on the RIOT node.
 Also you should be able to ping the RIOT node from Linux:
 
     # make sure to use the actual devices address here...
-    ping6 -I bt0 2001:db8::uuvv:wwff:fexx:yyzz
+    ping -I bt0 2001:db8::uuvv:wwff:fexx:yyzz

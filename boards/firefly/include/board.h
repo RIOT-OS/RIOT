@@ -7,8 +7,7 @@
  */
 
 /**
- * @defgroup    boards_firefly Firefly Board
- * @ingroup     boards
+ * @ingroup     boards_firefly
  * @brief       Support for the Firefly board
  * @{
  *
@@ -72,11 +71,6 @@ extern "C" {
 #define CC1200_GPD0_GPIO    GPIO_PIN(PORT_B, 4)
 #define CC1200_GPD2_GPIO    GPIO_PIN(PORT_B, 0)
 /** @} */
-
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 } /* end extern "C" */

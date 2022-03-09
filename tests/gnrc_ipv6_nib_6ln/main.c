@@ -35,6 +35,7 @@
 #include "net/ndp.h"
 #include "net/sixlowpan/nd.h"
 #include "sched.h"
+#include "timex.h"
 
 #define _BUFFER_SIZE    (196)
 #define _ARO_LTIME      (4224)
@@ -87,7 +88,7 @@ static void _set_up(void)
     gnrc_netif_acquire(_mock_netif);
     /* reset some fields not set by the nib interface initializer */
     _mock_netif->ipv6.mtu = IPV6_MIN_MTU;
-    _mock_netif->cur_hl = GNRC_NETIF_DEFAULT_HL;
+    _mock_netif->cur_hl = CONFIG_GNRC_NETIF_DEFAULT_HL;
     gnrc_netif_ipv6_addr_remove_internal(_mock_netif, &_loc_gb);
     gnrc_netif_release(_mock_netif);
     memset(_buffer, 0, sizeof(_buffer));
@@ -797,7 +798,7 @@ static uint8_t _netif_addr_count(const gnrc_netif_t *netif)
 {
     unsigned count = 0U;
 
-    for (int i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
         if (netif->ipv6.addrs_flags[i] != 0) {
             count++;
         }
@@ -1327,12 +1328,6 @@ int _mock_netif_get(gnrc_netapi_opt_t *opt)
                 *val = sizeof(_loc_l2);
                 return sizeof(uint16_t);
             }
-        case NETOPT_IPV6_IID:
-            if (opt->data_len < sizeof(_loc_iid)) {
-                return -EOVERFLOW;
-            }
-            memcpy(opt->data, _loc_iid, sizeof(_loc_iid));
-            return sizeof(_loc_iid);
         case NETOPT_IS_WIRED:
             return 1;
         case NETOPT_MAX_PDU_SIZE: {

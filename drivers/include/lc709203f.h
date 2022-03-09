@@ -311,7 +311,7 @@ void lc709203f_set_rsoc_initial(const lc709203f_t *dev);
  * @param[in] *dev		pointer to lc709203f_t struct containing the i2c device and the address
  * @param[in] value		temp in 0.1K 0xAAC=0°C
  *
- * @return              LC709203F_CELL_TEMP_INVALID Invlid cell temp
+ * @return              LC709203F_CELL_TEMP_INVALID Invalid cell temp
 
  */
 int8_t lc709203f_set_cell_temp(const lc709203f_t *dev, const unsigned int value);

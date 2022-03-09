@@ -23,6 +23,7 @@
 #define CRYPTO_CIPHERS_H
 
 #include <stdint.h>
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,27 +31,29 @@ extern "C" {
 
 /* Shared header file for all cipher algorithms */
 
-/* Set the algorithms that should be compiled in here. When these defines
- * are set, then packets will be compiled 5 times.
+/** @brief the length of keys in bytes
+ *
+ * As of now AES is the only cipher which supports different key sizes.
+ * Here we optimize the CIPHERS_MAX_KEY_SIZE to always have the smallest possible
+ * value based on which AES key sizes are used.
  */
-// #define CRYPTO_THREEDES
-// #define CRYPTO_AES
-
-/** @brief the length of keys in bytes */
-#define CIPHERS_MAX_KEY_SIZE 20
+#if IS_USED(MODULE_CRYPTO_AES_256)
+    #define CIPHERS_MAX_KEY_SIZE 32
+#elif IS_USED(MODULE_CRYPTO_AES_192)
+    #define CIPHERS_MAX_KEY_SIZE 24
+#else
+    #define CIPHERS_MAX_KEY_SIZE 16
+#endif
 #define CIPHER_MAX_BLOCK_SIZE 16
-
 
 /**
  * Context sizes needed for the different ciphers.
  * Always order by number of bytes descending!!! <br><br>
  *
- * threedes     needs 24  bytes                           <br>
  * aes          needs CIPHERS_MAX_KEY_SIZE bytes          <br>
  */
-#if defined(CRYPTO_THREEDES)
-    #define CIPHER_MAX_CONTEXT_SIZE 24
-#elif defined(CRYPTO_AES)
+#if IS_USED(MODULE_CRYPTO_AES_256) || IS_USED(MODULE_CRYPTO_AES_192) || \
+    IS_USED(MODULE_CRYPTO_AES_128)
     #define CIPHER_MAX_CONTEXT_SIZE CIPHERS_MAX_KEY_SIZE
 #else
 /* 0 is not a possibility because 0-sized arrays are not allowed in ISO C */
@@ -63,7 +66,8 @@ extern "C" {
 #define CIPHER_ERR_INVALID_LENGTH     -4
 #define CIPHER_ERR_ENC_FAILED         -5
 #define CIPHER_ERR_DEC_FAILED         -6
-/** Is returned by the cipher_init functions, if the corresponding alogirithm has not been included in the build */
+/** Is returned by the cipher_init functions, if the corresponding algorithm
+ * has not been included in the build */
 #define CIPHER_ERR_BAD_CONTEXT_SIZE    0
 /**  Returned by cipher_init upon successful initialization of a cipher. */
 #define CIPHER_INIT_SUCCESS            1
@@ -72,37 +76,41 @@ extern "C" {
  * @brief   the context for cipher-operations
  */
 typedef struct {
-    uint8_t context[CIPHER_MAX_CONTEXT_SIZE];  /**< buffer for cipher operations */
+    uint8_t key_size;                           /**< key size used */
+    uint8_t context[CIPHER_MAX_CONTEXT_SIZE];   /**< buffer for cipher operations */
 } cipher_context_t;
-
 
 /**
  * @brief   BlockCipher-Interface for the Cipher-Algorithms
  */
 typedef struct cipher_interface_st {
-    /** Blocksize of this cipher */
+    /** @brief Blocksize of this cipher */
     uint8_t block_size;
 
-    /** Maximum key size for this cipher */
-    uint8_t max_key_size;
-
-    /** the init function */
+    /**
+     * @brief the init function.
+     *
+     * This function is responsible for checking that the given key_size is
+     * valid for the chosen cipher.
+     */
     int (*init)(cipher_context_t *ctx, const uint8_t *key, uint8_t key_size);
 
-    /** the encrypt function */
+    /** @brief the encrypt function */
     int (*encrypt)(const cipher_context_t *ctx, const uint8_t *plain_block,
                    uint8_t *cipher_block);
 
-    /** the decrypt function */
+    /** @brief the decrypt function */
     int (*decrypt)(const cipher_context_t *ctx, const uint8_t *cipher_block,
                    uint8_t *plain_block);
 } cipher_interface_t;
 
-
+/** Pointer type to BlockCipher-Interface for the Cipher-Algorithms */
 typedef const cipher_interface_t *cipher_id_t;
 
-extern const cipher_id_t CIPHER_AES_128;
-
+/**
+ * @brief AES cipher id
+ */
+extern const cipher_id_t CIPHER_AES;
 
 /**
  * @brief basic struct for using block ciphers
@@ -114,7 +122,6 @@ typedef struct {
     cipher_context_t context;               /**< The encryption context (buffer)
                                                  for the algorithm */
 } cipher_t;
-
 
 /**
  * @brief Initialize new cipher state
@@ -134,7 +141,6 @@ typedef struct {
 int cipher_init(cipher_t *cipher, cipher_id_t cipher_id, const uint8_t *key,
                 uint8_t key_size);
 
-
 /**
  * @brief Encrypt data of BLOCK_SIZE length
  * *
@@ -150,7 +156,6 @@ int cipher_init(cipher_t *cipher, cipher_id_t cipher_id, const uint8_t *key,
  */
 int cipher_encrypt(const cipher_t *cipher, const uint8_t *input,
                    uint8_t *output);
-
 
 /**
  * @brief Decrypt data of BLOCK_SIZE length
@@ -168,7 +173,6 @@ int cipher_encrypt(const cipher_t *cipher, const uint8_t *input,
 int cipher_decrypt(const cipher_t *cipher, const uint8_t *input,
                    uint8_t *output);
 
-
 /**
  * @brief Get block size of cipher
  * *
@@ -178,7 +182,6 @@ int cipher_decrypt(const cipher_t *cipher, const uint8_t *input,
  * @return           The cipher's block size (in bytes)
  */
 int cipher_get_block_size(const cipher_t *cipher);
-
 
 #ifdef __cplusplus
 }

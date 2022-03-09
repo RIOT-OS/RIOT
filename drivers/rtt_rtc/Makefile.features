@@ -1,0 +1,2 @@
+FEATURES_PROVIDED += periph_rtc
+FEATURES_PROVIDED += periph_rtc_ms

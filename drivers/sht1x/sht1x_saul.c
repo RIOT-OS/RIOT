@@ -31,20 +31,20 @@ static int read(const sht1x_dev_t *dev, int16_t *temp, int16_t *hum)
 {
     for (int retries = 0; retries < SHT1X_SAUL_RETRIES; retries++) {
         switch (sht1x_read(dev, temp, hum)) {
-            case 0:
-                return 0;
-            case -EBADMSG:
-                puts("[sht1x] CRC");
-                continue;
-            case -EPROTO:
-                puts("[sht1x] Sensor did not acknowledge measurement command");
-                continue;
-            case -ECANCELED:
-                puts("[sht1x] Measurement times out");
-                /* falls through */
-            default:
-                /* Other failure, cannot recover so giving up */
-                return -1;
+        case 0:
+            return 0;
+        case -EBADMSG:
+            puts("[sht1x] CRC");
+            continue;
+        case -EPROTO:
+            puts("[sht1x] Sensor did not acknowledge measurement command");
+            continue;
+        case -ECANCELED:
+            puts("[sht1x] Measurement times out");
+            /* falls through */
+        default:
+            /* Other failure, cannot recover so giving up */
+            return -1;
         }
     }
 

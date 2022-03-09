@@ -6,7 +6,6 @@
  * directory for more details.
  */
 
-
 /**
  * @defgroup    sys_random Random
  * @ingroup     sys
@@ -22,6 +21,9 @@
  *  - Simple Park-Miller PRNG
  *  - Musl C PRNG
  *  - Fortuna (CS)PRNG
+ *  - Hardware Random Number Generator (non-seedable)
+ *    HWRNG differ in how they generate random numbers and may not use a PRNG internally.
+ *    Refer to the manual of your MCU for details.
  */
 
 #ifndef RANDOM_H
@@ -94,7 +96,7 @@ void random_bytes(uint8_t *buf, size_t size);
  */
 uint32_t random_uint32_range(uint32_t a, uint32_t b);
 
-#if PRNG_FLOAT
+#if PRNG_FLOAT || defined(DOXYGEN)
 /* These real versions are due to Isaku Wada, 2002/01/09 added */
 
 /**

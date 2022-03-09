@@ -24,15 +24,15 @@
 #include "periph/pwm.h"
 #include "timex.h" /* for US_PER_SEC */
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #ifndef SERVO_FREQUENCY
-#define SERVO_FREQUENCY       (100U)
+#define SERVO_FREQUENCY     (100U)
 #endif
 
 #ifndef SERVO_RESOLUTION
-#define SERVO_RESOLUTION      (US_PER_SEC / SERVO_FREQUENCY)
+#define SERVO_RESOLUTION    (US_PER_SEC / SERVO_FREQUENCY)
 #endif
 
 int servo_init(servo_t *dev, pwm_t pwm, int pwm_channel, unsigned int min, unsigned int max)

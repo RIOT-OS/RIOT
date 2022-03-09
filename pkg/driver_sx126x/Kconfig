@@ -1,0 +1,20 @@
+# Copyright (c) 2021 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config PACKAGE_DRIVER_SX126X
+    bool "LLCC68 driver package"
+    depends on TEST_KCONFIG
+    depends on HAS_PERIPH_SPI
+    select MODULE_PERIPH_SPI
+    select MODULE_ZTIMER
+    select ZTIMER_USEC
+    select MODULE_DRIVER_SX126X_HAL
+
+config MODULE_DRIVER_SX126X_HAL
+    bool
+    help
+        HAL implementation for the SX126X LoRa radio driver.

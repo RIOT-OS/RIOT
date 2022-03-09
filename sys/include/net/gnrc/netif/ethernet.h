@@ -27,6 +27,7 @@ extern "C" {
 /**
  * @brief   Creates an Ethernet network interface
  *
+ * @param[out] netif    The interface. May not be `NULL`.
  * @param[in] stack     The stack for the network interface's thread.
  * @param[in] stacksize Size of @p stack.
  * @param[in] priority  Priority for the network interface's thread.
@@ -35,14 +36,11 @@ extern "C" {
  *
  * @see @ref gnrc_netif_create()
  *
- * @attention   Fails and crashes (assertion error with @ref DEVELHELP or
- *              segmentation fault without) if `GNRC_NETIF_NUMOF` is lower than
- *              the number of calls to this function.
- *
- * @return  The network interface on success.
+ * @return  0 on success
+ * @return  negative number on error
  */
-gnrc_netif_t *gnrc_netif_ethernet_create(char *stack, int stacksize, char priority,
-                                         char *name, netdev_t *dev);
+int gnrc_netif_ethernet_create(gnrc_netif_t *netif, char *stack, int stacksize,
+                               char priority, char *name, netdev_t *dev);
 
 #ifdef __cplusplus
 }

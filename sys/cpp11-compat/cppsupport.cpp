@@ -27,15 +27,6 @@ extern "C" {
 }
 
 /**
- * @brief DSO handle
- *
- * This symbol is used by dynamic shared objects to identify them, but it is
- * somehow pulled in as a dependency by the compiler-generated global (static)
- * constructor code.
- */
-void *__dso_handle __attribute__((weak)) = NULL;
-
-/**
  * @brief Definition of a pure virtual function
  *
  * Calling this function is an error.
@@ -106,22 +97,6 @@ void __verbose_terminate_handler()
      Elegant Invention
  */
 
-void* operator new(std::size_t size) {
-    return std::malloc(size);
-}
-
-void* operator new[](std::size_t size) {
-    return std::malloc(size);
-}
-
-void operator delete(void* ptr) noexcept {
-    std::free(ptr);
-}
-
-void operator delete[](void* ptr) noexcept {
-    std::free(ptr);
-}
-
 /* Optionally you can override the 'nothrow' versions as well.
    This is useful if you want to catch failed allocs with your
    own debug code, or keep track of heap usage for example,
@@ -141,6 +116,20 @@ void operator delete(void* ptr, const std::nothrow_t&) noexcept {
 }
 
 void operator delete[](void* ptr, const std::nothrow_t&) noexcept {
+    std::free(ptr);
+}
+
+/* end of tinynew.cpp */
+
+/* additional delete operators required by C++14 */
+
+void operator delete (void* ptr, std::size_t,
+                      const std::nothrow_t&) noexcept {
+    std::free(ptr);
+}
+
+void operator delete[] (void* ptr, std::size_t,
+                        const std::nothrow_t&) noexcept {
     std::free(ptr);
 }
 

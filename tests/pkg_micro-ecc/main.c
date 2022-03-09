@@ -36,7 +36,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "assert.h"
+#include "test_utils/expect.h"
 #include "hashes/sha256.h"
 #include "uECC.h"
 
@@ -117,11 +117,10 @@ int main(void)
     const struct uECC_Curve_t *curve = uECC_secp256r1();
     int errorc = 0;
 
-    assert(uECC_curve_private_key_size(curve) <= MAX_CURVE_SIZE);
-    assert(uECC_curve_public_key_size(curve) <= MAX_PUBLIC_KEY_SIZE);
+    expect(uECC_curve_private_key_size(curve) <= MAX_CURVE_SIZE);
+    expect(uECC_curve_public_key_size(curve) <= MAX_PUBLIC_KEY_SIZE);
 
     printf("Testing %d random private key pairs and signature without using HWRNG\n", TESTROUNDS);
-
 
     for (int i = 0; i < TESTROUNDS; ++i) {
         printf("Round %d\n", i);

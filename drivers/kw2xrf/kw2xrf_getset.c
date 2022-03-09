@@ -27,7 +27,7 @@
 #include "kw2xrf_intern.h"
 #include "byteorder.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define KW2XRF_LQI_HW_MAX           230      /**< LQI Saturation Level */
@@ -398,22 +398,6 @@ void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state)
                     MKW2XDM_PHY_CTRL1_RXACKRQD);
                 break;
 
-            case KW2XRF_OPT_TELL_RX_START:
-                kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2,
-                    MKW2XDM_PHY_CTRL2_RX_WMRK_MSK);
-                break;
-
-            case KW2XRF_OPT_TELL_RX_END:
-                kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2,
-                    MKW2XDM_PHY_CTRL2_RXMSK);
-                break;
-
-            case KW2XRF_OPT_TELL_TX_END:
-                kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2,
-                    MKW2XDM_PHY_CTRL2_TXMSK);
-                break;
-
-            case KW2XRF_OPT_TELL_TX_START:
             default:
                 /* do nothing */
                 break;
@@ -453,23 +437,6 @@ void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state)
                     MKW2XDM_PHY_CTRL1_RXACKRQD);
                 break;
 
-            case KW2XRF_OPT_TELL_RX_START:
-                kw2xrf_set_dreg_bit(dev, MKW2XDM_PHY_CTRL2,
-                    MKW2XDM_PHY_CTRL2_RX_WMRK_MSK);
-                break;
-
-            case KW2XRF_OPT_TELL_RX_END:
-                kw2xrf_set_dreg_bit(dev, MKW2XDM_PHY_CTRL2,
-                    MKW2XDM_PHY_CTRL2_RXMSK);
-                break;
-
-            case KW2XRF_OPT_TELL_TX_END:
-                kw2xrf_set_dreg_bit(dev, MKW2XDM_PHY_CTRL2,
-                    MKW2XDM_PHY_CTRL2_TXMSK);
-                break;
-
-
-            case KW2XRF_OPT_TELL_TX_START:
             default:
                 /* do nothing */
                 break;

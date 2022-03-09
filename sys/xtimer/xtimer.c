@@ -23,7 +23,10 @@
 #include <string.h>
 
 #include "xtimer.h"
+#include "atomic_utils.h"
+#include "msg.h"
 #include "mutex.h"
+#include "rmutex.h"
 #include "thread.h"
 #include "irq.h"
 #include "div.h"
@@ -37,16 +40,6 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-/*
- * @brief: struct for mutex lock with timeout
- * xtimer_mutex_lock_timeout() uses it to give information to the timer callback function
- */
-typedef struct {
-    mutex_t *mutex;
-    thread_t *thread;
-    volatile int timeout;
-} mutex_thread_t;
 
 static void _callback_unlock_mutex(void* arg)
 {
@@ -67,7 +60,6 @@ void _xtimer_tsleep(uint32_t offset, uint32_t long_offset)
 
     timer.callback = _callback_unlock_mutex;
     timer.arg = (void*) &mutex;
-    timer.target = timer.long_target = 0;
 
     mutex_lock(&mutex);
     _xtimer_set64(&timer, offset, long_offset);
@@ -81,62 +73,24 @@ void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period) {
     timer.callback = _callback_unlock_mutex;
     timer.arg = (void*) &mutex;
 
-    uint32_t target = (*last_wakeup) + period;
+    /* time sensitive until setting offset */
+    unsigned int state = irq_disable();
     uint32_t now = _xtimer_now();
-    /* make sure we're not setting a value in the past */
-    if (now < (*last_wakeup)) {
-        /* base timer overflowed between last_wakeup and now */
-        if (!((now < target) && (target < (*last_wakeup)))) {
-            /* target time has already passed */
-            goto out;
-        }
-    }
-    else {
-        /* base timer did not overflow */
-        if ((((*last_wakeup) <= target) && (target <= now))) {
-            /* target time has already passed */
-            goto out;
-        }
+    uint32_t elapsed = now - (*last_wakeup);
+    uint32_t offset = (*last_wakeup) + period - now;
+    irq_restore(state);
+
+    if (elapsed >= period) {
+        /* timer should be fired right now (some time drift might happen) */
+        *last_wakeup = now;
+        return;
     }
 
-    /*
-     * For large offsets, set an absolute target time.
-     * As that might cause an underflow, for small offsets, set a relative
-     * target time.
-     * For very small offsets, spin.
-     */
-    /*
-     * Note: last_wakeup _must never_ specify a time in the future after
-     * _xtimer_periodic_sleep returns.
-     * If this happens, last_wakeup may specify a time in the future when the
-     * next call to _xtimer_periodic_sleep is made, which in turn will trigger
-     * the overflow logic above and make the next timer fire too early, causing
-     * last_wakeup to point even further into the future, leading to a chain
-     * reaction.
-     *
-     * tl;dr Don't return too early!
-     */
-    uint32_t offset = target - now;
-    DEBUG("xps, now: %9" PRIu32 ", tgt: %9" PRIu32 ", off: %9" PRIu32 "\n", now, target, offset);
-    if (offset < XTIMER_PERIODIC_SPIN) {
-        _xtimer_spin(offset);
-    }
-    else {
-        if (offset < XTIMER_PERIODIC_RELATIVE) {
-            /* NB: This will overshoot the target by the amount of time it took
-             * to get here from the beginning of xtimer_periodic_wakeup()
-             *
-             * Since interrupts are normally enabled inside this function, this time may
-             * be undeterministic. */
-            target = _xtimer_now() + offset;
-        }
-        mutex_lock(&mutex);
-        DEBUG("xps, abs: %" PRIu32 "\n", target);
-        _xtimer_set_absolute(&timer, target);
-        mutex_lock(&mutex);
-    }
-out:
-    *last_wakeup = target;
+    mutex_lock(&mutex);
+    _xtimer_set64(&timer, offset, 0);
+    mutex_lock(&mutex);
+
+    *last_wakeup = now + offset;
 }
 
 #ifdef MODULE_CORE_MSG
@@ -158,7 +112,7 @@ static inline void _setup_msg(xtimer_t *timer, msg_t *msg, kernel_pid_t target_p
 void _xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid)
 {
     _setup_msg(timer, msg, target_pid);
-    _xtimer_set(timer, offset);
+    _xtimer_set64(timer, offset, 0);
 }
 
 void _xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t target_pid)
@@ -175,19 +129,19 @@ static void _setup_timer_msg(msg_t *m, xtimer_t *t)
     m->type = MSG_XTIMER;
     m->content.ptr = m;
 
-    t->target = t->long_target = 0;
+    t->offset = t->long_offset = 0;
 }
 
 /* Waits for incoming message or timeout. */
 static int _msg_wait(msg_t *m, msg_t *tmsg, xtimer_t *t)
 {
     msg_receive(m);
+    xtimer_remove(t);
     if (m->type == MSG_XTIMER && m->content.ptr == tmsg) {
         /* we hit the timeout */
         return -1;
     }
     else {
-        xtimer_remove(t);
         return 1;
     }
 }
@@ -196,7 +150,7 @@ int _xtimer_msg_receive_timeout64(msg_t *m, uint64_t timeout_ticks) {
     msg_t tmsg;
     xtimer_t t;
     _setup_timer_msg(&tmsg, &t);
-    _xtimer_set_msg64(&t, timeout_ticks, &tmsg, sched_active_pid);
+    _xtimer_set_msg64(&t, timeout_ticks, &tmsg, thread_getpid());
     return _msg_wait(m, &tmsg, &t);
 }
 
@@ -205,7 +159,7 @@ int _xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout_ticks)
     msg_t tmsg;
     xtimer_t t;
     _setup_timer_msg(&tmsg, &t);
-    _xtimer_set_msg(&t, timeout_ticks, &tmsg, sched_active_pid);
+    _xtimer_set_msg(&t, timeout_ticks, &tmsg, thread_getpid());
     return _msg_wait(msg, &tmsg, &t);
 }
 #endif /* MODULE_CORE_MSG */
@@ -220,7 +174,7 @@ void _xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid)
     timer->callback = _callback_wakeup;
     timer->arg = (void*) ((intptr_t)pid);
 
-    _xtimer_set(timer, offset);
+    _xtimer_set64(timer, offset, 0);
 }
 
 void _xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid)
@@ -241,48 +195,41 @@ void xtimer_now_timex(timex_t *out)
 
 static void _mutex_timeout(void *arg)
 {
-    /* interrupts a disabled because xtimer can spin
-     * if xtimer_set spins the callback is executed
-     * in the thread context
-     *
-     * If the xtimer spin is fixed in the future
-     * interups disable/restore can be removed
-     */
-    unsigned irqstate = irq_disable();
-
-    mutex_thread_t *mt = (mutex_thread_t *)arg;
-
-    mt->timeout = 1;
-    list_node_t *node = list_remove(&mt->mutex->queue,
-                                    (list_node_t *)&mt->thread->rq_entry);
-
-    /* if thread was removed from the list */
-    if (node != NULL) {
-        if (mt->mutex->queue.next == NULL) {
-            mt->mutex->queue.next = MUTEX_LOCKED;
-        }
-        sched_set_status(mt->thread, STATUS_PENDING);
-        irq_restore(irqstate);
-        sched_switch(mt->thread->priority);
-        return;
-    }
-    irq_restore(irqstate);
+    mutex_cancel(arg);
 }
 
 int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t timeout)
 {
-    xtimer_t t;
-    mutex_thread_t mt = { mutex, (thread_t *)sched_active_thread, 0 };
-
-    if (timeout != 0) {
-        t.callback = _mutex_timeout;
-        t.arg = (void *)((mutex_thread_t *)&mt);
-        xtimer_set64(&t, timeout);
+    if (mutex_trylock(mutex)) {
+        return 0;
     }
 
-    mutex_lock(mutex);
+    if (timeout == 0) {
+        return - 1;
+    }
+
+    mutex_cancel_t mc = mutex_cancel_init(mutex);
+    xtimer_t t = { .callback = _mutex_timeout, .arg = &mc };
+
+    xtimer_set64(&t, timeout);
+    if (mutex_lock_cancelable(&mc)) {
+        return -1;
+    }
     xtimer_remove(&t);
-    return -mt.timeout;
+    return 0;
+}
+
+int xtimer_rmutex_lock_timeout(rmutex_t *rmutex, uint64_t timeout)
+{
+    if (rmutex_trylock(rmutex)) {
+        return 0;
+    }
+    if (xtimer_mutex_lock_timeout(&rmutex->mutex, timeout) == 0) {
+        atomic_store_kernel_pid(&rmutex->owner, thread_getpid());
+        rmutex->refcount++;
+        return 0;
+    }
+    return -1;
 }
 
 #ifdef MODULE_CORE_THREAD_FLAGS
@@ -291,11 +238,45 @@ static void _set_timeout_flag_callback(void* arg)
     thread_flags_set(arg, THREAD_FLAG_TIMEOUT);
 }
 
-void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout)
+static void _set_timeout_flag_prepare(xtimer_t *t)
 {
     t->callback = _set_timeout_flag_callback;
-    t->arg = (thread_t *)sched_active_thread;
+    t->arg = thread_get_active();
     thread_flags_clear(THREAD_FLAG_TIMEOUT);
+}
+
+void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout)
+{
+    _set_timeout_flag_prepare(t);
     xtimer_set(t, timeout);
 }
+
+void xtimer_set_timeout_flag64(xtimer_t *t, uint64_t timeout)
+{
+    _set_timeout_flag_prepare(t);
+    xtimer_set64(t, timeout);
+}
 #endif
+
+uint64_t xtimer_left_usec(const xtimer_t *timer)
+{
+    unsigned state = irq_disable();
+    /* ensure we're working on valid data by making a local copy of timer */
+    xtimer_t t = *timer;
+    uint64_t now_us = xtimer_now_usec64();
+    irq_restore(state);
+
+    uint64_t start_us = _xtimer_usec_from_ticks64(
+        ((uint64_t)t.long_start_time << 32) | t.start_time);
+    uint64_t target_us = start_us + _xtimer_usec_from_ticks64(
+        ((uint64_t)t.long_offset) << 32 | t.offset);
+
+    /* Let's assume that 64bit won't overflow anytime soon. There'd be >580
+     * years when counting nanoseconds. With microseconds, there are 580000
+     * years of space in 2**64... */
+    if (now_us > target_us) {
+        return 0;
+    }
+
+    return target_us - now_us;
+}

@@ -1,0 +1,43 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_TEST_UTILS_RESULT_OUTPUT
+    bool "Use result output abstraction"
+    depends on TEST_KCONFIG
+
+if MODULE_TEST_UTILS_RESULT_OUTPUT
+
+choice
+    bool "Test utils result output"
+    default MODULE_TEST_UTILS_RESULT_OUTPUT_JSON
+    help
+        A common API that can format result output depending on the module
+        used.
+
+config MODULE_TEST_UTILS_RESULT_OUTPUT_TXT
+    bool "Text"
+    select MODULE_FMT
+    help
+        Output results in plain text. Intended for developer friendly console
+        output.
+
+config MODULE_TEST_UTILS_RESULT_OUTPUT_JSON
+    bool "JSON"
+    select MODULE_FMT
+    help
+        Output results json formatted results. This allows generic json parsers
+        to be used. Trailing commas may be present.
+
+config MODULE_TEST_UTILS_RESULT_OUTPUT_CHECK
+    bool "Check"
+    help
+        Asserts that the structure of the result output are correct. No output
+        is given.
+
+endchoice
+
+endif # MODULE_TEST_UTILS_RESULT_OUTPUT

@@ -29,7 +29,7 @@
 #include "fs/constfs.h"
 #include "vfs.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* File system operations */
@@ -74,7 +74,6 @@ static const vfs_dir_ops_t constfs_dir_ops = {
     .readdir = constfs_readdir,
     .closedir = constfs_closedir,
 };
-
 
 const vfs_file_system_t constfs_file_system = {
     .f_op = &constfs_file_ops,
@@ -145,7 +144,6 @@ static int constfs_statvfs(vfs_mount_t *mountp, const char *restrict path, struc
     }
     constfs_t *fs = mountp->private_data;
     /* clear out the stat buffer first */
-    memset(buf, 0, sizeof(*buf));
     buf->f_bsize = sizeof(uint8_t); /* block size */
     buf->f_frsize = sizeof(uint8_t); /* fundamental block size */
     fsblkcnt_t f_blocks = 0;
@@ -283,7 +281,8 @@ static int constfs_readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
     if (fp->path == NULL) {
         return -EIO;
     }
-    size_t len = strnlen(fp->path, VFS_NAME_MAX + 1);
+    const char *filename = fp->path[0] == '/' ? fp->path + 1 : fp->path;
+    size_t len = strnlen(filename, VFS_NAME_MAX + 1);
     if (len > VFS_NAME_MAX) {
         /* name does not fit in vfs_dirent_t buffer */
         /* skipping past the broken entry */
@@ -292,7 +291,7 @@ static int constfs_readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
         return -EAGAIN;
     }
     /* copy the string, including terminating null */
-    memcpy(&entry->d_name[0], fp->path, len + 1);
+    memcpy(&entry->d_name[0], filename, len + 1);
     entry->d_ino = filenum;
     ++filenum;
     dirp->private_data.value = filenum;
@@ -309,8 +308,7 @@ static int constfs_closedir(vfs_DIR *dirp)
 
 static void _constfs_write_stat(const constfs_file_t *fp, struct stat *restrict buf)
 {
-    /* clear out the stat buffer first */
-    memset(buf, 0, sizeof(*buf));
+    /* buffer is cleared by vfs already */
     buf->st_nlink = 1;
     buf->st_mode = S_IFREG | S_IRUSR | S_IRGRP | S_IROTH;
     buf->st_size = fp->size;

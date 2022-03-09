@@ -1,0 +1,40 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#               2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_L3G4200D
+    bool
+    prompt "L3G4200D gyroscope" if !(MODULE_SAUL_DEFAULT && HAVE_L3G4200D)
+    default y if (MODULE_SAUL_DEFAULT && HAVE_L3G4200D)
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+
+config HAVE_L3G4200D
+    bool
+    help
+        Indicates that a l3g4200d sensor is present.
+
+menuconfig KCONFIG_USEMODULE_L3G4200D
+    bool "Configure L3G4200D driver"
+    depends on USEMODULE_L3G4200D
+    help
+        Configure the L3G4200D driver using Kconfig.
+
+if KCONFIG_USEMODULE_L3G4200D
+
+config L3G4200D_DEFAULT_ADDRESS
+    hex "Default I2C address"
+    range 0x68 0x69
+    default 0x68
+    help
+        The address depends on the status of SDO Pin. Default
+        address corresponds to SDO connected to GND. For more
+        information refer to the section 'I2C Operation' in
+        the datasheet.
+
+endif # KCONFIG_USEMODULE_L3G4200D

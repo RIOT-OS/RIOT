@@ -44,7 +44,7 @@ extern "C" {
   */
 #define CC2420_CHAN_MIN         (IEEE802154_CHANNEL_MIN)
 #define CC2420_CHAN_MAX         (IEEE802154_CHANNEL_MAX)
-#define CC2420_CHAN_DEFAULT     (IEEE802154_DEFAULT_CHANNEL)
+#define CC2420_CHAN_DEFAULT     (CONFIG_IEEE802154_DEFAULT_CHANNEL)
 /** @} */
 
 /**
@@ -53,7 +53,7 @@ extern "C" {
  */
 #define CC2420_TXPOWER_MIN      (-25)
 #define CC2420_TXPOWER_MAX      (0)
-#define CC2420_TXPOWER_DEFAULT  (IEEE802154_DEFAULT_TXPOWER)
+#define CC2420_TXPOWER_DEFAULT  (CONFIG_IEEE802154_DEFAULT_TXPOWER)
 /** @} */
 
 /**
@@ -101,11 +101,13 @@ typedef struct {
  *
  * @param[out] dev          device descriptor
  * @param[in]  params       device parameters
+ * @param[in]  index        index of @p params in a global parameter struct array.
+ *                          If initialized manually, pass a unique identifier instead.
  *
  * @return                  0 on success
  * @return                  -1 on error
  */
-void cc2420_setup(cc2420_t *dev, const cc2420_params_t *params);
+void cc2420_setup(cc2420_t *dev, const cc2420_params_t *params, uint8_t index);
 
 /**
  * @brief   Initialize a given CC2420 device

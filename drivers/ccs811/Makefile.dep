@@ -1,0 +1,8 @@
+FEATURES_REQUIRED += periph_gpio
+FEATURES_REQUIRED += periph_i2c
+USEMODULE += ztimer
+USEMODULE += ztimer_usec
+
+ifneq (,$(filter ccs811_full,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+endif

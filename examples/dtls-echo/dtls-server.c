@@ -22,11 +22,13 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdio.h>
 #include <inttypes.h>
 
 #include "net/sock/udp.h"
 #include "msg.h"
+#include "timex.h"
 #include "tinydtls_keys.h"
 
 /* TinyDTLS */
@@ -34,7 +36,7 @@
 #include "dtls_debug.h"
 #include "tinydtls.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef DTLS_DEFAULT_PORT
@@ -167,7 +169,7 @@ static int _send_to_peer_handler(struct dtls_context_t *ctx,
     return sock_udp_send(remote_peer->sock, buf, len, remote_peer->remote);
 }
 
-#ifdef DTLS_PSK
+#ifdef CONFIG_DTLS_PSK
 static unsigned char psk_id[PSK_ID_MAXLEN] = PSK_DEFAULT_IDENTITY;
 static size_t psk_id_length = sizeof(PSK_DEFAULT_IDENTITY) - 1;
 static unsigned char psk_key[PSK_MAXLEN] = PSK_DEFAULT_KEY;
@@ -220,9 +222,9 @@ static int _peer_get_psk_info_handler(struct dtls_context_t *ctx, const session_
 
     return dtls_alert_fatal_create(DTLS_ALERT_DECRYPT_ERROR);
 }
-#endif /* DTLS_PSK */
+#endif /* CONFIG_DTLS_PSK */
 
-#ifdef DTLS_ECC
+#ifdef CONFIG_DTLS_ECC
 static int _peer_get_ecdsa_key_handler(struct dtls_context_t *ctx,
                                        const session_t *session,
                                        const dtls_ecdsa_key_t **result)
@@ -258,7 +260,7 @@ static int _peer_verify_ecdsa_key_handler(struct dtls_context_t *ctx,
 
     return 0;
 }
-#endif /* DTLS_ECC */
+#endif /* CONFIG_DTLS_ECC */
 
 /* DTLS variables and register are initialized. */
 dtls_context_t *_server_init_dtls(dtls_remote_peer_t *remote_peer)
@@ -269,19 +271,19 @@ dtls_context_t *_server_init_dtls(dtls_remote_peer_t *remote_peer)
         .write = _send_to_peer_handler,
         .read = _read_from_peer_handler,
         .event = NULL,
-#ifdef DTLS_PSK
+#ifdef CONFIG_DTLS_PSK
         .get_psk_info = _peer_get_psk_info_handler,
-#endif  /* DTLS_PSK */
-#ifdef DTLS_ECC
+#endif  /* CONFIG_DTLS_PSK */
+#ifdef CONFIG_DTLS_ECC
         .get_ecdsa_key = _peer_get_ecdsa_key_handler,
         .verify_ecdsa_key = _peer_verify_ecdsa_key_handler
-#endif  /* DTLS_ECC */
+#endif  /* CONFIG_DTLS_ECC */
     };
 
-#ifdef DTLS_PSK
+#ifdef CONFIG_DTLS_PSK
     DEBUG("Server support PSK\n");
 #endif
-#ifdef DTLS_ECC
+#ifdef CONFIG_DTLS_ECC
     DEBUG("Server support ECC\n");
 #endif
 
@@ -345,9 +347,7 @@ void *_dtls_server_wrapper(void *arg)
     }
 
     while (active) {
-
-        msg_try_receive(&msg); /* Check if we got an (thread) message */
-        if (msg.type == DTLS_STOP_SERVER_MSG) {
+        if ((msg_try_receive(&msg) == -1) && (msg.type == DTLS_STOP_SERVER_MSG)) {
             active = false;
         }
         else {

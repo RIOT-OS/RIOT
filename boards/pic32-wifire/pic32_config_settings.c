@@ -26,7 +26,6 @@
  * place them at different addresses.
  */
 
-
 /*
  *  DEVCFG3_LA  @ 0x1FC0FFC0 (lower alias)
  *  ADEVFGC3_LA @ 0x1FC0FF40 (alternate devcfg3 in lower alias)
@@ -148,7 +147,6 @@ volatile uint32_t ADEVCFG2_B1 __attribute__ ((used, section(".adevcfg2_b1"))) =
 /* Not needed by default: */
 /* uint32_t DEVCFG2_B2  __attribute__ ((section(".devcfg2_b2")))  = DEVCFG2_LA; */
 /* uint32_t ADEVCFG2_B2 __attribute__ ((section(".adevcfg2_b2"))) = DEVCFG2_LA; */
-
 
 /*
  * DEVCFG1_LA  @ 0x1FC0FFC8 (lower alias)
@@ -346,7 +344,6 @@ volatile uint32_t ADEVCFG0_B1  __attribute__ ((used, section(".adevcfg0_b1")))=
  *
  */
 
-
 /*
  * DEVCP0_LA  @ 0x1FC0FFDC (lower alias)
  * ADEVCP0_LA @ 0x1FC0FF5C (alternate devcp0 in lower alias)
@@ -388,7 +385,6 @@ volatile uint32_t SEQ_B1[4] __attribute__ ((used, section(".seq_b1"))) =
  *   {0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF};
  */
 
-
 /*
  * STUPIDLY Microchip has hard coded the MSB bit of devsign to 0, So even if
  * you erase the whole device, everything returns 0xFFFFFFF except this 1
@@ -407,7 +403,6 @@ volatile uint32_t DEVSIGN_B1  __attribute__ ((used, section(".devsign_b1")))  = 
 volatile uint32_t ADEVSIGN_B1 __attribute__ ((used, section(".adevsign_b1"))) = 0x7FFFFFFF;
 volatile uint32_t DEVSIGN_B2  __attribute__ ((used, section(".devsign_b2")))  = 0x7FFFFFFF;
 volatile uint32_t ADEVSIGN_B2 __attribute__ ((used, section(".adevsign_b2"))) = 0x7FFFFFFF;
-
 
 /*
  * Without a reference to this function from elsewhere LD throws the whole

@@ -28,7 +28,7 @@
 #include "net/cord/config.h"
 #include "net/cord/ep_standalone.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 /* stack configuration */
@@ -38,7 +38,7 @@
 
 #define UPDATE_TIMEOUT      (0xe537)
 
-#define TIMEOUT_US          ((uint64_t)(CORD_UPDATE_INTERVAL * US_PER_SEC))
+#define TIMEOUT_US          ((uint64_t)(CONFIG_CORD_UPDATE_INTERVAL * US_PER_SEC))
 
 static char _stack[STACKSIZE];
 

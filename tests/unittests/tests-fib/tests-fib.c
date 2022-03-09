@@ -702,7 +702,6 @@ static void test_fib_16_prefix_match(void)
     fib_deinit(&test_fib_table);
 }
 
-
 /*
 * @brief testing receiving an destination address set matching a specific prefix
 */

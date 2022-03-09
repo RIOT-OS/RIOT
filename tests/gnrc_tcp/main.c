@@ -15,10 +15,13 @@
 #include "net/gnrc/tcp.h"
 
 #define MAIN_QUEUE_SIZE (8)
+#define TCB_QUEUE_SIZE (1)
 #define BUFFER_SIZE (2049)
 
 static msg_t main_msg_queue[MAIN_QUEUE_SIZE];
-static gnrc_tcp_tcb_t tcb;
+static gnrc_tcp_tcb_t tcbs[TCB_QUEUE_SIZE];
+static gnrc_tcp_tcb_t *tcb = tcbs;
+static gnrc_tcp_tcb_queue_t queue = GNRC_TCP_TCB_QUEUE_INIT;
 static char buffer[BUFFER_SIZE];
 
 void dump_args(int argc, char **argv)
@@ -29,17 +32,6 @@ void dump_args(int argc, char **argv)
         printf(", argv[%d] = %s", i, argv[i]);
     }
     printf("\n");
-}
-
-int get_af_family(char *family)
-{
-    if (memcmp(family, "AF_INET6", sizeof("AF_INET6")) == 0) {
-        return AF_INET6;
-    }
-    else if (memcmp(family, "AF_INET", sizeof("AF_INET")) == 0) {
-        return AF_INET;
-    }
-    return AF_UNSPEC;
 }
 
 /* API Export for test script */
@@ -91,23 +83,66 @@ int buffer_read_cmd(int argc, char **argv)
     return 0;
 }
 
+int gnrc_tcp_ep_from_str_cmd(int argc, char **argv)
+{
+    dump_args(argc, argv);
+
+    gnrc_tcp_ep_t ep;
+    int err = gnrc_tcp_ep_from_str(&ep, argv[1]);
+    switch (err) {
+        case -EINVAL:
+            printf("%s: returns -EINVAL\n", argv[0]);
+            break;
+
+        default:
+            printf("%s: returns %d\n", argv[0], err);
+    }
+
+    if (err == 0) {
+        char addr_as_str[IPV6_ADDR_MAX_STR_LEN];
+        switch (ep.family) {
+            case AF_INET6:
+                printf("Family: AF_INET6\n");
+                ipv6_addr_to_str(addr_as_str, (ipv6_addr_t *) ep.addr.ipv6,
+                                 sizeof(addr_as_str));
+                printf("Addr: %s\n", addr_as_str);
+                break;
+
+            case AF_INET:
+                printf("Family: AF_INET\n");
+                break;
+
+            default:
+                printf("Family: %d\n", ep.family);
+        }
+        printf("Port: %d\n", ep.port);
+        printf("Netif: %d\n", ep.netif);
+    }
+    return err;
+}
+
 int gnrc_tcp_tcb_init_cmd(int argc, char **argv)
 {
     dump_args(argc, argv);
-    gnrc_tcp_tcb_init(&tcb);
+
+    // Initialize all given TCBs
+    for (int i = 0; i < TCB_QUEUE_SIZE; ++i)
+    {
+        gnrc_tcp_tcb_init(&(tcbs[i]));
+    }
+    printf("%s: returns 0\n", argv[0]);
     return 0;
 }
 
-int gnrc_tcp_open_active_cmd(int argc, char **argv)
+int gnrc_tcp_open_cmd(int argc, char **argv)
 {
     dump_args(argc, argv);
-    int af_family = get_af_family(argv[1]);
-    char *target_addr = argv[2];
-    uint16_t target_port = atol(argv[3]);
-    uint16_t local_port = atol(argv[4]);
 
-    int err = gnrc_tcp_open_active(&tcb, af_family, target_addr, target_port,
-                                   local_port);
+    gnrc_tcp_ep_t remote;
+    gnrc_tcp_ep_from_str(&remote, argv[1]);
+    uint16_t local_port = atol(argv[2]);
+
+    int err = gnrc_tcp_open(tcb, &remote, local_port);
     switch (err) {
         case -EAFNOSUPPORT:
             printf("%s: returns -EAFNOSUPPORT\n", argv[0]);
@@ -143,22 +178,14 @@ int gnrc_tcp_open_active_cmd(int argc, char **argv)
     return err;
 }
 
-int gnrc_tcp_open_passive_cmd(int argc, char **argv)
+int gnrc_tcp_listen_cmd(int argc, char **argv)
 {
     dump_args(argc, argv);
-    int af_family = get_af_family(argv[1]);
-    char *local_addr = NULL;
-    uint16_t local_port = 0;
 
-    if (argc == 3) {
-        local_port = atol(argv[2]);
-    }
-    else if (argc == 4) {
-        local_addr = argv[2];
-        local_port = atol(argv[3]);
-    }
+    gnrc_tcp_ep_t local;
+    gnrc_tcp_ep_from_str(&local, argv[1]);
 
-    int err = gnrc_tcp_open_passive(&tcb, af_family, local_addr, local_port);
+    int err = gnrc_tcp_listen(&queue, tcbs, ARRAY_SIZE(tcbs), &local);
     switch (err) {
         case -EAFNOSUPPORT:
             printf("%s: returns -EAFNOSUPPORT\n", argv[0]);
@@ -182,17 +209,56 @@ int gnrc_tcp_open_passive_cmd(int argc, char **argv)
     return err;
 }
 
+int gnrc_tcp_accept_cmd(int argc, char **argv)
+{
+    dump_args(argc, argv);
+
+    gnrc_tcp_tcb_t *tmp = NULL;
+    int timeout = atol(argv[1]);
+    int err = gnrc_tcp_accept(&queue, &tmp, timeout);
+    switch (err) {
+        case -EINVAL:
+            printf("%s: returns -EINVAL\n", argv[0]);
+            break;
+
+        case -EAGAIN:
+            printf("%s: returns -EAGAIN\n", argv[0]);
+            break;
+
+        case -ENOMEM:
+            printf("%s: returns -ENOMEM\n", argv[0]);
+            break;
+
+        case -ETIMEDOUT:
+            printf("%s: returns -ETIMEDOUT\n", argv[0]);
+            break;
+
+        default:
+            printf("%s: returns %d\n", argv[0], err);
+    }
+
+    if (tmp) {
+        tcb = tmp;
+    }
+
+    return err;
+}
+
 int gnrc_tcp_send_cmd(int argc, char **argv)
 {
     dump_args(argc, argv);
 
-    int timeout = atol(argv[1]);
-    size_t to_send = strlen(buffer);
+    size_t timeout = atol(argv[1]);
+    size_t to_send = atol(argv[2]);
     size_t sent = 0;
 
-    while (sent < to_send) {
-        int ret = gnrc_tcp_send(&tcb, buffer + sent, to_send - sent, timeout);
+    do {
+        int ret = gnrc_tcp_send(tcb, buffer + sent, to_send - sent, timeout);
         switch (ret) {
+            case 0:
+                printf("%s: returns 0\n", argv[0]);
+                return ret;
+
             case -ENOTCONN:
                 printf("%s: returns -ENOTCONN\n", argv[0]);
                 return ret;
@@ -210,7 +276,7 @@ int gnrc_tcp_send_cmd(int argc, char **argv)
                 return ret;
         }
         sent += ret;
-    }
+    } while (sent < to_send);
 
     printf("%s: sent %u\n", argv[0], (unsigned)sent);
     return sent;
@@ -224,8 +290,8 @@ int gnrc_tcp_recv_cmd(int argc, char **argv)
     size_t to_receive = atol(argv[2]);
     size_t rcvd = 0;
 
-    while (rcvd < to_receive) {
-        int ret = gnrc_tcp_recv(&tcb, buffer + rcvd, to_receive - rcvd,
+    do {
+        int ret = gnrc_tcp_recv(tcb, buffer + rcvd, to_receive - rcvd,
                                 timeout);
         switch (ret) {
             case 0:
@@ -253,7 +319,7 @@ int gnrc_tcp_recv_cmd(int argc, char **argv)
                 return ret;
         }
         rcvd += ret;
-    }
+    } while (rcvd < to_receive);
 
     printf("%s: received %u\n", argv[0], (unsigned)rcvd);
     return 0;
@@ -262,24 +328,111 @@ int gnrc_tcp_recv_cmd(int argc, char **argv)
 int gnrc_tcp_close_cmd(int argc, char **argv)
 {
     dump_args(argc, argv);
-    gnrc_tcp_close(&tcb);
+    gnrc_tcp_close(tcb);
+    printf("%s: returns\n", argv[0]);
     return 0;
 }
 
 int gnrc_tcp_abort_cmd(int argc, char **argv)
 {
     dump_args(argc, argv);
-    gnrc_tcp_abort(&tcb);
+    gnrc_tcp_abort(tcb);
+    printf("%s: returns\n", argv[0]);
+    return 0;
+}
+
+int gnrc_tcp_stop_listen_cmd(int argc, char **argv)
+{
+    dump_args(argc, argv);
+    gnrc_tcp_stop_listen(&queue);
+    printf("%s: returns\n", argv[0]);
+    return 0;
+}
+
+int gnrc_tcp_get_local_cmd(int argc, char **argv)
+{
+    dump_args(argc, argv);
+    gnrc_tcp_ep_t ep;
+
+    int err = gnrc_tcp_get_local(tcb, &ep);
+    switch (err) {
+        case 0:
+            printf("%s: returns 0\n", argv[0]);
+            printf("Endpoint: addr.ipv6=");
+            ipv6_addr_print((ipv6_addr_t *) ep.addr.ipv6);
+            printf(" netif=%u port=%u\n", ep.netif, ep.port);
+            break;
+
+        case -EADDRNOTAVAIL:
+            printf("%s: returns -EADDRNOTAVAIL\n", argv[0]);
+            break;
+
+        default:
+            printf("%s: returns %d\n", argv[0], err);
+    }
+    return 0;
+}
+
+int gnrc_tcp_get_remote_cmd(int argc, char **argv)
+{
+    dump_args(argc, argv);
+    gnrc_tcp_ep_t ep;
+
+    int err = gnrc_tcp_get_remote(tcb, &ep);
+    switch (err) {
+        case 0:
+            printf("%s: returns 0\n", argv[0]);
+            printf("Endpoint: addr.ipv6=");
+            ipv6_addr_print((ipv6_addr_t *) ep.addr.ipv6);
+            printf(" netif=%u port=%u\n", ep.netif, ep.port);
+            break;
+
+        case -ENOTCONN:
+            printf("%s: returns -ENOTCONN\n", argv[0]);
+            break;
+
+        default:
+            printf("%s: returns %d\n", argv[0], err);
+    }
+    return 0;
+}
+
+int gnrc_tcp_queue_get_local_cmd(int argc, char **argv)
+{
+    dump_args(argc, argv);
+    gnrc_tcp_ep_t ep;
+
+    int err = gnrc_tcp_queue_get_local(&queue, &ep);
+    switch (err) {
+        case 0:
+            printf("%s: returns 0\n", argv[0]);
+            printf("Endpoint: addr.ipv6=");
+            ipv6_addr_print((ipv6_addr_t *) ep.addr.ipv6);
+            printf(" netif=%u port=%u\n", ep.netif, ep.port);
+            break;
+
+        case -EADDRNOTAVAIL:
+            printf("%s: returns -EADDRNOTAVAIL\n", argv[0]);
+            break;
+
+        default:
+            printf("%s: returns %d\n", argv[0], err);
+    }
     return 0;
 }
 
 /* Exporting GNRC TCP Api to for shell usage */
 static const shell_command_t shell_commands[] = {
-    { "gnrc_tcp_tcb_init", "gnrc_tcp: init tcb", gnrc_tcp_tcb_init_cmd },
-    { "gnrc_tcp_open_active", "gnrc_tcp: open active connection",
-      gnrc_tcp_open_active_cmd },
-    { "gnrc_tcp_open_passive", "gnrc_tcp: open passive connection",
-      gnrc_tcp_open_passive_cmd },
+    { "gnrc_tcp_ep_from_str", "Build endpoint from string",
+      gnrc_tcp_ep_from_str_cmd },
+    { "gnrc_tcp_tcb_init", "gnrc_tcp: init tcb",
+      gnrc_tcp_tcb_init_cmd },
+    { "gnrc_tcp_open", "gnrc_tcp: open connection",
+      gnrc_tcp_open_cmd },
+    { "gnrc_tcp_listen", "gnrc_tcp: listen for connection",
+      gnrc_tcp_listen_cmd },
+    { "gnrc_tcp_accept", "gnrc_tcp: accept connection",
+      gnrc_tcp_accept_cmd },
     { "gnrc_tcp_send", "gnrc_tcp: send data to connected peer",
       gnrc_tcp_send_cmd },
     { "gnrc_tcp_recv", "gnrc_tcp: recv data from connected peer",
@@ -288,11 +441,22 @@ static const shell_command_t shell_commands[] = {
       gnrc_tcp_close_cmd },
     { "gnrc_tcp_abort", "gnrc_tcp: close connection forcefully",
       gnrc_tcp_abort_cmd },
-    { "buffer_init", "init internal buffer", buffer_init_cmd },
+    { "gnrc_tcp_stop_listen", "gnrc_tcp: stop listening",
+      gnrc_tcp_stop_listen_cmd },
+    { "gnrc_tcp_get_local", "gnrc_tcp: get local",
+      gnrc_tcp_get_local_cmd },
+    { "gnrc_tcp_get_remote", "gnrc_tcp: get remote",
+      gnrc_tcp_get_remote_cmd },
+    { "gnrc_tcp_queue_get_local", "gnrc_tcp: get queue local",
+      gnrc_tcp_queue_get_local_cmd },
+    { "buffer_init", "init internal buffer",
+      buffer_init_cmd },
     { "buffer_get_max_size", "get max size of internal buffer",
       buffer_get_max_size_cmd },
-    { "buffer_write", "write data into internal buffer", buffer_write_cmd },
-    { "buffer_read", "read data from internal buffer", buffer_read_cmd },
+    { "buffer_write", "write data into internal buffer",
+      buffer_write_cmd },
+    { "buffer_read", "read data from internal buffer",
+      buffer_read_cmd },
     { NULL, NULL, NULL }
 };
 

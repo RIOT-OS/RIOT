@@ -17,9 +17,9 @@
  * Mainly designed for H-bridge, it could also drive some brushless drivers.
  *
  * Some H-bridge driver circuits handle several motors.
- * Maximum motor number by H-bridge is set to 2 with MOTOR_DRIVER_MAX macro.
+ * Maximum motor number by H-bridge is set to 2 with CONFIG_MOTOR_DRIVER_MAX macro.
  * This macro can be overridden to support H-bridge drivers with more outputs.
- * However, MOTOR_DRIVER_MAX should not exceed PWM channels number.
+ * However, CONFIG_MOTOR_DRIVER_MAX should not exceed PWM channels number.
  *
  * motor_driver_t structure represents an H-bridge.
  * As several H-bridge can share a same PWM device, motor_driver_t can
@@ -92,11 +92,17 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup drivers_motor_driver_config     Motor_Driver driver compile configuration
+ * @ingroup config_drivers_actuators
+ * @{
+ */
+/**
  * @brief Maximum number of motors by motor driver
  */
-#ifndef MOTOR_DRIVER_MAX
-#define MOTOR_DRIVER_MAX    (2)
-#endif /* MOTOR_DRIVER_MAX */
+#ifndef CONFIG_MOTOR_DRIVER_MAX
+#define CONFIG_MOTOR_DRIVER_MAX    (2)
+#endif
+/** @} */
 
 /**
  * @brief Macro to return motor driver id
@@ -167,7 +173,7 @@ typedef struct {
     uint32_t pwm_frequency;                 /**< PWM device frequency */
     uint32_t pwm_resolution;                /**< PWM device resolution */
     uint8_t nb_motors;                      /**< number of moros */
-    motor_t motors[MOTOR_DRIVER_MAX];       /**< motors array */
+    motor_t motors[CONFIG_MOTOR_DRIVER_MAX];       /**< motors array */
     motor_driver_cb_t cb;                   /**< callback on motor_set */
 } motor_driver_config_t;
 

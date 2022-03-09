@@ -33,7 +33,7 @@ int main(void)
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
     puts("Test application for the USBUS CDC ECM interface\n");
     puts("This test pulls in parts of the GNRC network stack, use the\n"
-         "provided shell commands (i.e. ifconfig, ping6) to interact with\n"
+         "provided shell commands (i.e. ifconfig, ping) to interact with\n"
          "the CDC ECM based network interface.\n");
 
     /* start shell */

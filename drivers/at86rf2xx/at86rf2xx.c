@@ -24,22 +24,98 @@
  * @}
  */
 
-
-#include "luid.h"
+#include "kernel_defines.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
+#if IS_USED(IEEE802154_SECURITY)
+#include "net/ieee802154_security.h"
+#endif
 #include "net/gnrc.h"
 #include "at86rf2xx_registers.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_netdev.h"
+#if IS_USED(MODULE_AT86RF2XX_AES_SPI)
+#include "at86rf2xx_aes.h"
+#endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
-
-void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
+#if IS_USED(MODULE_AT86RF2XX_AES_SPI) && \
+    IS_USED(MODULE_IEEE802154_SECURITY)
+/**
+ * @brief   Pass the 802.15.4 encryption key to the transceiver hardware
+ *
+ * @param[in] dev               Abstract security device descriptor
+ * @param[in] key               Encryption key to be used
+ * @param[in] key_size          Size of the encryption key in bytes
+ */
+static void _at86rf2xx_set_key(ieee802154_sec_dev_t *dev,
+                               const uint8_t *key, uint8_t key_size)
 {
-    netdev_t *netdev = (netdev_t *)dev;
+    (void)key_size;
+    at86rf2xx_aes_key_write_encrypt((at86rf2xx_t *)dev->ctx, key);
+}
+
+/**
+ * @brief   Compute CBC-MAC from IEEE 802.15.4 security context
+ *
+ * @param[in]       dev         Abstract security device descriptor
+ * @param[out]      cipher      Buffer to store cipher blocks
+ * @param[in]       iv          Initial vector
+ * @param[in]       plain       Input data blocks
+ * @param[in]       nblocks     Number of blocks
+ */
+static void _at86rf2xx_cbc(const ieee802154_sec_dev_t *dev,
+                           uint8_t *cipher,
+                           uint8_t *iv,
+                           const uint8_t *plain,
+                           uint8_t nblocks)
+{
+    at86rf2xx_aes_cbc_encrypt((at86rf2xx_t *)dev->ctx,
+                              (aes_block_t *)cipher,
+                              NULL,
+                              iv,
+                              (aes_block_t *)plain,
+                              nblocks);
+}
+
+/**
+ * @brief   Perform ECB encryption
+ *
+ * @param[in]       dev         Abstract security device descriptor
+ * @param[out]      cipher      Output cipher blocks
+ * @param[in]       plain       Plain blocks
+ * @param[in]       nblocks     Number of blocks
+ */
+static void _at86rf2xx_ecb(const ieee802154_sec_dev_t *dev,
+                           uint8_t *cipher,
+                           const uint8_t *plain,
+                           uint8_t nblocks)
+{
+    at86rf2xx_aes_ecb_encrypt((at86rf2xx_t *)dev->ctx,
+                              (aes_block_t *)cipher,
+                              NULL,
+                              (aes_block_t *)plain,
+                              nblocks);
+
+}
+/**
+ * @brief   Struct that contains IEEE 802.15.4 security operations
+ *          which are implemented, using the transceiver´s hardware
+ *          crypto capabilities
+ */
+static const ieee802154_radio_cipher_ops_t _at86rf2xx_cipher_ops = {
+    .set_key = _at86rf2xx_set_key,
+    .ecb = _at86rf2xx_ecb,
+    .cbc = _at86rf2xx_cbc
+};
+#endif /* IS_USED(MODULE_AT86RF2XX_AES_SPI) && \
+          IS_USED(MODULE_IEEE802154_SECURITY) */
+
+void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params, uint8_t index)
+{
+    netdev_t *netdev = &dev->netdev.netdev;
 
     netdev->driver = &at86rf2xx_driver;
     /* State to return after receiving or transmitting */
@@ -56,6 +132,10 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     /* initialize device descriptor */
     dev->params = *params;
 #endif
+
+    netdev_register(netdev, NETDEV_AT86RF2XX, index);
+    /* set device address */
+    netdev_ieee802154_setup(&dev->netdev);
 }
 
 static void at86rf2xx_disable_clock_output(at86rf2xx_t *dev)
@@ -89,10 +169,7 @@ static void at86rf2xx_enable_smart_idle(at86rf2xx_t *dev)
 
 void at86rf2xx_reset(at86rf2xx_t *dev)
 {
-    eui64_t addr_long;
-
-    at86rf2xx_hardware_reset(dev);
-
+    uint8_t tmp;
     netdev_ieee802154_reset(&dev->netdev);
 
     /* Reset state machine to ensure a known state */
@@ -100,26 +177,24 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
         at86rf2xx_set_state(dev, AT86RF2XX_STATE_FORCE_TRX_OFF);
     }
 
-    /* get an 8-byte unique ID to use as hardware address */
-    luid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
-    /* make sure we mark the address as non-multicast and not globally unique */
-    addr_long.uint8[0] &= ~(0x01);
-    addr_long.uint8[0] |=  (0x02);
     /* set short and long address */
-    at86rf2xx_set_addr_long(dev, &addr_long);
-    at86rf2xx_set_addr_short(dev, &addr_long.uint16[ARRAY_SIZE(addr_long.uint16) - 1]);
+    at86rf2xx_set_addr_long(dev, (eui64_t *)dev->netdev.long_addr);
+    at86rf2xx_set_addr_short(dev, (network_uint16_t *)dev->netdev.short_addr);
 
     /* set default channel */
     at86rf2xx_set_chan(dev, AT86RF2XX_DEFAULT_CHANNEL);
     /* set default TX power */
     at86rf2xx_set_txpower(dev, AT86RF2XX_DEFAULT_TXPOWER);
     /* set default options */
-    at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
-    at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
 
-    static const netopt_enable_t enable = NETOPT_ENABLE;
-    netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
-                          &enable, sizeof(enable));
+    if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
+        at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
+        at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
+
+        static const netopt_enable_t enable = NETOPT_ENABLE;
+        netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
+                              &enable, sizeof(enable));
+    }
 
     /* enable safe mode (protect RX FIFO until reading data starts) */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
@@ -130,7 +205,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
 
 #if !defined(MODULE_AT86RFA1) && !defined(MODULE_AT86RFR2)
     /* don't populate masked interrupt flags to IRQ_STATUS register */
-    uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_1);
+    tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_1);
     tmp &= ~(AT86RF2XX_TRX_CTRL_1_MASK__IRQ_MASK_MODE);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_1, tmp);
 #endif
@@ -144,13 +219,31 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     /* enable interrupts */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
                         AT86RF2XX_IRQ_STATUS_MASK__TRX_END);
+
+    /* enable TX start interrupt for retry counter */
+#ifdef AT86RF2XX_REG__IRQ_MASK1
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK1,
+                             AT86RF2XX_IRQ_STATUS_MASK1__TX_START);
+#endif
+
     /* clear interrupt flags */
     at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
 
+#if IS_USED(MODULE_IEEE802154_SECURITY) && \
+    IS_USED(MODULE_AT86RF2XX_AES_SPI)
+    dev->netdev.sec_ctx.dev.cipher_ops = &_at86rf2xx_cipher_ops;
+    dev->netdev.sec_ctx.dev.ctx = dev;
+#endif
+
     /* State to return after receiving or transmitting */
-    dev->idle_state = AT86RF2XX_STATE_RX_AACK_ON;
+    dev->idle_state = AT86RF2XX_PHY_STATE_RX;
     /* go into RX state */
-    at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_AACK_ON);
+    at86rf2xx_set_state(dev, AT86RF2XX_PHY_STATE_RX);
+
+    /* Enable RX start IRQ */
+    tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_MASK);
+    tmp |= AT86RF2XX_IRQ_STATUS_MASK__RX_START;
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
 
     DEBUG("at86rf2xx_reset(): reset complete.\n");
 }
@@ -173,8 +266,8 @@ void at86rf2xx_tx_prepare(at86rf2xx_t *dev)
     uint8_t state;
 
     dev->pending_tx++;
-    state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);
-    if (state != AT86RF2XX_STATE_TX_ARET_ON) {
+    state = at86rf2xx_set_state(dev, AT86RF2XX_PHY_STATE_TX);
+    if (state != AT86RF2XX_PHY_STATE_TX) {
         dev->idle_state = state;
     }
     dev->tx_frame_len = IEEE802154_FCS_LEN;
@@ -188,17 +281,20 @@ size_t at86rf2xx_tx_load(at86rf2xx_t *dev, const uint8_t *data,
     return offset + len;
 }
 
-void at86rf2xx_tx_exec(const at86rf2xx_t *dev)
+void at86rf2xx_tx_exec(at86rf2xx_t *dev)
 {
-    netdev_t *netdev = (netdev_t *)dev;
+    netdev_t *netdev = &dev->netdev.netdev;
+
+#if AT86RF2XX_HAVE_RETRIES
+    dev->tx_retries = -1;
+#endif
 
     /* write frame length field in FIFO */
     at86rf2xx_sram_write(dev, 0, &(dev->tx_frame_len), 1);
     /* trigger sending of pre-loaded frame */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE,
                         AT86RF2XX_TRX_STATE__TX_START);
-    if (netdev->event_callback &&
-        (dev->flags & AT86RF2XX_OPT_TELL_TX_START)) {
+    if (netdev->event_callback) {
         netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
     }
 }

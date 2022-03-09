@@ -23,7 +23,7 @@
 
 #include "crypto/modes/ecb.h"
 
-int cipher_encrypt_ecb(cipher_t *cipher, uint8_t *input,
+int cipher_encrypt_ecb(const cipher_t *cipher, const uint8_t *input,
                        size_t length, uint8_t *output)
 {
     size_t offset;
@@ -46,7 +46,7 @@ int cipher_encrypt_ecb(cipher_t *cipher, uint8_t *input,
     return offset;
 }
 
-int cipher_decrypt_ecb(cipher_t *cipher, uint8_t *input,
+int cipher_decrypt_ecb(const cipher_t *cipher, const uint8_t *input,
                        size_t length, uint8_t *output)
 {
     size_t offset = 0;

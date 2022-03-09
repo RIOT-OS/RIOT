@@ -50,11 +50,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
-/**
  * @brief   Use the 2nd UART for STDIO on this board
  */
 #define STDIO_UART_DEV      UART_DEV(1)
@@ -67,6 +62,14 @@ void board_init(void);
 #define XTIMER_BACKOFF      (19)
 /** @} */
 
+/* The boards debug header only exports  SWD, so JTAG-only pins PA15, PB3(*),
+ * and PB4 can be remapped as regular GPIOs instead. (Note: PB3 is also used as
+ * SWO.  The user needs to take care to not enable SWO with the debugger while
+ * at the same time PB3 is used as GPIO. But RIOT does not use SWO in any case,
+ * so if a user adds this feature in her/his own code, she/he should be well
+ * aware of this.)
+ */
+#define STM32F1_DISABLE_JTAG    /**< Disable JTAG to allow pins being used as GPIOs */
 #ifdef __cplusplus
 }
 #endif

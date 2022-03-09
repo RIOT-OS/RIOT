@@ -30,6 +30,13 @@ extern "C" {
 void tests_checksum(void);
 
 /**
+ * @brief   Generates tests for checksum/crc8.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_checksum_crc8_tests(void);
+
+/**
  * @brief   Generates tests for checksum/crc16_ccitt.h
  *
  * @return  embUnit tests if successful, NULL if not.

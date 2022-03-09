@@ -26,12 +26,14 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "mutex.h"
-#include "assert.h"
+#include "periph/gpio.h"
 #include "periph/spi.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 /**
@@ -134,8 +136,7 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
         gpio_init((gpio_t)cs, GPIO_OUT);
     }
     else {
-        if ((cs >= SPI_HWCS_NUMOF) ||
-            (spi_config[bus].pin_cs[cs] == GPIO_UNDEF)) {
+        if ((cs >= SPI_HWCS_NUMOF) || !gpio_is_valid(spi_config[bus].pin_cs[cs])) {
             return SPI_NOCS;
         }
         gpio_init_port(spi_config[bus].pin_cs[cs], spi_config[bus].pcr);
@@ -144,9 +145,10 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
     return SPI_OK;
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    (void) cs;
+    (void)cs;
+    assert((unsigned)bus < SPI_NUMOF);
     /* lock and power on the bus */
     mutex_lock(&locks[bus]);
     poweron(bus);
@@ -156,8 +158,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     /* configure clock and mode */
     dev(bus)->CTAR[0] = (mode | SPI_CTAR_FMSZ(7) | spi_clk_config[clk]);
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)

@@ -1,0 +1,445 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU models
+config CPU_MODEL_STM32F722IC
+    bool
+    select CPU_LINE_STM32F722XX
+
+config CPU_MODEL_STM32F722IE
+    bool
+    select CPU_LINE_STM32F722XX
+
+config CPU_MODEL_STM32F722RC
+    bool
+    select CPU_LINE_STM32F722XX
+
+config CPU_MODEL_STM32F722RE
+    bool
+    select CPU_LINE_STM32F722XX
+
+config CPU_MODEL_STM32F722VC
+    bool
+    select CPU_LINE_STM32F722XX
+
+config CPU_MODEL_STM32F722VE
+    bool
+    select CPU_LINE_STM32F722XX
+
+config CPU_MODEL_STM32F722ZC
+    bool
+    select CPU_LINE_STM32F722XX
+
+config CPU_MODEL_STM32F722ZE
+    bool
+    select CPU_LINE_STM32F722XX
+
+config CPU_MODEL_STM32F723IC
+    bool
+    select CPU_LINE_STM32F723XX
+
+config CPU_MODEL_STM32F723IE
+    bool
+    select CPU_LINE_STM32F723XX
+
+config CPU_MODEL_STM32F723VC
+    bool
+    select CPU_LINE_STM32F723XX
+
+config CPU_MODEL_STM32F723VE
+    bool
+    select CPU_LINE_STM32F723XX
+
+config CPU_MODEL_STM32F723ZC
+    bool
+    select CPU_LINE_STM32F723XX
+
+config CPU_MODEL_STM32F723ZE
+    bool
+    select CPU_LINE_STM32F723XX
+
+config CPU_MODEL_STM32F730I8
+    bool
+    select CPU_LINE_STM32F730XX
+
+config CPU_MODEL_STM32F730R8
+    bool
+    select CPU_LINE_STM32F730XX
+
+config CPU_MODEL_STM32F730V8
+    bool
+    select CPU_LINE_STM32F730XX
+
+config CPU_MODEL_STM32F730Z8
+    bool
+    select CPU_LINE_STM32F730XX
+
+config CPU_MODEL_STM32F732IE
+    bool
+    select CPU_LINE_STM32F732XX
+
+config CPU_MODEL_STM32F732RE
+    bool
+    select CPU_LINE_STM32F732XX
+
+config CPU_MODEL_STM32F732VE
+    bool
+    select CPU_LINE_STM32F732XX
+
+config CPU_MODEL_STM32F732ZE
+    bool
+    select CPU_LINE_STM32F732XX
+
+config CPU_MODEL_STM32F733IE
+    bool
+    select CPU_LINE_STM32F733XX
+
+config CPU_MODEL_STM32F733VE
+    bool
+    select CPU_LINE_STM32F733XX
+
+config CPU_MODEL_STM32F733ZE
+    bool
+    select CPU_LINE_STM32F733XX
+
+config CPU_MODEL_STM32F745IE
+    bool
+    select CPU_LINE_STM32F745XX
+
+config CPU_MODEL_STM32F745IG
+    bool
+    select CPU_LINE_STM32F745XX
+
+config CPU_MODEL_STM32F745VE
+    bool
+    select CPU_LINE_STM32F745XX
+
+config CPU_MODEL_STM32F745VG
+    bool
+    select CPU_LINE_STM32F745XX
+
+config CPU_MODEL_STM32F745ZE
+    bool
+    select CPU_LINE_STM32F745XX
+
+config CPU_MODEL_STM32F745ZG
+    bool
+    select CPU_LINE_STM32F745XX
+
+config CPU_MODEL_STM32F746BE
+    bool
+    select CPU_LINE_STM32F746XX
+
+config CPU_MODEL_STM32F746BG
+    bool
+    select CPU_LINE_STM32F746XX
+
+config CPU_MODEL_STM32F746IE
+    bool
+    select CPU_LINE_STM32F746XX
+
+config CPU_MODEL_STM32F746IG
+    bool
+    select CPU_LINE_STM32F746XX
+
+config CPU_MODEL_STM32F746NE
+    bool
+    select CPU_LINE_STM32F746XX
+
+config CPU_MODEL_STM32F746NG
+    bool
+    select CPU_LINE_STM32F746XX
+
+config CPU_MODEL_STM32F746VE
+    bool
+    select CPU_LINE_STM32F746XX
+
+config CPU_MODEL_STM32F746VG
+    bool
+    select CPU_LINE_STM32F746XX
+
+config CPU_MODEL_STM32F746ZE
+    bool
+    select CPU_LINE_STM32F746XX
+
+config CPU_MODEL_STM32F746ZG
+    bool
+    select CPU_LINE_STM32F746XX
+
+config CPU_MODEL_STM32F750N8
+    bool
+    select CPU_LINE_STM32F750XX
+
+config CPU_MODEL_STM32F750V8
+    bool
+    select CPU_LINE_STM32F750XX
+
+config CPU_MODEL_STM32F750Z8
+    bool
+    select CPU_LINE_STM32F750XX
+
+config CPU_MODEL_STM32F756BG
+    bool
+    select CPU_LINE_STM32F756XX
+
+config CPU_MODEL_STM32F756IG
+    bool
+    select CPU_LINE_STM32F756XX
+
+config CPU_MODEL_STM32F756NG
+    bool
+    select CPU_LINE_STM32F756XX
+
+config CPU_MODEL_STM32F756VG
+    bool
+    select CPU_LINE_STM32F756XX
+
+config CPU_MODEL_STM32F756ZG
+    bool
+    select CPU_LINE_STM32F756XX
+
+config CPU_MODEL_STM32F765BG
+    bool
+    select CPU_LINE_STM32F765XX
+
+config CPU_MODEL_STM32F765BI
+    bool
+    select CPU_LINE_STM32F765XX
+
+config CPU_MODEL_STM32F765IG
+    bool
+    select CPU_LINE_STM32F765XX
+
+config CPU_MODEL_STM32F765II
+    bool
+    select CPU_LINE_STM32F765XX
+
+config CPU_MODEL_STM32F765NG
+    bool
+    select CPU_LINE_STM32F765XX
+
+config CPU_MODEL_STM32F765NI
+    bool
+    select CPU_LINE_STM32F765XX
+
+config CPU_MODEL_STM32F765VG
+    bool
+    select CPU_LINE_STM32F765XX
+
+config CPU_MODEL_STM32F765VI
+    bool
+    select CPU_LINE_STM32F765XX
+
+config CPU_MODEL_STM32F765ZG
+    bool
+    select CPU_LINE_STM32F765XX
+
+config CPU_MODEL_STM32F765ZI
+    bool
+    select CPU_LINE_STM32F765XX
+
+config CPU_MODEL_STM32F767BG
+    bool
+    select CPU_LINE_STM32F767XX
+
+config CPU_MODEL_STM32F767BI
+    bool
+    select CPU_LINE_STM32F767XX
+
+config CPU_MODEL_STM32F767IG
+    bool
+    select CPU_LINE_STM32F767XX
+
+config CPU_MODEL_STM32F767II
+    bool
+    select CPU_LINE_STM32F767XX
+
+config CPU_MODEL_STM32F767NG
+    bool
+    select CPU_LINE_STM32F767XX
+
+config CPU_MODEL_STM32F767NI
+    bool
+    select CPU_LINE_STM32F767XX
+
+config CPU_MODEL_STM32F767VG
+    bool
+    select CPU_LINE_STM32F767XX
+
+config CPU_MODEL_STM32F767VI
+    bool
+    select CPU_LINE_STM32F767XX
+
+config CPU_MODEL_STM32F767ZG
+    bool
+    select CPU_LINE_STM32F767XX
+
+config CPU_MODEL_STM32F767ZI
+    bool
+    select CPU_LINE_STM32F767XX
+
+config CPU_MODEL_STM32F769AI
+    bool
+    select CPU_LINE_STM32F769XX
+
+config CPU_MODEL_STM32F769BG
+    bool
+    select CPU_LINE_STM32F769XX
+
+config CPU_MODEL_STM32F769BI
+    bool
+    select CPU_LINE_STM32F769XX
+
+config CPU_MODEL_STM32F769IG
+    bool
+    select CPU_LINE_STM32F769XX
+
+config CPU_MODEL_STM32F769II
+    bool
+    select CPU_LINE_STM32F769XX
+
+config CPU_MODEL_STM32F769NG
+    bool
+    select CPU_LINE_STM32F769XX
+
+config CPU_MODEL_STM32F769NI
+    bool
+    select CPU_LINE_STM32F769XX
+
+config CPU_MODEL_STM32F777BI
+    bool
+    select CPU_LINE_STM32F777XX
+
+config CPU_MODEL_STM32F777II
+    bool
+    select CPU_LINE_STM32F777XX
+
+config CPU_MODEL_STM32F777NI
+    bool
+    select CPU_LINE_STM32F777XX
+
+config CPU_MODEL_STM32F777VI
+    bool
+    select CPU_LINE_STM32F777XX
+
+config CPU_MODEL_STM32F777ZI
+    bool
+    select CPU_LINE_STM32F777XX
+
+config CPU_MODEL_STM32F778AI
+    bool
+    select CPU_FAM_F7
+
+config CPU_MODEL_STM32F779AI
+    bool
+    select CPU_LINE_STM32F779XX
+
+config CPU_MODEL_STM32F779BI
+    bool
+    select CPU_LINE_STM32F779XX
+
+config CPU_MODEL_STM32F779II
+    bool
+    select CPU_LINE_STM32F779XX
+
+config CPU_MODEL_STM32F779NI
+    bool
+    select CPU_LINE_STM32F779XX
+
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32f722ic" if CPU_MODEL_STM32F722IC
+    default "stm32f722ie" if CPU_MODEL_STM32F722IE
+    default "stm32f722rc" if CPU_MODEL_STM32F722RC
+    default "stm32f722re" if CPU_MODEL_STM32F722RE
+    default "stm32f722vc" if CPU_MODEL_STM32F722VC
+    default "stm32f722ve" if CPU_MODEL_STM32F722VE
+    default "stm32f722zc" if CPU_MODEL_STM32F722ZC
+    default "stm32f722ze" if CPU_MODEL_STM32F722ZE
+    default "stm32f723ic" if CPU_MODEL_STM32F723IC
+    default "stm32f723ie" if CPU_MODEL_STM32F723IE
+    default "stm32f723vc" if CPU_MODEL_STM32F723VC
+    default "stm32f723ve" if CPU_MODEL_STM32F723VE
+    default "stm32f723zc" if CPU_MODEL_STM32F723ZC
+    default "stm32f723ze" if CPU_MODEL_STM32F723ZE
+    default "stm32f730i8" if CPU_MODEL_STM32F730I8
+    default "stm32f730r8" if CPU_MODEL_STM32F730R8
+    default "stm32f730v8" if CPU_MODEL_STM32F730V8
+    default "stm32f730z8" if CPU_MODEL_STM32F730Z8
+    default "stm32f732ie" if CPU_MODEL_STM32F732IE
+    default "stm32f732re" if CPU_MODEL_STM32F732RE
+    default "stm32f732ve" if CPU_MODEL_STM32F732VE
+    default "stm32f732ze" if CPU_MODEL_STM32F732ZE
+    default "stm32f733ie" if CPU_MODEL_STM32F733IE
+    default "stm32f733ve" if CPU_MODEL_STM32F733VE
+    default "stm32f733ze" if CPU_MODEL_STM32F733ZE
+    default "stm32f745ie" if CPU_MODEL_STM32F745IE
+    default "stm32f745ig" if CPU_MODEL_STM32F745IG
+    default "stm32f745ve" if CPU_MODEL_STM32F745VE
+    default "stm32f745vg" if CPU_MODEL_STM32F745VG
+    default "stm32f745ze" if CPU_MODEL_STM32F745ZE
+    default "stm32f745zg" if CPU_MODEL_STM32F745ZG
+    default "stm32f746be" if CPU_MODEL_STM32F746BE
+    default "stm32f746bg" if CPU_MODEL_STM32F746BG
+    default "stm32f746ie" if CPU_MODEL_STM32F746IE
+    default "stm32f746ig" if CPU_MODEL_STM32F746IG
+    default "stm32f746ne" if CPU_MODEL_STM32F746NE
+    default "stm32f746ng" if CPU_MODEL_STM32F746NG
+    default "stm32f746ve" if CPU_MODEL_STM32F746VE
+    default "stm32f746vg" if CPU_MODEL_STM32F746VG
+    default "stm32f746ze" if CPU_MODEL_STM32F746ZE
+    default "stm32f746zg" if CPU_MODEL_STM32F746ZG
+    default "stm32f750n8" if CPU_MODEL_STM32F750N8
+    default "stm32f750v8" if CPU_MODEL_STM32F750V8
+    default "stm32f750z8" if CPU_MODEL_STM32F750Z8
+    default "stm32f756bg" if CPU_MODEL_STM32F756BG
+    default "stm32f756ig" if CPU_MODEL_STM32F756IG
+    default "stm32f756ng" if CPU_MODEL_STM32F756NG
+    default "stm32f756vg" if CPU_MODEL_STM32F756VG
+    default "stm32f756zg" if CPU_MODEL_STM32F756ZG
+    default "stm32f765bg" if CPU_MODEL_STM32F765BG
+    default "stm32f765bi" if CPU_MODEL_STM32F765BI
+    default "stm32f765ig" if CPU_MODEL_STM32F765IG
+    default "stm32f765ii" if CPU_MODEL_STM32F765II
+    default "stm32f765ng" if CPU_MODEL_STM32F765NG
+    default "stm32f765ni" if CPU_MODEL_STM32F765NI
+    default "stm32f765vg" if CPU_MODEL_STM32F765VG
+    default "stm32f765vi" if CPU_MODEL_STM32F765VI
+    default "stm32f765zg" if CPU_MODEL_STM32F765ZG
+    default "stm32f765zi" if CPU_MODEL_STM32F765ZI
+    default "stm32f767bg" if CPU_MODEL_STM32F767BG
+    default "stm32f767bi" if CPU_MODEL_STM32F767BI
+    default "stm32f767ig" if CPU_MODEL_STM32F767IG
+    default "stm32f767ii" if CPU_MODEL_STM32F767II
+    default "stm32f767ng" if CPU_MODEL_STM32F767NG
+    default "stm32f767ni" if CPU_MODEL_STM32F767NI
+    default "stm32f767vg" if CPU_MODEL_STM32F767VG
+    default "stm32f767vi" if CPU_MODEL_STM32F767VI
+    default "stm32f767zg" if CPU_MODEL_STM32F767ZG
+    default "stm32f767zi" if CPU_MODEL_STM32F767ZI
+    default "stm32f769ai" if CPU_MODEL_STM32F769AI
+    default "stm32f769bg" if CPU_MODEL_STM32F769BG
+    default "stm32f769bi" if CPU_MODEL_STM32F769BI
+    default "stm32f769ig" if CPU_MODEL_STM32F769IG
+    default "stm32f769ii" if CPU_MODEL_STM32F769II
+    default "stm32f769ng" if CPU_MODEL_STM32F769NG
+    default "stm32f769ni" if CPU_MODEL_STM32F769NI
+    default "stm32f777bi" if CPU_MODEL_STM32F777BI
+    default "stm32f777ii" if CPU_MODEL_STM32F777II
+    default "stm32f777ni" if CPU_MODEL_STM32F777NI
+    default "stm32f777vi" if CPU_MODEL_STM32F777VI
+    default "stm32f777zi" if CPU_MODEL_STM32F777ZI
+    default "stm32f778ai" if CPU_MODEL_STM32F778AI
+    default "stm32f779ai" if CPU_MODEL_STM32F779AI
+    default "stm32f779bi" if CPU_MODEL_STM32F779BI
+    default "stm32f779ii" if CPU_MODEL_STM32F779II
+    default "stm32f779ni" if CPU_MODEL_STM32F779NI

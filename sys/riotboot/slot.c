@@ -20,7 +20,10 @@
  *
  * @}
  */
+
+#include <assert.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "cpu.h"
 #include "riotboot/slot.h"
@@ -32,10 +35,10 @@
  * address of the bootloader, thus the header is located after the
  * space reserved to the bootloader.
  */
-const riotboot_hdr_t * const riotboot_slots[] = {
-    (riotboot_hdr_t*)(CPU_FLASH_BASE + SLOT0_OFFSET),   /* First slot address -> firmware image */
+const riotboot_hdr_t *const riotboot_slots[] = {
+    (riotboot_hdr_t *)(CPU_FLASH_BASE + SLOT0_OFFSET),      /* First slot address -> firmware image */
 #if NUM_SLOTS == 2
-    (riotboot_hdr_t*)(CPU_FLASH_BASE + SLOT1_OFFSET),   /* Second slot address -> firmware image */
+    (riotboot_hdr_t *)(CPU_FLASH_BASE + SLOT1_OFFSET),      /* Second slot address -> firmware image */
 #endif
 };
 
@@ -92,4 +95,9 @@ const riotboot_hdr_t *riotboot_slot_get_hdr(unsigned slot)
     assert(slot < riotboot_slot_numof);
 
     return riotboot_slots[slot];
+}
+
+size_t riotboot_slot_offset(unsigned slot)
+{
+    return (size_t)riotboot_slot_get_hdr(slot) - CPU_FLASH_BASE;
 }

@@ -61,7 +61,6 @@ uint16_t crc16_ccitt_update(uint16_t crc, const unsigned char *buf, size_t len);
  */
 uint16_t crc16_ccitt_calc(const unsigned char *buf, size_t len);
 
-
 #ifdef __cplusplus
 }
 #endif

@@ -21,20 +21,11 @@
 #ifndef IRQ_ARCH_H
 #define IRQ_ARCH_H
 
-#include "irq.h"
-#include "sched.h"
-#include "thread.h"
+#include "irq_arch_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief   Indicates the interrupt nesting depth
- *
- * The variable is increment on entry into and decremented on exit from an ISR.
- */
-extern volatile uint32_t irq_interrupt_nesting;
 
 /**
  * @name   CPU interrupt numbers
@@ -54,37 +45,6 @@ extern volatile uint32_t irq_interrupt_nesting;
 #define CPU_INUM_SOFTWARE   17  /**< Level interrupt with low priority 1 */
 #define CPU_INUM_ETH        18  /**< Level interrupt with low priority 1 */
 #define CPU_INUM_TIMER      19  /**< Level interrupt with medium priority 2 */
-/** @} */
-
-/**
- * @name   Macros to enter and exit an ISR
- *
- * Since all the stuff is done in `_frxt_int_enter` and `_frxt_int_exit`, these
- * macros are doing nothing and are kept only for source code compatibility.
- *
- * @{
- */
-#define irq_isr_enter()
-#define irq_isr_exit()
-/** @} */
-
-/**
- * @name   Macros to enter and exit a critical region
- *
- * @note: since they use a local variable they can be used only in same function
- *
- * @{
- */
-#define critical_enter()   int _irq_state = irq_disable()
-#define critical_exit()    irq_restore(_irq_state)
-/** @} */
-
-/**
- * @name   Macros to enter and exit a critical region with state variable
- * @{
- */
-#define critical_enter_var(m)   m = irq_disable()
-#define critical_exit_var(m)    irq_restore(m)
 /** @} */
 
 #ifdef __cplusplus

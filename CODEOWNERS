@@ -1,0 +1,155 @@
+## CODEOWNERS for autoreview assigning in github
+
+# https://help.github.com/en/articles/about-code-owners#codeowners-syntax
+
+# Order is important; for each modified file, the last matching
+# pattern takes the most precedence.
+
+*.md                                        @jia200x
+
+/.murdock                                   @kaspar030
+
+/boards/common/atxmega/                     @nandojve
+/boards/common/esp*/                        @gschorcht
+/boards/common/nrf*/                        @aabadie @haukepetersen
+/boards/common/nucleo*/                     @aabadie
+/boards/common/silabs/                      @basilfx
+/boards/common/slwstk6000b/                 @basilfx
+/boards/common/stm32/                       @aabadie @fjmolinas
+/boards/e180-zg120b-tb/                     @basilfx
+/boards/esp*/                               @gschorcht @yegorich
+/boards/hamilton/                           @Hyungsin
+/boards/ikea-tradfri/                       @basilfx
+/boards/lobaro-lorabox/                     @leandrolanzieri
+/boards/nrf*/                               @aabadie @haukepetersen
+/boards/nucleo*/                            @aabadie @fjmolinas
+/boards/phynode-kw41z/                      @jia200x
+/boards/sam*-xpro/                          @dylad
+/boards/same54-xpro/                        @benpicco
+/boards/sensebox_samd21/                    @leandrolanzieri @jia200x
+/boards/slstk340*/                          @basilfx
+/boards/sltb001a/                           @basilfx
+/boards/slwstk6000b/                        @basilfx
+/boards/slwstk6220a/                        @basilfx
+/boards/sodaq-sara-aff/                     @leandrolanzieri
+/boards/stk3*00/                            @basilfx
+/boards/openmote*/                          @MrKevinWeiss
+/boards/cc1352p-launchpad                   @luisan00
+/boards/atxmega*/                           @nandojve
+
+/core/                                      @kaspar030
+
+/cpu/arm7_common/                           @kaspar030 @maribu
+/cpu/avr8_common/                           @kYc0o @maribu @nandojve
+/cpu/atmega*/                               @kYc0o @maribu
+/cpu/atxmega/                               @nandojve
+/cpu/cc2538/                                @hexluthor @smlng @fjmolinas
+/cpu/cc26x0/                                @hexluthor @smlng
+/cpu/cc26x2_cc13x2/                         @hexluthor @smlng
+/cpu/cc26xx_cc13xx/                         @hexluthor @smlng
+/cpu/cortexm_common/                        @kaspar030 @bergzand
+/cpu/efm32/                                 @basilfx
+/cpu/esp*/                                  @gschorcht
+/cpu/fe310/                                 @aabadie @kaspar030 @bergzand
+/cpu/kinetis/                               @fjmolinas
+/cpu/lpc2387/                               @benpicco @maribu
+/cpu/mips*/                                 @kaspar030 @francois-berder
+/cpu/msp430*/                               @kaspar030 @gschorcht
+/cpu/nrf*/                                  @aabadie @haukepetersen
+/cpu/nrf52/radio/nrf802154/                 @bergzand @SemjonKerner @jia200x
+/cpu/sam0_common/                           @benpicco @dylad @keestux
+/cpu/samd21/                                @dylad @biboc
+/cpu/samd5x/                                @benpicco @dylad
+/cpu/saml1x/                                @dylad
+/cpu/saml21/                                @dylad
+/cpu/stm32*/                                @aabadie @fjmolinas @DipSwitch @vincent-d
+/cpu/stm32/periph/eth*                      @maribu
+/cpu/stm32/periph/ptp.c                     @maribu
+
+/doc/                                       @aabadie @jia200x
+
+/dist/tools/sliptty/                        @miri64
+/dist/tools/dhcpv6-pd_ia/                   @miri64
+
+/drivers/ad7746/                            @leandrolanzieri
+/drivers/at24mac/                           @benpicco
+/drivers/at86rf215/                         @benpicco
+/drivers/at86rf2xx/                         @daniel-k @Hyungsin @jia200x @smlng @miri64
+/drivers/bh1900nux/                         @wosym
+/drivers/bq2429x/                           @jeandudey
+/drivers/cc110x/                            @maribu
+/drivers/cc1xxx_common/                     @maribu
+/drivers/ccs811/                            @gschorcht
+/drivers/enc28j60/                          @haukepetersen
+/drivers/dcf77/                             @daexel
+/drivers/dht/                               @wosym
+/drivers/dose/                              @jue89
+/drivers/ds18/                              @leandrolanzieri
+/drivers/itg320x/                           @gschorcht
+/drivers/mcp2515/                           @wosym
+/drivers/mrf24j40/                          @bergzand
+/drivers/pca9685/                           @gschorcht
+/drivers/sht3x/                             @gschorcht
+/drivers/si70xx/                            @basilfx
+/drivers/slipdev/                           @miri64
+/drivers/sx127x/                            @aabadie @jia200x
+/drivers/ws281x/                            @maribu
+/drivers/xbee/                              @haukepetersen @miri64
+/drivers/include/periph/                    @MrKevinWeiss
+/drivers/periph_common/                     @MrKevinWeiss
+/drivers/include/periph/ptp.h               @maribu
+
+/pkg/cryptoauthlib/                         @Einhornhool @PeterKietzmann
+/pkg/lua/                                   @jcarrano
+/pkg/lwip/                                  @miri64
+/pkg/gecko_sdk/                             @basilfx
+/pkg/lora-serialization/                    @leandrolanzieri
+/pkg/micropython/                           @bergzand @kaspar030
+/pkg/openthread/                            @Hyungsin @jia200x
+/pkg/semtech-loramac/                       @aabadie @jia200x
+/pkg/tinydtls/                              @rfuentess @leandrolanzieri
+/pkg/u8g2/                                  @basilfx
+/pkg/ucglib/                                @basilfx
+/pkg/wakaama/                               @leandrolanzieri
+
+/sys/clif/                                  @leandrolanzieri
+/sys/event/                                 @kaspar030
+/sys/evtimer/                               @kaspar030
+/sys/fmt/                                   @kaspar030
+/sys/net/application_layer/gcoap/           @haukepetersen @kb2ma @chrysn
+/sys/net/application_layer/nanocoap/        @kaspar030 @haukepetersen @kb2ma @chrysn
+/sys/include/net/sock*                      @maribu
+/sys/net/netif/                             @miri64 @jia200x
+/sys/net/gnrc/network_layer/                @miri64
+/sys/net/gnrc/transport_layer/tcp/          @brummer-simon @miri64
+/sys/net/gnrc/transport_layer/udp/          @miri64
+/sys/net/gnrc/link_layer/lorawan/           @jia200x
+/sys/net/gnrc/netif/                        @miri64 @jia200x
+/sys/net/gnrc/routing/rpl/                  @cgundogan @emmanuelsearch
+/sys/net/                                   @miri64 @haukepetersen @PeterKietzmann @cgundogan
+/sys/pm_layered/                            @kaspar030
+/sys/random/fortuna/                        @basilfx
+/sys/riotboot/                              @kaspar030 @fjmolinas
+/sys/suit                                   @kaspar030 @fjmolinas @bergzand
+/sys/tsrb/                                  @kaspar030
+/sys/usb/                                   @bergzand @dylad @aabadie
+/sys/xtimer/                                @kaspar030 @MichelRottleuthner
+
+/sys/include/ztimer.h                       @kaspar030 @bergzand
+/sys/include/ztimer/                        @kaspar030 @bergzand
+/sys/ztimer/                                @kaspar030 @bergzand
+
+/tests/                                     @smlng @leandrolanzieri @aabadie @MichelRottleuthner @fjmolinas
+/tests/candev/                              @wosym
+/tests/driver_bq2429x/                      @jeandudey
+/tests/driver_dht/                          @wosym
+/tests/gnrc*                                @miri64
+/tests/lwip*                                @miri64
+/tests/slip/                                @miri64
+/tests/unittests                            @miri64
+/tests/*/tests/*.py                         @miri64
+/tests/cpu_efm32_features/                  @basilfx
+
+# KConfig maintainers will be notified about all KConfig changes
+Kconfig                                     @leandrolanzieri @jia200x @cgundogan
+pm.c                                        @kaspar030

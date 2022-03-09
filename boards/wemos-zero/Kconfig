@@ -1,0 +1,18 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD
+    default "wemos-zero" if BOARD_WEMOS_ZERO
+
+config BOARD_WEMOS_ZERO
+    bool
+    default y
+    select BOARD_COMMON_ARDUINO_ZERO
+    select HAS_HIGHLEVEL_STDIO
+
+source "$(RIOTBOARD)/common/arduino-zero/Kconfig"
+source "$(RIOTBOARD)/common/samdx1-arduino-bootloader/Kconfig"

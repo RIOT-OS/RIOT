@@ -1,0 +1,22 @@
+menu "Application"
+
+menuconfig KCONFIG_APP_MSG_1
+    bool "Configure message 1"
+    default y
+    help
+        This will enable configuring the first message via Kconfig
+
+if KCONFIG_APP_MSG_1
+
+config APP_MSG_1_TEXT
+    string "Message 1 text"
+    default "Message 1 defined in Kconfig file"
+
+endif # KCONFIG_APP_MSG_1
+
+config APP_MSG_2
+    bool "Message 2"
+    help
+        Activate printing the second message
+
+endmenu # Application

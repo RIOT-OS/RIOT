@@ -5,6 +5,5 @@ FEATURES_REQUIRED += periph_wdt
 
 USEMODULE += xtimer
 USEMODULE += shell
-USEMODULE += shell_commands
 
 include $(RIOTBASE)/Makefile.include

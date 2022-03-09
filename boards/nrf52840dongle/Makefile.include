@@ -1,0 +1,31 @@
+# This board uses the vendor's serial bootloader
+
+PROGRAMMER ?= nrfutil
+
+ifeq (nrfutil,$(PROGRAMMER))
+
+  # Using nrfutil implies using the Nordic bootloader described at
+  # <https://devzone.nordicsemi.com/nordic/short-range-guides/b/getting-started/posts/nrf52840-dongle-programming-tutorial>.
+  #
+  # It has a static MBR at the first 4k, and an ample 128k Open USB Bootloader at
+  # the end, leaving 892k for the application. This overwrites any SoftDevice,
+  # but that's what the minimal working example for the dongle does as well.
+
+  ROM_OFFSET = 0x1000
+  ROM_LEN = 0xdf000
+
+  FLASHFILE = $(HEXFILE)
+  FLASHDEPS += $(HEXFILE).zip
+  FLASHER = nrfutil
+  FFLAGS = dfu usb-serial --port=${PORT} --package=$(HEXFILE).zip
+
+  include $(RIOTMAKE)/tools/usb_board_reset.mk
+endif
+
+PROGRAMMERS_SUPPORTED += nrfutil
+
+%.hex.zip: %.hex
+	$(call check_cmd,$(FLASHER),Flash program and preparation tool)
+	$(FLASHER) pkg generate --hw-version 52 --sd-req 0x00 --application-version 1 --application $< $@
+
+include $(RIOTBOARD)/common/nrf52/Makefile.include

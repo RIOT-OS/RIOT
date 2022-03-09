@@ -64,7 +64,7 @@ static void task_delete_wrapper(void *task_handle)
 static void task_yield_wrapper(void)
 {
 #ifdef RIOT_VERSION
-    thread_yield_higher();    
+    thread_yield_higher();
 #else
     portYIELD();
 #endif
@@ -73,7 +73,7 @@ static void task_yield_wrapper(void)
 static void task_yield_from_isr_wrapper(void)
 {
 #ifdef RIOT_VERSION
-    thread_yield_higher();    
+    thread_yield_higher();
 #else
     portYIELD();
 #endif
@@ -152,7 +152,7 @@ static bool semphr_take_from_isr_wrapper(void *semphr, int *hptw)
     signed portBASE_TYPE ret;
 
     ret = xSemaphoreTakeFromISR(semphr, (signed portBASE_TYPE *)hptw);
-    
+
     return ret == pdPASS ? true : false;
 }
 
@@ -397,13 +397,13 @@ static int32_t rand_wrapper(void)
 
 void *osi_task_top_sp(void)
 {
-    extern volatile thread_t *sched_active_thread;
-    return sched_active_thread ? sched_active_thread->sp : 0;
+    thread_t *active_thread = thread_get_active();
+    return active_thread ? active_thread->sp : 0;
 }
 
 const wifi_osi_funcs_t s_wifi_osi_funcs = {
     .version = ESP_WIFI_OS_ADAPTER_VERSION,
-    
+
     .task_create = task_create_wrapper,
     .task_delete = task_delete_wrapper,
     .task_yield = task_yield_wrapper,
@@ -411,7 +411,7 @@ const wifi_osi_funcs_t s_wifi_osi_funcs = {
     .task_delay = task_delay_wrapper,
     .task_get_current_task = task_get_current_task_wrapper,
     .task_get_max_priority = task_get_max_priority_wrapper,
-    
+
     .task_ms_to_tick = task_ms_to_tick_wrapper,
 
     .task_suspend_all = task_suspend_all_wrapper,
@@ -419,19 +419,19 @@ const wifi_osi_funcs_t s_wifi_osi_funcs = {
 
     .os_init = os_init_wrapper,
     .os_start = os_start_wrapper,
-    
+
     .semphr_create = semphr_create_wrapper,
     .semphr_delete = semphr_delete_wrapper,
     .semphr_take_from_isr = semphr_take_from_isr_wrapper,
     .semphr_give_from_isr = semphr_give_from_isr_wrapper,
     .semphr_take = semphr_take_wrapper,
     .semphr_give = semphr_give_wrapper,
-    
+
     .mutex_create = mutex_create_wrapper,
     .mutex_delete = mutex_delete_wrapper,
     .mutex_lock = mutex_lock_wrapper,
     .mutex_unlock = mutex_unlock_wrapper,
-    
+
     .queue_create = queue_create_wrapper,
     .queue_delete = queue_delete_wrapper,
     .queue_send = queue_send_wrapper,

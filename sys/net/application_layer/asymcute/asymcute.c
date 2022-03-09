@@ -18,21 +18,23 @@
  * @}
  */
 
+#include <assert.h>
 #include <limits.h>
 
-#include "log.h"
 #include "random.h"
 #include "byteorder.h"
+#include "timex.h"
 
+#include "net/sock/async/event.h"
 #include "net/asymcute.h"
 
-#define ENABLE_DEBUG            (0)
+#define ENABLE_DEBUG            0
 #include "debug.h"
 
 #define PROTOCOL_VERSION        (0x01)
 
-#define RETRY_TO                (ASYMCUTE_T_RETRY * US_PER_SEC)
-#define KEEPALIVE_TO            (ASYMCUTE_KEEPALIVE_PING * US_PER_SEC)
+#define RETRY_TO                (CONFIG_ASYMCUTE_T_RETRY * US_PER_SEC)
+#define KEEPALIVE_TO            (CONFIG_ASYMCUTE_KEEPALIVE_PING * US_PER_SEC)
 
 #define VALID_PUBLISH_FLAGS     (MQTTSN_QOS_1 | MQTTSN_DUP | MQTTSN_RETAIN)
 #define VALID_SUBSCRIBE_FLAGS   (MQTTSN_QOS_1 | MQTTSN_DUP)
@@ -51,10 +53,11 @@
 
 #define LEN_PINGRESP            (2U)
 
+#define MIN_PKT_LEN             (2)
+
 /* Internally used connection states */
 enum {
-    UNINITIALIZED = 0,      /**< connection context is not initialized */
-    NOTCON,                 /**< not connected to any gateway */
+    NOTCON = 0,             /**< not connected to any gateway */
     CONNECTING,             /**< connection is being setup */
     CONNECTED,              /**< connection is established */
     TEARDOWN,               /**< connection is being torn down */
@@ -158,43 +161,59 @@ static void _compile_sub_unsub(asymcute_req_t *req, asymcute_con_t *con,
     size_t topic_len = strlen(sub->topic->name);
     size_t pos = _len_set(req->data, (topic_len + 4));
 
-
     req->msg_id = _msg_id_next(con);
     req->data[pos] = type;
     req->data[pos + 1] = sub->topic->flags;
     byteorder_htobebufs(&req->data[pos + 2], req->msg_id);
-    memcpy(&req->data[pos + 4], sub->topic->name, topic_len);
+    if (sub->topic->flags & MQTTSN_TIT_MASK) {
+        memcpy(&req->data[pos + 4], &sub->topic->id, 2);
+    }
+    else {
+        memcpy(&req->data[pos + 4], sub->topic->name, topic_len);
+    }
     req->data_len = (pos + 4 + topic_len);
-    req->arg = (void *)sub;
+    req->arg = sub;
 }
 
-static void _req_resend(asymcute_req_t *req, asymcute_con_t *con)
+static ssize_t _req_resend(asymcute_req_t *req, asymcute_con_t *con, int initial)
 {
-    event_timeout_set(&req->to_timer, RETRY_TO);
-    sock_udp_send(&con->sock, req->data, req->data_len, &con->server_ep);
+    ssize_t n = sock_udp_send(&con->sock, req->data, req->data_len, NULL);
+    /* if sending the initial packet fails we do not set the retry timer, as we
+     * handle the return value directly */
+    if (!((initial == 1) && (n < MIN_PKT_LEN))) {
+        event_timeout_set(&req->to_timer, RETRY_TO);
+    }
+    return n;
 }
 
 /* @pre con is locked */
-static void _req_send(asymcute_req_t *req, asymcute_con_t *con,
+static int _req_send(asymcute_req_t *req, asymcute_con_t *con,
                       asymcute_to_cb_t cb)
 {
     /* initialize request */
     req->con = con;
     req->cb = cb;
-    req->retry_cnt = ASYMCUTE_N_RETRY;
-    event_callback_init(&req->to_evt, _on_req_timeout, (void *)req);
+    req->retry_cnt = CONFIG_ASYMCUTE_N_RETRY;
+    event_callback_init(&req->to_evt, _on_req_timeout, req);
     event_timeout_init(&req->to_timer, &_queue, &req->to_evt.super);
     /* add request to the pending queue (if non-con request) */
     req->next = con->pending;
     con->pending = req;
     /* send request */
-    _req_resend(req, con);
+    ssize_t n = _req_resend(req, con, 1);
+    if (n < MIN_PKT_LEN) {
+        req->con = NULL;
+        mutex_unlock(&req->lock);
+        return ASYMCUTE_SENDERR;
+    }
+    return ASYMCUTE_OK;
 }
 
-static void _req_send_once(asymcute_req_t *req, asymcute_con_t *con)
+static int _req_send_once(asymcute_req_t *req, asymcute_con_t *con)
 {
-    sock_udp_send(&con->sock, req->data, req->data_len, &con->server_ep);
+    ssize_t n = sock_udp_send(&con->sock, req->data, req->data_len, NULL);
     mutex_unlock(&req->lock);
+    return (n >= MIN_PKT_LEN) ? ASYMCUTE_OK : ASYMCUTE_SENDERR;
 }
 
 static void _req_cancel(asymcute_req_t *req)
@@ -227,12 +246,15 @@ static void _disconnect(asymcute_con_t *con, uint8_t state)
         }
         con->subscriptions = NULL;
     }
+    if (state == NOTCON) {
+        sock_udp_close(&con->sock);
+    }
     con->state = state;
 }
 
 static void _on_req_timeout(void *arg)
 {
-    asymcute_req_t *req = (asymcute_req_t *)arg;
+    asymcute_req_t *req = arg;
 
     /* only process the timeout, if the request is still active */
     if (req->con == NULL) {
@@ -241,7 +263,7 @@ static void _on_req_timeout(void *arg)
 
     if (req->retry_cnt--) {
         /* resend the packet */
-        _req_resend(req, req->con);
+        _req_resend(req, req->con, 0);
         return;
     }
     else {
@@ -264,6 +286,7 @@ static unsigned _on_con_timeout(asymcute_con_t *con, asymcute_req_t *req)
     (void)req;
 
     con->state = NOTCON;
+    sock_udp_close(&con->sock);
     return ASYMCUTE_TIMEOUT;
 }
 
@@ -271,7 +294,7 @@ static unsigned _on_discon_timeout(asymcute_con_t *con, asymcute_req_t *req)
 {
     (void)req;
 
-    con->state = NOTCON;
+    _disconnect(con, NOTCON);
     return ASYMCUTE_DISCONNECTED;
 }
 
@@ -280,7 +303,7 @@ static unsigned _on_suback_timeout(asymcute_con_t *con, asymcute_req_t *req)
     (void)con;
 
     /* reset the subscription context */
-    asymcute_sub_t *sub = (asymcute_sub_t *)req->arg;
+    asymcute_sub_t *sub = req->arg;
     if (sub == NULL) {
         return ASYMCUTE_REJECTED;
     }
@@ -290,7 +313,7 @@ static unsigned _on_suback_timeout(asymcute_con_t *con, asymcute_req_t *req)
 
 static void _on_keepalive_evt(void *arg)
 {
-    asymcute_con_t *con = (asymcute_con_t *)arg;
+    asymcute_con_t *con = arg;
 
     mutex_lock(&con->lock);
 
@@ -302,7 +325,7 @@ static void _on_keepalive_evt(void *arg)
     if (con->keepalive_retry_cnt) {
         /* (re)send keep alive ping and set dedicated retransmit timer */
         uint8_t ping[2] = { 2, MQTTSN_PINGREQ };
-        sock_udp_send(&con->sock, ping, sizeof(ping), &con->server_ep);
+        sock_udp_send(&con->sock, ping, sizeof(ping), NULL);
         con->keepalive_retry_cnt--;
         event_timeout_set(&con->keepalive_timer, RETRY_TO);
         mutex_unlock(&con->lock);
@@ -328,7 +351,7 @@ static void _on_connack(asymcute_con_t *con, const uint8_t *data, size_t len)
     if (data[2] == MQTTSN_ACCEPTED) {
         con->state = CONNECTED;
         /* start keep alive timer */
-        con->keepalive_retry_cnt = ASYMCUTE_N_RETRY;
+        con->keepalive_retry_cnt = CONFIG_ASYMCUTE_N_RETRY;
         event_timeout_set(&con->keepalive_timer, KEEPALIVE_TO);
         ret = ASYMCUTE_CONNECTED;
     }
@@ -353,7 +376,6 @@ static void _on_disconnect(asymcute_con_t *con, size_t len)
     }
     mutex_unlock(&con->lock);
     con->user_cb(req, ASYMCUTE_DISCONNECTED);
-
 }
 
 static void _on_pingreq(asymcute_con_t *con)
@@ -361,7 +383,7 @@ static void _on_pingreq(asymcute_con_t *con)
     /* simply reply with a PINGRESP message */
     mutex_lock(&con->lock);
     uint8_t resp[2] = { LEN_PINGRESP, MQTTSN_PINGRESP };
-    sock_udp_send(&con->sock, resp, sizeof(resp), &con->server_ep);
+    sock_udp_send(&con->sock, resp, sizeof(resp), NULL);
     mutex_unlock(&con->lock);
 }
 
@@ -369,9 +391,9 @@ static void _on_pingresp(asymcute_con_t *con)
 {
     mutex_lock(&con->lock);
     /* only handle ping resp message if we are actually waiting for a reply */
-    if (con->keepalive_retry_cnt < ASYMCUTE_N_RETRY) {
+    if (con->keepalive_retry_cnt < CONFIG_ASYMCUTE_N_RETRY) {
         event_timeout_clear(&con->keepalive_timer);
-        con->keepalive_retry_cnt = ASYMCUTE_N_RETRY;
+        con->keepalive_retry_cnt = CONFIG_ASYMCUTE_N_RETRY;
         event_timeout_set(&con->keepalive_timer, KEEPALIVE_TO);
     }
     mutex_unlock(&con->lock);
@@ -391,7 +413,7 @@ static void _on_regack(asymcute_con_t *con, const uint8_t *data, size_t len)
     unsigned ret = ASYMCUTE_REJECTED;
     if (data[6] == MQTTSN_ACCEPTED) {
         /* finish the registration by applying the topic id */
-        asymcute_topic_t *topic = (asymcute_topic_t *)req->arg;
+        asymcute_topic_t *topic = req->arg;
         if (topic == NULL) {
             return;
         }
@@ -433,7 +455,7 @@ static void _on_publish(asymcute_con_t *con, uint8_t *data,
         uint8_t pkt[7] = { 7, MQTTSN_PUBACK, 0, 0, 0, 0, ret };
         /* copy topic and message id */
         memcpy(&pkt[2], &data[pos + 2], 4);
-        sock_udp_send(&con->sock, pkt, 7, &con->server_ep);
+        sock_udp_send(&con->sock, pkt, 7, NULL);
     }
 
     /* release the context and notify the user (on success) */
@@ -472,19 +494,25 @@ static void _on_suback(asymcute_con_t *con, const uint8_t *data, size_t len)
     }
 
     unsigned ret = ASYMCUTE_REJECTED;
-    if (data[7] == MQTTSN_ACCEPTED) {
-        /* parse and apply assigned topic id */
-        asymcute_sub_t *sub = (asymcute_sub_t *)req->arg;
-        if (sub == NULL) {
-            return;
-        }
+    /* parse and apply assigned topic id */
+    asymcute_sub_t *sub = req->arg;
+    if (sub == NULL) {
+        return;
+    }
 
-        sub->topic->id = byteorder_bebuftohs(&data[3]);
+    if (data[7] == MQTTSN_ACCEPTED) {
+        /* do not assign a topic ID for short and predefined topics */
+        if (!(sub->topic->flags & MQTTSN_TIT_MASK)) {
+            sub->topic->id = byteorder_bebuftohs(&data[3]);
+        }
         sub->topic->con = con;
         /* insert subscription to connection context */
         sub->next = con->subscriptions;
         con->subscriptions = sub;
         ret = ASYMCUTE_SUBSCRIBED;
+    }
+    else {
+        sub->topic = NULL;
     }
 
     /* notify the user */
@@ -504,7 +532,7 @@ static void _on_unsuback(asymcute_con_t *con, const uint8_t *data, size_t len)
     }
 
     /* remove subscription from list */
-    asymcute_sub_t *sub = (asymcute_sub_t *)req->arg;
+    asymcute_sub_t *sub = req->arg;
     if (sub == NULL) {
         return;
     } else if (con->subscriptions == sub) {
@@ -528,85 +556,7 @@ static void _on_unsuback(asymcute_con_t *con, const uint8_t *data, size_t len)
     con->user_cb(req, ASYMCUTE_UNSUBSCRIBED);
 }
 
-static void _on_data(asymcute_con_t *con, size_t pkt_len, sock_udp_ep_t *remote)
-{
-    if (pkt_len < 2) {
-        return;
-    }
-
-    size_t len;
-    size_t pos = _len_get(con->rxbuf, &len);
-
-    /* make sure the incoming data was send by 'our' gateway */
-    if (!sock_udp_ep_equal(&con->server_ep, remote)) {
-        return;
-    }
-    /* validate incoming data: verify message length */
-    if ((pkt_len <= pos) || (pkt_len < len)) {
-        /* length field of MQTT-SN packet seems to be invalid -> drop the pkt */
-        return;
-    }
-
-    /* figure out required action based on message type */
-    uint8_t type = con->rxbuf[pos];
-    switch (type) {
-        case MQTTSN_CONNACK:
-            _on_connack(con, con->rxbuf, len);
-            break;
-        case MQTTSN_DISCONNECT:
-            _on_disconnect(con, len);
-            break;
-        case MQTTSN_PINGREQ:
-            _on_pingreq(con);
-            break;
-        case MQTTSN_PINGRESP:
-            _on_pingresp(con);
-            break;
-        case MQTTSN_REGACK:
-            _on_regack(con, con->rxbuf, len);
-            break;
-        case MQTTSN_PUBLISH:
-            _on_publish(con, con->rxbuf, pos, len);
-            break;
-        case MQTTSN_PUBACK:
-            _on_puback(con, con->rxbuf, len);
-            break;
-        case MQTTSN_SUBACK:
-            _on_suback(con, con->rxbuf, len);
-            break;
-        case MQTTSN_UNSUBACK:
-            _on_unsuback(con, con->rxbuf, len);
-            break;
-        default:
-            break;
-    }
-}
-
-void *_listener(void *arg)
-{
-    asymcute_con_t *con = (asymcute_con_t *)arg;
-
-    /* create a socket for this listener, using an ephemeral port */
-    sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
-    if (sock_udp_create(&con->sock, &local, NULL, 0) != 0) {
-        LOG_ERROR("[asymcute] error creating listener socket\n");
-        return NULL;
-    }
-
-    while (1) {
-        sock_udp_ep_t remote;
-        int n = sock_udp_recv(&con->sock, con->rxbuf, ASYMCUTE_BUFSIZE,
-                              SOCK_NO_TIMEOUT, &remote);
-        if (n > 0) {
-            _on_data(con, (size_t)n, &remote);
-        }
-    }
-
-    /* should never be reached */
-    return NULL;
-}
-
-void *_handler(void *arg)
+void *_eventloop(void *arg)
 {
     (void)arg;
     event_queue_init(&_queue);
@@ -615,50 +565,64 @@ void *_handler(void *arg)
     return NULL;
 }
 
-int asymcute_listener_run(asymcute_con_t *con, char *stack, size_t stacksize,
-                          char priority, asymcute_evt_cb_t callback)
+void _on_pkt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
 {
-    /* make sure con is not running */
-    assert(con);
-    assert((priority > 0) && (priority < THREAD_PRIORITY_IDLE - 1));
-    assert(callback);
+    asymcute_con_t *con = (asymcute_con_t *)arg;
 
-    int ret = ASYMCUTE_OK;
+    if (type & SOCK_ASYNC_MSG_RECV) {
+        ssize_t pkt_len = sock_udp_recv(sock, con->rxbuf,
+                                        CONFIG_ASYMCUTE_BUFSIZE, 0, NULL);
+        if (pkt_len >= MIN_PKT_LEN) {
+            size_t len;
+            size_t pos = _len_get(con->rxbuf, &len);
 
-    /* make sure the connection context is not already used */
-    mutex_lock(&con->lock);
-    if (con->state != UNINITIALIZED) {
-        ret = ASYMCUTE_BUSY;
-        goto end;
+            /* validate incoming data: verify message length */
+            if (((size_t)pkt_len <= pos) || ((size_t)pkt_len < len)) {
+                /* length field of MQTT-SN packet seems to be invalid -> drop the pkt */
+                return;
+            }
+
+            /* figure out required action based on message type */
+            uint8_t type = con->rxbuf[pos];
+            switch (type) {
+                case MQTTSN_CONNACK:
+                    _on_connack(con, con->rxbuf, len);
+                    break;
+                case MQTTSN_DISCONNECT:
+                    _on_disconnect(con, len);
+                    break;
+                case MQTTSN_PINGREQ:
+                    _on_pingreq(con);
+                    break;
+                case MQTTSN_PINGRESP:
+                    _on_pingresp(con);
+                    break;
+                case MQTTSN_REGACK:
+                    _on_regack(con, con->rxbuf, len);
+                    break;
+                case MQTTSN_PUBLISH:
+                    _on_publish(con, con->rxbuf, pos, len);
+                    break;
+                case MQTTSN_PUBACK:
+                    _on_puback(con, con->rxbuf, len);
+                    break;
+                case MQTTSN_SUBACK:
+                    _on_suback(con, con->rxbuf, len);
+                    break;
+                case MQTTSN_UNSUBACK:
+                    _on_unsuback(con, con->rxbuf, len);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
-
-    /* initialize the connection context */
-    memset(con, 0, sizeof(asymcute_con_t));
-    random_bytes((uint8_t *)&con->last_id, 2);
-    event_callback_init(&con->keepalive_evt, _on_keepalive_evt, con);
-    event_timeout_init(&con->keepalive_timer, &_queue, &con->keepalive_evt.super);
-    con->keepalive_retry_cnt = ASYMCUTE_N_RETRY;
-    con->state = NOTCON;
-    con->user_cb = callback;
-
-    /* start listener thread */
-    thread_create(stack,
-                  stacksize,
-                  priority,
-                  THREAD_CREATE_WOUT_YIELD,
-                  _listener,
-                  con,
-                  "asymcute_listener");
-
-end:
-    mutex_unlock(&con->lock);
-    return ret;
 }
 
 void asymcute_handler_run(void)
 {
     thread_create(_stack, sizeof(_stack), ASYMCUTE_HANDLER_PRIO,
-                  0, _handler, NULL, "asymcute_main");
+                  THREAD_CREATE_STACKTEST, _eventloop, NULL, "asymcute_main");
 }
 
 int asymcute_topic_init(asymcute_topic_t *topic, const char *topic_name,
@@ -671,7 +635,6 @@ int asymcute_topic_init(asymcute_topic_t *topic, const char *topic_name,
     if (asymcute_topic_is_reg(topic)) {
         return ASYMCUTE_REGERR;
     }
-
     if (topic_name == NULL) {
         if ((topic_id == 0) || (topic_id == UINT16_MAX)) {
             return ASYMCUTE_OVERFLOW;
@@ -679,7 +642,7 @@ int asymcute_topic_init(asymcute_topic_t *topic, const char *topic_name,
     }
     else {
         len = strlen(topic_name);
-        if ((len == 0) || (len > ASYMCUTE_TOPIC_MAXLEN)) {
+        if ((len == 0) || (len > CONFIG_ASYMCUTE_TOPIC_MAXLEN)) {
             return ASYMCUTE_OVERFLOW;
         }
     }
@@ -690,8 +653,7 @@ int asymcute_topic_init(asymcute_topic_t *topic, const char *topic_name,
     if (topic_name == NULL) {
         topic->id = topic_id;
         topic->flags = MQTTSN_TIT_PREDEF;
-        memcpy(topic->name, &topic_id, 2);
-        topic->name[2] = '\0';
+        memcpy(topic->name, "..\0", 3);
     }
     else {
         strncpy(topic->name, topic_name, sizeof(topic->name));
@@ -711,7 +673,7 @@ bool asymcute_is_connected(const asymcute_con_t *con)
 
 int asymcute_connect(asymcute_con_t *con, asymcute_req_t *req,
                      sock_udp_ep_t *server, const char *cli_id, bool clean,
-                     asymcute_will_t *will)
+                     asymcute_will_t *will, asymcute_evt_cb_t callback)
 {
     assert(con);
     assert(req);
@@ -732,7 +694,7 @@ int asymcute_connect(asymcute_con_t *con, asymcute_req_t *req,
     /* check if the context is not already connected to any gateway */
     mutex_lock(&con->lock);
     if (con->state != NOTCON) {
-        ret = ASYMCUTE_GWERR;
+        ret = ASYMCUTE_BUSY;
         goto end;
     }
     /* get mutual access to the request context */
@@ -741,10 +703,26 @@ int asymcute_connect(asymcute_con_t *con, asymcute_req_t *req,
         goto end;
     }
 
-    /* prepare the connection context */
+    /* initialize the connection context */
+    memset(con, 0, sizeof(asymcute_con_t));
+    random_bytes((uint8_t *)&con->last_id, 2);
+    con->keepalive_retry_cnt = CONFIG_ASYMCUTE_N_RETRY;
+    event_callback_init(&con->keepalive_evt, _on_keepalive_evt, con);
+    event_timeout_init(&con->keepalive_timer, &_queue, &con->keepalive_evt.super);
+    con->user_cb = callback;
     con->state = CONNECTING;
     strncpy(con->cli_id, cli_id, sizeof(con->cli_id));
-    memcpy(&con->server_ep, server, sizeof(con->server_ep));
+
+    /* create a socket for this listener, using an ephemeral port */
+    sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
+    local.port = 0;
+    local.netif = server->netif;
+    if (sock_udp_create(&con->sock, &local, server, 0) != 0) {
+        con->state = NOTCON;
+        ret = ASYMCUTE_GWERR;
+        goto end;
+    }
+    sock_udp_event_init(&con->sock, &_queue, _on_pkt, con);
 
     /* compile and send connect message */
     req->msg_id = 0;
@@ -752,10 +730,13 @@ int asymcute_connect(asymcute_con_t *con, asymcute_req_t *req,
     req->data[1] = MQTTSN_CONNECT;
     req->data[2] = ((clean) ? MQTTSN_CS : 0);
     req->data[3] = PROTOCOL_VERSION;
-    byteorder_htobebufs(&req->data[4], ASYMCUTE_KEEPALIVE);
+    byteorder_htobebufs(&req->data[4], CONFIG_ASYMCUTE_KEEPALIVE);
     memcpy(&req->data[6], cli_id, id_len);
     req->data_len = (size_t)req->data[0];
-    _req_send(req, con, _on_con_timeout);
+    ret =  _req_send(req, con, _on_con_timeout);
+    if (ret != ASYMCUTE_OK) {
+        _disconnect(con, NOTCON);
+    }
 
 end:
     mutex_unlock(&con->lock);
@@ -789,7 +770,7 @@ int asymcute_disconnect(asymcute_con_t *con, asymcute_req_t *req)
     req->data[0] = 2;
     req->data[1] = MQTTSN_DISCONNECT;
     req->data_len = 2;
-    _req_send(req, con, _on_discon_timeout);
+    ret = _req_send(req, con, _on_discon_timeout);
 
 end:
     mutex_unlock(&con->lock);
@@ -821,8 +802,16 @@ int asymcute_register(asymcute_con_t *con, asymcute_req_t *req,
         goto end;
     }
 
+    /* if we have a short or predefined topic, there is no need to send a
+     * registration message. We assign the connection right away */
+    if (topic->flags & MQTTSN_TIT_MASK) {
+        topic->con = con;
+        mutex_unlock(&req->lock);
+        goto end;
+    }
+
     /* prepare topic */
-    req->arg = (void *)topic;
+    req->arg = topic;
     size_t topic_len = strlen(topic->name);
 
     /* prepare registration request */
@@ -835,7 +824,7 @@ int asymcute_register(asymcute_con_t *con, asymcute_req_t *req,
     req->data_len = (pos + 5 + topic_len);
 
     /* send the request */
-    _req_send(req, con, NULL);
+    ret = _req_send(req, con, NULL);
 
 end:
     mutex_unlock(&con->lock);
@@ -858,7 +847,7 @@ int asymcute_publish(asymcute_con_t *con, asymcute_req_t *req,
         return ASYMCUTE_NOTSUP;
     }
     /* check for message size */
-    if ((data_len + 9) > ASYMCUTE_BUFSIZE) {
+    if ((data_len + 9) > CONFIG_ASYMCUTE_BUFSIZE) {
         return ASYMCUTE_OVERFLOW;
     }
     /* make sure topic is registered */
@@ -877,8 +866,14 @@ int asymcute_publish(asymcute_con_t *con, asymcute_req_t *req,
         goto end;
     }
 
-    /* get message id */
-    req->msg_id = _msg_id_next(con);
+    /* set MsgId only for QoS 1 and 2, else it must be set to 0 */
+    if (((flags & MQTTSN_QOS_MASK) == MQTTSN_QOS_1) ||
+        ((flags & MQTTSN_QOS_MASK) == MQTTSN_QOS_2)) {
+        req->msg_id = _msg_id_next(con);
+    }
+    else {
+        req->msg_id = 0;
+    }
 
     /* assemble message */
     size_t pos = _len_set(req->data, data_len + 6);
@@ -891,10 +886,10 @@ int asymcute_publish(asymcute_con_t *con, asymcute_req_t *req,
 
     /* publish selected data */
     if (flags & MQTTSN_QOS_1) {
-        _req_send(req, con, NULL);
+        ret = _req_send(req, con, NULL);
     }
     else {
-        _req_send_once(req, con);
+        ret = _req_send_once(req, con);
     }
 
 end:
@@ -928,11 +923,14 @@ int asymcute_subscribe(asymcute_con_t *con, asymcute_req_t *req,
         ret = ASYMCUTE_GWERR;
         goto end;
     }
-    /* check if we are already subscribed to the given topic */
-    for (asymcute_sub_t *sub = con->subscriptions; sub; sub = sub->next) {
-        if (asymcute_topic_equal(topic, sub->topic)) {
-            ret = ASYMCUTE_SUBERR;
-            goto end;
+    /* check if we are already subscribed to the given topic, but only if the
+     * topic was already registered */
+    if (asymcute_topic_is_reg(topic)) {
+        for (asymcute_sub_t *sub = con->subscriptions; sub; sub = sub->next) {
+            if (asymcute_topic_equal(topic, sub->topic)) {
+                ret = ASYMCUTE_SUBERR;
+                goto end;
+            }
         }
     }
     /* make sure request context is clear to be used */
@@ -945,10 +943,11 @@ int asymcute_subscribe(asymcute_con_t *con, asymcute_req_t *req,
     sub->cb = callback;
     sub->arg = arg;
     sub->topic = topic;
+    topic->flags |= flags;
 
     /* send SUBSCRIBE message */
     _compile_sub_unsub(req, con, sub, MQTTSN_SUBSCRIBE);
-    _req_send(req, con, _on_suback_timeout);
+    ret = _req_send(req, con, _on_suback_timeout);
 
 end:
     mutex_unlock(&con->lock);
@@ -982,7 +981,7 @@ int asymcute_unsubscribe(asymcute_con_t *con, asymcute_req_t *req,
 
     /* prepare and send UNSUBSCRIBE message */
     _compile_sub_unsub(req, con, sub, MQTTSN_UNSUBSCRIBE);
-    _req_send(req, con, NULL);
+    ret = _req_send(req, con, NULL);
 
 end:
     mutex_unlock(&con->lock);

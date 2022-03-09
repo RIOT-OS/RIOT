@@ -1,1 +1,3 @@
--include $(RIOTCPU)/msp430_common/Makefile.features
+CPU_FAM = msp430f
+
+include $(RIOTCPU)/msp430_common/Makefile.features

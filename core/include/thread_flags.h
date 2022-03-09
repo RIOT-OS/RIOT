@@ -39,8 +39,11 @@
  * Usually, if it is only of interest that an event occurred, but not how many
  * of them, thread flags should be considered.
  *
- * Note that some flags (currently the three most significant bits) are used by
+ * Note that some flags (currently the two most significant bits) are used by
  * core functions and should not be set by the user. They can be waited for.
+ * Unlike @ref core_msg "messages" (which are only ever sent when requested),
+ * these flags can be set unprompted. (For example, @ref THREAD_FLAG_MSG_WAITING
+ * is set on a thread automatically with every message sent there).
  *
  * This API is optional and must be enabled by adding "core_thread_flags" to USEMODULE.
  *
@@ -54,11 +57,6 @@
 #ifndef THREAD_FLAGS_H
 #define THREAD_FLAGS_H
 
-#ifndef MODULE_CORE_THREAD_FLAGS
-#error Missing USEMODULE += core_thread_flags
-#endif
-
-#include "kernel_types.h"
 #include "sched.h"  /* for thread_t typedef */
 
 #ifdef __cplusplus
@@ -103,6 +101,19 @@ extern "C" {
  * @see xtimer_set_timeout_flag
  */
 #define THREAD_FLAG_TIMEOUT         (1u << 14)
+
+/**
+ * @brief Comprehensive set of all predefined flags
+ *
+ * This bit mask is set for all thread flag bits that are predefined in RIOT.
+ * Flags within this set may be set on a thread by the operating system without
+ * the thread soliciting them (though not all are; for example, @ref
+ * THREAD_FLAG_TIMEOUT is not).
+ *
+ * When using custom flags, asserting that they are not in this set can help
+ * avoid conflict with future additions to the predefined flags.
+ */
+#define THREAD_FLAG_PREDEFINED_MASK (THREAD_FLAG_MSG_WAITING | THREAD_FLAG_TIMEOUT)
 /** @} */
 
 /**
@@ -136,11 +147,11 @@ thread_flags_t thread_flags_clear(thread_flags_t mask);
  * immediately, otherwise, it will suspend the thread (as
  * THREAD_STATUS_WAIT_ANY) until any of the flags in mask get set.
  *
- * Both ways, it will clear and return (sched_active_thread-flags & mask).
+ * Both ways, it will clear and return (`thread_get_active()->flags & mask`).
  *
  * @param[in]   mask    mask of flags to wait for
  *
- * @returns     flags that caused return/wakeup ((sched_active_thread-flags & mask).
+ * @returns     flags that caused return/wakeup (`thread_get_active()->flags & mask`).
  */
 thread_flags_t thread_flags_wait_any(thread_flags_t mask);
 
@@ -151,7 +162,7 @@ thread_flags_t thread_flags_wait_any(thread_flags_t mask);
  * immediately, otherwise, it will suspend the thread (as
  * THREAD_STATUS_WAIT_ALL) until all of the flags in mask have been set.
  *
- * Both ways, it will clear and return (sched_active_thread-flags & mask).
+ * Both ways, it will clear and return (`thread_get_active()->flags & mask`).
  *
  * @param[in]   mask    mask of flags to wait for
  *

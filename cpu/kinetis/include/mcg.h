@@ -7,7 +7,8 @@
  * details.
  */
 
-#ifdef MODULE_PERIPH_MCG /* please doxygen by hiding dangling references */
+/* please doxygen by hiding dangling references */
+#if defined(MODULE_PERIPH_MCG) || defined(MODULE_PERIPH_MCG_LITE)
 /**
  * @defgroup    cpu_kinetis_mcg Kinetis MCG
  * @ingroup     cpu_kinetis
@@ -170,6 +171,5 @@ void kinetis_mcg_init(void);
 }
 #endif
 
-/** @} */
-
 #endif /* MCG_H */
+/** @} */

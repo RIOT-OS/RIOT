@@ -79,6 +79,22 @@
  */
 
 /**
+ * @defgroup    sys_auto_init_lwip_netif lwIP netif drivers auto-initialization
+ * @ingroup     sys_auto_init
+ * @brief       Provides auto-initialization of network device drivers for lwIP
+ *
+ * @see @ref pkg_lwip, @ref sys_auto_init
+ */
+
+/**
+ * @defgroup    sys_auto_init_multimedia Multimedia driver auto-initialization
+ * @ingroup     sys_auto_init
+ * @brief       Provides auto-initialization of Multimedia drivers
+ *
+ * @see @ref drivers_multimedia, @ref sys_auto_init
+ */
+
+/**
  * @{
  *
  * @file

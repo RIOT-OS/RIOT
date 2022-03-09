@@ -28,25 +28,17 @@
 extern "C" {
 #endif
 
-/**
- * @brief Overwrite the default gpio_t type definition
- */
+#ifndef DOXYGEN
 #define HAVE_GPIO_T
 typedef uint32_t gpio_t;
-/** @} */
 
-/**
- * @brief Definition of a fitting UNDEF value
- */
 #define GPIO_UNDEF          (0xffffffff)
 
-/**
- * @brief Define a CPU specific GPIO pin generator macro
- */
 #define GPIO_PIN(x, y)      (((uint32_t)PIOA + (x << 9)) | y)
+#endif /* DOXYGEN */
 
 /**
- * @brief Declare needed generic SPI functions
+ * @name Declare needed generic SPI functions
  * @{
  */
 #define PERIPH_SPI_NEEDS_INIT_CS
@@ -66,9 +58,24 @@ typedef uint32_t gpio_t;
 #define TIMER_MAX_VAL       (0xffffffff)
 
 /**
- * @brief   We use 3 channels for each defined timer
+ * @brief   We use one channel for each defined timer
+ *
+ * While the peripheral provides three channels, the current interrupt
+ * flag handling leads to a race condition where calling timer_clear() on one
+ * channel can disable a pending flag for other channels.
+ * Until resolved, limit the peripheral to only one channel.
  */
-#define TIMER_CHANNELS      (3)
+#define TIMER_CHANNEL_NUMOF (1)
+
+/**
+ * @name    RTT configuration
+ * @{
+ */
+#define RTT_MAX_VALUE       (0xffffffff)
+#define RTT_CLOCK_FREQUENCY (CHIP_FREQ_XTAL_32K)          /* in Hz */
+#define RTT_MIN_FREQUENCY   (1) /* in Hz */
+#define RTT_MAX_FREQUENCY   (RTT_CLOCK_FREQUENCY)         /* in Hz */
+/** @} */
 
 /**
  * @brief   Generate GPIO mode bitfields
@@ -103,10 +110,6 @@ typedef uint32_t gpio_t;
 #define DAC_NUMOF           (2U)
 
 #ifndef DOXYGEN
-/**
- * @brief   Override GPIO modes
- * @{
- */
 #define HAVE_GPIO_MODE_T
 typedef enum {
     GPIO_IN    = GPIO_MODE(0, 0, 0),    /**< IN */
@@ -116,19 +119,13 @@ typedef enum {
     GPIO_OD    = GPIO_MODE(1, 0, 1),    /**< OD */
     GPIO_OD_PU = GPIO_MODE(1, 1, 1),    /**< OD with pull-up */
 } gpio_mode_t;
-/** @} */
 
-/**
- * @brief Override flank configuration values
- * @{
- */
 #define HAVE_GPIO_FLANK_T
 typedef enum {
     GPIO_RISING = 1,        /**< emit interrupt on rising flank */
     GPIO_FALLING = 2,       /**< emit interrupt on falling flank */
     GPIO_BOTH = 3           /**< emit interrupt on both flanks */
 } gpio_flank_t;
-/** @} */
 #endif /* ndef DOXYGEN */
 
 /**

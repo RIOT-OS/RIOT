@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief       Device driver implementation for the DHT 11 and 22
+ * @brief       Device driver implementation for the DHT11, 21 and 22
  *              temperature and humidity sensor
  *
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
@@ -35,20 +35,19 @@
 #include "dht.h"
 #include "dht_params.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG            0
 #include "debug.h"
 
 /* Every pulse send by the DHT longer than 40µs is interpreted as 1 */
-#define PULSE_WIDTH_THRESHOLD       (40U)
+#define PULSE_WIDTH_THRESHOLD   (40U)
 /* If an expected pulse is not detected within 1000µs, something is wrong */
-#define TIMEOUT                     (1000U)
+#define TIMEOUT                 (1000U)
 /* The DHT sensor cannot measure more than once a second */
-#define DATA_HOLD_TIME              (US_PER_SEC)
+#define DATA_HOLD_TIME          (US_PER_SEC)
 /* The start signal by pulling data low for at least 18ms and then up for
  * 20-40µs*/
-#define START_LOW_TIME              (20U * US_PER_MS)
-#define START_HIGH_TIME             (40U)
-
+#define START_LOW_TIME          (20U * US_PER_MS)
+#define START_HIGH_TIME         (40U)
 
 static inline void _reset(dht_t *dev)
 {
@@ -76,12 +75,12 @@ static inline int _wait_for_level(gpio_t pin, bool expect, unsigned timeout)
     return (timeout > 0) ? 0 : -1;
 }
 
-static int _read(uint16_t *dest, gpio_t pin, int bits)
+static int _read(uint8_t *dest, gpio_t pin)
 {
-    DEBUG("read\n");
+    DEBUG("[dht] read\n");
     uint16_t res = 0;
 
-    for (int i = 0; i < bits; i++) {
+    for (int i = 0; i < 8; i++) {
         uint32_t start, end;
         res <<= 1;
         /* measure the length between the next rising and falling flanks (the
@@ -108,27 +107,26 @@ static int _read(uint16_t *dest, gpio_t pin, int bits)
 
 int dht_init(dht_t *dev, const dht_params_t *params)
 {
-    DEBUG("dht_init\n");
+    DEBUG("[dht] dht_init\n");
 
     /* check parameters and configuration */
     assert(dev && params);
-    assert((params->type == DHT11) || (params->type == DHT22) || (params->type == DHT21));
 
     memset(dev, 0, sizeof(dht_t));
     dev->params = *params;
 
     _reset(dev);
 
-    xtimer_usleep(2000 * US_PER_MS);
+    xtimer_msleep(2000);
 
-    DEBUG("dht_init: success\n");
+    DEBUG("[dht] dht_init: success\n");
     return DHT_OK;
 }
 
 int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
 {
-    uint16_t csum;
-    uint16_t raw_hum, raw_temp;
+    uint8_t csum;
+    uint8_t raw_temp_i, raw_temp_d, raw_hum_i, raw_hum_d;
 
     assert(dev);
 
@@ -159,17 +157,24 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
          */
 
         /* read the humidity, temperature, and checksum bits */
-        if (_read(&raw_hum, dev->params.pin, 16)) {
+        if (_read(&raw_hum_i, dev->params.pin)) {
+            _reset(dev);
+            return DHT_TIMEOUT;
+        }
+        if (_read(&raw_hum_d, dev->params.pin)) {
+            _reset(dev);
+            return DHT_TIMEOUT;
+        }
+        if (_read(&raw_temp_i, dev->params.pin)) {
+            _reset(dev);
+            return DHT_TIMEOUT;
+        }
+        if (_read(&raw_temp_d, dev->params.pin)) {
             _reset(dev);
             return DHT_TIMEOUT;
         }
 
-        if (_read(&raw_temp, dev->params.pin, 16)) {
-            _reset(dev);
-            return DHT_TIMEOUT;
-        }
-
-        if (_read(&csum, dev->params.pin, 8)) {
+        if (_read(&csum, dev->params.pin)) {
             _reset(dev);
             return DHT_TIMEOUT;
         }
@@ -179,33 +184,23 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
         _reset(dev);
 
         /* validate the checksum */
-        uint8_t sum = (raw_temp >> 8) + (raw_temp & 0xff) + (raw_hum >> 8)
-                    + (raw_hum & 0xff);
+        uint8_t sum = (raw_temp_i) + (raw_temp_d) + (raw_hum_i) + (raw_hum_d);
         if (sum != csum) {
-            DEBUG("error: checksum doesn't match\n");
+            DEBUG("[dht] error: checksum doesn't match\n");
             return DHT_NOCSUM;
         }
 
         /* parse the RAW values */
-        DEBUG("RAW values: temp: %7i hum: %7i\n", (int)raw_temp, (int)raw_hum);
-        switch (dev->params.type) {
-            case DHT11:
-                dev->last_val.temperature = (int16_t)((raw_temp >> 8) * 10);
-                dev->last_val.humidity = (int16_t)((raw_hum >> 8) * 10);
-                break;
-            /* DHT21 == DHT22 (same value in enum), so both are handled here */
-            case DHT22:
-                dev->last_val.humidity = (int16_t)raw_hum;
-                /* if the high-bit is set, the value is negative */
-                if (raw_temp & 0x8000) {
-                    dev->last_val.temperature = (int16_t)((raw_temp & ~0x8000) * -1);
-                }
-                else {
-                    dev->last_val.temperature = (int16_t)raw_temp;
-                }
-                break;
-            default:
-                return DHT_NODEV;      /* this should never be reached */
+        DEBUG("[dht] RAW values: temp: %2i.%i hum: %2i.%i\n", (int)raw_temp_i,
+            (int)raw_temp_d, (int)raw_hum_i, (int)raw_hum_d);
+
+        dev->last_val.humidity = raw_hum_i * 10 + raw_hum_d;
+        /* MSB set means negative temperature on DHT22. Will always be 0 on DHT11 */
+        if (raw_temp_i & 0x80) {
+            dev->last_val.temperature = -((raw_temp_i & ~0x80) * 10 + raw_temp_d);
+        }
+        else {
+            dev->last_val.temperature = raw_temp_i * 10 + raw_temp_d;
         }
 
         /* update time of last measurement */

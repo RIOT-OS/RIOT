@@ -30,7 +30,7 @@
 #include "tcs37727.h"
 #include "tcs37727-internal.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 #include "debug.h"
 
 #define BUS             (dev->p.i2c)

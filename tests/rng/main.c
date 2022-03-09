@@ -110,7 +110,6 @@ static int cmd_dump(int argc, char **argv)
         printf("usage: %s [samples] [lower-bound upper-bound]\n", argv[0]);
     }
 
-
     return 0;
 }
 

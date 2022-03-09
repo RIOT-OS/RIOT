@@ -62,7 +62,6 @@ typedef struct {
     uint8_t inner_hash[SHA1_DIGEST_LENGTH];
 } sha1_context;
 
-
 /**
  * @brief Initialize SHA-1 message digest context
  *

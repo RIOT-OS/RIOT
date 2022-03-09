@@ -1,0 +1,5 @@
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  USEMODULE += sx1276
+endif
+
+include $(RIOTBOARD)/common/esp32/Makefile.dep

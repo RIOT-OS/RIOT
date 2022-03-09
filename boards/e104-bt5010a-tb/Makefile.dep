@@ -1,0 +1,10 @@
+USEMODULE += boards_common_e104_bt50xxa_tb
+
+# use nrfmin for GNRC as nimble is too large for the board
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  ifeq (,$(filter nimble_% nrf802154,$(USEMODULE)))
+    USEMODULE += nrfmin
+  endif
+endif
+
+include $(RIOTBOARD)/common/e104-bt50xxa-tb/Makefile.dep

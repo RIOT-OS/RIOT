@@ -1,0 +1,14 @@
+# Include this for boards whose timer periph cannot generate a clock frequency
+# suitable for xtimer with the available clock sources and dividers.
+# This will use ztimer to perform the required frequency conversion.
+# By default, xtimer is still used with ztimer as backed, unless
+# ztimer_xtimer_compat is used.
+
+config HAVE_ZTIMER_ONLY
+    bool
+    default y
+    select MODULE_ZTIMER if MODULE_XTIMER
+    select MODULE_ZTIMER_PERIPH_TIMER if MODULE_XTIMER
+    help
+        Indicates that the board cannot generate a clock frequency suitable for
+        xtimer and requires ztimer for conversion. ztimer is used as backend.

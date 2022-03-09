@@ -1,0 +1,126 @@
+From 1f739fa4e49839c63ef2831ed454965746ed104d Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Sat, 13 Nov 2021 09:17:04 +0100
+Subject: [PATCH] Silence -Wcast-align in public headers
+
+---
+ include/flatbuffers/flatbuffers.h | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
+diff --git a/include/flatbuffers/flatbuffers.h b/include/flatbuffers/flatbuffers.h
+index a1a95f00..8c50576e 100644
+--- a/include/flatbuffers/flatbuffers.h
++++ b/include/flatbuffers/flatbuffers.h
+@@ -83,7 +83,10 @@ template<typename T> struct IndirectHelper {
+   typedef T mutable_return_type;
+   static const size_t element_stride = sizeof(T);
+   static return_type Read(const uint8_t *p, uoffset_t i) {
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wcast-align"
+     return EndianScalar((reinterpret_cast<const T *>(p))[i]);
++#pragma GCC diagnostic pop
+   }
+ };
+ template<typename T> struct IndirectHelper<Offset<T>> {
+@@ -92,7 +95,10 @@ template<typename T> struct IndirectHelper<Offset<T>> {
+   static const size_t element_stride = sizeof(uoffset_t);
+   static return_type Read(const uint8_t *p, uoffset_t i) {
+     p += i * sizeof(uoffset_t);
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wcast-align"
+     return reinterpret_cast<return_type>(p + ReadScalar<uoffset_t>(p));
++#pragma GCC diagnostic pop
+   }
+ };
+ template<typename T> struct IndirectHelper<const T *> {
+@@ -807,12 +813,18 @@ class vector_downward {
+   // Specialized version of push() that avoids memcpy call for small data.
+   template<typename T> void push_small(const T &little_endian_t) {
+     make_space(sizeof(T));
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wcast-align"
+     *reinterpret_cast<T *>(cur_) = little_endian_t;
++#pragma GCC diagnostic pop
+   }
+ 
+   template<typename T> void scratch_push_small(const T &t) {
+     ensure_space(sizeof(T));
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wcast-align"
+     *reinterpret_cast<T *>(scratch_) = t;
++#pragma GCC diagnostic pop
+     scratch_ += sizeof(T);
+   }
+ 
+@@ -1217,7 +1229,10 @@ class FlatBufferBuilder {
+     // Write the offsets into the table
+     for (auto it = buf_.scratch_end() - num_field_loc * sizeof(FieldLoc);
+          it < buf_.scratch_end(); it += sizeof(FieldLoc)) {
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wcast-align"
+       auto field_location = reinterpret_cast<FieldLoc *>(it);
++#pragma GCC diagnostic pop
+       auto pos = static_cast<voffset_t>(vtableoffsetloc - field_location->off);
+       // If this asserts, it means you've set a field twice.
+       FLATBUFFERS_ASSERT(
+@@ -1225,7 +1240,10 @@ class FlatBufferBuilder {
+       WriteScalar<voffset_t>(buf_.data() + field_location->id, pos);
+     }
+     ClearOffsets();
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wcast-align"
+     auto vt1 = reinterpret_cast<voffset_t *>(buf_.data());
++#pragma GCC diagnostic pop
+     auto vt1_size = ReadScalar<voffset_t>(vt1);
+     auto vt_use = GetSize();
+     // See if we already have generated a vtable with this exact same
+@@ -1233,8 +1251,11 @@ class FlatBufferBuilder {
+     if (dedup_vtables_) {
+       for (auto it = buf_.scratch_data(); it < buf_.scratch_end();
+            it += sizeof(uoffset_t)) {
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wcast-align"
+         auto vt_offset_ptr = reinterpret_cast<uoffset_t *>(it);
+         auto vt2 = reinterpret_cast<voffset_t *>(buf_.data_at(*vt_offset_ptr));
++#pragma GCC diagnostic pop
+         auto vt2_size = *vt2;
+         if (vt1_size != vt2_size || 0 != memcmp(vt2, vt1, vt1_size)) continue;
+         vt_use = *vt_offset_ptr;
+@@ -1889,8 +1910,11 @@ protected:
+   struct StringOffsetCompare {
+     StringOffsetCompare(const vector_downward &buf) : buf_(&buf) {}
+     bool operator()(const Offset<String> &a, const Offset<String> &b) const {
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wcast-align"
+       auto stra = reinterpret_cast<const String *>(buf_->data_at(a.o));
+       auto strb = reinterpret_cast<const String *>(buf_->data_at(b.o));
++#pragma GCC diagnostic pop
+       return StringLessThan(stra->data(), stra->size(),
+                             strb->data(), strb->size());
+     }
+@@ -2272,8 +2296,11 @@ class Table {
+   template<typename P> P GetPointer(voffset_t field) {
+     auto field_offset = GetOptionalFieldOffset(field);
+     auto p = data_ + field_offset;
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wcast-align"
+     return field_offset ? reinterpret_cast<P>(p + ReadScalar<uoffset_t>(p))
+                         : nullptr;
++#pragma GCC diagnostic pop
+   }
+   template<typename P> P GetPointer(voffset_t field) const {
+     return const_cast<Table *>(this)->GetPointer<P>(field);
+@@ -2282,7 +2309,10 @@ class Table {
+   template<typename P> P GetStruct(voffset_t field) const {
+     auto field_offset = GetOptionalFieldOffset(field);
+     auto p = const_cast<uint8_t *>(data_ + field_offset);
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wcast-align"
+     return field_offset ? reinterpret_cast<P>(p) : nullptr;
++#pragma GCC diagnostic pop
+   }
+ 
+   template<typename T> bool SetField(voffset_t field, T val, T def) {
+-- 
+2.33.1
+

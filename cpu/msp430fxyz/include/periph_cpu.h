@@ -44,7 +44,6 @@ typedef uint16_t gpio_t;
 
 /**
  * @brief   Mandatory function for defining a GPIO pins
- * @{
  */
 #define GPIO_PIN(x, y)      ((gpio_t)(((x & 0xff) << 8) | (1 << (y & 0x07))))
 
@@ -68,6 +67,7 @@ typedef enum {
 
 /**
  * @brief   Override SPI mode selection values
+ * @{
  */
 #define HAVE_SPI_MODE_T
 #ifndef SPI_USE_USCI
@@ -89,6 +89,7 @@ typedef enum {
 
 /**
  * @brief   Override SPI clock speed selection values
+ * @{
  */
 #define HAVE_SPI_CLK_T
 typedef enum {

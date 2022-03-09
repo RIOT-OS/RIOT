@@ -1,10 +1,9 @@
 /***************************************************************************//**
  * @file
  * @brief EFR32MG1P_ADC register and bit field definitions
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -1323,133 +1322,133 @@ typedef struct {
 #define _ADC_SCANMASK_SCANINPUTEN_SHIFT                    0                                                     /**< Shift value for ADC_SCANINPUTEN */
 #define _ADC_SCANMASK_SCANINPUTEN_MASK                     0xFFFFFFFFUL                                          /**< Bit mask for ADC_SCANINPUTEN */
 #define _ADC_SCANMASK_SCANINPUTEN_DEFAULT                  0x00000000UL                                          /**< Mode DEFAULT for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT0INPUT0NEGSEL       0x00000001UL                                          /**< Mode INPUT0INPUT0NEGSEL for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT0                   0x00000001UL                                          /**< Mode INPUT0 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT1                   0x00000002UL                                          /**< Mode INPUT1 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT0INPUT0NEGSEL       0x00000001UL                                          /**< Mode INPUT0INPUT0NEGSEL for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT1INPUT2             0x00000002UL                                          /**< Mode INPUT1INPUT2 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT1                   0x00000002UL                                          /**< Mode INPUT1 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT2                   0x00000004UL                                          /**< Mode INPUT2 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT2INPUT2NEGSEL       0x00000004UL                                          /**< Mode INPUT2INPUT2NEGSEL for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT3                   0x00000008UL                                          /**< Mode INPUT3 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT3INPUT4             0x00000008UL                                          /**< Mode INPUT3INPUT4 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT4                   0x00000010UL                                          /**< Mode INPUT4 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT3                   0x00000008UL                                          /**< Mode INPUT3 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT4INPUT4NEGSEL       0x00000010UL                                          /**< Mode INPUT4INPUT4NEGSEL for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT4                   0x00000010UL                                          /**< Mode INPUT4 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT5INPUT6             0x00000020UL                                          /**< Mode INPUT5INPUT6 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT5                   0x00000020UL                                          /**< Mode INPUT5 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT6INPUT6NEGSEL       0x00000040UL                                          /**< Mode INPUT6INPUT6NEGSEL for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT6                   0x00000040UL                                          /**< Mode INPUT6 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT7                   0x00000080UL                                          /**< Mode INPUT7 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT6INPUT6NEGSEL       0x00000040UL                                          /**< Mode INPUT6INPUT6NEGSEL for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT7INPUT0             0x00000080UL                                          /**< Mode INPUT7INPUT0 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT8INPUT9             0x00000100UL                                          /**< Mode INPUT8INPUT9 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT7                   0x00000080UL                                          /**< Mode INPUT7 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT8                   0x00000100UL                                          /**< Mode INPUT8 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT9                   0x00000200UL                                          /**< Mode INPUT9 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT8INPUT9             0x00000100UL                                          /**< Mode INPUT8INPUT9 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT9INPUT9NEGSEL       0x00000200UL                                          /**< Mode INPUT9INPUT9NEGSEL for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT10INPUT11           0x00000400UL                                          /**< Mode INPUT10INPUT11 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT9                   0x00000200UL                                          /**< Mode INPUT9 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT10                  0x00000400UL                                          /**< Mode INPUT10 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT11INPUT11NEGSEL     0x00000800UL                                          /**< Mode INPUT11INPUT11NEGSEL for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT10INPUT11           0x00000400UL                                          /**< Mode INPUT10INPUT11 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT11                  0x00000800UL                                          /**< Mode INPUT11 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT12INPUT13           0x00001000UL                                          /**< Mode INPUT12INPUT13 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT11INPUT11NEGSEL     0x00000800UL                                          /**< Mode INPUT11INPUT11NEGSEL for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT12                  0x00001000UL                                          /**< Mode INPUT12 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT13INPUT13NEGSEL     0x00002000UL                                          /**< Mode INPUT13INPUT13NEGSEL for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT12INPUT13           0x00001000UL                                          /**< Mode INPUT12INPUT13 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT13                  0x00002000UL                                          /**< Mode INPUT13 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT14INPUT15           0x00004000UL                                          /**< Mode INPUT14INPUT15 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT13INPUT13NEGSEL     0x00002000UL                                          /**< Mode INPUT13INPUT13NEGSEL for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT14                  0x00004000UL                                          /**< Mode INPUT14 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT15INPUT15NEGSEL     0x00008000UL                                          /**< Mode INPUT15INPUT15NEGSEL for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT14INPUT15           0x00004000UL                                          /**< Mode INPUT14INPUT15 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT15                  0x00008000UL                                          /**< Mode INPUT15 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT16INPUT17           0x00010000UL                                          /**< Mode INPUT16INPUT17 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT15INPUT15NEGSEL     0x00008000UL                                          /**< Mode INPUT15INPUT15NEGSEL for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT16                  0x00010000UL                                          /**< Mode INPUT16 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT17INPUT18           0x00020000UL                                          /**< Mode INPUT17INPUT18 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT16INPUT17           0x00010000UL                                          /**< Mode INPUT16INPUT17 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT17                  0x00020000UL                                          /**< Mode INPUT17 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT17INPUT18           0x00020000UL                                          /**< Mode INPUT17INPUT18 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT18INPUT19           0x00040000UL                                          /**< Mode INPUT18INPUT19 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT18                  0x00040000UL                                          /**< Mode INPUT18 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT19                  0x00080000UL                                          /**< Mode INPUT19 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT19INPUT20           0x00080000UL                                          /**< Mode INPUT19INPUT20 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT20INPUT21           0x00100000UL                                          /**< Mode INPUT20INPUT21 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT20                  0x00100000UL                                          /**< Mode INPUT20 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT21                  0x00200000UL                                          /**< Mode INPUT21 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT21INPUT22           0x00200000UL                                          /**< Mode INPUT21INPUT22 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT21                  0x00200000UL                                          /**< Mode INPUT21 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT22INPUT23           0x00400000UL                                          /**< Mode INPUT22INPUT23 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT22                  0x00400000UL                                          /**< Mode INPUT22 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT23INPUT16           0x00800000UL                                          /**< Mode INPUT23INPUT16 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT23                  0x00800000UL                                          /**< Mode INPUT23 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT24                  0x01000000UL                                          /**< Mode INPUT24 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT23INPUT16           0x00800000UL                                          /**< Mode INPUT23INPUT16 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT24INPUT25           0x01000000UL                                          /**< Mode INPUT24INPUT25 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT25INPUT26           0x02000000UL                                          /**< Mode INPUT25INPUT26 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT24                  0x01000000UL                                          /**< Mode INPUT24 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT25                  0x02000000UL                                          /**< Mode INPUT25 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT26                  0x04000000UL                                          /**< Mode INPUT26 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT25INPUT26           0x02000000UL                                          /**< Mode INPUT25INPUT26 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT26INPUT27           0x04000000UL                                          /**< Mode INPUT26INPUT27 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT27INPUT28           0x08000000UL                                          /**< Mode INPUT27INPUT28 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT26                  0x04000000UL                                          /**< Mode INPUT26 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT27                  0x08000000UL                                          /**< Mode INPUT27 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT28INPUT29           0x10000000UL                                          /**< Mode INPUT28INPUT29 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT27INPUT28           0x08000000UL                                          /**< Mode INPUT27INPUT28 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT28                  0x10000000UL                                          /**< Mode INPUT28 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT28INPUT29           0x10000000UL                                          /**< Mode INPUT28INPUT29 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT29                  0x20000000UL                                          /**< Mode INPUT29 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT29INPUT30           0x20000000UL                                          /**< Mode INPUT29INPUT30 for ADC_SCANMASK */
-#define _ADC_SCANMASK_SCANINPUTEN_INPUT30                  0x40000000UL                                          /**< Mode INPUT30 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT30INPUT31           0x40000000UL                                          /**< Mode INPUT30INPUT31 for ADC_SCANMASK */
+#define _ADC_SCANMASK_SCANINPUTEN_INPUT30                  0x40000000UL                                          /**< Mode INPUT30 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT31INPUT24           0x80000000UL                                          /**< Mode INPUT31INPUT24 for ADC_SCANMASK */
 #define _ADC_SCANMASK_SCANINPUTEN_INPUT31                  0x80000000UL                                          /**< Mode INPUT31 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_DEFAULT                   (_ADC_SCANMASK_SCANINPUTEN_DEFAULT << 0)              /**< Shifted mode DEFAULT for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT0INPUT0NEGSEL        (_ADC_SCANMASK_SCANINPUTEN_INPUT0INPUT0NEGSEL << 0)   /**< Shifted mode INPUT0INPUT0NEGSEL for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT0                    (_ADC_SCANMASK_SCANINPUTEN_INPUT0 << 0)               /**< Shifted mode INPUT0 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT1                    (_ADC_SCANMASK_SCANINPUTEN_INPUT1 << 0)               /**< Shifted mode INPUT1 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT0INPUT0NEGSEL        (_ADC_SCANMASK_SCANINPUTEN_INPUT0INPUT0NEGSEL << 0)   /**< Shifted mode INPUT0INPUT0NEGSEL for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT1INPUT2              (_ADC_SCANMASK_SCANINPUTEN_INPUT1INPUT2 << 0)         /**< Shifted mode INPUT1INPUT2 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT1                    (_ADC_SCANMASK_SCANINPUTEN_INPUT1 << 0)               /**< Shifted mode INPUT1 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT2                    (_ADC_SCANMASK_SCANINPUTEN_INPUT2 << 0)               /**< Shifted mode INPUT2 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT2INPUT2NEGSEL        (_ADC_SCANMASK_SCANINPUTEN_INPUT2INPUT2NEGSEL << 0)   /**< Shifted mode INPUT2INPUT2NEGSEL for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT3                    (_ADC_SCANMASK_SCANINPUTEN_INPUT3 << 0)               /**< Shifted mode INPUT3 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT3INPUT4              (_ADC_SCANMASK_SCANINPUTEN_INPUT3INPUT4 << 0)         /**< Shifted mode INPUT3INPUT4 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT4                    (_ADC_SCANMASK_SCANINPUTEN_INPUT4 << 0)               /**< Shifted mode INPUT4 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT3                    (_ADC_SCANMASK_SCANINPUTEN_INPUT3 << 0)               /**< Shifted mode INPUT3 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT4INPUT4NEGSEL        (_ADC_SCANMASK_SCANINPUTEN_INPUT4INPUT4NEGSEL << 0)   /**< Shifted mode INPUT4INPUT4NEGSEL for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT4                    (_ADC_SCANMASK_SCANINPUTEN_INPUT4 << 0)               /**< Shifted mode INPUT4 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT5INPUT6              (_ADC_SCANMASK_SCANINPUTEN_INPUT5INPUT6 << 0)         /**< Shifted mode INPUT5INPUT6 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT5                    (_ADC_SCANMASK_SCANINPUTEN_INPUT5 << 0)               /**< Shifted mode INPUT5 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT6INPUT6NEGSEL        (_ADC_SCANMASK_SCANINPUTEN_INPUT6INPUT6NEGSEL << 0)   /**< Shifted mode INPUT6INPUT6NEGSEL for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT6                    (_ADC_SCANMASK_SCANINPUTEN_INPUT6 << 0)               /**< Shifted mode INPUT6 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT7                    (_ADC_SCANMASK_SCANINPUTEN_INPUT7 << 0)               /**< Shifted mode INPUT7 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT6INPUT6NEGSEL        (_ADC_SCANMASK_SCANINPUTEN_INPUT6INPUT6NEGSEL << 0)   /**< Shifted mode INPUT6INPUT6NEGSEL for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT7INPUT0              (_ADC_SCANMASK_SCANINPUTEN_INPUT7INPUT0 << 0)         /**< Shifted mode INPUT7INPUT0 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT8INPUT9              (_ADC_SCANMASK_SCANINPUTEN_INPUT8INPUT9 << 0)         /**< Shifted mode INPUT8INPUT9 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT7                    (_ADC_SCANMASK_SCANINPUTEN_INPUT7 << 0)               /**< Shifted mode INPUT7 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT8                    (_ADC_SCANMASK_SCANINPUTEN_INPUT8 << 0)               /**< Shifted mode INPUT8 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT9                    (_ADC_SCANMASK_SCANINPUTEN_INPUT9 << 0)               /**< Shifted mode INPUT9 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT8INPUT9              (_ADC_SCANMASK_SCANINPUTEN_INPUT8INPUT9 << 0)         /**< Shifted mode INPUT8INPUT9 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT9INPUT9NEGSEL        (_ADC_SCANMASK_SCANINPUTEN_INPUT9INPUT9NEGSEL << 0)   /**< Shifted mode INPUT9INPUT9NEGSEL for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT10INPUT11            (_ADC_SCANMASK_SCANINPUTEN_INPUT10INPUT11 << 0)       /**< Shifted mode INPUT10INPUT11 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT9                    (_ADC_SCANMASK_SCANINPUTEN_INPUT9 << 0)               /**< Shifted mode INPUT9 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT10                   (_ADC_SCANMASK_SCANINPUTEN_INPUT10 << 0)              /**< Shifted mode INPUT10 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT11INPUT11NEGSEL      (_ADC_SCANMASK_SCANINPUTEN_INPUT11INPUT11NEGSEL << 0) /**< Shifted mode INPUT11INPUT11NEGSEL for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT10INPUT11            (_ADC_SCANMASK_SCANINPUTEN_INPUT10INPUT11 << 0)       /**< Shifted mode INPUT10INPUT11 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT11                   (_ADC_SCANMASK_SCANINPUTEN_INPUT11 << 0)              /**< Shifted mode INPUT11 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT12INPUT13            (_ADC_SCANMASK_SCANINPUTEN_INPUT12INPUT13 << 0)       /**< Shifted mode INPUT12INPUT13 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT11INPUT11NEGSEL      (_ADC_SCANMASK_SCANINPUTEN_INPUT11INPUT11NEGSEL << 0) /**< Shifted mode INPUT11INPUT11NEGSEL for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT12                   (_ADC_SCANMASK_SCANINPUTEN_INPUT12 << 0)              /**< Shifted mode INPUT12 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT13INPUT13NEGSEL      (_ADC_SCANMASK_SCANINPUTEN_INPUT13INPUT13NEGSEL << 0) /**< Shifted mode INPUT13INPUT13NEGSEL for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT12INPUT13            (_ADC_SCANMASK_SCANINPUTEN_INPUT12INPUT13 << 0)       /**< Shifted mode INPUT12INPUT13 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT13                   (_ADC_SCANMASK_SCANINPUTEN_INPUT13 << 0)              /**< Shifted mode INPUT13 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT14INPUT15            (_ADC_SCANMASK_SCANINPUTEN_INPUT14INPUT15 << 0)       /**< Shifted mode INPUT14INPUT15 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT13INPUT13NEGSEL      (_ADC_SCANMASK_SCANINPUTEN_INPUT13INPUT13NEGSEL << 0) /**< Shifted mode INPUT13INPUT13NEGSEL for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT14                   (_ADC_SCANMASK_SCANINPUTEN_INPUT14 << 0)              /**< Shifted mode INPUT14 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT15INPUT15NEGSEL      (_ADC_SCANMASK_SCANINPUTEN_INPUT15INPUT15NEGSEL << 0) /**< Shifted mode INPUT15INPUT15NEGSEL for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT14INPUT15            (_ADC_SCANMASK_SCANINPUTEN_INPUT14INPUT15 << 0)       /**< Shifted mode INPUT14INPUT15 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT15                   (_ADC_SCANMASK_SCANINPUTEN_INPUT15 << 0)              /**< Shifted mode INPUT15 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT16INPUT17            (_ADC_SCANMASK_SCANINPUTEN_INPUT16INPUT17 << 0)       /**< Shifted mode INPUT16INPUT17 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT15INPUT15NEGSEL      (_ADC_SCANMASK_SCANINPUTEN_INPUT15INPUT15NEGSEL << 0) /**< Shifted mode INPUT15INPUT15NEGSEL for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT16                   (_ADC_SCANMASK_SCANINPUTEN_INPUT16 << 0)              /**< Shifted mode INPUT16 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT17INPUT18            (_ADC_SCANMASK_SCANINPUTEN_INPUT17INPUT18 << 0)       /**< Shifted mode INPUT17INPUT18 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT16INPUT17            (_ADC_SCANMASK_SCANINPUTEN_INPUT16INPUT17 << 0)       /**< Shifted mode INPUT16INPUT17 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT17                   (_ADC_SCANMASK_SCANINPUTEN_INPUT17 << 0)              /**< Shifted mode INPUT17 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT17INPUT18            (_ADC_SCANMASK_SCANINPUTEN_INPUT17INPUT18 << 0)       /**< Shifted mode INPUT17INPUT18 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT18INPUT19            (_ADC_SCANMASK_SCANINPUTEN_INPUT18INPUT19 << 0)       /**< Shifted mode INPUT18INPUT19 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT18                   (_ADC_SCANMASK_SCANINPUTEN_INPUT18 << 0)              /**< Shifted mode INPUT18 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT19                   (_ADC_SCANMASK_SCANINPUTEN_INPUT19 << 0)              /**< Shifted mode INPUT19 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT19INPUT20            (_ADC_SCANMASK_SCANINPUTEN_INPUT19INPUT20 << 0)       /**< Shifted mode INPUT19INPUT20 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT20INPUT21            (_ADC_SCANMASK_SCANINPUTEN_INPUT20INPUT21 << 0)       /**< Shifted mode INPUT20INPUT21 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT20                   (_ADC_SCANMASK_SCANINPUTEN_INPUT20 << 0)              /**< Shifted mode INPUT20 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT21                   (_ADC_SCANMASK_SCANINPUTEN_INPUT21 << 0)              /**< Shifted mode INPUT21 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT21INPUT22            (_ADC_SCANMASK_SCANINPUTEN_INPUT21INPUT22 << 0)       /**< Shifted mode INPUT21INPUT22 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT21                   (_ADC_SCANMASK_SCANINPUTEN_INPUT21 << 0)              /**< Shifted mode INPUT21 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT22INPUT23            (_ADC_SCANMASK_SCANINPUTEN_INPUT22INPUT23 << 0)       /**< Shifted mode INPUT22INPUT23 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT22                   (_ADC_SCANMASK_SCANINPUTEN_INPUT22 << 0)              /**< Shifted mode INPUT22 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT23INPUT16            (_ADC_SCANMASK_SCANINPUTEN_INPUT23INPUT16 << 0)       /**< Shifted mode INPUT23INPUT16 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT23                   (_ADC_SCANMASK_SCANINPUTEN_INPUT23 << 0)              /**< Shifted mode INPUT23 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT24                   (_ADC_SCANMASK_SCANINPUTEN_INPUT24 << 0)              /**< Shifted mode INPUT24 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT23INPUT16            (_ADC_SCANMASK_SCANINPUTEN_INPUT23INPUT16 << 0)       /**< Shifted mode INPUT23INPUT16 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT24INPUT25            (_ADC_SCANMASK_SCANINPUTEN_INPUT24INPUT25 << 0)       /**< Shifted mode INPUT24INPUT25 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT25INPUT26            (_ADC_SCANMASK_SCANINPUTEN_INPUT25INPUT26 << 0)       /**< Shifted mode INPUT25INPUT26 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT24                   (_ADC_SCANMASK_SCANINPUTEN_INPUT24 << 0)              /**< Shifted mode INPUT24 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT25                   (_ADC_SCANMASK_SCANINPUTEN_INPUT25 << 0)              /**< Shifted mode INPUT25 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT26                   (_ADC_SCANMASK_SCANINPUTEN_INPUT26 << 0)              /**< Shifted mode INPUT26 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT25INPUT26            (_ADC_SCANMASK_SCANINPUTEN_INPUT25INPUT26 << 0)       /**< Shifted mode INPUT25INPUT26 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT26INPUT27            (_ADC_SCANMASK_SCANINPUTEN_INPUT26INPUT27 << 0)       /**< Shifted mode INPUT26INPUT27 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT27INPUT28            (_ADC_SCANMASK_SCANINPUTEN_INPUT27INPUT28 << 0)       /**< Shifted mode INPUT27INPUT28 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT26                   (_ADC_SCANMASK_SCANINPUTEN_INPUT26 << 0)              /**< Shifted mode INPUT26 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT27                   (_ADC_SCANMASK_SCANINPUTEN_INPUT27 << 0)              /**< Shifted mode INPUT27 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT28INPUT29            (_ADC_SCANMASK_SCANINPUTEN_INPUT28INPUT29 << 0)       /**< Shifted mode INPUT28INPUT29 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT27INPUT28            (_ADC_SCANMASK_SCANINPUTEN_INPUT27INPUT28 << 0)       /**< Shifted mode INPUT27INPUT28 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT28                   (_ADC_SCANMASK_SCANINPUTEN_INPUT28 << 0)              /**< Shifted mode INPUT28 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT28INPUT29            (_ADC_SCANMASK_SCANINPUTEN_INPUT28INPUT29 << 0)       /**< Shifted mode INPUT28INPUT29 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT29                   (_ADC_SCANMASK_SCANINPUTEN_INPUT29 << 0)              /**< Shifted mode INPUT29 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT29INPUT30            (_ADC_SCANMASK_SCANINPUTEN_INPUT29INPUT30 << 0)       /**< Shifted mode INPUT29INPUT30 for ADC_SCANMASK */
-#define ADC_SCANMASK_SCANINPUTEN_INPUT30                   (_ADC_SCANMASK_SCANINPUTEN_INPUT30 << 0)              /**< Shifted mode INPUT30 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT30INPUT31            (_ADC_SCANMASK_SCANINPUTEN_INPUT30INPUT31 << 0)       /**< Shifted mode INPUT30INPUT31 for ADC_SCANMASK */
+#define ADC_SCANMASK_SCANINPUTEN_INPUT30                   (_ADC_SCANMASK_SCANINPUTEN_INPUT30 << 0)              /**< Shifted mode INPUT30 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT31INPUT24            (_ADC_SCANMASK_SCANINPUTEN_INPUT31INPUT24 << 0)       /**< Shifted mode INPUT31INPUT24 for ADC_SCANMASK */
 #define ADC_SCANMASK_SCANINPUTEN_INPUT31                   (_ADC_SCANMASK_SCANINPUTEN_INPUT31 << 0)              /**< Shifted mode INPUT31 for ADC_SCANMASK */
 

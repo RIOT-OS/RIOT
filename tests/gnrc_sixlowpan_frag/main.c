@@ -25,8 +25,6 @@
 #include "net/gnrc/sixlowpan/frag/rb.h"
 #include "xtimer.h"
 
-#include "test_utils/interactive_sync.h"
-
 #define TEST_NETIF_HDR_SRC      { 0xb3, 0x47, 0x60, 0x49, \
                                   0x78, 0xfe, 0x95, 0x48 }
 #define TEST_NETIF_HDR_DST      { 0xa4, 0xf2, 0xd2, 0xc9, \
@@ -35,7 +33,7 @@
 #define TEST_TAG                (0x690e)
 #define TEST_PAGE               (0)
 #define TEST_RECEIVE_TIMEOUT    (100U)
-#define TEST_GC_TIMEOUT         (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US + TEST_RECEIVE_TIMEOUT)
+#define TEST_GC_TIMEOUT         (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US + TEST_RECEIVE_TIMEOUT)
 
 /* test date taken from an experimental run (uncompressed ICMPv6 echo reply with
  * 300 byte payload)*/
@@ -210,7 +208,7 @@ static const gnrc_sixlowpan_frag_rb_t *_first_non_empty_rbuf(void)
 {
     const gnrc_sixlowpan_frag_rb_t *rbuf = gnrc_sixlowpan_frag_rb_array();
 
-    for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         if (!gnrc_sixlowpan_frag_rb_entry_empty(&rbuf[i])) {
             return rbuf;
         }
@@ -251,7 +249,7 @@ static void _check_pktbuf(const gnrc_sixlowpan_frag_rb_t *entry)
     TEST_ASSERT_MESSAGE(gnrc_pktbuf_is_empty(), "Packet buffer is not empty");
 }
 
-static void test_rbuf_add__success_first_fragment(void)
+static void _rbuf_create_first_fragment(void)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, _fragment1, sizeof(_fragment1),
                                           GNRC_NETTYPE_SIXLOWPAN);
@@ -265,6 +263,15 @@ static void test_rbuf_add__success_first_fragment(void)
      * fragment 1 (fragment dispatch was removed, IPHC was applied etc.). */
     _test_entry(entry, TEST_FRAGMENT2_OFFSET,
                 TEST_FRAGMENT1_OFFSET, TEST_FRAGMENT2_OFFSET - 1);
+}
+
+static void test_rbuf_add__success_first_fragment(void)
+{
+    const gnrc_sixlowpan_frag_rb_t *entry;
+
+    _rbuf_create_first_fragment();
+    /* get entry to release entry->pkt it in `_check_pktbuf()` */
+    TEST_ASSERT_NOT_NULL((entry = _first_non_empty_rbuf()));
     _check_pktbuf(entry);
 }
 
@@ -323,7 +330,7 @@ static void test_rbuf_add__success_complete(void)
     msg_t msg = { .type = 0U };
     gnrc_netreg_entry_t reg = GNRC_NETREG_ENTRY_INIT_PID(
             GNRC_NETREG_DEMUX_CTX_ALL,
-            sched_active_pid
+            thread_getpid()
         );
 
     gnrc_netreg_register(TEST_DATAGRAM_NETTYPE, &reg);
@@ -381,7 +388,7 @@ static void test_rbuf_add__full_rbuf(void)
     gnrc_pktsnip_t *pkt;
     const gnrc_sixlowpan_frag_rb_t *rbuf;
 
-    for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         pkt = gnrc_pktbuf_add(NULL, _fragment1, sizeof(_fragment1),
                               GNRC_NETTYPE_SIXLOWPAN);
         TEST_ASSERT_NOT_NULL(pkt);
@@ -398,7 +405,7 @@ static void test_rbuf_add__full_rbuf(void)
             &_test_netif_hdr.hdr, pkt, TEST_FRAGMENT1_OFFSET, TEST_PAGE
         ));
     rbuf = gnrc_sixlowpan_frag_rb_array();
-    for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         const gnrc_sixlowpan_frag_rb_t *entry = &rbuf[i];
 
         TEST_ASSERT_MESSAGE(!gnrc_sixlowpan_frag_rb_entry_empty(entry),
@@ -458,7 +465,7 @@ static void test_rbuf_add__overlap_lhs(void)
             &_test_netif_hdr.hdr, pkt2, pkt2_offset, TEST_PAGE
         ));
     rbuf = gnrc_sixlowpan_frag_rb_array();
-    for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         const gnrc_sixlowpan_frag_rb_t *entry = &rbuf[i];
         if (!gnrc_sixlowpan_frag_rb_entry_empty(entry)) {
             static const size_t pkt3_offset = TEST_FRAGMENT3_OFFSET - 8U - 1;
@@ -507,7 +514,7 @@ static void test_rbuf_add__overlap_rhs(void)
             &_test_netif_hdr.hdr, pkt2, pkt2_offset, TEST_PAGE
         ));
     rbuf = gnrc_sixlowpan_frag_rb_array();
-    for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         const gnrc_sixlowpan_frag_rb_t *entry = &rbuf[i];
         if (!gnrc_sixlowpan_frag_rb_entry_empty(entry)) {
             static const size_t pkt3_offset = TEST_FRAGMENT3_OFFSET + 8U - 1U;
@@ -529,30 +536,59 @@ static void test_rbuf_add__overlap_rhs(void)
     _check_pktbuf(NULL);
 }
 
+static void test_rbuf_get_by_dg(void)
+{
+    const gnrc_sixlowpan_frag_rb_t *entry;
+
+    TEST_ASSERT_NULL(
+        gnrc_sixlowpan_frag_rb_get_by_datagram(&_test_netif_hdr.hdr, TEST_TAG)
+    );
+    /* add a fragment */
+    _rbuf_create_first_fragment();
+    TEST_ASSERT_NOT_NULL(
+        gnrc_sixlowpan_frag_rb_get_by_datagram(&_test_netif_hdr.hdr, TEST_TAG)
+    );
+    /* get entry to release entry->pkt it in `_check_pktbuf()` */
+    entry = _first_non_empty_rbuf();
+    /* entry is however not properly removed yet */
+    TEST_ASSERT_NOT_NULL(entry);
+    _check_pktbuf(entry);
+}
+
 static void test_rbuf_exists(void)
 {
+    const gnrc_sixlowpan_frag_rb_t *entry;
+
     TEST_ASSERT(!gnrc_sixlowpan_frag_rb_exists(&_test_netif_hdr.hdr, TEST_TAG));
     /* add a fragment */
-    test_rbuf_add__success_first_fragment();
+    _rbuf_create_first_fragment();
     TEST_ASSERT(gnrc_sixlowpan_frag_rb_exists(&_test_netif_hdr.hdr, TEST_TAG));
+    /* get entry to release entry->pkt it in `_check_pktbuf()` */
+    entry = _first_non_empty_rbuf();
+    /* entry is however not properly removed yet */
+    TEST_ASSERT_NOT_NULL(entry);
+    _check_pktbuf(entry);
 }
 
 static void test_rbuf_rm_by_dg(void)
 {
     /* add a fragment */
-    test_rbuf_add__success_first_fragment();
+    _rbuf_create_first_fragment();
     gnrc_sixlowpan_frag_rb_rm_by_datagram(&_test_netif_hdr.hdr, TEST_TAG);
     TEST_ASSERT(!gnrc_sixlowpan_frag_rb_exists(&_test_netif_hdr.hdr, TEST_TAG));
+    _check_pktbuf(NULL);
 }
 
 static void test_rbuf_rm(void)
 {
     const gnrc_sixlowpan_frag_rb_t *entry;
 
-    test_rbuf_add__success_first_fragment();
+    _rbuf_create_first_fragment();
     entry = _first_non_empty_rbuf();
     /* entry is however not properly removed yet */
     TEST_ASSERT_NOT_NULL(entry);
+    /* release packet as `gnrc_sixlowpan_frag_rb_remove()` does not do this */
+    gnrc_pktbuf_release(entry->pkt);
     /* intentionally discarding const qualifier since we enter rbuf's internal
      * context again */
     gnrc_sixlowpan_frag_rb_remove((gnrc_sixlowpan_frag_rb_t *)entry);
@@ -572,8 +608,8 @@ static void test_rbuf_gc__manually(void)
             &_test_netif_hdr.hdr, pkt, TEST_FRAGMENT1_OFFSET, TEST_PAGE
         )));
     TEST_ASSERT_NOT_NULL(entry);
-    /* set arrival GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US into the past */
-    entry->super.arrival -= GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US;
+    /* set arrival CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US into the past */
+    entry->super.arrival -= CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US;
     gnrc_sixlowpan_frag_rb_gc();
     /* reassembly buffer is now empty */
     TEST_ASSERT_NULL(_first_non_empty_rbuf());
@@ -614,6 +650,7 @@ static void run_unittests(void)
         new_TestFixture(test_rbuf_add__too_big_fragment),
         new_TestFixture(test_rbuf_add__overlap_lhs),
         new_TestFixture(test_rbuf_add__overlap_rhs),
+        new_TestFixture(test_rbuf_get_by_dg),
         new_TestFixture(test_rbuf_exists),
         new_TestFixture(test_rbuf_rm_by_dg),
         new_TestFixture(test_rbuf_rm),
@@ -629,10 +666,6 @@ static void run_unittests(void)
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
-    /* no auto-init, so xtimer needs to be initialized manually*/
-    xtimer_init();
     /* netreg requires queue, but queue size one should be enough for us */
     msg_init_queue(&_msg_queue, 1U);
     run_unittests();

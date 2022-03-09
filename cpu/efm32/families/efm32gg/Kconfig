@@ -1,0 +1,237 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_FAM_EFM32GG
+    bool
+    select CPU_CORE_CORTEX_M3
+    select CPU_COMMON_EFM32
+    select CPU_EFM32_SERIES0
+    select HAS_CORTEXM_MPU
+
+config MODULE_CPU_EFM32GG
+    bool
+    depends on CPU_FAM_EFM32GG
+    depends on TEST_KCONFIG
+    default y
+    help
+        EFM32GG family-specific code.
+
+## CPU Models
+config CPU_MODEL_EFM32GG330F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG295F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG940F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG840F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG332F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG990F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG890F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG232F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG942F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG842F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG395F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG295F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG995F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG895F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG395F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG230F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG895F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG390F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG290F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG995F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG980F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG940F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG942F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG330F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG230F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG842F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG332F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG232F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG880F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG840F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG380F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG890F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG990F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG290F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG390F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG900F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG900F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG380F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG280F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG280F512
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG980F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+config CPU_MODEL_EFM32GG880F1024
+    bool
+    select CPU_FAM_EFM32GG
+
+## Common CPU symbols
+config CPU_FAM
+    default "efm32gg" if CPU_FAM_EFM32GG
+
+config CPU_MODEL
+    default "efm32gg330f512"  if CPU_MODEL_EFM32GG330F512
+    default "efm32gg295f512"  if CPU_MODEL_EFM32GG295F512
+    default "efm32gg940f1024" if CPU_MODEL_EFM32GG940F1024
+    default "efm32gg840f1024" if CPU_MODEL_EFM32GG840F1024
+    default "efm32gg332f512"  if CPU_MODEL_EFM32GG332F512
+    default "efm32gg990f512"  if CPU_MODEL_EFM32GG990F512
+    default "efm32gg890f512"  if CPU_MODEL_EFM32GG890F512
+    default "efm32gg232f512"  if CPU_MODEL_EFM32GG232F512
+    default "efm32gg942f1024" if CPU_MODEL_EFM32GG942F1024
+    default "efm32gg842f1024" if CPU_MODEL_EFM32GG842F1024
+    default "efm32gg395f1024" if CPU_MODEL_EFM32GG395F1024
+    default "efm32gg295f1024" if CPU_MODEL_EFM32GG295F1024
+    default "efm32gg995f1024" if CPU_MODEL_EFM32GG995F1024
+    default "efm32gg895f1024" if CPU_MODEL_EFM32GG895F1024
+    default "efm32gg395f512"  if CPU_MODEL_EFM32GG395F512
+    default "efm32gg230f512"  if CPU_MODEL_EFM32GG230F512
+    default "efm32gg895f512"  if CPU_MODEL_EFM32GG895F512
+    default "efm32gg390f512"  if CPU_MODEL_EFM32GG390F512
+    default "efm32gg290f512"  if CPU_MODEL_EFM32GG290F512
+    default "efm32gg995f512"  if CPU_MODEL_EFM32GG995F512
+    default "efm32gg980f512"  if CPU_MODEL_EFM32GG980F512
+    default "efm32gg940f512"  if CPU_MODEL_EFM32GG940F512
+    default "efm32gg942f512"  if CPU_MODEL_EFM32GG942F512
+    default "efm32gg330f1024" if CPU_MODEL_EFM32GG330F1024
+    default "efm32gg230f1024" if CPU_MODEL_EFM32GG230F1024
+    default "efm32gg842f512"  if CPU_MODEL_EFM32GG842F512
+    default "efm32gg332f1024" if CPU_MODEL_EFM32GG332F1024
+    default "efm32gg232f1024" if CPU_MODEL_EFM32GG232F1024
+    default "efm32gg880f512"  if CPU_MODEL_EFM32GG880F512
+    default "efm32gg840f512"  if CPU_MODEL_EFM32GG840F512
+    default "efm32gg380f512"  if CPU_MODEL_EFM32GG380F512
+    default "efm32gg890f1024" if CPU_MODEL_EFM32GG890F1024
+    default "efm32gg990f1024" if CPU_MODEL_EFM32GG990F1024
+    default "efm32gg290f1024" if CPU_MODEL_EFM32GG290F1024
+    default "efm32gg390f1024" if CPU_MODEL_EFM32GG390F1024
+    default "efm32gg900f1024" if CPU_MODEL_EFM32GG900F1024
+    default "efm32gg900f512"  if CPU_MODEL_EFM32GG900F512
+    default "efm32gg380f1024" if CPU_MODEL_EFM32GG380F1024
+    default "efm32gg280f1024" if CPU_MODEL_EFM32GG280F1024
+    default "efm32gg280f512"  if CPU_MODEL_EFM32GG280F512
+    default "efm32gg980f1024" if CPU_MODEL_EFM32GG980F1024
+    default "efm32gg880f1024" if CPU_MODEL_EFM32GG880F1024

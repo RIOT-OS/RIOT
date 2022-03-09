@@ -73,15 +73,10 @@ extern "C" {
  * @name    Accelerometer configuration
  * @{
  */
-#define LIS2DH12_PARAM_CS   GPIO_PIN(0, 8)
-#define LIS2DH12_PARAM_INT1 GPIO_PIN(0, 2)
-#define LIS2DH12_PARAM_INT2 GPIO_PIN(0, 6)
+#define LIS2DH12_PARAM_CS       GPIO_PIN(0, 8)
+#define LIS2DH12_PARAM_INT_PIN1 GPIO_PIN(0, 2)
+#define LIS2DH12_PARAM_INT_PIN2 GPIO_PIN(0, 6)
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

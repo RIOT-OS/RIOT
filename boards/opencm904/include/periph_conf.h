@@ -19,45 +19,17 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+/* This board provides an HSE */
+#ifndef CONFIG_BOARD_HAS_HSE
+#define CONFIG_BOARD_HAS_HSE    1
+#endif
+
 #include "periph_cpu.h"
+#include "clk_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Clock system configuration
- * @{
- **/
-/* high speed clock configuration:
- * 0 := use internal HSI oscillator (always 8MHz)
- * HSE frequency value := use external HSE oscillator with given freq [in Hz]
- *                        must be 4000000 <= value <= 16000000 */
-#define CLOCK_HSE           (8000000U)
-/* low speed clock configuration:
- * 0 := use internal LSI oscillator (~40kHz)
- * 1 := use extern LSE oscillator, always 32.768kHz */
-#define CLOCK_LSE           (0)
-/* targeted system clock speed [in Hz], must be <= 72MHz */
-#define CLOCK_CORECLOCK     (72000000U)
-/* PLL configuration, set both values to zero to disable PLL usage. The values
- * must be set to satisfy the following equation:
- * CORECLOCK := CLOCK_SOURCE / PLL_DIV * PLL_MUL
- * with
- * 1 <= CLOCK_PLL_DIV <= 2
- * 2 <= CLOCK_PLL_MUL <= 17 */
-#define CLOCK_PLL_DIV       (1)
-#define CLOCK_PLL_MUL       (9)
-/* AHB and APBx bus clock configuration, keep in mind the following constraints:
- * ABP1 <= 36MHz
- */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV1
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV2
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 2)
-/** @} */
 
 /**
  * @name   Timer configuration

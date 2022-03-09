@@ -8,7 +8,6 @@
  */
 
 /**
- * @defgroup    bootloaders    RIOT compatible bootloaders
  * @ingroup     bootloaders
  * @{
  *

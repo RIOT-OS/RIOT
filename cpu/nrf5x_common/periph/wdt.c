@@ -19,13 +19,15 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "timex.h"
 #include "periph/wdt.h"
 
 #include "nrf_clock.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* By default, allow watchdog during sleep.

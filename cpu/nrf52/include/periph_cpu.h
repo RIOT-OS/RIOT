@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015-2018 Freie Universität Berlin
+ *               2020 Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief           nRF52 specific definitions for handling peripherals
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author          Philipp-Alexander Blum <philipp-blum@jakiku.de>
  */
 
 #ifndef PERIPH_CPU_H
@@ -23,6 +25,14 @@
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+/**
+ * @brief   Enable the workaround for the SPI single byte transmit errata (No.
+ * 58 on the nrf52832)
+ */
+#ifdef CPU_MODEL_NRF52832XXAA
+#define ERRATA_SPI_SINGLE_BYTE_WORKAROUND (1)
 #endif
 
 /**
@@ -42,7 +52,7 @@ extern "C" {
 #define SPI_SCKSEL          (dev(bus)->PSEL.SCK)
 #define SPI_MOSISEL         (dev(bus)->PSEL.MOSI)
 #define SPI_MISOSEL         (dev(bus)->PSEL.MISO)
-#ifndef CPU_MODEL_NRF52840XXAA
+#ifdef CPU_MODEL_NRF52832XXAA
 #define UART_IRQN           (UARTE0_UART0_IRQn)
 #endif
 /** @} */
@@ -50,7 +60,19 @@ extern "C" {
 /**
  * @brief   The nRF52 family of CPUs provides a fixed number of 9 ADC lines
  */
+#ifdef SAADC_CH_PSELP_PSELP_VDDHDIV5
+#define ADC_NUMOF           (10U)
+#else
 #define ADC_NUMOF           (9U)
+#endif
+
+/**
+ * @brief   SPI temporary buffer size for storing const data in RAM before
+ *          initiating DMA transfer
+ */
+#ifndef CONFIG_SPI_MBUF_SIZE
+#define CONFIG_SPI_MBUF_SIZE    64
+#endif
 
 /**
  * @brief   nRF52 specific naming of ADC lines (for convenience)
@@ -65,6 +87,9 @@ enum {
     NRF52_AIN6 = 6,         /**< Analog Input 6 */
     NRF52_AIN7 = 7,         /**< Analog Input 7 */
     NRF52_VDD  = 8,         /**< VDD, not useful if VDD is reference... */
+#ifdef SAADC_CH_PSELP_PSELP_VDDHDIV5
+    NRF52_VDDHDIV5 = 9,     /**< VDDH divided by 5 */
+#endif
 };
 
 #ifndef DOXYGEN
@@ -105,8 +130,8 @@ typedef enum {
  */
 typedef struct {
     NRF_TWIM_Type *dev;         /**< TWIM hardware device */
-    uint8_t scl;                /**< SCL pin */
-    uint8_t sda;                /**< SDA pin */
+    gpio_t scl;                 /**< SCL pin */
+    gpio_t sda;                 /**< SDA pin */
     i2c_speed_t speed;          /**< Bus speed */
 } i2c_conf_t;
 /** @} */
@@ -117,6 +142,14 @@ typedef struct {
  */
 #define PERIPH_I2C_NEED_READ_REG
 #define PERIPH_I2C_NEED_WRITE_REG
+/** @} */
+
+/**
+ * @name    Define macros for sda and scl pin to be able to reinitialize them
+ * @{
+ */
+#define i2c_pin_sda(dev) i2c_config[dev].sda
+#define i2c_pin_scl(dev) i2c_config[dev].scl
 /** @} */
 
 /**
@@ -155,25 +188,91 @@ typedef enum {
  * @note    define unused pins only from right to left, so the defined channels
  *          always start with channel 0 to x and the undefined ones are from x+1
  *          to PWM_CHANNELS.
+ *
+ * @warning All the channels not in active use must be set to GPIO_UNDEF; just
+ *          initializing fewer members of pin would insert a 0 value, which
+ *          would be interpreted as the P0.00 pin that's then driven.
  */
+#if defined(PWM_PRESENT) || DOXYGEN
 typedef struct {
     NRF_PWM_Type *dev;                  /**< PWM device descriptor */
-    uint32_t pin[PWM_CHANNELS];         /**< PWM out pins */
+    gpio_t pin[PWM_CHANNELS];           /**< PWM out pins */
 } pwm_conf_t;
+#endif
 
-#ifdef CPU_MODEL_NRF52840XXAA
+#if !defined(CPU_MODEL_NRF52832XXAA)
 /**
  * @brief   Structure for UART configuration data
  */
 typedef struct {
-    NRF_UARTE_Type *dev;    /**< UART with EasyDMA device base register address */
-    uint8_t rx_pin;         /**< RX pin */
-    uint8_t tx_pin;         /**< TX pin */
-    uint8_t rts_pin;        /**< RTS pin - set to GPIO_UNDEF when not using HW flow control */
-    uint8_t cts_pin;        /**< CTS pin - set to GPIO_UNDEF when not using HW flow control */
+    NRF_UARTE_Type *dev;    /**< UART with EasyDMA device base
+                             * register address */
+    gpio_t rx_pin;          /**< RX pin */
+    gpio_t tx_pin;          /**< TX pin */
+#ifdef MODULE_PERIPH_UART_HW_FC
+    gpio_t rts_pin;         /**< RTS pin */
+    gpio_t cts_pin;         /**< CTS pin */
+#endif
     uint8_t irqn;           /**< IRQ channel */
 } uart_conf_t;
 #endif
+
+/**
+ * @brief   Size of the UART TX buffer for non-blocking mode.
+ */
+#ifndef UART_TXBUF_SIZE
+#define UART_TXBUF_SIZE    (64)
+#endif
+
+/**
+ * @brief  SPI configuration values
+ */
+typedef struct {
+    NRF_SPIM_Type *dev; /**< SPI device used */
+    gpio_t sclk;        /**< CLK pin */
+    gpio_t mosi;        /**< MOSI pin */
+    gpio_t miso;        /**< MISO pin */
+#if ERRATA_SPI_SINGLE_BYTE_WORKAROUND
+    uint8_t ppi;        /**< PPI channel */
+#endif
+} spi_conf_t;
+
+/**
+ * @brief Common SPI/I2C interrupt callback
+ *
+ * @param   arg     Opaque context pointer
+ */
+typedef void (*spi_twi_irq_cb_t)(void *arg);
+
+/**
+ * @brief Reqister a SPI IRQ handler for a shared I2C/SPI irq vector
+ *
+ * @param   bus bus to register the IRQ handler on
+ * @param   cb  callback to call on IRQ
+ * @param   arg Argument to pass to the handler
+ */
+void spi_twi_irq_register_spi(NRF_SPIM_Type *bus,
+                              spi_twi_irq_cb_t cb, void *arg);
+
+/**
+ * @brief Reqister a I2C IRQ handler for a shared I2C/SPI irq vector
+ *
+ * @param   bus bus to register the IRQ handler on
+ * @param   cb  callback to call on IRQ
+ * @param   arg Argument to pass to the handler
+ */
+void spi_twi_irq_register_i2c(NRF_TWIM_Type *bus,
+                              spi_twi_irq_cb_t cb, void *arg);
+
+/**
+ * @brief USBDEV buffers must be word aligned because of DMA restrictions
+ */
+#define USBDEV_CPU_DMA_ALIGNMENT       (4)
+
+/**
+ * @brief USBDEV buffer instantiation requirement
+ */
+#define USBDEV_CPU_DMA_REQUIREMENTS    __attribute__((aligned(USBDEV_CPU_DMA_ALIGNMENT)))
 
 #ifdef __cplusplus
 }

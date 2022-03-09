@@ -1,0 +1,66 @@
+' to generate SVG run plantuml -tsvg gnrc_ipv6_auto_subnets-flow.puml
+@startuml
+
+<style>
+participant {
+	FontColor	#white
+	BackGroundColor	#275a4b
+	LineColor	#3fa687
+	LineThickness	2.0
+}
+
+actor {
+	FontColor	#white
+	BackGroundColor	#275a4b
+	LineColor	#3fa687
+	LineThickness	2.0
+}
+
+note {
+	FontColor	white
+	BackGroundColor	#30735f
+	LineColor	#388d73
+}
+
+arrow {
+	LineColor	#3fa687
+	LineThickness	2.0
+}
+
+</style>
+
+skinparam sequence {
+	LifeLineBorderColor	#275a4b
+	LifeLineBorderThickness	2
+}
+
+participant "**A**\n2e:a3:9e:a9:68:<i>23</i>" as A
+participant "**B**\n2e:a3:9e:a9:68:<i>42</i>" as B
+participant "**C**\n2e:a3:9e:a9:68:<i>f6</i>" as C
+
+note across: <i>Address of **A** < Address of **B** < Address of **C**</i>
+
+note over A: index: 0\nlocal subnets: 2
+/ note over C: index: 0\nlocal subnets: 1
+/ note over B: index: 0\nlocal subnets: 1
+
+A -> C: I want to create **2** local subnets
+A -> B: I want to create **2** local subnets
+
+note over C: index: **2**\ntotal subnets: **3**
+/ note over B: index: **2**\ntotal subnets: **3**
+
+C -> A: I want to create **1** local subnet
+C -> B: I want to create **1** local subnet
+
+note over A: index: 0\ntotal subnets: **3**
+/ note over B: index: 2\ntotal subnets: **4**
+
+B -> C: I want to create **1** local subnet
+B -> A: I want to create **1** local subnet
+
+note over A: index: 0 local: 2\ntotal subnets: **4**
+/ note over C: index: **3** local: 1\ntotal subnets: **4**
+/ note over B: index: 2 local: 1\ntotal subnets: 4
+
+@enduml

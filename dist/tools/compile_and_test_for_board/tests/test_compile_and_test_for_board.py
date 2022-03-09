@@ -10,7 +10,7 @@ def test_help_message():
     script = 'compile_and_test_for_board.py'
 
     # Read the help message from executing the script
-    help_bytes = subprocess.check_output(['./%s' % script, '--help'])
+    help_bytes = subprocess.check_output([f'./{script}', '--help'])
     help_msg = help_bytes.decode('utf-8')
 
     docstring = compile_and_test_for_board.__doc__

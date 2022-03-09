@@ -77,8 +77,6 @@ void fletcher16_update(fletcher16_ctx_t *ctx, const uint8_t *data, size_t len);
  */
 uint16_t fletcher16_finish(fletcher16_ctx_t *ctx);
 
-
-
 #ifdef __cplusplus
 }
 #endif

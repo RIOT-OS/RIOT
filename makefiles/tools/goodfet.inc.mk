@@ -1,0 +1,5 @@
+FLASHER ?= $(RIOTTOOLS)/goodfet/goodfet.bsl
+FLASHFILE ?= $(HEXFILE)
+
+GOODFET_FLAGS += -c $(PROG_DEV) -r -e -I -p $(FLASHFILE)
+FFLAGS ?= $(GOODFET_FLAGS)

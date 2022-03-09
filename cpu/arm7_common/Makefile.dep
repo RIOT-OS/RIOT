@@ -1,0 +1,11 @@
+# use common ARM7 periph code
+USEMODULE += arm7_common_periph
+
+FEATURES_REQUIRED_ANY += newlib|picolibc
+ifneq (,$(filter newlib,$(USEMODULE)))
+  # use the nano-specs of Newlib when available
+  DEFAULT_MODULE += newlib_nano
+endif
+
+# Make calls to malloc and friends thread-safe
+USEMODULE += malloc_thread_safe

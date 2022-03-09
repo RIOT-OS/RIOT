@@ -1,0 +1,7 @@
+# include variants of VCNL40x0 drivers as pseudo modules
+PSEUDOMODULES += vcnl4010
+PSEUDOMODULES += vcnl4020
+PSEUDOMODULES += vcnl4040
+
+USEMODULE_INCLUDES_vcnl40x0 := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_vcnl40x0)

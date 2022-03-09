@@ -1,0 +1,77 @@
+## CPU Models
+config CPU_MODEL_SAML21E15B
+    bool
+    select CPU_FAM_SAML21
+
+config CPU_MODEL_SAML21E16B
+    bool
+    select CPU_FAM_SAML21
+
+config CPU_MODEL_SAML21E17B
+    bool
+    select CPU_FAM_SAML21
+
+config CPU_MODEL_SAML21E18B
+    bool
+    select CPU_FAM_SAML21
+
+config CPU_MODEL_SAML21G16B
+    bool
+    select CPU_FAM_SAML21
+
+config CPU_MODEL_SAML21G17B
+    bool
+    select CPU_FAM_SAML21
+
+config CPU_MODEL_SAML21G18B
+    bool
+    select CPU_FAM_SAML21
+
+config CPU_MODEL_SAML21J16B
+    bool
+    select CPU_FAM_SAML21
+
+config CPU_MODEL_SAML21J17B
+    bool
+    select CPU_FAM_SAML21
+
+config CPU_MODEL_SAML21J17BU
+    bool
+    select CPU_FAM_SAML21
+
+config CPU_MODEL_SAML21J18B
+    bool
+    select CPU_FAM_SAML21
+
+config CPU_MODEL_SAML21J18BU
+    bool
+    select CPU_FAM_SAML21
+
+config CPU_MODEL_SAML21E18A
+    bool
+    select CPU_FAM_SAML21
+
+config CPU_MODEL_SAML21G18A
+    bool
+    select CPU_FAM_SAML21
+
+config CPU_MODEL_SAML21J18A
+    bool
+    select CPU_FAM_SAML21
+
+config CPU_MODEL
+    default "saml21e15b" if CPU_MODEL_SAML21E15B
+    default "saml21e16b" if CPU_MODEL_SAML21E16B
+    default "saml21e17b" if CPU_MODEL_SAML21E17B
+    default "saml21e18b" if CPU_MODEL_SAML21E18B
+    default "saml21g16b" if CPU_MODEL_SAML21G16B
+    default "saml21g17b" if CPU_MODEL_SAML21G17B
+    default "saml21g18b" if CPU_MODEL_SAML21G18B
+    default "saml21j16b" if CPU_MODEL_SAML21J16B
+    default "saml21j17b" if CPU_MODEL_SAML21J17B
+    default "saml21j17bu" if CPU_MODEL_SAML21J17BU
+    default "saml21j18b" if CPU_MODEL_SAML21J18B
+    default "saml21j18bu" if CPU_MODEL_SAML21J18BU
+    default "saml21e18a" if CPU_MODEL_SAML21E18A
+    default "saml21g18a" if CPU_MODEL_SAML21G18A
+    default "saml21j18a" if CPU_MODEL_SAML21J18A

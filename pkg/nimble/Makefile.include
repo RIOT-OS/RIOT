@@ -7,7 +7,12 @@ INCLUDES += -I$(RIOTPKG)/nimble/contrib/include
 INCLUDES += $(NIMIBASE)/nimble/include
 
 # include the RIOT NPL headers
-INCLUDES += $(NIMIBASE)/porting/npl/riot/include
+ifneq (,$(filter nimble_npl_riot,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/porting/npl/riot/include
+else
+  INCLUDES += $(NIMIBASE)/porting/npl/riot/include/npl_syscfg
+  INCLUDES += -I$(RIOTPKG)/nimble/npl/include
+endif
 INCLUDES += $(NIMIBASE)/porting/nimble/include
 
 # include nimble controller headers
@@ -15,10 +20,19 @@ ifneq (,$(filter nimble_controller,$(USEMODULE)))
   INCLUDES += $(NIMIBASE)/nimble/controller/include
   # set environment
   CFLAGS += -DNIMBLE_CFG_CONTROLLER=1
-  CFLAGS += -DMYNEWT_VAL_OS_CPUTIME_FREQ=32768
-
+  ifneq (,$(filter nimble_npl_riot,$(USEMODULE)))
+    CFLAGS += -DMYNEWT_VAL_OS_CPUTIME_FREQ=32768
+  endif
   ifneq (,$(filter nimble_drivers_nrf5x,$(USEMODULE)))
     INCLUDES += $(NIMIBASE)/nimble/drivers/$(CPU_FAM)/include
+  endif
+
+  # Enable additional PHY modes if requested by the build
+  ifneq (,$(filter ble_phy_2mbit,$(FEATURES_USED)))
+    CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_LE_2M_PHY=1
+  endif
+  ifneq (,$(filter ble_phy_coded,$(FEATURES_USED)))
+    CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_LE_CODED_PHY=1
   endif
 endif
 
@@ -31,11 +45,6 @@ ifneq (,$(filter nimble_host_store_ram,$(USEMODULE)))
 endif
 ifneq (,$(filter nimble_host_util,$(USEMODULE)))
   INCLUDES += $(NIMIBASE)/nimble/host/util/include
-endif
-
-# include tinycrypt headers
-ifneq (,$(filter nimble_controller,$(USEMODULE)))
-  INCLUDES += $(NIMIBASE)/ext/tinycrypt/include
 endif
 
 # include transport headers
@@ -76,24 +85,77 @@ endif
 ifneq (,$(filter nimble_addr,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/addr/include
 endif
+
+ifneq (,$(filter nimble_autoadv,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/nimble/autoadv/include
+endif
+
 ifneq (,$(filter nimble_autoconn,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/autoconn/include
 endif
+
+ifneq (,$(filter nimble_adv_ext,$(USEMODULE)))
+  CFLAGS += -DMYNEWT_VAL_BLE_EXT_ADV=1
+  CFLAGS += -DMYNEWT_VAL_BLE_LL_EXT_ADV_AUX_PTR_CNT=2
+  ifneq (,$(filter nimble_controller,$(USEMODULE)))
+    CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_LL_EXT_ADV=1
+  endif
+endif
+
 ifneq (,$(filter nimble_netif,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/netif/include
 
   # configure NimBLE's internals
   NIMBLE_MAX_CONN ?= 3
-  CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_SIZE=264
   CFLAGS += -DMYNEWT_VAL_BLE_L2CAP_COC_MAX_NUM=$(NIMBLE_MAX_CONN)
   CFLAGS += -DMYNEWT_VAL_BLE_MAX_CONNECTIONS=$(NIMBLE_MAX_CONN)
-  # NimBLEs internal buffer need to hold one IPv6 MTU per connection
-  # for the internal MTU of 256 byte, we need 10 mbufs per connection...
+
+  # the maximum fragment size that we can receive. For maximum efficiency this
+  # should be equal to the maximum configured link layer packet size.
+  # WARNING: this value MUST never be larger than MYNEWT_VAL_BLE_LL_MAX_PKT_SIZE
+  CFLAGS += -DMYNEWT_VAL_BLE_L2CAP_COC_MPS=251
+
+  # in order to fit a 251 byte COC data segment into a single mbuf buffer, the
+  # used block size must be at least 297 byte (251 data + 48 overhead)
+  CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_SIZE="(MYNEWT_VAL_BLE_L2CAP_COC_MPS + 48)"
+
+  # in the worst case, NimBLEs internal buffer needs to hold two full IPv6 MTUs
+  # per connection (1 TX and 1 RX). But in practice this would be highly over-
+  # provisioned. Allocating 10 memory blocks per connection plus another 5
+  # for internal buffering has proven to be a generous default value.
   CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_COUNT=35
+
+  # optimize the NimBLE controller for IP traffic
+  ifneq (,$(filter nimble_controller,$(USEMODULE)))
+    CFLAGS += -DMYNEWT_VAL_BLE_LL_MAX_PKT_SIZE=251
+    CFLAGS += -DMYNEWT_VAL_BLE_LL_CONN_INIT_SLOTS=1
+    CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_DATA_LEN_EXT=1
+  endif
+else
+  ifneq (,$(filter stdio_nimble,$(USEMODULE)))
+    # the maximum fragment size that we can receive. For maximum efficiency this
+    # should be equal to the maximum configured link layer packet size.
+    # WARNING: this value MUST never be larger than MYNEWT_VAL_BLE_LL_MAX_PKT_SIZE
+    CFLAGS += -DMYNEWT_VAL_BLE_L2CAP_COC_MPS=251
+
+    # in order to fit a 251 byte COC data segment into a single mbuf buffer, the
+    # used block size must be at least 297 byte (251 data + 48 overhead)
+    CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_SIZE="(MYNEWT_VAL_BLE_L2CAP_COC_MPS + 48)"
+  endif
 endif
+
+ifneq (,$(filter nimble_rpble,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/nimble/rpble/include
+endif
+
 ifneq (,$(filter nimble_scanlist,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/scanlist/include
 endif
+
 ifneq (,$(filter nimble_scanner,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/scanner/include
+endif
+
+ifneq (,$(filter nimble_statconn,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/nimble/statconn/include
 endif

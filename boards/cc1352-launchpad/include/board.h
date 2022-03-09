@@ -42,7 +42,7 @@ extern "C" {
  * @name    On-board button configuration
  * @{
  */
-#define BTN0_PIN            GPIO_PIN(0, 13)
+#define BTN0_PIN            GPIO_PIN(0, 15)
 #define BTN0_MODE           GPIO_IN_PU
 
 #define BTN1_PIN            GPIO_PIN(0, 14)
@@ -64,11 +64,6 @@ extern "C" {
 #define LED1_OFF            gpio_clear(LED1_PIN)
 #define LED1_TOGGLE         gpio_toggle(LED1_PIN)
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

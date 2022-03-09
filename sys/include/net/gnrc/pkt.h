@@ -25,8 +25,9 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
-#include "kernel_types.h"
+#include "sched.h"
 #include "net/gnrc/nettype.h"
+#include "list.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -123,6 +124,24 @@ typedef struct gnrc_pktsnip {
 } gnrc_pktsnip_t;
 
 /**
+ * @brief   Returns the snip before a given snip in a packet
+ *
+ * @param[in] pkt   A packet.
+ * @param[in] snip  The snip for which the predecessor in @p pkt is searched for.
+ *
+ * @return  The snip before @p snip in @p pkt if @p snip is in @p pkt.
+ * @return  `NULL`, if @p snip is not in @p pkt.
+ */
+static inline gnrc_pktsnip_t *gnrc_pkt_prev_snip(gnrc_pktsnip_t *pkt,
+                                                 gnrc_pktsnip_t *snip)
+{
+    while ((pkt != NULL) && (pkt->next != snip)) {
+        pkt = pkt->next;
+    }
+    return pkt;
+}
+
+/**
  * @brief Calculates length of a packet in byte.
  *
  * @param[in] pkt  list of packet snips.
@@ -139,6 +158,62 @@ static inline size_t gnrc_pkt_len(const gnrc_pktsnip_t *pkt)
     }
 
     return len;
+}
+
+/**
+ * @brief   Appends a snip to a packet.
+ *
+ * @param[in] pkt   A packet.
+ * @param[in] snip  A snip.
+ *
+ * @return  The new head of @p pkt.
+ */
+static inline gnrc_pktsnip_t *gnrc_pkt_append(gnrc_pktsnip_t *pkt,
+                                              gnrc_pktsnip_t *snip)
+{
+    /* find last snip in pkt */
+    gnrc_pktsnip_t *last = gnrc_pkt_prev_snip(pkt, NULL);
+
+    if (last != NULL) {
+        last->next = snip;
+    }
+    else {
+        /* last == NULL means snip */
+        pkt = snip;
+    }
+    return pkt;
+}
+
+/**
+ * @brief   Prepends a snip to a packet.
+ *
+ * @param[in] pkt   A packet.
+ * @param[in] snip  A snip.
+ *
+ * @return  The new head of @p pkt.
+ */
+static inline gnrc_pktsnip_t *gnrc_pkt_prepend(gnrc_pktsnip_t *pkt,
+                                               gnrc_pktsnip_t *snip)
+{
+    snip->next = pkt;
+    return snip;
+}
+
+/**
+ * @brief   Deletes a snip from a packet.
+ *
+ * @param[in] pkt   A packet.
+ * @param[in] snip  A snip.
+ *
+ * @return  The new head of @p pkt.
+ */
+static inline gnrc_pktsnip_t *gnrc_pkt_delete(gnrc_pktsnip_t *pkt,
+                                              gnrc_pktsnip_t *snip)
+{
+    list_node_t list = { (list_node_t *)pkt };
+
+    list_remove(&list, (list_node_t *)snip);
+    return (gnrc_pktsnip_t *)list.next;
 }
 
 /**

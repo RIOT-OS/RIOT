@@ -21,8 +21,18 @@
 #include <stdint.h>
 #include <sys/types.h>
 
+#include "kernel_defines.h"
+
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#if IS_USED(MODULE_LWIP_IPV6)
+#include "net/ipv6.h"
+#define SOCK_IP_EP_ANY  SOCK_IPV6_EP_ANY
+#elif IS_USED(MODULE_LWIP_IPV4)
+#include "net/ipv4.h"
+#define SOCK_IP_EP_ANY  SOCK_IPV4_EP_ANY
 #endif
 
 /**

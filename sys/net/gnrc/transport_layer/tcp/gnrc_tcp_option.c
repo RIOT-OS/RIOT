@@ -16,17 +16,19 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  * @}
  */
-#include "internal/common.h"
-#include "internal/option.h"
+#include "include/gnrc_tcp_common.h"
+#include "include/gnrc_tcp_option.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
-int _option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr)
+int _gnrc_tcp_option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr)
 {
+    TCP_DEBUG_ENTER;
     /* Extract offset value. Return if no options are set */
     uint8_t offset = GET_OFFSET(byteorder_ntohs(hdr->off_ctl));
     if (offset <= TCP_HDR_OFFSET_MIN) {
+        TCP_DEBUG_LEAVE;
         return 0;
     }
 
@@ -41,11 +43,12 @@ int _option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr)
         /* Examine current option */
         switch (option->kind) {
             case TCP_OPTION_KIND_EOL:
-                DEBUG("gnrc_tcp_option.c : _option_parse() : EOL option found\n");
+                TCP_DEBUG_INFO("EOL option found.");
+                TCP_DEBUG_LEAVE;
                 return 0;
 
             case TCP_OPTION_KIND_NOP:
-                DEBUG("gnrc_tcp_option.c : _option_parse() : NOP option found\n");
+                TCP_DEBUG_INFO("NOP option found.");
                 opt_ptr += 1;
                 opt_left -= 1;
                 continue;
@@ -53,30 +56,30 @@ int _option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr)
             case TCP_OPTION_KIND_MSS:
                 if (opt_left < TCP_OPTION_LENGTH_MIN || option->length > opt_left ||
                     option->length != TCP_OPTION_LENGTH_MSS) {
-
-                    DEBUG("gnrc_tcp_option.c : _option_parse() : invalid MSS Option length.\n");
+                    TCP_DEBUG_ERROR("Invalid MSS option length.");
+                    TCP_DEBUG_LEAVE;
                     return -1;
                 }
+                TCP_DEBUG_INFO("MSS option found.");
                 tcb->mss = (option->value[0] << 8) | option->value[1];
-                DEBUG("gnrc_tcp_option.c : _option_parse() : MSS option found. MSS=%"PRIu16"\n",
-                      tcb->mss);
                 break;
 
             default:
                 if (opt_left >= TCP_OPTION_LENGTH_MIN) {
-                    DEBUG("gnrc_tcp_option.c : _option_parse() : Unsupported option found.\
-                          KIND=%"PRIu8", LENGTH=%"PRIu8"\n", option->kind, option->length);
+                    TCP_DEBUG_INFO("Valid, unsupported option found.");
                 }
         }
 
         if ((opt_left < TCP_OPTION_LENGTH_MIN) || (option->length > opt_left) ||
             (option->length < TCP_OPTION_LENGTH_MIN)) {
-            DEBUG("gnrc_tcp_option.c : _option_parse() : Invalid option. Drop Packet.\n");
+            TCP_DEBUG_ERROR("Invalid option found.");
+            TCP_DEBUG_LEAVE;
             return -1;
         }
 
         opt_ptr += option->length;
         opt_left -= option->length;
     }
+    TCP_DEBUG_LEAVE;
     return 0;
 }

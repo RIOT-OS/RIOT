@@ -48,7 +48,6 @@ void copy_al2un(unsigned char *dst, const unsigned long *src, int count);
  */
 void copy_un2al(unsigned long *dst, const unsigned char *src, int count);
 
-
 /** Results of Disk Functions */
 typedef enum {
     DISKIO_RES_OK = 0,     /**< 0: Successful */
@@ -104,7 +103,6 @@ typedef enum {
 /** @} */
 
 /** @} */
-
 
 /**
  * @brief   Initialize media control interface (MCI)

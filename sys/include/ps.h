@@ -6,7 +6,6 @@
  * directory for more details.
  */
 
-
 /**
  * @defgroup    sys_ps PS
  * @ingroup     sys

@@ -18,13 +18,13 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "kernel_defines.h"
 #include "shell_commands.h"
 #include "shell.h"
 
-#if !defined(SHELL_NO_ECHO) || !defined(SHELL_NO_PROMPT)
+#if !IS_ACTIVE(CONFIG_SHELL_NO_ECHO) || !IS_ACTIVE(CONFIG_SHELL_NO_PROMPT)
 #error This test assumes no shell echo or shell prompt
 #endif
-
 
 /**
  * @brief true - do nothing, successfully
@@ -45,7 +45,6 @@ static int cmd_true(int argc, char **argv)
     (void)argv;
     return 0;
 }
-
 
 /**
  * @brief shellping, replies shellpong
@@ -115,7 +114,6 @@ static int cmd_getchar(int argc, char **argv)
     printf("%s 0x%02x\n", argv[0], getchar());
     return 0;
 }
-
 
 static const shell_command_t shell_commands[] = {
     { "shellping", "Just print 'shellpong'", cmd_shellping },

@@ -6,7 +6,7 @@ operations that are necessary to manage keys and sign images.
 This program is written for Python3, and has several dependencies on
 Python libraries.  These can be installed using 'pip3' manually:
 
-    pip3 install --user pycrypto
+    pip3 install --user pycryptodome
     pip3 install --user pyasn1
     pip3 install --user ecdsa
 

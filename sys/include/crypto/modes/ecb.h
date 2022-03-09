@@ -42,9 +42,8 @@ extern "C" {
  * @return           A negative error code if something went wrong
  *
  */
-int cipher_encrypt_ecb(cipher_t *cipher, uint8_t *input, size_t length,
-                       uint8_t *output);
-
+int cipher_encrypt_ecb(const cipher_t *cipher, const uint8_t *input,
+                       size_t length, uint8_t *output);
 
 /**
  * @brief Decrypts data of arbitrary length in ecb mode.
@@ -59,8 +58,8 @@ int cipher_encrypt_ecb(cipher_t *cipher, uint8_t *input, size_t length,
  * @return           Length of decrypted data on a successful decryption
  * @return           A negative error code if something went wrong
  */
-int cipher_decrypt_ecb(cipher_t *cipher, uint8_t *input, size_t length,
-                       uint8_t *output);
+int cipher_decrypt_ecb(const cipher_t *cipher, const uint8_t *input,
+                       size_t length, uint8_t *output);
 
 #ifdef __cplusplus
 }

@@ -23,9 +23,6 @@
 #include "periph_cpu.h"
 #include "assert.h"
 
-/* guard this file, must be done before including periph/eeprom.h */
-#if defined(EEPROM_SIZE)
-
 #include "periph/eeprom.h"
 
 uint8_t eeprom_read_byte(uint32_t pos)
@@ -60,4 +57,3 @@ size_t eeprom_erase(void)
 {
     return eeprom_clear(0, EEPROM_SIZE);
 }
-#endif

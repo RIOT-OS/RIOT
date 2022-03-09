@@ -15,7 +15,8 @@
  *
  * The WS2812 or SK6812 RGB LEDs, or more commonly known as NeoPixels, can be
  * chained so that a single data pin of the MCU can control an arbitrary number
- * of RGB LEDs.
+ * of RGB LEDs. This driver supports both the WS2812/SK6812 and the WS2812b
+ * LEDs.
  *
  * # Support
  *
@@ -36,12 +37,42 @@
  * @warning On 8MHz ATmegas, only pins at GPIO ports B, C, and D are supported.
  *          (On 16MHz ATmegas, any pin is fine.)
  *
+ * ## ESP32
+ *
+ * The ESP32 implementation is frequency independent, as frequencies above 80MHz
+ * are high enough to support bit banging without assembly.
+ *
+ * ## Native/VT100
+ *
+ * The native (VT100) implementation writes the LED state to the console.
+ *
  * ### Usage
  *
- * Add the following to your `Makefile` to use the ATmega backend:
+ * Add the following to your `Makefile`:
  *
+ * * Auto-selecting the backend:
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Makefile
+ * USEMODULE += ws281x
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * This will automatically pull in one of the backends supported by your board.
+ * In case multiple backends apply and the automatic selection does not pick
+ * your preferred backend, you can manually pick your preferred backend as
+ * described below.
+ *
+ * * the ATmega backend:
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Makefile
  * USEMODULE += ws281x_atmega
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * * the ESP32 backend:
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Makefile
+ * USEMODULE += ws281x_esp32
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * * the native/VT100 backend:
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Makefile
+ * USEMODULE += ws281x_vt100
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @{
@@ -59,6 +90,7 @@
 
 #include "color.h"
 #include "periph/gpio.h"
+#include "ws281x_backend.h"
 #include "ws281x_constants.h"
 #include "xtimer.h"
 
@@ -92,6 +124,7 @@ typedef struct {
     ws281x_params_t params;   /**< Parameters of the LED chain */
 } ws281x_t;
 
+#if defined(WS281X_HAVE_INIT) || defined(DOXYGEN)
 /**
  * @brief   Initialize an WS281x RGB LED chain
  *
@@ -103,6 +136,12 @@ typedef struct {
  * @retval  -EIO    Failed to initialize the data GPIO pin
  */
 int ws281x_init(ws281x_t *dev, const ws281x_params_t *params);
+#else
+static inline int ws281x_init(ws281x_t *dev, const ws281x_params_t *params) {
+    dev->params = *params;
+    return 0;
+}
+#endif
 
 /**
  * @brief   Writes the color data of the user supplied buffer

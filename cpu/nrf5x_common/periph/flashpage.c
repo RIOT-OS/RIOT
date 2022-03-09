@@ -23,15 +23,38 @@
 #include "assert.h"
 #include "periph/flashpage.h"
 
-void flashpage_write_raw(void *target_addr, const void *data, size_t len)
+#ifndef NRF_NVMC
+#define NRF_NVMC NRF_NVMC_S
+#endif
+
+void flashpage_erase(unsigned page)
 {
-    /* assert multiples of FLASHPAGE_RAW_BLOCKSIZE are written and no less of
+    assert(page < (int)FLASHPAGE_NUMOF);
+
+    uint32_t *page_addr = (uint32_t *)flashpage_addr(page);
+
+    /* erase given page */
+    NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Een;
+#ifndef NRF_NVMC_S
+    NRF_NVMC->ERASEPAGE = (uint32_t)page_addr;
+#else
+    /* NRF_NVMC->ERASEPAGE doesn't exist on nRF9160 family, the proper
+       way to erase a page is to write 0xFFFFFFFF in the first 32-bit
+       word of the page to erase it (see Chap 4.4.2 from nRF9160 datasheet ) */
+    *page_addr = UINT32_MAX;
+#endif
+    while (NRF_NVMC->READY == 0) {}
+}
+
+void flashpage_write(void *target_addr, const void *data, size_t len)
+{
+    /* assert multiples of FLASHPAGE_WRITE_BLOCK_SIZE are written and no less of
        that length. */
-    assert(!(len % FLASHPAGE_RAW_BLOCKSIZE));
+    assert(!(len % FLASHPAGE_WRITE_BLOCK_SIZE));
 
     /* ensure writes are aligned */
-    assert(!(((unsigned)target_addr % FLASHPAGE_RAW_ALIGNMENT) ||
-            ((unsigned)data % FLASHPAGE_RAW_ALIGNMENT)));
+    assert(!(((unsigned)target_addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) ||
+            ((unsigned)data % FLASHPAGE_WRITE_BLOCK_ALIGNMENT)));
 
     /* ensure the length doesn't exceed the actual flash size */
     assert(((unsigned)target_addr + len) <
@@ -41,27 +64,10 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
     const uint32_t *data_addr = data;
 
     NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Wen;
-    for (unsigned i = 0; i < (len / FLASHPAGE_RAW_BLOCKSIZE); i++) {
+    for (unsigned i = 0; i < (len / FLASHPAGE_WRITE_BLOCK_SIZE); i++) {
         *page_addr++ = data_addr[i];
     }
 
     /* finish up */
     NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Ren;
-}
-
-void flashpage_write(int page, const void *data)
-{
-    assert(page < (int)FLASHPAGE_NUMOF);
-
-    uint32_t *page_addr = (uint32_t *)flashpage_addr(page);
-
-    /* erase given page */
-    NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Een;
-    NRF_NVMC->ERASEPAGE = (uint32_t)page_addr;
-    while (NRF_NVMC->READY == 0) {}
-
-    /* write data to page */
-    if (data != NULL) {
-        flashpage_write_raw(page_addr, data, FLASHPAGE_SIZE);
-    }
 }

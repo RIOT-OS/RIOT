@@ -19,6 +19,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "opt3001.h"
 #include "opt3001_regs.h"
 #include "periph/i2c.h"
@@ -27,7 +29,7 @@
 #include "byteorder.h"
 #include "math.h"
 
-#define ENABLE_DEBUG  (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define DEV_I2C     (dev->params.i2c_dev) /**< BUS */
@@ -58,7 +60,7 @@ int opt3001_init(opt3001_t *dev, const opt3001_params_t *params)
     /* Set range number, mode of conversion and conversion time */
     reg = OPT3001_CONFIG_RN_FSR;
     reg |= OPT3001_REGS_CONFIG_MOC(OPT3001_CONFIG_M_SHUTDOWN);
-    reg |= OPT3001_REGS_CONFIG_CT(OPT3001_CONVERSION_TIME);
+    reg |= OPT3001_REGS_CONFIG_CT(CONFIG_OPT3001_CONVERSION_TIME);
 
     /* Configure for latched window-style comparison operation */
     reg |= OPT3001_REGS_CONFIG_L;
@@ -81,7 +83,7 @@ int opt3001_init(opt3001_t *dev, const opt3001_params_t *params)
 int opt3001_reset(const opt3001_t *dev)
 {
     uint16_t reg = OPT3001_CONFIG_RESET;
-    reg &= (0xF0FF | OPT3001_REGS_CONFIG_CT(OPT3001_CONVERSION_TIME));
+    reg &= (0xF0FF | OPT3001_REGS_CONFIG_CT(CONFIG_OPT3001_CONVERSION_TIME));
     reg = htons(reg);
 
     /* Acquire exclusive access to the bus. */

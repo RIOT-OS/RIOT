@@ -1,0 +1,5 @@
+# full featured version of CCS811 driver as pseudo module
+PSEUDOMODULES += ccs811_full
+
+USEMODULE_INCLUDES_ccs811 := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_ccs811)

@@ -129,7 +129,6 @@ int binsearch_str(const void *start, size_t offset, size_t stride, size_t nmemb,
 const void *binsearch_str_p(const void *start, size_t offset, size_t stride,
                             size_t nmemb, const char *str, size_t n);
 
-
 #ifdef __cplusplus
 }
 #endif

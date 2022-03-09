@@ -13,6 +13,13 @@
 
 #include <string.h>
 
+/*
+ *  Test Vectors for the Stream Cipher ChaCha
+ *  draft-strombergson-chacha-test-vectors-00
+ *
+ *   https://tools.ietf.org/html/draft-strombergson-chacha-test-vectors-00
+ */
+
 static const uint8_t TC8_KEY[32] = {
     0xc4, 0x6e, 0xc1, 0xb1, 0x8c, 0xe8, 0xa8, 0x78,
     0x72, 0x5a, 0x37, 0xe7, 0x80, 0xdf, 0xb7, 0x35,

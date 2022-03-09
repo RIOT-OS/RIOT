@@ -1,0 +1,25 @@
+# This file is passed to objcopy with --redefine-syms. It contains a list of
+# symbols to be renamed in the esp8266 vendor libraries as "old new". Symbols
+# not present in the library are ignored and lines starting with # are comments,
+# however unfortunately empty lines are not ignored.
+#
+# Note: printf and ets_printf symbol renames are handled in the pkg Makefile.
+#
+# libcore.a
+rtc_init               esp_rtc_init
+#
+# libcore.a libwpa.a and libespnow.a
+aes_decrypt            wpa_aes_decrypt
+aes_decrypt_deinit     wpa_aes_decrypt_deinit
+aes_decrypt_init       wpa_aes_decrypt_init
+aes_encrypt            wpa_aes_encrypt
+aes_encrypt_deinit     wpa_aes_encrypt_deinit
+aes_encrypt_init       wpa_aes_encrypt_init
+aes_unwrap             wpa_aes_unwrap
+aes_wrap               wpa_aes_wrap
+hmac_md5               wpa_hmac_md5
+hmac_sha1              wpa_hmac_sha1
+hmac_sha1_vector       wpa_hmac_sha1_vector
+pbkdf2_sha1            wpa_pbkdf2_sha1
+rc4_skip               wpa_rc4_skip
+sha1_prf               wpa_sha1_prf

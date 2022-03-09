@@ -44,12 +44,12 @@
 #endif
 
 /**
- * @brief   Period in microseconds at which an ESP-NOW node scans for other
+ * @brief   Period in milliseconds at which an ESP-NOW node scans for other
  *          ESP-NOW nodes in its range.
  * @ingroup cpu_esp_common_conf
  */
-#ifndef ESP_NOW_SCAN_PERIOD
-#define ESP_NOW_SCAN_PERIOD     (10000000UL)
+#ifndef ESP_NOW_SCAN_PERIOD_MS
+#define ESP_NOW_SCAN_PERIOD_MS     (10000UL)
 #endif
 
 /**
@@ -92,7 +92,7 @@
  */
 #ifndef ESP_NOW_PARAMS
 #define ESP_NOW_PARAMS   { .key = ESP_NOW_KEY, \
-                           .scan_period = ESP_NOW_SCAN_PERIOD, \
+                           .scan_period = ESP_NOW_SCAN_PERIOD_MS, \
                            .softap_pass = ESP_NOW_SOFT_AP_PASS, \
                            .channel = ESP_NOW_CHANNEL \
                          }
@@ -103,10 +103,10 @@
  */
 typedef struct
 {
-    uint8_t* key;         /**< key of type uint8_t [16] or NULL (no encryption) */
-    uint32_t scan_period; /**< Period at which the node scans for other nodes */
-    char*    softap_pass; /**< Passphrase used for the SoftAP interface */
-    uint8_t  channel;     /**< Channel used for ESP-NOW nodes */
+    const uint8_t* key;      /**< key of type uint8_t [16] or NULL (no encryption) */
+    uint32_t scan_period;    /**< Period at which the node scans for other nodes */
+    const char* softap_pass; /**< Passphrase used for the SoftAP interface */
+    uint8_t channel;         /**< Channel used for ESP-NOW nodes */
 
 } esp_now_params_t;
 

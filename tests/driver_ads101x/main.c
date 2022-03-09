@@ -21,13 +21,12 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
-#include "timex.h"
+#include "ztimer.h"
 #include "ads101x.h"
 #include "ads101x_params.h"
 #include "ads101x_regs.h"
 
-#define SLEEP_USEC  (100 * US_PER_MS)
+#define SLEEP_MSEC      100
 
 static ads101x_t dev;
 static ads101x_alert_t alert_dev;
@@ -117,7 +116,7 @@ int main(void)
 
         puts("");
 
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_MSEC, SLEEP_MSEC);
     }
 
     return 0;

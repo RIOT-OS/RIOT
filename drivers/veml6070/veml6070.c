@@ -24,13 +24,12 @@
 #include "veml6070.h"
 #include "veml6070_params.h"
 #include "periph/i2c.h"
-#include "xtimer.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
-#define VEML6070_ADDRH                (0x39)
-#define VEML6070_ADDRL                (0x38)
+#define VEML6070_ADDRH      (0x39)
+#define VEML6070_ADDRL      (0x38)
 
 /*---------------------------------------------------------------------------*
  *                          VEML6070 Core API                                *

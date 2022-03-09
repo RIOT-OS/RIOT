@@ -6,8 +6,7 @@ PIN ?= GPIO_PIN(0, 0)
 N ?= 8
 
 USEMODULE += ws281x
-
-FEATURES_REQUIRED := arch_avr8 # <-- Currently only backend for AVR boards
+USEMODULE += xtimer
 
 # Only AVR boards CPU clocked at 8MHz or 16 MHz are supported. The Waspmote Pro
 # is clocked at 14.7456 MHz :-/

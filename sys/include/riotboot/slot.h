@@ -29,6 +29,8 @@
 extern "C" {
 #endif
 
+#include <stddef.h>
+
 #include "riotboot/hdr.h"
 
 /**
@@ -94,10 +96,36 @@ static inline void riotboot_slot_print_hdr(unsigned slot)
 }
 
 /**
+ * @brief Get the offset (in flash, in bytes) for a given slot.
+ */
+size_t riotboot_slot_offset(unsigned slot);
+
+/**
  * @brief  Dump the addresses of all configured slots
  *
  */
 void riotboot_slot_dump_addrs(void);
+
+/**
+ * @brief  Get the size of a slot
+ *
+ * @param[in]   slot    slot nr to get the size from
+ *
+ * @returns             The slot size in bytes
+ */
+static inline size_t riotboot_slot_size(unsigned slot)
+{
+    switch (slot) {
+    case 0:
+        return SLOT0_LEN;
+#if NUM_SLOTS == 2
+    case 1:
+        return SLOT1_LEN;
+#endif
+    default:
+        return 0;
+    }
+}
 
 /**
  * @brief   Number of configured firmware slots (incl. bootloader slot)
@@ -107,7 +135,7 @@ extern const unsigned riotboot_slot_numof;
 /**
  * @brief   Storage for header pointers of the configured slots
  */
-extern const riotboot_hdr_t * const riotboot_slots[];
+extern const riotboot_hdr_t *const riotboot_slots[];
 
 #ifdef __cplusplus
 }

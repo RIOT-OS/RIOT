@@ -21,7 +21,7 @@
 #include "cc110x.h"
 #include "cc110x_internal.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* Use NETDEV_EVENT_ISR to indicate that no event needs to be passed to upper
@@ -280,10 +280,7 @@ void cc110x_isr(netdev_t *netdev)
      */
     netdev_event_t post_isr_event = NETDEV_NO_EVENT;
 
-    if (cc110x_acquire(dev) != SPI_OK) {
-        DEBUG("[cc110x] ISR: CRITICAL ERROR: Couldn't acquire device\n");
-        return;
-    }
+    cc110x_acquire(dev);
 
     /* Disable IRQs in a coarse manner, instead of doing so any time the
      * IOCFGx configuration registers are changed. (This should be less

@@ -1,0 +1,237 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_FAM_EZR32WG
+    bool
+    select CPU_CORE_CORTEX_M4F
+    select CPU_COMMON_EFM32
+    select CPU_EFM32_SERIES0
+    select HAS_CORTEXM_MPU
+
+config MODULE_CPU_EZR32WG
+    bool
+    depends on CPU_FAM_EZR32WG
+    depends on TEST_KCONFIG
+    default y
+    help
+        EZR32WG family-specific code.
+
+## CPU Models
+config CPU_MODEL_EZR32WG230F128R68
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F256R68
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F128R55
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F256R55
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F64R61
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F256R60
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F64R68
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F128R60
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F128R61
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F256R61
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F256R69
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F64R61
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F128R69
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F256R63
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F128R63
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F64R68
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F256R67
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F128R67
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F256R60
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F128R60
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F64R55
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F128R68
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F64R60
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F256R68
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F64R63
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F64R69
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F128R55
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F256R55
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F64R67
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F256R63
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F128R63
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F256R69
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F128R69
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F64R55
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F256R67
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F128R67
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F64R60
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F128R61
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F64R69
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG330F256R61
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F64R63
+    bool
+    select CPU_FAM_EZR32WG
+
+config CPU_MODEL_EZR32WG230F64R67
+    bool
+    select CPU_FAM_EZR32WG
+
+## Common CPU symbols
+config CPU_FAM
+    default "ezr32wg" if CPU_FAM_EZR32WG
+
+config CPU_MODEL
+    default "ezr32wg230f128r68" if CPU_MODEL_EZR32WG230F128R68
+    default "ezr32wg230f256r68" if CPU_MODEL_EZR32WG230F256R68
+    default "ezr32wg330f128r55" if CPU_MODEL_EZR32WG330F128R55
+    default "ezr32wg330f256r55" if CPU_MODEL_EZR32WG330F256R55
+    default "ezr32wg330f64r61"  if CPU_MODEL_EZR32WG330F64R61
+    default "ezr32wg330f256r60" if CPU_MODEL_EZR32WG330F256R60
+    default "ezr32wg230f64r68"  if CPU_MODEL_EZR32WG230F64R68
+    default "ezr32wg330f128r60" if CPU_MODEL_EZR32WG330F128R60
+    default "ezr32wg230f128r61" if CPU_MODEL_EZR32WG230F128R61
+    default "ezr32wg230f256r61" if CPU_MODEL_EZR32WG230F256R61
+    default "ezr32wg330f256r69" if CPU_MODEL_EZR32WG330F256R69
+    default "ezr32wg230f64r61"  if CPU_MODEL_EZR32WG230F64R61
+    default "ezr32wg330f128r69" if CPU_MODEL_EZR32WG330F128R69
+    default "ezr32wg330f256r63" if CPU_MODEL_EZR32WG330F256R63
+    default "ezr32wg330f128r63" if CPU_MODEL_EZR32WG330F128R63
+    default "ezr32wg330f64r68"  if CPU_MODEL_EZR32WG330F64R68
+    default "ezr32wg330f256r67" if CPU_MODEL_EZR32WG330F256R67
+    default "ezr32wg330f128r67" if CPU_MODEL_EZR32WG330F128R67
+    default "ezr32wg230f256r60" if CPU_MODEL_EZR32WG230F256R60
+    default "ezr32wg230f128r60" if CPU_MODEL_EZR32WG230F128R60
+    default "ezr32wg230f64r55"  if CPU_MODEL_EZR32WG230F64R55
+    default "ezr32wg330f128r68" if CPU_MODEL_EZR32WG330F128R68
+    default "ezr32wg230f64r60"  if CPU_MODEL_EZR32WG230F64R60
+    default "ezr32wg330f256r68" if CPU_MODEL_EZR32WG330F256R68
+    default "ezr32wg330f64r63"  if CPU_MODEL_EZR32WG330F64R63
+    default "ezr32wg330f64r69"  if CPU_MODEL_EZR32WG330F64R69
+    default "ezr32wg230f128r55" if CPU_MODEL_EZR32WG230F128R55
+    default "ezr32wg230f256r55" if CPU_MODEL_EZR32WG230F256R55
+    default "ezr32wg330f64r67"  if CPU_MODEL_EZR32WG330F64R67
+    default "ezr32wg230f256r63" if CPU_MODEL_EZR32WG230F256R63
+    default "ezr32wg230f128r63" if CPU_MODEL_EZR32WG230F128R63
+    default "ezr32wg230f256r69" if CPU_MODEL_EZR32WG230F256R69
+    default "ezr32wg230f128r69" if CPU_MODEL_EZR32WG230F128R69
+    default "ezr32wg330f64r55"  if CPU_MODEL_EZR32WG330F64R55
+    default "ezr32wg230f256r67" if CPU_MODEL_EZR32WG230F256R67
+    default "ezr32wg230f128r67" if CPU_MODEL_EZR32WG230F128R67
+    default "ezr32wg330f64r60"  if CPU_MODEL_EZR32WG330F64R60
+    default "ezr32wg330f128r61" if CPU_MODEL_EZR32WG330F128R61
+    default "ezr32wg230f64r69"  if CPU_MODEL_EZR32WG230F64R69
+    default "ezr32wg330f256r61" if CPU_MODEL_EZR32WG330F256R61
+    default "ezr32wg230f64r63"  if CPU_MODEL_EZR32WG230F64R63
+    default "ezr32wg230f64r67"  if CPU_MODEL_EZR32WG230F64R67

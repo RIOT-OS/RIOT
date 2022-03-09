@@ -1,0 +1,6 @@
+# include variants of lm75 drivers as pseudo modules
+PSEUDOMODULES += lm75a
+PSEUDOMODULES += tmp1075
+
+USEMODULE_INCLUDES_lm75 := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_lm75)

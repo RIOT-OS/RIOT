@@ -2,5 +2,102 @@
 # moment.
 FEATURES_REQUIRED += arch_32bit
 
-# lwip currently doesn't compile on esp8266
-FEATURES_BLACKLIST += arch_esp8266
+DEFAULT_MODULE += auto_init_lwip
+
+ifneq (,$(filter sock_async,$(USEMODULE)))
+  USEMODULE += lwip_sock_async
+endif
+ifneq (,$(filter sock_ip,$(USEMODULE)))
+  USEMODULE += lwip_sock_ip
+endif
+ifneq (,$(filter sock_tcp,$(USEMODULE)))
+  USEMODULE += lwip_sock_tcp
+endif
+ifneq (,$(filter sock_udp,$(USEMODULE)))
+  USEMODULE += lwip_sock_udp
+endif
+
+ifneq (,$(filter stm32_eth,$(USEMODULE)))
+  ifneq (,$(filter lwip_dhcp_auto,$(USEMODULE)))
+    USEMODULE += stm32_eth_link_up
+  endif
+endif
+
+ifneq (,$(filter lwip_ipv6_autoconfig lwip_ipv6_mld,$(USEMODULE)))
+  USEMODULE += lwip_ipv6
+endif
+
+ifneq (,$(filter lwip_ipv4,$(USEMODULE)))
+  USEMODULE += ipv4
+endif
+
+ifneq (,$(filter lwip_ipv6,$(USEMODULE)))
+  USEMODULE += ipv6
+  USEMODULE += random
+endif
+
+ifneq (,$(filter lwip_udplite,$(USEMODULE)))
+  USEMODULE += lwip_udp
+endif
+
+ifneq (,$(filter lwip_sock_%,$(USEMODULE)))
+  USEMODULE += lwip_sock
+endif
+
+ifneq (,$(filter lwip_sock_ip,$(USEMODULE)))
+  USEMODULE += lwip_raw
+endif
+
+ifneq (,$(filter lwip_sock_tcp,$(USEMODULE)))
+  USEMODULE += lwip_tcp
+endif
+
+ifneq (,$(filter lwip_sock_udp,$(USEMODULE)))
+  USEMODULE += lwip_udp
+endif
+
+ifneq (,$(filter lwip_sixlowpan,$(USEMODULE)))
+  USEMODULE += lwip_ipv6_autoconfig
+  USEMODULE += l2util
+endif
+
+ifneq (,$(filter lwip_%,$(USEMODULE)))
+  USEPKG += lwip
+  USEMODULE += core_mbox
+  USEMODULE += lwip_api
+  USEMODULE += lwip_contrib
+  USEMODULE += lwip_core
+  USEMODULE += lwip_netif
+  USEMODULE += lwip_netif_init_devs
+  USEMODULE += netdev
+  ifeq (,$(filter lwip_ipv4 lwip_ipv6,$(USEMODULE)))
+    USEMODULE += lwip_ipv4
+  endif
+  ifeq (,$(filter lwip_tcp lwip_udp lwip_udplite,$(USEMODULE)))
+    USEMODULE += lwip_raw
+  endif
+  ifneq (,$(filter netdev_eth,$(USEMODULE)))
+    USEMODULE += lwip_ethernet
+  endif
+endif
+
+ifneq (,$(filter lwip_ppp,$(USEMODULE)))
+  USEMODULE += lwip_polarssl
+endif
+
+ifneq (,$(filter lwip_contrib,$(USEMODULE)))
+  USEMODULE += sema
+  USEMODULE += ztimer_msec
+endif
+
+ifneq (,$(filter lwip_netif,$(USEMODULE)))
+  USEMODULE += netif
+endif
+
+ifneq (,$(filter lwip_dhcp_auto,$(USEMODULE)))
+  USEMODULE += lwip_dhcp
+endif
+
+ifneq (,$(filter netif,$(USEMODULE)))
+  USEMODULE += fmt
+endif

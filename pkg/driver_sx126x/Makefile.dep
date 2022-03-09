@@ -1,0 +1,7 @@
+# module dependencies
+USEMODULE += driver_sx126x_hal
+USEMODULE += ztimer
+USEMODULE += ztimer_usec
+
+# required features
+FEATURES_REQUIRED += periph_spi

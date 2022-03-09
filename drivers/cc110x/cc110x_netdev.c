@@ -24,7 +24,6 @@
 #include "assert.h"
 #include "iolist.h"
 #include "irq.h"
-#include "luid.h"
 #include "mutex.h"
 #include "net/eui64.h"
 #include "net/netdev.h"
@@ -33,7 +32,7 @@
 #include "cc110x.h"
 #include "cc110x_internal.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static int cc110x_init(netdev_t *netdev);
@@ -89,7 +88,7 @@ void cc110x_on_gdo(void *_dev)
         mutex_unlock(&dev->isr_signal);
     }
     else {
-        dev->netdev.event_callback(&dev->netdev, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr(&dev->netdev);
     }
 }
 
@@ -121,36 +120,36 @@ static int identify_device(cc110x_t *dev)
     }
 
     switch (version) {
-        case 3:
-            DEBUG("[cc110x] Detected CC1100 transceiver\n");
-            /* RSSI offset is 78dBm @ 868MHz & 250kBaud.
-             * Depends on the symbol rate and base band and ranges from
-             * 74dBm to 79dBm.
-             */
-            dev->rssi_offset = 78;
-            return 0;
-        case 5:
-            DEBUG("[cc110x] Detected CC1100E transceiver\n");
-            /* RSSI offset is 79 dBm @ 250kbps & 250 kbps.
-             * Depends on base band and symbol rate and ranges from
-             * 75dBm to 79dBm
-             */
-            dev->rssi_offset = 79;
-            return 0;
-        case 4:
-        /* falls through */
-        case 14:
-        /* falls through */
-        case 20:
-            /* RSSI offset for the CC1101 is independent of symbol rate and
-             * base 74 dBm
-             */
-            dev->rssi_offset = 74;
-            DEBUG("[cc110x] Detected CC1101 transceiver\n");
-            return 0;
-        default:
-            DEBUG("[cc110x] Device not a CC110x transceiver\n");
-            return -1;
+    case 3:
+        DEBUG("[cc110x] Detected CC1100 transceiver\n");
+        /* RSSI offset is 78dBm @ 868MHz & 250kBaud.
+         * Depends on the symbol rate and base band and ranges from
+         * 74dBm to 79dBm.
+         */
+        dev->rssi_offset = 78;
+        return 0;
+    case 5:
+        DEBUG("[cc110x] Detected CC1100E transceiver\n");
+        /* RSSI offset is 79 dBm @ 250kbps & 250 kbps.
+         * Depends on base band and symbol rate and ranges from
+         * 75dBm to 79dBm
+         */
+        dev->rssi_offset = 79;
+        return 0;
+    case 4:
+    /* falls through */
+    case 14:
+    /* falls through */
+    case 20:
+        /* RSSI offset for the CC1101 is independent of symbol rate and
+         * base 74 dBm
+         */
+        dev->rssi_offset = 74;
+        DEBUG("[cc110x] Detected CC1101 transceiver\n");
+        return 0;
+    default:
+        DEBUG("[cc110x] Device not a CC110x transceiver\n");
+        return -1;
     }
 }
 
@@ -248,17 +247,11 @@ static int cc110x_init(netdev_t *netdev)
     /* Make sure the crystal is stable and the chip ready. This is needed as
      * the reset is done via an SPI command, but the SPI interface must not be
      * used unless the chip is ready according to the data sheet. After the
-     * reset, a second call to cc110x_power_on() is needed to finally have
+     * reset, a second call to cc110x_power_on_and_acquire() is needed to finally have
      * the transceiver in a known state and ready for SPI communication.
      */
-    if (cc110x_power_on(dev)) {
+    if (cc110x_power_on_and_acquire(dev)) {
         DEBUG("[cc110x] netdev_driver_t::init(): Failed to pull CS pin low\n");
-        return -EIO;
-    }
-
-    if (cc110x_acquire(dev) != SPI_OK) {
-        DEBUG("[cc110x] netdev_driver_t::init(): Failed to setup/acquire SPI "
-              "interface\n");
         return -EIO;
     }
 
@@ -267,15 +260,9 @@ static int cc110x_init(netdev_t *netdev)
     cc110x_release(dev);
 
     /* Again, make sure the crystal is stable and the chip ready */
-    if (cc110x_power_on(dev)) {
+    if (cc110x_power_on_and_acquire(dev)) {
         DEBUG("[cc110x] netdev_driver_t::init(): Failed to pull CS pin low "
               "after reset\n");
-        return -EIO;
-    }
-
-    if (cc110x_acquire(dev) != SPI_OK) {
-        DEBUG("[cc110x] netdev_driver_t::init(): Failed to setup/acquire SPI "
-              "interface after reset\n");
         return -EIO;
     }
 
@@ -310,13 +297,11 @@ static int cc110x_init(netdev_t *netdev)
         return -EIO;
     }
 
-    /* Setup the layer 2 address, but do not accept CC110X_L2ADDR_AUTO (which
+    /* Setup the layer 2 address, but do not accept CC1XXX_BCAST_ADDR (which
      * has the value 0x00 and is used for broadcast)
      */
-    dev->addr = dev->params.l2addr;
-    while (dev->addr == CC110X_L2ADDR_AUTO) {
-        luid_get(&dev->addr, 1);
-    }
+    cc1xxx_eui_get(&dev->netdev, &dev->addr);
+    assert(dev->addr != CC1XXX_BCAST_ADDR);
     cc110x_write(dev, CC110X_REG_ADDR, dev->addr);
 
     /* Setup interrupt on GDO0  */
@@ -342,13 +327,12 @@ static int cc110x_init(netdev_t *netdev)
     dev->state = CC110X_STATE_IDLE;
     cc110x_release(dev);
 
-
     int retval; /*< Store return value to be able to pass through error code */
     /* Apply configuration (if non-NULL) and channel map, which also calls
      * cc110x_full_calibration
      */
     retval = cc110x_apply_config(dev, dev->params.config, dev->params.channels,
-                                 CC110X_DEFAULT_CHANNEL);
+                                 CONFIG_CC110X_DEFAULT_CHANNEL);
     if (retval) {
         gpio_irq_disable(dev->params.gdo0);
         gpio_irq_disable(dev->params.gdo2);
@@ -369,11 +353,7 @@ static int cc110x_recv(netdev_t *netdev, void *buf, size_t len, void *info)
     /* Call to cc110x_enter_rx_mode() will clear dev->buf.len, so back up it first */
     int size = dev->buf.len;
 
-    if (cc110x_acquire(dev) != SPI_OK) {
-        DEBUG("[cc110x] netdev_driver_t::recv(): cc110x_acquire() "
-              "failed\n");
-        return -EIO;
-    }
+    cc110x_acquire(dev);
 
     /* Copy RX info on last frame (if requested) */
     if (info != NULL) {
@@ -411,26 +391,26 @@ static int cc110x_send(netdev_t *netdev, const iolist_t *iolist)
     /* assert that cc110x_send was called with valid parameters */
     assert(netdev && iolist && (iolist->iol_len == sizeof(cc1xxx_l2hdr_t)));
 
-    if (cc110x_acquire(dev) != SPI_OK) {
-        DEBUG("[cc110x] netdev_driver_t::send(): cc110x_acquire() failed\n");
-        return -1;
-    }
+    cc110x_acquire(dev);
 
     switch (dev->state) {
-        case CC110X_STATE_FSTXON:
-            /* falls through */
-        case CC110X_STATE_RX_MODE:
-            break;
-        case CC110X_STATE_RECEIVING:
-            cc110x_release(dev);
-            DEBUG("[cc110x] netdev_driver_t::send(): Refusing to send while "
-                  "receiving a frame\n");
-            return -EBUSY;
-        default:
-            cc110x_release(dev);
-            DEBUG("[cc110x] netdev_driver_t::send(): Driver state %i prevents "
-                  "sending\n", (int)dev->state);
-            return -1;
+    case CC110X_STATE_FSTXON:
+        /* falls through */
+    case CC110X_STATE_RX_MODE:
+        break;
+    case CC110X_STATE_RECEIVING:
+        cc110x_release(dev);
+        DEBUG("[cc110x] netdev_driver_t::send(): Refusing to send while "
+              "receiving a frame\n");
+        return -EBUSY;
+    case CC110X_STATE_OFF:
+        cc110x_release(dev);
+        return -ENOTSUP;
+    default:
+        cc110x_release(dev);
+        DEBUG("[cc110x] netdev_driver_t::send(): Driver state %i prevents "
+              "sending\n", (int)dev->state);
+        return -1;
     }
 
     /* Copy data to send into frame buffer */
@@ -486,8 +466,19 @@ static int cc110x_send(netdev_t *netdev, const iolist_t *iolist)
     gpio_irq_enable(dev->params.gdo2);
 
     while ((dev->state & 0x07) == CC110X_STATE_TX_MODE) {
-        /* Block until mutex is unlocked from ISR */
-        mutex_lock(&dev->isr_signal);
+        uint64_t timeout = (dev->state != CC110X_STATE_TX_COMPLETING) ?
+                           2048 : 1024;
+        /* Block until mutex is unlocked from ISR, or a timeout occurs. The
+         * timeout prevents deadlocks when IRQs are lost. If the TX FIFO
+         * still needs to be filled, the timeout is 1024 µs - or after 32 Byte
+         * (= 50%) of the FIFO have been transmitted at 250 kbps. If
+         * no additional data needs to be fed into the FIFO, a timeout of
+         * 2048 µs is used instead to allow the frame to be completely drained
+         * before the timeout triggers. The ISR handler is prepared to be
+         * called prematurely, so we don't need to worry about extra calls
+         * to cc110x_isr() introduced by accident.
+         */
+        xtimer_mutex_lock_timeout(&dev->isr_signal, timeout);
         cc110x_isr(&dev->netdev);
     }
 
@@ -495,23 +486,22 @@ static int cc110x_send(netdev_t *netdev, const iolist_t *iolist)
 }
 
 /**
- * @brief   Generate an IPv6 interface identifier for a CC110X transceiver
+ * @brief   Checks if the CC110x's address filter is disabled
+ * @param   dev     Transceiver to check if in promiscuous mode
+ * @param   dest    Store the result here
  *
- * @param   dev     Transceiver to create the IPv6 interface identifier (IID)
- * @param   iid     Store the generated IID here
- *
- * @return  Returns the size of @ref eui64_t to confirm with the API
+ * @return  Returns the size of @ref netopt_enable_t to confirm with the API
  *          in @ref netdev_driver_t::get
  */
-static int cc110x_get_iid(cc110x_t *dev, eui64_t *iid)
+static int cc110x_get_promiscuous_mode(cc110x_t *dev, netopt_enable_t *dest)
 {
-    static const eui64_t empty_iid = {
-        .uint8 = { 0x00, 0x00, 0x00, 0xff, 0xfe, 0x00, 0x00, 0x00 }
-    };
+    cc110x_acquire(dev);
 
-    *iid = empty_iid;
-    iid->uint8[7] = dev->addr;
-    return sizeof(eui64_t);
+    uint8_t pktctrl1;
+    cc110x_read(dev, CC110X_REG_PKTCTRL1, &pktctrl1);
+    *dest = ((pktctrl1 & CC110X_PKTCTRL1_GET_ADDR_MODE) == CC110X_PKTCTRL1_ADDR_ALL);
+    cc110x_release(dev);
+    return sizeof(netopt_enable_t);
 }
 
 static int cc110x_get(netdev_t *netdev, netopt_t opt,
@@ -519,45 +509,75 @@ static int cc110x_get(netdev_t *netdev, netopt_t opt,
 {
     cc110x_t *dev = (cc110x_t *)netdev;
 
+    (void)max_len;  /* only used in assert() */
     switch (opt) {
-        case NETOPT_DEVICE_TYPE:
-            assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)val) = NETDEV_TYPE_CC110X;
-            return sizeof(uint16_t);
-        case NETOPT_PROTO:
-            assert(max_len == sizeof(gnrc_nettype_t));
-            *((gnrc_nettype_t *)val) = CC110X_DEFAULT_PROTOCOL;
-            return sizeof(gnrc_nettype_t);
-        case NETOPT_MAX_PDU_SIZE:
-            assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)val) = CC110X_MAX_FRAME_SIZE - sizeof(cc1xxx_l2hdr_t);
-            return sizeof(uint16_t);
-        case NETOPT_ADDR_LEN:
-        /* falls through */
-        case NETOPT_SRC_LEN:
-            assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)val) = CC1XXX_ADDR_SIZE;
-            return sizeof(uint16_t);
-        case NETOPT_ADDRESS:
-            assert(max_len >= CC1XXX_ADDR_SIZE);
-            *((uint8_t *)val) = dev->addr;
-            return CC1XXX_ADDR_SIZE;
-        case NETOPT_IPV6_IID:
-            if (max_len < sizeof(eui64_t)) {
-                return -EOVERFLOW;
+    case NETOPT_DEVICE_TYPE:
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)val) = NETDEV_TYPE_CC110X;
+        return sizeof(uint16_t);
+    case NETOPT_PROTO:
+        assert(max_len == sizeof(gnrc_nettype_t));
+        *((gnrc_nettype_t *)val) = CC110X_DEFAULT_PROTOCOL;
+        return sizeof(gnrc_nettype_t);
+    case NETOPT_MAX_PDU_SIZE:
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)val) = CC110X_MAX_FRAME_SIZE - sizeof(cc1xxx_l2hdr_t);
+        return sizeof(uint16_t);
+    case NETOPT_ADDR_LEN:
+    /* falls through */
+    case NETOPT_SRC_LEN:
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)val) = CC1XXX_ADDR_SIZE;
+        return sizeof(uint16_t);
+    case NETOPT_ADDRESS:
+        assert(max_len >= CC1XXX_ADDR_SIZE);
+        *((uint8_t *)val) = dev->addr;
+        return CC1XXX_ADDR_SIZE;
+    case NETOPT_CHANNEL:
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)val) = dev->channel;
+        return sizeof(uint16_t);
+    case NETOPT_TX_POWER:
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)val) = dbm_from_tx_power[dev->tx_power];
+        return sizeof(uint16_t);
+    case NETOPT_PROMISCUOUSMODE:
+        assert(max_len == sizeof(netopt_enable_t));
+        return cc110x_get_promiscuous_mode(dev, val);
+    case NETOPT_STATE:
+        assert(max_len == sizeof(netopt_state_t));
+        {
+            netopt_state_t *state = val;
+            switch (dev->state) {
+            case CC110X_STATE_RECEIVING:
+            case CC110X_STATE_FRAME_READY:
+            case CC110X_STATE_RXFIFO_OVERFLOW:
+                *state = NETOPT_STATE_RX;
+                break;
+            case CC110X_STATE_IDLE:
+                *state = NETOPT_STATE_STANDBY;
+                break;
+            case CC110X_STATE_OFF:
+                *state = NETOPT_STATE_SLEEP;
+                break;
+            case CC110X_STATE_TX_MODE:
+            case CC110X_STATE_TX_COMPLETING:
+            case CC110X_STATE_TXFIFO_UNDERFLOW:
+                *state = NETOPT_STATE_TX;
+                break;
+            case CC110X_STATE_RX_MODE:
+                *state = NETOPT_STATE_IDLE;
+                break;
+            default:
+                *state = NETOPT_STATE_RESET;
+                break;
             }
-            return cc110x_get_iid(dev, val);
-        case NETOPT_CHANNEL:
-            assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)val) = dev->channel;
-            return sizeof(uint16_t);
-        case NETOPT_TX_POWER:
-            assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)val) = dbm_from_tx_power[dev->tx_power];
-            return sizeof(uint16_t);
-        default:
-            return -ENOTSUP;
+        }
+        break;
+    default:
+        break;
     }
+    return -ENOTSUP;
 }
 
 /**
@@ -568,14 +588,36 @@ static int cc110x_get(netdev_t *netdev, netopt_t opt,
  */
 static int cc110x_set_addr(cc110x_t *dev, uint8_t addr)
 {
-    if (cc110x_acquire(dev) != SPI_OK) {
-        return -EIO;
-    }
+    cc110x_acquire(dev);
 
     dev->addr = addr;
     cc110x_write(dev, CC110X_REG_ADDR, addr);
     cc110x_release(dev);
     return 1;
+}
+
+/**
+ * @brief   Enables/disables the CC110x's address filter
+ * @param   dev     Transceiver to turn promiscuous mode on/off
+ * @param   enable  Whether to enable or disable promiscuous mode
+ *
+ * @return  Returns the size of @ref netopt_enable_t to confirm with the API
+ *          in @ref netdev_driver_t::set
+ */
+static int cc110x_set_promiscuous_mode(cc110x_t *dev, netopt_enable_t enable)
+{
+    cc110x_acquire(dev);
+
+    uint8_t pktctrl1 = CC110X_PKTCTRL1_VALUE;
+    if (enable == NETOPT_ENABLE) {
+        pktctrl1 |= CC110X_PKTCTRL1_ADDR_ALL;
+    }
+    else {
+        pktctrl1 |= CC110X_PKTCTRL1_ADDR_MATCH;
+    }
+    cc110x_write(dev, CC110X_REG_PKTCTRL1, pktctrl1);
+    cc110x_release(dev);
+    return sizeof(netopt_enable_t);
 }
 
 static int cc110x_set(netdev_t *netdev, netopt_t opt,
@@ -585,38 +627,56 @@ static int cc110x_set(netdev_t *netdev, netopt_t opt,
     cc110x_t *dev = (cc110x_t *)netdev;
 
     switch (opt) {
-        case NETOPT_ADDRESS:
-            assert(len == CC1XXX_ADDR_SIZE);
-            return cc110x_set_addr(dev, *((uint8_t *)val));
-        case NETOPT_CHANNEL:
-        {
-            assert(len == sizeof(uint16_t));
-            int retval;
-            uint16_t channel = *((uint16_t *)val);
-            if (channel >= CC110X_MAX_CHANNELS) {
-                return -EINVAL;
-            }
-            if ((retval = cc110x_set_channel(dev, (uint8_t)channel))) {
-                return retval;
+    case NETOPT_ADDRESS:
+        assert(len == CC1XXX_ADDR_SIZE);
+        return cc110x_set_addr(dev, *((uint8_t *)val));
+    case NETOPT_CHANNEL:
+    {
+        assert(len == sizeof(uint16_t));
+        int retval;
+        uint16_t channel = *((uint16_t *)val);
+        if (channel >= CC110X_MAX_CHANNELS) {
+            return -EINVAL;
+        }
+        if ((retval = cc110x_set_channel(dev, (uint8_t)channel))) {
+            return retval;
+        }
+    }
+        return sizeof(uint16_t);
+    case NETOPT_TX_POWER:
+    {
+        assert(len == sizeof(int16_t));
+        int16_t dbm = *((int16_t *)val);
+        cc110x_tx_power_t power = CC110X_TX_POWER_MINUS_30_DBM;
+        for ( ; power < CC110X_TX_POWER_PLUS_10_DBM; power++) {
+            if ((int16_t)tx_power_from_dbm[power] >= dbm) {
+                break;
             }
         }
-            return sizeof(uint16_t);
-        case NETOPT_TX_POWER:
-        {
-            assert(len == sizeof(int16_t));
-            int16_t dbm = *((int16_t *)val);
-            cc110x_tx_power_t power = CC110X_TX_POWER_MINUS_30_DBM;
-            for ( ; power < CC110X_TX_POWER_PLUS_10_DBM; power++) {
-                if ((int16_t)tx_power_from_dbm[power] >= dbm) {
-                    break;
-                }
-            }
-            if (cc110x_set_tx_power(dev, power)) {
-                return -EINVAL;
-            }
+        if (cc110x_set_tx_power(dev, power)) {
+            return -EINVAL;
         }
-            return sizeof(uint16_t);
+    }
+        return sizeof(uint16_t);
+    case NETOPT_PROMISCUOUSMODE:
+        assert(len == sizeof(netopt_enable_t));
+        return cc110x_set_promiscuous_mode(dev, *((const netopt_enable_t *)val));
+    case NETOPT_STATE:
+        assert(len == sizeof(netopt_state_t));
+        switch (*((netopt_state_t *)val)) {
+        case NETOPT_STATE_RESET:
+        case NETOPT_STATE_IDLE:
+            cc110x_wakeup(dev);
+            return sizeof(netopt_state_t);
+        case NETOPT_STATE_OFF:
+        case NETOPT_STATE_SLEEP:
+            cc110x_sleep(dev);
+            return sizeof(netopt_state_t);
         default:
             return -ENOTSUP;
+        }
+        break;
+    default:
+        return -ENOTSUP;
     }
 }

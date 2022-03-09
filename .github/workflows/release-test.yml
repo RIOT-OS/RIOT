@@ -1,0 +1,175 @@
+name: release-tests
+
+# Run automated part of the tests specified by the release specs (see
+# https://github.com/RIOT-OS/Release-Specs/) on `native` and IoT-LAB boards.
+#
+# It is split into `native` tests and IoT-LAB tests, as the tests are
+# resource-wise disjunct and thus can be run parallel. For each IoT-LAB board
+# test an IoT-LAB experiment is started using the `rici` account.
+#
+# This workflow is run periodically on master with a cron job, on new pushed
+# release candidates tags and release tags, and can be triggered via workflow
+# dispatch.
+
+on:
+  schedule:
+    - cron: '0 3 * * 6'
+  push:
+    # Run on all new release candidates and release tags
+    tags:
+      - '[0-9][0-9][0-9][0-9].[0-9][0-9]-RC[0-9]*'
+      - '[0-9][0-9][0-9][0-9].[0-9][0-9]'
+      - '[0-9][0-9][0-9][0-9].[0-9][0-9].*'
+  workflow_dispatch:
+    inputs:
+      riot_version:
+        description: 'RIOT version to checkout'
+        required: true
+        default: 'master'
+      release_specs_version:
+        description: 'Release-Specs version to checkout'
+        required: true
+        default: 'master'
+      docker_version:
+        description: 'riot/riotbuild docker image version'
+        required: true
+        default: 'latest'
+      filter:
+        description: 'Pytest filter. Leave empty for all.'
+        required: false
+
+env:
+  DOCKER_MAKE_ARGS: -j
+# split up native and IoT-LAB tasks to parallelize somewhat and prevent
+# to hit Github Limit of 6h per job.
+jobs:
+  tasks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        pytest_mark:
+          - "iotlab_creds"
+        include:
+          - pytest_mark: "not iotlab_creds"
+            sudo: "sudo"
+    steps:
+    - name: Generate .riotgithubtoken
+      run: |
+        if [ -z "${{ matrix.sudo }}" ]; then
+          echo '${{ secrets.RIOT_CI_ACCESS_TOKEN }}' > ~/.riotgithubtoken
+        else
+          sudo sh -c "echo '${{ secrets.RIOT_CI_ACCESS_TOKEN }}' > ~/.riotgithubtoken"
+        fi
+    - name: Setup IoT-LAB credentials
+      if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
+      run: |
+        echo '${{ secrets.IOTLABRC }}' > ~/.iotlabrc
+    - name: Setup SSH agent
+      if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
+      uses: webfactory/ssh-agent@v0.4.1
+      with:
+        ssh-private-key: ${{ secrets.IOTLAB_PRIVATE_KEY }}
+    - name: Fetch host key from IoT-LAB saclay site
+      if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
+      run: |
+        IOTLAB_USER=$(cat ~/.iotlabrc | cut -f1 -d:)
+        ssh -oStrictHostKeyChecking=accept-new \
+          ${IOTLAB_USER}@saclay.iot-lab.info exit
+    - name: Fetch host key from IoT-LAB lille site
+      if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
+      run: |
+        IOTLAB_USER=$(cat ~/.iotlabrc | cut -f1 -d:)
+        ssh -oStrictHostKeyChecking=accept-new \
+          ${IOTLAB_USER}@lille.iot-lab.info exit
+    - name: Checkout Release-Specs
+      uses: actions/checkout@v2
+      with:
+        repository: RIOT-OS/Release-Specs
+        path: Release-Specs
+        fetch-depth: 1
+        ref: ${{ github.event.inputs.release_specs_version }}
+    - name: Checkout RIOT
+      uses: actions/checkout@v2
+      with:
+        repository: RIOT-OS/RIOT
+        path: RIOT
+        fetch-depth: 1
+        ref: ${{ github.event.inputs.riot_version }}
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install tox junit2html
+    - name: Pull riotbuild docker image
+      run: |
+        DOCKER_VERSION="${{ github.event.inputs.docker_version }}"
+        if [ -z "$DOCKER_VERSION" ]; then
+          DOCKER_VERSION="latest"
+        fi
+        docker pull riot/riotbuild:$DOCKER_VERSION
+    - name: Create TAP interfaces
+      if: ${{ matrix.pytest_mark == 'not iotlab_creds' }}
+      run: |
+        sudo RIOT/dist/tools/tapsetup/tapsetup -c 11
+    - name: Run release tests
+      timeout-minutes: 350
+      run: |
+        RIOTBASE="$GITHUB_WORKSPACE/RIOT"
+        TOX_ARGS=""
+        if ! echo ${{ github.event.inputs.riot_version }} | \
+              grep -q "[0-9]\{4\}.[0-9]\{2\}-RC[0-9]\+"; then
+          TOX_ARGS+="--non-RC "
+        fi
+        if [ -n "${{ github.event.inputs.filter }}" ]; then
+          K="-k"
+        fi
+
+        cd Release-Specs
+        # definition in env does not work since $GITHUB_WORKSPACE seems not to
+        # be accessible
+        ${{ matrix.sudo }} \
+          BUILD_IN_DOCKER=1 \
+          DOCKER_MAKE_ARGS=${DOCKER_MAKE_ARGS} \
+          DOCKER_ENV_VARS="USEMODULE QUIETER" \
+          GITHUB_REPOSITORY=${GITHUB_REPOSITORY} \
+          GITHUB_RUN_ID=${GITHUB_RUN_ID} \
+          GITHUB_SERVER_URL=${GITHUB_SERVER_URL} \
+          APPKEY="${{ secrets.CI_TTN_APPKEY }}" \
+          NWKSKEY="${{ secrets.CI_TTN_NWKSKEY_ABP }}" \
+          APPSKEY="${{ secrets.CI_TTN_APPSKEY_ABP }}" \
+          DEVEUI="70B3D57ED00463E7" \
+          APPEUI="0000000000000000" \
+          DEVADDR="260B41C7" \
+          TTN_DL_KEY="${{ secrets.CI_TTN_DL_KEY }}" \
+          TTN_APP_ID="release-tests" \
+          TTN_DEV_ID="eui-70b3d57ed00463e7-otaa" \
+          TTN_DEV_ID_ABP="eui-70b3d57ed0046d5d-abp" \
+          RIOTBASE=${RIOTBASE} \
+          $(which tox) -e test -- ${TOX_ARGS} \
+            ${K} "${{ github.event.inputs.filter }}" -m "${{ matrix.pytest_mark }}"
+    - name: junit2html and XML deploy
+      if: always()
+      run: |
+        DATE=$(date +"%Y-%m-%d-%H-%M-%S")
+        if echo ${{ github.event.inputs.riot_version }} | \
+              grep -q "[0-9]\{4\}.[0-9]\{2\}"; then
+          VER=${{ github.event.inputs.riot_version }}
+        else
+          VER=$(git -C $GITHUB_WORKSPACE/RIOT rev-parse --short HEAD)
+        fi
+        MARK=$(echo "${{ matrix.pytest_mark }}" | tr '[ _]' '-')
+        REPORT_XML=$GITHUB_WORKSPACE/Release-Specs/test-report.xml
+        REPORT_NAME=test-reports/test-report-$MARK-$VER-$DATE
+        mkdir test-reports/
+        junit2html ${REPORT_XML} ${REPORT_NAME}.html
+        cp ${REPORT_XML} ${REPORT_NAME}.xml
+    - uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: Test Reports
+        path: test-reports/*

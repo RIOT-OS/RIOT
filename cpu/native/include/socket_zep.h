@@ -13,6 +13,39 @@
  *
  * @see @ref net_zep for protocol definitions
  *
+ * This ZEP implementation can send a dummy HELLO packet on startup.
+ * This is used to make dispatchers aware of the node.
+ * To enable this behavior, add
+ *
+ * ```
+ * USEMODULE += socket_zep_hello
+ * ```
+ *
+ * to your Makefile.
+ *
+ * A ZEP dispatcher can just drop those packets (ZEP type 0xFF) if it
+ * chooses to parse the ZEP header.
+ *
+ * The header of the HELLO packet will look like this:
+ *
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *     |         Preamble (EX)         |  Version (2)  |  Type  (255)  |
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *     |                                                               |
+ *     +                                                               +
+ *     |                                                               |
+ *     +                         Reserved (0)                         +
+ *     |                                                               |
+ *     +                                                               +
+ *     |                                                               |
+ *     +               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *     |               |      'H'      |      'E'      |      'L'      |
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *     |      'L'      |      'O'      |       0       |       0       |
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *     |       0       |       0       |       0       |       0       |
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *
  * @{
  *
  * @file
@@ -25,30 +58,12 @@
 
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
+#include "net/ieee802154/radio.h"
 #include "net/zep.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief   ZEP device state
- */
-typedef struct {
-    netdev_ieee802154_t netdev;     /**< netdev internal member */
-    int sock_fd;                    /**< socket fd */
-    netdev_event_t last_event;      /**< event triggered */
-    uint32_t seq;                   /**< ZEP sequence number */
-    /**
-     * @brief   Receive buffer
-     */
-    uint8_t rcv_buf[sizeof(zep_v2_data_hdr_t) + IEEE802154_FRAME_LEN_MAX];
-    /**
-     * @brief   Buffer for send header
-     */
-    uint8_t snd_hdr_buf[sizeof(zep_v2_data_hdr_t)];
-    uint16_t chksum_buf;            /**< buffer for send checksum calculation */
-} socket_zep_t;
 
 /**
  * @brief   ZEP device initialization parameters
@@ -59,6 +74,40 @@ typedef struct {
     char *remote_addr;  /**< remote address string */
     char *remote_port;  /**< local address string */
 } socket_zep_params_t;
+
+/**
+ * @brief   ZEP device state
+ */
+typedef struct {
+    /**
+     * @brief   command line parameters
+     */
+    const socket_zep_params_t *params;
+    int sock_fd;                    /**< socket fd */
+    uint32_t seq;                   /**< ZEP sequence number */
+    /**
+     * @brief   Receive buffer
+     */
+    uint8_t rcv_buf[sizeof(zep_v2_data_hdr_t) + IEEE802154_FRAME_LEN_MAX];
+    /**
+     * @brief   Send buffer
+     */
+    uint8_t snd_buf[sizeof(zep_v2_data_hdr_t) + IEEE802154_FRAME_LEN_MAX];
+    uint8_t snd_len;                /**< bytes to send */
+    uint16_t pan_id;                /**< PAN ID of the ZEP network */
+    uint16_t chan;                  /**< virtual radio channel */
+    /**
+     * @brief   Short address of the virtual radio
+     */
+    uint8_t addr_short[IEEE802154_SHORT_ADDRESS_LEN];
+    /**
+     * @brief   Long address of the virtual radio
+     */
+    uint8_t addr_long[IEEE802154_LONG_ADDRESS_LEN];
+    ieee802154_filter_mode_t filter_mode;   /**< frame filter mode */
+    bool rx;                                /**< whether the radio is listening for packets */
+    bool send_hello;                        /**< send HELLO packet on connect */
+} socket_zep_t;
 
 /**
  * @brief   Setup socket_zep_t structure
@@ -74,6 +123,14 @@ void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params);
  * @param dev  the socket_zep device handle to cleanup
  */
 void socket_zep_cleanup(socket_zep_t *dev);
+
+/**
+ * @brief   Setup socket ZEP in order to be used with the IEEE 802.15.4 Radio HAL
+ *
+ * @param[in] dev  pointer to the socket ZEP instance
+ * @param[in] hal  pointer to the HAL descriptor associated to the device
+ */
+void socket_zep_hal_setup(socket_zep_t *dev, ieee802154_dev_t *hal);
 
 #ifdef __cplusplus
 }

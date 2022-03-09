@@ -1,8 +1,14 @@
-ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += cc1100
+  USEMODULE += cc110x_868mhz
 endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += ltc4150
   USEMODULE += sht11
+endif
+
+# default to mtd_mci
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += mtd_mci
 endif

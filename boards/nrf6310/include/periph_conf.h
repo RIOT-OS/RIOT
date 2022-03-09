@@ -36,13 +36,11 @@ extern "C" {
  * @{
  */
 #define UART_NUMOF          (1U)
-#define UART_0_EN           1
 #define UART_IRQ_PRIO       1
 
 /* UART pin configuration */
 #define UART_PIN_RX       16
 #define UART_PIN_TX       17
-#define UART_HWFLOWCTRL   0
 #define UART_PIN_RTS      19
 #define UART_PIN_CTS      18
 /** @} */

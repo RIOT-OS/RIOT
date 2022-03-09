@@ -1,10 +1,9 @@
 /***************************************************************************//**
  * @file
  * @brief EFR32MG1P_MSC register and bit field definitions
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -408,13 +407,13 @@ typedef struct {
 #define _MSC_LOCK_LOCKKEY_SHIFT                 0                                 /**< Shift value for MSC_LOCKKEY */
 #define _MSC_LOCK_LOCKKEY_MASK                  0xFFFFUL                          /**< Bit mask for MSC_LOCKKEY */
 #define _MSC_LOCK_LOCKKEY_DEFAULT               0x00000000UL                      /**< Mode DEFAULT for MSC_LOCK */
-#define _MSC_LOCK_LOCKKEY_LOCK                  0x00000000UL                      /**< Mode LOCK for MSC_LOCK */
 #define _MSC_LOCK_LOCKKEY_UNLOCKED              0x00000000UL                      /**< Mode UNLOCKED for MSC_LOCK */
+#define _MSC_LOCK_LOCKKEY_LOCK                  0x00000000UL                      /**< Mode LOCK for MSC_LOCK */
 #define _MSC_LOCK_LOCKKEY_LOCKED                0x00000001UL                      /**< Mode LOCKED for MSC_LOCK */
 #define _MSC_LOCK_LOCKKEY_UNLOCK                0x00001B71UL                      /**< Mode UNLOCK for MSC_LOCK */
 #define MSC_LOCK_LOCKKEY_DEFAULT                (_MSC_LOCK_LOCKKEY_DEFAULT << 0)  /**< Shifted mode DEFAULT for MSC_LOCK */
-#define MSC_LOCK_LOCKKEY_LOCK                   (_MSC_LOCK_LOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for MSC_LOCK */
 #define MSC_LOCK_LOCKKEY_UNLOCKED               (_MSC_LOCK_LOCKKEY_UNLOCKED << 0) /**< Shifted mode UNLOCKED for MSC_LOCK */
+#define MSC_LOCK_LOCKKEY_LOCK                   (_MSC_LOCK_LOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for MSC_LOCK */
 #define MSC_LOCK_LOCKKEY_LOCKED                 (_MSC_LOCK_LOCKKEY_LOCKED << 0)   /**< Shifted mode LOCKED for MSC_LOCK */
 #define MSC_LOCK_LOCKKEY_UNLOCK                 (_MSC_LOCK_LOCKKEY_UNLOCK << 0)   /**< Shifted mode UNLOCK for MSC_LOCK */
 
@@ -458,13 +457,13 @@ typedef struct {
 #define _MSC_MASSLOCK_MASK                      0x0000FFFFUL                          /**< Mask for MSC_MASSLOCK */
 #define _MSC_MASSLOCK_LOCKKEY_SHIFT             0                                     /**< Shift value for MSC_LOCKKEY */
 #define _MSC_MASSLOCK_LOCKKEY_MASK              0xFFFFUL                              /**< Bit mask for MSC_LOCKKEY */
-#define _MSC_MASSLOCK_LOCKKEY_LOCK              0x00000000UL                          /**< Mode LOCK for MSC_MASSLOCK */
 #define _MSC_MASSLOCK_LOCKKEY_UNLOCKED          0x00000000UL                          /**< Mode UNLOCKED for MSC_MASSLOCK */
+#define _MSC_MASSLOCK_LOCKKEY_LOCK              0x00000000UL                          /**< Mode LOCK for MSC_MASSLOCK */
 #define _MSC_MASSLOCK_LOCKKEY_DEFAULT           0x00000001UL                          /**< Mode DEFAULT for MSC_MASSLOCK */
 #define _MSC_MASSLOCK_LOCKKEY_LOCKED            0x00000001UL                          /**< Mode LOCKED for MSC_MASSLOCK */
 #define _MSC_MASSLOCK_LOCKKEY_UNLOCK            0x0000631AUL                          /**< Mode UNLOCK for MSC_MASSLOCK */
-#define MSC_MASSLOCK_LOCKKEY_LOCK               (_MSC_MASSLOCK_LOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for MSC_MASSLOCK */
 #define MSC_MASSLOCK_LOCKKEY_UNLOCKED           (_MSC_MASSLOCK_LOCKKEY_UNLOCKED << 0) /**< Shifted mode UNLOCKED for MSC_MASSLOCK */
+#define MSC_MASSLOCK_LOCKKEY_LOCK               (_MSC_MASSLOCK_LOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for MSC_MASSLOCK */
 #define MSC_MASSLOCK_LOCKKEY_DEFAULT            (_MSC_MASSLOCK_LOCKKEY_DEFAULT << 0)  /**< Shifted mode DEFAULT for MSC_MASSLOCK */
 #define MSC_MASSLOCK_LOCKKEY_LOCKED             (_MSC_MASSLOCK_LOCKKEY_LOCKED << 0)   /**< Shifted mode LOCKED for MSC_MASSLOCK */
 #define MSC_MASSLOCK_LOCKKEY_UNLOCK             (_MSC_MASSLOCK_LOCKKEY_UNLOCK << 0)   /**< Shifted mode UNLOCK for MSC_MASSLOCK */

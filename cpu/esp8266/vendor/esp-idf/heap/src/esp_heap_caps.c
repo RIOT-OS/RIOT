@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 
 #include <string.h>
 #include <assert.h>
@@ -24,7 +24,7 @@
 #include "esp_heap_trace.h"
 #include "priv/esp_heap_caps_priv.h"
 
-#if ENABLE_DEBUG
+#if IS_ACTIVE(ENABLE_DEBUG)
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #endif
 

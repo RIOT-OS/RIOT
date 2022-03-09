@@ -37,6 +37,20 @@ static void tear_down(void)
     tsrb_init(&_tsrb, _tsrb_buffer, BUFFER_SIZE);
 }
 
+static void test_clear(void)
+{
+    TEST_ASSERT_EQUAL_INT(0, tsrb_avail(&_tsrb));
+
+    for (int i = 0; i < BUFFER_SIZE; i++) {
+        TEST_ASSERT_EQUAL_INT(0, tsrb_add_one(&_tsrb, TEST_INPUT));
+        TEST_ASSERT_EQUAL_INT(i + 1, tsrb_avail(&_tsrb));
+    }
+
+    tsrb_clear(&_tsrb);
+
+    TEST_ASSERT_EQUAL_INT(0, tsrb_avail(&_tsrb));
+}
+
 static void test_empty(void)
 {
     TEST_ASSERT_EQUAL_INT(1, tsrb_empty(&_tsrb));
@@ -115,6 +129,43 @@ static void test_get(void)
     }
 }
 
+static void test_peek_one(void)
+{
+    int res;
+
+    TEST_ASSERT_EQUAL_INT(-1, tsrb_peek_one(&_tsrb));
+    TEST_ASSERT_EQUAL_INT(0, tsrb_add_one(&_tsrb, TEST_INPUT));
+    TEST_ASSERT_EQUAL_INT(TEST_INPUT, tsrb_peek_one(&_tsrb));
+    TEST_ASSERT_EQUAL_INT(TEST_INPUT, tsrb_peek_one(&_tsrb));
+    TEST_ASSERT_EQUAL_INT(TEST_INPUT, tsrb_get_one(&_tsrb));
+    TEST_ASSERT_EQUAL_INT(-1, tsrb_peek_one(&_tsrb));
+    TEST_ASSERT_EQUAL_INT(0, tsrb_add_one(&_tsrb, 0xff));
+    res = tsrb_peek_one(&_tsrb);
+    TEST_ASSERT_EQUAL_INT(0xff, res);
+    /* 0xff is -1 in signed int8_t */
+    TEST_ASSERT(-1 != res);
+}
+
+static void test_peek(void)
+{
+    TEST_ASSERT(BUFFER_SIZE < sizeof(_io_buffer));
+    TEST_ASSERT_EQUAL_INT(0, tsrb_peek(&_tsrb, _io_buffer,
+                                      sizeof(_io_buffer)));
+
+    for (int i = 0; i < BUFFER_SIZE; i++) {
+        TEST_ASSERT_EQUAL_INT(0, tsrb_add_one(&_tsrb, TEST_INPUT + i));
+    }
+    TEST_ASSERT_EQUAL_INT(BUFFER_SIZE, tsrb_peek(&_tsrb, _io_buffer,
+                                                sizeof(_io_buffer)));
+    for (int i = 0; i < BUFFER_SIZE; i++) {
+        TEST_ASSERT_EQUAL_INT((TEST_INPUT + i), _io_buffer[i]);
+    }
+    for (int i = BUFFER_SIZE; i < (int)sizeof(_io_buffer); i++) {
+        TEST_ASSERT_EQUAL_INT(IO_BUFFER_CANARY, _io_buffer[i]);
+    }
+    TEST_ASSERT_EQUAL_INT(BUFFER_SIZE, tsrb_avail(&_tsrb));
+}
+
 static void test_drop(void)
 {
     TEST_ASSERT(BUFFER_SIZE < sizeof(_io_buffer));
@@ -165,12 +216,15 @@ static void test_add(void)
 static Test *tests_tsrb_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
+        new_TestFixture(test_clear),
         new_TestFixture(test_empty),
         new_TestFixture(test_avail),
         new_TestFixture(test_full),
         new_TestFixture(test_free),
         new_TestFixture(test_get_one),
+        new_TestFixture(test_peek_one),
         new_TestFixture(test_get),
+        new_TestFixture(test_peek),
         new_TestFixture(test_drop),
         new_TestFixture(test_add_one),
         new_TestFixture(test_add),

@@ -30,7 +30,6 @@
  */
 saul_reg_t *saul_reg = NULL;
 
-
 int saul_reg_add(saul_reg_t *dev)
 {
     saul_reg_t *tmp = saul_reg;
@@ -50,29 +49,6 @@ int saul_reg_add(saul_reg_t *dev)
             tmp = tmp->next;
         }
         tmp->next = dev;
-    }
-    return 0;
-}
-
-int saul_reg_rm(saul_reg_t *dev)
-{
-    saul_reg_t *tmp = saul_reg;
-
-    if (saul_reg == NULL || dev == NULL) {
-        return -ENODEV;
-    }
-    if (saul_reg == dev) {
-        saul_reg = dev->next;
-        return 0;
-    }
-    while (tmp->next && (tmp->next != dev)) {
-        tmp = tmp->next;
-    }
-    if (tmp->next == dev) {
-        tmp->next = dev->next;
-    }
-    else {
-        return -ENODEV;
     }
     return 0;
 }
@@ -106,6 +82,19 @@ saul_reg_t *saul_reg_find_name(const char *name)
 
     while (tmp) {
         if (strcmp(tmp->name, name) == 0) {
+            return tmp;
+        }
+        tmp = tmp->next;
+    }
+    return NULL;
+}
+
+saul_reg_t *saul_reg_find_type_and_name(uint8_t type, const char *name)
+{
+    saul_reg_t *tmp = saul_reg;
+
+    while (tmp) {
+        if (tmp->driver->type == type && strcmp(tmp->name, name) == 0) {
             return tmp;
         }
         tmp = tmp->next;

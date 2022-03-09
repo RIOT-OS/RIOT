@@ -1,11 +1,17 @@
-export NATIVEINCLUDES += -I$(RIOTCPU)/native/include -I$(RIOTBASE)/sys/include
+NATIVEINCLUDES += -I$(RIOTCPU)/native/include -I$(RIOTBASE)/sys/include
 
 # Local include for OSX
 ifeq ($(BUILDOSXNATIVE),1)
-    export NATIVEINCLUDES += -I$(RIOTCPU)/native/osx-libc-extra
+  NATIVEINCLUDES += -I$(RIOTCPU)/native/osx-libc-extra
 endif
 
-USEMODULE += periph
-USEMODULE += periph_uart
+ifneq (,$(filter periph_can,$(USEMODULE)))
+  LINKFLAGS += -lsocketcan
+endif
 
-TOOLCHAINS_SUPPORTED = gnu llvm
+TOOLCHAINS_SUPPORTED = gnu llvm afl
+
+# Platform triple as used by Rust
+ifeq ($(OS) $(OS_ARCH),Linux x86_64)
+  RUST_TARGET = i686-unknown-linux-gnu
+endif

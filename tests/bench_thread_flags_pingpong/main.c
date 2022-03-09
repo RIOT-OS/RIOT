@@ -19,6 +19,8 @@
  */
 
 #include <stdio.h>
+#include "macros/units.h"
+#include "clk.h"
 #include "thread.h"
 
 #include "thread_flags.h"
@@ -61,7 +63,7 @@ int main(void)
                                        NULL,
                                        "second_thread");
 
-    thread_t *tcb = (thread_t *)sched_threads[other];
+    thread_t *tcb = thread_get(other);
 
     xtimer_t timer;
     timer.callback = _timer_callback;
@@ -74,7 +76,10 @@ int main(void)
         n++;
     }
 
-    printf("{ \"result\" : %"PRIu32" }\n", n);
+    printf("{ \"result\" : %"PRIu32, n);
+    printf(", \"ticks\" : %"PRIu32,
+           (uint32_t)((TEST_DURATION/US_PER_MS) * (coreclk()/KHZ(1)))/n);
+    puts(" }");
 
     return 0;
 }

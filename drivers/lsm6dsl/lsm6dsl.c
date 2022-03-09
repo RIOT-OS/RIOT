@@ -20,12 +20,14 @@
  * @}
  */
 
-#include "xtimer.h"
+#include <assert.h>
+
+#include "ztimer.h"
 
 #include "lsm6dsl.h"
 #include "lsm6dsl_internal.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -60,7 +62,7 @@ int lsm6dsl_init(lsm6dsl_t *dev, const lsm6dsl_params_t *params)
     /* Reboot */
     i2c_write_reg(BUS, ADDR, LSM6DSL_REG_CTRL3_C, LSM6DSL_CTRL3_C_BOOT, 0);
 
-    xtimer_usleep(LSM6DSL_BOOT_WAIT);
+    ztimer_sleep(ZTIMER_MSEC, LSM6DSL_BOOT_WAIT_MS);
 
     if (i2c_read_reg(BUS, ADDR, LSM6DSL_REG_WHO_AM_I, &tmp, 0) < 0) {
         i2c_release(BUS);

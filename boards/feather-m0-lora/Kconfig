@@ -1,0 +1,16 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "feather-m0-lora" if BOARD_FEATHER_M0_LORA
+
+config BOARD_FEATHER_M0_LORA
+    bool
+    default y
+    select BOARD_FEATHER_M0_BASE
+    select HAVE_SX1276
+
+source "$(RIOTBOARD)/feather-m0/Kconfig.feather-m0-base"

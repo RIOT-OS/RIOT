@@ -128,7 +128,6 @@ typedef struct {
  */
 int mma7660_init(mma7660_t *dev, const mma7660_params_t *params);
 
-
 /**
  * @brief   Set the mode register
  *

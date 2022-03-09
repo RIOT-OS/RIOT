@@ -18,11 +18,15 @@
  * @}
  */
 
+#include <assert.h>
+
+#include "board.h"
+#include "atomic_utils.h"
 #include "irq.h"
 #include "periph/pm.h"
 #include "pm_layered.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef PM_NUM_MODES
@@ -30,25 +34,17 @@
 #endif
 
 #ifndef PM_BLOCKER_INITIAL
-#define PM_BLOCKER_INITIAL { .val_u32 = 0x01010101 }
+#define PM_BLOCKER_INITIAL 0x01010101   /* block all by default */
 #endif
-
-/**
- * @brief Power Management mode typedef
- */
-typedef union {
-    uint32_t val_u32;
-    uint8_t val_u8[PM_NUM_MODES];
-} pm_blocker_t;
 
 /**
  * @brief Global variable for keeping track of blocked modes
  */
-volatile pm_blocker_t pm_blocker = PM_BLOCKER_INITIAL;
+static pm_blocker_t pm_blocker = { .val_u32 = PM_BLOCKER_INITIAL };
 
 void pm_set_lowest(void)
 {
-    pm_blocker_t blocker = pm_blocker;
+    pm_blocker_t blocker = { .val_u32 = atomic_load_u32(&pm_blocker.val_u32) };
     unsigned mode = PM_NUM_MODES;
     while (mode) {
         if (blocker.val_u8[mode-1]) {
@@ -87,11 +83,18 @@ void pm_unblock(unsigned mode)
     irq_restore(state);
 }
 
+pm_blocker_t pm_get_blocker(void)
+{
+    pm_blocker_t result = { .val_u32 = atomic_load_u32(&pm_blocker.val_u32) };
+    return result;
+}
+
 #ifndef PROVIDES_PM_LAYERED_OFF
 void pm_off(void)
 {
-    pm_blocker.val_u32 = 0;
-    pm_set_lowest();
-    while(1) {}
+    irq_disable();
+    while(1) {
+        pm_set(0);
+    }
 }
 #endif

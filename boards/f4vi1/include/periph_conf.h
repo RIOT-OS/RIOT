@@ -21,8 +21,16 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+/* This board provides an HSE */
+#ifndef CONFIG_BOARD_HAS_HSE
+#define CONFIG_BOARD_HAS_HSE    1
+#endif
+
+/* The HSE provides a 16MHz clock */
+#define CLOCK_HSE               MHZ(16)
+
 #include "periph_cpu.h"
-#include "f4/cfg_clock_168_16_0.h"
+#include "clk_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,15 +77,14 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB2,
         .irqn       = USART6_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 14,
-        .dma_chan   = 5
+#ifdef MODULE_PERIPH_DMA
+        .dma        = DMA_STREAM_UNDEF,
+        .dma_chan   = UINT8_MAX,
 #endif
     }
 };
 
 #define UART_0_ISR          (isr_usart6)
-#define UART_0_DMA_ISR      (isr_dma2_stream6)
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */

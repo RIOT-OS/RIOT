@@ -1,0 +1,13 @@
+MODULE = u8g2_sdl
+
+CFLAGS += $(shell sdl2-config --cflags)
+
+# Ignore warning generated when compiling this module
+CFLAGS += -Wno-empty-translation-unit \
+          -Wno-newline-eof \
+          -Wno-unused-parameter \
+          -Wno-unused \
+          -Wno-overlength-strings \
+          -Wno-pointer-arith
+
+include $(RIOTBASE)/Makefile.base

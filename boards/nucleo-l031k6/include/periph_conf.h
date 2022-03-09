@@ -21,8 +21,13 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+/* Add specific clock configuration (HSE, LSE) for this board here */
+#ifndef CONFIG_BOARD_HAS_LSE
+#define CONFIG_BOARD_HAS_LSE            1
+#endif
+
 #include "periph_cpu.h"
-#include "l0/cfg_clock_32_16_1.h"
+#include "clk_conf.h"
 #include "cfg_i2c1_pb6_pb7.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"
@@ -79,30 +84,13 @@ static const pwm_conf_t pwm_config[] = {
  * @name    SPI configuration
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 32000000Hz */
-        7,  /* -> 125000Hz */
-        5,  /* -> 500000Hz */
-        4,  /* -> 1000000Hz */
-        2,  /* -> 4000000Hz */
-        1   /* -> 8000000Hz */
-    },
-    {       /* for APB2 @ 32000000Hz */
-        7,  /* -> 125000Hz */
-        5,  /* -> 500000Hz */
-        4,  /* -> 1000000Hz */
-        2,  /* -> 4000000Hz */
-        1   /* -> 8000000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
         .dev      = SPI1,
         .mosi_pin = GPIO_PIN(PORT_B, 5),
         .miso_pin = GPIO_PIN(PORT_B, 4),
         .sclk_pin = GPIO_PIN(PORT_B, 3),
-        .cs_pin   = GPIO_UNDEF,
+        .cs_pin   = SPI_CS_UNDEF,
         .mosi_af  = GPIO_AF0,
         .miso_af  = GPIO_AF0,
         .sclk_af  = GPIO_AF0,
@@ -119,16 +107,17 @@ static const spi_conf_t spi_config[] = {
  * @name    ADC configuration
  * @{
  */
-#define ADC_CONFIG {                           \
-    { GPIO_PIN(PORT_A, 0), 0 },  /* Pin A0 */  \
-    { GPIO_PIN(PORT_A, 1), 1 },  /* Pin A1 */  \
-    { GPIO_PIN(PORT_A, 3), 3 },  /* Pin A2 */  \
-    { GPIO_PIN(PORT_A, 4), 4 },  /* Pin A3 */  \
-    { GPIO_PIN(PORT_A, 5), 5 },  /* Pin A4 */  \
-    { GPIO_PIN(PORT_A, 6), 6 },  /* Pin A5 */  \
-    { GPIO_PIN(PORT_A, 7), 7 },  /* Pin A6 */  \
-}
-#define ADC_NUMOF           (7U)
+static const adc_conf_t adc_config[] = {
+    { GPIO_PIN(PORT_A, 0), 0 },  /* Pin A0 */
+    { GPIO_PIN(PORT_A, 1), 1 },  /* Pin A1 */
+    { GPIO_PIN(PORT_A, 3), 3 },  /* Pin A2 */
+    { GPIO_PIN(PORT_A, 4), 4 },  /* Pin A3 */
+    { GPIO_PIN(PORT_A, 5), 5 },  /* Pin A4 */
+    { GPIO_PIN(PORT_A, 6), 6 },  /* Pin A5 */
+    { GPIO_PIN(PORT_A, 7), 7 },  /* Pin A6 */
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 #ifdef __cplusplus

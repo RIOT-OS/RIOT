@@ -38,11 +38,12 @@
 #define __SOCKADDR_COMMON_SIZE  (sizeof (unsigned short int))
 #endif
 
+#include <stdalign.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/uio.h>
 
-#include "kernel_types.h"
+#include "architecture.h"
 #include "net/af.h"
 #include "sys/bytes.h"
 
@@ -121,21 +122,26 @@ typedef unsigned short sa_family_t;   /**< address family type */
 
 /**
  * @brief   Used to define the socket address.
+ *
+ * @details This structure is is forced to be aligned as `uint32_t`, as e.g.
+ *          the IPv4 address is stored as `uint32_t`
  */
 struct sockaddr {
-    sa_family_t sa_family;                  /**< Address family */
+    alignas(uint32_t) sa_family_t sa_family;/**< Address family */
     char sa_data[SOCKADDR_MAX_DATA_LEN];    /**< Socket address (variable length data) */
 };
 
 /**
  * @brief   Implementation based socket address table.
  * @extends struct sockaddr
+ *
+ * @details This structure is is forced to be aligned as `uint32_t`, as e.g.
+ *          the IPv4 address is stored as `uint32_t`
  */
 struct sockaddr_storage {
-    sa_family_t ss_family;                  /**< Address family */
+    alignas(uint32_t) sa_family_t ss_family;/**< Address family */
     uint8_t ss_data[SOCKADDR_MAX_DATA_LEN]; /**< Socket address */
 };
-
 
 /**
  * @brief   Accept a new connection on a socket

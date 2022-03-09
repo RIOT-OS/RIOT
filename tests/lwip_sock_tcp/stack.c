@@ -13,10 +13,6 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @}
  */
-
-
-#include "xtimer.h"
-
 #include "lwip.h"
 #include "lwip/netif.h"
 
@@ -24,6 +20,5 @@
 
 void _net_init(void)
 {
-    xtimer_init();
     lwip_bootstrap();
 }

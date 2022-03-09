@@ -26,15 +26,15 @@
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 #include "debug.h"
 
 #define MAX_VAL         0x7fff
 
-#define DEV_I2C      (dev->params.i2c)
-#define DEV_ADDR     (dev->params.addr)
-#define DEV_MODE     (dev->params.mode)
-#define DEV_SCALE    (dev->params.scale)
+#define DEV_I2C         (dev->params.i2c)
+#define DEV_ADDR        (dev->params.addr)
+#define DEV_MODE        (dev->params.mode)
+#define DEV_SCALE       (dev->params.scale)
 
 int l3g4200d_init(l3g4200d_t *dev, const l3g4200d_params_t *params)
 {

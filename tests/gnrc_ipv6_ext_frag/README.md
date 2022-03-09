@@ -24,7 +24,7 @@ frames to properly communicate over the TAP interface.
 
 The tests succeeds if you see the string `SUCCESS`.
 
-If any problems are encountered (i.e. if the test prints the sting `FAILED`),
+If any problems are encountered (i.e. if the test prints the string `FAILED`),
 set the echo parameter in the `run()` function at the bottom of the test script
 (tests/01-run.py) to `True`. The test script will then offer a more detailed
 output.

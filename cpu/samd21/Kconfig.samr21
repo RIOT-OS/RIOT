@@ -1,0 +1,37 @@
+## CPU Models
+config CPU_MODEL_SAMR21E16A
+    bool
+    select CPU_FAM_SAMR21
+
+config CPU_MODEL_SAMR21E17A
+    bool
+    select CPU_FAM_SAMR21
+
+config CPU_MODEL_SAMR21E18A
+    bool
+    select CPU_FAM_SAMR21
+
+config CPU_MODEL_SAMR21E19A
+    bool
+    select CPU_FAM_SAMR21
+
+config CPU_MODEL_SAMR21G16A
+    bool
+    select CPU_FAM_SAMR21
+
+config CPU_MODEL_SAMR21G17A
+    bool
+    select CPU_FAM_SAMR21
+
+config CPU_MODEL_SAMR21G18A
+    bool
+    select CPU_FAM_SAMR21
+
+config CPU_MODEL
+    default "samr21e16a" if CPU_MODEL_SAMR21E16A
+    default "samr21e17a" if CPU_MODEL_SAMR21E17A
+    default "samr21e18a" if CPU_MODEL_SAMR21E18A
+    default "samr21e19a" if CPU_MODEL_SAMR21E19A
+    default "samr21g16a" if CPU_MODEL_SAMR21G16A
+    default "samr21g17a" if CPU_MODEL_SAMR21G17A
+    default "samr21g18a" if CPU_MODEL_SAMR21G18A

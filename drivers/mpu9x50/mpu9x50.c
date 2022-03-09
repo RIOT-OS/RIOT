@@ -22,11 +22,12 @@
 
 #include "mpu9x50.h"
 #include "mpu9x50_regs.h"
+#include "mpu9x50_internal.h"
 #include "periph/i2c.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "byteorder.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define REG_RESET           (0x00)
@@ -72,7 +73,7 @@ int mpu9x50_init(mpu9x50_t *dev, const mpu9x50_params_t *params)
 
     /* Reset MPU9X50 registers and afterwards wake up the chip */
     i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_PWR_MGMT_1_REG, MPU9X50_PWR_RESET, 0);
-    xtimer_usleep(MPU9X50_RESET_SLEEP_US);
+    ztimer_sleep(ZTIMER_MSEC, MPU9X50_RESET_SLEEP_MS);
     i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_PWR_MGMT_1_REG, MPU9X50_PWR_WAKEUP, 0);
 
     /* Release the bus, it is acquired again inside each function */
@@ -102,7 +103,7 @@ int mpu9x50_init(mpu9x50_t *dev, const mpu9x50_params_t *params)
     temp &= ~(MPU9X50_PWR_ACCEL | MPU9X50_PWR_GYRO);
     i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_PWR_MGMT_2_REG, temp, 0);
     i2c_release(DEV_I2C);
-    xtimer_usleep(MPU9X50_PWR_CHANGE_SLEEP_US);
+    ztimer_sleep(ZTIMER_MSEC, MPU9X50_PWR_CHANGE_SLEEP_MS);
 
     return 0;
 }
@@ -116,9 +117,7 @@ int mpu9x50_set_accel_power(mpu9x50_t *dev, mpu9x50_pwr_t pwr_conf)
     }
 
     /* Acquire exclusive access */
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
 
     /* Read current power management 2 configuration */
     i2c_read_reg(DEV_I2C, DEV_ADDR, MPU9X50_PWR_MGMT_2_REG, &pwr_2_setting, 0);
@@ -143,7 +142,7 @@ int mpu9x50_set_accel_power(mpu9x50_t *dev, mpu9x50_pwr_t pwr_conf)
     i2c_release(DEV_I2C);
 
     dev->conf.accel_pwr = pwr_conf;
-    xtimer_usleep(MPU9X50_PWR_CHANGE_SLEEP_US);
+    ztimer_sleep(ZTIMER_MSEC, MPU9X50_PWR_CHANGE_SLEEP_MS);
 
     return 0;
 }
@@ -157,9 +156,7 @@ int mpu9x50_set_gyro_power(mpu9x50_t *dev, mpu9x50_pwr_t pwr_conf)
     }
 
     /* Acquire exclusive access */
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
 
     /* Read current power management 2 configuration */
     i2c_read_reg(DEV_I2C, DEV_ADDR, MPU9X50_PWR_MGMT_2_REG, &pwr_2_setting, 0);
@@ -191,7 +188,7 @@ int mpu9x50_set_gyro_power(mpu9x50_t *dev, mpu9x50_pwr_t pwr_conf)
     i2c_release(DEV_I2C);
 
     dev->conf.gyro_pwr = pwr_conf;
-    xtimer_usleep(MPU9X50_PWR_CHANGE_SLEEP_US);
+    ztimer_sleep(ZTIMER_MSEC, MPU9X50_PWR_CHANGE_SLEEP_MS);
 
     return 0;
 }
@@ -205,9 +202,7 @@ int mpu9x50_set_compass_power(mpu9x50_t *dev, mpu9x50_pwr_t pwr_conf)
     }
 
     /* Acquire exclusive access */
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
 
     /* Read current user control configuration */
     i2c_read_reg(DEV_I2C, DEV_ADDR, MPU9X50_USER_CTRL_REG, &usr_ctrl_setting, 0);
@@ -236,7 +231,7 @@ int mpu9x50_set_compass_power(mpu9x50_t *dev, mpu9x50_pwr_t pwr_conf)
     i2c_release(DEV_I2C);
 
     dev->conf.compass_pwr = pwr_conf;
-    xtimer_usleep(MPU9X50_PWR_CHANGE_SLEEP_US);
+    ztimer_sleep(ZTIMER_MSEC, MPU9X50_PWR_CHANGE_SLEEP_MS);
 
     return 0;
 }
@@ -265,9 +260,7 @@ int mpu9x50_read_gyro(const mpu9x50_t *dev, mpu9x50_results_t *output)
     }
 
     /* Acquire exclusive access */
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
     /* Read raw data */
     i2c_read_regs(DEV_I2C, DEV_ADDR, MPU9X50_GYRO_START_REG, data, 6, 0);
     /* Release the bus */
@@ -308,9 +301,7 @@ int mpu9x50_read_accel(const mpu9x50_t *dev, mpu9x50_results_t *output)
     }
 
     /* Acquire exclusive access */
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
     /* Read raw data */
     i2c_read_regs(DEV_I2C, DEV_ADDR, MPU9X50_ACCEL_START_REG, data, 6, 0);
     /* Release the bus */
@@ -332,9 +323,7 @@ int mpu9x50_read_compass(const mpu9x50_t *dev, mpu9x50_results_t *output)
     uint8_t data[6];
 
     /* Acquire exclusive access */
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
     /* Read raw data */
     i2c_read_regs(DEV_I2C, DEV_ADDR, MPU9X50_EXT_SENS_DATA_START_REG, data, 6, 0);
     /* Release the bus */
@@ -365,9 +354,7 @@ int mpu9x50_read_temperature(const mpu9x50_t *dev, int32_t *output)
     uint16_t data;
 
     /* Acquire exclusive access */
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
     /* Read raw temperature value */
     i2c_read_regs(DEV_I2C, DEV_ADDR, MPU9X50_TEMP_START_REG, &data, 2, 0);
     /* Release the bus */
@@ -391,9 +378,7 @@ int mpu9x50_set_gyro_fsr(mpu9x50_t *dev, mpu9x50_gyro_ranges_t fsr)
         case MPU9X50_GYRO_FSR_500DPS:
         case MPU9X50_GYRO_FSR_1000DPS:
         case MPU9X50_GYRO_FSR_2000DPS:
-            if (i2c_acquire(DEV_I2C)) {
-                return -1;
-            }
+            i2c_acquire(DEV_I2C);
             i2c_write_reg(DEV_I2C, DEV_ADDR,
                     MPU9X50_GYRO_CFG_REG, (fsr << 3), 0);
             i2c_release(DEV_I2C);
@@ -417,9 +402,7 @@ int mpu9x50_set_accel_fsr(mpu9x50_t *dev, mpu9x50_accel_ranges_t fsr)
         case MPU9X50_ACCEL_FSR_4G:
         case MPU9X50_ACCEL_FSR_8G:
         case MPU9X50_ACCEL_FSR_16G:
-            if (i2c_acquire(DEV_I2C)) {
-                return -1;
-            }
+            i2c_acquire(DEV_I2C);
             i2c_write_reg(DEV_I2C, DEV_ADDR,
                     MPU9X50_ACCEL_CFG_REG, (fsr << 3), 0);
             i2c_release(DEV_I2C);
@@ -446,9 +429,7 @@ int mpu9x50_set_sample_rate(mpu9x50_t *dev, uint16_t rate)
     /* Compute divider to achieve desired sample rate and write to rate div register */
     divider = (1000 / rate - 1);
 
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
     i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_RATE_DIV_REG, divider, 0);
 
     /* Store configured sample rate */
@@ -476,9 +457,7 @@ int mpu9x50_set_compass_sample_rate(mpu9x50_t *dev, uint8_t rate)
     /* Compute divider to achieve desired sample rate and write to slave ctrl register */
     divider = (dev->conf.sample_rate / rate - 1);
 
-    if (i2c_acquire(DEV_I2C)) {
-        return -1;
-    }
+    i2c_acquire(DEV_I2C);
     i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_SLAVE4_CTRL_REG, divider, 0);
     i2c_release(DEV_I2C);
 
@@ -513,10 +492,10 @@ static int compass_init(mpu9x50_t *dev)
 
     /* Configure Power Down mode */
     i2c_write_reg(DEV_I2C, DEV_COMP_ADDR, COMPASS_CNTL_REG, MPU9X50_COMP_POWER_DOWN, 0);
-    xtimer_usleep(MPU9X50_COMP_MODE_SLEEP_US);
+    ztimer_sleep(ZTIMER_MSEC, MPU9X50_COMP_MODE_SLEEP_MS);
     /* Configure Fuse ROM access */
     i2c_write_reg(DEV_I2C, DEV_COMP_ADDR, COMPASS_CNTL_REG, MPU9X50_COMP_FUSE_ROM, 0);
-    xtimer_usleep(MPU9X50_COMP_MODE_SLEEP_US);
+    ztimer_sleep(ZTIMER_MSEC, MPU9X50_COMP_MODE_SLEEP_MS);
     /* Read sensitivity adjustment values from Fuse ROM */
     i2c_read_regs(DEV_I2C, DEV_COMP_ADDR, COMPASS_ASAX_REG, data, 3, 0);
     dev->conf.compass_x_adj = data[0];
@@ -524,7 +503,7 @@ static int compass_init(mpu9x50_t *dev)
     dev->conf.compass_z_adj = data[2];
     /* Configure Power Down mode again */
     i2c_write_reg(DEV_I2C, DEV_COMP_ADDR, COMPASS_CNTL_REG, MPU9X50_COMP_POWER_DOWN, 0);
-    xtimer_usleep(MPU9X50_COMP_MODE_SLEEP_US);
+    ztimer_sleep(ZTIMER_MSEC, MPU9X50_COMP_MODE_SLEEP_MS);
 
     /* Disable Bypass Mode to configure MPU as master to the compass */
     conf_bypass(dev, 0);
@@ -574,13 +553,13 @@ static void conf_bypass(const mpu9x50_t *dev, uint8_t bypass_enable)
    if (bypass_enable) {
        data &= ~(BIT_I2C_MST_EN);
        i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_USER_CTRL_REG, data, 0);
-       xtimer_usleep(MPU9X50_BYPASS_SLEEP_US);
+       ztimer_sleep(ZTIMER_MSEC, MPU9X50_BYPASS_SLEEP_MS);
        i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_INT_PIN_CFG_REG, BIT_I2C_BYPASS_EN, 0);
    }
    else {
        data |= BIT_I2C_MST_EN;
        i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_USER_CTRL_REG, data, 0);
-       xtimer_usleep(MPU9X50_BYPASS_SLEEP_US);
+       ztimer_sleep(ZTIMER_MSEC, MPU9X50_BYPASS_SLEEP_MS);
        i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9X50_INT_PIN_CFG_REG, REG_RESET, 0);
    }
 }

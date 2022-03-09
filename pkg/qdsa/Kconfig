@@ -1,0 +1,36 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config PACKAGE_QDSA
+    bool "qDSA Digital Signatures package"
+    depends on TEST_KCONFIG
+    depends on !HAS_ARCH_16BIT
+    help
+        Small and Secure Digital Signatures with Curve-based
+        Diffie-Hellman Key Pairs.
+
+if PACKAGE_QDSA
+
+config MODULE_QDSA_ASM
+    bool
+    default y if HAS_ARCH_AVR8 || CPU_CORE_CORTEX_M23
+    default y if CPU_CORE_CORTEX_M0 || CPU_CORE_CORTEX_M0PLUS
+    depends on TEST_KCONFIG
+
+config MODULE_QDSA_IMPL_ARM
+    bool
+    default y if CPU_CORE_CORTEX_M23 || CPU_CORE_CORTEX_M0 || CPU_CORE_CORTEX_M0PLUS
+
+config MODULE_QDSA_IMPL_AVR
+    bool
+    default y if HAS_ARCH_AVR8
+
+config MODULE_QDSA_IMPL_CREF
+    bool
+    default y if !MODULE_QDSA_IMPL_ARM && !MODULE_QDSA_IMPL_AVR
+
+endif # PACKAGE_QDSA

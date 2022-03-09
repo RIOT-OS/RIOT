@@ -6,7 +6,6 @@
  * directory for more details.
  */
 
-
 /**
  * @defgroup    sys_app_metadata app_metadata
  * @ingroup     sys

@@ -1,0 +1,80 @@
+PSEUDOMODULES += openwsn_serial \
+                 openwsn_debugpins \
+                 openwsn_6lo_fragmentation \
+                 openwsn_icmpv6_echo \
+                 openwsn_iee802154e_security \
+                 openwsn_leds \
+                 openwsn_sock \
+                 openwsn_sock_async \
+                 openwsn_scheduler \
+                 openwsn_sctimer \
+                 openwsn_sctimer_rtt \
+                 openwsn_sctimer_ztimer \
+                 openwsn_radio \
+                 #
+
+DIRS += $(RIOTBASE)/pkg/openwsn/contrib
+
+INCLUDES += -I$(PKGDIRBASE)/openwsn \
+            -I$(PKGDIRBASE)/openwsn/kernel \
+            -I$(PKGDIRBASE)/openwsn/inc \
+            -I$(PKGDIRBASE)/openwsn/drivers/common \
+            -I$(PKGDIRBASE)/openwsn/drivers/common/crypto \
+            -I$(PKGDIRBASE)/openwsn/bsp/boards/ \
+            -I$(PKGDIRBASE)/openwsn/openstack/ \
+            -I$(PKGDIRBASE)/openwsn/openstack/02a-MAClow \
+            -I$(PKGDIRBASE)/openwsn/openstack/02b-MAChigh \
+            -I$(PKGDIRBASE)/openwsn/openstack/03a-IPHC \
+            -I$(PKGDIRBASE)/openwsn/openstack/03b-IPv6 \
+            -I$(PKGDIRBASE)/openwsn/openstack/04-TRAN \
+            -I$(PKGDIRBASE)/openwsn/openstack/cross-layers \
+            -I$(PKGDIRBASE)/openwsn/openapps \
+            -I$(PKGDIRBASE)/openwsn/openapps/cjoin \
+            -I$(PKGDIRBASE)/openwsn/openweb \
+            -I$(PKGDIRBASE)/openwsn/openweb/opencoap \
+            -I$(RIOTBASE)/pkg/openwsn/include \
+
+ifneq (,$(filter openwsn_riotos,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBASE)/pkg/openwsn/scheduler
+  DIRS += $(RIOTBASE)/pkg/openwsn/scheduler
+endif
+
+ifneq (,$(filter openwsn_sock_udp,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBASE)/pkg/openwsn/sock
+  DIRS += $(RIOTBASE)/pkg/openwsn/sock
+endif
+
+# Set OpenWSN configurations flags, see $(PKG_SOURCE_DIR)/openwsn-fw/inc/config.h
+ifneq (,$(filter openwsn_cjoin,$(USEMODULE)))
+  CFLAGS += -DBOARD_CRYPTOENGINE_ENABLED=1
+endif
+
+ifneq (,$(filter openwsn_sock%,$(USEMODULE)))
+  ifneq (,$(filter openwsn_sock_async,$(USEMODULE)))
+    CFLAGS += -DSOCK_HAS_ASYNC
+  endif
+  ifneq (,$(filter sock_async_event,$(USEMODULE)))
+    # Needed only if using event and not simple callbacks
+    CFLAGS += -DSOCK_HAS_ASYNC_CTX
+  endif
+endif
+
+# In OpenWSN the ISR stack is shared with the network stack. OpenWSN stack is
+# 2Kb, this means that the ISR stack in OpenWSN might have up to 2Kb available.
+# To keep the same marging increase the ISR stack to 2Kb as well. In practice
+# 1Kb should be enough.
+CFLAGS += -DISR_STACKSIZE=2048
+
+# at86rf2xx state machine is in enhanced mode by default, OpenWSN requires
+# basic mode.
+ifneq (,$(filter at86rf2xx,$(USEMODULE)))
+  CFLAGS += -DAT86RF2XX_BASIC_MODE
+endif
+
+# Auto ACK should be disabled in order to run OpenWSN
+ifndef CONFIG_KCONFIG_USEMODULE_IEEE802154
+  CFLAGS += -DCONFIG_IEEE802154_AUTO_ACK_DISABLE
+endif
+
+# LLVM ARM shows issues with missing definitions for stdatomic
+TOOLCHAINS_BLACKLIST += llvm

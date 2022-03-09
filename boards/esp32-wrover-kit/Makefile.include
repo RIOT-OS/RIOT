@@ -1,8 +1,10 @@
 PSEUDOMODULES += esp32_wrover_kit_camera
 
-USEMODULE += boards_common_esp32
-
 # configure the serial interface
 PORT_LINUX ?= /dev/ttyUSB1
+
+ifneq (,$(filter esp_jtag,$(USEMODULE)))
+  OPENOCD_CONFIG ?= board/esp32-wrover-kit-3.3v.cfg
+endif
 
 include $(RIOTBOARD)/common/esp32/Makefile.include

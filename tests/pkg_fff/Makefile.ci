@@ -1,0 +1,2 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    nucleo-l011k4

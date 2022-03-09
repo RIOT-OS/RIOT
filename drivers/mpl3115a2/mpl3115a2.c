@@ -22,6 +22,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
@@ -32,11 +33,11 @@
 #include "mpl3115a2.h"
 #include "mpl3115a2_reg.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 #include "debug.h"
 
-#define BUS                 (dev->params.i2c)
-#define ADDR                (dev->params.addr)
+#define BUS             (dev->params.i2c)
+#define ADDR            (dev->params.addr)
 
 int mpl3115a2_init(mpl3115a2_t *dev, const mpl3115a2_params_t *params)
 {

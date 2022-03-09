@@ -29,6 +29,8 @@
 #define WGM0 0
 #define WGM1 1
 #define WGM2 3
+#define COMB0 4
+#define COMB1 5
 #define COMA0 6
 #define COMA1 7
 
@@ -38,7 +40,7 @@ static struct {
     uint8_t res;
 } state[PWM_NUMOF];
 
-static inline unsigned get_prescaler(pwm_t dev, uint32_t *scale)
+static inline uint8_t get_prescaler(pwm_t dev, uint32_t *scale)
 {
     uint16_t divmask = pwm_conf[dev].div;
     uint32_t target = *scale;
@@ -58,8 +60,41 @@ static inline unsigned get_prescaler(pwm_t dev, uint32_t *scale)
     return pre;
 }
 
+static inline void compute_cra_and_crb(pwm_t dev, uint8_t pre)
+{
+    uint8_t cra = (1 << WGM1) | (1 << WGM0);
+    uint8_t crb = pre;
+
+    if (pwm_conf[dev].pin_ch[0] != GPIO_UNDEF) {
+        cra |= (1 << COMA1);
+    }
+    else {
+        crb |= (1 << WGM2);
+    }
+
+    if (pwm_conf[dev].pin_ch[1] != GPIO_UNDEF) {
+        cra |= (1 << COMB1);
+    }
+
+    state[dev].CRA = cra;
+    state[dev].CRB = crb;
+}
+
+static inline void apply_config(pwm_t dev)
+{
+    pwm_conf[dev].dev->CRA = state[dev].CRA;
+    pwm_conf[dev].dev->CRB = state[dev].CRB;
+
+    if (pwm_conf[dev].pin_ch[0] == GPIO_UNDEF) {
+        /* If channel 0 is not used, variable resolutions can be used for
+         * channel 1 */
+        pwm_conf[dev].dev->OCR[0] = state[dev].res;
+    }
+}
+
 uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
+    (void)mode;
     /* only left implemented, max resolution 256 */
     assert(dev < PWM_NUMOF && mode == PWM_LEFT && res <= 256);
     /* resolution != 256 only valid if ch0 not used */
@@ -81,35 +116,24 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     /* find out prescaler */
     uint32_t scale = (CLOCK_CORECLOCK / (freq * (uint32_t)res));
-    unsigned pre = get_prescaler(dev, &scale);
+    uint8_t pre = get_prescaler(dev, &scale);
     freq = (CLOCK_CORECLOCK / (scale * (uint32_t)res));
 
-    /* compute register values and enable pins */
-    uint8_t cra = _BV(WGM1) | _BV(WGM0);
-    uint8_t crb = 0;
+    /* Compute configuration and store it in the state. (The state is needed
+     * for later calls to pwm_poweron().)*/
+    compute_cra_and_crb(dev, pre);
+    state[dev].res = res - 1;
 
-    res -= 1;
-    /* configure pins and resolution. Output must be low at initialization.
-     * Force the pin low to avoid flickering. */
+    /* Apply configuration stored in state */
+    apply_config(dev);
+
+    /* Enable outputs */
     if (pwm_conf[dev].pin_ch[0] != GPIO_UNDEF) {
         gpio_init(pwm_conf[dev].pin_ch[0], GPIO_OUT);
-        gpio_clear(pwm_conf[dev].pin_ch[0]);
     }
-    else {
-        crb |= _BV(WGM2);
-        pwm_conf[dev].dev->OCR[0] = (uint8_t)res;
-    }
-
     if (pwm_conf[dev].pin_ch[1] != GPIO_UNDEF) {
         gpio_init(pwm_conf[dev].pin_ch[1], GPIO_OUT);
-        gpio_clear(pwm_conf[dev].pin_ch[1]);
     }
-
-    pwm_conf[dev].dev->CRA = cra;
-    pwm_conf[dev].dev->CRB = crb | (pre);
-    state[dev].CRA = cra;
-    state[dev].CRB = crb | (pre);
-    state[dev].res = res;
 
     /* return real frequency */
     return freq;
@@ -132,21 +156,11 @@ uint8_t pwm_channels(pwm_t dev)
 void pwm_set(pwm_t dev, uint8_t ch, uint16_t value)
 {
     assert(dev < PWM_NUMOF && ch <= 1 && pwm_conf[dev].pin_ch[ch] != GPIO_UNDEF);
-
-    /* output flickers when duty cycle is 0 or 100%. Simply force the pin
-     * low or high respectively to have a clean output. */
-    uint8_t bit = (_BV(COMA1) >> (ch << 1));
-    if (value >= state[dev].res) {
-        pwm_conf[dev].dev->CRA &= ~bit;
-        gpio_set(pwm_conf[dev].pin_ch[ch]);
-    }
-    else if (value == 0) {
-        pwm_conf[dev].dev->CRA &= ~bit;
-        gpio_clear(pwm_conf[dev].pin_ch[ch]);
+    if (value > state[dev].res) {
+        pwm_conf[dev].dev->OCR[ch] = state[dev].res;
     }
     else {
         pwm_conf[dev].dev->OCR[ch] = value;
-        pwm_conf[dev].dev->CRA |= bit;
     }
 }
 
@@ -160,8 +174,8 @@ void pwm_poweron(pwm_t dev)
     else {
         power_timer0_enable();
     }
-    pwm_conf[dev].dev->CRA = state[dev].CRA;
-    pwm_conf[dev].dev->CRB = state[dev].CRB;
+
+    apply_config(dev);
 }
 
 void pwm_poweroff(pwm_t dev)
@@ -169,7 +183,7 @@ void pwm_poweroff(pwm_t dev)
     assert(dev < PWM_NUMOF);
     pwm_conf[dev].dev->CRA = 0x00;
     pwm_conf[dev].dev->CRB = 0x00;
-    /* disable power reduction */
+    /* disable timers to lower power consumption */
     if (dev) {
         power_timer2_disable();
     }

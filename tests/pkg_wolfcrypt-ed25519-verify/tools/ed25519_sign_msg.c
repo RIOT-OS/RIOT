@@ -26,7 +26,6 @@ void print_sig(void *sig_in)
     od_hex_dump(sig, ED25519_SIG_SIZE, 8);
 }
 
-
 int main(void)
 {
     uint8_t priv[ED25519_KEY_SIZE], pub[ED25519_KEY_SIZE];

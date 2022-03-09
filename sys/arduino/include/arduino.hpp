@@ -23,8 +23,16 @@
 
 extern "C" {
 #include <stdint.h>
+#include "irq.h"
 #include "periph/gpio.h"
 #include "arduino_board.h"
+
+/**
+ * @brief   Returns the number of milliseconds since start
+ *
+ * @return value of milliseconds since start
+ */
+unsigned long millis();
 }
 
 #include "serialport.hpp"
@@ -114,13 +122,6 @@ void delayMicroseconds(unsigned long usec);
  */
 unsigned long micros();
 
-/**
- * @brief   Returns the number of milliseconds since start
- *
- * @return value of milliseconds since start
- */
-unsigned long millis();
-
 #if MODULE_PERIPH_ADC || DOXYGEN
 /**
  * @brief   Read the current value of the given analog pin
@@ -164,6 +165,22 @@ int analogRead(int pin);
  */
 void analogWrite(int pin, int value);
 #endif
+
+/**
+ * @brief   Enables interrupts
+ */
+static inline void interrupts(void)
+{
+    irq_enable();
+}
+
+/**
+ * @brief   Disables interrupts
+ */
+static inline void noInterrupts(void)
+{
+    irq_disable();
+}
 
 #endif /* ARDUINO_HPP */
 /** @} */

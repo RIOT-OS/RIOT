@@ -1,0 +1,2 @@
+USEMODULE += xtimer
+FEATURES_REQUIRED += periph_gpio periph_spi periph_gpio_irq

@@ -1,0 +1,5 @@
+# interrupt variant of the ITG320X driver as pseudo module
+PSEUDOMODULES += itg320x_int
+
+USEMODULE_INCLUDES_itg320x := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_itg320x)

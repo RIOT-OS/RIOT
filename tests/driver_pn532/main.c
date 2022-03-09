@@ -22,7 +22,7 @@
 
 #include "pn532.h"
 #include "pn532_params.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define LOG_LEVEL LOG_INFO
 #include "log.h"
@@ -46,32 +46,26 @@ int main(void)
     unsigned len;
     int ret;
 
-#if defined(PN532_SUPPORT_I2C)
-    ret = pn532_init_i2c(&pn532, &pn532_conf[0]);
-#elif defined(PN532_SUPPORT_SPI)
-    ret = pn532_init_spi(&pn532, &pn532_conf[0]);
-#else
-#error None of PN532_SUPPORT_I2C and PN532_SUPPORT_SPI set!
-#endif
+    pn532_mode_t mode = IS_ACTIVE(MODULE_PN532_I2C) ? PN532_I2C : PN532_SPI;
+    ret = pn532_init(&pn532, &pn532_conf[0], mode);
 
     if (ret != 0) {
         LOG_INFO("init error %d\n", ret);
     }
 
-    xtimer_usleep(200000);
+    ztimer_sleep(ZTIMER_MSEC, 200);
     LOG_INFO("awake\n");
 
     uint32_t fwver;
     pn532_fw_version(&pn532, &fwver);
     LOG_INFO("ver %d.%d\n", (unsigned)PN532_FW_VERSION(fwver), (unsigned)PN532_FW_REVISION(fwver));
 
-
     ret = pn532_sam_configuration(&pn532, PN532_SAM_NORMAL, 1000);
     LOG_INFO("set sam %d\n", ret);
 
     while (1) {
         /* Delay not to be always polling the interface */
-        xtimer_usleep(250000UL);
+        ztimer_sleep(ZTIMER_MSEC, 250);
 
         ret = pn532_get_passive_iso14443a(&pn532, &card, 0x50);
         if (ret < 0) {

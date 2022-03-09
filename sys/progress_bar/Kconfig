@@ -1,0 +1,58 @@
+# Copyright (c) 2021 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_PROGRESS_BAR
+    bool "A simple CLI progress bar"
+    depends on TEST_KCONFIG
+
+menuconfig KCONFIG_USEMODULE_PROGRESS_BAR
+    bool "Configure progress bar module"
+    depends on USEMODULE_PROGRESS_BAR
+    help
+        Configure the progress bar module using Kconfig.
+
+if KCONFIG_USEMODULE_PROGRESS_BAR
+
+config PROGRESS_BAR_LENGTH
+    int "Progress bar length"
+    default 25
+    help
+       Progress bar maximum characters length
+
+config PROGRESS_BAR_FULL_CHARACTER
+    string "Progress bar character"
+    default "█"
+    help
+        The character that will be printed when the progress bar fills up.
+
+config PROGRESS_BAR_EMPTY_CHARACTER
+    string "Progress bar empty character"
+    default " "
+    help
+         The character that will be printed when the progress bar empties.
+
+config PROGRESS_BAR_PREFIX_CHARACTER
+    string "Progress bar prefix"
+    default "|"
+    help
+        Character displayed on the left of the progress bar
+
+config PROGRESS_BAR_SUFFIX_CHARACTER
+    string "Progress bar suffix"
+    default "|"
+    help
+        Character displayed on the left of the progress bar
+
+config PROGRESS_BAR_PREFIX_MAX_LENGTH
+    int "Progress bar prefix max length"
+    default 32
+
+config PROGRESS_BAR_SUFFIX_MAX_LENGTH
+    int "Progress bar suffix max length"
+    default 32
+
+endif # KCONFIG_USEMODULE_PROGRESS_BAR

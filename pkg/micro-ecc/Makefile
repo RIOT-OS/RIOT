@@ -1,11 +1,9 @@
 PKG_NAME=micro-ecc
 PKG_URL=https://github.com/kmackay/micro-ecc.git
-PKG_VERSION=b6c0cdbe7d20af48b0c2a909a66ff00b093d1542
+PKG_VERSION=4b1709c17abbe938d6d8811f4c7c5d082a144799
 PKG_LICENSE=BSD-2-Clause
 
-.PHONY: all
+include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	"$(MAKE)" -C $(PKG_BUILDDIR)
-
-include $(RIOTBASE)/pkg/pkg.mk
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(RIOTBASE)/Makefile.base

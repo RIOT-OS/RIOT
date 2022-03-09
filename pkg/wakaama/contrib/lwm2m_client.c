@@ -21,6 +21,8 @@
 
 #include <string.h>
 
+#include "timex.h"
+
 #include "liblwm2m.h"
 
 #include "lwm2m_platform.h"
@@ -28,7 +30,7 @@
 #include "lwm2m_client_config.h"
 #include "lwm2m_client_connection.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**
@@ -48,7 +50,6 @@ bool lwm2m_device_reboot_requested(void);
  * @param arg ignored
  */
 static void *_lwm2m_client_run(void *arg);
-
 
 static char _lwm2m_client_stack[THREAD_STACKSIZE_MAIN +
                                 THREAD_EXTRA_STACKSIZE_PRINTF];
@@ -71,7 +72,7 @@ lwm2m_context_t *lwm2m_client_run(lwm2m_client_data_t *client_data,
     _client_data->local_ep.netif = SOCK_ADDR_ANY_NETIF;
 
     /* create sock for UDP server */
-    _client_data->local_ep.port = atoi(LWM2M_LOCAL_PORT);
+    _client_data->local_ep.port = atoi(CONFIG_LWM2M_LOCAL_PORT);
     if (sock_udp_create(&_client_data->sock, &_client_data->local_ep, NULL, 0)) {
         DEBUG("[lwm2m_client_run] Can't create server socket\n");
         return NULL;
@@ -84,8 +85,8 @@ lwm2m_context_t *lwm2m_client_run(lwm2m_client_data_t *client_data,
         return NULL;
     }
 
-    res = lwm2m_configure(_client_data->lwm2m_ctx, LWM2M_DEVICE_NAME, NULL,
-                          LWM2M_ALT_PATH, obj_numof, obj_list);
+    res = lwm2m_configure(_client_data->lwm2m_ctx, CONFIG_LWM2M_DEVICE_NAME, NULL,
+                          CONFIG_LWM2M_ALT_PATH, obj_numof, obj_list);
     if (res) {
         DEBUG("[lwm2m_client_run] Failed to configure LwM2M\n");
         return NULL;
@@ -167,8 +168,13 @@ static void *_lwm2m_client_run(void *arg)
                 break;
         }
 
-        DEBUG("Waiting for UDP packet on port: %d\n", _client_data->sock.local.port);
-        rcv_len = sock_udp_recv(&_client_data->sock, &rcv_buf, sizeof(rcv_buf),
+        sock_udp_ep_t local;
+        int res = sock_udp_get_local(&_client_data->sock, &local);
+        /* avoid compilation errors if NDEBUG is enabled */
+        (void)res;
+        assert(res >= 0);
+        DEBUG("Waiting for UDP packet on port: %d\n", local.port);
+        rcv_len = sock_udp_recv(&_client_data->sock, rcv_buf, sizeof(rcv_buf),
                                 tv * US_PER_SEC, &remote);
         DEBUG("sock_udp_recv()\n");
         if (rcv_len > 0) {
@@ -176,12 +182,12 @@ static void *_lwm2m_client_run(void *arg)
             lwm2m_client_connection_t *conn = lwm2m_client_connection_find(
                                             _client_data->conn_list, &remote);
             if (conn) {
-                DEBUG("lwm2m_connection_handle_packet(%d)\n", rcv_len);
+                DEBUG("lwm2m_connection_handle_packet(%i)\n", (int)rcv_len);
                 int result = lwm2m_connection_handle_packet(conn, rcv_buf,
                                                             rcv_len,
                                                             _client_data);
                 if (0 != result) {
-                    DEBUG("error handling message %d\n", result);
+                    DEBUG("error handling message %i\n", result);
                 }
             }
             else {
@@ -190,10 +196,10 @@ static void *_lwm2m_client_run(void *arg)
         }
         else if ((rcv_len < 0) &&
                  ((rcv_len != -EAGAIN) && (rcv_len != -ETIMEDOUT))) {
-            DEBUG("Unexpected sock_udp_recv error code %i\n", rcv_len);
+            DEBUG("Unexpected sock_udp_recv error code %i\n", (int)rcv_len);
         }
         else {
-            DEBUG("UDP error code: %d\n", rcv_len);
+            DEBUG("UDP error code: %i\n", (int)rcv_len);
         }
     }
     return NULL;

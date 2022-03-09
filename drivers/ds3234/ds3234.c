@@ -24,13 +24,12 @@
 #include "ds3234.h"
 #include "ds3234_regs.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG            0
 #include "debug.h"
 
 /* SPI command byte parameters */
 #define DS3234_CMD_READ         (0x00)
 #define DS3234_CMD_WRITE        (0x80)
-
 
 /**
  * @brief Read one or more registers from the sensor
@@ -79,7 +78,7 @@ int ds3234_pps_init(const ds3234_params_t *dev)
     }
     DEBUG("ds3234: init on SPI_DEV(%u)\n", dev->spi);
 
-    if (ENABLE_DEBUG) {
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
         for (int k = 0; k <= 0x19; ++k) {
             uint8_t dbg_reg = 0;
             ds3234_read_reg(dev, k, 1, &dbg_reg);

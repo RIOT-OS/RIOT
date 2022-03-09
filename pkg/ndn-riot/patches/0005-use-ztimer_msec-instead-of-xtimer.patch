@@ -1,0 +1,256 @@
+From b5cf1b1f24584666df472166104139f7627424e9 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Thu, 9 Dec 2021 15:17:13 +0100
+Subject: [PATCH] use ztimer_msec instead of xtimer
+
+---
+ app.c | 12 ++++++------
+ app.h |  4 ++--
+ cs.h  |  2 --
+ fib.h |  1 -
+ l2.c  | 13 +++++++------
+ ndn.c |  1 -
+ pit.c | 12 +++++++-----
+ pit.h |  4 ++--
+ 8 files changed, 24 insertions(+), 25 deletions(-)
+
+diff --git a/app.c b/app.c
+index bc4718d..8e5598a 100644
+--- a/app.c
++++ b/app.c
+@@ -225,8 +225,8 @@ int ndn_app_run(ndn_app_t* handle)
+                       msg.sender_pid, handle->id);
+                 return NDN_APP_STOP;
+
+-            case MSG_XTIMER:
+-                DEBUG("ndn_app: XTIMER msg received from thread %"
++            case MSG_ZTIMER:
++                DEBUG("ndn_app: ZTIMER msg received from thread %"
+                       PRIkernel_pid " (pid=%" PRIkernel_pid ")\n",
+                       msg.sender_pid, handle->id);
+
+@@ -299,7 +299,7 @@ static inline void _release_sched_cb_table(ndn_app_t* handle)
+         DEBUG("ndn_app: remove scheduler cb entry (pid=%"
+               PRIkernel_pid ")\n", handle->id);
+         DL_DELETE(handle->_scb_table, entry);
+-        xtimer_remove(&entry->timer);
++        ztimer_remove(ZTIMER_USEC, &entry->timer);
+         free(entry);
+     }
+ }
+@@ -380,14 +380,14 @@ int ndn_app_schedule(ndn_app_t* handle, ndn_app_sched_cb_t cb, void* context,
+     if (entry == NULL) return -1;
+
+     // initialize the timer
+-    entry->timer = (xtimer_t) {0};
++    entry->timer = (ztimer_t) {0};
+
+     // initialize the msg struct
+-    entry->timer_msg.type = MSG_XTIMER;
++    entry->timer_msg.type = MSG_ZTIMER;
+     entry->timer_msg.content.ptr = (char*)(&entry->timer_msg);
+
+     // set a timer to send a message to the app thread
+-    xtimer_set_msg(&entry->timer, timeout, &entry->timer_msg, handle->id);
++    ztimer_set_msg(ZTIMER_USEC, &entry->timer, timeout, &entry->timer_msg, handle->id);
+
+     return 0;
+ }
+diff --git a/app.h b/app.h
+index c357692..21666d9 100644
+--- a/app.h
++++ b/app.h
+@@ -23,7 +23,7 @@
+ #include "encoding/name.h"
+ #include "forwarding-strategy.h"
+
+-#include <xtimer.h>
++#include <ztimer.h>
+ #include <net/gnrc/pktbuf.h>
+ #include "sched.h"
+
+@@ -95,7 +95,7 @@ typedef struct _sched_cb_entry {
+     struct _sched_cb_entry *next;
+     ndn_app_sched_cb_t cb;
+     void* context;
+-    xtimer_t timer;
++    ztimer_t timer;
+     msg_t timer_msg;
+ } _sched_cb_entry_t;
+
+diff --git a/cs.h b/cs.h
+index 01edf2b..c544cf8 100644
+--- a/cs.h
++++ b/cs.h
+@@ -22,8 +22,6 @@
+
+ #include "encoding/shared-block.h"
+
+-//#include <xtimer.h>
+-
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+diff --git a/fib.h b/fib.h
+index 5e190d2..cdf70aa 100644
+--- a/fib.h
++++ b/fib.h
+@@ -23,7 +23,6 @@
+ #include "encoding/shared-block.h"
+ #include "face-table.h"
+
+-#include <xtimer.h>
+ #include "sched.h"
+
+ #ifdef __cplusplus
+diff --git a/l2.c b/l2.c
+index a0546b5..817c210 100644
+--- a/l2.c
++++ b/l2.c
+@@ -20,7 +20,8 @@
+ #include "encoding/shared-block.h"
+ #include "ndn.h"
+
+-#include <xtimer.h>
++#include <timex.h>
++#include <ztimer.h>
+ #include <net/gnrc/netif/hdr.h>
+ #include <debug.h>
+
+@@ -59,7 +60,7 @@ typedef struct _l2_frag_block {
+ typedef struct _l2_frag_entry {
+     struct _l2_frag_entry* prev;
+     struct _l2_frag_entry* next;
+-    xtimer_t timer;
++    ztimer_t timer;
+     msg_t timer_msg;
+     uint8_t* netif_hdr;
+     size_t netif_hdr_len;
+@@ -69,13 +70,13 @@ typedef struct _l2_frag_entry {
+ } _l2_frag_entry_t;
+
+ //TODO: use larger timeout value in non-test environment
+-#define NDN_L2_FRAG_MAX_LIFETIME    (10U * US_PER_SEC)
++#define NDN_L2_FRAG_MAX_LIFETIME    (10U * MS_PER_SEC)
+
+ static _l2_frag_entry_t* _l2_frag_list;
+
+ static void _release_l2_frag_entry(_l2_frag_entry_t* entry) {
+     DL_DELETE(_l2_frag_list, entry);
+-    xtimer_remove(&entry->timer);
++    ztimer_remove(ZTIMER_USEC, &entry->timer);
+     _l2_frag_block_t *blk, *tmp;
+     LL_FOREACH_SAFE(entry->frags, blk, tmp) {
+         free(blk->data);
+@@ -155,7 +156,7 @@ ndn_shared_block_t* ndn_l2_frag_receive(kernel_pid_t iface,
+         entry->id = id;
+
+         // initialize timer
+-        entry->timer = (xtimer_t) {0};
++        entry->timer = (ztimer_t) {0};
+         entry->timer_msg.type = NDN_L2_FRAG_MSG_TYPE_TIMEOUT;
+         entry->timer_msg.content.ptr = (char*)(&entry->timer_msg);
+
+@@ -166,7 +167,7 @@ ndn_shared_block_t* ndn_l2_frag_receive(kernel_pid_t iface,
+     assert(entry != NULL);
+
+     // set (reset) timer
+-    xtimer_set_msg(&entry->timer, NDN_L2_FRAG_MAX_LIFETIME,
++    ztimer_set_msg(ZTIMER_USEC, &entry->timer, NDN_L2_FRAG_MAX_LIFETIME,
+                    &entry->timer_msg, ndn_pid);
+
+     if ((entry->frags_map & seq_map) != 0) {
+diff --git a/ndn.c b/ndn.c
+index 3db7411..d370d0b 100644
+--- a/ndn.c
++++ b/ndn.c
+@@ -36,7 +36,6 @@
+ #include <net/gnrc/netreg.h>
+ #include <thread.h>
+ #include <timex.h>
+-#include <xtimer.h>
+
+ #define GNRC_NDN_STACK_SIZE        (THREAD_STACKSIZE_DEFAULT)
+ #define GNRC_NDN_PRIO              (THREAD_PRIORITY_MAIN - 3)
+diff --git a/pit.c b/pit.c
+index 692105e..dc1698c 100644
+--- a/pit.c
++++ b/pit.c
+@@ -28,6 +28,8 @@
+ #define ENABLE_DEBUG 1
+ #include <debug.h>
+ #include <utlist.h>
++#include <timex.h>
++#include <ztimer.h>
+
+ #include <assert.h>
+ #include <stdlib.h>
+@@ -120,7 +122,7 @@ int ndn_pit_add(kernel_pid_t face_id, int face_type, ndn_shared_block_t* si,
+                 DEBUG("ndn: add to existing pit entry (face=%"
+                       PRIkernel_pid ")\n", face_id);
+                 /* reset timer */
+-                xtimer_set_msg(&entry->timer, lifetime, &entry->timer_msg,
++                ztimer_set_msg(ZTIMER_USEC, &entry->timer, lifetime, &entry->timer_msg,
+                                ndn_pid);
+ 		// overwrite forwarding strategy
+ 		entry->forwarding_strategy = strategy;
+@@ -155,14 +157,14 @@ int ndn_pit_add(kernel_pid_t face_id, int face_type, ndn_shared_block_t* si,
+ 	*pit_entry = entry;
+
+     /* initialize the timer */
+-    entry->timer = (xtimer_t) {0};
++    entry->timer = (ztimer_t) {0};
+
+     /* initialize the msg struct */
+     entry->timer_msg.type = NDN_PIT_MSG_TYPE_TIMEOUT;
+     entry->timer_msg.content.ptr = (char*)(&entry->timer_msg);
+
+     /* set a timer to send a message to ndn thread */
+-    xtimer_set_msg(&entry->timer, lifetime, &entry->timer_msg, ndn_pid);
++    ztimer_set_msg(ZTIMER_USEC, &entry->timer, lifetime, &entry->timer_msg, ndn_pid);
+
+     // set forwarding strategy
+     entry->forwarding_strategy = strategy;
+@@ -175,7 +177,7 @@ void ndn_pit_release(ndn_pit_entry_t *entry)
+ {
+     assert(_pit != NULL);
+     DL_DELETE(_pit, entry);
+-    xtimer_remove(&entry->timer);
++    ztimer_remove(ZTIMER_USEC, &entry->timer);
+     ndn_shared_block_release(entry->shared_pi);
+     free(entry->face_list);
+     free(entry);
+@@ -253,7 +255,7 @@ int ndn_pit_match_data(ndn_shared_block_t* sd, kernel_pid_t iface)
+ 	    DEBUG("ndn: found matching pit entry for data\n");
+
+             DL_DELETE(_pit, entry);
+-            xtimer_remove(&entry->timer);
++            ztimer_remove(ZTIMER_USEC, &entry->timer);
+
+ 	    // invoke forwarding strategy trigger if available
+ 	    if (entry->forwarding_strategy->before_satisfy_interest) {
+diff --git a/pit.h b/pit.h
+index 3384a4c..91664e0 100644
+--- a/pit.h
++++ b/pit.h
+@@ -24,7 +24,7 @@
+ #include "face-table.h"
+
+ #include "sched.h"
+-#include <xtimer.h>
++#include <ztimer.h>
+
+ #ifdef __cplusplus
+ extern "C" {
+@@ -39,7 +39,7 @@ typedef struct ndn_pit_entry {
+     struct ndn_pit_entry *prev;
+     struct ndn_pit_entry *next;
+     ndn_shared_block_t *shared_pi;  /**< shared TLV block of the pending interest */
+-    xtimer_t timer;                 /**< xtimer struct */
++    ztimer_t timer;                 /**< ztimer struct */
+     msg_t timer_msg;                /**< special message to indicate timeout event */
+
+     // List of incoming faces
+--
+2.30.2
+

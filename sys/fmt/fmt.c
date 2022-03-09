@@ -31,6 +31,7 @@
 ssize_t write(int fildes, const void *buf, size_t nbyte);
 #endif
 
+#include "kernel_defines.h"
 #include "fmt.h"
 
 static const char _hex_chars[16] = "0123456789ABCDEF";
@@ -48,19 +49,23 @@ static const uint32_t _tenmap[] = {
 
 #define TENMAP_SIZE  ARRAY_SIZE(_tenmap)
 
-static inline int _is_digit(char c)
-{
-    return (c >= '0' && c <= '9');
-}
-
-static inline int _is_upper(char c)
-{
-    return (c >= 'A' && c <= 'Z');
-}
-
 static inline char _to_lower(char c)
 {
     return 'a' + (c - 'A');
+}
+
+int fmt_is_number(const char *str)
+{
+    if (!str || !*str) {
+        return 0;
+    }
+    for (; *str; str++) {
+        if (!fmt_is_digit(*str)) {
+            return 0;
+        }
+    }
+
+    return 1;
 }
 
 size_t fmt_byte_hex(char *out, uint8_t byte)
@@ -156,6 +161,11 @@ size_t fmt_hex_bytes(uint8_t *out, const char *hex)
     }
 
     size_t final_len = len >> 1;
+
+    if (out == NULL) {
+        return final_len;
+    }
+
     for (size_t i = 0, j = 0; j < final_len; i += 2, j++) {
         out[j] = fmt_hex_byte(hex + i);
     }
@@ -299,61 +309,62 @@ size_t fmt_s16_dec(char *out, int16_t val)
     return fmt_s32_dec(out, val);
 }
 
-size_t fmt_s16_dfp(char *out, int16_t val, int fp_digits)
+size_t fmt_s16_dfp(char *out, int16_t val, int scale)
 {
-    return fmt_s32_dfp(out, val, fp_digits);
+    return fmt_s32_dfp(out, val, scale);
 }
 
-size_t fmt_s32_dfp(char *out, int32_t val, int fp_digits)
+size_t fmt_s32_dfp(char *out, int32_t val, int scale)
 {
-    assert(fp_digits > -(int)TENMAP_SIZE);
+    unsigned pos = 0;
 
-    unsigned  pos = 0;
-
-    if (fp_digits == 0) {
+    if (scale == 0) {
         pos = fmt_s32_dec(out, val);
     }
-    else if (fp_digits > 0) {
+    else if (scale > 0) {
         pos = fmt_s32_dec(out, val);
         if (out) {
-            memset(&out[pos], '0', fp_digits);
+            memset(&out[pos], '0', scale);
         }
-        pos += fp_digits;
+        pos += scale;
     }
     else {
-        fp_digits *= -1;
-        uint32_t e = _tenmap[fp_digits];
-        int32_t abs = (val / (int32_t)e);
-        int32_t div = val - (abs * e);
-
-        /* the divisor should never be negative */
-        if (div < 0) {
-            div *= -1;
-        }
-        /* handle special case for negative number with zero as absolute value */
-        if ((abs == 0) && (val < 0)) {
+        scale = -scale;
+        char buf[10]; /* "2147483648" */
+        int negative = val < 0;
+        uint32_t uval = negative ? -val : val;
+        int len = fmt_u32_dec(buf, uval);
+        if (negative) {
             if (out) {
                 out[pos] = '-';
             }
             pos++;
         }
+        if (len <= scale) {
+            int zeroes = scale - len + 1;
+            if (out) {
+                memset(&out[pos], '0', zeroes);
+            }
+            pos += zeroes;
+        }
+        if (out) {
+            memcpy(&out[pos], buf, len);
+        }
 
-        if (!out) {
-            /* compensate for the decimal point character... */
-            pos += fmt_s32_dec(NULL, abs) + 1;
+        pos += len;
+
+        if (out) {
+            unsigned dot_pos = pos - scale;
+            for (unsigned i = pos; i >= dot_pos; i--) {
+                out[i] = out[i - 1];
+            }
+            out[dot_pos] = '.';
         }
-        else {
-            pos += fmt_s32_dec(&out[pos], abs);
-            out[pos++] = '.';
-            unsigned div_len = fmt_s32_dec(&out[pos], div);
-            fmt_lpad(&out[pos], div_len, (size_t)fp_digits, '0');
-        }
-        pos += fp_digits;
+        pos += 1;
     }
 
     return pos;
 }
-
 /* this is very probably not the most efficient implementation, as it at least
  * pulls in floating point math.  But it works, and it's always nice to have
  * low hanging fruits when optimizing. (Kaspar)
@@ -437,7 +448,7 @@ size_t fmt_to_lower(char *out, const char *str)
     size_t len = 0;
 
     while (str && *str) {
-        if (_is_upper(*str)) {
+        if (fmt_is_upper(*str)) {
             if (out) {
                 *out++ = _to_lower(*str);
             }
@@ -457,7 +468,7 @@ uint32_t scn_u32_dec(const char *str, size_t n)
     uint32_t res = 0;
     while(n--) {
         char c = *str++;
-        if (!_is_digit(c)) {
+        if (!fmt_is_digit(c)) {
             break;
         }
         else {
@@ -474,8 +485,8 @@ uint32_t scn_u32_hex(const char *str, size_t n)
 
     while (n--) {
         char c = *str++;
-        if (!_is_digit(c)) {
-            if (_is_upper(c)) {
+        if (!fmt_is_digit(c)) {
+            if (fmt_is_upper(c)) {
                 c = _to_lower(c);
             }
             if (c == '\0' || c > 'f') {

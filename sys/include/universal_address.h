@@ -128,7 +128,6 @@ uint8_t* universal_address_get_address(universal_address_container_t *entry,
 int universal_address_compare(universal_address_container_t *entry,
                               uint8_t *addr, size_t *addr_size_in_bits);
 
-
 /**
 * @brief Determine if the entry equals the provided prefix
 *        This function requires to be provided with the full size of the used

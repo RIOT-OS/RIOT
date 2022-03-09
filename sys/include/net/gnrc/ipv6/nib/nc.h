@@ -144,7 +144,7 @@ typedef struct {
     /**
      * @brief   Neighbor's link-layer address
      */
-    uint8_t l2addr[GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
+    uint8_t l2addr[CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
     /**
      * @brief   Neighbor information as defined in
      *          @ref net_gnrc_ipv6_nib_nc_info "info values"
@@ -208,7 +208,7 @@ static inline unsigned gnrc_ipv6_nib_nc_get_ar_state(const gnrc_ipv6_nib_nc_t *e
  * @brief   Adds an unmanaged neighbor entry to NIB
  *
  * @pre `ipv6 != NULL`
- * @pre `l2addr_len <= GNRC_IPV6_NIB_L2ADDR_MAX_LEN`
+ * @pre `l2addr_len <= CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN`
  * @pre `(iface > KERNEL_PID_UNDEF) && (iface <= KERNEL_PID_LAST)`
  *
  * @param[in] ipv6          The neighbor's IPv6 address.
@@ -222,10 +222,13 @@ static inline unsigned gnrc_ipv6_nib_nc_get_ar_state(const gnrc_ipv6_nib_nc_t *e
  * If an entry pointing to the same IPv6 address as @p ipv6 exists already it
  * will be overwritten and marked as unmanaged.
  *
- * If @ref GNRC_IPV6_NIB_CONF_ARSM != 0 @p l2addr and @p l2addr_len won't be set.
+ * If @ref CONFIG_GNRC_IPV6_NIB_ARSM == 0 @p l2addr and @p l2addr_len won't be
+ * set and @p ipv6 must be a link-local address.
  *
  * @return  0 on success.
  * @return  -ENOMEM, if no space is left in neighbor cache.
+ * @return  -EINVAL, if @p ipv6 is invalid (i.e.
+ *          @ref CONFIG_GNRC_IPV6_NIB_ARSM == 0 and @p ipv6 is not link-local).
  */
 int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
                          const uint8_t *l2addr, size_t l2addr_len);

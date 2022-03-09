@@ -19,15 +19,20 @@
 
 #include <stdio.h>
 
+#include "fmt.h"
 #include "thread.h"
 #include "irq.h"
 #include "net/nanocoap_sock.h"
-#include "xtimer.h"
 
 #include "shell.h"
 
-#include "suit/coap.h"
+#include "suit/transport/coap.h"
+#ifdef MODULE_SUIT_STORAGE_FLASHWRITE
 #include "riotboot/slot.h"
+#endif
+
+#include "suit/storage.h"
+#include "suit/storage/ram.h"
 
 #ifdef MODULE_PERIPH_GPIO
 #include "periph/gpio.h"
@@ -68,9 +73,11 @@ static void cb(void *arg)
 }
 #endif
 
-int main(void)
+#ifdef MODULE_SUIT_STORAGE_FLASHWRITE
+static int cmd_print_riotboot_hdr(int argc, char **argv)
 {
-    puts("RIOT SUIT update example application");
+    (void)argc;
+    (void)argv;
 
     int current_slot = riotboot_slot_current();
     if (current_slot != -1) {
@@ -78,21 +85,110 @@ int main(void)
          * confuses the test script. As a workaround, just disable interrupts
          * for a while.
          */
-        irq_disable();
-        printf("running from slot %d\n", current_slot);
-        printf("slot start addr = %p\n", (void *)riotboot_slot_get_hdr(current_slot));
+        unsigned state = irq_disable();
         riotboot_slot_print_hdr(current_slot);
-        irq_enable();
+        irq_restore(state);
     }
     else {
         printf("[FAILED] You're not running riotboot\n");
     }
+    return 0;
+}
+
+static int cmd_print_current_slot(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    /* Sometimes, udhcp output messes up the following printfs.  That
+     * confuses the test script. As a workaround, just disable interrupts
+     * for a while.
+     */
+    unsigned state = irq_disable();
+    printf("Running from slot %d\n", riotboot_slot_current());
+    irq_restore(state);
+    return 0;
+}
+#endif
+
+static int cmd_print_slot_content(int argc, char **argv)
+{
+    char *slot;
+    uint32_t offset;
+    size_t len;
+
+    if (argc < 4) {
+        printf("usage: %s <storage_id> <addr> <len>\n", argv[0]);
+        return -1;
+    }
+
+    slot = argv[1];
+    offset = atoi(argv[2]);
+    len  = atoi(argv[3]);
+
+    suit_storage_t *storage = suit_storage_find_by_id(slot);
+    if (!storage) {
+        printf("No storage with id \"%s\" present\n", slot);
+        return -1;
+    }
+
+    suit_storage_set_active_location(storage, slot);
+
+    if (suit_storage_has_readptr(storage)) {
+        const uint8_t *buf;
+        size_t available;
+        suit_storage_read_ptr(storage, &buf, &available);
+
+        size_t to_print = available < offset + len ? available - offset : len;
+        for (size_t i = offset; i < to_print; i++) {
+            print_byte_hex(buf[i]);
+        };
+        puts("");
+    }
+
+    return 0;
+}
+
+static int cmd_lsstorage(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+
+    if (IS_ACTIVE(MODULE_SUIT_STORAGE_RAM)) {
+        for (unsigned i = 0; i < CONFIG_SUIT_STORAGE_RAM_REGIONS; i++) {
+            printf("RAM slot %u: \"%s%u\"\n", i,
+                    CONFIG_SUIT_STORAGE_RAM_LOCATION_PREFIX, i);
+        }
+    }
+    if (IS_ACTIVE(MODULE_SUIT_STORAGE_FLASHWRITE)) {
+        puts("Flashwrite slot 0: \"\"\n");
+    }
+
+    return 0;
+}
+
+static const shell_command_t shell_commands[] = {
+#ifdef MODULE_SUIT_STORAGE_FLASHWRITE
+    { "current-slot", "Print current slot number", cmd_print_current_slot },
+    { "riotboot-hdr", "Print current slot header", cmd_print_riotboot_hdr },
+#endif
+    { "storage_content", "Print the slot content", cmd_print_slot_content },
+    { "lsstorage", "Print the available storage paths", cmd_lsstorage },
+    { NULL, NULL, NULL }
+};
+
+int main(void)
+{
+    puts("RIOT SUIT update example application");
 
 #if defined(MODULE_PERIPH_GPIO_IRQ) && defined(BTN0_PIN)
     /* initialize a button to manually trigger an update */
     gpio_init_int(BTN0_PIN, BTN0_MODE, GPIO_FALLING, cb, NULL);
 #endif
 
+#ifdef MODULE_SUIT_STORAGE_FLASHWRITE
+    cmd_print_current_slot(0, NULL);
+    cmd_print_riotboot_hdr(0, NULL);
+#endif
 
     /* start suit coap updater thread */
     suit_coap_run();
@@ -109,7 +205,7 @@ int main(void)
 
     puts("Starting the shell");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

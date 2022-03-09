@@ -1,0 +1,7 @@
+USEMODULE_INCLUDES_dfplayer := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_dfplayer)
+
+ifneq (,$(filter arch_avr8 arch_msp430,$(FEATURES_USED)))
+  # no strerror() on AVR and MSP430
+  CFLAGS += -DCONFIG_DFPLAYER_NO_STRERROR
+endif

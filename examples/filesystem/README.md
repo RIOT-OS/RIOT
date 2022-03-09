@@ -7,8 +7,8 @@ application.
 
 In particular, this example shows:
 
-- how to mount/format/unmount a file system, either with spiffs, littlefs or
-  constfs
+- how to mount/format/unmount a file system, either with spiffs, littlefs, fatfs
+  or constfs
 - how to open/read/write/close a file with and without newlib
 
 In RIOT, most file systems use a `mtd` as flash interface. So to use this

@@ -1,0 +1,34 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD_COMMON_BLXXXPILL
+    bool
+    select HAS_PERIPH_ADC
+    select HAS_PERIPH_DMA
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_PWM
+    select HAS_PERIPH_RTC
+    select HAS_PERIPH_RTT
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+    select HAS_PERIPH_QDEC
+
+    # Clock configuration
+    select BOARD_HAS_HSE
+    select BOARD_HAS_LSE
+
+    select HAVE_SAUL_GPIO
+
+config MODULE_BOARDS_COMMON_BLXXXPILL
+    bool
+    depends on TEST_KCONFIG
+    help
+       Common code of bluepill or blackpill boards
+
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"

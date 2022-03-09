@@ -1,0 +1,63 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_USBUS_CDC_ACM
+    bool "Configure USBUS CDC ACM"
+    depends on USEMODULE_USBUS_CDC_ACM
+    depends on KCONFIG_USEMODULE_USBUS
+    help
+        Configure the USBUS CDC ACM module via Kconfig.
+
+if KCONFIG_USEMODULE_USBUS_CDC_ACM
+
+config USBUS_CDC_ACM_STDIO_BUF_SIZE_EXP
+    int "Buffer size for STDIN and STDOUT data (as exponent of 2^n)"
+    default 7
+    range 0 31
+    depends on USEMODULE_STDIO_CDC_ACM
+    help
+        As buffer size ALWAYS needs to be power of two, this changes this option
+        represents the exponent of 2^n, which will be used as the size of the
+        buffer.
+
+choice
+    bool "USB CDC ACM bulk endpoint size"
+    default USBUS_CDC_ACM_BULK_EP_SIZE_64
+    help
+        This configures the maximum amount of bytes (chars) sent per transfer
+        over the USB connection.
+
+config USBUS_CDC_ACM_BULK_EP_SIZE_8
+    bool "8"
+
+config USBUS_CDC_ACM_BULK_EP_SIZE_16
+    bool "16"
+
+config USBUS_CDC_ACM_BULK_EP_SIZE_32
+    bool "32"
+
+config USBUS_CDC_ACM_BULK_EP_SIZE_64
+    bool "64"
+
+endchoice
+
+endif # KCONFIG_USEMODULE_USBUS_CDC_ACM
+
+config MODULE_USBUS_CDC_ACM
+    bool "USB CDC ACM support"
+    depends on MODULE_USBUS
+    select MODULE_TSRB
+
+# extend STDIO options
+choice STDIO_IMPLEMENTATION
+
+config MODULE_STDIO_CDC_ACM
+    bool "CDC ACM"
+    depends on MODULE_USBUS_CDC_ACM
+    select MODULE_ISRPIPE
+    select MODULE_STDIO_AVAILABLE
+
+endchoice

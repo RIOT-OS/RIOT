@@ -1,0 +1,52 @@
+From 4408e8bd0c67efe6e08606568f8642f33e2fffdf Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Mon, 24 Jan 2022 17:54:46 +0100
+Subject: [PATCH] dtls_time: migrate to ztimer64_usec
+
+---
+ dtls_time.c | 4 ++--
+ dtls_time.h | 5 +++--
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/dtls_time.c b/dtls_time.c
+index 5d353b4..4ae4414 100644
+--- a/dtls_time.c
++++ b/dtls_time.c
+@@ -43,12 +43,12 @@ dtls_tick_t dtls_clock_offset;
+
+ void
+ dtls_clock_init(void) {
+-  dtls_clock_offset = xtimer_now64().ticks64;
++  dtls_clock_offset = ztimer64_now(ZTIMER64_MSEC);
+ }
+
+ void
+ dtls_ticks(dtls_tick_t *t) {
+-  *t = xtimer_now64().ticks64 -dtls_clock_offset;
++  *t = ztimer64_now(ZTIMER64_MSEC) - dtls_clock_offset;
+ }
+
+ #endif /* RIOT_VERSION */
+diff --git a/dtls_time.h b/dtls_time.h
+index f16b2d0..4cae153 100644
+--- a/dtls_time.h
++++ b/dtls_time.h
+@@ -39,12 +39,13 @@
+
+ #elif defined(RIOT_VERSION)
+
+-#include <xtimer.h>
++#include "ztimer64.h"
++#include "timex.h"
+
+ /* this macro is already present on FreeBSD
+    which causes a redefine error otherwise */
+ #ifndef CLOCK_SECOND
+-#define CLOCK_SECOND (xtimer_ticks_from_usec64(1000000UL).ticks64)
++#define CLOCK_SECOND (MS_PER_SEC)
+ #endif
+
+ typedef uint64_t clock_time_t;
+--
+2.30.2
+

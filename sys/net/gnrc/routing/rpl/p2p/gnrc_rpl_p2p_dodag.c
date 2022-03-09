@@ -19,7 +19,7 @@
 #include "net/gnrc/rpl/p2p_dodag.h"
 #include "net/gnrc/rpl/p2p_structs.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 gnrc_rpl_p2p_ext_t *gnrc_rpl_p2p_ext_new(gnrc_rpl_dodag_t *dodag)

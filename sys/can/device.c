@@ -18,9 +18,11 @@
  * @}
  */
 
+#include <assert.h>
 #include <errno.h>
 
 #include "thread.h"
+#include "ztimer.h"
 #include "can/device.h"
 #include "can/common.h"
 #include "can/pkt.h"
@@ -30,7 +32,7 @@
 #include "can/can_trx.h"
 #endif
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef CAN_DEVICE_MSG_QUEUE_SIZE
@@ -145,7 +147,7 @@ static int power_down(candev_dev_t *candev_dev)
     }
 
 #ifdef MODULE_CAN_PM
-    xtimer_remove(&candev_dev->pm_timer);
+    ztimer_remove(ZTIMER_USEC, &candev_dev->pm_timer);
     candev_dev->last_pm_update = 0;
 #endif
 
@@ -170,15 +172,15 @@ static void pm_reset(candev_dev_t *candev_dev, uint32_t value)
 
     if (value == 0) {
         candev_dev->last_pm_value = 0;
-        xtimer_remove(&candev_dev->pm_timer);
+        ztimer_remove(ZTIMER_USEC, &candev_dev->pm_timer);
         return;
     }
 
     if (candev_dev->last_pm_update == 0 ||
-            value > (candev_dev->last_pm_value - (xtimer_now_usec() - candev_dev->last_pm_update))) {
+            value > (candev_dev->last_pm_value - (ztimer_now(ZTIMER_USEC) - candev_dev->last_pm_update))) {
         candev_dev->last_pm_value = value;
-        candev_dev->last_pm_update = xtimer_now_usec();
-        xtimer_set(&candev_dev->pm_timer, value);
+        candev_dev->last_pm_update = ztimer_now(ZTIMER_USEC);
+        ztimer_set(ZTIMER_USEC, &candev_dev->pm_timer, value);
     }
 }
 #endif
@@ -371,7 +373,6 @@ kernel_pid_t can_device_init(char *stack, int stacksize, char priority,
     return res;
 }
 
-
 #define SJW 2
 #define CAN_SYNC_SEG 1
 
@@ -503,7 +504,7 @@ int can_device_calc_bittiming(uint32_t clock, const struct can_bittiming_const *
          tseg >= timing_const->tseg1_min + timing_const->tseg2_min; tseg--) {
         uint32_t nbt = tseg + CAN_SYNC_SEG;
 
-        /* theoritical brp */
+        /* theoretical brp */
         uint32_t brp = clock / (timing->bitrate * nbt);
         /* brp according to brp_inc */
         brp = (brp / timing_const->brp_inc) * timing_const->brp_inc;

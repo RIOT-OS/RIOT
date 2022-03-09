@@ -39,7 +39,6 @@ extern "C" {
 #define ADC_NUMOF   (1)     /**< number of ADC channels */
 /** @} */
 
-
 /**
  * @name    DAC configuration
  *
@@ -48,7 +47,6 @@ extern "C" {
  */
 #define DAC_NUMOF   (0)     /**< number of DAC channels */
 /** @} */
-
 
 /**
  * @name   I2C configuration
@@ -193,32 +191,55 @@ static const spi_conf_t spi_config[] = {
 
 /* software timer */
 #define TIMER_NUMOF         (1U)    /**< number of timer devices */
-#define TIMER_CHANNELS      (10U)   /**< number of channels per timer device */
+#define TIMER_CHANNEL_NUMOF (10U)   /**< number of channels per timer device */
 
 #else /* MODULE_ESP_SW_TIMER */
 
 /* hardware timer */
 #define TIMER_NUMOF         (1U)    /**< number of timer devices */
-#define TIMER_CHANNELS      (1U)    /**< number of channels per timer device */
+#define TIMER_CHANNEL_NUMOF (1U)    /**< number of channels per timer device */
 
 #endif /* MODULE_ESP_SW_TIMER */
 /** @} */
 
-
 /**
  * @name   UART configuration
  *
- * All ESP8266 boards have exactly one UART device with fixed pin mapping.
- * This UART device is used for flashing and as a console interface.
- * Therefore, the number of UART devices is fixed and can not be overridden.
- * Used pins are determined by the MCU implementation and are defined here
- * only for documentation reasons.
+ * All ESP8266 boards have two UART devices with two options of pin mappings
+ * each, however most board will only expose only UART0 and in the GPIO1 and
+ * GPIO3 pins, although other combinations are possible. In particular, the
+ * boot ROM will map both GPIO1 and GPIO2 as TX for UART0 on boot, so either
+ * one can be used for serial communication or flashing the device.
+ * While UART1 is also available, the only option for UART1 RX pin (GPIO8) is
+ * used for the board flash, but UART1 TX can be used separately
+ *
+ * Pin mapping available:
+ *  UART0 TX:  GPIO1 and GPIO2  (both enabled by the boot ROM)
+ *  UART0 RX:  GPIO3
+ *  UART1 TX:  GPIO2 and GPIO7  (GPIO7 is used by the flash)
+ *  UART0 RX:  GPIO8            (GPIO8 is used by the flash)
+ *
+ * UART0 device is used for flashing and as a console interface. UART1 if
+ * UART1_TXD is defined can be used for communication with other peripherals at
+ * a different baudrate if desired.
  *
  * @{
  */
-
+#ifndef UART0_TXD
 #define UART0_TXD   GPIO1               /**< TxD pin of UART_DEV(0) */
+#endif /* UART0_TXD */
+
+#ifndef UART0_RXD
 #define UART0_RXD   GPIO3               /**< RxD pin of UART_DEV(0) */
+#endif /* UART0_RXD */
+
+#ifdef DOXYGEN
+#define UART1_TXD   GPIO2               /**< TxD pin of UART_DEV(1) */
+#endif /* DOXYGEN */
+
+#ifndef UART1_RXD
+#define UART1_RXD   GPIO_UNDEF          /**< RxD pin of UART_DEV(1) */
+#endif /* UART1_RXD */
 
 /**
  * @brief   Static array with configuration for declared UART devices
@@ -228,6 +249,12 @@ static const uart_conf_t uart_config[] = {
         .txd = UART0_TXD,
         .rxd = UART0_RXD,
     },
+#ifdef UART1_TXD
+    {
+        .txd = UART1_TXD,
+        .rxd = UART1_RXD,
+    },
+#endif /* UART1_TXD */
 };
 
 /**
@@ -238,7 +265,7 @@ static const uart_conf_t uart_config[] = {
  *
  * @note UART_NUMOF definition must not be changed.
  */
-#define UART_NUMOF  (sizeof(uart_config)/sizeof(uart_config[0]))
+#define UART_NUMOF  ARRAY_SIZE(uart_config)
 /** @} */
 
 #ifdef __cplusplus

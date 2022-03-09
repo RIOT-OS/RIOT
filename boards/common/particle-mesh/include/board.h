@@ -27,6 +27,61 @@ extern "C" {
 #endif
 
 /**
+ *
+ * @name    Bootloader configuration options
+ * @{
+ */
+
+/** @brief Build a firmware suitable for the Particle bootloader
+ *
+ * If this is defined, additional metadata about the firmware is included in
+ * the firmware (called the module_info in Particle), and additional code is
+ * inserted in board setup.
+ *
+ * Do not define this manually; instead, set `PARTICLE_MONOFIRMWARE=1` as an
+ * variable in the build scripts like `BOARD` is defined, and the particle
+ * common make file defines it and configures suitable postprocessing of the
+ * binary.
+ *
+ * @see @ref boards_common_particle-mesh
+ *
+ */
+#ifdef DOXYGEN
+#define PARTICLE_MONOFIRMWARE
+#endif
+
+/** @brief Limit Particle bootloader checksumming to the binary start
+ *
+ * If this define is set in the Makefile, the binary size announced to the
+ * bootloader is limited to the reset vector and the firmware metadata, and
+ * only that part is checksummed.
+ *
+ * This is useful when @ref drivers_periph_flashpage is used, as otherwise the
+ * firmware's writes on itself would invalidate its checksum.
+ *
+ * @see @ref boards_common_particle-mesh
+ */
+#ifdef DOXYGEN
+#define PARTICLE_MONOFIRMWARE_CHECKSUMLIMIT
+#endif
+
+/** @brief Platform ID of the board for the Particle bootloader
+ *
+ * This is set by the individual board's build configuration, and gets used
+ * when building with @ref PARTICLE_MONOFIRMWARE; then, it is put into the
+ * module information for the board bootloader to verify that the firmware was
+ * built for the right device.
+ *
+ * The individual values are documented in the Particle DeviceOS source code in
+ * `build/platform-id.mk`.
+ */
+#ifdef DOXYGEN
+#define PARTICLE_PLATFORM_ID
+#endif
+
+/** @} */
+
+/**
  * @name    LED pin configuration
  * @{
  */

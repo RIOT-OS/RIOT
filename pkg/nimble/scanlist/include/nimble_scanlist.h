@@ -28,6 +28,7 @@
 #include "clist.h"
 #include "net/ble.h"
 #include "nimble/ble.h"
+#include "nimble_scanner.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,6 +54,8 @@ typedef struct {
     uint32_t first_update;          /**< first packet timestamp */
     uint32_t last_update;           /**< last packet timestamp */
     uint8_t type;                   /**< advertising packet type */
+    uint8_t phy_pri;                /**< primary PHY used */
+    uint8_t phy_sec;                /**< secondary PHY advertised */
 } nimble_scanlist_entry_t;
 
 /**
@@ -67,11 +70,12 @@ void nimble_scanlist_init(void);
  *
  * @param[in]  type     type of the advertising packet received
  * @param[in]  addr     BLE address of the scanned node
- * @param[in]  rssi     RSSI of the received advertising packet
+ * @param[in]  info     Additional information on received advertising event
  * @param[in]  ad       the payload of the advertising packet
  * @param[in]  len      length of @p ad
  */
-void nimble_scanlist_update(uint8_t type, const ble_addr_t *addr, int8_t rssi,
+void nimble_scanlist_update(uint8_t type, const ble_addr_t *addr,
+                            const nimble_scanner_info_t *info,
                             const uint8_t *ad, size_t len);
 
 /**
@@ -111,7 +115,6 @@ void nimble_scanlist_print(void);
  * @param[in] e         entry to dump
  */
 void nimble_scanlist_print_entry(nimble_scanlist_entry_t *e);
-
 
 #ifdef __cplusplus
 }

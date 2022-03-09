@@ -25,7 +25,7 @@
 #include "kernel_defines.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -36,19 +36,21 @@ typedef enum {
     PANIC_SOFT_REBOOT,
     PANIC_HARD_REBOOT,
     PANIC_ASSERT_FAIL,
+    PANIC_EXPECT_FAIL,
 #ifdef MODULE_CORTEXM_COMMON
-    PANIC_NMI_HANDLER,       /**< non maskable interrupt */
-    PANIC_HARD_FAULT,        /**< hard fault */
-#if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
-    defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7)
-    PANIC_MEM_MANAGE,        /**< memory controller interrupt */
-    PANIC_BUS_FAULT,         /**< bus fault */
-    PANIC_USAGE_FAULT,       /**< undefined instruction or unaligned access */
-    PANIC_DEBUG_MON,         /**< debug interrupt */
+    PANIC_NMI_HANDLER,          /**< non maskable interrupt */
+    PANIC_HARD_FAULT,           /**< hard fault */
+#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M33) || \
+    defined(CPU_CORE_CORTEX_M4) || defined(CPU_CORE_CORTEX_M4F) || \
+    defined(CPU_CORE_CORTEX_M7)
+    PANIC_MEM_MANAGE,           /**< memory controller interrupt */
+    PANIC_BUS_FAULT,            /**< bus fault */
+    PANIC_USAGE_FAULT,          /**< undefined instruction or unaligned access */
+    PANIC_DEBUG_MON,            /**< debug interrupt */
 #endif
-    PANIC_DUMMY_HANDLER,     /**< unhandled interrupt */
+    PANIC_DUMMY_HANDLER,        /**< unhandled interrupt */
 #endif
-    PANIC_SSP,               /**< stack smashing protector failure */
+    PANIC_SSP,                  /**< stack smashing protector failure */
     PANIC_UNDEFINED
 } core_panic_t;
 

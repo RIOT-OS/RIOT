@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 
+#include "common.h"
 #include "embUnit.h"
 #include "net/eui48.h"
 #include "net/eui64.h"
@@ -32,6 +33,10 @@
 #define TEST_EUI48_EUI64    { 0x21, 0x55, 0x31, 0xff, 0xfe, 0x02, 0x41, 0xfd }
 #define TEST_EUI48_IID      { 0x23, 0x55, 0x31, 0xff, 0xfe, 0x02, 0x41, 0xfd }
 #define TEST_EUI64_IID      { 0x23, 0x55, 0x31, 0x02, 0x41, 0xfd, 0xfb, 0xfd }
+#define TEST_IPV6_GROUP     { 0xff, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+                              0x3f, 0x6c, 0xa1, 0xbb, 0xe5, 0x03, 0x6b, 0xe2 }
+/* see https://tools.ietf.org/html/rfc2464#section-7 */
+#define TEST_ETHERNET_GROUP { 0x33, 0x33, 0xe5, 0x03, 0x6b, 0xe2 }
 
 static void test_eui64_from_addr__success(void)
 {
@@ -381,6 +386,87 @@ static void test_addr_len_from_l2ao__ENOTSUP(void)
                                                         &opt));
 }
 
+static void test_ipv6_group_to_l2group__success(void)
+{
+    static const ipv6_addr_t test_group = {
+        .u8 = TEST_IPV6_GROUP,
+    };
+    static const eui48_t test_ethernet = {
+        .uint8 = TEST_ETHERNET_GROUP,
+    };
+    uint8_t res[L2UTIL_ADDR_MAX_LEN];
+
+    /* test Ethernet */
+    memset(res, 0, sizeof(res));
+    TEST_ASSERT_EQUAL_INT(sizeof(test_ethernet),
+                          l2util_ipv6_group_to_l2_group(NETDEV_TYPE_ETHERNET,
+                                                        &test_group, res));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(&test_ethernet, res,
+                                    sizeof(test_ethernet)));
+}
+
+static void test_ipv6_group_to_l2group__ENOTSUP(void)
+{
+    static const ipv6_addr_t test_group = {
+        .u8 = TEST_IPV6_GROUP,
+    };
+    uint8_t res[L2UTIL_ADDR_MAX_LEN];
+
+    TEST_ASSERT_EQUAL_INT(-ENOTSUP,
+                          l2util_ipv6_group_to_l2_group(NETDEV_TYPE_UNKNOWN,
+                                                        &test_group, res));
+}
+
+static void test_l2util_addr_to_str(void)
+{
+    static const uint8_t ethernet_l2addr[] = ETHERNET_SRC;
+    static const uint8_t ieee802154_l2addr_long[] = IEEE802154_LONG_SRC;
+    static const uint8_t ieee802154_l2addr_short[] = IEEE802154_SHORT_SRC;
+    static const uint8_t netif0_l2addr[] = NETIF0_SRC;
+    char out[sizeof(netif0_l2addr) * 3];
+
+    TEST_ASSERT(out == l2util_addr_to_str(NULL, 0, out));
+    TEST_ASSERT_EQUAL_STRING("", &out[0]);
+    TEST_ASSERT(out == l2util_addr_to_str(ethernet_l2addr,
+                                              sizeof(ethernet_l2addr), out));
+    TEST_ASSERT_EQUAL_STRING("3E:E6:B5:22:FD:0A", &out[0]);
+    TEST_ASSERT(out == l2util_addr_to_str(ieee802154_l2addr_long,
+                                              sizeof(ieee802154_l2addr_long),
+                                              out));
+    TEST_ASSERT_EQUAL_STRING("3E:E6:B5:0F:19:22:FD:0A", &out[0]);
+    TEST_ASSERT(out == l2util_addr_to_str(ieee802154_l2addr_short,
+                                              sizeof(ieee802154_l2addr_short),
+                                              out));
+    TEST_ASSERT_EQUAL_STRING("FD:0A", &out[0]);
+    TEST_ASSERT(out == l2util_addr_to_str(netif0_l2addr,
+                                              sizeof(netif0_l2addr),
+                                              out));
+    TEST_ASSERT_EQUAL_STRING("3E:E7:B5:0F:19:22:FD:0A", &out[0]);
+}
+
+static void test_l2util_addr_from_str(void)
+{
+    static const uint8_t ethernet_l2addr[] = ETHERNET_SRC;
+    static const uint8_t ieee802154_l2addr_long[] = IEEE802154_LONG_SRC;
+    static const uint8_t ieee802154_l2addr_short[] = IEEE802154_SHORT_SRC;
+    uint8_t out[GNRC_NETIF_L2ADDR_MAXLEN];
+
+    TEST_ASSERT_EQUAL_INT(0, l2util_addr_from_str("", out));
+    TEST_ASSERT_EQUAL_INT(sizeof(ethernet_l2addr),
+                          l2util_addr_from_str("3E:E6:B5:22:FD:0A", out));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(ethernet_l2addr, out,
+                                    sizeof(ethernet_l2addr)));
+    TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_long),
+                          l2util_addr_from_str("3E:E6:B5:0F:19:22:FD:0A",
+                                                   out));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(ieee802154_l2addr_long, out,
+                                    sizeof(ieee802154_l2addr_long)));
+    TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_short),
+                          l2util_addr_from_str("FD:0A", out));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(ieee802154_l2addr_short, out,
+                                    sizeof(ieee802154_l2addr_short)));
+}
+
 TestRef test_l2util(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -395,6 +481,10 @@ TestRef test_l2util(void)
         new_TestFixture(test_addr_len_from_l2ao__success),
         new_TestFixture(test_addr_len_from_l2ao__EINVAL),
         new_TestFixture(test_addr_len_from_l2ao__ENOTSUP),
+        new_TestFixture(test_ipv6_group_to_l2group__success),
+        new_TestFixture(test_ipv6_group_to_l2group__ENOTSUP),
+        new_TestFixture(test_l2util_addr_to_str),
+        new_TestFixture(test_l2util_addr_from_str),
     };
 
     EMB_UNIT_TESTCALLER(tests_l2util, NULL, NULL, fixtures);

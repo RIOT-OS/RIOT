@@ -56,7 +56,6 @@ int isrpipe_read_timeout(isrpipe_t *isrpipe, uint8_t *buffer, size_t count, uint
     return res;
 }
 
-
 int isrpipe_read_all_timeout(isrpipe_t *isrpipe, uint8_t *buffer, size_t count, uint32_t timeout)
 {
     uint8_t *pos = buffer;

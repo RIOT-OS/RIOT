@@ -21,6 +21,7 @@
 
 #include <signal.h>
 #include <stdio.h>
+#include <poll.h>
 /* enable signal handler register access on different platforms
  * check here for more:
  * http://sourceforge.net/p/predef/wiki/OperatingSystems/
@@ -48,8 +49,6 @@
 #include <sys/time.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
-
-#include "kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -117,6 +116,7 @@ extern int (*real_pause)(void);
 extern int (*real_pipe)(int[2]);
 /* The ... is a hack to save includes: */
 extern int (*real_select)(int nfds, ...);
+extern int (*real_poll)(struct pollfd *nfds, ...);
 extern int (*real_setitimer)(int which, const struct itimerval
         *__restrict value, struct itimerval *__restrict ovalue);
 extern int (*real_setsid)(void);
@@ -133,6 +133,7 @@ extern int (*real_fputc)(int c, FILE *stream);
 extern int (*real_fgetc)(FILE *stream);
 extern mode_t (*real_umask)(mode_t cmask);
 extern ssize_t (*real_writev)(int fildes, const struct iovec *iov, int iovcnt);
+extern ssize_t (*real_send)(int sockfd, const void *buf, size_t len, int flags);
 
 #ifdef __MACH__
 #else
@@ -149,8 +150,8 @@ extern volatile int _native_sigpend;
 extern volatile int _native_in_isr;
 extern volatile int _native_in_syscall;
 
-extern char __isr_stack[SIGSTKSZ];
-extern char __end_stack[SIGSTKSZ];
+extern char __isr_stack[];
+extern char __end_stack[];
 extern ucontext_t native_isr_context;
 extern ucontext_t end_context;
 extern ucontext_t *_native_cur_ctx, *_native_isr_ctx;
@@ -180,8 +181,6 @@ int register_interrupt(int sig, _native_callback_t handler);
  * unregister interrupt handler for interrupt sig
  */
 int unregister_interrupt(int sig);
-
-//#include <sys/param.h>
 
 #ifdef __cplusplus
 }

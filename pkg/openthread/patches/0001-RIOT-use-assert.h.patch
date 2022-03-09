@@ -1,0 +1,25 @@
+From 49352494e1e22c9d2d85e13867daee1a0553faa5 Mon Sep 17 00:00:00 2001
+From: Alexandre Abadie <alexandre.abadie@inria.fr>
+Date: Sat, 2 Oct 2021 16:39:28 +0200
+Subject: [PATCH 1/1] RIOT use assert.h
+
+---
+ src/core/common/debug.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/core/common/debug.hpp b/src/core/common/debug.hpp
+index 50dd2b2b2..97d44394f 100644
+--- a/src/core/common/debug.hpp
++++ b/src/core/common/debug.hpp
+@@ -41,7 +41,7 @@
+ 
+ #if OPENTHREAD_CONFIG_ASSERT_ENABLE
+ 
+-#if defined(__APPLE__) || defined(__linux__)
++#if defined(__APPLE__) || defined(__linux__) || defined(OPENTHREAD_TARGET_RIOT)
+ 
+ #include <assert.h>
+ 
+-- 
+2.30.2
+

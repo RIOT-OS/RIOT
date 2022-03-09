@@ -98,14 +98,14 @@ extern "C" {
  * @brief  Default QDEC undefined value
  */
 #ifndef QDEC_UNDEF
-#define QDEC_UNDEF           (UINT_MAX)
+#define QDEC_UNDEF           (UINT_FAST8_MAX)
 #endif
 
 /**
  * @brief   Default QDEC type definition
  */
 #ifndef HAVE_QDEC_T
-typedef unsigned int qdec_t;
+typedef uint_fast8_t qdec_t;
 #endif
 
 /**

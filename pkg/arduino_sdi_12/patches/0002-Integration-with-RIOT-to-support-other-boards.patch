@@ -1,0 +1,112 @@
+From e5a4be53f1bdc4a3c435ad7a35f2d6333277837e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=2E=20David=20Ib=C3=A1=C3=B1ez?= <jdavid.ibp@gmail.com>
+Date: Tue, 3 Aug 2021 12:19:19 +0200
+Subject: [PATCH 2/3] Integration with RIOT, to support other boards
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+For unknown boards (not directly supported by the library):
+
+- Use micros() for timing, when sending a command
+
+This has been tested with the remote-revb board.
+
+Signed-off-by: J. David Ibáñez <jdavid.ibp@gmail.com>
+---
+ src/SDI12.h          | 10 +++++++++-
+ src/SDI12_boards.cpp | 10 +++++++++-
+ src/SDI12_boards.h   | 33 ++++++++++++++++++++++++++++++++-
+ 3 files changed, 50 insertions(+), 3 deletions(-)
+
+diff --git src/SDI12.h src/SDI12.h
+index 6469c7b..b57b5bc 100644
+--- src/SDI12.h
++++ src/SDI12.h
+@@ -191,11 +191,19 @@ enum LookaheadMode {
+  * processor timer directly.
+  */
+ #define READTIME sdi12timer.SDI12TimerRead()
+-#else
++
++#elif defined(TCNTX)
+ /**
+  * @brief The function or macro used to read the clock timer value.
+  */
+ #define READTIME TCNTX
++
++#else
++/**
++ * @brief The function or macro used to read the clock timer value.
++ */
++#define READTIME sdi12timer.SDI12TimerRead()
++
+ #endif  // defined(ESP32) || defined(ESP8266)
+ 
+ /**
+diff --git src/SDI12_boards.cpp src/SDI12_boards.cpp
+index beb28e8..2159eee 100644
+--- src/SDI12_boards.cpp
++++ src/SDI12_boards.cpp
+@@ -275,5 +275,13 @@ sdi12timer_t SDI12Timer::SDI12TimerRead(void) {
+ }
+ // Unknown board
+ #else
+-#error "Please define your board timer and pins"
++
++void         SDI12Timer::configSDI12TimerPrescale(void) {}
++void         SDI12Timer::resetSDI12TimerPrescale(void) {}
++sdi12timer_t SDI12Timer::SDI12TimerRead(void) {
++  // Its a one microsecond clock but we want 64uS ticks so divide by 64 i.e. right shift
++  // 6
++  return ((sdi12timer_t)(micros() >> 6));
++}
++
+ #endif
+diff --git src/SDI12_boards.h src/SDI12_boards.h
+index a2a533e..ff0e69e 100644
+--- src/SDI12_boards.h
++++ src/SDI12_boards.h
+@@ -387,7 +387,38 @@ class SDI12Timer {
+ 
+ // Unknown board
+ #else
+-#error "Please define your board timer and pins"
++
++  /**
++   * @brief Read the processor micros and right shift 6 bits (ie, divide by 64) to get a
++   * 64µs tick.
++   *
++   * @return **sdi12timer_t** The current processor micros
++   */
++  sdi12timer_t SDI12TimerRead(void);
++
++/**
++ * @brief The number of "ticks" of the timer that occur within the timing of one bit
++ * at the SDI-12 baud rate of 1200 bits/second.
++ *
++ * 48MHz / 3 pre-prescaler = 16MHz
++ * 16MHz / 1024 prescaler = 15624 'ticks'/sec = 64 µs / 'tick'
++ * (1 sec/1200 bits) * (1 tick/64 µs) = 13.0208 ticks/bit
++ */
++#define TICKS_PER_BIT 13
++/**
++ * @brief The number of "ticks" of the timer per SDI-12 bit, shifted by 2^10.
++ *
++ * 1/(13.0208 ticks/bit) * 2^10 = 78.6432
++ */
++#define BITS_PER_TICK_Q10 79
++/**
++ * @brief A "fudge factor" to get the Rx to work well.   It mostly works to ensure that
++ * uneven tick increments get rounded up.
++ *
++ * @see https://github.com/SlashDevin/NeoSWSerial/pull/13
++ */
++#define RX_WINDOW_FUDGE 2
++
+ #endif
+ };
+ 
+-- 
+2.34.1
+

@@ -41,7 +41,6 @@ void gnrc_netif_hdr_print(gnrc_netif_hdr_t *hdr)
         puts("0x0");
     }
 
-
     if (hdr->src_l2addr_len > 0) {
         printf("src_l2addr: %s\n",
                gnrc_netif_addr_to_str(gnrc_netif_hdr_get_src_addr(hdr),

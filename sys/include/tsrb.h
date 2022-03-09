@@ -12,9 +12,6 @@
  * @brief       Thread-safe ringbuffer implementation
  * @{
  *
- * @note        This ringbuffer implementation can be used without locking if
- *              there's only one producer and one consumer.
- *
  * @attention   Buffer size must be a power of two!
  *
  * @file
@@ -30,6 +27,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "irq.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,8 +39,8 @@ extern "C" {
 typedef struct tsrb {
     uint8_t *buf;               /**< Buffer to operate on. */
     unsigned int size;          /**< Size of buffer, must be power of 2. */
-    volatile unsigned reads;    /**< total number of reads */
-    volatile unsigned writes;   /**< total number of writes */
+    unsigned reads;             /**< total number of reads */
+    unsigned writes;            /**< total number of writes */
 } tsrb_t;
 
 /**
@@ -69,6 +68,17 @@ static inline void tsrb_init(tsrb_t *rb, uint8_t *buffer, unsigned bufsize)
 }
 
 /**
+ * @brief        Clear a tsrb.
+ * @param[out]   rb Ringbuffer to operate on
+ */
+static inline void tsrb_clear(tsrb_t *rb)
+{
+    unsigned irq_state = irq_disable();
+    rb->reads = rb->writes;
+    irq_restore(irq_state);
+}
+
+/**
  * @brief       Test if the tsrb is empty.
  * @param[in]   rb  Ringbuffer to operate on
  * @return      0   if not empty
@@ -76,9 +86,11 @@ static inline void tsrb_init(tsrb_t *rb, uint8_t *buffer, unsigned bufsize)
  */
 static inline int tsrb_empty(const tsrb_t *rb)
 {
-    return (rb->reads == rb->writes);
+    unsigned irq_state = irq_disable();
+    int retval = (rb->reads == rb->writes);
+    irq_restore(irq_state);
+    return retval;
 }
-
 
 /**
  * @brief       Get number of bytes available for reading
@@ -87,7 +99,10 @@ static inline int tsrb_empty(const tsrb_t *rb)
  */
 static inline unsigned int tsrb_avail(const tsrb_t *rb)
 {
-    return (rb->writes - rb->reads);
+    unsigned irq_state = irq_disable();
+    int retval = (rb->writes - rb->reads);
+    irq_restore(irq_state);
+    return retval;
 }
 
 /**
@@ -98,7 +113,10 @@ static inline unsigned int tsrb_avail(const tsrb_t *rb)
  */
 static inline int tsrb_full(const tsrb_t *rb)
 {
-    return (rb->writes - rb->reads) == rb->size;
+    unsigned irq_state = irq_disable();
+    int retval = (rb->writes - rb->reads) == rb->size;
+    irq_restore(irq_state);
+    return retval;
 }
 
 /**
@@ -108,7 +126,10 @@ static inline int tsrb_full(const tsrb_t *rb)
  */
 static inline unsigned int tsrb_free(const tsrb_t *rb)
 {
-    return (rb->size - rb->writes + rb->reads);
+    unsigned irq_state = irq_disable();
+    int retval = (rb->size - rb->writes + rb->reads);
+    irq_restore(irq_state);
+    return retval;
 }
 
 /**
@@ -120,6 +141,14 @@ static inline unsigned int tsrb_free(const tsrb_t *rb)
 int tsrb_get_one(tsrb_t *rb);
 
 /**
+ * @brief       Get a byte from ringbuffer, without removing it
+ * @param[in]   rb  Ringbuffer to operate on
+ * @return      >=0 byte that has been read
+ * @return      -1  if no byte available
+ */
+int tsrb_peek_one(tsrb_t *rb);
+
+/**
  * @brief       Get bytes from ringbuffer
  * @param[in]   rb  Ringbuffer to operate on
  * @param[out]  dst buffer to write to
@@ -127,6 +156,15 @@ int tsrb_get_one(tsrb_t *rb);
  * @return      nr of bytes written to @p dst
  */
 int tsrb_get(tsrb_t *rb, uint8_t *dst, size_t n);
+
+/**
+ * @brief       Get bytes from ringbuffer, without removing them
+ * @param[in]   rb  Ringbuffer to operate on
+ * @param[out]  dst buffer to write to
+ * @param[in]   n   max number of bytes to write to @p dst
+ * @return      nr of bytes written to @p dst
+ */
+int tsrb_peek(tsrb_t *rb, uint8_t *dst, size_t n);
 
 /**
  * @brief       Drop bytes from ringbuffer

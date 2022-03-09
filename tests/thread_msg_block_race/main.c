@@ -24,10 +24,9 @@
 
 #include "periph/timer.h"
 #include "random.h"
+#include "test_utils/expect.h"
 #include "thread.h"
 #include "msg.h"
-
-#include "test_utils/interactive_sync.h"
 
 #define CANARY_TYPE         (0x21fd)
 
@@ -81,15 +80,13 @@ static void *_thread(void *arg)
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
     kernel_pid_t pid;
 
     timer_init(TIMER_DEV(0), TIMER_FREQ, _timer, NULL);
     random_init(timer_read(TIMER_DEV(0)));
     puts("Test is \"successful\" if it runs forever without halting\n"
          "on any of the assertion in this file\n");
-    _pid_main = sched_active_pid;
+    _pid_main = thread_getpid();
 
     puts("I will try to trigger an interrupt at random intervals. When an\n"
          "interrupt is fired while ISR is disable in the thread_yield_higher()\n"
@@ -99,7 +96,7 @@ int main(void)
     pid = thread_create(_stack, sizeof(_stack), THREAD_PRIORITY_MAIN + 1,
                         THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
                         _thread, NULL, "nr2");
-    assert(pid != KERNEL_PID_UNDEF);
+    expect(pid != KERNEL_PID_UNDEF);
 
     while (1) {
         msg_t msg = { .type = CANARY_TYPE };

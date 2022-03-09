@@ -1,0 +1,19 @@
+FEATURES_REQUIRED += periph_gpio
+FEATURES_REQUIRED += periph_i2c
+
+_PCF857X_IRQ_MODULE := $(filter pcf857x_irq_%,$(USEMODULE))
+ifneq (,$(_PCF857X_IRQ_MODULE))
+  # pull in the correspondant event_thread_<priority> module
+  USEMODULE += $(_PCF857X_IRQ_MODULE:pcf857x_irq_%=event_thread_%)
+  USEMODULE += pcf857x_irq
+else
+  ifneq (,$(filter pcf857x_irq,$(USEMODULE)))
+    # pull in the pcf857x_irq_medium module as default if pcf857x_irq is used.
+    USEMODULE += pcf857x_irq_medium
+  endif
+endif
+
+ifneq (,$(filter pcf857x_irq,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+  USEMODULE += pcf857x
+endif

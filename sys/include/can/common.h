@@ -63,8 +63,8 @@ typedef enum {
     CANOPT_STATE_SLEEP,           /**< sleep mode */
     CANOPT_STATE_LISTEN_ONLY,     /**< listen only mode */
     CANOPT_STATE_ON,              /**< power on, rx / tx mode */
+    CANOPT_STATE_LOOPBACK,        /**< loopback mode */
 } canopt_state_t;
-
 
 /**
  * @brief Structure to pass a CAN option

@@ -1,0 +1,38 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#               2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_TCS37727
+    bool "TCS37727 RGB Light Sensor"
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+
+config HAVE_TCS37727
+    bool
+    select MODULE_TCS37727 if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a tcs37727 rgb light sensor is present.
+
+menuconfig KCONFIG_USEMODULE_TCS37727
+    bool "Configure TCS37727 driver"
+    depends on USEMODULE_TCS37727
+    help
+        Configure the TCS37727 driver using Kconfig.
+
+if KCONFIG_USEMODULE_TCS37727
+
+config TCS37727_ATIME_DEFAULT
+    int "RGBC integration time in microseconds"
+    range 2400 614000
+    default 200000
+    help
+        RGBC integration time impacts both the resolution and the sensitivity
+        of the RGBC reading. Refer to the section "RGBC Time Register" in the
+        datasheet for more information.
+
+endif # KCONFIG_USEMODULE_TCS37727

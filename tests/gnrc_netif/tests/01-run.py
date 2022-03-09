@@ -8,12 +8,12 @@
 # directory for more details.
 
 import sys
-from testrunner import run
+from testrunner import run, check_unittests
 
 
 def testfunc(child):
     # embUnit tests
-    child.expect(r"OK \(\d+ tests\)")
+    check_unittests(child)
     # output cross-checked hex data with WireShark -> "Import from Hex Dump..."
     # test_netapi_send__raw_unicast_ethernet_packet
     child.expect("Sending data from Ethernet device:")
@@ -80,7 +80,7 @@ def testfunc(child):
     child.expect("pktdump dumping Ethernet packet with empty payload")
     child.expect("PKTDUMP: data received:")
     child.expect(r"~~ SNIP  0 - size:   0 byte, type: NETTYPE_UNDEF \(0\)")
-    child.expect(r"00000000~~ SNIP  1 - size:  \d+ byte, type: NETTYPE_NETIF \(-1\)")
+    child.expect(r"~~ SNIP  1 - size:  \d+ byte, type: NETTYPE_NETIF \(-1\)")
     child.expect(r"if_pid: (\d+)  rssi: -?\d+  lqi: \d+")
     assert 0 < int(child.match.group(1))
     child.expect("flags: 0x0")
@@ -91,7 +91,7 @@ def testfunc(child):
     child.expect(r"pktdump dumping IEEE 802\.15\.4 packet with empty payload")
     child.expect("PKTDUMP: data received:")
     child.expect(r"~~ SNIP  0 - size:   0 byte, type: NETTYPE_UNDEF \(0\)")
-    child.expect(r"00000000~~ SNIP  1 - size:  \d+ byte, type: NETTYPE_NETIF \(-1\)")
+    child.expect(r"~~ SNIP  1 - size:  \d+ byte, type: NETTYPE_NETIF \(-1\)")
     child.expect(r"if_pid: (\d+)  rssi: -?\d+  lqi: \d+")
     assert 0 < int(child.match.group(1))
     child.expect("flags: 0x0")

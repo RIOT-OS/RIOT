@@ -1,0 +1,66 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_ILI9341
+    bool "ILI9341 display driver"
+    depends on HAS_PERIPH_SPI
+    depends on HAS_PERIPH_GPIO
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_SPI
+    select MODULE_PERIPH_GPIO
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
+
+config HAVE_ILI9341
+    bool
+    select MODULE_ILI9341 if MODULE_DISP_DEV
+    help
+      Indicates that an ILI9341 display is present.
+
+menuconfig KCONFIG_USEMODULE_ILI9341
+    bool "Configure ILI9341 driver"
+    depends on USEMODULE_ILI9341
+    help
+        Configure the ILI9341 display driver using Kconfig.
+
+if KCONFIG_USEMODULE_ILI9341
+
+config ILI9341_GVDD
+    int "GVDD voltage level (in millivolts)"
+    default 4800
+    range 3000 6000
+    help
+        Configure GVDD level, which is a reference level for the VCOM level and
+        the grayscale voltage level. GVDD should be ≦ (AVDD - 0.5) V .
+
+config ILI9341_VCOMH
+    int "VCOMH voltage level (in millivolts)"
+    default 4250
+    range 2700 5875
+    help
+        Configure the high level of VCOM AC voltage. VCOM needs to be adjusted
+        to match the capacitance and performance specifications of the TFT panel
+        to maximize contrast and minimize flickering
+
+config ILI9341_VCOML
+    int "VCOML voltage level (in millivolts)"
+    default -2000
+    range -2500 0
+    help
+        Configure the low level of VCOM AC voltage. VCOM needs to be adjusted to
+        match the capacitance and performance specifications of the TFT panel to
+        maximize contrast and minimize flickering
+
+config ILI9341_LE_MODE
+    bool "Enable little endian to big endian conversion"
+    help
+        Enable this configuration to convert little endian colors to big endian.
+        ILI9341 device requires colors to be send in big endian RGB-565 format.
+        Enabling this option allows for little endian colors. Enabling this
+        however will slow down the driver as it cannot use DMA anymore.
+
+endif # KCONFIG_USEMODULE_ILI9341

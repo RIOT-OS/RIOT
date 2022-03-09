@@ -25,7 +25,7 @@
 #include <stdint.h>
 
 #include "cib.h"
-#include "kernel_types.h"
+#include "sched.h"
 #include "mbox.h"
 #include "mutex.h"
 #include "random.h"
@@ -115,6 +115,16 @@ static inline void sys_mbox_set_invalid(sys_mbox_t *mbox)
 /** @} */
 
 typedef kernel_pid_t sys_thread_t;      /**< Platform specific thread type */
+
+/**
+ * @name    Functions for locking/unlocking core to assure thread safety.
+ * @{
+ */
+void sys_lock_tcpip_core(void);
+#define LOCK_TCPIP_CORE()          sys_lock_tcpip_core()
+void sys_unlock_tcpip_core(void);
+#define UNLOCK_TCPIP_CORE()        sys_unlock_tcpip_core()
+/** @} */
 
 #ifdef MODULE_RANDOM
 /**

@@ -1,0 +1,2 @@
+FEATURES_REQUIRED += periph_i2c
+FEATURES_REQUIRED += periph_gpio_irq

@@ -40,7 +40,7 @@ static void set_up(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_ABR_NUMOF authoritative border router list entries with
+ * Creates CONFIG_GNRC_IPV6_NIB_ABR_NUMOF authoritative border router list entries with
  * different addresses and then tries to create another one
  * Expected result: gnrc_ipv6_nib_abr_add() returns -ENOMEM
  */
@@ -51,7 +51,7 @@ static void test_nib_abr_add__ENOMEM(void)
                                 { .u64 = TEST_UINT64 } } };
     gnrc_ipv6_nib_abr_t abr;
 
-    for (unsigned i = 0; i < GNRC_IPV6_NIB_ABR_NUMOF; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_ABR_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_abr_add(&addr));
         addr.u16[0].u16++;
         TEST_ASSERT(gnrc_ipv6_nib_abr_iter(&iter_state, &abr));
@@ -61,7 +61,7 @@ static void test_nib_abr_add__ENOMEM(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_ABR_NUMOF authoritative border router list entries with
+ * Creates CONFIG_GNRC_IPV6_NIB_ABR_NUMOF authoritative border router list entries with
  * different addresses and then tries to add another equal to the last.
  * Expected result: should return 0.
  */
@@ -72,7 +72,7 @@ static void test_nib_abr_add__success(void)
                                 { .u64 = TEST_UINT64 } } };
     gnrc_ipv6_nib_abr_t abr;
 
-    for (unsigned i = 0; i < GNRC_IPV6_NIB_ABR_NUMOF; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_ABR_NUMOF; i++) {
         addr.u16[0].u16++;
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_abr_add(&addr));
         TEST_ASSERT(gnrc_ipv6_nib_abr_iter(&iter_state, &abr));

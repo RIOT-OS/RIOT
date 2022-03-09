@@ -22,7 +22,6 @@
 #define ENCX24J600_H
 
 #include "mutex.h"
-#include "kernel_types.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #include "net/netdev.h"

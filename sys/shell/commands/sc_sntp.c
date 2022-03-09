@@ -24,6 +24,7 @@
 #include "net/sntp.h"
 #include "net/ntp_packet.h"
 #include "net/af.h"
+#include "net/gnrc/netif.h"
 #include "net/ipv6/addr.h"
 #include "timex.h"
 
@@ -82,7 +83,7 @@ int _ntpdate(int argc, char **argv)
         puts("Error in synchronization");
         return 1;
     }
-#ifdef MODULE_NEWLIB
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
     struct tm *tm;
     time_t time = (time_t)(sntp_get_unix_usec() / US_PER_SEC);
 

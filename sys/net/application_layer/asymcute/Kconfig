@@ -1,0 +1,91 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_ASYMCUTE
+    bool "Configure Asymcute"
+    depends on USEMODULE_ASYMCUTE
+    help
+        Configure Asymcute using Kconfig.`Asymcute` is a asynchronous MQTT-SN
+        client implementation, aiming at providing the user a high degree of
+        flexibility. It provides a flexible interface that allows users to issue
+        any number of concurrent requests to one or more different gateways
+        simultaneously.
+
+if KCONFIG_USEMODULE_ASYMCUTE
+
+config ASYMCUTE_DEFAULT_PORT
+    int "Default UDP port to listen on"
+    default 1883
+    help
+        Default UDP port to listen on (also used as SRC port). This will write
+        to macro 'CONFIG_ASYMCUTE_DEFAULT_PORT'. Usage can be found in
+        examples/asymcute_mqttsn
+
+config ASYMCUTE_BUFSIZE
+    int "Size of buffer used for receive and request buffers"
+    default 128
+
+config ASYMCUTE_TOPIC_MAXLEN
+    int "Maximum topic length"
+    default 32
+    help
+        Configure maximum length for client's topic. The value must be less than
+        (256 - 8) and less than ('CONFIG_ASYMCUTE_BUFSIZE' - 8).
+
+config ASYMCUTE_KEEPALIVE
+    int "Keep alive interval in seconds"
+    range 300 $(UINT32_MAX)
+    default 360
+    help
+        Configure 'CONFIG_ASYMCUTE_KEEPALIVE', keep alive interval in seconds
+        which is communicated to the gateway in the CONNECT message. For more
+        information, see MQTT-SN Spec v1.2, section 5.4.4. For default values,
+        see section 7.2 -> TWAIT: > 5 min. Default value is 360 seconds which
+        corresponds to 6 minutes.
+
+config ASYMCUTE_KEEPALIVE_PING_EN
+    bool "Enable configuration of keep alive ping"
+    help
+        Enable configuration of 'CONFIG_ASYMCUTE_KEEPALIVE_PING', keep alive
+        ping interval. If not enabled, 'CONFIG_ASYMCUTE_KEEPALIVE_PING' will
+        default to three quarters of 'CONFIG_ASYMCUTE_KEEPALIVE', keep alive
+        interval.
+
+config ASYMCUTE_KEEPALIVE_PING
+    int "Keep alive ping interval in seconds"
+    default 270
+    depends on ASYMCUTE_KEEPALIVE_PING_EN
+    help
+        Configure 'CONFIG_ASYMCUTE_KEEPALIVE_PING', interval used by client for
+        sending periodic keep alive ping messages to the gateway. The value must
+        be less than 'CONFIG_ASYMCUTE_KEEPALIVE'.
+
+config ASYMCUTE_T_RETRY
+    int "Retry timer in seconds"
+    range 10 15
+    default 10
+    help
+        Configure 'CONFIG_ASYMCUTE_T_RETRY', interval used for timing the retry
+        messages which are sent when the expected reply from GW is not received.
+        The retry timer is started by the client when the message is sent and
+        stopped when the expected reply from GW is received. If the timer times
+        out and the expected GW’s reply is not received, the client retransmits
+        the message. For more information, see MQTT-SN Spec v1.2, section 6.13.
+        For default values, see section 7.2 -> Tretry: 10 to 15 sec.
+
+config ASYMCUTE_N_RETRY
+    int "Maximum number of retransmissions"
+    range 3 5
+    default 3
+    help
+        Configure 'CONFIG_ASYMCUTE_N_RETRY',the maximum number of retransmissions
+        in the event that the retry timer times out. After 'CONFIG_ASYMCUTE_N_RETRY'
+        number of retransmissions, the client aborts the procedure and assumes
+        that its MQTT-SN connection to the gateway is disconnected. For more
+        information, see MQTT-SN Spec v1.2, section 6.13. For default values,
+        see section 7.2 -> Nretry: 3-5.
+
+endif # KCONFIG_USEMODULE_ASYMCUTE

@@ -25,6 +25,7 @@
 #include "fs/fatfs.h"
 #include "vfs.h"
 #include "mtd.h"
+#include "board.h"
 
 #include "kernel_defines.h"
 
@@ -53,9 +54,7 @@ static const char test_txt[]  = "the test file content 123 abc";
 static const char test_txt2[] = "another text";
 static const char test_txt3[] = "hello world for vfs";
 
-static fatfs_desc_t fatfs = {
-    .vol_idx = 0
-};
+static fatfs_desc_t fatfs;
 
 static vfs_mount_t _test_vfs_mount = {
     .mount_point = MNT_PATH,
@@ -63,23 +62,29 @@ static vfs_mount_t _test_vfs_mount = {
     .private_data = (void *)&fatfs,
 };
 
-/* provide mtd devices for use within diskio layer of fatfs */
-mtd_dev_t *fatfs_mtd_devs[FF_VOLUMES];
-
-#ifdef MODULE_MTD_NATIVE
-/* mtd device for native is provided in boards/native/board_init.c */
+#if defined(MODULE_MTD_NATIVE) || defined(MODULE_MTD_MCI)
+/* mtd devices are provided in the board's board_init.c*/
 extern mtd_dev_t *mtd0;
-#elif MODULE_MTD_SDCARD
+#endif
+
+#if defined(MODULE_MTD_SDCARD)
 #define SDCARD_SPI_NUM ARRAY_SIZE(sdcard_spi_params)
 extern sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
 mtd_sdcard_t mtd_sdcard_devs[SDCARD_SPI_NUM];
 /* always default to first sdcard*/
-static mtd_dev_t *mtd1 = (mtd_dev_t*)&mtd_sdcard_devs[0];
+static mtd_dev_t *mtd_sdcard = (mtd_dev_t*)&mtd_sdcard_devs[0];
 #endif
 
 static void print_test_result(const char *test_name, int ok)
 {
     printf("%s:[%s]\n", test_name, ok ? "OK" : "FAILED");
+}
+
+static void test_format(void)
+{
+#ifdef MODULE_FATFS_VFS_FORMAT
+    print_test_result("test_format__format", vfs_format(&_test_vfs_mount) == 0);
+#endif
 }
 
 static void test_mount(void)
@@ -214,7 +219,6 @@ static void test_dir(void)
     print_test_result("test_dir__umount", vfs_umount(&_test_vfs_mount) == 0);
 }
 
-
 static void test_rename(void)
 {
     vfs_DIR dir;
@@ -292,8 +296,106 @@ static void test_create(void)
     nw = vfs_write(fd, test_txt, sizeof(test_txt));
     print_test_result("test_create__write_wo", nw == sizeof(test_txt));
     print_test_result("test_create__close_wo", vfs_close(fd) == 0);
+
+    /* test create if file exists */
+    fd = vfs_open(FULL_FNAME1, O_WRONLY | O_CREAT, 0);
+    print_test_result("test_create__open_wo2", fd >= 0);
+
+    nw = vfs_write(fd, test_txt, sizeof(test_txt));
+    print_test_result("test_create__write_wo2", nw == sizeof(test_txt));
+    print_test_result("test_create__close_wo2", vfs_close(fd) == 0);
+
     print_test_result("test_create__umount", vfs_umount(&_test_vfs_mount) == 0);
 }
+
+static void test_fstat(void)
+{
+    int fd;
+    struct stat stat_buf;
+
+    print_test_result("test_stat__mount", vfs_mount(&_test_vfs_mount) == 0);
+
+    fd = vfs_open(FULL_FNAME1, O_WRONLY | O_TRUNC, 0);
+    print_test_result("test_stat__open", fd >= 0);
+    print_test_result("test_stat__write",
+            vfs_write(fd, test_txt, sizeof(test_txt)) == sizeof(test_txt));
+    print_test_result("test_stat__close", vfs_close(fd) == 0);
+
+    print_test_result("test_stat__direct", vfs_stat(FULL_FNAME1, &stat_buf) == 0);
+
+    fd = vfs_open(FULL_FNAME1, O_RDONLY, 0);
+    print_test_result("test_stat__open", fd >= 0);
+    print_test_result("test_stat__stat", vfs_fstat(fd, &stat_buf) == 0);
+    print_test_result("test_stat__close", vfs_close(fd) == 0);
+    print_test_result("test_stat__size", stat_buf.st_size == sizeof(test_txt));
+    print_test_result("test_stat__umount", vfs_umount(&_test_vfs_mount) == 0);
+}
+
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
+static void test_libc(void)
+{
+    FILE* fl;
+    char buf[sizeof(test_txt) + sizeof(test_txt2)];
+    print_test_result("test_libc__mount", vfs_mount(&_test_vfs_mount) == 0);
+
+    /* try to open file that doesn't exist */
+    fl = fopen(FULL_FNAME_NXIST, "r");
+    print_test_result("test_libc__fopen", fl == NULL);
+    if (fl) {
+        fclose(fl);
+    }
+
+    /* create new file write and check content */
+    remove(FULL_FNAME2);
+    fl = fopen(FULL_FNAME2, "w+");
+    print_test_result("test_libc__fopen_w", fl != NULL);
+    if (fl) {
+        print_test_result("test_libc__fputs_w", fputs(test_txt, fl) >= 0);
+        rewind(fl);
+        print_test_result("test_libc__fread_w",
+                fread(buf, sizeof(*buf), sizeof(buf), fl) > 0);
+        print_test_result("test_libc__strcmp_w", strcmp(test_txt, buf) == 0);
+        print_test_result("test_libc__fclose_w", fclose(fl) == 0);
+    }
+
+    /* cppcheck-suppress resourceLeak
+     * (reason: cppcheck <2.0 reports a false positive here) */
+    fl = fopen(FULL_FNAME2, "r"); /* open file RO */
+    print_test_result("test_libc__fopen_r", fl != NULL);
+    if (fl) {
+        print_test_result("test_libc__fclose_r", fclose(fl) == 0);
+    }
+
+    /* remove file */
+    print_test_result("test_libc__remove", remove(FULL_FNAME2) == 0);
+
+    /* append to non existing file */
+    fl = fopen(FULL_FNAME2, "a");
+    print_test_result("test_libc__fopen_a", fl != NULL);
+    if (fl) {
+        print_test_result("test_libc__fputs_a", fputs(test_txt, fl) >= 0);
+        print_test_result("test_libc__fclose_a", fclose(fl) == 0);
+    }
+
+    /* append to existing file and check content */
+    fl = fopen(FULL_FNAME2, "a+");
+    print_test_result("test_libc__fopen_a2", fl != NULL);
+    if (fl) {
+        print_test_result("test_libc__fputs_a2", fputs(test_txt2, fl) >= 0);
+        rewind(fl);
+        print_test_result("test_libc__fread_a2",
+                fread(buf, sizeof(*buf), sizeof(buf), fl) > 0);
+        print_test_result("test_libc__strcmp_a2",
+                strncmp(test_txt, buf, strlen(test_txt)) == 0);
+        print_test_result("test_libc__strcmp_a2", strncmp(test_txt2,
+                    &buf[strlen(test_txt)], strlen(test_txt2)) == 0);
+        print_test_result("test_libc__fclose_a2", fclose(fl) == 0);
+    }
+    print_test_result("test_libc__remove", remove(FULL_FNAME2) == 0);
+
+    print_test_result("test_libc__umount", vfs_umount(&_test_vfs_mount) == 0);
+}
+#endif
 
 int main(void)
 {
@@ -302,20 +404,22 @@ int main(void)
         mtd_sdcard_devs[i].base.driver = &mtd_sdcard_driver;
         mtd_sdcard_devs[i].sd_card = &sdcard_spi_devs[i];
         mtd_sdcard_devs[i].params = &sdcard_spi_params[i];
-        fatfs_mtd_devs[i] = &mtd_sdcard_devs[i].base;
         mtd_init(&mtd_sdcard_devs[i].base);
     }
 #endif
 
-#ifdef MODULE_MTD_NATIVE
-    fatfs_mtd_devs[fatfs.vol_idx] = mtd0;
-#else
-    fatfs_mtd_devs[fatfs.vol_idx] = mtd1;
+#if defined(MODULE_MTD_NATIVE) || defined(MODULE_MTD_MCI)
+    fatfs.dev = mtd0;
+#endif
+
+#if defined(MODULE_MTD_SDCARD)
+    fatfs.dev = mtd_sdcard;
 #endif
 
     printf("Tests for FatFs over VFS - test results will be printed "
            "in the format test_name:result\n");
 
+    test_format();
     test_mount();
     test_open();
     test_rw();
@@ -324,6 +428,10 @@ int main(void)
     test_unlink();
     test_mkrmdir();
     test_create();
+    test_fstat();
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
+    test_libc();
+#endif
 
     printf("Test end.\n");
     return 0;

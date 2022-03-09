@@ -1,0 +1,14 @@
+CPU = efm32
+CPU_FAM = efr32mg1b
+CPU_MODEL = efr32mg1b232f256gm32
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_rtc
+FEATURES_PROVIDED += periph_rtt
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart periph_uart_modecfg
+
+# Put other features for this board (in alphabetical order)
+FEATURES_PROVIDED += efm32_coretemp
+FEATURES_PROVIDED += riotboot

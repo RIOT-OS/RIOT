@@ -22,7 +22,6 @@
 #ifndef C_FUNCTIONS_H
 #define C_FUNCTIONS_H
 
-
 /*
  * all headers defining c functions must be marked as extern "C" when included
  * into c++ sources

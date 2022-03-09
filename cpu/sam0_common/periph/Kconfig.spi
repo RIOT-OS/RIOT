@@ -1,0 +1,14 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config SPI_DMA_THRESHOLD_BYTES
+    int "SPI DMA threshold (bytes)"
+    depends on MODULE_PERIPH_DMA
+    depends on MODULE_PERIPH_SPI
+    default 16
+    help
+        Threshold in bytes under which no SPI DMA transfer will be performed.
+        Polling will be used instead.

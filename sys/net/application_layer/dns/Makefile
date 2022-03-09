@@ -1,2 +1,5 @@
-MODULE=sock_dns
+SRC :=
+
+SUBMODULE := 1
+
 include $(RIOTBASE)/Makefile.base

@@ -1,6 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += lsm6dsl
-USEMODULE += xtimer
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
 
 include $(RIOTBASE)/Makefile.include

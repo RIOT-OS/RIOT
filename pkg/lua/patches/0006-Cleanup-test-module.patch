@@ -1,7 +1,7 @@
-From 542105cafbba381ef40c414a4025ea25d20371a2 Mon Sep 17 00:00:00 2001
+From c579b54b04653e07114755d17a3999edceb3843c Mon Sep 17 00:00:00 2001
 From: Juan Carrano <j.carrano@fu-berlin.de>
 Date: Mon, 14 May 2018 15:19:14 +0200
-Subject: [PATCH 6/8] Cleanup test module.
+Subject: [PATCH 6/7] Cleanup test module.
 
 This patch makes several improvements to the test module intended
 to allow testing inside embedded environments:
@@ -493,5 +493,5 @@ index fc4e2388..b40f0d5c 100644
  /*
  ** RCS ident string
 -- 
-2.17.1
+2.25.1
 

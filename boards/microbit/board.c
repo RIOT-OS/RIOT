@@ -23,10 +23,7 @@
 
 void board_init(void)
 {
-    /* initialize the CPU */
-    cpu_init();
-
     /* initialize the micro:bit's buttons */
-    gpio_init(BTN0_PIN, GPIO_IN);
-    gpio_init(BTN1_PIN, GPIO_IN);
+    gpio_init(BTN0_PIN, BTN0_MODE);
+    gpio_init(BTN1_PIN, BTN1_MODE);
 }

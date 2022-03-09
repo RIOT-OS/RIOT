@@ -22,11 +22,12 @@
 #include <string.h>
 
 #include "dsp0401.h"
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 #include "periph/gpio.h"
 #include "periph/pwm.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define LATCH_DELAY         (50U) /* 50 us */
@@ -164,11 +165,11 @@ static void _shift_char(const dsp0401_t *dev, uint8_t c)
 
 static void _latch(const dsp0401_t *dev)
 {
-    xtimer_usleep(LATCH_DELAY);
+    ztimer_sleep(ZTIMER_USEC, LATCH_DELAY);
     gpio_set(LAT);
-    xtimer_usleep(LATCH_DELAY);
+    ztimer_sleep(ZTIMER_USEC, LATCH_DELAY);
     gpio_clear(LAT);
-    xtimer_usleep(LATCH_DELAY);
+    ztimer_sleep(ZTIMER_USEC, LATCH_DELAY);
 }
 
 int dsp0401_init(dsp0401_t *dev, const dsp0401_params_t *params)
@@ -238,12 +239,12 @@ void dsp0401_scroll_text(const dsp0401_t *dev, char *text, uint16_t delay)
     for (unsigned i = 0; i < strlen(text); ++i) {
         _shift_char(dev, text[i]);
         _latch(dev);
-        xtimer_usleep((uint32_t)(delay * US_PER_MS));
+        ztimer_sleep(ZTIMER_USEC, delay * US_PER_MS);
     }
 
     for (unsigned i = 0; i < MOD_COUNT * 4; ++i) {
         _shift_char(dev, ' ');
         _latch(dev);
-        xtimer_usleep((uint32_t)(delay * US_PER_MS));
+        ztimer_sleep(ZTIMER_USEC, delay * US_PER_MS);
     }
 }

@@ -36,7 +36,7 @@ int main(void)
 
     puts("Test application for the encx24j600 driver\n");
     puts("This test just pulls in parts of the GNRC network stack, use the\n"
-         "provided shell commands (i.e. ifconfig, ping6) to interact with\n"
+         "provided shell commands (i.e. ifconfig, ping) to interact with\n"
          "your encx24j600 device.\n");
 
     /* start shell */

@@ -25,7 +25,7 @@
 #include "spin_random.h"
 #include "random.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* Default is whatever, just some small delay if the user forgets to initialize */

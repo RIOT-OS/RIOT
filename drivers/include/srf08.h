@@ -35,9 +35,6 @@
 extern "C" {
 #endif
 
-/** @brief   The sensors default I2C address */
-#define SRF08_DEFAULT_ADDR              112
-
 /** @brief   The sensors command register (write) */
 #define SRF08_COMMAND_REG               0x0
 
@@ -66,11 +63,18 @@ extern "C" {
 #define SRF08_MAX_GAIN                  0x1F
 
 /**
+ * @brief   Device initialization parameters
+ */
+typedef struct {
+    i2c_t i2c;                  /**< I2C device the sensor is connected to */
+    uint8_t addr;               /**< I2C bus address of the sensor */
+} srf08_params_t;
+
+/**
  * @brief   Device descriptor for SRF08 sensors
  */
 typedef struct {
-    i2c_t i2c;               /**< I2C device the sensor is connected to */
-    uint8_t addr;            /**< I2C bus address of the sensor */
+    srf08_params_t params;      /**< Initialization parameters */
 } srf08_t;
 
 /**
@@ -89,15 +93,14 @@ typedef enum {
  * @brief   Initialize the SRF08 ultrasonic sensor
  *
  * @param[in] dev           device descriptor of an SRF08 sensor
- * @param[in] i2c           I2C device the sensor is connected to
- * @param[in] addr          I2C address of the sensor
+ * @param[in] params        initialization parameters
  *
  * @return                  0 on successful initialization
  * @return                  -3 on max. range error
  * @return                  -4 on max. gain error
  *
  */
-int srf08_init(srf08_t *dev, i2c_t i2c, uint8_t addr);
+int srf08_init(srf08_t *dev, const srf08_params_t *params);
 
 /**
  * @brief   Set the maximum range of the SRF08.

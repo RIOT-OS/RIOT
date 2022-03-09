@@ -192,7 +192,7 @@ int sds011_init(sds011_t *dev, const sds011_params_t *params)
 {
     assert((dev != NULL) && (params != NULL) && (params->uart < UART_NUMOF));
 
-    if ((params->pwr_pin != GPIO_UNDEF) &&
+    if ((gpio_is_valid(params->pwr_pin)) &&
         (gpio_init(params->pwr_pin, GPIO_OUT) != 0)) {
         return SDS011_ERROR;
     }
@@ -230,7 +230,7 @@ int sds011_register_callback(sds011_t *dev, sds011_callback_t cb, void *ctx)
 void sds011_power_on(const sds011_t *dev)
 {
     assert(dev != NULL);
-    if(dev->params.pwr_pin != GPIO_UNDEF) {
+    if(gpio_is_valid(dev->params.pwr_pin)) {
         gpio_write(dev->params.pwr_pin, dev->params.pwr_ah);
     }
 }
@@ -238,7 +238,7 @@ void sds011_power_on(const sds011_t *dev)
 void sds011_power_off(const sds011_t *dev)
 {
     assert(dev != NULL);
-    if(dev->params.pwr_pin != GPIO_UNDEF) {
+    if(gpio_is_valid(dev->params.pwr_pin)) {
         gpio_write(dev->params.pwr_pin, !dev->params.pwr_ah);
     }
 }

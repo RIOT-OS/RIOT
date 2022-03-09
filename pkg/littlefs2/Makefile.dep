@@ -1,0 +1,5 @@
+USEMODULE += vfs
+USEMODULE += littlefs2_fs
+USEMODULE += mtd
+
+FEATURES_BLACKLIST += arch_msp430

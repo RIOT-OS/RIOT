@@ -7,7 +7,6 @@
 To use, add
 
     #
-    GNRC_NETIF_NUMOF := 2
     USEMODULE += stdio_ethos gnrc_netdev
     CFLAGS += '-DETHOS_UART=UART_DEV(0)' -DETHOS_BAUDRATE=115200
 

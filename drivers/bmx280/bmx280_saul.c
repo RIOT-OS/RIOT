@@ -35,9 +35,11 @@ static int read_temperature(const void *dev, phydat_t *res)
 
 static int read_pressure(const void *dev, phydat_t *res)
 {
-    res->val[0] = bmx280_read_pressure((bmx280_t *)dev) / 100;
     res->unit = UNIT_PA;
-    res->scale = 2;
+    res->scale = 0;
+
+    int32_t val = bmx280_read_pressure((bmx280_t *)dev);
+    phydat_fit(res, &val, 1);
 
     return 1;
 }

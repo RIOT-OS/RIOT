@@ -90,7 +90,6 @@ static const uint32_t T[4][16] = {
       0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391 },
 };
 
-
 /**
  * @brief   md5F(), md5G(), md5H(), and md5I() are described in RFC 1321
  *
@@ -250,7 +249,6 @@ void md5_update(md5_ctx_t *ctx, const void *data, size_t len)
         }
     }
 }
-
 
 void md5_final(md5_ctx_t *ctx, void *digest)
 {

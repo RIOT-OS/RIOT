@@ -31,7 +31,6 @@ extern "C" {
  * @name xtimer configuration
  * @{
  */
-#define XTIMER_OVERHEAD     (6)
 #define XTIMER_BACKOFF      (10)
 /** @} */
 
@@ -80,12 +79,6 @@ extern "C" {
 #define BTN0_PIN            GPIO_PIN(PORT_A, 0)
 #define BTN0_MODE           GPIO_IN
 /** @} */
-
-
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

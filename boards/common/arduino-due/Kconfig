@@ -1,0 +1,28 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD_COMMON_ARDUINO_DUE
+    bool
+    select CPU_MODEL_SAM3X8E
+    select HAS_ARDUINO
+    select HAS_PERIPH_ADC
+    select HAS_PERIPH_DAC
+    select HAS_PERIPH_GPIO
+    select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_PWM
+    select HAS_PERIPH_RTT
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+
+    select HAVE_SAUL_GPIO
+    select MODULE_BOARDS_COMMON_ARDUINO_DUE if TEST_KCONFIG
+
+config MODULE_BOARDS_COMMON_ARDUINO_DUE
+    bool
+    depends on TEST_KCONFIG
+    help
+      Common code for boards based on arduino-due.

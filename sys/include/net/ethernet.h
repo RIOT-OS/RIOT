@@ -18,7 +18,6 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-
 #ifndef NET_ETHERNET_H
 #define NET_ETHERNET_H
 

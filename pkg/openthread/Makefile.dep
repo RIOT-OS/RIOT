@@ -1,7 +1,10 @@
 USEMODULE += openthread_contrib
-USEMODULE += mbedcrypto
 
+USEMODULE += netdev
 USEMODULE += openthread_contrib_netdev
 USEMODULE += l2util
-USEMODULE += xtimer
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
+USEMODULE += event
+
 FEATURES_REQUIRED += cpp

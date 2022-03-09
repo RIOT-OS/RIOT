@@ -1,0 +1,16 @@
+USEMODULE += ztimer
+USEMODULE += ztimer_usec
+FEATURES_REQUIRED += periph_i2c
+FEATURES_OPTIONAL += periph_i2c_reconfigure
+DEFAULT_MODULE += auto_init_security
+USEMODULE += cryptoauthlib_contrib
+
+ifneq (,$(filter cryptoauthlib_test,$(USEMODULE)))
+  USEMODULE += cryptoauthlib_test_jwt
+  USEMODULE += cryptoauthlib_test_tng
+  USEMODULE += cryptoauthlib_test_atcacert
+endif
+
+# Some EFM32 CPU families define AES_COUNT, which is also defined by this
+# library.
+FEATURES_BLACKLIST += arch_efm32

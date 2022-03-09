@@ -26,7 +26,7 @@
 #include "ph_oem_params.h"
 #include "ph_oem_regs.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define DEV_I2C (dev->params.i2c)
@@ -181,7 +181,7 @@ static int _set_interrupt_pin(const ph_oem_t *dev)
 int ph_oem_enable_interrupt(ph_oem_t *dev, ph_oem_interrupt_pin_cb_t cb,
                             void *arg)
 {
-    if (dev->params.interrupt_pin == GPIO_UNDEF) {
+    if (!gpio_is_valid(dev->params.interrupt_pin)) {
         return PH_OEM_INTERRUPT_GPIO_UNDEF;
     }
 
@@ -270,7 +270,7 @@ static int _new_reading_available(const ph_oem_t *dev)
             i2c_release(DEV_I2C);
             return PH_OEM_READ_ERR;
         }
-        xtimer_usleep(20 * US_PER_MS);
+        xtimer_msleep(20);
     } while (new_reading_available == 0);
 
     /* need to manually reset register back to 0x00 */
@@ -292,7 +292,7 @@ int ph_oem_start_new_reading(const ph_oem_t *dev)
 
     /* if interrupt pin is undefined, poll till new reading was taken and stop
      * device form taking further readings */
-    if (dev->params.interrupt_pin == GPIO_UNDEF) {
+    if (!gpio_is_valid(dev->params.interrupt_pin)) {
         int result = _new_reading_available(dev);
         if (result < 0) {
             return result;

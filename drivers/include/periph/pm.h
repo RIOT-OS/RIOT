@@ -24,7 +24,6 @@
 #ifndef PERIPH_PM_H
 #define PERIPH_PM_H
 
-#include "assert.h"
 #include "periph_cpu.h"
 
 #ifdef MODULE_PM_LAYERED

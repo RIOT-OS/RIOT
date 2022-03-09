@@ -1,6 +1,10 @@
 # Utilities to set variables and environment for targets
+# The variables defined here cover edge cases in make string handling.
 # These functions should help replacing immediate evaluation and global 'export'
 
+comma := ,
+blank :=
+space := $(blank) $(blank)
 
 # Evaluate a deferred variable only once on its first usage
 # Uses after that will be as if it was an immediate evaluation

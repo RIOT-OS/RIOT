@@ -45,7 +45,6 @@
 #define FRAG1_DISP      (0xC5)  /* 11 00 01 01 */
 #define FRAGN_DISP      (0xE5)  /* 11 10 01 01 */
 
-
 /* Test with 6LoWPAN dispatch byte indicating a none-LoWPAN frame (NALP = Not a
  * LoWPAN frame)
  * see https://tools.ietf.org/html/rfc4944#section-5.1

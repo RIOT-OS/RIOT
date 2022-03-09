@@ -38,6 +38,8 @@
 #ifndef DS18_H
 #define DS18_H
 
+#include <stdint.h>
+
 #include "periph/gpio.h"
 
 #ifdef __cplusplus
@@ -51,7 +53,6 @@ extern "C" {
 #define DS18_OK                       (0)
 #define DS18_ERROR                    (-1)
 /** @} */
-
 
 /**
  * @brief Device initialization parameters

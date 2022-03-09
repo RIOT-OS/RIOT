@@ -11,6 +11,9 @@ from testrunner import run
 
 
 def testfunc(child):
+    # Wait for serial.begin() to complete
+    child.expect_exact("Hello Arduino!")
+
     # 1 Basic read+write test on serial with error command
     child.sendline("wrang")
     child.expect_exact("UNK")
@@ -61,6 +64,11 @@ def testfunc(child):
     child.expect_exact("println(unsigned long, DEC): 1234567890")
     child.expect_exact("print(unsigned long, HEX): 499602d2")
     child.expect_exact("println(unsigned long, HEX): 499602d2")
+    child.expect_exact("print(float): 3.14")
+    child.expect_exact("print(float): 3")
+    child.expect_exact("print(float): 3.1")
+    child.expect_exact("print(float): 3.14")
+    child.expect_exact("print(float): 3.141")
 
 
 if __name__ == "__main__":

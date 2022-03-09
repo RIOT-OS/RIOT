@@ -26,12 +26,8 @@
 
 void board_init(void)
 {
-    /* initialize the on-board LED */
-    gpio_init(LED0_PIN, GPIO_OUT);
 
     /* initialize the on-board button */
     gpio_init(BTN0_PIN, BTN0_MODE);
 
-    /* initialize the CPU */
-    cpu_init();
 }

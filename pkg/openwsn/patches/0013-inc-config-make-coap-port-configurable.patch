@@ -1,0 +1,46 @@
+From ca63f11e29ad96cafa845306cec622d457ea1f67 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 4 Dec 2020 17:01:58 +0100
+Subject: [PATCH 13/13] inc/config: make coap port configurable
+
+---
+ inc/config.h   | 9 +++++++++
+ inc/opendefs.h | 2 +-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/inc/config.h b/inc/config.h
+index fd215d28..11a7ccef 100644
+--- a/inc/config.h
++++ b/inc/config.h
+@@ -216,6 +216,15 @@
+ #define OPENWSN_COAP_C IS_USED(MODULE_OPENWSN_COAP)
+ #endif
+ 
++/**
++ * \def OPENWSN_COAP_PORT_DEFAULT
++ *
++ * Defines the default port to use for COAP
++ *
++ */
++#ifndef OPENWSN_COAP_PORT_DEFAULT
++#define OPENWSN_COAP_PORT_DEFAULT   (5683)
++#endif
+ 
+ // ========================== Stack modules ===========================
+ 
+diff --git a/inc/opendefs.h b/inc/opendefs.h
+index 6a263ca0..0442563b 100644
+--- a/inc/opendefs.h
++++ b/inc/opendefs.h
+@@ -99,7 +99,7 @@ enum {
+ // warning: first 4 MSB of 2° octet may coincide with previous protocol number
+ enum {
+     //UDP
+-    WKP_UDP_COAP = 5683,
++    WKP_UDP_COAP = OPENWSN_COAP_PORT_DEFAULT,
+     WKP_UDP_ECHO = 7,
+     WKP_UDP_EXPIRATION = 5,
+     WKP_UDP_MONITOR = 3,
+-- 
+2.28.0
+

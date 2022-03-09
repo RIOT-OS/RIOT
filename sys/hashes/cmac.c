@@ -49,7 +49,7 @@ int cmac_init(cmac_context_t *ctx, const uint8_t *key, uint8_t key_size)
     }
 
     memset(ctx, 0, sizeof(cmac_context_t));
-    return cipher_init(&(ctx->aes_ctx), CIPHER_AES_128, key, key_size);
+    return cipher_init(&(ctx->aes_ctx), CIPHER_AES, key, key_size);
 }
 
 void cmac_update(cmac_context_t *ctx, const void *data, size_t len)

@@ -1,5 +1,6 @@
-ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += cc1101
+  USEMODULE += cc110x_868mhz
 endif
 
 # add support for LEDs and buttons as default saul devices

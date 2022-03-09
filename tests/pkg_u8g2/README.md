@@ -11,7 +11,7 @@ This test application will initialize the U8g2 to output on one of the following
 * output to I2C graphics screen.
 * output to SPI graphics screen.
 
-Note: you may have to run `make clean` between different output modes.
+Note: you may have to run `make clean` after you changed to a different output mode.
 
 ### Output to terminal
 To output to this virtual screen, supply `TEST_OUTPUT=1` to the `make` command.
@@ -26,7 +26,7 @@ To output to screen, supply `TEST_OUTPUT=3` to the `make` command.
 
 * `TEST_SPI` &mdash; The SPI device.
 * `TEST_PIN_CS` &mdash; If applicable, the CS pin.
-* `TEST_PIN_DC` &mdash; If applicable, the Command/Data pin.
+* `TEST_PIN_DC` &mdash; If applicable, the Data/Command pin.
 * `TEST_PIN_RESET` &mdash; If applicable, the reset pin.
 * `TEST_DISPLAY` &mdash; The used display driver (see https://github.com/olikraus/u8g2/wiki/u8g2setupc). Make sure you select a SPI compatible display.
 

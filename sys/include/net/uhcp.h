@@ -10,6 +10,15 @@
  * @defgroup    net_uhcp UHCP
  * @ingroup     net
  * @brief       Provides UHCP (micro host configuration protocol)
+ *
+ * UHCP (micro host configuration protocol) is a RIOT-proprietary protocol that
+ * was developed to have a simple drop-in replacement for
+ * [DHCPv6 prefix delegation](@ref net_dhcpv6_client) (which was not implemented
+ * when UHCP was introduced).
+ *
+ * If you have root access on your host machine or access to a DHCPv6 server
+ * providing prefix delegation, DHCPv6 is preferred over UHCP.
+ *
  * @{
  *
  * @file
@@ -128,7 +137,8 @@ void uhcp_handle_push(uhcp_push_t *req, uint8_t *src, uint16_t port, uhcp_iface_
 /**
  * @brief handle incoming prefix (as parsed from push packet)
  *
- * Supposed to be implemented by UHCP client implementations.
+ * Supposed to be implemented by UHCP client implementations for the network
+ * stack.
  *
  * The function might be called with an already configured prefix. In that
  * case, the lifetime *MUST* be updated.

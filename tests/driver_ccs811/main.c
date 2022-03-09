@@ -14,12 +14,12 @@
  *
  * The test application demonstrates the use of the CCS811 using
  *
- * - data-ready status function ```ccs811_data_ready``` to wait for
+ * - data-ready status function `ccs811_data_ready` to wait for
  *   new data and
  * - default configuration parameters, that is, the measurement mode
- *   ```CCS811_MODE_1S``` with one measurement per second.
+ *   `CCS811_MODE_1S` with one measurement per second.
  *
- * Please refer ```$(RIOTBASE)/tests/driver_ccs811_full``` to learn how
+ * Please refer `$(RIOTBASE)/tests/driver_ccs811_full` to learn how
  * to use the CCS811 with interrupts.
  */
 
@@ -27,7 +27,7 @@
 #include <string.h>
 
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "ccs811.h"
 #include "ccs811_params.h"
@@ -54,11 +54,11 @@ int main(void)
 
         /* wait and check for for new data every 10 ms */
         while (ccs811_data_ready (&sensor) != CCS811_OK) {
-            xtimer_usleep(10000);
+            ztimer_sleep(ZTIMER_USEC, 10000);
         }
 
         /* read the data and print them on success */
-        if (ccs811_read_iaq(&sensor, &tvoc, &eco2, 0, 0) != CCS811_OK) {
+        if (ccs811_read_iaq(&sensor, &tvoc, &eco2, 0, 0) == CCS811_OK) {
             printf("TVOC [ppb]: %d\neCO2 [ppm]: %d\n", tvoc, eco2);
             puts("+-------------------------------------+");
         }

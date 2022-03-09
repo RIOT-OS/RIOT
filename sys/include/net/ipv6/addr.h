@@ -23,7 +23,6 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-
 #ifndef NET_IPV6_ADDR_H
 #define NET_IPV6_ADDR_H
 
@@ -53,7 +52,6 @@ extern "C" {
  */
 #define IPV6_ADDR_MAX_STR_LEN       (sizeof("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"))
 #endif
-
 
 /**
  * @brief The first 10 bits of a site-local IPv6 unicast address
@@ -164,7 +162,6 @@ typedef union {
                                                0x00, 0x00, 0x00, 0x00, \
                                                0x00, 0x00, 0x00, 0x00, \
                                                0x00, 0x00, 0x00, 0x02 }}
-
 
 /**
  * @brief   Static initializer for the site-local all routers multicast IPv6
@@ -483,7 +480,6 @@ static inline bool ipv6_addr_is_global(const ipv6_addr_t *addr)
     }
 }
 
-
 /**
  * @brief   Check if @p addr is solicited-node multicast address.
  *
@@ -501,7 +497,6 @@ static inline bool ipv6_addr_is_solicited_node(const ipv6_addr_t *addr)
     return (memcmp(addr, &ipv6_addr_solicited_node_prefix,
                    sizeof(ipv6_addr_t) - 3) == 0);
 }
-
 
 /**
  * @brief   Checks if two IPv6 addresses are equal.
@@ -535,6 +530,19 @@ uint8_t ipv6_addr_match_prefix(const ipv6_addr_t *a, const ipv6_addr_t *b);
  *                      (set to 128 when greater than 128).
  */
 void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix, uint8_t bits);
+
+/**
+ * @brief   Sets IPv6 address @p out with a given prefix and interface ID
+ *
+ * @param[out]  out     Address to initialize
+ * @param[in]   prefix  Prefix in host byte order
+ * @param[in]   iid     Interface ID in host byte order
+ */
+static inline void ipv6_addr_init(ipv6_addr_t *out, uint64_t prefix, uint64_t iid)
+{
+    out->u64[0] = byteorder_htonll(prefix);
+    out->u64[1] = byteorder_htonll(iid);
+}
 
 /**
  * @brief   Sets the last @p bits of IPv6 address @p out to @p iid.
@@ -687,7 +695,7 @@ static inline void ipv6_addr_set_all_routers_multicast(ipv6_addr_t *addr, unsign
  */
 static inline void ipv6_addr_set_solicited_nodes(ipv6_addr_t *out, const ipv6_addr_t *in)
 {
-    out->u64[0] = byteorder_htonll(0xff02000000000000);
+    out->u64[0] = byteorder_htonll(0xff02000000000000ull);
     out->u32[2] = byteorder_htonl(1);
     out->u8[12] = 0xff;
     out->u8[13] = in->u8[13];
@@ -704,7 +712,7 @@ static inline void ipv6_addr_set_solicited_nodes(ipv6_addr_t *out, const ipv6_ad
  * @param[out] result       The resulting string representation of at least
  *                          @ref IPV6_ADDR_MAX_STR_LEN
  * @param[in] addr          An IPv6 address
- * @param[in] result_len    Length of @p result_len
+ * @param[in] result_len    Length of @p result
  *
  * @return  @p result, on success
  * @return  NULL, if @p result_len was lesser than IPV6_ADDR_MAX_STR_LEN
@@ -720,14 +728,35 @@ char *ipv6_addr_to_str(char *result, const ipv6_addr_t *addr, uint8_t result_len
  *          RFC 5952
  *      </a>
  *
- * @param[in] result    The resulting byte representation
- * @param[in] addr      An IPv6 address string representation
+ * @param[out] result    The resulting byte representation
+ * @param[in] addr       An IPv6 address string representation
  *
  * @return  @p result, on success
  * @return  NULL, if @p addr was malformed
  * @return  NULL, if @p result or @p addr was NULL
  */
 ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr);
+
+/**
+ * @brief   Converts an IPv6 address from a buffer of characters to a
+ *          byte-represented IPv6 address
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc5952">
+ *          RFC 5952
+ *      </a>
+ *
+ * @note    @p addr_len should be between 0 and IPV6_ADDR_MAX_STR_LEN
+ *
+ * @param[out] result    The resulting byte representation
+ * @param[in] addr       An IPv6 address string representation
+ * @param[in] addr_len   The amount of characters to parse
+ *
+ * @return  @p result, on success
+ * @return  NULL, if @p addr was malformed
+ * @return  NULL, if @p result or @p addr was NULL
+ */
+ipv6_addr_t *ipv6_addr_from_buf(ipv6_addr_t *result, const char *addr,
+                                size_t addr_len);
 
 /**
  * @brief split IPv6 address string representation and return remaining string

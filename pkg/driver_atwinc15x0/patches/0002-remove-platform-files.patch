@@ -1,0 +1,885 @@
+From 6c56be47ce245340129438daafa09b4b0a45b2d2 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Thu, 26 Mar 2020 23:23:17 +0100
+Subject: [PATCH 2/6] remove platform files
+
+---
+ src/bsp/include/nm_bsp_arduino.h              |  74 ------
+ src/bsp/include/nm_bsp_avr.h                  |  54 -----
+ src/bsp/include/nm_bsp_internal.h             |  59 -----
+ src/bsp/include/nm_bsp_samd21.h               |  52 -----
+ src/bsp/source/nm_bsp_arduino.c               | 214 ------------------
+ src/bsp/source/nm_bsp_arduino_avr.c           | 164 --------------
+ .../source/nm_bus_wrapper_samd21.cpp          | 200 ----------------
+ 7 files changed, 817 deletions(-)
+ delete mode 100644 src/bsp/include/nm_bsp_arduino.h
+ delete mode 100644 src/bsp/include/nm_bsp_avr.h
+ delete mode 100644 src/bsp/include/nm_bsp_internal.h
+ delete mode 100644 src/bsp/include/nm_bsp_samd21.h
+ delete mode 100644 src/bsp/source/nm_bsp_arduino.c
+ delete mode 100644 src/bsp/source/nm_bsp_arduino_avr.c
+ delete mode 100644 src/bus_wrapper/source/nm_bus_wrapper_samd21.cpp
+
+diff --git a/src/bsp/include/nm_bsp_arduino.h b/src/bsp/include/nm_bsp_arduino.h
+deleted file mode 100644
+index 77417e8..0000000
+--- a/src/bsp/include/nm_bsp_arduino.h
++++ /dev/null
+@@ -1,74 +0,0 @@
+-/**
+- *
+- * \file
+- *
+- * \brief This module contains NMC1500 BSP APIs definitions.
+- *
+- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+- *
+- * \asf_license_start
+- *
+- * \page License
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *
+- * 1. Redistributions of source code must retain the above copyright notice,
+- *    this list of conditions and the following disclaimer.
+- *
+- * 2. Redistributions in binary form must reproduce the above copyright notice,
+- *    this list of conditions and the following disclaimer in the documentation
+- *    and/or other materials provided with the distribution.
+- *
+- * 3. The name of Atmel may not be used to endorse or promote products derived
+- *    from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
+- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
+- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
+- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+- * POSSIBILITY OF SUCH DAMAGE.
+- *
+- * \asf_license_stop
+- *
+- */
+-
+-#ifndef _NM_BSP_ARDUINO_H_
+-#define _NM_BSP_ARDUINO_H_
+-
+-#include <stdint.h>
+-
+-#include <Arduino.h>
+-
+-/*
+- * Arduino variants may redefine those pins.
+- * If no pins are specified the following defaults are used:
+- *  WINC1501_RESET_PIN   - pin 5
+- *  WINC1501_INTN_PIN    - pin 7
+- *  WINC1501_CHIP_EN_PIN - not connected (tied to VCC)
+- */
+-#if !defined(WINC1501_RESET_PIN)
+-  #define WINC1501_RESET_PIN  5
+-#endif
+-#if !defined(WINC1501_INTN_PIN)
+-  #define WINC1501_INTN_PIN   7
+-#endif
+-#if !defined(WINC1501_SPI_CS_PIN)
+-  #define WINC1501_SPI_CS_PIN 10
+-#endif
+-#if !defined(WINC1501_CHIP_EN_PIN)
+-  #define WINC1501_CHIP_EN_PIN -1
+-#endif
+-
+-extern int8_t gi8Winc1501CsPin;
+-extern int8_t gi8Winc1501ResetPin;
+-extern int8_t gi8Winc1501IntnPin;
+-extern int8_t gi8Winc1501ChipEnPin;
+-
+-#endif /* _NM_BSP_ARDUINO_H_ */
+diff --git a/src/bsp/include/nm_bsp_avr.h b/src/bsp/include/nm_bsp_avr.h
+deleted file mode 100644
+index c5991f2..0000000
+--- a/src/bsp/include/nm_bsp_avr.h
++++ /dev/null
+@@ -1,54 +0,0 @@
+-/**
+- *
+- * \file
+- *
+- * \brief This module contains NMC1500 BSP APIs definitions.
+- *
+- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+- *
+- * \asf_license_start
+- *
+- * \page License
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *
+- * 1. Redistributions of source code must retain the above copyright notice,
+- *    this list of conditions and the following disclaimer.
+- *
+- * 2. Redistributions in binary form must reproduce the above copyright notice,
+- *    this list of conditions and the following disclaimer in the documentation
+- *    and/or other materials provided with the distribution.
+- *
+- * 3. The name of Atmel may not be used to endorse or promote products derived
+- *    from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
+- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
+- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
+- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+- * POSSIBILITY OF SUCH DAMAGE.
+- *
+- * \asf_license_stop
+- *
+- */
+-
+-#ifndef _NM_BSP_AVR_H_
+-#define _NM_BSP_AVR_H_
+-
+-#pragma once
+-
+-#define NM_DEBUG			0
+-#define NM_BSP_PRINTF
+-
+-#define CONF_WINC_USE_SPI	1
+-
+-#define NM_EDGE_INTERRUPT	1
+-
+-#endif /* _NM_BSP_AVR_H_ */
+diff --git a/src/bsp/include/nm_bsp_internal.h b/src/bsp/include/nm_bsp_internal.h
+deleted file mode 100644
+index 5117a1d..0000000
+--- a/src/bsp/include/nm_bsp_internal.h
++++ /dev/null
+@@ -1,59 +0,0 @@
+-/**
+- *
+- * \file
+- *
+- * \brief This module contains NMC1500 BSP APIs declarations.
+- *
+- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+- *
+- * \asf_license_start
+- *
+- * \page License
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *
+- * 1. Redistributions of source code must retain the above copyright notice,
+- *    this list of conditions and the following disclaimer.
+- *
+- * 2. Redistributions in binary form must reproduce the above copyright notice,
+- *    this list of conditions and the following disclaimer in the documentation
+- *    and/or other materials provided with the distribution.
+- *
+- * 3. The name of Atmel may not be used to endorse or promote products derived
+- *    from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
+- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
+- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
+- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+- * POSSIBILITY OF SUCH DAMAGE.
+- *
+- * \asf_license_stop
+- *
+- */
+-/**@defgroup  BSPDefine Defines
+- * @ingroup nm_bsp
+- * @{
+- */
+-#ifndef _NM_BSP_INTERNAL_H_
+-#define _NM_BSP_INTERNAL_H_
+-
+-#ifdef ARDUINO_ARCH_AVR
+-#define LIMITED_RAM_DEVICE
+-#include "bsp/include/nm_bsp_avr.h"
+-#else
+-#include "bsp/include/nm_bsp_samd21.h"
+-#endif
+-
+-#if defined(ARDUINO) && !defined(ARDUINO_SAMD_MKR1000)
+-#define CONF_PERIPH
+-#endif
+-
+-#endif //_NM_BSP_INTERNAL_H_
+\ No newline at end of file
+diff --git a/src/bsp/include/nm_bsp_samd21.h b/src/bsp/include/nm_bsp_samd21.h
+deleted file mode 100644
+index 296cd20..0000000
+--- a/src/bsp/include/nm_bsp_samd21.h
++++ /dev/null
+@@ -1,52 +0,0 @@
+-/**
+- *
+- * \file
+- *
+- * \brief This module contains NMC1500 BSP APIs definitions.
+- *
+- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+- *
+- * \asf_license_start
+- *
+- * \page License
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *
+- * 1. Redistributions of source code must retain the above copyright notice,
+- *    this list of conditions and the following disclaimer.
+- *
+- * 2. Redistributions in binary form must reproduce the above copyright notice,
+- *    this list of conditions and the following disclaimer in the documentation
+- *    and/or other materials provided with the distribution.
+- *
+- * 3. The name of Atmel may not be used to endorse or promote products derived
+- *    from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
+- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
+- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
+- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+- * POSSIBILITY OF SUCH DAMAGE.
+- *
+- * \asf_license_stop
+- *
+- */
+-
+-#ifndef _NM_BSP_SAMD21_H_
+-#define _NM_BSP_SAMD21_H_
+-
+-#define NM_DEBUG			0
+-#define NM_BSP_PRINTF
+-
+-#define CONF_WINC_USE_SPI	1
+-
+-#define NM_EDGE_INTERRUPT	1
+-
+-#endif /* _NM_BSP_SAMD21_H_ */
+diff --git a/src/bsp/source/nm_bsp_arduino.c b/src/bsp/source/nm_bsp_arduino.c
+deleted file mode 100644
+index b10674b..0000000
+--- a/src/bsp/source/nm_bsp_arduino.c
++++ /dev/null
+@@ -1,214 +0,0 @@
+-/**
+- *
+- * \file
+- *
+- * \brief This module contains SAMD21 BSP APIs implementation.
+- *
+- * Copyright (c) 2014 Atmel Corporation. All rights reserved.
+- *
+- * \asf_license_start
+- *
+- * \page License
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *
+- * 1. Redistributions of source code must retain the above copyright notice,
+- *    this list of conditions and the following disclaimer.
+- *
+- * 2. Redistributions in binary form must reproduce the above copyright notice,
+- *    this list of conditions and the following disclaimer in the documentation
+- *    and/or other materials provided with the distribution.
+- *
+- * 3. The name of Atmel may not be used to endorse or promote products derived
+- *    from this software without specific prior written permission.
+- *
+- * 4. This software may only be redistributed and used in connection with an
+- *    Atmel microcontroller product.
+- *
+- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
+- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
+- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
+- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+- * POSSIBILITY OF SUCH DAMAGE.
+- *
+- * \asf_license_stop
+- *
+- */
+-
+-#include "bsp/include/nm_bsp.h"
+-#include "bsp/include/nm_bsp_arduino.h"
+-#include "common/include/nm_common.h"
+-
+-int8_t gi8Winc1501CsPin = WINC1501_SPI_CS_PIN;
+-int8_t gi8Winc1501ResetPin = WINC1501_RESET_PIN;
+-int8_t gi8Winc1501IntnPin = WINC1501_INTN_PIN;
+-int8_t gi8Winc1501ChipEnPin = WINC1501_CHIP_EN_PIN;
+-
+-static tpfNmBspIsr gpfIsr;
+-
+-void __attribute__((weak)) attachInterruptMultiArch(uint32_t pin, void *chip_isr, uint32_t mode)
+-{
+-	attachInterrupt(pin, chip_isr, mode);
+-}
+-
+-void __attribute__((weak)) detachInterruptMultiArch(uint32_t pin)
+-{
+-	detachInterrupt(pin);
+-}
+-
+-static void chip_isr(void)
+-{
+-	if (gpfIsr) {
+-		gpfIsr();
+-	}
+-}
+-
+-/*
+- *	@fn		init_chip_pins
+- *	@brief	Initialize reset, chip enable and wake pin
+- *	@author	M.S.M
+- *	@date	11 July 2012
+- *	@version	1.0
+- */
+-static void init_chip_pins(void)
+-{
+-	if (gi8Winc1501ResetPin > -1)
+-	{
+-		/* Configure RESETN pin as output. */
+-		pinMode(gi8Winc1501ResetPin, OUTPUT);
+-		digitalWrite(gi8Winc1501ResetPin, HIGH);
+-	}
+-
+-	/* Configure INTN pins as input. */
+-	pinMode(gi8Winc1501IntnPin, INPUT);
+-
+-	if (gi8Winc1501ChipEnPin > -1)
+-	{
+-		/* Configure CHIP_EN as pull-up */
+-		pinMode(gi8Winc1501ChipEnPin, INPUT_PULLUP);
+-	}
+-}
+-
+-static void deinit_chip_pins(void)
+-{
+-	if (gi8Winc1501ResetPin > -1)
+-	{
+-		digitalWrite(gi8Winc1501ResetPin, LOW);
+-		pinMode(gi8Winc1501ResetPin, INPUT);
+-	}
+-
+-	if (gi8Winc1501ChipEnPin > -1)
+-	{
+-		pinMode(gi8Winc1501ChipEnPin, INPUT);
+-	}
+-}
+-
+-/*
+- *	@fn		nm_bsp_init
+- *	@brief	Initialize BSP
+- *	@return	0 in case of success and -1 in case of failure
+- *	@author	M.S.M
+- *	@date	11 July 2012
+- *	@version	1.0
+- */
+-sint8 nm_bsp_init(void)
+-{
+-	gpfIsr = NULL;
+-
+-	init_chip_pins();
+-
+-	nm_bsp_reset();
+-
+-	return M2M_SUCCESS;
+-}
+-
+-/**
+- *	@fn		nm_bsp_deinit
+- *	@brief	De-iInitialize BSP
+- *	@return	0 in case of success and -1 in case of failure
+- *	@author	M. Abdelmawla
+- *	@date	11 July 2012
+- *	@version	1.0
+- */
+-sint8 nm_bsp_deinit(void)
+-{
+-	deinit_chip_pins();
+-
+-	return M2M_SUCCESS;
+-}
+-
+-/**
+- *	@fn		nm_bsp_reset
+- *	@brief	Reset NMC1500 SoC by setting CHIP_EN and RESET_N signals low,
+- *           CHIP_EN high then RESET_N high
+- *	@author	M. Abdelmawla
+- *	@date	11 July 2012
+- *	@version	1.0
+- */
+-void nm_bsp_reset(void)
+-{
+-	if (gi8Winc1501ResetPin > -1)
+-	{
+-		digitalWrite(gi8Winc1501ResetPin, LOW);
+-		nm_bsp_sleep(100);
+-		digitalWrite(gi8Winc1501ResetPin, HIGH);
+-		nm_bsp_sleep(100);
+-	}
+-}
+-
+-/*
+- *	@fn		nm_bsp_sleep
+- *	@brief	Sleep in units of mSec
+- *	@param[IN]	u32TimeMsec
+- *				Time in milliseconds
+- *	@author	M.S.M
+- *	@date	28 OCT 2013
+- *	@version	1.0
+- */
+-void nm_bsp_sleep(uint32 u32TimeMsec)
+-{
+-	while (u32TimeMsec--) {
+-		delay(1);
+-	}
+-}
+-
+-/*
+- *	@fn		nm_bsp_register_isr
+- *	@brief	Register interrupt service routine
+- *	@param[IN]	pfIsr
+- *				Pointer to ISR handler
+- *	@author	M.S.M
+- *	@date	28 OCT 2013
+- *	@sa		tpfNmBspIsr
+- *	@version	1.0
+- */
+-void nm_bsp_register_isr(tpfNmBspIsr pfIsr)
+-{
+-	gpfIsr = pfIsr;
+-	attachInterruptMultiArch(gi8Winc1501IntnPin, chip_isr, FALLING);
+-}
+-
+-/*
+- *	@fn		nm_bsp_interrupt_ctrl
+- *	@brief	Enable/Disable interrupts
+- *	@param[IN]	u8Enable
+- *				'0' disable interrupts. '1' enable interrupts
+- *	@author	M.S.M
+- *	@date	28 OCT 2013
+- *	@version	1.0
+- */
+-void nm_bsp_interrupt_ctrl(uint8 u8Enable)
+-{
+-	if (u8Enable) {
+-		attachInterruptMultiArch(gi8Winc1501IntnPin, chip_isr, FALLING);
+-	} else {
+-		detachInterruptMultiArch(gi8Winc1501IntnPin);
+-	}
+-}
+diff --git a/src/bsp/source/nm_bsp_arduino_avr.c b/src/bsp/source/nm_bsp_arduino_avr.c
+deleted file mode 100644
+index 050d5d5..0000000
+--- a/src/bsp/source/nm_bsp_arduino_avr.c
++++ /dev/null
+@@ -1,164 +0,0 @@
+-/**
+- *
+- * \file
+- *
+- * \brief This module contains SAMD21 BSP APIs implementation.
+- *
+- * Copyright (c) 2014 Atmel Corporation. All rights reserved.
+- *
+- * \asf_license_start
+- *
+- * \page License
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *
+- * 1. Redistributions of source code must retain the above copyright notice,
+- *    this list of conditions and the following disclaimer.
+- *
+- * 2. Redistributions in binary form must reproduce the above copyright notice,
+- *    this list of conditions and the following disclaimer in the documentation
+- *    and/or other materials provided with the distribution.
+- *
+- * 3. The name of Atmel may not be used to endorse or promote products derived
+- *    from this software without specific prior written permission.
+- *
+- * 4. This software may only be redistributed and used in connection with an
+- *    Atmel microcontroller product.
+- *
+- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
+- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
+- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
+- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+- * POSSIBILITY OF SUCH DAMAGE.
+- *
+- * \asf_license_stop
+- *
+- */
+-
+-#ifdef ARDUINO_ARCH_AVR
+-
+-#include "bsp/include/nm_bsp.h"
+-#include "bsp/include/nm_bsp_arduino.h"
+-#include "common/include/nm_common.h"
+-
+-#define IS_MEGA (defined(ARDUINO_AVR_MEGA) || defined(ARDUINO_AVR_MEGA2560))
+-
+-static tpfNmBspIsr gpfIsr;
+-
+-volatile uint8_t *_receivePortRegister;
+-volatile uint8_t *_pcint_maskreg;
+-uint8_t _receiveBitMask;
+-volatile uint8_t prev_pin_read = 1;
+-
+-uint8_t rx_pin_read()
+-{
+-  return *_receivePortRegister & _receiveBitMask;
+-}
+-
+-#if !IS_MEGA
+-
+-#if defined(PCINT0_vect)
+-ISR(PCINT0_vect)
+-{
+-	if (!rx_pin_read() && gpfIsr)
+-	{
+-		gpfIsr();
+-	}
+-}
+-#endif
+-
+-#if defined(PCINT1_vect)
+-ISR(PCINT1_vect, ISR_ALIASOF(PCINT0_vect));
+-#endif
+-
+-#if defined(PCINT2_vect)
+-ISR(PCINT2_vect, ISR_ALIASOF(PCINT0_vect));
+-#endif
+-
+-#if defined(PCINT3_vect)
+-ISR(PCINT3_vect, ISR_ALIASOF(PCINT0_vect));
+-#endif
+-
+-#endif // !IS_MEGA
+-
+-#if defined(TIMER4_OVF_vect)
+-ISR(TIMER4_OVF_vect) {
+-	uint8_t curr_pin_read = rx_pin_read();
+-	if ((curr_pin_read != prev_pin_read) && !curr_pin_read && gpfIsr)
+-	{
+-		gpfIsr();
+-	}
+-	prev_pin_read = curr_pin_read;
+-}
+-
+-// stategy 3 - start a timer and perform a sort of polling
+-void attachFakeInterruptToTimer(void) {
+-	TCCR4B = (1<<CS41);
+-	TIMSK4 = (1<<TOIE4);
+-    OCR4C = 0xFF;
+-}
+-#else
+-void attachFakeInterruptToTimer(void) {
+-}
+-#endif
+-
+-// strategy 1 - attach external interrupt to change pin (works on 328)
+-void attachInterruptToChangePin(int pin) {
+-	pinMode(pin, INPUT_PULLUP);
+-	_receiveBitMask = digitalPinToBitMask(pin);
+-	uint8_t port = digitalPinToPort(pin);
+-	_receivePortRegister = portInputRegister(port);
+-
+-	if (!digitalPinToPCICR(pin)) {
+-		//need to fallback to strategy 2
+-		attachFakeInterruptToTimer();
+-		return;
+-	}
+-
+-	*digitalPinToPCICR(pin) |= _BV(digitalPinToPCICRbit(pin));
+-	_pcint_maskreg = digitalPinToPCMSK(pin);
+-	*_pcint_maskreg |= _BV(digitalPinToPCMSKbit(pin));
+-}
+-
+-void detachInterruptToChangePin(int pin) {
+-    *_pcint_maskreg &= ~(_BV(digitalPinToPCMSKbit(pin)));
+-}
+-
+-void attachInterruptMultiArch(uint32_t pin, void *chip_isr, uint32_t mode)
+-{
+-	int pin_irq;
+-	gpfIsr = chip_isr;
+-
+-	// stategy 0 - attach external interrupt to pin (works on 32u4)
+-	pin_irq = digitalPinToInterrupt((int)pin);
+-	if (pin_irq == (int)NOT_AN_INTERRUPT) {
+-		attachInterruptToChangePin(pin);
+-		return;
+-	}
+-
+-	attachInterrupt(pin_irq, chip_isr, mode);
+-	return;
+-}
+-
+-void detachInterruptMultiArch(uint32_t pin)
+-{
+-	int pin_irq;
+-
+-	pin_irq = digitalPinToInterrupt((int)pin);
+-	if (pin_irq == (int)NOT_AN_INTERRUPT) {
+-		detachInterruptToChangePin(pin);
+-		return;
+-	}
+-
+-	detachInterrupt(pin_irq);
+-}
+-
+-#endif
+-
+diff --git a/src/bus_wrapper/source/nm_bus_wrapper_samd21.cpp b/src/bus_wrapper/source/nm_bus_wrapper_samd21.cpp
+deleted file mode 100644
+index 22a7473..0000000
+--- a/src/bus_wrapper/source/nm_bus_wrapper_samd21.cpp
++++ /dev/null
+@@ -1,200 +0,0 @@
+-/**
+- *
+- * \file
+- *
+- * \brief This module contains NMC1000 bus wrapper APIs implementation.
+- *
+- * Copyright (c) 2014 Atmel Corporation. All rights reserved.
+- *
+- * \asf_license_start
+- *
+- * \page License
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *
+- * 1. Redistributions of source code must retain the above copyright notice,
+- *    this list of conditions and the following disclaimer.
+- *
+- * 2. Redistributions in binary form must reproduce the above copyright notice,
+- *    this list of conditions and the following disclaimer in the documentation
+- *    and/or other materials provided with the distribution.
+- *
+- * 3. The name of Atmel may not be used to endorse or promote products derived
+- *    from this software without specific prior written permission.
+- *
+- * 4. This software may only be redistributed and used in connection with an
+- *    Atmel microcontroller product.
+- *
+- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
+- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
+- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
+- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+- * POSSIBILITY OF SUCH DAMAGE.
+- *
+- * \asf_license_stop
+- *
+- */
+-
+-#include <Arduino.h>
+-#include <SPI.h>
+-
+-/*
+- * Variants may define an alternative SPI instace to use for WiFi101.
+- * If not defined the following defaults are used:
+- *   WINC1501_SPI    - SPI
+- */
+-#if !defined(WINC1501_SPI)
+-  #define WINC1501_SPI SPI
+-#endif
+-
+-extern "C" {
+-
+-#include "bsp/include/nm_bsp.h"
+-#include "bsp/include/nm_bsp_arduino.h"
+-#include "common/include/nm_common.h"
+-#include "bus_wrapper/include/nm_bus_wrapper.h"
+-
+-}
+-
+-#define NM_BUS_MAX_TRX_SZ	256
+-
+-tstrNmBusCapabilities egstrNmBusCapabilities =
+-{
+-	NM_BUS_MAX_TRX_SZ
+-};
+-
+-static const SPISettings wifi_SPISettings(12000000L, MSBFIRST, SPI_MODE0);
+-
+-static sint8 spi_rw(uint8* pu8Mosi, uint8* pu8Miso, uint16 u16Sz)
+-{
+-	uint8 u8Dummy = 0;
+-	uint8 u8SkipMosi = 0, u8SkipMiso = 0;
+-
+-	if (!pu8Mosi) {
+-		pu8Mosi = &u8Dummy;
+-		u8SkipMosi = 1;
+-	}
+-	else if(!pu8Miso) {
+-		pu8Miso = &u8Dummy;
+-		u8SkipMiso = 1;
+-	}
+-	else {
+-		return M2M_ERR_BUS_FAIL;
+-	}
+-
+-	WINC1501_SPI.beginTransaction(wifi_SPISettings);
+-	digitalWrite(gi8Winc1501CsPin, LOW);
+-
+-	while (u16Sz) {
+-		*pu8Miso = WINC1501_SPI.transfer(*pu8Mosi);
+-			
+-		u16Sz--;
+-		if (!u8SkipMiso)
+-			pu8Miso++;
+-		if (!u8SkipMosi)
+-			pu8Mosi++;
+-	}
+-
+-	digitalWrite(gi8Winc1501CsPin, HIGH);
+-	WINC1501_SPI.endTransaction();
+-
+-	return M2M_SUCCESS;
+-}
+-
+-extern "C" {
+-
+-/*
+-*	@fn		nm_bus_init
+-*	@brief	Initialize the bus wrapper
+-*	@return	M2M_SUCCESS in case of success and M2M_ERR_BUS_FAIL in case of failure
+-*	@author	M.S.M
+-*	@date	28 oct 2013
+-*	@version	1.0
+-*/
+-sint8 nm_bus_init(void * /* pvInitValue */)
+-{
+-	sint8 result = M2M_SUCCESS;
+-
+-	/* Configure SPI peripheral. */
+-	WINC1501_SPI.begin();
+-	
+-	/* Configure CS PIN. */
+-	pinMode(gi8Winc1501CsPin, OUTPUT);
+-	digitalWrite(gi8Winc1501CsPin, HIGH);
+-
+-	/* Reset WINC1500. */
+-	nm_bsp_reset();
+-	nm_bsp_sleep(1);
+-
+-	return result;
+-}
+-
+-/*
+-*	@fn		nm_bus_ioctl
+-*	@brief	send/receive from the bus
+-*	@param[IN]	u8Cmd
+-*					IOCTL command for the operation
+-*	@param[IN]	pvParameter
+-*					Arbitrary parameter depenging on IOCTL
+-*	@return	M2M_SUCCESS in case of success and M2M_ERR_BUS_FAIL in case of failure
+-*	@author	M.S.M
+-*	@date	28 oct 2013
+-*	@note	For SPI only, it's important to be able to send/receive at the same time
+-*	@version	1.0
+-*/
+-sint8 nm_bus_ioctl(uint8 u8Cmd, void* pvParameter)
+-{
+-	sint8 s8Ret = 0;
+-	switch(u8Cmd)
+-	{
+-		case NM_BUS_IOCTL_RW: {
+-			tstrNmSpiRw *pstrParam = (tstrNmSpiRw *)pvParameter;
+-			s8Ret = spi_rw(pstrParam->pu8InBuf, pstrParam->pu8OutBuf, pstrParam->u16Sz);
+-		}
+-		break;
+-		default:
+-			s8Ret = -1;
+-			M2M_ERR("invalide ioclt cmd\n");
+-			break;
+-	}
+-
+-	return s8Ret;
+-}
+-
+-/*
+-*	@fn		nm_bus_deinit
+-*	@brief	De-initialize the bus wrapper
+-*	@author	M.S.M
+-*	@date	28 oct 2013
+-*	@version	1.0
+-*/
+-sint8 nm_bus_deinit(void)
+-{
+-	WINC1501_SPI.end();
+-	return 0;
+-}
+-
+-/*
+-*	@fn			nm_bus_reinit
+-*	@brief		re-initialize the bus wrapper
+-*	@param [in]	void *config
+-*					re-init configuration data
+-*	@return		M2M_SUCCESS in case of success and M2M_ERR_BUS_FAIL in case of failure
+-*	@author		Dina El Sissy
+-*	@date		19 Sept 2012
+-*	@version	1.0
+-*/
+-sint8 nm_bus_reinit(void* /* config */)
+-{
+-	return M2M_SUCCESS;
+-}
+-
+-} // extern "C"
+-
+-- 
+2.17.1
+

@@ -1,0 +1,11 @@
+# this file enables modules defined in Kconfig. Do not use this file for
+# application configuration. This is only needed during migration.
+CONFIG_MODULE_PERIPH_DMA=y
+CONFIG_MODULE_PERIPH_SPI=y
+
+CONFIG_MODULE_SHELL=y
+CONFIG_MODULE_SHELL_COMMANDS=y
+CONFIG_MODULE_SCHEDSTATISTICS=y
+CONFIG_MODULE_ZTIMER=y
+CONFIG_MODULE_ZTIMER_SEC=y
+CONFIG_ZTIMER_USEC=y

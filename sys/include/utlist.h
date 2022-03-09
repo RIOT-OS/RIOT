@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /** @brief Version number */
 #define UTLIST_VERSION 1.9.9
+#include <stddef.h>
 
 #include <assert.h>
 
@@ -191,7 +192,6 @@ do {                                                                            
     }                                                                                          \
   }                                                                                            \
 } while (0)
-
 
 #define DL_SORT(list, cmp)                                                                     \
     DL_SORT2(list, cmp, prev, next)
@@ -731,7 +731,6 @@ do {                                                                            
  }                                                                                             \
 } while (0)
 /** @} */
-
 
 /**
  * @name    Circular doubly linked list macros

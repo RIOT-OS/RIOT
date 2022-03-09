@@ -26,8 +26,11 @@ SenseBox board is based on the Atmel SAMD21G18A microcontroller. See
 
 ### Accessing STDIO via UART
 
-To access the STDIO of RIOT, a FTDI to USB converted needs to be plugged to
-the UART/Serial 1 pins on the board.
+STDIO of RIOT is directly available over the USB port.
+
+The `TERM_DELAY` environment variable can be used to add a delay (in second)
+before opening the serial terminal. The default value is 2s which should be
+enough in most of the situation.
 
 ### On I2C port
 I2C port is enabled by default. To disable it use ```I2C_DISABLE```. To

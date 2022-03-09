@@ -1,0 +1,175 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_COMMON_KINETIS
+    bool
+    select HAS_CPU_KINETIS
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_GPIO
+    select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_PM
+
+    # enable kinetis periph drivers if available
+    imply MODULE_PERIPH_ICS
+    imply MODULE_PERIPH_MCG
+    imply MODULE_PERIPH_MCG_LITE
+    imply MODULE_PERIPH_WDOG
+
+    select MODULE_CORE_THREAD_FLAGS if MODULE_PERIPH_I2C
+    select MODULE_PERIPH_TIMER if MODULE_PERIPH_RTT && HAS_PERIPH_TIMER
+
+config CPU_FAM_EA
+    bool
+    select CPU_COMMON_KINETIS
+    select HAS_PERIPH_ICS
+
+config CPU_FAM_K
+    bool
+    select CPU_COMMON_KINETIS
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_PAGEWISE
+    select HAS_PERIPH_MCG
+
+config CPU_FAM_L
+    bool
+    select CPU_COMMON_KINETIS
+    select HAS_PERIPH_MCG_LITE
+
+config CPU_FAM_W
+    bool
+    select CPU_COMMON_KINETIS
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_PAGEWISE
+    select HAS_PERIPH_MCG
+
+## CPU Models
+config CPU_MODEL_MK20DX256VLH7
+    bool
+    select CPU_CORE_CORTEX_M4
+    select CPU_FAM_K
+
+config CPU_MODEL_MK22FN512VLH12
+    bool
+    select CPU_CORE_CORTEX_M4F
+    select CPU_FAM_K
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_MKL43Z256VLH4
+    bool
+    select CPU_CORE_CORTEX_M0PLUS
+    select CPU_FAM_L
+
+config CPU_MODEL_MKL43Z256VMP4
+    bool
+    select CPU_CORE_CORTEX_M0PLUS
+    select CPU_FAM_L
+
+config CPU_MODEL_MKL43Z128VLH4
+    bool
+    select CPU_CORE_CORTEX_M0PLUS
+    select CPU_FAM_L
+
+config CPU_MODEL_MKL43Z128VMP4
+    bool
+    select CPU_CORE_CORTEX_M0PLUS
+    select CPU_FAM_L
+
+config CPU_MODEL_MK60DN512VLL10
+    bool
+    select CPU_CORE_CORTEX_M4
+    select CPU_FAM_K
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_MK64FN1M0VLL12
+    bool
+    select CPU_CORE_CORTEX_M4F
+    select CPU_FAM_K
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_MKW21D256VHA5
+    bool
+    select CPU_CORE_CORTEX_M4
+    select CPU_FAM_W
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_MKW21D512VHA5
+    bool
+    select CPU_CORE_CORTEX_M4
+    select CPU_FAM_W
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_MKW22D512VHA5
+    bool
+    select CPU_CORE_CORTEX_M4
+    select CPU_FAM_W
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_MKW41Z256VHT4
+    bool
+    select CPU_CORE_CORTEX_M0PLUS
+    select CPU_FAM_W
+
+config CPU_MODEL_MKW41Z512VHT4
+    bool
+    select CPU_CORE_CORTEX_M0PLUS
+    select CPU_FAM_W
+
+config CPU_MODEL_S9KEAZ128ACLH
+    bool
+    select CPU_CORE_CORTEX_M4
+    select CPU_FAM_EA
+
+## Definition of specific features
+config HAS_CPU_KINETIS
+    bool
+    help
+        Indicates that a 'kinetis' cpu is being used.
+
+config HAS_PERIPH_MCG
+    bool
+    help
+        Indicates that the cpu uses the Kinetis Multipurpose Clock Generator.
+
+config HAS_PERIPH_MCG_LITE
+    bool
+    help
+        Indicates that the cpu uses the lite version of the Kinetis Multipurpose Clock Generator.
+
+config HAS_PERIPH_ICS
+    bool
+    help
+        Indicates that the cpu uses the Kinetis Internal Clock Source
+        controller.
+
+## Common CPU symbols
+config CPU_FAM
+    default "ea" if CPU_FAM_EA
+    default "k" if CPU_FAM_K
+    default "l" if CPU_FAM_L
+    default "w" if CPU_FAM_W
+
+config CPU_MODEL
+    default "mk20dx256vlh7"   if CPU_MODEL_MK20DX256VLH7
+    default "mk22fn512vlh12"  if CPU_MODEL_MK22FN512VLH12
+    default "mk60dn512vll10"  if CPU_MODEL_MK60DN512VLL10
+    default "mk64fn1m0vll12"  if CPU_MODEL_MK64FN1M0VLL12
+    default "mkw21d256vha5"   if CPU_MODEL_MKW21D256VHA5
+    default "mkw21d512vha5"   if CPU_MODEL_MKW21D512VHA5
+    default "mkw22d512vha5"   if CPU_MODEL_MKW22D512VHA5
+    default "mkw41z256vht4"   if CPU_MODEL_MKW41Z256VHT4
+    default "mkw41z512vht4"   if CPU_MODEL_MKW41Z512VHT4
+    default "mkl43z256vlh4"   if CPU_MODEL_MKL43Z256VLH4
+    default "mkl43z256vmp4"   if CPU_MODEL_MKL43Z256VMP4
+    default "mkl43z128vlh4"   if CPU_MODEL_MKL43Z128VLH4
+    default "mkl43z128vmp4"   if CPU_MODEL_MKL43Z128VMP4
+    default "s9keaz128aclh" if CPU_MODEL_S9KEAZ128ACLH
+
+config CPU
+    default "kinetis" if CPU_COMMON_KINETIS
+
+source "$(RIOTCPU)/cortexm_common/Kconfig"
+
+rsource "periph/Kconfig"

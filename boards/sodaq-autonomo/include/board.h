@@ -27,14 +27,6 @@ extern "C" {
 #endif
 
 /**
- * @name    xtimer configuration
- * @{
- */
-#define XTIMER              TIMER_1
-#define XTIMER_CHAN         (0)
-/** @} */
-
-/**
  * @name    LED pin definitions and handlers
  * @{
  */

@@ -1,0 +1,167 @@
+menuconfig MODULE_LM75
+    bool
+    prompt "LM75A/TMP1075 Temperatire Sensors" if !(MODULE_SAUL_DEFAULT && HAVE_LM75)
+    default y if (MODULE_SAUL_DEFAULT && HAVE_LM75)
+    depends on TEST_KCONFIG
+    depends on HAS_PERIPH_I2C
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_I2C
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO_IRQ
+
+if MODULE_LM75
+
+choice
+    bool "sensor variant"
+    default MODULE_LM75A if HAVE_LM75A
+    default MODULE_TMP1075 if HAVE_TMP1075
+    help
+        Only the LM75A and TMP1075 temperature sensors are supported at the time.
+
+config MODULE_LM75A
+    bool "LM75A temperature sensor"
+
+config MODULE_TMP1075
+    bool "TMP1075 extended driver"
+
+endchoice
+
+endif # MODULE_LM75
+
+config HAVE_LM75
+    bool
+    help
+        Indicates that a lm75a/tmp1075 sensor is present.
+
+config HAVE_LM75A
+    bool
+    select HAVE_LM75
+    help
+        Indicates that a lm75a sensor is present.
+
+config HAVE_TMP1075
+    bool
+    select HAVE_LM75
+    help
+        Indicates that a tmp1075 sensor is present.
+
+menuconfig KCONFIG_USEMODULE_LM75
+    bool "Configure LM75 driver"
+    depends on USEMODULE_LM75
+    help
+        Configure the LM75 driver using Kconfig.
+
+if KCONFIG_USEMODULE_LM75
+
+config LM75_I2C_ADDR
+    hex "Default I2C Address"
+    range 0x48 0x4F
+    default 0x48
+    help
+        The LM75A and TMP1075 allow for up to 8 and 32 devices, respectively, on a single bus.
+        The address value depends on the state of the A0, A1 and A2 pins.
+        Default value (0x48) corresponds to A0, A1 and A2 pins all connected to GND.
+        For more information refer to the 'Slaves Address' section in the datasheet.
+
+choice
+    bool "Operation Mode"
+    default NORMAL_MODE
+    help
+        Whether the device operates in normal or shutdown mode.
+
+config NORMAL_MODE
+    bool "Normal mode"
+
+config SHUTDOWN_MODE
+    bool "Shutdown mode"
+
+endchoice
+
+
+choice
+    bool "Thermostat mode"
+    default COMPARATOR_MODE
+    help
+        Defines whether the device operates is comparator or interrupt mode.
+        The main difference between the two modes is that in comparator mode, the OS output becomes active
+        when Temp has exceeded T_OS and reset when Temp has dropped below T_hyst, reading a register or
+        putting the device into shutdown mode does not change the state of the OS output; while in interrupt mode,
+        once it has been activated either by exceeding T_OS or dropping below T_hyst the OS output will remain active
+        indefinitely until reading a register, then the OS output is reset.
+        For more information please refer to the datasheet.
+
+config COMPARATOR_MODE
+    bool "Comparator mode"
+
+config INTERRUPT_MODE
+    bool "Interrupt mode"
+
+endchoice
+
+
+choice
+    bool "OS pin polarity"
+    default OS_ACTIVE_LOW
+    help
+        Define the polarity of the overtemperature shutdown(OS) pin.
+
+config OS_ACTIVE_LOW
+    bool "os active on low voltage"
+
+config OS_ACTIVE_HIGH
+    bool "os active on high voltage"
+
+endchoice
+
+
+choice
+    bool "Fault Queue configuration"
+    default FAULT_1
+    help
+        Define the number of consecutive faults that must occur for the OS pin to become active
+
+config FAULT_1
+    bool "1 fault"
+
+config FAULT_2
+    bool "2 faults"
+
+config FAULT_3
+    bool "3 faults - only available in the TMP1075 sensor"
+
+config FAULT_4
+    bool "4 faults"
+
+config FAULT_6
+    bool "6 faults - only available in the LM75A sensor"
+
+endchoice
+
+
+if MODULE_TMP1075
+
+choice
+    bool "Conversion rate"
+    default TMP1075_CONV_RATE_REG_27H
+    help
+        Defines the frequency through which temperature conversions are performed and the temperature register is updated
+
+config TMP1075_CONV_RATE_REG_27H
+    bool "27.5 ms conversion rate"
+
+config TMP1075_CONV_RATE_REG_55
+    bool "55 ms conversion rate"
+
+config TMP1075_CONV_RATE_REG_110
+    bool "110 ms conversion rate"
+
+config TMP1075_CONV_RATE_REG_220
+    bool "220 ms conversion rate"
+
+
+endchoice
+
+endif # MODULE_TMP1075
+
+endif # KCONFIG_USEMODULE_LM75

@@ -1,21 +1,28 @@
-ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
-  USEMODULE += netdev_tap
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  ifeq (,$(filter socket_zep,$(USEMODULE)))
+    USEMODULE += netdev_tap
+  endif
 endif
 
 ifneq (,$(filter mtd,$(USEMODULE)))
   USEMODULE += mtd_native
 endif
 
-ifneq (,$(filter can,$(USEMODULE)))
+ifneq (,$(filter periph_can,$(FEATURES_USED)))
   ifeq ($(OS),Linux)
-    USEMODULE += can_linux
     CFLAGS += -DCAN_DLL_NUMOF=2
   endif
 endif
 
-ifneq (,$(filter socket_zep,$(USEMODULE)))
-  USEMODULE += iolist
-  USEMODULE += netdev_ieee802154
-  USEMODULE += checksum
-  USEMODULE += random
+# default to using littlefs2 on the virtual flash
+ifneq (,$(filter vfs_default,$(USEMODULE)))
+  USEPKG += littlefs2
+  USEMODULE += mtd
 endif
+
+ifneq (,$(filter lvgl,$(USEPKG)))
+  USEPKG += lv_drivers
+  USEMODULE += lv_drivers_sdl
+endif
+
+USEMODULE += native_drivers

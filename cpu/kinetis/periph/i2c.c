@@ -36,13 +36,13 @@
 #include "periph_conf.h"
 #include "periph/i2c.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG        0
 /* Define ENABLE_TRACE to 1 to enable printing of all TX/RX bytes to UART for extra verbose debugging */
-#define ENABLE_TRACE    (1)
+#define ENABLE_TRACE        1
 /* Define ENABLE_INIT_DEBUG to 1 to enable DEBUG prints in i2c_init. Currently
  * this causes the system to hang when running i2c_init during boot because of
  * uninitialized stdio UART */
-#define ENABLE_INIT_DEBUG (0)
+#define ENABLE_INIT_DEBUG   0
 #include "debug.h"
 
 #if ENABLE_TRACE
@@ -104,15 +104,13 @@ typedef struct {
     int retval; /**< return value from ISR */
 } i2c_state_t;
 
-
 static i2c_state_t i2c_state[I2C_NUMOF];
 
-int i2c_acquire(i2c_t dev)
+void i2c_acquire(i2c_t dev)
 {
     assert((unsigned)dev < I2C_NUMOF);
     mutex_lock(&i2c_state[dev].mtx);
     i2c_state[dev].pid = thread_getpid();
-    return 0;
 }
 
 void i2c_release(i2c_t dev)

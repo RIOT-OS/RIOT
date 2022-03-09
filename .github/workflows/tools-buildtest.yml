@@ -1,0 +1,81 @@
+name: tools-buildtest
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  tools-build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Build flatc standalone
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/flatc
+    - name: Build mosquitto_rsmb standalone
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/mosquitto_rsmb
+    - name: Build bossa-1.8 standalone
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/bossa-1.8
+    - name: Build bossa-1.9 standalone
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/bossa-1.9
+    - name: Build bossa-nrf52 standalone
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/bossa-nrf52
+    - name: Build edbg standalone
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/edbg
+    - name: Build pic32prog standalone
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/pic32prog
+    - name: Build setsid standalone
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/setsid
+    - name: Build ethos
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/ethos
+    - name: Build uhcpd
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/uhcpd
+    - name: Build stm32 clk_conf
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C cpu/stm32/dist/clk_conf
+    - name: Build kinetis calc_spi_scalers
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C cpu/kinetis/dist/calc_spi_scalers
+    - name: Build fixdep tool
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/fixdep
+    - name: Build lpc2k_pgm tool
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/lpc2k_pgm
+    - name: Build riotboot_serial tool
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/riotboot_serial
+    - name: Build ZEP dispatcher & topology generator
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/zep_dispatch

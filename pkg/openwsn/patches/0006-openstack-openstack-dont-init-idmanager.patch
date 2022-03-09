@@ -1,0 +1,27 @@
+From 0aac1d530e20b0773775e40fa81694f20fcaa443 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 15 May 2020 13:45:02 +0200
+Subject: [PATCH 06/11] openstack/openstack: dont init idmanager
+
+Dont initiate idmanager in OpenWSN but in RIOT to allow overriding
+default short address.
+---
+ openstack/openstack.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/openstack/openstack.c b/openstack/openstack.c
+index 10920319..c220b8ff 100644
+--- a/openstack/openstack.c
++++ b/openstack/openstack.c
+@@ -59,7 +59,7 @@ void openstack_init(void) {
+ 
+     //===== stack
+     //-- cross-layer
+-    idmanager_init();    // call first since initializes EUI64 and isDAGroot
++    // idmanager_init();    // call first since initializes EUI64 and isDAGroot
+     openqueue_init();
+     openrandom_init();
+ 
+-- 
+2.28.0
+

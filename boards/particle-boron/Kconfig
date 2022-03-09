@@ -1,0 +1,16 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "particle-boron" if BOARD_PARTICLE_BORON
+
+config BOARD_PARTICLE_BORON
+    bool
+    default y
+    select BOARD_COMMON_PARTICLE_MESH
+    select MODULE_PERIPH_UART_HW_FC if TEST_KCONFIG && HAS_PERIPH_UART_HW_FC && MODULE_PERIPH_UART
+
+source "$(RIOTBOARD)/common/particle-mesh/Kconfig"

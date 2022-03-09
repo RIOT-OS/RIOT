@@ -153,7 +153,6 @@ void msp430_init_dco(void)
     CCTL2 = CCIS0 + CM0 + CAP;            /* Define CCR2, CAP, ACLK */
     TACTL = TASSEL1 + TACLR + MC1;        /* SMCLK, continuous mode */
 
-
     while (1) {
         unsigned int compare;
 
@@ -194,11 +193,7 @@ void msp430_init_dco(void)
 
 void board_init(void)
 {
-    msp430_cpu_init();
     msb_ports_init();
 
     msp430_set_cpu_speed(CLOCK_CORECLOCK);
-
-    /* finally initialize STDIO */
-    stdio_init();
 }

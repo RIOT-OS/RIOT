@@ -1,0 +1,7 @@
+include $(RIOTBOARD)/common/makefiles/stdio_cdc_acm.dep.mk
+
+# USB Board reset only works if CDC ACM is used
+ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
+  USEMODULE += boards_common_samdx1-arduino-bootloader
+  USEMODULE += usb_board_reset
+endif

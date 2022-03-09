@@ -27,7 +27,7 @@
 #include "periph/gpio.h"
 #include "xtimer.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static void ds18_low(const ds18_t *dev)
@@ -184,8 +184,8 @@ int ds18_read(const ds18_t *dev, int16_t *temperature)
 
     DEBUG("[DS18] Received byte: 0x%02x\n", b2);
 
-    int32_t measurement = ((int16_t)(b2 << 8 | b1) * 625);
-    *temperature = (int16_t)(measurement / 100);
+    int32_t measurement = (int16_t)(b2 << 8 | b1);
+    *temperature = (int16_t)((100 * measurement) >> 4);
 
     return DS18_OK;
 }

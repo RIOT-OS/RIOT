@@ -1,0 +1,105 @@
+## CPU Models
+# XMEGA - A1/A1U
+config CPU_MODEL_XMEGA64A1
+    bool
+    select CPU_CORE_ATXMEGA_A1
+
+config CPU_MODEL_XMEGA128A1
+    bool
+    select CPU_CORE_ATXMEGA_A1
+
+config CPU_MODEL_XMEGA64A1U
+    bool
+    select CPU_CORE_ATXMEGA_A1
+
+config CPU_MODEL_XMEGA128A1U
+    bool
+    select CPU_CORE_ATXMEGA_A1
+
+# XMEGA - A3/A3U/A3BU
+config CPU_MODEL_XMEGA64A3
+    bool
+    select CPU_CORE_ATXMEGA_A3
+
+config CPU_MODEL_XMEGA128A3
+    bool
+    select CPU_CORE_ATXMEGA_A3
+
+config CPU_MODEL_XMEGA192A3
+    bool
+    select CPU_CORE_ATXMEGA_A3
+
+config CPU_MODEL_XMEGA256A3
+    bool
+    select CPU_CORE_ATXMEGA_A3
+
+config CPU_MODEL_XMEGA64A3U
+    bool
+    select CPU_CORE_ATXMEGA_A3
+
+config CPU_MODEL_XMEGA128A3U
+    bool
+    select CPU_CORE_ATXMEGA_A3
+
+config CPU_MODEL_XMEGA192A3U
+    bool
+    select CPU_CORE_ATXMEGA_A3
+
+config CPU_MODEL_XMEGA256A3U
+    bool
+    select CPU_CORE_ATXMEGA_A3
+
+config CPU_MODEL_XMEGA256A3BU
+    bool
+    select CPU_CORE_ATXMEGA_A3
+
+# XMEGA - A4/A4U
+config CPU_MODEL_XMEGA16A4
+    bool
+    select CPU_CORE_ATXMEGA_A4
+
+config CPU_MODEL_XMEGA32A4
+    bool
+    select CPU_CORE_ATXMEGA_A4
+
+config CPU_MODEL_XMEGA16A4U
+    bool
+    select CPU_CORE_ATXMEGA_A4
+
+config CPU_MODEL_XMEGA32A4U
+    bool
+    select CPU_CORE_ATXMEGA_A4
+
+config CPU_MODEL_XMEGA64A4U
+    bool
+    select CPU_CORE_ATXMEGA_A4
+
+config CPU_MODEL_XMEGA128A4U
+    bool
+    select CPU_CORE_ATXMEGA_A4
+
+config CPU_MODEL
+    string
+    default "atxmega64a1"    if CPU_MODEL_XMEGA64A1
+    default "atxmega128a1"   if CPU_MODEL_XMEGA128A1
+    default "atxmega192a1"   if CPU_MODEL_XMEGA192A1
+    default "atxmega256a1"   if CPU_MODEL_XMEGA256A1
+    default "atxmega64a1u"   if CPU_MODEL_XMEGA64A1U
+    default "atxmega128a1u"  if CPU_MODEL_XMEGA128A1U
+
+    default "atxmega64a3"    if CPU_MODEL_XMEGA64A3
+    default "atxmega128a3"   if CPU_MODEL_XMEGA128A3
+    default "atxmega192a3"   if CPU_MODEL_XMEGA192A3
+    default "atxmega256a3"   if CPU_MODEL_XMEGA256A3
+    default "atxmega64a3u"   if CPU_MODEL_XMEGA64A3U
+    default "atxmega128a3u"  if CPU_MODEL_XMEGA128A3U
+    default "atxmega192a3u"  if CPU_MODEL_XMEGA192A3U
+    default "atxmega256a3u"  if CPU_MODEL_XMEGA256A3U
+    default "atxmega256a3bu" if CPU_MODEL_XMEGA256A3BU
+
+    default "atxmega16a4"    if CPU_MODEL_XMEGA16A4
+    default "atxmega32a4"    if CPU_MODEL_XMEGA32A4
+    default "atxmega16a4u"   if CPU_MODEL_XMEGA16A4U
+    default "atxmega32a4u"   if CPU_MODEL_XMEGA32A4U
+    default "atxmega64a4u"   if CPU_MODEL_XMEGA64A4U
+    default "atxmega128a4u"  if CPU_MODEL_XMEGA128A4U

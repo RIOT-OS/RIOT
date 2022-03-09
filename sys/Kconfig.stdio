@@ -1,0 +1,70 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menu "Standard Input/Output (STDIO)"
+    depends on TEST_KCONFIG
+
+choice STDIO_IMPLEMENTATION
+    bool "STDIO implementation"
+    default MODULE_STDIO_NATIVE if CPU_ARCH_NATIVE
+    default MODULE_STDIO_UART
+
+# TODO: add MODULE_STDIO_ETHOS
+
+config MODULE_STDIO_RTT
+    bool "JLink RTT"
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
+
+config MODULE_SLIPDEV_STDIO
+    bool "SLIP network device"
+    depends on MODULE_SLIPDEV
+    select USE_STDOUT_BUFFERED
+    select MODULE_ISRPIPE
+
+config MODULE_STDIO_NULL
+    bool "Null"
+    help
+        Empty implementation.
+
+config MODULE_STDIO_UART
+    bool "UART"
+    depends on HAS_PERIPH_UART
+    select MODULE_PERIPH_UART
+
+config MODULE_STDIO_NATIVE
+    bool "Native"
+    depends on CPU_ARCH_NATIVE
+
+endchoice
+
+config MODULE_STDIN
+    bool "Standard Input"
+
+config MODULE_STDIO_UART_RX
+    bool
+    depends on MODULE_STDIO_UART
+    select MODULE_ISRPIPE
+    select MODULE_STDIO_AVAILABLE
+    default y if MODULE_STDIN
+    help
+        Reception when using UART-based STDIO needs to be enabled.
+
+config MODULE_STDIO_AVAILABLE
+    bool
+    help
+        Indicates that the implementation supports function stdio_available
+
+config MODULE_PRINTF_FLOAT
+    bool "Float support in printf"
+
+config USE_STDOUT_BUFFERED
+    bool
+    help
+        Select this to prefer buffered standard output if provided by the implementation.
+
+endmenu # Standard Input/Output (STDIO)

@@ -1,0 +1,84 @@
+# Copyright (c) 2021 Inria
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menuconfig MODULE_SX126X
+    bool
+    prompt "SX1261/2/8 and LLCC68 LoRa radio driver" if !(HAVE_SX126X && MODULE_NETDEV_DEFAULT)
+    default y if (HAVE_SX126X && MODULE_NETDEV_DEFAULT)
+    depends on TEST_KCONFIG
+    depends on HAS_PERIPH_SPI
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_SPI
+    select PACKAGE_DRIVER_SX126X
+    select MODULE_IOLIST
+
+choice
+    bool "Radio variant"
+    depends on MODULE_SX126X
+    default MODULE_SX1261 if HAVE_SX1261
+    default MODULE_SX1262 if HAVE_SX1262
+    default MODULE_SX1268 if HAVE_SX1268
+    default MODULE_LLCC68 if HAVE_LLCC68
+    default MODULE_SX126X_STM32WL if HAVE_SX126X_STM32WL
+
+config MODULE_SX1261
+    bool "SX1261"
+    select MODULE_PERIPH_GPIO_IRQ
+
+config MODULE_SX1262
+    bool "SX1262"
+    select MODULE_PERIPH_GPIO_IRQ
+
+config MODULE_SX1268
+    bool "SX1268"
+    select MODULE_PERIPH_GPIO_IRQ
+
+config MODULE_LLCC68
+    bool "LLCC68"
+    select MODULE_PERIPH_GPIO_IRQ
+
+config MODULE_SX126X_STM32WL
+    bool "SX126X-STM32WL"
+
+endchoice
+
+config HAVE_SX1261
+    bool
+    select HAVE_SX126X
+    help
+      Indicates that an sx1261 transceiver is present.
+
+config HAVE_SX1262
+    bool
+    select HAVE_SX126X
+    help
+      Indicates that an sx1262 transceiver is present.
+
+config HAVE_SX1268
+    bool
+    select HAVE_SX126X
+    help
+      Indicates that an sx1268 transceiver is present.
+
+config HAVE_LLCC68
+    bool
+    select HAVE_SX126X
+    help
+      Indicates that an llcc68 transceiver is present.
+
+config HAVE_SX126X_STM32WL
+    bool
+    select HAVE_SX126X
+    help
+      Indicates that an sx126x_stm32wl transceiver is present.
+
+config HAVE_SX126X
+    bool
+    help
+      Indicates that an sx126x transceiver is present.

@@ -18,7 +18,8 @@
  * This file contains the default configurations for those external hardware
  * modules that have been tested with the ESP8266 and are preconfigured here.
  * Most of these configurations can be overridden by an
- * \ref esp8266_app_spec_conf "application-specific configuration".
+ * \ref esp8266_application_specific_board_configuration
+ * "application-specific configuration".
  *
  * The configurations of the respective hardware modules only take place if
  * the corresponding driver modules are used.
@@ -41,9 +42,8 @@ extern "C" {
  * Configuration for the ENC28J60 interface when module ```enc28j60``` is used.
  *
  * SPI_DEV(0) is always used for the the module. The only configurations that
- * can be overridden by
- * \ref esp8266_app_spec_conf "Application Specific Board Configuration"
- * are the CS, INT and RESET signals.
+ * can be overridden by \ref esp8266_application_specific_board_configuration
+ * "Application Specific Board Configuration" are the CS, INT and RESET signals.
  *
  * @note    The RESET signal can also be connected to the ESP8266 RST pin to
  *          keep an additional GPIO free.
@@ -71,9 +71,8 @@ extern "C" {
  * Configuration for the MRF24J40 interface when module ```mrf24j40``` is used.
  *
  * SPI_DEV(0) is always used for the the module. The only configurations that
- * can be overridden by
- * \ref esp8266_app_spec_conf "Application Specific Board Configuration"
- * are the CS, INT and RESET signals.
+ * can be overridden by \ref esp8266_application_specific_board_configuration
+ * "Application Specific Board Configuration" are the CS, INT and RESET signals.
  *
  * @note    The RESET signal can also be connected to the ESP8266 RST pin to
  *          keep an additional GPIO free.
@@ -104,7 +103,8 @@ extern "C" {
  *
  * The SPI interface with the corresponding pins used for the SD-Card
  * interface is fixed. SPI_DEV(0) is always used for the SD-Card. The only
- * configuration that can be overridden by \ref esp8266_app_spec_conf
+ * configuration that can be overridden by
+ * \ref esp8266_application_specific_board_configuration
  * "Application Specific Board Configuration" is the CS signal.
  * If not defined, the default CS signal of SPI_DEV(0) is used.
  * @{

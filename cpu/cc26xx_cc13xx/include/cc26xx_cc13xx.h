@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup         cpu_cc13x2_definitions
+ * @ingroup         cpu_cc26xx_cc13xx_definitions
  * @{
  *
  * @file
- * @brief           CC13x2 MCU interrupt definitions
+ * @brief           CC26xx, CC13xx definitions
  *
  * @author          Leon M. George <leon@georgemail.eu>
  * @author          Anton Gerasimov <tossel@gmail.com>
@@ -26,15 +26,48 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Unsigned 8-bit register type.
+ */
 typedef volatile uint8_t reg8_t;
+/**
+ * @brief Unsigned 16-bit register type.
+ */
+typedef volatile uint16_t reg16_t;
+/**
+ * @brief Unsigned 32-bit register type.
+ */
 typedef volatile uint32_t reg32_t;
 
-/** @addtogroup CC13x2_cmsis CMSIS Definitions */
-/*@{*/
+/**
+ * @brief   Masked 8-bit register
+ */
+typedef struct {
+    reg8_t LOW; /**< Low 4-bit half */
+    reg8_t HIGH; /**< High 4-bit half */
+} reg8_m4_t;
 
-/** interrupt number definition */
-typedef enum IRQn
-{
+/**
+ * @brief   Masked 8-bit register
+ */
+typedef reg16_t reg8_m8_t;
+
+/**
+ * @brief   Masked 32-bit register
+ */
+typedef struct {
+    reg32_t LOW; /**< Low 16-bit half */
+    reg32_t HIGH; /**< High 16-bit half */
+} reg32_m16_t;
+
+/**
+ * @addtogroup CC13x2_cmsis CMSIS Definitions
+ * @{
+ */
+/**
+ * @brief Interrupt number definition
+ */
+typedef enum IRQn {
     /******  Cortex-M4 Processor Exceptions Numbers ****************************/
     ResetHandler_IRQn     = -15, /**<  1 Reset Handler                         */
     NonMaskableInt_IRQn   = -14, /**<  2 Non Maskable Interrupt                */
@@ -97,11 +130,12 @@ typedef enum IRQn
 
 /**
  * @brief Configuration of the Cortex-M4 processor and core peripherals
+ * @{
  */
-
 #define __MPU_PRESENT          1      /**< CC13x2 does provide a MPU */
 #define __NVIC_PRIO_BITS       3      /**< CC13x2 offers priority levels from 0..7 */
 #define __Vendor_SysTickConfig 0      /**< Set to 1 if different SysTick config is used */
+/** @} */
 
 #define RCOSC48M_FREQ               48000000 /**< 48 MHz */
 #define RCOSC24M_FREQ               24000000 /**< 24 MHz */
@@ -114,19 +148,34 @@ typedef enum IRQn
 #else
 #include <core_cm3.h>
 #endif
-/*@}*/
+/** @} */
 
-/** @ingroup cpu_specific_peripheral_memory_map
-  * @{
-  */
-#define FLASH_BASE                  0x00000000 /**< FLASH base address */
-#define PERIPH_BASE                 0x40000000 /**< Peripheral base address */
-/*@}*/
+/**
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
+ */
+#define FLASH_BASE         0x00000000 /**< FLASH base address */
+#define PERIPH_BASE        0x40000000 /**< Peripheral base address */
+#define PERIPH_BASE_NONBUF 0x60000000 /**< Peripheral base address (nonbuf) */
+#define ROM_HARD_API_BASE  0x10000048 /**< ROM Hard-API base address */
+#define ROM_API_TABLE      ((uint32_t *) 0x10000180) /**< ROM API table */
+/** @} */
+
+/**
+ * @brief   ADI master instruction offsets
+ * @{
+ */
+#define ADI_DIR            0x00000000
+#define ADI_SET            0x00000010
+#define ADI_CLR            0x00000020
+#define ADI_MASK4B         0x00000040
+#define ADI_MASK8B         0x00000060
+#define ADI_MASK16B        0x00000080
+/** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* CC26XX_CC13XX_H */
-
-/*@}*/
+/** @} */

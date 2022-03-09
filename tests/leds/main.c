@@ -21,14 +21,11 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include "clk.h"
 #include "board.h"
 #include "periph_conf.h"
 
-#ifdef CLOCK_CORECLOCK
-#define DELAY_SHORT         (CLOCK_CORECLOCK / 50)
-#else
-#define DELAY_SHORT         (500000UL)
-#endif
+#define DELAY_SHORT         (coreclk() / 50)
 #define DELAY_LONG          (DELAY_SHORT * 4)
 
 void dumb_delay(uint32_t delay)
@@ -86,7 +83,6 @@ int main(void)
         printf("Available LEDs: %i\n\n", numof);
         puts("Will now light up each LED once short and twice long in a loop");
     }
-
 
     while (1) {
 #ifdef LED0_ON

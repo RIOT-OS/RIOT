@@ -50,7 +50,15 @@ extern "C" {
  * @{
  */
 #define XTIMER_WIDTH        (16U)
-#define XTIMER_OVERHEAD     (6U)
+/** @} */
+
+/**
+ * @name    ztimer configuration
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_TYPE    ZTIMER_TYPE_PERIPH_TIMER
+#define CONFIG_ZTIMER_USEC_DEV     TIMER_DEV(0)
+#define CONFIG_ZTIMER_USEC_MIN     (2)
 /** @} */
 
 /**
@@ -89,11 +97,6 @@ extern "C" {
 #define LED2_OFF            (GPIOC->ODR |=  LED2_MASK)
 #define LED2_TOGGLE         (GPIOC->ODR ^=  LED2_MASK)
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

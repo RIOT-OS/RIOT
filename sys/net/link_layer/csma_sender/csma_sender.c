@@ -21,6 +21,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <inttypes.h>
 
 #include "xtimer.h"
 #include "random.h"
@@ -29,19 +30,14 @@
 
 #include "net/csma_sender.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if ENABLE_DEBUG
-/* For PRIu16 etc. */
-#include <inttypes.h>
-#endif
-
 const csma_sender_conf_t CSMA_SENDER_CONF_DEFAULT = {
-    CSMA_SENDER_MIN_BE_DEFAULT,
-    CSMA_SENDER_MAX_BE_DEFAULT,
-    CSMA_SENDER_MAX_BACKOFFS_DEFAULT,
-    CSMA_SENDER_BACKOFF_PERIOD_UNIT
+    CONFIG_CSMA_SENDER_MIN_BE_DEFAULT,
+    CONFIG_CSMA_SENDER_MAX_BE_DEFAULT,
+    CONFIG_CSMA_SENDER_MAX_BACKOFFS_DEFAULT,
+    CONFIG_CSMA_SENDER_BACKOFF_PERIOD_UNIT
 };
 
 /*--------------------- "INTERNAL" UTILITY FUNCTIONS ---------------------*/
@@ -63,16 +59,15 @@ static inline uint32_t choose_backoff_period(int be,
     if (be > conf->max_be) {
         be = conf->max_be;
     }
-    uint32_t max_backoff = ((1 << be) - 1) * CSMA_SENDER_BACKOFF_PERIOD_UNIT;
+    uint32_t max_backoff = ((1 << be) - 1) * CONFIG_CSMA_SENDER_BACKOFF_PERIOD_UNIT;
 
     uint32_t period = random_uint32() % max_backoff;
-    if (period < CSMA_SENDER_BACKOFF_PERIOD_UNIT) {
-        period = CSMA_SENDER_BACKOFF_PERIOD_UNIT;
+    if (period < CONFIG_CSMA_SENDER_BACKOFF_PERIOD_UNIT) {
+        period = CONFIG_CSMA_SENDER_BACKOFF_PERIOD_UNIT;
     }
 
     return period;
 }
-
 
 /**
  * @brief Perform a CCA and send the given packet if medium is available
@@ -157,7 +152,7 @@ int csma_sender_csma_ca_send(netdev_t *dev, iolist_t *iolist,
 
     /* if we arrive here, then we must perform the CSMA/CA procedure
        ourselves by software */
-    random_init(_xtimer_now());
+    random_init(xtimer_now_usec());
     DEBUG("csma: Starting software CSMA/CA....\n");
 
     int nb = 0, be = conf->min_be;
@@ -192,7 +187,6 @@ int csma_sender_csma_ca_send(netdev_t *dev, iolist_t *iolist,
     DEBUG("csma: Software CSMA/CA failure: medium never available.\n");
     return -EBUSY;
 }
-
 
 int csma_sender_cca_send(netdev_t *dev, iolist_t *iolist)
 {

@@ -1,0 +1,6 @@
+USEMODULE += netdev_eth
+USEMODULE += ztimer_msec
+USEPKG += driver_atwinc15x0
+FEATURES_REQUIRED += periph_gpio
+FEATURES_REQUIRED += periph_gpio_irq
+FEATURES_REQUIRED += periph_spi

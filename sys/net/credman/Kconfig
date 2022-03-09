@@ -1,0 +1,28 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_CREDMAN
+    bool "Configure CREDMAN"
+    depends on USEMODULE_CREDMAN
+    help
+        Configure CREDMAN, Credentials management module for (D)TLS, using
+        Kconfig.
+
+if KCONFIG_USEMODULE_CREDMAN
+
+config CREDMAN_MAX_CREDENTIALS
+    int "MAX number of credentials in credential pool"
+    default 2
+    help
+        Configure 'CONFIG_CREDMAN_MAX_CREDENTIALS', the maximum number of
+        allowed credentials in the credential pool.
+
+config CREDMAN_MAX_ASN1_OBJ
+    int "Maximum number of ASN.1 objects when decoding keys"
+    default 8
+    depends on USEMODULE_CREDMAN_LOAD
+
+endif # KCONFIG_USEMODULE_CREDMAN

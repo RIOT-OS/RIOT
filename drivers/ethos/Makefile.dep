@@ -1,0 +1,9 @@
+FEATURES_REQUIRED += periph_uart
+USEMODULE += iolist
+USEMODULE += netdev_eth
+USEMODULE += random
+USEMODULE += tsrb
+
+ifneq (,$(filter ethos_stdio,$(USEMODULE)))
+  USEMODULE += isrpipe
+endif

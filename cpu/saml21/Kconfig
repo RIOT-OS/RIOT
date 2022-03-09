@@ -1,0 +1,52 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_COMMON_SAML21
+    bool
+    select CPU_COMMON_SAM0
+    select CPU_CORE_CORTEX_M0PLUS
+    select HAS_BACKUP_RAM
+    select HAS_CPU_SAML21
+    select HAS_PERIPH_DMA
+    select HAS_PERIPH_GPIO_FAST_READ
+    select HAS_PERIPH_RTC_MEM
+    select HAS_PERIPH_UART_COLLISION
+
+config CPU_FAM_SAML21
+    bool
+    select CPU_COMMON_SAML21
+    select HAS_PERIPH_HWRNG
+
+config CPU_FAM_SAMR30
+    bool
+    select CPU_COMMON_SAML21
+
+config CPU_FAM_SAMR34
+    bool
+    select CPU_COMMON_SAML21
+    select HAS_PERIPH_HWRNG
+
+## Declaration of specific features
+config HAS_CPU_SAML21
+    bool
+    help
+        Indicates that a 'saml21' cpu is being used.
+
+## Common CPU symbols
+config CPU_FAM
+    default "saml21" if CPU_FAM_SAML21
+    default "samr30" if CPU_FAM_SAMR30
+    default "samr34" if CPU_FAM_SAMR34
+
+config CPU
+    default "saml21" if CPU_COMMON_SAML21
+
+source "$(RIOTCPU)/saml21/Kconfig.saml21"
+source "$(RIOTCPU)/saml21/Kconfig.samr30"
+source "$(RIOTCPU)/saml21/Kconfig.samr34"
+
+source "$(RIOTCPU)/sam0_common/Kconfig"

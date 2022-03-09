@@ -1,0 +1,28 @@
+# Tell the build system that the CPU depends on the Cortex-M common files:
+USEMODULE += cortexm_common
+
+# include common periph code
+USEMODULE += cortexm_common_periph
+
+FEATURES_REQUIRED_ANY += newlib|picolibc
+ifneq (,$(filter newlib,$(USEMODULE)))
+  # use the nano-specs of Newlib when available
+  DEFAULT_MODULE += newlib_nano
+endif
+
+# Export the peripheral drivers to be linked into the final binary:
+USEMODULE += periph
+
+# Use Hardware FPU by default if present
+FEATURES_OPTIONAL += cortexm_fpu
+ifneq (,$(filter cortexm_fpu,$(FEATURES_USED)))
+  DEFAULT_MODULE += cortexm_fpu
+endif
+
+# Enable the MPU stack guard if develhelp is enabled
+ifeq (1, $(DEVELHELP))
+  FEATURES_OPTIONAL += cortexm_mpu
+endif
+
+# Make calls to malloc and friends thread-safe
+USEMODULE += malloc_thread_safe

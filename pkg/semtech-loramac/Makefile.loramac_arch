@@ -1,6 +1,6 @@
-MODULE := semtech_loramac_arch
+MODULE = semtech_loramac_arch
 
-SRCS := utilities.c
+SRC = utilities.c
 
 CFLAGS += -Wno-sign-compare
 

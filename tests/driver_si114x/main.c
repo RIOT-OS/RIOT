@@ -25,7 +25,8 @@
 
 #include "si114x.h"
 #include "si114x_params.h"
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 #include "board.h"
 
 static si114x_t dev;
@@ -63,7 +64,7 @@ int main(void)
                si114x_read_response(&dev));
 
         /* 2 seconds delay between measures */
-        xtimer_sleep(2);
+        ztimer_sleep(ZTIMER_MSEC, 2 * MS_PER_SEC);
     }
 
     return 0;

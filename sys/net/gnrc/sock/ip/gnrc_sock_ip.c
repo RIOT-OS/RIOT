@@ -15,6 +15,7 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include <assert.h>
 #include <errno.h>
 #include <string.h>
 
@@ -86,25 +87,67 @@ int sock_ip_get_remote(sock_ip_t *sock, sock_ip_ep_t *remote)
     return 0;
 }
 
-ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
-                     uint32_t timeout, sock_ip_ep_t *remote)
+ssize_t sock_ip_recv_aux(sock_ip_t *sock, void *data, size_t max_len,
+                         uint32_t timeout, sock_ip_ep_t *remote,
+                         sock_ip_aux_rx_t *aux)
 {
+    void *pkt = NULL, *ctx = NULL;
+    uint8_t *ptr = data;
+    ssize_t res, ret = 0;
+    bool nobufs = false;
+
+    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    while ((res = sock_ip_recv_buf_aux(sock, &pkt, &ctx, timeout, remote, aux)) > 0) {
+        if (res > (ssize_t)max_len) {
+            nobufs = true;
+            continue;
+        }
+        memcpy(ptr, pkt, res);
+        ptr += res;
+        ret += res;
+    }
+    return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
+}
+
+ssize_t sock_ip_recv_buf_aux(sock_ip_t *sock, void **data, void **buf_ctx,
+                             uint32_t timeout, sock_ip_ep_t *remote,
+                             sock_ip_aux_rx_t *aux)
+{
+    (void)aux;
     gnrc_pktsnip_t *pkt;
     sock_ip_ep_t tmp;
     int res;
+    gnrc_sock_recv_aux_t _aux = { 0 };
 
-    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    assert((sock != NULL) && (data != NULL) && (buf_ctx != NULL));
+    if (*buf_ctx != NULL) {
+        *data = NULL;
+        gnrc_pktbuf_release(*buf_ctx);
+        *buf_ctx = NULL;
+        return 0;
+    }
     if (sock->local.family == 0) {
         return -EADDRNOTAVAIL;
     }
     tmp.family = sock->local.family;
-    res = gnrc_sock_recv((gnrc_sock_reg_t *)sock, &pkt, timeout, &tmp);
+#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+    if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_LOCAL)) {
+        _aux.local = &aux->local;
+    }
+#endif
+#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+    if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_TIMESTAMP)) {
+        _aux.timestamp = &aux->timestamp;
+    }
+#endif
+#if IS_USED(MODULE_SOCK_AUX_RSSI)
+    if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_RSSI)) {
+        _aux.rssi = &aux->rssi;
+    }
+#endif
+    res = gnrc_sock_recv((gnrc_sock_reg_t *)sock, &pkt, timeout, &tmp, &_aux);
     if (res < 0) {
         return res;
-    }
-    if (pkt->size > max_len) {
-        gnrc_pktbuf_release(pkt);
-        return -ENOBUFS;
     }
     if (remote != NULL) {
         /* return remote to possibly block if wrong remote */
@@ -119,15 +162,32 @@ ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
         gnrc_pktbuf_release(pkt);
         return -EPROTO;
     }
-    memcpy(data, pkt->data, pkt->size);
+#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+    if (aux != NULL) {
+        aux->flags &= ~(SOCK_AUX_GET_LOCAL);
+    }
+#endif
+#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+    if ((aux != NULL) && (_aux.flags & GNRC_SOCK_RECV_AUX_FLAG_TIMESTAMP)) {
+        aux->flags &= ~(SOCK_AUX_GET_TIMESTAMP);
+    }
+#endif
+#if IS_USED(MODULE_SOCK_AUX_RSSI)
+    if ((aux != NULL) && (_aux.flags & GNRC_SOCK_RECV_AUX_FLAG_RSSI)) {
+        aux->flags &= ~(SOCK_AUX_GET_RSSI);
+    }
+#endif
+    *data = pkt->data;
+    *buf_ctx = pkt;
     res = (int)pkt->size;
-    gnrc_pktbuf_release(pkt);
     return res;
 }
 
-ssize_t sock_ip_send(sock_ip_t *sock, const void *data, size_t len,
-                     uint8_t proto, const sock_ip_ep_t *remote)
+ssize_t sock_ip_send_aux(sock_ip_t *sock, const void *data, size_t len,
+                         uint8_t proto, const sock_ip_ep_t *remote,
+                         sock_ip_aux_tx_t *aux)
 {
+    (void)aux;
     int res;
     gnrc_pktsnip_t *pkt;
     sock_ip_ep_t local;
@@ -171,7 +231,7 @@ ssize_t sock_ip_send(sock_ip_t *sock, const void *data, size_t len,
         gnrc_ep_set(&rem, remote, sizeof(rem));
     }
     if ((remote != NULL) && (remote->family == AF_UNSPEC) &&
-        (sock->remote.family != AF_UNSPEC)) {
+        (sock != NULL) && (sock->remote.family != AF_UNSPEC)) {
         /* remote was set on create so take its family */
         rem.family = sock->remote.family;
     }
@@ -195,7 +255,28 @@ ssize_t sock_ip_send(sock_ip_t *sock, const void *data, size_t len,
     if (res <= 0) {
         return res;
     }
+#ifdef SOCK_HAS_ASYNC
+    if ((sock != NULL) && (sock->reg.async_cb.ip)) {
+        sock->reg.async_cb.ip(sock, SOCK_ASYNC_MSG_SENT,
+                              sock->reg.async_cb_arg);
+    }
+#endif  /* SOCK_HAS_ASYNC */
     return res;
 }
+
+#ifdef SOCK_HAS_ASYNC
+void sock_ip_set_cb(sock_ip_t *sock, sock_ip_cb_t cb, void *arg)
+{
+    sock->reg.async_cb_arg = arg;
+    sock->reg.async_cb.ip = cb;
+}
+
+#ifdef SOCK_HAS_ASYNC_CTX
+sock_async_ctx_t *sock_ip_get_async_ctx(sock_ip_t *sock)
+{
+    return &sock->reg.async_ctx;
+}
+#endif  /* SOCK_HAS_ASYNC_CTX */
+#endif  /* SOCK_HAS_ASYNC */
 
 /** @} */

@@ -1,0 +1,33 @@
+PKG_NAME=stm32cmsis
+
+# The package URL depends on the family of the target STM32
+PKG_URL=https://github.com/STMicroelectronics/cmsis_device_$(CPU_FAM)
+
+PKG_VERSION_f0=8b86197c7ab77ad029c34dc73cf6d4a1e12327d8  # v2.3.6
+PKG_VERSION_f1=71ad5b3bf5cbb4d35cf8c8726c1b343871f0df0a  # v4.3.3
+PKG_VERSION_f2=694c49f696d359f57f23153ab7acf3ac1a43f663  # v2.2.5
+PKG_VERSION_f3=167eefd811de90a58c41e0a32071cdfecede389a  # v2.3.6
+PKG_VERSION_f4=6fe2c1f498feda34ee422720ff8b3bd1b4656145  # v2.6.7
+PKG_VERSION_f7=0abe04b1c85a848f1cec8dd4b2893dc8e3f07757  # v1.2.6
+PKG_VERSION_g0=051d85f2f5a9b5d67d2fbb4e97861b2e8ec1ef89  # v1.4.1
+PKG_VERSION_g4=3a3a8909720e37bece786f6011ba865951b369c8  # v1.2.1
+PKG_VERSION_l0=532d96973e7b2ae5546a2c88cb216429f74f5f5d  # v1.9.2
+PKG_VERSION_l1=1827333a7f7822282a6a46e4169596b5fb58cf61  # v2.3.2
+PKG_VERSION_l4=26ed4846f831f730d852507e178061053e522daf  # v1.7.1
+PKG_VERSION_l5=fcf61cd086e02c7a1cf7535ffe30622d1f5d36aa  # v1.0.4
+PKG_VERSION_u5=147947d99f50554101d2a339ad19c2972c3ff161  # v1.0.1
+PKG_VERSION_wb=3a801574163338b562f56e7eb503a955818f1a56  # v1.9.0
+PKG_VERSION_wl=7bf548678b1132d829072ce86443c8036d538460  # v1.1.0
+
+PKG_VERSION=$(PKG_VERSION_$(CPU_FAM))
+PKG_LICENSE=Apache-2
+
+# Store the cloned repositories under the stm32 directory to prevent downloads
+# for each builds.
+PKG_SOURCE_DIR = $(RIOTBASE)/build/stm32/cmsis/$(CPU_FAM)
+PKG_PATCH_DIR = $(RIOTCPU)/stm32/include/vendor/patches/$(CPU_FAM)
+
+include $(RIOTBASE)/pkg/pkg.mk
+
+all:
+	@:

@@ -33,7 +33,6 @@
 #include "at86rf2xx_registers.h"
 #endif
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -216,7 +215,6 @@ void at86rf2xx_assert_awake(at86rf2xx_t *dev);
  * @param[in,out] dev   device to reset
  */
 void at86rf2xx_hardware_reset(at86rf2xx_t *dev);
-
 
 /**
  * @brief   Set PHY parameters based on channel and page number

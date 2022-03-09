@@ -26,7 +26,6 @@ extern "C" {
 
 #include <ctype.h>
 #include <errno.h>
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -57,7 +56,6 @@ typedef struct {
     sock_udp_t sock;               /**< UDP server sock */
     sock_udp_ep_t local_ep;        /**< Local endpoint */
     lwm2m_context_t *lwm2m_ctx;    /**< LwM2M context */
-    lwm2m_object_t *obj_security;  /**< LwM2M security object */
     lwm2m_client_connection_t *conn_list; /**< LwM2M connections list */
 } lwm2m_client_data_t;
 

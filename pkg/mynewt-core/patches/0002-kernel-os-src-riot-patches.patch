@@ -1,0 +1,293 @@
+From e02018ca20f3a7192764973cf47ef27520dd50bf Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Thu, 27 May 2021 11:58:13 +0200
+Subject: [PATCH 2/3] kernel/os/src: riot patches
+
+---
+ kernel/os/include/os/endian.h     |  1 +
+ kernel/os/include/os/os_callout.h | 16 ++++----
+ kernel/os/include/os/os_mutex.h   | 16 +++-----
+ kernel/os/include/os/os_sem.h     | 10 ++---
+ kernel/os/include/os/os_task.h    | 62 +++++--------------------------
+ kernel/os/src/os_mbuf.c           |  4 +-
+ kernel/os/src/os_msys.c           |  1 -
+ 7 files changed, 30 insertions(+), 80 deletions(-)
+
+diff --git a/kernel/os/include/os/endian.h b/kernel/os/include/os/endian.h
+index 021a73ed6..4affebec2 100644
+--- a/kernel/os/include/os/endian.h
++++ b/kernel/os/include/os/endian.h
+@@ -20,6 +20,7 @@
+ #ifndef H_ENDIAN_
+ #define H_ENDIAN_
+ 
++#include "byteorder.h"
+ #include <inttypes.h>
+ 
+ #ifdef __cplusplus
+diff --git a/kernel/os/include/os/os_callout.h b/kernel/os/include/os/os_callout.h
+index b407f3f44..749e41a10 100644
+--- a/kernel/os/include/os/os_callout.h
++++ b/kernel/os/include/os/os_callout.h
+@@ -31,7 +31,9 @@
+ extern "C" {
+ #endif
+ 
++#include "os/queue.h"
+ #include "os/os_eventq.h"
++#include "ztimer.h"
+ #include <stddef.h>
+ 
+ /**
+@@ -43,11 +45,7 @@ struct os_callout {
+     struct os_event c_ev;
+     /** Pointer to the event queue to post the event to */
+     struct os_eventq *c_evq;
+-    /** Number of ticks in the future to expire the callout */
+-    os_time_t c_ticks;
+-
+-
+-    TAILQ_ENTRY(os_callout) c_next;
++    ztimer_t timer;
+ };
+ 
+ /**
+@@ -86,7 +84,7 @@ void os_callout_init(struct os_callout *cf, struct os_eventq *evq,
+  *
+  * @param c The callout to stop
+  */
+-void os_callout_stop(struct os_callout *);
++void os_callout_stop(struct os_callout *c);
+ 
+ 
+ /**
+@@ -97,7 +95,7 @@ void os_callout_stop(struct os_callout *);
+  *
+  * @return 0 on success, non-zero on failure
+  */
+-int os_callout_reset(struct os_callout *, os_time_t);
++int os_callout_reset(struct os_callout *c, os_time_t ticks);
+ 
+ /**
+  * Returns the number of ticks which remains to callout.
+@@ -107,7 +105,7 @@ int os_callout_reset(struct os_callout *, os_time_t);
+  *
+  * @return Number of ticks to first pending callout
+  */
+-os_time_t os_callout_remaining_ticks(struct os_callout *, os_time_t);
++os_time_t os_callout_remaining_ticks(struct os_callout *c, os_time_t now);
+ 
+ /**
+  * Returns whether the callout is pending or not.
+@@ -119,7 +117,7 @@ os_time_t os_callout_remaining_ticks(struct os_callout *, os_time_t);
+ static inline int
+ os_callout_queued(struct os_callout *c)
+ {
+-    return c->c_next.tqe_prev != NULL;
++    return ztimer_is_set(ZTIMER_MSEC, &c->timer);
+ }
+ 
+ /**
+diff --git a/kernel/os/include/os/os_mutex.h b/kernel/os/include/os/os_mutex.h
+index 7fb67fa49..3449c420c 100644
+--- a/kernel/os/include/os/os_mutex.h
++++ b/kernel/os/include/os/os_mutex.h
+@@ -27,8 +27,10 @@
+ #ifndef _OS_MUTEX_H_
+ #define _OS_MUTEX_H_
+ 
+-#include "os/os.h"
+ #include "os/queue.h"
++#include "os/os_types.h"
++#include "os/os_error.h"
++#include "mutex.h"
+ 
+ #ifdef __cplusplus
+ extern "C" {
+@@ -38,14 +40,7 @@ extern "C" {
+  * OS mutex structure
+  */
+ struct os_mutex {
+-    SLIST_HEAD(, os_task) mu_head;
+-    uint8_t     _pad;
+-    /** Mutex owner's default priority */
+-    uint8_t     mu_prio;
+-    /** Mutex call nesting level */
+-    uint16_t    mu_level;
+-    /** Task that owns the mutex */
+-    struct os_task *mu_owner;
++    mutex_t mutex;
+ };
+ 
+ /*
+@@ -119,7 +114,8 @@ os_error_t os_mutex_pend(struct os_mutex *mu, os_time_t timeout);
+  */
+ static inline uint16_t os_mutex_get_level(struct os_mutex *mu)
+ {
+-    return mu->mu_level;
++    (void) mu;
++    return 0;
+ }
+ 
+ #ifdef __cplusplus
+diff --git a/kernel/os/include/os/os_sem.h b/kernel/os/include/os/os_sem.h
+index aa5456d42..32c5a0d12 100644
+--- a/kernel/os/include/os/os_sem.h
++++ b/kernel/os/include/os/os_sem.h
+@@ -27,7 +27,10 @@
+ #ifndef _OS_SEM_H_
+ #define _OS_SEM_H_
+ 
++#include "os/os_types.h"
+ #include "os/queue.h"
++#include "os/os_error.h"
++#include "sema.h"
+ 
+ #ifdef __cplusplus
+ extern "C" {
+@@ -37,10 +40,7 @@ extern "C" {
+  * Structure representing an OS semaphore.
+  */
+ struct os_sem {
+-    SLIST_HEAD(, os_task) sem_head;
+-    uint16_t    _pad;
+-    /** Number of tokens */
+-    uint16_t    sem_tokens;
++    sema_t sema;        /**< the semaphore */
+ };
+ 
+ /*
+@@ -100,7 +100,7 @@ os_error_t os_sem_pend(struct os_sem *sem, os_time_t timeout);
+  */
+ static inline uint16_t os_sem_get_count(struct os_sem *sem)
+ {
+-    return sem->sem_tokens;
++    return sem->sema.value;
+ }
+ 
+ #ifdef __cplusplus
+diff --git a/kernel/os/include/os/os_task.h b/kernel/os/include/os/os_task.h
+index b42f51ca2..ce6418941 100644
+--- a/kernel/os/include/os/os_task.h
++++ b/kernel/os/include/os/os_task.h
+@@ -28,10 +28,9 @@
+ #ifndef _OS_TASK_H
+ #define _OS_TASK_H
+ 
+-#include "os/os.h"
+-#include "os/os_sanity.h"
+-#include "os/os_arch.h"
++#include "os/os_types.h"
+ #include "os/queue.h"
++#include "thread.h"
+ 
+ #ifdef __cplusplus
+ extern "C" {
+@@ -76,7 +75,7 @@ typedef enum os_task_state {
+ /** Task waiting on a event queue */
+ #define OS_TASK_FLAG_EVQ_WAIT       (0x08U)
+ 
+-typedef void (*os_task_func_t)(void *);
++typedef thread_task_func_t os_task_func_t;
+ 
+ #define OS_TASK_MAX_NAME_LEN (32)
+ 
+@@ -84,54 +83,7 @@ typedef void (*os_task_func_t)(void *);
+  * Structure containing information about a running task
+  */
+ struct os_task {
+-    /*
+-     * t_stackptr and t_stackbottom fields may be accessed directly from
+-     * assembly code and should never be moved in this structure.
+-     */
+-
+-    /** Current stack pointer for this task */
+-    os_stack_t *t_stackptr;
+-    /** Pointer to bottom of this task's stack */
+-    os_stack_t *t_stackbottom;
+-    /** Size of this task's stack */
+-    uint16_t t_stacksize;
+-    /** Task ID */
+-    uint8_t t_taskid;
+-    /** Task Priority */
+-    uint8_t t_prio;
+-    /* Task state, either READY or SLEEP */
+-    uint8_t t_state;
+-    /** Task flags, bitmask */
+-    uint8_t t_flags;
+-    uint8_t t_lockcnt;
+-    uint8_t t_pad;
+-
+-    /** Task name */
+-    const char *t_name;
+-    /** Task function that executes */
+-    os_task_func_t t_func;
+-    /** Argument to pass to task function when called */
+-    void *t_arg;
+-
+-    /** Current object task is waiting on, either a semaphore or mutex */
+-    void *t_obj;
+-
+-    /** Default sanity check for this task */
+-    struct os_sanity_check t_sanity_check;
+-
+-    /** Next scheduled wakeup if this task is sleeping */
+-    os_time_t t_next_wakeup;
+-    /** Total task run time */
+-    os_time_t t_run_time;
+-    /**
+-     * Total number of times this task has been context switched during
+-     * execution.
+-     */
+-    uint32_t t_ctx_sw_cnt;
+-
+-    STAILQ_ENTRY(os_task) t_os_task_list;
+-    TAILQ_ENTRY(os_task) t_os_list;
+-    SLIST_ENTRY(os_task) t_obj_list;
++    kernel_pid_t pid;
+ };
+ 
+ /** @cond INTERNAL_HIDDEN */
+@@ -263,6 +215,12 @@ struct os_task *os_task_info_get_next(const struct os_task *,
+  */
+ void os_task_info_get(const struct os_task *task, struct os_task_info *oti);
+ 
++/**
++ *  * @brief   Lets current thread yield.
++ *
++ */
++void os_task_yield(void);
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/kernel/os/src/os_mbuf.c b/kernel/os/src/os_mbuf.c
+index 494dedc32..ed9f1c693 100644
+--- a/kernel/os/src/os_mbuf.c
++++ b/kernel/os/src/os_mbuf.c
+@@ -50,9 +50,7 @@ os_mqueue_init(struct os_mqueue *mq, os_event_fn *ev_cb, void *arg)
+     STAILQ_INIT(&mq->mq_head);
+ 
+     ev = &mq->mq_ev;
+-    memset(ev, 0, sizeof(*ev));
+-    ev->ev_cb = ev_cb;
+-    ev->ev_arg = arg;
++    os_event_init(ev, ev_cb, arg);
+ 
+     return (0);
+ }
+diff --git a/kernel/os/src/os_msys.c b/kernel/os/src/os_msys.c
+index 67c118473..9a06db6fd 100644
+--- a/kernel/os/src/os_msys.c
++++ b/kernel/os/src/os_msys.c
+@@ -20,7 +20,6 @@
+ #include <assert.h>
+ #include "os/mynewt.h"
+ #include "mem/mem.h"
+-#include "os_priv.h"
+ 
+ static STAILQ_HEAD(, os_mbuf_pool) g_msys_pool_list =
+     STAILQ_HEAD_INITIALIZER(g_msys_pool_list);
+-- 
+2.28.0
+

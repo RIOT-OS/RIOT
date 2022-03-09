@@ -1,0 +1,4 @@
+# Put board specific dependencies here
+ifneq (native,$(BOARD))
+  USEMODULE += stdio_ethos
+endif

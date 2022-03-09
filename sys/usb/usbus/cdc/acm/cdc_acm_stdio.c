@@ -19,8 +19,12 @@
  * @}
  */
 
-#include <stdio.h>
+#define USB_H_USER_IS_RIOT_INTERNAL
 
+#include <stdio.h>
+#include <sys/types.h>
+
+#include "log.h"
 #include "isrpipe.h"
 
 #include "usb/usbus.h"
@@ -30,9 +34,13 @@
 #include "vfs.h"
 #endif
 
+#ifdef MODULE_USB_BOARD_RESET
+#include "usb_board_reset_internal.h"
+#endif
+
 static usbus_cdcacm_device_t cdcacm;
-static uint8_t _cdc_tx_buf_mem[USBUS_CDC_ACM_STDIO_BUF_SIZE];
-static uint8_t _cdc_rx_buf_mem[USBUS_CDC_ACM_STDIO_BUF_SIZE];
+static uint8_t _cdc_tx_buf_mem[CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE];
+static uint8_t _cdc_rx_buf_mem[CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE];
 static isrpipe_t _cdc_stdio_isrpipe = ISRPIPE_INIT(_cdc_rx_buf_mem);
 
 void stdio_init(void)
@@ -43,6 +51,13 @@ void stdio_init(void)
 #endif
 }
 
+#if IS_USED(MODULE_STDIO_AVAILABLE)
+int stdio_available(void)
+{
+    return tsrb_avail(&_cdc_stdio_isrpipe.tsrb);
+}
+#endif
+
 ssize_t stdio_read(void* buffer, size_t len)
 {
     (void)buffer;
@@ -52,10 +67,15 @@ ssize_t stdio_read(void* buffer, size_t len)
 
 ssize_t stdio_write(const void* buffer, size_t len)
 {
-    usbus_cdc_acm_submit(&cdcacm, buffer, len);
-    usbus_cdc_acm_flush(&cdcacm);
-    /* Use tsrb and flush */
-    return len;
+    const char *start = buffer;
+    do {
+        size_t n = usbus_cdc_acm_submit(&cdcacm, buffer, len);
+        usbus_cdc_acm_flush(&cdcacm);
+        /* Use tsrb and flush */
+        buffer = (char *)buffer + n;
+        len -= n;
+    } while (len);
+    return (char *)buffer - start;
 }
 
 static void _cdc_acm_rx_pipe(usbus_cdcacm_device_t *cdcacm,
@@ -71,4 +91,7 @@ void usb_cdc_acm_stdio_init(usbus_t *usbus)
 {
     usbus_cdc_acm_init(usbus, &cdcacm, _cdc_acm_rx_pipe, NULL,
                        _cdc_tx_buf_mem, sizeof(_cdc_tx_buf_mem));
+#ifdef MODULE_USB_BOARD_RESET
+    usbus_cdc_acm_set_coding_cb(&cdcacm, usb_board_reset_coding_cb);
+#endif
 }

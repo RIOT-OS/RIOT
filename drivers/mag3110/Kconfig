@@ -1,0 +1,37 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#               2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_MAG3110
+    bool "MAG3110 3-Axis Digital Magnetometer"
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+
+config HAVE_MAG3110
+    bool
+    select MODULE_MAG3110 if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a mag3110 magnetometer is present.
+
+menuconfig KCONFIG_USEMODULE_MAG3110
+    bool "Configure MAG3110 driver"
+    depends on USEMODULE_MAG3110
+    help
+        Configure the MAG3110 driver using Kconfig.
+
+if KCONFIG_USEMODULE_MAG3110
+
+config MAG3110_I2C_ADDRESS
+    hex "I2C default address"
+    range 0x0E 0x0F
+    default 0x0E
+    help
+        The address depends on part number of MAG3110.
+        For more information refer to the datasheet.
+
+endif # KCONFIG_USEMODULE_MAG3110

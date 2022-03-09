@@ -1,0 +1,89 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_RANDOM
+    bool "Pseudo-Random Number Generation"
+    depends on TEST_KCONFIG
+    select MODULE_LUID
+    select MODULE_PERIPH_HWRNG if HAS_PERIPH_HWRNG && !MODULE_PUF_SRAM
+
+if MODULE_RANDOM
+
+choice RANDOM_IMPLEMENTATION
+    bool "PRNG Implementation"
+    depends on TEST_KCONFIG
+    default MODULE_PRNG_HWRNG if HAS_PERIPH_HWRNG
+    default MODULE_PRNG_MUSL_LCG
+
+menuconfig MODULE_PRNG_FORTUNA
+    bool "Fortuna"
+    select MODULE_HASHES
+    select MODULE_FORTUNA
+    select MODULE_CRYPTO
+    select MODULE_CRYPTO_AES_128
+
+if MODULE_PRNG_FORTUNA
+
+config MODULE_FORTUNA_RESEED
+    bool "Reseed prng according to FORTUNA_RESEED_INTERVAL_MS"
+    select MODULE_XTIMER
+    select MODULE_ATOMIC_UTILS
+endif
+
+config MODULE_PRNG_HWRNG
+    bool "Hardware RNG"
+    depends on HAS_PERIPH_HWRNG
+    select MODULE_PERIPH_HWRNG
+
+config MODULE_PRNG_MARSENNE
+    bool "Marsenne"
+
+config MODULE_PRNG_MINISTD
+    bool "Mini STD"
+
+config MODULE_PRNG_MUSL_LCG
+    bool "MUSL LCG"
+
+config MODULE_PRNG_SHA1PRNG
+    bool "SHA-1"
+    select MODULE_PRNG_SHAXPRNG
+    select MODULE_HASHES
+
+config MODULE_PRNG_SHA256PRNG
+    bool "SHA-256"
+    select MODULE_PRNG_SHAXPRNG
+    select MODULE_HASHES
+
+config MODULE_PRNG_TINYMT32
+    bool "Tiny-MT 32"
+    select MODULE_TINYMT32
+
+config MODULE_PRNG_XORSHIFT
+    bool "XOR Shift"
+
+endchoice # RANDOM_IMPLEMENTATION
+
+config MODULE_AUTO_INIT_RANDOM
+    bool "Auto-initialize the random subsystem"
+    default y
+    depends on MODULE_AUTO_INIT
+
+config MODULE_PRNG_SHAXPRNG
+    bool
+    help
+        Unified implementation for SHA-256 and SHA-1 PRNG.
+
+config MODULE_PRNG
+    bool
+    default y
+    help
+        Basic Pseudo-random number generation module.
+
+rsource "fortuna/Kconfig"
+rsource "tinymt32/Kconfig"
+
+endif # MODULE_RANDOM

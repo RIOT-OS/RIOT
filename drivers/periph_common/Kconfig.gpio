@@ -1,0 +1,61 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_PERIPH_GPIO
+    bool "GPIO peripheral driver"
+    default y
+    depends on HAS_PERIPH_GPIO
+    select MODULE_PERIPH_COMMON
+
+if MODULE_PERIPH_GPIO
+
+config MODULE_PERIPH_INIT_GPIO
+    bool "Auto initialize GPIO peripheral"
+    default y if MODULE_PERIPH_INIT
+
+config MODULE_PERIPH_GPIO_IRQ
+    bool "GPIO interrupt peripheral driver"
+    depends on HAS_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_COMMON
+
+config MODULE_PERIPH_GPIO_FAST_READ
+    bool "GPIO fast read"
+    depends on HAS_PERIPH_GPIO_FAST_READ
+    help
+        This trades an increase in power consumption for a decrease in GPIO pin
+        read latency.
+
+config MODULE_PERIPH_GPIO_TAMPER_WAKE
+    bool "enable wake from Deep Sleep by RTC tamper pins"
+    depends on HAS_PERIPH_GPIO_TAMPER_WAKE
+    help
+        If you enable this, a RTC tamper pin that has been configured as an
+        interrupt can wake the CPU from Deep Sleep. Only RTC tamper pins
+        (and the RTC alarm) can wake the CPU from Deep Sleep.
+
+# TODO: this module is actually jus  t an artifact from the way periph_init_%
+# modules are handled in Makefile. We need to define it to keep the list the
+# same for now. We should be able to remove it later on.
+
+config MODULE_PERIPH_INIT_GPIO_IRQ
+    bool "Auto initialize GPIO interrupt peripheral"
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_GPIO_IRQ
+
+config MODULE_PERIPH_INIT_GPIO_FAST_READ
+    bool "Auto initialize GPIO fast read"
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_GPIO_FAST_READ
+
+config MODULE_PERIPH_INIT_GPIO_TAMPER_WAKE
+    bool "Auto initialize tamper detection"
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_GPIO_TAMPER_WAKE
+
+endif # MODULE_PERIPH_GPIO
+
+osource "$(RIOTCPU)/$(CPU)/periph/Kconfig.gpio"

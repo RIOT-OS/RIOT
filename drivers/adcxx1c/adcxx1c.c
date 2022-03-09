@@ -17,6 +17,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "adcxx1c.h"
 #include "adcxx1c_params.h"
 #include "adcxx1c_regs.h"
@@ -24,7 +26,7 @@
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define DEV (dev->params.i2c)
@@ -103,7 +105,7 @@ int adcxx1c_enable_alert(adcxx1c_t *dev, adcxx1c_cb_t cb, void *arg)
 
     i2c_acquire(DEV);
     i2c_read_reg(DEV, ADDR, ADCXX1C_CONF_ADDR, &reg, 0);
-    reg |= (dev->params.alert_pin != GPIO_UNDEF ? ADCXX1C_CONF_ALERT_PIN_EN : 0)
+    reg |= (gpio_is_valid(dev->params.alert_pin) ? ADCXX1C_CONF_ALERT_PIN_EN : 0)
             | ADCXX1C_CONF_ALERT_FLAG_EN;
     status = i2c_write_reg(DEV, ADDR, ADCXX1C_CONF_ADDR, reg, 0);
     i2c_release(DEV);
@@ -113,7 +115,7 @@ int adcxx1c_enable_alert(adcxx1c_t *dev, adcxx1c_cb_t cb, void *arg)
         return ADCXX1C_NOI2C;
     }
 
-    if (dev->params.alert_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.alert_pin)) {
         dev->cb = cb;
         dev->arg = arg;
         /* alert active low */
@@ -167,4 +169,30 @@ int adcxx1c_set_alert_parameters(const adcxx1c_t *dev, int16_t low_limit,
     i2c_release(DEV);
 
     return ADCXX1C_OK;
+}
+
+int adcxx1c_get_and_clear_alert(const adcxx1c_t *dev)
+{
+    int status;
+    uint8_t alert;
+
+    i2c_acquire(DEV);
+
+    status = i2c_read_reg(DEV, ADDR, ADCXX1C_ALERT_STATUS_ADDR, &alert, 0);
+    if (status < 0) {
+        i2c_release(DEV);
+        DEBUG("[adcxx1c] get_and_clear_alert - error: unable to read reg (%d)\n", status);
+        return ADCXX1C_NOI2C;
+    }
+
+    status = i2c_write_reg(DEV, ADDR, ADCXX1C_ALERT_STATUS_ADDR, alert, 0);
+    if (status < 0) {
+        i2c_release(DEV);
+        DEBUG("[adcxx1c] get_and_clear_alert - error: unable to write reg (%d)\n", status);
+        return ADCXX1C_NOI2C;
+    }
+
+    i2c_release(DEV);
+
+    return alert;
 }

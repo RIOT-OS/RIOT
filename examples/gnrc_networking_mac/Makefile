@@ -4,19 +4,20 @@ APPLICATION = gnrc_networking_mac
 # If no BOARD is found in the environment, use this default:
 BOARD ?= samr21-xpro
 
-# Currently, GoMacH has only been tested and evaluated through on samr21-xpro and iotlab-m3.
+# Currently, GoMacH has only been tested and evaluated through on samr21-xpro, iotlab-m3 and
+# derfmega256 (at86rf2xx based radios).
 # Once GoMacH has also been tested through on other boards, the whitelist should be
 # then accordingly extended.
 # Notably, for LWMAC, we have only evaluated it on samr21-xpro nodes. To this end, if
 # you are going to include LWMAC for testing, you should only run the example on samr21-xpro.
-BOARD_WHITELIST := samr21-xpro iotlab-m3
+BOARD_WHITELIST := samr21-xpro iotlab-m3 avr-rss2 atmega256rfr2-xpro derfmega256
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
-USEMODULE += gnrc_netdev_default
+USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for IPv6 and UDP
 USEMODULE += gnrc_ipv6_router_default
@@ -53,7 +54,7 @@ DEVELHELP ?= 1
 
 # Uncomment this to join RPL DODAGs even if DIOs do not contain
 # DODAG Configuration Options (see the doc for more info)
-# CFLAGS += -DGNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
+# CFLAGS += -DCONFIG_GNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1

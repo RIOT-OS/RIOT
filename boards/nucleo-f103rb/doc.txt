@@ -5,33 +5,35 @@
 
 ## Overview
 
-The Nucleo-F103 is a board from ST's Nucleo family supporting a ARM Cortex-M3
+The Nucleo-F103RB is a board from ST's Nucleo family supporting a ARM Cortex-M3
 STM32F103RB microcontroller with 20Kb of SRAM and 128Kb of ROM Flash.
 
 ## Hardware
 
-![Nucleo64 F103](http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
+![Nucleo64 F103RB](http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
 
 ### MCU
 | MCU        | STM32F103RB       |
-|:------------- |:--------------------- |
-| Family | ARM Cortex-M3     |
-| Vendor | ST Microelectronics   |
-| RAM        | 20Kb |
+|:---------- |:----------------- |
+| Family     | ARM Cortex-M3     |
+| Vendor     | ST Microelectronics |
+| RAM        | 20Kb              |
 | Flash      | 128Kb             |
-| Frequency  | up to 72MHz    |
-| FPU        | yes               |
-| Timers | 7 (2x watchdog, 1 SysTick, 4x 16-bit) |
-| ADCs       | 1x 12-bit         |
+| Frequency  | up to 72MHz       |
+| FPU        | no                |
+| Timers     | 7 (2x watchdog, 1 SysTick, 4x 16-bit) |
+| ADCs       | 1x 12-bit (16 channels) |
 | UARTs      | 3                 |
 | SPIs       | 2                 |
 | I2Cs       | 2                 |
 | RTC        | 1                 |
-| Vcc        | 2.0V - 3.6V           |
-| Datasheet  | [Datasheet](http://www.st.com/en/evaluation-tools/nucleo-f103rb.html) |
-| Reference Manual | [Reference Manual](http://www.st.com/resource/en/datasheet/stm32f103rb.pdf) |
-| Programming Manual | [Programming Manual](http://www.st.com/resource/en/programming_manual/dm00051352.pdf) |
-| Board Manual   | [Board Manual](http://www.st.com/resource/en/user_manual/dm00105823.pdf)|
+| USB        | 1                 |
+| CAN        | 1                 |
+| Vcc        | 2.0V - 3.6V       |
+| Datasheet  | [Datasheet](http://www.st.com/resource/en/datasheet/stm32f103rb.pdf) |
+| Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/cd00171190.pdf) |
+| Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/cd00228163.pdf) |
+| Board Manual | [Board Manual](http://www.st.com/resource/en/user_manual/dm00105823.pdf) |
 
 ## Implementation Status
 | Device | ID        | Supported | Comments  |
@@ -47,22 +49,22 @@ STM32F103RB microcontroller with 20Kb of SRAM and 128Kb of ROM Flash.
 |        | Timer     | 2 16 bit timers (TIM2 and TIM3)       | |
 
 ## Flashing the device
-The ST Nucleo-F103 board includes an on-board ST-LINK V2 programmer. The
+The ST Nucleo-F103RB board includes an on-board ST-LINK V2 programmer. The
 easiest way to program the board is to use OpenOCD. Once you have installed
 OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
 installation instructions), you can flash the board simply by typing:
 
 ```
-make BOARD=nucleo-f103 flash
+make BOARD=nucleo-f103rb flash
 ```
 and debug via GDB by simply typing
 ```
-make BOARD=nucleo-f103 debug
+make BOARD=nucleo-f103rb debug
 ```
 
 
 ## Supported Toolchains
-For using the ST Nucleo-F103 board we strongly recommend the usage of the
+For using the ST Nucleo-F103RB board we strongly recommend the usage of the
 [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
  */

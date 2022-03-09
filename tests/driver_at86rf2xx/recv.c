@@ -60,10 +60,10 @@ void recv(netdev_t *dev)
             break;
     }
     printf("Dest. PAN: 0x%04x, Dest. addr.: ",
-           byteorder_ntohs(byteorder_ltobs(dst_pan)));
+           byteorder_ltohs(dst_pan));
     print_addr(dst, dst_len);
     printf("\nSrc. PAN: 0x%04x, Src. addr.: ",
-           byteorder_ntohs(byteorder_ltobs(src_pan)));
+           byteorder_ltohs(src_pan));
     print_addr(src, src_len);
     printf("\nSecurity: ");
     if (buffer[0] & IEEE802154_FCF_SECURITY_EN) {

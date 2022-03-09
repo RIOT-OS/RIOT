@@ -1,0 +1,16 @@
+# Copyright (c) 2020 Benjamin Valentin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "e104-bt5010a-tb" if BOARD_E104_BT5010A_TB
+
+config BOARD_E104_BT5010A_TB
+    bool
+    default y
+    select BOARD_COMMON_E104_BT50XXA_TB
+    select CPU_MODEL_NRF52810XXAA
+
+source "$(RIOTBOARD)/common/e104-bt50xxa-tb/Kconfig"

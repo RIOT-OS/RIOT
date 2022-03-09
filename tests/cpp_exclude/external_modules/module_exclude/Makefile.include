@@ -1,0 +1,3 @@
+# Use an immediate variable to evaluate `LAST_MAKEFILEDIR` now
+USEMODULE_INCLUDES_module_exclude := $(LAST_MAKEFILEDIR)
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_module_exclude)

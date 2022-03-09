@@ -27,6 +27,7 @@
 #include "cpu.h"
 #include "periph_conf.h"
 #include "board_common.h"
+#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,6 +64,14 @@ extern "C" {
  */
 #define LSM303DLHC_PARAM_ACC_PIN   GPIO_PIN(PORT_B, 12)
 #define LSM303DLHC_PARAM_MAG_PIN   GPIO_PIN(PORT_B, 2)
+/** @} */
+
+/**
+ * @name MTD configuration
+ * @{
+ */
+extern mtd_dev_t *mtd0;     /**< SPI NOR Flash device */
+#define MTD_0     mtd0      /**< Indicate presence of MTD device */
 /** @} */
 
 #ifdef __cplusplus

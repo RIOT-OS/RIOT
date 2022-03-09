@@ -11,4 +11,9 @@ EXTDEFINES = $(addprefix -D,$(call uppercase_and_underscore,$(ED)))
 # filter "pseudomodules" from "real modules", but not "no_pseudomodules"
 REALMODULES += $(filter-out $(PSEUDOMODULES), $(_ALLMODULES))
 REALMODULES += $(filter $(NO_PSEUDOMODULES), $(_ALLMODULES))
-BASELIBS += $(REALMODULES:%=$(BINDIR)/%.a)
+BASELIBS += $(REALMODULES:%=%.module)
+
+# Add modules compiled with Makefile.base and extra archives
+GENERATED_MODULES = $(notdir $(shell find $(BINDIR) -type d)) $(basename $(notdir $(ARCHIVES)))
+
+NON_GENERATED_MODULES = $(filter-out $(GENERATED_MODULES),$(REALMODULES))

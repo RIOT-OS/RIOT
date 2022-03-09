@@ -4,6 +4,7 @@ INCLUDES += -I$(RIOTBASE)/pkg/lwip/include \
 PSEUDOMODULES += lwip_arp
 PSEUDOMODULES += lwip_autoip
 PSEUDOMODULES += lwip_dhcp
+PSEUDOMODULES += lwip_dhcp_auto
 PSEUDOMODULES += lwip_ethernet
 PSEUDOMODULES += lwip_igmp
 PSEUDOMODULES += lwip_ipv6_autoconfig
@@ -14,6 +15,13 @@ PSEUDOMODULES += lwip_stats
 PSEUDOMODULES += lwip_tcp
 PSEUDOMODULES += lwip_udp
 PSEUDOMODULES += lwip_udplite
+PSEUDOMODULES += lwip_sock_async
+
+# lwip's include/lwip/arch.h decides based on existence of SSIZE_MAX whether it
+# should define ssize_t. That doesn't work with the mips toolchain.
+ifneq (, $(filter mips32r2_common,$(USEMODULE)))
+    CFLAGS += -DSSIZE_MAX=INT_MAX
+endif
 
 ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lwip/contrib
@@ -21,11 +29,14 @@ endif
 ifneq (,$(filter lwip_netdev,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lwip/contrib/netdev
 endif
+ifneq (,$(filter lwip_netif_init_devs,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lwip/init_devs
+endif
 ifneq (,$(filter lwip_sock,$(USEMODULE)))
-  ifneq (,$(filter lwip_ipv6,$(USEMODULE)))
-    CFLAGS += -DSOCK_HAS_IPV6
-  endif
   DIRS += $(RIOTBASE)/pkg/lwip/contrib/sock
+endif
+ifneq (,$(filter lwip_sock_async,$(USEMODULE)))
+  CFLAGS += -DSOCK_HAS_ASYNC
 endif
 ifneq (,$(filter lwip_sock_ip,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lwip/contrib/sock/ip

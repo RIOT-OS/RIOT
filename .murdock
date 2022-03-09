@@ -1,13 +1,141 @@
 #!/bin/sh
 
-: ${TEST_BOARDS_AVAILABLE:="nrf52dk samr21-xpro"}
-: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
+# uncomment and change this to limit builds, e.g.,
+#export BOARDS="samr21-xpro native"
+# and / or
+#export APPS="examples/hello-world tests/unittests"
+
+#
+: ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
+
+# temporarily disabling llvm builds until https://github.com/RIOT-OS/RIOT/pull/15595
+# is in
+#: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
+: ${TEST_BOARDS_LLVM_COMPILE:=""}
+
+: ${TEST_KCONFIG_BOARDS_AVAILABLE:="
+adafruit-itsybitsy-m4
+arduino-due
+arduino-leonardo
+arduino-mkrzero
+arduino-mega2560
+arduino-nano
+atxmega-a1-xplained
+atxmega-a3bu-xplained
+avr-rss2
+avsextrem
+bastwan
+bluepill
+b-l475e-iot01a
+cc1352-launchpad
+cc2650-launchpad
+derfmega128
+dwm1001
+esp32-ci
+esp32-heltec-lora32-v2
+esp8266-ci
+esp8266-esp-12x
+hamilton
+hifive1
+mbed_lpc1768
+mega-xplained
+microbit
+mulle
+native
+nrf52840dk
+nrf9160dk
+nucleo-f072rb
+nucleo-f103rb
+nucleo-f207zg
+nucleo-f334r8
+nucleo-f429zi
+nucleo-f767zi
+nucleo-g071rb
+nucleo-g474re
+nucleo-l011k4
+nucleo-l073rz
+nucleo-l152re
+nucleo-l433rc
+nucleo-l552ze-q
+p-nucleo-wb55
+qn9080dk
+remote-revb
+same54-xpro
+samr21-xpro
+seeedstudio-gd32
+slstk3400a
+sltb001a
+slwstk6220a
+stm32f723e-disco
+stm32mp157c-dk2
+waspmote-pro
+weact-f401ce
+z1
+"}
+
+: ${TEST_KCONFIG_ENFORCE_APP_GROUPS:="
+tests/cb_mux*
+tests/congure_*
+tests/driver_b*
+tests/driver_f*
+tests/driver_g*
+tests/driver_h*
+tests/driver_i*
+tests/driver_j*
+tests/driver_l*
+tests/driver_o*
+tests/driver_p*
+tests/driver_q*
+tests/driver_r*
+tests/driver_s*
+tests/driver_t*
+tests/driver_u*
+tests/driver_v*
+tests/external_board_dirs
+tests/periph_*
+tests/pkg_elk
+tests/pkg_uzlib
+tests/prng_*
+tests/trace
+tests/xtimer_*
+tests/ztimer_*
+examples/hello-world
+tests/ieee802154_hal
+"}
+
+# This list prevents boards from being tested by the TEST_KCONFIG_TEST_ALLOWLIST
+# This should only be used for boards that require a lot of work, such as,
+# requiring modelling of a clock tree.
+# As a rule of thumb, only add boards here if there are not differences in
+# modules or packages.
+# Eventually this list will be removed...
+#
+: ${TEST_KCONFIG_BOARD_BLOCKLIST:="
+6lowpan-clicker
+pic32-wifire
+"}
+
+# This list will force all boards that are not in the TEST_KCONFIG_BOARD_BLOCKLIST
+# to be tested on the apps. The purpose is to prevent new boards from skipping
+# the kconfig implementations.
+: ${TEST_KCONFIG_TEST_ALLOWLIST:="
+examples/hello-world
+tests/saul
+tests/mtd_mapper
+"}
+
+: ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/driver_at86rf2xx_aes"}
 
 export RIOT_CI_BUILD=1
-export STATIC_TESTS=${STATIC_TESTS:-1}
+export CC_NOCOLOR=1
+export STATIC_TESTS=0
 export CFLAGS_DBG=""
 export DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
 export ENABLE_TEST_CACHE=${ENABLE_TEST_CACHE:-1}
+export MURDOCK_REDIS_HOST=${MURDOCK_REDIS_HOST:-127.0.0.1}
+NIGHTLY=${NIGHTLY:-0}
+RUN_TESTS=${RUN_TESTS:-${NIGHTLY}}
+FULL_BUILD=${FULL_BUILD:-${NIGHTLY}}
 
 # This is a work around for a bug in CCACHE which interacts very badly with
 # some features of RIOT and of murdock. The result is that ccache is
@@ -26,10 +154,63 @@ export ENABLE_TEST_CACHE=${ENABLE_TEST_CACHE:-1}
 # It is only the combination of these three factors which causes this bug.
 export OPTIONAL_CFLAGS_BLACKLIST="-gz"
 
-NIGHTLY=${NIGHTLY:-0}
-RUN_TESTS=${RUN_TESTS:-${NIGHTLY}}
+DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS -E ENABLE_TEST_CACHE
+         -E TEST_HASH -E CI_PULL_LABELS -ECI_BASE_BRANCH -ECI_BASE_COMMIT
+         -EPKG_USE_MIRROR -EAPPS_CHANGED -EBOARDS_CHANGED -ESTATIC_TESTS"
 
-DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS -E ENABLE_TEST_CACHE -E TEST_HASH"
+if [ ${NIGHTLY} -eq 1 ]; then
+    export PKG_USE_MIRROR=0
+fi
+
+CFCR_ARGS="--upstreambranch ${CI_BASE_COMMIT}"
+
+get_supported_kconfig_board_app() {
+    local board=$1
+    local appdir=$2
+    if is_in_list "${board}" "${TEST_KCONFIG_BOARD_BLOCKLIST}"; then
+        return 1
+    fi
+
+    # On nightlies run all possible kconfig tests on all boards
+    # Normally we don't want to do this as it adds quite a bit to build time
+    # and the subset of boards we are testing for are pretty good at catching
+    # any bugs...
+    # This will be over one day, I promise.
+    if [ ${NIGHTLY} -eq 1 ]; then
+        if is_in_list "${appdir}" "${TEST_KCONFIG_ENFORCE_APP_GROUPS}"; then
+            return 0
+        fi
+        if [ -f "${appdir}/app.config.test" ]; then
+            return 0
+        fi
+    fi
+    if is_in_list "${appdir}" "${TEST_KCONFIG_TEST_ALLOWLIST}"; then
+        return 0
+    fi
+    if is_in_list "${board}" "${TEST_KCONFIG_BOARDS_AVAILABLE}"; then
+        if is_in_list "${appdir}" "${TEST_KCONFIG_ENFORCE_APP_GROUPS}"; then
+            return 0
+        fi
+        if [ -f "${appdir}/app.config.test" ]; then
+            return 0
+        fi
+    fi
+    return 1
+}
+
+kconfig_module_packages_diff() {
+    local board=$1
+    local appdir=$2
+
+    make clean --no-print-directory -C ${appdir} BOARD=${board}
+    mmp=$(make --no-print-directory info-modules info-packages -C ${appdir} BOARD=${board})
+
+    make clean --no-print-directory -C ${appdir} BOARD=${board}
+    kmp=$(TEST_KCONFIG=1 make --no-print-directory info-modules info-packages -C ${appdir} BOARD=${board})
+
+
+    bash -c "diff <(echo \"${mmp}\") <(echo \"${kmp}\")"
+}
 
 check_label() {
     local label="${1}"
@@ -116,7 +297,35 @@ get_apps() {
 # Only print for boards in $BOARDS.
 get_supported_boards() {
     local appdir=$1
+    local only_changed=0
+
+    if [ -n "$APPS_CHANGED" ]; then
+        if is_in_list "$appdir" "${APPS_CHANGED}"; then
+            # this app has changed -> build for all boards
+            true
+        else
+            # this is not a changed app -> build for changed boards
+            only_changed=1
+        fi
+    else
+        if [ -n "$BOARDS_CHANGED" ]; then
+            echo d
+            # no changed apps, some changed boards -> build for changed boards
+            only_changed=1
+        else
+            # no changed apps list, no changed boards list -> build all boards
+            true
+        fi
+    fi
+
+    if [ $only_changed -eq 1 ]; then
+        BOARDS_=${BOARDS}
+        export BOARDS="$BOARDS_CHANGED"
+    fi
+
     local boards="$(make --no-print-directory -C$appdir info-boards-supported 2>/dev/null || echo broken)"
+
+    export BOARDS="${BOARDS_}"
 
     if [ "$boards" = broken ]; then
         echo "makefile_broken"
@@ -168,8 +377,12 @@ get_app_board_toolchain_pairs() {
 
 # use dwqc to create full "appdir board toolchain" compile job list
 get_compile_jobs() {
+    check_label "CI: skip compile test" && return
+    update_changed_modules || return
+
     get_apps | \
-        dwqc ${DWQ_ENV} -s \
+        maybe_filter_changed_apps | \
+        dwqc ${DWQ_ENV} --queue default-first -s \
         ${DWQ_JOBID:+--subjob} \
         "$0 get_app_board_toolchain_pairs \${1} $0 compile"
 }
@@ -196,11 +409,11 @@ test_hash_calc() {
 
 test_cache_get() {
     test "${ENABLE_TEST_CACHE}" = "1" || return 1
-    test -n "$(redis-cli get $1)" > /dev/null
+    test -n "$(redis-cli -h ${MURDOCK_REDIS_HOST} get $1)" > /dev/null
 }
 
 test_cache_put() {
-    redis-cli set "$1" ok
+    redis-cli -h ${MURDOCK_REDIS_HOST} set "$1" ok
 }
 
 # compile one app for one board with one toolchain. delete intermediates.
@@ -228,12 +441,43 @@ compile() {
     # sanity checks
     [ $# -ne 2 ] && error "$0: compile: invalid parameters (expected \$appdir \$board:\$toolchain)"
     [ ! -d "$appdir" ] && error "$0: compile: error: application directory \"$appdir\" doesn't exist"
-    [ ! -d "boards/$board" ] && error "$0: compile: error: board directory \"boards/$board\" doesn't exist"
 
-    # compile
+    # We compile a first time with Kconfig based dependency
+    # resolution for regression purposes. $TEST_KCONFIG contains a
+    # list of board-application tuples that are currently modeled to
+    # run with Kconfig
+
+    should_check_kconfig_hash=0
+
+    if get_supported_kconfig_board_app "${board}" "${appdir}"; then
+        should_check_kconfig_hash=1
+        BOARD=${board} make -C${appdir} clean
+        CCACHE_BASEDIR="$(pwd)" BOARD=${board} TOOLCHAIN=${toolchain} RIOT_CI_BUILD=1 TEST_KCONFIG=1 \
+                        make -C${appdir} all test-input-hash -j${JOBS:-4}
+        RES=$?
+        if [ $RES -eq 0 ]; then
+            kconfig_test_hash=$(test_hash_calc "${BINDIR}")
+        else
+            kconfig_test_hash=0
+            echo "An error occurred while compiling using Kconfig";
+        fi
+    fi
+
+    # compile without Kconfig
     CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
         make -C${appdir} clean all test-input-hash -j${JOBS:-4}
     RES=$?
+
+    test_hash=$(test_hash_calc "$BINDIR")
+
+    if [ ${should_check_kconfig_hash} != 0 ]; then
+        if [ ${kconfig_test_hash} != ${test_hash} ]; then
+            echo "Hashes of binaries with and without Kconfig mismatch for ${appdir} with ${board}";
+            echo "Please check that all used modules are modelled in Kconfig and enabled";
+            kconfig_module_packages_diff ${board} ${appdir}
+            RES=1
+        fi
+    fi
 
     # run tests
     if [ $RES -eq 0 ]; then
@@ -243,7 +487,6 @@ compile() {
                     BOARD=$board make -C${appdir} test
                     RES=$?
                 elif is_in_list "$board" "$TEST_BOARDS_AVAILABLE"; then
-                    test_hash=$(test_hash_calc "$BINDIR")
                     echo "-- test_hash=$test_hash"
                     if test_cache_get $test_hash; then
                         echo "-- skipping test due to positive cache hit"
@@ -314,7 +557,11 @@ run_test() {
     BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir flash-only termdeps -j2
 
     # now run the actual test
-    BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir test
+    if is_in_list "${appdir}" "${TEST_WITH_CONFIG_SUPPORTED}"; then
+        BOARD=${board} TOOLCHAIN=${toolchain} make -C${appdir} test-with-config
+    else
+        BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir test
+    fi
     RES=$?
 
     if [ $RES -eq 0 -a -n "$TEST_HASH" ]; then
@@ -325,26 +572,119 @@ run_test() {
     return $RES
 }
 
-# execute static tests
-static_tests() {
-    local repo=${CI_BASE_REPO:-https://github.com/RIOT-OS/RIOT}
-    local branch=${CI_BASE_BRANCH:-master}
+basename_list () {
+    for path in $*; do
+        basename $path
+    done
+}
 
-    print_worker
-
-    OUT="$(git remote add upstream $repo 2>&1 && git fetch upstream ${branch}:${branch} 2>&1)"
-    RES=$?
-    if [ $RES -ne 0 ]; then
-        echo "$OUT"
-        exit 1
+# calls out to can_fast_ci_run.py.
+#
+# returns 1 if nothing should be built.
+# or, returns 0, potentially meddling with BOARDS, APPS, BOARDS_CHANGED, APPS_CHANGED.
+update_changed_modules() {
+    # early out if there's no base commit info
+    if [ -z "${CI_BASE_COMMIT}" ]; then
+        return 0
     fi
 
-    BUILDTEST_MCU_GROUP=static-tests ./dist/tools/ci/build_and_test.sh
+    # early out if a full build is requested
+    if [ $FULL_BUILD -eq 1 ]; then
+        return 0
+    fi
+
+    # if these are set, just build what's requested.
+    if [ -n "$BOARDS" -o -n "$APPS" ]; then
+        return 0
+    fi
+
+    # do full build if requested by label
+    check_label "CI: full build" && return 0
+
+    # call out to can_fast_ci_run.py
+    # that script will output e.g.,
+    #    APPS_CHANGED="foo/bar foo/barfoo"
+    #    BOARDS_CHANGED="foo/bar foo/barfoo"
+    # just eval that output, so we set those variables directly in this shell.
+    eval $(dist/tools/ci/can_fast_ci_run.py \
+        ${CFCR_ARGS} \
+        --changed-boards --changed-apps \
+        2>/dev/null || echo CFCR_ERROR=1)
+
+    # if this errors, it means we cannot skip any builds.
+    if [ -n "$CFCR_ERROR" ]; then
+        return 0
+    fi
+
+    # if can_fast_ci_run exits 0 but doesn't output any changed apps or boards,
+    # it means we can skip all compile jobs.
+    if [ -z "$APPS_CHANGED" -a -z "$BOARDS_CHANGED" ]; then
+        return 1
+    fi
+
+    # can_fast_ci_run.py outputs "board/fooboard", but the rest of this script
+    # expects a board name without leading "board/".
+    if [ -n "$BOARDS_CHANGED" ]; then
+        export BOARDS_CHANGED="$(basename_list $BOARDS_CHANGED)"
+    fi
+
+    # if no board has changed, filter by just setting APPS.
+    # same for apps -> BOARDS.
+    if [ -z "$APPS_CHANGED" -a -n "$BOARDS_CHANGED" ]; then
+        export BOARDS="$(echo $BOARDS_CHANGED | $(_greplist ${BOARDS}))"
+        unset BOARDS_CHANGED
+    elif [ -n "$APPS_CHANGED" -a -z "$BOARDS_CHANGED" ]; then
+        export APPS="$(echo $APPS_CHANGED | $(_greplist ${APPS}))"
+        unset APPS_CHANGED
+    fi
+
+    export APPS_CHANGED
+    export BOARDS_CHANGED
+}
+
+maybe_filter_changed_apps() {
+    # if no boards have changes, only a subset of the apps need to be built.
+    # else, all apps need to be passed, as they'll need to be built for
+    # the changed boards.
+    if [ -n "$BOARDS_CHANGED" ]; then
+        cat
+    else
+        $(_greplist $APPS_CHANGED)
+    fi
+}
+
+# execute static tests
+static_tests() {
+    print_worker
+    build_filter_status
+
+    [ "$STATIC_TESTS" = "1" ] && \
+        ./dist/tools/ci/static_tests.sh
+    true
+}
+
+build_filter_status() {
+    echo "--- can_fast_ci_run:"
+    if [ $FULL_BUILD -eq 1 ]; then
+        echo "--- doing full build."
+        return
+    fi
+
+    dist/tools/ci/can_fast_ci_run.py ${CFCR_ARGS} --explain --json --changed-boards --changed-apps
+    if [ -n "$MURDOCK_TEST_CHANGE_FILTER" ]; then
+        echo MURDOCK_TEST_CHANGE_FILTER=$MURDOCK_TEST_CHANGE_FILTER
+    fi
+
+    echo ""
+    update_changed_modules
+
+    if [ -n "$CFCR_ERROR" ]; then
+        echo "-- can_fast_ci_run.py exited non-zero"
+    fi
 }
 
 get_non_compile_jobs() {
-    [ "$STATIC_TESTS" = "1" ] && \
-        echo "$0 static_tests###{ \"jobdir\" : \"exclusive\" }"
+    echo "$0 static_tests"
 }
 
 get_jobs() {

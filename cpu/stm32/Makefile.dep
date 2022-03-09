@@ -1,0 +1,56 @@
+# All stm32 families provide pm support
+
+# include stm32 common periph drivers, clock configurations and vectors
+USEMODULE += periph stm32_clk stm32_vectors
+
+ifneq (,$(filter periph_usbdev,$(FEATURES_USED)))
+  USEMODULE += ztimer
+  USEMODULE += ztimer_msec
+endif
+
+ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
+  USEMODULE += tsrb
+endif
+
+ifneq (,$(filter stm32_eth_%,$(USEMODULE)))
+  USEMODULE += stm32_eth
+endif
+
+ifneq (,$(filter stm32_eth_auto,$(USEMODULE)))
+  USEMODULE += stm32_eth_link_up
+endif
+
+ifneq (,$(filter stm32_eth,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_eth
+  USEMODULE += netdev_eth
+  USEMODULE += iolist
+  USEMODULE += ztimer
+  USEMODULE += ztimer_msec
+endif
+
+ifneq (,$(filter periph_can,$(FEATURES_USED)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
+endif
+
+ifneq (,$(filter periph_eth periph_ptp,$(USEMODULE)))
+  USEMODULE += periph_eth_common
+endif
+
+# periph_rtc_mem is currently tied to the periph_rtc
+ifneq (,$(filter periph_rtc_mem,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_rtc
+endif
+
+ifneq (,$(filter periph_adc,$(FEATURES_USED)))
+  ifneq (,$(filter f3 l4 wl, $(CPU_FAM)))
+    USEMODULE += ztimer
+    USEMODULE += ztimer_msec
+  endif
+endif
+
+ifneq (,$(filter periph_vbat,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_adc
+endif
+
+include $(RIOTCPU)/cortexm_common/Makefile.dep

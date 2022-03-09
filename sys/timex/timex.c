@@ -21,18 +21,18 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #include "timex.h"
 
 timex_t timex_add(const timex_t a, const timex_t b)
 {
-#if ENABLE_DEBUG
-    if (!timex_isnormalized(&a) || !timex_isnormalized(&b)) {
-        puts("timex_add on denormalized value");
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        if (!timex_isnormalized(&a) || !timex_isnormalized(&b)) {
+            puts("timex_add on denormalized value");
+        }
     }
-#endif
 
     timex_t result;
     result.seconds = a.seconds + b.seconds;
@@ -52,22 +52,22 @@ timex_t timex_set(uint32_t seconds, uint32_t microseconds)
     result.seconds = seconds;
     result.microseconds = microseconds;
 
-#if ENABLE_DEBUG
-    if (!timex_isnormalized(&result)) {
-        puts("timex_set on denormalized value");
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        if (!timex_isnormalized(&result)) {
+            puts("timex_set on denormalized value");
+        }
     }
-#endif
 
     return result;
 }
 
 timex_t timex_sub(const timex_t a, const timex_t b)
 {
-#if ENABLE_DEBUG
-    if (!timex_isnormalized(&a) || !timex_isnormalized(&b)) {
-        puts("timex_sub on denormalized value");
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        if (!timex_isnormalized(&a) || !timex_isnormalized(&b)) {
+            puts("timex_sub on denormalized value");
+        }
     }
-#endif
 
     timex_t result;
 
@@ -85,11 +85,11 @@ timex_t timex_sub(const timex_t a, const timex_t b)
 
 int timex_cmp(const timex_t a, const timex_t b)
 {
-#if ENABLE_DEBUG
-    if (!timex_isnormalized(&a) || !timex_isnormalized(&b)) {
-        puts("timex_cmp on denormalized value");
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        if (!timex_isnormalized(&a) || !timex_isnormalized(&b)) {
+            puts("timex_cmp on denormalized value");
+        }
     }
-#endif
 
     if (a.seconds < b.seconds) {
         return -1;

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 Ken Rabold
+ *               2019 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,32 +15,20 @@
  * @brief       Peripheral specific definitions for the HiFive1b RISC-V board
  *
  * @author      Ken Rabold
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include "kernel_defines.h"
+#include "macros/units.h"
+#include "periph_cpu.h"
+#include "clk_conf.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Core Clock configuration
- * @{
- */
-/* As defined in boards/hifive1/board.c CPU_DESIRED_FREQ **/
-#define CLOCK_CORECLOCK             (200000000ul)
-/** @} */
-
-/**
- * @name    Xtimer configuration
- * @{
- */
-#define XTIMER_DEV                  (0)
-#define XTIMER_CHAN                 (0)
-#define XTIMER_WIDTH                (32)
-#define XTIMER_HZ                   (32768ul)
-/** @} */
 
 /**
  * @name    Timer configuration
@@ -50,22 +39,42 @@ extern "C" {
 /** @} */
 
 /**
- * @name    RTT/RTC configuration
- *
+ * @name   UART configuration
  * @{
  */
-#define RTT_FREQUENCY               (1)             /* in Hz */
-#define RTT_MAX_VALUE               (0xFFFFFFFF)
-#define RTT_INTR_PRIORITY           (2)
+static const uart_conf_t uart_config[] = {
+    {
+        .addr       = UART0_CTRL_ADDR,
+        .rx         = GPIO_PIN(0, 16),
+        .tx         = GPIO_PIN(0, 17),
+        .isr_num    = INT_UART0_BASE,
+    },
+    {
+        .addr       = UART1_CTRL_ADDR,
+        .rx         = GPIO_PIN(0, 23),
+        .tx         = GPIO_PIN(0, 18),
+        .isr_num    = INT_UART1_BASE,
+    },
+};
 
+#define UART_NUMOF                  ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
- * @name    GPIO configuration
+ * @name    SPI device configuration
  *
  * @{
  */
-#define GPIO_INTR_PRIORITY          (3)
+static const spi_conf_t spi_config[] = {
+    {
+        .addr       = SPI1_CTRL_ADDR,
+        .mosi       = GPIO_PIN(0, 3), /* D11 */
+        .miso       = GPIO_PIN(0, 4), /* D12 */
+        .sclk       = GPIO_PIN(0, 5), /* D13 */
+    },
+};
+
+#define SPI_NUMOF                  ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
@@ -77,13 +86,19 @@ extern "C" {
 /** @} */
 
 /**
- * @name    UART configuration
- *
+ * @name    I2C configuration
  * @{
  */
-#define UART_NUMOF                  (2)
-#define UART0_RX_INTR_PRIORITY      (2)
-#define UART1_RX_INTR_PRIORITY      (2)
+static const i2c_conf_t i2c_config[] = {
+    {
+        .addr   = I2C0_CTRL_ADDR,
+        .scl    = GPIO_PIN(0, 13),
+        .sda    = GPIO_PIN(0, 12),
+        .speed  = I2C_SPEED_NORMAL,
+     },
+};
+
+#define I2C_NUMOF                   ARRAY_SIZE(i2c_config)
 /** @} */
 
 #ifdef __cplusplus

@@ -19,21 +19,35 @@
  */
 
 #include <stdio.h>
-#include <xtimer.h>
+#include "ztimer.h"
+#include "periph_conf.h"
 
 #define LINE_DELAY_MS   100
 
 static inline uint32_t puts_delay(const char* str)
 {
     puts(str);
-    xtimer_usleep(LINE_DELAY_MS * 1000);
+    ztimer_sleep(ZTIMER_USEC, LINE_DELAY_MS * 1000);
     return LINE_DELAY_MS * 1000;
+}
+
+static void _irq_disabled_print(void)
+{
+    unsigned state = irq_disable();
+    /* fill the transmit buffer */
+    for (uint8_t i = 0; i < UART_TXBUF_SIZE; i++) {
+        printf(" ");
+    }
+    puts("\nputs with disabled interrupts and a full transmit buffer");
+    irq_restore(state);
 }
 
 int main(void)
 {
+    _irq_disabled_print();
+
     uint32_t total_us = 0;
-    xtimer_ticks32_t counter = xtimer_now();
+    uint32_t counter = ztimer_now(ZTIMER_USEC);
 
     /* Richard Stallman and the Free Software Foundation
        claim no copyright on this song. */
@@ -59,9 +73,9 @@ int main(void)
     total_us += puts_delay("You'll be free, hackers, you'll be free.");
     total_us += puts_delay("");
 
-    counter.ticks32 = xtimer_now().ticks32 - counter.ticks32;
+    counter = ztimer_now(ZTIMER_USEC) - counter;
 
-    printf("== printed in %" PRIu32 "/%" PRIu32 " µs ==\n", xtimer_usec_from_ticks(counter), total_us);
+    printf("== printed in %" PRIu32 "/%" PRIu32 " µs ==\n", counter, total_us);
 
     puts("[SUCCESS]");
 

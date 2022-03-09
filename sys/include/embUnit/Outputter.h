@@ -51,7 +51,6 @@ typedef void(*OutputterPrintSuccessfulFunction)(void*,TestRef,int);
 typedef void(*OutputterPrintFailureFunction)(void*,TestRef,char*,int,char*,int);
 typedef void(*OutputterPrintStatisticsFunction)(void*,TestResultRef);
 
-
 struct __OutputterImplement {
     OutputterPrintHeaderFunction        printHeader;
     OutputterPrintStartTestFunction     printStartTest;

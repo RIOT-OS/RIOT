@@ -1,0 +1,18 @@
+# Copyright (c) 2020 Benjamin Valentin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD
+    default "weact-f411ce" if BOARD_WEACT_F411CE
+
+config BOARD_WEACT_F411CE
+    bool
+    default y
+    select BOARD_COMMON_WEACT_F4X1CX
+    select CPU_MODEL_STM32F411CE
+    select MODULE_BOARDS_COMMON_WEACT-F4X1CX if TEST_KCONFIG
+
+source "$(RIOTBOARD)/common/weact-f4x1cx/Kconfig"

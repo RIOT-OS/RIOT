@@ -1,0 +1,123 @@
+/*
+ * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2020 Google LLC
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup    boards_esp32_esp-ethernet-kit ESP32-Ethernet-Kit
+ * @ingroup     boards_esp32
+ * @brief       Support for for Espressif ESP32-Ethernet-Kit
+ * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Erik Ekman <eekman@google.com>
+
+\section esp32_ethernet_kit Espressif ESP32-Ethernet-Kit
+
+## Table of Contents {#esp32_ethernet_kit_toc}
+
+1. [Overview](#esp32_ethernet_kit_overview)
+2. [Hardware](#esp32_ethernet_kit_hardware)
+    1. [MCU](#esp32_ethernet_kit_mcu)
+    2. [Board Configuration](#esp32_ethernet_kit_board_configuration)
+3. [Flashing the Device](#esp32_ethernet_kit_flashing)
+4. [On-Chip Debugging with the device](#esp32_ethernet_kit_debugging)
+
+## Overview {#esp32_ethernet_kit_overview}
+
+The Espressif [ESP32-Ethernet-Kit](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-ethernet-kit.html) is a development board that uses a ESP32-WROVER module (-B or -E depending on version). Most important features of the board are
+
+- 100 Mbps Ethernet via IP101G PHY
+- USB bridge with JTAG interface
+
+Furthermore, some GPIOs are broken out for extension. The USB bridge based on FDI FT2232HL provides a JTAG interface for OCD debugging through the USB interface.
+
+@image html "https://docs.espressif.com/projects/esp-idf/en/latest/esp32/_images/esp32-ethernet-kit-v1.2-overview.png" "ESP32-Ethernet-Kit" width=500
+
+There are different revisions of the board:
+- \ref boards_esp32_esp-ethernet-kit-v1_0
+- \ref boards_esp32_esp-ethernet-kit-v1_1
+- \ref boards_esp32_esp-ethernet-kit-v1_2
+
+[Back to table of contents](#esp32_ethernet_kit_toc)
+
+## Hardware {#esp32_ethernet_kit_hardware}
+
+This section describes
+
+- the [MCU](#esp32_ethernet_kit_mcu),
+- the default [board configuration](#esp32_ethernet_kit_board_configuration).
+
+[Back to table of contents](#esp32_ethernet_kit_toc)
+
+### MCU {#esp32_ethernet_kit_mcu}
+
+Most features of the board are provided by the ESP32 SoC. For detailed
+information about the ESP32, see section \ref esp32_mcu_esp32 "MCU ESP32".
+
+[Back to table of contents](#esp32_ethernet_kit_toc)
+
+### Board Configuration {#esp32_ethernet_kit_board_configuration}
+
+ESP32-Ethernet-Kit has the following on-board components
+
+- 100 Mbps Ethernet via IP101G PHY
+- USB bridge with JTAG interface
+
+For detailed information about the configuration of ESP32 boards, see
+section Peripherals in \ref esp32_riot.
+
+The board is available in different versions. See the per-version file for details.
+
+[Back to table of contents](#esp32_ethernet_kit_toc)
+
+## Flashing the Device {#esp32_ethernet_kit_flashing}
+
+Flashing RIOT is quite straight forward. The board has a Micro-USB connector with reset/boot/flash logic. Just connect the board using the programming port to your host computer and type:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+make flash BOARD=esp32-ethernet-kit-v1_X ...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+where `X` is the minor revision number of the board.
+
+The USB bridge is based on FDI FT2232HL and offers two USB interfaces:
+
+- the first interface is the JTAG interface for [On-Chip debugging](#esp32_ethernet_kit_debugging)
+- the second interface is the console interface, which is also used for flashing
+
+Therefore, it might be necessary have to declare the USB interface in the make command. For example, if the ESP32-Ethernet-Kit is connected to the host computer through the USB interfaces `/dev/ttyUSB0` and `/dev/ttyUSB1`, the make command would be used as following:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+make flash BOARD=esp32-ethernet-kit-v1_X PORT=/dev/ttyUSB1 ...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Please note that `/dev/ttyUSB1` is used as the console port by default. Therefore the variable `PORT` only needs to be defined if the console port is another port.
+
+For detailed information about ESP32 as well as configuring and compiling RIOT for ESP32 boards, see \ref esp32_riot.
+
+[Back to table of contents](#esp32_ethernet_kit_toc)
+
+## On-Chip Debugging with the Device {#esp32_ethernet_kit_debugging}
+
+Since the USB bridge based on FDI FT2232HL provides a JTAG interface for debugging through an USB interface, using ESP32-Ethernet-Kit is the easiest and most convenient way for On-Chip debugging. Please refer the [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/jtag-debugging/index.html) for details on how to setup and how to use ESP32-Ethernet-Kit and OpenOCD.
+
+To use the JTAG interface, the `esp_jtag` module must be used to disable the `SPI_DEV(0)` which normally uses the GPIOs for the JTAG signals.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+USEMODULE+=esp_jtag make flash BOARD=esp32-ethernet-kit-v1_X ...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Furthermore the function switches (DIP switches) for the JTAG signals must be set to ON.
+
+To flash using OpenOCD, install the [openocd-esp32](https://github.com/espressif/openocd-esp32) fork.
+Export where openocd is located and then flash with PROGRAMMER set:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+export OPENOCD="~/openocd-esp32/src/openocd -s ~/openocd-esp32/tcl"
+PROGRAMMER=openocd USEMODULE+=esp_jtag make flash BOARD=esp32-ethernet-kit-v1_X
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To start a debugging session (board will be reset, but not flashed):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+export OPENOCD="~/openocd-esp32/src/openocd -s ~/openocd-esp32/tcl"
+PROGRAMMER=openocd USEMODULE+=esp_jtag make debug BOARD=esp32-ethernet-kit-v1_X
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Back to table of contents](#esp32_ethernet_kit_toc)
+ */

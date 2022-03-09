@@ -23,7 +23,6 @@
 extern "C" {
 #endif
 
-
 /**
  * WDT registers
  */
@@ -41,11 +40,12 @@ typedef struct {
     reg32_t LOCK; /**< lock */
 } wdt_regs_t;
 
-/** @ingroup cpu_specific_peripheral_memory_map
-  * @{
-  */
+/**
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
+ */
 #define WDT_BASE      0x40080000 /**< WDT base address */
-/*@}*/
+/** @} */
 
 #define WDT           ((wdt_regs_t *) (WDT_BASE)) /**< WDT register bank */
 
@@ -54,5 +54,4 @@ typedef struct {
 #endif
 
 #endif /* CC26XX_CC13XX_WDT_H */
-
-/*@}*/
+/** @} */

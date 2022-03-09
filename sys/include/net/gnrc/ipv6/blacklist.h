@@ -33,14 +33,14 @@ extern "C" {
 /**
  * @defgroup    net_gnrc_ipv6_blacklist_conf GNRC IPv6 address blacklisting compile configurations
  * @ingroup     net_gnrc_ipv6_blacklist
- * @ingroup     config
+ * @ingroup     net_gnrc_conf
  * @{
  */
 /**
  * Maximum size of the blacklist.
  */
-#ifndef GNRC_IPV6_BLACKLIST_SIZE
-#define GNRC_IPV6_BLACKLIST_SIZE    (8)
+#ifndef CONFIG_GNRC_IPV6_BLACKLIST_SIZE
+#define CONFIG_GNRC_IPV6_BLACKLIST_SIZE    (8)
 #endif
 /** @} */
 

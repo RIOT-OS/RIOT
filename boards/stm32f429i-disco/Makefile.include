@@ -1,0 +1,4 @@
+STLINK_VERSION ?= 2
+INCLUDES  += -I$(RIOTBOARD)/stm32f429i-disc1/include
+
+include $(RIOTBOARD)/stm32f429i-disc1/Makefile.include

@@ -1,0 +1,17 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "arduino-leonardo" if BOARD_ARDUINO_LEONARDO
+
+config BOARD_ARDUINO_LEONARDO
+    bool
+    default y
+    select BOARD_COMMON_ARDUINO_ATMEGA
+    select CPU_MODEL_ATMEGA32U4
+    select MODULE_BOARDS_COMMON_ARDUINO-ATMEGA if TEST_KCONFIG
+
+source "$(RIOTBOARD)/common/arduino-atmega/Kconfig"

@@ -1,0 +1,30 @@
+# Copyright (C) 2021 Luo Jia (HUST IoT Security Lab)
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD
+    default "alientek-pandora" if BOARD_ALIENTEK_PANDORA
+
+config BOARD_ALIENTEK_PANDORA
+    bool
+    default y
+    select CPU_MODEL_STM32L475VE
+
+    # Put defined MCU peripherals here (in alphabetical order)
+    select HAS_PERIPH_RTC
+    select HAS_PERIPH_RTT
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+
+    # Put other features for this board (in alphabetical order)
+    select HAS_RIOTBOOT
+
+    # Clock configuration
+    select BOARD_HAS_LSE
+
+    select HAVE_SAUL_GPIO
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"

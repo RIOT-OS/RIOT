@@ -15,7 +15,6 @@
  * @}
  */
 
-
 #include "msg.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/netif/hdr.h"
@@ -30,12 +29,13 @@
 
 static msg_t _msg_queue[_MSG_QUEUE_SIZE];
 static gnrc_netreg_entry_t _udp_handler;
+static char _rx_buf[32];
 
 void _net_init(void)
 {
     msg_init_queue(_msg_queue, _MSG_QUEUE_SIZE);
     gnrc_netreg_entry_init_pid(&_udp_handler, GNRC_NETREG_DEMUX_CTX_ALL,
-                               sched_active_pid);
+                               thread_getpid());
 }
 
 void _prepare_send_checks(void)
@@ -47,9 +47,10 @@ static gnrc_pktsnip_t *_build_udp_packet(const ipv6_addr_t *src,
                                          const ipv6_addr_t *dst,
                                          uint16_t src_port, uint16_t dst_port,
                                          void *data, size_t data_len,
-                                         uint16_t netif)
+                                         uint16_t netif,
+                                         const inject_aux_t *aux)
 {
-    gnrc_pktsnip_t *netif_hdr, *ipv6, *udp;
+    gnrc_pktsnip_t *netif_hdr_snip, *ipv6, *udp;
     udp_hdr_t *udp_hdr;
     ipv6_hdr_t *ipv6_hdr;
     uint16_t csum = 0;
@@ -85,23 +86,27 @@ static gnrc_pktsnip_t *_build_udp_packet(const ipv6_addr_t *src,
     else {
         udp_hdr->checksum = byteorder_htons(~csum);
     }
-    LL_APPEND(udp, ipv6);
-    netif_hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
-    if (netif_hdr == NULL) {
+    udp = gnrc_pkt_append(udp, ipv6);
+    netif_hdr_snip = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+    if (netif_hdr_snip == NULL) {
         return NULL;
     }
-    ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = (kernel_pid_t)netif;
-    LL_APPEND(udp, netif_hdr);
-    return udp;
+    gnrc_netif_hdr_t *netif_hdr = netif_hdr_snip->data;
+    netif_hdr->if_pid = (kernel_pid_t)netif;
+    if (aux) {
+        gnrc_netif_hdr_set_timestamp(netif_hdr, aux->timestamp);
+        netif_hdr->rssi = aux->rssi;
+    }
+    return gnrc_pkt_append(udp, netif_hdr_snip);
 }
 
-
-bool _inject_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
-                    uint16_t src_port, uint16_t dst_port,
-                    void *data, size_t data_len, uint16_t netif)
+bool _inject_packet_aux(const ipv6_addr_t *src, const ipv6_addr_t *dst,
+                        uint16_t src_port, uint16_t dst_port,
+                        void *data, size_t data_len, uint16_t netif,
+                        const inject_aux_t *aux)
 {
     gnrc_pktsnip_t *pkt = _build_udp_packet(src, dst, src_port, dst_port,
-                                            data, data_len, netif);
+                                            data, data_len, netif, aux);
 
     if (pkt == NULL) {
         return false;
@@ -126,9 +131,11 @@ bool _check_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
                    void *data, size_t data_len, uint16_t iface,
                    bool random_src_port)
 {
-    gnrc_pktsnip_t *pkt, *ipv6, *udp;
+    gnrc_pktsnip_t *pkt, *ipv6, *udp, *payload;
     ipv6_hdr_t *ipv6_hdr;
     udp_hdr_t *udp_hdr;
+    size_t payload_len;
+    char *payload_buf;
     msg_t msg;
 
     msg_receive(&msg);
@@ -160,12 +167,22 @@ bool _check_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
         return _res(pkt, false);
     }
     udp_hdr = udp->data;
+
+    payload = udp->next;
+    payload_buf = _rx_buf;
+    while (payload) {
+        memcpy(payload_buf, payload->data, payload->size);
+        payload_buf += payload->size;
+        payload = payload->next;
+    }
+    payload_len = payload_buf - _rx_buf;
+
     return _res(pkt, (memcmp(src, &ipv6_hdr->src, sizeof(ipv6_addr_t)) == 0) &&
                 (memcmp(dst, &ipv6_hdr->dst, sizeof(ipv6_addr_t)) == 0) &&
                 (ipv6_hdr->nh == PROTNUM_UDP) &&
                 (random_src_port || (src_port == byteorder_ntohs(udp_hdr->src_port))) &&
                 (dst_port == byteorder_ntohs(udp_hdr->dst_port)) &&
                 (udp->next != NULL) &&
-                (data_len == udp->next->size) &&
-                (memcmp(data, udp->next->data, data_len) == 0));
+                (data_len ==payload_len ) &&
+                (memcmp(data, _rx_buf, data_len) == 0));
 }

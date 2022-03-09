@@ -23,7 +23,6 @@
 #include <errno.h>
 #include <stdint.h>
 
-#include "kernel_types.h"
 #include "msg.h"
 #include "net/gnrc/pkt.h"
 #include "thread.h"
@@ -78,7 +77,7 @@ static inline int gnrc_neterr_reg(gnrc_pktsnip_t *pkt)
     if (pkt->err_sub != KERNEL_PID_UNDEF) {
         return EALREADY;
     }
-    pkt->err_sub = sched_active_pid;
+    pkt->err_sub = thread_getpid();
     return 0;
 }
 #else

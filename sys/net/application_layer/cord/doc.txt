@@ -15,11 +15,11 @@
  * # About
  * The `cord` ([Co]RE [R]esource [D]irectory) module provides endpoint and
  * lookup client functionality for interacting with CoRE Resource Directories
- * (RDs) as defined in `draft-ietf-core-resource-directory-15`.
+ * (RDs) as defined in `draft-ietf-core-resource-directory-27`.
  *
- * @see https://tools.ietf.org/html/draft-ietf-core-resource-directory-15
+ * @see https://tools.ietf.org/html/draft-ietf-core-resource-directory-27
  *
- * `draft-ietf-core-resource-directory-15` defines two types different roles for
+ * `draft-ietf-core-resource-directory-27` defines two types different roles for
  * nodes when interacting with a RD:
  * - `endpoint`: registers and manages entries at the RD
  * - `client`: performs different kind of lookups
@@ -39,7 +39,7 @@
  *   | EP |----      |                 |
  *   +----+
  * ```
- * Figure copied form `draft-ietf-core-resource-directory-15`.
+ * Figure copied form `draft-ietf-core-resource-directory-27`.
  *
  * @note In the context of this module, we refer to these roles as `endpoint
  *       (ep)` and `lookup client (lc)`. This should hopefully prevent some
@@ -49,7 +49,7 @@
  * # Structure
  *
  * This module is structured in a number of submodules with goal to reflect the
- * different roles described in `draft-ietf-core-resource-directory-15`:
+ * different roles described in `draft-ietf-core-resource-directory-27`:
  *
  * - `cord_ep`:     standard endpoint implementation following the rules as
  *                  defined i.a. in sections 5.2, 5.3, A.1, and A.2

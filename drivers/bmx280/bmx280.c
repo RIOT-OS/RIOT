@@ -28,9 +28,8 @@
 #include "assert.h"
 #include "bmx280.h"
 #include "bmx280_internals.h"
-#include "xtimer.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #ifdef BMX280_USE_SPI
@@ -51,9 +50,7 @@
 #ifdef BMX280_USE_SPI /* using SPI mode */
 static inline int _acquire(const bmx280_t *dev)
 {
-    if (spi_acquire(BUS, CS, MODE, CLK) != SPI_OK) {
-        return BMX280_ERR_BUS;
-    }
+    spi_acquire(BUS, CS, MODE, CLK);
     return BMX280_OK;
 }
 
@@ -84,9 +81,7 @@ static int _read_burst(const bmx280_t *dev, uint8_t reg, void *buf, size_t len)
 
 static inline int _acquire(const bmx280_t *dev)
 {
-    if (i2c_acquire(BUS) != 0) {
-        return BMX280_ERR_BUS;
-    }
+    i2c_acquire(BUS);
     return BMX280_OK;
 }
 
@@ -237,7 +232,6 @@ int bmx280_init(bmx280_t *dev, const bmx280_params_t *params)
     dev->params = *params;
     uint8_t reg;
 
-
 #ifdef BMX280_USE_SPI
     /* configure the chip-select pin */
     if (spi_init_cs(BUS, CS) != SPI_OK) {
@@ -255,6 +249,7 @@ int bmx280_init(bmx280_t *dev, const bmx280_params_t *params)
     /* test the connection to the device by reading and verifying its chip ID */
     if (_read_reg(dev, BMX280_CHIP_ID_REG, &reg) != BMX280_OK) {
         DEBUG("[bmx280] error: unable to read chip ID from device\n");
+        _release(dev);
         return BMX280_ERR_NODEV;
     }
     if (reg != BMX280_CHIP_ID_VAL) {

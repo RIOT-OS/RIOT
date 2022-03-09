@@ -26,9 +26,12 @@ extern "C" {
 #endif
 
 /**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
+ * @name    xtimer configuration
+ * @{
  */
-void board_init(void);
+#define XTIMER_DEV          TIMER_DEV(1)
+#define XTIMER_CHAN         (0)
+/** @} */
 
 #ifdef __cplusplus
 }

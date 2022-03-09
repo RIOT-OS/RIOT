@@ -14,6 +14,7 @@
  */
 
 #include <assert.h>
+#include <errno.h>
 #include <stdbool.h>
 
 #include "byteorder.h"
@@ -31,15 +32,16 @@
 
 #include "net/gnrc/ipv6/ext/frag.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
-static gnrc_ipv6_ext_frag_send_t _snd_bufs[GNRC_IPV6_EXT_FRAG_SEND_SIZE];
-static gnrc_ipv6_ext_frag_rbuf_t _rbuf[GNRC_IPV6_EXT_FRAG_RBUF_SIZE];
-static gnrc_ipv6_ext_frag_limits_t _limits_pool[GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE];
+static gnrc_ipv6_ext_frag_send_t _snd_bufs[CONFIG_GNRC_IPV6_EXT_FRAG_SEND_SIZE];
+static gnrc_ipv6_ext_frag_rbuf_t _rbuf[CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_SIZE];
+static gnrc_ipv6_ext_frag_limits_t _limits_pool[CONFIG_GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE];
 static clist_node_t _free_limits;
 static xtimer_t _gc_xtimer;
 static msg_t _gc_msg = { .type = GNRC_IPV6_EXT_FRAG_RBUF_GC };
+static gnrc_ipv6_ext_frag_stats_t _stats;
 
 /**
  * @todo    Implement better mechanism as described in
@@ -61,7 +63,7 @@ void gnrc_ipv6_ext_frag_init(void)
     memset(_rbuf, 0, sizeof(_rbuf));
 #endif
     _last_id = random_uint32();
-    for (unsigned i = 0; i < GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE; i++) {
         clist_rpush(&_free_limits, (clist_node_t *)&_limits_pool[i]);
     }
 }
@@ -84,8 +86,9 @@ static gnrc_ipv6_ext_frag_send_t *_snd_buf_alloc(void);
  *          datagrams and fragments.
  *
  * @param[in] snd_buf   A fragmentation send buffer entry
+ * @param[in] error     Error number for the error causing the release
  */
-static void _snd_buf_free(gnrc_ipv6_ext_frag_send_t *snd_buf);
+static void _snd_buf_free(gnrc_ipv6_ext_frag_send_t *snd_buf, int error);
 
 /**
  * @brief   Removes a fragmentation send buffer without releasing the stored
@@ -174,7 +177,7 @@ void gnrc_ipv6_ext_frag_send(gnrc_ipv6_ext_frag_send_t *snd_buf)
                     gnrc_pktbuf_release(ptr);
                 }
             }
-            _snd_buf_free(snd_buf);
+            _snd_buf_free(snd_buf, ENOSPC);
             return;
         }
         ptr = tmp;
@@ -211,7 +214,7 @@ void gnrc_ipv6_ext_frag_send(gnrc_ipv6_ext_frag_send_t *snd_buf)
     if (ptr == NULL) {
         DEBUG("ipv6_ext_frag: unable to create fragmentation header\n");
         gnrc_pktbuf_release(to_send);
-        _snd_buf_free(snd_buf);
+        _snd_buf_free(snd_buf, ENOSPC);
         return;
     }
     remaining -= sizeof(ipv6_ext_frag_t);
@@ -236,7 +239,7 @@ void gnrc_ipv6_ext_frag_send(gnrc_ipv6_ext_frag_send_t *snd_buf)
             if (ptr == NULL) {
                 DEBUG("ipv6_ext_frag: packet buffer full, canceling fragmentation\n");
                 gnrc_pktbuf_release(to_send);
-                _snd_buf_free(snd_buf);
+                _snd_buf_free(snd_buf, ENOSPC);
                 return;
             }
             assert(snd_buf->pkt->next == ptr);  /* we just created it with mark */
@@ -254,7 +257,12 @@ void gnrc_ipv6_ext_frag_send(gnrc_ipv6_ext_frag_send_t *snd_buf)
     /* tell gnrc_ipv6 to send the above prepared fragment */
     msg.type = GNRC_IPV6_EXT_FRAG_SEND;
     msg.content.ptr = to_send;
-    msg_try_send(&msg, gnrc_ipv6_pid);
+    if (msg_try_send(&msg, gnrc_ipv6_pid) <= 0) {
+        DEBUG("ipv6_ext_frag: Unable to send fragment, canceling fragmentation\n");
+        gnrc_pktbuf_release(to_send);
+        _snd_buf_free(snd_buf, ENOMEM);
+        return;
+    }
     if (last_fragment) {
         /* last fragment => we don't need the send buffer anymore.
          * But as we just sent it to gnrc_ipv6 we still need the packet
@@ -266,17 +274,23 @@ void gnrc_ipv6_ext_frag_send(gnrc_ipv6_ext_frag_send_t *snd_buf)
          * later */
         msg.type = GNRC_IPV6_EXT_FRAG_CONTINUE;
         msg.content.ptr = snd_buf;
-        msg_try_send(&msg, gnrc_ipv6_pid);
+        if (msg_try_send(&msg, gnrc_ipv6_pid) <= 0) {
+            DEBUG("ipv6_ext_frag: Unable to continue fragmentation, canceling\n");
+            _snd_buf_free(snd_buf, ENOMEM);
+        }
     }
 }
 
 static gnrc_ipv6_ext_frag_send_t *_snd_buf_alloc(void)
 {
-    for (unsigned i = 0; i < GNRC_IPV6_EXT_FRAG_SEND_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_EXT_FRAG_SEND_SIZE; i++) {
         gnrc_ipv6_ext_frag_send_t *snd_buf = &_snd_bufs[i];
         if (snd_buf->pkt == NULL) {
             return snd_buf;
         }
+    }
+    if (IS_USED(MODULE_GNRC_IPV6_EXT_FRAG_STATS)) {
+        _stats.frag_full++;
     }
     return NULL;
 }
@@ -287,13 +301,13 @@ static void _snd_buf_del(gnrc_ipv6_ext_frag_send_t *snd_buf)
     snd_buf->pkt = NULL;
 }
 
-static void _snd_buf_free(gnrc_ipv6_ext_frag_send_t *snd_buf)
+static void _snd_buf_free(gnrc_ipv6_ext_frag_send_t *snd_buf, int error)
 {
     if (snd_buf->per_frag) {
         gnrc_pktbuf_release(snd_buf->per_frag);
     }
     if (snd_buf->pkt) {
-        gnrc_pktbuf_release(snd_buf->pkt);
+        gnrc_pktbuf_release_error(snd_buf->pkt, error);
     }
     _snd_buf_del(snd_buf);
 }
@@ -420,8 +434,8 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_frag_reass(gnrc_pktsnip_t *pkt)
         goto error_release;
     }
     rbuf->arrival = xtimer_now_usec();
-    xtimer_set_msg(&_gc_xtimer, GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US, &_gc_msg,
-                   sched_active_pid);
+    xtimer_set_msg(&_gc_xtimer, CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US, &_gc_msg,
+                   thread_getpid());
     nh = fh->nh;
     offset = ipv6_ext_frag_get_offset(fh);
     switch (_overlaps(rbuf, offset, pkt->size)) {
@@ -476,8 +490,10 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_frag_reass(gnrc_pktsnip_t *pkt)
         memcpy(((uint8_t *)rbuf->pkt->data) + offset, pkt->data, pkt->size);
         /* if entry was newly created above */
         if (rbuf->pkt->next == fh_snip->next) {
-            /* we don't need the payload anymore, headers are still kept to be
-             * reused when assembled, so just remove the payload. */
+            /* we don't need the payload and fragment header anymore, the
+             * remaining headers are still kept to be reused when assembled, so
+             * just remove the payload. */
+            gnrc_pktbuf_remove_snip(pkt, fh_snip);
             gnrc_pktbuf_remove_snip(pkt, pkt);
         }
         else {
@@ -493,6 +509,10 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_frag_reass(gnrc_pktsnip_t *pkt)
         gnrc_ipv6_ext_frag_rbuf_del(rbuf);
         ipv6->len = byteorder_htons(byteorder_ntohs(ipv6->len) -
                                     sizeof(ipv6_ext_frag_t));
+        if (IS_USED(MODULE_GNRC_IPV6_EXT_FRAG_STATS)) {
+            _stats.fragments++;
+            _stats.datagrams++;
+        }
         return pkt;
     }
     else {
@@ -536,7 +556,7 @@ gnrc_ipv6_ext_frag_rbuf_t *gnrc_ipv6_ext_frag_rbuf_get(ipv6_hdr_t *ipv6,
                                                        uint32_t id)
 {
     gnrc_ipv6_ext_frag_rbuf_t *res = NULL, *oldest = NULL;
-    for (unsigned i = 0; i < GNRC_IPV6_EXT_FRAG_RBUF_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_SIZE; i++) {
         gnrc_ipv6_ext_frag_rbuf_t *tmp = &_rbuf[i];
         if (tmp->ipv6 != NULL) {
             if ((tmp->id == id) &&
@@ -555,13 +575,20 @@ gnrc_ipv6_ext_frag_rbuf_t *gnrc_ipv6_ext_frag_rbuf_get(ipv6_hdr_t *ipv6,
             oldest = tmp;
         }
     }
-    if (res == NULL) {
+    if ((res == NULL) &&
+        !IS_ACTIVE(CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_DO_NOT_OVERRIDE)) {
         assert(oldest != NULL); /* reassembly buffer is full, so there needs
                                  * to be an oldest entry */
         DEBUG("ipv6_ext_frag: dropping oldest entry\n");
+        if (IS_USED(MODULE_GNRC_IPV6_EXT_FRAG_STATS)) {
+            _stats.rbuf_full++;
+        }
         gnrc_ipv6_ext_frag_rbuf_del(oldest);
         res = oldest;
         _init_rbuf(res, ipv6, id);
+    }
+    else if (IS_USED(MODULE_GNRC_IPV6_EXT_FRAG_STATS) && (res == NULL)) {
+        _stats.rbuf_full++;
     }
     return res;
 }
@@ -578,12 +605,17 @@ void gnrc_ipv6_ext_frag_rbuf_free(gnrc_ipv6_ext_frag_rbuf_t *rbuf)
 void gnrc_ipv6_ext_frag_rbuf_gc(void)
 {
     uint32_t now = xtimer_now_usec();
-    for (unsigned i = 0; i < GNRC_IPV6_EXT_FRAG_RBUF_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_SIZE; i++) {
         gnrc_ipv6_ext_frag_rbuf_t *rbuf = &_rbuf[i];
-        if ((now - rbuf->arrival) > GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US) {
+        if ((now - rbuf->arrival) > CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US) {
             gnrc_ipv6_ext_frag_rbuf_del(rbuf);
         }
     }
+}
+
+gnrc_ipv6_ext_frag_stats_t *gnrc_ipv6_ext_frag_stats(void)
+{
+    return (IS_USED(MODULE_GNRC_IPV6_EXT_FRAG_STATS)) ? &_stats : NULL;
 }
 
 typedef struct {
@@ -695,6 +727,10 @@ static gnrc_pktsnip_t *_completed(gnrc_ipv6_ext_frag_rbuf_t *rbuf)
         /* rewrite length */
         rbuf->ipv6->len = byteorder_htons(rbuf->pkt_len);
         rbuf->pkt = NULL;
+        if (IS_USED(MODULE_GNRC_IPV6_EXT_FRAG_STATS)) {
+            _stats.fragments += clist_count(&rbuf->limits);
+            _stats.datagrams++;
+        }
         gnrc_ipv6_ext_frag_rbuf_free(rbuf);
         return res;
     }

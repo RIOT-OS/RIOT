@@ -23,10 +23,11 @@
 #include "net/gnrc.h"
 #include "gnrc_netif_xbee.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 #include "debug.h"
 
-#define BCAST   (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)
+#define BCAST           (GNRC_NETIF_HDR_FLAGS_BROADCAST | \
+                         GNRC_NETIF_HDR_FLAGS_MULTICAST)
 
 static gnrc_pktsnip_t *xbee_adpt_recv(gnrc_netif_t *netif)
 {
@@ -95,9 +96,7 @@ static gnrc_pktsnip_t *xbee_adpt_recv(gnrc_netif_t *netif)
     DEBUG("[xbee-gnrc] recv: successfully parsed packet\n");
 
     /* and append the netif header */
-    LL_APPEND(payload, netif_snip);
-
-    return payload;
+    return gnrc_pkt_append(payload, netif_snip);
 }
 
 static int xbee_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
@@ -116,12 +115,12 @@ static int xbee_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     hdr = (gnrc_netif_hdr_t *)pkt->data;
     if (hdr->flags & BCAST) {
         uint16_t addr = 0xffff;
-        res = xbee_build_hdr((xbee_t *)netif, xhdr, size, &addr, 2);
+        res = xbee_build_hdr((xbee_t *)netif->dev, xhdr, size, &addr, 2);
         DEBUG("[xbee-gnrc] send: preparing to send broadcast\n");
     }
     else {
         uint8_t *addr = gnrc_netif_hdr_get_dst_addr(hdr);
-        res = xbee_build_hdr((xbee_t *)netif, xhdr, size, addr,
+        res = xbee_build_hdr((xbee_t *)netif->dev, xhdr, size, addr,
                              hdr->dst_l2addr_len);
         if (res < 0) {
             if (res == -EOVERFLOW) {
@@ -167,10 +166,9 @@ static const gnrc_netif_ops_t _xbee_ops = {
     .set = gnrc_netif_set_from_netdev,
 };
 
-gnrc_netif_t *gnrc_netif_xbee_create(char *stack, int stacksize,
-                                     char priority, char *name,
-                                     netdev_t *dev)
+int gnrc_netif_xbee_create(gnrc_netif_t *netif, char *stack, int stacksize,
+                           char priority, char *name, netdev_t *dev)
 {
-    return gnrc_netif_create(stack, stacksize, priority, name,
+    return gnrc_netif_create(netif, stack, stacksize, priority, name,
                              dev, &_xbee_ops);
 }

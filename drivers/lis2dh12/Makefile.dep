@@ -1,0 +1,12 @@
+ifneq (,$(filter lis2dh12_spi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_spi
+endif
+
+ifneq (,$(filter lis2dh12_i2c,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
+ifneq (,$(filter lis2dh12_int,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+endif

@@ -56,8 +56,8 @@ extern "C" {
 #define CCS811_PARAMS    { .i2c_dev   = CCS811_PARAM_I2C_DEV,  \
                            .i2c_addr  = CCS811_PARAM_I2C_ADDR, \
                            .mode      = CCS811_PARAM_MODE,     \
-                           .int_mode  = CCS811_PARAM_INT_MODE, \
                            .int_pin   = CCS811_PARAM_INT_PIN,  \
+                           .int_mode  = CCS811_PARAM_INT_MODE, \
                            .wake_pin  = CCS811_PARAM_WAKE_PIN, \
                            .reset_pin = CCS811_PARAM_RESET_PIN \
                          }

@@ -25,7 +25,7 @@
 
 #include "periph/pm.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 enum system_sleepmode {
@@ -82,5 +82,5 @@ void pm_set(unsigned mode)
             break;
     }
 
-    cortexm_sleep(deep);
+    sam0_cortexm_sleep(deep);
 }

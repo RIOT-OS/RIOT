@@ -1,0 +1,59 @@
+From 43da6ef67dea118695d6b1dd2542ce1f199956e8 Mon Sep 17 00:00:00 2001
+From: Jose Alamos <jose.alamos@haw-hamburg.de>
+Date: Tue, 24 Mar 2020 14:29:26 +0100
+Subject: [PATCH] ndn-riot: add MAX_GNRC_NETIFS macro
+
+---
+ netif.c | 6 +++---
+ netif.h | 7 +++++++
+ 2 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/netif.c b/netif.c
+index 5e24c6d..7e3edb9 100644
+--- a/netif.c
++++ b/netif.c
+@@ -29,12 +29,12 @@
+ #include <random.h>
+ #include <thread.h>
+ 
+-static ndn_netif_t _netif_table[GNRC_NETIF_NUMOF];
++static ndn_netif_t _netif_table[MAX_GNRC_NETIFS];
+ 
+ void ndn_netif_auto_add(void)
+ {
+     /* initialize the netif table entry */
+-    for (int i = 0; i < GNRC_NETIF_NUMOF; ++i) {
++    for (int i = 0; i < MAX_GNRC_NETIFS; ++i) {
+         _netif_table[i].iface = KERNEL_PID_UNDEF;
+     }
+ 
+@@ -99,7 +99,7 @@ static ndn_netif_t* _ndn_netif_find(kernel_pid_t iface)
+ {
+     if (iface == KERNEL_PID_UNDEF) return NULL;
+ 
+-    for (int i = 0; i < GNRC_NETIF_NUMOF; ++i) {
++    for (int i = 0; i < MAX_GNRC_NETIFS; ++i) {
+         if (_netif_table[i].iface == iface)
+             return &_netif_table[i];
+     }
+diff --git a/netif.h b/netif.h
+index 1e7fbdc..2175858 100644
+--- a/netif.h
++++ b/netif.h
+@@ -24,6 +24,13 @@
+ 
+ #include "encoding/block.h"
+ 
++/**
++ * @brief Max number of GNRC network interfaces
++ */
++#ifndef MAX_GNRC_NETIFS
++#define MAX_GNRC_NETIFS (1)
++#endif
++
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+-- 
+2.25.0
+

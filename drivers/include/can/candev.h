@@ -35,7 +35,6 @@ extern "C" {
 #include "can/common.h"
 #include "mutex.h"
 
-
 /**
  * @brief   Possible event types that are sent from the device driver to the
  *          upper layer
@@ -64,7 +63,7 @@ typedef struct candev candev_t;
  * @brief   Event callback for signaling event to upper layers
  *
  * @param[in] dev           CAN device descriptor
- * @param[in] type          type of the event
+ * @param[in] event         type of the event
  * @param[in] arg           event argument
  */
 typedef void (*candev_event_cb_t)(candev_t *dev, candev_event_t event, void *arg);

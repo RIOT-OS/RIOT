@@ -25,15 +25,24 @@
 
 #ifdef RIOT_VERSION
 
-/* RIOT has its own putchar function which writes to UART */
-extern int putchar(int c);
-#define uart_putc putchar
+/* the putchar definition from stdio.h can't be used here */
+#undef putchar
 
-#else /* RIOT_VERSION */
+/* inidicator is true when stdio is initialized */
+int stdio_is_initialized = 0;
+
+#endif /* RIOT_VERSION */
 
 #ifndef CONFIG_CONSOLE_UART_NONE
 static void uart_putc(int c)
 {
+#ifdef RIOT_VERSION
+    if (stdio_is_initialized) {
+        putchar(c);
+        return;
+    }
+#endif /* RIOT_VERSION */
+
     while (1) {
         uint32_t fifo_cnt = READ_PERI_REG(UART_STATUS(CONFIG_CONSOLE_UART_NUM)) & (UART_TXFIFO_CNT << UART_TXFIFO_CNT_S);
 
@@ -46,8 +55,6 @@ static void uart_putc(int c)
 #else
 #define uart_putc(_c) { }
 #endif
-
-#endif /* RIOT_VERSION */
 
 int __attribute__ ((weak)) ets_putc(int c)
 {

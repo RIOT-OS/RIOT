@@ -1,0 +1,218 @@
+/*
+ * Copyright (C) 2021 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup    fido2 FIDO2 - Fast Identity Online 2
+ * @ingroup     sys
+ * @brief       Description of the FIDO2 CTAP implementation in RIOT
+ * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
+ *
+ * @warning This feature is experimental!
+ *          This API is experimental and in an early state - expect changes.
+ *
+ * @warning The FIDO2 implementation currently stores private keys in plain text inside flash memory.
+ *
+ * FIDO2 is an authentication standard that seeks to solve the password problem
+ * by enabling passwordless authentication. Instead of using passwords to
+ * authenticate to web services, FIDO2 enables users to use common devices
+ * (authenticators) to create cryptographic credentials which are then used
+ * for authentication. FIDO2 consists of the [W3C Web Authentication
+ * specification (WebAuthn)](https://www.w3.org/TR/2019/REC-webauthn-1-20190304/)
+ * and the [Client to Authenticator Protocol (CTAP)](https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html).
+ *
+ * **This code implements the FIDO2 CTAP protocol.**
+ *
+ * ### General
+ *
+ * Following is an overview of the entities of this implementation and their relationships:
+ *
+ *
+ *                     +-----------+  +-----------+   +-----------+   +-----------+
+ *                     |           |  |           |   |           |   |           |
+ *                     | ctap_cbor |  |ctap_crypto|   | ctap_mem  |   |ctap_utils |
+ *                     |           |  |           |   |           |   |           |
+ *                     +-----------+  +-----------+   +-----------+   +-----|-----+
+ *                           |             |               |                |
+ *                           |             |               |                |
+ *                           |         +---------------------------+        |
+ *                           |         |                           |        |
+ *                           |---------|           ctap            |--------|
+ *                                     |                           |
+ *                                     +---------------------------+
+ *                                                   |
+ *                                     +-------------|-------------+
+ *                                     |                           |
+ *                                     |       ctap_transport      |
+ *                                     |                           |
+ *                                     +---------------------------+
+ *                                           |
+ *                                           |
+ *                                     +-----------+
+ *                                     |           |
+ *                                     | ctap_hid  |
+ *                                     |           |
+ *                                     +-----------+
+ *
+ *
+ *
+ * **ctap_hid**
+ *
+ * USB Human Interface Device (USB HID) transport binding for CTAP (CTAPHID).
+ *
+ * Initializes the USBUS HID interface.
+ *
+ * Communicates with the USBUS USB HID interface through the USBUS HID IO interface.
+ *
+ * **ctap_transport**
+ *
+ * Initializes CTAP layer.
+ *
+ * Initializes CTAP event queue.
+ *
+ * Manages CTAP transport bindings (currently only CTAPHID).
+ *
+ * **ctap**
+ *
+ * Contains the main CTAP logic.
+ *
+ * Makes use of helpers for flash access, cryptographic operations and CBOR operations.
+ *
+ * **ctap_cbor**
+ *
+ * Helper containing functionality to parse and encode CBOR messages. Uses the [tinyCBOR](https://doc.riot-os.org/group__pkg__tinycbor.html) pkg.
+ *
+ * **ctap_crypto**
+ *
+ * Helper containing functionality for cryptographic operations.
+ *
+ * Abstraction for cryptographic operations (SHA256, HMAC-SHA-256, AES CCM).
+ *
+ * @note This abstraction exposes error return values which are currently not implemented in all cases by the RIOT crypto API.
+ *
+ * Abstraction for Elliptic curve cryptography (ECC) operations. Uses the [micro-ecc](https://api.riot-os.org/group__pkg__micro__ecc.html) pkg.
+ *
+ * Parsing of cryptographic signatures into ASN.1 DER format. Uses the [tiny-asn1](http://doc.riot-os.org/group__pkg__tiny-asn1.html) pkg.
+ *
+ * **ctap_mem**
+ *
+ * Abstraction for flash operations. Uses the RIOT [Flashpage MTD driver](http://api.riot-os.org/group__drivers__mtd__flashpage.html).
+ *
+ * Adds additional functionality to speedup flash accesses (e.g. by checking if a flash page is erased to avoid unnecessary erasures of flash pages).
+ *
+ * **ctap_utils**
+ *
+ * Abstraction for GPIO functionality and LED animations.
+ *
+ * ### Implemented features
+ * **FIDO2 CTAP methods**
+ *
+ * All methods defined in the FIDO2 CTAP specification are implemented. Specifically
+ * these are:
+ *      * MakeCredential
+ *      * GetAssertion
+ *      * GetNextAssertion
+ *      * GetInfo
+ *      * ClientPIN
+ *      * Reset
+ *
+ * For information about the FIDO2 CTAP methods refer to the [CTAP specification](https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html#authenticator-api).
+ *
+ * **Transport bindings**
+ *
+ * The USB Human Interface Device (USB HID) transport binding is fully implemented.
+ *
+ * For more information about the available transport bindings refer to the [CTAP specification](https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html#transport-specific-bindings).
+ *
+ * **Credentials**
+ *
+ * Both types of credentials are supported. Resident and non resident.
+ *
+ *  * Resident Credentials
+ *      * Resident credentials are credentials stored on the authenticator.
+ *      * This implementation stores resident keys in flash memory.
+ *      @warning As of now the credentials (containing a private key) are stored
+ *       in plain text inside flash memory
+ *
+ *  * Non-resident credentials
+ *      * Non-resident credentials are credentials that are stored by the relying
+ *        party in encrypted form.
+ *      * To encrypt the credentials, this implementation uses the RIOT [AES-CCM 128
+ *        CCM implementation](https://api.riot-os.org/ccm_8h.html).
+ *
+ * For more information about the two types of credential refer to the [WebAuthn specification](https://www.w3.org/TR/2019/REC-webauthn-1-20190304/#sctn-credential-storage-modality)
+ *
+ * **Attestation types**
+ *
+ * Currently only self attestation is supported.
+ *
+ * For more information about available attestation types refer to the [WebAuthn specification](https://www.w3.org/TR/2019/REC-webauthn-1-20190304/#sctn-attestation-types).
+ *
+ * ### Unimplemented features
+ *
+ * **Backward compatibility with FIDO1**
+ *
+ * For more information about the backward compatibility of FIDO2 to FIDO1
+ * refer to the [CTAP specification](https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html#u2f-interoperability).
+ *
+ * **Support of further attestation types**
+ *
+ * Specifically these are:
+ *  * Basic Attestation
+ *  * Attestation Certificate Authority
+ *  * Elliptic Curve based Direct Anonymous Attestation
+ *
+ * For more information about available attestation types refer to the [WebAuthn specification](https://www.w3.org/TR/2019/REC-webauthn-1-20190304/#sctn-attestation-types).
+ *
+ * **Support of further transport bindings**
+ *
+ * Specifically these are:
+ *  * Near Field Communication (NFC)
+ *  * Bluetooth Low Energy (BLE)
+ *
+ * For information about the available transport bindings refer to the
+ * [CTAP specification](https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html#transport-specific-bindings).
+ *
+ * **Extensions**
+ *
+ * For information about CTAP extensions refer to the [CTAP specification](https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html#sctn-defined-extensions)
+ *
+ * **CTAP 2.1 support**
+ *
+ * None of the additions from the [CTAP 2.1 specification](https://fidoalliance.org/specs/fido-v2.1-ps-20210615/fido-client-to-authenticator-protocol-v2.1-ps-20210615.html)  are implemented.
+ *
+ * ### Testing
+ *
+ * Testing is done with the help of the fido2-tests package based on the [solokeys fido2-tests](https://github.com/solokeys/fido2-tests).
+ *
+ * For for more information about testing the FIDO2 CTAP implementation refer to the README of the test application (`/tests/sys_fido2_ctap`).
+ *
+ * **Todo**
+ *
+ * * The expected return codes of some tests were changed due to different opinions of how to interpret the CTAP2 specification. Refer to the [issue](https://github.com/solokeys/fido2-tests/issues/55) for more information. As of writing this the issue is still open.
+ *
+ * ### Configuration
+ *
+ * There are two CFLAGS which can be used to change the behavior of the FIDO2 CTAP implementation:
+ *
+ *  * **FIDO2_CTAP_DISABLE_UP**: Disables the user presence test. User presence will always be set to true.
+ * This is helpful when running the fido2-tests as one doesn't have to click the button many times, as well as other use cases
+ * where no user presence test is wanted.
+ *  * **FIDO2_CTAP_DISABLE_LED**: Disables LED animations which are used to indicate that user action is needed.
+ *
+ * The CFLAGS can either be set in the Makefile or configured via KConfig.
+ *
+ * ### Future work
+ *
+ * Future improvements / extensions to the FIDO2 CTAP implementation that should be implemented are:
+ *
+ * * Usage of secure elements if available to safely store private keys of FIDO2 credentials.
+ * * Usage of an extra cryptographic processor (e.g. [ARM CryptoCell](https://infocenter.nordicsemi.com/index.jsp?topic=%2Fps_nrf9160%2Fcryptocell.html)) to improve efficiency and drop dependency for ECC cryptography.
+ * * Support of further attestation types.
+ * * Support of further CTAP transport bindings.
+ * * Support of CTAP 2.1.
+ */

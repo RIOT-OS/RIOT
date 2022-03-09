@@ -1,0 +1,65 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig KCONFIG_USEMODULE_DHCPV6
+    bool "Configure DHCPv6"
+    depends on USEMODULE_DHCPV6
+    help
+        Configure DHCPv6 using Kconfig.
+
+if KCONFIG_USEMODULE_DHCPV6
+menuconfig KCONFIG_USEMODULE_DHCPV6_CLIENT
+    bool "Configure DHCPv6 client"
+    depends on USEMODULE_DHCPV6_CLIENT
+    help
+        Configure DHCPv6 client using Kconfig.
+
+if KCONFIG_USEMODULE_DHCPV6_CLIENT
+
+config DHCPV6_CLIENT_ADDR_LEASE_MAX
+    int "Maximum number of leases to be stored"
+    default 1
+
+config DHCPV6_CLIENT_PFX_LEASE_MAX
+    int "Maximum number of prefix leases to be stored"
+    default 1
+
+menuconfig KCONFIG_USEMODULE_DHCPV6_CLIENT_MUD_URL
+    bool "Enable DHCPv6 Client MUD URL"
+    help
+        Enable the inclusion of a MUD URL in DHCPv6 packets
+        as specified in RFC 8520, section 10. This URL
+        has to point to a MUD file containing YANG-based JSON
+        with a description of the device and its suggested
+        network behavior. The URL must use the "https" scheme.
+
+if KCONFIG_USEMODULE_DHCPV6_CLIENT_MUD_URL
+
+config DHCPV6_CLIENT_MUD_URL
+    string "URL pointing to a Manufacturer Usage Description file"
+
+endif # KCONFIG_USEMODULE_DHCPV6_CLIENT_MUD_URL
+endif # KCONFIG_USEMODULE_DHCPV6_CLIENT
+
+menuconfig KCONFIG_USEMODULE_DHCPV6_RELAY
+    bool "Configure DHCPv6 relay agent"
+    depends on USEMODULE_DHCPV6_RELAY
+    help
+        Configure DHCPv6 relay agent using Kconfig.
+
+if KCONFIG_USEMODULE_DHCPV6_RELAY
+
+config DHCPV6_RELAY_HOP_LIMIT
+    int "Maximum hop count in relay-forward message (HOP_COUNT_LIMIT)"
+    default 8
+
+config DHCPV6_RELAY_BUFLEN
+    int "Default length of relay agent send and receive buffer"
+    default 256
+
+endif # KCONFIG_USEMODULE_DHCPV6_RELAY
+endif # KCONFIG_USEMODULE_DHCPV6

@@ -1,0 +1,18 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD
+    default "blackpill" if BOARD_BLACKPILL
+
+config BOARD_BLACKPILL
+    bool
+    default y
+    select BOARD_COMMON_BLXXXPILL
+    select CPU_MODEL_STM32F103C8
+    select MODULE_BOARDS_COMMON_BLXXXPILL if TEST_KCONFIG
+
+source "$(RIOTBOARD)/common/blxxxpill/Kconfig"

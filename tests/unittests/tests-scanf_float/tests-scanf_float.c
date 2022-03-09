@@ -24,7 +24,6 @@
 
 #include "tests-scanf_float.h"
 
-
 #define TEST_EASY(name, format, constant) static void test_ ## name (void) \
 {\
     int items;\

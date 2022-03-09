@@ -1,0 +1,15 @@
+# Select a C library
+FEATURES_REQUIRED_ANY += newlib|picolibc
+ifneq (,$(filter newlib,$(USEMODULE)))
+  DEFAULT_MODULE += newlib_nano
+  USEMODULE += newlib_syscalls_default
+endif
+
+# Tell the build system that the CPU depends on the risc-v common files:
+USEMODULE += riscv_common
+
+# include common periph code
+USEMODULE += riscv_common_periph
+
+# Make calls to malloc and friends thread-safe
+USEMODULE += malloc_thread_safe

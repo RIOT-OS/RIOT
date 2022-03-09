@@ -1,0 +1,26 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_PERIPH_FLEXCOMM
+    bool
+    depends on TEST_KCONFIG
+    default y if MODULE_PERIPH_UART || MODULE_PERIPH_I2C || MODULE_PERIPH_SPI
+    help
+      Flexcomm interrupt dispatch driver.
+
+config MODULE_PERIPH_GPIO_MUX
+    bool
+    depends on TEST_KCONFIG
+    help
+      Common Pin MUX functions for qn908x CPUs.
+
+config MODULE_PERIPH_ADC
+    bool "ADC peripheral driver"
+    depends on HAS_PERIPH_ADC
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_USEC
+    select MODULE_ZTIMER_PERIPH_TIMER

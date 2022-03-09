@@ -21,7 +21,7 @@
 
 #include "periph/pwm.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 #include "debug.h"
 
 /**
@@ -90,12 +90,12 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     /* pin configuration */
     for (unsigned i = 0; i < PWM_CHANNELS; i++) {
-        if (pwm_config[pwm].pin[i] != GPIO_UNDEF) {
-            NRF_P0->PIN_CNF[pwm_config[pwm].pin[i]] = PIN_CNF_SET;
-        }
         /* either left aligned pol or inverted duty cycle */
         pwm_seq[pwm][i] = (POL_MASK & mode) ? POL_MASK : res;
-        dev(pwm)->PSEL.OUT[i] = pwm_config[pwm].pin[i];
+        /* Sign-extend the undefined pin into a value that also sets the
+         * 'Disconnected' field, and is also that register's reset state */
+        uint32_t extended_pin = (int32_t)(int8_t)pwm_config[pwm].pin[i];
+        dev(pwm)->PSEL.OUT[i] = extended_pin;
         DEBUG("set PIN[%i] to %i with 0x%x\n",
               (int)i, (int)pwm_config[pwm].pin[i], pwm_seq[pwm][i]);
     }
@@ -118,7 +118,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     /* setup the sequence */
     dev(pwm)->SEQ[0].PTR = (uint32_t)pwm_seq[pwm];
-    dev(pwm)->SEQ[0].CNT = pwm_channels(pwm);
+    dev(pwm)->SEQ[0].CNT = PWM_CHANNELS;
     dev(pwm)->SEQ[0].REFRESH = 0;
     dev(pwm)->SEQ[0].ENDDELAY = 0;
 

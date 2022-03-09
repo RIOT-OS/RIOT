@@ -1,0 +1,5 @@
+# Parse kconfig symbol `CONFIG_SKALD_ADV_CHANNELS` to an ordered list
+ifdef CONFIG_SKALD_ADV_CHANNELS
+  SKALD_ADV_CHAN := { $(shell echo $(CONFIG_SKALD_ADV_CHANNELS)) }
+  CFLAGS += -DSKALD_ADV_CHAN="$(SKALD_ADV_CHAN)"
+endif

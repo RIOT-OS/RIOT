@@ -1,0 +1,15 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_SHELL_COMMANDS
+    bool "Basic shell commands"
+    depends on MODULE_SHELL
+
+config MODULE_I2C_SCAN
+    bool "I2c scanner"
+    depends on MODULE_SHELL
+    depends on MODULE_PERIPH_I2C

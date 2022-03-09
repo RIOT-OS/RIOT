@@ -1,0 +1,116 @@
+#
+# ztimer dependencies
+#
+
+# "ztimer" is the default meta-module of ztimer
+ifneq (,$(filter ztimer,$(USEMODULE)))
+  USEMODULE += ztimer_core
+  USEMODULE += ztimer_convert_frac
+  USEMODULE += ztimer_convert_shift
+  DEFAULT_MODULE += auto_init_ztimer
+  DEFAULT_MODULE += ztimer_init
+endif
+
+# unless ztimer_xtimer_compat is used, make xtimer use ztimer_usec as backend.
+ifneq (,$(filter ztimer,$(USEMODULE)))
+  ifneq (,$(filter xtimer,$(USEMODULE)))
+    ifeq (,$(filter ztimer_xtimer_compat ztimer64_xtimer_compat,$(USEMODULE)))
+      USEMODULE += xtimer_on_ztimer
+    else
+      USEMODULE += div
+    endif
+  endif
+  ifneq (,$(filter evtimer,$(USEMODULE)))
+    USEMODULE += evtimer_on_ztimer
+  endif
+endif
+
+ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+  USEMODULE += ztimer_usec
+endif
+
+ifneq (,$(filter ztimer64_xtimer_compat,$(USEMODULE)))
+  USEMODULE += ztimer64_usec
+  USEMODULE += ztimer_xtimer_compat
+endif
+
+# make xtimer use ztimer_usec as low level timer
+ifneq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
+  USEMODULE += ztimer_usec
+endif
+
+# make evtimer use ztimer_msec as low level timer
+ifneq (,$(filter evtimer_on_ztimer,$(USEMODULE)))
+  USEMODULE += ztimer_msec
+endif
+
+ifneq (,$(filter ztimer_%,$(USEMODULE)))
+  USEMODULE += ztimer_core
+  USEMODULE += ztimer_extend
+endif
+
+ifneq (,$(filter ztimer_convert_%,$(USEMODULE)))
+  USEMODULE += ztimer_convert
+endif
+
+ifneq (,$(filter ztimer_periph_timer,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_timer
+endif
+
+ifneq (,$(filter ztimer_periph_rtc,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_rtc
+endif
+
+ifneq (,$(filter ztimer_periph_rtt,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_rtt
+endif
+
+ifneq (,$(filter ztimer_periph_ptp,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_ptp_timer
+endif
+
+ifneq (,$(filter ztimer_convert_frac,$(USEMODULE)))
+  USEMODULE += frac
+endif
+
+ifneq (,$(filter ztimer_usec,$(USEMODULE)))
+  USEMODULE += ztimer
+  USEMODULE += ztimer_periph_timer
+endif
+
+# NOTE: select the module here and not in the CPU so that order of inclusion
+# does not have periph_rtt selected earlier that it should be while at the same
+# time avoiding the module 'ztimer-no_periph_rtt' being included unecesarily.
+# The sam0 rtt busy loops for 180us every time an alarm is set or
+# the counter is read, this propagates and leads to timing errors
+# on ztimer_msec that are higher than > +-1msec.
+# The same goes for the fe310 rtt.
+ifneq (,$(filter sam% fe310,$(CPU)))
+  USEMODULE += ztimer_no_periph_rtt
+endif
+
+ifneq (,$(filter ztimer_msec ztimer_sec,$(USEMODULE)))
+  USEMODULE += ztimer
+  ifeq (,$(filter ztimer_no_periph_rtt,$(USEMODULE)))
+    FEATURES_OPTIONAL += periph_rtt
+    # HACK: periph_rtt will get used only in the next iteration but an updated
+    # state for FEATURES_USED is needed here so include `features_check.inc.mk`
+    # here instead.
+    # An other option would be to check FEATURES_PROVIDED this would avoid the
+    # order of inclusion problem but it would no take into account possible conflicts
+    # and is also currently not allowed in the build system.
+    # An other alternative would be to delay to the next loop, but this produce a
+    # case where another loop is not executed and the conditional not evaluated
+    # If these kind of usecases pop up before Kconfig migration is completed
+    # then another alternative would be introduce a variable to require an extra
+    # loop independent of USEMODULE, FEATURES_REQUIRED and USEPKG
+    include $(RIOTMAKE)/features_check.inc.mk
+    ifneq (,$(filter periph_rtt,$(FEATURES_USED)))
+      USEMODULE += ztimer_periph_rtt
+    else
+      USEMODULE += ztimer_periph_timer
+    endif
+  else
+    USEMODULE += ztimer_periph_timer
+  endif
+endif

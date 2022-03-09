@@ -16,6 +16,9 @@
  * @}
  */
 
+#define USB_H_USER_IS_RIOT_INTERNAL
+
+#include <assert.h>
 #include <string.h>
 
 #include "tsrb.h"
@@ -26,7 +29,7 @@
 #include "usb/usbus/cdc/acm.h"
 #include "usb/usbus/control.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static void _init(usbus_t *usbus, usbus_handler_t *handler);
@@ -86,7 +89,7 @@ static size_t _gen_mngt_descriptor(usbus_t *usbus, usbus_cdcacm_device_t *cdcacm
     mngt.length = sizeof(usb_desc_call_mngt_t);
     mngt.type = USB_TYPE_DESCRIPTOR_CDC;
     mngt.subtype = USB_CDC_DESCR_SUBTYPE_CALL_MGMT;
-    mngt.capabalities = 0;
+    mngt.capabilities = 0;
     mngt.data_if = cdcacm->iface_data.idx;
     usbus_control_slicer_put_bytes(usbus, (uint8_t*)&mngt, sizeof(mngt));
     return sizeof(usb_desc_call_mngt_t);
@@ -114,7 +117,7 @@ static size_t _gen_acm_descriptor(usbus_t *usbus)
     acm.type = USB_TYPE_DESCRIPTOR_CDC;
     acm.subtype = USB_CDC_DESCR_SUBTYPE_ACM;
     /* Support for Set/Get_Line_coding, Control_State, and Serial_State notif */
-    acm.capabalities = 0x02;
+    acm.capabilities = 0x02;
     usbus_control_slicer_put_bytes(usbus, (uint8_t*)&acm, sizeof(acm));
     return sizeof(usb_desc_acm_t);
 }
@@ -145,15 +148,35 @@ static size_t _gen_full_acm_descriptor(usbus_t *usbus, void *arg)
 /* Submit (ACM interface in) */
 size_t usbus_cdc_acm_submit(usbus_cdcacm_device_t *cdcacm, const uint8_t *buf, size_t len)
 {
-    return tsrb_add(&cdcacm->tsrb, buf, len);
+    size_t n;
+    unsigned old;
+    if (cdcacm->state != USBUS_CDC_ACM_LINE_STATE_DISCONNECTED) {
+        old = irq_disable();
+        n = tsrb_add(&cdcacm->tsrb, buf, len);
+        irq_restore(old);
+        return n;
+    }
+    /* stuff as much data as possible into tsrb, discarding the oldest */
+    old = irq_disable();
+    n = tsrb_free(&cdcacm->tsrb);
+    if (len > n) {
+        n += tsrb_drop(&cdcacm->tsrb, len - n);
+        buf += len - n;
+    } else {
+        n = len;
+    }
+    tsrb_add(&cdcacm->tsrb, buf, n);
+    /* behave as if everything has been written correctly */
+    irq_restore(old);
+    return len;
 }
 
 void usbus_cdc_acm_set_coding_cb(usbus_cdcacm_device_t *cdcacm,
                                  usbus_cdcacm_coding_cb_t coding_cb)
 {
-    irq_disable();
+    unsigned old = irq_disable();
     cdcacm->coding_cb = coding_cb;
-    irq_enable();
+    irq_restore(old);
 }
 
 /* flush event */
@@ -190,13 +213,13 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     cdcacm->cdcacm_descr.arg = cdcacm;
 
     /* Configure Interface 0 as control interface */
-    cdcacm->iface_ctrl.class = USB_CLASS_CDC_CONTROL ;
+    cdcacm->iface_ctrl.class = USB_CLASS_CDC_CONTROL;
     cdcacm->iface_ctrl.subclass = USB_CDC_SUBCLASS_ACM;
     cdcacm->iface_ctrl.protocol = USB_CDC_PROTOCOL_NONE;
     cdcacm->iface_ctrl.descr_gen = &cdcacm->cdcacm_descr;
     cdcacm->iface_ctrl.handler = handler;
     /* Configure second interface to handle data endpoint */
-    cdcacm->iface_data.class = USB_CLASS_CDC_DATA ;
+    cdcacm->iface_data.class = USB_CLASS_CDC_DATA;
     cdcacm->iface_data.subclass = USB_CDC_SUBCLASS_NONE;
     cdcacm->iface_data.protocol = USB_CDC_PROTOCOL_NONE;
     cdcacm->iface_data.descr_gen = NULL;
@@ -210,14 +233,14 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     usbus_enable_endpoint(ep);
     ep = usbus_add_endpoint(usbus, &cdcacm->iface_data,
                             USB_EP_TYPE_BULK, USB_EP_DIR_IN,
-                            USBUS_CDC_ACM_BULK_EP_SIZE);
+                            CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE);
     ep->interval = 0; /* Interval is not used with bulk endpoints */
     usbus_enable_endpoint(ep);
     /* Store the endpoint reference to activate it
      * when DTE present is signalled by the host */
     ep = usbus_add_endpoint(usbus, &cdcacm->iface_data,
                             USB_EP_TYPE_BULK, USB_EP_DIR_OUT,
-                            USBUS_CDC_ACM_BULK_EP_SIZE);
+                            CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE);
     ep->interval = 0; /* Interval is not used with bulk endpoints */
     usbus_enable_endpoint(ep);
 
@@ -234,10 +257,17 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
 {
     (void)state;
     usbus_cdcacm_device_t *cdcacm = (usbus_cdcacm_device_t*)handler;
-    switch(setup->request) {
+    switch (setup->request) {
         case USB_CDC_MGNT_REQUEST_SET_LINE_CODING:
-            if ((state == USBUS_CONTROL_REQUEST_STATE_OUTDATA) &&
-                    (setup->length == sizeof(usb_req_cdcacm_coding_t))) {
+            if (!(cdcacm->coding_cb)) {
+                /* Line coding not supported, return STALL */
+                DEBUG("CDCACM: line coding not supported\n");
+                return -1;
+            }
+            if (setup->length != sizeof(usb_req_cdcacm_coding_t)) {
+                return -1; /* Incorrect amount of data expected */
+            }
+            if (state == USBUS_CONTROL_REQUEST_STATE_OUTDATA) {
                 size_t len = 0;
                 usb_req_cdcacm_coding_t *coding =
                     (usb_req_cdcacm_coding_t*)usbus_control_get_out_data(usbus,
@@ -275,7 +305,8 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
                 usbus_endpoint_t *data_out = usbus_interface_find_endpoint(
                         &cdcacm->iface_data, USB_EP_TYPE_BULK, USB_EP_DIR_OUT);
                 assert(data_out);
-                usbdev_ep_ready(data_out->ep, 0);
+                usbdev_ep_xmit(data_out->ep, cdcacm->out_buf,
+                               CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE);
                 usbus_cdc_acm_flush(cdcacm);
             }
             else {
@@ -297,14 +328,17 @@ static void _handle_in(usbus_cdcacm_device_t *cdcacm,
         (cdcacm->state != USBUS_CDC_ACM_LINE_STATE_DTE)) {
         return;
     }
+    /* copy at most CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE chars from input into ep->buf */
+    unsigned old = irq_disable();
     while (!tsrb_empty(&cdcacm->tsrb)) {
         int c = tsrb_get_one(&cdcacm->tsrb);
-        ep->buf[cdcacm->occupied++] = (uint8_t)c;
-        if (cdcacm->occupied >= USBUS_CDC_ACM_BULK_EP_SIZE) {
+        cdcacm->in_buf[cdcacm->occupied++] = (uint8_t)c;
+        if (cdcacm->occupied >= CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE) {
             break;
         }
     }
-    usbdev_ep_ready(ep, cdcacm->occupied);
+    irq_restore(old);
+    usbdev_ep_xmit(ep, cdcacm->in_buf, cdcacm->occupied);
 }
 
 static void _transfer_handler(usbus_t *usbus, usbus_handler_t *handler,
@@ -318,9 +352,9 @@ static void _transfer_handler(usbus_t *usbus, usbus_handler_t *handler,
         /* Retrieve incoming data */
         usbdev_ep_get(ep, USBOPT_EP_AVAILABLE, &len, sizeof(size_t));
         if (len > 0) {
-            cdcacm->cb(cdcacm, ep->buf, len);
+            cdcacm->cb(cdcacm, cdcacm->out_buf, len);
         }
-        usbdev_ep_ready(ep, 0);
+        usbdev_ep_xmit(ep, cdcacm->out_buf, CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE);
     }
     if ((ep->dir == USB_EP_DIR_IN) && (ep->type == USB_EP_TYPE_BULK)) {
         cdcacm->occupied = 0;
@@ -350,7 +384,7 @@ static void _handle_reset(usbus_handler_t *handler)
 static void _event_handler(usbus_t *usbus, usbus_handler_t *handler, usbus_event_usb_t event)
 {
     (void)usbus;
-    switch(event) {
+    switch (event) {
         case USBUS_EVENT_USB_RESET:
             _handle_reset(handler);
             break;

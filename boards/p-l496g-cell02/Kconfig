@@ -1,0 +1,34 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD
+    default "p-l496g-cell02" if BOARD_P_L496G_CELL02
+
+config BOARD_P_L496G_CELL02
+    bool
+    default y
+    select CPU_MODEL_STM32L496AG
+
+    # Put defined MCU peripherals here (in alphabetical order)
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_LPUART
+    select HAS_PERIPH_RTC
+    select HAS_PERIPH_RTT
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+    select HAS_PERIPH_USBDEV
+
+    # Put other features for this board (in alphabetical order)
+    select HAS_RIOTBOOT
+
+    # Clock configuration
+    select BOARD_HAS_LSE
+
+    select HAVE_SAUL_GPIO
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"

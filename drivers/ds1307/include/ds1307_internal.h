@@ -64,7 +64,6 @@ extern "C" {
 #define DS1307_YEAR_OFFSET          (-100)  /**< offset in years from 1900 */
 /** @} */
 
-
 #ifdef __cplusplus
 }
 #endif

@@ -25,8 +25,6 @@
 #include "thread.h"
 #include "mutex.h"
 
-#include "test_utils/interactive_sync.h"
-
 #ifndef PROBLEM
 #define PROBLEM 12
 #endif
@@ -65,8 +63,6 @@ int main(void)
     msg_t args[PROBLEM];
     kernel_pid_t ths;
     uint32_t factorial = 1;
-
-    test_utils_interactive_sync();
 
     printf("[START] compute %d! (factorial).\n", PROBLEM);
 

@@ -1,7 +1,7 @@
-From 7bcfa3205fc5f36445cc9b03d400278be2dad673 Mon Sep 17 00:00:00 2001
+From b9b3409270387c7edf6df440cb3e1ad00e6205e6 Mon Sep 17 00:00:00 2001
 From: Martine Lenders <mail@martine-lenders.eu>
 Date: Thu, 12 May 2016 16:07:35 +0200
-Subject: [PATCH] Fix warnings
+Subject: [PATCH 1/2] Fix warnings
 
 ---
  libfixmath/fix16_str.c                            |  8 ++++----
@@ -83,5 +83,5 @@ index bac57d2..57ad8f8 100644
  
 -
 -- 
-2.20.1
+2.27.0
 

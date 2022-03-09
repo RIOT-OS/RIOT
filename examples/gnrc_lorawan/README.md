@@ -8,13 +8,14 @@ able to send and receive LoRaWAN packets and perform basic LoRaWAN commands
 The MAC layers still doesn't implement any duty cycle restriction mechanism.
 However, it respects the retransmission procedure.
 
-Only Class A and EU868 region are supported so far.
+Only Class A in EU868 and IN865 regions are supported so far.
 
 Usage
 =====
 
 It's necessary to join the LoRaWAN network either via OTAA or ABP.
 All keys, addresses and EUIs are in network endian (big endian).
+Region need to be set in the Makefile.
 
 ## OTAA
 
@@ -28,6 +29,7 @@ ifconfig 3 set appeui BBBBBBBBBBBBBBBB
 ifconfig 3 set appkey CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 ifconfig 3 up
 ```
+If Chirpstack is being used, the AppEUI is ignored.
 
 Wait for 5-6 seconds. Type `ifconfig`. The link status should be `up`:
 
@@ -60,20 +62,25 @@ select join mode and type `ifconfig <if_pid> up`.
 E.g in the application Makefile:
 
 ```
-CFLAGS += -DLORAMAC_DEV_EUI_DEFAULT=\{0xAA\,0xAA\,0xAA\,0xAA\,0xAA\,0xAA\,0xAA\,0xAA\}
-CFLAGS += -DLORAMAC_APP_EUI_DEFAULT=\{0xBB\,0xBB\,0xBB\,0xBB\,0xBB\,0xBB\,0xBB\,0xBB\}
-CFLAGS += -DLORAMAC_APP_KEY_DEFAULT=\{0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\}
-CFLAGS += -DLORAMAC_APP_SKEY_DEFAULT=\{0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\}
-CFLAGS += -DLORAMAC_NWK_SKEY_DEFAULT=\{0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\}
-CFLAGS += -DLORAMAC_DEV_ADDR_DEFAULT=\{0xFF\,0xFF\,0xFF\,0xFF\}
+CFLAGS += -DCONFIG_LORAMAC_DEV_EUI_DEFAULT=\"AAAAAAAAAAAAAAAA\"
+CFLAGS += -DCONFIG_LORAMAC_APP_EUI_DEFAULT=\"BBBBBBBBBBBBBBBB\"
+CFLAGS += -DCONFIG_LORAMAC_APP_KEY_DEFAULT=\"CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC\"
+CFLAGS += -DCONFIG_LORAMAC_APP_SKEY_DEFAULT=\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"
+CFLAGS += -DCONFIG_LORAMAC_NWK_SKEY_DEFAULT=\"EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\"
+CFLAGS += -DCONFIG_LORAMAC_DEV_ADDR_DEFAULT=\"FFFFFFFF\"
 ```
 
 ## Send data
 
-After join, send data using `send` command. E.g to send "Hello RIOT!" to port 2:
+After join, send data using `txtsnd` command:
+```
+txtsnd <if> <hex_port> <data>
+```
+
+E.g to send "Hello RIOT!" to LoRaWAN port 123 (hex 0x7B) via interface 3:
 
 ```
-send 3 "Hello RIOT!" 2
+txtsnd 3 7B "Hello RIOT!"
 ```
 
 ## Changing datarate of transmission
@@ -97,7 +104,7 @@ Send some data. The result of the Link Check request can be seen with
 
 ```
 ifconfig 3 link_check
-send 3 "Join the RIOT!"
+txtsnd 3 01 "Join the RIOT!"
 ```
 
 Check demodulation margin and number of gateways using `ifconfig`
@@ -121,18 +128,43 @@ E.g send confirmable messages:
 
 ```
 ifconfig 3 ack_req
-send "My confirmable message"
+txtsnd 3 01 "My confirmable message"
 ```
 
 And unconfirmable messages:
 
 ```
 ifconfig 3 -ack_req
-send "My unconfirmable message"
+txtsnd 3 01 "My unconfirmable message"
 ```
 
+## Receiving data
+
+Schedule a downlink for the LoRaWAN node in the Application Server. If using
+TTN, this can be done under `Applications > <APP> > Devices > <DEV> > Overview`
+and then check the `Downlink` section.
+
+After sending data, the LoRaWAN Network Server will reply with the downlink
+data. For simplicity, this application is configured to dump downlink data to
+[GNRC pktdump](https://doc.riot-os.org/pktdump_8h.html).
+
+E.g:
+```
+PKTDUMP: data received:
+~~ SNIP  0 - size:   2 byte, type: NETTYPE_UNDEF (0)
+00000000  AA  AA
+~~ SNIP  1 - size:   9 byte, type: NETTYPE_NETIF (-1)
+if_pid: 3  rssi: -32768  lqi: 0
+flags: 0x0
+src_l2addr: (nil)
+dst_l2addr: 01
+~~ PKT    -  2 snips, total size:  11 byte
+```
+
+This downlink was sent to port 1 (check `dst_l2addr` field)
+
 Current state and future plans
-============
+==============================
 
 The current GNRC LoRaWAN stack is still in an experimental state. It's still
 not compliant with the LoRaWAN specification because some features like duty

@@ -1,0 +1,6 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    frdm-kw41z \
+    pba-d-01-kw2x \
+    phynode-kw41z \
+    usb-kw41z \
+    #

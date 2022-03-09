@@ -1,0 +1,13 @@
+DEFAULT_MODULE += auto_init_at86rf2xx
+DEFAULT_MODULE += netdev_ieee802154_oqpsk
+
+USEMODULE += xtimer
+USEMODULE += ieee802154
+USEMODULE += netdev_ieee802154
+
+# only needed for SPI based variants
+ifeq (,$(filter at86rfa1 at86rfr2,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
+  FEATURES_REQUIRED += periph_spi
+endif

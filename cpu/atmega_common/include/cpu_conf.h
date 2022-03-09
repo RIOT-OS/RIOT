@@ -48,7 +48,17 @@ extern "C" {
 /* keep THREAD_STACKSIZE_IDLE > THREAD_EXTRA_STACKSIZE_PRINTF
  * to avoid not printing of debug in interrupts
  */
+#ifndef THREAD_STACKSIZE_IDLE
+#if MODULE_XTIMER || MODULE_ZTIMER64
+/* xtimer's 64 bit arithmetic doesn't perform well on 8 bit archs. In order to
+ * prevent a stack overflow when an timer triggers while the idle thread is
+ * running, we have to increase the stack size then
+ */
+#define THREAD_STACKSIZE_IDLE      (192)
+#else
 #define THREAD_STACKSIZE_IDLE      (128)
+#endif
+#endif
 /** @} */
 
 /**
@@ -61,10 +71,14 @@ extern "C" {
  */
 #define HAVE_HEAP_STATS
 
+/**
+ * @brief   This arch uses the inlined IRQ API.
+ */
+#define IRQ_API_INLINED     (1)
+
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif /* CPU_CONF_H */
 /** @} */

@@ -19,17 +19,23 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  * @}
  */
+
+#define USB_H_USER_IS_RIOT_INTERNAL
+
+#include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <errno.h>
 
+#include "architecture.h"
 #include "cpu.h"
 #include "nrfusb.h"
 #include "periph/usbdev.h"
 #include "usb.h"
 #include "usb/descriptor.h"
+#include "bitarithm.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static nrfusb_t _usbdevs[NRF_USB_NUM_PERIPH];
@@ -37,12 +43,12 @@ static nrfusb_t _usbdevs[NRF_USB_NUM_PERIPH];
 static void _init(usbdev_t *usbdev);
 static int _get(usbdev_t *usbdev, usbopt_t opt, void *value, size_t max_len);
 static int _set(usbdev_t *usbdev, usbopt_t opt, const void *value, size_t value_len);
-static usbdev_ep_t *_new_ep(usbdev_t *dev, usb_ep_type_t type, usb_ep_dir_t dir, size_t buf_len);
+static usbdev_ep_t *_new_ep(usbdev_t *dev, usb_ep_type_t type, usb_ep_dir_t dir, size_t len);
 static void _esr(usbdev_t *usbdev);
 static void _ep_init(usbdev_ep_t *ep);
 static int _ep_get(usbdev_ep_t *ep, usbopt_ep_t opt, void *value, size_t max_len);
 static int _ep_set(usbdev_ep_t *ep, usbopt_ep_t opt, const void *value, size_t value_len);
-static int _ep_ready(usbdev_ep_t *ep, size_t len);
+static int _ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len);
 static void _ep_esr(usbdev_ep_t *ep);
 
 static const usbdev_driver_t _driver = {
@@ -55,7 +61,7 @@ static const usbdev_driver_t _driver = {
     .ep_get = _ep_get,
     .ep_set = _ep_set,
     .ep_esr = _ep_esr,
-    .ready = _ep_ready,
+    .xmit = _ep_xmit,
 };
 
 static inline usbdev_ep_t *_get_ep_in(nrfusb_t *usbdev, unsigned num)
@@ -107,12 +113,9 @@ static inline void poweron(nrfusb_t *usbdev)
     *(volatile uint32_t *)0x4006EC00 = 0x00009375;
 
     /* Enable peripheral a second time */
+    /* cppcheck-suppress redundantAssignment
+     * (reason: re-enabled as per nordic instructions for this errata) */
     usbdev->device->ENABLE = USBD_ENABLE_ENABLE_Msk;
-}
-
-static inline void poweroff(nrfusb_t *usbdev)
-{
-    usbdev->device->ENABLE = 0x00;
 }
 
 static void usb_attach(nrfusb_t *usbdev)
@@ -127,21 +130,11 @@ static void usb_detach(nrfusb_t *usbdev)
     usbdev->device->USBPULLUP = 0x00;
 }
 
-static void _ep_set_address(usbdev_ep_t *ep)
-{
-    nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
-    if (ep->dir == USB_EP_DIR_OUT) {
-        usbdev->device->EPOUT[ep->num].PTR = (uint32_t)ep->buf;
-    }
-    else {
-        usbdev->device->EPIN[ep->num].PTR = (uint32_t)ep->buf;
-    }
-}
-
 static void _copy_setup(usbdev_ep_t *ep)
 {
     nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
-    usb_setup_t *setup = (usb_setup_t*)ep->buf;
+    usb_setup_t *setup = (usb_setup_t*)(intptr_t)usbdev->device->EPOUT[0].PTR;
+
     setup->type = usbdev->device->BMREQUESTTYPE;
     setup->request = usbdev->device->BREQUEST;
     setup->value = usbdev->device->WVALUEL | usbdev->device->WVALUEH << 8;
@@ -155,20 +148,11 @@ static void _copy_setup(usbdev_ep_t *ep)
     }
 }
 
-static int _ep_set_size(usbdev_ep_t *ep)
-{
-    /* TODO: validate size */
-    nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
-    if (ep->dir == USB_EP_DIR_OUT) {
-        usbdev->device->EPOUT[ep->num].MAXCNT = (uint32_t)ep->len;
-    }
-    return 1;
-}
-
 static void _ep_enable(usbdev_ep_t *ep)
 {
     DEBUG("Enabling endpoint %u dir %s\n", ep->num, ep->dir == USB_EP_DIR_OUT ? "OUT" : "IN");
-    nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
+    nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
+
     if (ep->dir == USB_EP_DIR_OUT) {
         usbdev->device->EPOUTEN |= 1 << ep->num;
     }
@@ -181,7 +165,8 @@ static void _ep_disable(usbdev_ep_t *ep)
 {
     /* TODO: validate size */
     DEBUG("disabling endpoint %u dir %s\n", ep->num, ep->dir == USB_EP_DIR_OUT ? "OUT" : "IN");
-    nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
+    nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
+
     if (ep->dir == USB_EP_DIR_OUT) {
         usbdev->device->EPOUTEN &= ~(1 << ep->num);
     }
@@ -193,17 +178,19 @@ static void _ep_disable(usbdev_ep_t *ep)
 static void _ep_set_stall(usbdev_ep_t *ep, usbopt_enable_t enable)
 {
     /* TODO: validate size */
-    nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
+    nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
     uint32_t val = (ep->num & USBD_EPSTALL_EP_Msk) |
-                    (ep->dir == USB_EP_DIR_IN ? USBD_EPSTALL_IO_Msk : 0) |
-                    (enable ? USBD_EPSTALL_STALL_Msk : 0);
+                   (ep->dir == USB_EP_DIR_IN ? USBD_EPSTALL_IO_Msk : 0) |
+                   (enable ? USBD_EPSTALL_STALL_Msk : 0);
+
     usbdev->device->EPSTALL = val;
 }
 
 static usbopt_enable_t _ep_get_stall(usbdev_ep_t *ep)
 {
     /* TODO: validate size */
-    nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
+    nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
+
     if (ep->dir == USB_EP_DIR_OUT) {
         return usbdev->device->HALTED.EPOUT[ep->num] ? USBOPT_ENABLE
                                                      : USBOPT_DISABLE;
@@ -217,7 +204,8 @@ static usbopt_enable_t _ep_get_stall(usbdev_ep_t *ep)
 static size_t _ep_get_available(usbdev_ep_t *ep)
 {
     /* TODO: validate size */
-    nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
+    nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
+
     if (ep->dir == USB_EP_DIR_OUT) {
         return usbdev->device->SIZE.EPOUT[ep->num];
     }
@@ -228,7 +216,8 @@ static size_t _ep_get_available(usbdev_ep_t *ep)
 
 static void _ep_dma_out(usbdev_ep_t *ep)
 {
-    nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
+    nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
+
     assert(ep->dir == USB_EP_DIR_OUT);
     _enable_errata_199();
     usbdev->device->TASKS_STARTEPOUT[ep->num] = 1;
@@ -241,7 +230,8 @@ static void _ep_dma_out(usbdev_ep_t *ep)
 
 static void _ep_dma_in(usbdev_ep_t *ep)
 {
-    nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
+    nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
+
     assert(ep->dir == USB_EP_DIR_IN);
     _enable_errata_199();
     usbdev->device->TASKS_STARTEPIN[ep->num] = 1;
@@ -270,11 +260,11 @@ static void _init(usbdev_t *dev)
 {
     DEBUG("nrfusb: initializing\n");
     /* Engineering revision version A is affected by errata 94, crash *
-     * instead of pretending to have functional USB                   */
+    * instead of pretending to have functional USB                   */
     assert(NRF_FICR->INFO.VARIANT != 0x41414141);
-    nrfusb_t *usbdev = (nrfusb_t*)dev;
+    nrfusb_t *usbdev = (nrfusb_t *)dev;
+
     poweron(usbdev);
-    usbdev->used = 0;
     usbdev->sstate = NRFUSB_SETUP_READY;
 
     /* Enable a set of interrupts */
@@ -289,49 +279,55 @@ static int _get(usbdev_t *usbdev, usbopt_t opt, void *value, size_t max_len)
     (void)usbdev;
     (void)max_len;
     int res = -ENOTSUP;
+
     switch (opt) {
-        case USBOPT_MAX_VERSION:
-            assert(max_len == sizeof(usb_version_t));
-            *(usb_version_t *)value = USB_VERSION_20;
-            res = sizeof(usb_version_t);
-            break;
-        case USBOPT_MAX_SPEED:
-            assert(max_len == sizeof(usb_speed_t));
-            *(usb_speed_t *)value = USB_SPEED_FULL;
-            res = sizeof(usb_speed_t);
-            break;
-        default:
-            DEBUG("unhandled get call: 0x%x\n", opt);
-            break;
+    case USBOPT_MAX_VERSION:
+        assert(max_len == sizeof(usb_version_t));
+        *(usb_version_t *)value = USB_VERSION_20;
+        res = sizeof(usb_version_t);
+        break;
+    case USBOPT_MAX_SPEED:
+        assert(max_len == sizeof(usb_speed_t));
+        *(usb_speed_t *)value = USB_SPEED_FULL;
+        res = sizeof(usb_speed_t);
+        break;
+    default:
+        DEBUG("unhandled get call: 0x%x\n", opt);
+        break;
     }
     return res;
 }
 
 static int _set(usbdev_t *dev, usbopt_t opt,
-               const void *value, size_t value_len)
+                const void *value, size_t value_len)
 {
-    nrfusb_t *usbdev = (nrfusb_t*)dev;
+    nrfusb_t *usbdev = (nrfusb_t *)dev;
+
     (void)value_len;
     int res = -ENOTSUP;
+
     switch (opt) {
-        case USBOPT_ATTACH:
-            assert(value_len == sizeof(usbopt_enable_t));
-            if (*((usbopt_enable_t *)value)) {
-                usb_attach(usbdev);
-            }
-            else {
-                usb_detach(usbdev);
-            }
-            res = sizeof(usbopt_enable_t);
-            break;
-        default:
-            DEBUG("Unhandled set call: 0x%x\n", opt);
-            break;
+    case USBOPT_ATTACH:
+        assert(value_len == sizeof(usbopt_enable_t));
+        if (*((usbopt_enable_t *)value)) {
+            usb_attach(usbdev);
+        }
+        else {
+            usb_detach(usbdev);
+        }
+        res = sizeof(usbopt_enable_t);
+        break;
+    default:
+        DEBUG("Unhandled set call: 0x%x\n", opt);
+        break;
     }
     return res;
 }
 
-static usbdev_ep_t *_new_ep(usbdev_t *dev, usb_ep_type_t type, usb_ep_dir_t dir, size_t buf_len)
+static usbdev_ep_t *_new_ep(usbdev_t *dev,
+                            usb_ep_type_t type,
+                            usb_ep_dir_t dir,
+                            size_t len)
 {
     nrfusb_t *usbdev = (nrfusb_t*)dev;
     /* The IP supports all types for all endpoints */
@@ -355,28 +351,17 @@ static usbdev_ep_t *_new_ep(usbdev_t *dev, usb_ep_type_t type, usb_ep_dir_t dir,
     if (res) {
         res->dev = dev;
         res->dir = dir;
+        res->type = type;
+        res->len = len;
         DEBUG("nrfusb: Allocated new ep (%d %s)\n", res->num, res->dir == USB_EP_DIR_OUT ? "OUT" : "IN");
-        if (usbdev->used + buf_len < NRF_USB_BUF_SPACE) {
-            res->buf = usbdev->buffer + usbdev->used;
-            res->len = buf_len;
-            if (_ep_set_size(res) < 0) {
-                return NULL;
-            }
-            usbdev->used += buf_len;
-            _ep_set_address(res);
-            res->type = type;
-            res->dev = dev;
-        }
-        else {
-            DEBUG("nrfusb: error allocating buffer space\n");
-        }
     }
     return res;
 }
 
 static void _ep_enable_irq(usbdev_ep_t *ep)
 {
-    nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
+    nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
+
     if (ep->dir == USB_EP_DIR_IN) {
         if (ep->num == 0) {
             usbdev->device->INTENSET = USBD_INTENSET_EP0DATADONE_Msk;
@@ -391,7 +376,8 @@ static void _ep_enable_irq(usbdev_ep_t *ep)
 
 static void _ep_disable_irq(usbdev_ep_t *ep)
 {
-    nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
+    nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
+
     if (ep->dir == USB_EP_DIR_IN) {
         if (ep->num == 0) {
             usbdev->device->INTENCLR = USBD_INTENCLR_EP0DATADONE_Msk;
@@ -407,8 +393,7 @@ static void _ep_disable_irq(usbdev_ep_t *ep)
 static void _ep_init(usbdev_ep_t *ep)
 {
     nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
-    _ep_set_size(ep);
-    _ep_set_address(ep);
+
     if (ep->num == 0) {
         usbdev->device->EVENTS_EP0SETUP = 0;
     }
@@ -423,67 +408,65 @@ static void _ep_init(usbdev_ep_t *ep)
 }
 
 static int _ep_get(usbdev_ep_t *ep, usbopt_ep_t opt,
-                  void *value, size_t max_len)
+                   void *value, size_t max_len)
 {
     (void)max_len;
     int res = -ENOTSUP;
+
     switch (opt) {
-        case USBOPT_EP_STALL:
-            assert(max_len == sizeof(usbopt_enable_t));
-            *(usbopt_enable_t *)value = _ep_get_stall(ep);
-            res = sizeof(usbopt_enable_t);
-            break;
-        case USBOPT_EP_AVAILABLE:
-            assert(max_len == sizeof(size_t));
-            *(size_t *)value = _ep_get_available(ep);
-            res = sizeof(size_t);
-            break;
-        default:
-            DEBUG("Unhandled get call: 0x%x\n", opt);
-            break;
+    case USBOPT_EP_STALL:
+        assert(max_len == sizeof(usbopt_enable_t));
+        *(usbopt_enable_t *)value = _ep_get_stall(ep);
+        res = sizeof(usbopt_enable_t);
+        break;
+    case USBOPT_EP_AVAILABLE:
+        assert(max_len == sizeof(size_t));
+        *(size_t *)value = _ep_get_available(ep);
+        res = sizeof(size_t);
+        break;
+    default:
+        DEBUG("Unhandled get call: 0x%x\n", opt);
+        break;
     }
     return res;
 }
 
 static int _ep_set(usbdev_ep_t *ep, usbopt_ep_t opt,
-                  const void *value, size_t value_len)
+                   const void *value, size_t value_len)
 {
     (void)value_len;
     int res = -ENOTSUP;
+
     switch (opt) {
-        case USBOPT_EP_ENABLE:
-            assert(value_len == sizeof(usbopt_enable_t));
-            if (*((usbopt_enable_t *)value)) {
-                _ep_enable(ep);
-                _ep_init(ep);
-            }
-            else {
-                _ep_disable(ep);
-            }
-            res = sizeof(usbopt_enable_t);
-            break;
-        case USBOPT_EP_STALL:
-            assert(value_len == sizeof(usbopt_enable_t));
-            _ep_set_stall(ep, *(usbopt_enable_t *)value);
-            res = sizeof(usbopt_enable_t);
-            break;
-        case USBOPT_EP_READY:
-            assert(value_len == sizeof(usbopt_enable_t));
-            if (*((usbopt_enable_t *)value)) {
-                _ep_ready(ep, 0);
-                res = sizeof(usbopt_enable_t);
-            }
-            break;
-        default:
-            DEBUG("Unhandled set call: 0x%x\n", opt);
-            break;
+    case USBOPT_EP_ENABLE:
+        assert(value_len == sizeof(usbopt_enable_t));
+        if (*((usbopt_enable_t *)value)) {
+            _ep_enable(ep);
+            _ep_init(ep);
+        }
+        else {
+            _ep_disable(ep);
+        }
+        res = sizeof(usbopt_enable_t);
+        break;
+    case USBOPT_EP_STALL:
+        assert(value_len == sizeof(usbopt_enable_t));
+        _ep_set_stall(ep, *(usbopt_enable_t *)value);
+        res = sizeof(usbopt_enable_t);
+        break;
+    default:
+        DEBUG("Unhandled set call: 0x%x\n", opt);
+        break;
     }
     return res;
 }
 
-static int _ep0_ready(usbdev_ep_t *ep, size_t len)
+static int _ep0_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
 {
-    nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
+    nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
+    /* Assert the alignment required for the buffers */
+    assert(HAS_ALIGNMENT_OF(buf, USBDEV_CPU_DMA_ALIGNMENT));
+
     if (ep->dir == USB_EP_DIR_IN) {
         if (len == 0 && usbdev->sstate == NRFUSB_SETUP_WRITE) {
             usbdev->device->TASKS_EP0STATUS = 1;
@@ -491,12 +474,14 @@ static int _ep0_ready(usbdev_ep_t *ep, size_t len)
             usbdev->sstate = NRFUSB_SETUP_ACKIN;
         }
         else {
-            usbdev->device->EPIN[0].PTR = (uint32_t)ep->buf;
+            usbdev->device->EPIN[0].PTR = (uint32_t)(intptr_t)buf;
             usbdev->device->EPIN[0].MAXCNT = (uint32_t)len;
             usbdev->device->TASKS_STARTEPIN[0] = 1;
         }
     }
     else {
+        usbdev->device->EPOUT[0].PTR = (uint32_t)(intptr_t)buf;
+        usbdev->device->EPOUT[0].MAXCNT = (uint32_t)len;
         /* USB_EP_DIR_OUT */
         if (usbdev->sstate == NRFUSB_SETUP_READ) {
             usbdev->device->TASKS_EP0STATUS = 1;
@@ -510,19 +495,23 @@ static int _ep0_ready(usbdev_ep_t *ep, size_t len)
     return len;
 }
 
-static int _ep_ready(usbdev_ep_t *ep, size_t len)
+static int _ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
 {
-    nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
+    nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
+
     if (ep->num == 0) {
         /* Endpoint 0 requires special handling as per datasheet sec 6.35.9 */
-        return _ep0_ready(ep, len);
+        return _ep0_xmit(ep, buf, len);
     }
     if (ep->dir == USB_EP_DIR_IN) {
-        usbdev->device->EPIN[ep->num].PTR = (uint32_t)ep->buf;
+        usbdev->device->EPIN[ep->num].PTR = (uint32_t)(intptr_t)buf;
         usbdev->device->EPIN[ep->num].MAXCNT = (uint32_t)len;
         _ep_dma_in(ep);
     }
     else {
+        /* Pre-Setup the EasyDMA settings */
+        usbdev->device->EPOUT[ep->num].PTR = (uint32_t)(intptr_t)buf;
+        usbdev->device->EPOUT[ep->num].MAXCNT = (uint32_t)(intptr_t)len;
         /* Write nonzero value to EPOUT to indicate ready */
         usbdev->device->SIZE.EPOUT[ep->num] = 1;
     }
@@ -531,7 +520,8 @@ static int _ep_ready(usbdev_ep_t *ep, size_t len)
 
 static void _esr(usbdev_t *dev)
 {
-    nrfusb_t *usbdev = (nrfusb_t*)dev;
+    nrfusb_t *usbdev = (nrfusb_t *)dev;
+
     if (usbdev->device->EVENTS_USBRESET) {
         DEBUG("nrfusb: reset condition\n");
         usbdev->device->EVENTS_USBRESET = 0;
@@ -556,8 +546,9 @@ static void _esr(usbdev_t *dev)
 
 static signed _ep0_esr(usbdev_ep_t *ep)
 {
-    nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
+    nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
     signed event = -1;
+
     if (ep->dir == USB_EP_DIR_OUT) {
         if (usbdev->sstate == NRFUSB_SETUP_ACKOUT) {
             usbdev->sstate = NRFUSB_SETUP_READY;
@@ -593,8 +584,9 @@ static signed _ep0_esr(usbdev_ep_t *ep)
 
 static void _ep_esr(usbdev_ep_t *ep)
 {
-    nrfusb_t *usbdev = (nrfusb_t*)ep->dev;
+    nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
     signed event = -1;
+
     if (ep->num == 0) {
         event = _ep0_esr(ep);
     }
@@ -628,14 +620,15 @@ void isr_usbd(void)
 {
     /* Only one usb peripheral possible at the moment */
     nrfusb_t *usbdev = &_usbdevs[0];
+
     /* Generic USB peripheral events */
     if (usbdev->device->EVENTS_USBRESET &&
-            (usbdev->device->INTEN & USBD_INTEN_USBRESET_Msk)) {
+        (usbdev->device->INTEN & USBD_INTEN_USBRESET_Msk)) {
         usbdev->device->INTENCLR = USBD_INTENCLR_USBRESET_Msk;
         usbdev->usbdev.cb(&usbdev->usbdev, USBDEV_EVENT_ESR);
     }
     else if (usbdev->device->EVENTS_USBEVENT &&
-            (usbdev->device->INTEN & USBD_INTEN_USBEVENT_Msk)) {
+             (usbdev->device->INTEN & USBD_INTEN_USBEVENT_Msk)) {
         usbdev->device->INTENCLR = USBD_INTENCLR_USBEVENT_Msk;
         usbdev->usbdev.cb(&usbdev->usbdev, USBDEV_EVENT_ESR);
     }
@@ -643,12 +636,12 @@ void isr_usbd(void)
         /* Endpoint specific isr handling*/
         /* Endpoint 0 SETUP data received requests */
         if (usbdev->device->EVENTS_EP0SETUP &&
-                (usbdev->device->INTEN & USBD_INTEN_EP0SETUP_Msk)) {
+            (usbdev->device->INTEN & USBD_INTEN_EP0SETUP_Msk)) {
             usbdev->usbdev.epcb(_get_ep_out(usbdev, 0), USBDEV_EVENT_ESR);
             _ep_disable_irq(_get_ep_out(usbdev, 0));
         }
         if (usbdev->device->EVENTS_EP0DATADONE &&
-                (usbdev->device->INTEN & USBD_INTEN_EP0DATADONE_Msk)) {
+            (usbdev->device->INTEN & USBD_INTEN_EP0DATADONE_Msk)) {
             if (usbdev->sstate == NRFUSB_SETUP_READ) {
                 usbdev->usbdev.epcb(_get_ep_in(usbdev, 0), USBDEV_EVENT_ESR);
                 _ep_disable_irq(_get_ep_in(usbdev, 0));
@@ -668,14 +661,14 @@ void isr_usbd(void)
                     if (ep->type != USB_EP_TYPE_NONE) {
                         /* OUT type endpoint */
                         usbdev->usbdev.epcb(ep,
-                                USBDEV_EVENT_ESR);
+                                            USBDEV_EVENT_ESR);
                     }
                 }
                 else {
                     usbdev_ep_t *ep = _get_ep_in(usbdev, epnum);
                     if (ep->type != USB_EP_TYPE_NONE) {
                         usbdev->usbdev.epcb(ep,
-                                USBDEV_EVENT_ESR);
+                                            USBDEV_EVENT_ESR);
                     }
                 }
                 epdatastatus &= ~(1 << epnum);

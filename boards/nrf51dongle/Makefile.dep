@@ -1,1 +1,3 @@
+FEATURES_REQUIRED += periph_uart_hw_fc
+
 include $(RIOTBOARD)/common/nrf51/Makefile.dep

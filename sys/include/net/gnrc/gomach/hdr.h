@@ -117,7 +117,6 @@ typedef struct __attribute__((packed)) {
     gnrc_gomach_l2_addr_t dst_addr;     /**< Address of this node. */
 } gnrc_gomach_frame_preamble_t;
 
-
 /**
  * @brief   GoMacH preamble_ack frame.
  */

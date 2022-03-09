@@ -1,0 +1,20 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD_COMMON_NUCLEO64
+    bool
+    select HAS_ARDUINO
+
+    # Clock configuration
+    select BOARD_HAS_HSE if !CPU_FAM_G0 && !CPU_FAM_L0 && !CPU_FAM_L1 && !CPU_FAM_L4
+    select BOARD_HAS_LSE if !BOARD_NUCLEO_L152RE
+
+config MODULE_PERIPH_INIT_LED0
+    default n if MODULE_PERIPH_SPI
+
+source "$(RIOTBOARD)/common/nucleo/Kconfig"
+source "$(RIOTBOARD)/common/stm32/Kconfig"

@@ -65,6 +65,11 @@ typedef enum {
     GPIO_BOTH = IOCFG_EDGEDET_BOTH
 } gpio_flank_t;
 
+/**
+ * @brief   CPU specific GPIO pin generator macro
+ */
+#define GPIO_PIN(x, y)  (((x) & 0) | (y))
+
 /*
  * @brief   Invalid UART mode mask
  *
@@ -119,9 +124,10 @@ typedef struct {
    uart_regs_t *regs;
    int tx_pin;
    int rx_pin;
+#ifdef MODULE_PERIPH_UART_HW_FC
    int rts_pin;
    int cts_pin;
-   int flow_control;
+#endif
    int intn;
 } uart_conf_t;
 /** @} */

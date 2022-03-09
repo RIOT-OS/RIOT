@@ -35,7 +35,7 @@ extern "C" {
 #define HDC1000_PARAM_I2C            I2C_DEV(0)
 #endif
 #ifndef HDC1000_PARAM_ADDR
-#define HDC1000_PARAM_ADDR           (HDC1000_I2C_ADDRESS)
+#define HDC1000_PARAM_ADDR           (CONFIG_HDC1000_I2C_ADDRESS)
 #endif
 #ifndef HDC1000_PARAM_RES
 #define HDC1000_PARAM_RES            HDC1000_14BIT

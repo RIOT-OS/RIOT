@@ -1,0 +1,20 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_ATXMEGA_EBI
+    bool
+    depends on TEST_KCONFIG
+    depends on CPU_COMMON_ATXMEGA
+    depends on HAS_ATXMEGA_EBI
+    default y if CPU_CORE_ATXMEGA_A1
+    help
+        Low-level EBI (External BUS Interface) driver.
+
+config HAS_ATXMEGA_EBI
+    bool
+    help
+        Indicates that the External Bus Interface is present.

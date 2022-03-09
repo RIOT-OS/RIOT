@@ -21,7 +21,7 @@
  * data, as well as writing data to the UART port, which means transmitting
  * data. The UART device and the corresponding pins need to be mapped in
  * `RIOT/boards/ * /include/periph_conf.h`. Furthermore, you need to select the
- * baudrate for initialization which is typically {9600, 19200, 38400, 57600,
+ * symbol rate for initialization which is typically {9600, 19200, 38400, 57600,
  * 115200} baud. Additionally, you should register a callback function that is
  * executed in interrupt context when data is being received. The driver will
  * then read the received data byte, call the registered callback function and
@@ -58,14 +58,13 @@
 #ifndef PERIPH_UART_H
 #define PERIPH_UART_H
 
+#include <errno.h>
+#include <limits.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <limits.h>
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
-/* TODO: remove once all platforms are ported to this interface */
-#include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -75,14 +74,14 @@ extern "C" {
  * @brief   Define default UART type identifier
  */
 #ifndef HAVE_UART_T
-typedef unsigned int uart_t;
+typedef uint_fast8_t uart_t;
 #endif
 
 /**
  * @brief   Default UART undefined value
  */
 #ifndef UART_UNDEF
-#define UART_UNDEF          (UINT_MAX)
+#define UART_UNDEF          (UINT_FAST8_MAX)
 #endif
 
 /**
@@ -101,24 +100,37 @@ typedef unsigned int uart_t;
 typedef void(*uart_rx_cb_t)(void *arg, uint8_t data);
 
 /**
+ * @brief   Signature for receive start condition interrupt callback
+ *
+ * @param[in] arg           context to the callback (optional)
+ */
+typedef void(*uart_rxstart_cb_t)(void *arg);
+
+/**
  * @brief   Interrupt context for a UART device
  */
 #ifndef HAVE_UART_ISR_CTX_T
 typedef struct {
     uart_rx_cb_t rx_cb;     /**< data received interrupt callback */
-    void *arg;              /**< argument to both callback routines */
+    void *arg;              /**< argument to data received callback */
+#ifdef MODULE_PERIPH_UART_RXSTART_IRQ
+    uart_rxstart_cb_t rxs_cb;   /**< start condition received interrupt callback */
+    void *rxs_arg;          /**< argument to start condition received callback */
+#endif
 } uart_isr_ctx_t;
 #endif
 
 /**
- * @brief   Possible UART return values
+ * @brief       Possible UART return values
+ *
+ * @deprecated  Use the errno constants directly instead.
  */
 enum {
-    UART_OK         =  0,   /**< everything in order */
-    UART_NODEV      = -1,   /**< invalid UART device given */
-    UART_NOBAUD     = -2,   /**< given baudrate is not applicable */
-    UART_INTERR     = -3,   /**< all other internal errors */
-    UART_NOMODE     = -4    /**< given mode is not applicable */
+    UART_OK         =  0,           /**< everything in order */
+    UART_NODEV      = -ENODEV,      /**< invalid UART device given */
+    UART_NOBAUD     = -ENOTSUP,     /**< given symbol rate is not applicable */
+    UART_NOMODE     = -ENOTSUP,     /**< given mode is not applicable */
+    UART_INTERR     = -EIO,         /**< all other internal errors */
 };
 
 /**
@@ -163,24 +175,168 @@ typedef enum {
  * - 8 data bits
  * - no parity
  * - 1 stop bit
- * - baudrate as given
+ * - symbol rate as given
  *
  * If no callback parameter is given (rx_cb := NULL), the UART will be
  * initialized in TX only mode.
  *
  * @param[in] uart          UART device to initialize
- * @param[in] baudrate      desired baudrate in baud/s
+ * @param[in] baud          desired symbol rate in baud
  * @param[in] rx_cb         receive callback, executed in interrupt context once
  *                          for every byte that is received (RX buffer filled),
  *                          set to NULL for TX only mode
  * @param[in] arg           optional context passed to the callback functions
  *
- * @return                  UART_OK on success
- * @return                  UART_NODEV on invalid UART device
- * @return                  UART_NOBAUD on inapplicable baudrate
- * @return                  UART_INTERR on other errors
+ * @retval  0               Success
+ * @retval  -ENODEV         Invalid UART device
+ * @retval  -ENOTSUP        Unsupported symbol rate
+ * @retval  <0              On other errors
  */
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg);
+int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg);
+
+#if defined(MODULE_PERIPH_UART_RECONFIGURE) || DOXYGEN
+/**
+ * @brief   Change the pins of the given UART back to plain GPIO functionality
+ *
+ * The pin mux of the RX and TX pins of the bus will be changed back to
+ * default (GPIO) mode and the UART is powered off.
+ * This allows to use the UART pins for another function and return to UART
+ * functionality again by calling @ref uart_init_pins
+ *
+ * If you want the pin to be in a defined state, call @ref gpio_init on it.
+ *
+ * @note Until this is implemented on all platforms, this requires the
+ *       periph_uart_reconfigure feature to be used.
+ *
+ * @param[in] uart      the device to de-initialize
+ */
+void uart_deinit_pins(uart_t uart);
+
+/**
+ * @brief   Initialize the used UART pins, i.e. RX and TX
+ *
+ *
+ * After calling uart_init, the pins must be initialized (i.e. uart_init is
+ * calling this function internally). In normal cases, this function will not
+ * be used. But there are some devices, that use UART bus lines also for other
+ * purposes and need the option to dynamically re-configure one or more of the
+ * used pins. So they can take control over certain pins and return control back
+ * to the UART driver using this function.
+ *
+ * The pins used are configured in the board's periph_conf.h.
+ *
+ * @param[in] uart      UART device the pins are configure for
+ */
+void uart_init_pins(uart_t uart);
+
+#if DOXYGEN
+/**
+ * @brief   Get the RX pin of the given UART.
+ *
+ * @param[in] uart      The device to query
+ *
+ * @note Until this is implemented on all platforms, this requires the
+ *       periph_uart_reconfigure feature to be used.
+ *
+ * @return              The GPIO used for the UART RX line.
+ */
+gpio_t uart_pin_rx(uart_t uart);
+
+/**
+ * @brief   Get the TX pin of the given UART.
+ *
+ * @param[in] uart      The device to query
+ *
+ * @note Until this is implemented on all platforms, this requires the
+ *       periph_uart_reconfigure feature to be used.
+ *
+ * @return              The GPIO used for the UART TX line.
+ */
+gpio_t uart_pin_tx(uart_t uart);
+
+#endif /* DOXYGEN */
+#endif /* MODULE_PERIPH_UART_RECONFIGURE */
+
+#if defined(MODULE_PERIPH_UART_RXSTART_IRQ) || DOXYGEN
+
+/**
+ * @brief   Configure the function that will be called when a start condition
+ *          is detected.
+ *
+ *          This will not enable / disable the generation of the RX start
+ *          interrupt.
+ *
+ * @note    You have to add the module `periph_uart_rxstart_irq` to your project
+ *          to enable this function
+ *
+ * @param[in] uart      The device to configure
+ * @param[in] cb        The function called when a start condition is detected
+ * @param[in] arg       Optional function argument
+ */
+void uart_rxstart_irq_configure(uart_t uart, uart_rxstart_cb_t cb, void *arg);
+
+/**
+ * @brief   Enable the RX start interrupt.
+ *
+ * @note    You have to add the module `periph_uart_rxstart_irq` to your project
+ *          to enable this function
+ *
+ * @param[in] uart      The device to configure
+ */
+void uart_rxstart_irq_enable(uart_t uart);
+
+/**
+ * @brief   Disable the RX start interrupt.
+ *
+ * @note    You have to add the module `periph_uart_rxstart_irq` to your project
+ *          to enable this function
+ *
+ * @param[in] uart      The device to configure
+ */
+void uart_rxstart_irq_disable(uart_t uart);
+#endif /* MODULE_PERIPH_UART_RXSTART_IRQ */
+
+#if defined(MODULE_PERIPH_UART_COLLISION) || DOXYGEN
+/**
+ * @brief   Enables collision detection check of the UART.
+ *          This assumes the UART is connected to a bus where RX and TX are
+ *          connected. After each sent byte it is checked whether the same
+ *          byte could be received.
+ *
+ *          This disables the RX interrupt.
+ *
+ * @note    You have to add the module `periph_uart_rxstart_irq` to your project
+ *          to enable this function
+ *
+ * @param[in] uart      The device to configure
+ */
+void uart_collision_detect_enable(uart_t uart);
+/**
+ * @brief   Disables collision detection check of the UART.
+ *
+ *          If an RX interrupt was configured before, it is enabled again.
+ *
+ * @note    You have to add the module `periph_uart_rxstart_irq` to your project
+ *          to enable this function
+ *
+ * @param[in] uart      The device to configure
+ */
+void uart_collision_detect_disable(uart_t uart);
+
+/**
+ * @brief   Disables collision detection check of the UART.
+ *
+ *          If an RX interrupt was configured before, it is enabled again.
+ *
+ * @note    You have to add the module `periph_uart_rxstart_irq` to your project
+ *          to enable this function
+ *
+ * @param[in] uart      The device to probe
+ *
+ * @return              true if a collision occurred during the last transder
+ */
+bool uart_collision_detected(uart_t uart);
+#endif /* MODULE_PERIPH_UART_COLLISION */
 
 /**
  * @brief   Setup parity, data and stop bits for a given UART device
@@ -190,8 +346,9 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg);
  * @param[in] parity        parity mode
  * @param[in] stop_bits     number of stop bits in a UART frame
  *
- * @return                  UART_OK on success
- * @return                  UART_NOMODE on other errors
+ * @retval  0               Success
+ * @retval  -ENOTSUP        Given configuration not supported
+ * @retval  <0              Other error
  */
 int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
               uart_stop_bits_t stop_bits);

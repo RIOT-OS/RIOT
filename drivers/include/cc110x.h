@@ -91,7 +91,7 @@
  * Please note that the layer 2 address by default is derived from the CPU ID.
  * Due to the birthday paradox with only 20 devices the probability of a
  * collision is already bigger than 50%. Thus, manual address assignment is
- * supported by defining `C110X_PARAM_L2ADDR`.
+ * supported by providing an implementation of @ref cc1xxx_eui_get.
  *
  *
  * Base Band, Data Rate, Channel Bandwidth and Channel Map Configuration
@@ -226,12 +226,6 @@ extern "C" {
 #define CC110X_MAX_CHANNELS             8
 
 /**
- * @brief   Special value to indicate that layer 2 address should be derived
- *          from the CPU-ID
- */
-#define CC110X_L2ADDR_AUTO              0x00
-
-/**
  * @brief   Default protocol for data that is coming in
  */
 #ifdef MODULE_GNRC_SIXLOWPAN
@@ -240,12 +234,19 @@ extern "C" {
 #define CC110X_DEFAULT_PROTOCOL         (GNRC_NETTYPE_UNDEF)
 #endif
 
-#ifndef CC110X_DEFAULT_CHANNEL
+/**
+ * @defgroup drivers_cc110x_config CC1100/CC1100e/CC1101 Sub-GHz transceiver driver
+ *                                 compile time configuration
+ * @ingroup config_drivers_netdev
+ * @{
+ */
 /**
  * @brief The default channel to set up after initializing the device
  */
-#define CC110X_DEFAULT_CHANNEL      (0U)
+#ifndef CONFIG_CC110X_DEFAULT_CHANNEL
+#define CONFIG_CC110X_DEFAULT_CHANNEL      (0U)
 #endif
+/** @} */
 
 /**
  * @brief   The state of the CC1100/CC1101 transceiver
@@ -255,41 +256,41 @@ extern "C" {
  * page 31 in the data sheet for the possible states in the status byte.
  */
 typedef enum {
-    CC110X_STATE_IDLE               = 0b00000000,   /**< IDLE state */
+    CC110X_STATE_IDLE               = 0x00,   /**< IDLE state */
     /**
      * @brief   Frame received, waiting for upper layer to retrieve it
      *
      * Transceiver is in IDLE state.
      */
-    CC110X_STATE_FRAME_READY        = 0b00001000,
+    CC110X_STATE_FRAME_READY        = 0x08,
     /**
-     * @brief   Frame received, waiting for upper layer to retrieve it
+     * @brief   Devices is powered down
      *
      * Transceiver is in SLEEP state. There is no matching representation in the
      * status byte, as reading the status byte will power up the transceiver in
      * bring it in the IDLE state. Thus, we set the three least significant bits
      * to the IDLE state
      */
-    CC110X_STATE_OFF                = 0b00010000,
-    CC110X_STATE_RX_MODE            = 0b00000001,   /**< Listening for frames */
+    CC110X_STATE_OFF                = 0x10,
+    CC110X_STATE_RX_MODE            = 0x01,   /**< Listening for frames */
     /**
      * @brief   Receiving a frame just now
      *
      * Transceiver is in RX state.
      */
-    CC110X_STATE_RECEIVING          = 0b00001001,
-    CC110X_STATE_TX_MODE            = 0b00000010,   /**< Transmit mode */
+    CC110X_STATE_RECEIVING          = 0x09,
+    CC110X_STATE_TX_MODE            = 0x02,   /**< Transmit mode */
     /**
      * @brief   Waiting for transceiver to complete outgoing transmission
      *
      * Transceiver is in TX state
      */
-    CC110X_STATE_TX_COMPLETING      = 0b00001010,
-    CC110X_STATE_FSTXON             = 0b00000011,   /**< Fast TX ready */
-    CC110X_STATE_CALIBRATE          = 0b00000100,   /**< Device is calibrating */
-    CC110X_STATE_SETTLING           = 0b00000101,   /**< PLL is settling */
-    CC110X_STATE_RXFIFO_OVERFLOW    = 0b00000110,   /**< RX FIFO overflown */
-    CC110X_STATE_TXFIFO_UNDERFLOW   = 0b00000111,   /**< TX FIFO underflown */
+    CC110X_STATE_TX_COMPLETING      = 0x0A,
+    CC110X_STATE_FSTXON             = 0x03,   /**< Fast TX ready */
+    CC110X_STATE_CALIBRATE          = 0x04,   /**< Device is calibrating */
+    CC110X_STATE_SETTLING           = 0x05,   /**< PLL is settling */
+    CC110X_STATE_RXFIFO_OVERFLOW    = 0x06,   /**< RX FIFO overflown */
+    CC110X_STATE_TXFIFO_UNDERFLOW   = 0x07,   /**< TX FIFO underflown */
 } cc110x_state_t;
 
 /**
@@ -303,7 +304,7 @@ typedef enum {
     CC110X_TX_POWER_0_DBM,                          /**< 0 dBm */
     CC110X_TX_POWER_PLUS_5_DBM,                     /**< 5 dBm */
     CC110X_TX_POWER_PLUS_7_DBM,                     /**< 7 dBm */
-    CC110X_TX_POWER_PLUS_10_DBM,                    /**< 1 dBm */
+    CC110X_TX_POWER_PLUS_10_DBM,                    /**< 10 dBm */
     CC110X_TX_POWER_NUMOF,                          /**< Number of TX power options */
 } cc110x_tx_power_t;
 
@@ -323,7 +324,6 @@ typedef enum {
 typedef struct {
     uint8_t data[8]; /**< Magic number to store in the configuration register */
 } cc110x_patable_t;
-
 
 /**
  * @brief   Configuration of the transceiver to use
@@ -464,11 +464,6 @@ typedef struct {
     spi_cs_t cs;                        /**< GPIO pin connected to chip select */
     gpio_t gdo0;                        /**< GPIO pin connected to GDO0 */
     gpio_t gdo2;                        /**< GPIO pin connected to GDO2 */
-    /**
-     * @brief Layer-2 address to use or `CC110X_L2ADDR_AUTO` to derive it from
-     *        the CPU ID
-     */
-    uint8_t l2addr;
 } cc110x_params_t;
 
 /**
@@ -552,11 +547,13 @@ typedef struct {
  *
  * @param   dev     Device descriptor to use
  * @param   params  Parameter of the device to setup
+ * @param   index   Index of @p params in a global parameter struct array.
+ *                  If initialized manually, pass a unique identifier instead.
  *
  * @retval  0       Device successfully set up
  * @retval  -EINVAL @p dev or @p params is `NULL`, or @p params is invalid
  */
-int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params);
+int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params, uint8_t index);
 
 /**
  * @brief Apply the given configuration and the given channel map and performs
@@ -635,6 +632,21 @@ int cc110x_set_channel(cc110x_t *dev, uint8_t channel);
  * @retval  -EIO    Communication with the transceiver failed
  */
 int cc110x_set_tx_power(cc110x_t *dev, cc110x_tx_power_t power);
+
+/**
+ * @brief   Wakes the transceiver from SLEEP mode and enters RX mode
+ *
+ * @retval  0       Success
+ * @retval  -EIO    Communication with the transceiver failed
+ */
+int cc110x_wakeup(cc110x_t *dev);
+
+/**
+ * @brief   Sets the transceiver into SLEEP mode.
+ *
+ * Only @ref cc110x_wakeup can awake the device again.
+ */
+void cc110x_sleep(cc110x_t *dev);
 
 #ifdef __cplusplus
 }

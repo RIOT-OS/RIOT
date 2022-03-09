@@ -19,43 +19,27 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+/* This board provides an LSE */
+#ifndef CONFIG_BOARD_HAS_LSE
+#define CONFIG_BOARD_HAS_LSE    1
+#endif
+
+/* This board provides an HSE */
+#ifndef CONFIG_BOARD_HAS_HSE
+#define CONFIG_BOARD_HAS_HSE    1
+#endif
+
+/* The HSE provides a 25MHz clock */
+#define CLOCK_HSE               MHZ(25)
+
 #include "periph_cpu.h"
+#include "clk_conf.h"
 #include "cfg_rtt_default.h"
+#include "cfg_usb_otg_fs.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Clock settings
- *
- * @note    This is auto-generated from
- *          `cpu/stm32_common/dist/clk_conf/clk_conf.c`
- * @{
- */
-/* give the target core clock (HCLK) frequency [in Hz],
- * maximum: 216MHz */
-#define CLOCK_CORECLOCK     (216000000U)
-/* 0: no external high speed crystal available
- * else: actual crystal frequency [in Hz] */
-#define CLOCK_HSE           (25000000U)
-/* 0: no external low speed crystal available,
- * 1: external crystal available (always 32.768kHz) */
-#define CLOCK_LSE           (1)
-/* peripheral clock setup */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV4     /* max 54MHz */
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 4)
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV2     /* max 108MHz */
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 2)
-
-/* Main PLL factors */
-#define CLOCK_PLL_M          (25)
-#define CLOCK_PLL_N          (432)
-#define CLOCK_PLL_P          (2)
-#define CLOCK_PLL_Q          (9)
-/** @} */
 
 /**
  * @name    Timer configuration
@@ -73,7 +57,7 @@ static const timer_conf_t timer_config[] = {
 
 #define TIMER_0_ISR         isr_tim2
 
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
@@ -90,7 +74,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB2,
         .irqn       = USART6_IRQn,
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_UNDEF,
         .rts_pin    = GPIO_UNDEF,
         .cts_af     = GPIO_AF8,
@@ -106,7 +90,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_UNDEF,
         .rts_pin    = GPIO_UNDEF,
         .cts_af     = GPIO_AF8,
@@ -122,7 +106,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB1,
         .irqn       = UART7_IRQn,
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_PIN(PORT_F, 9),
         .rts_pin    = GPIO_PIN(PORT_F, 8),
         .cts_af     = GPIO_AF8,
@@ -138,7 +122,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB1,
         .irqn       = UART5_IRQn,
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_UNDEF,
         .rts_pin    = GPIO_UNDEF,
         .cts_af     = GPIO_AF8,
@@ -153,7 +137,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_3_ISR          (isr_uart7)
 #define UART_4_ISR          (isr_uart5)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
@@ -171,45 +155,49 @@ static const i2c_conf_t i2c_config[] = {
         .bus            = APB1,
         .rcc_mask       = RCC_APB1ENR_I2C2EN,
         .irqn           = I2C2_ER_IRQn,
-    }
+    },
+    {   /* Connected to touchscreen controller */
+        .dev            = I2C3,
+        .speed          = I2C_SPEED_NORMAL,
+        .scl_pin        = GPIO_PIN(PORT_A, 8),
+        .sda_pin        = GPIO_PIN(PORT_H, 8),
+        .scl_af         = GPIO_AF4,
+        .sda_af         = GPIO_AF4,
+        .bus            = APB1,
+        .rcc_mask       = RCC_APB1ENR_I2C3EN,
+        .irqn           = I2C3_ER_IRQn,
+    },
+    {
+        .dev            = I2C1,
+        .speed          = I2C_SPEED_NORMAL,
+        .scl_pin        = GPIO_PIN(PORT_B, 8),
+        .sda_pin        = GPIO_PIN(PORT_B, 9),
+        .scl_af         = GPIO_AF4,
+        .sda_af         = GPIO_AF4,
+        .bus            = APB1,
+        .rcc_mask       = RCC_APB1ENR_I2C1EN,
+        .irqn           = I2C1_ER_IRQn,
+    },
 };
 
 #define I2C_0_ISR           isr_i2c2_er
+#define I2C_1_ISR           isr_i2c3_er
+#define I2C_2_ISR           isr_i2c1_er
 
-#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
 /**
  * @name   SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 54000000Hz */
-        7,  /* -> 210937Hz */
-        6,  /* -> 421875Hz */
-        5,  /* -> 843750Hz */
-        3,  /* -> 3375000Hz */
-        2   /* -> 6750000Hz */
-    },
-    {       /* for APB2 @ 108000000Hz */
-        7,  /* -> 421875Hz */
-        7,  /* -> 421875Hz */
-        6,  /* -> 843750Hz */
-        4,  /* -> 3375000Hz */
-        3   /* -> 6750000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     { /* Arduino connector */
         .dev      = SPI1,
         .mosi_pin = GPIO_PIN(PORT_B, 5),
         .miso_pin = GPIO_PIN(PORT_B, 4),
         .sclk_pin = GPIO_PIN(PORT_A, 5),
-        .cs_pin   = GPIO_UNDEF,
+        .cs_pin   = SPI_CS_UNDEF,
         .mosi_af  = GPIO_AF5,
         .miso_af  = GPIO_AF5,
         .sclk_af  = GPIO_AF5,
@@ -232,7 +220,7 @@ static const spi_conf_t spi_config[] = {
     },
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 #ifdef __cplusplus

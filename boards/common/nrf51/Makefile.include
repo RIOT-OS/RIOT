@@ -1,6 +1,3 @@
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
-
 # include common nrf51 headers
 INCLUDES += -I$(RIOTBOARD)/common/nrf51/include
 
@@ -9,12 +6,16 @@ ifneq (,$(filter nimble,$(USEPKG)))
   CFLAGS += -DBOARD_NRF51_XTIMER_ALT
 endif
 
+# Use openocd by default
+PROGRAMMER ?= openocd
+
 ifeq ($(PROGRAMMER),openocd)
   # use common openocd configuration for nrf51
-  export OPENOCD_CONFIG = $(RIOTBOARD)/common/nrf51/dist/openocd.cfg
-  include $(RIOTMAKE)/tools/openocd.inc.mk
+  OPENOCD_CONFIG = $(RIOTBOARD)/common/nrf51/dist/openocd.cfg
 else ifeq ($(PROGRAMMER),jlink)
   # setup JLink for flashing
-  export JLINK_DEVICE := nrf51822
-  include $(RIOTMAKE)/tools/jlink.inc.mk
+  JLINK_DEVICE = nrf51822
 endif
+
+# Set openocd as default supported programmers
+PROGRAMMERS_SUPPORTED += openocd

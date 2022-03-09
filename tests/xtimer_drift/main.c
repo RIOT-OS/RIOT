@@ -65,7 +65,6 @@ struct timer_msg msg_d = { .interval = (TEST_INTERVAL * 2) };
 void *slacker_thread(void *arg)
 {
     (void) arg;
-    timex_t now;
 
     LOG_DEBUG("run thread %" PRIkernel_pid "\n", thread_getpid());
 
@@ -77,7 +76,6 @@ void *slacker_thread(void *arg)
         msg_t m;
         msg_receive(&m);
         struct timer_msg *tmsg = m.content.ptr;
-        xtimer_now_timex(&now);
         xtimer_usleep(TEST_MSG_RX_USLEEP);
 
         tmsg->msg.type = 12345;
@@ -120,7 +118,11 @@ void *worker_thread(void *arg)
             expected = last + TEST_HZ * test_interval;
             int32_t jitter = now - expected;
             printf("now=%" PRIu32 ".%06" PRIu32 " (0x%08" PRIx32 " ticks), ",
+#ifdef MODULE_ZTIMER_XTIMER_COMPAT
+                   sec, us, ticks);
+#else
                    sec, us, ticks.ticks32);
+#endif
             printf("drift=%" PRId32 " us, jitter=%" PRId32 " us\n",
                    drift, jitter);
             last = now;

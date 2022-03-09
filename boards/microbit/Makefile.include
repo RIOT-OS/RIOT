@@ -1,22 +1,18 @@
 # define the default port depending on the host OS
-PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 
 # for this board we support flashing via openocd or pyocd
 PROGRAMMER ?= openocd
+PROGRAMMERS_SUPPORTED += pyocd
 
-ifeq (openocd,$(PROGRAMMER))
-  DEBUG_ADAPTER = dap
-else ifeq (pyocd,$(PROGRAMMER))
-  include $(RIOTMAKE)/tools/pyocd.inc.mk
-endif
+OPENOCD_DEBUG_ADAPTER = dap
 
 # QEMU 4.0 added microbit system emulation.
-EMULATOR = qemu-system-arm
-EMULATOR_FLAGS = -M microbit -device loader,file=$(ELFFILE) \
-                 -serial stdio \
-                 -monitor telnet::45454,server,nowait \
-                 -nographic
+RIOT_EMULATOR ?= qemu
+
+ifneq (,$(filter microbit,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBOARD)/common/microbit/include
+endif
 
 # include nrf51 boards common configuration
 include $(RIOTBOARD)/common/nrf51/Makefile.include

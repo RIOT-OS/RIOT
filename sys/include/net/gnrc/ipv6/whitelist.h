@@ -31,14 +31,14 @@ extern "C" {
 /**
  * @defgroup    net_gnrc_ipv6_whitelist_conf GNRC IPv6 address whitelisting compile configurations
  * @ingroup     net_gnrc_ipv6_whitelist
- * @ingroup     config
+ * @ingroup     net_gnrc_conf
  * @{
  */
 /**
  * Maximum size of the whitelist.
  */
-#ifndef GNRC_IPV6_WHITELIST_SIZE
-#define GNRC_IPV6_WHITELIST_SIZE    (8)
+#ifndef CONFIG_GNRC_IPV6_WHITELIST_SIZE
+#define CONFIG_GNRC_IPV6_WHITELIST_SIZE    (8)
 #endif
 /** @} */
 

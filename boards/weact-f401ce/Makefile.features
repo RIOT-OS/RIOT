@@ -1,0 +1,6 @@
+CPU_MODEL = stm32f401ce
+
+include $(RIOTBOARD)/common/weact-f4x1cx/Makefile.features
+
+# weact-f401ce provides a custom default Kconfig clock configuration
+KCONFIG_BOARD_CONFIG += $(RIOTBOARD)/weact-f401ce/clock.config

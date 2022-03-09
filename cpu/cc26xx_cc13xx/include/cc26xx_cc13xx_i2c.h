@@ -25,7 +25,6 @@
 extern "C" {
 #endif
 
-
 /**
  * I2C registers
  */
@@ -101,7 +100,6 @@ typedef struct {
  *              1: The I2C controller is idle.
  */
 #define MSTAT_IDLE  0x00000020
-
 
 /**
  * @brief       Arbitration lost
@@ -187,9 +185,10 @@ cycle or continues on to a repeated START condition
  */
 #define MCTRL_RUN  0x00000001
 
-/** @ingroup cpu_specific_peripheral_memory_map
-  * @{
-  */
+/**
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
+ */
 #define I2C_BASE           (PERIPH_BASE + 0x2000) /**< I2C base address */
 /** @} */
 
@@ -200,5 +199,4 @@ cycle or continues on to a repeated START condition
 #endif
 
 #endif /* CC26XX_CC13XX_I2C_H */
-
-/*@}*/
+/** @} */

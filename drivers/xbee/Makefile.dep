@@ -1,0 +1,5 @@
+FEATURES_REQUIRED += periph_uart
+FEATURES_REQUIRED += periph_gpio
+USEMODULE += ieee802154
+USEMODULE += ztimer
+USEMODULE += ztimer_msec

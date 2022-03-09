@@ -1,0 +1,3 @@
+FEATURES_REQUIRED += periph_i2c
+USEMODULE += ztimer
+USEMODULE += ztimer_msec

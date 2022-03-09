@@ -1,27 +1,29 @@
-# set default port depending on operating system
-PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+# Use OpenOCD by default
+PROGRAMMER ?= openocd
 
 # Use the shared OpenOCD configuration
 # Using dap or jlink depends on which firmware the OpenSDA debugger is running
-DEBUG_ADAPTER ?= dap
-#DEBUG_ADAPTER ?= jlink
+OPENOCD_DEBUG_ADAPTER ?= dap
+#OPENOCD_DEBUG_ADAPTER ?= jlink
 
 # Configuration for OpenOCD v0.10.0 and newer
 # For KW41Z, an OpenOCD version built from source is required. The support for
 # kw41z was introduced in
 # https://github.com/ntfreak/openocd/2c8602ed9f084d6680cec7d0ca1d5dc71c865a5f
-export OPENOCD_CONFIG ?= $(RIOTBOARD)/common/frdm/dist/openocd-$(CPU_FAMILY).cfg
+ifeq ($(CPU_CORE), cortex-m0plus)
+  OPENOCD_KINETIS_FAMILY = klx
+else
+  OPENOCD_KINETIS_FAMILY = kx
+endif
+
+OPENOCD_CONFIG ?= $(RIOTBOARD)/common/frdm/dist/openocd-$(OPENOCD_KINETIS_FAMILY).cfg
 
 # Check the flash configuration field before flashing
-export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh
-
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
+OPENOCD_PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh
 
 # The board can become un-flashable after some execution,
 # use connect_assert_srst to always be able to flash or reset the board.
-export OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 
-# this board uses openocd
-include $(RIOTMAKE)/tools/openocd.inc.mk
+# openocd programmer is supported with FRDM boards
+PROGRAMMERS_SUPPORTED += openocd

@@ -18,7 +18,6 @@
  * @}
  */
 
-
 #include <string.h>
 
 #include "saul.h"

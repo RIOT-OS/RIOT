@@ -1,0 +1,3 @@
+# Use an immediate variable to evaluate `MAKEFILE_LIST` now
+USEMODULE_INCLUDES_openwsn_scheduler_mock := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_openwsn_scheduler_mock)

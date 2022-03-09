@@ -1,0 +1,18 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_ISRPIPE
+    bool "ISR Pipe"
+    select MODULE_TSRB
+    depends on TEST_KCONFIG
+    help
+        ISR -> userspace pipe.
+
+config MODULE_ISRPIPE_READ_TIMEOUT
+    bool "ISR Pipe read with timeout"
+    depends on MODULE_ISRPIPE
+    select MODULE_XTIMER

@@ -20,6 +20,7 @@
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
+#include "kernel_defines.h"
 #include "mutex.h"
 
 #include "cpu_conf.h"
@@ -30,7 +31,9 @@
 #include "em_gpio.h"
 #include "em_timer.h"
 #include "em_usart.h"
-#ifdef _SILICON_LABS_32B_SERIES_0
+#include "em_wdog.h"
+#include "em_rtc.h"
+#if defined(_SILICON_LABS_32B_SERIES_0)
 #include "em_dac.h"
 #endif
 
@@ -79,9 +82,9 @@ typedef struct {
  */
 typedef struct {
     uint8_t dev;                      /**< device index */
-#ifdef _SILICON_LABS_32B_SERIES_0
+#if defined(_SILICON_LABS_32B_SERIES_0)
     ADC_SingleInput_TypeDef input;    /**< input channel */
-#else
+#elif defined(_SILICON_LABS_32B_SERIES_1)
     ADC_PosSel_TypeDef input;         /**< input channel */
 #endif
     ADC_Ref_TypeDef reference;        /**< channel voltage reference */
@@ -92,6 +95,11 @@ typedef struct {
  * @brief   Length of CPU ID in octets.
  */
 #define CPUID_LEN           (8U)
+
+/**
+ * @brief   CPU Frequency Define
+ */
+#define CLOCK_CORECLOCK     SystemCoreClock
 
 #if defined(DAC_COUNT) && DAC_COUNT > 0
 /**
@@ -111,6 +119,23 @@ typedef struct {
     DAC_Ref_TypeDef ref;    /**< channel voltage reference */
 } dac_chan_conf_t;
 #endif
+
+/**
+ * @name    Real time counter configuration
+ * @{
+ */
+/* RTT_MAX_VALUE some are 24bit, some are 32bit */
+#ifdef _RTC_CNT_MASK
+#define RTT_MAX_VALUE       _RTC_CNT_MASK        /* mask has all bits set ==> MAX*/
+#endif
+#ifdef _RTCC_CNT_MASK
+#define RTT_MAX_VALUE       _RTCC_CNT_MASK       /* mask has all bits set ==> MAX*/
+#endif
+#define RTT_MAX_FREQUENCY   (32768U)             /* in Hz */
+#define RTT_MIN_FREQUENCY   (1U)                 /* in Hz */
+#define RTT_CLOCK_FREQUENCY (32768U)             /* in Hz, LFCLK*/
+
+/** @} */
 
 /**
  * @brief   Define a custom type for GPIO pins.
@@ -211,7 +236,7 @@ typedef enum {
 #ifdef AES_CTRL_AES256
 #define HAVE_HWCRYPTO_AES256
 #endif
-#ifdef _SILICON_LABS_32B_SERIES_1
+#if defined(_SILICON_LABS_32B_SERIES_1)
 #define HAVE_HWCRYPTO_SHA1
 #define HAVE_HWCRYPTO_SHA256
 #endif
@@ -348,16 +373,24 @@ typedef struct {
  * @{
  */
 typedef struct {
-    TIMER_TypeDef *dev;     /**< Timer device used */
+    void *dev;              /**< TIMER_TypeDef or LETIMER_TypeDef device used */
     CMU_Clock_TypeDef cmu;  /**< the device CMU channel */
 } timer_dev_t;
 
 typedef struct {
-    timer_dev_t prescaler;  /**< the lower numbered neighboring timer */
+    timer_dev_t prescaler;  /**< the lower neighboring timer (not initialized for LETIMER) */
     timer_dev_t timer;      /**< the higher numbered timer */
     IRQn_Type irq;          /**< number of the higher timer IRQ channel */
+    uint8_t channel_numof;       /**< number of channels per timer */
 } timer_conf_t;
 /** @} */
+
+/**
+ * @brief   Use LETIMER as the base timer for XTIMER
+ */
+#ifndef CONFIG_EFM32_XTIMER_USE_LETIMER
+#define CONFIG_EFM32_XTIMER_USE_LETIMER   0
+#endif
 
 /**
  * @brief   UART device configuration.
@@ -420,6 +453,23 @@ typedef struct {
  * @brief   Number of usable power modes.
  */
 #define PM_NUM_MODES    (2U)
+
+/**
+ * @name    Watchdog timer (WDT) configuration
+ * @{
+ */
+#define WDT_CLOCK_HZ            (1000U)
+
+#define NWDT_TIME_LOWER_LIMIT   ((1U << (3U + wdogPeriod_9)) + 1U)
+#define NWDT_TIME_UPPER_LIMIT   ((1U << (3U + wdogPeriod_256k)) + 1U)
+
+#ifdef _SILICON_LABS_32B_SERIES_1
+#define WDT_TIME_LOWER_LIMIT    NWDT_TIME_LOWER_LIMIT
+#define WDT_TIME_UPPER_LIMIT    NWDT_TIME_UPPER_LIMIT
+#endif
+
+#define WDT_HAS_STOP            (1U)
+/** @} */
 
 #ifdef __cplusplus
 }

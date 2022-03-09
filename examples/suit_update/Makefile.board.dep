@@ -1,0 +1,6 @@
+ifeq ($(BOARD),native)
+  USEMODULE += suit_storage_ram
+  USEMODULE += netdev_default
+else
+  USEMODULE += suit_storage_flashwrite
+endif

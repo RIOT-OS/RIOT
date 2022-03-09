@@ -1,0 +1,18 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_HTS221
+    bool "ST HTS221 digital Humidity Sensor"
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+
+config HAVE_HTS221
+    bool
+    select MODULE_HTS221 if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a ST HTS221 sensor is present.

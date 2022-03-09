@@ -29,7 +29,7 @@
 #include "srf02.h"
 #include "periph/i2c.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 /**
@@ -51,7 +51,6 @@
 #define CMD_ADDR_SEQ2       (0xaa)
 #define CMD_ADDR_SEQ3       (0xa5)
 /** @} */
-
 
 int srf02_init(srf02_t *dev, i2c_t i2c, uint8_t addr)
 {

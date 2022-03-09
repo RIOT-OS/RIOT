@@ -37,12 +37,22 @@ extern "C" {
 #include "periph/i2c.h"
 
 /**
+ * @defgroup drivers_lpsxxx_config     LPS331AP/LPS25HB/LPS22HB driver compile configuration
+ * @ingroup config_drivers_sensors
+ * @{
+ */
+/**
  * @brief   The sensors default I2C address
  *
- * Default address corresponds to SDO/SA0 pad connected to ground. If SDO/SA0
- * pad is connected to power supply, I2C address is 0x5C.
+ * The address depends on the status of SDO/SA0 Pin. Default
+ * address corresponds to SDO/SA0 connected to VDD. For more
+ * information refer to the section 'I2C operation' in the
+ * datasheet.
  */
-#define LPSXXX_DEFAULT_ADDRESS  (0x5d)
+#ifndef CONFIG_LPSXXX_DEFAULT_ADDRESS
+#define CONFIG_LPSXXX_DEFAULT_ADDRESS  (0x5d)
+#endif
+/** @} */
 
 /**
  * @brief   Return codes
@@ -71,6 +81,13 @@ typedef enum {
     LPSXXX_RATE_25HZ = 3,       /**< sample with 25Hz, default */
     LPSXXX_RATE_50HZ = 4,       /**< sample with 50Hz */
     LPSXXX_RATE_75HZ = 5        /**< sample with 75Hz */
+#elif MODULE_LPS22HH
+    LPSXXX_RATE_10HZ = 2,       /**< sample with 10Hz */
+    LPSXXX_RATE_25HZ = 3,       /**< sample with 25Hz, default */
+    LPSXXX_RATE_50HZ = 4,       /**< sample with 50Hz */
+    LPSXXX_RATE_75HZ = 5,       /**< sample with 75Hz */
+    LPSXXX_RATE_100HZ = 6,      /**< sample with 100Hz */
+    LPSXXX_RATE_200HZ = 7       /**< sample with 200Hz */
 #endif
 } lpsxxx_rate_t;
 
@@ -79,7 +96,7 @@ typedef enum {
  */
 #if MODULE_LPS331AP || MODULE_LPS25HB
 #define LPSXXX_DEFAULT_RATE     (LPSXXX_RATE_7HZ)
-#else /* MODULE_LPS22HB */
+#else /* MODULE_LPS22HB || MODULE_LPS22HH */
 #define LPSXXX_DEFAULT_RATE     (LPSXXX_RATE_25HZ)
 #endif
 

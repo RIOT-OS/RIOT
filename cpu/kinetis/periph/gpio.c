@@ -412,4 +412,12 @@ void isr_portb_portc(void)
     cortexm_isr_end();
 }
 #endif
+#if defined(PORTC_BASE) && defined(PORTD_BASE)
+/* Combined ISR used in certain KL devices */
+void isr_portc_portd(void)
+{
+    irq_handler(PORTC, 2);
+    irq_handler(PORTD, 3);
+}
+#endif
 #endif /* MODULE_PERIPH_GPIO_IRQ */

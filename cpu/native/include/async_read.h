@@ -18,6 +18,9 @@
 #ifndef ASYNC_READ_H
 #define ASYNC_READ_H
 
+#include <stdlib.h>
+#include <poll.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -33,6 +36,16 @@ extern "C" {
  * @brief   asynchronus read callback type
  */
 typedef void (*native_async_read_callback_t)(int fd, void *arg);
+
+/**
+ * @brief    Interrupt callback information structure
+ */
+typedef struct {
+    pid_t child_pid;                    /**< PID of the interrupt listener */
+    native_async_read_callback_t cb;    /**< Interrupt callback function */
+    void *arg;                          /**< Argument ptr for the callback */
+    struct pollfd *fd;                  /**< sysfs gpio fd */
+} async_read_t;
 
 /**
  * @brief   initialize asynchronus read system
@@ -66,6 +79,16 @@ void native_async_read_continue(int fd);
  *                     descriptor is ready to read.
  */
 void native_async_read_add_handler(int fd, void *arg, native_async_read_callback_t handler);
+
+/**
+ * @brief   start monitoring of file descriptor as interrupt
+ *
+ * @param[in] fd       The file descriptor to monitor
+ * @param[in] arg      Pointer to be passed as arguments to the callback
+ * @param[in] handler  The callback function to be called when the file
+ *                     descriptor is ready to read.
+ */
+void native_async_read_add_int_handler(int fd, void *arg, native_async_read_callback_t handler);
 
 #ifdef __cplusplus
 }

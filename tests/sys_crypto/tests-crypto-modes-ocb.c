@@ -50,8 +50,6 @@ static size_t TEST_1_EXPECTED_LEN = 16;
 
 static uint8_t TEST_1_TAG_LEN = 16;
 
-
-
 /* Test 2:
     N: BBAA99887766554433221101
     A: 0001020304050607
@@ -86,7 +84,6 @@ static size_t TEST_2_EXPECTED_LEN = sizeof(TEST_2_EXPECTED);
 
 static uint8_t TEST_2_TAG_LEN = 16;
 
-
 /* Test 3:
     N: BBAA99887766554433221102
     A: 0001020304050607
@@ -118,7 +115,6 @@ static uint8_t TEST_3_EXPECTED[] = {
 static size_t TEST_3_EXPECTED_LEN = sizeof(TEST_3_EXPECTED);
 
 static uint8_t TEST_3_TAG_LEN = 16;
-
 
 /* Test 4:
     N: BBAA99887766554433221103
@@ -152,7 +148,6 @@ static uint8_t TEST_4_EXPECTED[] = {
 static size_t TEST_4_EXPECTED_LEN = sizeof(TEST_4_EXPECTED);
 
 static uint8_t TEST_4_TAG_LEN = 16;
-
 
 /* Test 16:
     N: BBAA9988776655443322110F
@@ -196,8 +191,6 @@ static uint8_t TEST_16_EXPECTED[] = {
 static size_t TEST_16_EXPECTED_LEN = sizeof(TEST_16_EXPECTED);
 
 static uint8_t TEST_16_TAG_LEN = 16;
-
-
 
 /* Test 17:
 
@@ -259,7 +252,6 @@ static size_t TEST_17_EXPECTED_LEN = sizeof(TEST_17_EXPECTED);
 
 static uint8_t TEST_17_TAG_LEN = 12;
 
-
 /* Share test buffer output */
 static uint8_t data[60];
 
@@ -277,7 +269,7 @@ static void test_encrypt_op(uint8_t *key, uint8_t key_len,
     TEST_ASSERT_MESSAGE(sizeof(data) >= output_expected_len,
                         "Output buffer too small");
 
-    err = cipher_init(&cipher, CIPHER_AES_128, key, key_len);
+    err = cipher_init(&cipher, CIPHER_AES, key, key_len);
     TEST_ASSERT_EQUAL_INT(1, err);
 
     len = cipher_encrypt_ocb(&cipher, adata, adata_len,
@@ -327,7 +319,7 @@ static void test_decrypt_op(uint8_t *key, uint8_t key_len,
     TEST_ASSERT_MESSAGE(sizeof(data) >= output_expected_len,
                         "Output buffer too small");
 
-    err = cipher_init(&cipher, CIPHER_AES_128, key, key_len);
+    err = cipher_init(&cipher, CIPHER_AES, key, key_len);
     TEST_ASSERT_EQUAL_INT(1, err);
 
     len = cipher_decrypt_ocb(&cipher, adata, adata_len,
@@ -409,10 +401,14 @@ static void test_crypto_modes_ocb_decrypt(void)
 
 static void test_crypto_modes_ocb_bad_parameter_values(void)
 {
-    uint8_t key[16], auth_data[1], nonce[16], input[16], output[32];
+    uint8_t key[16] = {0};
+    uint8_t auth_data[1] = {0};
+    uint8_t nonce[16] = {0};
+    uint8_t input[16] = {0};
+    uint8_t output[32] = {0};
     cipher_t cipher;
 
-    cipher_init(&cipher, CIPHER_AES_128, key, 16);
+    cipher_init(&cipher, CIPHER_AES, key, 16);
     /* tag length must be positive */
     int rv = cipher_encrypt_ocb(&cipher, auth_data, sizeof(auth_data), 0, nonce,
                                 15, input, sizeof(input), output);

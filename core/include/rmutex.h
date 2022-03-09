@@ -24,17 +24,12 @@
 #define RMUTEX_H
 
 #include <stdint.h>
-#ifdef __cplusplus
-#include "c11_atomics_compat.hpp"
-#else
-#include <stdatomic.h>
-#endif
 
 #include "mutex.h"
-#include "kernel_types.h"
+#include "sched.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -62,14 +57,14 @@ typedef struct rmutex_t {
      *          atomic_int_least16_t is used. Note @ref kernel_pid_t is an int16
      * @internal
      */
-    atomic_int_least16_t owner;
+    kernel_pid_t owner;
 } rmutex_t;
 
 /**
  * @brief Static initializer for rmutex_t.
  * @details This initializer is preferable to rmutex_init().
  */
-#define RMUTEX_INIT { MUTEX_INIT, 0, ATOMIC_VAR_INIT(KERNEL_PID_UNDEF) }
+#define RMUTEX_INIT { MUTEX_INIT, 0, KERNEL_PID_UNDEF }
 
 /**
  * @brief Initializes a recursive mutex object.
@@ -80,6 +75,7 @@ typedef struct rmutex_t {
 static inline void rmutex_init(rmutex_t *rmutex)
 {
     rmutex_t empty_rmutex = RMUTEX_INIT;
+
     *rmutex = empty_rmutex;
 }
 

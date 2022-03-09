@@ -21,10 +21,29 @@
 #define BOARD_H
 
 #include "cpu.h"
+#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @name    AT24MAC402 configuration
+ * @{
+ */
+#define AT24MAC_PARAM_I2C_DEV   I2C_DEV(1)
+#define AT24MAC_PARAM_I2C_ADDR  (0x5E)
+#define AT24MAC_PARAM_TYPE      AT24MAC4XX
+#define AT24CXXX_PARAM_I2C      I2C_DEV(1)
+#define AT24CXXX_PARAM_ADDR     (0x56)
+/** @} */
+
+/**
+ * @name    ATECC508A configuration
+ * @{
+ */
+#define ATCA_PARAM_I2C           I2C_DEV(1)
+/** @} */
 
 /**
  * @name   LED pin definitions and handlers
@@ -50,17 +69,22 @@ extern "C" {
 /** @} */
 
 /**
+ * @name MTD configuration
+ * @{
+ */
+extern mtd_dev_t *mtd0, *mtd1;
+#define MTD_0       mtd0
+#define MTD_1       mtd1
+#define MTD_NUMOF   2
+/** @} */
+
+/**
  * @name    Xtimer configuration
  * @{
  */
 #define XTIMER_WIDTH                (32)
 #define XTIMER_HZ                   (1000000ul)
 /** @} */
-
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

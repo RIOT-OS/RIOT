@@ -1,0 +1,700 @@
+Build 1.210 (GCC)
+=================
+05/14/2020
+
+New device support:
+------------------
+- None
+
+New features / changes:
+-----------------------
+- Adjusted high-memory boundaries in default linker command files to fix CPU47
+- Changed lower (<0x10000) memory name from 'ROM' to 'FRAM' in applicable linker
+  command files
+- Removed redundant TLV #defines from header files
+
+Bug fixes:
+----------
+- Removed invalid IO ports from several MSP430FRxx devices
+- Added missing HSPLL #defines for MSP430FR6043 family
+- Fixed FR2XX/4XX family include guard in legacy.h
+
+
+Build 1.209 (GCC)
+=================
+02/03/2020
+
+New device support:
+------------------
+- MSP430FR2673, MSP430FR2672
+- MSP430FR6005, MSP430FR6007
+
+New features / changes:
+-----------------------
+- None
+
+Bug fixes:
+----------
+- None
+
+
+Build 1.208 (GCC)
+=================
+08/29/2019
+
+New device support:
+------------------
+- None
+
+New features / changes:
+-----------------------
+- Added support for blinking LED example
+
+Bug fixes:
+----------
+- Fixed GNU compiler build options
+- Added missing ALIGN directives for .preinit/init/fini_array sections in GCC
+  linker command files
+
+
+Build 1.207 (GCC)
+=================
+02/14/2019
+
+New device support:
+------------------
+- MSP430FR2676, MSP430FR2675, MSP430FR2476, MSP430FR2475
+
+New features / changes:
+-----------------------
+- Updated definition of "__no_init" in in430.h
+
+Bug fixes:
+----------
+- Corrected usage of NOPs in enable/disable interrupt macros in in430.h
+- Removed invalid byte-access #defines (*_L/*_H) for DMA registers which only 
+  allow word access from applicable device header files
+
+
+Build 1.206 (GCC)
+=================
+07/26/2018
+
+New device support:
+------------------
+- None
+
+New features / changes:
+-----------------------
+- None
+
+Bug fixes:
+----------
+- Added missing CPU errata compiler switches for MSP430FR2522, FR2512, FR2422
+- Removed invalid SYSRSTIV_FLLUL #define from MSP430F5/F6 device header files
+
+
+Build 1.205 (GCC)
+=================
+04/23/2018
+
+New device support:
+------------------
+- MSP430FR2355, MSP430FR2353, MSP430FR2155, MSP430FR2153
+
+New features / changes:
+-----------------------
+- None
+
+Bug fixes:
+----------
+- Fixed another issue with .tinyram sections
+
+
+Build 1.204 (GCC)
+=================
+12/21/2017
+
+New device support:
+------------------
+- MSP430FR6043, MSP430FR6041, MSP430FR5043, MSP430FR5041,
+  MSP430FR60431, MSP430FR50431
+
+New features / changes:
+-----------------------
+- Separated release notes by toolchain (CCS, IAR, GCC)
+- Added build version number to device XML and GNU compiler options file
+- Minor update in legacy.h
+
+Bug fixes:
+----------
+- Added missing .tinyram assignments in applicable linker command files
+
+
+Build 1.203
+===========
+10/05/2017
+
+New device support:
+------------------
+- MSP430FR2522, MSP430FR2512, MSP430FR2422
+
+New features / changes:
+-----------------------
+- Added -minrt option for GCC builds on devices with .5K of MAIN memory
+
+Bug fixes:
+----------
+- Fixed name conflict in GCC linker files for FR2xx devices (INFO vs. INFOMEM)
+
+
+Build 1.201
+===========
+06/28/2017
+
+New device support:
+------------------
+- MSP430FR2100, MSP430FR2000
+
+New features / changes:
+-----------------------
+- Enabled MPU by default for FR57xx family devices
+- Moved toolchain specific CCS device XML files to separate folder (targetdb/options)
+- Changed GCC linker files to place .persistent section into lower FRAM
+- Changed GCC linker files to properly split rodata, data, bss and text sections for
+  devices with large memory
+- Added a workaround to enable GCC project builds for FR6047 family in CCS
+
+Bug fixes:
+----------
+- Fixed offset definitions for port registers in header files for newer devices
+- Fixed linker options in *_TI CCS device XML files using -D instead of --define
+- Fixed CCS linker files using __LARGE_DATA_MODEL__ instead of __LARGE_CODE_MODEL__
+- Fixed inconsistencies in IAR SFR files for newer devices
+
+
+Build 1.200
+===========
+05/31/2017
+
+New device support:
+------------------
+- MSP430FR6047, MSP430FR60471, MSP4306045, MSP430FR6037, MSP430FR60371, MSP430FR6035
+
+New features / changes:
+-----------------------
+- Moved toolchain specific data from CCS device XMLs to separate _TI/_GNU XMLs
+- Added list of memory boundary defines to header files for newer devices
+- Changed CCS device XMLs to activate MPU by default for applicable devices
+
+Bug fixes:
+----------
+- Removed invalid linker- and IDE integration files for "generic" devices
+- Fixed RAM boundaries for MSP430F67641 and MSP430F67641A
+- As of last support files release 7.2.4: Fixed wrong -mmcu flags in GCC specific device 
+  XML files
+
+Known Limitations:
+------------------
+- MPU is not enabled by default on FR57xx family devices
+
+==========================================================================================
+Build 1.199 - 27.02.2017
+==========================================================================================
+15.02.2017   Several updates in legacy.h
+10.02.2017   Minor change for calculated interrupt vector definitions in IAR header files
+07.02.2017   Added --near_data=none option for devices with RAM in memory > 0x10000
+06.02.2017   Fixed WDT base address and WDTCTL offset for FR4xx/FR2xx family devices
+02.02.2017   Fixed an issue with INFO memory of FRAM devices being initialized on reset
+02.02.2017   Fixed RAM boundaries for FR596x devices
+02.02.2017   Changed I/O offset definitions to be relative to PORTx base for newer devices
+13.12.2016   Enabled --gc-section compiler option for GCC builds
+08.12.2016   Added mirrored RAM ranges to IAR menu files for applicable devices
+==========================================================================================
+Build 1.198 - 22.11.2016
+==========================================================================================
+18.11.2016   Added missing ADCRES control bits for FR4xx/FR2xx devices
+04.10.2016   Fixed offset definitions for certain registers in modules DIO and RTC
+04.10.2016   Removed duplicate and invalid defines in header files for newer devices
+04.10.2016   Fixed comment format in all header files for newer devices
+26.09.2016   Moved CPU architecture define in header to account for in430.h dependencies
+==========================================================================================
+Build 1.194 - 27.09.2016
+==========================================================================================
+26.09.2016   Updated in430.h for GCC and changed include order in GCC headers accordingly
+==========================================================================================
+release Package 19.09.2016
+==========================================================================================
+06.09.2016   Removed invalid INFOMEM definitions in GCC linker files for fr2xx devices
+06.09.2016   Updated legacy.h with old LEA_SC definitions
+06.09.2016   Renamed LEA_SC module to LEA (including all registers and other definitions)
+==========================================================================================
+release Package 10.06.2016
+==========================================================================================
+10.06.2016   Fixed typo in TI_COMPILER_VERSION check in CCS linker command files
+01.06.2016   Corrected TLV address offsets in header files for G2xx/F2xx devices
+==========================================================================================
+release Package 20.05.2016
+==========================================================================================
+19.05.2016   Added SIGNATURE sections in GCC linker command files
+19.05.2016   Removed invalid code from generic GCC symbol files
+18.05.2016   Added silicon errata switches to GCC compiler options in CCS device XMLs
+02.05.2016   Added missing register separator comments in header files for newer MSP430s
+28.04.2016   Changed format of multi-JSTATE bit modules in IAR menu files
+12.04.2016   Added missing alternate register definitions (RTCCNT) for devices with RTC_C
+==========================================================================================
+release Package 11.04.2016
+==========================================================================================
+11.04.2016   Added missing register definition macros to iomacros.h for GCC
+08.04.2016   Added missing __MSP430_HAS_P*SEL__ definitions in F1xx/F2xx/F4xx headers
+08.04.2016   Fixed typo in GCC linker files
+05.04.2016   Fixed debug_line option in GCC linker files for smaller memory devices
+==========================================================================================
+release Package 31.03.2016
+==========================================================================================
+31.03.2016   Fixed register definitions in GCC header files for FR5994 and FR2311 family
+31.03.2016   Removed invalid header and support files for FR5994 family devices
+==========================================================================================
+release Package 30.03.2016
+==========================================================================================
+30.03.2016   Changed 16bit access definitions for 32bit registers in GCC headers
+29.03.2016   Enhanced DEFWL macro in IAR header files
+29.03.2016   Corrected family definition for several FR2xx devices
+29.03.2016   Removed unnecessary memory allocation in GCC linker files
+29.03.2016   Added legacy definitions for FR413x BKMEM module
+==========================================================================================
+release Package 24.03.2016
+==========================================================================================
+24.03.2016   Added ADC10PDIV_3 definition to resolve backwards compatibility issues
+==========================================================================================
+release Package 02.03.2016
+==========================================================================================
+02.03.2016   Updated compiler workaround switches in CCS xml files
+==========================================================================================
+release Package 03.02.2016
+==========================================================================================
+27.01.2016   Added: MSP430FR5994, MSP430FR5992, MSP430FR5964, MSP430FR5962, MSP430FR5894, 
+                    MSP430FR5892, MSP430FR5864, MSP430FR5862
+             Added: MSP430FR2311, MSP430FR2310
+==========================================================================================
+release Package 22.12.2015
+==========================================================================================
+21.12.2015   Revised TAG_ADC10_1 values for applicable devices
+16.12.2015   Added upper bss section in GCC linker files
+15.12.2015   Removed invalid LCD definitions in CC430F514x header and support files
+02.12.2015   Removed invalid ADC10PDIV_3 definitions for MSP430F5247 and related devices
+02.12.2015   Added CAPTIVATE registers
+16.11.2015   Added mhwmult option in the GNU Compiler option with the CCS device.xml files
+09.11.2015   Fixed AESOP_2 and AESOP_3 comments mismatch and typo
+09.11.2015   Added new GCC linker symbols files
+09.11.2015   Added missing GCC linker option in CCS xml files
+04.11.2015   CCS linker file memory regions split
+==========================================================================================
+release Package 29.10.2015
+==========================================================================================
+28.10.2015   Added GCC linker heap memory support
+==========================================================================================
+release Package 27.10.2015
+==========================================================================================
+20.10.2015   Updated CCS cmd file for IPE signature
+14.10.2015   CCS linker file: fixed mapping of manual IPE configuration to right memory range
+13.10.2015   updated a comment in the GCC linker file (.noinit)
+13.10.2015   Restructured memory segment output for GCC linker files
+13.10.2015   Added: MSP430FR2532, MSP430FR2533, MSP430FR2632, MSP430FR2633
+06.10.2015   Added INFO memory tag in IAR menu files
+28.09.2015   Added BSL memory tag in IAR menu files
+24.09.2015   Fixed mirrored RAM section for F6659
+15.09.2015   Changed IAR linker files to support MPU + IPE enabled together
+15.09.2015   Corrected RAM memory range in lnk430f5359.xcl
+14.09.2015   Removed 0x400 offset for IPEEND
+14.09.2015   Add a .ipe_const section for constants in the IPE area in CCS linker files
+14.09.2015   Added new IAR menu file features requested by IAR
+14.09.2015   Added ram func feature for CCS
+==========================================================================================
+release Package 10.08.2015
+==========================================================================================
+29.07.2015   Updated comments for USCI IV Bit definitions
+==========================================================================================
+release Package 17.07.2015
+==========================================================================================
+17.07.2015   Fixed issue with BSL signature overlapping with interrupt vectors
+16.07.2015   Fixed DMA issue in msp430frxx_6xxgeneric.h
+14.07.2015   Add new definitions for Driverlib to differentiate SYSCFG2 bits
+09.07.2015   F673xA: added missing 3rd SD24 Channel definition
+29.06.2015   FR59xx and FR69xx: removed not available defines for SYSSNIV_SVS and SYSSNIV_ACCTEIFG
+09.06.2015   F677x: fixed wrong define DMAxTSEL__USCIB3TX to DMAxTSEL__USCIA3TX
+16.04.2015   added: RF430F5175 RF430F5155 RF430F5144
+             added: MSP430FR5922 MSP430FR59221
+02.04.2015   Updated Segment size and calculation for FR57xx devices
+==========================================================================================
+release Package 25.03.2015
+==========================================================================================
+13.03.2015   updated IAR xcl file format
+18.02.2015   added Port 7 for MSP430F5239
+==========================================================================================
+release Package 04.02.2015
+==========================================================================================
+31.07.2014   LCD_B and LCD_C: added missing LCDBLKPRE_x and LCDDIV_x definitions
+25.07.2014   G2xx1,G2xx2,G2xx3: added dummy TRAPINT_VECTOR interrupt vector as bugfix for USCI29
+16.07.2014   FR5xx/FR6xx: added define SYSRSTIV_ACCTEIFG
+04.07.2014   ESI: Renamed bit ESIVCC2 to ESIVMIDEN, renamed bit ESIVSS to ESISHTSM
+==========================================================================================
+release Package 29.06.2014
+==========================================================================================
+25.06.2014   Updated MPU inplementation into CCS Linker Command files
+==========================================================================================
+release Package 29.04.2014
+==========================================================================================
+==========================================================================================
+release Package 21.01.2014
+==========================================================================================
+20.01.2014   Added Version Tag to Linker command files (identical to header files)
+             updated Signature defintion for CCS in linker command files 
+             replaced MirrowRAMEnd with MirrowedRAMEnd 
+             added MSP430F677xA devices
+21.11.2013   MSP430F665x: Added USCI_A2 and USCI_B2 to DMA Trigger Table
+20.11.2013   CCS: updated path for mathlib (4xx/5xx version)
+11.11.2013   MSP430i20xx: fixed TAxIV_TAIFG definition
+31.10.2013   MSP430G25xx: updated tags for TLV data
+24.07.2013   MSP430FR59xx: Replaced NACCESSx with NWAITSx
+23.07.2013   Module LDOPWR: fixed wrong define of LDOEN (from LDOOEN)
+==========================================================================================
+release Package 18.07.2013
+==========================================================================================
+18.07.2013   CCS: added code template support
+11.07.2013   removed not available PxDS Register definitions
+==========================================================================================
+release Package 09.07.2013
+==========================================================================================
+09.07.2013   fixed identifier for debugger for MSP430i devices
+             added base address define  for MSP430i devices
+==========================================================================================
+release Package 28.06.2013
+==========================================================================================
+28.06.2013   added P7 to MSP430F5237
+10.06.2013   updated CCS linker command file for devices with MPU
+10.06.2013   added MSP430I20xx and MSP430F525x devices
+10.05.2013   MSP430F51x2 Fixed Typo PM_UCB0SOMO -> PM_UCB0SOMI
+==========================================================================================
+release Package 08.05.2013
+==========================================================================================
+25.04.2013   fixed RAM size for MSP430G2102 and MSP430G2132
+==========================================================================================
+release Package 19.03.2013
+==========================================================================================
+15.03.2013   added RTCAE bits to RTC Module
+11.03.2013   added DCOR to MSP430G2x55 devices
+             added 5xx style defintions for 2xx/4xx devices for TA0IV Register
+             fixed some typos in 5xx/6xx device with TimerA/B Interrupt vector definitions
+10.02.2013   fixed size of Signature in FRAM Devices
+==========================================================================================
+release Package 31.01.2013
+==========================================================================================
+31.01.2013   added MSP430G2755, MSP430G2855, MSP430G2955
+15.01.2013   changed defines to CapTouchIO from CapSenseIO to align with Users Guide
+13.12.2012   Module name changed from RTC_CE to RTC_C
+13.12.2012   CCS: Removed Legacy CCE V2 defines for Interrupt Vectors
+14.11.2012   fixed missing UCA1 in FR57x3/7
+14.11.2012   FR56xx: fixed typo in SYSRSTIV_MPUSEG defintions
+                     replaced COMP_B with COMP_E
+==========================================================================================
+release Package 13.11.2012
+==========================================================================================
+24.10.2012 replaced define TBSSEL__TACLK with TBSSEL__TBCLK
+           ADC12B: fixed some Typos in ADC12 definitions (ADC10 was used before)
+28.09.2012 USB devices: removed UPCS0 definition
+==========================================================================================
+release Package 25.09.2012
+==========================================================================================
+25.09.2012 F677x: added Comp B to Interrupt Vector Table
+21.09.2012 CCS: fixed issue with Board files under Linux
+18.09.2012 added Signature Memory Segments to linker command file
+12.09.2012 CCS: added USB RAM segment to linker command file
+16.08.2012 added MSP430F6x5x and MSP430F5x5x devices
+           added MSP430F677x devices
+17.07.2012 Updated PxSELC register address to offset 0x16 (instead of 0x10)
+           MSP430FR58xx/MSP430FR59xx replaced Comperator B with Comperator E
+28.06.2012 Added TimerD Cal Tag for TLV Table (Devices with TimerD only)
+13.06.2012 Fixed definitions for LCD: VLCD_13, VLCD_14, VLCD_3_26, VLCD_3_32
+13.06.2012 F67xx: Removed not available Bits SD24BINCHx
+==========================================================================================
+release Package 12.06.2012
+==========================================================================================
+31.05.2012 added MSP430SL5438A
+31.05.2012 CC430: removed not available Definitions: RF1AIFIV_RFRXIFG and RF1AIFIV_TFRXIFG
+29.05.2012 FR596x devices
+03.05.2012 MSP430FR57xx: removed not available PxDS Registers
+==========================================================================================
+release Package 30.03.2012
+==========================================================================================
+30.03.2012 MSP430F53xx, MSP430F52xx and MSP430F67xx: removed RCRS7OFF
+29.03.2012 MSP430F66xx: Added for defines for SYSSNIV_SVMLVLRIFG and SYSSNIV_SVMHVLRIFG
+==========================================================================================
+release Package 19.03.2012
+==========================================================================================
+13.03.2012 added MSP430FR5969
+22.02.2012 CCS: removed --advice:power=all and --advice:power_severity=remark from XML file
+                changed default output format from coff to elf
+                added addtional data segments to linker command file
+17.02.2012 Fixed UCBxSTAT display size in Debugger
+15.02.2012 CCS: Moved Modules to msp430 sub folder
+08.02.2012 CCS: updated MPU section:__mpusam = 0x7513;
+                updated MPU section:__mpuseg incremented by one if MemSize = x.5;
+18.01.2012 CCS: added .data Section (required for SYSBIOS)
+18.01.2012 CCS: changed pathes to use / instead of \ within XML files
+           CCS: package with unix style linefeeds added
+13.01.2012 ADC12B removed ADC12DIF for odd Registers
+           added defines for TimerA Interrrupt vectors to Timer0_A
+11.01.2012 Updated Comment for UC7BIT
+           Fixed Typo for MC__CONTINOUS (legacy definition for old define added)
+==========================================================================================
+release Package 14.12.2011
+==========================================================================================
+13.12.2011 Updated all FR57xx device to have 1k RAM
+28.11.2011 Fixed the G2230 and G2210 Menu file, leading to the device being reported as incorrect. 
+28.11.2011 Changed format of Interrupt Table in CCS V5 for ULP Advisor check
+           added Tag to CCS V5 XML files to enalbe ULP Advisor
+           removed -o0 option in CCS V4
+02.11.2011 updated FRAM error flag names for FR57xx
+           removed MPULOCK bit
+20.10.2011 added More memory information (RAM2/ USB RAM / Mirrowed RAM)
+14.10.2011 added TLV do MSP430XGenergic
+==========================================================================================
+release Package 01.10.2011
+==========================================================================================
+29.09.2011 fixed Typo in comment of TASSEL0/1
+==========================================================================================
+release Package 30.09.2011
+==========================================================================================
+29.09.2011 added G2230 and the G2210
+==========================================================================================
+15.09.2011 CCS: added Board Files
+15.09.2011 IAR: added Tag if INFOA can be locked
+==========================================================================================
+release Package 10.08.2011
+==========================================================================================
+03.08.2011 CCS: changed Stack and BSS location for FRAM devices to RAM
+02.08.2011 added Devices: F522x, F643x. F533x, FR57xx; F67xx, CC430F614x,  CC430F51xx
+02.08.2011 added Devices: GenericX Device
+03.08.2011 Fixed definition of RTCTEV__0000 and RTCTEV__1200
+==========================================================================================
+release Package 24.06.2011
+==========================================================================================
+09.06.2011 F663x: fixed wrong definitions in DMA Trigger 7 and 8
+==========================================================================================
+release Package 09.06.2011
+==========================================================================================
+09.06.2011 CPU BUG30 added for IAR
+           fixed comment of Peripheral section in IAR XCL files (5xx devices only)
+           added bit defintions for PAIN, PBIN,.. in XML and sfr files
+25.05.2011 F663x and FR573: Fixed definition of RTCTEV__0000 and RTCTEV__1200
+                            Removed not availabe bits RTCMODE and RTCSSELx
+12.05.2011 Fixed SD24 Tag for AFE253 (3 SD) devices
+19.04.2011 Added base address of 5xx modules
+           added PxSELC registers for FRAM devices
+07.04.2011 Fixed typo LCD_C (VLCD) definitions
+29.03.2011 Fixed Memory (RAM) for Fg477 and F477
+16.03.2011 Fixed typo in comment of AFE devices
+           Removed SD24CONF0 in AFE devices
+           Removed caldata for 1MHZ and 16MHZ in AFE devices
+==========================================================================================
+release Package 08.03.2011
+==========================================================================================
+07.03.2011 Set some FR57xx devices and all AFE device to released
+07.03.2011 Updated FR57xx devices
+04.03.2011 Added P3SEL for G2x53
+28.02.2011 IAR: added LPM5 Tag
+09.12.2010 F530x: added PU (USB LDO)
+08.12.2010 CCS: SD16: removed wrong entries in SD16 xml file
+06.12.2010 USB: added alternate define  USBIV - USBVECINT
+16.11.2010 F51x2: Fixed PortMapper Definitons
+==========================================================================================
+release Package 11.11.2010
+==========================================================================================
+11.11.2010 Removed Port4 in CC430F51xx devices
+09.11.2010 Added Devices to release package: Kryton, AFE253, F532x, F532x,  F534x, BT5xxx
+           updated PortU and USB defintions according to UG
+           changed access type to Timer A/B/D to word only
+15.10.2010 Added FW428/FW429
+15.10.2010 A-Pool: added LCMP : A-POOL Latch comparator
+==========================================================================================
+release Package 23.09.2010
+==========================================================================================
+14.09.2010 Fixed ADC12 (2xx/4xx) sfr file for ADC12MCTL
+           Removed DCOR bit in 5xx devices according UG
+==========================================================================================
+release Package 09.08.2010
+==========================================================================================
+==========================================================================================
+release Package 06.08.2010
+==========================================================================================
+03.08.2010 Replaced PSSKEY with PMMKEY on some older 5xx devices
+                    removed archiving of old Modules
+                    added Device Prefix for Modules on non-released devices
+==========================================================================================
+release Package 28.07.2010
+==========================================================================================
+27.07.2010 CCS-XML: added FilterString
+26.07.2010 removed P7/P8/PA from F24x
+26.07.2010 removed USCI 2/3 from 5418/5435/5437           
+           released device for Aug 2010 update
+10.07.2010 set L092 to normal CPU instead of CPUX
+05.07.2010 F471x3 Fixed Definition SD16MEMx, SD16IV
+05.07.2010 F5xx: added missing & for ADC12MEM
+05.07.2010 F663x removed EDI
+==========================================================================================
+release Package 17.06.2010
+==========================================================================================
+16.06.2010 CCS: removed for inbetween release: Family Tag to XML files
+11.06.2010 added support for GCC
+10.06.2010 Updated some OSCCAP settings for the F47xx devices
+09.06.2010 CCS: added Family Tag to XML files
+07.06.2010 Updated F47126/F47127 source files (fixed missing DMA and RTC)
+==========================================================================================
+release Package 27.05.2010
+==========================================================================================
+17.05.2010 CCS: added support Large/Small Memory Model in CCS cmd files
+17.05.2010 added support for F438/F438 spins
+==========================================================================================
+release Package 17.05.2010
+==========================================================================================
+17.05.2010 Removed L092EMU device
+04.05.2010 released L092 devices
+27.04.2010 added missing CG461x devices
+15.03.2010 FE42x2: Fixed swapped IRMS and IRMS_2 definitions
+==========================================================================================
+release Package 16.03.2010
+==========================================================================================
+15.03.2010 changed FETSTRING for F20x1 and F20x2 due to Argon Devices
+           added F6638 and F5510 to release package
+           updated EEM info for 5xx
+09.03.2010 updated EEM info for many devices (F5xx with 3 BKPT ,  F4719x)
+08.03.2010 IAR: replaced <In430.h> with "in430.h" as requested by A.Dannenberg /SDO
+05.03.2010 5xx: Changed access type of DMAxSZ registers to word only
+26.02.2010 removed XT2 from F5172 (int)
+26.02.2010 updated PM on F5510 (int)
+16.02.2010 updated comment in F41x2
+09.02.2010 CCS: replaced <In430.h> with "in430.h" as requested by A.Dannenberg /SDO
+==========================================================================================
+release Package 25.01.2010 (new update and with label applied)
+==========================================================================================
+25.01.2010 released F51x2
+25.01.2010 CCS: fixed bug in generation of XML files
+==========================================================================================
+release Package 16.12.2009 (new update and with label applied)
+==========================================================================================
+16.12.2009 updated defintions for KEY and PW (Password) as requested by system
+            PW register will cause PUC on wrong access / Key just ignores
+08.12.2009 CCS: added support of ENUM generation in XML files
+08.12.2009 Fixed typo in ADC10: SREF3 -> SREF2
+02.12.2009 CCS: fixed definitin of RESET_VECTOR for ASM
+01.12.2009 added u-type castings for #defines into IAR header file 
+01.12.2009 some comment cleanup in ADC12/ADC10 done
+26.11.2009 fixed typo WDTSSEL__SCMLK -> WDTSSEL__SMCLK
+20.11.2009 Removed support for old TI ASM
+16.11.2009 CC430: removed XT2DRIVE_x definitions
+==========================================================================================
+release Package 11.11.2009 (new update and with label applied)
+==========================================================================================
+10.11.2009 activated description field for CCS
+==========================================================================================
+release Package 10.11.2009 (new update and with label applied)
+==========================================================================================
+10.11.2009 F23x0: added dummy TRAPINT_VECTOR interrupt vector as bugfix for USCI29
+10.11.2009 implemented description field for CCS
+10.11.2009 fixed type enalbe in several modules
+==========================================================================================
+release Package 04.11.2009 (new update and with label applied)
+==========================================================================================
+05.11.2009 changed grouping of Port Mapping
+04.11.2009 updated TAG_ADC12_1 and TAG_ADC10_1 to 0x08
+03.11.2009 Fixed error in Port Mapping
+29.10.2009 Added several new device spins
+26.10.2009 MSP430FE42x2: Fixed swapped IRMS_2 definitions
+30.09.2009 L092/C092: set CPU type to CPUX (pre request from Team)
+29.09.2009 PMM: updated LOCKBAK to LOCKIO as shown in the UG LOCKBAK is used by RTC, added LOCKLPM5
+27.08.2009 IAR: added CPU Tag for menu files (BTT556)
+24.08.2009 CCS: fixed error in ASM int generation for numbers below 10
+19.08.2009 fixed wrong Ram size for F5527 -> 0x3BFF
+19.08.2009 removed Port D on F55xx devcie with 64 pin package
+12.08.2009 added 51x1 to internal devices
+==========================================================================================
+release Package 20.07.2009 
+==========================================================================================
+10.08.2009 updated RAM sizes of CC430F6137/CC430F5137
+07.08.2009 updated header of CCS cmd files according to Andreas D. recommendations
+05.08.2009 F55xx fixed type in DMA Trigger Defs
+04.08.2009 implemented generation of dedicated header files
+16.06.2009 implemented splitt of USCI modules
+06.06.2009 made TAxIV and TBxIV registers for 5xx devices writeable
+           removed SYSARB register in 5xx SYS module
+==========================================================================================
+release Package 03.06.2009 / 07.06.2009
+==========================================================================================
+03.06.2009 added CHECKSUM to IAR xcl files
+23.06.2009 F5xx: xml files: USCI - I2C added missing bits
+23.06.2009 F5xx: sfr files: MPY - added missing bits for MPYCTL and SUMEXT
+05.05.2009 F5xx: Flash - removed some bits according to UG (EEI / EEIEX)
+05.05.2009 CC430 devices: changed RTC_A_VECTOR to RTC_VECTOR
+05.05.2009 CCS4: implemented ISR definition for ASM header files
+05.05.2009 CCS4: split of CMD files implemented
+04.05.2009 updated USB related header files
+04.05.2009 updated MSP430.h files + special file for IAR
+04.05.2009 IAR: replaced __IAR_SYSTEMS_ICC with __IAR_SYSTEMS_ICC__ 
+17.04.2009 IAR: replace 20 Bit register access with short access (only allowed in small memory model)
+16.04.2009 Updated Comments for Comp.B (Ref Resitor divider and COMP_B_ISR Vector)
+           Removed XT1OFIFG from F552x and F551x
+14.04.2009 added Target VCC to menu and xml files
+==========================================================================================
+release Package 25.03.2009
+==========================================================================================
+23.03.2009 fixed error in Imagecraft files for 5xx devices
+23.03.2009 replaced label for RSTWU/PORTWU to LPM5WU 
+23.03.2009 F41x2 removed LFXT1DIG
+23.03.2009 Added TLV and DMA definitions for 5xx devices
+16.03.2009 fixed wrong LCDMEM usage
+26.02.2009 updated MSP430L092
+24.02.2009 removed SD16CONFx registers from SFR files
+==========================================================================================
+release Package 11.02.2009
+==========================================================================================
+11.02.2009 released CC430 devices
+09.02.2009 removed some XT2 bits from F41x2, 
+           added comment to new release files F41x2, F471x6, F471x7, F47x, FG47x 
+04.02.2009 released F41x2
+30.01.2009 released F471x6, F471x7, F47x, FG47x
+29.01.2009 fixed error in LCDB 
+20.01.2009 added byte alarm Register definitions for RTC in 5xx family
+20.01.2009 F41x2 replaced LCD with LCDA
+15.01.2009 5xx LCD_B fixed wrong alignment in #define LCDDIV__1
+18.12.2008 Added PMMLPM5xxx def to PMM
+20.11.2008 Added <cyclecounter> and <iv_base> Tags
+17.11.2008 Added msp430x241x.h
+14.11.2008 Added RTxPS to F5xx devices
+           Added missing USCI registers F5xx devices
+           removed wrong byte definitions on *.cmd files (5xx)
+06.11.2008 FE42x2 do not have HWMPY
+05.11.2008 reduce RAM for CC430 by 2 to avoid bug with Stackpointer
+30.10.2008 added additional FLL bits for F42x2
+           moved INTVEC legacy defs of TB0 to module
+           added LFXT1DIG to some devices
+ 
+27.10.2008 changed name for TB to TB0 in F5xx/F6xx devices
+23.10.2008 removed LCDB size bits
+           changed VLCDx bits from 8 to 9
+           changed CCE printf default to minimal
+15.10.2008 added CCS 4.0 package
+13.10.2008 updated RAM config for F552x/F551x
+10.10.2008 change style for V2 style interrupts defintion in CCE
+           removed unused defintions in PMM
+           updated RF defintions for CC1101
+04.09.2008 increased Stack/Heap size for large Ram Devices
+03.09.2008 removed P10 from TC0701
+           added USBPLL definitions
+26.08.2008 stopped support for IAR_V1 and CCE V1, CCE V2 (files now longer will be updated)
+26.08.2008 fixed wrong bit in UCS UCSUNLOCKHIST1
+           added SD16XDIV2 to sfr files
+25.08.2008 added Missing FCTL2 bits in sfr files. Updated FX47x files added Missing FCTL2 bits in sfr files. Updated FX47x files  
+20.08.2008 updated FG47x files with some OA bits updated FG47x files with some OA bits  
+19.08.2008 added F471x6 added F471x6  
+31.07.2008 updated FG47x and F47x with SD16BUF updated FG47x and F47x with SD16BUF  

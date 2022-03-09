@@ -158,15 +158,6 @@ void my_class::do_something_else() {
 - Keywords are always followed by a whitespace: `if (...)`, `template <...>`,
   `while (...)`, etc.
 
-- Leave a whitespace after `!` to make negations easily recognizable:
-
-  ```cpp
-  if (! sunny())
-      stay_home();
-  else
-      go_outside();
-  ```
-
 - Opening braces belong to the same line:
 
   ```cpp

@@ -34,22 +34,24 @@
 #include "mrf24j40_internal.h"
 #include "mrf24j40_registers.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static void _irq_handler(void *arg)
 {
-    netdev_t *dev = (netdev_t *) arg;
+    netdev_t *dev = arg;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(dev, netdev_ieee802154_t, netdev);
+    mrf24j40_t *mrf24j40 = container_of(netdev_ieee802154, mrf24j40_t, netdev);
 
-    if (dev->event_callback) {
-        dev->event_callback(dev, NETDEV_EVENT_ISR);
-    }
-    ((mrf24j40_t *)arg)->irq_flag = 1;
+    netdev_trigger_event_isr(dev);
+
+    mrf24j40->irq_flag = 1;
 }
 
 static int _init(netdev_t *netdev)
 {
-    mrf24j40_t *dev = (mrf24j40_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    mrf24j40_t *dev = container_of(netdev_ieee802154, mrf24j40_t, netdev);
 
     /* initialize GPIOs */
     spi_init_cs(dev->params.spi, dev->params.cs_pin);
@@ -67,7 +69,8 @@ static int _init(netdev_t *netdev)
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
-    mrf24j40_t *dev = (mrf24j40_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    mrf24j40_t *dev = container_of(netdev_ieee802154, mrf24j40_t, netdev);
     size_t len = 0;
 
     mrf24j40_tx_prepare(dev);
@@ -105,7 +108,8 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
-    mrf24j40_t *dev = (mrf24j40_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    mrf24j40_t *dev = container_of(netdev_ieee802154, mrf24j40_t, netdev);
     uint8_t phr;
     size_t pkt_len;
     int res = -ENOBUFS;
@@ -162,7 +166,8 @@ static netopt_state_t _get_state(mrf24j40_t *dev)
 
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 {
-    mrf24j40_t *dev = (mrf24j40_t *) netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    mrf24j40_t *dev = container_of(netdev_ieee802154, mrf24j40_t, netdev);
 
     if (netdev == NULL) {
         return -ENODEV;
@@ -185,7 +190,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
                 res = -EOVERFLOW;
             }
             else {
-                *(uint64_t*)val = mrf24j40_get_addr_long(dev);
+                mrf24j40_get_addr_long(dev, val);
                 res = sizeof(uint64_t);
             }
             break;
@@ -232,26 +237,10 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             break;
 
         case NETOPT_RX_START_IRQ:
-            *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & MRF24J40_OPT_TELL_RX_START);
-            res = sizeof(netopt_enable_t);
-            break;
-
         case NETOPT_RX_END_IRQ:
-            *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & MRF24J40_OPT_TELL_RX_END);
-            res = sizeof(netopt_enable_t);
-            break;
-
         case NETOPT_TX_START_IRQ:
-            *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & MRF24J40_OPT_TELL_TX_START);
-            res = sizeof(netopt_enable_t);
-            break;
-
         case NETOPT_TX_END_IRQ:
-            *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & MRF24J40_OPT_TELL_TX_END);
+            *((netopt_enable_t *)val) = NETOPT_ENABLE;
             res = sizeof(netopt_enable_t);
             break;
 
@@ -331,10 +320,24 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             }
             break;
 
+#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+
+        case NETOPT_IEEE802154_PHY:
+            assert(max_len >= sizeof(int8_t));
+            *(uint8_t *)val = IEEE802154_PHY_OQPSK;
+            return sizeof(uint8_t);
+
+        case NETOPT_OQPSK_RATE:
+            assert(max_len >= sizeof(int8_t));
+            *(uint8_t *)val = mrf24j40_get_turbo(dev);
+            return sizeof(uint8_t);
+
+#endif /* MODULE_NETDEV_IEEE802154_OQPSK */
+
         default:
             /* try netdev settings */
-            res = netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt,
-                                         val, max_len);
+            res = netdev_ieee802154_get(container_of(netdev, netdev_ieee802154_t, netdev),
+                                        opt, val, max_len);
     }
     return res;
 }
@@ -364,7 +367,8 @@ static int _set_state(mrf24j40_t *dev, netopt_state_t state)
 
 static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 {
-    mrf24j40_t *dev = (mrf24j40_t *) netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    mrf24j40_t *dev = container_of(netdev_ieee802154, mrf24j40_t, netdev);
     int res = -ENOTSUP;
 
     if (dev == NULL) {
@@ -387,7 +391,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 res = -EOVERFLOW;
             }
             else {
-                mrf24j40_set_addr_long(dev, *((const uint64_t *)val));
+                mrf24j40_set_addr_long(dev, val);
                 res = sizeof(uint64_t);
             }
             break;
@@ -473,30 +477,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             res = sizeof(netopt_enable_t);
             break;
 
-        case NETOPT_RX_START_IRQ:
-            mrf24j40_set_option(dev, MRF24J40_OPT_TELL_RX_START,
-                                ((const bool *)val)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
-        case NETOPT_RX_END_IRQ:
-            mrf24j40_set_option(dev, MRF24J40_OPT_TELL_RX_END,
-                                ((const bool *)val)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
-        case NETOPT_TX_START_IRQ:
-            mrf24j40_set_option(dev, MRF24J40_OPT_TELL_TX_START,
-                                ((const bool *)val)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
-        case NETOPT_TX_END_IRQ:
-            mrf24j40_set_option(dev, MRF24J40_OPT_TELL_TX_END,
-                                ((const bool *)val)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
         case NETOPT_CSMA:
             mrf24j40_set_option(dev, MRF24J40_OPT_CSMA,
                                 ((const bool *)val)[0]);
@@ -525,20 +505,31 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             }
             break;
 
+#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+
+        case NETOPT_OQPSK_RATE:
+            res = !!*(uint8_t *)val;
+            mrf24j40_set_turbo(dev, res);
+            res = sizeof(uint8_t);
+            break;
+
+#endif /* MODULE_NETDEV_IEEE802154_OQPSK */
+
         default:
             break;
     }
     /* try netdev building flags */
     if (res == -ENOTSUP) {
-        res = netdev_ieee802154_set((netdev_ieee802154_t *)netdev, opt,
-                                     val, len);
+        res = netdev_ieee802154_set(container_of(netdev, netdev_ieee802154_t, netdev),
+                                    opt, val, len);
     }
     return res;
 }
 
 static void _isr(netdev_t *netdev)
 {
-    mrf24j40_t *dev = (mrf24j40_t *) netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    mrf24j40_t *dev = container_of(netdev_ieee802154, mrf24j40_t, netdev);
     /* update pending bits */
     mrf24j40_update_tasks(dev);
     DEBUG("[mrf24j40] INTERRUPT (pending: %x),\n", dev->pending);
@@ -547,7 +538,7 @@ static void _isr(netdev_t *netdev)
         dev->pending &= ~(MRF24J40_TASK_TX_READY);
         DEBUG("[mrf24j40] EVT - TX_END\n");
 #ifdef MODULE_NETSTATS_L2
-        if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_END)) {
+        if (netdev->event_callback) {
             uint8_t txstat = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXSTAT);
             dev->tx_retries = (txstat >> MRF24J40_TXSTAT_MAX_FRAME_RETRIES_SHIFT);
             /* transmission failed */
@@ -572,9 +563,7 @@ static void _isr(netdev_t *netdev)
     /* Receive interrupt occurred */
     if (dev->pending & MRF24J40_TASK_RX_READY) {
         DEBUG("[mrf24j40] EVT - RX_END\n");
-        if ((dev->netdev.flags & MRF24J40_OPT_TELL_RX_END)) {
-            netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
-        }
+        netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
         dev->pending &= ~(MRF24J40_TASK_RX_READY);
     }
     DEBUG("[mrf24j40] END IRQ\n");

@@ -1,0 +1,24 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_L2FILTER
+    bool "Configure L2filter"
+    depends on USEMODULE_L2FILTER
+    help
+        Configure L2filter using Kconfig. This module is used for filtering
+        (allowlisting or denylisting) link layer addresses.
+
+if KCONFIG_USEMODULE_L2FILTER
+
+config L2FILTER_ADDR_MAXLEN
+    int "Maximum length of addresses that can be stored in the filter list"
+    default 8
+
+config L2FILTER_LISTSIZE
+    int "Number of slots in each filter list (filter entries per device)"
+    default 8
+
+endif # KCONFIG_USEMODULE_L2FILTER

@@ -58,9 +58,7 @@
  * see: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=60932
  */
 #ifdef __cplusplus
-#include <atomic>
-/* Make atomic_int available without namespace specifier */
-using std::atomic_int;
+#include "c11_atomics_compat.hpp"
 #else
 #include <stdatomic.h> /* for atomic_int */
 #endif
@@ -68,8 +66,10 @@ using std::atomic_int;
 #include <sys/types.h> /* for off_t etc. */
 #include <sys/statvfs.h> /* for struct statvfs */
 
-#include "kernel_types.h"
+#include "sched.h"
 #include "clist.h"
+#include "mtd.h"
+#include "xfa.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -80,6 +80,84 @@ extern "C" {
  * empty definition instead: */
 /* #define restrict */
 #endif
+
+/**
+ * @brief   MAX functions for internal use
+ * @{
+ */
+#ifndef _MAX
+#define _MAX(a, b) ((a) > (b) ? (a) : (b))
+#endif
+#ifndef MAX4
+#define MAX4(a, b, c, d) _MAX(_MAX((a), (b)), _MAX((c),(d)))
+#endif
+/** @} */
+
+/**
+ * @brief   VFS parameters for FAT
+ * @{
+ */
+#ifdef MODULE_FATFS_VFS
+#include "ffconf.h"
+
+#if FF_FS_TINY
+#define _FATFS_FILE_CACHE               (0)
+#else
+#define _FATFS_FILE_CACHE               FF_MAX_SS
+#endif
+
+#if FF_USE_FASTSEEK
+#define _FATFS_FILE_SEEK_PTR             (4)
+#else
+#define _FATFS_FILE_SEEK_PTR             (0)
+#endif
+
+#define FATFS_VFS_DIR_BUFFER_SIZE       (44)
+#define FATFS_VFS_FILE_BUFFER_SIZE      (72 + _FATFS_FILE_CACHE + _FATFS_FILE_SEEK_PTR)
+#else
+#define FATFS_VFS_DIR_BUFFER_SIZE       (1)
+#define FATFS_VFS_FILE_BUFFER_SIZE      (1)
+#endif
+/** @} */
+
+/**
+ * @brief   VFS parameters for littlefs
+ * @{
+ */
+#ifdef MODULE_LITTLEFS
+#define LITTLEFS_VFS_DIR_BUFFER_SIZE    (44)
+#define LITTLEFS_VFS_FILE_BUFFER_SIZE   (56)
+#else
+#define LITTLEFS_VFS_DIR_BUFFER_SIZE    (1)
+#define LITTLEFS_VFS_FILE_BUFFER_SIZE   (1)
+#endif
+/** @} */
+
+/**
+ * @brief   VFS parameters for littlefs2
+ * @{
+ */
+#ifdef MODULE_LITTLEFS2
+#define LITTLEFS2_VFS_DIR_BUFFER_SIZE   (52)
+#define LITTLEFS2_VFS_FILE_BUFFER_SIZE  (84)
+#else
+#define LITTLEFS2_VFS_DIR_BUFFER_SIZE   (1)
+#define LITTLEFS2_VFS_FILE_BUFFER_SIZE  (1)
+#endif
+/** @} */
+
+/**
+ * @brief   VFS parameters for spiffs
+ * @{
+ */
+#ifdef MODULE_SPIFFS
+#define SPIFFS_VFS_DIR_BUFFER_SIZE      (12)
+#define SPIFFS_VFS_FILE_BUFFER_SIZE     (1)
+#else
+#define SPIFFS_VFS_DIR_BUFFER_SIZE      (1)
+#define SPIFFS_VFS_FILE_BUFFER_SIZE     (1)
+#endif
+/** @} */
 
 #ifndef VFS_MAX_OPEN_FILES
 /**
@@ -116,7 +194,11 @@ extern "C" {
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_DIR_BUFFER_SIZE (12)
+#define VFS_DIR_BUFFER_SIZE MAX4(FATFS_VFS_DIR_BUFFER_SIZE,     \
+                                 LITTLEFS_VFS_DIR_BUFFER_SIZE,  \
+                                 LITTLEFS2_VFS_DIR_BUFFER_SIZE, \
+                                 SPIFFS_VFS_DIR_BUFFER_SIZE     \
+                                )
 #endif
 
 #ifndef VFS_FILE_BUFFER_SIZE
@@ -139,7 +221,11 @@ extern "C" {
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_FILE_BUFFER_SIZE (1)
+#define VFS_FILE_BUFFER_SIZE MAX4(FATFS_VFS_FILE_BUFFER_SIZE,    \
+                                  LITTLEFS_VFS_FILE_BUFFER_SIZE, \
+                                  LITTLEFS2_VFS_FILE_BUFFER_SIZE,\
+                                  SPIFFS_VFS_FILE_BUFFER_SIZE    \
+                                 )
 #endif
 
 #ifndef VFS_NAME_MAX
@@ -157,6 +243,36 @@ extern "C" {
  * @brief Used with vfs_bind to bind to any available fd number
  */
 #define VFS_ANY_FD (-1)
+
+/**
+ * @brief Helper macro for VFS_AUTO_MOUNT
+ *
+ * @param[in] mtd   MTD device to use for filesystem
+ */
+#define VFS_MTD(mtd) { .dev = &mtd.base }
+
+/**
+ * @brief Define an automatic mountpoint
+ *
+ * @param[in] type  file system type
+ *                  Can be littlefs, littlefs2, spiffs or fatfs
+ *
+ *                  Internally, file systems supporting this must name their
+ *                  @ref vfs_file_system_t `${TYPE}_file_system`, and must use
+ *                  a type named `${TYPE}_desc_t` for their private data
+ * @param[in] mtd   file system backed device configuration
+ * @param[in] path  Mount path
+ * @param[in] idx   Unique index of the mount point
+ */
+#define VFS_AUTO_MOUNT(type, mtd, path, idx)        \
+    static type ## _desc_t fs_desc_ ## idx = mtd;   \
+                                                    \
+    XFA(vfs_mountpoints_xfa, 0)                     \
+    vfs_mount_t _mount_mtd_ ## idx = {              \
+        .fs = &type ## _file_system,                \
+        .mount_point = path,                        \
+        .private_data = &fs_desc_ ## idx,           \
+    }
 
 /* Forward declarations */
 /**
@@ -181,6 +297,11 @@ typedef struct vfs_file_system_ops vfs_file_system_ops_t;
 typedef struct vfs_mount_struct vfs_mount_t;
 
 /**
+ * @brief   MTD driver for VFS
+ */
+extern const vfs_file_ops_t mtd_vfs_ops;
+
+/**
  * @brief A file system driver
  */
 typedef struct {
@@ -197,7 +318,7 @@ struct vfs_mount_struct {
     const vfs_file_system_t *fs; /**< The file system driver for the mount point */
     const char *mount_point;     /**< Mount point, e.g. "/mnt/cdrom" */
     size_t mount_point_len;      /**< Length of mount_point string (set by vfs_mount) */
-    atomic_int open_files;       /**< Number of currently open files */
+    atomic_int open_files;       /**< Number of currently open files and directories */
     void *private_data;          /**< File system driver private data, implementation defined */
 };
 
@@ -370,6 +491,17 @@ struct vfs_file_ops {
      * @return <0 on error
      */
     ssize_t (*write) (vfs_file_t *filp, const void *src, size_t nbytes);
+
+    /**
+     * @brief Synchronize a file on storage
+     *        Any pending writes are written out to storage.
+     *
+     * @param[in]  filp     pointer to open file
+     *
+     * @return 0 on success
+     * @return <0 on error
+     */
+    int (*fsync) (vfs_file_t *filp);
 };
 
 /**
@@ -542,23 +674,6 @@ struct vfs_file_system_ops {
      * @return <0 on error
      */
     int (*statvfs) (vfs_mount_t *mountp, const char *restrict path, struct statvfs *restrict buf);
-
-    /**
-     * @brief Get file system status of an open file
-     *
-     * @p path is only passed for consistency against the POSIX statvfs function.
-     * @c vfs_statvfs calls this function only when it has determined that
-     * @p path belongs to this file system. @p path is a file system relative
-     * path and does not necessarily name an existing file.
-     *
-     * @param[in]  mountp  file system mount to operate on
-     * @param[in]  filp    pointer to an open file on the file system being queried
-     * @param[out] buf     pointer to statvfs struct to fill
-     *
-     * @return 0 on success
-     * @return <0 on error
-     */
-    int (*fstatvfs) (vfs_mount_t *mountp, vfs_file_t *filp, struct statvfs *buf);
 };
 
 /**
@@ -615,6 +730,17 @@ int vfs_fstat(int fd, struct stat *buf);
 int vfs_fstatvfs(int fd, struct statvfs *buf);
 
 /**
+ * @brief Get file system status of the file system containing an open directory
+ *
+ * @param[in]  dirp     pointer to open directory
+ * @param[out] buf      pointer to statvfs struct to fill
+ *
+ * @return 0 on success
+ * @return <0 on error
+ */
+int vfs_dstatvfs(vfs_DIR *dirp, struct statvfs *buf);
+
+/**
  * @brief Seek to position in file
  *
  * @p whence determines the function of the seek and should be set to one of
@@ -668,6 +794,17 @@ ssize_t vfs_read(int fd, void *dest, size_t count);
  * @return <0 on error
  */
 ssize_t vfs_write(int fd, const void *src, size_t count);
+
+/**
+ * @brief Synchronize a file on storage
+ *        Any pending writes are written out to storage.
+ *
+ * @param[in]  fd       fd number obtained from vfs_open
+ *
+ * @return 0 on success
+ * @return <0 on error
+ */
+int vfs_fsync(int fd);
 
 /**
  * @brief Open a directory for reading with readdir
@@ -743,6 +880,21 @@ int vfs_format(vfs_mount_t *mountp);
 int vfs_mount(vfs_mount_t *mountp);
 
 /**
+ * @brief Mount a file system with a pre-configured mount path
+ *
+ * @note This assumes mount points have been configured with @ref VFS_AUTO_MOUNT.
+ *
+ * @warning If the @ref pseudomodule_vfs_auto_format is used a format attempt will
+ * be made if the mount fails.
+ *
+ * @param[in]  path     Path of the pre-configured mount point
+ *
+ * @return 0 on success
+ * @return <0 on error
+ */
+int vfs_mount_by_path(const char *path);
+
+/**
  * @brief Rename a file
  *
  * The file @p from_path will be renamed to @p to_path
@@ -760,7 +912,7 @@ int vfs_rename(const char *from_path, const char *to_path);
 /**
  * @brief Unmount a mounted file system
  *
- * This will fail if there are any open files on the mounted file system
+ * This will fail if there are any open files or directories on the mounted file system
  *
  * @param[in]  mountp    pointer to the mount structure of the file system to unmount
  *
@@ -875,7 +1027,8 @@ int vfs_normalize_path(char *buf, const char *path, size_t buflen);
  *
  * Set @p cur to @c NULL to start from the beginning
  *
- * @see @c sc_vfs.c (@c df command) for a usage example
+ * @deprecated This will become an internal-only function after the 2022.04
+ *   release, use @ref vfs_iterate_mount_dirs instead.
  *
  * @param[in]  cur  current iterator value
  *
@@ -883,6 +1036,66 @@ int vfs_normalize_path(char *buf, const char *path, size_t buflen);
  * @return     NULL if @p cur is the last element in the list
  */
 const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur);
+
+/**
+ * @brief Iterate through all mounted file systems by their root directories
+ *
+ * Unlike @ref vfs_iterate_mounts, this is thread safe, and allows thread safe
+ * access to the mount point's stats through @ref vfs_dstatvfs. If mounts or
+ * unmounts happen while iterating, this is guaranteed to report all file
+ * systems that stayed mounted, and may report any that are transiently
+ * mounted for up to as often as they are (re)mounted. Note that the volume
+ * being reported can not be unmounted as @p dir is an open directory.
+ *
+ * Zero-initialize @p dir to start. As long as @c true is returned, @p dir is a
+ * valid directory on which the user can call @ref vfs_readdir or @ref
+ * vfs_dstatvfs (or even peek at its `.mp` if they dare ignore the warning in
+ * @ref vfs_DIR).
+ *
+ * Users MUST NOT call @ref vfs_closedir if they intend to keep iterating, but
+ * MUST call it when aborting iteration.
+ *
+ * Note that this requires all enumerated file systems to support the `opendir`
+ * @ref vfs_dir_ops; any file system that does not support that will
+ * prematurely terminate the mount point enumeration.
+ *
+ * @see @c sc_vfs.c (@c df command) for a usage example
+ *
+ * @param[inout]  dir     The root directory of the discovered mount point
+ *
+ * @return     @c true if another file system is mounted; @p dir then contains an open directory.
+ * @return     @c false if the file system list is exhausted; @p dir is uninitialized then.
+ */
+bool vfs_iterate_mount_dirs(vfs_DIR *dir);
+
+/**
+ * @brief   Get information about the file for internal purposes
+ *
+ * @attention   Not thread safe! Do not modify any of the fields in the returned
+ * struct.
+ * @note        For file descriptor internal usage only.
+ *
+ * @internal
+ * @param[in] fd    A file descriptor
+ *
+ * @return  Pointer to the file information struct if a file with @p fd exists.
+ * @return  NULL, when no file with file descriptor @p fd exists.
+ */
+const vfs_file_t *vfs_file_get(int fd);
+
+/** @brief  Implementation of `stat` using `fstat`
+ *
+ * This helper can be used by file system drivers that do not have any more
+ * efficient implementation of `fs_op::stat` than opening the file and running
+ * `f_op::fstat` on it.
+ *
+ * It can be set as `fs_op::stat` by a file system driver, provided it
+ * implements `f_op::open` and `f_op::fstat` and `f_op::close`, and its `open`
+ * accepts `NULL` in the `abs_path` position.
+ */
+int vfs_sysop_stat_from_fstat(vfs_mount_t *mountp,
+        const char *restrict path,
+        struct stat *restrict buf);
 
 #ifdef __cplusplus
 }

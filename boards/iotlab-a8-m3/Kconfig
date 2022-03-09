@@ -1,0 +1,17 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD
+    default "iotlab-a8-m3" if BOARD_IOTLAB_A8_M3
+
+config BOARD_IOTLAB_A8_M3
+    bool
+    default y
+    select BOARD_COMMON_IOTLAB
+    select MODULE_BOARDS_COMMON_IOTLAB if TEST_KCONFIG
+
+source "$(RIOTBOARD)/common/iotlab/Kconfig"

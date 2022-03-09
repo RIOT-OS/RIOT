@@ -90,7 +90,6 @@ typedef struct __attribute__((packed)) {
     ipv4_addr_t dst;        /**< destination address of this packet */
 } ipv4_hdr_t;
 
-
 /**
  * @brief   Sets the version field of @p hdr to 6
  *

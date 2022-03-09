@@ -21,10 +21,6 @@
 #include "mutex.h"
 #include "priority_queue.h"
 
-#if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
-#   include "msp430_types.h"
-#endif
-
 #if defined(__WITH_AVRLIBC__)
 /* avr-libc 'time.h' does not include 'sys/types.h' but we need 'clockid_t' */
 #   include <sys/types.h>

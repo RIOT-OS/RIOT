@@ -82,14 +82,14 @@ extern "C" {
  * @brief  Default PWM undefined value
  */
 #ifndef PWM_UNDEF
-#define PWM_UNDEF           (UINT_MAX)
+#define PWM_UNDEF           (UINT_FAST8_MAX)
 #endif
 
 /**
  * @brief   Default PWM type definition
  */
 #ifndef HAVE_PWM_T
-typedef unsigned int pwm_t;
+typedef uint_fast8_t pwm_t;
 #endif
 
 /**

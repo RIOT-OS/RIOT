@@ -1,0 +1,23 @@
+# Copyright (c) 2020 HAW Hamburg
+# Copyright (c) 2020 Google LLC
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "esp32-ethernet-kit-v1_2" if BOARD_ESP32_ETHERNET_KIT_V1_2
+
+config BOARD_ESP32_ETHERNET_KIT_V1_2
+    bool
+    default y
+    select BOARD_COMMON_ESP32
+    select CPU_MODEL_ESP32_WROVER_E
+    select HAS_ESP_JTAG
+    select HAS_PERIPH_ADC
+    select HAS_PERIPH_ETH
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_PWM
+    select HAS_PERIPH_SPI if !MODULE_ESP_JTAG
+
+source "$(RIOTBOARD)/common/esp32/Kconfig"

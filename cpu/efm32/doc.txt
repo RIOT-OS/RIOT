@@ -77,6 +77,12 @@
  */
 
 /**
+ * @defgroup        cpu_efm32hg Silicon Labs EFM32HG family
+ * @ingroup         cpu_efm32
+ * @brief           Silicon Labs's EFM32HG MCUs family implementation
+ */
+
+/**
  * @defgroup        cpu_efm32lg Silicon Labs EFM32LG family
  * @ingroup         cpu_efm32
  * @brief           Silicon Labs's EFM32LG MCUs family implementation
@@ -95,6 +101,18 @@
  */
 
 /**
+ * @defgroup        cpu_efm32zg Silicon Labs EFM32ZG family
+ * @ingroup         cpu_efm32
+ * @brief           Silicon Labs's EFM32ZG MCUs family implementation
+ */
+
+/**
+ * @defgroup        cpu_efr32mg1b Silicon Labs EFR32MG1P family
+ * @ingroup         cpu_efm32
+ * @brief           Silicon Labs's EFR32MG1B MCUs family implementation
+ */
+
+/**
  * @defgroup        cpu_efr32mg1p Silicon Labs EFR32MG1P family
  * @ingroup         cpu_efm32
  * @brief           Silicon Labs's EFR32MG1P MCUs family implementation
@@ -104,4 +122,10 @@
  * @defgroup        cpu_efr32mg12p Silicon Labs EFR32MG12P family
  * @ingroup         cpu_efm32
  * @brief           Silicon Labs's EFR32MG12P MCUs family implementation
+ */
+
+/**
+ * @defgroup        cpu_ezr32wg Silicon Labs EZR32WG family
+ * @ingroup         cpu_efm32
+ * @brief           Silicon Labs's EZR32WG MCUs family implementation
  */

@@ -19,6 +19,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "periph/pm.h"
 #include "periph/wdt.h"
@@ -26,7 +28,7 @@
 #include <avr/interrupt.h>
 #include "avr/wdt.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 uint8_t wdt_prescaler = WDTO_15MS;

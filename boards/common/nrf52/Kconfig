@@ -1,0 +1,13 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD_COMMON_NRF52
+    bool
+    select HAS_PERIPH_RTT
+    select HAS_PERIPH_TIMER
+    select HAS_RIOTBOOT
+
+    select HAVE_SAUL_NRF_TEMPERATURE

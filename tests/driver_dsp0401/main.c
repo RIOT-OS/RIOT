@@ -23,11 +23,12 @@
 
 #include "dsp0401_params.h"
 #include "dsp0401.h"
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 
-#define TEST_DELAY      (2U)               /* 2 seconds delay between each test */
-#define WORD_DELAY      (750U)             /* 750 milliseconds delay between each word */
-#define SCROLL_DELAY    (200U)             /* 200 milliseconds delay between character shift */
+#define TEST_DELAY_US   (2U * US_PER_SEC)  /* 2 seconds delay between each test */
+#define WORD_DELAY_US   (750U * US_PER_MS) /* 750 milliseconds delay between each word */
+#define SCROLL_DELAY_MS (200U)             /* 200 milliseconds delay between character shift */
 #ifndef LOOPS
 #define LOOPS           (3U)               /* Number of display loops before exit */
 #endif
@@ -49,19 +50,19 @@ int main(void)
     while (loop < LOOPS) {
         puts("[INFO] Displaying 'THIS IS RIOT'");
         dsp0401_display_text(&dev, (char*)"THIS");
-        xtimer_usleep(WORD_DELAY * US_PER_MS);
+        ztimer_sleep(ZTIMER_USEC, WORD_DELAY_US);
         dsp0401_display_text(&dev, (char*)" IS ");
-        xtimer_usleep(WORD_DELAY * US_PER_MS);
+        ztimer_sleep(ZTIMER_USEC, WORD_DELAY_US);
         dsp0401_display_text(&dev, (char*)"RIOT");
-        xtimer_sleep(TEST_DELAY);
+        ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
 
         puts("[INFO] Clearing text!");
         dsp0401_clear_text(&dev);
-        xtimer_sleep(TEST_DELAY);
+        ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
 
         puts("[INFO] Scrolling 'THIS IS RIOT'");
-        dsp0401_scroll_text(&dev, (char*)("THIS IS RIOT"), SCROLL_DELAY);
-        xtimer_sleep(TEST_DELAY);
+        dsp0401_scroll_text(&dev, (char*)("THIS IS RIOT"), SCROLL_DELAY_MS);
+        ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
         puts("[INFO] Done\n");
         ++loop;
     }

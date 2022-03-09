@@ -6,6 +6,8 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#include <assert.h>
 #include <mips/cpu.h>
 #include <mips/hal.h>
 #include <unistd.h>
@@ -34,7 +36,6 @@
 #define MM_SYSCALL         (0x8B7C0000)
 #define MM_SYSCALL_MASK    (0xfffffc00)
 
-
 #ifdef MIPS_HARD_FLOAT
 /* pointer to the current and old fpu context for lazy context switching */
 static struct fp64ctx *currentfpctx;   /* fpu context of current running task */
@@ -56,11 +57,11 @@ static struct fp64ctx *oldfpctx;       /* fpu context of last task that executed
  *    |               |
  *     ---------------
  *    |  16 byte pad  |
- *     ---------------   <--- sched_active_thread->sp
+ *     ---------------   <--- thread_get_active()->sp
  */
 
 char *thread_stack_init(thread_task_func_t task_func, void *arg,
-                             void *stack_start, int stack_size)
+                        void *stack_start, int stack_size)
 {
     /* make sure it is aligned to 8 bytes this is a requirement of the O32 ABI */
     uintptr_t *p = (uintptr_t *)(((long)(stack_start) + stack_size) & ~7);
@@ -107,7 +108,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
 
 void thread_stack_print(void)
 {
-    uintptr_t *sp = (void *)sched_active_thread->sp;
+    uintptr_t *sp = (void *)thread_get_active()->sp;
 
     printf("Stack trace:\n");
     while (*sp != STACK_END_PAINT) {
@@ -132,23 +133,11 @@ void cpu_switch_context_exit(void)
 
     sched_run();
 
-    __asm volatile ("lw    $sp, 0(%0)" : : "r" (&sched_active_thread->sp));
+    __asm volatile ("lw    $sp, 0(%0)" : : "r" (&thread_get_active()->sp));
 
     __exception_restore();
 
     UNREACHABLE();
-}
-
-void thread_yield_higher(void)
-{
-    /*
-     * throw a syscall exception to get into exception level
-     * we context switch at exception level.
-     *
-     * Note syscall 1 is reserved for UHI see:
-     * http://wiki.prplfoundation.org/w/images/4/42/UHI_Reference_Manual.pdf
-     */
-    __asm volatile ("syscall 2");
 }
 
 struct linkctx* exctx_find(reg_t id, struct gpctx *gp)
@@ -175,7 +164,6 @@ mem_rw(const void *vaddr)
     memcpy(&v, vaddr, sizeof(v));
     return v;
 }
-
 
 #ifdef MIPS_DSP
 extern int _dsp_save(struct dspctx *ctx);
@@ -233,10 +221,15 @@ _mips_handle_exception(struct gpctx *ctx, int exception)
                     irq_restore(status);
                     return;
                 }
+                else if (ctx->t2[1] == __MIPS_UHI_READ && ctx->a[0] == STDIN_FILENO) {
+                    ctx->v[0] = stdio_read((void *)ctx->a[1], ctx->a[2]);
+                    ctx->epc += 4; /* move PC past the syscall */
+                    return;
+                }
                 else if (ctx->t2[1] == __MIPS_UHI_FSTAT &&
-                         (ctx->a[0] == STDOUT_FILENO || ctx->a[0] == STDERR_FILENO)) {
+                         (ctx->a[0] == STDOUT_FILENO || ctx->a[0] == STDIN_FILENO || ctx->a[0] == STDERR_FILENO)) {
                     /*
-                     * Printf fstat's the stdout/stderr file so
+                     * Printf fstat's the stdout/stdin/stderr file so
                      * fill out a minimal struct stat.
                      */
                     struct stat *sbuf = (struct stat *)ctx->a[1];
@@ -268,8 +261,8 @@ _mips_handle_exception(struct gpctx *ctx, int exception)
                  * Note we cannot use the current sp value as
                  * the prologue of this function has adjusted it
                  */
-                sched_active_thread->sp = (char *)(ctx->sp
-                                                   - sizeof(struct gpctx) - PADDING);
+                thread_t *t = thread_get_active();
+                t->sp = (char *)(ctx->sp - sizeof(struct gpctx) - PADDING);
 
 #ifdef MIPS_DSP
                 _dsp_save(&dsp_ctx);
@@ -284,7 +277,8 @@ _mips_handle_exception(struct gpctx *ctx, int exception)
 
                 sched_run();
 
-                new_ctx = (struct gpctx *)((unsigned int)sched_active_thread->sp + PADDING);
+                t = thread_get_active();
+                new_ctx = (struct gpctx *)((unsigned int)t->sp + PADDING);
 
 #ifdef MIPS_HARD_FLOAT
                 currentfpctx = (struct fp64ctx *)exctx_find(LINKCTX_TYPE_FP64, new_ctx);
@@ -332,7 +326,7 @@ _mips_handle_exception(struct gpctx *ctx, int exception)
                 new_ctx->status &= ~SR_CU1;
 #endif
 
-                __asm volatile ("lw    $sp, 0(%0)" : : "r" (&sched_active_thread->sp));
+                __asm volatile ("lw    $sp, 0(%0)" : : "r" (&thread_get_active()->sp));
 
                 /*
                  * Jump straight to the exception restore code

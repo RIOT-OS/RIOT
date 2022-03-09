@@ -37,11 +37,6 @@ extern "C" {
 #define NRF_USB_NUM_PERIPH 1
 
 /**
- * USB endpoint buffer space
- */
-#define NRF_USB_BUF_SPACE   USBDEV_EP_BUF_SPACE
-
-/**
  * Number of USB IN and OUT endpoints
  */
 #define NRF_USB_NUM_EP      USBDEV_NUM_ENDPOINTS
@@ -65,9 +60,6 @@ typedef struct {
     usbdev_ep_t ep_ins[NRF_USB_NUM_EP];     /**< IN type endpoints              */
     usbdev_ep_t ep_outs[ NRF_USB_NUM_EP];   /**< OUT type endpoints             */
     NRF_USBD_Type *device;                  /**< Ptr to the device registers    */
-    size_t used;                            /**< Number of bytes from the
-                                                 buffer that are used           */
-    uint8_t buffer[NRF_USB_BUF_SPACE];      /**< Buffer space for endpoint data */
     nrfusb_setup_state_t sstate;            /**< Setup request state machine    */
 } nrfusb_t;
 

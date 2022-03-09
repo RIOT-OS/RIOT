@@ -23,66 +23,35 @@
 #ifndef NET_SOCK_ASYNC_H
 #define NET_SOCK_ASYNC_H
 
-#ifdef MODULE_SOCK_DTLS
-#include "net/sock/dtls.h"
-#endif
-
-#ifdef MODULE_SOCK_IP
-#include "net/sock/ip.h"
-#endif
-
-#ifdef MODULE_SOCK_TCP
-#include "net/sock/tcp.h"
-#endif
-
-#ifdef MODULE_SOCK_UDP
-#include "net/sock/udp.h"
-#endif
+#include "net/sock/async/types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #if defined(SOCK_HAS_ASYNC) || defined(DOXYGEN)
-#ifdef SOCK_HAS_ASYNC_CTX
-#include "sock_async_ctx.h"     /* defines sock_async_ctx_t */
-#endif
-
-/**
- * @brief   Flag types to signify asynchronous sock events
- * @note    Only applicable with @ref SOCK_HAS_ASYNC defined.
- */
-typedef enum {
-    SOCK_ASYNC_CONN_RDY  = 0x0001,  /**< Connection ready event */
-    SOCK_ASYNC_CONN_FIN  = 0x0002,  /**< Connection finished event */
-    SOCK_ASYNC_CONN_RECV = 0x0004,  /**< Listener received connection event */
-    SOCK_ASYNC_MSG_RECV  = 0x0010,  /**< Message received event */
-    SOCK_ASYNC_MSG_SENT  = 0x0020,  /**< Message sent event */
-    SOCK_ASYNC_PATH_PROP = 0x0040,  /**< Path property changed event */
-} sock_async_flags_t;
-
 #if defined(MODULE_SOCK_DTLS) || defined(DOXYGEN)
-/**
- * @brief   Event callback for @ref sock_dtls_t
- *
- * @pre `(sock != NULL)`
- *
- * @note    Only applicable with @ref SOCK_HAS_ASYNC defined.
- *
- * @param[in] sock  The sock the event happened on
- * @param[in] flags The event flags. Expected values are
- *                  - @ref SOCK_ASYNC_CONN_RDY (if a session you created becomes ready),
- *                  - @ref SOCK_ASYNC_CONN_FIN (if a created session was destroyed),
- *                  - @ref SOCK_ASYNC_CONN_RECV (if a peer tries to create a session),
- *                  - @ref SOCK_ASYNC_MSG_RECV,
- *                  - @ref SOCK_ASYNC_MSG_SENT,
- *                  - @ref SOCK_ASYNC_PATH_PROP, or
- *                  - a combination of them.
- */
-typedef void (*sock_dtls_cb_t)(sock_dtls_t *sock, sock_async_flags_t flags);
 
 /**
- * @brief   Gets the asynchronous event context from sock object
+ * @brief Gets the asynchronous event session from sock object
+ *
+ * @pre `(sock != NULL) && (session != NULL)`
+ *
+ * @note Only available with @ref SOCK_HAS_ASYNC defined.
+ *       Should only be called within a DTLS event and session is only available
+ *       for the event types @ref SOCK_ASYNC_CONN_RDY and @ref SOCK_ASYNC_CONN_FIN.
+ *       For other event types use @ref sock_dtls_recv() to get the session.
+ *
+ * @param[in]  sock       The DTLS sock object of the current event.
+ * @param[out] session    Session object of the current event.
+ *
+ * @return true if the event session is available, false otherwise.
+ */
+bool sock_dtls_get_event_session(sock_dtls_t *sock,
+                                 sock_dtls_session_t *session);
+
+/**
+ * @brief   Sets the asynchronous event context from sock object
  *
  * @pre `(sock != NULL)`
  *
@@ -91,29 +60,14 @@ typedef void (*sock_dtls_cb_t)(sock_dtls_t *sock, sock_async_flags_t flags);
  *
  * @note    Only available with @ref SOCK_HAS_ASYNC defined.
  *
- * @param[in] sock  A DTLS sock object.
- * @param[in] cb    An event callback. May be NULL to unset event callback.
+ * @param[in] sock      A DTLS sock object.
+ * @param[in] cb        An event callback. May be NULL to unset event callback.
+ * @param[in] cb_arg    Argument to provide to @p cb. May be NULL.
  */
-void sock_dtls_set_cb(sock_dtls_t *sock, sock_dtls_cb_t cb);
+void sock_dtls_set_cb(sock_dtls_t *sock, sock_dtls_cb_t cb, void *cb_arg);
 #endif  /* defined(MODULE_SOCK_DTLS) || defined(DOXYGEN) */
 
 #if defined(MODULE_SOCK_IP) || defined(DOXYGEN)
-/**
- * @brief   Event callback for @ref sock_ip_t
- *
- * @pre `(sock != NULL)`
- *
- * @note    Only applicable with @ref SOCK_HAS_ASYNC defined.
- *
- * @param[in] sock  The sock the event happened on
- * @param[in] flags The event flags. Expected values are
- *                  - @ref SOCK_ASYNC_MSG_RECV,
- *                  - @ref SOCK_ASYNC_MSG_SENT,
- *                  - @ref SOCK_ASYNC_PATH_PROP, or
- *                  - a combination of them.
- */
-typedef void (*sock_ip_cb_t)(sock_ip_t *sock, sock_async_flags_t flags);
-
 /**
  * @brief   Sets event callback for @ref sock_ip_t
  *
@@ -126,43 +80,12 @@ typedef void (*sock_ip_cb_t)(sock_ip_t *sock, sock_async_flags_t flags);
  *
  * @param[in] sock  A raw IPv4/IPv6 sock object.
  * @param[in] cb    An event callback. May be NULL to unset event callback.
+ * @param[in] cb_arg    Argument to provide to @p cb. May be NULL.
  */
-void sock_ip_set_cb(sock_ip_t *sock, sock_ip_cb_t cb);
+void sock_ip_set_cb(sock_ip_t *sock, sock_ip_cb_t cb, void *cb_arg);
 #endif  /* defined(MODULE_SOCK_IP) || defined(DOXYGEN) */
 
 #if defined(MODULE_SOCK_TCP) || defined(DOXYGEN)
-/**
- * @brief   Event callback for @ref sock_tcp_t
- *
- * @pre `(sock != NULL)`
- *
- * @note    Only applicable with @ref SOCK_HAS_ASYNC defined.
- *
- * @param[in] sock  The sock the event happened on
- * @param[in] flags The event flags. Expected values are
- *                  - @ref SOCK_ASYNC_CONN_RDY,
- *                  - @ref SOCK_ASYNC_CONN_FIN,
- *                  - @ref SOCK_ASYNC_MSG_RECV,
- *                  - @ref SOCK_ASYNC_MSG_SENT,
- *                  - @ref SOCK_ASYNC_PATH_PROP, or
- *                  - a combination of them.
- */
-typedef void (*sock_tcp_cb_t)(sock_tcp_t *sock, sock_async_flags_t flags);
-
-/**
- * @brief   Event callback for @ref sock_tcp_queue_t
- *
- * @pre `(queue != NULL)`
- *
- * @note    Only applicable with @ref SOCK_HAS_ASYNC defined.
- *
- * @param[in] queue The TCP listening queue the event happened on
- * @param[in] flags The event flags. The only expected value is @ref
- *                  SOCK_ASYNC_CONN_RECV.
- */
-typedef void (*sock_tcp_queue_cb_t)(sock_tcp_queue_t *queue,
-                                    sock_async_flags_t flags);
-
 /**
  * @brief   Sets event callback for @ref sock_tcp_t
  *
@@ -173,10 +96,11 @@ typedef void (*sock_tcp_queue_cb_t)(sock_tcp_queue_t *queue,
  *
  * @note    Only available with @ref SOCK_HAS_ASYNC defined.
  *
- * @param[in] sock  A TCP sock object.
- * @param[in] cb    An event callback. May be NULL to unset event callback.
+ * @param[in] sock      A TCP sock object.
+ * @param[in] cb        An event callback. May be NULL to unset event callback.
+ * @param[in] cb_arg    Argument to provide to @p cb. May be NULL.
  */
-void sock_tcp_set_cb(sock_tcp_t *sock, sock_tcp_cb_t cb);
+void sock_tcp_set_cb(sock_tcp_t *sock, sock_tcp_cb_t cb, void *cb_arg);
 
 /**
  * @brief   Sets event callback for @ref sock_tcp_queue_t
@@ -188,29 +112,15 @@ void sock_tcp_set_cb(sock_tcp_t *sock, sock_tcp_cb_t cb);
  *
  * @note    Only available with @ref SOCK_HAS_ASYNC defined.
  *
- * @param[in] queue A TCP listening queue.
- * @param[in] cb    An event callback. May be NULL to unset event callback.
+ * @param[in] queue     A TCP listening queue.
+ * @param[in] cb        An event callback. May be NULL to unset event callback.
+ * @param[in] cb_arg    Argument to provide to @p cb. May be NULL.
  */
-void sock_tcp_queue_set_cb(sock_tcp_queue_t *queue, sock_tcp_queue_cb_t cb);
+void sock_tcp_queue_set_cb(sock_tcp_queue_t *queue, sock_tcp_queue_cb_t cb,
+                           void *cb_arg);
 #endif  /* defined(MODULE_SOCK_TCP) || defined(DOXYGEN) */
 
 #if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
-/**
- * @brief   Event callback for @ref sock_udp_t
- *
- * @pre `(sock != NULL)`
- *
- * @note    Only applicable with @ref SOCK_HAS_ASYNC defined.
- *
- * @param[in] sock  The sock the event happened on
- * @param[in] flags The event flags. Expected values are
- *                  - @ref SOCK_ASYNC_MSG_RECV,
- *                  - @ref SOCK_ASYNC_MSG_SENT,
- *                  - @ref SOCK_ASYNC_PATH_PROP, or
- *                  - a combination of them.
- */
-typedef void (*sock_udp_cb_t)(sock_udp_t *sock, sock_async_flags_t type);
-
 /**
  * @brief   Gets the asynchronous event context from sock object
  *
@@ -221,13 +131,16 @@ typedef void (*sock_udp_cb_t)(sock_udp_t *sock, sock_async_flags_t type);
  *
  * @note    Only available with @ref SOCK_HAS_ASYNC defined.
  *
- * @param[in] sock  A UDP sock object.
- * @param[in] cb    An event callback. May be NULL to unset event callback.
+ * @param[in] sock      A UDP sock object.
+ * @param[in] cb        An event callback. May be NULL to unset event callback.
+ * @param[in] cb_arg    Argument to provide to @p cb
  */
-void sock_udp_set_cb(sock_udp_t *sock, sock_udp_cb_t cb);
+void sock_udp_set_cb(sock_udp_t *sock, sock_udp_cb_t cb, void *cb_arg);
 #endif  /* defined(MODULE_SOCK_UDP) || defined(DOXYGEN) */
 
 #if defined(SOCK_HAS_ASYNC_CTX) || defined(DOXYGEN)
+#include "sock_async_ctx.h"     /* defines sock_async_ctx_t */
+
 #if defined(MODULE_SOCK_DTLS) || defined(DOXYGEN)
 /**
  * @brief   Gets the asynchronous event context from sock object

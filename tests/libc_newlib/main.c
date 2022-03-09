@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include "embUnit.h"
 
-
 #ifdef MODULE_NEWLIB
 #include <newlib.h>
 
@@ -43,7 +42,6 @@
 #endif /* MODULE_NEWLIB_NANO */
 
 #endif /* MODULE_NEWLIB */
-
 
 /* Newlib-nano removed the integer only 'iprintf' functions which are now mapped
  * to printf.
@@ -73,7 +71,6 @@ static void test_newlib(void)
 #endif
 #endif
 }
-
 
 static Test *tests_newlib(void)
 {

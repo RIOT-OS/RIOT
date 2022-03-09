@@ -1,0 +1,1 @@
+../../../../../boards/nrf52840dk/include/board.h

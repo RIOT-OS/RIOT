@@ -1,0 +1,156 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config MODULE_CORTEXM_COMMON
+    bool
+    default y if CPU_CORE_CORTEX_M
+    depends on TEST_KCONFIG
+    imply MODULE_NEWLIB_NANO
+    select MODULE_PERIPH
+    select MODULE_MALLOC_THREAD_SAFE if TEST_KCONFIG
+    help
+        Common code for Cortex-M cores.
+
+config CPU_ARCH_ARMV6M
+    bool
+    select HAS_ARCH_ARM
+    select HAS_ARCH_32BIT
+    select HAS_NO_IDLE_THREAD
+
+config CPU_ARCH_ARMV7M
+    bool
+    select HAS_ARCH_ARM
+    select HAS_ARCH_32BIT
+    select HAS_NO_IDLE_THREAD
+
+config CPU_ARCH_ARMV8M
+    bool
+    select HAS_ARCH_ARM
+    select HAS_ARCH_32BIT
+    select HAS_NO_IDLE_THREAD
+
+config CPU_ARCH
+    default "armv6m" if CPU_ARCH_ARMV6M
+    default "armv7m" if CPU_ARCH_ARMV7M
+    default "armv8m" if CPU_ARCH_ARMV8M
+
+config CPU_CORE_CORTEX_M
+    bool
+    select HAS_CPU_CORE_CORTEXM
+    select HAS_PERIPH_PM
+    select HAS_PUF_SRAM
+    select HAS_PICOLIBC
+    select HAS_CPP
+    select HAS_LIBSTDCPP
+    select HAS_CPU_CHECK_ADDRESS
+    select HAS_SSP
+    select HAS_CORTEXM_SVC
+    select HAS_NEWLIB
+    select HAS_DBGPIN
+
+## Common CPU symbols
+config CPU_CORE
+    default "cortex-m0" if CPU_CORE_CORTEX_M0
+    default "cortex-m0plus" if CPU_CORE_CORTEX_M0PLUS
+    default "cortex-m23" if CPU_CORE_CORTEX_M23
+    default "cortex-m3" if CPU_CORE_CORTEX_M3
+    default "cortex-m33" if CPU_CORE_CORTEX_M33
+    default "cortex-m4" if CPU_CORE_CORTEX_M4
+    default "cortex-m4f" if CPU_CORE_CORTEX_M4F
+    default "cortex-m7" if CPU_CORE_CORTEX_M7
+
+config CPU_CORE_CORTEX_M0
+    bool
+    select CPU_ARCH_ARMV6M
+    select CPU_CORE_CORTEX_M
+    select HAS_RUST_TARGET
+
+config CPU_CORE_CORTEX_M0PLUS
+    bool
+    select CPU_ARCH_ARMV6M
+    select CPU_CORE_CORTEX_M
+    select HAS_RUST_TARGET
+
+config CPU_CORE_CORTEX_M23
+    bool
+    select CPU_ARCH_ARMV8M
+    select CPU_CORE_CORTEX_M
+    #select HAS_RUST_TARGET
+
+config CPU_CORE_CORTEX_M3
+    bool
+    select CPU_ARCH_ARMV7M
+    select CPU_CORE_CORTEX_M
+    select HAS_RUST_TARGET
+
+config CPU_CORE_CORTEX_M33
+    bool
+    select CPU_ARCH_ARMV8M
+    select CPU_CORE_CORTEX_M
+    #select HAS_RUST_TARGET
+
+config CPU_CORE_CORTEX_M4
+    bool
+    select CPU_ARCH_ARMV7M
+    select CPU_CORE_CORTEX_M
+    select HAS_RUST_TARGET
+
+config CPU_CORE_CORTEX_M4F
+    bool
+    select CPU_ARCH_ARMV7M
+    select CPU_CORE_CORTEX_M
+    select HAS_CORTEXM_FPU
+    select HAS_RUST_TARGET
+
+config CPU_CORE_CORTEX_M7
+    bool
+    select CPU_ARCH_ARMV7M
+    select CPU_CORE_CORTEX_M
+    select HAS_CORTEXM_FPU
+
+## Definition of specific features
+config HAS_CPU_CORE_CORTEXM
+    bool
+    help
+        Indicates that the current CPU has an ARM Cortex-M core.
+
+config HAS_CORTEXM_FPU
+    bool
+    help
+        Indicates that a ARM Cortex-M FPU is present.
+
+config HAS_CORTEXM_MPU
+    bool
+    help
+        Indicates that a ARM Cortex-M MPU is present.
+
+config HAS_CORTEXM_SVC
+    bool
+    help
+        Indicates that ARM Cortex-M Supervisor Calls are available.
+
+menu "Cortex-M"
+    depends on TEST_KCONFIG
+    depends on CPU_CORE_CORTEX_M
+
+config MODULE_CORTEXM_FPU
+    bool "Cortex-M Floating Point Unit (FPU) support"
+    default y
+    depends on HAS_CORTEXM_FPU
+
+config MODULE_MPU_STACK_GUARD
+    bool "Memory Protection Unit (MPU) stack guard"
+    default y if DEVELHELP
+    depends on HAS_CORTEXM_MPU
+
+endmenu # Cortex-M
+
+rsource "periph/Kconfig"
+
+choice LIBC_IMPLEMENTATION
+    default MODULE_NEWLIB
+    default MODULE_PICOLIBC
+endchoice

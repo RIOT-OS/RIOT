@@ -34,20 +34,32 @@
 #define NET_NETIF_H
 
 #include <stdint.h>
+#include <string.h>
 
 #include "list.h"
 #include "net/netopt.h"
+
+#ifdef MODULE_NETSTATS_NEIGHBOR
+#include "cib.h"
+#include "net/netstats.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief   Maximum length for an interface name
+ * @defgroup net_netif_conf Network interfaces compile configurations
+ * @ingroup  config
+ * @{
  */
-#ifndef NETIF_NAMELENMAX
-#define NETIF_NAMELENMAX    (8U)
+/**
+ * @brief    Maximum length for an interface name
+ */
+#ifndef CONFIG_NETIF_NAMELENMAX
+#define CONFIG_NETIF_NAMELENMAX    (8U)
 #endif
+/** @} */
 
 /**
  * @brief Network interface descriptor.
@@ -55,7 +67,10 @@ extern "C" {
  * @note All network interfaces should inherit from this structure.
  */
 typedef struct {
-    list_node_t node;  /**< Pointer to the next interface */
+    list_node_t node;               /**< Pointer to the next interface */
+#ifdef MODULE_NETSTATS_NEIGHBOR
+    netstats_nb_table_t neighbors;  /**< Structure containing all L2 neighbors */
+#endif
 } netif_t;
 
 /**
@@ -69,25 +84,48 @@ typedef struct {
  * @return next network interface.
  * @return NULL, if there is no interface after @p last
  */
-netif_t *netif_iter(netif_t *last);
+netif_t *netif_iter(const netif_t *last);
 
 /**
  * @brief   Gets name of an interface
  *
  * @pre `name != NULL`
- * @pre name holds at least @ref NETIF_NAMELENMAX characters
+ * @pre name holds at least @ref CONFIG_NETIF_NAMELENMAX characters
  *
  * @note    Supposed to be implemented by the networking module. `name` must be
  *          zero-terminated in the result!
  *
  * @param[in] netif A network interface.
  * @param[out] name The name of the interface. Must not be `NULL`. Must at least
- *                  hold @ref NETIF_NAMELENMAX bytes.
+ *                  hold @ref CONFIG_NETIF_NAMELENMAX bytes.
  *
  * @return  length of @p name on success
  */
 
 int netif_get_name(netif_t *netif, char *name);
+
+/**
+ * @brief   Gets the numeric identifier of an interface
+ *
+ * @param[in] netif A network interface.
+ *
+ * @return  The numeric identifier of an interface
+ * @return  -1 if @p netif is not registered
+ */
+int16_t netif_get_id(const netif_t *netif);
+
+/**
+ * @brief   Gets interface by name, from a buffer
+ *
+ * @pre `name != NULL`
+ *
+ * @param[in] name          The name of an interface as an array of chars. Must not be `NULL`.
+ * @param[in] name_len      Number of characters in @p name.
+ *
+ * @return  Pointer to the interface that matches the name
+ * @retval  NULL if no interface is named @p name.
+ */
+netif_t *netif_get_by_name_buffer(const char *name, size_t name_len);
 
 /**
  * @brief   Gets interface by name
@@ -98,10 +136,23 @@ int netif_get_name(netif_t *netif, char *name);
  * @param[in] name  The name of an interface as a zero-terminated. Must not be
  *                  `NULL`.
  *
- * @return  The identifier of the interface on success.
+ * @return  The interface on success.
  * @return  NULL if no interface is named @p name.
  */
-netif_t *netif_get_by_name(const char *name);
+static inline netif_t *netif_get_by_name(const char *name)
+{
+    return netif_get_by_name_buffer(name, strlen(name));
+}
+
+/**
+ * @brief   Gets interface by a numeric identifier.
+ *
+ * @param[in] id  A numeric identifier.
+ *
+ * @return  The interface on success.
+ * @return  NULL if no interface with identifier @p id.
+ */
+netif_t *netif_get_by_id(int16_t id);
 
 /**
  * @brief   Gets option from an interface
@@ -136,7 +187,6 @@ int netif_get_opt(netif_t *netif, netopt_t opt, uint16_t context,
  */
 int netif_set_opt(netif_t *netif, netopt_t opt, uint16_t context,
                   void *value, size_t value_len);
-
 
 /**
  * @brief   Registers a network interface in the global interface list.

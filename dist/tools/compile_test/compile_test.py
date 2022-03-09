@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2014  René Kijewski  <rene.kijewski@fu-berlin.de>
@@ -19,23 +19,17 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-from __future__ import print_function
-
 from collections import defaultdict
 from itertools import groupby
 from os import devnull, environ
 from os.path import abspath, dirname, isfile, join
 from subprocess import CalledProcessError, check_call, check_output, PIPE, Popen
 from sys import argv, exit, stdout
-
-
-try:
-    # Python 2.x
-    from StringIO import StringIO
-except ImportError:
-    # Python 3.x
-    from io import StringIO
+from io import StringIO
 from itertools import tee
+
+
+MAKE = environ.get("MAKE", "make")
 
 
 class Termcolor:
@@ -90,7 +84,7 @@ def get_results_and_output_from(fd):
 
 
 def get_app_dirs():
-    return check_output(["make", "-f", "makefiles/app_dirs.inc.mk", "info-applications"]) \
+    return check_output([MAKE, "-f", "makefiles/app_dirs.inc.mk", "info-applications"]) \
             .decode("utf-8", errors="ignore")\
             .split()
 
@@ -130,7 +124,7 @@ def build_all():
             stdout.flush()
             try:
                 app_dir = join(riotbase, folder, application)
-                subprocess = Popen(('make', 'buildtest'),
+                subprocess = Popen((MAKE, 'buildtest'),
                                    bufsize=1, stdin=null, stdout=PIPE, stderr=null,
                                    cwd=app_dir,
                                    env=subprocess_env)

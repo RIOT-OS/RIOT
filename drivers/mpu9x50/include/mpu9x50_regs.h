@@ -21,7 +21,6 @@
 #ifndef MPU9X50_REGS_H
 #define MPU9X50_REGS_H
 
-
 #ifdef __cplusplus
  extern "C" {
 #endif

@@ -34,6 +34,16 @@
 #define SHELL_VFS_BUFSIZE 256
 static uint8_t _shell_vfs_data_buffer[SHELL_VFS_BUFSIZE];
 
+/**
+ * @brief Auto-Mount array
+ */
+XFA_USE_CONST(vfs_mount_t, vfs_mountpoints_xfa);
+
+/**
+ * @brief Number of automatic mountpoints
+ */
+#define MOUNTPOINTS_NUMOF XFA_LEN(vfs_mount_t, vfs_mountpoints_xfa)
+
 static void _ls_usage(char **argv)
 {
     printf("%s <path>\n", argv[0]);
@@ -49,6 +59,9 @@ static void _vfs_usage(char **argv)
     printf("%s mv <src> <dest>\n", argv[0]);
     printf("%s rm <file>\n", argv[0]);
     printf("%s df [path]\n", argv[0]);
+    if (MOUNTPOINTS_NUMOF > 0) {
+        printf("%s mount [path]\n", argv[0]);
+    }
     puts("r: Read [bytes] bytes at [offset] in file <path>");
     puts("w: Write (<a>: append, <o> overwrite) <ascii> or <hex> string <data> in file <path>");
     puts("ls: list files in <path>");
@@ -102,11 +115,11 @@ static int _errno_string(int err, char *buf, size_t buflen)
 }
 #undef _case_snprintf_errno_name
 
-static void _print_df(const char *path)
+static void _print_df(vfs_DIR *dir)
 {
     struct statvfs buf;
-    int res = vfs_statvfs(path, &buf);
-    printf("%-16s ", path);
+    int res = vfs_dstatvfs(dir, &buf);
+    printf("%-16s ", dir->mp->mount_point);
     if (res < 0) {
         char err[16];
         _errno_string(res, err, sizeof(err));
@@ -123,16 +136,40 @@ static int _df_handler(int argc, char **argv)
     puts("Mountpoint              Total         Used    Available     Capacity");
     if (argc > 1) {
         const char *path = argv[1];
-        _print_df(path);
+        /* Opening a directory just to statfs is somewhat odd, but it is the
+         * easiest to support with a single _print_df function */
+        vfs_DIR dir;
+        int res = vfs_opendir(&dir, path);
+        if (res == 0) {
+            _print_df(&dir);
+            vfs_closedir(&dir);
+        } else {
+            char err[16];
+            _errno_string(res, err, sizeof(err));
+            printf("Failed to open `%s`: %s\n", path, err);
+        }
     }
     else {
         /* Iterate through all mount points */
-        const vfs_mount_t *it = NULL;
-        while ((it = vfs_iterate_mounts(it)) != NULL) {
-            _print_df(it->mount_point);
+        vfs_DIR it = { 0 };
+        while (vfs_iterate_mount_dirs(&it)) {
+            _print_df(&it);
         }
     }
     return 0;
+}
+
+static int _mount_handler(int argc, char **argv)
+{
+    if (argc < 2) {
+        printf("usage: %s [path]\n", argv[0]);
+        puts("mount pre-configured mount point");
+        return -1;
+    }
+
+    int res = vfs_mount_by_path(argv[1]);
+    puts(strerror(res));
+    return res;
 }
 
 static int _read_handler(int argc, char **argv)
@@ -517,7 +554,10 @@ int _ls_handler(int argc, char **argv)
     unsigned int nfiles = 0;
 
     while (1) {
+        char path_name[2 * (VFS_NAME_MAX + 1)];
         vfs_dirent_t entry;
+        struct stat stat;
+
         res = vfs_readdir(&dir, &entry);
         if (res < 0) {
             _errno_string(res, (char *)buf, sizeof(buf));
@@ -533,8 +573,17 @@ int _ls_handler(int argc, char **argv)
             /* end of stream */
             break;
         }
-        printf("%s\n", entry.d_name);
-        ++nfiles;
+
+        snprintf(path_name, sizeof(path_name), "%s/%s", path, entry.d_name);
+        vfs_stat(path_name, &stat);
+        if (stat.st_mode & S_IFDIR) {
+            printf("%s/\n", entry.d_name);
+        } else if (stat.st_mode & S_IFREG) {
+            printf("%s\t%lu B\n", entry.d_name, stat.st_size);
+            ++nfiles;
+        } else {
+            printf("%s\n", entry.d_name);
+        }
     }
     if (ret == 0) {
         printf("total %u files\n", nfiles);
@@ -576,6 +625,9 @@ int _vfs_handler(int argc, char **argv)
     }
     else if (strcmp(argv[1], "df") == 0) {
         return _df_handler(argc - 1, &argv[1]);
+    }
+    else if (MOUNTPOINTS_NUMOF > 0 && strcmp(argv[1], "mount") == 0) {
+        return _mount_handler(argc - 1, &argv[1]);
     }
     else {
         printf("vfs: unsupported sub-command \"%s\"\n", argv[1]);

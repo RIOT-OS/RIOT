@@ -25,8 +25,6 @@
 #include "thread.h"
 #include "msg.h"
 
-#include "test_utils/interactive_sync.h"
-
 char t1_stack[THREAD_STACKSIZE_MAIN];
 
 kernel_pid_t p_send = KERNEL_PID_UNDEF, p_recv = KERNEL_PID_UNDEF;
@@ -56,10 +54,8 @@ void *thread1(void *arg)
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
     msg_t msg;
-    p_recv = sched_active_pid;
+    p_recv = thread_getpid();
 
     p_send = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN - 1,
                        THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,

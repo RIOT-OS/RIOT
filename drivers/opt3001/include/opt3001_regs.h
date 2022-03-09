@@ -19,7 +19,6 @@
 #ifndef OPT3001_REGS_H
 #define OPT3001_REGS_H
 
-
 #ifdef __cplusplus
  extern "C" {
 #endif

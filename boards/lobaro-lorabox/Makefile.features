@@ -1,4 +1,4 @@
-CPU = stm32l1
+CPU = stm32
 CPU_MODEL = stm32l151cb_a
 
 # Put defined MCU peripherals here (in alphabetical order)

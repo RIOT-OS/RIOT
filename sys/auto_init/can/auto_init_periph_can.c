@@ -16,7 +16,7 @@
  * @}
  */
 
-#ifdef MODULE_PERIPH_CAN
+#include "periph/can.h"
 #include "can/device.h"
 #include "can_params.h"
 
@@ -52,6 +52,3 @@ void auto_init_periph_can(void) {
                         candev_params[i].name, &candev_dev[i]);
     }
 }
-#else
-typedef int dont_be_pedantic;
-#endif

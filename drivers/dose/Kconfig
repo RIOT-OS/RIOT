@@ -1,0 +1,23 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_DOSE
+    bool "Configure DOSE driver"
+    depends on USEMODULE_DOSE
+    help
+        Configure the Differentially Operated Serial Ethernet (DOSE)
+        driver using Kconfig.
+
+if KCONFIG_USEMODULE_DOSE
+
+config DOSE_TIMEOUT_BYTES
+    int "Transaction timeout in bytes"
+    default 50
+    help
+        Timeout, in bytes at the set baudrate, to bring the driver back into idle state if
+        the remote side died within a transaction.
+
+endif # KCONFIG_USEMODULE_DOSE

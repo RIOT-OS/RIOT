@@ -1,0 +1,16 @@
+INCLUDES += -I$(RIOTPKG)/mynewt-core/include \
+            -I$(PKGDIRBASE)/mynewt-core/kernel/os/include \
+            -I$(PKGDIRBASE)/mynewt-core/hw/hal/include \
+            -I$(PKGDIRBASE)/mynewt-core/util/mem/include \
+            -I$(PKGDIRBASE)/mynewt-core/sys/stats/stub/include \
+            #
+
+DIRS += $(RIOTPKG)/mynewt-core/contrib \
+        #
+
+ifneq (,$(filter nrf5%,$(CPU)))
+  # OS_CPUTIME is set to 32.767 Hz
+  CFLAGS += -DMYNEWT_VAL_OS_CPUTIME_FREQ=32768
+else
+  CFLAGS += -DMYNEWT_VAL_OS_CPUTIME_FREQ=CONFIG_ZTIMER_MSEC_BASE_FREQ
+endif

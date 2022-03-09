@@ -7,7 +7,6 @@
  * directory for more details.
  */
 
-
 /**
  * @ingroup     examples
  * @{
@@ -25,7 +24,6 @@
 #include "shell.h"
 #include "msg.h"
 #include "log.h"
-
 
 #ifdef WITH_RIOT_SOCKETS
 #error RIOT-OS is set to use sockets but this DTLS app is configured for socks.
@@ -62,12 +60,12 @@ int main(void)
     /* we need a message queue for the thread running the shell in order to
      * receive potentially fast incoming networking packets */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
-    LOG(LOG_INFO, "RIOT wolfSSL DTLS testing implementation");
+    LOG(LOG_INFO, "RIOT wolfSSL DTLS testing implementation\n");
     wolfSSL_Init();
     wolfSSL_Debugging_ON();
 
     /* start shell */
-    LOG(LOG_INFO, "All up, running the shell now");
+    LOG(LOG_INFO, "All up, running the shell now\n");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 

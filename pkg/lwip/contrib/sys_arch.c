@@ -22,11 +22,13 @@
 #include "lwip/mem.h"
 #include "lwip/opt.h"
 #include "lwip/sys.h"
+#include "lwip/tcpip.h"
 
+#include "irq.h"
 #include "msg.h"
 #include "sema.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define _MSG_SUCCESS    (0x5cac)
 #define _MSG_TIMEOUT    (0x5cad)
@@ -38,7 +40,7 @@ void sys_init(void)
 
 u32_t sys_now(void)
 {
-    return (uint32_t)(xtimer_now_usec64() / US_PER_MS);
+    return ztimer_now(ZTIMER_MSEC);
 }
 
 err_t sys_mutex_new(sys_mutex_t *mutex)
@@ -75,22 +77,22 @@ void sys_sem_free(sys_sem_t *sem)
 
 void sys_sem_signal(sys_sem_t *sem)
 {
-    LWIP_ASSERT("invalid semaphor", sys_sem_valid(sem));
+    LWIP_ASSERT("invalid semaphore", sys_sem_valid(sem));
     sema_post((sema_t *)sem);
 }
 
 u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t count)
 {
-    LWIP_ASSERT("invalid semaphor", sys_sem_valid(sem));
+    LWIP_ASSERT("invalid semaphore", sys_sem_valid(sem));
     if (count != 0) {
-        uint64_t stop, start;
-        start = xtimer_now_usec64();
-        int res = sema_wait_timed((sema_t *)sem, count * US_PER_MS);
-        stop = xtimer_now_usec64() - start;
+        uint32_t stop, start;
+        start = ztimer_now(ZTIMER_MSEC);
+        int res = sema_wait_timed_ztimer((sema_t *)sem, ZTIMER_MSEC, count);
+        stop = ztimer_now(ZTIMER_MSEC);
         if (res == -ETIMEDOUT) {
             return SYS_ARCH_TIMEOUT;
         }
-        return (u32_t)(stop / US_PER_MS);
+        return stop - start;
     }
     else {
         sema_wait((sema_t *)sem);
@@ -140,21 +142,20 @@ static void _mbox_timeout(void *arg)
 u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
 {
     msg_t m;
-    xtimer_t timer = { .callback = _mbox_timeout, .arg = &mbox->mbox };
-    uint64_t start, stop;
+    ztimer_t timer = { .callback = _mbox_timeout, .arg = &mbox->mbox };
+    uint32_t start, stop;
 
-    start = xtimer_now_usec64();
+    start = ztimer_now(ZTIMER_MSEC);
     if (timeout > 0) {
-        uint64_t u_timeout = (timeout * US_PER_MS);
-        xtimer_set64(&timer, u_timeout);
+        ztimer_set(ZTIMER_MSEC, &timer, timeout);
     }
     mbox_get(&mbox->mbox, &m);
-    stop = xtimer_now_usec64();
-    xtimer_remove(&timer);  /* in case timer did not time out */
+    stop = ztimer_now(ZTIMER_MSEC);
+    ztimer_remove(ZTIMER_MSEC, &timer);  /* in case timer did not time out */
     switch (m.type) {
         case _MSG_SUCCESS:
             *msg = m.content.ptr;
-            return (u32_t)((stop - start) / US_PER_MS);
+            return stop - start;
         case _MSG_TIMEOUT:
             break;
         default:    /* should not happen */
@@ -220,6 +221,34 @@ sys_thread_t sys_thread_new(const char *name, lwip_thread_fn thread, void *arg,
     mutex_lock(&params.sync);
     thread_yield_higher();
     return res;
+}
+
+static kernel_pid_t lwip_tcpip_thread = KERNEL_PID_UNDEF;
+static kernel_pid_t lwip_lock_thread;
+
+void sys_mark_tcpip_thread(void) {
+    lwip_tcpip_thread = thread_getpid();
+}
+
+void sys_lock_tcpip_core(void) {
+    sys_mutex_lock(&lock_tcpip_core);
+    lwip_lock_thread = thread_getpid();
+}
+void sys_unlock_tcpip_core(void) {
+    lwip_lock_thread = KERNEL_PID_UNDEF;
+    sys_mutex_unlock(&lock_tcpip_core);
+}
+
+bool sys_check_core_locked(void) {
+    /* Don't call from inside isr */
+    if (irq_is_in()) {
+        return false;
+    }
+    if (lwip_tcpip_thread != KERNEL_PID_UNDEF) {
+        /* only call from thread with lock */
+        return lwip_lock_thread == thread_getpid();
+    }
+    return true;
 }
 
 /** @} */

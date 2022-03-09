@@ -1,0 +1,34 @@
+# Copyright (c) 2020 Benjamin Valentin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD_COMMON_WEACT_F4X1CX
+    bool
+    # Put defined MCU peripherals here (in alphabetical order)
+    select HAS_PERIPH_ADC
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_PWM
+    select HAS_PERIPH_RTC
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+    select HAS_PERIPH_USBDEV
+    select HAS_HIGHLEVEL_STDIO
+
+    # Clock configuration
+    select BOARD_HAS_HSE
+    select BOARD_HAS_LSE
+
+    select HAVE_SAUL_GPIO
+    select HAVE_MTD_SPI_NOR
+
+config MODULE_BOARDS_COMMON_WEACT-F4X1CX
+    bool
+    depends on TEST_KCONFIG
+    help
+       Common code of weact based boards
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"

@@ -1,0 +1,3 @@
+PSEUDOMODULES += esp32_ttgo_t_beam_v1_0
+
+include $(RIOTBOARD)/common/esp32/Makefile.include

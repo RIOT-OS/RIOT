@@ -1,0 +1,15 @@
+INCLUDES += -I$(RIOTBOARD)/common/stm32/include
+INCLUDES += -I$(RIOTBOARD)/common/weact-f4x1cx/include
+
+# default to flashing over USB
+PROGRAMMER ?= dfu-util
+DFU_USB_ID ?= 0483:df11
+DFU_USE_DFUSE = 1
+ROM_OFFSET ?= 0x0
+
+# CDC ACM is available faster on STM32
+TERM_DELAY ?= 1
+
+# Setup of programmer and serial is shared between STM32 based boards
+include $(RIOTMAKE)/boards/stm32.inc.mk
+include $(RIOTMAKE)/tools/usb_board_reset.mk

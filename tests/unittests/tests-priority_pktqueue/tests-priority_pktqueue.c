@@ -23,8 +23,8 @@
 #include "tests-priority_pktqueue.h"
 
 #define PKT_INIT_ELEM(len, data, next) \
-    { (next), (data), (len), 1, GNRC_NETTYPE_UNDEF }
-#define PKT_INIT_ELEM_STATIC_DATA(data, next) PKT_INIT_ELEM(sizeof(data), data, next)
+    { (next), (void *)(data), (len), 1, GNRC_NETTYPE_UNDEF }
+#define PKT_INIT_ELEM_STATIC_DATA(data, next) PKT_INIT_ELEM(sizeof(data), (void *)(data), (next))
 #define PKTQUEUE_INIT_ELEM(pkt) { NULL, pkt }
 
 static gnrc_priority_pktqueue_t pkt_queue;
@@ -189,7 +189,6 @@ static void test_gnrc_priority_pktqueue_pop_empty(void)
     TEST_ASSERT_NULL(res);
     TEST_ASSERT_EQUAL_INT(0, gnrc_priority_pktqueue_length(&pkt_queue));
 }
-
 
 static void test_gnrc_priority_pktqueue_pop(void)
 {

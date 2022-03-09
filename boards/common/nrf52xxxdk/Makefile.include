@@ -1,6 +1,5 @@
 # include this module into the build
 INCLUDES += -I$(RIOTBOARD)/common/nrf52xxxdk/include
-USEMODULE += boards_common_nrf52xxdk
 
 # include common configuration for nrf52 based boards
 include $(RIOTBOARD)/common/nrf52/Makefile.include

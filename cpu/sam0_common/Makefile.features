@@ -1,10 +1,36 @@
+CPU_FAM := $(shell echo $(CPU_MODEL) | cut -c -6)
+
 FEATURES_PROVIDED += periph_cpuid
+
+CPU_MODELS_WITHOUT_DMA = samd20%
+ifeq (,$(filter $(CPU_MODELS_WITHOUT_DMA),$(CPU_MODEL)))
+  FEATURES_PROVIDED += periph_dma
+endif
+
 FEATURES_PROVIDED += periph_flashpage
-FEATURES_PROVIDED += periph_flashpage_raw
+FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_flashpage_rwee
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
+FEATURES_PROVIDED += periph_i2c_reconfigure
+FEATURES_PROVIDED += periph_rtt_set_counter
+FEATURES_PROVIDED += periph_rtt_overflow
+FEATURES_PROVIDED += periph_spi_reconfigure
+FEATURES_PROVIDED += periph_spi_gpio_mode
+FEATURES_PROVIDED += periph_timer_periodic # implements timer_set_periodic()
 FEATURES_PROVIDED += periph_uart_modecfg
 FEATURES_PROVIDED += periph_uart_nonblocking
-FEATURES_PROVIDED += periph_wdt periph_wdt_cb
+FEATURES_PROVIDED += periph_uart_reconfigure
+FEATURES_PROVIDED += periph_uart_rxstart_irq
+FEATURES_PROVIDED += periph_wdt periph_wdt_cb periph_wdt_warning_period
 
--include $(RIOTCPU)/cortexm_common/Makefile.features
+FEATURES_CONFLICT += periph_rtc:periph_rtt
+FEATURES_CONFLICT_MSG += "The RTC and RTT map to the same hardware peripheral."
+
+include $(RIOTCPU)/cortexm_common/Makefile.features
+
+# Add sam0 configurations after including cortexm_common so sam0 takes precendence
+# This configuration enables modules that are only available when using Kconfig
+# module modelling
+ifeq (1, $(TEST_KCONFIG))
+  KCONFIG_CPU_CONFIG += $(RIOTCPU)/sam0_common/sam0_common.config
+endif

@@ -31,7 +31,7 @@
 #include "lpsxxx.h"
 #include "lpsxxx_internal.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 /**
@@ -104,6 +104,9 @@ int lpsxxx_init(lpsxxx_t *dev, const lpsxxx_params_t * params)
     tmp = LPSXXX_CTRL_REG1_BDU | LPSXXX_CTRL_REG1_PD |
             (DEV_RATE << LPSXXX_CTRL_REG1_ODR_POS);
 #elif MODULE_LPS22HB
+    tmp = LPSXXX_CTRL_REG1_EN_LPFP | /* Low-pass filter configuration: ODR/9 */
+            LPSXXX_CTRL_REG1_BDU | (DEV_RATE << LPSXXX_CTRL_REG1_ODR_POS);
+#elif MODULE_LPS22HH
     tmp = LPSXXX_CTRL_REG1_EN_LPFP | /* Low-pass filter configuration: ODR/9 */
             LPSXXX_CTRL_REG1_BDU | (DEV_RATE << LPSXXX_CTRL_REG1_ODR_POS);
 #endif
@@ -213,7 +216,6 @@ int lpsxxx_enable(const lpsxxx_t *dev)
     tmp |= LPSXXX_CTRL_REG1_EN_LPFP | /* Low-pass filter configuration: ODR/9 */
             LPSXXX_CTRL_REG1_BDU | (DEV_RATE << LPSXXX_CTRL_REG1_ODR_POS);
 #endif
-
 
     DEBUG("[lpsxxx] enable: update reg1 with %02X\n", tmp);
 

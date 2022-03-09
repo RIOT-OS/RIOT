@@ -42,14 +42,12 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   User button
+ * @name    User button pin configuration
+ * @{
  */
-#define BTN_B1_PIN          GPIO_PIN(PORT_B, 3)
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and stdio
- */
-void board_init(void);
+#define BTN0_PIN            GPIO_PIN(PORT_B, 3)     /**< User button pin */
+#define BTN0_MODE           GPIO_IN_PU              /**< User button pin mode */
+/** @} */
 
 #ifdef __cplusplus
 }

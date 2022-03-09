@@ -1,5 +1,7 @@
 MODULE := tinycbor
 
+CFLAGS += -Wno-maybe-uninitialized
+
 SRC += cborerrorstrings.c
 SRC += cborencoder.c
 SRC += cborencoder_close_container_checked.c

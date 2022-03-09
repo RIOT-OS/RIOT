@@ -14,6 +14,7 @@
  * @{
  */
 
+#include <assert.h>
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
@@ -25,10 +26,8 @@
 #include "log.h"
 #include "xtimer.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
-
-#if ENABLE_DEBUG
 
 #define ASSERT_PARAM(cond) \
     do { \
@@ -43,12 +42,6 @@
         DEBUG("[pca9685] %s i2c dev=%d addr=%02x: " f "\n", \
               __func__, d->params.i2c_dev, dev->params.i2c_addr, ## __VA_ARGS__)
 
-#else /* ENABLE_DEBUG */
-
-#define ASSERT_PARAM(cond) assert(cond)
-#define DEBUG_DEV(f, d, ...)
-
-#endif /* ENABLE_DEBUG */
 #define ERROR_DEV(f, d, ...) \
         LOG_ERROR("[pca9685] %s i2c dev=%d addr=%02x: " f "\n", \
                   __func__, d->params.i2c_dev, dev->params.i2c_addr, ## __VA_ARGS__)
@@ -104,7 +97,7 @@ int pca9685_init(pca9685_t *dev, const pca9685_params_t *params)
 
     DEBUG_DEV("params=%p", dev, params);
 
-    if (dev->params.oe_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.oe_pin)) {
         /* init the pin an disable outputs first */
         gpio_init(dev->params.oe_pin, GPIO_OUT);
         gpio_set(dev->params.oe_pin);
@@ -219,20 +212,20 @@ void pca9685_pwm_poweron(pca9685_t *dev)
         /* clear the SLEEP bit */
         byte &= ~PCA9685_MODE1_SLEEP;
         EXEC(_write(dev, PCA9685_REG_MODE1, &byte, 1));
-        /* allow 500 us for oscilator to stabilize */
+        /* allow 500 us for oscillator to stabilize */
         xtimer_usleep(500);
         /* clear the RESTART bit to start all PWM channels*/
         EXEC(_update(dev, PCA9685_REG_MODE1, PCA9685_MODE1_RESTART, 1));
     }
     else {
         EXEC(_update(dev, PCA9685_REG_MODE1, PCA9685_MODE1_SLEEP, 0));
-        /* allow 500 us for oscilator to stabilize */
+        /* allow 500 us for oscillator to stabilize */
         xtimer_usleep(500);
         /* clear the RESTART bit to start all PWM channels*/
         EXEC(_update(dev, PCA9685_REG_MODE1, PCA9685_MODE1_RESTART, 1));
     }
 
-    if (dev->params.oe_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.oe_pin)) {
         gpio_clear(dev->params.oe_pin);
     }
 
@@ -244,7 +237,7 @@ void pca9685_pwm_poweroff(pca9685_t *dev)
     ASSERT_PARAM(dev != NULL);
     DEBUG_DEV("", dev);
 
-    if (dev->params.oe_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.oe_pin)) {
         gpio_set(dev->params.oe_pin);
     }
 
@@ -299,10 +292,7 @@ static int _read(const pca9685_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
     DEBUG_DEV("reg=%02x data=%p len=%"PRIu32"", dev, reg, data, len);
 
     /* acquire the I2C device */
-    if (i2c_acquire(dev->params.i2c_dev)) {
-        DEBUG_DEV("could not acquire I2C bus", dev);
-        return -PCA9685_ERROR_I2C;
-    }
+    i2c_acquire(dev->params.i2c_dev);
 
     if (i2c_read_regs(dev->params.i2c_dev,
                       dev->params.i2c_addr, reg, data, len, 0) != 0) {
@@ -320,10 +310,7 @@ static int _write(const pca9685_t *dev, uint8_t reg, const uint8_t *data, uint32
 {
     DEBUG_DEV("reg=%02x data=%p len=%"PRIu32"", dev, reg, data, len);
 
-    if (i2c_acquire(dev->params.i2c_dev)) {
-        DEBUG_DEV("could not acquire I2C bus", dev);
-        return -PCA9685_ERROR_I2C;
-    }
+    i2c_acquire(dev->params.i2c_dev);
 
     if (i2c_write_regs(dev->params.i2c_dev,
                        dev->params.i2c_addr, reg, data, len, 0) != 0) {

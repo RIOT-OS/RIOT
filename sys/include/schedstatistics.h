@@ -30,7 +30,6 @@
 #define SCHEDSTATISTICS_H
 
 #include <stdint.h>
-#include "kernel_types.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -43,7 +42,7 @@ typedef struct {
     uint32_t laststart;      /**< Time stamp of the last time this thread was
                                   scheduled to run */
     unsigned int schedules;  /**< How often the thread was scheduled to run */
-    uint64_t runtime_ticks;  /**< The total runtime of this thread in ticks */
+    uint64_t runtime_us;     /**< The total runtime of this thread in microseconds */
 } schedstat_t;
 
 /**
