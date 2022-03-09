@@ -37,6 +37,17 @@ void cpu_init(void)
     NRF_NVMC_S->ICACHECNF = (NVMC_ICACHECNF_CACHEEN_Msk);
 #endif
 
+    if (IS_USED(MODULE_NRFXLIB_NRF_MODEM)) {
+        /* Move POWER and IPC peripherals and half of the RAM to unsecure domain
+           as required by NRF modem library */
+        NRF_SPU_S->PERIPHID[IPC_IRQn].PERM &= ~SPU_EXTDOMAIN_PERM_SECATTR_Msk;
+        NRF_SPU_S->PERIPHID[CLOCK_POWER_IRQn].PERM &= ~SPU_EXTDOMAIN_PERM_SECATTR_Msk;
+        /* Mark first half of RAM as non secure */
+        for (unsigned i=0; i<15; i++)
+        {
+            NRF_SPU_S->RAMREGION[i].PERM &= ~SPU_RAMREGION_PERM_SECATTR_Msk;
+        }
+    }
     /* call cortexm default initialization */
     cortexm_init();
 
