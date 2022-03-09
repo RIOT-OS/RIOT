@@ -9,5 +9,8 @@ config MODULE_ESP_IDF_GPIO
     bool
     depends on TEST_KCONFIG
     depends on MODULE_ESP_IDF
+
+    default y if MODULE_PERIPH_GPIO
+
     help
         ESP-IDF code for peripheral GPIO.

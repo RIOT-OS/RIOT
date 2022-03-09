@@ -3,6 +3,9 @@ MODULE = esp_idf_gpio
 # source files to be compiled for this module
 ESP32_SDK_SRC = \
   components/driver/gpio.c \
+  components/driver/rtc_io.c \
+  components/driver/rtc_module.c \
+  components/hal/gpio_hal.c \
   components/soc/$(CPU)/gpio_periph.c \
   #
 
