@@ -472,6 +472,11 @@ uint32_t esp_get_free_internal_heap_size( void ) __attribute__((alias("get_free_
  * @name Other system functions
  */
 
+int _rename_r(struct _reent *r, const char *from, const char *to)
+{
+    return 0;
+}
+
 struct _reent* __getreent(void) {
     return _GLOBAL_REENT;
 }
