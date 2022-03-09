@@ -6,7 +6,9 @@
 #
 
 menuconfig MODULE_INA3221
-    bool "INA3221 current/power monitor"
+    bool
+    prompt "INA3221 current/power monitor" if !(MODULE_SAUL_DEFAULT && HAVE_INA3221)
+    default (MODULE_SAUL_DEFAULT && HAVE_INA3221)
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
@@ -14,9 +16,21 @@ menuconfig MODULE_INA3221
     select MODULE_PERIPH_I2C
 
 config MODULE_INA3221_ALERTS
-    bool "Altert pins"
+    bool "Alert pins"
     depends on HAS_PERIPH_GPIO_IRQ
     depends on MODULE_INA3221
     select MODULE_PERIPH_GPIO_IRQ
+    default HAVE_INA3221_ALERTS
     help
         Say y to enable the usage of alert pins.
+
+config HAVE_INA3221
+    bool
+    help
+        Indicates that a INA3221 current/power monitor is present.
+
+config HAVE_INA3221_ALERTS
+    bool
+    select HAVE_INA3221
+    help
+        Indicates that a INA3221 current/power monitor is present with alert pins wired.

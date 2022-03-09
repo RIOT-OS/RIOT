@@ -10,3 +10,8 @@ config MODULE_BH1900NUX
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
+
+config HAVE_BH1900NUX
+    bool
+    help
+        Indicates that the BH1900NUX temperature sensor is present.

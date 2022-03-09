@@ -5,14 +5,16 @@
 # directory for more details.
 #
 
-config MODULE_AIP31068
-    bool "AIP31068 I2C LCD controller"
+config MODULE_CST816S
+    bool "cst816s touch screen"
+    depends on HAS_PERIPH_GPIO_IRQ
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
-    select MODULE_XTIMER
+    select MODULE_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_I2C
+    select MODULE_XTIMER
 
-config HAVE_AIP31068
+config HAVE_CST816S
     bool
     help
-        Indicates that the AIP31068 I2C LCD controller is present.
+        Indicates that a cst816s touch screen is present.

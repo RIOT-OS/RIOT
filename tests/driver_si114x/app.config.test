@@ -4,5 +4,6 @@
 CONFIG_MODULE_ZTIMER=y
 CONFIG_MODULE_ZTIMER_MSEC=y
 
+CONFIG_MODULE_SI114X=y
 # This test should also work with Si1146 and Si1147 variants.
 CONFIG_MODULE_SI1145=y

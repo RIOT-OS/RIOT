@@ -11,3 +11,8 @@ config MODULE_TJA1042
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
     select MODULE_CAN_TRX
+
+config HAVE_TJA1042
+    bool
+    help
+      Indicates that a TJA1042 High Speed CAN transceiver is present.
