@@ -39,19 +39,19 @@ extern "C" {
 #define ESP_LOG_LEVEL(level, tag, format, ...) \
             do { \
                 if ((esp_log_level_t)level==ESP_LOG_ERROR ) { \
-                    LOG_TAG(level, E, tag, format, ##__VA_ARGS__);  \
+                    ESP_LOGE(tag, format, ##__VA_ARGS__);  \
                 } \
                 else if ((esp_log_level_t)level==ESP_LOG_WARN ) { \
-                    LOG_TAG(level, W, tag, format, ##__VA_ARGS__);  \
+                    ESP_LOGW(tag, format, ##__VA_ARGS__);  \
                 } \
                 else if ((esp_log_level_t)level==ESP_LOG_INFO ) { \
-                    LOG_TAG(level, I, tag, format, ##__VA_ARGS__);  \
+                    ESP_LOGI(tag, format, ##__VA_ARGS__);  \
                 } \
                 else if ((esp_log_level_t)level==ESP_LOG_DEBUG ) { \
-                    LOG_TAG(level, D, tag, format, ##__VA_ARGS__);  \
+                    ESP_LOGD(tag, format, ##__VA_ARGS__);  \
                 } \
                 else if ((esp_log_level_t)level==ESP_LOG_VERBOSE ) { \
-                    LOG_TAG(level, V, tag, format, ##__VA_ARGS__);  \
+                    ESP_LOGV(tag, format, ##__VA_ARGS__);  \
                 } \
             } while (0)
 
@@ -61,6 +61,35 @@ extern "C" {
                     ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
                 } \
             } while (0)
+
+#define ESP_LOGE(tag, format, ...) esp_log_write((esp_log_level_t)LOG_ERROR  , tag, format "\n", ##__VA_ARGS__)
+#define ESP_LOGW(tag, format, ...) esp_log_write((esp_log_level_t)LOG_WARNING, tag, format "\n", ##__VA_ARGS__)
+#define ESP_LOGI(tag, format, ...) esp_log_write((esp_log_level_t)LOG_INFO   , tag, format "\n", ##__VA_ARGS__)
+#define ESP_LOGD(tag, format, ...) esp_log_write((esp_log_level_t)LOG_DEBUG  , tag, format "\n", ##__VA_ARGS__)
+#define ESP_LOGV(tag, format, ...) esp_log_write((esp_log_level_t)LOG_ALL    , tag, format "\n", ##__VA_ARGS__)
+
+#if MODULE_ESP_LOG_TAGGED
+
+#define ESP_DRAM_LOGE(tag, format, ...) \
+            do { \
+                if ((esp_log_level_t)LOG_LOCAL_LEVEL >= ESP_LOG_ERROR ) { \
+                    esp_rom_printf(DRAM_STR(LOG_FORMAT(E, format)), \
+                                   system_get_time_ms(), ##__VA_ARGS__); \
+                }\
+            } while (0U)
+
+#else
+
+#define ESP_DRAM_LOGE(tag, format, ...) \
+            do { \
+                if ((esp_log_level_t)LOG_LOCAL_LEVEL >= ESP_LOG_ERROR ) { \
+                    esp_rom_printf(DRAM_STR(LOG_FORMAT(E, format)), \
+                                   ##__VA_ARGS__); \
+                }\
+            } while (0U)
+
+#endif
+
 
 #endif /* defined(RIOT_VERSION) */
 

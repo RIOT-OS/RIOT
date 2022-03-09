@@ -126,7 +126,7 @@ void IRAM_ATTR esp_log_writev(esp_log_level_t level,
     if ((unsigned)act_level > CONFIG_LOG_DEFAULT_LEVEL) {
         return;
     }
-
+#if 0   /* seems not to be required any longer */
     /*
      * The format of log output from ESP SDK libraries is "X (s) t: message\n"
      * where X is the log level, d the system time in milliseconds and t the
@@ -144,6 +144,12 @@ void IRAM_ATTR esp_log_writev(esp_log_level_t level,
     va_arg(arglist, const char*);
     vsnprintf(_printf_buf, PRINTF_BUFSIZ, msg, arglist);
     va_end(arglist);
+#else
+    va_list arglist;
+    va_copy(arglist, args);
+    vsnprintf(_printf_buf, PRINTF_BUFSIZ, format, arglist);
+    va_end(arglist);
+#endif
 
     switch (act_level) {
         case LOG_NONE   : return;
