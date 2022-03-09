@@ -697,6 +697,21 @@ Other examples include:
 - LM75
 - LIS2DH12
 
+### Driver module defaults and optional variants
+
+This is a special case where variants exist that can be selected as a choice
+with defaults but the possiblilty to have an empty or generic variant is
+present.
+This may occur if params are defined for only one device but user params can
+have multiple devices or just want to override the variants present in kconfig.
+
+This is a generic example of [the
+module](module_defaults_with_optional_variants.kconfig), and the
+[board](board_variant.kconfig)
+
+Other examples include:
+- AT24CXXX
+
 ### Boards with multiple variants requiring different default order
 
 If a board contains multiple possible variants, but can only select one,

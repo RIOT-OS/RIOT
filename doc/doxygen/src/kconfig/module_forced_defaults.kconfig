@@ -8,4 +8,4 @@ config HAVE_MY_MODULE
 # There is an assumption that depenencies will be met when using this.
     select MODULE_MY_MODULE if MY_DEFAULT
     help
-      Indicates that MY_MODULE is present.
+        Indicates that MY_MODULE is present.

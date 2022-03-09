@@ -38,22 +38,22 @@ endif # MODULE_MY_MODULE
 config HAVE_MY_MODULE
     bool
     help
-      Indicates that MY_MODULE is present.
+        Indicates that MY_MODULE is present.
 
 config HAVE_MY_MODULE_VARIANT_1
     bool
     select HAVE_MY_MODULE
     help
-      Indicates that MY_MODULE is VARIANT_1.
+        Indicates that MY_MODULE is VARIANT_1.
 
 config HAVE_MY_MODULE_VARIANT_2
     bool
     select HAVE_MY_MODULE
     help
-      Indicates that MY_MODULE is VARIANT_2.
+        Indicates that MY_MODULE is VARIANT_2.
 
 config HAVE_MY_MODULE_VARIANT_n
     bool
     select HAVE_MY_MODULE
     help
-      Indicates that MY_MODULE is VARIANT_n.
+        Indicates that MY_MODULE is VARIANT_n.

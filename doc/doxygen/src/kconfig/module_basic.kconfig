@@ -6,4 +6,4 @@ config MODULE_MY_MODULE
 config HAVE_MY_MODULE
     bool
     help
-      Indicates that MY_MODULE is present.
+        Indicates that MY_MODULE is present.

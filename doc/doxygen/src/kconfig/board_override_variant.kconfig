@@ -20,3 +20,4 @@ choice MY_DRIVER_MODULE_VARIANT
     default MODULE_DRIVER_MODULE_VARIANT_1 if HAVE_MY_DRIVER_MODULE_VARIANT_1
 # Note that overriding choices DO NOT require duplication of dependancies
 # Nor do they require duplication of prompts, or helps
+endchoice
