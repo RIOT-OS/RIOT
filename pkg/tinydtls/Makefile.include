@@ -11,6 +11,9 @@ INCLUDES += -I$(PKG_BUILDDIR)
 # Mandatory for tinyDTLS
 CFLAGS += -DDTLSv12 -DWITH_SHA256
 
+# Reduce stack requirements by using shared buffer
+CFLAGS += -DDTLS_CONSTRAINED_STACK
+
 # Check that the used PRNG implementation is cryptographically secure
 CRYPTO_SECURE_IMPLEMENTATIONS := prng_sha256prng prng_sha1prng prng_hwrng
 USED_PRNG_IMPLEMENTATIONS := $(filter prng_%,$(USEMODULE))
