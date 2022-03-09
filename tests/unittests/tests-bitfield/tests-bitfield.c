@@ -197,6 +197,31 @@ static void test_bf_get_unset_lastbyte(void)
     TEST_ASSERT_EQUAL_INT(39, res);
 }
 
+static void test_bf_ops(void)
+{
+    const uint8_t zero[3] = {0};
+    const uint8_t set[3] = { 0xFF, 0xFF, 0xFF };
+
+    uint8_t a[3] = { 0xAA, 0x55, 0xF0 };
+    uint8_t b[3] = { 0x55, 0xAA, 0x0F };
+    uint8_t c[3];
+
+    bf_or(c, a, b, 24);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(c, set, sizeof(c)));
+
+    bf_inv(c, c, 24);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(c, zero, sizeof(c)));
+
+    bf_and(c, a, b, 24);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(c, zero, sizeof(c)));
+
+    bf_inv(c, c, 24);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(c, set, sizeof(c)));
+
+    bf_xor(c, c, a, 24);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(c, b, sizeof(c)));
+}
+
 Test *tests_bitfield_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -208,6 +233,7 @@ Test *tests_bitfield_tests(void)
         new_TestFixture(test_bf_get_unset_firstbyte),
         new_TestFixture(test_bf_get_unset_middle),
         new_TestFixture(test_bf_get_unset_lastbyte),
+        new_TestFixture(test_bf_ops),
     };
 
     EMB_UNIT_TESTCALLER(bitfield_tests, NULL, NULL, fixtures);
