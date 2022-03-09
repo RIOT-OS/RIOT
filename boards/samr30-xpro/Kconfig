@@ -21,4 +21,5 @@ config BOARD_SAMR30_XPRO
     select HAS_PERIPH_USBDEV
     select HAS_RIOTBOOT
 
+    select HAVE_AT86RF212B
     select HAVE_SAUL_GPIO

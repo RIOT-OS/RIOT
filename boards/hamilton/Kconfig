@@ -21,6 +21,7 @@ config BOARD_HAMILTON
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
 
+    select HAVE_AT86RF233
     select HAVE_FXOS8700
     select HAVE_HDC1000
     select HAVE_PIR

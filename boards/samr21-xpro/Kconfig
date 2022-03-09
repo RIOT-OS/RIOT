@@ -23,5 +23,6 @@ config BOARD_SAMR21_XPRO
     select HAS_PERIPH_USBDEV
     select HAS_RIOTBOOT
 
-    select HAVE_SAUL_GPIO
     select HAVE_EDBG_EUI
+    select HAVE_SAUL_GPIO
+    select HAVE_AT86RF233
