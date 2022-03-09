@@ -20,7 +20,9 @@ ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
   USEMODULE += stdio_uart
 endif
 
-USEMODULE += xtensa
+ifneq (,$(filter esp8266 esp32 esp32s%,$(CPU)))
+  USEMODULE += xtensa
+endif
 
 # Features used by ESP*
 
