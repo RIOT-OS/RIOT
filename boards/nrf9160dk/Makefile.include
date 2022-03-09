@@ -1,2 +1,12 @@
+PROGRAMMERS_SUPPORTED ?= jlink
+
+PROGRAMMERS_SUPPORTED += nrfjprog
+
+ifeq ($(PROGRAMMER),nrfjprog)
+    FLASHFILE = $(HEXFILE)
+    FFLAGS = --program $(FLASHFILE) --family NRF91 --reset
+    include $(RIOTMAKE)/tools/nrfjprog.inc.mk
+endif
+
 # include this module into the build
 INCLUDES += -I$(RIOTBOARD)/nrf9160dk/include
