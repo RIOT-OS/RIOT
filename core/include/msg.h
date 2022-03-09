@@ -370,12 +370,31 @@ int msg_reply(msg_t *m, msg_t *reply);
 int msg_reply_int(msg_t *m, msg_t *reply);
 
 /**
- * @brief Check how many messages are available in the message queue
+ * @brief Check how many messages are available (waiting) in the message queue
+ *        of a specific thread
+ *
+ * @param[in] pid    a PID
+ *
+ * @return Number of messages available in queue of @p pid on success
+ * @return 0, if no caller's message queue is initialized
+ */
+unsigned msg_avail_thread(kernel_pid_t pid);
+
+/**
+ * @brief Check how many messages are available (waiting) in the message queue
  *
  * @return Number of messages available in our queue on success
  * @return 0, if no caller's message queue is initialized
  */
 unsigned msg_avail(void);
+
+/**
+ * @brief Get maximum capacity of a thread's queue length
+ *
+ * @return Number of total messages that fit in the queue of @p pid on success
+ * @return 0, if no caller's message queue is initialized
+ */
+unsigned msg_queue_capacity(kernel_pid_t pid);
 
 /**
  * @brief Initialize the current thread's message queue.
