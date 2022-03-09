@@ -1,6 +1,9 @@
 # add a list of subdirectories, that should also be build
 DIRS += periph
-DIRS += vendor
+
+ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
+  DIRS += vendor
+endif
 
 ifneq (,$(filter esp_freertos_common,$(USEMODULE)))
   DIRS += freertos
