@@ -24,6 +24,15 @@ ifneq (,$(filter auto_init_gnrc_netif,$(USEMODULE)))
   USEMODULE += gnrc_netif_init_devs
 endif
 
+ifneq (,$(filter auto_init_sock_dns,$(USEMODULE)))
+  ifneq (,$(filter ipv4,$(USEMODULE)))
+    USEMODULE += ipv4_addr
+  endif
+  ifneq (,$(filter ipv6,$(USEMODULE)))
+    USEMODULE += ipv6_addr
+  endif
+endif
+
 ifneq (,$(filter congure_%,$(USEMODULE)))
   USEMODULE += congure
 endif
