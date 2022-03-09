@@ -22,6 +22,16 @@
 #ifndef SDKCONFIG_H
 #define SDKCONFIG_H
 
+/*
+ * The SoC capability definitions are often included indirectly in the
+ * ESP-IDF files, although all ESP-IDF files require them. Since not all
+ * ESP-IDF header files are included in RIOT, the SoC capability definitions
+ * are unknown if they are only indirectly included. Therefore, the SoC
+ * capabilities are included in this file and are thus available to all
+ * ESP-IDF files. This avoids to update vendor code.
+ */
+#include "soc/soc_caps.h"
+
 #ifndef DOXYGEN
 
 #ifdef __cplusplus
@@ -88,6 +98,7 @@ extern "C" {
 #ifndef CONFIG_LOG_DEFAULT_LEVEL
 #define CONFIG_LOG_DEFAULT_LEVEL    LOG_LEVEL
 #endif
+#define CONFIG_LOG_MAXIMUM_LEVEL    LOG_LEVEL
 
 /**
  * ESP32 specific configuration
@@ -99,6 +110,9 @@ extern "C" {
 #define CONFIG_ESP32_XTAL_FREQ                  0
 #endif
 
+#ifdef MODULE_ESP_RTC_TIMER_32K
+#define CONFIG_ESP32_RTC_CLK_SRC_EXT_CRYS       1
+#endif
 #define CONFIG_ESP32_RTC_XTAL_BOOTSTRAP_CYCLES  100
 #define CONFIG_ESP32_RTC_CLK_CAL_CYCLES         (8 * 1024)
 
@@ -112,6 +126,7 @@ extern "C" {
 #define CONFIG_TRACEMEM_RESERVE_DRAM            0
 #define CONFIG_ULP_COPROC_RESERVE_MEM           0
 
+#define CONFIG_ESP_SYSTEM_CHECK_INT_LEVEL_4     1
 #define CONFIG_ESP_SYSTEM_EVENT_QUEUE_SIZE      32
 #define CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE 2560
 #define CONFIG_NUMBER_OF_UNIVERSAL_MAC_ADDRESS  4
@@ -187,12 +202,18 @@ extern "C" {
 #define CONFIG_ESPTOOLPY_FLASHFREQ_40M          1
 #if defined(FLASH_MODE_QIO)
 #define CONFIG_FLASHMODE_QIO                    1
+#define CONFIG_ESPTOOLPY_FLASHMODE_QIO          1
 #elif defined(FLASH_MODE_QOUT)
 #define CONFIG_FLASHMODE_QOUT                   1
+#define CONFIG_ESPTOOLPY_FLASHMODE_QOUT         1
 #elif defined(FLASH_MODE_DIO)
 #define CONFIG_FLASHMODE_DIO                    1
-#else
+#define CONFIG_ESPTOOLPY_FLASHMODE_DIO          1
+#elif defined(FLASH_MODE_DOUT)
 #define CONFIG_FLASHMODE_DOUT                   1
+#define CONFIG_ESPTOOLPY_FLASHMODE_DOUT         1
+#else
+#error "Unknown flash mode selected."
 #endif
 
 /**
