@@ -16,7 +16,7 @@ config CPU_FAM_ESP32
     select HAS_ARCH_ESP32
     select HAS_CPU_ESP32
     select HAS_ESP_WIFI_ENTERPRISE
-    select HAS_PERIPH_ADC_CTRL
+    select HAS_PERIPH_ADC_ARCH
     select HAS_PUF_SRAM
 
     select PACKAGE_ESP32_SDK if TEST_KCONFIG
@@ -75,10 +75,10 @@ config HAS_ESP_SPI_RAM
         Indicates that an external RAM is connected via the FSPI interface in
         the board.
 
-config HAS_PERIPH_ADC_CTRL
+config HAS_PERIPH_ADC_ARCH
     bool
     help
-        Indicates that an ESP32 ADC controller peripheral is present.
+        Indicates that architecure specific ADC peripherals are present.
 
 ## Common CPU symbols
 config CPU_CORE

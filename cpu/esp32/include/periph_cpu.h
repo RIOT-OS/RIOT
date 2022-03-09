@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2022 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -21,6 +21,8 @@
 
 #include <stdint.h>
 #include "sdkconfig.h"
+#include "soc/periph_defs.h"
+#include "soc/soc_caps.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -238,24 +240,6 @@ typedef enum {
  * @{
  */
 
-#ifndef DOXYGEN
-/**
- * @brief   Possible ADC resolution settings
- */
-#define HAVE_ADC_RES_T
-typedef enum {
-    ADC_RES_6BIT  = 0xf0,   /**< ADC resolution: 6 bit is not supported */
-    ADC_RES_8BIT  = 0xf1,   /**< ADC resolution: 8 bit is not supported  */
-    ADC_RES_9BIT  = 0,      /**< ADC resolution: 9 bit */
-    ADC_RES_10BIT = 1,      /**< ADC resolution: 10 bit */
-    ADC_RES_11BIT = 2,      /**< ADC resolution: 11 bit */
-    ADC_RES_12BIT = 3,      /**< ADC resolution: 12 bit */
-    ADC_RES_14BIT = 0xf2,   /**< ADC resolution: 14 bit is not supported */
-    ADC_RES_16BIT = 0xf3,   /**< ADC resolution: 16 bit is not supported */
-} adc_res_t;
-/** @} */
-#endif /* ndef DOXYGEN */
-
 /**
  * @brief  Number of ADC channels that could be used at maximum
  *
@@ -263,7 +247,7 @@ typedef enum {
  * therefore not usable. The maximum number of ADC channels (ADC_NUMOF_MAX)
  * is therefore set to 16.
  */
-#define ADC_NUMOF_MAX   16
+#define ADC_NUMOF_MAX   (SOC_ADC_CHANNEL_NUM(0) + SOC_ADC_CHANNEL_NUM(1))
 
 /** @} */
 
