@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2019 Inria
- *               2022 Nicole Faerber <@>
+ *               2022 Nicole Faerber <nicole.faerber@digitaluhr-manufactur.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,7 +14,7 @@
  * @file
  * @brief       Peripheral configuration for the Bangle.js 2
  *
- * @author      Nicole Faerber <@>
+ * @author      Nicole Faerber <nicole.faerber@digitaluhr-manufactur.de>
  *
  */
 
@@ -36,14 +36,14 @@ extern "C" {
  */
 static const spi_conf_t spi_config[] = {
     {
-        .dev  = NRF_SPIM0,
+        .dev  = NRF_SPIM2,
         .sclk = GPIO_PIN(0, 26),
         .mosi = GPIO_PIN(0, 27),
         //.miso = GPIO_UNDEF,
         //.ppi = 0,
     },
     {
-        .dev  = NRF_SPIM1,
+        .dev  = NRF_SPIM3,
         .sclk = GPIO_PIN(0, 16),
         .mosi = GPIO_PIN(0, 15),
         .miso = GPIO_PIN(0, 13),
@@ -67,10 +67,10 @@ static const i2c_conf_t i2c_config[] = {
     },
     {
         .dev = NRF_TWIM1,
-        .scl = GPIO_PIN(1, 6),
-        .sda = GPIO_PIN(1, 5),
+        .scl = GPIO_PIN(1, 13),
+        .sda = GPIO_PIN(1, 12),
         .speed = I2C_SPEED_FAST
-    }
+    },
 };
 
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
