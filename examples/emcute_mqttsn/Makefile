@@ -42,3 +42,6 @@ DEVELHELP ?= 1
 QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
+
+# Set a custom channel if needed
+include $(RIOTMAKE)/default-radio-settings.inc.mk

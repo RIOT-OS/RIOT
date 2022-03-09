@@ -13,6 +13,9 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include <assert.h>
+#include <stdio.h>
+
 #include "lwip/sock_internal.h"
 
 #include "net/af.h"
@@ -348,9 +351,6 @@ static int _create(int type, int proto, uint16_t flags, struct netconn **out)
 #endif
     return 0;
 }
-
-#include <assert.h>
-#include <stdio.h>
 
 int lwip_sock_create(struct netconn **conn, const struct _sock_tl_ep *local,
                      const struct _sock_tl_ep *remote, int proto,

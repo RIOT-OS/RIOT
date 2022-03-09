@@ -5,7 +5,9 @@
 # directory for more details.
 #
 menuconfig MODULE_SM_PWM_01C
-    bool "SM_PWM_01C Amphenol infrared dust sensor"
+    bool
+    prompt "SM_PWM_01C Amphenol infrared dust sensor" if !(MODULE_SAUL_DEFAULT && HAVE_SM_PWM_01C)
+    default (MODULE_SAUL_DEFAULT && HAVE_SM_PWM_01C)
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_GPIO_IRQ
     depends on TEST_KCONFIG
@@ -19,6 +21,12 @@ config MODULE_SM_PWM_01C_MA
     bool "Use a moving average for sensor values"
     depends on MODULE_SM_PWM_01C
     default y
+
+config HAVE_SM_PWM_01C
+    bool
+    help
+      Indicates that a SM_PWM_01C Amphenol infrared dust sensor is present.
+
 
 menuconfig KCONFIG_USEMODULE_SM_PWM_01C
     bool "Configure SM_PWM_01C driver"

@@ -11,3 +11,8 @@ config MODULE_MY9221
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
     select MODULE_XTIMER
+
+config HAVE_MY9221
+    bool
+    help
+      Indicates that a MY9221 LED controller is present.

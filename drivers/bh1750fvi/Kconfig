@@ -11,3 +11,8 @@ config MODULE_BH1750FVI
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
     select MODULE_XTIMER
+
+config HAVE_BH1750FVI
+    bool
+    help
+        Indicates that the BH1750FVI ambient light sensor is present.

@@ -11,3 +11,9 @@ config MODULE_TSL4531X
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
     select MODULE_XTIMER
+
+config HAVE_TSL4531X
+    bool
+    select MODULE_TSL4531X if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a TSL4531X illuminance sensor is present.

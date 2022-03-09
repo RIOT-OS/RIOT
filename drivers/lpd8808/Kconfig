@@ -11,3 +11,8 @@ config MODULE_LPD8808
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
     select MODULE_COLOR
+
+config HAVE_LPD8808
+    bool
+    help
+        Indicates that a LPD8808 based LED Strip is present.
