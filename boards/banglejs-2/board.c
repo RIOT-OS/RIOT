@@ -75,6 +75,7 @@ void board_init(void)
     gpio_init(CHARGE_COMPLETE, GPIO_IN);
 
     // bring touch controller out of reset
+    gpio_init(TOUCH_RESET, GPIO_OUT);
     gpio_set(TOUCH_RESET);
 
     // LCD CS is high active
@@ -92,7 +93,6 @@ void board_init(void)
     
     // init ADC
     adc_init(1); // battery voltage monitor
-
     // init touchscreen
 #ifdef ENABLE_TOUCH
     if (cst816s_init(&_input_dev, &_cst816s_input_params, touch_cb, NULL) != CST816S_OK) {
