@@ -26,8 +26,11 @@
 
 #include "esp_common.h"
 #include "esp/common_macros.h"
+
+#if __xtensa__
 #include "esp/xtensa_ops.h"
 #include "xtensa/xtensa_context.h"
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -37,6 +40,7 @@
  */
 volatile uint32_t irq_interrupt_nesting = 0;
 
+#if __xtensa__
 /**
  * @brief Disable all maskable interrupts
  */
@@ -92,15 +96,6 @@ void IRAM irq_restore(unsigned int state)
 }
 
 /**
- * @brief See if the current context is inside an ISR
- */
-bool IRAM irq_is_in(void)
-{
-    DEBUG("irq_interrupt_nesting = %d\n", irq_interrupt_nesting);
-    return irq_interrupt_nesting;
-}
-
-/**
  * @brief Test if IRQs are currently enabled
  */
 bool IRAM irq_is_enabled(void)
@@ -109,4 +104,15 @@ bool IRAM irq_is_enabled(void)
 
     RSR(reg, 230);
     return (reg & 0xf) == 0;
+}
+
+#endif /* __xtensa__ */
+
+/**
+ * @brief See if the current context is inside an ISR
+ */
+bool IRAM irq_is_in(void)
+{
+    DEBUG("irq_interrupt_nesting = %" PRIu32 "\n", irq_interrupt_nesting);
+    return irq_interrupt_nesting;
 }
