@@ -294,7 +294,7 @@ typedef enum {
 /**
  * @brief  Number of DAC channels that could be used at maximum.
  */
-#define DAC_NUMOF_MAX   2
+#define DAC_NUMOF_MAX   (SOC_DAC_PERIPH_NUM)
 
 /** @} */
 
