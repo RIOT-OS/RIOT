@@ -27,16 +27,19 @@ extern "C" {
 #endif
 
 #define portTICK_PERIOD_MS      10
-#define portTickType            TickType_t
 
 #define portTICK_RATE_MS        portTICK_PERIOD_MS
 
 #define BaseType_t              portBASE_TYPE
-#define UBaseType_t             unsigned portBASE_TYPE
+#define UBaseType_t             portUBASE_TYPE
+#define TickType_t              portTICK_TYPE
+#define StackType_t             portSTACK_TYPE
+
+#define portTickType            TickType_t
 
 #define pdMS_TO_TICKS(ms)       ((TickType_t)(ms / portTICK_PERIOD_MS))
 
-typedef uint32_t TickType_t;
+#define xSemaphoreHandle        SemaphoreHandle_t
 
 uint32_t xPortGetTickRateHz(void);
 BaseType_t xPortInIsrContext(void);

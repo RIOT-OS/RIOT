@@ -14,6 +14,7 @@
 #ifndef DOXYGEN
 
 #include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 #include <stdlib.h>
 #include "mutex.h"
@@ -35,6 +36,8 @@ BaseType_t xSemaphoreTake (SemaphoreHandle_t xSemaphore,
 BaseType_t xSemaphoreGiveRecursive (SemaphoreHandle_t xSemaphore);
 BaseType_t xSemaphoreTakeRecursive (SemaphoreHandle_t xSemaphore,
                                     TickType_t xTicksToWait);
+
+TaskHandle_t xSemaphoreGetMutexHolder(SemaphoreHandle_t xMutex);
 
 #define vPortCPUInitializeMutex(m)  mutex_init(m)
 

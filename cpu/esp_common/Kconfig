@@ -81,6 +81,7 @@ config MODULE_ESP_COMMON
     select MODULE_LOG # override default log implementation by default
     select MODULE_PERIPH
     select MODULE_ESP_IDF
+    select MODULE_CORE_THREAD_FLAGS if MODULE_ZTIMER_MSEC
     help
       Common code module for ESP SoCs.
 

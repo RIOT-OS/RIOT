@@ -53,6 +53,13 @@ ifneq (,$(filter esp_qemu,$(USEMODULE)))
   CFLAGS += -DQEMU
 endif
 
+ifneq (,$(filter esp_freertos_common,$(USEMODULE)))
+  # thread_t.name required by FreeRTOS adaptation layer and esp_gdbstub
+  CFLAGS += -DCONFIG_THREAD_NAMES
+  # thread_t.stack_start required by FreeRTOS adaptation layer
+  CFLAGS += -DSCHED_TEST_STACK
+endif
+
 # use 32 priority levels if any WiFi interface or the ETH interface is used
 ifneq (,$(filter esp_wifi_any esp_eth,$(USEMODULE)))
   CFLAGS += -DSCHED_PRIO_LEVELS=32

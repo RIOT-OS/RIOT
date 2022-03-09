@@ -93,3 +93,7 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   USEMODULE += netopt
   USEMODULE += ztimer_msec
 endif
+
+ifneq (,$(filter ztimer_msec,$(USEMODULE)))
+  USEMODULE += core_thread_flags
+endif
