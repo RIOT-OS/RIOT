@@ -1,0 +1,3 @@
+MODULE = nrfxlib_nrf_modem
+
+include $(RIOTBASE)/Makefile.base

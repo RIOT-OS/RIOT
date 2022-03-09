@@ -1,0 +1,14 @@
+# List of RIOT PSEUDOMODULES
+PSEUDOMODULES += nrfxlib_nrf_modem \
+                 #
+
+DIRS += $(RIOTPKG)/nrfxlib/contrib
+
+INCLUDES += -I$(RIOTPKG)/nrfxlib/include
+
+ifneq (,$(filter nrfxlib_nrf_modem,$(USEMODULE)))
+  INCLUDES += -I$(BUILD_DIR)/pkg/nrfxlib/nrf_modem/include
+  ARCHIVES += $(BINDIR)/libmodem.a
+endif
+
+
