@@ -2,6 +2,10 @@ MODULE=esp_idf
 
 # Add a list of subdirectories, that should also be built:
 
+ifneq (,$(filter esp_idf_adc,$(USEMODULE)))
+  DIRS += adc
+endif
+
 ifneq (,$(filter esp_idf_common,$(USEMODULE)))
   DIRS += common
 endif
