@@ -12,6 +12,12 @@
  * @ingroup     core_sync
  * @brief       Mutex for thread synchronization
  *
+ * @warning     By default, no mitigation against priority inversion is
+ *              employed. If your application is subject to priority inversion
+ *              and cannot tolerate the additional delay this can cause, use
+ *              module `core_mutex_priority_inheritance` to employ
+ *              priority inheritance as mitigation.
+ *
  * Mutex Implementation Basics
  * ===========================
  *
@@ -127,6 +133,24 @@ typedef struct {
      * @internal
      */
     list_node_t queue;
+#if defined(DOXYGEN) || defined(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE)
+    /**
+     * @brief   The current owner of the mutex or `NULL`
+     * @note    Only available if module core_mutex_priority_inheritance
+     *          is used.
+     *
+     * If either the mutex is not locked or the mutex is not locked by a thread
+     * (e.g. because it is used to synchronize a thread with an ISR completion),
+     * this will have the value of `NULL`.
+     */
+    kernel_pid_t owner;
+    /**
+     * @brief   Original priority of the owner
+     * @note    Only available if module core_mutex_priority_inheritance
+     *          is used.
+     */
+    uint8_t owner_original_priority;
+#endif
 } mutex_t;
 
 /**
@@ -141,16 +165,21 @@ typedef struct {
     uint8_t cancelled;  /**< Flag whether the mutex has been cancelled */
 } mutex_cancel_t;
 
+#ifndef __cplusplus
 /**
  * @brief Static initializer for mutex_t.
  * @details This initializer is preferable to mutex_init().
  */
-#define MUTEX_INIT { { NULL } }
+#  define MUTEX_INIT { .queue = { .next = NULL } }
 
 /**
  * @brief Static initializer for mutex_t with a locked mutex
  */
-#define MUTEX_INIT_LOCKED { { MUTEX_LOCKED } }
+#  define MUTEX_INIT_LOCKED { .queue = { .next = MUTEX_LOCKED } }
+#else
+#  define MUTEX_INIT {}
+#  define MUTEX_INIT_LOCKED { { MUTEX_LOCKED } }
+#endif /* __cplusplus */
 
 /**
  * @cond INTERNAL
@@ -231,6 +260,15 @@ static inline int mutex_trylock(mutex_t *mutex)
 
     if (mutex->queue.next == NULL) {
         mutex->queue.next = MUTEX_LOCKED;
+#ifdef MODULE_CORE_MUTEX_PRIORITY_INHERITANCE
+        mutex->owner = KERNEL_PID_UNDEF;
+        thread_t *t = thread_get_active();
+        /* in case mutex_trylock() is not called from thread context */
+        if (t) {
+            mutex->owner = t->pid;
+            mutex->owner_original_priority = t->priority;
+        }
+#endif
         retval = 1;
     }
     irq_restore(irq_state);
