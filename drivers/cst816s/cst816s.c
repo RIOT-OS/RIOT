@@ -30,6 +30,8 @@
 #include "debug.h"
 #include <string.h>
 
+#define CST816_INIT_DELAY 500
+
 const char *cst816s_gesture_str[] = {
     [CST816S_GESTURE_NONE]         = "none",
     [CST816S_GESTURE_SLIDE_DOWN]   = "slide down",
@@ -64,23 +66,15 @@ static void _cst816s_reset(const cst816s_t *dev)
 int cst816s_read(const cst816s_t *dev, cst816s_touch_data_t *data)
 {
     uint8_t buf[9]; /* 3 bytes "header" and 6 bytes touch info */
+    int res;
 
-    DEBUG("cst i2c %d\n", dev->params->i2c_dev);
-#if 1
     i2c_acquire(dev->params->i2c_dev);
-    DEBUG("cst acquire\n");
-    DEBUG("cst to read %d, 0x%02x, %d\n", dev->params->i2c_dev, dev->params->i2c_addr, sizeof(buf));
-    int res = i2c_read_regs(dev->params->i2c_dev, dev->params->i2c_addr,
-                            0, buf, sizeof(buf), 0);
-    DEBUG("cst i2c_read=%d\n", res);
-    i2c_release(dev->params->i2c_dev);
-    DEBUG("cst release\n");
-# else
-    int res=0;
-    (void) dev;
 
-    memset(buf,0,sizeof(buf));
-#endif
+    buf[0]=0x0;
+    i2c_write_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 1, 0);
+    res = i2c_read_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 9, 0);
+
+    i2c_release(dev->params->i2c_dev);
 
     if (res < 0) {
         return res;
@@ -97,17 +91,59 @@ int cst816s_read(const cst816s_t *dev, cst816s_touch_data_t *data)
 int cst816s_init(cst816s_t *dev, const cst816s_params_t *params,
                  cst816s_irq_cb_t cb, void *arg)
 {
+    uint8_t buf[10];
+
     assert(dev && params);
     dev->params = params;
     dev->cb = cb;
     dev->cb_arg = arg;
 
-    DEBUG("cst i2c=%d\n", dev->params->i2c_dev);
-
     if (dev->params->reset != GPIO_UNDEF) {
         gpio_init(dev->params->reset, GPIO_OUT);
         _cst816s_reset(dev);
     }
+
+    i2c_acquire(dev->params->i2c_dev);
+
+    buf[0]=0x15;
+    i2c_write_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 1, 0);
+    i2c_read_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 1, 0);
+    xtimer_usleep(CST816_INIT_DELAY);
+
+    buf[0]=0xa7;
+    i2c_write_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 1, 0);
+    i2c_read_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 3, 0);
+    DEBUG("cst816 ver %02x %02x %02x\n", buf[0], buf[1], buf[2]);
+    xtimer_usleep(CST816_INIT_DELAY);
+
+    /*
+      [2] EnConLR - Continuous operation can slide around
+      [1] EnConUD - Slide up and down to enable continuous operation
+      [0] EnDClick - Enable Double-click action
+    */
+    buf[0]=0xEC;
+    buf[1]=0b00000101;
+    i2c_write_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 2, 0);
+    xtimer_usleep(CST816_INIT_DELAY);
+
+    /*
+      [7] EnTest - Interrupt pin to test, enable automatic periodic issued after a low pulse.
+      [6] EnTouch - When a touch is detected, a periodic pulsed Low.
+      [5] EnChange - Upon detecting a touch state changes, pulsed Low.
+      [4] EnMotion - When the detected gesture is pulsed Low.
+      [0] OnceWLP - Press gesture only issue a pulse signal is low.
+    */
+    buf[0]=0xFA;
+    buf[1]=0b01110000;
+    i2c_write_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 2, 0);
+    xtimer_usleep(CST816_INIT_DELAY);
+
+    // read a report once to clear IRQ
+    buf[0]=0x0;
+    i2c_write_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 1, 0);
+    i2c_read_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 9, 0);
+
+    i2c_release(dev->params->i2c_dev);
 
     if ((dev->params->irq != GPIO_UNDEF) && cb) {
         if (gpio_init_int(dev->params->irq, GPIO_IN,
