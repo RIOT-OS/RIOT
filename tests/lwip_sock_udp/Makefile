@@ -31,6 +31,5 @@ USEMODULE += sock_udp
 DISABLE_MODULE += auto_init_lwip
 
 CFLAGS += -DSO_REUSE
-CFLAGS += -DLWIP_SO_RCVTIMEO
 
 include $(RIOTBASE)/Makefile.include
