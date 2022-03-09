@@ -100,24 +100,48 @@ static const gpio_t dac_channels[] = DAC_GPIOS;
  * @{
  */
 
+#if defined(I2C0_SCL) && !defined(I2C0_SCL_PULLUP)
+/** Define SCL pullup enabled by default */
+#define I2C0_SCL_PULLUP true
+#endif
+#if defined(I2C0_SDA) && !defined(I2C0_SDA_PULLUP)
+/** Define SDA pullup enabled by default */
+#define I2C0_SDA_PULLUP true
+#endif
+
+#if defined(I2C1_SCL) && !defined(I2C1_SCL_PULLUP)
+/** Define SCL pullup enabled by default */
+#define I2C1_SCL_PULLUP true
+#endif
+#if defined(I2C1_SDA) && !defined(I2C1_SDA_PULLUP)
+/** Define SDA pullup enabled by default */
+#define I2C1_SDA_PULLUP true
+#endif
+
 /**
  * @brief   Static array with configuration for declared I2C devices
  */
 static const i2c_conf_t i2c_config[] = {
-    #if defined(I2C0_SCL) && defined(I2C0_SDA) && defined(I2C0_SPEED)
+#if defined(I2C0_SCL) && defined(I2C0_SDA) && defined(I2C0_SPEED)
     {
+        .module = PERIPH_I2C0_MODULE,
         .speed = I2C0_SPEED,
         .scl = I2C0_SCL,
         .sda = I2C0_SDA,
+        .scl_pullup = I2C0_SCL_PULLUP,
+        .sda_pullup = I2C0_SCL_PULLUP,
     },
-    #endif
-    #if defined(I2C1_SCL) && defined(I2C1_SDA) && defined(I2C1_SPEED)
+#endif
+#if defined(I2C1_SCL) && defined(I2C1_SDA) && defined(I2C1_SPEED)
     {
+        .module = PERIPH_I2C1_MODULE,
         .speed = I2C1_SPEED,
         .scl = I2C1_SCL,
         .sda = I2C1_SDA,
+        .scl_pullup = I2C1_SCL_PULLUP,
+        .sda_pullup = I2C1_SCL_PULLUP,
     },
-    #endif
+#endif
 };
 
 /**
@@ -228,18 +252,18 @@ static const uart_conf_t uart_config[] = {
         .txd = UART0_TXD,
         .rxd = UART0_RXD,
     },
-    #if defined(UART1_TXD) && defined(UART1_RXD)
+#if defined(UART1_TXD) && defined(UART1_RXD)
     {
         .txd = UART1_TXD,
         .rxd = UART1_RXD,
     },
-    #endif
-    #if defined(UART2_TXD) && defined(UART2_RXD)
+#endif
+#if defined(UART2_TXD) && defined(UART2_RXD)
     {
         .txd = UART2_TXD,
         .rxd = UART2_RXD,
     },
-    #endif
+#endif
 };
 
 /**
