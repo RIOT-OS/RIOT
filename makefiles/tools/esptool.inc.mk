@@ -24,6 +24,7 @@ else
   FFLAGS += --chip $(FLASH_CHIP) --port $(PROG_DEV) --baud $(PROGRAMMER_SPEED)
   FFLAGS += --before default_reset write_flash -z
   FFLAGS += --flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ)
+  FFLAGS += --flash_size detect
   FFLAGS += $(BOOTLOADER_POS) $(BOOTLOADER_BIN)
   FFLAGS += 0x8000 $(BINDIR)/partitions.bin
   FFLAGS += 0x10000 $(FLASHFILE)
@@ -36,7 +37,7 @@ ifneq (,$(filter esp32,$(CPU_FAM)))
 	$(Q)echo \
 		"--flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ) " \
 		"--flash_size $(FLASH_SIZE)MB" \
-		"$(BOOTLOADER_POS) $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN)" \
+		"$(BOOTLOADER_POS) $(BOOTLOADER_BIN)" \
 		"0x8000 $(BINDIR)/partitions.bin" \
 		"0x10000 $(FLASHFILE)" > $(BINDIR)/qemu_flash_args
 	$(Q)$(ESPTOOL) \
