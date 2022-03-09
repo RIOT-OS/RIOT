@@ -199,6 +199,11 @@ void auto_init(void)
         extern void dsm_init(void);
         dsm_init();
     }
+    if (IS_USED(MODULE_AUTO_INIT_NRFXLIB_NRF_MODEM)) {
+        LOG_DEBUG("Auto init nRF Modem.\n");
+        extern void nrf_modem_bootstrap(void);
+        nrf_modem_bootstrap();
+    }
 
     /* initialize USB devices */
     if (IS_USED(MODULE_AUTO_INIT_USBUS)) {

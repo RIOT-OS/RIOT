@@ -90,6 +90,11 @@ extern "C" {
  */
 void board_init(void);
 
+/**
+ * @brief Initialize board specific parameters for nrf_modem
+ */
+int nrf_modem_setup(void);
+
 #ifdef __cplusplus
 }
 #endif
