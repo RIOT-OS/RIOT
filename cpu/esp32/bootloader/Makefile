@@ -57,7 +57,6 @@ ESP_SDK_BOOTLOADER_SRCS = \
   components/esp_hw_support/port/$(CPU)/rtc_pm.c \
   components/esp_hw_support/port/$(CPU)/rtc_sleep.c \
   components/esp_hw_support/port/$(CPU)/rtc_time.c \
-  components/esp_hw_support/port/$(CPU)/rtc_wdt.c \
   components/esp_rom/patches/esp_rom_crc.c \
   components/esp_rom/patches/esp_rom_sys.c \
   components/esp_rom/patches/esp_rom_tjpgd.c \
@@ -71,37 +70,55 @@ ESP_SDK_BOOTLOADER_SRCS = \
   components/log/log_noos.c \
   components/newlib/syscalls.c \
   components/soc/$(CPU)/adc_periph.c \
-  components/soc/$(CPU)/dac_periph.c \
   components/soc/$(CPU)/gpio_periph.c \
   components/soc/$(CPU)/i2c_periph.c \
   components/soc/$(CPU)/i2s_periph.c \
   components/soc/$(CPU)/interrupts.c \
-  components/soc/$(CPU)/lcd_periph.c \
   components/soc/$(CPU)/ledc_periph.c \
-  components/soc/$(CPU)/mcpwm_periph.c \
-  components/soc/$(CPU)/pcnt_periph.c \
   components/soc/$(CPU)/rmt_periph.c \
-  components/soc/$(CPU)/rtc_io_periph.c \
-  components/soc/$(CPU)/sdio_slave_periph.c \
-  components/soc/$(CPU)/sdmmc_periph.c \
   components/soc/$(CPU)/sigmadelta_periph.c \
   components/soc/$(CPU)/spi_periph.c \
   components/soc/$(CPU)/timer_periph.c \
-  components/soc/$(CPU)/touch_sensor_periph.c \
   components/soc/$(CPU)/uart_periph.c \
   components/soc/lldesc.c \
   components/spi_flash/$(CPU)/spi_flash_rom_patch.c \
-  components/xtensa/eri.c \
-  components/xtensa/xt_trax.c \
+  #
+
+ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
+  ESP_SDK_BOOTLOADER_SRCS += components/esp_hw_support/port/$(CPU)/rtc_wdt.c
+  ESP_SDK_BOOTLOADER_SRCS += components/soc/$(CPU)/lcd_periph.c
+  ESP_SDK_BOOTLOADER_SRCS += components/soc/$(CPU)/pcnt_periph.c
+  ESP_SDK_BOOTLOADER_SRCS += components/soc/$(CPU)/rtc_io_periph.c
+  ESP_SDK_BOOTLOADER_SRCS += components/soc/$(CPU)/touch_sensor_periph.c
+  ESP_SDK_BOOTLOADER_SRCS += components/xtensa/eri.c
+  ESP_SDK_BOOTLOADER_SRCS += components/xtensa/xt_trax.c
+else
+  ESP_SDK_BOOTLOADER_SRCS += components/esp_hw_support/port/$(CPU)/cpu_util_$(CPU).c
+endif
+
+ifneq (,$(filter esp32 esp32s2,$(CPU)))
+  ESP_SDK_BOOTLOADER_SRCS += components/soc/$(CPU)/dac_periph.c
+endif
+
+ifneq (,$(filter esp32 esp32s3,$(CPU)))
+  ESP_SDK_BOOTLOADER_SRCS += components/soc/$(CPU)/mcpwm_periph.c
+  ESP_SDK_BOOTLOADER_SRCS += components/soc/$(CPU)/sdio_slave_periph.c
+  ESP_SDK_BOOTLOADER_SRCS += components/soc/$(CPU)/sdmmc_periph.c
+endif
+
+ifneq (,$(filter esp32c3 esp32h2 esp32s3,$(CPU)))
+  ESP_SDK_BOOTLOADER_SRCS += components/efuse/$(CPU)/esp_efuse_rtc_calib.c
+endif
 
 ifneq (,$(filter esp32,$(CPU)))
   ESP_SDK_BOOTLOADER_SRCS += components/efuse/src/esp_efuse_api_key_esp32.c
+  ESP_SDK_BOOTLOADER_ASMSRC = components/esp_rom/patches/esp_rom_longjmp.S
 else
   ESP_SDK_BOOTLOADER_SRCS += components/efuse/src/esp_efuse_api_key_esp32xx.c
+  ESP_SDK_BOOTLOADER_SRCS += components/soc/$(CPU)/dedic_gpio_periph.c
+  ESP_SDK_BOOTLOADER_SRCS += components/soc/$(CPU)/gdma_periph.c
+  ESP_SDK_BOOTLOADER_SRCS += components/soc/soc_include_legacy_warn.c
 endif
-
-ESP_SDK_BOOTLOADER_ASMSRC = \
-  components/esp_rom/patches/esp_rom_longjmp.S \
 
 # Bootloader sdkconfig.h defined in CURDIR directory.
 INCLUDES = \
@@ -136,14 +153,27 @@ INCLUDES = \
   -I$(ESP32_SDK_DIR)/components/soc/include \
   -I$(ESP32_SDK_DIR)/components/spi_flash/include \
   -I$(ESP32_SDK_DIR)/components/spi_flash/include/spi_flash \
-  -I$(ESP32_SDK_DIR)/components/xtensa/$(CPU)/include \
-  -I$(ESP32_SDK_DIR)/components/xtensa/include \
   #
 
+CFLAGS = -include '$(RIOTBUILD_CONFIG_HEADER_C)' \
+
+ifneq (,$(filter riscv32%,$(TARGET_ARCH)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/riscv/include
+  CFLAGS += -DCONFIG_IDF_TARGET_ARCH_RISCV
+  CFLAGS += -march=rv32imc
+  CFLAGS += -Wno-error=format=
+  CFLAGS += -nostartfiles
+  CFLAGS += -Wno-format
+endif
+
+ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/$(CPU)/include
+  CFLAGS += -mlongcalls -mtext-section-literals
+endif
+
 # BOOTLOADER_BUILD=1 signals to the SDK that's a bootloader build.
-CFLAGS = \
-  -include '$(RIOTBUILD_CONFIG_HEADER_C)' \
-  -mlongcalls \
+CFLAGS += \
   -Wno-frame-address \
   -ffunction-sections \
   -fdata-sections \
@@ -176,11 +206,13 @@ CFLAGS = \
   -MT \
   #
 
-ifneq (,$(filter esp32 esp32s2 esp32s3,$(CPU)))
+ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
+  LINKFLAGS = -mlongcalls
   ESP_SDK_BOOTLOADER_ADD_LINK_FLAGS += -L$(ESP32_SDK_DIR)/components/xtensa/$(CPU) -lxt_hal
 endif
 
 ifneq (,$(filter esp32 esp32s2,$(CPU)))
+  LINKFLAGS =
   ESP_SDK_BOOTLOADER_ADD_LINK_FLAGS += \
     -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU)/ld/$(CPU).rom.newlib-funcs.ld \
     -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU)/ld/$(CPU).rom.spiflash.ld \
@@ -190,8 +222,7 @@ endif
 # Bootloader link flags. We use the SDK source and linking files instead of the
 # RIOT-OS ones to link the bootloader. Note that we also use the unmodified
 # SDK libraries.
-LINKFLAGS = \
-  -mlongcalls \
+LINKFLAGS += \
   -Wno-frame-address \
   -o $(ESP_SDK_BOOTLOADER_DIR)/bootloader.elf \
   -Wl,--cref \
