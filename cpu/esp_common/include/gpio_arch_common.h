@@ -39,12 +39,12 @@ extern "C" {
 typedef enum
 {
     _GPIO = 0,  /**< pin used as standard GPIO */
-#ifdef MCU_ESP32
+#ifndef MCU_ESP8266
     _ADC,       /**< pin is used as ADC input */
     _CAN,       /**< pin is used as CAN signal */
     _DAC,       /**< pin is used as DAC output */
     _EMAC,      /**< pin is used as EMAC signal */
-#endif /* MCU_ESP32 */
+#endif /* !MCU_ESP8266 */
     _I2C,       /**< pin is used as I2C signal */
     _PWM,       /**< pin is used as PWM output */
     _SPI,       /**< pin is used as SPI interface */

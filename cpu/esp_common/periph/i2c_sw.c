@@ -45,7 +45,7 @@
 #include "gpio_arch.h"
 #include "rom/ets_sys.h"
 
-#ifdef MCU_ESP32
+#ifndef MCU_ESP8266
 
 #include "soc/gpio_reg.h"
 #include "soc/gpio_struct.h"
@@ -57,7 +57,7 @@
 #define GPIO_SET(l,h,b) if (b < 32) GPIO.l =  BIT(b); else GPIO.h.val =  BIT(b-32)
 #define GPIO_GET(l,h,b) ((b < 32) ? GPIO.l & BIT(b) : GPIO.h.val & BIT(b-32))
 
-#else /* MCU_ESP32 */
+#else /* MCU_ESP8266 */
 
 #include "esp/gpio_regs.h"
 #include "sdk/ets.h"
@@ -79,7 +79,7 @@
 extern uint8_t system_get_cpu_freq(void);
 extern bool system_update_cpu_freq(uint8_t freq);
 
-#endif /* MCU_ESP32 */
+#endif /* MCU_ESP8266 */
 
 typedef struct
 {
@@ -203,7 +203,7 @@ void i2c_init(i2c_t dev)
     }
 
     /* Configure and initialize SDA and SCL pin. */
-#ifdef MCU_ESP32
+#ifndef MCU_ESP8266
     /*
      * ESP32 pins are used in input/output mode with open-drain output driver.
      * Signal levels are then realized as following:
@@ -225,7 +225,7 @@ void i2c_init(i2c_t dev)
     }
     gpio_set(i2c_config[dev].sda);
 
-#else /* MCU_ESP32 */
+#else /* !MCU_ESP8266 */
     /*
      * Due to critical timing required by the I2C software implementation,
      * the ESP8266 GPIOs can not be used directly in GPIO_OD_PU mode.
@@ -245,7 +245,7 @@ void i2c_init(i2c_t dev)
         gpio_init(_i2c_bus[dev].sda, GPIO_IN_PU)) {
         return;
     }
-#endif /* MCU_ESP32 */
+#endif /* !MCU_ESP8266 */
 
     /* store the usage type in GPIO table */
     gpio_set_pin_usage(_i2c_bus[dev].scl, _I2C);
@@ -438,29 +438,29 @@ static inline void _i2c_delay(_i2c_bus_t* bus)
 static inline bool _i2c_scl_read(_i2c_bus_t* bus)
 {
     /* read SCL status (pin is in open-drain mode and set) */
-#ifdef MCU_ESP32
+#ifndef MCU_ESP8266
     return GPIO_GET(in, in1, bus->scl);
-#else /* MCU_ESP32 */
+#else /* !MCU_ESP8266 */
     return GPIO.IN & bus->scl_bit;
-#endif /* MCU_ESP32 */
+#endif /* !MCU_ESP8266 */
 }
 
 static inline bool _i2c_sda_read(_i2c_bus_t* bus)
 {
     /* read SDA status (pin is in open-drain mode and set) */
-#ifdef MCU_ESP32
+#ifndef MCU_ESP8266
     return GPIO_GET(in, in1, bus->sda);
-#else /* MCU_ESP32 */
+#else /* !MCU_ESP8266 */
     return GPIO.IN & bus->sda_bit;
-#endif /* MCU_ESP32 */
+#endif /* !MCU_ESP8266 */
 }
 
 static inline void _i2c_scl_high(_i2c_bus_t* bus)
 {
-#ifdef MCU_ESP32
+#ifndef MCU_ESP8266
     /* set SCL signal high (pin is in open-drain mode and pulled-up) */
     GPIO_SET(out_w1ts, out1_w1ts, bus->scl);
-#else /* MCU_ESP32 */
+#else /* !MCU_ESP8266 */
 #if I2C_CLOCK_STRETCH > 0
     /*
      * set SCL signal high (switch back to GPIO_IN_PU mode, that is the pin is
@@ -471,15 +471,15 @@ static inline void _i2c_scl_high(_i2c_bus_t* bus)
     /* No clock stretching supported, always drive the SCL pin. */
     GPIO.OUT_SET = bus->scl_bit;
 #endif /* I2C_CLOCK_STRETCH > 0 */
-#endif /* MCU_ESP32 */
+#endif /* !MCU_ESP8266 */
 }
 
 static inline void _i2c_scl_low(_i2c_bus_t* bus)
 {
-#ifdef MCU_ESP32
+#ifndef MCU_ESP8266
     /* set SCL signal low (actively driven to low) */
     GPIO_SET(out_w1tc, out1_w1tc, bus->scl);
-#else /* MCU_ESP32 */
+#else /* !MCU_ESP8266 */
 #if I2C_CLOCK_STRETCH > 0
     /*
      * set SCL signal low (switch temporarily to GPIO_OD_PU where the
@@ -490,35 +490,35 @@ static inline void _i2c_scl_low(_i2c_bus_t* bus)
     /* No clock stretching supported, always drive the SCL pin. */
     GPIO.OUT_CLEAR = bus->scl_bit;
 #endif /* I2C_CLOCK_STRETCH > 0 */
-#endif /* MCU_ESP32 */
+#endif /* !MCU_ESP8266 */
 }
 
 static inline void _i2c_sda_high(_i2c_bus_t* bus)
 {
-#ifdef MCU_ESP32
+#ifndef MCU_ESP8266
     /* set SDA signal high (pin is in open-drain mode and pulled-up) */
     GPIO_SET(out_w1ts, out1_w1ts, bus->sda);
-#else /* MCU_ESP32 */
+#else /* !MCU_ESP8266 */
     /*
      * set SDA signal high (switch back to GPIO_IN_PU mode, that is the pin is
      * in open-drain mode and pulled-up to high)
      */
     GPIO.ENABLE_OUT_CLEAR = bus->sda_bit;
-#endif /* MCU_ESP32 */
+#endif /* !MCU_ESP8266 */
 }
 
 static inline void _i2c_sda_low(_i2c_bus_t* bus)
 {
-#ifdef MCU_ESP32
+#ifndef MCU_ESP8266
     /* set SDA signal low (actively driven to low) */
     GPIO_SET(out_w1tc, out1_w1tc, bus->sda);
-#else /* MCU_ESP32 */
+#else /* !MCU_ESP8266 */
     /*
      * set SDA signal low (switch temporarily to GPIO_OD_PU where the
      * written output value 0 drives the pin actively to low)
      */
     GPIO.ENABLE_OUT_SET = bus->sda_bit;
-#endif /* MCU_ESP32 */
+#endif /* !MCU_ESP8266 */
 }
 
 static void _i2c_clear(_i2c_bus_t* bus)
