@@ -126,16 +126,20 @@ This encompass both components needed for riot-sys and for the later installatio
 
 Installing **C2Rust** is special because
 it can only be built using a particular nightly version
-(as explained in its [introduction post])
-and needs some patches applied:
+(as explained in its [introduction post]):
 
 ```shell
 $ rustup install nightly-2019-12-05
 $ rustup component add --toolchain nightly-2019-12-05 rustfmt rustc-dev
-$ git clone https://github.com/chrysn-pull-requests/c2rust -b for-riot
+$ git clone https://github.com/immunant/c2rust
 $ cd c2rust
+$ git reset --hard 6674d785
 $ cargo +nightly-2019-12-05 install --locked --path c2rust
 ```
+
+The `git reset` step pins C2Rust to the version at time of writing.
+It is expected that later versions of C2Rust would work just as well,
+but they may need a more recent nightly Rust.
 
 [cargo]: https://doc.rust-lang.org/cargo/
 [**rustup**, installed as described on its website]: https://rustup.rs/
