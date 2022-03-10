@@ -418,8 +418,15 @@ static inline void _i2c_delay(_i2c_bus_t* bus)
     /* produces a delay */
     uint32_t cycles = bus->delay;
     if (cycles) {
+#if __xtensa__
         __asm__ volatile ("1: _addi.n  %0, %0, -1 \n"
                           "   bnez     %0, 1b     \n" : "=r" (cycles) : "0" (cycles));
+#endif
+#if __riscv
+        uint32_t zero = 0;
+        __asm__ volatile ("1: add  %0, %0, -1 \n"
+                          "   bne  %0, %2, 1b \n" : "=r" (cycles) : "0" (cycles), "r" (zero));
+#endif
     }
 }
 

@@ -17,6 +17,8 @@
  * @}
  */
 
+#if __xtensa__
+
 #include <malloc.h>
 #include <string.h>
 #include <stdlib.h>
@@ -216,3 +218,5 @@ void _panic_handler(uint32_t addr)
     pm_off();
     while (1) { };
 }
+
+#endif /* __xtensa__ */
