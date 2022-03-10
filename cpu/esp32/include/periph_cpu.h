@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include "sdkconfig.h"
 #include "hal/ledc_types.h"
+#include "hal/spi_types.h"
 #include "soc/ledc_struct.h"
 #include "soc/periph_defs.h"
 #include "soc/soc_caps.h"
@@ -508,8 +509,8 @@ typedef struct {
  * @brief   SPI controllers that can be used for peripheral interfaces
  */
 typedef enum {
-    HSPI = 2,         /**< HSPI interface controller */
-    VSPI = 3,         /**< VSPI interface controller */
+    HSPI = HSPI_HOST,       /**< HSPI interface controller */
+    VSPI = VSPI_HOST,       /**< VSPI interface controller */
 } spi_ctrl_t;
 
 /**
@@ -526,7 +527,7 @@ typedef struct {
 /**
  * @brief   Maximum number of SPI interfaces that can be used by board definitions
  */
-#define SPI_NUMOF_MAX   2
+#define SPI_NUMOF_MAX   (SOC_SPI_PERIPH_NUM - 1)
 
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTE  /**< requires function spi_transfer_byte */
 #define PERIPH_SPI_NEEDS_TRANSFER_REG   /**< requires function spi_transfer_reg */
