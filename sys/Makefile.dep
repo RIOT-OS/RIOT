@@ -255,7 +255,7 @@ ifneq (,$(filter posix_select,$(USEMODULE)))
   endif
   USEMODULE += core_thread_flags
   USEMODULE += posix_headers
-  USEMODULE += xtimer
+  USEMODULE += ztimer64_usec
 endif
 
 ifneq (,$(filter picolibc,$(USEMODULE)))
@@ -325,12 +325,8 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
 endif
 
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
-  USEMODULE += sema
-  USEMODULE += xtimer
-  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-    # requires sema_timed that requires 64bit
-    USEMODULE += ztimer64_xtimer_compat
-  endif
+  USEMODULE += sema_deprecated
+  USEMODULE += ztimer64_usec
   USEMODULE += posix_headers
 endif
 
@@ -346,6 +342,16 @@ endif
 
 ifneq (,$(filter sema_inv,$(USEMODULE)))
   USEMODULE += atomic_utils
+endif
+
+ifneq (,$(filter sema,$(USEMODULE)))
+  USEMODULE += ztimer
+endif
+
+ifneq (,$(filter sema_deprecated,$(USEMODULE)))
+  USEMODULE += sema
+  USEMODULE += ztimer64
+  USEMODULE += ztimer64_usec
 endif
 
 ifneq (,$(filter telnet,$(USEMODULE)))
@@ -393,7 +399,7 @@ ifneq (,$(filter netstats_neighbor_%, $(USEMODULE)))
 endif
 
 ifneq (,$(filter pthread,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer64_usec
   USEMODULE += timex
   ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
     # requires 64bit ftimestamps
