@@ -275,6 +275,9 @@ PSEUDOMODULES += ztimer64_%
 ## configuration header board.h. These can be found out by running tests/ztimer_overhead
 PSEUDOMODULES += ztimer_auto_adjust
 
+# core_lib is not a submodule
+NO_PSEUDOMODULES += core_lib
+
 # ztimer's main module is called "ztimer_core"
 NO_PSEUDOMODULES += ztimer_core
 NO_PSEUDOMODULES += netdev_ieee802154_submac

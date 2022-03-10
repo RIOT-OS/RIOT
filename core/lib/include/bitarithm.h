@@ -56,40 +56,40 @@ extern "C" {
  * @{
  */
 #ifndef BIT0
-#define BIT0  0x00000001
-#define BIT1  0x00000002
-#define BIT2  0x00000004
-#define BIT3  0x00000008
-#define BIT4  0x00000010
-#define BIT5  0x00000020
-#define BIT6  0x00000040
-#define BIT7  0x00000080
-#define BIT8  0x00000100
-#define BIT9  0x00000200
-#define BIT10 0x00000400
-#define BIT11 0x00000800
-#define BIT12 0x00001000
-#define BIT13 0x00002000
-#define BIT14 0x00004000
-#define BIT15 0x00008000
+#define BIT0  0x00000001 /**< Bit 0 set define */
+#define BIT1  0x00000002 /**< Bit 1 set define */
+#define BIT2  0x00000004 /**< Bit 2 set define */
+#define BIT3  0x00000008 /**< Bit 3 set define */
+#define BIT4  0x00000010 /**< Bit 4 set define */
+#define BIT5  0x00000020 /**< Bit 5 set define */
+#define BIT6  0x00000040 /**< Bit 6 set define */
+#define BIT7  0x00000080 /**< Bit 7 set define */
+#define BIT8  0x00000100 /**< Bit 8 set define */
+#define BIT9  0x00000200 /**< Bit 9 set define */
+#define BIT10 0x00000400 /**< Bit 10 set define */
+#define BIT11 0x00000800 /**< Bit 11 set define */
+#define BIT12 0x00001000 /**< Bit 12 set define */
+#define BIT13 0x00002000 /**< Bit 13 set define */
+#define BIT14 0x00004000 /**< Bit 14 set define */
+#define BIT15 0x00008000 /**< Bit 15 set define */
 #endif
 #ifndef BIT16
-#define BIT16 0x00010000
-#define BIT17 0x00020000
-#define BIT18 0x00040000
-#define BIT19 0x00080000
-#define BIT20 0x00100000
-#define BIT21 0x00200000
-#define BIT22 0x00400000
-#define BIT23 0x00800000
-#define BIT24 0x01000000
-#define BIT25 0x02000000
-#define BIT26 0x04000000
-#define BIT27 0x08000000
-#define BIT28 0x10000000
-#define BIT29 0x20000000
-#define BIT30 0x40000000
-#define BIT31 0x80000000
+#define BIT16 0x00010000 /**< Bit 16 set define */
+#define BIT17 0x00020000 /**< Bit 17 set define */
+#define BIT18 0x00040000 /**< Bit 18 set define */
+#define BIT19 0x00080000 /**< Bit 19 set define */
+#define BIT20 0x00100000 /**< Bit 20 set define */
+#define BIT21 0x00200000 /**< Bit 21 set define */
+#define BIT22 0x00400000 /**< Bit 22 set define */
+#define BIT23 0x00800000 /**< Bit 23 set define */
+#define BIT24 0x01000000 /**< Bit 24 set define */
+#define BIT25 0x02000000 /**< Bit 25 set define */
+#define BIT26 0x04000000 /**< Bit 26 set define */
+#define BIT27 0x08000000 /**< Bit 27 set define */
+#define BIT28 0x10000000 /**< Bit 28 set define */
+#define BIT29 0x20000000 /**< Bit 29 set define */
+#define BIT30 0x40000000 /**< Bit 30 set define */
+#define BIT31 0x80000000 /**< Bit 31 set define */
 #endif
 /** @} */
 
