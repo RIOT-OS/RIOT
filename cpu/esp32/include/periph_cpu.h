@@ -21,6 +21,8 @@
 
 #include <stdint.h>
 #include "sdkconfig.h"
+#include "hal/ledc_types.h"
+#include "soc/ledc_struct.h"
 #include "soc/periph_defs.h"
 #include "soc/soc_caps.h"
 
@@ -350,39 +352,86 @@ typedef struct {
 /**
  * @name   PWM configuration
  *
- * PWM implementation uses ESP32's high-speed MCPWM modules. ESP32 has 2 such
- * modules, each with up to 6 channels (PWM_CHANNEL_NUM_DEV_MAX). Thus, the
- * maximum number of PWM devices is 2 and the maximum total number of PWM
- * channels is 12.
+ * The implementation of the PWM peripheral driver uses the LED PWM Controller
+ * (LEDC) module of the ESP32x SoC. This LEDC module has one or two channel
+ * groups with 6 or 8 channels each. The channels of each channel group can
+ * use one of 4 timers as clock source. Thus, it is possible to define at
+ * 4 or 8 virtual PWM devices in RIOT with different frequencies and
+ * resolutions. Regardless of whether the LEDC module of the ESP32x SoC has
+ * one or two channel groups, the PWM driver implementation allows to organize
+ * the available channels into up to 4 virtual PWM devices.
  *
- * PWM0_GPIOS and PWM1_GPIOS in the board-specific peripheral configuration
- * each define a list of GPIOs that can be used with the respective PWM
- * devices as PWM channels. The order of the listed GPIOs determines the
- * association between the RIOT PWM channels and the GPIOs.
+ * The assignment of the available channels to the virtual PWM devices is
+ * done in the board-specific peripheral configuration by defining the
+ * macros `PWM0_GPIOS`, `PWM1_GPIOS`, `PWM2_GPIOS` and `PWM3_GPIOS` These
+ * macros specify the GPIOs that are used as channels for the available
+ * virtual PWM devices PWM_DEV(0) ... PWM_DEV(3) in RIOT. The mapping of
+ * these channels to the available channel groups and channel group timers
+ * is done by the driver automatically as follows.
  *
- * @note The definition of PWM0_GPIOS and PWM1_GPIOS can be omitted or
- * empty. In the latter case, they must at least contain the curly braces.
- * The corresponding PWM device can not be used in this case.
+ * <center>
+ * Macro        | 1 Channel Group       | 2 Channel Groups       | Timer
+ * -------------|-----------------------|------------------------|---------------
+ * `PWM0_GPIOS` | `LEDC_LOW_SPEED_MODE` | `LEDC_LOW_SPEED_MODE`  | `LEDC_TIMER_0`
+ * `PWM1_GPIOS` | `LEDC_LOW_SPEED_MODE` | `LEDC_HIGH_SPEED_MODE` | `LEDC_TIMER_1`
+ * `PWM2_GPIOS` | `LEDC_LOW_SPEED_MODE` | `LEDC_LOW_SPEED_MODE`  | `LEDC_TIMER_2`
+ * `PWM3_GPIOS` | `LEDC_LOW_SPEED_MODE` | `LEDC_HIGH_SPEED_MODE` | `LEDC_TIMER_3`
  *
- * PWM_NUMOF is determined automatically from the PWM0_GPIOS and PWM1_GPIOS
- * definitions.
+ * </center>
+ * For example, if the LEDC module of the ESP32x SoC has two channel groups,
+ * two virtual PWM devices with 2 x 6/8 channels could be used by defining
+ * 'PWM0_GPIOS' and 'PWM1_GPIOS' with 6/8 GPIOs each.
  *
- * @note As long as the GPIOs listed in PWM0_GPIOS and PMW1_GPIOS are not
- * initialized as PWM channels with the *pwm_init* function, they can be used
- * other purposes.
+ * @note
+ * - The total number of channels defined for a channel group must not exceed
+ *   #PWM_CH_NUMOF_MAX.
+ * - The definition of `PWM0_GPIOS`, `PWM1_GPIOS`, `PWM2_GPIOS` and
+ *   `PWM3_GPIOS` can be omitted. In this case the existing macros should
+ *   be defined in ascending order, as the first defined macro is assigned
+ *   to PWM_DEV(0), the second defined macro is assigned to PWM_DEV(1)
+ *   and so on. So the minimal configuration would define all channels by
+ *   `PWM0_GPIOS` as PWM_DEV(0).
+ * - #PWM_NUMOF is determined automatically.
+ * - The order of the GPIOs in these macros determines the mapping between
+ *   RIOT's PWM channels and the GPIOs.
+ * - As long as the GPIOs listed in `PWM0_GPIOS`, `PWM1_GPIOS`,
+ *   `PWM2_GPIOS` and `PWM3_GPIOS` are not initialized as PWM channels with
+ *   the #pwm_init function, they can be used for other purposes.
  *
  * @{
  */
 
 /**
+ * @brief   PWM configuration structure type
+ *
+ * The implementation of the PWM peripheral driver uses the LED PWM Controller
+ * (LEDC) module of the ESP32x SoC. The LEDC module has up to 2 channel groups
+ * with 6 or 8 channels each, which can use one of 4 timers.
+ *
+ * Based on these maximum 2 channel groups with 6 or 8 channels each and 4
+ * timers, up to 4 PWM devices can be configured in RIOT. The configuration
+ * structure defines static parameters for each virtual PWM device, i.e.
+ * the channel group used, the timer used, the number of channels used and
+ * the GPIOs assigned to the channels. The number of channels used by a PWM
+ * device corresponds to the number of GPIOs assigned to this PWM device.
+ */
+typedef struct {
+    uint8_t module;         /**< LEDC module identifier */
+    ledc_mode_t group;      /**< LEDC channel group used (low/high speed) */
+    ledc_timer_t timer;     /**< LEDC timer used by this device */
+    uint8_t ch_numof;       /**< Number of channels used by this device */
+    const gpio_t *gpios;    /**< GPIOs used as channels of this device */
+} pwm_config_t;
+
+/**
  * @brief   Maximum number of PWM devices
  */
-#define PWM_NUMOF_MAX           (2)
+#define PWM_NUMOF_MAX       (4)
 
 /**
  * @brief   Maximum number of channels per PWM device.
  */
-#define PWM_CHANNEL_NUM_DEV_MAX (6)
+#define PWM_CH_NUMOF_MAX    (SOC_LEDC_CHANNEL_NUM)
 
 /** @} */
 
