@@ -81,6 +81,7 @@ ifneq (,$(filter gnrc_%,$(filter-out gnrc_lorawan gnrc_netapi gnrc_netreg gnrc_n
 endif
 
 ifneq (,$(filter gnrc_sock_%,$(USEMODULE)))
+  USEMODULE += iolist
   USEMODULE += gnrc_sock
   ifneq (,$(filter sock_aux_timestamp,$(USEMODULE)))
     USEMODULE += gnrc_netif_timestamp
