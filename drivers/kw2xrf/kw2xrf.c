@@ -54,7 +54,7 @@ static void kw2xrf_set_address(kw2xrf_t *dev)
     kw2xrf_set_addr_short(dev, ntohs(addr_long.uint16[0].u16));
 }
 
-void kw2xrf_setup(kw2xrf_t *dev, const kw2xrf_params_t *params)
+void kw2xrf_setup(kw2xrf_t *dev, const kw2xrf_params_t *params, uint8_t index)
 {
     netdev_t *netdev = &dev->netdev.netdev;
 
@@ -71,6 +71,9 @@ void kw2xrf_setup(kw2xrf_t *dev, const kw2xrf_params_t *params)
     kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2, MKW2XDM_PHY_CTRL2_RXMSK);
     kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2, MKW2XDM_PHY_CTRL2_TXMSK);
     DEBUG("[kw2xrf] setup finished\n");
+
+    /* register with netdev */
+    netdev_register(netdev, NETDEV_KW2XRF, index);
 }
 
 int kw2xrf_init(kw2xrf_t *dev, gpio_cb_t cb)
