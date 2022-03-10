@@ -36,7 +36,7 @@ static uart_hal_context_t _uart_hal_ctx[] = {
         .dev = UART_LL_GET_HW(1),
     },
 #endif
-#if UART_NUM_MAX >= 3 
+#if UART_NUM_MAX >= 3
     {
         .dev = UART_LL_GET_HW(2),
     },
@@ -45,7 +45,6 @@ static uart_hal_context_t _uart_hal_ctx[] = {
 
 void esp_idf_uart_set_wakeup_threshold(unsigned uart_num, uint32_t threshold)
 {
-    assert(uart_num < sizeof(_uart_hal_ctx)/sizeof(_uart_hal_ctx[0]));
+    assert(uart_num < ARRAY_SIZE(_uart_hal_ctx));
     uart_hal_set_wakeup_thrd(&_uart_hal_ctx[uart_num], threshold);
 }
-
