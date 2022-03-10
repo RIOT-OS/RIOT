@@ -81,11 +81,11 @@ endif
 # NOTE: select the module here and not in the CPU so that order of inclusion
 # does not have periph_rtt selected earlier that it should be while at the same
 # time avoiding the module 'ztimer-no_periph_rtt' being included unecesarily.
-# The sam0 rtt busy loops for 180us every time an alarm is set or
+# The samd21 rtt busy loops for 180us every time an alarm is set or
 # the counter is read, this propagates and leads to timing errors
 # on ztimer_msec that are higher than > +-1msec.
 # The same goes for the fe310 rtt.
-ifneq (,$(filter sam% fe310,$(CPU)))
+ifneq (,$(filter samd21 fe310,$(CPU)))
   USEMODULE += ztimer_no_periph_rtt
 endif
 
