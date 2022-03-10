@@ -1,4 +1,8 @@
-# Use as default the most commonly used ports on Linux and OSX
+# Select the most recently attached tty interface
+ifeq (1,$(MOST_RECENT_PORT))
+  PORT ?= $(shell $(RIOTTOOLS)/usb-serial/ttys.py --most-recent --format path)
+endif
+# Otherwise, use as default the most commonly used ports on Linux and OSX
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
