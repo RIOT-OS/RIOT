@@ -22,7 +22,7 @@
 
 #include "mutex.h"
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "soft_spi.h"
 #include "soft_spi_params.h"
@@ -165,7 +165,7 @@ static inline uint8_t _transfer_one_byte(soft_spi_t bus, uint8_t out)
         uint8_t bit = out >> 7;
         gpio_write(soft_spi_config[bus].mosi_pin, bit);
 
-        xtimer_usleep(soft_spi_config[bus].sleep_us);
+        ztimer_sleep(ZTIMER_USEC, soft_spi_config[bus].sleep_us);
         gpio_toggle(soft_spi_config[bus].clk_pin);
 
         out <<= 1; /*shift transfer register*/
@@ -173,7 +173,7 @@ static inline uint8_t _transfer_one_byte(soft_spi_t bus, uint8_t out)
         bit = gpio_read(soft_spi_config[bus].miso_pin);
         out = bit ? (out | 0x01) : (out & 0xfe); /*set or delete bit 0*/
 
-        xtimer_usleep(soft_spi_config[bus].sleep_us);
+        ztimer_sleep(ZTIMER_USEC, soft_spi_config[bus].sleep_us);
         --i;
         if (i > 0) {
             gpio_toggle(soft_spi_config[bus].clk_pin);
@@ -183,7 +183,7 @@ static inline uint8_t _transfer_one_byte(soft_spi_t bus, uint8_t out)
     if (SPI_MODE_0 == soft_spi_config[bus].soft_spi_mode ||
         SPI_MODE_2 == soft_spi_config[bus].soft_spi_mode) {
         /* CPHA = 0 */
-        xtimer_usleep(soft_spi_config[bus].sleep_us);
+        ztimer_sleep(ZTIMER_USEC, soft_spi_config[bus].sleep_us);
         gpio_toggle(soft_spi_config[bus].clk_pin);
     }
 

@@ -14,7 +14,8 @@
  * This module provides a software implemented Serial Peripheral Interface bus.
  * It is intended to be used in situation where hardware spi is not available.
  * The signatures of the functions are identical to the functions declared in
- * `spi.h`. The clock speed is approximated by using `xtimer_usleep()`.
+ * `spi.h`. The clock speed is approximated by using `ztimer_sleep()` with
+ * `ZTIMER_USEC` as clock.
  *
  * To use the software SPI as drop-in replacement for `periph_spi`, add the
  * following to your application's Makefile:
