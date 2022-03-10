@@ -31,8 +31,10 @@ extern "C" {
  * @brief   A macro to return the string respresentation of x
  */
 #ifndef XTSTR
-#define _XTSTR(x)    # x
-#define XTSTR(x)    _XTSTR(x)
+# ifndef DOXYGEN
+#  define _XTSTR(x)    # x
+# endif /* DOXYGEN */
+# define XTSTR(x)    _XTSTR(x)
 #endif /* XTSTR */
 
 #ifdef __cplusplus
