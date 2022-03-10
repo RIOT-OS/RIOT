@@ -512,7 +512,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
             break;
 
         case NETOPT_RF_TESTMODE:
-#ifdef KW2XRF_TESTMODE
+#ifdef MODULE_KW2XRF_TESTMODE
             if (len < sizeof(uint8_t)) {
                 res = -EOVERFLOW;
             }

@@ -21,8 +21,6 @@
 #include "kw2xrf_reg.h"
 #include "kw2xrf_tm.h"
 
-#ifdef KW2XRF_TESTMODE
-
 static inline void enable_xcvr_test_mode(kw2xrf_t *dev)
 {
     uint8_t reg;
@@ -58,7 +56,7 @@ int kw2xrf_set_test_mode(kw2xrf_t *dev, uint8_t mode)
     disable_xcvr_test_mode(dev);
     kw2xrf_set_channel(dev, dev->netdev.chan);
 
-    switch(mode) {
+    switch (mode) {
         case NETOPT_RF_TESTMODE_IDLE:
             reg = 0;
             kw2xrf_write_iregs(dev, MKW2XDMI_TX_MODE_CTRL, &reg, 1);
@@ -177,5 +175,4 @@ int kw2xrf_set_test_mode(kw2xrf_t *dev, uint8_t mode)
     return 1;
 }
 
-#endif
 /** @} */
