@@ -148,13 +148,6 @@ extern mtd_dev_t *mtd0;
 #endif /* MODULE_SPIFFS || DOXYGEN */
 
 /**
- * @brief Initialize the hardware that is common for all ESP32 boards.
- *
- * This function has to be called from the board specific `board_init` function.
- */
-void board_init_common(void);
-
-/**
   * @brief Print the board configuration in a human readable format
   */
 void print_board_config(void);
@@ -170,9 +163,6 @@ void print_board_config(void);
 #ifdef __cplusplus
 extern "C"
 #endif
-
-/* declaration of `board_init_common` is required when compiling vendor code */
-extern void board_init_common(void);
 
 #ifdef __cplusplus
 }
