@@ -13,9 +13,7 @@ menuconfig MODULE_SM_PWM_01C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
-    select MODULE_ZTIMER
-    select ZTIMER_USEC
-    select MODULE_ZTIMER_PERIPH_TIMER
+    select MODULE_ZTIMER_USEC
 
 config MODULE_SM_PWM_01C_MA
     bool "Use a moving average for sensor values"

@@ -7,6 +7,6 @@
 
 config MODULE_SCHEDSTATISTICS
     bool "Scheduler statistics support"
-    select ZTIMER_USEC
+    select MODULE_ZTIMER_USEC
     depends on TEST_KCONFIG
     select MODULE_SCHED_CB

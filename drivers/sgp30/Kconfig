@@ -13,9 +13,7 @@ menuconfig MODULE_SGP30
     depends on TEST_KCONFIG
     select MODULE_CHECKSUM
     select MODULE_PERIPH_I2C
-    select MODULE_ZTIMER
-    select MODULE_ZTIMER_PERIPH_TIMER
-    select ZTIMER_USEC
+    select MODULE_ZTIMER_USEC
 
 config MODULE_SGP30_STRICT
     bool "Strict reading period"

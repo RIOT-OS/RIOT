@@ -13,7 +13,7 @@ config MODULE_DSP0401
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_PWM
     select MODULE_ZTIMER
-    select ZTIMER_USEC
+    select MODULE_ZTIMER_USEC
 
 config HAVE_DSP0401
     bool

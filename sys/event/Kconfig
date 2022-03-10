@@ -49,6 +49,6 @@ config MODULE_EVENT_TIMEOUT_ZTIMER
 config MODULE_EVENT_TIMEOUT
     bool "Legacy API, support for triggering events after timeout"
     select MODULE_EVENT_TIMEOUT_ZTIMER
-    select ZTIMER_USEC
+    select MODULE_ZTIMER_USEC
 
 endif # MODULE_EVENT

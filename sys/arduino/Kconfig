@@ -25,7 +25,7 @@ menuconfig MODULE_ARDUINO
     select MODULE_FMT
     select MODULE_ZTIMER
     select MODULE_ZTIMER_MSEC
-    select ZTIMER_USEC
+    select MODULE_ZTIMER_USEC
 
 config MODULE_ARDUINO_PWM
     bool "PWM support for Arduino"

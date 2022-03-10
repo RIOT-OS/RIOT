@@ -11,7 +11,7 @@ config MODULE_SI1133
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
     select MODULE_ZTIMER
-    select ZTIMER_USEC
+    select MODULE_ZTIMER_USEC
 
 config HAVE_SI1133
     bool
