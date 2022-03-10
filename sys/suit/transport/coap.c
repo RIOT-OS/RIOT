@@ -133,181 +133,6 @@ static inline uint32_t deadline_left(uint32_t deadline)
     return left;
 }
 
-static ssize_t _nanocoap_request(sock_udp_t *sock, coap_pkt_t *pkt, size_t len)
-{
-    ssize_t res = -EAGAIN;
-    size_t pdu_len = (pkt->payload - (uint8_t *)pkt->hdr) + pkt->payload_len;
-    uint8_t *buf = (uint8_t *)pkt->hdr;
-    uint32_t id = coap_get_id(pkt);
-
-    /* TODO: timeout random between between ACK_TIMEOUT and (ACK_TIMEOUT *
-     * ACK_RANDOM_FACTOR) */
-    uint32_t timeout = CONFIG_COAP_ACK_TIMEOUT * US_PER_SEC;
-    uint32_t deadline = deadline_from_interval(timeout);
-
-    /* add 1 for initial transmit */
-    unsigned tries_left = CONFIG_COAP_MAX_RETRANSMIT + 1;
-
-    while (tries_left) {
-        if (res == -EAGAIN) {
-            res = sock_udp_send(sock, buf, pdu_len, NULL);
-            if (res <= 0) {
-                DEBUG("nanocoap: error sending coap request, %d\n", (int)res);
-                break;
-            }
-        }
-
-        res = sock_udp_recv(sock, buf, len, deadline_left(deadline), NULL);
-        if (res <= 0) {
-            if (res == -ETIMEDOUT) {
-                DEBUG("nanocoap: timeout\n");
-
-                tries_left--;
-                if (!tries_left) {
-                    DEBUG("nanocoap: maximum retries reached\n");
-                    break;
-                }
-                else {
-                    timeout *= 2;
-                    deadline = deadline_from_interval(timeout);
-                    res = -EAGAIN;
-                    continue;
-                }
-            }
-            DEBUG("nanocoap: error receiving coap response, %d\n", (int)res);
-            break;
-        }
-        else {
-            if (coap_parse(pkt, (uint8_t *)buf, res) < 0) {
-                DEBUG("nanocoap: error parsing packet\n");
-                res = -EBADMSG;
-            }
-            else if (coap_get_id(pkt) != id) {
-                res = -EBADMSG;
-                continue;
-            }
-
-            break;
-        }
-    }
-
-    return res;
-}
-
-static int _fetch_block(coap_pkt_t *pkt, uint8_t *buf, sock_udp_t *sock,
-                        const char *path, coap_blksize_t blksize, size_t num)
-{
-    uint8_t *pktpos = buf;
-    uint16_t lastonum = 0;
-
-    pkt->hdr = (coap_hdr_t *)buf;
-
-    pktpos += coap_build_hdr(pkt->hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET,
-                             num);
-    pktpos += coap_opt_put_uri_pathquery(pktpos, &lastonum, path);
-    pktpos +=
-        coap_opt_put_uint(pktpos, lastonum, COAP_OPT_BLOCK2,
-                          (num << 4) | blksize);
-
-    pkt->payload = pktpos;
-    pkt->payload_len = 0;
-
-    int res = _nanocoap_request(sock, pkt, 64 + (0x1 << (blksize + 4)));
-    if (res < 0) {
-        return res;
-    }
-
-    res = coap_get_code(pkt);
-    DEBUG("code=%i\n", res);
-    if (res != 205) {
-        return -res;
-    }
-
-    return 0;
-}
-
-int suit_coap_get_blockwise(sock_udp_ep_t *remote, const char *path,
-                            coap_blksize_t blksize,
-                            coap_blockwise_cb_t callback, void *arg)
-{
-    /* mmmmh dynamically sized array */
-    uint8_t buf[64 + (0x1 << (blksize + 4))];
-    sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
-    coap_pkt_t pkt;
-
-    /* HACK: use random local port */
-    local.port = 0x8000 + (xtimer_now_usec() % 0XFFF);
-
-    sock_udp_t sock;
-    int res = sock_udp_create(&sock, &local, remote, 0);
-    if (res < 0) {
-        return res;
-    }
-
-    int more = 1;
-    size_t num = 0;
-    res = -1;
-    while (more == 1) {
-        DEBUG("fetching block %u\n", (unsigned)num);
-        res = _fetch_block(&pkt, buf, &sock, path, blksize, num);
-        DEBUG("res=%i\n", res);
-
-        if (!res) {
-            coap_block1_t block2;
-            coap_get_block2(&pkt, &block2);
-            more = block2.more;
-
-            if (callback(arg, block2.offset, pkt.payload, pkt.payload_len,
-                         more)) {
-                DEBUG("callback res != 0, aborting.\n");
-                res = -1;
-                goto out;
-            }
-        }
-        else {
-            DEBUG("error fetching block\n");
-            res = -1;
-            goto out;
-        }
-
-        num += 1;
-    }
-
-out:
-    sock_udp_close(&sock);
-    return res;
-}
-
-int suit_coap_get_blockwise_url(const char *url,
-                                coap_blksize_t blksize,
-                                coap_blockwise_cb_t callback, void *arg)
-{
-    char hostport[CONFIG_SOCK_HOSTPORT_MAXLEN];
-    char urlpath[CONFIG_SOCK_URLPATH_MAXLEN];
-    sock_udp_ep_t remote;
-
-    if (strncmp(url, "coap://", 7)) {
-        LOG_INFO("suit: URL doesn't start with \"coap://\"\n");
-        return -EINVAL;
-    }
-
-    if (sock_urlsplit(url, hostport, urlpath) < 0) {
-        LOG_INFO("suit: invalid URL\n");
-        return -EINVAL;
-    }
-
-    if (sock_udp_str2ep(&remote, hostport) < 0) {
-        LOG_INFO("suit: invalid URL\n");
-        return -EINVAL;
-    }
-
-    if (!remote.port) {
-        remote.port = COAP_PORT;
-    }
-
-    return suit_coap_get_blockwise(&remote, urlpath, blksize, callback, arg);
-}
-
 typedef struct {
     size_t offset;
     uint8_t *ptr;
@@ -334,20 +159,20 @@ static int _2buf(void *arg, size_t offset, uint8_t *buf, size_t len, int more)
     }
 }
 
-ssize_t suit_coap_get_blockwise_url_buf(const char *url,
-                                        coap_blksize_t blksize,
-                                        uint8_t *buf, size_t len)
+static ssize_t suit_coap_get_blockwise_url_buf(const char *url,
+                                               coap_blksize_t blksize, void *work_buf,
+                                               uint8_t *buf, size_t len)
 {
     _buf_t _buf = { .ptr = buf, .len = len };
-    int res = suit_coap_get_blockwise_url(url, blksize, _2buf, &_buf);
+    int res = nanocoap_get_blockwise_url(url, blksize, work_buf, _2buf, &_buf);
 
     return (res < 0) ? (ssize_t)res : (ssize_t)_buf.offset;
 }
 
-static void _suit_handle_url(const char *url)
+static void _suit_handle_url(const char *url, coap_blksize_t blksize, void *work_buf)
 {
     LOG_INFO("suit_coap: downloading \"%s\"\n", url);
-    ssize_t size = suit_coap_get_blockwise_url_buf(url, CONFIG_SUIT_COAP_BLOCKSIZE,
+    ssize_t size = suit_coap_get_blockwise_url_buf(url, blksize, work_buf,
                                                    _manifest_buf,
                                                    SUIT_MANIFEST_BUFSIZE);
     if (size >= 0) {
@@ -436,6 +261,8 @@ static void *_suit_coap_thread(void *arg)
 {
     (void)arg;
 
+    uint8_t buffer[NANOCOAP_BLOCKWISE_BUF(CONFIG_SUIT_COAP_BLOCKSIZE)];
+
     LOG_INFO("suit_coap: started.\n");
     msg_t msg_queue[4];
     msg_init_queue(msg_queue, 4);
@@ -449,7 +276,7 @@ static void *_suit_coap_thread(void *arg)
         switch (m.content.value) {
             case SUIT_MSG_TRIGGER:
                 LOG_INFO("suit_coap: trigger received\n");
-                _suit_handle_url(_url);
+                _suit_handle_url(_url, CONFIG_SUIT_COAP_BLOCKSIZE, buffer);
                 break;
             default:
                 LOG_WARNING("suit_coap: warning: unhandled msg\n");

@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += dfplayer
-USEMODULE += event_thread_lowest
+USEMODULE += event_thread
 USEMODULE += shell
 USEMODULE += shell_commands
 

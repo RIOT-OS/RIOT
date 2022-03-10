@@ -73,11 +73,6 @@ extern "C" {
 #define CONFIG_ZTIMER_USEC_MIN     (8)
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-extern void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

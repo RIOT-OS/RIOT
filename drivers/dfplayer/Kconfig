@@ -27,3 +27,8 @@ config DFPLAYER_NO_STRERROR
     help
         Say y to print error codes as numbers when using the shell, instead of the corresponding
         standard error string.
+
+config HAVE_DFPLAYER
+    bool
+    help
+        Indicates that a DFPlayer Mini MP3 Player is present.

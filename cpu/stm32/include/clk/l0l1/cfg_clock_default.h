@@ -71,7 +71,7 @@ extern "C" {
  * PLL_MUL:         multiplier, allowed values: 3, 4, 6, 8, 12, 16, 24, 32, 48. Default is 4.
  * CORECLOCK        -> 32MHz MAX!
  */
-#define CLOCK_CORECLOCK                 ((CLOCK_PLL_SRC / CONFIG_CLOCK_PLL_DIV) * CONFIG_CLOCK_PLL_MUL)
+#define CLOCK_CORECLOCK                 ((CLOCK_PLL_SRC * CONFIG_CLOCK_PLL_MUL) / CONFIG_CLOCK_PLL_DIV)
 #if CLOCK_CORECLOCK > MHZ(32)
 #error "SYSCLK cannot exceed 32MHz"
 #endif

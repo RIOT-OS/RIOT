@@ -88,7 +88,7 @@ ifneq (,$(filter tmp1075 lm75%,$(USEMODULE)))
   USEMODULE += lm75
 endif
 
-ifneq (,$(filter lps331ap lps2%hb lps22hh,$(USEMODULE)))
+ifneq (,$(filter lps331ap lps2%,$(USEMODULE)))
   USEMODULE += lpsxxx
 endif
 

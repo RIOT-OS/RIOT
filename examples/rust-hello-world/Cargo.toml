@@ -9,4 +9,5 @@ resolver = "2"
 crate-type = ["staticlib"]
 
 [dependencies]
-riot-wrappers = "0.7"
+# `default-features = false` can be removed with 0.8, and enables building on stable during the 0.7 series
+riot-wrappers = { version = "0.7", features = [ "set_panic_handler" ], default-features = false }

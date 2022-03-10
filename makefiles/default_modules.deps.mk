@@ -6,6 +6,10 @@ ifneq (,$(filter auto_init_ztimer,$(USEMODULE)))
   USEMODULE += ztimer_init
 endif
 
+ifneq (,$(filter ztimer_auto_adjust,$(USEMODULE)))
+  USEMODULE += ztimer_overhead
+endif
+
 ifneq (,$(filter auto_init_saul,$(USEMODULE)))
   USEMODULE += saul_init_devs
 endif

@@ -26,4 +26,8 @@ Example of command line for changing the max activity period to 5s:
 CFLAGS=-DCONFIG_LVGL_ACTIVITY_PERIOD=5000 make -C tests/pkg_lvgl
 ```
 
+### SDL Usage
+
+See @ref pkg_lv_drivers.
+
  */

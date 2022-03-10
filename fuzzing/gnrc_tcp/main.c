@@ -14,6 +14,7 @@
 
 #include "net/af.h"
 #include "net/gnrc/tcp.h"
+#include "net/gnrc/netreg.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/pkt.h"
 

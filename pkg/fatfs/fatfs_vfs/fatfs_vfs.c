@@ -87,6 +87,11 @@ static int _format(vfs_mount_t *mountp)
     }
 #endif
 
+    /* make sure the volume has been initialized */
+    if (_init(mountp)) {
+        return -EINVAL;
+    }
+
     const MKFS_PARM param = {
         .fmt = CONFIG_FATFS_FORMAT_TYPE,
     };

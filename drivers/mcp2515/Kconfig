@@ -15,3 +15,8 @@ config MODULE_MCP2515
     select MODULE_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_SPI
     select MODULE_XTIMER
+
+config HAVE_MCP2515
+    bool
+    help
+        Indicates that a MCP2515 CAN controller is present.

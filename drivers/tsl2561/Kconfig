@@ -12,3 +12,9 @@ config MODULE_TSL2561
     select MODULE_PERIPH_I2C
     select MODULE_ZTIMER
     select MODULE_ZTIMER_MSEC
+
+config HAVE_TSL2561
+    bool
+    select MODULE_TSL2561 if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a TSL2561 illuminance sensor is present.

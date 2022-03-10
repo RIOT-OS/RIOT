@@ -14,6 +14,12 @@ config MODULE_GP2Y10XX
     select MODULE_PERIPH_ADC
     select MODULE_XTIMER
 
+config HAVE_GP2Y10XX
+    bool
+    select MODULE_GP2Y10XX if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a GP2Y10xx Optical Dust Sensor is present.
+
 menuconfig KCONFIG_USEMODULE_GP2Y10XX
     bool "Configure GP2Y10xx driver"
     depends on USEMODULE_GP2Y10XX

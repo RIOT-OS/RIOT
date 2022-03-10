@@ -10,3 +10,9 @@ config MODULE_MMA7660
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
+
+config HAVE_MMA7660
+    bool
+    select MODULE_MMA7660 if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a MMA7660 Accelerometer is present.

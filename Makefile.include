@@ -584,6 +584,9 @@ USEMODULE_INCLUDES =
 
 include $(RIOTBASE)/sys/Makefile.include
 
+# add default board_init()
+DIRS += $(RIOTBASE)/boards/common/init
+
 # include Makefile.includes of each driver modules if they exist
 -include $(USEMODULE:%=$(RIOTBASE)/drivers/%/Makefile.include)
 

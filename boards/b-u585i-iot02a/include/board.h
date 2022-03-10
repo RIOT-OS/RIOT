@@ -75,11 +75,6 @@ extern "C" {
 #define LPSXXX_PARAM_I2C    I2C_DEV(1)
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

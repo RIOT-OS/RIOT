@@ -15,3 +15,8 @@ config MODULE_AT25XXX
     help
         This driver also supports M95xxx, 25AAxxx, 25LCxxx, CAT25xxx & BR25Sxxx
         families.
+
+config HAVE_AT25XXX
+    bool
+    help
+        Indicates that the AT25xxx SPI-EEPROM is present.

@@ -20,10 +20,11 @@ APPDIR=$3
 TERMPROG=$4
 TERMFLAGS=$5
 PORT=$6
+EMULATOR_TMP_DIR=$7
 
 # temporary file that contains the emulator pid
-EMULATOR_PIDFILE=$(mktemp -t "emulator_pid.XXXXXXXXXX")
-SOCAT_PIDFILE=$(mktemp -t "socat_pid.XXXXXXXXXX")
+EMULATOR_PIDFILE="${EMULATOR_TMP_DIR}/emulator_pid"
+SOCAT_PIDFILE="${EMULATOR_TMP_DIR}/socat_pid"
 
 # will be called by trap
 cleanup() {
@@ -37,6 +38,7 @@ cleanup() {
     kill "$(cat ${EMULATOR_PIDFILE})"
     rm -f "${EMULATOR_PIDFILE}"
     rm -f ${PORT}
+    rmdir ${EMULATOR_TMP_DIR}
     exit 0
 }
 # cleanup after script terminates
@@ -46,6 +48,7 @@ trap "cleanup terminal for ${EMULATOR} emulator" EXIT
 sh -c "\
     EMULATOR_PIDFILE=${EMULATOR_PIDFILE} \
     EMULATE=1 \
+    EMULATOR_TMP_DIR=${EMULATOR_TMP_DIR} \
     BOARD=${BOARD} \
     make -C ${APPDIR} emulate & \
     echo \$! > ${EMULATOR_PIDFILE}" &
@@ -55,7 +58,7 @@ if [ ${EMULATOR} = "qemu" ]
 then
     sleep 1
     sh -c "\
-        socat pty,link=${PORT},raw,echo=0 TCP:localhost:5555 & \
+        socat unix-connect:${EMULATOR_TMP_DIR}/uart_socket pty,link=${PORT},raw,echo=0 & \
         echo \$! > ${SOCAT_PIDFILE}" &
 fi
 

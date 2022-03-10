@@ -305,6 +305,12 @@ void auto_init(void)
         gnrc_ipv6_auto_subnets_init();
     }
 
+    if (IS_USED(MODULE_AUTO_INIT_TELNET)) {
+        LOG_DEBUG("auto_init TELNET server\n");
+        extern void telnet_server_start(void);
+        telnet_server_start();
+    }
+
     if (IS_USED(MODULE_AUTO_INIT_MULTIMEDIA)) {
         LOG_DEBUG("auto_init MULTIMEDIA\n");
         if (IS_USED(MODULE_DFPLAYER)) {
@@ -323,5 +329,11 @@ void auto_init(void)
         LOG_DEBUG("Auto init UDP benchmark\n");
         extern void benchmark_udp_auto_init(void);
         benchmark_udp_auto_init();
+    }
+
+    if (IS_USED(MODULE_AUTO_INIT_SOCK_DNS)) {
+        LOG_DEBUG("Auto init sock_dns.\n");
+        extern void auto_init_sock_dns(void);
+        auto_init_sock_dns();
     }
 }

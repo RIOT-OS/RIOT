@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 
+#include "net/gnrc/netif.h"
 #include "net/ipv6.h"
 #include "net/nanocoap_sock.h"
 #include "shell.h"

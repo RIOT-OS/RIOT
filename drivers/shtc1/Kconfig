@@ -11,3 +11,9 @@ config MODULE_SHTC1
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
     select MODULE_CHECKSUM
+
+config HAVE_SHTC1
+    bool
+    select MODULE_SHTC1 if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a SHTC1 temperature and humidity sensor is present.

@@ -201,11 +201,11 @@ static dose_signal_t state_transit_idle(dose_t *ctx, dose_signal_t signal)
     (void) ctx;
     (void) signal;
 
-    _watchdog_stop();
-
     if (ctx->state == DOSE_STATE_RECV) {
         bool dirty = ctx->flags & DOSE_FLAG_RECV_BUF_DIRTY;
         bool done  = ctx->flags & DOSE_FLAG_END_RECEIVED;
+
+        _watchdog_stop();
 
         /* We got here from RECV state. The driver's thread has to look
          * if this frame should be processed. By queuing NETDEV_EVENT_ISR,

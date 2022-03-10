@@ -11,3 +11,9 @@ config MODULE_DS75LX
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
     select MODULE_XTIMER
+
+config HAVE_DS75LX
+    bool
+    select MODULE_DS75LX if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a DS75LX temperature sensor is present.

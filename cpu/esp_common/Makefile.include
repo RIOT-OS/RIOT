@@ -120,7 +120,7 @@ PROGRAMMERS_SUPPORTED += esptool
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
 FLASHFILE ?= $(ELFFILE).bin
 
-ESPTOOL ?= $(RIOTTOOLS)/esptool/esptool.py
+ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool.py
 
 # This is the binary that ends up programmed in the flash.
 $(ELFFILE).bin: $(ELFFILE)
@@ -147,7 +147,7 @@ $(BINDIR)/partitions.csv: $(FLASHFILE)
 	$(Q)ls -l $< | awk '{ print $$5 }' >> $@
 
 $(BINDIR)/partitions.bin: $(PARTITION_TABLE_CSV)
-	$(Q)python3 $(RIOTTOOLS)/esptool/gen_esp32part.py --verify $< $@
+	$(Q)python3 $(RIOTTOOLS)/esptools/gen_esp32part.py --verify $< $@
 
 # Convert .elf and .csv to .bin files at build time, but make them available for
 # tests at flash time. These can't be added to FLASHDEPS because they depend on

@@ -1,0 +1,9 @@
+USEMODULE += sema
+USEMODULE += ztimer64_msec
+USEMODULE += ztimer_usec
+
+
+#WAMR supports "X86_32/64", "AARCH64", "ARM", "THUMB", "MIPS", "XTENSA" and RISCV
+FEATURES_REQUIRED_ANY += arch_native|arch_esp32|arch_riscv|cortexm_svc
+#arch_arm|arch_mips32r2|arch_esp need modified
+#  build/pkg/wamr/core/iwasm/common/arch/invokeNative_<arch>.s

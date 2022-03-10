@@ -299,6 +299,7 @@
 #ifndef NET_SOCK_TCP_H
 #define NET_SOCK_TCP_H
 
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/types.h>

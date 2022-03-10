@@ -18,6 +18,7 @@
  * @brief   DNS sock definitions
  *
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author  Hendrik van Essen <hendrik.ve@fu-berlin.de>
  */
 
 #ifndef NET_SOCK_DNS_H
@@ -34,6 +35,41 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#ifdef MODULE_AUTO_INIT_SOCK_DNS
+/**
+ * @brief IP version of the address provided with CONFIG_AUTO_INIT_SOCK_DNS_SERVER_ADDR
+ */
+#ifndef CONFIG_AUTO_INIT_SOCK_DNS_IP_VERSION
+    /* IPv6 is preferred */
+    #if defined(SOCK_HAS_IPV6)
+        #define CONFIG_AUTO_INIT_SOCK_DNS_IP_VERSION 6
+    #elif defined(SOCK_HAS_IPV4)
+        #define CONFIG_AUTO_INIT_SOCK_DNS_IP_VERSION 4
+    #else
+        #error "Neither IPv4 nor IPv6 included in build"
+    #endif
+#endif
+
+/**
+ * @brief Address of the DNS server
+ */
+#ifndef CONFIG_AUTO_INIT_SOCK_DNS_SERVER_ADDR
+    /* Default to Google Public DNS */
+    #if CONFIG_AUTO_INIT_SOCK_DNS_IP_VERSION == 6
+        #define CONFIG_AUTO_INIT_SOCK_DNS_SERVER_ADDR "2001:4860:4860::8888"
+    #elif CONFIG_AUTO_INIT_SOCK_DNS_IP_VERSION == 4
+        #define CONFIG_AUTO_INIT_SOCK_DNS_SERVER_ADDR "8.8.8.8"
+    #endif
+#endif
+
+/**
+ * @brief Port of the DNS server
+ */
+#ifndef CONFIG_AUTO_INIT_SOCK_DNS_SERVER_PORT
+#define CONFIG_AUTO_INIT_SOCK_DNS_SERVER_PORT SOCK_DNS_PORT
+#endif
+#endif /* MODULE_AUTO_INIT_SOCK_DNS */
 
 /**
  * @name DNS defines

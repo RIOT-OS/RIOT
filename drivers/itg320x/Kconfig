@@ -6,7 +6,9 @@
 #
 
 menuconfig MODULE_ITG320X
-    bool "ITG320X 3-axis gyroscope"
+    bool
+    prompt "ITG320X 3-axis gyroscope" if !(MODULE_SAUL_DEFAULT && HAVE_ITG320X)
+    default (MODULE_SAUL_DEFAULT && HAVE_ITG320X)
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
@@ -19,5 +21,18 @@ config MODULE_ITG320X_INT
     depends on MODULE_ITG320X
     depends on HAS_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_GPIO_IRQ
+    default HAVE_ITG320X_INT
     help
         Say y to fetch the data when the data-ready interrupt is triggered.
+
+config HAVE_ITG320X
+    bool
+    help
+        Indicates that a ITG320X 3-axis gyroscope is present.
+
+config HAVE_ITG320X_INT
+    bool
+    select HAVE_ITG320X
+    help
+        Indicates that a ITG320X 3-axis gyroscope is present with interrupt pin
+        wired.

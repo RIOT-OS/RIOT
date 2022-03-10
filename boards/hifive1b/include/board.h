@@ -57,11 +57,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
-/**
  * @brief   Initialize the board clock to use PLL and faster SPI access.
  */
 void board_init_clock(void);

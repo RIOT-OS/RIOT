@@ -141,11 +141,12 @@ menu "xtimer and evtimer compatibility"
 
 choice
     bool "xtimer compatibility"
-    depends on MODULE_XTIMER && MODULE_ZTIMER && MODULE_ZTIMER_PERIPH_TIMER
+    depends on MODULE_XTIMER && MODULE_ZTIMER
 
 config MODULE_XTIMER_ON_ZTIMER
     bool "ztimer_usec as timer backend for xtimer"
     select MODULE_ZTIMER_USEC
+    select MODULE_ZTIMER_PERIPH_TIMER
 
 config MODULE_ZTIMER_XTIMER_COMPAT
     bool "map xtimer calls to ztimer"
@@ -155,15 +156,22 @@ config MODULE_ZTIMER_XTIMER_COMPAT
         This is a wrapper of xtimer API on ztimer_usec and is currently
         incomplete. Unless doing testing, use xtimer on ztimer.
 
+comment "The ztimer xtimer compatibility module is incomplete, consider using MODULE_ZTIMER64_XTIMER_COMPAT instead."
+    depends on MODULE_ZTIMER_XTIMER_COMPAT
+
 endchoice
 
-comment "The ztimer xtimer compatibility module is incomplete, consider using MODULE_XTIMER_ON_ZTIMER instead."
-    depends on MODULE_ZTIMER_XTIMER_COMPAT
+config MODULE_ZTIMER64_XTIMER_COMPAT
+    bool "map xtimer calls to ztimer64"
+    select MODULE_DIV
+    select MODULE_ZTIMER64
+    select MODULE_ZTIMER64_USEC
+    help
+        This is a wrapper of xtimer API on ztimer64_usec.
 
 config MODULE_EVTIMER_ON_ZTIMER
     bool "Use ztimer_msec as timer backend for evtimer"
     depends on MODULE_ZTIMER_MSEC
-    select MODULE_ZTIMER_NOW64
 
 endmenu # xtimer compatibility
 
@@ -182,6 +190,10 @@ config MODULE_AUTO_INIT_ZTIMER
     depends on MODULE_AUTO_INIT
     select MODULE_ZTIMER_INIT
     default y
+
+config MODULE_ZTIMER_AUTO_ADJUST
+    bool "Auto adjust ztimer set and sleep values"
+    select MODULE_ZTIMER_OVERHEAD
 
 config MODULE_ZTIMER_NOW64
     bool "Use a 64-bits result for ztimer_now()"

@@ -15,4 +15,6 @@
  * to your makefile.
  * 48kB is enough for the test other uses may need more or may
  * need this to be applied to other threads using `THREAD_STACKSIZE_DEFAULT`
+ *
+ * @include pkg/u8g2/README.md
  */

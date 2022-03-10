@@ -12,6 +12,7 @@
 #include "shell.h"
 #include "msg.h"
 #include "net/sock/tcp.h"
+#include "net/gnrc/tcp.h"
 
 #define MAIN_QUEUE_SIZE (8)
 #define SOCK_TCP_QUEUE_SIZE (1)

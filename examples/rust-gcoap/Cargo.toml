@@ -9,8 +9,8 @@ resolver = "2"
 crate-type = ["staticlib"]
 
 [dependencies]
-riot-wrappers = { version = "^0.7", features = [ "with_coap_message", "with_coap_handler" ] }
+riot-wrappers = { version = "^0.7.18", features = [ "set_panic_handler", "panic_handler_format", "with_coap_message", "with_coap_handler" ] }
 
 coap-message-demos = { git = "https://gitlab.com/chrysn/coap-message-demos/", default-features = false }
-coap-handler-implementations = "0.1"
+coap-handler-implementations = "0.3"
 riot-coap-handler-demos = { git = "https://gitlab.com/etonomy/riot-module-examples/", features = [ "vfs" ] }

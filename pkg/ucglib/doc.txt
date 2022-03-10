@@ -3,4 +3,6 @@
  * @ingroup  pkg
  * @brief    Provides a color graphics library for OLED and LCD displays
  * @see      https://github.com/olikraus/ucglib
+ *
+ * @include pkg/ucglib/README.md
  */

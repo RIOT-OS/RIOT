@@ -24,8 +24,6 @@ static netdev_t sam0eth;
 static char stack[THREAD_STACKSIZE_DEFAULT];
 static gnrc_netif_t _netif;
 
-extern void sam0_eth_setup(netdev_t *netdev);
-
 void auto_init_sam0_eth(void)
 {
     /* setup netdev device */

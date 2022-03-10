@@ -65,11 +65,6 @@ extern mtd_dev_t *mtd0;
 #define XTIMER_HZ                   (1000000ul)
 /** @} */
 
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

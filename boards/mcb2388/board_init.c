@@ -37,7 +37,3 @@ void led_init(void)
     FIO2DIR |= LED0_MASK | LED1_MASK | LED2_MASK | LED3_MASK \
             |  LED4_MASK | LED5_MASK | LED6_MASK | LED7_MASK;
 }
-
-void board_init(void)
-{
-}

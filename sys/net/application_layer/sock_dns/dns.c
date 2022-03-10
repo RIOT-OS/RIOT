@@ -12,11 +12,14 @@
  * @file
  * @brief   sock DNS client implementation
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author  Hendrik van Essen <hendrik.ve@fu-berlin.de>
  * @}
  */
 
 #include <errno.h>
 #include <string.h>
+
+#include <arpa/inet.h>
 
 #include "net/dns.h"
 #include "net/dns/msg.h"
@@ -24,10 +27,43 @@
 #include "net/sock/dns.h"
 
 /* min domain name length is 1, so minimum record length is 7 */
-#define DNS_MIN_REPLY_LEN   (unsigned)(sizeof(dns_hdr_t ) + 7)
+#define DNS_MIN_REPLY_LEN   (unsigned)(sizeof(dns_hdr_t) + 7)
 
 /* global DNS server UDP endpoint */
 sock_udp_ep_t sock_dns_server;
+
+#ifdef MODULE_AUTO_INIT_SOCK_DNS
+void auto_init_sock_dns(void)
+{
+    assert(   CONFIG_AUTO_INIT_SOCK_DNS_IP_VERSION == 4
+           || CONFIG_AUTO_INIT_SOCK_DNS_IP_VERSION == 6);
+
+    assert(   CONFIG_AUTO_INIT_SOCK_DNS_SERVER_PORT > 0
+           && CONFIG_AUTO_INIT_SOCK_DNS_SERVER_PORT <= 0xffff);
+
+    switch (CONFIG_AUTO_INIT_SOCK_DNS_IP_VERSION) {
+#ifdef SOCK_HAS_IPV4
+    case 4:
+        inet_pton(AF_INET, CONFIG_AUTO_INIT_SOCK_DNS_SERVER_ADDR,
+                  sock_dns_server.addr.ipv4);
+        sock_dns_server.family = AF_INET;
+        break;
+#endif
+#ifdef SOCK_HAS_IPV6
+    case 6:
+        inet_pton(AF_INET6, CONFIG_AUTO_INIT_SOCK_DNS_SERVER_ADDR,
+                  sock_dns_server.addr.ipv6);
+        sock_dns_server.family = AF_INET6;
+        break;
+#endif
+    default:
+        assert(0);
+        return;
+    }
+
+    sock_dns_server.port = CONFIG_AUTO_INIT_SOCK_DNS_SERVER_PORT;
+}
+#endif /* MODULE_AUTO_INIT_SOCK_DNS */
 
 int sock_dns_query(const char *domain_name, void *addr_out, int family)
 {

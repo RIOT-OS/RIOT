@@ -27,6 +27,7 @@
 #include "msg.h"
 #include "net/emcute.h"
 #include "net/ipv6/addr.h"
+#include "thread.h"
 
 #ifndef EMCUTE_ID
 #define EMCUTE_ID           ("gertrud")

@@ -54,7 +54,7 @@ static void _ztimer_periodic_callback(void *arg)
 }
 
 void ztimer_periodic_init(ztimer_clock_t *clock, ztimer_periodic_t *timer,
-                          int (*callback)(
+                          bool (*callback)(
                               void *), void *arg, uint32_t interval)
 {
     *timer =

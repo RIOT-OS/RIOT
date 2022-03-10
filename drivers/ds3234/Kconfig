@@ -10,3 +10,8 @@ config MODULE_DS3234
     depends on HAS_PERIPH_SPI
     depends on TEST_KCONFIG
     select MODULE_PERIPH_SPI
+
+config HAVE_DS3234
+    bool
+    help
+        Indicates that a DS3234 real-time clock is present.
