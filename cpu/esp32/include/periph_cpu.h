@@ -443,7 +443,7 @@ typedef struct {
 /**
  * @brief   The address of the register for accessing the hardware RNG.
  */
-#define RNG_DATA_REG_ADDR   (0x3ff75144)
+#define RNG_DATA_REG_ADDR   (WDEV_RND_REG)
 /** @} */
 
 /**
