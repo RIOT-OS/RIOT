@@ -11,3 +11,9 @@ config MODULE_SHT2X
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
     select MODULE_XTIMER
+
+config HAVE_SHT2X
+    bool
+    select MODULE_SHT2X if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a SHT2x temperature and humidity sensor is present.

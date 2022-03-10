@@ -24,9 +24,12 @@
 #include <string.h>
 
 #include "net/coap.h"
+#include "net/gnrc/netif.h"
+#include "net/ipv6.h"
 #include "net/nanocoap.h"
 #include "net/nanocoap_sock.h"
 #include "net/sock/udp.h"
+
 #include "od.h"
 
 static ssize_t _send(coap_pkt_t *pkt, size_t len, char *addr_str, char *port_str)
@@ -80,7 +83,7 @@ static ssize_t _send(coap_pkt_t *pkt, size_t len, char *addr_str, char *port_str
 int nanotest_client_cmd(int argc, char **argv)
 {
     /* Ordered like the RFC method code numbers, but off by 1. GET is code 0. */
-    char *method_codes[] = {"get", "post", "put"};
+    const char *method_codes[] = {"get", "post", "put"};
     unsigned buflen = 128;
     uint8_t buf[buflen];
     coap_pkt_t pkt;
@@ -160,4 +163,51 @@ int nanotest_client_cmd(int argc, char **argv)
     printf("usage: %s <get|post|put> <addr>[%%iface] <port> <path> [data]\n",
            argv[0]);
     return 1;
+}
+
+static int _blockwise_cb(void *arg, size_t offset, uint8_t *buf, size_t len, int more)
+{
+    (void)arg;
+    (void)more;
+
+    printf("offset %03u: ", (unsigned)offset);
+    for (unsigned i = 0; i < len; ++i) {
+        putchar(buf[i]);
+    }
+    puts("");
+
+    return 0;
+}
+
+int nanotest_client_url_cmd(int argc, char **argv)
+{
+    /* Ordered like the RFC method code numbers, but off by 1. GET is code 0. */
+    const char *method_codes[] = {"get", "post", "put"};
+
+    if (argc < 3) {
+        goto error;
+    }
+
+    int code_pos = -1;
+    for (size_t i = 0; i < ARRAY_SIZE(method_codes); i++) {
+        if (strcmp(argv[1], method_codes[i]) == 0) {
+            code_pos = i;
+            break;
+        }
+    }
+    if (code_pos == -1) {
+        goto error;
+    }
+
+    if (code_pos != 0) {
+        printf("TODO: implement %s request\n", method_codes[code_pos]);
+        return -1;
+    }
+
+    uint8_t buffer[NANOCOAP_BLOCKWISE_BUF(COAP_BLOCKSIZE_32)];
+    return  nanocoap_get_blockwise_url(argv[2], COAP_BLOCKSIZE_32, buffer,
+                                       _blockwise_cb, NULL);
+error:
+    printf("usage: %s <get|post|put> <url> [data]\n", argv[0]);
+    return -1;
 }

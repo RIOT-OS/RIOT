@@ -6,8 +6,9 @@
 #
 
 menuconfig MODULE_SX127X
-    bool "Semtech SX1272 and SX1276 radios driver" if !(HAVE_SX127X && MODULE_NETDEV_DEFAULT)
-    default y if (HAVE_SX127X && MODULE_NETDEV_DEFAULT)
+    bool
+    prompt "Semtech SX1272 and SX1276 radios driver" if !(MODULE_NETDEV_DEFAULT && HAVE_SX127X)
+    default y if (MODULE_NETDEV_DEFAULT && HAVE_SX127X)
     depends on TEST_KCONFIG
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_GPIO_IRQ
@@ -24,7 +25,7 @@ menuconfig MODULE_SX127X
     help
         Only LoRa long range modem is supported at the moment.
 
-choice
+choice SX127X_VARIANT
     bool "Radio variant"
     depends on MODULE_SX127X
     default MODULE_SX1272 if HAVE_SX1272

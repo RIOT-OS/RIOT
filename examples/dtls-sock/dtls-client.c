@@ -20,6 +20,7 @@
 
 #include "kernel_defines.h"
 
+#include "net/gnrc/netif.h"
 #include "net/sock/udp.h"
 #include "net/sock/dtls.h"
 #include "net/sock/dtls/creds.h"

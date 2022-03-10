@@ -77,4 +77,17 @@ else
     $(shell $(COLOR_ECHO) "$(COLOR_RED)Deprecated modules are in use:$(COLOR_RESET)"\
                           "$(DEPRECATED_MODULES_USED)" 1>&2)
   endif
+
+  # Warn about telnet
+  ifneq (,$(filter auto_init_telnet,$(USEMODULE)))
+    ifneq (1,$(I_UNDERSTAND_THAT_TELNET_IS_INSECURE))
+      $(shell $(COLOR_ECHO) "$(COLOR_RED)Telnet will be started automatically, "\
+                            "make sure you understand why this almost certainly "\
+                            "is a REALLY BAD idea before proceeding!$(COLOR_RESET)" 1>&2)
+      $(error I_UNDERSTAND_THAT_TELNET_IS_INSECURE must be set to 1 to proceed)
+    else
+      $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)Telnet will be started automatically,"\
+                            "don't run this on public networks!$(COLOR_RESET)" 1>&2)
+    endif
+  endif
 endif

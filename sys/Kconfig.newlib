@@ -17,6 +17,8 @@ config MODULE_NEWLIB_SYSCALLS_DEFAULT
     bool
     default y
     depends on !HAVE_CUSTOM_NEWLIB_SYSCALLS
+    select MODULE_DIV
+    select MODULE_ZTIMER64_XTIMER_COMPAT if MODULE_ZTIMER_XTIMER_COMPAT
     help
         Default implementation of newlib system calls.
 

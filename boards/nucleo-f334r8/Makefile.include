@@ -1,2 +1,8 @@
+#variable needed by cpy2remed PROGRAMMER
+#it contains name of ST-Link removable media
+DIR_NAME_AT_REMED = "NODE_F334R8"
+
+PROGRAMMERS_SUPPORTED += cpy2remed
+
 # load the common Makefile.include for Nucleo boards
 include $(RIOTBOARD)/common/nucleo64/Makefile.include

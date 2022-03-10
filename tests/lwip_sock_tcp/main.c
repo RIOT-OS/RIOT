@@ -28,7 +28,8 @@
 #include "sched.h"
 #include "test_utils/expect.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
+#include "timex.h"
 
 #include "constants.h"
 #include "stack.h"
@@ -515,7 +516,7 @@ static void test_tcp_write4__success(void)
     expect(((ssize_t)exp_data.iov_len) == sock_tcp_write(&_sock, "Hello!",
                                                         sizeof("Hello!")));
     expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
-    xtimer_usleep(5000);            /* wait for server */
+    ztimer_sleep(ZTIMER_MSEC, 5);            /* wait for server */
 }
 #endif /* MODULE_LWIP_IPV4 */
 
@@ -947,7 +948,7 @@ static void test_tcp_write6__success(void)
     expect(((ssize_t)exp_data.iov_len) == sock_tcp_write(&_sock, "Hello!",
                                                         sizeof("Hello!")));
     expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
-    xtimer_usleep(5000);            /* wait for server */
+    ztimer_sleep(ZTIMER_MSEC, 5);            /* wait for server */
 }
 #endif /* MODULE_LWIP_IPV6 */
 

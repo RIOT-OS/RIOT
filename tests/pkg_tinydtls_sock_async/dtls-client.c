@@ -21,6 +21,7 @@
 
 #include "event/thread.h"
 #include "event/timeout.h"
+#include "net/gnrc/netif.h"
 #include "net/sock/async/event.h"
 #include "net/sock/udp.h"
 #include "net/sock/dtls.h"

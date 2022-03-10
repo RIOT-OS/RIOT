@@ -11,6 +11,9 @@ endif
 ifneq (,$(filter cipher_modes,$(USEMODULE)))
   DIRS += crypto/modes
 endif
+ifneq (,$(filter telnet,$(USEMODULE)))
+  DIRS += net/application_layer/telnet
+endif
 ifneq (,$(filter constfs,$(USEMODULE)))
   DIRS += fs/constfs
 endif

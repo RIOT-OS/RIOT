@@ -74,11 +74,6 @@
  #define RF_SWITCH_TOGGLE    gpio_toggle(RF_SWITCH_GPIO)
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

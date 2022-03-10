@@ -25,14 +25,6 @@
 extern "C" {
 #endif
 
-/**
- * @brief Initialize the board specific hardware
- */
-static inline void board_init(void) {
-    /* there is nothing special to initialize on this board */
-    board_init_common();
-}
-
 #if !MODULE_ESP_ETH || DOXYGEN
 /**
  * @name    Button pin definitions

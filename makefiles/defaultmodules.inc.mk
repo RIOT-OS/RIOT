@@ -1,4 +1,4 @@
-DEFAULT_MODULE += board cpu core core_init core_msg core_panic sys
+DEFAULT_MODULE += board board_common_init cpu core core_init core_msg core_panic sys
 
 # Include potentially added default modules by the board
 -include $(BOARDDIR)/Makefile.default

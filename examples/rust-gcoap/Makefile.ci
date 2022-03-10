@@ -1,11 +1,19 @@
 BOARD_INSUFFICIENT_MEMORY := \
+    airfy-beacon \
     blackpill \
     bluepill \
     bluepill-stm32f030c8 \
+    calliope-mini \
+    im880b \
     i-nucleo-lrwan1 \
+    microbit \
+    nrf51dongle \
+    nrf6310 \
     nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
+    nucleo-f070rb \
+    nucleo-f072rb \
     nucleo-f302r8 \
     nucleo-f303k8 \
     nucleo-f334r8 \
@@ -22,4 +30,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32g0316-disco \
     stm32l0538-disco \
     stm32mp157c-dk2 \
+    yunjia-nrf51822 \
     #

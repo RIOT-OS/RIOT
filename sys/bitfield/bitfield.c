@@ -21,11 +21,11 @@
 #include "bitfield.h"
 #include "irq.h"
 
-int bf_get_unset(uint8_t field[], int size)
+int bf_get_unset(uint8_t field[], size_t size)
 {
     int result = -1;
     int nbytes = (size + 7) / 8;
-    int i = 0;
+    size_t i = 0;
 
     unsigned state = irq_disable();
 
@@ -43,5 +43,5 @@ int bf_get_unset(uint8_t field[], int size)
     }
 
     irq_restore(state);
-    return(result);
+    return result;
 }

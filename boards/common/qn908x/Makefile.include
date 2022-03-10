@@ -22,8 +22,12 @@ OPENOCD_PRE_FLASH_CMDS += "-c qn908x disable_wdog"
 # in another ELF file and we set it as the FLASHFILE.
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
 ELFFILE_CHECKSUM ?= $(ELFFILE:.elf=-checksum.elf)
+ELFFILE_SHADOW ?= $(ELFFILE:.elf=-shadow.elf)
 
-$(ELFFILE_CHECKSUM): $(ELFFILE)
+$(ELFFILE_SHADOW): $(ELFFILE)
+	$(Q)cp $(ELFFILE) $(ELFFILE_SHADOW)
+
+$(ELFFILE_CHECKSUM): $(ELFFILE_SHADOW)
 	$(Q)$(OBJCOPY) --dump-section .vectors=$<.vectors $<
 	$(Q)$(RIOTBOARD)/common/qn908x/dist/nxp_checksum.py $(if $(Q),--quiet) \
 	  $<.vectors

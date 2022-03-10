@@ -22,6 +22,7 @@
 #include <stdlib.h>
 
 #include "net/cord/ep.h"
+#include "net/gnrc/netif.h"
 #include "net/nanocoap.h"
 #include "net/sock/util.h"
 #include "net/cord/config.h"

@@ -139,11 +139,6 @@ extern "C"
 #define MMA8X5X_PARAM_ADDR          (0x1D)
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and standard I/O
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

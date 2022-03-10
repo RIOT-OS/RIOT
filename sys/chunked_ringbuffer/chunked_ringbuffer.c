@@ -22,13 +22,13 @@
 static int _get_free_chunk(chunk_ringbuf_t *rb)
 {
     int idx = rb->chunk_cur;
-    for (int i = 0; i < CHUNK_NUM_MAX; ++i) {
+    for (int i = 0; i < CONFIG_CHUNK_NUM_MAX; ++i) {
         uintptr_t _ptr = atomic_load_uintptr((uintptr_t *)&rb->chunk_start[idx]);
         if (_ptr == 0) {
             return idx;
         }
 
-        if (++idx == CHUNK_NUM_MAX) {
+        if (++idx == CONFIG_CHUNK_NUM_MAX) {
             idx = 0;
         }
     }
@@ -39,13 +39,13 @@ static int _get_free_chunk(chunk_ringbuf_t *rb)
 static int _get_complete_chunk(chunk_ringbuf_t *rb)
 {
     int idx = rb->chunk_cur;
-    for (int i = 0; i < CHUNK_NUM_MAX; ++i) {
+    for (int i = 0; i < CONFIG_CHUNK_NUM_MAX; ++i) {
         uintptr_t _ptr = atomic_load_uintptr((uintptr_t *)&rb->chunk_start[idx]);
         if (_ptr) {
             return idx;
         }
 
-        if (++idx == CHUNK_NUM_MAX) {
+        if (++idx == CONFIG_CHUNK_NUM_MAX) {
             idx = 0;
         }
     }
@@ -219,7 +219,7 @@ bool crb_consume_chunk(chunk_ringbuf_t *rb, void *dst, size_t len)
     }
 
     /* advance first used slot nr */
-    rb->chunk_cur = (rb->chunk_cur + 1) % CHUNK_NUM_MAX;
+    rb->chunk_cur = (rb->chunk_cur + 1) % CONFIG_CHUNK_NUM_MAX;
 
     irq_restore(state);
 

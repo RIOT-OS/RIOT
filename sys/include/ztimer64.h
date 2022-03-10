@@ -66,6 +66,7 @@
 
 #include <stdint.h>
 
+#include "irq.h"
 #include "mutex.h"
 #include "msg.h"
 #include "ztimer.h"

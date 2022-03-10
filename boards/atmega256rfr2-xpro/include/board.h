@@ -46,8 +46,8 @@ extern "C" {
  * @name    ztimer configuration values
  * @{
  */
-#define CONFIG_ZTIMER_USEC_ADJUST_SET     (128)
-#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   (128)
+#define CONFIG_ZTIMER_USEC_ADJUST_SET     (132)
+#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   (120)
 /** @} */
 
 /**
@@ -69,11 +69,6 @@ extern "C" {
 #define BTN0_PIN     GPIO_PIN(PORT_E, 4)
 #define BTN0_MODE    GPIO_IN_PU
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

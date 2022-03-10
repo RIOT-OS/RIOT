@@ -31,9 +31,9 @@ extern "C" {
 #endif
 
 /**
- * @brief   Measure ztimer overhead
+ * @brief   Measure overhead for ztimer_set()
  *
- * This function can be used to measure the overhead incurred by ztimer.
+ * This function can be used to measure the overhead incurred by ztimer_set().
  * It will configure a callback to trigger after @p base ticks, then return the
  * number of ticks that have passed, minus @p base.
  *
@@ -41,7 +41,18 @@ extern "C" {
  * @param[in]   base    base interval to use
  * @return  (time from ztimer_set() until callback) - base
  */
-int32_t ztimer_overhead(ztimer_clock_t *clock, uint32_t base);
+int32_t ztimer_overhead_set(ztimer_clock_t *clock, uint32_t base);
+
+/**
+ * @brief   Measure overhead for ztimer_sleep()
+ *
+ * This function can be used to measure the overhead incurred by ztimer_sleep().
+ *
+ * @param[in]   clock   ztimer clock to operate on
+ * @param[in]   base    base interval to use
+ * @return  (time(ztimer_sleep(base))) - base
+ */
+int32_t ztimer_overhead_sleep(ztimer_clock_t *clock, uint32_t base);
 
 #endif /* ZTIMER_OVERHEAD_H */
 /** @} */

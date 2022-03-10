@@ -51,6 +51,8 @@ STM32F446ZE microcontroller with 128Kb of RAM and 512Kb of ROM Flash.
 
 ## Flashing the device
 
+### Flashing the Board Using OpenOCD
+
 The ST Nucleo-F446ZE board includes an on-board ST-LINK V2 programmer. The
 easiest way to program the board is to use OpenOCD. Once you have installed
 OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
@@ -63,6 +65,19 @@ and debug via GDB by simply typing
 ```
 make BOARD=nucleo-f446ze debug
 ```
+
+### Flashing the Board Using ST-LINK Removable Media
+
+On-board ST-LINK programmer provides via composite USB device removable media.
+Copying the HEX file causes reprogramming of the board. This task
+could be performed manually; however, the cpy2remed (copy to removable
+media) PROGRAMMER script does this automatically. To program board in
+this manner, use the command:
+```
+make BOARD=nucleo-f446ze PROGRAMMER=cpy2remed flash
+```
+@note This PROGRAMMER requires ST-LINK firmware 2.37.26 or newer. Firmware updates
+could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
 
 ## Supported Toolchains
 

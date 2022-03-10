@@ -149,18 +149,6 @@
 extern "C" {
 #endif
 
-/**
- * @brief Initialize the board specific hardware
- */
-static inline void board_init(void) {
-#if MODULE_ILI9341
-    gpio_init(LCD_BACKLIGHT, GPIO_OUT);
-#endif
-
-    /* there is nothing special to initialize on this board */
-    board_init_common();
-}
-
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

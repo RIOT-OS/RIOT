@@ -30,6 +30,11 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+# Add 3k extra stack: The Rust examples take more of it than gcoap expects,
+# presumably because the example use the standard library's sting formatting
+# instead of one of the more optimized formatters.
+CFLAGS += -DGCOAP_STACK_SIZE='(THREAD_STACKSIZE_DEFAULT+DEBUG_EXTRA_STACKSIZE+sizeof(coap_pkt_t)+1024)'
+
 # The name of crate (as per Cargo.toml package name, but with '-' replaced with '_')
 APPLICATION_RUST_MODULE = rust_gcoap
 BASELIBS += $(APPLICATION_RUST_MODULE).module

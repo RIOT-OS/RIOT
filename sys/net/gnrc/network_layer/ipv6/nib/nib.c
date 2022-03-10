@@ -25,6 +25,7 @@
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ndp.h"
+#include "net/gnrc/netreg.h"
 #include "net/gnrc/pktqueue.h"
 #include "net/gnrc/sixlowpan/nd.h"
 #include "net/ndp.h"
@@ -1376,9 +1377,8 @@ static void _handle_rtr_timeout(_nib_dr_entry_t *router)
     if ((router->next_hop != NULL) && (router->next_hop->mode & _DRL)) {
         _nib_offl_entry_t *route = NULL;
         unsigned iface = _nib_onl_get_if(router->next_hop);
-        ipv6_addr_t addr;
+        ipv6_addr_t addr = router->next_hop->ipv6;
 
-        memcpy(&addr, &router->next_hop, sizeof(addr));
         _nib_drl_remove(router);
         /* also remove all routes to that router */
         while ((route = _nib_offl_iter(route))) {

@@ -1,35 +1,39 @@
 QEMU ?= qemu-system-arm
 QEMU_MACHINE ?= $(BOARD)
-QEMU_MONITOR_PORT ?= 45454
-QEMU_MONITOR_FLAGS ?= telnet::$(QEMU_MONITOR_PORT),server,nowait
 FLASHFILE ?= $(ELFFILE)
 
-QEMU_SERIAL_TCP_PORT ?= 5555
+ifeq (,$(EMULATOR_TMP_DIR))
+  EMULATOR_TMP_DIR := $(shell mktemp -td riot_$(APPLICATION)_$(BOARD).XXXXX)
+endif
+
+EMULATOR_SERIAL_PORT ?= $(EMULATOR_TMP_DIR)/uart
+EMULATOR_MONITOR ?= $(EMULATOR_TMP_DIR)/mon
 
 # Configure emulator variables
 EMULATOR ?= $(QEMU)
-EMULATOR_FLAGS ?= -machine $(QEMU_MACHINE) -device loader,file=$(ELFFILE) \
-                  -serial telnet::$(QEMU_SERIAL_TCP_PORT),server,nowait,nodelay \
-                  -monitor $(QEMU_MONITOR_FLAGS) \
+EMULATOR_FLAGS ?= -machine $(QEMU_MACHINE) \
+                  -device loader,file=$(ELFFILE) \
+                  -serial  unix:$(EMULATOR_SERIAL_PORT)_socket,server=on,wait=off \
+                  -monitor unix:$(EMULATOR_MONITOR)_socket,server=on,wait=off \
                   -nographic
 
 # Configure the qemu terminal access
-EMULATOR_SERIAL_PORT ?= /tmp/riot_$(APPLICATION)_$(BOARD)_uart
 PORT = $(EMULATOR_SERIAL_PORT)
 RIOT_TERMPROG := $(TERMPROG)
 RIOT_TERMFLAGS := $(TERMFLAGS)
 TERMPROG := $(RIOTTOOLS)/emulator/term.sh
-TERMFLAGS := $(RIOT_EMULATOR) $(BOARD) $(APPDIR) $(RIOT_TERMPROG) '$(RIOT_TERMFLAGS)' $(EMULATOR_SERIAL_PORT)
+TERMFLAGS := $(RIOT_EMULATOR) $(BOARD) $(APPDIR) $(RIOT_TERMPROG) '$(RIOT_TERMFLAGS)' $(EMULATOR_SERIAL_PORT) $(EMULATOR_TMP_DIR)
 
-# Configure the debugger
-GDB_PORT ?= 3333
-QEMU_DEBUG_FLAGS += -S -gdb tcp::$(GDB_PORT)
+# Configure the debugger ,wait=off
+GDB_REMOTE ?= $(EMULATOR_TMP_DIR)/gdb_socket
+
+QEMU_DEBUG_FLAGS += -S -gdb unix:$(GDB_REMOTE),server=on
 QEMU_DEBUG_FLAGS += $(EMULATOR_FLAGS)
 
 DEBUGSERVER ?= $(EMULATOR)
 DEBUGSERVER_FLAGS ?= $(QEMU_DEBUG_FLAGS)
 
-DEBUGGER_FLAGS ?= $(BOARD) $(APPDIR) $(ELFFILE) $(GDB_PORT)
+DEBUGGER_FLAGS ?= $(BOARD) $(APPDIR) $(ELFFILE) $(GDB_REMOTE) $(EMULATOR_TMP_DIR)
 DEBUGGER ?= $(RIOTTOOLS)/emulator/debug.sh
 
 # No flasher available with qemu emulator

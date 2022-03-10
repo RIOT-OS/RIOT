@@ -372,6 +372,7 @@ static NORETURN void IRAM system_init (void)
     #endif
 
     /* initialize the board */
+    extern void board_init(void);
     board_init();
 
     /* route a software interrupt source to CPU as trigger for thread yields */

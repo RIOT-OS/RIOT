@@ -84,9 +84,19 @@ Toolchain {#toolchain}
 
 To install the necessary Rust components, it is easiest use [**rustup**, installed as described on its website].
 
-Using Rust on RIOT requires a nightly version of Rust,
+Using most of Rust on RIOT requires a nightly version of Rust,
 because some transpiled expressions for RIOT make use of unstable features,
 and because the RIOT wrappers use some unstable idioms.
+
+@note
+Building on stable is supported for some examples and platforms starting with Rust 1.59
+(e.g., the rust-hello-world on any ARM Cortex, but not yet on native).
+Try it out by adding `CARGO_CHANNEL=stable` to the project's Makefile;
+where it doesn't work, rustc will complain that "`#![feature]` may not be used on the stable release channel".
+
+@note
+A stable version of Rust is not currently provided with the Docker images;
+consequently, builds on stable are not tested as regularly as builds on nightly.
 
 Make sure you have both the nightly **toolchain**
 and the core library for the CPU (**target**) of your choice available:
@@ -116,17 +126,20 @@ This encompass both components needed for riot-sys and for the later installatio
 
 Installing **C2Rust** is special because
 it can only be built using a particular nightly version
-(as explained in its [introduction post])
-and needs some patches applied:
+(as explained in its [introduction post]):
 
 ```shell
 $ rustup install nightly-2019-12-05
 $ rustup component add --toolchain nightly-2019-12-05 rustfmt rustc-dev
-$ cargo +nightly-2019-12-05 install c2rust
-$ git clone https://github.com/chrysn-pull-requests/c2rust -b for-riot
+$ git clone https://github.com/immunant/c2rust
 $ cd c2rust
+$ git reset --hard 6674d785
 $ cargo +nightly-2019-12-05 install --locked --path c2rust
 ```
+
+The `git reset` step pins C2Rust to the version at time of writing.
+It is expected that later versions of C2Rust would work just as well,
+but they may need a more recent nightly Rust.
 
 [cargo]: https://doc.rust-lang.org/cargo/
 [**rustup**, installed as described on its website]: https://rustup.rs/

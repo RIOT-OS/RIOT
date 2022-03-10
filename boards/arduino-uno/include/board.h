@@ -19,6 +19,16 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+/**
+ * @name    ztimer configuration values
+ *
+ * @note    Overrides arduino-atmega defaults
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_ADJUST_SET     (128)
+#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   (116)
+/** @} */
+
 #include "board_common.h"
 
 #ifdef __cplusplus

@@ -20,4 +20,9 @@ ifneq (,$(filter vfs_default,$(USEMODULE)))
   USEMODULE += mtd
 endif
 
+ifneq (,$(filter lvgl,$(USEPKG)))
+  USEPKG += lv_drivers
+  USEMODULE += lv_drivers_sdl
+endif
+
 USEMODULE += native_drivers

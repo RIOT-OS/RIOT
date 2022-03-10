@@ -29,6 +29,7 @@ INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/tcpip_adapter
 INCLUDES += -I$(RIOTCPU)/$(CPU)
 
 ifneq (,$(filter esp_eth,$(USEMODULE)))
+  INCLUDES += -I$(RIOTCPU)/$(CPU)/esp-eth
   INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/ethernet
 endif
 

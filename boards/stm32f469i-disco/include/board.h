@@ -70,11 +70,6 @@ extern "C"
 #define BTN0_MODE GPIO_IN
 /** @} */
 
-/**
- * @brief Initialize board specific hardware
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

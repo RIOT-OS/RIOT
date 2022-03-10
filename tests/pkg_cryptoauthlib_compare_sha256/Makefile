@@ -1,3 +1,5 @@
+BOARD ?= nucleo-f767zi
+
 include ../Makefile.tests_common
 
 # Test fails to build for these boards fails due to

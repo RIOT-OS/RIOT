@@ -523,6 +523,7 @@
 #define NET_SOCK_DTLS_H
 
 #include <assert.h>
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/types.h>

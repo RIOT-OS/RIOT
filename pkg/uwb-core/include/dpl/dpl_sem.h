@@ -22,6 +22,8 @@
 
 #include <stdint.h>
 
+#include "dpl_types.h"
+#include "dpl_error.h"
 #include "os/os_sem.h"
 
 #ifdef __cplusplus

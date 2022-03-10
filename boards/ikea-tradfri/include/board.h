@@ -104,11 +104,6 @@ extern mtd_dev_t *mtd0;
 #define MTD_0 mtd0
 /** @} */
 
-/**
- * @brief   Initialize the board (GPIO, sensors, clocks).
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

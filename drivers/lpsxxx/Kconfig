@@ -15,7 +15,7 @@ menuconfig MODULE_LPSXXX
     select MODULE_PERIPH_I2C
     help
         Device driver for the LPSXXX pressure sensor family
-        (LPS331AP/LPS25HB/LPS22HB/LPS22HH). Select a model.
+        (LPS331AP/LPS25HB/LPS22HB/LPS22HH/LPS22CH). Select a model.
 
 if MODULE_LPSXXX
 
@@ -25,9 +25,10 @@ choice
     default MODULE_LPS22HB if HAVE_LPS22HB
     default MODULE_LPS22HH if HAVE_LPS22HH
     default MODULE_LPS25HB if HAVE_LPS25HB
+    default MODULE_LPS22CH if HAVE_LPS22CH
     help
         Device driver for the LPSXXX pressure sensor family
-        (LPS331AP/LPS25HB/LPS22HB/LPS22HH). Select a model.
+        (LPS331AP/LPS25HB/LPS22HB/LPS22HH/LPS22CH). Select a model.
 
 config MODULE_LPS331AP
     bool "LPS331AP"
@@ -40,6 +41,9 @@ config MODULE_LPS22HH
 
 config MODULE_LPS25HB
     bool "LPS25HB"
+
+config MODULE_LPS22CH
+    bool "LPS22CH"
 
 endchoice
 
@@ -91,3 +95,9 @@ config HAVE_LPS25HB
     select HAVE_LPSXXX
     help
         Indicates that a LPS25HB sensor is present.
+
+config HAVE_LPS22CH
+    bool
+    select HAVE_LPSXXX
+    help
+        Indicates that a LPS22CH sensor is present.

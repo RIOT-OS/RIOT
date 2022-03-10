@@ -8,6 +8,9 @@ USEMODULE += embunit
 USEMODULE += gnrc_sock_udp
 USEMODULE += gnrc_ipv6
 
+USEMODULE += ipv4_addr
+USEMODULE += ipv6_addr
+
 # pretend to include sock_dns
 CFLAGS += -DMODULE_SOCK_DNS=1
 

@@ -14,6 +14,12 @@ config MODULE_HSC
         This driver supports the Honeywell HSC series pressure and temperature
         sensors that use an I2C interface.
 
+config HAVE_HSC
+    bool
+    select MODULE_HSC if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a HSC series pressure and temperature sensor is present.
+
 menuconfig KCONFIG_USEMODULE_HSC
     bool "Configure HSC pressure and temperature sensor driver"
     depends on USEMODULE_HSC
