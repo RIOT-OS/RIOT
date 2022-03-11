@@ -64,6 +64,7 @@ PSEUDOMODULES += evtimer_mbox
 PSEUDOMODULES += evtimer_on_ztimer
 PSEUDOMODULES += fatfs_vfs_format
 PSEUDOMODULES += fmt_%
+PSEUDOMODULES += gcoap_forward_proxy
 PSEUDOMODULES += gcoap_dtls
 PSEUDOMODULES += fido2_tests
 PSEUDOMODULES += gnrc_dhcpv6_%
