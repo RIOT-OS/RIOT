@@ -35,7 +35,7 @@ static ssize_t _forward_proxy_handler(coap_pkt_t* pdu, uint8_t *buf,
                                       size_t len, void *ctx);
 
 const coap_resource_t forward_proxy_resources[] = {
-    { "/", COAP_GET, _forward_proxy_handler, NULL },
+    { "/", COAP_IGNORE, _forward_proxy_handler, NULL },
 };
 
 gcoap_listener_t forward_proxy_listener = {

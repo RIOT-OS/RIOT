@@ -110,6 +110,8 @@ extern "C" {
 #define COAP_FETCH              (0x10)
 #define COAP_PATCH              (0x20)
 #define COAP_IPATCH             (0x40)
+#define COAP_IGNORE             (0xFF)   /**< For situations where the method
+                                              is not important */
 #define COAP_MATCH_SUBTREE      (0x8000) /**< Path is considered as a prefix
                                               when matching */
 /** @} */
