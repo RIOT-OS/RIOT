@@ -18,7 +18,6 @@ ifneq (,$(filter cpp,$(USEMODULE)))
 endif
 
 ifneq (,$(filter esp_eth,$(USEMODULE)))
-  USEMODULE += esp_idf_efuse
   USEMODULE += esp_idf_eth
   USEMODULE += esp_idf_event
   USEMODULE += esp_idf_gpio
@@ -32,7 +31,6 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   # add additional modules and packages used for any WiFi interface
   USEPKG += esp32_sdk_lib_phy
   USEPKG += esp32_sdk_lib_wifi
-  USEMODULE += esp_idf_efuse
   USEMODULE += esp_idf_event
   USEMODULE += esp_idf_heap
   USEMODULE += esp_idf_nvs_flash
@@ -85,13 +83,8 @@ ifneq (,$(filter esp_rtc_timer_32k,$(FEATURES_USED)))
   USEMODULE += esp_rtc_timer_32k
 endif
 
-ifneq (,$(filter periph_adc periph_dac,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_adc_arch
-endif
-
 ifneq (,$(filter periph_gpio,$(USEMODULE)))
   USEMODULE += esp_idf_gpio
-  USEMODULE += periph_gpio_arch
 endif
 
 ifneq (,$(filter periph_i2c,$(USEMODULE)))
@@ -109,7 +102,6 @@ endif
 
 ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
   FEATURES_REQUIRED += esp_spi_ram
-  USEMODULE += esp_idf_efuse
   USEMODULE += esp_idf_gpio
   USEMODULE += esp_idf_heap
   USEMODULE += esp_idf_spi_flash
