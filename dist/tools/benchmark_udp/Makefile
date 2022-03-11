@@ -10,7 +10,7 @@ run:
 	$(BINARY) :: 12345
 
 RIOTBASE:=../../..
-RIOT_INCLUDES=-I$(RIOTBASE)/core/include -I$(RIOTBASE)/sys/include
+RIOT_INCLUDES=-I$(RIOTBASE)/core/lib/include -I$(RIOTBASE)/sys/include
 SRCS:=$(wildcard *.c)
 $(BINARY): $(SRCS)
 	$(CC) $(CFLAGS) $(CFLAGS_EXTRA) $(RIOT_INCLUDES) -I.. $(SRCS) -o $@
