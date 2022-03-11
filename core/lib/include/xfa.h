@@ -72,6 +72,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
     _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
     _XFA_CONST(name, 0_) const volatile type name [0] = {}; \
     _XFA_CONST(name, 9_) const volatile type name ## _end [0] = {}; \
+    _XFA_ACCESSORS(type, name, const) \
     _Pragma("GCC diagnostic pop") \
     extern const unsigned __xfa_dummy
 
@@ -94,6 +95,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
     _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
     _XFA(name, 0_) type name [0] = {}; \
     _XFA(name, 9_) type name ## _end [0] = {}; \
+    _XFA_ACCESSORS(type, name) \
     _Pragma("GCC diagnostic pop") \
     extern const unsigned __xfa_dummy
 
@@ -110,7 +112,9 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  */
 #define XFA_USE_CONST(type, name) \
     extern const type name []; \
-    extern const type name ## _end []
+    extern const type name ## _end []; \
+    _XFA_ACCESSORS(type, name, const) \
+    extern const unsigned __xfa_dummy
 
 /**
  * @brief Declare an external writable cross-file array
@@ -125,7 +129,9 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  */
 #define XFA_USE(type, name) \
     extern type name []; \
-    extern type name ## _end []
+    extern type name ## _end []; \
+    _XFA_ACCESSORS(type, name) \
+    extern const unsigned __xfa_dummy
 
 /**
  * @brief Define variable in writable cross-file array
@@ -177,10 +183,37 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
 
 /**
  * @brief Calculate number of entries in cross-file array
+ *
+ * @note Deprecated. Use `<xfa_name>_len()`.
  */
 #define XFA_LEN(type, \
                 name) (((uintptr_t)name ## _end - (uintptr_t)name) / \
                        sizeof(type))
+
+/**
+ * @brief define accessor functions
+ *
+ * This is a helper macro defining `<name>_len()` and `<name>_get_copy(n)` and
+ * `<name>_get_ptr(n)` accessor functions for a given XFA.
+ *
+ * (used internally by the other XFA macros, no need to this call by users.)
+ *
+ * @internal
+ *
+ * @param[in]   type    name of the cross-file array
+ * @param[in]   name    name of the cross-file array
+ * @param[in]   ...     optional "const" qualifier
+ */
+#define _XFA_ACCESSORS(type, name, ...) \
+    static inline unsigned name ## _len(void) { \
+        return (unsigned)((uintptr_t)&name ## _end - (uintptr_t)&name) / sizeof(type); \
+    } \
+    static inline __attribute__((no_sanitize("undefined"))) type name ## _get_copy(unsigned n) { \
+        return (type)name[n]; \
+    } \
+    static inline __attribute__((no_sanitize("undefined"))) __VA_ARGS__ type * name ## _get_ptr(unsigned n) { \
+        return (__VA_ARGS__ type *) &name[n]; \
+    }
 
 #ifdef __cplusplus
 extern "C" {
