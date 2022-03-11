@@ -1,0 +1,22 @@
+# Copyright (c) 2022 Juergen Fitschen
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menuconfig PACKAGE_TINYVCDIFF
+    bool "Tiny VCDIFF"
+    depends on TEST_KCONFIG
+
+if PACKAGE_TINYVCDIFF
+
+config TINYVCDIFF_BUFFER_SIZE
+    int "Buffer size"
+    default 128
+    help
+        For VCDIFF copy and run instruction the library requires a buffer.
+        The best performance is achieved for sizes of typical page sizes of
+        the underlying MTD or VFS backend. But a size of just 1 byte would
+        work, too.
+
+endif # PACKAGE_TINYVCDIFF

@@ -1,0 +1,10 @@
+# Buffer size for vcdiff
+CONFIG_TINYVCDIFF_BUFFER_SIZE ?= 128
+CFLAGS += -DVCDIFF_BUFFER_SIZE=$(CONFIG_TINYVCDIFF_BUFFER_SIZE)
+
+# Disable debugging if DEVELHELP is turned off
+ifneq ($(DEVELHELP),1)
+  CFLAGS += -DVCDIFF_NDEBUG
+endif
+
+INCLUDES += -I$(PKGDIRBASE)/tinyvcdiff/include
