@@ -35,6 +35,13 @@ ifneq (, $(filter $(BOARD), $(ASAN_BOARDS)))
   LINKFLAGS += $(LINKFLAGS_ASAN)
 endif
 
+# for these boards, enable ubsan (Undefined Behavior Sanitizer)
+UBSAN_BOARDS ?= native
+ifneq (, $(filter $(BOARD), $(UBSAN_BOARDS)))
+  CFLAGS += $(CFLAGS_UBSAN)
+  LINKFLAGS += $(LINKFLAGS_UBSAN)
+endif
+
 include $(RIOTBASE)/Makefile.include
 
 .PHONY: $(UNIT_TESTS)
