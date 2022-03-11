@@ -33,6 +33,7 @@ extern "C" {
 #include "stdbool.h"
 #include "sdcard_spi.h"
 #include "timex.h"
+#include "board.h"
 
 /* number of clocks that should be applied to the card on init
    before taking further actions (see sd spec. 6.4.1.1 Power Up Time of Card) */
