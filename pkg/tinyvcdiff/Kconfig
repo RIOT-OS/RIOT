@@ -19,4 +19,21 @@ config TINYVCDIFF_BUFFER_SIZE
         the underlying MTD or VFS backend. But a size of just 1 byte would
         work, too.
 
+menuconfig MODULE_TINYVCDIFF_MTD
+    bool "MTD Backend"
+    depends on MODULE_MTD
+    default y
+    help
+        Use a MTD device as VCDIFF target or source.
+
+if MODULE_TINYVCDIFF_MTD
+
+config TINYVCDIFF_MTD_WRITE_SIZE
+    int "Write size"
+    default 4
+    help
+        Alignment and minimum size for MTD write access.
+
+endif # MODULE_TINYVCDIFF_MTD
+
 endif # PACKAGE_TINYVCDIFF

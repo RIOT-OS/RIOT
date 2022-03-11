@@ -8,3 +8,8 @@ ifneq ($(DEVELHELP),1)
 endif
 
 INCLUDES += -I$(PKGDIRBASE)/tinyvcdiff/include
+INCLUDES += -I$(RIOTPKG)/tinyvcdiff/include
+
+ifneq (,$(filter tinyvcdiff_mtd,$(USEMODULE)))
+  DIRS += $(RIOTPKG)/tinyvcdiff/contrib/tinyvcdiff_mtd
+endif

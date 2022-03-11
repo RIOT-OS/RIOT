@@ -1,0 +1,3 @@
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += tinyvcdiff_mtd
+endif
