@@ -481,19 +481,20 @@ void print_u64_dec(uint64_t val);
 void print_s64_dec(uint64_t val);
 
 /**
- * @brief Print int32 value with a decimal point
+ * @brief Print int32 value with a scale
  *
- * This avoids floats allowing a decimal point to be inserted in an integer.
+ * This avoids floats allowing scaling of an integer.
  *
- * For example: if @p val is -35648 and @p digit is 2, the resulting
- * string will be "-356.48".
+ * For example: if @p val is -35648 and @p scale is 2, the resulting
+ * string will be "-3564800" or @p scale is -2 then the string will be
+ * "-356.48".
  *
  * @note This uses a portion of fmt_s32_dfp()
  *
  * @param[in]   val     Value to print
- * @param[in]   digit   Decimal point place starting from the right
+ * @param[in]   scale   Scale value
  */
-void print_s32_frac_dec(int32_t val, unsigned digit);
+void print_s32_dfp(int32_t val, int scale);
 
 /**
  * @brief Print float value

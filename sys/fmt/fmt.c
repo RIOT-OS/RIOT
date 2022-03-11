@@ -47,7 +47,8 @@ static const uint32_t _tenmap[] = {
     10000000LU,
 };
 
-#define TENMAP_SIZE  ARRAY_SIZE(_tenmap)
+#define TENMAP_SIZE     ARRAY_SIZE(_tenmap)
+#define MAX_DFP_CHARS   11*2 /* Must be bigger than double digits of -s32 */
 
 static inline char _to_lower(char c)
 {
@@ -568,14 +569,72 @@ void print_s64_dec(uint64_t val)
     print(buf, len);
 }
 
-void print_s32_frac_dec(int32_t val, unsigned digit)
+void print_s32_dfp(int32_t val, int scale)
 {
-    char buf[12]; /* "-214.7483648" */
-    for (; digit >= TENMAP_SIZE; digit--) {
-        val /= 10;
+    char buf[MAX_DFP_CHARS];
+    int val_digits = 0;
+    size_t len;
+    if (val == 0) {
+        buf[0] = '0';
+        print(buf, 1);
+        return;
     }
-    size_t len = fmt_s32_dfp(buf, val, -(int)digit);
-    print(buf, len);
+
+    /* Though this probably is silly, using a plain divisor seems to be an
+     * such as val/(10*val_digits) really seem to suffer from converting to
+     * floating points or issues when approaching the maximum of an int32 */
+    int32_t shadow_val = val;
+    for (; shadow_val != 0; val_digits++) {
+        shadow_val /= 10;
+    }
+
+    int total_digits = scale + val_digits;
+    if (val < 0) {
+        total_digits++;
+    }
+    if (total_digits > MAX_DFP_CHARS) {
+        /* Too many characters means we have to print extra 0s. */
+        //test_s32_dfp -134217727 21
+        if (val < 0) {
+            len = fmt_s32_dfp(buf, val, MAX_DFP_CHARS - val_digits - 1);
+        }
+        else {
+            len = fmt_s32_dfp(buf, val, MAX_DFP_CHARS - val_digits);
+        }
+
+        print(buf, len);
+        buf[0] = '0';
+        for (; total_digits > MAX_DFP_CHARS; total_digits--) {
+            print(buf, 1);
+        }
+    }
+    else if (val_digits - scale + 2 > MAX_DFP_CHARS) {
+        /* If too many fractional decimal points we need to print them one by
+         * one. Probably can chunk it to the buffer size but optimization comes
+         * after usage. */
+        if (val < 0) {
+            buf[0] = '-';
+            print(buf, 1);
+        }
+        buf[0] = '0';
+        buf[1] = '.';
+        print(buf, 2);
+        for (;val_digits - scale + 2 > MAX_DFP_CHARS; scale++) {
+            print(buf, 1);
+        }
+        len = fmt_s32_dfp(buf, val, scale);
+        if (val < 0) {
+            print(buf + 3, len - 3);
+        }
+        else {
+            print(buf + 2, len - 2);
+        }
+
+    }
+    else {
+        len = fmt_s32_dfp(buf, val, scale);
+        print(buf, len);
+    }
 }
 
 void print_float(float f, unsigned precision)

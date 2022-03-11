@@ -137,9 +137,9 @@ void turo_u64(turo_t *ctx, uint64_t val);
  *
  * @param[in] ctx       The implementation specific turo context.
  * @param[in] val       The value to output.
- * @param[in] digit     Decimal point place starting from the right
+ * @param[in] scale     Scale value
  */
-void turo_s32_frac(turo_t *ctx, int32_t val, unsigned digit);
+void turo_s32_dfp(turo_t *ctx, int32_t val, int scale);
 
 /**
  * @brief  Outputs a formatted float result of varied precision.

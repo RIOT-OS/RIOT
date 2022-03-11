@@ -65,10 +65,10 @@ void turo_u64(turo_t *ctx, uint64_t val)
     print_u64_dec(val);
 }
 
-void turo_s32_frac(turo_t *ctx, int32_t val, unsigned digit)
+void turo_s32_dfp(turo_t *ctx, int32_t val, int scale)
 {
     _print_comma(ctx, TURO_STATE_NEED_COMMA);
-    print_s32_frac_dec(val, digit);
+    print_s32_dfp(val, scale);
 }
 
 void turo_float(turo_t *ctx, float val)
