@@ -19,6 +19,7 @@
  *          </a>
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Hendrik van Essen <hendrik.ve@fu-berlin.de>
  */
 #ifndef NETINET_IN_H
 #define NETINET_IN_H
@@ -27,6 +28,7 @@
 #include <sys/socket.h>
 
 #include "net/protnum.h"
+#include "net/ipv4/addr.h"
 #include "net/ipv6/addr.h"
 #include "sys/bytes.h"
 
@@ -38,22 +40,32 @@ extern "C" {
 #define INET6_ADDRSTRLEN    (46)    /**< Length of the string form for IPv6. */
 
 /**
- * IPv4 local host address.
+ * IPv4 none address (255.255.255.255)
  */
-#define INADDR_ANY          ((in_addr_t)0x00000000)
+#define INADDR_NONE_INIT        IPV4_ADDR_NONE
 
 /**
- * IPv4 broadcast address.
+ * IPv4 loopback address (127.0.0.1)
  */
-#define INADDR_BROADCAST    ((in_addr_t)0xffffffff)
+#define INADDR_LOOPBACK_INIT    IPV4_ADDR_LOOPBACK
 
 /**
- * IPv6 wildcard address.
+ * IPv4 any address (0.0.0.0)
+ */
+#define INADDR_ANY_INIT         IPV4_ADDR_ANY
+
+/**
+ * IPv4 broadcast address (255.255.255.255)
+ */
+#define INADDR_BROADCAST_INIT   IPV4_ADDR_BROADCAST
+
+/**
+ * IPv6 wildcard address (::)
  */
 #define IN6ADDR_ANY_INIT        IPV6_ADDR_UNSPECIFIED
 
 /**
- * IPv6 loopback address.
+ * IPv6 loopback address (::1)
  */
 #define IN6ADDR_LOOPBACK_INIT   IPV6_ADDR_LOOPBACK
 
@@ -208,10 +220,13 @@ typedef uint16_t in_port_t;         /**< Internet port type */
 typedef uint32_t in_addr_t;         /**< IPv4 address type */
 
 /**
- * IPv4 address structure type.
+ * @brief   IPv4 address structure type.
  */
 struct in_addr {
-    in_addr_t s_addr;           /**< an IPv4 address */
+    union {
+        uint8_t s_addr_u8[4];   /**< unsigned 8-bit integer array */
+        in_addr_t s_addr;       /**< an IPv4 address */
+    };
 };
 
 /**
