@@ -18,6 +18,7 @@
 
 #include "embUnit.h"
 
+#include "net/dns_mock.h"
 #include "net/gnrc/netif.h"
 #include "net/sock/util.h"
 #include "net/utils.h"
@@ -101,16 +102,11 @@ static void test_ipv6_addr_from_str__invalid_interface(void)
 
 static void test_ipv6_addr_from_str__success4(void)
 {
-    static const ipv6_addr_t a = { {
-            0x26, 0x06, 0x28, 0x00, 0x02, 0x20, 0x00, 0x01,
-            0x02, 0x48, 0x18, 0x93, 0x25, 0xc8, 0x19, 0x46
-        }
-    };
     ipv6_addr_t address;
     netif_t *netif;
 
-    TEST_ASSERT_EQUAL_INT(netutils_get_ipv6(&address, &netif, "example.com"), 0);
-    TEST_ASSERT(ipv6_addr_equal(&a, &address));
+    TEST_ASSERT_EQUAL_INT(netutils_get_ipv6(&address, &netif, SOCK_DNS_MOCK_EXAMPLE_COM_HOSTNAME), 0);
+    TEST_ASSERT(ipv6_addr_equal(&sock_dns_mock_example_com_addr_ipv6, &address));
 }
 
 static void test_ipv6_addr_from_str__success5(void)
@@ -164,11 +160,10 @@ static void test_ipv4_addr_from_str__success(void)
 
 static void test_ipv4_addr_from_str__success2(void)
 {
-    static const ipv4_addr_t a = { { 0x5d, 0xb8, 0xd8, 0x22 } };
     ipv4_addr_t address;
 
-    TEST_ASSERT_EQUAL_INT(netutils_get_ipv4(&address, "example.com"), 0);
-    TEST_ASSERT(ipv4_addr_equal(&a, &address));
+    TEST_ASSERT_EQUAL_INT(netutils_get_ipv4(&address, SOCK_DNS_MOCK_EXAMPLE_COM_HOSTNAME), 0);
+    TEST_ASSERT(ipv4_addr_equal(&sock_dns_mock_example_com_addr_ipv4, &address));
 }
 
 Test *tests_netutils_ipv4_tests(void)

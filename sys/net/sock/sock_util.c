@@ -28,7 +28,8 @@
 
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
-#ifdef MODULE_SOCK_DNS
+
+#if defined(MODULE_SOCK_DNS) || defined(MODULE_SOCK_DNS_MOCK)
 #include "net/sock/dns.h"
 #endif
 
@@ -264,7 +265,7 @@ int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str)
         return 0;
     }
 
-#if defined(MODULE_SOCK_DNS)
+#if defined(MODULE_SOCK_DNS) || defined(MODULE_SOCK_DNS_MOCK)
     int family;
     char hostbuf[CONFIG_SOCK_HOSTPORT_MAXLEN];
     const char *host;
