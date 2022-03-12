@@ -54,7 +54,7 @@ extern "C" {
 /**
  * @brief   Length of the CPU_ID in octets
  */
-#define CPUID_LEN           (7U)
+#define CPUID_LEN               (6U)
 
 /**
  * @name   GPIO configuration
