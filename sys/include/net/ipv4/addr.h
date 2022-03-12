@@ -13,9 +13,10 @@
  * @{
  *
  * @file
- * @brief   IPv6 address type and helper functions definitions
+ * @brief   IPv4 address type and helper functions definitions
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Hendrik van Essen <hendrik.ve@fu-berlin.de>
  */
 #ifndef NET_IPV4_ADDR_H
 #define NET_IPV4_ADDR_H
@@ -42,6 +43,53 @@ typedef union {
     uint8_t u8[4];          /**< as 4 8-bit unsigned integer */
     network_uint32_t u32;   /**< as 32-bit unsigned integer */
 } ipv4_addr_t;
+
+/**
+ * @brief   Static initializer for the none IPv4 address (255.255.255.255)
+ */
+#define IPV4_ADDR_NONE      {{ 0xff, 0xff, 0xff, 0xff }}
+
+/**
+ * @brief   Static initializer for the loopback IPv4 address (127.0.0.1)
+ */
+#define IPV4_ADDR_LOOPBACK  {{ 0x7f, 0x00, 0x00, 0x01 }}
+
+/**
+ * @brief   Static initializer for the any IPv4 address (0.0.0.0)
+ */
+#define IPV4_ADDR_ANY       {{ 0x00, 0x00, 0x00, 0x00 }}
+
+/**
+ * @brief   Static initializer for the broadcast IPv4 address (255.255.255.255)
+ */
+#define IPV4_ADDR_BROADCAST {{ 0xff, 0xff, 0xff, 0xff }}
+
+/**
+ * @brief In-memory constants of defined addresses
+ * @{
+ */
+/**
+ * @see @ref IPV4_ADDR_NONE
+ */
+extern const ipv4_addr_t ipv4_addr_none;
+
+/**
+ * @see @ref IPV4_ADDR_LOOPBACK
+ */
+extern const ipv4_addr_t ipv4_addr_loopback;
+
+/**
+ * @see @ref IPV4_ADDR_ANY
+ */
+extern const ipv4_addr_t ipv4_addr_any;
+
+/**
+ * @see @ref IPV4_ADDR_BROADCAST
+ */
+extern const ipv4_addr_t ipv4_addr_broadcast;
+/**
+ * @}
+ */
 
 /**
  * @brief   Checks if two IPv4 addresses are equal.
