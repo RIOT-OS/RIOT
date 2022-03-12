@@ -107,6 +107,11 @@ static sock_tcp_t _tcp_sock_pool[SOCKET_POOL_SIZE][SOCKET_TCP_QUEUE_SIZE];
 BITFIELD(_sock_pool_used, SOCKET_POOL_SIZE);
 static mutex_t _socket_pool_mutex = MUTEX_INIT;
 
+const struct in_addr inaddr_none = { INADDR_NONE_INIT };
+const struct in_addr inaddr_loopback = { INADDR_LOOPBACK_INIT };
+const struct in_addr inaddr_any = { INADDR_ANY_INIT };
+const struct in_addr inaddr_broadcast = { INADDR_BROADCAST_INIT };
+
 const struct in6_addr in6addr_any = IN6ADDR_ANY_INIT;
 const struct in6_addr in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
 
