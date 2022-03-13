@@ -101,6 +101,13 @@ ipv4_addr_t *ipv4_addr_from_str(ipv4_addr_t *result, const char *addr);
 ipv4_addr_t *ipv4_addr_from_buf(ipv4_addr_t *result, const char *addr,
                                 size_t addr_len);
 
+/**
+ * @brief Print IPv4 address to stdout
+ *
+ * @param[in]   addr  Pointer to ipv6_addr_t to print
+ */
+void ipv4_addr_print(const ipv4_addr_t *addr);
+
 #ifdef __cplusplus
 }
 #endif
