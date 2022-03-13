@@ -36,4 +36,11 @@ config TINYVCDIFF_MTD_WRITE_SIZE
 
 endif # MODULE_TINYVCDIFF_MTD
 
+config MODULE_TINYVCDIFF_VFS
+    bool "VFS Backend"
+    depends on MODULE_VFS
+    default y
+    help
+        Use a VFS file as VCDIFF target or source.
+
 endif # PACKAGE_TINYVCDIFF
