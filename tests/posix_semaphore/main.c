@@ -30,7 +30,7 @@
 #include "msg.h"
 #include "timex.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer64.h"
 
 #define SEMAPHORE_MSG_QUEUE_SIZE        (8)
 #define SEMAPHORE_TEST_THREADS          (5)
@@ -263,12 +263,12 @@ void test4(void)
 
     puts("first: wait 1 sec for s1");
 
-    start = xtimer_now_usec64();
+    start = ztimer64_now(ZTIMER64_USEC);
     abs.tv_sec = (time_t)((start / US_PER_SEC) + 1);
     abs.tv_nsec = (long)((start % US_PER_SEC) * 1000);
 
     int ret = sem_timedwait(&s1, &abs);
-    elapsed = xtimer_now_usec64() - start;
+    elapsed = ztimer64_now(ZTIMER64_USEC) - start;
 
     if (ret != 0) {
         if (errno != ETIMEDOUT) {

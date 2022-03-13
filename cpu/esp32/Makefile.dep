@@ -13,6 +13,10 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   DEFAULT_MODULE += newlib_nano
 endif
 
+ifneq (,$(filter libstdcpp,$(USEMODULE)))
+  USEMODULE += pthread
+endif
+
 ifneq (,$(filter esp_eth,$(USEMODULE)))
   USEMODULE += esp_freertos
   USEMODULE += esp_idf_eth
@@ -40,6 +44,7 @@ endif
 
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
   # add additional modules required by esp_idf_nvs_flash
+  USEMODULE += pthread
   USEMODULE += mtd
 endif
 

@@ -119,3 +119,6 @@ crate
 
 # VAs (volt ampere second) => was
 vas
+
+# Sur (macOS version alias) => Sure, sir
+sur

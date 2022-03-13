@@ -90,17 +90,104 @@ static inline bool bf_isset(uint8_t field[], size_t idx)
 }
 
 /**
+ * @brief  Perform a bitwise OR operation on two bitfields
+ *         `out = a | b`
+ *
+ * @pre   The size of @p a, @p b and @p out must be at least @p len bits
+ *
+ * @note  This operation will also affect unused bits of the bytes that make up
+ *        the bitfield.
+ *
+ * @param[out]    out   The resulting bitfield
+ * @param[in]     a     The first bitfield
+ * @param[in]     b     The second bitfield
+ * @param[in]     len   The number of bits in the bitfields
+ */
+static inline void bf_or(uint8_t out[], const uint8_t a[], const uint8_t b[], size_t len)
+{
+    len = (len + 7) / 8;
+    while (len--) {
+        out[len] = a[len] | b[len];
+    }
+}
+
+/**
+ * @brief  Perform a bitwise AND operation on two bitfields
+ *         `out = a & b`
+ *
+ * @pre   The size of @p a, @p b and @p out must be at least @p len bits
+ *
+ * @note  This operation will also affect unused bits of the bytes that make up
+ *        the bitfield.
+ *
+ * @param[out]    out   The resulting bitfield
+ * @param[in]     a     The first bitfield
+ * @param[in]     b     The second bitfield
+ * @param[in]     len   The number of bits in the bitfields
+ */
+static inline void bf_and(uint8_t out[], const uint8_t a[], const uint8_t b[], size_t len)
+{
+    len = (len + 7) / 8;
+    while (len--) {
+        out[len] = a[len] & b[len];
+    }
+}
+
+/**
+ * @brief  Perform a bitwise XOR operation on two bitfields
+ *         `out = a ^ b`
+ *
+ * @pre   The size of @p a, @p b and @p out must be at least @p len bits
+ *
+ * @note  This operation will also affect unused bits of the bytes that make up
+ *        the bitfield.
+ *
+ * @param[out]    out   The resulting bitfield
+ * @param[in]     a     The first bitfield
+ * @param[in]     b     The second bitfield
+ * @param[in]     len   The number of bits in the bitfields
+ */
+static inline void bf_xor(uint8_t out[], const uint8_t a[], const uint8_t b[], size_t len)
+{
+    len = (len + 7) / 8;
+    while (len--) {
+        out[len] = a[len] ^ b[len];
+    }
+}
+
+/**
+ * @brief  Perform a bitwise NOT operation on a bitfield
+ *         `out = ~a`
+ *
+ * @pre   The size of @p a and @p out must be at least @p len bits
+ *
+ * @note  This operation will also affect unused bits of the bytes that make up
+ *        the bitfield.
+ *
+ * @param[out]    out   The resulting bitfield
+ * @param[in]     a     The bitfield to invert
+ * @param[in]     len   The number of bits in the bitfield
+ */
+static inline void bf_inv(uint8_t out[], const uint8_t a[], size_t len)
+{
+    len = (len + 7) / 8;
+    while (len--) {
+        out[len] = ~a[len];
+    }
+}
+
+/**
  * @brief  Atomically get the number of an unset bit and set it
  *
  * This function can be used to record e.g., empty entries in an array.
  *
  * @param[in,out] field The bitfield
- * @param[in]     size  The size of the bitfield
+ * @param[in]     len   The number of bits in the bitfield to consider
  *
  * @return      number of bit that was set
  * @return      -1 if no bit was unset
  */
-int bf_get_unset(uint8_t field[], int size);
+int bf_get_unset(uint8_t field[], size_t len);
 
 #ifdef __cplusplus
 }

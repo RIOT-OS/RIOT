@@ -24,6 +24,15 @@ ifneq (,$(filter auto_init_gnrc_netif,$(USEMODULE)))
   USEMODULE += gnrc_netif_init_devs
 endif
 
+ifneq (,$(filter auto_init_sock_dns,$(USEMODULE)))
+  ifneq (,$(filter ipv4,$(USEMODULE)))
+    USEMODULE += ipv4_addr
+  endif
+  ifneq (,$(filter ipv6,$(USEMODULE)))
+    USEMODULE += ipv6_addr
+  endif
+endif
+
 ifneq (,$(filter congure_%,$(USEMODULE)))
   USEMODULE += congure
 endif
@@ -246,7 +255,7 @@ ifneq (,$(filter posix_select,$(USEMODULE)))
   endif
   USEMODULE += core_thread_flags
   USEMODULE += posix_headers
-  USEMODULE += xtimer
+  USEMODULE += ztimer64_usec
 endif
 
 ifneq (,$(filter picolibc,$(USEMODULE)))
@@ -316,12 +325,8 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
 endif
 
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
-  USEMODULE += sema
-  USEMODULE += xtimer
-  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-    # requires sema_timed that requires 64bit
-    USEMODULE += ztimer64_xtimer_compat
-  endif
+  USEMODULE += sema_deprecated
+  USEMODULE += ztimer64_usec
   USEMODULE += posix_headers
 endif
 
@@ -337,6 +342,16 @@ endif
 
 ifneq (,$(filter sema_inv,$(USEMODULE)))
   USEMODULE += atomic_utils
+endif
+
+ifneq (,$(filter sema,$(USEMODULE)))
+  USEMODULE += ztimer
+endif
+
+ifneq (,$(filter sema_deprecated,$(USEMODULE)))
+  USEMODULE += sema
+  USEMODULE += ztimer64
+  USEMODULE += ztimer64_usec
 endif
 
 ifneq (,$(filter telnet,$(USEMODULE)))
@@ -384,7 +399,7 @@ ifneq (,$(filter netstats_neighbor_%, $(USEMODULE)))
 endif
 
 ifneq (,$(filter pthread,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer64_usec
   USEMODULE += timex
   ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
     # requires 64bit ftimestamps
@@ -587,6 +602,11 @@ endif
 
 ifneq (,$(filter l2filter_%,$(USEMODULE)))
   USEMODULE += l2filter
+endif
+
+ifneq (,$(filter gcoap_forward_proxy,$(USEMODULE)))
+  USEMODULE += gcoap
+  USEMODULE += uri_parser
 endif
 
 ifneq (,$(filter gcoap_dtls,$(USEMODULE)))
@@ -874,6 +894,7 @@ ifneq (,$(filter fido2_ctap_%,$(USEMODULE)))
   USEMODULE += fido2_ctap_transport
   USEMODULE += fido2_ctap
   ifneq (,$(filter fido2_ctap_transport_hid,$(USEMODULE)))
+      USEMODULE += ztimer64_msec
       USEMODULE += usbus_hid
       DISABLE_MODULE += auto_init_usbus
   endif
@@ -891,7 +912,7 @@ ifneq (,$(filter fido2_ctap,$(USEMODULE)))
   USEMODULE += mtd_write_page
   USEMODULE += ztimer_msec
   USEMODULE += event
-  USEMODULE += event_timeout
+  USEMODULE += event_timeout_ztimer
   USEMODULE += cipher_modes
   USEMODULE += crypto_aes_256
   USEMODULE += hashes

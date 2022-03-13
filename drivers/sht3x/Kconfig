@@ -11,7 +11,7 @@ config MODULE_SHT3X
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
     select MODULE_CHECKSUM
-    select MODULE_XTIMER
+    select MODULE_ZTIMER_MSEC
 
 config HAVE_SHT3X
     bool

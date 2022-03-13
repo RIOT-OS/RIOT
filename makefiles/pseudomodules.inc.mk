@@ -64,6 +64,7 @@ PSEUDOMODULES += evtimer_mbox
 PSEUDOMODULES += evtimer_on_ztimer
 PSEUDOMODULES += fatfs_vfs_format
 PSEUDOMODULES += fmt_%
+PSEUDOMODULES += gcoap_forward_proxy
 PSEUDOMODULES += gcoap_dtls
 PSEUDOMODULES += fido2_tests
 PSEUDOMODULES += gnrc_dhcpv6_%
@@ -186,6 +187,7 @@ PSEUDOMODULES += saul_pwm
 PSEUDOMODULES += scanf_float
 PSEUDOMODULES += sched_cb
 PSEUDOMODULES += sched_runq_callback
+PSEUDOMODULES += sema_deprecated
 PSEUDOMODULES += semtech_loramac_rx
 PSEUDOMODULES += senml_cbor
 PSEUDOMODULES += senml_phydat
@@ -273,6 +275,9 @@ PSEUDOMODULES += ztimer64_%
 ## Alternatively CONFIG_ZTIMER_USEC_ADJUST_% values can be set in the BOARDs
 ## configuration header board.h. These can be found out by running tests/ztimer_overhead
 PSEUDOMODULES += ztimer_auto_adjust
+
+# core_lib is not a submodule
+NO_PSEUDOMODULES += core_lib
 
 # ztimer's main module is called "ztimer_core"
 NO_PSEUDOMODULES += ztimer_core

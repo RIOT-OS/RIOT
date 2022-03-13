@@ -62,10 +62,9 @@ extern "C" {
  * @brief CTAP_HID transaction timeout in microseconds
  */
 #ifdef CONFIG_FIDO2_CTAP_TRANSPORT_HID_TRANSACTION_TIMEOUT
-#define CTAP_HID_TRANSACTION_TIMEOUT (CONFIG_FIDO2_CTAP_TRANSPORT_HID_TRANSACTION_TIMEOUT * \
-                                      US_PER_MS)
+#define CTAP_HID_TRANSACTION_TIMEOUT_MS (CONFIG_FIDO2_CTAP_TRANSPORT_HID_TRANSACTION_TIMEOUT)
 #else
-#define CTAP_HID_TRANSACTION_TIMEOUT (500 * US_PER_MS)
+#define CTAP_HID_TRANSACTION_TIMEOUT_MS (500)
 #endif
 
 /**
@@ -237,7 +236,7 @@ void fido2_ctap_transport_hid_handle_packet(void *pkt_raw);
  *
  * CTAP specification (version 20190130) section 5.6
  *
- * @ref CTAP_HID_TRANSACTION_TIMEOUT
+ * @ref CTAP_HID_TRANSACTION_TIMEOUT_MS
  */
 void fido2_ctap_transport_hid_check_timeouts(void);
 

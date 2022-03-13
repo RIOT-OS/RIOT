@@ -1,7 +1,6 @@
 include ../Makefile.tests_common
 
 USEMODULE += sema
-USEMODULE += xtimer
-USEMODULE += ztimer_usec
+USEMODULE += sema_deprecated
 
 include $(RIOTBASE)/Makefile.include

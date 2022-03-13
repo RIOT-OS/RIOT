@@ -1,5 +1,6 @@
 NATIVEINCLUDES += -DNATIVE_INCLUDES
 NATIVEINCLUDES += -I$(RIOTBOARD)/native/include/
+NATIVEINCLUDES += -I$(RIOTBASE)/core/lib/include/
 NATIVEINCLUDES += -I$(RIOTBASE)/core/include/
 NATIVEINCLUDES += -I$(RIOTBASE)/drivers/include/
 

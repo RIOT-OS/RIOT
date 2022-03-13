@@ -1,5 +1,14 @@
 # include variants of mrf24j40 drivers as pseudo modules
 PSEUDOMODULES += mrf24j40m%
 
+ifneq (,$(filter mrf24j40m%,$(USEMODULE)))
+  ifndef CONFIG_KCONFIG_MODULE_MRF24J40
+    # all modules but mrf24j40ma have an external PA
+    ifeq (,$(filter mrf24j40ma,$(USEMODULE)))
+      CFLAGS += -DCONFIG_MRF24J40_USE_EXT_PA_LNA
+    endif
+  endif
+endif
+
 USEMODULE_INCLUDES_mrf24j40 := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_mrf24j40)

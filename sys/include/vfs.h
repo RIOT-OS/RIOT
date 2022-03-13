@@ -107,13 +107,27 @@ extern "C" {
 #endif
 
 #if FF_USE_FASTSEEK
-#define _FATFS_FILE_SEEK_PTR             (4)
+#define _FATFS_FILE_SEEK_PTR            (4)
 #else
-#define _FATFS_FILE_SEEK_PTR             (0)
+#define _FATFS_FILE_SEEK_PTR            (0)
 #endif
 
-#define FATFS_VFS_DIR_BUFFER_SIZE       (44)
-#define FATFS_VFS_FILE_BUFFER_SIZE      (72 + _FATFS_FILE_CACHE + _FATFS_FILE_SEEK_PTR)
+#if FF_FS_EXFAT
+#define _FATFS_FILE_EXFAT               (44)
+#define _FATFS_DIR_EXFAT                (32)
+#else
+#define _FATFS_FILE_EXFAT               (0)
+#define _FATFS_DIR_EXFAT                (0)
+#endif
+
+#if FF_USE_LFN
+#define _FATFS_DIR_LFN                  (4)
+#else
+#define _FATFS_DIR_LFN                  (0)
+#endif
+
+#define FATFS_VFS_DIR_BUFFER_SIZE       (44 + _FATFS_DIR_LFN + _FATFS_DIR_EXFAT)
+#define FATFS_VFS_FILE_BUFFER_SIZE      (72 + _FATFS_FILE_CACHE + _FATFS_FILE_SEEK_PTR + _FATFS_FILE_EXFAT)
 #else
 #define FATFS_VFS_DIR_BUFFER_SIZE       (1)
 #define FATFS_VFS_FILE_BUFFER_SIZE      (1)

@@ -89,10 +89,10 @@ enum {
  * @name Logging convenience defines
  * @{
  */
-#define LOG_ERROR(...) LOG(LOG_ERROR, __VA_ARGS__)
-#define LOG_WARNING(...) LOG(LOG_WARNING, __VA_ARGS__)
-#define LOG_INFO(...) LOG(LOG_INFO, __VA_ARGS__)
-#define LOG_DEBUG(...) LOG(LOG_DEBUG, __VA_ARGS__)
+#define LOG_ERROR(...) LOG(LOG_ERROR, __VA_ARGS__)      /**< log an error */
+#define LOG_WARNING(...) LOG(LOG_WARNING, __VA_ARGS__)  /**< log a warning */
+#define LOG_INFO(...) LOG(LOG_INFO, __VA_ARGS__)        /**< for the curious */
+#define LOG_DEBUG(...) LOG(LOG_DEBUG, __VA_ARGS__)      /**< teach some ignorance */
 /** @} */
 
 #ifdef MODULE_LOG

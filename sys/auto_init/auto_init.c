@@ -330,4 +330,10 @@ void auto_init(void)
         extern void benchmark_udp_auto_init(void);
         benchmark_udp_auto_init();
     }
+
+    if (IS_USED(MODULE_AUTO_INIT_SOCK_DNS)) {
+        LOG_DEBUG("Auto init sock_dns.\n");
+        extern void auto_init_sock_dns(void);
+        auto_init_sock_dns();
+    }
 }
