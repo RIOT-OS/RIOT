@@ -36,6 +36,7 @@ extern "C" {
  */
 static const spi_conf_t spi_config[] = {
     {
+        // LPM013M126 LCD
         .dev  = NRF_SPIM2,
         .sclk = GPIO_PIN(0, 26),
         .mosi = GPIO_PIN(0, 27),
@@ -43,6 +44,7 @@ static const spi_conf_t spi_config[] = {
         //.ppi = 0,
     },
     {
+        // SPI flash
         .dev  = NRF_SPIM3,
         .sclk = GPIO_PIN(0, 16),
         .mosi = GPIO_PIN(0, 15),
@@ -60,6 +62,7 @@ static const spi_conf_t spi_config[] = {
  */
 static const i2c_conf_t i2c_config[] = {
     {
+        // CST816S touschscreen
         .dev = NRF_TWIM0,
         .scl = GPIO_PIN(1, 2),
         .sda = GPIO_PIN(1, 1),
@@ -85,6 +88,7 @@ static const i2c_conf_t i2c_config[] = {
  */
 static const uart_conf_t uart_config[] = {
     {
+        // GNSS
         .dev        = NRF_UARTE0,
         .rx_pin     = GPIO_PIN(0, 30),
         .tx_pin     = GPIO_PIN(0, 31),
@@ -114,7 +118,9 @@ static const pwm_conf_t pwm_config[] = {
     // LCD backlight
     { NRF_PWM0, { GPIO_PIN(0, 8), GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF } },
     // LCD EXTCOM
-    { NRF_PWM1, { GPIO_PIN(0, 6), GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF } }
+    { NRF_PWM1, { GPIO_PIN(0, 6), GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF } },
+    // vibration motor
+    { NRF_PWM2, { GPIO_PIN(0, 19), GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF } }
 };
 #define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 
