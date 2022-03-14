@@ -1,0 +1,29 @@
+# Copyright (c) 2022 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "nrf52840-ci-eth" if BOARD_NRF52840DK_CI_ETH
+
+config BOARD_NRF52840DK_CI_ETH
+    bool
+    default y
+    select BOARDS_COMMON_NRF52XXXDK
+    select CPU_MODEL_NRF52840XXAA
+    select HAS_PERIPH_PWM
+    select HAS_PERIPH_USBDEV
+    select HAS_VDD_LC_FILTER_REG0
+    select HAVE_MTD_SPI_NOR
+
+    # bring ethernet drivers
+    select HAVE_W5100
+    select HAVE_ETHOS
+    select HAVE_DOSE
+    select HAVE_ENCX24J600
+    select HAVE_ENC28J60
+
+    select MODULE_BOARDS_COMMON_NRF52XXXDK if TEST_KCONFIG
+
+source "$(RIOTBOARD)/common/nrf52xxxdk/Kconfig"
