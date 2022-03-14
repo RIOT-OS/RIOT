@@ -37,7 +37,13 @@ static const sx127x_params_t sx127x_params[] =
         .dio0_pin  = GPIO_PIN(0,  12),
         .dio1_pin  = GPIO_PIN(0,  14), // not routed in the board
         .dio2_pin  = GPIO_PIN(1,  8), // not routed in the board
-        .dio3_pin  = GPIO_PIN(1, 9) // not routed in the board
+        .dio3_pin  = GPIO_PIN(1, 9), // not routed in the board
+#if defined(SX127X_USE_TX_SWITCH) || defined(SX127X_USE_RX_SWITCH)
+        /* use a gpio to control the antenna tx switch
+         * (the value is inverted in the board, so we
+         *  call the **receive pin** to achieve the intended functionality) */
+        .rx_switch_pin  = GPIO_PIN(0, 2)
+#endif
     }
 };
 
