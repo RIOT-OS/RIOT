@@ -48,6 +48,14 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
+/* Config for which pins are used for uart */
+#ifndef PULGA_UART0_RX
+#define PULGA_UART0_RX GPIO_PIN(0,25)
+#endif
+#ifndef PULGA_UART0_TX
+#define PULGA_UART0_TX GPIO_PIN(0,28)
+#endif
+
 /**
  * @name    UART configuration
  * @{
@@ -55,12 +63,8 @@ static const spi_conf_t spi_config[] = {
 static const uart_conf_t uart_config[] = {
     { /* Mapped to USB virtual COM port */
         .dev        = NRF_UARTE0,
-	// default pins
-        .rx_pin     = GPIO_PIN(0,25), // TODO: how to configure this from application?
-        .tx_pin     = GPIO_PIN(0,28), // TODO: how to configure this from application?
-        // CMSS Pulga Battery pins
-        //.rx_pin     = GPIO_PIN(0,25),
-        //.tx_pin     = GPIO_PIN(0,31),
+        .rx_pin     = PULGA_UART0_RX,
+        .tx_pin     = PULGA_UART0_TX,
 #ifdef MODULE_PERIPH_UART_HW_FC
         .rts_pin    = GPIO_UNDEF,
         .cts_pin    = GPIO_UNDEF,
