@@ -120,8 +120,6 @@ void kw2xrf_read_iregs(kw2xrf_t *dev, uint8_t addr, uint8_t *buf, uint8_t length
  * @param[in] dev device descriptor
  * @param[in] data A buffer with the value to write to the fifo.
  * @param[in] data_length The count of bytes which should be written.
- *
- * @return number of bytes written.
  */
 void kw2xrf_write_fifo(kw2xrf_t *dev, uint8_t *data, uint8_t data_length);
 
@@ -131,8 +129,6 @@ void kw2xrf_write_fifo(kw2xrf_t *dev, uint8_t *data, uint8_t data_length);
  * @param[in] dev device descriptor
  * @param[out] data A buffer to store the value of the fifo.
  * @param[in] data_length The count of bytes which should be read.
- *
- * @return number of bytes read.
  */
 void kw2xrf_read_fifo(kw2xrf_t *dev, uint8_t *data, uint8_t data_length);
 
