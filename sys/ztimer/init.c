@@ -91,7 +91,7 @@
 
 /* ZTIMER_USEC always uses the basic timer
  * basic timer is available on all boards */
-#if MODULE_ZTIMER_USEC
+#if IS_USED(MODULE_ZTIMER_USEC) || IS_USED(MODULE_XTIMER_ON_ZTIMER)
 #  ifndef INIT_ZTIMER_TIMER
 #    define INIT_ZTIMER_TIMER 1
 #  endif
@@ -161,8 +161,7 @@ static ztimer_periph_rtc_t ZTIMER_RTC;
 #endif
 
 /* Step 3: setup constants for ztimers and memory for converters */
-
-#if MODULE_ZTIMER_USEC
+#if IS_USED(MODULE_ZTIMER_USEC) || IS_USED(MODULE_XTIMER_ON_ZTIMER)
 #  ifdef ZTIMER_TIMER
 ztimer_clock_t *const ZTIMER_USEC_BASE = &ZTIMER_TIMER_CLK;
 #  else
@@ -213,7 +212,7 @@ ztimer_clock_t *const ZTIMER_SEC = &_ztimer_convert_frac_sec.super.super;
 #  endif
 #endif
 
-#if IS_USED(MODULE_ZTIMER_USEC)
+#if IS_USED(MODULE_ZTIMER_USEC) || IS_USED(MODULE_XTIMER_ON_ZTIMER)
 #ifndef CONFIG_ZTIMER_AUTO_ADJUST_BASE_ITVL
 #define CONFIG_ZTIMER_AUTO_ADJUST_BASE_ITVL     1000
 #endif
@@ -274,7 +273,7 @@ void ztimer_init(void)
 #endif
 
 /* Step 5: initialize ztimers requested */
-#if MODULE_ZTIMER_USEC
+#if IS_USED(MODULE_ZTIMER_USEC) || IS_USED(MODULE_XTIMER_ON_ZTIMER)
 #  if ZTIMER_TIMER_FREQ != FREQ_1MHZ
 #    if ZTIMER_TIMER_FREQ == FREQ_250KHZ
     LOG_DEBUG("ztimer_init(): ZTIMER_USEC convert_shift %lu to 1000000\n",
