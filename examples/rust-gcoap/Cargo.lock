@@ -199,14 +199,15 @@ dependencies = [
 
 [[package]]
 name = "coap-handler-implementations"
-version = "0.3.2"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca1e5d3168a34c9fa795cf06e43864234d9ff07e8a3374227ae3b23fa1daf386"
+checksum = "3c38a836121cc920c50ec1f115a967108b7f6cc7c4de3a13cff7d7efee06f476"
 dependencies = [
  "coap-handler",
  "coap-message",
  "coap-numbers",
  "crc",
+ "minicbor",
  "serde",
  "serde_cbor",
  "windowed-infinity",
@@ -399,9 +400,9 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
 name = "libc"
-version = "0.2.119"
+version = "0.2.120"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1bf2e165bb3457c8e098ea76f3e3bc9db55f87aa90d52d0e6be741470916aaa4"
+checksum = "ad5c14e80759d0939d013e6ca49930e59fc53dd8e5009132f76240c179380c09"
 
 [[package]]
 name = "libloading"
@@ -436,6 +437,26 @@ name = "memchr"
 version = "2.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "308cc39be01b73d0d18f82a0e7b2a3df85245f84af96fdddc5d202d27e47b86a"
+
+[[package]]
+name = "minicbor"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b419e66bd98ccf5824dd4b8f4141f7431d1d07733c3e13c946278204a437d2b"
+dependencies = [
+ "minicbor-derive",
+]
+
+[[package]]
+name = "minicbor-derive"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "03c32aff53852dc6dd3817559d603734e4f7a65411702953238aafdcb3a7fd47"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "minimal-lexical"
@@ -516,9 +537,9 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.5.4"
+version = "1.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d07a8629359eb56f1e2fb1652bb04212c072a87ba68546a04065d525673ac461"
+checksum = "1a11647b6b25ff05a515cb92c365cec08801e83423a235b51e231e1808747286"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -534,7 +555,7 @@ checksum = "f497285884f3fcff424ffc933e56d7cbca511def0c9831a7f9b5f6153e3cc89b"
 [[package]]
 name = "riot-coap-handler-demos"
 version = "0.1.0"
-source = "git+https://gitlab.com/etonomy/riot-module-examples/#2fc38cbc4a14529cad9162f4dc3ed0f56c01448c"
+source = "git+https://gitlab.com/etonomy/riot-module-examples/#a8b30094beb6e76a6b66c5e785a6cf5bd4a8860d"
 dependencies = [
  "coap-handler",
  "coap-handler-implementations",
@@ -543,6 +564,7 @@ dependencies = [
  "embedded-graphics",
  "embedded-hal",
  "heapless",
+ "minicbor",
  "riot-sys",
  "riot-wrappers",
  "serde",
@@ -552,9 +574,9 @@ dependencies = [
 
 [[package]]
 name = "riot-sys"
-version = "0.7.4"
+version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b2041eeef3e226f836d27cace1e6131f88a53b53df0ae62eb1cae060d9eb2a6e"
+checksum = "9de5c15320408ef57f6bc1e3a1d391d0280e0f6e3c0dada2033f063faf45e9ca"
 dependencies = [
  "bindgen",
  "c2rust-asm-casts",
@@ -568,9 +590,9 @@ dependencies = [
 
 [[package]]
 name = "riot-wrappers"
-version = "0.7.19"
+version = "0.7.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1fc2844134d2599d7a010382c659aa0713d9ddc845a3791bf48e2801e9f4c59f"
+checksum = "950c81c82bf80d4889c175ae453cf4dbecdd506ff88725339eeda034de1c1d3b"
 dependencies = [
  "bare-metal 1.0.0",
  "coap-handler",
@@ -747,9 +769,9 @@ checksum = "8ea5119cdb4c55b55d432abb513a0429384878c15dde60cc77b1c99de1a95a6a"
 
 [[package]]
 name = "syn"
-version = "1.0.86"
+version = "1.0.87"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a65b3f4ffa0092e9887669db0eae07941f023991ab58ea44da8fe8e2d511c6b"
+checksum = "1e59d925cf59d8151f25a3bedf97c9c157597c9df7324d32d68991cc399ed08b"
 dependencies = [
  "proc-macro2",
  "quote",
