@@ -8,15 +8,18 @@
 menu "ztimer64 - High level timer abstraction layer"
 
 config MODULE_ZTIMER64_USEC
-    bool
+    bool "Microseconds 64bit Timer"
+    select MODULE_ZTIMER64
     depends on MODULE_ZTIMER_USEC
 
 config MODULE_ZTIMER64_MSEC
     bool "Milliseconds 64bit Timer"
+    select MODULE_ZTIMER64
     depends on MODULE_ZTIMER_MSEC
 
 config MODULE_ZTIMER64_SEC
     bool "Milliseconds 64bit Timer"
+    select MODULE_ZTIMER64
     depends on MODULE_ZTIMER_SEC
 
 config MODULE_ZTIMER64_INIT
