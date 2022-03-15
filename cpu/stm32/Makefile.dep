@@ -4,7 +4,8 @@
 USEMODULE += periph stm32_clk stm32_vectors
 
 ifneq (,$(filter periph_usbdev,$(FEATURES_USED)))
-  ifeq (,$(filter f3 wb,$(CPU_FAM)))
+  # TODO: STM32F105xx and STM32F107xx also use synopsys_dwc2
+  ifeq (,$(filter f1 f3 wb,$(CPU_FAM)))
     USEMODULE += usbdev_synopsys_dwc2
   endif
   USEMODULE += ztimer

@@ -51,7 +51,7 @@ endif
 
 # Select the correct implementation for `periph_usbdev`
 ifneq (,$(filter periph_usbdev,$(USEMODULE)))
-  ifneq (,$(filter f3 wb,$(CPU_FAM)))
+  ifneq (,$(filter f1 f3 wb,$(CPU_FAM)))
     SRC += usbdev_fs.c
   endif
 endif
