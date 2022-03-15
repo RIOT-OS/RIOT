@@ -7,26 +7,17 @@
 
 menu "ztimer64 - High level timer abstraction layer"
 
-# TODO: this extra indirection in the entry point for ztimer_usec is required
-# to allow xtimer compatibility modules to depend on ztimer being there while
-# still selecting ztimer_usec.
-config ZTIMER64_USEC
-    bool "Microseconds 64bit Timer"
-    select MODULE_ZTIMER_USEC
-    select MODULE_ZTIMER64
-    select MODULE_ZTIMER64_USEC
-
 config MODULE_ZTIMER64_USEC
     bool
-    select MODULE_ZTIMER_USEC
+    depends on MODULE_ZTIMER_USEC
 
 config MODULE_ZTIMER64_MSEC
     bool "Milliseconds 64bit Timer"
-    select MODULE_ZTIMER_MSEC
+    depends on MODULE_ZTIMER_MSEC
 
 config MODULE_ZTIMER64_SEC
     bool "Milliseconds 64bit Timer"
-    select MODULE_ZTIMER_SEC
+    depends on MODULE_ZTIMER_SEC
 
 config MODULE_ZTIMER64_INIT
     bool

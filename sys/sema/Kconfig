@@ -13,4 +13,5 @@ config MODULE_SEMA
 config MODULE_SEMA_DEPRECATED
     bool "Semaphore compatible with 64bit timeouts, deprecated"
     select MODULE_SEMA
-    select ZTIMER64_USEC
+    select MODULE_ZTIMER64_USEC
+    select MODULE_ZTIMER64

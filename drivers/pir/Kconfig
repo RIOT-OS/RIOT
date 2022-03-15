@@ -12,7 +12,10 @@ config MODULE_PIR
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
-    select ZTIMER64_USEC
+    select MODULE_ZTIMER64_USEC
+    select MODULE_ZTIMER64
+    select MODULE_ZTIMER_USEC
+    select MODULE_ZTIMER
 
 config HAVE_PIR
     bool
