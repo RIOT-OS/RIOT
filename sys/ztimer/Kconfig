@@ -11,6 +11,7 @@ config ZTIMER_CUSTOM_BACKEND_CONFIGURATION
     bool "Override default backend selection"
 
 config MODULE_ZTIMER_NO_PERIPH_RTT
+    depends on HAS_PERIPH_RTT
     bool "Disable ztimer_periph_rtt auto-inclusion"
     help
         This module disables the auto-inclusion of ztimer_periph_rtt as a backend
