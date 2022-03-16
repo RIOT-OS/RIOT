@@ -82,7 +82,7 @@ void at86rf215_reset_and_cfg(at86rf215_t *dev)
 
     dev->flags |= AT86RF215_OPT_AUTOACK
                |  AT86RF215_OPT_CSMA
-#if CONFIG_AT86RF215_RPC
+#if CONFIG_AT86RF215_RPC_EN
                |  AT86RF215_OPT_RPC
 #endif
                ;
