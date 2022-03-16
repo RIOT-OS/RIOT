@@ -29,6 +29,15 @@ def testfunc(child):
         child.expect_exact('wrote local page buffer to last flash page')
         child.expect('>')
 
+    # check if board has flash page reservation capability and if so test that as well
+    # capability is deduced from help contents
+    child.sendline("help")
+    index = child.expect(['test_reserved_pagewise', '>'])
+    if index == 0:
+        child.sendline("test_reserved_pagewise")
+        child.expect_exact('wrote local page buffer to reserved flash page')
+        child.expect('>')
+
     # check if board has RWWEE capability and if so test that as well
     # capability is deduced from help contents
     child.sendline("help")
