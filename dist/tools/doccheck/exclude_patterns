@@ -14891,3 +14891,32 @@ drivers/encx24j600/include/encx24j600_params\.h:[0-9]+: warning: Member ENCX24J6
 drivers/encx24j600/include/encx24j600_params\.h:[0-9]+: warning: Member ENCX24J600_PARAM_CS \(macro definition\) of file encx24j600_params\.h is not documented\.
 drivers/encx24j600/include/encx24j600_params\.h:[0-9]+: warning: Member ENCX24J600_PARAM_INT \(macro definition\) of file encx24j600_params\.h is not documented\.
 drivers/encx24j600/include/encx24j600_params\.h:[0-9]+: warning: Member ENCX24J600_PARAMS \(macro definition\) of file encx24j600_params\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member EXTERNAL_OSC32_SOURCE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member ULTRA_LOW_POWER_INTERNAL_OSC_SOURCE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_CHANNELS \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member TIMER_1_CHANNELS \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member TIMER_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR_TX \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member PWM_0_EN \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member PWM_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member pwm_chan0_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member RTT_FREQUENCY \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member ADC_PRESCALER \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member ADC_NEG_INPUT \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member ADC_REF_DEFAULT \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member ADC_DEV \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member adc_channels\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member sam_usbdev_config\[\] \(variable\) of file periph_conf\.h is not documented\.
