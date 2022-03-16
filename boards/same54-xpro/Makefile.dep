@@ -3,7 +3,7 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
 endif
 
 ifneq (,$(filter eui_provider,$(USEMODULE)))
-  USEMODULE += at24mac
+  USEMODULE += at24mac_eui
 endif
 
 ifneq (,$(filter mtd,$(USEMODULE)))

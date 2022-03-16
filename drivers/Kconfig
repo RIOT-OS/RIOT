@@ -36,7 +36,7 @@ endmenu # Display Device Drivers
 
 menu "Miscellaneous Device Drivers"
 rsource "at/Kconfig"
-rsource "at24mac/Kconfig"
+rsource "at24mac_eui/Kconfig"
 rsource "bq2429x/Kconfig"
 rsource "cst816s/Kconfig"
 rsource "ds1307/Kconfig"

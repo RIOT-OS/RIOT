@@ -16,6 +16,10 @@ ifneq (,$(filter at24c%,$(USEMODULE)))
   USEMODULE += at24cxxx
 endif
 
+ifneq (,$(filter at24mac,$(USEMODULE)))
+    USEMODULE += at24mac_eeprom at24mac_eui
+endif
+
 ifneq (,$(filter at86rf215%,$(USEMODULE)))
   USEMODULE += at86rf215
 endif

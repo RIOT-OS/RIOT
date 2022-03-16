@@ -6,15 +6,20 @@
 #
 
 config MODULE_AT24MAC
+    bool "Use both eeprom and unique ID of AT24MAC"
+    depends on TEST_KCONFIG
+    depends on HAS_PERIPH_I2C
+    select MODULE_AT24MAC_EUI
+    select MODULE_AT24CXXX
+    select HAVE_AT24MAC
+
+config MODULE_AT24MAC_EUI
     bool
     prompt "AT24MAC unique ID" if !(MODULE_EUI_PROVIDER && HAVE_AT24MAC)
     default (MODULE_EUI_PROVIDER && HAVE_AT24MAC)
     depends on TEST_KCONFIG
     depends on HAS_PERIPH_I2C
     select MODULE_PERIPH_I2C
-# Deprecated functionality, the eeprom should be independent of the id.
-# Should be removed in the 2022.07 release.
-    select MODULE_AT24CXXX
 
 choice AT24CXXX_VARIANT
     default MODULE_AT24MAC_EEPROM if HAVE_AT24MAC
