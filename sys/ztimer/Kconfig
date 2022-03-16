@@ -152,6 +152,7 @@ config MODULE_ZTIMER_XTIMER_COMPAT
     bool "map xtimer calls to ztimer"
     select MODULE_DIV
     select MODULE_ZTIMER_USEC
+    select MODULE_ZTIMER_PERIPH_TIMER
     help
         This is a wrapper of xtimer API on ztimer_usec and is currently
         incomplete. Unless doing testing, use xtimer on ztimer.

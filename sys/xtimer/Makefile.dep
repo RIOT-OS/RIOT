@@ -1,14 +1,31 @@
-ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-  # xtimer is used, ztimer xtimer wrapper is not
-  DEFAULT_MODULE += auto_init_xtimer
-  USEMODULE += div
-  ifeq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
-    # ztimer is not used, so use *periph_timer as low-level timer*.
-    FEATURES_REQUIRED += periph_timer
-  else
-    # will use *ztimer_usec as low-level timer*
+DEFAULT_MODULE += auto_init_xtimer
+# In whatever combination of backends periph_timer will be required
+# - xtimer (only) -> periph_timer
+# - xtimer_on_ztimer -> ztimer_usec -> ztimer_periph_timer -> periph_timer
+# - ztimer_xtimer_compat -> ztimer_usec -> ztimer_periph_timer -> periph_timer
+# But requesting it here avoid an ifeq dependency that would be subject to
+# dependency inclusion order issues
+FEATURES_REQUIRED += periph_timer
+
+USEMODULE += xtimer_no_ztimer_default
+ifeq (,$(filter xtimer_no_ztimer_default,$(USEMODULE)))
+  ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+    USEMODULE += xtimer_on_ztimer
   endif
 else
-  # ztimer_xtimer_compat is used, all of *xtimer's API will be mapped on ztimer
-  # or ztimer64 *
+  ifneq (,$(filter ztimer,$(USEMODULE)))
+    ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+      USEMODULE += xtimer_on_ztimer
+    endif
+  endif
+endif
+
+ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+  DISABLE_MODULE += auto_init_xtimer
+  USEMODULE += div
+endif
+
+# make xtimer use ztimer_usec as low level timer
+ifneq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
+  USEMODULE += ztimer_usec
 endif
