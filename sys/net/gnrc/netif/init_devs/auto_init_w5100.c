@@ -55,7 +55,7 @@ void auto_init_w5100(void)
         LOG_DEBUG("[auto_init_netif] initializing w5100 #%u\n", i);
 
         /* setup netdev device */
-        w5100_setup(&dev[i], &w5100_params[i]);
+        w5100_setup(&dev[i], &w5100_params[i], i);
         /* initialize netdev <-> gnrc adapter state */
         gnrc_netif_ethernet_create(&_netif[i], stack[i], MAC_STACKSIZE, MAC_PRIO, "w5100",
                                    &dev[i].nd);

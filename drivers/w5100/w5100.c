@@ -110,8 +110,11 @@ static void extint(void *arg)
     netdev_trigger_event_isr(&dev->nd);
 }
 
-void w5100_setup(w5100_t *dev, const w5100_params_t *params)
+void w5100_setup(w5100_t *dev, const w5100_params_t *params, uint8_t index)
 {
+    assert(dev);
+    assert(params);
+
     /* initialize netdev structure */
     dev->nd.driver = &netdev_driver_w5100;
     dev->nd.event_callback = NULL;
@@ -123,6 +126,8 @@ void w5100_setup(w5100_t *dev, const w5100_params_t *params)
     /* initialize the chip select pin and the external interrupt pin */
     spi_init_cs(dev->p.spi, dev->p.cs);
     gpio_init_int(dev->p.evt, GPIO_IN, GPIO_FALLING, extint, dev);
+
+    netdev_register(&dev->nd, NETDEV_W5100, index);
 }
 
 static int init(netdev_t *netdev)

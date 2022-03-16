@@ -324,6 +324,7 @@ typedef enum {
     NETDEV_ETHOS,
     NETDEV_SLIPDEV,
     NETDEV_TAP,
+    NETDEV_W5100,
     /* add more if needed */
 } netdev_type_t;
 /** @} */
