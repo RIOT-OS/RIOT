@@ -14,9 +14,7 @@ menuconfig MODULE_CCS811
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_I2C
-    select MODULE_ZTIMER
-    select MODULE_ZTIMER_USEC
-    select MODULE_ZTIMER_PERIPH_TIMER
+    select ZTIMER_USEC
 
 config MODULE_CCS811_FULL
     bool "Full functionalities"
