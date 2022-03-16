@@ -10,3 +10,6 @@ ifneq (,$(filter benchmark_udp,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += xtimer
 endif
+ifneq (,$(filter test_utils_netdev_eth_minimal,$(USEMODULE)))
+  include $(RIOTBASE)/sys/test_utils/netdev_eth_minimal/Makefile.dep
+endif
