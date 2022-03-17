@@ -6,5 +6,6 @@ FEATURES_PROVIDED += arch_msp430
 FEATURES_PROVIDED += dbgpin
 FEATURES_PROVIDED += newlib
 FEATURES_PROVIDED += periph_flashpage
+FEATURES_PROVIDED += periph_flashpage_in_address_space
 FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_pm

@@ -151,6 +151,31 @@ enum {
 #error "periph/flashpage: FLASHPAGE_NUMOF not defined"
 #endif
 
+#ifdef MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
+/**
+ * @def   FLASH_WRITABLE_INIT(name, size)
+ * @brief Define an array in flash memory
+ *
+ * This macro defines an array stored in the ".flash_writable" section
+ * which is part of flash memory. With this macro it is possible to
+ * reserve flash memory at build time.
+ *
+ * E.g. FLASH_WRITABLE_INIT(a, 2); will create a array with name 'a'
+ * of size 2 * @ref FLASHPAGE_SIZE which is stored in flash memory and takes up
+ * 2 flash pages.
+ *
+ * Symbols created by using this macro are sorted in ascending order by name.
+ * Therefore, &a < &b where a and b are arrays created using this macro.
+ *
+ * @param[in] name name of the array
+ * @param[in] size size of the array in unit of @ref FLASHPAGE_SIZE
+ */
+#define FLASH_WRITABLE_INIT(name, size) \
+    __attribute__((aligned(FLASHPAGE_SIZE))) \
+    __attribute__((section(".flash_writable." #name))) \
+    static const uint8_t name [size * FLASHPAGE_SIZE]
+#endif
+
 /**
  * @brief   Get the page size of the given page number
  *

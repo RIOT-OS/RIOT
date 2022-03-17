@@ -233,6 +233,10 @@ SECTIONS
         _eheap1 = ORIGIN(bkup_ram) + LENGTH(bkup_ram);
     } > bkup_ram
 
+    .flash_writable (NOLOAD) : {
+        KEEP(*(SORT(.flash_writable.*)))
+    } > rom
+
     .end_fw (NOLOAD) : ALIGN(4) {
         _end_fw = . ;
     } > rom

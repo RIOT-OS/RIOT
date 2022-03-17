@@ -73,6 +73,12 @@ config HAS_ETHERNET
     help
         Indicates that Ethernet connectivity is present.
 
+config HAS_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
+    bool
+    help
+        Indicates that static memory sections can fundamentally be turned
+        into flash pages.
+
 config HAS_HIGHLEVEL_STDIO
     bool
     help
