@@ -79,7 +79,6 @@ export DOCKER_ENV_VARS += \
 # Their origin cannot be checked since they are often redefined or overriden
 # in Makefile/Makefile.include, etc. and their origin is changed to file
 export DOCKER_ENV_VARS_ALWAYS += \
-  CFLAGS \
   DISABLE_MODULE \
   DEFAULT_MODULE \
   FEATURES_REQUIRED \
