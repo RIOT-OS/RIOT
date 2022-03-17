@@ -12,6 +12,8 @@ RIOTBASE ?= $(CURDIR)/../..
 # development process:
 DEVELHELP ?= 1
 
+CFLAGS += -DUART_TXBUF_SIZE=4
+
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 

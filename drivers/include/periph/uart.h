@@ -65,6 +65,9 @@
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#include "mutex.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -116,6 +119,9 @@ typedef struct {
 #ifdef MODULE_PERIPH_UART_RXSTART_IRQ
     uart_rxstart_cb_t rxs_cb;   /**< start condition received interrupt callback */
     void *rxs_arg;          /**< argument to start condition received callback */
+#endif
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    mutex_t *tx_empty;      /**< lock for waiting for an empty TX buffer */
 #endif
 } uart_isr_ctx_t;
 #endif

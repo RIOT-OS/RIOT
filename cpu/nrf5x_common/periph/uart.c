@@ -223,6 +223,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     /* set up the TX buffer */
+    mutex_init(&uart_ctx[uart].tx_empty);
     tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
 #endif
 
@@ -290,7 +291,11 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
                 tx_buf[uart] = tsrb_get_one(&uart_tx_rb[uart]);
                 _write_buf(uart, &tx_buf[uart], 1);
             }
-            while (tsrb_add_one(&uart_tx_rb[uart], data[i]) < 0) {}
+            while (tsrb_add_one(&uart_tx_rb[uart], data[i]) < 0) {
+                /* Wait until the buffer is empty */
+                mutex_trylock(&uart_ctx[uart].tx_empty);
+                mutex_lock(&uart_ctx[uart].tx_empty);
+            }
         }
     }
     /* if no transmission is ongoing bootstrap the transmission process
@@ -393,6 +398,8 @@ static inline void irq_handler(uart_t uart)
         if (!tsrb_empty(&uart_tx_rb[uart])) {
             tx_buf[uart] = tsrb_get_one(&uart_tx_rb[uart]);
             _write_buf(uart, &tx_buf[uart], 1);
+        } else {
+            mutex_unlock(&uart_ctx[uart].tx_empty);
         }
     }
 #endif

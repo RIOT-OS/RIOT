@@ -93,6 +93,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     /* set up the TX buffer */
+    mutex_init(&uart_ctx[uart].tx_empty);
     tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
 #endif
 
@@ -251,7 +252,11 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
                bootstrapped */
             /* If Tx FIFO is full then add to ring buffer */
             if (uart_config[uart].dev->cc2538_uart_fr.FRbits.TXFF) {
-                while (tsrb_add_one(&uart_tx_rb[uart], data[i]) < 0) {}
+                while (tsrb_add_one(&uart_tx_rb[uart], data[i]) < 0) {
+                    /* Wait until the buffer is empty */
+                    mutex_trylock(&uart_ctx[uart].tx_empty);
+                    mutex_lock(&uart_ctx[uart].tx_empty);
+                }
             }
             /* If tx FIFO is not full then add data to the FIFO */
             else {
@@ -263,7 +268,10 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
                 if (byte >= 0) {
                     uart_config[uart].dev->DR = byte;
                     irq_restore(state);
-                    while (tsrb_add_one(&uart_tx_rb[uart], data[i]) < 0) {}
+                    while (tsrb_add_one(&uart_tx_rb[uart], data[i]) < 0) {
+                        mutex_trylock(&uart_ctx[uart].tx_empty);
+                        mutex_lock(&uart_ctx[uart].tx_empty);
+                    }
                 }
                 /* If there is not data in the buffer directly write the
                    current byte */
@@ -318,6 +326,7 @@ static inline void irq_handler_tx(uart_t uart)
         else {
             /* disable the interrupt if there are no more bytes to send */
             uart_config[uart].dev->cc2538_uart_im.IM &= ~TXMIS;
+            mutex_unlock(&uart_ctx[uart].tx_empty);
             break;
         }
     }

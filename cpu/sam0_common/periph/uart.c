@@ -167,6 +167,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     /* set up the TX buffer */
+    mutex_init(&uart_ctx[uart].tx_empty);
     tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
 #endif
 
@@ -314,7 +315,11 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
             tsrb_add_one(&uart_tx_rb[uart], *data);
         }
         else {
-            while (tsrb_add_one(&uart_tx_rb[uart], *data) < 0) {}
+            while (tsrb_add_one(&uart_tx_rb[uart], *data) < 0) {
+                /* Wait until the buffer is empty */
+                mutex_trylock(&uart_ctx[uart].tx_empty);
+                mutex_lock(&uart_ctx[uart].tx_empty);
+            }
         }
         dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_DRE;
     }
@@ -500,6 +505,7 @@ static inline void irq_handler_tx(unsigned uartnum)
     /* disable the interrupt if there are no more bytes to send */
     if (tsrb_empty(&uart_tx_rb[uartnum])) {
         dev(uartnum)->INTENCLR.reg = SERCOM_USART_INTENSET_DRE;
+        mutex_unlock(&uart_ctx[uart].tx_empty);
     }
 }
 #endif
