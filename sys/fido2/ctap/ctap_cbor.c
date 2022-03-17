@@ -819,8 +819,12 @@ int fido2_ctap_cbor_parse_get_assertion_req(ctap_get_assertion_req_t *req,
     CborValue map;
     CborType type;
 
-    ret = cbor_parser_init(req_raw, len, CborValidateCanonicalFormat, &parser,
-                           &it);
+    ret = cbor_parser_init(req_raw, len, 0, &parser, &it);
+    if (ret != CborNoError) {
+        return CTAP2_ERR_CBOR_PARSING;
+    }
+
+    ret = cbor_value_validate(&it, CborValidateCanonicalFormat);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -937,8 +941,12 @@ int fido2_ctap_cbor_parse_client_pin_req(ctap_client_pin_req_t *req,
     CborValue it;
     CborValue map;
 
-    ret = cbor_parser_init(req_raw, len, CborValidateCanonicalFormat, &parser,
-                           &it);
+    ret = cbor_parser_init(req_raw, len, 0, &parser, &it);
+    if (ret != CborNoError) {
+        return CTAP2_ERR_CBOR_PARSING;
+    }
+
+    ret = cbor_value_validate(&it, CborValidateCanonicalFormat);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -1048,8 +1056,12 @@ int fido2_ctap_cbor_parse_make_credential_req(ctap_make_credential_req_t *req,
     CborValue map;
     CborType type;
 
-    ret = cbor_parser_init(buf, size, CborValidateCanonicalFormat, &parser,
-                           &it);
+    ret = cbor_parser_init(buf, size, 0, &parser, &it);
+    if (ret != CborNoError) {
+        return CTAP2_ERR_CBOR_PARSING;
+    }
+
+    ret = cbor_value_validate(&it, CborValidateCanonicalFormat);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
