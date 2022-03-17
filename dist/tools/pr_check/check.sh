@@ -36,7 +36,8 @@ keyword_filter() {
     grep -i \
         -e "^    [0-9a-f]\+ .\{0,2\}SQUASH" \
         -e "^    [0-9a-f]\+ .\{0,2\}FIX" \
-        -e "^    [0-9a-f]\+ .\{0,2\}REMOVE *ME"
+        -e "^    [0-9a-f]\+ .\{0,2\}REMOVE *ME" \
+        -e "^    [0-9a-f]\+ .\{0,2\}Update"
 }
 
 SQUASH_COMMITS="$(git log $(git merge-base HEAD "${RIOT_MASTER}")...HEAD --pretty=format:"    %h %s" | \
