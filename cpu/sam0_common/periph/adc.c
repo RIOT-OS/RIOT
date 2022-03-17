@@ -28,16 +28,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-/* The SAMD5x/SAME5x family has two ADCs: ADC0 and ADC1.
- * Introducing ADC_DEV as alias for the respective device (ADC/ADC0/ADC1). */
-#ifndef ADC_DEV
-    #ifdef ADC0
-        #define ADC_DEV ADC0
-    #else
-        #define ADC_DEV ADC
-    #endif
-#endif
-
 #ifndef ADC_GCLK_SRC
     #define ADC_GCLK_SRC SAM0_GCLK_MAIN
 #endif
@@ -47,10 +37,10 @@
 #endif
 
 /* Prototypes */
-static void _adc_poweroff(void);
-static void _setup_clock(void);
-static void _setup_calibration(void);
-static int _adc_configure(adc_res_t res);
+static void _adc_poweroff(Adc *dev);
+static void _setup_clock(Adc *dev);
+static void _setup_calibration(Adc *dev);
+static int _adc_configure(Adc *dev, adc_res_t res);
 
 static mutex_t _lock = MUTEX_INIT;
 
@@ -64,26 +54,26 @@ static inline void _done(void)
     mutex_unlock(&_lock);
 }
 
-static inline void _wait_syncbusy(void)
+static inline void _wait_syncbusy(Adc *dev)
 {
 #ifdef ADC_STATUS_SYNCBUSY
-    while (ADC_DEV->STATUS.reg & ADC_STATUS_SYNCBUSY) {}
+    while (dev->STATUS.reg & ADC_STATUS_SYNCBUSY) {}
 #else
     /* Ignore the ADC SYNCBUSY.SWTRIG status
      * The ADC SYNCBUSY.SWTRIG gets stuck to '1' after wake-up from Standby Sleep mode.
      * SAMD5x/SAME5x errata: DS80000748 (page 10)
      */
-    while (ADC_DEV->SYNCBUSY.reg & ~ADC_SYNCBUSY_SWTRIG) {}
+    while (dev->SYNCBUSY.reg & ~ADC_SYNCBUSY_SWTRIG) {}
 #endif
 }
 
-static void _adc_poweroff(void)
+static void _adc_poweroff(Adc *dev)
 {
-    _wait_syncbusy();
+    _wait_syncbusy(dev);
 
     /* Disable */
-    ADC_DEV->CTRLA.reg &= ~ADC_CTRLA_ENABLE;
-    _wait_syncbusy();
+    dev->CTRLA.reg &= ~ADC_CTRLA_ENABLE;
+    _wait_syncbusy(dev);
 
     /* Disable bandgap */
 #ifdef SYSCTRL_VREF_BGOUTEN
@@ -97,7 +87,7 @@ static void _adc_poweroff(void)
 #endif
 }
 
-static void _setup_clock(void)
+static void _setup_clock(Adc *dev)
 {
     /* Enable gclk in case we are the only user */
     sam0_gclk_enable(ADC_GCLK_SRC);
@@ -110,14 +100,14 @@ static void _setup_clock(void)
                       | GCLK_CLKCTRL_GEN(ADC_GCLK_SRC)
                       | GCLK_CLKCTRL_ID(ADC_GCLK_ID);
     /* Configure prescaler */
-    ADC_DEV->CTRLB.reg = ADC_PRESCALER;
+    dev->CTRLB.reg = ADC_PRESCALER;
 #else
     /* Power on */
     #ifdef MCLK_APBCMASK_ADC
         MCLK->APBCMASK.reg |= MCLK_APBCMASK_ADC;
     #else
         #ifdef MCLK_APBDMASK_ADC0
-            if (ADC_DEV == ADC0) {
+            if (dev == ADC0) {
                 MCLK->APBDMASK.reg |= MCLK_APBDMASK_ADC0;
             } else {
                 MCLK->APBDMASK.reg |= MCLK_APBDMASK_ADC1;
@@ -129,7 +119,7 @@ static void _setup_clock(void)
 
     #ifdef ADC0_GCLK_ID
         /* GCLK Setup */
-        if (ADC_DEV == ADC0) {
+        if (dev == ADC0) {
             GCLK->PCHCTRL[ADC0_GCLK_ID].reg = GCLK_PCHCTRL_CHEN
                     | GCLK_PCHCTRL_GEN(ADC_GCLK_SRC);
         }
@@ -138,22 +128,22 @@ static void _setup_clock(void)
                     | GCLK_PCHCTRL_GEN(ADC_GCLK_SRC);
         }
         /* Configure prescaler */
-        ADC_DEV->CTRLA.reg = ADC_PRESCALER;
+        dev->CTRLA.reg = ADC_PRESCALER;
     #else
         /* GCLK Setup */
         GCLK->PCHCTRL[ADC_GCLK_ID].reg = GCLK_PCHCTRL_CHEN
                 | GCLK_PCHCTRL_GEN(ADC_GCLK_SRC);
         /* Configure prescaler */
-        ADC_DEV->CTRLB.reg = ADC_PRESCALER;
+        dev->CTRLB.reg = ADC_PRESCALER;
     #endif
 #endif
 }
 
-static void _setup_calibration(void)
+static void _setup_calibration(Adc *dev)
 {
 #ifdef ADC_CALIB_BIAS_CAL
     /* Load the fixed device calibration constants */
-    ADC_DEV->CALIB.reg =
+    dev->CALIB.reg =
         ADC_CALIB_BIAS_CAL((*(uint32_t*)ADC_FUSES_BIASCAL_ADDR >>
                             ADC_FUSES_BIASCAL_Pos)) |
         ADC_CALIB_LINEARITY_CAL((*(uint64_t*)ADC_FUSES_LINEARITY_0_ADDR >>
@@ -161,22 +151,22 @@ static void _setup_calibration(void)
 #else
     /* Set default calibration from NVM */
     #ifdef ADC0_FUSES_BIASCOMP_ADDR
-        if (ADC_DEV == ADC0) {
-            ADC_DEV->CALIB.reg =
+        if (dev == ADC0) {
+            dev->CALIB.reg =
                 ADC0_FUSES_BIASCOMP((*(uint32_t*)ADC0_FUSES_BIASCOMP_ADDR)) >>
                 ADC_CALIB_BIASCOMP_Pos |
                 ADC0_FUSES_BIASREFBUF((*(uint32_t*)ADC0_FUSES_BIASREFBUF_ADDR) >>
                 ADC0_FUSES_BIASREFBUF_Pos);
         }
         else {
-            ADC_DEV->CALIB.reg =
+            dev->CALIB.reg =
                 ADC1_FUSES_BIASCOMP((*(uint32_t*)ADC1_FUSES_BIASCOMP_ADDR)) >>
                 ADC_CALIB_BIASCOMP_Pos |
                 ADC1_FUSES_BIASREFBUF((*(uint32_t*)ADC1_FUSES_BIASREFBUF_ADDR) >>
                 ADC1_FUSES_BIASREFBUF_Pos);
         }
     #else
-        ADC_DEV->CALIB.reg =
+        dev->CALIB.reg =
                 ADC_FUSES_BIASCOMP((*(uint32_t*)ADC_FUSES_BIASCOMP_ADDR)) >>
                 ADC_CALIB_BIASCOMP_Pos |
                 ADC_FUSES_BIASREFBUF((*(uint32_t*)ADC_FUSES_BIASREFBUF_ADDR) >>
@@ -185,7 +175,7 @@ static void _setup_calibration(void)
 #endif
 }
 
-static int _adc_configure(adc_res_t res)
+static int _adc_configure(Adc *dev, adc_res_t res)
 {
     /* Individual comparison necessary because ADC Resolution Bits are not
      * numerically in order and 16Bit (averaging - not currently supported)
@@ -195,32 +185,32 @@ static int _adc_configure(adc_res_t res)
         return -1;
     }
 
-    _adc_poweroff();
+    _adc_poweroff(dev);
 
-    if (ADC_DEV->CTRLA.reg & ADC_CTRLA_SWRST ||
-        ADC_DEV->CTRLA.reg & ADC_CTRLA_ENABLE ) {
+    if (dev->CTRLA.reg & ADC_CTRLA_SWRST ||
+        dev->CTRLA.reg & ADC_CTRLA_ENABLE ) {
         DEBUG("adc: not ready\n");
         return -1;
     }
 
-    _setup_clock();
-    _setup_calibration();
+    _setup_clock(dev);
+    _setup_calibration(dev);
 
     /* Set ADC resolution */
 #ifdef ADC_CTRLC_RESSEL
     /* Reset resolution bits in CTRLC */
-    ADC_DEV->CTRLC.reg &= ~ADC_CTRLC_RESSEL_Msk;
-    ADC_DEV->CTRLC.reg |= res;
+    dev->CTRLC.reg &= ~ADC_CTRLC_RESSEL_Msk;
+    dev->CTRLC.reg |= res;
 #else
     /* Reset resolution bits in CTRLB */
-    ADC_DEV->CTRLB.reg &= ~ADC_CTRLB_RESSEL_Msk;
-    ADC_DEV->CTRLB.reg |= res;
+    dev->CTRLB.reg &= ~ADC_CTRLB_RESSEL_Msk;
+    dev->CTRLB.reg |= res;
 #endif
 
     /* Set Voltage Reference */
-    ADC_DEV->REFCTRL.reg = ADC_REF_DEFAULT;
+    dev->REFCTRL.reg = ADC_REF_DEFAULT;
     /* Disable all interrupts */
-    ADC_DEV->INTENCLR.reg = 0xFF;
+    dev->INTENCLR.reg = 0xFF;
 
 #ifdef SYSCTRL_VREF_BGOUTEN
     /* Enable bandgap if VREF is internal 1V */
@@ -235,8 +225,8 @@ static int _adc_configure(adc_res_t res)
 #endif
 
     /*  Enable ADC Module */
-    ADC_DEV->CTRLA.reg |= ADC_CTRLA_ENABLE;
-    _wait_syncbusy();
+    dev->CTRLA.reg |= ADC_CTRLA_ENABLE;
+    _wait_syncbusy(dev);
     return 0;
 }
 
@@ -262,28 +252,35 @@ int32_t adc_sample(adc_t line, adc_res_t res)
         return -1;
     }
 
+    /* The SAMD5x/SAME5x family has two ADCs: ADC0 and ADC1. */
+#ifdef ADC0
+    Adc *dev = adc_channels[line].dev;
+#else
+    Adc *dev = ADC;
+#endif
+
     _prep();
 
-    if (_adc_configure(res) != 0) {
+    if (_adc_configure(dev, res) != 0) {
         _done();
         DEBUG("adc: configuration failed\n");
         return -1;
     }
 
-    ADC_DEV->INPUTCTRL.reg = ADC_GAIN_FACTOR_DEFAULT
+    dev->INPUTCTRL.reg = ADC_GAIN_FACTOR_DEFAULT
                            | adc_channels[line].muxpos
                            | ADC_NEG_INPUT;
-    _wait_syncbusy();
+    _wait_syncbusy(dev);
 
     /* Start the conversion */
-    ADC_DEV->SWTRIG.reg = ADC_SWTRIG_START;
+    dev->SWTRIG.reg = ADC_SWTRIG_START;
 
     /* Wait for the result */
-    while (!(ADC_DEV->INTFLAG.reg & ADC_INTFLAG_RESRDY)) {}
+    while (!(dev->INTFLAG.reg & ADC_INTFLAG_RESRDY)) {}
 
-    int result = ADC_DEV->RESULT.reg;
+    int result = dev->RESULT.reg;
 
-    _adc_poweroff();
+    _adc_poweroff(dev);
     _done();
 
     return result;
