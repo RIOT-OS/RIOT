@@ -55,6 +55,8 @@ menu "Sensor variants used"
     config MODULE_L3GD20H
         bool "L3GD20H"
         default y if HAVE_L3GD20H
+        default y if !MODULE_L3GD20 && !MODULE_L3G4200D_NG && !MODULE_A3G4250D && !MODULE_I3G4250D
+
         help
             Enables the support for L3GD20H.
 
