@@ -269,13 +269,12 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
 
 #define ADC_NEG_INPUT                       ADC_INPUTCTRL_MUXNEG(0x18u)
 #define ADC_REF_DEFAULT                     ADC_REFCTRL_REFSEL_INTVCC1
-#define ADC_DEV                             ADC1
 
 static const adc_conf_chan_t adc_channels[] = {
-    /* port, pin, muxpos */
-    {GPIO_PIN(PB, 8), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN2)}, /* A2 */
-    {GPIO_PIN(PB, 9), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN3)}, /* A3 */
-    {GPIO_PIN(PB, 4), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN6)}, /* A7 - Light sensor */
+    /* port, pin, muxpos, dev */
+    {GPIO_PIN(PB, 8), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN2), ADC1},   /* A2 */
+    {GPIO_PIN(PB, 9), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN3), ADC1},   /* A3 */
+    {GPIO_PIN(PB, 4), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN6), ADC1},   /* A7 - Light sensor */
 };
 
 #define ADC_NUMOF                           ARRAY_SIZE(adc_channels)
