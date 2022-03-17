@@ -237,6 +237,7 @@ Further information                                      {#further-information}
  - @ref porting-boards
  - @ref creating-modules
  - @ref advanced-build-system-tricks
+ - @ref build-in-docker
 
 <!--
 Idea for this section: just name each of RIOT's main features/concepts and link
