@@ -14919,3 +14919,6 @@ boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member ADC_DEV 
 boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member adc_channels\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member sam_usbdev_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f429zi/include/periph_conf\.h:[0-9]+: warning: Member DMA_2_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f429zi/include/periph_conf\.h:[0-9]+: warning: Member ETH_DMA_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f429zi/include/periph_conf\.h:[0-9]+: warning: Member eth_config \(variable\) of file periph_conf\.h is not documented\.
