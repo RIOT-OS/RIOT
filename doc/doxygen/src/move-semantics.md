@@ -65,6 +65,10 @@ individual functions may state that they take a reference to be short-lived,
 and make no requirements on the pointer's validity beyond the function's execution.
 (The @ref ztimer_is_set function might make such a statement).
 
+The lack of a required destructor / finalizer / closing function for a type
+is not a reliable indicator that a type is movable
+(but it is a pretty good hint).
+
 Examples
 --------
 
