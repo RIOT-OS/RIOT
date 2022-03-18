@@ -505,6 +505,7 @@ static inline void irq_handler_tx(uart_t uart)
     /* disable the interrupt if there are no more bytes to send */
     if (tsrb_empty(&uart_tx_rb[uart])) {
         dev(uart)->CR1 &= ~(USART_CR1_TCIE);
+    } else if(tsrb_avail(&uart_tx_rb[uart]) == (UART_TXBUF_SIZE>>1)) {
         mutex_unlock(&isr_ctx[uart].tx_empty);
     }
 }

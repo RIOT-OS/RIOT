@@ -505,6 +505,7 @@ static inline void irq_handler_tx(unsigned uartnum)
     /* disable the interrupt if there are no more bytes to send */
     if (tsrb_empty(&uart_tx_rb[uartnum])) {
         dev(uartnum)->INTENCLR.reg = SERCOM_USART_INTENSET_DRE;
+    } else if(tsrb_avail(&uart_tx_rb[uart]) == (UART_TXBUF_SIZE>>1)) {
         mutex_unlock(&uart_ctx[uart].tx_empty);
     }
 }

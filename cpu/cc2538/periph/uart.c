@@ -322,11 +322,13 @@ static inline void irq_handler_tx(uart_t uart)
         int byte = tsrb_get_one(&uart_tx_rb[uart]);
         if (byte >= 0) {
             uart_config[uart].dev->DR = byte;
+            if(tsrb_avail(&uart_tx_rb[uart]) == (UART_TXBUF_SIZE>>1)) {
+                mutex_unlock(&uart_ctx[uart].tx_empty);
+            }
         }
         else {
             /* disable the interrupt if there are no more bytes to send */
             uart_config[uart].dev->cc2538_uart_im.IM &= ~TXMIS;
-            mutex_unlock(&uart_ctx[uart].tx_empty);
             break;
         }
     }

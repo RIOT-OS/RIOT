@@ -398,8 +398,9 @@ static inline void irq_handler(uart_t uart)
         if (!tsrb_empty(&uart_tx_rb[uart])) {
             tx_buf[uart] = tsrb_get_one(&uart_tx_rb[uart]);
             _write_buf(uart, &tx_buf[uart], 1);
-        } else {
-            mutex_unlock(&uart_ctx[uart].tx_empty);
+            if(tsrb_avail(&uart_tx_rb[uart]) == (UART_TXBUF_SIZE>>1)) {
+                mutex_unlock(&uart_ctx[uart].tx_empty);
+            }
         }
     }
 #endif
