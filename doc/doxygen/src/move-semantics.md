@@ -5,7 +5,7 @@ This page describes general properties of types defined (`typedef`'d) in RIOT.
 It is mostly aimed at developers who alter or extend RIOT;
 API users can often ignore them if they stick to idiomatic C.
 
-This is being documented for consistenty within RIOT,
+This is being documented for consistency within RIOT,
 and for the benefit of users who use RIOT
 from other languages (such as @rust using-rust "Rust" )
 or do other advanced things like implementing coroutines.
@@ -56,7 +56,7 @@ Types are generally not movable, unless they are
 * taken by value (or returned by value) in public API functions (or preprocessor macros) that use the type.
 
 In addition,
-individual functions may state that they take a reference to be a short-lived,
+individual functions may state that they take a reference to be short-lived,
 and make no requirements on the pointer's validity beyond the function's execution.
 (The @ref ztimer_is_set function might make such a statement).
 
