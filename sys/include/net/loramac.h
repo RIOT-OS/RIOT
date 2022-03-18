@@ -547,6 +547,15 @@ extern "C" {
  */
 #define LORAMAC_NETWORK_ID_LEN                  (3U)
 
+/**
+ * @brief   Maximum length for channel mask
+ *
+ *          The actual length is set by each region-specific LoRaMac
+ *          implementation (see CHANNELS_MASK_SIZE), which
+ *          automatically slices down the channel array mask.
+ */
+#define LORAMAC_CHANNELS_MASK_MAX_LEN                     (6U)
+
 /** @} */
 
 /**
