@@ -505,6 +505,14 @@ uint8_t semtech_loramac_get_rx2_dr(semtech_loramac_t *mac);
 void semtech_loramac_set_uplink_counter(semtech_loramac_t *mac, uint32_t counter);
 
 /**
+ * @brief   Sets the Channels Mask
+ *
+ * @param[in] mac          Pointer to the mac
+ * @param[in] mask         Mask array, e.g., {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0x0000, 0x0000}
+ */
+void semtech_loramac_set_channels_mask(semtech_loramac_t *mac, uint16_t *mask);
+
+/**
  * @brief   Gets the Uplink Frame Counter
  *
  * @param[in] mac          Pointer to the mac
