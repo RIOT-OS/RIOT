@@ -5,17 +5,12 @@ This page describes general properties of types defined (`typedef`'d) in RIOT.
 It is mostly aimed at developers who alter or extend RIOT;
 API users can often ignore them if they stick to idiomatic C.
 
-This is being documented for consistency within RIOT,
-and for the benefit of users who use RIOT
-from other languages (such as @rust using-rust "Rust" )
-or do other advanced things like implementing coroutines.
-
 Movability
 ----------
 
 In C, generally,
 any type can technically be copied or moved,
-e.g. by returning it (which is possible but discouraged for larger structs),
+e.g. by returning it,
 by assigning it to other variables
 or by using `memcpy` / `memmove`.
 
@@ -34,18 +29,28 @@ but not store the pointer anywhere.
 Why do we care?
 ---------------
 
-The C compiler in general doesn't move around
-data that has been allocated on stack or on the heap
-by itself,
-so movability is usually not something that
-ideomatic C needs to deal with.
+In C we avoid passing large items by value,
+and consequently pass pointers around to initialize and finalize values;
+consequently, a stable address of a value is often around and ready to be used.
 
-The Rust compiler does move data around,
-if it deems it beneficial for optimization.
+In @rust using-rust "Rust" there are no restrictions on the size of return values,
+and logically moving values makes it easy to uphold [RAII] guarantees.
+(The Rust compiler will often use its knowledge of the program to not make values actually move,
+but neither is that guaranteed nor can it be reliably observed).
+
+[RAII]: https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization
 
 As most of RIOT's C APIs are being used by Rust through wrappers,
 movability of a type needs to be specified
 in order to no force Rust to assume *may never move* on *all* types.
+Types that may not move but are allocated by Rust
+require more [verbose and complicated] application code.
+
+[verbose and complicated]: https://doc.rust-lang.org/core/pin/index.html
+
+In addition to the benefits for the Rust wrappers,
+the documenting movability helps keeping RIOT internally consistent,
+and assists in other advanced use cases like coroutines.
 
 Is a type movable?
 ------------------
