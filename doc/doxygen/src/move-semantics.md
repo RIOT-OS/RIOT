@@ -68,7 +68,7 @@ and make no requirements on the pointer's validity beyond the function's executi
 Examples
 --------
 
-The @ref ipv6_addr_t type is movable (because it is (TBD -- will be) documented to be):
+The @ref ipv6_addr_t type is movable (because @ref IPV6_ADDR_LOOPBACK returns one by value):
 while it is frequently passed by referenced due to its sheer size,
 an application may just `memcpy` an address out of an obtained pointer and store it for later use
 (maybe along with a cache entry).
