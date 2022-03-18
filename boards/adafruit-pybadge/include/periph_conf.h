@@ -269,13 +269,16 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
 
 #define ADC_NEG_INPUT                       ADC_INPUTCTRL_MUXNEG(0x18u)
 #define ADC_REF_DEFAULT                     ADC_REFCTRL_REFSEL_INTVCC1
-#define ADC_DEV                             ADC1
 
 static const adc_conf_chan_t adc_channels[] = {
-    /* port, pin, muxpos */
-    {GPIO_PIN(PB, 8), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN2)}, /* A2 */
-    {GPIO_PIN(PB, 9), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN3)}, /* A3 */
-    {GPIO_PIN(PB, 4), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN6)}, /* A7 - Light sensor */
+    /* port, pin, muxpos, dev */
+    {GPIO_PIN(PA, 5), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN5), ADC0},   /* A1 */
+    {GPIO_PIN(PB, 8), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN2), ADC0},   /* A2 */
+    {GPIO_PIN(PB, 9), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN3), ADC0},   /* A3 */
+    {GPIO_PIN(PA, 4), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN4), ADC0},   /* A4 */
+    {GPIO_PIN(PA, 6), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN6), ADC0},   /* A5 */
+    {GPIO_PIN(PB, 1), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN13), ADC0},  /* A6 - VMEAS */
+    {GPIO_PIN(PB, 4), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN6), ADC1},   /* A7 - Light sensor */
 };
 
 #define ADC_NUMOF                           ARRAY_SIZE(adc_channels)
