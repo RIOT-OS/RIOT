@@ -40,7 +40,7 @@ Types are generally not movable, unless they are
 * taken by value (or returned by value) in public API functions (or preprocessor macros) that use the type.
 
 In addition,
-individual functions may state that they take a reference to be a short-lived,
+individual functions may state that they take a reference to be short-lived,
 and make no requirements on the pointer's validity beyond the function's execution.
 (The @ref ztimer_is_set function might make such a statement).
 
