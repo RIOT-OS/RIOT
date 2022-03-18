@@ -59,7 +59,7 @@ extern "C" {
  *          This can be written to by applications
  */
 #ifndef VFS_DEFAULT_DATA
-#if IS_USED(MODULE_MTD_MCI) || IS_USED(MODULE_MTD_SDCARD)
+#if IS_USED(MODULE_MTD_MCI) || IS_USED(MODULE_MTD_SDCARD) || IS_USED(MODULE_SAM0_SDHC)
 #define VFS_DEFAULT_DATA    VFS_DEFAULT_SD(0)
 #else
 #define VFS_DEFAULT_DATA    VFS_DEFAULT_NVM(0)
