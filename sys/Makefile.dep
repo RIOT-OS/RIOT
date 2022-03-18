@@ -857,20 +857,7 @@ endif
 
 # handle xtimer's deps. Needs to be done *after* ztimer
 ifneq (,$(filter xtimer,$(USEMODULE)))
-  ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-    # xtimer is used, ztimer xtimer wrapper is not
-    DEFAULT_MODULE += auto_init_xtimer
-    USEMODULE += div
-    ifeq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
-      # ztimer is not used, so use *periph_timer as low-level timer*.
-      FEATURES_REQUIRED += periph_timer
-    else
-      # will use *ztimer_usec as low-level timer*
-    endif
-  else
-    # ztimer_xtimer_compat is used, all of *xtimer's API will be mapped on ztimer
-    # or ztimer64 *
-  endif
+  include $(RIOTBASE)/sys/xtimer/Makefile.dep
 endif
 
 ifneq (,$(filter devfs_hwrng,$(USEMODULE)))

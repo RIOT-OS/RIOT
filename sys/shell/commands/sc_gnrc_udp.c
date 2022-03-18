@@ -31,9 +31,10 @@
 #include "net/utils.h"
 #include "timex.h"
 #include "utlist.h"
-#if IS_USED(MODULE_ZTIMER)
+#if IS_USED(MODULE_ZTIMER_USEC) || IS_USED(MODULE_ZTIMER_MSEC)
 #include "ztimer.h"
-#else
+#endif
+#if IS_USED(MODULE_XTIMER)
 #include "xtimer.h"
 #endif
 
