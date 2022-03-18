@@ -64,7 +64,7 @@ static void _loramac_set_usage(void)
 static void _loramac_get_usage(void)
 {
     puts("Usage: loramac get <deveui|appeui|appkey|appskey|nwkskey|devaddr|"
-         "class|dr|adr|public|netid|tx_power|rx2_freq|rx2_dr|ul_cnt>");
+         "class|dr|adr|public|netid|tx_power|rx2_freq|rx2_dr|ul_cnt|ch_mask>");
 }
 
 int _loramac_handler(int argc, char **argv)
@@ -165,6 +165,15 @@ int _loramac_handler(int argc, char **argv)
         }
         else if (strcmp("ul_cnt", argv[2]) == 0) {
             printf("Uplink Counter: %"PRIu32"\n", semtech_loramac_get_uplink_counter(&loramac));
+        }
+        else if (strcmp("ch_mask", argv[2]) == 0) {
+            uint16_t mask[LORAMAC_CHANNELS_MASK_LEN] = { 0 };
+            semtech_loramac_get_channels_mask(&loramac, mask);
+            printf("Channels mask: ");
+            for (size_t i = 0; i < LORAMAC_CHANNELS_MASK_LEN; i++) {
+                printf("%04x", mask[i]);
+            }
+            printf("\n");
         }
         else {
             _loramac_get_usage();
@@ -353,10 +362,10 @@ int _loramac_handler(int argc, char **argv)
                 puts("Example (sets channels 0-3): loramac set ch_mask 000F00000000000000000000");
                 return 1;
             }
-            uint16_t mask[LORAMAC_CHANNELS_MASK_MAX_LEN] = { 0 };
-            uint8_t tmp[LORAMAC_CHANNELS_MASK_MAX_LEN*2];
+            uint16_t mask[LORAMAC_CHANNELS_MASK_LEN] = { 0 };
+            uint8_t tmp[LORAMAC_CHANNELS_MASK_LEN*2];
             fmt_hex_bytes(tmp, argv[3]);
-            for (size_t i = 0, j = 0; i < LORAMAC_CHANNELS_MASK_MAX_LEN; i++, j+=2) {
+            for (size_t i = 0, j = 0; i < LORAMAC_CHANNELS_MASK_LEN; i++, j+=2) {
                 /* copy over to span a 16-bit -wide unsigned integer */
                 mask[i] |= tmp[j] << 8;
                 mask[i] |= tmp[j+1];
