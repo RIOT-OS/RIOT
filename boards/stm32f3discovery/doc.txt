@@ -92,11 +92,12 @@ e-compass.
 
 An 3-axis gyroscope is soldered on the board.
 
-| Sensor | L3GD20        |
+| Sensor | L3GD20/I3G4250D [1] |
 |:------------- |:--------------------- |
 | Type       | Gyroscope     |
 | Vendor | ST Microelectronics   |
-| Datasheet  | [Datasheet](https://www.mouser.de/datasheet/2/389/l3gd20-954745.pdf)    |
+| Datasheet L3GD20 | [Datasheet](https://www.mouser.de/datasheet/2/389/l3gd20-954745.pdf) |
+| Datasheet I3G4250D | [Datasheet](https://www.st.com/resource/en/datasheet/i3g4250d.pdf) |
 | Connected to   | SPI_0         |
 | Pin Config:    | |
 | Device | SPI1          |
@@ -107,6 +108,8 @@ An 3-axis gyroscope is soldered on the board.
 | INT1       | PE0 (IN)      |
 | INT2/DRDY  | PE1 (IN)      |
 
+[1] L3GD20 (up to rev. D01), IG34250D (from rev. E02)
+The driver detects automatically which sensor variant is on the board.
 
 ## Implementation Status
 
@@ -123,7 +126,7 @@ An 3-axis gyroscope is soldered on the board.
 |        | Inpute Capture| no        | |
 | Accelerometer  | LSM303DLHC    | no        | planned |
 | Magnetometer   | LSM303DLHC    | no        | planned |
-| Gyroscope  | L3GD20    | no        | planned |
+| Gyroscope  | L3GD20/I3G4250D | yes        | |
 
 
 ## Flashing the device

@@ -97,6 +97,16 @@ extern "C" {
 #define LSM303DLHC_PARAM_MAG_PIN    GPIO_PIN(PORT_E, 2)
 /** @} */
 
+/**
+ * @name L3GD20 (Rev. C01, D01), I3G4250D (Rev. E02)
+ * @{
+ */
+#define L3GXXXX_SPI_DEV     SPI_DEV(0)          /**< SPI bus used for L3Gxxxx */
+#define L3GXXXX_SPI_CS      GPIO_PIN(PORT_E, 3) /**< SPI CS pin used for L3Gxxxx */
+#define L3GXXXX_INT1_PIN    GPIO_PIN(PORT_E, 0) /**< INT1 pin used for L3Gxxxx */
+#define L3GXXXX_INT2_PIN    GPIO_PIN(PORT_E, 1) /**< INT2/DRDY pin used for L3Gxxxx */
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
