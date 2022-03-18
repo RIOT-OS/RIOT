@@ -31,6 +31,22 @@ Consequently, functions taking a reference
 may use the reference to access the value for the duration of the function,
 but not store the pointer anywhere.
 
+Why do we care?
+---------------
+
+The C compiler in general doesn't move around
+data that has been allocated on stack or on the heap
+by itself,
+so movability is usually not something that
+ideomatic C needs to deal with.
+
+The Rust compiler does move data around,
+if it deems it beneficial for optimization.
+
+As most of RIOT's C APIs are being used by Rust through wrappers,
+movability of a type needs to be specified
+in order to no force Rust to assume *may never move* on *all* types.
+
 Is a type movable?
 ------------------
 
