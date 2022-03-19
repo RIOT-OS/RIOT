@@ -3,8 +3,7 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
 endif
 
 ifneq (,$(filter disp_dev,$(USEMODULE)))
-  # Driver not supported yet
-  # USEMODULE += st7735
+  USEMODULE += st7735
 endif
 
 ifneq (,$(filter mtd,$(USEMODULE)))
