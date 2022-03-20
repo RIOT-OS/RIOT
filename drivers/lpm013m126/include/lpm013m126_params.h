@@ -57,21 +57,17 @@ extern "C" {
 #define LPM013M126_PARAM_NUM_LINES    176U
 #endif
 
-#ifndef LPM013M126_PARAM_ROTATION
-#define LPM013M126_PARAM_ROTATION     LPM013M126_ROTATION_HORZ_FLIP
-#endif
 
 #ifndef LPM013M126_PARAMS
 #define LPM013M126_PARAMS              { .spi = LPM013M126_PARAM_SPI, \
                                       .spi_clk = LPM013M126_PARAM_SPI_CLK, \
                                       .spi_mode = LPM013M126_PARAM_SPI_MODE, \
                                       .cs_pin = LPM013M126_PARAM_CS, \
-                                      .extcom_pin = LPM013M126_PARAM_DCX, \
-                                      .disp_pin = LPM013M126_PARAM_RST, \
+                                      .extcom_pin = LPM013M126_PARAM_EXTCOM, \
+                                      .disp_pin = LPM013M126_PARAM_DISP, \
                                       .inverted = LPM013M126_PARAM_INVERTED, \
                                       .lines = LPM013M126_PARAM_NUM_LINES, \
-                                      .rotation = LPM013M126_PARAM_ROTATION, \
-                                    }
+                                      }
 #endif
 /**@}*/
 

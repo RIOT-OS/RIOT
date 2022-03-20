@@ -21,6 +21,9 @@
 #include <assert.h>
 #include <stdint.h>
 
+#define ENABLE_DEBUG 1
+#include "debug.h"
+
 #include "lpm013m126.h"
 #include "lpm013m126_disp_dev.h"
 
@@ -28,14 +31,20 @@
 #define LPM013M126_DISP_DEV_HEIGHT     (176U)
 #endif
 
+//
+// in fact the LCD is 3bpp but smallest LVGL supports is 8bpp
+// results in RGB 332
+//
 #ifndef LPM013M126_DISP_COLOR_DEPTH
-#define LPM013M126_DISP_COLOR_DEPTH    (4U)
+#define LPM013M126_DISP_COLOR_DEPTH    (8U)
 #endif
 
 static void _lpm013m126_map(const disp_dev_t *dev, uint16_t x1, uint16_t x2,
                   uint16_t y1, uint16_t y2, const uint16_t *color)
 {
     lpm013m126_t *lpm013m126 = (lpm013m126_t *)dev;
+    assert(dev);
+
     lpm013m126_pixmap(lpm013m126, x1, x2, y1, y2, color);
 }
 
@@ -67,8 +76,7 @@ static void _lpm013m126_set_invert(const disp_dev_t *disp_dev, bool invert)
 
     if (invert) {
         lpm013m126_invert(dev);
-    }
-    else {
+    } else {
         lpm013m126_noupdate(dev);
     }
 }

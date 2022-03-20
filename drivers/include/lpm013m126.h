@@ -53,7 +53,6 @@ typedef struct {
     gpio_t disp_pin;                 /**< pin connected to the reset line */
     bool inverted;                  /**< Display works in inverted color mode */
     uint16_t lines;                 /**< Number of lines, from 16 to 320 in 8 line steps */
-    //ili9341_rotation_t rotation;    /**< Display rotation mode */
 } lpm013m126_params_t;
 
 /**
@@ -108,6 +107,10 @@ void lpm013m126_invert(const lpm013m126_t *dev);
  * @param[in]   dev     device descriptor
  */
 void lpm013m126_noupdate(const lpm013m126_t *dev);
+
+void lpm013m126_off(void);
+
+void lpm013m126_on(void);
 
 #ifdef __cplusplus
 }
