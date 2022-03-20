@@ -276,15 +276,15 @@ void IRAM_ATTR thread_yield_higher(void)
     }
     #endif
     if (!irq_is_in()) {
-#ifdef MCU_ESP32
-        /* generate the software interrupt to switch the context */
-        DPORT_WRITE_PERI_REG(DPORT_CPU_INTR_FROM_CPU_0_REG, DPORT_CPU_INTR_FROM_CPU_0);
-#else /* MCU_ESP32 */
+#ifdef MCU_ESP8266
         critical_enter();
         ets_soft_int_type = ETS_SOFT_INT_YIELD;
         WSR(BIT(ETS_SOFT_INUM), interrupt);
         critical_exit();
-#endif /* MCU_ESP32 */
+#else /* MCU_ESP8266 */
+        /* generate the software interrupt to switch the context */
+        DPORT_WRITE_PERI_REG(DPORT_CPU_INTR_FROM_CPU_0_REG, DPORT_CPU_INTR_FROM_CPU_0);
+#endif /* MCU_ESP8266 */
     }
     else {
         /* set the context switch flag */
