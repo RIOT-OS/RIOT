@@ -119,6 +119,15 @@ static void _touch_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 }
 #endif
 
+static void _lvgl_disp_rounder_cb(lv_disp_drv_t * disp_drv, lv_area_t * area)
+{
+  (void) disp_drv;
+
+   /* the lpm013m126 can only update full lines */
+   area->x1 = 0;
+   area->x2 = 175;
+}
+
 void lvgl_init(screen_dev_t *screen_dev)
 {
     lv_init();
@@ -145,6 +154,7 @@ void lvgl_init(screen_dev_t *screen_dev)
        underlying display device parameters */
     disp_drv.hor_res = disp_dev_width(screen_dev->display);
     disp_drv.ver_res = disp_dev_height(screen_dev->display);
+    disp_drv.rounder_cb = _lvgl_disp_rounder_cb;
 #endif
 
     lv_disp_drv_register(&disp_drv);
