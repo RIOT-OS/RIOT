@@ -10,6 +10,7 @@ ifneq (,$(filter mtd,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi_on_qspi
   USEMODULE += mtd_spi_nor
   USEMODULE += mtd_at24cxxx at24mac
+  USEMODULE += sam0_sdhc
 endif
 
 # enables sam0_eth as default network device
@@ -17,8 +18,9 @@ ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += sam0_eth
 endif
 
-# default to using littlefs2 on the external flash
+# default to using littlefs2 on the external flash and fatfs on SD card
 ifneq (,$(filter vfs_default,$(USEMODULE)))
   USEPKG += littlefs2
+  USEMODULE += fatfs_vfs
   USEMODULE += mtd
 endif

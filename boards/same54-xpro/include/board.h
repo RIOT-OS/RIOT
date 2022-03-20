@@ -72,10 +72,11 @@ extern "C" {
  * @name MTD configuration
  * @{
  */
-extern mtd_dev_t *mtd0, *mtd1;
+extern mtd_dev_t *mtd0, *mtd1, *mtd2;
 #define MTD_0       mtd0
 #define MTD_1       mtd1
-#define MTD_NUMOF   2
+#define MTD_2       mtd2
+#define MTD_NUMOF   3
 /** @} */
 
 /**

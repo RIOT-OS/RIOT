@@ -4906,11 +4906,13 @@ boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member LED0_TOGGLE \(macro
 boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
 boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member MTD_0 \(macro definition\) of file board\.h is not documented\.
 boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member MTD_1 \(macro definition\) of file board\.h is not documented\.
+boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member MTD_2 \(macro definition\) of file board\.h is not documented\.
 boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member MTD_NUMOF \(macro definition\) of file board\.h is not documented\.
 boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
 boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member mtd0 \(variable\) of file board\.h is not documented\.
 boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member mtd1 \(variable\) of file board\.h is not documented\.
+boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member mtd2 \(variable\) of file board\.h is not documented\.
 boards/same54\-xpro/include/eui_provider_params\.h:[0-9]+: warning: Member EUI48_PROVIDER_FUNC \(macro definition\) of file eui_provider_params\.h is not documented\.
 boards/same54\-xpro/include/eui_provider_params\.h:[0-9]+: warning: Member EUI48_PROVIDER_TYPE \(macro definition\) of file eui_provider_params\.h is not documented\.
 boards/same54\-xpro/include/periph_conf\.h:[0-9]+: warning: Member ADC_DEV \(macro definition\) of file periph_conf\.h is not documented\.

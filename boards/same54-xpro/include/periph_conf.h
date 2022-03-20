@@ -361,6 +361,17 @@ static const adc_conf_chan_t adc_channels[] = {
 /** @} */
 
 /**
+ * @name SDHC configuration
+ *
+ *       This is entirely optional, but allows us to save a few bytes if only
+ *       a single SDHC instance is used.
+ * @{
+ */
+#define SDHC_DEV            SDHC1       /**< The SDHC instance to use */
+#define SDHC_DEV_ISR        isr_sdhc1   /**< Interrupt service routing for SDHC1 */
+/** @} */
+
+/**
  * @name Ethernet peripheral configuration
  * @{
  */
