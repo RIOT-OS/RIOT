@@ -149,6 +149,7 @@ config MODULE_PERIPH_INIT_TEMPERATURE
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_TEMPERATURE
 
+rsource "Kconfig.timer"
 rsource "Kconfig.uart"
 
 config MODULE_PERIPH_USBDEV
@@ -169,6 +170,5 @@ config HAVE_SHARED_PERIPH_RTT_PERIPH_RTC
         The periph_rtc module or the periph_rtt module share hardware, thus,
         only one can be selected.
 
-rsource "Kconfig.timer"
 rsource "Kconfig.vbat"
 rsource "Kconfig.wdt"
