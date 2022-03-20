@@ -10031,7 +10031,6 @@ drivers/include/sht2x\.h:[0-9]+: warning: Member SHT2X_USER_EOB_MASK \(macro def
 drivers/include/sht2x\.h:[0-9]+: warning: Member SHT2X_USER_HEATER_MASK \(macro definition\) of group drivers_sht2x is not documented\.
 drivers/include/sht2x\.h:[0-9]+: warning: Member SHT2X_USER_OTP_MASK \(macro definition\) of group drivers_sht2x is not documented\.
 drivers/include/sht2x\.h:[0-9]+: warning: Member SHT2X_USER_RESERVED_MASK \(macro definition\) of group drivers_sht2x is not documented\.
-drivers/include/shtc1\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/include/sx127x\.h:[0-9]+: warning: Member SX127X_CHANNEL_HOPPING_FLAG \(macro definition\) of group drivers_sx127x is not documented\.
 drivers/include/sx127x\.h:[0-9]+: warning: Member SX127X_ENABLE_CRC_FLAG \(macro definition\) of group drivers_sx127x is not documented\.
 drivers/include/sx127x\.h:[0-9]+: warning: Member SX127X_ENABLE_FIXED_HEADER_LENGTH_FLAG \(macro definition\) of group drivers_sx127x is not documented\.
@@ -11966,10 +11965,10 @@ drivers/sht3x/include/sht3x_params\.h:[0-9]+: warning: Member SHT3X_PARAM_I2C_DE
 drivers/sht3x/include/sht3x_params\.h:[0-9]+: warning: Member SHT3X_PARAM_MODE \(macro definition\) of file sht3x_params\.h is not documented\.
 drivers/sht3x/include/sht3x_params\.h:[0-9]+: warning: Member SHT3X_PARAM_REPEAT \(macro definition\) of file sht3x_params\.h is not documented\.
 drivers/sht3x/include/sht3x_params\.h:[0-9]+: warning: Member SHT3X_SAUL_INFO \(macro definition\) of file sht3x_params\.h is not documented\.
-drivers/shtc1/include/shtc1_params\.h:[0-9]+: warning: Member SHTC1_PARAMS \(macro definition\) of file shtc1_params\.h is not documented\.
-drivers/shtc1/include/shtc1_params\.h:[0-9]+: warning: Member SHTC1_PARAM_I2C_ADDR \(macro definition\) of file shtc1_params\.h is not documented\.
-drivers/shtc1/include/shtc1_params\.h:[0-9]+: warning: Member SHTC1_PARAM_I2C_DEV \(macro definition\) of file shtc1_params\.h is not documented\.
-drivers/shtc1/include/shtc1_params\.h:[0-9]+: warning: Member SHTC1_SAUL_INFO \(macro definition\) of file shtc1_params\.h is not documented\.
+drivers/shtcx/include/shtcx_params\.h:[0-9]+: warning: Member SHTCX_PARAMS \(macro definition\) of file shtcx_params\.h is not documented\.
+drivers/shtcx/include/shtcx_params\.h:[0-9]+: warning: Member SHTCX_PARAM_I2C_ADDR \(macro definition\) of file shtcx_params\.h is not documented\.
+drivers/shtcx/include/shtcx_params\.h:[0-9]+: warning: Member SHTCX_PARAM_I2C_DEV \(macro definition\) of file shtcx_params\.h is not documented\.
+drivers/shtcx/include/shtcx_params\.h:[0-9]+: warning: Member SHTCX_SAUL_INFO \(macro definition\) of file shtcx_params\.h is not documented\.
 drivers/si1133/include/si1133_internals\.h:[0-9]+: warning: Member SI1133_ADCCONFIG_ADCMUX_MASK \(macro definition\) of file si1133_internals\.h is not documented\.
 drivers/si1133/include/si1133_internals\.h:[0-9]+: warning: Member SI1133_ADCCONFIG_ADCMUX_SHIFT \(macro definition\) of file si1133_internals\.h is not documented\.
 drivers/si1133/include/si1133_internals\.h:[0-9]+: warning: Member SI1133_ADCCONFIG_DECIM_RATE_MASK \(macro definition\) of file si1133_internals\.h is not documented\.
@@ -14891,3 +14890,35 @@ drivers/encx24j600/include/encx24j600_params\.h:[0-9]+: warning: Member ENCX24J6
 drivers/encx24j600/include/encx24j600_params\.h:[0-9]+: warning: Member ENCX24J600_PARAM_CS \(macro definition\) of file encx24j600_params\.h is not documented\.
 drivers/encx24j600/include/encx24j600_params\.h:[0-9]+: warning: Member ENCX24J600_PARAM_INT \(macro definition\) of file encx24j600_params\.h is not documented\.
 drivers/encx24j600/include/encx24j600_params\.h:[0-9]+: warning: Member ENCX24J600_PARAMS \(macro definition\) of file encx24j600_params\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member EXTERNAL_OSC32_SOURCE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member ULTRA_LOW_POWER_INTERNAL_OSC_SOURCE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_CHANNELS \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member TIMER_1_CHANNELS \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member TIMER_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR_TX \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member PWM_0_EN \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member PWM_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member pwm_chan0_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member RTT_FREQUENCY \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member ADC_PRESCALER \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member ADC_NEG_INPUT \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member ADC_REF_DEFAULT \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member ADC_DEV \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member adc_channels\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member sam_usbdev_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f429zi/include/periph_conf\.h:[0-9]+: warning: Member DMA_2_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f429zi/include/periph_conf\.h:[0-9]+: warning: Member ETH_DMA_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f429zi/include/periph_conf\.h:[0-9]+: warning: Member eth_config \(variable\) of file periph_conf\.h is not documented\.

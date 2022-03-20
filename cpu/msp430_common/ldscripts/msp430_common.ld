@@ -12,6 +12,10 @@ SECTIONS
     _srom = ORIGIN(ROM);
     _erom = ORIGIN(ROM) + LENGTH(ROM);
 
+    .flash_writable (NOLOAD) : {
+        KEEP(*(SORT(.flash_writable.*)))
+    } > ROM
+
     .end_fw (NOLOAD) : ALIGN(4) {
         _end_fw = . ;
     } > ROM
