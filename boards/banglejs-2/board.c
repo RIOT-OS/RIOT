@@ -69,6 +69,9 @@ void board_init(void)
     gpio_clear(LCD_DISP);
     gpio_init(LCD_EXTCOMIN, GPIO_OUT);
     gpio_clear(LCD_EXTCOMIN);
+    // LCD CS is high active
+    gpio_init(LCD_CS, GPIO_OUT);
+    gpio_clear(LCD_CS);
 
     gpio_init(BUTTON0, GPIO_IN_PU);
     gpio_init(EXTPOWER_PRESENT, GPIO_IN);
@@ -78,35 +81,38 @@ void board_init(void)
     gpio_init(TOUCH_RESET, GPIO_OUT);
     gpio_set(TOUCH_RESET);
 
-    // LCD CS is high active
-    gpio_init(LCD_CS, GPIO_OUT);
-    gpio_clear(LCD_CS);
-
     // init PWMs
-    pwm_init(PWM_DEV(0), PWM_RIGHT, 1250, 100);
-    pwm_set(PWM_DEV(0), 0, 80); // 80% LCD backlight brightness
-    pwm_poweron(PWM_DEV(0));
+    if (pwm_init(PWM_DEV(0), PWM_RIGHT, 1250, 100) > 0) {
+        pwm_set(PWM_DEV(0), 0, 0); // 0% LCD backlight brightness
+        pwm_poweroff(PWM_DEV(0));
+    }
 
-    pwm_init(PWM_DEV(1), PWM_RIGHT, 1250, 100);
-    pwm_set(PWM_DEV(1), 0, 50); // 50% duty cylce @ 125kHz for EXTCOM ?
-    pwm_poweron(PWM_DEV(1));
+    if (pwm_init(PWM_DEV(1), PWM_RIGHT, 1250, 100) > 0) {
+        pwm_set(PWM_DEV(1), 0, 50); // 50% duty cylce @ 125kHz for EXTCOM ?
+        //pwm_poweron(PWM_DEV(1));
+    }
+
+    if (pwm_init(PWM_DEV(2), PWM_RIGHT, 1250, 100) > 0) {
+        pwm_set(PWM_DEV(2), 0, 0); // vibration off
+        pwm_poweroff(PWM_DEV(2));
+    }
     
     // init ADC
     adc_init(1); // battery voltage monitor
-    // init touchscreen
-#ifdef ENABLE_TOUCH
-    if (cst816s_init(&_input_dev, &_cst816s_input_params, touch_cb, NULL) != CST816S_OK) {
-        printf("cst init fail\n");
-    };
-#endif
 }
 
 void board_power_off(void)
 {
     // power off peripherals as much as we can
     gpio_clear(LCD_DISP);
+#if 0
     gpio_clear(LCD_BACKLIGHT);
     gpio_clear(VIBRATOR);
+#else
+    pwm_poweroff(PWM_DEV(0)); // LCD ExtCOM
+    pwm_poweroff(PWM_DEV(1)); // LCD backlight
+    pwm_poweroff(PWM_DEV(2)); // vibration motor
+#endif
     gpio_clear(HRM_PWR);
     gpio_clear(GPS_PWR);
 
