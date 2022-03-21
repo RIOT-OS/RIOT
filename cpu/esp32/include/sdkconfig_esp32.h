@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       SDK configuration compatible to the ESP-IDF
+ * @brief       SDK configuration used by the ESP-IDF for ESP32
  *
  * The SDK configuration can be partially overridden by application-specific
  * board configuration.
@@ -19,18 +19,8 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef SDKCONFIG_H
-#define SDKCONFIG_H
-
-/*
- * The SoC capability definitions are often included indirectly in the
- * ESP-IDF files, although all ESP-IDF files require them. Since not all
- * ESP-IDF header files are included in RIOT, the SoC capability definitions
- * are unknown if they are only indirectly included. Therefore, the SoC
- * capabilities are included in this file and are thus available to all
- * ESP-IDF files. This avoids to update vendor code.
- */
-#include "soc/soc_caps.h"
+#ifndef SDKCONFIG_ESP32_H
+#define SDKCONFIG_ESP32_H
 
 #ifndef DOXYGEN
 
@@ -39,23 +29,19 @@ extern "C" {
 #endif
 
 /**
- * @brief   SDK version number
- *
- * Determined with `git describe --tags` in `$ESP32_SDK_DIR`
- */
-#if !defined(IDF_VER) || DOXYGEN
-#include "esp_idf_ver.h"
-#endif
-
-/**
  * @name    Clock configuration
  * @{
  */
 
-#ifndef DOXYGEN
 /* Mapping of Kconfig defines to the respective enumeration values */
 #if CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_2
 #define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   2
+#elif CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_5
+#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ     5
+#elif CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_10
+#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ     10
+#elif CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_20
+#define CONFIG_ESP32C3_DEFAULT_CPU_FREQ_MHZ     20
 #elif CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_40
 #define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   40
 #elif CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_80
@@ -64,7 +50,6 @@ extern "C" {
 #define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   160
 #elif CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_240
 #define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   240
-#endif
 #endif
 
 /**
@@ -273,5 +258,5 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
-#endif /* SDKCONFIG_H */
+#endif /* SDKCONFIG_ESP32_H */
 /** @} */
