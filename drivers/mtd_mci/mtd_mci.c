@@ -111,7 +111,7 @@ static int mtd_mci_write_page(mtd_dev_t *dev, const void *buff, uint32_t page,
         return -EIO;
     }
 
-    return pages * SD_HC_BLOCK_SIZE;
+    return min(size, pages * SD_HC_BLOCK_SIZE);
 }
 
 static int mtd_mci_erase_sector(mtd_dev_t *dev, uint32_t sector, uint32_t count)
