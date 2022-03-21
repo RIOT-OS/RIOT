@@ -58,6 +58,7 @@ menu "ESP32x configurations"
 endmenu
 
 orsource "Kconfig.esp32"
+orsource "Kconfig.esp32c3"
 
 rsource "bootloader/Kconfig"
 rsource "esp-idf/Kconfig"
