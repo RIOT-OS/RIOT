@@ -1,6 +1,9 @@
 ifneq (,$(filter test_utils_result_output,$(USEMODULE)))
   include $(RIOTBASE)/sys/test_utils/result_output/Makefile.dep
 endif
+ifneq (,$(filter test_utils_netdev_ieee802154_minimal,$(USEMODULE)))
+  include $(RIOTBASE)/sys/test_utils/netdev_ieee802154_minimal/Makefile.dep
+endif
 ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
   USEMODULE += stdin
 endif
