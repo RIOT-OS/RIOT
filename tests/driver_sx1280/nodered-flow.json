@@ -1,0 +1,277 @@
+[
+    {
+        "id": "ae568ebc.fb41b8",
+        "type": "tab",
+        "label": "Multitech 2.4GHz",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "e94e4490.834a38",
+        "type": "mqtt in",
+        "z": "ae568ebc.fb41b8",
+        "name": "MTCDT 2G4 00800000a000123 Stats",
+        "topic": "gateway/00800000a0001234/event/stats",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c7e7709f.0823d",
+        "x": 190,
+        "y": 80,
+        "wires": [
+            [
+                "88ef1fe1.a72bb"
+            ]
+        ]
+    },
+    {
+        "id": "686dca30.04bb3c",
+        "type": "debug",
+        "z": "ae568ebc.fb41b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 870,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "a76fe098.a4d998",
+        "type": "mqtt in",
+        "z": "ae568ebc.fb41b8",
+        "name": "MTCDT 2G4 00800000a0001234 Up",
+        "topic": "gateway/00800000a0001234/event/up",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c7e7709f.0823d",
+        "x": 180,
+        "y": 260,
+        "wires": [
+            [
+                "91042b89.3edba8"
+            ]
+        ]
+    },
+    {
+        "id": "d531e42d.28f238",
+        "type": "mqtt in",
+        "z": "ae568ebc.fb41b8",
+        "name": "MTCDT 2G4 00800000a0001234 Down",
+        "topic": "gateway/00800000a0001234/event/down",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c7e7709f.0823d",
+        "x": 190,
+        "y": 200,
+        "wires": [
+            [
+                "bbe8b558.ace8b"
+            ]
+        ]
+    },
+    {
+        "id": "88ef1fe1.a72bb",
+        "type": "json",
+        "z": "ae568ebc.fb41b8",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 470,
+        "y": 80,
+        "wires": [
+            [
+                "b5598a85.4cf3b8"
+            ]
+        ]
+    },
+    {
+        "id": "91042b89.3edba8",
+        "type": "json",
+        "z": "ae568ebc.fb41b8",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 470,
+        "y": 260,
+        "wires": [
+            [
+                "62121791.024668"
+            ]
+        ]
+    },
+    {
+        "id": "bbe8b558.ace8b",
+        "type": "json",
+        "z": "ae568ebc.fb41b8",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 470,
+        "y": 200,
+        "wires": [
+            [
+                "874290c7.1b0178"
+            ]
+        ]
+    },
+    {
+        "id": "b5598a85.4cf3b8",
+        "type": "function",
+        "z": "ae568ebc.fb41b8",
+        "name": "toHex",
+        "func": "var p = msg.payload;\nvar g = p.gatewayID;\nmsg.payload.gatewayID = Buffer.from(g, 'base64').toString('hex');\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 630,
+        "y": 80,
+        "wires": [
+            [
+                "e5439f34.2a10c",
+                "79a5c29e.b43de4"
+            ]
+        ]
+    },
+    {
+        "id": "3c7099f5.78f5fe",
+        "type": "function",
+        "z": "ae568ebc.fb41b8",
+        "name": "toHex",
+        "func": "var p = msg.payload;\n\nvar phyPayloadHex = Buffer.from(p.phyPayload, 'base64').toString('hex');\n\nmsg.payload.phyPayloadHex = phyPayloadHex;\n\nvar rxInfo = p.rxInfo;\nrxInfo.gatewayID = Buffer.from(rxInfo.gatewayID, 'base64').toString('hex');\nmsg.payload.rxInfo = rxInfo;\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 570,
+        "y": 700,
+        "wires": [
+            [
+                "686dca30.04bb3c",
+                "3b6bca71.bb5d4e"
+            ]
+        ]
+    },
+    {
+        "id": "e5439f34.2a10c",
+        "type": "link out",
+        "z": "ae568ebc.fb41b8",
+        "name": "",
+        "links": [
+            "4b00e4e3.78ac9c"
+        ],
+        "x": 815,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "3b6bca71.bb5d4e",
+        "type": "link out",
+        "z": "ae568ebc.fb41b8",
+        "name": "",
+        "links": [
+            "4ace9ee2.c6829"
+        ],
+        "x": 815,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "79a5c29e.b43de4",
+        "type": "debug",
+        "z": "ae568ebc.fb41b8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 830,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "62121791.024668",
+        "type": "function",
+        "z": "ae568ebc.fb41b8",
+        "name": "add esp",
+        "func": "function esp(rssi,snr) {\n    return rssi + snr - (10*Math.log10(1 + Math.pow(10,0.1*snr)));\n}\n\nvar p = msg.payload;\n\nvar rxInfo = p.rxInfo;\n\nif(rxInfo){\n    if(Array.isArray(rxInfo)) {\n        rxInfo.forEach(r => {\n            r.esp = esp(r.rssi,r.loRaSNR);\n        });\n    } else {\n        var rssi = rxInfo.rssi;\n        var snr = rxInfo.loRaSNR;\n        p.rxInfo.esp = esp(rssi,snr);\n    }\n}\n\nvar hospots = p.hospots;\n\nif(hospots){\n    hospots.forEach(h => {\n        r.esp = esp(h.rssi,h.snr);\n    });\n}\n\nmsg.payload = p;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 560,
+        "y": 320,
+        "wires": [
+            [
+                "e313e71.320d298"
+            ]
+        ]
+    },
+    {
+        "id": "874290c7.1b0178",
+        "type": "debug",
+        "z": "ae568ebc.fb41b8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 830,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "e313e71.320d298",
+        "type": "function",
+        "z": "ae568ebc.fb41b8",
+        "name": "add devaddr and other",
+        "func": "const MType_JoinRequest = 0x00;\nconst MType_Unconfirmed_Data_Up = 0x40;\nconst MType_Confirmed_Data_Up = 0x80;\n\nvar p = msg.payload;\n\nvar phyPayload = Buffer.from(p.phyPayload,'base64');\n\nvar mhdr = phyPayload[0];\n\nif(phyPayload.length > 13) {\n    var hdr = phyPayload[0];\n    if(((hdr === MType_Unconfirmed_Data_Up) || (hdr === MType_Confirmed_Data_Up))) {\n        p.frametype = \"dataup\";\n        p.devaddr = phyPayload.readUInt32LE(1).toString(16);\n        p.fctrl = phyPayload.readUInt8(5).toString(16);\n        var foptlen = p.fctrl & 0x0f;\n        p.fcnt = phyPayload.readUInt16LE(6);\n        p.fport = phyPayload.readUInt8(8+foptlen);\n        p.mic = phyPayload.readUInt32LE(phyPayload.length-4).toString(16);\n    } else  if(hdr === MType_JoinRequest && phyPayload.length === 23) {\n        p.frametype = \"joinrequest\";\n        p.appeui = phyPayload.readBigUInt64LE(1).toString(16);\n        p.deveui = phyPayload.readBigUInt64LE(9).toString(16);\n    } else {\n        p.frametype = \"unknown\";\n    }\n}\n\nmsg.payload = p;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 600,
+        "y": 380,
+        "wires": [
+            [
+                "3c7099f5.78f5fe"
+            ]
+        ]
+    },
+    {
+        "id": "c7e7709f.0823d",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "LNS",
+        "broker": "test.mosquitto.org",
+        "port": "8883",
+        "tls": "e038e18.c53e52",
+        "clientid": "",
+        "usetls": true,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "e038e18.c53e52",
+        "type": "tls-config",
+        "z": "",
+        "name": "",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "",
+        "servername": "",
+        "verifyservercert": false
+    }
+]
