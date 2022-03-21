@@ -1,0 +1,15 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if TEST_KCONFIG
+
+config MODULE_ESP_HW_COUNTER
+    bool "Enable hardware counter as low-level timer peripheral"
+    depends on HAS_ESP_HW_COUNTER
+    depends on MODULE_PERIPH_TIMER
+
+endif # TEST_KCONFIG
