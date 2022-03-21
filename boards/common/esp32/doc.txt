@@ -20,8 +20,7 @@
 /**
  * @defgroup    boards_esp32  ESP32 Boards
  * @ingroup     boards
- * @brief       This group of boards contains the documentation
- *              defined ESP32 boards.
+ * @brief       This group of boards contains the documentation of ESP32 boards.
  *
  * @note        For detailed information about the ESP32 SoC, the tool chain
  *              as well as configuring and compiling RIOT for ESP32 boards,

@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Common board for the Arduino API
+ * @brief       Common board definitions for the Arduino API
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */

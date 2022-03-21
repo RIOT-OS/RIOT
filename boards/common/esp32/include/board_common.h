@@ -8,9 +8,10 @@
 
 /**
  * @ingroup     boards_common_esp32
- * @brief       Board definitions that are common for all ESP32 boards.
+ * @brief       Common board definitions for ESP32 boards.
  *
- * This file contains board configurations that are valid for all ESP32.
+ * This file contains board configurations that are valid for all
+ * ESP32 boards.
  *
  * For detailed information about the configuration of ESP32 boards, see
  * section \ref esp32_peripherals "Common Peripherals".
@@ -22,9 +23,6 @@
 
 #ifndef BOARD_COMMON_H
 #define BOARD_COMMON_H
-
-/* not required when compiling ESP32 vendor code parts */
-#ifndef ESP32_IDF_CODE
 
 #include <stdint.h>
 
@@ -156,19 +154,5 @@ void print_board_config(void);
 } /* end extern "C" */
 #endif
 
-#else /* ESP32_IDF_CODE */
-
-#ifndef DOXYGEN
-
-#ifdef __cplusplus
-extern "C"
-#endif
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* DOXYGEN */
-#endif /* ESP32_IDF_CODE */
 #endif /* BOARD_COMMON_H */
 /** @} */

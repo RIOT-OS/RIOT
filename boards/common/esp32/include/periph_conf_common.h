@@ -8,9 +8,10 @@
 
 /**
  * @ingroup     boards_common_esp32
- * @brief       Common declarations of ESP32 periphery for all ESP32 boards
+ * @brief       Common peripheral configurations for ESP32 boards
  *
- * This file contains peripheral configurations that are valid for all ESP32.
+ * This file contains peripheral configurations that are valid for all
+ * ESP32 boards.
  *
  * For detailed information about the configuration of ESP32 boards, see
  * section \ref esp32_peripherals "Common Peripherals".

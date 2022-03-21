@@ -58,7 +58,7 @@ information about the ESP32, see section \ref esp32_mcu_esp32 "MCU ESP32".
 
 Generic ESP32-WROOM-32 boards do not have special hardware on board and all
 GPIOs are simply broken out for flexibility. Therefore, the board
-configuration is the most flexible one with provides:
+configuration is the most flexible one which provides:
 
 18 x ADC channels at maximum
 2 x DAC channels at maximum
@@ -75,10 +75,10 @@ This is possible because GPIOs are only used for a specific peripheral
 interface when
 
 - the corresponding peripheral module is used, e.g. `periph_i2c`, or
-- a corresponding init function is called z. `adc_init`, `dac_init` and
-  `pwm_init` or
+- a corresponding init function is called #adc_init, #dac_init and
+  #pwm_init or
 - The corresponding peripheral interface is used for the first time,
-  e.g. `spi_aqcuire.
+  e.g. #spi_acquire.
 
 That is, the purpose for which a GPIO is used depends on which module
 or function is used first.
@@ -170,7 +170,7 @@ and can be used for any purpose. However, if optional off-board hardware
 modules are used, these GPIOs may also be occupied, see
 section \ref esp32_wroom_32_board_configuration for more information.
 
-The corresponding board schematics can be found her [here]
+The corresponding board schematics can be found [here]
 (https://dl.espressif.com/dl/schematics/esp32_devkitc_v4-sch-20180607a.pdf)
 
 @image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/ESP32-WROOM-32_pinouts.png" "EPS32-DevKitC V4 Pinout"
