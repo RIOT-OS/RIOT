@@ -26,7 +26,10 @@
 #include "net/gnrc/tx_sync.h"
 #include "net/udp.h"
 #include "utlist.h"
-#ifdef MODULE_XTIMER
+#if IS_USED(MODULE_ZTIMER_USEC)
+#include "ztimer.h"
+#endif
+#if IS_USED(MODULE_XTIMER)
 #include "xtimer.h"
 #endif
 
@@ -38,7 +41,7 @@ extern gnrc_pktsnip_t *gnrc_pktbuf_fuzzptr;
 gnrc_pktsnip_t *gnrc_sock_prevpkt = NULL;
 #endif
 
-#ifdef MODULE_XTIMER
+#if IS_USED(MODULE_XTIMER) || IS_USED(MODULE_ZTIMER_USEC)
 #define _TIMEOUT_MAGIC      (0xF38A0B63U)
 #define _TIMEOUT_MSG_TYPE   (0x8474)
 
@@ -116,7 +119,14 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     if (mbox_size(&reg->mbox) != GNRC_SOCK_MBOX_SIZE) {
         return -EINVAL;
     }
-#ifdef MODULE_XTIMER
+#if IS_USED(MODULE_ZTIMER_USEC)
+    ztimer_t timeout_timer;
+    if ((timeout != SOCK_NO_TIMEOUT) && (timeout != 0)) {
+        timeout_timer.callback = _callback_put;
+        timeout_timer.arg = reg;
+        ztimer_set(ZTIMER_USEC, &timeout_timer, timeout);
+    }
+#elif IS_USED(MODULE_XTIMER)
     xtimer_t timeout_timer;
 
     /* xtimer_spin would make this never receive anything.
@@ -139,14 +149,16 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
             return -EAGAIN;
         }
     }
-#ifdef MODULE_XTIMER
+#if IS_USED(MODULE_ZTIMER_USEC)
+    ztimer_remove(ZTIMER_USEC, &timeout_timer);
+#elif IS_USED(MODULE_XTIMER)
     xtimer_remove(&timeout_timer);
 #endif
     switch (msg.type) {
         case GNRC_NETAPI_MSG_TYPE_RCV:
             pkt = msg.content.ptr;
             break;
-#ifdef MODULE_XTIMER
+#if IS_USED(MODULE_XTIMER) || IS_USED(MODULE_ZTIMER_USEC)
         case _TIMEOUT_MSG_TYPE:
             if (msg.content.value == _TIMEOUT_MAGIC) {
                 return -ETIMEDOUT;
