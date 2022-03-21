@@ -106,10 +106,9 @@ typedef struct
 
 static _i2c_bus_t _i2c_bus[I2C_NUMOF] = {};
 
-/* to ensure that I2C is always optimized with -O2 to use the defined delays */
+#if defined(CPU_FAM_ESP32)
 #pragma GCC optimize ("O2")
 
-#if defined(MCU_ESP32)
 #define I2C_CLK_CAL     62      /* clock calibration offset */
 #elif defined(MCU_ESP8266)
 #define I2C_CLK_CAL     47      /* clock calibration offset */

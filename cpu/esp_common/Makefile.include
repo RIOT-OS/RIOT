@@ -34,7 +34,7 @@ CFLAGS += -fdata-sections
 CFLAFS += -ffunction-sections
 CFLAGS += -fzero-initialized-in-bss
 
-ifeq (,$(filter esp32c% esp32h%,$(CPU)))
+ifeq (,$(filter esp32c% esp32h%,$(CPU_FAM)))
   CFLAGS += -mlongcalls -mtext-section-literals
 endif
 

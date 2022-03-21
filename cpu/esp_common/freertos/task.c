@@ -26,8 +26,12 @@
 #endif
 #include "timex.h"
 
-#ifdef MCU_ESP32
+#ifdef CPU_FAM_ESP32
 #include "soc/soc.h"
+#endif
+
+#ifdef CPU_FAM_ESP32C3
+#define PRO_CPU_NUM (0)
 #endif
 
 #include "freertos/FreeRTOS.h"
@@ -371,7 +375,7 @@ BaseType_t xTaskNotifyWait(uint32_t ulBitsToClearOnEntry,
 {
     kernel_pid_t pid = thread_getpid();
 
-    DEBUG("%s task=%d entry=%08"PRIx32" exit=%08"PRIx32" wait=%u\n", __func__,
+    DEBUG("%s task=%d entry=%08"PRIx32" exit=%08"PRIx32" wait=%"PRIu32"\n", __func__,
           pid, ulBitsToClearOnEntry, ulBitsToClearOnExit, xTicksToWait);
 
     assert(pid_is_valid(pid));
