@@ -55,19 +55,6 @@ extern "C" {
 #endif
 
 /**
- * @defgroup net_skald_conf Skald compile configurations
- * @ingroup config
- * @{
- */
-/**
- * @brief   Advertising interval in microseconds
- */
-#ifndef CONFIG_SKALD_INTERVAL_MS
-#define CONFIG_SKALD_INTERVAL_MS        (1000U)
-#endif
-/** @} */
-
-/**
  * @brief   List of advertising channels
  */
 #ifndef SKALD_ADV_CHAN
@@ -89,6 +76,7 @@ typedef struct {
     ztimer_t timer;         /**< timer for scheduling advertising events */
     ztimer_now_t last;      /**< last timer trigger (for offset compensation) */
     uint8_t cur_chan;       /**< keep track of advertising channels */
+    uint32_t adv_itvl_ms;   /**< advertising interval [ms] */
 } skald_ctx_t;
 
 /**
