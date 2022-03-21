@@ -14922,3 +14922,21 @@ boards/adafruit\-pybadge/include/periph_conf\.h:[0-9]+: warning: Member sam_usbd
 boards/nucleo\-f429zi/include/periph_conf\.h:[0-9]+: warning: Member DMA_2_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/nucleo\-f429zi/include/periph_conf\.h:[0-9]+: warning: Member ETH_DMA_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/nucleo\-f429zi/include/periph_conf\.h:[0-9]+: warning: Member eth_config \(variable\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member DMA_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member DMA_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member DMA_2_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member DMA_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member dma_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member UART_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member UART_2_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member PWM_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member ETH_DMA_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member eth_config \(variable\) of file periph_conf\.h is not documented\.

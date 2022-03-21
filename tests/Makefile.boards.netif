@@ -33,6 +33,7 @@ BOARD_PROVIDES_NETIF := \
     nrf6310 \
     nucleo-f207zg \
     nucleo-f429zi \
+    nucleo-f439zi \
     nucleo-f767zi \
     openlabs-kw41z-mini \
     openlabs-kw41z-mini-256kib \
