@@ -166,7 +166,7 @@ either based on
 - Tensilica Xtensa 32-bit LX7 microprocessor (ESP32-S2, ESP32-S3), or
 - 32-bit RISC-V CPU (ESP32-C3, ESP32-H2).
 
-At the moment, ESP32 variant is supported by RIOT-OS.
+At the moment, ESP32 and ESP32-C3 variants (families) are supported by RIOT-OS.
 
 @note Even if the used ESP32x SoC is a dual-core version, RIOT-OS uses only
       one core.
@@ -400,7 +400,7 @@ script takes an argument that specifies which tools to download and install:
 $ dist/tools/esptools/install.sh
 
 install.sh <tool>
-tool = all | esp32 | openocd | qemu
+tool = all | esp32 | esp32c3 | openocd | qemu
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Thus, either all tools or only certain tools can be installed.
@@ -427,7 +427,7 @@ paths of the installed tools using again the environment variable
 $ . dist/tools/esptools/export.sh
 
 Usage: export.sh <tool>
-tool = all | esp32 | openocd | qemu
+tool = all | esp32 | esp32c3 | openocd | qemu
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 All the tools required for building a RIOT application for ESP32x SoCs should then
@@ -644,6 +644,7 @@ The number of GPIOs and their usage depends on the respective ESP32x SoC family.
 For details, see:
 
 - \ref esp32_gpio_pins_esp32 "ESP32"
+- \ref esp32_gpio_pins_esp32c3 "ESP32-C3"
 
 [Back to table of contents](#esp32_toc)
 
@@ -655,6 +656,7 @@ used as ADC channels depend on the respective ESP32x SoC family. For
 details, see:
 
 - \ref esp32_adc_channels_esp32 "ESP32"
+- \ref esp32_adc_channels_esp32c3 "ESP32-C3"
 
 #ADC_GPIOS in the board-specific peripheral configuration defines the
 list of GPIOs that can be used as ADC channels on the board, for example:
@@ -711,6 +713,7 @@ extern int adc_line_vref_to_gpio(adc_t line, gpio_t gpio);
 For the GPIO that can be used with this function, see:
 
 - \ref esp32_adc_channels_esp32 "ESP32"
+- \ref esp32_adc_channels_esp32c3 "ESP32-C3"
 
 @note ADC2 is also used by the WiFi module. The GPIOs connected to ADC2 are
       therefore not available as ADC channels if the modules `esp_wifi` or
@@ -783,6 +786,7 @@ The default configuration of I2C interfaces for ESP32x SoC boards depend
 on used ESP32x SoC family, for details see:
 
 - \ref esp32_i2c_interfaces_esp32 "ESP32"
+- \ref esp32_i2c_interfaces_esp32c3 "ESP32-C3"
 
 @note
 - To ensure that the `I2Cn_*` symbols define the configuration for
@@ -832,6 +836,7 @@ The low-speed channel group always exists while the existence high-speed
 channel depends on respective ESP32x SoC family. For details, see:
 
 - \ref esp32_pwm_channels_esp32 "ESP32"
+- \ref esp32_pwm_channels_esp32c3 "ESP32-C3"
 
 Each channel group has 4 timers which can be used as clock source by the
 channels of the respective channel group. Thus it would be possible to
@@ -951,6 +956,7 @@ The default configuration of SPI interface for ESP32x SoC boards depend
 on used ESP32x SoC family, for details see:
 
 - \ref esp32_spi_interfaces_esp32 "ESP32"
+- \ref esp32_spi_interfaces_esp32c3 "ESP32-C3"
 
 @note
 - To ensure that the `SPIn_*` symbols define the configuration for
@@ -992,6 +998,7 @@ The number of timers and available timer implementations depend on used
 ESP32x SoC family, for details see:
 
 - \ref esp32_timers_esp32 "ESP32"
+- \ref esp32_timers_esp32c3 "ESP32-C3"
 
 Timers are MCU built-in features and not board-specific. There is nothing to
 be configured.
@@ -1051,6 +1058,7 @@ The default configuration of the UART interfaces for ESP32x SoC boards depend
 on used ESP32x SoC family, for details see:
 
 - \ref esp32_uart_interfaces_esp32 "ESP32"
+- \ref esp32_uart_interfaces_esp32c3 "ESP32-C3"
 
 @note To ensure that the `UARTn_*` symbols define the configuration for
       UART_DEV(n), the configuration of the UART interfaces UART_DEV(n)
@@ -1811,6 +1819,7 @@ connected to this JTAG interface depend on the ESP32x SoC variant (family).
 For details, see:
 
 - \ref esp32_jtag_interface_esp32 "ESP32"
+- \ref esp32_jtag_interface_esp32c3 "ESP32-C3"
 
 This JTAG interface can be used with OpenOCD and GDB for On-Chip debugging
 of your software on instruction level. When you compile your software with
@@ -1829,6 +1838,7 @@ Other ESP32x SoC variants (families) have an built in USB-to-JTAG bridge
 that can be used without additional chips. For details, see:
 
 - \ref esp32_jtag_interface_esp32 "ESP32"
+- \ref esp32_jtag_interface_esp32c3 "ESP32-C3"
 
 To use the JTAG debugging, the precompiled version of OpenOCD for ESP32 has to
 be installed using the toolchain install script while being in RIOT's root
@@ -1869,6 +1879,7 @@ Detailed information on how to configure the JTAG interface of the respective
 ESP32x SoC variant (family) can be found in ESP-IDF Programming Guide:
 
 - [ESP32](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/jtag-debugging/index.html)
+- [ESP32-C3](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-guides/jtag-debugging/index.html)
 
 [Back to table of contents](#esp32_toc)
 
