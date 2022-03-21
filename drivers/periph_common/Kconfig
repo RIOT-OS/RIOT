@@ -84,16 +84,6 @@ config MODULE_PERIPH_INIT_HWRNG
 
 rsource "Kconfig.i2c"
 
-config MODULE_PERIPH_PWM
-    bool "PWM peripheral driver"
-    depends on HAS_PERIPH_PWM
-    select MODULE_PERIPH_COMMON
-
-config MODULE_PERIPH_INIT_PWM
-    bool "Auto initialize PWM peripheral"
-    default y if MODULE_PERIPH_INIT
-    depends on MODULE_PERIPH_PWM
-
 config MODULE_PERIPH_PM
     bool "Power Management (PM) peripheral driver"
     default y
@@ -104,6 +94,16 @@ config MODULE_PERIPH_INIT_PM
     bool "Auto initialize Power Management (PM) peripheral"
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_PM
+
+config MODULE_PERIPH_PWM
+    bool "PWM peripheral driver"
+    depends on HAS_PERIPH_PWM
+    select MODULE_PERIPH_COMMON
+
+config MODULE_PERIPH_INIT_PWM
+    bool "Auto initialize PWM peripheral"
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_PWM
 
 config MODULE_PERIPH_QDEC
     bool "Quadrature Decoder (QDEC) peripheral driver"
