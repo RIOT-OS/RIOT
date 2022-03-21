@@ -1,11 +1,9 @@
+INCLUDES += -I$(APPDIR)
+BOARD ?= samr21-xpro
+
 include ../Makefile.tests_common
 
-DISABLE_MODULE += auto_init_at86rf2xx
-
-USEMODULE += od
-USEMODULE += shell
-USEMODULE += shell_commands
-USEMODULE += ps
+USEMODULE += test_utils_netdev_ieee802154_minimal
 
 # define the driver to be used for selected boards
 ifneq (,$(filter samr21-xpro,$(BOARD)))
@@ -23,5 +21,7 @@ DRIVER ?= at86rf231
 
 # include the selected driver
 USEMODULE += $(DRIVER)
+
+CFLAGS += -DEVENT_THREAD_STACKSIZE_DEFAULT=1024
 
 include $(RIOTBASE)/Makefile.include
