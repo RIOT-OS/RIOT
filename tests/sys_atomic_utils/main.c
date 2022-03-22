@@ -29,7 +29,8 @@
 #include "random.h"
 #include "shell.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 
 #include "volatile_utils.h"
 
@@ -1093,7 +1094,7 @@ static void *thread_checker_func(void *arg)
                 break;
         }
 
-        xtimer_usleep((random_uint32() & 0x3ff) + XTIMER_BACKOFF);
+        ztimer_sleep(ZTIMER_USEC, (random_uint32() & 0x3ff));
     }
 
     return NULL;
@@ -1144,8 +1145,8 @@ static int start_test(test_width_t width, size_t fn_index, int timeout)
     }
 
     if (timeout) {
-        static xtimer_t xt = { .callback = test_timeout_callback };
-        xtimer_set(&xt, US_PER_SEC * timeout);
+        static ztimer_t xt = { .callback = test_timeout_callback };
+        ztimer_set(ZTIMER_USEC, &xt, US_PER_SEC * timeout);
     }
     mutex_unlock(&conf_mutex);
     return 0;
