@@ -48,9 +48,7 @@ ifneq (,$(filter nimble_host_util,$(USEMODULE)))
 endif
 
 # include transport headers
-ifneq (,$(filter nimble_transport_ram,$(USEMODULE)))
-  INCLUDES += $(NIMIBASE)/nimble/transport/ram/include
-endif
+INCLUDES += $(NIMIBASE)/nimble/transport/include
 
 # include services
 ifneq (,$(filter nimble_svc_ans,$(USEMODULE)))
