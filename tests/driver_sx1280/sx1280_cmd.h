@@ -26,6 +26,10 @@
 #define DELAY_BETWEEN_TX                    (2000000U)
 #endif
 
+#ifndef DELAY_FOR_RX
+#define DELAY_FOR_RX                    (500000U)
+#endif
+
 #ifndef SECONDS_IF_INIT_FAILED
 #define SECONDS_IF_INIT_FAILED              (5U)
 #endif

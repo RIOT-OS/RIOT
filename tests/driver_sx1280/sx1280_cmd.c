@@ -28,6 +28,8 @@
 
 #include "sx1280_cmd.h"
 
+// TODO add a mutex
+static bool _SX1280_WaitingRx = false;
 
 static ral_status_t sx1280_init_status;
 
@@ -600,11 +602,22 @@ int sx1280_listen_cmd(int argc, char **argv)
             printf("ral_sx1280_setup_rx_lora ERROR %d\n", res);
         }
         else {
+            _SX1280_WaitingRx = true;
             res = ral_sx1280_set_rx(&ral_default_cfg, timeout * 1000);
             if (res != RAL_STATUS_OK) {
                 printf("ral_sx1280_set_rx ERROR %d\n", res);
+                _SX1280_WaitingRx = false;
+            }
+            else {
+                while (_SX1280_WaitingRx) {
+                    xtimer_usleep(DELAY_FOR_RX);
+                }
+
             }
         }
+
+
+
     }
 
     return 0;
@@ -637,20 +650,23 @@ static void _SX1280_OnRxDone(void)
     }
     else {
         printf("Rx(%u): ", size);
-		for (unsigned int i = 0; i < size; i++) {
-			printf("%02x", buffer[i]);
-		}
-		printf("\n");
+        for (unsigned int i = 0; i < size; i++) {
+            printf("%02x", buffer[i]);
+        }
+        printf("\n");
 
         ral_rx_pkt_status_lora_t pkt_status;
         res = ral_sx1280_get_lora_pkt_status(&ral_default_cfg, &pkt_status);
         if (res != RAL_STATUS_OK) {
             printf("ral_sx1280_get_lora_pkt_status ERROR %d\n", res);
-        } else {
+        }
+        else {
             printf(" SNR=%d dBm / RSSI=%d dBm\n", pkt_status.snr_pkt_in_db,
                    pkt_status.rssi_pkt_in_dbm);
         }
     }
+    _SX1280_WaitingRx = false;
+
 }
 
 /*
@@ -659,6 +675,8 @@ static void _SX1280_OnRxDone(void)
 static void _SX1280_OnRxTimeout(void)
 {
     printf("SX1280 OnRxTimeout\n");
+    _SX1280_WaitingRx = false;
+
 }
 
 /*
@@ -667,6 +685,8 @@ static void _SX1280_OnRxTimeout(void)
 static void _SX1280_OnRxError(void)
 {
     printf("SX1280 OnRxError\n");
+    _SX1280_WaitingRx = false;
+
 }
 
 static void sx1280_handler_cb(void *arg)
@@ -680,6 +700,7 @@ static void sx1280_handler_cb(void *arg)
  */
 int sx1280_init(void)
 {
+    _SX1280_WaitingRx = false;
     static const radio_callbacks_t rcb = { .txDone = _SX1280_OnTxDone, .rxDone =
                                                _SX1280_OnRxDone, .rxHeaderDone = NULL, .rxTimeout =
                                                _SX1280_OnRxTimeout, .rxError = _SX1280_OnRxError, };
