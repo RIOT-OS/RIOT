@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 PHYTEC Messtechnik GmbH
+ * Copyright (C) 2022 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,41 +7,43 @@
  */
 
 /**
- * @{
  * @ingroup     tests
- * @file
- * @brief       Test application for KW2x network device driver
+ * @{
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Jonas Remmert <j.remmert@phytec.de>
+ * @file
+ * @brief       Test application for KW2XRF IEEE 802.15.4 device driver
+ *
+ * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
+ *
  * @}
  */
 
 #include <stdio.h>
 
 #include "fmt.h"
-#include "shell.h"
+#include "init_dev.h"
 #include "kw2xrf.h"
-#include "net/gnrc.h"
-#include "net/gnrc/netapi.h"
-#include "net/netopt.h"
-
-#define KW2XRF_TESTMODE     (1)
-
-#ifdef KW2XRF_TESTMODE
 #include "kw2xrf_tm.h"
+#include "kw2xrf_params.h"
+#include "shell.h"
+#include "test_utils/netdev_ieee802154_minimal.h"
+
+static kw2xrf_t kw2xrf[KW2XRF_NUM];
 
 /* utility functions */
 static void _set_test_mode(int argc, char **argv, uint8_t mode)
 {
     (void) argc;
     if (fmt_is_number(argv[1])) {
-        kernel_pid_t dev = atoi(argv[1]);
-
-        if (gnrc_netif_get_by_pid(dev)) {
-            gnrc_netapi_set(dev, NETOPT_RF_TESTMODE, 0, (void *)&mode, sizeof(mode));
+        int idx = atoi(argv[1]);
+        if (idx >= (int)KW2XRF_NUM) {
+            puts("invalid interface ID");
             return;
         }
+
+        netdev_t *dev = &(kw2xrf[idx].netdev.netdev);
+        dev->driver->set(dev, NETOPT_RF_TESTMODE, &mode, sizeof(mode));
+        return;
     }
     printf("usage: %s <if_id>\n", argv[0]);
     return;
@@ -113,10 +115,28 @@ static int _tm_ctx_nm1(int argc, char **argv)
     return 0;
 }
 
-#endif
+int netdev_ieee802154_minimal_init_devs(netdev_event_cb_t cb) {
+    puts("Initializing KW2XRF devices");
+
+    for (unsigned i = 0; i < KW2XRF_NUM; i++) {
+        printf("%d out of %d\n", i + 1, KW2XRF_NUM);
+        /* setup the specific driver */
+        kw2xrf_setup(&kw2xrf[i], &kw2xrf_params[i], i);
+
+        /* set the application-provided callback */
+        kw2xrf[i].netdev.netdev.event_callback = cb;
+
+        /* initialize the device driver */
+        int res = kw2xrf[i].netdev.netdev.driver->init(&kw2xrf[i].netdev.netdev);
+        if (res != 0) {
+            return -1;
+        }
+    }
+
+    return 0;
+}
 
 static const shell_command_t shell_commands[] = {
-#ifdef KW2XRF_TESTMODE
     { "idle", "xcvr idle mode", _tm_idle },
     { "ctx_prbs9", "continues transmit the prbs9 pattern", _tm_ctx_prbs9 },
     { "crx", "continues receive mode, useful for current measuring", _tm_crx },
@@ -128,14 +148,18 @@ static const shell_command_t shell_commands[] = {
     { "ctx_ext", "continues transmit modulated carrier", _tm_ctx_ext },
     { "ctx_nm0", "continues transmit modulated carrier", _tm_ctx_nm0 },
     { "ctx_nm1", "continues transmit modulated carrier", _tm_ctx_nm1 },
-#endif
     { NULL, NULL, NULL }
 };
 
 int main(void)
 {
+    puts("Test application for KW2XRF IEEE 802.15.4 device driver");
 
-    puts("KW2XRF device driver test");
+    int res = netdev_ieee802154_minimal_init();
+    if (res) {
+        puts("Error initializing devices");
+        return 1;
+    }
 
     /* start the shell */
     puts("Initialization successful - starting the shell now");
