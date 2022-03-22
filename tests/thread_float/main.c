@@ -25,7 +25,7 @@
 
 #include "thread.h"
 #include "msg.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "timex.h"
 
 static char t1_stack[THREAD_STACKSIZE_MAIN];
@@ -34,17 +34,17 @@ static char t3_stack[THREAD_STACKSIZE_MAIN];
 
 static kernel_pid_t p1, p2, p3;
 
-static xtimer_t timer;
-#define OFFSET (10 * XTIMER_BACKOFF)
+static ztimer_t timer;
+
+#define OFFSET (100)
 
 static mutex_t lock = MUTEX_INIT;
 
 static void timer_cb(void *arg)
 {
     (void) arg;
-
     thread_yield();
-    xtimer_set(&timer, OFFSET);
+    ztimer_set(ZTIMER_USEC, &timer, OFFSET);
 }
 
 static void *thread_1_2_3(void *_arg)
@@ -92,7 +92,7 @@ int main(void)
     puts("THREADS CREATED\n");
 
     timer.callback = timer_cb;
-    xtimer_set(&timer, OFFSET);
+    ztimer_set(ZTIMER_USEC, &timer, OFFSET);
 
     return 0;
 }
