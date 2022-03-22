@@ -86,7 +86,7 @@ static void test_counter_mode(void)
     puts("thread synced");
 
     /* wait for all threads to terminate, we are going to re-use the stack */
-    xtimer_msleep(10);
+    xtimer_msleep(50);
 }
 
 static void test_mask_mode(void)
@@ -113,7 +113,7 @@ static void test_mask_mode(void)
     puts("thread synced");
 
     /* wait for all threads to terminate, we are going to re-use the stack */
-    xtimer_msleep(10);
+    xtimer_msleep(50);
 }
 
 int main(void)
