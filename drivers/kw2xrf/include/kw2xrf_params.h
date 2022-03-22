@@ -20,6 +20,7 @@
 #define KW2XRF_PARAMS_H
 
 #include "board.h"
+#include "kw2xrf.h"
 
 #ifdef __cplusplus
 extern "C" {
