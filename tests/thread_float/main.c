@@ -42,7 +42,7 @@ static mutex_t lock = MUTEX_INIT;
 
 static void timer_cb(void *arg)
 {
-    (void) arg;
+    (void)arg;
     thread_yield();
     ztimer_set(ZTIMER_USEC, &timer, OFFSET);
 }
@@ -80,6 +80,7 @@ int main(void)
     const char *t1_name = "t1";
     const char *t2_name = "t2";
     const char *t3_name = "t3";
+
     p1 = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN + 1,
                        THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
                        thread_1_2_3, (void *)t1_name, t1_name);
