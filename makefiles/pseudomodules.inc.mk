@@ -168,6 +168,7 @@ PSEUDOMODULES += nimble_phy_2mbit
 PSEUDOMODULES += nimble_rpble_ext
 PSEUDOMODULES += nimble_statconn_ext
 PSEUDOMODULES += nimble_autoadv_shell
+PSEUDOMODULES += nrfx
 PSEUDOMODULES += newlib
 PSEUDOMODULES += newlib_gnu_source
 PSEUDOMODULES += newlib_nano

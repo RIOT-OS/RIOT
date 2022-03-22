@@ -1,0 +1,28 @@
+ifneq (,$(filter nrf51,$(CPU_FAM)))
+  CFLAGS += -DNRF51
+endif
+ifneq (,$(filter nrf52805xxaa,$(CPU_MODEL)))
+  CFLAGS += -DNRF52805_XXAA
+endif
+ifneq (,$(filter nrf52810xxaa,$(CPU_MODEL)))
+  CFLAGS += -DNRF52810_XXAA
+endif
+ifneq (,$(filter nrf52811xxaa,$(CPU_MODEL)))
+  CFLAGS += -DNRF52811_XXAA
+endif
+ifneq (,$(filter nrf52820xxaa,$(CPU_MODEL)))
+  CFLAGS += -DNRF52820_XXAA
+endif
+ifneq (,$(filter nrf52832xxaa,$(CPU_MODEL)))
+  CFLAGS += -DNRF52832_XXAA
+endif
+ifneq (,$(filter nrf52833xxaa,$(CPU_MODEL)))
+  CFLAGS += -DNRF52833_XXAA
+endif
+ifneq (,$(filter nrf52840xxaa,$(CPU_MODEL)))
+  CFLAGS += -DNRF52840_XXAA
+endif
+
+INCLUDES += -I$(PKGDIRBASE)/nrfx
+INCLUDES += -I$(PKGDIRBASE)/nrfx/mdk
+INCLUDES += -I$(RIOTPKG)/nrfx/include
