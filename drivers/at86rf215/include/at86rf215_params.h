@@ -20,6 +20,7 @@
 #ifndef AT86RF215_PARAMS_H
 #define AT86RF215_PARAMS_H
 
+#include "at86rf215.h"
 #include "board.h"
 
 #ifdef __cplusplus
