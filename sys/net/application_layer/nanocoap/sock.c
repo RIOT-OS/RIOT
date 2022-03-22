@@ -279,6 +279,38 @@ int nanocoap_get_blockwise_url(const char *url,
     return res;
 }
 
+typedef struct {
+    uint8_t *ptr;
+    size_t len;
+} _buf_t;
+
+static int _2buf(void *arg, size_t offset, uint8_t *buf, size_t len, int more)
+{
+    _buf_t *dst = arg;
+
+    if (offset + len > dst->len) {
+        return -1;
+    }
+
+    memcpy(dst->ptr + offset, buf, len);
+
+    if (!more) {
+        dst->len = offset + len;
+    }
+
+    return 0;
+}
+
+ssize_t nanocoap_get_blockwise_url_to_buf(const char *url,
+                                          coap_blksize_t blksize, void *work_buf,
+                                          void *buf, size_t len)
+{
+    _buf_t _buf = { .ptr = buf, .len = len };
+    int res = nanocoap_get_blockwise_url(url, blksize, work_buf, _2buf, &_buf);
+
+    return (res < 0) ? (ssize_t)res : (ssize_t)_buf.len;
+}
+
 int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
 {
     nanocoap_sock_t sock;

@@ -133,48 +133,12 @@ static inline uint32_t deadline_left(uint32_t deadline)
     return left;
 }
 
-typedef struct {
-    size_t offset;
-    uint8_t *ptr;
-    size_t len;
-} _buf_t;
-
-static int _2buf(void *arg, size_t offset, uint8_t *buf, size_t len, int more)
-{
-    (void)more;
-
-    _buf_t *_buf = arg;
-    if (_buf->offset != offset) {
-        return 0;
-    }
-    if (len > _buf->len) {
-        return -1;
-    }
-    else {
-        memcpy(_buf->ptr, buf, len);
-        _buf->offset += len;
-        _buf->ptr += len;
-        _buf->len -= len;
-        return 0;
-    }
-}
-
-static ssize_t suit_coap_get_blockwise_url_buf(const char *url,
-                                               coap_blksize_t blksize, void *work_buf,
-                                               uint8_t *buf, size_t len)
-{
-    _buf_t _buf = { .ptr = buf, .len = len };
-    int res = nanocoap_get_blockwise_url(url, blksize, work_buf, _2buf, &_buf);
-
-    return (res < 0) ? (ssize_t)res : (ssize_t)_buf.offset;
-}
-
 static void _suit_handle_url(const char *url, coap_blksize_t blksize, void *work_buf)
 {
     LOG_INFO("suit_coap: downloading \"%s\"\n", url);
-    ssize_t size = suit_coap_get_blockwise_url_buf(url, blksize, work_buf,
-                                                   _manifest_buf,
-                                                   SUIT_MANIFEST_BUFSIZE);
+    ssize_t size = nanocoap_get_blockwise_url_to_buf(url, blksize, work_buf,
+                                                     _manifest_buf,
+                                                     SUIT_MANIFEST_BUFSIZE);
     if (size >= 0) {
         LOG_INFO("suit_coap: got manifest with size %u\n", (unsigned)size);
 
