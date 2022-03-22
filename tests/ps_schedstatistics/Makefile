@@ -14,3 +14,8 @@ USEMODULE += ztimer_sec
 DISABLE_MODULE += test_utils_interactive_sync_shell
 
 include $(RIOTBASE)/Makefile.include
+
+# Increase stacksize for AVR idle thread
+ifneq (,$(filter avr8_common,$(USEMODULE)))
+  CFLAGS +=-DTHREAD_STACKSIZE_IDLE=THREAD_STACKSIZE_DEFAULT
+endif
