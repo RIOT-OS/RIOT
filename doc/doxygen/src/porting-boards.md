@@ -176,6 +176,41 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 PROGRAMMER ?= openocd
 ```
 
+## Timer Configurations                            {#board-timer-configurations}
+
+When using high level timers, i.e. `ztimer` there is an overhead in calling
+for @ref ztimer_sleep and @ref ztimer_set functions. This offset can be
+compensated for. It can be measured by running `tests/ztimer_overhead`
+on your board, i.e:
+
+```shell
+$ BOARD=my-new-board make -C tests/ztimer_overhead
+main(): This is RIOT!
+ZTIMER_USEC auto_adjust params:
+    ZTIMER_USEC->adjust_set = xx
+    ZTIMER_USEC->adjust_sleep = xx
+ZTIMER_USEC auto_adjust params cleared
+zitmer_overhead_set...
+min=6 max=7 avg_diff=6
+zitmer_overhead_sleep...
+min=21 max=21 avg_diff=21
+ZTIMER_USEC adjust params for my-new-board:
+    CONFIG_ZTIMER_USEC_ADJUST_SET    6
+    CONFIG_ZTIMER_USEC_ADJUST_SLEEP  21
+```
+
+The last two lines can be added as defines to the new board `board.h`:
+
+```c
+/**
+ * @name    ztimer configuration values
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_ADJUST_SET     6
+#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   21
+/** @} */
+```
+
 ## doc.txt                                                          {#board-doc}
 
 Although not explicitly needed, if upstreamed and as a general good
