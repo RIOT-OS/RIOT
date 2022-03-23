@@ -153,6 +153,7 @@ static void build_lorawan_frame(uint8_t *frame, uint8_t frame_len, uint8_t mhdr,
     frame[8] = fport;
     memcpy(frame + HEADER_SIZE, frm_payload, frm_payload_len);
 
+#ifdef 0
     if (appskey != NULL) {
         // TODO encrypt payload + 9 with appskey
     }
@@ -161,7 +162,7 @@ static void build_lorawan_frame(uint8_t *frame, uint8_t frame_len, uint8_t mhdr,
         // add MIC with nwkskey
         uint32_t mic;
         const size_t mic_idx = frame_len - MIC_SIZE;
-        lorawan_cmac_calculate_mic(frame, mic_idx, nwkskey, devaddr, 0, fcnt, &mic);
+        // TODO lorawan_cmac_calculate_mic(frame, mic_idx, nwkskey, devaddr, 0, fcnt, &mic);
 
         printf("mic_idx=%d, ", mic_idx);
         printf("mic=");
@@ -170,6 +171,7 @@ static void build_lorawan_frame(uint8_t *frame, uint8_t frame_len, uint8_t mhdr,
 
         memcpy((uint8_t *)(frame + mic_idx), &mic, MIC_SIZE);
     }
+#endif
 }
 
 
