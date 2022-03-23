@@ -14940,3 +14940,5 @@ boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \
 boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member ETH_DMA_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member eth_config \(variable\) of file periph_conf\.h is not documented\.
+boards/arduino\-mega2560/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_ADJUST_SET \(macro definition\) of file board\.h is not documented\.
+boards/arduino\-mega2560/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_ADJUST_SLEEP \(macro definition\) of file board\.h is not documented\.
