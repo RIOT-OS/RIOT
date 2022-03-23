@@ -50,14 +50,21 @@ static const i2c_conf_t i2c_config[] = {
         .rcc_mask       = RCC_APB1ENR_I2C1EN,
         .clk            = CLOCK_APB1,
         .irqn           = I2C1_EV_IRQn,
-#elif CPU_FAM_STM32L4 || CPU_FAM_STM32WB || CPU_FAM_STM32G4 || CPU_FAM_STM32L5
+#elif CPU_FAM_STM32L4 || CPU_FAM_STM32WB || CPU_FAM_STM32G4
         .rcc_mask       = RCC_APB1ENR1_I2C1EN,
+        .rcc_sw_mask    = RCC_CCIPR_I2C1SEL_1,          /* HSI (16 MHz) */
+        .irqn           = I2C1_ER_IRQn,
+#elif CPU_FAM_STM32L5
+        .rcc_mask       = RCC_APB1ENR1_I2C1EN,
+        .rcc_sw_mask    = RCC_CCIPR1_I2C1SEL_1,         /* HSI (16 MHz) */
         .irqn           = I2C1_ER_IRQn,
 #elif CPU_FAM_STM32G0
         .rcc_mask       = RCC_APBENR1_I2C1EN,
+        .rcc_sw_mask    = RCC_CCIPR_I2C1SEL_1,          /* HSI (16 MHz) */
         .irqn           = I2C1_IRQn,
 #elif CPU_FAM_STM32F7
         .rcc_mask       = RCC_APB1ENR_I2C1EN,
+        .rcc_sw_mask    = RCC_DCKCFGR2_I2C1SEL_1,       /* HSI (16 MHz) */
         .irqn           = I2C1_ER_IRQn,
 #elif CPU_FAM_STM32F0 || CPU_FAM_STM32L0
         .rcc_mask       = RCC_APB1ENR_I2C1EN,
