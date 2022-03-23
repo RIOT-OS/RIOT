@@ -49,8 +49,8 @@ static int _get_component_size(suit_manifest_t *manifest,
 {
     nanocbor_value_t param_size;
     if ((suit_param_ref_to_cbor(manifest, &comp->param_size, &param_size) == 0)
-            || (nanocbor_get_uint32(&param_size, img_size) < 0)) { return
-        SUIT_ERR_INVALID_MANIFEST;
+            || (nanocbor_get_uint32(&param_size, img_size) < 0)) {
+        return SUIT_ERR_INVALID_MANIFEST;
     }
     return SUIT_OK;
 }
@@ -359,9 +359,8 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
     if (0) {}
 #ifdef MODULE_SUIT_TRANSPORT_COAP
     else if (strncmp(manifest->urlbuf, "coap://", 7) == 0) {
-        uint8_t buffer[NANOCOAP_BLOCKWISE_BUF(CONFIG_SUIT_COAP_BLOCKSIZE)];
         res = nanocoap_get_blockwise_url(manifest->urlbuf, CONFIG_SUIT_COAP_BLOCKSIZE,
-                                         buffer, suit_storage_helper,
+                                         suit_storage_helper,
                                          manifest);
     }
 #endif
