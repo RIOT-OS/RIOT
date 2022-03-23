@@ -13,8 +13,8 @@ SX1280_MODULE = lambda80_mikrobus0
 endif
 
 USEMODULE += sx1280
-USEMODULE += hashes
-USEMODULE += crypto
+# USEMODULE += hashes
+# USEMODULE += crypto
 
 USEMODULE += shell
 USEMODULE += shell_commands

@@ -26,7 +26,6 @@
 
 #include "ral_sx1280.h"
 
-#include "lorawan_crypto.h"
 
 #include "sx1280_cmd.h"
 
