@@ -1,0 +1,39 @@
+From 2edefd222d20da75252f89645c13a332b8098acd Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Thu, 24 Mar 2022 17:15:06 +0100
+Subject: [PATCH 6/6] hw/drivers/dw1000_otp: fix function signature
+
+---
+ hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_otp.h | 2 +-
+ hw/drivers/uwb/uwb_dw1000/src/dw1000_otp.c            | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_otp.h b/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_otp.h
+index 0651606..0e665ae 100644
+--- a/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_otp.h
++++ b/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_otp.h
+@@ -50,7 +50,7 @@ extern "C" {
+ #define OTP_XTRIM_ADDRESS  (0x1E)         //!< OTP address definition for crystal trim
+ 
+ uint32_t _dw1000_otp_read(struct _dw1000_dev_instance_t * inst, uint16_t address);
+-void dw1000_opt_read(struct _dw1000_dev_instance_t * inst, uint32_t address, uint32_t * buffer, uint16_t length);
++void dw1000_otp_read(struct _dw1000_dev_instance_t * inst, uint32_t address, uint32_t * buffer, uint16_t length);
+ 
+ #ifdef __cplusplus
+ }
+diff --git a/hw/drivers/uwb/uwb_dw1000/src/dw1000_otp.c b/hw/drivers/uwb/uwb_dw1000/src/dw1000_otp.c
+index a8fdf3c..444e93a 100644
+--- a/hw/drivers/uwb/uwb_dw1000/src/dw1000_otp.c
++++ b/hw/drivers/uwb/uwb_dw1000/src/dw1000_otp.c
+@@ -51,7 +51,7 @@
+  * @return void
+  *
+  */
+-void dw1000_phy_otp_read(struct _dw1000_dev_instance_t * inst, uint32_t address, uint32_t * buffer, uint16_t length)
++void dw1000_otp_read(struct _dw1000_dev_instance_t * inst, uint32_t address, uint32_t * buffer, uint16_t length)
+ {
+     uint16_t i;
+     dw1000_phy_sysclk_XTAL(inst); // NOTE: Set system clock to XTAL - this is necessary to make sure the values read by _dwt_otpread are reliable
+-- 
+2.32.0
+
