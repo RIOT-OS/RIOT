@@ -110,7 +110,7 @@ int ztimer_msg_receive_timeout(ztimer_clock_t *clock, msg_t *msg,
         return 1;
     }
 
-    ztimer_t t;
+    ztimer_t t = { .base = { .next = NULL } };
     msg_t m = { .type = MSG_ZTIMER, .content.ptr = &m };
 
     ztimer_set_msg(clock, &t, timeout, &m, thread_getpid());
