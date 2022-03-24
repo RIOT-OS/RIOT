@@ -42,7 +42,7 @@ extern "C" {
 /* Swap the 2 bytes of RGB565 color.
  * Useful if the display has a 8 bit interface (e.g. SPI)*/
 #ifndef LV_COLOR_16_SWAP
-#if IS_USED(MODULE_ILI9341)
+#if IS_USED(MODULE_LCD)
 #define LV_COLOR_16_SWAP   1
 #else
 #define LV_COLOR_16_SWAP   0
