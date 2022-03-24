@@ -105,7 +105,7 @@ static int _con(int argc, char **argv)
         return 1;
     }
 
-    if (sock_udp_str2ep(&_gw, argv[1]) != 0) {
+    if (sock_udp_name2ep(&_gw, argv[1]) != 0) {
         puts("error: unable to parse gateway address");
         _gw.port = 0;
         return 1;
