@@ -817,9 +817,9 @@ void sock_dtls_init(void)
 
 static void _ep_to_session(const sock_udp_ep_t *ep, session_t *session)
 {
-    session->port = ep->port;
-    session->size = sizeof(ipv6_addr_t) +       /* addr */
-                    sizeof(unsigned short);     /* port */
+    dtls_session_init(session);
+    session->addr.port = ep->port;
+
     if (ipv6_addr_is_link_local((ipv6_addr_t *)ep->addr.ipv6)) {
         /* set ifindex for link-local addresses */
         session->ifindex = ep->netif;
@@ -827,15 +827,15 @@ static void _ep_to_session(const sock_udp_ep_t *ep, session_t *session)
     else {
         session->ifindex = SOCK_ADDR_ANY_NETIF;
     }
-    memcpy(&session->addr, &ep->addr.ipv6, sizeof(ipv6_addr_t));
+    memcpy(&session->addr.addr, &ep->addr.ipv6, sizeof(session->addr.addr));
 }
 
 static void _session_to_ep(const session_t *session, sock_udp_ep_t *ep)
 {
-    ep->port = session->port;
+    ep->port = session->addr.port;
     ep->netif = session->ifindex;
     ep->family = AF_INET6;
-    memcpy(&ep->addr.ipv6, &session->addr, sizeof(ipv6_addr_t));
+    memcpy(&ep->addr.ipv6, &session->addr.addr, sizeof(ep->addr.ipv6));
 }
 
 static inline uint32_t _update_timeout(uint32_t start, uint32_t timeout)
