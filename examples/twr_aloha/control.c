@@ -149,6 +149,7 @@ static bool _complete_cb(struct uwb_dev *inst, struct uwb_mac_interface *cbs)
         event_post(uwb_core_get_eventq(), &_rng_listen_event.super);
         return false;
     }
+
     /* get received frame */
     struct uwb_rng_instance *rng = (struct uwb_rng_instance *)cbs->inst_ptr;
 
@@ -156,6 +157,15 @@ static bool _complete_cb(struct uwb_dev *inst, struct uwb_mac_interface *cbs)
     twr_frame_t *frame = rng->frames[rng->idx_current];
     /* parse data*/
     uwb_core_rng_data_t data;
+
+    /* with ss twr, the last frame will hold the initiator as the src address,
+       with ds twr, it will hold the responder address */
+    if (IS_ACTIVE(CONFIG_TWR_PRINTF_INITIATOR_ONLY) &&
+        ((frame->code < UWB_DATA_CODE_DS_TWR && frame->src_address != _udev->uid) ||
+         (frame->code >= UWB_DATA_CODE_DS_TWR && frame->dst_address != _udev->uid))) {
+        event_post(uwb_core_get_eventq(), &_rng_listen_event.super);
+        return true;
+    }
 
     data.src = frame->src_address;
     data.dest = frame->dst_address;
