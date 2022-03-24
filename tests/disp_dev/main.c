@@ -56,7 +56,7 @@ int main(void)
 #if IS_USED(MODULE_ILI9341)
     ili9341_t *ili9341 = (ili9341_t *)disp_dev->dev;
     expect(ili9341);
-    expect(max_width == ili9341->params->lines);
+    expect(max_width == ili9341->dev.params->lines);
     expect(max_height == 240);
 #endif
 
