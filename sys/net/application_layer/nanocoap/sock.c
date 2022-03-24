@@ -263,7 +263,7 @@ int nanocoap_get_blockwise_url(const char *url,
         return -EINVAL;
     }
 
-    if (sock_udp_str2ep(&remote, hostport) < 0) {
+    if (sock_udp_name2ep(&remote, hostport) < 0) {
         DEBUG("nanocoap: invalid URL\n");
         return -EINVAL;
     }
