@@ -201,7 +201,7 @@ int mtd_write_page(mtd_dev_t *mtd, const void *data, uint32_t page,
         return -ENODEV;
     }
 
-    if (mtd->work_area == NULL) {
+    if (mtd->driver->flags & MTD_DRIVER_FLAG_DIRECT_WRITE) {
         return mtd_write_page_raw(mtd, data, page, offset, len);
     }
 
