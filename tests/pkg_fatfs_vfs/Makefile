@@ -6,6 +6,7 @@ FEATURES_REQUIRED += periph_spi
 
 # remove this if you don't want to format your SD card
 USEMODULE += fatfs_vfs_format
+CFLAGS += -DCONFIG_FATFS_FORMAT_ALLOC_STATIC=1
 
 FATFS_IMAGE_FILE_SIZE_MIB ?= 128
 
