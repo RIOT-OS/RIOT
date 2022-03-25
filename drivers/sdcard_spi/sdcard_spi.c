@@ -714,6 +714,8 @@ static inline int _read_blocks(sdcard_spi_t *card, int cmd_idx, int bladdr, uint
 int sdcard_spi_read_blocks(sdcard_spi_t *card, int blockaddr, uint8_t *data, int blocksize,
                            int nblocks, sd_rw_response_t *state)
 {
+    *state = 0;
+
     if (nblocks > 1) {
         return _read_blocks(card, SD_CMD_18, blockaddr, data, blocksize, nblocks, state);
     }
@@ -848,6 +850,8 @@ static inline int _write_blocks(sdcard_spi_t *card, uint8_t cmd_idx, int bladdr,
 int sdcard_spi_write_blocks(sdcard_spi_t *card, int blockaddr, const uint8_t *data, int blocksize,
                             int nblocks, sd_rw_response_t *state)
 {
+    *state = 0;
+
     if (nblocks > 1) {
         return _write_blocks(card, SD_CMD_25, blockaddr, data, blocksize, nblocks, state);
     }
