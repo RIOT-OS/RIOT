@@ -107,13 +107,13 @@ static int cmd_read(int argc, char **argv)
 
     int res = mtd_read(dev, buffer, addr, len);
 
-    od_hex_dump_ext(buffer, len, 0, addr);
-
-    free(buffer);
-
     if (res) {
         printf("error: %i\n", res);
+    } else {
+        od_hex_dump_ext(buffer, len, 0, addr);
     }
+
+    free(buffer);
 
     return res;
 }
@@ -140,13 +140,13 @@ static int cmd_read_page(int argc, char **argv)
 
     int res = mtd_read_page(dev, buffer, page, offset, len);
 
-    od_hex_dump_ext(buffer, len, 0, page * dev->page_size + offset);
-
-    free(buffer);
-
     if (res) {
         printf("error: %i\n", res);
+    } else {
+        od_hex_dump_ext(buffer, len, 0, page * dev->page_size + offset);
     }
+
+    free(buffer);
 
     return res;
 }
