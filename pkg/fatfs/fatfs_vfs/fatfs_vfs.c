@@ -29,6 +29,7 @@
 #include "fs/fatfs.h"
 
 #include "time.h"
+#include "mutex.h"
 
 #define ENABLE_DEBUG 0
 #include <debug.h>
