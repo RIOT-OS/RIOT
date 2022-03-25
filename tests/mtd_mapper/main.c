@@ -290,6 +290,11 @@ static void test_mtd_write(void)
     }
 }
 
+static void set_up(void)
+{
+    memset(_dummy_memory, 0xff, sizeof(_dummy_memory));
+}
+
 Test *tests_mtd_mapper_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -299,7 +304,7 @@ Test *tests_mtd_mapper_tests(void)
         new_TestFixture(test_mtd_write),
     };
 
-    EMB_UNIT_TESTCALLER(mtd_flashpage_tests, NULL, NULL, fixtures);
+    EMB_UNIT_TESTCALLER(mtd_flashpage_tests, set_up, NULL, fixtures);
 
     return (Test *)&mtd_flashpage_tests;
 }
