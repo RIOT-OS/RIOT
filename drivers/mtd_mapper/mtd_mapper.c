@@ -116,7 +116,14 @@ static int _write_page(mtd_dev_t *mtd, const void *src, uint32_t page,
                                  page + _page_offset(region),
                                  offset, count);
     _unlock(region);
-    return res;
+
+    if (res < 0) {
+        return res;
+    }
+
+    /* mtd_write_page_raw() returns 0 on success
+     * but we are expected to return the written byte count */
+    return count;
 }
 
 static int _read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count)
@@ -143,7 +150,14 @@ static int _read_page(mtd_dev_t *mtd, void *dest, uint32_t page,
                             page + _page_offset(region),
                             offset, count);
     _unlock(region);
-    return res;
+
+    if (res < 0) {
+        return res;
+    }
+
+    /* mtd_read_page() returns 0 on success
+     * but we are expected to return the read byte count */
+    return count;
 }
 
 static int _erase(mtd_dev_t *mtd, uint32_t addr, uint32_t count)
