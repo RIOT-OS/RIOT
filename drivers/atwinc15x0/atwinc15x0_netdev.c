@@ -46,10 +46,20 @@
 #define ATWINC15X0_WAIT_TIMEOUT         (20)
 #define ATWINC15X0_WAIT_RECONNECT_MS    (5000)
 
+/**
+ * @brief   Don't perform operations that would wake the device from sleep
+ */
+#define _CHECK_SLEEP_STATE(dev) do {                                        \
+                                    if (dev->state != NETOPT_STATE_IDLE) {  \
+                                        return -EBUSY;                      \
+                                    }                                       \
+                                } while (0)
+
 /* Forward function declarations */
 static void _atwinc15x0_wifi_cb(uint8_t event, void *msg);
 static void _atwinc15x0_eth_cb(uint8_t type, void *msg, void *ctrl);
 static int _atwinc15x0_connect(void);
+static int _set_state(atwinc15x0_t *dev, netopt_state_t state);
 
 /**
  * The following buffer is required by the ATWINC15x0 vendor driver to store
@@ -241,6 +251,15 @@ static int _atwinc15x0_send(netdev_t *netdev, const iolist_t *iolist)
         return -ENODEV;
     }
 
+    /* send wakes from standby but not from sleep */
+    if (dev->state == NETOPT_STATE_SLEEP) {
+        DEBUG("%s WiFi is in SLEEP state, cannot send", __func__);
+        return -ENODEV;
+    }
+    if (dev->state == NETOPT_STATE_STANDBY) {
+        _set_state(dev, NETOPT_STATE_IDLE);
+    }
+
     /* atwinc15x0_eth_buf should not be used for incoming packets here */
     assert(dev->rx_buf == NULL);
 
@@ -337,6 +356,19 @@ static int _atwinc15x0_recv(netdev_t *netdev, void *buf, size_t len, void *info)
     return rx_size;
 }
 
+static netopt_enable_t _get_link_state(atwinc15x0_t *dev)
+{
+    if (dev->state != NETOPT_STATE_IDLE) {
+        return NETOPT_DISABLE;
+    }
+
+    if (dev->connected) {
+        return NETOPT_ENABLE;
+    }
+
+    return NETOPT_DISABLE;
+}
+
 static int _atwinc15x0_get(netdev_t *netdev, netopt_t opt, void *val,
                            size_t max_len)
 {
@@ -362,8 +394,7 @@ static int _atwinc15x0_get(netdev_t *netdev, netopt_t opt, void *val,
 
         case NETOPT_LINK:
             assert(max_len == sizeof(netopt_enable_t));
-            *((netopt_enable_t *)val) = (dev->connected) ? NETOPT_ENABLE
-                                                         : NETOPT_DISABLE;
+            *((netopt_enable_t *)val) = _get_link_state(dev);
             return sizeof(netopt_enable_t);
 
         case NETOPT_CHANNEL:
@@ -371,9 +402,15 @@ static int _atwinc15x0_get(netdev_t *netdev, netopt_t opt, void *val,
             *((uint16_t *)val) = dev->channel;
             return sizeof(uint16_t);
 
+        case NETOPT_STATE:
+            assert(max_len >= sizeof(netopt_state_t));
+            *((netopt_state_t *)val) = dev->state;
+            return sizeof(netopt_state_t);
+
         case NETOPT_RSSI:
             assert(max_len == sizeof(int16_t));
             _rssi_info_ready = false;
+            _CHECK_SLEEP_STATE(dev);
             /* trigger the request current RSSI (asynchronous function) */
             if (m2m_wifi_req_curr_rssi() != M2M_SUCCESS) {
                 return 0;
@@ -392,9 +429,30 @@ static int _atwinc15x0_get(netdev_t *netdev, netopt_t opt, void *val,
     }
 }
 
+static int _set_state(atwinc15x0_t *dev, netopt_state_t state)
+{
+    switch (state) {
+    case NETOPT_STATE_SLEEP:
+    case NETOPT_STATE_STANDBY:
+        m2m_wifi_set_sleep_mode(M2M_PS_MANUAL, CONFIG_ATWINC15X0_RECV_BCAST);
+        m2m_wifi_request_sleep(UINT32_MAX);
+        dev->state = state;
+       return sizeof(netopt_state_t);
+    case NETOPT_STATE_IDLE:
+        m2m_wifi_set_sleep_mode(M2M_PS_DEEP_AUTOMATIC, CONFIG_ATWINC15X0_RECV_BCAST);
+        dev->state = state;
+        return sizeof(netopt_state_t);
+    default:
+        break;
+    }
+
+    return -ENOTSUP;
+}
+
 static int _atwinc15x0_set(netdev_t *netdev, netopt_t opt, const void *val,
                            size_t max_len)
 {
+    atwinc15x0_t *dev = (atwinc15x0_t *)netdev;
     assert(val);
 
     DEBUG("%s dev=%p opt=%u val=%p max_len=%u\n", __func__,
@@ -405,6 +463,9 @@ static int _atwinc15x0_set(netdev_t *netdev, netopt_t opt, const void *val,
             assert(max_len == ETHERNET_ADDR_LEN);
             m2m_wifi_set_mac_address((uint8_t *)val);
             return ETHERNET_ADDR_LEN;
+        case NETOPT_STATE:
+            assert(max_len <= sizeof(netopt_state_t));
+            return _set_state(dev, *((const netopt_state_t *)val));
         default:
             return netdev_eth_set(netdev, opt, val, max_len);
     }
@@ -423,6 +484,7 @@ static int _atwinc15x0_init(netdev_t *netdev)
     atwinc15x0->bsp_isr = NULL;
     atwinc15x0->bsp_irq_enabled = true;
     atwinc15x0->connected = false;
+    atwinc15x0->state = NETOPT_STATE_IDLE;
     atwinc15x0->rx_len = 0;
     atwinc15x0->rx_buf = NULL;
 
@@ -448,6 +510,9 @@ static int _atwinc15x0_init(netdev_t *netdev)
         LOG_ERROR("[atwinc15x0] m2m_wifi_enable_dhcp failed with %d\n", res);
         return res;
     }
+
+    /* enable automatic power saving */
+    m2m_wifi_set_sleep_mode(M2M_PS_DEEP_AUTOMATIC, CONFIG_ATWINC15X0_RECV_BCAST);
 
     /* try to connect and return */
     return _atwinc15x0_connect();
