@@ -139,8 +139,8 @@ unsigned gnrc_netif_numof(void)
 
 gnrc_netif_t *gnrc_netif_iter(const gnrc_netif_t *prev)
 {
-    netif_t *result = netif_iter(&prev->netif);
-    return container_of(result, gnrc_netif_t, netif);
+    netif_t *result = netif_iter((prev) ? &prev->netif : NULL);
+    return (result) ? container_of(result, gnrc_netif_t, netif) : NULL;
 }
 
 gnrc_netif_t *gnrc_netif_get_by_type(netdev_type_t type, uint8_t index)
