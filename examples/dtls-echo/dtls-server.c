@@ -123,7 +123,7 @@ static int dtls_handle_read(dtls_context_t *ctx)
         session.ifindex = remote_peer->remote->netif;
     }
 
-    memcpy(&session.addr.addr, &remote_peer->remote->addr.ipv6, sizeof(session.addr.addr));
+    memcpy(&session.addr.ipv6, &remote_peer->remote->addr.ipv6, sizeof(session.addr.ipv6));
     return dtls_handle_message(ctx, &session, packet_rcvd, res);
 }
 

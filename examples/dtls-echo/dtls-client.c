@@ -128,11 +128,11 @@ static int dtls_handle_read(dtls_context_t *ctx)
         session.ifindex = remote.netif;
     }
 
-    memcpy(&session.addr.addr, &remote.addr.ipv6, sizeof(session.addr.addr));
+    memcpy(&session.addr.ipv6, &remote.addr.ipv6, sizeof(session.addr.ipv6));
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         DEBUG("DBG-Client: Msg received from \n\t Addr Src: [");
-        ipv6_addr_print(&session.addr.addr);
+        ipv6_addr_print(&session.addr.ipv6);
         DEBUG("]:%u\n", remote.port);
     }
 
@@ -361,8 +361,8 @@ dtls_context_t *_init_dtls(sock_udp_t *sock, sock_udp_ep_t *local,
     /* Second: We prepare the DTLS Session by means of ctx->app */
     dst->addr.port = remote->port;
 
-    /* NOTE: remote.addr.ipv6 and dst->addr.addr are different structures. */
-    if (ipv6_addr_from_str(&dst->addr.addr, addr_str) == NULL) {
+    /* NOTE: remote.addr.ipv6 and dst->addr.ipv6 are different structures. */
+    if (ipv6_addr_from_str(&dst->addr.ipv6, addr_str) == NULL) {
         puts("ERROR: init_dtls was unable to load the IPv6 addresses!");
         return new_context;
     }
