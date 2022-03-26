@@ -5,6 +5,10 @@ ifneq (,$(filter vfs_auto_format,$(USEMODULE)))
   DEFAULT_MODULE += fatfs_vfs_format
 endif
 
+ifneq (,$(filter fatfs_threadsafe,$(USEMODULE)))
+  USEMODULE += ztimer_msec
+endif
+
 # Use RTC for timestamps if available
 ifeq (,$(filter rtt_rtc,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_rtc
