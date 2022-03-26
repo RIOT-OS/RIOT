@@ -11,5 +11,6 @@ config MODULE_RTT_RTC
     depends on TEST_KCONFIG
     select MODULE_PERIPH_RTT
     select MODULE_RTC_UTILS
+    imply MODULE_ZTIMER_NO_PERIPH_RTT
     help
         Basic RTC implementation based on a RTT.
