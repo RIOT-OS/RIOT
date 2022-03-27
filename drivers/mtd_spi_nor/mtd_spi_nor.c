@@ -304,7 +304,8 @@ static uint32_t mtd_spi_nor_get_size(const mtd_jedec_id_t *id)
     if (mtd_spi_manuf_match(id, SPI_NOR_JEDEC_ATMEL) &&
         /* ID 2 is used to encode the product version, usually 1 or 2 */
         (id->device[1] & ~0x3) == 0) {
-        return (0x1F & id->device[0]) * MBIT_AS_BYTES;
+        /* capacity encoded as power of 32k sectors */
+        return (32 * 1024) << (0x1F & id->device[0]);
     }
     if (mtd_spi_manuf_match(id, SPI_NOR_JEDEC_MICROCHIP)) {
         switch (id->device[1]) {
