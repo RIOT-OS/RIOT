@@ -5,6 +5,7 @@ Command line utility to list and filter TTYs
 import argparse
 import json
 import os
+import re
 import sys
 import time
 
@@ -43,32 +44,9 @@ def filters_match(filters, tty):
     """
     Check if the given TTY interface matches all given filters
     """
-    if filters.serial is not None:
-        if filters.serial != tty["serial"]:
-            return False
 
-    if filters.driver is not None:
-        if filters.driver != tty["driver"]:
-            return False
-
-    if filters.model is not None:
-        if filters.model != tty["model"]:
-            return False
-
-    if filters.model_db is not None:
-        if filters.model_db != tty["model_db"]:
-            return False
-
-    if filters.vendor is not None:
-        if filters.vendor != tty["vendor"]:
-            return False
-
-    if filters.vendor_db is not None:
-        if filters.vendor != tty["vendor_db"]:
-            return False
-
-    for forbidden_serial in filters.exclude_serial:
-        if tty["serial"] == forbidden_serial:
+    for key, regex in filters:
+        if not regex.match(tty[key]):
             return False
 
     return True
@@ -111,19 +89,20 @@ def parse_args(args):
     parser.add_argument("--serial", default=None, type=str,
                         help="Print only devices matching this serial")
     parser.add_argument("--driver", default=None, type=str,
-                        help="Print only devices using this driver")
+                        help="Print only devices using a driver matching this "
+                             "regex")
     parser.add_argument("--model", default=None, type=str,
-                        help="Print only devices matching this model "
-                             "(as reported from device)")
+                        help="Print only devices with a model matching this "
+                             "regex (as reported from device)")
     parser.add_argument("--model-db", default=None, type=str,
-                        help="Print only devices matching this model "
-                             "(DB entry)")
+                        help="Print only devices with a model matching this "
+                             "regex (DB entry)")
     parser.add_argument("--vendor", default=None, type=str,
-                        help="Print only devices matching this vendor "
-                             "(as reported from device)")
+                        help="Print only devices with a vendor matching this "
+                             "regex (as reported from device)")
     parser.add_argument("--vendor-db", default=None, type=str,
-                        help="Print only devices matching this vendor "
-                             "(DB entry)")
+                        help="Print only devices with a vendor matching this "
+                             "regex (DB entry)")
     parser.add_argument("--exclude-serial", type=str, nargs='*', default=None,
                         help="Ignore devices with these serial numbers. "
                              + "Environment variable EXCLUDE_TTY_SERIAL can "
@@ -194,16 +173,45 @@ def print_results(args, ttys):
         print(tty[args.format])
 
 
+def generate_filters(args):
+    """
+    Generate filters for use in the filters_match function from the command
+    line arguments
+    """
+    result = list()
+    if args.serial is not None:
+        result.append(("serial", re.compile(r"^" + re.escape(args.serial)
+                       + r"$")))
+
+    if args.driver is not None:
+        result.append(("driver", re.compile(args.driver)))
+
+    if args.model is not None:
+        result.append(("model", re.compile(args.model)))
+
+    if args.model_db is not None:
+        result.append(("model_db", re.compile(args.model_db)))
+
+    if args.vendor is not None:
+        result.append(("vendor", re.compile(args.vendor)))
+
+    if args.vendor_db is not None:
+        result.append(("vendor_db", re.compile(args.vendor_db)))
+
+    return result
+
+
 def print_ttys(args):
     """
     Print ttys as specified by the given command line arguments
     """
     args = parse_args(args)
+    filters = generate_filters(args)
 
     ttys = []
     for dev in pyudev.Context().list_devices(subsystem='tty', ID_BUS='usb'):
         tty = tty2dict(dev)
-        if filters_match(args, tty):
+        if tty["serial"] not in args.exclude_serial and filters_match(filters, tty):
             ttys.append(tty)
 
     if args.most_recent:
