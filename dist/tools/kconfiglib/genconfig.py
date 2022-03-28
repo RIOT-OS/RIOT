@@ -395,7 +395,7 @@ with error.""")
 
     # HACK: Force all symbols to be evaluated, to catch warnings generated
     # during evaluation (such as out-of-range integers)
-    kconf.write_config(os.devnull)
+    kconf.write_config(os.devnull, save_old=False)
 
     if not check_configs(kconf) and not args.ignore_config_errors:
         sys.exit(1)
