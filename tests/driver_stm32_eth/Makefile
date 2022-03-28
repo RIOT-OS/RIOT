@@ -1,10 +1,15 @@
+BOARD ?= nucleo-f207zg
+
+INCLUDES += -I$(APPDIR)
+
 include ../Makefile.tests_common
 
 USEMODULE += test_utils_netdev_eth_minimal
 
 # the driver to test
-USEMODULE += ethos
+USEMODULE += stm32_eth
 
-INCLUDES += -I$(APPDIR)
+FEATURES_REQUIRED += periph_eth
+FEATURES_REQUIRED += cpu_stm32
 
 include $(RIOTBASE)/Makefile.include

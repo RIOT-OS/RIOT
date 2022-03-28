@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Test application for DOSE driver
+ * @brief       Test application for STM32 ethernet peripheral driver
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  *
@@ -21,36 +21,30 @@
 #include <stdio.h>
 
 #include "shell.h"
-#include "test_utils/netdev_eth_minimal.h"
-#include "init_dev.h"
 #include "assert.h"
-#include "dose.h"
-#include "dose_params.h"
+#include "stm32_eth.h"
+#include "test_utils/netdev_eth_minimal.h"
 
-static dose_t dose[DOSE_NUM];
+static netdev_t stm32_eth;
 
 int netdev_eth_minimal_init_devs(netdev_event_cb_t cb) {
-    for (unsigned i = 0; i < DOSE_NUM; i ++) {
-        netdev_t *device = &dose[i].netdev;
 
-        /* setup the specific driver */
-        dose_setup(&dose[i], &dose_params[i], i);
+    /* setup the specific driver */
+    stm32_eth_netdev_setup(&stm32_eth);
 
-        /* set the application-provided callback */
-        device->event_callback = cb;
+    /* set the application-provided callback */
+    stm32_eth.event_callback = cb;
 
-        /* initialize the device driver */
-        int res = device->driver->init(device);
-        assert(!res);
-    }
+    /* initialize the device driver */
+    int res = stm32_eth.driver->init(&stm32_eth);
+    assert(!res);
 
     return 0;
 }
 
-
 int main(void)
 {
-    puts("Test application for DOSE driver");
+    puts("Test application for STM32 ethernet peripheral driver");
 
     int res = netdev_eth_minimal_init();
     if (res) {

@@ -188,6 +188,9 @@ endif
 ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
   DIRS += test_utils/interactive_sync
 endif
+ifneq (,$(filter test_utils_netdev_eth_minimal,$(USEMODULE)))
+  DIRS += test_utils/netdev_eth_minimal
+endif
 ifneq (,$(filter test_utils_result_output,$(USEMODULE)))
   DIRS += test_utils/result_output
 endif

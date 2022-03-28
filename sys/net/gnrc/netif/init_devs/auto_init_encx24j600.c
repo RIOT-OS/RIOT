@@ -58,7 +58,7 @@ void auto_init_encx24j600(void)
         LOG_DEBUG("[auto_init_netif] initializing encx24j600 #%u\n", i);
 
         /* setup netdev device */
-        encx24j600_setup(&encx24j600[i], &encx24j600_params[i]);
+        encx24j600_setup(&encx24j600[i], &encx24j600_params[i], i);
 
         /* initialize netdev<->gnrc adapter state */
         gnrc_netif_ethernet_create(&_netif[i], _netdev_eth_stack[i], ENCX24J600_MAC_STACKSIZE,

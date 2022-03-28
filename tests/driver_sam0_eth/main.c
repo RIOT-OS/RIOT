@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Test application for DOSE driver
+ * @brief       Test application for SAM0 ethernet peripheral
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  *
@@ -24,33 +24,29 @@
 #include "test_utils/netdev_eth_minimal.h"
 #include "init_dev.h"
 #include "assert.h"
-#include "dose.h"
-#include "dose_params.h"
+#include "net/netdev.h"
+#include "sam0_eth_netdev.h"
 
-static dose_t dose[DOSE_NUM];
+static netdev_t sam0_eth;
 
 int netdev_eth_minimal_init_devs(netdev_event_cb_t cb) {
-    for (unsigned i = 0; i < DOSE_NUM; i ++) {
-        netdev_t *device = &dose[i].netdev;
 
-        /* setup the specific driver */
-        dose_setup(&dose[i], &dose_params[i], i);
+    /* setup the specific driver */
+    sam0_eth_setup(&sam0_eth);
 
-        /* set the application-provided callback */
-        device->event_callback = cb;
+    /* set the application-provided callback */
+    sam0_eth.event_callback = cb;
 
-        /* initialize the device driver */
-        int res = device->driver->init(device);
-        assert(!res);
-    }
+    /* initialize the device driver */
+    int res = sam0_eth.driver->init(&sam0_eth);
+    assert(!res);
 
     return 0;
 }
 
-
 int main(void)
 {
-    puts("Test application for DOSE driver");
+    puts("Test application for SAM0 ethernet peripheral");
 
     int res = netdev_eth_minimal_init();
     if (res) {
