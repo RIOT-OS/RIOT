@@ -48,7 +48,7 @@ static void *_thread_fn(void *arg)
             volatile uint32_t now = ztimer_now(ZTIMER_USEC);
             (void)now;
         }
-        ztimer_sleep(ZTIMER_USEC, 100); /* Sleep for a bit */
+        ztimer_sleep(ZTIMER_USEC, 1000); /* Sleep for a bit */
         msg_send(&m2, pids[next]);
     }
 

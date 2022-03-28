@@ -12,7 +12,7 @@ import time
 from testrunner import run
 
 
-PRECISION = float(os.getenv("TEST_PERIPH_TIMER_PERIODIC_PRECISION", "0"))
+PRECISION = float(os.getenv("TEST_PERIPH_TIMER_PERIODIC_PRECISION", "0.01"))
 
 
 def testfunc(child):
