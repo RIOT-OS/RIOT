@@ -25,8 +25,13 @@
 #include <string.h>
 #include <errno.h>
 
+#include "kernel_defines.h"
 #include "mtd.h"
+#if IS_USED(MODULE_ZTIMER_USEC)
+#include "ztimer.h"
+#elif IS_USED(MODULE_XTIMER)
 #include "xtimer.h"
+#endif
 #include "thread.h"
 #include "byteorder.h"
 #include "mtd_spi_nor.h"
@@ -338,10 +343,14 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
 {
     unsigned i = 0, j = 0;
     uint32_t div = 2;
+#if IS_ACTIVE(ENABLE_DEBUG)
     uint32_t diff = 0;
-    if (IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_XTIMER)) {
-        diff = xtimer_now_usec();
-    }
+#endif
+#if IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_ZTIMER_USEC)
+    diff = ztimer_now(ZTIMER_USEC);
+#elif IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_XTIMER)
+    diff = xtimer_now_usec();
+#endif
     do {
         uint8_t status;
         mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
@@ -351,7 +360,21 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
             break;
         }
         i++;
-#if MODULE_XTIMER
+#if IS_USED(MODULE_ZTIMER_USEC)
+        if (us) {
+            ztimer_sleep(ZTIMER_USEC, us);
+            /* reduce the waiting time quickly if the estimate was too short,
+             * but still avoid busy (yield) waiting */
+            if (us > 2) {
+                us -= (us / div);
+                div++;
+            }
+        }
+        else {
+            j++;
+            thread_yield();
+        }
+#elif IS_USED(MODULE_XTIMER)
         if (us) {
             xtimer_usleep(us);
             /* reduce the waiting time quickly if the estimate was too short,
@@ -375,10 +398,14 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
 #endif
     } while (1);
     DEBUG("wait loop %u times, yield %u times", i, j);
-    if (IS_ACTIVE(ENABLE_DEBUG) && IS_ACTIVE(MODULE_XTIMER)) {
-        diff = xtimer_now_usec() - diff;
-        DEBUG(", total wait %"PRIu32"us", diff);
-    }
+#if IS_ACTIVE(ENABLE_DEBUG)
+#if IS_USED(MODULE_ZTIMER_USEC)
+    diff = ztimer_now(ZTIMER_USEC) - diff;
+#elif IS_USED(MODULE_XTIMER)
+    diff = xtimer_now_usec() - diff;
+#endif
+    DEBUG(", total wait %"PRIu32"us", diff);
+#endif
     DEBUG("\n");
 }
 
@@ -416,20 +443,22 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
     switch (power) {
         case MTD_POWER_UP:
             mtd_spi_cmd(dev, dev->params->opcode->wake);
-#if defined(MODULE_XTIMER)
             /* No sense in trying multiple times if no xtimer to wait between
                reads */
             uint8_t retries = 0;
             int res = 0;
             do {
+#if IS_USED(MODULE_ZTIMER_USEC)
+                ztimer_sleep(ZTIMER_USEC, dev->params->wait_chip_wake_up);
+#elif IS_USED(MODULE_XTIMER)
                 xtimer_usleep(dev->params->wait_chip_wake_up);
+#endif
                 res = mtd_spi_read_jedec_id(dev, &dev->jedec_id);
                 retries++;
             } while (res < 0 && retries < MTD_POWER_UP_WAIT_FOR_ID);
             if (res < 0) {
                 return -EIO;
             }
-#endif
             /* enable 32 bit address mode */
             if (dev->addr_width == 4) {
                 _enable_32bit_addr(dev);
