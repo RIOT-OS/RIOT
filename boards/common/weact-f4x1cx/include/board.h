@@ -64,13 +64,12 @@ extern "C" {
  *       You have to solder a serial flash yourself and adjust the parameters.
  * @{
  */
-#define WEACT_4X1CX_NOR_PAGE_SIZE          (256)
-#define WEACT_4X1CX_NOR_PAGES_PER_SECTOR   (16)
-#define WEACT_4X1CX_NOR_FLAGS              (SPI_NOR_F_SECT_4K | SPI_NOR_F_SECT_32K)
-#define WEACT_4X1CX_NOR_SPI_DEV            SPI_DEV(0)
-#define WEACT_4X1CX_NOR_SPI_CLK            SPI_CLK_10MHZ
-#define WEACT_4X1CX_NOR_SPI_CS             GPIO_PIN(PORT_A, 4)
-#define WEACT_4X1CX_NOR_SPI_MODE           SPI_MODE_0
+#define WEACT_4X1CX_NOR_PAGE_SIZE           (256)
+#define WEACT_4X1CX_NOR_PAGES_PER_SECTOR    (16)
+#define WEACT_4X1CX_NOR_SPI_DEV             SPI_DEV(0)
+#define WEACT_4X1CX_NOR_SPI_CLK             SPI_CLK_10MHZ
+#define WEACT_4X1CX_NOR_SPI_CS              GPIO_PIN(PORT_A, 4)
+#define WEACT_4X1CX_NOR_SPI_MODE            SPI_MODE_0
 /** @} */
 
 /**
