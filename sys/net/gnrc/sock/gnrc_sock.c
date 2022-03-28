@@ -120,14 +120,14 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
         return -EINVAL;
     }
 #if IS_USED(MODULE_ZTIMER_USEC)
-    ztimer_t timeout_timer;
+    ztimer_t timeout_timer = { .base = { .next = NULL } };
     if ((timeout != SOCK_NO_TIMEOUT) && (timeout != 0)) {
         timeout_timer.callback = _callback_put;
         timeout_timer.arg = reg;
         ztimer_set(ZTIMER_USEC, &timeout_timer, timeout);
     }
 #elif IS_USED(MODULE_XTIMER)
-    xtimer_t timeout_timer;
+    xtimer_t timeout_timer = { .callback = NULL };
 
     /* xtimer_spin would make this never receive anything.
      * Avoid that by setting the minimal not spinning timeout. */
