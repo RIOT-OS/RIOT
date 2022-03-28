@@ -74,7 +74,7 @@ void nimble_autoadv_init(void)
 {
     nimble_autoadv_reset();
 
-    if (!NIMBLE_AUTOADV_START_MANUALLY) {
+    if (!CONFIG_NIMBLE_AUTOADV_START_MANUALLY) {
         nimble_autoadv_start();
     }
 }
@@ -160,7 +160,7 @@ void nimble_autoadv_reset(void)
     int rc = 0;
     (void) rc;
 
-    if (IS_ACTIVE(NIMBLE_AUTOADV_FLAG_FIELD) && BLUETIL_AD_FLAGS_DEFAULT != 0) {
+    if (IS_ACTIVE(CONFIG_NIMBLE_AUTOADV_FLAG_FIELD) && BLUETIL_AD_FLAGS_DEFAULT != 0) {
         rc = bluetil_ad_init_with_flags(&_ad, buf, sizeof(buf),
                                         BLUETIL_AD_FLAGS_DEFAULT);
         assert(rc == BLUETIL_AD_OK);
@@ -169,8 +169,8 @@ void nimble_autoadv_reset(void)
         bluetil_ad_init(&_ad, buf, 0, sizeof(buf));
     }
 
-    if (NIMBLE_AUTOADV_DEVICE_NAME != NULL) {
-        rc = bluetil_ad_add_name(&_ad, NIMBLE_AUTOADV_DEVICE_NAME);
+    if (CONFIG_NIMBLE_AUTOADV_DEVICE_NAME != NULL) {
+        rc = bluetil_ad_add_name(&_ad, CONFIG_NIMBLE_AUTOADV_DEVICE_NAME);
         assert(rc == BLUETIL_AD_OK);
     }
 

@@ -283,7 +283,7 @@ int main(void)
     assert(rc == 0);
 
     /* set the device name */
-    ble_svc_gap_device_name_set(NIMBLE_AUTOADV_DEVICE_NAME);
+    ble_svc_gap_device_name_set(CONFIG_NIMBLE_AUTOADV_DEVICE_NAME);
     /* reload the GATT server to link our added services */
     ble_gatts_start();
 

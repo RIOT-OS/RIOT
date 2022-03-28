@@ -35,25 +35,25 @@ extern "C" {
 #endif
 
 /**
-* @brief    Name of the device for the advertising procedure. If this is not
+ * @brief   Name of the device for the advertising procedure. If this is not
  *          defined, it will be defined as NULL, resulting in not configuring
  *          a name at all.
 */
-#ifndef NIMBLE_AUTOADV_DEVICE_NAME
-    #define NIMBLE_AUTOADV_DEVICE_NAME NULL
+#ifndef CONFIG_NIMBLE_AUTOADV_DEVICE_NAME
+#define CONFIG_NIMBLE_AUTOADV_DEVICE_NAME       "NimBLE on RIOT"
 #endif
 
 /**
 * @brief    If an application is calling functions from nimble, e.g.
- *          ble_svc_gap_device_name_set(), NIMBLE_AUTOADV_START_MANUALLY should
+ *          ble_svc_gap_device_name_set(), CONFIG_NIMBLE_AUTOADV_START_MANUALLY should
  *          be set to 1 and then the application should call
- *          nimble_autoadv_start() after all of its nimble calls to prevent
+ *          nimble_autoadv_start(NULL) after all of its nimble calls to prevent
  *          errors like BLE_HS_EBUSY.
  *
  *          Defined as 0 by default.
 */
-#ifndef NIMBLE_AUTOADV_START_MANUALLY
-    #define NIMBLE_AUTOADV_START_MANUALLY 0
+#ifndef CONFIG_NIMBLE_AUTOADV_START_MANUALLY
+#define CONFIG_NIMBLE_AUTOADV_START_MANUALLY    0
 #endif
 
 /**
@@ -63,8 +63,8 @@ extern "C" {
  *          are non-zero and the advertising packet is connectable, otherwise
  *          the Flags data type may be omitted.
  */
-#ifndef NIMBLE_AUTOADV_FLAG_FIELD
-    #define NIMBLE_AUTOADV_FLAG_FIELD 1
+#ifndef CONFIG_NIMBLE_AUTOADV_FLAG_FIELD
+#define CONFIG_NIMBLE_AUTOADV_FLAG_FIELD        1
 #endif
 
 /**
@@ -124,7 +124,7 @@ void nimble_auto_adv_set_gap_cb(ble_gap_event_fn *cb, void *cb_arg);
 /**
  * @brief   Start the automated advertising procedure.
  *
- *          Needs to be called manually when NIMBLE_AUTOADV_START_MANUALLY was
+ *          Needs to be called manually when CONFIG_NIMBLE_AUTOADV_START_MANUALLY was
  *          set to true and after every call of nimble_autoadv_stop() to start
  *          advertising again.
  */
