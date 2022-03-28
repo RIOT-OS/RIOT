@@ -684,26 +684,6 @@ int nimble_netif_close(int handle)
     return 0;
 }
 
-#if MYNEWT_VAL_BLE_EXT_ADV
-static int _get_phy_hci(uint8_t mode)
-{
-    switch (mode) {
-        case NIMBLE_PHY_1M:
-            return BLE_HCI_LE_PHY_1M;
-#if IS_USED(MODULE_NIMBLE_PHY_2MBIT)
-        case NIMBLE_PHY_2M:
-            return BLE_HCI_LE_PHY_2M;
-#endif
-#if IS_USED(MODULE_NIMBLE_PHY_CODED)
-        case NIMBLE_PHY_CODED:
-            return BLE_HCI_LE_PHY_CODED;
-#endif
-        default:
-            return -1;
-    }
-}
-#endif
-
 static int _accept(const uint8_t *ad, size_t ad_len, const ble_addr_t *addr,
                    const nimble_netif_accept_cfg_t *params)
 {
@@ -730,8 +710,8 @@ static int _accept(const uint8_t *ad, size_t ad_len, const ble_addr_t *addr,
     memset(&p, 0, sizeof(p));
 
     /* figure out PHY modes */
-    int phy_pri = _get_phy_hci(params->primary_phy);
-    int phy_sec = _get_phy_hci(params->secondary_phy);
+    int phy_pri = nimble_riot_get_phy_hci(params->primary_phy);
+    int phy_sec = nimble_riot_get_phy_hci(params->secondary_phy);
     if ((phy_pri < 0) || (phy_sec < 0)) {
         nimble_netif_conn_free(handle, NULL);
         return -EINVAL;

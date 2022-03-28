@@ -128,26 +128,6 @@ void nimble_autoadv_set_gap_cb(ble_gap_event_fn *cb, void *cb_arg)
     }
 }
 
-#if MYNEWT_VAL_BLE_EXT_ADV
-static int _get_phy_hci(uint8_t mode)
-{
-    switch (mode) {
-    case NIMBLE_PHY_1M:
-        return BLE_HCI_LE_PHY_1M;
-#if IS_USED(MODULE_NIMBLE_PHY_2MBIT)
-    case NIMBLE_PHY_2M:
-        return BLE_HCI_LE_PHY_2M;
-#endif
-#if IS_USED(MODULE_NIMBLE_PHY_CODED)
-    case NIMBLE_PHY_CODED:
-        return BLE_HCI_LE_PHY_CODED;
-#endif
-    default:
-        return -1;
-    }
-}
-#endif
-
 void nimble_autoadv_start(ble_addr_t *addr)
 {
     int rc;
@@ -172,8 +152,8 @@ void nimble_autoadv_start(ble_addr_t *addr)
         .own_addr_type = _cfg.own_addr_type,
         .peer = *addr,
         .filter_policy = _cfg.filter_policy,
-        .primary_phy = _get_phy_hci(_cfg.phy),
-        .secondary_phy = _get_phy_hci(_cfg.phy),
+        .primary_phy = nimble_riot_get_phy_hci(_cfg.phy),
+        .secondary_phy = nimble_riot_get_phy_hci(_cfg.phy),
         .tx_power = _cfg.tx_power,
         .sid = CONFIG_NIMBLE_AUTOADV_INSTANCE,
     };

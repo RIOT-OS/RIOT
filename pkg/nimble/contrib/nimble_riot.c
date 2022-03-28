@@ -197,3 +197,23 @@ void nimble_riot_init(void)
     assert(res == 0);
 #endif
 }
+
+#if MYNEWT_VAL_BLE_EXT_ADV
+int nimble_riot_get_phy_hci(uint8_t mode)
+{
+    switch (mode) {
+    case NIMBLE_PHY_1M:
+        return BLE_HCI_LE_PHY_1M;
+#if IS_USED(MODULE_NIMBLE_PHY_2MBIT)
+    case NIMBLE_PHY_2M:
+        return BLE_HCI_LE_PHY_2M;
+#endif
+#if IS_USED(MODULE_NIMBLE_PHY_CODED)
+    case NIMBLE_PHY_CODED:
+        return BLE_HCI_LE_PHY_CODED;
+#endif
+    default:
+        return -1;
+    }
+}
+#endif
