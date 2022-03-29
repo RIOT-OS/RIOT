@@ -265,6 +265,7 @@ int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str)
     }
 
 #if defined(MODULE_SOCK_DNS)
+    int family;
     char hostbuf[CONFIG_SOCK_HOSTPORT_MAXLEN];
     const char *host;
     char *hostend = strchr(str, ':');
@@ -282,13 +283,28 @@ int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str)
         ep_out->port = atoi(hostend + 1);;
     }
 
-    switch (sock_dns_query(host, &ep_out->addr, AF_UNSPEC)) {
+    if (IS_ACTIVE(SOCK_HAS_IPV4) && IS_ACTIVE(SOCK_HAS_IPV6)) {
+        family = AF_UNSPEC;
+    } else if (IS_ACTIVE(SOCK_HAS_IPV4)) {
+        family = AF_INET;
+    } else if (IS_ACTIVE(SOCK_HAS_IPV6)) {
+        family = AF_INET6;
+    } else {
+        assert(0);
+        return -EINVAL;
+    }
+
+    switch (sock_dns_query(host, &ep_out->addr, family)) {
+#ifdef SOCK_HAS_IPV4
     case 4:
         ep_out->family = AF_INET;
         return 0;
+#endif
+#ifdef SOCK_HAS_IPV6
     case 16:
         ep_out->family = AF_INET6;
         return 0;
+#endif
     default:
         return -EINVAL;
     }
