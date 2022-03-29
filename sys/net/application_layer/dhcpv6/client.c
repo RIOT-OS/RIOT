@@ -613,8 +613,6 @@ static int _preparse_advertise(uint8_t *adv, size_t len, uint8_t **buf)
     dhcpv6_opt_duid_t *cid = NULL, *sid = NULL;
     dhcpv6_opt_pref_t *pref = NULL;
     dhcpv6_opt_status_t *status = NULL;
-    dhcpv6_opt_ia_pd_t *ia_pd = NULL;
-    dhcpv6_opt_ia_na_t *ia_na = NULL;
     size_t orig_len = len;
     uint8_t pref_val = 0;
 
@@ -640,16 +638,6 @@ static int _preparse_advertise(uint8_t *adv, size_t len, uint8_t **buf)
             case DHCPV6_OPT_STATUS:
                 status = (dhcpv6_opt_status_t *)opt;
                 break;
-            case DHCPV6_OPT_IA_PD:
-                if (IS_USED(MODULE_DHCPV6_CLIENT_IA_PD)) {
-                    ia_pd = (dhcpv6_opt_ia_pd_t *)opt;
-                }
-                break;
-            case DHCPV6_OPT_IA_NA:
-                if (IS_USED(MODULE_DHCPV6_CLIENT_IA_NA)) {
-                    ia_na = (dhcpv6_opt_ia_na_t *)opt;
-                }
-                break;
             case DHCPV6_OPT_PREF:
                 pref = (dhcpv6_opt_pref_t *)opt;
                 break;
@@ -657,11 +645,9 @@ static int _preparse_advertise(uint8_t *adv, size_t len, uint8_t **buf)
                 break;
         }
     }
-    if ((cid == NULL) || (sid == NULL) ||
-        (IS_USED(MODULE_DHCPV6_CLIENT_IA_PD) && (ia_pd == NULL)) ||
-        (IS_USED(MODULE_DHCPV6_CLIENT_IA_NA) && (ia_na == NULL))) {
-        DEBUG("DHCPv6 client: ADVERTISE does not contain either server ID, "
-              "client ID, IA_PD or IA_NA option\n");
+    if ((cid == NULL) || (sid == NULL)) {
+        DEBUG("DHCPv6 client: ADVERTISE does not contain either server ID "
+              "or client ID\n");
         return -1;
     }
     if (!_check_status_opt(status) || !_check_cid_opt(cid)) {
@@ -991,8 +977,6 @@ static bool _parse_ia_na_option(dhcpv6_opt_ia_na_t *ia_na)
 static bool _parse_reply(uint8_t *rep, size_t len, uint8_t request_type)
 {
     dhcpv6_opt_duid_t *cid = NULL, *sid = NULL;
-    dhcpv6_opt_ia_pd_t *ia_pd = NULL;
-    dhcpv6_opt_ia_na_t *ia_na = NULL;
     dhcpv6_opt_status_t *status = NULL;
     dhcpv6_opt_smr_t *smr = NULL;
     dhcpv6_opt_imr_t *imr = NULL;
@@ -1020,16 +1004,6 @@ static bool _parse_reply(uint8_t *rep, size_t len, uint8_t request_type)
             case DHCPV6_OPT_STATUS:
                 status = (dhcpv6_opt_status_t *)opt;
                 break;
-            case DHCPV6_OPT_IA_PD:
-                if (IS_USED(MODULE_DHCPV6_CLIENT_IA_PD)) {
-                    ia_pd = (dhcpv6_opt_ia_pd_t *)opt;
-                }
-                break;
-            case DHCPV6_OPT_IA_NA:
-                if (IS_USED(MODULE_DHCPV6_CLIENT_IA_NA)) {
-                    ia_na = (dhcpv6_opt_ia_na_t *)opt;
-                }
-                break;
             case DHCPV6_OPT_SMR:
                 smr = (dhcpv6_opt_smr_t *)opt;
                 break;
@@ -1042,12 +1016,14 @@ static bool _parse_reply(uint8_t *rep, size_t len, uint8_t request_type)
             default:
                 break;
         }
+        /* 0 option is used as an end marker, len can include bogus bytes */
+        if (!byteorder_ntohs(opt->type)) {
+            break;
+        }
     }
-    if ((cid == NULL) || (sid == NULL) ||
-        (IS_USED(MODULE_DHCPV6_CLIENT_IA_PD) && (ia_pd == NULL)) ||
-        (IS_USED(MODULE_DHCPV6_CLIENT_IA_NA) && (ia_na == NULL))) {
-        DEBUG("DHCPv6 client: ADVERTISE does not contain either server ID, "
-              "client ID, IA_PD or IA_NA option\n");
+    if ((cid == NULL) || (sid == NULL)) {
+        DEBUG("DHCPv6 client: ADVERTISE does not contain either server ID "
+              "or client ID\n");
         return false;
     }
     if (!_check_cid_opt(cid) || !_check_sid_opt(sid)) {
