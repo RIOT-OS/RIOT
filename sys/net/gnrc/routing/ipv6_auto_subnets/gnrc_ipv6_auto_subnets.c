@@ -306,6 +306,10 @@ static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t 
         /* configure subnet on downstream interface */
         idx = gnrc_netif_ipv6_add_prefix(downstream, &new_prefix, new_prefix_len,
                                          valid_ltime, pref_ltime);
+        if (idx < 0) {
+            DEBUG("auto_subnets: adding prefix to %u failed\n", downstream->pid);
+            continue;
+        }
 
         /* start advertising subnet */
         gnrc_ipv6_nib_change_rtr_adv_iface(downstream, true);
@@ -320,9 +324,7 @@ static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t 
         }
 
         /* configure RPL root if applicable */
-        if (idx >= 0) {
-            gnrc_rpl_configure_root(downstream, &downstream->ipv6.addrs[idx]);
-        }
+        gnrc_rpl_configure_root(downstream, &downstream->ipv6.addrs[idx]);
     }
 
     /* immediately send an RA with RIO */
