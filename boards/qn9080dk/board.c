@@ -57,11 +57,3 @@ static mtd_spi_nor_t mtd_nor_dev = {
 
 mtd_dev_t *mtd0 = (mtd_dev_t *)&mtd_nor_dev;
 #endif /* MODULE_MTD */
-
-void board_init(void)
-{
-    /* Initialize LEDs and Buttons. */
-    gpio_init(BTN1_PIN, BTN1_MODE);
-    gpio_init(BTN2_PIN, BTN2_MODE);
-
-}

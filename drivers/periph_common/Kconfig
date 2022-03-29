@@ -28,6 +28,12 @@ config MODULE_PERIPH_INIT_ADC
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_ADC
 
+config MODULE_PERIPH_INIT_BUTTONS
+    bool
+    depends on TEST_KCONFIG
+    help
+        Enable auto initialization of on-board buttons
+
 config MODULE_PERIPH_CPUID
     bool "CPU unique ID"
     depends on HAS_PERIPH_CPUID

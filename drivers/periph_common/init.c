@@ -63,6 +63,11 @@ void periph_init(void)
         extern void led_init(void);
         led_init();
     }
+    /* initialize buttonss */
+    if (IS_USED(MODULE_PERIPH_INIT_BUTTONS)) {
+        extern void button_init(void);
+        button_init();
+    }
     /* initialize configured I2C devices */
 #ifdef MODULE_PERIPH_INIT_I2C
     for (unsigned i = 0; i < I2C_NUMOF; i++) {

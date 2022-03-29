@@ -67,9 +67,3 @@ mtd_dev_t *mtd1 = (mtd_dev_t *)&at24mac_dev;
 VFS_AUTO_MOUNT(littlefs2, VFS_MTD(same54_nor_dev), "/nvm", 0);
 #endif
 #endif /* MODULE_MTD */
-
-void board_init(void)
-{
-    /* initialize the on-board button */
-    gpio_init(BTN0_PIN, BTN0_MODE);
-}
