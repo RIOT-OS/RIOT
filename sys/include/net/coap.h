@@ -33,6 +33,7 @@ extern "C" {
 
 /**
  * @name    CoAP option numbers
+ * @anchor  net_coap_opt
  * @{
  */
 #define COAP_OPT_URI_HOST       (3)
