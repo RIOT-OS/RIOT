@@ -10,5 +10,6 @@ menu "Test utilities"
 
 rsource "dummy_thread/Kconfig"
 rsource "interactive_sync/Kconfig"
+rsource "print_stack_usage/Kconfig"
 rsource "result_output/Kconfig"
 endmenu # Test utilities
