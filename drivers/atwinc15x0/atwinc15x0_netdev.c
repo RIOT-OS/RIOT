@@ -193,6 +193,11 @@ static void _atwinc15x0_wifi_cb(uint8_t type, void *msg)
                     atwinc15x0->connected = false;
                     atwinc15x0->netdev.event_callback(&atwinc15x0->netdev,
                                                       NETDEV_EVENT_LINK_DOWN);
+                    /* do not reconnect on standby or sleep */
+                    if (atwinc15x0->state == NETOPT_STATE_STANDBY ||
+                        atwinc15x0->state == NETOPT_STATE_SLEEP) {
+                        break;
+                    }
                     /* wait and try to reconnect */
                     ztimer_sleep(ZTIMER_MSEC, ATWINC15X0_WAIT_RECONNECT_MS);
                     _atwinc15x0_connect();
@@ -434,13 +439,15 @@ static int _set_state(atwinc15x0_t *dev, netopt_state_t state)
     switch (state) {
     case NETOPT_STATE_SLEEP:
     case NETOPT_STATE_STANDBY:
+        dev->state = state;
+        m2m_wifi_disconnect();
         m2m_wifi_set_sleep_mode(M2M_PS_MANUAL, CONFIG_ATWINC15X0_RECV_BCAST);
         m2m_wifi_request_sleep(UINT32_MAX);
-        dev->state = state;
        return sizeof(netopt_state_t);
     case NETOPT_STATE_IDLE:
         m2m_wifi_set_sleep_mode(M2M_PS_DEEP_AUTOMATIC, CONFIG_ATWINC15X0_RECV_BCAST);
         dev->state = state;
+        _atwinc15x0_connect();
         return sizeof(netopt_state_t);
     default:
         break;
