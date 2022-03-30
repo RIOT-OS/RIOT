@@ -575,13 +575,15 @@ const netdev_driver_t atwinc15x0_netdev_driver = {
     .set = _atwinc15x0_set,
 };
 
-void atwinc15x0_setup(atwinc15x0_t *dev, const atwinc15x0_params_t *params)
+void atwinc15x0_setup(atwinc15x0_t *dev, const atwinc15x0_params_t *params, uint8_t idx)
 {
     assert(dev);
 
     atwinc15x0 = dev;
     atwinc15x0->netdev.driver = &atwinc15x0_netdev_driver;
     atwinc15x0->params = *params;
+
+    netdev_register(&dev->netdev, NETDEV_ATWINC15X0, idx);
 }
 
 void atwinc15x0_irq(void)
