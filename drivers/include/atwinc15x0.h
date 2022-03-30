@@ -80,8 +80,9 @@ typedef struct atwinc15x0 {
  *
  * @param[in] dev     Device descriptor
  * @param[in] params  Parameters for device initialization
+ * @param[in] idx     Index in the params struct
  */
-void atwinc15x0_setup(atwinc15x0_t *dev, const atwinc15x0_params_t *params);
+void atwinc15x0_setup(atwinc15x0_t *dev, const atwinc15x0_params_t *params, uint8_t idx);
 
 #ifdef __cplusplus
 }
