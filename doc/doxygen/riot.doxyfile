@@ -764,6 +764,7 @@ INPUT                  = ../../doc.txt \
                          src/porting-boards.md \
                          src/driver-guide.md \
                          src/getting-started.md \
+                         src/build-in-docker.md \
                          ../../tests/README.md \
                          src/build-system-basics.md \
                          src/kconfig/kconfig.md \

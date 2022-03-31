@@ -42,6 +42,7 @@
 #include "xtimer.h"
 #include "stdio_base.h"
 
+#include "kernel_defines.h"
 #include "native_internal.h"
 
 #define ENABLE_DEBUG 0
@@ -474,10 +475,10 @@ int getpid(void)
     return -1;
 }
 
-#ifdef MODULE_XTIMER
+#if (IS_USED(MODULE_LIBC_GETTIMEOFDAY))
 int _gettimeofday(struct timeval *tp, void *restrict tzp)
 {
-    (void) tzp;
+    (void)tzp;
     uint64_t now = xtimer_now_usec64();
     tp->tv_sec  = now / US_PER_SEC;
     tp->tv_usec = now - tp->tv_sec;

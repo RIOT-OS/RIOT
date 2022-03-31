@@ -38,16 +38,25 @@ extern "C"
  * @brief   Macro helper to initialize a mtd_t with flash-age driver
  */
 #define MTD_FLASHPAGE_INIT_VAL(_pages_per_sector) { \
-    .driver = &mtd_flashpage_driver, \
-    .sector_count = FLASHPAGE_NUMOF, \
-    .pages_per_sector = _pages_per_sector,\
-    .page_size = FLASHPAGE_SIZE / _pages_per_sector,\
+    .base = {                                       \
+        .driver = &mtd_flashpage_driver,            \
+        .sector_count = FLASHPAGE_NUMOF,            \
+        .pages_per_sector = _pages_per_sector,      \
+        .page_size = FLASHPAGE_SIZE / _pages_per_sector, \
+    },                                              \
 }
 
 /**
  * @brief   Flashpage MTD device operations table
  */
 extern const mtd_desc_t mtd_flashpage_driver;
+
+/**
+ * @brief    MTD flashpage descriptor
+ */
+typedef struct {
+    mtd_dev_t base;     /**< MTD generic device */
+} mtd_flashpage_t;
 
 #ifdef __cplusplus
 }

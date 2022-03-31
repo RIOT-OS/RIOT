@@ -1,3 +1,7 @@
+include ../Makefile.tests_common
+
+USEMODULE += test_utils_netdev_eth_minimal
+
 # the driver to test
 USEMODULE += dose
 
@@ -13,4 +17,6 @@ ifneq (,$(filter same54-xpro, $(BOARD)))
   USEMODULE += dose_watchdog
 endif
 
-include ../driver_netdev_common/Makefile.netdev.mk
+INCLUDES += -I$(APPDIR)
+
+include $(RIOTBASE)/Makefile.include

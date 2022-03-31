@@ -132,7 +132,7 @@ static int mtd_sdcard_write_page(mtd_dev_t *dev, const void *buff, uint32_t page
     }
 
     if (err != SD_RW_OK) {
-        printf("err: %d\n", err);
+        DEBUG("mtd_sdcard_write_page: error %d\n", err);
         return -EIO;
     }
     return size;
@@ -157,7 +157,7 @@ static int mtd_sdcard_erase_sector(mtd_dev_t *dev, uint32_t sector, uint32_t cou
                                 dev->work_area, SD_HC_BLOCK_SIZE,
                                 1, &err);
         if (err != SD_RW_OK) {
-            printf("err: %d\n", err);
+            DEBUG("mtd_sdcard_erase_sector: error %d\n", err);
             return -EIO;
         }
         --count;

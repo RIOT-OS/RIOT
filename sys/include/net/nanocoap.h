@@ -927,6 +927,7 @@ static inline unsigned coap_szx2size(unsigned szx)
 
 /**
  * @name    Functions -- Options Write Packet API
+ * @anchor  net_nanocoap_opt_add
  *
  * Use a coap_pkt_t struct to manage writing Options to the PDU.
  *
@@ -1266,6 +1267,25 @@ static inline ssize_t coap_opt_add_uri_path_buffer(coap_pkt_t *pkt,
  * @return        -ENOSPC if no buffer space for payload marker
  */
 ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags);
+
+/**
+ * @brief   Removes an option previously added with function in
+ *          [the coap_opt_add_...() group](@ref net_nanocoap_opt_add)
+ *
+ * @param[in] pkt       Packet to remove option from.
+ * @param[in] optnum    Option number of the option to remove. If the option appears more than once,
+ *                      the first occurrence will be removed
+ *
+ * @pre     pkt != NULL
+ * @pre     The packet was finished using @ref coap_opt_finish() and any payload is in its final
+ *          configuration.
+ *
+ * @return  The new size of the packet with option of number @p optnum removed. In turn this means
+ *          if there is no such option in the packet, the original size of the packet will be
+ *          removed.
+ * @return  -EINVAL if there was a parsing error for the existing options
+ */
+ssize_t coap_opt_remove(coap_pkt_t *pkt, uint16_t optnum);
 /**@}*/
 
 /**

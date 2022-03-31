@@ -32,6 +32,16 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Enable reception of broadcast frames
+ *
+ *          If your application does not rely on receiving broadcast messages
+ *          you can disable this to save power.
+ */
+#ifndef CONFIG_ATWINC15X0_RECV_BCAST
+#define CONFIG_ATWINC15X0_RECV_BCAST (1)
+#endif
+
+/**
  * @brief   ATWINC15x0 hardware and global parameters
  */
 typedef struct {
@@ -52,6 +62,7 @@ typedef struct atwinc15x0 {
     atwinc15x0_params_t params; /**< Device initialization parameters */
 
     bool connected;             /**< Indicates whether connected to an AP */
+    netopt_state_t state;       /**< Current interface state, only sleep or idle */
     char ap[ETHERNET_ADDR_LEN]; /**< BSSID of current AP */
     uint8_t channel;            /**< Channel used for current AP */
     int8_t rssi;                /**< RSSI last measured by the WiFi module */
@@ -69,8 +80,9 @@ typedef struct atwinc15x0 {
  *
  * @param[in] dev     Device descriptor
  * @param[in] params  Parameters for device initialization
+ * @param[in] idx     Index in the params struct
  */
-void atwinc15x0_setup(atwinc15x0_t *dev, const atwinc15x0_params_t *params);
+void atwinc15x0_setup(atwinc15x0_t *dev, const atwinc15x0_params_t *params, uint8_t idx);
 
 #ifdef __cplusplus
 }

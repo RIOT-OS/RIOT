@@ -114,8 +114,8 @@ static int dtls_handle_read(dtls_context_t *ctx)
     DEBUG("DBG-Server: Record Rcvd\n");
 
     /* (DTLS) session requires the remote peer address (IPv6:Port) and netif */
-    session.size = sizeof(uint8_t) * 16 + sizeof(unsigned short);
-    session.port = remote_peer->remote->port;
+    dtls_session_init(&session);
+    session.addr.port = remote_peer->remote->port;
     if (remote_peer->remote->netif ==  SOCK_ADDR_ANY_NETIF) {
         session.ifindex = SOCK_ADDR_ANY_NETIF;
     }
@@ -123,7 +123,7 @@ static int dtls_handle_read(dtls_context_t *ctx)
         session.ifindex = remote_peer->remote->netif;
     }
 
-    memcpy(&session.addr, &remote_peer->remote->addr.ipv6, sizeof(session.addr));
+    memcpy(&session.addr.ipv6, &remote_peer->remote->addr.ipv6, sizeof(session.addr.ipv6));
     return dtls_handle_message(ctx, &session, packet_rcvd, res);
 }
 

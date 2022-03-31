@@ -12,9 +12,13 @@ ifneq (,$(filter lvgl_extra_widget_spinner,$(USEMODULE)))
   USEMODULE += lvgl_widget_arc
 endif
 
-ifneq (,$(filter lvgl_extra_widget_win,$(USEMODULE)))
+ifneq (,$(filter lvgl_extra_widget_win lvgl_extra_widget_menu,$(USEMODULE)))
   USEMODULE += lvgl_widget_btn
   USEMODULE += lvgl_widget_img
+endif
+
+ifneq (,$(filter lvgl_extra_widget_tabview,$(USEMODULE)))
+  USEMODULE += lvgl_widget_btnmatrix
 endif
 
 ifneq (,$(filter lvgl_widget_textarea lvgl_widget_roller lvgl_widget_img lvgl_widget_dropdown lvgl_extra_widget_win,$(USEMODULE)))

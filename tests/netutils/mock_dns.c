@@ -35,13 +35,22 @@ int sock_dns_query(const char *domain_name, void *addr_out, int family)
         return -ENOTSUP;
     }
 
+    if (family == AF_UNSPEC) {
+        if (IS_USED(SOCK_HAS_IPV4)) {
+            family = AF_INET;
+        }
+        if (IS_USED(SOCK_HAS_IPV6)) {
+            family = AF_INET6;
+        }
+    }
+
     switch (family) {
     case AF_INET:
         memcpy(addr_out, &addr_ipv4, sizeof(addr_ipv4));
-        return 0;
+        return sizeof(addr_ipv4);
     case AF_INET6:
         memcpy(addr_out, &addr_ipv6, sizeof(addr_ipv6));
-        return 0;
+        return sizeof(addr_ipv6);
     default:
         return -EAFNOSUPPORT;
     }

@@ -41,7 +41,7 @@
 #include "byteorder.h"
 #include "panic.h"
 
-#include "cpu_conf_stm32_common.h"
+#include "stmclk.h"
 
 #include "periph/i2c.h"
 #include "periph/gpio.h"
@@ -58,6 +58,18 @@
 #define I2C_FLAG_WRITE  (0)
 
 #define CLEAR_FLAG      (I2C_ICR_NACKCF | I2C_ICR_ARLOCF | I2C_ICR_BERRCF | I2C_ICR_ADDRCF)
+
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
+#define I2C_CLOCK_SRC_REG       (RCC->CFGR3)
+#elif defined(RCC_CCIPR_I2C1SEL)
+#define I2C_CLOCK_SRC_REG       (RCC->CCIPR)
+#elif defined(RCC_CCIPR1_I2C1SEL)
+#define I2C_CLOCK_SRC_REG       (RCC->CCIPR1)
+#elif defined(RCC_DCKCFGR2_I2C1SEL)
+#define I2C_CLOCK_SRC_REG       (RCC->DCKCFGR2)
+#endif
+
+static uint32_t hsi_state;
 
 /* static function definitions */
 static inline void _i2c_init(I2C_TypeDef *i2c, uint32_t timing);
@@ -87,9 +99,11 @@ void i2c_init(i2c_t dev)
     NVIC_SetPriority(i2c_config[dev].irqn, I2C_IRQ_PRIO);
     NVIC_EnableIRQ(i2c_config[dev].irqn);
 
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
-    /* Set I2CSW bits to enable I2C clock source */
-    RCC->CFGR3 |= i2c_config[dev].rcc_sw_mask;
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
+    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L4) || \
+    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WB)
+    /* select I2C clock source */
+    I2C_CLOCK_SRC_REG |= i2c_config[dev].rcc_sw_mask;
 #endif
 
     DEBUG("[i2c] init: configuring pins\n");
@@ -141,6 +155,11 @@ void i2c_acquire(i2c_t dev)
     assert(dev < I2C_NUMOF);
 
     mutex_lock(&locks[dev]);
+    hsi_state = (RCC->CR & RCC_CR_HSION);
+    if (!hsi_state) {
+        /* the internal RC oscillator (HSI) must be enabled */
+        stmclk_enable_hsi();
+    }
 
     periph_clk_en(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
 
@@ -158,6 +177,9 @@ void i2c_release(i2c_t dev)
     _wait_for_bus(i2c_config[dev].dev);
 
     periph_clk_dis(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
+    if (!hsi_state) {
+        stmclk_disable_hsi();
+    }
 
     mutex_unlock(&locks[dev]);
 }

@@ -36,8 +36,8 @@
 #endif
 #define TEST_ADDRESS0       (FLASHPAGE_NUMOF - 1)
 
-static mtd_dev_t _dev = MTD_FLASHPAGE_INIT_VAL(8);
-static mtd_dev_t *dev = &_dev;
+static mtd_flashpage_t _dev = MTD_FLASHPAGE_INIT_VAL(8);
+static mtd_dev_t *dev = &_dev.base;
 
 static void setup(void)
 {

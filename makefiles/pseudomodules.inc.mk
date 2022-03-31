@@ -121,6 +121,10 @@ PSEUDOMODULES += log
 PSEUDOMODULES += log_printfnoformat
 PSEUDOMODULES += log_color
 PSEUDOMODULES += lora
+## @defgroup pseudomodule_libc_gettimeofday libc_gettimeofday
+## @brief Includes implementation of gettimeofday()
+##
+PSEUDOMODULES += libc_gettimeofday
 
 ## @defgroup pseudomodule_mpu_stack_guard mpu_stack_guard
 ## @brief MPU based stack guard

@@ -1,0 +1,47 @@
+From 6fbe634900e15b006edf3d6c9a6b79f19d286840 Mon Sep 17 00:00:00 2001
+From: Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
+Date: Thu, 24 Mar 2022 12:00:27 +0100
+Subject: [PATCH] session.h: Modify session_t for RIOT
+
+Now the addr member of session_t includes both the IPv6 address and the
+port.
+---
+ session.c | 4 ++--
+ session.h | 6 ++++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/session.c b/session.c
+index 300224e..020ab5b 100644
+--- a/session.c
++++ b/session.c
+@@ -34,8 +34,8 @@
+ #elif defined(WITH_RIOT_GNRC)
+ #define _dtls_address_equals_impl(A,B)                          \
+   ((A)->size == (B)->size                                       \
+-   && (A)->port == (B)->port                                    \
+-   && ipv6_addr_equal(&((A)->addr),&((B)->addr))                \
++   && (A)->addr.port == (B)->addr.port                                    \
++   && ipv6_addr_equal(&((A)->addr.addr),&((B)->addr.addr))                \
+    && (A)->ifindex == (B)->ifindex)
+ #else /* WITH_CONTIKI */
+ 
+diff --git a/session.h b/session.h
+index a8ac8f3..2ab600a 100644
+--- a/session.h
++++ b/session.h
+@@ -35,8 +35,10 @@ typedef struct {
+ #include "net/ipv6/addr.h"
+ typedef struct {
+   unsigned char size;
+-  ipv6_addr_t addr;
+-  unsigned short port;
++  struct {
++    ipv6_addr_t addr;
++    unsigned short port;
++  } addr;
+   int ifindex;
+ } session_t;
+ #else /* ! WITH_CONTIKI && ! WITH_RIOT_GNRC */
+-- 
+2.35.1
+

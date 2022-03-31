@@ -280,14 +280,10 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
     uint8_t cid;
 #endif  /* MODULE_GNRC_SIXLOWPAN_CTX */
-
-    if ((sixco->len != SIXLOWPAN_ND_OPT_6CTX_LEN_MIN) ||
-        ((sixco->len != SIXLOWPAN_ND_OPT_6CTX_LEN_MAX) &&
-         (sixco->ctx_len > 64U)) ||
-        (icmpv6->type != ICMPV6_RTR_ADV)) {
-        DEBUG("nib: received 6CO of invalid length (%u), must be %u "
-              "or wasn't delivered by RA."
-              "\n",
+    (void)icmpv6;
+    if (sixco->len != (sixco->ctx_len > 64U
+        ? SIXLOWPAN_ND_OPT_6CTX_LEN_MAX : SIXLOWPAN_ND_OPT_6CTX_LEN_MIN)) {
+        DEBUG("nib: received 6CO of invalid length (%u), must be %u\n",
               sixco->len,
               (sixco->ctx_len > 64U) ? SIXLOWPAN_ND_OPT_6CTX_LEN_MAX :
                                        SIXLOWPAN_ND_OPT_6CTX_LEN_MIN);

@@ -38,9 +38,13 @@
 #define PAGE_SIZE 64
 #endif
 
-#define MEMORY_SIZE         PAGE_SIZE * PAGE_PER_SECTOR * SECTOR_COUNT
+#define MEMORY_PAGE_COUNT    PAGE_PER_SECTOR * SECTOR_COUNT
+
+#define MEMORY_SIZE          PAGE_SIZE * MEMORY_PAGE_COUNT
 
 #define REGION_FLASH_SIZE    MEMORY_SIZE / 2
+
+#define REGION_PAGE_COUNT    MEMORY_PAGE_COUNT / 2
 
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
@@ -252,6 +256,26 @@ static void test_mtd_read(void)
     }
 }
 
+static void test_mtd_read_page(void)
+{
+    int ret;
+
+    for (uint32_t i = 0; i < REGION_PAGE_COUNT; i += 1) {
+        ret = mtd_read_page(_dev_a, _buffer, i, 0, PAGE_SIZE);
+        TEST_ASSERT_EQUAL_INT(0, ret);
+        _test_mem(_buffer, PAGE_SIZE, 0xff);
+    }
+
+    for (uint32_t i = 0; i < REGION_PAGE_COUNT; i += 1) {
+        ret = mtd_read_page(_dev_b, _buffer, i, 0, PAGE_SIZE);
+        TEST_ASSERT_EQUAL_INT(0, ret);
+        _test_mem(_buffer, PAGE_SIZE, 0xff);
+    }
+
+    ret = mtd_read_page(_dev_b, _buffer, REGION_PAGE_COUNT, 0, PAGE_SIZE);
+    TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
+}
+
 static void test_mtd_write(void)
 {
     static const uint8_t test_val_a = 0xAA;
@@ -290,16 +314,70 @@ static void test_mtd_write(void)
     }
 }
 
+static void test_mtd_write_page(void)
+{
+    static const uint8_t test_val_a = 0xAA;
+    int ret;
+
+    memset(_buffer, test_val_a, PAGE_SIZE);
+
+    /* Write first region */
+    for (uint32_t i = 0; i < REGION_PAGE_COUNT; i += 1) {
+        ret = mtd_write_page(_dev_a, _buffer, i, 0, PAGE_SIZE);
+        TEST_ASSERT_EQUAL_INT(0, ret);
+    }
+
+    /* Check second region, should still be 0xFF */
+    for (uint32_t i = 0; i < REGION_PAGE_COUNT; i += 1) {
+        ret = mtd_read_page(_dev_b, _buffer, i, 0, PAGE_SIZE);
+        TEST_ASSERT_EQUAL_INT(0, ret);
+        _test_mem(_buffer, PAGE_SIZE, 0xFF);
+    }
+
+    static const uint8_t test_val_b = 0xBB;
+    memset(_buffer, test_val_b, PAGE_SIZE);
+
+    /* Write second region */
+    for (uint32_t i = 0; i < REGION_PAGE_COUNT; i += 1) {
+        ret = mtd_write_page(_dev_b, _buffer, i, 0, PAGE_SIZE);
+        TEST_ASSERT_EQUAL_INT(0, ret);
+    }
+
+    /* Check second region after write, should now be 0xBB */
+    for (uint32_t i = 0; i < REGION_PAGE_COUNT; i += 1) {
+        ret = mtd_read_page(_dev_b, _buffer, i, 0, PAGE_SIZE);
+        TEST_ASSERT_EQUAL_INT(0, ret);
+        _test_mem(_buffer, PAGE_SIZE, 0xBB);
+    }
+
+    /* Check first region, should still be 0xAA */
+    for (uint32_t i = 0; i < REGION_PAGE_COUNT; i += 1) {
+        ret = mtd_read_page(_dev_a, _buffer, i, 0, PAGE_SIZE);
+        TEST_ASSERT_EQUAL_INT(0, ret);
+        _test_mem(_buffer, PAGE_SIZE, 0xAA);
+    }
+
+    ret = mtd_write_page(_dev_b, _buffer, REGION_PAGE_COUNT, 0, PAGE_SIZE);
+    TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
+}
+
+static void set_up(void)
+{
+    memset(_dummy_memory, 0xff, sizeof(_dummy_memory));
+}
+
 Test *tests_mtd_mapper_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_mtd_init),
         new_TestFixture(test_mtd_erase),
         new_TestFixture(test_mtd_read),
+        new_TestFixture(test_mtd_read_page),
         new_TestFixture(test_mtd_write),
+        new_TestFixture(test_mtd_write_page),
     };
 
-    EMB_UNIT_TESTCALLER(mtd_flashpage_tests, NULL, NULL, fixtures);
+    EMB_UNIT_TESTCALLER(mtd_flashpage_tests, set_up, NULL, fixtures);
 
     return (Test *)&mtd_flashpage_tests;
 }

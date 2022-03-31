@@ -17,3 +17,11 @@ FEATURES_BLACKLIST += arch_riscv
 # - lua/liolib.c:671:38: error: '_IOFBF' undeclared (first use in this function)
 # - lua/liolib.c:671:46: error: '_IOLBF' undeclared (first use in this function)
 FEATURES_BLACKLIST += picolibc
+
+ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
+  USEMODULE += libc_gettimeofday
+endif
+
+ifneq (,$(filter native,$(CPU)))
+  USEMODULE += libc_gettimeofday
+endif

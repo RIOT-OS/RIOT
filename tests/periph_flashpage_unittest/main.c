@@ -46,11 +46,12 @@ static void test_flashbase_addr(void)
     void *addr;
 
     addr = flashpage_addr(0);
-    TEST_ASSERT_EQUAL_INT((int)CPU_FLASH_BASE, (int)addr);
+    TEST_ASSERT_EQUAL_INT((unsigned int)CPU_FLASH_BASE, (unsigned int)addr);
     addr = flashpage_addr(FLASHPAGE_NUMOF - 1);
-    TEST_ASSERT_EQUAL_INT((long)CPU_FLASH_BASE + (((unsigned)FLASHPAGE_NUMOF - 1) * FLASHPAGE_SIZE), (int)addr);
+    TEST_ASSERT_EQUAL_INT((long)CPU_FLASH_BASE + (((unsigned)FLASHPAGE_NUMOF - 1) * FLASHPAGE_SIZE),
+                          (unsigned int)addr);
     addr = flashpage_addr(12);
-    TEST_ASSERT_EQUAL_INT((int)CPU_FLASH_BASE + (12 * FLASHPAGE_SIZE), (int)addr);
+    TEST_ASSERT_EQUAL_INT((unsigned int)CPU_FLASH_BASE + (12 * FLASHPAGE_SIZE), (unsigned int)addr);
 }
 
 static void test_flashbase_page(void)
@@ -65,7 +66,9 @@ static void test_flashbase_page(void)
     TEST_ASSERT_EQUAL_INT(1, page);
     page = flashpage_page((void *)(CPU_FLASH_BASE + FLASHPAGE_SIZE + 1));
     TEST_ASSERT_EQUAL_INT(1, page);
-    page = flashpage_page((void *)(CPU_FLASH_BASE + ((unsigned)FLASHPAGE_SIZE * (FLASHPAGE_NUMOF - 1))));
+    page =
+        flashpage_page((void *)(CPU_FLASH_BASE +
+                                ((unsigned)FLASHPAGE_SIZE * (FLASHPAGE_NUMOF - 1))));
     TEST_ASSERT_EQUAL_INT(FLASHPAGE_NUMOF - 1, page);
 }
 

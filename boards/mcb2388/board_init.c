@@ -31,6 +31,11 @@ static mtd_dev_t _mtd_mci = { .driver = &mtd_mci_driver };
 mtd_dev_t *mtd0 = &_mtd_mci;
 #endif
 
+#ifdef MODULE_VFS_DEFAULT
+#include "vfs_default.h"
+VFS_AUTO_MOUNT(fatfs, { .dev = &_mtd_mci }, VFS_DEFAULT_SD(0), 0);
+#endif
+
 void led_init(void)
 {
     /* LEDs */

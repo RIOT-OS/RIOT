@@ -119,9 +119,8 @@ static int dtls_handle_read(dtls_context_t *ctx)
         return 0;
     }
 
-    /* session requires the remote socket (IPv6:UDP) address and netif  */
-    session.size = sizeof(uint8_t) * 16 + sizeof(unsigned short);
-    session.port = remote.port;
+    dtls_session_init(&session);
+    session.addr.port = remote.port;
     if (remote.netif == SOCK_ADDR_ANY_NETIF) {
         session.ifindex = SOCK_ADDR_ANY_NETIF;
     }
@@ -129,11 +128,11 @@ static int dtls_handle_read(dtls_context_t *ctx)
         session.ifindex = remote.netif;
     }
 
-    memcpy(&session.addr, &remote.addr.ipv6, sizeof(session.addr));
+    memcpy(&session.addr.ipv6, &remote.addr.ipv6, sizeof(session.addr.ipv6));
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         DEBUG("DBG-Client: Msg received from \n\t Addr Src: [");
-        ipv6_addr_print(&session.addr);
+        ipv6_addr_print(&session.addr.ipv6);
         DEBUG("]:%u\n", remote.port);
     }
 
@@ -325,6 +324,8 @@ dtls_context_t *_init_dtls(sock_udp_t *sock, sock_udp_ep_t *local,
     dtls_set_log_level(TINYDTLS_LOG_LVL);
 #endif
 
+    dtls_session_init(dst);
+
     /* First, we prepare the UDP Sock */
     local->port = (unsigned short) CLIENT_PORT;
     remote->port = (unsigned short) DTLS_DEFAULT_PORT;
@@ -358,11 +359,10 @@ dtls_context_t *_init_dtls(sock_udp_t *sock, sock_udp_ep_t *local,
     }
 
     /* Second: We prepare the DTLS Session by means of ctx->app */
-    dst->size = sizeof(uint8_t) * 16 + sizeof(unsigned short);
-    dst->port = remote->port;
+    dst->addr.port = remote->port;
 
-    /* NOTE: remote.addr.ipv6 and dst->addr are different structures. */
-    if (ipv6_addr_from_str(&dst->addr, addr_str) == NULL) {
+    /* NOTE: remote.addr.ipv6 and dst->addr.ipv6 are different structures. */
+    if (ipv6_addr_from_str(&dst->addr.ipv6, addr_str) == NULL) {
         puts("ERROR: init_dtls was unable to load the IPv6 addresses!");
         return new_context;
     }

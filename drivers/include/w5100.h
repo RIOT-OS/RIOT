@@ -74,8 +74,13 @@ typedef struct {
  *
  * This function pre-initializes the netdev structure, saves the configuration
  * parameters and finally initializes the SPI bus and the used GPIO pins.
+ *
+ * @param [out] dev     the handle of the device to initialize
+ * @param [in]  params  parameters for device initialization
+ * @param [in]  index   Index of @p params in a global parameter struct array.
+ *                      If initialized manually, pass a unique identifier instead.
  */
-void w5100_setup(w5100_t *dev, const w5100_params_t *params);
+void w5100_setup(w5100_t *dev, const w5100_params_t *params, uint8_t index);
 
 #ifdef __cplusplus
 }

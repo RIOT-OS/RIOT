@@ -11,6 +11,9 @@ USEMODULE += gnrc
 USEMODULE += gnrc_netif_ieee802154
 USEMODULE += gnrc_pktdump
 
+# somehow this breaks the test
+DISABLE_MODULE += test_utils_print_stack_usage
+
 TEST_ON_CI_WHITELIST += native
 
 include $(RIOTBASE)/Makefile.include

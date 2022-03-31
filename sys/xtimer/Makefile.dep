@@ -7,7 +7,6 @@ DEFAULT_MODULE += auto_init_xtimer
 # dependency inclusion order issues
 FEATURES_REQUIRED += periph_timer
 
-USEMODULE += xtimer_no_ztimer_default
 ifeq (,$(filter xtimer_no_ztimer_default,$(USEMODULE)))
   ifeq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
     USEMODULE += ztimer_xtimer_compat

@@ -20,7 +20,6 @@ if MODULE_XTIMER
 
 config MODULE_XTIMER_NO_ZTIMER_DEFAULT
     bool "xtimer does not select ztimer"
-    default y
 
 config MODULE_AUTO_INIT_XTIMER
     bool "Auto-init xtimer"
