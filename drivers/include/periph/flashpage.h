@@ -151,7 +151,7 @@ enum {
 #error "periph/flashpage: FLASHPAGE_NUMOF not defined"
 #endif
 
-#ifdef MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
+#if defined(MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE) || defined(DOXYGEN)
 /**
  * @def   FLASH_WRITABLE_INIT(name, size)
  * @brief Define an array in flash memory
