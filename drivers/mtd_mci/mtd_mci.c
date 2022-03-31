@@ -48,6 +48,7 @@ static int mtd_mci_init(mtd_dev_t *dev)
 
     dev->pages_per_sector = 1;
     dev->page_size = SD_HC_BLOCK_SIZE;
+    dev->write_size = SD_HC_BLOCK_SIZE;
     mci_ioctl(GET_SECTOR_COUNT, &dev->sector_count);
 
     DEBUG("sector size: %lu\n", dev->page_size);
