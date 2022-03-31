@@ -457,6 +457,200 @@ static void test_nanocoap__option_add_buffer_max(void)
     TEST_ASSERT_EQUAL_INT(-ENOSPC, len);
 }
 
+static void __test_option_remove(uint16_t stride)
+{
+    const char payload[] = "My test payload";
+    /* header 4, token 2, options (8 - 1) * 4 = 28, payload marker 1 + payload */
+    uint8_t buf[4U + 2U + 28U + 1U + sizeof(payload)];
+    coap_pkt_t pkt;
+    uint16_t msgid = 0xABCD;
+    uint8_t token[2] = {0xDA, 0xEC};
+
+    ssize_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
+                                 &token[0], 2, COAP_METHOD_GET, msgid);
+    /* shrink buffer to attempt overfill */
+    coap_pkt_init(&pkt, &buf[0], sizeof(buf) - 1, len);
+
+    /* add seven options of options 1 to 7 */
+    for (uint16_t count = 1; count < 8; count++) {
+        len = coap_opt_add_uint(&pkt, (uint16_t)(count * stride), count);
+        if (stride < 13) {
+            TEST_ASSERT_EQUAL_INT(2U, len);
+        }
+        else if (stride < 269) {
+            TEST_ASSERT_EQUAL_INT(3U, len);
+        }
+        else {
+            TEST_ASSERT_EQUAL_INT(4U, len);
+        }
+    }
+    /* header 4, token 2, options (8 - 1) * opt_len, payload marker 1 */
+    unsigned exp_len = 4U + 2U + ((8 - 1) * ((stride < 13) ? 2U : ((stride < 269) ? 3U : 4U))) + 1U;
+    /* finish with payload marker */
+    len = coap_opt_finish(&pkt, COAP_OPT_FINISH_PAYLOAD);
+    TEST_ASSERT_EQUAL_INT(exp_len, len);
+    /* add payload to check move of payload */
+    memcpy(pkt.payload, payload, sizeof(payload));
+    pkt.payload_len = sizeof(payload);
+
+    /* remove option number 3 */
+    len = coap_opt_remove(&pkt, (3U * stride));
+    /* one option was removed so remove from expected length based on stride */
+    exp_len -= (stride < 13) ? 2U : ((stride < 269) ? 3U : 4U);
+    if (((stride >= 7) && (stride < 13)) || ((stride >= 135) && (stride < 269))) {
+        /* account for growing delta size */
+        exp_len += 1;
+    }
+    TEST_ASSERT_EQUAL_INT(exp_len + sizeof(payload), len);
+
+    /* check if all but option number 3 are still the same */
+    for (uint16_t count = 1; count < 8; count++) {
+        uint32_t value;
+        len = coap_opt_get_uint(&pkt, (uint16_t)(count * stride), &value);
+        if (count == 3U) {
+            TEST_ASSERT_EQUAL_INT(-ENOENT, len);
+        }
+        else {
+            TEST_ASSERT_EQUAL_INT(0, len);
+            TEST_ASSERT_EQUAL_INT(count, value);
+        }
+    }
+    /* check payload */
+    TEST_ASSERT_EQUAL_STRING(payload, (char *)pkt.payload);
+
+    /* remove non-existent option */
+    len = coap_opt_remove(&pkt, (14U * stride));
+    /* no option was removed so same as before */
+    TEST_ASSERT_EQUAL_INT(exp_len + sizeof(payload), len);
+    /* and everything should still be the same */
+    for (uint16_t count = 1; count < 8; count++) {
+        uint32_t value;
+        len = coap_opt_get_uint(&pkt, (uint16_t)(count * stride), &value);
+        if (count == 3U) {
+            TEST_ASSERT_EQUAL_INT(-ENOENT, len);
+        }
+        else {
+            TEST_ASSERT_EQUAL_INT(0, len);
+            TEST_ASSERT_EQUAL_INT(count, value);
+        }
+    }
+    TEST_ASSERT_EQUAL_STRING(payload, (char *)pkt.payload);
+
+    /* remove first option */
+    len = coap_opt_remove(&pkt, (1U * stride));
+    /* one option was removed so remove from expected length based on stride */
+    exp_len -= (stride < 13) ? 2U : ((stride < 269) ? 3U : 4U);
+    if (((stride >= 7) && (stride < 13)) || ((stride >= 135) && (stride < 269))) {
+        /* account for growing delta size */
+        exp_len += 1;
+    }
+    TEST_ASSERT_EQUAL_INT(exp_len + sizeof(payload), len);
+    /* and everything should still be the same */
+    for (uint16_t count = 1; count < 8; count++) {
+        uint32_t value;
+        len = coap_opt_get_uint(&pkt, (uint16_t)(count * stride), &value);
+        if ((count == 1U) || (count == 3U)) {
+            TEST_ASSERT_EQUAL_INT(-ENOENT, len);
+        }
+        else {
+            TEST_ASSERT_EQUAL_INT(0, len);
+            TEST_ASSERT_EQUAL_INT(count, value);
+        }
+    }
+
+    TEST_ASSERT_EQUAL_STRING(payload, (char *)pkt.payload);
+    /* remove last option */
+    len = coap_opt_remove(&pkt, (7U * stride));
+    /* one option was removed so remove from expected length based on stride */
+    exp_len -= (stride < 13) ? 2U : ((stride < 269) ? 3U : 4U);
+    TEST_ASSERT_EQUAL_INT(exp_len + sizeof(payload), len);
+    /* and everything should still be the same */
+    for (uint16_t count = 1; count < 8; count++) {
+        uint32_t value;
+        len = coap_opt_get_uint(&pkt, (uint16_t)(count * stride), &value);
+        if ((count == 1U) || (count == 3U) || (count == 7U)) {
+            TEST_ASSERT_EQUAL_INT(-ENOENT, len);
+        }
+        else {
+            TEST_ASSERT_EQUAL_INT(0, len);
+            TEST_ASSERT_EQUAL_INT(count, value);
+        }
+    }
+    TEST_ASSERT_EQUAL_STRING(payload, (char *)pkt.payload);
+}
+
+static void test_nanocoap__option_remove_delta_1(void)
+{
+    /* base line */
+    __test_option_remove(1U);
+}
+
+static void test_nanocoap__option_remove_delta_7(void)
+{
+    /* delta goes above 13 when removing option => option header of next option grows */
+    __test_option_remove(7U);
+}
+
+static void test_nanocoap__option_remove_delta_13(void)
+{
+    __test_option_remove(13U);
+}
+
+static void test_nanocoap__option_remove_delta_32(void)
+{
+    __test_option_remove(32U);
+}
+
+static void test_nanocoap__option_remove_delta_135(void)
+{
+    /* delta goes above 269 when removing option => option header of next option grows */
+    __test_option_remove(135U);
+}
+
+static void test_nanocoap__option_remove_delta_269(void)
+{
+    __test_option_remove(269U);
+}
+
+static void test_nanocoap__option_remove_delta_512(void)
+{
+    __test_option_remove(512U);
+}
+
+
+static void test_nanocoap__option_remove_no_payload(void)
+{
+    /* header 4, token 2, option length 3, 0 payload marker 1 */
+    uint8_t buf[4U + 2U + 4U];
+    coap_pkt_t pkt;
+    uint32_t value;
+    uint16_t msgid = 0xABCD;
+    uint8_t token[2] = {0xDA, 0xEC};
+
+    ssize_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
+                                 &token[0], 2, COAP_METHOD_GET, msgid);
+    /* shrink buffer to attempt overfill */
+    coap_pkt_init(&pkt, &buf[0], sizeof(buf) - 1, len);
+
+    len = coap_opt_add_uint(&pkt, 1U, 500U);
+    TEST_ASSERT_EQUAL_INT(3U, len);
+    /* header 4, token 2, options (8 - 1) * opt_len */
+    unsigned exp_len = 4U + 2U + 3U;
+    /* finish with payload marker */
+    len = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
+    TEST_ASSERT_EQUAL_INT(exp_len, len);
+    /* add payload to check move of payload */
+    TEST_ASSERT_EQUAL_INT(0, pkt.payload_len);
+
+    /* remove option number 3 */
+    len = coap_opt_remove(&pkt, 1U);
+    exp_len -= 3U;
+    TEST_ASSERT_EQUAL_INT(exp_len, len);
+    len = coap_opt_get_uint(&pkt, 1U, &value);
+    TEST_ASSERT_EQUAL_INT(-ENOENT, len);
+    TEST_ASSERT_EQUAL_INT(0, pkt.payload_len);
+}
+
 /*
  * Helper for server_get tests below.
  * GET Request for nanocoap server example /riot/value resource.
@@ -882,6 +1076,14 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__get_multi_query),
         new_TestFixture(test_nanocoap__add_uri_query2),
         new_TestFixture(test_nanocoap__option_add_buffer_max),
+        new_TestFixture(test_nanocoap__option_remove_delta_1),
+        new_TestFixture(test_nanocoap__option_remove_delta_7),
+        new_TestFixture(test_nanocoap__option_remove_delta_13),
+        new_TestFixture(test_nanocoap__option_remove_delta_32),
+        new_TestFixture(test_nanocoap__option_remove_delta_135),
+        new_TestFixture(test_nanocoap__option_remove_delta_269),
+        new_TestFixture(test_nanocoap__option_remove_delta_512),
+        new_TestFixture(test_nanocoap__option_remove_no_payload),
         new_TestFixture(test_nanocoap__options_get_opaque),
         new_TestFixture(test_nanocoap__options_iterate),
         new_TestFixture(test_nanocoap__server_get_req),
