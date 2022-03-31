@@ -20,11 +20,37 @@
 #include "thread.h"
 #include "log.h"
 
+#if MODULE_FMT
+#include "fmt.h"
+#endif
+
+#if MODULE_FMT
+/* fmt's `print_str()` needs very little stack. ~200 total was fine on Cortex-M. */
+# define MIN_SIZE   (THREAD_STACKSIZE_TINY)
+#else
+# define MIN_SIZE   (THREAD_STACKSIZE_TINY + THREAD_EXTRA_STACKSIZE_PRINTF)
+#endif
+
 void print_stack_usage_metric(const char *name, void *stack, unsigned max_size)
 {
     unsigned free = thread_measure_stack_free(stack);
-    LOG_INFO("{ \"threads\": [{ \"name\": \"%s\", \"stack_size\": %u, \"stack_used\": %u }]}\n",
-             name, max_size, max_size - free);
+
+    if ((LOG_LEVEL >= LOG_INFO) &&
+        (thread_get_stacksize(thread_get_active()) >= MIN_SIZE)) {
+#if MODULE_FMT
+        print_str("{ \"threads\": [{ \"name\": \"");
+        print_str(name);
+        print_str(", \"stack_size\": ");
+        print_u32_dec(max_size);
+        print_str(", \"stack_used\": ");
+        print_u32_dec(max_size - free);
+        print_str("}]}\n");
+#else
+        printf(
+            "{ \"threads\": [{ \"name\": \"%s\", \"stack_size\": %u, \"stack_used\": %u }]}\n",
+            name, max_size, max_size - free);
+#endif
+    }
 }
 
 #ifdef DEVELHELP
