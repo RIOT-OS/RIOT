@@ -252,13 +252,13 @@ static int _atwinc15x0_send(netdev_t *netdev, const iolist_t *iolist)
     assert(iolist);
 
     if (!dev->connected) {
-        DEBUG("%s WiFi is still not connected to AP, cannot send", __func__);
+        DEBUG("%s WiFi is still not connected to AP, cannot send\n", __func__);
         return -ENODEV;
     }
 
     /* send wakes from standby but not from sleep */
     if (dev->state == NETOPT_STATE_SLEEP) {
-        DEBUG("%s WiFi is in SLEEP state, cannot send", __func__);
+        DEBUG("%s WiFi is in SLEEP state, cannot send\n", __func__);
         return -ENODEV;
     }
     if (dev->state == NETOPT_STATE_STANDBY) {
