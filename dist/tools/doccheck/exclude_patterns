@@ -552,6 +552,9 @@ boards/b\-l475e\-iot01a/include/periph_conf\.h:[0-9]+: warning: Member DMA_0_ISR
 boards/b\-l475e\-iot01a/include/periph_conf\.h:[0-9]+: warning: Member DMA_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/b\-l475e\-iot01a/include/periph_conf\.h:[0-9]+: warning: Member DMA_2_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/b\-l475e\-iot01a/include/periph_conf\.h:[0-9]+: warning: Member DMA_3_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/b\-l475e\-iot01a/include/periph_conf\.h:[0-9]+: warning: Member DMA_4_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/b\-l475e\-iot01a/include/periph_conf\.h:[0-9]+: warning: Member DMA_5_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/b\-l475e\-iot01a/include/periph_conf\.h:[0-9]+: warning: Member DMA_6_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/b\-l475e\-iot01a/include/periph_conf\.h:[0-9]+: warning: Member DMA_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/b\-l475e\-iot01a/include/periph_conf\.h:[0-9]+: warning: Member I2C_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/b\-l475e\-iot01a/include/periph_conf\.h:[0-9]+: warning: Member I2C_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
