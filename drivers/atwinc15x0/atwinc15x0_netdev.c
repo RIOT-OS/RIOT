@@ -443,8 +443,14 @@ static int _set_state(atwinc15x0_t *dev, netopt_state_t state)
         m2m_wifi_disconnect();
         m2m_wifi_set_sleep_mode(M2M_PS_MANUAL, CONFIG_ATWINC15X0_RECV_BCAST);
         m2m_wifi_request_sleep(UINT32_MAX);
+        if (gpio_is_valid(atwinc15x0->params.wake_pin)) {
+            gpio_clear(atwinc15x0->params.wake_pin);
+        }
        return sizeof(netopt_state_t);
     case NETOPT_STATE_IDLE:
+        if (gpio_is_valid(atwinc15x0->params.wake_pin)) {
+            gpio_set(atwinc15x0->params.wake_pin);
+        }
         m2m_wifi_set_sleep_mode(M2M_PS_DEEP_AUTOMATIC, CONFIG_ATWINC15X0_RECV_BCAST);
         dev->state = state;
         _atwinc15x0_connect();
