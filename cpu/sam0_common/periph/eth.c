@@ -92,6 +92,8 @@ static uint8_t  rx_buf[ETH_RX_BUFFER_COUNT][ETH_RX_BUFFER_SIZE] __attribute__((a
 static uint8_t  tx_buf[ETH_TX_BUFFER_COUNT][ETH_TX_BUFFER_SIZE] __attribute__((aligned(GMAC_BUF_ALIGNMENT)));
 extern sam0_eth_netdev_t _sam0_eth_dev;
 
+static bool _is_sleeping;
+
 /* Flush our reception buffers and reset reception internal mechanism,
    this function may be call from ISR context */
 void sam0_clear_rx_buffers(void)
@@ -102,6 +104,33 @@ void sam0_clear_rx_buffers(void)
     rx_idx = 0;
     rx_curr = rx_desc;
     GMAC->RBQB.reg = (uint32_t) rx_desc;
+}
+
+static void _enable_clock(void)
+{
+    /* Enable GMAC clocks */
+    MCLK->AHBMASK.reg |= MCLK_AHBMASK_GMAC;
+    MCLK->APBCMASK.reg |= MCLK_APBCMASK_GMAC;
+}
+
+static void _disable_clock(void)
+{
+    /* Disable GMAC clocks */
+    MCLK->AHBMASK.reg &= ~MCLK_AHBMASK_GMAC;
+    MCLK->APBCMASK.reg &= ~MCLK_APBCMASK_GMAC;
+}
+
+void sam0_eth_poweron(void)
+{
+    _enable_clock();
+    sam0_clear_rx_buffers();
+    _is_sleeping = false;
+}
+
+void sam0_eth_poweroff(void)
+{
+    _is_sleeping = true;
+    _disable_clock();
 }
 
 static void _init_desc_buf(void)
@@ -174,6 +203,10 @@ int sam0_eth_send(const struct iolist *iolist)
     unsigned len = iolist_size(iolist);
     unsigned tx_len = 0;
     tx_curr = &tx_desc[tx_idx];
+
+    if (_is_sleeping) {
+        return -ENOTSUP;
+    }
 
     /* load packet data into TX buffer */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
@@ -288,13 +321,6 @@ static int _try_receive(char* data, unsigned max_len, int block)
 int sam0_eth_receive_blocking(char *data, unsigned max_len)
 {
     return _try_receive(data, max_len, 1);
-}
-
-static void _enable_clock(void)
-{
-    /* Enable GMAC clocks */
-    MCLK->AHBMASK.reg |= MCLK_AHBMASK_GMAC;
-    MCLK->APBCMASK.reg |= MCLK_APBCMASK_GMAC;
 }
 
 int sam0_eth_init(void)
