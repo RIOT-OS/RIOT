@@ -1337,13 +1337,12 @@ kernel_pid_t gcoap_init(void)
     /* randomize initial value */
     atomic_init(&_coap_state.next_message_id, (unsigned)random_uint32());
 
+    if (IS_USED(MODULE_NANOCOAP_CACHE)) {
+        nanocoap_cache_init();
+    }
     /* initialize the forward proxy operation, if compiled */
     if (IS_ACTIVE(MODULE_GCOAP_FORWARD_PROXY)) {
         gcoap_forward_proxy_init();
-    }
-    /* gcoap_forward_proxy_init() also initializes nanocoap_cache_init() */
-    else if (IS_USED(MODULE_NANOCOAP_CACHE)) {
-        nanocoap_cache_init();
     }
 
     return _pid;
