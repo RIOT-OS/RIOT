@@ -13,4 +13,7 @@ USEMODULE += ztimer_sec
 # the start of the shell
 DISABLE_MODULE += test_utils_interactive_sync_shell
 
+# microbit qemu failing currently
+TEST_ON_CI_BLACKLIST += microbit
+
 include $(RIOTBASE)/Makefile.include

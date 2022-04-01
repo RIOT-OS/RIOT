@@ -10,4 +10,7 @@ TEST_ON_CI_BLACKLIST += native
 USEMODULE += fmt
 USEMODULE += ztimer_usec ztimer_msec
 
+# microbit qemu lacks rtt
+TEST_ON_CI_BLACKLIST += microbit
+
 include $(RIOTBASE)/Makefile.include

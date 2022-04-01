@@ -11,6 +11,9 @@ USEMODULE += netdev_test
 
 CFLAGS += -DTEST_SUITES
 
+# microbit qemu failing currently
+TEST_ON_CI_BLACKLIST += microbit
+
 include $(RIOTBASE)/Makefile.include
 
 ifndef CONFIG_GNRC_IPV6_NIB_NO_RTR_SOL

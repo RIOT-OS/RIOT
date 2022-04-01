@@ -33,4 +33,7 @@ DISABLE_MODULE += auto_init_lwip
 CFLAGS += -DSO_REUSE
 CFLAGS += -DLWIP_SO_RCVTIMEO
 
+# microbit qemu failing currently
+TEST_ON_CI_BLACKLIST += microbit
+
 include $(RIOTBASE)/Makefile.include

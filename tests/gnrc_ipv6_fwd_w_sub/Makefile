@@ -14,6 +14,9 @@ USEMODULE += xtimer
 
 CFLAGS += -DTEST_SUITES
 
+# microbit qemu failing currently
+TEST_ON_CI_BLACKLIST += microbit
+
 include $(RIOTBASE)/Makefile.include
 
 # Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.

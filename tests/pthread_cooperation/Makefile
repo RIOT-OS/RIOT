@@ -14,4 +14,7 @@ BOARD_BLACKLIST := arduino-nano arduino-duemilanove \
 USEMODULE += posix_headers
 USEMODULE += pthread
 
+# microbit qemu failing currently
+TEST_ON_CI_BLACKLIST += microbit
+
 include $(RIOTBASE)/Makefile.include

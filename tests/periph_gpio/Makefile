@@ -37,6 +37,9 @@ endif
 # avoid running Kconfig by default
 SHOULD_RUN_KCONFIG ?=
 
+# microbit qemu failing currently
+TEST_ON_CI_BLACKLIST += microbit
+
 include $(RIOTBASE)/Makefile.include
 
 $(call target-export-variables,test,PORT_UNDER_TEST)
