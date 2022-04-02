@@ -27,6 +27,7 @@
 #include "thread.h"
 #include "fmt.h"
 
+#include "periph/pm.h"
 #if IS_USED(MODULE_PERIPH_RTC)
 #include "periph/rtc.h"
 #else
@@ -147,6 +148,16 @@ int main(void)
 {
     puts("LoRaWAN Class A low-power application");
     puts("=====================================");
+
+    /*
+     * Enable deep sleep power mode (e.g. STOP mode on STM32) which
+     * in general provides RAM retention after wake-up.
+     */
+#if IS_USED(MODULE_PM_LAYERED)
+    for (unsigned i = 1; i < PM_NUM_MODES; ++i) {
+        pm_unblock(i);
+    }
+#endif
 
     /* Initialize the radio driver */
 #if IS_USED(MODULE_SX127X)
