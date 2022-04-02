@@ -42,6 +42,15 @@ static char telnet_stack[THREAD_STACKSIZE_DEFAULT];
 
 #define SOCK_TCP_TIMEOUT_MS 50
 
+/*
+ * Work-around for https://github.com/RIOT-OS/RIOT/issues/17896
+ */
+#if CONFIG_TELNET_AUTO_DISCONNECT_SEC != 0
+#define INACTIVE_PERIODS_MAX  ((CONFIG_TELNET_AUTO_DISCONNECT_SEC * MS_PER_SEC) \
+                               / SOCK_TCP_TIMEOUT_MS)
+static unsigned _inactive_count;
+#endif
+
 enum {
     TELNET_CMD_EOF  = 236,
     TELNET_CMD_SE   = 240,
@@ -207,6 +216,11 @@ static void *telnet_thread(void *arg)
             res = sock_tcp_read(client, rx_buf, sizeof(rx_buf), SOCK_TCP_TIMEOUT_MS);
             _release();
             if (res == -ETIMEDOUT) {
+#if CONFIG_TELNET_AUTO_DISCONNECT_SEC != 0
+                if (++_inactive_count == INACTIVE_PERIODS_MAX) {
+                    break;
+                }
+#endif
                 continue;
             }
 
@@ -214,6 +228,9 @@ static void *telnet_thread(void *arg)
                 break;
             }
 
+#if CONFIG_TELNET_AUTO_DISCONNECT_SEC != 0
+            _inactive_count = 0;
+#endif
             for (int i = 0; i < res; ++i) {
                 uint8_t c = rx_buf[i];
 

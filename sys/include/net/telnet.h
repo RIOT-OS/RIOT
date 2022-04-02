@@ -38,6 +38,18 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Automatically terminate the connection after a
+ *          period of inactivity.
+ *
+ *          Set to 0 to disable auto-disconnect.
+ *
+ *          This is a workaround for issue #17896
+ */
+#ifndef CONFIG_TELNET_AUTO_DISCONNECT_SEC
+#define CONFIG_TELNET_AUTO_DISCONNECT_SEC       (10)
+#endif
+
+/**
  * @brief   Start the Telnet server thread
  *
  * @return  0 on success, error otherwise
