@@ -1,0 +1,41 @@
+From ba0f363621429a2f6ac78d63f1d17ec322820814 Mon Sep 17 00:00:00 2001
+From: Geovane Fedrecheski <geonnave@gmail.com>
+Date: Thu, 17 Mar 2022 23:11:38 -0300
+Subject: [PATCH] relax channel mask rules in region AU915
+
+This reflects the latest state of the RegionAU915ChanMaskSet function
+(latest change in Mar 8 2021):
+https://github.com/Lora-net/LoRaMac-node/blob/691086af5524803d17fd22d3096cda62da4b0713/src/mac/region/RegionAU915.c#L475
+
+The removal of the rules was made in this commit:
+https://github.com/Lora-net/LoRaMac-node/commit/e60bd869
+
+---
+ src/mac/region/RegionAU915.c | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+diff --git a/src/mac/region/RegionAU915.c b/src/mac/region/RegionAU915.c
+index 067a15df..68b311fd 100644
+--- a/src/mac/region/RegionAU915.c
++++ b/src/mac/region/RegionAU915.c
+@@ -384,17 +384,6 @@ void RegionAU915ApplyCFList( ApplyCFListParams_t* applyCFList )
+ 
+ bool RegionAU915ChanMaskSet( ChanMaskSetParams_t* chanMaskSet )
+ {
+-    uint8_t nbChannels = RegionCommonCountChannels( chanMaskSet->ChannelsMaskIn, 0, 4 );
+-
+-    // Check the number of active channels
+-    // According to ACMA regulation, we require at least 20 125KHz channels, if
+-    // the node shall utilize 125KHz channels.
+-    if( ( nbChannels < 20 ) &&
+-        ( nbChannels > 0 ) )
+-    {
+-        return false;
+-    }
+-
+     switch( chanMaskSet->ChannelsMaskType )
+     {
+         case CHANNELS_MASK:
+-- 
+2.20.1
+
