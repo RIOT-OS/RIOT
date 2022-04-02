@@ -452,7 +452,7 @@ typedef struct {
 /**
  * @brief   Number of usable power modes.
  */
-#define PM_NUM_MODES    (2U)
+#define PM_NUM_MODES    (3U)
 
 /**
  * @name    Watchdog timer (WDT) configuration

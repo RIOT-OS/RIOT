@@ -56,7 +56,7 @@ typedef uint32_t gpio_t;
  * @name    Power mode configuration
  * @{
  */
-#define PM_NUM_MODES        (4)
+#define PM_NUM_MODES        (5)
 /** @} */
 
 /**

@@ -95,7 +95,7 @@ enum {
  * @name    Power management configuration
  * @{
  */
-#define PM_NUM_MODES            (4)
+#define PM_NUM_MODES            (5)
 /** @} */
 
 /**
