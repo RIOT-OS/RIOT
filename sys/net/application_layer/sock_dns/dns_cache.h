@@ -54,7 +54,7 @@ extern "C" {
  * @param[in]   family          Either AF_INET, AF_INET6 or AF_UNSPEC
  *
  * @return      the size of the resolved address on success
- * @return      < 0 otherwise
+ * @return      <= 0 otherwise
  */
 int sock_dns_cache_query(const char *domain_name, void *addr_out, int family);
 
@@ -62,12 +62,11 @@ int sock_dns_cache_query(const char *domain_name, void *addr_out, int family);
  * @brief Add an IP address for a DNS name to the DNS cache
  *
  * @param[in]   domain_name     DNS name to resolve into address
- * @param[in]   addr_out        buffer to write result into
+ * @param[in]   addr            buffer containing the address
  * @param[in]   addr_len        length of the address in bytes
  * @param[in]   ttl             lifetime of the entry in seconds
  */
-void sock_dns_cache_add(const char *domain_name, const void *addr_out,
-                        int addr_len, uint32_t ttl);
+void sock_dns_cache_add(const char *domain_name, const void *addr, int addr_len, uint32_t ttl);
 #else
 static inline int sock_dns_cache_query(const char *domain_name,
                                        void *addr_out, int family)
@@ -78,11 +77,11 @@ static inline int sock_dns_cache_query(const char *domain_name,
     return 0;
 }
 
-static inline void sock_dns_cache_add(const char *domain_name, const void *addr_out,
+static inline void sock_dns_cache_add(const char *domain_name, const void *addr,
                                       int addr_len, uint32_t ttl)
 {
     (void)domain_name;
-    (void)addr_out;
+    (void)addr;
     (void)addr_len;
     (void)ttl;
 }

@@ -1,0 +1,2 @@
+USEMODULE += gnrc_ipv6
+USEMODULE += sock_dns_cache
