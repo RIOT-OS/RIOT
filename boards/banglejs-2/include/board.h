@@ -120,7 +120,6 @@ extern "C" {
  */
 /** @} */
 
-#if 0
 /**
  * @name NOR flash hardware configuration
  * @{
@@ -142,7 +141,6 @@ extern "C" {
 extern mtd_dev_t *mtd0;
 #define MTD_0 mtd0
 /** @} */
-#endif
 
 /**
  * @name Touch screen configuration

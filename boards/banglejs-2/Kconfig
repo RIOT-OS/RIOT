@@ -20,7 +20,7 @@ config BOARD_BANGLEJS2
 
     select HAVE_CST816S
 
-#    select HAVE_ILI9341
-#    select HAVE_MTD_SPI_NOR
+    select HAVE_LPM013M126
+    select HAVE_MTD_SPI_NOR
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

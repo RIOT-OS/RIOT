@@ -20,6 +20,8 @@
 
 #include "cpu.h"
 #include "board.h"
+#include "mtd.h"
+#include "mtd_spi_nor.h"
 
 #include "periph/gpio.h"
 #include "periph/spi.h"
@@ -28,31 +30,37 @@
 #include "periph/pwm.h"
 #include "periph/spi.h"
 
-#include "cst816s.h"
+#include "timex.h"
 
-// #define ENABLE_TOUCH
-
-//char touch_ev=0;
-#ifdef ENABLE_TOUCH
-cst816s_t _input_dev;
-cst816s_touch_data_t tdata;
-
-static const cst816s_params_t _cst816s_input_params = {
-    .i2c_dev = I2C_DEV(0),
-    .i2c_addr = TOUCH_I2C_ADDR,
-    .irq = TOUCH_INT,
-    .irq_flank = GPIO_FALLING,
-    .reset = TOUCH_RESET,
+#ifdef MODULE_MTD
+static const mtd_spi_nor_params_t _banglejs2_nor_params = {
+    .opcode = &mtd_spi_nor_opcode_default,
+    .wait_chip_erase = 9LU * US_PER_SEC,
+    .wait_32k_erase = 160LU *US_PER_MS,
+    .wait_sector_erase = 70LU * US_PER_MS,
+    .wait_chip_wake_up = 1LU * US_PER_MS,
+    .clk = BANGLEJS2_NOR_SPI_CLK,
+    .flag = BANGLEJS2_NOR_FLAGS,
+    .spi = BANGLEJS2_NOR_SPI_DEV,
+    .mode = BANGLEJS2_NOR_SPI_MODE,
+    .cs = BANGLEJS2_NOR_SPI_CS,
+    .wp = GPIO_UNDEF,
+    .hold = GPIO_UNDEF,
 };
 
-static void touch_cb(void *arg)
-{
-    (void) arg;
+static mtd_spi_nor_t banglejs2_nor_dev = {
+    .base = {
+        .driver = &mtd_spi_nor_driver,
+        .page_size = BANGLEJS2_NOR_PAGE_SIZE,
+        .pages_per_sector = BANGLEJS2_NOR_PAGES_PER_SECTOR,
+        .sector_count = BANGLEJS2_NOR_SECTOR_COUNT,
+    },
+    .params = &_banglejs2_nor_params,
+};
 
-    // can not read I2C from IRQ context, just set a flag
-    touch_ev=1;
-}
-#endif
+mtd_dev_t *mtd0 = (mtd_dev_t *)&banglejs2_nor_dev;
+#endif /* MODULE_MTD */
+
 
 void board_init(void)
 {

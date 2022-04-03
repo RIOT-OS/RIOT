@@ -366,7 +366,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  * - LV_TXT_ENC_UTF8
  * - LV_TXT_ENC_ASCII
  */
-#define LV_TXT_ENC LV_TXT_ENC_ASCII
+// #define LV_TXT_ENC LV_TXT_ENC_ASCII
+#define LV_TXT_ENC LV_TXT_ENC_UTF8
 
  /*Can break (wrap) texts on these chars*/
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
