@@ -245,6 +245,7 @@ typedef struct {
     uint8_t validation_buf[SUIT_COSE_BUF_SIZE];
     char *urlbuf;                   /**< Buffer containing the manifest url */
     size_t urlbuf_len;              /**< Length of the manifest url */
+    uint32_t seq_number;            /**< Set sequence number */
 } suit_manifest_t;
 
 /**
