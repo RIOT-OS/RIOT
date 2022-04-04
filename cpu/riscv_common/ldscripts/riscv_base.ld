@@ -231,7 +231,7 @@ SECTIONS
 
   .flash_writable (NOLOAD) : {
     KEEP(*(SORT(.flash_writable.*)))
-  } > rom
+  } > flash
 
   .end_fw (NOLOAD) : ALIGN(4) {
     _end_fw = . ;
