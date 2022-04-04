@@ -54,7 +54,7 @@ extern "C" {
  * @brief Power Management mode blocker typedef
  */
 typedef struct {
-    uint8_t val_u8[PM_NUM_MODES];       /**< power mode blockers u8 */
+    uint8_t blockers[PM_NUM_MODES];     /**< number of blockers for the mode */
 } pm_blocker_t;
 
 /**

@@ -54,7 +54,7 @@
 /**
  * @brief Global variable for keeping track of blocked modes
  */
-static pm_blocker_t pm_blocker = { .val_u8 = PM_BLOCKER_INITIAL };
+static pm_blocker_t pm_blocker = { .blockers = PM_BLOCKER_INITIAL };
 
 void pm_set_lowest(void)
 {
@@ -63,7 +63,7 @@ void pm_set_lowest(void)
     /* set lowest mode if blocker is still the same */
     unsigned state = irq_disable();
     while (mode) {
-        if (pm_blocker.val_u8[mode-1]) {
+        if (pm_blocker.blockers[mode - 1]) {
             break;
         }
         mode--;
@@ -77,19 +77,19 @@ void pm_set_lowest(void)
 
 void pm_block(unsigned mode)
 {
-    assert(pm_blocker.val_u8[mode] != 255);
+    assert(pm_blocker.blockers[mode] != 255);
 
     unsigned state = irq_disable();
-    pm_blocker.val_u8[mode]++;
+    pm_blocker.blockers[mode]++;
     irq_restore(state);
 }
 
 void pm_unblock(unsigned mode)
 {
-    assert(pm_blocker.val_u8[mode] > 0);
+    assert(pm_blocker.blockers[mode] > 0);
 
     unsigned state = irq_disable();
-    pm_blocker.val_u8[mode]--;
+    pm_blocker.blockers[mode]--;
     irq_restore(state);
 }
 
