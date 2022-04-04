@@ -865,6 +865,11 @@ ifneq (,$(filter suit_storage_flashwrite, $(USEMODULE)))
   USEMODULE += riotboot_flashwrite_verify_sha256
 endif
 
+ifneq (,$(filter suit_storage_vfs,$(USEMODULE)))
+  USEMODULE += vfs
+  USEMODULE += mtd
+endif
+
 ifneq (,$(filter suit_%,$(USEMODULE)))
   USEMODULE += suit
 endif
