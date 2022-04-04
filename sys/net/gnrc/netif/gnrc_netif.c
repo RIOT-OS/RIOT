@@ -1459,6 +1459,61 @@ bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
 #endif  /* IS_USED(MODULE_GNRC_NETIF_BUS) */
 #endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
 
+static int _change_state_and_wait(gnrc_netif_t *netif, netopt_state_t state, unsigned timeout_ms)
+{
+    int res = 0;
+
+    netopt_state_t state_prev;
+    while (gnrc_netapi_get(netif->pid, NETOPT_STATE, 0, &state_prev, sizeof(state_prev)) == -EBUSY) {}
+
+    if (state == state_prev) {
+        return 0;
+    }
+
+#if IS_USED(MODULE_GNRC_NETIF_BUS)
+    gnrc_netif_event_t event;
+
+    if ((state == NETOPT_STATE_SLEEP) || (state == NETOPT_STATE_OFF) ||
+        (state == NETOPT_STATE_STANDBY)) {
+        event = GNRC_NETIF_EVENT_LINK_STATE_CHANGED_DOWN;
+    } else {
+        event = GNRC_NETIF_EVENT_LINK_STATE_CHANGED_UP;
+    }
+
+    msg_bus_entry_t sub;
+    msg_bus_t *bus = gnrc_netif_get_bus(netif, GNRC_NETIF_BUS_IFACE);
+    msg_bus_attach(bus, &sub);
+    msg_bus_subscribe(&sub, event);
+#endif
+
+    while (gnrc_netapi_set(netif->pid, NETOPT_STATE, 0, &state, sizeof(state)) == -EBUSY) {}
+
+    if (timeout_ms == 0) {
+        return 0;
+    }
+
+#if IS_USED(MODULE_GNRC_NETIF_BUS)
+    msg_t m;
+    if (ztimer_msg_receive_timeout(ZTIMER_MSEC, &m, timeout_ms) < 0) {
+        DEBUG_PUTS("gnrc_netif: timeout waiting for state change");
+        res = -ETIMEDOUT;
+    }
+    msg_bus_detach(bus, &sub);
+#endif
+
+    return res;
+}
+
+int gnrc_netif_up(gnrc_netif_t *netif, unsigned timeout_ms)
+{
+    return _change_state_and_wait(netif, NETOPT_STATE_IDLE, timeout_ms);
+}
+
+int gnrc_netif_down(gnrc_netif_t *netif, unsigned timeout_ms)
+{
+    return _change_state_and_wait(netif, NETOPT_STATE_SLEEP, timeout_ms);
+}
+
 static void _update_l2addr_from_dev(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;

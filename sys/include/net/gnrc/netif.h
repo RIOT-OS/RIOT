@@ -752,6 +752,28 @@ static inline int gnrc_netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     return gnrc_netapi_send(netif->pid, pkt);
 }
 
+/**
+ * @brief   Bring up an interface that has previously been disabled
+ *
+ * @param netif         pointer to the interface
+ * @param timeout_ms    timeout for confirmation from the interface
+ *
+ * @return              0 on success
+ *                      negative error
+ */
+int gnrc_netif_up(gnrc_netif_t *netif, unsigned timeout_ms);
+
+/**
+ * @brief   Disable a network interface
+ *
+ * @param netif         pointer to the interface
+ * @param timeout_ms    timeout for confirmation from the interface
+ *
+ * @return              0 on success
+ *                      negative error
+ */
+int gnrc_netif_down(gnrc_netif_t *netif, unsigned timeout_ms);
+
 #if defined(MODULE_GNRC_NETIF_BUS) || DOXYGEN
 /**
  * @brief   Get a message bus of a given @ref gnrc_netif_t interface.
