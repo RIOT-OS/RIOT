@@ -99,7 +99,7 @@ endif
 
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   USEMODULE += random
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter dhcpv6_%,$(USEMODULE)))
@@ -167,7 +167,7 @@ endif
 
 ifneq (,$(filter uhcpc,$(USEMODULE)))
   USEMODULE += posix_inet
-  USEMODULE += xtimer
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter netdev_tap,$(USEMODULE)))
@@ -274,7 +274,6 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += vfs
   USEMODULE += posix_headers
-  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter shell,$(USEMODULE)))
@@ -818,7 +817,7 @@ endif
 
 ifneq (,$(filter suit_transport_coap, $(USEMODULE)))
   USEMODULE += nanocoap_sock
-  USEMODULE += xtimer
+  USEMODULE += ztimer_msec
   USEMODULE += sock_util
 endif
 
