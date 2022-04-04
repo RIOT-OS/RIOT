@@ -103,8 +103,29 @@ typedef enum {
     GNRC_NETIF_BUS_IPV6,                    /**< provides @ref gnrc_ipv6_event_t
                                                  messages to subscribers */
 #endif
+    GNRC_NETIF_BUS_IFACE,                   /**< provides @ref gnrc_netif_event_t
+                                                 messages to subscribers */
     GNRC_NETIF_BUS_NUMOF
 } gnrc_netif_bus_t;
+
+/**
+ * @brief   Event types for GNRC_NETIF_BUS_IFACE per-interface message bus
+ */
+typedef enum {
+    /**
+     * @brief   Link state changed to UP
+     *
+     * The event is generated when the link state on the interface became online.
+     */
+    GNRC_NETIF_EVENT_LINK_STATE_CHANGED_DOWN,
+
+    /**
+     * @brief   Link state changed to DOWN
+     *
+     * The event is generated when the link state on the interface become offline.
+     */
+    GNRC_NETIF_EVENT_LINK_STATE_CHANGED_UP,
+} gnrc_netif_event_t;
 
 /**
  * @brief   Event types for GNRC_NETIF_BUS_IPV6 per-interface message bus

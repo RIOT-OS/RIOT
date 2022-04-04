@@ -2056,6 +2056,9 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
 
                     msg_send(&msg, gnrc_ipv6_pid);
                 }
+                gnrc_netif_event_bus_post(netif,
+                                          GNRC_NETIF_EVENT_LINK_STATE_CHANGED_UP,
+                                          netif);
                 break;
             case NETDEV_EVENT_LINK_DOWN:
                 if (IS_USED(MODULE_GNRC_IPV6)) {
@@ -2063,6 +2066,9 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
 
                     msg_send(&msg, gnrc_ipv6_pid);
                 }
+                gnrc_netif_event_bus_post(netif,
+                                          GNRC_NETIF_EVENT_LINK_STATE_CHANGED_DOWN,
+                                          netif);
                 break;
             case NETDEV_EVENT_RX_COMPLETE:
                 pkt = netif->ops->recv(netif);
