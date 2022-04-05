@@ -35,12 +35,12 @@ int main(void)
     unsigned n = XFA_LEN(xfatest_t, xfatest);
     printf("xfatest[%u]:\n", n);
     for (unsigned i = 0; i < n; i++) {
-        printf("[%u] = %u, \"%s\"\n", i, xfatest[i].val, xfatest[i].text);
+        printf("[%u] = %u, \"%s\"\n", i, xfatest_get_ptr(i)->val, xfatest_get_ptr(i)->text);
     }
     n = XFA_LEN(xfatest_t, xfatest_const);
     printf("xfatest_const[%u]:\n", n);
     for (unsigned i = 0; i < n; i++) {
-        printf("[%u] = %u, \"%s\"\n", i, xfatest_const[i].val, xfatest_const[i].text);
+        printf("[%u] = %u, \"%s\"\n", i, xfatest_const_get_ptr(i)->val, xfatest_const_get_ptr(i)->text);
     }
 
     return 0;
