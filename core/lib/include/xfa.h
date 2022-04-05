@@ -216,7 +216,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
         return (unsigned)((uintptr_t)&name ## _end - (uintptr_t)&name) / sizeof(type); \
     } \
     static inline NO_SANITIZE type name ## _get_copy(unsigned n) { \
-        return (type)name[n]; \
+        return *(type*)&name[n]; \
     } \
     static inline NO_SANITIZE __VA_ARGS__ type * name ## _get_ptr(unsigned n) { \
         return (__VA_ARGS__ type *) &name[n]; \
