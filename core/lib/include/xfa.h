@@ -27,6 +27,13 @@
 
 #include <inttypes.h>
 
+#if !defined(__clang__) && __GNUC__ < 8
+/* yes, avr and xtensa are stuck to gcc 5.2. In 2022. :/ */
+# define NO_SANITIZE
+#else
+# define NO_SANITIZE __attribute__((no_sanitize("undefined")))
+#endif
+
 /*
  * Unfortunately, current gcc trips over accessing XFA's because of their
  * zero-size start/end array that are used of symbol markers, with an "array
@@ -208,10 +215,10 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
     static inline unsigned name ## _len(void) { \
         return (unsigned)((uintptr_t)&name ## _end - (uintptr_t)&name) / sizeof(type); \
     } \
-    static inline __attribute__((no_sanitize("undefined"))) type name ## _get_copy(unsigned n) { \
+    static inline NO_SANITIZE type name ## _get_copy(unsigned n) { \
         return (type)name[n]; \
     } \
-    static inline __attribute__((no_sanitize("undefined"))) __VA_ARGS__ type * name ## _get_ptr(unsigned n) { \
+    static inline NO_SANITIZE __VA_ARGS__ type * name ## _get_ptr(unsigned n) { \
         return (__VA_ARGS__ type *) &name[n]; \
     }
 
