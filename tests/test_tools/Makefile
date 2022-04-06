@@ -10,6 +10,9 @@ DISABLE_MODULE += test_utils_interactive_sync
 # include sys/test_utils/dummy_thread
 USEMODULE += dummy_thread
 
+# microbit qemu failing currently
+TEST_ON_CI_BLACKLIST += microbit
+
 include $(RIOTBASE)/Makefile.include
 
 # Set the shell echo configuration via CFLAGS if not being controlled via Kconfig

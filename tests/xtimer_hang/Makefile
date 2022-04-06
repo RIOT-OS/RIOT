@@ -18,4 +18,7 @@ DISABLE_MODULE := core_msg
 #CFLAGS += -DWORKER_THREAD_PIN_2=GPIO_PIN\(5,6\)
 #CFLAGS += -DMAIN_THREAD_PIN=GPIO_PIN\(5,5\)
 
+# microbit qemu failing currently
+TEST_ON_CI_BLACKLIST += microbit
+
 include $(RIOTBASE)/Makefile.include

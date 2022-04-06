@@ -10,6 +10,9 @@ DISABLE_MODULE += periph_init_rtt
 # avoid running Kconfig by default
 SHOULD_RUN_KCONFIG ?=
 
+# microbit qemu lacks rtt
+TEST_ON_CI_BLACKLIST += microbit
+
 include $(RIOTBASE)/Makefile.include
 
 # Put board specific dependencies here

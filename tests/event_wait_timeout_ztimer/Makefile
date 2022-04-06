@@ -11,5 +11,7 @@ ifneq (,$(filter stm32f030f4-demo,$(BOARD)))
   CFLAGS += -DTHREAD_STACKSIZE_DEFAULT=512
 endif
 
+# microbit qemu lacks rtt
+TEST_ON_CI_BLACKLIST += microbit
 
 include $(RIOTBASE)/Makefile.include
