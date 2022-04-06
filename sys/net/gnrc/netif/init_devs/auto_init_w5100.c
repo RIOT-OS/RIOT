@@ -21,12 +21,13 @@
 #include "w5100.h"
 #include "w5100_params.h"
 #include "net/gnrc/netif/ethernet.h"
+#include "include/init_devs.h"
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define MAC_STACKSIZE   (THREAD_STACKSIZE_DEFAULT)
+#define MAC_STACKSIZE   (GNRC_NETIF_STACKSIZE_DEFAULT)
 #define MAC_PRIO        (GNRC_NETIF_PRIO)
 /*** @} */
 

@@ -22,6 +22,7 @@
 #include "log.h"
 #include "usb/usbus/cdc/ecm.h"
 #include "net/gnrc/netif/ethernet.h"
+#include "include/init_devs.h"
 
 /**
  * @brief global cdc ecm object, declared in the usb auto init file
@@ -32,7 +33,7 @@ extern usbus_cdcecm_device_t cdcecm;
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define CDCECM_MAC_STACKSIZE (THREAD_STACKSIZE_DEFAULT)
+#define CDCECM_MAC_STACKSIZE (GNRC_NETIF_STACKSIZE_DEFAULT)
 #ifndef CDCECM_MAC_PRIO
 #define CDCECM_MAC_PRIO      (GNRC_NETIF_PRIO)
 #endif

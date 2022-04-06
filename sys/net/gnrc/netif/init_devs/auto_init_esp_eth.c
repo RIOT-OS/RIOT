@@ -19,6 +19,7 @@
 #include "esp_eth_params.h"
 #include "esp_eth_netdev.h"
 #include "net/gnrc/netif/ethernet.h"
+#include "include/init_devs.h"
 
 static gnrc_netif_t _netif;
 

@@ -21,8 +21,9 @@
 #include "debug.h"
 #include "netdev_tap_params.h"
 #include "net/gnrc/netif/ethernet.h"
+#include "include/init_devs.h"
 
-#define TAP_MAC_STACKSIZE           (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
+#define TAP_MAC_STACKSIZE           (GNRC_NETIF_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
 #define TAP_MAC_PRIO                (GNRC_NETIF_PRIO)
 
 static netdev_tap_t netdev_tap[NETDEV_TAP_MAX];
