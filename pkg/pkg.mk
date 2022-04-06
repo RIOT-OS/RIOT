@@ -115,7 +115,9 @@ $(PKG_PATCHED): $(PKG_PATCHED_PREREQUISITES)
 	$(call gen_dependency_files,$@.d,$(PKG_PATCHED_PREREQUISITES))
 	$(Q)$(GIT_IN_PKG) clean $(GIT_QUIET) -xdff '**' -e $(PKG_STATE:$(PKG_SOURCE_DIR)/%='%*')
 	$(Q)$(GIT_IN_PKG) checkout $(GIT_QUIET) -f $(PKG_VERSION)
-	$(Q)$(GIT_IN_PKG) $(GITFLAGS) am $(GITAMFLAGS) $(PKG_PATCHES) </dev/null
+	$(Q) if test -n "$(PKG_PATCHES)" ; then \
+	       $(GIT_IN_PKG) $(GITFLAGS) am $(GITAMFLAGS) $(PKG_PATCHES) ; \
+	     fi
 	@touch $@
 
 $(PKG_DOWNLOADED): $(MAKEFILE_LIST) | $(PKG_SOURCE_DIR)/.git

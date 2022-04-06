@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += printf_float
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
 
 # native has known issues: the context switch via glibc's setcontext()
 # apparently doesn't properly save and restore the FPU state. This results in

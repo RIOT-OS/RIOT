@@ -32,7 +32,7 @@
 #include "net/nanocoap_sock.h"
 #include "thread.h"
 #include "periph/pm.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "suit/transport/coap.h"
 #include "net/sock/util.h"
@@ -112,69 +112,12 @@ ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
                              subtree->resources_numof);
 }
 
-static inline uint32_t _now(void)
-{
-    return xtimer_now_usec();
-}
-
-static inline uint32_t deadline_from_interval(int32_t interval)
-{
-    assert(interval >= 0);
-    return _now() + (uint32_t)interval;
-}
-
-static inline uint32_t deadline_left(uint32_t deadline)
-{
-    int32_t left = (int32_t)(deadline - _now());
-
-    if (left < 0) {
-        left = 0;
-    }
-    return left;
-}
-
-typedef struct {
-    size_t offset;
-    uint8_t *ptr;
-    size_t len;
-} _buf_t;
-
-static int _2buf(void *arg, size_t offset, uint8_t *buf, size_t len, int more)
-{
-    (void)more;
-
-    _buf_t *_buf = arg;
-    if (_buf->offset != offset) {
-        return 0;
-    }
-    if (len > _buf->len) {
-        return -1;
-    }
-    else {
-        memcpy(_buf->ptr, buf, len);
-        _buf->offset += len;
-        _buf->ptr += len;
-        _buf->len -= len;
-        return 0;
-    }
-}
-
-static ssize_t suit_coap_get_blockwise_url_buf(const char *url,
-                                               coap_blksize_t blksize, void *work_buf,
-                                               uint8_t *buf, size_t len)
-{
-    _buf_t _buf = { .ptr = buf, .len = len };
-    int res = nanocoap_get_blockwise_url(url, blksize, work_buf, _2buf, &_buf);
-
-    return (res < 0) ? (ssize_t)res : (ssize_t)_buf.offset;
-}
-
 static void _suit_handle_url(const char *url, coap_blksize_t blksize, void *work_buf)
 {
     LOG_INFO("suit_coap: downloading \"%s\"\n", url);
-    ssize_t size = suit_coap_get_blockwise_url_buf(url, blksize, work_buf,
-                                                   _manifest_buf,
-                                                   SUIT_MANIFEST_BUFSIZE);
+    ssize_t size = nanocoap_get_blockwise_url_to_buf(url, blksize, work_buf,
+                                                     _manifest_buf,
+                                                     SUIT_MANIFEST_BUFSIZE);
     if (size >= 0) {
         LOG_INFO("suit_coap: got manifest with size %u\n", (unsigned)size);
 
@@ -197,7 +140,7 @@ static void _suit_handle_url(const char *url, coap_blksize_t blksize, void *work
             const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(
                 riotboot_slot_other());
             riotboot_hdr_print(hdr);
-            xtimer_sleep(1);
+            ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
 
             if (riotboot_hdr_validate(hdr) == 0) {
                 LOG_INFO("suit_coap: rebooting...\n");

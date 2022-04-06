@@ -23,15 +23,10 @@
 
 void board_init(void)
 {
-
-    /* initialize the on-board button */
-    gpio_init(BTN0_PIN, BTN0_MODE);
-
     /* If the PA24 and PA25 pins are not connected, it is recommended
      * to enable a pull-up on PA24 and PA25 through input GPIO mode.
      * (those have external pull-ups on the board that would leak current)
      */
     gpio_init(GPIO_PIN(PA, 24), GPIO_IN_PU);
     gpio_init(GPIO_PIN(PA, 25), GPIO_IN_PU);
-
 }

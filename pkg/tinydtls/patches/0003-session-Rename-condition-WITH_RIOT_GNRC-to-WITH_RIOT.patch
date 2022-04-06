@@ -1,0 +1,61 @@
+From 86dea8ab253df87aa09bc477b26ed1331ce149c6 Mon Sep 17 00:00:00 2001
+From: HendrikVE <hendrik1995@msn.com>
+Date: Fri, 25 Mar 2022 13:45:39 +0100
+Subject: [PATCH 3/4] session: Rename condition WITH_RIOT_GNRC to
+ WITH_RIOT_SOCK
+
+Using tinydtls on RIOT OS is not limited to GNRC as network stack.
+It is also working with e.g. lwIP, see: https://github.com/RIOT-OS/RIOT/pull/17552
+Therefore the name WITH_RIOT_GNRC is misleading.
+---
+ session.c | 2 +-
+ session.h | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/session.c b/session.c
+index 020ab5b..7615188 100644
+--- a/session.c
++++ b/session.c
+@@ -31,7 +31,7 @@
+    && (A)->port == (B)->port					\
+    && uip_ipaddr_cmp(&((A)->addr),&((B)->addr))			\
+    && (A)->ifindex == (B)->ifindex)
+-#elif defined(WITH_RIOT_GNRC)
++#elif defined(WITH_RIOT_SOCK)
+ #define _dtls_address_equals_impl(A,B)                          \
+   ((A)->size == (B)->size                                       \
+    && (A)->addr.port == (B)->addr.port                                    \
+diff --git a/session.h b/session.h
+index 2ab600a..9d7041a 100644
+--- a/session.h
++++ b/session.h
+@@ -31,7 +31,7 @@ typedef struct {
+   int ifindex;
+ } session_t;
+  /* TODO: Add support for RIOT over sockets  */
+-#elif defined(WITH_RIOT_GNRC)
++#elif defined(WITH_RIOT_SOCK)
+ #include "net/ipv6/addr.h"
+ typedef struct {
+   unsigned char size;
+@@ -41,7 +41,7 @@ typedef struct {
+   } addr;
+   int ifindex;
+ } session_t;
+-#else /* ! WITH_CONTIKI && ! WITH_RIOT_GNRC */
++#else /* ! WITH_CONTIKI && ! WITH_RIOT_SOCK */
+ 
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+@@ -57,7 +57,7 @@ typedef struct {
+   } addr;
+   int ifindex;
+ } session_t;
+-#endif /* ! WITH_CONTIKI && ! WITH_RIOT_GNRC */
++#endif /* ! WITH_CONTIKI && ! WITH_RIOT_SOCK */
+ 
+ /** 
+  * Resets the given session_t object @p sess to its default
+-- 
+2.25.1
+

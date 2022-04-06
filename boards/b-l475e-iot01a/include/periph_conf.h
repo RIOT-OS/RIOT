@@ -40,14 +40,20 @@ extern "C" {
 static const dma_conf_t dma_config[] = {
     { .stream = 1 },    /* DMA1 Channel 2 - SPI1_RX */
     { .stream = 2 },    /* DMA1 Channel 3 - SPI1_TX */
-    { .stream = 3 },    /* DMA1 Channel 4 - USART1_TX */
+    { .stream = 3 },    /* DMA1 Channel 4 - USART1_TX / SPI2_RX */
+    { .stream = 4 },    /* DMA1 Channel 5 - SPI2_TX */
+    { .stream = 8 },    /* DMA2 Channel 1 - SPI3_RX */
+    { .stream = 9 },    /* DMA2 Channel 2 - SPI3_TX */
     { .stream = 10 },   /* DMA2 Channel 3 - UART4_TX */
 };
 
 #define DMA_0_ISR  isr_dma1_channel2
 #define DMA_1_ISR  isr_dma1_channel3
 #define DMA_2_ISR  isr_dma1_channel4
-#define DMA_3_ISR  isr_dma2_channel3
+#define DMA_3_ISR  isr_dma1_channel5
+#define DMA_4_ISR  isr_dma2_channel1
+#define DMA_5_ISR  isr_dma2_channel2
+#define DMA_6_ISR  isr_dma2_channel3
 
 #define DMA_NUMOF           ARRAY_SIZE(dma_config)
 /** @} */
@@ -104,7 +110,7 @@ static const uart_conf_t uart_config[] = {
         .type       = STM32_USART,
         .clk_src    = 0, /* Use APB clock */
 #ifdef MODULE_PERIPH_DMA
-        .dma        = 3,
+        .dma        = 6,
         .dma_chan   = 2
 #endif
     }
@@ -159,6 +165,44 @@ static const spi_conf_t spi_config[] = {
         .rx_dma   = 0,
         .rx_dma_chan = 1,
 #endif
+    },
+    {
+        .dev      = SPI2,
+        .mosi_pin = GPIO_PIN(PORT_D, 4),
+        .miso_pin = GPIO_PIN(PORT_D, 3),
+        .sclk_pin = GPIO_PIN(PORT_D, 1),
+        .cs_pin   = SPI_CS_UNDEF,
+        .mosi_af  = GPIO_AF5,
+        .miso_af  = GPIO_AF5,
+        .sclk_af  = GPIO_AF5,
+        .cs_af    = GPIO_AF5,
+        .rccmask  = RCC_APB1ENR1_SPI2EN,
+        .apbbus   = APB1,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma   = 3,
+        .tx_dma_chan = 1,
+        .rx_dma   = 2,
+        .rx_dma_chan = 1,
+#endif
+    },
+    {
+        .dev      = SPI3,
+        .mosi_pin = GPIO_PIN(PORT_C, 12),
+        .miso_pin = GPIO_PIN(PORT_C, 11),
+        .sclk_pin = GPIO_PIN(PORT_C, 10),
+        .cs_pin   = SPI_CS_UNDEF,
+        .mosi_af  = GPIO_AF6,
+        .miso_af  = GPIO_AF6,
+        .sclk_af  = GPIO_AF6,
+        .cs_af    = GPIO_AF6,
+        .rccmask  = RCC_APB1ENR1_SPI3EN,
+        .apbbus   = APB1,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma   = 5,
+        .tx_dma_chan = 3,
+        .rx_dma   = 4,
+        .rx_dma_chan = 3,
+#endif
     }
 };
 
@@ -179,6 +223,7 @@ static const i2c_conf_t i2c_config[] = {
         .sda_af         = GPIO_AF4,
         .bus            = APB1,
         .rcc_mask       = RCC_APB1ENR1_I2C1EN,
+        .rcc_sw_mask    = RCC_CCIPR_I2C1SEL_1,          /* HSI (16 MHz) */
         .irqn           = I2C1_ER_IRQn,
     },
     {
@@ -190,6 +235,7 @@ static const i2c_conf_t i2c_config[] = {
         .sda_af         = GPIO_AF4,
         .bus            = APB1,
         .rcc_mask       = RCC_APB1ENR1_I2C2EN,
+        .rcc_sw_mask    = RCC_CCIPR_I2C2SEL_1,          /* HSI (16 MHz) */
         .irqn           = I2C2_ER_IRQn,
     },
 };

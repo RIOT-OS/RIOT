@@ -14,6 +14,7 @@
  *
  * @author  Aiman Ismail <muhammadaimanbin.ismail@haw-hamburg.de>
  * @author  Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
+ * @author  Hendrik van Essen <hendrik.ve@fu-berlin.de>
  */
 
 #include <assert.h>
@@ -89,10 +90,8 @@ typedef struct ecdsa_key_assignment {
 static ecdsa_key_assignment_t _ecdsa_keys[CONFIG_DTLS_CREDENTIALS_MAX];
 #endif
 
-static int _read(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
-                 size_t len)
+static int _read(struct dtls_context_t *ctx, session_t *session, uint8_t *buf, size_t len)
 {
-    (void)session;
     sock_dtls_t *sock = dtls_get_app_data(ctx);
 
     DEBUG("sock_dtls: decrypted message arrived\n");
@@ -109,14 +108,12 @@ static int _read(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
     return len;
 }
 
-static int _write(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
-                  size_t len)
+static int _write(struct dtls_context_t *ctx, session_t *session, uint8_t *buf, size_t len)
 {
     sock_dtls_t *sock = (sock_dtls_t *)dtls_get_app_data(ctx);
     sock_udp_ep_t remote;
 
     _session_to_ep(session, &remote);
-    remote.family = AF_INET6;
 
     ssize_t res = sock_udp_send(sock->udp_sock, buf, len, &remote);
 
@@ -129,9 +126,6 @@ static int _write(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
 static int _event(struct dtls_context_t *ctx, session_t *session,
                   dtls_alert_level_t level, unsigned short code)
 {
-    (void)level;
-    (void)session;
-
     sock_dtls_t *sock = dtls_get_app_data(ctx);
     msg_t msg = { .type = code, .content.ptr = session };
 
@@ -310,7 +304,6 @@ static int _get_psk_info(struct dtls_context_t *ctx, const session_t *session,
 static int _get_ecdsa_key(struct dtls_context_t *ctx, const session_t *session,
                           const dtls_ecdsa_key_t **result)
 {
-    (void)session;
     int ret = CREDMAN_ERROR;
     sock_dtls_t *sock = (sock_dtls_t *)dtls_get_app_data(ctx);
     sock_udp_ep_t ep;
@@ -535,15 +528,20 @@ int sock_dtls_session_init(sock_dtls_t *sock, const sock_udp_ep_t *ep,
     if (!sock->udp_sock || (sock_udp_get_local(sock->udp_sock, &local) < 0)) {
         return -EADDRNOTAVAIL;
     }
+
     if (ep->port == 0) {
         return -EINVAL;
     }
+
     switch (ep->family) {
+#ifdef SOCK_HAS_IPV4
     case AF_INET:
- #if IS_ACTIVE(SOCK_HAS_IPV6)
-    case AF_INET6:
- #endif
         break;
+#endif
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
+        break;
+#endif
     default:
         return -EINVAL;
     }
@@ -817,25 +815,56 @@ void sock_dtls_init(void)
 
 static void _ep_to_session(const sock_udp_ep_t *ep, session_t *session)
 {
-    session->port = ep->port;
-    session->size = sizeof(ipv6_addr_t) +       /* addr */
-                    sizeof(unsigned short);     /* port */
-    if (ipv6_addr_is_link_local((ipv6_addr_t *)ep->addr.ipv6)) {
-        /* set ifindex for link-local addresses */
-        session->ifindex = ep->netif;
-    }
-    else {
+    dtls_session_init(session);
+    session->addr.family = ep->family;
+    session->addr.port = ep->port;
+
+    switch (ep->family) {
+#ifdef SOCK_HAS_IPV4
+    case AF_INET:
         session->ifindex = SOCK_ADDR_ANY_NETIF;
+        memcpy(&session->addr.ipv4, &ep->addr.ipv4, sizeof(session->addr.ipv4));
+        break;
+#endif
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
+        if (ipv6_addr_is_link_local((ipv6_addr_t *)ep->addr.ipv6)) {
+            /* set ifindex for link-local addresses */
+            session->ifindex = ep->netif;
+        }
+        else {
+            session->ifindex = SOCK_ADDR_ANY_NETIF;
+        }
+        memcpy(&session->addr.ipv6, &ep->addr.ipv6, sizeof(session->addr.ipv6));
+        break;
+#endif
+    default:
+        assert(0);
+        return;
     }
-    memcpy(&session->addr, &ep->addr.ipv6, sizeof(ipv6_addr_t));
 }
 
 static void _session_to_ep(const session_t *session, sock_udp_ep_t *ep)
 {
-    ep->port = session->port;
+    ep->port = session->addr.port;
     ep->netif = session->ifindex;
-    ep->family = AF_INET6;
-    memcpy(&ep->addr.ipv6, &session->addr, sizeof(ipv6_addr_t));
+    ep->family = session->addr.family;
+
+    switch (session->addr.family) {
+#ifdef SOCK_HAS_IPV4
+    case AF_INET:
+        memcpy(&ep->addr.ipv4, &session->addr.ipv4, sizeof(ep->addr.ipv4));
+        break;
+#endif
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
+        memcpy(&ep->addr.ipv6, &session->addr.ipv6, sizeof(ep->addr.ipv6));
+        break;
+#endif
+    default:
+        /* addr_family is actually ok to be 0 when coming from _copy_buffer */
+        return;
+    }
 }
 
 static inline uint32_t _update_timeout(uint32_t start, uint32_t timeout)

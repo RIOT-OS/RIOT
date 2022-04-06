@@ -44,11 +44,6 @@ mtd_dev_t *mtd0 = (mtd_dev_t *)&sensebox_sd_dev;
 
 void board_init(void)
 {
-
-
-    /* initialize the on-board button on pin PA20 */
-    gpio_init(BTN0_PIN, BTN0_MODE);
-
     /* initialize XBEE1 bus enable pin */
     gpio_init(XBEE1_EN_PIN, XBEE1_EN_MODE);
 

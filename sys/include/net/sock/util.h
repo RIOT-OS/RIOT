@@ -117,6 +117,22 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath);
 int sock_tl_str2ep(struct _sock_tl_ep *ep_out, const char *str);
 
 /**
+ * @brief   Convert string to common IP-based transport layer endpoint
+ *          If the `sock_dns` module is used, this will do a DNS lookup
+ *          if @p str is not an IP address.
+ *
+ * Takes eg., "riot-os.org:1234" and converts it into the corresponding
+ * endpoint structure.
+ *
+ * @param[out]  ep_out  endpoint structure to fill
+ * @param[in]   str     string to read from
+ *
+ * @returns     0 on success
+ * @returns     <0 otherwise
+ */
+int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str);
+
+/**
  * @brief    Convert string to TCP endpoint
  *
  * Takes eg., "[2001:db8::1]:1234" and converts it into the corresponding UDP
@@ -134,6 +150,25 @@ static inline int sock_tcp_str2ep(sock_tcp_ep_t *ep_out, const char *str)
 }
 
 /**
+ * @brief    Convert string to TCP endpoint
+ *           If the `sock_dns` module is used, this will do a DNS lookup
+ *           if @p str is not an IP address.
+ *
+ * Takes eg., "exampl.com:80" or "[2001:db8::1]:1234" and converts it into
+ * the corresponding UDP endpoint structure.
+ *
+ * @param[out]  ep_out  endpoint structure to fill
+ * @param[in]   str     string to read from
+ *
+ * @returns     0 on success
+ * @returns     <0 otherwise
+ */
+static inline int sock_tcp_name2ep(sock_tcp_ep_t *ep_out, const char *str)
+{
+    return sock_tl_name2ep(ep_out, str);
+}
+
+/**
  * @brief    Convert string to UDP endpoint
  *
  * Takes eg., "[2001:db8::1]:1234" and converts it into the corresponding UDP
@@ -148,6 +183,25 @@ static inline int sock_tcp_str2ep(sock_tcp_ep_t *ep_out, const char *str)
 static inline int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str)
 {
     return sock_tl_str2ep(ep_out, str);
+}
+
+/**
+ * @brief    Convert string to UDP endpoint
+ *           If the `sock_dns` module is used, this will do a DNS lookup
+ *           if @p str is not an IP address.
+ *
+ * Takes eg., "exampl.com:80" or "[2001:db8::1]:1234" and converts it into
+ * the corresponding UDP endpoint structure.
+ *
+ * @param[out]  ep_out  endpoint structure to fill
+ * @param[in]   str     string to read from
+ *
+ * @returns     0 on success
+ * @returns     <0 otherwise
+ */
+static inline int sock_udp_name2ep(sock_udp_ep_t *ep_out, const char *str)
+{
+    return sock_tl_name2ep(ep_out, str);
 }
 
 /**

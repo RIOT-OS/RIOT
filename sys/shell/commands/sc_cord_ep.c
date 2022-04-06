@@ -30,7 +30,7 @@
 static int make_sock_ep(sock_udp_ep_t *ep, const char *addr)
 {
     ep->port = 0;
-    if (sock_udp_str2ep(ep, addr) < 0) {
+    if (sock_udp_name2ep(ep, addr) < 0) {
         return -1;
     }
     /* if netif not specified in addr */

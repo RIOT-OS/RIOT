@@ -154,6 +154,7 @@ static const i2c_conf_t i2c_config[] = {
         .sda_af         = GPIO_AF4,
         .bus            = APB1,
         .rcc_mask       = RCC_APB1ENR_I2C2EN,
+        .rcc_sw_mask    = RCC_DCKCFGR2_I2C2SEL_1,
         .irqn           = I2C2_ER_IRQn,
     },
     {   /* Connected to touchscreen controller */
@@ -165,6 +166,7 @@ static const i2c_conf_t i2c_config[] = {
         .sda_af         = GPIO_AF4,
         .bus            = APB1,
         .rcc_mask       = RCC_APB1ENR_I2C3EN,
+        .rcc_sw_mask    = RCC_DCKCFGR2_I2C3SEL_1,
         .irqn           = I2C3_ER_IRQn,
     },
     {
@@ -176,6 +178,7 @@ static const i2c_conf_t i2c_config[] = {
         .sda_af         = GPIO_AF4,
         .bus            = APB1,
         .rcc_mask       = RCC_APB1ENR_I2C1EN,
+        .rcc_sw_mask    = RCC_DCKCFGR2_I2C1SEL_1,
         .irqn           = I2C1_ER_IRQn,
     },
 };

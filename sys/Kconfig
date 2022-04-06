@@ -14,6 +14,7 @@ rsource "base64/Kconfig"
 rsource "benchmark/Kconfig"
 rsource "bitfield/Kconfig"
 rsource "bloom/Kconfig"
+rsource "bus/Kconfig"
 rsource "cb_mux/Kconfig"
 rsource "checksum/Kconfig"
 rsource "chunked_ringbuffer/Kconfig"
@@ -48,8 +49,14 @@ config MODULE_NEWLIB
 config MODULE_PICOLIBC
     bool "Picolibc"
     depends on HAS_PICOLIBC
-
 endchoice
+
+config MODULE_LIBC_GETTIMEOFDAY
+    bool
+    select MODULE_XTIMER
+    select MODULE_ZTIMER64_XTIMER_COMPAT if MODULE_ZTIMER_XTIMER_COMPAT
+    help
+        Support for gettimeofday()
 
 rsource "Kconfig.newlib"
 rsource "Kconfig.picolibc"

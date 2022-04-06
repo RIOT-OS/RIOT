@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "sht3x.h"
 #include "sht3x_params.h"
 
@@ -55,7 +55,7 @@ int main(void)
         else {
             printf("Could not read data from sensor, error %d\n", res);
         }
-        xtimer_usleep(1000000);
+        ztimer_sleep(ZTIMER_MSEC, 1000);
     }
 
     return 0;

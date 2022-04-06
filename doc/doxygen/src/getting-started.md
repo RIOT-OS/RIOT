@@ -353,6 +353,8 @@ Troubleshooting                                    {#docker-troubleshooting}
 
 On some Ubuntu versions a make with `BUILD_IN_DOCKER=1` can't resolve the host name of for example github.com. To fix this add the file `/etc/docker/daemon.json` with the address of your DNS Server.
 
+For more details see @ref build-in-docker.
+
 Generating compile_commands.json e.g. for code completion in IDEs
 =================================================================
 

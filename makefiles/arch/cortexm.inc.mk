@@ -20,7 +20,7 @@ ifneq (llvm,$(TOOLCHAIN))
   endif
 endif
 
-CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
+CFLAGS_LINK  = -ffunction-sections -fdata-sections -fshort-enums
 CFLAGS_DBG  ?= -ggdb -g3
 CFLAGS_OPT  ?= -Os
 

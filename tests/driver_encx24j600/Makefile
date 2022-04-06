@@ -1,12 +1,9 @@
+INCLUDES += -I$(APPDIR)
+
 include ../Makefile.tests_common
 
-USEMODULE += auto_init_gnrc_netif
+USEMODULE += test_utils_netdev_eth_minimal
 USEMODULE += encx24j600
-USEMODULE += gnrc_ipv6_router_default
-USEMODULE += gnrc_icmpv6_echo
-USEMODULE += shell
-USEMODULE += shell_commands
-USEMODULE += ps
 
 # set board specific peripheral configurations
 ifneq (,$(filter nucleo-f334r8,$(BOARD)))
@@ -23,9 +20,3 @@ ifneq (,$(filter nucleo-f334r8,$(BOARD)))
 endif
 
 include $(RIOTBASE)/Makefile.include
-
-# lower pktbuf size
-# Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
-ifndef CONFIG_GNRC_PKTBUF_SIZE
-  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=2048
-endif

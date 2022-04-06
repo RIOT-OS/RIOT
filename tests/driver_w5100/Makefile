@@ -1,4 +1,10 @@
-# the driver to test
-USEMODULE = w5100
+include ../Makefile.tests_common
 
-include ../driver_netdev_common/Makefile.netdev.mk
+USEMODULE += test_utils_netdev_eth_minimal
+
+# the driver to test
+USEMODULE += w5100
+
+INCLUDES += -I$(APPDIR)
+
+include $(RIOTBASE)/Makefile.include

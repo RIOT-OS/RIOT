@@ -131,7 +131,7 @@ static int tcp_connect(char *addr_str, char *local_port_str)
     }
 
     /* parse destination address */
-    if (sock_tcp_str2ep(&dst, addr_str) < 0) {
+    if (sock_tcp_name2ep(&dst, addr_str) < 0) {
         puts("Error: unable to parse destination address");
         return 1;
     }

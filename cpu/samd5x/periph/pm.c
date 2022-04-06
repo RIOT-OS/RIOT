@@ -45,11 +45,13 @@ void pm_set(unsigned mode)
             _mode = PM_SLEEPCFG_SLEEPMODE_STANDBY;
             deep = 1;
             break;
-        default: /* Falls through */
         case 3:
             DEBUG_PUTS("pm_set(): setting IDLE2 mode.");
             _mode = PM_SLEEPCFG_SLEEPMODE_IDLE2;
             break;
+        default:
+            /* no sleep */
+            return;
     }
 
     /* write sleep configuration */

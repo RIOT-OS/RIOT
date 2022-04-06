@@ -14,6 +14,11 @@ menuconfig MODULE_PERIPH_FLASHPAGE
 # periph_init_% modules are handled in Makefile. We need to define them to keep
 # the list the same for now. We should be able to remove them later on.
 
+config MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
+    bool "Static memory sections can fundamentally be turned into flash pages"
+    depends on HAS_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
+    depends on MODULE_PERIPH_FLASHPAGE_PAGEWISE
+
 config MODULE_PERIPH_INIT_FLASHPAGE
     bool "Auto initialize Flashpage peripheral"
     default y if MODULE_PERIPH_INIT

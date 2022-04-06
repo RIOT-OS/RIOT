@@ -55,6 +55,10 @@ jobs:
       uses: aabadie/riot-action@v1
       with:
         cmd: make -C dist/tools/uhcpd
+    - name: Build UDP Benchmark
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/benchmark_udp
     - name: Build stm32 clk_conf
       uses: aabadie/riot-action@v1
       with:

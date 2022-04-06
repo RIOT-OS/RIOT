@@ -14,3 +14,11 @@ ifneq (,$(filter sock_dtls,$(USEMODULE)))
   USEMODULE += tinydtls_sock_dtls
   USEMODULE += ztimer_usec
 endif
+
+ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
+  USEMODULE += libc_gettimeofday
+endif
+
+ifneq (,$(filter native,$(CPU)))
+  USEMODULE += libc_gettimeofday
+endif

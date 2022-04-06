@@ -54,8 +54,8 @@ extern "C" {
  * @name    ztimer configuration values
  * @{
  */
-#define CONFIG_ZTIMER_USEC_ADJUST_SET     (96)
-#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   (97)
+#define CONFIG_ZTIMER_USEC_ADJUST_SET     (99)
+#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   (100)
 /** @} */
 
 /**

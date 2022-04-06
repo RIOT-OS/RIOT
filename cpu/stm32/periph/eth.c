@@ -443,8 +443,6 @@ static int stm32_eth_init(netdev_t *netdev)
                 | ETH_DMABMR_RDP_32Beat | ETH_DMABMR_PBL_32Beat
                 | ETH_DMABMR_EDE;
 
-    netdev_register(netdev, NETDEV_STM32_ETH, 0);
-
     eui48_t hwaddr;
     netdev_eui48_get(netdev, &hwaddr);
     stm32_eth_set_addr(hwaddr.uint8);
@@ -719,4 +717,5 @@ void stm32_eth_netdev_setup(netdev_t *netdev)
 {
     stm32_eth_netdev = netdev;
     netdev->driver = &netdev_driver_stm32f4eth;
+    netdev_register(netdev, NETDEV_STM32_ETH, 0);
 }

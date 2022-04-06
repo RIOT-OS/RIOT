@@ -99,7 +99,7 @@ endif
 
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   USEMODULE += random
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter dhcpv6_%,$(USEMODULE)))
@@ -167,7 +167,7 @@ endif
 
 ifneq (,$(filter uhcpc,$(USEMODULE)))
   USEMODULE += posix_inet
-  USEMODULE += xtimer
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter netdev_tap,$(USEMODULE)))
@@ -242,9 +242,12 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   endif
   ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
     USEMODULE += div
-    ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-      # requires 64bit timestamps when using xtimer
-      USEMODULE += ztimer64_xtimer_compat
+    ifneq (,$(filter libc_gettimeofday,$(USEMODULE)))
+      USEMODULE += xtimer
+      ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+        # requires 64bit timestamps
+        USEMODULE += ztimer64_xtimer_compat
+      endif
     endif
   endif
 endif
@@ -255,7 +258,7 @@ ifneq (,$(filter posix_select,$(USEMODULE)))
   endif
   USEMODULE += core_thread_flags
   USEMODULE += posix_headers
-  USEMODULE += xtimer
+  USEMODULE += ztimer64_usec
 endif
 
 ifneq (,$(filter picolibc,$(USEMODULE)))
@@ -271,7 +274,6 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += vfs
   USEMODULE += posix_headers
-  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter shell,$(USEMODULE)))
@@ -325,12 +327,8 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
 endif
 
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
-  USEMODULE += sema
-  USEMODULE += xtimer
-  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-    # requires sema_timed that requires 64bit
-    USEMODULE += ztimer64_xtimer_compat
-  endif
+  USEMODULE += sema_deprecated
+  USEMODULE += ztimer64_usec
   USEMODULE += posix_headers
 endif
 
@@ -346,6 +344,16 @@ endif
 
 ifneq (,$(filter sema_inv,$(USEMODULE)))
   USEMODULE += atomic_utils
+endif
+
+ifneq (,$(filter sema,$(USEMODULE)))
+  USEMODULE += ztimer
+endif
+
+ifneq (,$(filter sema_deprecated,$(USEMODULE)))
+  USEMODULE += sema
+  USEMODULE += ztimer64
+  USEMODULE += ztimer64_usec
 endif
 
 ifneq (,$(filter telnet,$(USEMODULE)))
@@ -393,7 +401,7 @@ ifneq (,$(filter netstats_neighbor_%, $(USEMODULE)))
 endif
 
 ifneq (,$(filter pthread,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer64_usec
   USEMODULE += timex
   ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
     # requires 64bit ftimestamps
@@ -596,6 +604,11 @@ endif
 
 ifneq (,$(filter l2filter_%,$(USEMODULE)))
   USEMODULE += l2filter
+endif
+
+ifneq (,$(filter gcoap_forward_proxy,$(USEMODULE)))
+  USEMODULE += gcoap
+  USEMODULE += uri_parser
 endif
 
 ifneq (,$(filter gcoap_dtls,$(USEMODULE)))
@@ -804,7 +817,7 @@ endif
 
 ifneq (,$(filter suit_transport_coap, $(USEMODULE)))
   USEMODULE += nanocoap_sock
-  USEMODULE += xtimer
+  USEMODULE += ztimer_msec
   USEMODULE += sock_util
 endif
 
@@ -846,20 +859,7 @@ endif
 
 # handle xtimer's deps. Needs to be done *after* ztimer
 ifneq (,$(filter xtimer,$(USEMODULE)))
-  ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-    # xtimer is used, ztimer xtimer wrapper is not
-    DEFAULT_MODULE += auto_init_xtimer
-    USEMODULE += div
-    ifeq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
-      # ztimer is not used, so use *periph_timer as low-level timer*.
-      FEATURES_REQUIRED += periph_timer
-    else
-      # will use *ztimer_usec as low-level timer*
-    endif
-  else
-    # ztimer_xtimer_compat is used, all of *xtimer's API will be mapped on ztimer
-    # or ztimer64 *
-  endif
+  include $(RIOTBASE)/sys/xtimer/Makefile.dep
 endif
 
 ifneq (,$(filter devfs_hwrng,$(USEMODULE)))
@@ -883,6 +883,7 @@ ifneq (,$(filter fido2_ctap_%,$(USEMODULE)))
   USEMODULE += fido2_ctap_transport
   USEMODULE += fido2_ctap
   ifneq (,$(filter fido2_ctap_transport_hid,$(USEMODULE)))
+      USEMODULE += ztimer64_msec
       USEMODULE += usbus_hid
       DISABLE_MODULE += auto_init_usbus
   endif
@@ -900,7 +901,7 @@ ifneq (,$(filter fido2_ctap,$(USEMODULE)))
   USEMODULE += mtd_write_page
   USEMODULE += ztimer_msec
   USEMODULE += event
-  USEMODULE += event_timeout
+  USEMODULE += event_timeout_ztimer
   USEMODULE += cipher_modes
   USEMODULE += crypto_aes_256
   USEMODULE += hashes

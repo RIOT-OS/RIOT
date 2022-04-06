@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
@@ -55,7 +56,19 @@ static char raw_buf[RAW_BUF_SIZE] ALIGNMENT_ATTR;
  *          requires 64 bit alignment.
  */
 static uint8_t page_mem[FLASHPAGE_SIZE] ALIGNMENT_ATTR;
-#endif
+
+#ifdef MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
+/**
+ * @brief Reserve 1 page of flash memory
+ */
+FLASH_WRITABLE_INIT(_backing_memory, 0x1);
+
+/*
+* @brief Created to test the sorting of symbols in .flash_writable section
+*/
+FLASH_WRITABLE_INIT(_abacking_memory, 0x1);
+#endif /* MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE */
+#endif /* MODULE_PERIPH_FLASHPAGE_PAGEWISE */
 
 static int getpage(const char *str)
 {
@@ -361,7 +374,63 @@ static int cmd_test_last(int argc, char **argv)
     puts("wrote local page buffer to last flash page");
     return 0;
 }
-#endif
+
+#ifdef MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
+/**
+ * @brief   Does a write and verify test on reserved page
+ */
+static int cmd_test_reserved(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+    /**
+     * Arrays created by the FLASH_WRITABLE_INIT macro should be sorted in
+     * ascending order by name.
+     */
+    assert(&_abacking_memory < &_backing_memory);
+
+    char fill = 'a';
+    const char sig[] = {"RIOT"};
+    unsigned page = flashpage_page((void *)_backing_memory);
+
+    printf("Reserved page num: %u \n", page);
+
+    flashpage_read(page, page_mem);
+
+    /* test is running for the first time so initialize flash */
+    if (memcmp(sig, &page_mem[1], sizeof(sig)) != 0) {
+        page_mem[0] = 0;
+        memcpy(&page_mem[1], sig, sizeof(sig));
+    }
+    else {
+        page_mem[0]++;
+    }
+
+    printf("Since the last firmware update this test has been run "
+           "%u times \n", page_mem[0]);
+
+    /* fill memory after counter and signature */
+    for (unsigned i = 0x1 + sizeof(sig); i < sizeof(page_mem); i++) {
+        page_mem[i] = (uint8_t)fill++;
+        if (fill > 'z') {
+            fill = 'a';
+        }
+    }
+
+    if (flashpage_write_and_verify(page, page_mem) != FLASHPAGE_OK) {
+        puts("error verifying the content of reserved page");
+        return 1;
+    }
+
+    puts("wrote local page buffer to reserved flash page");
+    puts("\nWhen running on a bootloader, as an extra check, try restarting "
+         "the board and check whether this application still comes up.");
+
+    return 0;
+}
+#endif /* MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE */
+#endif /* MODULE_PERIPH_FLASHPAGE_PAGEWISE */
 
 /**
  * @brief   Does a short raw write on last page available
@@ -641,6 +710,9 @@ static const shell_command_t shell_commands[] = {
     { "edit", "Write bytes to the local page buffer", cmd_edit },
     { "test", "Write and verify test pattern", cmd_test },
     { "test_last_pagewise", "Write and verify test pattern on last page available", cmd_test_last },
+#endif
+#ifdef MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
+    { "test_reserved_pagewise", "Write and verify short write on reserved page", cmd_test_reserved},
 #endif
     { "test_last_raw", "Write and verify raw short write on last page available", cmd_test_last_raw },
 #ifdef FLASHPAGE_RWWEE_NUMOF

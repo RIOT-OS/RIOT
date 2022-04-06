@@ -9,6 +9,7 @@ menuconfig MODULE_CORE
     bool "RIOT Core"
     default y
     depends on TEST_KCONFIG
+    depends on MODULE_CORE_LIB
     help
         RIOT's core module. Only change this if you know what you are doing. If
         unsure, say Y.
@@ -49,6 +50,12 @@ config MODULE_SCHED_CB
     bool "Callback support on the scheduler"
 
 endif # MODULE_CORE
+
+config MODULE_CORE_LIB
+    bool
+    default y
+    help
+        Select y to to include core libs
 
 menuconfig KCONFIG_USEMODULE_CORE
     bool "Configure RIOT Core"

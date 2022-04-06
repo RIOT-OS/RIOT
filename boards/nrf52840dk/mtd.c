@@ -54,4 +54,8 @@ static mtd_spi_nor_t nrf52840dk_nor_dev = {
 
 mtd_dev_t *mtd0 = (mtd_dev_t *)&nrf52840dk_nor_dev;
 
+#ifdef MODULE_VFS_DEFAULT
+#include "vfs_default.h"
+VFS_AUTO_MOUNT(littlefs2, VFS_MTD(nrf52840dk_nor_dev), VFS_DEFAULT_NVM(0), 0);
+#endif
 #endif

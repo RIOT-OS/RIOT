@@ -99,7 +99,7 @@ static int udp_send(char *addr_str, char *data, unsigned int num,
     size_t data_len;
 
     /* parse destination address */
-    if (sock_udp_str2ep(&dst, addr_str) < 0) {
+    if (sock_udp_name2ep(&dst, addr_str) < 0) {
         puts("Error: unable to parse destination address");
         return 1;
     }

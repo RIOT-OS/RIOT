@@ -1,0 +1,57 @@
+menuconfig PACKAGE_LITTLEFS2
+    bool "littlefs v2.x.y file system"
+    depends on TEST_KCONFIG
+
+menuconfig MODULE_LITTLEFS2_FS
+    bool "VFS/MTD Driver"
+    default y
+    depends on PACKAGE_LITTLEFS2
+    select MODULE_VFS
+    select MODULE_MTD
+    help
+        This module attaches littlefs to RIOT by utilizing the MTD and VFS
+        driver.
+
+if MODULE_LITTLEFS2_FS
+
+config LITTLEFS2_LOOKAHEAD_SIZE
+    int "Default lookahead size"
+    default 16
+
+config LITTLEFS2_FILE_BUFFER_SIZE
+    int "File buffer size"
+    default 0
+    help
+        If 0, dynamic allocation is used.
+        If set, only one file can be used at a time, must be program size (mtd page
+        size is used internally as program size).
+
+config LITTLEFS2_READ_BUFFER_SIZE
+    int "Read buffer size"
+    default 0
+    help
+        If 0, dynamic allocation is used.
+        If set, it must be read size (mtd page size is used internally as read
+        size).
+
+config LITTLEFS2_PROG_BUFFER_SIZE
+    int "Prog buffer size"
+    default 0
+    help
+        if 0, dynamic allocation is used.
+        If set, it must be program size.
+
+config LITTLEFS2_CACHE_PAGES
+    int "Number of pages used as cache"
+    default 1
+    help
+        Sets the number of pages used as cache. Has to be at least 1.
+
+config LITTLEFS2_BLOCK_CYCLES
+    int "Max erase cycles before blocks are evicted"
+    default 512
+    help
+        Sets the maximum number of erase cycles before blocks are evicted as a part
+        of wear leveling. -1 disables wear-leveling.
+
+endif # MODULE_LITTLEFS2_FS

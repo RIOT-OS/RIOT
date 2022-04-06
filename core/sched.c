@@ -304,6 +304,12 @@ NORETURN void sched_task_exit(void)
     DEBUG("sched_task_exit: ending thread %" PRIkernel_pid "...\n",
           thread_getpid());
 
+#if defined(MODULE_TEST_UTILS_PRINT_STACK_USAGE) && defined(DEVELHELP)
+    void print_stack_usage_metric(const char *name, void *stack, unsigned max_size);
+    thread_t *me = thread_get_active();
+    print_stack_usage_metric(me->name, me->stack_start, me->stack_size);
+#endif
+
     (void)irq_disable();
     sched_threads[thread_getpid()] = NULL;
     sched_num_threads--;

@@ -39,14 +39,14 @@ config MODULE_PERIPH_RTC_SERIES1
         help
         RTC driver implementation for EFM32 series 1.
 
-config MODULE_PERIPH_RTT_SERIES0
+config PERIPH_RTT_SERIES0
     bool
     depends on CPU_EFM32_SERIES0
     default MODULE_PERIPH_RTT
     help
         RTT driver implementation for EFM32 series 0.
 
-config MODULE_PERIPH_RTT_SERIES1
+config PERIPH_RTT_SERIES1
     bool
     depends on CPU_EFM32_SERIES1
     default MODULE_PERIPH_RTT

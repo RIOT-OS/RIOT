@@ -24,7 +24,7 @@
     3. [Limitations of the RIOT-port](#esp32_limitations)
 4. [Toolchain](#esp32_toolchain)
     1. [RIOT Docker Toolchain (riotdocker)](#esp32_riot_docker_toolchain)
-    2. [Manual Toolchain Installation](#esp32_manual_toolchain_installation)
+    2. [Manual Toolchain Installation](#esp32_local_toolchain_installation)
 5. [Flashing the Device](#esp32_flashing_the_device)
     1. [Toolchain Usage](#esp32_toolchain_usage)
     2. [Compile Options](#esp32_compile_options)
@@ -135,6 +135,7 @@ Module                                              | Default   | Short descript
 [esp_log_startup](#esp32_esp_log_module)            | not used  | enable additional startup information
 [esp_log_tagged](#esp32_esp_log_module)             | not used  | add additional information to the log output
 [esp_now](#esp32_esp_now_network_interface)         | not used  | enable the ESP-NOW network device
+[esp_qemu](#esp32_esp_qemu)                         | not used  | build QEMU for ESP32 application image
 [esp_rtc_timer_32k](#esp32_rtt_counter)             | not used  | use RTC timer with external 32.768 kHz crystal as RTT
 [esp_spi_ram](#esp32_spi_ram)                       | not used  | enable SPI RAM
 [esp_spiffs](#esp32_spiffs_device)                  | not used  | enable SPIFFS for on-board flash memory
@@ -241,174 +242,140 @@ The implementation of RIOT-OS for ESP32 SOCs has the following limitations at th
 
 # Toolchain {#esp32_toolchain}
 
-Following software components are required for compilation:
+To build RIOT applications for ESP32, the following components are required:
 
-- **Xtensa GCC** compiler suite for ESP32
-- **ESP-IDF** SDK which includes all ESP32 SoC definitions, basic libraries and the hardware
-  abstraction library `libhal.a`
-- Modified version of ESP flash programmer tool **`esptool.py`**
+- ESP32 Toolchain including GCC, GDB and optionally OpenOCD and QEMU
+- ESP32 SDK called ESP-IDF (Espressif IoT Development Framework)
+- `esptool.py` for flashing
 
-There are two options to install the Toolchain:
+Principally, there are two ways to install and use the ESP32 toolchain, either
 
-- **riotdocker** image, see section [RIOT Docker Toolchain (riotdocker)](#esp32_riot_docker_toolchain)
-- **manual installation**, see section [Manual Toolchain Installation](#esp32_manual_toolchain_installation)
+- using the **RIOT Docker build image**, see section
+  [Using RIOT Docker Toolchain](#esp32_riot_docker_toolchain), or
+- using a **local installation** of the ESP32 toolchain, see section
+  [Using Local Toolchain Installation](#esp32_local_toolchain_installation).
 
 [Back to table of contents](#esp32_toc)
 
-## RIOT Docker Toolchain (riotdocker) {#esp32_riot_docker_toolchain}
+## Using RIOT Docker Toolchain {#esp32_riot_docker_toolchain}
 
-The easiest way to use install the toolchain is the RIOT Docker image `riotdocker`. The
-compilation process using Docker consists of two steps
+The easiest way to use the ESP32 toolchain is to use the RIOT Docker build
+image. It is specially prepared for building RIOT applications for various
+platforms and already has all the required tools and packages installed.
+Details on how to setup Docker can be found in section
+[Getting Started](https://doc.riot-os.org/getting-started.html#docker).
 
-1. making the RIOT application in Docker with command `make BOARD= ...`
-2. flashing the RIOT application on the host computer with command `make flash-only BOARD=...`
+The building process using Docker comprises two steps:
 
-where step 2 requires that the ESP flash programmer `esptool.py` is installed.
+1. Building the RIOT application **in Docker** using command:
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   $ sudo docker run --rm -i -t -u $UID -v $(pwd):/data/riotbuild riot/riotbuild
+   riotbuild@container-id:~$ make BOARD= ...
+   riotbuild@container_id:~$ exit
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2. Flashing the RIOT application **on the host system** using command
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   $ make flash-only BOARD=...
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Both steps can also be performed with a single command on the host system
-using the `BUILD_IN_DOCKER` variable:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-BUILD_IN_DOCKER=1 make BOARD=... flash
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+by setting the `BUILD_IN_DOCKER` variable:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ BUILD_IN_DOCKER=1 DOCKER="sudo docker" \
+  make flash BOARD=...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+@note
+During the migration phase from the ESP32 toolchain with GCC 5.2.0, which was
+specially compiled for RIOT, to Espressif's precompiled ESP32 vendor toolchain
+with GCC 8.4.0, the RIOT Docker build image
+[schorcht/riotbuild_esp32_espressif_gcc_8.4.0]
+(https://hub.docker.com/repository/docker/schorcht/riotbuild_esp32_espressif_gcc_8.4.0)
+has to be used instead of `riot/riotbuild` as this already contains the
+precompiled ESP32 vendor toolchain from Espressif while `riot/riotbuild`
+does not.
+Therefore, the RIOT Docker build image has to be pulled with command:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ sudo docker pull schorcht/riotbuild_esp32_espressif_gcc_8.4.0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+and the RIOT Docker build image in step 1 has to be started with command:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ sudo docker run --rm -i -t -u $UID -v $(pwd):/data/riotbuild schorcht/riotbuild_esp32_espressif_gcc_8.4.0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The single step build command on the host system has then to be:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ BUILD_IN_DOCKER=1 DOCKER="sudo docker" DOCKER_IMAGE=schorcht/riotbuild_esp32_espressif_gcc_8.4.0 \
+  make flash BOARD=...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 [Back to table of contents](#esp32_toc)
 
-### Preparing the Environment {#esp32_preparing_the_environment}
+## Using Local Toolchain Installation {#esp32_local_toolchain_installation}
 
-Using RIOT Docker requires at least the following software:
+### Prerequisites
 
-- **Docker** container virtualization software `docker`
-- RIOT Docker (**`riotdocker`**) image
-- ESP flash programmer tool **`esptool.py`**
+In addition to the common tools defined in section
+[Getting Started - Common Tools](https://doc.riot-os.org/getting-started.html#compiling-riot),
+the following tools or packages are required to install and use the ESP32
+toolchain (Debian/Ubuntu package names):
 
-For information about installing Docker on your host, refer to the appropriate manuals for your
-operating system. For example, the easiest way to install Docker on the Ubuntu/Debian system is:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-sudo apt-get install docker.io
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-For information on how to install `esptool.py`, see section
-[Installation of `esptool.py`](#esp32_installation_of_esptool).
+- `curl`
+- `python3`
+- `python3-serial`
+- `telnet`
 
-[Back to table of contents](#esp32_toc)
+### Script-based installation
 
-### Generating a riotdocker Image {#esp32_generating_docker_image}
+The shell script `$RIOTBASE/dist/tools/esptools/install.sh` is used to
+install Espressif's precompiled versions of the following tools:
 
-A `riotdocker` fork that only installs the `RIOT-Xtensa-ESP32-toolchain` is available at
-[GitHub](https://github.com/gschorcht/riotdocker-Xtensa-ESP.git). After cloning this git repository,
-you can use branch `esp32_only` to generate a Docker image with a size of "only" 990 MiB:
+- ESP32 vendor toolchain
+- OpenOCD for ESP32
+- QEMU for ESP32
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-git clone https://github.com/gschorcht/riotdocker-Xtensa-ESP.git
-cd riotdocker-Xtensa-ESP
-git checkout esp32_only
-docker build -t riotbuild .
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-A `riotdocker` version that contains the toolchains for all different RIOT platforms can be
-found at [GitHub](https://github.com/RIOT-OS/riotdocker). However, the Docker image generated from
-the this Docker file has a size of about 1.5 GiB.
+`$RIOTBASE` defines the root directory of the RIOT repository. The shell
+script takes an argument that specifies which tools to download and install:
 
-Once a Docker image has been created, it can be started with the following commands while in the
-RIOT root directory:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cd /path/to/RIOT
-docker run -i -t --privileged -v /dev:/dev -u $UID -v $(pwd):/data/riotbuild riotbuild
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-@note RIOT's root directory `/path/to/RIOT` becomes visible as the home directory of the
-      `riotbuild` user in the Docker image. That is, the output of compilations performed in
-      RIOT Docker is also accessible on the host system.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ dist/tools/esptools/install.sh
 
-Please refer the [RIOT wiki](https://github.com/RIOT-OS/RIOT/wiki/Use-Docker-to-build-RIOT) on how
-to use the Docker image to compile RIOT OS.
+install.sh <tool>
+tool = all | esp32 | openocd | qemu
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[Back to table of contents](#esp32_toc)
+Thus, either all tools or only certain tools can be installed.
 
-### Using an Existing riotdocker Image {#esp32_using_existing_docker_image}
+The ESP32 tools are installed within a subdirectory of the directory specified
+by the environment variable `$IDF_TOOLS_PATH`. If the environment variable
+`$IDF_TOOLS_PATH` is not defined, `$HOME/.espressif` is used as default.
 
-Alternatively, an existing Docker image from Docker Hub can be used. You can either pull and start
-the [schorcht/riotbuild_esp32](https://hub.docker.com/r/schorcht/riotbuild_esp32) Docker image which
-only contains the `RIOT-Xtensa-ESP32-toolchain` using
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cd /path/to/RIOT
-docker run -i -t --privileged -v /dev:/dev -u $UID -v $(pwd):/data/riotbuild schorcht/riotbuild_esp32
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-or the [riot/riotbuild](https://hub.docker.com/r/riot/riotbuild/) Docker image (size is about
-1.5 GiB) which contains the toolchains for all platforms using
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cd /path/to/RIOT
-docker run -i -t --privileged -v /dev:/dev -u $UID -v $(pwd):/data/riotbuild riot/riotbuild
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using the variable `IDF_TOOLS_PATH` and its default value `$HOME/.espressif` for
+the toolchain installation in RIOT allows to reuse the tools that have already
+been installed according to the section ["Get Started, Step 3. Set up the tools"]
+(https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/linux-macos-setup.html#get-started-set-up-tools).
+if you have already used ESP-IDF directly.
+
+### Using the toolchain
+
+Once the ESP32 tools are installed in the directory specified by the
+environment variable `$IDF_TOOLS_PATH`, the shell script
+`$RIOTBASE/dist/tools/esptools/install.sh` can be sourced to export the
+paths of the installed tools using again the environment variable
+`$IDF_TOOLS_PATH`.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ . dist/tools/esptools/export.sh
+
+Usage: export.sh <tool>
+tool = all | esp32 | openocd | qemu
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All the tools required for building a RIOT application for ESP32 should then
+be found in the path.
 
 [Back to table of contents](#esp32_toc)
 
-### Make Process with Docker Image {#esp32_flashing_using_docker}
-
-Using Docker, the make process consists of the following two steps:
-
-1. **making** the RIOT binary **within a RIOT Docker image**
-2. **flashing** the RIOT binary using a flasher program **on the host system**
-
-Once the RIOT Docker image has been started from RIOT's root directory, a RIOT application can be
-compiled inside the Docker using the make command as usual, for example:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-make BOARD=esp32-esp-12x -C tests/shell ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This will generate a RIOT binary in ELF format.
-
-@note You can't use the `flash` target inside the Docker image.
-
-The RIOT binary has to be flash outside docker on the host system. Since the Docker image was
-stared while in RIOT's root directory, the output of the compilations is also accessible on the host
-system. On the host system, the `flash-only` target can then be used to flash the binary.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-make flash-only BOARD=esp32-esp-12x -C tests/shell
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-[Back to table of contents](#esp32_toc)
-
-## Manual Toolchain Installation {#esp32_manual_toolchain_installation}
-
-A more difficult way to install the toolchain is the manual installation of required components as
-described below.
-
-@note To use the precompiled toolchain the following packages (Debian/Ubuntu) have to be
-      installed:<br>
-      `build-essential`
-      `cppcheck`
-      `coccinelle`
-      `curl`
-      `doxygen`
-      `git`
-      `graphviz`
-      `make`
-      `pcregrep`
-      `python`
-      `python-serial`
-      `python3`
-      `python3-flake8`
-      `unzip`
-      `wget`
-
-[Back to table of contents](#esp32_toc)
-
-### Installation of Xtensa GCC compiler suite {#esp32_installation_of_xtensa_gcc}
-
-Xtensa GCC compiler for ESP32 can be downloaded and installed as precompiled binary archive from
-GitHub.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-mkdir -p $HOME/esp
-cd $HOME/esp
-git clone https://github.com/gschorcht/xtensa-esp32-elf.git
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Once the compiler is installed you can add the binary directory to your `PATH` variable.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-export PATH=$PATH:$HOME/esp/xtensa-esp32-elf/bin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-[Back to table of contents](#esp32_toc)
-
-### ESP-IDF (Espressif IoT Development Framework) {#esp32_installation_of_esp_idf}
+### Installation of the ESP32 SDK (ESP-IDF) {#esp32_installation_of_esp_idf}
 
 RIOT-OS uses the ESP-IDF, the official SDK from Espressif, as part of the
 build. It is downloaded as a package at build-time and there is no need to
@@ -418,58 +385,49 @@ install it separately.
 
 The RIOT port does not work with the `esptool.py` ESP flasher program
 available on [GitHub](https://github.com/espressif/esptool) or
-as a package for your OS. Instead, a modified version is required.
+as a package for your OS. Instead, a modified version included in
+ESP-IDF SDK is required.
 
-To avoid the installation of the complete ESP-IDF SDK, for example,
-because RIOT Docker `riotdocker` is used for compilation, `esptool.py`
-has been extracted from the SDK and placed in RIOT's
-directory `dist/tools/esptool`.
+To avoid the installation of the complete ESP-IDF SDK, for example, because
+RIOT Docker build image is used for compilation, `esptool.py` has been
+extracted from the SDK and placed in RIOT's directory `dist/tools/esptool`.
 For convenience, the build system uses always the version from this directory.
 
 Therefore, it is **not necessary to install** `esptool.py` explicitly. However
 `esptool.py` depends on `pySerial` which can be installed either
 using `pip`
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-sudo pip install pyserial
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ sudo pip3 install pyserial
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 or the package manager of your OS, for example on Debian/Ubuntu systems:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-apt install python-pyserial
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ apt install python3-serial
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For more information on `esptool.py`, please refer to the
 [git repository](https://github.com/espressif/esptool).
 
 [Back to table of contents](#esp32_toc)
 
-
 # Flashing the Device {#esp32_flashing_the_device}
 
 ## Toolchain Usage {#esp32_toolchain_usage}
 
-Once you have installed all required components, you should have the following directories.
+Once the toolchain is installed either as RIOT docker build image or as local installation, a RIOT application can be compiled and flashed for an ESP32 boards. For that purpuse change to RIOT's root directory and execute the make
+command, for example:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/path/to/esp/esp-idf
-/path/to/esp/xtensa-esp32-elf
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- RIOT Docker build image installation
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  $ BUILD_IN_DOCKER=1 DOCKER="sudo docker" \
+    make flash BOARD=esp32-wroom-32 -C tests/shell [Compile Options]
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- Local toolchain installation
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  $ make flash BOARD=esp32-wroom-32 -C tests/shell [Compile Options]
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To use the toolchain and optionally the SDK, please check that your environment variables are set
-correctly to
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-export ESP32_SDK_DIR=/path/to/esp/esp-idf
-export PATH=$PATH:/path/to/esp/xtensa-esp32-elf/bin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To compile an application for an ESP32 board, change to RIOT's root directory and execute the make
-command, e.g.,
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-make flash BOARD=esp32-generic -C tests/shell [Compile Options]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-where the `BOARD` variable specifies the generic ESP32 board definition and option `-C` the
-directory of application.
+The `BOARD` variable in the example specifies the generic ESP32 board
+definition and option `-C` the directory of the application.
 
 [Back to table of contents](#esp32_toc)
 
@@ -484,7 +442,6 @@ Option      | Values                | Default       | Description
 `CFLAGS`    | string                | empty         | Override default board and driver configurations, see section [Application-Specific Configurations](#esp32_application_specific_configurations).
 `FLASH_MODE`| dout, dio, qout, qio  | dout          | Set the flash mode, see section [Flash Modes](#esp32_flash_modes)
 `PORT`      | `/dev/tty*`           | `/dev/ttyUSB0`| Set the port for flashing the firmware.
-`QEMU`      | 0, 1                  | 0             | Generate an image for QEMU, see section [QEMU Mode and GDB](#esp32_qemu_mode_and_gdb).
 
 </center><br>
 
@@ -503,6 +460,7 @@ esp_log_colored     | Enable colored log output, see section [Log output](#esp32
 esp_log_startup     | Enable additional startup information, see section [Log output](#esp32_esp_log_module).
 esp_log_tagged      | Add additional information to the log output, see section [Log output](#esp32_esp_log_module).
 esp_now             | Enable the built-in WiFi module with the ESP-NOW protocol as `netdev` network device, see section [ESP-NOW Network Interface](#esp32_esp_now_network_interface).
+esp_qemu            | Generate an application image for QEMU, see section [QEMU Mode and GDB](#esp32_qemu_mode_and_gdb).
 esp_rtc_timer_32k   | Enable RTC hardware timer with external 32.768 kHz crystal.
 esp_spiffs          | Enable the optional SPIFFS drive in on-board flash memory, see section [SPIFFS Device](#esp32_spiffs_device).
 esp_spi_ram         | Enable the optional SPI RAM, see section [SPI RAM Modules](#esp32_spi_ram).
@@ -1784,7 +1742,7 @@ INCLUDES += -I$(APPDIR)
 
 ESP32 provides a JTAG interface at GPIOs 12 ... 15 for On-Chip Debugging.
 
-ESP32 Pin     | ESP32 signal name JTAG Signal
+ESP32 Pin     | JTAG Signal
 :-------------|:-----------
 CHIP_PU       | TRST_N
 GPIO15 (MTDO) | TDO
@@ -1793,77 +1751,178 @@ GPIO13 (MTCK) | TCK
 GPIO14 (MTMS) | TMS
 GND           | GND
 
-This JTAG interface can be used with OpenOCD and GDB to debug your software on
-instruction level. When you compile your software with debugging information
-(module `esp_gdb`) you can also debug on source code level as well.
+This JTAG interface can be used with OpenOCD and GDB for On-Chip debugging
+of your software on instruction level. When you compile your software with
+debugging information (module `esp_gdb`) you can debug on source code
+level as well.
 
 @note
-When debugging, the GPIOs used for the JTAG interface must not be used for anything else.
+When debugging, the GPIOs used for the JTAG interface must not be used for
+anything else.
 
-Detailed information on how to configure the JTAG interface of the ESP32 and to
-setup of OpenOCD and GDB can be found in section JTAG Debugging in the
-[ESP-IDF Programming Guide](https://esp-idf.readthedocs.io/en/latest/api-guides/jtag-debugging/index.html).
+Some boards like the \ref esp32_wrover_kit_toc "ESP-WROVER-KIT V3" or the
+\ref esp32-ethernet-kit-v1_0 "ESP32-Ethernet-Kit " have a USB bridge with
+JTAG interface on-board that can be directly used for JTAG debugging.
 
-[Back to table of contents](#esp32_toc)
+To use the JTAG debugging, the precompiled version of OpenOCD for ESP32 has to
+be installed using the install script while being in RIOT's
+root directory, see also section
+[Using Local Toolchain Installation](#esp32_local_toolchain_installation).
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ dist/tools/esptools/install.sh openocd
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before OpenOCD can be used, the `PATH` variable has to be set correctly
+and the `OPENOCD` variable has to be exported using the following command.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ . dist/tools/esptools/export.sh openocd
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once the `PATH` variable as well as the `OPENOCD` variable are set, the
+debugging session can be started using either
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ PROGRAMMER=openocd USEMODULE=esp_jtag \
+  make debug BOARD=esp32-wrover-kit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if the board defines an OpenOCD board configuration file or using
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ PROGRAMMER=openocd USEMODULE=esp_jtag OPENOCD_CONFIG=board/esp-wroom-32.cfg \
+  make debug BOARD=esp32-wroom-32
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if the board does not define an OpenOCD board configuration file.
+
+@note
+The board will be reset, but not flashed with this command. However, flashing
+would be also possible with OpenOCD and the JTAG interface using command:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ PROGRAMMER=openocd USEMODULE=esp_jtag \
+  make flash BOARD=esp32-wrover-kit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Detailed information on how to configure the JTAG interface of the ESP32
+can be found in section JTAG Debugging in the [ESP-IDF Programming Guide]
+(https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/jtag-debugging/index.html).
+
+[Back to table of contents](#esp32_wrover_kit_toc)
 
 ## QEMU Mode and GDB {#esp32_qemu_mode_and_gdb}
 
-When you execute command `make flash` with QEMU mode enabled
-(`QEMU=1`), instead of loading the image to the target hardware, a binary
-image called `esp32flash.bin` is created in the target directory.
-Furthermore, two ROM binary files `rom.bin` and `rom1.bin` are copied
-to the target directory. This files file can then be used together with QEMU to
-debug the code in GDB.
+RIOT applications that do not require interaction with real hardware such as
+GPIOs, I2C or SPI devices, WiFi interface, etc. can also be debugged using
+QEMU for ESP32. For this purpose, either QEMU for ESP32 must be installed,
+see section [Local Toolchain Installation](#esp32_local_toolchain_installation)
+or the RIOT Docker build image has to be used in which QEMU for ESP32 is already
+installed.
 
-The binary image can be compiled with debugging information using module
-`esp_gdb` or optimized without debugging information (default). The latter
-one is the default. The version with debugging information can be debugged in
-source code while the optimized version can only be debugged in assembler mode.
+To use QEMU for ESP32, an application has to be built with `esp_qemu` module
+enabled, for example with local toolchain installation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ USEMODULE=esp_qemu make flash BOARD=esp32-wroom-32 -C tests/shell
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+or with RIOT Docker build image
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ BUILD_IN_DOCKER=1 DOCKER="sudo docker" \
+  USEMODULE=esp_qemu make flash BOARD=esp32-wroom-32 -C tests/shell
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To use QEMU, you have to install QEMU for Xtensa with ESP32 machine
-implementation as following.
+Instead of flashing the image to the target hardware, a binary image named
+`qemu_flash_image.bin` is created in the target directory. In addition, two ROM
+files `rom.bin` and `rom1.bin` are copied to the target directory. These
+files can then be used with QEMU for ESP32 to debug the application in GDB
+without having the hardware. The binary image `qemu_flash_image.bin`
+represents a 4 MByte Flash image.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cd $HOME/src
-git clone git://github.com/Ebiroll/qemu_esp32
-cp qemu_esp32/bin/xtensa-esp32-elf-gdb $HOME/esp/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb.qemu
-rm -rf qemu_esp32
+QEMU for ESP32 can then be started with command:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ qemu-system-xtensa \
+    -s -machine esp32 \
+    -drive file=tests/shell/bin/esp32-wroom-32/qemu_flash_image.bin,if=mtd,format=raw \
+    -serial tcp::5555,server,nowait
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-git clone git://github.com/Ebiroll/qemu-xtensa-esp32
-cd qemu-xtensa-esp32
-./configure --disable-werror --prefix=$HOME/esp/qemu-esp32 --target-list=xtensa-softmmu,xtensaeb-softmmu
-make install
-cd ..; rm -rf qemu-xtensa-esp32 # optional
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To interact with the application on the emulated ESP32 in QEMU, a second
+terminal is required in which the `telnet` command is used to communicate
+with the application on `localhost` using TCP port 5555:
 
-Once the compilation has been finished, QEMU for Xtensa with ESP32 machine
-implementation should be available in `$HOME/esp/qemu-esp32` and you can
-change to your application target directory to start it in one terminal window, for example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ telnet localhost 5555
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cd $HOME/src/RIOT-Xtensa-ESP/tests/shell/bin/esp32-generic
-$HOME/esp/qemu-esp32/bin/qemu-system-xtensa -d guest_errors,unimp -cpu esp32 -M esp32 -m 4M -S -s > io.txt
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-where `$HOME/src/RIOT-Xtensa-ESP` is the root directory of RIOT and `tests/shell` is the application.
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
 
-@note
-QEMU starts always the files `esp32flash.bin`, `rom.bin` and
-`rom1.bin` in local directory. Therefore, Please make sure that you are in
-the correct destination directory before starting QEMU.
+main(): This is RIOT! (Version: 2022.04)
+test_shell.
 
-In the second terminal window, you can then start GDB and connect to the emulation for the example.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-xtensa-esp32-elf-gdb.qemu $HOME/src/RIOT-Xtensa-ESP/tests/shell/bin/esp32-generic/tests_shell.elf
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-To start debugging, you have to connect to QEMU with command:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> help
+help
+Command              Description
+---------------------------------------
+bufsize              Get the shell's buffer size
+start_test           starts a test
+...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To debug the application in QEMU for ESP32, another terminal is required:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ xtensa-esp32-elf-gdb tests/shell/bin/esp32-wroom-32/tests_shell.elf
+
+GNU gdb (crosstool-NG crosstool-ng-1.22.0-80-g6c4433a5) 7.10
+Copyright (C) 2015 Free Software Foundation, Inc.
+...
+Reading symbols from tests/shell/bin/esp32-wroom-32/tests_shell.elf...done.
 (gdb) target remote :1234
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-@note
-QEMU for Xtensa ESP32 does not support interrupts. That is, once your
-application uses interrupts, e.g., timers, the application cannot be debugged
-using QEMU together with GDB.
+Remote debugging using :1234
+pm_set (mode=2) at cpu/esp32/periph/pm.c:117
+117	        return;
+(gdb)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+QEMU for ESP32 can also be used in RIOT Docker build image. For that purpose
+QEMU has to be started in the Docker container.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ sudo docker run --rm -i -t -u $UID -v $(pwd):/data/riotbuild riot/riotbuild
+riotbuild@container-id:~$ USEMODULE=esp_qemu make flash BOARD=esp32-wroom-32 -C tests/shell
+riotbuild@container-id:~$ qemu-system-xtensa \
+    -s -machine esp32 \
+    -drive file=tests/shell/bin/esp32-wroom-32/qemu_flash_image.bin,if=mtd,format=raw \
+    -serial tcp::5555,server,nowait
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In a second and a third terminal, you need to execute a shell in the same RIOT
+Docker container where QEMU for ESP32 was started. The required container ID
+`<container-id>` is shown in the prompt of the terminal in which QEMU for ESP32
+was started.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ sudo docker docker exec -it <container-id> bash
+riotbuild@container-id:~$telnet localhost 5555
+
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+
+main(): This is RIOT! (Version: 2022.04)
+test_shell.
+>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ sudo docker docker exec -it <container-id> bash
+riotbuild@container-id:~$ xtensa-esp32-elf-gdb tests/shell/bin/esp32-wroom-32/tests_shell.elf
+
+GNU gdb (crosstool-NG crosstool-ng-1.22.0-80-g6c4433a5) 7.10
+Copyright (C) 2015 Free Software Foundation, Inc.
+...
+Reading symbols from tests/shell/bin/esp32-wroom-32/tests_shell.elf...done.
+(gdb) target remote :1234
+
+Remote debugging using :1234
+pm_set (mode=2) at cpu/esp32/periph/pm.c:117
+117	        return;
+(gdb)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 [Back to table of contents](#esp32_toc)
 

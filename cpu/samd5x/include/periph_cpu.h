@@ -53,7 +53,11 @@ extern "C" {
  * @name    Power mode configuration
  * @{
  */
-#define PM_NUM_MODES        (3)
+#define PM_NUM_MODES       4            /**< Backup, Hibernate, Standby, Idle */
+
+#ifndef PM_BLOCKER_INITIAL
+#define PM_BLOCKER_INITIAL 0x00010101   /**< Block all modes but Idle */
+#endif
 /** @} */
 
 /**

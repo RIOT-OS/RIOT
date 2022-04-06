@@ -69,13 +69,16 @@ ESP32-Ethernet-Kit has the following on-board components
 For detailed information about the configuration of ESP32 boards, see
 section Peripherals in \ref esp32_riot.
 
-The board is available in different versions. See the per-version file for details.
+The board is available in different versions. See the per-version file for
+details.
 
 [Back to table of contents](#esp32_ethernet_kit_toc)
 
 ## Flashing the Device {#esp32_ethernet_kit_flashing}
 
-Flashing RIOT is quite straight forward. The board has a Micro-USB connector with reset/boot/flash logic. Just connect the board using the programming port to your host computer and type:
+Flashing RIOT is quite straight forward. The board has a Micro-USB connector
+with reset/boot/flash logic. Just connect the board using the programming port
+to your host computer and type:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 make flash BOARD=esp32-ethernet-kit-v1_X ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,41 +86,74 @@ where `X` is the minor revision number of the board.
 
 The USB bridge is based on FDI FT2232HL and offers two USB interfaces:
 
-- the first interface is the JTAG interface for [On-Chip debugging](#esp32_ethernet_kit_debugging)
+- the first interface is the JTAG interface for
+  [On-Chip debugging](#esp32_ethernet_kit_debugging)
 - the second interface is the console interface, which is also used for flashing
 
-Therefore, it might be necessary have to declare the USB interface in the make command. For example, if the ESP32-Ethernet-Kit is connected to the host computer through the USB interfaces `/dev/ttyUSB0` and `/dev/ttyUSB1`, the make command would be used as following:
+Therefore, it might be necessary have to declare the USB interface in the make
+command. For example, if the ESP32-Ethernet-Kit is connected to the host
+computer through the USB interfaces `/dev/ttyUSB0` and `/dev/ttyUSB1`, the make
+command would be used as following:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 make flash BOARD=esp32-ethernet-kit-v1_X PORT=/dev/ttyUSB1 ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Please note that `/dev/ttyUSB1` is used as the console port by default. Therefore the variable `PORT` only needs to be defined if the console port is another port.
+Please note that `/dev/ttyUSB1` is used as the console port by default.
+Therefore the variable `PORT` only needs to be defined if the console port is
+another port.
 
-For detailed information about ESP32 as well as configuring and compiling RIOT for ESP32 boards, see \ref esp32_riot.
+For detailed information about ESP32 as well as configuring and compiling RIOT
+for ESP32 boards, see \ref esp32_riot.
 
 [Back to table of contents](#esp32_ethernet_kit_toc)
 
 ## On-Chip Debugging with the Device {#esp32_ethernet_kit_debugging}
 
-Since the USB bridge based on FDI FT2232HL provides a JTAG interface for debugging through an USB interface, using ESP32-Ethernet-Kit is the easiest and most convenient way for On-Chip debugging. Please refer the [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/jtag-debugging/index.html) for details on how to setup and how to use ESP32-Ethernet-Kit and OpenOCD.
+Since the USB bridge based on FDI FT2232HL provides a JTAG interface for
+debugging through an USB interface, using ESP32-Ethernet-Kit is the easiest
+and most convenient way for On-Chip debugging. Please refer the
+[ESP-IDF Programming Guide]
+(https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/jtag-debugging/index.html)
+for details on how to setup and how to use ESP32-Ethernet-Kit and OpenOCD.
 
-To use the JTAG interface, the `esp_jtag` module must be used to disable the `SPI_DEV(0)` which normally uses the GPIOs for the JTAG signals.
+To use the JTAG interface, the `esp_jtag` module must be used to disable the
+`SPI_DEV(0)` which normally uses the GPIOs for the JTAG signals.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-USEMODULE+=esp_jtag make flash BOARD=esp32-ethernet-kit-v1_X ...
+USEMODULE=esp_jtag make flash BOARD=esp32-ethernet-kit-v1_X ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Furthermore the function switches (DIP switches) for the JTAG signals must be set to ON.
+Furthermore the function switches (DIP switches) for the JTAG signals must be
+set to ON.
 
-To flash using OpenOCD, install the [openocd-esp32](https://github.com/espressif/openocd-esp32) fork.
-Export where openocd is located and then flash with PROGRAMMER set:
+To flash and debug using OpenOCD, the precompiled version of OpenOCD for
+ESP32 has to be installed using the install script while being in RIOT's
+root directory, see also section [Using Local Toolchain Installation]
+(#esp32_local_toolchain_installation).
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-export OPENOCD="~/openocd-esp32/src/openocd -s ~/openocd-esp32/tcl"
-PROGRAMMER=openocd USEMODULE+=esp_jtag make flash BOARD=esp32-ethernet-kit-v1_X
+dist/tools/esptool/install.sh openocd
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To start a debugging session (board will be reset, but not flashed):
+Before OpenOCD can then be used, the `PATH` variable has to be set correctly
+and the `OPENOCD` variable has to be exported using the following command.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-export OPENOCD="~/openocd-esp32/src/openocd -s ~/openocd-esp32/tcl"
-PROGRAMMER=openocd USEMODULE+=esp_jtag make debug BOARD=esp32-ethernet-kit-v1_X
+. dist/tools/esptool/export.sh openocd
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once the `PATH` variable and the `OPENOCD` variable are set, OpenOCD can be used
+
+- to flash the application using command
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  PROGRAMMER=openocd USEMODULE=esp_jtag make flash BOARD=esp32-ethernet-kit-v1_X ...
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- to start a debugging session (the board will be reset, but not flashed)
+  using command
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  PROGRAMMER=openocd USEMODULE=esp_jtag make debug BOARD=esp32-ethernet-kit-v1_X ...
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+by setting the `PROGRAMMER` variable to `openocd`.
+
+@note Even if the JTAG interface is used for debugging, the ESP32 standard
+method for flashing with `esptool.py` can still be used. In that case, the
+`flash` target is made without setting the `PROGRAMMER` variable.
 
 [Back to table of contents](#esp32_ethernet_kit_toc)
  */

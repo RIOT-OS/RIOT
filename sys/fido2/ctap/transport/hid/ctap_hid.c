@@ -17,7 +17,8 @@
 
 #include <string.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
+#include "ztimer64.h"
 #include "usb/usbus.h"
 #include "usb/usbus/hid.h"
 #include "usb/usbus/hid_io.h"
@@ -528,12 +529,12 @@ bool fido2_ctap_transport_hid_should_cancel(void)
 
 void fido2_ctap_transport_hid_check_timeouts(void)
 {
-    uint64_t now = xtimer_now_usec64();
+    uint64_t now = ztimer64_now(ZTIMER64_MSEC);
 
     for (uint8_t i = 0; i < CTAP_HID_CIDS_MAX; i++) {
         /* transaction timed out because cont packets didn't arrive in time */
         if (_is_busy && g_cids[i].taken &&
-            (now - g_cids[i].last_used) >= CTAP_HID_TRANSACTION_TIMEOUT &&
+            (now - g_cids[i].last_used) >= CTAP_HID_TRANSACTION_TIMEOUT_MS &&
             _state.cid == g_cids[i].cid && !_state.is_locked) {
 
             _send_error_response(g_cids[i].cid, CTAP_HID_ERR_MSG_TIMEOUT);
@@ -547,14 +548,14 @@ void fido2_ctap_transport_hid_check_timeouts(void)
 
 static int8_t _add_cid(uint32_t cid)
 {
-    uint64_t oldest = xtimer_now_usec64();
+    uint64_t oldest = ztimer64_now(ZTIMER64_MSEC);
     int8_t index_oldest = -1;
 
     for (int i = 0; i < CTAP_HID_CIDS_MAX; i++) {
         if (!g_cids[i].taken) {
             g_cids[i].taken = true;
             g_cids[i].cid = cid;
-            g_cids[i].last_used = xtimer_now_usec64();
+            g_cids[i].last_used = ztimer64_now(ZTIMER64_MSEC);
 
             return CTAP_HID_OK;
         }
@@ -569,7 +570,7 @@ static int8_t _add_cid(uint32_t cid)
     if (index_oldest > -1) {
         g_cids[index_oldest].taken = true;
         g_cids[index_oldest].cid = cid;
-        g_cids[index_oldest].last_used = xtimer_now_usec64();
+        g_cids[index_oldest].last_used = ztimer64_now(ZTIMER64_MSEC);
         return CTAP_HID_OK;
     }
 
@@ -580,7 +581,7 @@ static int8_t _refresh_cid(uint32_t cid)
 {
     for (int i = 0; i < CTAP_HID_CIDS_MAX; i++) {
         if (g_cids[i].cid == cid) {
-            g_cids[i].last_used = xtimer_now_usec64();
+            g_cids[i].last_used = ztimer64_now(ZTIMER64_MSEC);
             return CTAP_HID_OK;
         }
     }
@@ -622,19 +623,19 @@ static void _wink(uint32_t cid, uint8_t cmd)
     for (int i = 1; i <= 8; i++) {
 #ifdef LED0_TOGGLE
         LED0_TOGGLE;
-        xtimer_msleep(delay);
+        ztimer_sleep(ZTIMER_MSEC, delay);
 #endif
 #ifdef LED1_TOGGLE
         LED1_TOGGLE;
-        xtimer_msleep(delay);
+        ztimer_sleep(ZTIMER_MSEC, delay);
 #endif
 #ifdef LED2_TOGGLE
         LED2_TOGGLE;
-        xtimer_msleep(delay);
+        ztimer_sleep(ZTIMER_MSEC, delay);
 #endif
 #ifdef LED3_TOGGLE
         LED3_TOGGLE;
-        xtimer_msleep(delay);
+        ztimer_sleep(ZTIMER_MSEC, delay);
 #endif
         delay /= 2;
     }

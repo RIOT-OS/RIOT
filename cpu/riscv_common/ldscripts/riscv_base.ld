@@ -229,6 +229,10 @@ SECTIONS
     PROVIDE( _sp = . );
   } >ram AT>ram :ram
 
+  .flash_writable (NOLOAD) : {
+    KEEP(*(SORT(.flash_writable.*)))
+  } > flash
+
   .end_fw (NOLOAD) : ALIGN(4) {
     _end_fw = . ;
   } > flash

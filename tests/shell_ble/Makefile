@@ -15,11 +15,6 @@ TESTRUNNER_SHELL_SKIP_REBOOT = 1
 TESTRUNNER_RESET_BOARD_ON_STARTUP = 0
 
 ifneq (,$(filter term,$(MAKECMDGOALS)))
-  # for z1, socat doesn't work (unknown reason)
-  ifeq (z1, $(BOARD))
-    RIOT_TERMINAL ?= pyterm
-  endif
-
   # Use a terminal that does not introduce extra characters into the stream.
   RIOT_TERMINAL ?= socat
 else ifneq (,$(filter test,$(MAKECMDGOALS)))

@@ -407,7 +407,10 @@ ifneq (,$(IOTLAB_NODE))
 endif
 
 # Add standard include directories
-INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
+INCLUDES += -I$(RIOTBASE)/core/lib/include
+INCLUDES += -I$(RIOTBASE)/core/include
+INCLUDES += -I$(RIOTBASE)/drivers/include
+INCLUDES += -I$(RIOTBASE)/sys/include
 
 # process provided features
 include $(RIOTBASE)/Makefile.features
@@ -864,7 +867,7 @@ cleanterm: $(TERMDEPS)
 	$(TERMPROG) $(TERMFLAGS) $(TERMTEE)
 
 list-ttys:
-	$(Q)$(RIOTTOOLS)/usb-serial/list-ttys.sh
+	$(Q)$(RIOTTOOLS)/usb-serial/ttys.py
 
 doc:
 	$(MAKE) -BC $(RIOTBASE) doc

@@ -1,4 +1,8 @@
-# Use as default the most commonly used ports on Linux and OSX
+# Select the most recently attached tty interface
+ifeq (1,$(MOST_RECENT_PORT))
+  PORT ?= $(shell $(RIOTTOOLS)/usb-serial/ttys.py --most-recent --format path)
+endif
+# Otherwise, use as default the most commonly used ports on Linux and OSX
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
@@ -21,7 +25,7 @@ ifeq ($(RIOT_TERMINAL),pyterm)
 else ifeq ($(RIOT_TERMINAL),socat)
   SOCAT_OUTPUT ?= -
   TERMPROG ?= $(RIOT_TERMINAL)
-  TERMFLAGS ?= $(SOCAT_OUTPUT) open:$(PORT),b$(BAUD),echo=0,raw
+  TERMFLAGS ?= $(SOCAT_OUTPUT) open:$(PORT),b$(BAUD),echo=0,raw,cs8,parenb=0,cstopb=0
 else ifeq ($(RIOT_TERMINAL),picocom)
   TERMPROG  ?= picocom
   TERMFLAGS ?= --nolock --imap lfcrlf --baud "$(BAUD)" "$(PORT)"

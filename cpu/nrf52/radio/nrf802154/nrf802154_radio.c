@@ -253,7 +253,7 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
 {
     (void) dev;
     bool eagain;
-    ieee802154_tx_info_t *info = NULL;
+    ieee802154_tx_info_t *info = ctx;
     int state = _state;
     bool enable_shorts = false;
     int radio_state = NRF_RADIO->STATE;
