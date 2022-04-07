@@ -20,5 +20,16 @@
  */
 
 #include "external_module.h"
+#include "auto_init_utils.h"
 
+#define PRIO 1111
+
+AUTO_INIT(auto_init_external_module, PRIO);
+
+bool external_module_initialized = false;
 char *external_module_message = "Linking worked";
+
+void auto_init_external_module(void)
+{
+    external_module_initialized = true;
+}
