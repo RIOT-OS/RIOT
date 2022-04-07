@@ -5,6 +5,11 @@ BASELIBS += $(APPLICATION_RUST_MODULE).module
 
 FEATURES_REQUIRED += rust_target
 
+# This example can, on all platforms, be built with a stable version of Rust.
+# For most advanced features (eg. when using CoAP, SAUL or the shell with
+# Rust), this needs to be set to "nightly" for the time being.
+CARGO_CHANNEL = stable
+
 # Currently unknown, something related to the LED_PORT definition that doesn't
 # pass C2Rust's transpilation
 BOARD_BLACKLIST := ek-lm4f120xl
