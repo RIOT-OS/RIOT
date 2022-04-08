@@ -16,12 +16,19 @@
  */
 
 #include <stdio.h>
+#include "kernel_defines.h"
+#if IS_USED(MODULE_TENSORFLOW_LITE)
+#include "tensorflow/lite/micro/kernels/all_ops_resolver.h"
 #include "tensorflow/lite/micro/micro_error_reporter.h"
 #include "tensorflow/lite/micro/micro_interpreter.h"
-#include "tensorflow/lite/micro/kernels/micro_ops.h"
-#include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
-#include "tensorflow/lite/schema/schema_generated.h"
 #include "tensorflow/lite/version.h"
+#else
+#include "tensorflow/lite/micro/all_ops_resolver.h"
+#include "tensorflow/lite/micro/micro_error_reporter.h"
+#include "tensorflow/lite/micro/micro_interpreter.h"
+#include "tensorflow/lite/micro/system_setup.h"
+#endif
+#include "tensorflow/lite/schema/schema_generated.h"
 
 #include "blob/digit.h"
 #include "blob/model.tflite.h"
@@ -45,14 +52,20 @@ namespace {
 // The name of this function is important for Arduino compatibility.
 void setup()
 {
+#if IS_USED(MODULE_TFLITE_MICRO)
+    tflite::InitializeTarget();
+#endif
+
     // Set up logging. Google style is to avoid globals or statics because of
     // lifetime uncertainty, but since this has a trivial destructor it's okay.
+    // NOLINTNEXTLINE(runtime-global-variables)
     static tflite::MicroErrorReporter micro_error_reporter;
     error_reporter = &micro_error_reporter;
 
     // Map the model into a usable data structure. This doesn't involve any
     // copying or parsing, it's a very lightweight operation.
     model = tflite::GetModel(model_tflite);
+
     if (model->version() != TFLITE_SCHEMA_VERSION) {
         printf("Model provided is schema version %d not equal "
                "to supported version %d.",
@@ -60,24 +73,17 @@ void setup()
         return;
     }
 
-    // Explicitly load required operators
-    static tflite::MicroMutableOpResolver micro_mutable_op_resolver;
-    micro_mutable_op_resolver.AddBuiltin(
-        tflite::BuiltinOperator_FULLY_CONNECTED,
-        tflite::ops::micro::Register_FULLY_CONNECTED(), 1, 4);
-    micro_mutable_op_resolver.AddBuiltin(
-        tflite::BuiltinOperator_SOFTMAX,
-        tflite::ops::micro::Register_SOFTMAX(), 1, 2);
-    micro_mutable_op_resolver.AddBuiltin(
-        tflite::BuiltinOperator_QUANTIZE,
-        tflite::ops::micro::Register_QUANTIZE());
-    micro_mutable_op_resolver.AddBuiltin(
-        tflite::BuiltinOperator_DEQUANTIZE,
-        tflite::ops::micro::Register_DEQUANTIZE(), 1, 2);
+    // This pulls in all the operation implementations we need.
+    // NOLINTNEXTLINE(runtime-global-variables)
+#if IS_USED(MODULE_TFLITE_MICRO)
+    static tflite::AllOpsResolver resolver;
+#else
+    static tflite::ops::micro::AllOpsResolver resolver;
+#endif
 
     // Build an interpreter to run the model with.
     static tflite::MicroInterpreter static_interpreter(
-        model, micro_mutable_op_resolver, tensor_arena, kTensorArenaSize, error_reporter);
+        model, resolver, tensor_arena, kTensorArenaSize, error_reporter);
     interpreter = &static_interpreter;
 
     // Allocate memory from the tensor_arena for the model's tensors.
