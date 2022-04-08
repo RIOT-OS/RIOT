@@ -31,7 +31,7 @@ typedef enum {
     AF_UNSPEC = 0,              /**< unspecified address family */
 #define AF_UNSPEC   AF_UNSPEC   /**< unspecified address family (as macro) */
     AF_UNIX,                    /**< local to host (pipes, portals) address family. */
-#define AF_UNIX     AF_UNIX     /**< unspecified address family (as macro) */
+#define AF_UNIX     AF_UNIX     /**< local to host (pipes, portals) address family. (as macro) */
     AF_PACKET,                  /**< packet family */
 #define AF_PACKET   AF_PACKET   /**< packet family (as macro) */
     AF_INET,                    /**< internetwork address family: UDP, TCP, etc. */
