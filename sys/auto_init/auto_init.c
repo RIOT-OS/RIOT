@@ -258,6 +258,11 @@ extern void auto_init_candev(void);
 AUTO_INIT(auto_init_candev,
           AUTO_INIT_PRIO_MOD_CAN);
 #endif
+#if IS_USED(MODULE_AUTO_INIT_CSP)
+extern void auto_init_csp(void);
+AUTO_INIT(auto_init_csp,
+          AUTO_INIT_PRIO_MOD_CSP);
+#endif
 #if IS_USED(MODULE_SUIT)
 extern void suit_init_conditions(void);
 AUTO_INIT(suit_init_conditions,

@@ -1,0 +1,43 @@
+From d44bf05a74b6782e020dd0deff3b81cf96bc447f Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 8 Apr 2022 17:31:10 +0200
+Subject: [PATCH 2/2] src: include RIOT headers
+
+---
+ include/csp/arch/csp_queue.h | 3 ++-
+ src/csp_semaphore.h          | 2 ++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/include/csp/arch/csp_queue.h b/include/csp/arch/csp_queue.h
+index 512b7dc..19efd82 100644
+--- a/include/csp/arch/csp_queue.h
++++ b/include/csp/arch/csp_queue.h
+@@ -14,10 +14,11 @@
+ #define CSP_QUEUE_OK 0
+ #define CSP_QUEUE_ERROR -1
+ 
+-typedef void * csp_queue_handle_t;
+ 
+ #if (CSP_FREERTOS)
+ typedef StaticQueue_t csp_static_queue_t;
++#elif (CSP_RIOT)
++#include "csp_types_riot.h"
+ #elif (CSP_ZEPHYR)
+ #include <zephyr.h>
+ typedef struct k_msgq csp_static_queue_t;
+diff --git a/src/csp_semaphore.h b/src/csp_semaphore.h
+index 17e876a..f83d0b4 100644
+--- a/src/csp_semaphore.h
++++ b/src/csp_semaphore.h
+@@ -14,6 +14,8 @@
+     #include <FreeRTOS.h>
+     #include <task.h>
+     typedef TaskHandle_t csp_bin_sem_t;
++#elif (CSP_RIOT)
++    #include "csp_types_riot.h"
+ #elif (CSP_ZEPHYR)
+     #include <zephyr.h>
+     typedef struct k_sem csp_bin_sem_t;
+-- 
+2.32.0
+

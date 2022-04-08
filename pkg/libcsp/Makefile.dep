@@ -1,0 +1,30 @@
+USEMODULE += libcsp_contrib
+# currently only the can interace is supported
+USEMODULE += libcsp_drivers_can
+USEMODULE += luid
+USEMODULE += l2util
+USEMODULE += random
+
+DEFAULT_MODULE += auto_init_csp
+
+ifneq (,$(filter libcsp_contrib,$(USEMODULE)))
+  USEMODULE += ztimer_msec
+  USEMODULE += ztimer_sec
+  USEMODULE += tsrb
+endif
+
+ifneq (,$(filter libcsp_drivers_can,$(USEMODULE)))
+  USEMODULE += libcsp_interfaces
+  USEMODULE += conn_can
+  USEMODULE += can
+  USEMODULE += can_trx
+  DEFAULT_MODULE += auto_init_can
+  ifneq (,$(filter native,$(CPU)))
+    FEATURES_REQUIRED += periph_can
+  endif
+endif
+
+ifneq (,$(filter shell_commands,$(USEMODULE)))
+  DEFAULT_MODULE += libcsp_shell
+  DEFAULT_MODULE += libcsp_shell_server
+endif
