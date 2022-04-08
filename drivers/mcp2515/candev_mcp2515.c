@@ -428,10 +428,6 @@ static int _set_filter(candev_t *dev, const struct can_filter *filter)
 
     candev_mcp2515_t *dev_mcp = container_of(dev, candev_mcp2515_t, candev);
 
-    if (f.can_mask == 0) {
-        return -EINVAL; /* invalid mask */
-    }
-
     if (mutex_trylock(&_mcp_mutex)) {
         mode = mcp2515_get_mode(dev_mcp);
         res = mcp2515_set_mode(dev_mcp, MODE_CONFIG);
@@ -529,10 +525,6 @@ static int _remove_filter(candev_t *dev, const struct can_filter *filter)
     enum mcp2515_mode mode;
 
     candev_mcp2515_t *dev_mcp = container_of(dev, candev_mcp2515_t, candev);
-
-    if (f.can_mask == 0) {
-        return -1; /* invalid mask */
-    }
 
     if (mutex_trylock(&_mcp_mutex)) {
         mode = mcp2515_get_mode(dev_mcp);
