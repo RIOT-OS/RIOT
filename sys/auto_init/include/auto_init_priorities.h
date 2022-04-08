@@ -273,7 +273,7 @@ extern "C" {
 /**
  * @brief   CAN priority
  */
-#define AUTO_INIT_PRIO_MOD_CAN                          1420
+#define AUTO_INIT_PRIO_MOD_CAN                          1111
 #endif
 #ifndef AUTO_INIT_PRIO_MOD_SUIT
 /**
