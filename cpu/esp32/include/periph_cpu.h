@@ -38,7 +38,7 @@ extern "C" {
 /**
  * @brief   Number of usable low power modes
  */
-#define PM_NUM_MODES            (2U)
+#define PM_NUM_MODES            (3U)
 
 /**
  * @name    Power modes

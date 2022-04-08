@@ -53,10 +53,6 @@ else ifeq (abp,$(ACTIVATION_MODE))
   CFLAGS += -DUSE_ABP
 endif
 
-# Enable deep sleep power mode (e.g. STOP mode on STM32) which
-# in general provides RAM retention after wake-up.
-CFLAGS += -DPM_BLOCKER_INITIAL=0x00000001
-
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:

@@ -107,7 +107,7 @@ static int cmd_unblock(char *arg)
     }
 
     pm_blocker_t pm_blocker = pm_get_blocker();
-    if (pm_blocker.val_u8[mode] == 0) {
+    if (pm_blocker.blockers[mode] == 0) {
         printf("Mode %d is already unblocked.\n", mode);
         return 1;
     }
@@ -127,8 +127,8 @@ static int cmd_show(char *arg)
 
     pm_blocker_t pm_blocker = pm_get_blocker();
     for (unsigned i = 0; i < PM_NUM_MODES; i++) {
-        printf("mode %u blockers: %u \n", i, pm_blocker.val_u8[i]);
-        if (pm_blocker.val_u8[i]) {
+        printf("mode %u blockers: %u \n", i, pm_blocker.blockers[i]);
+        if (pm_blocker.blockers[i]) {
             lowest_allowed_mode = i + 1;
         }
     }

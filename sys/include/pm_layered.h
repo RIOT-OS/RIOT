@@ -16,9 +16,10 @@
  *
  * This simple power management interface is based on the following assumptions:
  *
- * - CPUs define up to 4 power modes (from zero, the lowest power mode, to
- *   PM_NUM_MODES-1, the highest)
- * - there is an implicit extra idle mode (which has the number PM_NUM_MODES)
+ * - CPUs define a number of power modes (from zero, the lowest power mode, to
+ *   PM_NUM_MODES, the highest)
+ * - there is an implicit extra busy-wait mode (which has the number PM_NUM_MODES)
+ *   where the CPU is kept spinning if all modes are blocked.
  * - individual power modes can be blocked/unblocked, e.g., by peripherals
  * - if a mode is blocked, so are implicitly all lower modes
  * - the idle thread automatically selects and sets the lowest unblocked mode
@@ -52,9 +53,8 @@ extern "C" {
 /**
  * @brief Power Management mode blocker typedef
  */
-typedef union {
-    uint32_t val_u32;                   /**< power mode blockers u32 */
-    uint8_t val_u8[PM_NUM_MODES];       /**< power mode blockers u8 */
+typedef struct {
+    uint8_t blockers[PM_NUM_MODES];     /**< number of blockers for the mode */
 } pm_blocker_t;
 
 /**

@@ -32,14 +32,15 @@ extern "C" {
 /**
  * @brief   Number of usable low power modes
  */
-#define PM_NUM_MODES    (2U)
+#define PM_NUM_MODES            (3U)
 
 /**
  * @name    Power modes
  * @{
  */
-#define STM32_PM_STOP         (1U)  /**< Index of STOP mode */
-#define STM32_PM_STANDBY      (0U)  /**< Index of STANDBY mode */
+#define STM32_PM_IDLE           (2U)  /**< Index of IDLE mode */
+#define STM32_PM_STOP           (1U)  /**< Index of STOP mode */
+#define STM32_PM_STANDBY        (0U)  /**< Index of STANDBY mode */
 /** @} */
 
 #ifndef PM_EWUP_CONFIG

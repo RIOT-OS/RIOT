@@ -105,7 +105,7 @@ static int cmd_unblock_rtc(int argc, char **argv)
     }
 
     pm_blocker_t pm_blocker = pm_get_blocker();
-    if (pm_blocker.val_u8[mode] == 0) {
+    if (pm_blocker.blockers[mode] == 0) {
         printf("Mode %d is already unblocked.\n", mode);
         return 1;
     }

@@ -148,7 +148,7 @@ typedef uint32_t spi_cs_t;
  * @name    Kinetis power mode configuration
  * @{
  */
-#define PM_NUM_MODES    (3U)
+#define PM_NUM_MODES    (4U)
 enum {
     KINETIS_PM_LLS  = 0,
     KINETIS_PM_VLPS = 1,
