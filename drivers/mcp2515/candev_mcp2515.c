@@ -245,6 +245,7 @@ static void _isr(candev_t *candev)
 
     if (mutex_trylock(&_mcp_mutex)) {
         flag = mcp2515_get_irq(dev);
+        mcp2515_clear_irq(dev, flag & ~(INT_RX0 | INT_RX1));
         mutex_unlock(&_mcp_mutex);
     }
     else {
@@ -283,24 +284,13 @@ static void _isr(candev_t *candev)
         if (flag & INT_MESSAGE_ERROR) {
             _irq_message_error(dev);
         }
-
         if (mutex_trylock(&_mcp_mutex)) {
             flag = mcp2515_get_irq(dev);
-            mutex_unlock(&_mcp_mutex);
-        }
-        else {
-            DEBUG("isr2: Failed to lock mutex\n");
-            _neednewisr = 1;
-            return;
-        }
-
-        /* clear all flags except for RX flags, which are cleared by receiving */
-        if (mutex_trylock(&_mcp_mutex)) {
             mcp2515_clear_irq(dev, flag & ~(INT_RX0 | INT_RX1));
             mutex_unlock(&_mcp_mutex);
         }
         else {
-            DEBUG("isr3: failed to lock mutex\n");
+            DEBUG("isr2: Failed to lock mutex\n");
             _neednewisr = 1;
             return;
         }
