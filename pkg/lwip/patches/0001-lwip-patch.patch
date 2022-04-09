@@ -1,0 +1,39 @@
+From 517bc69a216e48ab82542e1d5ec6f3846af80e84 Mon Sep 17 00:00:00 2001
+From: "mariem.charrada" <mariem.charrada@ml-pa.com>
+Date: Tue, 25 Jan 2022 07:33:46 +0100
+Subject: [PATCH] lwip-patch
+
+---
+ src/core/dns.c             | 1 +
+ src/include/lwip/sockets.h | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/src/core/dns.c b/src/core/dns.c
+index 9d2f61ed..e8d9950e 100644
+--- a/src/core/dns.c
++++ b/src/core/dns.c
+@@ -94,6 +94,7 @@
+ #include "lwip/memp.h"
+ #include "lwip/dns.h"
+ #include "lwip/prot/dns.h"
++#include "lwip/sys.h"
+ 
+ #include <string.h>
+ 
+diff --git a/src/include/lwip/sockets.h b/src/include/lwip/sockets.h
+index d70d36c4..f62b7dd7 100644
+--- a/src/include/lwip/sockets.h
++++ b/src/include/lwip/sockets.h
+@@ -671,7 +671,9 @@ int lwip_inet_pton(int af, const char *src, void *dst);
+ /** @ingroup socket */
+ #define close(s)                                  lwip_close(s)
+ /** @ingroup socket */
++#if MBEDTLS_ENABLED == 0
+ #define fcntl(s,cmd,val)                          lwip_fcntl(s,cmd,val)
++#endif
+ /** @ingroup socket */
+ #define ioctl(s,cmd,argp)                         lwip_ioctl(s,cmd,argp)
+ #endif /* LWIP_POSIX_SOCKETS_IO_NAMES */
+-- 
+2.25.1
+
