@@ -1,0 +1,41 @@
+From 32ff5a1f43f3cbf800cdc5460808f2a5e17a8759 Mon Sep 17 00:00:00 2001
+From: "mariem.charrada" <mariem.charrada@ml-pa.com>
+Date: Tue, 25 Jan 2022 23:18:14 +0100
+Subject: [PATCH] mbedtls-patch
+
+---
+ library/aes.c         | 4 ++--
+ library/net_sockets.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/library/aes.c b/library/aes.c
+index 31824e75c..0261ec566 100644
+--- a/library/aes.c
++++ b/library/aes.c
+@@ -376,8 +376,8 @@ static int aes_init_done = 0;
+ static void aes_gen_tables( void )
+ {
+     int i, x, y, z;
+-    int pow[256];
+-    int log[256];
++    uint8_t pow[256];
++    uint8_t log[256];
+ 
+     /*
+      * compute pow and log tables over GF(2^8)
+diff --git a/library/net_sockets.c b/library/net_sockets.c
+index 5fbe1f764..3d127655d 100644
+--- a/library/net_sockets.c
++++ b/library/net_sockets.c
+@@ -33,7 +33,7 @@
+ 
+ #if !defined(unix) && !defined(__unix__) && !defined(__unix) && \
+     !defined(__APPLE__) && !defined(_WIN32) && !defined(__QNXNTO__) && \
+-    !defined(__HAIKU__) && !defined(__midipix__)
++    !defined(__HAIKU__) && !defined(__midipix__) && !defined(RIOT_VERSION)
+ #error "This module only works on Unix and Windows, see MBEDTLS_NET_C in config.h"
+ #endif
+ 
+-- 
+2.25.1
+
