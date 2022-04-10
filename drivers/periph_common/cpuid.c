@@ -31,6 +31,12 @@
 #ifdef CPUID_ADDR
 void cpuid_get(void *id)
 {
+/* gcc 11.2.0 builtin bounds checking raises the following false positive warnings */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas" /* silence the CI due to unknown -Wstringop-overread */
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#pragma GCC diagnostic ignored "-Wstringop-overread"
     memcpy(id, (void *)CPUID_ADDR, CPUID_LEN);
+#pragma GCC diagnostic pop
 }
 #endif
