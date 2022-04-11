@@ -26,25 +26,13 @@
 
 #include "riot_logo.h"
 
-#if IS_USED(MODULE_ST7735)
-#include "st7735.h"
-#include "st7735_params.h"
-#elif IS_USED(MODULE_ILI9341)
 #include "ili9341.h"
 #include "ili9341_params.h"
-#else
-#error "Include either module 'st7735' or 'ili9341'"
-#endif
 
 int main(void)
 {
     lcd_t dev;
-
-#if IS_USED(MODULE_ST7735)
-    dev.driver = &lcd_st7735_driver;
-#elif IS_USED(MODULE_ILI9341)
     dev.driver = &lcd_ili9341_driver;
-#endif
 
     puts("lcd TFT display test application");
 
@@ -56,16 +44,6 @@ int main(void)
     BACKLIGHT_ON;
 #endif
 
-#if IS_USED(MODULE_ST7735)
-    if (lcd_init(&dev, (lcd_params_t *)&st7735_params[0].params) == 0) {
-        puts("[OK]");
-    }
-    else {
-        puts("[Failed]");
-        return 1;
-    }
-#endif
-#if IS_USED(MODULE_ILI9341)
     if (lcd_init(&dev, &ili9341_params[0]) == 0) {
         puts("[OK]");
     }
@@ -73,7 +51,6 @@ int main(void)
         puts("[Failed]");
         return 1;
     }
-#endif
 
     puts("lcd TFT display filling map");
     lcd_fill(&dev, 0, dev.params->lines, 0, dev.params->rgb_channels, 0x0000);
