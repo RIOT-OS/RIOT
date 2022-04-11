@@ -26,7 +26,7 @@ FEATURES_REQUIRED += periph_spi
 
 ifneq (,$(filter gnrc,$(USEMODULE)))
   ifeq (,$(filter gnrc_netif_pktq,$(USEMODULE)))
-    USEMODULE += at86rf215_blocking_send
+    DEFAULT_MODULE += at86rf215_blocking_send
   endif
 endif
 
