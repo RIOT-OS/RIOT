@@ -11,10 +11,10 @@ ifneq (,$(filter fatfs_vfs,$(USEMODULE)))
 endif
 
 #if periph_rtc is available use it. Otherwise use static timestamps
-ifneq (,$(filter periph_rtc,$(USEMODULE)))
-  CFLAGS += -DFATFS_FFCONF_OPT_FS_NORTC=0
-else
+ifeq (,$(filter rtt_rtc periph_rtc,$(USEMODULE)))
   CFLAGS += -DFATFS_FFCONF_OPT_FS_NORTC=1
+else
+  CFLAGS += -DFATFS_FFCONF_OPT_FS_NORTC=0
 endif
 
 ifeq ($(OS),Darwin)
