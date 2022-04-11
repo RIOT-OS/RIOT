@@ -64,7 +64,7 @@ extern int _at30tse75x_handler(int argc, char **argv);
 extern int _saul(int argc, char **argv);
 #endif
 
-#ifdef MODULE_PERIPH_RTC
+#if defined(MODULE_PERIPH_RTC) || defined(MODULE_RTT_RTC)
 extern int _rtc_handler(int argc, char **argv);
 #endif
 
@@ -262,7 +262,7 @@ const shell_command_t _shell_command_list[] = {
     { "random_init", "initializes the PRNG", _random_init },
     { "random_get", "returns 32 bit of pseudo randomness", _random_get },
 #endif
-#ifdef MODULE_PERIPH_RTC
+#if defined(MODULE_PERIPH_RTC) || defined(MODULE_RTT_RTC)
     {"rtc", "control RTC peripheral interface",  _rtc_handler},
 #endif
 #ifdef MODULE_RTT_CMD
