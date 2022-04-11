@@ -5137,8 +5137,11 @@ boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member RTT_FREQUENCY
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_CHANNELS \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member TIMER_1_CHANNELS \(macro definition\) of file periph_conf\.h is not documented\.
+boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member TIMER_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member UART_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member ULTRA_LOW_POWER_INTERNAL_OSC_SOURCE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member adc_channels\[\] \(variable\) of file periph_conf\.h is not documented\.
