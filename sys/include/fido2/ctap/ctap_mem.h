@@ -41,28 +41,15 @@ extern "C" {
 /** @} */
 
 /**
- * @brief First flash page to store data in
- *
- * @note This can corrupt firmware if CTAP_FLASH_START_PAGE is set to a
- * flash page containing firmware. Therefore make sure that CTAP_FLASH_START_PAGE
- * is located after the firmware.
+ * @brief   Default amount of flashpages to use
  */
-#if defined(CONFIG_FIDO2_CTAP_FLASH_START_PAGE) && \
-    (CONFIG_FIDO2_CTAP_FLASH_START_PAGE >= 0)
-#define CTAP_FLASH_START_PAGE CONFIG_FIDO2_CTAP_FLASH_START_PAGE
-#else
-#define CTAP_FLASH_START_PAGE (FLASHPAGE_NUMOF - 4)
+#ifndef CONFIG_FIDO2_CTAP_NUM_FLASHPAGES
+#define CONFIG_FIDO2_CTAP_NUM_FLASHPAGES 4
 #endif
 
-/**
- * @brief Start page for storing resident keys
- */
-#define CTAP_FLASH_RK_START_PAGE CTAP_FLASH_START_PAGE
-
-/**
- * @brief Page for storing authenticator state information
- */
-#define CTAP_FLASH_STATE_PAGE CTAP_FLASH_RK_START_PAGE - 1
+#if CONFIG_FIDO2_CTAP_NUM_FLASHPAGES < 2
+#error "ctap_mem.h: Configured number of flashpages is invalid"
+#endif
 
 /**
  * @brief Calculate padding needed to align struct size for saving to flash
@@ -85,6 +72,12 @@ extern "C" {
                              CTAP_FLASH_ALIGN_PAD(ctap_state_t))
 
 /**
+ * @brief Max amount of resident keys that can be stored on device
+ */
+#define CTAP_FLASH_MAX_NUM_RKS ((CONFIG_FIDO2_CTAP_NUM_FLASHPAGES - 1) * \
+                                FLASHPAGE_SIZE / CTAP_FLASH_RK_SZ)
+
+/**
  * @brief Minimum flash sector size needed to hold CTAP related data
  *
  * This is needed to ensure that the MTD work_area buffer is big enough
@@ -95,6 +88,14 @@ extern "C" {
  * @brief Pages per sector needed
  */
 #define CTAP_FLASH_PAGES_PER_SECTOR ((CTAP_FLASH_MIN_SECTOR_SZ / FLASHPAGE_SIZE) + 1)
+
+/**
+ * Offset of flashpage for storing resident keys
+ *
+ * The offset is in units of flashpages from the beginning of the flash memory
+ * area dedicated for storing CTAP data.
+ */
+#define CTAP_FLASH_RK_OFF 0x1
 
 /**
  * @brief Initialize memory helper
@@ -128,13 +129,6 @@ int fido2_ctap_mem_write(const void *buf, uint32_t page, uint32_t offset, uint32
 int fido2_ctap_mem_read(void *buf, uint32_t page, uint32_t offset, uint32_t len);
 
 /**
- * @brief Get maximum amount of resident credentials that can be stored
- *
- * @return maximum amount that can be stored
- */
-uint16_t fido2_ctap_mem_get_max_rk_amount(void);
-
-/**
  * @brief Get flashpage number resident key with index @p rk_idx.
  *
  * @param[in] rk_idx    index of resident key
@@ -154,6 +148,27 @@ int fido2_ctap_mem_get_flashpage_number_of_rk(uint16_t rk_idx);
  * @return -1 if @p rk_idx is invalid
  */
 int fido2_ctap_mem_get_offset_of_rk_into_flashpage(uint16_t rk_idx);
+
+/**
+ * @brief Get page number for storing authenticator state information
+ *
+ * @return page number
+ */
+unsigned fido2_ctap_mem_flash_page(void);
+
+/**
+ * @brief Get start page for storing resident keys
+ *
+ * @return page number
+ */
+unsigned fido2_ctap_mem_get_rk_start_page(void);
+
+/**
+ * @brief Erase all flashpages containing CTAP data
+ *
+ * @return @ref ctap_status_codes_t
+ */
+int fido2_ctap_mem_erase_flash(void);
 
 #ifdef __cplusplus
 }

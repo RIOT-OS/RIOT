@@ -180,7 +180,7 @@ static int _ctap_decrypt_rk(ctap_resident_key_t *rk, ctap_cred_id_t *id);
 /**
  * @brief Write credential to flash
  */
-static int _save_rk(ctap_resident_key_t *rk);
+static int _write_rk_to_flash(ctap_resident_key_t *rk);
 
 /**
  * @brief Save PIN to authenticator state and write the updated state to flash
@@ -191,16 +191,6 @@ static int _save_pin(uint8_t *pin, size_t len);
  * @brief Write authenticator state to flash.
  */
 static int _write_state_to_flash(const ctap_state_t *state);
-
-/**
- * @brief Read authenticator state from flash
- */
-static int _read_state_from_flash(ctap_state_t *state);
-
-/**
- * @brief Write resident key to flash
- */
-static int _write_rk_to_flash(const ctap_resident_key_t *rk, int page, int offset);
 
 /**
  * @brief Check if PIN protocol version is supported
@@ -282,7 +272,12 @@ int fido2_ctap_init(void)
         return -EPROTO;
     }
 
-    ret = _read_state_from_flash(&_state);
+    /**
+     * CTAP state information is stored at flashpage 0 of the memory area
+     * dedicated for storing CTAP data
+     */
+    ret = fido2_ctap_mem_read(&_state, fido2_ctap_mem_flash_page(), 0,
+                               sizeof(_state));
 
     if (ret != CTAP2_OK) {
         return -EPROTO;
@@ -432,6 +427,8 @@ size_t fido2_ctap_reset(ctap_resp_t *resp)
 
 static int _reset(void)
 {
+    fido2_ctap_mem_erase_flash();
+
     _state.initialized_marker = CTAP_INITIALIZED_MARKER;
     _state.rem_pin_att = CTAP_PIN_MAX_ATTS;
     _state.pin_is_set = false;
@@ -582,7 +579,7 @@ static int _make_credential(ctap_req_t *req_raw)
 
     /* if created credential is a resident credential, save it to flash */
     if (rk) {
-        ret = _save_rk(&k);
+        ret = _write_rk_to_flash(&k);
         if (ret != CTAP2_OK) {
             goto done;
         }
@@ -735,7 +732,7 @@ static int _get_assertion(ctap_req_t *req_raw)
      * therefore needs to be saved on the device.
      */
     if (!rk->cred_desc.has_nonce) {
-        ret = _save_rk(rk);
+        ret = _write_rk_to_flash(rk);
 
         if (ret != CTAP2_OK) {
             goto done;
@@ -821,7 +818,7 @@ static int _get_next_assertion(void)
      * therefore needs to be saved on the device.
      */
     if (!rk->cred_desc.has_nonce) {
-        ret = _save_rk(rk);
+        ret = _write_rk_to_flash(rk);
 
         if (ret != CTAP2_OK) {
             goto done;
@@ -1527,16 +1524,13 @@ static int _find_matching_rks(ctap_resident_key_t *rks, size_t rks_len,
  * so rk's can't be deleted, only overwritten => we can be sure that there are
  * no holes when reading keys from flash memory
  */
-static int _save_rk(ctap_resident_key_t *rk)
+static int _write_rk_to_flash(ctap_resident_key_t *rk)
 {
     int ret;
-    int page_num = CTAP_FLASH_RK_START_PAGE, offset_into_page = 0;
+    int page_num = fido2_ctap_mem_flash_page() + CTAP_FLASH_RK_OFF;
+    int offset_into_page = 0;
     bool equal = false;
     ctap_resident_key_t rk_tmp = { 0 };
-
-    if (_state.rk_amount_stored >= fido2_ctap_mem_get_max_rk_amount()) {
-        return CTAP2_ERR_KEY_STORE_FULL;
-    }
 
     if (_state.rk_amount_stored > 0) {
         for (uint16_t i = 0; i <= _state.rk_amount_stored; i++) {
@@ -1571,6 +1565,10 @@ static int _save_rk(ctap_resident_key_t *rk)
     }
 
     if (!equal) {
+        if (_state.rk_amount_stored >= CTAP_FLASH_MAX_NUM_RKS) {
+            return CTAP2_ERR_KEY_STORE_FULL;
+        }
+
         _state.rk_amount_stored++;
         ret = _write_state_to_flash(&_state);
 
@@ -1579,7 +1577,7 @@ static int _save_rk(ctap_resident_key_t *rk)
         }
     }
 
-    return _write_rk_to_flash(rk, page_num, offset_into_page);
+    return fido2_ctap_mem_write(rk, page_num, offset_into_page, CTAP_FLASH_RK_SZ);
 }
 
 static int _make_auth_data_assert(uint8_t *rp_id, size_t rp_id_len,
@@ -1792,17 +1790,13 @@ static int _ctap_decrypt_rk(ctap_resident_key_t *rk, ctap_cred_id_t *id)
 
 static int _write_state_to_flash(const ctap_state_t *state)
 {
-    return fido2_ctap_mem_write(state, CTAP_FLASH_STATE_PAGE, 0, CTAP_FLASH_STATE_SZ);
-}
-
-static int _read_state_from_flash(ctap_state_t *state)
-{
-    return fido2_ctap_mem_read(state, CTAP_FLASH_STATE_PAGE, 0, sizeof(*state));
-}
-
-static int _write_rk_to_flash(const ctap_resident_key_t *rk, int page, int offset)
-{
-    return fido2_ctap_mem_write(rk, page, offset, CTAP_FLASH_RK_SZ);
+    /**
+     * CTAP state information is stored at flashpage 0 of the memory area
+     * dedicated for storing CTAP data
+     */
+    return fido2_ctap_mem_write(state,
+                                fido2_ctap_mem_flash_page(), 0,
+                                CTAP_FLASH_STATE_SZ);
 }
 
 int fido2_ctap_get_sig(const uint8_t *auth_data, size_t auth_data_len,
