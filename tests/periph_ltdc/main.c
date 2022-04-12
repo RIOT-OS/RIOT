@@ -30,8 +30,6 @@
 
 #define RECT_WIDTH      200
 #define RECT_HEIGHT     100
-#define PICTURE_WIDTH   128
-#define PICTURE_HEIGHT  69
 
 int main(void)
 {
@@ -59,29 +57,29 @@ int main(void)
 
     /* Display the RIOT logo in all 4 screen corners */
     ltdc_map(
-        0, PICTURE_WIDTH - 1, 0, PICTURE_HEIGHT - 1,
+        0, RIOT_LOGO_WIDTH - 1, 0, RIOT_LOGO_HEIGHT - 1,
         (const uint16_t *)picture
     );
     ztimer_sleep(ZTIMER_MSEC, MS_PER_SEC);
     ltdc_clear();
 
     ltdc_map(
-        LCD_SCREEN_WIDTH - PICTURE_WIDTH, LCD_SCREEN_WIDTH - 1, 0, PICTURE_HEIGHT - 1,
+        LCD_SCREEN_WIDTH - RIOT_LOGO_WIDTH, LCD_SCREEN_WIDTH - 1, 0, RIOT_LOGO_HEIGHT - 1,
         (const uint16_t *)picture
     );
     ztimer_sleep(ZTIMER_MSEC, MS_PER_SEC);
     ltdc_clear();
 
     ltdc_map(
-        LCD_SCREEN_WIDTH - PICTURE_WIDTH, LCD_SCREEN_WIDTH - 1,
-        LCD_SCREEN_HEIGHT - PICTURE_HEIGHT, LCD_SCREEN_HEIGHT - 1,
+        LCD_SCREEN_WIDTH - RIOT_LOGO_WIDTH, LCD_SCREEN_WIDTH - 1,
+        LCD_SCREEN_HEIGHT - RIOT_LOGO_HEIGHT, LCD_SCREEN_HEIGHT - 1,
         (const uint16_t *)picture
     );
     ztimer_sleep(ZTIMER_MSEC, MS_PER_SEC);
     ltdc_clear();
 
     ltdc_map(
-        0, PICTURE_WIDTH - 1, LCD_SCREEN_HEIGHT - PICTURE_HEIGHT, LCD_SCREEN_HEIGHT - 1,
+        0, RIOT_LOGO_WIDTH - 1, LCD_SCREEN_HEIGHT - RIOT_LOGO_HEIGHT, LCD_SCREEN_HEIGHT - 1,
         (const uint16_t *)picture
     );
     ztimer_sleep(ZTIMER_MSEC, MS_PER_SEC);
@@ -89,8 +87,8 @@ int main(void)
 
     /* Display the RIOT logo in the center of the screen */
     ltdc_map(
-        ((LCD_SCREEN_WIDTH - PICTURE_WIDTH) >> 1), ((LCD_SCREEN_WIDTH + PICTURE_WIDTH) >> 1) - 1,
-        ((LCD_SCREEN_HEIGHT - PICTURE_HEIGHT) >> 1), ((LCD_SCREEN_HEIGHT + PICTURE_HEIGHT) >> 1) - 1,
+        ((LCD_SCREEN_WIDTH - RIOT_LOGO_WIDTH) >> 1), ((LCD_SCREEN_WIDTH + RIOT_LOGO_WIDTH) >> 1) - 1,
+        ((LCD_SCREEN_HEIGHT - RIOT_LOGO_HEIGHT) >> 1), ((LCD_SCREEN_HEIGHT + RIOT_LOGO_HEIGHT) >> 1) - 1,
         (const uint16_t *)picture
     );
 
