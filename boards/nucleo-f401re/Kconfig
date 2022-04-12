@@ -25,4 +25,7 @@ config BOARD_NUCLEO_F401RE
     select HAS_PERIPH_UART
     select HAS_PERIPH_QDEC
 
+    # Put other features for this board (in alphabetical order)
+    select HAS_RIOTBOOT
+
 source "$(RIOTBOARD)/common/nucleo64/Kconfig"
