@@ -156,11 +156,6 @@ static int _send(candev_t *candev, const struct can_frame *frame)
     int ret = 0;
     enum mcp2515_mode mode;
 
-    if (frame->can_id > 0x1FFFFFFF) {
-        DEBUG("Illegal CAN-ID!\n");
-        return -EINVAL;
-    }
-
     if (mutex_trylock(&_mcp_mutex)) {
         mode = mcp2515_get_mode(dev);
         mutex_unlock(&_mcp_mutex);
