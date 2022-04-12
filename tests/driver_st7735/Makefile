@@ -10,6 +10,9 @@ USEMODULE += ztimer_msec
 # the variable to empty
 SHOULD_RUN_KCONFIG ?=
 
+# add include path for riot_logo.h
+INCLUDES += -I$(RIOTBASE)/tests
+
 include $(RIOTBASE)/Makefile.include
 
 # Check if being configured via Kconfig
