@@ -42,7 +42,7 @@ extern "C" {
  * Default CAN bitrate
  */
 #ifndef CANDEV_MCP2515_DEFAULT_BITRATE
-#define CANDEV_MCP2515_DEFAULT_BITRATE 125000
+#define CANDEV_MCP2515_DEFAULT_BITRATE 500000
 #endif
 
 /**
