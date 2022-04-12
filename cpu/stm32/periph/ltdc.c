@@ -212,11 +212,10 @@ void ltdc_fill(uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2, const uint16_
 }
 
 #if IS_USED(MODULE_DISP_DEV)
-static void _ltdc_map(const disp_dev_t *disp_dev, uint16_t x1, uint16_t x2,
-                  uint16_t y1, uint16_t y2, const uint16_t *color)
+static void _ltdc_map(const disp_dev_t *disp_dev, const disp_dev_area_t *area, const uint16_t *color)
 {
     (void)disp_dev;
-    ltdc_map(x1, x2, y1, y2, color);
+    ltdc_map(area->x1, area->x2, area->y1, area->y2, color);
 }
 
 static uint16_t _ltdc_height(const disp_dev_t *disp_dev)
