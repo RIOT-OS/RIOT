@@ -131,7 +131,6 @@ extern "C" {
 #define CTAP_STACKSIZE 15000
 #endif
 
-#if !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)
 /**
  * @brief CTAP user presence button
  */
@@ -142,10 +141,13 @@ extern "C" {
 /* set default button if no button is configured */
 #ifdef BTN0_PIN
 #define CTAP_UP_BUTTON BTN0_PIN
-/* if no button available disable UP test */
 #else
+#define CTAP_UP_BUTTON 0
+/**
+ * @brief Disable user presence test configuration
+ */
 #define CONFIG_FIDO2_CTAP_DISABLE_UP 1
-#endif
+#endif /* BTN0_PIN */
 #endif
 
 /**
@@ -174,7 +176,19 @@ extern "C" {
 #define CTAP_UP_BUTTON_FLANK GPIO_FALLING
 #endif
 
-#endif /* !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP) */
+/**
+ * @brief Disable user presence test configuration
+ */
+#ifndef CONFIG_FIDO2_CTAP_DISABLE_UP
+#define CONFIG_FIDO2_CTAP_DISABLE_UP 0
+#endif
+
+/**
+ * @brief Disable user LED animation configuration
+ */
+#ifndef CONFIG_FIDO2_CTAP_DISABLE_LED
+#define CONFIG_FIDO2_CTAP_DISABLE_LED 0
+#endif
 
 /**
  * @brief Max size of relying party name
