@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Koen Zandberg <koen@bergzand.net>
+ *               2021 Francisco Molina
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Test application for lcd tft displays
  *
  * @author      Koen Zandberg <koen@bergzand.net>
+ * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  *
  * @}
  */
@@ -26,13 +28,13 @@
 
 #include "riot_logo.h"
 
-#include "ili9341.h"
-#include "ili9341_params.h"
+#include "st7735.h"
+#include "st7735_params.h"
 
 int main(void)
 {
     lcd_t dev;
-    dev.driver = &lcd_ili9341_driver;
+    dev.driver = &lcd_st7735_driver;
 
     puts("lcd TFT display test application");
 
@@ -44,7 +46,7 @@ int main(void)
     BACKLIGHT_ON;
 #endif
 
-    if (lcd_init(&dev, &ili9341_params[0]) == 0) {
+    if (lcd_init(&dev, &st7735_params[0].params) == 0) {
         puts("[OK]");
     }
     else {

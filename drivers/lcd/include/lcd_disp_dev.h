@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     drivers_ili9341
+ * @ingroup     drivers_lcd
  * @{
  *
  * @file
@@ -16,8 +16,8 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef ILI9341_DISP_DEV_H
-#define ILI9341_DISP_DEV_H
+#ifndef LCD_DISP_DEV_H
+#define LCD_DISP_DEV_H
 
 #include "disp_dev.h"
 
@@ -28,10 +28,11 @@ extern "C" {
 /**
  * @brief   Reference to the display device driver struct
  */
-extern const disp_dev_driver_t ili9341_disp_dev_driver;
+extern const disp_dev_driver_t lcd_disp_dev_driver;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* ILI9341_DISP_DEV_H */
+#endif /* LCD_DISP_DEV_H */
+/** @} */

@@ -107,7 +107,7 @@ extern "C" {
 #define ILI9341_PARAM_NUM_LINES (240U)                          /**< Number of screen lines */
 #define ILI9341_PARAM_RGB       (1)                             /**< RGB configuration */
 #define ILI9341_PARAM_INVERTED  (1)                             /**< Inversion configuration */
-#define ILI9341_PARAM_ROTATION  (ILI9341_ROTATION_HORZ_FLIP)    /**< Rotation mode */
+#define ILI9341_PARAM_ROTATION  (LCD_ROTATION_HORZ_FLIP)        /**< Rotation mode */
 /** @} */
 
 #ifdef __cplusplus

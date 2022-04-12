@@ -2,7 +2,7 @@ BOARD ?= stm32f429i-disc1
 
 include ../Makefile.tests_common
 
-USEMODULE += ili9341
+USEMODULE += st7735
 USEMODULE += ztimer
 USEMODULE += ztimer_msec
 
