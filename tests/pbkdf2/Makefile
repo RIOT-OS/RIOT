@@ -8,6 +8,9 @@ USEMODULE += base64
 # Use a terminal that does not introduce extra characters into the stream.
 RIOT_TERMINAL ?= socat
 
+#ensure the rx buffer has some room even with large test patterns
+CFLAGS += -DSTDIO_UART_RX_BUFSIZE=128
+
 include $(RIOTBASE)/Makefile.include
 
 # Increase Stack size for AVR
