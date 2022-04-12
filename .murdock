@@ -454,7 +454,7 @@ compile() {
         should_check_kconfig_hash=1
         BOARD=${board} make -C${appdir} clean
         CCACHE_BASEDIR="$(pwd)" BOARD=${board} TOOLCHAIN=${toolchain} RIOT_CI_BUILD=1 TEST_KCONFIG=1 \
-                        make -C${appdir} all test-input-hash -j${JOBS:-4}
+                        nice make -C${appdir} all test-input-hash -j${JOBS:-4}
         RES=$?
         if [ $RES -eq 0 ]; then
             kconfig_test_hash=$(test_hash_calc "${BINDIR}")
@@ -466,7 +466,7 @@ compile() {
 
     # compile without Kconfig
     CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
-        make -C${appdir} clean all test-input-hash -j${JOBS:-4}
+        nice make -C${appdir} clean all test-input-hash -j${JOBS:-4}
     RES=$?
 
     test_hash=$(test_hash_calc "$BINDIR")
