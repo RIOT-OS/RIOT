@@ -987,7 +987,7 @@ typedef enum {
  * @param[in] cr                        Coding rate used to send the packet
  * @return                              time on air in us
  */
-static inline uint32_t lora_time_on_air(size_t pkt_len, uint8_t dr, uint8_t cr)
+static inline uint32_t lora_time_on_air(size_t pkt_len, loramac_dr_idx_t dr, uint8_t cr)
 {
     assert(dr <= LORAMAC_DR_6);
     const uint8_t _K[6][4] = {
