@@ -14,5 +14,9 @@ ifneq (,$(filter microbit,$(USEMODULE)))
   INCLUDES += -I$(RIOTBOARD)/common/microbit/include
 endif
 
+ifeq (1,$(EMULATE))
+   RIOT_TEST_TIMEOUT ?= 20
+endif
+
 # include nrf51 boards common configuration
 include $(RIOTBOARD)/common/nrf51/Makefile.include
