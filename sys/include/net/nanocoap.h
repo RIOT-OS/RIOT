@@ -155,18 +155,12 @@ extern "C" {
 
 /**
  * @brief    Maximum length of a CoAP header for a blockwise message
+ *
+ *           Value obtained experimentally when using SUIT
  */
 #ifndef CONFIG_NANOCOAP_BLOCK_HEADER_MAX
-#define CONFIG_NANOCOAP_BLOCK_HEADER_MAX   (64)
+#define CONFIG_NANOCOAP_BLOCK_HEADER_MAX   (80)
 #endif
-
-/**
- * @brief    Work buffer size for blockwise operation
- *
- * @param[in] blksize   CoAP blocksize
- */
-#define NANOCOAP_BLOCKWISE_BUF(blksize)    (CONFIG_NANOCOAP_BLOCK_HEADER_MAX \
-                                           + (0x1 << (blksize + 4)))
 
 /**
  * @name coap_opt_finish() flag parameter values
@@ -251,6 +245,18 @@ typedef ssize_t (*coap_handler_t)(coap_pkt_t *pkt, uint8_t *buf, size_t len, voi
 typedef int (*coap_blockwise_cb_t)(void *arg, size_t offset, uint8_t *buf, size_t len, int more);
 
 /**
+ * @brief   Coap equest callback descriptor
+ *
+ * @param[in] arg      Pointer to be passed as arguments to the callback
+ * @param[in] pkt      The received CoAP response.
+ *                     Buffers point to network stack internal memory.
+ *
+ * @returns   >=0       on success
+ * @returns    <0       on error
+ */
+typedef int (*coap_request_cb_t)(void *arg, coap_pkt_t *pkt);
+
+/**
  * @brief   Method flag type
  *
  * Must be large enough to contain all @ref nanocoap_method_flags "CoAP method flags"
@@ -324,7 +330,7 @@ static inline uint8_t coap_code(unsigned cls, unsigned detail)
  *
  * @returns     message code class
  */
-static inline unsigned coap_get_code_class(coap_pkt_t *pkt)
+static inline unsigned coap_get_code_class(const coap_pkt_t *pkt)
 {
     return pkt->hdr->code >> 5;
 }
@@ -348,7 +354,7 @@ static inline unsigned coap_get_code_detail(const coap_pkt_t *pkt)
  *
  * @returns     message code in decimal format
  */
-static inline unsigned coap_get_code(coap_pkt_t *pkt)
+static inline unsigned coap_get_code(const coap_pkt_t *pkt)
 {
     return (coap_get_code_class(pkt) * 100) + coap_get_code_detail(pkt);
 }
@@ -399,6 +405,18 @@ static inline unsigned coap_get_token_len(const coap_pkt_t *pkt)
 static inline unsigned coap_get_total_hdr_len(const coap_pkt_t *pkt)
 {
     return sizeof(coap_hdr_t) + coap_get_token_len(pkt);
+}
+
+/**
+ * @brief   Get the total length of a CoAP packet
+ *
+ * @param[in]   pkt   CoAP packet
+ *
+ * @returns     total CoAP length
+ */
+static inline unsigned coap_get_total_len(const coap_pkt_t *pkt)
+{
+    return (uintptr_t)pkt->payload - (uintptr_t)pkt->hdr + pkt->payload_len;
 }
 
 /**
