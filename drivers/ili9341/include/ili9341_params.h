@@ -62,7 +62,7 @@ extern "C" {
 #define ILI9341_PARAM_RGB_CHANNELS      240U    /**< Number of RGB channels (e.g. columns) */
 #endif
 #ifndef ILI9341_PARAM_ROTATION
-#define ILI9341_PARAM_ROTATION          LCD_ROTATION_HORZ_FLIP
+#define ILI9341_PARAM_ROTATION          ILI9341_ROTATION_HORZ_FLIP
 #endif
 #ifndef ILI9341_PARAM_OFFSET_X
 #define ILI9341_PARAM_OFFSET_X          0               /**< Horizontal offset */

@@ -79,6 +79,19 @@ extern "C" {
 #endif
 
 /**
+ * @name    ILI9341 display rotation modes
+ * @{
+ */
+#define ST7735_ROTATION_VERT            0                   /**< Vertical mode */
+#define ST7735_ROTATION_VERT_FLIP       LCD_MADCTL_MX | \
+                                        LCD_MADCTL_MY       /**< Flipped vertical */
+#define ST7735_ROTATION_HORZ            LCD_MADCTL_MV | \
+                                        LCD_MADCTL_MX       /**< Horizontal mode */
+#define ST7735_ROTATION_HORZ_FLIP       LCD_MADCTL_MV | \
+                                        LCD_MADCTL_MY       /**< Horizontal flipped */
+/** @} */
+
+/**
  * @brief   Device descriptor for a st7735
  *
  */

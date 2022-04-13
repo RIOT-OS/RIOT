@@ -131,7 +131,7 @@ static int _init(lcd_t *dev, const lcd_params_t *params)
     _write_cmd(dev, LCD_CMD_VMCTRL2, command_params, 1);
 
     /* Memory access CTL */
-    command_params[0] = LCD_MADCTL_MY | LCD_MADCTL_MV;
+    command_params[0] = dev->params->rotation;
     command_params[0] |= dev->params->rgb ? 0 : LCD_MADCTL_BGR;
     _write_cmd(dev, LCD_CMD_MADCTL, command_params, 1);
 
