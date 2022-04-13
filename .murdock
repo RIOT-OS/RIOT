@@ -7,7 +7,7 @@
 
 #
 : ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
-: ${EMULATED_BOARDS_AVAILABLE:="microbit"}
+#: ${EMULATED_BOARDS_AVAILABLE:="microbit"}
 
 # temporarily disabling llvm builds until https://github.com/RIOT-OS/RIOT/pull/15595
 # is in
