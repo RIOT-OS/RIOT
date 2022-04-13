@@ -64,8 +64,7 @@ void board_init(void)
         gpio_set(SPEAKER_ENABLE_PIN);
     }
 
-    /* ST7735 driver is not supported yet uncomment the following code once it is */
-    /* if (IS_USED(MODULE_ST7735)) {
+    if (IS_USED(MODULE_ST7735)) {
         gpio_init(BACKLIGHT_PIN, GPIO_OUT);
-    }*/
+    }
 }
