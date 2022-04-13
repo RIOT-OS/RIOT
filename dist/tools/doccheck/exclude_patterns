@@ -10084,6 +10084,8 @@ drivers/io1_xplained/include/io1_xplained_internals\.h:[0-9]+: warning: Member I
 drivers/io1_xplained/include/io1_xplained_params\.h:[0-9]+: warning: Member IO1_XPLAINED_PARAMS \(macro definition\) of file io1_xplained_params\.h is not documented\.
 drivers/io1_xplained/include/io1_xplained_params\.h:[0-9]+: warning: Member IO1_XPLAINED_PARAM_ADDR \(macro definition\) of file io1_xplained_params\.h is not documented\.
 drivers/io1_xplained/include/io1_xplained_params\.h:[0-9]+: warning: Member IO1_XPLAINED_SAUL_INFO \(macro definition\) of file io1_xplained_params\.h is not documented\.
+drivers/ir_nec/include/ir_nec_params\.h:35: warning: Member IR_NEC_PARAM_PIN \(macro definition\) of file ir_nec_params\.h is not documented\.
+drivers/ir_nec/include/ir_nec_params\.h:39: warning: Member IR_NEC_PARAMS \(macro definition\) of file ir_nec_params\.h is not documented\.
 drivers/isl29020/include/isl29020\-internal\.h:[0-9]+: warning: Member ISL29020_CMD_EN \(macro definition\) of file isl29020\-internal\.h is not documented\.
 drivers/isl29020/include/isl29020\-internal\.h:[0-9]+: warning: Member ISL29020_CMD_LIGHT \(macro definition\) of file isl29020\-internal\.h is not documented\.
 drivers/isl29020/include/isl29020\-internal\.h:[0-9]+: warning: Member ISL29020_CMD_MODE \(macro definition\) of file isl29020\-internal\.h is not documented\.
