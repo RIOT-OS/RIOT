@@ -47,7 +47,7 @@ void auto_init_st7735(void)
     for (size_t i = 0; i < ST7735_NUMOF; i++) {
         st7735_devs[i].dev.driver = &lcd_st7735_driver;
         LOG_DEBUG("[auto_init_screen] initializing st7735 #%u\n", i);
-        if (lcd_init(&st7735_devs[i].dev, &st7735_params[i].params) < 0) {
+        if (lcd_init(&st7735_devs[i].dev, &st7735_params[i]) < 0) {
             LOG_ERROR("[auto_init_screen] error initializing st7735 #%u\n", i);
             continue;
         }

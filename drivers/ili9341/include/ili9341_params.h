@@ -20,6 +20,7 @@
 #define ILI9341_PARAMS_H
 
 #include "board.h"
+#include "lcd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,9 +61,14 @@ extern "C" {
 #ifndef ILI9341_PARAM_RGB_CHANNELS
 #define ILI9341_PARAM_RGB_CHANNELS      240U    /**< Number of RGB channels (e.g. columns) */
 #endif
-
 #ifndef ILI9341_PARAM_ROTATION
-#define ILI9341_PARAM_ROTATION     LCD_ROTATION_HORZ_FLIP
+#define ILI9341_PARAM_ROTATION          LCD_ROTATION_HORZ_FLIP
+#endif
+#ifndef ILI9341_PARAM_OFFSET_X
+#define ILI9341_PARAM_OFFSET_X          0               /**< Horizontal offset */
+#endif
+#ifndef ILI9341_PARAM_OFFSET_Y
+#define ILI9341_PARAM_OFFSET_Y          0               /**< Vertival offset */
 #endif
 
 /**
@@ -78,8 +84,10 @@ extern "C" {
                                       .rgb = ILI9341_PARAM_RGB, \
                                       .inverted = ILI9341_PARAM_INVERTED, \
                                       .lines = ILI9341_PARAM_NUM_LINES, \
-                                      .rotation = ILI9341_PARAM_ROTATION, \
                                       .rgb_channels = ILI9341_PARAM_RGB_CHANNELS, \
+                                      .rotation = ILI9341_PARAM_ROTATION, \
+                                      .offset_x = ILI9341_PARAM_OFFSET_X, \
+                                      .offset_y = ILI9341_PARAM_OFFSET_Y, \
 }
 #endif
 /** @} */

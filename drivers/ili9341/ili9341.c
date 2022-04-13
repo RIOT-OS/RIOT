@@ -168,6 +168,11 @@ static void _set_area(const lcd_t *dev, uint16_t x1, uint16_t x2,
 {
     be_uint16_t params[2];
 
+    x1 += dev->params->offset_x;
+    x2 += dev->params->offset_x;
+    y1 += dev->params->offset_y;
+    y2 += dev->params->offset_y;
+
     params[0] = byteorder_htons(x1);
     params[1] = byteorder_htons(x2);
 

@@ -22,6 +22,7 @@
 #define ST7735_PARAMS_H
 
 #include "board.h"
+#include "lcd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,29 +63,33 @@ extern "C" {
 #ifndef ST7735_PARAM_RGB_CHANNELS
 #define ST7735_PARAM_RGB_CHANNELS   128U            /**< Number of RGB channels (e.g. columns) */
 #endif
-#ifndef ST7735_OFFSET_X
-#define ST7735_OFFSET_X             0               /**< Horizontal offset */
+#ifndef ST7735_PARAM_ROTATION
+#define ST7735_PARAM_ROTATION       LCD_ROTATION_HORZ   /**< Rotation mode (unused) */
 #endif
-#ifndef ST7735_OFFSET_Y
-#define ST7735_OFFSET_Y             0               /**< Vertival offset */
+#ifndef ST7735_PARAM_OFFSET_X
+#define ST7735_PARAM_OFFSET_X       0               /**< Horizontal offset */
+#endif
+#ifndef ST7735_PARAM_OFFSET_Y
+#define ST7735_PARAM_OFFSET_Y       0               /**< Vertival offset */
 #endif
 
 /**
  * @brief   Default params
  */
 #ifndef ST7735_PARAMS
-#define ST7735_PARAMS              {  .params.spi = ST7735_PARAM_SPI, \
-                                      .params.spi_clk = ST7735_PARAM_SPI_CLK, \
-                                      .params.spi_mode = ST7735_PARAM_SPI_MODE, \
-                                      .params.cs_pin = ST7735_PARAM_CS, \
-                                      .params.dcx_pin = ST7735_PARAM_DCX, \
-                                      .params.rst_pin = ST7735_PARAM_RST, \
-                                      .params.rgb = ST7735_PARAM_RGB, \
-                                      .params.inverted = ST7735_PARAM_INVERTED, \
-                                      .params.lines = ST7735_PARAM_NUM_LINES, \
-                                      .params.rgb_channels = ST7735_PARAM_RGB_CHANNELS, \
-                                      .offset_x = ST7735_OFFSET_X, \
-                                      .offset_y = ST7735_OFFSET_Y, \
+#define ST7735_PARAMS              {  .spi = ST7735_PARAM_SPI, \
+                                      .spi_clk = ST7735_PARAM_SPI_CLK, \
+                                      .spi_mode = ST7735_PARAM_SPI_MODE, \
+                                      .cs_pin = ST7735_PARAM_CS, \
+                                      .dcx_pin = ST7735_PARAM_DCX, \
+                                      .rst_pin = ST7735_PARAM_RST, \
+                                      .rgb = ST7735_PARAM_RGB, \
+                                      .inverted = ST7735_PARAM_INVERTED, \
+                                      .lines = ST7735_PARAM_NUM_LINES, \
+                                      .rgb_channels = ST7735_PARAM_RGB_CHANNELS, \
+                                      .rotation = LCD_ROTATION_HORZ, \
+                                      .offset_x = ST7735_PARAM_OFFSET_X, \
+                                      .offset_y = ST7735_PARAM_OFFSET_Y, \
                                     }
 #endif
 /** @} */
@@ -99,7 +104,7 @@ extern "C" {
 /**
  * @brief   Configure LCD
  */
-static const st7735_params_t st7735_params[] =
+static const lcd_params_t st7735_params[] =
 {
     ST7735_PARAMS,
 };

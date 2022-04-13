@@ -46,7 +46,7 @@ int main(void)
     BACKLIGHT_ON;
 #endif
 
-    if (lcd_init(&dev, &st7735_params[0].params) == 0) {
+    if (lcd_init(&dev, &st7735_params[0]) == 0) {
         puts("[OK]");
     }
     else {

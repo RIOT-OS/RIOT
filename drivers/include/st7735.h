@@ -87,15 +87,6 @@ typedef struct {
 } st7735_t;
 
 /**
- * @brief   Device initialization parameters
- */
-typedef struct {
-    lcd_params_t params;            /**< LCD struct params */
-    uint8_t offset_x;             /**< LCD offset to apply on x axis. */
-    uint8_t offset_y;             /**< LCD offset to apply on y axis. */
-} st7735_params_t;
-
-/**
  * @brief   LCD device operations table
  */
 extern const lcd_driver_t lcd_st7735_driver;
