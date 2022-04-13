@@ -64,7 +64,12 @@ int main(void)
         disp_dev_map(disp_dev->dev, 0, max_width - 1, y, y, display_buffer);
     }
 
-    disp_dev_map(disp_dev->dev, 95, 222, 85, 153, (const uint16_t *)picture);
+    disp_dev_map(
+        disp_dev->dev,
+        ((max_width - RIOT_LOGO_WIDTH) >> 1), ((max_width + RIOT_LOGO_WIDTH) >> 1) - 1,
+        ((max_height - RIOT_LOGO_HEIGHT) >> 1), ((max_height + RIOT_LOGO_HEIGHT) >> 1) - 1,
+        (const uint16_t *)picture
+    );
 
     puts("SUCCESS");
 
