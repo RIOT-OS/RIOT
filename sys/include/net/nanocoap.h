@@ -148,6 +148,13 @@ extern "C" {
 #define CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX  (6)
 #endif
 
+/**
+ * @brief CoAP block-wise-transfer size that should be used by default
+ */
+#ifndef CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT
+#define CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT  COAP_BLOCKSIZE_64
+#endif
+
 /** @brief   Maximum length of a query string written to a message */
 #ifndef CONFIG_NANOCOAP_QS_MAX
 #define CONFIG_NANOCOAP_QS_MAX             (64)

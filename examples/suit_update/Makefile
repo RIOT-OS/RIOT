@@ -106,7 +106,7 @@ include $(RIOTBASE)/Makefile.include
 # allow to use large blocks to utilize large MTUs (802.15.4g, Ethernet, WiFi)
 LARGE_BLOCKS ?= 0
 ifeq (1, $(LARGE_BLOCKS))
-  CFLAGS += -DCONFIG_SUIT_COAP_BLOCKSIZE=COAP_BLOCKSIZE_1024
+  CFLAGS += -DCONFIG_NANOCOAP_BLOCKSIZE_DEFAULT=COAP_BLOCKSIZE_1024
 else
 # lower pktbuf size to something sufficient for this application
 # Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
