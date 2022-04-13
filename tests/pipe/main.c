@@ -30,7 +30,6 @@
 
 #include "thread.h"
 #include "pipe.h"
-#include "pipe.h"
 
 #define BYTES_TOTAL (26)
 
