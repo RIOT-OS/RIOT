@@ -188,6 +188,17 @@ int _parse_netif(sock_udp_ep_t *ep_out, char *netifstart)
     return (netifend - netifstart);
 }
 
+static int _get_default_netif(sock_udp_ep_t *ep_out)
+{
+    netif_t *netif = netif_iter(NULL);
+    if (netif == NULL || netif_iter(netif) != NULL) {
+        return -EINVAL;
+    }
+
+    ep_out->netif = netif_get_id(netif);
+    return 0;
+}
+
 int sock_tl_str2ep(struct _sock_tl_ep *ep_out, const char *str)
 {
     unsigned brackets_flag;
@@ -251,6 +262,10 @@ int sock_tl_str2ep(struct _sock_tl_ep *ep_out, const char *str)
 #ifdef SOCK_HAS_IPV6
     if (inet_pton(AF_INET6, hostbuf, ep_out->addr.ipv6) == 1) {
         ep_out->family = AF_INET6;
+        if (*hostend != '%' &&
+            ipv6_addr_is_link_local((ipv6_addr_t *)ep_out->addr.ipv6)) {
+            return _get_default_netif(ep_out);
+        }
         return 0;
     }
 #endif
