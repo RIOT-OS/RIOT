@@ -180,7 +180,7 @@ static int _ctap_decrypt_rk(ctap_resident_key_t *rk, ctap_cred_id_t *id);
 /**
  * @brief Write credential to flash
  */
-static int _save_rk(ctap_resident_key_t *rk);
+static int _write_rk_to_flash(ctap_resident_key_t *rk);
 
 /**
  * @brief Save PIN to authenticator state and write the updated state to flash
@@ -191,16 +191,6 @@ static int _save_pin(uint8_t *pin, size_t len);
  * @brief Write authenticator state to flash.
  */
 static int _write_state_to_flash(const ctap_state_t *state);
-
-/**
- * @brief Read authenticator state from flash
- */
-static int _read_state_from_flash(ctap_state_t *state);
-
-/**
- * @brief Write resident key to flash
- */
-static int _write_rk_to_flash(const ctap_resident_key_t *rk, int page, int offset);
 
 /**
  * @brief Check if PIN protocol version is supported
@@ -282,7 +272,12 @@ int fido2_ctap_init(void)
         return -EPROTO;
     }
 
-    ret = _read_state_from_flash(&_state);
+    /**
+     * CTAP state information is stored at flashpage 0 of the memory area
+     * dedicated for storing CTAP data
+     */
+    ret = fido2_ctap_mem_read(&_state, fido2_ctap_mem_flash_page(), 0,
+                              sizeof(_state));
 
     if (ret != CTAP2_OK) {
         return -EPROTO;
@@ -296,17 +291,13 @@ int fido2_ctap_init(void)
         }
     }
 
-#if !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)
-#ifdef CTAP_UP_BUTTON
-    ret = fido2_ctap_utils_init_gpio_pin(CTAP_UP_BUTTON, CTAP_UP_BUTTON_MODE, CTAP_UP_BUTTON_FLANK);
-    if (ret != CTAP2_OK) {
-        return -EPROTO;
+    if (!IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)) {
+        ret = fido2_ctap_utils_init_gpio_pin(CTAP_UP_BUTTON, CTAP_UP_BUTTON_MODE,
+                                             CTAP_UP_BUTTON_FLANK);
+        if (ret != CTAP2_OK) {
+            return -EPROTO;
+        }
     }
-#else
-    DEBUG("fido2_ctap: error - No button configured even though user presence is enabled \n");
-    return -EIO;
-#endif  /* CTAP_UP_BUTTON */
-#endif  /* !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP) */
 
     ret = fido2_ctap_crypto_init();
 
@@ -432,6 +423,8 @@ size_t fido2_ctap_reset(ctap_resp_t *resp)
 
 static int _reset(void)
 {
+    fido2_ctap_mem_erase_flash();
+
     _state.initialized_marker = CTAP_INITIALIZED_MARKER;
     _state.rem_pin_att = CTAP_PIN_MAX_ATTS;
     _state.pin_is_set = false;
@@ -494,9 +487,10 @@ static int _make_credential(ctap_req_t *req_raw)
     if (req.exclude_list_len > 0) {
         if (_rks_exist(req.exclude_list, req.exclude_list_len, req.rp.id,
                        req.rp.id_len)) {
-#if !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)
-            fido2_ctap_utils_user_presence_test();
-#endif
+            if (!IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)) {
+                fido2_ctap_utils_user_presence_test();
+            }
+
             ret = CTAP2_ERR_CREDENTIAL_EXCLUDED;
             goto done;
         }
@@ -516,9 +510,10 @@ static int _make_credential(ctap_req_t *req_raw)
     if (fido2_ctap_pin_is_set() && req.pin_auth_present) {
         /* CTAP specification (version 20190130) section 5.5.8.1 */
         if (req.pin_auth_len == 0) {
-#if !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)
-            fido2_ctap_utils_user_presence_test();
-#endif
+            if (!IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)) {
+                fido2_ctap_utils_user_presence_test();
+            }
+
             ret = CTAP2_ERR_PIN_INVALID;
             goto done;
         }
@@ -535,9 +530,10 @@ static int _make_credential(ctap_req_t *req_raw)
     /* CTAP specification (version 20190130) section 5.5.8.1 */
     else if (!fido2_ctap_pin_is_set() && req.pin_auth_present
              && req.pin_auth_len == 0) {
-#if !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)
-        fido2_ctap_utils_user_presence_test();
-#endif
+        if (!IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)) {
+            fido2_ctap_utils_user_presence_test();
+        }
+
         ret = CTAP2_ERR_PIN_NOT_SET;
         goto done;
     }
@@ -552,21 +548,22 @@ static int _make_credential(ctap_req_t *req_raw)
     }
 
     /* last moment where transaction can be cancelled */
-#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
-    if (fido2_ctap_transport_hid_should_cancel()) {
-        ret = CTAP2_ERR_KEEPALIVE_CANCEL;
-        goto done;
+    if (IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)) {
+        if (fido2_ctap_transport_hid_should_cancel()) {
+            ret = CTAP2_ERR_KEEPALIVE_CANCEL;
+            goto done;
+        }
     }
-#endif
 
     /* user presence test to create a new credential */
-#if IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)
-    up = true;
-#else
-    if (fido2_ctap_utils_user_presence_test() == CTAP2_OK) {
+    if (IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)) {
         up = true;
     }
-#endif
+    else {
+        if (fido2_ctap_utils_user_presence_test() == CTAP2_OK) {
+            up = true;
+        }
+    }
 
     ret = _make_auth_data_attest(&req, &auth_data, &k, uv, up, rk);
 
@@ -582,7 +579,7 @@ static int _make_credential(ctap_req_t *req_raw)
 
     /* if created credential is a resident credential, save it to flash */
     if (rk) {
-        ret = _save_rk(&k);
+        ret = _write_rk_to_flash(&k);
         if (ret != CTAP2_OK) {
             goto done;
         }
@@ -637,9 +634,10 @@ static int _get_assertion(ctap_req_t *req_raw)
     if (fido2_ctap_pin_is_set() && req.pin_auth_present) {
         /* CTAP specification (version 20190130) section 5.5.8.2 */
         if (req.pin_auth_len == 0) {
-#if !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)
-            fido2_ctap_utils_user_presence_test();
-#endif
+            if (!IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)) {
+                fido2_ctap_utils_user_presence_test();
+            }
+
             ret = CTAP2_ERR_PIN_INVALID;
             goto done;
         }
@@ -656,9 +654,10 @@ static int _get_assertion(ctap_req_t *req_raw)
     /* CTAP specification (version 20190130) section 5.5.8.2 */
     else if (!fido2_ctap_pin_is_set() && req.pin_auth_present
              && req.pin_auth_len == 0) {
-#if !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)
-        fido2_ctap_utils_user_presence_test();
-#endif
+        if (!IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)) {
+            fido2_ctap_utils_user_presence_test();
+        }
+
         ret = CTAP2_ERR_PIN_NOT_SET;
         goto done;
     }
@@ -673,19 +672,20 @@ static int _get_assertion(ctap_req_t *req_raw)
     }
 
     if (req.options.up) {
-#if IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)
-        up = true;
-        _assert_state.up = true;
-#else
-        if (fido2_ctap_utils_user_presence_test() == CTAP2_OK) {
+        if (IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)) {
             up = true;
             _assert_state.up = true;
         }
         else {
-            ret = CTAP2_ERR_OPERATION_DENIED;
-            goto done;
+            if (fido2_ctap_utils_user_presence_test() == CTAP2_OK) {
+                up = true;
+                _assert_state.up = true;
+            }
+            else {
+                ret = CTAP2_ERR_OPERATION_DENIED;
+                goto done;
+            }
         }
-#endif
     }
 
     if (req.options.uv) {
@@ -705,12 +705,10 @@ static int _get_assertion(ctap_req_t *req_raw)
     rk = &_assert_state.rks[_assert_state.cred_counter++];
 
     /* last moment where transaction can be cancelled */
-#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
     if (fido2_ctap_transport_hid_should_cancel()) {
         ret = CTAP2_ERR_KEEPALIVE_CANCEL;
         goto done;
     }
-#endif
 
     ret = _make_auth_data_assert(req.rp_id, req.rp_id_len, &auth_data, uv,
                                  up,
@@ -735,7 +733,7 @@ static int _get_assertion(ctap_req_t *req_raw)
      * therefore needs to be saved on the device.
      */
     if (!rk->cred_desc.has_nonce) {
-        ret = _save_rk(rk);
+        ret = _write_rk_to_flash(rk);
 
         if (ret != CTAP2_OK) {
             goto done;
@@ -821,7 +819,7 @@ static int _get_next_assertion(void)
      * therefore needs to be saved on the device.
      */
     if (!rk->cred_desc.has_nonce) {
-        ret = _save_rk(rk);
+        ret = _write_rk_to_flash(rk);
 
         if (ret != CTAP2_OK) {
             goto done;
@@ -999,12 +997,12 @@ static int _set_pin(ctap_client_pin_req_t *req)
     }
 
     /* last moment where transaction can be cancelled */
-#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
-    if (fido2_ctap_transport_hid_should_cancel()) {
-        ret = CTAP2_ERR_KEEPALIVE_CANCEL;
-        goto done;
+    if (IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)) {
+        if (fido2_ctap_transport_hid_should_cancel()) {
+            ret = CTAP2_ERR_KEEPALIVE_CANCEL;
+            goto done;
+        }
     }
-#endif
 
     sz = fmt_strnlen((char *)new_pin_dec, CTAP_PIN_MAX_SIZE + 1);
     if (sz < CTAP_PIN_MIN_SIZE || sz > CTAP_PIN_MAX_SIZE) {
@@ -1104,12 +1102,12 @@ static int _change_pin(ctap_client_pin_req_t *req)
     }
 
     /* last moment where transaction can be cancelled */
-#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
-    if (fido2_ctap_transport_hid_should_cancel()) {
-        ret = CTAP2_ERR_KEEPALIVE_CANCEL;
-        goto done;
+    if (IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)) {
+        if (fido2_ctap_transport_hid_should_cancel()) {
+            ret = CTAP2_ERR_KEEPALIVE_CANCEL;
+            goto done;
+        }
     }
-#endif
 
     /* verify decrypted pinHash against LEFT(SHA-256(curPin), 16) */
     if (memcmp(pin_hash_dec, _state.pin_hash, CTAP_PIN_TOKEN_SZ) != 0) {
@@ -1193,12 +1191,12 @@ static int _get_pin_token(ctap_client_pin_req_t *req)
     }
 
     /* last moment where transaction can be cancelled */
-#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
-    if (fido2_ctap_transport_hid_should_cancel()) {
-        ret = CTAP2_ERR_KEEPALIVE_CANCEL;
-        goto done;
+    if (IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)) {
+        if (fido2_ctap_transport_hid_should_cancel()) {
+            ret = CTAP2_ERR_KEEPALIVE_CANCEL;
+            goto done;
+        }
     }
-#endif
 
     /* sha256 of shared secret ((abG).x) to obtain shared key */
     ret = fido2_ctap_crypto_sha256(shared_secret, sizeof(shared_secret), shared_key);
@@ -1527,16 +1525,13 @@ static int _find_matching_rks(ctap_resident_key_t *rks, size_t rks_len,
  * so rk's can't be deleted, only overwritten => we can be sure that there are
  * no holes when reading keys from flash memory
  */
-static int _save_rk(ctap_resident_key_t *rk)
+static int _write_rk_to_flash(ctap_resident_key_t *rk)
 {
     int ret;
-    int page_num = CTAP_FLASH_RK_START_PAGE, offset_into_page = 0;
+    int page_num = fido2_ctap_mem_flash_page() + CTAP_FLASH_RK_OFF;
+    int offset_into_page = 0;
     bool equal = false;
     ctap_resident_key_t rk_tmp = { 0 };
-
-    if (_state.rk_amount_stored >= fido2_ctap_mem_get_max_rk_amount()) {
-        return CTAP2_ERR_KEY_STORE_FULL;
-    }
 
     if (_state.rk_amount_stored > 0) {
         for (uint16_t i = 0; i <= _state.rk_amount_stored; i++) {
@@ -1571,6 +1566,10 @@ static int _save_rk(ctap_resident_key_t *rk)
     }
 
     if (!equal) {
+        if (_state.rk_amount_stored >= CTAP_FLASH_MAX_NUM_RKS) {
+            return CTAP2_ERR_KEY_STORE_FULL;
+        }
+
         _state.rk_amount_stored++;
         ret = _write_state_to_flash(&_state);
 
@@ -1579,7 +1578,7 @@ static int _save_rk(ctap_resident_key_t *rk)
         }
     }
 
-    return _write_rk_to_flash(rk, page_num, offset_into_page);
+    return fido2_ctap_mem_write(rk, page_num, offset_into_page, CTAP_FLASH_RK_SZ);
 }
 
 static int _make_auth_data_assert(uint8_t *rp_id, size_t rp_id_len,
@@ -1792,17 +1791,13 @@ static int _ctap_decrypt_rk(ctap_resident_key_t *rk, ctap_cred_id_t *id)
 
 static int _write_state_to_flash(const ctap_state_t *state)
 {
-    return fido2_ctap_mem_write(state, CTAP_FLASH_STATE_PAGE, 0, CTAP_FLASH_STATE_SZ);
-}
-
-static int _read_state_from_flash(ctap_state_t *state)
-{
-    return fido2_ctap_mem_read(state, CTAP_FLASH_STATE_PAGE, 0, sizeof(*state));
-}
-
-static int _write_rk_to_flash(const ctap_resident_key_t *rk, int page, int offset)
-{
-    return fido2_ctap_mem_write(rk, page, offset, CTAP_FLASH_RK_SZ);
+    /**
+     * CTAP state information is stored at flashpage 0 of the memory area
+     * dedicated for storing CTAP data
+     */
+    return fido2_ctap_mem_write(state,
+                                fido2_ctap_mem_flash_page(), 0,
+                                CTAP_FLASH_STATE_SZ);
 }
 
 int fido2_ctap_get_sig(const uint8_t *auth_data, size_t auth_data_len,

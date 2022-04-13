@@ -25,6 +25,12 @@ Note:
 * When registering and authenticating on [Webauthn.io](https://webauthn.io/) you
 will need to push button 1 on your device in order to show user presence.
 
+**Resetting the authenticator**
+* To reset the authenticator, meaning that all credentials and state information
+will be deleted, execute the `reset.py` file located in this directory.
+  * This requires you to install the python fido2 package. To install run:
+    `pip install fido2==0.8.1`.
+
 ### Unit testing
 Unit testing is based on the `fido2_tests` package.
 

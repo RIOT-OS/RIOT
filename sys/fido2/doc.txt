@@ -17,6 +17,10 @@
  *
  * @warning The FIDO2 implementation currently stores private keys in plain text inside flash memory.
  *
+ * @warning This implementation persists FIDO CTAP data across reboots and when unpowered;
+ *          any firmware update loses the data because it will be overwritten. This applies both to firmware updates through
+ *          bootloaders and to firmware updates through external programmers.
+ *
  * FIDO2 is an authentication standard that seeks to solve the password problem
  * by enabling passwordless authentication. Instead of using passwords to
  * authenticate to web services, FIDO2 enables users to use common devices
@@ -102,6 +106,8 @@
  *
  * Abstraction for flash operations. Uses the RIOT [Flashpage MTD driver](http://api.riot-os.org/group__drivers__mtd__flashpage.html).
  *
+ * Flash memory is reserved at build time using the `FLASH_WRITABLE_INIT` macro. The amount of flashpages reserved can be configured as `FIDO2_CTAP_NUM_FLASHPAGES` in KConfig. The implementation needs at least 1 flashpage to store state information and 1 flashpage to store credentials also called resident keys (rks). Therefore, the minimum amount of flashpages needed is 2. State information is stored on the first flashpage, credentials (rks) on the following flashpages.
+ *
  * Adds additional functionality to speedup flash accesses (e.g. by checking if a flash page is erased to avoid unnecessary erasures of flash pages).
  *
  * **ctap_utils**
@@ -134,6 +140,8 @@
  *
  *  * Resident Credentials
  *      * Resident credentials are credentials stored on the authenticator.
+ *      * They are also called resident key (rk) credentials due to the key material
+ *        being stored on the device.
  *      * This implementation stores resident keys in flash memory.
  *      @warning As of now the credentials (containing a private key) are stored
  *       in plain text inside flash memory
