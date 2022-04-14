@@ -15,11 +15,14 @@
 _TRIPLES_TO_TEST := \
     riscv-none-embed \
     riscv32-none-elf \
-    riscv-none-elf \
     riscv32-unknown-elf \
+    riscv32-elf \
+    riscv-none-elf \
     riscv-unknown-elf \
+    riscv-elf \
     riscv64-none-elf \
-    riscv64-unknown-elf
+    riscv64-unknown-elf \
+    riscv64-elf
 
 TARGET_ARCH_RISCV ?= \
   $(strip \
