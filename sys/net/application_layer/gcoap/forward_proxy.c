@@ -175,7 +175,7 @@ static bool _parse_endpoint(sock_udp_ep_t *remote,
         }
     }
     else {
-        remote->port = 5683;
+        remote->port = COAP_PORT;
     }
 
     return true;
