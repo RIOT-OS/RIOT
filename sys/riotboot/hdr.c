@@ -29,6 +29,7 @@
 #include "log.h"
 #else
 #define LOG_INFO(...) printf(__VA_ARGS__)
+#define LOG_DEBUG(...) printf(__VA_ARGS__)
 #endif
 
 #include "riotboot/hdr.h"
@@ -53,7 +54,7 @@ void riotboot_hdr_print(const riotboot_hdr_t *riotboot_hdr)
 int riotboot_hdr_validate(const riotboot_hdr_t *riotboot_hdr)
 {
     if (riotboot_hdr->magic_number != RIOTBOOT_MAGIC) {
-        LOG_INFO("%s: riotboot_hdr magic number invalid\n", __func__);
+        LOG_DEBUG("%s: riotboot_hdr magic number invalid\n", __func__);
         return -1;
     }
 
@@ -61,7 +62,7 @@ int riotboot_hdr_validate(const riotboot_hdr_t *riotboot_hdr)
               riotboot_hdr->chksum ? 0 : -1;
 
     if (res) {
-        LOG_INFO("%s: riotboot_hdr checksum invalid\n", __func__);
+        LOG_DEBUG("%s: riotboot_hdr checksum invalid\n", __func__);
     }
 
     return res;
