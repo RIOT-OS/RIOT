@@ -25,6 +25,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "atomic_utils.h"
 #include "net/nanocoap_sock.h"
 #include "net/sock/util.h"
 #include "net/sock/udp.h"
@@ -45,6 +46,13 @@ typedef struct {
     void *arg;
     bool more;
 } _block_ctx_t;
+
+static uint16_t _get_id(void)
+{
+    __attribute__((section(".noinit")))
+    static uint16_t id;
+    return atomic_fetch_add_u16(&id, 1);
+}
 
 int nanocoap_sock_connect(nanocoap_sock_t *sock, sock_udp_ep_t *local, sock_udp_ep_t *remote)
 {
@@ -231,7 +239,7 @@ ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path, void *buf, si
     };
 
     pkt.hdr = buf;
-    pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET, 1);
+    pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET, _get_id());
     pktpos += coap_opt_put_uri_path(pktpos, 0, path);
     pkt.payload = pktpos;
     pkt.payload_len = 0;
@@ -309,8 +317,7 @@ static int _fetch_block(coap_pkt_t *pkt, sock_udp_t *sock,
     uint8_t *pktpos = (void *)pkt->hdr;
     uint16_t lastonum = 0;
 
-    pktpos += coap_build_hdr(pkt->hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET,
-                             num);
+    pktpos += coap_build_hdr(pkt->hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET, _get_id());
     pktpos += coap_opt_put_uri_pathquery(pktpos, &lastonum, path);
     pktpos += coap_opt_put_uint(pktpos, lastonum, COAP_OPT_BLOCK2,
                                 (num << 4) | blksize);
