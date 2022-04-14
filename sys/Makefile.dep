@@ -648,9 +648,7 @@ ifneq (,$(filter gcoap,$(USEMODULE)))
   USEMODULE += ztimer_usec
   USEMODULE += event_callback
   USEMODULE += event_timeout_ztimer
-  ifneq (,$(filter openwsn%,$(USEMODULE)))
-    USEMODULE += openwsn_sock_udp
-  endif
+  USEMODULE += random
 endif
 
 ifneq (,$(filter luid,$(USEMODULE)))
