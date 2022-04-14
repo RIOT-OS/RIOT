@@ -257,6 +257,8 @@ static inline void event_queue_claim(event_queue_t *queue)
  * in the previous position on the queue. So reposting an event while it is
  * already on the queue will have no effect.
  *
+ * @pre     queue should be initialized
+ *
  * @param[in]   queue   event queue to queue event in
  * @param[in]   event   event to queue in event queue
  */
