@@ -28,6 +28,7 @@
 #include "net/nanocoap_sock.h"
 #include "net/sock/util.h"
 #include "net/sock/udp.h"
+#include "random.h"
 #include "sys/uio.h"
 #include "timex.h"
 
@@ -88,9 +89,8 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
 
     unsigned state = STATE_SEND_REQUEST;
 
-    /* TODO: timeout random between between ACK_TIMEOUT and (ACK_TIMEOUT * ACK_RANDOM_FACTOR) */
-    uint32_t timeout = CONFIG_COAP_ACK_TIMEOUT_MS * US_PER_MS;
-
+    uint32_t timeout = random_uint32_range(CONFIG_COAP_ACK_TIMEOUT_MS * US_PER_MS,
+                                           CONFIG_COAP_ACK_TIMEOUT_MS * CONFIG_COAP_RANDOM_FACTOR_1000);
     /* add 1 for initial transmit */
     unsigned tries_left = CONFIG_COAP_MAX_RETRANSMIT + 1;
 
