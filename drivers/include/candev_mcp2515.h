@@ -32,7 +32,6 @@
 #include "periph/gpio.h"
 #include "periph/spi.h"
 #include "mutex.h"
-#include "xtimer.h"
 
 #ifdef __cplusplus
 extern "C" {
