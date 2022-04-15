@@ -1849,13 +1849,14 @@ ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
  * @param[in]   pkt             pointer to (parsed) CoAP packet
  * @param[out]  resp_buf        buffer for response
  * @param[in]   resp_buf_len    size of response buffer
- * @param[in]   context         ptr to a @ref coap_resource_subtree_t instance
+ * @param[in]   context         pointer to request context, must contain context
+ *                              to @ref coap_resource_subtree_t instance
  *
  * @returns     size of the reply packet on success
  * @returns     <0 on error
  */
 ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
-                             size_t resp_buf_len, void *context);
+                             size_t resp_buf_len, coap_request_ctx_t *context);
 
 /**
  * @brief   Convert message code (request method) into a corresponding bit field

@@ -426,10 +426,10 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
 }
 
 ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
-                             void *context)
+                             coap_request_ctx_t *context)
 {
     assert(context);
-    coap_resource_subtree_t *subtree = context;
+    coap_resource_subtree_t *subtree = context->context;
     return coap_tree_handler(pkt, buf, len, subtree->resources,
                              subtree->resources_numof);
 }
@@ -461,7 +461,11 @@ ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
             break;
         }
         else {
-            return resource->handler(pkt, resp_buf, resp_buf_len, resource->context);
+            coap_request_ctx_t ctx = {
+                .resource = resource,
+                .context  = resource->context,
+            };
+            return resource->handler(pkt, resp_buf, resp_buf_len, &ctx);
         }
     }
 
@@ -1196,7 +1200,7 @@ size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
 }
 
 ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, uint8_t *buf, \
-                                             size_t len, void *context)
+                                             size_t len, coap_request_ctx_t *context)
 {
     (void)context;
     coap_block_slicer_t slicer;

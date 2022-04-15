@@ -33,7 +33,7 @@
 #endif
 
 static ssize_t _version_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
-                                void *context)
+                                coap_request_ctx_t *context)
 {
     (void)context;
     return coap_reply_simple(pkt, COAP_CODE_205, buf, len,
@@ -41,7 +41,7 @@ static ssize_t _version_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
 }
 
 static ssize_t _trigger_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
-                                void *context)
+                                coap_request_ctx_t *context)
 {
     (void)context;
     unsigned code;
@@ -66,12 +66,12 @@ static ssize_t _trigger_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
 
 #ifdef MODULE_RIOTBOOT_SLOT
 static ssize_t _slot_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
-                             void *context)
+                             coap_request_ctx_t *context)
 {
     /* context is passed either as NULL or 0x1 for /active or /inactive */
     char c = '0';
 
-    if (context) {
+    if (coap_request_ctx_get_context(context)) {
         c += riotboot_slot_other();
     }
     else {
