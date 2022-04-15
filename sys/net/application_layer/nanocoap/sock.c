@@ -357,7 +357,7 @@ int nanocoap_sock_get_blockwise(nanocoap_sock_t *sock, const char *path,
 
         if (res) {
             DEBUG("error fetching block %u: %d\n", num, res);
-            return -1;
+            return res;
         }
 
         num += 1;
