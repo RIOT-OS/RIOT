@@ -241,6 +241,11 @@ typedef struct {
 } coap_pkt_t;
 
 /**
+ * @brief   CoAP resource request handler context
+ */
+typedef struct _coap_request_ctx coap_request_ctx_t;
+
+/**
  * @brief   Resource handler type
  *
  * Functions that implement this must be prepared to be called multiple times
@@ -254,7 +259,8 @@ typedef struct {
  * For POST, PATCH and other non-idempotent methods, this is an additional
  * requirement introduced by the contract of this type.
  */
-typedef ssize_t (*coap_handler_t)(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context);
+typedef ssize_t (*coap_handler_t)(coap_pkt_t *pkt, uint8_t *buf, size_t len,
+                                  coap_request_ctx_t *context);
 
 /**
  * @brief   Coap blockwise request callback descriptor
@@ -306,6 +312,38 @@ typedef const struct {
     const coap_resource_t *resources;   /**< ptr to resource array  */
     const size_t resources_numof;       /**< number of entries in array */
 } coap_resource_subtree_t;
+
+/**
+ * @brief   CoAP resource request handler context
+ */
+struct _coap_request_ctx {
+    const coap_resource_t *resource;    /**< resource of the request        */
+    void *context;                      /**< request context                */
+};
+
+/**
+ * @brief   Get resource path associated with a CoAP request
+ *
+ * @param[in]   ctx The request context
+ *
+ * @return  Resource path of the request
+ */
+static inline const char *coap_request_get_path(const coap_request_ctx_t *ctx)
+{
+    return ctx->resource->path;
+}
+
+/**
+ * @brief   Get resource context associated with a CoAP request
+ *
+ * @param[in]   ctx The request context
+ *
+ * @return  Resource context of the request
+ */
+static inline void *coap_request_get_context(const coap_request_ctx_t *ctx)
+{
+    return ctx->context;
+}
 
 /**
  * @brief   Block1 helper struct
@@ -1953,7 +1991,7 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
  */
 extern ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, \
                                                     uint8_t *buf, size_t len,
-                                                    void *context);
+                                                    coap_request_ctx_t *context);
 /**@}*/
 
 /**
