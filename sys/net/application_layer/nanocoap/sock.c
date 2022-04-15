@@ -301,11 +301,10 @@ static int _block_cb(void *arg, coap_pkt_t *pkt)
     /* response was not block-wise */
     if (!coap_get_block2(pkt, &block2)) {
         block2.offset = 0;
-        ctx->more = false;
-    } else {
-        ctx->more = block2.more;
+        block2.more = false;
     }
 
+    ctx->more = block2.more;
     return ctx->callback(ctx->arg, block2.offset, pkt->payload, pkt->payload_len, block2.more);
 }
 
