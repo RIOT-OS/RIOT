@@ -120,11 +120,9 @@ static int _ram_finish(suit_storage_t *storage, const suit_manifest_t *manifest)
     return SUIT_OK;
 }
 
-static int _ram_install(suit_storage_t *storage,
-                        const suit_manifest_t *manifest)
+static int _ram_install(suit_storage_t *storage, const suit_manifest_t *manifest)
 {
-    (void)manifest;
-    (void)storage;
+    suit_storage_set_seq_no(storage, manifest->seq_number);
     return SUIT_OK;
 }
 
