@@ -40,6 +40,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     stk3200 \
     stm32f030f4-demo \
     stm32f0discovery \
+    stm32f7508-dk \
     stm32g0316-disco \
     stm32l0538-disco \
     stm32mp157c-dk2 \
