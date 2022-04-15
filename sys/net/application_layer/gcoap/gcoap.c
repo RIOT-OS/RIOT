@@ -63,7 +63,8 @@ static ssize_t _tl_send(gcoap_socket_t *sock, const void *data, size_t len,
                         const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux);
 static ssize_t _tl_authenticate(gcoap_socket_t *sock, const sock_udp_ep_t *remote,
                                 uint32_t timeout);
-static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
+static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len,
+                                        coap_request_ctx_t *ctx);
 static void _cease_retransmission(gcoap_request_memo_t *memo);
 static size_t _handle_req(gcoap_socket_t *sock, coap_pkt_t *pdu, uint8_t *buf,
                           size_t len, sock_udp_ep_t *remote);
@@ -688,13 +689,18 @@ static size_t _handle_req(gcoap_socket_t *sock, coap_pkt_t *pdu, uint8_t *buf,
     ssize_t pdu_len;
     char *offset;
 
+    coap_request_ctx_t ctx = {
+        .resource = resource,
+    };
+
     if (coap_get_proxy_uri(pdu, &offset) > 0) {
-        pdu_len = resource->handler(pdu, buf, len, remote);
+        ctx.context = remote;
     }
     else {
-        pdu_len = resource->handler(pdu, buf, len, resource->context);
+        ctx.context = resource->context;
     }
 
+    pdu_len = resource->handler(pdu, buf, len, &ctx);
     if (pdu_len < 0) {
         pdu_len = gcoap_response(pdu, buf, len,
                                  COAP_CODE_INTERNAL_SERVER_ERROR);
@@ -883,7 +889,7 @@ static void _expire_request(gcoap_request_memo_t *memo)
  * /.well-known/core itself.
  */
 static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len,
-                                        void *ctx)
+                                        coap_request_ctx_t *ctx)
 {
     (void)ctx;
 
