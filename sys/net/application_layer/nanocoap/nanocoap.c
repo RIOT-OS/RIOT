@@ -69,6 +69,7 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     pkt->payload = NULL;
     pkt->payload_len = 0;
     memset(pkt->opt_crit, 0, sizeof(pkt->opt_crit));
+    pkt->snips = NULL;
 
     if (len < sizeof(coap_hdr_t)) {
         DEBUG("msg too short\n");

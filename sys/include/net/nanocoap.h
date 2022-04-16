@@ -88,6 +88,7 @@
 #ifdef RIOT_VERSION
 #include "bitfield.h"
 #include "byteorder.h"
+#include "iolist.h"
 #include "net/coap.h"
 #else
 #include "coap.h"
@@ -200,6 +201,7 @@ typedef struct {
                                                        * @deprecated Use coap_get_token(),
                                                        *     Will be removed after 2022.10. */
     uint8_t *payload;                                 /**< pointer to payload      */
+    iolist_t *snips;                                  /**< payload snips (optional)*/
     uint16_t payload_len;                             /**< length of payload       */
     uint16_t options_len;                             /**< length of options array */
     coap_optpos_t options[CONFIG_NANOCOAP_NOPTS_MAX]; /**< option offset array     */
@@ -430,7 +432,9 @@ static inline unsigned coap_get_total_hdr_len(const coap_pkt_t *pkt)
 }
 
 /**
- * @brief   Get the total length of a CoAP packet
+ * @brief   Get the total length of a CoAP packet in the packet buffer
+ *
+ * @note This does not include possible payload snips.
  *
  * @param[in]   pkt   CoAP packet
  *

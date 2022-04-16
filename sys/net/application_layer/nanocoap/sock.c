@@ -121,15 +121,13 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                                  coap_request_cb_t cb, void *arg)
 {
     ssize_t tmp, res = 0;
-    const void *pdu = pkt->hdr;
-    const size_t pdu_len = coap_get_total_len(pkt);
     const unsigned id = coap_get_id(pkt);
     void *payload, *ctx = NULL;
     const uint8_t *token = coap_get_token(pkt);
     uint8_t token_len = coap_get_token_len(pkt);
+    uint8_t state = STATE_SEND_REQUEST;
 
-    unsigned state = STATE_SEND_REQUEST;
-
+    /* random timeout, deadline for receive retries */
     uint32_t timeout = random_uint32_range(CONFIG_COAP_ACK_TIMEOUT_MS * US_PER_MS,
                                            CONFIG_COAP_ACK_TIMEOUT_MS * CONFIG_COAP_RANDOM_FACTOR_1000);
     uint32_t deadline = _deadline_from_interval(timeout);
@@ -143,16 +141,24 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
     /* try receiving another packet without re-request */
     bool retry_rx = false;
 
+    iolist_t head = {
+        .iol_next = pkt->snips,
+        .iol_base = pkt->hdr,
+        .iol_len  = coap_get_total_len(pkt),
+    };
+
     while (1) {
         switch (state) {
         case STATE_SEND_REQUEST:
-            DEBUG("nanocoap: send %u bytes (%u tries left)\n", (unsigned)pdu_len, tries_left);
+            DEBUG("nanocoap: send %u bytes (%u tries left)\n",
+                  (unsigned)iolist_size(&head), tries_left);
+
             if (--tries_left == 0) {
                 DEBUG("nanocoap: maximum retries reached\n");
                 return -ETIMEDOUT;
             }
 
-            res = sock_udp_send(sock, pdu, pdu_len, NULL);
+            res = sock_udp_sendv(sock, &head, NULL);
             if (res <= 0) {
                 DEBUG("nanocoap: error sending coap request, %d\n", (int)res);
                 return res;
