@@ -482,7 +482,7 @@ static void _set_addr_width(mtd_dev_t *mtd)
     uint32_t flash_size = mtd->pages_per_sector * mtd->page_size
                         * mtd->sector_count;
 
-    if (flash_size > 0xFFFFFF) {
+    if (flash_size > (0x1UL << 24)) {
         dev->addr_width = 4;
     } else {
         dev->addr_width = 3;
