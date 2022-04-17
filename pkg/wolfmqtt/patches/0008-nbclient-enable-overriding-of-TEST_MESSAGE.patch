@@ -1,0 +1,36 @@
+From 39b7630154971939b5ddbb892b90b3ff94435588 Mon Sep 17 00:00:00 2001
+From: Hendrik van Essen <hendrik.ve@fu-berlin.de>
+Date: Fri, 5 Feb 2021 17:13:38 +0100
+Subject: [PATCH 08/10] nbclient: enable overriding of TEST_MESSAGE
+
+---
+ examples/nbclient/nbclient.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/examples/nbclient/nbclient.c b/examples/nbclient/nbclient.c
+index acf2012..9093c09 100644
+--- a/examples/nbclient/nbclient.c
++++ b/examples/nbclient/nbclient.c
+@@ -38,7 +38,10 @@ static int mStopRead = 0;
+ 
+ /* Maximum size for network read/write callbacks. */
+ #define MAX_BUFFER_SIZE 1024
++
++#ifndef TEST_MESSAGE
+ #define TEST_MESSAGE    "test"
++#endif
+ 
+ #ifdef WOLFMQTT_DISCONNECT_CB
+ /* callback indicates a network error occurred */
+@@ -526,7 +529,7 @@ exit:
+         /* init defaults */
+         mqtt_init_ctx(&mqttCtx);
+         mqttCtx.app_name = "nbclient";
+-        mqttCtx.message = DEFAULT_MESSAGE;
++        mqttCtx.message = TEST_MESSAGE;
+ 
+         /* parse arguments */
+         rc = mqtt_parse_args(&mqttCtx, argc, argv);
+-- 
+2.25.1
+

@@ -1,0 +1,25 @@
+From beb3ee89f565baf209b8646c37a1f13a059a2f3a Mon Sep 17 00:00:00 2001
+From: Hendrik van Essen <hendrik.ve@fu-berlin.de>
+Date: Thu, 16 Sep 2021 02:12:10 +0200
+Subject: [PATCH 03/10] WOLFMQTT_ENABLE_STDIN_CAP not supported on RIOT OS
+
+---
+ examples/mqttexample.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/examples/mqttexample.h b/examples/mqttexample.h
+index ea6fc5a..7e2ed14 100644
+--- a/examples/mqttexample.h
++++ b/examples/mqttexample.h
+@@ -41,7 +41,7 @@
+     /* For Linux/Mac */
+     #if !defined(FREERTOS) && !defined(USE_WINDOWS_API) && \
+         !defined(FREESCALE_MQX) && !defined(FREESCALE_KSDK_MQX) && \
+-        !defined(MICROCHIP_MPLAB_HARMONY)
++        !defined(MICROCHIP_MPLAB_HARMONY) && !defined(RIOT_OS)
+         /* Make sure its not explicitly disabled and not already defined */
+         #if !defined(WOLFMQTT_NO_STDIN_CAP) && \
+             !defined(WOLFMQTT_ENABLE_STDIN_CAP)
+-- 
+2.25.1
+

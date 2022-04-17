@@ -1,6 +1,6 @@
 PKG_NAME    = wolfmqtt
 PKG_URL     = https://github.com/wolfssl/wolfmqtt.git
-PKG_VERSION = 238a70ec96a7501853b81241352c5091a86e9251 # v1.7
+PKG_VERSION = v1.12.0
 PKG_LICENSE = GPLv2
 
 include $(RIOTBASE)/pkg/pkg.mk

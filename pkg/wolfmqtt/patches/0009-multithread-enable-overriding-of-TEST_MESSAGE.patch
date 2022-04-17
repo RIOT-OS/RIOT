@@ -1,0 +1,49 @@
+From e125fd277437e422983b01f20d06c1593c2f952a Mon Sep 17 00:00:00 2001
+From: Hendrik van Essen <hendrik.ve@fu-berlin.de>
+Date: Sat, 6 Feb 2021 00:01:55 +0100
+Subject: [PATCH 09/10] multithread: enable overriding of TEST_MESSAGE
+
+---
+ examples/multithread/multithread.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/examples/multithread/multithread.c b/examples/multithread/multithread.c
+index 1fa1b9a..1b66835 100755
+--- a/examples/multithread/multithread.c
++++ b/examples/multithread/multithread.c
+@@ -38,7 +38,11 @@
+ /* Maximum size for network read/write callbacks. There is also a v5 define that
+    describes the max MQTT control packet size, DEFAULT_MAX_PKT_SZ. */
+ #define MAX_BUFFER_SIZE 1024
+-#define TEST_MESSAGE    "test00"
++
++#ifndef TEST_MESSAGE
++#define TEST_MESSAGE    "(  ) test"
++#endif
++
+ /* Number of publish tasks. Each will send a unique message to the broker. */
+ #define NUM_PUB_TASKS   10
+ 
+@@ -567,7 +571,7 @@ static void *publish_task(void *param)
+ #endif
+ {
+     int rc;
+-    char buf[7];
++    char buf[50];
+     MQTTCtx *mqttCtx = (MQTTCtx*)param;
+     MqttPublish publish;
+     word32 startSec = 0;
+@@ -580,8 +584,8 @@ static void *publish_task(void *param)
+     publish.topic_name = mqttCtx->topic_name;
+     publish.packet_id = mqtt_get_packetid_threadsafe();
+     XSTRNCPY(buf, TEST_MESSAGE, sizeof(buf));
+-    buf[4] = '0' + ((publish.packet_id / 10) % 10);
+-    buf[5] = '0' + (publish.packet_id % 10);
++    buf[1] = '0' + ((publish.packet_id / 10) % 10);
++    buf[2] = '0' + (publish.packet_id % 10);
+     publish.buffer = (byte*)buf;
+     publish.total_len = (word16)XSTRLEN(buf);
+ 
+-- 
+2.25.1
+

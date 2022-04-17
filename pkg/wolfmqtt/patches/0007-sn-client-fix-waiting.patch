@@ -1,0 +1,35 @@
+From e767ac75245f5fb273e2a1e48e66349a9b130b43 Mon Sep 17 00:00:00 2001
+From: Hendrik van Essen <hendrik.ve@fu-berlin.de>
+Date: Sun, 17 Apr 2022 18:34:57 +0200
+Subject: [PATCH 07/10] sn-client: fix waiting
+
+---
+ examples/sn-client/sn-client.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/examples/sn-client/sn-client.c b/examples/sn-client/sn-client.c
+index 5ec6c30..70c0ea0 100644
+--- a/examples/sn-client/sn-client.c
++++ b/examples/sn-client/sn-client.c
+@@ -485,10 +485,16 @@ int sn_test(MQTTCtx *mqttCtx)
+ #endif
+ 
+     /* Read Loop */
+-    PRINTF("MQTT Waiting for message...");
+-
+     do {
++        /* check for test mode */
++        if (mStopRead) {
++            rc = MQTT_CODE_SUCCESS;
++            PRINTF("MQTT Exiting...");
++            break;
++        }
++
+         /* Try and read packet */
++        PRINTF("MQTT Waiting for message...");
+         rc = SN_Client_WaitMessage(&mqttCtx->client,
+                                    mqttCtx->cmd_timeout_ms);
+ 
+-- 
+2.25.1
+

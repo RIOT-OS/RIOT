@@ -1,0 +1,35 @@
+From 3e31f2fe4af088ddfe8c147f2ce443d41e8105db Mon Sep 17 00:00:00 2001
+From: Hendrik van Essen <hendrik.ve@fu-berlin.de>
+Date: Sun, 17 Apr 2022 18:16:48 +0200
+Subject: [PATCH 06/10] sn-client: fix LoadProhibitedCause
+
+---
+ examples/sn-client/sn-client.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/examples/sn-client/sn-client.c b/examples/sn-client/sn-client.c
+index d7c8f68..5ec6c30 100644
+--- a/examples/sn-client/sn-client.c
++++ b/examples/sn-client/sn-client.c
+@@ -64,14 +64,10 @@ static int sn_message_cb(MqttClient *client, MqttMessage *msg,
+         PRINTF("MQTT-SN Message: Topic ID %d, Qos %d, Id %d, Len %u",
+                 topicId, msg->qos, msg->packet_id, msg->total_len);
+ 
+-        /* for test mode: check if TEST_MESSAGE was received */
+-        if (mqttCtx->test_mode) {
+-            if (XSTRLEN(TEST_MESSAGE) == msg->buffer_len &&
+-                XSTRNCMP(TEST_MESSAGE, (char*)msg->buffer,
+-                         msg->buffer_len) == 0)
+-            {
+-                mStopRead = 1;
+-            }
++        if (XSTRLEN(TEST_MESSAGE) == msg->buffer_len &&
++            XSTRNCMP(TEST_MESSAGE, (char*)msg->buffer, msg->buffer_len) == 0)
++        {
++            mStopRead = 1;
+         }
+     }
+ 
+-- 
+2.25.1
+

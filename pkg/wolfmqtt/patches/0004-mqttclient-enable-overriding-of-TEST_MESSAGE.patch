@@ -1,0 +1,50 @@
+From 31f77ea1b9271aadd0315afd303aa773e973a0ee Mon Sep 17 00:00:00 2001
+From: Hendrik van Essen <hendrik.ve@fu-berlin.de>
+Date: Thu, 21 Jan 2021 20:32:55 +0100
+Subject: [PATCH 04/10] mqttclient: enable overriding of TEST_MESSAGE
+
+---
+ examples/mqttclient/mqttclient.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/examples/mqttclient/mqttclient.c b/examples/mqttclient/mqttclient.c
+index 871b7a8..ddac8d6 100644
+--- a/examples/mqttclient/mqttclient.c
++++ b/examples/mqttclient/mqttclient.c
+@@ -38,6 +38,10 @@ static int mStopRead = 0;
+    describes the max MQTT control packet size, DEFAULT_MAX_PKT_SZ. */
+ #define MAX_BUFFER_SIZE 1024
+ 
++#ifndef TEST_MESSAGE
++#define TEST_MESSAGE    "test"
++#endif
++
+ #ifdef WOLFMQTT_PROPERTY_CB
+ #define MAX_CLIENT_ID_LEN 64
+ char gClientId[MAX_CLIENT_ID_LEN] = {0};
+@@ -77,10 +81,10 @@ static int mqtt_message_cb(MqttClient *client, MqttMessage *msg,
+         PRINTF("MQTT Message: Topic %s, Qos %d, Len %u",
+             buf, msg->qos, msg->total_len);
+ 
+-        /* for test mode: check if DEFAULT_MESSAGE was received */
++        /* for test mode: check if TEST_MESSAGE was received */
+         if (mqttCtx->test_mode) {
+-            if (XSTRLEN(DEFAULT_MESSAGE) == msg->buffer_len &&
+-                XSTRNCMP(DEFAULT_MESSAGE, (char*)msg->buffer,
++            if (XSTRLEN(TEST_MESSAGE) == msg->buffer_len &&
++                XSTRNCMP(TEST_MESSAGE, (char*)msg->buffer,
+                          msg->buffer_len) == 0)
+             {
+                 mStopRead = 1;
+@@ -708,7 +712,7 @@ int main(int argc, char** argv)
+     /* init defaults */
+     mqtt_init_ctx(&mqttCtx);
+     mqttCtx.app_name = "mqttclient";
+-    mqttCtx.message = DEFAULT_MESSAGE;
++    mqttCtx.message = TEST_MESSAGE;
+ 
+     /* parse arguments */
+     rc = mqtt_parse_args(&mqttCtx, argc, argv);
+-- 
+2.25.1
+
