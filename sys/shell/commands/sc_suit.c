@@ -23,15 +23,33 @@
 #include <inttypes.h>
 
 #include "suit/transport/coap.h"
+#include "suit/storage.h"
+
+static void _print_usage(char **argv)
+{
+    printf("Usage: %s fetch <manifest url>\n", argv[0]);
+    printf("       %s seq_no\n", argv[0]);
+}
 
 int _suit_handler(int argc, char **argv)
 {
-    if (argc != 2) {
-        printf("Usage: %s <manifest url>\n", argv[0]);
+    if (argc < 2) {
+        _print_usage(argv);
         return 1;
     }
 
-    suit_coap_trigger((uint8_t *)argv[1], strlen(argv[1]));
+    if (strcmp(argv[1], "fetch") == 0) {
+        suit_coap_trigger((uint8_t *)argv[2], strlen(argv[2]));
+    }
+    else if (strcmp(argv[1], "seq_no") == 0) {
+        uint32_t seq_no = 0;
+        suit_storage_get_highest_seq_no(&seq_no);
+        printf("seq_no: %" PRIu32 "\n", seq_no);
+    }
+    else {
+        _print_usage(argv);
+        return -1;
+    }
 
     return 0;
 }
