@@ -173,6 +173,17 @@ int nanocoap_sock_connect(nanocoap_sock_t *sock, sock_udp_ep_t *local,
                           sock_udp_ep_t *remote);
 
 /**
+ * @brief   Create a CoAP client socket by URL
+ *
+ * @param[in]   url     URL with server information to connect to
+ * @param[out]  sock    CoAP UDP socket
+ *
+ * @returns     0 on success
+ * @returns     <0 on error
+ */
+int nanocoap_sock_url_connect(const char *url, nanocoap_sock_t *sock);
+
+/**
  * @brief   Close a CoAP client socket
  *
  * @param[in]  sock     CoAP UDP socket

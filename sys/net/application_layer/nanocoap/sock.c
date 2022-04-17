@@ -360,22 +360,17 @@ int nanocoap_sock_get_blockwise(nanocoap_sock_t *sock, const char *path,
     return 0;
 }
 
-int nanocoap_get_blockwise_url(const char *url,
-                               coap_blksize_t blksize,
-                               coap_blockwise_cb_t callback, void *arg)
+int nanocoap_sock_url_connect(const char *url, nanocoap_sock_t *sock)
 {
     char hostport[CONFIG_SOCK_HOSTPORT_MAXLEN];
-    char urlpath[CONFIG_SOCK_URLPATH_MAXLEN];
     sock_udp_ep_t remote;
-    nanocoap_sock_t sock;
-    int res;
 
     if (strncmp(url, "coap://", 7)) {
         DEBUG("nanocoap: URL doesn't start with \"coap://\"\n");
         return -EINVAL;
     }
 
-    if (sock_urlsplit(url, hostport, urlpath) < 0) {
+    if (sock_urlsplit(url, hostport, NULL) < 0) {
         DEBUG("nanocoap: invalid URL\n");
         return -EINVAL;
     }
@@ -385,12 +380,20 @@ int nanocoap_get_blockwise_url(const char *url,
         return -EINVAL;
     }
 
-    res = nanocoap_sock_connect(&sock, NULL, &remote);
+    return nanocoap_sock_connect(sock, NULL, &remote);
+}
+
+int nanocoap_get_blockwise_url(const char *url,
+                               coap_blksize_t blksize,
+                               coap_blockwise_cb_t callback, void *arg)
+{
+    nanocoap_sock_t sock;
+    int res = nanocoap_sock_url_connect(url, &sock);
     if (res) {
         return res;
     }
 
-    res = nanocoap_sock_get_blockwise(&sock, urlpath, blksize, callback, arg);
+    res = nanocoap_sock_get_blockwise(&sock, sock_urlpath(url), blksize, callback, arg);
     nanocoap_sock_close(&sock);
 
     return res;
