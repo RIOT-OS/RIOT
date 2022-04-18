@@ -153,4 +153,4 @@ Dealing with this,
 and other aspects of maintenance of the crates,
 is described in [the `rust_minimal` test's README].
 
-[the `rust_minimal` test's README]: (https://github.com/RIOT-OS/RIOT/blob/master/tests/rust_minimal/README.md).
+[the `rust_minimal` test's README]: https://github.com/RIOT-OS/RIOT/blob/master/tests/rust_minimal/README.md
