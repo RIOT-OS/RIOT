@@ -63,13 +63,12 @@ int flashpage_write_and_verify(unsigned page, const void *data)
 void flashpage_write_page(unsigned page, const void *data)
 {
     assert((unsigned) page < FLASHPAGE_NUMOF);
+    assert(data != NULL);
 
     flashpage_erase(page);
 
     /* write page */
-    if (data != NULL) {
-        flashpage_write(flashpage_addr(page), data, FLASHPAGE_SIZE);
-    }
+    flashpage_write(flashpage_addr(page), data, FLASHPAGE_SIZE);
 }
 #endif
 
