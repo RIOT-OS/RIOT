@@ -88,10 +88,10 @@ static int _print_dir(const char *url, char *buf, size_t len)
                                       _print_dir_cb, &ctx);
 }
 
-int _nanocoap_get_handler(int argc, char **argv)
+static int _nanocoap_get_handler(int argc, char **argv)
 {
     int res;
-    char buffer[CONFIG_NANOCOAP_QS_MAX];
+    char buffer[CONFIG_NANOCOAP_URI_MAX];
     char *dst, *url = argv[1];
 
     if (argc < 2) {
@@ -139,4 +139,43 @@ int _nanocoap_get_handler(int argc, char **argv)
     return res;
 }
 
+static int _nanocoap_put_handler(int argc, char **argv)
+{
+    int res;
+    char *file, *url;
+    char buffer[CONFIG_NANOCOAP_URI_MAX];
+    char work_buf[coap_szx2size(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT) + 1];
+
+    if (argc < 3) {
+        printf("Usage: %s <file> <url>\n", argv[0]);
+        return -EINVAL;
+    }
+
+    file = argv[1];
+    url = argv[2];
+
+    if (_is_dir(url)) {
+        const char *basename = strrchr(file, '/');
+        if (basename == NULL) {
+            return -EINVAL;
+        }
+        if (snprintf(buffer, sizeof(buffer), "%s%s",
+                     url, basename + 1) >= (int)sizeof(buffer)) {
+            puts("Constructed URI too long");
+            return -ENOBUFS;
+        }
+        url = buffer;
+    }
+
+    res = nanocoap_vfs_put_url(url, file, work_buf, sizeof(work_buf));
+    if (res < 0) {
+        printf("Upload failed: %s\n", strerror(-res));
+    }
+    else {
+        printf("Saved to %s\n", url);
+    }
+    return res;
+}
+
 SHELL_COMMAND(ncget, "download a file from a CoAP server", _nanocoap_get_handler);
+SHELL_COMMAND(ncput, "upload a file to a CoAP server", _nanocoap_put_handler);
