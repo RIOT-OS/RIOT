@@ -31,6 +31,15 @@
 
 #define MTD_FLASHPAGE_END_ADDR     ((uint32_t) CPU_FLASH_BASE + (FLASHPAGE_NUMOF * FLASHPAGE_SIZE))
 
+/* The MTD driver operates on an address space of 0 to N. However, the */
+/* flashpage driver operates on an address space of CPU_FLASH_BASE to */
+/* MTD_FLASHPAGE_END_ADDR. This function takes a MTD address and returns a */
+/* flashpage address. */
+static uword_t _mtd_to_flashpage_addr(uint32_t addr)
+{
+    return addr + CPU_FLASH_BASE;
+}
+
 static int _init(mtd_dev_t *dev)
 {
     (void)dev;
@@ -40,6 +49,8 @@ static int _init(mtd_dev_t *dev)
 
 static int _read(mtd_dev_t *dev, void *buf, uint32_t addr, uint32_t size)
 {
+    addr = _mtd_to_flashpage_addr(addr);
+
     assert(addr < MTD_FLASHPAGE_END_ADDR);
 
     (void)dev;
@@ -50,14 +61,15 @@ static int _read(mtd_dev_t *dev, void *buf, uint32_t addr, uint32_t size)
     }
 #endif
 
-    uword_t dst_addr = addr;
-    memcpy(buf, (void *)dst_addr, size);
+    memcpy(buf, (void *)addr, size);
 
     return 0;
 }
 
 static int _write(mtd_dev_t *dev, const void *buf, uint32_t addr, uint32_t size)
 {
+    addr = _mtd_to_flashpage_addr(addr);
+
     (void)dev;
 
 #ifndef CPU_HAS_UNALIGNED_ACCESS
@@ -75,14 +87,14 @@ static int _write(mtd_dev_t *dev, const void *buf, uint32_t addr, uint32_t size)
         return -EOVERFLOW;
     }
 
-    uword_t dst_addr = addr;
-    flashpage_write((void *)dst_addr, buf, size);
+    flashpage_write((void *)addr, buf, size);
 
     return 0;
 }
 
 int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
 {
+    addr = _mtd_to_flashpage_addr(addr);
     size_t sector_size = dev->page_size * dev->pages_per_sector;
 
     if (size % sector_size) {
@@ -95,10 +107,8 @@ int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
         return -EOVERFLOW;
     }
 
-    uword_t dst_addr = addr;
-
     for (size_t i = 0; i < size; i += sector_size) {
-        flashpage_erase(flashpage_page((void *)(dst_addr + i)));
+        flashpage_erase(flashpage_page((void *)(addr + i)));
     }
 
     return 0;
