@@ -186,7 +186,7 @@ def _test_successful_update(child, client, app_ver):
 
 def _test_suit_command_is_there(child):
     child.sendline('suit')
-    child.expect_exact("Usage: suit <manifest url>")
+    child.expect_exact("Usage: suit fetch <manifest url>")
 
 
 def testfunc(child):
