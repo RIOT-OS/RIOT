@@ -1,7 +1,7 @@
-From d44bf05a74b6782e020dd0deff3b81cf96bc447f Mon Sep 17 00:00:00 2001
+From 398c8d928fd3eb0d578920cd31adcd07552ebb23 Mon Sep 17 00:00:00 2001
 From: Francisco Molina <femolina@uc.cl>
 Date: Fri, 8 Apr 2022 17:31:10 +0200
-Subject: [PATCH 2/2] src: include RIOT headers
+Subject: [PATCH 2/4] src: include RIOT headers
 
 ---
  include/csp/arch/csp_queue.h | 3 ++-

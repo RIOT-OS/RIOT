@@ -13,6 +13,11 @@ ifneq (,$(filter libcsp_drivers_can,$(USEMODULE)))
   DIRS += $(RIOTPKG)/libcsp/drivers/can
 endif
 
+ifneq (,$(filter libcsp_sock_udp,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBASE)/pkg/libcsp/sock
+  DIRS += $(RIOTPKG)/libcsp/sock
+endif
+
 ifneq (,$(filter auto_init_csp,$(USEMODULE)))
   DIRS += $(RIOTPKG)/libcsp/init
 endif

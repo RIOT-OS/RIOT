@@ -1,7 +1,7 @@
-From 7fee4b2dd84bca533754a1d441dbbe487891e303 Mon Sep 17 00:00:00 2001
+From ff915f077eb1eeab7a43e9be3ff82b78b6cf1b55 Mon Sep 17 00:00:00 2001
 From: Francisco Molina <femolina@uc.cl>
 Date: Tue, 19 Apr 2022 17:17:07 +0200
-Subject: [PATCH 1/2] src/csp_buffer: buffer/skbuf statically defined data size
+Subject: [PATCH 1/4] src/csp_buffer: buffer/skbuf statically defined data size
 
 ---
  include/csp/csp_types.h | 11 ++---------

@@ -28,3 +28,11 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
   DEFAULT_MODULE += libcsp_shell
   DEFAULT_MODULE += libcsp_shell_server
 endif
+
+ifneq (,$(filter sock_udp,$(USEMODULE)))
+  USEMODULE += ipv6
+  USEMODULE += ipv6_addr
+  USEMODULE += netif
+  USEMODULE += libcsp_sock_udp
+  USEMODULE += sock_async
+endif

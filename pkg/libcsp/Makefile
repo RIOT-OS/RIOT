@@ -12,6 +12,7 @@ IGNORE_MODULES := libcsp_contrib \
                   libcsp_drivers_can \
                   libcsp_shell \
                   libcsp_shell_server \
+                  libcsp_sock_udp \
                   #
 
 LIBCSP_MODULES := $(filter-out $(IGNORE_MODULES),$(filter libcsp_%,$(USEMODULE)))
