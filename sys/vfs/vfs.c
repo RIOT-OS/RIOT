@@ -748,25 +748,40 @@ int vfs_stat(const char *restrict path, struct stat *restrict buf)
     if (path == NULL || buf == NULL) {
         return -EINVAL;
     }
+    memset(buf, 0, sizeof(*buf));
+
     const char *rel_path;
     vfs_mount_t *mountp;
-    int res;
-    res = _find_mount(&mountp, path, &rel_path);
+    int res = _find_mount(&mountp, path, &rel_path);
     /* _find_mount implicitly increments the open_files count on success */
     if (res < 0) {
         /* No mount point maps to the requested file name */
         DEBUG("vfs_stat: no matching mount\n");
         return res;
     }
-    if ((mountp->fs->fs_op == NULL) || (mountp->fs->fs_op->stat == NULL)) {
+    if (mountp->fs->fs_op == NULL) {
+        res = -EPERM;
+        goto out;
+    }
+    if (mountp->fs->fs_op->stat == NULL) {
         /* stat not supported */
         DEBUG("vfs_stat: stat not supported by fs!\n");
-        /* remember to decrement the open_files count */
-        atomic_fetch_sub(&mountp->open_files, 1);
-        return -EPERM;
+        if (mountp->fs->f_op->fstat) {
+            res = -EPERM;
+            goto out;
+        }
+        /* emulate stat with fstat */
+        int fd = vfs_open(path, O_RDONLY, 0);
+        if (fd < 0) {
+            res = fd;
+            goto out;
+        }
+        res = vfs_fstat(fd, buf);
+        vfs_close(fd);
+        goto out;
     }
-    memset(buf, 0, sizeof(*buf));
     res = mountp->fs->fs_op->stat(mountp, rel_path, buf);
+out:
     /* remember to decrement the open_files count */
     atomic_fetch_sub(&mountp->open_files, 1);
     return res;
