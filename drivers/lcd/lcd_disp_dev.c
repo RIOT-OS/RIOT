@@ -27,11 +27,10 @@
 #define LCD_DISP_COLOR_DEPTH    (16U)
 #endif
 
-static void _lcd_map(const disp_dev_t *dev, uint16_t x1, uint16_t x2,
-                  uint16_t y1, uint16_t y2, const uint16_t *color)
+static void _lcd_map(const disp_dev_t *dev, const disp_dev_area_t *area, const uint16_t *color)
 {
     lcd_t *lcd = (lcd_t *)dev;
-    lcd_pixmap(lcd, x1, x2, y1, y2, color);
+    lcd_pixmap(lcd, area->x1, area->x2, area->y1, area->y2, color);
 }
 
 static uint16_t _lcd_height(const disp_dev_t *disp_dev)

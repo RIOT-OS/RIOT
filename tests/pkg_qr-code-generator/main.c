@@ -79,8 +79,12 @@ int main(void)
     const uint8_t h_offset = (disp_dev_height(disp_dev->dev) - (size * scale)) / 2;
 
     /* Clear the screen */
+    disp_dev_area_t area;
     for (uint16_t y = 0; y < disp_dev_height(disp_dev->dev); y ++) {
-        disp_dev_map(disp_dev->dev, 0, disp_dev_width(disp_dev->dev) - 1, y, y, display_buffer);
+        area.x1 = 0;
+        area.x2 = disp_dev_width(disp_dev->dev) - 1;
+        area.y1 = area.y2 = y;
+        disp_dev_map(disp_dev->dev, &area, display_buffer);
     }
 
     /* Prepare a subset of the display buffer for white tiles */
@@ -95,10 +99,11 @@ int main(void)
         for (int x = 0; x < size; x++) {
 #ifdef MODULE_DISP_DEV
             if (qrcodegen_getModule(qr0, x, y)) {
-                disp_dev_map(disp_dev->dev,
-                             w_offset + (x * scale), w_offset + ((x + 1)* scale) - 1,
-                             h_offset + (y * scale), h_offset + ((y + 1)* scale) - 1,
-                             display_buffer);
+                area.x1 = w_offset + (x * scale);
+                area.x2 = w_offset + ((x + 1)* scale) - 1;
+                area.y1 = h_offset + (y * scale);
+                area.y2 = h_offset + ((y + 1)* scale) - 1;
+                disp_dev_map(disp_dev->dev, &area, display_buffer);
             }
 #endif
             printf("%s", qrcodegen_getModule(qr0, x, y) ? "██" : "  ");

@@ -43,6 +43,16 @@ extern "C" {
 typedef struct disp_dev disp_dev_t;
 
 /**
+ * @brief   Display area coordinates
+ */
+typedef struct {
+    uint16_t x1;                    /**< Horizontal start position (included) */
+    uint16_t x2;                    /**< Horizontal end position (included) */
+    uint16_t y1;                    /**< Vertical start position (included) */
+    uint16_t y2;                    /**< Vertical end position (included) */
+} disp_dev_area_t;
+
+/**
  * @brief   Generic type for a display driver
  */
 typedef struct {
@@ -50,14 +60,11 @@ typedef struct {
      * @brief   Map an area to display on the device
      *
      * @param[in] dev   Pointer to the display device
-     * @param[in] x1    Left coordinate
-     * @param[in] x2    Right coordinate
-     * @param[in] y1    Top coordinate
-     * @param[in] y2    Bottom coordinate
+     * @param[in] area  Coordinates of display area
      * @param[in] color Array of color to map to the display
      */
     void (*map)(const disp_dev_t *dev,
-                uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2,
+                const disp_dev_area_t *area,
                 const uint16_t *color);
 
     /**
@@ -139,14 +146,11 @@ disp_dev_reg_t *disp_dev_reg_find_screen(uint8_t screen_id);
  * @brief   Map an area to display on the device
  *
  * @param[in] dev   Pointer to the display device
- * @param[in] x1    Left coordinate
- * @param[in] x2    Right coordinate
- * @param[in] y1    Top coordinate
- * @param[in] y2    Bottom coordinate
+ * @param[in] area  Coordinates of display area
  * @param[in] color Array of color to map to the display
  */
 void disp_dev_map(const disp_dev_t *dev,
-                  uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2,
+                  const disp_dev_area_t *area,
                   const uint16_t *color);
 
 /**
