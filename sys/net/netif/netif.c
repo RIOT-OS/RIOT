@@ -36,6 +36,21 @@ int netif_register(netif_t *netif)
     return 0;
 }
 
+int netif_unregister(netif_t *netif)
+{
+    void *found;
+
+    if (netif == NULL) {
+        return -EINVAL;
+    }
+
+    unsigned state = irq_disable();
+    found = list_remove(&netif_list, &netif->node);
+    irq_restore(state);
+
+    return found ? 0 : -EINVAL;
+}
+
 netif_t *netif_iter(const netif_t *last)
 {
     if (last == NULL) {

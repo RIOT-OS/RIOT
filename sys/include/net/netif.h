@@ -200,6 +200,17 @@ int netif_set_opt(netif_t *netif, netopt_t opt, uint16_t context,
  */
 int netif_register(netif_t *netif);
 
+/**
+ * @brief   Removes a network interface in the global interface list.
+ *
+ * @param[in] netif     Interface to be removed
+ *
+ * @return  0 on success
+ * @return  -EINVAL if @p netif is NULL
+ *                  or not part of the global interface list
+ */
+int netif_unregister(netif_t *netif);
+
 #ifdef __cplusplus
 }
 #endif
