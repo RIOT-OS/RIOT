@@ -25,8 +25,8 @@ extern "C" {
  * @name    cst816s timing constants
  * @{
  */
-#define CST816S_RESET_DURATION_LOW      (20 * US_PER_MS)
-#define CST816S_RESET_DURATION_HIGH     (400 * US_PER_MS)
+#define CST816S_RESET_DURATION_LOW_MS       (20)    /**< Duration of reset pin low (in ms) */
+#define CST816S_RESET_DURATION_HIGH_MS      (400)   /**< Duration of reset pin high (in ms) */
 /** @} */
 
 #ifdef __cplusplus

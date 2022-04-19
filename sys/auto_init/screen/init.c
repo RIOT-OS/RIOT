@@ -41,6 +41,10 @@ void auto_init_screen(void)
 
     if (IS_USED(MODULE_TOUCH_DEV)) {
         DEBUG("auto_init_screen: init touch drivers\n");
+        if (IS_USED(MODULE_CST816S)) {
+            extern void auto_init_cst816s(void);
+            auto_init_cst816s();
+        }
         if (IS_USED(MODULE_STMPE811)) {
             extern void auto_init_stmpe811(void);
             auto_init_stmpe811();

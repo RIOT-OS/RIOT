@@ -75,6 +75,21 @@ static const cst816s_params_t cst816s_params[] =
  */
 #define CST816S_NUMOF    ARRAY_SIZE(cst816s_params)
 
+/**
+ * @brief   Default screen identifiers
+ */
+#ifndef CST816S_PARAM_SCREEN_IDS
+#define CST816S_PARAM_SCREEN_IDS       0
+#endif
+
+/**
+ * @brief   Configure screen identifiers
+ */
+static const uint8_t cst816s_screen_ids[] =
+{
+    CST816S_PARAM_SCREEN_IDS,
+};
+
 #ifdef __cplusplus
 }
 #endif
