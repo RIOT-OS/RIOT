@@ -232,6 +232,30 @@ static void test_sock_tl_name2ep__name_only(void)
     TEST_ASSERT(ipv6_addr_equal(&a, (ipv6_addr_t *)&ep.addr.ipv6));
 }
 
+static void test_sock_tl_name2ep__ip_if_port_single_netif(void)
+{
+    static const ipv6_addr_t a = { {
+            0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
+        }
+    };
+    struct _sock_tl_ep ep;
+
+    /* we want to test default netif assignment with a single interface */
+    for (unsigned i = 0; i < ARRAY_SIZE(dummy_netif) - 1; --i) {
+        netif_unregister(&dummy_netif[0].netif);
+    }
+
+    int res = sock_tl_name2ep(&ep, "[fe80::f8f9:fafb:fcfd:feff]:1234");
+    TEST_ASSERT_EQUAL_INT(res, 0);
+    TEST_ASSERT_EQUAL_INT(AF_INET6, ep.family);
+    TEST_ASSERT_EQUAL_INT(1234, ep.port);
+    TEST_ASSERT_EQUAL_INT(1, ep.netif);
+    TEST_ASSERT(ipv6_addr_equal(&a, (ipv6_addr_t *)&ep.addr.ipv6));
+
+    netif_register(&dummy_netif[0].netif);
+}
+
 Test *tests_netutils_ipv6_tests(void)
 {
     for (unsigned i = 0; i < ARRAY_SIZE(dummy_netif); ++i) {
@@ -253,6 +277,7 @@ Test *tests_netutils_ipv6_tests(void)
         new_TestFixture(test_sock_tl_name2ep__ip_if_port),
         new_TestFixture(test_sock_tl_name2ep__name_port),
         new_TestFixture(test_sock_tl_name2ep__name_only),
+        new_TestFixture(test_sock_tl_name2ep__ip_if_port_single_netif),
     };
 
     EMB_UNIT_TESTCALLER(ipv6_addr_tests, NULL, NULL, fixtures);
