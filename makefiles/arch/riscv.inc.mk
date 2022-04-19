@@ -33,6 +33,10 @@ TARGET_ARCH_RISCV ?= \
 
 TARGET_ARCH ?= $(TARGET_ARCH_RISCV)
 
+ifeq (,$(TARGET_ARCH))
+  $(error No RISC-V toolchain detected. Make sure a RISC-V toolchain is installed.)
+endif
+
 ifeq ($(TOOLCHAIN),gnu)
   NEW_RISCV_ISA := $(shell echo "" | $(TARGET_ARCH)-as -march=rv32imac_zicsr -mabi=ilp32 - > /dev/null 2>&1 && echo 1 || echo 0)
 endif
