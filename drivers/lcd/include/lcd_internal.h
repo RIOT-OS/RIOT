@@ -68,30 +68,6 @@ extern "C" {
 #define LCD_CMD_IFCTL           0xf6    /**< Interface control */
 /** @} */
 
-/**
- * @name Memory access control bits
- * @{
- */
-#define LCD_MADCTL_MY           0x80    /**< Row address order */
-#define LCD_MADCTL_MX           0x40    /**< Column access order */
-#define LCD_MADCTL_MV           0x20    /**< Row column exchange */
-#define LCD_MADCTL_ML           0x10    /**< Vertical refresh order */
-#define LCD_MADCTL_BGR          0x08    /**< Color selector switch control */
-#define LCD_MADCTL_MH           0x04    /**< Horizontal refresh direction */
-/** @} */
-
-/**
- * @name Display rotation modes
- * @{
- */
-#define LCD_MADCTL_VERT         LCD_MADCTL_MX       /**< Vertical mode */
-#define LCD_MADCTL_VERT_FLIP    LCD_MADCTL_MY       /**< Flipped vertical */
-#define LCD_MADCTL_HORZ         LCD_MADCTL_MV       /**< Horizontal mode */
-#define LCD_MADCTL_HORZ_FLIP    LCD_MADCTL_MV | \
-                                LCD_MADCTL_MY | \
-                                LCD_MADCTL_MX       /**< Horizontal flipped */
-/** @} */
-
 #define LCD_PIXSET_16BIT        0x55    /**< MCU and RGB 16 bit interface */
 #define LCD_PIXSET_18BIT        0x66    /**< MCU and RGB 18 bit interface (not implemented) */
 

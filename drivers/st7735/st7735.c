@@ -192,14 +192,12 @@ static int _init(lcd_t *dev, const lcd_params_t *params)
 static void _set_area(const lcd_t *dev, uint16_t x1, uint16_t x2,
                       uint16_t y1, uint16_t y2)
 {
-    st7735_params_t *st7735_params = (st7735_params_t *)dev->params;
-
     be_uint16_t params[2];
 
-    x1 += st7735_params->offset_x;
-    x2 += st7735_params->offset_x;
-    y1 += st7735_params->offset_y;
-    y2 += st7735_params->offset_y;
+    x1 += dev->params->offset_x;
+    x2 += dev->params->offset_x;
+    y1 += dev->params->offset_y;
+    y2 += dev->params->offset_y;
 
     params[0] = byteorder_htons(x1);
     params[1] = byteorder_htons(x2);

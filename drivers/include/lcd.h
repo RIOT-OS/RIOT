@@ -107,6 +107,8 @@ typedef  struct {
     uint16_t lines;             /**< Number of lines, from 16 to 320 in 8 line steps */
     uint16_t rgb_channels;      /**< Display rgb channels */
     lcd_rotation_t rotation;    /**< Display rotation mode */
+    uint8_t offset_x;           /**< LCD offset to apply on x axis. */
+    uint8_t offset_y;           /**< LCD offset to apply on y axis. */
 } lcd_params_t;
 
 /**
