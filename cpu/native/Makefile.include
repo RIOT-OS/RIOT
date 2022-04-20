@@ -6,7 +6,10 @@ ifeq ($(BUILDOSXNATIVE),1)
 endif
 
 ifneq (,$(filter periph_can,$(USEMODULE)))
-  LINKFLAGS += -lsocketcan
+  ifeq (,$(filter libsocketcan,$(USEPKG)))
+    # link system libsocketcan if not using the provided package
+    LINKFLAGS += -lsocketcan
+  endif
 endif
 
 TOOLCHAINS_SUPPORTED = gnu llvm afl

@@ -1,0 +1,9 @@
+MODULE=libsocketcan
+
+CFLAGS += -Wno-strict-prototypes
+CFLAGS += -Wno-pointer-arith
+CFLAGS += -Wno-old-style-definition
+
+SRC += libsocketcan.c
+
+include $(RIOTBASE)/Makefile.base
