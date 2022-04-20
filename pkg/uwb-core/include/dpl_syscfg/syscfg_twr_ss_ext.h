@@ -43,7 +43,7 @@ extern "C" {
  * @brief tx holdoff delay for SS EXT TWR (usec)
  */
 #ifndef MYNEWT_VAL_TWR_SS_EXT_TX_HOLDOFF
-#define MYNEWT_VAL_TWR_SS_EXT_TX_HOLDOFF (((uint32_t)0x0400))
+#define MYNEWT_VAL_TWR_SS_EXT_TX_HOLDOFF (((uint32_t)0x0400 + 0xA0 * IS_USED(MODULE_UWB_CORE_RNG_TRX_INFO)))
 #endif
 
 #ifdef __cplusplus
