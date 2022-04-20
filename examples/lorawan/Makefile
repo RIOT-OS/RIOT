@@ -44,7 +44,13 @@ USEPKG += semtech-loramac
 USEMODULE += $(DRIVER)
 USEMODULE += fmt
 FEATURES_OPTIONAL += periph_rtc
-FEATURES_OPTIONAL += periph_eeprom
+
+# Uncomment the following line to enable Loramac stack state persistence on EEPROM.
+# Make sure the EEPROM is erased before enabling this and when flashing a board
+# with an EEPROM the first time. If the board already contains a previous Loramac state
+# in its EEPROM that is not corresponding to your LoRaWAN application settings,
+# joining a network will fail.
+# FEATURES_OPTIONAL += periph_eeprom
 
 CFLAGS += -DSEND_PERIOD_S=$(SEND_PERIOD_S)
 ifeq (otaa,$(ACTIVATION_MODE))
