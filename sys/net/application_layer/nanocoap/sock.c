@@ -92,7 +92,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
     ssize_t tmp, res = 0;
     size_t pdu_len = (pkt->payload - (uint8_t *)pkt->hdr) + pkt->payload_len;
     uint8_t *buf = (uint8_t*)pkt->hdr;
-    uint32_t id = coap_get_id(pkt);
+    unsigned id = coap_get_id(pkt);
     void *payload, *ctx = NULL;
 
     unsigned state = STATE_SEND_REQUEST;
@@ -105,9 +105,13 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
     /* check if we expect a reply */
     const bool confirmable = coap_get_type(pkt) == COAP_TYPE_CON;
 
+    /* try receiving another packet without re-request */
+    bool retry_rx = false;
+
     while (1) {
         switch (state) {
         case STATE_SEND_REQUEST:
+            DEBUG("nanocoap: send %u bytes (%u tries left)\n", pdu_len, tries_left);
             if (--tries_left == 0) {
                 DEBUG("nanocoap: maximum retries reached\n");
                 return -ETIMEDOUT;
@@ -119,16 +123,26 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                 return res;
             }
 
-            if (confirmable || cb) {
-                state = STATE_AWAIT_RESPONSE;
-            } else {
+            /* no response needed and no response handler given */
+            if (!confirmable && !cb) {
                 return 0;
             }
+
+            /* ctx must have been released at this point */
+            assert(ctx == NULL);
+            state = STATE_AWAIT_RESPONSE;
             /* fall-through */
         case STATE_AWAIT_RESPONSE:
+            DEBUG("nanocoap: waiting for response (timeout: %lu µs)\n", timeout);
             tmp = sock_udp_recv_buf(sock, &payload, &ctx, timeout, NULL);
             if (tmp == 0) {
                 /* no more data */
+                /* sock_udp_recv_buf() needs to be called in a loop until ctx is NULL again
+                 * to release the buffer */
+                if (retry_rx) {
+                    retry_rx = false;
+                    continue;
+                }
                 return res;
             }
             res = tmp;
@@ -146,10 +160,12 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
             /* parse response */
             if (coap_parse(pkt, payload, res) < 0) {
                 DEBUG("nanocoap: error parsing packet\n");
-                res = -EBADMSG;
+                retry_rx = true;
+                continue;
             }
             else if (coap_get_id(pkt) != id) {
-                res = -EBADMSG;
+                DEBUG("nanocoap: ID mismatch %u != %u\n", coap_get_id(pkt), id);
+                retry_rx = true;
                 continue;
             }
 
