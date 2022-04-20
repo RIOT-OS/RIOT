@@ -14,7 +14,7 @@ config MODULE_MCP2515
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_SPI
-    select MODULE_XTIMER
+    select ZTIMER_USEC
 
 config HAVE_MCP2515
     bool

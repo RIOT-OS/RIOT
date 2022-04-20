@@ -32,7 +32,7 @@
 #include "periph_conf.h"
 #include "thread.h"
 #include "sched.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -156,11 +156,6 @@ static int _send(candev_t *candev, const struct can_frame *frame)
     int ret = 0;
     enum mcp2515_mode mode;
 
-    if (frame->can_id > 0x1FFFFFFF) {
-        DEBUG("Illegal CAN-ID!\n");
-        return -EINVAL;
-    }
-
     if (mutex_trylock(&_mcp_mutex)) {
         mode = mcp2515_get_mode(dev);
         mutex_unlock(&_mcp_mutex);
@@ -245,6 +240,7 @@ static void _isr(candev_t *candev)
 
     if (mutex_trylock(&_mcp_mutex)) {
         flag = mcp2515_get_irq(dev);
+        mcp2515_clear_irq(dev, flag & ~(INT_RX0 | INT_RX1));
         mutex_unlock(&_mcp_mutex);
     }
     else {
@@ -283,24 +279,13 @@ static void _isr(candev_t *candev)
         if (flag & INT_MESSAGE_ERROR) {
             _irq_message_error(dev);
         }
-
         if (mutex_trylock(&_mcp_mutex)) {
             flag = mcp2515_get_irq(dev);
-            mutex_unlock(&_mcp_mutex);
-        }
-        else {
-            DEBUG("isr2: Failed to lock mutex\n");
-            _neednewisr = 1;
-            return;
-        }
-
-        /* clear all flags except for RX flags, which are cleared by receiving */
-        if (mutex_trylock(&_mcp_mutex)) {
             mcp2515_clear_irq(dev, flag & ~(INT_RX0 | INT_RX1));
             mutex_unlock(&_mcp_mutex);
         }
         else {
-            DEBUG("isr3: failed to lock mutex\n");
+            DEBUG("isr2: Failed to lock mutex\n");
             _neednewisr = 1;
             return;
         }
@@ -438,10 +423,6 @@ static int _set_filter(candev_t *dev, const struct can_filter *filter)
 
     candev_mcp2515_t *dev_mcp = container_of(dev, candev_mcp2515_t, candev);
 
-    if (f.can_mask == 0) {
-        return -EINVAL; /* invalid mask */
-    }
-
     if (mutex_trylock(&_mcp_mutex)) {
         mode = mcp2515_get_mode(dev_mcp);
         res = mcp2515_set_mode(dev_mcp, MODE_CONFIG);
@@ -539,10 +520,6 @@ static int _remove_filter(candev_t *dev, const struct can_filter *filter)
     enum mcp2515_mode mode;
 
     candev_mcp2515_t *dev_mcp = container_of(dev, candev_mcp2515_t, candev);
-
-    if (f.can_mask == 0) {
-        return -1; /* invalid mask */
-    }
 
     if (mutex_trylock(&_mcp_mutex)) {
         mode = mcp2515_get_mode(dev_mcp);
