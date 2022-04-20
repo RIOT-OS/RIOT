@@ -135,7 +135,6 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
             if (res == -ETIMEDOUT) {
                 DEBUG("nanocoap: timeout\n");
                 timeout *= 2;
-                tries_left--;
                 state = STATE_SEND_REQUEST;
                 continue;
             }
