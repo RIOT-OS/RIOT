@@ -29,7 +29,7 @@ extern "C" {
  * @brief uwb-core uwb_rng module is enabled
  */
 #ifndef MYNEWT_VAL_UWB_RNG_ENABLED
-#define MYNEWT_VAL_UWB_RNG_ENABLED ((IS_ACTIVE(MODULE_UWB_CORE_RNG)))
+#define MYNEWT_VAL_UWB_RNG_ENABLED ((IS_USED(MODULE_UWB_CORE_RNG)))
 #endif
 
 /**

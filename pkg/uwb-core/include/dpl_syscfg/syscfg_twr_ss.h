@@ -29,7 +29,7 @@ extern "C" {
  * @brief Enable ranging services
  */
 #ifndef MYNEWT_VAL_TWR_SS_ENABLED
-#define MYNEWT_VAL_TWR_SS_ENABLED (IS_ACTIVE(MODULE_UWB_CORE_TWR_SS))
+#define MYNEWT_VAL_TWR_SS_ENABLED (IS_USED(MODULE_UWB_CORE_TWR_SS))
 #endif
 
 /**
