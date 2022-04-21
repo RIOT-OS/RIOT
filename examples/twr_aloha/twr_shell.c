@@ -121,7 +121,8 @@ int _twr_handler(int argc, char **argv)
         uint32_t count = 1;
         uint32_t interval_ms = 1000;
         int proto = UWB_DATA_CODE_SS_TWR;
-        uint8_t addr[IEEE802154_SHORT_ADDRESS_LEN_STR_MAX];
+        uint8_t addr[IEEE802154_SHORT_ADDRESS_LEN];
+        uint16_t short_addr = 0x0000;
         int res = 0;
         if (argc < 3) {
             _print_usage();
@@ -136,6 +137,11 @@ int _twr_handler(int argc, char **argv)
                     puts("[Error]: unable to parse address.\n"
                          "Must be of format [0-9a-fA-F]{2}(:[0-9a-fA-F]{2})*\n"
                          "(hex pairs delimited by colons)");
+                    res = 1;
+                }
+                short_addr = addr[1] + (addr[0] << 8);
+                if (short_addr == 0x0000) {
+                    printf("[ERROR]: invalid addr %s\n", arg);
                     res = 1;
                 }
             }
@@ -194,11 +200,10 @@ int _twr_handler(int argc, char **argv)
                 }
             }
         }
-        if (res != 0) {
+        if (res != 0 || (short_addr == 0x0000)) {
             _print_usage();
             return 1;
         }
-        uint16_t short_addr = addr[1] + (addr[0] << 8);
         puts("[twr]: start ranging");
         uwb_core_rng_start(short_addr, proto, interval_ms, count);
         if (IS_ACTIVE(CONFIG_TWR_SHELL_BLOCKING)) {
