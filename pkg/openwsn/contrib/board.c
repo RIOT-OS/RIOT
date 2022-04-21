@@ -49,8 +49,8 @@ void board_init_openwsn(void)
     LOG_DEBUG("[openwsn/board]: init\n");
 
 #ifdef MODULE_PM_LAYERED
-    /* sleeping is currently not supported, block all sleep modes */
-    for (uint8_t i = 0; i < PM_NUM_MODES; i++) {
+    /* sleeping is currently not supported, block all sleep modes except IDLE */
+    for (uint8_t i = 0; i < PM_NUM_MODES - 1; i++) {
         pm_block(i);
     }
 #endif

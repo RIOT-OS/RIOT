@@ -154,7 +154,7 @@ int main(void)
      * in general provides RAM retention after wake-up.
      */
 #if IS_USED(MODULE_PM_LAYERED)
-    for (unsigned i = 1; i < PM_NUM_MODES; ++i) {
+    for (unsigned i = 1; i < PM_NUM_MODES - 1; ++i) {
         pm_unblock(i);
     }
 #endif
