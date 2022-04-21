@@ -80,10 +80,25 @@ static int _send_ack(nanocoap_sock_t *sock, coap_pkt_t *pkt)
     coap_hdr_t ack;
     unsigned tkl = coap_get_token_len(pkt);
 
-    coap_build_hdr(&ack, COAP_TYPE_ACK, pkt->token, tkl,
+    coap_build_hdr(&ack, COAP_TYPE_ACK, coap_get_token(pkt), tkl,
                    COAP_CODE_VALID, ntohs(pkt->hdr->id));
 
     return sock_udp_send(sock, &ack, sizeof(ack), NULL);
+}
+
+static bool _id_or_token_missmatch(const coap_pkt_t *pkt, unsigned id,
+                                   const void *token, size_t token_len)
+{
+    switch (coap_get_type(pkt)) {
+    case COAP_TYPE_RST:
+    case COAP_TYPE_ACK:
+        return coap_get_id(pkt) != id;
+    default:
+        if (coap_get_token_len(pkt) != token_len) {
+            return true;
+        }
+        return memcmp(coap_get_token(pkt), token, token_len);
+    }
 }
 
 ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
@@ -94,6 +109,8 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
     uint8_t *buf = (uint8_t*)pkt->hdr;
     unsigned id = coap_get_id(pkt);
     void *payload, *ctx = NULL;
+    const uint8_t *token = coap_get_token(pkt);
+    uint8_t token_len = coap_get_token_len(pkt);
 
     unsigned state = STATE_SEND_REQUEST;
 
@@ -163,7 +180,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                 retry_rx = true;
                 continue;
             }
-            else if (coap_get_id(pkt) != id) {
+            else if (_id_or_token_missmatch(pkt, id, token, token_len)) {
                 DEBUG("nanocoap: ID mismatch %u != %u\n", coap_get_id(pkt), id);
                 retry_rx = true;
                 continue;
