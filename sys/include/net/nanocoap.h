@@ -366,7 +366,7 @@ static inline unsigned coap_get_code(const coap_pkt_t *pkt)
  *
  * @returns     raw message code
  */
-static inline unsigned coap_get_code_raw(coap_pkt_t *pkt)
+static inline unsigned coap_get_code_raw(const coap_pkt_t *pkt)
 {
     return (unsigned)pkt->hdr->code;
 }
@@ -378,7 +378,7 @@ static inline unsigned coap_get_code_raw(coap_pkt_t *pkt)
  *
  * @returns     message ID
  */
-static inline unsigned coap_get_id(coap_pkt_t *pkt)
+static inline unsigned coap_get_id(const coap_pkt_t *pkt)
 {
     return ntohs(pkt->hdr->id);
 }
@@ -429,7 +429,7 @@ static inline unsigned coap_get_total_len(const coap_pkt_t *pkt)
  * @returns     COAP_TYPE_ACK
  * @returns     COAP_TYPE_RST
  */
-static inline unsigned coap_get_type(coap_pkt_t *pkt)
+static inline unsigned coap_get_type(const coap_pkt_t *pkt)
 {
     return (pkt->hdr->ver_t_tkl & 0x30) >> 4;
 }
@@ -441,7 +441,7 @@ static inline unsigned coap_get_type(coap_pkt_t *pkt)
  *
  * @returns     CoAP version number
  */
-static inline unsigned coap_get_ver(coap_pkt_t *pkt)
+static inline unsigned coap_get_ver(const coap_pkt_t *pkt)
 {
     return (pkt->hdr->ver_t_tkl & 0x60) >> 6;
 }
@@ -453,7 +453,7 @@ static inline unsigned coap_get_ver(coap_pkt_t *pkt)
  *
  * @returns     pointer to first byte after the header
  */
-static inline uint8_t *coap_hdr_data_ptr(coap_hdr_t *hdr)
+static inline uint8_t *coap_hdr_data_ptr(const coap_hdr_t *hdr)
 {
     return ((uint8_t *)hdr) + sizeof(coap_hdr_t);
 }
