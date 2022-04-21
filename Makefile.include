@@ -654,7 +654,7 @@ HEXFILE ?= $(ELFFILE:.elf=.hex)
 BINFILE ?= $(ELFFILE:.elf=.bin)
 MAPFILE ?= $(ELFFILE:.elf=.map)
 
-ifneq (,$(filter suit, $(USEMODULE)))
+ifneq (,$(filter suit,$(USEMODULE)))
   include $(RIOTMAKE)/suit.base.inc.mk
 endif
 
@@ -662,6 +662,11 @@ endif
 # variables defined in `riotboot.mk` for `FLASHFILE` before it is evaluated.
 # It should be included after defining 'BINFILE' for 'riotboot.bin' handling.
 include $(RIOTMAKE)/boot/riotboot.mk
+
+# include suit targets
+ifneq (,$(filter suit,$(USEMODULE)))
+  include $(RIOTMAKE)/suit.inc.mk
+endif
 
 # Targets to get given file
 elffile: $(ELFFILE)
