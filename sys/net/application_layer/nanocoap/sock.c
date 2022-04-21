@@ -32,6 +32,7 @@
 #include "random.h"
 #include "sys/uio.h"
 #include "timex.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -101,6 +102,21 @@ static bool _id_or_token_missmatch(const coap_pkt_t *pkt, unsigned id,
     }
 }
 
+static uint32_t _deadline_from_interval(uint32_t interval)
+{
+    return US_PER_MS * ztimer_now(ZTIMER_MSEC) + interval;
+}
+
+static uint32_t _deadline_left_us(uint32_t deadline)
+{
+    uint32_t now = ztimer_now(ZTIMER_MSEC) * US_PER_MS;
+    if (now > deadline) {
+        return 0;
+    }
+
+    return deadline - now;
+}
+
 ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                                  coap_request_cb_t cb, void *arg)
 {
@@ -116,6 +132,8 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
 
     uint32_t timeout = random_uint32_range(CONFIG_COAP_ACK_TIMEOUT_MS * US_PER_MS,
                                            CONFIG_COAP_ACK_TIMEOUT_MS * CONFIG_COAP_RANDOM_FACTOR_1000);
+    uint32_t deadline = _deadline_from_interval(timeout);
+
     /* add 1 for initial transmit */
     unsigned tries_left = CONFIG_COAP_MAX_RETRANSMIT + 1;
 
@@ -150,8 +168,9 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
             state = STATE_AWAIT_RESPONSE;
             /* fall-through */
         case STATE_AWAIT_RESPONSE:
-            DEBUG("nanocoap: waiting for response (timeout: %lu µs)\n", timeout);
-            tmp = sock_udp_recv_buf(sock, &payload, &ctx, timeout, NULL);
+            DEBUG("nanocoap: waiting for response (timeout: %"PRIu32" µs)\n",
+                  _deadline_left_us(deadline));
+            tmp = sock_udp_recv_buf(sock, &payload, &ctx, _deadline_left_us(deadline), NULL);
             if (tmp == 0) {
                 /* no more data */
                 /* sock_udp_recv_buf() needs to be called in a loop until ctx is NULL again
@@ -166,6 +185,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
             if (res == -ETIMEDOUT) {
                 DEBUG("nanocoap: timeout\n");
                 timeout *= 2;
+                deadline = _deadline_from_interval(timeout);
                 state = STATE_SEND_REQUEST;
                 continue;
             }
