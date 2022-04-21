@@ -396,6 +396,18 @@ static inline unsigned coap_get_token_len(const coap_pkt_t *pkt)
 }
 
 /**
+ * @brief   Get pointer to a message's token
+ *
+ * @param[in]   pkt   CoAP packet
+ *
+ * @returns     pointer to the token position
+ */
+static inline void *coap_get_token(const coap_pkt_t *pkt)
+{
+    return (uint8_t*)pkt->hdr + sizeof(coap_hdr_t);
+}
+
+/**
  * @brief   Get the total header length (4-byte header + token length)
  *
  * @param[in]   pkt   CoAP packet
