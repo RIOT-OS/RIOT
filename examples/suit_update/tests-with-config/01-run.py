@@ -143,8 +143,8 @@ def running_slot(child):
 
 
 def _test_invalid_version(child, client, app_ver):
-    publish(TMPDIR.name, COAP_HOST, app_ver - 1)
-    notify(COAP_HOST, client, app_ver - 1)
+    publish(TMPDIR.name, COAP_HOST, app_ver)
+    notify(COAP_HOST, client, app_ver)
     child.expect_exact("suit_coap: trigger received")
     child.expect_exact("suit: verifying manifest signature")
     child.expect_exact("seq_nr <= running image")
