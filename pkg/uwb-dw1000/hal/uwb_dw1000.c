@@ -39,7 +39,10 @@
 #define DW1000_THREAD_PRIORITY  MYNEWT_VAL_UWB_DEV_TASK_PRIO
 #endif
 
-#define OTP_CH1_TX_POWER_PRF_16         (0x0010)
+#define OTP_CH1_TX_POWER_PRF_16_ADDRESS         (0x0010)
+#define OTP_CH5_PG_DELAY_ADDRESS                (0x001E)
+#define OTP_CH5_PG_DELAY_MASK                   (0x00FF00ff)
+#define OTP_CH5_PG_DELAY_SHIFT                  (16)
 
 /* Link list head */
 static struct _dw1000_dev_instance_t *dw1000_instance_head;
@@ -131,19 +134,28 @@ void uwb_dw1000_config_and_start(dw1000_dev_instance_t *dev)
 void uwb_dw1000_update_config_from_otp(dw1000_dev_instance_t *dev)
 {
     /* every channel has to registers, first for PRF16, second PRF64 */
-    uint16_t address = OTP_CH1_TX_POWER_PRF_16 + (2 * (dev->uwb_dev.config.channel - 1)) +
+    uint16_t address = OTP_CH1_TX_POWER_PRF_16_ADDRESS + (2 * (dev->uwb_dev.config.channel - 1)) +
                        (dev->uwb_dev.config.prf - DWT_PRF_16M);
 
-    /* channel 6 is missing, so channel 7 is actually to addresses ealier */
+    /* channel 6 is missing, so channel 7 is actually to addresses earlier */
     if (dev->uwb_dev.config.channel == 7) {
         address -= 2;
     }
-
     uint32_t tx_power = _dw1000_otp_read(dev, address);
 
     LOG_DEBUG("uwb-dw1000: OTP addr=(%" PRIx16 "),val=(%" PRIx32 ")\n", address, tx_power);
     if (tx_power != 0) {
         dev->uwb_dev.config.txrf.power = tx_power;
+    }
+
+    if (dev->uwb_dev.config.channel == 5) {
+        uint8_t pg_delay =
+            ((_dw1000_otp_read(dev,
+                               OTP_CH5_PG_DELAY_ADDRESS) & OTP_CH5_PG_DELAY_MASK) >>
+             OTP_CH5_PG_DELAY_SHIFT);
+        LOG_DEBUG("uwb-dw1000: pg-delay addr=(%" PRIx16 "),val=(%" PRIx16 ")\n",
+                  OTP_CH5_PG_DELAY_ADDRESS, pg_delay);
+        dev->uwb_dev.config.txrf.PGdly = pg_delay;
     }
 }
 
