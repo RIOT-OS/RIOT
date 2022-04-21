@@ -76,6 +76,19 @@ extern "C" {
 #define CONFIG_ILI9341_VCOML            -2000
 #endif
 
+
+/**
+ * @name    ILI9341 display rotation modes
+ * @{
+ */
+#define ILI9341_ROTATION_VERT           LCD_MADCTL_MX       /**< Vertical mode */
+#define ILI9341_ROTATION_VERT_FLIP      LCD_MADCTL_MY       /**< Flipped vertical */
+#define ILI9341_ROTATION_HORZ           LCD_MADCTL_MV       /**< Horizontal mode */
+#define ILI9341_ROTATION_HORZ_FLIP      LCD_MADCTL_MV | \
+                                        LCD_MADCTL_MY | \
+                                        LCD_MADCTL_MX       /**< Horizontal flipped */
+/** @} */
+
 /**
  * @brief   Device descriptor for a ili9341
  */

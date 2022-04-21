@@ -64,7 +64,7 @@ extern "C" {
 #define ST7735_PARAM_RGB_CHANNELS   128U            /**< Number of RGB channels (e.g. columns) */
 #endif
 #ifndef ST7735_PARAM_ROTATION
-#define ST7735_PARAM_ROTATION       LCD_ROTATION_HORZ   /**< Rotation mode (unused) */
+#define ST7735_PARAM_ROTATION       ST7735_ROTATION_HORZ    /**< Rotation mode */
 #endif
 #ifndef ST7735_PARAM_OFFSET_X
 #define ST7735_PARAM_OFFSET_X       0               /**< Horizontal offset */
@@ -87,7 +87,7 @@ extern "C" {
                                       .inverted = ST7735_PARAM_INVERTED, \
                                       .lines = ST7735_PARAM_NUM_LINES, \
                                       .rgb_channels = ST7735_PARAM_RGB_CHANNELS, \
-                                      .rotation = LCD_ROTATION_HORZ, \
+                                      .rotation = ST7735_PARAM_ROTATION, \
                                       .offset_x = ST7735_PARAM_OFFSET_X, \
                                       .offset_y = ST7735_PARAM_OFFSET_Y, \
                                     }

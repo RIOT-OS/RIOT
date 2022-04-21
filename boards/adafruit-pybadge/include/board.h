@@ -75,6 +75,7 @@ extern "C" {
 #define ST7735_PARAM_RGB_CHANNELS   (128U)                      /**< Number of screen rgb channel (height) */
 #define ST7735_PARAM_RGB        (1)                             /**< RGB configuration */
 #define ST7735_PARAM_INVERTED   (0)                             /**< Inversion configuration */
+#define ST7735_PARAM_ROTATION   (ST7735_ROTATION_HORZ_FLIP)     /**< Rotation mode */
 #define LCD_SCREEN_WIDTH        (ST7735_PARAM_NUM_LINES)        /**< LCD screen width */
 #define LCD_SCREEN_HEIGHT       (ST7735_PARAM_RGB_CHANNELS)     /**< LCD screen height */
 /** @} */

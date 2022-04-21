@@ -69,29 +69,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name Display rotation modes
- * @{
- */
-#define LCD_MADCTL_VERT         LCD_MADCTL_MX       /**< Vertical mode */
-#define LCD_MADCTL_VERT_FLIP    LCD_MADCTL_MY       /**< Flipped vertical */
-#define LCD_MADCTL_HORZ         LCD_MADCTL_MV       /**< Horizontal mode */
-#define LCD_MADCTL_HORZ_FLIP    LCD_MADCTL_MV | \
-    LCD_MADCTL_MY | \
-    LCD_MADCTL_MX                                       /**< Horizontal flipped */
-/** @} */
-
-
-/**
- * @brief   Display rotation mode
- */
-typedef enum {
-    LCD_ROTATION_VERT       = LCD_MADCTL_VERT,      /**< Vertical mode */
-    LCD_ROTATION_VERT_FLIP  = LCD_MADCTL_VERT_FLIP, /**< Vertical flipped mode */
-    LCD_ROTATION_HORZ       = LCD_MADCTL_HORZ,      /**< Horizontal mode */
-    LCD_ROTATION_HORZ_FLIP  = LCD_MADCTL_HORZ_FLIP, /**< Horizontal flipped mode */
-} lcd_rotation_t;
-
-/**
  * @brief   Device initialization parameters
  */
 typedef  struct {
@@ -106,7 +83,7 @@ typedef  struct {
     bool inverted;              /**< Display works in inverted color mode */
     uint16_t lines;             /**< Number of lines, from 16 to 320 in 8 line steps */
     uint16_t rgb_channels;      /**< Display rgb channels */
-    lcd_rotation_t rotation;    /**< Display rotation mode */
+    uint8_t rotation;           /**< Display rotation mode */
     uint8_t offset_x;           /**< LCD offset to apply on x axis. */
     uint8_t offset_y;           /**< LCD offset to apply on y axis. */
 } lcd_params_t;
