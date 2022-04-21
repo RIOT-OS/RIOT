@@ -608,7 +608,7 @@ static size_t _handle_req(gcoap_socket_t *sock, coap_pkt_t *pdu, uint8_t *buf,
             memo->token_len = coap_get_token_len(pdu);
             memo->socket = *sock;
             if (memo->token_len) {
-                memcpy(&memo->token[0], pdu->token, memo->token_len);
+                memcpy(&memo->token[0], coap_get_token(pdu), memo->token_len);
             }
             DEBUG("gcoap: Registered observer for: %s\n", memo->resource->path);
         }
@@ -803,7 +803,7 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
             }
         } else if (coap_get_token_len(memo_pdu) == cmplen) {
             memo_pdu->token = coap_hdr_data_ptr(memo_pdu->hdr);
-            if ((memcmp(src_pdu->token, memo_pdu->token, cmplen) == 0)
+            if ((memcmp(coap_get_token(src_pdu), memo_pdu->token, cmplen) == 0)
                     && sock_udp_ep_equal(&memo->remote_ep, remote)) {
                 *memo_ptr = memo;
                 break;
