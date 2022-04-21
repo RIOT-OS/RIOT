@@ -44,11 +44,11 @@ def test_suit_fetch():
 def test_suit_sequence_no():
     rc = init_ctrl(
         output="""
-seq_no: 123456789
+seq_no: 0x12345678
     """
     )
     si = riotctrl_shell.sys.SUIT(rc)
     res = si.suit_sequence_no()
     parser = riotctrl_shell.sys.SUITSequenceNoParser()
     # mock just returns last input
-    assert parser.parse(res) == 123456789
+    assert parser.parse(res) == 0x12345678
