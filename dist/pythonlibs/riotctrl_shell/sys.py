@@ -43,13 +43,13 @@ class Version(ShellInteraction):
 
 class SUITSequenceNoParser(ShellInteractionParser):
     def __init__(self):
-        self.c_seq_no = re.compile(r"seq_no: (?P<seq_no>\d+)$")
+        self.c_seq_no = re.compile(r"seq_no: (?P<seq_no>0x[0-9a-fA-F:]+)$")
 
     def parse(self, cmd_output):
         for line in cmd_output.splitlines():
             m = self.c_seq_no.search(line)
             if m is not None:
-                return int(m.group("seq_no"))
+                return int(m.group("seq_no"), 16)
         return None
 
 

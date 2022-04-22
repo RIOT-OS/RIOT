@@ -44,7 +44,7 @@ int _suit_handler(int argc, char **argv)
     else if (strcmp(argv[1], "seq_no") == 0) {
         uint32_t seq_no = 0;
         suit_storage_get_highest_seq_no(&seq_no);
-        printf("seq_no: %" PRIu32 "\n", seq_no);
+        printf("seq_no: 0x%08" PRIx32 "\n", seq_no);
     }
     else {
         _print_usage(argv);
