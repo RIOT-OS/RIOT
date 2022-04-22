@@ -12,6 +12,7 @@ APP_VER ?= $(EPOCH)
 ifeq ($(BOARD),native)
   SUIT_CLIENT ?= [2001:db8::2]
   SUIT_COAP_SERVER ?= [2001:db8::1]
+  $(call target-export-variables,test-with-config,SUIT_COAP_SERVER)
 endif
 
 ifeq ($(BOARD),native)

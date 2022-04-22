@@ -11,19 +11,37 @@ import subprocess
 import sys
 import tempfile
 import time
+import re
+import random
+from ipaddress import (
+    IPv6Address,
+    IPv6Network,
+)
 
 from testrunner import run
 from testrunner import utils
 
-# Default test over loopback interface
-COAP_HOST = "[fd00:dead:beef::1]"
+COAP_HOST = os.getenv("SUIT_COAP_SERVER", "[fd00:dead:beef::1]")
+BOARD = os.getenv("BOARD", "samr21-xpro")
 
 UPDATING_TIMEOUT = 10
 MANIFEST_TIMEOUT = 15
 
 USE_ETHOS = int(os.getenv("USE_ETHOS", "1"))
-TAP = os.getenv("TAP", "riot0")
+IFACE = os.getenv("IFACE", "tapbr0")
 TMPDIR = tempfile.TemporaryDirectory()
+
+
+def get_iface_addr(iface):
+    out = subprocess.check_output(["ip", "a", "s", "dev", iface]).decode()
+    p = re.compile(
+        r"inet6\s+(?P<global>[0-9a-fA-F:]+:[A-Fa-f:0-9]+/\d+)\s+" r"scope\s+global"
+    )
+    for line in out.splitlines():
+        m = p.search(line)
+        if m is not None:
+            return m.group("global")
+    return None
 
 
 def start_aiocoap_fileserver():
@@ -90,7 +108,7 @@ def get_ipv6_addr(child):
         child.expect(
             r"inet6 addr: (?P<lladdr>[0-9a-fA-F:]+:[A-Fa-f:0-9]+)" "  scope: link  VAL"
         )
-        addr = "{}%{}".format(child.match.group("lladdr").lower(), TAP)
+        addr = "{}%{}".format(child.match.group("lladdr").lower(), IFACE)
     return addr
 
 
@@ -117,7 +135,20 @@ def get_reachable_addr(child):
     # Give some time for the network interface to be configured
     time.sleep(1)
     # Get address
-    client_addr = get_ipv6_addr(child)
+    if BOARD == "native":
+        iface_addr = get_iface_addr(IFACE)
+        network = IPv6Network(iface_addr, strict=False)
+        client_addr = iface_addr
+        while iface_addr == client_addr:
+            client_addr = IPv6Address(
+                random.randrange(
+                    int(network.network_address) + 1, int(network.broadcast_address) - 1
+                )
+            )
+        child.sendline(f"ifconfig 5 add {client_addr}/{format(network.prefixlen)}")
+        client_addr = format(client_addr)
+    else:
+        client_addr = get_ipv6_addr(child)
     # Verify address is reachable
     ping6(client_addr)
     return "[{}]".format(client_addr)
@@ -166,21 +197,22 @@ def _test_successful_update(child, client, app_ver):
         child.expect_exact("suit_coap: trigger received")
         child.expect_exact("suit: verifying manifest signature")
         child.expect(
-            r"riotboot_flashwrite: initializing update to target slot (\d+)\r\n",
+            r"SUIT policy check OK.\r\n",
             timeout=MANIFEST_TIMEOUT,
         )
-        target_slot = int(child.match.group(1))
         # Wait for update to complete
         while wait_for_update(child) == 0:
             pass
+        # Check successful install
+        child.expect_exact("Install correct payload")
+        child.expect_exact("Install correct payload")
 
-        # Wait for reboot
-        child.expect_exact("suit_coap: rebooting...")
-        # Verify running slot
-        current_slot = running_slot(child)
-        assert target_slot == current_slot, "BOOTED FROM SAME SLOT"
-        # Verify client is reachable and get address
-        client = get_reachable_addr(child)
+        # Wait for reboot on non-native BOARDs
+        if BOARD != "native":
+            child.expect_exact("suit_coap: rebooting...")
+            # Verify client is reachable and get address
+            client = get_reachable_addr(child)
+        assert seq_no(child) == version
 
 
 def _test_suit_command_is_there(child):

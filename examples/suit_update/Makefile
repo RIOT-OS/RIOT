@@ -55,6 +55,7 @@ DEFAULT_MODULE += test_utils_interactive_sync
 
 ifeq ($(BOARD),native)
   USE_ETHOS ?= 0
+  IFACE ?= tapbr0
   # Configure two RAM regions with 2K each
   CFLAGS += -DCONFIG_SUIT_STORAGE_RAM_REGIONS=2 -DCONFIG_SUIT_STORAGE_RAM_SIZE=2048
 endif
@@ -78,9 +79,9 @@ ifeq (1,$(USE_ETHOS))
   #     $ cd dist/tools/ethos; sudo ./setup_network.sh riot0 2001:db8::0/64
   #
   #... in another shell and keep it running.
-  export TAP ?= riot0
+  IFACE ?= riot0
   TERMPROG = $(RIOTTOOLS)/ethos/ethos
-  TERMFLAGS = $(TAP) $(PORT)
+  TERMFLAGS = $(IFACE) $(PORT)
 endif
 
 # Ensure both slot bin files are always generated and linked to avoid compiling
@@ -105,6 +106,11 @@ TEST_ON_CI_BLACKLIST = all
 include $(CURDIR)/Makefile.suit.custom
 
 include $(RIOTBASE)/Makefile.include
+
+# export IFACE for test
+$(call target-export-variables,test-with-config test-with-config/check-config,IFACE)
+# export BOARD
+$(call target-export-variables,test-with-config test-with-config/check-config,BOARD)
 
 # allow to use large blocks to utilize large MTUs (802.15.4g, Ethernet, WiFi)
 LARGE_BLOCKS ?= 0
