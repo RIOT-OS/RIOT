@@ -51,7 +51,7 @@ def notify(coap_server, client_url, version=None):
     assert not subprocess.call(cmd)
 
 
-def publish(server_dir, server_url, app_ver, keys='default', latest_name=None):
+def publish(server_dir, server_url, app_ver, keys="default", latest_name=None):
     cmd = [
         "make",
         "suit/publish",
@@ -68,14 +68,15 @@ def publish(server_dir, server_url, app_ver, keys='default', latest_name=None):
 
 
 def wait_for_update(child):
-    return child.expect([r"Fetching firmware \|[█ ]+\|\s+\d+\%",
-                         "Finalizing payload store"],
-                        timeout=UPDATING_TIMEOUT)
+    return child.expect(
+        [r"Fetching firmware \|[█ ]+\|\s+\d+\%", "Finalizing payload store"],
+        timeout=UPDATING_TIMEOUT,
+    )
 
 
 def get_ipv6_addr(child):
-    child.expect_exact('>')
-    child.sendline('ifconfig')
+    child.expect_exact(">")
+    child.sendline("ifconfig")
     if USE_ETHOS == 0:
         # Get device global address
         child.expect(
@@ -87,8 +88,7 @@ def get_ipv6_addr(child):
         # Get device local address
         child.expect_exact("Link type: wired")
         child.expect(
-            r"inet6 addr: (?P<lladdr>[0-9a-fA-F:]+:[A-Fa-f:0-9]+)"
-            "  scope: link  VAL"
+            r"inet6 addr: (?P<lladdr>[0-9a-fA-F:]+:[A-Fa-f:0-9]+)" "  scope: link  VAL"
         )
         addr = "{}%{}".format(child.match.group("lladdr").lower(), TAP)
     return addr
@@ -127,7 +127,7 @@ def seq_no(child):
     utils.test_utils_interactive_sync_shell(child, 5, 1)
     # get version of currently running image
     # "seq_no: 0x00000000"
-    child.sendline('suit seq_no')
+    child.sendline("suit seq_no")
     child.expect(r"seq_no: (?P<seq_no>0x[0-9a-fA-F:]+)\r\n")
     app_ver = int(child.match.group("seq_no"), 16)
     return app_ver
@@ -136,7 +136,7 @@ def seq_no(child):
 def running_slot(child):
     utils.test_utils_interactive_sync_shell(child, 5, 1)
 
-    child.sendline('current-slot')
+    child.sendline("current-slot")
     child.expect(r"Running from slot (\d+)\r\n")
     slot = int(child.match.group(1))
     return slot
@@ -151,7 +151,7 @@ def _test_invalid_version(child, client, app_ver):
 
 
 def _test_invalid_signature(child, client, app_ver):
-    publish(TMPDIR.name, COAP_HOST, app_ver + 1, 'invalid_keys')
+    publish(TMPDIR.name, COAP_HOST, app_ver + 1, "invalid_keys")
     notify(COAP_HOST, client, app_ver + 1)
     child.expect_exact("suit_coap: trigger received")
     child.expect_exact("suit: verifying manifest signature")
@@ -184,7 +184,7 @@ def _test_successful_update(child, client, app_ver):
 
 
 def _test_suit_command_is_there(child):
-    child.sendline('suit')
+    child.sendline("suit")
     child.expect_exact("Usage: suit fetch <manifest url>")
 
 
