@@ -171,6 +171,16 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
             DEBUG("nanocoap: waiting for response (timeout: %"PRIu32" µs)\n",
                   _deadline_left_us(deadline));
             tmp = sock_udp_recv_buf(sock, &payload, &ctx, _deadline_left_us(deadline), NULL);
+            /* sock_udp_recv_buf() is supposed to return multiple packet fragments
+             * when called multiple times with the same context.
+             * In practise, this is not implemented and it will always return a pointer
+             * to the whole packet on the first call and NULL on the second call, which
+             * releases the packet.
+             * This assertion will trigger should the behavior change in the future.
+             */
+            if (retry_rx) {
+                assert(tmp == 0 && ctx == NULL);
+            }
             if (tmp == 0) {
                 /* no more data */
                 /* sock_udp_recv_buf() needs to be called in a loop until ctx is NULL again
