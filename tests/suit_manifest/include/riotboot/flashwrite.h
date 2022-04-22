@@ -35,15 +35,6 @@ static inline int riotboot_flashwrite_init(riotboot_flashwrite_t *state,
     (void)target_slot;
     return 0;
 }
-
-static inline riotboot_flashwrite_verify_sha256(digest,
-                                                img_size,
-                                                target_slot) {
-    (void)digest;
-    (void)img_size;
-    (void)target_slot;
-    return 0;
-}
 #ifdef __cplusplus
 }
 #endif

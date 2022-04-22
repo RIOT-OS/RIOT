@@ -137,6 +137,18 @@ extern const unsigned riotboot_slot_numof;
  */
 extern const riotboot_hdr_t *const riotboot_slots[];
 
+/**
+ * @brief       Verify the digest of an image from header
+ *
+ * @param[in]   hdr             riotboot hdr
+ *
+ * @returns     0 if the digest is valid
+ * @returns     -1 if the digest is invalid
+ */
+#if defined(MODULE_RIOTBOOT_SLOT_VERIFY_SHA256) || DOXYGEN
+int riotboot_slot_verify_sha256(const riotboot_hdr_t *hdr);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
