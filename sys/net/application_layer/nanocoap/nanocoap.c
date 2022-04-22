@@ -471,7 +471,7 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
                           unsigned code,
                           uint8_t *buf, size_t len,
                           unsigned ct,
-                          const uint8_t *payload, uint8_t payload_len)
+                          const void *payload, uint8_t payload_len)
 {
     uint8_t *payload_start = buf + coap_get_total_hdr_len(pkt);
     uint8_t *bufpos = payload_start;
@@ -696,7 +696,7 @@ static unsigned _put_delta_optlen(uint8_t *buf, unsigned offset, unsigned shift,
     return offset;
 }
 
-size_t coap_put_option(uint8_t *buf, uint16_t lastonum, uint16_t onum, const uint8_t *odata, size_t olen)
+size_t coap_put_option(uint8_t *buf, uint16_t lastonum, uint16_t onum, const void *odata, size_t olen)
 {
     assert(lastonum <= onum);
 
@@ -842,7 +842,7 @@ size_t coap_opt_put_uint(uint8_t *buf, uint16_t lastonum, uint16_t onum,
 }
 
 /* Common functionality for addition of an option */
-static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val,
+static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, const void *val,
                             size_t val_len)
 {
     if (pkt->options_len >= CONFIG_NANOCOAP_NOPTS_MAX) {
@@ -945,7 +945,7 @@ ssize_t coap_opt_add_uri_query2(coap_pkt_t *pkt, const char *key, size_t key_len
     return _add_opt_pkt(pkt, COAP_OPT_URI_QUERY, (uint8_t *)qs, qs_len);
 }
 
-ssize_t coap_opt_add_opaque(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val, size_t val_len)
+ssize_t coap_opt_add_opaque(coap_pkt_t *pkt, uint16_t optnum, const void *val, size_t val_len)
 {
     return _add_opt_pkt(pkt, optnum, val, val_len);
 }
@@ -1166,7 +1166,7 @@ size_t coap_blockwise_put_char(coap_block_slicer_t *slicer, uint8_t *bufpos, cha
 }
 
 size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
-                                const uint8_t *c, size_t len)
+                                const void *c, size_t len)
 {
     size_t str_len = 0;    /* Length of the string to copy */
 
@@ -1189,7 +1189,7 @@ size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
     }
 
     /* Only copy the relevant part of the string to the buffer */
-    memcpy(bufpos, c + str_offset, str_len);
+    memcpy(bufpos, (uint8_t *)c + str_offset, str_len);
     slicer->cur += len;
     return str_len;
 }
