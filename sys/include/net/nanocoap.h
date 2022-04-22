@@ -225,9 +225,6 @@ typedef struct {
  */
 typedef struct {
     coap_hdr_t *hdr;                                  /**< pointer to raw packet   */
-    uint8_t *token;                                   /**< pointer to token
-                                                       * @deprecated Use coap_get_token(),
-                                                       *     Will be removed after 2022.10. */
     uint8_t *payload;                                 /**< pointer to end of the header */
     iolist_t *snips;                                  /**< payload snips (optional)*/
     uint16_t payload_len;                             /**< length of payload       */
