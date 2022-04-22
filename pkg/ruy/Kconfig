@@ -7,3 +7,7 @@
 config PACKAGE_RUY
     bool "The ruy matrix multiplication library"
     depends on TEST_KCONFIG
+    depends on HAS_CPP
+    depends on HAS_LIBSTDCPP
+
+    select MODULE_CPP11-COMPAT
