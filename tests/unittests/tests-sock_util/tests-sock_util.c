@@ -114,6 +114,7 @@ static void test_sock_util_urlsplit__host_path(void)
             sock_urlsplit(TEST_URL, addr, urlpath));
     TEST_ASSERT_EQUAL_STRING(TEST_URL_HOSTPART, (char*)addr);
     TEST_ASSERT_EQUAL_STRING(TEST_URL_LOCALPART, (char*)urlpath);
+    TEST_ASSERT_EQUAL_STRING(TEST_URL_LOCALPART, sock_urlpath(TEST_URL));
 }
 
 static void test_sock_util_urlsplit__no_path(void)
@@ -130,18 +131,21 @@ static void test_sock_util_urlsplit__dnsname(void)
             sock_urlsplit(TEST_URL_DNS, addr, urlpath));
     TEST_ASSERT_EQUAL_STRING(TEST_URL_DNS_HOSTPART, (char*)addr);
     TEST_ASSERT_EQUAL_STRING(TEST_URL_LOCALPART, (char*)urlpath);
+    TEST_ASSERT_EQUAL_STRING(TEST_URL_LOCALPART, sock_urlpath(TEST_URL));
 }
 
 static void test_sock_util_urlsplit__invalid_sep(void)
 {
     TEST_ASSERT_EQUAL_INT(-EINVAL,
             sock_urlsplit(TEST_URL_INVALID, addr, urlpath));
+    TEST_ASSERT_NULL(sock_urlpath(TEST_URL_INVALID));
 }
 
 static void test_sock_util_urlsplit__no_schema(void)
 {
     TEST_ASSERT_EQUAL_INT(-EINVAL,
             sock_urlsplit(TEST_URL_INVALID2, addr, urlpath));
+    TEST_ASSERT_NULL(sock_urlpath(TEST_URL_INVALID2));
 }
 
 static void test_sock_util_urlsplit__hostport_too_long(void)

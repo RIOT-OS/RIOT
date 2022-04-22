@@ -149,6 +149,17 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath)
     return 0;
 }
 
+const char *sock_urlpath(const char *url)
+{
+    assert(url);
+    char *hoststart = _find_hoststart(url);
+    if (!hoststart) {
+        return NULL;
+    }
+
+    return _find_pathstart(hoststart);
+}
+
 int _parse_port(sock_udp_ep_t *ep_out, const char *portstart)
 {
     int port_len = strlen(portstart);
