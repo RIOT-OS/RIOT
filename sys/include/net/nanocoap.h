@@ -1906,7 +1906,7 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
                           unsigned code,
                           uint8_t *buf, size_t len,
                           unsigned ct,
-                          const void *payload, uint8_t payload_len);
+                          const void *payload, size_t payload_len);
 
 /**
  * @brief   Reference to the default .well-known/core handler defined by the

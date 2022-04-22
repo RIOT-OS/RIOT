@@ -471,7 +471,7 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
                           unsigned code,
                           uint8_t *buf, size_t len,
                           unsigned ct,
-                          const void *payload, uint8_t payload_len)
+                          const void *payload, size_t payload_len)
 {
     uint8_t *payload_start = buf + coap_get_total_hdr_len(pkt);
     uint8_t *bufpos = payload_start;
