@@ -101,6 +101,9 @@ TESTRUNNER_RESET_AFTER_TERM ?= 1
 # with ed25519 support.
 TEST_ON_CI_BLACKLIST = all
 
+# Add custom SUIT targets
+include $(CURDIR)/Makefile.suit.custom
+
 include $(RIOTBASE)/Makefile.include
 
 # allow to use large blocks to utilize large MTUs (802.15.4g, Ethernet, WiFi)
