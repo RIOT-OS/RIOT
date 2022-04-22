@@ -220,7 +220,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                 if (cb) {
                     res = cb(arg, pkt);
                 } else {
-                    res = 0;
+                    res = _get_error(pkt);
                 }
                 break;
             }
@@ -298,16 +298,7 @@ ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path, void *buf, si
     pkt.payload = pktpos;
     pkt.payload_len = 0;
 
-    int res = nanocoap_sock_request_cb(sock, &pkt, _get_cb, &ctx);
-    if (res < 0) {
-        return res;
-    }
-
-    if (coap_get_code(&pkt) != 205) {
-        return -ENOENT;
-    }
-
-    return res;
+    return nanocoap_sock_request_cb(sock, &pkt, _get_cb, &ctx);
 }
 
 ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local,
@@ -382,14 +373,7 @@ static int _fetch_block(nanocoap_sock_t *sock, uint8_t *buf, size_t len,
     pkt.payload = buf;
     pkt.payload_len = 0;
 
-    int res = nanocoap_sock_request_cb(sock, &pkt, _block_cb, ctx);
-    if (res < 0) {
-        return res;
-    }
-
-    DEBUG("code=%i\n", coap_get_code(&pkt));
-
-    return _get_error(&pkt);
+    return nanocoap_sock_request_cb(sock, &pkt, _block_cb, ctx);
 }
 
 int nanocoap_sock_get_blockwise(nanocoap_sock_t *sock, const char *path,
