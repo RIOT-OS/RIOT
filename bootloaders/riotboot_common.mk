@@ -21,6 +21,11 @@ USEMODULE += stdio_null
 # RIOT codebase
 RIOTBASE ?= $(CURDIR)/../..
 
+ifneq (,$(filter riotboot_slot_verify_sha256,$(USEMODULE)))
+  # Slightly increase ISR_STACKSIZE for digest validation
+  CFLAGS += -DISR_STACKSIZE=768
+endif
+
 include $(RIOTBASE)/Makefile.include
 
 # limit riotboot bootloader size

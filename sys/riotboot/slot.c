@@ -101,3 +101,15 @@ size_t riotboot_slot_offset(unsigned slot)
 {
     return (size_t)riotboot_slot_get_hdr(slot) - CPU_FLASH_BASE;
 }
+
+int riotboot_slot_validate(unsigned slot)
+{
+    if (riotboot_hdr_validate(riotboot_slot_get_hdr(slot)) == 0) {
+#if IS_USED(MODULE_RIOTBOOT_SLOT_VERIFY_SHA256)
+        return riotboot_slot_verify_sha256(riotboot_slot_get_hdr(slot));
+#else
+        return 0;
+#endif
+    }
+    return -1;
+}

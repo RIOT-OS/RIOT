@@ -18,7 +18,10 @@
  * - "RIOT" as magic number
  * - the application version
  * - the address where the RIOT firmware is found
- * - the checksum of the three previous fields
+ * - the checksum of the three previous fields (for backwards compatibility)
+ * - the image size
+ * - the sha256 digest of the image
+ * - the checksum (of all previous fields)
  *
  * @file
  * @brief       RIOT "partition" header and tools
@@ -37,6 +40,8 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include "riotboot/hdr.h"
+#include "hashes/sha256.h"
 
 /**
  * @brief  Magic number for riotboot_hdr
@@ -52,6 +57,9 @@ typedef struct {
     uint32_t magic_number;      /**< Header magic number (always "RIOT")              */
     uint32_t version;           /**< Integer representing the partition version       */
     uint32_t start_addr;        /**< Address after the allocated space for the header */
+    uint32_t chksum_legacy;     /**< Checksum of riotboot_hdr digest excluded         */
+    uint32_t img_size;          /**< Firmware size                                    */
+    uint8_t digest[SHA256_DIGEST_LENGTH]; /**< sh256 of image                         */
     uint32_t chksum;            /**< Checksum of riotboot_hdr                         */
 } riotboot_hdr_t;
 /** @} */
@@ -82,6 +90,17 @@ int riotboot_hdr_validate(const riotboot_hdr_t *riotboot_hdr);
  * @returns the checksum of the given riotboot_hdr
  */
 uint32_t riotboot_hdr_checksum(const riotboot_hdr_t *riotboot_hdr);
+
+/**
+ * @brief  Calculate legacy header checksum (no digest or img_size)
+ *
+ * This function calculates the checksum of @ref riotboot_hdr_t first three fields
+ *
+ * @param[in] riotboot_hdr  ptr to image header
+ *
+ * @returns the checksum of the given riotboot_hdr
+ */
+uint32_t riotboot_hdr_checksum_legacy(const riotboot_hdr_t *riotboot_hdr);
 
 #ifdef __cplusplus
 }

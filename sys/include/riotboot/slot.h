@@ -79,10 +79,7 @@ const riotboot_hdr_t *riotboot_slot_get_hdr(unsigned slot);
  *
  * @returns 0 if ok.
  */
-static inline int riotboot_slot_validate(unsigned slot)
-{
-    return riotboot_hdr_validate(riotboot_slot_get_hdr(slot));
-}
+int riotboot_slot_validate(unsigned slot);
 
 /**
  * @brief  Print formatted slot header to STDIO
