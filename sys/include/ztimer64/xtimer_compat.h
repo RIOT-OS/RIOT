@@ -123,7 +123,7 @@ static inline void xtimer_sleep(uint32_t seconds)
 static inline void xtimer_msleep(uint32_t milliseconds)
 {
     if (IS_ACTIVE(MODULE_ZTIMER_MSEC)) {
-        ztimer_sleep(ZTIMER_USEC, milliseconds);
+        ztimer_sleep(ZTIMER_MSEC, milliseconds);
     }
     else {
         ztimer64_sleep(ZTIMER64_USEC, ((uint64_t)milliseconds) * 1000LLU);
