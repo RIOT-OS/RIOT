@@ -104,14 +104,6 @@ static inline void _print_download_progress(suit_manifest_t *manifest,
 
 static kernel_pid_t _suit_coap_pid;
 
-ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
-                             void *context)
-{
-    coap_resource_subtree_t *subtree = context;
-    return coap_tree_handler(pkt, buf, len, subtree->resources,
-                             subtree->resources_numof);
-}
-
 static void _suit_handle_url(const char *url, coap_blksize_t blksize)
 {
     LOG_INFO("suit_coap: downloading \"%s\"\n", url);
