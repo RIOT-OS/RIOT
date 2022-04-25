@@ -1,9 +1,43 @@
 # Copyright (c) 2020 Freie Universitaet Berlin
+#               2022 Inria
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-config USEPKG_SEMTECH_LORAMAC
+config PACKAGE_SEMTECH-LORAMAC
+    bool "Semtech Loramac-node package"
+    depends on TEST_KCONFIG
+    depends on !HAS_ARCH_MSP430
+
+    select MODULE_RANDOM
+    select MODULE_HASHES
+    select MODULE_CRYPTO_AES_128
+    select MODULE_ZTIMER_MSEC
+
+    select MODULE_SEMTECH_LORAMAC_CONTRIB
+    select MODULE_SEMTECH_LORAMAC_MAC
+    select MODULE_SEMTECH_LORAMAC_MAC_REGION
+    select MODULE_SEMTECH_LORAMAC_CRYPTO
+    select MODULE_SEMTECH_LORAMAC_ARCH
+
+config MODULE_SEMTECH_LORAMAC_CONTRIB
     bool
-    select HAVE_LORAWAN
+
+config MODULE_SEMTECH_LORAMAC_RX
+    bool
+
+config MODULE_SEMTECH_LORAMAC_CONTRIB
+    bool
+
+config MODULE_SEMTECH_LORAMAC_MAC
+    bool
+
+config MODULE_SEMTECH_LORAMAC_MAC_REGION
+    bool
+
+config MODULE_SEMTECH_LORAMAC_CRYPTO
+    bool
+
+config MODULE_SEMTECH_LORAMAC_ARCH
+    bool
