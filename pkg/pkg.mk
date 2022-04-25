@@ -143,8 +143,8 @@ $(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
 	$(Q)$(GIT_IN_PKG) remote add origin $(PKG_URL)
 	$(Q)$(GIT_IN_PKG) config extensions.partialClone origin
 	$(Q)$(GIT_IN_PKG) config advice.detachedHead false
-	$(Q)$(GIT_IN_PKG) fetch --depth=1 -t --filter=blob:none origin $(PKG_VERSION)
-	$(Q)$(GIT_IN_PKG) checkout $(PKG_VERSION)
+	$(Q)$(GIT_IN_PKG) fetch $(GIT_QUIET) --depth=1 -t --filter=blob:none origin $(PKG_VERSION)
+	$(Q)$(GIT_IN_PKG) checkout $(GIT_QUIET) $(PKG_VERSION)
 endif
 
 ifeq ($(PKG_SOURCE_DIR),$(PKG_BUILD_DIR))
