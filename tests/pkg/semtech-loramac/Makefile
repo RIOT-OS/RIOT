@@ -7,6 +7,7 @@ BOARD_WITHOUT_LORAMAC_RX := \
     i-nucleo-lrwan1 \
     stm32f0discovery \
     waspmote-pro \
+    #
 
 LORA_DRIVER ?= sx1276
 LORA_REGION ?= EU868
@@ -32,5 +33,9 @@ ifneq (,$(filter iotlab%,$(MAKECMDGOALS)))
   IOTLAB_SITE  ?= saclay
   include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
 endif
+
+# This application provides a 'Kconfig' file and we want to explicitly disable
+# Kconfig by default by setting this variable to empty
+SHOULD_RUN_KCONFIG ?=
 
 include $(RIOTBASE)/Makefile.include
