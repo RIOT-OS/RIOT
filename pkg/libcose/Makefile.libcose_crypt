@@ -1,4 +1,6 @@
 MODULE := libcose_crypt
 SUBMODULES = 1
 
+SRC += keygen_symm.c
+
 include $(RIOTBASE)/Makefile.base
