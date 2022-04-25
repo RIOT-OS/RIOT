@@ -25,6 +25,8 @@
  * ```c
  * #include <haclnacl.h>
  * ```
-*
- * @see     https://github.com/mitls/hacl-c
+ *
+ * @see     https://github.com/RIOT-OS-pkgmirror/hacl-c_archived
+ * @see     https://hacl-star.github.io/
+ * @see     https://github.com/project-everest/hacl-star/
  */
