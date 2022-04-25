@@ -30,8 +30,12 @@ extern "C" {
  * @brief Default parameters (device names)
  */
 static const candev_params_t candev_params[] = {
+#if CAN_DLL_NUMOF >= 1
     { .name = "can0", },
+#endif
+#if CAN_DLL_NUMOF >= 2
     { .name = "can1", },
+#endif
 };
 
 #ifdef __cplusplus

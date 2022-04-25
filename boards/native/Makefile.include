@@ -101,6 +101,15 @@ ifneq (,$(filter periph_eeprom,$(FEATURES_USED)))
   TERMFLAGS += $(EEPROM_FILE_FLAGS)
 endif
 
+VCAN_IFNUM ?= 0
+VCAN_IFNAME ?= vcan0
+VCAN_IFACE ?= $(VCAN_IFNUM):$(VCAN_IFNAME)
+# set the default vcan interface
+ifneq (,$(filter periph_can,$(FEATURES_USED)))
+  PERIPH_CAN_FLAGS ?= --can $(VCAN_IFACE)
+  TERMFLAGS += $(PERIPH_CAN_FLAGS)
+endif
+
 TERMFLAGS += $(PORT)
 
 ASFLAGS =

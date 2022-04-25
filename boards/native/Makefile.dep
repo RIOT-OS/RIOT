@@ -10,9 +10,6 @@ endif
 
 ifneq (,$(filter periph_can,$(FEATURES_USED)))
   USEPKG += libsocketcan
-  ifeq ($(OS),Linux)
-    CFLAGS += -DCAN_DLL_NUMOF=2
-  endif
 endif
 
 # default to using littlefs2 on the virtual flash
