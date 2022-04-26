@@ -8,3 +8,7 @@
 config MODULE_PTHREAD
     bool "Pthread Support"
     depends on TEST_KCONFIG
+    select MODULE_TIMEX
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER64_XTIMER_COMPAT if MODULE_ZTIMER_XTIMER_COMPAT
+    select ZTIMER64_USEC
