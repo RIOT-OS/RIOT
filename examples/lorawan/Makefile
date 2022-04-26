@@ -40,6 +40,7 @@ LORA_REGION ?= EU868
 
 # Include the Semtech-loramac package
 USEPKG += semtech-loramac
+USEMODULE += auto_init_loramac
 
 USEMODULE += $(DRIVER)
 USEMODULE += fmt
