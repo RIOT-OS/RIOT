@@ -8,16 +8,24 @@ include $(RIOTBASE)/pkg/pkg.mk
 CFLAGS += -Wno-cast-align
 
 CMSIS_NN_MODULES =                   \
-    cmsis-nn_ActivationFunctions     \
-    cmsis-nn_ConvolutionFunctions    \
-    cmsis-nn_FullyConnectedFunctions \
-    cmsis-nn_NNSupportFunctions      \
-    cmsis-nn_PoolingFunctions        \
-    cmsis-nn_SoftmaxFunctions        \
+    cmsis-nn_activationfunctions     \
+    cmsis-nn_convolutionfunctions    \
+    cmsis-nn_fullyconnectedfunctions \
+    cmsis-nn_nnsupportfunctions      \
+    cmsis-nn_poolingfunctions        \
+    cmsis-nn_softmaxfunctions        \
+    #
+
+DIR_activationfunctions        := ActivationFunctions
+DIR_convolutionfunctions       := ConvolutionFunctions
+DIR_fullyconnectedfunctions    := FullyConnectedFunctions
+DIR_nnsupportfunctions         := NNSupportFunctions
+DIR_poolingfunctions           := PoolingFunctions
+DIR_softmaxfunctions           := SoftmaxFunctions
 
 .PHONY: cmsis-nn_%
 
 all: $(CMSIS_NN_MODULES)
 
 cmsis-nn_%:
-	$(MAKE) -C $(PKG_SOURCE_DIR)/CMSIS/NN/Source/$* -f $(CURDIR)/Makefile.cmsis-nn MODULE=$@
+	$(MAKE) -C $(PKG_SOURCE_DIR)/CMSIS/NN/Source/$(DIR_$*) -f $(CURDIR)/Makefile.cmsis-nn MODULE=$@
