@@ -105,12 +105,6 @@ void cpu_init(void)
 #ifdef MODULE_AVR_LIBC_EXTRA
     avr8_stdio_init();
 #endif
-    /* Initialize peripherals for which modules are included in the makefile.*/
-    /* spi_init */
-    /* rtc_init */
-    /* hwrng_init */
-    periph_init();
-
 #ifdef CPU_ATXMEGA
     /* Enable Multilevel Interrupt Controller */
     PMIC.CTRL |= PMIC_HILVLEN_bm
@@ -119,6 +113,12 @@ void cpu_init(void)
 #endif
 
     irq_enable();
+
+    /* Initialize peripherals for which modules are included in the makefile.*/
+    /* spi_init */
+    /* rtc_init */
+    /* hwrng_init */
+    periph_init();
 }
 
 struct __freelist {
