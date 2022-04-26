@@ -29,7 +29,7 @@ extern "C" {
  * @brief Enable double sided extended two way ranging
  */
 #ifndef MYNEWT_VAL_TWR_DS_EXT_ENABLED
-#define MYNEWT_VAL_TWR_DS_EXT_ENABLED IS_ACTIVE(MODULE_UWB_CORE_TWR_DS_EXT)
+#define MYNEWT_VAL_TWR_DS_EXT_ENABLED IS_USED(MODULE_UWB_CORE_TWR_DS_EXT)
 #endif
 
 /**
