@@ -25,7 +25,7 @@
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
-static struct netif netif;
+static lwip_netif_t netif;
 static netdev_ieee802154_submac_t nrf802154_netdev;
 
 static void auto_init_nrf802154(void)

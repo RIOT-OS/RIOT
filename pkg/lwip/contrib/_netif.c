@@ -16,12 +16,13 @@
  */
 
 #include "fmt.h"
-#include "lwip/netif.h"
+#include "lwip/netif/compat.h"
 #include "net/netif.h"
 
 int netif_get_name(netif_t *iface, char *name)
 {
-    struct netif *netif = (struct netif *)iface;
+    lwip_netif_t *lwip_netif = (lwip_netif_t*) iface;
+    struct netif *netif = &lwip_netif->lwip_netif;
 
     int res = 2;
     name[0] = netif->name[0];

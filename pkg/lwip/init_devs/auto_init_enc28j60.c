@@ -27,7 +27,7 @@
 
 #define NETIF_ENC28J60_NUMOF        ARRAY_SIZE(enc28j60_params)
 
-static struct netif netif[NETIF_ENC28J60_NUMOF];
+static lwip_netif_t netif[NETIF_ENC28J60_NUMOF];
 static enc28j60_t enc28j60_devs[NETIF_ENC28J60_NUMOF];
 
 static void auto_init_enc28j60(void)

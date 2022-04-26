@@ -21,6 +21,7 @@
 #include "lwip/ethip6.h"
 #include "lwip/netif.h"
 #include "lwip/netifapi.h"
+#include "lwip/netif/compat.h"
 #include "lwip/netif/netdev.h"
 #include "lwip/opt.h"
 #include "lwip/pbuf.h"
@@ -192,7 +193,6 @@ err_t lwip_netdev_init(struct netif *netif)
     }
     netif->flags |= NETIF_FLAG_IGMP;
     netif->flags |= NETIF_FLAG_MLD6;
-    netdev->context = netif;
 #if LWIP_IPV6_AUTOCONFIG
     netif->ip6_autoconfig_enabled = 1;
 #endif
@@ -279,7 +279,8 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         }
     }
     else {
-        struct netif *netif = dev->context;
+        lwip_netif_t *compat_netif = dev->context;
+        struct netif *netif = &compat_netif->lwip_netif;
         switch (event) {
             case NETDEV_EVENT_RX_COMPLETE: {
                 struct pbuf *p = _get_recv_pkt(dev);

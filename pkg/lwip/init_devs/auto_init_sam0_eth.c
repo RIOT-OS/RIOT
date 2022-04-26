@@ -27,7 +27,7 @@
 static netdev_t sam0_eth;
 extern void sam0_eth_setup(netdev_t *netdev);
 
-static struct netif netif;
+static lwip_netif_t netif;
 
 static void auto_init_sam0_eth(void)
 {
