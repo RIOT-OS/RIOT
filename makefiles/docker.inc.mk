@@ -86,7 +86,6 @@ export DOCKER_ENV_VARS_ALWAYS += \
   FEATURES_OPTIONAL \
   USEMODULE \
   USEPKG \
-  KCONFIG_ADD_CONFIG \
  #
 
 # Find which variables were set using the command line or the environment and
