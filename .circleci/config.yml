@@ -15,8 +15,11 @@ jobs:
       - run:
           command: |
             cp -R doc/doxygen/html /doc
+      - run:
+          name: Compress Artifacts
+          command: tar -cvzf /doc.tar /doc
       - store_artifacts:
-          path: /doc
+          path: /doc.tar
 
 workflows:
   version: 2
