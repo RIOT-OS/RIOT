@@ -80,6 +80,10 @@ ifneq (,$(filter test,$(MAKECMDGOALS)))
   DEFAULT_MODULE += test_utils_interactive_sync
 endif
 
+# This application provides a 'Kconfig' file and we want to explicitly disable
+# Kconfig by default by setting this variable to empty
+SHOULD_RUN_KCONFIG ?=
+
 include $(RIOTBASE)/Makefile.include
 
 ifndef CONFIG_KCONFIG_USEMODULE_LORAWAN

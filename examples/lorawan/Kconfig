@@ -1,0 +1,5 @@
+config APPLICATION
+    bool
+    default y
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_RTC if HAS_PERIPH_RTC && (!HAVE_SHARED_PERIPH_RTT_PERIPH_RTC || !MODULE_PERIPH_RTT)
