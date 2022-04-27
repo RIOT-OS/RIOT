@@ -54,11 +54,11 @@
 /* Internal functions */
 static void *_event_loop(void *arg);
 static void _on_sock_udp_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg);
-static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote,
+static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux,
                               uint8_t *buf, size_t len, bool truncated);
 static int _tl_init_coap_socket(gcoap_socket_t *sock, gcoap_socket_type_t type);
 static ssize_t _tl_send(gcoap_socket_t *sock, const void *data, size_t len,
-                        const sock_udp_ep_t *remote);
+                        const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux);
 static ssize_t _tl_authenticate(gcoap_socket_t *sock, const sock_udp_ep_t *remote,
                                 uint32_t timeout);
 static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
@@ -264,7 +264,7 @@ static void _on_sock_dtls_evt(sock_dtls_t *sock, sock_async_flags_t type, void *
         sock_udp_ep_t ep;
         sock_dtls_session_get_udp_ep(&socket.ctx_dtls_session, &ep);
         /* Truncated DTLS messages would already have gotten lost at verification */
-        _process_coap_pdu(&socket, &ep,  _listen_buf, res, false);
+        _process_coap_pdu(&socket, &ep, NULL, _listen_buf, res, false);
     }
 }
 
@@ -295,6 +295,9 @@ static void _on_sock_udp_evt(sock_udp_t *sock, sock_async_flags_t type, void *ar
         void *buf_ctx = NULL;
         bool truncated = false;
         size_t cursor = 0;
+        sock_udp_aux_rx_t aux_in = {
+            .flags = SOCK_AUX_GET_LOCAL,
+        };
 
         /* The zero-copy _buf API is not used to its full potential here -- we
          * still copy out data in what is a manual version of sock_udp_recv,
@@ -307,7 +310,7 @@ static void _on_sock_udp_evt(sock_udp_t *sock, sock_async_flags_t type, void *ar
          * single slice (but that may be a realistic assumption).
          */
         while (true) {
-            ssize_t res = sock_udp_recv_buf(sock, &stackbuf, &buf_ctx, 0, &remote);
+            ssize_t res = sock_udp_recv_buf_aux(sock, &stackbuf, &buf_ctx, 0, &remote, &aux_in);
             if (res < 0) {
                 DEBUG("gcoap: udp recv failure: %d\n", (int)res);
                 return;
@@ -322,13 +325,24 @@ static void _on_sock_udp_evt(sock_udp_t *sock, sock_async_flags_t type, void *ar
             memcpy(&_listen_buf[cursor], stackbuf, res);
             cursor += res;
         }
-        gcoap_socket_t socket = { .type = GCOAP_SOCKET_TYPE_UDP, .socket.udp = sock };
-        _process_coap_pdu(&socket, &remote, _listen_buf, cursor, truncated);
+
+        /* make sure we reply with the same address that the request was destined for */
+        sock_udp_aux_tx_t aux_out = {
+            .flags = SOCK_AUX_SET_LOCAL,
+            .local = aux_in.local,
+        };
+
+        gcoap_socket_t socket = {
+            .type = GCOAP_SOCKET_TYPE_UDP,
+            .socket.udp = sock,
+         };
+
+        _process_coap_pdu(&socket, &remote, &aux_out, _listen_buf, cursor, truncated);
     }
 }
 
 /* Processes and evaluates the coap pdu */
-static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote,
+static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux,
                               uint8_t *buf, size_t len, bool truncated)
 {
     coap_pkt_t pdu;
@@ -393,8 +407,7 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote,
             }
 
             if (pdu_len > 0) {
-                ssize_t bytes = _tl_send(sock, _listen_buf, pdu_len,
-                                                remote);
+                ssize_t bytes = _tl_send(sock, _listen_buf, pdu_len, remote, aux);
                 if (bytes <= 0) {
                     DEBUG("gcoap: send response failed: %d\n", (int)bytes);
                 }
@@ -454,8 +467,7 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote,
          * */
         pdu.hdr->ver_t_tkl &= 0xf0;
 
-        ssize_t bytes = _tl_send(sock, buf,
-                                      sizeof(coap_hdr_t), remote);
+        ssize_t bytes = _tl_send(sock, buf, sizeof(coap_hdr_t), remote, aux);
         if (bytes <= 0) {
             DEBUG("gcoap: empty response failed: %d\n", (int)bytes);
         }
@@ -492,7 +504,7 @@ static void _on_resp_timeout(void *arg) {
         }
 
         ssize_t bytes = _tl_send(&memo->socket, memo->msg.data.pdu_buf,
-                                 memo->msg.data.pdu_len, &memo->remote_ep);
+                                 memo->msg.data.pdu_len, &memo->remote_ep, NULL);
         if (bytes <= 0) {
             DEBUG("gcoap: sock resend failed: %d\n", (int)bytes);
             _expire_request(memo);
@@ -978,12 +990,12 @@ static int _tl_init_coap_socket(gcoap_socket_t *sock, gcoap_socket_type_t type)
 }
 
 static ssize_t _tl_send(gcoap_socket_t *sock, const void *data, size_t len,
-                       const sock_udp_ep_t *remote)
+                        const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux)
 {
     ssize_t res = -1;
     switch (sock->type) {
         case GCOAP_SOCKET_TYPE_UDP:
-            res = sock_udp_send(sock->socket.udp, data, len, remote);
+            res = sock_udp_send_aux(sock->socket.udp, data, len, remote, aux);
             break;
 #if IS_USED(MODULE_GCOAP_DTLS)
         case GCOAP_SOCKET_TYPE_DTLS:
@@ -1268,7 +1280,7 @@ ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
     }
 
     if (res == 0) {
-        res = _tl_send(&socket, buf, len, remote);
+        res = _tl_send(&socket, buf, len, remote, NULL);
     }
     if (res <= 0) {
         if (memo != NULL) {
@@ -1346,7 +1358,7 @@ size_t gcoap_obs_send(const uint8_t *buf, size_t len,
     _find_obs_memo_resource(&memo, resource);
 
     if (memo) {
-        ssize_t bytes = _tl_send(&memo->socket, buf, len, memo->observer);
+        ssize_t bytes = _tl_send(&memo->socket, buf, len, memo->observer, NULL);
         return (size_t)((bytes > 0) ? bytes : 0);
     }
     else {
