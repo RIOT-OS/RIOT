@@ -63,6 +63,10 @@ endif
 
 ifneq (,$(filter nimble_autoadv,$(USEMODULE)))
   USEMODULE += bluetil_ad
+  USEMODULE += bluetil_addr
+  ifneq (,$(filter shell_commands,$(USEMODULE)))
+    DEFAULT_MODULE += nimble_autoadv_shell
+  endif
 endif
 
 ifneq (,$(filter nimble_autoconn_ext,$(USEMODULE)))
@@ -120,6 +124,15 @@ endif
 ifneq (,$(filter nimble_netif_ext,$(USEMODULE)))
   USEMODULE += nimble_netif
   USEMODULE += nimble_adv_ext
+endif
+
+ifneq (,$(filter nimble_netif,$(USEMODULE)))
+  # nimble_netif and nimble_autoadv will both setup gat advertisement, which will
+  # conflict with each other. Using the extended advertisement module allows
+  # setting this up on independent state machines allowing them to run concurently
+  ifneq (,$(filter nimble_autoadv,$(USEMODULE)))
+    USEMODULE += nimble_adv_ext
+  endif
 endif
 
 ifneq (,$(filter nimble_netif,$(USEMODULE)))

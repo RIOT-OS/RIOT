@@ -88,6 +88,7 @@ endif
 
 ifneq (,$(filter nimble_autoadv,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/autoadv/include
+  DIRS += $(RIOTPKG)/nimble/autoadv
 endif
 
 ifneq (,$(filter nimble_autoconn,$(USEMODULE)))
@@ -97,8 +98,19 @@ endif
 ifneq (,$(filter nimble_adv_ext,$(USEMODULE)))
   CFLAGS += -DMYNEWT_VAL_BLE_EXT_ADV=1
   CFLAGS += -DMYNEWT_VAL_BLE_LL_EXT_ADV_AUX_PTR_CNT=2
+  CFLAGS += -DMYNEWT_VAL_BLE_LL_SCAN_AUX_SEGMENT_CNT=1
   ifneq (,$(filter nimble_controller,$(USEMODULE)))
     CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_LL_EXT_ADV=1
+  endif
+  ifneq (,$(filter nimble_netif,$(USEMODULE)))
+    $(eval $(call _add_ext_adv_instance,NIMBLE_NETIF_ADV_INSTANCE))
+  endif
+  ifneq (,$(filter nimble_autoadv,$(USEMODULE)))
+    $(eval $(call _add_ext_adv_instance,NIMBLE_AUTOADV_INSTANCE))
+  endif
+  # check that an advertisement instances was configured
+  ifneq (-1,$(BLE_MULTI_ADV_INSTANCES))
+    CFLAGS += -DMYNEWT_VAL_BLE_MULTI_ADV_INSTANCES=$(BLE_MULTI_ADV_INSTANCES)
   endif
 endif
 

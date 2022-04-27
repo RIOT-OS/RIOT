@@ -55,7 +55,9 @@
 #define NIMBLE_NETIF_PRIO       GNRC_NETIF_PRIO
 #endif
 
-#define EXT_ADV_INST            0
+#ifndef CONFIG_NIMBLE_NETIF_ADV_INSTANCE
+#define CONFIG_NIMBLE_NETIF_ADV_INSTANCE            0
+#endif
 
 /* thread flag used for signaling transmit readiness */
 #define FLAG_TX_UNSTALLED       (1u << 13)
@@ -682,26 +684,6 @@ int nimble_netif_close(int handle)
     return 0;
 }
 
-#if MYNEWT_VAL_BLE_EXT_ADV
-static int _get_phy_hci(uint8_t mode)
-{
-    switch (mode) {
-        case NIMBLE_PHY_1M:
-            return BLE_HCI_LE_PHY_1M;
-#if IS_USED(MODULE_NIMBLE_PHY_2MBIT)
-        case NIMBLE_PHY_2M:
-            return BLE_HCI_LE_PHY_2M;
-#endif
-#if IS_USED(MODULE_NIMBLE_PHY_CODED)
-        case NIMBLE_PHY_CODED:
-            return BLE_HCI_LE_PHY_CODED;
-#endif
-        default:
-            return -1;
-    }
-}
-#endif
-
 static int _accept(const uint8_t *ad, size_t ad_len, const ble_addr_t *addr,
                    const nimble_netif_accept_cfg_t *params)
 {
@@ -728,8 +710,8 @@ static int _accept(const uint8_t *ad, size_t ad_len, const ble_addr_t *addr,
     memset(&p, 0, sizeof(p));
 
     /* figure out PHY modes */
-    int phy_pri = _get_phy_hci(params->primary_phy);
-    int phy_sec = _get_phy_hci(params->secondary_phy);
+    int phy_pri = nimble_riot_get_phy_hci(params->primary_phy);
+    int phy_sec = nimble_riot_get_phy_hci(params->secondary_phy);
     if ((phy_pri < 0) || (phy_sec < 0)) {
         nimble_netif_conn_free(handle, NULL);
         return -EINVAL;
@@ -763,7 +745,7 @@ static int _accept(const uint8_t *ad, size_t ad_len, const ble_addr_t *addr,
     p.secondary_phy = (uint8_t)phy_sec;
     p.tx_power = params->tx_power;
 
-    res = ble_gap_ext_adv_configure(EXT_ADV_INST, &p, NULL,
+    res = ble_gap_ext_adv_configure(CONFIG_NIMBLE_NETIF_ADV_INSTANCE, &p, NULL,
                                     _on_gap_slave_evt, (void *)handle);
     if (res != 0) {
         nimble_netif_conn_free(handle, NULL);
@@ -782,10 +764,10 @@ static int _accept(const uint8_t *ad, size_t ad_len, const ble_addr_t *addr,
             nimble_netif_conn_free(handle, NULL);
             return -ENOMEM;
         }
-        res = ble_gap_ext_adv_set_data(EXT_ADV_INST, data);
+        res = ble_gap_ext_adv_set_data(CONFIG_NIMBLE_NETIF_ADV_INSTANCE, data);
         assert(res == 0);
     }
-    res = ble_gap_ext_adv_start(EXT_ADV_INST, params->timeout_ms / 10, 0);
+    res = ble_gap_ext_adv_start(CONFIG_NIMBLE_NETIF_ADV_INSTANCE, params->timeout_ms / 10, 0);
 #else
     uint8_t mode = (addr != NULL) ? BLE_GAP_CONN_MODE_DIR
                                   : BLE_GAP_CONN_MODE_UND;
@@ -847,7 +829,7 @@ int nimble_netif_accept_stop(void)
 
     int res;
 #if MYNEWT_VAL_BLE_EXT_ADV
-    res = ble_gap_ext_adv_stop(EXT_ADV_INST);
+    res = ble_gap_ext_adv_stop(CONFIG_NIMBLE_NETIF_ADV_INSTANCE);
 #else
     res = ble_gap_adv_stop();
 #endif

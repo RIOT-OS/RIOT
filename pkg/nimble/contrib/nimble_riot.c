@@ -41,6 +41,11 @@
 #include "nimble_statconn.h"
 #endif
 
+#ifdef MODULE_NIMBLE_AUTOADV
+#include "nimble_autoadv_params.h"
+#include "nimble_autoadv.h"
+#endif
+
 #if defined(MODULE_NIMBLE_AUTOCONN) && !defined(MODULE_NIMBLE_AUTOCONN_NOAUTOINIT)
 #include "nimble_autoconn.h"
 #include "nimble_autoconn_params.h"
@@ -184,8 +189,7 @@ void nimble_riot_init(void)
 #endif
 
 #ifdef MODULE_NIMBLE_AUTOADV
-    extern void nimble_autoadv_init(void);
-    nimble_autoadv_init();
+    nimble_autoadv_init(&nimble_autoadv_cfg);
 #endif
 
 #ifdef MODULE_NIMBLE_RPBLE
@@ -193,3 +197,23 @@ void nimble_riot_init(void)
     assert(res == 0);
 #endif
 }
+
+#if MYNEWT_VAL_BLE_EXT_ADV
+int nimble_riot_get_phy_hci(uint8_t mode)
+{
+    switch (mode) {
+    case NIMBLE_PHY_1M:
+        return BLE_HCI_LE_PHY_1M;
+#if IS_USED(MODULE_NIMBLE_PHY_2MBIT)
+    case NIMBLE_PHY_2M:
+        return BLE_HCI_LE_PHY_2M;
+#endif
+#if IS_USED(MODULE_NIMBLE_PHY_CODED)
+    case NIMBLE_PHY_CODED:
+        return BLE_HCI_LE_PHY_CODED;
+#endif
+    default:
+        return -1;
+    }
+}
+#endif

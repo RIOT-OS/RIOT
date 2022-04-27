@@ -35,7 +35,7 @@ to your makefile.
 
 The advertised device name can then optionally be configured with
 ```
-CFLAGS += -DNIMBLE_AUTOADV_DEVICE_NAME='"Riot OS device"'
+CFLAGS += -DCONFIG_NIMBLE_AUTOADV_DEVICE_NAME='"Riot OS device"'
 ```
 Otherwise the device will appear as "*RIOT OS device*".
 

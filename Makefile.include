@@ -172,6 +172,8 @@ CLEAN = $(filter clean, $(MAKECMDGOALS))
 include $(RIOTMAKE)/utils/variables.mk
 include $(RIOTMAKE)/utils/strings.mk
 
+# include nimble makefile tools
+include $(RIOTMAKE)/pkg/nimble.adv.mk
 
 # UNAME is always needed so use simple variable expansion so only evaluated once
 UNAME := $(shell uname -m -s)

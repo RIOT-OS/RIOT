@@ -14947,3 +14947,12 @@ boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member ETH_DMA_ISR
 boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member eth_config \(variable\) of file periph_conf\.h is not documented\.
 boards/arduino\-mega2560/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_ADJUST_SET \(macro definition\) of file board\.h is not documented\.
 boards/arduino\-mega2560/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_ADJUST_SLEEP \(macro definition\) of file board\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_ADV_ITVL_MS \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_ADV_DURATION_MS \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_FLAGS \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_PHY \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_TX_POWER \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_CHANNEL_MAP \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_OWN_ADDR_TYPE \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_FILTER_POLICY \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_PARAMS \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
