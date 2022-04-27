@@ -151,5 +151,5 @@
 /tests/cpu_efm32_features/                  @basilfx
 
 # KConfig maintainers will be notified about all KConfig changes
-Kconfig                                     @leandrolanzieri @jia200x @cgundogan
+Kconfig                                     @leandrolanzieri @jia200x @MrKevinWeiss
 pm.c                                        @kaspar030
