@@ -55,9 +55,9 @@ class TwrCmd(ShellInteraction):
             args=("lst", "on" if on else "off"), timeout=timeout, async_=async_
         )
 
-    def twr_req(self, count=1, interval=1000, proto="ss", timeout=-1, async_=False):
+    def twr_req(self, addr="ff:ff", count=1, interval=1000, proto="ss", timeout=-1, async_=False):
         return self.twr_cmd(
-            args=("req", f"-c {count}", f"-p {proto}", f"-i {interval}"),
+            args=("req", f"{addr}", f"-c {count}", f"-p {proto}", f"-i {interval}"),
             timeout=timeout,
             async_=async_,
         )
