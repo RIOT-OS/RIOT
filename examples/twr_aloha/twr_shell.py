@@ -18,6 +18,7 @@ class TwrIfconfigParser(ShellInteractionParser):
     hwaddr_c = re.compile(r"HWaddr:\s+(?P<name>[0-9a-fA-F:]+)\s")
     hwaddr64_c = re.compile(r"Long HWaddr:\s+(?P<name>[0-9a-fA-F:]+)")
     panid_c = re.compile(r"NID:\s+(?P<name>[0-9a-fA-F:]+)")
+    channel_c = re.compile(r"Channel:\s+(?P<name>[0-9]+)")
 
     def parse(self, cmd_output):
         netif = {
@@ -25,6 +26,7 @@ class TwrIfconfigParser(ShellInteractionParser):
             "hwaddr": None,
             "hwaddr64": None,
             "panid": None,
+            "channel": None,
         }
         for line in cmd_output.splitlines():
             m = self.iface_c.search(line)
@@ -39,6 +41,9 @@ class TwrIfconfigParser(ShellInteractionParser):
             m = self.panid_c.search(line)
             if m is not None:
                 netif["panid"] = m.group("name")
+            m = self.channel_c.search(line)
+            if m is not None:
+                netif["channel"] = m.group("name")
         return netif
 
 

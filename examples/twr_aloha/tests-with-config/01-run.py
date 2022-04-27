@@ -23,6 +23,7 @@ class TwrShell(Reboot, TwrCmd):
         "hwaddr": None,
         "hwaddr64": None,
         "panid": None,
+        "channel": None,
     }
 
     def parse_netif(self):
@@ -40,6 +41,9 @@ class TwrShell(Reboot, TwrCmd):
 
     def panid(self):
         return self._netif["panid"]
+
+    def channel(self):
+        return self._netif["channel"]
 
 
 class TestTWRBase(unittest.TestCase):
@@ -68,7 +72,7 @@ class TestTWR(TestTWRBase):
         assert self.shell.panid() == "DE:CA"
         assert self.shell.hwaddr() is not None
         assert self.shell.hwaddr64() is not None
-        assert self.shell.panid() is not None
+        assert self.shell.channel() == "5"  # default channel is 5
 
     def test_listen(self):
         assert "[twr]: start listening" in self.shell.twr_listen(on=True)

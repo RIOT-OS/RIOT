@@ -35,6 +35,14 @@
 #define IEEE802154_SHORT_ADDRESS_LEN_STR_MAX \
     (sizeof("00:00"))
 
+/* See 7.2.31.1 Units of TX Power Control */
+#define DW1000_TX_POWER_COARSE_SHIFT        (5)
+#define DW1000_TX_POWER_COARSE_MASK         (0xE0)
+#define DW1000_TX_POWER_FINE_MASK           (0x1F)
+#define DW1000_TX_POWER_MULTI               (10)
+#define DW1000_TX_POWER_COARSE_STEP         (30)        /* 3dbM * 10 */
+#define DW1000_TX_POWER_FINE_STEP           (5)         /* 0.5dbM * 10 */
+
 int _twr_ifconfig(int argc, char **argv)
 {
     (void)argc;
@@ -49,11 +57,24 @@ int _twr_ifconfig(int argc, char **argv)
     printf("\tHWaddr: %s  ",
            l2util_addr_to_str(buffer, IEEE802154_SHORT_ADDRESS_LEN, addr_str));
     byteorder_htobebufs(buffer, udev->pan_id);
+    printf("Channel: %d  ", udev->config.channel);
     printf("NID: %s\n\n",
            l2util_addr_to_str(buffer, IEEE802154_SHORT_ADDRESS_LEN, addr_str));
     byteorder_htobebufll(buffer, udev->euid);
     printf("\t\tLong HWaddr: %s\n",
            l2util_addr_to_str(buffer, IEEE802154_LONG_ADDRESS_LEN, addr_str));
+    /* 000 -> 18dBM gain, 110 -> 0dBm gain */
+    int tx_power =
+        DW1000_TX_POWER_COARSE_STEP  *
+        (6 -
+         ((udev->config.txrf.BOOSTNORM & DW1000_TX_POWER_COARSE_MASK) >>
+          DW1000_TX_POWER_COARSE_SHIFT)) +
+        (udev->config.txrf.BOOSTNORM & DW1000_TX_POWER_FINE_MASK) *
+        DW1000_TX_POWER_FINE_STEP;
+
+    printf("\t\tTX-Power: %d.%ddBm  ", tx_power / DW1000_TX_POWER_MULTI,
+           tx_power > (tx_power / DW1000_TX_POWER_MULTI) * DW1000_TX_POWER_MULTI ? 5 : 0);
+    printf("TC-PGdelay: 0x%02x\n", udev->config.txrf.PGdly);
 
     return 0;
 }
