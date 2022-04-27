@@ -13,11 +13,15 @@ menuconfig MODULE_RANDOM
 
 if MODULE_RANDOM
 
+comment "This platform has a Hardware RNG, consider using it"
+    depends on HAS_PERIPH_HWRNG && !MODULE_PRNG_HWRNG
+
 choice RANDOM_IMPLEMENTATION
     bool "PRNG Implementation"
     depends on TEST_KCONFIG
-    default MODULE_PRNG_HWRNG if HAS_PERIPH_HWRNG
     default MODULE_PRNG_MUSL_LCG
+    # TODO: make HWRNG on platforms where it is available is a better default, but we want to
+    # match Makefile.dep. Add it back when migration is done.
 
 menuconfig MODULE_PRNG_FORTUNA
     bool "Fortuna"
