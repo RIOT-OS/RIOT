@@ -19,7 +19,7 @@
 
 #include "cpu.h"
 #include "nrf_clock.h"
-#include "nrfx.h"
+#include "nrfx_riot.h"
 #include "periph_conf.h"
 #include "periph/init.h"
 #include "stdio_base.h"
