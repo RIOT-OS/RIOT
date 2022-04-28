@@ -5,10 +5,6 @@
 # directory for more details.
 #
 
-config MODULE_PTHREAD
-    bool "Pthread Support"
+config MODULE_MODELS
+    bool "uTensor models"
     depends on TEST_KCONFIG
-    select MODULE_TIMEX
-    select MODULE_ZTIMER
-    select MODULE_ZTIMER64_XTIMER_COMPAT if MODULE_ZTIMER_XTIMER_COMPAT
-    select ZTIMER64_USEC
