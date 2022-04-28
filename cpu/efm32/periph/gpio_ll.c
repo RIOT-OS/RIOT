@@ -47,6 +47,16 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, const gpio_conf_t *conf)
     case GPIO_OUTPUT_PUSH_PULL:
         mode = gpioModePushPull;
         break;
+    case GPIO_OUTPUT_OPEN_DRAIN:
+        mode = gpioModeWiredAnd;
+        break;
+    case GPIO_OUTPUT_OPEN_SOURCE:
+        mode = gpioModeWiredOr;
+        break;
+    case GPIO_USED_BY_PERIPHERAL:
+        /* Needs to be configured to what the peripheral actually needs
+         * instead (eg. DISABLED for analog input, some output for timers and
+         * UARTs etc); fall-through */
     default:
         /* Some probably are by the hardware, but not yet by this
          * implementation */
@@ -67,6 +77,12 @@ void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin)
     switch (mode) {
     case gpioModePushPull:
         dest->state = GPIO_OUTPUT_PUSH_PULL;
+        break;
+    case gpioModeWiredOr:
+        dest->state = GPIO_OUTPUT_OPEN_SOURCE;
+        break;
+    case gpioModeWiredAnd:
+        dest->state = GPIO_OUTPUT_OPEN_DRAIN;
         break;
     case gpioModeInput:
         dest->state = GPIO_INPUT;
