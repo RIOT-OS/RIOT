@@ -107,3 +107,5 @@ endif
 ifneq (,$(filter esp_jtag,$(USEMODULE)))
   FEATURES_REQUIRED += esp_jtag
 endif
+
+USEMODULE += libc_gettimeofday
