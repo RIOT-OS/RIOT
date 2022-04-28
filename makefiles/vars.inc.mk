@@ -4,6 +4,7 @@ FLASH_ADDR ?= 0x0
 export Q                     # Used in front of Makefile lines to suppress the printing of the command if user did not opt-in to see them.
 export QQ                    # as Q, but be more quiet
 export QUIET                 # The parameter to use whether to show verbose makefile commands or not.
+export QUIETER               # The parameter to use to hide most makefile output
 
 export OS                    # The operating system of the build host
 export OS_ARCH               # The build host's hardware architecture
