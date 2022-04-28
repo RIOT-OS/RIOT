@@ -31,7 +31,7 @@ all: $(filter $(MYNEWT_CORE_MODULES),$(USEMODULE))
 	@true
 
 mynewt-core_%: rm_riot_provided_headers
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/$(MYNEWT_CORE_PATH_$*) -f $(RIOTPKG)/$(PKG_NAME)/$@.mk MODULE=$@
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/$(MYNEWT_CORE_PATH_$*) -f $(RIOTPKG)/$(PKG_NAME)/$@.mk MODULE=$@
 
 # The following mynewt-core headers are provided by RIOT, remove them from
 # mynewt-core include paths to avoid header conflicts
