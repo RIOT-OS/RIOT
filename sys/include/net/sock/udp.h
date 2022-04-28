@@ -683,8 +683,9 @@ static inline ssize_t sock_udp_send_aux(sock_udp_t *sock,
                                         sock_udp_aux_tx_t *aux)
 {
     const iolist_t snip = {
-        .iol_base = (void *)data,
-        .iol_len  = len,
+        NULL,
+        (void *)data,
+        len,
     };
 
     return sock_udp_sendv_aux(sock, &snip, remote, aux);
