@@ -30,28 +30,59 @@
 
 int gpio_ll_init(gpio_port_t port, uint8_t pin, const gpio_conf_t *conf)
 {
-    if (conf->pull != GPIO_FLOATING) {
-        /* Some probably are by the hardware, but not yet by this
-         * implementation */
-        return -ENOTSUP;
-    }
-
     GPIO_Mode_TypeDef mode;
+
+    bool initial = conf->initial_value;
+
     switch (conf->state) {
     case GPIO_DISCONNECT:
+        /* ignoring pull */
         mode = gpioModeDisabled;
         break;
     case GPIO_INPUT:
-        mode = gpioModeInput;
+        switch (conf->pull) {
+        case GPIO_FLOATING:
+            mode = gpioModeInput;
+            break;
+        case GPIO_PULL_UP:
+            initial = true;
+            mode = gpioModeInputPull;
+            break;
+        case GPIO_PULL_DOWN:
+            initial = false;
+            mode = gpioModeInputPull;
+            break;
+        default:
+            return -ENOTSUP;
+        }
         break;
     case GPIO_OUTPUT_PUSH_PULL:
+        /* ignoring pull */
         mode = gpioModePushPull;
         break;
     case GPIO_OUTPUT_OPEN_DRAIN:
-        mode = gpioModeWiredAnd;
+        switch (conf->pull) {
+        case GPIO_FLOATING:
+            mode = gpioModeWiredAnd;
+            break;
+        case GPIO_PULL_UP:
+            mode = gpioModeWiredAndPullUp;
+            break;
+        default: /* including PULL_DOWN, which makes no sense here*/
+            return -ENOTSUP;
+        }
         break;
     case GPIO_OUTPUT_OPEN_SOURCE:
-        mode = gpioModeWiredOr;
+        switch (conf->pull) {
+        case GPIO_FLOATING:
+            mode = gpioModeWiredOr;
+            break;
+        case GPIO_PULL_DOWN:
+            mode = gpioModeWiredOrPullDown;
+            break;
+        default: /* including PULL_UP, which makes no sense here*/
+            return -ENOTSUP;
+        }
         break;
     case GPIO_USED_BY_PERIPHERAL:
         /* Needs to be configured to what the peripheral actually needs
@@ -63,7 +94,7 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, const gpio_conf_t *conf)
         return -ENOTSUP;
     }
 
-    GPIO_PinModeSet(port, pin, mode, conf->initial_value);
+    GPIO_PinModeSet(port, pin, mode, initial);
 
     return 0;
 }
@@ -74,6 +105,8 @@ void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin)
 
     GPIO_Mode_TypeDef mode = GPIO_PinModeGet(port, pin);
 
+    dest->pull = GPIO_FLOATING;
+
     switch (mode) {
     case gpioModePushPull:
         dest->state = GPIO_OUTPUT_PUSH_PULL;
@@ -81,11 +114,25 @@ void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin)
     case gpioModeWiredOr:
         dest->state = GPIO_OUTPUT_OPEN_SOURCE;
         break;
+    case gpioModeWiredOrPullDown:
+        dest->state = GPIO_OUTPUT_OPEN_SOURCE;
+        dest->pull = GPIO_PULL_DOWN;
+        break;
     case gpioModeWiredAnd:
         dest->state = GPIO_OUTPUT_OPEN_DRAIN;
         break;
+    case gpioModeWiredAndPullUp:
+        dest->state = GPIO_OUTPUT_OPEN_DRAIN;
+        dest->pull = GPIO_PULL_UP;
+        break;
     case gpioModeInput:
         dest->state = GPIO_INPUT;
+        break;
+    case gpioModeInputPull:
+        dest->state = GPIO_INPUT;
+        dest->pull = GPIO_PinOutGet(port, pin) ?
+            GPIO_PULL_UP :
+            GPIO_PULL_DOWN;
         break;
     case gpioModeDisabled:
         /* Fall-through: There is no error reporting here */
@@ -93,8 +140,6 @@ void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin)
         dest->state = GPIO_DISCONNECT;
         break;
     }
-
-    dest->pull = GPIO_FLOATING;
 
     /* as good as any */
     dest->slew_rate = GPIO_SLEW_FAST;
