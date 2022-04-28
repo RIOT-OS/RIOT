@@ -14,6 +14,23 @@
  * @file
  * @brief       CPU specific part of the Peripheral GPIO Low-Level API
  *
+ * Noteworthy aspects of this implementation:
+ *
+ * * The platform has no "GPIO_USED_BY_PERIPHERAL" -- instead, the pin needs to
+ *   be configured as by the using peripheral's properties (eg. push-pull for
+ *   UART, disabled for ADC to minimize GPIO influence, etc.).
+ *
+ * * Alternative drive strengths are supported by the hardware, but not
+ *   implemented in the driver. Adding them would be possible, but is tedious
+ *   to implement: As each port can only have one alternative drive strength,
+ *   changing that would require iterating over all pins, decide whether they
+ *   are using an alternative drive strength, and refuse changing it if any are
+ *   found.
+ *
+ * * There is an optional glitch suppression filter after the Schmitt trigger;
+ *   no custom API (which would be a local extension to @ref gpio_conf_t) is
+ *   implemented yet to enable the filters.
+ *
  * @author      Christian Amsüss <chrysn@fsfe.org>
  */
 

@@ -105,6 +105,7 @@ void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin)
 
     dest->initial_value = (gpio_ll_read_output(port) >> pin) & 1;
 
-    /* as good as any as long as we don't configure the others */
+    /* Using 'strong' her already as that fits with what the hardware has
+     * (lowest, low, standard, high) */
     dest->drive_strength = GPIO_DRIVE_STRONG;
 }
