@@ -20,11 +20,11 @@ all: $(PKG_SOURCE_DIR)/
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)
 
 $(PKG_SOURCE_DIR)/: $(PKGDIRBASE)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT)
-	test "$(PKG_SHA512)  $(PKG_ZIPFILE)" =  "$$(sha512sum "${PKG_ZIPFILE}")"
+	$(QQ)test "$(PKG_SHA512)  $(PKG_ZIPFILE)" =  "$$(sha512sum "${PKG_ZIPFILE}")"
 	$(Q)$(UNZIP_HERE) -D -d $(PKGDIRBASE) $<
 
 $(PKG_ZIPFILE):
-	mkdir -p $(PKGDIRBASE)
+	$(QQ)mkdir -p $(PKGDIRBASE)
 	$(Q)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT)
 
 clean::

@@ -111,40 +111,41 @@ gen_dependency_files = $(file >$1,$@: $2)$(foreach f,$2,$(file >>$1,$(f):))
 # * checkout the wanted base commit
 # * apply patches if there are any. (If none, it does nothing)
 $(PKG_PATCHED): $(PKG_PATCHED_PREREQUISITES)
-	$(info [INFO] patch $(PKG_NAME))
+	$(if $(QUIETER),,$(info [INFO] patch $(PKG_NAME)))
 	$(call gen_dependency_files,$@.d,$(PKG_PATCHED_PREREQUISITES))
 	$(Q)$(GIT_IN_PKG) clean $(GIT_QUIET) -xdff '**' -e $(PKG_STATE:$(PKG_SOURCE_DIR)/%='%*')
 	$(Q)$(GIT_IN_PKG) checkout $(GIT_QUIET) -f $(PKG_VERSION)
 	$(Q) if test -n "$(PKG_PATCHES)" ; then \
 	       $(GIT_IN_PKG) $(GITFLAGS) am $(GITAMFLAGS) $(PKG_PATCHES) ; \
 	     fi
-	@touch $@
+	$(Q)touch $@
 
 $(PKG_DOWNLOADED): $(MAKEFILE_LIST) | $(PKG_SOURCE_DIR)/.git
-	$(info [INFO] updating $(PKG_NAME) $(PKG_DOWNLOADED))
+	$(if $(QUIETER),,$(info [INFO] updating $(PKG_NAME) $(PKG_DOWNLOADED)))
 	$(Q)if ! $(GIT_IN_PKG) cat-file -e $(PKG_VERSION); then \
-		printf "[INFO] fetching new $(PKG_NAME) version "$(PKG_VERSION)"\n"; \
+		$(if $(QUIETER),,printf "[INFO] fetching new $(PKG_NAME) version "$(PKG_VERSION)"\n";) \
 		$(GIT_IN_PKG) fetch $(GIT_QUIET) "$(PKG_URL)" "$(PKG_VERSION)"; \
 	fi
-	echo $(PKG_VERSION) > $@
+	$(Q)echo $(PKG_VERSION) > $@
 
 ifeq ($(GIT_CACHE_DIR),$(wildcard $(GIT_CACHE_DIR)))
 $(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
-	$(info [INFO] cloning $(PKG_NAME))
+	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME)))
 	$(Q)rm -Rf $(PKG_SOURCE_DIR)
 	$(Q)mkdir -p $(PKG_SOURCE_DIR)
 	$(Q)$(GITCACHE) clone $(PKG_URL) $(PKG_VERSION) $(PKG_SOURCE_DIR)
 else
+# redirect stderr so git sees a pipe and not a terminal see https://github.com/git/git/blob/master/progress.c#L138
 $(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
-	$(info [INFO] cloning without cache $(PKG_NAME))
+	$(if $(QUIETER),,$(info [INFO] cloning without cache $(PKG_NAME)))
 	$(Q)rm -Rf $(PKG_SOURCE_DIR)
 	$(Q)mkdir -p $(PKG_SOURCE_DIR)
-	$(Q)git init -q $(PKG_SOURCE_DIR)
+	$(Q)git init $(GIT_QUIET) $(PKG_SOURCE_DIR)
 	$(Q)$(GIT_IN_PKG) remote add origin $(PKG_URL)
 	$(Q)$(GIT_IN_PKG) config extensions.partialClone origin
 	$(Q)$(GIT_IN_PKG) config advice.detachedHead false
 	$(Q)$(GIT_IN_PKG) fetch $(GIT_QUIET) --depth=1 -t --filter=blob:none origin $(PKG_VERSION)
-	$(Q)$(GIT_IN_PKG) checkout $(GIT_QUIET) $(PKG_VERSION)
+	$(Q)$(GIT_IN_PKG) checkout $(GIT_QUIET) $(PKG_VERSION) 2>&1 | cat
 endif
 
 ifeq ($(PKG_SOURCE_DIR),$(PKG_BUILD_DIR))
