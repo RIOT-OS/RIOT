@@ -7,6 +7,9 @@ USEMODULE += random
 
 DEFAULT_MODULE += auto_init_csp
 
+FEATURES_OPTIONAL += periph_rtc
+FEATURES_OPTIONAL += periph_rtc_ms
+
 ifneq (,$(filter libcsp_contrib,$(USEMODULE)))
   USEMODULE += ztimer_msec
   USEMODULE += ztimer_sec

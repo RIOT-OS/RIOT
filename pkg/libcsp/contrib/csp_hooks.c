@@ -17,6 +17,7 @@
 
 #include <csp/csp_hooks.h>
 #include "cpu.h"
+#include "pm.h"
 
 __attribute__((weak)) uint32_t csp_memfree_hook(void)
 {
@@ -30,7 +31,11 @@ __attribute__((weak)) unsigned int csp_ps_hook(csp_packet_t *packet)
 }
 
 __attribute__((weak)) void csp_reboot_hook(void)
-{}
+{
+    pm_reboot();
+}
 
 __attribute__((weak)) void csp_shutdown_hook(void)
-{}
+{
+    pm_off();
+}

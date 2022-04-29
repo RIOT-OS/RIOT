@@ -89,7 +89,7 @@ static void _start_server(const char *port_str)
 {
     uint16_t port = atoi(port_str);
 
-    /* check tha port does not belong to one of the reserved ports and that its
+    /* check that port does not belong to one of the reserved ports and that its
        in the allowed port range */
     if (port <= CSP_UPTIME || port > csp_id_get_max_port()) {
         printf("ERROR: invalid port specified, Bind port [%d,%d)\n", CSP_UPTIME + 1,

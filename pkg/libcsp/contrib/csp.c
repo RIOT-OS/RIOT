@@ -25,7 +25,7 @@
 #include "thread.h"
 
 /**
- * @brief   Priority used for uwb-core event queue
+ * @brief   Priority used for CSP routing thread
  */
 #ifndef CSP_ROUTE_PRIO
 #define CSP_ROUTE_PRIO                   (THREAD_PRIORITY_MAIN - 3)

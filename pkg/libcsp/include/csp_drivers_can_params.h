@@ -31,15 +31,18 @@ extern "C" {
  * @{
  */
 #ifndef CONFIG_CSP_DRIVERS_CAN_IFNUM
-#define CONFIG_CSP_DRIVERS_CAN_IFNUM           (0)
+#define CONFIG_CSP_DRIVERS_CAN_IFNUM           (0)                      /**< Default Can Device ifnum */
 #endif
 #ifndef CONFIG_CSP_DRIVERS_CAN_ADDR
-#define CONFIG_CSP_DRIVERS_CAN_ADDR            CSP_CAN_IFACE_ADDR_UNDEF
+#define CONFIG_CSP_DRIVERS_CAN_ADDR            CSP_CAN_IFACE_ADDR_UNDEF /**< Default CSP can addr */
 #endif
 #ifndef CONFIG_CSP_DRIVERS_CAN_NETMASK
-#define CONFIG_CSP_DRIVERS_CAN_NETMASK         (4)
+#define CONFIG_CSP_DRIVERS_CAN_NETMASK         (4)                      /**< Default CSP can net mask */
 #endif
 
+/**
+ * @brief   Default CSP can driver interface parameters
+ */
 #ifndef CONFIG_CSP_DRIVERS_CAN_PARAMS_DEFAULT
 #define CONFIG_CSP_DRIVERS_CAN_PARAMS_DEFAULT        { .ifnum = CONFIG_CSP_DRIVERS_CAN_IFNUM, \
                                                        .addr = CONFIG_CSP_DRIVERS_CAN_ADDR, \

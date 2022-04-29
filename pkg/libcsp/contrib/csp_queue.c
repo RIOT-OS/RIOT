@@ -22,7 +22,7 @@
 
 static int pop_item(csp_static_queue_t *q, void *buf)
 {
-    if(tsrb_get(&q->tsrb, buf, q->item_size) == (int) q->item_size) {
+    if (tsrb_get(&q->tsrb, buf, q->item_size) == (int)q->item_size) {
         mutex_unlock(&q->push);
         return q->item_size;
     }
@@ -31,7 +31,7 @@ static int pop_item(csp_static_queue_t *q, void *buf)
 
 static int push_item(csp_static_queue_t *q, const void *value)
 {
-    if(tsrb_add(&q->tsrb, value, q->item_size) == (int) q->item_size) {
+    if (tsrb_add(&q->tsrb, value, q->item_size) == (int)q->item_size) {
         mutex_unlock(&q->pop);
         return q->item_size;
     }
@@ -42,7 +42,7 @@ csp_queue_handle_t csp_queue_create_static(int length, size_t item_size,
                                            char *buf, csp_static_queue_t *queue)
 {
     queue->item_size = item_size;
-    tsrb_init(&queue->tsrb, (uint8_t*) buf, length * item_size);
+    tsrb_init(&queue->tsrb, (uint8_t *)buf, length * item_size);
     mutex_init(&queue->pop);
     mutex_init(&queue->push);
     /* since all queues begin empty lock the 'pop' mutex */
@@ -58,6 +58,7 @@ int csp_queue_enqueue(csp_queue_handle_t queue, const void *value, uint32_t time
         return CSP_QUEUE_ERROR;
     }
     int res = push_item(queue, value);
+
     /* unlock 'push' lock, unless queue is full, next callers will wait on lock */
     if (csp_queue_free(queue)) {
         mutex_unlock(&queue->push);
@@ -79,6 +80,7 @@ int csp_queue_dequeue(csp_queue_handle_t queue, void *buf, uint32_t timeout)
         return CSP_QUEUE_ERROR;
     }
     int res = pop_item(queue, buf);
+
     /* unlock 'pop' lock, unless queue is empty, next callers will wait on lock */
     if (csp_queue_size(queue)) {
         mutex_unlock(&queue->pop);

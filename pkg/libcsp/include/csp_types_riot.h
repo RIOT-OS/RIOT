@@ -16,8 +16,8 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
-#ifndef CSP_RIOT_TYPES_H
-#define CSP_RIOT_TYPES_H
+#ifndef CSP_TYPES_RIOT_H
+#define CSP_TYPES_RIOT_H
 
 #include <stdint.h>
 
@@ -40,7 +40,7 @@ extern "C" {
 #define CSP_MAX_TIMEOUT         (UINT32_MAX)
 
 /**
- * @brief CSP sempahore type
+ * @brief CSP semaphore type
  */
 typedef sema_t csp_bin_sem_t;
 
@@ -63,4 +63,4 @@ typedef csp_static_queue_t *csp_queue_handle_t;
 }
 #endif
 
-#endif /* CSP_RIOT_TYPES_H */
+#endif /* CSP_TYPES_RIOT_H */
