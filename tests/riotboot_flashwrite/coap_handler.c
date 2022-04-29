@@ -15,9 +15,9 @@
 
 static riotboot_flashwrite_t _writer;
 
-ssize_t _flashwrite_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, void *context)
+ssize_t _flashwrite_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_request_ctx_t *ctx)
 {
-    riotboot_flashwrite_t *writer = context;
+    riotboot_flashwrite_t *writer = ctx->context;
 
     uint32_t result = COAP_CODE_204;
 
