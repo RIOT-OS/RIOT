@@ -258,6 +258,14 @@ typedef struct _coap_request_ctx coap_request_ctx_t;
  *
  * For POST, PATCH and other non-idempotent methods, this is an additional
  * requirement introduced by the contract of this type.
+ *
+ * @param[in]  pkt      The request packet
+ * @param[out] buf      Buffer for the response
+ * @param[in]  len      Size of the response buffer
+ * @param[in]  context  Request context
+ *
+ * @return     Number of response bytes written on success
+ *             Negative error on failure
  */
 typedef ssize_t (*coap_handler_t)(coap_pkt_t *pkt, uint8_t *buf, size_t len,
                                   coap_request_ctx_t *context);
