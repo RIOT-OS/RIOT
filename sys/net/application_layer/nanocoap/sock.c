@@ -403,7 +403,7 @@ int nanocoap_sock_get_blockwise(nanocoap_sock_t *sock, const char *path,
         DEBUG("fetching block %u\n", num);
 
         int res = _fetch_block(sock, buf, sizeof(buf), path, blksize, num, &ctx);
-        if (res) {
+        if (res < 0) {
             DEBUG("error fetching block %u: %d\n", num, res);
             return res;
         }
