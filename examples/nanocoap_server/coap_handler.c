@@ -22,7 +22,7 @@ static const uint8_t block2_intro[] = "This is RIOT (Version: ";
 static const uint8_t block2_board[] = " running on a ";
 static const uint8_t block2_mcu[] = " board with a ";
 
-static ssize_t _echo_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _echo_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
 {
     (void)context;
     char uri[CONFIG_NANOCOAP_URI_MAX];
@@ -37,14 +37,14 @@ static ssize_t _echo_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *co
                              (uint8_t *)sub_uri, sub_uri_len);
 }
 
-static ssize_t _riot_board_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _riot_board_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
 {
     (void)context;
     return coap_reply_simple(pkt, COAP_CODE_205, buf, len,
             COAP_FORMAT_TEXT, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
 }
 
-static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
 {
     (void)context;
     coap_block_slicer_t slicer;
@@ -77,7 +77,7 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, v
                                    buf, len, payload_len, &slicer);
 }
 
-static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
 {
     (void) context;
 
@@ -112,7 +112,7 @@ static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, vo
             COAP_FORMAT_TEXT, (uint8_t*)rsp, p);
 }
 
-ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, void *context)
+ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
 {
     (void)context;
 
