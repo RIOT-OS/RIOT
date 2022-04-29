@@ -131,8 +131,8 @@
  *                 pkt = msg.content.ptr;
  *                 _handle_outgoing_pkt(pkt);
  *                 break;
- *              case GNRC_NETAPI_MSG_TYPE_SET:
- *              case GNRC_NETAPI_MSG_TYPE_GET:
+ *             case GNRC_NETAPI_MSG_TYPE_SET:
+ *             case GNRC_NETAPI_MSG_TYPE_GET:
  *                 msg_reply(&msg, &reply);
  *                 break;
  *             default:
