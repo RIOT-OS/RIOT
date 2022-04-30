@@ -27,6 +27,10 @@
 #include "net/gcoap.h"
 #endif
 
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTT) || IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTTSN)
+#include "wolfmqtt/mqtt_types.h"
+#endif
+
 static const char *_scheme_strings[] = {
     "coap",
     "coaps",

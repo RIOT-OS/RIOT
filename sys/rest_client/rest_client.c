@@ -29,6 +29,14 @@
 #include "rest_client/transport/coap.h"
 #endif
 
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTT)
+#include "rest_client/transport/mqtt.h"
+#endif
+
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTTSN)
+#include "rest_client/transport/mqttsn.h"
+#endif
+
 #include "rest_client.h"
 
 #define ENABLE_DEBUG REST_CLIENT_ENABLE_DEBUG
@@ -46,6 +54,20 @@ static rest_client_result_t _dispatcher(
     {
         return rest_client_transport_coap_send(rest_client, listener, method, qos,
                                                headers, path, query_string, body, body_len);
+    }
+#endif
+
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTT)
+    if (rest_client->scheme == REST_CLIENT_SCHEME_MQTT) {
+        return rest_client_transport_mqtt_send(rest_client, listener, method, qos,
+                                               headers, path, query_string, body, body_len);
+    }
+#endif
+
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTTSN)
+    if (rest_client->scheme == REST_CLIENT_SCHEME_MQTTSN) {
+        return rest_client_transport_mqttsn_send(rest_client, listener, method, qos,
+                                                 headers, path, query_string, body, body_len);
     }
 #endif
 
@@ -181,6 +203,45 @@ rest_client_result_t rest_client_init(rest_client_t *rest_client)
     }
 #endif
 
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTT)
+    if (rest_client->scheme == REST_CLIENT_SCHEME_MQTT) {
+
+        assert(rest_client->scheme == REST_CLIENT_SCHEME_MQTT);
+        assert(rest_client->hostname != NULL);
+        assert(rest_client->port != 0);
+
+        if (_resolve(
+                rest_client->hostname,
+                rest_client->is_numeric_hostname,
+                &(rest_client->_addr)) < 0) {
+            DEBUG("_resolve() of %s failed\n", rest_client->hostname);
+            return REST_CLIENT_ERROR_CLIENT;
+        }
+
+        return rest_client_transport_mqtt_init(rest_client);
+    }
+#endif
+
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTTSN)
+    if (rest_client->scheme == REST_CLIENT_SCHEME_MQTTSN) {
+
+        assert(rest_client->scheme == REST_CLIENT_SCHEME_MQTTSN);
+        assert(rest_client->mqttsn_gateway != NULL);
+        assert(rest_client->mqttsn_gateway->hostname != NULL);
+        assert(rest_client->mqttsn_gateway->port != 0);
+
+        if (_resolve(
+                rest_client->mqttsn_gateway->hostname,
+                rest_client->mqttsn_gateway->is_numeric_hostname,
+                &(rest_client->mqttsn_gateway->_addr)) < 0) {
+            DEBUG("_resolve() of %s failed\n", rest_client->mqttsn_gateway->hostname);
+            return REST_CLIENT_ERROR_CLIENT;
+        }
+
+        return rest_client_transport_mqttsn_init(rest_client);
+    }
+#endif
+
     return REST_CLIENT_ERROR_CLIENT;
 }
 
@@ -193,6 +254,18 @@ rest_client_result_t rest_client_deinit(rest_client_t *rest_client)
     {
         /* no-op for CoAP based transport */
         return REST_CLIENT_RESULT_OK;
+    }
+#endif
+
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTT)
+    if (rest_client->scheme == REST_CLIENT_SCHEME_MQTT) {
+        return rest_client_transport_mqtt_deinit(rest_client);
+    }
+#endif
+
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTTSN)
+    if (rest_client->scheme == REST_CLIENT_SCHEME_MQTTSN) {
+        return rest_client_transport_mqttsn_deinit(rest_client);
     }
 #endif
 
@@ -211,6 +284,18 @@ rest_client_result_t rest_client_connect(rest_client_t *rest_client)
     }
 #endif
 
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTT)
+    if (rest_client->scheme == REST_CLIENT_SCHEME_MQTT) {
+        return rest_client_transport_mqtt_connect(rest_client);
+    }
+#endif
+
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTTSN)
+    if (rest_client->scheme == REST_CLIENT_SCHEME_MQTTSN) {
+        return rest_client_transport_mqttsn_connect(rest_client);
+    }
+#endif
+
     return REST_CLIENT_ERROR_CLIENT;
 }
 
@@ -223,6 +308,18 @@ rest_client_result_t rest_client_disconnect(rest_client_t *rest_client)
     {
         /* no-op for CoAP based transport */
         return REST_CLIENT_RESULT_OK;
+    }
+#endif
+
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTT)
+    if (rest_client->scheme == REST_CLIENT_SCHEME_MQTT) {
+        return rest_client_transport_mqtt_disconnect(rest_client);
+    }
+#endif
+
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTTSN)
+    if (rest_client->scheme == REST_CLIENT_SCHEME_MQTTSN) {
+        return rest_client_transport_mqttsn_disconnect(rest_client);
     }
 #endif
 

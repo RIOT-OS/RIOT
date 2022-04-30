@@ -30,6 +30,11 @@
 #include <sys/socket.h>
 #include "net/sock/udp.h"
 
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTT) || IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTTSN)
+#include "wolfmqtt/mqtt_socket.h"
+#include "wolfmqtt/mqtt_client.h"
+#endif
+
 #define REST_CLIENT_DEFAULT_PORT_COAP         5683
 #define REST_CLIENT_DEFAULT_PORT_COAP_SECURE  5684
 #define REST_CLIENT_DEFAULT_PORT_HTTP         80
@@ -135,6 +140,70 @@ typedef struct rest_client_response_listener_t {
     void (*listener) (struct rest_client_response_listener_t*);
 } rest_client_response_listener_t;
 
+// Todo: #if ... || defined(DOXYGEN)
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTT) || IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTTSN)
+/* MQTT Client state */
+typedef enum {
+    WMQ_BEGIN = 0,
+    WMQ_NET_INIT,
+    WMQ_INIT,
+    WMQ_TCP_CONN,
+    WMQ_MQTT_CONN,
+    WMQ_SUB,
+    WMQ_PUB,
+    WMQ_WAIT_MSG,
+    WMQ_UNSUB,
+    WMQ_DISCONNECT,
+    WMQ_NET_DISCONNECT,
+    WMQ_DONE
+} rest_client_mqtt_context_state_t;
+
+/* MQTT Client context */
+typedef struct {
+    rest_client_mqtt_context_state_t stat;
+
+    //void* app_ctx; /* For storing application specific data */
+    rest_client_response_listener_t* listener;
+
+    /* client and net containers */
+    MqttClient client;
+    MqttNet net;
+
+    /* temp mqtt containers */
+    MqttConnect connect;
+    MqttSubscribe subscribe;
+    MqttUnsubscribe unsubscribe;
+    /* Todo: convert to single value */
+    MqttTopic topics[1];
+    MqttPublish publish;
+    MqttDisconnect disconnect;
+
+#ifdef WOLFMQTT_SN
+    SN_Publish publish_sn;
+#endif
+
+    /* configuration */
+    const char *app_name;
+    const char *host;
+    bool is_numeric_host;
+    uint16_t port;
+    _ipvx_addr_t *addr;
+    const char *username;
+    const char *password;
+    uint8_t *tx_buf, *rx_buf;
+#ifdef WOLFMQTT_NONBLOCK
+    uint32_t start_sec; /* used for keep-alive */
+    unsigned int use_non_block_mode:1; /* set to use non-blocking mode. network callbacks can return
+                                       MQTT_CODE_CONTINUE to indicate "would block" */
+#endif
+#ifdef WOLFMQTT_CLIENT_ID
+    uint8_t clean_session;
+    const char *client_id;
+    unsigned int dynamic_client_id:1;
+#endif
+} rest_client_mqtt_context_t;
+#endif /* IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTT) || IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTTSN) */
+
 #if IS_USED(MODULE_REST_CLIENT_TRANSPORT_COAP)
 typedef struct rest_client_coap_proxy_t {
     rest_client_scheme_t scheme;
@@ -160,15 +229,38 @@ typedef struct {
 } rest_client_coap_context_t;
 #endif
 
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTTSN)
+typedef struct {
+    char *hostname;
+    bool is_numeric_hostname;
+    uint16_t port;
+    _ipvx_addr_t _addr; /* For internal use only */
+} rest_client_mqttsn_gateway_t;
+#endif
+
+/**
+ * @brief   Structure containing all information to connect to an endpoint. Besides basic
+ *          information like the hostname and port this struct also contains transport
+ *          specific members such as a reference to rest_client_coap_proxy_t when using CoAP.
+ */
 typedef struct {
     rest_client_scheme_t scheme;
     char *hostname;
     bool is_numeric_hostname;
     uint16_t port;
     _ipvx_addr_t _addr; /* For internal use only */
+
 #if IS_USED(MODULE_REST_CLIENT_TRANSPORT_COAP)
     rest_client_coap_context_t coap_context;
     rest_client_coap_proxy_t *coap_proxy;
+#endif
+
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTT) || IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTTSN)
+    rest_client_mqtt_context_t mqtt_context;
+#endif
+
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_MQTTSN)
+    rest_client_mqttsn_gateway_t *mqttsn_gateway;
 #endif
 } rest_client_t;
 

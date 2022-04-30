@@ -35,6 +35,19 @@ ifneq (,$(filter rest_client_transport_coaps,$(USEMODULE)))
   USEMODULE += sock_util
 endif
 
+ifneq (,$(filter rest_client_transport_mqtt%,$(USEMODULE)))
+  USEMODULE += wolfmqtt
+  USEMODULE += posix_netdb
+  USEMODULE += posix_sockets
+  USEMODULE += posix_select
+  USEMODULE += ztimer_sec
+  USEMODULE += uuid
+endif
+
+ifneq (,$(filter rest_client_transport_mqtt,$(USEMODULE)))
+  USEMODULE += sock_tcp
+endif
+
 ifneq (,$(filter arduino,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_adc
   FEATURES_OPTIONAL += periph_i2c
