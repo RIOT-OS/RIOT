@@ -30,6 +30,9 @@
 #include <fcntl.h>
 
 #include "vfs.h"
+#if MODULE_VFS_UTIL
+#include "vfs_util.h"
+#endif
 
 #define SHELL_VFS_BUFSIZE 256
 static uint8_t _shell_vfs_data_buffer[SHELL_VFS_BUFSIZE];
@@ -634,4 +637,39 @@ int _vfs_handler(int argc, char **argv)
         return 1;
     }
 }
+
+static inline void _print_digest(const uint8_t *digest, size_t len, const char *file)
+{
+    for (unsigned i = 0; i < len; ++i) {
+        printf("%02x", digest[i]);
+    }
+    printf("  %s\n", file);
+}
+
+#if MODULE_MD5SUM
+#include "hashes/md5.h"
+int _vfs_md5sum_cmd(int argc, char **argv)
+{
+    int res;
+    uint8_t digest[MD5_DIGEST_LENGTH];
+
+    if (argc < 2) {
+        printf("usage: %s [file] …\n", argv[0]);
+        return -1;
+    }
+
+    for (int i = 1; i < argc; ++i) {
+        const char *file = argv[i];
+        res = vfs_file_md5(file, digest,
+                           _shell_vfs_data_buffer, sizeof(_shell_vfs_data_buffer));
+        if (res < 0) {
+            printf("%s: error %d\n", file, res);
+        } else {
+            _print_digest(digest, sizeof(digest), file);
+        }
+    }
+
+    return 0;
+}
+#endif
 #endif
