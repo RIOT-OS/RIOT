@@ -84,16 +84,37 @@ Also provides some system signals and power.
 
 ## Working with this Dev-Kit
 
-There are two requirements to start,first of them is the **gcc-arm-embedded** toolchain,
+To start the **gcc-arm-embedded** toolchain have to be installed,
 we can follow the usual process [here](https://github.com/RIOT-OS/RIOT/wiki/Family:-ARM).
 
-The other requirement is **OpenOCD**, also we can follow the usual process
+## Flashing the device
+
+### Flashing the Board using OpenOCD
+
+The start install **OpenOCD**, also we can follow the usual process
 [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD)
 
-Once both things are installed and ready to work just connect the board through
+Once everything is installed and ready to work just connect the board through
 the USB Mini-B connector try to compile and flash some code, type:
 
 ```
 make flash BOARD=stm32f469i-disco
 ```
+
+### Flashing the Board Using ST-LINK Removable Media
+
+On-board ST-LINK programmer provides via composite USB device removable media.
+Copying the HEX file causes reprogramming of the board. This task
+could be performed manually; however, the cpy2remed (copy to removable
+media) PROGRAMMER script does this automatically. To program board in
+this manner, use the command:
+```
+make BOARD=stm32f469i-disco PROGRAMMER=cpy2remed flash
+```
+@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware update
+s
+could be found on [this STM webpage](https://www.st.com/en/development-tools/sts
+w-link007.html).
+
+
 */
