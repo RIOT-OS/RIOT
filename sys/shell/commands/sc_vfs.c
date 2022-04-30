@@ -672,4 +672,31 @@ int _vfs_md5sum_cmd(int argc, char **argv)
     return 0;
 }
 #endif
+
+#if MODULE_SHA1SUM
+#include "hashes/sha1.h"
+int _vfs_sha1sum_cmd(int argc, char **argv)
+{
+    int res;
+    uint8_t digest[SHA1_DIGEST_LENGTH];
+
+    if (argc < 2) {
+        printf("usage: %s [file] …\n", argv[0]);
+        return -1;
+    }
+
+    for (int i = 1; i < argc; ++i) {
+        const char *file = argv[i];
+        res = vfs_file_sha1(file, digest,
+                           _shell_vfs_data_buffer, sizeof(_shell_vfs_data_buffer));
+        if (res < 0) {
+            printf("%s: error %d\n", file, res);
+        } else {
+            _print_digest(digest, sizeof(digest), file);
+        }
+    }
+
+    return 0;
+}
+#endif
 #endif

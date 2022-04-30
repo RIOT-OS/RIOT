@@ -197,6 +197,7 @@ PSEUDOMODULES += semtech_loramac_rx
 PSEUDOMODULES += senml_cbor
 PSEUDOMODULES += senml_phydat
 PSEUDOMODULES += senml_saul
+PSEUDOMODULES += sha1sum
 PSEUDOMODULES += shell_hooks
 PSEUDOMODULES += slipdev_stdio
 PSEUDOMODULES += slipdev_l2addr
