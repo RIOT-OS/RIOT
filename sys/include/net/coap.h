@@ -152,6 +152,8 @@ extern "C" {
 #define COAP_FORMAT_SENSML_EXI              (115)
 #define COAP_FORMAT_SENML_XML               (310)
 #define COAP_FORMAT_SENSML_XML              (311)
+#define COAP_FORMAT_VND_KAFKA_JSON_V2_JSON  (17500)
+#define COAP_FORMAT_VND_KAFKA_V2_JSON       (17501)
 /** @} */
 
 /**
