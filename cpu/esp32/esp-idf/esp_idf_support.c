@@ -87,8 +87,6 @@ static esp_log_level_entry_t _log_levels[] = {
     { .tag = "*", .level = LOG_DEBUG },
 };
 
-static char _printf_buf[PRINTF_BUFSIZ];
-
 /*
  * provided by: /path/to/esp-idf/component/log/log.c
  */
@@ -131,39 +129,8 @@ void IRAM_ATTR esp_log_writev(esp_log_level_t level,
     if ((unsigned)act_level > CONFIG_LOG_DEFAULT_LEVEL) {
         return;
     }
-#if 0   /* seems not to be required any longer */
-    /*
-     * The format of log output from ESP SDK libraries is "X (s) t: message\n"
-     * where X is the log level, d the system time in milliseconds and t the
-     * tag. To be able to enable these additional information by module
-     * `esp_log_tagged`, we have to separate these information from the
-     * message here.
-     */
-    const char* msg = (strchr (format, ':') + 2);
 
-    va_list arglist;
-    va_copy(arglist, args);
-
-    /* remove time and tag argument from argument list */
-    va_arg(arglist, unsigned);
-    va_arg(arglist, const char*);
-    vsnprintf(_printf_buf, PRINTF_BUFSIZ, msg, arglist);
-    va_end(arglist);
-#else
-    va_list arglist;
-    va_copy(arglist, args);
-    vsnprintf(_printf_buf, PRINTF_BUFSIZ, format, arglist);
-    va_end(arglist);
-#endif
-
-    switch (act_level) {
-        case LOG_NONE   : return;
-        case LOG_ERROR  : LOG_TAG_ERROR  (tag, "%s", _printf_buf); break;
-        case LOG_WARNING: LOG_TAG_WARNING(tag, "%s", _printf_buf); break;
-        case LOG_INFO   : LOG_TAG_INFO   (tag, "%s", _printf_buf); break;
-        case LOG_DEBUG  : LOG_TAG_DEBUG  (tag, "%s", _printf_buf); break;
-        case LOG_ALL    : LOG_TAG_ALL    (tag, "%s", _printf_buf); break;
-    }
+    vprintf(format, args);
 }
 
 /*
