@@ -334,7 +334,7 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter md5sum,$(USEMODULE)))
+ifneq (,$(filter md5sum sha1sum sha256sum,$(USEMODULE)))
   USEMODULE += vfs_util
   USEMODULE += hashes
 endif

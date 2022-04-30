@@ -223,6 +223,10 @@ extern int _vfs_md5sum_cmd(int argc, char **argv);
 extern int _vfs_sha1sum_cmd(int argc, char **argv);
 #endif
 
+#ifdef MODULE_SHA256SUM
+extern int _vfs_sha256sum_cmd(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
     {"version", "Prints current RIOT_VERSION", _version_handler},
@@ -281,6 +285,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_SHA1SUM
     {"sha1sum", "Compute and check SHA1 message digest", _vfs_sha1sum_cmd},
+#endif
+#ifdef MODULE_SHA256SUM
+    {"sha256sum", "Compute and check SHA256 message digest", _vfs_sha256sum_cmd},
 #endif
 #ifdef MODULE_GNRC_IPV6_NIB
     {"nib", "Configure neighbor information base", _gnrc_ipv6_nib},
