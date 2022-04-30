@@ -1,4 +1,4 @@
-CFLAGS += -DWOLFMQTT_USER_SETTINGS=1
-
 INCLUDES += -I$(APPDIR)
 INCLUDES += -I$(PKGDIRBASE)/wolfmqtt
+INCLUDES += -I$(PKGDIRBASE)/wolfmqtt/wolfmqtt
+INCLUDES += -I$(PKGDIRBASE)/wolfmqtt/wolfmqtt_examples

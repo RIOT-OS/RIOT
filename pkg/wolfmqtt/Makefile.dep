@@ -1,4 +1,7 @@
 USEMODULE += wolfmqtt
+ifneq (,$(filter wolfmqtt_examples_%,$(USEMODULE)))
+  USEMODULE += wolfmqtt_examples
+endif
 
 ifneq (,$(filter wolfmqtt_examples%,$(USEMODULE)))
   USEMODULE += wolfmqtt_examples

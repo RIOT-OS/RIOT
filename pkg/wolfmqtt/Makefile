@@ -17,19 +17,19 @@ all: $(filter \
     ,$(USEMODULE))
 
 wolfmqtt:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(CURDIR)/Makefile.$(PKG_NAME)
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(CURDIR)/Makefile.$(PKG_NAME)
 
 wolfmqtt_examples:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfmqtt_examples -f $(CURDIR)/Makefile.$(PKG_NAME).examples
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfmqtt_examples -f $(CURDIR)/Makefile.$(PKG_NAME).examples
 
 wolfmqtt_examples_mqttclient:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfmqtt_examples/mqttclient -f $(CURDIR)/Makefile.$(PKG_NAME).examples.mqttclient
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfmqtt_examples/mqttclient -f $(CURDIR)/Makefile.$(PKG_NAME).examples.mqttclient
 
 wolfmqtt_examples_snclient:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfmqtt_examples/sn-client -f $(CURDIR)/Makefile.$(PKG_NAME).examples.snclient
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfmqtt_examples/sn-client -f $(CURDIR)/Makefile.$(PKG_NAME).examples.snclient
 
 wolfmqtt_examples_nbclient:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfmqtt_examples/nbclient -f $(CURDIR)/Makefile.$(PKG_NAME).examples.nbclient
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfmqtt_examples/nbclient -f $(CURDIR)/Makefile.$(PKG_NAME).examples.nbclient
 
 wolfmqtt_examples_multithread:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfmqtt_examples/multithread -f $(CURDIR)/Makefile.$(PKG_NAME).examples.multithread
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfmqtt_examples/multithread -f $(CURDIR)/Makefile.$(PKG_NAME).examples.multithread

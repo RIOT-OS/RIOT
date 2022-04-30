@@ -21,6 +21,9 @@ WIFI_PASS ?= "WIFI_PASS"
 # This firmware is implemented inside the package examples
 USEMODULE += wolfmqtt_examples_multithread
 
+# we want to use user_settings.h to control the wolfMQTT package
+CFLAGS += -DWOLFMQTT_USER_SETTINGS=1
+
 LWIP_IPV4 ?= 1
 LWIP_IPV6 ?= 1
 

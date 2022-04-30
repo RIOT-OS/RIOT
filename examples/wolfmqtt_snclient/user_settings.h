@@ -31,12 +31,12 @@ extern "C" {
     #endif
     #ifdef SOCK_HAS_IPV6
         #undef  DEFAULT_MQTT_HOST_IPV6
-        #define DEFAULT_MQTT_HOST_IPV6   "2003:e9:f44:2f25:95dc:c243:6b3b:a257" /* local */
+        #define DEFAULT_MQTT_HOST_IPV6   "2003:e9:f48:f000:6c89:4139:63e5:f3ff" /* local */
     #endif
 #endif
 
 #undef  DEFAULT_MQTT_PORT
-#define DEFAULT_MQTT_PORT   10000
+#define DEFAULT_MQTT_PORT   10006
 
 /* OPTIONAL */
 #undef  TEST_MESSAGE
