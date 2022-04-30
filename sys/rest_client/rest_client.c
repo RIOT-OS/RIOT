@@ -25,6 +25,10 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_COAP)
+#include "rest_client/transport/coap.h"
+#endif
+
 #include "rest_client.h"
 
 #define ENABLE_DEBUG REST_CLIENT_ENABLE_DEBUG
@@ -35,6 +39,16 @@ static rest_client_result_t _dispatcher(
         rest_client_method_t method, rest_client_qos_t qos,
         rest_client_header_t *headers, char *path, char *query_string, uint8_t *body, int body_len)
 {
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_COAP)
+    if (rest_client->coap_proxy != NULL ||
+        rest_client->scheme == REST_CLIENT_SCHEME_COAP ||
+        rest_client->scheme == REST_CLIENT_SCHEME_COAP_SECURE)
+    {
+        return rest_client_transport_coap_send(rest_client, listener, method, qos,
+                                               headers, path, query_string, body, body_len);
+    }
+#endif
+
     return REST_CLIENT_ERROR_CLIENT;
 }
 
@@ -123,21 +137,95 @@ static int _resolve(char *hostname, bool is_numeric_hostname, _ipvx_addr_t *addr
 
 rest_client_result_t rest_client_init(rest_client_t *rest_client)
 {
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_COAP)
+    if (rest_client->coap_proxy != NULL ||
+        rest_client->scheme == REST_CLIENT_SCHEME_COAP ||
+        rest_client->scheme == REST_CLIENT_SCHEME_COAP_SECURE) {
+
+        if (rest_client->coap_proxy != NULL) {
+            assert(rest_client->coap_proxy->hostname != NULL);
+            assert(rest_client->coap_proxy->port != 0);
+
+            if (_resolve(
+                    rest_client->coap_proxy->hostname,
+                    rest_client->coap_proxy->is_numeric_hostname,
+                    &(rest_client->coap_proxy->_addr)) < 0) {
+                DEBUG("_resolve() of %s failed\n", rest_client->coap_proxy->hostname);
+                return REST_CLIENT_ERROR_CLIENT;
+            }
+
+            /* detect IP version for later use when formatting proxy_uri */
+            if (rest_client->is_numeric_hostname) {
+                if (_resolve(rest_client->hostname, true, &(rest_client->_addr)) < 0) {
+                    DEBUG("_resolve() of %s failed\n", rest_client->hostname);
+                    return REST_CLIENT_ERROR_CLIENT;
+                }
+            }
+        }
+        else {
+            assert(rest_client->scheme == REST_CLIENT_SCHEME_COAP ||
+                   rest_client->scheme == REST_CLIENT_SCHEME_COAP_SECURE);
+            assert(rest_client->hostname != NULL);
+            assert(rest_client->port != 0);
+
+            if (_resolve(
+                    rest_client->hostname,
+                    rest_client->is_numeric_hostname,
+                    &(rest_client->_addr)) < 0) {
+                DEBUG("_resolve() of %s failed\n", rest_client->hostname);
+                return REST_CLIENT_ERROR_CLIENT;
+            }
+        }
+
+        return rest_client_transport_coap_init(rest_client);
+    }
+#endif
+
     return REST_CLIENT_ERROR_CLIENT;
 }
 
 rest_client_result_t rest_client_deinit(rest_client_t *rest_client)
 {
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_COAP)
+    if (rest_client->coap_proxy != NULL ||
+        rest_client->scheme == REST_CLIENT_SCHEME_COAP ||
+        rest_client->scheme == REST_CLIENT_SCHEME_COAP_SECURE)
+    {
+        /* no-op for CoAP based transport */
+        return REST_CLIENT_RESULT_OK;
+    }
+#endif
+
     return REST_CLIENT_ERROR_CLIENT;
 }
 
 rest_client_result_t rest_client_connect(rest_client_t *rest_client)
 {
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_COAP)
+    if (rest_client->coap_proxy != NULL ||
+        rest_client->scheme == REST_CLIENT_SCHEME_COAP ||
+        rest_client->scheme == REST_CLIENT_SCHEME_COAP_SECURE)
+    {
+        /* no-op for CoAP based transport */
+        return REST_CLIENT_RESULT_OK;
+    }
+#endif
+
     return REST_CLIENT_ERROR_CLIENT;
 }
 
 rest_client_result_t rest_client_disconnect(rest_client_t *rest_client)
 {
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_COAP)
+    if (rest_client->coap_proxy != NULL ||
+        rest_client->scheme == REST_CLIENT_SCHEME_COAP ||
+        rest_client->scheme == REST_CLIENT_SCHEME_COAP_SECURE)
+    {
+        /* no-op for CoAP based transport */
+        return REST_CLIENT_RESULT_OK;
+    }
+#endif
+
     return REST_CLIENT_ERROR_CLIENT;
 }
 

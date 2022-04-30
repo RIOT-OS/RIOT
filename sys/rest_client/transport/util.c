@@ -23,6 +23,10 @@
 
 #include "rest_client/util.h"
 
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_COAP)
+#include "net/gcoap.h"
+#endif
+
 static const char *_scheme_strings[] = {
     "coap",
     "coaps",
@@ -85,3 +89,43 @@ const char* rest_client_util_method_to_string(rest_client_method_t method)
             return NULL;
     }
 }
+
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_COAP)
+int rest_client_util_translate_to_coap_method(rest_client_method_t method)
+{
+    switch (method) {
+        case REST_CLIENT_METHOD_GET:
+            return COAP_METHOD_GET;
+        case REST_CLIENT_METHOD_POST:
+            return COAP_METHOD_POST;
+        case REST_CLIENT_METHOD_PUT:
+            return COAP_METHOD_PUT;
+        case REST_CLIENT_METHOD_PATCH:
+            return COAP_METHOD_PATCH;
+        case REST_CLIENT_METHOD_DELETE:
+            return COAP_METHOD_DELETE;
+        default:
+            assert(!"The default case of switch was reached.");
+            return -1;
+    }
+}
+
+int rest_client_util_translate_to_coap_format(rest_client_content_type_t format)
+{
+    switch (format) {
+        case REST_CLIENT_CONTENT_TYPE_TEXT_PLAIN:
+            return COAP_FORMAT_TEXT;
+        case REST_CLIENT_CONTENT_TYPE_APPLICATION_JSON:
+            return COAP_FORMAT_JSON;
+        case REST_CLIENT_CONTENT_TYPE_APPLICATION_CBOR:
+            return COAP_FORMAT_CBOR;
+        case REST_CLIENT_CONTENT_TYPE_APPLICATION_VND_KAFKA_JSON_V2_JSON:
+            return COAP_FORMAT_VND_KAFKA_JSON_V2_JSON;
+        case REST_CLIENT_CONTENT_TYPE_APPLICATION_VND_KAFKA_V2_JSON:
+            return COAP_FORMAT_VND_KAFKA_V2_JSON;
+        default:
+            assert(!"The default case of switch was reached.");
+            return -1;
+    }
+}
+#endif

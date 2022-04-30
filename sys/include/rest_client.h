@@ -135,12 +135,41 @@ typedef struct rest_client_response_listener_t {
     void (*listener) (struct rest_client_response_listener_t*);
 } rest_client_response_listener_t;
 
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_COAP)
+typedef struct rest_client_coap_proxy_t {
+    rest_client_scheme_t scheme;
+    char *hostname;
+    bool is_numeric_hostname;
+    uint16_t port;
+    _ipvx_addr_t _addr; /* For internal use only */
+    bool proxy_http_status;
+} rest_client_coap_proxy_t;
+
+/* Retain request path to re-request if response includes block. User must not
+ * start a new request (with a new path) until any blockwise transfer
+ * completes or times out. */
+#define _LAST_REQ_PATH_MAX (1024)
+#define PROXY_URI_LEN 512
+
+typedef struct {
+    rest_client_response_listener_t listener;
+    bool proxied;
+    sock_udp_ep_t proxy_remote;
+    char proxy_uri[PROXY_URI_LEN];
+    char last_req_path[_LAST_REQ_PATH_MAX];
+} rest_client_coap_context_t;
+#endif
+
 typedef struct {
     rest_client_scheme_t scheme;
     char *hostname;
     bool is_numeric_hostname;
     uint16_t port;
     _ipvx_addr_t _addr; /* For internal use only */
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_COAP)
+    rest_client_coap_context_t coap_context;
+    rest_client_coap_proxy_t *coap_proxy;
+#endif
 } rest_client_t;
 
 /**

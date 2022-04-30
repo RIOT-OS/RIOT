@@ -9,6 +9,32 @@ ifneq (,$(filter rest_client_transport_%, $(USEMODULE)))
   USEMODULE += rest_client_transport
 endif
 
+ifneq (,$(filter rest_client_transport_coaps,$(USEMODULE)))
+  USEMODULE += rest_client_transport_coap
+endif
+
+ifneq (,$(filter rest_client_transport_coap,$(USEMODULE)))
+  USEMODULE += gcoap
+  USEMODULE += posix_netdb
+  USEMODULE += auto_init_sock_dns
+endif
+
+ifneq (,$(filter rest_client_transport_coaps,$(USEMODULE)))
+  # TinyDTLS only has support for 32-bit architectures ATM
+  FEATURES_REQUIRED += arch_32bit
+
+  # Required by DTLS. Currently, only tinyDTLS is supported by sock_dtls.
+  USEPKG += tinydtls
+  USEMODULE += tinydtls_sock_dtls
+  # tinydtls needs crypto secure PRNG
+  USEMODULE += prng_sha1prng
+  USEMODULE += sock_dtls
+  USEMODULE += gcoap_dtls
+
+  # extra utilities for endpoint printing
+  USEMODULE += sock_util
+endif
+
 ifneq (,$(filter arduino,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_adc
   FEATURES_OPTIONAL += periph_i2c

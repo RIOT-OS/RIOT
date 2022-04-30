@@ -29,4 +29,9 @@ const char* rest_client_util_scheme_to_string(rest_client_scheme_t scheme);
 
 const char* rest_client_util_method_to_string(rest_client_method_t method);
 
+#if IS_USED(MODULE_REST_CLIENT_TRANSPORT_COAP)
+int rest_client_util_translate_to_coap_method(rest_client_method_t method);
+int rest_client_util_translate_to_coap_format(rest_client_content_type_t format);
+#endif
+
 #endif /* REST_CLIENT_UTIL_H */
