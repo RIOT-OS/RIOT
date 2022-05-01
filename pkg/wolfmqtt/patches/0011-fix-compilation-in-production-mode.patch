@@ -1,0 +1,50 @@
+From 57232f41ffc0fb84f60048bbfbbe7670733fb07d Mon Sep 17 00:00:00 2001
+From: HendrikVE <hendrik1995@msn.com>
+Date: Sun, 1 May 2022 13:48:49 +0200
+Subject: [PATCH] fix compilation in production mode
+
+---
+ src/mqtt_packet.c      | 3 +++
+ wolfmqtt/mqtt_packet.h | 4 +---
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/mqtt_packet.c b/src/mqtt_packet.c
+index 7314de8..1d76af0 100755
+--- a/src/mqtt_packet.c
++++ b/src/mqtt_packet.c
+@@ -2070,6 +2070,8 @@ const char* MqttPacket_TypeDesc(MqttPacketType packet_type)
+ #endif
+ 
+ #ifdef WOLFMQTT_SN
++
++#ifdef WOLFMQTT_DEBUG_CLIENT
+ const char* SN_Packet_TypeDesc(SN_MsgType packet_type)
+ {
+     switch (packet_type) {
+@@ -2136,6 +2138,7 @@ const char* SN_Packet_TypeDesc(SN_MsgType packet_type)
+     }
+     return "Unknown";
+ }
++#endif /* WOLFMQTT_DEBUG_CLIENT */
+ 
+ int SN_Decode_Header(byte *rx_buf, int rx_buf_len,
+     SN_MsgType* p_packet_type, word16* p_packet_id)
+diff --git a/wolfmqtt/mqtt_packet.h b/wolfmqtt/mqtt_packet.h
+index e2b84b1..b0ebe41 100644
+--- a/wolfmqtt/mqtt_packet.h
++++ b/wolfmqtt/mqtt_packet.h
+@@ -1169,10 +1169,8 @@ WOLFMQTT_LOCAL int SN_Decode_Ping(byte *rx_buf, int rx_buf_len);
+ WOLFMQTT_LOCAL int SN_Packet_Read(struct _MqttClient *client, byte* rx_buf,
+         int rx_buf_len, int timeout_ms);
+ 
+-#ifndef WOLFMQTT_NO_ERROR_STRINGS
++#ifdef WOLFMQTT_DEBUG_CLIENT
+     WOLFMQTT_LOCAL const char* SN_Packet_TypeDesc(SN_MsgType packet_type);
+-#else
+-    #define SN_Packet_TypeDesc(x) "not compiled in"
+ #endif
+ #endif /* WOLFMQTT_SN */
+ 
+-- 
+2.25.1
+
