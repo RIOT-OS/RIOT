@@ -301,7 +301,10 @@ static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t 
               new_prefix_len, downstream->pid);
 
         /* first remove old prefix if the prefix changed */
-        _remove_old_prefix(downstream, &new_prefix, new_prefix_len, &ext_opts);
+        if (_remove_old_prefix(downstream, &new_prefix, new_prefix_len, &ext_opts)) {
+            /* if the prefix did not change, there is nothing to do here */
+            continue;
+        }
 
         /* configure subnet on downstream interface */
         idx = gnrc_netif_ipv6_add_prefix(downstream, &new_prefix, new_prefix_len,
