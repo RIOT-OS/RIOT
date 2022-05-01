@@ -178,6 +178,12 @@ PSEUDOMODULES += gnrc_nettype_ipv6
 PSEUDOMODULES += gnrc_nettype_ipv6_ext
 ## @}
 
+## @defgroup 	net_gnrc_nettype_ipv6_ext   gnrc_nettype_ipv6_ext
+## @{
+## Enables @ref GNRC_NETTYPE_IPV6_EXT.
+PSEUDOMODULES += gnrc_nettype_ipv6_ext_esp
+## @}
+
 ## @defgroup 	net_gnrc_nettype_lorawan    gnrc_nettype_lorawan
 ## Enables @ref GNRC_NETTYPE_LORAWAN
 ## @{
@@ -473,6 +479,7 @@ PSEUDOMODULES += shell_cmd_gnrc_udp
 PSEUDOMODULES += shell_cmd_heap
 PSEUDOMODULES += shell_cmd_i2c_scan
 PSEUDOMODULES += shell_cmd_iw
+PSEUDOMODULES += shell_cmd_ike_control
 PSEUDOMODULES += shell_cmd_lwip_netif
 PSEUDOMODULES += shell_cmd_mci
 PSEUDOMODULES += shell_cmd_md5sum

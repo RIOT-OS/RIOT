@@ -87,7 +87,7 @@ extern "C" {
 #endif
 
 #ifndef GNRC_IPV6_STACK_SIZE
-#define GNRC_IPV6_STACK_SIZE          (1536)
+#define GNRC_IPV6_STACK_SIZE          (4096)
 #endif
 #ifndef GNRC_PKTDUMP_STACKSIZE
 #define GNRC_PKTDUMP_STACKSIZE        (THREAD_STACKSIZE_DEFAULT << 1)

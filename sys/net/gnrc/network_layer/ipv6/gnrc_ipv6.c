@@ -37,6 +37,11 @@
 #include "net/gnrc/ipv6/ext/frag.h"
 #endif
 
+#ifdef MODULE_GNRC_IPV6_IPSEC
+#include "net/gnrc/ipv6/ipsec/ipsec.h"
+#include "net/gnrc/ipv6/ipsec/ipsec_ts.h"
+#endif
+
 #ifdef MODULE_FIB
 #include "net/fib.h"
 #include "net/fib/table.h"
@@ -271,6 +276,35 @@ static void _send_to_iface(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         gnrc_pktbuf_release_error(pkt, EMSGSIZE);
         return;
     }
+#ifdef MODULE_GNRC_IPV6_IPSEC
+    ipsec_ts_t ts;
+    if (ipsec_ts_from_pkt(pkt, &ts))
+    {
+        DEBUG("ipv6_ipsec: couldn't create traffic selector. Release pkt\n");
+        gnrc_pktbuf_release_error(pkt, EPROTO);
+        return;
+    }
+    switch (ipsec_get_policy_rule(&ts, TRAFFIC_DIR_OUT)) {
+        case IPSEC_SP_RULE_PROTECT:
+            DEBUG("ipv6_ipsec: TX PROTECT\n");
+            if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6_EXT_ESP, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
+                DEBUG("ipv6_ipsec: no ESP thread found\n");
+                gnrc_pktbuf_release(pkt);
+            }
+            return;
+        case IPSEC_SP_RULE_DROP:
+            DEBUG("ipv6_ipsec: TX DROP\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        case IPSEC_SP_RULE_BYPASS:
+            DEBUG("ipv6_ipsec: TX BYPASS\n");
+            break;
+        case IPSEC_SP_RULE_ERROR:
+            DEBUG("ipv6_ipsec: TX ERROR\n");
+            gnrc_pktbuf_release_error(pkt, EPROTO);
+            return;
+    }
+#endif /* MODULE_GNRC_IPV6_IPSEC */
     DEBUG("ipv6: Sending (src = %s, ",
           ipv6_addr_to_str(addr_str, &hdr->src, sizeof(addr_str)));
     DEBUG("dst = %s, next header = %u, length = %u)\n",
@@ -855,6 +889,32 @@ static void _receive(gnrc_pktsnip_t *pkt)
               "consumed due to it\n");
         return;
     }
+#ifdef MODULE_GNRC_IPV6_IPSEC
+    ipsec_ts_t ts;
+    if (ipsec_ts_from_pkt(pkt, &ts))
+    {
+        DEBUG("ipv6_ipsec: couldn't create traffic selector. Release pkt\n");
+        gnrc_pktbuf_release_error(pkt, EPROTO);
+        return;
+    }
+    switch (ipsec_get_policy_rule(&ts, TRAFFIC_DIR_IN)) {
+        case IPSEC_SP_RULE_PROTECT:
+            /* Was processed in extension processing */
+            DEBUG("ipv6_ipsec: RX PROTECT\n");
+            break;
+        case IPSEC_SP_RULE_DROP:
+            DEBUG("ipv6_ipsec: RX DROP\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        case IPSEC_SP_RULE_BYPASS:
+            DEBUG("ipv6_ipsec: RX BYPASS\n");
+            break;
+        case IPSEC_SP_RULE_ERROR:
+            DEBUG("ipv6_ipsec: RX ERROR\n");
+            gnrc_pktbuf_release_error(pkt, EPROTO);
+            return;
+    }
+#endif /* MODULE_GNRC_IPV6_IPSEC */
     if (_pkt_not_for_me(&netif, hdr)) { /* if packet is not for me */
         DEBUG("ipv6: packet destination not this host\n");
 

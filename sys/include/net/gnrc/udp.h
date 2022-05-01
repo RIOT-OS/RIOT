@@ -52,7 +52,7 @@ extern "C" {
  * @brief   Priority of the UDP thread
  */
 #ifndef GNRC_UDP_PRIO
-#define GNRC_UDP_PRIO           (THREAD_PRIORITY_MAIN - 2)
+#define GNRC_UDP_PRIO           (THREAD_PRIORITY_MAIN - 1)
 #endif
 
 /**

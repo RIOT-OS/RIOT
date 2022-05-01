@@ -180,6 +180,11 @@ config MODULE_SHELL_CMD_IW
     bool "Command to interact with WiFi interfaces"
     depends on MODULE_ZTIMER_SEC
 
+config MODULE_SHELL_CMD_IKE_CONTROL
+    bool "Command for managing IPSec"
+    depends on MODULE_SHELL_CMDS
+    depends on MODULE_IKE
+
 config MODULE_SHELL_CMD_LWIP_NETIF
     bool "Command to manage lwIP network interfaces (ifconfig)"
     default y if MODULE_SHELL_CMDS_DEFAULT
