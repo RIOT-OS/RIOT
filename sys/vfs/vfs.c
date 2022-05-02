@@ -355,6 +355,22 @@ ssize_t vfs_write(int fd, const void *src, size_t count)
     return filp->f_op->write(filp, src, count);
 }
 
+ssize_t vfs_write_iol(int fd, const iolist_t *snips)
+{
+    int res, sum = 0;
+
+    while (snips) {
+        res = vfs_write(fd, snips->iol_base, snips->iol_len);
+        if (res < 0) {
+            return res;
+        }
+        sum += res;
+        snips = snips->iol_next;
+    }
+
+    return sum;
+}
+
 int vfs_fsync(int fd)
 {
     DEBUG_NOT_STDOUT(fd, "vfs_fsync: %d\n", fd);
