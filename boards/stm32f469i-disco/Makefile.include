@@ -7,5 +7,9 @@ PROGRAMMER ?= openocd
 # this board has an on-board ST-link adapter
 OPENOCD_DEBUG_ADAPTER ?= stlink
 
-# openocd programmer is supported
-PROGRAMMERS_SUPPORTED += openocd
+#variable needed by cpy2remed PROGRAMMER
+#it contains name of ST-Link removable media
+DIR_NAME_AT_REMED = "DIS_F469NI"
+
+# openocd and cpy2remed programmers are supported
+PROGRAMMERS_SUPPORTED += openocd cpy2remed
