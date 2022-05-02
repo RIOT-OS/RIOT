@@ -854,6 +854,10 @@ ifneq (,$(filter suit_transport_coap, $(USEMODULE)))
   USEMODULE += sock_util
 endif
 
+ifneq (,$(filter suit_transport_vfs, $(USEMODULE)))
+  USEMODULE += vfs_util
+endif
+
 ifneq (,$(filter suit_storage_%, $(USEMODULE)))
   USEMODULE += suit_storage
 endif

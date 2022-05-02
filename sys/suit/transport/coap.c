@@ -34,8 +34,13 @@
 #include "periph/pm.h"
 #include "ztimer.h"
 
+#ifdef MODULE_SUIT_TRANSPORT_COAP
 #include "suit/transport/coap.h"
 #include "net/sock/util.h"
+#endif
+#ifdef MODULE_SUIT_TRANSPORT_VFS
+#include "vfs_util.h"
+#endif
 
 #ifdef MODULE_RIOTBOOT_SLOT
 #include "riotboot/slot.h"
@@ -81,10 +86,27 @@ static kernel_pid_t _suit_coap_pid;
 
 static void _suit_handle_url(const char *url, coap_blksize_t blksize)
 {
+    ssize_t size;
     LOG_INFO("suit_coap: downloading \"%s\"\n", url);
-    ssize_t size = nanocoap_get_blockwise_url_to_buf(url, blksize,
-                                                     _manifest_buf,
-                                                     SUIT_MANIFEST_BUFSIZE);
+
+    if (0) {}
+#ifdef MODULE_SUIT_TRANSPORT_COAP
+    else if (strncmp(url, "coap://", 7) == 0) {
+        size = nanocoap_get_blockwise_url_to_buf(url, blksize,
+                                                 _manifest_buf,
+                                                 sizeof(_manifest_buf));
+    }
+#endif
+#ifdef MODULE_SUIT_TRANSPORT_VFS
+    else if (strncmp(url, "file:/", 6) == 0) {
+        size = vfs_file_to_buffer(&url[6], _manifest_buf, sizeof(_manifest_buf));
+    }
+#endif
+    else {
+        LOG_WARNING("suit_coap: unsupported URL scheme!\n)");
+        return;
+    }
+
     if (size >= 0) {
         LOG_INFO("suit_coap: got manifest with size %u\n", (unsigned)size);
 
