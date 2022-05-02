@@ -223,6 +223,21 @@ static int _adc_configure(Adc *dev, adc_res_t res)
         SUPC->VREF.reg |= SUPC_VREF_VREFOE;
     }
 #endif
+#ifdef ADC_REFCTRL_REFSEL_AREFA
+    if (ADC_REF_DEFAULT == ADC_REFCTRL_REFSEL_AREFA) {
+        gpio_init_mux(ADC_REFSEL_AREFA_PIN, GPIO_MUX_B);
+    }
+#endif
+#ifdef ADC_REFCTRL_REFSEL_AREFB
+    if (ADC_REF_DEFAULT == ADC_REFCTRL_REFSEL_AREFB) {
+        gpio_init_mux(ADC_REFSEL_AREFB_PIN, GPIO_MUX_B);
+    }
+#endif
+#ifdef ADC_REFCTRL_REFSEL_AREFC
+    if (ADC_REF_DEFAULT == ADC_REFCTRL_REFSEL_AREFC) {
+        gpio_init_mux(ADC_REFSEL_AREFC_PIN, GPIO_MUX_B);
+    }
+#endif
 
     /*  Enable ADC Module */
     dev->CTRLA.reg |= ADC_CTRLA_ENABLE;
