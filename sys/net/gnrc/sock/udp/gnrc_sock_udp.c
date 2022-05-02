@@ -289,7 +289,6 @@ ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
     sock_ip_ep_t local;
     sock_udp_ep_t remote_cpy;
     sock_ip_ep_t *rem;
-    uint8_t *payload_buf;
 
     assert((sock != NULL) || (remote != NULL));
 
@@ -371,12 +370,7 @@ ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
     }
 
     /* copy payload data into payload snip */
-    payload_buf = payload->data;
-    while (snips) {
-        memcpy(payload_buf, snips->iol_base, snips->iol_len);
-        payload_buf += snips->iol_len;
-        snips = snips->iol_next;
-    }
+    iolist_to_buffer(snips, payload->data, payload->size);
 
     pkt = gnrc_udp_hdr_build(payload, src_port, dst_port);
     if (pkt == NULL) {
