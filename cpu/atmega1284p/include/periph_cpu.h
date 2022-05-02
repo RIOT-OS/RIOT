@@ -54,6 +54,33 @@ enum {
                                  GPIO_PIN(PORT_B, 2) }
 
 /**
+ * @brief   Get the interrupt vector number of the given GPIO pin
+ */
+static inline uint8_t atmega_pin2exti(uint8_t port_num, uint8_t pin_num)
+{
+    if (port_num == PORT_B) {
+        return 2;
+    }
+
+    return pin_num - 2;
+}
+
+/**
+ * @brief   Check if the given pin can be used as external interrupt
+ */
+static inline bool atmega_has_pin_exti(uint8_t port_num, uint8_t pin_num)
+{
+    switch (port_num) {
+    default:
+        return false;
+    case PORT_D:
+        return ((pin_num == 2) || (pin_num == 3));
+    case PORT_B:
+        return pin_num == 2;
+    }
+}
+
+/**
  * @name   Defines for the I2C interface
  * @{
  */
