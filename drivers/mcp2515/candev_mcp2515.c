@@ -305,6 +305,11 @@ static int _set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
         }
         else {
             memcpy(&candev->bittiming, value, sizeof(candev->bittiming));
+            if (can_device_calc_bittiming(dev->conf->clk / 2 /* f_quantum = f_osc / 2 */,
+                            &bittiming_const, &candev->bittiming) < 0) {
+                DEBUG_PUTS("set0_Failed to calculate bittiming");
+                return -ERANGE;
+            }
             res = _init(candev);
             if (res == 0) {
                 res = sizeof(candev->bittiming);
