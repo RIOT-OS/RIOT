@@ -36,6 +36,6 @@ static int read_acc(const void *dev, phydat_t *res)
 
 const saul_driver_t mma7660_saul_driver = {
     .read = read_acc,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_ACCEL,
 };

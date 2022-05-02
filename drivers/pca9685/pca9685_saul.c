@@ -21,7 +21,7 @@
 
 extern pca9685_t pca9685_devs[];
 
-static int set(const void *dev, phydat_t *data)
+static int set(const void *dev, const phydat_t *data)
 {
     const pca9685_saul_pwm_params_t *p = (const pca9685_saul_pwm_params_t *)dev;
     pca9685_pwm_set(&pca9685_devs[p->dev], p->channel, (uint16_t)data->val[0]);
@@ -29,7 +29,7 @@ static int set(const void *dev, phydat_t *data)
 }
 
 const saul_driver_t pca9685_pwm_saul_driver = {
-    .read = saul_notsup,
+    .read = saul_read_notsup,
     .write = set,
     .type = SAUL_ACT_SERVO
 };

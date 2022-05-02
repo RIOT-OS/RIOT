@@ -44,12 +44,12 @@ static int read_temperature(const void *dev, phydat_t *res)
 
 const saul_driver_t lis2dh12_saul_driver = {
     .read = read_accelerometer,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_ACCEL,
 };
 
 const saul_driver_t lis2dh12_saul_temp_driver = {
     .read = read_temperature,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_TEMP,
 };

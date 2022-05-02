@@ -37,6 +37,6 @@ static int read_ppm(const void *dev, phydat_t *res)
 
 const saul_driver_t mhz19_ppm_saul_driver = {
     .read = read_ppm,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_CO2
 };

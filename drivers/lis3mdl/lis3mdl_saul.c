@@ -36,6 +36,6 @@ static int read_mag(const void *dev, phydat_t *res)
 
 const saul_driver_t lis3mdl_saul_mag_driver = {
     .read = read_mag,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_MAG,
 };

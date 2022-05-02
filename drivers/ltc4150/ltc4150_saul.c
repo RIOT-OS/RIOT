@@ -56,12 +56,12 @@ static int read_current(const void *dev, phydat_t *res)
 
 const saul_driver_t ltc4150_saul_charge_driver = {
     .read = read_charge,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_CHARGE
 };
 
 const saul_driver_t ltc4150_saul_current_driver = {
     .read = read_current,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_CURRENT
 };

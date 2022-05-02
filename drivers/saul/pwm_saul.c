@@ -74,7 +74,7 @@ static inline void setchan(const saul_pwm_channel_t *chan, uint16_t value)
             (chan->flags & SAUL_PWM_INVERTED) ? saul_pwm_resolution - value : value);
 }
 
-static int write_dimmer(const void *dev, phydat_t *state)
+static int write_dimmer(const void *dev, const phydat_t *state)
 {
     const saul_pwm_dimmer_params_t *p = dev;
 
@@ -94,12 +94,12 @@ static int write_dimmer(const void *dev, phydat_t *state)
 }
 
 const saul_driver_t dimmer_saul_driver = {
-    .read = saul_notsup,
+    .read = saul_read_notsup,
     .write = write_dimmer,
     .type = SAUL_ACT_DIMMER
 };
 
-static int write_rgb(const void *dev, phydat_t *state)
+static int write_rgb(const void *dev, const phydat_t *state)
 {
     const saul_pwm_rgb_params_t *p = dev;
 
@@ -123,7 +123,7 @@ static int write_rgb(const void *dev, phydat_t *state)
 }
 
 const saul_driver_t rgb_saul_driver = {
-    .read = saul_notsup,
+    .read = saul_read_notsup,
     .write = write_rgb,
     .type = SAUL_ACT_LED_RGB
 };

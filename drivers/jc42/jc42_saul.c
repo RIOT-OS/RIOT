@@ -36,6 +36,6 @@ static int read_temperature(const void *dev, phydat_t *res)
 
 const saul_driver_t jc42_temperature_saul_driver = {
     .read = read_temperature,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_TEMP
 };
