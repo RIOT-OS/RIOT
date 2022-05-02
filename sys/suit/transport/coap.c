@@ -77,31 +77,6 @@ static char _stack[SUIT_COAP_STACKSIZE];
 static char _url[SUIT_URL_MAX];
 static uint8_t _manifest_buf[SUIT_MANIFEST_BUFSIZE];
 
-#ifdef MODULE_SUIT
-static inline void _print_download_progress(suit_manifest_t *manifest,
-                                            size_t offset, size_t len,
-                                            size_t image_size)
-{
-    (void)manifest;
-    (void)offset;
-    (void)len;
-    DEBUG("_suit_flashwrite(): writing %u bytes at pos %u\n", len, offset);
-#if defined(MODULE_PROGRESS_BAR)
-    if (image_size != 0) {
-        char _suffix[7] = { 0 };
-        uint8_t _progress = 100 * (offset + len) / image_size;
-        sprintf(_suffix, " %3d%%", _progress);
-        progress_bar_print("Fetching firmware ", _suffix, _progress);
-        if (_progress == 100) {
-            puts("");
-        }
-    }
-#else
-    (void) image_size;
-#endif
-}
-#endif
-
 static kernel_pid_t _suit_coap_pid;
 
 static void _suit_handle_url(const char *url, coap_blksize_t blksize)
@@ -147,49 +122,6 @@ static void _suit_handle_url(const char *url, coap_blksize_t blksize)
     else {
         LOG_INFO("suit_coap: error getting manifest\n");
     }
-}
-
-int suit_storage_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
-                        int more)
-{
-    suit_manifest_t *manifest = (suit_manifest_t *)arg;
-
-    uint32_t image_size;
-    nanocbor_value_t param_size;
-    size_t total = offset + len;
-    suit_component_t *comp = &manifest->components[manifest->component_current];
-    suit_param_ref_t *ref_size = &comp->param_size;
-
-    /* Grab the total image size from the manifest */
-    if ((suit_param_ref_to_cbor(manifest, ref_size, &param_size) == 0) ||
-            (nanocbor_get_uint32(&param_size, &image_size) < 0)) {
-        /* Early exit if the total image size can't be determined */
-        return -1;
-    }
-
-    if (image_size < offset + len) {
-        /* Extra newline at the start to compensate for the progress bar */
-        LOG_ERROR(
-            "\n_suit_coap(): Image beyond size, offset + len=%u, "
-            "image_size=%u\n", (unsigned)(total), (unsigned)image_size);
-        return -1;
-    }
-
-    if (!more && image_size != total) {
-        LOG_INFO("Incorrect size received, got %u, expected %u\n",
-                 (unsigned)total, (unsigned)image_size);
-        return -1;
-    }
-
-    _print_download_progress(manifest, offset, len, image_size);
-
-    int res = suit_storage_write(comp->storage_backend, manifest, buf, offset, len);
-    if (!more) {
-        LOG_INFO("Finalizing payload store\n");
-        /* Finalize the write if no more data available */
-        res = suit_storage_finish(comp->storage_backend, manifest);
-    }
-    return res;
 }
 
 static void *_suit_coap_thread(void *arg)
