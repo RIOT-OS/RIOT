@@ -151,6 +151,11 @@ static void _dose_watchdog_cb(void *arg, int chan)
     (void) chan;
     (void) arg;
 
+    /* Workaround: timer_stop() after timer_set_periodic() is sometimes ignored */
+    if (!_watchdog_users) {
+        timer_stop(DOSE_TIMER_DEV);
+    }
+
     for (unsigned i = 0; i < _dose_numof; ++i) {
         dose_t *ctx = &_dose_base[i];
 
