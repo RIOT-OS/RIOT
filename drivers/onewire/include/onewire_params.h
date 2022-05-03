@@ -30,35 +30,29 @@ extern "C" {
  * @brief   Set default configuration parameters for the ds18
  * @{
  */
-#ifndef DS18_PARAM_PIN
-#define DS18_PARAM_PIN             (GPIO_PIN(0, 0))
-#endif
-#ifndef DS18_PARAM_PULL
-#define DS18_PARAM_PULL            (GPIO_OD_PU)
+#ifndef ONEWIRE_PARAMS_PIN
+#define ONEWIRE_PARAMS_PIN (GPIO_PIN(0, 0))
 #endif
 
-#define DS18_PARAMS_DEFAULT        { .pin     = DS18_PARAM_PIN, \
-                                     .out_mode = DS18_PARAM_PULL }
+#ifndef ONEWIRE_PARAMS_OUT_MODE
+#define ONEWIRE_PARAMS_OUT_MODE (GPIO_OD_PU)
+#endif
+
+#ifndef ONEWIRE_PARAMS
+#define ONEWIRE_PARAMS \
+    { \
+        .pin = ONEWIRE_PARAMS_PIN, \
+        .out_mode = ONEWIRE_PARAMS_OUT_MODE \
+    }
+#endif
+
 /**@}*/
 
 /**
  * @brief   Configure ds18
  */
-static const ds18_params_t ds18_params[] =
-{
-#ifdef DS18_PARAMS_BOARD
-    DS18_PARAMS_BOARD,
-#else
-    DS18_PARAMS_DEFAULT,
-#endif
-};
-
-/**
- * @brief   Configure SAUL registry entries
- */
-static const saul_reg_info_t ds18_saul_reg_info[] =
-{
-    { .name = "ds18" }
+static const onewire_params_t onewire_params[] = {
+    ONEWIRE_PARAMS
 };
 
 #ifdef __cplusplus

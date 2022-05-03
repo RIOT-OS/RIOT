@@ -20,102 +20,159 @@
  * @}
  */
 
+#include "onewire.h"
+
 #include <errno.h>
 
-#include "onewire.h"
-#include "onewire_internal.h"
-
-#include "log.h"
+#include "byteorder.h"
+#include "log.h" // TODO: rm?
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "xtimer.h" // TODO: use ztimer?
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static void onewire_low(const onewire_t *dev)
+// 1-wire signal delays (in useconds)
+//TODO: better doc?
+#define ONEWIRE_DELAY_RESET         (480U)
+#define ONEWIRE_DELAY_PRESENCE      (60U)
+#define ONEWIRE_DELAY_SLOT          (60U)
+#define ONEWIRE_SAMPLE_TIME         (10U)
+#define ONEWIRE_DELAY_RW_PULSE      (1U)
+#define ONEWIRE_DELAY_R_RECOVER     (ONEWIRE_DELAY_SLOT - ONEWIRE_SAMPLE_TIME)
+
+static uint8_t _crc8_byte(uint8_t crc, uint8_t data)
+{
+    crc = crc ^ data;
+
+    for (unsigned i = 0; i < 8; i++) {
+        if (crc & 0x01) {
+            crc = (crc >> 1) ^ 0x8C;
+        }
+        else {
+            crc >>= 1;
+        }
+    }
+
+    return crc;
+}
+
+static uint8_t _crc8(uint8_t crc, uint8_t *buf, size_t size)
+{
+    for (unsigned i = 0; i < size; i++) {
+        crc = _crc8_byte(crc, buf[i]);
+    }
+
+    return crc;
+}
+
+static void onewire_pin_low(const onewire_t *dev)
 {
     /* Set gpio as output and clear pin */
     gpio_init(dev->params.pin, GPIO_OUT);
     gpio_clear(dev->params.pin);
 }
 
-static void onewire_release(const onewire_t *dev)
+static void onewire_pin_release(const onewire_t *dev)
 {
     /* Init pin as input */
     gpio_init(dev->params.pin, dev->params.in_mode);
 }
 
-static void onewire_write_bit(const onewire_t *dev, uint8_t bit)
+int onewire_reset_bus(const onewire_t *dev)
 {
-    /* Initiate write slot */
-    onewire_low(dev);
+    int res;
 
-    /* Release pin when bit==1 */
-    if (bit) {
-        onewire_release(dev);
+    /* Line low and sleep the reset delay */
+    onewire_pin_low(dev);
+    xtimer_usleep(ONEWIRE_DELAY_RESET);
+
+    /* Release and wait for the presence response */
+    onewire_pin_release(dev);
+    xtimer_usleep(ONEWIRE_DELAY_PRESENCE);
+
+    /* Check device presence */
+    res = gpio_read(dev->params.pin);
+
+    /* Sleep for reset delay */
+    xtimer_usleep(ONEWIRE_DELAY_RESET);
+
+    /* If no device pulled the bus low */
+    if (res)
+    {
+        return -EIO;
     }
 
-    /* Wait for slot to end */
-    xtimer_usleep(DS18_DELAY_SLOT);
-    onewire_release(dev);
-    xtimer_usleep(1);
+    return 0;
 }
 
-#if 1
-static int onewire_read_bit(const onewire_t *dev, uint8_t *bit)
+int onewire_read_bit(const onewire_t *dev, uint8_t *bit)
 {
     /* Initiate read slot */
-    onewire_low(dev);
-    onewire_release(dev);
+    onewire_pin_low(dev);
+    onewire_pin_release(dev);
 
-#if defined(MODULE_DS18_OPTIMIZED)
-    xtimer_usleep(DS18_SAMPLE_TIME);
+#if defined(MODULE_ONEWIRE_OPTIMIZED)
+    xtimer_usleep(ONEWIRE_SAMPLE_TIME);
     *bit = gpio_read(dev->params.pin);
-    xtimer_usleep(DS18_DELAY_R_RECOVER);
+    xtimer_usleep(ONEWIRE_DELAY_R_RECOVER);
     return 0;
 #else
     uint32_t start, measurement = 0;
 
     /* Measure time low of device pin, timeout after slot time*/
     start = xtimer_now_usec();
-    while (!gpio_read(dev->params.pin) && measurement < DS18_DELAY_SLOT) {
+    while (!gpio_read(dev->params.pin) && measurement < ONEWIRE_DELAY_SLOT) {
         measurement = xtimer_now_usec() - start;
     }
 
     /* If there was a timeout return error */
-    if (measurement >= DS18_DELAY_SLOT) {
+    if (measurement >= ONEWIRE_DELAY_SLOT) {
         return -EIO;
     }
 
     /* When gpio was low for less than the sample time, bit is high*/
-    *bit = measurement < DS18_SAMPLE_TIME;
+    *bit = measurement < ONEWIRE_SAMPLE_TIME;
 
     /* Wait for slot to end */
-    xtimer_usleep(DS18_DELAY_SLOT - measurement);
+    xtimer_usleep(ONEWIRE_DELAY_SLOT - measurement);
 
     return 0;
 #endif
 }
-#endif
 
-#if 1
+void onewire_write_bit(const onewire_t *dev, uint8_t bit)
+{
+    /* Initiate write slot */
+    onewire_pin_low(dev);
+
+    /* Release pin when bit==1 */
+    if (bit) {
+        onewire_pin_release(dev);
+    }
+
+    /* Wait for slot to end */
+    xtimer_usleep(ONEWIRE_DELAY_SLOT);
+    onewire_pin_release(dev);
+    xtimer_usleep(1);
+}
+
 int onewire_read_byte(const onewire_t *dev, uint8_t *byte)
 {
     uint8_t bit = 0;
     *byte = 0;
 
     for (int i = 0; i < 8; i++) {
-        if (onewire_read_bit(dev, &bit) == 0) {
-            *byte |= (bit << i);
-        }
-        else {
+
+        if (onewire_read_bit(dev, &bit) < 0) {
             return -EIO;
         }
+
+        *byte |= (bit << i);
     }
 
     return 0;
 }
-#endif
 
 void onewire_write_byte(const onewire_t *dev, uint8_t byte)
 {
@@ -124,89 +181,57 @@ void onewire_write_byte(const onewire_t *dev, uint8_t byte)
     }
 }
 
-#if 0
-static int onewire_reset(const onewire_t *dev)
+int onewire_read_word(const onewire_t *dev, uint16_t *word)
 {
     int res;
+    le_uint16_t data;
 
-    /* Line low and sleep the reset delay */
-    onewire_low(dev);
-    xtimer_usleep(DS18_DELAY_RESET);
+    res = onewire_read(dev, &data, 2);
 
-    /* Release and wait for the presence response */
-    onewire_release(dev);
-    xtimer_usleep(DS18_DELAY_PRESENCE);
-
-    /* Check device presence */
-    res = gpio_read(dev->params.pin);
-
-    /* Sleep for reset delay */
-    xtimer_usleep(DS18_DELAY_RESET);
+    *word = byteorder_ltohs(data); //TODO?
 
     return res;
 }
-#endif
 
-#if 0
-int onewire_trigger(const onewire_t *dev)
+void onewire_write_word(const onewire_t *dev, uint16_t word)
+{
+    le_uint16_t data = byteorder_htols(word); //TODO?
+
+    onewire_write(dev, &data, 2);
+}
+
+int onewire_read(const onewire_t *dev, void *buf, size_t size)
 {
     int res;
+    uint8_t *data = buf;
 
-    res = onewire_reset(dev);
-    if (res) {
-        return -EIO;
+    for (size_t i = 0; i < size; i++) {
+        res = onewire_read_byte(dev, &data[i]);
+
+        if (res < 0) {
+            return res;
+        }
     }
 
-    /* Please note that this command triggers a conversion on all devices
-     * connected to the bus. */
-    onewire_write_byte(dev, DS18_CMD_SKIPROM);
-    onewire_write_byte(dev, DS18_CMD_CONVERT);
-
-    return 0;
+    return size;
 }
-#endif
 
-#if 0
-int onewire_read(const onewire_t *dev, int16_t *temperature)
+void onewire_write(const onewire_t *dev, const void *buf, size_t size)
 {
-    int res;
-    uint8_t b1 = 0, b2 = 0;
+    const uint8_t *data = buf;
 
-    DEBUG("[DS18] Reset and read scratchpad\n");
-    res = ds18_reset(dev);
-    if (res) {
-        return -EIO;
+    for (size_t i = 0; i < size; i++) {
+        onewire_write_byte(dev, data[i]);
     }
-
-    ds18_write_byte(dev, DS18_CMD_SKIPROM);
-    ds18_write_byte(dev, DS18_CMD_RSCRATCHPAD);
-
-    if (ds18_read_byte(dev, &b1) != 0) {
-        DEBUG("[DS18] Error reading temperature byte 1\n");
-        return DS18_ERROR;
-    }
-
-    DEBUG("[DS18] Received byte: 0x%02x\n", b1);
-
-    if (ds18_read_byte(dev, &b2) != 0) {
-        DEBUG("[DS18] Error reading temperature byte 2\n");
-        return DS18_ERROR;
-    }
-
-    DEBUG("[DS18] Received byte: 0x%02x\n", b2);
-
-    int32_t measurement = (int16_t)(b2 << 8 | b1);
-    *temperature = (int16_t)((100 * measurement) >> 4);
-
-    return 0;
 }
-#endif
 
 int onewire_init(onewire_t *dev, const onewire_params_t *params)
 {
     int res;
 
     dev->params = *params;
+
+    mutex_init(&dev->lock);
 
     /* Deduct the input mode from the output mode. If pull-up resistors are
      * used for output then will be used for input as well. */
@@ -216,4 +241,70 @@ int onewire_init(onewire_t *dev, const onewire_params_t *params)
     res = gpio_init(dev->params.pin, dev->params.in_mode) == 0 ? 0 : -EIO;
 
     return res;
+}
+
+void onewire_aquire(onewire_t *dev)
+{
+    mutex_lock(&dev->lock);
+}
+
+void onewire_release(onewire_t *dev)
+{
+    mutex_unlock(&dev->lock);
+}
+
+int onewire_cmd_skiprom(onewire_t *dev)
+{
+    int res;
+
+    res = onewire_reset_bus(dev);
+    if (res < 0)
+    {
+        return -EIO; //TODO
+    }
+
+    onewire_write_byte(dev, ONEWIRE_CMD_SKIPROM);
+
+    return 0;
+}
+
+int onewire_cmd_readrom(onewire_t *dev, onewire_id_rom_t *rom)
+{
+    int res;
+
+    res = onewire_reset_bus(dev);
+    if (res < 0)
+    {
+        return -EIO; //TODO
+    }
+
+    onewire_write_byte(dev, ONEWIRE_CMD_READROM);
+    onewire_read(dev, rom, sizeof(*rom));
+
+#if ENABLE_DEBUG
+
+    DEBUG("device type: 0x%02x\n", rom->type);
+
+    DEBUG("serial number: 0x");
+    for (unsigned i = 0; i < sizeof(rom->serial_number); i++)
+    {
+        DEBUG("%02x", rom->serial_number[i]);
+    }
+    DEBUG("\n");
+
+    DEBUG("stored crc: 0x%02x\n", rom->crc);
+
+    uint8_t crc;
+    crc = _crc8(0  , (uint8_t*)&rom->type         , sizeof(rom->type         ));
+    crc = _crc8(crc, (uint8_t*)&rom->serial_number, sizeof(rom->serial_number));
+    DEBUG("calculated crc: 0x%02x\n", crc);
+
+#endif
+
+    if (_crc8(0, (uint8_t*)rom, sizeof(*rom)) != 0)
+    {
+        return -EIO; //TODO
+    }
+
+    return 0;
 }
