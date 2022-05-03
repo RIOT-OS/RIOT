@@ -224,7 +224,12 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
             /* disable CTC mode */
             ctx[tim].mode &= (1 << 3);
         }
-        ctx[tim].dev->CRB = ctx[tim].mode;
+        /* enable timer or stop it */
+        if (flags & TIM_FLAG_SET_STOPPED) {
+            ctx[tim].dev->CRB = 0;
+        } else {
+            ctx[tim].dev->CRB = ctx[tim].mode;
+        }
     } else {
         assert((flags & TIM_FLAG_RESET_ON_MATCH) == 0);
         res = -1;

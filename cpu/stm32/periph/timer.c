@@ -149,6 +149,10 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
 
     clear_oneshot(tim, channel);
 
+    if (flags & TIM_FLAG_SET_STOPPED) {
+        timer_stop(tim);
+    }
+
     if (flags & TIM_FLAG_RESET_ON_SET) {
         /* setting COUNT gives us an interrupt on all channels */
         unsigned state = irq_disable();

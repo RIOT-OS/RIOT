@@ -90,6 +90,16 @@ typedef uint_fast8_t tim_t;
 #endif
 
 /**
+ * @brief   Keep the timer stopped after setting alarm.
+ *
+ * When set, the timer will remained stopped after a timer_set_periodic() and
+ * can be started manually with timer_start().
+ */
+#ifndef TIM_FLAG_SET_STOPPED
+#define TIM_FLAG_SET_STOPPED    (0x04)
+#endif
+
+/**
  * @brief   Signature of event callback functions triggered from interrupts
  *
  * @param[in] arg       optional context for the callback

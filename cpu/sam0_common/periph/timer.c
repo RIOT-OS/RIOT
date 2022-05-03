@@ -110,27 +110,21 @@ static uint8_t _get_prescaler(uint32_t freq_out, uint32_t freq_in)
 /* TOP value is CC0 */
 static inline void _set_mfrq(tim_t tim)
 {
-    timer_stop(tim);
-    wait_synchronization(tim);
 #ifdef TC_WAVE_WAVEGEN_MFRQ
     dev(tim)->WAVE.reg = TC_WAVE_WAVEGEN_MFRQ;
 #else
     dev(tim)->CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_MFRQ_Val;
 #endif
-    timer_start(tim);
 }
 
 /* TOP value is MAX timer value */
 static inline void _set_nfrq(tim_t tim)
 {
-    timer_stop(tim);
-    wait_synchronization(tim);
 #ifdef TC_WAVE_WAVEGEN_NFRQ
     dev(tim)->WAVE.reg = TC_WAVE_WAVEGEN_NFRQ;
 #else
     dev(tim)->CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_NFRQ_Val;
 #endif
-    timer_start(tim);
 }
 
 /**
@@ -242,9 +236,12 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
 {
     DEBUG("Setting timer %i channel %i to %i (repeating)\n", tim, channel, value);
 
+    timer_stop(tim);
+
     /* set timeout value */
     switch (channel) {
     case 0:
+        /* clear interrupt */
         dev(tim)->INTFLAG.reg = TC_INTFLAG_MC0;
 
         if (flags & TIM_FLAG_RESET_ON_MATCH) {
@@ -274,6 +271,10 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
 
     if (flags & TIM_FLAG_RESET_ON_SET) {
         dev(tim)->COUNT.reg = 0;
+    }
+
+    if (!(flags & TIM_FLAG_SET_STOPPED)) {
+        timer_start(tim);
     }
 
     clear_oneshot(tim, channel);
@@ -328,10 +329,12 @@ unsigned int timer_read(tim_t tim)
 void timer_stop(tim_t tim)
 {
     dev(tim)->CTRLA.bit.ENABLE = 0;
+    wait_synchronization(tim);
 }
 
 void timer_start(tim_t tim)
 {
+    wait_synchronization(tim);
     dev(tim)->CTRLA.bit.ENABLE = 1;
 }
 
