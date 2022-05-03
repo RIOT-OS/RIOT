@@ -257,7 +257,7 @@ static int enable_int(int argc, char **argv)
 }
 #endif /* MODULE_PCF857X_IRQ */
 
-static int read(int argc, char **argv)
+static int read_pin(int argc, char **argv)
 {
     if (argc < 3) {
         printf("usage: %s <port> <pin>\n", argv[0]);
@@ -285,7 +285,7 @@ static int read(int argc, char **argv)
     return 0;
 }
 
-static int set(int argc, char **argv)
+static int set_pin(int argc, char **argv)
 {
     if (argc < 3) {
         printf("usage: %s <port> <pin>\n", argv[0]);
@@ -304,7 +304,7 @@ static int set(int argc, char **argv)
     return 0;
 }
 
-static int clear(int argc, char **argv)
+static int clear_pin(int argc, char **argv)
 {
     if (argc < 3) {
         printf("usage: %s <port> <pin>\n", argv[0]);
@@ -323,7 +323,7 @@ static int clear(int argc, char **argv)
     return 0;
 }
 
-static int toggle(int argc, char **argv)
+static int toggle_pin(int argc, char **argv)
 {
     if (argc < 3) {
         printf("usage: %s <port> <pin>\n", argv[0]);
@@ -396,10 +396,10 @@ static const shell_command_t shell_commands[] = {
     { "init_int", "init as external INT w/o pull resistor", init_int },
     { "enable_int", "enable or disable gpio interrupt", enable_int },
 #endif
-    { "read", "read pin status", read },
-    { "set", "set pin to HIGH", set },
-    { "clear", "set pin to LOW", clear },
-    { "toggle", "toggle pin", toggle },
+    { "read", "read pin status", read_pin },
+    { "set", "set pin to HIGH", set_pin },
+    { "clear", "set pin to LOW", clear_pin },
+    { "toggle", "toggle pin", toggle_pin },
     { "bench", "run a set of predefined benchmarks", bench },
     { NULL, NULL, NULL }
 };
