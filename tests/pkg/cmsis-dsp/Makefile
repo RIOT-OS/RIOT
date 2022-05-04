@@ -1,7 +1,8 @@
 BOARD ?= samr21-xpro
 include ../Makefile.pkg_common
 
-USEPKG += cmsis-dsp
+USEPKG += cmsis
+USEMODULE += cmsis-dsp
 
 BOARD_WHITELIST := \
   airfy-beacon \
@@ -19,6 +20,7 @@ BOARD_WHITELIST := \
   nucleo-f334r8 \
   nucleo-f401re \
   nucleo-l152re \
+  nucleo-l476rg \
   openmote-cc2538 \
   pba-d-01-kw2x \
   samd21-xpro \
