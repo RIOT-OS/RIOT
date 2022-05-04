@@ -21,6 +21,7 @@ config AUTO_INIT_ENABLE_DEBUG
     default n
 
 rsource "screen/Kconfig"
+rsource "security/Kconfig"
 rsource "multimedia/Kconfig"
 
 endif # MODULE_AUTO_INIT
