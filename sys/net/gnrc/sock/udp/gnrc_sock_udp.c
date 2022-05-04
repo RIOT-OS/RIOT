@@ -346,6 +346,16 @@ ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
         src_port = sock->local.port;
         memcpy(&local, &sock->local, sizeof(local));
     }
+#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+    /* user supplied local endpoint takes precedent */
+    if ((aux != NULL) && (aux->flags & SOCK_AUX_SET_LOCAL)) {
+        local.family = aux->local.family;
+        local.netif = aux->local.netif;
+        memcpy(&local.addr, &aux->local.addr, sizeof(local.addr));
+
+        aux->flags &= ~SOCK_AUX_SET_LOCAL;
+    }
+#endif
     /* sock can't be NULL at this point */
     if (remote == NULL) {
         rem = (sock_ip_ep_t *)&sock->remote;
