@@ -13,6 +13,7 @@ BLOBS += input
 # (cpu_core_cortexm is the only feature available) for the moment.
 BOARD_WHITELIST := \
   b-l475e-iot01a \
+  b-u585i-iot02a \
   iotlab-m3 \
   nrf52832-mdk \
   nrf52dk \

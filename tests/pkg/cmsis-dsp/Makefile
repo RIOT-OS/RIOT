@@ -7,10 +7,12 @@ USEMODULE += cmsis-dsp
 BOARD_WHITELIST := \
   airfy-beacon \
   arduino-due \
+  b-u585i-iot02a \
   cc2538dk \
   f4vi1 \
   iotlab-m3 \
   mbed_lpc1768 \
+  microbit-v2 \
   msbiot \
   mulle \
   nucleo-f091rc \
