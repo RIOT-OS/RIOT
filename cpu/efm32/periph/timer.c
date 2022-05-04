@@ -22,7 +22,6 @@
 
 #include "cpu.h"
 #include "log.h"
-#include "assert.h"
 #include "periph/timer.h"
 #include "periph_conf.h"
 #include "pm_layered.h"
@@ -73,11 +72,13 @@ static inline bool _is_letimer(tim_t dev)
 #endif
 }
 
-static void _letimer_init(tim_t dev, uint32_t freq)
+static int _letimer_init(tim_t dev, uint32_t freq)
 {
     (void) freq;
 #if LETIMER_COUNT
-    assert(freq == 32768);
+    if (freq != 32768) {
+        return -1;
+    }
 
     LETIMER_TypeDef *tim = timer_config[dev].timer.dev;
 
@@ -96,15 +97,22 @@ static void _letimer_init(tim_t dev, uint32_t freq)
 #else
     (void) dev;
 #endif
+
+    return 0;
 }
 
-static void _timer_init(tim_t dev, uint32_t freq)
+static int _timer_init(tim_t dev, uint32_t freq)
 {
     TIMER_TypeDef *pre, *tim;
 
     /* get timers */
     pre = timer_config[dev].prescaler.dev;
     tim = timer_config[dev].timer.dev;
+
+    if (pre == NULL) {
+        /* Running without a prescaler is currently not supported*/
+        return -1;
+    }
 
     /* enable clocks */
     CMU_ClockEnable(cmuClock_HFPER, true);
@@ -141,6 +149,8 @@ static void _timer_init(tim_t dev, uint32_t freq)
     /* enable interrupts for the channels */
     TIMER_IntClear(tim, TIMER_IFC_CC0 | TIMER_IFC_CC1 | TIMER_IFC_CC2);
     TIMER_IntEnable(tim, TIMER_IEN_CC0 | TIMER_IEN_CC1 | TIMER_IEN_CC2);
+
+    return 0;
 }
 
 int timer_init(tim_t dev, uint32_t freq, timer_cb_t callback, void *arg)
@@ -154,10 +164,14 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t callback, void *arg)
     isr_ctx[dev].cb = callback;
     isr_ctx[dev].arg = arg;
 
+    int error = 0;
     if (_is_letimer(dev)) {
-        _letimer_init(dev, freq);
+        error = _letimer_init(dev, freq);
     } else {
-        _timer_init(dev, freq);
+        error = _timer_init(dev, freq);
+    }
+    if (error < 0) {
+        return error;
     }
 
     NVIC_ClearPendingIRQ(timer_config[dev].irq);
