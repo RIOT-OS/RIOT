@@ -63,7 +63,7 @@
 /* static function definitions */
 static void _init(i2c_t dev);
 static void _i2c_init(I2C_TypeDef *i2c, uint32_t clk, uint32_t ccr);
-static int _start(I2C_TypeDef *dev, uint8_t address_byte, uint8_t flags,
+static int _i2c_start(I2C_TypeDef *dev, uint8_t address_byte, uint8_t flags,
                   size_t length);
 static int _stop(I2C_TypeDef *dev);
 static int _is_sr1_mask_set(I2C_TypeDef *i2c, uint32_t mask, uint8_t flags);
@@ -234,7 +234,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
         !(flags & I2C_NOSTART)) {
         return -EOPNOTSUPP;
     }
-    int ret = _start(i2c, (address << 1) | I2C_FLAG_READ, flags, length);
+    int ret = _i2c_start(i2c, (address << 1) | I2C_FLAG_READ, flags, length);
     if (ret < 0) {
         if (ret == -ETIMEDOUT) {
             _init(dev);
@@ -282,7 +282,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data,
     assert(i2c != NULL);
     DEBUG("[i2c] write_bytes: Starting\n");
     /* Length is 0 in start since we don't need to preset the stop bit */
-    ret = _start(i2c, (address << 1) | I2C_FLAG_WRITE, flags, 0);
+    ret = _i2c_start(i2c, (address << 1) | I2C_FLAG_WRITE, flags, 0);
     if (ret < 0) {
         if (ret == -ETIMEDOUT) {
             _init(dev);
@@ -321,7 +321,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data,
     return _wait_for_bus(i2c);
 }
 
-static int _start(I2C_TypeDef *i2c, uint8_t address_byte, uint8_t flags,
+static int _i2c_start(I2C_TypeDef *i2c, uint8_t address_byte, uint8_t flags,
                   size_t length)
 {
     assert(i2c != NULL);
