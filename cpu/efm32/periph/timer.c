@@ -101,6 +101,47 @@ static int _letimer_init(tim_t dev, uint32_t freq)
     return 0;
 }
 
+static int _timer_init_unprescaled(tim_t dev, uint32_t freq)
+{
+    /* This is generally similar to _timer_init, but does not prescale -- some
+     * duplication is accepted here in a trade-off for readability. */
+
+    TIMER_TypeDef *tim;
+
+    /* get timers */
+    tim = timer_config[dev].timer.dev;
+
+    /* enable clocks */
+    CMU_ClockEnable(cmuClock_HFPER, true);
+    CMU_ClockEnable(timer_config[dev].timer.cmu, true);
+
+    /* reset and initialize peripherals */
+    TIMER_Init_TypeDef init_tim = TIMER_INIT_DEFAULT;
+
+    init_tim.enable = false;
+    uint32_t freq_timer = CMU_ClockFreqGet(timer_config[dev].timer.cmu);
+    /* -1: We want to hit it precisely, not get a smaller one */
+    init_tim.prescale = TIMER_PrescalerCalc(freq - 1, freq_timer);
+    if (init_tim.prescale > timerPrescale1024 || freq_timer >> init_tim.prescale != freq) {
+        return -1;
+    }
+
+    TIMER_Reset(tim);
+
+    TIMER_Init(tim, &init_tim);
+
+    /* note: when changing this, update timer_set_absolute()'s TopGet,
+     * which assumes either 0xffffffff or 0xffff
+     */
+    TIMER_TopSet(tim, _is_wtimer(dev) ? 0xffffffff : 0xffff);
+
+    /* enable interrupts for the channels */
+    TIMER_IntClear(tim, TIMER_IFC_CC0 | TIMER_IFC_CC1 | TIMER_IFC_CC2);
+    TIMER_IntEnable(tim, TIMER_IEN_CC0 | TIMER_IEN_CC1 | TIMER_IEN_CC2);
+
+    return 0;
+}
+
 static int _timer_init(tim_t dev, uint32_t freq)
 {
     TIMER_TypeDef *pre, *tim;
@@ -111,7 +152,7 @@ static int _timer_init(tim_t dev, uint32_t freq)
 
     if (pre == NULL) {
         /* Running without a prescaler is currently not supported*/
-        return -1;
+        return _timer_init_unprescaled(dev, freq);
     }
 
     /* enable clocks */
