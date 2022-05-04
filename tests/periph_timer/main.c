@@ -48,7 +48,7 @@ static void cb(void *arg, int chan)
     fired++;
 }
 
-static int test_timer(unsigned num)
+static int test_timer(unsigned num, unsigned speed)
 {
     int set = 0;
 
@@ -61,7 +61,7 @@ static int test_timer(unsigned num)
     }
 
     /* initialize and halt timer */
-    if (timer_init(TIMER_DEV(num), TIMER_SPEED, cb, (void *)(COOKIE * num)) < 0) {
+    if (timer_init(TIMER_DEV(num), speed, cb, (void *)(COOKIE * num)) < 0) {
         printf("TIMER_%u: ERROR on initialization - skipping\n\n", num);
         return 0;
     }
@@ -119,10 +119,27 @@ int main(void)
     printf("Available timers: %i\n", TIMER_NUMOF);
 
     /* test all configured timers */
+    printf("\nTesting with the speed that each timer is expected to work with: %u Hz\n", TIMER_SPEED);
     for (unsigned i = 0; i < TIMER_NUMOF; i++) {
         printf("\nTesting TIMER_%u:\n", i);
-        res += test_timer(i);
+        res += test_timer(i, TIMER_SPEED);
     }
+
+    unsigned speeds[] = {32768, 250000, 500000, 1000000};
+    for (unsigned s = 0; s < ARRAY_SIZE(speeds); ++s) {
+        unsigned speed = speeds[s];
+        if (speed == TIMER_SPEED) {
+            /* been there above */
+            continue;
+        }
+        printf("\nTesting with additional speed: %u Hz (failure is OK)\n", speed);
+
+        for (unsigned i = 0; i < TIMER_NUMOF; i++) {
+            printf("\nTesting TIMER_%u:\n", i);
+            test_timer(i, speed);
+        }
+    }
+
     /* draw conclusion */
     if (res == TIMER_NUMOF) {
         puts("\nTEST SUCCEEDED");
