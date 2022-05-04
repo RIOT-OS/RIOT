@@ -368,8 +368,9 @@ typedef struct {
 /**
  * @brief   Define timer configuration values
  *
- * @note    The two timers must be adjacent to each other (e.g. TIMER0 and
- *          TIMER1, or TIMER2 and TIMER3, etc.).
+ * @note    The main timer must be the next timer after the prescaler (e.g.
+ *          TIMER0 as prescaler and TIMER1 as timer, or TIMER2 as prescaler and
+ *          TIMER3 as timer, etc.).
  * @{
  */
 typedef struct {
