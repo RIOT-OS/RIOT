@@ -1,7 +1,8 @@
 BOARD ?= nucleo-l476rg
 include ../Makefile.pkg_common
 
-USEPKG += cmsis-nn
+USEPKG += cmsis
+USEMODULE += cmsis-nn
 
 BLOBS += input
 
