@@ -71,6 +71,11 @@ enum mcp2515_error {
 /** Wake up source */
 #define MCP2515_WKUP_SRC_INTERNAL 1
 
+/** Acceptance mode (enable/disable filtering) */
+#ifndef MCP2515_RECV_FILTER_EN
+#define MCP2515_RECV_FILTER_EN  0
+#endif
+
 /**
  * @brief Initialize pins and SPI interface
  *

@@ -108,7 +108,15 @@ int mcp2515_init(candev_mcp2515_t *dev, void (*irq_handler_cb)(void *))
         return -1;
     }
 
-    uint8_t cmd = MCP2515_RXB0CTRL_MODE_RECV_ALL;
+    uint8_t cmd;
+    if (IS_ACTIVE(MCP2515_RECV_FILTER_EN)) {
+        DEBUG_PUTS("filtering enabled");
+        cmd = MCP2515_RXB0CTRL_MODE_RECV_FILTER;
+    }
+    else {
+        DEBUG_PUTS("filtering disabled");
+        cmd = MCP2515_RXB0CTRL_MODE_RECV_ALL;
+    }
 
     res = mcp2515_spi_write(dev, MCP2515_RXB0CTRL, &cmd, 1);
     if (res < 0) {
