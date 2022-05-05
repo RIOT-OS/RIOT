@@ -43,9 +43,6 @@ static volatile uint32_t sw_count;
 static volatile uint32_t timeouts[MAX_CHANNELS];
 static volatile unsigned args[MAX_CHANNELS];
 
-/* Ensure the constant correctly typed even on platform with "short" ints */
-const uint32_t timer_speed = TIMER_SPEED;
-
 static void cb(void *arg, int chan)
 {
     timeouts[chan] = sw_count;
@@ -124,16 +121,16 @@ int main(void)
     printf("Available timers: %i\n", TIMER_NUMOF);
 
     /* test all configured timers */
-    printf("\nTesting with the speed that each timer is expected to work with: %" PRIu32 " Hz\n", timer_speed);
+    printf("\nTesting with the speed that each timer is expected to work with: %" PRIu32 " Hz\n", (uint32_t)TIMER_SPEED);
     for (unsigned i = 0; i < TIMER_NUMOF; i++) {
         printf("\nTesting TIMER_%u:\n", i);
-        res += test_timer(i, timer_speed);
+        res += test_timer(i, TIMER_SPEED);
     }
 
     uint32_t speeds[] = {32768, 250000, 500000, 1000000};
     for (unsigned s = 0; s < ARRAY_SIZE(speeds); ++s) {
         uint32_t speed = speeds[s];
-        if (speed == timer_speed) {
+        if (speed == TIMER_SPEED) {
             /* been there above */
             continue;
         }
