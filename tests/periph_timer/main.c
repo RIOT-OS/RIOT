@@ -125,9 +125,9 @@ int main(void)
         res += test_timer(i, TIMER_SPEED);
     }
 
-    unsigned speeds[] = {32768, 250000, 500000, 1000000};
+    uint32_t speeds[] = {32768, 250000, 500000, 1000000};
     for (unsigned s = 0; s < ARRAY_SIZE(speeds); ++s) {
-        unsigned speed = speeds[s];
+        uint32_t speed = speeds[s];
         if (speed == TIMER_SPEED) {
             /* been there above */
             continue;
