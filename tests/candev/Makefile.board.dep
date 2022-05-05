@@ -9,6 +9,8 @@ ifeq ($(CAN_DRIVER), PERIPH_CAN)
   FEATURES_REQUIRED += periph_can
 else ifeq ($(CAN_DRIVER), MCP2515)
   USEMODULE += mcp2515
+  # Uncomment to enable MCP2515 reception filtering
+  # CFLAGS += "-DMCP2515_RECV_FILTER_EN=1"
 else ifeq ($(CAN_DRIVER), CAN_ALT)
   # other can modules can be defined here
 endif
