@@ -119,7 +119,7 @@ int main(void)
     printf("Available timers: %i\n", TIMER_NUMOF);
 
     /* test all configured timers */
-    printf("\nTesting with the speed that each timer is expected to work with: %u Hz\n", TIMER_SPEED);
+    printf("\nTesting with the speed that each timer is expected to work with: %" PRIu32 " Hz\n", UINT32_C(TIMER_SPEED));
     for (unsigned i = 0; i < TIMER_NUMOF; i++) {
         printf("\nTesting TIMER_%u:\n", i);
         res += test_timer(i, TIMER_SPEED);
@@ -132,7 +132,7 @@ int main(void)
             /* been there above */
             continue;
         }
-        printf("\nTesting with additional speed: %u Hz (failure is OK)\n", speed);
+        printf("\nTesting with additional speed: %" PRIu32 " Hz (failure is OK)\n", speed);
 
         for (unsigned i = 0; i < TIMER_NUMOF; i++) {
             printf("\nTesting TIMER_%u:\n", i);
