@@ -220,7 +220,8 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
             switch (coap_get_type(pkt)) {
             case COAP_TYPE_RST:
                 /* TODO: handle different? */
-                return -EBADMSG;
+                res = -EBADMSG;
+                break;
             case COAP_TYPE_CON:
                 _send_ack(sock, pkt);
                 /* fall-through */
