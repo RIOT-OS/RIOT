@@ -63,7 +63,7 @@ CFLAGS += -DCPU_CORE_$(call uppercase_and_underscore,$(CPU_CORE))
 
 # Add soft or hard FPU CFLAGS depending on the module
 ifneq (,$(filter cortexm_fpu,$(USEMODULE)))
-  ifeq ($(CPU_CORE),cortex-m7)
+  ifneq (,$(filter $(CPU_CORE),cortex-m33 cortex-m7))
     CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv5-sp-d16
   else
     CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv4-sp-d16
