@@ -53,7 +53,7 @@ else ifneq (,$(filter $(BOARDS_TIMER_250kHz),$(BOARD)))
 else ifneq (,$(filter $(BOARDS_TIMER_32kHz),$(BOARD)))
   TIMER_SPEED ?= 32768
 else ifneq (,$(filter $(BOARDS_TIMER_SYSCLK),$(BOARD)))
-  TIMER_SPEED ?= coreclk\(\)
+  TIMER_SPEED ?= coreclk()
 endif
 
 TIMER_SPEED ?= 1000000
