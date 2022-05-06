@@ -50,7 +50,7 @@ static void cb(void *arg, int chan)
     fired++;
 }
 
-static int test_timer(unsigned num, unsigned speed)
+static int test_timer(unsigned num, uint32_t speed)
 {
     int set = 0;
 

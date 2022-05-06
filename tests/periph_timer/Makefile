@@ -58,5 +58,5 @@ endif
 
 TIMER_SPEED ?= 1000000
 
-CFLAGS += -DTIMER_SPEED=$(TIMER_SPEED)
+CFLAGS += -DTIMER_SPEED="$(shell echo "${TIMER_SPEED}" | sed "s/^[0-9]\+$$/UINT32_C(&)/")"
 include $(RIOTBASE)/Makefile.include
