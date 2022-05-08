@@ -29,6 +29,7 @@
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/ipv6/addr.h"
+#include "net/l2util.h"
 #include "net/lora.h"
 #include "net/loramac.h"
 #include "net/netif.h"
@@ -660,7 +661,7 @@ static void _netif_list(netif_t *iface)
     if (res >= 0) {
         char hwaddr_str[res * 3];
         printf(" HWaddr: %s ",
-               gnrc_netif_addr_to_str(hwaddr, res, hwaddr_str));
+               l2util_addr_to_str(hwaddr, res, hwaddr_str));
     }
     res = netif_get_opt(iface, NETOPT_CHANNEL, 0, &u16, sizeof(u16));
     if (res >= 0) {
@@ -788,7 +789,7 @@ static void _netif_list(netif_t *iface)
     if (res >= 0) {
         char hwaddr_str[res * 3];
         printf("Long HWaddr: ");
-        printf("%s ", gnrc_netif_addr_to_str(hwaddr, res, hwaddr_str));
+        printf("%s ", l2util_addr_to_str(hwaddr, res, hwaddr_str));
         line_thresh++;
     }
     line_thresh = _newline(0U, line_thresh);
@@ -935,8 +936,8 @@ static void _netif_list(netif_t *iface)
         for (unsigned i = 0; i < CONFIG_L2FILTER_LISTSIZE; i++) {
             if (filter[i].addr_len > 0) {
                 char hwaddr_str[filter[i].addr_len * 3];
-                gnrc_netif_addr_to_str(filter[i].addr, filter[i].addr_len,
-                                       hwaddr_str);
+                l2util_addr_to_str(filter[i].addr, filter[i].addr_len,
+                                   hwaddr_str);
                 printf("            %2i: %s\n", count++, hwaddr_str);
             }
         }
@@ -1300,7 +1301,7 @@ static int _netif_set_lw_key(netif_t *iface, netopt_t opt, char *key_str)
 static int _netif_set_addr(netif_t *iface, netopt_t opt, char *addr_str)
 {
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
-    size_t addr_len = gnrc_netif_addr_from_str(addr_str, addr);
+    size_t addr_len = l2util_addr_from_str(addr_str, addr);
 
     if (addr_len == 0) {
         printf("error: unable to parse address.\n"
@@ -1449,7 +1450,7 @@ static int _netif_set_encrypt_key(netif_t *iface, netopt_t opt, char *key_str)
 static int _netif_addrm_l2filter(netif_t *iface, char *val, bool add)
 {
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
-    size_t addr_len = gnrc_netif_addr_from_str(val, addr);
+    size_t addr_len = l2util_addr_from_str(val, addr);
 
     if ((addr_len == 0) || (addr_len > CONFIG_L2FILTER_ADDR_MAXLEN)) {
         printf("error: given address is invalid\n");
