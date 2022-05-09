@@ -251,8 +251,6 @@ def generate_module_compile_commands(path, state, args):
 
     if args.clangd:
         cdetails.cflags.append('-Wno-unknown-warning-option')
-        # avoid including host system headers
-        cdetails.cflags.append('-nostdinc')
 
     c_extra_includes = []
     cxx_extra_includes = []
