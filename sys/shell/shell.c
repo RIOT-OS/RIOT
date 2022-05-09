@@ -54,12 +54,6 @@ XFA_INIT_CONST(shell_command_t*, shell_commands_xfa);
     #define flush_if_needed()
 #endif /* MODULE_NEWLIB || MODULE_PICOLIBC */
 
-#ifdef MODULE_SHELL_COMMANDS
-    #define _builtin_cmds _shell_command_list
-#else
-    #define _builtin_cmds NULL
-#endif
-
 #define SQUOTE '\''
 #define DQUOTE '"'
 #define ESCAPECHAR '\\'
@@ -117,8 +111,8 @@ static shell_command_handler_t find_handler(
         handler = search_commands(command_list, command);
     }
 
-    if (handler == NULL && _builtin_cmds != NULL) {
-        handler = search_commands(_builtin_cmds, command);
+    if (IS_USED(MODULE_SHELL_COMMANDS) && handler == NULL) {
+        handler = search_commands(_shell_command_list, command);
     }
 
     if (handler == NULL) {
@@ -152,8 +146,8 @@ static void print_help(const shell_command_t *command_list)
         print_commands(command_list);
     }
 
-    if (_builtin_cmds != NULL) {
-        print_commands(_builtin_cmds);
+    if (IS_USED(MODULE_SHELL_COMMANDS)) {
+        print_commands(_shell_command_list);
     }
 
     print_commands_xfa();
