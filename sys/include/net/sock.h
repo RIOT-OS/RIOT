@@ -303,6 +303,21 @@ enum {
      * @ref sock_dtls_aux_rx_t::rssi.
      */
     SOCK_AUX_GET_RSSI = (1LU << 2),
+    /**
+     * @brief   Flag to set the local address/endpoint
+     *
+     * @note    Select module `sock_aux_local` and a compatible network stack
+     *          to use this
+     *
+     * This is the address/endpoint the packet/datagram/segment will be sent from.
+     * This flag will be cleared if the network stack stored the local
+     * address/endpoint as requested, otherwise the bit remains set.
+     *
+     * Depending on the family of the socket, the timestamp will be stored in
+     * @ref sock_udp_aux_tx_t::local, @ref sock_ip_aux_tx_t::local, or in
+     * @ref sock_dtls_aux_tx_t::local.
+     */
+    SOCK_AUX_SET_LOCAL = (1LU << 3),
 };
 
 /**
