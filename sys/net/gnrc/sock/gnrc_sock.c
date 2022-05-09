@@ -288,6 +288,10 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
         netif_hdr->if_pid = iface;
         pkt = gnrc_pkt_prepend(pkt, netif);
     }
+    else {
+        return -EINVAL;
+    }
+
 #ifdef MODULE_GNRC_NETERR
     /* cppcheck-suppress uninitvar
      * (reason: pkt is initialized in AF_INET6 case above, otherwise function
