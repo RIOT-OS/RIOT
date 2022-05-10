@@ -1,0 +1,27 @@
+USEMODULE += wolfmqtt
+
+ifneq (,$(filter wolfmqtt_examples%,$(USEMODULE)))
+  USEMODULE += wolfmqtt_examples
+  USEMODULE += posix_netdb
+  USEMODULE += posix_sockets
+  USEMODULE += posix_select
+  USEMODULE += ztimer_sec
+endif
+
+ifneq (,$(filter wolfmqtt_examples_mqttclient,$(USEMODULE)))
+  USEMODULE += sock_tcp
+endif
+
+ifneq (,$(filter wolfmqtt_examples_multithread,$(USEMODULE)))
+  USEMODULE += sock_tcp
+  USEMODULE += posix_semaphore
+  USEMODULE += pthread
+endif
+
+ifneq (,$(filter wolfmqtt_examples_nbclient,$(USEMODULE)))
+  USEMODULE += sock_tcp
+endif
+
+ifneq (,$(filter wolfmqtt_examples_snclient,$(USEMODULE)))
+  USEMODULE += sock_udp
+endif

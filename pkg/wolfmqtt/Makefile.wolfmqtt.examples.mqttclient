@@ -1,0 +1,3 @@
+MODULE = wolfmqtt_examples_mqttclient
+
+include $(RIOTBASE)/Makefile.base

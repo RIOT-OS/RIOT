@@ -1,0 +1,400 @@
+From 4aeefeec027a2e56c2db52158db68bf325af22e5 Mon Sep 17 00:00:00 2001
+From: Hendrik van Essen <hendrik.ve@fu-berlin.de>
+Date: Fri, 29 Jan 2021 02:19:42 +0100
+Subject: [PATCH 2/8] adapt network code to RIOT
+
+---
+ wolfmqtt/mqtt_types.h                   |   2 +-
+ wolfmqtt_examples/mqttexample.c         |   9 ++
+ wolfmqtt_examples/mqttnet.c             | 188 +++++++++++++++++++-----
+ wolfmqtt_examples/sn-client/sn-client.c |  13 +-
+ 4 files changed, 172 insertions(+), 40 deletions(-)
+
+diff --git a/wolfmqtt/mqtt_types.h b/wolfmqtt/mqtt_types.h
+index 8d70c2b..d822aca 100644
+--- a/wolfmqtt/mqtt_types.h
++++ b/wolfmqtt/mqtt_types.h
+@@ -91,7 +91,7 @@
+         #include <dispatch/dispatch.h>
+         typedef dispatch_semaphore_t wm_Sem;
+ 
+-    #elif defined(__FreeBSD__) || defined(__linux__)
++    #elif defined(__FreeBSD__) || defined(__linux__) || defined(RIOT_OS)
+         /* Posix Style Semaphore */
+         #define WOLFMQTT_POSIX_SEMAPHORES
+         #include <semaphore.h>
+diff --git a/wolfmqtt_examples/mqttexample.c b/wolfmqtt_examples/mqttexample.c
+index 42e8035..722cb17 100644
+--- a/wolfmqtt_examples/mqttexample.c
++++ b/wolfmqtt_examples/mqttexample.c
+@@ -211,7 +211,16 @@ void mqtt_show_usage(MQTTCtx* mqttCtx)
+ void mqtt_init_ctx(MQTTCtx* mqttCtx)
+ {
+     XMEMSET(mqttCtx, 0, sizeof(MQTTCtx));
++#if WOLFMQTT_USE_HOSTNAME
+     mqttCtx->host = DEFAULT_MQTT_HOST;
++#else
++    #ifdef MODULE_IPV6_ADDR
++    /* prefer IPv6 */
++    mqttCtx->host = DEFAULT_MQTT_HOST_IPV6;
++    #else
++    mqttCtx->host = DEFAULT_MQTT_HOST_IPV4;
++    #endif
++#endif
+     mqttCtx->qos = DEFAULT_MQTT_QOS;
+     mqttCtx->clean_session = 1;
+     mqttCtx->keep_alive_sec = DEFAULT_KEEP_ALIVE_SEC;
+diff --git a/wolfmqtt_examples/mqttnet.c b/wolfmqtt_examples/mqttnet.c
+index f53a8ea..97a51ba 100644
+--- a/wolfmqtt_examples/mqttnet.c
++++ b/wolfmqtt_examples/mqttnet.c
+@@ -96,6 +96,31 @@
+         #error wolfMQTT must be built with WOLFMQTT_NONBLOCK defined for Harmony
+     #endif
+ 
++/* RIOT OS */
++#elif defined(RIOT_OS)
++    #include <arpa/inet.h>
++    #include <netinet/in.h>
++    #include <netdb.h>
++
++    #include <sys/select.h>
++    #include <sys/socket.h>
++    #include <sys/time.h>
++
++    #include "net/ipv4/addr.h"
++    #include "net/ipv6/addr.h"
++    #include "net/sock/dns.h"
++    #include "net/sock/ip.h"
++    #include "net/sock/tcp.h"
++    #include "net/sock/udp.h"
++
++    #include "ztimer.h"
++
++    #include <unistd.h>
++    #include <errno.h>
++    #include <fcntl.h>
++
++    #define SOCK_ADDR_IN    struct sockaddr_storage
++
+ /* Linux */
+ #else
+     #include <sys/types.h>
+@@ -557,7 +582,6 @@ static int NetConnect(void *context, const char* host, word16 port,
+     int timeout_ms)
+ {
+     SocketContext *sock = (SocketContext*)context;
+-    int type = SOCK_STREAM;
+     int rc = -1;
+     SOERROR_T so_error = 0;
+     struct addrinfo *result = NULL;
+@@ -572,12 +596,28 @@ static int NetConnect(void *context, const char* host, word16 port,
+                 host, port, timeout_ms, mqttCtx->use_tls);
+ 
+             XMEMSET(&hints, 0, sizeof(hints));
+-            hints.ai_family = AF_INET;
+             hints.ai_socktype = SOCK_STREAM;
+             hints.ai_protocol = IPPROTO_TCP;
+ 
++            if (IS_USED(MODULE_IPV4_ADDR) && IS_USED(MODULE_IPV6_ADDR)) {
++                hints.ai_family = AF_UNSPEC;
++            }
++            else if (IS_USED(MODULE_IPV4_ADDR)) {
++                hints.ai_family = AF_INET;
++            }
++            else if (IS_USED(MODULE_IPV6_ADDR)) {
++                hints.ai_family = AF_INET6;
++            }
++            else {
++                PRINTF("Error: Neither IPv4 nor IPv6 included in build");
++                assert(0);
++            }
++
+             XMEMSET(&sock->addr, 0, sizeof(sock->addr));
+-            sock->addr.sin_family = AF_INET;
++
++        #if ! WOLFMQTT_USE_HOSTNAME
++            hints.ai_flags |= AI_NUMERICHOST;
++        #endif
+ 
+             rc = getaddrinfo(host, NULL, &hints, &result);
+             if (rc == 0) {
+@@ -588,18 +628,34 @@ static int NetConnect(void *context, const char* host, word16 port,
+                     goto exit;
+                 }
+ 
+-                /* prefer ip4 addresses */
+                 while (result_i) {
+-                    if (result_i->ai_family == AF_INET)
++                    if (hints.ai_family == AF_UNSPEC) {
++                        /* take first result which is either IPv4 or IPv6 */
++                        break;
++                    }
++                    else if (hints.ai_family == result_i->ai_family) {
++                        /* take first matching IPv4/IPv6 result */
+                         break;
++                    }
++
+                     result_i = result_i->ai_next;
+                 }
+ 
+                 if (result_i) {
+-                    sock->addr.sin_port = htons(port);
+-                    sock->addr.sin_family = AF_INET;
+-                    sock->addr.sin_addr =
+-                        ((SOCK_ADDR_IN*)(result_i->ai_addr))->sin_addr;
++                    if (result_i->ai_family == AF_INET) {
++                        struct sockaddr_in *sa4 = (struct sockaddr_in*) &sock->addr;
++                        sa4->sin_family = AF_INET;
++                        sa4->sin_port = htons(port);
++                        sa4->sin_addr =
++                                ((struct sockaddr_in*)(result_i->ai_addr))->sin_addr;
++                    }
++                    else if (result_i->ai_family == AF_INET6) {
++                        struct sockaddr_in6 *sa6 = (struct sockaddr_in6*) &sock->addr;
++                        sa6->sin6_family = AF_INET6;
++                        sa6->sin6_port = htons(port);
++                        sa6->sin6_addr =
++                                ((struct sockaddr_in6*)(result_i->ai_addr))->sin6_addr;
++                    }
+                 }
+                 else {
+                     rc = -1;
+@@ -614,7 +670,8 @@ static int NetConnect(void *context, const char* host, word16 port,
+             rc = -1;
+ 
+             /* Create socket */
+-            sock->fd = SOCK_OPEN(sock->addr.sin_family, type, 0);
++            sock->fd = SOCK_OPEN(sock->addr.ss_family, SOCK_STREAM, 0);
++
+             if (sock->fd == SOCKET_INVALID)
+                 goto exit;
+ 
+@@ -642,8 +699,17 @@ static int NetConnect(void *context, const char* host, word16 port,
+             }
+         #endif
+ 
++            /* Default to error */
++            rc = -1;
++
+             /* Start connect */
+-            rc = SOCK_CONNECT(sock->fd, (struct sockaddr*)&sock->addr, sizeof(sock->addr));
++            if (sock->addr.ss_family == AF_INET) {
++                rc = SOCK_CONNECT(sock->fd, (struct sockaddr*) &sock->addr, sizeof(struct sockaddr_in));
++            }
++            else if (sock->addr.ss_family == AF_INET6) {
++                rc = SOCK_CONNECT(sock->fd, (struct sockaddr*) &sock->addr, sizeof(struct sockaddr_in6));
++            }
++
+             if (rc < 0) {
+                 /* Check for error */
+                 socklen_t len = sizeof(so_error);
+@@ -687,8 +753,7 @@ static int SN_NetConnect(void *context, const char* host, word16 port,
+     int timeout_ms)
+ {
+     SocketContext *sock = (SocketContext*)context;
+-    int type = SOCK_DGRAM;
+-    int rc;
++    int rc = 0;
+     SOERROR_T so_error = 0;
+     struct addrinfo *result = NULL;
+     struct addrinfo hints;
+@@ -697,13 +762,29 @@ static int SN_NetConnect(void *context, const char* host, word16 port,
+     PRINTF("NetConnect: Host %s, Port %u, Timeout %d ms, Use TLS %d\n",
+         host, port, timeout_ms, mqttCtx->use_tls);
+ 
+-    /* Get address information for host and locate IPv4 */
+-    XMEMSET(&hints, 0, sizeof(struct addrinfo));
+-    hints.ai_family = AF_INET;
+-    hints.ai_socktype = SOCK_DGRAM; /* Datagram socket */
++    XMEMSET(&hints, 0, sizeof(hints));
++    hints.ai_socktype = SOCK_DGRAM;
++    hints.ai_protocol = IPPROTO_UDP;
++
++    if (IS_USED(MODULE_IPV4_ADDR) && IS_USED(MODULE_IPV6_ADDR)) {
++        hints.ai_family = AF_UNSPEC;
++    }
++    else if (IS_USED(MODULE_IPV4_ADDR)) {
++        hints.ai_family = AF_INET;
++    }
++    else if (IS_USED(MODULE_IPV6_ADDR)) {
++        hints.ai_family = AF_INET6;
++    }
++    else {
++        PRINTF("Error: Neither IPv4 nor IPv6 included in build");
++        assert(0);
++    }
+ 
+     XMEMSET(&sock->addr, 0, sizeof(sock->addr));
+-    sock->addr.sin_family = AF_INET;
++
++#if ! WOLFMQTT_USE_HOSTNAME
++    hints.ai_flags |= AI_NUMERICHOST;
++#endif
+ 
+     rc = getaddrinfo(host, NULL, &hints, &result);
+     if (rc == 0) {
+@@ -714,18 +795,34 @@ static int SN_NetConnect(void *context, const char* host, word16 port,
+             goto exit;
+         }
+ 
+-        /* prefer ip4 addresses */
+         while (result_i) {
+-            if (result_i->ai_family == AF_INET)
++            if (hints.ai_family == AF_UNSPEC) {
++                /* take first result which is either IPv4 or IPv6 */
+                 break;
++            }
++            else if (hints.ai_family == result_i->ai_family) {
++                /* take first matching IPv4/IPv6 result */
++                break;
++            }
++
+             result_i = result_i->ai_next;
+         }
+ 
+         if (result_i) {
+-            sock->addr.sin_port = htons(port);
+-            sock->addr.sin_family = AF_INET;
+-            sock->addr.sin_addr =
+-                ((SOCK_ADDR_IN*)(result_i->ai_addr))->sin_addr;
++            if (result_i->ai_family == AF_INET) {
++                struct sockaddr_in *sa4 = (struct sockaddr_in*) &sock->addr;
++                sa4->sin_family = AF_INET;
++                sa4->sin_port = htons(port);
++                sa4->sin_addr =
++                        ((struct sockaddr_in*)(result_i->ai_addr))->sin_addr;
++            }
++            else if (result_i->ai_family == AF_INET6) {
++                struct sockaddr_in6 *sa6 = (struct sockaddr_in6*) &sock->addr;
++                sa6->sin6_family = AF_INET6;
++                sa6->sin6_port = htons(port);
++                sa6->sin6_addr =
++                        ((struct sockaddr_in6*)(result_i->ai_addr))->sin6_addr;
++            }
+         }
+         else {
+             rc = -1;
+@@ -736,16 +833,17 @@ static int SN_NetConnect(void *context, const char* host, word16 port,
+     if (rc != 0)
+         goto exit;
+ 
+-    if (rc == 0) {
+-        /* Create the socket */
+-        sock->fd = SOCK_OPEN(sock->addr.sin_family, type, 0);
+-        if (sock->fd == SOCKET_INVALID) {
+-            rc = -1;
+-        }
++    /* Default to success */
++    rc = 0;
++
++    /* Create socket */
++    sock->fd = SOCK_OPEN(sock->addr.ss_family, SOCK_DGRAM, 0);
++
++    if (sock->fd == SOCKET_INVALID) {
++        rc = -1;
+     }
+ 
+-    if (rc == 0)
+-    {
++    if (rc == 0) {
+     #ifndef WOLFMQTT_NO_TIMEOUT
+         fd_set fdset;
+         struct timeval tv;
+@@ -758,8 +856,16 @@ static int SN_NetConnect(void *context, const char* host, word16 port,
+         (void)timeout_ms;
+     #endif /* !WOLFMQTT_NO_TIMEOUT */
+ 
++        /* Default to error */
++        rc = -1;
++
+         /* Start connect */
+-        rc = SOCK_CONNECT(sock->fd, (struct sockaddr*)&sock->addr, sizeof(sock->addr));
++        if (sock->addr.ss_family == AF_INET) {
++            rc = SOCK_CONNECT(sock->fd, (struct sockaddr*) &sock->addr, sizeof(struct sockaddr_in));
++        }
++        else if (sock->addr.ss_family == AF_INET6) {
++            rc = SOCK_CONNECT(sock->fd, (struct sockaddr*) &sock->addr, sizeof(struct sockaddr_in6));
++        }
+     }
+ 
+   exit:
+@@ -895,7 +1001,7 @@ static int NetRead_ex(void *context, byte* buf, int buf_len,
+                 }
+                 /* Check if rx or error */
+             #ifdef WOLFMQTT_ENABLE_STDIN_CAP
+-                else if ((!mqttCtx->test_mode && FD_ISSET(STDIN, &recvfds)) 
++                else if ((!mqttCtx->test_mode && FD_ISSET(STDIN, &recvfds))
+                 #ifdef WOLFMQTT_MULTITHREAD
+                     || FD_ISSET(sock->pfd[0], &recvfds)
+                 #endif
+@@ -903,9 +1009,11 @@ static int NetRead_ex(void *context, byte* buf, int buf_len,
+                     return MQTT_CODE_STDIN_WAKE;
+                 }
+             #endif
++
+                 if (FD_ISSET(sock->fd, &errfds)) {
+-                    rc = -1;
+-                    break;
++                    // Todo: find out reason why we can ignore this case
++                    //rc = -1;
++                    //break;
+                 }
+             }
+             else {
+@@ -1041,6 +1149,9 @@ int MqttClientNet_Init(MqttNet* net, MQTTCtx* mqttCtx)
+     }
+ #endif /* MICROCHIP_MPLAB_HARMONY */
+ 
++    /* wait until connection has been established */
++    ztimer_sleep(ZTIMER_SEC, 10);
++
+     if (net) {
+         SocketContext* sockCtx;
+ 
+@@ -1059,7 +1170,7 @@ int MqttClientNet_Init(MqttNet* net, MQTTCtx* mqttCtx)
+         sockCtx->fd = SOCKET_INVALID;
+         sockCtx->stat = SOCK_BEGIN;
+         sockCtx->mqttCtx = mqttCtx;
+-    
++
+     #if defined(WOLFMQTT_MULTITHREAD) && defined(WOLFMQTT_ENABLE_STDIN_CAP)
+         /* setup the pipe for waking select() */
+         if (pipe(sockCtx->pfd) != 0) {
+@@ -1075,6 +1186,9 @@ int MqttClientNet_Init(MqttNet* net, MQTTCtx* mqttCtx)
+ #ifdef WOLFMQTT_SN
+ int SN_ClientNet_Init(MqttNet* net, MQTTCtx* mqttCtx)
+ {
++    /* wait until connection has been established */
++    ztimer_sleep(ZTIMER_SEC, 10);
++
+     if (net) {
+         SocketContext* sockCtx;
+ 
+diff --git a/wolfmqtt_examples/sn-client/sn-client.c b/wolfmqtt_examples/sn-client/sn-client.c
+index 8dffc14..607986b 100644
+--- a/wolfmqtt_examples/sn-client/sn-client.c
++++ b/wolfmqtt_examples/sn-client/sn-client.c
+@@ -460,8 +460,17 @@ int main(int argc, char** argv)
+     mqttCtx.app_name = "sn-client";
+ 
+     /* Settings for MQTT-SN gateway */
+-    mqttCtx.host = "localhost";
+-    mqttCtx.port = 10000;
++#if WOLFMQTT_USE_HOSTNAME
++    mqttCtx.host = DEFAULT_MQTT_HOST;
++#else
++    #ifdef MODULE_IPV6_ADDR
++    /* prefer IPv6 */
++    mqttCtx.host = DEFAULT_MQTT_HOST_IPV6;
++    #else
++    mqttCtx.host = DEFAULT_MQTT_HOST_IPV4;
++    #endif
++#endif
++    mqttCtx.port = DEFAULT_MQTT_PORT;
+ 
+     /* parse arguments */
+     rc = mqtt_parse_args(&mqttCtx, argc, argv);
+-- 
+2.25.1
+

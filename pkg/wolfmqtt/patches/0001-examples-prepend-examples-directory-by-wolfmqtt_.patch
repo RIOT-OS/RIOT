@@ -1,0 +1,526 @@
+From d635637cc69dc977f3333e34b1b0522a40c3679a Mon Sep 17 00:00:00 2001
+From: Hendrik van Essen <hendrik.ve@fu-berlin.de>
+Date: Thu, 21 Jan 2021 14:44:00 +0100
+Subject: [PATCH 1/8] examples: prepend examples directory by wolfmqtt_
+
+---
+ {examples => wolfmqtt_examples}/aws/awsiot.c                  | 4 ++--
+ {examples => wolfmqtt_examples}/aws/awsiot.h                  | 2 +-
+ {examples => wolfmqtt_examples}/aws/awsiot.vcxproj            | 0
+ {examples => wolfmqtt_examples}/azure/azureiothub.c           | 4 ++--
+ {examples => wolfmqtt_examples}/azure/azureiothub.h           | 2 +-
+ {examples => wolfmqtt_examples}/azure/azureiothub.vcxproj     | 0
+ {examples => wolfmqtt_examples}/firmware/firmware.h           | 0
+ .../firmware/firmware/firmware.X/nbproject/configurations.xml | 0
+ .../firmware/firmware/firmware.X/nbproject/project.xml        | 0
+ {examples => wolfmqtt_examples}/firmware/fwclient.c           | 4 ++--
+ {examples => wolfmqtt_examples}/firmware/fwclient.h           | 2 +-
+ {examples => wolfmqtt_examples}/firmware/fwclient.vcxproj     | 0
+ {examples => wolfmqtt_examples}/firmware/fwpush.c             | 4 ++--
+ {examples => wolfmqtt_examples}/firmware/fwpush.h             | 2 +-
+ {examples => wolfmqtt_examples}/firmware/fwpush.vcxproj       | 0
+ {examples => wolfmqtt_examples}/include.am                    | 0
+ {examples => wolfmqtt_examples}/mqttclient/mqttclient.c       | 2 +-
+ {examples => wolfmqtt_examples}/mqttclient/mqttclient.h       | 2 +-
+ {examples => wolfmqtt_examples}/mqttclient/mqttclient.vcxproj | 0
+ {examples => wolfmqtt_examples}/mqttexample.c                 | 4 ++--
+ {examples => wolfmqtt_examples}/mqttexample.h                 | 0
+ {examples => wolfmqtt_examples}/mqttnet.c                     | 4 ++--
+ {examples => wolfmqtt_examples}/mqttnet.h                     | 2 +-
+ {examples => wolfmqtt_examples}/mqttsimple/mqttsimple.c       | 0
+ {examples => wolfmqtt_examples}/mqttsimple/mqttsimple.h       | 0
+ {examples => wolfmqtt_examples}/mqttuart.c                    | 4 ++--
+ {examples => wolfmqtt_examples}/multithread/multithread.c     | 4 ++--
+ {examples => wolfmqtt_examples}/multithread/multithread.h     | 2 +-
+ .../multithread/multithread.vcxproj                           | 0
+ {examples => wolfmqtt_examples}/nbclient/nbclient.c           | 2 +-
+ {examples => wolfmqtt_examples}/nbclient/nbclient.h           | 2 +-
+ {examples => wolfmqtt_examples}/nbclient/nbclient.vcxproj     | 0
+ {examples => wolfmqtt_examples}/sn-client/sn-client.c         | 2 +-
+ {examples => wolfmqtt_examples}/sn-client/sn-client.h         | 2 +-
+ {examples => wolfmqtt_examples}/sn-client/sn-client.vcxproj   | 0
+ {examples => wolfmqtt_examples}/wiot/wiot.c                   | 4 ++--
+ {examples => wolfmqtt_examples}/wiot/wiot.h                   | 2 +-
+ {examples => wolfmqtt_examples}/wiot/wiot.vcxproj             | 0
+ 38 files changed, 31 insertions(+), 31 deletions(-)
+ rename {examples => wolfmqtt_examples}/aws/awsiot.c (99%)
+ rename {examples => wolfmqtt_examples}/aws/awsiot.h (95%)
+ rename {examples => wolfmqtt_examples}/aws/awsiot.vcxproj (100%)
+ rename {examples => wolfmqtt_examples}/azure/azureiothub.c (99%)
+ rename {examples => wolfmqtt_examples}/azure/azureiothub.h (95%)
+ rename {examples => wolfmqtt_examples}/azure/azureiothub.vcxproj (100%)
+ rename {examples => wolfmqtt_examples}/firmware/firmware.h (100%)
+ rename {examples => wolfmqtt_examples}/firmware/firmware/firmware/firmware.X/nbproject/configurations.xml (100%)
+ rename {examples => wolfmqtt_examples}/firmware/firmware/firmware/firmware.X/nbproject/project.xml (100%)
+ rename {examples => wolfmqtt_examples}/firmware/fwclient.c (99%)
+ rename {examples => wolfmqtt_examples}/firmware/fwclient.h (96%)
+ rename {examples => wolfmqtt_examples}/firmware/fwclient.vcxproj (100%)
+ rename {examples => wolfmqtt_examples}/firmware/fwpush.c (99%)
+ rename {examples => wolfmqtt_examples}/firmware/fwpush.h (96%)
+ rename {examples => wolfmqtt_examples}/firmware/fwpush.vcxproj (100%)
+ rename {examples => wolfmqtt_examples}/include.am (100%)
+ rename {examples => wolfmqtt_examples}/mqttclient/mqttclient.c (99%)
+ rename {examples => wolfmqtt_examples}/mqttclient/mqttclient.h (95%)
+ rename {examples => wolfmqtt_examples}/mqttclient/mqttclient.vcxproj (100%)
+ rename {examples => wolfmqtt_examples}/mqttexample.c (99%)
+ rename {examples => wolfmqtt_examples}/mqttexample.h (100%)
+ rename {examples => wolfmqtt_examples}/mqttnet.c (99%)
+ rename {examples => wolfmqtt_examples}/mqttnet.h (97%)
+ rename {examples => wolfmqtt_examples}/mqttsimple/mqttsimple.c (100%)
+ rename {examples => wolfmqtt_examples}/mqttsimple/mqttsimple.h (100%)
+ rename {examples => wolfmqtt_examples}/mqttuart.c (96%)
+ rename {examples => wolfmqtt_examples}/multithread/multithread.c (99%)
+ rename {examples => wolfmqtt_examples}/multithread/multithread.h (95%)
+ rename {examples => wolfmqtt_examples}/multithread/multithread.vcxproj (100%)
+ rename {examples => wolfmqtt_examples}/nbclient/nbclient.c (99%)
+ rename {examples => wolfmqtt_examples}/nbclient/nbclient.h (95%)
+ rename {examples => wolfmqtt_examples}/nbclient/nbclient.vcxproj (100%)
+ rename {examples => wolfmqtt_examples}/sn-client/sn-client.c (99%)
+ rename {examples => wolfmqtt_examples}/sn-client/sn-client.h (95%)
+ rename {examples => wolfmqtt_examples}/sn-client/sn-client.vcxproj (100%)
+ rename {examples => wolfmqtt_examples}/wiot/wiot.c (99%)
+ rename {examples => wolfmqtt_examples}/wiot/wiot.h (95%)
+ rename {examples => wolfmqtt_examples}/wiot/wiot.vcxproj (100%)
+
+diff --git a/examples/aws/awsiot.c b/wolfmqtt_examples/aws/awsiot.c
+similarity index 99%
+rename from examples/aws/awsiot.c
+rename to wolfmqtt_examples/aws/awsiot.c
+index d71e116..8e2f1bb 100644
+--- a/examples/aws/awsiot.c
++++ b/wolfmqtt_examples/aws/awsiot.c
+@@ -58,8 +58,8 @@
+ #include <wolfssl/wolfcrypt/hmac.h>
+ 
+ #include "awsiot.h"
+-#include "examples/mqttexample.h"
+-#include "examples/mqttnet.h"
++#include "wolfmqtt_examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttnet.h"
+ #include <wolfmqtt/version.h>
+ 
+ /* Locals */
+diff --git a/examples/aws/awsiot.h b/wolfmqtt_examples/aws/awsiot.h
+similarity index 95%
+rename from examples/aws/awsiot.h
+rename to wolfmqtt_examples/aws/awsiot.h
+index 3dc21fe..5c66d15 100644
+--- a/examples/aws/awsiot.h
++++ b/wolfmqtt_examples/aws/awsiot.h
+@@ -22,7 +22,7 @@
+ #ifndef WOLFMQTT_AWSIOT_H
+ #define WOLFMQTT_AWSIOT_H
+ 
+-#include "examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttexample.h"
+ 
+ 
+ /* Exposed functions */
+diff --git a/examples/aws/awsiot.vcxproj b/wolfmqtt_examples/aws/awsiot.vcxproj
+similarity index 100%
+rename from examples/aws/awsiot.vcxproj
+rename to wolfmqtt_examples/aws/awsiot.vcxproj
+diff --git a/examples/azure/azureiothub.c b/wolfmqtt_examples/azure/azureiothub.c
+similarity index 99%
+rename from examples/azure/azureiothub.c
+rename to wolfmqtt_examples/azure/azureiothub.c
+index e8bb54d..ff7d38a 100644
+--- a/examples/azure/azureiothub.c
++++ b/wolfmqtt_examples/azure/azureiothub.c
+@@ -62,8 +62,8 @@
+ #include <wolfssl/wolfcrypt/hmac.h>
+ 
+ #include "azureiothub.h"
+-#include "examples/mqttexample.h"
+-#include "examples/mqttnet.h"
++#include "wolfmqtt_examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttnet.h"
+ 
+ /* Locals */
+ static int mStopRead = 0;
+diff --git a/examples/azure/azureiothub.h b/wolfmqtt_examples/azure/azureiothub.h
+similarity index 95%
+rename from examples/azure/azureiothub.h
+rename to wolfmqtt_examples/azure/azureiothub.h
+index f0db48e..3186513 100644
+--- a/examples/azure/azureiothub.h
++++ b/wolfmqtt_examples/azure/azureiothub.h
+@@ -22,7 +22,7 @@
+ #ifndef WOLFMQTT_AZUREIOTHUB_H
+ #define WOLFMQTT_AZUREIOTHUB_H
+ 
+-#include "examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttexample.h"
+ 
+ 
+ /* Exposed functions */
+diff --git a/examples/azure/azureiothub.vcxproj b/wolfmqtt_examples/azure/azureiothub.vcxproj
+similarity index 100%
+rename from examples/azure/azureiothub.vcxproj
+rename to wolfmqtt_examples/azure/azureiothub.vcxproj
+diff --git a/examples/firmware/firmware.h b/wolfmqtt_examples/firmware/firmware.h
+similarity index 100%
+rename from examples/firmware/firmware.h
+rename to wolfmqtt_examples/firmware/firmware.h
+diff --git a/examples/firmware/firmware/firmware/firmware.X/nbproject/configurations.xml b/wolfmqtt_examples/firmware/firmware/firmware/firmware.X/nbproject/configurations.xml
+similarity index 100%
+rename from examples/firmware/firmware/firmware/firmware.X/nbproject/configurations.xml
+rename to wolfmqtt_examples/firmware/firmware/firmware/firmware.X/nbproject/configurations.xml
+diff --git a/examples/firmware/firmware/firmware/firmware.X/nbproject/project.xml b/wolfmqtt_examples/firmware/firmware/firmware/firmware.X/nbproject/project.xml
+similarity index 100%
+rename from examples/firmware/firmware/firmware/firmware.X/nbproject/project.xml
+rename to wolfmqtt_examples/firmware/firmware/firmware/firmware.X/nbproject/project.xml
+diff --git a/examples/firmware/fwclient.c b/wolfmqtt_examples/firmware/fwclient.c
+similarity index 99%
+rename from examples/firmware/fwclient.c
+rename to wolfmqtt_examples/firmware/fwclient.c
+index 22435c4..194361e 100644
+--- a/examples/firmware/fwclient.c
++++ b/wolfmqtt_examples/firmware/fwclient.c
+@@ -51,8 +51,8 @@
+ 
+ #include "fwclient.h"
+ #include "firmware.h"
+-#include "examples/mqttexample.h"
+-#include "examples/mqttnet.h"
++#include "wolfmqtt_examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttnet.h"
+ 
+ /* Configuration */
+ #define MAX_BUFFER_SIZE         FIRMWARE_MAX_PACKET
+diff --git a/examples/firmware/fwclient.h b/wolfmqtt_examples/firmware/fwclient.h
+similarity index 96%
+rename from examples/firmware/fwclient.h
+rename to wolfmqtt_examples/firmware/fwclient.h
+index 3fdf7ba..496c400 100644
+--- a/examples/firmware/fwclient.h
++++ b/wolfmqtt_examples/firmware/fwclient.h
+@@ -22,7 +22,7 @@
+ #ifndef WOLFMQTT_FWCLIENT_H
+ #define WOLFMQTT_FWCLIENT_H
+ 
+-#include "examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttexample.h"
+ 
+ #define FIRMWARE_CLIIENT_ID     "WolfMQTTFWClient"
+ #define FIRMWARE_DEF_SAVE_AS    "firmware.bin"
+diff --git a/examples/firmware/fwclient.vcxproj b/wolfmqtt_examples/firmware/fwclient.vcxproj
+similarity index 100%
+rename from examples/firmware/fwclient.vcxproj
+rename to wolfmqtt_examples/firmware/fwclient.vcxproj
+diff --git a/examples/firmware/fwpush.c b/wolfmqtt_examples/firmware/fwpush.c
+similarity index 99%
+rename from examples/firmware/fwpush.c
+rename to wolfmqtt_examples/firmware/fwpush.c
+index 0653594..49c5307 100644
+--- a/examples/firmware/fwpush.c
++++ b/wolfmqtt_examples/firmware/fwpush.c
+@@ -51,8 +51,8 @@
+ 
+ #include "fwpush.h"
+ #include "firmware.h"
+-#include "examples/mqttexample.h"
+-#include "examples/mqttnet.h"
++#include "wolfmqtt_examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttnet.h"
+ 
+ /* Configuration */
+ #define MAX_BUFFER_SIZE         FIRMWARE_MAX_PACKET
+diff --git a/examples/firmware/fwpush.h b/wolfmqtt_examples/firmware/fwpush.h
+similarity index 96%
+rename from examples/firmware/fwpush.h
+rename to wolfmqtt_examples/firmware/fwpush.h
+index 39fa48f..2fe4fcd 100644
+--- a/examples/firmware/fwpush.h
++++ b/wolfmqtt_examples/firmware/fwpush.h
+@@ -22,7 +22,7 @@
+ #ifndef WOLFMQTT_FWPUSH_H
+ #define WOLFMQTT_FWPUSH_H
+ 
+-#include "examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttexample.h"
+ 
+ #define FIRMWARE_PUSH_CLIENT_ID "WolfMQTTFwPush"
+ #define FIRMWARE_PUSH_DEF_FILE  "README.md"
+diff --git a/examples/firmware/fwpush.vcxproj b/wolfmqtt_examples/firmware/fwpush.vcxproj
+similarity index 100%
+rename from examples/firmware/fwpush.vcxproj
+rename to wolfmqtt_examples/firmware/fwpush.vcxproj
+diff --git a/examples/include.am b/wolfmqtt_examples/include.am
+similarity index 100%
+rename from examples/include.am
+rename to wolfmqtt_examples/include.am
+diff --git a/examples/mqttclient/mqttclient.c b/wolfmqtt_examples/mqttclient/mqttclient.c
+similarity index 99%
+rename from examples/mqttclient/mqttclient.c
+rename to wolfmqtt_examples/mqttclient/mqttclient.c
+index f0a7356..9f50e22 100644
+--- a/examples/mqttclient/mqttclient.c
++++ b/wolfmqtt_examples/mqttclient/mqttclient.c
+@@ -27,7 +27,7 @@
+ #include "wolfmqtt/mqtt_client.h"
+ 
+ #include "mqttclient.h"
+-#include "examples/mqttnet.h"
++#include "wolfmqtt_examples/mqttnet.h"
+ 
+ /* Locals */
+ static int mStopRead = 0;
+diff --git a/examples/mqttclient/mqttclient.h b/wolfmqtt_examples/mqttclient/mqttclient.h
+similarity index 95%
+rename from examples/mqttclient/mqttclient.h
+rename to wolfmqtt_examples/mqttclient/mqttclient.h
+index 0bdf289..e224af9 100644
+--- a/examples/mqttclient/mqttclient.h
++++ b/wolfmqtt_examples/mqttclient/mqttclient.h
+@@ -22,7 +22,7 @@
+ #ifndef WOLFMQTT_MQTTCLIENT_H
+ #define WOLFMQTT_MQTTCLIENT_H
+ 
+-#include "examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttexample.h"
+ 
+ 
+ /* Exposed functions */
+diff --git a/examples/mqttclient/mqttclient.vcxproj b/wolfmqtt_examples/mqttclient/mqttclient.vcxproj
+similarity index 100%
+rename from examples/mqttclient/mqttclient.vcxproj
+rename to wolfmqtt_examples/mqttclient/mqttclient.vcxproj
+diff --git a/examples/mqttexample.c b/wolfmqtt_examples/mqttexample.c
+similarity index 99%
+rename from examples/mqttexample.c
+rename to wolfmqtt_examples/mqttexample.c
+index c39d000..42e8035 100644
+--- a/examples/mqttexample.c
++++ b/wolfmqtt_examples/mqttexample.c
+@@ -25,8 +25,8 @@
+ #endif
+ 
+ #include "wolfmqtt/mqtt_client.h"
+-#include "examples/mqttexample.h"
+-#include "examples/mqttnet.h"
++#include "wolfmqtt_examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttnet.h"
+ 
+ 
+ /* locals */
+diff --git a/examples/mqttexample.h b/wolfmqtt_examples/mqttexample.h
+similarity index 100%
+rename from examples/mqttexample.h
+rename to wolfmqtt_examples/mqttexample.h
+diff --git a/examples/mqttnet.c b/wolfmqtt_examples/mqttnet.c
+similarity index 99%
+rename from examples/mqttnet.c
+rename to wolfmqtt_examples/mqttnet.c
+index 98476a4..f53a8ea 100644
+--- a/examples/mqttnet.c
++++ b/wolfmqtt_examples/mqttnet.c
+@@ -25,8 +25,8 @@
+ #endif
+ 
+ #include "wolfmqtt/mqtt_client.h"
+-#include "examples/mqttnet.h"
+-#include "examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttnet.h"
++#include "wolfmqtt_examples/mqttexample.h"
+ 
+ /* FreeRTOS TCP */
+ #ifdef FREERTOS_TCP
+diff --git a/examples/mqttnet.h b/wolfmqtt_examples/mqttnet.h
+similarity index 97%
+rename from examples/mqttnet.h
+rename to wolfmqtt_examples/mqttnet.h
+index 2657052..690ddd3 100644
+--- a/examples/mqttnet.h
++++ b/wolfmqtt_examples/mqttnet.h
+@@ -26,7 +26,7 @@
+     extern "C" {
+ #endif
+ 
+-#include "examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttexample.h"
+ 
+ /* Default MQTT host broker to use, when none is specified in the examples */
+ #ifndef DEFAULT_MQTT_HOST
+diff --git a/examples/mqttsimple/mqttsimple.c b/wolfmqtt_examples/mqttsimple/mqttsimple.c
+similarity index 100%
+rename from examples/mqttsimple/mqttsimple.c
+rename to wolfmqtt_examples/mqttsimple/mqttsimple.c
+diff --git a/examples/mqttsimple/mqttsimple.h b/wolfmqtt_examples/mqttsimple/mqttsimple.h
+similarity index 100%
+rename from examples/mqttsimple/mqttsimple.h
+rename to wolfmqtt_examples/mqttsimple/mqttsimple.h
+diff --git a/examples/mqttuart.c b/wolfmqtt_examples/mqttuart.c
+similarity index 96%
+rename from examples/mqttuart.c
+rename to wolfmqtt_examples/mqttuart.c
+index bec2f27..303c022 100644
+--- a/examples/mqttuart.c
++++ b/wolfmqtt_examples/mqttuart.c
+@@ -25,13 +25,13 @@
+ #endif
+ 
+ #include "wolfmqtt/mqtt_client.h"
+-#include "examples/mqttnet.h"
++#include "wolfmqtt_examples/mqttnet.h"
+ 
+ 
+ /* TODO: Add includes for UART HW */
+ 
+ /* Include the example code */
+-#include "examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttexample.h"
+ 
+ 
+ /* this code is a template for using UART for communication */
+diff --git a/examples/multithread/multithread.c b/wolfmqtt_examples/multithread/multithread.c
+similarity index 99%
+rename from examples/multithread/multithread.c
+rename to wolfmqtt_examples/multithread/multithread.c
+index f2bb6d0..df84df4 100755
+--- a/examples/multithread/multithread.c
++++ b/wolfmqtt_examples/multithread/multithread.c
+@@ -27,8 +27,8 @@
+ #include "wolfmqtt/mqtt_client.h"
+ 
+ #include "multithread.h"
+-#include "examples/mqttnet.h"
+-#include "examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttnet.h"
++#include "wolfmqtt_examples/mqttexample.h"
+ 
+ #include <stdint.h>
+ 
+diff --git a/examples/multithread/multithread.h b/wolfmqtt_examples/multithread/multithread.h
+similarity index 95%
+rename from examples/multithread/multithread.h
+rename to wolfmqtt_examples/multithread/multithread.h
+index 4da2d65..16b8138 100644
+--- a/examples/multithread/multithread.h
++++ b/wolfmqtt_examples/multithread/multithread.h
+@@ -22,7 +22,7 @@
+ #ifndef WOLFMQTT_MULTITHREAD_H
+ #define WOLFMQTT_MULTITHREAD_H
+ 
+-#include "examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttexample.h"
+ 
+ 
+ /* Exposed functions */
+diff --git a/examples/multithread/multithread.vcxproj b/wolfmqtt_examples/multithread/multithread.vcxproj
+similarity index 100%
+rename from examples/multithread/multithread.vcxproj
+rename to wolfmqtt_examples/multithread/multithread.vcxproj
+diff --git a/examples/nbclient/nbclient.c b/wolfmqtt_examples/nbclient/nbclient.c
+similarity index 99%
+rename from examples/nbclient/nbclient.c
+rename to wolfmqtt_examples/nbclient/nbclient.c
+index 5558e8b..b3fff62 100644
+--- a/examples/nbclient/nbclient.c
++++ b/wolfmqtt_examples/nbclient/nbclient.c
+@@ -29,7 +29,7 @@
+ 
+ #ifdef WOLFMQTT_NONBLOCK
+ #include "nbclient.h"
+-#include "examples/mqttnet.h"
++#include "wolfmqtt_examples/mqttnet.h"
+ 
+ /* Locals */
+ static int mStopRead = 0;
+diff --git a/examples/nbclient/nbclient.h b/wolfmqtt_examples/nbclient/nbclient.h
+similarity index 95%
+rename from examples/nbclient/nbclient.h
+rename to wolfmqtt_examples/nbclient/nbclient.h
+index df4dd96..9cb0384 100644
+--- a/examples/nbclient/nbclient.h
++++ b/wolfmqtt_examples/nbclient/nbclient.h
+@@ -22,7 +22,7 @@
+ #ifndef WOLFMQTT_NBCLIENT_H
+ #define WOLFMQTT_NBCLIENT_H
+ 
+-#include "examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttexample.h"
+ 
+ 
+ /* Exposed functions */
+diff --git a/examples/nbclient/nbclient.vcxproj b/wolfmqtt_examples/nbclient/nbclient.vcxproj
+similarity index 100%
+rename from examples/nbclient/nbclient.vcxproj
+rename to wolfmqtt_examples/nbclient/nbclient.vcxproj
+diff --git a/examples/sn-client/sn-client.c b/wolfmqtt_examples/sn-client/sn-client.c
+similarity index 99%
+rename from examples/sn-client/sn-client.c
+rename to wolfmqtt_examples/sn-client/sn-client.c
+index cbc7438..8dffc14 100644
+--- a/examples/sn-client/sn-client.c
++++ b/wolfmqtt_examples/sn-client/sn-client.c
+@@ -27,7 +27,7 @@
+ #include "wolfmqtt/mqtt_client.h"
+ 
+ #include "sn-client.h"
+-#include "examples/mqttnet.h"
++#include "wolfmqtt_examples/mqttnet.h"
+ 
+ /* Locals */
+ static int mStopRead = 0;
+diff --git a/examples/sn-client/sn-client.h b/wolfmqtt_examples/sn-client/sn-client.h
+similarity index 95%
+rename from examples/sn-client/sn-client.h
+rename to wolfmqtt_examples/sn-client/sn-client.h
+index 351c17e..5bd0665 100644
+--- a/examples/sn-client/sn-client.h
++++ b/wolfmqtt_examples/sn-client/sn-client.h
+@@ -22,7 +22,7 @@
+ #ifndef WOLFMQTT_SNCLIENT_H
+ #define WOLFMQTT_SNCLIENT_H
+ 
+-#include "examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttexample.h"
+ 
+ 
+ /* Exposed functions */
+diff --git a/examples/sn-client/sn-client.vcxproj b/wolfmqtt_examples/sn-client/sn-client.vcxproj
+similarity index 100%
+rename from examples/sn-client/sn-client.vcxproj
+rename to wolfmqtt_examples/sn-client/sn-client.vcxproj
+diff --git a/examples/wiot/wiot.c b/wolfmqtt_examples/wiot/wiot.c
+similarity index 99%
+rename from examples/wiot/wiot.c
+rename to wolfmqtt_examples/wiot/wiot.c
+index 864b35d..5ee9c8e 100644
+--- a/examples/wiot/wiot.c
++++ b/wolfmqtt_examples/wiot/wiot.c
+@@ -33,8 +33,8 @@
+ #include "wolfmqtt/mqtt_client.h"
+ 
+ #include "wiot.h"
+-#include "examples/mqttexample.h"
+-#include "examples/mqttnet.h"
++#include "wolfmqtt_examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttnet.h"
+ 
+ /* Locals */
+ static int mStopRead = 0;
+diff --git a/examples/wiot/wiot.h b/wolfmqtt_examples/wiot/wiot.h
+similarity index 95%
+rename from examples/wiot/wiot.h
+rename to wolfmqtt_examples/wiot/wiot.h
+index fc3933f..41aeea0 100755
+--- a/examples/wiot/wiot.h
++++ b/wolfmqtt_examples/wiot/wiot.h
+@@ -22,7 +22,7 @@
+ #ifndef WOLFMQTT_WIOT_H
+ #define WOLFMQTT_WIOT_H
+ 
+-#include "examples/mqttexample.h"
++#include "wolfmqtt_examples/mqttexample.h"
+ 
+ 
+ /* Exposed functions */
+diff --git a/examples/wiot/wiot.vcxproj b/wolfmqtt_examples/wiot/wiot.vcxproj
+similarity index 100%
+rename from examples/wiot/wiot.vcxproj
+rename to wolfmqtt_examples/wiot/wiot.vcxproj
+-- 
+2.25.1
+

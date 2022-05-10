@@ -1,0 +1,57 @@
+From 108ae4fb6262e11b56f34eb7e8ecd4d8b701bc4b Mon Sep 17 00:00:00 2001
+From: HendrikVE <hendrik1995@msn.com>
+Date: Sat, 12 Mar 2022 00:56:51 +0100
+Subject: [PATCH 2/2] fix compilation error
+
+---
+ src/mqtt_packet.c | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
+
+diff --git a/src/mqtt_packet.c b/src/mqtt_packet.c
+index 447bd8b..7c56fda 100755
+--- a/src/mqtt_packet.c
++++ b/src/mqtt_packet.c
+@@ -1753,9 +1753,7 @@ int MqttPacket_Read(MqttClient *client, byte* rx_buf, int rx_buf_len,
+                 return MqttPacket_HandleNetError(client,
+                          MQTT_CODE_ERROR_NETWORK);
+             }
+-
+-            FALL_THROUGH;
+-        }
++        } FALL_THROUGH;
+ 
+         case MQTT_PK_READ_HEAD:
+         {
+@@ -1800,9 +1798,7 @@ int MqttPacket_Read(MqttClient *client, byte* rx_buf, int rx_buf_len,
+                 rc += sizeof(header->type_flags);
+                 client->packet.header_len = rc;
+             }
+-
+-            FALL_THROUGH;
+-        }
++        } FALL_THROUGH;
+ 
+         case MQTT_PK_READ:
+         {
+@@ -3132,16 +3128,12 @@ int SN_Packet_Read(MqttClient *client, byte* rx_buf, int rx_buf_len,
+                 total_len = rx_buf[0];
+                 client->packet.header_len = len;
+             }
+-
+-            FALL_THROUGH;
+-        }
++        } FALL_THROUGH;
+ 
+         case MQTT_PK_READ_HEAD:
+         {
+             client->packet.stat = MQTT_PK_READ_HEAD;
+-
+-            FALL_THROUGH;
+-        }
++        } FALL_THROUGH;
+ 
+         case MQTT_PK_READ:
+         {
+-- 
+2.25.1
+

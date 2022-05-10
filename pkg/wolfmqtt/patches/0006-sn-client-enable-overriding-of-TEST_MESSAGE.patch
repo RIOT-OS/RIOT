@@ -1,0 +1,35 @@
+From 2fa9077a4813035dd3c890ad5400281e069ae0e7 Mon Sep 17 00:00:00 2001
+From: Hendrik van Essen <hendrik.ve@fu-berlin.de>
+Date: Wed, 27 Jan 2021 19:04:04 +0100
+Subject: [PATCH 6/8] sn-client: enable overriding of TEST_MESSAGE
+
+---
+ wolfmqtt_examples/sn-client/sn-client.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/wolfmqtt_examples/sn-client/sn-client.c b/wolfmqtt_examples/sn-client/sn-client.c
+index 607986b..01d1a09 100644
+--- a/wolfmqtt_examples/sn-client/sn-client.c
++++ b/wolfmqtt_examples/sn-client/sn-client.c
+@@ -36,9 +36,15 @@ static int mStopRead = 0;
+ 
+ /* Configuration */
+ /* Maximum size for network read/write callbacks. */
+-#define MAX_BUFFER_SIZE 1024
+-#define TEST_MESSAGE    "test"
+-#define SHORT_TOPIC_NAME "s1"
++#define MAX_BUFFER_SIZE     1024
++
++#ifndef SHORT_TOPIC_NAME
++#define SHORT_TOPIC_NAME    "s1"
++#endif
++
++#ifndef TEST_MESSAGE
++#define TEST_MESSAGE        "test"
++#endif
+ 
+ static int sn_message_cb(MqttClient *client, MqttMessage *msg,
+     byte msg_new, byte msg_done)
+-- 
+2.25.1
+
