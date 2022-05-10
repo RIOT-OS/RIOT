@@ -846,7 +846,7 @@ void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
  * @returns     Number of bytes written to @p bufpos
  */
 size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
-                                const uint8_t *c, size_t len);
+                                const void *c, size_t len);
 
 /**
  * @brief Add a single character to a block2 reply.
@@ -1149,7 +1149,7 @@ static inline ssize_t coap_opt_add_format(coap_pkt_t *pkt, uint16_t format)
  * @return        <0 on error
  * @return        -ENOSPC if no available options
  */
-ssize_t coap_opt_add_opaque(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val, size_t val_len);
+ssize_t coap_opt_add_opaque(coap_pkt_t *pkt, uint16_t optnum, const void *val, size_t val_len);
 
 /**
  * @brief   Adds a single Uri-Query option in the form 'key=value' into pkt
@@ -1620,7 +1620,7 @@ size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t last
  *
  * @returns     amount of bytes written to @p buf
  */
-size_t coap_put_option(uint8_t *buf, uint16_t lastonum, uint16_t onum, const uint8_t *odata, size_t olen);
+size_t coap_put_option(uint8_t *buf, uint16_t lastonum, uint16_t onum, const void *odata, size_t olen);
 
 /**
  * @brief   Insert block1 option into buffer
@@ -1906,7 +1906,7 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
                           unsigned code,
                           uint8_t *buf, size_t len,
                           unsigned ct,
-                          const uint8_t *payload, uint8_t payload_len);
+                          const void *payload, size_t payload_len);
 
 /**
  * @brief   Reference to the default .well-known/core handler defined by the
