@@ -1,1 +1,1 @@
-FEATURES_REQUIRED += cpp
+FEATURES_REQUIRED += cpp libstdcpp
