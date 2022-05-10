@@ -1298,7 +1298,7 @@ static void test_netif_get_name(void)
     TEST_ASSERT_NOT_NULL(netif);
 
     res = netif_get_name(netif, name);
-    sprintf(exp_name, "%d", (int) ((gnrc_netif_t *)netif)->pid);
+    sprintf(exp_name, "%d", netif_get_id(netif));
     TEST_ASSERT_EQUAL_INT(strlen(exp_name), res);
     TEST_ASSERT_EQUAL_STRING(&exp_name[0], &name[0]);
 }
