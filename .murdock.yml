@@ -1,0 +1,15 @@
+push:
+  branches:
+    - staging
+    - testing
+
+pr:
+  enable_comments: true
+  sticky_comment: true
+
+commit:
+  skip_keywords: ["ci_skip", "murdock_skip"]
+
+artifacts:
+  - output.txt
+  - doc-preview/
