@@ -21,6 +21,7 @@ rsource "chunked_ringbuffer/Kconfig"
 rsource "color/Kconfig"
 rsource "crypto/Kconfig"
 rsource "congure/Kconfig"
+rsource "cpp11-compat/Kconfig"
 rsource "cpp_new_delete/Kconfig"
 rsource "cxx_ctor_guards/Kconfig"
 rsource "div/Kconfig"
@@ -52,11 +53,9 @@ config MODULE_PICOLIBC
 endchoice
 
 config MODULE_LIBC_GETTIMEOFDAY
-    bool
+    bool "Support for gettimeofday()"
     select MODULE_XTIMER
     select MODULE_ZTIMER64_XTIMER_COMPAT if MODULE_ZTIMER_XTIMER_COMPAT
-    help
-        Support for gettimeofday()
 
 rsource "Kconfig.newlib"
 rsource "Kconfig.picolibc"

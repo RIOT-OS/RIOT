@@ -11,4 +11,7 @@ TEST_ON_CI_BLACKLIST += native
 #CFLAGS += -DSLEEP_PIN=7
 #CFLAGS += -DSLEEP_PORT=PORT_F
 
+# microbit qemu failing currently
+TEST_ON_CI_BLACKLIST += microbit
+
 include $(RIOTBASE)/Makefile.include

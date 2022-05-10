@@ -9,7 +9,7 @@ INCLUDES += -I$(RIOTBASE)/cpu/arm7_common/include/
 MCPU ?= arm7tdmi-s
 
 CFLAGS_CPU  = -mcpu=$(MCPU)
-CFLAGS_LINK = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
+CFLAGS_LINK = -ffunction-sections -fdata-sections -fshort-enums
 CFLAGS_DBG  ?= -ggdb -g3
 CFLAGS_OPT  ?= -Os
 

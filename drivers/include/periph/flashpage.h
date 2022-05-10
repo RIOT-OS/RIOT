@@ -151,7 +151,7 @@ enum {
 #error "periph/flashpage: FLASHPAGE_NUMOF not defined"
 #endif
 
-#ifdef MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
+#if defined(MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE) || defined(DOXYGEN)
 /**
  * @def   FLASH_WRITABLE_INIT(name, size)
  * @brief Define an array in flash memory
@@ -238,6 +238,9 @@ void flashpage_erase(unsigned page);
 
 /**
  * @brief Get number of first free flashpage
+ * @deprecated Use @ref FLASH_WRITABLE_INIT instead, which is usable in modules
+ *             as well as applications. The function will be removed after
+ *             the 2022.04 release.
  *
  * If riotboot is used in two slot mode, this number will change across
  * firmware updates as the firmware slots alternate.
@@ -246,6 +249,9 @@ unsigned flashpage_first_free(void);
 
 /**
  * @brief Get number of last free flashpage
+ * @deprecated Use @ref FLASH_WRITABLE_INIT instead, which is usable in modules
+ *             as well as applications. The function will be removed after
+ *             the 2022.04 release.
  *
  * If riotboot is used in two slot mode, this number will change across
  * firmware updates as the firmware slots alternate.

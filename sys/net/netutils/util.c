@@ -20,7 +20,7 @@
 #include <string.h>
 
 #include "net/utils.h"
-#ifdef MODULE_SOCK_DNS
+#if defined(MODULE_SOCK_DNS) || defined(MODULE_SOCK_DNS_MOCK)
 #include "net/af.h"
 #include "net/sock/dns.h"
 #endif
@@ -44,7 +44,7 @@ int netutils_get_ipv4(ipv4_addr_t *addr, const char *hostname)
     for (size_t i = 0; i < strlen(hostname); i++) {
         bool is_not_ipv4 = (hostname[i] < '0' || hostname[i] > '9') && hostname[i] != '.';
 
-#ifdef MODULE_SOCK_DNS
+#if defined(MODULE_SOCK_DNS) || defined(MODULE_SOCK_DNS_MOCK)
         /* once we see an invalid character for an IPv4 address try to
          * resolve the hostname by DNS */
         if (is_not_ipv4) {
@@ -77,7 +77,7 @@ int netutils_get_ipv6(ipv6_addr_t *addr, netif_t **netif, const char *hostname)
         return -EINVAL;
     }
 
-#ifdef MODULE_SOCK_DNS
+#if defined(MODULE_SOCK_DNS) || defined(MODULE_SOCK_DNS_MOCK)
     /* hostname is not an IPv6 address */
     if (strchr(hostname, ':') == NULL) {
         int res = sock_dns_query(hostname, addr, AF_INET6);

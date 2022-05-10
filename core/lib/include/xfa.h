@@ -25,6 +25,8 @@
 #ifndef XFA_H
 #define XFA_H
 
+#include <inttypes.h>
+
 /*
  * Unfortunately, current gcc trips over accessing XFA's because of their
  * zero-size start/end array that are used of symbol markers, with an "array
@@ -177,7 +179,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  * @brief Calculate number of entries in cross-file array
  */
 #define XFA_LEN(type, \
-                name) (((const char *)name ## _end - (const char *)name) / \
+                name) (((uintptr_t)name ## _end - (uintptr_t)name) / \
                        sizeof(type))
 
 #ifdef __cplusplus

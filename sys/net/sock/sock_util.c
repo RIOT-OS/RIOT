@@ -28,7 +28,8 @@
 
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
-#ifdef MODULE_SOCK_DNS
+
+#if defined(MODULE_SOCK_DNS) || defined(MODULE_SOCK_DNS_MOCK)
 #include "net/sock/dns.h"
 #endif
 
@@ -148,6 +149,17 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath)
     return 0;
 }
 
+const char *sock_urlpath(const char *url)
+{
+    assert(url);
+    char *hoststart = _find_hoststart(url);
+    if (!hoststart) {
+        return NULL;
+    }
+
+    return _find_pathstart(hoststart);
+}
+
 int _parse_port(sock_udp_ep_t *ep_out, const char *portstart)
 {
     int port_len = strlen(portstart);
@@ -264,7 +276,7 @@ int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str)
         return 0;
     }
 
-#if defined(MODULE_SOCK_DNS)
+#if defined(MODULE_SOCK_DNS) || defined(MODULE_SOCK_DNS_MOCK)
     int family;
     char hostbuf[CONFIG_SOCK_HOSTPORT_MAXLEN];
     const char *host;

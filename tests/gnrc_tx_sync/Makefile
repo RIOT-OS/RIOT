@@ -17,6 +17,9 @@ USEMODULE += xtimer
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += iolist
 
+# microbit qemu failing currently
+TEST_ON_CI_BLACKLIST += microbit
+
 include $(RIOTBASE)/Makefile.include
 
 CFLAGS += -DDEBUG_ASSERT_VERBOSE=1

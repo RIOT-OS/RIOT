@@ -164,6 +164,10 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value,
         return -1;
     }
 
+    if (flags & TIM_FLAG_SET_STOPPED) {
+        timer_stop(tim);
+    }
+
     clear_oneshot(tim, channel);
 
     if (flags & TIM_FLAG_RESET_ON_SET) {

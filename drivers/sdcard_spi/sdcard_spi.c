@@ -60,13 +60,13 @@ static inline int _transfer_bytes(sdcard_spi_t *card, const uint8_t *out, uint8_
 
 /* uses bitbanging for spi communication which allows to enable pull-up on the miso pin for
    greater card compatibility on platforms that don't have a hw pull up installed */
-static inline int _sw_spi_rxtx_byte(sdcard_spi_t *card, uint8_t out, uint8_t *in);
+static inline void _sw_spi_rxtx_byte(sdcard_spi_t *card, uint8_t out, uint8_t *in);
 
 /* wrapper for default spi_transfer_byte function */
-static inline int _hw_spi_rxtx_byte(sdcard_spi_t *card, uint8_t out, uint8_t *in);
+static inline void _hw_spi_rxtx_byte(sdcard_spi_t *card, uint8_t out, uint8_t *in);
 
 /* function pointer to switch to hw spi mode after init sequence */
-static int (*_dyn_spi_rxtx_byte)(sdcard_spi_t *card, uint8_t out, uint8_t *in);
+static void (*_dyn_spi_rxtx_byte)(sdcard_spi_t *card, uint8_t out, uint8_t *in);
 
 static inline uint32_t _deadline_from_interval(uint32_t interval)
 {
@@ -383,12 +383,8 @@ static inline void _send_dummy_byte(sdcard_spi_t *card)
 {
     uint8_t read_byte;
 
-    if (_dyn_spi_rxtx_byte(card, SD_CARD_DUMMY_BYTE, &read_byte) == 1) {
-        DEBUG("_send_dummy_byte:echo: 0x%02x\n", read_byte);
-    }
-    else {
-        DEBUG("_send_dummy_byte:_dyn_spi_rxtx_byte: [FAILED]\n");
-    }
+    _dyn_spi_rxtx_byte(card, SD_CARD_DUMMY_BYTE, &read_byte);
+    DEBUG("_send_ummy_byte:echo: 0x%02x\n", read_byte);
 }
 
 static inline bool _wait_for_not_busy(sdcard_spi_t *card, uint32_t retry_us)
@@ -396,21 +392,15 @@ static inline bool _wait_for_not_busy(sdcard_spi_t *card, uint32_t retry_us)
     uint32_t retry_timeout = _deadline_from_interval(retry_us);
 
     do {
-        uint8_t read_byte;
-        if (_dyn_spi_rxtx_byte(card, SD_CARD_DUMMY_BYTE, &read_byte) == 1) {
-            if (read_byte == 0xFF) {
-                DEBUG("_wait_for_not_busy: [OK]\n");
-                return true;
-            }
-            else {
-                DEBUG("_wait_for_not_busy: [BUSY]\n");
-            }
+        uint8_t read_byte = 0x00;
+        _dyn_spi_rxtx_byte(card, SD_CARD_DUMMY_BYTE, &read_byte);
+        if (read_byte == 0xFF) {
+            DEBUG("_wait_for_not_busy: [OK]\n");
+            return true;
         }
         else {
-            DEBUG("_wait_for_not_busy:_dyn_spi_rxtx_byte: [FAILED]\n");
-            return false;
+            DEBUG("_wait_for_not_busy: [BUSY]\n");
         }
-
     } while (retry_us && _deadline_left(retry_timeout));
 
     DEBUG("_wait_for_not_busy: [FAILED]\n");
@@ -532,13 +522,8 @@ static inline uint8_t _wait_for_r1(sdcard_spi_t *card, uint32_t retry_us)
     uint8_t r1;
 
     do {
-        if (_dyn_spi_rxtx_byte(card, SD_CARD_DUMMY_BYTE, &r1) != 1) {
-            DEBUG("_wait_for_r1: _dyn_spi_rxtx_byte:[ERROR]\n");
-            continue;
-        }
-        else {
-            DEBUG("_wait_for_r1: r1=0x%02x\n", r1);
-        }
+        _dyn_spi_rxtx_byte(card, SD_CARD_DUMMY_BYTE, &r1);
+        DEBUG("_wait_for_r1: r1=0x%02x\n", r1);
 
         if (R1_VALID(r1)) {
             DEBUG("_wait_for_r1: R1_VALID\n");
@@ -564,7 +549,7 @@ void _unselect_card_spi(sdcard_spi_t *card)
     spi_release(card->params.spi_dev);
 }
 
-static inline int _sw_spi_rxtx_byte(sdcard_spi_t *card, uint8_t out, uint8_t *in)
+static inline void _sw_spi_rxtx_byte(sdcard_spi_t *card, uint8_t out, uint8_t *in)
 {
     uint8_t rx = 0;
     int i = 7;
@@ -583,31 +568,25 @@ static inline int _sw_spi_rxtx_byte(sdcard_spi_t *card, uint8_t out, uint8_t *in
         gpio_clear(card->params.clk);
     }
     *in = rx;
-    return 1;
 }
 
-static inline int _hw_spi_rxtx_byte(sdcard_spi_t *card, uint8_t out, uint8_t *in)
+static inline void _hw_spi_rxtx_byte(sdcard_spi_t *card, uint8_t out, uint8_t *in)
 {
     *in = spi_transfer_byte(card->params.spi_dev, SPI_CS_UNDEF, true, out);
-    return 1;
 }
 
 static inline int _transfer_bytes(sdcard_spi_t *card, const uint8_t *out, uint8_t *in,
                                   unsigned int length)
 {
-    int trans_ret;
     unsigned trans_bytes = 0;
     uint8_t in_temp;
 
     for (trans_bytes = 0; trans_bytes < length; trans_bytes++) {
         if (out != NULL) {
-            trans_ret = _dyn_spi_rxtx_byte(card, out[trans_bytes], &in_temp);
+            _dyn_spi_rxtx_byte(card, out[trans_bytes], &in_temp);
         }
         else {
-            trans_ret = _dyn_spi_rxtx_byte(card, SD_CARD_DUMMY_BYTE, &in_temp);
-        }
-        if (trans_ret < 0) {
-            return trans_ret;
+            _dyn_spi_rxtx_byte(card, SD_CARD_DUMMY_BYTE, &in_temp);
         }
         if (in != NULL) {
             in[trans_bytes] = in_temp;

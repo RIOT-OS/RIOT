@@ -392,8 +392,9 @@ gnrc_netif_t *gnrc_netif_get_by_pid(kernel_pid_t pid);
  *                      @p CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF `* sizeof(ipv6_addr_t)
  *                      here (and have @p addrs of the according length).
  *
- * @return  Number of addresses in @p addrs times `sizeof(ipv6_addr_t)` on
- *          success (including 0).
+ * @return  Size of the array of addresses in @p addrs on success.
+ *          (number of addresses times `sizeof(ipv6_addr_t)`)
+ *          May be 0 if no addresses are configured.
  * @return  -ENOTSUP, if @p netif doesn't support IPv6.
  */
 static inline int gnrc_netif_ipv6_addrs_get(const gnrc_netif_t *netif,

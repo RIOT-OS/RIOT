@@ -31,7 +31,7 @@
 #include "lwip/inet_chksum.h"
 #include "lwip/nd6.h"
 #include "lwip/priv/nd6_priv.h"
-#include "lwip/netif.h"
+#include "lwip/netif/compat.h"
 #include "lwip/netif/netdev.h"
 #include "lwip/tcpip.h"
 #include "netif/etharp.h"
@@ -46,7 +46,7 @@
 static msg_t _msg_queue[_MSG_QUEUE_SIZE];
 static uint8_t _netdev_buffer[_NETDEV_BUFFER_SIZE];
 netdev_test_t netdev;
-static struct netif netif;
+static lwip_netif_t lwip_netif;
 static kernel_pid_t _check_pid = KERNEL_PID_UNDEF;
 static mutex_t _netdev_buffer_mutex = MUTEX_INIT;
 static uint8_t _netdev_buffer_size;
@@ -138,6 +138,7 @@ static int _netdev_send(netdev_t *dev, const iolist_t *iolist)
 
 void _net_init(void)
 {
+    struct netif *netif = &lwip_netif.lwip_netif;
     msg_init_queue(_msg_queue, _MSG_QUEUE_SIZE);
     _check_pid = thread_getpid();
 
@@ -156,14 +157,15 @@ void _net_init(void)
     netdev_test_set_isr_cb(&netdev, _netdev_isr);
     /* netdev needs to be set-up */
     expect(netdev.netdev.netdev.driver);
+    netdev.netdev.netdev.context = &lwip_netif;
 #if LWIP_IPV4
     ip4_addr_t local4, mask4, gw4;
     local4.addr = _TEST_ADDR4_LOCAL;
     mask4.addr = _TEST_ADDR4_MASK;
     gw4.addr = _TEST_ADDR4_GW;
-    netif_add(&netif, &local4, &mask4, &gw4, &netdev, lwip_netdev_init, tcpip_input);
+    netif_add(netif, &local4, &mask4, &gw4, &netdev, lwip_netdev_init, tcpip_input);
 #else
-    netif_add(&netif, &netdev, lwip_netdev_init, tcpip_input);
+    netif_add(netif, &netdev, lwip_netdev_init, tcpip_input);
 #endif
 #if LWIP_IPV6
     static const uint8_t local6_a[] = _TEST_ADDR6_LOCAL;
@@ -175,12 +177,12 @@ void _net_init(void)
 
     memcpy(&local6.addr, local6_a, sizeof(local6_a));
     ip6_addr_clear_zone(&local6);
-    netif_add_ip6_address(&netif, &local6, &idx);
+    netif_add_ip6_address(netif, &local6, &idx);
     for (int i = 0; i <= idx; i++) {
-        netif.ip6_addr_state[i] |= IP6_ADDR_VALID;
+        netif->ip6_addr_state[i] |= IP6_ADDR_VALID;
     }
 #endif
-    netif_set_default(&netif);
+    netif_set_default(netif);
     lwip_bootstrap();
     ztimer_sleep(ZTIMER_MSEC, 3 * MS_PER_SEC);    /* Let the auto-configuration run warm */
 }
@@ -210,13 +212,14 @@ void _prepare_send_checks(void)
            LWIP_ND6_NUM_NEIGHBORS * sizeof(struct nd6_neighbor_cache_entry));
     for (int i = 0; i < LWIP_ND6_NUM_NEIGHBORS; i++) {
         struct nd6_neighbor_cache_entry *nc = &neighbor_cache[i];
+        struct netif *netif = &lwip_netif.lwip_netif;
         if (nc->state == ND6_NO_ENTRY) {
             nc->state = ND6_REACHABLE;
             memcpy(&nc->next_hop_address, remote6, sizeof(remote6));
             ip6_addr_assign_zone(&nc->next_hop_address,
-                                 IP6_UNICAST, &netif);
+                                 IP6_UNICAST, netif);
             memcpy(&nc->lladdr, mac, 6);
-            nc->netif = &netif;
+            nc->netif = netif;
             nc->counter.reachable_time = UINT32_MAX;
             break;
         }

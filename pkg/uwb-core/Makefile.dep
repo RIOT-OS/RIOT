@@ -16,10 +16,6 @@ ifneq (,$(filter uwb-core_rng,$(USEMODULE)))
   USEMODULE += uwb-core_dsp
 endif
 
-ifneq (,$(filter uwb-core_uwbcfg,$(USEMODULE)))
-  USEMODULE += uwb-core_config
-endif
-
 ifneq (,$(filter uwb-core_dpl,$(USEMODULE)))
   USEPKG += mynewt-core
   USEMODULE += mynewt-core_os

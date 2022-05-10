@@ -7,6 +7,7 @@
 
 #
 : ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
+#: ${EMULATED_BOARDS_AVAILABLE:="microbit"}
 
 # temporarily disabling llvm builds until https://github.com/RIOT-OS/RIOT/pull/15595
 # is in
@@ -481,10 +482,16 @@ compile() {
 
     # run tests
     if [ $RES -eq 0 ]; then
-        if [ $RUN_TESTS -eq 1 -o "$board" = "native" ]; then
+        if is_in_list "$board" "$EMULATED_BOARDS_AVAILABLE"; then
+            EMULATED=1
+        else
+            EMULATED=0
+        fi
+
+        if [ $RUN_TESTS -eq 1 -o "$board" = "native" -o "$EMULATED" = "1" ]; then
             if [ -f "${BINDIR}/.test" ]; then
-                if [ "$board" = "native" ]; then
-                    BOARD=$board make -C${appdir} test
+                if [ "$board" = "native" -o "${EMULATED}" = "1" ]; then
+                    EMULATE=${EMULATED} BOARD=$board make -C${appdir} test
                     RES=$?
                 elif is_in_list "$board" "$TEST_BOARDS_AVAILABLE"; then
                     echo "-- test_hash=$test_hash"
@@ -500,10 +507,10 @@ compile() {
         fi
     fi
 
+    # log some build stats
     if [ -d ${BINDIR} ]
     then
-        echo "-- build directory size: $(du -sh ${BINDIR} | cut -f1)"
-
+        echo "{\"build/\": $(du -s ${BINDIR} | cut -f1)}"
         # cleanup
         rm -rf ${BINDIR}
     fi

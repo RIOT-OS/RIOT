@@ -40,11 +40,18 @@ LORA_REGION ?= EU868
 
 # Include the Semtech-loramac package
 USEPKG += semtech-loramac
+USEMODULE += auto_init_loramac
 
 USEMODULE += $(DRIVER)
 USEMODULE += fmt
 FEATURES_OPTIONAL += periph_rtc
-FEATURES_OPTIONAL += periph_eeprom
+
+# Uncomment the following line to enable Loramac stack state persistence on EEPROM.
+# Make sure the EEPROM is erased before enabling this and when flashing a board
+# with an EEPROM the first time. If the board already contains a previous Loramac state
+# in its EEPROM that is not corresponding to your LoRaWAN application settings,
+# joining a network will fail.
+# FEATURES_OPTIONAL += periph_eeprom
 
 CFLAGS += -DSEND_PERIOD_S=$(SEND_PERIOD_S)
 ifeq (otaa,$(ACTIVATION_MODE))
@@ -52,10 +59,6 @@ ifeq (otaa,$(ACTIVATION_MODE))
 else ifeq (abp,$(ACTIVATION_MODE))
   CFLAGS += -DUSE_ABP
 endif
-
-# Enable deep sleep power mode (e.g. STOP mode on STM32) which
-# in general provides RAM retention after wake-up.
-CFLAGS += -DPM_BLOCKER_INITIAL=0x00000001
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the

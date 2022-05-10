@@ -16,11 +16,10 @@
  * @}
  */
 
-#ifdef MODULE_MCP2515
 #include "can/device.h"
 #include "mcp2515_params.h"
 
-#define CANDEV_MCP2515_NUMOF ((ARRAY_SIZE(candev_mcp2515_params) / ARRAY_SIZE(candev_params_t)))
+#define CANDEV_MCP2515_NUMOF (ARRAY_SIZE(candev_mcp2515_params))
 
 #ifndef CANDEV_MCP2515_STACKSIZE
 #define CANDEV_MCP2515_STACKSIZE (THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF)
@@ -55,6 +54,3 @@ void auto_init_can_mcp2515(void) {
                             &candev_dev_mcp2515[i]);
     }
 }
-#else
-typedef int dont_be_pedantic;
-#endif

@@ -466,6 +466,18 @@ static int _atwinc15x0_set(netdev_t *netdev, netopt_t opt, const void *val,
         case NETOPT_STATE:
             assert(max_len <= sizeof(netopt_state_t));
             return _set_state(dev, *((const netopt_state_t *)val));
+        case NETOPT_L2_GROUP:
+            if (m2m_wifi_enable_mac_mcast((void *)val, 1)) {
+                return -EINVAL;
+            } else {
+                return max_len;
+            }
+        case NETOPT_L2_GROUP_LEAVE:
+            if (m2m_wifi_enable_mac_mcast((void *)val, 0)) {
+                return -EINVAL;
+            } else {
+                return max_len;
+            }
         default:
             return netdev_eth_set(netdev, opt, val, max_len);
     }

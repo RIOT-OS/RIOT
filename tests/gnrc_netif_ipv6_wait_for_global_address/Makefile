@@ -16,4 +16,7 @@ CFLAGS += -DGNRC_NETIF_GROUPS_NUMOF=8
 CFLAGS += -DLOG_LEVEL=LOG_NONE
 CFLAGS += -DTEST_SUITES
 
+# microbit qemu failing currently
+TEST_ON_CI_BLACKLIST += microbit
+
 include $(RIOTBASE)/Makefile.include

@@ -17,8 +17,8 @@ REGEX_INCLUDES = re.compile(REGEX_INCLUDES, re.MULTILINE)
 
 def detect_includes_and_version_gcc(compiler):
     """
-    Runs the given compiler with -v -E on an no-op compilation unit and parses the built-in
-    include search directories and the GCC version from the output
+    Runs the given compiler with -v -E on an no-op compilation unit and parses
+    the built-in include search directories and the GCC version from the output
 
     :param compiler: name / path of the compiler to run
     :type compiler: str
@@ -33,21 +33,35 @@ def detect_includes_and_version_gcc(compiler):
             inputdata = b"typedef int dont_be_pedantic;"
             _, stderrdata = proc.communicate(input=inputdata)
     except FileNotFoundError:
-        msg = "Compiler {} not found, not adding system include paths\n".format(compiler)
+        msg = f"Compiler {compiler} not found, not adding system include paths\n"
         sys.stderr.write(msg)
         return []
 
     stderrdata = stderrdata.decode("utf-8")
     version = REGEX_VERSION.search(stderrdata).group(1)
-    includes = [os.path.abspath(p) for p in REGEX_INCLUDES.search(stderrdata).group(1).split()]
+    tmp = [os.path.abspath(p) for p in REGEX_INCLUDES.search(stderrdata).group(1).split()]
+
+    # the include path containing newlib.h must come prior to the gcc headers
+    # in the include list to avoid mischief from happening
+    newlib_path = ""
+    includes = []
+    for path in tmp:
+        if os.path.exists(os.path.join(path, "newlib.h")):
+            newlib_path = path
+            includes.append(path)
+            break
+
+    for path in tmp:
+        if path != newlib_path:
+            includes.append(path)
 
     return (includes, version)
 
 
 def detect_libstdcxx_includes(compiler, includes, version):
     """
-    Tries to detect the g++ libstdc++ built-in include search directories using black magic and
-    adds them to the list given in includes
+    Tries to detect the g++ libstdc++ built-in include search directories using
+    black magic and adds them to the list given in includes
 
     :param compiler: Name or path of the compiler
     :type compiler: str
@@ -69,7 +83,8 @@ def detect_libstdcxx_includes(compiler, includes, version):
 
 def detect_built_in_includes(compiler, args):
     """
-    Tries to detect the built-in include search directories of the given compiler
+    Tries to detect the built-in include search directories of the given
+    compiler
 
     :param compiler: Name or path of the compiler
     :type compiler: str
@@ -85,14 +100,15 @@ def detect_built_in_includes(compiler, args):
         if args.add_libstdcxx_includes:
             detect_libstdcxx_includes(compiler, includes, version)
     elif compiler in ('clang', 'clang++', 'gcc', 'g++'):
-        # clang / clang++ doesn't have any magic include search dirs built in, so we don't need
-        # to detect them.
+        # clang / clang++ doesn't have any magic include search dirs built in,
+        # so we don't need to detect them.
         # for host gcc/g++ we don't need to detect magic include dirs either.
         includes = []
     else:
-        msg = "Warning: Cannot detect default include search paths for {}\n".format(compiler)
+        msg = f"Warning: Cannot detect default include search paths for {compiler}\n"
         sys.stderr.write(msg)
         includes = []
+
     return includes
 
 
@@ -147,12 +163,14 @@ def get_built_in_include_flags(compiler, state, args):
     """
     Get built-in include search directories as parameter list.
 
-    :param compiler: Name or path of the compiler to get the include search dirs from
+    :param compiler: Name or path of the compiler to get the include search
+                     dirs from
     :type compiler: str
     :param state: state of the program
     :param args: command line arguments
 
-    :return: The -isystem <...> compiler flags for the built-in include search dirs as list
+    :return: The -isystem <...> compiler flags for the built-in include search
+             dirs as list
     :rtype: list
     """
 
@@ -169,7 +187,8 @@ def get_built_in_include_flags(compiler, state, args):
 
 def write_compile_command(state, compiler, src, flags, cdetails, path):
     """
-    Write the compile command for the given source file with the given parameters to stdout
+    Write the compile command for the given source file with the given
+    parameters to stdout
 
     :param state: state of the program
     :param compiler: the C/C++ compiler used
@@ -209,9 +228,11 @@ def write_compile_command(state, compiler, src, flags, cdetails, path):
 
 def generate_module_compile_commands(path, state, args):
     """
-    Generate section of compile_commands.json for the module in path and write it to stdout.
+    Generate section of compile_commands.json for the module in path and write
+    it to stdout.
 
-    :param path: path of the module's bin folder to emit the compile_commands.json chunk for
+    :param path: path of the module's bin folder to emit the
+                 compile_commands.json chunk for
     :type path: str
     :param state: state of the program
     :param args: command line arguments

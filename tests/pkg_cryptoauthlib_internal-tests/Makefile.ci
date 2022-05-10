@@ -27,6 +27,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     samd10-xmini \
     saml10-xpro \
     saml11-xpro \
+    stm32f7508-dk \
     waspmote-pro \
     zigduino \
     #

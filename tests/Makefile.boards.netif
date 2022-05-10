@@ -49,6 +49,7 @@ BOARD_PROVIDES_NETIF := \
     samr30-xpro \
     spark-core \
     stm32f746g-disco \
+    stm32f7508-dk \
     telosb \
     thingy52 \
     usb-kw41z \

@@ -289,7 +289,6 @@ ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
     sock_ip_ep_t local;
     sock_udp_ep_t remote_cpy;
     sock_ip_ep_t *rem;
-    uint8_t *payload_buf;
 
     assert((sock != NULL) || (remote != NULL));
 
@@ -346,6 +345,16 @@ ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
         src_port = sock->local.port;
         memcpy(&local, &sock->local, sizeof(local));
     }
+#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+    /* user supplied local endpoint takes precedent */
+    if ((aux != NULL) && (aux->flags & SOCK_AUX_SET_LOCAL)) {
+        local.family = aux->local.family;
+        local.netif = aux->local.netif;
+        memcpy(&local.addr, &aux->local.addr, sizeof(local.addr));
+
+        aux->flags &= ~SOCK_AUX_SET_LOCAL;
+    }
+#endif
     /* sock can't be NULL at this point */
     if (remote == NULL) {
         rem = (sock_ip_ep_t *)&sock->remote;
@@ -371,12 +380,7 @@ ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
     }
 
     /* copy payload data into payload snip */
-    payload_buf = payload->data;
-    while (snips) {
-        memcpy(payload_buf, snips->iol_base, snips->iol_len);
-        payload_buf += snips->iol_len;
-        snips = snips->iol_next;
-    }
+    iolist_to_buffer(snips, payload->data, payload->size);
 
     pkt = gnrc_udp_hdr_build(payload, src_port, dst_port);
     if (pkt == NULL) {

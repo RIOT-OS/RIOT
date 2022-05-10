@@ -452,7 +452,7 @@ typedef struct {
 /**
  * @brief   Number of usable power modes.
  */
-#define PM_NUM_MODES    (2U)
+#define PM_NUM_MODES    (3U)
 
 /**
  * @name    Watchdog timer (WDT) configuration
@@ -470,6 +470,38 @@ typedef struct {
 
 #define WDT_HAS_STOP            (1U)
 /** @} */
+
+/* GPIO_LL's overrides */
+#ifndef DOXYGEN
+
+/* Not supported by hardware */
+#define HAVE_GPIO_SLEW_T
+typedef enum {
+    GPIO_SLEW_SLOWEST = 0,
+    GPIO_SLEW_SLOW = 0,
+    GPIO_SLEW_FAST = 0,
+    GPIO_SLEW_FASTEST = 0,
+} gpio_slew_t;
+
+/* Not supported by hardware */
+#define HAVE_GPIO_PULL_STRENGTH_T
+typedef enum {
+    GPIO_PULL_WEAKEST = 0,
+    GPIO_PULL_WEAK = 0,
+    GPIO_PULL_STRONG = 0,
+    GPIO_PULL_STRONGEST = 0
+} gpio_pull_strength_t;
+
+/* Not implemented, see gpio_ll_arch.h comments */
+#define HAVE_GPIO_DRIVE_STRENGTH_T
+typedef enum {
+    GPIO_DRIVE_WEAKEST = 0,
+    GPIO_DRIVE_WEAK = 0,
+    GPIO_DRIVE_STRONG = 0,
+    GPIO_DRIVE_STRONGEST = 0
+} gpio_drive_strength_t;
+
+#endif
 
 #ifdef __cplusplus
 }

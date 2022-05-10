@@ -67,13 +67,17 @@ extern "C" {
  * @name    Display configuration (not supported yet)
  * @{
  */
-#define ST7735_PARAM_SPI       SPI_DEV(1)                      /**< SPI device */
-#define ST7735_PARAM_CS        GPIO_PIN(PB, 7)                 /**< Chip select pin */
-#define ST7735_PARAM_DCX       GPIO_PIN(PB, 5)                 /**< DCX pin */
-#define ST7735_PARAM_RST       GPIO_PIN(PA, 0)                 /**< Reset pin */
-#define ST7735_PARAM_NUM_LINES (128U)                          /**< Number of screen lines */
-#define ST7735_PARAM_RGB       (1)                             /**< RGB configuration */
-#define ST7735_PARAM_INVERTED  (1)                             /**< Inversion configuration */
+#define ST7735_PARAM_SPI        SPI_DEV(1)                      /**< SPI device */
+#define ST7735_PARAM_CS         GPIO_PIN(PB, 7)                 /**< Chip select pin */
+#define ST7735_PARAM_DCX        GPIO_PIN(PB, 5)                 /**< DCX pin */
+#define ST7735_PARAM_RST        GPIO_PIN(PA, 0)                 /**< Reset pin */
+#define ST7735_PARAM_NUM_LINES  (160U)                          /**< Number of screen lines */
+#define ST7735_PARAM_RGB_CHANNELS   (128U)                      /**< Number of screen rgb channel (height) */
+#define ST7735_PARAM_RGB        (1)                             /**< RGB configuration */
+#define ST7735_PARAM_INVERTED   (0)                             /**< Inversion configuration */
+#define ST7735_PARAM_ROTATION   (ST7735_ROTATION_HORZ_FLIP)     /**< Rotation mode */
+#define LCD_SCREEN_WIDTH        (ST7735_PARAM_NUM_LINES)        /**< LCD screen width */
+#define LCD_SCREEN_HEIGHT       (ST7735_PARAM_RGB_CHANNELS)     /**< LCD screen height */
 /** @} */
 
 /**

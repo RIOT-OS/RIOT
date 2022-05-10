@@ -29,8 +29,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)
-
 /**
  * @brief Flag holding information if user is present or not
  */
@@ -63,9 +61,9 @@ int fido2_ctap_utils_user_presence_test(void)
 
     gpio_irq_enable(_pin);
 
-#if !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_LED)
-    fido2_ctap_utils_led_animation();
-#endif
+    if (!IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_LED)) {
+        fido2_ctap_utils_led_animation();
+    }
 
     ret = _user_present ? CTAP2_OK : CTAP2_ERR_ACTION_TIMEOUT;
 
@@ -81,7 +79,6 @@ static void _gpio_cb(void *arg)
     _user_present = true;
 }
 
-#if !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_LED)
 void fido2_ctap_utils_led_animation(void)
 {
     uint32_t start = ztimer_now(ZTIMER_MSEC);
@@ -118,5 +115,3 @@ void fido2_ctap_utils_led_animation(void)
     LED2_OFF;
 #endif
 }
-#endif  /* !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_LED) */
-#endif  /* CONFIG_FIDO2_CTAP_DISABLE_UP */

@@ -115,7 +115,9 @@ $(PKG_PATCHED): $(PKG_PATCHED_PREREQUISITES)
 	$(call gen_dependency_files,$@.d,$(PKG_PATCHED_PREREQUISITES))
 	$(Q)$(GIT_IN_PKG) clean $(GIT_QUIET) -xdff '**' -e $(PKG_STATE:$(PKG_SOURCE_DIR)/%='%*')
 	$(Q)$(GIT_IN_PKG) checkout $(GIT_QUIET) -f $(PKG_VERSION)
-	$(Q)$(GIT_IN_PKG) $(GITFLAGS) am $(GITAMFLAGS) $(PKG_PATCHES) </dev/null
+	$(Q) if test -n "$(PKG_PATCHES)" ; then \
+	       $(GIT_IN_PKG) $(GITFLAGS) am $(GITAMFLAGS) $(PKG_PATCHES) ; \
+	     fi
 	@touch $@
 
 $(PKG_DOWNLOADED): $(MAKEFILE_LIST) | $(PKG_SOURCE_DIR)/.git
@@ -126,11 +128,24 @@ $(PKG_DOWNLOADED): $(MAKEFILE_LIST) | $(PKG_SOURCE_DIR)/.git
 	fi
 	echo $(PKG_VERSION) > $@
 
+ifeq ($(GIT_CACHE_DIR),$(wildcard $(GIT_CACHE_DIR)))
 $(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
 	$(info [INFO] cloning $(PKG_NAME))
 	$(Q)rm -Rf $(PKG_SOURCE_DIR)
 	$(Q)mkdir -p $(PKG_SOURCE_DIR)
 	$(Q)$(GITCACHE) clone $(PKG_URL) $(PKG_VERSION) $(PKG_SOURCE_DIR)
+else
+$(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
+	$(info [INFO] cloning without cache $(PKG_NAME))
+	$(Q)rm -Rf $(PKG_SOURCE_DIR)
+	$(Q)mkdir -p $(PKG_SOURCE_DIR)
+	$(Q)git init -q $(PKG_SOURCE_DIR)
+	$(Q)$(GIT_IN_PKG) remote add origin $(PKG_URL)
+	$(Q)$(GIT_IN_PKG) config extensions.partialClone origin
+	$(Q)$(GIT_IN_PKG) config advice.detachedHead false
+	$(Q)$(GIT_IN_PKG) fetch $(GIT_QUIET) --depth=1 -t --filter=blob:none origin $(PKG_VERSION)
+	$(Q)$(GIT_IN_PKG) checkout $(GIT_QUIET) $(PKG_VERSION)
+endif
 
 ifeq ($(PKG_SOURCE_DIR),$(PKG_BUILD_DIR))
 # This is the case for packages that are built within their source directory

@@ -547,6 +547,17 @@ extern "C" {
  */
 #define LORAMAC_NETWORK_ID_LEN                  (3U)
 
+/**
+ * @brief   Channel mask length
+ *
+ *          Must match CHANNELS_MASK_SIZE in src/mac/region/RegionXXYYY.c
+ */
+#if defined(REGION_AU915) || defined(REGION_CN470) || defined(REGION_US915) || defined(REGION_US915_HYBRID) || defined(REGION_AS923)
+#define LORAMAC_CHANNELS_MASK_LEN                     (6U)
+#else
+#define LORAMAC_CHANNELS_MASK_LEN                     (1U)
+#endif
+
 /** @} */
 
 /**
@@ -976,7 +987,7 @@ typedef enum {
  * @param[in] cr                        Coding rate used to send the packet
  * @return                              time on air in us
  */
-static inline uint32_t lora_time_on_air(size_t pkt_len, uint8_t dr, uint8_t cr)
+static inline uint32_t lora_time_on_air(size_t pkt_len, loramac_dr_idx_t dr, uint8_t cr)
 {
     assert(dr <= LORAMAC_DR_6);
     const uint8_t _K[6][4] = {

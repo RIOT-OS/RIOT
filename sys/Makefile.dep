@@ -41,6 +41,14 @@ ifneq (,$(filter congure_test,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
+ifneq (,$(filter congure_reno,$(USEMODULE)))
+  USEMODULE += congure_reno_methods
+endif
+
+ifneq (,$(filter congure_reno_methods,$(USEMODULE)))
+  USEMODULE += seq
+endif
+
 ifneq (,$(filter eepreg,$(USEMODULE)))
   FEATURES_REQUIRED += periph_eeprom
 endif
@@ -99,7 +107,7 @@ endif
 
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   USEMODULE += random
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter dhcpv6_%,$(USEMODULE)))
@@ -167,7 +175,7 @@ endif
 
 ifneq (,$(filter uhcpc,$(USEMODULE)))
   USEMODULE += posix_inet
-  USEMODULE += xtimer
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter netdev_tap,$(USEMODULE)))
@@ -274,7 +282,6 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += vfs
   USEMODULE += posix_headers
-  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter shell,$(USEMODULE)))
@@ -635,15 +642,14 @@ endif
 ifneq (,$(filter gcoap,$(USEMODULE)))
   USEMODULE += nanocoap
   USEMODULE += sock_async_event
+  USEMODULE += sock_aux_local
   USEMODULE += sock_udp
   USEMODULE += sock_util
   USEMODULE += ztimer_msec
   USEMODULE += ztimer_usec
   USEMODULE += event_callback
   USEMODULE += event_timeout_ztimer
-  ifneq (,$(filter openwsn%,$(USEMODULE)))
-    USEMODULE += openwsn_sock_udp
-  endif
+  USEMODULE += random
 endif
 
 ifneq (,$(filter luid,$(USEMODULE)))
@@ -653,6 +659,7 @@ endif
 ifneq (,$(filter nanocoap_sock,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += sock_util
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter nanocoap_%,$(USEMODULE)))
@@ -818,7 +825,7 @@ endif
 
 ifneq (,$(filter suit_transport_coap, $(USEMODULE)))
   USEMODULE += nanocoap_sock
-  USEMODULE += xtimer
+  USEMODULE += ztimer_msec
   USEMODULE += sock_util
 endif
 
@@ -892,6 +899,7 @@ endif
 
 ifneq (,$(filter fido2_ctap,$(USEMODULE)))
   FEATURES_REQUIRED += periph_flashpage
+  FEATURES_REQUIRED += periph_flashpage_in_address_space
   FEATURES_REQUIRED += periph_gpio_irq
 
   USEPKG += tiny-asn1

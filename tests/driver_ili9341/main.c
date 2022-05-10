@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Test application for the ili9431 tft display
+ * @brief       Test application for lcd tft displays
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  *
@@ -22,16 +22,19 @@
 #include "timex.h"
 #include "ztimer.h"
 #include "board.h"
-#include "ili9341.h"
-#include "ili9341_params.h"
+#include "lcd.h"
 
 #include "riot_logo.h"
 
+#include "ili9341.h"
+#include "ili9341_params.h"
+
 int main(void)
 {
-    ili9341_t dev;
+    lcd_t dev;
+    dev.driver = &lcd_ili9341_driver;
 
-    puts("ili9341 TFT display test application");
+    puts("lcd TFT display test application");
 
     /* initialize the sensor */
     printf("Initializing display...");
@@ -41,7 +44,7 @@ int main(void)
     BACKLIGHT_ON;
 #endif
 
-    if (ili9341_init(&dev, &ili9341_params[0]) == 0) {
+    if (lcd_init(&dev, &ili9341_params[0]) == 0) {
         puts("[OK]");
     }
     else {
@@ -49,38 +52,41 @@ int main(void)
         return 1;
     }
 
-    puts("ili9341 TFT display filling map");
-    ili9341_fill(&dev, 0, 319, 0, 239, 0x0000);
-    puts("ili9341 TFT display map filled");
+    puts("lcd TFT display filling map");
+    lcd_fill(&dev, 0, dev.params->lines, 0, dev.params->rgb_channels, 0x0000);
+    puts("lcd TFT display map filled");
 
     /* Fill square with blue */
     puts("Drawing blue rectangle");
-    ili9341_fill(&dev, 10, 59, 10, 109, 0x001F);
+    lcd_fill(&dev, 0, dev.params->lines / 3, 0, dev.params->rgb_channels, 0x001F);
     ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
 
     puts("Drawing green rectangle");
-    ili9341_fill(&dev, 10, 59, 10, 109, 0x07E0);
+    lcd_fill(&dev, dev.params->lines / 3, 2 * (dev.params->lines / 3), 0,
+             dev.params->rgb_channels, 0x07E0);
     ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
 
     puts("Drawing red rectangle");
-    ili9341_fill(&dev, 10, 59, 10, 109, 0xf800);
+    lcd_fill(&dev, 2 * (dev.params->lines / 3), dev.params->lines, 0,
+             dev.params->rgb_channels, 0xf800);
     ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
 
-    ili9341_invert_on(&dev);
-    puts("ili9341 TFT display inverted");
+    lcd_invert_on(&dev);
+    puts("lcd TFT display inverted");
     ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
-    ili9341_invert_off(&dev);
-    puts("ili9341 TFT display normal");
+    lcd_invert_off(&dev);
+    puts("lcd TFT display normal");
 
-    /* Make the same square black again */
-    ili9341_fill(&dev, 10, 59, 10, 109, 0x0000);
-
+    puts("lcd TFT display clear screen");
+    lcd_fill(&dev, 0, dev.params->lines, 0, dev.params->rgb_channels, 0x0000);
 #ifndef CONFIG_NO_RIOT_IMAGE
     /* Approximate middle of the display */
-    ili9341_pixmap(&dev, 95, 222, 85, 153, (const uint16_t *)picture);
+    uint8_t x1 = (dev.params->lines / 2) - (RIOT_LOGO_WIDTH / 2);
+    uint8_t y1 = (dev.params->rgb_channels / 2) - (RIOT_LOGO_HEIGHT / 2);
+    lcd_pixmap(&dev, x1, x1 + RIOT_LOGO_WIDTH - 1, y1, y1 +  RIOT_LOGO_HEIGHT - 1,
+               (const uint16_t *)picture);
 #endif
-    while (1) {
-    }
+    while (1) {}
 
     return 0;
 }

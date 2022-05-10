@@ -22,6 +22,8 @@ RIOT_INCLUDE += -I$(RIOTBASE)/sys/include
 
 SRCS := main.c topology.c zep_parser.c
 SRCS += $(RIOTBASE)/sys/net/link_layer/ieee802154/ieee802154.c
+SRCS += $(RIOTBASE)/sys/fmt/fmt.c
+SRCS += $(RIOTBASE)/sys/net/link_layer/l2util/l2util.c
 
 $(DISPATCH): $(SRCS) bin
 	$(CC) $(CFLAGS) $(CFLAGS_EXTRA) $(SRCS) -o $@

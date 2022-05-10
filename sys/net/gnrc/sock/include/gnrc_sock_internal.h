@@ -125,13 +125,15 @@ static inline void gnrc_ep_set(sock_ip_ep_t *out, const sock_ip_ep_t *in,
                                size_t in_size)
 {
     memcpy(out, in, in_size);
-    if (gnrc_netif_highlander() && (out->netif == 0)) {
-        /* set interface implicitly */
-        gnrc_netif_t *netif = gnrc_netif_iter(NULL);
+    if (out->netif != SOCK_ADDR_ANY_NETIF) {
+        return;
+    }
 
-        if (netif != NULL) {
-            out->netif = netif->pid;
-        }
+    /* set interface implicitly */
+    gnrc_netif_t *netif = gnrc_netif_iter(NULL);
+    if ((netif != NULL) &&
+        (gnrc_netif_highlander() || (gnrc_netif_iter(netif) == NULL))) {
+        out->netif = netif->pid;
     }
 }
 

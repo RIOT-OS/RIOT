@@ -102,8 +102,6 @@
 /*** @decawave-mynewt-core/lib/uwb_rng */
 #include "dpl_syscfg/syscfg_uwb_rng.h"
 
-/*** @decawave-mynewt-core/sys/uwbcfg */
-#include "dpl_syscfg/syscfg_uwbcfg.h"
 #endif
 
 #if IS_USED(MODULE_UWB_DW1000)

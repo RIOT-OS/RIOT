@@ -223,6 +223,13 @@ ssize_t sock_ip_send_aux(sock_ip_t *sock, const void *data, size_t len,
         }
         memcpy(&local, &sock->local, sizeof(local));
     }
+#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+    /* user supplied local endpoint takes precedent */
+    if ((aux != NULL) && (aux->flags & SOCK_AUX_SET_LOCAL)) {
+        local = aux->local;
+        aux->flags &= ~SOCK_AUX_SET_LOCAL;
+    }
+#endif
     if (remote == NULL) {
         /* sock can't be NULL at this point */
         memcpy(&rem, &sock->remote, sizeof(rem));

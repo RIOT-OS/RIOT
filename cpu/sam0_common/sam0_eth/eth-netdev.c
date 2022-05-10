@@ -36,6 +36,8 @@
 
 /* Internal helpers */
 extern int sam0_eth_init(void);
+extern void sam0_eth_poweron(void);
+extern void sam0_eth_poweroff(void);
 extern int sam0_eth_send(const struct iolist *iolist);
 extern int sam0_eth_receive_blocking(char *data, unsigned max_len);
 extern void sam0_eth_set_mac(const eui48_t *mac);
@@ -101,6 +103,22 @@ static int _sam0_eth_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_l
     return res;
 }
 
+static int _set_state(netopt_state_t state)
+{
+    switch (state) {
+        case NETOPT_STATE_SLEEP:
+            sam0_eth_poweroff();
+            break;
+        case NETOPT_STATE_IDLE:
+            sam0_eth_poweron();
+            break;
+        default:
+            return -ENOTSUP;
+    }
+
+    return sizeof(netopt_state_t);
+}
+
 static int _sam0_eth_set(netdev_t *netdev, netopt_t opt, const void *val, size_t max_len)
 {
     int res = -1;
@@ -111,6 +129,9 @@ static int _sam0_eth_set(netdev_t *netdev, netopt_t opt, const void *val, size_t
             sam0_eth_set_mac((eui48_t *)val);
             res = ETHERNET_ADDR_LEN;
             break;
+        case NETOPT_STATE:
+            assert(max_len <= sizeof(netopt_state_t));
+            return _set_state(*((const netopt_state_t *)val));
         default:
             res = netdev_eth_set(netdev, opt, val, max_len);
             break;

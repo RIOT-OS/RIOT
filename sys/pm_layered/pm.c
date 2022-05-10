@@ -19,9 +19,9 @@
  */
 
 #include <assert.h>
+#include <string.h>
 
 #include "board.h"
-#include "atomic_utils.h"
 #include "irq.h"
 #include "periph/pm.h"
 #include "pm_layered.h"
@@ -34,58 +34,73 @@
 #endif
 
 #ifndef PM_BLOCKER_INITIAL
-#define PM_BLOCKER_INITIAL 0x01010101   /* block all by default */
+#if PM_NUM_MODES == 1
+#define PM_BLOCKER_INITIAL { 0 }
+#endif
+#if PM_NUM_MODES == 2
+#define PM_BLOCKER_INITIAL { 1, 0 }
+#endif
+#if PM_NUM_MODES == 3
+#define PM_BLOCKER_INITIAL { 1, 1, 0 }
+#endif
+#if PM_NUM_MODES == 4
+#define PM_BLOCKER_INITIAL { 1, 1, 1, 0 }
+#endif
+#if PM_NUM_MODES == 5
+#define PM_BLOCKER_INITIAL { 1, 1, 1, 1, 0 }
+#endif
 #endif
 
 /**
  * @brief Global variable for keeping track of blocked modes
  */
-static pm_blocker_t pm_blocker = { .val_u32 = PM_BLOCKER_INITIAL };
+static pm_blocker_t pm_blocker = { .blockers = PM_BLOCKER_INITIAL };
 
 void pm_set_lowest(void)
 {
-    pm_blocker_t blocker = { .val_u32 = atomic_load_u32(&pm_blocker.val_u32) };
     unsigned mode = PM_NUM_MODES;
+
+    /* set lowest mode if blocker is still the same */
+    unsigned state = irq_disable();
     while (mode) {
-        if (blocker.val_u8[mode-1]) {
+        if (pm_blocker.blockers[mode - 1]) {
             break;
         }
         mode--;
     }
 
-    /* set lowest mode if blocker is still the same */
-    unsigned state = irq_disable();
-    if (blocker.val_u32 == pm_blocker.val_u32) {
-        DEBUG("pm: setting mode %u\n", mode);
+    if (mode != PM_NUM_MODES) {
         pm_set(mode);
-    }
-    else {
-        DEBUG("pm: mode block changed\n");
     }
     irq_restore(state);
 }
 
 void pm_block(unsigned mode)
 {
-    assert(pm_blocker.val_u8[mode] != 255);
+    assert(pm_blocker.blockers[mode] != 255);
 
     unsigned state = irq_disable();
-    pm_blocker.val_u8[mode]++;
+    pm_blocker.blockers[mode]++;
     irq_restore(state);
 }
 
 void pm_unblock(unsigned mode)
 {
-    assert(pm_blocker.val_u8[mode] > 0);
+    assert(pm_blocker.blockers[mode] > 0);
 
     unsigned state = irq_disable();
-    pm_blocker.val_u8[mode]--;
+    pm_blocker.blockers[mode]--;
     irq_restore(state);
 }
 
 pm_blocker_t pm_get_blocker(void)
 {
-    pm_blocker_t result = { .val_u32 = atomic_load_u32(&pm_blocker.val_u32) };
+    pm_blocker_t result;
+
+    unsigned state = irq_disable();
+    memcpy(&result, &pm_blocker, sizeof(result));
+    irq_restore(state);
+
     return result;
 }
 

@@ -265,7 +265,6 @@ If this optional step is skipped then `SUIT_COAP_SERVER` will be
 the link local address of the `bt0` interface and `SUIT_CLIENT` will be
 the link local address of the device, with the interface specified. e.g:
 
-
       SUIT_COAP_SERVER=[fe80::19:86ff:fe00:16ca]
       SUIT_CLIENT=[fe80::e4dd:e0ff:fe8f:7365%bt0]
 
@@ -306,10 +305,10 @@ see 6 pairs of messages indicating where (filepath) the file was published and
 the corresponding coap resource URI
 
     ...
-    published "/home/francisco/workspace/RIOT/examples/suit_update/bin/samr21-xpro/suit_update-riot.suitv3_signed.1557135946.bin"
-           as "coap://[2001:db8::1]/fw/samr21-xpro/suit_update-riot.suitv3_signed.1557135946.bin"
-    published "/home/francisco/workspace/RIOT/examples/suit_update/bin/samr21-xpro/suit_update-riot.suitv3_signed.latest.bin"
-           as "coap://[2001:db8::1]/fw/samr21-xpro/suit_update-riot.suitv3_signed.latest.bin"
+    published "${RIOTBASE}/examples/suit_update/bin/samr21-xpro/suit_files/riot.suit.1632124156.bin"
+       as "coap://[2001:db8::1]/fw/suit_update/samr21-xpro/riot.suit.1632124156.bin"
+    published "${RIOTBASE}/examples/suit_update/bin/samr21-xpro/suit_files/riot.suit.latest.bin"
+       as "coap://[2001:db8::1]/fw/suit_update/samr21-xpro/riot.suit.latest.bin"
     ...
 
 ### Notify an update to the device
@@ -497,19 +496,6 @@ When a new manifest url is received on the trigger resource a message is resent
 to the coap thread with the manifest's url. The thread will then fetch the
 manifest by a block coap request to the specified url.
 
-- **support for v3**
-
-This includes v3 manifest support. When a url is received in the /suit/trigger
-coap resource it will trigger a coap blockwise fetch of the manifest. When this
-manifest is received it will be parsed. The signature of the manifest will be
-verified and then the rest of the manifest content. If the received manifest is valid it
-will extract the url for the firmware location from the manifest.
-
-It will then fetch the firmware, write it to the inactive slot and reboot the device.
-Digest validation is done once all the firmware is written to flash.
-From there the bootloader takes over, verifying the slot riotboot_hdr and boots
-from the newest image.
-
 #### Key Generation
 
 To sign the manifest and for the device to verify the manifest a pair of keys
@@ -574,10 +560,10 @@ The following variables are defined in makefiles/suit.inc.mk:
 
 The following convention is used when naming a manifest
 
-    SUIT_MANIFEST ?= $(BINDIR_APP)-riot.suitv3.$(APP_VER).bin
-    SUIT_MANIFEST_LATEST ?= $(BINDIR_APP)-riot.suitv3.latest.bin
-    SUIT_MANIFEST_SIGNED ?= $(BINDIR_APP)-riot.suitv3_signed.$(APP_VER).bin
-    SUIT_MANIFEST_SIGNED_LATEST ?= $(BINDIR_APP)-riot.suitv3_signed.latest.bin
+    SUIT_MANIFEST ?= $(BINDIR_SUIT)/$(SUIT_MANIFEST_BASENAME)_unsigned.$(APP_VER).bin
+    SUIT_MANIFEST_LATEST ?= $(BINDIR_SUIT)/$(SUIT_MANIFEST_BASENAME)_unsigned.latest.bin
+    SUIT_MANIFEST_SIGNED ?= $(BINDIR_SUIT)/$(SUIT_MANIFEST_BASENAME).$(APP_VER).bin
+    SUIT_MANIFEST_SIGNED_LATEST ?= $(BINDIR_SUIT)/$(SUIT_MANIFEST_BASENAME).latest.bin
 
 The following default values are using for generating the manifest:
 

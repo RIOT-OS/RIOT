@@ -1,0 +1,74 @@
+From 6288db9eff3db6bac6c4074fa946342dd64c7634 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Thu, 5 May 2022 10:44:46 +0200
+Subject: [PATCH] drivers/common/crypto: fix mismatching function signatures
+
+This allows OpenWSN again to be compiled with newer versions of GCC,
+which in `master` fails with:
+
+```
+"make" -C /home/maribu/Repos/software/RIOT/build/pkg/openwsn/drivers/common/crypto -f /home/maribu/Repos/software/RIOT/Makefile.base MODULE=openwsn_crypto
+/home/maribu/Repos/software/RIOT/build/pkg/openwsn/drivers/common/crypto/aes128.c:49:30: error: argument 1 of type 'uint8_t[16]' {aka 'unsigned char[16]'} with mismatched bound [-Werror=array-parameter=]
+   49 | owerror_t aes128_enc(uint8_t buffer[16], uint8_t key[16]) {
+      |                      ~~~~~~~~^~~~~~~~~~
+In file included from /home/maribu/Repos/software/RIOT/build/pkg/openwsn/drivers/common/crypto/aes128.c:12:
+/home/maribu/Repos/software/RIOT/build/pkg/openwsn/drivers/common/crypto/aes128.h:22:31: note: previously declared as 'uint8_t *' {aka 'unsigned char *'}
+   22 | owerror_t aes128_enc(uint8_t *buffer, uint8_t *key);
+      |                      ~~~~~~~~~^~~~~~
+/home/maribu/Repos/software/RIOT/build/pkg/openwsn/drivers/common/crypto/aes128.c:49:50: error: argument 2 of type 'uint8_t[16]' {aka 'unsigned char[16]'} with mismatched bound [-Werror=array-parameter=]
+   49 | owerror_t aes128_enc(uint8_t buffer[16], uint8_t key[16]) {
+      |                                          ~~~~~~~~^~~~~~~
+In file included from /home/maribu/Repos/software/RIOT/build/pkg/openwsn/drivers/common/crypto/aes128.c:12:
+/home/maribu/Repos/software/RIOT/build/pkg/openwsn/drivers/common/crypto/aes128.h:22:48: note: previously declared as 'uint8_t *' {aka 'unsigned char *'}
+   22 | owerror_t aes128_enc(uint8_t *buffer, uint8_t *key);
+      |                                       ~~~~~~~~~^~~
+cc1: all warnings being treated as errors
+```
+---
+ drivers/common/crypto/aes128.c | 2 +-
+ drivers/common/crypto/hkdf.c   | 2 +-
+ drivers/common/crypto/hmac.c   | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/common/crypto/aes128.c b/drivers/common/crypto/aes128.c
+index c74da586..16674092 100644
+--- a/drivers/common/crypto/aes128.c
++++ b/drivers/common/crypto/aes128.c
+@@ -46,7 +46,7 @@ void aes_enc(unsigned char *state, unsigned char *expandedKey);
+ 
+ //=========================== public ==========================================
+ 
+-owerror_t aes128_enc(uint8_t buffer[16], uint8_t key[16]) {
++owerror_t aes128_enc(uint8_t *buffer, uint8_t *key) {
+     uint8_t expandedKey[176];
+ 
+     expand_key(expandedKey, key);       // expand the key into 176 bytes
+diff --git a/drivers/common/crypto/hkdf.c b/drivers/common/crypto/hkdf.c
+index bd12ef2e..e8d33b3b 100644
+--- a/drivers/common/crypto/hkdf.c
++++ b/drivers/common/crypto/hkdf.c
+@@ -315,7 +315,7 @@ int hkdfFinalBits(HKDFContext *context, uint8_t ikm_bits,
+ int hkdfResult(HKDFContext *context,
+                uint8_t prk[USHAMaxHashSize],
+                const unsigned char *info, int info_len,
+-               uint8_t okm[ ], int okm_len)
++               uint8_t okm[USHAMaxHashSize], int okm_len)
+ {
+   uint8_t prkbuf[USHAMaxHashSize];
+   int ret;
+diff --git a/drivers/common/crypto/hmac.c b/drivers/common/crypto/hmac.c
+index b09c50e5..f0a689db 100644
+--- a/drivers/common/crypto/hmac.c
++++ b/drivers/common/crypto/hmac.c
+@@ -218,7 +218,7 @@ int hmacFinalBits(HMACContext *context,
+  *   sha Error Code.
+  *
+  */
+-int hmacResult(HMACContext *context, uint8_t *digest)
++int hmacResult(HMACContext *context, uint8_t digest[USHAMaxHashSize])
+ {
+   int ret;
+   if (!context) return shaNull;
+-- 
+2.36.0
+

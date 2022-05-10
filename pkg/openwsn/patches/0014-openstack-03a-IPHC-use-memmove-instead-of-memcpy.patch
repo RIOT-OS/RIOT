@@ -1,0 +1,26 @@
+From d7c8d2a0ee86b7a2e1a7915f4f789c27fde83cf9 Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Sun, 3 Apr 2022 20:39:23 +0200
+Subject: [PATCH] openstack/03a-IPHC: use memmove() instead of memcpy()
+
+The memory segments do overlap, so we must use memmove() instead of memcpy().
+---
+ openstack/03a-IPHC/frag.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/openstack/03a-IPHC/frag.c b/openstack/03a-IPHC/frag.c
+index d2ca5f45..7ee0b3ba 100644
+--- a/openstack/03a-IPHC/frag.c
++++ b/openstack/03a-IPHC/frag.c
+@@ -708,7 +708,7 @@ opentimers_id_t frag_timerq_dequeue(void) {
+     opentimers_id_t expired;
+     expired = frag_vars.frag_timerq[0];
+ 
+-    memcpy((uint8_t *) frag_vars.frag_timerq, (uint8_t * ) & (frag_vars.frag_timerq[1]), NUM_OF_CONCURRENT_TIMERS - 1);
++    memmove((uint8_t *) frag_vars.frag_timerq, (uint8_t * ) & (frag_vars.frag_timerq[1]), NUM_OF_CONCURRENT_TIMERS - 1);
+     frag_vars.frag_timerq[NUM_OF_CONCURRENT_TIMERS - 1] = 0;
+ 
+     return expired;
+-- 
+2.32.0
+

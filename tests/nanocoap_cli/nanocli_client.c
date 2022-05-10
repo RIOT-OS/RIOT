@@ -204,9 +204,8 @@ int nanotest_client_url_cmd(int argc, char **argv)
         return -1;
     }
 
-    uint8_t buffer[NANOCOAP_BLOCKWISE_BUF(COAP_BLOCKSIZE_32)];
-    return  nanocoap_get_blockwise_url(argv[2], COAP_BLOCKSIZE_32, buffer,
-                                       _blockwise_cb, NULL);
+    return nanocoap_get_blockwise_url(argv[2], COAP_BLOCKSIZE_32,
+                                      _blockwise_cb, NULL);
 error:
     printf("usage: %s <get|post|put> <url> [data]\n", argv[0]);
     return -1;

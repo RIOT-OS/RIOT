@@ -97,7 +97,11 @@ extern "C" {
  * @brief The maximum number of threads to be scheduled
  */
 #ifndef MAXTHREADS
+#if defined(MODULE_CORE_THREAD)
 #define MAXTHREADS 32
+#else
+#define MAXTHREADS 0
+#endif
 #endif
 
 /**

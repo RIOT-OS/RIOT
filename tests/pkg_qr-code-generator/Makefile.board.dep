@@ -1,4 +1,4 @@
 # Boards with a screen can use disp_dev
-ifneq (,$(filter stm32f429i-disc% stm32f746g-disco pinetime adafruit-clue esp32-wrover-kit,$(BOARD)))
+ifneq (,$(filter stm32f429i-disc% stm32f746g-disco stm32f7508-dk pinetime adafruit-clue adafruit-pybadge esp32-wrover-kit,$(BOARD)))
   USEMODULE += disp_dev
 endif

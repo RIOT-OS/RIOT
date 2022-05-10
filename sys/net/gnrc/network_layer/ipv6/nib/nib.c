@@ -818,7 +818,9 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     evtimer_del(&_nib_evtimer, &netif->ipv6.search_rtr.event);
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     if (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_6lbr(netif)) {
-        _set_rtr_adv(netif);
+        if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)) {
+            _set_rtr_adv(netif);
+        }
         /* but re-fetch information from router in time */
         _evtimer_add(netif, GNRC_IPV6_NIB_SEARCH_RTR,
                      &netif->ipv6.search_rtr, (next_timeout >> 2) * 3);
@@ -1005,7 +1007,6 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         gnrc_ndp_nbr_adv_send(&nbr_sol->tgt, netif, &ipv6->src, false, NULL);
     }
     else {
-        gnrc_pktsnip_t *reply_aro = NULL;
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
         ndp_opt_t *sl2ao = NULL;
         sixlowpan_nd_opt_ar_t *aro = NULL;
@@ -1027,7 +1028,7 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                     if (gnrc_netif_is_6lr(netif)) {
                         DEBUG("nib: Storing SL2AO for later handling\n");
                         sl2ao = opt;
-                        break;
+                        break; /* SL2AO is handled below together with an ARO */
                     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LR */
                     _handle_sl2ao(netif, ipv6, (const icmpv6_hdr_t *)nbr_sol,
@@ -1045,7 +1046,18 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                     break;
             }
         }
-        reply_aro = _copy_and_handle_aro(netif, ipv6, nbr_sol, aro, sl2ao);
+        gnrc_pktsnip_t *reply_aro = NULL;
+        if (aro && sl2ao) {
+        /* If no SLLAO is included, then any included ARO is ignored. */
+            if (!(reply_aro = _copy_and_handle_aro(netif, ipv6, nbr_sol, aro, sl2ao))) {
+            /* If the Length field is not two, or if the Status field is not zero,
+               then the NS is silently ignored.*/
+                return;
+            }
+        }
+        else if (sl2ao) {
+            _handle_sl2ao(netif, ipv6, (const icmpv6_hdr_t *)nbr_sol, sl2ao);
+        }
         /* check if target address is anycast */
         if (netif->ipv6.addrs_flags[tgt_idx] & GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST) {
             _send_delayed_nbr_adv(netif, &nbr_sol->tgt, ipv6, reply_aro);

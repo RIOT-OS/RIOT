@@ -29,7 +29,7 @@ extern "C" {
  * @brief Enable toplevel ranging services
  */
 #ifndef MYNEWT_VAL_TWR_DS_ENABLED
-#define MYNEWT_VAL_TWR_DS_ENABLED (IS_ACTIVE(MODULE_UWB_CORE_TWR_DS))
+#define MYNEWT_VAL_TWR_DS_ENABLED (IS_USED(MODULE_UWB_CORE_TWR_DS))
 #endif
 
 /**
@@ -43,7 +43,7 @@ extern "C" {
  * @brief tx holdoff delay for DS TWR (usec)
  */
 #ifndef MYNEWT_VAL_TWR_DS_TX_HOLDOFF
-#define MYNEWT_VAL_TWR_DS_TX_HOLDOFF (((uint32_t)0x0300))
+#define MYNEWT_VAL_TWR_DS_TX_HOLDOFF (((uint32_t)0x0300 + 0xA0 * IS_USED(MODULE_UWB_CORE_RNG_TRX_INFO)))
 #endif
 
 #ifdef __cplusplus

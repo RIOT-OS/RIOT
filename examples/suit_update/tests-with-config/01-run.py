@@ -123,20 +123,19 @@ def get_reachable_addr(child):
     return "[{}]".format(client_addr)
 
 
-def app_version(child):
+def seq_no(child):
     utils.test_utils_interactive_sync_shell(child, 5, 1)
     # get version of currently running image
-    # "Image Version: 0x00000000"
-    child.sendline('riotboot-hdr')
-    child.expect(r"Image Version: (?P<app_ver>0x[0-9a-fA-F:]+)\r\n")
-    app_ver = int(child.match.group("app_ver"), 16)
+    # "seq_no: 0x00000000"
+    child.sendline('suit seq_no')
+    child.expect(r"seq_no: (?P<seq_no>0x[0-9a-fA-F:]+)\r\n")
+    app_ver = int(child.match.group("seq_no"), 16)
     return app_ver
 
 
 def running_slot(child):
     utils.test_utils_interactive_sync_shell(child, 5, 1)
-    # get version of currently running image
-    # "Image Version: 0x00000000"
+
     child.sendline('current-slot')
     child.expect(r"Running from slot (\d+)\r\n")
     slot = int(child.match.group(1))
@@ -144,8 +143,8 @@ def running_slot(child):
 
 
 def _test_invalid_version(child, client, app_ver):
-    publish(TMPDIR.name, COAP_HOST, app_ver - 1)
-    notify(COAP_HOST, client, app_ver - 1)
+    publish(TMPDIR.name, COAP_HOST, app_ver)
+    notify(COAP_HOST, client, app_ver)
     child.expect_exact("suit_coap: trigger received")
     child.expect_exact("suit: verifying manifest signature")
     child.expect_exact("seq_nr <= running image")
@@ -186,12 +185,12 @@ def _test_successful_update(child, client, app_ver):
 
 def _test_suit_command_is_there(child):
     child.sendline('suit')
-    child.expect_exact("Usage: suit <manifest url>")
+    child.expect_exact("Usage: suit fetch <manifest url>")
 
 
 def testfunc(child):
     # Get current app_ver
-    current_app_ver = app_version(child)
+    current_app_ver = seq_no(child)
     # Verify client is reachable and get address
     client = get_reachable_addr(child)
 

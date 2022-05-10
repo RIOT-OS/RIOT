@@ -5137,8 +5137,11 @@ boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member RTT_FREQUENCY
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_CHANNELS \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member TIMER_1_CHANNELS \(macro definition\) of file periph_conf\.h is not documented\.
+boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member TIMER_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member UART_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member ULTRA_LOW_POWER_INTERNAL_OSC_SOURCE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member adc_channels\[\] \(variable\) of file periph_conf\.h is not documented\.
@@ -14283,7 +14286,6 @@ sys/include/net/coap\.h:[0-9]+: warning: Member COAP_TYPE_ACK \(macro definition
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_TYPE_CON \(macro definition\) of group net_coap is not documented\.
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_TYPE_NON \(macro definition\) of group net_coap is not documented\.
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_TYPE_RST \(macro definition\) of group net_coap is not documented\.
-sys/include/net/cord/config\.h:[0-9]+: warning: unbalanced grouping commands
 sys/include/net/dhcpv6/client\.h:[0-9]+: warning: unbalanced grouping commands
 sys/include/net/dhcpv6\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 sys/include/net/dns\.h:[0-9]+: warning: Member DNS_CLASS_IN \(macro definition\) of group net_dns is not documented\.
@@ -14945,3 +14947,12 @@ boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member ETH_DMA_ISR
 boards/nucleo\-f439zi/include/periph_conf\.h:[0-9]+: warning: Member eth_config \(variable\) of file periph_conf\.h is not documented\.
 boards/arduino\-mega2560/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_ADJUST_SET \(macro definition\) of file board\.h is not documented\.
 boards/arduino\-mega2560/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_ADJUST_SLEEP \(macro definition\) of file board\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_ADV_ITVL_MS \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_ADV_DURATION_MS \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_FLAGS \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_PHY \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_TX_POWER \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_CHANNEL_MAP \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_OWN_ADDR_TYPE \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_FILTER_POLICY \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
+pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_PARAMS \(macro definition\) of file nimble_autoadv_params\.h is not documented\.

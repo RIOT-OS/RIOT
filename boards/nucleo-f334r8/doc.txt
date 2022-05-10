@@ -77,10 +77,18 @@ could be performed manually; however, the cpy2remed (copy to removable
 media) PROGRAMMER script does this automatically. To program board in
 this manner, use the command:
 ```
-make BOARD=nucleo-f429zi PROGRAMMER=cpy2remed flash
+make BOARD=nucleo-f334r8 PROGRAMMER=cpy2remed flash
 ```
 @note This PROGRAMMER requires ST-LINK firmware 2.37.26 or newer. Firmware updates
 could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
+
+## Accessing RIOT shell
+
+Default RIOT shell access utilize VCP (Virtual COM Port) via USB interface,
+provided by integrated ST-LINK programmer. ST-LINK is connected to the
+microcontroller USART2.
+
+The default baud rate is 115200.
 
 ## Supported Toolchains
 For using the ST Nucleo-F334R8 board we strongly recommend the usage of the

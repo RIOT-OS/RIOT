@@ -27,7 +27,7 @@
 
 #define NETIF_ATWINC_NUMOF ARRAY_SIZE(atwinc15x0_params)
 
-static struct netif netif[NETIF_ATWINC_NUMOF];
+static lwip_netif_t netif[NETIF_ATWINC_NUMOF];
 static atwinc15x0_t atwinc15x0_devs[NETIF_ATWINC_NUMOF];
 
 static void auto_init_atwinc15x0(void)

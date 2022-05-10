@@ -215,7 +215,7 @@ static int gap_event_cb(struct ble_gap_event *event, void *arg)
         case BLE_GAP_EVENT_CONNECT:
             if (event->connect.status) {
                 _stop_updating();
-                nimble_autoadv_start();
+                nimble_autoadv_start(NULL);
                 return 0;
             }
             _conn_handle = event->connect.conn_handle;
@@ -223,7 +223,7 @@ static int gap_event_cb(struct ble_gap_event *event, void *arg)
 
         case BLE_GAP_EVENT_DISCONNECT:
             _stop_updating();
-            nimble_autoadv_start();
+            nimble_autoadv_start(NULL);
             break;
 
         case BLE_GAP_EVENT_SUBSCRIBE:
@@ -296,29 +296,32 @@ int main(void)
     assert(res == 0);
 
     /* set the device name */
-    ble_svc_gap_device_name_set(NIMBLE_AUTOADV_DEVICE_NAME);
+    ble_svc_gap_device_name_set(CONFIG_NIMBLE_AUTOADV_DEVICE_NAME);
     /* reload the GATT server to link our added services */
     ble_gatts_start();
 
-    struct ble_gap_adv_params advp;
-    memset(&advp, 0, sizeof(advp));
-
-    advp.conn_mode = BLE_GAP_CONN_MODE_UND;
-    advp.disc_mode = BLE_GAP_DISC_MODE_GEN;
-    advp.itvl_min  = BLE_GAP_ADV_FAST_INTERVAL1_MIN;
-    advp.itvl_max  = BLE_GAP_ADV_FAST_INTERVAL1_MAX;
-
+    nimble_autoadv_cfg_t cfg = {
+        .adv_duration_ms = BLE_HS_FOREVER,
+        .adv_itvl_ms = BLE_GAP_ADV_ITVL_MS(100),
+        .flags = NIMBLE_AUTOADV_FLAG_CONNECTABLE | NIMBLE_AUTOADV_FLAG_LEGACY | \
+                 NIMBLE_AUTOADV_FLAG_SCANNABLE,
+        .channel_map = 0,
+        .filter_policy = 0,
+        .own_addr_type = nimble_riot_own_addr_type,
+        .phy = NIMBLE_PHY_1M,
+        .tx_power = 0,
+    };
     /* set advertise params */
-    nimble_autoadv_set_ble_gap_adv_params(&advp);
+    nimble_autoadv_cfg_update(&cfg);
 
     /* configure and set the advertising data */
     uint16_t hrs_uuid = BLE_GATT_SVC_HRS;
     nimble_autoadv_add_field(BLE_GAP_AD_UUID16_INCOMP, &hrs_uuid, sizeof(hrs_uuid));
 
-    nimble_auto_adv_set_gap_cb(&gap_event_cb, NULL);
+    nimble_autoadv_set_gap_cb(&gap_event_cb, NULL);
 
     /* start to advertise this node */
-    nimble_autoadv_start();
+    nimble_autoadv_start(NULL);
 
     /* run an event loop for handling the heart rate update events */
     event_loop(&_eq);

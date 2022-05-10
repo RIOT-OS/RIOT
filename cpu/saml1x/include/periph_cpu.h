@@ -30,16 +30,8 @@ extern "C" {
  * @name    Power mode configuration
  * @{
  */
-#define PM_NUM_MODES        (1)
+#define PM_NUM_MODES        (2)
 /** @} */
-
-/**
- * @brief   Override the default initial PM blocker
- * @todo   Idle modes are enabled by default, deep sleep mode blocked
- */
-#ifndef PM_BLOCKER_INITIAL
-#define PM_BLOCKER_INITIAL  0x00000001
-#endif
 
 /**
  * @name   SAML1x GCLK definitions

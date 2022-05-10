@@ -84,31 +84,26 @@ Toolchain {#toolchain}
 
 To install the necessary Rust components, it is easiest use [**rustup**, installed as described on its website].
 
-Using most of Rust on RIOT requires a nightly version of Rust,
-because some transpiled expressions for RIOT make use of unstable features,
-and because the RIOT wrappers use some unstable idioms.
+Using Rust on RIOT needs the latest stable or nightly version of Rust,
+depending on the precise example used.
+(Several modules, such as CoAP, SAUL or the shell, need features not yet available on stable yet;
+the minimal test is performed on stable, and examples are configured to use stable as it becomes available).
 
-@note
-Building on stable is supported for some examples and platforms starting with Rust 1.59
-(e.g., the rust-hello-world on any ARM Cortex, but not yet on native).
-Try it out by adding `CARGO_CHANNEL=stable` to the project's Makefile;
-where it doesn't work, rustc will complain that "`#![feature]` may not be used on the stable release channel".
-
-@note
-A stable version of Rust is not currently provided with the Docker images;
-consequently, builds on stable are not tested as regularly as builds on nightly.
-
-Make sure you have both the nightly **toolchain**
+Make sure you have both the nightly and stable **toolchains**
 and the core library for the CPU (**target**) of your choice available:
 
 ```
 $ rustup toolchain add nightly
+$ rustup toolchain add stable
 $ rustup target add thumbv7m-none-eabi --toolchain nightly
+$ rustup target add thumbv7m-none-eabi --toolchain stable
 ```
 
-(Substitute thumbv7m-none-eavi with the value of `RUST_TARGET`
+Substitute thumbv7m-none-eabi with the value of `RUST_TARGET`
 in the output of `make info-build` of an application that has your current board selected,
 or just add it later whenever the Rust compiler complains about not finding the core library for a given target).
+Installing only nightly will work just as well,
+but you may need to remove the `CARGO_CHANNEL = stable` lines from tests or examples.
 
 
 While Rust comes with its own [cargo] dependency tracker for any Rust code,
@@ -158,4 +153,4 @@ Dealing with this,
 and other aspects of maintenance of the crates,
 is described in [the `rust_minimal` test's README].
 
-[the `rust_minimal` test's README]: (https://github.com/RIOT-OS/RIOT/blob/master/tests/rust_minimal/README.md).
+[the `rust_minimal` test's README]: https://github.com/RIOT-OS/RIOT/blob/master/tests/rust_minimal/README.md

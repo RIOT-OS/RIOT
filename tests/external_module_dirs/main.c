@@ -32,7 +32,11 @@
 
 int main(void)
 {
-    puts("If it compiles, it works!");
     printf("Message: %s\n", external_module_message);
+    if (!external_module_initialized) {
+        puts("External module has not been initialized.");
+        return 1;
+    }
+    puts("Initialization worked!");
     return 0;
 }

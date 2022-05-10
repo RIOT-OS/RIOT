@@ -12,6 +12,7 @@ config MODULE_POSIX_HEADERS
     bool
 
 rsource "inet/Kconfig"
+rsource "pthread/Kconfig"
 rsource "sleep/Kconfig"
 
 endmenu # Posix

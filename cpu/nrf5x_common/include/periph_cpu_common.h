@@ -80,6 +80,50 @@ extern "C" {
  */
 #define GPIO_MODE(oe, ic, pr, dr)   (oe | (ic << 1) | (pr << 2) | (dr << 8))
 
+#ifndef DOXYGEN /* BEGIN: GPIO LL overwrites */
+#define HAVE_GPIO_SLEW_T
+typedef enum {
+    GPIO_SLEW_SLOWEST = 0,
+    GPIO_SLEW_SLOW = 0,
+    GPIO_SLEW_FAST = 0,
+    GPIO_SLEW_FASTEST = 0,
+} gpio_slew_t;
+
+#define HAVE_GPIO_PULL_STRENGTH_T
+typedef enum {
+    GPIO_PULL_WEAKEST = 0,
+    GPIO_PULL_WEAK = 0,
+    GPIO_PULL_STRONG = 0,
+    GPIO_PULL_STRONGEST = 0
+} gpio_pull_strength_t;
+
+#define HAVE_GPIO_DRIVE_STRENGTH_T
+typedef enum {
+    GPIO_DRIVE_WEAKEST = 0,
+    GPIO_DRIVE_WEAK = 0,
+    GPIO_DRIVE_STRONG = 1,
+    GPIO_DRIVE_STRONGEST = 1
+} gpio_drive_strength_t;
+
+#define HAVE_GPIO_IRQ_TRIG_T
+typedef enum {
+    GPIO_TRIGGER_EDGE_RISING    = GPIOTE_CONFIG_POLARITY_LoToHi << GPIOTE_CONFIG_POLARITY_Pos,
+    GPIO_TRIGGER_EDGE_FALLING   = GPIOTE_CONFIG_POLARITY_HiToLo << GPIOTE_CONFIG_POLARITY_Pos,
+    GPIO_TRIGGER_EDGE_BOTH      = GPIO_TRIGGER_EDGE_RISING | GPIO_TRIGGER_EDGE_FALLING,
+    GPIO_TRIGGER_LEVEL_HIGH     = 0, /**< unsupported */
+    GPIO_TRIGGER_LEVEL_LOW      = 0, /**< unsupported */
+} gpio_irq_trig_t;
+
+#define HAVE_GPIO_PULL_T
+typedef enum {
+    GPIO_FLOATING = 0,
+    GPIO_PULL_UP = GPIO_PIN_CNF_PULL_Pullup << GPIO_PIN_CNF_PULL_Pos,
+    GPIO_PULL_DOWN = GPIO_PIN_CNF_PULL_Pulldown << GPIO_PIN_CNF_PULL_Pos,
+    /* GPIO_PULL_KEEP is not supported by, gpio_ll_init() returns -ENOTSUP */
+    GPIO_PULL_KEEP = 0xff
+} gpio_pull_t;
+#endif /* END: GPIO LL overwrites */
+
 /**
  * @brief   No support for HW chip select...
  */

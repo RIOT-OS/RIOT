@@ -1,0 +1,18 @@
+USEMODULE += cpp11-compat
+
+USEPKG += flatbuffers
+USEPKG += gemmlowp
+USEPKG += ruy
+
+USEMODULE += tflite-c
+USEMODULE += tflite-core-api
+USEMODULE += tflite-kernels
+USEMODULE += tflite-kernels-internal
+USEMODULE += tflite-kernels-internal-reference
+USEMODULE += tflite-micro
+USEMODULE += tflite-micro-kernels
+USEMODULE += tflite-micro-memory-planner
+USEMODULE += tflite-schema
+
+# This package doesn't work on riscv and mips
+FEATURES_BLACKLIST += arch_mips32r2 arch_riscv

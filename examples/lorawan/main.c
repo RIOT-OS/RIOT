@@ -27,6 +27,7 @@
 #include "thread.h"
 #include "fmt.h"
 
+#include "periph/pm.h"
 #if IS_USED(MODULE_PERIPH_RTC)
 #include "periph/rtc.h"
 #else
@@ -36,18 +37,6 @@
 
 #include "net/loramac.h"
 #include "semtech_loramac.h"
-
-#if IS_USED(MODULE_SX127X)
-#include "sx127x.h"
-#include "sx127x_netdev.h"
-#include "sx127x_params.h"
-#endif
-
-#if IS_USED(MODULE_SX126X)
-#include "sx126x.h"
-#include "sx126x_netdev.h"
-#include "sx126x_params.h"
-#endif
 
 /* By default, messages are sent every 20s to respect the duty cycle
    on each channel */
@@ -62,13 +51,7 @@
 static kernel_pid_t sender_pid;
 static char sender_stack[THREAD_STACKSIZE_MAIN / 2];
 
-static semtech_loramac_t loramac;
-#if IS_USED(MODULE_SX127X)
-static sx127x_t sx127x;
-#endif
-#if IS_USED(MODULE_SX126X)
-static sx126x_t sx126x;
-#endif
+extern semtech_loramac_t loramac;
 #if !IS_USED(MODULE_PERIPH_RTC)
 static ztimer_t timer;
 #endif
@@ -148,21 +131,15 @@ int main(void)
     puts("LoRaWAN Class A low-power application");
     puts("=====================================");
 
-    /* Initialize the radio driver */
-#if IS_USED(MODULE_SX127X)
-    sx127x_setup(&sx127x, &sx127x_params[0], 0);
-    loramac.netdev = &sx127x.netdev;
-    loramac.netdev->driver = &sx127x_driver;
+    /*
+     * Enable deep sleep power mode (e.g. STOP mode on STM32) which
+     * in general provides RAM retention after wake-up.
+     */
+#if IS_USED(MODULE_PM_LAYERED)
+    for (unsigned i = 1; i < PM_NUM_MODES - 1; ++i) {
+        pm_unblock(i);
+    }
 #endif
-
-#if IS_USED(MODULE_SX126X)
-    sx126x_setup(&sx126x, &sx126x_params[0], 0);
-    loramac.netdev = &sx126x.netdev;
-    loramac.netdev->driver = &sx126x_driver;
-#endif
-
-    /* Initialize the loramac stack */
-    semtech_loramac_init(&loramac);
 
 #ifdef USE_OTAA /* OTAA activation mode */
     /* Convert identifiers and keys strings to byte arrays */

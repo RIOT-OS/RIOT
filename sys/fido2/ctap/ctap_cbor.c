@@ -1574,6 +1574,7 @@ static int _parse_allow_list(CborValue *it, ctap_cred_desc_alt_t *allow_list,
 {
     size_t len2 = *allow_list_len;
     int retval = _parse_exclude_list(it, allow_list, &len2);
+
     *allow_list_len = (uint8_t)len2;
     return retval;
 }
@@ -1729,6 +1730,7 @@ static int _parse_byte_array_u8len(CborValue *it, uint8_t *dst, uint8_t *len)
 {
     size_t len2 = *len;
     int retval = _parse_byte_array(it, dst, &len2);
+
     *len = (uint8_t)len2;
     return retval;
 }
@@ -1757,6 +1759,7 @@ static int _parse_text_string_u8len(CborValue *it, char *dst, uint8_t *len)
 {
     size_t len2 = *len;
     int retval = _parse_text_string(it, dst, &len2);
+
     *len = (uint8_t)len2;
     return retval;
 }

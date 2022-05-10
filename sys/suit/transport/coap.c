@@ -32,7 +32,7 @@
 #include "net/nanocoap_sock.h"
 #include "thread.h"
 #include "periph/pm.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "suit/transport/coap.h"
 #include "net/sock/util.h"
@@ -104,39 +104,10 @@ static inline void _print_download_progress(suit_manifest_t *manifest,
 
 static kernel_pid_t _suit_coap_pid;
 
-ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
-                             void *context)
-{
-    coap_resource_subtree_t *subtree = context;
-    return coap_tree_handler(pkt, buf, len, subtree->resources,
-                             subtree->resources_numof);
-}
-
-static inline uint32_t _now(void)
-{
-    return xtimer_now_usec();
-}
-
-static inline uint32_t deadline_from_interval(int32_t interval)
-{
-    assert(interval >= 0);
-    return _now() + (uint32_t)interval;
-}
-
-static inline uint32_t deadline_left(uint32_t deadline)
-{
-    int32_t left = (int32_t)(deadline - _now());
-
-    if (left < 0) {
-        left = 0;
-    }
-    return left;
-}
-
-static void _suit_handle_url(const char *url, coap_blksize_t blksize, void *work_buf)
+static void _suit_handle_url(const char *url, coap_blksize_t blksize)
 {
     LOG_INFO("suit_coap: downloading \"%s\"\n", url);
-    ssize_t size = nanocoap_get_blockwise_url_to_buf(url, blksize, work_buf,
+    ssize_t size = nanocoap_get_blockwise_url_to_buf(url, blksize,
                                                      _manifest_buf,
                                                      SUIT_MANIFEST_BUFSIZE);
     if (size >= 0) {
@@ -161,7 +132,7 @@ static void _suit_handle_url(const char *url, coap_blksize_t blksize, void *work
             const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(
                 riotboot_slot_other());
             riotboot_hdr_print(hdr);
-            xtimer_sleep(1);
+            ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
 
             if (riotboot_hdr_validate(hdr) == 0) {
                 LOG_INFO("suit_coap: rebooting...\n");
@@ -225,8 +196,6 @@ static void *_suit_coap_thread(void *arg)
 {
     (void)arg;
 
-    uint8_t buffer[NANOCOAP_BLOCKWISE_BUF(CONFIG_SUIT_COAP_BLOCKSIZE)];
-
     LOG_INFO("suit_coap: started.\n");
     msg_t msg_queue[4];
     msg_init_queue(msg_queue, 4);
@@ -240,7 +209,7 @@ static void *_suit_coap_thread(void *arg)
         switch (m.content.value) {
             case SUIT_MSG_TRIGGER:
                 LOG_INFO("suit_coap: trigger received\n");
-                _suit_handle_url(_url, CONFIG_SUIT_COAP_BLOCKSIZE, buffer);
+                _suit_handle_url(_url, CONFIG_SUIT_COAP_BLOCKSIZE);
                 break;
             default:
                 LOG_WARNING("suit_coap: warning: unhandled msg\n");

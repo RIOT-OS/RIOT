@@ -1,5 +1,5 @@
 ifneq (,$(filter gcoap,$(USEMODULE)))
-   USEMODULE += gnrc_sock_async
+  USEMODULE += gnrc_sock_async
 endif
 
 ifneq (,$(filter sock_async,$(USEMODULE)))

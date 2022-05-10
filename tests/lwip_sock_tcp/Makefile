@@ -29,4 +29,7 @@ CFLAGS += -DLWIP_SOCK_TCP_ACCEPT_TIMEOUT=500
 CFLAGS += -DLWIP_NETIF_LOOPBACK=1
 CFLAGS += -DLWIP_HAVE_LOOPIF=1
 
+# microbit qemu failing currently
+TEST_ON_CI_BLACKLIST += microbit
+
 include $(RIOTBASE)/Makefile.include

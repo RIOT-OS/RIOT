@@ -19,10 +19,7 @@
  * @}
  */
 
-#define ENABLE_DEBUG 0
-
 #include <assert.h>
-#include <debug.h>
 #include <errno.h>
 #include <isrpipe.h>
 #include <stdio.h>
@@ -48,6 +45,9 @@ static candev_mcp2515_t mcp2515_dev;
 #else
 /* add includes for other candev drivers here */
 #endif
+
+#define ENABLE_DEBUG 0
+#include <debug.h>
 
 /* Default is not using loopback test mode */
 #ifndef CONFIG_USE_LOOPBACK_MODE
@@ -96,7 +96,6 @@ static int _send(int argc, char **argv)
 
 static int _receive(int argc, char **argv)
 {
-    uint8_t buf[CAN_MAX_DLEN];
     int n = 1;
 
     if (argc > 1) {
@@ -108,26 +107,21 @@ static int _receive(int argc, char **argv)
     }
 
     for (int i = 0; i < n; i++) {
-        uint32_t can_id = 0;
-        uint8_t can_dlc = 0;
+        struct can_frame frame;
 
         puts("Reading from Rxbuf...");
-        isrpipe_read(&rxbuf, buf, 4);       /* can-id */
-        can_id = ((uint32_t)buf[0] << 24) |
-                 ((uint32_t)buf[1] << 16) |
-                 ((uint32_t)buf[2] << 8) |
-                 ((uint32_t)buf[3]);
-        isrpipe_read(&rxbuf, buf, 1);       /* can-dlc */
-        can_dlc = buf[0];
-        if (can_dlc > 0) {
-            isrpipe_read(&rxbuf, buf, can_dlc); /* data */
+        isrpipe_read(&rxbuf, (uint8_t *)&(frame.can_id), sizeof(frame.can_id));
+        frame.can_id &= 0x1FFFFFFF; /* clear invalid bits */
+        isrpipe_read(&rxbuf, (uint8_t *)&(frame.can_dlc), 1);
+        printf("id: %" PRIx32 " dlc: %" PRIx8, frame.can_id, frame.can_dlc);
+        if (frame.can_dlc > 0) {
+            printf(" data: ");
+            isrpipe_read(&rxbuf, frame.data, frame.can_dlc); /* data */
+            for (int i = 0; i < frame.can_dlc; i++) {
+                printf("0x%X ", frame.data[i]);
+            }
         }
-
-        printf("id: %" PRIx32 " dlc: %" PRIx8 " Data: \n", can_id, can_dlc);
-        for (int i = 0; i < can_dlc; i++) {
-            printf("0x%X ", buf[i]);
-        }
-        puts("");
+        putchar('\n');
     }
 
     return 0;
@@ -163,25 +157,17 @@ static void _can_event_callback(candev_t *dev, candev_event_t event, void *arg)
 
         frame = (struct can_frame *)arg;
 
-        DEBUG("\tid: %" PRIx32 " dlc: %" PRIx8 " Data: \n\t", frame->can_id,
+        DEBUG("            id: %" PRIx32 " dlc: %" PRIx8 " data: ", frame->can_id & 0x1FFFFFFF,
               frame->can_dlc);
         for (uint8_t i = 0; i < frame->can_dlc; i++) {
             DEBUG("0x%X ", frame->data[i]);
         }
-        DEBUG(" ");
+        DEBUG_PUTS("");
 
         /* Store in buffer until user requests the data */
-        isrpipe_write_one(&rxbuf,
-                          (uint8_t)((frame->can_id & 0x1FFFFFFF) >> 24));
-        isrpipe_write_one(&rxbuf,
-                          (uint8_t)((frame->can_id & 0xFF0000) >> 16));
-        isrpipe_write_one(&rxbuf, (uint8_t)((frame->can_id & 0xFF00) >> 8));
-        isrpipe_write_one(&rxbuf, (uint8_t)((frame->can_id & 0xFF)));
-
+        isrpipe_write(&rxbuf, (uint8_t *)&(frame->can_id), sizeof(frame->can_id));
         isrpipe_write_one(&rxbuf, frame->can_dlc);
-        for (uint8_t i = 0; i < frame->can_dlc; i++) {
-            isrpipe_write_one(&rxbuf, frame->data[i]);
-        }
+        isrpipe_write(&rxbuf, frame->data, frame->can_dlc);
 
         break;
     case CANDEV_EVENT_RX_ERROR:

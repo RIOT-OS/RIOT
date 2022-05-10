@@ -257,6 +257,8 @@ static inline void event_queue_claim(event_queue_t *queue)
  * in the previous position on the queue. So reposting an event while it is
  * already on the queue will have no effect.
  *
+ * @pre     queue should be initialized
+ *
  * @param[in]   queue   event queue to queue event in
  * @param[in]   event   event to queue in event queue
  */
@@ -310,6 +312,8 @@ event_t *event_get(event_queue_t *queue);
  *          the strictest requirements.
  *
  * @pre     0 < @p n_queues (expect blowing `assert()` otherwise)
+ * @pre     The queue must have a waiter (i.e. it should have been claimed, or
+ *          initialized using @ref event_queue_init, @ref event_queues_init)
  *
  * @param[in]   queues      Array of event queues to get event from
  * @param[in]   n_queues    Number of event queues passed in @p queues
@@ -328,6 +332,9 @@ event_t *event_wait_multi(event_queue_t *queues, size_t n_queues);
  *
  * @warning     There can only be a single waiter on a queue!
  *
+ * @pre     The queue must have a waiter (i.e. it should have been claimed, or
+ *          initialized using @ref event_queue_init, @ref event_queues_init)
+ *
  * @param[in]   queue   event queue to get event from
  *
  * @returns     pointer to next event
@@ -341,6 +348,9 @@ static inline event_t *event_wait(event_queue_t *queue)
 /**
  * @brief   Get next event from event queue, blocking until timeout expires
  *
+ * @pre     The queue must have a waiter (i.e. it should have been claimed, or
+ *          initialized using @ref event_queue_init, @ref event_queues_init)
+ *
  * @param[in]   queue    queue to query for an event
  * @param[in]   timeout  maximum time to wait for an event to be posted in us
  *
@@ -351,6 +361,9 @@ event_t *event_wait_timeout(event_queue_t *queue, uint32_t timeout);
 
 /**
  * @brief   Get next event from event queue, blocking until timeout expires
+ *
+ * @pre     The queue must have a waiter (i.e. it should have been claimed, or
+ *          initialized using @ref event_queue_init, @ref event_queues_init)
  *
  * @param[in]   queue    queue to query for an event
  * @param[in]   timeout  maximum time to wait for an event to be posted in us
@@ -367,6 +380,9 @@ event_t *event_wait_timeout64(event_queue_t *queue, uint64_t timeout);
  *
  * This function is the same as event_wait_timeout() with the difference that it
  * uses ztimer instead of xtimer as timer backend.
+ *
+ * @pre     The queue must have a waiter (i.e. it should have been claimed, or
+ *          initialized using @ref event_queue_init, @ref event_queues_init)
  *
  * @param[in]   queue    queue to query for an event
  * @param[in]   clock    ztimer clock to use
@@ -398,6 +414,9 @@ event_t *event_wait_timeout_ztimer(event_queue_t *queue,
  *
  * @see event_wait_multi
  *
+ * @pre     The queue must have a waiter (i.e. it should have been claimed, or
+ *          initialized using @ref event_queue_init, @ref event_queues_init)
+ *
  * @param[in]   queues      Event queues to process
  * @param[in]   n_queues    Number of queues passed with @p queues
  */
@@ -423,6 +442,9 @@ static inline void event_loop_multi(event_queue_t *queues, size_t n_queues)
  *         event->handler(event);
  *     }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * @pre     The queue must have a waiter (i.e. it should have been claimed, or
+ *          initialized using @ref event_queue_init, @ref event_queues_init)
  *
  * @param[in]   queue   event queue to process
  */

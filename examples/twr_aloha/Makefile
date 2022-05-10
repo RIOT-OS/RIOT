@@ -27,6 +27,8 @@ USEMODULE += uwb-core_twr_ss_ack
 USEMODULE += uwb-core_twr_ss_ext
 USEMODULE += uwb-core_twr_ds
 USEMODULE += uwb-core_twr_ds_ext
+## Uncomment to enable trx info such as rssi, los, fppl calculation
+# USEMODULE += uwb-core_rng_trx_info
 
 # System modules used by this application
 USEMODULE += shell

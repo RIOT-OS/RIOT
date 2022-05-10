@@ -175,7 +175,7 @@ static bool _parse_endpoint(sock_udp_ep_t *remote,
         }
     }
     else {
-        remote->port = 5683;
+        remote->port = COAP_PORT;
     }
 
     return true;
@@ -292,7 +292,7 @@ static int _gcoap_forward_proxy_via_coap(coap_pkt_t *client_pkt,
     pkt.hdr->id = client_pkt->hdr->id;
 
     if (token_len) {
-        memcpy(pkt.token, client_pkt->token, token_len);
+        memcpy(coap_get_token(&pkt), coap_get_token(client_pkt), token_len);
     }
 
     /* copy all options from client_pkt to pkt */

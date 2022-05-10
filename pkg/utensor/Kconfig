@@ -10,13 +10,15 @@ config PACKAGE_UTENSOR
     depends on TEST_KCONFIG
     depends on HAS_LIBSTDCPP
     depends on HAS_CPP
-    select MODULE_UTENSOR_OPS
-    select MODULE_UTENSOR_UTIL
+    select MODULE_UTENSOR-OPS
+    select MODULE_UTENSOR-UTIL
+    select MODULE_CPP
+    select MODULE_LIBSTDCPP
 
-config MODULE_UTENSOR_OPS
+config MODULE_UTENSOR-OPS
     bool
     depends on TEST_KCONFIG
 
-config MODULE_UTENSOR_UTIL
+config MODULE_UTENSOR-UTIL
     bool
     depends on TEST_KCONFIG

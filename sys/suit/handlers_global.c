@@ -76,6 +76,7 @@ static int _seq_no_handler(suit_manifest_t *manifest, int key,
     }
 
     LOG_INFO("suit: validated sequence number\n)");
+    manifest->seq_number = seq_nr;
     manifest->validated |= SUIT_VALIDATED_SEQ_NR;
     return SUIT_OK;
 

@@ -11,5 +11,9 @@ ifneq (,$(filter disp_dev,$(USEMODULE)))
   USEMODULE += ili9341
 endif
 
+ifneq (,$(filter touch_dev,$(USEMODULE)))
+  USEMODULE += cst816s
+endif
+
 # include common nrf52 dependencies
 include $(RIOTBOARD)/common/nrf52/Makefile.dep

@@ -196,7 +196,8 @@ typedef struct {
 #define SUIT_COMPONENT_STATE_FETCHED       (1 << 0) /**< Component is fetched */
 #define SUIT_COMPONENT_STATE_FETCH_FAILED  (1 << 1) /**< Component fetched but failed */
 #define SUIT_COMPONENT_STATE_VERIFIED      (1 << 2) /**< Component is verified */
-#define SUIT_COMPONENT_STATE_FINALIZED     (1 << 3) /**< Component successfully installed */
+#define SUIT_COMPONENT_STATE_INSTALLED     (1 << 3) /**< Component is installed, but has not been verified */
+#define SUIT_COMPONENT_STATE_FINALIZED     (1 << 4) /**< Component successfully installed */
 /** @} */
 
 /**
@@ -245,6 +246,7 @@ typedef struct {
     uint8_t validation_buf[SUIT_COSE_BUF_SIZE];
     char *urlbuf;                   /**< Buffer containing the manifest url */
     size_t urlbuf_len;              /**< Length of the manifest url */
+    uint32_t seq_number;            /**< Set sequence number */
 } suit_manifest_t;
 
 /**

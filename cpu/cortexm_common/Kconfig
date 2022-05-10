@@ -90,6 +90,7 @@ config CPU_CORE_CORTEX_M33
     bool
     select CPU_ARCH_ARMV8M
     select CPU_CORE_CORTEX_M
+    select HAS_CORTEXM_FPU
     #select HAS_RUST_TARGET
 
 config CPU_CORE_CORTEX_M4

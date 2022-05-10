@@ -20,6 +20,7 @@
 #define ILI9341_PARAMS_H
 
 #include "board.h"
+#include "lcd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,15 +55,25 @@ extern "C" {
 #ifndef ILI9341_PARAM_INVERTED
 #define ILI9341_PARAM_INVERTED     0
 #endif
-
 #ifndef ILI9341_PARAM_NUM_LINES
-#define ILI9341_PARAM_NUM_LINES    320U
+#define ILI9341_PARAM_NUM_LINES         320U    /**< Number of lines */
 #endif
-
+#ifndef ILI9341_PARAM_RGB_CHANNELS
+#define ILI9341_PARAM_RGB_CHANNELS      240U    /**< Number of RGB channels (e.g. columns) */
+#endif
 #ifndef ILI9341_PARAM_ROTATION
-#define ILI9341_PARAM_ROTATION     ILI9341_ROTATION_HORZ_FLIP
+#define ILI9341_PARAM_ROTATION          ILI9341_ROTATION_HORZ_FLIP
+#endif
+#ifndef ILI9341_PARAM_OFFSET_X
+#define ILI9341_PARAM_OFFSET_X          0               /**< Horizontal offset */
+#endif
+#ifndef ILI9341_PARAM_OFFSET_Y
+#define ILI9341_PARAM_OFFSET_Y          0               /**< Vertival offset */
 #endif
 
+/**
+ * @brief   Default params
+ */
 #ifndef ILI9341_PARAMS
 #define ILI9341_PARAMS              { .spi = ILI9341_PARAM_SPI, \
                                       .spi_clk = ILI9341_PARAM_SPI_CLK, \
@@ -73,15 +84,18 @@ extern "C" {
                                       .rgb = ILI9341_PARAM_RGB, \
                                       .inverted = ILI9341_PARAM_INVERTED, \
                                       .lines = ILI9341_PARAM_NUM_LINES, \
+                                      .rgb_channels = ILI9341_PARAM_RGB_CHANNELS, \
                                       .rotation = ILI9341_PARAM_ROTATION, \
-                                    }
+                                      .offset_x = ILI9341_PARAM_OFFSET_X, \
+                                      .offset_y = ILI9341_PARAM_OFFSET_Y, \
+}
 #endif
-/**@}*/
+/** @} */
 
 /**
  * @brief   Configure ILI9341
  */
-static const ili9341_params_t ili9341_params[] =
+static const lcd_params_t ili9341_params[] =
 {
     ILI9341_PARAMS,
 };
@@ -101,8 +115,19 @@ static const uint8_t ili9341_screen_ids[] =
     ILI9341_PARAM_SCREEN_IDS,
 };
 
+/**
+ * @brief   Define the number of configured displays
+ */
+#define ILI9341_NUMOF           ARRAY_SIZE(ili9341_params)
+/**
+ * @brief   Define the number screens this display driver is attached to
+ */
+#define ILI9341_SCREEN_NUMOF    ARRAY_SIZE(ili9341_screen_ids)
+
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* ILI9341_PARAMS_H */
+/** @} */

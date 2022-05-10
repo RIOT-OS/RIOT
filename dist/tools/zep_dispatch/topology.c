@@ -37,6 +37,8 @@ struct edge {
     float weight_b_a;
 };
 
+size_t l2util_addr_from_str(const char *str, uint8_t *out);
+
 static char *_fmt_addr(char *out, size_t out_len, const uint8_t *addr, uint8_t addr_len)
 {
     char *start = out;
@@ -70,9 +72,8 @@ static struct node *_find_or_create_node(list_node_t *nodes, const char *name)
     struct node *node = _find_node_by_name(nodes, name);
 
     if (node == NULL) {
-        node = malloc(sizeof(*node));
+        node = calloc(1, sizeof(*node));
         strncpy(node->name, name, sizeof(node->name) - 1);
-        node->mac_len = 0;
         list_add(nodes, &node->next);
     }
 
@@ -94,6 +95,17 @@ static bool _parse_line(char *line, list_node_t *nodes, list_node_t *edges)
 
     if (a == NULL || b == NULL) {
         return false;
+    }
+
+    /* add node with a defined MAC address */
+    if (strcmp(b, ":=") == 0) {
+        struct node *n = _find_or_create_node(nodes, a);
+        if (n == NULL) {
+            return false;
+        }
+
+        n->mac_len = l2util_addr_from_str(e_ab, n->mac);
+        return true;
     }
 
     if (e_ab == NULL) {
@@ -264,9 +276,16 @@ bool topology_add(topology_t *t, const uint8_t *mac, uint8_t mac_len,
             continue;
         }
 
-        /* abort if node is already in list */
+        /* node is already in the list - either it is connected or MAC was pinned */
         if (memcmp(super->mac, mac, mac_len) == 0) {
-            return true;
+            if (super->addr.sin6_port == addr->sin6_port) {
+                /* abort if node is already connected */
+                return true;
+            } else {
+                /* use pre-allocated node */
+                empty = super;
+                break;
+            }
         }
     }
 

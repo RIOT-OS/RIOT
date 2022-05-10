@@ -80,6 +80,7 @@ event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
     do {
         unsigned state = irq_disable();
         for (size_t i = 0; i < n_queues; i++) {
+            assert(queues[i].waiter);
             result = container_of(clist_lpop(&queues[i].event_list),
                                   event_t, list_node);
             if (result) {
@@ -100,6 +101,7 @@ event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
 static event_t *_wait_timeout(event_queue_t *queue)
 {
     assert(queue);
+    assert(queue->waiter);
     event_t *result;
     thread_flags_t flags = 0;
 

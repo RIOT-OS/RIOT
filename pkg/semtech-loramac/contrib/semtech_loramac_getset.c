@@ -407,3 +407,25 @@ uint32_t semtech_loramac_get_uplink_counter(semtech_loramac_t *mac)
     mutex_unlock(&mac->lock);
     return counter;
 }
+
+void semtech_loramac_set_channels_mask(semtech_loramac_t *mac, uint16_t *mask)
+{
+    mutex_lock(&mac->lock);
+    DEBUG("[semtech-loramac] setting channels mask\n");
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_CHANNELS_MASK;
+    mibReq.Param.ChannelsMask = mask;
+    LoRaMacMibSetRequestConfirm(&mibReq);
+    mutex_unlock(&mac->lock);
+}
+
+void semtech_loramac_get_channels_mask(semtech_loramac_t *mac, uint16_t *mask)
+{
+    mutex_lock(&mac->lock);
+    DEBUG("[semtech-loramac] getting channels mask\n");
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_CHANNELS_MASK;
+    LoRaMacMibGetRequestConfirm(&mibReq);
+    memcpy(mask, mibReq.Param.ChannelsMask, LORAMAC_CHANNELS_MASK_LEN);
+    mutex_unlock(&mac->lock);
+}

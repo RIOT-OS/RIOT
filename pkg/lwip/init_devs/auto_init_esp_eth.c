@@ -27,7 +27,7 @@
 extern esp_eth_netdev_t _esp_eth_dev;
 extern void esp_eth_setup(esp_eth_netdev_t* dev);
 
-static struct netif netif;
+static lwip_netif_t netif;
 
 static void auto_init_esp_eth(void)
 {

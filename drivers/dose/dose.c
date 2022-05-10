@@ -177,8 +177,8 @@ static void _dose_watchdog_cb(void *arg, int chan)
 static void _watchdog_init(unsigned timeout_us)
 {
     timer_init(DOSE_TIMER_DEV, US_PER_SEC, _dose_watchdog_cb, NULL);
-    timer_set_periodic(DOSE_TIMER_DEV, 0, timeout_us, TIM_FLAG_RESET_ON_MATCH);
-    timer_stop(DOSE_TIMER_DEV);
+    timer_set_periodic(DOSE_TIMER_DEV, 0, timeout_us,
+                       TIM_FLAG_RESET_ON_MATCH | TIM_FLAG_SET_STOPPED);
 }
 #else
 static inline void _watchdog_start(void) {}

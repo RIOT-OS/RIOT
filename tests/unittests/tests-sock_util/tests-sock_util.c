@@ -63,6 +63,9 @@
 #define TEST_STR2EP_NETIF           "[fe80::1%45]"
 #define TEST_STR2EP_NETIF2          "[fe80::1%23]:243"
 #define TEST_STR2EP_NETIF_GLOBAL    "[2001:db8:a::1%75]"
+#define TEST_STR2EP_LL              "[fe80::1]"
+#define TEST_STR2EP_LL_PORT         "[fe80::1]:243"
+#define TEST_STR2EP_GLOBAL_PORT     "[2001:db8:a::1]:123"
 #define TEST_STR2EP_NETIF_INVALID   "[fe80::1%]:752"
 #define TEST_STR2EP_NETIF_INVALID2  "[fe80::1%56776]:1346"
 #define TEST_STR2EP_NETIF_INVALID3  "[fe80::1%53:4232"
@@ -114,6 +117,7 @@ static void test_sock_util_urlsplit__host_path(void)
             sock_urlsplit(TEST_URL, addr, urlpath));
     TEST_ASSERT_EQUAL_STRING(TEST_URL_HOSTPART, (char*)addr);
     TEST_ASSERT_EQUAL_STRING(TEST_URL_LOCALPART, (char*)urlpath);
+    TEST_ASSERT_EQUAL_STRING(TEST_URL_LOCALPART, sock_urlpath(TEST_URL));
 }
 
 static void test_sock_util_urlsplit__no_path(void)
@@ -130,18 +134,21 @@ static void test_sock_util_urlsplit__dnsname(void)
             sock_urlsplit(TEST_URL_DNS, addr, urlpath));
     TEST_ASSERT_EQUAL_STRING(TEST_URL_DNS_HOSTPART, (char*)addr);
     TEST_ASSERT_EQUAL_STRING(TEST_URL_LOCALPART, (char*)urlpath);
+    TEST_ASSERT_EQUAL_STRING(TEST_URL_LOCALPART, sock_urlpath(TEST_URL));
 }
 
 static void test_sock_util_urlsplit__invalid_sep(void)
 {
     TEST_ASSERT_EQUAL_INT(-EINVAL,
             sock_urlsplit(TEST_URL_INVALID, addr, urlpath));
+    TEST_ASSERT_NULL(sock_urlpath(TEST_URL_INVALID));
 }
 
 static void test_sock_util_urlsplit__no_schema(void)
 {
     TEST_ASSERT_EQUAL_INT(-EINVAL,
             sock_urlsplit(TEST_URL_INVALID2, addr, urlpath));
+    TEST_ASSERT_NULL(sock_urlpath(TEST_URL_INVALID2));
 }
 
 static void test_sock_util_urlsplit__hostport_too_long(void)
@@ -171,7 +178,6 @@ static void test_sock_util_urlsplit__null_path_buffer(void)
 static void test_sock_util_str2ep__ipv6_noport(void)
 {
     sock_udp_ep_t ep;
-    ep.port = 0;
     TEST_ASSERT_EQUAL_INT(0, sock_udp_str2ep(&ep, TEST_STR2EP));
     TEST_ASSERT_EQUAL_INT(0, ep.port);
     TEST_ASSERT_EQUAL_INT(0, ep.netif);
@@ -181,7 +187,6 @@ static void test_sock_util_str2ep__ipv6_noport(void)
 static void test_sock_util_str2ep__ipv4_noport(void)
 {
     sock_udp_ep_t ep;
-    ep.port = 0;
     TEST_ASSERT_EQUAL_INT(0, sock_udp_str2ep(&ep, TEST_STR2EP_V4));
     TEST_ASSERT_EQUAL_INT(0, ep.port);
     TEST_ASSERT_EQUAL_INT(0, ep.netif);
@@ -264,6 +269,33 @@ static void test_sock_util_str2ep__netif_with_global_addr(void)
     TEST_ASSERT_EQUAL_INT(AF_INET6, ep.family);
 }
 
+static void test_sock_util_str2ep__ll(void)
+{
+    sock_udp_ep_t ep;
+    TEST_ASSERT_EQUAL_INT(0, sock_udp_str2ep(&ep, TEST_STR2EP_LL));
+    TEST_ASSERT_EQUAL_INT(0, ep.port);
+    TEST_ASSERT_EQUAL_INT(0, ep.netif);
+    TEST_ASSERT_EQUAL_INT(AF_INET6, ep.family);
+}
+
+static void test_sock_util_str2ep__ll_with_port(void)
+{
+    sock_udp_ep_t ep;
+    TEST_ASSERT_EQUAL_INT(0, sock_udp_str2ep(&ep, TEST_STR2EP_LL_PORT));
+    TEST_ASSERT_EQUAL_INT(243, ep.port);
+    TEST_ASSERT_EQUAL_INT(0, ep.netif);
+    TEST_ASSERT_EQUAL_INT(AF_INET6, ep.family);
+}
+
+static void test_sock_util_str2ep__with_global_addr_port(void)
+{
+    sock_udp_ep_t ep;
+    TEST_ASSERT_EQUAL_INT(0, sock_udp_str2ep(&ep, TEST_STR2EP_GLOBAL_PORT));
+    TEST_ASSERT_EQUAL_INT(123, ep.port);
+    TEST_ASSERT_EQUAL_INT(0, ep.netif);
+    TEST_ASSERT_EQUAL_INT(AF_INET6, ep.family);
+}
+
 Test *tests_sock_util_all(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -291,6 +323,9 @@ Test *tests_sock_util_all(void)
         new_TestFixture(test_sock_util_str2ep__netif),
         new_TestFixture(test_sock_util_str2ep__netif_with_port),
         new_TestFixture(test_sock_util_str2ep__netif_with_global_addr),
+        new_TestFixture(test_sock_util_str2ep__ll),
+        new_TestFixture(test_sock_util_str2ep__ll_with_port),
+        new_TestFixture(test_sock_util_str2ep__with_global_addr_port),
     };
 
     EMB_UNIT_TESTCALLER(sockutil_tests, setup, NULL, fixtures);

@@ -56,15 +56,24 @@ int main(void)
 #if IS_USED(MODULE_ILI9341)
     ili9341_t *ili9341 = (ili9341_t *)disp_dev->dev;
     expect(ili9341);
-    expect(max_width == ili9341->params->lines);
+    expect(max_width == ili9341->dev.params->lines);
     expect(max_height == 240);
 #endif
 
+    disp_dev_area_t area;
     for (uint16_t y = 0; y < max_height; ++y) {
-        disp_dev_map(disp_dev->dev, 0, max_width - 1, y, y, display_buffer);
+        area.x1 = 0;
+        area.x2 = max_width - 1;
+        area.y1 = y;
+        area.y2 = y;
+        disp_dev_map(disp_dev->dev, &area, display_buffer);
     }
 
-    disp_dev_map(disp_dev->dev, 95, 222, 85, 153, (const uint16_t *)picture);
+    area.x1 = ((max_width - RIOT_LOGO_WIDTH) >> 1);
+    area.x2 = ((max_width + RIOT_LOGO_WIDTH) >> 1);
+    area.y1 = ((max_height - RIOT_LOGO_HEIGHT) >> 1);
+    area.y2 = ((max_height + RIOT_LOGO_HEIGHT) >> 1);
+    disp_dev_map(disp_dev->dev, &area, (const uint16_t *)picture);
 
     puts("SUCCESS");
 

@@ -155,18 +155,12 @@ extern "C" {
 
 /**
  * @brief    Maximum length of a CoAP header for a blockwise message
+ *
+ *           Value obtained experimentally when using SUIT
  */
 #ifndef CONFIG_NANOCOAP_BLOCK_HEADER_MAX
-#define CONFIG_NANOCOAP_BLOCK_HEADER_MAX   (64)
+#define CONFIG_NANOCOAP_BLOCK_HEADER_MAX   (80)
 #endif
-
-/**
- * @brief    Work buffer size for blockwise operation
- *
- * @param[in] blksize   CoAP blocksize
- */
-#define NANOCOAP_BLOCKWISE_BUF(blksize)    (CONFIG_NANOCOAP_BLOCK_HEADER_MAX \
-                                           + (0x1 << (blksize + 4)))
 
 /**
  * @name coap_opt_finish() flag parameter values
@@ -202,7 +196,9 @@ typedef struct {
  */
 typedef struct {
     coap_hdr_t *hdr;                                  /**< pointer to raw packet   */
-    uint8_t *token;                                   /**< pointer to token        */
+    uint8_t *token;                                   /**< pointer to token
+                                                       * @deprecated Use coap_get_token(),
+                                                       *     Will be removed after 2022.10. */
     uint8_t *payload;                                 /**< pointer to payload      */
     uint16_t payload_len;                             /**< length of payload       */
     uint16_t options_len;                             /**< length of options array */
@@ -245,10 +241,22 @@ typedef ssize_t (*coap_handler_t)(coap_pkt_t *pkt, uint8_t *buf, size_t len, voi
  * @param[in] len      Length of the received data
  * @param[in] more     -1 for no option, 0 for last block, 1 for more blocks
  *
- * @returns    0       on success
- * @returns   -1       on error
+ * @returns  >=0       on success
+ * @returns   <0       on error
  */
 typedef int (*coap_blockwise_cb_t)(void *arg, size_t offset, uint8_t *buf, size_t len, int more);
+
+/**
+ * @brief   Coap equest callback descriptor
+ *
+ * @param[in] arg      Pointer to be passed as arguments to the callback
+ * @param[in] pkt      The received CoAP response.
+ *                     Buffers point to network stack internal memory.
+ *
+ * @returns   >=0       on success
+ * @returns    <0       on error
+ */
+typedef int (*coap_request_cb_t)(void *arg, coap_pkt_t *pkt);
 
 /**
  * @brief   Method flag type
@@ -266,6 +274,14 @@ typedef struct {
     coap_handler_t handler;         /**< ptr to resource handler            */
     void *context;                  /**< ptr to user defined context data   */
 } coap_resource_t;
+
+/**
+ * @brief   Type for CoAP resource subtrees
+ */
+typedef const struct {
+    const coap_resource_t *resources;   /**< ptr to resource array  */
+    const size_t resources_numof;       /**< number of entries in array */
+} coap_resource_subtree_t;
 
 /**
  * @brief   Block1 helper struct
@@ -324,7 +340,7 @@ static inline uint8_t coap_code(unsigned cls, unsigned detail)
  *
  * @returns     message code class
  */
-static inline unsigned coap_get_code_class(coap_pkt_t *pkt)
+static inline unsigned coap_get_code_class(const coap_pkt_t *pkt)
 {
     return pkt->hdr->code >> 5;
 }
@@ -348,7 +364,7 @@ static inline unsigned coap_get_code_detail(const coap_pkt_t *pkt)
  *
  * @returns     message code in decimal format
  */
-static inline unsigned coap_get_code(coap_pkt_t *pkt)
+static inline unsigned coap_get_code(const coap_pkt_t *pkt)
 {
     return (coap_get_code_class(pkt) * 100) + coap_get_code_detail(pkt);
 }
@@ -360,7 +376,7 @@ static inline unsigned coap_get_code(coap_pkt_t *pkt)
  *
  * @returns     raw message code
  */
-static inline unsigned coap_get_code_raw(coap_pkt_t *pkt)
+static inline unsigned coap_get_code_raw(const coap_pkt_t *pkt)
 {
     return (unsigned)pkt->hdr->code;
 }
@@ -372,7 +388,7 @@ static inline unsigned coap_get_code_raw(coap_pkt_t *pkt)
  *
  * @returns     message ID
  */
-static inline unsigned coap_get_id(coap_pkt_t *pkt)
+static inline unsigned coap_get_id(const coap_pkt_t *pkt)
 {
     return ntohs(pkt->hdr->id);
 }
@@ -390,6 +406,18 @@ static inline unsigned coap_get_token_len(const coap_pkt_t *pkt)
 }
 
 /**
+ * @brief   Get pointer to a message's token
+ *
+ * @param[in]   pkt   CoAP packet
+ *
+ * @returns     pointer to the token position
+ */
+static inline void *coap_get_token(const coap_pkt_t *pkt)
+{
+    return (uint8_t*)pkt->hdr + sizeof(coap_hdr_t);
+}
+
+/**
  * @brief   Get the total header length (4-byte header + token length)
  *
  * @param[in]   pkt   CoAP packet
@@ -402,6 +430,18 @@ static inline unsigned coap_get_total_hdr_len(const coap_pkt_t *pkt)
 }
 
 /**
+ * @brief   Get the total length of a CoAP packet
+ *
+ * @param[in]   pkt   CoAP packet
+ *
+ * @returns     total CoAP length
+ */
+static inline unsigned coap_get_total_len(const coap_pkt_t *pkt)
+{
+    return (uintptr_t)pkt->payload - (uintptr_t)pkt->hdr + pkt->payload_len;
+}
+
+/**
  * @brief   Get the message type
  *
  * @param[in]   pkt   CoAP packet
@@ -411,7 +451,7 @@ static inline unsigned coap_get_total_hdr_len(const coap_pkt_t *pkt)
  * @returns     COAP_TYPE_ACK
  * @returns     COAP_TYPE_RST
  */
-static inline unsigned coap_get_type(coap_pkt_t *pkt)
+static inline unsigned coap_get_type(const coap_pkt_t *pkt)
 {
     return (pkt->hdr->ver_t_tkl & 0x30) >> 4;
 }
@@ -423,7 +463,7 @@ static inline unsigned coap_get_type(coap_pkt_t *pkt)
  *
  * @returns     CoAP version number
  */
-static inline unsigned coap_get_ver(coap_pkt_t *pkt)
+static inline unsigned coap_get_ver(const coap_pkt_t *pkt)
 {
     return (pkt->hdr->ver_t_tkl & 0x60) >> 6;
 }
@@ -435,7 +475,7 @@ static inline unsigned coap_get_ver(coap_pkt_t *pkt)
  *
  * @returns     pointer to first byte after the header
  */
-static inline uint8_t *coap_hdr_data_ptr(coap_hdr_t *hdr)
+static inline uint8_t *coap_hdr_data_ptr(const coap_hdr_t *hdr)
 {
     return ((uint8_t *)hdr) + sizeof(coap_hdr_t);
 }
@@ -806,7 +846,7 @@ void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
  * @returns     Number of bytes written to @p bufpos
  */
 size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
-                                const uint8_t *c, size_t len);
+                                const void *c, size_t len);
 
 /**
  * @brief Add a single character to a block2 reply.
@@ -1109,7 +1149,7 @@ static inline ssize_t coap_opt_add_format(coap_pkt_t *pkt, uint16_t format)
  * @return        <0 on error
  * @return        -ENOSPC if no available options
  */
-ssize_t coap_opt_add_opaque(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val, size_t val_len);
+ssize_t coap_opt_add_opaque(coap_pkt_t *pkt, uint16_t optnum, const void *val, size_t val_len);
 
 /**
  * @brief   Adds a single Uri-Query option in the form 'key=value' into pkt
@@ -1580,7 +1620,7 @@ size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t last
  *
  * @returns     amount of bytes written to @p buf
  */
-size_t coap_put_option(uint8_t *buf, uint16_t lastonum, uint16_t onum, const uint8_t *odata, size_t olen);
+size_t coap_put_option(uint8_t *buf, uint16_t lastonum, uint16_t onum, const void *odata, size_t olen);
 
 /**
  * @brief   Insert block1 option into buffer
@@ -1722,6 +1762,25 @@ ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
                           size_t resources_numof);
 
 /**
+ * @brief   Generic coap subtree handler
+ *
+ * This function can be used as a generic handler for resources with the
+ * @ref COAP_MATCH_SUBTREE where a new @ref coap_resource_t is to be parsed.
+ *
+ * @note The @p context must be of type @ref coap_resource_subtree_t.
+ *
+ * @param[in]   pkt             pointer to (parsed) CoAP packet
+ * @param[out]  resp_buf        buffer for response
+ * @param[in]   resp_buf_len    size of response buffer
+ * @param[in]   context         ptr to a @ref coap_resource_subtree_t instance
+ *
+ * @returns     size of the reply packet on success
+ * @returns     <0 on error
+ */
+ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
+                             size_t resp_buf_len, void *context);
+
+/**
  * @brief   Convert message code (request method) into a corresponding bit field
  *
  * @param[in]   code    request code denoting the request method
@@ -1847,7 +1906,7 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
                           unsigned code,
                           uint8_t *buf, size_t len,
                           unsigned ct,
-                          const uint8_t *payload, uint8_t payload_len);
+                          const void *payload, size_t payload_len);
 
 /**
  * @brief   Reference to the default .well-known/core handler defined by the

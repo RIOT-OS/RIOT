@@ -302,9 +302,11 @@ struct ztimer_base {
 };
 
 #if MODULE_ZTIMER_NOW64
-typedef uint64_t ztimer_now_t;  /**< type for ztimer_now() result */
+typedef uint64_t ztimer_now_t;  /**< type for ztimer_now() result
+                                 * @deprecated use uint32_t or ztimer64 */
 #else
-typedef uint32_t ztimer_now_t;  /**< type for ztimer_now() result */
+typedef uint32_t ztimer_now_t;  /**< type for ztimer_now() result
+                                 * @deprecated use uint32_t or ztimer64 */
 #endif
 
 /**

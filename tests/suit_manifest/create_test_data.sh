@@ -47,5 +47,5 @@ gen_manifest "${MANIFEST_DIR}/manifest3.bin".unsigned 2 "${MANIFEST_DIR}/file1.b
 sign_manifest "${MANIFEST_DIR}/manifest3.bin".unsigned "${MANIFEST_DIR}/manifest3.bin"
 
 # valid manifest, valid seqnr, signed, 2 components
-gen_manifest "${MANIFEST_DIR}/manifest4.bin".unsigned 2 "${MANIFEST_DIR}/file1.bin:0:ram:0" "${MANIFEST_DIR}/file2.bin:0:ram:1"
+gen_manifest "${MANIFEST_DIR}/manifest4.bin".unsigned 3 "${MANIFEST_DIR}/file1.bin:0:ram:0" "${MANIFEST_DIR}/file2.bin:0:ram:1"
 sign_manifest "${MANIFEST_DIR}/manifest4.bin".unsigned "${MANIFEST_DIR}/manifest4.bin"

@@ -11,6 +11,9 @@ RIOT_TERMINAL ?= socat
 
 APP_SHELL_FMT ?= NONE
 
+# microbit qemu failing currently
+TEST_ON_CI_BLACKLIST += microbit
+
 include $(RIOTBASE)/Makefile.include
 
 # the test script skips tests if socat is not used

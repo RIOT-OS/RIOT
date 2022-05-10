@@ -43,6 +43,10 @@ config MODULE_CORE_PANIC
     bool "Kernel crash handling module"
     default y
 
+config MODULE_CORE_THREAD
+    bool "Support for Threads"
+    default y
+
 config MODULE_CORE_THREAD_FLAGS
     bool "Thread flags"
 

@@ -76,8 +76,10 @@ static void _disp_map(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *col
         return;
     }
 
-    disp_dev_map(_screen_dev->display, area->x1, area->x2, area->y1, area->y2,
-                 (const uint16_t *)color_p);
+    const disp_dev_area_t disp_area = {
+        area->x1, area->x2, area->y1, area->y2
+    };
+    disp_dev_map(_screen_dev->display, &disp_area, (const uint16_t *)color_p);
 
     LOG_DEBUG("[lvgl] flush display\n");
 

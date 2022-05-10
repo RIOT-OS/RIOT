@@ -68,6 +68,7 @@
 
 #include "sched.h"
 #include "clist.h"
+#include "iolist.h"
 #include "mtd.h"
 #include "xfa.h"
 
@@ -808,6 +809,17 @@ ssize_t vfs_read(int fd, void *dest, size_t count);
  * @return <0 on error
  */
 ssize_t vfs_write(int fd, const void *src, size_t count);
+
+/**
+ * @brief Write bytes from an iolist to an open file
+ *
+ * @param[in]  fd       fd number obtained from vfs_open
+ * @param[in]  iolist   iolist to read from
+ *
+ * @return number of bytes written on success
+ * @return <0 on error
+ */
+ssize_t vfs_write_iol(int fd, const iolist_t *iolist);
 
 /**
  * @brief Synchronize a file on storage

@@ -103,6 +103,16 @@ static inline int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint,
 int sock_urlsplit(const char *url, char *hostport, char *urlpath);
 
 /**
+ * @brief   Returns a pointer to the path component in @p url
+ *
+ * @param[in]   url         URL to examine. Must not be NULL.
+ *
+ * @returns     pointer to the start of the path component in @p url
+ * @returns     NULL if @p url is invalid
+ */
+const char *sock_urlpath(const char *url);
+
+/**
  * @brief    Convert string to common IP-based transport layer endpoint
  *
  * Takes eg., "[2001:db8::1]:1234" and converts it into the corresponding UDP

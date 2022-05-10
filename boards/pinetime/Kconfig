@@ -16,6 +16,7 @@ config BOARD_PINETIME
     select HAS_PERIPH_SPI
     select HAS_VDD_LC_FILTER_REG1
 
+    select HAVE_CST816S
     select HAVE_ILI9341
     select HAVE_MTD_SPI_NOR
 

@@ -342,7 +342,7 @@ static uint32_t mtd_spi_nor_get_size(const mtd_jedec_id_t *id)
 static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us)
 {
     unsigned i = 0, j = 0;
-    uint32_t div = 2;
+    uint32_t div = 1; /* first wait one full interval */
 #if IS_ACTIVE(ENABLE_DEBUG)
     uint32_t diff = 0;
 #endif
@@ -362,13 +362,15 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
         i++;
 #if IS_USED(MODULE_ZTIMER_USEC)
         if (us) {
-            ztimer_sleep(ZTIMER_USEC, us);
+            uint32_t wait_us = us / div;
+            uint32_t wait_min = 2;
+
+            wait_us = wait_us > wait_min ? wait_us : wait_min;
+
+            ztimer_sleep(ZTIMER_USEC, wait_us);
             /* reduce the waiting time quickly if the estimate was too short,
              * but still avoid busy (yield) waiting */
-            if (us > 2) {
-                us -= (us / div);
-                div++;
-            }
+            div++;
         }
         else {
             j++;
@@ -376,16 +378,15 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
         }
 #elif IS_USED(MODULE_XTIMER)
         if (us) {
-            xtimer_usleep(us);
+            uint32_t wait_us = us / div;
+            uint32_t wait_min = 2 * XTIMER_BACKOFF;
+
+            wait_us = wait_us > wait_min ? wait_us : wait_min;
+
+            xtimer_usleep(wait_us);
             /* reduce the waiting time quickly if the estimate was too short,
              * but still avoid busy (yield) waiting */
-            if (us > 2 * XTIMER_BACKOFF) {
-                us -= (us / div);
-                div++;
-            }
-            else {
-                us = 2 * XTIMER_BACKOFF;
-            }
+            div++;
         }
         else {
             j++;
@@ -481,7 +482,7 @@ static void _set_addr_width(mtd_dev_t *mtd)
     uint32_t flash_size = mtd->pages_per_sector * mtd->page_size
                         * mtd->sector_count;
 
-    if (flash_size > 0xFFFFFF) {
+    if (flash_size > (0x1UL << 24)) {
         dev->addr_width = 4;
     } else {
         dev->addr_width = 3;

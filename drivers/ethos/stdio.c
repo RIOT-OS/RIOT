@@ -24,6 +24,9 @@
 #include "ethos.h"
 #include "isrpipe.h"
 #include "stdio_uart.h"
+#if IS_USED(MODULE_VFS)
+#include "vfs.h"
+#endif
 
 extern ethos_t ethos;
 
