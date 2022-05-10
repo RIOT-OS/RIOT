@@ -351,6 +351,11 @@ void gnrc_ipv6_nib_rtr_adv_pio_cb(gnrc_netif_t *upstream, const ndp_opt_pi_t *pi
         return;
     }
 
+    /* only consider prefix meant for autonomous address configuration */
+    if (!(pio->flags & NDP_OPT_PI_FLAGS_A)) {
+        return;
+    }
+
 #if IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE)
     /* if we are the only router on this bus, we can directly choose a prefix */
     _configure_subnets(subnets, 0, upstream, pio);
