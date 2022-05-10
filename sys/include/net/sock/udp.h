@@ -335,6 +335,14 @@ typedef struct {
  * @brief   Auxiliary data provided when sending using an UDP sock object
  */
 typedef struct {
+#if defined(MODULE_SOCK_AUX_LOCAL) || defined(DOXYGEN)
+    /**
+     * @brief   The local endpoint from which the datagram will be sent
+     *
+     * @see SOCK_AUX_SET_LOCAL
+     */
+    sock_udp_ep_t local;
+#endif /* MODULE_SOCK_AUX_ENDPOINT */
 #if defined(MODULE_SOCK_AUX_TIMESTAMP) || defined(DOXYGEN)
     /**
      * @brief   System time the datagram was send
