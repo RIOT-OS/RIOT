@@ -103,48 +103,6 @@ int cst816s_init(cst816s_t *dev, const cst816s_params_t *params,
         _cst816s_reset(dev);
     }
 
-    i2c_acquire(dev->params->i2c_dev);
-
-    buf[0]=0x15;
-    i2c_write_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 1, 0);
-    i2c_read_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 1, 0);
-    xtimer_usleep(CST816_INIT_DELAY);
-
-    buf[0]=0xa7;
-    i2c_write_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 1, 0);
-    i2c_read_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 3, 0);
-    DEBUG("cst816 ver %02x %02x %02x\n", buf[0], buf[1], buf[2]);
-    xtimer_usleep(CST816_INIT_DELAY);
-
-    /*
-      [2] EnConLR - Continuous operation can slide around
-      [1] EnConUD - Slide up and down to enable continuous operation
-      [0] EnDClick - Enable Double-click action
-    */
-    buf[0]=0xEC;
-    buf[1]=0b00000101;
-    i2c_write_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 2, 0);
-    xtimer_usleep(CST816_INIT_DELAY);
-
-    /*
-      [7] EnTest - Interrupt pin to test, enable automatic periodic issued after a low pulse.
-      [6] EnTouch - When a touch is detected, a periodic pulsed Low.
-      [5] EnChange - Upon detecting a touch state changes, pulsed Low.
-      [4] EnMotion - When the detected gesture is pulsed Low.
-      [0] OnceWLP - Press gesture only issue a pulse signal is low.
-    */
-    buf[0]=0xFA;
-    buf[1]=0b01110000;
-    i2c_write_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 2, 0);
-    xtimer_usleep(CST816_INIT_DELAY);
-
-    // read a report once to clear IRQ
-    buf[0]=0x0;
-    i2c_write_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 1, 0);
-    i2c_read_bytes(dev->params->i2c_dev, dev->params->i2c_addr, buf, 9, 0);
-
-    i2c_release(dev->params->i2c_dev);
-
     if ((dev->params->irq != GPIO_UNDEF) && cb) {
         if (gpio_init_int(dev->params->irq, GPIO_IN,
                           dev->params->irq_flank,
