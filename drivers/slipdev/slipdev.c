@@ -228,6 +228,10 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
     switch (opt) {
         case NETOPT_IS_WIRED:
             return 1;
+        case NETOPT_RX_END_IRQ:
+            assert(max_len == sizeof(netopt_enable_t));
+            *((netopt_enable_t *)value) = NETOPT_ENABLE;
+            return sizeof(netopt_enable_t);
         case NETOPT_DEVICE_TYPE:
             assert(max_len == sizeof(uint16_t));
             *((uint16_t *)value) = NETDEV_TYPE_SLIP;
