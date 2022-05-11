@@ -132,9 +132,11 @@ all-valgrind: CFLAGS += -DHAVE_VALGRIND_H
 all-valgrind: NATIVEINCLUDES += $(shell pkg-config valgrind --cflags)
 all-gprof: CFLAGS += -pg
 all-gprof: LINKFLAGS += -pg
-all-asan: CFLAGS += -fsanitize=address -fno-omit-frame-pointer
-all-asan: CFLAGS += -DNATIVE_MEMORY
-all-asan: LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer
+
+CFLAGS_ASAN += -fsanitize=address -fno-omit-frame-pointer -DNATIVE_MEMORY
+LINKFLAGS_ASAN += -fsanitize=address -fno-omit-frame-pointer
+all-asan: CFLAGS += $(CFLAGS_ASAN)
+all-asan: LINKFLAGS += $(LINKFLAGS_ASAN)
 all-asan: export AFL_USE_ASAN=1
 
 INCLUDES += $(NATIVEINCLUDES)
