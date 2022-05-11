@@ -1439,13 +1439,9 @@ static void _check_netdev_capabilities(netdev_t *dev)
 {
     /* Check whether RX- and TX-complete interrupts are supported by the driver */
     if (IS_ACTIVE(DEVELHELP)) {
-        netopt_enable_t enable = NETOPT_ENABLE;
-        int res = dev->driver->get(dev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
-        if ((res != sizeof(enable)) || (enable != NETOPT_ENABLE)) {
-            LOG_WARNING("NETOPT_RX_END_IRQ not implemented by driver\n");
-        }
         if (IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ)) {
-            res = dev->driver->get(dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
+            netopt_enable_t enable = NETOPT_ENABLE;
+            int res = dev->driver->get(dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
             if ((res != sizeof(enable)) || (enable != NETOPT_ENABLE)) {
                 LOG_WARNING("NETOPT_TX_END_IRQ not implemented by driver\n");
             }
