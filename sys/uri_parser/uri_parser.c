@@ -109,6 +109,14 @@ bool _consume_port(uri_parser_result_t *result, const char *ipv6_end,
         }
         result->port = port_begin + 1;
         result->port_len = authority_end - result->port;
+
+        /* ports can't exceed 5 characters */
+        if (result->port_len > 5){
+            result->port = NULL;
+            result->port_len = 0;
+            return false;
+        }
+
         /* cut host part before port and ':' */
         result->host_len -= result->port_len + 1;
     }
