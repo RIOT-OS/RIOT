@@ -302,7 +302,6 @@ int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
             return sizeof(netopt_enable_t);
 
         case NETOPT_RX_START_IRQ:
-        case NETOPT_RX_END_IRQ:
         case NETOPT_TX_START_IRQ:
         case NETOPT_TX_END_IRQ:
             *((netopt_enable_t *)value) = NETOPT_ENABLE;
