@@ -245,7 +245,7 @@ static void _forward_resp_handler(const gcoap_request_memo_t *memo,
     (void) remote; /* this is the origin server */
     client_ep_t *cep = (client_ep_t *)memo->context;
 
-    if (memo->state == GCOAP_MEMO_RESP) {
+    if ((memo->state == GCOAP_MEMO_RESP) || (memo->state == GCOAP_MEMO_RESP_TRUNC)) {
         /* forward the response packet as-is to the client */
         gcoap_forward_proxy_dispatch((uint8_t *)pdu->hdr,
                                      (pdu->payload -
