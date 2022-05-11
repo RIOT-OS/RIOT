@@ -423,6 +423,27 @@ static const validate_t validate_uris[] = {
         "",
         "",
         0),
+    VEC("coap://example.com:1234568910",
+        /* is URI */
+        true,
+        /* parsed scheme */
+        "coap",
+        /* parsed userinfo */
+        "",
+        /* parsed host */
+        "example.com",
+        /* parsed host without zoneid */
+        "",
+        /* parsed zoneid */
+        "",
+        /* parsed port */
+        "",
+        /* parsed path */
+        "",
+        /* parsed query */
+        "",
+        /* expected return value */
+        -1),
 };
 
 static char _failure_msg[VEC_MSG_LEN];
