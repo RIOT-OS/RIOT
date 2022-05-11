@@ -28,6 +28,13 @@ INCLUDES += -I$(RIOTBASE)/tests/unittests/common
 # some tests need more stack
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=THREAD_STACKSIZE_LARGE
 
+# for these boards, enable asan (Address Sanitizer)
+ASAN_BOARDS ?= native
+ifneq (, $(filter $(BOARD), $(ASAN_BOARDS)))
+  CFLAGS += $(CFLAGS_ASAN)
+  LINKFLAGS += $(LINKFLAGS_ASAN)
+endif
+
 include $(RIOTBASE)/Makefile.include
 
 .PHONY: $(UNIT_TESTS)
