@@ -60,6 +60,7 @@ void gcoap_forward_proxy_init(void);
  * @param[in]  pkt           Packet to parse
  * @param[in]  client        Endpoint of the client
  * @param[in]  local         Local endpoint
+ * @param[in]  client_tl     [Socket type](@ref gcoap_socket_type_t) of the client
  *
  * @return    0              if parsing was successful
  * @return    -ENOTSUP       if the forward proxy is not compiled in
@@ -67,7 +68,8 @@ void gcoap_forward_proxy_init(void);
  * @return    -EINVAL        if Proxy-Uri is malformed
  */
 int gcoap_forward_proxy_request_process(coap_pkt_t *pkt,
-                                        const sock_udp_ep_t *client, const sock_udp_ep_t *local);
+                                        const sock_udp_ep_t *client, const sock_udp_ep_t *local,
+                                        gcoap_socket_type_t client_tl);
 
 /**
  * @brief  Finds the memo for an outstanding request within the
