@@ -94,6 +94,11 @@ void nanocoap_cache_key_generate(const coap_pkt_t *req, uint8_t *cache_key)
     for (unsigned i = 0; i < req->options_len; i++) {
         ssize_t optlen = coap_opt_get_next(req, &opt, &value, !i);
         if (optlen >= 0) {
+            /* gCoAP forward proxy is ETag-aware, so skip ETag option,
+             * see https://datatracker.ietf.org/doc/html/rfc7252#section-5.4.2 */
+            if (IS_USED(MODULE_GCOAP_FORWARD_PROXY) && (opt.opt_num == COAP_OPT_ETAG)) {
+                continue;
+            }
             /* skip NoCacheKey,
                see https://tools.ietf.org/html/rfc7252#section-5.4.6 */
             if ((opt.opt_num & 0x1E) == 0x1C) {
@@ -218,7 +223,6 @@ int nanocoap_cache_process(const uint8_t *cache_key, unsigned request_method,
             /* no space left in the cache? */
             return -1;
         }
-        /* TODO: ETAG handling */
     }
 
     return 0;
