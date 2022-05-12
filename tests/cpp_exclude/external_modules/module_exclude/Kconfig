@@ -8,5 +8,5 @@
 config MODULE_MODULE_EXCLUDE
     bool "Exclude module"
     depends on TEST_KCONFIG
-    select HAS_CPP
-    select HAS_LIBSTDCPP
+    depends on HAS_CPP
+    depends on HAS_LIBSTDCPP
