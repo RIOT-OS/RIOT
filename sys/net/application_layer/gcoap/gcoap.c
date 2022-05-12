@@ -1737,9 +1737,10 @@ void gcoap_forward_proxy_find_req_memo(gcoap_request_memo_t **memo_ptr,
     _find_req_memo(memo_ptr, src_pdu, remote, false);
 }
 
-ssize_t gcoap_forward_proxy_dispatch(const uint8_t *buf, size_t len, sock_udp_ep_t *remote)
+ssize_t gcoap_forward_proxy_dispatch(gcoap_socket_t *socket, const uint8_t *buf, size_t len,
+                                     sock_udp_ep_t *remote)
 {
-    return sock_udp_send(&_sock_udp, buf, len, remote);
+    return _tl_send(socket, buf, len, remote, NULL);
 }
 
 /** @} */

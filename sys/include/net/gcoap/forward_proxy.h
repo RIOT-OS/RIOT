@@ -71,6 +71,7 @@ void gcoap_forward_proxy_find_req_memo(gcoap_request_memo_t **memo_ptr,
 /**
  * @brief   Sends a buffer containing a CoAP message to the @p remote endpoint
  *
+ * @param[in] socket GCoAP socket to send CoAP message over.
  * @param[in] buf    Buffer that contains the CoAP message to be sent
  * @param[in] len    Length of @p buf
  * @param[in] remote Remote endpoint to send the message to
@@ -80,8 +81,8 @@ void gcoap_forward_proxy_find_req_memo(gcoap_request_memo_t **memo_ptr,
  * @return  length of the packet
  * @return  < 0 on error
  */
-ssize_t gcoap_forward_proxy_dispatch(const uint8_t *buf,
-                                     size_t len, sock_udp_ep_t *remote);
+ssize_t gcoap_forward_proxy_dispatch(gcoap_socket_t *socket, const uint8_t *buf, size_t len,
+                                     sock_udp_ep_t *remote);
 
 #ifdef __cplusplus
 }
