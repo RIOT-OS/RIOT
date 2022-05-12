@@ -800,13 +800,8 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
         }
 
         gcoap_request_memo_t *memo = &_coap_state.open_reqs[i];
-        if (memo->send_limit == GCOAP_SEND_LIMIT_NON) {
-            memo_pdu->hdr = (coap_hdr_t *) &memo->msg.hdr_buf[0];
-        }
-        else {
-            memo_pdu->hdr = (coap_hdr_t *) memo->msg.data.pdu_buf;
-        }
 
+        memo_pdu->hdr = gcoap_request_memo_get_hdr(memo);
         if (by_mid) {
             if ((src_pdu->hdr->id == memo_pdu->hdr->id)
                     && sock_udp_ep_equal(&memo->remote_ep, remote)) {
@@ -833,12 +828,8 @@ static void _expire_request(gcoap_request_memo_t *memo)
         /* Pass response to handler */
         if (memo->resp_handler) {
             coap_pkt_t req;
-            if (memo->send_limit == GCOAP_SEND_LIMIT_NON) {
-                req.hdr = (coap_hdr_t *)&memo->msg.hdr_buf[0];   /* for reference */
-            }
-            else {
-                req.hdr = (coap_hdr_t *)memo->msg.data.pdu_buf;
-            }
+
+            req.hdr = gcoap_request_memo_get_hdr(memo);
             memo->resp_handler(memo, &req, NULL);
         }
         if (memo->send_limit != GCOAP_SEND_LIMIT_NON) {

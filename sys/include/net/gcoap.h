@@ -1126,6 +1126,23 @@ ssize_t gcoap_encode_link(const coap_resource_t *resource, char *buf,
 sock_dtls_t *gcoap_get_sock_dtls(void);
 #endif
 
+/**
+ * @brief   Get the header of a request from a @ref gcoap_request_memo_t
+ *
+ * @param[in] memo  A request memo. Must not be NULL.
+ *
+ * @return  The request header for the given request memo.
+ */
+static inline coap_hdr_t *gcoap_request_memo_get_hdr(const gcoap_request_memo_t *memo)
+{
+    if (memo->send_limit == GCOAP_SEND_LIMIT_NON) {
+        return (coap_hdr_t *)&memo->msg.hdr_buf[0];
+    }
+    else {
+        return (coap_hdr_t *)memo->msg.data.pdu_buf;
+    }
+}
+
 #ifdef __cplusplus
 }
 #endif
