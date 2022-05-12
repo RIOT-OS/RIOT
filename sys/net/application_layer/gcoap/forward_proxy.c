@@ -314,13 +314,8 @@ static void _forward_resp_handler(const gcoap_request_memo_t *memo,
         }
         else {
             coap_pkt_t req;
-            if (memo->send_limit == GCOAP_SEND_LIMIT_NON) {
-                req.hdr = (coap_hdr_t *) &memo->msg.hdr_buf[0];
-            }
-            else {
-                req.hdr = (coap_hdr_t *) memo->msg.data.pdu_buf;
-            }
 
+            req.hdr = gcoap_request_memo_get_hdr(memo);
             size_t pdu_len = pdu->payload_len +
                 (pdu->payload - (uint8_t *)pdu->hdr);
             nanocoap_cache_process(cep->cache_key, coap_get_code(&req), pdu, pdu_len);
