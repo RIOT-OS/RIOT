@@ -34,13 +34,6 @@
 typedef void (*IAP)(unsigned int[], unsigned int[]);
 static const IAP IAP_Entry = (IAP)0x7ffffff1;
 
-/**
- * @brief   Memory markers, defined in the linker script
- * @{
- */
-extern uint32_t _end_fw;
-extern uint32_t _erom;
-
 static uint32_t iap(uint32_t code, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4)
 {
     /* contains parameters for IAP command */
@@ -257,14 +250,4 @@ void flashpage_write(void *target_addr, const void *data, size_t len)
     if (err) {
         DEBUG("ERROR: COPY_RAM_TO_FLASH: %u\n", err);
     }
-}
-
-unsigned flashpage_first_free(void)
-{
-    return flashpage_page(&_end_fw) + 1;
-}
-
-unsigned flashpage_last_free(void)
-{
-    return flashpage_page(&_erom) - 1;
 }
