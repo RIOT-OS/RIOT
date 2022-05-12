@@ -80,7 +80,10 @@ typedef struct {
 
     size_t response_len; /**< length of the message in @p response */
 
-    unsigned request_method; /**< the method of the initial request */
+    uint8_t request_method; /**< the method of the initial request */
+#if IS_USED(MODULE_GCOAP) || defined(DOXYGEN)
+    bool truncated;         /**< the cached response is truncated */
+#endif  /* IS_USED(MODULE_GCOAP) || defined(DOXYGEN) */
 
     /**
      * @brief absolute system time in seconds until which this cache entry
@@ -142,11 +145,11 @@ size_t nanocoap_cache_free_count(void);
  * @param[in] resp            The response to operate on
  * @param[in] resp_len        The actual length of the response in @p resp
  *
- * @return  0 on successfully handling the response
- * @return  -1 on error
+ * @return  The cache entry on successfully handling the response
+ * @return  NULL on error
  */
-int nanocoap_cache_process(const uint8_t *cache_key, unsigned request_method,
-                           const coap_pkt_t *resp, size_t resp_len);
+nanocoap_cache_entry_t *nanocoap_cache_process(const uint8_t *cache_key, unsigned request_method,
+                                               const coap_pkt_t *resp, size_t resp_len);
 /**
  * @brief   Creates a new or gets an existing cache entry using the
  *          request packet.

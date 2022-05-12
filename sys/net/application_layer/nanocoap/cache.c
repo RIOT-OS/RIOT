@@ -163,8 +163,8 @@ nanocoap_cache_entry_t *nanocoap_cache_request_lookup(const coap_pkt_t *req)
     return ce;
 }
 
-int nanocoap_cache_process(const uint8_t *cache_key, unsigned request_method,
-                           const coap_pkt_t *resp, size_t resp_len)
+nanocoap_cache_entry_t *nanocoap_cache_process(const uint8_t *cache_key, unsigned request_method,
+                                               const coap_pkt_t *resp, size_t resp_len)
 {
     nanocoap_cache_entry_t *ce;
     ce = nanocoap_cache_key_lookup(cache_key);
@@ -218,14 +218,14 @@ int nanocoap_cache_process(const uint8_t *cache_key, unsigned request_method,
        ETag Option for validation.
     */
     else if (resp->hdr->code == COAP_CODE_CONTENT) {
-        if (NULL == nanocoap_cache_add_by_key(cache_key, request_method,
-                                              resp, resp_len)) {
+        if ((ce = nanocoap_cache_add_by_key(cache_key, request_method,
+                                            resp, resp_len)) == NULL) {
             /* no space left in the cache? */
-            return -1;
+            return NULL;
         }
     }
 
-    return 0;
+    return ce;
 }
 static nanocoap_cache_entry_t *_nanocoap_cache_pop(void)
 {

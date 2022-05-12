@@ -461,6 +461,9 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
                                                   sizeof(_listen_buf)) < 0) {
                             memo->state = GCOAP_MEMO_ERR;
                         }
+                        if (ce->truncated) {
+                            memo->state = GCOAP_MEMO_RESP_TRUNC;
+                        }
                     }
                     /* TODO: resend request if VALID but no cache entry? */
                     else if ((pdu.hdr->code != COAP_CODE_VALID)) {
@@ -1139,8 +1142,11 @@ static void _cache_process(gcoap_request_memo_t *memo,
     size_t pdu_len = pdu->payload_len +
         (pdu->payload - (uint8_t *)pdu->hdr);
 #if IS_USED(MODULE_NANOCOAP_CACHE)
+    nanocoap_cache_entry_t *ce;
     /* cache_key in memo is pre-processor guarded so we need to as well */
-    nanocoap_cache_process(memo->cache_key, coap_get_code(&req), pdu, pdu_len);
+    if ((ce = nanocoap_cache_process(memo->cache_key, coap_get_code(&req), pdu, pdu_len))) {
+        ce->truncated = (memo->state == GCOAP_MEMO_RESP_TRUNC);
+    }
 #else
     (void)req;
     (void)pdu_len;
@@ -1199,8 +1205,7 @@ static void _receive_from_cache_cb(void *ctx)
             coap_pkt_t pdu = { .hdr = (coap_hdr_t *)_listen_buf };
             _copy_hdr_from_req_memo(&pdu, memo);
             if (_cache_build_response(ce, &pdu, _listen_buf, sizeof(_listen_buf)) >= 0) {
-                /* TODO somehow find out if cached response was truncated? */
-                memo->state = GCOAP_MEMO_RESP;
+                memo->state = (ce->truncated) ? GCOAP_MEMO_RESP_TRUNC : GCOAP_MEMO_RESP;
                 memo->resp_handler(memo, &pdu, &memo->remote_ep);
                 if (memo->send_limit >= 0) {        /* if confirmable */
                     *memo->msg.data.pdu_buf = 0;    /* clear resend PDU buffer */
