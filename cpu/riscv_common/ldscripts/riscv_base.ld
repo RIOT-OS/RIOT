@@ -34,10 +34,6 @@ SECTIONS
 {
   __stack_size     = DEFINED(__stack_size) ? __stack_size : 256;
 
-  /* Populate information about rom size */
-  _srom = ORIGIN(flash);
-  _erom = ORIGIN(flash) + LENGTH(flash);
-
   .init           :
   {
     KEEP (*(SORT_NONE(.init)))
@@ -231,9 +227,5 @@ SECTIONS
 
   .flash_writable (NOLOAD) : {
     KEEP(*(SORT(.flash_writable.*)))
-  } > flash
-
-  .end_fw (NOLOAD) : ALIGN(4) {
-    _end_fw = . ;
   } > flash
 }
