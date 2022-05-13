@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "event.h"
 #include "od.h"
 #include "timex.h"
 #include "random.h"
@@ -796,14 +797,7 @@ static void _lwmac_event_cb(netdev_t *dev, netdev_event_t event)
     gnrc_netif_t *netif = (gnrc_netif_t *) dev->context;
 
     if (event == NETDEV_EVENT_ISR) {
-        msg_t msg;
-
-        msg.type = NETDEV_MSG_TYPE_EVENT;
-        msg.content.ptr = (void *) netif;
-
-        if (msg_send(&msg, netif->pid) <= 0) {
-            LOG_WARNING("WARNING: [LWMAC] gnrc_netdev: possibly lost interrupt.\n");
-        }
+        event_post(&netif->evq, &netif->event_isr);
     }
     else {
         DEBUG("gnrc_netdev: event triggered -> %i\n", event);
