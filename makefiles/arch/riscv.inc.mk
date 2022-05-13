@@ -38,23 +38,23 @@ ifeq (,$(TARGET_ARCH))
 endif
 
 ifeq ($(TOOLCHAIN),gnu)
-  NEW_RISCV_ISA := $(shell echo "" | $(TARGET_ARCH)-as -march=rv32imac_zicsr -mabi=ilp32 - > /dev/null 2>&1 && echo 1 || echo 0)
+  GCC_DEFAULTS_TO_NEW_RISCV_ISA ?= $(shell echo "typedef int dont_be_pedantic;" | $(TARGET_ARCH)-gcc -march=rv32imac -mabi=ilp32 -misa-spec=2.2 -E - > /dev/null 2>&1 && echo 1 || echo 0)
 endif
 
-NEW_RISCV_ISA ?= 0
+GCC_DEFAULTS_TO_NEW_RISCV_ISA ?= 0
+
+CFLAGS_CPU := -march=rv32imac -mabi=ilp32
 
 # Since RISC-V ISA specifications 20191213 instructions previously included in
 # rv32imac have been moved to the ZICSR extension. See
 # https://riscv.org/wp-content/uploads/2019/12/riscv-spec-20191213.pdf
 #
-# Select the march based on the ISA spec implemented by the used compiler:
-ifeq (1,$(NEW_RISCV_ISA))
-  CFLAGS_CPU := -march=rv32imac_zicsr
-else
-  CFLAGS_CPU := -march=rv32imac
+# Select the oldest ISA spec in which ZICSR was not yet split out into an
+# extension
+ifeq (1,$(GCC_DEFAULTS_TO_NEW_RISCV_ISA))
+  CFLAGS_CPU += -misa-spec=2.2
 endif
 
-CFLAGS_CPU += -mabi=ilp32
 ifeq ($(TOOLCHAIN),llvm)
   # Always use riscv32-none-elf as target triple for clang, as some
   # autodetected gcc target triples are incompatible with clang
@@ -76,7 +76,7 @@ LINKFLAGS += -T$(LINKER_SCRIPT)
 CFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) $(CFLAGS_LINK)
 ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
 # export linker flags
-LINKFLAGS +=  -march=rv32imac -mabi=ilp32 $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT) -nostartfiles -Wl,--gc-sections -static -lgcc
+LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT) -nostartfiles -Wl,--gc-sections -static -lgcc
 
 # Platform triple as used by Rust
 RUST_TARGET = riscv32imac-unknown-none-elf
