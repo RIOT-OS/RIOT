@@ -231,7 +231,7 @@ static void test_nanocoap_cache__max_age(void)
     /* the absolute time of max-age should be at approx. now + 30 sec
        (1 sec buffer) */
     now = ztimer_now(ZTIMER_SEC);
-    TEST_ASSERT(c->max_age < (now + 31));
+    TEST_ASSERT(nanocoap_cache_entry_is_stale(c, now + 31));
 
     /* delete previously added cache entry */
     nanocoap_cache_del(c);
@@ -251,7 +251,10 @@ static void test_nanocoap_cache__max_age(void)
     /* the absolute time of max-age should be at approx. now + 60 sec
        (1 sec buffer) */
     now = ztimer_now(ZTIMER_SEC);
-    TEST_ASSERT(c->max_age < (now + 61));
+    TEST_ASSERT(nanocoap_cache_entry_is_stale(c, now + 61));
+    /* check overflow cases */
+    c->max_age = UINT32_MAX - 40;
+    TEST_ASSERT(nanocoap_cache_entry_is_stale(c, 20));
 }
 
 Test *tests_nanocoap_cache_tests(void)

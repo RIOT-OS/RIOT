@@ -23,6 +23,7 @@
 #define NET_NANOCOAP_CACHE_H
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include "clist.h"
 #include "net/nanocoap.h"
@@ -89,7 +90,7 @@ typedef struct {
      * @brief absolute system time in seconds until which this cache entry
      * is considered valid.
      */
-    ztimer_now_t max_age;
+    uint32_t max_age;
 } nanocoap_cache_entry_t;
 
 /**
@@ -229,6 +230,21 @@ void nanocoap_cache_key_generate(const coap_pkt_t *req, uint8_t *cache_key);
  * @return  <0 or 0> (see memcmp()) for unequal cache keys
  */
 ssize_t nanocoap_cache_key_compare(uint8_t *cache_key1, uint8_t *cache_key2);
+
+/**
+ * @brief   Check if the Max-Age of a cache entry has passed
+ *
+ * @param[in] ce    A cache entry
+ * @param[in] now   The current time
+ *
+ * @return true, if Max-Age of cache entry has passed.
+ * @return false, if Max-Age of cache entry has not yet passed.
+ */
+static inline bool nanocoap_cache_entry_is_stale(const nanocoap_cache_entry_t *ce, uint32_t now)
+{
+    /* see https://en.wikipedia.org/w/index.php?title=Serial_number_arithmetic&oldid=1085516466#General_solution */
+    return ((int)(now - ce->max_age) > 0);
+}
 
 #ifdef __cplusplus
 }

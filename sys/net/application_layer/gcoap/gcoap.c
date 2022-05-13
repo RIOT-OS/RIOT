@@ -1253,8 +1253,7 @@ static bool _cache_lookup(gcoap_request_memo_t *memo,
         /* cache hit, methods are equal, and cache entry is not stale */
         if (*ce &&
             ((*ce)->request_method == coap_get_code(pdu)) &&
-            /* if now < (*ce)->max_age we have an overflow => result large as (*ce)->max_age */
-            ((unsigned)(now - (*ce)->max_age) > (*ce)->max_age)) {
+            !nanocoap_cache_entry_is_stale(*ce, now)) {
             return true;
         }
     }
