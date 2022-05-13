@@ -48,8 +48,7 @@
         }                                                                   \
     } while (0)
 
-#define VEC_MSG_LEN (sizeof("Unexpected userinfo member \"\" for \"\"") + \
-                     64U + 8U)
+#define VEC_MSG_LEN   (256)
 
 typedef struct {
     char uri[64];
