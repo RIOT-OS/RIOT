@@ -26,7 +26,9 @@
 #include <string.h>
 
 #include "assert.h"
+#include "net/coap.h"
 #include "net/gcoap.h"
+#include "net/nanocoap/cache.h"
 #include "net/sock/async/event.h"
 #include "net/sock/util.h"
 #include "mutex.h"
@@ -77,6 +79,12 @@ static int _find_obs_memo(gcoap_observe_memo_t **memo, sock_udp_ep_t *remote,
                                                        coap_pkt_t *pdu);
 static void _find_obs_memo_resource(gcoap_observe_memo_t **memo,
                                    const coap_resource_t *resource);
+static nanocoap_cache_entry_t *_cache_lookup_memo(gcoap_request_memo_t *cache_key);
+static void _cache_process(gcoap_request_memo_t *memo,
+                           coap_pkt_t *pdu);
+static ssize_t _cache_build_response(nanocoap_cache_entry_t *ce, coap_pkt_t *pdu,
+                                     uint8_t *buf, size_t len);
+static void _receive_from_cache_cb(void *arg);
 
 static int _request_matcher_default(gcoap_listener_t *listener,
                                     const coap_resource_t **resource,
@@ -130,6 +138,7 @@ static char _msg_stack[GCOAP_STACK_SIZE];
 static event_queue_t _queue;
 static uint8_t _listen_buf[CONFIG_GCOAP_PDU_BUF_SIZE];
 static sock_udp_t _sock_udp;
+static event_callback_t _receive_from_cache;
 
 #if IS_USED(MODULE_GCOAP_DTLS)
 /* DTLS variables and definitions */
@@ -435,6 +444,32 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
                     event_timeout_clear(&memo->resp_evt_tmout);
                 }
                 memo->state = truncated ? GCOAP_MEMO_RESP_TRUNC : GCOAP_MEMO_RESP;
+                if (IS_USED(MODULE_NANOCOAP_CACHE)) {
+                    nanocoap_cache_entry_t *ce = NULL;
+
+                    if ((pdu.hdr->code == COAP_CODE_VALID) &&
+                        (ce = _cache_lookup_memo(memo))) {
+                        /* update max_age from response and send cached response */
+                        uint32_t max_age = 60;
+
+                        coap_opt_get_uint(&pdu, COAP_OPT_MAX_AGE, &max_age);
+                        ce->max_age = ztimer_now(ZTIMER_SEC) + max_age;
+                        /* copy all options and possible payload from the cached response
+                         * to the new response */
+                        assert((uint8_t *)pdu.hdr == &_listen_buf[0]);
+                        if (_cache_build_response(ce, &pdu, _listen_buf,
+                                                  sizeof(_listen_buf)) < 0) {
+                            memo->state = GCOAP_MEMO_ERR;
+                        }
+                        if (ce->truncated) {
+                            memo->state = GCOAP_MEMO_RESP_TRUNC;
+                        }
+                    }
+                    /* TODO: resend request if VALID but no cache entry? */
+                    else if ((pdu.hdr->code != COAP_CODE_VALID)) {
+                        _cache_process(memo, &pdu);
+                    }
+                }
                 if (memo->resp_handler) {
                     memo->resp_handler(memo, &pdu, remote);
                 }
@@ -1084,6 +1119,207 @@ static ssize_t _tl_authenticate(gcoap_socket_t *sock, const sock_udp_ep_t *remot
 #endif
 }
 
+static nanocoap_cache_entry_t *_cache_lookup_memo(gcoap_request_memo_t *memo)
+{
+#if IS_USED(MODULE_NANOCOAP_CACHE)
+    /* cache_key in memo is pre-processor guarded so we need to as well */
+    return nanocoap_cache_key_lookup(memo->cache_key);
+#else
+    (void)memo;
+    return NULL;
+#endif
+}
+
+static void _cache_process(gcoap_request_memo_t *memo,
+                           coap_pkt_t *pdu)
+{
+    if (!IS_USED(MODULE_NANOCOAP_CACHE)) {
+        return;
+    }
+    coap_pkt_t req;
+
+    req.hdr = gcoap_request_memo_get_hdr(memo);
+    size_t pdu_len = pdu->payload_len +
+        (pdu->payload - (uint8_t *)pdu->hdr);
+#if IS_USED(MODULE_NANOCOAP_CACHE)
+    nanocoap_cache_entry_t *ce;
+    /* cache_key in memo is pre-processor guarded so we need to as well */
+    if ((ce = nanocoap_cache_process(memo->cache_key, coap_get_code(&req), pdu, pdu_len))) {
+        ce->truncated = (memo->state == GCOAP_MEMO_RESP_TRUNC);
+    }
+#else
+    (void)req;
+    (void)pdu_len;
+#endif
+}
+
+static ssize_t _cache_build_response(nanocoap_cache_entry_t *ce, coap_pkt_t *pdu,
+                                     uint8_t *buf, size_t len)
+{
+    if (!IS_USED(MODULE_NANOCOAP_CACHE)) {
+        return -ENOTSUP;
+    }
+    if (len < ce->response_len) {
+        return -ENOBUFS;
+    }
+    /* Use the same code from the cached content. Use other header
+     * fields from the incoming request */
+    gcoap_resp_init(pdu, buf, len, ce->response_pkt.hdr->code);
+    /* copy all options and possible payload from the cached response
+     * to the new response */
+    unsigned header_len_req = coap_get_total_hdr_len(pdu);
+    unsigned header_len_cached = coap_get_total_hdr_len(&ce->response_pkt);
+    unsigned opt_payload_len = ce->response_len - header_len_cached;
+
+    /* copy all options and possible payload from the cached response
+     * to the new response */
+    memcpy((buf + header_len_req),
+           (ce->response_buf + header_len_cached),
+           opt_payload_len);
+    /* parse into pdu including all options and payload pointers etc */
+    coap_parse(pdu, buf, header_len_req + opt_payload_len);
+    return ce->response_len;
+}
+
+static void _copy_hdr_from_req_memo(coap_pkt_t *pdu, gcoap_request_memo_t *memo)
+{
+    coap_pkt_t req_pdu;
+
+    req_pdu.hdr = gcoap_request_memo_get_hdr(memo);
+    memcpy(pdu->hdr, req_pdu.hdr, coap_get_total_hdr_len(&req_pdu));
+}
+
+static void _receive_from_cache_cb(void *ctx)
+{
+    if (!IS_USED(MODULE_NANOCOAP_CACHE)) {
+        return;
+    }
+
+    gcoap_request_memo_t *memo = ctx;
+    nanocoap_cache_entry_t *ce = NULL;
+
+    if ((ce = _cache_lookup_memo(memo))) {
+        if (memo->resp_handler) {
+            /* copy header from request so gcoap_resp_init in _cache_build_response works correctly
+             */
+            coap_pkt_t pdu = { .hdr = (coap_hdr_t *)_listen_buf };
+            _copy_hdr_from_req_memo(&pdu, memo);
+            if (_cache_build_response(ce, &pdu, _listen_buf, sizeof(_listen_buf)) >= 0) {
+                memo->state = (ce->truncated) ? GCOAP_MEMO_RESP_TRUNC : GCOAP_MEMO_RESP;
+                memo->resp_handler(memo, &pdu, &memo->remote_ep);
+                if (memo->send_limit >= 0) {        /* if confirmable */
+                    *memo->msg.data.pdu_buf = 0;    /* clear resend PDU buffer */
+                }
+                memo->state = GCOAP_MEMO_UNUSED;
+            }
+        }
+    }
+    else {
+        /* oops we somehow lost the cache entry */
+        DEBUG("gcoap: cache entry was lost\n");
+        if (memo->resp_handler) {
+            memo->state = GCOAP_MEMO_ERR;
+            memo->resp_handler(memo, NULL, &memo->remote_ep);
+        }
+    }
+}
+
+static void _update_memo_cache_key(gcoap_request_memo_t *memo, uint8_t *cache_key)
+{
+#if IS_USED(MODULE_NANOCOAP_CACHE)
+    if (memo) {
+        /* memo->cache_key is guarded by MODULE_NANOCOAP_CACHE, so preprocessor
+         * magic is needed */
+        memcpy(memo->cache_key, cache_key, CONFIG_NANOCOAP_CACHE_KEY_LENGTH);
+    }
+#else
+    (void)memo;
+    (void)cache_key;
+#endif
+}
+
+static bool _cache_lookup(gcoap_request_memo_t *memo,
+                          coap_pkt_t *pdu,
+                          nanocoap_cache_entry_t **ce)
+{
+    if (IS_USED(MODULE_NANOCOAP_CACHE)) {
+        uint8_t cache_key[SHA256_DIGEST_LENGTH];
+        ztimer_now_t now = ztimer_now(ZTIMER_SEC);
+
+        nanocoap_cache_key_generate(pdu, cache_key);
+        *ce = nanocoap_cache_key_lookup(cache_key);
+
+        _update_memo_cache_key(memo, cache_key);
+        /* cache hit, methods are equal, and cache entry is not stale */
+        if (*ce &&
+            ((*ce)->request_method == coap_get_code(pdu)) &&
+            !nanocoap_cache_entry_is_stale(*ce, now)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static ssize_t _cache_check(const uint8_t *buf, size_t len,
+                            gcoap_request_memo_t *memo,
+                            bool *cache_hit)
+{
+    if (!IS_USED(MODULE_NANOCOAP_CACHE)) {
+        return len;
+    }
+    coap_pkt_t req;
+    nanocoap_cache_entry_t *ce = NULL;
+    /* XXX cast to const might cause problems here :-/ */
+    ssize_t res = coap_parse(&req, (uint8_t *)buf, len);
+
+    if (res < 0) {
+        DEBUG("gcoap: parse failure for cache lookup: %d\n", (int)res);
+        return -EINVAL;
+    }
+
+    *cache_hit = _cache_lookup(memo, &req, &ce);
+
+    if (!(*cache_hit) && (ce != NULL)) {
+        /* Cache entry was found, but it is stale. Try to validate */
+        uint8_t *resp_etag;
+        /* Searching for more ETags might become necessary in the future */
+        ssize_t resp_etag_len = coap_opt_get_opaque(&ce->response_pkt, COAP_OPT_ETAG, &resp_etag);
+
+        /* ETag found, but don't act on illegal ETag size */
+        if ((resp_etag_len > 0) && ((size_t)resp_etag_len <= COAP_ETAG_LENGTH_MAX)) {
+            uint8_t *tmp_etag;
+            ssize_t tmp_etag_len = coap_opt_get_opaque(&req, COAP_OPT_ETAG, &tmp_etag);
+
+            if (tmp_etag_len >= resp_etag_len) {
+                memcpy(tmp_etag, resp_etag, resp_etag_len);
+                /* shorten ETag option if necessary */
+                if ((size_t)resp_etag_len < COAP_ETAG_LENGTH_MAX) {
+                    /* now we need the start of the option (not its value) so dig once more */
+                    uint8_t *start = coap_find_option(&req, COAP_OPT_ETAG);
+                    /* option length must always be <= COAP_ETAG_LENGTH_MAX = 8 < 12, so the length
+                     * is encoded in the first byte, see also RFC 7252, section 3.1 */
+                    *start &= 0x0f;
+                    /* first if around here should make sure we are <= 8 < 0xf, so we don't need to
+                     * bitmask resp_etag_len */
+                    *start |= (uint8_t)resp_etag_len;
+                    /* remove padding */
+                    size_t rem_len = (len - (tmp_etag + COAP_ETAG_LENGTH_MAX - buf));
+                    memmove(tmp_etag + resp_etag_len, tmp_etag + COAP_ETAG_LENGTH_MAX, rem_len);
+                    len -= (COAP_ETAG_LENGTH_MAX - resp_etag_len);
+                }
+            }
+        }
+        else {
+            len = coap_opt_remove(&req, COAP_OPT_ETAG);
+        }
+    }
+    else {
+        len = coap_opt_remove(&req, COAP_OPT_ETAG);
+    }
+    return len;
+}
+
 /*
  * gcoap interface functions
  */
@@ -1105,6 +1341,9 @@ kernel_pid_t gcoap_init(void)
     /* randomize initial value */
     atomic_init(&_coap_state.next_message_id, (unsigned)random_uint32());
 
+    if (IS_USED(MODULE_NANOCOAP_CACHE)) {
+        nanocoap_cache_init();
+    }
     /* initialize the forward proxy operation, if compiled */
     if (IS_ACTIVE(MODULE_GCOAP_FORWARD_PROXY)) {
         gcoap_forward_proxy_init();
@@ -1163,7 +1402,12 @@ int gcoap_req_init_path_buffer(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
 
     coap_pkt_init(pdu, buf, len, res);
-    if ((path != NULL) && (path_len > 0)) {
+    if (IS_USED(MODULE_NANOCOAP_CACHE)) {
+        static const uint8_t tmp[COAP_ETAG_LENGTH_MAX] = { 0 };
+        /* add slack to maybe add an ETag on stale cache hit later */
+        res = coap_opt_add_opaque(pdu, COAP_OPT_ETAG, tmp, sizeof(tmp));
+    }
+    if ((res > 0) && (path != NULL) && (path_len > 0)) {
         res = coap_opt_add_uri_path_buffer(pdu, path, path_len);
     }
     return (res > 0) ? 0 : res;
@@ -1179,6 +1423,7 @@ ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
     unsigned msg_type  = (*buf & 0x30) >> 4;
     uint32_t timeout   = 0;
     ssize_t res = 0;
+    bool cache_hit = false;
 
     assert(remote != NULL);
 
@@ -1208,6 +1453,15 @@ ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
         memo->context = context;
         memcpy(&memo->remote_ep, remote, sizeof(sock_udp_ep_t));
         memo->socket = socket;
+
+        if (IS_USED(MODULE_NANOCOAP_CACHE)) {
+            ssize_t res = _cache_check(buf, len, memo, &cache_hit);
+
+            if (res < 0) {
+                return res;
+            }
+            len = res;
+        }
 
         switch (msg_type) {
         case COAP_TYPE_CON:
@@ -1249,6 +1503,25 @@ ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
         mutex_unlock(&_coap_state.lock);
         if (memo->state == GCOAP_MEMO_UNUSED) {
             return 0;
+        }
+        if (cache_hit) {
+            /* post to receive cache entry */
+            event_callback_init(&_receive_from_cache,
+                                _receive_from_cache_cb,
+                                memo);
+            event_post(&_queue, &_receive_from_cache.super);
+            return len;
+        }
+    }
+    /* check cache without memo */
+    else if (IS_USED(MODULE_NANOCOAP_CACHE)) {
+        ssize_t res = _cache_check(buf, len, NULL, &cache_hit);
+
+        if (res < 0) {
+            return res;
+        }
+        if (cache_hit > 0) {
+            return res;
         }
     }
 

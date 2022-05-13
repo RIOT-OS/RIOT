@@ -405,6 +405,7 @@
 #include "net/sock/dtls.h"
 #endif
 #include "net/nanocoap.h"
+#include "net/nanocoap/cache.h"
 #include "timex.h"
 
 #ifdef __cplusplus
@@ -809,6 +810,14 @@ struct gcoap_request_memo {
     event_timeout_t resp_evt_tmout;     /**< Limits wait for response */
     event_callback_t resp_tmout_cb;     /**< Callback for response timeout */
     gcoap_socket_t socket;              /**< Transport type to remote endpoint */
+#if IS_USED(MODULE_NANOCOAP_CACHE) || DOXYGEN
+    /**
+     * @brief   Cache key for the request
+     *
+     * @note    Only available with module ['nanocoap_cache'](@ref net_nanocoap_cache)
+     */
+    uint8_t cache_key[CONFIG_NANOCOAP_CACHE_KEY_LENGTH];
+#endif
 };
 
 /**
@@ -856,6 +865,12 @@ void gcoap_register_listener(gcoap_listener_t *listener);
  * If @p code is COAP_CODE_EMPTY, prepares a complete "CoAP ping" 4 byte empty
  * message request, ready to send.
  *
+ * With module module [`nanocoap_cache`](@ref net_nanocoap_cache) an all-zero ETag option of
+ * length 8 which is updated with a value or removed in @ref gcoap_req_send() /
+ * @ref gcoap_req_send_tl() depending on existing cache entries for cache (re-)validation. If you do
+ * not use the given send functions or do not want cache entries to revalidated for any reason,
+ * remove that empty option using @ref coap_opt_remove().
+ *
  * @param[out] pdu      Request metadata
  * @param[out] buf      Buffer containing the PDU
  * @param[in] len       Length of the buffer
@@ -879,6 +894,12 @@ int gcoap_req_init_path_buffer(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  *
  * If @p code is COAP_CODE_EMPTY, prepares a complete "CoAP ping" 4 byte empty
  * message request, ready to send.
+ *
+ * With module module [`nanocoap_cache`](@ref net_nanocoap_cache) an all-zero ETag option of
+ * length 8 which is updated with a value or removed in @ref gcoap_req_send() /
+ * @ref gcoap_req_send_tl() depending on existing cache entries for cache (re-)validation. If you do
+ * not use the given send functions or do not want cache entries to revalidated for any reason,
+ * remove that empty option using @ref coap_opt_remove().
  *
  * @param[out] pdu      Request metadata
  * @param[out] buf      Buffer containing the PDU
@@ -914,9 +935,14 @@ static inline int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                                     unsigned code, char *path)
 {
-    return (gcoap_req_init(pdu, buf, len, code, path) == 0)
-                ? coap_opt_finish(pdu, COAP_OPT_FINISH_NONE)
-                : -1;
+    if (gcoap_req_init(pdu, buf, len, code, path) == 0) {
+        if (IS_USED(MODULE_NANOCOAP_CACHE)) {
+            /* remove ETag option slack added for cache validation */
+            coap_opt_remove(pdu, COAP_OPT_ETAG);
+        }
+        return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
+    }
+    return -1;
 }
 
 /**

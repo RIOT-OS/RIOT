@@ -23,6 +23,7 @@
 #define NET_NANOCOAP_CACHE_H
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include "clist.h"
 #include "net/nanocoap.h"
@@ -80,13 +81,16 @@ typedef struct {
 
     size_t response_len; /**< length of the message in @p response */
 
-    unsigned request_method; /**< the method of the initial request */
+    uint8_t request_method; /**< the method of the initial request */
+#if IS_USED(MODULE_GCOAP) || defined(DOXYGEN)
+    bool truncated;         /**< the cached response is truncated */
+#endif  /* IS_USED(MODULE_GCOAP) || defined(DOXYGEN) */
 
     /**
      * @brief absolute system time in seconds until which this cache entry
      * is considered valid.
      */
-    ztimer_now_t max_age;
+    uint32_t max_age;
 } nanocoap_cache_entry_t;
 
 /**
@@ -142,11 +146,11 @@ size_t nanocoap_cache_free_count(void);
  * @param[in] resp            The response to operate on
  * @param[in] resp_len        The actual length of the response in @p resp
  *
- * @return  0 on successfully handling the response
- * @return  -1 on error
+ * @return  The cache entry on successfully handling the response
+ * @return  NULL on error
  */
-int nanocoap_cache_process(const uint8_t *cache_key, unsigned request_method,
-                           const coap_pkt_t *resp, size_t resp_len);
+nanocoap_cache_entry_t *nanocoap_cache_process(const uint8_t *cache_key, unsigned request_method,
+                                               const coap_pkt_t *resp, size_t resp_len);
 /**
  * @brief   Creates a new or gets an existing cache entry using the
  *          request packet.
@@ -226,6 +230,21 @@ void nanocoap_cache_key_generate(const coap_pkt_t *req, uint8_t *cache_key);
  * @return  <0 or 0> (see memcmp()) for unequal cache keys
  */
 ssize_t nanocoap_cache_key_compare(uint8_t *cache_key1, uint8_t *cache_key2);
+
+/**
+ * @brief   Check if the Max-Age of a cache entry has passed
+ *
+ * @param[in] ce    A cache entry
+ * @param[in] now   The current time
+ *
+ * @return true, if Max-Age of cache entry has passed.
+ * @return false, if Max-Age of cache entry has not yet passed.
+ */
+static inline bool nanocoap_cache_entry_is_stale(const nanocoap_cache_entry_t *ce, uint32_t now)
+{
+    /* see https://en.wikipedia.org/w/index.php?title=Serial_number_arithmetic&oldid=1085516466#General_solution */
+    return ((int)(now - ce->max_age) > 0);
+}
 
 #ifdef __cplusplus
 }

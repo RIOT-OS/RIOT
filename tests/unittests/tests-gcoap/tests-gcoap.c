@@ -22,6 +22,12 @@
 #include "unittests-constants.h"
 #include "tests-gcoap.h"
 
+#if IS_USED(MODULE_NANOCOAP_CACHE)
+#define ETAG_SLACK 9    /* account for ETag slack implicitly added by gcoap_req_init() */
+#else
+#define ETAG_SLACK 0
+#endif
+
 /*
  * A test set of dummy resources. The resource handlers are set to NULL.
  */
@@ -161,7 +167,7 @@ static void test_gcoap__client_put_req(void)
 static void test_gcoap__client_put_req_overfill(void)
 {
     /* header 4, token 2, path 11, format 1, marker 1 = 19 */
-    uint8_t buf[18];
+    uint8_t buf[18 + ETAG_SLACK];
     coap_pkt_t pdu;
     ssize_t len;
     char path[] = "/riot/value";
@@ -194,7 +200,7 @@ static void test_gcoap__client_get_path_defer(void)
 
     len = coap_opt_finish(&pdu, COAP_OPT_FINISH_NONE);
     TEST_ASSERT_EQUAL_INT(len,
-                          sizeof(coap_hdr_t) + CONFIG_GCOAP_TOKENLEN +optlen);
+                          sizeof(coap_hdr_t) + CONFIG_GCOAP_TOKENLEN + ETAG_SLACK + optlen);
 
     coap_parse(&pdu, buf, len);
 
@@ -222,7 +228,7 @@ static void test_gcoap__client_ping(void)
 
     /* confirm length */
     res = coap_opt_finish(&pdu, COAP_OPT_FINISH_NONE);
-    TEST_ASSERT_EQUAL_INT(4, res);
+    TEST_ASSERT_EQUAL_INT(4 + ETAG_SLACK, res);
 }
 
 /*
