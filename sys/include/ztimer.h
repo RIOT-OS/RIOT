@@ -301,12 +301,26 @@ struct ztimer_base {
     uint32_t offset;            /**< offset from last timer in list */
 };
 
+/**
+ * @defgroup   sys_ztimer_now64 ztimer_now64
+ * @brief 64-bit timestamp support
+ *
+ * @deprecated use @ref ztimer_now() returning uint32_t or alternatively use
+ *             module `ztimer64` with @ref ztimer64_now() returning uint64_t.
+ *             Will be removed after 2022.10 release.
+ */
+/**
+ * @typedef ztimer_now_t
+ * @brief type for ztimer_now() result
+ *
+ * @deprecated use @ref ztimer_now() returning uint32_t or alternatively use
+ *             module `ztimer64` with @ref ztimer64_now() returning uint64_t.
+ *             Will be removed after 2022.10 release.
+ */
 #if MODULE_ZTIMER_NOW64
-typedef uint64_t ztimer_now_t;  /**< type for ztimer_now() result
-                                 * @deprecated use uint32_t or ztimer64 */
+typedef uint64_t ztimer_now_t;
 #else
-typedef uint32_t ztimer_now_t;  /**< type for ztimer_now() result
-                                 * @deprecated use uint32_t or ztimer64 */
+typedef uint32_t ztimer_now_t;
 #endif
 
 /**
