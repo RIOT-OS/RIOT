@@ -13,7 +13,7 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   DEFAULT_MODULE += newlib_nano
 endif
 
-ifneq (,$(filter libstdcpp,$(USEMODULE)))
+ifneq (,$(filter cpp,$(USEMODULE)))
   USEMODULE += pthread
 endif
 
