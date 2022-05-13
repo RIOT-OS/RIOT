@@ -320,6 +320,7 @@ if __name__ == '__main__':
         _args.add_libstdcxx_includes = True
         _args.filter_out = ['-mno-thumb-interwork',
                             # Only even included for versions of GCC that support it
+                            '-misa-spec=2.2',
                             '-malign-data=natural',
                             # Only supported starting with clang 11
                             '-msmall-data-limit=8',
