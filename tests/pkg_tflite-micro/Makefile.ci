@@ -59,6 +59,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l053r8 \
     nucleo-l073rz \
     nucleo-l412kb \
+    nucleo-l432kc \
     nucleo-wl55jc \
     olimexino-stm32 \
     opencm904 \
