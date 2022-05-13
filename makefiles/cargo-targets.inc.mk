@@ -34,3 +34,9 @@ $(APPLICATION_RUST_MODULE).module: $(CARGO_LIB) FORCE
 	$(Q)cd $(BINDIR)/$(APPLICATION_RUST_MODULE)/ && $(AR) x $<
 	$(Q)# ... and move them back if any exist, careful to err if anything is duplicate
 	$(Q)rmdir $(BINDIR)/$(APPLICATION_RUST_MODULE)/bin/ || (mv -n $(BINDIR)/$(APPLICATION_RUST_MODULE)/bin/* $(BINDIR)/$(APPLICATION_RUST_MODULE)/ && rmdir $(BINDIR)/$(APPLICATION_RUST_MODULE)/bin/)
+
+# create cargo folders
+# This prevents cargo inside docker from creating them with root permissions
+# (should they not exist), and also from re-building everything every time
+# because the .cargo inside is as ephemeral as the build container.
+$(shell mkdir -p ~/.cargo/git ~/.cargo/registry)
