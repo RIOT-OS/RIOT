@@ -33,6 +33,10 @@
 #include "pktbuf_internal.h"
 #include "pktbuf_static.h"
 
+#ifndef CONFIG_GNRC_PKTBUF_TRACE_LEN
+#define CONFIG_GNRC_PKTBUF_TRACE_LEN (128)
+#endif
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -52,6 +56,84 @@ static uint16_t max_byte_count = 0;
 static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, const void *data, size_t size,
                                     gnrc_nettype_t type);
 static void *_pktbuf_alloc(size_t size);
+
+#if IS_USED(MODULE_GNRC_TRACE_PKTBUF_STATIC)
+static uintptr_t _leases[CONFIG_GNRC_PKTBUF_TRACE_LEN];
+static size_t _lease_len[CONFIG_GNRC_PKTBUF_TRACE_LEN];
+
+static void _lease_out(const void *ptr, size_t len)
+{
+    len = _align(len);
+    DEBUG("leasing out %u bytes at %p\n", len, ptr);
+
+    bool marked = false;
+    for (unsigned i = 0; i < ARRAY_SIZE(_leases); ++i) {
+        assert(_leases[i] != (uintptr_t)ptr);
+
+        if (_leases[i] == 0 && !marked) {
+            _leases[i] = (uintptr_t)ptr;
+            _lease_len[i] = len;
+            marked = true;
+        }
+    }
+
+    if (!marked) {
+        puts("gnrc_pktbuf: out of trace space, increase CONFIG_GNRC_PKTBUF_TRACE_LEN");
+    }
+}
+
+static void _lease_return(const void *ptr, size_t len)
+{
+    len = _align(len);
+    DEBUG("returning %u bytes at %p\n", len, ptr);
+
+    bool found = false;
+    for (unsigned i = 0; i < ARRAY_SIZE(_leases); ++i) {
+        uintptr_t _ptr = (uintptr_t)ptr;
+        uintptr_t _start = _leases[i];
+        uintptr_t _end = _start + _lease_len[i];
+
+        if (_ptr < _start || _ptr > _end) {
+            continue;
+        }
+
+        if (_start == _ptr) {
+            assert(!found);
+            found = true;
+            if (_lease_len[i] == len) {
+                _leases[i] = 0;
+                _lease_len[i] = 0;
+            } else {
+                assert(len < _lease_len[i]);
+                _leases[i] = _ptr + len;
+                _lease_len[i] -= len;
+                DEBUG("remaining %u bytes at 0x%x\n", _lease_len[i], _leases[i]);
+            }
+            continue;
+        }
+
+        if (_ptr + len <= _end) {
+            found = true;
+            _lease_len[i] = _ptr - _start;
+        }
+    }
+
+    assert(found);
+}
+#else
+static inline void _lease_out(const void *ptr, size_t len)
+{
+    (void)ptr;
+    (void)len;
+}
+
+static inline void _lease_return(const void *ptr, size_t len)
+{
+    (void)ptr;
+    (void)len;
+
+}
+#endif
 
 static inline void _set_pktsnip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *next,
                                 void *data, size_t size, gnrc_nettype_t type)
@@ -412,6 +494,9 @@ static void *_pktbuf_alloc(size_t size)
         max_byte_count = last_byte;
     }
 #endif
+
+    _lease_out(ptr, size);
+
     return (void *)ptr;
 }
 
@@ -433,6 +518,8 @@ void gnrc_pktbuf_free_internal(void *data, size_t size)
 {
     size_t bytes_at_end;
     _unused_t *new = (_unused_t *)data, *prev = NULL, *ptr = _first_unused;
+
+    _lease_return(data, size);
 
     if (!gnrc_pktbuf_contains(data)) {
         return;
