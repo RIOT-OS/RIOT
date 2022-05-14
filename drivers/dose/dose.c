@@ -632,6 +632,15 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
                 *((netopt_enable_t *)value) = NETOPT_DISABLE;
             }
             return sizeof(netopt_enable_t);
+        case NETOPT_MAX_PDU_SIZE:
+            if (CONFIG_DOSE_RX_BUF_LEN < (ETHERNET_FRAME_LEN + DOSE_FRAME_CRC_LEN)) {
+                if (max_len < sizeof(uint16_t)) {
+                    return -EINVAL;
+                }
+                *((uint16_t *)value) = CONFIG_DOSE_RX_BUF_LEN - DOSE_FRAME_CRC_LEN;
+                return sizeof(uint16_t);
+            }
+            /* fall-through */
         default:
             return netdev_eth_get(dev, opt, value, max_len);
     }

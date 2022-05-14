@@ -160,7 +160,14 @@ typedef enum {
 /** @} */
 
 #define DOSE_FRAME_CRC_LEN          (2)     /**< CRC16 is used */
-#define DOSE_FRAME_LEN (ETHERNET_FRAME_LEN + DOSE_FRAME_CRC_LEN) /**< dose frame length */
+
+/**
+ * @brief   DOSE RX buffer length
+ *          Should be large enough to fit at least one Ethernet frame
+ */
+#ifndef CONFIG_DOSE_RX_BUF_LEN
+#define CONFIG_DOSE_RX_BUF_LEN (ETHERNET_FRAME_LEN + DOSE_FRAME_CRC_LEN)
+#endif
 
 /**
  * @brief   Hardware timer to use with the `dose_watchdog` module.
@@ -182,7 +189,7 @@ typedef struct {
     uint8_t opts;                           /**< Driver options */
     dose_state_t state;                     /**< Current state of the driver's state machine */
     mutex_t state_mtx;                      /**< Is unlocked every time a state is (re)entered */
-    uint8_t recv_buf[DOSE_FRAME_LEN];       /**< Receive buffer for incoming frames */
+    uint8_t recv_buf[CONFIG_DOSE_RX_BUF_LEN]; /**< Receive buffer for incoming frames */
     chunk_ringbuf_t rb;                     /**< Ringbuffer to store received frames.       */
                                             /* Written to from interrupts (with irq_disable */
                                             /* to prevent any simultaneous writes),         */
