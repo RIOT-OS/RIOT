@@ -30,7 +30,7 @@
 #define TEST_ITER           (1000UL)
 #endif
 
-#define STEP                (0.1)
+#define FLOAT_STEP          (0.1)
 
 int main(void)
 {
@@ -39,7 +39,7 @@ int main(void)
     puts("Testing floating point arithmetic...\n");
 
     for (unsigned long i = 0; i < TEST_ITER; i++) {
-        x += STEP;
+        x += FLOAT_STEP;
         double z = (x - floor(x));
         if (z >= 1.0) {
             puts("[FAILED]");
