@@ -794,6 +794,9 @@ int vfs_open(const char *name, int flags, mode_t mode);
  *
  * @return number of bytes read on success
  * @return <0 on error
+ *
+ * For simple cases of only a single read from a file, the @ref
+ * vfs_file_to_buffer function can be used.
  */
 ssize_t vfs_read(int fd, void *dest, size_t count);
 
@@ -806,6 +809,9 @@ ssize_t vfs_read(int fd, void *dest, size_t count);
  *
  * @return number of bytes written on success
  * @return <0 on error
+ *
+ * For simple cases of only a single write to a file, the @ref
+ * vfs_file_from_buffer function can be used.
  */
 ssize_t vfs_write(int fd, const void *src, size_t count);
 
