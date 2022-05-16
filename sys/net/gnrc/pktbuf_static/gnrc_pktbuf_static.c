@@ -61,10 +61,18 @@ static void *_pktbuf_alloc(size_t size);
 static uintptr_t _leases[CONFIG_GNRC_PKTBUF_TRACE_LEN];
 static size_t _lease_len[CONFIG_GNRC_PKTBUF_TRACE_LEN];
 
+static uint32_t _leased_out;
+
+uint32_t gnrc_pktbuf_get_usage(void)
+{
+    return _leased_out;
+}
+
 static void _lease_out(const void *ptr, size_t len)
 {
     len = _align(len);
-    DEBUG("leasing out %u bytes at %p\n", len, ptr);
+    DEBUG("leasing out %u bytes at %p (total: %u)\n", len, ptr, _leased_out + len);
+    _leased_out += len;
 
     bool marked = false;
     for (unsigned i = 0; i < ARRAY_SIZE(_leases); ++i) {
@@ -85,7 +93,9 @@ static void _lease_out(const void *ptr, size_t len)
 static void _lease_return(const void *ptr, size_t len)
 {
     len = _align(len);
-    DEBUG("returning %u bytes at %p\n", len, ptr);
+    DEBUG("returning %u bytes at %p (total: %d)\n", len, ptr, (int)_leased_out - len);
+    assert(len <= _leased_out);
+    _leased_out -= len;
 
     bool found = false;
     for (unsigned i = 0; i < ARRAY_SIZE(_leases); ++i) {
