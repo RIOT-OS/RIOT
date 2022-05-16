@@ -56,9 +56,6 @@ ifeq (1,$(GCOAP_ENABLE_DTLS))
   USEMODULE += gcoap_dtls
   # tinydtls needs crypto secure PRNG
   USEMODULE += prng_sha1prng
-
-  # Maximum number of DTLS sessions
-  CFLAGS += -DDTLS_PEER_MAX=1
 endif
 
 # Instead of simulating an Ethernet connection, we can also simulate
