@@ -53,7 +53,6 @@ static const char *_netopt_strmap[] = {
     [NETOPT_STATE]                 = "NETOPT_STATE",
     [NETOPT_RAWMODE]               = "NETOPT_RAWMODE",
     [NETOPT_RX_START_IRQ]          = "NETOPT_RX_START_IRQ",
-    [NETOPT_RX_END_IRQ]            = "NETOPT_RX_END_IRQ",
     [NETOPT_TX_START_IRQ]          = "NETOPT_TX_START_IRQ",
     [NETOPT_TX_END_IRQ]            = "NETOPT_TX_END_IRQ",
     [NETOPT_AUTOCCA]               = "NETOPT_AUTOCCA",

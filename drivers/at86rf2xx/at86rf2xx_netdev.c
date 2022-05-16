@@ -351,7 +351,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             break;
 
         case NETOPT_RX_START_IRQ:
-        case NETOPT_RX_END_IRQ:
         case NETOPT_TX_START_IRQ:
         case NETOPT_TX_END_IRQ:
             *((netopt_enable_t *)val) = NETOPT_ENABLE;

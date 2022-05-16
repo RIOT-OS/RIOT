@@ -155,8 +155,6 @@ static void gomach_reinit_radio(gnrc_netif_t *netif)
         netopt_enable_t enable;
         netif->dev->driver->get(netif->dev, NETOPT_RX_START_IRQ, &enable, sizeof(enable));
         assert(enable == NETOPT_ENABLE);
-        netif->dev->driver->get(netif->dev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
-        assert(enable == NETOPT_ENABLE);
         netif->dev->driver->get(netif->dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
         assert(enable == NETOPT_ENABLE);
     }

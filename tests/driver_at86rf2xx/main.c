@@ -91,7 +91,6 @@ int main(void)
 
     unsigned dev_success = 0;
     for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
-        netopt_enable_t en = NETOPT_ENABLE;
         const at86rf2xx_params_t *p = &at86rf2xx_params[i];
         netdev_t *dev = &devs[i].netdev.netdev;
 
@@ -101,7 +100,6 @@ int main(void)
         if (dev->driver->init(dev) < 0) {
             continue;
         }
-        dev->driver->set(dev, NETOPT_RX_END_IRQ, &en, sizeof(en));
         dev_success++;
     }
 

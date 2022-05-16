@@ -251,18 +251,6 @@ typedef enum {
     NETOPT_RX_START_IRQ,
 
     /**
-     * @brief   (@ref netopt_enable_t) Used to check if the driver generates
-     *          NETDEV_EVENT_RX_COMPLETE events
-     *
-     * This interrupt is triggered after a complete frame is received.
-     *
-     * @note    In case a transceiver does not support this interrupt, the event
-     *          may be triggered by the driver
-     * @warning This value is read-only and cannot be configured at run-time
-     */
-    NETOPT_RX_END_IRQ,
-
-    /**
      * @brief   (@ref netopt_enable_t) Used to check if the driver generates NETDEV_EVENT_TX_STARTED
      *          events
      *
