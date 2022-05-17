@@ -74,11 +74,21 @@ static int _init(mtd_dev_t *mtd)
     mtd_mapper_region_t *region = container_of(mtd, mtd_mapper_region_t, mtd);
     mtd_dev_t *backing_mtd = region->parent->mtd;
 
-    /* Configuration sanity checks */
-    assert(backing_mtd->page_size == region->mtd.page_size);
-    assert(backing_mtd->pages_per_sector == region->mtd.pages_per_sector);
+    /* inherit physical properties */
+    if (region->mtd.page_size == 0) {
+        region->mtd.page_size = backing_mtd->page_size;
+    }
+    if (region->mtd.pages_per_sector == 0) {
+        region->mtd.pages_per_sector = backing_mtd->pages_per_sector;
+    }
+    region->mtd.write_size = backing_mtd->write_size;
+
+    /* Configuration sanity check */
+    assert(backing_mtd->page_size >= region->mtd.page_size);
+    assert(backing_mtd->write_size <= region->mtd.page_size);
+    assert(region->mtd.page_size * region->mtd.pages_per_sector
+        == backing_mtd->page_size * backing_mtd->pages_per_sector);
     assert(backing_mtd->sector_count >= region->mtd.sector_count);
-    assert(backing_mtd->write_size == region->mtd.write_size);
 
     /* offset + region size must not exceed the backing device */
     assert(region->sector + region->mtd.sector_count <= backing_mtd->sector_count);
