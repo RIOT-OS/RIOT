@@ -1104,22 +1104,52 @@ static inline int _fd_is_valid(int fd)
     return 0;
 }
 
+static bool _is_dir(vfs_mount_t *mountp, vfs_DIR *dir, const char *restrict path)
+{
+    const vfs_dir_ops_t *ops = mountp->fs->d_op;
+    if (!ops->opendir) {
+        return false;
+    }
+
+    dir->d_op = ops;
+    dir->mp = mountp;
+
+    int res = ops->opendir(dir, path, path);
+    if (res < 0) {
+        return false;
+    }
+
+    ops->closedir(dir);
+    return true;
+}
+
 int vfs_sysop_stat_from_fstat(vfs_mount_t *mountp, const char *restrict path, struct stat *restrict buf)
 {
     const vfs_file_ops_t * f_op = mountp->fs->f_op;
-    vfs_file_t opened = {
-        .mp = mountp,
-        /* As per definition of the `vfsfile_ops::open` field */
-        .f_op = f_op,
-        .private_data = { .ptr = NULL },
-        .pos = 0,
+
+    union {
+        vfs_file_t file;
+        vfs_DIR dir;
+    } filedir = {
+        .file = {
+            .mp = mountp,
+            /* As per definition of the `vfsfile_ops::open` field */
+            .f_op = f_op,
+            .private_data = { .ptr = NULL },
+            .pos = 0,
+        },
     };
-    int err = f_op->open(&opened, path, 0, 0, NULL);
+
+    int err = f_op->open(&filedir.file, path, 0, 0, NULL);
     if (err < 0) {
+        if (_is_dir(mountp, &filedir.dir, path)) {
+            buf->st_mode = S_IFDIR;
+            return 0;
+        }
         return err;
     }
-    err = f_op->fstat(&opened, buf);
-    f_op->close(&opened);
+    err = f_op->fstat(&filedir.file, buf);
+    f_op->close(&filedir.file);
     return err;
 }
 
