@@ -1,0 +1,11 @@
+ifneq (,$(filter lorabasics_sx1280_driver,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+  FEATURES_REQUIRED += periph_spi
+
+  USEMODULE += ztimer_msec
+
+  USEMODULE += lorabasics_driver_sx1280_hal
+endif
+# This package has assumptions that only work for 32-bit architectures
+FEATURES_REQUIRED += arch_32bit
+USEMODULE += lorabasics_smtc_ral
