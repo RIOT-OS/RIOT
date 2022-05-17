@@ -927,6 +927,18 @@ int vfs_mount(vfs_mount_t *mountp);
 int vfs_mount_by_path(const char *path);
 
 /**
+ * @brief Unmount a file system with a pre-configured mount path
+ *
+ * @note This assumes mount points have been configured with @ref VFS_AUTO_MOUNT.
+ *
+ * @param[in]  path     Path of the pre-configured mount point
+ *
+ * @return 0 on success
+ * @return <0 on error
+ */
+int vfs_unmount_by_path(const char *path);
+
+/**
  * @brief Rename a file
  *
  * The file @p from_path will be renamed to @p to_path

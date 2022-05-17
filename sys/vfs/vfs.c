@@ -1197,4 +1197,15 @@ int vfs_mount_by_path(const char *path)
     return -ENOENT;
 }
 
+int vfs_unmount_by_path(const char *path)
+{
+    for (unsigned i = 0; i < MOUNTPOINTS_NUMOF; ++i) {
+        if (strcmp(path, vfs_mountpoints_xfa[i].mount_point) == 0) {
+            return vfs_umount(&vfs_mountpoints_xfa[i]);
+        }
+    }
+
+    return -ENOENT;
+}
+
 /** @} */
