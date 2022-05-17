@@ -88,6 +88,7 @@ extern "C" {
 #define NDP_OPT_PI                  (3)     /**< prefix information option */
 #define NDP_OPT_RH                  (4)     /**< redirected option */
 #define NDP_OPT_MTU                 (5)     /**< MTU option */
+#define NDP_OPT_TIMESTAMP           (13)    /**< Timestamp option */
 #define NDP_OPT_RI                  (24)    /**< Route Information Option */
 #define NDP_OPT_RDNSS               (25)    /**< recursive DNS server option */
 #define NDP_OPT_AR                  (33)    /**< address registration option */
@@ -334,6 +335,20 @@ typedef struct __attribute__((packed)) {
     network_uint32_t route_ltime;   /**< route lifetime */
     ipv6_addr_t prefix;             /**< prefix */
 } ndp_opt_ri_t;
+
+/**
+ * @brief   Timestamp option format
+ * @extends ndp_opt_t
+ *
+ * @see     [RFC 3971, section 5.3.1](https://www.rfc-editor.org/rfc/rfc3971.html#section-5.3.1)
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t type;                   /**< option type */
+    uint8_t len;                    /**< length in units of 8 octets */
+    uint8_t resv[6];                /**< reserved field */
+    network_uint64_t timestamp;     /**< seconds since Unix epoch (first 48 bit) */
+                                    /**  remaining 16 bits are 1/64K fractions of a second */
+} ndp_opt_timestamp_t;
 
 /**
  * @brief   Redirected header option format

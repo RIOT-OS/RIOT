@@ -466,6 +466,8 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 static uint32_t _handle_rio(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                             const ndp_opt_ri_t *pio);
+
+static void _handle_timestamp(const ndp_opt_timestamp_t *tsmp);
 /** @} */
 
 /* Iterator for NDP options in a packet */
@@ -742,6 +744,9 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             case NDP_OPT_MTU:
                 _handle_mtuo(netif, (const icmpv6_hdr_t *)rtr_adv,
                              (ndp_opt_mtu_t *)opt);
+                break;
+            case NDP_OPT_TIMESTAMP:
+                _handle_timestamp((ndp_opt_timestamp_t *)opt);
                 break;
             case NDP_OPT_RI:
                 _handle_rio(netif, ipv6, (ndp_opt_ri_t *)opt);
@@ -1659,5 +1664,19 @@ static uint32_t _handle_rio(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     }
 
     return route_ltime;
+}
+
+static void _handle_timestamp(const ndp_opt_timestamp_t *tsmp)
+{
+    if (!IS_USED(MODULE_GNRC_IPV6_NIB_TIMESTAMP)) {
+        return;
+    }
+
+    uint64_t seconds = byteorder_ntohll(tsmp->timestamp) >> 16;
+    uint16_t ms = (1000 * (seconds & 0xFFFF)) >> 16;
+
+    DEBUG("nib: received Timestamp option:\n");
+    DEBUG("     - Seconds: %u\n", (unsigned)seconds);
+    DEBUG("     - Milliseconds: %u\n", ms);
 }
 /** @} */

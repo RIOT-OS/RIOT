@@ -240,6 +240,19 @@ gnrc_pktsnip_t *gnrc_ndp_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next)
     return pkt;
 }
 
+gnrc_pktsnip_t *gnrc_ndp_opt_timestamp_build(uint64_t now, gnrc_pktsnip_t *next)
+{
+    gnrc_pktsnip_t *pkt = gnrc_ndp_opt_build(NDP_OPT_TIMESTAMP,
+                                             sizeof(ndp_opt_timestamp_t), next);
+    if (pkt != NULL) {
+        ndp_opt_timestamp_t *time_opt = pkt->data;
+
+        memset(time_opt->resv, 0, sizeof(time_opt->resv));
+        time_opt->timestamp = byteorder_htonll(now);
+    }
+    return pkt;
+}
+
 gnrc_pktsnip_t *gnrc_ndp_opt_rdnss_build(uint32_t ltime, ipv6_addr_t *addrs,
                                          unsigned addrs_num,
                                          gnrc_pktsnip_t *next)

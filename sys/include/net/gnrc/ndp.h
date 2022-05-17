@@ -279,6 +279,24 @@ gnrc_pktsnip_t *gnrc_ndp_opt_ri_build(const ipv6_addr_t *prefix,
 gnrc_pktsnip_t *gnrc_ndp_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next);
 
 /**
+ * @brief   Builds the Timestamp option.
+ *
+ * @see [RFC 3971, section 5.3.1](https://www.rfc-editor.org/rfc/rfc3971.html#section-5.3.1)
+ *
+ * @note    Should only be used with router advertisemnents. This is not checked
+ *          however, since nodes should silently ignore it in other NDP messages.
+ *
+ * @param[in] now           Upper 48 bit: Seconds since the Unix epoch
+ *                                        (January 1, 1970, 00:00 UTC)
+ *                          Lower 16 bit: Fraction of the current second.
+ * @param[in] next          More options in the packet. NULL, if there are none.
+ *
+ * @return  The packet snip list of options, on success
+ * @return  NULL, if packet buffer is full
+ */
+gnrc_pktsnip_t *gnrc_ndp_opt_timestamp_build(uint64_t now, gnrc_pktsnip_t *next);
+
+/**
  * @brief   Builts the recursive DNS server option
  *
  * @see [RFC 8106, section 5.1](https://tools.ietf.org/html/rfc8106#section-5.1)
