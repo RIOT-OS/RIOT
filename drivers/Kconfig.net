@@ -21,5 +21,6 @@ rsource "slipdev/Kconfig"
 rsource "$(RIOTCPU)/native/socket_zep/Kconfig"
 rsource "sx126x/Kconfig"
 rsource "sx127x/Kconfig"
+rsource "sx1280/Kconfig"
 rsource "tja1042/Kconfig"
 endmenu # Network Device Drivers
