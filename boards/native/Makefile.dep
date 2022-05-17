@@ -12,9 +12,11 @@ ifneq (,$(filter periph_can,$(FEATURES_USED)))
   USEPKG += libsocketcan
 endif
 
-# default to using littlefs2 on the virtual flash
+# default to using littlefs2 on the virtual flash if no other fs was selected
 ifneq (,$(filter vfs_default,$(USEMODULE)))
-  USEPKG += littlefs2
+  ifeq (,$(filter spiffs littlefs fatfs_vfs,$(USEMODULE)))
+    USEMODULE += littlefs2
+  endif
   USEMODULE += mtd
 endif
 
