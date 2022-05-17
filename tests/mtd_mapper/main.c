@@ -192,9 +192,6 @@ static mtd_mapper_region_t _region_a = {
     .mtd = {
         .driver = &mtd_mapper_driver,
         .sector_count = SECTOR_COUNT / 2,
-        .pages_per_sector = PAGE_PER_SECTOR,
-        .page_size = PAGE_SIZE,
-        .write_size = WRITE_SIZE,
     },
     .parent = &_parent,
     .sector = 0,
@@ -204,9 +201,6 @@ static mtd_mapper_region_t _region_b = {
     .mtd = {
         .driver = &mtd_mapper_driver,
         .sector_count = SECTOR_COUNT / 2,
-        .pages_per_sector = PAGE_PER_SECTOR,
-        .page_size = PAGE_SIZE,
-        .write_size = WRITE_SIZE,
     },
     .parent = &_parent,
     .sector = SECTOR_COUNT / 2,
