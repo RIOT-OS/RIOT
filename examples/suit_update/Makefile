@@ -41,6 +41,10 @@ QUIET ?= 1
 
 USEMODULE += suit suit_transport_coap
 
+# enable VFS transport (only works on boards with external storage)
+USEMODULE += suit_transport_vfs
+USEMODULE += vfs_default
+
 # Display a progress bar during firmware download
 USEMODULE += progress_bar
 
