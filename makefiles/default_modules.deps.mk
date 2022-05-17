@@ -14,6 +14,10 @@ ifneq (,$(filter auto_init_saul,$(USEMODULE)))
   USEMODULE += saul_init_devs
 endif
 
+ifneq (,$(filter auto_init_libcose_crypt,$(USEMODULE)))
+  USEMODULE += libcose_crypt_init
+endif
+
 ifneq (,$(filter xtimer,$(USEMODULE)))
   ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
     USEMODULE += div
