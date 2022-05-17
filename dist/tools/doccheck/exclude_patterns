@@ -14281,6 +14281,8 @@ sys/include/net/coap\.h:[0-9]+: warning: Member COAP_OPT_BLOCK1 \(macro definiti
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_OPT_BLOCK2 \(macro definition\) of group net_coap is not documented\.
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_OPT_CONTENT_FORMAT \(macro definition\) of group net_coap is not documented\.
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_OPT_ETAG \(macro definition\) of group net_coap is not documented\.
+sys/include/net/coap\.h:[0-9]+: warning: Member COAP_OPT_IF_MATCH \(macro definition\) of group net_coap is not documented\.
+sys/include/net/coap\.h:[0-9]+: warning: Member COAP_OPT_IF_NONE_MATCH \(macro definition\) of group net_coap is not documented\.
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_OPT_MAX_AGE \(macro definition\) of group net_coap is not documented\.
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_OPT_LOCATION_PATH \(macro definition\) of group net_coap is not documented\.
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_OPT_LOCATION_QUERY \(macro definition\) of group net_coap is not documented\.

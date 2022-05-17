@@ -35,8 +35,10 @@ extern "C" {
  * @name    CoAP option numbers
  * @{
  */
+#define COAP_OPT_IF_MATCH       (1)
 #define COAP_OPT_URI_HOST       (3)
 #define COAP_OPT_ETAG           (4)
+#define COAP_OPT_IF_NONE_MATCH  (5)
 #define COAP_OPT_OBSERVE        (6)
 #define COAP_OPT_LOCATION_PATH  (8)
 #define COAP_OPT_URI_PATH       (11)

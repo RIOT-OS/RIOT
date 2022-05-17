@@ -27,7 +27,8 @@ static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 /* CoAP resources. Must be sorted by path (ASCII order). */
 static const coap_resource_t _resources[] = {
-    { "/vfs", COAP_GET | COAP_MATCH_SUBTREE, gcoap_fileserver_handler, VFS_DEFAULT_DATA },
+    { "/vfs", COAP_GET | COAP_PUT | COAP_DELETE | COAP_MATCH_SUBTREE,
+      gcoap_fileserver_handler, VFS_DEFAULT_DATA },
 };
 
 static gcoap_listener_t _listener = {
