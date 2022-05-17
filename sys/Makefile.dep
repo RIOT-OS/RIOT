@@ -846,6 +846,7 @@ endif
 
 ifneq (,$(filter suit_transport_%, $(USEMODULE)))
   USEMODULE += suit_transport
+  USEMODULE += suit_transport_worker
 endif
 
 ifneq (,$(filter suit_transport_coap, $(USEMODULE)))

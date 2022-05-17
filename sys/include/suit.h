@@ -63,6 +63,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief Maximum length of a SUIT resource URL
+ */
+#ifndef SUIT_URL_MAX
+#define SUIT_URL_MAX            128
+#endif
+
+/**
  * @brief Current SUIT serialization format version
  *
  * see https://tools.ietf.org/html/draft-ietf-suit-manifest-03#section-7 for

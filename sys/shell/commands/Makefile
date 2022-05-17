@@ -134,7 +134,7 @@ ifneq (,$(filter nimble_statconn,$(USEMODULE)))
   SRC += sc_nimble_statconn.c
 endif
 
-ifneq (,$(filter suit_transport_coap,$(USEMODULE)))
+ifneq (,$(filter suit_transport_worker,$(USEMODULE)))
   SRC += sc_suit.c
 endif
 
