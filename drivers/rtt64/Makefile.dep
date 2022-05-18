@@ -1,0 +1,2 @@
+FEATURES_REQUIRED += periph_rtt
+FEATURES_REQUIRED += periph_rtt_set_counter
