@@ -43,9 +43,9 @@
 |                   | RTT           | yes           |                       |
 |                   | Timer         | yes           |                       |
 | Radio Chip        | AT86RF231     | yes           |                       |
-| Accelerometer     | L3G4200D      | yes           |                       |
-| Magnetometer      | L3G4200D      | yes           |                       |
-| Gyroscope         | LSM303DLHC    | yes           |                       |
+| Accelerometer     | LSM303DLHC    | yes           |                       |
+| Magnetometer      | LSM303DLHC    | yes           |                       |
+| Gyroscope         | L3G4200D      | yes           |                       |
 | Pressure Sensor   | LPS331AP      | yes           |                       |
 | Light Sensor      | ISL29020      | yes           |                       |
 | SPI Flash         | N25Q128       | yes           |                       |
