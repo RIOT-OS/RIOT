@@ -1,0 +1,68 @@
+From 272fb3de6159f79d8100821e4a6ed3fcd359173f Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Mon, 4 Apr 2022 08:47:50 +0200
+Subject: [PATCH 2/2] treewide: fix include paths
+
+---
+ smtc_ral/src/ral.c         | 6 +++---
+ smtc_ral/src/ral_sx1280.c  | 2 +-
+ sx1280_driver/src/sx1280.c | 6 +++---
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/smtc_ral/src/ral.c b/smtc_ral/src/ral.c
+index 55fb127..0cba70c 100644
+--- a/smtc_ral/src/ral.c
++++ b/smtc_ral/src/ral.c
+@@ -34,8 +34,8 @@
+  * --- DEPENDENCIES ------------------------------------------------------------
+  */
+ 
+-#include "ral.h"
+-#include "ral_hal.h"
++#include "smtc_ral/src/ral.h"
++#include "smtc_ral/src/ral_hal.h"
+ 
+ #if defined( SX126X )
+ #include "ral_sx126x.h"
+@@ -47,7 +47,7 @@
+ #include "ral_sx1276.h"
+ #endif
+ #if defined( SX1280 )
+-#include "ral_sx1280.h"
++#include "smtc_ral/src/ral_sx1280.h"
+ #endif
+ #if !defined( SX126X ) && !defined( SX1272 ) && !defined( SX1276 ) && !defined( SX1280 )
+ #error "Unknown radio selected..."
+diff --git a/smtc_ral/src/ral_sx1280.c b/smtc_ral/src/ral_sx1280.c
+index bd584ca..ecd8c03 100644
+--- a/smtc_ral/src/ral_sx1280.c
++++ b/smtc_ral/src/ral_sx1280.c
+@@ -36,7 +36,7 @@
+ 
+ #include <string.h>  // memcpy
+ 
+-#include "sx1280.h"
++#include "sx1280_driver/src/sx1280.h"
+ #include "ral_sx1280.h"
+ 
+ /*
+diff --git a/sx1280_driver/src/sx1280.c b/sx1280_driver/src/sx1280.c
+index d3e7d18..0b69d55 100644
+--- a/sx1280_driver/src/sx1280.c
++++ b/sx1280_driver/src/sx1280.c
+@@ -35,9 +35,9 @@
+  */
+ 
+ #include <string.h>  // memcpy
+-#include "sx1280_hal.h"
+-#include "sx1280_regs.h"
+-#include "sx1280.h"
++#include "sx1280_driver/src/sx1280_hal.h"
++#include "sx1280_driver/src/sx1280_regs.h"
++#include "sx1280_driver/src/sx1280.h"
+ 
+ /*
+  * -----------------------------------------------------------------------------
+-- 
+2.32.0
+

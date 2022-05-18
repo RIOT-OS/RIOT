@@ -75,6 +75,14 @@ extern "C" {
 #define CONFIG_LORA_BW_DEFAULT                      (LORA_BW_250_KHZ)
 #elif IS_ACTIVE(CONFIG_LORA_BW_DEFAULT_500)
 #define CONFIG_LORA_BW_DEFAULT                      (LORA_BW_500_KHZ)
+#elif IS_ACTIVE(CONFIG_LORA_BW_DEFAULT_200)
+#define CONFIG_LORA_BW_DEFAULT                      (LORA_BW_200_KHZ)
+#elif IS_ACTIVE(CONFIG_LORA_BW_DEFAULT_400)
+#define CONFIG_LORA_BW_DEFAULT                      (LORA_BW_400_KHZ)
+#elif IS_ACTIVE(CONFIG_LORA_BW_DEFAULT_800)
+#define CONFIG_LORA_BW_DEFAULT                      (LORA_BW_800_KHZ)
+#elif IS_ACTIVE(CONFIG_LORA_BW_DEFAULT_1600)
+#define CONFIG_LORA_BW_DEFAULT                      (LORA_BW_1600_KHZ)
 #endif
 
 #ifndef CONFIG_LORA_BW_DEFAULT
@@ -131,6 +139,12 @@ extern "C" {
 #define CONFIG_LORA_CR_DEFAULT                      (LORA_CR_4_7)
 #elif IS_ACTIVE(CONFIG_LORA_CR_DEFAULT_CR_4_8)
 #define CONFIG_LORA_CR_DEFAULT                      (LORA_CR_4_8)
+#elif IS_ACTIVE(CONFIG_LORA_CR_DEFAULT_CR_LI_4_5)
+#define CONFIG_LORA_CR_DEFAULT                      (LORA_CR_LI_4_5)
+#elif IS_ACTIVE(CONFIG_LORA_CR_DEFAULT_CR_LI_4_6)
+#define CONFIG_LORA_CR_DEFAULT                      (LORA_CR_LI_4_6)
+#elif IS_ACTIVE(CONFIG_LORA_CR_DEFAULT_CR_LI_4_8)
+#define CONFIG_LORA_CR_DEFAULT                      (LORA_CR_LI_4_8)
 #endif
 
 #ifndef CONFIG_LORA_CR_DEFAULT
@@ -201,6 +215,18 @@ extern "C" {
  */
 #define LORA_SYNCWORD_PUBLIC           (0x34)  /**< Syncword used for public networks */
 #define LORA_SYNCWORD_PRIVATE          (0x12)  /**< Syncword used for private networks */
+/* see https://lora-developers.semtech.com/documentation/tech-papers-and-guides/physical-layer-proposal-2.4ghz */
+#define LORA_SYNCWORD_ISM2400_PUBLIC   (0x21)  /**< Syncword used for public networks on ISM2400 */
+/** @} */
+
+/**
+ * @name    LoRa 2.4Ghz band frequency definitions
+ *
+ * See https://lora-developers.semtech.com/documentation/tech-papers-and-guides/physical-layer-proposal-2.4ghz/
+ * @{
+ */
+#define LORA_ISM2400_FREQUENCY_LOW             2400000000   /**< lowest frequency ISM24000 band */
+#define LORA_ISM2400_FREQUENCY_HIGH            2500000000   /**< highest frequency ISM24000 band */
 /** @} */
 
 /**
@@ -213,14 +239,19 @@ extern "C" {
 enum {
     LORA_BW_125_KHZ = 0,               /**< 125 kHz bandwidth */
     LORA_BW_250_KHZ,                   /**< 250 kHz bandwidth */
-    LORA_BW_500_KHZ                    /**< 500 kHz bandwidth */
+    LORA_BW_500_KHZ,                   /**< 500 kHz bandwidth */
+    LORA_BW_200_KHZ,                   /**< 200 kHz bandwidth, only 2.4Ghz */
+    LORA_BW_400_KHZ,                   /**< 400 kHz bandwidth, only 2.4Ghz */
+    LORA_BW_800_KHZ,                   /**< 800 kHz bandwidth, only 2.4Ghz  */
+    LORA_BW_1600_KHZ,                  /**< 1600 kHz bandwidth, only 2.4Ghz  */
 };
 
 /**
  * @brief   LoRa modulation spreading factor rate
  */
 enum {
-    LORA_SF6 = 6,                      /**< spreading factor 6 */
+    LORA_SF5 = 5,                      /**< spreading factor 5, sx126x and sx1280 */
+    LORA_SF6,                          /**< spreading factor 6 */
     LORA_SF7,                          /**< spreading factor 7 */
     LORA_SF8,                          /**< spreading factor 8 */
     LORA_SF9,                          /**< spreading factor 9 */
@@ -236,7 +267,10 @@ enum {
     LORA_CR_4_5 = 1,                   /**< coding rate 4/5 */
     LORA_CR_4_6,                       /**< coding rate 4/6 */
     LORA_CR_4_7,                       /**< coding rate 4/7 */
-    LORA_CR_4_8                        /**< coding rate 4/8 */
+    LORA_CR_4_8,                       /**< coding rate 4/8 */
+    LORA_CR_LI_4_5,                    /**< coding rate long interleaving 4/5 */
+    LORA_CR_LI_4_6,                    /**< coding rate long interleaving 4/6 */
+    LORA_CR_LI_4_8                     /**< coding rate long interleaving 4/8 */
 };
 /** @} */
 
