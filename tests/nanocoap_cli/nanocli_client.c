@@ -29,6 +29,7 @@
 #include "net/nanocoap.h"
 #include "net/nanocoap_sock.h"
 #include "net/sock/udp.h"
+#include "net/sock/util.h"
 
 #include "od.h"
 
@@ -209,4 +210,59 @@ int nanotest_client_url_cmd(int argc, char **argv)
 error:
     printf("usage: %s <get|post|put> <url> [data]\n", argv[0]);
     return -1;
+}
+
+static const char song[] =
+    "Join us now and share the software;\n"
+    "You'll be free, hackers, you'll be free.\n"
+    "Join us now and share the software;\n"
+    "You'll be free, hackers, you'll be free.\n"
+    "\n"
+    "Hoarders can get piles of money,\n"
+    "That is true, hackers, that is true.\n"
+    "But they cannot help their neighbors;\n"
+    "That's not good, hackers, that's not good.\n"
+    "\n"
+    "When we have enough free software\n"
+    "At our call, hackers, at our call,\n"
+    "We'll kick out those dirty licenses\n"
+    "Ever more, hackers, ever more.\n"
+    "\n"
+    "Join us now and share the software;\n"
+    "You'll be free, hackers, you'll be free.\n"
+    "Join us now and share the software;\n"
+    "You'll be free, hackers, you'll be free.\n";
+
+int nanotest_client_put_cmd(int argc, char **argv)
+{
+    int res;
+    coap_block_request_t ctx;
+
+    if (argc < 2) {
+        printf("usage: %s <url>\n", argv[0]);
+        return 1;
+    }
+
+    res = nanocoap_block_request_init_url(&ctx, argv[1],
+                                          COAP_METHOD_PUT, COAP_BLOCKSIZE_32);
+    if (res < 0) {
+        printf("error: %d\n", res);
+        return res;
+    }
+
+    const char *pos = song;
+    size_t len = sizeof(song);
+
+    while (len) {
+        res = nanocoap_sock_block_request(&ctx, pos, len, 0, NULL, NULL);
+        if (res <= 0) {
+            puts(strerror(-res));
+            break;
+        }
+        len -= res;
+        pos += res;
+    }
+
+    nanocoap_block_request_done(&ctx);
+    return res;
 }
