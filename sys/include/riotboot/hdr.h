@@ -59,6 +59,8 @@ typedef struct {
     uint32_t start_addr;        /**< Address after the allocated space for the header */
     uint32_t chksum_legacy;     /**< Checksum of riotboot_hdr digest excluded         */
     uint32_t img_size;          /**< Firmware size                                    */
+    uint16_t header_len;        /**< Size of the riotboot header, excluding the checksum */
+    uint16_t reserved;          /**< Reserver field */
     uint8_t digest[SHA256_DIGEST_LENGTH]; /**< sh256 of image                         */
     uint32_t chksum;            /**< Checksum of riotboot_hdr                         */
 } riotboot_hdr_t;

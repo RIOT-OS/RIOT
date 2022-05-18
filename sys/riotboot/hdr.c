@@ -75,8 +75,7 @@ int riotboot_hdr_validate(const riotboot_hdr_t *riotboot_hdr)
 
 uint32_t riotboot_hdr_checksum(const riotboot_hdr_t *riotboot_hdr)
 {
-    return fletcher32((uint16_t *)riotboot_hdr, offsetof(riotboot_hdr_t,
-                                                         chksum) /
+    return fletcher32((uint16_t *)riotboot_hdr, riotboot_hdr->header_len /
                       sizeof(uint16_t));
 }
 

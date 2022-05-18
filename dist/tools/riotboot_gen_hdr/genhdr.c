@@ -39,6 +39,7 @@ static void populate_hdr(riotboot_hdr_t *hdr, uint32_t ver, uint32_t addr,
     hdr->version = ver;
     hdr->start_addr = addr;
     hdr->img_size = img_size;
+    hdr->header_len = sizeof(riotboot_hdr_t) -  sizeof(hdr->chksum);
     hdr->chksum_legacy = riotboot_hdr_checksum_legacy(hdr);
     memcpy(hdr->digest, digest, SHA256_DIGEST_LENGTH);
     /* calculate header checksum */
