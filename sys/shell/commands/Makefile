@@ -106,7 +106,7 @@ ifneq (,$(filter lwip_netif,$(USEMODULE)))
   SRC += sc_lwip_netif.c
 endif
 
-ifneq (,$(filter rtt_rtc periph_rtc,$(USEMODULE)))
+ifneq (,$(filter rtt_rtc periph_rtc rtt64,$(USEMODULE)))
   SRC += sc_rtc.c
 endif
 
