@@ -277,11 +277,11 @@ void phydat_fit(phydat_t *dat, const int32_t *values, unsigned int dim);
  * for @ref UNIT_NONE.
  *
  * @param[in]  data     data to encode
- * @param[in]  dim      dimensions used in @p data, MUST be > 0 and < PHYDAT_DIM
+ * @param[in]  dim      dimensions used in @p data, MUST be > 0 and <= PHYDAT_DIM
  * @param[out] buf      target buffer for the JSON string, or NULL
  *
  * @pre     @p dim > 0
- * @pre     @p dim < PHYDAT_DIM
+ * @pre     @p dim <= PHYDAT_DIM
  *
  * @return  number of bytes (potentially) written to @p buf, including `\0`
  *          terminator

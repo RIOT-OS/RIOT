@@ -43,7 +43,7 @@ static size_t _bool_to_str(int16_t val, char *buf)
 
 size_t phydat_to_json(const phydat_t *data, size_t dim, char *buf)
 {
-    assert((dim > 0) && (dim < PHYDAT_DIM));
+    assert((dim > 0) && (dim <= PHYDAT_DIM));
 
     size_t pos = 0;
 
