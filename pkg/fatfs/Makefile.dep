@@ -6,6 +6,6 @@ ifneq (,$(filter vfs_auto_format,$(USEMODULE)))
 endif
 
 # Use RTC for timestamps if available
-ifeq (,$(filter rtt_rtc,$(USEMODULE)))
+ifeq (,$(filter rtt_rtc rtt64,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_rtc
 endif
