@@ -96,28 +96,28 @@ static void test_vfs_null_fs_ops_rename(void)
 {
     TEST_ASSERT_EQUAL_INT(0, _test_vfs_fs_op_mount_res);
     int res = vfs_rename("/test/foo", "/test/bar");
-    TEST_ASSERT_EQUAL_INT(-EPERM, res);
+    TEST_ASSERT_EQUAL_INT(-EROFS, res);
 }
 
 static void test_vfs_null_fs_ops_unlink(void)
 {
     TEST_ASSERT_EQUAL_INT(0, _test_vfs_fs_op_mount_res);
     int res = vfs_unlink("/test/foo");
-    TEST_ASSERT_EQUAL_INT(-EPERM, res);
+    TEST_ASSERT_EQUAL_INT(-EROFS, res);
 }
 
 static void test_vfs_null_fs_ops_mkdir(void)
 {
     TEST_ASSERT_EQUAL_INT(0, _test_vfs_fs_op_mount_res);
     int res = vfs_mkdir("/test/foodir", 0);
-    TEST_ASSERT_EQUAL_INT(-EPERM, res);
+    TEST_ASSERT_EQUAL_INT(-EROFS, res);
 }
 
 static void test_vfs_null_fs_ops_rmdir(void)
 {
     TEST_ASSERT_EQUAL_INT(0, _test_vfs_fs_op_mount_res);
     int res = vfs_rmdir("/test/foodir");
-    TEST_ASSERT_EQUAL_INT(-EPERM, res);
+    TEST_ASSERT_EQUAL_INT(-EROFS, res);
 }
 
 static void test_vfs_null_fs_ops_stat(void)

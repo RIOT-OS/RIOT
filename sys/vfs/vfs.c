@@ -609,7 +609,7 @@ int vfs_rename(const char *from_path, const char *to_path)
         DEBUG("vfs_rename: rename not supported by fs!\n");
         /* remember to decrement the open_files count */
         atomic_fetch_sub(&mountp->open_files, 1);
-        return -EPERM;
+        return -EROFS;
     }
     const char *rel_to;
     vfs_mount_t *mountp_to;
@@ -668,7 +668,7 @@ int vfs_unlink(const char *name)
         DEBUG("vfs_unlink: unlink not supported by fs!\n");
         /* remember to decrement the open_files count */
         atomic_fetch_sub(&mountp->open_files, 1);
-        return -EPERM;
+        return -EROFS;
     }
     res = mountp->fs->fs_op->unlink(mountp, rel_path);
     DEBUG("vfs_unlink: unlink %p, \"%s\"", (void *)mountp, rel_path);
@@ -705,7 +705,7 @@ int vfs_mkdir(const char *name, mode_t mode)
         DEBUG("vfs_mkdir: mkdir not supported by fs!\n");
         /* remember to decrement the open_files count */
         atomic_fetch_sub(&mountp->open_files, 1);
-        return -EPERM;
+        return -EROFS;
     }
     res = mountp->fs->fs_op->mkdir(mountp, rel_path, mode);
     DEBUG("vfs_mkdir: mkdir %p, \"%s\"", (void *)mountp, rel_path);
@@ -742,7 +742,7 @@ int vfs_rmdir(const char *name)
         DEBUG("vfs_rmdir: rmdir not supported by fs!\n");
         /* remember to decrement the open_files count */
         atomic_fetch_sub(&mountp->open_files, 1);
-        return -EPERM;
+        return -EROFS;
     }
     res = mountp->fs->fs_op->rmdir(mountp, rel_path);
     DEBUG("vfs_rmdir: rmdir %p, \"%s\"", (void *)mountp, rel_path);
