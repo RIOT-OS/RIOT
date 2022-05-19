@@ -51,6 +51,56 @@ int vfs_file_from_buffer(const char *file, const void *buf, size_t len);
  */
 int vfs_file_to_buffer(const char* file, void* buf, size_t len);
 
+#if MODULE_HASHES || DOXYGEN
+/**
+ * @brief   Compute the MD5 message digest of a file
+ *
+ *          Requires the `hashes` module.
+ *
+ * @param[in]  file     Source file path
+ * @param[out] digest   Destination buffer, must fit @ref MD5_DIGEST_LENGTH bytes
+ * @param[out] work_buf Work buffer
+ * @param[in] work_buf_len  Size of the work buffer
+ *
+ * @return  0 on success
+ * @return  negative error
+ */
+int vfs_file_md5(const char* file, void *digest,
+                 void *work_buf, size_t work_buf_len);
+
+/**
+ * @brief   Compute the SHA1 message digest of a file
+ *
+ *          Requires the `hashes` module.
+ *
+ * @param[in]  file     Source file path
+ * @param[out] digest   Destination buffer, must fit @ref SHA1_DIGEST_LENGTH bytes
+ * @param[out] work_buf Work buffer
+ * @param[in] work_buf_len  Size of the work buffer
+ *
+ * @return  0 on success
+ * @return  negative error
+ */
+int vfs_file_sha1(const char* file, void *digest,
+                  void *work_buf, size_t work_buf_len);
+
+/**
+ * @brief   Compute the SHA256 message digest of a file
+ *
+ *          Requires the `hashes` module.
+ *
+ * @param[in]  file     Source file path
+ * @param[out] digest   Destination buffer, must fit @ref SHA256_DIGEST_LENGTH bytes
+ * @param[out] work_buf Work buffer
+ * @param[in] work_buf_len  Size of the work buffer
+ *
+ * @return  0 on success
+ * @return  negative error
+ */
+int vfs_file_sha256(const char* file, void *digest,
+                    void *work_buf, size_t work_buf_len);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

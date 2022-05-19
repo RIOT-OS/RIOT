@@ -139,6 +139,7 @@ PSEUDOMODULES += mpu_stack_guard
 ## This is a protection mechanism which makes exploitation of buffer overflows significantly harder.
 PSEUDOMODULES += mpu_noexec_ram
 
+PSEUDOMODULES += md5sum
 PSEUDOMODULES += mtd_write_page
 PSEUDOMODULES += nanocoap_%
 PSEUDOMODULES += netdev_default
@@ -196,6 +197,8 @@ PSEUDOMODULES += semtech_loramac_rx
 PSEUDOMODULES += senml_cbor
 PSEUDOMODULES += senml_phydat
 PSEUDOMODULES += senml_saul
+PSEUDOMODULES += sha1sum
+PSEUDOMODULES += sha256sum
 PSEUDOMODULES += shell_hooks
 PSEUDOMODULES += slipdev_stdio
 PSEUDOMODULES += slipdev_l2addr

@@ -334,6 +334,11 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter md5sum sha1sum sha256sum,$(USEMODULE)))
+  USEMODULE += vfs_util
+  USEMODULE += hashes
+endif
+
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
   USEMODULE += sema_deprecated
   USEMODULE += ztimer64_usec

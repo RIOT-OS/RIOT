@@ -79,3 +79,78 @@ int vfs_file_to_buffer(const char* file, void* buf, size_t len)
 
     return res;
 }
+
+#if MODULE_HASHES
+#include "hashes/md5.h"
+#include "hashes/sha1.h"
+#include "hashes/sha256.h"
+
+int vfs_file_md5(const char* file, void *digest,
+                 void *work_buf, size_t work_buf_len)
+{
+    md5_ctx_t ctx;
+
+    int res, fd = vfs_open(file, O_RDONLY, 0);
+
+    if (fd < 0) {
+        DEBUG("can't open %s for reading\n", file);
+        return fd;
+    }
+
+    md5_init(&ctx);
+    while ((res = vfs_read(fd, work_buf, work_buf_len)) > 0) {
+        md5_update(&ctx, work_buf, res);
+    }
+    md5_final(&ctx, digest);
+
+    vfs_close(fd);
+
+    return res > 0 ? 0 : res;
+}
+
+int vfs_file_sha1(const char* file, void *digest,
+                  void *work_buf, size_t work_buf_len)
+{
+    sha1_context ctx;
+    int res, fd = vfs_open(file, O_RDONLY, 0);
+
+    if (fd < 0) {
+        DEBUG("can't open %s for reading\n", file);
+        return fd;
+    }
+
+    sha1_init(&ctx);
+    while ((res = vfs_read(fd, work_buf, work_buf_len)) > 0) {
+        sha1_update(&ctx, work_buf, res);
+    }
+    sha1_final(&ctx, digest);
+
+    vfs_close(fd);
+
+    return res > 0 ? 0 : res;
+
+}
+
+int vfs_file_sha256(const char* file, void *digest,
+                    void *work_buf, size_t work_buf_len)
+{
+    sha256_context_t ctx;
+    int res, fd = vfs_open(file, O_RDONLY, 0);
+
+    if (fd < 0) {
+        DEBUG("can't open %s for reading\n", file);
+        return fd;
+    }
+
+    sha256_init(&ctx);
+    while ((res = vfs_read(fd, work_buf, work_buf_len)) > 0) {
+        sha256_update(&ctx, work_buf, res);
+    }
+    sha256_final(&ctx, digest);
+
+    vfs_close(fd);
+
+    return res > 0 ? 0 : res;
+
+}
+#endif /* MODULE_HASHES */
