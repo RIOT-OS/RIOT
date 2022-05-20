@@ -291,6 +291,7 @@ void ztimer64_init(void)
 {
 #if MODULE_ZTIMER64_USEC
     ztimer64_clock_init(ZTIMER64_USEC, ZTIMER_USEC);
+    ztimer64_clock_adjust(ZTIMER64_USEC, 1653057300000000LL);
 #endif
 #if MODULE_ZTIMER64_MSEC
     ztimer64_clock_init(ZTIMER64_MSEC, ZTIMER_MSEC);
