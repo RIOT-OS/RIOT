@@ -45,6 +45,7 @@ static int mtd_sdcard_init(mtd_dev_t *dev)
 
         /* sdcard_spi always uses the fixed block size of SD-HC cards */
         dev->page_size        = SD_HC_BLOCK_SIZE;
+        dev->write_size       = SD_HC_BLOCK_SIZE;
         return 0;
     }
     return -EIO;

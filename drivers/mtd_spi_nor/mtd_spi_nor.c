@@ -521,6 +521,9 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
         mtd->sector_count = mtd_spi_nor_get_size(&dev->jedec_id)
                           / (mtd->pages_per_sector * mtd->page_size);
     }
+    /* SPI NOR is byte addressable; instances don't need to configure that */
+    assert(mtd->write_size <= 1);
+    mtd->write_size = 1;
     _set_addr_width(mtd);
 
     DEBUG("mtd_spi_nor_init: %" PRIu32 " bytes "

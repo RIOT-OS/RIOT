@@ -43,6 +43,9 @@ extern "C"
         .sector_count = FLASHPAGE_NUMOF,            \
         .pages_per_sector = _pages_per_sector,      \
         .page_size = FLASHPAGE_SIZE / _pages_per_sector, \
+        .write_size = FLASHPAGE_WRITE_BLOCK_SIZE >= FLASHPAGE_WRITE_BLOCK_ALIGNMENT \
+            ? FLASHPAGE_WRITE_BLOCK_SIZE            \
+            : FLASHPAGE_WRITE_BLOCK_ALIGNMENT,      \
     },                                              \
 }
 

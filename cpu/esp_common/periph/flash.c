@@ -127,6 +127,7 @@ void spi_flash_drive_init (void)
     _flash_driver.write_page = &_flash_write_page;
     _flash_driver.erase = &_flash_erase;
     _flash_driver.power = &_flash_power;
+    _flash_driver.flags = MTD_DRIVER_FLAG_CLEARING_OVERWRITE;
 
     /* first, set the beginning of flash to 0x0 to read partition table */
     _flash_beg  = 0x0;
@@ -200,6 +201,9 @@ void spi_flash_drive_init (void)
 
     _flash_dev.pages_per_sector = _flashchip->sector_size / _flashchip->page_size;
     _flash_dev.page_size = _flashchip->page_size;
+    /* Emulation for smaller / unaligned writes is present, but at reduced
+     * performance */
+    _flash_dev.write_size = 4;
 
     DEBUG("%s flashchip chip_size=%d block_size=%d sector_size=%d page_size=%d\n", __func__,
           _flashchip->chip_size, _flashchip->block_size,

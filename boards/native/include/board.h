@@ -76,6 +76,11 @@ void _native_LED_RED_TOGGLE(void);
 #ifndef MTD_SECTOR_NUM
 #define MTD_SECTOR_NUM          (2048)
 #endif
+/** Advertised write size. While the file system backend supports single byte
+ * granularity, this can be increased to mimic other media. */
+#ifndef MTD_WRITE_SIZE
+#define MTD_WRITE_SIZE          (1)
+#endif
 #ifndef MTD_NATIVE_FILENAME
 #define MTD_NATIVE_FILENAME     "MEMORY.bin"
 #endif

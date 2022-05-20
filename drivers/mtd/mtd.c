@@ -36,6 +36,15 @@ int mtd_init(mtd_dev_t *mtd)
 
     int res = -ENOTSUP;
 
+    /* Drivers preceding the introduction of write_size need to set it. While
+     * this assert breaks applications that previously worked, it is likely
+     * that these applications silently assumed a certain write size and would
+     * break when switching the MTD backend. When tripping over this assert,
+     * please update your driver to produce a correct value *and* place a check
+     * in your application for whether the backend allows sufficiently small
+     * writes. */
+    assert(mtd->write_size != 0);
+
     if (mtd->driver->init) {
         res = mtd->driver->init(mtd);
     }

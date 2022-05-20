@@ -115,6 +115,7 @@ static mtd_dev_t dev = {
     .sector_count = SECTOR_COUNT,
     .pages_per_sector = PAGE_PER_SECTOR,
     .page_size = PAGE_SIZE,
+    .write_size = 1,
 };
 
 static mtd_dev_t *_dev = (mtd_dev_t*) &dev;

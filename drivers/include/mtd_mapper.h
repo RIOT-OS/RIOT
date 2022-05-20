@@ -39,6 +39,7 @@
  *         .sector_count = SECTOR_COUNT / 2,
  *         .pages_per_sector = PAGE_PER_SECTOR,
  *         .page_size = PAGE_SIZE,
+ *         .write_size = WRITE_SIZE,
  *     },
  *     .parent = &parent,
  *     .sector = SECTOR_COUNT / 2

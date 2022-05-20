@@ -78,6 +78,7 @@ static int _init(mtd_dev_t *mtd)
     assert(backing_mtd->page_size == region->mtd.page_size);
     assert(backing_mtd->pages_per_sector == region->mtd.pages_per_sector);
     assert(backing_mtd->sector_count >= region->mtd.sector_count);
+    assert(backing_mtd->write_size == region->mtd.write_size);
 
     /* offset + region size must not exceed the backing device */
     assert(region->sector + region->mtd.sector_count <= backing_mtd->sector_count);

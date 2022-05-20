@@ -22,7 +22,7 @@
  *
  * MTD devices expose a block based erase and write interface. In that, they
  * are the distinct from block devices (like hard disks) on which individual
- * bytes can be overridden. The [Linux MTD FAQ](http://www.linux-mtd.infradead.org/faq/general.html)
+ * bytes can be overwritten. The [Linux MTD FAQ](http://www.linux-mtd.infradead.org/faq/general.html)
  * has a convenient comparison (beware though of terminology differences
  * outlined below). They can be erased (with some granularity, often wearing
  * out the erased area a bit), and erased areas can be written to (sometimes
@@ -44,11 +44,25 @@
  *
  *   Pages are a subdivision of sectors.
  *
+ * * The **write size** is the minimum size of writes to the device, and also
+ *   the required alignment of writes.
+ *
+ *   The write size is a divider of the page. It is often between 1 to 4 bytes
+ *   long, but may be up to the full page size.
+ *
  * * The device's **flags** indicate features, eg. whether a memory location
  *   can be overwritten without erasing it first.
  *
- * Note that some properties of the backend are currently not advertised to the
- * user (see the documentation of @ref mtd_write).
+ * Unless a flag (such as @ref MTD_DRIVER_FLAG_DIRECT_WRITE or @ref
+ * MTD_DRIVER_FLAG_CLEARING_OVERWRITE) allows it, this MTD API does not allow
+ * memory areas to be written to twice between erase operations. Drivers are
+ * not expected to count write accesses, and neither do this module's
+ * functions: The performance impact would be too great. It is up to the
+ * application to only write to erased memory once. Failure to do so may damage
+ * hardware.
+ *
+ * This MTD API currently does not specify which value will be read from an
+ * erased sector.
  *
  * @file
  *
@@ -96,6 +110,7 @@ typedef struct {
     uint32_t sector_count;     /**< Number of sector in the MTD */
     uint32_t pages_per_sector; /**< Number of pages by sector in the MTD */
     uint32_t page_size;        /**< Size of the pages in the MTD */
+    uint32_t write_size;       /**< Minimum size and alignment of writes to the device */
 #if defined(MODULE_MTD_WRITE_PAGE) || DOXYGEN
     void *work_area;           /**< sector-sized buffer (only present when @ref mtd_write_page is enabled) */
 #endif
@@ -105,12 +120,21 @@ typedef struct {
  * @brief   MTD driver can write any data to the storage without erasing it first.
  *
  * If this is set, a write completely overrides the previous values.
- *
- * Its absence makes no statement on whether or not writes to memory areas that
- * have been written to previously are allowed, and if so, whether previously
- * written bits should be written again or not written.
  */
 #define MTD_DRIVER_FLAG_DIRECT_WRITE    (1 << 0)
+
+/**
+ * @brief   MTD driver supports arbitrary clearing overwrites
+ *
+ * If this is set, (arbitrarily) many writes are permitted per write size, and
+ * the result is the old value bitwise-AND the written value.
+ *
+ * This property is common for managed flash memories. (By comparison, the raw
+ * flash often used internally by MCUs may not allow overwrites, or may allow
+ * them with the same semantics, but only for a limited number of writes
+ * between erasures; there is currently no flag describing these any further).
+ */
+#define MTD_DRIVER_FLAG_CLEARING_OVERWRITE    (1 << 1)
 
 /**
  * @brief   MTD driver interface
@@ -315,8 +339,9 @@ int mtd_read_page(mtd_dev_t *mtd, void *dest, uint32_t page, uint32_t offset, ui
  * @brief   Write data to a MTD device
  *
  * @p addr + @p count must be inside a page boundary. @p addr can be anywhere
- * but the buffer cannot overlap two pages. Though some devices might enforce alignment
- * on both @p addr and @p buf.
+ * but the buffer cannot overlap two pages.
+ *
+ * Both parameters must be multiples of the device's write size.
  *
  * @param      mtd   the device to write to
  * @param[in]  src   the buffer to write
@@ -341,6 +366,8 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count);
  * writes if it is required by the underlying storage media.
  *
  * This performs a raw write, no automatic read-modify-write cycle is performed.
+ *
+ * Both @p offset and @p size must be multiples of the device's write size.
  *
  * @p offset must be smaller than the page size
  *

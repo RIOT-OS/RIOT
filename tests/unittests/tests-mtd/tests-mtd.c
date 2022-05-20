@@ -39,6 +39,9 @@
 #ifndef PAGE_SIZE
 #define PAGE_SIZE 128
 #endif
+#ifndef WRITE_SIZE
+#define WRITE_SIZE 1
+#endif
 
 static uint8_t dummy_memory[PAGE_PER_SECTOR * PAGE_SIZE * SECTOR_COUNT];
 
@@ -115,6 +118,7 @@ static mtd_dev_t _dev = {
     .sector_count = SECTOR_COUNT,
     .pages_per_sector = PAGE_PER_SECTOR,
     .page_size = PAGE_SIZE,
+    .write_size = WRITE_SIZE,
 };
 
 static mtd_dev_t *dev = (mtd_dev_t*) &_dev;
