@@ -143,8 +143,9 @@ void *timer_thread_local(void *arg)
         uint32_t sec = tmp.tm_sec;
         uint32_t min = tmp.tm_min;
         uint32_t hr = tmp.tm_hour;
-        printf("%02" PRIu32 ":%02" PRIu32 ":%02" PRIu32 "\n", hr, min,
-               sec);
+        printf("%02i.%02i.%04i %02" PRIu32 ":%02" PRIu32 ":%02" PRIu32 "\n", 
+                tmp.tm_mday, tmp.tm_mon, tmp.tm_year +  1900,
+                hr, min, sec);
     }
 }
 
