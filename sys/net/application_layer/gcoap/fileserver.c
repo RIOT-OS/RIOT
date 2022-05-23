@@ -207,7 +207,7 @@ late_err:
 
 static ssize_t gcoap_fileserver_directory_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                                                   struct requestdata *request,
-                                                  gcoap_fileserver_entry_t *resource)
+                                                  const char *root, const char* resource_dir)
 {
     vfs_DIR dir;
     coap_block_slicer_t slicer;
@@ -227,9 +227,8 @@ static ssize_t gcoap_fileserver_directory_handler(coap_pkt_t *pdu, uint8_t *buf,
     coap_opt_add_block2(pdu, &slicer, true);
     buf += coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
 
-    size_t root_len = resource->root ? strlen(resource->root) : 0;
+    size_t root_len = root ? strlen(root) : 0;
     const char *root_dir = &request->namebuf[root_len];
-    const char *resource_dir = resource->resource;
     size_t root_dir_len = strlen(root_dir);
     size_t resource_dir_len = strlen(resource_dir);
 
@@ -264,8 +263,10 @@ static ssize_t gcoap_fileserver_directory_handler(coap_pkt_t *pdu, uint8_t *buf,
     return (uintptr_t)buf - (uintptr_t)pdu->hdr;
 }
 
-ssize_t gcoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx) {
-    gcoap_fileserver_entry_t *entry = ctx;
+ssize_t gcoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                                 coap_request_ctx_t *ctx) {
+    const char *root = ctx->context;
+    const char *resource = ctx->resource->path;
     struct requestdata request = {
         .etag_sent = false,
         .blocknum2 = 0,
@@ -276,12 +277,12 @@ ssize_t gcoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, void
      * zeroed to get a 0-terminated string. */
     size_t namelength = 0;
     uint8_t errorcode = COAP_CODE_INTERNAL_SERVER_ERROR;
-    uint8_t strip_remaining = _count_char(entry->resource, '/');
+    uint8_t strip_remaining = _count_char(resource, '/');
 
     /* If a root directory for the server was specified, use that */
-    if (entry->root && strlen(entry->root) > 1) {
-        strncpy(request.namebuf, entry->root, sizeof(request.namebuf));
-        namelength = strlen(entry->root);
+    if (root && strlen(root) > 1) {
+        strncpy(request.namebuf, root, sizeof(request.namebuf));
+        namelength = strlen(root);
     }
 
     bool is_directory = true; /* either no path component at all or trailing '/' */
@@ -360,7 +361,7 @@ ssize_t gcoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, void
      * pass a struct pointer later. So far, those could even be hooked into the
      * resource list, but that'll go away once we parse more options */
     if (is_directory) {
-        return gcoap_fileserver_directory_handler(pdu, buf, len, &request, entry);
+        return gcoap_fileserver_directory_handler(pdu, buf, len, &request, root, resource);
     }
     else {
         return gcoap_fileserver_file_handler(pdu, buf, len, &request);
