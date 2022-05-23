@@ -196,9 +196,17 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
             }
         }
     }
-    ltime_min = (gnrc_netif_is_6lbr(netif)) ?
-                (SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT) :
-                _nib_abr_entry_valid_offset(abr);
+    if (gnrc_netif_is_6lbr(netif)) {
+        ltime_min = 0U;
+
+        /* update valid time */
+        abr->valid_until_ms = evtimer_now_msec() + (
+            SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT * MS_PER_SEC * SEC_PER_MIN
+        );
+    }
+    else {
+        ltime_min = _nib_abr_entry_valid_offset(abr);
+    }
     (void)ltime_min;    /* gnrc_sixlowpan_nd_opt_abr_build might evaluate to NOP */
     abro = gnrc_sixlowpan_nd_opt_abr_build(abr->version, ltime_min, &abr->addr,
                                            ext_opts);
