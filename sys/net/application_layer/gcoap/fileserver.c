@@ -37,9 +37,9 @@ struct requestdata {
     /** 0-terminated expanded file name in the VFS */
     char namebuf[COAPFILESERVER_PATH_MAX];
     uint32_t blocknum2;
-    unsigned int szx2; /* would prefer uint8_t but that's what coap_get_blockopt gives */
     uint32_t etag;
     bool etag_sent;
+    uint8_t szx2;
 };
 
 /**
