@@ -35,7 +35,7 @@ static int _read(const void *dev, phydat_t *res)
 
 const saul_driver_t efm32_coretemp_saul_driver = {
     .read = _read,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_TEMP
 };
 

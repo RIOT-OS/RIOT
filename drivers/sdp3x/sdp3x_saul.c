@@ -49,12 +49,12 @@ static int read_differential_pressure(const void *dev, phydat_t *res)
 
 const saul_driver_t sdp3x_temperature_saul_driver = {
     .read = read_temperature,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_TEMP,
 };
 
 const saul_driver_t sdp3x_differential_pressure_saul_driver = {
     .read = read_differential_pressure,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_PRESS,
 };

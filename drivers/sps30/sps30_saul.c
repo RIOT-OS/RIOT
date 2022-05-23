@@ -156,30 +156,30 @@ static int read_ps(const void *dev, phydat_t *data)
 
 const saul_driver_t sps30_saul_driver_mc_pm_1_2p5_4 = {
     .read = read_mc_pm_1_2p5_4,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_PM
 };
 
 const saul_driver_t sps30_saul_driver_mc_pm_10 = {
     .read = read_mc_pm_10,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_PM
 };
 
 const saul_driver_t sps30_saul_driver_nc_pm_0p5_1_2p5 = {
     .read = read_nc_pm_0p5_1_2p5,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_COUNT
 };
 
 const saul_driver_t sps30_saul_driver_nc_pm_4_10 = {
     .read = read_nc_pm_4_10,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_COUNT
 };
 
 const saul_driver_t sps30_saul_driver_ps = {
     .read = read_ps,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_SIZE
 };

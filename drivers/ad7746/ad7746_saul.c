@@ -78,18 +78,18 @@ static int _read_volt(const void *dev, phydat_t *res)
 
 const saul_driver_t ad7746_saul_driver_cap = {
     .read = _read_cap,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_CAPACITANCE,
 };
 
 const saul_driver_t ad7746_saul_driver_temp = {
     .read = _read_temp,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_TEMP
 };
 
 const saul_driver_t ad7746_saul_driver_volt = {
     .read = _read_volt,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_VOLTAGE
 };

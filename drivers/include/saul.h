@@ -275,7 +275,7 @@ typedef int(*saul_read_t)(const void *dev, phydat_t *res);
  * @return  -ENOTSUP if the device does not support this operation
  * @return  -ECANCELED on other errors
  */
-typedef int(*saul_write_t)(const void *dev, phydat_t *data);
+typedef int(*saul_write_t)(const void *dev, const phydat_t *data);
 
 /**
  * @brief   Definition of the RIOT actuator/sensor interface
@@ -297,9 +297,18 @@ typedef struct {
 void saul_init_devs(void);
 
 /**
- * @brief   Default not supported function
+ * @brief   Fallback function when write is not supported
+ *
+ * @details Returns `-NOTSUP` without evaluating arguments.
  */
-int saul_notsup(const void *dev, phydat_t *dat);
+int saul_write_notsup(const void *dev, const phydat_t *dat);
+
+/**
+ * @brief   Fallback function when read is not supported
+ *
+ * @details Returns `-NOTSUP` without evaluating arguments.
+ */
+int saul_read_notsup(const void *dev, phydat_t *dat);
 
 /**
  * @brief   Helper function converts a class ID to a string

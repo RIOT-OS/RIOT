@@ -44,6 +44,6 @@ static int read_temp(const void *dev, phydat_t *res)
 
 const saul_driver_t tmp00x_saul_driver = {
     .read = read_temp,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_OBJTEMP,
 };

@@ -21,7 +21,7 @@
 
 extern mcp47xx_t mcp47xx_devs[];
 
-static int set(const void *dev, phydat_t *data)
+static int set(const void *dev, const phydat_t *data)
 {
     const mcp47xx_saul_dac_params_t *p = (const mcp47xx_saul_dac_params_t *)dev;
     mcp47xx_dac_set(&mcp47xx_devs[p->dev], p->channel, (uint16_t)data->val[0]);

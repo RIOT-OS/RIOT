@@ -43,7 +43,7 @@ static int _read_voltage(const void *dev, phydat_t *res)
 
 static saul_driver_t nrf_vddh_saul_driver = {
     .read = _read_voltage,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_VOLTAGE,
 };
 

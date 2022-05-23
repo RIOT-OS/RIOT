@@ -43,6 +43,6 @@ static int read_lux(const void *dev, phydat_t *res)
 
 const saul_driver_t opt3001_saul_driver = {
     .read = read_lux,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_LIGHT,
 };

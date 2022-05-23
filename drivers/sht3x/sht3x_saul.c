@@ -110,12 +110,12 @@ static int read_hum(const void *dev, phydat_t *data)
 
 const saul_driver_t sht3x_saul_driver_temperature = {
     .read = read_temp,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_TEMP
 };
 
 const saul_driver_t sht3x_saul_driver_humidity = {
     .read = read_hum,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_HUM
 };

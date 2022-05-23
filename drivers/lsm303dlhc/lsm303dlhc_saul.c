@@ -70,12 +70,12 @@ static int read_mag(const void *dev, phydat_t *res)
 
 const saul_driver_t lsm303dlhc_saul_acc_driver = {
     .read = read_acc,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_ACCEL,
 };
 
 const saul_driver_t lsm303dlhc_saul_mag_driver = {
     .read = read_mag,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_MAG,
 };

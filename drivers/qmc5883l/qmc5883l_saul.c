@@ -36,6 +36,6 @@ static int read(const void *dev, phydat_t *res)
 
 const saul_driver_t qmc5883l_saul_driver = {
     .read = read,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_MAG,
 };

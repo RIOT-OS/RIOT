@@ -134,7 +134,7 @@ int saul_reg_read(saul_reg_t *dev, phydat_t *res);
  * @return      -ENOTSUP if read operation is not supported by the device
  * @return      -ECANCELED on device errors
  */
-int saul_reg_write(saul_reg_t *dev, phydat_t *data);
+int saul_reg_write(saul_reg_t *dev, const phydat_t *data);
 
 #ifdef __cplusplus
 }
