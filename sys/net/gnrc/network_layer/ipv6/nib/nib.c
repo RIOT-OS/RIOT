@@ -675,7 +675,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     }
 #endif  /* !CONFIG_GNRC_IPV6_NIB_6LBR */
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
-    if (rtr_adv->ltime.u16 != 0) {
+    if (!gnrc_netif_is_6lbr(netif) && rtr_adv->ltime.u16 != 0) {
         uint16_t rtr_ltime = byteorder_ntohs(rtr_adv->ltime);
 
         dr = _nib_drl_add(&ipv6->src, netif->pid);
