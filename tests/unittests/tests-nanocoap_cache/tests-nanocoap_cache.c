@@ -70,9 +70,9 @@ static void test_nanocoap_cache__cachekey(void)
     nanocoap_cache_key_generate((const coap_pkt_t *) &pkt2, digest2);
 
     /* compare 1. and 3. packet */
-    TEST_ASSERT_EQUAL_INT(-1, nanocoap_cache_key_compare(digest1, digest2));
+    TEST_ASSERT(nanocoap_cache_key_compare(digest1, digest2) < 0);
     /* compare 3. and 1. packet */
-    TEST_ASSERT_EQUAL_INT(1,  nanocoap_cache_key_compare(digest2, digest1));
+    TEST_ASSERT(nanocoap_cache_key_compare(digest2, digest1) > 0);
 }
 static void test_nanocoap_cache__add(void)
 {
