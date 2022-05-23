@@ -33,4 +33,11 @@ On Debian/Ubuntu you can install the required libraries with
 sudo apt install gcc-multilib
 ```
 
+Likewise, for the unittest execution, `libasan5` is needed for 32 bit binaries.
+On Debian/Ubuntu you can install the required libraries with
+
+```
+sudo apt install lib32asan5
+```
+
  */
