@@ -303,9 +303,6 @@ extern "C" {
 #define MCP2515_RXB0CTRL_MODE_RECV_FILTER       0x00
 #define MCP2515_RXB0CTRL_RXM0                   0x20
 #define MCP2515_RXB0CTRL_RXM1                   0x40
-#define MCP2515_RXB0CTRL_MODE_RECV_STD_OR_EXT   0x00
-#define MCP2515_RXB0CTRL_MODE_RECV_STD          MCP2515_RXB0CTRL_RXM0
-#define MCP2515_RXB0CTRL_MODE_RECV_EXT          MCP2515_RXB0CTRL_RXM1
 #define MCP2515_RXB0CTRL_MODE_RECV_ALL          (MCP2515_RXB0CTRL_RXM1 | \
                                                  MCP2515_RXB0CTRL_RXM0)
 
@@ -316,9 +313,6 @@ extern "C" {
 #define MCP2515_RXB1CTRL_MODE_RECV_FILTER       0x00
 #define MCP2515_RXB1CTRL_RXM0                   0x20
 #define MCP2515_RXB1CTRL_RXM1                   0x40
-#define MCP2515_RXB1CTRL_MODE_RECV_STD_OR_EXT   0x00
-#define MCP2515_RXB1CTRL_MODE_RECV_STD          MCP2515_RXB1CTRL_RXM0
-#define MCP2515_RXB1CTRL_MODE_RECV_EXT          MCP2515_RXB1CTRL_RXM1
 #define MCP2515_RXB1CTRL_MODE_RECV_ALL          (MCP2515_RXB1CTRL_RXM1 | \
                                                  MCP2515_RXB1CTRL_RXM0)
 /** @} */
