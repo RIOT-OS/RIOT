@@ -116,6 +116,11 @@ jobs:
       if: ${{ matrix.pytest_mark == 'not iotlab_creds' }}
       run: |
         sudo RIOT/dist/tools/tapsetup/tapsetup -c 11
+    - name: Install native dependencies
+      if: ${{ matrix.pytest_mark == 'not iotlab_creds' }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install lib32asan5
     - name: Run release tests
       timeout-minutes: 350
       run: |
