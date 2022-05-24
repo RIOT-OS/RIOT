@@ -194,6 +194,16 @@ extern "C" {
 #define CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU 0
 #endif
 
+/**
+ * @brief   Automatically add 6LoWPAN compression at border router
+ *
+ * When set, 6LoWPAN compression context 0 will be automatically set for the prefix configured by
+ * prefix deligation at the border router.
+ */
+#ifndef CONFIG_GNRC_NETIF_IPV6_BR_AUTO_6CTX
+#define CONFIG_GNRC_NETIF_IPV6_BR_AUTO_6CTX   1
+#endif
+
 #ifdef __cplusplus
 }
 #endif
