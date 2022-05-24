@@ -187,6 +187,10 @@ extern int _i2c_scan(int argc, char **argv);
 extern int _loramac_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_NANOCOAP_VFS
+extern int _nanocoap_get_handler(int argc, char **argv);
+#endif
+
 #ifdef MODULE_NICE
 extern int _sc_nice(int argc, char **argv);
 #endif
@@ -288,6 +292,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_SHA256SUM
     {"sha256sum", "Compute and check SHA256 message digest", _vfs_sha256sum_cmd},
+#endif
+#ifdef MODULE_NANOCOAP_VFS
+    {"ncget", "download a file from a CoAP server", _nanocoap_get_handler},
 #endif
 #ifdef MODULE_GNRC_IPV6_NIB
     {"nib", "Configure neighbor information base", _gnrc_ipv6_nib},

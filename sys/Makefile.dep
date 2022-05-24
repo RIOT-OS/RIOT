@@ -682,6 +682,11 @@ ifneq (,$(filter nanocoap_cache,$(USEMODULE)))
   USEMODULE += hashes
 endif
 
+ifneq (,$(filter nanocoap_vfs,$(USEMODULE)))
+  USEMODULE += nanocoap_sock
+  USEMODULE += vfs
+endif
+
 ifneq (,$(filter nanocoap_%,$(USEMODULE)))
   USEMODULE += nanocoap
 endif

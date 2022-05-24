@@ -15,6 +15,24 @@ USEMODULE += gnrc_ipv6_default
 
 USEMODULE += nanocoap_sock
 
+# boards where basic nanocoap functionality fits, but no VFS
+LOW_MEMORY_BOARDS := atmega1284p atxmega-a3bu-xplained derfmega128 \
+                     saml11-xpro bluepill saml10-xpro blackpill nucleo-f302r8 \
+                     stm32mp157c-dk2 stm32f7508-dk
+
+# Don't enable VFS functions on small boards
+ifeq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
+  USEMODULE += nanocoap_vfs
+  USEMODULE += vfs_default
+  # USEMODULE += vfs_auto_format
+  USEMODULE += shell_commands
+
+  # always enable auto-format for native
+  ifeq ($(BOARD),native)
+    USEMODULE += vfs_auto_format
+  endif
+endif
+
 # Required by test
 USEMODULE += od
 USEMODULE += shell

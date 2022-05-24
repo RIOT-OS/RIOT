@@ -122,6 +122,10 @@ ifneq (,$(filter semtech-loramac,$(USEPKG)))
   SRC += sc_loramac.c
 endif
 
+ifneq (,$(filter nanocoap_vfs,$(USEMODULE)))
+  SRC += sc_nanocoap_vfs.c
+endif
+
 ifneq (,$(filter nimble_netif,$(USEMODULE)))
   SRC += sc_nimble_netif.c
 endif

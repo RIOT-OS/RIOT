@@ -76,7 +76,7 @@ extern const coap_resource_subtree_t coap_resource_subtree_suit;
  * @brief Coap block-wise-transfer size used for SUIT
  */
 #ifndef CONFIG_SUIT_COAP_BLOCKSIZE
-#define CONFIG_SUIT_COAP_BLOCKSIZE  COAP_BLOCKSIZE_64
+#define CONFIG_SUIT_COAP_BLOCKSIZE  CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT
 #endif
 
 /**
