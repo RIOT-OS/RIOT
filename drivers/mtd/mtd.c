@@ -36,6 +36,10 @@ int mtd_init(mtd_dev_t *mtd)
 
     int res = -ENOTSUP;
 
+    if (mtd->driver->init) {
+        res = mtd->driver->init(mtd);
+    }
+
     /* Drivers preceding the introduction of write_size need to set it. While
      * this assert breaks applications that previously worked, it is likely
      * that these applications silently assumed a certain write size and would
@@ -44,10 +48,6 @@ int mtd_init(mtd_dev_t *mtd)
      * in your application for whether the backend allows sufficiently small
      * writes. */
     assert(mtd->write_size != 0);
-
-    if (mtd->driver->init) {
-        res = mtd->driver->init(mtd);
-    }
 
 #ifdef MODULE_MTD_WRITE_PAGE
     if ((mtd->driver->flags & MTD_DRIVER_FLAG_DIRECT_WRITE) == 0) {
