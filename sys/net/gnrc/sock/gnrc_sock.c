@@ -142,6 +142,14 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     }
 #endif
     if (timeout != 0) {
+#if defined(DEVELHELP) && IS_ACTIVE(SOCK_HAS_ASYNC)
+        if (reg->async_cb.generic) {
+            /* this warning is a false positive when sock_*_recv() was not called from
+             * the asynchronous handler */
+            LOG_WARNING("gnrc_sock: timeout != 0 within the asynchronous callback lead "
+                        "to unexpected delays within the asynchronous handler.\n");
+        }
+#endif
         mbox_get(&reg->mbox, &msg);
     }
     else {
