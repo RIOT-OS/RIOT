@@ -6,8 +6,3 @@ CONFIG_MODULE_FIDO2_CTAP_TRANSPORT=y
 CONFIG_MODULE_FIDO2_CTAP_TRANSPORT_HID=y
 
 CONFIG_PACKAGE_FIDO2_TESTS=y
-
-# Should be autoselecting the MODULE_PRNG_HWRNG if possible
-# Since the makefile cannot we have to override until end of migration
-# Remove when TEST_KCONFIG is complete
-CONFIG_MODULE_PRNG_MUSL_LCG=y
