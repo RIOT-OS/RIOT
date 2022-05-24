@@ -12,3 +12,7 @@ OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 
 # include shared global Nucleo Makefile
 include $(RIOTBOARD)/common/nucleo/Makefile.include
+
+#Automatic flash directory name generation failed for this board
+#and it should be set manually - see PR #18057
+DIR_NAME_AT_REMED = "NODE_WB55RG"

@@ -6,3 +6,10 @@ INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 
 # Setup of programmer and serial is shared between STM32 based boards
 include $(RIOTMAKE)/boards/stm32.inc.mk
+
+# variable needed by cpy2remed PROGRAMMER
+# it contains name of ST-Link removable media
+
+DIR_NAME_AT_REMED = "NODE$(call uppercase,$(subst -,_,$(subst nucleo,,$(BOARD))))"
+
+PROGRAMMERS_SUPPORTED += cpy2remed
