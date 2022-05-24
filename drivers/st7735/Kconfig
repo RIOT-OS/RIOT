@@ -16,6 +16,12 @@ config MODULE_ST7735
     select MODULE_ZTIMER
     select MODULE_ZTIMER_MSEC
 
+config HAVE_ST7735
+    bool
+    select MODULE_ST7735 if MODULE_DISP_DEV
+    help
+      Indicates that an ST7735 display is present.
+
 menuconfig KCONFIG_USEMODULE_ST7735
     bool "Configure ST7735 driver"
     depends on USEMODULE_ST7735
