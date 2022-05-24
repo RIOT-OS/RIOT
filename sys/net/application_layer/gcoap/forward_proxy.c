@@ -102,7 +102,7 @@ static ssize_t _forward_proxy_handler(coap_pkt_t *pdu, uint8_t *buf,
                                       size_t len, coap_request_ctx_t *ctx)
 {
     int pdu_len;
-    sock_udp_ep_t *remote = (sock_udp_ep_t *)ctx->context;
+    sock_udp_ep_t *remote = coap_request_ctx_get_context(ctx);
 
     pdu_len = gcoap_forward_proxy_request_process(pdu, remote);
 

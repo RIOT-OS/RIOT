@@ -54,7 +54,7 @@ static ssize_t handler_info(coap_pkt_t *pdu, uint8_t *buf, size_t len, coap_requ
 
 static ssize_t handler_text(coap_pkt_t *pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx)
 {
-    return text_resp(pdu, buf, len, ctx->context, COAP_FORMAT_TEXT);
+    return text_resp(pdu, buf, len, coap_request_ctx_get_context(ctx), COAP_FORMAT_TEXT);
 }
 
 static const coap_resource_t resources[] = {

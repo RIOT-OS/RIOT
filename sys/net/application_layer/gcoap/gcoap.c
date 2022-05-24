@@ -28,6 +28,8 @@
 #include "assert.h"
 #include "net/coap.h"
 #include "net/gcoap.h"
+#include "net/gcoap/forward_proxy.h"
+#include "nanocoap_internal.h"
 #include "net/nanocoap/cache.h"
 #include "net/sock/async/event.h"
 #include "net/sock/util.h"
@@ -41,8 +43,6 @@
 #include "net/credman.h"
 #include "net/dsm.h"
 #endif
-
-#include "net/gcoap/forward_proxy.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"

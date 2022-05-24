@@ -27,7 +27,7 @@
 #include <string.h>
 
 #include "bitarithm.h"
-#include "net/nanocoap.h"
+#include "nanocoap_internal.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -429,7 +429,7 @@ ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
                              coap_request_ctx_t *context)
 {
     assert(context);
-    coap_resource_subtree_t *subtree = context->context;
+    coap_resource_subtree_t *subtree = coap_request_ctx_get_context(context);
     return coap_tree_handler(pkt, buf, len, subtree->resources,
                              subtree->resources_numof);
 }
@@ -1235,4 +1235,14 @@ unsigned coap_get_len(coap_pkt_t *pkt)
         pktlen += pkt->payload_len + 1;
     }
     return pktlen;
+}
+
+const char *coap_request_ctx_get_path(const coap_request_ctx_t *ctx)
+{
+    return ctx->resource->path;
+}
+
+void *coap_request_ctx_get_context(const coap_request_ctx_t *ctx)
+{
+    return ctx->context;
 }

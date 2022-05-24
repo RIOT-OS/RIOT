@@ -265,8 +265,8 @@ static ssize_t gcoap_fileserver_directory_handler(coap_pkt_t *pdu, uint8_t *buf,
 
 ssize_t gcoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                                  coap_request_ctx_t *ctx) {
-    const char *root = ctx->context;
-    const char *resource = ctx->resource->path;
+    const char *root = coap_request_ctx_get_context(ctx);
+    const char *resource = coap_request_ctx_get_path(ctx);
     struct requestdata request = {
         .etag_sent = false,
         .blocknum2 = 0,

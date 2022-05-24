@@ -241,6 +241,11 @@ typedef struct {
 } coap_pkt_t;
 
 /**
+ * @brief   Forward declaration of internal CoAP resource request handler context
+ */
+struct _coap_request_ctx;
+
+/**
  * @brief   CoAP resource request handler context
  */
 typedef struct _coap_request_ctx coap_request_ctx_t;
@@ -322,24 +327,13 @@ typedef const struct {
 } coap_resource_subtree_t;
 
 /**
- * @brief   CoAP resource request handler context
- */
-struct _coap_request_ctx {
-    const coap_resource_t *resource;    /**< resource of the request        */
-    void *context;                      /**< request context                */
-};
-
-/**
  * @brief   Get resource path associated with a CoAP request
  *
  * @param[in]   ctx The request context
  *
  * @return  Resource path of the request
  */
-static inline const char *coap_request_get_path(const coap_request_ctx_t *ctx)
-{
-    return ctx->resource->path;
-}
+const char *coap_request_ctx_get_path(const coap_request_ctx_t *ctx);
 
 /**
  * @brief   Get resource context associated with a CoAP request
@@ -348,10 +342,7 @@ static inline const char *coap_request_get_path(const coap_request_ctx_t *ctx)
  *
  * @return  Resource context of the request
  */
-static inline void *coap_request_get_context(const coap_request_ctx_t *ctx)
-{
-    return ctx->context;
-}
+void *coap_request_ctx_get_context(const coap_request_ctx_t *ctx);
 
 /**
  * @brief   Block1 helper struct
