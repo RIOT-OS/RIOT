@@ -17,17 +17,24 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding
 from cryptography.hazmat.primitives.serialization import PrivateFormat
 from cryptography.hazmat.primitives.serialization import NoEncryption
+from cryptography.hazmat.primitives.serialization import BestAvailableEncryption
 
 
 def main():
-    if len(sys.argv) != 2:
-        print("usage: gen_key.py <secret filename>")
+    if len(sys.argv) < 2:
+        print("usage: gen_key.py <secret filename> [password]")
         sys.exit(1)
+
+    if len(sys.argv) > 2:
+        pw = str.encode(sys.argv[2])
+        crypt = BestAvailableEncryption(pw)
+    else:
+        crypt = NoEncryption()
 
     pk = Ed25519PrivateKey.generate()
     pem = pk.private_bytes(encoding=Encoding.PEM,
                            format=PrivateFormat.PKCS8,
-                           encryption_algorithm=NoEncryption()
+                           encryption_algorithm=crypt,
                            )
 
     with open(sys.argv[1], "wb") as f:

@@ -60,7 +60,7 @@ def main(options):
     digest = None
     private_key_buffer = options.private_key.read()
     try:
-        private_key = ks.load_pem_private_key(private_key_buffer, password=None, backend=default_backend())
+        private_key = ks.load_pem_private_key(private_key_buffer, password=str.encode(options.password) if options.password else None, backend=default_backend())
         if isinstance(private_key, ec.EllipticCurvePrivateKey):
             options.key_type = 'ES{}'.format(private_key.key_size)
         elif isinstance(private_key, ed25519.Ed25519PrivateKey):

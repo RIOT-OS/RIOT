@@ -66,6 +66,7 @@ class MainArgumentParser(object):
         sign_parser.add_argument('-k', '--private-key', metavar='FILE', type=argparse.FileType('rb'), required=True)
         sign_parser.add_argument('-i', '--key-id', metavar='ID', type=str)
         sign_parser.add_argument('-o', '--output-file', metavar='FILE', type=argparse.FileType('wb'), required=True)
+        sign_parser.add_argument('-p', '--password', type=str)
 
         parse_parser = subparsers.add_parser('parse', help='Parse a manifest')
 
@@ -77,6 +78,7 @@ class MainArgumentParser(object):
         get_pubkey_parser.add_argument('-k', '--private-key', metavar='FILE', type=argparse.FileType('rb'), required=True)
         get_pubkey_parser.add_argument('-f', '--output-format', choices=get_pubkey.OutputFormaters.keys(), default='pem')
         get_pubkey_parser.add_argument('-o', '--output-file', metavar='FILE', type=argparse.FileType('wb'), default=sys.stdout)
+        get_pubkey_parser.add_argument('-p', '--password', type=str)
 
         keygen_parser = subparsers.add_parser('keygen', help='Create a signing key. Not for production use')
 

@@ -75,7 +75,7 @@ def main(options):
     if options.output_format in ('pem', 'der', 'uecc', 'header'):
         private_key = ks.load_pem_private_key(
             options.private_key.read(),
-            password=None,
+            password=str.encode(options.password) if options.password else None,
             backend=default_backend()
         )
 
