@@ -6,19 +6,15 @@
 #
 
 config PACKAGE_DRIVER_ATWINC15X0
-    bool "ATWINC15x0 WiFi driver package"
+    bool
     depends on TEST_KCONFIG
-    depends on HAS_PERIPH_SPI
-    depends on HAS_PERIPH_GPIO
-    depends on HAS_PERIPH_GPIO_IRQ
-    select MODULE_PERIPH_SPI
-    select MODULE_PERIPH_GPIO
-    select MODULE_PERIPH_GPIO_IRQ
+    depends on MODULE_ATWINC15X0
     select MODULE_DRIVER_ATWINC15X0
     select MODULE_DRIVER_ATWINC15X0_COMMON
     select MODULE_DRIVER_ATWINC15X0_SPI_FLASH
     help
         ATWINC15x0 WiFi vendor driver from the Arduino WiFi101 library.
+        This is needed by the RIOT ATWINC15x0 driver.
 
 config MODULE_DRIVER_ATWINC15X0
     bool
@@ -30,3 +26,4 @@ config MODULE_DRIVER_ATWINC15X0_COMMON
 
 config MODULE_DRIVER_ATWINC15X0_SPI_FLASH
     bool
+    depends on TEST_KCONFIG

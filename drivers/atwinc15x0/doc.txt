@@ -156,10 +156,13 @@ Symbol                         | Default          | Description
 
 At the moment only WPA2 Personal Mode is supported. The required settings are:
 
-Parameter | Default   | Description
-:---------|:----------|:------------
-WIFI_SSID | "RIOT_AP" | SSID of the AP to be used.
-WIFI_PASS | -         | Passphrase used for the AP as clear text (max. 64 chars).
+Parameter  | Default   | Description
+:----------|:----------|:------------
+#WIFI_SSID | "RIOT_AP" | SSID of the AP to be used.
+#WIFI_PASS | -         | Passphrase used for the AP as clear text (max. 64 chars) [1].
+
+
+1. Leave `WIFI_PASS` undefined to connect to an open WiFi access point.
 
 The following example shows the make command with the setting of different GPIOs and the WiFi parameters.
 ```

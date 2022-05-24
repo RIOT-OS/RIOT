@@ -27,16 +27,30 @@ extern "C" {
 
 /**
  * @brief   SSID of the AP to be used.
+ *
+ * The SSID must not contain more than 32 characters.
  */
 #ifndef WIFI_SSID
+#ifndef CONFIG_WIFI_SSID
 #define WIFI_SSID       "RIOT_AP"
-#endif
+#else /* CONFIG_WIFI_SSID */
+#define WIFI_SSID       CONFIG_WIFI_SSID
+#endif /* CONFIG_WIFI_SSID */
+#endif /* WIFI_SSID */
 
 /**
  * @brief   Passphrase used for the AP as clear text (max. 64 chars).
+ *
+ * The passphrase is defined as a clear text string with a maximum
+ * of 64 characters. It is used for WPA2 personal mode authentication.
+ *
+ * If passphrase is not defined, an "open" AP without WPA2 authentication is
+ * used.
  */
-#ifdef DOXYGEN
-#define WIFI_PASS       "ThisistheRIOTporttoESP"
+#if DOXYGEN
+#define WIFI_PASS       "This is RIOT-OS"
+#elif defined(CONFIG_WIFI_PASS)
+#define WIFI_PASS       CONFIG_WIFI_PASS
 #endif
 
 /**

@@ -1,0 +1,375 @@
+# Copyright (c) 2021 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config DRIVER_NETDEV_COMMON
+    bool
+    default y if TEST_KCONFIG
+
+    # Modules to include:
+    select MODULE_SHELL
+    select MODULE_SHELL_COMMANDS
+    select MODULE_PS
+
+    # gnrc is a meta module including all required, basic gnrc networking modules
+    select MODULE_GNRC
+
+    # automatically initialize the network interface
+    select MODULE_AUTO_INIT_GNRC_NETIF
+
+    # shell command to send L2 packets with a simple string
+    select MODULE_GNRC_TXTSND
+
+    # the application dumps received packets to stdout
+    select MODULE_GNRC_PKTDUMP
+
+    # TODO: parameters defined in default-radio-settings.inc.mk
+
+# the following is just for testing and is removed before merge
+
+if TEST_KCONFIG
+
+config MODULE_NETOPT
+    bool
+
+config MODULE_NETDEV
+    bool
+    default y if BOARD_ATXMEGA_A1_XPLAINED && MODULE_NETDEV_DEFAULT
+    default y if BOARD_ATXMEGA_A3BU_XPLAINED && MODULE_NETDEV_DEFAULT
+    select MODULE_EUI_PROVIDER
+
+config MODULE_NETDEV_ETH
+    bool
+    default y if HAS_PERIPH_ETH
+    select MODULE_NATIVE_CLI_EUI_PROVIDER if BOARD_NATIVE
+    select MODULE_NETDEV
+    select MODULE_NETDEV_REGISTER if !MODULE_GNRC_NETIF_SINGLE
+
+    select MODULE_STM32_ETH if HAS_PERIPH_ETH && HAS_CPU_STM32 && !MODULE_ATWINC15X0
+    select MODULE_SAM0_ETH if HAS_PERIPH_ETH && HAS_CPU_SAMD5X && !MODULE_ATWINC15X0
+
+config MODULE_NETDEV_IEEE802154
+    bool
+    select MODULE_NETDEV
+    select MODULE_NETDEV_REGISTER if !MODULE_GNRC_NETIF_SINGLE
+    select MODULE_RANDOM
+
+config MODULE_NETDEV_IEEE802154_OQPSK
+    bool
+
+config MODULE_NETDEV_IEEE802154_SUBMAC
+    bool
+    default y if HAS_RADIO_NRF802154 && MODULE_NETDEV_DEFAULT
+    default y if MODULE_CC2538_RF && MODULE_NETDEV_DEFAULT
+    select MODULE_GNRC_NETIF_PKTQ
+    select MODULE_IEEE802154
+    select MODULE_IEEE802154_SUBMAC
+    select MODULE_NETDEV_IEEE802154
+    select NRF5X_RADIO if HAS_RADIO_NRF802154
+
+config MODULE_NETDEV_REGISTER
+    bool
+
+config MODULE_NETDEV_TAP
+    bool
+    default y if BOARD_NATIVE && MODULE_NETDEV_DEFAULT
+    select MODULE_NETDEV_ETH
+    select MODULE_IOLIST
+
+###
+
+config MODULE_AT86RF212B
+    bool
+    default y if BOARD_MULLE && MODULE_NETDEV_DEFAULT
+    select MODULE_AT86RF2XX
+    select MODULE_PERIPH_GPIO_IRQ
+
+config MODULE_AT86RF233
+    bool
+    default y if BOARD_HAMILTON && MODULE_NETDEV_DEFAULT
+    default y if BOARD_SAMR21_XPRO && MODULE_NETDEV_DEFAULT
+    select MODULE_AT86RF2XX
+    select MODULE_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_SPI
+
+config MODULE_AT86RFA1
+    bool
+    default y if HAS_CPU_ATMEGA128RFA1 && MODULE_NETDEV_DEFAULT
+    select MODULE_AT86RF2XX
+
+config MODULE_AT86RFR2
+    bool
+    default y if HAS_CPU_ATMEGA256RFR2 && MODULE_NETDEV_DEFAULT
+    select MODULE_AT86RF2XX
+
+config MODULE_AT86RF2XX
+    bool
+    select MODULE_AUTO_INIT_AT86RF2XX
+    select MODULE_AUTO_INIT_RANDOM
+    select MODULE_NETDEV_IEEE802154
+    select MODULE_NETDEV_IEEE802154_OQPSK
+    select MODULE_IEEE802154
+    select MODULE_RANDOM
+    select MODULE_XTIMER
+
+config MODULE_AUTO_INIT_AT86RF2XX
+    bool
+
+config MODULE_AUTO_INIT_GNRC_NETIF
+    bool
+
+config MODULE_AUTO_INIT_GNRC_PKTBUF
+    bool
+
+config MODULE_AUTO_INIT_GNRC_PKTDUMP
+    bool
+
+config MODULE_CC1100
+    bool
+    default y if BOARD_AVSEXTREM && MODULE_NETDEV_DEFAULT
+    select MODULE_CC110X
+    select MODULE_CC110X_868MHZ
+    select MODULE_NETDEV
+
+config MODULE_CC110X
+    bool
+    select MODULE_CC1XXX_COMMON
+    select MODULE_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_INIT_GPIO_IRQ
+    select MODULE_PERIPH_INIT_SPI
+    select MODULE_PERIPH_SPI
+    select MODULE_XTIMER
+
+config MODULE_CC110X_868MHZ
+    bool
+
+config MODULE_CC1XXX_COMMON
+    bool
+
+config MODULE_CC2420
+    bool
+    default y if BOARD_Z1 && MODULE_NETDEV_DEFAULT
+    select MODULE_IEEE802154
+    select MODULE_NETDEV_IEEE802154
+    select MODULE_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_SPI
+    select MODULE_PERIPH_TIMER
+    select MODULE_XTIMER
+
+config MODULE_ESP_NOW
+    bool
+    default y if HAS_ESP_NOW && MODULE_NETDEV_DEFAULT
+    select MODULE_ESP_IDF_HEAP
+    select MODULE_ESP_IDF_NVS_FLASH
+    select MODULE_ESP_IDF_SPI_FLASH
+    select MODULE_ESP_IDF_WPA_SUPPLICANT_CRYPTO
+    select MODULE_ESP_IDF_WPA_SUPPLICANT_PORT
+    select MODULE_ESP_WIFI_ANY
+    select MODULE_NETDEV
+    select MODULE_NETOP
+    select MODULE_MTD
+
+config MODULE_ESP_IDF_HEAP
+    bool
+
+config MODULE_ESP_IDF_NVS_FLASH
+    bool
+
+config MODULE_ESP_IDF_SPI_FLASH
+    bool
+
+config MODULE_ESP_IDF_WPA_SUPPLICANT_CRYPTO
+    bool
+
+config MODULE_ESP_IDF_WPA_SUPPLICANT_PORT
+    bool
+
+config MODULE_ESP_WIFI_ANY
+    bool
+
+config MODULE_GNRC
+    bool
+    select MODULE_GNRC_NETAPI
+    select MODULE_GNRC_NETIF_ETHERNET if MODULE_NETDEV_ETH
+    select MODULE_GNRC_NETIF_IEEE802154 if MODULE_NETDEV_IEEE802154
+    select MODULE_GNRC_NETREG
+    select MODULE_GNRC_NETIF
+    select MODULE_GNRC_NETIF_HDR
+    select MODULE_GNRC_PKTBUF
+
+config MODULE_GNRC_NETAPI
+    bool
+
+config MODULE_GNRC_NETREG
+    bool
+
+config MODULE_GNRC_NETIF
+    bool
+    select MODULE_NETIF
+    select MODULE_L2UTIL
+    select MODULE_FMT
+
+config MODULE_GNRC_NETIF_ETHERNET
+    bool
+    select MODULE_NETIF
+
+config MODULE_GNRC_NETIF_IEEE802154
+    bool
+    select MODULE_NETIF
+
+config MODULE_GNRC_NETIF_HDR
+    bool
+
+config MODULE_GNRC_NETIF_INIT_DEVS
+    bool
+    default y if MODULE_AUTO_INIT_GNRC_NETIF
+
+config MODULE_GNRC_PKT
+    bool
+
+config MODULE_GNRC_PKTBUF
+    bool
+    select MODULE_GNRC_PKTBUF_STATIC
+    select MODULE_AUTO_INIT_GNRC_PKTBUF
+    select MODULE_GNRC_PKT
+
+config MODULE_GNRC_PKTBUF_STATIC
+    bool
+
+config MODULE_GNRC_PKTDUMP
+    bool
+    select MODULE_AUTO_INIT_GNRC_PKTDUMP
+    select MODULE_OD
+    select MODULE_GNRC_PKTBUF
+
+config MODULE_GNRC_NETIF_PKTQ
+    bool
+
+config MODULE_GNRC_TXTSND
+    bool
+
+config MODULE_L2UTIL
+    bool
+
+config MODULE_NATIVE_CLI_EUI_PROVIDER
+    bool
+
+config MODULE_NETIF
+    bool
+
+config MODULE_NIMBLE_NETIF
+    bool
+    default y if BOARD_DWM1001 && MODULE_NETDEV_DEFAULT
+    depends on HAS_BLE_NIMBLE
+    select MODULE_AUTO_INIT_RANDOM
+    select MODULE_NETDEV
+    select PACKAGE_NIMBLE
+    select MODULE_NIMBLE_CONTROLLER
+    select MODULE_NIMBLE_DRIVERS_NRF5X if HAS_CPU_NRF52
+    select MODULE_NIMBLE_HOST
+    select MODULE_NIMBLE_NPL_RIOT
+    select MODULE_NIMBLE_PORTING_NIMBLE
+    select MODULE_NIMBLE_RIOT_CONTRIB
+    select MODULE_NIMBLE_SCANLIST
+    select MODULE_NIMBLE_SCANNER
+    select MODULE_NIMBLE_TRANSPORT_RAM
+    select MODULE_RANDOM
+
+config MODULE_BLUETIL_AD
+    bool
+
+config MODULE_BLUETIL_ADDR
+    bool
+
+config PACKAGE_NIMBLE
+    bool "NIMBLE package"
+    select MODULE_SEMA
+    select MODULE_EVENT
+    select MODULE_EVENT_CALLBACK
+    select MODULE_ZTIMER_MSEC
+    select MODULE_ZTIMER_PERIPH_TIMER
+
+config MODULE_NIMBLE_ADDR
+    bool
+    select MODULE_BLUETIL_AD
+    select MODULE_BLUETIL_ADDR
+
+config MODULE_NIMBLE_CONTROLLER
+    bool
+
+config MODULE_NIMBLE_DRIVERS_NRF5X
+    bool
+    select MODULE_PERIPH_TIMER
+    select MODULE_PERIPH_INIT_TIMER
+
+config MODULE_NIMBLE_HOST
+    bool
+    select MODULE_NIMBLE_HOST_STORE_RAM
+    select MODULE_NIMBLE_HOST_UTIL
+    select PACKAGE_TINYCRYPT
+
+config MODULE_NIMBLE_HOST_STORE_RAM
+    bool
+
+config MODULE_NIMBLE_HOST_UTIL
+    bool
+
+config MODULE_NIMBLE_NPL_RIOT
+    bool
+
+config MODULE_NIMBLE_PORTING_NIMBLE
+    bool
+
+config MODULE_NIMBLE_RIOT_CONTRIB
+    bool
+
+config MODULE_NIMBLE_SCANLIST
+    bool
+    select MODULE_NIMBLE_ADDR
+    select MODULE_BLUETIL_AD
+    select MODULE_ZTIMER_USEC
+
+config MODULE_NIMBLE_SCANNER
+    bool
+
+config MODULE_NIMBLE_TRANSPORT_RAM
+    bool
+
+config MODULE_OD
+    bool
+
+config MODULE_PERIPH_ETH
+    bool
+
+config MODULE_PERIPH_ETH_COMMON
+    bool
+
+config MODULE_PERIPH_INIT_ETH
+    bool
+
+config MODULE_PERIPH_INIT_ETH_COMMON
+    bool
+
+config MODULE_SAM0_ETH
+    bool
+    select MODULE_IOLIST
+    select MODULE_NETOPT
+    select MODULE_PERIPH_ETH if HAS_PERIPH_ETH
+    select MODULE_PERIPH_ETH_COMMON if HAS_PERIPH_ETH
+    select MODULE_PERIPH_INIT_ETH if HAS_PERIPH_ETH
+    select MODULE_PERIPH_INIT_ETH_COMMON if HAS_PERIPH_ETH
+
+config MODULE_STM32_ETH
+    bool
+    select MODULE_IOLIST
+    select MODULE_PERIPH_ETH if HAS_PERIPH_ETH
+    select MODULE_PERIPH_ETH_COMMON if HAS_PERIPH_ETH
+    select MODULE_PERIPH_INIT_ETH if HAS_PERIPH_ETH
+    select MODULE_PERIPH_INIT_ETH_COMMON if HAS_PERIPH_ETH
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
+
+endif # TEST_KCONFIG

@@ -7,7 +7,7 @@
 
 config HAVE_NRF5X_RADIO
     bool
-    select NRF5X_RADIO if MODULE_NETDEV_DEFAULT
+    select NRF5X_RADIO if MODULE_NETDEV_DEFAULT && !PACKAGE_NIMBLE
     help
         Indicates that an NRF5X radio is present.
 
