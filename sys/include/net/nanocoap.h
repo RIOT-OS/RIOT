@@ -312,8 +312,8 @@ typedef const struct {
 typedef struct {
     size_t offset;                  /**< offset of received data            */
     uint32_t blknum;                /**< block number                       */
-    unsigned szx;                   /**< szx value                          */
-    int more;                       /**< -1 for no option, 0 for last block,
+    uint8_t szx;                    /**< szx value                          */
+    int8_t more;                    /**< -1 for no option, 0 for last block,
                                           1 for more blocks coming          */
 } coap_block1_t;
 
@@ -956,7 +956,7 @@ static inline int coap_get_block2(coap_pkt_t *pkt, coap_block1_t *block)
  * @returns     0 if more flag is not set
  * @returns     1 if more flag is set
  */
-int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, unsigned *szx);
+int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, uint8_t *szx);
 
 /**
  * @brief    Check whether any of the packet's options that are critical

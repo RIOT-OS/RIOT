@@ -367,7 +367,7 @@ ssize_t coap_opt_get_string(coap_pkt_t *pkt, uint16_t optnum,
     return (int)(max_len - left);
 }
 
-int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, unsigned *szx)
+int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, uint8_t *szx)
 {
     uint8_t *optpos = coap_find_option(pkt, option);
     if (!optpos) {
@@ -1110,7 +1110,7 @@ void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
 void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
 {
     uint32_t blknum = 0;
-    unsigned szx = 0;
+    uint8_t szx = 0;
 
     /* Retrieve the block2 option from the client request */
     if (coap_get_blockopt(pkt, COAP_OPT_BLOCK2, &blknum, &szx) >= 0) {
