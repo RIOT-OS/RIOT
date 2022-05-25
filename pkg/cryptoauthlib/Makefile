@@ -1,6 +1,6 @@
 PKG_NAME=cryptoauthlib
 PKG_URL=https://github.com/MicrochipTech/cryptoauthlib
-PKG_VERSION=af8187776cd3f3faf8bed412eaf6ff7221862e19
+PKG_VERSION=055dd4afafb019db1f4d61880aa441832139faa2
 PKG_LICENSE=LGPL-2.1
 PKG_TEST_NAME=cryptoauthlib_test
 
@@ -23,6 +23,7 @@ CFLAGS += -Wno-type-limits
 CFLAGS += -Wno-unused-function
 CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-unused-variable
+CFLAGS += -Wno-format-nonliteral
 
 TOOLCHAIN_FILE=$(PKG_SOURCE_DIR)/xcompile-toolchain.cmake
 
@@ -39,7 +40,6 @@ cryptoauth: $(PKG_BUILD_DIR)/Makefile
 $(PKG_BUILD_DIR)/Makefile: $(TOOLCHAIN_FILE)
 	cmake -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
 		  -Wno-dev \
-		  -DATCA_HAL_I2C:BOOL=TRUE \
 		  -B$(PKG_BUILD_DIR) \
 		  -H$(PKG_SOURCE_DIR)/lib
 
@@ -47,10 +47,15 @@ $(TOOLCHAIN_FILE): git-download
 	$(RIOTTOOLS)/cmake/generate-xcompile-toolchain.sh > $(TOOLCHAIN_FILE)
 
 build_tests:
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/third_party/unity -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_third_party_unity
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/test -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/test/jwt -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_jwt
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/test/tng -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_tng
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/test/atcacert -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_atcacert
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/test/api_atcab -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_api_atcab
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/test/api_calib -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_api_calib
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/test/api_crypto -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_api_crypto
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/test/vectors -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_vectors
 
 git-download: | ..cmake_version_supported
 

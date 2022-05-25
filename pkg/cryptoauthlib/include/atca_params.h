@@ -21,6 +21,7 @@
 #define ATCA_PARAMS_H
 
 #include "board.h"
+#include "periph/i2c.h"
 #include "cryptoauthlib.h"
 
 #ifdef __cplusplus
@@ -53,15 +54,15 @@ extern "C" {
 #define ATCA_RX_RETRIES          (20)
 #endif
 #ifndef ATCA_DEVTYPE
-#define ATCA_DEVTYPE            (ATECC508A)
+#define ATCA_DEVTYPE            (ATECC608A)
 #endif
 
 #ifndef ATCA_PARAMS
 #define ATCA_PARAMS                {    .iface_type = ATCA_I2C_IFACE, \
                                         .devtype = ATCA_DEVTYPE, \
-                                        .atcai2c.slave_address = ATCA_PARAM_ADDR, \
+                                        .atcai2c.address = ATCA_PARAM_ADDR, \
                                         .atcai2c.bus = ATCA_PARAM_I2C, \
-                                        .atcai2c.baud = -1,                        /**< Not used in RIOT */ \
+                                        .atcai2c.baud = -1, /**< Not used in RIOT */ \
                                         .wake_delay = 1500, \
                                         .rx_retries = ATCA_RX_RETRIES }
 #endif

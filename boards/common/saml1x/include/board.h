@@ -29,6 +29,15 @@ extern "C" {
 #endif
 
 /**
+ * @brief ATCA device type on SAML11 XPro boards
+ * @{
+ */
+#ifdef BOARD_SAML11_XPRO
+#define ATCA_DEVTYPE    (ATECC508A)
+#endif
+/** @} */
+
+/**
  * @name    PORT selection macros
  * @{
  */
