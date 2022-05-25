@@ -38,7 +38,6 @@
 
 #include TEST_MANIFEST_INCLUDE(file1.bin.h)
 #include TEST_MANIFEST_INCLUDE(file2.bin.h)
-#define SUIT_URL_MAX            128
 
 typedef struct {
     const unsigned char *data;
@@ -73,13 +72,13 @@ const size_t num_payloads = ARRAY_SIZE(payloads);
 static int test_suit_manifest(const unsigned char *manifest_bin,
                                 size_t manifest_bin_len)
 {
-    char _url[SUIT_URL_MAX];
+    char _url[CONFIG_SOCK_URLPATH_MAXLEN];
     suit_manifest_t manifest;
 
     memset(&manifest, 0, sizeof(manifest));
 
     manifest.urlbuf = _url;
-    manifest.urlbuf_len = SUIT_URL_MAX;
+    manifest.urlbuf_len = CONFIG_SOCK_URLPATH_MAXLEN;
 
     int res;
     if ((res =

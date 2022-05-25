@@ -47,7 +47,7 @@ static ssize_t _trigger_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
     unsigned code;
     size_t payload_len = pkt->payload_len;
     if (payload_len) {
-        if (payload_len >= SUIT_URL_MAX) {
+        if (payload_len >= CONFIG_SOCK_URLPATH_MAXLEN) {
             code = COAP_CODE_REQUEST_ENTITY_TOO_LARGE;
         }
         else {

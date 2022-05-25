@@ -76,7 +76,7 @@
 #define SUIT_MSG_TRIGGER        0x12345
 
 static char _stack[SUIT_WORKER_STACKSIZE];
-static char _url[SUIT_URL_MAX];
+static char _url[CONFIG_SOCK_URLPATH_MAXLEN];
 static uint8_t _manifest_buf[SUIT_MANIFEST_BUFSIZE];
 
 static kernel_pid_t _suit_worker_pid;
@@ -113,7 +113,7 @@ static void _suit_handle_url(const char *url)
         memset(&manifest, 0, sizeof(manifest));
 
         manifest.urlbuf = _url;
-        manifest.urlbuf_len = SUIT_URL_MAX;
+        manifest.urlbuf_len = CONFIG_SOCK_URLPATH_MAXLEN;
 
         int res;
         if ((res = suit_parse(&manifest, _manifest_buf, size)) != SUIT_OK) {
