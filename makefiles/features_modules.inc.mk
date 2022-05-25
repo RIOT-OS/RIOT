@@ -11,23 +11,28 @@ USEMODULE += $(PERIPH_FEATURES)
 
 # Add all USED periph_% init modules unless they are blacklisted
 PERIPH_IGNORE_MODULES := \
-  periph_init% \
+  periph_clic \
   periph_common \
+  periph_coretimer \
+  periph_flash \
   periph_flexcomm \
+  periph_gpio_ll \
+  periph_gpio_ll_irq \
+  periph_gpio_ll_irq_level_triggered_high \
+  periph_gpio_ll_irq_level_triggered_low \
+  periph_gpio_ll_irq_unmask \
   periph_gpio_mux \
   periph_i2c_hw \
   periph_i2c_sw \
-  periph_rtc_ms \
+  periph_init% \
   periph_mcg \
-  periph_wdog \
-  periph_flash \
+  periph_plic \
+  periph_rtc_ms \
   periph_rtc_rtt \
   periph_rtt_hw_rtc \
   periph_rtt_hw_sys \
-  periph_clic \
-  periph_coretimer \
-  periph_plic \
-  periph_spi_on_qspi
+  periph_spi_on_qspi \
+  periph_wdog \
   #
 PERIPH_MODULES := $(filter-out $(PERIPH_IGNORE_MODULES),\
                                $(filter periph_%,$(USEMODULE)))
