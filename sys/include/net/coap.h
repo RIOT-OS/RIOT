@@ -53,6 +53,11 @@ extern "C" {
 #define COAP_OPT_BLOCK1         (27)
 #define COAP_OPT_PROXY_URI      (35)
 #define COAP_OPT_PROXY_SCHEME   (39)
+/**
+ * @brief suppress CoAP response
+ * @see [RFC 7968](https://datatracker.ietf.org/doc/html/rfc7967)
+ */
+#define COAP_OPT_NO_RESPONSE    (258)
 /** @} */
 
 /**
