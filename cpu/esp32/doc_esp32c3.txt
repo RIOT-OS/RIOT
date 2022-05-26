@@ -185,7 +185,7 @@ There are two option on how to uese the JTAG interface on ESP32-C3:
 
 2.  Using an external JTAG adapter connected to the JTAG interface exposed
     to GPIOs as follows:
-    JTAG Signal | ESP32C3 Pin
+    JTAG Signal | ESP32-C3 Pin
     :-----------|:-----------
     TRST_N      | CHIP_PU
     TDO         | GPIO7 (MTDO)

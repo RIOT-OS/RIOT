@@ -53,8 +53,14 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define ESP_PM_WUP_PINS_ANY_HIGH    ESP_EXT1_WAKEUP_ANY_HIGH
+#if SOC_GPIO_SUPPORT_DEEPSLEEP_WAKEUP
+#define ESP_PM_WUP_PINS_ANY_LOW     ESP_GPIO_WAKEUP_GPIO_LOW
+#define ESP_PM_WUP_PINS_ANY_HIGH    ESP_GPIO_WAKEUP_GPIO_HIGH
+#endif
+#if SOC_PM_SUPPORT_EXT_WAKEUP
 #define ESP_PM_WUP_PINS_ALL_LOW     ESP_EXT1_WAKEUP_ALL_LOW
+#define ESP_PM_WUP_PINS_ANY_HIGH    ESP_EXT1_WAKEUP_ANY_HIGH
+#endif
 
 #ifndef ESP_PM_WUP_LEVEL
 #define ESP_PM_WUP_LEVEL            ESP_PM_WUP_PINS_ANY_HIGH
@@ -446,7 +452,15 @@ void gpio_pm_sleep_enter(unsigned mode)
             }
 #endif /* SOC_RTCIO_INPUT_OUTPUT_SUPPORTED */
         }
+#if SOC_GPIO_SUPPORT_DEEPSLEEP_WAKEUP
+        /* ESP_PM_WUP_PINS_ANY_LOW or ESP_PM_WUP_PINS_ANY_HIGH */
+        esp_deep_sleep_enable_gpio_wakeup(wup_pin_mask, ESP_PM_WUP_LEVEL);
+#elif SOC_PM_SUPPORT_EXT_WAKEUP
+        /* ESP_PM_WUP_PINS_ALL_LOW or ESP_PM_WUP_PINS_ANY_HIGH */
         esp_sleep_enable_ext1_wakeup(wup_pin_mask, ESP_PM_WUP_LEVEL);
+#else
+        #error "ESP32x SoC variant doesn't allow to define GPIOs for wake-up from deep sleep"
+#endif
 #endif /* ESP_PM_WUP_PINS */
     }
     else {
