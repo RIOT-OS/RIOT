@@ -829,6 +829,16 @@ static inline void _ztimer_sleep_scale_down(ztimer_clock_t *clock,
 }
 
 /**
+ * @name        Sleep functions with relaxed requirements
+ *
+ * Use these functions to automatically select the most suitable (in terms of
+ * resolution) clock out of the given clocks automatically. This may result
+ * in a significantly reduced resolution and longer sleeps that requested.
+ * However, sleeps are rounded up to sleep at least the requested duration.
+ *
+ * @{
+ */
+/**
  * @brief       Sleep at least for the given amount of microseconds with relaxed
  *              requirements
  * @param[in]   usecs       Number of microseconds to sleep
@@ -899,6 +909,8 @@ static inline void ztimer_sleep_secs_relaxed(uint32_t secs)
         _ztimer_sleep_scale_up(ZTIMER_USEC, secs, US_PER_SEC);
     }
 }
+/** @} */ /* Group relaxed sleep functions */
+
 /** @} */
 
 #ifdef __cplusplus
