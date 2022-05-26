@@ -15,8 +15,8 @@ config CPU_FAM_ESP32
     select CPU_CORE_XTENSA_LX6
     select HAS_ARCH_ESP32
     select HAS_CPU_ESP32
+    select HAS_ESP_HW_COUNTER
     select HAS_ESP_WIFI_ENTERPRISE
-    select HAS_PERIPH_ADC_ARCH
     select HAS_PUF_SRAM
 
     select PACKAGE_ESP32_SDK if TEST_KCONFIG
@@ -63,6 +63,11 @@ config HAS_CPU_ESP32
     help
         Indicates that the current CPU is 'esp32'.
 
+config HAS_ESP_HW_COUNTER
+    bool
+    help
+        Indicates that HW counters can be used.
+
 config HAS_ESP_RTC_TIMER_32K
     bool
     help
@@ -74,11 +79,6 @@ config HAS_ESP_SPI_RAM
     help
         Indicates that an external RAM is connected via the FSPI interface in
         the board.
-
-config HAS_PERIPH_ADC_ARCH
-    bool
-    help
-        Indicates that architecure specific ADC peripherals are present.
 
 ## Common CPU symbols
 config CPU_CORE
@@ -120,7 +120,6 @@ menu "ESP32 specific configurations"
     config MODULE_ESP_SPI_RAM
         bool "SPI RAM support"
         depends on HAS_ESP_SPI_RAM
-        select MODULE_ESP_IDF_EFUSE
         select MODULE_ESP_IDF_GPIO
         select MODULE_ESP_IDF_HEAP
         select MODULE_ESP_IDF_SPI_FLASH
@@ -136,5 +135,6 @@ endmenu
 
 rsource "bootloader/Kconfig"
 rsource "esp-idf/Kconfig"
+rsource "esp-idf-api/Kconfig"
 rsource "periph/Kconfig"
 source "$(RIOTCPU)/esp_common/Kconfig"
