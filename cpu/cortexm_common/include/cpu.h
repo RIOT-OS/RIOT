@@ -219,17 +219,16 @@ static inline void cpu_jump_to_image(uint32_t image_address)
     __asm("BX %0" :: "r" (destination_address));
 }
 
-/* The following register is only present for
-   Cortex-M0+, -M23, -M3, -M33, -M4 and M7 CPUs */
-#if defined(CPU_CORE_CORTEX_M0PLUS) || defined(CPU_CORE_CORTEX_M23) || \
-    defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M33) || \
-    defined(CPU_CORE_CORTEX_M4) || defined(CPU_CORE_CORTEX_M4F) || \
-    defined(CPU_CORE_CORTEX_M7)
+/**
+ * @brief   Returns the start address of the current firmware
+ *
+ * @return  Start address of the current ROM
+ */
 static inline uint32_t cpu_get_image_baseaddr(void)
 {
-    return SCB->VTOR;
+    extern uint32_t _sfixed;
+    return (uintptr_t)&_sfixed;
 }
-#endif
 
 /**
  * @brief   Checks is memory address valid or not
