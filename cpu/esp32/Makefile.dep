@@ -79,6 +79,11 @@ ifneq (,$(filter periph_adc periph_dac,$(USEMODULE)))
   FEATURES_REQUIRED += periph_adc_arch
 endif
 
+ifneq (,$(filter periph_gpio,$(USEMODULE)))
+  USEMODULE += esp_idf_gpio
+  USEMODULE += periph_gpio_arch
+endif
+
 ifneq (,$(filter periph_i2c,$(USEMODULE)))
   ifneq (,$(filter esp_i2c_hw,$(USEMODULE)))
     USEMODULE += ztimer_msec

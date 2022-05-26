@@ -23,18 +23,11 @@
 #include <stdbool.h>
 
 #include "gpio_arch_common.h"
+#include "periph/gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#ifndef DOXYGEN
-/**
- * @brief   Returns the RTCIO pin number or -1 if the pin is not an RTCIO pin
- */
-int8_t gpio_is_rtcio (gpio_t pin);
-
-#endif /* DOXYGEN */
 
 /**
  * @brief   Called before the power management enters a light or deep sleep mode
