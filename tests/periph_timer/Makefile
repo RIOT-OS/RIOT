@@ -59,4 +59,7 @@ endif
 TIMER_SPEED ?= 1000000
 
 CFLAGS += -DTIMER_SPEED=$(TIMER_SPEED)
+
+EXTERNAL_BOARD_DIRS += $(CURDIR)/../external_board_dirs/esp-ci-boards
+
 include $(RIOTBASE)/Makefile.include
