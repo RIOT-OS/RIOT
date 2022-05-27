@@ -22,6 +22,10 @@ config BOARD_ESP32_CI
     select HAS_SDCARD_SPI
 
     select HAVE_ILI9341
+    select MODULE_BOARD_ESP32-CI
+
+config MODULE_BOARD_ESP32-CI
+    bool
 
 if TEST_KCONFIG
 
