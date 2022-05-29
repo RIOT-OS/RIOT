@@ -86,6 +86,7 @@
 #include <unistd.h>
 
 #ifdef RIOT_VERSION
+#include "bitarithm.h"
 #include "bitfield.h"
 #include "byteorder.h"
 #include "iolist.h"
@@ -987,6 +988,19 @@ bool coap_has_unprocessed_critical_options(const coap_pkt_t *pkt);
 static inline unsigned coap_szx2size(unsigned szx)
 {
     return (1 << (szx + 4));
+}
+
+/**
+ * @brief   Helper to encode byte size into next equal or smaller SZX value
+ *
+ * @param[in]   len     Size in bytes
+ *
+ * @returns     closest SZX value that fits into a buffer of @p len
+ */
+static inline unsigned coap_size2szx(unsigned len)
+{
+    assert(len >= 16);
+    return bitarithm_msb(len >> 4);
 }
 /**@}*/
 
