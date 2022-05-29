@@ -62,7 +62,7 @@ uint8_t bitarithm_bits_set_u32(uint32_t v)
 }
 #endif
 
-const uint8_t MultiplyDeBruijnBitPosition[32] =
+const uint8_t bitarithm_MultiplyDeBruijnBitPosition[32] =
 {
     0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
     31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9

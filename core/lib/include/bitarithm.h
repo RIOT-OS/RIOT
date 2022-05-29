@@ -163,6 +163,20 @@ static inline unsigned bitarithm_msb(unsigned v)
 #endif
 }
 
+/**
+ * @private
+ *
+ * @brief Lookup table for a fast CLS / LSB implementations.
+ *
+ * This is not supposed to be public, and should be declared `extern const` in
+ * the two functions which use it -- but that causes [transpiler issues], so it
+ * is declared here as a workaround. (Once that issue is resolved and part of
+ * CI, this line will be removed again).
+ *
+ * [transpiler issues]: https://github.com/immunant/c2rust/issues/423
+ */
+extern const uint8_t bitarithm_MultiplyDeBruijnBitPosition[32];
+
 static inline unsigned bitarithm_lsb(unsigned v)
 #if defined(BITARITHM_LSB_BUILTIN)
 {
@@ -171,12 +185,11 @@ static inline unsigned bitarithm_lsb(unsigned v)
 #elif defined(BITARITHM_LSB_LOOKUP)
 {
 /* Source: http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightMultLookup */
-    extern const uint8_t MultiplyDeBruijnBitPosition[32];
     /* cppcheck-suppress oppositeExpression
      * (reason: `x & -x` is a bit twiddling idiom to extract the LSB; the
      * check treats opposite arguments as indicator for poor copy-pasting
      * as e.g. `x + -x` or `x & ~x` don't make sense. ) */
-    return MultiplyDeBruijnBitPosition[((uint32_t)((v & -v) * 0x077CB531U)) >>
+    return bitarithm_MultiplyDeBruijnBitPosition[((uint32_t)((v & -v) * 0x077CB531U)) >>
                                        27];
 }
 #else
@@ -219,13 +232,12 @@ static inline unsigned bitarithm_test_and_clear(unsigned state, uint8_t *index)
     return state & ~(1 << *index);
 #elif defined(BITARITHM_LSB_LOOKUP)
     /* Source: http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightMultLookup */
-    extern const uint8_t MultiplyDeBruijnBitPosition[32];
     /* cppcheck-suppress oppositeExpression
      * (reason: `x & -x` is a bit twiddling idiom to extract the LSB; the
      * check treats opposite arguments as indicator for poor copy-pasting
      * as e.g. `x + -x` or `x & ~x` don't make sense. ) */
     uint32_t least_bit = state & -state;
-    *index = MultiplyDeBruijnBitPosition[(least_bit * 0x077CB531U) >> 27];
+    *index = bitarithm_MultiplyDeBruijnBitPosition[(least_bit * 0x077CB531U) >> 27];
     return state & ~least_bit;
 #else
     while ((state & 1) == 0) {
