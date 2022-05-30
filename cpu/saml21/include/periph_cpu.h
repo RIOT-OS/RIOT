@@ -63,6 +63,19 @@ typedef enum {
 #endif /* ndef DOXYGEN */
 
 /**
+ * @brief   Pins that can be used for ADC input
+ */
+static const gpio_t sam0_adc_pins[1][20] = {
+    {
+        GPIO_PIN(PA, 2), GPIO_PIN(PA, 3), GPIO_PIN(PB, 8),  GPIO_PIN(PB, 9),
+        GPIO_PIN(PA, 4), GPIO_PIN(PA, 5), GPIO_PIN(PA, 6),  GPIO_PIN(PA, 7),
+        GPIO_PIN(PB, 0), GPIO_PIN(PB, 1), GPIO_PIN(PB, 2),  GPIO_PIN(PB, 3),
+        GPIO_PIN(PB, 4), GPIO_PIN(PB, 5), GPIO_PIN(PB, 6),  GPIO_PIN(PB, 7),
+        GPIO_PIN(PA, 8), GPIO_PIN(PA, 9), GPIO_PIN(PA, 10), GPIO_PIN(PA, 11),
+    }
+};
+
+/**
  * @brief   The MCU has a 12 bit DAC
  */
 #define DAC_RES_BITS        (12)
