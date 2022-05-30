@@ -36,6 +36,10 @@
     #define ADC_GAIN_FACTOR_DEFAULT (0)
 #endif
 
+#ifndef ADC_NEG_INPUT
+    #define ADC_NEG_INPUT (0)
+#endif
+
 /* Prototypes */
 static void _adc_poweroff(Adc *dev);
 static void _setup_clock(Adc *dev);
