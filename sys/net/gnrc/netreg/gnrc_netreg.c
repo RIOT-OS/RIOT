@@ -73,6 +73,16 @@ void gnrc_netreg_unregister(gnrc_nettype_t type, gnrc_netreg_entry_t *entry)
     }
 
     LL_DELETE(netreg[type], entry);
+
+#if defined(MODULE_GNRC_NETAPI_MBOX)
+    /* drain packets still in the mbox */
+    if (entry->type == GNRC_NETREG_TYPE_MBOX) {
+        msg_t msg;
+        while (mbox_try_get(entry->target.mbox, &msg)) {
+            gnrc_pktbuf_release_error(msg.content.ptr, EBADF);
+        }
+    }
+#endif
 }
 
 /**
