@@ -274,6 +274,8 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     Adc *dev = ADC;
 #endif
 
+    bool diffmode = adc_channels[line].muxpos & ADC_INPUTCTRL_DIFFMODE;
+
     _prep();
 
     if (_adc_configure(dev, res) != 0) {
@@ -283,8 +285,12 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     }
 
     dev->INPUTCTRL.reg = ADC_GAIN_FACTOR_DEFAULT
-                           | adc_channels[line].muxpos
-                           | ADC_NEG_INPUT;
+                       | adc_channels[line].muxpos
+                       | (diffmode ? 0 : ADC_NEG_INPUT);
+#ifdef ADC_CTRLB_DIFFMODE
+    dev->CTRLB.bit.DIFFMODE = diffmode;
+#endif
+
     _wait_syncbusy(dev);
 
     /* Start the conversion */
@@ -293,10 +299,15 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     /* Wait for the result */
     while (!(dev->INTFLAG.reg & ADC_INTFLAG_RESRDY)) {}
 
-    int result = dev->RESULT.reg;
+    int16_t result = dev->RESULT.reg;
 
     _adc_poweroff(dev);
     _done();
+
+    /* in differential mode we lose one bit for the sign */
+    if (diffmode) {
+        result *= 2;
+    }
 
     return result;
 }

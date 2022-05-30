@@ -780,6 +780,14 @@ typedef struct {
 } adc_conf_chan_t;
 
 /**
+ * @brief Compatibility define for muxpos struct member
+ *        Unused on all platforms that have DIFFMODE in CTRLB
+ */
+#ifndef ADC_INPUTCTRL_DIFFMODE
+#define ADC_INPUTCTRL_DIFFMODE  (1 << 7)
+#endif
+
+/**
  * @brief Pin that can be used for external voltage reference A
  */
 #define ADC_REFSEL_AREFA_PIN    GPIO_PIN(PA, 3)
