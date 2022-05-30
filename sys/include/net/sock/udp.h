@@ -367,6 +367,13 @@ typedef struct {
  * @pre `(sock != NULL)`
  * @pre `(remote == NULL) || (remote->port != 0)`
  *
+ * @warning If you create a socket you are responsible for receiving messages
+ *          sent to it by calling @ref sock_udp_recv.
+ *          Otherwise, the packet queue of the @p sock may congest until the
+ *          socket is closed.
+ *          If you only want to send without receiving, use @ref sock_udp_send
+ *          instead with `sock` set to NULL.
+ *
  * @param[out] sock     The resulting sock object.
  * @param[in] local     Local end point for the sock object.
  *                      May be NULL.
