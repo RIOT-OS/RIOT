@@ -455,7 +455,7 @@ ifneq (,$(filter gnrc_pktbuf_cmd,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter gnrc_netif_%,$(USEMODULE)))
+ifneq (,$(filter gnrc_netif_%,$(filter-out gnrc_netif_pktq,$(USEMODULE))))
   USEMODULE += gnrc_netif
   USEMODULE += core_thread_flags
   USEMODULE += event
