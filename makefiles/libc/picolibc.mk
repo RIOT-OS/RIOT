@@ -14,7 +14,7 @@ endif
 .PHONY: _missing-picolibc
 
 _missing-picolibc:
-	@$(Q)echo "picolibc was selected to be build but no picolibc.spec could be found"
+	@$(Q)echo "picolibc was selected to be build but no picolibc.specs could be found"
 	@$(Q)echo "you might want to install "picolibc" for "$(TARGET_ARCH)""
 	@$(Q)echo "or add "FEATURES_BLACKLIST += picolibc" to Makefile)"
 	@$(COLOR_ECHO) "$(COLOR_RED)check your installation or build configuration.$(COLOR_RESET)"
