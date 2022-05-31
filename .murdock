@@ -7,7 +7,7 @@
 
 #
 : ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
-: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
+: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk nucleo-f401re samr21-xpro slstk3402a"}
 #: ${EMULATED_BOARDS_AVAILABLE:="microbit"}
 
 : ${TEST_KCONFIG_BOARDS_AVAILABLE:="
