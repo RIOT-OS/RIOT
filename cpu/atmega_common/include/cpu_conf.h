@@ -77,6 +77,10 @@ extern "C" {
  */
 #define IRQ_API_INLINED     (1)
 
+#ifndef DOXYGEN
+#define HAS_FLASH_UTILS_ARCH    1
+#endif
+
 #ifdef __cplusplus
 }
 #endif
