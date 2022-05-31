@@ -5,7 +5,7 @@ RESET ?= $(RIOTTOOLS)/openocd/openocd.sh
 
 FLASHFILE ?= $(ELFFILE)
 FFLAGS ?= flash $(FLASHFILE)
-DEBUGGER_FLAGS ?= debug $(ELFFILE)
+DEBUGGER_FLAGS ?= debug $(DEBUG_ELFFILE)
 DEBUGSERVER_FLAGS ?= debug-server
 RESET_FLAGS ?= reset
 
