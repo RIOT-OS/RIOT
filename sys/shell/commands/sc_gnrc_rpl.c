@@ -18,12 +18,14 @@
 
 #include <string.h>
 #include <stdio.h>
+
 #include "net/gnrc/netif.h"
 #include "net/gnrc/rpl.h"
-#include "net/gnrc/rpl/structs.h"
 #include "net/gnrc/rpl/dodag.h"
-#include "utlist.h"
+#include "net/gnrc/rpl/structs.h"
+#include "shell.h"
 #include "trickle.h"
+#include "utlist.h"
 #ifdef MODULE_GNRC_RPL_P2P
 #include "net/gnrc/rpl/p2p.h"
 #include "net/gnrc/rpl/p2p_dodag.h"
@@ -453,6 +455,8 @@ int _gnrc_rpl(int argc, char **argv)
     puts("* show\t\t\t\t\t- show instance and dodag tables");
     return 0;
 }
+
+SHELL_COMMAND(rpl, "rpl configuration tool ('rpl help' for more information)", _gnrc_rpl);
 /**
  * @}
  */

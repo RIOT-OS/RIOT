@@ -14,6 +14,7 @@
  */
 
 #include "net/gnrc/pktbuf.h"
+#include "shell.h"
 
 int _gnrc_pktbuf_cmd(int argc, char **argv)
 {
@@ -22,5 +23,7 @@ int _gnrc_pktbuf_cmd(int argc, char **argv)
     gnrc_pktbuf_stats();
     return 0;
 }
+
+SHELL_COMMAND(pktbuf, "prints internal stats of the packet buffer", _gnrc_pktbuf_cmd);
 
 /** @} */

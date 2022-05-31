@@ -19,6 +19,7 @@
  */
 
 #include "cpu_conf.h"
+#include "shell.h"
 
 #if defined(MODULE_NEWLIB_SYSCALLS_DEFAULT) || defined (HAVE_HEAP_STATS)
 extern void heap_stats(void);
@@ -39,3 +40,5 @@ int _heap_handler(int argc, char **argv)
     return 1;
 #endif
 }
+
+SHELL_COMMAND(heap, "Prints heap statistics.", _heap_handler);

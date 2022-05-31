@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "shell_commands.h"
 #include "shell.h"
 
 #if MODULE_STDIO_RTT

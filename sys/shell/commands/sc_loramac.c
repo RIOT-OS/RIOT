@@ -21,11 +21,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "shell.h"
 #include "fmt.h"
-
 #include "net/loramac.h"
 #include "semtech_loramac.h"
+#include "shell.h"
 
 extern semtech_loramac_t loramac;
 
@@ -512,3 +511,5 @@ int _loramac_handler(int argc, char **argv)
 
     return 0;
 }
+
+SHELL_COMMAND(loramac, "Control Semtech loramac stack", _loramac_handler);

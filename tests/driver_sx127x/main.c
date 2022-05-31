@@ -28,7 +28,6 @@
 
 #include "thread.h"
 #include "shell.h"
-#include "shell_commands.h"
 
 #include "net/netdev.h"
 #include "net/netdev/lora.h"

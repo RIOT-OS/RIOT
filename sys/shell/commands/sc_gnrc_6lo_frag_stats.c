@@ -16,6 +16,7 @@
 #include <stdio.h>
 
 #include "net/gnrc/sixlowpan/frag/stats.h"
+#include "shell.h"
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS
 #include "net/gnrc/sixlowpan/frag/sfr.h"
 #endif
@@ -53,5 +54,7 @@ int _gnrc_6lo_frag_stats(int argc, char **argv)
     printf("dgs complete: %u\n", stats->datagrams);
     return 0;
 }
+
+SHELL_COMMAND(6lo_frag, "6LoWPAN fragment statistics", _gnrc_6lo_frag_stats);
 
 /** @} */

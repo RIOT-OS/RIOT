@@ -24,6 +24,7 @@
 #include "net/gnrc/netif.h"
 #include "net/netstats.h"
 #include "net/netstats/neighbor.h"
+#include "shell.h"
 
 static void _print_neighbors(netif_t *dev)
 {
@@ -100,3 +101,5 @@ int _netstats_nb(int argc, char **argv)
 
     return 0;
 }
+
+SHELL_COMMAND(neigh, "Show neighbor statistics", _netstats_nb);

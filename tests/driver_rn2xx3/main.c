@@ -24,7 +24,6 @@
 
 #include "timex.h"
 #include "shell.h"
-#include "shell_commands.h"
 #include "fmt.h"
 
 #include "rn2xx3.h"

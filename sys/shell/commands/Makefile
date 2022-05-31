@@ -1,6 +1,6 @@
 MODULE = shell_commands
 
-SRC = shell_commands.c sc_sys.c
+SRC = sc_sys.c
 
 ifneq (,$(filter app_metadata,$(USEMODULE)))
   SRC += sc_app_metadata.c

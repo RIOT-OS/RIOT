@@ -23,7 +23,6 @@
 #include "at86rf215_internal.h"
 #include "thread.h"
 #include "shell.h"
-#include "shell_commands.h"
 #include "sys/bus.h"
 
 #include "net/gnrc/pktdump.h"

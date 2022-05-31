@@ -187,6 +187,8 @@ int _openwsn_ifconfig(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(ifconfig, "Shows assigned IPv6 addresses", _openwsn_ifconfig);
+
 static int _neighbors_cmd(char *arg)
 {
     (void)arg;
@@ -610,3 +612,5 @@ int _openwsn_handler(int argc, char **argv)
     _print_usage();
     return -1;
 }
+
+SHELL_COMMAND(openwsn, "OpenWSN commands", _openwsn_handler);

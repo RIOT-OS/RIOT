@@ -23,7 +23,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "periph/pm.h"
+#include "shell.h"
 
 #ifdef MODULE_PM_LAYERED
 #include "pm_layered.h"
@@ -196,3 +198,5 @@ int _pm_handler(int argc, char **argv)
     _print_usage();
     return 1;
 }
+
+SHELL_COMMAND(pm, "interact with layered PM subsystem", _pm_handler);

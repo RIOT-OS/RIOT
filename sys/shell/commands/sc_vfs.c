@@ -29,6 +29,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "shell.h"
 #include "vfs.h"
 #if MODULE_VFS_UTIL
 #include "vfs_util.h"
@@ -659,6 +660,8 @@ int _ls_handler(int argc, char **argv)
     return ret;
 }
 
+SHELL_COMMAND(ls, "list files", _ls_handler);
+
 int _vfs_handler(int argc, char **argv)
 {
     if (argc < 2) {
@@ -705,6 +708,8 @@ int _vfs_handler(int argc, char **argv)
     }
 }
 
+SHELL_COMMAND(vfs, "virtual file system operations", _vfs_handler);
+
 static inline void _print_digest(const uint8_t *digest, size_t len, const char *file)
 {
     for (unsigned i = 0; i < len; ++i) {
@@ -738,6 +743,8 @@ int _vfs_md5sum_cmd(int argc, char **argv)
 
     return 0;
 }
+
+SHELL_COMMAND(md5sum, "Compute and check MD5 message digest", _vfs_md5sum_cmd);
 #endif
 
 #if MODULE_SHA1SUM
@@ -765,6 +772,8 @@ int _vfs_sha1sum_cmd(int argc, char **argv)
 
     return 0;
 }
+
+SHELL_COMMAND(sha1sum, "Compute and check SHA1 message digest", _vfs_sha1sum_cmd);
 #endif
 
 #if MODULE_SHA256SUM
@@ -792,5 +801,7 @@ int _vfs_sha256sum_cmd(int argc, char **argv)
 
     return 0;
 }
+
+SHELL_COMMAND(sha256sum, "Compute and check SHA256 message digest", _vfs_sha256sum_cmd);
 #endif
 #endif

@@ -20,7 +20,6 @@
 #include <string.h>
 
 #include "shell.h"
-#include "shell_commands.h"
 #include "net/gnrc.h"
 
 #define MAIN_QUEUE_SIZE     (8)

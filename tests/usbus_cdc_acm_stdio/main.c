@@ -21,7 +21,6 @@
 #include <stdlib.h>
 
 #include "shell.h"
-#include "shell_commands.h"
 
 static int cmd_text(int argc, char **argv)
 {

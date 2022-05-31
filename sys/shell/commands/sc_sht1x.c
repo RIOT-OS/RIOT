@@ -20,10 +20,13 @@
  * @}
  */
 
-#include <stdio.h>
+#include <errno.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "shell.h"
 #include "sht1x.h"
 #include "sht1x_params.h"
 
@@ -102,6 +105,8 @@ int _get_humidity_handler(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(hum, "Prints measured humidity.", _get_humidity_handler);
+
 int _get_temperature_handler(int argc, char **argv)
 {
     int16_t temp;
@@ -113,6 +118,8 @@ int _get_temperature_handler(int argc, char **argv)
     printf("Temperature: %i.%02i°C\n", (int)temp / 100, (int)temp % 100);
     return 0;
 }
+
+SHELL_COMMAND(temp, "Prints measured temperature.", _get_temperature_handler);
 
 int _get_weather_handler(int argc, char **argv)
 {
@@ -127,6 +134,8 @@ int _get_weather_handler(int argc, char **argv)
     printf("Temperature: %i.%02i°C\n", (int)temp / 100, (int)temp % 100);
     return 0;
 }
+
+SHELL_COMMAND(weather, "Prints measured humidity and temperature.", _get_weather_handler);
 
 static void print_config(const sht1x_dev_t *dev)
 {
@@ -372,3 +381,5 @@ int _sht_config_handler(int argc, char **argv)
     print_config(&sht1x_devs[dev_num]);
     return 0;
 }
+
+SHELL_COMMAND(sht_config, "Get/set SHT10/11/15 sensor configuration.", _sht_config_handler);

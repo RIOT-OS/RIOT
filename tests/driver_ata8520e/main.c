@@ -24,7 +24,6 @@
 #include <inttypes.h>
 
 #include "shell.h"
-#include "shell_commands.h"
 
 #include "ata8520e_params.h"
 #include "ata8520e.h"

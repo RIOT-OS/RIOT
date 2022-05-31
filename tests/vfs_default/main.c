@@ -20,7 +20,6 @@
 #include <stdio.h>
 
 #include "shell.h"
-#include "shell_commands.h"
 #include "vfs_default.h"
 
 int main(void)

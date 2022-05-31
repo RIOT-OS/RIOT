@@ -21,11 +21,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "net/cord/config.h"
 #include "net/cord/ep.h"
 #include "net/gnrc/netif.h"
 #include "net/nanocoap.h"
 #include "net/sock/util.h"
-#include "net/cord/config.h"
+#include "shell.h"
 
 static int make_sock_ep(sock_udp_ep_t *ep, const char *addr)
 {
@@ -132,3 +133,5 @@ int _cord_ep_handler(int argc, char **argv)
 
     return 0;
 }
+
+SHELL_COMMAND(cord_ep, "Resource directory endpoint commands", _cord_ep_handler);

@@ -63,4 +63,6 @@ usage:
     printf("usage: %s [start|stop|config] <server> <port>\n", argv[0]);
     return -1;
 }
+
+SHELL_COMMAND(bench_udp, "UDP benchmark", _benchmark_udp_handler);
 /** @} */

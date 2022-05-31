@@ -23,7 +23,7 @@
 
 #include "net/bluetil/addr.h"
 #include "nimble_statconn.h"
-
+#include "shell.h"
 
 static uint8_t _parsephy(const char *phy_str)
 {
@@ -104,3 +104,5 @@ int _nimble_statconn_handler(int argc, char **argv)
 
     return 0;
 }
+
+SHELL_COMMAND(statconn, "NimBLE netif statconn", _nimble_statconn_handler);

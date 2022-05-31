@@ -25,6 +25,7 @@
 #include <inttypes.h>
 
 #include "periph/rtt.h"
+#include "shell.h"
 
 /*
  * Since some RTT implementations do not implement all API functions, default
@@ -192,3 +193,5 @@ int _rtt_handler(int argc, char **argv)
     }
     return 0;
 }
+
+SHELL_COMMAND(rtt, "control RTT peripheral interface",  _rtt_handler);

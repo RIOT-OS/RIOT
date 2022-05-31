@@ -19,15 +19,17 @@
  */
 
 #include <arpa/inet.h>
-#include <stdio.h>
 #include <stdint.h>
-#include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include "thread.h"
+#include <string.h>
+
 #include "net/af.h"
-#include "net/gnrc/netif.h"
 #include "net/fib.h"
 #include "net/gnrc/ipv6.h"
+#include "net/gnrc/netif.h"
+#include "shell.h"
+#include "thread.h"
 
 #define INFO1_TXT "fibroute add <destination> via <next hop> [dev <device>]"
 #define INFO2_TXT " [lifetime <lifetime>]"
@@ -252,3 +254,5 @@ int _fib_route_handler(int argc, char **argv)
     puts("\nunrecognized parameters.\nPlease enter fibroute [add|del] for more information.");
     return 1;
 }
+
+SHELL_COMMAND(fibroute, "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler);

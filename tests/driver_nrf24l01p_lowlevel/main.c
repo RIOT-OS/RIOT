@@ -43,7 +43,6 @@
 #include "periph/gpio.h"
 #include "ztimer.h"
 #include "shell.h"
-#include "shell_commands.h"
 #include "thread.h"
 #include "msg.h"
 
