@@ -327,6 +327,11 @@ extern void auto_init_sock_dns(void);
 AUTO_INIT(auto_init_sock_dns,
           AUTO_INIT_PRIO_MOD_DOCK_DNS);
 #endif
+#if IS_USED(MODULE_RIOTBOOT_VFS) && !IS_USED(RIOTBOOT)
+extern void riotboot_vfs_cancel(void);
+AUTO_INIT(riotboot_vfs_cancel,
+          AUTO_INIT_PRIO_RIOTBOOT_VFS);
+#endif
 
 void auto_init(void)
 {

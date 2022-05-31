@@ -3,6 +3,8 @@
 # flash cannot be divided by two slots while staying FLASHPAGE_SIZE aligned.
 ifneq (,$(filter usbus_dfu,$(USEMODULE)))
   RIOTBOOT_LEN ?= 0x4000
+else ifneq (,$(filter riotboot_vfs,$(USEMODULE)))
+  RIOTBOOT_LEN ?= 0x8000
 else
   RIOTBOOT_LEN ?= 0x2000
 endif

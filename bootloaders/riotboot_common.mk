@@ -12,7 +12,9 @@ CFLAGS += -DRIOTBOOT
 # Disable unused modules
 CFLAGS += -DNDEBUG -DLOG_LEVEL=LOG_NONE
 DISABLE_MODULE += core_init core_msg core_panic
-DISABLE_MODULE += auto_init auto_init_%
+ifeq (,$(filter auto_init,$(USEMODULE)))
+  DISABLE_MODULE += auto_init auto_init_%
+endif
 DISABLE_MODULE += pm_layered
 
 # avoid using stdio

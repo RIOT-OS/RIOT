@@ -163,6 +163,11 @@ extern int _vfs_handler(int argc, char **argv);
 extern int _ls_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_RIOTBOOT_VFS
+extern int _cmd_dump_rom(int argc, char **argv);
+extern int _cmd_riotboot_vfs_flash(int argc, char **argv);
+#endif
+
 #ifdef MODULE_BENCHMARK_UDP
 extern int _benchmark_udp_handler(int argc, char **argv);
 #endif
@@ -360,6 +365,10 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_VFS
     {"vfs", "virtual file system operations", _vfs_handler},
     {"ls", "list files", _ls_handler},
+#endif
+#ifdef MODULE_RIOTBOOT_VFS
+    { "dump_rom", "write the current firmware image to a file", _cmd_dump_rom },
+    { "flash_rom", "write a firmware file to flash", _cmd_riotboot_vfs_flash },
 #endif
 #ifdef MODULE_CONN_CAN
     {"can", "CAN commands", _can_handler},

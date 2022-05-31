@@ -10,7 +10,11 @@ CFLAGS += -DCPU_COMMON_SAMD5X
 # Slot size is determined by "((total_flash_size - RIOTBOOT_LEN) / 2)".
 # If RIOTBOOT_LEN uses an uneven number of flashpages, the remainder of the
 # flash cannot be divided by two slots while staying FLASHPAGE_SIZE aligned.
-RIOTBOOT_LEN ?= 0x4000
+ifneq (,$(filter riotboot_vfs,$(USEMODULE)))
+  RIOTBOOT_LEN ?= 0xa000
+else
+  RIOTBOOT_LEN ?= 0x4000
+endif
 
 BACKUP_RAM_ADDR = 0x47000000
 BACKUP_RAM_LEN  = 0x2000
