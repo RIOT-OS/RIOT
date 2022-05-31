@@ -29,10 +29,6 @@
 extern int _reboot_handler(int argc, char **argv);
 extern int _version_handler(int argc, char **argv);
 
-#ifdef MODULE_CONFIG
-extern int _id_handler(int argc, char **argv);
-#endif
-
 #ifdef MODULE_DFPLAYER
 extern int _sc_dfplayer(int argc, char **argv);
 #endif
@@ -239,9 +235,6 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_BENCHMARK_UDP
     {"bench_udp", "UDP benchmark", _benchmark_udp_handler},
-#endif
-#ifdef MODULE_CONFIG
-    {"id", "Gets or sets the node's id.", _id_handler},
 #endif
 #ifdef MODULE_HEAP_CMD
     {"heap", "Prints heap statistics.", _heap_handler},
