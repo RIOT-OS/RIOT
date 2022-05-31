@@ -34,6 +34,10 @@ int riotboot_slot_verify_sha256(const riotboot_hdr_t *hdr)
     uint8_t digest[SHA256_DIGEST_LENGTH];
     uint8_t *img_start = (uint8_t *)hdr->start_addr;
 
+    if (hdr->img_size + hdr->start_addr > CPU_FLASH_BASE + ROM_LEN) {
+        return -1;
+    }
+
     sha256_init(&sha256);
     sha256_update(&sha256, img_start, hdr->img_size);
     sha256_final(&sha256, digest);
