@@ -23,16 +23,24 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+static mutex_t _pool_lock = MUTEX_INIT;
 static gnrc_pktqueue_t _pool[CONFIG_GNRC_NETIF_PKTQ_POOL_SIZE];
 
-static gnrc_pktqueue_t *_get_free_entry(void)
+static gnrc_pktqueue_t *_get_free_entry(gnrc_pktsnip_t *pkt)
 {
+    gnrc_pktqueue_t *entry = NULL;
+
+    mutex_lock(&_pool_lock);
     for (unsigned i = 0; i < CONFIG_GNRC_NETIF_PKTQ_POOL_SIZE; i++) {
         if (_pool[i].pkt == NULL) {
-            return &_pool[i];
+            _pool[i].pkt = pkt;
+            entry = &_pool[i];
+            break;
         }
     }
-    return NULL;
+    mutex_unlock(&_pool_lock);
+
+    return entry;
 }
 
 unsigned gnrc_netif_pktq_usage(void)
@@ -52,12 +60,11 @@ int gnrc_netif_pktq_put(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     assert(netif != NULL);
     assert(pkt != NULL);
 
-    gnrc_pktqueue_t *entry = _get_free_entry();
+    gnrc_pktqueue_t *entry = _get_free_entry(pkt);
 
     if (entry == NULL) {
         return -1;
     }
-    entry->pkt = pkt;
     gnrc_pktqueue_add(&netif->send_queue.queue, entry);
     return 0;
 }
@@ -94,12 +101,11 @@ int gnrc_netif_pktq_push_back(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     assert(netif != NULL);
     assert(pkt != NULL);
 
-    gnrc_pktqueue_t *entry = _get_free_entry();
+    gnrc_pktqueue_t *entry = _get_free_entry(pkt);
 
     if (entry == NULL) {
         return -1;
     }
-    entry->pkt = pkt;
     LL_PREPEND(netif->send_queue.queue, entry);
     return 0;
 }
