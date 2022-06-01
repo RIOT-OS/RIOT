@@ -25,6 +25,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "net/netdev.h"
 
 #include "net/ethernet/hdr.h"
@@ -43,7 +44,8 @@ typedef struct netdev_tap {
     char tap_name[IFNAMSIZ];            /**< host dev file name */
     int tap_fd;                         /**< host file descriptor for the TAP */
     uint8_t addr[ETHERNET_ADDR_LEN];    /**< The MAC address of the TAP */
-    uint8_t promiscuous;                 /**< Flag for promiscuous mode */
+    bool promiscuous;                   /**< Flag for promiscuous mode */
+    bool wired;                         /**< Flag for wired mode */
 } netdev_tap_t;
 
 /**
@@ -52,6 +54,8 @@ typedef struct netdev_tap {
 typedef struct {
     char **tap_name;                    /**< Name of the host system's tap
                                              interface to bind to. */
+    bool wired;                         /**< Interface should behave like a
+                                             wired interface. */
 } netdev_tap_params_t;
 
 /**
