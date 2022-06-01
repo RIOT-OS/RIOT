@@ -244,3 +244,9 @@ ifneq (,$(filter-out netdev_default, $(filter netdev_%,$(USEMODULE))))
     USEMODULE += netdev_register
   endif
 endif
+
+ifneq (,$(filter gnrc_netif_timestamp,$(USEMODULE)))
+  ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
+    USEMODULE += netdev_ieee802154_rx_timestamp
+  endif
+endif

@@ -1,0 +1,20 @@
+# Copyright (c) 2022 Otto-von-Guericke-Universität Magdeburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menu "Network Device Drivers"
+
+config MODULE_NETDEV_DEFAULT
+    bool "Enable default network devices on the platform"
+
+menu "IEEE 802.15.4 Device Drivers"
+    visible if MODULE_NETDEV_IEEE802154
+
+config MODULE_NETDEV_IEEE802154_RX_TIMESTAMP
+    bool "Timestamp received frames"
+
+endmenu # IEEE 802.15.4 Device Drivers
+
+endmenu # Network Device Drivers
