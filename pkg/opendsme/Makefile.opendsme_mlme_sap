@@ -1,3 +1,0 @@
-MODULE = opendsme_mlme_sap
-
-include $(RIOTBASE)/Makefile.base

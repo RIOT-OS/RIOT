@@ -1,3 +1,0 @@
-MODULE = opendsme_beaconmanager
-
-include $(RIOTBASE)/Makefile.base

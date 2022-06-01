@@ -1,3 +1,0 @@
-MODULE = opendsme_datastructures
-
-include $(RIOTBASE)/Makefile.base

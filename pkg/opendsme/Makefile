@@ -55,4 +55,4 @@ export SRCXXEXT=cc
 all: $(OPENDSME_MODULES)
 
 opendsme_%:
-	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/$(DIR_$@) -f $(CURDIR)/Makefile.$@
+	$(QQ)OPENDSME_MODULE=$@ "$(MAKE)" -C $(PKG_SOURCE_DIR)/$(DIR_$@) -f $(CURDIR)/Makefile.opendsme_module

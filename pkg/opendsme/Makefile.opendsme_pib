@@ -1,3 +1,0 @@
-MODULE = opendsme_pib
-
-include $(RIOTBASE)/Makefile.base

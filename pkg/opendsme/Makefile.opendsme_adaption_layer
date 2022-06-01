@@ -1,3 +1,0 @@
-MODULE = opendsme_adaption_layer
-
-include $(RIOTBASE)/Makefile.base
