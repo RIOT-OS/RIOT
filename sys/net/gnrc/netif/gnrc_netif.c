@@ -1598,6 +1598,9 @@ int gnrc_netif_default_init(gnrc_netif_t *netif)
 #ifdef MODULE_GNRC_IPV6_NIB
     gnrc_ipv6_nib_init_iface(netif);
 #endif
+#if DEVELHELP
+    assert(options_tested);
+#endif
     return 0;
 }
 
@@ -1816,9 +1819,6 @@ static void *_gnrc_netif_thread(void *args)
         LOG_ERROR("gnrc_netif: init failed: %d\n", ctx->result);
         return NULL;
     }
-#if DEVELHELP
-    assert(options_tested);
-#endif
 #ifdef MODULE_NETSTATS_L2
     memset(&netif->stats, 0, sizeof(netstats_t));
 #endif
