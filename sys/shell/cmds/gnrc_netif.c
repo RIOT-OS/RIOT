@@ -63,6 +63,8 @@ static const struct {
 } flag_cmds[] = {
     { "6lo", NETOPT_6LO },
     { "ack_req", NETOPT_ACK_REQ },
+    { "gts", NETOPT_GTS_TX },
+    { "pan_coord", NETOPT_PAN_COORD },
     { "autoack", NETOPT_AUTOACK },
     { "autocca", NETOPT_AUTOCCA },
     { "csma", NETOPT_CSMA },
