@@ -10,11 +10,12 @@ SUIT_TOOL ?= $(RIOTBASE)/dist/tools/suit/suit-manifest-generator/bin/suit-tool
 # Will use $(SUIT_KEY_DIR)/$(SUIT_KEY).pem as combined private/public key
 # files.
 SUIT_KEY ?= default
+XDG_DATA_HOME ?= $(HOME)/.local/share
 
 ifeq (1, $(RIOT_CI_BUILD))
   SUIT_KEY_DIR ?= $(BINDIR)
 else
-  SUIT_KEY_DIR ?= $(RIOTBASE)/keys
+  SUIT_KEY_DIR ?= $(XDG_DATA_HOME)/RIOT/keys
 endif
 
 # Enable user to encrypt private key with a password

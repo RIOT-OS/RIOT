@@ -571,7 +571,7 @@ The following default values are using for generating the manifest:
     SUIT_SEQNR ?= $(APP_VER)
     SUIT_CLASS ?= $(BOARD)
     SUIT_KEY ?= default
-    SUIT_KEY_DIR ?= $(RIOTBASE)/keys
+    SUIT_KEY_DIR ?= $(XDG_DATA_HOME)/RIOT/keys
     SUIT_SEC ?= $(SUIT_KEY_DIR)/$(SUIT_KEY).pem
 
 All files (both slot binaries, both manifests, copies of manifests with
