@@ -18,9 +18,10 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "flash_utils.h"
 #include "phydat.h"
 #include "saul_reg.h"
+#include "xtimer.h"
 
 /**
  * @brief   Read the sensors every second
@@ -44,7 +45,7 @@ int main(void)
 
         while (dev) {
             int dim = saul_reg_read(dev, &res);
-            printf("\nDev: %s\tType: %s\n", dev->name,
+            printf("\nDev: %s\tType: %" PRIsflash "\n", dev->name,
                    saul_class_to_str(dev->driver->type));
             phydat_dump(&res, dim);
             dev = dev->next;
