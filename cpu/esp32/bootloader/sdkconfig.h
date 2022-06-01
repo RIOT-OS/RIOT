@@ -30,7 +30,13 @@
 #ifndef DOXYGEN
 
 #include "esp_idf_ver.h"
-#include "sdkconfig_default.h"
+
+#if defined(CPU_FAM_ESP32)
+#include "sdkconfig_default_esp32.h"
+#else
+#error "ESP32x family implementation missing"
+#endif
+
 
 #ifdef __cplusplus
 extern "C" {
