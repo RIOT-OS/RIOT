@@ -1,0 +1,3 @@
+MODULE = opendsme_caplayer
+
+include $(RIOTBASE)/Makefile.base

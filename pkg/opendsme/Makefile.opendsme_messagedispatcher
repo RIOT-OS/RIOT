@@ -1,0 +1,3 @@
+MODULE = opendsme_messagedispatcher
+
+include $(RIOTBASE)/Makefile.base

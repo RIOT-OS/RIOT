@@ -1,0 +1,46 @@
+# Copyright (c) 2022 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig KCONFIG_USEPKG_OPENDSME
+    bool "Configure openDSME"
+    help
+        Configure openDSME using Kconfig.
+
+if KCONFIG_USEPKG_OPENDSME
+
+config OPENDSME_MAX_NEIGHBOURS
+    int "Maximum number of DSME neighbours"
+    default 20
+
+config OPENDSME_MAX_LOST_BEACONS
+    int "Maximum number of lost beacons before assuming the device desynchronized"
+    default 8
+    help
+        Sets the maximum number of lost beacons before the MAC triggers a
+        de-association procedure. Higher values are beneficial in noisy
+        environments, because the MAC will keep synchronization despite losing some
+        beacons. However, lower values are better for mobile nodes, because devices
+        may sinchronize faster to a new coordinator.
+
+config OPENDSME_CAP_QUEUE_SIZE
+    int "DSME CAP queue size (for CSMA/CA transmissions)"
+    default 8
+    help
+        The CAP queue stores frames to be sent during the Contention Access Period
+        using CSMA-CA. Because the transmission delay of CSMA-CA is lower compared to
+        GTS transmissions, small values are preferred to reduce memory requirements.
+
+config OPENDSME_CFP_QUEUE_SIZE
+    int "DSME CFP queue size (for GTS transmissions)"
+    default 22
+    help
+        The CFP queue stores frames to be sent during the Contention Free Period
+        using a dedicated GTS. In contrast to CSMA-CA transmissions, GTS transmission
+        take longer as a result of slot schedules. Therefore, the GTS queue should
+        have more capacity than the CAP queue (OPENDSME_CAP_QUEUE_SIZE).
+
+endif # KCONFIG_USEPKG_OPENDSME

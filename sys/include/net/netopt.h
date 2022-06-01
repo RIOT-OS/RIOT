@@ -828,6 +828,25 @@ typedef enum {
      * @brief   (array of byte arrays) Leave an link layer multicast group
      */
     NETOPT_L2_GROUP_LEAVE,
+
+    /**
+     * @brief (netopt_enable_t) Set/Get PAN coordinator role
+     */
+    NETOPT_PAN_COORD,
+
+    /**
+     * @brief (ieee802154_dsme_alloc_t) Allocate DSME GTS slot
+     */
+    NETOPT_GTS_ALLOC,
+
+    /**
+     * @brief (netopt_enable_t) Transmit frames using GTS transmission
+     *
+     * When set, frames are sent using a Guaranteed Time Slot (GTS). Otherwise
+     * with CSMA/CA.
+     */
+    NETOPT_GTS_TX,
+
     /**
      * @brief   maximum number of options defined here.
      *

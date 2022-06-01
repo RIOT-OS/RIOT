@@ -133,6 +133,9 @@ static const char *_netopt_strmap[] = {
     [NETOPT_BATMON]                = "NETOPT_BATMON",
     [NETOPT_L2_GROUP]              = "NETOPT_L2_GROUP",
     [NETOPT_L2_GROUP_LEAVE]        = "NETOPT_L2_GROUP_LEAVE",
+    [NETOPT_PAN_COORD]             = "NETOPT_PAN_COORD",
+    [NETOPT_GTS_ALLOC]             = "NETOPT_GTS_ALLOC",
+    [NETOPT_GTS_TX]                = "NETOPT_GTS_TX",
     [NETOPT_NUMOF]                 = "NETOPT_NUMOF",
 };
 

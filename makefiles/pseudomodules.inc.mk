@@ -376,6 +376,7 @@ PSEUDOMODULES += newlib_nano
 PSEUDOMODULES += nice
 ## @}
 PSEUDOMODULES += nrf24l01p_ng_diagnostics
+PSEUDOMODULES += opendsme
 PSEUDOMODULES += openthread
 PSEUDOMODULES += picolibc
 PSEUDOMODULES += picolibc_stdout_buffered

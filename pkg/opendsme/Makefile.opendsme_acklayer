@@ -1,0 +1,3 @@
+MODULE = opendsme_acklayer
+
+include $(RIOTBASE)/Makefile.base

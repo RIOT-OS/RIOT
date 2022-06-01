@@ -1,0 +1,3 @@
+MODULE = opendsme_associationmanager
+
+include $(RIOTBASE)/Makefile.base

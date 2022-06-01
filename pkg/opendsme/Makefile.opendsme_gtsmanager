@@ -1,0 +1,3 @@
+MODULE = opendsme_gtsmanager
+
+include $(RIOTBASE)/Makefile.base

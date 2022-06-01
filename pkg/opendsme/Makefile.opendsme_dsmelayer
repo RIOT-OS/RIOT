@@ -1,0 +1,3 @@
+MODULE = opendsme_dsmelayer
+
+include $(RIOTBASE)/Makefile.base
