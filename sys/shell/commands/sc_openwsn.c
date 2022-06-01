@@ -93,9 +93,10 @@ static char *_get_component(int id)
     return NULL;
 }
 
-int _openwsn_ifconfig(char *arg)
+int _openwsn_ifconfig(int argc, char **argv)
 {
-    (void)arg;
+    (void)argc;
+    (void)argv;
 
     open_addr_t *addr;
     /* Use shared buffer for IEEE802154_LONG_ADDRES and IPV6_ADDR str
