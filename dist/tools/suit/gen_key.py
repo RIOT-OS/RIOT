@@ -11,6 +11,7 @@
 # directory for more details.
 #
 
+import os
 import sys
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -37,7 +38,7 @@ def main():
                            encryption_algorithm=crypt,
                            )
 
-    with open(sys.argv[1], "wb") as f:
+    with open(os.open(sys.argv[1], os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600), "wb") as f:
         f.write(pem)
 
 
