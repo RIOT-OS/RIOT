@@ -63,6 +63,11 @@ mtd_dev_t* mtd0 = 0;
 static mtd_dev_t  _flash_dev;
 static mtd_desc_t _flash_driver;
 
+#ifdef MODULE_VFS_DEFAULT
+#include "vfs_default.h"
+VFS_AUTO_MOUNT(littlefs2, { .dev = &_flash_dev }, VFS_DEFAULT_NVM(0), 0);
+#endif
+
 #ifdef MCU_ESP8266
 
 /* for source code compatibility with ESP32 SDK */
