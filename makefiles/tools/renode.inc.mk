@@ -59,7 +59,7 @@ RENODE_DEBUG_FLAGS += -e "machine StartGdbServer $(GDB_PORT) true"
 DEBUGSERVER ?= $(EMULATOR)
 DEBUGSERVER_FLAGS ?= $(RENODE_DEBUG_FLAGS)
 
-DEBUGGER_FLAGS ?= $(BOARD) $(APPDIR) $(ELFFILE) $(GDB_REMOTE) $(EMULATOR_TMP_DIR) "-ex \"monitor start\""
+DEBUGGER_FLAGS ?= $(BOARD) $(APPDIR) $(DEBUG_ELFFILE) $(GDB_REMOTE) $(EMULATOR_TMP_DIR) "-ex \"monitor start\""
 DEBUGGER ?= $(RIOTTOOLS)/emulator/debug.sh
 
 # No flasher available with renode emulator

@@ -10,7 +10,7 @@ FFLAGS = $(MSPDEBUGFLAGS) "prog $(FLASHFILE)"
 DEBUGSERVER = $(FLASHER)
 DEBUGSERVER_FLAGS = $(MSPDEBUGFLAGS) gdb
 DEBUGGER = $(PREFIX)gdb
-DEBUGGER_FLAGS = --ex="target remote localhost:2000" --ex "monitor reset halt" --ex load -ex "monitor reset halt"  $(ELFFILE)
+DEBUGGER_FLAGS = --ex="target remote localhost:2000" --ex "monitor reset halt" --ex load -ex "monitor reset halt"  $(DEBUG_ELFFILE)
 
 # setup reset tool
 RESET ?= mspdebug

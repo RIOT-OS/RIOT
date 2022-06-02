@@ -670,6 +670,9 @@ ifneq (,$(filter suit,$(USEMODULE)))
   include $(RIOTMAKE)/suit.inc.mk
 endif
 
+# elf file used for the debugger, must include bootloader offset
+DEBUG_ELFFILE ?= $(ELFFILE)
+
 # Targets to get given file
 elffile: $(ELFFILE)
 hexfile: $(HEXFILE)
