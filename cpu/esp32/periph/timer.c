@@ -72,6 +72,16 @@
  * TMG1 is left disabled. TMG1 is only enabled when more than one
  * timer device is needed.
  *
+ * ---
+ * ESP32-C3 hast only two 54 bit hardware timers:
+ * two timer groups TMG0 and TMG1 with 1 timer each
+ *
+ * TMG0, timer 0 is used for system time in us and is therefore not
+ * available as low level timer. Timers have only one channel. Timer devices
+ * are mapped to hardware timer as following:
+ *
+ *     0 -> TMG1 timer 0
+ *
  * PLEASE NOTE: Don't use ETS timer functions ets_timer_* in and this hardware
  * timer implementation together!
  */
@@ -79,6 +89,11 @@
 #if defined(CPU_FAM_ESP32)
 
 #define HW_TIMER_CORRECTION   (RTC_PLL_320M / CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ)
+#define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION << 1, 5))
+
+#elif defined(CPU_FAM_ESP32C3)
+
+#define HW_TIMER_CORRECTION   10
 #define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION << 1, 5))
 
 #else
@@ -130,6 +145,14 @@ static const struct _hw_timer_desc_t _timers_desc[] =
         .int_mask = BIT(TIMER_1),
         .int_src  = ETS_TG1_T1_LEVEL_INTR_SOURCE,
     }
+#elif defined(CPU_FAM_ESP32C3)
+    {
+        .module = PERIPH_TIMG1_MODULE,
+        .group = TIMER_GROUP_1,
+        .index = TIMER_0,
+        .int_mask = BIT(TIMER_0),
+        .int_src  = ETS_TG1_T0_LEVEL_INTR_SOURCE
+    },
 #else
 #error "MCU implementation needed"
 #endif
