@@ -110,7 +110,7 @@ void _exit_r(struct _reent *r, int status)
 
 #if !IS_USED(MODULE_VFS)
 int _fcntl_r(struct _reent *r, int fd, int cmd, int arg)
-                              __attribute__((weak,alias("_no_sys_func")));
+                              __attribute__((weak, alias("_no_sys_func")));
 #endif
 
 #ifndef CLOCK_REALTIME

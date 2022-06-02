@@ -341,7 +341,7 @@ void spi_print_config(void)
 {
     for (unsigned bus = 0; bus < SPI_NUMOF; bus++) {
         printf("\tSPI_DEV(%u)\t%s ", bus, _spi_names[_spi[bus].hostid]);
-        printf("sck=%d " , spi_config[bus].sck);
+        printf("sck=%d ", spi_config[bus].sck);
         printf("miso=%d ", spi_config[bus].miso);
         printf("mosi=%d ", spi_config[bus].mosi);
         printf("cs0=%d\n", spi_config[bus].cs);
