@@ -20,6 +20,8 @@
  * @}
  */
 
+#include <stdio.h>
+
 #include "fmt.h"
 
 int main(void)
@@ -43,7 +45,9 @@ int main(void)
     print_str("\n");
     print_float(1.2345, 5);
     print_str("\n");
-    print_str("Test successful.\n");
+    printf("%s", "Test ");
+    print_str("successful.");
+    puts("");
 
     return 0;
 }
