@@ -64,6 +64,11 @@ int g_wpa_ca_cert_len;
 char *g_wpa_ttls_phase2_type;
 bool g_wpa_suiteb_certification;
 
+char *g_wpa_phase1_options;
+
+uint8_t *g_wpa_pac_file;
+int g_wpa_pac_file_len;
+
 /*
  * provided by: /path/to/esp-idf/components/log/log_freertos.c
  */
