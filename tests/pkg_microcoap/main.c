@@ -18,13 +18,12 @@
  */
 
 #include <stdio.h>
+
 #include "msg.h"
+#include "net/netif.h"
 #include "xtimer.h"
 
 void microcoap_server_loop(void);
-
-/* import "ifconfig" shell command, used for printing addresses */
-extern int _gnrc_netif_config(int argc, char **argv);
 
 int main(void)
 {
@@ -34,8 +33,9 @@ int main(void)
     xtimer_sleep(3);
 
     /* print network addresses */
-    puts("Configured network interfaces:");
-    _gnrc_netif_config(0, NULL);
+    printf("{\"IPv6 addresses\": [\"");
+    netifs_print_ipv6("\", \"");
+    puts("\"]}");
 
     /* start coap server loop */
     microcoap_server_loop();
