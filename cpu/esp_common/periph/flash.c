@@ -31,17 +31,19 @@
 
 #include "mtd.h"
 
-#include "esp_flash_data_types.h"
 #include "esp_partition.h"
 
 #ifdef MCU_ESP32
 
+#include "esp_flash_partitions.h"
+#include "esp_spi_flash.h"
 #include "rom/cache.h"
 #include "rom/spi_flash.h"
-#include "esp_spi_flash.h"
+#include "soc/soc.h"
 
 #else /* MCU_ESP32 */
 
+#include "esp_flash_data_types.h"
 #include "rom_functions.h"
 #include "spi_flash.h"
 
@@ -386,10 +388,12 @@ esp_err_t IRAM_ATTR spi_flash_write(size_t addr, const void *buff, size_t size)
     RETURN_WITH_ESP_ERR_CODE(result);
 }
 
+#if !IS_USED(MODULE_ESP_IDF_SPI_FLASH)
 esp_err_t IRAM_ATTR spi_flash_erase_sector(size_t sector)
 {
     return spi_flash_erase_range(sector * _flashchip->sector_size, 1);
 }
+#endif
 
 esp_err_t IRAM_ATTR spi_flash_erase_range(size_t addr, size_t size)
 {

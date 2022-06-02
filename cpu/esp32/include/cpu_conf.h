@@ -27,7 +27,6 @@
 #include "cpu_conf_common.h"
 #include "esp_common_log.h"
 #include "xtensa_conf.h"
-#include "xtensa/xtensa_context.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,13 +36,31 @@ extern "C" {
  * @name   Stack size configuration
  * @{
  */
-#define THREAD_EXTRA_STACKSIZE_PRINTF (1024)
+/** Extra thread stack size required if newlib-nano is not used */
+#ifdef CONFIG_NEWLIB_NANO_FORMAT
+#define THREAD_EXTRA_STACKSIZE          (0)
+#else
+#define THREAD_EXTRA_STACKSIZE          (512)
+#endif
+
+/** Extra thread stack size if `printf` is used */
+#define THREAD_EXTRA_STACKSIZE_PRINTF   (1536)
+
 #ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT      (2048)
+/** Default thread stack size */
+#define THREAD_STACKSIZE_DEFAULT        (2048)
 #endif
+
 #ifndef THREAD_STACKSIZE_IDLE
-#define THREAD_STACKSIZE_IDLE         (2048)
+/** Stack size for the idle thread */
+#define THREAD_STACKSIZE_IDLE           (2048)
 #endif
+
+#ifndef ESP_WIFI_STACKSIZE
+/** Stack size for the WiFi thread */
+#define ESP_WIFI_STACKSIZE              (THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE)
+#endif
+
 /** @} */
 
 /**

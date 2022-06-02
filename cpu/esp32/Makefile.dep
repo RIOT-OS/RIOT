@@ -3,11 +3,9 @@
 include $(RIOTCPU)/esp_common/Makefile.dep
 
 USEPKG += esp32_sdk
-USEPKG += esp32_sdk_libs
 
-USEMODULE += esp_idf_driver
-USEMODULE += esp_idf_esp32
-USEMODULE += esp_idf_soc
+USEMODULE += esp_idf_common
+USEMODULE += esp_bootloader
 
 ifneq (,$(filter newlib,$(USEMODULE)))
   DEFAULT_MODULE += newlib_nano
@@ -18,28 +16,38 @@ ifneq (,$(filter cpp,$(USEMODULE)))
 endif
 
 ifneq (,$(filter esp_eth,$(USEMODULE)))
-  USEMODULE += esp_freertos
+  USEMODULE += esp_idf_efuse
   USEMODULE += esp_idf_eth
-  USEMODULE += esp_idf_eth_phy
+  USEMODULE += esp_idf_event
+  USEMODULE += esp_idf_gpio
+  USEMODULE += esp_idf_spi_flash
   USEMODULE += netdev_eth
   USEMODULE += netopt
   USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
-  # add additional modules used for any WiFi interface
-  USEMODULE += esp_freertos
+  # add additional modules and packages used for any WiFi interface
+  USEPKG += esp32_sdk_lib_phy
+  USEPKG += esp32_sdk_lib_wifi
+  USEMODULE += esp_idf_efuse
+  USEMODULE += esp_idf_event
   USEMODULE += esp_idf_heap
   USEMODULE += esp_idf_nvs_flash
-  USEMODULE += esp_idf_wpa_supplicant_crypto
-  USEMODULE += esp_idf_wpa_supplicant_port
+  USEMODULE += esp_idf_spi_flash
+  USEMODULE += esp_idf_wifi
+  USEMODULE += esp_idf_wpa_supplicant
+  USEMODULE += pthread
 endif
 
-ifneq (,$(filter esp_wifi_enterprise,$(USEMODULE)))
-  # add additional modules used for WPA2 Enterprise mode
-  USEMODULE += esp_idf_wpa_supplicant_wpa2_eap_peer
-  USEMODULE += esp_idf_wpa_supplicant_wpa2_tls
-  USEMODULE += esp_idf_wpa_supplicant_wpa2_utils
+ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
+  # The ESP-IDF heap component uses the TLSF implementation that is part of
+  # the component. To avoid conflicts with modules and packages that use the
+  # RIOT package `tlsf`, this package is also used for the ESP-IDF heap instead
+  # of its own implementation. There does not seem to be any differences in
+  # the implementations of TLSF with the exception of heap poisoning, which
+  # is not configured.
+  USEPKG += tlsf
 endif
 
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
@@ -74,13 +82,13 @@ ifneq (,$(filter periph_i2c,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter esp_now esp_wifi esp_spi_ram,$(USEMODULE)))
-  # the ESP-IDF heap has to be used if SPI RAM is used
-  USEMODULE += esp_idf_heap
-endif
-
 ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
   FEATURES_REQUIRED += esp_spi_ram
+  USEMODULE += esp_idf_efuse
+  USEMODULE += esp_idf_gpio
+  USEMODULE += esp_idf_heap
+  USEMODULE += esp_idf_spi_flash
+  USEMODULE += esp_idf_spi_ram
 endif
 
 ifneq (,$(filter mtd,$(USEMODULE)))

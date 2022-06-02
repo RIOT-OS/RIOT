@@ -69,7 +69,7 @@ LIB_PRINTF(coexist, LOG_DEBUG, "coexist")
 LIB_PRINTF(core, LOG_DEBUG, "core")
 LIB_PRINTF(espnow, LOG_DEBUG, "espnow")
 LIB_PRINTF(net80211, LOG_DEBUG, "net80211")
-LIB_PRINTF(phy, LOG_INFO, "core")
+LIB_PRINTF(phy, LOG_DEBUG, "phy")
 LIB_PRINTF(pp, LOG_DEBUG, "pp")
 LIB_PRINTF(sc, LOG_DEBUG, "smartconfig")
 /* The ESP8266 SDK uses smartconfig_printf but the ESP32 one uses sc_printf. */

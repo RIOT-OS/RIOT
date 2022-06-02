@@ -1,0 +1,246 @@
+From c1c2ff384f02d973624de0c8250eb49c73a3ea84 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sun, 30 Jan 2022 07:59:30 +0100
+Subject: [PATCH 01/12] esp_hw_support: rename rtc_init
+
+Rename `rtc_init` to `rtc_init_module` due to name conflicts with RIOT `periph/rtc` module.
+---
+ components/bt/controller/lib_esp32                | 2 +-
+ components/esp_hw_support/port/esp32/rtc_init.c   | 2 +-
+ components/esp_hw_support/port/esp32c3/rtc_init.c | 2 +-
+ components/esp_hw_support/port/esp32h2/rtc_init.c | 2 +-
+ components/esp_hw_support/port/esp32s2/rtc_init.c | 2 +-
+ components/esp_hw_support/port/esp32s3/rtc_init.c | 2 +-
+ components/esp_phy/lib                            | 2 +-
+ components/esp_system/port/soc/esp32/clk.c        | 2 +-
+ components/esp_system/port/soc/esp32c3/clk.c      | 2 +-
+ components/esp_system/port/soc/esp32h2/clk.c      | 2 +-
+ components/esp_system/port/soc/esp32s2/clk.c      | 2 +-
+ components/esp_system/port/soc/esp32s3/clk.c      | 2 +-
+ components/esp_wifi/lib                           | 2 +-
+ components/soc/esp32/include/soc/rtc.h            | 2 +-
+ components/soc/esp32c3/include/soc/rtc.h          | 2 +-
+ components/soc/esp32h2/include/soc/rtc.h          | 2 +-
+ components/soc/esp32s2/include/soc/rtc.h          | 2 +-
+ components/soc/esp32s3/include/soc/rtc.h          | 2 +-
+ 18 files changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/components/bt/controller/lib_esp32 b/components/bt/controller/lib_esp32
+index ec4b716eb6..54a69e5361 160000
+--- a/components/bt/controller/lib_esp32
++++ b/components/bt/controller/lib_esp32
+@@ -1 +1 @@
+-Subproject commit ec4b716eb60c50f14642f7b7ce9825791469e4c1
++Subproject commit 54a69e53616cbd3e3f3bbf150e42930a7912349a
+diff --git a/components/esp_hw_support/port/esp32/rtc_init.c b/components/esp_hw_support/port/esp32/rtc_init.c
+index e66a493b3d..7f1d191554 100644
+--- a/components/esp_hw_support/port/esp32/rtc_init.c
++++ b/components/esp_hw_support/port/esp32/rtc_init.c
+@@ -14,7 +14,7 @@
+ #include "soc/gpio_periph.h"
+ 
+ 
+-void rtc_init(rtc_config_t cfg)
++void rtc_init_module(rtc_config_t cfg)
+ {
+     CLEAR_PERI_REG_MASK(RTC_CNTL_ANA_CONF_REG, RTC_CNTL_PVTMON_PU | RTC_CNTL_TXRF_I2C_PU |
+             RTC_CNTL_RFRX_PBUS_PU | RTC_CNTL_CKGEN_I2C_PU | RTC_CNTL_PLL_I2C_PU);
+diff --git a/components/esp_hw_support/port/esp32c3/rtc_init.c b/components/esp_hw_support/port/esp32c3/rtc_init.c
+index 388399f107..f6fdc69244 100644
+--- a/components/esp_hw_support/port/esp32c3/rtc_init.c
++++ b/components/esp_hw_support/port/esp32c3/rtc_init.c
+@@ -25,7 +25,7 @@ static void set_ocode_by_efuse(int calib_version);
+ static void calibrate_ocode(void);
+ static void set_rtc_dig_dbias(void);
+ 
+-void rtc_init(rtc_config_t cfg)
++void rtc_init_module(rtc_config_t cfg)
+ {
+     REGI2C_WRITE_MASK(I2C_DIG_REG, I2C_DIG_REG_XPD_DIG_REG, 0);
+     REGI2C_WRITE_MASK(I2C_DIG_REG, I2C_DIG_REG_XPD_RTC_REG, 0);
+diff --git a/components/esp_hw_support/port/esp32h2/rtc_init.c b/components/esp_hw_support/port/esp32h2/rtc_init.c
+index 7b684d3d3d..ff0b5f4912 100644
+--- a/components/esp_hw_support/port/esp32h2/rtc_init.c
++++ b/components/esp_hw_support/port/esp32h2/rtc_init.c
+@@ -27,7 +27,7 @@ void pmu_ctl(void);
+ void dcdc_ctl(uint32_t mode);
+ void regulator_slt(regulator_config_t regula_cfg);
+ 
+-void rtc_init(rtc_config_t cfg)
++void rtc_init_module(rtc_config_t cfg)
+ {
+     CLEAR_PERI_REG_MASK(RTC_CNTL_ANA_CONF_REG, RTC_CNTL_PVTMON_PU);
+     REG_SET_FIELD(RTC_CNTL_TIMER1_REG, RTC_CNTL_PLL_BUF_WAIT, cfg.pll_wait);
+diff --git a/components/esp_hw_support/port/esp32s2/rtc_init.c b/components/esp_hw_support/port/esp32s2/rtc_init.c
+index 7932a89aa0..8910f7a279 100644
+--- a/components/esp_hw_support/port/esp32s2/rtc_init.c
++++ b/components/esp_hw_support/port/esp32s2/rtc_init.c
+@@ -24,7 +24,7 @@ __attribute__((unused)) static const char *TAG = "rtc_init";
+ static void set_ocode_by_efuse(int calib_version);
+ static void calibrate_ocode(void);
+ 
+-void rtc_init(rtc_config_t cfg)
++void rtc_init_module(rtc_config_t cfg)
+ {
+     CLEAR_PERI_REG_MASK(RTC_CNTL_ANA_CONF_REG, RTC_CNTL_PVTMON_PU);
+     REG_SET_FIELD(RTC_CNTL_TIMER1_REG, RTC_CNTL_PLL_BUF_WAIT, cfg.pll_wait);
+diff --git a/components/esp_hw_support/port/esp32s3/rtc_init.c b/components/esp_hw_support/port/esp32s3/rtc_init.c
+index ed44fd7baa..f0b7f5c8c2 100644
+--- a/components/esp_hw_support/port/esp32s3/rtc_init.c
++++ b/components/esp_hw_support/port/esp32s3/rtc_init.c
+@@ -31,7 +31,7 @@ static const char *TAG = "rtcinit";
+ static void set_ocode_by_efuse(int calib_version);
+ static void calibrate_ocode(void);
+ 
+-void rtc_init(rtc_config_t cfg)
++void rtc_init_module(rtc_config_t cfg)
+ {
+     REGI2C_WRITE_MASK(I2C_DIG_REG, I2C_DIG_REG_XPD_RTC_REG, 0);
+     REGI2C_WRITE_MASK(I2C_DIG_REG, I2C_DIG_REG_XPD_DIG_REG, 0);
+diff --git a/components/esp_phy/lib b/components/esp_phy/lib
+index 4779ddaaf2..2d89c532cc 160000
+--- a/components/esp_phy/lib
++++ b/components/esp_phy/lib
+@@ -1 +1 @@
+-Subproject commit 4779ddaaf29e1d6aa2d26980103a1c1bbaa29462
++Subproject commit 2d89c532ccba0bb9988d1d1c6d719bbe1d8b65b8
+diff --git a/components/esp_system/port/soc/esp32/clk.c b/components/esp_system/port/soc/esp32/clk.c
+index 8015d50d98..aed4554a20 100644
+--- a/components/esp_system/port/soc/esp32/clk.c
++++ b/components/esp_system/port/soc/esp32/clk.c
+@@ -124,7 +124,7 @@ static void select_rtc_slow_clk(slow_clk_sel_t slow_clk)
+  __attribute__((weak)) void esp_clk_init(void)
+ {
+     rtc_config_t cfg = RTC_CONFIG_DEFAULT();
+-    rtc_init(cfg);
++    rtc_init_module(cfg);
+ 
+ #if (CONFIG_ESP32_COMPATIBLE_PRE_V2_1_BOOTLOADERS || CONFIG_ESP32_APP_INIT_CLK)
+     /* Check the bootloader set the XTAL frequency.
+diff --git a/components/esp_system/port/soc/esp32c3/clk.c b/components/esp_system/port/soc/esp32c3/clk.c
+index 685c3a040b..187b1ce649 100644
+--- a/components/esp_system/port/soc/esp32c3/clk.c
++++ b/components/esp_system/port/soc/esp32c3/clk.c
+@@ -80,7 +80,7 @@ static const char *TAG = "clk";
+     if (rst_reas == RESET_REASON_CHIP_POWER_ON) {
+         cfg.cali_ocode = 1;
+     }
+-    rtc_init(cfg);
++    rtc_init_module(cfg);
+ 
+     assert(rtc_clk_xtal_freq_get() == RTC_XTAL_FREQ_40M);
+ 
+diff --git a/components/esp_system/port/soc/esp32h2/clk.c b/components/esp_system/port/soc/esp32h2/clk.c
+index 52cb9e9c44..ee6c2f0a1b 100644
+--- a/components/esp_system/port/soc/esp32h2/clk.c
++++ b/components/esp_system/port/soc/esp32h2/clk.c
+@@ -79,7 +79,7 @@ static const char *TAG = "clk";
+     if (rst_reas == RESET_REASON_CHIP_POWER_ON) {
+         cfg.cali_ocode = 1;
+     }
+-    rtc_init(cfg);
++    rtc_init_module(cfg);
+ 
+     assert(rtc_clk_xtal_freq_get() == RTC_XTAL_FREQ_32M);
+ 
+diff --git a/components/esp_system/port/soc/esp32s2/clk.c b/components/esp_system/port/soc/esp32s2/clk.c
+index 6a8e00b6e4..9b7128ca0a 100644
+--- a/components/esp_system/port/soc/esp32s2/clk.c
++++ b/components/esp_system/port/soc/esp32s2/clk.c
+@@ -81,7 +81,7 @@ static void select_rtc_slow_clk(slow_clk_sel_t slow_clk);
+     if (rst_reas == RESET_REASON_CHIP_POWER_ON) {
+         cfg.cali_ocode = 1;
+     }
+-    rtc_init(cfg);
++    rtc_init_module(cfg);
+ 
+     rtc_clk_fast_freq_set(RTC_FAST_FREQ_8M);
+ 
+diff --git a/components/esp_system/port/soc/esp32s3/clk.c b/components/esp_system/port/soc/esp32s3/clk.c
+index 79b125cc04..89565eafc3 100644
+--- a/components/esp_system/port/soc/esp32s3/clk.c
++++ b/components/esp_system/port/soc/esp32s3/clk.c
+@@ -82,7 +82,7 @@ static void select_rtc_slow_clk(slow_clk_sel_t slow_clk);
+     if (rst_reas == RESET_REASON_CHIP_POWER_ON) {
+         cfg.cali_ocode = 1;
+     }
+-    rtc_init(cfg);
++    rtc_init_module(cfg);
+ 
+     assert(rtc_clk_xtal_freq_get() == RTC_XTAL_FREQ_40M);
+ 
+diff --git a/components/esp_wifi/lib b/components/esp_wifi/lib
+index cd7d14917f..5ae7e325b8 160000
+--- a/components/esp_wifi/lib
++++ b/components/esp_wifi/lib
+@@ -1 +1 @@
+-Subproject commit cd7d14917f2c3d0ea4382f4a188cb290304faf47
++Subproject commit 5ae7e325b89bc2d0799e2de6fcaccf41ffdbb408
+diff --git a/components/soc/esp32/include/soc/rtc.h b/components/soc/esp32/include/soc/rtc.h
+index bbbf3c7550..3b98346679 100644
+--- a/components/soc/esp32/include/soc/rtc.h
++++ b/components/soc/esp32/include/soc/rtc.h
+@@ -685,7 +685,7 @@ typedef struct rtc_config_s {
+  * Initialize RTC clock and power control related functions
+  * @param cfg configuration options as rtc_config_t
+  */
+-void rtc_init(rtc_config_t cfg);
++void rtc_init_module(rtc_config_t cfg);
+ 
+ #define RTC_VDDSDIO_TIEH_1_8V 0 //!< TIEH field value for 1.8V VDDSDIO
+ #define RTC_VDDSDIO_TIEH_3_3V 1 //!< TIEH field value for 3.3V VDDSDIO
+diff --git a/components/soc/esp32c3/include/soc/rtc.h b/components/soc/esp32c3/include/soc/rtc.h
+index db67d3ac51..2142df2c2f 100644
+--- a/components/soc/esp32c3/include/soc/rtc.h
++++ b/components/soc/esp32c3/include/soc/rtc.h
+@@ -839,7 +839,7 @@ typedef struct {
+  * Initialize RTC clock and power control related functions
+  * @param cfg configuration options as rtc_config_t
+  */
+-void rtc_init(rtc_config_t cfg);
++void rtc_init_module(rtc_config_t cfg);
+ 
+ /**
+  * Structure describing vddsdio configuration
+diff --git a/components/soc/esp32h2/include/soc/rtc.h b/components/soc/esp32h2/include/soc/rtc.h
+index 5585986ed2..7a1dd718c6 100644
+--- a/components/soc/esp32h2/include/soc/rtc.h
++++ b/components/soc/esp32h2/include/soc/rtc.h
+@@ -925,7 +925,7 @@ typedef struct {
+ * Initialize RTC clock and power control related functions
+ * @param cfg configuration options as rtc_config_t
+ */
+-void rtc_init(rtc_config_t cfg);
++void rtc_init_module(rtc_config_t cfg);
+ 
+ /**
+  * Structure describing vddsdio configuration
+diff --git a/components/soc/esp32s2/include/soc/rtc.h b/components/soc/esp32s2/include/soc/rtc.h
+index 11b13fb6aa..73caf3395c 100644
+--- a/components/soc/esp32s2/include/soc/rtc.h
++++ b/components/soc/esp32s2/include/soc/rtc.h
+@@ -854,7 +854,7 @@ typedef struct {
+  * Initialize RTC clock and power control related functions
+  * @param cfg configuration options as rtc_config_t
+  */
+-void rtc_init(rtc_config_t cfg);
++void rtc_init_module(rtc_config_t cfg);
+ 
+ /**
+  * Structure describing vddsdio configuration
+diff --git a/components/soc/esp32s3/include/soc/rtc.h b/components/soc/esp32s3/include/soc/rtc.h
+index aa09874f2c..eb8bbed68b 100644
+--- a/components/soc/esp32s3/include/soc/rtc.h
++++ b/components/soc/esp32s3/include/soc/rtc.h
+@@ -849,7 +849,7 @@ typedef struct {
+  * Initialize RTC clock and power control related functions
+  * @param cfg configuration options as rtc_config_t
+  */
+-void rtc_init(rtc_config_t cfg);
++void rtc_init_module(rtc_config_t cfg);
+ 
+ /**
+  * Structure describing vddsdio configuration
+-- 
+2.17.1
+

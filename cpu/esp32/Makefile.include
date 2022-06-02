@@ -1,5 +1,5 @@
 # ESP32 specific flashing options
-FLASH_CHIP  = esp32
+FLASH_CHIP  = $(CPU)
 FLASH_MODE ?= dout
 FLASH_FREQ  = 40m   # DO NOT CHANGE
 FLASH_SIZE ?= 4
@@ -11,9 +11,12 @@ include $(RIOTCPU)/esp_common/Makefile.include
 
 # regular Makefile
 
-TARGET_ARCH_ESP32 ?= xtensa-esp32-elf
-TARGET_ARCH ?= $(TARGET_ARCH_ESP32)
+TARGET_ARCH_$(CPU) ?= xtensa-$(CPU)-elf
+TARGET_ARCH ?= $(TARGET_ARCH_$(CPU))
 
+CPU_UC = $(shell echo '$(CPU)' | tr '[:lower:]' '[:upper:]')
+
+PSEUDOMODULES += esp_bootloader
 PSEUDOMODULES += esp_gdbstub
 PSEUDOMODULES += esp_hw_counter
 PSEUDOMODULES += esp_i2c_hw
@@ -22,34 +25,95 @@ PSEUDOMODULES += esp_rtc_timer_32k
 PSEUDOMODULES += esp_spi_ram
 PSEUDOMODULES += esp_wifi_enterprise
 
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/esp32
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/heap
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/spi_flash
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/tcpip_adapter
-INCLUDES += -I$(RIOTCPU)/$(CPU)
+INCLUDES += -I$(RIOTCPU)/$(CPU)/esp-idf/include
+INCLUDES += -I$(RIOTCPU)/$(CPU)/esp-idf/include/log
+
+INCLUDES += -I$(ESP32_SDK_DIR)/components/
+INCLUDES += -I$(ESP32_SDK_DIR)/components/driver/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_common/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include/soc
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/include/$(CPU)
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_timer/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/$(CPU)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/platform_port/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/heap/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/log/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/newlib/platform_include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/$(CPU)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/$(CPU)/include
+
+ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include/soc/$(CPU)
+endif
+
+ifneq (,$(filter esp_idf_spi_flash,$(USEMODULE)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/bootloader_support/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include
+endif
+
+ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/bootloader_support/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_eth/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_event/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_netif/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_system/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_wifi/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/nvs_flash/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include
+endif
+
+ifneq (,$(filter esp_wifi_enterprise,$(USEMODULE)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/wpa_supplicant/esp_supplicant/include
+endif
 
 ifneq (,$(filter esp_eth,$(USEMODULE)))
   INCLUDES += -I$(RIOTCPU)/$(CPU)/esp-eth
-  INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/ethernet
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_eth/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_event/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_netif/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_wifi/include
 endif
 
-CFLAGS += -DSDK_NOT_USED -DCONFIG_FREERTOS_UNICORE=1 -DESP_PLATFORM
+# we use ESP32 only in single core mode
+CFLAGS += -DCONFIG_ESP_SYSTEM_SINGLE_CORE_MODE
+CFLAGS += -DCONFIG_FREERTOS_UNICORE
+
+# other ESP-IDF configurations
+CFLAGS += -DCONFIG_IDF_TARGET_$(CPU_UC)
+CFLAGS += -DESP_PLATFORM
 CFLAGS += -DLOG_TAG_IN_BRACKETS
+
+# shortcuts used by ESP-IDF
+CFLAGS += -Dasm=__asm
+CFLAGS += -Dtypeof=__typeof__
 CFLAGS += -D_CONST=const
 
+LINKFLAGS += -L$(ESP32_SDK_DIR)/components/xtensa/$(CPU)
+ARCHIVES += -lxt_hal
+
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld/
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.ld
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.common.ld
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.peripherals.ld
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.ld
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.nanofmt.ld
+LINKFLAGS += -T$(ESP32_SDK_DIR)/components/soc/$(CPU)/ld/$(CPU).peripherals.ld
+LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU)/ld/$(CPU).rom.api.ld
+LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU)/ld/$(CPU).rom.ld
+LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU)/ld/$(CPU).rom.newlib-data.ld
+LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU)/ld/$(CPU).rom.newlib-funcs.ld
+LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU)/ld/$(CPU).rom.newlib-time.ld
+LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU)/ld/$(CPU).rom.spiflash.ld
+LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU)/ld/$(CPU).rom.redefined.ld
+LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/memory.ld
+LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/sections.ld
 LINKFLAGS += -nostdlib -lgcc -Wl,-gc-sections
 
 # Libraries needed when using esp_wifi_any pseudomodule
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
-  ARCHIVES += -lcore -lrtc -lnet80211 -lpp -lcoexist -lwps -lwpa -lwpa2
+  LINKFLAGS += -L$(ESP32_SDK_LIB_WIFI_DIR)/$(CPU)
+  LINKFLAGS += -L$(ESP32_SDK_LIB_PHY_DIR)/$(CPU)
+  ARCHIVES += -lcore -lrtc -lnet80211 -lpp -lcoexist
   ARCHIVES += -lphy -lstdc++
 endif
 
@@ -62,11 +126,16 @@ ifneq (,$(filter cpp,$(USEMODULE)))
   ARCHIVES += -lstdc++
 endif
 
+ifneq (,$(filter esp_bootloader,$(USEMODULE)))
+  # Bootloader file used by esptool.inc.mk
+  BOOTLOADER_BIN ?= $(BINDIR)/esp_bootloader/bootloader.bin
+endif
+
 ifneq (,$(filter esp_jtag,$(USEMODULE)))
   PROGRAMMERS_SUPPORTED += openocd
   PARTITION_POS = 0x8000
   OPENOCD_PRE_FLASH_CMDS = -c 'echo "Installing Bootloader at $(BOOTLOADER_POS)"' \
-    -c 'flash write_image erase "$(RIOTCPU)/$(CPU)/bin/bootloader.bin" $(BOOTLOADER_POS) bin' \
+    -c 'flash write_image erase "$(BOOTLOADER_BIN)" $(BOOTLOADER_POS) bin' \
     -c 'echo "Installing partition table at $(PARTITION_POS)"' \
     -c 'flash write_image erase "$(BINDIR)/partitions.bin" $(PARTITION_POS) bin'
   IMAGE_OFFSET = 0x10000
@@ -75,3 +144,5 @@ ifneq (,$(filter esp_jtag,$(USEMODULE)))
   # Without resets debug target fails with 'Target not examined yet'
   OPENOCD_DBG_EXTRA_CMD += -c 'reset halt'
 endif
+
+$(BOOTLOADER_BIN):

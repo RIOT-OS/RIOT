@@ -89,6 +89,12 @@ extern "C" {
 #ifndef TCPIP_THREAD_STACKSIZE
 #define TCPIP_THREAD_STACKSIZE        (3072)
 #endif
+
+#ifndef ESP_WIFI_STACKSIZE
+/** Stack size for the WiFi thread */
+#define ESP_WIFI_STACKSIZE            (1536)
+#endif
+
 /** @} */
 
 /**

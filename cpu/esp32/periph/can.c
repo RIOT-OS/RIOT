@@ -36,13 +36,19 @@
 
 #include "periph/can.h"
 #include "periph/gpio.h"
-#include "soc/can_struct.h"
+
+#include "hal/twai_ll.h"
+#include "soc/gpio_sig_map.h"
 #include "soc/gpio_struct.h"
+#include "soc/twai_struct.h"
+#include "soc/soc.h"
 
 #include "xtensa/xtensa_api.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+#define CAN     TWAI
 
 /** Common ESP CAN definitions */
 #define ESP_CAN_INTR_MASK   (0xffU)      /* interrupts handled by ESP CAN */
@@ -337,10 +343,10 @@ static int _esp_can_set(candev_t *candev, canopt_t opt, void *value, size_t valu
                 return -EOVERFLOW;
             }
             if (opt == CANOPT_TEC) {
-                CAN.tx_error_counter_reg.byte = *((uint16_t*)value);
+                CAN.tx_error_counter_reg.txerr = *((uint16_t*)value);
             }
             else {
-                CAN.rx_error_counter_reg.byte = *((uint16_t*)value);
+                CAN.rx_error_counter_reg.rxerr = *((uint16_t*)value);
             }
             res = sizeof(uint16_t);
             break;
@@ -408,10 +414,10 @@ static int _esp_can_get(candev_t *candev, canopt_t opt, void *value, size_t max_
             }
 
             if (opt == CANOPT_TEC) {
-                *((uint16_t *)value) = CAN.tx_error_counter_reg.byte;
+                *((uint16_t *)value) = CAN.tx_error_counter_reg.txerr;
             }
             else {
-                *((uint16_t *)value) = CAN.rx_error_counter_reg.byte;
+                *((uint16_t *)value) = CAN.rx_error_counter_reg.rxerr;
             }
 
             res = sizeof(uint16_t);
@@ -532,8 +538,8 @@ static void _esp_can_set_reset_mode(void)
 {
     DEBUG("%s\n", __func__);
 
-    while (CAN.mode_reg.reset != 1) {
-        CAN.mode_reg.reset = 1;
+    while (CAN.mode_reg.rm != 1) {
+        CAN.mode_reg.rm = 1;
     }
 }
 
@@ -541,8 +547,8 @@ static void _esp_can_set_operating_mode(void)
 {
     DEBUG("%s\n", __func__);
 
-    while (CAN.mode_reg.reset != 0) {
-        CAN.mode_reg.reset = 0;
+    while (CAN.mode_reg.rm != 0) {
+        CAN.mode_reg.rm = 0;
     }
 }
 
@@ -558,33 +564,33 @@ static int _esp_can_config(can_t *dev)
     _esp_can_set_reset_mode();
 
     /* configuration is done in listen only mode */
-    CAN.mode_reg.self_test = 0;
-    CAN.mode_reg.listen_only = 1;
+    CAN.mode_reg.stm = 0;
+    CAN.mode_reg.lom = 1;
 
     /* Use SJA1000 PeliCAN mode and registers layout */
-    CAN.clock_divider_reg.can_mode = 1;
+    CAN.clock_divider_reg.cm = 1;
 
 #ifndef ESP_CAN_CLK_OUT
-    CAN.clock_divider_reg.clock_off = 1;
-    CAN.clock_divider_reg.clock_divider = 0;
+    CAN.clock_divider_reg.co = 1;
+    CAN.clock_divider_reg.cd = 0;
 #else
     uint32_t clk_out_div = ESP_CAN_CLK_OUT_DIV / 2 - 1;
     clk_out_div = (clk_out_div < 7) ? clk_out_div : 7;
-    CAN.clock_divider_reg.clock_off = 0;
-    CAN.clock_divider_reg.clock_divider = clk_out_div;
+    CAN.clock_divider_reg.co = 0;
+    CAN.clock_divider_reg.cd = clk_out_div;
 #endif
 
     /* set error counter values and warning limits */
-    CAN.error_warning_limit_reg.byte = ESP_CAN_ERROR_WARNING_LIMIT;
-    CAN.tx_error_counter_reg.byte = 0;
-    CAN.rx_error_counter_reg.byte = 0;
+    CAN.error_warning_limit_reg.ewl = ESP_CAN_ERROR_WARNING_LIMIT;
+    CAN.tx_error_counter_reg.txerr = 0;
+    CAN.rx_error_counter_reg.rxerr = 0;
 
     /* accept all CAN messages, filtering is done by software */
-    CAN.mode_reg.acceptance_filter = 0;            /* single filter */
-    CAN.acceptance_filter.mask_reg[0].byte = 0xff; /* all bits masked */
-    CAN.acceptance_filter.mask_reg[1].byte = 0xff;
-    CAN.acceptance_filter.mask_reg[2].byte = 0xff;
-    CAN.acceptance_filter.mask_reg[3].byte = 0xff;
+    CAN.mode_reg.afm = 0;                           /* single filter */
+    CAN.acceptance_filter.amr[0].byte = 0xff;  /* all bits masked */
+    CAN.acceptance_filter.amr[1].byte = 0xff;
+    CAN.acceptance_filter.amr[2].byte = 0xff;
+    CAN.acceptance_filter.amr[3].byte = 0xff;
 
     /* clear interrupt status register by read and enable all interrupts */
     uint32_t tmp = CAN.interrupt_reg.val; (void)tmp;
@@ -652,7 +658,7 @@ static void _esp_can_init_pins(can_t *dev)
     /* Init TX pin */
     gpio_init(dev->tx_pin, GPIO_OUT);
     gpio_set_pin_usage(dev->tx_pin, _CAN);
-    GPIO.func_out_sel_cfg[dev->tx_pin].func_sel = CAN_TX_IDX;
+    GPIO.func_out_sel_cfg[dev->tx_pin].func_sel = TWAI_TX_IDX;
 
     /* Init RX pin */
     gpio_init(dev->rx_pin, GPIO_IN);
@@ -665,14 +671,14 @@ static void _esp_can_init_pins(can_t *dev)
     /* Init CLK_OUT pin (optional) if defined */
     gpio_init(dev->clk_out_pin, GPIO_OD);
     gpio_set_pin_usage(dev->clk_out_pin, _CAN);
-    GPIO.func_out_sel_cfg[dev->clk_out_pin].func_sel = CAN_CLKOUT_IDX;
+    GPIO.func_out_sel_cfg[dev->clk_out_pin].func_sel = TWAI_CLKOUT_IDX;
 #endif
 
     /* Init BUS_ON_OFF pin pin (optional) if defined */
 #ifdef ESP_CAN_BUS_ON_OFF
     gpio_init(dev->bus_on_of_pin, GPIO_OD);
     gpio_set_pin_usage(dev->bus_on_of_pin, _CAN);
-    GPIO.func_out_sel_cfg[dev->bus_on_of_pin].func_sel = CAN_BUS_OFF_ON_IDX;
+    GPIO.func_out_sel_cfg[dev->bus_on_of_pin].func_sel = TWAI_BUS_OFF_ON_IDX;
 #endif
 }
 
@@ -695,8 +701,8 @@ static int _esp_can_set_mode(can_t *dev, canopt_state_t state)
             _esp_can_power_up(dev);
             /* set the new mode (has to be done in reset mode) */
             _esp_can_set_reset_mode();
-            CAN.mode_reg.self_test = 0;
-            CAN.mode_reg.listen_only = 1;
+            CAN.mode_reg.stm = 0;
+            CAN.mode_reg.lom = 1;
             _esp_can_set_operating_mode ();
             break;
 
@@ -715,8 +721,8 @@ static int _esp_can_set_mode(can_t *dev, canopt_state_t state)
             _esp_can_power_up(dev);
             /* set the new mode (has to be done in reset mode) */
             _esp_can_set_reset_mode();
-            CAN.mode_reg.self_test = 0;
-            CAN.mode_reg.listen_only = 0;
+            CAN.mode_reg.stm = 0;
+            CAN.mode_reg.lom = 0;
             _esp_can_set_operating_mode ();
             break;
 
@@ -740,29 +746,29 @@ static void IRAM_ATTR _esp_can_intr_handler(void *arg)
     critical_enter();
 
     /* read the registers to clear them */
-    can_status_reg_t sta_reg = CAN.status_reg;
-    can_intr_reg_t   int_reg = CAN.interrupt_reg;
+    uint32_t sta_reg = CAN.status_reg.val;
+    uint32_t int_reg = CAN.interrupt_reg.val;
 
-    DEBUG("%s int=%08x sta=%08x\n", __func__, int_reg.val, sta_reg.val);
+    DEBUG("%s int=%08x sta=%08x\n", __func__, int_reg, sta_reg);
 
     /* Wake-Up Interrupt (not supported by ESP32) */
-    if (int_reg.reserved1) {
+    if (int_reg & BIT(4)) {
         DEBUG("%s wake-up interrupt\n", __func__);
         dev->events |= ESP_CAN_EVENT_WAKE_UP;
     }
 
     /* Arbitration Lost Interrupt */
-    if (int_reg.arb_lost) {
+    if (int_reg & TWAI_LL_INTR_ALI) {
         DEBUG("%s arbitration lost interrupt\n", __func__);
         /* can only happen during transmission, handle it as error in single shot transmission */
         dev->events |= ESP_CAN_EVENT_TX_ERROR;
     }
 
     /* bus or error status has changed, handle this first */
-    if (int_reg.err_warn) {
+    if (int_reg & TWAI_LL_INTR_EI) {
 
         /* BUS_OFF state condition */
-        if (sta_reg.error && sta_reg.bus) {
+        if ((sta_reg & TWAI_LL_STATUS_ES) && (sta_reg & TWAI_LL_STATUS_BS)) {
             DEBUG("%s bus-off state interrupt\n", __func__);
             /* switch to listen only mode to freeze the RX error counter */
             _esp_can_set_mode (dev, CANOPT_STATE_LISTEN_ONLY);
@@ -771,7 +777,7 @@ static void IRAM_ATTR _esp_can_intr_handler(void *arg)
         }
 
         /* ERROR_WARNING state condition, RX/TX error counter are > 96 */
-        else if (sta_reg.error && !sta_reg.bus) {
+        else if ((sta_reg & TWAI_LL_STATUS_ES) && !(sta_reg & TWAI_LL_STATUS_BS)) {
             DEBUG("%s error warning interrupt\n", __func__);
             /* save the event */
             dev->events |= ESP_CAN_EVENT_ERROR_WARNING;
@@ -779,13 +785,13 @@ static void IRAM_ATTR _esp_can_intr_handler(void *arg)
     }
 
     /* enter to / return from ERROR_PASSIVE state */
-    if (int_reg.err_passive) {
+    if (int_reg & TWAI_LL_INTR_EPI) {
         /* enter to the ERROR_PASSIVE state when one of the error counters is >= 128 */
-        if (CAN.tx_error_counter_reg.byte >= ESP_CAN_ERROR_PASSIVE_LIMIT ||
-            CAN.rx_error_counter_reg.byte >= ESP_CAN_ERROR_PASSIVE_LIMIT) {
+        if (CAN.tx_error_counter_reg.txerr >= ESP_CAN_ERROR_PASSIVE_LIMIT ||
+            CAN.rx_error_counter_reg.rxerr >= ESP_CAN_ERROR_PASSIVE_LIMIT) {
             DEBUG("%s error passive interrupt %d %d\n", __func__,
-                  CAN.tx_error_counter_reg.byte,
-                  CAN.rx_error_counter_reg.byte);
+                  CAN.tx_error_counter_reg.txerr,
+                  CAN.rx_error_counter_reg.rxerr);
             /* save the event */
             dev->events |= ESP_CAN_EVENT_ERROR_PASSIVE;
         }
@@ -796,23 +802,23 @@ static void IRAM_ATTR _esp_can_intr_handler(void *arg)
      * in ECC register (see SJA1000 Data sheet, Table 20 and 21)
      */
 
-    if (int_reg.bus_err) {
-        can_err_code_cap_reg_t ecc = CAN.error_code_capture_reg;
+    if (int_reg & TWAI_LL_INTR_BEI) {
         /* save the event */
-        DEBUG("%s bus error interrupt, ecc=%08x\n", __func__, ecc.val);
-        dev->events |= ecc.direction ? ESP_CAN_EVENT_RX_ERROR
-                                             : ESP_CAN_EVENT_TX_ERROR;
+        DEBUG("%s bus error interrupt, ecc=%08x\n", __func__,
+              CAN.error_code_capture_reg.val);
+        dev->events |= CAN.error_code_capture_reg.dir ? ESP_CAN_EVENT_RX_ERROR
+                                                      : ESP_CAN_EVENT_TX_ERROR;
     }
 
     /* TX buffer becomes free */
-    if (int_reg.tx) {
+    if (int_reg & TWAI_LL_INTR_TI) {
         DEBUG("%s transmit interrupt\n", __func__);
         /* save the event */
         dev->events |= ESP_CAN_EVENT_TX_CONFIRMATION;
     }
 
     /* RX buffer has one or more frames */
-    if (int_reg.rx) {
+    if (int_reg & TWAI_LL_INTR_RI) {
         /* get the number of messages in receive buffer */
         uint32_t msg_cnt = CAN.rx_message_counter_reg.val;
 
@@ -885,7 +891,7 @@ static void IRAM_ATTR _esp_can_intr_handler(void *arg)
     }
 
     /* data overrun interrupts are not handled */
-    if (int_reg.data_overrun) {
+    if (int_reg & BIT(3)) {
         DEBUG("%s data overrun interrupt\n", __func__);
         /* we use rx error since there is no separate overrun error */
         dev->events |= ESP_CAN_EVENT_RX_INDICATION;
@@ -913,25 +919,21 @@ static void _esp_can_set_bittiming(can_t *dev)
           timing->prop_seg, timing->phase_seg1, timing->phase_seg2,
           timing->sjw);
 
-    can_bus_tim_0_reg_t reg_0;
-    can_bus_tim_1_reg_t reg_1;
+    _esp_can_set_reset_mode();
 
     /* Again cppcheck gets off rails due to missing concept of union (see
      * explanation above), so we suppress false unreadVariable here */
     /* cppcheck-suppress unreadVariable */
-    reg_0.baud_rate_prescaler = (timing->brp / 2) - 1;
+    CAN.bus_timing_0_reg.brp = (timing->brp / 2) - 1;
     /* cppcheck-suppress unreadVariable */
-    reg_0.sync_jump_width = timing->sjw - 1;
+    CAN.bus_timing_0_reg.sjw = timing->sjw - 1;
     /* cppcheck-suppress unreadVariable */
-    reg_1.time_seg_1 = (timing->prop_seg + timing->phase_seg1) - 1;
+    CAN.bus_timing_1_reg.tseg1 = (timing->prop_seg + timing->phase_seg1) - 1;
     /* cppcheck-suppress unreadVariable */
-    reg_1.time_seg_2 = timing->phase_seg2 - 1;
+    CAN.bus_timing_1_reg.tseg2 = timing->phase_seg2 - 1;
     /* cppcheck-suppress unreadVariable */
-    reg_1.sampling = 0;
+    CAN.bus_timing_1_reg.sam = 0;
 
-    _esp_can_set_reset_mode();
-    CAN.bus_timing_0_reg.val = reg_0.val;
-    CAN.bus_timing_1_reg.val = reg_1.val;
     _esp_can_set_operating_mode();
 }
 

@@ -381,7 +381,7 @@ RIOT-OS uses the ESP-IDF, the official SDK from Espressif, as part of the
 build. It is downloaded as a package at build-time and there is no need to
 install it separately.
 
-### Installation of `esptool.py` (ESP flash programmer tool) {#esp32_installation_of_esptool}
+### Installation of esptool.py (ESP flash programmer tool) {#esp32_installation_of_esptool}
 
 The RIOT port does not work with the `esptool.py` ESP flasher program
 available on [GitHub](https://github.com/espressif/esptool) or

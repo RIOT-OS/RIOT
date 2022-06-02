@@ -82,29 +82,37 @@ struct _pwm_hw_t {
     const gpio_t* gpios;        /* GPIOs used as channel outputs */
 };
 
+#ifdef PWM0_GPIOS
+static const gpio_t _pwm_channel_gpios_0[] = PWM0_GPIOS;
+#endif
+
+#ifdef PWM1_GPIOS
+static const gpio_t _pwm_channel_gpios_1[] = PWM1_GPIOS;
+#endif
+
 /* static configuration of PWM devices */
 static const struct _pwm_hw_t _pwm_hw[] =
 {
-    #ifdef PWM0_GPIOS
+#ifdef PWM0_GPIOS
     {
         .regs = &MCPWM0,
         .mod = PERIPH_PWM0_MODULE,
         .int_src = ETS_PWM0_INTR_SOURCE,
         .signal_group = PWM0_OUT0A_IDX,
-        .gpio_num = ARRAY_SIZE(pwm0_channels),
-        .gpios = pwm0_channels,
+        .gpio_num = ARRAY_SIZE(_pwm_channel_gpios_0),
+        .gpios = _pwm_channel_gpios_0,
     },
-    #endif
-    #ifdef PWM1_GPIOS
+#endif
+#ifdef PWM1_GPIOS
     {
         .regs = &MCPWM1,
         .mod = PERIPH_PWM1_MODULE,
         .int_src = ETS_PWM1_INTR_SOURCE,
         .signal_group = PWM1_OUT0A_IDX,
-        .gpio_num = ARRAY_SIZE(pwm1_channels),
-        .gpios = pwm1_channels,
+        .gpio_num = ARRAY_SIZE(_pwm_channel_gpios_1),
+        .gpios = _pwm_channel_gpios_1,
     },
-    #endif
+#endif
 };
 
 /* data structure dynamic channel configuration */
@@ -219,13 +227,13 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
                          break;
         case PWM_RIGHT:  cmp = value - 1;
                          break;
-        case PWM_CENTER: cmp = _pwm_hw[pwm].regs->timer[0].period.period - value;
+        case PWM_CENTER: cmp = _pwm_hw[pwm].regs->timer[0].timer_cfg0.timer_period - value;
                          break;
     }
-    _pwm_hw[pwm].regs->channel[op_idx].cmpr_value[op_out].cmpr_val = cmp;
+    _pwm_hw[pwm].regs->operators[op_idx].timestamp[op_out].gen = cmp;
 
     /* set actions for timing events (reset all first) */
-    _pwm_hw[pwm].regs->channel[op_idx].generator[op_out].val = 0;
+    _pwm_hw[pwm].regs->operators[op_idx].generator[op_out].val = 0;
 
     if (op_out == 0)
     {
@@ -233,18 +241,18 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
         switch (_pwm_dev[pwm].mode)
         {
             case PWM_LEFT:
-                _pwm_hw[pwm].regs->channel[op_idx].generator[op_out].utez = PWM_OP_ACTION_HIGH;
-                _pwm_hw[pwm].regs->channel[op_idx].generator[op_out].utea = PWM_OP_ACTION_LOW;
+                _pwm_hw[pwm].regs->operators[op_idx].generator[op_out].gen_utez = PWM_OP_ACTION_HIGH;
+                _pwm_hw[pwm].regs->operators[op_idx].generator[op_out].gen_utea = PWM_OP_ACTION_LOW;
                 break;
 
             case PWM_RIGHT:
-                _pwm_hw[pwm].regs->channel[op_idx].generator[op_out].dtea = PWM_OP_ACTION_HIGH;
-                _pwm_hw[pwm].regs->channel[op_idx].generator[op_out].dtep = PWM_OP_ACTION_LOW;
+                _pwm_hw[pwm].regs->operators[op_idx].generator[op_out].gen_dtea = PWM_OP_ACTION_HIGH;
+                _pwm_hw[pwm].regs->operators[op_idx].generator[op_out].gen_dtep = PWM_OP_ACTION_LOW;
                 break;
 
             case PWM_CENTER:
-                _pwm_hw[pwm].regs->channel[op_idx].generator[op_out].utea = PWM_OP_ACTION_HIGH;
-                _pwm_hw[pwm].regs->channel[op_idx].generator[op_out].dtea = PWM_OP_ACTION_LOW;
+                _pwm_hw[pwm].regs->operators[op_idx].generator[op_out].gen_utea = PWM_OP_ACTION_HIGH;
+                _pwm_hw[pwm].regs->operators[op_idx].generator[op_out].gen_dtea = PWM_OP_ACTION_LOW;
                 break;
         }
     }
@@ -253,18 +261,18 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
         switch (_pwm_dev[pwm].mode)
         {
             case PWM_LEFT:
-                _pwm_hw[pwm].regs->channel[op_idx].generator[op_out].utez = PWM_OP_ACTION_HIGH;
-                _pwm_hw[pwm].regs->channel[op_idx].generator[op_out].uteb = PWM_OP_ACTION_LOW;
+                _pwm_hw[pwm].regs->operators[op_idx].generator[op_out].gen_utez = PWM_OP_ACTION_HIGH;
+                _pwm_hw[pwm].regs->operators[op_idx].generator[op_out].gen_uteb = PWM_OP_ACTION_LOW;
                 break;
 
             case PWM_RIGHT:
-                _pwm_hw[pwm].regs->channel[op_idx].generator[op_out].dteb = PWM_OP_ACTION_HIGH;
-                _pwm_hw[pwm].regs->channel[op_idx].generator[op_out].dtep = PWM_OP_ACTION_LOW;
+                _pwm_hw[pwm].regs->operators[op_idx].generator[op_out].gen_dteb = PWM_OP_ACTION_HIGH;
+                _pwm_hw[pwm].regs->operators[op_idx].generator[op_out].gen_dtep = PWM_OP_ACTION_LOW;
                 break;
 
             case PWM_CENTER:
-                _pwm_hw[pwm].regs->channel[op_idx].generator[op_out].uteb = PWM_OP_ACTION_HIGH;
-                _pwm_hw[pwm].regs->channel[op_idx].generator[op_out].dteb = PWM_OP_ACTION_LOW;
+                _pwm_hw[pwm].regs->operators[op_idx].generator[op_out].gen_uteb = PWM_OP_ACTION_HIGH;
+                _pwm_hw[pwm].regs->operators[op_idx].generator[op_out].gen_dteb = PWM_OP_ACTION_LOW;
                 break;
         }
     }
@@ -297,15 +305,15 @@ static void _pwm_start(pwm_t pwm)
     switch (mode) {
         case PWM_LEFT:
             period = res;
-            _pwm_hw[pwm].regs->timer[0].mode.mode = PWM_TIMER_MOD_UP;
+            _pwm_hw[pwm].regs->timer[0].timer_cfg1.timer_mod = PWM_TIMER_MOD_UP;
             break;
         case PWM_RIGHT:
             period = res;
-            _pwm_hw[pwm].regs->timer[0].mode.mode = PWM_TIMER_MOD_DOWN;
+            _pwm_hw[pwm].regs->timer[0].timer_cfg1.timer_mod = PWM_TIMER_MOD_DOWN;
             break;
         case PWM_CENTER:
             period = res * 2;
-            _pwm_hw[pwm].regs->timer[0].mode.mode = PWM_TIMER_MOD_UP_DOWN;
+            _pwm_hw[pwm].regs->timer[0].timer_cfg1.timer_mod = PWM_TIMER_MOD_UP_DOWN;
             break;
     }
 
@@ -351,19 +359,19 @@ static void _pwm_start(pwm_t pwm)
            8 bit timer prescaler can scale down timer clock to 2,5 kHz */
         prescale = 250;
     }
-    _pwm_hw[pwm].regs->clk_cfg.prescale = prescale - 1;
+    _pwm_hw[pwm].regs->clk_cfg.clk_prescale = prescale - 1;
 
     /* set timing parameters (only timer0 is used) */
-    _pwm_hw[pwm].regs->timer[0].period.prescale = (PWM_CLK / prescale / cps) - 1;
-    _pwm_hw[pwm].regs->timer[0].period.period = (mode == PWM_CENTER) ? res : res - 1;
-    _pwm_hw[pwm].regs->timer[0].period.upmethod = PWM_TIMER_UPDATE_IMMIDIATE;
+    _pwm_hw[pwm].regs->timer[0].timer_cfg0.timer_prescale = (PWM_CLK / prescale / cps) - 1;
+    _pwm_hw[pwm].regs->timer[0].timer_cfg0.timer_period = (mode == PWM_CENTER) ? res : res - 1;
+    _pwm_hw[pwm].regs->timer[0].timer_cfg0.timer_period_upmethod = PWM_TIMER_UPDATE_IMMIDIATE;
 
     /* start the timer */
-    _pwm_hw[pwm].regs->timer[0].mode.start = PWM_TIMER_RUNS_ON;
+    _pwm_hw[pwm].regs->timer[0].timer_cfg1.timer_start = PWM_TIMER_RUNS_ON;
 
     /* set timer sync phase and enable timer sync input */
-    _pwm_hw[pwm].regs->timer[0].sync.timer_phase = 0;
-    _pwm_hw[pwm].regs->timer[0].sync.in_en = 1;
+    _pwm_hw[pwm].regs->timer[0].timer_sync.timer_phase = 0;
+    _pwm_hw[pwm].regs->timer[0].timer_sync.timer_synci_en = 1;
 
     /* set the duty for all channels to start them */
     for (int i = 0; i < _pwm_dev[pwm].chn_num; i++) {
@@ -373,14 +381,15 @@ static void _pwm_start(pwm_t pwm)
 
     /* sync all timers */
     for (unsigned i = 0; i < PWM_NUMOF; i++) {
-        _pwm_hw[i].regs->timer[0].sync.sync_sw = ~_pwm_hw[i].regs->timer[0].sync.sync_sw;
+        _pwm_hw[i].regs->timer[0].timer_sync.timer_sync_sw =
+            ~_pwm_hw[i].regs->timer[0].timer_sync.timer_sync_sw;
     }
 }
 
 static void _pwm_stop(pwm_t pwm)
 {
     /* disable the timer */
-    _pwm_hw[pwm].regs->timer[0].mode.mode = PWM_TIMER_MOD_FREEZE;
+    _pwm_hw[pwm].regs->timer[0].timer_cfg1.timer_mod = PWM_TIMER_MOD_FREEZE;
 }
 
 /* do some static initialization and configuration checks */

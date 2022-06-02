@@ -28,8 +28,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef XTENSA_API_H
 #define XTENSA_API_H
 
-#include <xtensa/hal.h>
+#include <stdbool.h>
 
+#include <xtensa/hal.h>
 #include "xtensa_context.h"
 
 #ifdef __cplusplus
@@ -119,6 +120,25 @@ static inline void xt_set_intclear(unsigned int arg)
 {
     xthal_set_intclear(arg);
 }
+
+/*
+-------------------------------------------------------------------------------
+  Call this function to get handler's argument for the specified interrupt.
+
+    n        - Interrupt number.
+-------------------------------------------------------------------------------
+*/
+extern void * xt_get_interrupt_handler_arg(int n);
+
+/*
+-------------------------------------------------------------------------------
+  Call this function to check if the specified interrupt is free to use.
+
+    intr       - Interrupt number.
+    cpu        - cpu number.
+-------------------------------------------------------------------------------
+*/
+bool xt_int_has_handler(int intr, int cpu);
 
 #ifdef __cplusplus
 }

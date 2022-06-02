@@ -42,7 +42,7 @@ ifneq (,$(filter esp_now,$(USEMODULE)))
   ARCHIVES += -lespnow
 endif
 
-ARCHIVES += -lgcc -lwpa -lcore -lnet80211 -lphy -lpp -lstdc++
+ARCHIVES += -lgcc -lhal -lwpa -lcore -lnet80211 -lphy -lpp -lstdc++
 
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld
 LINKFLAGS += -Tesp8266.rom.ld

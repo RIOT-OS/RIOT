@@ -24,27 +24,31 @@
 #include <string.h>
 #include <sys/reent.h>
 
-#include "macros/units.h"
+/* RIOT headers have to be included before ESP-IDF headers! */
 #include "board.h"
-#include "esp_attr.h"
+#include "esp/common_macros.h"
 #include "exceptions.h"
 #include "irq_arch.h"
 #include "kernel_defines.h"
 #include "kernel_init.h"
 #include "log.h"
+#include "periph_cpu.h"
 #include "stdio_base.h"
 #include "syscalls.h"
 #include "thread_arch.h"
+#include "tools.h"
 
 #include "periph/cpuid.h"
 #include "periph/init.h"
 #include "periph/rtc.h"
 
+/* ESP-IDF headers */
 #include "driver/periph_ctrl.h"
-#include "esp/common_macros.h"
-#include "esp32/esp_sleep.h"
-#include "heap/esp_heap_caps_init.h"
-#include "log/esp_log.h"
+#include "esp_attr.h"
+#include "esp_heap_caps_init.h"
+#include "esp_log.h"
+#include "esp_sleep.h"
+#include "esp_timer.h"
 #include "rom/cache.h"
 #include "rom/ets_sys.h"
 #include "rom/rtc.h"
@@ -60,14 +64,15 @@
 #include "xtensa/core-macros.h"
 #include "xtensa/xtensa_api.h"
 
-#include "periph_cpu.h"
-#include "tools.h"
+#if IS_USED(MODULE_ESP_SPI_RAM)
+#include "spiram.h"
+#endif
 
-#ifdef MODULE_PUF_SRAM
+#if IS_USED(MODULE_PUF_SRAM)
 #include "puf_sram.h"
 #endif
 
-#ifdef MODULE_STDIO_UART
+#if IS_USED(MODULE_STDIO_UART)
 #include "stdio_uart.h"
 #endif
 
@@ -77,7 +82,7 @@
 #define STRINGIFY(s) STRINGIFY2(s)
 #define STRINGIFY2(s) #s
 
-#if MODULE_ESP_LOG_STARTUP
+#if IS_USED(MODULE_ESP_LOG_STARTUP)
 #define LOG_STARTUP(format, ...) LOG_TAG_EARLY(LOG_INFO, D, __func__, format, ##__VA_ARGS__)
 #else
 #define LOG_STARTUP(format, ...)
@@ -93,23 +98,34 @@ extern uint8_t _rtc_bss_start;
 extern uint8_t _rtc_bss_end;
 extern uint8_t _rtc_bss_rtc_start;
 extern uint8_t _rtc_bss_rtc_end;
-extern uint8_t _init_start;
+extern uint8_t _iram_start;
 
 /* external esp function declarations */
 extern void esp_clk_init(void);
 extern void esp_perip_clk_init(void);
 extern void esp_reent_init(struct _reent* r);
-extern void esp_panic_wdt_stop (void);
-extern void spi_ram_init(void);
-extern void spi_ram_heap_init(void);
 extern uint32_t hwrand (void);
 extern void bootloader_clock_configure(void);
+
+/* external RTC function declarations since they are not declared in headers */
+/* components/esp_hw_support/include/esp_private/esp_clk.h */
+extern int esp_clk_apb_freq(void);
+extern int esp_clk_cpu_freq(void);
+extern int esp_clk_xtal_freq(void);
+extern uint32_t esp_clk_slowclk_cal_get(void);
+/* components/esp_hw_support/include/soc/esp32/rtc.h */
+extern uint64_t esp_rtc_get_time_us(void);
+
+/* components/esp_system/port/include/esp_clk_internal.h */
+extern void IRAM_ATTR rtc_clk_select_rtc_slow_clk(rtc_slow_freq_t slow_clk);
 
 /* forward declarations */
 static void system_init(void);
 static void intr_matrix_clear(void);
 
 typedef int32_t esp_err_t;
+
+uint64_t g_startup_time = 0;
 
 /**
  * @brief   CPU startup function
@@ -121,16 +137,16 @@ NORETURN void IRAM call_start_cpu0 (void)
 {
     register uint32_t *sp __asm__ ("a1"); (void)sp;
 
-    cpu_configure_region_protection();
+    esp_cpu_configure_region_protection();
 
     /* move exception vectors to IRAM */
-    asm volatile ("wsr %0, vecbase\n" ::"r"(&_init_start));
+    asm volatile ("wsr %0, vecbase\n" ::"r"(&_iram_start));
 
     RESET_REASON reset_reason = rtc_get_reset_reason(PRO_CPU_NUM);
 
     /* reset from panic handler by RWDT or TG0WDT */
     if (reset_reason == RTCWDT_SYS_RESET || reset_reason == TG0WDT_SYS_RESET) {
-        esp_panic_wdt_stop();
+        /* TODO esp_panic_wdt_stop was called here in former versions */
     }
 
 #ifdef MODULE_PUF_SRAM
@@ -157,7 +173,7 @@ NORETURN void IRAM call_start_cpu0 (void)
     uint8_t cpu_id[CPUID_LEN];
     cpuid_get ((void*)cpu_id);
 
-#ifdef MODULE_ESP_LOG_STARTUP
+#if IS_USED(MODULE_ESP_LOG_STARTUP)
     ets_printf("\n");
     LOG_STARTUP("Starting ESP32 with ID: ");
     for (unsigned i = 0; i < CPUID_LEN; i++) {
@@ -177,8 +193,8 @@ NORETURN void IRAM call_start_cpu0 (void)
     }
 
     LOG_STARTUP("Current clocks in Hz: CPU=%d APB=%d XTAL=%d SLOW=%d\n",
-                rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()),
-                rtc_clk_apb_freq_get(), MHZ(rtc_clk_xtal_freq_get()),
+                esp_clk_cpu_freq(),
+                esp_clk_apb_freq(), esp_clk_xtal_freq(),
                 rtc_clk_slow_freq_get_hz());
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
@@ -207,21 +223,18 @@ NORETURN void IRAM call_start_cpu0 (void)
     }
 
     /* init SPI RAM if enabled */
-    #if CONFIG_SPIRAM_SUPPORT && CONFIG_SPIRAM_BOOT_INIT
-    spi_ram_init();
-    #endif
+#if CONFIG_SPIRAM_SUPPORT && CONFIG_SPIRAM_BOOT_INIT
+    if (esp_spiram_init() != ESP_OK) {
+        LOG_STARTUP("Failed to initialize SPI RAM\n");
+        exit(1);
+    }
+#endif
 
     LOG_STARTUP("PRO cpu starts user code\n");
     system_init();
 
     UNREACHABLE();
 }
-
-#define RTC_FAST_FREQ_8M_MHZ    8000000
-#define rtc_select_slow_clk     select_rtc_slow_clk
-
-extern uint32_t esp_clk_slowclk_cal_get(void);
-extern void IRAM_ATTR rtc_select_slow_clk(rtc_slow_freq_t slow_clk);
 
 static void IRAM system_clk_init (void)
 {
@@ -238,13 +251,13 @@ static void IRAM system_clk_init (void)
     /* set FAST_CLK to internal low power clock of 8 MHz */
     rtc_clk_fast_freq_set(RTC_FAST_FREQ_8M);
 
-#if MODULE_ESP_RTC_TIMER_32K
+#if IS_USED(MODULE_ESP_RTC_TIMER_32K)
     /* set SLOW_CLK to external 32.768 kHz crystal clock */
-    rtc_select_slow_clk(RTC_SLOW_FREQ_32K_XTAL);
+    rtc_clk_select_rtc_slow_clk(RTC_SLOW_FREQ_32K_XTAL);
 #else
     /* set SLOW_CLK to internal low power clock of 150 kHz */
     rtc_clk_32k_enable(false);
-    rtc_select_slow_clk(RTC_SLOW_FREQ_RTC);
+    rtc_clk_select_rtc_slow_clk(RTC_SLOW_FREQ_RTC);
 #endif
 
     LOG_STARTUP("Switching system clocks can lead to some unreadable characters\n");
@@ -267,11 +280,14 @@ static void IRAM system_clk_init (void)
                                                set to 2 MHz and handled later */
     }
 
-    uint32_t freq_before = rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()) / MHZ(1);
+    uint32_t freq_before = esp_clk_cpu_freq() / MHZ;
 
     if (freq_before != CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ) {
+        rtc_cpu_freq_config_t clk_cfg;
+        rtc_clk_cpu_freq_to_config(freq, &clk_cfg);
+
         /* set configured CPU frequency */
-        rtc_clk_cpu_freq_set(freq);
+        rtc_clk_cpu_freq_set_config(&clk_cfg);
 
         /* Recalculate the ccount to make time calculation correct. */
         uint32_t freq_after = CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ;
@@ -294,6 +310,7 @@ static NORETURN void IRAM system_init (void)
 
     /* disable clocks of peripherals that are not needed at startup */
     esp_perip_clk_init();
+    g_startup_time = esp_rtc_get_time_us();
 
     /* set configured console UART baudrate */
     const int uart_clk_freq = rtc_clk_apb_freq_get();
@@ -328,15 +345,18 @@ static NORETURN void IRAM system_init (void)
     srand(hwrand());
 
     /* add SPI RAM to heap if enabled */
-    #if CONFIG_SPIRAM_SUPPORT && CONFIG_SPIRAM_BOOT_INIT
-    spi_ram_heap_init();
-    #endif
+#if CONFIG_SPIRAM_SUPPORT && CONFIG_SPIRAM_BOOT_INIT
+    esp_spiram_init_cache();
+    esp_spiram_add_to_heapalloc();
+#endif
 
     /* print some infos */
     LOG_STARTUP("Used clocks in Hz: CPU=%d APB=%d XTAL=%d FAST=%d SLOW=%d\n",
-                rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()),
-                rtc_clk_apb_freq_get(), MHZ(rtc_clk_xtal_freq_get()),
-                RTC_FAST_FREQ_8M_MHZ, rtc_clk_slow_freq_get_hz());
+                esp_clk_cpu_freq(),
+                esp_clk_apb_freq(), esp_clk_xtal_freq(),
+                rtc_clk_fast_freq_get() == RTC_FAST_FREQ_8M ? 8 * MHZ
+                                                            : esp_clk_xtal_freq()/4,
+                rtc_clk_slow_freq_get_hz());
     LOG_STARTUP("XTAL calibration value: %d\n", esp_clk_slowclk_cal_get());
     LOG_STARTUP("Heap free: %u bytes\n", get_free_heap_size());
     uart_tx_wait_idle(CONFIG_CONSOLE_UART_NUM);
@@ -352,7 +372,7 @@ static NORETURN void IRAM system_init (void)
     periph_init();
 
     /* print system time */
-#ifdef MODULE_PERIPH_RTC
+#if IS_USED(MODULE_PERIPH_RTC)
     struct tm _sys_time;
     rtc_get_time(&_sys_time);
     LOG_STARTUP("System time: %04d-%02d-%02d %02d:%02d:%02d\n",
@@ -361,15 +381,15 @@ static NORETURN void IRAM system_init (void)
 #endif
 
     /* print the board config */
-#ifdef MODULE_ESP_LOG_STARTUP
+#if IS_USED(MODULE_ESP_LOG_STARTUP)
     print_board_config();
 #endif
 
-    #if MODULE_MTD
+#if IS_USED(MODULE_MTD)
     /* init flash drive */
     extern void spi_flash_drive_init (void);
     spi_flash_drive_init();
-    #endif
+#endif
 
     /* initialize the board */
     extern void board_init(void);
@@ -385,8 +405,11 @@ static NORETURN void IRAM system_init (void)
     extern void esp_event_handler_init(void);
     esp_event_handler_init();
 
+    /* initialize ESP-IDF timer task */
+    esp_timer_init();
+
     /* starting RIOT */
-#ifdef MODULE_ESP_LOG_STARTUP
+#if IS_USED(MODULE_ESP_LOG_STARTUP)
     LOG_STARTUP("Starting RIOT kernel on PRO cpu\n");
     uart_tx_wait_idle(CONFIG_CONSOLE_UART_NUM);
 #else

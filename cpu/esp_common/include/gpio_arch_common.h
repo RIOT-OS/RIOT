@@ -20,6 +20,8 @@
 #ifndef GPIO_ARCH_COMMON_H
 #define GPIO_ARCH_COMMON_H
 
+#include "periph/gpio.h"
+
 #ifndef DOXYGEN
 
 #ifdef __cplusplus

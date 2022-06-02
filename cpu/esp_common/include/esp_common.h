@@ -30,8 +30,6 @@ extern "C" {
 #include "esp_common_log.h"
 #include "macros/xtstr.h"
 
-#define asm __asm__
-
 #if !defined(ICACHE_FLASH)
 #ifndef ICACHE_RAM_ATTR
 /** Places the code with this attribute in the IRAM. */
@@ -47,8 +45,10 @@ extern "C" {
 #define RTC_BSS_ATTR __attribute__((section(".rtc.bss")))
 #endif
 
+#ifndef MCU_ESP32
 #ifndef RTC_DATA_ATTR
 #define RTC_DATA_ATTR __attribute__((section(".rtc.data")))
+#endif
 #endif
 
 /** Print out a message that function is not yet implemented */

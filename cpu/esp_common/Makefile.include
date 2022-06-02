@@ -78,7 +78,7 @@ CFLAGS += $(if $(findstring qio,$(FLASH_MODE)),-DFLASH_MODE_QIO=1)
 CFLAGS += $(if $(findstring dio,$(FLASH_MODE)),-DFLASH_MODE_DIO=1)
 CFLAGS += $(if $(findstring dout,$(FLASH_MODE)),-DFLASH_MODE_DOUT=1)
 
-ARCHIVES += -lhal -lg -lc
+ARCHIVES += -lg -lc
 
 LINKFLAGS += $(CFLAGS_OPT) $(CFLAGS_DBG)
 #ifneq ($(CPU),esp8266)
@@ -132,8 +132,8 @@ $(ELFFILE).bin: $(ELFFILE)
 # Convert .elf and .csv to .bin files at build time, but make them available for
 # tests at flash time. These can't be added to FLASHDEPS because they depend on
 # on ELFFILE and would trigger a rebuild with "flash-only".
-BUILD_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin
-TEST_EXTRA_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin
+BUILD_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin $(BOOTLOADER_BIN)
+TEST_EXTRA_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin $(BOOTLOADER_BIN)
 
 # Default partition table with no OTA. Can be replaced with a custom partition
 # table setting PARTITION_TABLE_CSV.

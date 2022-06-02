@@ -47,13 +47,13 @@
 #include "cpu.h"
 #include "log.h"
 #include "mutex.h"
-#include "macros/units.h"
 #include "periph_conf.h"
 #include "periph/gpio.h"
 #include "periph/i2c.h"
 #include "thread_flags.h"
 
 #include "esp_common.h"
+#include "esp_attr.h"
 #include "gpio_arch.h"
 #include "driver/periph_ctrl.h"
 #include "irq_arch.h"
@@ -67,6 +67,9 @@
 #include "soc/soc.h"
 #include "syscalls.h"
 #include "xtensa/xtensa_api.h"
+
+#undef MHZ
+#include "macros/units.h"
 
 #if defined(I2C0_SPEED) || defined(I2C1_SPEED)
 

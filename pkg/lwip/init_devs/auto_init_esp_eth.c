@@ -17,7 +17,7 @@
  * @author  Erik Ekman <eekman@google.com>
  */
 
-#include "esp-eth/esp_eth_netdev.h"
+#include "esp_eth_netdev.h"
 
 #include "lwip_init_devs.h"
 

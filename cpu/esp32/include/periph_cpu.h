@@ -20,7 +20,7 @@
 #define PERIPH_CPU_H
 
 #include <stdint.h>
-#include "sdk_conf.h"
+#include "sdkconfig.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -27,6 +27,7 @@
 #include "ws281x_params.h"
 #include "ws281x_constants.h"
 #include "periph_cpu.h"
+#include "esp_private/esp_clk.h"
 #include "xtensa/core-macros.h"
 #include "soc/rtc.h"
 
@@ -45,11 +46,11 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
     const uint8_t *pos = buf;
     const uint8_t *end = pos + size;
 
-    // Cycles
+    /* Cycles */
     uint32_t total_cycles, one_on, one_off, zero_on, zero_off, on_wait, off_wait;
 
-    // Current frequency
-    rtc_cpu_freq_t freq = rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get());
+    /* Current frequency */
+    rtc_cpu_freq_t freq = esp_clk_cpu_freq();
 
     total_cycles = freq / (NS_PER_SEC / WS281X_T_DATA_NS);
     one_on = freq / (NS_PER_SEC / WS281X_T_DATA_ONE_NS);

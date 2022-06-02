@@ -47,23 +47,27 @@
 typedef struct {
     uint32_t saved_int_state;
     uint32_t critical_nesting;
+    uint32_t notification_value;
+    bool notification_wait_for;
 } thread_arch_ext_t;
 
 volatile thread_arch_ext_t threads_arch_exts[KERNEL_PID_LAST + 1] = {};
 
-BaseType_t xTaskCreatePinnedToCore (TaskFunction_t pvTaskCode,
-                                    const char * const pcName,
-                                    const uint32_t usStackDepth,
-                                    void * const pvParameters,
-                                    UBaseType_t uxPriority,
-                                    TaskHandle_t * const pvCreatedTask,
-                                    const BaseType_t xCoreID)
+BaseType_t xTaskCreatePinnedToCore(TaskFunction_t pvTaskCode,
+                                   const char * const pcName,
+                                   const uint32_t usStackDepth,
+                                   void * const pvParameters,
+                                   UBaseType_t uxPriority,
+                                   TaskHandle_t * const pvCreatedTask,
+                                   const BaseType_t xCoreID)
 {
+    assert(xCoreID == 0 || xCoreID == tskNO_AFFINITY);
+
     /* FreeRTOS priority values have to be inverted */
     uxPriority = SCHED_PRIO_LEVELS - uxPriority - 1;
 
-    DEBUG("%s name=%s size=%d prio=%d pvCreatedTask=%p ",
-          __func__, pcName, usStackDepth, uxPriority, pvCreatedTask);
+    DEBUG("%s name=%s size=%d prio=%d pvCreatedTask=%p xCoreId=%d",
+          __func__, pcName, usStackDepth, uxPriority, pvCreatedTask, xCoreID);
 
     char* stack = malloc(usStackDepth + sizeof(thread_t));
 
@@ -89,23 +93,23 @@ BaseType_t xTaskCreatePinnedToCore (TaskFunction_t pvTaskCode,
     return (pid < 0) ? pdFALSE : pdTRUE;
 }
 
-BaseType_t xTaskCreate (TaskFunction_t pvTaskCode,
-                        const char * const pcName,
-                        const uint32_t usStackDepth,
-                        void * const pvParameters,
-                        UBaseType_t uxPriority,
-                        TaskHandle_t * const pvCreatedTask)
+BaseType_t xTaskCreate(TaskFunction_t pvTaskCode,
+                       const char * const pcName,
+                       const uint32_t usStackDepth,
+                       void * const pvParameters,
+                       UBaseType_t uxPriority,
+                       TaskHandle_t * const pvCreatedTask)
 {
-    return xTaskCreatePinnedToCore (pvTaskCode,
-                                    pcName,
-                                    usStackDepth,
-                                    pvParameters,
-                                    uxPriority,
-                                    pvCreatedTask,
-                                    PRO_CPU_NUM);
+    return xTaskCreatePinnedToCore(pvTaskCode,
+                                   pcName,
+                                   usStackDepth,
+                                   pvParameters,
+                                   uxPriority,
+                                   pvCreatedTask,
+                                   PRO_CPU_NUM);
 }
 
-void vTaskDelete (TaskHandle_t xTaskToDelete)
+void vTaskDelete(TaskHandle_t xTaskToDelete)
 {
     extern volatile thread_t *sched_active_thread;
     DEBUG("%s pid=%d task=%p\n", __func__, thread_getpid(), xTaskToDelete);
@@ -125,6 +129,36 @@ void vTaskDelete (TaskHandle_t xTaskToDelete)
     sched_run();
 }
 
+void vTaskSuspend(TaskHandle_t xTaskToSuspend)
+{
+    extern volatile thread_t *sched_active_thread;
+    DEBUG("%s pid=%d task=%p\n", __func__, thread_getpid(), xTaskToSuspend);
+
+    uint32_t pid = (xTaskToSuspend == NULL) ? (uint32_t)thread_getpid()
+                                            : (uint32_t)xTaskToSuspend;
+
+    assert(pid <= KERNEL_PID_LAST);
+
+    /* set status to sleeping to suspend it */
+    thread_t* thread = (thread_t*)sched_threads[pid];
+    sched_set_status(thread, STATUS_SLEEPING);
+
+    /* trigger rescheduling */
+    sched_active_thread = NULL;
+    /* determine the new running task */
+    sched_run();
+}
+
+void vTaskResume(TaskHandle_t xTaskToResume)
+{
+    extern volatile thread_t *sched_active_thread;
+    DEBUG("%s pid=%d task=%p\n", __func__, thread_getpid(), xTaskToResume);
+
+    uint32_t pid = (uint32_t)xTaskToResume;
+    assert(pid <= KERNEL_PID_LAST);
+    thread_wakeup (pid);
+}
+
 TaskHandle_t xTaskGetCurrentTaskHandle(void)
 {
     DEBUG("%s pid=%d\n", __func__, thread_getpid());
@@ -136,9 +170,9 @@ TaskHandle_t xTaskGetCurrentTaskHandle(void)
 void vTaskDelay( const TickType_t xTicksToDelay )
 {
     DEBUG("%s xTicksToDelay=%d\n", __func__, xTicksToDelay);
-#if defined(MODULE_ESP_WIFI_ANY)
-     uint64_t ms = xTicksToDelay * MS_PER_SEC / xPortGetTickRateHz();
-     ztimer_sleep(ZTIMER_MSEC, ms);
+#if defined(MODULE_ESP_WIFI_ANY) || defined(MODULE_ESP_ETH)
+    uint64_t ms = xTicksToDelay * MS_PER_SEC / xPortGetTickRateHz();
+    ztimer_sleep(ZTIMER_MSEC, ms);
 #endif
 }
 
@@ -233,6 +267,90 @@ TickType_t prvGetExpectedIdleTime(void)
      * we simply return 0.
      */
     return 0;
+}
+
+BaseType_t xTaskNotifyGive(TaskHandle_t xTaskToNotify)
+{
+    DEBUG("%s pid=%d task=%p\n", __func__, thread_getpid(), xTaskToNotify);
+    vTaskNotifyGiveFromISR(xTaskToNotify, NULL);
+    return pdPASS;
+}
+
+void vTaskNotifyGiveFromISR(TaskHandle_t xTaskToNotify,
+                            BaseType_t *pxHigherPriorityTaskWoken)
+{
+    DEBUG("%s pid=%d task=%p\n", __func__, thread_getpid(), xTaskToNotify);
+
+    uint32_t pid = (uint32_t)xTaskToNotify;
+
+    assert(pid <= KERNEL_PID_LAST);
+
+    vTaskEnterCritical(0);
+
+    threads_arch_exts[pid].notification_value++;
+
+    if (threads_arch_exts[pid].notification_wait_for) {
+        /* if the task is waiting for notification, set its status to pending */
+        thread_t* thread = (thread_t*)sched_threads[pid];
+        sched_set_status(thread, STATUS_PENDING);
+
+        if (thread->priority < sched_threads[thread_getpid()]->priority) {
+            /* a context switch is needed */
+            if (pxHigherPriorityTaskWoken) {
+                *pxHigherPriorityTaskWoken = pdTRUE;
+            }
+
+            vTaskExitCritical(0);
+            /* sets only the sched_context_switch_request in ISRs */
+            thread_yield_higher();
+            return;
+        }
+    }
+    vTaskExitCritical(0);
+}
+
+uint32_t ulTaskNotifyTake(BaseType_t xClearCountOnExit,
+                          TickType_t xTicksToWait)
+{
+    DEBUG("%s pid=%d\n", __func__, thread_getpid());
+
+    kernel_pid_t pid = thread_getpid();
+
+    assert((pid >= 0) && (pid <= KERNEL_PID_LAST));
+
+    vTaskEnterCritical(0);
+
+    uint32_t prev_value = threads_arch_exts[pid].notification_value;
+
+    if (prev_value) {
+        /* notification was pending */
+        threads_arch_exts[pid].notification_value--;
+        vTaskExitCritical(0);
+    }
+    else if (xTicksToWait == 0 || irq_is_in()) {
+        /* if delaying is not allowed */
+        DEBUG("%s pid=%d delaying not allowed\n", __func__, thread_getpid());
+        assert(0);
+    }
+    else {
+        /* suspend the calling thread to wait for notification */
+        threads_arch_exts[pid].notification_wait_for = true;
+        thread_t *me = thread_get_active();
+        sched_set_status(me, STATUS_SLEEPING);
+
+        DEBUG("%s pid=%d suspend calling thread\n", __func__, thread_getpid());
+
+        vTaskExitCritical(0);
+        thread_yield_higher();
+
+        /* TODO timeout handling with xTicksToWait */
+        DEBUG("%s pid=%d continue calling thread\n", __func__, thread_getpid());
+    }
+    threads_arch_exts[pid].notification_wait_for = false;
+    if (xClearCountOnExit) {
+        threads_arch_exts[pid].notification_value = 0;
+    }
+    return prev_value;
 }
 
 #endif /* DOXYGEN */

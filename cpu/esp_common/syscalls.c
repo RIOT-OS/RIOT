@@ -56,23 +56,13 @@ int pthread_setcancelstate(int state, int *oldstate)
 }
 #endif /*  MODULE_PTHREAD */
 
-/*
- * TODO: When the lock functions in this section are enabled, an application
- * crashes when an ISR calls a `newlib` function that uses `_lock_acquire`
- * or `_log_acquire_recursive` to be thread-safe, for example, `puts` in
- * `tests/isr_yield_higher`. The reason is that the implementation of these
- * functions uses `mutex` and `rmutex` that do not work in the interrupt
- * context. Therefore, the lock functions are disabled for the moment, and
- * instead `newlib`'s dummy lock functions are used which do not guarantee
- * thread safety.
- */
-
 /**
  * @name Locking functions
  *
  * Following functions implement the lock mechanism for newlib.
  */
 
+#ifdef MCU_ESP8266
 /**
  * _malloc_rmtx is defined as static variable to avoid recursive calls of
  * malloc when _malloc_r tries to lock __malloc_lock_object the first
@@ -86,6 +76,7 @@ static rmutex_t _malloc_rmtx = RMUTEX_INIT;
  * the address of newlib's static variable __malloc_lock_object.
  */
 static _lock_t *__malloc_static_object = NULL;
+#endif
 
 void IRAM_ATTR _lock_init(_lock_t *lock)
 {
@@ -104,24 +95,12 @@ void IRAM_ATTR _lock_init_recursive(_lock_t *lock)
 {
     assert(lock != NULL);
 
-    /**
-     * Since we don't have direct access to newlib's static variable
-     * __malloc_lock_object, we have to rely on the fact that function
-     * _lock_aqcuire_recursive, and thus function _lock_init_recursive
-     * is called for the first time with newlib's static variable
-     * __malloc_lock_object as parameter. This is ensured by calling
-     * malloc in the function syscalls_init.
-     */
-    if (__malloc_static_object == NULL) {
-        *lock = (_lock_t)&_malloc_rmtx;
-        __malloc_static_object = lock;
-        return;
-    }
-
+#ifdef MCU_ESP8266
     /* _malloc_rmtx is static and has not to be allocated */
     if (lock == __malloc_static_object) {
         return;
     }
+#endif
 
     rmutex_t* rmtx = malloc(sizeof(rmutex_t));
 
@@ -135,7 +114,9 @@ void IRAM_ATTR _lock_init_recursive(_lock_t *lock)
 void IRAM_ATTR _lock_close(_lock_t *lock)
 {
     assert(lock != NULL);
+#ifdef MCU_ESP8266
     assert(lock != __malloc_static_object);
+#endif
 
     free((void*)*lock);
     *lock = 0;
@@ -144,7 +125,9 @@ void IRAM_ATTR _lock_close(_lock_t *lock)
 void IRAM_ATTR _lock_close_recursive(_lock_t *lock)
 {
     assert(lock != NULL);
+#ifdef MCU_ESP8266
     assert(lock != __malloc_static_object);
+#endif
 
     free((void*)*lock);
     *lock = 0;
@@ -152,16 +135,16 @@ void IRAM_ATTR _lock_close_recursive(_lock_t *lock)
 
 void IRAM_ATTR _lock_acquire(_lock_t *lock)
 {
+    /* if scheduler is not running, we have not to lock the mutex */
+    if (thread_getpid() == KERNEL_PID_UNDEF) {
+        return;
+    }
+
     assert(lock != NULL);
 
     /* if the lock data structure is still not allocated, initialize it first */
     if (*lock == 0) {
         _lock_init(lock);
-    }
-
-    /* if scheduler is not running, we have not to lock the mutex */
-    if (thread_get_active() == NULL) {
-        return;
     }
 
     assert(!irq_is_in());
@@ -170,16 +153,32 @@ void IRAM_ATTR _lock_acquire(_lock_t *lock)
 
 void IRAM_ATTR _lock_acquire_recursive(_lock_t *lock)
 {
+#ifdef MCU_ESP8266
+    /**
+     * Since we don't have direct access to newlib's static variable
+     * __malloc_lock_object, we have to rely on the fact that function
+     * _lock_aqcuire_recursive, and thus function _lock_init_recursive
+     * is called for the first time with newlib's static variable
+     * __malloc_lock_object as parameter. This is ensured by calling
+     * malloc in the function syscalls_init.
+     */
+    if (__malloc_static_object == NULL) {
+        *lock = (_lock_t)&_malloc_rmtx;
+        __malloc_static_object = lock;
+        return;
+    }
+#endif
+
+    /* if scheduler is not running, we have not to lock the mutex */
+    if (thread_getpid() == KERNEL_PID_UNDEF) {
+        return;
+    }
+
     assert(lock != NULL);
 
     /* if the lock data structure is still not allocated, initialize it first */
     if (*lock == 0) {
         _lock_init_recursive(lock);
-    }
-
-    /* if scheduler is not running, we have not to lock the rmutex */
-    if (thread_get_active() == NULL) {
-        return;
     }
 
     assert(!irq_is_in());
@@ -188,16 +187,16 @@ void IRAM_ATTR _lock_acquire_recursive(_lock_t *lock)
 
 int IRAM_ATTR _lock_try_acquire(_lock_t *lock)
 {
+    /* if scheduler is not running, we have not to lock the mutex */
+    if (thread_getpid() == KERNEL_PID_UNDEF) {
+        return 0;
+    }
+
     assert(lock != NULL);
 
     /* if the lock data structure is still not allocated, initialize it first */
     if (*lock == 0) {
         _lock_init(lock);
-    }
-
-    /* if scheduler is not running, we have not to lock the mutex */
-    if (thread_get_active() == NULL) {
-        return 0;
     }
 
     if (irq_is_in()) {
@@ -209,16 +208,16 @@ int IRAM_ATTR _lock_try_acquire(_lock_t *lock)
 
 int IRAM_ATTR _lock_try_acquire_recursive(_lock_t *lock)
 {
+    /* if scheduler is not running, we have not to lock the mutex */
+    if (thread_getpid() == KERNEL_PID_UNDEF) {
+        return 0;
+    }
+
     assert(lock != NULL);
 
     /* if the lock data structure is still not allocated, initialize it first */
     if (*lock == 0) {
         _lock_init_recursive(lock);
-    }
-
-    /* if scheduler is not running, we have not to lock the rmutex */
-    if (thread_get_active() == NULL) {
-        return 0;
     }
 
     if (irq_is_in()) {
@@ -230,24 +229,24 @@ int IRAM_ATTR _lock_try_acquire_recursive(_lock_t *lock)
 
 void IRAM_ATTR _lock_release(_lock_t *lock)
 {
-    assert(lock != NULL && *lock != 0);
-
     /* if scheduler is not running, we have not to unlock the mutex */
-    if (thread_get_active() == NULL) {
+    if (thread_getpid() == KERNEL_PID_UNDEF) {
         return;
     }
+
+    assert(lock != NULL && *lock != 0);
 
     mutex_unlock((mutex_t*)*lock);
 }
 
 void IRAM_ATTR _lock_release_recursive(_lock_t *lock)
 {
-    assert(lock != NULL && *lock != 0);
-
-    /* if scheduler is not running, we have not to unlock the rmutex */
-    if (thread_get_active() == NULL) {
+    /* if scheduler is not running, we have not to unlock the mutex */
+    if (thread_getpid() == KERNEL_PID_UNDEF) {
         return;
     }
+
+    assert(lock != NULL && *lock != 0);
 
     rmutex_unlock((rmutex_t*)*lock);
 }
@@ -383,6 +382,19 @@ void* IRAM_ATTR __wrap__calloc_r(struct _reent *r, size_t nmemb, size_t size)
 
 /* for compatibility with ESP-IDF heap functions */
 
+#ifndef MCU_ESP8266
+void* heap_caps_malloc(size_t size, uint32_t caps, const char *file, size_t line)
+                       __attribute__((alias("_heap_caps_malloc")));
+void* heap_caps_calloc(size_t n, size_t size, uint32_t caps, const char *file, size_t line)
+                       __attribute__((alias("_heap_caps_calloc")));
+void* heap_caps_realloc(void *ptr, size_t size, uint32_t caps, const char *file, size_t line)
+                        __attribute__((alias("_heap_caps_realloc")));
+void *heap_caps_zalloc(size_t size, uint32_t caps, const char *file, size_t line)
+                       __attribute__((alias("_heap_caps_zalloc")));
+void heap_caps_free(void *ptr, const char *file, size_t line)
+                    __attribute__((alias("_heap_caps_free")));
+#endif
+
 void* _heap_caps_malloc(size_t size, uint32_t caps, const char *file, size_t line)
 {
     (void)caps;
@@ -451,12 +463,18 @@ unsigned int IRAM_ATTR get_free_heap_size(void)
 
 /* alias for compatibility with espressif/wifi_libs */
 uint32_t esp_get_free_heap_size( void ) __attribute__((alias("get_free_heap_size")));
+uint32_t esp_get_free_internal_heap_size( void ) __attribute__((alias("get_free_heap_size")));
 
 #endif /* MODULE_ESP_IDF_HEAP */
 
 /**
  * @name Other system functions
  */
+
+int _rename_r(struct _reent *r, const char *from, const char *to)
+{
+    return 0;
+}
 
 struct _reent* __getreent(void) {
     return _GLOBAL_REENT;
