@@ -324,7 +324,7 @@ class RIOTApplication:
             if self.testcase:
                 self.testcase.stderr += err.output + "\n"
             self.logger.warning(
-                "Got an error during clean-intermediates," " ignore: %r", err
+                "Got an error during clean-intermediates, ignore: %r", err
             )
 
     def run_compilation_and_test(self, **test_kwargs):
