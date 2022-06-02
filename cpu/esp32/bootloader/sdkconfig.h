@@ -39,6 +39,8 @@
 #error "ESP32x family implementation missing"
 #endif
 
+#include "sdkconfig_default_common.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
