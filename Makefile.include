@@ -425,7 +425,7 @@ endif
 
 # mandatory includes!
 include $(RIOTMAKE)/pseudomodules.inc.mk
-include $(RIOTMAKE)/defaultmodules.inc.mk
+include $(RIOTMAKE)/defaultmodules_regular.inc.mk
 
 # Include Kconfig functionalities
 include $(RIOTMAKE)/kconfig.mk
