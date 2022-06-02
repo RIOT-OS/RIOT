@@ -816,9 +816,19 @@ static inline char *ipv6_addr_split_iface(char *addr_str)
 /**
  * @brief Print IPv6 address to stdout
  *
- * @param[in]   addr  Pointer to ipv6_addr_t to print
+ * @param[in]   addr    Pointer to ipv6_addr_t to print
  */
 void ipv6_addr_print(const ipv6_addr_t *addr);
+
+/**
+ * @brief Print IPv6 addresses to stdout
+ *
+ * @param[in]   addrs       Array of addresses to print
+ * @param[in]   num         Number of elements in @p addrs
+ * @param[in]   separator   Separator to print between addresses
+ */
+void ipv6_addrs_print(const ipv6_addr_t *addrs, size_t num,
+                      const char *separator);
 
 #ifdef __cplusplus
 }
