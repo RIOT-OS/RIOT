@@ -35,6 +35,7 @@ dwm1001
 esp32-ci
 esp32-heltec-lora32-v2
 esp32-olimex-evb
+esp32c3-devkit
 esp8266-ci
 esp8266-esp-12x
 hamilton
