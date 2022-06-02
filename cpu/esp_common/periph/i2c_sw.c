@@ -59,8 +59,8 @@
 #define I2C_CLOCK_STRETCH 200
 
 /* gpio access macros */
-#define GPIO_SET(l,h,b) if (b < 32) GPIO.l =  BIT(b); else GPIO.h.val =  BIT(b-32)
-#define GPIO_GET(l,h,b) ((b < 32) ? GPIO.l & BIT(b) : GPIO.h.val & BIT(b-32))
+#define GPIO_SET(lo, hi, b) if (b < 32) { GPIO.lo =  BIT(b); } else { GPIO.hi.val =  BIT(b-32); }
+#define GPIO_GET(lo, hi, b) ((b < 32) ? GPIO.lo & BIT(b) : GPIO.hi.val & BIT(b-32))
 
 #else /* MCU_ESP8266 */
 
@@ -86,8 +86,7 @@ extern bool system_update_cpu_freq(uint8_t freq);
 
 #endif /* MCU_ESP8266 */
 
-typedef struct
-{
+typedef struct {
     i2c_speed_t speed;
     i2c_t dev;
 

@@ -65,7 +65,7 @@ extern "C" {
   * @param  cond    the condition
   * @param  err     the return value in the case the condition is not fulfilled.
   */
-#define CHECK_PARAM_RET(cond,err)   if (!(cond)) \
+#define CHECK_PARAM_RET(cond, err)  if (!(cond)) \
                                     { \
                                         DEBUG("%s parameter condition (" #cond ") " \
                                               "not fulfilled\n", __func__); \
@@ -88,19 +88,19 @@ extern "C" {
 
 #else /* ENABLE_DEBUG */
 
-#define CHECK_PARAM_RET(cond,err) if (!(cond)) return err;
-#define CHECK_PARAM(cond)         if (!(cond)) return;
+#define CHECK_PARAM_RET(cond, err) if (!(cond)) { return err; }
+#define CHECK_PARAM(cond)          if (!(cond)) { return; }
 
 #endif /* ENABLE_DEBUG */
 
 /** gives the minimum of a and b */
 #ifndef MIN
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
 /** gives the maximum of a and b */
 #ifndef MAX
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
 /**

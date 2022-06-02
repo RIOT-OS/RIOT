@@ -33,11 +33,11 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#define MHZ 1000000
-
 #ifdef MCU_ESP8266
 #include "rom/ets_sys.h"
+#endif
 
+#ifndef PRO_CPU_NUM
 #define PRO_CPU_NUM (0)
 #endif
 
@@ -371,7 +371,7 @@ BaseType_t xTaskNotifyWait(uint32_t ulBitsToClearOnEntry,
 {
     kernel_pid_t pid = thread_getpid();
 
-    DEBUG("%s task=%d entry=%08"PRIx32" exit=%08"PRIx32" wait=%u\n", __func__,
+    DEBUG("%s task=%d entry=%08"PRIx32" exit=%08"PRIx32" wait=%"PRIu32"\n", __func__,
           pid, ulBitsToClearOnEntry, ulBitsToClearOnExit, xTicksToWait);
 
     assert(pid_is_valid(pid));

@@ -323,10 +323,10 @@ void spi_print_config(void)
 {
     for (unsigned bus = 0; bus < SPI_NUMOF; bus++) {
         printf("\tSPI_DEV(%u)\t%s ", bus, _spi_names[spi_config[bus].ctrl]);
-        printf("sck=%d " , spi_config[bus].sck);
+        printf("sck=%d ", spi_config[bus].sck);
         printf("miso=%d ", spi_config[bus].miso);
         printf("mosi=%d ", spi_config[bus].mosi);
-        printf("cs=%d\n" , spi_config[bus].cs);
+        printf("cs=%d\n", spi_config[bus].cs);
     }
 }
 
