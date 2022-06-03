@@ -52,16 +52,6 @@ def filters_match(filters, tty):
     return True
 
 
-def shorten(string, length):
-    """
-    Shorten the given string to the given length, if needed
-    """
-    if len(string) > length:
-        return string[:length - 3] + "..."
-
-    return string
-
-
 def parse_args(args):
     """
     Parse the given command line style arguments with argparse
