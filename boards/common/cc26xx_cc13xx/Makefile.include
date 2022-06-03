@@ -1,5 +1,9 @@
 # configure the flash tool
-PROGRAMMER ?= uniflash
+ifneq (,$(UNIFLASH_PATH))
+  PROGRAMMER ?= uniflash
+else
+  PROGRAMMER ?= openocd
+endif
 
 # uniflash and openocd programmers are supported
 PROGRAMMERS_SUPPORTED += openocd uniflash
