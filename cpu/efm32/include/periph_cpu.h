@@ -368,8 +368,17 @@ typedef struct {
 /**
  * @brief   Define timer configuration values
  *
- * @note    The two timers must be adjacent to each other (e.g. TIMER0 and
- *          TIMER1, or TIMER2 and TIMER3, etc.).
+ * Timers based on LETIMER can only be set to 32768Hz, and never have a
+ * prescale timer. Timers with a prescale timer are rather flexible in their
+ * frequency selection. Timers without a prescale timer are limited to their
+ * internal prescaler, and can only be configured to frequencies of `HFCORECLK
+ * * 2**(-n)` for `n` from 0 to 10 inclusive. (Typical values of `HFCORECLK`
+ * are 48 MHz if an external oscillator is used, or 14 MHz by default using the
+ * internal oscillator).
+ *
+ * @note    The main timer must be the next timer after the prescaler (e.g.
+ *          TIMER0 as prescaler and TIMER1 as timer, or TIMER2 as prescaler and
+ *          TIMER3 as timer, etc.).
  * @{
  */
 typedef struct {
@@ -378,7 +387,7 @@ typedef struct {
 } timer_dev_t;
 
 typedef struct {
-    timer_dev_t prescaler;  /**< the lower neighboring timer (not initialized for LETIMER) */
+    timer_dev_t prescaler;  /**< the lower neighboring timer (NULL/NULL when unused) */
     timer_dev_t timer;      /**< the higher numbered timer */
     IRQn_Type irq;          /**< number of the higher timer IRQ channel */
     uint8_t channel_numof;       /**< number of channels per timer */

@@ -89,6 +89,11 @@ static inline void _irq_enable(tim_t tim)
     NVIC_EnableIRQ(timer_config[tim].irq);
 }
 
+/**
+ * @ret a value <= TC_CTRLA_PRESCALER_DIV1024_Val on success
+ * @ret UINT8_MAX if the output frequency can not be derived from the input frequency
+ *
+ */
 static uint8_t _get_prescaler(uint32_t freq_out, uint32_t freq_in)
 {
     uint8_t scale = 0;
@@ -101,8 +106,9 @@ static uint8_t _get_prescaler(uint32_t freq_out, uint32_t freq_in)
         }
     }
 
-    /* fail if output frequency can't be derived from input frequency */
-    assert(freq_in == freq_out);
+    if (freq_in != freq_out) {
+        return UINT8_MAX;
+    }
 
     return scale;
 }

@@ -53,10 +53,10 @@ else ifneq (,$(filter $(BOARDS_TIMER_250kHz),$(BOARD)))
 else ifneq (,$(filter $(BOARDS_TIMER_32kHz),$(BOARD)))
   TIMER_SPEED ?= 32768
 else ifneq (,$(filter $(BOARDS_TIMER_SYSCLK),$(BOARD)))
-  TIMER_SPEED ?= coreclk\(\)
+  TIMER_SPEED ?= coreclk()
 endif
 
 TIMER_SPEED ?= 1000000
 
-CFLAGS += -DTIMER_SPEED=$(TIMER_SPEED)
+CFLAGS += -DTIMER_SPEED="$(shell echo "${TIMER_SPEED}" | sed "s/^[0-9]\+$$/UINT32_C(&)/")"
 include $(RIOTBASE)/Makefile.include
