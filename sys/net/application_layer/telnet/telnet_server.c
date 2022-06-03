@@ -37,6 +37,7 @@ static pipe_t _stdin_pipe;
 static sock_tcp_queue_t sock_queue;
 static sock_tcp_t socks[CONFIG_TELNET_TCP_QUEUE_SIZE];
 static sock_tcp_t *client;
+static bool _want_disconnect;
 
 static char telnet_stack[THREAD_STACKSIZE_DEFAULT];
 
@@ -206,6 +207,12 @@ static void *telnet_thread(void *arg)
             _acquire();
             res = sock_tcp_read(client, rx_buf, sizeof(rx_buf), SOCK_TCP_TIMEOUT_MS);
             _release();
+
+            if (_want_disconnect) {
+                _want_disconnect = false;
+                break;
+            }
+
             if (res == -ETIMEDOUT) {
                 continue;
             }
@@ -278,6 +285,13 @@ int telnet_server_read(void* buffer, size_t count)
         mutex_unlock(&connected_mutex);
     }
     return res;
+}
+
+void telnet_server_disconnect(void)
+{
+    if (connected) {
+        _want_disconnect = true;
+    }
 }
 
 int telnet_server_start(void)

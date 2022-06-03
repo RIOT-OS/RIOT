@@ -65,6 +65,14 @@ int telnet_server_write(const void* buffer, size_t len);
 int telnet_server_read(void* buffer, size_t count);
 
 /**
+ * @brief   Request to disconnect the current client
+ *
+ *          This only sets the disconnect request flag, so it's safe to call
+ *          this from interrupt context.
+ */
+void telnet_server_disconnect(void);
+
+/**
  * @brief   Callback function that gets called when a telnet client connects
  *          but before stdio is redirected.
  *
