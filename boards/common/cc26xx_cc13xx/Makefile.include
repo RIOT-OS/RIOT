@@ -4,5 +4,10 @@ PROGRAMMER ?= uniflash
 # uniflash and openocd programmers are supported
 PROGRAMMERS_SUPPORTED += openocd uniflash
 
+# If port selection via ttys.py is enabled by `MOST_RECENT_PORT=1`, filter
+# USB serials to only select the UART bridge of XDS110 debuggers, which is the
+# embedded debugger of these launchpad boards.
+TTY_BOARD_FILTER := --model XDS110 --iface-num 0
+
 OPENOCD_CONFIG ?= $(RIOTBOARD)/common/cc26xx_cc13xx/dist/openocd.cfg
 UNIFLASH_CONFIG ?= $(RIOTBOARD)/common/cc26xx_cc13xx/dist
