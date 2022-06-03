@@ -33,6 +33,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#ifdef MODULE_STDIO_TELNET
+#include "net/telnet.h"
+#endif
 #include "ztimer.h"
 
 #include "shell_lock.h"
@@ -115,8 +118,11 @@ static bool _login(char *line_buf, size_t buf_size)
 {
     _print_password_prompt();
 
-    if (readline(line_buf, buf_size) > 0) {
-        return _safe_strcmp(line_buf, CONFIG_SHELL_LOCK_PASSWORD);
+    while (1) {
+        memset(line_buf, 0, buf_size);
+        while (readline(line_buf, buf_size) > 0) {
+            return _safe_strcmp(line_buf, CONFIG_SHELL_LOCK_PASSWORD);
+        }
     }
 
     return false;
@@ -139,15 +145,28 @@ static void _login_barrier(char *line_buf, size_t buf_size)
             puts("Wrong password");
             ztimer_sleep(ZTIMER_MSEC, 1000);
         }
+#ifdef MODULE_STDIO_TELNET
+        telnet_server_disconnect();
+#endif
         ztimer_sleep(ZTIMER_MSEC, 7000);
     }
 }
+
+#ifdef MODULE_STDIO_TELNET
+void telnet_cb_disconneced(void)
+{
+    _shell_is_locked = true;
+}
+#endif
 
 #ifdef MODULE_SHELL_LOCK_AUTO_LOCKING
 static void _shell_auto_lock_ztimer_callback(void *arg)
 {
     (void) arg;
 
+#ifdef MODULE_STDIO_TELNET
+    telnet_server_disconnect();
+#endif
     _shell_is_locked = true;
 }
 
