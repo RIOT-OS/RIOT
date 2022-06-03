@@ -62,7 +62,7 @@ typedef struct {
  * Table for resolution mapping
  */
 _adc_esp_res_map_t _adc_esp_res_map[] =  {
-#if defined(MCU_ESP32)
+#if defined(CPU_FAM_ESP32)
     { .res = ADC_WIDTH_BIT_9,  .shift = 3 },    /* ADC_RES_6BIT  */
     { .res = ADC_WIDTH_BIT_9,  .shift = 1 },    /* ADC_RES_8BIT  */
     { .res = ADC_WIDTH_BIT_10, .shift = 0 },    /* ADC_RES_10BIT */
@@ -215,7 +215,7 @@ int adc_line_vref_to_gpio(adc_t line, gpio_t gpio)
 
     /* the GPIO for the output must be a channel of ADC2 */
     assert(_adc_hw[rtcio_out].adc_ctrl == ADC_UNIT_2);
-#if defined(MCU_ESP32) || defined(MCU_ESP32C3)
+#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32C3)
     /* for ESP32 and ESP32C3, given ADC line has to be a channel of ADC2  */
     assert(_adc_hw[rtcio_vref].adc_ctrl == ADC_UNIT_2);
 #endif

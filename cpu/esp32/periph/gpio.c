@@ -80,7 +80,7 @@ static bool _gpio_pin_pu[GPIO_PIN_NUMOF] = { };
 static bool _gpio_pin_pd[GPIO_PIN_NUMOF] = { };
 #endif
 
-#if defined(MCU_ESP32)
+#if defined(CPU_FAM_ESP32)
 
 #define GPIO_IN_GET(b)  (b < 32) ? GPIO.in & BIT(b) : GPIO.in1.val & BIT(b-32)
 #define GPIO_OUT_SET(b) if (b < 32) GPIO.out_w1ts = BIT(b); else GPIO.out1_w1ts.val = BIT(b-32)
@@ -88,7 +88,7 @@ static bool _gpio_pin_pd[GPIO_PIN_NUMOF] = { };
 #define GPIO_OUT_XOR(b) if (b < 32) GPIO.out ^=  BIT(b); else GPIO.out1.val ^=  BIT(b-32)
 #define GPIO_OUT_GET(b) (b < 32) ? (GPIO.out >> b) & 1 : (GPIO.out1.val >> (b-32)) & 1
 
-#elif defined(MCU_ESP32C3)
+#elif defined(CPU_FAM_ESP32C3)
 
 #define GPIO_IN_GET(b)  GPIO.in.val & BIT(b)
 #define GPIO_OUT_SET(b) GPIO.out_w1ts.val = BIT(b)

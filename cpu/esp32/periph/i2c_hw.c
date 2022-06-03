@@ -397,7 +397,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len, uint
     return _i2c_status_to_errno(dev);
 }
 
-#if defined(MCU_ESP32)
+#if defined(CPU_FAM_ESP32)
 #define I2C_NACK_INT_ENA_M  I2C_ACK_ERR_INT_ENA_M
 #endif
 

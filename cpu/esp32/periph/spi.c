@@ -52,6 +52,11 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+/* Ensure that the SPIn_* symbols define SPI_DEV(n) */
+#if !defined(SPI0_CTRL) && defined(SPI1_CTRL)
+#error "SPI_DEV(1) is used but SPI_DEV(0) is not defined"
+#endif
+
 /* SPI bus descriptor structure */
 struct _spi_bus_t {
     mutex_t lock;                    /* mutex for each SPI interface */
@@ -88,6 +93,8 @@ static struct _spi_bus_t _spi[] = {
 
 _Static_assert(SPI_NUMOF == ARRAY_SIZE(_spi),
                "Size of bus descriptor table doesn't match SPI_NUMOF");
+_Static_assert(SPI_NUMOF <= SPI_NUMOF_MAX,
+               "Number of defined SPI devices is greater than the number of supported devices");
 
 void IRAM_ATTR spi_init(spi_t bus)
 {
@@ -285,7 +292,7 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
     spi_ll_master_set_clock_by_reg(_spi[bus].periph->hw,
                                    &_spi[bus].timing.clock_reg);
 
-#if defined(MCU_ESP32C3)
+#if defined(CPU_FAM_ESP32C3)
     /*
      * If the SPI mode has been changed, the clock signal is only set to the
      * correct level at the beginning of the transfer on the ESP32C3. However,
@@ -301,7 +308,7 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
         spi_transfer_bytes(bus, GPIO_UNDEF, false, &temp, &temp, 1);
         _spi[bus].mode_last = mode;
     }
-#elif defined(MCU_ESP32)
+#elif defined(CPU_FAM_ESP32)
     /* This workaround isn't needed on ESP32 */
 #else
 #error Platform implementation is missing
@@ -319,9 +326,9 @@ void IRAM_ATTR spi_release(spi_t bus)
     mutex_unlock(&_spi[bus].lock);
 }
 
-#if defined(MCU_ESP32)
+#if defined(CPU_FAM_ESP32)
 static const char* _spi_names[] = { "CSPI/FSPI", "HSPI", "VSPI"  };
-#elif defined(MCU_ESP32C3)
+#elif defined(CPU_FAM_ESP32C3)
 static const char* _spi_names[] = { "SPI", "FSPI"  };
 #else
 #error Platform implementation required

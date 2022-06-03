@@ -214,7 +214,7 @@ static NORETURN void IRAM system_startup_cpu0(void)
 
 static NORETURN void IRAM system_init (void)
 {
-#if defined(MCU_ESP32)
+#if defined(CPU_FAM_ESP32)
     /* enable cached read from flash */
     Cache_Read_Enable(PRO_CPU_NUM);
 #endif

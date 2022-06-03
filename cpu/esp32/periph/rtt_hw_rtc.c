@@ -98,14 +98,14 @@ uint64_t _rtc_get_counter(void)
 {
     /* trigger timer register update */
     RTCCNTL.time_update.update = 1;
-#if defined(MCU_ESP32)
+#if defined(CPU_FAM_ESP32)
     /* wait until values in registers are valid */
     while (!RTCCNTL.time_update.valid) {
         ets_delay_us(1);
     }
     /* read the time from 48-bit counter and return */
     return (((uint64_t)RTCCNTL.time1.val) << 32) + RTCCNTL.time0;
-#elif defined(MCU_ESP32C3)
+#elif defined(CPU_FAM_ESP32C3)
     /* read the time from 48-bit counter and return */
     return (((uint64_t)RTCCNTL.time_high0.val) << 32) + RTCCNTL.time_low0;
 #else

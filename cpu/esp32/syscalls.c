@@ -207,9 +207,9 @@ static struct syscall_stub_table s_stub_table =
     ._link_r = (void*)&_no_sys_func,
     ._rename_r = (void*)&_no_sys_func,
 
-#if defined(MCU_ESP32) || \
-    defined(MCU_ESP32S2) || \
-    (defined(MCU_ESP32H2) && !defined(_RETARGETABLE_LOCKING))
+#if defined(CPU_FAM_ESP32) || \
+    defined(CPU_FAM_ESP32S2) || \
+    (defined(CPU_FAM_ESP32H2) && !defined(_RETARGETABLE_LOCKING))
     ._lock_init = &_lock_init,
     ._lock_init_recursive = &_lock_init_recursive,
     ._lock_close = &_lock_close,
@@ -255,10 +255,10 @@ void IRAM syscalls_init_arch(void)
     timer_hal_set_auto_reload(&sys_timer, false);
     timer_hal_set_counter_enable(&sys_timer, true);
 
-#if defined(MCU_ESP32)
+#if defined(CPU_FAM_ESP32)
     syscall_table_ptr_pro = &s_stub_table;
     syscall_table_ptr_app = &s_stub_table;
-#elif defined(MCU_ESP32S2)
+#elif defined(CPU_FAM_ESP32S2)
     syscall_table_ptr_pro = &s_stub_table;
 #else
     syscall_table_ptr = &s_stub_table;
@@ -323,7 +323,7 @@ void system_wdt_init(void)
     wdt_hal_write_protect_enable(&mwdt);
     wdt_hal_write_protect_enable(&rwdt);
 
-#if defined(MCU_ESP32)
+#if defined(CPU_FAM_ESP32)
     DEBUG("%s TIMERG0 wdtconfig0=%08x wdtconfig1=%08x wdtconfig2=%08x "
           "wdtconfig3=%08x wdtconfig4=%08x regclk=%08x\n", __func__,
           TIMERG0.wdt_config0.val, TIMERG0.wdt_config1.val,
