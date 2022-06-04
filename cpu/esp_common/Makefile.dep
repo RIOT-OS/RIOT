@@ -66,6 +66,11 @@ ifneq (,$(filter 4 5,$(LOG_LEVEL)))
   USEMODULE += esp_log_startup
 endif
 
+# default to using littlefs2 on the SPI flash
+ifneq (,$(filter vfs_default,$(USEMODULE)))
+  USEMODULE += littlefs2
+endif
+
 # each device has SPI flash memory, but it has to be enabled explicitly
 ifneq (,$(filter esp_spiffs,$(USEMODULE)))
   USEMODULE += spiffs
