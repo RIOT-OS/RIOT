@@ -14965,3 +14965,4 @@ pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMB
 pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_OWN_ADDR_TYPE \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
 pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_FILTER_POLICY \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
 pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_PARAMS \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
+cpu/esp32/include/periph_cpu_esp32\.h:[0-9]+: warning: Member GPIO[0-9]+ \(macro definition\) of file periph_cpu_esp32\.h is not documented.
