@@ -127,10 +127,6 @@
 #endif
 #endif
 
-/** PWM_DEV(1) is not used */
-#ifndef PWM1_GPIOS
-#define PWM1_GPIOS  { }
-#endif
 /** @} */
 
 /**

@@ -134,14 +134,9 @@ extern "C" {
 #else
 #error Configuration problem: Flash mode qio or qout is used, \
        GPIO9 and GPIO10 cannot be used as PWM channels as configured
-#define PWM0_GPIOS { }
 #endif
 #endif
 
-/** PWM_DEV(1) is not used */
-#ifndef PWM1_GPIOS
-#define PWM1_GPIOS { }
-#endif
 /** @} */
 
 /**

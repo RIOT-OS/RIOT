@@ -119,10 +119,6 @@
 #define PWM0_GPIOS { GPIO0, GPIO2 }
 #endif
 
-/** PWM_DEV(1) is not used */
-#ifndef PWM1_GPIOS
-#define PWM1_GPIOS  { }
-#endif
 /** @} */
 
 /**
