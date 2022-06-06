@@ -1,6 +1,6 @@
 PKG_NAME=minmea
 PKG_URL=https://github.com/kosma/minmea
-PKG_VERSION=ae4dd9442a9041345d5ef108f062e7e4ec6954f2
+PKG_VERSION=a0da280f6451c4ed20b711edb84dc3d258823e20
 PKG_LICENSE=WTFPL
 
 include $(RIOTBASE)/pkg/pkg.mk
