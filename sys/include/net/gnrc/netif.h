@@ -133,6 +133,7 @@ typedef struct {
 #if IS_USED(MODULE_GNRC_NETIF_BUS) || DOXYGEN
     msg_bus_t bus[GNRC_NETIF_BUS_NUMOF];    /**< Event Message Bus */
 #endif
+    msg_t msg_queue[GNRC_NETIF_MSG_QUEUE_SIZE]; /**< netif thread msg queue */
     /**
      * @brief   Flags for the interface
      *
