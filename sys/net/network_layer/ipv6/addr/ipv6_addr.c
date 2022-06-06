@@ -17,14 +17,11 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "net/ipv6/addr.h"
-
-#ifdef MODULE_FMT
-#include "fmt.h"
-#else
 #include <stdio.h>
-#endif
+
+#include "fmt.h"
+#include "kernel_defines.h"
+#include "net/ipv6/addr.h"
 
 const ipv6_addr_t ipv6_addr_unspecified = IPV6_ADDR_UNSPECIFIED;
 const ipv6_addr_t ipv6_addr_loopback = IPV6_ADDR_LOOPBACK;
@@ -147,11 +144,43 @@ void ipv6_addr_print(const ipv6_addr_t *addr)
     assert(addr);
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
     ipv6_addr_to_str(addr_str, addr, sizeof(addr_str));
-#ifdef MODULE_FMT
-    print_str(addr_str);
-#else
-    printf("%s", addr_str);
-#endif
+
+    if (IS_USED(MODULE_FMT)) {
+        print_str(addr_str);
+    }
+    else {
+        printf("%s", addr_str);
+    }
+}
+
+void ipv6_addrs_print(const ipv6_addr_t *addrs, size_t num,
+                      const char *separator)
+{
+    if (num == 0) {
+        return;
+    }
+
+    num--;
+    char buf[IPV6_ADDR_MAX_STR_LEN];
+    for (size_t idx = 0; idx < (size_t)num; idx++) {
+        ipv6_addr_to_str(buf, &addrs[idx], sizeof(buf));
+        if (IS_USED(MODULE_FMT)) {
+            print_str(buf);
+            print_str(separator);
+        }
+        else {
+            printf("%s%s", buf, separator);
+        }
+    }
+
+    ipv6_addr_to_str(buf, &addrs[num], sizeof(buf));
+    if (IS_USED(MODULE_FMT)) {
+        print_str(buf);
+        print_str(separator);
+    }
+    else {
+        printf("%s%s", buf, separator);
+    }
 }
 
 /**

@@ -15,9 +15,6 @@ USEMODULE += xtimer
 
 USEPKG += microcoap
 
-# include this for printing IP addresses
-USEMODULE += shell_commands
-
 # Use different settings when compiling for one of the following (low-memory)
 # boards
 LOW_MEMORY_BOARDS := nucleo-f334r8
