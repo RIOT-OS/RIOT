@@ -90,8 +90,8 @@ static void _read_req(void)
 {
 #ifdef RTC_READREQ_RREQ
     RTC->MODE0.READREQ.reg = RTC_READREQ_RREQ;
-    _wait_syncbusy();
 #endif
+    _wait_syncbusy();
 }
 #endif
 
@@ -644,7 +644,6 @@ void rtt_clear_overflow_cb(void)
 
 uint32_t rtt_get_counter(void)
 {
-    _wait_syncbusy();
     _read_req();
     return RTC->MODE0.COUNT.reg;
 }
