@@ -27,23 +27,10 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifndef NRF24L01P_NG_EXTRA_STACKSIZE
-/**
- * @brief   Additional stack size required by the driver
- *
- * With increasing of CONFIG_GNRC_NETIF_MSG_QUEUE_SIZE the required stack size
- * increases as well. A queue size of 8 messages works with default stack size,
- * so we increase the stack by `sizeof(msg_t)` for each additional element
- */
-#define NRF24L01P_NG_EXTRA_STACKSIZE  ((GNRC_NETIF_MSG_QUEUE_SIZE - 8) \
-                                      * sizeof(msg_t))
-#endif
-
 /**
  * @brief   Calculate the stack size for the MAC layer thread(s)
  */
 #define NRF24L01P_NG_MAC_STACKSIZE          (THREAD_STACKSIZE_DEFAULT + \
-                                            NRF24L01P_NG_EXTRA_STACKSIZE + \
                                             DEBUG_EXTRA_STACKSIZE)
 #ifndef NRF24L01P_NG_MAC_PRIO
 /**
