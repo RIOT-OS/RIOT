@@ -21,8 +21,7 @@
 #include <stdio.h>
 
 #include "net/ipv6/addr.h"
-#include "net/gnrc.h"
-#include "net/gnrc/netif.h"
+#include "net/netif.h"
 #include "net/telnet.h"
 #include "shell.h"
 #include "msg.h"
