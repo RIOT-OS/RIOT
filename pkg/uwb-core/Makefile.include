@@ -17,6 +17,8 @@ INCLUDES += -I$(PKGDIRBASE)/uwb-core/hw/drivers/uwb/include/ \
 PSEUDOMODULES += uwb-core_dpl
 PSEUDOMODULES += uwb-core_rng_trx_info
 
+PSEUDOMODULES += uwb-core_twr_sleep
+
 DIRS += $(RIOTPKG)/uwb-core/contrib \
         #
 

@@ -25,6 +25,7 @@
 #include "uwb_dw1000.h"
 #include "uwb_dw1000_params.h"
 
+#include "uwb_core/twr.h"
 #include "twr_ss/twr_ss.h"
 #include "twr_ss_ext/twr_ss_ext.h"
 #include "twr_ss_ack/twr_ss_ack.h"
@@ -44,7 +45,7 @@ void uwb_core_init(void)
     /* set preallocated buffers to avoid malloc/calloc */
     uwb_dw1000_set_buffs(&dev, _dw1000_tx_buffer, _dw1000_rx_buffer);
     /* setup dw1000 device */
-    uwb_dw1000_setup(&dev, (void *) &dw1000_params[0]);
+    uwb_dw1000_setup(&dev, (void *)&dw1000_params[0]);
     /* this will start a thread handling dw1000 device */
     uwb_dw1000_config_and_start(&dev);
     /* apply default configuration */
@@ -79,4 +80,8 @@ void uwb_core_init(void)
 #if IS_USED(MODULE_UWB_CORE_TWR_DS_EXT)
     twr_ds_ext_pkg_init();
 #endif
+    /* initiate twr helper module */
+    if (IS_USED(MODULE_UWB_CORE_TWR)) {
+        uwb_core_twr_init();
+    }
 }

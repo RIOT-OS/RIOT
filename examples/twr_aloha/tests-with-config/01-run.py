@@ -12,7 +12,12 @@ import unittest
 
 from riotctrl.ctrl import RIOTCtrl
 from riotctrl_shell.sys import Reboot
-from twr_shell import TwrCmd, TwrIfconfigParser
+from riotctrl_shell.twr import (
+    TWR_LISTEN_OFF_CMD_OUTPUT,
+    TWR_LISTEN_ON_CMD_OUTPUT,
+    TWR_REQUEST_CMD_OUTPUT,
+)
+from riotctrl_shell.twr import TwrCmd, TwrIfconfigParser
 
 
 class TwrShell(Reboot, TwrCmd):
@@ -75,11 +80,11 @@ class TestTWR(TestTWRBase):
         assert self.shell.channel() == "5"  # default channel is 5
 
     def test_listen(self):
-        assert "[twr]: start listening" in self.shell.twr_listen(on=True)
-        assert "[twr]: stop listening" in self.shell.twr_listen(on=False)
+        assert TWR_LISTEN_ON_CMD_OUTPUT in self.shell.twr_listen(on=True)
+        assert TWR_LISTEN_OFF_CMD_OUTPUT in self.shell.twr_listen(on=False)
 
     def test_req(self):
-        assert "[twr]: start ranging" in self.shell.twr_req()
+        assert TWR_REQUEST_CMD_OUTPUT in self.shell.twr_request()
 
 
 if __name__ == "__main__":

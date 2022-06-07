@@ -24,10 +24,28 @@ if PACKAGE_UWB-CORE
 config MODULE_AUTO_INIT_UWB-CORE
     bool "Auto-initialize the usb-core package"
     default y
+    select MODULE_AUTO_INIT_UWB
     depends on MODULE_AUTO_INIT
+
+config MODULE_UWB-CORE_INIT
+    bool "uwb-core initialization module"
+    default y
 
 config MODULE_UWB-CORE_CONTRIB
     bool
+
+config MODULE_UWB-CORE_TWR
+    bool "uwb-core two-way-ranging helper"
+    select MODULE_EVENT
+    select MODULE_EVENT_CALLBACK
+    select MODULE_EVENT_TIMEOUT_ZTIMER
+    select MODULE_EVENT_PERIODIC
+
+config MODULE_UWB-CORE_SHELL
+    bool "uwb-core two-way-ranging helper shell commands"
+    select MODULE_L2UTIL
+    select MODULE_TEST_UTILS_RESULT_OUTPUT
+    default y if MODULE_SHELL_COMMANDS
 
 config MODULE_UWB-CORE_DPL
     bool

@@ -1,9 +1,9 @@
 MODULE = uwb-core_contrib
 
-SRC = uwb_core.c
+SUBMODULES = 1
 
-ifneq (,$(filter auto_init_uwb-core,$(USEMODULE)))
-  SRC += uwb_core_init.c
-endif
+BASE_MODULE = uwb-core
+
+SRC = uwb_core.c
 
 include $(RIOTBASE)/Makefile.base
