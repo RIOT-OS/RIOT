@@ -78,7 +78,7 @@ Parallel fuzzing is supported through `AFL_FLAGS`, e.g.:
 	AFL_FLAGS="-M fuzzer01" make -C fuzzing/gnrc_tcp/ fuzz
 
 	# Start second AFL instance in a different terminal
-	AFL_FLAGS="-M fuzzer02" make -C fuzzing/gnrc_tcp/ fuzz
+	AFL_FLAGS="-S fuzzer02" make -C fuzzing/gnrc_tcp/ fuzz
 
 [sanitizers github]: https://github.com/google/sanitizers
 [afl homepage]: http://lcamtuf.coredump.cx/afl/
