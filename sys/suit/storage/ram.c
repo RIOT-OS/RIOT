@@ -24,10 +24,13 @@
 #include "fmt.h"
 #include "kernel_defines.h"
 #include "log.h"
+#include "xfa.h"
 
 #include "suit.h"
 #include "suit/storage.h"
 #include "suit/storage/ram.h"
+
+XFA_USE(suit_storage_t, suit_storage_reg);
 
 static inline suit_storage_ram_t *_get_ram(suit_storage_t *storage)
 {
@@ -227,3 +230,5 @@ suit_storage_ram_t suit_storage_ram = {
         .driver = &suit_storage_ram_driver,
     },
 };
+
+XFA(suit_storage_reg, 0) suit_storage_t* suit_storage_ram_ptr = &suit_storage_ram.storage;
