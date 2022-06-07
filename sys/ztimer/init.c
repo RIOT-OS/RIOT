@@ -49,6 +49,13 @@
 #include "ztimer/periph_rtc.h"
 #include "ztimer/config.h"
 
+/* both 'stdio_rtt' and 'stdio_semihosting' rely on ztimer for stdio output,
+   so not output is possible before 'ztimer' has been initiated, silence all
+   logs */
+#if IS_USED(MODULE_STDIO_RTT) || IS_USED(MODULE_STDIO_SEMIHOSTING)
+#undef LOG_LEVEL
+#define LOG_LEVEL   LOG_NONE
+#endif
 #include "log.h"
 
 #define WIDTH_TO_MAXVAL(width)  (UINT32_MAX >> (32 - width))
