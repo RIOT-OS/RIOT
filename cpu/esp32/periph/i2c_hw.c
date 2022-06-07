@@ -53,6 +53,11 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+/* Ensure that the I2Cn_* symbols define I2C_DEV(n) */
+#if !defined(I2C0_SPEED) && defined(I2C1_SPEED)
+#error "I2C_DEV(1) is used but I2C_DEV(0) is not defined"
+#endif
+
 typedef struct {
     i2c_speed_t clk_freq;   /* clock freuency in Hz according to bus speed */
     uint8_t cmd;            /* command index of a transfer*/
@@ -71,6 +76,11 @@ static i2c_hal_context_t _i2c_hw[] = {
     { .dev = I2C_LL_GET_HW(1) },
 #endif
 };
+
+_Static_assert(I2C_NUMOF == ARRAY_SIZE(_i2c_hw),
+               "Size of bus descriptor table doesn't match I2C_NUMOF");
+_Static_assert(I2C_NUMOF <= I2C_NUMOF_MAX,
+               "Number of defined I2C devices is greater than the number of supported devices");
 
 static _i2c_bus_t _i2c_bus[I2C_NUMOF] = {
 #if defined(I2C0_SPEED)

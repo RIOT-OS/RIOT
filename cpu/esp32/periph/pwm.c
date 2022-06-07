@@ -41,6 +41,15 @@
 
 #if defined(PWM0_GPIOS) || defined(PWM1_GPIOS) || defined(PWM2_GPIOS) || defined(PWM3_GPIOS)
 
+/* Ensure that the SPIn_* symbols define SPI_DEV(n) */
+#if defined(PWM1_GPIOS) && !defined(PWM0_GPIOS)
+#error "PWM1_GPIOS is used but PWM0_GPIOS is not defined"
+#elif defined(PWM2_GPIOS) && !defined(PWM1_GPIOS)
+#error "PWM2_GPIOS is used but PWM1_GPIOS is not defined"
+#elif defined(PWM3_GPIOS) && !defined(PWM2_GPIOS)
+#error "PWM3_GPIOS is used but PWM2_GPIOS is not defined"
+#endif
+
 #define SOC_LEDC_CLK_DIV_BIT_NUM        18
 #define SOC_LEDC_CLK_DIV_INT_BIT_NUM    10  /* integral part of CLK divider */
 #define SOC_LEDC_CLK_DIV_FRAC_BIT_NUM   8   /* fractional part of CLK divider */
