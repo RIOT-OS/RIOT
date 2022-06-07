@@ -38,6 +38,9 @@ int mtd_init(mtd_dev_t *mtd)
 
     if (mtd->driver->init) {
         res = mtd->driver->init(mtd);
+        if (res < 0) {
+            return res;
+        }
     }
 
     /* Drivers preceding the introduction of write_size need to set it. While
