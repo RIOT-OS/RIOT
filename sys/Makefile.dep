@@ -846,12 +846,17 @@ endif
 
 ifneq (,$(filter suit_transport_%, $(USEMODULE)))
   USEMODULE += suit_transport
+  USEMODULE += suit_transport_worker
 endif
 
 ifneq (,$(filter suit_transport_coap, $(USEMODULE)))
   USEMODULE += nanocoap_sock
   USEMODULE += ztimer_msec
   USEMODULE += sock_util
+endif
+
+ifneq (,$(filter suit_transport_vfs, $(USEMODULE)))
+  USEMODULE += vfs_util
 endif
 
 ifneq (,$(filter suit_storage_%, $(USEMODULE)))

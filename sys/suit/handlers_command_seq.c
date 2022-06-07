@@ -39,9 +39,19 @@
 #include "suit/transport/coap.h"
 #include "net/nanocoap_sock.h"
 #endif
+#ifdef MODULE_SUIT_TRANSPORT_VFS
+#include "suit/transport/vfs.h"
+#endif
 #include "suit/transport/mock.h"
 
+#if defined(MODULE_PROGRESS_BAR)
+#include "progress_bar.h"
+#endif
+
 #include "log.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 static int _get_component_size(suit_manifest_t *manifest,
                                suit_component_t *comp,
@@ -312,6 +322,74 @@ static int _start_storage(suit_manifest_t *manifest, suit_component_t *comp)
     return suit_storage_start(comp->storage_backend, manifest, img_size);
 }
 
+static inline void _print_download_progress(suit_manifest_t *manifest,
+                                            size_t offset, size_t len,
+                                            size_t image_size)
+{
+    (void)manifest;
+    (void)offset;
+    (void)len;
+    DEBUG("_suit_flashwrite(): writing %u bytes at pos %u\n", len, offset);
+#if defined(MODULE_PROGRESS_BAR)
+    if (image_size != 0) {
+        char _suffix[7] = { 0 };
+        uint8_t _progress = 100 * (offset + len) / image_size;
+        sprintf(_suffix, " %3d%%", _progress);
+        progress_bar_print("Fetching firmware ", _suffix, _progress);
+        if (_progress == 100) {
+            puts("");
+        }
+    }
+#else
+    (void) image_size;
+#endif
+}
+
+#if defined(MODULE_SUIT_TRANSPORT_COAP) || defined(MODULE_SUIT_TRANSPORT_VFS)
+static int _storage_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
+                           int more)
+{
+    suit_manifest_t *manifest = (suit_manifest_t *)arg;
+
+    uint32_t image_size;
+    nanocbor_value_t param_size;
+    size_t total = offset + len;
+    suit_component_t *comp = &manifest->components[manifest->component_current];
+    suit_param_ref_t *ref_size = &comp->param_size;
+
+    /* Grab the total image size from the manifest */
+    if ((suit_param_ref_to_cbor(manifest, ref_size, &param_size) == 0) ||
+            (nanocbor_get_uint32(&param_size, &image_size) < 0)) {
+        /* Early exit if the total image size can't be determined */
+        return -1;
+    }
+
+    if (image_size < offset + len) {
+        /* Extra newline at the start to compensate for the progress bar */
+        LOG_ERROR(
+            "\n_suit_coap(): Image beyond size, offset + len=%u, "
+            "image_size=%u\n", (unsigned)(total), (unsigned)image_size);
+        return -1;
+    }
+
+    if (!more && image_size != total) {
+        LOG_INFO("Incorrect size received, got %u, expected %u\n",
+                 (unsigned)total, (unsigned)image_size);
+        return -1;
+    }
+
+    _print_download_progress(manifest, offset, len, image_size);
+
+    int res = suit_storage_write(comp->storage_backend, manifest, buf, offset, len);
+    if (!more) {
+        LOG_INFO("Finalizing payload store\n");
+        /* Finalize the write if no more data available */
+        res = suit_storage_finish(comp->storage_backend, manifest);
+    }
+    return res;
+}
+#endif
+
 static int _dtv_fetch(suit_manifest_t *manifest, int key,
                       nanocbor_value_t *_it)
 {
@@ -343,6 +421,8 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
         LOG_DEBUG("URL parsing failed\n)");
         return err;
     }
+
+    assert(manifest->urlbuf && url_len < manifest->urlbuf_len);
     memcpy(manifest->urlbuf, url, url_len);
     manifest->urlbuf[url_len] = '\0';
 
@@ -360,13 +440,18 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
 #ifdef MODULE_SUIT_TRANSPORT_COAP
     else if (strncmp(manifest->urlbuf, "coap://", 7) == 0) {
         res = nanocoap_get_blockwise_url(manifest->urlbuf, CONFIG_SUIT_COAP_BLOCKSIZE,
-                                         suit_storage_helper,
+                                         _storage_helper,
                                          manifest);
     }
 #endif
 #ifdef MODULE_SUIT_TRANSPORT_MOCK
     else if (strncmp(manifest->urlbuf, "test://", 7) == 0) {
         res = suit_transport_mock_fetch(manifest);
+    }
+#endif
+#ifdef MODULE_SUIT_TRANSPORT_VFS
+    else if (strncmp(manifest->urlbuf, "file://", 7) == 0) {
+        res = suit_transport_vfs_fetch(manifest, _storage_helper, manifest);
     }
 #endif
     else {

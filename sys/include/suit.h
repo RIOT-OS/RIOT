@@ -325,22 +325,6 @@ static inline bool suit_component_check_flag(suit_component_t *component,
 int suit_component_name_to_string(const suit_manifest_t *manifest,
                                   const suit_component_t *component,
                                   char separator, char *buf, size_t buf_len);
-
-/**
- * @brief Helper function for writing bytes on flash a specified offset
- *
- * @param[in]   arg     ptr to the SUIT manifest
- * @param[in]   offset  offset to write to on flash
- * @param[in]   buf     bytes to write
- * @param[in]   len     length of bytes to write
- * @param[in]   more    whether more data is coming
- *
- * @return              0 on success
- * @return              <0 on error
- */
-int suit_storage_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
-                        int more);
-
 #ifdef __cplusplus
 }
 #endif
