@@ -36,6 +36,7 @@ def tty2dict(dev):
     result["model_db"] = dev.get("ID_MODEL_FROM_DATABASE")
     result["vendor"] = unescape(dev.get("ID_VENDOR_ENC"))
     result["vendor_db"] = dev.get("ID_VENDOR_FROM_DATABASE")
+    result["iface_num"] = str(int(dev.get("ID_USB_INTERFACE_NUM")))
 
     return result
 
@@ -50,16 +51,6 @@ def filters_match(filters, tty):
             return False
 
     return True
-
-
-def shorten(string, length):
-    """
-    Shorten the given string to the given length, if needed
-    """
-    if len(string) > length:
-        return string[:length - 3] + "..."
-
-    return string
 
 
 def parse_args(args):
@@ -78,6 +69,7 @@ def parse_args(args):
         "model_db",
         "driver",
         "ctime",
+        "iface_num",
     }
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("--most-recent", action="store_true",
@@ -103,6 +95,9 @@ def parse_args(args):
     parser.add_argument("--vendor-db", default=None, type=str,
                         help="Print only devices with a vendor matching this "
                              "regex (DB entry)")
+    parser.add_argument("--iface-num", default=None, type=str,
+                        help="Print only devices with a USB interface number "
+                             "matching this regex (DB entry)")
     parser.add_argument("--exclude-serial", type=str, nargs='*', default=None,
                         help="Ignore devices with these serial numbers. "
                              + "Environment variable EXCLUDE_TTY_SERIAL can "
@@ -165,7 +160,7 @@ def print_results(args, ttys):
             tty["ctime"] = time.strftime("%H:%M:%S",
                                          time.localtime(tty["ctime"]))
         headers = ["path", "driver", "vendor", "model", "model_db", "serial",
-                   "ctime"]
+                   "ctime", "iface_num"]
         print_table(ttys, headers)
         return
 
@@ -197,6 +192,9 @@ def generate_filters(args):
 
     if args.vendor_db is not None:
         result.append(("vendor_db", re.compile(args.vendor_db)))
+
+    if args.iface_num is not None:
+        result.append(("iface_num", re.compile(args.iface_num)))
 
     return result
 

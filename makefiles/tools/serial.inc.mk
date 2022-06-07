@@ -1,6 +1,7 @@
 # Select the most recently attached tty interface
 ifeq (1,$(MOST_RECENT_PORT))
-  PORT ?= $(shell $(RIOTTOOLS)/usb-serial/ttys.py --most-recent --format path)
+  TTYS_FLAGS := --most-recent --format path $(TTY_BOARD_FILTER)
+  PORT ?= $(shell $(RIOTTOOLS)/usb-serial/ttys.py $(TTYS_FLAGS))
 endif
 # Otherwise, use as default the most commonly used ports on Linux and OSX
 PORT_LINUX ?= /dev/ttyACM0
