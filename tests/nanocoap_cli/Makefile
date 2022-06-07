@@ -27,6 +27,9 @@ ifeq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   # USEMODULE += vfs_auto_format
   USEMODULE += shell_commands
 
+  # VFS operations require more stack on the main thread
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN=THREAD_STACKSIZE_LARGE
+
   # always enable auto-format for native
   ifeq ($(BOARD),native)
     USEMODULE += vfs_auto_format
