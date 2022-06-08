@@ -8,7 +8,13 @@ ifeq (bmp,$(PROGRAMMER))
   PORT_DARWIN ?= $(wordlist 2, 2, $(sort $(wildcard /dev/tty.usbmodem*)))
 endif
 
-PROGRAMMER ?= jlink
+# keep name of `JLINK` in sync with script jlink.sh in $(RIOTTOOLS)/jlink
+JLINK ?= JLinkExe
+ifneq (,$(command -v $(JLINK)))
+  PROGRAMMER ?= jlink
+else
+  PROGRAMMER ?= openocd
+endif
 # setup JLink for flashing
 JLINK_DEVICE = nrf52
 # setup OpenOCD for flashing. Version 0.10 of OpenOCD doesn't contain support
