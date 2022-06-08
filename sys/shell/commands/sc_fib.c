@@ -129,7 +129,7 @@ static void _fib_add(const char *dest, const char *next, kernel_pid_t pid, uint3
                   nxt_size, nxt_flags, lifetime);
 }
 
-int _fib_route_handler(int argc, char **argv)
+static int _fib_route_handler(int argc, char **argv)
 {
     /* e.g. fibroute right now don't care about the address/protocol family */
     if (argc == 1) {

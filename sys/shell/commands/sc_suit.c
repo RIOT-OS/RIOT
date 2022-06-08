@@ -32,7 +32,7 @@ static void _print_usage(char **argv)
     printf("       %s seq_no\n", argv[0]);
 }
 
-int _suit_handler(int argc, char **argv)
+static int _suit_handler(int argc, char **argv)
 {
     if (argc < 2) {
         _print_usage(argv);

@@ -85,7 +85,7 @@ static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6, uint32_t no
 static void _handle_reply(_ping_data_t *data, gnrc_pktsnip_t *pkt, uint32_t now_us);
 static int _finish(_ping_data_t *data);
 
-int _gnrc_icmpv6_ping(int argc, char **argv)
+static int _gnrc_icmpv6_ping(int argc, char **argv)
 {
     _ping_data_t data = {
         .netreg = GNRC_NETREG_ENTRY_INIT_PID(ICMPV6_ECHO_REP,

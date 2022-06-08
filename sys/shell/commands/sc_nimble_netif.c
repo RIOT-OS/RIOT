@@ -515,7 +515,7 @@ void sc_nimble_netif_init(void)
 #endif
 }
 
-int _nimble_netif_handler(int argc, char **argv)
+static int _nimble_netif_handler(int argc, char **argv)
 {
     if ((argc == 1) || _ishelp(argv[1])) {
 #if FULL_CONTROL

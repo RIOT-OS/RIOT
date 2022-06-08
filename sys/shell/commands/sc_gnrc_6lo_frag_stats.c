@@ -21,7 +21,7 @@
 #include "net/gnrc/sixlowpan/frag/sfr.h"
 #endif
 
-int _gnrc_6lo_frag_stats(int argc, char **argv)
+static int _gnrc_6lo_frag_stats(int argc, char **argv)
 {
     gnrc_sixlowpan_frag_stats_t *stats = gnrc_sixlowpan_frag_stats_get();
 

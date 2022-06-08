@@ -31,7 +31,7 @@
 static bool initialized = false;
 static at30tse75x_t dev;
 
-int _at30tse75x_handler(int argc, char **argv)
+static int _at30tse75x_handler(int argc, char **argv)
 {
     if(argc <= 1) {
         printf("Usage: %s init|read|mode|resolution|save|restore|config\n", argv[0]);

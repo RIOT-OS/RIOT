@@ -45,7 +45,7 @@ static inline uint8_t sector_read(unsigned char *read_buf, unsigned long sector,
     return 0;
 }
 
-int _get_sectorsize(int argc, char **argv)
+static int _get_sectorsize(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -65,7 +65,7 @@ int _get_sectorsize(int argc, char **argv)
 
 SHELL_COMMAND(dget_ssize, "Get the sector size of inserted memory card", _get_sectorsize);
 
-int _get_blocksize(int argc, char **argv)
+static int _get_blocksize(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -85,7 +85,7 @@ int _get_blocksize(int argc, char **argv)
 
 SHELL_COMMAND(dget_bsize, "Get the block size of inserted memory card", _get_blocksize);
 
-int _get_sectorcount(int argc, char **argv)
+static int _get_sectorcount(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -105,7 +105,7 @@ int _get_sectorcount(int argc, char **argv)
 
 SHELL_COMMAND(dget_scount, "Get the sector count of inserted memory card", _get_sectorcount);
 
-int _read_sector(int argc, char **argv)
+static int _read_sector(int argc, char **argv)
 {
     if (argc == 2) {
         unsigned long scount;
@@ -132,7 +132,7 @@ int _read_sector(int argc, char **argv)
 
 SHELL_COMMAND(dread_sec, "Reads the specified sector of inserted memory card", _read_sector);
 
-int _read_bytes(int argc, char **argv)
+static int _read_bytes(int argc, char **argv)
 {
     unsigned long sector = 1, scount, offset;
     unsigned short ssize, length;

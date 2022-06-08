@@ -27,7 +27,7 @@ extern void heap_stats(void);
 #include <stdio.h>
 #endif
 
-int _heap_handler(int argc, char **argv)
+static int _heap_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;

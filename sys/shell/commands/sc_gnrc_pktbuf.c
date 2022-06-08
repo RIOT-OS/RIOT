@@ -16,7 +16,7 @@
 #include "net/gnrc/pktbuf.h"
 #include "shell.h"
 
-int _gnrc_pktbuf_cmd(int argc, char **argv)
+static int _gnrc_pktbuf_cmd(int argc, char **argv)
 {
     (void)argc;
     (void)argv;

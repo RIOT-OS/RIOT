@@ -149,7 +149,7 @@ static int _rtc_usage(void)
     return 0;
 }
 
-int _rtc_handler(int argc, char **argv)
+static int _rtc_handler(int argc, char **argv)
 {
     if (argc < 2) {
         _rtc_usage();

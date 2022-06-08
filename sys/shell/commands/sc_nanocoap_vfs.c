@@ -88,7 +88,7 @@ static int _print_dir(const char *url, char *buf, size_t len)
                                       _print_dir_cb, &ctx);
 }
 
-int _nanocoap_get_handler(int argc, char **argv)
+static int _nanocoap_get_handler(int argc, char **argv)
 {
     int res;
     char buffer[CONFIG_NANOCOAP_QS_MAX];

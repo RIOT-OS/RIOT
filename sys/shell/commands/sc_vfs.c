@@ -590,7 +590,7 @@ static int _mkdir_handler(int argc, char **argv)
     return 0;
 }
 
-int _ls_handler(int argc, char **argv)
+static int _ls_handler(int argc, char **argv)
 {
     if (argc < 2) {
         _ls_usage(argv);
@@ -662,7 +662,7 @@ int _ls_handler(int argc, char **argv)
 
 SHELL_COMMAND(ls, "list files", _ls_handler);
 
-int _vfs_handler(int argc, char **argv)
+static int _vfs_handler(int argc, char **argv)
 {
     if (argc < 2) {
         _vfs_usage(argv);
@@ -720,7 +720,7 @@ static inline void _print_digest(const uint8_t *digest, size_t len, const char *
 
 #if MODULE_MD5SUM
 #include "hashes/md5.h"
-int _vfs_md5sum_cmd(int argc, char **argv)
+static int _vfs_md5sum_cmd(int argc, char **argv)
 {
     int res;
     uint8_t digest[MD5_DIGEST_LENGTH];
@@ -749,7 +749,7 @@ SHELL_COMMAND(md5sum, "Compute and check MD5 message digest", _vfs_md5sum_cmd);
 
 #if MODULE_SHA1SUM
 #include "hashes/sha1.h"
-int _vfs_sha1sum_cmd(int argc, char **argv)
+static int _vfs_sha1sum_cmd(int argc, char **argv)
 {
     int res;
     uint8_t digest[SHA1_DIGEST_LENGTH];
@@ -778,7 +778,7 @@ SHELL_COMMAND(sha1sum, "Compute and check SHA1 message digest", _vfs_sha1sum_cmd
 
 #if MODULE_SHA256SUM
 #include "hashes/sha256.h"
-int _vfs_sha256sum_cmd(int argc, char **argv)
+static int _vfs_sha256sum_cmd(int argc, char **argv)
 {
     int res;
     uint8_t digest[SHA256_DIGEST_LENGTH];

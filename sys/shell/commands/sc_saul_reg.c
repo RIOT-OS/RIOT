@@ -145,7 +145,7 @@ static void write(int argc, char **argv)
     printf("data successfully written to device #%i\n", num);
 }
 
-int _saul(int argc, char **argv)
+static int _saul(int argc, char **argv)
 {
     if (argc < 2) {
         list();
