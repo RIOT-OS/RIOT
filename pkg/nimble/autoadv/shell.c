@@ -22,7 +22,6 @@
 #include <stdio.h>
 
 #include "shell.h"
-#include "shell_commands.h"
 #include "xfa.h"
 
 #include "nimble_riot.h"

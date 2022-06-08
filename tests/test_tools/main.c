@@ -19,7 +19,6 @@
 #include <ctype.h>
 
 #include "kernel_defines.h"
-#include "shell_commands.h"
 #include "shell.h"
 
 #if !IS_ACTIVE(CONFIG_SHELL_NO_ECHO) || !IS_ACTIVE(CONFIG_SHELL_NO_PROMPT)

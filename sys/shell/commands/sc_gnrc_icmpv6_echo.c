@@ -27,23 +27,25 @@
 
 #include "bitfield.h"
 #include "byteorder.h"
-#include "sched.h"
-#ifdef MODULE_LUID
-#include "luid.h"
-#endif
 #include "msg.h"
 #include "net/gnrc.h"
 #include "net/gnrc/icmpv6.h"
-#ifdef MODULE_GNRC_IPV6_NIB
-#include "net/gnrc/ipv6/nib/nc.h"
-#endif
 #include "net/icmpv6.h"
 #include "net/ipv6.h"
 #include "net/utils.h"
+#include "sched.h"
+#include "shell.h"
 #include "timex.h"
 #include "unaligned.h"
 #include "utlist.h"
 #include "xtimer.h"
+
+#ifdef MODULE_LUID
+#include "luid.h"
+#endif
+#ifdef MODULE_GNRC_IPV6_NIB
+#include "net/gnrc/ipv6/nib/nc.h"
+#endif
 
 #define _SEND_NEXT_PING         (0xEF48)
 #define _PING_FINISH            (0xEF49)
@@ -143,6 +145,9 @@ finish:
     }
     return res;
 }
+
+SHELL_COMMAND(ping6, "Ping via ICMPv6", _gnrc_icmpv6_ping);
+SHELL_COMMAND(ping, "Alias for ping6", _gnrc_icmpv6_ping);
 
 static void _usage(char *cmdname)
 {

@@ -20,9 +20,10 @@
 #include <string.h>
 
 #include "kernel_defines.h"
-#include "net/ipv6/addr.h"
 #include "net/gnrc/sixlowpan/ctx.h"
+#include "net/ipv6/addr.h"
 #include "net/sixlowpan/nd.h"
+#include "shell.h"
 #include "timex.h"
 
 #if IS_USED(MODULE_ZTIMER_MSEC)
@@ -163,5 +164,7 @@ int _gnrc_6ctx(int argc, char **argv)
     }
     return 0;
 }
+
+SHELL_COMMAND(6ctx, "6LoWPAN context configuration tool", _gnrc_6ctx);
 
 /** @} */

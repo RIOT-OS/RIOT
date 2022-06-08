@@ -38,7 +38,6 @@
 #include "kernel_defines.h"
 #include "xfa.h"
 #include "shell.h"
-#include "shell_commands.h"
 
 /* define shell command cross file array */
 XFA_INIT_CONST(shell_command_t*, shell_commands_xfa);
@@ -111,10 +110,6 @@ static shell_command_handler_t find_handler(
         handler = search_commands(command_list, command);
     }
 
-    if (IS_USED(MODULE_SHELL_COMMANDS) && handler == NULL) {
-        handler = search_commands(_shell_command_list, command);
-    }
-
     if (handler == NULL) {
         handler = search_commands_xfa(command);
     }
@@ -144,10 +139,6 @@ static void print_help(const shell_command_t *command_list)
          "\n---------------------------------------");
     if (command_list != NULL) {
         print_commands(command_list);
-    }
-
-    if (IS_USED(MODULE_SHELL_COMMANDS)) {
-        print_commands(_shell_command_list);
     }
 
     print_commands_xfa();

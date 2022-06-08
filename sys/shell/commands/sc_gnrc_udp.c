@@ -26,9 +26,10 @@
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/hdr.h"
-#include "net/gnrc/udp.h"
 #include "net/gnrc/pktdump.h"
+#include "net/gnrc/udp.h"
 #include "net/utils.h"
+#include "shell.h"
 #include "timex.h"
 #include "utlist.h"
 #if IS_USED(MODULE_ZTIMER_USEC) || IS_USED(MODULE_ZTIMER_MSEC)
@@ -203,3 +204,5 @@ int _gnrc_udp_cmd(int argc, char **argv)
     }
     return 0;
 }
+
+SHELL_COMMAND(udp, "send data over UDP and listen on UDP ports", _gnrc_udp_cmd);

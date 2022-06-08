@@ -14,12 +14,12 @@
  */
 
 #include <stdio.h>
-#include <kernel_defines.h>
 
+#include "kernel_defines.h"
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/netif.h"
 #include "net/ipv6/addr.h"
-
+#include "shell.h"
 #include "timex.h"
 
 static void _usage(char **argv);
@@ -57,6 +57,8 @@ int _gnrc_ipv6_nib(int argc, char **argv)
     }
     return res;
 }
+
+SHELL_COMMAND(nib, "Configure neighbor information base", _gnrc_ipv6_nib);
 
 static void _usage(char **argv)
 {

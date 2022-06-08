@@ -22,8 +22,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "shell_commands.h"
 #include "diskio.h"
+#include "shell.h"
 
 static inline uint8_t sector_read(unsigned char *read_buf, unsigned long sector, unsigned long length, unsigned long offset)
 {
@@ -63,6 +63,8 @@ int _get_sectorsize(int argc, char **argv)
     }
 }
 
+SHELL_COMMAND(dget_ssize, "Get the sector size of inserted memory card", _get_sectorsize);
+
 int _get_blocksize(int argc, char **argv)
 {
     (void) argc;
@@ -81,6 +83,8 @@ int _get_blocksize(int argc, char **argv)
     }
 }
 
+SHELL_COMMAND(dget_bsize, "Get the block size of inserted memory card", _get_blocksize);
+
 int _get_sectorcount(int argc, char **argv)
 {
     (void) argc;
@@ -98,6 +102,8 @@ int _get_sectorcount(int argc, char **argv)
         return 1;
     }
 }
+
+SHELL_COMMAND(dget_scount, "Get the sector count of inserted memory card", _get_sectorcount);
 
 int _read_sector(int argc, char **argv)
 {
@@ -123,6 +129,8 @@ int _read_sector(int argc, char **argv)
         return 1;
     }
 }
+
+SHELL_COMMAND(dread_sec, "Reads the specified sector of inserted memory card", _read_sector);
 
 int _read_bytes(int argc, char **argv)
 {
@@ -173,3 +181,5 @@ int _read_bytes(int argc, char **argv)
     return 1;
 
 }
+
+SHELL_COMMAND(dread, "Reads the specified bytes from inserted memory card", _read_bytes);

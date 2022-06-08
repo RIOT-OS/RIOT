@@ -26,6 +26,7 @@
 #include "dfplayer.h"
 #include "dfplayer_internal.h"
 #include "fmt.h"
+#include "shell.h"
 
 static const char *_equalizers[] = {
     [DFPLAYER_EQ_NORMAL]    = "normal",
@@ -305,7 +306,7 @@ static void _print_help(const char *progname)
     );
 }
 
-int _sc_dfplayer(int argc, char **argv)
+static int _sc_dfplayer(int argc, char **argv)
 {
     unsigned dev_num = 0;
     int pos = 1;
@@ -619,3 +620,5 @@ int _sc_dfplayer(int argc, char **argv)
     _print_help(argv[0]);
     return 1;
 }
+
+SHELL_COMMAND(dfplayer, "Control a DFPlayer Mini MP3 player", _sc_dfplayer);

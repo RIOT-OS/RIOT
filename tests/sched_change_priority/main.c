@@ -24,7 +24,6 @@
 #include "architecture.h"
 #include "sched.h"
 #include "shell.h"
-#include "shell_commands.h"
 #include "thread.h"
 
 static int sc_hint(int argc, char **argv);

@@ -32,7 +32,6 @@
 #include "net/ieee802154/radio.h"
 
 #include "shell.h"
-#include "shell_commands.h"
 
 #include "test_utils/expect.h"
 #include "xtimer.h"

@@ -25,7 +25,6 @@
 #include "fmt.h"
 #include "net/sock/udp.h"
 #include "shell.h"
-#include "shell_commands.h"
 #include "net/ipv6/addr.h"
 
 #define MAIN_QUEUE_SIZE     (8)

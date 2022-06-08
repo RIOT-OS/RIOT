@@ -24,7 +24,6 @@
 
 #include "net/ieee802154.h"
 #include "net/l2util.h"
-#include "shell_commands.h"
 #include "shell.h"
 #include "ztimer.h"
 

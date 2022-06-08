@@ -22,7 +22,6 @@
 #include <stdio.h>
 
 #include "shell.h"
-#include "shell_commands.h"
 #include "sht1x_params.h"
 
 #define SHT1X_NUM     ARRAY_SIZE(sht1x_params)

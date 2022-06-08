@@ -24,11 +24,12 @@
 #include <string.h>
 #include <inttypes.h>
 
+#include "random.h"
+#include "shell.h"
+
 #ifdef MODULE_XTIMER
 #include "xtimer.h"
 #endif
-
-#include "random.h"
 
 int _random_init(int argc, char **argv)
 {
@@ -55,6 +56,8 @@ int _random_init(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(random_init, "initializes the PRNG", _random_init);
+
 int _random_get(int argc, char **argv)
 {
     (void) argc;
@@ -64,3 +67,5 @@ int _random_get(int argc, char **argv)
 
     return 0;
 }
+
+SHELL_COMMAND(random_get, "returns 32 bit of pseudo randomness", _random_get);

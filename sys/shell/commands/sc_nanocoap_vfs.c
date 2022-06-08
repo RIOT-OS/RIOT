@@ -23,9 +23,10 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include "vfs_default.h"
-#include "net/nanocoap_vfs.h"
 #include "net/nanocoap_sock.h"
+#include "net/nanocoap_vfs.h"
+#include "shell.h"
+#include "vfs_default.h"
 
 struct dir_list_ctx {
     char *buf;
@@ -137,3 +138,5 @@ int _nanocoap_get_handler(int argc, char **argv)
     }
     return res;
 }
+
+SHELL_COMMAND(ncget, "download a file from a CoAP server", _nanocoap_get_handler);

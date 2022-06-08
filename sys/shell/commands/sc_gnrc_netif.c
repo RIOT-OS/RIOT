@@ -24,14 +24,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "net/netif.h"
-#include "net/ipv6/addr.h"
+#include "fmt.h"
 #include "net/gnrc.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/hdr.h"
+#include "net/ipv6/addr.h"
 #include "net/lora.h"
 #include "net/loramac.h"
-#include "fmt.h"
+#include "net/netif.h"
+#include "shell.h"
 
 #ifdef MODULE_NETSTATS
 #include "net/netstats.h"
@@ -1781,6 +1782,8 @@ int _gnrc_netif_send(int argc, char **argv)
 
     return 0;
 }
+
+SHELL_COMMAND(txtsnd, "Sends a custom string as is over the link layer", _gnrc_netif_send);
 #endif
 
 int _gnrc_netif_config(int argc, char **argv)
@@ -1905,3 +1908,5 @@ int _gnrc_netif_config(int argc, char **argv)
     _usage(argv[0]);
     return 1;
 }
+
+SHELL_COMMAND(ifconfig, "Configure network interfaces", _gnrc_netif_config);

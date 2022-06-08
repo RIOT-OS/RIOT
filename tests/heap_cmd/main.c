@@ -18,7 +18,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "shell_commands.h"
 #include "shell.h"
 
 static int malloc_cmd(int argc, char **argv)

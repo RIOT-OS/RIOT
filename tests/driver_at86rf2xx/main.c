@@ -22,7 +22,6 @@
 
 #include "net/netdev.h"
 #include "shell.h"
-#include "shell_commands.h"
 #include "thread.h"
 #include "xtimer.h"
 

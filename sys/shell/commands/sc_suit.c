@@ -22,8 +22,9 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include "suit/transport/coap.h"
+#include "shell.h"
 #include "suit/storage.h"
+#include "suit/transport/coap.h"
 
 static void _print_usage(char **argv)
 {
@@ -53,3 +54,5 @@ int _suit_handler(int argc, char **argv)
 
     return 0;
 }
+
+SHELL_COMMAND(suit, "Trigger a SUIT firmware update", _suit_handler);

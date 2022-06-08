@@ -14,12 +14,16 @@ from testrunner import run
 EXPECTED_HELP = (
     'Command              Description',
     '---------------------------------------',
+    'bufsize              Get the shell\'s buffer size',
     'start_test           starts a test',
     'end_test             ends a test',
     'echo                 prints the input command',
-    'reboot               Reboot the node',
-    'ps                   Prints information about running threads.',
+    'empty                print nothing on command',
     'app_metadata         Returns application metadata',
+    'pm                   interact with layered PM subsystem',
+    'ps                   Prints information about running threads.',
+    'reboot               Reboot the node',
+    'version              Prints current RIOT_VERSION',
     'xfa_test1            xfa test command 1',
     'xfa_test2            xfa test command 2'
 )

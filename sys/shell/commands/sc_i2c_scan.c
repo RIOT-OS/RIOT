@@ -26,6 +26,7 @@
 
 #include "board.h"
 #include "periph/i2c.h"
+#include "shell.h"
 
 static int get_dev(i2c_t *dev, int argc, char **argv)
 {
@@ -107,3 +108,5 @@ int _i2c_scan(int argc, char **argv)
     i2c_release(dev);
     return 0;
 }
+
+SHELL_COMMAND(i2c_scan, "Performs an I2C bus scan", _i2c_scan);

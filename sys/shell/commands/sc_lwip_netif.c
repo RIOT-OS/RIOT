@@ -20,9 +20,11 @@
 
 #include <kernel_defines.h>
 #include <stdio.h>
+
 #include "lwip/netif/compat.h"
 #include "net/netdev.h"
 #include "net/netopt.h"
+#include "shell.h"
 
 #ifdef MODULE_LWIP_IPV6
 static void _netif_list_ipv6(struct netif *netif, int addr_index) {
@@ -102,3 +104,5 @@ int _lwip_netif_config(int argc, char **argv)
     printf("%s takes no arguments.\n", argv[0]);
     return 1;
 }
+
+SHELL_COMMAND(ifconfig, "List network interfaces", _lwip_netif_config);

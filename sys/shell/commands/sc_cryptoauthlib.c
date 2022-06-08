@@ -19,7 +19,9 @@
  */
 #include <stdio.h>
 #include <stdint.h>
+
 #include "cryptoauthlib.h"
+#include "shell.h"
 
 void get_bin(char *result, uint8_t byte)
 {
@@ -237,3 +239,6 @@ int _cryptoauth(int argc, char **argv)
     }
     return 0;
 }
+
+SHELL_COMMAND(cryptoauth, "Commands for Microchip CryptoAuth devices",
+        _cryptoauth);
