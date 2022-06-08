@@ -22,9 +22,10 @@ RANGE=30	# base node radio range
 VARIANCE=15	# random offset to radio range
 NUM=10		# number of nodes
 
-echo "writing to $FILE"
-
-./bin/topogen -w $WIDTH -h $HEIGHT -r $RANGE -v $VARIANCE -n $NUM > "$FILE"
+if [ ! -f "$FILE" ]; then
+	echo "writing to $FILE"
+	./bin/topogen -w $WIDTH -h $HEIGHT -r $RANGE -v $VARIANCE -n $NUM > "$FILE"
+fi
 
 if ! command -v gnuplot > /dev/null; then
     printf "${CWARN}%s${CRESET}\n" "gnuplot not installed"
