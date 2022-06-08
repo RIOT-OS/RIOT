@@ -508,7 +508,7 @@ static inline void irq_handler(unsigned uartnum)
 {
     uint32_t status = dev(uartnum)->INTFLAG.reg;
     /* TXC is used by uart_write() */
-    dev(uartnum)->INTFLAG.reg = status & ~SERCOM_USART_INTFLAG_TXC;
+    dev(uartnum)->INTFLAG.reg = status & ~(SERCOM_USART_INTFLAG_TXC | SERCOM_USART_INTFLAG_RXC);
 
 #if !defined(UART_HAS_TX_ISR) && defined(MODULE_PERIPH_UART_NONBLOCKING)
     if ((status & SERCOM_USART_INTFLAG_DRE) && dev(uartnum)->INTENSET.bit.DRE) {
@@ -522,7 +522,7 @@ static inline void irq_handler(unsigned uartnum)
     }
 #endif
 
-    if (status & SERCOM_USART_INTFLAG_RXC) {
+    while (dev(uartnum)->INTFLAG.reg & SERCOM_USART_INTFLAG_RXC) {
         /* interrupt flag is cleared by reading the data register */
         uart_ctx[uartnum].rx_cb(uart_ctx[uartnum].arg,
                                 (uint8_t)(dev(uartnum)->DATA.reg));
