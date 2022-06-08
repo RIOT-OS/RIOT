@@ -65,7 +65,7 @@ ifneq (,$(filter esp_idf_wifi,$(USEMODULE)))
   USEMODULE += esp_idf_adc
 endif
 
-ifneq (,$(filter periph_rtc,$(USEMODULE)))
+ifneq (,$(filter periph_rtt,$(USEMODULE)))
   FEATURES_OPTIONAL += esp_rtc_timer_32k
 endif
 
