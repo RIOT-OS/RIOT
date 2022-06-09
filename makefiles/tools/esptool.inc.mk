@@ -22,7 +22,7 @@ else
   FLASHER = $(ESPTOOL)
   FFLAGS += --chip $(FLASH_CHIP) --port $(PROG_DEV) --baud $(PROGRAMMER_SPEED)
   FFLAGS += --before default_reset write_flash -z
-  FFLAGS += --flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ)
+  FFLAGS += --flash_mode dio --flash_freq $(FLASH_FREQ)
   FFLAGS += --flash_size detect
   FFLAGS += $(BOOTLOADER_POS) $(BOOTLOADER_BIN)
   FFLAGS += 0x8000 $(BINDIR)/partitions.bin
