@@ -255,6 +255,7 @@ static void _init_sub_prefix(ipv6_addr_t *out,
     out->u8[bytes] |= idx << shift;
 }
 
+/* returns true if a new prefix was added, false if nothing changed */
 static bool _remove_old_prefix(gnrc_netif_t *netif,
                                const ipv6_addr_t *pfx, uint8_t pfx_len,
                                gnrc_pktsnip_t **ext_opts)
@@ -271,7 +272,7 @@ static bool _remove_old_prefix(gnrc_netif_t *netif,
 
         /* The prefix did not change - nothing to do here */
         if (match_len >= pfx_len && pfx_len == entry.pfx_len) {
-            return true;
+            return false;
         }
 
         /* find prefix that is closest to the new prefix */
@@ -283,7 +284,7 @@ static bool _remove_old_prefix(gnrc_netif_t *netif,
 
     /* no prefix found */
     if (old_pfx_len == CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_FIX_LEN) {
-        return false;
+        return true;
     }
 
     DEBUG("auto_subnets: remove old prefix %s/%u\n",
@@ -299,7 +300,7 @@ static bool _remove_old_prefix(gnrc_netif_t *netif,
     /* remove the prefix */
     gnrc_ipv6_nib_pl_del(netif->pid, &old_pfx, old_pfx_len);
 
-    return false;
+    return true;
 }
 
 static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t *upstream,
@@ -346,20 +347,21 @@ static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t 
 
         /* first remove old prefix if the prefix changed */
         if (_remove_old_prefix(downstream, &new_prefix, new_prefix_len, &ext_opts)) {
-            /* if the prefix did not change, there is nothing to do here */
-            continue;
-        }
 
-        /* configure subnet on downstream interface */
-        idx = gnrc_netif_ipv6_add_prefix(downstream, &new_prefix, new_prefix_len,
+            /* configure subnet on downstream interface */
+            idx = gnrc_netif_ipv6_add_prefix(downstream, &new_prefix, new_prefix_len,
                                          valid_ltime, pref_ltime);
-        if (idx < 0) {
-            DEBUG("auto_subnets: adding prefix to %u failed\n", downstream->pid);
-            continue;
-        }
+            if (idx < 0) {
+                DEBUG("auto_subnets: adding prefix to %u failed\n", downstream->pid);
+                continue;
+            }
 
-        /* start advertising subnet */
-        gnrc_ipv6_nib_change_rtr_adv_iface(downstream, true);
+            /* start advertising subnet */
+            gnrc_ipv6_nib_change_rtr_adv_iface(downstream, true);
+
+            /* configure RPL root if applicable */
+            gnrc_rpl_configure_root(downstream, &downstream->ipv6.addrs[idx]);
+        }
 
         /* add route information option with new subnet */
         tmp = gnrc_ndp_opt_ri_build(&new_prefix, new_prefix_len, valid_ltime,
@@ -369,9 +371,6 @@ static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t 
         } else {
             ext_opts = tmp;
         }
-
-        /* configure RPL root if applicable */
-        gnrc_rpl_configure_root(downstream, &downstream->ipv6.addrs[idx]);
     }
 
     /* immediately send an RA with RIO */
