@@ -17,6 +17,8 @@
  * @}
  */
 
+#ifdef MODULE_PERIPH_DAC
+
 #include <stdbool.h>
 
 #include "driver/dac_common.h"
@@ -35,3 +37,5 @@ esp_err_t esp_idf_dac_output_disable(dac_channel_t channel)
 {
     return dac_output_disable(channel);
 }
+
+#endif
