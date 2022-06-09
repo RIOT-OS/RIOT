@@ -223,7 +223,7 @@ SECTIONS
     *components/spi_flash/spi_flash_chip_winbond.*(.literal .literal.* .text .text.*)
     *components/spi_flash/*/spi_flash_rom_patch.*(.literal .literal.* .text .text.*)
     *components/spi_flash/spi_flash_timing_tuning.*(.literal .literal.* .text .text.*)
-    *components/spi_flash/spi_timing_config.*(.literal .literal.* .text .text.*)
+    *components/spi_flash/*/spi_timing_config.*(.literal .literal.* .text .text.*)
 
     *components/riscv/interrupt.*(.literal .literal.* .text .text.*)
     *components/riscv/vectors.*(.literal .literal.* .text .text.*)
@@ -323,7 +323,7 @@ SECTIONS
     *components/spi_flash/spi_flash_chip_winbond.*(.rodata .rodata.*)
     *components/spi_flash/*/spi_flash_rom_patch.*(.rodata .rodata.*)
     *components/spi_flash/spi_flash_timing_tuning.*(.rodata .rodata.*)
-    *components/spi_flash/spi_timing_config.*(.rodata .rodata.*)
+    *components/spi_flash/*/spi_timing_config.*(.rodata .rodata.*)
 
     _data_end = ABSOLUTE(.);
     . = ALIGN(4);
