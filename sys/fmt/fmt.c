@@ -508,22 +508,16 @@ uint32_t scn_u32_hex(const char *str, size_t n)
 
 void print(const char *s, size_t n)
 {
+    if (IS_USED(MODULE_STDIO_NATIVE)) {
+        /* native gets special treatment as native's stdio code is ...
+         * special */
+        printf("%.*s", (int)n, s);
+        return;
+    }
+
     while (n > 0) {
         ssize_t written;
-        if (IS_USED(MODULE_STDIO_NATIVE)) {
-            /* for native fwrite is not wrapped and would use the system's
-             * write directly, resulting in corrupted output. Instead, use the
-             * stdio_write wrapper directly here to force all output from
-             * puts() / printf() and fmt to be handled the same. */
-            extern ssize_t stdio_write(const void* buffer, size_t len);
-            written = stdio_write(s, n);
-        }
-        else {
-            /* For all but native: Use fwrite rather than the cheaper unbuffered
-             * write() to avoid corrupted output when mixing stdio and fmt
-             * for C libs that use buffered output */
-            written = fwrite(s, 1, n, stdout);
-        }
+        written = fwrite(s, 1, n, stdout);
         if (written < 0) {
             break;
         }
