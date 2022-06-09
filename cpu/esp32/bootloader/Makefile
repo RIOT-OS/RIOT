@@ -206,6 +206,16 @@ CFLAGS += \
   -MT \
   #
 
+ifeq (20m,$(FLASH_FREQ))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHFREQ_20M
+else ifeq (40m,$(FLASH_FREQ))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHFREQ_40M
+else ifeq (80m,$(FLASH_FREQ))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHFREQ_80M
+else ifeq (120m,$(FLASH_FREQ))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHFREQ_120M
+endif
+
 ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
   LINKFLAGS = -mlongcalls
   ESP_SDK_BOOTLOADER_ADD_LINK_FLAGS += -L$(ESP32_SDK_DIR)/components/xtensa/$(CPU_FAM) -lxt_hal
@@ -226,7 +236,6 @@ LINKFLAGS += \
   -Wno-frame-address \
   -o $(ESP_SDK_BOOTLOADER_DIR)/bootloader.elf \
   -Wl,--cref \
-  -Wl,--defsym=IDF_TARGET_ESP32=0 \
   -Wl,--gc-sections \
   -fno-lto \
   -fno-rtti \
@@ -313,9 +322,16 @@ FLASH_CHIP = $(CPU_FAM)
 ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool_v3.2.py
 # TODO: These should be exported/configurable from the app side. That would
 # require to export these values.
-FLASH_MODE ?= dout
-FLASH_FREQ ?= 40m
-FLASH_SIZE ?= 4
+ifneq (,$(filter esp32,$(CPU_FAM)))
+  FLASH_MODE  = dio
+  FLASH_FREQ  = 40m   # DO NOT CHANGE
+  FLASH_SIZE ?= 4
+endif
+ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
+  FLASH_MODE  = dio
+  FLASH_FREQ  = 80m   # DO NOT CHANGE
+  FLASH_SIZE ?= 4
+endif
 
 # We use esptool to extract a version 1 app from the bootloader.elf. This is
 # like the regular objdump binary file but it contains a 16 byte header which
