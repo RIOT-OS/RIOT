@@ -19,7 +19,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "fmt.h"
 #include "kernel_defines.h"
 #include "net/ipv6/addr.h"
 
@@ -145,12 +144,7 @@ void ipv6_addr_print(const ipv6_addr_t *addr)
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
     ipv6_addr_to_str(addr_str, addr, sizeof(addr_str));
 
-    if (IS_USED(MODULE_FMT)) {
-        print_str(addr_str);
-    }
-    else {
-        printf("%s", addr_str);
-    }
+    printf("%s", addr_str);
 }
 
 void ipv6_addrs_print(const ipv6_addr_t *addrs, size_t num,
@@ -160,26 +154,10 @@ void ipv6_addrs_print(const ipv6_addr_t *addrs, size_t num,
         return;
     }
 
-    num--;
     char buf[IPV6_ADDR_MAX_STR_LEN];
     for (size_t idx = 0; idx < (size_t)num; idx++) {
         ipv6_addr_to_str(buf, &addrs[idx], sizeof(buf));
-        if (IS_USED(MODULE_FMT)) {
-            print_str(buf);
-            print_str(separator);
-        }
-        else {
-            printf("%s%s", buf, separator);
-        }
-    }
-
-    ipv6_addr_to_str(buf, &addrs[num], sizeof(buf));
-    if (IS_USED(MODULE_FMT)) {
-        print_str(buf);
-        print_str(separator);
-    }
-    else {
-        printf("%s%s", buf, separator);
+        printf("%s%s", buf, idx + 1 == num ? "" : separator);
     }
 }
 
