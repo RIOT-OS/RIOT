@@ -102,10 +102,15 @@ endif
 
 ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
   FEATURES_REQUIRED += esp_spi_ram
+  FEATURES_OPTIONAL += esp_spi_oct
   USEMODULE += esp_idf_gpio
   USEMODULE += esp_idf_heap
   USEMODULE += esp_idf_spi_flash
   USEMODULE += esp_idf_spi_ram
+endif
+
+ifneq (,$(filter esp_spi_oct,$(FEATURES_USED)))
+  USEMODULE += esp_spi_oct
 endif
 
 ifneq (,$(filter mtd,$(USEMODULE)))
