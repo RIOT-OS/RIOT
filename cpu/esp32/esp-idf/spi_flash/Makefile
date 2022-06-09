@@ -4,10 +4,10 @@ MODULE = esp_idf_spi_flash
 ESP32_SDK_SRC = \
   components/bootloader_support/src/bootloader_common.c \
   components/driver/spi_common.c \
-  components/spi_flash/$(CPU_FAM)/flash_ops_$(CPU_FAM).c \
   components/spi_flash/$(CPU_FAM)/spi_flash_rom_patch.c \
-  components/spi_flash/esp_flash_api.c \
   components/spi_flash/partition.c \
+#  components/spi_flash/esp_flash_api.c \
+#  components/spi_flash/$(CPU_FAM)/flash_ops_$(CPU_FAM).c \
   #
 
 ifeq (,$(filter periph_spi,$(USEMODULE)))
@@ -16,6 +16,10 @@ ifeq (,$(filter periph_spi,$(USEMODULE)))
 endif
 
 ifneq (,$(filter esp32,$(CPU_FAM)))
+  ESP32_SDK_SRC += components/spi_flash/esp_flash_spi_init.c
+endif
+
+ifneq (,$(filter esp32 esp32s3,$(CPU_FAM)))
   ESP32_SDK_SRC += components/spi_flash/flash_mmap.c
 endif
 

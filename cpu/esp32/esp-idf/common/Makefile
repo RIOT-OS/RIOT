@@ -103,6 +103,16 @@ ifneq (,$(filter esp32c3,$(CPU_FAM)))
   ESP32_SDK_SRC += components/hal/systimer_hal.c
 endif
 
+ifneq (,$(filter esp32s3,$(CPU_FAM)))
+  ESP32_SDK_SRC += components/esp_hw_support/sleep_retention.c
+  ESP32_SDK_SRC += components/esp_timer/src/esp_timer_impl_systimer.c
+  ESP32_SDK_SRC += components/hal/$(CPU_FAM)/rtc_cntl_hal.c
+  ESP32_SDK_SRC += components/hal/$(CPU_FAM)/touch_sensor_hal.c
+  ESP32_SDK_SRC += components/hal/systimer_hal.c
+  ESP32_SDK_SRC += components/spi_flash/spi_flash_timing_tuning.c
+  ESP32_SDK_SRC += components/spi_flash/$(CPU_FAM)/spi_timing_config.c
+endif
+
 include $(RIOTBASE)/Makefile.base
 
 ESP32_SDK_BIN = $(BINDIR)/$(MODULE)
