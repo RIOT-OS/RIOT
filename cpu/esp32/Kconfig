@@ -34,6 +34,13 @@ config HAS_ESP_SPI_RAM
         Indicates that an external RAM is connected via the SPI interface to
         the ESP32x SoC on the board.
 
+config HAS_ESP_SPI_OCT
+    bool
+    help
+        Indicates that Octal SPI mode is used for Flash and SPI RAM. In this
+        case additional GPIOs are used for the SPI interface and cannot be
+        used for other purposes.
+
 config CPU
     default "esp32" if HAS_CPU_ESP32
 
@@ -59,6 +66,7 @@ endmenu
 
 orsource "Kconfig.esp32"
 orsource "Kconfig.esp32c3"
+orsource "Kconfig.esp32s3"
 
 rsource "bootloader/Kconfig"
 rsource "esp-idf/Kconfig"
