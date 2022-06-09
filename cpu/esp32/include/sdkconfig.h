@@ -23,6 +23,15 @@
 #define SDKCONFIG_H
 
 /*
+ * Some files in ESP-IDF use functions from `stdlib.h` without including the
+ * header. To avoid having to patch all these files, `stdlib.h` is included
+ * in this header file, which in turn is included by every ESP-IDF file.
+ */
+#ifndef __ASSEMBLER__
+#include <stdlib.h>
+#endif
+
+/*
  * The SoC capability definitions are often included indirectly in the
  * ESP-IDF files, although all ESP-IDF files require them. Since not all
  * ESP-IDF header files are included in RIOT, the SoC capability definitions
@@ -167,7 +176,7 @@
 #define CONFIG_ESP32_WIFI_TX_BA_WIN             6
 #define CONFIG_ESP32_WIFI_AMPDU_RX_ENABLED      1
 #define CONFIG_ESP32_WIFI_RX_BA_WIN             6
-#ifdef MODULE_ESP_IDF_NVS_ENABLED
+#if defined(MODULE_ESP_IDF_NVS_FLASH) && !defined(CPU_FAM_ESP32C3)
 #define CONFIG_ESP32_WIFI_NVS_ENABLED           1
 #endif
 #define CONFIG_ESP32_WIFI_TASK_PINNED_TO_CORE_0 1
@@ -203,6 +212,8 @@
 #include "sdkconfig_esp32.h"
 #elif defined(CPU_FAM_ESP32C3)
 #include "sdkconfig_esp32c3.h"
+#elif defined(CPU_FAM_ESP32S3)
+#include "sdkconfig_esp32s3.h"
 #else
 #error "ESP32x family implementation missing"
 #endif

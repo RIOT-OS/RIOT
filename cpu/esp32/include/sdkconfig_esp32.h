@@ -105,8 +105,13 @@ extern "C" {
 #define CONFIG_BROWNOUT_DET                     CONFIG_ESP32_BROWNOUT_DET
 
 #define CONFIG_ESP32_DEEP_SLEEP_WAKEUP_DELAY    2000
-#define CONFIG_ESP32_TRACEMEM_RESERVE_DRAM      0
+#define CONFIG_ESP32_TRACEMEM_RESERVE_DRAM      0x0
 #define CONFIG_ESP32_ULP_COPROC_RESERVE_MEM     0
+
+/**
+ * ESP32 specific sleep configuration (DO NOT CHANGE)
+ */
+#define CONFIG_ESP_SLEEP_RTC_BUS_ISO_WORKAROUND 1
 
 /**
  * ESP32 specific ADC calibration
