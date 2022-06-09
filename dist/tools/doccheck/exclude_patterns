@@ -4834,6 +4834,7 @@ boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member TIMER_1_ISR \
 boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member UART_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
+boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member UART_2_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member adc_channels\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
