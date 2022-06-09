@@ -124,6 +124,28 @@ static inline bool _is_gc(_nib_onl_entry_t *node)
             GNRC_IPV6_NIB_NC_INFO_AR_STATE_GC);
 }
 
+static _nib_onl_entry_t *_replace_onl_entry(_nib_onl_entry_t *tmp,
+                                            const ipv6_addr_t *addr,
+                                            unsigned iface,
+                                            uint16_t cstate)
+{
+    DEBUG("nib: Removing neighbor cache entry (addr = %s, iface = %u) ",
+          ipv6_addr_to_str(addr_str, &tmp->ipv6, sizeof(addr_str)),
+          _nib_onl_get_if(tmp));
+    DEBUG("for (addr = %s, iface = %u)\n",
+          ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
+          iface);
+    /* call _nib_nc_remove to remove timers from _evtimer */
+    _nib_nc_remove(tmp);
+
+   _override_node(addr, iface, tmp);
+   /* cstate masked in _nib_nc_add() already */
+   tmp->info |= cstate;
+   tmp->mode = _NC;
+
+    return tmp;
+}
+
 static inline _nib_onl_entry_t *_cache_out_onl_entry(const ipv6_addr_t *addr,
                                                      unsigned iface,
                                                      uint16_t cstate)
@@ -132,6 +154,9 @@ static inline _nib_onl_entry_t *_cache_out_onl_entry(const ipv6_addr_t *addr,
     _nib_onl_entry_t *first = (_nib_onl_entry_t *)clist_lpop(&_next_removable);
     _nib_onl_entry_t *tmp = first, *res = NULL;
 
+    uint32_t oldest_ttl = UINT32_MAX;
+    _nib_onl_entry_t *oldest = NULL;
+
     DEBUG("nib: Searching for replaceable entries (addr = %s, iface = %u)\n",
           ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)), iface);
     if (tmp == NULL) {
@@ -139,21 +164,13 @@ static inline _nib_onl_entry_t *_cache_out_onl_entry(const ipv6_addr_t *addr,
     }
     do {
         if (_is_gc(tmp)) {
-            DEBUG("nib: Removing neighbor cache entry (addr = %s, "
-                  "iface = %u) ",
-                  ipv6_addr_to_str(addr_str, &tmp->ipv6,
-                                   sizeof(addr_str)),
-                  _nib_onl_get_if(tmp));
-            DEBUG("for (addr = %s, iface = %u)\n",
-                  ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
-                  iface);
-            /* call _nib_nc_remove to remove timers from _evtimer */
-            _nib_nc_remove(tmp);
-            res = tmp;
-            _override_node(addr, iface, res);
-            /* cstate masked in _nib_nc_add() already */
-            res->info |= cstate;
-            res->mode = _NC;
+            res = _replace_onl_entry(tmp, addr, iface, cstate);
+        } else {
+            uint32_t timeout = _evtimer_lookup(&tmp->nud_timeout, GNRC_IPV6_NIB_REACH_TIMEOUT);
+            if (timeout < oldest_ttl) {
+                oldest_ttl = timeout;
+                oldest = tmp;
+            }
         }
         /* requeue if not garbage collectible at the moment or queueing
          * newly created NCE or in case entry becomes garbage collectible
@@ -164,6 +181,11 @@ static inline _nib_onl_entry_t *_cache_out_onl_entry(const ipv6_addr_t *addr,
             tmp = (_nib_onl_entry_t *)clist_lpop(&_next_removable);
         }
     } while ((tmp != first) && (res == NULL));
+
+    if (res == NULL && oldest) {
+        res = _replace_onl_entry(oldest, addr, iface, cstate);
+    }
+
     if (res == NULL) {
         /* we did not find any removable entry => requeue current one */
         clist_rpush(&_next_removable, (clist_node_t *)tmp);
