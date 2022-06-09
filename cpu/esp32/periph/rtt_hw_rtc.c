@@ -105,7 +105,7 @@ uint64_t _rtc_get_counter(void)
     }
     /* read the time from 48-bit counter and return */
     return (((uint64_t)RTCCNTL.time1.val) << 32) + RTCCNTL.time0;
-#elif defined(CPU_FAM_ESP32C3)
+#elif defined(CPU_FAM_ESP32C3) || defined(CPU_FAM_ESP32S3)
     /* read the time from 48-bit counter and return */
     return (((uint64_t)RTCCNTL.time_high0.val) << 32) + RTCCNTL.time_low0;
 #else
