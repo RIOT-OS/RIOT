@@ -38,6 +38,7 @@
 #include "kernel_defines.h"
 #include "xfa.h"
 #include "shell.h"
+#include "shell_lock.h"
 
 /* define shell command cross file array */
 XFA_INIT_CONST(shell_command_t*, shell_commands_xfa);
@@ -60,6 +61,10 @@ XFA_INIT_CONST(shell_command_t*, shell_commands_xfa);
 #define TAB '\t'
 
 #define PARSE_ESCAPE_MASK 0x4;
+
+extern void shell_lock_checkpoint(char *line_buf, int len);
+extern bool shell_lock_is_locked(void);
+extern void shell_lock_auto_lock_refresh(void);
 
 enum parse_state {
     PARSE_BLANK             = 0x0,
@@ -106,6 +111,7 @@ static shell_command_handler_t find_handler(
         const shell_command_t *command_list, char *command)
 {
     shell_command_handler_t handler = NULL;
+
     if (command_list != NULL) {
         handler = search_commands(command_list, command);
     }
@@ -404,7 +410,7 @@ static inline void new_line(void)
  * @return  EOF, if the end of the input stream was reached.
  * @return  -ENOBUFS if the buffer size was exceeded.
  */
-static int readline(char *buf, size_t size)
+int readline(char *buf, size_t size) /* needed externally by module shell_lock */
 {
     int curr_pos = 0;
     bool length_exceeded = false;
@@ -471,10 +477,25 @@ static int readline(char *buf, size_t size)
 void shell_run_once(const shell_command_t *shell_commands,
                     char *line_buf, int len)
 {
+    if (IS_USED(MODULE_SHELL_LOCK)) {
+        shell_lock_checkpoint(line_buf, len);
+    }
+
     print_prompt();
 
     while (1) {
         int res = readline(line_buf, len);
+
+        if (IS_USED(MODULE_SHELL_LOCK)) {
+            if (shell_lock_is_locked()) {
+                break;
+            }
+        }
+
+        if (IS_USED(MODULE_SHELL_LOCK_AUTO_LOCKING)) {
+            /* reset lock countdown in case of new input */
+            shell_lock_auto_lock_refresh();
+        }
 
         switch (res) {
 

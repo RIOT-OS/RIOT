@@ -50,10 +50,13 @@ void telnet_cb_pre_connected(sock_tcp_t *sock)
     printf("%s connected\n", addr_str);
 }
 
+/* shell lock module makes use of disconnect callback */
+#ifndef MODULE_SHELL_LOCK
 void telnet_cb_disconneced(void)
 {
     puts("disconnected");
 }
+#endif
 
 void telnet_cb_connected(sock_tcp_t *sock)
 {

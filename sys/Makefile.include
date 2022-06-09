@@ -155,3 +155,7 @@ endif
 ifneq (,$(filter test_utils_netdev_eth_minimal,$(USEMODULE)))
   CFLAGS += -DCONFIG_NETDEV_REGISTER_SIGNAL
 endif
+
+ifneq (,$(filter shell_lock,$(USEMODULE)))
+  include $(RIOTBASE)/sys/shell_lock/Makefile.include
+endif

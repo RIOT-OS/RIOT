@@ -97,6 +97,10 @@ ifneq (,$(filter trace,$(USEMODULE)))
   USEMODULE += ztimer_usec
 endif
 
+ifneq (,$(filter shell_lock,$(USEMODULE)))
+  USEMODULE += ztimer_msec
+endif
+
 ifneq (,$(filter ssp,$(USEMODULE)))
   FEATURES_REQUIRED += ssp
 endif
