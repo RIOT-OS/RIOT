@@ -78,14 +78,6 @@ ifneq (,$(filter lwip,$(USEMODULE)))
   CFLAGS += -DTCPIP_THREAD_PRIO=5
 endif
 
-# if SPI RAM is enabled, the qout flash mode has to be used
-_FLASH_MODE_PREV := $(FLASH_MODE)
-ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
-  FLASH_MODE = qout
-else
-  FLASH_MODE = $(_FLASH_MODE_PREV)
-endif
-
 # set CFLAG for the correspondant FLASH_MODE
 CFLAGS += $(if $(findstring qout,$(FLASH_MODE)),-DFLASH_MODE_QOUT=1)
 CFLAGS += $(if $(findstring qio,$(FLASH_MODE)),-DFLASH_MODE_QIO=1)
