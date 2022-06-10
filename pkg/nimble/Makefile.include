@@ -48,9 +48,7 @@ ifneq (,$(filter nimble_host_util,$(USEMODULE)))
 endif
 
 # include transport headers
-ifneq (,$(filter nimble_transport_ram,$(USEMODULE)))
-  INCLUDES += $(NIMIBASE)/nimble/transport/ram/include
-endif
+INCLUDES += $(NIMIBASE)/nimble/transport/include
 
 # include services
 ifneq (,$(filter nimble_svc_ans,$(USEMODULE)))
@@ -96,6 +94,8 @@ ifneq (,$(filter nimble_autoconn,$(USEMODULE)))
 endif
 
 ifneq (,$(filter nimble_adv_ext,$(USEMODULE)))
+  # extended advertising HCI events can be up to 257 bytes
+  CFLAGS += -DMYNEWT_VAL_BLE_TRANSPORT_EVT_SIZE=257
   CFLAGS += -DMYNEWT_VAL_BLE_EXT_ADV=1
   CFLAGS += -DMYNEWT_VAL_BLE_LL_EXT_ADV_AUX_PTR_CNT=2
   CFLAGS += -DMYNEWT_VAL_BLE_LL_SCAN_AUX_SEGMENT_CNT=1
@@ -112,6 +112,10 @@ ifneq (,$(filter nimble_adv_ext,$(USEMODULE)))
   ifneq (-1,$(BLE_MULTI_ADV_INSTANCES))
     CFLAGS += -DMYNEWT_VAL_BLE_MULTI_ADV_INSTANCES=$(BLE_MULTI_ADV_INSTANCES)
   endif
+else
+  # when only using non-extended advertisements the maximum HCI event size is
+  # 45 bytes
+  CFLAGS += -DMYNEWT_VAL_BLE_TRANSPORT_EVT_SIZE=45
 endif
 
 ifneq (,$(filter nimble_netif,$(USEMODULE)))

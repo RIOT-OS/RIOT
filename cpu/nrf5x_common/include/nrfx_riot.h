@@ -19,8 +19,8 @@
  * @author          Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef NRFX_H
-#define NRFX_H
+#ifndef NRFX_RIOT_H
+#define NRFX_RIOT_H
 
 #include "kernel_defines.h"
 #include "cpu_conf.h"
@@ -63,5 +63,5 @@ static inline void nrfx_dcdc_init(void)
 }
 #endif
 
-#endif /* NRFX_H */
+#endif /* NRFX_RIOT_H */
 /** @} */

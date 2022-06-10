@@ -23,7 +23,7 @@
 #define DONT_OVERRIDE_NVIC
 
 #include "cpu.h"
-#include "nrfx.h"
+#include "nrfx_riot.h"
 #include "nrf_clock.h"
 #include "periph_conf.h"
 #include "periph/init.h"

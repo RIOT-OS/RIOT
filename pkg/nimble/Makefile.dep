@@ -3,6 +3,8 @@ USEMODULE += sema
 USEMODULE += event_callback
 USEMODULE += ztimer_msec
 
+USEPKG += nrfx
+
 # Requires nimble feature
 FEATURES_REQUIRED += ble_nimble
 
@@ -11,6 +13,9 @@ USEMODULE += nimble_riot_contrib
 
 # RIOT port
 USEMODULE += nimble_porting_nimble
+
+# Generic modules used by host and controller
+USEMODULE += nimble_transport
 
 # Pull in dependencies based on used features
 ifneq (,$(filter ble_phy_coded,$(FEATURES_USED)))
@@ -50,7 +55,6 @@ endif
 
 # nimble controller dependencies
 ifneq (,$(filter nimble_controller,$(USEMODULE)))
-  USEMODULE += nimble_transport_ram
   ifneq (,$(filter nrf5%,$(CPU_FAM)))
     USEMODULE += nimble_drivers_nrf5x
   endif
