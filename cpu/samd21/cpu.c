@@ -117,7 +117,14 @@ static void clk_init(void)
 
     /* adjust NVM wait states */
     PM->APBBMASK.reg |= PM_APBBMASK_NVMCTRL;
-    NVMCTRL->CTRLB.reg |= NVMCTRL_CTRLB_RWS(WAITSTATES);
+    NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_RWS(WAITSTATES)
+#ifdef CPU_SAMD20
+    /* errata: In Standby, Idle1 and Idle2 Sleep modes,
+               the device might not wake up from sleep. */
+                       | NVMCTRL_CTRLB_SLEEPPRM_DISABLED
+#endif
+    /* errata: Default value of MANW in NVM.CTRLB is 0. */
+                       | NVMCTRL_CTRLB_MANW;
     PM->APBBMASK.reg &= ~PM_APBBMASK_NVMCTRL;
 
 #if CLOCK_8MHZ
