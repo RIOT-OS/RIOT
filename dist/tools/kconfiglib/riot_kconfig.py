@@ -28,6 +28,14 @@ class RiotKconfig(Kconfig):
         super(RiotKconfig, self).write_autoconf(filename, header)
         self.unique_defined_syms = tmp_unique_defined_syms
 
+    def evaluate_config(self):
+        """Evaluate the current configuration.
+
+        Useful to catch warnings (such as out-of-range integers) before writing
+        the configuration to a file.
+        """
+        self._config_contents(None)
+
 
 def standard_riot_kconfig(description=None):
     """
