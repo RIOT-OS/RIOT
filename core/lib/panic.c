@@ -39,6 +39,8 @@
 #include "usb_board_reset.h"
 #endif
 
+const char assert_crash_message[] = "FAILED ASSERTION.";
+
 /* flag preventing "recursive crash printing loop" */
 static int crashed = 0;
 

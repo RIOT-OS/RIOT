@@ -16,17 +16,15 @@
 #include <stdio.h>
 
 #include "assert.h"
-#include "panic.h"
 
-__NORETURN void _assert_failure(const char *file, unsigned line)
+#ifdef DEBUG_ASSERT_VERBOSE
+NORETURN void _assert_failure(const char *file, unsigned line)
 {
-    printf("%s:%u => ", file, line);
-    core_panic(PANIC_ASSERT_FAIL, "FAILED ASSERTION.");
+    printf("%s:%u => ", file, line); \
+    core_panic(PANIC_ASSERT_FAIL, assert_crash_message); \
 }
-
-__NORETURN void _assert_panic(void)
-{
-    core_panic(PANIC_ASSERT_FAIL, "FAILED ASSERTION.");
-}
+#else
+typedef int dont_be_pedantic;
+#endif
 
 /** @} */
