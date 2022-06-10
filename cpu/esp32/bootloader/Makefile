@@ -327,7 +327,7 @@ ifneq (,$(filter esp32,$(CPU_FAM)))
   FLASH_FREQ  = 40m   # DO NOT CHANGE
   FLASH_SIZE ?= 4
 endif
-ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
+ifneq (,$(filter esp32c3 esp32s2 esp32s3,$(CPU_FAM)))
   FLASH_MODE  = dio
   FLASH_FREQ  = 80m   # DO NOT CHANGE
   FLASH_SIZE ?= 4
