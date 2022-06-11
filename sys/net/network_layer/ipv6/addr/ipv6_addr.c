@@ -176,10 +176,9 @@ void ipv6_addrs_print(const ipv6_addr_t *addrs, size_t num,
     ipv6_addr_to_str(buf, &addrs[num], sizeof(buf));
     if (IS_USED(MODULE_FMT)) {
         print_str(buf);
-        print_str(separator);
     }
     else {
-        printf("%s%s", buf, separator);
+        printf("%s", buf);
     }
 }
 
