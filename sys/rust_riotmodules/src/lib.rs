@@ -8,3 +8,6 @@
 
 #[cfg(feature = "riot-module-lsm303agr")]
 extern crate riot_module_lsm303agr;
+
+#[cfg(feature = "riot-module-shell-democommands")]
+extern crate riot_module_shell_democommands;

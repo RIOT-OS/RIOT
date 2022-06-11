@@ -13,6 +13,9 @@ CARGO_COMPILE_COMMANDS_FLAGS = --clang
 ifneq (,$(filter lsm303agr,$(USEMODULE)))
   CARGO_OPTIONS += --features rust_riotmodules/riot-module-lsm303agr
 endif
+ifneq (,$(filter shell_democommands,$(USEMODULE)))
+  CARGO_OPTIONS += --features rust_riotmodules/riot-module-shell-democommands
+endif
 
 # This is duplicating the compile-commands rule because unlike in the use case
 # when a $(RIOTBASE)/compile_commands.json is built, we *want* this to be
