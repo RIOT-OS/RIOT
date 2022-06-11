@@ -854,8 +854,9 @@ preflash: $(BUILD_BEFORE_FLASH)
 
 # graphical memory usage analyzer
 COSY_TOOL ?= $(PKGDIRBASE)/cosy/cosy.py
+COSY_PORT ?= 12345
 cosy: $(ELFFILE) $(COSY_TOOL)
-	$(COSY_TOOL) --riot-base $(RIOTBASE) $(APPDIR) $(BOARD) $(ELFFILE) $(MAPFILE)
+	$(COSY_TOOL) --port $(COSY_PORT) --riot-base $(RIOTBASE) $(APPDIR) $(BOARD) $(ELFFILE) $(MAPFILE)
 
 ifneq (,$(TERMLOG)$(TERMTEE))
   TERMTEE ?= | tee -a $(TERMLOG)
