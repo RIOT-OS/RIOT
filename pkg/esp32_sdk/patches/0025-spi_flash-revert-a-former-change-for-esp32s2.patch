@@ -1,0 +1,29 @@
+From 74d193f25d9bc130be19531eee2edaf7c0f1431b Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sun, 12 Jun 2022 17:09:09 +0200
+Subject: [PATCH 25/25] spi_flash: revert a former change for esp32s2
+
+---
+ components/spi_flash/cache_utils.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/components/spi_flash/cache_utils.c b/components/spi_flash/cache_utils.c
+index 11a6b857c89..d7d750abddb 100644
+--- a/components/spi_flash/cache_utils.c
++++ b/components/spi_flash/cache_utils.c
+@@ -391,7 +391,6 @@ IRAM_ATTR bool spi_flash_cache_enabled(void)
+     return result;
+ }
+ 
+-#ifndef RIOT_VERSION
+ #if CONFIG_IDF_TARGET_ESP32S2
+ IRAM_ATTR void esp_config_instruction_cache_mode(void)
+ {
+@@ -958,4 +957,3 @@ void IRAM_ATTR spi_flash_enable_cache(uint32_t cpuid)
+     spi_flash_restore_cache(0, 0); // TODO cache_value should be non-zero
+ #endif
+ }
+-#endif /* RIOT_VERSION */
+-- 
+2.17.1
+
