@@ -182,6 +182,8 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 
     uint32_t now = rtt_get_counter();
 
+    rtc_tm_normalize(time);
+
     alarm_time   = rtc_mktime(time);
     alarm_cb_arg = arg;
     alarm_cb     = cb;
