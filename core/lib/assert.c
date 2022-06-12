@@ -16,6 +16,7 @@
 #include <stdio.h>
 
 #include "assert.h"
+#include "cpu.h"
 #include "panic.h"
 
 __NORETURN void _assert_failure(const char *file, unsigned line)
@@ -26,6 +27,7 @@ __NORETURN void _assert_failure(const char *file, unsigned line)
 
 __NORETURN void _assert_panic(void)
 {
+    cpu_print_last_instruction();
     core_panic(PANIC_ASSERT_FAIL, "FAILED ASSERTION.");
 }
 
