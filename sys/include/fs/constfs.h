@@ -37,9 +37,9 @@ extern "C" {
  * @brief A file in ConstFS (file name + contents)
  */
 typedef struct {
-    const char *path; /**< file system relative path to file */
+    const char *path;  /**< file system relative path to file */
     const size_t size; /**< length of @c data */
-    const uint8_t *data; /**< pointer to file contents */
+    const void *data;  /**< pointer to file contents */
 } constfs_file_t;
 
 /**

@@ -197,7 +197,7 @@ static ssize_t constfs_read(vfs_file_t *filp, void *dest, size_t nbytes)
     if (nbytes > (fp->size - filp->pos)) {
         nbytes = fp->size - filp->pos;
     }
-    memcpy(dest, fp->data + filp->pos, nbytes);
+    memcpy(dest, (const uint8_t *)fp->data + filp->pos, nbytes);
     DEBUG("constfs_read: read %lu bytes\n", (long unsigned)nbytes);
     filp->pos += nbytes;
     return nbytes;
