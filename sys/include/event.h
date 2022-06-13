@@ -147,6 +147,7 @@ typedef void (*event_handler_t)(event_t *);
 struct event {
     clist_node_t list_node;     /**< event queue list entry             */
     event_handler_t handler;    /**< pointer to event handler function  */
+    unsigned num_posted;        /**< how often the event was posted     */
 };
 
 /**

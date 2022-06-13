@@ -38,9 +38,10 @@ void event_post(event_queue_t *queue, event_t *event)
     assert(queue && event);
 
     unsigned state = irq_disable();
-    if (!event->list_node.next) {
+    if (event->num_posted == 0) {
         clist_rpush(&queue->event_list, &event->list_node);
     }
+    ++event->num_posted;
     thread_t *waiter = queue->waiter;
     irq_restore(state);
 
@@ -55,20 +56,33 @@ void event_cancel(event_queue_t *queue, event_t *event)
     assert(event);
 
     unsigned state = irq_disable();
-    clist_remove(&queue->event_list, &event->list_node);
-    event->list_node.next = NULL;
+    if (event->num_posted && --event->num_posted == 0) {
+        clist_remove(&queue->event_list, &event->list_node);
+    }
     irq_restore(state);
+}
+
+static event_t *_get(event_queue_t *queue)
+{
+    clist_node_t *node = clist_lpeek(&queue->event_list);
+    event_t *result = container_of(node, event_t, list_node);
+
+    if (result) {
+        assert(result->num_posted);
+        if (--result->num_posted == 0) {
+            clist_lpop(&queue->event_list);
+        }
+    }
+
+    return result;
 }
 
 event_t *event_get(event_queue_t *queue)
 {
     unsigned state = irq_disable();
-    event_t *result = (event_t *) clist_lpop(&queue->event_list);
+    event_t *result = _get(queue);
     irq_restore(state);
 
-    if (result) {
-        result->list_node.next = NULL;
-    }
     return result;
 }
 
@@ -81,8 +95,7 @@ event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
         unsigned state = irq_disable();
         for (size_t i = 0; i < n_queues; i++) {
             assert(queues[i].waiter);
-            result = container_of(clist_lpop(&queues[i].event_list),
-                                  event_t, list_node);
+            result = _get(&queues[i]);
             if (result) {
                 break;
             }
@@ -93,7 +106,6 @@ event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
         }
     } while (result == NULL);
 
-    result->list_node.next = NULL;
     return result;
 }
 
