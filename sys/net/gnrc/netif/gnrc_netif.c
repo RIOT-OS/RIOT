@@ -1927,15 +1927,18 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         gnrc_pktsnip_t *pkt = NULL;
         switch (event) {
             case NETDEV_EVENT_RX_COMPLETE:
-                pkt = netif->ops->recv(netif);
+                do {
+                    pkt = netif->ops->recv(netif);
+                    if (pkt) {
+                        _process_receive_stats(netif, pkt);
+                        _pass_on_packet(pkt);
+                    }
+                } while (pkt);
+
                 /* send packet previously queued within netif due to the lower
                  * layer being busy.
                  * Further packets will be sent on later TX_COMPLETE */
                 _send_queued_pkt(netif);
-                if (pkt) {
-                    _process_receive_stats(netif, pkt);
-                    _pass_on_packet(pkt);
-                }
                 break;
 #if IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ)
             case NETDEV_EVENT_TX_COMPLETE:
