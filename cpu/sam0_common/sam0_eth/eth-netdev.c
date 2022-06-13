@@ -40,6 +40,7 @@ extern void sam0_eth_poweron(void);
 extern void sam0_eth_poweroff(void);
 extern int sam0_eth_send(const struct iolist *iolist);
 extern int sam0_eth_receive_blocking(char *data, unsigned max_len);
+extern bool sam0_eth_has_queued_pkt(void);
 extern void sam0_eth_set_mac(const eui48_t *mac);
 extern void sam0_eth_get_mac(char *out);
 extern void sam0_clear_rx_buffers(void);
@@ -68,6 +69,12 @@ static int _sam0_eth_recv(netdev_t *netdev, void *buf, size_t len, void *info)
     (void)info;
     (void)netdev;
     unsigned ret = sam0_eth_receive_blocking((char *)buf, len);
+
+    /* frame received, check if another frame is queued */
+    if (buf && sam0_eth_has_queued_pkt()) {
+        netdev_trigger_event_isr(netdev);
+    }
+
     return ret;
 }
 
