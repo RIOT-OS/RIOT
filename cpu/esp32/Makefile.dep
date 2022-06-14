@@ -71,7 +71,7 @@ ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
 endif
 
 ifneq (,$(filter esp_idf_wifi,$(USEMODULE)))
-  # add additional modules required by esp_idf_nvs_flash
+  # add additional modules required by esp_idf_wifi
   USEMODULE += esp_idf_adc
 endif
 

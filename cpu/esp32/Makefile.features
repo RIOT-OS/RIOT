@@ -4,7 +4,7 @@ ifneq (,$(filter esp32,$(CPU_FAM)))
 else ifneq (,$(filter esp32c3,$(CPU_FAM)))
   CPU_ARCH = riscv_esp32
   CPU_CORE = riscv32
-else ifneq (,$(filter esp32s3,$(CPU_FAM)))
+else ifneq (,$(filter esp32s2 esp32s3,$(CPU_FAM)))
   CPU_ARCH = xtensa
   CPU_CORE = xtensa-lx7
 else
@@ -19,11 +19,11 @@ FEATURES_PROVIDED += arch_esp32
 FEATURES_PROVIDED += esp_wifi_enterprise
 FEATURES_PROVIDED += puf_sram
 
-ifneq (,$(filter esp32 esp32s3,$(CPU_FAM)))
+ifneq (,$(filter esp32 esp32s2 esp32s3,$(CPU_FAM)))
   FEATURES_PROVIDED += esp_hw_counter
 endif
 
-ifneq (,$(filter esp32-wrover% esp32s3%r2 esp32s3%r8 esp32s3%r8v,$(CPU_MODEL)))
+ifneq (,$(filter esp32-wrover% esp32s2%r2 esp32s3%r2 esp32s3%r8 esp32s3%r8v,$(CPU_MODEL)))
   FEATURES_PROVIDED += esp_spi_ram
   ifneq (,$(filter esp32s3%r8 esp32s3%r8v,$(CPU_MODEL)))
     FEATURES_PROVIDED += esp_spi_oct
