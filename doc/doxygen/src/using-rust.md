@@ -68,14 +68,14 @@ but through established platform independent traits.
 For example, the main API surface of an [I2CDevice]
 is its implementation of the [corresponding embedded-hal I2C traits] for reading and writing.
 
-The wrapper are [documented together with riot-sys and some of the examples].
+The wrappers are [documented together with riot-sys and some of the examples].
 
 [**riot-sys**]: https://crates.io/crates/riot-sys
 [**riot-wrappers**]: https://crates.io/crates/riot-wrappers
 [bindgen]: https://crates.io/crates/bindgen
 [C2Rust]: https://c2rust.com/
 [riot_wrappers::mutex::Mutex]: https://rustdoc.etonomy.org/riot_wrappers/mutex/struct.Mutex.html
-[documented together with riot-sys and some of the examples]: https://rustdoc.etonomy.org/riot_wrappers/mutex/struct.Mutex.html
+[documented together with riot-sys and some of the examples]: https://rustdoc.etonomy.org/
 [I2CDevice]: https://rustdoc.etonomy.org/riot_wrappers/i2c/struct.I2CDevice.html
 [corresponding embedded-hal I2C traits]: https://rustdoc.etonomy.org/embedded_hal/blocking/i2c/index.html
 
