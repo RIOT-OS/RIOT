@@ -35,7 +35,7 @@ def detect_includes_and_version_gcc(compiler):
     except FileNotFoundError:
         msg = f"Compiler {compiler} not found, not adding system include paths\n"
         sys.stderr.write(msg)
-        return []
+        return ([], "")
 
     stderrdata = stderrdata.decode("utf-8")
     version = REGEX_VERSION.search(stderrdata).group(1)
