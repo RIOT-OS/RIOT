@@ -339,6 +339,8 @@ static uint8_t IRAM _uart_rx_one_char(uart_t uart)
 #elif defined(CPU_FAM_ESP32S3)
     /* read the lowest byte from RX FIFO register */
     return _uarts[uart].regs->fifo.rxfifo_rd_byte;
+#elif defined(CPU_FAM_ESP32S2)
+    return READ_PERI_REG(UART_FIFO_AHB_REG(uart));
 #else
     /* read the lowest byte from RX FIFO register */
     return _uarts[uart].regs->ahb_fifo.rw_byte;
