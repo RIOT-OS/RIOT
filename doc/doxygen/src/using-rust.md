@@ -86,8 +86,8 @@ To install the necessary Rust components, it is easiest use [**rustup**, install
 
 Using Rust on RIOT needs the latest stable or nightly version of Rust,
 depending on the precise example used.
-(Several modules, such as CoAP, SAUL or the shell, need features not yet available on stable yet;
-the minimal test is performed on stable, and examples are configured to use stable as it becomes available).
+(Currently, it's mainly the CoAP parts that use nightly features, and some native builds;
+until stable is universally available, only tests are run on stable by default).
 
 Make sure you have both the nightly and stable **toolchains**
 and the core library for the CPU (**target**) of your choice available:
@@ -95,6 +95,7 @@ and the core library for the CPU (**target**) of your choice available:
 ```
 $ rustup toolchain add nightly
 $ rustup toolchain add stable
+$ rustup default nightly
 $ rustup target add thumbv7m-none-eabi --toolchain nightly
 $ rustup target add thumbv7m-none-eabi --toolchain stable
 ```
@@ -103,7 +104,7 @@ Substitute thumbv7m-none-eabi with the value of `RUST_TARGET`
 in the output of `make info-build` of an application that has your current board selected,
 or just add it later whenever the Rust compiler complains about not finding the core library for a given target).
 Installing only nightly will work just as well,
-but you may need to remove the `CARGO_CHANNEL = stable` lines from tests or examples.
+but you may need to remove the `CARGO_CHANNEL = stable` line to run tests.
 
 
 While Rust comes with its own [cargo] dependency tracker for any Rust code,
@@ -119,26 +120,15 @@ consider installing this list of packages on Debian
 This encompass both components needed for riot-sys and for the later installation of C2Rust.
 
 
-Installing **C2Rust** is special because
-it can only be built using a particular nightly version
-(as explained in its [introduction post]):
+In addition to the Rust compiler you'll need to install the C2Rust transpiler;
+as this is using some recent fixes, it is best installed as:
 
 ```shell
-$ rustup install nightly-2019-12-05
-$ rustup component add --toolchain nightly-2019-12-05 rustfmt rustc-dev
-$ git clone https://github.com/immunant/c2rust
-$ cd c2rust
-$ git reset --hard 6674d785
-$ cargo +nightly-2019-12-05 install --locked --path c2rust
+$ cargo install c2rust --git https://github.com/immunant/c2rust
 ```
-
-The `git reset` step pins C2Rust to the version at time of writing.
-It is expected that later versions of C2Rust would work just as well,
-but they may need a more recent nightly Rust.
 
 [cargo]: https://doc.rust-lang.org/cargo/
 [**rustup**, installed as described on its website]: https://rustup.rs/
-[introduction post]: https://immunant.com/blog/2019/08/introduction-to-c2rust/
 
 Maintenance
 -----------
