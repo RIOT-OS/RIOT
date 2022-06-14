@@ -363,7 +363,7 @@ int _gnrc_rpl_set_pio(char *inst_id, bool status)
     return 0;
 }
 
-int _gnrc_rpl(int argc, char **argv)
+static int _gnrc_rpl(int argc, char **argv)
 {
     if ((argc < 2) || (strcmp(argv[1], "show") == 0)) {
         return _gnrc_rpl_dodag_show();

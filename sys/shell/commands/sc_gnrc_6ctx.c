@@ -49,7 +49,7 @@ static void _usage(char *cmd_str)
     puts("       reassigned after 5 min.");
 }
 
-int _gnrc_6ctx_list(void)
+static int _gnrc_6ctx_list(void)
 {
     puts("cid|prefix                                     |C|ltime");
     puts("-----------------------------------------------------------");
@@ -66,7 +66,7 @@ int _gnrc_6ctx_list(void)
     return 0;
 }
 
-int _gnrc_6ctx_add(char *cmd_str, char *ctx_str, char *prefix_str, char *ltime_str)
+static int _gnrc_6ctx_add(char *cmd_str, char *ctx_str, char *prefix_str, char *ltime_str)
 {
     ipv6_addr_t prefix;
     char *addr_str, *prefix_len_str, *save_ptr;
@@ -109,7 +109,7 @@ int _gnrc_6ctx_add(char *cmd_str, char *ctx_str, char *prefix_str, char *ltime_s
     return 0;
 }
 
-int _gnrc_6ctx_del(char *cmd_str, char *ctx_str)
+static int _gnrc_6ctx_del(char *cmd_str, char *ctx_str)
 {
     gnrc_sixlowpan_ctx_t *ctx;
     unsigned cid = atoi(ctx_str);
@@ -143,7 +143,7 @@ int _gnrc_6ctx_del(char *cmd_str, char *ctx_str)
     return 0;
 }
 
-int _gnrc_6ctx(int argc, char **argv)
+static int _gnrc_6ctx(int argc, char **argv)
 {
     if (argc < 2) {
         _gnrc_6ctx_list();

@@ -162,7 +162,7 @@ static int _can_usage(void)
     return 0;
 }
 
-int _can_handler(int argc, char **argv)
+static int _can_handler(int argc, char **argv)
 {
     if (argc < 2) {
         _can_usage();

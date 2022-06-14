@@ -89,7 +89,7 @@ static void _print_neighbors(netif_t *dev)
     }
 }
 
-int _netstats_nb(int argc, char **argv)
+static int _netstats_nb(int argc, char **argv)
 {
     (void) argc;
     (void) argv;

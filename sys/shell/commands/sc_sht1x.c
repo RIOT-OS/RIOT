@@ -93,7 +93,7 @@ static int read_sensor(int16_t *temp, int16_t *hum, int argc, char **argv)
     return 0;
 }
 
-int _get_humidity_handler(int argc, char **argv)
+static int _get_humidity_handler(int argc, char **argv)
 {
     int16_t hum;
 
@@ -107,7 +107,7 @@ int _get_humidity_handler(int argc, char **argv)
 
 SHELL_COMMAND(hum, "Prints measured humidity.", _get_humidity_handler);
 
-int _get_temperature_handler(int argc, char **argv)
+static int _get_temperature_handler(int argc, char **argv)
 {
     int16_t temp;
 
@@ -121,7 +121,7 @@ int _get_temperature_handler(int argc, char **argv)
 
 SHELL_COMMAND(temp, "Prints measured temperature.", _get_temperature_handler);
 
-int _get_weather_handler(int argc, char **argv)
+static int _get_weather_handler(int argc, char **argv)
 {
     int16_t hum;
     int16_t temp;
@@ -175,7 +175,7 @@ static void invalid_argument(int index, char **argv, const char *valid)
            argv[index + 1], argv[index], valid, argv[0]);
 }
 
-int _sht_config_handler(int argc, char **argv)
+static int _sht_config_handler(int argc, char **argv)
 {
     uint8_t set_conf = 0;
     uint8_t unset_conf = 0;

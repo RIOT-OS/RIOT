@@ -27,7 +27,7 @@
 #include "shell.h"
 #include "thread.h"
 
-int _sc_nice(int argc, char **argv)
+static int _sc_nice(int argc, char **argv)
 {
     if (argc != 3) {
         printf("Usage: %s <THREAD_ID> <PRIORITY>\n"

@@ -82,7 +82,7 @@ static void _netif_list(struct netif *netif) {
 #endif
 }
 
-int _lwip_netif_config(int argc, char **argv)
+static int _lwip_netif_config(int argc, char **argv)
 {
     if (argc < 2) {
         /* List in interface order, which is normally reverse of list order */

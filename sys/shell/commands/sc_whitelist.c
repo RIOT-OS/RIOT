@@ -31,7 +31,7 @@ static void _usage(char *cmd)
     puts("         Print this.");
 }
 
-int _whitelist(int argc, char **argv)
+static int _whitelist(int argc, char **argv)
 {
     ipv6_addr_t addr;
     if (argc < 2) {

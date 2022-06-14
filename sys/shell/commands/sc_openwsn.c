@@ -93,7 +93,7 @@ static char *_get_component(int id)
     return NULL;
 }
 
-int _openwsn_ifconfig(int argc, char **argv)
+static int _openwsn_ifconfig(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
@@ -572,7 +572,7 @@ static void _print_usage(void)
 #endif
 }
 
-int _openwsn_handler(int argc, char **argv)
+static int _openwsn_handler(int argc, char **argv)
 {
     if (argc < 2) {
         _print_usage();

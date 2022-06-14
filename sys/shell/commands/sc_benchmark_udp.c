@@ -24,7 +24,7 @@
 static const char *bench_server = BENCH_SERVER_DEFAULT;
 static uint16_t bench_port = BENCH_PORT_DEFAULT;
 
-int _benchmark_udp_handler(int argc, char **argv)
+static int _benchmark_udp_handler(int argc, char **argv)
 {
     if (argc < 2) {
         goto usage;

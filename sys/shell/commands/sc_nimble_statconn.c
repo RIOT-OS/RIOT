@@ -45,7 +45,7 @@ static uint8_t _parsephy(const char *phy_str)
     }
 }
 
-int _nimble_statconn_handler(int argc, char **argv)
+static int _nimble_statconn_handler(int argc, char **argv)
 {
     nimble_statconn_cfg_t cfg;
 

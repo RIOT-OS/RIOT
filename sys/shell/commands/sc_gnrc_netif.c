@@ -1725,7 +1725,7 @@ static int _netif_del(netif_t *iface, char *addr_str)
 
 /* shell commands */
 #ifdef MODULE_GNRC_TXTSND
-int _gnrc_netif_send(int argc, char **argv)
+static int _gnrc_netif_send(int argc, char **argv)
 {
     netif_t *iface;
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
@@ -1786,6 +1786,8 @@ int _gnrc_netif_send(int argc, char **argv)
 SHELL_COMMAND(txtsnd, "Sends a custom string as is over the link layer", _gnrc_netif_send);
 #endif
 
+/* TODO: updated tests/gnrc_dhcpv6_client to no longer abuse this shell command
+ * and add static qualifier */
 int _gnrc_netif_config(int argc, char **argv)
 {
     if (argc < 2) {

@@ -34,8 +34,6 @@
 #include "pm_layered.h"
 #endif
 
-extern int _pm_handler(int argc, char **argv);
-
 #include "shell.h"
 
 #ifndef BTN0_INT_FLANK
@@ -172,6 +170,23 @@ static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
 };
 
+#if IS_USED(MODULE_PM_LAYERED)
+static void _show_blockers(void)
+{
+    uint8_t lowest_allowed_mode = 0;
+
+    pm_blocker_t pm_blocker = pm_get_blocker();
+    for (unsigned i = 0; i < PM_NUM_MODES; i++) {
+        printf("mode %u blockers: %u \n", i, pm_blocker.blockers[i]);
+        if (pm_blocker.blockers[i]) {
+            lowest_allowed_mode = i + 1;
+        }
+    }
+
+    printf("Lowest allowed mode: %u\n", lowest_allowed_mode);
+}
+#endif /* MODULE_PM_LAYERED */
+
 /**
  * @brief   Application entry point.
  */
@@ -191,8 +206,7 @@ int main(void)
      * the state of PM blockers so that the user will know which power mode has
      * been entered and is presumably responsible for the unresponsive shell.
      */
-    _pm_handler(2, (char *[]){"pm", "show"});
-
+    _show_blockers();
 #else
     puts("This application allows you to test the CPU power management.\n"
          "Layered support is not unavailable for this CPU. Reset the CPU if\n"

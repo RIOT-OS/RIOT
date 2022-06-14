@@ -21,7 +21,7 @@
 #include "ps.h"
 #include "shell.h"
 
-int _ps_handler(int argc, char **argv)
+static int _ps_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;

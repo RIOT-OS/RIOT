@@ -149,7 +149,7 @@ static int cmd_off(char *arg)
     return 0;
 }
 
-int _pm_handler(int argc, char **argv)
+static int _pm_handler(int argc, char **argv)
 {
     if (argc < 2) {
         _print_usage();

@@ -37,7 +37,7 @@ static void _usage(char *cmd)
     printf("default: timeout = %lu\n", _DEFAULT_TIMEOUT);
 }
 
-int _ntpdate(int argc, char **argv)
+static int _ntpdate(int argc, char **argv)
 {
     uint32_t timeout = _DEFAULT_TIMEOUT;
 

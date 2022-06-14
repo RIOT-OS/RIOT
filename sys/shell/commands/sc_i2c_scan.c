@@ -52,7 +52,7 @@ static inline int is_addr_reserved(uint16_t addr)
     return 0;
 }
 
-int _i2c_scan(int argc, char **argv)
+static int _i2c_scan(int argc, char **argv)
 {
     i2c_t dev;
     if (get_dev(&dev, argc, argv)) {

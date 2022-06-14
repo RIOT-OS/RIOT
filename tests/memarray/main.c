@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include "memarray.h"
+#include "ps.h"
 
 #define MESSAGE_SIZE         (8U)
 
@@ -38,8 +39,6 @@
 #ifndef NUMBER_OF_LOOPS
 #define NUMBER_OF_LOOPS      (1)
 #endif
-
-extern int _ps_handler(int argc, char **argv);
 
 struct block_t {
     struct node *next;
@@ -114,7 +113,7 @@ int main(void)
     int loop = 0;
 
     printf("Starting (%d, %u)\n", MAX_NUMBER_BLOCKS, MESSAGE_SIZE);
-    _ps_handler(0, NULL);
+    ps();
 
     printf("LOOP #%i:\n", loop + 1);
     while (count <  NUMBER_OF_TESTS) {
@@ -184,7 +183,7 @@ int main(void)
            res, (unsigned)memarray_available(&block_storage));
 
     printf("Finishing\n");
-    _ps_handler(0, NULL);
+    ps();
 
     return 0;
 }

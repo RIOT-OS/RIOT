@@ -31,7 +31,7 @@ void get_bin(char *result, uint8_t byte)
     result[8] = '\0';
 }
 
-int _read_config(void)
+static int _read_config(void)
 {
     uint8_t data[ATCA_ECC_CONFIG_SIZE];
     uint8_t data_count = 0;
@@ -165,7 +165,7 @@ int _read_config(void)
     return 0;
 }
 
-int _check_lock_config(void)
+static int _check_lock_config(void)
 {
     bool is_locked = false;
     atcab_is_locked(LOCK_ZONE_CONFIG, &is_locked);
@@ -180,7 +180,7 @@ int _check_lock_config(void)
     return 0;
 }
 
-int _check_lock_data(void)
+static int _check_lock_data(void)
 {
     bool is_locked = false;
     atcab_is_locked(LOCK_ZONE_DATA, &is_locked);
@@ -195,7 +195,7 @@ int _check_lock_data(void)
     return 0;
 }
 
-int _lock_config(void)
+static int _lock_config(void)
 {
     bool is_locked = false;
     atcab_is_locked(LOCK_ZONE_CONFIG, &is_locked);
@@ -214,7 +214,7 @@ int _lock_config(void)
     return 0;
 }
 
-int _cryptoauth(int argc, char **argv)
+static int _cryptoauth(int argc, char **argv)
 {
     if (argc > 1) {
         if ((strcmp(argv[1], "read") == 0)) {

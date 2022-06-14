@@ -66,7 +66,7 @@ static void _loramac_get_usage(void)
          "class|dr|adr|public|netid|tx_power|rx2_freq|rx2_dr|ul_cnt|ch_mask>");
 }
 
-int _loramac_handler(int argc, char **argv)
+static int _loramac_handler(int argc, char **argv)
 {
     if (argc < 2) {
         _loramac_usage();

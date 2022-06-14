@@ -150,7 +150,7 @@ static int _rtt_cmd_usage(void)
     return 0;
 }
 
-int _rtt_handler(int argc, char **argv)
+static int _rtt_handler(int argc, char **argv)
 {
     if (argc < 2) {
         _rtt_cmd_usage();

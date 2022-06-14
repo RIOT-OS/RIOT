@@ -18,7 +18,7 @@
 #include "net/gnrc/ipv6/ext/frag.h"
 #include "shell.h"
 
-int _gnrc_ipv6_frag_stats(int argc, char **argv)
+static int _gnrc_ipv6_frag_stats(int argc, char **argv)
 {
     (void)argc;
     (void)argv;

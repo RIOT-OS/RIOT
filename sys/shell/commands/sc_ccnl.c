@@ -41,7 +41,7 @@ static void _open_usage(void)
     puts("ccnl <interface>");
 }
 
-int _ccnl_open(int argc, char **argv)
+static int _ccnl_open(int argc, char **argv)
 {
     /* check if already running */
     if (ccnl_relay.ifcount >= CCNL_MAX_INTERFACES) {
@@ -84,7 +84,7 @@ static void _content_usage(char *argv)
             argv, argv);
 }
 
-int _ccnl_content(int argc, char **argv)
+static int _ccnl_content(int argc, char **argv)
 {
     if (argc < 2) {
         ccnl_cs_dump(&ccnl_relay);
@@ -202,7 +202,7 @@ static void _interest_usage(char *arg)
             arg, arg);
 }
 
-int _ccnl_interest(int argc, char **argv)
+static int _ccnl_interest(int argc, char **argv)
 {
     if (argc < 2) {
         _interest_usage(argv[0]);
@@ -241,7 +241,7 @@ static void _ccnl_fib_usage(char *argv)
             argv, argv, argv, argv, argv);
 }
 
-int _ccnl_fib(int argc, char **argv)
+static int _ccnl_fib(int argc, char **argv)
 {
     if (argc < 2) {
         ccnl_fib_show(&ccnl_relay);

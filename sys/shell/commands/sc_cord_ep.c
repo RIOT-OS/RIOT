@@ -46,7 +46,7 @@ static int make_sock_ep(sock_udp_ep_t *ep, const char *addr)
     return 0;
 }
 
-int _cord_ep_handler(int argc, char **argv)
+static int _cord_ep_handler(int argc, char **argv)
 {
     int res;
 

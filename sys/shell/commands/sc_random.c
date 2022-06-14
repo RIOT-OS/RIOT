@@ -31,7 +31,7 @@
 #include "xtimer.h"
 #endif
 
-int _random_init(int argc, char **argv)
+static int _random_init(int argc, char **argv)
 {
     int initval;
 
@@ -58,7 +58,7 @@ int _random_init(int argc, char **argv)
 
 SHELL_COMMAND(random_init, "initializes the PRNG", _random_init);
 
-int _random_get(int argc, char **argv)
+static int _random_get(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
