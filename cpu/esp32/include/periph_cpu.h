@@ -560,7 +560,7 @@ typedef struct {
  *   That is, if SPI_DEV(1) is used by defining the `SPI1_*` symbols,
  *   SPI_DEV(0) must also be used by defining the `SPI0_*` symbols.
  * - The order in which the available interfaces `SPI2_HOST` (alias `HSPI` or
- *   `FSP`) and `SPI3_HOST` (alias `HSPI`) are assigned doesn't matter.
+ *   `FSPI`) and `SPI3_HOST` (alias `VPSI` or `HSPI`) are assigned doesn't matter.
  * - The GPIOs listed in the configuration are only initialized as SPI
  *   signals when the `periph_spi` module is used. Otherwise they are not
  *   allocated and can be used for other purposes.
@@ -582,9 +582,15 @@ typedef spi_host_device_t spi_ctrl_t;
  * sheets. These alias names have been declared obsolete in ESP-IDF. For
  * source code compatibility reasons these alias names are defined here.
  */
+#if defined(CPU_FAM_ESP32)
 #define HSPI    SPI2_HOST   /**< Alias name for SPI2_HOST as used in former ESP-IDF versions */
-#define FSPI    SPI2_HOST   /**< Alias name for SPI2_HOST as used in former ESP-IDF versions */
 #define VSPI    SPI3_HOST   /**< Alias name for SPI3_HOST as used in former ESP-IDF versions */
+#elif defined(CPU_FAM_ESP32S2)
+#define FSPI    SPI2_HOST   /**< Alias name for SPI2_HOST as used in former ESP-IDF versions */
+#define HSPI    SPI3_HOST   /**< Alias name for SPI3_HOST as used in former ESP-IDF versions */
+#else
+#define FSPI    SPI2_HOST   /**< Alias name for SPI2_HOST as used in former ESP-IDF versions */
+#endif
 
 /**
  * @brief   SPI configuration structure type
@@ -724,6 +730,8 @@ typedef struct {
 #include "periph_cpu_esp32.h"
 #elif defined(CPU_FAM_ESP32C3)
 #include "periph_cpu_esp32c3.h"
+#elif defined(CPU_FAM_ESP32S2)
+#include "periph_cpu_esp32s2.h"
 #elif defined(CPU_FAM_ESP32S3)
 #include "periph_cpu_esp32s3.h"
 #else

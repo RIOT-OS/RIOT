@@ -83,6 +83,7 @@
 #define CONFIG_ESP_SYSTEM_CHECK_INT_LEVEL_4     1
 #define CONFIG_ESP_SYSTEM_EVENT_QUEUE_SIZE      32
 #define CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE 2560
+#define CONFIG_ESP_SYSTEM_SINGLE_CORE_MODE      1
 
 #define CONFIG_ESP_TIME_FUNCS_USE_ESP_TIMER     1
 #define CONFIG_ESP_TIMER_TASK_STACK_SIZE        3584
@@ -134,6 +135,9 @@
 #define CONFIG_SPI_FLASH_SUPPORT_MXIC_CHIP          1
 #define CONFIG_SPI_FLASH_SUPPORT_GD_CHIP            1
 #define CONFIG_SPI_FLASH_SUPPORT_WINBOND_CHIP       1
+#define CONFIG_SPI_FLASH_SUPPORT_BOYA_CHIP          1
+#define CONFIG_SPI_FLASH_SUPPORT_TH_CHIP            1
+#define CONFIG_SPI_FLASH_SUPPORT_MXIC_OPI_CHIP      1
 
 /**
  * Ethernet driver configuration (DO NOT CHANGE)
@@ -212,6 +216,8 @@
 #include "sdkconfig_esp32.h"
 #elif defined(CPU_FAM_ESP32C3)
 #include "sdkconfig_esp32c3.h"
+#elif defined(CPU_FAM_ESP32S2)
+#include "sdkconfig_esp32s2.h"
 #elif defined(CPU_FAM_ESP32S3)
 #include "sdkconfig_esp32s3.h"
 #else
