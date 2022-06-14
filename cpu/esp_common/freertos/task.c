@@ -30,7 +30,7 @@
 #include "soc/soc.h"
 #endif
 
-#if defined(CPU_FAM_ESP32C3) || defined(CPU_FAM_ESP32S3)
+#if defined(CPU_FAM_ESP32C3) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
 #define PRO_CPU_NUM (0)
 #endif
 
