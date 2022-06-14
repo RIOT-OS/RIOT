@@ -66,6 +66,7 @@ endmenu
 
 orsource "Kconfig.esp32"
 orsource "Kconfig.esp32c3"
+orsource "Kconfig.esp32s2"
 orsource "Kconfig.esp32s3"
 
 rsource "bootloader/Kconfig"
