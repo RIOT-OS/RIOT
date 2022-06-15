@@ -4,6 +4,6 @@ USEPKG += fff
 FEATURES_BLACKLIST += periph_i2c
 
 # only two threads used
-CFLAGS += -DMAXTHREADS=2
+CFLAGS += -DMAXTHREADS=3
 
 include $(RIOTBASE)/Makefile.include
