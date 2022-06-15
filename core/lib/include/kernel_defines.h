@@ -85,18 +85,6 @@ extern "C" {
 #endif
 
 /**
- * @def CONST
- * @brief A function declared as *CONST* is #PURE and also not allowed to
- *        examine global memory. I.e. a *CONST* function cannot even
- *        dereference a pointer parameter.
- */
-#ifdef __GNUC__
-#define CONST  __attribute__((const))
-#else
-#define CONST
-#endif
-
-/**
  * @def PURE
  * @brief The function has no effects except the return value and its return
  *        value depends only on the parameters and/or global variables. Such a
