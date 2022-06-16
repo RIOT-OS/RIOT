@@ -6,7 +6,7 @@
 ## Overview
 
 The Nucleo-F042K6 is a board from ST's Nucleo family supporting ARM Cortex-M0 
-STM32F042K6 microcontroller with 6kB of RAM and 32kB of Flash.
+STM32F042K6 microcontroller with 6KiB of RAM and 32KiB of Flash.
 
 ## Flashing the Board Using ST-LINK Removable Media
 

@@ -6,7 +6,7 @@
 ## Overview
 
 The Nucleo-L011K4 is a board from ST's Nucleo family supporting ARM-Cortex-M0+
-STM32L011K4 microcontroller with 2kB of RAM and 16kB of Flash.
+STM32L011K4 microcontroller with 2KiB of RAM and 16KiB of Flash.
 
 ## Flashing the Board Using ST-LINK Removable Media
 
