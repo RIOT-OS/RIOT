@@ -18,6 +18,15 @@ $(CARGO_COMPILE_COMMANDS): $(BUILDDEPS)
 
 
 $(CARGO_LIB): $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS) FORCE
+	$(Q)command -v cargo >/dev/null || ($(COLOR_ECHO) \
+		'$(COLOR_RED)Error: `cargo` command missing to build Rust modules.$(COLOR_RESET) Please install as described on <https://doc.riot-os.org/using-rust.html>.' ;\
+		exit 1)
+	$(Q)command -v $${C2RUST:-c2rust} >/dev/null || ($(COLOR_ECHO) \
+		'$(COLOR_RED)Error: `'$${C2RUST:-c2rust}'` command missing to build Rust modules.$(COLOR_RESET) Please install as described on <https://doc.riot-os.org/using-rust.html>.' ;\
+		exit 1)
+	$(Q)command -v rustup >/dev/null || ($(COLOR_ECHO) \
+		'$(COLOR_RED)Error: `rustup` command missing.$(COLOR_RESET) While it is not essential for building Rust modules, it is the only known way to install the target core libraries (or nightly for -Zbuild-std) needed to do so. If you do think that building should be possible, please edit this file, and file an issue about building Rust modules with the installation method you are using -- later checks in this file, based on rustup, will need to be adjusted for that.' ;\
+		exit 1)
 	$(Q)[ x"${RUST_TARGET}" != x"" ] || ($(COLOR_ECHO) "$(COLOR_RED)Error: No RUST_TARGET was set for this platform.$(COLOR_RESET) Set FEATURES_REQUIRED+=rust_target to catch this earlier."; exit 1)
 	$(Q)# If distribution installed cargos ever grow the capacity to build RIOT, this absence of `rustup` might be OK. But that'd need them to both have cross tools around and cross core libs, none of which is currently the case.
 	$(Q)# Ad grepping for "std": We're not *actually* checking for std but more for core -- but rust-stc-$TARGET is the name of any standard libraries that'd be available for that target.
