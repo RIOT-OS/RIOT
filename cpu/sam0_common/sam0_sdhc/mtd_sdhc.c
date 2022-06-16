@@ -69,7 +69,7 @@ static int _read_page(mtd_dev_t *dev, void *buff, uint32_t page,
     DEBUG("%s(%lu, %lu, %lu)\n", __func__, page, offset, size);
 
     /* emulate unaligned / sub-page read */
-    if (pages == 0 || offset) {
+    if (pages == 0 || offset || ((uintptr_t)buff & 0x3)) {
 #if IS_USED(MODULE_MTD_WRITE_PAGE)
         if (dev->work_area == NULL) {
             DEBUG("mtd_sdhc: no work area\n");
@@ -105,7 +105,7 @@ static int _write_page(mtd_dev_t *dev, const void *buff, uint32_t page,
     DEBUG("%s(%lu, %lu, %lu)\n", __func__, page, offset, size);
 
     /* emulate unaligned / sub-page write */
-    if (pages == 0 || offset) {
+    if (pages == 0 || offset || ((uintptr_t)buff & 0x3)) {
 #if IS_USED(MODULE_MTD_WRITE_PAGE)
         if (dev->work_area == NULL) {
             DEBUG("mtd_sdhc: no work area\n");
