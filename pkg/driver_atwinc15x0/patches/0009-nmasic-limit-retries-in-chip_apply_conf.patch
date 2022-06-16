@@ -1,0 +1,36 @@
+From c1efd943abeb7ddf643bdb0849d1d70ae748ac5d Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Wed, 15 Jun 2022 18:05:45 +0200
+Subject: [PATCH 3/3] nmasic: limit retries in chip_apply_conf()
+
+---
+ src/driver/source/nmasic.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/driver/source/nmasic.c b/src/driver/source/nmasic.c
+index b77dc5a..bcc766d 100644
+--- a/src/driver/source/nmasic.c
++++ b/src/driver/source/nmasic.c
+@@ -65,6 +65,7 @@
+ sint8 chip_apply_conf(uint32 u32Conf)
+ {
+ 	sint8 ret = M2M_SUCCESS;
++	uint16 retries = TIMEOUT;
+ 	uint32 val32 = u32Conf;
+ 	
+ #if (defined __ENABLE_PMU__) || (defined CONF_WINC_INT_PMU)
+@@ -98,9 +99,9 @@ sint8 chip_apply_conf(uint32 u32Conf)
+ 		} else {
+ 			break;
+ 		}
+-	} while(1);
++	} while(--retries);
+ 
+-	return M2M_SUCCESS;
++	return retries ? M2M_SUCCESS : M2M_ERR_TIME_OUT;
+ }
+ void chip_idle(void)
+ {
+-- 
+2.34.1
+
