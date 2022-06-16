@@ -18,7 +18,7 @@ $(CARGO_COMPILE_COMMANDS): $(BUILDDEPS)
 
 
 $(CARGO_LIB): $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS) FORCE
-	$(Q)[ x"${RUST_TARGET}" != x"" ] || (echo "Error: No RUST_TARGET was set for this platform. (Set FEATURES_REQUIRED+=rust_target to catch this earlier)."; exit 1)
+	$(Q)[ x"${RUST_TARGET}" != x"" ] || ($(COLOR_ECHO) "$(COLOR_RED)Error: No RUST_TARGET was set for this platform.$(COLOR_RESET) Set FEATURES_REQUIRED+=rust_target to catch this earlier."; exit 1)
 	$(Q)# If distribution installed cargos ever grow the capacity to build RIOT, this absence of `rustup` might be OK. But that'd need them to both have cross tools around and cross core libs, none of which is currently the case.
 	$(Q)# Ad grepping for "std": We're not *actually* checking for std but more for core -- but rust-stc-$TARGET is the name of any standard libraries that'd be available for that target.
 	$(Q)[ x"$(findstring build-std,$(CARGO_OPTIONS))" != x"" ] || \
