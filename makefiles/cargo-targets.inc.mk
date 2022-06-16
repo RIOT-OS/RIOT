@@ -27,6 +27,14 @@ $(CARGO_LIB): $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS
 		'$(COLOR_RED)Error: No Rust libraries are installed for the board'"'"'s CPU.$(COLOR_RESET) Run\n    $(COLOR_GREEN)$$$(COLOR_RESET) rustup target add $(RUST_TARGET) $(patsubst %,--toolchain %,$(CARGO_CHANNEL))\nor set `CARGO_OPTIONS=-Zbuild-std=core`.'; \
 		exit 1)
 	$(Q)CC= CFLAGS= CPPFLAGS= CXXFLAGS= RIOT_COMPILE_COMMANDS_JSON="$(CARGO_COMPILE_COMMANDS)" RIOT_USEMODULE="$(USEMODULE)" cargo $(patsubst +,,+${CARGO_CHANNEL}) build --target $(RUST_TARGET) `if [ x$(CARGO_PROFILE) = xrelease ]; then echo --release; else if [ x$(CARGO_PROFILE) '!=' xdebug ]; then echo "--profile $(CARGO_PROFILE)"; fi; fi` $(CARGO_OPTIONS)
+	$(Q)CC= CFLAGS= CPPFLAGS= CXXFLAGS= \
+		RIOT_COMPILE_COMMANDS_JSON="$(CARGO_COMPILE_COMMANDS)" \
+		RIOT_USEMODULE="$(USEMODULE)" \
+		cargo $(patsubst +,,+${CARGO_CHANNEL}) \
+			build \
+			--target $(RUST_TARGET) \
+			`if [ x$(CARGO_PROFILE) = xrelease ]; then echo --release; else if [ x$(CARGO_PROFILE) '!=' xdebug ]; then echo "--profile $(CARGO_PROFILE)"; fi; fi` \
+			$(CARGO_OPTIONS)
 
 $(APPLICATION_RUST_MODULE).module: $(CARGO_LIB) FORCE
 	$(Q)# Ensure no old object files persist. These would lead to duplicate
