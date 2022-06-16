@@ -269,13 +269,19 @@ static void _init_spi(spi_t bus, SercomSpi *dev)
 
 static void _spi_acquire(spi_t bus, spi_mode_t mode, spi_clk_t clk)
 {
+    /* clock can't be higher than source clock */
+    uint32_t gclk_src = sam0_gclk_freq(spi_config[bus].gclk_src);
+    if (clk > gclk_src) {
+        clk = gclk_src;
+    }
+
     /* configure bus clock, in synchronous mode its calculated from
      * BAUD.reg = (f_ref / (2 * f_bus) - 1)
      * with f_ref := CLOCK_CORECLOCK as defined by the board
      * to mitigate the rounding error due to integer arithmetic, the
      * equation is modified to
      * BAUD.reg = ((f_ref + f_bus) / (2 * f_bus) - 1) */
-    const uint8_t baud = ((sam0_gclk_freq(spi_config[bus].gclk_src) + clk) / (2 * clk) - 1);
+    const uint8_t baud = (gclk_src + clk) / (2 * clk) - 1;
 
     /* configure device to be master and set mode and pads,
      *
