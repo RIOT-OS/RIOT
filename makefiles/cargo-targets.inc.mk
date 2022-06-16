@@ -19,6 +19,13 @@ $(CARGO_COMPILE_COMMANDS): $(BUILDDEPS)
 
 $(CARGO_LIB): $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS) FORCE
 	$(Q)[ x"${RUST_TARGET}" != x"" ] || (echo "Error: No RUST_TARGET was set for this platform. (Set FEATURES_REQUIRED+=rust_target to catch this earlier)."; exit 1)
+	$(Q)# If distribution installed cargos ever grow the capacity to build RIOT, this absence of `rustup` might be OK. But that'd need them to both have cross tools around and cross core libs, none of which is currently the case.
+	$(Q)# Ad grepping for "std": We're not *actually* checking for std but more for core -- but rust-stc-$TARGET is the name of any standard libraries that'd be available for that target.
+	$(Q)[ x"$(findstring build-std,$(CARGO_OPTIONS))" != x"" ] || \
+		(rustup component list $(patsubst %,--toolchain %,$(CARGO_CHANNEL)) --installed | grep 'rust-std-$(RUST_TARGET)$$' --quiet) || \
+		($(COLOR_ECHO) \
+		'$(COLOR_RED)Error: No Rust libraries are installed for the board'"'"'s CPU.$(COLOR_RESET) Run\n    $(COLOR_GREEN)$$$(COLOR_RESET) rustup target add $(RUST_TARGET) $(patsubst %,--toolchain %,$(CARGO_CHANNEL))\nor set `CARGO_OPTIONS=-Zbuild-std=core`.'; \
+		exit 1)
 	$(Q)CC= CFLAGS= CPPFLAGS= CXXFLAGS= RIOT_COMPILE_COMMANDS_JSON="$(CARGO_COMPILE_COMMANDS)" RIOT_USEMODULE="$(USEMODULE)" cargo $(patsubst +,,+${CARGO_CHANNEL}) build --target $(RUST_TARGET) `if [ x$(CARGO_PROFILE) = xrelease ]; then echo --release; else if [ x$(CARGO_PROFILE) '!=' xdebug ]; then echo "--profile $(CARGO_PROFILE)"; fi; fi` $(CARGO_OPTIONS)
 
 $(APPLICATION_RUST_MODULE).module: $(CARGO_LIB) FORCE
