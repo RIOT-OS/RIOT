@@ -27,7 +27,8 @@
 #include "shell.h"
 
 #ifdef MODULE_LWIP_IPV6
-static void _netif_list_ipv6(struct netif *netif, int addr_index) {
+static void _netif_list_ipv6(struct netif *netif, int addr_index, uint8_t state)
+{
     printf("        inet6 addr: ");
     ip_addr_debug_print(LWIP_DBG_ON, netif_ip_addr6(netif, addr_index));
     printf(" scope: ");
@@ -40,11 +41,26 @@ static void _netif_list_ipv6(struct netif *netif, int addr_index) {
     } else {
         printf("unknown");
     }
+    printf(" state:");
+    if (ip6_addr_istentative(state)) {
+        printf(" tentative (%u probes send)",
+                (unsigned)(state & IP6_ADDR_TENTATIVE_COUNT_MASK));
+    }
+    if (ip6_addr_isvalid(state)) {
+        printf(" valid");
+    }
+    if (ip6_addr_ispreferred(state)) {
+        printf(" preferred");
+    }
+    if (ip6_addr_isduplicated(state)) {
+        printf(" duplicated");
+    }
     printf("\n");
 }
 #endif
 
-static void _netif_list(struct netif *netif) {
+static void _netif_list(struct netif *netif)
+{
     int i;
     char name[CONFIG_NETIF_NAMELENMAX];
     struct netdev *dev = netif->state;
@@ -75,8 +91,15 @@ static void _netif_list(struct netif *netif) {
 
 #ifdef MODULE_LWIP_IPV6
     for (i = 0; i < LWIP_IPV6_NUM_ADDRESSES; i++) {
-        if (netif_ip6_addr_state(netif, i) != IP6_ADDR_INVALID) {
-            _netif_list_ipv6(netif, i);
+        uint8_t state = netif_ip6_addr_state(netif, i);
+        /* Note: !ip_addr_isinvalid() also matches tentative addresses,
+         * ip_addr_isvalid() would filter them out. We want both valid and
+         * tentative addresses to aid debugging when an address gets stuck in
+         * tentative state. _netif_list_ipv6() prints the state (e.g. valid or
+         * tentative), so users will not confuse tentative addresses with
+         * valid ones. */
+        if (!ip6_addr_isinvalid(state)) {
+            _netif_list_ipv6(netif, i, state);
         }
     }
 #endif
