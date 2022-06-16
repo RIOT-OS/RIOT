@@ -173,7 +173,6 @@ int test_init(void)
     return 0;
 }
 
-
 static int _init_driver(netdev_t *netdev, netdev_event_cb_t cb)
 {
     /* set the application-provided callback */
