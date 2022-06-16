@@ -679,7 +679,7 @@ binfile: $(BINFILE)
 flashfile: $(FLASHFILE)
 
 ifeq (,$(FLASHFILE))
-  $(error FLASHFILE is not defined for this board: $(FLASHFILE))
+  $(error FLASHFILE is not defined for this board: $(BOARD))
 endif
 
 BUILD_FILES += $(ELFFILE) $(BINFILE) $(FLASHFILE) $(HASHFILE)
