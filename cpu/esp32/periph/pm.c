@@ -91,9 +91,8 @@ void pm_reboot(void)
         esp_wifi_stop();
     }
 
-    /* suspend and flush UARTs */
-    for (int i = 0; i < 3; ++i) {
-        REG_SET_BIT(UART_FLOW_CONF_REG(i), UART_FORCE_XOFF);
+    /* flush all UARTs of the SoC, there is no problem to do it for uninitialized UARTs */
+    for (int i = 0; i < SOC_UART_NUM; ++i) {
         uart_tx_wait_idle(i);
     }
 
