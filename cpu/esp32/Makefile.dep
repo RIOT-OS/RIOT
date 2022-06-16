@@ -40,16 +40,6 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   USEMODULE += pthread
 endif
 
-ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
-  # The ESP-IDF heap component uses the TLSF implementation that is part of
-  # the component. To avoid conflicts with modules and packages that use the
-  # RIOT package `tlsf`, this package is also used for the ESP-IDF heap instead
-  # of its own implementation. There does not seem to be any differences in
-  # the implementations of TLSF with the exception of heap poisoning, which
-  # is not configured.
-  USEPKG += tlsf
-endif
-
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
   # add additional modules required by esp_idf_nvs_flash
   USEMODULE += pthread
@@ -89,6 +79,18 @@ ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
   USEMODULE += esp_idf_heap
   USEMODULE += esp_idf_spi_flash
   USEMODULE += esp_idf_spi_ram
+endif
+
+ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
+  # The ESP-IDF heap component uses the TLSF implementation that is part of
+  # the component. To avoid conflicts with modules and packages that use the
+  # RIOT package `tlsf`, this package is also used for the ESP-IDF heap instead
+  # of its own implementation. There does not seem to be any differences in
+  # the implementations of TLSF with the exception of heap poisoning, which
+  # is not configured.
+  USEPKG += tlsf
+else
+  USEMODULE += malloc_thread_safe
 endif
 
 ifneq (,$(filter mtd,$(USEMODULE)))
