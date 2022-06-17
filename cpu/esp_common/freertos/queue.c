@@ -55,7 +55,7 @@ QueueHandle_t xQueueGenericCreate( const UBaseType_t uxQueueLength,
                                    const UBaseType_t uxItemSize,
                                    const uint8_t ucQueueType )
 {
-    DEBUG("%s pid=%d len=%u size=%u type=%u ", __func__,
+    DEBUG("%s pid=%d len=%u size=%u type=%u\n", __func__,
           thread_getpid(), uxQueueLength, uxItemSize, ucQueueType);
 
     uint32_t queue_size = uxQueueLength * uxItemSize;
@@ -116,8 +116,8 @@ BaseType_t IRAM_ATTR _queue_generic_send(QueueHandle_t xQueue,
                                          TickType_t xTicksToWait,
                                          BaseType_t * const pxHigherPriorityTaskWoken)
 {
-    DEBUG("%s pid=%d prio=%d queue=%p pos=%d wait=%u woken=%p isr=%d\n", __func__,
-          thread_getpid(), sched_threads[thread_getpid()]->priority,
+    DEBUG("%s pid=%d prio=%d queue=%p pos=%d wait=%"PRIu32" woken=%p isr=%d\n", __func__,
+          thread_getpid(), thread_get_priority(thread_get_active()),
           xQueue, xCopyPosition, xTicksToWait, pxHigherPriorityTaskWoken,
           irq_is_in());
 
@@ -163,7 +163,7 @@ BaseType_t IRAM_ATTR _queue_generic_send(QueueHandle_t xQueue,
                 list_node_t *next = list_remove_head(&queue->receiving);
                 thread_t *proc = container_of((clist_node_t*)next, thread_t, rq_entry);
                 sched_set_status(proc, STATUS_PENDING);
-                ctx_switch = proc->priority < sched_threads[thread_getpid()]->priority;
+                ctx_switch = proc->priority < thread_get_priority(thread_get_active());
 
                 DEBUG("%s pid=%d queue=%p unlock waiting pid=%d switch=%d\n",
                       __func__, thread_getpid(), xQueue, proc->pid, ctx_switch);
@@ -222,8 +222,8 @@ BaseType_t IRAM_ATTR _queue_generic_recv (QueueHandle_t xQueue,
                                           const BaseType_t xJustPeeking,
                                           BaseType_t * const pxHigherPriorityTaskWoken)
 {
-    DEBUG("%s pid=%d prio=%d queue=%p wait=%u peek=%u woken=%p isr=%d\n", __func__,
-          thread_getpid(), sched_threads[thread_getpid()]->priority,
+    DEBUG("%s pid=%d prio=%d queue=%p wait=%"PRIu32" peek=%u woken=%p isr=%d\n", __func__,
+          thread_getpid(), thread_get_priority(thread_get_active()),
           xQueue, xTicksToWait, xJustPeeking, pxHigherPriorityTaskWoken,
           irq_is_in());
 
@@ -269,7 +269,7 @@ BaseType_t IRAM_ATTR _queue_generic_recv (QueueHandle_t xQueue,
             sched_set_status(proc, STATUS_PENDING);
 
             /* test whether context switch is required */
-            bool ctx_switch = proc->priority < sched_threads[thread_getpid()]->priority;
+            bool ctx_switch = proc->priority < thread_get_priority(thread_get_active());
 
             DEBUG("%s pid=%d queue=%p unlock waiting pid=%d switch=%d\n",
             __func__, thread_getpid(), xQueue, proc->pid, ctx_switch);
@@ -326,8 +326,8 @@ BaseType_t IRAM_ATTR xQueueGenericSend( QueueHandle_t xQueue,
                                         TickType_t xTicksToWait,
                                         const BaseType_t xCopyPosition )
 {
-    DEBUG("%s pid=%d prio=%d queue=%p wait=%u pos=%d\n", __func__,
-          thread_getpid(), sched_threads[thread_getpid()]->priority,
+    DEBUG("%s pid=%d prio=%d queue=%p wait=%"PRIu32" pos=%d\n", __func__,
+          thread_getpid(), thread_get_priority(thread_get_active()),
           xQueue, xTicksToWait, xCopyPosition);
 
     return _queue_generic_send(xQueue, pvItemToQueue, xCopyPosition,
@@ -340,7 +340,7 @@ BaseType_t IRAM_ATTR xQueueGenericSendFromISR( QueueHandle_t xQueue,
                                                const BaseType_t xCopyPosition )
 {
     DEBUG("%s pid=%d prio=%d queue=%p pos=%d woken=%p\n", __func__,
-          thread_getpid(), sched_threads[thread_getpid()]->priority,
+          thread_getpid(), thread_get_priority(thread_get_active()),
           xQueue, xCopyPosition, pxHigherPriorityTaskWoken);
 
     return _queue_generic_send(xQueue, pvItemToQueue, xCopyPosition,
@@ -352,8 +352,8 @@ BaseType_t IRAM_ATTR xQueueGenericReceive (QueueHandle_t xQueue,
                                            TickType_t xTicksToWait,
                                            const BaseType_t xJustPeeking)
 {
-    DEBUG("%s pid=%d prio=%d queue=%p wait=%u peek=%d\n", __func__,
-          thread_getpid(), sched_threads[thread_getpid()]->priority,
+    DEBUG("%s pid=%d prio=%d queue=%p wait=%"PRIu32" peek=%d\n", __func__,
+          thread_getpid(), thread_get_priority(thread_get_active()),
           xQueue, xTicksToWait, xJustPeeking);
 
     return _queue_generic_recv(xQueue, pvBuffer, xTicksToWait,
@@ -365,7 +365,7 @@ BaseType_t IRAM_ATTR xQueueReceiveFromISR (QueueHandle_t xQueue,
                                            BaseType_t * const pxHigherPriorityTaskWoken)
 {
     DEBUG("%s pid=%d prio=%d queue=%p woken=%p\n", __func__,
-          thread_getpid(), sched_threads[thread_getpid()]->priority,
+          thread_getpid(), thread_get_priority(thread_get_active()),
           xQueue, pxHigherPriorityTaskWoken);
 
     return _queue_generic_recv(xQueue, pvBuffer, 0,

@@ -66,14 +66,14 @@ BaseType_t xTaskCreatePinnedToCore(TaskFunction_t pvTaskCode,
     /* FreeRTOS priority values have to be inverted */
     uxPriority = SCHED_PRIO_LEVELS - uxPriority - 1;
 
-    DEBUG("%s name=%s size=%d prio=%d pvCreatedTask=%p xCoreId=%d",
+    DEBUG("%s name=%s size=%"PRIu32" prio=%u pvCreatedTask=%p xCoreId=%d\n",
           __func__, pcName, usStackDepth, uxPriority, pvCreatedTask, xCoreID);
 
     char* stack = malloc(usStackDepth + sizeof(thread_t));
 
     if (!stack) {
         LOG_TAG_ERROR("freertos", "not enough memory to create task %s with "
-                      "stack size of %d bytes\n", pcName, usStackDepth);
+                      "stack size of %"PRIu32" bytes\n", pcName, usStackDepth);
         abort();
         return pdFALSE;
     }
@@ -249,7 +249,7 @@ void vTaskExitCritical( portMUX_TYPE *mux )
 
 void vTaskStepTick(const TickType_t xTicksToJump)
 {
-    DEBUG("%s xTicksToJump=%d\n", __func__, xTicksToJump);
+    DEBUG("%s xTicksToJump=%"PRIu32"\n", __func__, xTicksToJump);
     /*
      * TODO:
      * At the moment, only the calling task is set to sleep state. Usually, the

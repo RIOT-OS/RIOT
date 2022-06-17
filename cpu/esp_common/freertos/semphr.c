@@ -84,7 +84,7 @@ BaseType_t xSemaphoreGive (SemaphoreHandle_t xSemaphore)
 BaseType_t xSemaphoreTake (SemaphoreHandle_t xSemaphore,
                            TickType_t xTicksToWait)
 {
-    DEBUG("%s mutex=%p wait=%u\n", __func__, xSemaphore, xTicksToWait);
+    DEBUG("%s mutex=%p wait=%"PRIu32"\n", __func__, xSemaphore, xTicksToWait);
 
     assert(xSemaphore != NULL);
 
@@ -137,7 +137,7 @@ BaseType_t xSemaphoreGiveRecursive (SemaphoreHandle_t xSemaphore)
 BaseType_t xSemaphoreTakeRecursive (SemaphoreHandle_t xSemaphore,
                                     TickType_t xTicksToWait)
 {
-    DEBUG("%s rmutex=%p wait=%u\n", __func__, xSemaphore, xTicksToWait);
+    DEBUG("%s rmutex=%p wait=%"PRIu32"\n", __func__, xSemaphore, xTicksToWait);
 
     assert(xSemaphore != NULL);
     assert(((_rmutex_t*)xSemaphore)->type == queueQUEUE_TYPE_RECURSIVE_MUTEX);

@@ -17,6 +17,7 @@
 #include "stdint.h"
 
 #ifndef MCU_ESP8266
+#include "esp_heap_caps.h"
 #include "esp_timer.h"
 #endif
 
@@ -29,8 +30,10 @@ extern "C" {
 
 #define portBASE_TYPE                   int
 #define portUBASE_TYPE                  unsigned portBASE_TYPE
+#define portTICK_TYPE                   uint32_t
+#define portSTACK_TYPE                  uint8_t
 
-#define portMAX_DELAY                   0xFFFFFFFF
+#define portMAX_DELAY                   0xFFFFFFFFUL
 
 #define portMUX_TYPE                    mutex_t
 #define portMUX_INITIALIZE              mutex_init
@@ -49,6 +52,8 @@ extern "C" {
 
 #define portSET_INTERRUPT_MASK_FROM_ISR     xPortSetInterruptMaskFromISR
 #define portCLEAR_INTERRUPT_MASK_FROM_ISR   vPortClearInterruptMaskFromISR
+
+#define errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY    ( -1 )
 
 #ifdef MCU_ESP32
 
