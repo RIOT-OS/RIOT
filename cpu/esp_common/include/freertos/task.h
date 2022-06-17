@@ -31,7 +31,18 @@ extern "C" {
 #define taskENTER_CRITICAL          portENTER_CRITICAL
 #define taskEXIT_CRITICAL           portEXIT_CRITICAL
 
+#define taskSCHEDULER_RUNNING       2
+
+typedef enum {
+    eNoAction = 0,
+    eSetBits,
+    eIncrement,
+    eSetValueWithOverwrite,
+    eSetValueWithoutOverwrite,
+} eNotifyAction;
+
 typedef void (*TaskFunction_t)(void *);
+typedef void (*TlsDeleteCallbackFunction_t)( int, void * );
 
 typedef void* TaskHandle_t;
 
@@ -58,10 +69,28 @@ void vTaskSuspendAll(void);
 
 TaskHandle_t xTaskGetCurrentTaskHandle(void);
 
+const char *pcTaskGetTaskName(TaskHandle_t xTaskToQuery);
+
+UBaseType_t uxTaskGetStackHighWaterMark(TaskHandle_t xTask);
+
+void *pvTaskGetThreadLocalStoragePointer(TaskHandle_t xTaskToQuery,
+                                         BaseType_t xIndex);
+void vTaskSetThreadLocalStoragePointerAndDelCallback(TaskHandle_t xTaskToSet,
+                                                     BaseType_t xIndex,
+                                                     void *pvValue,
+                                                     TlsDeleteCallbackFunction_t pvDelCallback);
+
 void vTaskEnterCritical(portMUX_TYPE *mux);
 void vTaskExitCritical(portMUX_TYPE *mux);
 
 TickType_t xTaskGetTickCount(void);
+
+BaseType_t xTaskNotify(TaskHandle_t xTaskToNotify, uint32_t ulValue,
+                       eNotifyAction eAction);
+BaseType_t xTaskNotifyWait(uint32_t ulBitsToClearOnEntry,
+                           uint32_t ulBitsToClearOnExit,
+                           uint32_t *pulNotificationValue,
+                           TickType_t xTicksToWait);
 
 BaseType_t xTaskNotifyGive(TaskHandle_t xTaskToNotify);
 void vTaskNotifyGiveFromISR(TaskHandle_t xTaskToNotify,
