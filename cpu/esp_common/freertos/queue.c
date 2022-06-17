@@ -110,6 +110,50 @@ void vQueueDelete( QueueHandle_t xQueue )
     free(xQueue);
 }
 
+BaseType_t IRAM_ATTR xQueueReset( QueueHandle_t xQueue )
+{
+    DEBUG("%s pid=%d queue=%p\n", __func__, thread_getpid(), xQueue);
+
+    assert(xQueue != NULL);
+
+    vTaskEnterCritical(0);
+
+    _queue_t* queue = (_queue_t*)xQueue;
+    queue->item_front = 0;
+    queue->item_tail = 0;
+    queue->item_level = 0;
+
+    /* return if there is no waiting sending thread */
+    if (queue->sending.next == NULL) {
+        DEBUG("%s pid=%d queue=%p return pdPASS\n", __func__,
+              thread_getpid(), xQueue);
+        vTaskExitCritical(0);
+        return pdPASS;
+    }
+
+    /* otherwise unlock the waiting sending thread */
+    list_node_t *next = list_remove_head(&queue->sending);
+    thread_t *proc = container_of((clist_node_t*)next, thread_t, rq_entry);
+    sched_set_status(proc, STATUS_PENDING);
+
+    /* test whether context switch is required */
+    bool ctx_switch = proc->priority < thread_get_priority(thread_get_active());
+
+    DEBUG("%s pid=%d queue=%p unlock waiting pid=%d switch=%d\n",
+          __func__, thread_getpid(), xQueue, proc->pid, ctx_switch);
+
+    if (ctx_switch) {
+        vTaskExitCritical(0);
+        /* sets only the sched_context_switch_request in ISRs */
+        sched_switch(proc->priority);
+    }
+    else {
+        vTaskExitCritical(0);
+    }
+
+    return pdPASS;
+}
+
 BaseType_t IRAM_ATTR _queue_generic_send(QueueHandle_t xQueue,
                                          const void * const pvItemToQueue,
                                          const BaseType_t xCopyPosition,
