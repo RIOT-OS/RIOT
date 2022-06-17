@@ -24,6 +24,9 @@
 #include "rmutex.h"
 #include "syscalls.h"
 #include "thread.h"
+#if IS_USED(MODULE_ZTIMER_MSEC)
+#include "ztimer.h"
+#endif
 
 #include "rom/ets_sys.h"
 
@@ -154,6 +157,40 @@ BaseType_t IRAM_ATTR xQueueReset( QueueHandle_t xQueue )
     return pdPASS;
 }
 
+#if IS_USED(MODULE_ZTIMER_MSEC)
+
+/* descriptor for timeout handling for a thread that is waiting in a queue */
+typedef struct {
+    thread_t *thread;       /* the thread */
+    list_node_t *queue;     /* the queue in which it is waiting */
+    bool timeout;           /* timeout occurred */
+} _queue_waiting_thread_t;
+
+static void _queue_timeout(void *arg)
+{
+    _queue_waiting_thread_t *wtd = arg;
+
+    assert(wtd != NULL);
+    assert(wtd->queue != NULL);
+    assert(wtd->thread != NULL);
+
+    vTaskEnterCritical(0);
+
+    /* remove the thread from the waiting queue */
+    list_node_t *node = (list_node_t *)&(wtd->thread->rq_entry);
+    list_remove(wtd->queue, node);
+
+    /* unblock the waintg thread */
+    sched_set_status(wtd->thread, STATUS_PENDING);
+    sched_context_switch_request =
+        wtd->thread->priority < thread_get_priority(thread_get_active());
+
+    wtd->timeout = true;
+
+    vTaskExitCritical(0);
+}
+#endif
+
 BaseType_t IRAM_ATTR _queue_generic_send(QueueHandle_t xQueue,
                                          const void * const pvItemToQueue,
                                          const BaseType_t xCopyPosition,
@@ -248,10 +285,33 @@ BaseType_t IRAM_ATTR _queue_generic_send(QueueHandle_t xQueue,
 
             DEBUG("%s pid=%d queue=%p suspended calling thread\n", __func__,
                   thread_getpid(), xQueue);
+
+#if IS_USED(MODULE_ZTIMER_MSEC)
+            _queue_waiting_thread_t wdt = { .queue = &queue->sending,
+                                            .thread = me,
+                                            .timeout = false };
+            ztimer_t tm = { .callback = _queue_timeout,
+                            .arg = &wdt };
+            if (xTicksToWait < portMAX_DELAY) {
+                ztimer_set(ZTIMER_MSEC, &tm, xTicksToWait * portTICK_PERIOD_MS);
+            }
+#else
+            assert((xTicksToWait == 0) || (xTicksToWait == portMAX_DELAY));
+#endif
             vTaskExitCritical(0);
             thread_yield_higher();
 
-            /* TODO timeout handling with xTicksToWait */
+#if IS_USED(MODULE_ZTIMER_MSEC)
+            vTaskEnterCritical(0);
+            if (xTicksToWait < portMAX_DELAY) {
+                ztimer_remove(ZTIMER_MSEC, &tm);
+                if (wdt.timeout) {
+                    vTaskExitCritical(0);
+                    return errQUEUE_FULL;
+                }
+            }
+            vTaskExitCritical(0);
+#endif
             DEBUG("%s pid=%d queue=%p continue calling thread\n", __func__,
                   thread_getpid(), xQueue);
         }
@@ -354,10 +414,32 @@ BaseType_t IRAM_ATTR _queue_generic_recv (QueueHandle_t xQueue,
             DEBUG("%s pid=%d queue=%p suspended calling thread\n", __func__,
                   thread_getpid(), xQueue);
 
+#if IS_USED(MODULE_ZTIMER_MSEC)
+            _queue_waiting_thread_t wdt = { .queue = &queue->receiving,
+                                            .thread = me,
+                                            .timeout = false };
+            ztimer_t tm = { .callback = _queue_timeout,
+                            .arg = &wdt };
+            if (xTicksToWait < portMAX_DELAY) {
+                ztimer_set(ZTIMER_MSEC, &tm, xTicksToWait * portTICK_PERIOD_MS);
+            }
+#else
+            assert((xTicksToWait == 0) || (xTicksToWait == portMAX_DELAY));
+#endif
             vTaskExitCritical(0);
             thread_yield_higher();
 
-            /* TODO timeout handling with xTicksToWait */
+#if IS_USED(MODULE_ZTIMER_MSEC)
+            vTaskEnterCritical(0);
+            if (xTicksToWait < portMAX_DELAY) {
+                ztimer_remove(ZTIMER_MSEC, &tm);
+                if (wdt.timeout) {
+                    vTaskExitCritical(0);
+                    return errQUEUE_FULL;
+                }
+            }
+            vTaskExitCritical(0);
+#endif
             DEBUG("%s pid=%d queue=%p continue calling thread\n", __func__,
                   thread_getpid(), xQueue);
         }
