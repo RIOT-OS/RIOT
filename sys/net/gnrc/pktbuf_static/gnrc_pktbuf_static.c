@@ -36,6 +36,15 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+/**
+ * @brief enable use-after-free detection
+ */
+#ifndef CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE
+#define CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE (0)
+#endif
+
+#define CANARY 0x55
+
 /* The static buffer needs to be aligned to word size, so that its start
  * address can be casted to `_unused_t *` safely. Just allocating an array of
  * (word sized) uintptr_t is a trivial way to do this */
@@ -53,6 +62,18 @@ static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, const void *data, size
                                     gnrc_nettype_t type);
 static void *_pktbuf_alloc(size_t size);
 
+static const void *mem_is_set(const void *data, uint8_t c, size_t len)
+{
+    const uint8_t *end = (uint8_t *)data + len;
+    for (const uint8_t *d = data; d != end; ++d) {
+        if (c != *d) {
+            return d;
+        }
+    }
+
+    return NULL;
+}
+
 static inline void _set_pktsnip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *next,
                                 void *data, size_t size, gnrc_nettype_t type)
 {
@@ -69,6 +90,9 @@ static inline void _set_pktsnip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *next,
 void gnrc_pktbuf_init(void)
 {
     mutex_lock(&gnrc_pktbuf_mutex);
+    if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE) {
+        memset(_pktbuf_buf, CANARY, sizeof(_pktbuf_buf));
+    }
     _first_unused = (_unused_t *)_pktbuf_buf;
     _first_unused->next = NULL;
     _first_unused->size = sizeof(_pktbuf_buf);
@@ -412,6 +436,18 @@ static void *_pktbuf_alloc(size_t size)
         max_byte_count = last_byte;
     }
 #endif
+
+    const void *mismatch;
+    if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE &&
+        (mismatch = mem_is_set(ptr + 1, CANARY, size - sizeof(_unused_t)))) {
+        printf("[%p] mismatch at offset %"PRIuPTR"/%u (ignoring %u initial bytes that were repurposed)\n",
+               (void *)ptr, (uintptr_t)mismatch - (uintptr_t)ptr, (unsigned)size, (unsigned)sizeof(_unused_t));
+#ifdef MODULE_OD
+        od_hex_dump(ptr, size, 0);
+#endif
+        assert(0);
+    }
+
     return (void *)ptr;
 }
 
@@ -426,6 +462,9 @@ static inline _unused_t *_merge(_unused_t *a, _unused_t *b)
 
     a->next = b->next;
     a->size = b->size + ((uint8_t *)b - (uint8_t *)a);
+    if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE) {
+        memset(b, CANARY, sizeof(*b));
+    }
     return a;
 }
 
@@ -437,6 +476,11 @@ void gnrc_pktbuf_free_internal(void *data, size_t size)
     if (!gnrc_pktbuf_contains(data)) {
         return;
     }
+
+    if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE) {
+        memset(data, CANARY, _align(size));
+    }
+
     while (ptr && (((void *)ptr) < data)) {
         prev = ptr;
         ptr = ptr->next;
