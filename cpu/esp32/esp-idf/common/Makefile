@@ -21,6 +21,7 @@ ESP32_SDK_SRC = \
   components/esp_rom/patches/esp_rom_uart.c \
   components/esp_system/esp_err.c \
   components/esp_system/esp_system.c \
+  components/esp_system/port/cpu_start.c \
   components/esp_system/port/soc/$(CPU)/cache_err_int.c \
   components/esp_system/port/soc/$(CPU)/clk.c \
   components/esp_system/port/soc/$(CPU)/reset_reason.c \
