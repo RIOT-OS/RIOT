@@ -117,6 +117,11 @@ static int prepare(littlefs2_desc_t *fs)
 
     memset(&fs->fs, 0, sizeof(fs->fs));
 
+    static_assert(0 > CONFIG_LITTLEFS2_MIN_BLOCK_SIZE_EXP ||
+                  6 < CONFIG_LITTLEFS2_MIN_BLOCK_SIZE_EXP,
+                  "CONFIG_LITTLEFS2_MIN_BLOCK_SIZE_EXP must be at least 7, "
+                  "to configure a reasonable block size of at least 128 bytes.");
+
     size_t block_size = fs->dev->pages_per_sector * fs->dev->page_size;
 #if CONFIG_LITTLEFS2_MIN_BLOCK_SIZE_EXP >= 0
     block_size = ((block_size - 1) + (1u << CONFIG_LITTLEFS2_MIN_BLOCK_SIZE_EXP))
