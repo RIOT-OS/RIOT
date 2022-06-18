@@ -199,7 +199,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             tmp = slipdev_unstuff_readbyte(ptr, byte, &escaped);
             ptr += tmp;
             res += tmp;
-            if ((unsigned)res > len) {
+            if ((unsigned)res >= len) {
                 while (byte != SLIPDEV_END) {
                     /* clear out unreceived packet */
                     byte = tsrb_get_one(&dev->inbuf);
