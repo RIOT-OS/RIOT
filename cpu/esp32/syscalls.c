@@ -138,6 +138,17 @@ int clock_gettime(clockid_t clock_id, struct timespec *tp)
     return clock_gettime_r(_GLOBAL_REENT, clock_id, tp);
 }
 
+#if !IS_USED(MODULE_LIBC_GETTIMEOFDAY)
+int IRAM _gettimeofday_r(struct _reent *r, struct timeval *tv, void *tz)
+{
+    (void) tz;
+    uint64_t now = system_get_time_64();
+    tv->tv_sec = div_u64_by_1000000(now);
+    tv->tv_usec = now - (tv->tv_sec * US_PER_SEC);
+    return 0;
+}
+#endif
+
 static int _no_sys_func(struct _reent *r)
 {
     DEBUG("%s: system function does not exist\n", __func__);
