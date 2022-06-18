@@ -395,11 +395,6 @@ ifneq (,$(IOTLAB_NODE))
   PROGRAMMER ?= iotlab
   # iotlab uses ELFFILE by default for flashing boards.
   FLASHFILE ?= $(ELFFILE)
-  # RIOT_CI_BUILD disables the build of BINFILE which is required for flashing
-  # on IoT-LAB
-  ifeq (1,$(RIOT_CI_BUILD))
-    BUILD_FILES += $(BINFILE)
-  endif
   # Disable IOTLAB_NODE if inside Docker to avoid including the
   # iotlab.single.inc.mk file which is useless there: it's only useful for
   # flashing and this is done outside of Docker.
@@ -654,6 +649,7 @@ endif
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
 BINFILE ?= $(ELFFILE:.elf=.bin)
+HASHFILE ?= $(BINFILE)
 MAPFILE ?= $(ELFFILE:.elf=.map)
 
 ifneq (,$(filter suit,$(USEMODULE)))
@@ -683,16 +679,10 @@ binfile: $(BINFILE)
 flashfile: $(FLASHFILE)
 
 ifeq (,$(FLASHFILE))
-  $(error FLASHFILE is not defined for this board: $(FLASHFILE))
+  $(error FLASHFILE is not defined for this board: $(BOARD))
 endif
 
-# By default always build ELFFILE, BINFILE and FLASHFILE
-ifeq ($(RIOT_CI_BUILD),1)
-  # Don't build BINFILE on the CI to save some computation time
-  BUILD_FILES += $(ELFFILE) $(FLASHFILE)
-else
-  BUILD_FILES += $(ELFFILE) $(BINFILE) $(FLASHFILE)
-endif
+BUILD_FILES += $(ELFFILE) $(BINFILE) $(FLASHFILE) $(HASHFILE)
 
 # variables used to compile and link c++
 ifneq (,$(filter cpp,$(USEMODULE)))

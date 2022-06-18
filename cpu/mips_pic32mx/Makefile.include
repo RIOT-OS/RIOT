@@ -31,3 +31,6 @@ endif
 
 # system objcopy is not able to generate a binfile for MIPS
 BINFILE =
+
+# hence, use HEXFILE instead for hashing
+HASHFILE = $(HEXFILE)
