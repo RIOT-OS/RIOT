@@ -29,6 +29,7 @@ config MODULE_PERIPH_RTT_HW_RTC
 
 config MODULE_ESP_HW_COUNTER
     bool "Use hardware counter"
+    depends on HAS_ESP_HW_COUNTER
     depends on MODULE_PERIPH_TIMER
 
 endif # TEST_KCONFIG

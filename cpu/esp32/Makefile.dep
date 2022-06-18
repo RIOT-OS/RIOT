@@ -5,6 +5,7 @@ include $(RIOTCPU)/esp_common/Makefile.dep
 USEPKG += esp32_sdk
 
 USEMODULE += esp_idf_common
+USEMODULE += esp_idf_efuse
 USEMODULE += esp_bootloader
 
 ifneq (,$(filter newlib,$(USEMODULE)))
@@ -16,7 +17,6 @@ ifneq (,$(filter cpp,$(USEMODULE)))
 endif
 
 ifneq (,$(filter esp_eth,$(USEMODULE)))
-  USEMODULE += esp_idf_efuse
   USEMODULE += esp_idf_eth
   USEMODULE += esp_idf_event
   USEMODULE += esp_idf_gpio
@@ -30,7 +30,6 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   # add additional modules and packages used for any WiFi interface
   USEPKG += esp32_sdk_lib_phy
   USEPKG += esp32_sdk_lib_wifi
-  USEMODULE += esp_idf_efuse
   USEMODULE += esp_idf_event
   USEMODULE += esp_idf_heap
   USEMODULE += esp_idf_nvs_flash
@@ -48,6 +47,10 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   USEMODULE += esp_idf_wpa_supplicant_utils
   USEMODULE += esp_idf_wpa_supplicant_wps
   USEMODULE += pthread
+endif
+
+ifneq (,$(filter esp_hw_counter,$(USEMODULE)))
+  FEATURES_REQUIRED += esp_hw_counter
 endif
 
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
@@ -83,7 +86,6 @@ endif
 
 ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
   FEATURES_REQUIRED += esp_spi_ram
-  USEMODULE += esp_idf_efuse
   USEMODULE += esp_idf_gpio
   USEMODULE += esp_idf_heap
   USEMODULE += esp_idf_spi_flash
