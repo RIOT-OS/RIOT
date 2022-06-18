@@ -118,6 +118,11 @@ static int prepare(littlefs_desc_t *fs)
 
     memset(&fs->fs, 0, sizeof(fs->fs));
 
+    static_assert(0 > LITTLEFS_MIN_BLOCK_SIZE_EXP ||
+                  6 < LITTLEFS_MIN_BLOCK_SIZE_EXP,
+                  "LITTLEFS_MIN_BLOCK_SIZE_EXP must be at least 7, "
+                  "to configure a reasonable block size of at least 128 bytes.");
+
     size_t block_size = fs->dev->pages_per_sector * fs->dev->page_size;
 #if LITTLEFS_MIN_BLOCK_SIZE_EXP >= 0
     block_size = ((block_size - 1) + (1u << LITTLEFS_MIN_BLOCK_SIZE_EXP))
