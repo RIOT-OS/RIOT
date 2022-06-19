@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       Low-level I2C driver software implementation using for ESP SoCs
+ * @brief       Low-level I2C driver software implementation for ESP SoCs
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  *
@@ -35,6 +35,7 @@
 
 #include "cpu.h"
 #include "log.h"
+#include "macros/units.h"
 #include "mutex.h"
 #include "periph_conf.h"
 #include "periph/gpio.h"
@@ -42,11 +43,15 @@
 
 #include "esp_attr.h"
 #include "esp_common.h"
+#if !defined(MCU_ESP8266)
+#include "esp_private/esp_clk.h"
+#endif
 #include "gpio_arch.h"
 #include "rom/ets_sys.h"
 
 #ifndef MCU_ESP8266
 
+#include "hal/cpu_hal.h"
 #include "soc/gpio_reg.h"
 #include "soc/gpio_struct.h"
 
@@ -104,38 +109,21 @@ static _i2c_bus_t _i2c_bus[I2C_NUMOF] = {};
 /* to ensure that I2C is always optimized with -O2 to use the defined delays */
 #pragma GCC optimize ("O2")
 
-#ifdef MCU_ESP32
-static const uint32_t _i2c_delays[][5] =
-{
-    /* values specify one half-period and are only valid for -O2 option     */
-    /* value = [period - 0.25 us (240 MHz) / 0.5us(160MHz) / 1.0us(80MHz)]  */
-    /*         * cycles per second / 2                                      */
-    /* 1 us = 16 cycles (80 MHz) / 32 cycles (160 MHz) / 48 cycles (240)    */
-    /* max clock speeds    2 MHz CPU clock:  19 kHz                         */
-    /*                    40 MHz CPU clock: 308 kHz                         */
-    /*                    80 MHz CPU clock: 516 kHz                         */
-    /*                   160 MHz CPU clock: 727 kHz                         */
-    /*                   240 MHz CPU clock: 784 kHz                         */
-    /* values for             80,  160,  240,  2,  40 MHz                   */
-    [I2C_SPEED_LOW]       = {790, 1590, 2390, 10, 390 }, /*  10 kbps (period 100 us) */
-    [I2C_SPEED_NORMAL]    = { 70,  150,  230,  0,  30 }, /* 100 kbps (period 10 us)  */
-    [I2C_SPEED_FAST]      = { 11,   31,   51,  0,   0 }, /* 400 kbps (period 2.5 us) */
-    [I2C_SPEED_FAST_PLUS] = {  0,    0,    0,  0,   0 }, /*   1 Mbps (period 1 us)   */
-    [I2C_SPEED_HIGH]      = {  0,    0,    0,  0,   0 }  /* 3.4 Mbps (period 0.3 us) not working */
+#if defined(MCU_ESP32)
+#define I2C_CLK_CAL     62      /* clock calibration offset */
+#elif defined(MCU_ESP8266)
+#define I2C_CLK_CAL     47      /* clock calibration offset */
+#else
+#error "Platform implementation is missing"
+#endif
+
+static const uint32_t _i2c_clocks[] = {
+    10 * KHZ(1),    /* I2C_SPEED_LOW */
+    100 * KHZ(1),   /* I2C_SPEED_NORMAL */
+    400 * KHZ(1),   /* I2C_SPEED_FAST */
+    1000 * KHZ(1),  /* I2C_SPEED_FAST_PLUS */
+    3400 * KHZ(1),  /* I2C_SPEED_HIGH */
 };
-#else /* MCU_ESP32 */
-static const uint32_t _i2c_delays[][2] =
-{
-    /* values specify one half-period and are only valid for -O2 option         */
-    /* value = [period - 0.5us(160MHz) or 1.0us(80MHz)] * cycles per second / 2 */
-    /* 1 us = 20 cycles (80 MHz) / 40 cycles (160 MHz)                          */
-    [I2C_SPEED_LOW]       = {989, 1990}, /*   10 kbps (period 100 us)  */
-    [I2C_SPEED_NORMAL]    = { 89,  190}, /*  100 kbps (period 10 us)   */
-    [I2C_SPEED_FAST]      = { 15,   40}, /*  400 kbps (period 2.5 us)  */
-    [I2C_SPEED_FAST_PLUS] = {  0,   13}, /*    1 Mbps (period 1 us)    */
-    [I2C_SPEED_HIGH]      = {   0,   0}  /*  3.4 Mbps (period 0.3 us) is not working */
-};
-#endif /* MCU_ESP32 */
 
 /* forward declaration of internal functions */
 
@@ -155,6 +143,13 @@ static int _i2c_read_byte(_i2c_bus_t* bus, uint8_t* byte, bool ack);
 static int _i2c_arbitration_lost(_i2c_bus_t* bus, const char* func);
 static void _i2c_abort(_i2c_bus_t* bus, const char* func);
 static void _i2c_clear(_i2c_bus_t* bus);
+
+#if defined(MCU_ESP8266)
+static inline int esp_clk_cpu_freq(void)
+{
+    return ets_get_cpu_frequency() * MHZ(1);
+}
+#endif
 
 /* implementation of i2c interface */
 
@@ -177,19 +172,10 @@ void i2c_init(i2c_t dev)
     _i2c_bus[dev].sda_bit = BIT(_i2c_bus[dev].sda); /* store bit mask for faster access */
     _i2c_bus[dev].started = false; /* for handling of repeated start condition */
 
-    switch (ets_get_cpu_frequency()) {
-        case  80: _i2c_bus[dev].delay = _i2c_delays[_i2c_bus[dev].speed][0]; break;
-        case 160: _i2c_bus[dev].delay = _i2c_delays[_i2c_bus[dev].speed][1]; break;
-#ifdef MCU_ESP32
-        case 240: _i2c_bus[dev].delay = _i2c_delays[_i2c_bus[dev].speed][2]; break;
-        case   2: _i2c_bus[dev].delay = _i2c_delays[_i2c_bus[dev].speed][3]; break;
-        case  40: _i2c_bus[dev].delay = _i2c_delays[_i2c_bus[dev].speed][4]; break;
-#endif
-        default : LOG_TAG_INFO("i2c", "I2C software implementation is not "
-                               "supported for this CPU frequency: %d MHz\n",
-                               ets_get_cpu_frequency());
-                  return;
-    }
+    uint32_t delay;
+    delay = esp_clk_cpu_freq() / _i2c_clocks[_i2c_bus[dev].speed] / 2;
+    delay = (delay > I2C_CLK_CAL) ? delay - I2C_CLK_CAL : 0;
+    _i2c_bus[dev].delay = delay;
 
     DEBUG("%s: scl=%d sda=%d speed=%d\n", __func__,
           _i2c_bus[dev].scl, _i2c_bus[dev].sda, _i2c_bus[dev].speed);
@@ -418,8 +404,18 @@ static inline void _i2c_delay(_i2c_bus_t* bus)
     /* produces a delay */
     uint32_t cycles = bus->delay;
     if (cycles) {
-        __asm__ volatile ("1: _addi.n  %0, %0, -1 \n"
-                          "   bnez     %0, 1b     \n" : "=r" (cycles) : "0" (cycles));
+#ifdef MCU_ESP8266
+        uint32_t ccount;
+        __asm__ __volatile__("rsr %0,ccount":"=a" (ccount));
+        uint32_t wait_until = ccount + cycles;
+        while (ccount < wait_until) {
+            __asm__ __volatile__("rsr %0,ccount":"=a" (ccount));
+        }
+#else
+        uint32_t start = cpu_hal_get_cycle_count();
+        uint32_t wait_until = start + cycles;
+        while (cpu_hal_get_cycle_count() < wait_until) { }
+#endif
     }
 }
 
@@ -837,8 +833,13 @@ static IRAM_ATTR int _i2c_read_byte(_i2c_bus_t* bus, uint8_t *byte, bool ack)
 
 void i2c_print_config(void)
 {
-    for (unsigned dev = 0; dev < I2C_NUMOF; dev++) {
-        printf("\tI2C_DEV(%u)\tscl=%d sda=%d\n",
-               dev, i2c_config[dev].scl, i2c_config[dev].sda);
+    if (I2C_NUMOF) {
+        for (unsigned dev = 0; dev < I2C_NUMOF; dev++) {
+            printf("\tI2C_DEV(%u)\tscl=%d sda=%d\n",
+                   dev, i2c_config[dev].scl, i2c_config[dev].sda);
+        }
+    }
+    else {
+        LOG_TAG_INFO("i2c", "no I2C devices\n");
     }
 }
