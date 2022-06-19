@@ -560,7 +560,7 @@ typedef struct {
 /**
  * @brief   Maximum number of UART interfaces
  */
-#define UART_NUMOF_MAX  (3)
+#define UART_NUMOF_MAX  (SOC_UART_NUM)
 /** @} */
 
 #ifdef MODULE_PERIPH_CAN
