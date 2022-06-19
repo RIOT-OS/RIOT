@@ -879,13 +879,13 @@ used.
 
 Example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
-#define SPI0_CTRL    VSPI
+#define SPI0_CTRL   VSPI
 #define SPI0_SCK    GPIO18      // SCK  Periphery
 #define SPI0_MISO   GPIO19      // MISO Periphery
 #define SPI0_MOSI   GPIO23      // MOSI Periphery
 #define SPI0_CS0    GPIO5       // CS0  Periphery
 
-#define SPI1_CTRL    HSPI
+#define SPI1_CTRL   HSPI
 #define SPI1_SCK    GPIO14      // SCK  Camera
 #define SPI1_MISO   GPIO12      // MISO Camera
 #define SPI1_MOSI   GPIO13      // MOSI Camera
@@ -1119,7 +1119,7 @@ supports the following operating modes:
 - In **Deep-sleep** the CPU and the SRAM are powered down. The RTC memory can
   be retained. The system must be restarted when it returns from this mode.
 
-Since the peripherals are not working during _Light-sleep_/_Deep-sleep_, the
+Since the peripherals are not working during _Light-sleep_ and _Deep-sleep_, the
 CPU cannot be woken up by internal interrupt sources such as timers. Therefore,
 RIOT's layered power management can't select them as idle power mode. They are
 therefore blocked for normal operation. The application has to select them
@@ -1145,7 +1145,7 @@ as parameter. To exit from these modes, several wake-up sources can be used.
 
 [Back to table of contents](#esp32_toc)
 
-#### Wake-up Sources in _Light-sleep_ Mode
+#### Wake-up Sources in _Light-sleep_
 
 Possible wake-up sources for the _Light-sleep_ mode are:
 
@@ -1165,7 +1165,7 @@ entering _Light-sleep_ mode.
 
 [Back to table of contents](#esp32_toc)
 
-#### Wake-up Sources in _Light-sleep_ Mode
+#### Wake-up Sources in _Deep-sleep_ Mode
 
 Possible Wake-up sources for the _Deep-sleep_ mode are:
 
