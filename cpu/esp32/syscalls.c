@@ -207,9 +207,7 @@ static struct syscall_stub_table s_stub_table =
     ._link_r = (void*)&_no_sys_func,
     ._rename_r = (void*)&_no_sys_func,
 
-#if defined(MCU_ESP32) || \
-    defined(MCU_ESP32S2) || \
-    (defined(MCU_ESP32H2) && !defined(_RETARGETABLE_LOCKING))
+#if !defined(ESP_ROM_HAS_RETARGETABLE_LOCKING)
     ._lock_init = &_lock_init,
     ._lock_init_recursive = &_lock_init_recursive,
     ._lock_close = &_lock_close,
