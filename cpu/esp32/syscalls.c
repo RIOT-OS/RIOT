@@ -30,6 +30,7 @@
 #include "sys/lock.h"
 #include "timex.h"
 
+#include "esp_rom_caps.h"
 #include "hal/interrupt_controller_types.h"
 #include "hal/interrupt_controller_ll.h"
 #include "hal/timer_hal.h"
