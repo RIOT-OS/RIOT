@@ -136,5 +136,6 @@ endmenu
 
 rsource "bootloader/Kconfig"
 rsource "esp-idf/Kconfig"
+rsource "esp-idf-api/Kconfig"
 rsource "periph/Kconfig"
 source "$(RIOTCPU)/esp_common/Kconfig"

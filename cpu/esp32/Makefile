@@ -7,6 +7,7 @@ SRC = irq_arch.c startup.c syscalls.c
 DIRS += $(RIOTCPU)/esp_common
 DIRS += periph
 DIRS += esp-idf
+DIRS += esp-idf-api
 
 ifneq (, $(filter esp_bootloader, $(USEMODULE)))
     DIRS += bootloader
