@@ -181,3 +181,7 @@ endif
 ifneq (,$(filter tiny_strerror,$(USEMODULE)))
   include $(RIOTBASE)/sys/tiny_strerror/Makefile.include
 endif
+
+ifneq (,$(filter preprocessor_%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/preprocessor/Makefile.include
+endif
