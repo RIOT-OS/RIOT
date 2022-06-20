@@ -106,6 +106,7 @@ int mtd_read_page(mtd_dev_t *mtd, void *dest, uint32_t page, uint32_t offset,
     const uint32_t page_shift = bitarithm_msb(mtd->page_size);
     const uint32_t page_mask = mtd->page_size - 1;
 
+    /* ensure offset is within a page */
     page  += offset >> page_shift;
     offset = offset & page_mask;
 
@@ -264,6 +265,7 @@ int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page, uint32_t 
     const uint32_t page_shift = bitarithm_msb(mtd->page_size);
     const uint32_t page_mask = mtd->page_size - 1;
 
+    /* ensure offset is within a page */
     page  += offset >> page_shift;
     offset = offset & page_mask;
 
