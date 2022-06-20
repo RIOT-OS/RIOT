@@ -4,3 +4,9 @@ USEPKG += driver_atwinc15x0
 FEATURES_REQUIRED += periph_gpio
 FEATURES_REQUIRED += periph_gpio_irq
 FEATURES_REQUIRED += periph_spi
+
+# esp8266 vendor code and atwinc15x0 both define conflicting
+# spi_flash_{read, write} functions.
+# esp8266 already has build-in WiFi, so it's unlikely to ever
+# use this driver - just blacklist the architecture.
+FEATURES_BLACKLIST += arch_esp8266
