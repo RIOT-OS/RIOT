@@ -318,8 +318,6 @@ int mtd_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count);
  * The MTD layer will take care of splitting up the transaction into multiple
  * reads if it is required by the underlying storage media.
  *
- * @p offset must be smaller than the page size
- *
  * @param      mtd      the device to read from
  * @param[out] dest     the buffer to fill in
  * @param[in]  page     Page number to start reading from
@@ -368,8 +366,6 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count);
  * This performs a raw write, no automatic read-modify-write cycle is performed.
  *
  * Both @p offset and @p size must be multiples of the device's write size.
- *
- * @p offset must be smaller than the page size
  *
  * @param      mtd      the device to write to
  * @param[in]  src      the buffer to write
