@@ -30,8 +30,13 @@
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/pkt.h"
 
+#include "cpu.h"
 #include "pktbuf_internal.h"
 #include "pktbuf_static.h"
+
+#ifndef CONFIG_GNRC_PKTBUF_TRACE_LEN
+#define CONFIG_GNRC_PKTBUF_TRACE_LEN (128)
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -50,8 +55,118 @@ static uint16_t max_byte_count = 0;
 
 /* internal gnrc_pktbuf functions */
 static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, const void *data, size_t size,
-                                    gnrc_nettype_t type);
-static void *_pktbuf_alloc(size_t size);
+                                    gnrc_nettype_t type, uintptr_t last_inst);
+static void *_pktbuf_alloc(size_t size, uintptr_t last_inst);
+
+#if IS_USED(MODULE_GNRC_TRACE_PKTBUF_STATIC)
+static uintptr_t _leases[CONFIG_GNRC_PKTBUF_TRACE_LEN];
+static size_t _lease_len[CONFIG_GNRC_PKTBUF_TRACE_LEN];
+static kernel_pid_t _lease_pids[CONFIG_GNRC_PKTBUF_TRACE_LEN];
+static uintptr_t _lease_lr[CONFIG_GNRC_PKTBUF_TRACE_LEN];
+
+static uint32_t _leased_out;
+
+uint32_t gnrc_pktbuf_get_usage(void)
+{
+    return _leased_out;
+}
+
+void gnrc_pktbuf_print_leases(void)
+{
+    unsigned count = 0;
+    for (unsigned i = 0; i < ARRAY_SIZE(_leases); ++i) {
+        if (_leases[i] == 0) {
+            continue;
+        }
+
+        printf("=========== chunk %3d (%-10p size: %4u pid: %u lr: %x) ===========\n", count++,
+               (void *)_leases[i], _lease_len[i], _lease_pids[i], _lease_lr[i]);
+        od_hex_dump((void *)_leases[i], _lease_len[i], OD_WIDTH_DEFAULT);
+    }
+}
+
+static void _lease_out(const void *ptr, size_t len, uintptr_t last_inst)
+{
+    len = _align(len);
+    DEBUG("leasing out %u bytes at %p (total: %lu)\n", len, ptr, _leased_out + len);
+    _leased_out += len;
+
+    bool marked = false;
+    for (unsigned i = 0; i < ARRAY_SIZE(_leases); ++i) {
+        assert(_leases[i] != (uintptr_t)ptr);
+
+        if (_leases[i] == 0 && !marked) {
+            _leases[i] = (uintptr_t)ptr;
+            _lease_len[i] = len;
+            _lease_pids[i] = thread_getpid();
+            _lease_lr[i] = last_inst;
+            marked = true;
+        }
+    }
+
+    if (!marked) {
+        puts("gnrc_pktbuf: out of trace space, increase CONFIG_GNRC_PKTBUF_TRACE_LEN");
+    }
+}
+
+static void _lease_return(const void *ptr, size_t len)
+{
+    len = _align(len);
+    DEBUG("returning %u bytes at %p (total: %d)\n", len, ptr, (int)_leased_out - len);
+    assert(len <= _leased_out);
+    _leased_out -= len;
+
+    bool found = false;
+    for (unsigned i = 0; i < ARRAY_SIZE(_leases); ++i) {
+        uintptr_t _ptr = (uintptr_t)ptr;
+        uintptr_t _start = _leases[i];
+        uintptr_t _end = _start + _lease_len[i];
+
+        if (_ptr < _start || _ptr > _end) {
+            continue;
+        }
+
+        if (_start == _ptr) {
+            assert(!found);
+            found = true;
+            if (_lease_len[i] == len) {
+                _leases[i] = 0;
+                _lease_len[i] = 0;
+            } else {
+                assert(len < _lease_len[i]);
+                _leases[i] = _ptr + len;
+                _lease_len[i] -= len;
+                DEBUG("remaining %u bytes at 0x%x\n", _lease_len[i], _leases[i]);
+            }
+            continue;
+        }
+
+        if (_ptr + len <= _end) {
+            found = true;
+            _lease_len[i] = _ptr - _start;
+        }
+    }
+
+    if (!found) {
+        puts("possible leak");
+    }
+//    assert(found);
+}
+#else
+static inline void _lease_out(const void *ptr, size_t len, uintptr_t last_inst)
+{
+    (void)ptr;
+    (void)len;
+    (void)last_inst;
+}
+
+static inline void _lease_return(const void *ptr, size_t len)
+{
+    (void)ptr;
+    (void)len;
+
+}
+#endif
 
 static inline void _set_pktsnip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *next,
                                 void *data, size_t size, gnrc_nettype_t type)
@@ -79,6 +194,7 @@ gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, const void *data, size_t s
                                 gnrc_nettype_t type)
 {
     gnrc_pktsnip_t *pkt;
+    uintptr_t last_inst = cpu_get_last_instruction();
 
     if (size > CONFIG_GNRC_PKTBUF_SIZE) {
         DEBUG("pktbuf: size (%u) > CONFIG_GNRC_PKTBUF_SIZE (%u)\n",
@@ -86,13 +202,15 @@ gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, const void *data, size_t s
         return NULL;
     }
     mutex_lock(&gnrc_pktbuf_mutex);
-    pkt = _create_snip(next, data, size, type);
+    pkt = _create_snip(next, data, size, type, last_inst);
     mutex_unlock(&gnrc_pktbuf_mutex);
     return pkt;
 }
 
 gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_t type)
 {
+    uintptr_t last_inst = cpu_get_last_instruction();
+
     gnrc_pktsnip_t *marked_snip;
     /* size required for chunk */
     size_t required_new_size = _align(size);
@@ -108,7 +226,7 @@ gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_
         return NULL;
     }
     /* create new snip descriptor for marked data */
-    marked_snip = _pktbuf_alloc(sizeof(gnrc_pktsnip_t));
+    marked_snip = _pktbuf_alloc(sizeof(gnrc_pktsnip_t), last_inst);
     if (marked_snip == NULL) {
         DEBUG("pktbuf: could not reallocate marked section.\n");
         mutex_unlock(&gnrc_pktbuf_mutex);
@@ -118,14 +236,14 @@ gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_
      * for proper free */
     if ((pkt->size != size) && (size < required_new_size)) {
         void *new_data_rest;
-        new_data_marked = _pktbuf_alloc(size);
+        new_data_marked = _pktbuf_alloc(size, last_inst);
         if (new_data_marked == NULL) {
             DEBUG("pktbuf: could not reallocate marked section.\n");
             gnrc_pktbuf_free_internal(marked_snip, sizeof(gnrc_pktsnip_t));
             mutex_unlock(&gnrc_pktbuf_mutex);
             return NULL;
         }
-        new_data_rest = _pktbuf_alloc(pkt->size - size);
+        new_data_rest = _pktbuf_alloc(pkt->size - size, last_inst);
         if (new_data_rest == NULL) {
             DEBUG("pktbuf: could not reallocate remaining section.\n");
             gnrc_pktbuf_free_internal(marked_snip, sizeof(gnrc_pktsnip_t));
@@ -154,6 +272,7 @@ gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_
 
 int gnrc_pktbuf_realloc_data(gnrc_pktsnip_t *pkt, size_t size)
 {
+    uintptr_t last_inst = cpu_get_last_instruction();
     size_t aligned_size = _align(size);
 
     mutex_lock(&gnrc_pktbuf_mutex);
@@ -174,7 +293,7 @@ int gnrc_pktbuf_realloc_data(gnrc_pktsnip_t *pkt, size_t size)
     }
     /* if new size is bigger than old size */
     else if (size > pkt->size) {    /* new size does not fit */
-        void *new_data = _pktbuf_alloc(size);
+        void *new_data = _pktbuf_alloc(size, last_inst);
         if (new_data == NULL) {
             DEBUG("pktbuf: error allocating new data section\n");
             mutex_unlock(&gnrc_pktbuf_mutex);
@@ -207,6 +326,8 @@ void gnrc_pktbuf_hold(gnrc_pktsnip_t *pkt, unsigned int num)
 
 gnrc_pktsnip_t *gnrc_pktbuf_start_write(gnrc_pktsnip_t *pkt)
 {
+    uintptr_t last_inst = cpu_get_last_instruction();
+
     mutex_lock(&gnrc_pktbuf_mutex);
     if (pkt == NULL) {
         mutex_unlock(&gnrc_pktbuf_mutex);
@@ -214,7 +335,7 @@ gnrc_pktsnip_t *gnrc_pktbuf_start_write(gnrc_pktsnip_t *pkt)
     }
     if (pkt->users > 1) {
         gnrc_pktsnip_t *new;
-        new = _create_snip(pkt->next, pkt->data, pkt->size, pkt->type);
+        new = _create_snip(pkt->next, pkt->data, pkt->size, pkt->type, last_inst);
         if (new != NULL) {
             pkt->users--;
         }
@@ -341,9 +462,9 @@ bool gnrc_pktbuf_is_sane(void)
 #endif
 
 static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, const void *data, size_t size,
-                                    gnrc_nettype_t type)
+                                    gnrc_nettype_t type, uintptr_t last_inst)
 {
-    gnrc_pktsnip_t *pkt = _pktbuf_alloc(sizeof(gnrc_pktsnip_t));
+    gnrc_pktsnip_t *pkt = _pktbuf_alloc(sizeof(gnrc_pktsnip_t), last_inst);
     void *_data = NULL;
 
     if (pkt == NULL) {
@@ -351,7 +472,7 @@ static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, const void *data, size
         return NULL;
     }
     if (size > 0) {
-        _data = _pktbuf_alloc(size);
+        _data = _pktbuf_alloc(size, last_inst);
         if (_data == NULL) {
             DEBUG("pktbuf: error allocating data for new packet snip\n");
             gnrc_pktbuf_free_internal(pkt, sizeof(gnrc_pktsnip_t));
@@ -365,7 +486,7 @@ static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, const void *data, size
     return pkt;
 }
 
-static void *_pktbuf_alloc(size_t size)
+static void *_pktbuf_alloc(size_t size, uintptr_t last_inst)
 {
     _unused_t *prev = NULL, *ptr = _first_unused;
 
@@ -412,6 +533,9 @@ static void *_pktbuf_alloc(size_t size)
         max_byte_count = last_byte;
     }
 #endif
+
+    _lease_out(ptr, size, last_inst);
+
     return (void *)ptr;
 }
 
@@ -433,6 +557,8 @@ void gnrc_pktbuf_free_internal(void *data, size_t size)
 {
     size_t bytes_at_end;
     _unused_t *new = (_unused_t *)data, *prev = NULL, *ptr = _first_unused;
+
+    _lease_return(data, size);
 
     if (!gnrc_pktbuf_contains(data)) {
         return;

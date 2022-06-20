@@ -290,6 +290,10 @@ int gnrc_pktbuf_merge(gnrc_pktsnip_t *pkt);
 void gnrc_pktbuf_stats(void);
 #endif
 
+uint32_t gnrc_pktbuf_get_usage(void);
+
+void gnrc_pktbuf_print_leases(void);
+
 /* for testing */
 #ifdef TEST_SUITES
 /**
