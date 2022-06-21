@@ -80,6 +80,8 @@ ifeq (,$(RIOTNOLINK))
 test-input-hash: $(TESTS) $(TESTS_WITH_CONFIG) $(TESTS_AS_ROOT) $(HASHFILE) $(TEST_EXTRA_FILES)
 	sha1sum $^ > $(BINDIR)/test-input-hash.sha1
 else
-test-input-hash:
-	true
+# .SECONDARY creates the bin folder, we depend on it to avoid writing to it
+# prior to it being created when concurrent building is used
+test-input-hash: .SECONDARY
+	$(file >$(BINDIR)/test-input-hash.sha1,no binary generated due to RIOTNOLINK=1)
 endif

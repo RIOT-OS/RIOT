@@ -457,9 +457,9 @@ compile() {
                         make -C${appdir} all test-input-hash -j${JOBS:-4}
         RES=$?
         if [ $RES -eq 0 ]; then
-            kconfig_test_hash=$(test_hash_calc "${BINDIR}")
+            kconfig_hashes="$(cat ${BINDIR}/test-input-hash.sha1)"
         else
-            kconfig_test_hash=0
+            kconfig_hashes="kconfig-build-failed"
             echo "An error occurred while compiling using Kconfig";
         fi
     fi
@@ -470,12 +470,20 @@ compile() {
         make -C${appdir} all test-input-hash -j${JOBS:-4}
     RES=$?
 
+    no_kconfig_hashes="$(cat ${BINDIR}/test-input-hash.sha1)"
+    # test hash is used to cache test results, not for comparing binaries
+    # generated with and without KConfig
     test_hash=$(test_hash_calc "$BINDIR")
 
+
     if [ ${should_check_kconfig_hash} != 0 ]; then
-        if [ ${kconfig_test_hash} != ${test_hash} ]; then
+        if [ ${kconfig_hashes} != ${no_kconfig_hashes} ]; then
             echo "Hashes of binaries with and without Kconfig mismatch for ${appdir} with ${board}";
             echo "Please check that all used modules are modelled in Kconfig and enabled";
+            echo "Input without KConfig:"
+            echo "${no_kconfig_hashes}"
+            echo "Input with KConfig:"
+            echo "${kconfig_hashes}"
             kconfig_module_packages_diff ${board} ${appdir}
             RES=1
         fi
