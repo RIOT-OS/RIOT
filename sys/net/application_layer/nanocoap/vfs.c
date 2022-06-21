@@ -66,12 +66,12 @@ int nanocoap_vfs_get(nanocoap_sock_t *sock, const char *path, const char *dst)
     int fd, res;
     char dst_tmp[CONFIG_SOCK_URLPATH_MAXLEN];
 
-    DEBUG("nanocoap: downloading %s to %s\n", path, dst_tmp);
-
     fd = _prepare_file(dst, dst_tmp, sizeof(dst_tmp));
     if (fd < 0) {
         return fd;
     }
+
+    DEBUG("nanocoap: downloading %s to %s\n", path, dst_tmp);
     res = nanocoap_sock_get_blockwise(sock, path, CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT,
                                       _2file, &fd);
     return _finalize_file(fd, res, dst, dst_tmp);
@@ -82,12 +82,12 @@ int nanocoap_vfs_get_url(const char *url, const char *dst)
     int fd, res;
     char dst_tmp[CONFIG_SOCK_URLPATH_MAXLEN];
 
-    DEBUG("nanocoap: downloading %s to %s\n", url, dst_tmp);
-
     fd = _prepare_file(dst, dst_tmp, sizeof(dst_tmp));
     if (fd < 0) {
         return fd;
     }
+
+    DEBUG("nanocoap: downloading %s to %s\n", url, dst_tmp);
     res = nanocoap_get_blockwise_url(url, CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT,
                                      _2file, &fd);
     return _finalize_file(fd, res, dst, dst_tmp);
