@@ -70,7 +70,7 @@ On Linux, there's an application called
 [Uniflash](https://www.ti.com/tool/uniflash). Sadly, you'll have to install the
 whole IDE just to get the scripting interface :-[
 
-No idea about MacOSX.
+No idea about macOS.
 
 In order to flash the CC2650STK you need to plug the XDS110 probe through the
 JTAG and so-called "DevPack" connectors. Note that the back of the SensorTag

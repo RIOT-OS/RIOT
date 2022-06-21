@@ -46,7 +46,7 @@ to using `esp_now` for the downstream interface.
 
 ## Requirements
 This functionality works only on Linux machines.
-Mac OSX support will be added in the future (lack of native `tap` interface).
+macOS support will be added in the future (lack of native `tap` interface).
 
 If you want to use DHCPv6, you also need a DHCPv6 server configured for prefix
 delegation from the interface facing the border router. With the [KEA] DHCPv6

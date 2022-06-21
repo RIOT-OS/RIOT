@@ -27,7 +27,7 @@ extern "C" {
  *
  * @{
  */
-#ifdef __MACH__ /* OSX */
+#ifdef __MACH__ /* macOS */
 #ifndef THREAD_STACKSIZE_DEFAULT
 #define THREAD_STACKSIZE_DEFAULT            (163840)
 #endif

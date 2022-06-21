@@ -31,7 +31,7 @@
 #include <mach/mach_init.h>
 #include <mach/mach_port.h>
 #include <mach/mach_host.h>
-/* Both OS X and RIOT typedef thread_t. timer.c does not use either thread_t. */
+/* Both macOS and RIOT typedef thread_t. timer.c does not use either thread_t. */
 #define thread_t riot_thread_t
 #endif
 

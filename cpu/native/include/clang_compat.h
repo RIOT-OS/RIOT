@@ -1,5 +1,5 @@
 /*
- * clang_compat.h Undefines macros of clang on OSX to use RIOT's macros
+ * clang_compat.h Undefines macros of clang on macOS to use RIOT's macros
  *
  * Copyright (C) 2014 Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  *
