@@ -33,6 +33,7 @@
 #define URL             "bit.ly/2Ep11dm"
 /* calibrated TX power value */
 #define TX_PWR          (0U)
+#define ADV_ITVL_MS     1000U
 
 /* allocate two advertising contexts, one for Eddystone-URL and one for
  * Eddystone-URI */
@@ -45,10 +46,11 @@ int main(void)
 
     /* advertise the defined URI */
     skald_eddystone_uid_t uid = { URI_NAMESPACE, URI_INSTANCE };
-    skald_eddystone_uid_adv(&_ctx_uid, &uid, TX_PWR);
+    skald_eddystone_uid_adv(&_ctx_uid, &uid, TX_PWR, ADV_ITVL_MS);
 
     /* also advertise the defined short-URL */
-    skald_eddystone_url_adv(&_ctx_url, EDDYSTONE_URL_HTTPS, URL, TX_PWR);
+    skald_eddystone_url_adv(&_ctx_url, EDDYSTONE_URL_HTTPS, URL, TX_PWR,
+                            ADV_ITVL_MS);
 
     return 0;
 }

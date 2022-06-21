@@ -28,6 +28,7 @@
 #define MAJOR           (0x0023)
 #define MINOR           (0x0017)
 #define TXPOWER         (0U)
+#define ADV_ITVL_MS     1000U
 
 /* allocate a single advertising context */
 static skald_ctx_t _ctx;
@@ -38,7 +39,7 @@ int main(void)
 
     /* this will configure the iBeacon and start advertising it */
     skald_uuid_t uuid = { UUID };
-    skald_ibeacon_advertise(&_ctx, &uuid, MAJOR, MINOR, TXPOWER);
+    skald_ibeacon_advertise(&_ctx, &uuid, MAJOR, MINOR, TXPOWER, ADV_ITVL_MS);
 
     return 0;
 }
