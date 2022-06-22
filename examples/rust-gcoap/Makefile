@@ -41,6 +41,9 @@ BASELIBS += $(APPLICATION_RUST_MODULE).module
 
 FEATURES_REQUIRED += rust_target
 
+# This example requires a nightly version because of the CoAP dependencies
+CARGO_CHANNEL ?= ${CARGO_CHANNEL_NIGHTLY}
+
 # Currently unknown, something related to the LED_PORT definition that doesn't
 # pass C2Rust's transpilation
 BOARD_BLACKLIST := ek-lm4f120xl
