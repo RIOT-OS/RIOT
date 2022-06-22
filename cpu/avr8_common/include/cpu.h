@@ -168,23 +168,37 @@ void avr8_clk_init(void);
 
 /**
  * @brief   Print the last instruction's address
+ *
+ * @details This works only if called in a function as first statement, as
+ *          it relies on the return address to be the topmost item on the stack.
  */
 static inline void __attribute__((always_inline)) cpu_print_last_instruction(void)
 {
-    uint8_t hi;
-    uint8_t lo;
-    uint16_t ptr;
-
-    __asm__ volatile (
-        "in %[hi], __SP_H__     \n\t"
-        "in %[lo], __SP_L__     \n\t"
-        : [hi] "=r"(hi),
-          [lo] "=r"(lo)
+        uint32_t addr;
+    __asm__ volatile(
+        "ldi %D[dest], 0"                   "\n\t"
+#if __AVR_3_BYTE_PC__
+        "pop %C[dest] "      "\n\t"
+#else
+        "ldi %C[dest], 0"                   "\n\t"
+#endif
+        "pop %B[dest]"                      "\n\t"
+        "pop %A[dest]"                      "\n\t"
+        "push %A[dest]"                     "\n\t"
+        "push %B[dest]"                     "\n\t"
+#if __AVR_3_BYTE_PC__
+        "push %C[dest] "      "\n\t"
+#endif
+        : [dest]    "=r"(addr)
         : /* no inputs */
-        : /* no clobbers */
+        : "memory"
     );
-    ptr = hi << 8 | lo;
-    printf("Stack Pointer: 0x%04x\n", ptr);
+
+    /* addr now contains instruction to return to, subtract one to get
+     * the instruction that called this function. Also multiply by two to get
+     * the byte position, rather than the (16 bit) instruction position */
+    addr = (addr - 1 ) * 2;
+    printf("0x%" PRIx32 "\n", addr);
 }
 
 /**
