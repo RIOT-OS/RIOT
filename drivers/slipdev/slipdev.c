@@ -185,12 +185,20 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         }
     }
     else {
-        int byte;
+        int byte = 0;
         bool escaped = false;
         uint8_t *ptr = buf;
 
         do {
             int tmp;
+
+            if ((unsigned)res == len) {
+                /* clear out unreceived packet */
+                while (byte != SLIPDEV_END) {
+                    byte = tsrb_get_one(&dev->inbuf);
+                }
+                return -ENOBUFS;
+            }
 
             if ((byte = tsrb_get_one(&dev->inbuf)) < 0) {
                 /* something went wrong, return error */
@@ -199,13 +207,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             tmp = slipdev_unstuff_readbyte(ptr, byte, &escaped);
             ptr += tmp;
             res += tmp;
-            if ((unsigned)res >= len) {
-                while (byte != SLIPDEV_END) {
-                    /* clear out unreceived packet */
-                    byte = tsrb_get_one(&dev->inbuf);
-                }
-                return -ENOBUFS;
-            }
         } while (byte != SLIPDEV_END);
     }
     return res;
