@@ -37,6 +37,16 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   USEMODULE += esp_idf_spi_flash
   USEMODULE += esp_idf_wifi
   USEMODULE += esp_idf_wpa_supplicant
+  USEMODULE += esp_idf_wpa_supplicant_esp_supplicant
+  USEMODULE += esp_idf_wpa_supplicant_port
+  USEMODULE += esp_idf_wpa_supplicant_ap
+  USEMODULE += esp_idf_wpa_supplicant_common
+  USEMODULE += esp_idf_wpa_supplicant_crypto
+  USEMODULE += esp_idf_wpa_supplicant_eap_peer
+  USEMODULE += esp_idf_wpa_supplicant_rsn_supp
+  USEMODULE += esp_idf_wpa_supplicant_tls
+  USEMODULE += esp_idf_wpa_supplicant_utils
+  USEMODULE += esp_idf_wpa_supplicant_wps
   USEMODULE += pthread
 endif
 

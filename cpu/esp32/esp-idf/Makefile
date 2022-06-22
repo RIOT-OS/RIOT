@@ -1,5 +1,7 @@
 MODULE=esp_idf
 
+export ESP_IDF_PATH = $(shell pwd)
+
 # Add a list of subdirectories, that should also be built:
 
 DIRS += common

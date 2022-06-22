@@ -12,3 +12,14 @@ config MODULE_ESP_IDF_WPA_SUPPLICANT
     depends on MODULE_ESP_IDF
     help
         ESP-IDF WPA supplicant.
+
+rsource "esp_supplicant/Kconfig"
+rsource "port/Kconfig"
+rsource "src/ap/Kconfig"
+rsource "src/common/Kconfig"
+rsource "src/crypto/Kconfig"
+rsource "src/eap_peer/Kconfig"
+rsource "src/rsn_supp/Kconfig"
+rsource "src/tls/Kconfig"
+rsource "src/utils/Kconfig"
+rsource "src/wps/Kconfig"
