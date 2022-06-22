@@ -37,7 +37,7 @@
 #include "debug.h"
 
 /**
- * @brief enable use-after-free detection
+ * @brief enable use-after-free/out of bounds write detection
  */
 #ifndef CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE
 #define CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE (0)
