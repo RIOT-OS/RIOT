@@ -1791,10 +1791,20 @@ SHELL_COMMAND(txtsnd, "Sends a custom string as is over the link layer", _gnrc_n
 int _gnrc_netif_config(int argc, char **argv)
 {
     if (argc < 2) {
-        netif_t *netif = NULL;
+        netif_t *last = NULL;
 
-        while ((netif = netif_iter(netif))) {
+        /* Get interfaces in reverse order since the list is used like a stack.
+         * Stop when first netif in list already has been listed. */
+        while (last != netif_iter(NULL)) {
+            netif_t *netif = NULL;
+            netif_t *next = netif_iter(netif);
+            /* Step until next is end of list or was previously listed. */
+            do {
+                netif = next;
+                next = netif_iter(netif);
+            } while (next && next != last);
             _netif_list(netif);
+            last = netif;
         }
 
         return 0;
