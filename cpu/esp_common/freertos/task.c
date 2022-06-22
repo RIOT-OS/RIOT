@@ -21,7 +21,7 @@
 #include "log.h"
 #include "syscalls.h"
 #include "thread.h"
-#if defined(MODULE_ESP_WIFI_ANY) || defined(MODULE_ESP_ETH)
+#if defined(MODULE_ZTIMER_MSEC) || defined(MODULE_ZTIMER_USEC)
 #include "ztimer.h"
 #endif
 #include "timex.h"
@@ -48,10 +48,11 @@ typedef struct {
     uint32_t saved_int_state;
     uint32_t critical_nesting;
     uint32_t notification_value;
-    bool notification_wait_for;
+    bool notification_waiting;
+    bool notification_pending;
 } thread_arch_ext_t;
 
-volatile thread_arch_ext_t threads_arch_exts[KERNEL_PID_LAST + 1] = {};
+volatile thread_arch_ext_t threads_arch_exts[KERNEL_PID_LAST + 1] = { };
 
 BaseType_t xTaskCreatePinnedToCore(TaskFunction_t pvTaskCode,
                                    const char * const pcName,
@@ -66,14 +67,14 @@ BaseType_t xTaskCreatePinnedToCore(TaskFunction_t pvTaskCode,
     /* FreeRTOS priority values have to be inverted */
     uxPriority = SCHED_PRIO_LEVELS - uxPriority - 1;
 
-    DEBUG("%s name=%s size=%d prio=%d pvCreatedTask=%p xCoreId=%d",
+    DEBUG("%s name=%s size=%"PRIu32" prio=%u pvCreatedTask=%p xCoreId=%d\n",
           __func__, pcName, usStackDepth, uxPriority, pvCreatedTask, xCoreID);
 
     char* stack = malloc(usStackDepth + sizeof(thread_t));
 
     if (!stack) {
         LOG_TAG_ERROR("freertos", "not enough memory to create task %s with "
-                      "stack size of %d bytes\n", pcName, usStackDepth);
+                      "stack size of %"PRIu32" bytes\n", pcName, usStackDepth);
         abort();
         return pdFALSE;
     }
@@ -114,19 +115,16 @@ void vTaskDelete(TaskHandle_t xTaskToDelete)
     extern volatile thread_t *sched_active_thread;
     DEBUG("%s pid=%d task=%p\n", __func__, thread_getpid(), xTaskToDelete);
 
-    assert(xTaskToDelete != NULL);
-
     uint32_t pid = (uint32_t)xTaskToDelete;
+    assert(pid_is_valid(pid));
 
-    /* remove old task from scheduling */
+    /* remove the task from scheduling */
     thread_t* thread = (thread_t*)sched_threads[pid];
     sched_set_status(thread, STATUS_STOPPED);
     sched_threads[pid] = NULL;
     sched_num_threads--;
-    sched_active_thread = NULL;
 
-    /* determine the new running task */
-    sched_run();
+    free(thread->stack_start);
 }
 
 void vTaskSuspend(TaskHandle_t xTaskToSuspend)
@@ -134,19 +132,17 @@ void vTaskSuspend(TaskHandle_t xTaskToSuspend)
     extern volatile thread_t *sched_active_thread;
     DEBUG("%s pid=%d task=%p\n", __func__, thread_getpid(), xTaskToSuspend);
 
-    uint32_t pid = (xTaskToSuspend == NULL) ? (uint32_t)thread_getpid()
-                                            : (uint32_t)xTaskToSuspend;
-
-    assert(pid <= KERNEL_PID_LAST);
+    thread_t *thread = thread_get((xTaskToSuspend == NULL) ? (uint32_t)thread_getpid()
+                                                           : (uint32_t)xTaskToSuspend);
+    assert(thread != NULL);
 
     /* set status to sleeping to suspend it */
-    thread_t* thread = (thread_t*)sched_threads[pid];
     sched_set_status(thread, STATUS_SLEEPING);
 
-    /* trigger rescheduling */
-    sched_active_thread = NULL;
-    /* determine the new running task */
-    sched_run();
+    /* trigger rescheduling if a task suspends itself */
+    if (xTaskToSuspend == NULL) {
+        thread_yield_higher();
+    }
 }
 
 void vTaskResume(TaskHandle_t xTaskToResume)
@@ -155,8 +151,21 @@ void vTaskResume(TaskHandle_t xTaskToResume)
     DEBUG("%s pid=%d task=%p\n", __func__, thread_getpid(), xTaskToResume);
 
     uint32_t pid = (uint32_t)xTaskToResume;
-    assert(pid <= KERNEL_PID_LAST);
+    assert(pid_is_valid(pid));
     thread_wakeup (pid);
+}
+
+void vTaskDelay(const TickType_t xTicksToDelay)
+{
+    DEBUG("%s xTicksToDelay=%"PRIu32"\n", __func__, xTicksToDelay);
+
+#if defined(MODULE_ZTIMER_MSEC)
+    uint64_t ms = xTicksToDelay * portTICK_PERIOD_MS;
+    ztimer_sleep(ZTIMER_MSEC, ms);
+#elif defined(MODULE_ZTIMER_USEC)
+    uint64_t us = xTicksToDelay * portTICK_PERIOD_MS * US_PER_MS;
+    ztimer_sleep(ZTIMER_USEC, us);
+#endif
 }
 
 TaskHandle_t xTaskGetCurrentTaskHandle(void)
@@ -167,14 +176,50 @@ TaskHandle_t xTaskGetCurrentTaskHandle(void)
     return (TaskHandle_t)pid;
 }
 
-void vTaskDelay( const TickType_t xTicksToDelay )
+const char *pcTaskGetTaskName(TaskHandle_t xTaskToQuery)
 {
-    DEBUG("%s xTicksToDelay=%d\n", __func__, xTicksToDelay);
-#if defined(MODULE_ESP_WIFI_ANY) || defined(MODULE_ESP_ETH)
-    uint64_t ms = xTicksToDelay * MS_PER_SEC / xPortGetTickRateHz();
-    ztimer_sleep(ZTIMER_MSEC, ms);
-#endif
+    DEBUG("%s pid=%d task=%p\n", __func__, thread_getpid(), xTaskToQuery);
+
+    thread_t *thread = thread_get((xTaskToQuery == NULL) ? (uint32_t)thread_getpid()
+                                                         : (uint32_t)xTaskToQuery);
+    assert(thread != NULL);
+    return thread->name;
 }
+
+#ifdef DEVELHELP
+UBaseType_t uxTaskGetStackHighWaterMark(TaskHandle_t xTask)
+{
+    DEBUG("%s pid=%d task=%p\n", __func__, thread_getpid(), xTask);
+
+    thread_t *thread = thread_get((xTask == NULL) ? (uint32_t)thread_getpid()
+                                                  : (uint32_t)xTask);
+    assert(thread != NULL);
+    return thread_measure_stack_free(thread->stack_start);
+}
+
+void *pvTaskGetThreadLocalStoragePointer(TaskHandle_t xTaskToQuery,
+                                         BaseType_t xIndex)
+{
+    (void)xTaskToQuery;
+    (void)xIndex;
+
+    /* TODO define TLS using thread_arch_t */
+    return NULL;
+}
+
+void vTaskSetThreadLocalStoragePointerAndDelCallback(TaskHandle_t xTaskToSet,
+                                                     BaseType_t xIndex,
+                                                     void *pvValue,
+                                                     TlsDeleteCallbackFunction_t pvDelCallback)
+{
+    (void)xTaskToSet;
+    (void)xIndex;
+    (void)pvValue;
+    (void)pvDelCallback;
+
+    /* TODO define TLS using thread_arch_t */
+}
+#endif /* DEVELHELP */
 
 TickType_t xTaskGetTickCount (void)
 {
@@ -249,7 +294,7 @@ void vTaskExitCritical( portMUX_TYPE *mux )
 
 void vTaskStepTick(const TickType_t xTicksToJump)
 {
-    DEBUG("%s xTicksToJump=%d\n", __func__, xTicksToJump);
+    DEBUG("%s xTicksToJump=%"PRIu32"\n", __func__, xTicksToJump);
     /*
      * TODO:
      * At the moment, only the calling task is set to sleep state. Usually, the
@@ -269,6 +314,120 @@ TickType_t prvGetExpectedIdleTime(void)
     return 0;
 }
 
+BaseType_t xTaskNotify(TaskHandle_t xTaskToNotify, uint32_t ulValue,
+                       eNotifyAction eAction)
+{
+    uint32_t pid = (uint32_t)xTaskToNotify;
+    thread_t* thread = thread_get(pid);
+
+    DEBUG("%s task=%d notifies=%"PRIu32" value=%"PRIu32" action=%u\n", __func__,
+          thread_getpid(), pid, ulValue, eAction);
+
+    assert(pid_is_valid(pid));
+    assert(thread != NULL);
+
+    vTaskEnterCritical(0);
+
+    switch (eAction) {
+        case eSetBits:
+            threads_arch_exts[pid].notification_value |= ulValue;
+            break;
+        case eIncrement:
+            threads_arch_exts[pid].notification_value++;
+            break;
+        case eSetValueWithoutOverwrite:
+            if (threads_arch_exts[pid].notification_pending) {
+                /* if a notificatoin is pending, return with error */
+                vTaskExitCritical(0);
+                return pdFALSE;
+            }
+            /* fallthrough */
+        case eSetValueWithOverwrite:
+            threads_arch_exts[pid].notification_value = ulValue;
+            break;
+        default:
+            /* no action */
+            break;
+    }
+
+    if (threads_arch_exts[pid].notification_waiting) {
+        /* if the task is waiting for a notification, wake it up */
+        sched_set_status(thread, STATUS_PENDING);
+        vTaskExitCritical(0);
+        thread_yield_higher();
+        return pdTRUE;
+    }
+
+    threads_arch_exts[pid].notification_pending = true;
+
+    vTaskExitCritical(0);
+    return pdTRUE;
+}
+
+BaseType_t xTaskNotifyWait(uint32_t ulBitsToClearOnEntry,
+                           uint32_t ulBitsToClearOnExit,
+                           uint32_t *pulNotificationValue,
+                           TickType_t xTicksToWait)
+{
+    kernel_pid_t pid = thread_getpid();
+
+    DEBUG("%s task=%d entry=%08"PRIx32" exit=%08"PRIx32" wait=%u\n", __func__,
+          pid, ulBitsToClearOnEntry, ulBitsToClearOnExit, xTicksToWait);
+
+    assert(pid_is_valid(pid));
+    assert((xTicksToWait != 0) && !irq_is_in());
+
+    vTaskEnterCritical(0);
+
+    if (!threads_arch_exts[pid].notification_pending) {
+        /* bits to clear on entry if notification was not pending */
+        threads_arch_exts[pid].notification_value ^= ulBitsToClearOnEntry;
+
+        /* suspend the calling thread to wait for notification */
+        threads_arch_exts[pid].notification_waiting = true;
+        thread_t *me = thread_get_active();
+        sched_set_status(me, STATUS_SLEEPING);
+
+        DEBUG("%s pid=%d suspend calling thread\n", __func__, pid);
+
+#if IS_USED(MODULE_ZTIMER_MSEC)
+        ztimer_t tm = { };
+        uint32_t to = xTicksToWait * portTICK_PERIOD_MS;
+        /* set the timeout if given */
+        if (xTicksToWait < portMAX_DELAY) {
+            ztimer_set_timeout_flag(ZTIMER_MSEC, &tm, to);
+            ztimer_set_wakeup(ZTIMER_MSEC, &tm, to + 1, pid);
+        }
+#else
+        assert(xTicksToWait == portMAX_DELAY);
+#endif
+        vTaskExitCritical(0);
+        thread_yield_higher();
+
+#if IS_USED(MODULE_ZTIMER_MSEC)
+        vTaskEnterCritical(0);
+        if (xTicksToWait < portMAX_DELAY) {
+            ztimer_remove(ZTIMER_MSEC, &tm);
+            if (me->flags & THREAD_FLAG_TIMEOUT) {
+                vTaskExitCritical(0);
+                return pdFALSE;
+            }
+        }
+#else
+        assert(xTicksToWait == portMAX_DELAY);
+#endif
+    }
+
+    if (pulNotificationValue) {
+        /* save the notification value before clearing bits on exit */
+        *pulNotificationValue = threads_arch_exts[pid].notification_value;
+    }
+    threads_arch_exts[pid].notification_value ^= ulBitsToClearOnExit;
+
+    vTaskExitCritical(0);
+    return pdTRUE;
+}
+
 BaseType_t xTaskNotifyGive(TaskHandle_t xTaskToNotify)
 {
     DEBUG("%s pid=%d task=%p\n", __func__, thread_getpid(), xTaskToNotify);
@@ -279,19 +438,20 @@ BaseType_t xTaskNotifyGive(TaskHandle_t xTaskToNotify)
 void vTaskNotifyGiveFromISR(TaskHandle_t xTaskToNotify,
                             BaseType_t *pxHigherPriorityTaskWoken)
 {
-    DEBUG("%s pid=%d task=%p\n", __func__, thread_getpid(), xTaskToNotify);
-
     uint32_t pid = (uint32_t)xTaskToNotify;
+    thread_t* thread = thread_get(pid);
 
-    assert(pid <= KERNEL_PID_LAST);
+    DEBUG("%s task=%d notifies=%"PRIu32"\n", __func__, thread_getpid(), pid);
+
+    assert(pid_is_valid(pid));
+    assert(thread);
 
     vTaskEnterCritical(0);
 
     threads_arch_exts[pid].notification_value++;
 
-    if (threads_arch_exts[pid].notification_wait_for) {
+    if (threads_arch_exts[pid].notification_waiting) {
         /* if the task is waiting for notification, set its status to pending */
-        thread_t* thread = (thread_t*)sched_threads[pid];
         sched_set_status(thread, STATUS_PENDING);
 
         if (thread->priority < sched_threads[thread_getpid()]->priority) {
@@ -316,7 +476,7 @@ uint32_t ulTaskNotifyTake(BaseType_t xClearCountOnExit,
 
     kernel_pid_t pid = thread_getpid();
 
-    assert((pid >= 0) && (pid <= KERNEL_PID_LAST));
+    assert(pid_is_valid(pid));
 
     vTaskEnterCritical(0);
 
@@ -334,7 +494,7 @@ uint32_t ulTaskNotifyTake(BaseType_t xClearCountOnExit,
     }
     else {
         /* suspend the calling thread to wait for notification */
-        threads_arch_exts[pid].notification_wait_for = true;
+        threads_arch_exts[pid].notification_waiting = true;
         thread_t *me = thread_get_active();
         sched_set_status(me, STATUS_SLEEPING);
 
@@ -346,7 +506,7 @@ uint32_t ulTaskNotifyTake(BaseType_t xClearCountOnExit,
         /* TODO timeout handling with xTicksToWait */
         DEBUG("%s pid=%d continue calling thread\n", __func__, thread_getpid());
     }
-    threads_arch_exts[pid].notification_wait_for = false;
+    threads_arch_exts[pid].notification_waiting = false;
     if (xClearCountOnExit) {
         threads_arch_exts[pid].notification_value = 0;
     }

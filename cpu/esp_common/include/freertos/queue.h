@@ -32,7 +32,7 @@ QueueHandle_t xQueueCreateCountingSemaphore (const UBaseType_t uxMaxCount,
 
 void vQueueDelete (QueueHandle_t xQueue);
 
-BaseType_t xQueueGenericReset (QueueHandle_t xQueue, BaseType_t xNewQueue);
+BaseType_t xQueueReset (QueueHandle_t xQueue);
 
 BaseType_t xQueueGenericReceive (QueueHandle_t xQueue,
                                  void * const pvBuffer,
@@ -108,7 +108,10 @@ UBaseType_t uxQueueMessagesWaiting( QueueHandle_t xQueue );
                                   ( pxHigherPriorityTaskWoken ), \
                                   queueSEND_TO_BACK )
 
-#define xQueueReset( xQueue ) xQueueGenericReset( xQueue, pdFALSE )
+#define xQueueOverwriteFromISR( xQueue, pvItemToQueue, pxHigherPriorityTaskWoken ) \
+        xQueueGenericSendFromISR( ( xQueue ), ( pvItemToQueue ), \
+                                  ( pxHigherPriorityTaskWoken ), \
+                                  queueOVERWRITE )
 
 #ifdef __cplusplus
 }
