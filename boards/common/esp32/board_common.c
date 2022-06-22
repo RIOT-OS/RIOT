@@ -30,10 +30,6 @@
 extern "C" {
 #endif
 
-void board_init_common(void)
-{
-}
-
 extern void adc_print_config(void);
 extern void dac_print_config(void);
 extern void pwm_print_config(void);
