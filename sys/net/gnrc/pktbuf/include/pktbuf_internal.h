@@ -64,7 +64,8 @@ extern uint8_t *gnrc_pktbuf_static_buf;
 static inline bool gnrc_pktbuf_contains(void *ptr)
 {
 #if IS_USED(MODULE_GNRC_PKTBUF_STATIC)
-    return (unsigned)((uint8_t *)ptr - gnrc_pktbuf_static_buf) < CONFIG_GNRC_PKTBUF_SIZE;
+    return ((uintptr_t)ptr >= (uintptr_t)gnrc_pktbuf_static_buf) &&
+           ((uintptr_t)ptr < (uintptr_t)gnrc_pktbuf_static_buf + CONFIG_GNRC_PKTBUF_SIZE);
 #else
     (void)ptr;
     return true;
