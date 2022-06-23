@@ -465,8 +465,9 @@ compile() {
     fi
 
     # compile without Kconfig
+    BOARD=${board} make -C${appdir} clean
     CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
-        make -C${appdir} clean all test-input-hash -j${JOBS:-4}
+        make -C${appdir} all test-input-hash -j${JOBS:-4}
     RES=$?
 
     test_hash=$(test_hash_calc "$BINDIR")
