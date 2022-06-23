@@ -119,7 +119,7 @@ void rtt64_set_counter(uint64_t now)
 {
     unsigned state = irq_disable();
 
-    rtt_set_counter(now & RTT_MAX_VALUE);
+    rtt_set_counter(now >> (16 - RTT_SUBSEC_BITS));
     overflows = now >> RTT_SHIFT;
 
     irq_restore(state);
