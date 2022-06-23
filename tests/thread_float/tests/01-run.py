@@ -28,9 +28,15 @@ def same_computation_as_in_c_prog(thread_num):
 
 def testfunc(child):
     child.expect_exact("THREADS CREATED")
-    child.expect_exact("THREAD t1 start")
-    child.expect_exact("THREAD t2 start")
-    child.expect_exact("THREAD t3 start")
+    # Threads are started with THREAD_CREATE_WOUT_YIELD, and thus prone starting
+    # in a random sequence depending on any interrupts that cause rescheduling
+    threads_started = set()
+    for _ in range(3):
+        child.expect(r"THREAD t(\d) start\r\n")
+        thread_num = int(child.match.group(1))
+        assert 1 <= thread_num <= 3, "thread number has to be valid"
+        assert thread_num not in threads_started, "same thread must not be launched twice"
+        threads_started.add(thread_num)
 
     child.expect(r"t(\d): (\d{3}\.\d+)\r\n")
     first_thread = int(child.match.group(1))
