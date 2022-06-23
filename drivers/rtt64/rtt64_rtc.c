@@ -59,6 +59,19 @@ int rtc_get_time_ms(struct tm *time, uint16_t *ms)
     return 0;
 }
 
+void rtt_rtc_gettimeofday(uint32_t *secs, uint32_t *us)
+{
+    uint64_t secs64;
+
+    rtt64_get_time(&secs64, us);
+    *secs = (uint32_t)secs64;
+}
+
+void rtt_rtc_settimeofday(uint32_t s, uint32_t us)
+{
+    rtt64_set_time(s, us);
+}
+
 int rtc_get_time(struct tm *time)
 {
     return rtc_get_time_ms(time, NULL);
