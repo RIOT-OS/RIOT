@@ -1,14 +1,13 @@
-ifneq ($(CPU),esp32)
-
-ifneq (,$(filter esp_log_colored,$(USEMODULE)))
-  BOOTLOADER_COLOR = _colors
-endif
-ifneq (,$(filter esp_log_startup,$(USEMODULE)))
-  BOOTLOADER_INFO = _info
-endif
-# Full path to the bootloader binary. In the ESP32 case this is set by the
-# esp_bootloader module.
-BOOTLOADER_BIN ?= $(RIOTCPU)/$(CPU)/bin/bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
+ifeq ($(CPU),esp8266)
+  ifneq (,$(filter esp_log_colored,$(USEMODULE)))
+    BOOTLOADER_COLOR = _colors
+  endif
+  ifneq (,$(filter esp_log_startup,$(USEMODULE)))
+    BOOTLOADER_INFO = _info
+  endif
+  # Full path to the bootloader binary. In the ESP32 case this is set by the
+  # esp_bootloader module.
+  BOOTLOADER_BIN ?= $(RIOTCPU)/$(CPU)/bin/bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
 endif
 
 ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool.py
@@ -33,7 +32,7 @@ endif
 .PHONY: esp-qemu
 
 esp-qemu:
-ifneq (,$(filter esp32,$(CPU_FAM)))
+ifeq (esp32,$(CPU))
 	$(Q)echo \
 		"--flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ) " \
 		"--flash_size $(FLASH_SIZE)MB" \
@@ -41,7 +40,7 @@ ifneq (,$(filter esp32,$(CPU_FAM)))
 		"0x8000 $(BINDIR)/partitions.bin" \
 		"0x10000 $(FLASHFILE)" > $(BINDIR)/qemu_flash_args
 	$(Q)$(ESPTOOL) \
-		--chip esp32 merge_bin \
+		--chip $(CPU_FAM) merge_bin \
 		--fill-flash-size 4MB \
 		-o $(BINDIR)/qemu_flash_image.bin @$(BINDIR)/qemu_flash_args
 	$(Q)cp $(RIOTCPU)/$(CPU)/bin/rom_0x3ff90000_0x00010000.bin $(BINDIR)/rom1.bin
