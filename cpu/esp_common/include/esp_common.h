@@ -45,7 +45,7 @@ extern "C" {
 #define RTC_BSS_ATTR __attribute__((section(".rtc.bss")))
 #endif
 
-#ifndef MCU_ESP32
+#ifdef MCU_ESP8266
 #ifndef RTC_DATA_ATTR
 #define RTC_DATA_ATTR __attribute__((section(".rtc.data")))
 #endif
