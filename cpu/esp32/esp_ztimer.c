@@ -141,7 +141,7 @@ void ets_timer_done(ETSTimer *ptimer)
 
 void ets_timer_arm_us(ETSTimer *timer, uint32_t tmout, bool repeat)
 {
-    DEBUG("%s timer=%p tmout=%u repeat=%d\n", __func__, timer, tmout, repeat);
+    DEBUG("%s timer=%p tmout=%"PRIu32" repeat=%d\n", __func__, timer, tmout, repeat);
 
     struct _ets_to_ztimer* e2xt = _ets_to_ztimer_get(timer);
 
