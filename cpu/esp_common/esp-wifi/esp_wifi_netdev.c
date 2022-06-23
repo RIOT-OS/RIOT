@@ -615,7 +615,7 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
     /* send the the packet to the peer(s) mac address */
     if (esp_wifi_internal_tx(ESP_IF_WIFI_STA, dev->tx_buf, dev->tx_len) == ESP_OK) {
 #endif
-#ifdef MCU_ESP32
+#ifndef MCU_ESP8266
         /* for ESP8266 it is done in _esp_wifi_tx_cb */
         _esp_wifi_send_is_in = false;
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
@@ -872,7 +872,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
 
 #ifndef MODULE_ESP_NOW
     /* if module esp_now is used, the following part is already done */
-#ifdef MCU_ESP32
+#ifndef MCU_ESP8266
     extern portMUX_TYPE g_intr_lock_mux;
     mutex_init(&g_intr_lock_mux);
 #endif
