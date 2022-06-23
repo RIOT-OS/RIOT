@@ -95,7 +95,6 @@ and the core library for the CPU (**target**) of your choice available:
 ```
 $ rustup toolchain add nightly
 $ rustup toolchain add stable
-$ rustup default nightly
 $ rustup target add thumbv7m-none-eabi --toolchain nightly
 $ rustup target add thumbv7m-none-eabi --toolchain stable
 ```

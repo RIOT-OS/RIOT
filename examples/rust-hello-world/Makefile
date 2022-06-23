@@ -21,6 +21,11 @@ BASELIBS += $(APPLICATION_RUST_MODULE).module
 
 FEATURES_REQUIRED += rust_target
 
+# While this example can be built with stable Rust on many platforms, the
+# nightly channel is selected to smoothly transition from running this example
+# to experimenting with it (which might easily lead into nightly territory).
+CARGO_CHANNEL ?= $(CARGO_CHANNEL_NIGHTLY)
+
 # Currently unknown, something related to the LED_PORT definition that doesn't
 # pass C2Rust's transpilation
 BOARD_BLACKLIST := ek-lm4f120xl
