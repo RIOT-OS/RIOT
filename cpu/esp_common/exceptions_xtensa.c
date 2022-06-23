@@ -11,11 +11,13 @@
  * @{
  *
  * @file
- * @brief       ESP SoCs exception handling
+ * @brief       Exception handling for Xtensa-based ESP SoCs
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @}
  */
+
+#if __xtensa__
 
 #include <malloc.h>
 #include <string.h>
@@ -216,3 +218,5 @@ void _panic_handler(uint32_t addr)
     pm_off();
     while (1) { };
 }
+
+#endif /* __xtensa__ */
