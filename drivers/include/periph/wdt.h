@@ -231,6 +231,23 @@ extern "C" {
 #endif
 
 /**
+ * @brief   If `periph_wdt_auto_start` is used, this will be the lower bound
+ *          of when the WDT can be kicked.
+ */
+#ifndef CONFIG_PERIPH_WDT_WIN_MIN_MS
+#define CONFIG_PERIPH_WDT_WIN_MIN_MS    (0)
+#endif
+
+/**
+ * @brief   If `periph_wdt_auto_start` is used, this will be the max period
+ *          after which the WDT must be kicked or else it will reboot the
+ *          system.
+ */
+#ifndef CONFIG_PERIPH_WDT_WIN_MAX_MS
+#define CONFIG_PERIPH_WDT_WIN_MAX_MS    (1024)
+#endif
+
+/**
  * @brief    Start watchdog timer
  */
 void wdt_start(void);
