@@ -51,7 +51,7 @@ extern "C" {
 #endif
 
 #ifndef MCP2515_PARAM_RST
-#define MCP2515_PARAM_RST GPIO_PIN(0, 0)
+#define MCP2515_PARAM_RST GPIO_UNDEF
 #endif
 
 #ifndef MCP2515_PARAM_INT
