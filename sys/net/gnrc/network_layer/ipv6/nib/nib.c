@@ -1676,30 +1676,31 @@ static void _handle_timestamp(const ndp_opt_timestamp_t *tsmp)
         return;
     }
 
-    uint64_t now = byteorder_ntohll(tsmp->timestamp);
+    uint64_t remote = byteorder_ntohll(tsmp->timestamp);
     DEBUG("nib: received Timestamp option:\n");
-    DEBUG("     - Seconds: %u\n", (unsigned)(now >> 16));
-    DEBUG("     - Milliseconds: %u\n", (unsigned)(1000 * (now & 0xFFFF)) >> 16);
+    DEBUG("     - Seconds: %u\n", (unsigned)(remote >> 16));
+    DEBUG("     - Milliseconds: %u\n", (unsigned)(1000 * (remote & 0xFFFF)) >> 16);
 #if IS_USED(MODULE_RTT64)
     static uint16_t diff;
     uint64_t local = rtt64_get_counter();
-    now += diff;
+    remote += diff;
 
-    rtt64_set_counter(now);
+    rtt64_set_counter(remote);
 
-    DEBUG("     - remote: %u ticks\n", (unsigned)now);
+    DEBUG("     - remote: %u ticks\n", (unsigned)remote);
     DEBUG("     - local: %u ticks\n", (unsigned)local);
     DEBUG("     - diff: %u ticks\n", diff);
 
     /* try to account for transmission time */
     /* only do diff accounting if diff is less than 1s */
-    if ((now < local) && (local - now < 0xFFFF)) {
-        /* now is already now + diff */
-        diff = (local - now) / 2;
+    if ((remote < local) && (local - remote < 0xFFFF)) {
+        /* remote is already remote + diff */
+        diff = (local - remote) / 2;
+        DEBUG("     - new diff: %u ticks (%u ticks too fast)\n", diff, (unsigned)(local - remote));
+    } else if ((remote > local) && (remote - local < 0xFFFF)) {
+        /* remote is already remote + diff */
+        diff = (remote - local) / 2;
         DEBUG("     - new diff: %u ticks\n", diff);
-    } else if ((now > local) && (now - local < 0xFFFF)) {
-        diff -= _min(diff, now - local);
-        DEBUG("     - new diff: %u ticks (%u ticks too fast)\n", diff, (unsigned)(now - local));
     } else {
         diff = 0;
     }
