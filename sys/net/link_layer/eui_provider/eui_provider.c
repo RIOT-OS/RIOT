@@ -19,6 +19,16 @@
 #include "luid.h"
 #include "net/eui_provider.h"
 
+static inline unsigned _get_idx(netdev_t *netdev)
+{
+#ifdef MODULE_NETDEV_REGISTER
+    return netdev->index;
+#else
+    (void)netdev;
+    return 0;
+#endif
+}
+
 void netdev_eui48_get(netdev_t *netdev, eui48_t *addr)
 {
     unsigned i = EUI48_PROVIDER_NUMOF;
@@ -38,10 +48,8 @@ void netdev_eui48_get(netdev_t *netdev, eui48_t *addr)
             eui48_conf[i].index != NETDEV_INDEX_ANY) {
             continue;
         }
-#else
-        (void) netdev;
 #endif
-        if (eui48_conf[i].provider(i, addr) == 0) {
+        if (eui48_conf[i].provider(_get_idx(netdev), addr) == 0) {
             return;
         }
     }
@@ -68,10 +76,8 @@ void netdev_eui64_get(netdev_t *netdev, eui64_t *addr)
             eui64_conf[i].index != NETDEV_INDEX_ANY) {
             continue;
         }
-#else
-        (void) netdev;
 #endif
-        if (eui64_conf[i].provider(i, addr) == 0) {
+        if (eui64_conf[i].provider(_get_idx(netdev), addr) == 0) {
             return;
         }
     }
