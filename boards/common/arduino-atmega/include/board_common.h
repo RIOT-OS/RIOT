@@ -49,6 +49,9 @@ extern "C" {
 #ifdef CPU_ATMEGA328P
 #define LED0_PIN            GPIO_PIN(1, 5)
 #define LED0_MASK           (1 << DDB5)
+#define LED0_ON             (PORTB |=  LED0_MASK)
+#define LED0_OFF            (PORTB &= ~LED0_MASK)
+#define LED0_TOGGLE         (PORTB ^=  LED0_MASK)
 #endif
 
 #ifdef CPU_ATMEGA32U4
@@ -63,6 +66,9 @@ extern "C" {
 #ifdef CPU_ATMEGA2560
 #define LED0_PIN            GPIO_PIN(1, 7)
 #define LED0_MASK           (1 << DDB7)
+#define LED0_ON             (PORTB |=  LED0_MASK)
+#define LED0_OFF            (PORTB &= ~LED0_MASK)
+#define LED0_TOGGLE         (PORTB ^=  LED0_MASK)
 #endif
 
 #ifdef CPU_ATMEGA32U4
@@ -75,10 +81,6 @@ extern "C" {
 #define LED2_OFF            (PORTD |=  LED2_MASK) /**< TX LED */
 #define LED2_ON             (PORTD &= ~LED2_MASK)
 #define LED2_TOGGLE         (PORTD ^=  LED2_MASK)
-#else
-#define LED0_ON             (PORTD |=  LED0_MASK)
-#define LED0_OFF            (PORTD &= ~LED0_MASK)
-#define LED0_TOGGLE         (PORTD ^=  LED0_MASK)
 #endif
 /** @} */
 
