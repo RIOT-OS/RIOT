@@ -150,7 +150,7 @@ void rtt64_set_alarm_counter(uint64_t alarm, rtt_cb_t cb, void *arg)
     alarm_cb = cb;
     alarm_cb_arg = arg;
 
-    rtt_set_alarm(alarm & RTT_MAX_VALUE, cb, arg);
+    rtt_set_alarm(alarm >> (16 - RTT_SUBSEC_BITS), cb, arg);
     alarm_overflows = alarm >> RTT_SHIFT;
 
     irq_restore(state);
