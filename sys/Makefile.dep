@@ -24,6 +24,23 @@ ifneq (,$(filter auto_init_gnrc_netif,$(USEMODULE)))
   USEMODULE += gnrc_netif_init_devs
 endif
 
+ifneq (,$(filter auto_init_wdt_thread,$(USEMODULE)))
+  USEMODULE += periph_wdt_auto_start
+  USEMODULE += ztimer_msec
+
+  # we can only have either auto_init_wdt_event or auto_init_wdt_thread
+  ifneq (,$(filter auto_init_wdt_event,$(USEMODULE)))
+    $(error auto_init_wdt_event and auto_init_wdt_thread are mutually exclusive)
+  endif
+endif
+
+ifneq (,$(filter auto_init_wdt_event,$(USEMODULE)))
+  USEMODULE += event_periodic_callback
+  USEMODULE += event_thread
+  USEMODULE += periph_wdt_auto_start
+  USEMODULE += ztimer_msec
+endif
+
 ifneq (,$(filter auto_init_sock_dns,$(USEMODULE)))
   ifneq (,$(filter ipv4,$(USEMODULE)))
     USEMODULE += ipv4_addr
