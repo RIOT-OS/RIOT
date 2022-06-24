@@ -12,6 +12,7 @@ config MODULE_ESP_IDF
     depends on HAS_ARCH_ESP32
     default y
     select MODULE_ESP_IDF_COMMON
+    select MODULE_ESP_IDF_EFUSE
     select MODULE_ESP_IDF_SPI_FLASH if MODULE_MTD
     help
       Espressif IoT Development Framework.

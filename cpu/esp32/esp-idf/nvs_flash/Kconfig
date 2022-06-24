@@ -9,8 +9,9 @@ config MODULE_ESP_IDF_NVS_FLASH
     bool
     depends on TEST_KCONFIG
     depends on MODULE_ESP_IDF
-    select MODULE_CPP
+
     select MODULE_MTD
+
     help
         ESP-IDF non-volatile storage library. This library is required if
         the WiFi interface is used.

@@ -4,7 +4,9 @@ export ESP_IDF_PATH = $(shell pwd)
 
 # Add a list of subdirectories, that should also be built:
 
-DIRS += common
+ifneq (,$(filter esp_idf_common,$(USEMODULE)))
+  DIRS += common
+endif
 
 ifneq (,$(filter esp_idf_efuse,$(USEMODULE)))
   DIRS += efuse

@@ -28,3 +28,9 @@ include ../esp_idf.mk
 # vendor code contains casts that increase alignment requirements. Let's hope
 # those are false positives.
 CFLAGS += -Wno-cast-align
+
+# additional CFLAGS required for RISC-V architecture
+ifneq (,$(filter riscv32%,$(TARGET_ARCH)))
+  CFLAGS += -Wno-error=format=
+  CFLAGS += -Wno-format
+endif

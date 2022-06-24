@@ -2,10 +2,7 @@ MODULE = esp_idf_wifi
 
 # source files to be compiled for this module
 ESP32_SDK_SRC = \
-  components/driver/adc_common.c \
-  components/driver/rtc_module.c \
   components/esp_event/event_send.c \
-  components/esp_hw_support/hw_random.c \
   components/esp_hw_support/port/$(CPU)/dport_access.c \
   components/esp_phy/src/phy_init.c \
   components/esp_wifi/$(CPU)/esp_adapter.c \
