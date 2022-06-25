@@ -69,6 +69,11 @@ config HAS_ARCH_ESP_XTENSA
     help
         Indicates that an Xtensa-based 'ESP' architecture is being used.
 
+config HAS_ARCH_ESP_RISCV
+    bool
+    help
+        Indicates that an RISC-V-based 'ESP' architecture is being used.
+
 config HAS_ESP_WIFI_ENTERPRISE
     bool
     help
@@ -119,6 +124,7 @@ config MODULE_ESP_LOG_STARTUP
 config MODULE_ESP_QEMU
     bool "Simulate ESP with QEMU"
 
+rsource "esp-riscv/Kconfig"
 rsource "esp-xtensa/Kconfig"
 rsource "freertos/Kconfig"
 rsource "periph/Kconfig"
