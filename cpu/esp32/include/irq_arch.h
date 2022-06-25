@@ -46,7 +46,14 @@ extern "C" {
 #define CPU_INUM_ETH        18  /**< Level interrupt with low priority 1 */
 #define CPU_INUM_TIMER      19  /**< Level interrupt with medium priority 2 */
 #define CPU_INUM_FRC2       20  /**< Level interrupt with medium priority 2 */
+#define CPU_INUM_SYSTIMER   20  /**< Level interrupt with medium priority 2 */
+#define CPU_INUM_CACHEERR   25  /**< Level interrupt with high priority 4 */
 /** @} */
+
+/**
+ * @brief   Initialize architecture specific interrupt handling
+ */
+void esp_irq_init(void);
 
 #ifdef __cplusplus
 }
