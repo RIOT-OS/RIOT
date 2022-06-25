@@ -46,7 +46,7 @@ typedef struct intr_handle_data_t {
 static const struct intr_handle_data_t _irq_data_table[] = {
     { ETS_FROM_CPU_INTR0_SOURCE, CPU_INUM_SOFTWARE, 1 },
     { ETS_TG0_WDT_LEVEL_INTR_SOURCE, CPU_INUM_WDT, 1 },
-    { ETS_TG0_T0_LEVEL_INTR_SOURCE, CPU_INUM_RTC, 1 },
+    { ETS_TG0_T0_LEVEL_INTR_SOURCE, CPU_INUM_RTT, 1 },
 #if defined(MCU_ESP32) || defined(MCU_ESP32S2) || defined(MCU_ESP32S3)
     { ETS_TG0_T1_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
 #endif
