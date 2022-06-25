@@ -33,7 +33,7 @@
 
 #include "esp_partition.h"
 
-#ifdef MCU_ESP32
+#ifndef MCU_ESP8266
 
 #include "esp_flash_partitions.h"
 #include "esp_spi_flash.h"
@@ -41,13 +41,13 @@
 #include "rom/spi_flash.h"
 #include "soc/soc.h"
 
-#else /* MCU_ESP32 */
+#else /* !MCU_ESP8266 */
 
 #include "esp_flash_data_types.h"
 #include "rom_functions.h"
 #include "spi_flash.h"
 
-#endif /* MCU_ESP32 */
+#endif /* !MCU_ESP8266 */
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -166,13 +166,13 @@ void spi_flash_drive_init (void)
         }
     }
 
-#ifdef MCU_ESP32
+#ifndef MCU_ESP8266
     /* map the partition top address to next higher multiple of 0x100000 (1 MB) */
     part_top = (part_top + 0x100000) & ~0xfffff;
-#else /* MCU_ESP32 */
+#else /* !MCU_ESP8266 */
     /* map the partition top address to next higher multiple of 0x80000 (512 kB) */
     part_top = (part_top + 0x80000) & ~0x7ffff;
-#endif /* MCU_ESP32 */
+#endif /* !MCU_ESP8266 */
 
     /*
      * if flash drive start address is not configured, use the determined
