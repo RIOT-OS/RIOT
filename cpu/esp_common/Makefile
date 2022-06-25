@@ -21,4 +21,8 @@ ifneq (,$(filter esp_xtensa,$(USEMODULE)))
   DIRS += esp-xtensa
 endif
 
+ifneq (,$(filter esp_riscv,$(USEMODULE)))
+  DIRS += esp-riscv
+endif
+
 include $(RIOTBASE)/Makefile.base
