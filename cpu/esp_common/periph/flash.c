@@ -154,7 +154,7 @@ void spi_flash_drive_init (void)
         spi_flash_read (part_addr, (void*)part_buf, ESP_PART_ENTRY_SIZE);
 
         if (part->magic == ESP_PART_ENTRY_MAGIC) {
-            DEBUG("%s partition @%08x size=%08x label=%s\n", __func__,
+            DEBUG("%s partition @%08"PRIx32" size=%08"PRIx32" label=%s\n", __func__,
                   part->pos.offset, part->pos.size, part->label);
             if (part->pos.offset + part->pos.size > part_top) {
                 part_top = part->pos.offset + part->pos.size;
@@ -198,8 +198,9 @@ void spi_flash_drive_init (void)
     _flash_end  = _flashchip->chip_size - 5 * _flashchip->sector_size;
     _flash_size = _flash_end - _flash_beg; /* MUST be at least 3 sectors (0x3000) */
 
-    LOG_TAG_DEBUG("spi_flash", "MTD in SPI flash starts at address 0x%08x "
-                  "with a size of %d kbytes\n", _flash_beg, _flash_size >> 10);
+    LOG_TAG_DEBUG("spi_flash", "MTD in SPI flash starts at address "
+                  "0x%08"PRIx32" with a size of %"PRIu32" kbytes\n",
+                  _flash_beg, _flash_size >> 10);
 
     _flash_dev.driver = &_flash_driver;
     _flash_dev.sector_count = _flash_size / _flashchip->sector_size;
@@ -212,10 +213,12 @@ void spi_flash_drive_init (void)
      * performance */
     _flash_dev.write_size = 4;
 
-    DEBUG("%s flashchip chip_size=%d block_size=%d sector_size=%d page_size=%d\n", __func__,
+    DEBUG("%s flashchip chip_size=%"PRIu32" block_size=%"PRIu32
+          " sector_size=%"PRIu32" page_size=%"PRIu32"\n", __func__,
           _flashchip->chip_size, _flashchip->block_size,
           _flashchip->sector_size, _flashchip->page_size);
-    DEBUG("%s flash_dev sector_count=%d pages_per_sector=%d page_size=%d\n", __func__,
+    DEBUG("%s flash_dev sector_count=%"PRIu32" pages_per_sector=%"PRIu32
+          " page_size=%"PRIu32"\n", __func__,
           _flash_dev.sector_count, _flash_dev.pages_per_sector, _flash_dev.page_size);
     DEBUG("\n");
 }
@@ -238,7 +241,7 @@ const esp_partition_t* esp_partition_find_first(esp_partition_type_t type,
         spi_flash_read (info_addr, (void*)info_buf, ESP_PART_ENTRY_SIZE);
 
         if (info->magic == ESP_PART_ENTRY_MAGIC) {
-            DEBUG("%s partition @%08x size=%08x label=%s\n", __func__,
+            DEBUG("%s partition @%08"PRIx32" size=%08"PRIx32" label=%s\n", __func__,
                   info->pos.offset, info->pos.size, info->label);
             if ((info->type == type) &&
                 (info->subtype == subtype || subtype == ESP_PARTITION_SUBTYPE_ANY) &&
@@ -286,7 +289,7 @@ static int _flash_init  (mtd_dev_t *dev)
     CHECK_PARAM_RET (dev == &_flash_dev, -ENODEV);
 
     if (_flashchip->chip_size <= _flash_beg) {
-        LOG_ERROR("Flash size is equal or less than %d Byte, "
+        LOG_ERROR("Flash size is equal or less than %"PRIu32" Byte, "
                   "SPIFFS cannot be used\n", _flash_beg);
         return -ENODEV;
     }
@@ -296,7 +299,8 @@ static int _flash_init  (mtd_dev_t *dev)
 
 static int _flash_read  (mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
 {
-    DEBUG("%s dev=%p addr=%08x size=%u buf=%p\n", __func__, dev, addr, size, buff);
+    DEBUG("%s dev=%p addr=%08"PRIx32" size=%"PRIu32" buf=%p\n",
+          __func__, dev, addr, size, buff);
 
     CHECK_PARAM_RET (dev == &_flash_dev, -ENODEV);
     CHECK_PARAM_RET (buff != NULL, -ENOTSUP);
@@ -309,7 +313,8 @@ static int _flash_read  (mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t siz
 
 static int _flash_write (mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
 {
-    DEBUG("%s dev=%p addr=%08x size=%u buf=%p\n", __func__, dev, addr, size, buff);
+    DEBUG("%s dev=%p addr=%08"PRIx32" size=%"PRIu32" buf=%p\n",
+          __func__, dev, addr, size, buff);
 
     CHECK_PARAM_RET (dev == &_flash_dev, -ENODEV);
     CHECK_PARAM_RET (buff != NULL, -ENOTSUP);
@@ -336,7 +341,7 @@ static int _flash_write_page (mtd_dev_t *dev, const void *buff, uint32_t page,  
 
 static int _flash_erase (mtd_dev_t *dev, uint32_t addr, uint32_t size)
 {
-    DEBUG("%s dev=%p addr=%08x size=%u\n", __func__, dev, addr, size);
+    DEBUG("%s dev=%p addr=%08"PRIx32" size=%"PRIu32"\n", __func__, dev, addr, size);
 
     CHECK_PARAM_RET (dev == &_flash_dev, -ENODEV);
 
