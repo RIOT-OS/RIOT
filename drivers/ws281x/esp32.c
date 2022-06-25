@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       Implementation of `ws281x_write_buffer()` for the ESP32 CPU
+ * @brief       Implementation of `ws281x_write_buffer()` for the ESP32x CPU
  *
  * @author      Christian Friedrich Coors <me@ccoors.de>
  *
@@ -27,18 +27,13 @@
 #include "ws281x_params.h"
 #include "ws281x_constants.h"
 #include "periph_cpu.h"
+
 #include "esp_private/esp_clk.h"
-#include "xtensa/core-macros.h"
+#include "hal/cpu_hal.h"
 #include "soc/rtc.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-static inline __attribute__((always_inline)) uint32_t get_cycle_count(void) {
-    uint32_t ccount;
-    __asm__ __volatile__("rsr %0,ccount":"=a" (ccount));
-    return ccount;
-}
 
 void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
 {
@@ -74,14 +69,14 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
                 on_wait = zero_on;
                 off_wait = zero_off;
             }
-            start = get_cycle_count();
+            start = cpu_hal_get_cycle_count();
             gpio_set(dev->params.pin);
             current_wait = start + on_wait;
-            while (get_cycle_count() < current_wait) { }
+            while (cpu_hal_get_cycle_count() < current_wait) { }
             gpio_clear(dev->params.pin);
-            start = get_cycle_count();
+            start = cpu_hal_get_cycle_count();
             current_wait = start + off_wait;
-            while (get_cycle_count() < current_wait) { }
+            while (cpu_hal_get_cycle_count() < current_wait) { }
             data <<= 1;
         }
         pos++;
