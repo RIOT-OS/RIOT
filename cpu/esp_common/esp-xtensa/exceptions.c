@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       ESP SoCs exception handling
+ * @brief       Exception handling for Xtensa-based ESP SoCs
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @}
