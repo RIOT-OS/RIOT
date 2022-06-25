@@ -81,13 +81,13 @@ extern uint32_t spi_flash_get_id(void);
 #endif /* MCU_ESP8266 */
 
 /* forward declaration of mtd functions */
-static int _flash_init  (mtd_dev_t *dev);
-static int _flash_read  (mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size);
-static int _flash_write (mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size);
-static int _flash_write_page (mtd_dev_t *dev, const void *buff, uint32_t page,
+static int _flash_init(mtd_dev_t *dev);
+static int _flash_read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size);
+static int _flash_write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size);
+static int _flash_write_page(mtd_dev_t *dev, const void *buff, uint32_t page,
                               uint32_t offset, uint32_t size);
-static int _flash_erase (mtd_dev_t *dev, uint32_t addr, uint32_t size);
-static int _flash_power (mtd_dev_t *dev, enum mtd_power_state power);
+static int _flash_erase(mtd_dev_t *dev, uint32_t addr, uint32_t size);
+static int _flash_power(mtd_dev_t *dev, enum mtd_power_state power);
 
 static uint32_t _flash_beg;  /* first byte addr of the flash drive in SPI flash */
 static uint32_t _flash_end;  /* first byte addr after the flash drive in SPI flash */
@@ -108,7 +108,7 @@ static const uint32_t flash_sizes[] = {
 };
 #endif
 
-void spi_flash_drive_init (void)
+void spi_flash_drive_init(void)
 {
     DEBUG("%s\n", __func__);
 
@@ -178,7 +178,7 @@ void spi_flash_drive_init (void)
      * if flash drive start address is not configured, use the determined
      * one otherwise check the configured one and use it
      */
-    #if SPI_FLASH_DRIVE_START
+#if SPI_FLASH_DRIVE_START
     if (part_top > SPI_FLASH_DRIVE_START) {
         LOG_TAG_ERROR("spi_flash", "configured MTD start address in SPI Flash is to less\n");
     }
@@ -191,7 +191,7 @@ void spi_flash_drive_init (void)
     else {
         part_top = SPI_FLASH_DRIVE_START;
     }
-    #endif
+#endif
 
     /* second, change flash parameters according to partition table */
     _flash_beg  = part_top;
@@ -238,7 +238,7 @@ const esp_partition_t* esp_partition_find_first(esp_partition_type_t type,
     esp_partition_t* part;
 
     while (info_read && info_addr < ESP_PART_TABLE_ADDR + ESP_PART_TABLE_SIZE) {
-        spi_flash_read (info_addr, (void*)info_buf, ESP_PART_ENTRY_SIZE);
+        spi_flash_read(info_addr, (void*)info_buf, ESP_PART_ENTRY_SIZE);
 
         if (info->magic == ESP_PART_ENTRY_MAGIC) {
             DEBUG("%s partition @%08"PRIx32" size=%08"PRIx32" label=%s\n", __func__,
@@ -282,11 +282,11 @@ esp_err_t esp_partition_erase_range(const esp_partition_t* part,
 }
 #endif /* MCU_ESP8266 */
 
-static int _flash_init  (mtd_dev_t *dev)
+static int _flash_init(mtd_dev_t *dev)
 {
     DEBUG("%s dev=%p driver=%p\n", __func__, dev, &_flash_driver);
 
-    CHECK_PARAM_RET (dev == &_flash_dev, -ENODEV);
+    CHECK_PARAM_RET(dev == &_flash_dev, -ENODEV);
 
     if (_flashchip->chip_size <= _flash_beg) {
         LOG_ERROR("Flash size is equal or less than %"PRIu32" Byte, "
@@ -297,40 +297,40 @@ static int _flash_init  (mtd_dev_t *dev)
     return 0;
 }
 
-static int _flash_read  (mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
+static int _flash_read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
 {
     DEBUG("%s dev=%p addr=%08"PRIx32" size=%"PRIu32" buf=%p\n",
           __func__, dev, addr, size, buff);
 
-    CHECK_PARAM_RET (dev == &_flash_dev, -ENODEV);
-    CHECK_PARAM_RET (buff != NULL, -ENOTSUP);
+    CHECK_PARAM_RET(dev == &_flash_dev, -ENODEV);
+    CHECK_PARAM_RET(buff != NULL, -ENOTSUP);
 
     /* size must be within the flash address space */
-    CHECK_PARAM_RET (_flash_beg + addr + size <= _flash_end, -EOVERFLOW);
+    CHECK_PARAM_RET(_flash_beg + addr + size <= _flash_end, -EOVERFLOW);
 
     return (spi_flash_read(_flash_beg + addr, buff, size) == ESP_OK) ? 0 : -EIO;
 }
 
-static int _flash_write (mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
+static int _flash_write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
 {
     DEBUG("%s dev=%p addr=%08"PRIx32" size=%"PRIu32" buf=%p\n",
           __func__, dev, addr, size, buff);
 
-    CHECK_PARAM_RET (dev == &_flash_dev, -ENODEV);
-    CHECK_PARAM_RET (buff != NULL, -ENOTSUP);
+    CHECK_PARAM_RET(dev == &_flash_dev, -ENODEV);
+    CHECK_PARAM_RET(buff != NULL, -ENOTSUP);
 
     /* size must be within the flash address space */
-    CHECK_PARAM_RET (_flash_beg + addr + size <= _flash_end, -EOVERFLOW);
+    CHECK_PARAM_RET(_flash_beg + addr + size <= _flash_end, -EOVERFLOW);
 
     /* addr + size must be within a page */
-    CHECK_PARAM_RET (size <= _flashchip->page_size, -EOVERFLOW);
-    CHECK_PARAM_RET ((addr % _flashchip->page_size) + size <= _flashchip->page_size, -EOVERFLOW);
+    CHECK_PARAM_RET(size <= _flashchip->page_size, -EOVERFLOW);
+    CHECK_PARAM_RET((addr % _flashchip->page_size) + size <= _flashchip->page_size, -EOVERFLOW);
 
     return (spi_flash_write(_flash_beg + addr, buff, size) == ESP_OK) ? 0 : -EIO;
 }
 
-static int _flash_write_page (mtd_dev_t *dev, const void *buff, uint32_t page,  uint32_t offset,
-                              uint32_t size)
+static int _flash_write_page(mtd_dev_t *dev, const void *buff, uint32_t page,  uint32_t offset,
+                             uint32_t size)
 {
     uint32_t addr = _flash_beg + page * _flashchip->page_size + offset;
     uint32_t remaining = _flashchip->page_size - offset;
@@ -339,23 +339,23 @@ static int _flash_write_page (mtd_dev_t *dev, const void *buff, uint32_t page,  
     return (spi_flash_write(addr, buff, size) == ESP_OK) ? (int) size : -EIO;
 }
 
-static int _flash_erase (mtd_dev_t *dev, uint32_t addr, uint32_t size)
+static int _flash_erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
 {
     DEBUG("%s dev=%p addr=%08"PRIx32" size=%"PRIu32"\n", __func__, dev, addr, size);
 
-    CHECK_PARAM_RET (dev == &_flash_dev, -ENODEV);
+    CHECK_PARAM_RET(dev == &_flash_dev, -ENODEV);
 
     /* size must be within the flash address space */
-    CHECK_PARAM_RET (_flash_beg + addr + size <= _flash_end, -EOVERFLOW);
+    CHECK_PARAM_RET(_flash_beg + addr + size <= _flash_end, -EOVERFLOW);
 
     /* size must be a multiple of sector_size && at least one sector */
-    CHECK_PARAM_RET (size >= _flashchip->sector_size, -EOVERFLOW);
-    CHECK_PARAM_RET (size % _flashchip->sector_size == 0, -EOVERFLOW)
+    CHECK_PARAM_RET(size >= _flashchip->sector_size, -EOVERFLOW);
+    CHECK_PARAM_RET(size % _flashchip->sector_size == 0, -EOVERFLOW)
 
     return (spi_flash_erase_range(_flash_beg + addr, size) == ESP_OK) ? 0 : -EIO;
 }
 
-static int _flash_power (mtd_dev_t *dev, enum mtd_power_state power)
+static int _flash_power(mtd_dev_t *dev, enum mtd_power_state power)
 {
     DEBUG("%s\n", __func__);
 
