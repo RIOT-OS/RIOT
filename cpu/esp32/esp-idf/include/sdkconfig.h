@@ -181,6 +181,7 @@ extern "C" {
  * SPI Flash driver configuration (DO NOT CHANGE)
  */
 #define CONFIG_SPI_FLASH_ROM_DRIVER_PATCH       1
+#define CONFIG_SPI_FLASH_USE_LEGACY_IMPL        1
 
 /**
  * Ethernet driver configuration (DO NOT CHANGE)
