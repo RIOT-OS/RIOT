@@ -6,6 +6,8 @@ ESP32_SDK_SRC = \
   components/driver/spi_common.c \
   components/spi_flash/$(CPU)/flash_ops_$(CPU).c \
   components/spi_flash/$(CPU)/spi_flash_rom_patch.c \
+  components/spi_flash/esp_flash_api.c \
+  components/spi_flash/partition.c \
   #
 
 ifeq (,$(filter periph_spi,$(USEMODULE)))
