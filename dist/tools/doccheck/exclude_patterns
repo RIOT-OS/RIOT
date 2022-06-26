@@ -10974,6 +10974,7 @@ drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_RXB0CTRL_BUKT
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_RXB0CTRL_BUKT1 \(macro definition\) of file mcp2515_defines\.h is not documented\.
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_RXB0CTRL_FILHIT0 \(macro definition\) of file mcp2515_defines\.h is not documented\.
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_RXB0CTRL_MODE_RECV_ALL \(macro definition\) of file mcp2515_defines\.h is not documented\.
+drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_RXB0CTRL_MODE_RECV_FILTER \(macro definition\) of file mcp2515_defines\.h is not documented\.
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_RXB0CTRL_MODE_RECV_EXT \(macro definition\) of file mcp2515_defines\.h is not documented\.
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_RXB0CTRL_MODE_RECV_STD \(macro definition\) of file mcp2515_defines\.h is not documented\.
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_RXB0CTRL_MODE_RECV_STD_OR_EXT \(macro definition\) of file mcp2515_defines\.h is not documented\.
@@ -10998,6 +10999,7 @@ drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_RXB1CTRL_FILH
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_RXB1CTRL_FILHIT1 \(macro definition\) of file mcp2515_defines\.h is not documented\.
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_RXB1CTRL_FILHIT2 \(macro definition\) of file mcp2515_defines\.h is not documented\.
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_RXB1CTRL_MODE_RECV_ALL \(macro definition\) of file mcp2515_defines\.h is not documented\.
+drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_RXB1CTRL_MODE_RECV_FILTER \(macro definition\) of file mcp2515_defines\.h is not documented\.
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_RXB1CTRL_MODE_RECV_EXT \(macro definition\) of file mcp2515_defines\.h is not documented\.
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_RXB1CTRL_MODE_RECV_STD \(macro definition\) of file mcp2515_defines\.h is not documented\.
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_RXB1CTRL_MODE_RECV_STD_OR_EXT \(macro definition\) of file mcp2515_defines\.h is not documented\.

@@ -421,7 +421,6 @@ static int _get(candev_t *candev, canopt_t opt, void *value, size_t max_len)
 static int _set_filter(candev_t *dev, const struct can_filter *filter)
 {
     DEBUG("inside _set_filter of MCP2515\n");
-    bool filter_added = true;
     struct can_filter f = *filter;
     int res = -1;
     enum mcp2515_mode mode;
@@ -453,7 +452,7 @@ static int _set_filter(candev_t *dev, const struct can_filter *filter)
     /* Browse on each mailbox to find an empty space */
     int mailbox_index = 0;
 
-    while (mailbox_index < MCP2515_RX_MAILBOXES && !filter_added) {
+    while (mailbox_index < MCP2515_RX_MAILBOXES) {
         /* mask unused */
         if (dev_mcp->masks[mailbox_index] == 0) {
             /* set mask */
@@ -467,7 +466,7 @@ static int _set_filter(candev_t *dev, const struct can_filter *filter)
             dev_mcp->filter_ids[mailbox_index][0] = f.can_id;
 
             /* function succeeded */
-            filter_added = true;
+            break;
         }
 
         /* mask existed and same mask */
@@ -498,7 +497,7 @@ static int _set_filter(candev_t *dev, const struct can_filter *filter)
                 dev_mcp->filter_ids[mailbox_index][filter_pos] = f.can_id;
 
                 /* function succeeded */
-                filter_added = true;
+                break;
             }
         }
         mailbox_index++;
@@ -513,7 +512,8 @@ static int _set_filter(candev_t *dev, const struct can_filter *filter)
         return -1;
     }
 
-    return filter_added;
+    /* Filter added */
+    return 0;
 }
 
 static int _remove_filter(candev_t *dev, const struct can_filter *filter)
