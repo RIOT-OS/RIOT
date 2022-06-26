@@ -17,4 +17,8 @@ ifneq (,$(filter esp_wifi,$(USEMODULE)))
   DIRS += esp-wifi
 endif
 
+ifneq (,$(filter esp_xtensa,$(USEMODULE)))
+  DIRS += esp-xtensa
+endif
+
 include $(RIOTBASE)/Makefile.base
