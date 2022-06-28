@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2022 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -30,6 +30,8 @@
 #include "sys/lock.h"
 #include "timex.h"
 
+#include "hal/interrupt_controller_types.h"
+#include "hal/interrupt_controller_ll.h"
 #include "rom/ets_sys.h"
 #include "rom/libc_stubs.h"
 #include "soc/rtc.h"
@@ -37,7 +39,9 @@
 #include "soc/timer_group_reg.h"
 #include "soc/timer_group_struct.h"
 #include "sdkconfig.h"
+#if __xtensa__
 #include "xtensa/xtensa_api.h"
+#endif
 
 #ifdef MODULE_ESP_IDF_HEAP
 #include "esp_heap_caps.h"
@@ -45,6 +49,15 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+#if IS_USED(MODULE_CPP)
+/* weak function that have to be overridden, otherwise DEFAULT_ARENA_SIZE would
+ * be allocated that would consume the whole heap memory */
+size_t __cxx_eh_arena_size_get(void)
+{
+    return 0;
+}
+#endif
 
 #if IS_USED(MODULE_ESP_IDF_HEAP)
 
@@ -199,6 +212,7 @@ static struct syscall_stub_table s_stub_table =
     ._link_r = (void*)&_no_sys_func,
     ._rename_r = (void*)&_no_sys_func,
 
+#if !defined(ESP_ROM_HAS_RETARGETABLE_LOCKING)
     ._lock_init = &_lock_init,
     ._lock_init_recursive = &_lock_init_recursive,
     ._lock_close = &_lock_close,
@@ -209,7 +223,18 @@ static struct syscall_stub_table s_stub_table =
     ._lock_try_acquire_recursive = &_lock_try_acquire_recursive,
     ._lock_release = &_lock_release,
     ._lock_release_recursive = &_lock_release_recursive,
-
+#else
+    ._retarget_lock_init = &__retarget_lock_init,
+    ._retarget_lock_init_recursive = &__retarget_lock_init_recursive,
+    ._retarget_lock_close = &__retarget_lock_close,
+    ._retarget_lock_close_recursive = &__retarget_lock_close_recursive,
+    ._retarget_lock_acquire = &__retarget_lock_acquire,
+    ._retarget_lock_acquire_recursive = &__retarget_lock_acquire_recursive,
+    ._retarget_lock_try_acquire = &__retarget_lock_try_acquire,
+    ._retarget_lock_try_acquire_recursive = &__retarget_lock_try_acquire_recursive,
+    ._retarget_lock_release = &__retarget_lock_release,
+    ._retarget_lock_release_recursive = &__retarget_lock_release_recursive,
+#endif
 #if CONFIG_NEWLIB_NANO_FORMAT
     ._printf_float = &_printf_float,
     ._scanf_float = &_scanf_float,
@@ -226,8 +251,14 @@ void IRAM syscalls_init_arch(void)
     TIMER_SYSTEM.config.autoreload = 0;
     TIMER_SYSTEM.config.enable = 1;
 
+#if defined(MCU_ESP32)
     syscall_table_ptr_pro = &s_stub_table;
     syscall_table_ptr_app = &s_stub_table;
+#elif defined(MCU_ESP32S2)
+    syscall_table_ptr_pro = &s_stub_table;
+#else
+    syscall_table_ptr = &s_stub_table;
+#endif
 }
 
 uint32_t system_get_time(void)
@@ -301,13 +332,13 @@ void system_wdt_init(void)
     /* route WDT peripheral interrupt source to CPU_INUM_WDT */
     intr_matrix_set(PRO_CPU_NUM, ETS_TG0_WDT_LEVEL_INTR_SOURCE, CPU_INUM_WDT);
     /* set the interrupt handler and activate the interrupt */
-    xt_set_interrupt_handler(CPU_INUM_WDT, system_wdt_int_handler, NULL);
-    xt_ints_on(BIT(CPU_INUM_WDT));
+    intr_cntrl_ll_set_int_handler(CPU_INUM_WDT, system_wdt_int_handler, NULL);
+    intr_cntrl_ll_enable_interrupts(BIT(CPU_INUM_WDT));
 }
 
 void system_wdt_stop(void)
 {
-    xt_ints_off(BIT(CPU_INUM_WDT));
+    intr_cntrl_ll_disable_interrupts(BIT(CPU_INUM_WDT));
     TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;  /* disable write protection */
     TIMERG0.wdt_config0.en = 0;   /* disable MWDT */
     TIMERG0.wdt_feed = 1;         /* reset MWDT */
@@ -320,5 +351,5 @@ void system_wdt_start(void)
     TIMERG0.wdt_config0.en = 1;   /* disable MWDT */
     TIMERG0.wdt_feed = 1;         /* reset MWDT */
     TIMERG0.wdt_wprotect = 0;     /* enable write protection */
-    xt_ints_on(BIT(CPU_INUM_WDT));
+    intr_cntrl_ll_enable_interrupts(BIT(CPU_INUM_WDT));
 }
