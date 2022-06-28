@@ -62,7 +62,8 @@ SUIT keys consist of a private and a public key file, stored in `$(SUIT_KEY_DIR)
 Similar to how ssh names its keyfiles, the public key filename equals the
 private key file, but has an extra `.pub` appended.
 
-`SUIT_KEY_DIR` defaults to the `keys/` folder at the top of a RIOT checkout.
+`SUIT_KEY_DIR` defaults to the `keys/` folder in `$XDG_DATA_HOME/RIOT`
+(usually `~/.local/share/RIOT/keys`).
 
 If the chosen key doesn't exist, it will be generated automatically.
 That step can be done manually using the `suit/genkey` target.
