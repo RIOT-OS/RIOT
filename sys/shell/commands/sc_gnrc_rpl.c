@@ -206,12 +206,38 @@ int _gnrc_rpl_send_dis(void)
 #ifdef MODULE_NETSTATS_RPL
 static void _print_stats_block(netstats_rpl_block_t *block, const char *name)
 {
+    /* In the following we need to sync with the RPL thread via disabling IRQs
+     * to avoid reading corrupted data. The simpler strategy would be to
+     * disable IRQs during the whole printing (so in _stats()_, but stdio could
+     * be via a slow UART and, hence, have severe impact on the real time
+     * capabilities of the system. The second and simplest strategy would be to
+     * memcpy the whole netstats_rpl_t on to the stack with IRQs disabled and
+     * print the stack copy with IRQs re-enabled. However, that structure is
+     * 128 B in size, so that we would easily provoke a stack-overflow.
+     *
+     * Our strategy instead is to read the data four values at a time with
+     * IRQs disabled, and print them with IRQs re-enabled. The disadvantage is
+     * that stats may get updated while printing one group of values. However,
+     * the stats are grouped such that closely related values are read together.
+     * Hence, related metrics will always refer to the same state of the stats.
+     */
+    unsigned irq_state = irq_disable();
+    uint32_t rx_ucast = block->rx_ucast_count;
+    uint32_t tx_ucast = block->tx_ucast_count;
+    uint32_t rx_mcast = block->rx_mcast_count;
+    uint32_t tx_mcast = block->tx_mcast_count;
+    irq_restore(irq_state);
     printf("%7s #packets: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
-           name, block->rx_ucast_count, block->tx_ucast_count,
-           block->rx_mcast_count, block->tx_mcast_count);
+           name, rx_ucast, tx_ucast, rx_mcast, tx_mcast);
+
+    irq_state = irq_disable();
+    rx_ucast = block->rx_ucast_bytes;
+    tx_ucast = block->tx_ucast_bytes;
+    rx_mcast = block->rx_mcast_bytes;
+    tx_mcast = block->tx_mcast_bytes;
+    irq_restore(irq_state);
     printf("%7s   #bytes: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
-           name, block->rx_ucast_bytes, block->tx_ucast_bytes,
-           block->rx_mcast_bytes, block->tx_mcast_bytes);
+           name, rx_ucast, tx_ucast, rx_mcast, tx_mcast);
 }
 
 int _stats(void)
