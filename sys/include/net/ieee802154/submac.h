@@ -118,8 +118,6 @@ extern "C" {
 #include "net/ieee802154.h"
 #include "net/ieee802154/radio.h"
 
-#define IEEE802154_SUBMAC_MAX_RETRANSMISSIONS (4U)  /**< maximum number of frame retransmissions */
-
 /**
  * @brief IEEE 802.15.4 SubMAC forward declaration
  */

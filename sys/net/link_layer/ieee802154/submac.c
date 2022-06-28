@@ -64,7 +64,7 @@ static inline bool _does_handle_csma(ieee802154_dev_t *dev)
 
 static bool _has_retrans_left(ieee802154_submac_t *submac)
 {
-    return submac->retrans < IEEE802154_SUBMAC_MAX_RETRANSMISSIONS;
+    return submac->retrans < CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS;
 }
 
 static ieee802154_fsm_state_t _tx_end(ieee802154_submac_t *submac, int status,

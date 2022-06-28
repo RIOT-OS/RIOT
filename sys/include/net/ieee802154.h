@@ -302,6 +302,13 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
 #endif
 
 /**
+ * @brief IEEE802.15.4 default value for maximum frame retries.
+ */
+#ifndef CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS
+#define CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS     (4U)
+#endif
+
+/**
  * @brief Disable Auto ACK support
  */
 #ifdef DOXYGEN
