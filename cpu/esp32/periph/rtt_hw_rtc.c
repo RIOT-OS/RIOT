@@ -74,18 +74,18 @@ static void _rtc_init(void)
 static void _rtc_poweron(void)
 {
     /* route all interrupt sources to the same RTT level type interrupt */
-    intr_matrix_set(PRO_CPU_NUM, ETS_RTC_CORE_INTR_SOURCE, CPU_INUM_RTC);
+    intr_matrix_set(PRO_CPU_NUM, ETS_RTC_CORE_INTR_SOURCE, CPU_INUM_RTT);
 
     /* set interrupt handler and enable the CPU interrupt */
-    xt_set_interrupt_handler(CPU_INUM_RTC, _rtc_isr, NULL);
-    xt_ints_on(BIT(CPU_INUM_RTC));
+    xt_set_interrupt_handler(CPU_INUM_RTT, _rtc_isr, NULL);
+    xt_ints_on(BIT(CPU_INUM_RTT));
 }
 
 static void _rtc_poweroff(void)
 {
     /* reset interrupt handler and disable the CPU interrupt */
-    xt_ints_off(BIT(CPU_INUM_RTC));
-    xt_set_interrupt_handler(CPU_INUM_RTC, NULL, NULL);
+    xt_ints_off(BIT(CPU_INUM_RTT));
+    xt_set_interrupt_handler(CPU_INUM_RTT, NULL, NULL);
 }
 
 uint64_t _rtc_get_counter(void)
