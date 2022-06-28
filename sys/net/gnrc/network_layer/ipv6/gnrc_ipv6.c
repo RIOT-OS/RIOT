@@ -271,8 +271,12 @@ static void _send_to_iface(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
           ipv6_addr_to_str(addr_str, &hdr->dst, sizeof(addr_str)), hdr->nh,
           byteorder_ntohs(hdr->len));
 #ifdef MODULE_NETSTATS_IPV6
+    /* This is read from the netif thread. To prevent data corruptions, we
+     * have to guarantee mutually exclusive access */
+    unsigned irq_state = irq_disable();
     netif->ipv6.stats.tx_success++;
     netif->ipv6.stats.tx_bytes += gnrc_pkt_len(pkt->next);
+    irq_restore(irq_state);
 #endif
 
 #ifdef MODULE_GNRC_SIXLOWPAN
@@ -510,7 +514,11 @@ static void _send_unicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
               netif->pid);
         /* and send to interface */
 #ifdef MODULE_NETSTATS_IPV6
+        /* This is read from the netif thread. To prevent data corruptions, we
+         * have to guarantee mutually exclusive access */
+        unsigned irq_state = irq_disable();
         netif->ipv6.stats.tx_unicast_count++;
+        irq_restore(irq_state);
 #endif
         _send_to_iface(netif, pkt);
     }
@@ -533,7 +541,11 @@ static inline void _send_multicast_over_iface(gnrc_pktsnip_t *pkt,
     }
     DEBUG("ipv6: send multicast over interface %" PRIkernel_pid "\n", netif->pid);
 #ifdef MODULE_NETSTATS_IPV6
+    /* This is read from the netif thread. To prevent data corruptions, we
+     * have to guarantee mutually exclusive access */
+    unsigned irq_state = irq_disable();
     netif->ipv6.stats.tx_mcast_count++;
+    irq_restore(irq_state);
 #endif
     /* and send to interface */
     _send_to_iface(netif, pkt);
@@ -737,9 +749,13 @@ static void _receive(gnrc_pktsnip_t *pkt)
         netif = gnrc_netif_hdr_get_netif(netif_hdr->data);
 #ifdef MODULE_NETSTATS_IPV6
         assert(netif != NULL);
+        /* This is read from the netif thread. To prevent data corruptions, we
+         * have to guarantee mutually exclusive access */
+        unsigned irq_state = irq_disable();
         netstats_t *stats = &netif->ipv6.stats;
         stats->rx_count++;
         stats->rx_bytes += (gnrc_pkt_len(pkt) - netif_hdr->size);
+        irq_restore(irq_state);
 #endif
     }
 

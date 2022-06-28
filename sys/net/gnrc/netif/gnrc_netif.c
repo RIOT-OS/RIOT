@@ -186,25 +186,35 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             res = sizeof(uint8_t);
             break;
         case NETOPT_STATS:
-            /* XXX discussed this with Oleg, it's supposed to be a pointer */
             switch ((int16_t)opt->context) {
 #if IS_USED(MODULE_NETSTATS_IPV6) && IS_USED(MODULE_GNRC_NETIF_IPV6)
-                case NETSTATS_IPV6:
-                    assert(opt->data_len == sizeof(netstats_t *));
-                    *((netstats_t **)opt->data) = &netif->ipv6.stats;
-                    res = sizeof(&netif->ipv6.stats);
-                    break;
+            case NETSTATS_IPV6:
+                {
+                    assert(opt->data_len == sizeof(netstats_t));
+                    /* IPv6 thread is updating this, to prevent data
+                     * corruptions, we have to guarantee mutually exclusive
+                     * access */
+                    unsigned irq_state = irq_disable();
+                    memcpy(opt->data, &netif->ipv6.stats,
+                           sizeof(netif->ipv6.stats));
+                    irq_restore(irq_state);
+                    res = sizeof(netif->ipv6.stats);
+                }
+                break;
 #endif
 #ifdef MODULE_NETSTATS_L2
-                case NETSTATS_LAYER2:
-                    assert(opt->data_len == sizeof(netstats_t *));
-                    *((netstats_t **)opt->data) = &netif->stats;
-                    res = sizeof(&netif->stats);
-                    break;
+            case NETSTATS_LAYER2:
+                assert(opt->data_len == sizeof(netstats_t));
+                /* this is only accesses from the netif thread (us), so no need
+                 * to lock this */
+                memcpy(opt->data, &netif->stats,
+                       sizeof(netif->stats));
+                res = sizeof(netif->stats);
+                break;
 #endif
-                default:
-                    /* take from device */
-                    break;
+            default:
+                /* take from device */
+                break;
             }
             break;
 #if IS_USED(MODULE_GNRC_NETIF_IPV6)
@@ -413,6 +423,33 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
                                       opt->data_len);
             res = sizeof(netopt_enable_t);
             break;
+        case NETOPT_STATS:
+            switch ((int16_t)opt->context) {
+#if IS_USED(MODULE_NETSTATS_IPV6) && IS_USED(MODULE_GNRC_NETIF_IPV6)
+            case NETSTATS_IPV6:
+                {
+                    /* IPv6 thread is updating this, to prevent data
+                     * corruptions, we have to guarantee mutually exclusive
+                     * access */
+                    unsigned irq_state = irq_disable();
+                    memset(&netif->ipv6.stats, 0, sizeof(netif->ipv6.stats));
+                    irq_restore(irq_state);
+                    res = 0;
+                }
+                break;
+#endif
+#ifdef MODULE_NETSTATS_L2
+            case NETSTATS_LAYER2:
+                /* this is only accesses from the netif thread (us), so no need
+                 * to lock this */
+                memset(&netif->stats, 0, sizeof(netif->stats));
+                res = 0;
+                break;
+#endif
+            default:
+                /* take from device */
+                break;
+            }
         default:
             break;
     }

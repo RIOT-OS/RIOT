@@ -391,11 +391,12 @@ typedef enum {
     NETOPT_CCA_MODE,
 
     /**
-     * @brief   (@ref netstats_t*) get statistics about sent and received packets and data of the
-     *          device or protocol
+     * @brief   (@ref netstats_t) get statistics about sent and received packets
+     *          and data of the device or protocol
      *
-     * Expects a pointer to a @ref netstats_t struct that will be pointed to
-     * the corresponding @ref netstats_t of the module.
+     * A get operation expects a @ref netstats_t and will copy the current
+     * statistics into it, atomically. A set operation resets the statistics
+     * (zeros it out) regardless of the parameter given.
      */
     NETOPT_STATS,
 
