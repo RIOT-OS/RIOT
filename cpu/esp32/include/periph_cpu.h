@@ -19,6 +19,7 @@
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include "sdkconfig.h"
 #include "hal/ledc_types.h"
@@ -349,15 +350,18 @@ typedef enum {
  * @brief   I2C configuration structure type
  */
 typedef struct {
+    uint8_t module;         /**< I2C module identifier */
     i2c_speed_t speed;      /**< I2C bus speed */
     gpio_t scl;             /**< GPIO used as SCL pin */
     gpio_t sda;             /**< GPIO used as SDA pin */
+    bool scl_pullup;        /**< Pullup enabled for SCL pin */
+    bool sda_pullup;        /**< Pullup enabled for SDA pin */
 } i2c_conf_t;
 
 /**
  * @brief   Maximum number of I2C interfaces that can be used by board definitions
  */
-#define I2C_NUMOF_MAX   (2)
+#define I2C_NUMOF_MAX   (SOC_I2C_NUM)
 
 #define PERIPH_I2C_NEED_READ_REG    /**< i2c_read_reg required */
 #define PERIPH_I2C_NEED_READ_REGS   /**< i2c_read_regs required */
