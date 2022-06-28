@@ -41,10 +41,11 @@ extern "C" {
  * to avoid not printing of debug in interrupts
  */
 #ifndef THREAD_STACKSIZE_IDLE
-#if MODULE_XTIMER || MODULE_ZTIMER64
-/* xtimer's 64 bit arithmetic doesn't perform well on 8 bit archs. In order to
- * prevent a stack overflow when an timer triggers while the idle thread is
- * running, we have to increase the stack size then
+#if MODULE_XTIMER || MODULE_ZTIMER || MODULE_ZTIMER64
+/* For AVR no ISR stack is used, hence an IRQ will victimize the stack of
+ * whatever thread happens to be running with the IRQ kicks in. If more than
+ * trivial stuff is needed to be done in ISRs (e.g. when soft timers are used),
+ * the idle stack will overflow.
  */
 #define THREAD_STACKSIZE_IDLE           (384)
 #else
