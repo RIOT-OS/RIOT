@@ -24,6 +24,7 @@
 
 #ifndef ATMEGA_GPIO_H
 #define ATMEGA_GPIO_H
+#include <stddef.h>
 #include <stdio.h>
 
 #include <avr/interrupt.h>
@@ -55,11 +56,11 @@ static inline uint8_t atmega_port_num(gpio_t pin)
 }
 
 /**
- * @brief     Generate the PORTx address of the give pin.
+ * @brief     Generate the PINx address of the given pin.
  */
-static inline uint16_t atmega_port_addr(gpio_t pin)
+static inline uint16_t atmega_pin_addr(gpio_t pin)
 {
-    return (uintptr_t)(&atmega_gpio_port(pin)->port);
+    return (uintptr_t)atmega_gpio_port(atmega_port_num(pin));
 }
 
 /**
@@ -67,15 +68,15 @@ static inline uint16_t atmega_port_addr(gpio_t pin)
  */
 static inline uint16_t atmega_ddr_addr(gpio_t pin)
 {
-    return (atmega_port_addr(pin) - 0x01);
+    return atmega_pin_addr(pin) + offsetof(atmega_gpio_port_t, ddr);
 }
 
 /**
- * @brief     Generate the PINx address of the given pin.
+ * @brief     Generate the PORTx address of the give pin.
  */
-static inline uint16_t atmega_pin_addr(gpio_t pin)
+static inline uint16_t atmega_port_addr(gpio_t pin)
 {
-    return (atmega_port_addr(pin) - 0x02);
+    return atmega_pin_addr(pin) + offsetof(atmega_gpio_port_t, port);
 }
 
 #ifdef __cplusplus
