@@ -162,6 +162,14 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     return bytes;
 }
 
+static void _drop_frame(slipdev_t *dev)
+{
+    int byte;
+    do {
+        byte = tsrb_get_one(&dev->inbuf);
+    } while (byte > 0 && byte != SLIPDEV_END);
+}
+
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     slipdev_t *dev = (slipdev_t *)netdev;
@@ -169,46 +177,31 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     (void)info;
     if (buf == NULL) {
-        if (len > 0) {
-            /* remove data */
-            for (; len > 0; len--) {
-                int byte = tsrb_get_one(&dev->inbuf);
-                if ((byte == (int)SLIPDEV_END) || (byte < 0)) {
-                    /* end early if end of packet or ringbuffer is reached;
-                     * len might be larger than the actual packet */
-                    break;
-                }
-            }
-        } else {
-            /* the user was warned not to use a buffer size > `INT_MAX` ;-) */
-            res = (int)tsrb_avail(&dev->inbuf);
+        return (int)tsrb_avail(&dev->inbuf);
+    }
+
+    int byte = 0;
+    bool escaped = false;
+    uint8_t *ptr = buf;
+
+    do {
+        int tmp;
+
+        if ((unsigned)res == len) {
+            /* clear out unreceived packet */
+            _drop_frame(dev);
+            return -ENOBUFS;
         }
-    }
-    else {
-        int byte = 0;
-        bool escaped = false;
-        uint8_t *ptr = buf;
 
-        do {
-            int tmp;
+        if ((byte = tsrb_get_one(&dev->inbuf)) < 0) {
+            /* something went wrong, return error */
+            return -EIO;
+        }
+        tmp = slipdev_unstuff_readbyte(ptr, byte, &escaped);
+        ptr += tmp;
+        res += tmp;
+    } while (byte != SLIPDEV_END);
 
-            if ((unsigned)res == len) {
-                /* clear out unreceived packet */
-                while (byte != SLIPDEV_END) {
-                    byte = tsrb_get_one(&dev->inbuf);
-                }
-                return -ENOBUFS;
-            }
-
-            if ((byte = tsrb_get_one(&dev->inbuf)) < 0) {
-                /* something went wrong, return error */
-                return -EIO;
-            }
-            tmp = slipdev_unstuff_readbyte(ptr, byte, &escaped);
-            ptr += tmp;
-            res += tmp;
-        } while (byte != SLIPDEV_END);
-    }
     return res;
 }
 
