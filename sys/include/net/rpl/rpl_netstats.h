@@ -28,45 +28,28 @@ extern "C" {
 #endif
 
 /**
+ * @brief       One block of RPL statistics
+ */
+typedef struct {
+    uint32_t rx_ucast_count;            /**< unicast packets received */
+    uint32_t rx_ucast_bytes;            /**< unicast bytes received */
+    uint32_t rx_mcast_count;            /**< multicast packets received */
+    uint32_t rx_mcast_bytes;            /**< multicast bytes received */
+    uint32_t tx_ucast_count;            /**< unicast packets sent */
+    uint32_t tx_ucast_bytes;            /**< unicast bytes sent */
+    uint32_t tx_mcast_count;            /**< multicast packets sent */
+    uint32_t tx_mcast_bytes;            /**< multicast bytes sent*/
+
+} netstats_rpl_block_t;
+
+/**
  * @brief       RPL statistics struct
  */
 typedef struct {
-    /* DIO */
-    uint32_t dio_rx_ucast_count;        /**< unicast dio received in packets */
-    uint32_t dio_rx_ucast_bytes;        /**< unicast dio received in bytes */
-    uint32_t dio_rx_mcast_count;        /**< multicast dio received in packets */
-    uint32_t dio_rx_mcast_bytes;        /**< multicast dio received in bytes */
-    uint32_t dio_tx_ucast_count;        /**< unicast dio sent in packets */
-    uint32_t dio_tx_ucast_bytes;        /**< unicast dio sent in bytes */
-    uint32_t dio_tx_mcast_count;        /**< multicast dio sent in packets */
-    uint32_t dio_tx_mcast_bytes;        /**< multicast dio sent in bytes*/
-    /* DIS */
-    uint32_t dis_rx_ucast_count;        /**< unicast dis received in packets */
-    uint32_t dis_rx_ucast_bytes;        /**< unicast dis received in bytes */
-    uint32_t dis_rx_mcast_count;        /**< multicast dis received in packets */
-    uint32_t dis_rx_mcast_bytes;        /**< multicast dis received in bytes */
-    uint32_t dis_tx_ucast_count;        /**< unicast dis sent in packets */
-    uint32_t dis_tx_ucast_bytes;        /**< unicast dis sent in bytes */
-    uint32_t dis_tx_mcast_count;        /**< multicast dis sent in packets */
-    uint32_t dis_tx_mcast_bytes;        /**< multicast dis sent in bytes*/
-    /* DAO */
-    uint32_t dao_rx_ucast_count;        /**< unicast dao received in packets */
-    uint32_t dao_rx_ucast_bytes;        /**< unicast dao received in bytes */
-    uint32_t dao_rx_mcast_count;        /**< multicast dao received in packets */
-    uint32_t dao_rx_mcast_bytes;        /**< multicast dao received in bytes */
-    uint32_t dao_tx_ucast_count;        /**< unicast dao sent in packets */
-    uint32_t dao_tx_ucast_bytes;        /**< unicast dao sent in bytes */
-    uint32_t dao_tx_mcast_count;        /**< multicast dao sent in packets */
-    uint32_t dao_tx_mcast_bytes;        /**< multicast dao sent in bytes*/
-    /* DAO-ACK */
-    uint32_t dao_ack_rx_ucast_count;    /**< unicast dao_ack received in packets */
-    uint32_t dao_ack_rx_ucast_bytes;    /**< unicast dao_ack received in bytes */
-    uint32_t dao_ack_rx_mcast_count;    /**< multicast dao_ack received in packets */
-    uint32_t dao_ack_rx_mcast_bytes;    /**< multicast dao_ack received in bytes */
-    uint32_t dao_ack_tx_ucast_count;    /**< unicast dao_ack sent in packets */
-    uint32_t dao_ack_tx_ucast_bytes;    /**< unicast dao_ack sent in bytes */
-    uint32_t dao_ack_tx_mcast_count;    /**< multicast dao_ack sent in packets */
-    uint32_t dao_ack_tx_mcast_bytes;    /**< multicast dao_ack sent in bytes*/
+    netstats_rpl_block_t dio;           /**< DIO statistics */
+    netstats_rpl_block_t dis;           /**< DIS statistics */
+    netstats_rpl_block_t dao;           /**< DAO statistics */
+    netstats_rpl_block_t dao_ack;       /**< DAO-ACK statistics */
 } netstats_rpl_t;
 
 #ifdef __cplusplus

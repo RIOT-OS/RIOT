@@ -204,33 +204,23 @@ int _gnrc_rpl_send_dis(void)
 }
 
 #ifdef MODULE_NETSTATS_RPL
+static void _print_stats_block(netstats_rpl_block_t *block, const char *name)
+{
+    printf("%7s #packets: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
+           name, block->rx_ucast_count, block->tx_ucast_count,
+           block->rx_mcast_count, block->tx_mcast_count);
+    printf("%7s   #bytes: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
+           name, block->rx_ucast_bytes, block->tx_ucast_bytes,
+           block->rx_mcast_bytes, block->tx_mcast_bytes);
+}
+
 int _stats(void)
 {
     puts(  "Statistics        (ucast) RX / TX                  RX / TX (mcast)");
-    printf("DIO     #packets: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
-           gnrc_rpl_netstats.dio_rx_ucast_count, gnrc_rpl_netstats.dio_tx_ucast_count,
-           gnrc_rpl_netstats.dio_rx_mcast_count, gnrc_rpl_netstats.dio_tx_mcast_count);
-    printf("DIO       #bytes: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
-           gnrc_rpl_netstats.dio_rx_ucast_bytes, gnrc_rpl_netstats.dio_tx_ucast_bytes,
-           gnrc_rpl_netstats.dio_rx_mcast_bytes, gnrc_rpl_netstats.dio_tx_mcast_bytes);
-    printf("DIS     #packets: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
-           gnrc_rpl_netstats.dis_rx_ucast_count, gnrc_rpl_netstats.dis_tx_ucast_count,
-           gnrc_rpl_netstats.dis_rx_mcast_count, gnrc_rpl_netstats.dis_tx_mcast_count);
-    printf("DIS       #bytes: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
-           gnrc_rpl_netstats.dis_rx_ucast_bytes, gnrc_rpl_netstats.dis_tx_ucast_bytes,
-           gnrc_rpl_netstats.dis_rx_mcast_bytes, gnrc_rpl_netstats.dis_tx_mcast_bytes);
-    printf("DAO     #packets: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
-           gnrc_rpl_netstats.dao_rx_ucast_count, gnrc_rpl_netstats.dao_tx_ucast_count,
-           gnrc_rpl_netstats.dao_rx_mcast_count, gnrc_rpl_netstats.dao_tx_mcast_count);
-    printf("DAO       #bytes: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
-           gnrc_rpl_netstats.dao_rx_ucast_bytes, gnrc_rpl_netstats.dao_tx_ucast_bytes,
-           gnrc_rpl_netstats.dao_rx_mcast_bytes, gnrc_rpl_netstats.dao_tx_mcast_bytes);
-    printf("DAO-ACK #packets: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
-           gnrc_rpl_netstats.dao_ack_rx_ucast_count, gnrc_rpl_netstats.dao_ack_tx_ucast_count,
-           gnrc_rpl_netstats.dao_ack_rx_mcast_count, gnrc_rpl_netstats.dao_ack_tx_mcast_count);
-    printf("DAO-ACK   #bytes: %10" PRIu32 " / %-10" PRIu32 "  %10" PRIu32 " / %-10" PRIu32 "\n",
-           gnrc_rpl_netstats.dao_ack_rx_ucast_bytes, gnrc_rpl_netstats.dao_ack_tx_ucast_bytes,
-           gnrc_rpl_netstats.dao_ack_rx_mcast_bytes, gnrc_rpl_netstats.dao_ack_tx_mcast_bytes);
+    _print_stats_block(&gnrc_rpl_netstats.dio, "DIO");
+    _print_stats_block(&gnrc_rpl_netstats.dis, "DIS");
+    _print_stats_block(&gnrc_rpl_netstats.dao, "DAO");
+    _print_stats_block(&gnrc_rpl_netstats.dao_ack, "DAO-ACK");
     return 0;
 }
 #endif
