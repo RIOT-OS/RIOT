@@ -152,16 +152,18 @@ static const char *_netstats_module_to_str(uint8_t module)
 
 static int _netif_stats(netif_t *iface, unsigned module, bool reset)
 {
-    netstats_t *stats;
+    netstats_t stats;
     int res = netif_get_opt(iface, NETOPT_STATS, module, &stats,
-                            sizeof(&stats));
+                            sizeof(stats));
 
     if (res < 0) {
         puts("           Protocol or device doesn't provide statistics.");
     }
     else if (reset) {
-        memset(stats, 0, sizeof(netstats_t));
-        printf("Reset statistics for module %s!\n", _netstats_module_to_str(module));
+        res = netif_set_opt(iface, NETOPT_STATS, module, NULL, 0);
+        printf("Reset statistics for module %s: %s!\n",
+               _netstats_module_to_str(module),
+               (res < 0) ? "failed" : "succeeded");
     }
     else {
         printf("          Statistics for %s\n"
@@ -169,13 +171,13 @@ static int _netif_stats(netif_t *iface, unsigned module, bool reset)
                "            TX packets %u (Multicast: %u)  bytes %u\n"
                "            TX succeeded %u errors %u\n",
                _netstats_module_to_str(module),
-               (unsigned) stats->rx_count,
-               (unsigned) stats->rx_bytes,
-               (unsigned) (stats->tx_unicast_count + stats->tx_mcast_count),
-               (unsigned) stats->tx_mcast_count,
-               (unsigned) stats->tx_bytes,
-               (unsigned) stats->tx_success,
-               (unsigned) stats->tx_failed);
+               (unsigned)stats.rx_count,
+               (unsigned)stats.rx_bytes,
+               (unsigned)(stats.tx_unicast_count + stats.tx_mcast_count),
+               (unsigned)stats.tx_mcast_count,
+               (unsigned)stats.tx_bytes,
+               (unsigned)stats.tx_success,
+               (unsigned)stats.tx_failed);
         res = 0;
     }
     return res;
