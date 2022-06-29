@@ -265,6 +265,10 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
 
         state = STATE_IDLE;
         enable_shorts = true;
+        if (info) {
+            info->status = (_state == STATE_CCA_BUSY) ? TX_STATUS_MEDIUM_BUSY : TX_STATUS_SUCCESS;
+        }
+
         break;
     case IEEE802154_HAL_OP_SET_RX:
         eagain = (radio_state == RADIO_STATE_STATE_RxRu);
@@ -290,10 +294,6 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
     }
 
     _state = state;
-
-    if (info) {
-        info->status = (_state == STATE_CCA_BUSY) ? TX_STATUS_MEDIUM_BUSY : TX_STATUS_SUCCESS;
-    }
 
     if (enable_shorts) {
         NRF_RADIO->SHORTS = DEFAULT_SHORTS;
