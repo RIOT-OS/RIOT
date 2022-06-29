@@ -197,7 +197,7 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
     (void) dev;
 
     int res = -EBUSY;
-    int state;
+    int state = STATE_IDLE;
 
     switch (op) {
     case IEEE802154_HAL_OP_TRANSMIT:
