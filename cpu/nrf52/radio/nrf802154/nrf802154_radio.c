@@ -124,6 +124,11 @@ static bool _l2filter(uint8_t *mhr)
 
     int addr_len = ieee802154_get_dst(mhr, dst_addr, &dst_pan);
 
+    if ((mhr[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_BEACON) {
+        if ((memcmp(&nrf802154_pan_id, pan_bcast, 2) == 0)) {
+            return true;
+        }
+    }
     /* filter PAN ID */
     /* Will only work on little endian platform (all?) */
 
