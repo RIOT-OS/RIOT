@@ -29,10 +29,10 @@ A set of common tools and a toolchain for the hardware you target needs to be in
 ### Choosing an Operating System for the Development PC
 
 Most of the RIOT OS developers are using Linux on their development PCs, so you can expect the
-most streamlined experience here. Other POSIX-compliant OSes such as current versions of Mac OS or
+most streamlined experience here. Other POSIX-compliant OSes such as current versions of macOS or
 the various BSD flavours will also be fine - however, we rely on users to report bugs regarding
 tooling incompatibilities here. So expect occasional issues for the development branch and please
-help testing during the feature freeze period, if you develop on Mac OS or BSD.
+help testing during the feature freeze period, if you develop on macOS or BSD.
 
 Native development on Windows machines is not officially supported. What works well is using Linux
 in a virtual machine, but at much lower performance than running Linux natively. For development
@@ -144,8 +144,7 @@ For example, in Ubuntu the above tools can be installed with the following comma
   headers
     * Alternatively: Compile with `BUILD_IN_DOCKER=1`. Note that for running the executable you
       still need a multilib system (or 32 bit Linux) with glibc a standard C library.
-* A C library supporting the deprecated POSIX.1-2001 ucontext library (e.g. glibc, FreeBSD's libc,
-  Mac OS's libc)
+* A C library supporting the deprecated POSIX.1-2001 ucontext library (e.g. glibc, FreeBSD's libc)
 * Optional: GDB for debugging. (Prefer the multiarch version, this will also work for other boards)
 
 The build system                                            {#the-build-system}

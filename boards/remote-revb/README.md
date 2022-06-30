@@ -82,7 +82,7 @@ The RE-Mote has built-in support for USB 2.0 USB, Vendor and Product IDs are the
   * VID 0x0451
   * PID 0x16C8
 
-On Linux and OS X this is straightforward, on windows you need to install the following driver:
+On Linux and macOS this is straightforward, on windows you need to install the following driver:
 
 <https://github.com/alignan/lufa/blob/remote-zongle/LUFA/CodeTemplates/WindowsINF/LUFA%20CDC-ACM.inf>
 
@@ -97,7 +97,7 @@ On windows, devices will appear as a virtual `COM` port.
 
 On Linux, devices will appear under `/dev/`.
 
-On OS X, `/dev/tty.SLAB_USBtoUARTx`.
+On macOS, `/dev/tty.SLAB_USBtoUARTx`.
 
 On Linux:
 

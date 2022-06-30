@@ -77,6 +77,10 @@ JLinkExe tool, then specify `PROGRAMMER=jlink` when flashing:
 Be prevented that you'll need to disable Apple's System Integrity Protection
 to allow FTDI unsigned drivers to be loaded on your Mac.
 
+@warning    Caution, turning off the SIP may compromise your systems security and integrity.
+            See [developer.apple.com](https://developer.apple.com/documentation/security/disabling_and_enabling_system_integrity_protection) for details.
+
+
 To do this, reboot in recovery mode, by pressing simultaneously `cmd + R`
 while booting.
 Then, on the recovery mode go to Utilities/Terminal and type:

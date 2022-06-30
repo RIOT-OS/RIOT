@@ -158,7 +158,7 @@ Bash
 
 ## Troubleshooting
 
-For terminal output on OS X (`make term`) you need to install a driver:
+For terminal output on macOS (`make term`) you need to install a driver:
 http://www.ftdichip.com/Drivers/VCP.htm
 http://www.ftdichip.com/Drivers/VCP.htm
  */
