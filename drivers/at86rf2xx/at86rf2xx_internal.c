@@ -221,8 +221,9 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
 }
 
 #if AT86RF2XX_RANDOM_NUMBER_GENERATOR
-void at86rf2xx_get_random(const at86rf2xx_t *dev, uint8_t *data, size_t len)
+void at86rf2xx_get_random(at86rf2xx_t *dev, uint8_t *data, size_t len)
 {
+    at86rf2xx_disable_smart_idle(dev);
     for (size_t byteCount = 0; byteCount < len; ++byteCount) {
         uint8_t rnd = 0;
         for (uint8_t i = 0; i < 4; ++i) {
@@ -236,5 +237,6 @@ void at86rf2xx_get_random(const at86rf2xx_t *dev, uint8_t *data, size_t len)
         }
         data[byteCount] = rnd;
     }
+    at86rf2xx_enable_smart_idle(dev);
 }
 #endif

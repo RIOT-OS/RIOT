@@ -38,6 +38,9 @@ at86rf2xx_t devs[AT86RF2XX_NUM];
 static const shell_command_t shell_commands[] = {
     { "ifconfig", "Configure netdev", ifconfig },
     { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
+#if AT86RF2XX_SMART_IDLE_LISTENING
+    { "random", "Get a value from Random Number Generator", random_by_at86rf2xx },
+#endif
     { NULL, NULL, NULL }
 };
 
@@ -87,7 +90,6 @@ void *_recv_thread(void *arg)
 int main(void)
 {
     puts("AT86RF2xx device driver test");
-
     unsigned dev_success = 0;
     for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
         const at86rf2xx_params_t *p = &at86rf2xx_params[i];

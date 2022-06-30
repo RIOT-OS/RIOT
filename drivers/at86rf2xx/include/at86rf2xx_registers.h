@@ -533,6 +533,16 @@ extern "C" {
 #define AT86RF2XX_TRX_RPC_MASK__XAH_TX_RPC_EN                   (0x04)
 #define AT86RF2XX_TRX_RPC_MASK__IPAN_RPC_EN                     (0x02)
 
+/**
+ * @brief   Bits to set to enable smart idle
+ */
+#define AT86RF2XX_TRX_RPC_MASK__RX_RPC__SMART_IDLE \
+        (AT86RF2XX_TRX_RPC_MASK__RX_RPC_EN \
+        | AT86RF2XX_TRX_RPC_MASK__PDT_RPC_EN \
+        | AT86RF2XX_TRX_RPC_MASK__PLL_RPC_EN \
+        | AT86RF2XX_TRX_RPC_MASK__XAH_TX_RPC_EN \
+        | AT86RF2XX_TRX_RPC_MASK__IPAN_RPC_EN)
+
 #ifdef __cplusplus
 }
 #endif

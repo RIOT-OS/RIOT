@@ -612,6 +612,24 @@ void at86rf2xx_tx_exec(at86rf2xx_t *dev);
  */
 bool at86rf2xx_cca(at86rf2xx_t *dev);
 
+/**
+ * @brief   Enable the smart receive tecnology (SRT)
+ *
+ * The SRT reduces the power consumption during RX listening periods.
+ *
+ * @param[in]  dev          device to use
+ *
+ */
+void at86rf2xx_enable_smart_idle(at86rf2xx_t *dev);
+
+/**
+ * @brief   Disable the smart receive tecnology (SRT)
+ *
+ * @param[in]  dev          device to use
+ *
+ */
+void at86rf2xx_disable_smart_idle(at86rf2xx_t *dev);
+
 #ifdef __cplusplus
 }
 #endif
