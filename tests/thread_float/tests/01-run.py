@@ -26,25 +26,38 @@ def same_computation_as_in_c_prog(thread_num):
     return f
 
 
+def parse_result_line(child):
+    child.expect(r"t(\d): (\d{3}\.\d+|[+-]*nan|[+-]inf)\r\n")
+    # Note: intentionally keeping the float output as string to also test that
+    # printf("%f", ...) prints the exact same char sequence for the same float
+    # value each time
+    return (int(child.match.group(1)), child.match.group(2))
+
+
 def testfunc(child):
     child.expect_exact("THREADS CREATED")
-    child.expect_exact("THREAD t1 start")
-    child.expect_exact("THREAD t2 start")
-    child.expect_exact("THREAD t3 start")
+    # Threads are started with THREAD_CREATE_WOUT_YIELD, and thus prone starting
+    # in a random sequence depending on any interrupts that cause rescheduling
+    threads_started = set()
+    for _ in range(3):
+        child.expect(r"THREAD t(\d) start\r\n")
+        thread_num = int(child.match.group(1))
+        assert 1 <= thread_num <= 3, "thread number has to be valid"
+        assert thread_num not in threads_started, "same thread must not be launched twice"
+        threads_started.add(thread_num)
 
+    first_thread, first_result = parse_result_line(child)
     child.expect(r"t(\d): (\d{3}\.\d+)\r\n")
     first_thread = int(child.match.group(1))
-    # Note: intentionally keeping the float output as string to also test that printf("%f", ...)
-    # prints the exact same char sequence for the same float value each time
     first_result = child.match.group(2)
 
     # wait for second thread to print, but wait at most 50 messages
     second_thread = None
     for _ in range(50):
-        child.expect(r"t(\d): (\d{3}\.\d+)\r\n")
-        if int(child.match.group(1)) != first_thread:
-            second_thread = int(child.match.group(1))
-            second_result = child.match.group(2)
+        thread, result = parse_result_line(child)
+        if thread != first_thread:
+            second_thread = thread
+            second_result = result
             break
 
     assert second_thread is not None, "both threads t1 and t3 should print"
@@ -58,10 +71,8 @@ def testfunc(child):
 
     # wait for both threads to print at least MIN_PRINTS times, but wait at most 100 messages
     for _ in range(100):
-        child.expect(r"t(\d): (\d{3}\.\d+)\r\n")
-        thread = int(child.match.group(1))
+        thread, result = parse_result_line(child)
         assert thread in [1, 3], "only thread t1 and t3 should print"
-        result = child.match.group(2)
 
         if thread == first_thread:
             assert result == first_result, "same calculation but different result"
