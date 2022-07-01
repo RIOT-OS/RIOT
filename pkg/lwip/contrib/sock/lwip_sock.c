@@ -37,6 +37,9 @@
 #error "lwip_sock needs IPv4 or IPv6 support"
 #endif
 
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
 /**
  * @brief   Checks if an address family is *not* supported by the lwIP
  *          implementation
@@ -594,6 +597,7 @@ ssize_t lwip_sock_sendv(struct netconn *conn, const iolist_t *snips,
             return res;
         }
         if (ip_addr_isany_val(remote_addr)) {
+            DEBUG("[lwip_sock_sendv] remote_addr is all zero\n");
             return -EINVAL;
         }
     }
@@ -622,11 +626,27 @@ ssize_t lwip_sock_sendv(struct netconn *conn, const iolist_t *snips,
         ip_addr_t addr;
         u16_t port;
 
-        if (((remote != NULL) &&
-             (remote->netif != SOCK_ADDR_ANY_NETIF) &&
-             (netconn_getaddr(conn, &addr, &port, 1) == 0) &&
-             (remote->netif != lwip_sock_bind_addr_to_netif(&addr)))) {
-            return -EINVAL;
+        if ((remote != NULL)
+                && (remote->netif != SOCK_ADDR_ANY_NETIF)
+                && (netconn_getaddr(conn, &addr, &port, 1) == 0)) {
+            if (IS_ACTIVE(ENABLE_DEBUG)) {
+                DEBUG("[lwip_sock_sendv] sending from: \"");
+                /* lwip's ip_addr_debug triggers a -Waddress warning when
+                 * compiled with the ESP toolchain. In absence of a upstream
+                 * solution, we just disable the warning here. */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waddress"
+                ip_addr_debug_print(LWIP_DBG_ON, &addr);
+#pragma GCC diagnostic pop
+                DEBUG("\"\n");
+            }
+            uint16_t netif = lwip_sock_bind_addr_to_netif(&addr);
+            if (remote->netif != netif) {
+                DEBUG("[lwip_sock_sendv] lwip_sock_bind_addr_to_netif() "
+                      "returned %u, but expected %u\n",
+                      (unsigned)netif, (unsigned)remote->netif);
+                return -EINVAL;
+            }
         }
         tmp = conn;
     }
