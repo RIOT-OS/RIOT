@@ -415,6 +415,7 @@ static void _on_regack(asymcute_con_t *con, const uint8_t *data, size_t len)
         /* finish the registration by applying the topic id */
         asymcute_topic_t *topic = req->arg;
         if (topic == NULL) {
+            mutex_unlock(&con->lock);
             return;
         }
 
@@ -497,6 +498,7 @@ static void _on_suback(asymcute_con_t *con, const uint8_t *data, size_t len)
     /* parse and apply assigned topic id */
     asymcute_sub_t *sub = req->arg;
     if (sub == NULL) {
+        mutex_unlock(&con->lock);
         return;
     }
 
@@ -534,6 +536,7 @@ static void _on_unsuback(asymcute_con_t *con, const uint8_t *data, size_t len)
     /* remove subscription from list */
     asymcute_sub_t *sub = req->arg;
     if (sub == NULL) {
+        mutex_unlock(&con->lock);
         return;
     } else if (con->subscriptions == sub) {
         con->subscriptions = sub->next;
