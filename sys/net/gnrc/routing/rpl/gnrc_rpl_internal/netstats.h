@@ -23,6 +23,7 @@
 extern "C" {
 #endif
 
+#include "irq.h"
 #include "net/rpl/rpl_netstats.h"
 
 #define GNRC_RPL_NETSTATS_MULTICAST (0)
@@ -37,14 +38,18 @@ extern "C" {
  */
 static inline void gnrc_rpl_netstats_rx_DIO(netstats_rpl_t *netstats, size_t len, int cast)
 {
+    /* other threads (e.g. the shell thread via the rpl shell command) read
+     * out the data, so we have to sync accesses */
+    unsigned irq_state = irq_disable();
     if (cast == GNRC_RPL_NETSTATS_MULTICAST) {
-        netstats->dio_rx_mcast_count++;
-        netstats->dio_rx_mcast_bytes += len;
+        netstats->dio.rx_mcast_count++;
+        netstats->dio.rx_mcast_bytes += len;
     }
     else if (cast == GNRC_RPL_NETSTATS_UNICAST) {
-        netstats->dio_rx_ucast_count++;
-        netstats->dio_rx_ucast_bytes += len;
+        netstats->dio.rx_ucast_count++;
+        netstats->dio.rx_ucast_bytes += len;
     }
+    irq_restore(irq_state);
 }
 
 /**
@@ -56,14 +61,18 @@ static inline void gnrc_rpl_netstats_rx_DIO(netstats_rpl_t *netstats, size_t len
  */
 static inline void gnrc_rpl_netstats_tx_DIO(netstats_rpl_t *netstats, size_t len, int cast)
 {
+    /* other threads (e.g. the shell thread via the rpl shell command) read
+     * out the data, so we have to sync accesses */
+    unsigned irq_state = irq_disable();
     if (cast == GNRC_RPL_NETSTATS_MULTICAST) {
-        netstats->dio_tx_mcast_count++;
-        netstats->dio_tx_mcast_bytes += len;
+        netstats->dio.tx_mcast_count++;
+        netstats->dio.tx_mcast_bytes += len;
     }
     else if (cast == GNRC_RPL_NETSTATS_UNICAST) {
-        netstats->dio_tx_ucast_count++;
-        netstats->dio_tx_ucast_bytes += len;
+        netstats->dio.tx_ucast_count++;
+        netstats->dio.tx_ucast_bytes += len;
     }
+    irq_restore(irq_state);
 }
 
 /**
@@ -75,14 +84,18 @@ static inline void gnrc_rpl_netstats_tx_DIO(netstats_rpl_t *netstats, size_t len
  */
 static inline void gnrc_rpl_netstats_rx_DIS(netstats_rpl_t *netstats, size_t len, int cast)
 {
+    /* other threads (e.g. the shell thread via the rpl shell command) read
+     * out the data, so we have to sync accesses */
+    unsigned irq_state = irq_disable();
     if (cast == GNRC_RPL_NETSTATS_MULTICAST) {
-        netstats->dis_rx_mcast_count++;
-        netstats->dis_rx_mcast_bytes += len;
+        netstats->dis.rx_mcast_count++;
+        netstats->dis.rx_mcast_bytes += len;
     }
     else if (cast == GNRC_RPL_NETSTATS_UNICAST) {
-        netstats->dis_rx_ucast_count++;
-        netstats->dis_rx_ucast_bytes += len;
+        netstats->dis.rx_ucast_count++;
+        netstats->dis.rx_ucast_bytes += len;
     }
+    irq_restore(irq_state);
 }
 
 /**
@@ -94,14 +107,18 @@ static inline void gnrc_rpl_netstats_rx_DIS(netstats_rpl_t *netstats, size_t len
  */
 static inline void gnrc_rpl_netstats_tx_DIS(netstats_rpl_t *netstats, size_t len, int cast)
 {
+    /* other threads (e.g. the shell thread via the rpl shell command) read
+     * out the data, so we have to sync accesses */
+    unsigned irq_state = irq_disable();
     if (cast == GNRC_RPL_NETSTATS_MULTICAST) {
-        netstats->dis_tx_mcast_count++;
-        netstats->dis_tx_mcast_bytes += len;
+        netstats->dis.tx_mcast_count++;
+        netstats->dis.tx_mcast_bytes += len;
     }
     else if (cast == GNRC_RPL_NETSTATS_UNICAST) {
-        netstats->dis_tx_ucast_count++;
-        netstats->dis_tx_ucast_bytes += len;
+        netstats->dis.tx_ucast_count++;
+        netstats->dis.tx_ucast_bytes += len;
     }
+    irq_restore(irq_state);
 }
 
 /**
@@ -113,14 +130,18 @@ static inline void gnrc_rpl_netstats_tx_DIS(netstats_rpl_t *netstats, size_t len
  */
 static inline void gnrc_rpl_netstats_rx_DAO(netstats_rpl_t *netstats, size_t len, int cast)
 {
+    /* other threads (e.g. the shell thread via the rpl shell command) read
+     * out the data, so we have to sync accesses */
+    unsigned irq_state = irq_disable();
     if (cast == GNRC_RPL_NETSTATS_MULTICAST) {
-        netstats->dao_rx_mcast_count++;
-        netstats->dao_rx_mcast_bytes += len;
+        netstats->dao.rx_mcast_count++;
+        netstats->dao.rx_mcast_bytes += len;
     }
     else if (cast == GNRC_RPL_NETSTATS_UNICAST) {
-        netstats->dao_rx_ucast_count++;
-        netstats->dao_rx_ucast_bytes += len;
+        netstats->dao.rx_ucast_count++;
+        netstats->dao.rx_ucast_bytes += len;
     }
+    irq_restore(irq_state);
 }
 
 /**
@@ -132,14 +153,18 @@ static inline void gnrc_rpl_netstats_rx_DAO(netstats_rpl_t *netstats, size_t len
  */
 static inline void gnrc_rpl_netstats_tx_DAO(netstats_rpl_t *netstats, size_t len, int cast)
 {
+    /* other threads (e.g. the shell thread via the rpl shell command) read
+     * out the data, so we have to sync accesses */
+    unsigned irq_state = irq_disable();
     if (cast == GNRC_RPL_NETSTATS_MULTICAST) {
-        netstats->dao_tx_mcast_count++;
-        netstats->dao_tx_mcast_bytes += len;
+        netstats->dao.tx_mcast_count++;
+        netstats->dao.tx_mcast_bytes += len;
     }
     else if (cast == GNRC_RPL_NETSTATS_UNICAST) {
-        netstats->dao_tx_ucast_count++;
-        netstats->dao_tx_ucast_bytes += len;
+        netstats->dao.tx_ucast_count++;
+        netstats->dao.tx_ucast_bytes += len;
     }
+    irq_restore(irq_state);
 }
 
 /**
@@ -151,14 +176,18 @@ static inline void gnrc_rpl_netstats_tx_DAO(netstats_rpl_t *netstats, size_t len
  */
 static inline void gnrc_rpl_netstats_rx_DAO_ACK(netstats_rpl_t *netstats, size_t len, int cast)
 {
+    /* other threads (e.g. the shell thread via the rpl shell command) read
+     * out the data, so we have to sync accesses */
+    unsigned irq_state = irq_disable();
     if (cast == GNRC_RPL_NETSTATS_MULTICAST) {
-        netstats->dao_ack_rx_mcast_count++;
-        netstats->dao_ack_rx_mcast_bytes += len;
+        netstats->dao_ack.rx_mcast_count++;
+        netstats->dao_ack.rx_mcast_bytes += len;
     }
     else if (cast == GNRC_RPL_NETSTATS_UNICAST) {
-        netstats->dao_ack_rx_ucast_count++;
-        netstats->dao_ack_rx_ucast_bytes += len;
+        netstats->dao_ack.rx_ucast_count++;
+        netstats->dao_ack.rx_ucast_bytes += len;
     }
+    irq_restore(irq_state);
 }
 
 /**
@@ -170,14 +199,18 @@ static inline void gnrc_rpl_netstats_rx_DAO_ACK(netstats_rpl_t *netstats, size_t
  */
 static inline void gnrc_rpl_netstats_tx_DAO_ACK(netstats_rpl_t *netstats, size_t len, int cast)
 {
+    /* other threads (e.g. the shell thread via the rpl shell command) read
+     * out the data, so we have to sync accesses */
+    unsigned irq_state = irq_disable();
     if (cast == GNRC_RPL_NETSTATS_MULTICAST) {
-        netstats->dao_ack_tx_mcast_count++;
-        netstats->dao_ack_tx_mcast_bytes += len;
+        netstats->dao_ack.tx_mcast_count++;
+        netstats->dao_ack.tx_mcast_bytes += len;
     }
     else if (cast == GNRC_RPL_NETSTATS_UNICAST) {
-        netstats->dao_ack_tx_ucast_count++;
-        netstats->dao_ack_tx_ucast_bytes += len;
+        netstats->dao_ack.tx_ucast_count++;
+        netstats->dao_ack.tx_ucast_bytes += len;
     }
+    irq_restore(irq_state);
 }
 
 #ifdef __cplusplus

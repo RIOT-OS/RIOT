@@ -540,7 +540,17 @@ extern const ipv6_addr_t ipv6_addr_all_rpl_nodes;
 
 #ifdef MODULE_NETSTATS_RPL
 /**
- * @brief Statistics for RPL control messages
+ * @brief   Statistics for RPL control messages
+ * @warning Access to this structure need to be synchronized with the RPL
+ *          thread to avoid reading corrupted valued. The RPL thread will
+ *          disable IRQs while updating the fields. A reader that disables
+ *          IRQs while reading values from here will read back correct and
+ *          consistent values.
+ * @details Note that on 32 bit platforms reading individual fields usually is
+ *          safe without locking, as a 32 bit read typically is an atomic
+ *          operation. However, reasoning about e.g. the relation between TX
+ *          packets and TX bytes will still require IRQs disabled, as the stats
+ *          could be updated between the two reads even on 32 bit platforms.
  */
 extern netstats_rpl_t gnrc_rpl_netstats;
 #endif
