@@ -8,8 +8,8 @@
 config MODULE_XTENSA
     bool
     depends on TEST_KCONFIG
-    depends on HAS_ARCH_ESP
+    depends on HAS_ARCH_ESP_XTENSA
     default y
     help
-        Third-party software components used by the RIOT port for ESP32 and
-        ESP8266.
+        Third-party software components used by the RIOT port for Xtensa-based
+        ESP SoCs.
