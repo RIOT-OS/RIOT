@@ -63,6 +63,8 @@
 /* include ESP32x SoC specific compile time configurations */
 #if defined(CPU_FAM_ESP32)
 #include "cpu_conf_esp32.h"
+#elif defined(CPU_FAM_ESP32C3)
+#include "cpu_conf_esp32c3.h"
 #else
 #error "ESP32x family implementation missing"
 #endif

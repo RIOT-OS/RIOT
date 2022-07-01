@@ -46,6 +46,8 @@
  */
 #if defined(CPU_FAM_ESP32)
 #include "sdkconfig_esp32.h"
+#elif defined(CPU_FAM_ESP32C3)
+#include "sdkconfig_esp32c3.h"
 #else
 #error "ESP32x family implementation missing"
 #endif
