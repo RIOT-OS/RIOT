@@ -6,7 +6,7 @@
 ## Overview
 
 The Nucleo-F429ZI is a board from ST's Nucleo family supporting ARM Cortex-M4
-STM32F429ZI microcontroller with 256kB or RAM and 2Mb of Flash.
+STM32F429ZI microcontroller with 256KiB of RAM and 2MiB of Flash.
 
 ##Hardware
 
@@ -18,8 +18,8 @@ STM32F429ZI microcontroller with 256kB or RAM and 2Mb of Flash.
 |:-------------|:--------------------|
 | Family       | ARM Cortex-M4       |
 | Vendor       | ST Microelectronics |
-| RAM          | 256kB               |
-| Flash        | 2MB                 |
+| RAM          | 256KiB              |
+| Flash        | 2MiB                |
 | Frequency    | up to 180 MHz       |
 | FPU          | yes                 |
 | Ethernet     | 10/100 Mbps         |

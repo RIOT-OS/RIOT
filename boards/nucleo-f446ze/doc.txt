@@ -6,7 +6,7 @@
 ## Overview
 
 The Nucleo-F446ZE is a board from ST's Nucleo family supporting a ARM Cortex-M4
-STM32F446ZE microcontroller with 128Kb of RAM and 512Kb of ROM Flash.
+STM32F446ZE microcontroller with 128KiB of RAM and 512KiB of ROM Flash.
 
 ## Hardware
 
@@ -18,8 +18,8 @@ STM32F446ZE microcontroller with 128Kb of RAM and 512Kb of ROM Flash.
 |:---------- |:----------------- |
 | Family     | ARM Cortex-M4     |
 | Vendor     | ST Microelectronics |
-| RAM        | 128Kb             |
-| Flash      | 512Kb             |
+| RAM        | 128KiB            |
+| Flash      | 512KiB            |
 | Frequency  | up to 180MHz      |
 | FPU        | yes               |
 | Timers     | 17 (2x watchdog, 1 SysTick, 12x 16-bit, 2x 32-bit [TIM2]) |

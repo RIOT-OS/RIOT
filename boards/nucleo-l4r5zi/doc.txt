@@ -6,7 +6,7 @@
 ## Overview
 
 The Nucleo-L4R5ZI is a board from ST's Nucleo family supporting a ARM Cortex-M4
-STM32L4R5ZI microcontroller with 640Kb of RAM and 2Mb of ROM Flash.
+STM32L4R5ZI microcontroller with 640KiB of RAM and 2MiB of ROM Flash.
 
 ## Flashing the device
 

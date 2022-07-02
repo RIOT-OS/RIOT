@@ -7,7 +7,7 @@
 
 The Nucleo-F303ZE is a board from ST's Nucleo family supporting a ARM Cortex-M4
 STM32F303ZE
-microcontroller with 64Kb of RAM and 512Kb of ROM.
+microcontroller with 64KiB of RAM and 512KiB of ROM.
 
 ## Hardware
 
@@ -19,8 +19,8 @@ microcontroller with 64Kb of RAM and 512Kb of ROM.
 |:---------- |:----------------- |
 | Family     | ARM Cortex-M4     |
 | Vendor     | ST Microelectronics |
-| RAM        | 64Kb              |
-| Flash      | 512Kb             |
+| RAM        | 64KiB             |
+| Flash      | 512KiB            |
 | Frequency  | up to 72MHz       |
 | FPU        | yes               |
 | Timers     | 14 (10x 16-bit, 1x 32-bit [TIM2], 1x Systick, 2x watchdog) |
