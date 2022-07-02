@@ -3,6 +3,10 @@
 @ingroup     boards_common_nucleo144
 @brief       Support for the STM32 Nucleo-F439ZI
 
+## Overview
+
+The Nucleo-F439ZI is a board from ST's Nucleo family supporting ARM Cortex-M4
+STM32F439ZI microcontroller with, 256KiB or RAM and 2MiB of Flash.
 
 ## Flashing the device
 
