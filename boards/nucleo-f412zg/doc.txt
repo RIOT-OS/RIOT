@@ -2,7 +2,7 @@
  @defgroup    boards_nucleo-f412zg STM32 Nucleo-F412ZG
  @ingroup     boards_common_nucleo144
  @brief       Support for the STM32 Nucleo-F412ZG
- 
+
 ## Overview
 
 The Nucleo-F412ZG is a board from ST's Nucleo family supporting ARM Cortex-M4
