@@ -7,12 +7,12 @@
  */
 
 /**
- * @ingroup     cpu_esp_common
+ * @ingroup     cpu_esp8266
  * @ingroup     drivers_periph_hwrng
  * @{
  *
  * @file
- * @brief       Low-level random number generator driver implementation for ESP SoCs
+ * @brief       Low-level random number generator driver implementation for ESP8266 SoCs
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  *
