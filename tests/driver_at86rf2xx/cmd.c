@@ -20,7 +20,7 @@
 
 #include "net/netdev/ieee802154.h"
 #include "net/ieee802154.h"
-
+#include "at86rf2xx_internal.h"
 #include "common.h"
 
 #include "od.h"
@@ -303,4 +303,26 @@ static int send(int iface, le_uint16_t dst_pan, uint8_t *dst, size_t dst_len,
     return 0;
 }
 
+#if AT86RF2XX_SMART_IDLE_LISTENING
+void random_net_api(uint8_t idx, uint32_t *value)
+{
+    netdev_ieee802154_t *dev = &devs[idx].netdev;
+    dev->netdev.driver->get(&dev->netdev, NETOPT_RANDOM, value, sizeof(uint32_t));
+}
+
+int random_by_at86rf2xx(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    for (unsigned int i = 0; i < AT86RF2XX_NUM; i++) {
+        uint32_t test = 0;
+        at86rf2xx_get_random(&devs[i], (uint8_t *)&test, sizeof(test));
+        printf("Random number for device %u via native API: %" PRIx32 "\n", i, test);
+        test = 0;
+        random_net_api(i, &test);
+        printf("Random number for device %u via netopt: %" PRIx32 "\n", i, test);
+    }
+    return 0;
+}
+#endif
 /** @} */

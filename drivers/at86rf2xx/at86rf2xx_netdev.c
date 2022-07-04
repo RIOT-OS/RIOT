@@ -459,7 +459,12 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             return sizeof(uint8_t);
 
 #endif /* MODULE_NETDEV_IEEE802154_OQPSK */
-
+#if AT86RF2XX_RANDOM_NUMBER_GENERATOR
+        case NETOPT_RANDOM:
+            assert(max_len >= sizeof(uint32_t));
+            at86rf2xx_get_random(dev, (uint8_t*)val, sizeof(val));
+            break;
+#endif
         default:
             res = -ENOTSUP;
             break;
