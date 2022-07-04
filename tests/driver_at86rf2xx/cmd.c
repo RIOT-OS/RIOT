@@ -18,12 +18,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "net/netdev/ieee802154.h"
-#include "net/ieee802154.h"
 #include "at86rf2xx_internal.h"
 #include "common.h"
-
+#include "net/ieee802154.h"
+#include "net/netdev/ieee802154.h"
 #include "od.h"
+#include "test_utils/expect.h"
 
 #define _MAX_ADDR_LEN    (8)
 #define MAC_VECTOR_SIZE  (2) /* mhr + payload */
@@ -303,11 +303,18 @@ static int send(int iface, le_uint16_t dst_pan, uint8_t *dst, size_t dst_len,
     return 0;
 }
 
-#if AT86RF2XX_SMART_IDLE_LISTENING
+#if AT86RF2XX_RANDOM_NUMBER_GENERATOR
 void random_net_api(uint8_t idx, uint32_t *value)
 {
     netdev_ieee802154_t *dev = &devs[idx].netdev;
-    dev->netdev.driver->get(&dev->netdev, NETOPT_RANDOM, value, sizeof(uint32_t));
+    int retval = dev->netdev.driver->get(&dev->netdev, NETOPT_RANDOM,
+                                         value, sizeof(uint32_t));
+    if (retval < 0) {
+        printf("get(NETOPT_RANDOM) failed: %s\n", strerror(-retval));
+    }
+    else {
+        expect(retval == sizeof(*value));
+    }
 }
 
 int random_by_at86rf2xx(int argc, char **argv)
