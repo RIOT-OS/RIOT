@@ -31,6 +31,9 @@
 #include "xfa.h"
 #include "macros/xtstr.h"
 #include "kernel_defines.h"
+#if IS_USED(MODULE_PREPROCESSOR_SUCCESSOR)
+#include "preprocessor_successor.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -83,6 +86,12 @@ typedef struct {
     auto_init_module_t auto_init_xfa_ ## function                                       \
         = { .init = (auto_init_fn_t)function }
 #endif
+
+/**
+ * @brief   Construct a priority value equal to @p priority + 1,
+ *          to be used with @ref AUTO_INIT
+ */
+#define AUTO_INIT_PRIORITY_AFTER(priority)  RIOT_PP_SUCCESSOR(priority)
 
 #ifdef __cplusplus
 }

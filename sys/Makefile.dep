@@ -990,4 +990,8 @@ ifneq (,$(filter rust_riotmodules,$(USEMODULE)))
   include $(RIOTBASE)/sys/rust_riotmodules/Makefile.dep
 endif
 
+ifneq (,$(filter auto_init%,$(USEMODULE)))
+  USEMODULE += preprocessor_successor
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
