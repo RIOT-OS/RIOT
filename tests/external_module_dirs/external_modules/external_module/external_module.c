@@ -20,9 +20,10 @@
  */
 
 #include "external_module.h"
+#include "auto_init_priorities.h"
 #include "auto_init_utils.h"
 
-#define PRIO 1111
+#define PRIO AUTO_INIT_PRIORITY_AFTER(AUTO_INIT_PRIO_MOD_RANDOM)
 
 AUTO_INIT(auto_init_external_module, PRIO);
 
