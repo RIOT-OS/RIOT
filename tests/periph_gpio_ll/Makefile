@@ -44,7 +44,13 @@ CFLAGS += -DPIN_IN_0=$(PIN_IN_0)
 CFLAGS += -DPIN_IN_1=$(PIN_IN_1)
 CFLAGS += -DPIN_OUT_0=$(PIN_OUT_0)
 CFLAGS += -DPIN_OUT_1=$(PIN_OUT_1)
-# We only need 1 thread (+ the Idle thread on some platforms) and we really want
-# this app working on all boards.
-CFLAGS += -DMAXTHREADS=2
 CFLAGS += -DLOW_ROM=$(LOW_ROM)
+
+ifneq ($(CPU_FAM),esp32)
+  # We only need 1 thread (+ the Idle thread on some platforms) and we really
+  # want this app working on all boards.
+  CFLAGS += -DMAXTHREADS=2
+else
+  # ESP32 uses an extra thread for esp_timer
+  CFLAGS += -DMAXTHREADS=3
+endif

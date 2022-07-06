@@ -299,6 +299,8 @@ extern void IRAM_ATTR thread_yield_isr(void* arg);
 
 static NORETURN void IRAM system_init (void)
 {
+    static_assert(MAXTHREADS >= 3,
+            "ESP32 requires at least 3 threads, esp_timer, idle, and main");
     /* enable cached read from flash */
     Cache_Read_Enable(PRO_CPU_NUM);
 
