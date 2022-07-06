@@ -1,7 +1,7 @@
 .PHONY: info-objsize info-buildsizes info-build info-boards-supported \
         info-features-missing info-modules info-cpu \
         info-features-provided info-features-required \
-        info-features-used \
+        info-features-used info-kconfig-variables \
         info-debug-variable-% info-toolchains-supported \
         check-toolchain-supported \
         info-programmers-supported \
@@ -223,6 +223,11 @@ info-features-missing:
 
 info-features-used:
 	@for i in $(FEATURES_USED); do echo $$i; done
+
+# This target prints all variables set via KConfig sorted alphabetically for
+# debugging.
+info-kconfig-variables:
+	@for i in $(sort $(filter CONFIG_%,$(.VARIABLES))); do echo $$i; done
 
 info-debug-variable-%:
 	@echo $($*)
