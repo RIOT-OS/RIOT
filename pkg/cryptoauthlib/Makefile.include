@@ -4,6 +4,7 @@ PKG_TESTINCLDIR = $(PKG_SOURCE_DIR)/test
 INCLUDES += -I$(PKG_SOURCE_DIR)
 INCLUDES += -I$(PKG_SOURCE_DIR)/lib
 INCLUDES += -I$(PKG_SOURCE_DIR)/app
+INCLUDES += -I$(PKG_SOURCE_DIR)/lib/calib
 INCLUDES += -I$(RIOTPKG)/cryptoauthlib/include
 
 DIRS += $(RIOTPKG)/cryptoauthlib/contrib
@@ -14,4 +15,9 @@ ifneq (,$(filter cryptoauthlib_test,$(USEMODULE)))
   INCLUDES += -I$(PKG_TESTINCLDIR)/jwt
   INCLUDES += -I$(PKG_TESTINCLDIR)/tng
   INCLUDES += -I$(PKG_TESTINCLDIR)/atcacert
+  INCLUDES += -I$(PKG_TESTINCLDIR)/api_atcab
+  INCLUDES += -I$(PKG_TESTINCLDIR)/api_calib
+  INCLUDES += -I$(PKG_TESTINCLDIR)/api_crypto
+  INCLUDES += -I$(PKG_TESTINCLDIR)/vectors
+  INCLUDES += -I$(PKG_SOURCE_DIR)/third_party/unity
 endif

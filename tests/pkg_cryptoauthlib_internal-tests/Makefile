@@ -2,6 +2,7 @@ BOARD ?= nucleo-f767zi
 
 include ../Makefile.tests_common
 
+CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(3*THREAD_STACKSIZE_DEFAULT\)
 # Test fails to build for these boards fails due to
 # redefinition of define AES_COUNT in library, which
 # is also defined in board header files

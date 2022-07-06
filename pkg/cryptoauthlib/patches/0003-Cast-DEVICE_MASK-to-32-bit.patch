@@ -1,0 +1,25 @@
+From 33e403483a2eb3ce299949762dad636ddff07212 Mon Sep 17 00:00:00 2001
+From: Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
+Date: Tue, 5 Jul 2022 16:00:27 +0200
+Subject: [PATCH] Cast DEVICE_MASK to 32 bit
+
+---
+ test/atca_test.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/atca_test.h b/test/atca_test.h
+index fbf9be02..f3ec11fe 100644
+--- a/test/atca_test.h
++++ b/test/atca_test.h
+@@ -58,7 +58,7 @@ typedef struct
+     fp_menu_handler fp_handler;
+ } t_menu_info;
+
+-#define DEVICE_MASK(device)                 ((uint8_t)1 << device)
++#define DEVICE_MASK(device)                 ((uint32_t)1 << device)
+ #define REGISTER_TEST_CASE(group, name)     TEST_ ## group ## _ ## name ## _run
+
+ #define DEVICE_MASK_ECC                     (DEVICE_MASK(ATECC108A) | DEVICE_MASK(ATECC508A) | DEVICE_MASK(ATECC608))
+--
+2.37.0
+
