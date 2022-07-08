@@ -5,14 +5,11 @@ PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-IGNORE_MODULES := \
-                  #
+LV_DRIVERS_MODULES := $(filter lv_drivers_%,$(USEMODULE))
 
-LV_DRIVERS_MODULES := $(filter-out $(IGNORE_MODULES),$(filter lv_drivers_%,$(USEMODULE)))
-
-.PHONY: lvgl_%
+.PHONY: lv_drivers_%
 
 all: $(LV_DRIVERS_MODULES)
 
-lv_drivers_sdl:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/sdl -f $(CURDIR)/Makefile.lv_drivers_module MODULE=$@ SRC=sdl.c
+lv_drivers_%:
+	"$(MAKE)" -C $(PKG_SOURCE_DIR)/$* -f $(CURDIR)/Makefile.lv_drivers_module MODULE=$@ SRC=$*.c
