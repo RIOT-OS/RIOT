@@ -10,6 +10,8 @@ use riot_wrappers::{gcoap, thread, ztimer, gnrc};
 
 use coap_handler_implementations::{ReportingHandlerBuilder, HandlerBuilder};
 
+extern crate rust_riotmodules;
+
 riot_main!(main);
 
 fn main() {

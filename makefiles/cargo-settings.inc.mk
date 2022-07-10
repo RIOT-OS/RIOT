@@ -1,13 +1,3 @@
-# Rust's own version of the target triple / quadruple.
-#
-# This does not have a sane default, and needs to be set in the architecture
-# files.
-# RUST_TARGET = ...
-
-# Flags that need to be added to the RIOT_CFLAGS passed to cargo in order to
-# make bindgen happy
-CARGO_EXTRACFLAGS ?=
-
 # Setting anything other than "debug" or "release" will necessitate additional
 # -Z unstable-options as of 2021-03 nightlies.
 CARGO_PROFILE ?= release

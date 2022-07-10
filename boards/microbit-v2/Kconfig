@@ -19,6 +19,7 @@ config BOARD_MICROBIT_V2
     select HAS_VDD_LC_FILTER_REG1
 
     select HAVE_SAUL_GPIO
+    select HAVE_LSM303AGR
 
 source "$(RIOTBOARD)/common/microbit/Kconfig"
 source "$(RIOTBOARD)/common/nrf52/Kconfig"
