@@ -30,11 +30,17 @@
 #include "sys/lock.h"
 #include "timex.h"
 
+#include "esp_rom_caps.h"
 #include "hal/interrupt_controller_types.h"
 #include "hal/interrupt_controller_ll.h"
+#include "hal/timer_hal.h"
+#include "hal/wdt_hal.h"
+#include "hal/wdt_types.h"
 #include "rom/ets_sys.h"
 #include "rom/libc_stubs.h"
+#include "soc/periph_defs.h"
 #include "soc/rtc.h"
+#include "soc/rtc_cntl_reg.h"
 #include "soc/rtc_cntl_struct.h"
 #include "soc/timer_group_reg.h"
 #include "soc/timer_group_struct.h"
@@ -244,12 +250,19 @@ static struct syscall_stub_table s_stub_table =
 #endif /* CONFIG_NEWLIB_NANO_FORMAT */
 };
 
+timer_hal_context_t sys_timer = {
+    .dev = TIMER_LL_GET_HW(TIMER_SYSTEM_GROUP),
+    .idx = TIMER_SYSTEM_INDEX,
+};
+
 void IRAM syscalls_init_arch(void)
 {
-    /* enable the system timer in us (TMG0 is enabled by default) */
-    TIMER_SYSTEM.config.divider = rtc_clk_apb_freq_get() / MHZ;
-    TIMER_SYSTEM.config.autoreload = 0;
-    TIMER_SYSTEM.config.enable = 1;
+    /* initialize and enable the system timer in us (TMG0 is enabled by default) */
+    timer_hal_init(&sys_timer, TIMER_SYSTEM_GROUP, TIMER_SYSTEM_INDEX);
+    timer_hal_set_divider(&sys_timer, rtc_clk_apb_freq_get() / MHZ);
+    timer_hal_set_counter_increase(&sys_timer, true);
+    timer_hal_set_auto_reload(&sys_timer, false);
+    timer_hal_set_counter_enable(&sys_timer, true);
 
 #if defined(MCU_ESP32)
     syscall_table_ptr_pro = &s_stub_table;
@@ -263,10 +276,7 @@ void IRAM syscalls_init_arch(void)
 
 uint32_t system_get_time(void)
 {
-    /* latch 64 bit timer value before read */
-    TIMER_SYSTEM.update = 0;
-    /* read the current timer value */
-    return TIMER_SYSTEM.cnt_low;
+    return system_get_time_64();
 }
 
 uint32_t system_get_time_ms(void)
@@ -276,58 +286,68 @@ uint32_t system_get_time_ms(void)
 
 int64_t system_get_time_64(void)
 {
-    uint64_t  ret;
-    /* latch 64 bit timer value before read */
-    TIMER_SYSTEM.update = 0;
-    /* read the current timer value */
-    ret  = TIMER_SYSTEM.cnt_low;
-    ret += ((uint64_t)TIMER_SYSTEM.cnt_high) << 32;
+    uint64_t ret;
+    timer_hal_get_counter_value(&sys_timer, &ret);
     return ret;
 }
 
+wdt_hal_context_t mwdt;
+wdt_hal_context_t rwdt;
+
 static IRAM void system_wdt_int_handler(void *arg)
 {
-    TIMERG0.int_clr_timers.wdt=1; /* clear interrupt */
-    system_wdt_feed();
+    wdt_hal_handle_intr(&mwdt);
+    wdt_hal_write_protect_disable(&mwdt);
+    wdt_hal_feed(&mwdt);
+    wdt_hal_write_protect_enable(&mwdt);
 }
 
 void IRAM system_wdt_feed(void)
 {
-    DEBUG("%s\n", __func__);
-    TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;  /* disable write protection */
-    TIMERG0.wdt_feed=1;                        /* reset MWDT */
-    TIMERG0.wdt_wprotect=0;                    /* enable write protection */
+    wdt_hal_write_protect_disable(&mwdt);
+    wdt_hal_feed(&mwdt);
+    wdt_hal_write_protect_enable(&mwdt);
 }
 
 void system_wdt_init(void)
 {
-    /* disable boot watchdogs */
-    TIMERG0.wdt_config0.flashboot_mod_en = 0;
-    RTCCNTL.wdt_config0.flashboot_mod_en = 0;
+    /* initialize and disable boot watchdogs MWDT and RWDT (the prescaler for
+     * MWDT is the APB clock in MHz to get a microsecond tick, for RWDT it is
+     * not applicable) */
+    wdt_hal_init(&mwdt, WDT_MWDT0, rtc_clk_apb_freq_get()/MHZ, true);
+    wdt_hal_init(&rwdt, WDT_RWDT, 0, false);
 
-    /* enable system watchdog */
-    TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;  /* disable write protection */
-    TIMERG0.wdt_config0.stg0 = TIMG_WDT_STG_SEL_INT;          /* stage0 timeout: interrupt */
-    TIMERG0.wdt_config0.stg1 = TIMG_WDT_STG_SEL_RESET_SYSTEM; /* stage1 timeout: sys reset */
-    TIMERG0.wdt_config0.sys_reset_length = 7;  /* sys reset signal length: 3.2 us */
-    TIMERG0.wdt_config0.cpu_reset_length = 7;  /* sys reset signal length: 3.2 us */
-    TIMERG0.wdt_config0.edge_int_en = 0;
-    TIMERG0.wdt_config0.level_int_en = 1;
+    /* disable write protection for MWDT and RWDT */
+    wdt_hal_write_protect_disable(&mwdt);
+    wdt_hal_write_protect_disable(&rwdt);
 
-    /* MWDT clock = 80 * 12,5 ns = 1 us */
-    TIMERG0.wdt_config1.clk_prescale = 80;
+    /* configure stages */
+    wdt_hal_config_stage(&mwdt, WDT_STAGE0, 2 * US_PER_SEC, WDT_STAGE_ACTION_INT);
+    wdt_hal_config_stage(&mwdt, WDT_STAGE1, 2 * US_PER_SEC, WDT_STAGE_ACTION_RESET_SYSTEM);
+    wdt_hal_config_stage(&mwdt, WDT_STAGE2, 0, WDT_STAGE_ACTION_OFF);
+    wdt_hal_config_stage(&mwdt, WDT_STAGE3, 0, WDT_STAGE_ACTION_OFF);
 
-    /* define stage timeouts */
-    TIMERG0.wdt_config2 = 2 * US_PER_SEC;  /* stage 0: 2 s (interrupt) */
-    TIMERG0.wdt_config3 = 4 * US_PER_SEC;  /* stage 1: 4 s (sys reset) */
+    /* enable the watchdog */
+    wdt_hal_enable(&mwdt);
 
-    TIMERG0.wdt_config0.en = 1;   /* enable MWDT */
-    TIMERG0.wdt_feed = 1;         /* reset MWDT */
-    TIMERG0.wdt_wprotect = 0;     /* enable write protection */
+    /* enable write protection for MWDT and RWDT */
+    wdt_hal_write_protect_enable(&mwdt);
+    wdt_hal_write_protect_enable(&rwdt);
 
-    DEBUG("%s TIMERG0 wdt_config0=%08x wdt_config1=%08x wdt_config2=%08x\n",
-          __func__, TIMERG0.wdt_config0.val, TIMERG0.wdt_config1.val,
-          TIMERG0.wdt_config2);
+#if defined(MCU_ESP32)
+    DEBUG("%s TIMERG0 wdtconfig0=%08x wdtconfig1=%08x wdtconfig2=%08x "
+          "wdtconfig3=%08x wdtconfig4=%08x regclk=%08x\n", __func__,
+          TIMERG0.wdt_config0.val, TIMERG0.wdt_config1.val,
+          TIMERG0.wdt_config2, TIMERG0.wdt_config3,
+          TIMERG0.wdt_config4, TIMERG0.clk.val);
+#else
+    DEBUG("%s TIMERG0 wdtconfig0=%08"PRIx32" wdtconfig1=%08"PRIx32
+          " wdtconfig2=%08"PRIx32" wdtconfig3=%08"PRIx32
+          " wdtconfig4=%08"PRIx32" regclk=%08"PRIx32"\n", __func__,
+          TIMERG0.wdtconfig0.val, TIMERG0.wdtconfig1.val,
+          TIMERG0.wdtconfig2.val, TIMERG0.wdtconfig3.val,
+          TIMERG0.wdtconfig4.val, TIMERG0.regclk.val);
+#endif
 
     /* route WDT peripheral interrupt source to CPU_INUM_WDT */
     intr_matrix_set(PRO_CPU_NUM, ETS_TG0_WDT_LEVEL_INTR_SOURCE, CPU_INUM_WDT);
@@ -339,17 +359,15 @@ void system_wdt_init(void)
 void system_wdt_stop(void)
 {
     intr_cntrl_ll_disable_interrupts(BIT(CPU_INUM_WDT));
-    TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;  /* disable write protection */
-    TIMERG0.wdt_config0.en = 0;   /* disable MWDT */
-    TIMERG0.wdt_feed = 1;         /* reset MWDT */
-    TIMERG0.wdt_wprotect = 0;     /* enable write protection */
+    wdt_hal_write_protect_disable(&mwdt);
+    wdt_hal_disable(&mwdt);
+    wdt_hal_write_protect_enable(&mwdt);
 }
 
 void system_wdt_start(void)
 {
-    TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;  /* disable write protection */
-    TIMERG0.wdt_config0.en = 1;   /* disable MWDT */
-    TIMERG0.wdt_feed = 1;         /* reset MWDT */
-    TIMERG0.wdt_wprotect = 0;     /* enable write protection */
+    wdt_hal_write_protect_disable(&mwdt);
+    wdt_hal_enable(&mwdt);
+    wdt_hal_write_protect_enable(&mwdt);
     intr_cntrl_ll_enable_interrupts(BIT(CPU_INUM_WDT));
 }

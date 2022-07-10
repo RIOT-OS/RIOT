@@ -504,18 +504,28 @@ typedef struct {
  * configured here.
  * @{
  */
+
 #ifdef MODULE_ESP_HW_COUNTER
-/** hardware ccount/ccompare registers are used for timer implementation */
+/** Hardware ccount/ccompare registers are used for timer implementation */
 #define TIMER_NUMOF         (2)
 #define TIMER_CHANNEL_NUMOF (1)
 #else
-/** hardware timer modules are used for timer implementation (default) */
-#define TIMER_NUMOF         (3)
+/**
+ * @brief Hardware timer modules are used for timer implementation (default)
+ *
+ * Since one timer is used for the system time, there is one timer less than
+ * the total number of timers.
+ */
+#define TIMER_NUMOF         (SOC_TIMER_GROUP_TOTAL_TIMERS - 1)
 #define TIMER_CHANNEL_NUMOF (1)
 #endif
 
-/** Timer used for system time */
-#define TIMER_SYSTEM    TIMERG0.hw_timer[0]
+/** Timer group used for system time */
+#define TIMER_SYSTEM_GROUP      TIMER_GROUP_0
+/** Index of the timer in the timer timer group used for system time */
+#define TIMER_SYSTEM_INDEX      TIMER_0
+/** System time interrupt source */
+#define TIMER_SYSTEM_INT_SRC    ETS_TG0_T0_LEVEL_INTR_SOURCE
 
 /** @} */
 
