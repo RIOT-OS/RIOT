@@ -38,7 +38,7 @@ at86rf2xx_t devs[AT86RF2XX_NUM];
 static const shell_command_t shell_commands[] = {
     { "ifconfig", "Configure netdev", ifconfig },
     { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
-#if AT86RF2XX_SMART_IDLE_LISTENING
+#if AT86RF2XX_RANDOM_NUMBER_GENERATOR
     { "random", "Get a value from Random Number Generator", random_by_at86rf2xx },
 #endif
     { NULL, NULL, NULL }
