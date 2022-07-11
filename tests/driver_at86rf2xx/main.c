@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2022 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,110 +11,92 @@
  * @{
  *
  * @file
- * @brief       Test application for AT86RF2xx network device driver
+ * @brief       Test application for AT86RF2XX IEEE 802.15.4 device driver
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  *
  * @}
  */
 
 #include <stdio.h>
 
-#include "net/netdev.h"
+#include "at86rf2xx.h"
+#include "at86rf2xx_params.h"
+#include "at86rf2xx_internal.h"
+#include "init_dev.h"
+#include "net/ieee802154.h"
+#include "net/netdev/ieee802154.h"
 #include "shell.h"
-#include "thread.h"
-#include "xtimer.h"
+#include "test_utils/netdev_ieee802154_minimal.h"
+#include "test_utils/expect.h"
 
-#include "common.h"
+static at86rf2xx_t at86rf2xx[AT86RF2XX_NUM];
 
-#define _STACKSIZE      (THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF)
-#define MSG_TYPE_ISR    (0x3456)
-
-static char stack[_STACKSIZE];
-static kernel_pid_t _recv_pid;
-
-at86rf2xx_t devs[AT86RF2XX_NUM];
-
-static const shell_command_t shell_commands[] = {
-    { "ifconfig", "Configure netdev", ifconfig },
-    { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
 #if AT86RF2XX_RANDOM_NUMBER_GENERATOR
-    { "random", "Get a value from Random Number Generator", random_by_at86rf2xx },
-#endif
-    { NULL, NULL, NULL }
-};
-
-static void _event_cb(netdev_t *dev, netdev_event_t event)
+void random_net_api(uint8_t idx, uint32_t *value)
 {
-    if (event == NETDEV_EVENT_ISR) {
-        msg_t msg;
-
-        msg.type = MSG_TYPE_ISR;
-        msg.content.ptr = dev;
-
-        if (msg_send(&msg, _recv_pid) <= 0) {
-            puts("gnrc_netdev: possibly lost interrupt.");
-        }
+    netdev_ieee802154_t *dev = &at86rf2xx[idx].netdev;
+    dev->netdev.driver->get(&dev->netdev, NETOPT_RANDOM, value, sizeof(uint32_t));
+    int retval = dev->netdev.driver->get(&dev->netdev, NETOPT_RANDOM,
+                                         value, sizeof(uint32_t));
+    if (retval < 0) {
+        printf("get(NETOPT_RANDOM) failed: %s\n", strerror(-retval));
     }
     else {
-        switch (event) {
-            case NETDEV_EVENT_RX_COMPLETE:
-            {
-                recv(dev);
-
-                break;
-            }
-            default:
-                puts("Unexpected event received");
-                break;
-        }
+        expect(retval == sizeof(*value));
     }
 }
 
-void *_recv_thread(void *arg)
+int random_by_at86rf2xx(int argc, char **argv)
 {
-    (void)arg;
-    while (1) {
-        msg_t msg;
-        msg_receive(&msg);
-        if (msg.type == MSG_TYPE_ISR) {
-            netdev_t *dev = msg.content.ptr;
-            dev->driver->isr(dev);
-        }
-        else {
-            puts("unexpected message type");
+    (void)argc;
+    (void)argv;
+    for (unsigned int i = 0; i < AT86RF2XX_NUM; i++) {
+        uint32_t test = 0;
+        at86rf2xx_get_random(&at86rf2xx[i], (uint8_t *)&test, sizeof(test));
+        printf("Random number for device %u via native API: %" PRIx32 "\n", i, test);
+        test = 0;
+        random_net_api(i, &test);
+        printf("Random number for device %u via netopt: %" PRIx32 "\n", i, test);
+    }
+    return 0;
+}
+
+static const shell_command_t shell_commands[] = {
+    { "random", "Get a value from Random Number Generator", random_by_at86rf2xx },
+    { NULL, NULL, NULL }
+};
+#endif
+
+int netdev_ieee802154_minimal_init_devs(netdev_event_cb_t cb) {
+
+    puts("Initializing AT86RF2XX devices");
+
+    for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
+        printf("%d out of %d\n", i + 1, AT86RF2XX_NUM);
+        /* setup the specific driver */
+        at86rf2xx_setup(&at86rf2xx[i], &at86rf2xx_params[i], i);
+
+        /* set the application-provided callback */
+        at86rf2xx[i].netdev.netdev.event_callback = cb;
+
+        /* initialize the device driver */
+        int res = at86rf2xx[i].netdev.netdev.driver->init(&at86rf2xx[i].netdev.netdev);
+        if (res != 0) {
+            return -1;
         }
     }
+
+    return 0;
 }
 
 int main(void)
 {
-    puts("AT86RF2xx device driver test");
-    unsigned dev_success = 0;
-    for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
-        const at86rf2xx_params_t *p = &at86rf2xx_params[i];
-        netdev_t *dev = &devs[i].netdev.netdev;
+    puts("Test application for AT86RF2XX IEEE 802.15.4 device driver");
 
-        printf("Initializing AT86RF2xx radio at SPI_%d\n", p->spi);
-        at86rf2xx_setup(&devs[i], p, i);
-        dev->event_callback = _event_cb;
-        if (dev->driver->init(dev) < 0) {
-            continue;
-        }
-        dev_success++;
-    }
-
-    if (!dev_success) {
-        puts("No device could be initialized");
-        return 1;
-    }
-
-    _recv_pid = thread_create(stack, sizeof(stack), THREAD_PRIORITY_MAIN - 1,
-                              THREAD_CREATE_STACKTEST, _recv_thread, NULL,
-                              "recv_thread");
-
-    if (_recv_pid <= KERNEL_PID_UNDEF) {
-        puts("Creation of receiver thread failed");
+    int res = netdev_ieee802154_minimal_init();
+    if (res) {
+        puts("Error initializing devices");
         return 1;
     }
 
@@ -122,7 +104,11 @@ int main(void)
     puts("Initialization successful - starting the shell now");
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
+#if AT86RF2XX_RANDOM_NUMBER_GENERATOR
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+#else
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+#endif
 
     return 0;
 }

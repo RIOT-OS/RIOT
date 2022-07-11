@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 ML!PA Consulting GmbH
+ * Copyright (C) 2022 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,9 +11,10 @@
  * @{
  *
  * @file
- * @brief       Test application for at86rf215 driver
+ * @brief       Test application for AT86RF215 IEEE 802.15.4 device driver
  *
- * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
+ *
  * @}
  */
 
@@ -21,28 +22,20 @@
 
 #include "at86rf215.h"
 #include "at86rf215_internal.h"
-#include "thread.h"
+#include "at86rf215_params.h"
+#include "init_dev.h"
 #include "shell.h"
-#include "sys/bus.h"
+#include "test_utils/netdev_ieee802154_minimal.h"
 
-#include "net/gnrc/pktdump.h"
-#include "net/gnrc/netif.h"
-#include "net/gnrc.h"
+#include "thread.h"
+#include "event.h"
+#include "event/thread.h"
+#include "sys/bus.h"
 #include "od.h"
 
-static char batmon_stack[THREAD_STACKSIZE_MAIN];
-static at86rf215_t *dev;
+static at86rf215_t at86rf215[NETDEV_IEEE802154_MINIMAL_NUMOF];
 
-void netdev_register_signal(netdev_t *netdev, netdev_type_t type, uint8_t index)
-{
-   (void) index;
-    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev,
-                                                          netdev_ieee802154_t,
-                                                          netdev);
-    if (type == NETDEV_AT86RF215 && !dev) {
-        dev = container_of(netdev_ieee802154, at86rf215_t, netdev);
-    }
-}
+static char batmon_stack[THREAD_STACKSIZE_MAIN];
 
 void *batmon_thread(void *arg)
 {
@@ -65,21 +58,15 @@ static int cmd_enable_batmon(int argc, char **argv)
 {
     int res;
     uint16_t voltage;
-    gnrc_netif_t* netif = gnrc_netif_iter(NULL);
+    netdev_t *netdev = &(at86rf215[0].netdev.netdev);
 
     if (argc < 2) {
         printf("usage: %s <treshold_mV>\n", argv[0]);
         return -1;
     }
 
-    if (netif == NULL) {
-        puts("no netif found");
-        return -1;
-    }
-
     voltage = atoi(argv[1]);
-    res     = gnrc_netapi_set(netif->pid, NETOPT_BATMON, 0,
-                              &voltage, sizeof(voltage));
+    res = netdev->driver->set(netdev, NETOPT_BATMON, &voltage, sizeof(voltage));
 
     if (res != sizeof(voltage)) {
         puts("value out of range");
@@ -96,14 +83,10 @@ static int cmd_set_trim(int argc, char **argv)
     }
 
     uint8_t trim = atoi(argv[1]);
+    at86rf215_t *dev = at86rf215;
 
     if (trim > 0xF) {
         puts("Trim value out of range");
-        return 1;
-    }
-
-    if (dev == NULL) {
-        puts("No at86rf215 radio found");
         return 1;
     }
 
@@ -127,6 +110,7 @@ static int cmd_set_clock_out(int argc, char **argv)
     };
 
     at86rf215_clko_freq_t freq = AT86RF215_CLKO_26_MHz;
+    at86rf215_t *dev = at86rf215;
 
     if (argc > 1) {
         unsigned tmp = 0xFF;
@@ -150,11 +134,6 @@ static int cmd_set_clock_out(int argc, char **argv)
         freq = tmp;
     }
 
-    if (dev == NULL) {
-        puts("No at86rf215 radio found");
-        return 1;
-    }
-
     printf("Clock output set to %s %s\n", keys[freq], freq ? "MHz" : "");
     at86rf215_set_clock_output(dev, AT86RF215_CLKO_4mA, freq);
 
@@ -165,6 +144,7 @@ static int cmd_get_random(int argc, char **argv)
 {
     uint8_t values;
     uint8_t buffer[256];
+    at86rf215_t *dev = at86rf215;
 
     if (argc > 1) {
         values = atoi(argv[1]);
@@ -178,14 +158,71 @@ static int cmd_get_random(int argc, char **argv)
         return 1;
     }
 
-    if (dev == NULL) {
-        puts("No at86rf215 radio found");
-        return 1;
-    }
-
     at86rf215_get_random(dev, buffer, values);
 
     od_hex_dump(buffer, values, 0);
+
+    return 0;
+}
+
+int test_init(void)
+{
+    /* create battery monitor thread */
+    thread_create(batmon_stack, sizeof(batmon_stack), THREAD_PRIORITY_MAIN - 1,
+                  THREAD_CREATE_STACKTEST, batmon_thread, NULL, "batmon");
+    return 0;
+}
+
+static int _init_driver(netdev_t *netdev, netdev_event_cb_t cb)
+{
+    /* set the application-provided callback */
+    netdev->event_callback = cb;
+
+    /* initialize the device driver */
+    return netdev->driver->init(netdev);
+}
+
+int netdev_ieee802154_minimal_init_devs(netdev_event_cb_t cb) {
+    unsigned idx = 0;
+
+    puts("Initializing AT86RF215 at86rf215");
+
+    for (unsigned i = 0; i < AT86RF215_NUM; i++) {
+        at86rf215_t *at86rf215_subghz = NULL;
+        at86rf215_t *at86rf215_24ghz = NULL;
+
+        printf("%d out of %d\n", i + 1, AT86RF215_NUM);
+
+        if (IS_USED(MODULE_AT86RF215_SUBGHZ)) {
+            puts("Sub-GHz");
+            at86rf215_subghz = &at86rf215[idx];
+            idx++;
+        }
+
+        if (IS_USED(MODULE_AT86RF215_24GHZ)) {
+            puts("2.4 GHz");
+            at86rf215_24ghz = &at86rf215[idx];
+            idx++;
+        }
+
+        /* setup the specific driver */
+        at86rf215_setup(at86rf215_subghz, at86rf215_24ghz, &at86rf215_params[i], i);
+
+        int res = 0;
+        if (at86rf215_subghz) {
+            res = _init_driver(&at86rf215_subghz->netdev.netdev, cb);
+            if (res) {
+                return res;
+            }
+        }
+
+        if (at86rf215_24ghz) {
+            res = _init_driver(&at86rf215_24ghz->netdev.netdev, cb);
+            if (res) {
+                return res;
+            }
+        }
+    }
 
     return 0;
 }
@@ -200,16 +237,21 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    /* enable pktdump output */
-    gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
-                                                          gnrc_pktdump_pid);
-    gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
+    puts("Test application for AT86RF215 IEEE 802.15.4 device driver");
+
+    int res = netdev_ieee802154_minimal_init();
+    if (res) {
+        puts("Error initializing at86rf215");
+        return 1;
+    }
 
     /* create battery monitor thread */
     thread_create(batmon_stack, sizeof(batmon_stack), THREAD_PRIORITY_MAIN - 1,
                   THREAD_CREATE_STACKTEST, batmon_thread, NULL, "batmon");
 
     /* start the shell */
+    puts("Initialization successful - starting the shell now");
+
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 

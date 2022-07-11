@@ -1,0 +1,7 @@
+USEMODULE += board_nrf52840_ci_ieee802154
+
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  USEMODULE += mrf24j40
+endif
+
+include $(RIOTBOARD)/nrf52840dk/Makefile.dep

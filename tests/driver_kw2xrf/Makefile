@@ -1,15 +1,13 @@
+INCLUDES += -I$(APPDIR)
+BOARD ?= pba-d-01-kw2x
+
 include ../Makefile.tests_common
 
-USEMODULE += auto_init_gnrc_netif
-USEMODULE += gnrc
-USEMODULE += fmt
-USEMODULE += shell
-USEMODULE += shell_commands
-USEMODULE += ps
+USEMODULE += test_utils_netdev_ieee802154_minimal
 
-DRIVER ?= kw2xrf
+# the radio driver to test
+USEMODULE += kw2xrf
 
-# finally include the actual chosen driver
-USEMODULE += $(DRIVER)
+CFLAGS += -DEVENT_THREAD_STACKSIZE_DEFAULT=1024
 
 include $(RIOTBASE)/Makefile.include

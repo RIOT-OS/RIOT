@@ -194,6 +194,9 @@ endif
 ifneq (,$(filter test_utils_netdev_eth_minimal,$(USEMODULE)))
   DIRS += test_utils/netdev_eth_minimal
 endif
+ifneq (,$(filter test_utils_netdev_ieee802154_minimal,$(USEMODULE)))
+  DIRS += test_utils/netdev_ieee802154_minimal
+endif
 ifneq (,$(filter test_utils_print_stack_usage,$(USEMODULE)))
   DIRS += test_utils/print_stack_usage
 endif

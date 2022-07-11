@@ -139,6 +139,10 @@ ifneq (,$(filter test_utils_result_output,$(USEMODULE)))
   include $(RIOTBASE)/sys/test_utils/result_output/Makefile.include
 endif
 
+ifneq (,$(filter test_utils_netdev_ieee802154_minimal,$(USEMODULE)))
+  CFLAGS += -DCONFIG_NETDEV_REGISTER_SIGNAL
+endif
+
 ifneq (,$(filter ztimer,$(USEMODULE)))
   include $(RIOTBASE)/sys/ztimer/Makefile.include
 endif

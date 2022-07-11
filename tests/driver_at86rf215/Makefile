@@ -1,10 +1,15 @@
+INCLUDES += -I$(APPDIR)
 BOARD ?= openmote-b
+
+include ../Makefile.tests_common
+
+USEMODULE += test_utils_netdev_ieee802154_minimal
 
 # the radio driver to test
 USEMODULE += at86rf215
 USEMODULE += at86rf215_batmon
 USEMODULE += netdev_ieee802154_rx_timestamp
 
-CFLAGS += -DCONFIG_NETDEV_REGISTER_SIGNAL
+CFLAGS += -DEVENT_THREAD_STACKSIZE_DEFAULT=1024
 
-include ../driver_netdev_common/Makefile.netdev.mk
+include $(RIOTBASE)/Makefile.include
