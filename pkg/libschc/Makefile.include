@@ -1,0 +1,12 @@
+CFLAGS += -Wno-enum-conversion
+CFLAGS += -Wno-old-style-definition
+CFLAGS += -Wno-sign-compare
+CFLAGS += -Wno-strict-prototypes
+CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wno-unused-variable
+
+INCLUDES += -I$(RIOTBASE)/pkg/libschc/include
+INCLUDES += -I$(PKGDIRBASE)/libschc
+
+PSEUDOMODULES += libschc_coap
+PSEUDOMODULES += libschc_udpv6

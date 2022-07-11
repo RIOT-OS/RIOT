@@ -1,0 +1,9 @@
+ifneq (,$(filter libschc_%,$(USEMODULE)))
+  USEPKG += libschc
+endif
+
+ifneq (,$(filter libschc,$(USEPKG)))
+  USEMODULE += libschc_udpv6
+endif
+
+FEATURES_BLACKLIST += arch_8bit arch_16bit arch_esp8266

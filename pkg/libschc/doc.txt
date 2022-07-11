@@ -1,0 +1,11 @@
+/**
+ * @defgroup pkg_libschc    libSCHC
+ * @ingroup pkg
+ * @brief   Provides support for Static Context Header Compression and Fragmentation (SCHC)
+ * @see     https://github.com/imec-idlab/libschc
+ * @see     [RFC 8724](https://datatracker.ietf.org/doc/html/rfc8724)
+ * @experimental
+ *
+ * libSCHC is a C implementation of Static Context Header Compression and
+   Fragmentation
+ */

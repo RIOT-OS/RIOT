@@ -99,6 +99,7 @@
 /drivers/include/periph/ptp.h               @maribu
 
 /pkg/cryptoauthlib/                         @Einhornhool @PeterKietzmann
+/pkg/libschc/                               @bartmoons @miri64
 /pkg/lua/                                   @jcarrano
 /pkg/lwip/                                  @miri64
 /pkg/gecko_sdk/                             @basilfx
