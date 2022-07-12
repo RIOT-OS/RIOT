@@ -988,6 +988,7 @@ static bool _parse_reply(uint8_t *rep, size_t len, uint8_t request_type)
         DEBUG("DHCPv6 client: packet too small or transaction ID wrong\n");
         return false;
     }
+    len = orig_len - sizeof(dhcpv6_msg_t);
     for (dhcpv6_opt_t *opt = (dhcpv6_opt_t *)(&rep[sizeof(dhcpv6_msg_t)]);
          len > 0; len -= _opt_len(opt), opt = _opt_next(opt)) {
         if (len > orig_len) {
@@ -1078,6 +1079,10 @@ static bool _parse_reply(uint8_t *rep, size_t len, uint8_t request_type)
                  }
             default:
                 break;
+        }
+        /* 0 option is used as an end marker, len can include bogus bytes */
+        if (!byteorder_ntohs(opt->type)) {
+            break;
         }
     }
     return true;
