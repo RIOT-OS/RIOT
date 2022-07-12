@@ -64,7 +64,7 @@ server e.g. you can use the following configuration:
        "subnet": "2001:db8::/16",
        "pd-pools": [ { "prefix": "2001:db8::",
                        "prefix-len": 16,
-                       "delegated-len": 64 } ] },
+                       "delegated-len": 64 } ] }
   ]
   ...
 }
