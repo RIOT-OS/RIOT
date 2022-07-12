@@ -3,6 +3,7 @@
 SLIPTTY_DIR="$(cd "$(dirname "$0")" && pwd -P)"
 UHCPD="$(cd "${SLIPTTY_DIR}/../uhcpd/bin" && pwd -P)/uhcpd"
 DHCPD="$(cd "${SLIPTTY_DIR}/../dhcpv6-pd_ia/" && pwd -P)/dhcpv6-pd_ia.py"
+RADVD="$(cd "${SLIPTTY_DIR}/../radvd/" && pwd -P)/radvd.sh"
 TUN=sl0
 TUN_GLB="fdea:dbee:f::1/64"
 UHCPD_PID=
@@ -40,6 +41,7 @@ create_tun() {
             echo "    ${SUDO} sysctl -w net.ipv6.conf.all.forwarding=0" >&2
             echo "when not desired without this script" >&2
             ${SUDO} sysctl -w net.ipv6.conf.${TUN}.accept_ra=2
+            ${SUDO} sysctl -w net.ipv6.conf."${TUN}".accept_ra_rt_info_max_plen=64
             ${SUDO} ip link set ${TUN} up || exit 1
             ${SUDO} ip address add fe80::1/64 dev ${TUN}
             ${SUDO} ip address add ${TUN_GLB} dev ${TUN}
@@ -111,20 +113,26 @@ start_dhcpd() {
     ${DHCPD} -d -p ${DHCPD_PIDFILE} ${TUN} ${PREFIX} 2> /dev/null
 }
 
+start_radvd() {
+    "${RADVD}" -c "${TUN}" "${PREFIX}"
+}
+
 usage() {
-    echo "usage: $1 [-I <sl0>] [-d] [-e] [-g <addr>/<prefix_len>] <prefix> serial [baudrate]"
-    echo "usage: $1 [-I <sl0>] [-d] [-e] [-g <addr>/<prefix_len>] <prefix> tcp:host [port]"
+    echo "usage: $1 [-I <sl0>] [-d] [-r] [-e] [-g <addr>/<prefix_len>] <prefix> serial [baudrate]"
+    echo "usage: $1 [-I <sl0>] [-d] [-r] [-e] [-g <addr>/<prefix_len>] <prefix> tcp:host [port]"
 }
 
 trap "cleanup" INT QUIT TERM EXIT
 
 SLIP_ONLY=0
 USE_DHCPV6=0
+USE_RADVD=0
 
-while getopts dehI: opt; do
+while getopts dehIr: opt; do
     case ${opt} in
         d)  USE_DHCPV6=1; shift 1;;
         e)  SLIP_ONLY=1; shift 1;;
+        r)  USE_RADVD=1; shift 1;;
         I)  TUN=${OPTARG}; shift 2;;
         g)  TUN_GLB=${OPTARG}; shift 2;;
         h)  usage $0; exit 0;;
@@ -142,6 +150,9 @@ create_tun && \
 if [ ${SLIP_ONLY} -ne 1 ]; then
     if [ ${USE_DHCPV6} -eq 1 ]; then
         start_dhcpd
+        START_SLIP=$?
+    elif [ ${USE_RADVD} -eq 1 ]; then
+        start_radvd
         START_SLIP=$?
     else
         start_uhcpd
