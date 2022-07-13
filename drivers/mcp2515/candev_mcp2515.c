@@ -421,6 +421,8 @@ static int _get(candev_t *candev, canopt_t opt, void *value, size_t max_len)
 static int _set_filter(candev_t *dev, const struct can_filter *filter)
 {
     DEBUG("inside _set_filter of MCP2515\n");
+    assert(filter->target_mailbox < MCP2515_RX_MAILBOXES);
+
     struct can_filter f = *filter;
     int res = -1;
     enum mcp2515_mode mode;
@@ -449,58 +451,66 @@ static int _set_filter(candev_t *dev, const struct can_filter *filter)
         f.can_mask &= CAN_SFF_MASK;
     }
 
-    /* Browse on each mailbox to find an empty space */
-    int mailbox_index = 0;
-
-    while (mailbox_index < MCP2515_RX_MAILBOXES) {
-        /* mask unused */
-        if (dev_mcp->masks[mailbox_index] == 0) {
+    /* mask unused */
+    if (dev_mcp->masks[f.target_mailbox] == 0) {
+        if (mutex_trylock(&_mcp_mutex)) {
             /* set mask */
-            mcp2515_set_mask(dev_mcp, mailbox_index, f.can_mask);
+            mcp2515_set_mask(dev_mcp, f.target_mailbox, f.can_mask);
             /* set filter */
-            mcp2515_set_filter(dev_mcp, MCP2515_FILTERS_MB0 * mailbox_index,
-                               f.can_id);
+            mcp2515_set_filter(dev_mcp, MCP2515_FILTERS_MB0 * f.target_mailbox,
+                           f.can_id);
+            mutex_unlock(&_mcp_mutex);
+        }
+        else {
+           DEBUG("setfilt2_Failed to lock mutex\n");
+           return -1;
+        }
+
+        /* save filter */
+        dev_mcp->masks[f.target_mailbox] = f.can_mask;
+        dev_mcp->filter_ids[f.target_mailbox][0] = f.can_id;
+    }
+
+    /* mask existed and same mask */
+    else if (dev_mcp->masks[f.target_mailbox] == f.can_mask) {
+        /* find an empty space if it exists */
+        int filter_pos = 1; /* first one is already filled */
+        /* stop at the end of mailbox or an empty space found */
+        while (filter_pos < _max_filters(f.target_mailbox) &&
+               dev_mcp->filter_ids[f.target_mailbox][filter_pos] != 0) {
+            filter_pos++;
+        }
+
+        /* an empty space is found */
+        if (filter_pos < _max_filters(f.target_mailbox)) {
+            /* set filter on this memory space */
+            if (mutex_trylock(&_mcp_mutex)) {
+                mcp2515_set_filter(dev_mcp,
+                                   MCP2515_FILTERS_MB0 * f.target_mailbox + filter_pos,
+                                   f.can_id);
+                mutex_unlock(&_mcp_mutex);
+            }
+            else {
+                DEBUG("setfilt3_Failed to lock mutex");
+                return -1;
+            }
 
             /* save filter */
-            dev_mcp->masks[mailbox_index] = f.can_mask;
-            dev_mcp->filter_ids[mailbox_index][0] = f.can_id;
-
-            /* function succeeded */
-            break;
+            dev_mcp->filter_ids[f.target_mailbox][filter_pos] = f.can_id;
         }
-
-        /* mask existed and same mask */
-        else if (dev_mcp->masks[mailbox_index] == f.can_mask) {
-            /* find en empty space if it exist */
-            int filter_pos = 1; /* first one is already filled */
-            /* stop at the end of mailbox or an empty space found */
-            while (filter_pos < _max_filters(mailbox_index) &&
-                   dev_mcp->filter_ids[mailbox_index][filter_pos] != 0) {
-                filter_pos++;
+        /* No empty space is found */
+        else {
+            DEBUG_PUTS("no empty space found");
+            if (mutex_trylock(&_mcp_mutex)) {
+                mcp2515_set_mode(dev_mcp, mode);
+                mutex_unlock(&_mcp_mutex);
             }
-
-            /* an empty space is found */
-            if (filter_pos < _max_filters(mailbox_index)) {
-                /* set filter on this memory space */
-                if (mutex_trylock(&_mcp_mutex)) {
-                    mcp2515_set_filter(dev_mcp,
-                                       MCP2515_FILTERS_MB0 * mailbox_index + filter_pos,
-                                       f.can_id);
-                    mutex_unlock(&_mcp_mutex);
-                }
-                else {
-                    DEBUG("setfilt2_Failed to lock mutex");
-                    return -1;
-                }
-
-                /* save filter */
-                dev_mcp->filter_ids[mailbox_index][filter_pos] = f.can_id;
-
-                /* function succeeded */
-                break;
+            else {
+                DEBUG_PUTS("setfilt4_Failed to lock mutex");
+                return -1;
             }
+            return -1;
         }
-        mailbox_index++;
     }
 
     if (mutex_trylock(&_mcp_mutex)) {
@@ -508,7 +518,7 @@ static int _set_filter(candev_t *dev, const struct can_filter *filter)
         mutex_unlock(&_mcp_mutex);
     }
     else {
-        DEBUG("setfilt3_Failed to lock mutex");
+        DEBUG("setfilt5_Failed to lock mutex");
         return -1;
     }
 
