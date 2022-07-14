@@ -99,6 +99,8 @@ Parameter                               | Short Description                     
 [I2C1_SDA](#esp32_i2c_interfaces)       | GPIO used as SCL for I2C_DEV(1)                                   | o
 [PWM0_GPIOS](#esp32_pwm_channels)       | GPIOs that can be used at channels of PWM_DEV(0)                  | o
 [PWM1_GPIOS](#esp32_pwm_channels)       | GPIOs that can be used at channels of PWM_DEV(1)                  | o
+[PWM3_GPIOS](#esp32_pwm_channels)       | GPIOs that can be used at channels of PWM_DEV(2)                  | o
+[PWM4_GPIOS](#esp32_pwm_channels)       | GPIOs that can be used at channels of PWM_DEV(3)                  | o
 [SPI0_CTRL](#esp32_spi_interfaces)      | SPI Controller used for SPI_DEV(0), can be `VSPI` `HSPI`          | o
 [SPI0_SCK](#esp32_spi_interfaces)       | GPIO used as SCK for SPI_DEV(0)                                   | o
 [SPI0_MOSI](#esp32_spi_interfaces)      | GPIO used as MOSI for SPI_DEV(0)                                  | o
@@ -184,8 +186,8 @@ The key features of ESP32 are:
 | Ethernet          | MAC interface with dedicated DMA and IEEE 1588 support            | yes |
 | CAN               | version 2.0                                                       | yes |
 | IR                | up to 8 channels TX/RX                                            | no |
-| Motor PWM         | 2 devices x 6 channels                                            | yes |
-| LED PWM           | 16 channels                                                       | no |
+| Motor PWM         | 2 devices x 6 channels                                            | no |
+| LED PWM           | 16 channels                                                       | yes |
 | Crypto            | Hardware acceleration of AES, SHA-2, RSA, ECC, RNG                | no |
 | Vcc               | 2.5 - 3.6 V                                                       | |
 | Documents         | [Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf) <br> [Technical Reference](https://www.espressif.com/sites/default/files/documentation/esp32_technical_reference_manual_en.pdf) | |
@@ -809,6 +811,62 @@ waiting.
 ## PWM Channels {#esp32_pwm_channels}
 
 ESP supports two types of PWM generators
+
+The implementation of the PWM peripheral driver uses the LED PWM Controller
+(LEDC) module of the ESP32x SoC. This LEDC module has one or two channel
+groups with 6 or 8 channels each. The channels of each channel group can
+use one of 4 timers as clock source. Thus, it is possible to define at
+4 or 8 virtual PWM devices in RIOT with different frequencies and
+resolutions. Regardless of whether the LEDC module of the ESP32x SoC has
+one or two channel groups, the PWM driver implementation allows to organize
+the available channels into up to 4 virtual PWM devices.
+
+The assignment of the available channels to the virtual PWM devices is
+done in the board-specific peripheral configuration by defining the
+macros `PWM0_GPIOS`, `PWM1_GPIOS`, `PWM2_GPIOS` and `PWM3_GPIOS` These
+macros specify the GPIOs that are used as channels for the available
+virtual PWM devices PWM_DEV(0) ... PWM_DEV(3) in RIOT. The mapping of
+these channels to the available channel groups and channel group timers
+is done by the driver automatically as follows:
+
+<center>
+Macro        | 1 Channel Group       | 2 Channel Groups       | Timer
+-------------|-----------------------|------------------------|---------------
+`PWM0_GPIOS` | `LEDC_LOW_SPEED_MODE` | `LEDC_LOW_SPEED_MODE`  | `LEDC_TIMER_0`
+`PWM1_GPIOS` | `LEDC_LOW_SPEED_MODE` | `LEDC_HIGH_SPEED_MODE` | `LEDC_TIMER_1`
+`PWM2_GPIOS` | `LEDC_LOW_SPEED_MODE` | `LEDC_LOW_SPEED_MODE`  | `LEDC_TIMER_2`
+`PWM3_GPIOS` | `LEDC_LOW_SPEED_MODE` | `LEDC_HIGH_SPEED_MODE` | `LEDC_TIMER_3`
+
+</center>
+For example, if the LEDC module of the ESP32x SoC has two channel groups,
+two virtual PWM devices with 2 x 6/8 channels could be used by defining
+'PWM0_GPIOS' and 'PWM1_GPIOS' with up to 6 or 8 GPIOs each.
+
+Example:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+#define PWM0_GPIOS { GPIO0, GPIO2, GPIO4, GPIO16, GPIO17 }
+#define PWM1_GPIOS { GPIO27, GPIO32, GPIO33 }
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This configuration can be changed by
+[application specific configurations](#esp32_application_specific_configurations).
+
+@note
+- The total number of channels defined for a channel group must not exceed
+  #PWM_CH_NUMOF_MAX.
+- The definition of `PWM0_GPIOS`, `PWM1_GPIOS`, `PWM2_GPIOS` and
+  `PWM3_GPIOS` can be omitted. In this case the existing macros should
+  be defined in ascending order, as the first defined macro is assigned
+  to PWM_DEV(0), the second defined macro is assigned to PWM_DEV(1)
+  and so on. So the minimal configuration would define all channels by
+  `PWM0_GPIOS` as PWM_DEV(0).
+- #PWM_NUMOF is determined automatically.
+- The order of the GPIOs in these macros determines the mapping between
+  RIOT's PWM channels and the GPIOs.
+- As long as the GPIOs listed in `PWM0_GPIOS`, `PWM1_GPIOS`,
+  `PWM2_GPIOS` and `PWM3_GPIOS` are not initialized as PWM channels with
+  the #pwm_init function, they can be used for other purposes.
+
 
 - one LED PWM controller (LEDPWM) with 16 channels, and
 - two high-speed Motor Control PWM controllers (MCPWM) with 6 channels each.
