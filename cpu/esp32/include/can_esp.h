@@ -74,19 +74,9 @@ typedef struct can {
     uint32_t rx_frames_num;     /**< number of frames in ring buffer  */
     uint32_t rx_filter_num;     /**< number of acceptance filters     */
 
-    bool   powered_up;          /**< device is powered up    */
-
-    gpio_t tx_pin;              /**< CAN transceiver TX pin */
-    gpio_t rx_pin;              /**< CAN transceiver RX pin */
-#ifdef ESP_CAN_CLK_OUT
-    gpio_t clk_out_pin;         /**< optional CLK_OUT pin    */
-#endif
-#ifdef ESP_CAN_BUS_ON_OFF
-    gpio_t bus_on_off_pin;      /**< optional BUS_ON_OFF pin */
-#endif
+    bool   powered_up;          /**< device is powered up */
 
     uint32_t events;            /**< events triggered by the last interrupt */
-
 } can_t;
 
 /** CAN device type can_t is redefined by ESP CAN */
@@ -99,10 +89,10 @@ typedef struct {
     uint32_t bitrate;           /**< Bitrate */
     gpio_t tx_pin;              /**< CAN transceiver TX pin */
     gpio_t rx_pin;              /**< CAN transceiver RX pin */
-#ifdef ESP_CAN_CLK_OUT
+#ifdef CAN_CLK_OUT
     gpio_t clk_out_pin;         /**< optional CLK_OUT pin    */
 #endif
-#ifdef ESP_CAN_BUS_ON_OFF
+#ifdef CAN_BUS_ON_OFF
     gpio_t bus_on_off_pin;      /**< optional BUS_ON_OFF pin */
 #endif
 } can_conf_t;
