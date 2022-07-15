@@ -1,6 +1,6 @@
 PKG_NAME=lvgl
 PKG_URL=https://github.com/littlevgl/lvgl
-PKG_VERSION=0b5a1d4b23975b920ff841ea9cd038802f51711b  # v8.2.0
+PKG_VERSION=49c59f4615857759cc8caf88424324ab6386c888  # v8.3.0
 PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
