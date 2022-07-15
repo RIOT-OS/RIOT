@@ -101,7 +101,7 @@ typedef unsigned int gpio_t;
  * @brief   Define CPU specific number of GPIO pins
  * @{
  */
-#define GPIO_PIN_NUMOF      (40)
+#define GPIO_PIN_NUMOF      (SOC_GPIO_PIN_COUNT)
 /** @} */
 
 #ifndef DOXYGEN
@@ -112,14 +112,13 @@ typedef unsigned int gpio_t;
  */
 #define HAVE_GPIO_FLANK_T
 typedef enum {
-    GPIO_NONE    = 0,
-    GPIO_RISING  = 1,        /**< emit interrupt on rising flank  */
-    GPIO_FALLING = 2,        /**< emit interrupt on falling flank */
-    GPIO_BOTH    = 3,        /**< emit interrupt on both flanks   */
-    GPIO_LOW     = 4,        /**< emit interrupt on low level     */
-    GPIO_HIGH    = 5         /**< emit interrupt on low level     */
+    GPIO_NONE,
+    GPIO_RISING,    /**< emit interrupt on rising flank  */
+    GPIO_FALLING,   /**< emit interrupt on falling flank */
+    GPIO_BOTH,      /**< emit interrupt on both flanks */
+    GPIO_LOW,       /**< emit interrupt on low level */
+    GPIO_HIGH       /**< emit interrupt on low level */
 } gpio_flank_t;
-
 /** @} */
 
 /**
@@ -137,9 +136,10 @@ typedef enum {
     GPIO_OD_PU,     /**< open-drain output with pull-up */
     GPIO_IN_OUT,    /**< input and output */
     GPIO_IN_OD,     /**< input and open-drain output */
-    GPIO_IN_OD_PU   /**< input and open-drain output */
+    GPIO_IN_OD_PU   /**< input and open-drain output with pull-up */
 } gpio_mode_t;
 /** @} */
+
 #endif /* ndef DOXYGEN */
 /** @} */
 
