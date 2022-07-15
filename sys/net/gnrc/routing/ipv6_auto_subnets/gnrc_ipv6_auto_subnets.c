@@ -128,6 +128,9 @@
 #define CONFIG_GNRC_IPV6_AUTO_SUBNETS_NUMOF         (1)
 #endif
 
+/* Code below should not be included by Doxygen */
+#ifndef DOXYGEN
+
 #define SERVER_THREAD_STACKSIZE                     (THREAD_STACKSIZE_DEFAULT)
 #define SERVER_MSG_QUEUE_SIZE                       (CONFIG_GNRC_IPV6_AUTO_SUBNETS_PEERS_MAX)
 #define SERVER_MSG_TYPE_TIMEOUT                     (0x8fae)
@@ -645,4 +648,5 @@ void gnrc_ipv6_auto_subnets_init(void)
                                 _eventloop, NULL, "auto_subnets");
 }
 #endif /* !IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE) */
+#endif /* !DOXYGEN */
 /** @} */
