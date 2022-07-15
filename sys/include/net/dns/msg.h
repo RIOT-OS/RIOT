@@ -104,13 +104,14 @@ size_t dns_msg_compose_query(void *dns_buf, const char *domain_name,
  * @param[in] family        The address family used to compose the query for
  *                          this response (see @ref dns_msg_compose_query())
  * @param[out] addr_out     The IP address returned by the response.
+ * @param[out] ttl          The live time of the entry in seconds
  *
  * @return  Length of the @p addr_out on success.
  * @return  -EBADMSG, when an address corresponding to @p family can not be found
  *          in @p buf.
  */
 int dns_msg_parse_reply(const uint8_t *buf, size_t len, int family,
-                        void *addr_out);
+                        void *addr_out, uint32_t *ttl);
 
 #ifdef __cplusplus
 }

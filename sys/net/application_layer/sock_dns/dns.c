@@ -25,6 +25,7 @@
 #include "net/dns/msg.h"
 #include "net/sock/udp.h"
 #include "net/sock/dns.h"
+#include "dns_cache.h"
 
 /* min domain name length is 1, so minimum record length is 7 */
 #define DNS_MIN_REPLY_LEN   (unsigned)(sizeof(dns_hdr_t) + 7)
@@ -67,6 +68,8 @@ void auto_init_sock_dns(void)
 
 int sock_dns_query(const char *domain_name, void *addr_out, int family)
 {
+    ssize_t res;
+    sock_udp_t sock_dns;
     static uint8_t dns_buf[CONFIG_DNS_MSG_LEN];
 
     if (sock_dns_server.port == 0) {
@@ -77,9 +80,12 @@ int sock_dns_query(const char *domain_name, void *addr_out, int family)
         return -ENOSPC;
     }
 
-    sock_udp_t sock_dns;
+    res = sock_dns_cache_query(domain_name, addr_out, family);
+    if (res) {
+        return res;
+    }
 
-    ssize_t res = sock_udp_create(&sock_dns, NULL, &sock_dns_server, 0);
+    res = sock_udp_create(&sock_dns, NULL, &sock_dns_server, 0);
     if (res) {
         goto out;
     }
@@ -95,8 +101,10 @@ int sock_dns_query(const char *domain_name, void *addr_out, int family)
         res = sock_udp_recv(&sock_dns, dns_buf, sizeof(dns_buf), 1000000LU, NULL);
         if (res > 0) {
             if (res > (int)DNS_MIN_REPLY_LEN) {
+                uint32_t ttl;
                 if ((res = dns_msg_parse_reply(dns_buf, res, family,
-                                               addr_out)) > 0) {
+                                               addr_out, &ttl)) > 0) {
+                    sock_dns_cache_add(domain_name, addr_out, res, ttl);
                     goto out;
                 }
             }
