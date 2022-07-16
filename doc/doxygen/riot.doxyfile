@@ -776,7 +776,8 @@ INPUT                  = ../../doc.txt \
                          src/release-cycle.md \
                          src/changelog.md \
                          ../../LOSTANDFOUND.md \
-                         ../../makefiles/pseudomodules.inc.mk
+                         ../../makefiles/pseudomodules.inc.mk \
+                         ../../sys/net/gnrc/routing/ipv6_auto_subnets/gnrc_ipv6_auto_subnets.c
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

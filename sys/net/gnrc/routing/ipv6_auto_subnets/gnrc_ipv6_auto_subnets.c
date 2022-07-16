@@ -17,9 +17,9 @@
  * This module provides an automatic configuration for networks with a (simple)
  * tree topology.
  *
- * If a sufficiently large IPv6 prefix (> /64) is provided via Router Advertisements,
- * a routing node with this module will automatically configure subnets from it
- * by dividing it into sub-prefixes for each downstream interface.
+ * If a sufficiently large IPv6 subnet (prefix length < /64) is provided via Router
+ * Advertisements, a routing node with this module will automatically configure
+ * subnets from it by dividing it into sub-prefixes for each downstream interface.
  *
  * When using the `gnrc_ipv6_auto_subnets_simple` module, there can only be a single
  * routing node on each level of the network but an arbitrary number of leaf nodes.
@@ -44,10 +44,10 @@
  *
  * The new subnet must no longer be considered on-link by the hosts in the
  * parent network.
- * Therefore the downstream router will send a router advertisement with only
- * a Route Information Option included to the upstream network.
+ * Therefore the downstream router will send a router advertisement, which only
+ * contains a Route Information Option, to the upstream network.
  * The Route Information Option contains the prefix of the downstream network
- * so that upstream routers will no longer consider hosts in this subnet on-link
+ * so that upstream routers will no longer consider hosts in this subnet on-link,
  * but instead will use the downstream router to route to the new subnet.
  *
  * Usage
@@ -127,6 +127,9 @@
 #ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_NUMOF
 #define CONFIG_GNRC_IPV6_AUTO_SUBNETS_NUMOF         (1)
 #endif
+
+/* Code below should not be included by Doxygen */
+#ifndef DOXYGEN
 
 #define SERVER_THREAD_STACKSIZE                     (THREAD_STACKSIZE_DEFAULT)
 #define SERVER_MSG_QUEUE_SIZE                       (CONFIG_GNRC_IPV6_AUTO_SUBNETS_PEERS_MAX)
@@ -645,4 +648,5 @@ void gnrc_ipv6_auto_subnets_init(void)
                                 _eventloop, NULL, "auto_subnets");
 }
 #endif /* !IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE) */
+#endif /* !DOXYGEN */
 /** @} */
