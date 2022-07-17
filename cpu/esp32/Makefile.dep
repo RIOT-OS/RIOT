@@ -60,16 +60,17 @@ ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
   USEMODULE += mtd
 endif
 
+ifneq (,$(filter esp_idf_wifi,$(USEMODULE)))
+  # add additional modules required by esp_idf_wifi
+  USEMODULE += esp_idf_adc
+endif
+
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
-    FEATURES_OPTIONAL += esp_rtc_timer_32k
+  FEATURES_OPTIONAL += esp_rtc_timer_32k
 endif
 
 ifneq (,$(filter esp_rtc_timer_32k,$(FEATURES_USED)))
-    USEMODULE += esp_rtc_timer_32k
-endif
-
-ifneq (,$(filter periph_adc periph_dac,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_adc_ctrl
+  USEMODULE += esp_rtc_timer_32k
 endif
 
 ifneq (,$(filter periph_gpio,$(USEMODULE)))
@@ -111,6 +112,10 @@ endif
 
 ifneq (,$(filter mtd,$(USEMODULE)))
   USEMODULE += esp_idf_spi_flash
+endif
+
+ifneq (,$(filter periph_adc,$(USEMODULE)))
+  USEMODULE += esp_idf_adc
 endif
 
 ifneq (,$(filter periph_rtc,$(USEMODULE)))

@@ -704,15 +704,15 @@ Attenuation     | Voltage Range     | Symbol
 </center><br>
 
 @note The reference voltage Vref can vary from device to device in the range of 1.0V and 1.2V. The
-      Vref of a device can be read with the `#adc_vref_to_gpio25` function at GPIO 25.<br>
+      Vref of a device can be read with the `#adc_line_vref_to_gpio` function at GPIO 25.<br>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
-extern int adc_vref_to_gpio25 (void);
+extern int adc_line_vref_to_gpio(adc_t line, gpio_t gpio);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For that purpose GPIO25 is initialized automatically as ADC channel and is connected internally to
 Vref to measure the current voltage. Once the initialization is finished and the function returns
 with success, the current voltage can be read from GPIO25. The results of the ADC input can then be
-adjusted accordingly. The `#adc_vref_to_gpio25` function can be used to determine the current
+adjusted accordingly. The `#adc_line_vref_to_gpio` function can be used to determine the current
 voltage at ESP32.
 
 [Back to table of contents](#esp32_toc)

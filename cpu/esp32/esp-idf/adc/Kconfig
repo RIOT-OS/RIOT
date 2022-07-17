@@ -5,12 +5,12 @@
 # directory for more details.
 #
 
-config MODULE_ESP_IDF_WIFI
+config MODULE_ESP_IDF_ADC
     bool
     depends on TEST_KCONFIG
     depends on MODULE_ESP_IDF
 
-    select MODULE_ESP_IDF_ADC
+    default y if MODULE_PERIPH_ADC
 
     help
-        ESP-IDF code required for accessing the WiFi interface.
+        ESP-IDF code for ADC peripherals.
