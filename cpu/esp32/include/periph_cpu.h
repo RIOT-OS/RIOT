@@ -118,7 +118,7 @@ typedef enum {
     GPIO_FALLING,   /**< emit interrupt on falling flank */
     GPIO_BOTH,      /**< emit interrupt on both flanks */
     GPIO_LOW,       /**< emit interrupt on low level */
-    GPIO_HIGH       /**< emit interrupt on low level */
+    GPIO_HIGH       /**< emit interrupt on high level */
 } gpio_flank_t;
 /** @} */
 
