@@ -101,21 +101,74 @@ static bool _gpio_pin_pu[GPIO_PIN_NUMOF] = { };
 static bool _gpio_pin_pd[GPIO_PIN_NUMOF] = { };
 #endif
 
-#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
+#if SOC_GPIO_PIN_COUNT > 32
 
-#define GPIO_IN_GET(b)  (b < 32) ? GPIO.in & BIT(b) : GPIO.in1.val & BIT(b-32)
-#define GPIO_OUT_SET(b) if (b < 32) { GPIO.out_w1ts = BIT(b); } else { GPIO.out1_w1ts.val = BIT(b-32); }
-#define GPIO_OUT_CLR(b) if (b < 32) { GPIO.out_w1tc = BIT(b); } else { GPIO.out1_w1tc.val = BIT(b-32); }
-#define GPIO_OUT_XOR(b) if (b < 32) { GPIO.out ^=  BIT(b); } else { GPIO.out1.val ^=  BIT(b-32); }
-#define GPIO_OUT_GET(b) (b < 32) ? (GPIO.out >> b) & 1 : (GPIO.out1.val >> (b-32)) & 1
+static inline int _gpio_reg_in_get(gpio_t pin)
+{
+    return (pin < 32) ? (GPIO.in >> pin) & 1 : (GPIO.in1.val >> (pin - 32)) & 1;
+}
 
-#elif defined(CPU_FAM_ESP32C3)
+static inline int _gpio_reg_out_get(gpio_t pin)
+{
+    return (pin < 32) ? (GPIO.out >> pin) & 1 : (GPIO.out1.val >> (pin - 32)) & 1;
+}
 
-#define GPIO_IN_GET(b)  GPIO.in.val & BIT(b)
-#define GPIO_OUT_SET(b) GPIO.out_w1ts.val = BIT(b)
-#define GPIO_OUT_CLR(b) GPIO.out_w1tc.val = BIT(b)
-#define GPIO_OUT_XOR(b) GPIO.out.val ^=  BIT(b)
-#define GPIO_OUT_GET(b) (GPIO.out.val >> b) & 1
+static inline void _gpio_reg_out_set(gpio_t pin)
+{
+    if (pin < 32) {
+        GPIO.out_w1ts = BIT(pin);
+    }
+    else {
+        GPIO.out1_w1ts.val = BIT(pin - 32);
+    }
+}
+
+static inline void _gpio_reg_out_clr(gpio_t pin)
+{
+    if (pin < 32) {
+        GPIO.out_w1tc = BIT(pin);
+    }
+    else {
+        GPIO.out1_w1tc.val = BIT(pin - 32);
+    }
+}
+
+static inline void _gpio_reg_out_xor(gpio_t pin)
+{
+    if (pin < 32) {
+        GPIO.out ^=  BIT(pin);
+    }
+    else {
+        GPIO.out1.val ^=  BIT(pin - 32);
+    }
+}
+
+#elif SOC_GPIO_PIN_COUNT < 32
+
+static inline int _gpio_reg_in_get(gpio_t pin)
+{
+    return (GPIO.in.val >> pin) & 1;
+}
+
+static inline int _gpio_reg_out_get(gpio_t pin)
+{
+    return (GPIO.out.val >> pin) & 1;
+}
+
+static inline void _gpio_reg_out_set(gpio_t pin)
+{
+    GPIO.out_w1ts.val = BIT(pin);
+}
+
+static inline void _gpio_reg_out_clr(gpio_t pin)
+{
+    GPIO.out_w1tc.val = BIT(pin);
+}
+
+static inline void _gpio_reg_out_xor(gpio_t pin)
+{
+    GPIO.out.val ^=  BIT(pin);
+}
 
 #else
 #error "Platform implementation is missing"
@@ -349,11 +402,11 @@ int gpio_read(gpio_t pin)
 
     if (REG_GET_BIT(_gpio_to_iomux_reg[pin], FUN_IE)) {
         /* in case the pin is any kind of input, read from input register */
-        value = (GPIO_IN_GET(pin)) ? 1 : 0;
+        value = _gpio_reg_in_get(pin);
     }
     else {
         /* otherwise read the last value written to the output register */
-        value = GPIO_OUT_GET(pin);
+        value = _gpio_reg_out_get(pin);
     }
     DEBUG("%s gpio=%u val=%d\n", __func__, pin, value);
     return value;
@@ -364,10 +417,10 @@ void gpio_write(gpio_t pin, int value)
     DEBUG("%s gpio=%u val=%d\n", __func__, pin, value);
     assert(pin < GPIO_PIN_NUMOF);
     if (value) {
-        GPIO_OUT_SET(pin);
+        _gpio_reg_out_set(pin);
     }
     else {
-        GPIO_OUT_CLR(pin);
+        _gpio_reg_out_clr(pin);
     }
 }
 
@@ -375,14 +428,14 @@ void gpio_set(gpio_t pin)
 {
     DEBUG("%s gpio=%u\n", __func__, pin);
     assert(pin < GPIO_PIN_NUMOF);
-    GPIO_OUT_SET(pin);
+    _gpio_reg_out_set(pin);
 }
 
 void gpio_clear(gpio_t pin)
 {
     DEBUG("%s gpio=%u\n", __func__, pin);
     assert(pin < GPIO_PIN_NUMOF);
-    GPIO_OUT_CLR(pin);
+    _gpio_reg_out_clr(pin);
 
 }
 
@@ -390,7 +443,7 @@ void gpio_toggle(gpio_t pin)
 {
     DEBUG("%s gpio=%u\n", __func__, pin);
     assert(pin < GPIO_PIN_NUMOF);
-    GPIO_OUT_XOR(pin);
+    _gpio_reg_out_xor(pin);
 }
 
 #endif /* IS_USED(MODULE_ESP_IDF_GPIO_HAL) */
