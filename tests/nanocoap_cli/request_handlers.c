@@ -32,7 +32,7 @@
 /* internal value that can be read/written via CoAP */
 static uint8_t internal_value = 0;
 
-static ssize_t _value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
 {
     (void) context;
 

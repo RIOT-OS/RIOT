@@ -239,7 +239,7 @@ static int _unittests(int argc, char **argv)
     return 0;
 }
 
-static ssize_t _mock_dns_server(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx)
+static ssize_t _mock_dns_server(coap_pkt_t *pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx)
 {
     (void)ctx;
     if ((_resp_code >> 5) == COAP_CLASS_SUCCESS) {

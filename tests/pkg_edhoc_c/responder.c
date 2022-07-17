@@ -58,7 +58,7 @@ static wc_Sha256 _sha_r;
 struct tc_sha256_state_struct _sha_r;
 #endif
 
-ssize_t _edhoc_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+ssize_t _edhoc_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
 {
     (void)context;
     ssize_t msg_len = 0;

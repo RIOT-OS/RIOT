@@ -50,7 +50,7 @@ static void _on_ep_event(cord_ep_standalone_event_t event)
 
 /* define some dummy CoAP resources */
 static ssize_t _handler_dummy(coap_pkt_t *pdu,
-                              uint8_t *buf, size_t len, void *ctx)
+                              uint8_t *buf, size_t len, coap_request_ctx_t *ctx)
 {
     (void)ctx;
 
@@ -64,7 +64,7 @@ static ssize_t _handler_dummy(coap_pkt_t *pdu,
 }
 
 static ssize_t _handler_info(coap_pkt_t *pdu,
-                             uint8_t *buf, size_t len, void *ctx)
+                             uint8_t *buf, size_t len, coap_request_ctx_t *ctx)
 {
     (void)ctx;
 

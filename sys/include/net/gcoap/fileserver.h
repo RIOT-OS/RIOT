@@ -36,26 +36,24 @@
  *
  * * ``USEMODULE += gcoap_fileserver``
  *
- * * Have a @ref gcoap_fileserver_entry_t populated with the path you want to serve,
- *   and the number of path components to strip from incoming requests:
- *
- *   ```
- *   static const gcoap_fileserver_entry_t files_sd = {
- *       .root = "/sd0",
- *       .resource = "/files/sd"
- *   };
- *   ```
- *
  * * Enter a @ref gcoap_fileserver_handler handler into your CoAP server's
  *   resource list like this:
  *
  *   ```
  *   static const coap_resource_t _resources[] = {
  *       ...
- *       { "/files/sd", COAP_GET | COAP_MATCH_SUBTREE, gcoap_fileserver_handler, (void*)&files_sd },
+ *       {
+ *          .path = "/files/sd",
+ *          .methods = COAP_GET | COAP_MATCH_SUBTREE,
+ *          .handler = gcoap_fileserver_handler,
+ *          .context = "/sd0"
+ *       },
  *       ...
  *   }
  *   ```
+ *
+ *   The path argument specifies under which path the folder is served via CoAP while
+ *   the context argument contains the path on the local filesystem that will be served.
  *
  *   The allowed methods dictate whether it's read-only (``COAP_GET``) or (in the
  *   future<!-- WRITESUPPORT -->) read-write (``COAP_GET | COAP_PUT | COAP_DELETE``).
@@ -78,26 +76,6 @@ extern "C" {
 #include "net/nanocoap.h"
 
 /**
- * @brief File server starting point
- *
- * This struct needs to be present at the ctx of a gcoap_fileserver_handler entry
- * in a resource list.
- *
- */
-typedef struct {
-    /**
-     * @brief Path in the VFS that should be served.
-     *
-     * This does not need a trailing slash.
-     */
-    const char *root;
-    /**
-     * @brief The associated CoAP resource path
-     */
-    const char *resource;
-} gcoap_fileserver_entry_t;
-
-/**
  * @brief File server handler
  *
  * Serve a directory from the VFS as a CoAP resource tree.
@@ -106,12 +84,12 @@ typedef struct {
  * @param[in] pdu   CoAP request package
  * @param[out] buf  Buffer for the response
  * @param[in] len   Response buffer length
- * @param[in] ctx   pointer to a @ref gcoap_fileserver_entry_t
+ * @param[in] ctx   pointer to a @ref coap_request_ctx_t
  *
  * @return size of the response on success
  *         negative error
  */
-ssize_t gcoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx);
+ssize_t gcoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
 
 #ifdef __cplusplus
 }
