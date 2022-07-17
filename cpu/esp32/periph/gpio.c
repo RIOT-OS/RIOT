@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       Low-level GPIO driver implementation for ESP32
+ * @brief       GPIO driver implementation for ESP32
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @}
@@ -77,7 +77,7 @@
 #define GPIO_PRO_CPU_INTR_ENA       (BIT(2))
 
 /* architecture specific tables */
-extern gpio_pin_usage_t _gpio_pin_usage [GPIO_PIN_NUMOF];
+extern gpio_pin_usage_t _gpio_pin_usage[GPIO_PIN_NUMOF];
 
 _Static_assert(ARRAY_SIZE(_gpio_pin_usage) == SOC_GPIO_PIN_COUNT,
                "size of _gpio_pin_usage does not match SOC_GPIO_PIN_COUNT");
