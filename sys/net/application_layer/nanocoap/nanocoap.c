@@ -1246,3 +1246,13 @@ void *coap_request_ctx_get_context(const coap_request_ctx_t *ctx)
 {
     return ctx->context;
 }
+
+uint32_t coap_request_ctx_get_tl_type(const coap_request_ctx_t *ctx)
+{
+#ifdef MODULE_GCOAP
+    return ctx->tl_type;
+#else
+    (void)ctx;
+    return 0;
+#endif
+}

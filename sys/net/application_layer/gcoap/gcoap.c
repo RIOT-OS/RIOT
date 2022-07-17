@@ -684,13 +684,12 @@ static size_t _handle_req(gcoap_socket_t *sock, coap_pkt_t *pdu, uint8_t *buf,
         return -1;
     }
 
-    pdu->tl_type = (uint32_t)sock->type;
-
     ssize_t pdu_len;
     char *offset;
 
     coap_request_ctx_t ctx = {
         .resource = resource,
+        .tl_type = (uint32_t)sock->type,
     };
 
     if (coap_get_proxy_uri(pdu, &offset) > 0) {
@@ -899,7 +898,7 @@ static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t le
 
     plen += gcoap_get_resource_list_tl(pdu->payload, (size_t)pdu->payload_len,
                                        COAP_FORMAT_LINK,
-                                       (gcoap_socket_type_t)pdu->tl_type);
+                                       (gcoap_socket_type_t)coap_request_ctx_get_tl_type(ctx));
     return plen;
 }
 
