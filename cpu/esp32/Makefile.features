@@ -1,5 +1,3 @@
-CPU_FAM = esp32
-
 # MCU defined features that are provided independent on board definitions
 
 include $(RIOTCPU)/esp_common/Makefile.features
