@@ -62,7 +62,7 @@ typedef struct {
  * Table for resolution mapping
  */
 _adc_esp_res_map_t _adc_esp_res_map[] =  {
-#if defined(MCU_ESP32)
+#if defined(CPU_FAM_ESP32)
     { .res = ADC_WIDTH_BIT_9,  .shift = 3 },    /* ADC_RES_6BIT  */
     { .res = ADC_WIDTH_BIT_9,  .shift = 1 },    /* ADC_RES_8BIT  */
     { .res = ADC_WIDTH_BIT_10, .shift = 0 },    /* ADC_RES_10BIT */

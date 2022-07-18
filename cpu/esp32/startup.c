@@ -220,7 +220,7 @@ static NORETURN void IRAM system_init (void)
 {
     static_assert(MAXTHREADS >= 3,
             "ESP32 requires at least 3 threads, esp_timer, idle, and main");
-#if defined(MCU_ESP32)
+#if defined(CPU_FAM_ESP32)
     /* enable cached read from flash */
     Cache_Read_Enable(PRO_CPU_NUM);
 #endif

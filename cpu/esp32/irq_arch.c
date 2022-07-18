@@ -47,36 +47,36 @@ static const struct intr_handle_data_t _irq_data_table[] = {
     { ETS_FROM_CPU_INTR0_SOURCE, CPU_INUM_SOFTWARE, 1 },
     { ETS_TG0_WDT_LEVEL_INTR_SOURCE, CPU_INUM_WDT, 1 },
     { ETS_TG0_T0_LEVEL_INTR_SOURCE, CPU_INUM_RTT, 1 },
-#if defined(MCU_ESP32) || defined(MCU_ESP32S2) || defined(MCU_ESP32S3)
+#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
     { ETS_TG0_T1_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
 #endif
-#if defined(MCU_ESP32) || defined(MCU_ESP32S2)
+#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2)
     { ETS_TG0_LACT_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
 #endif
-#if !defined(MCU_ESP32C2)
+#if !defined(CPU_FAM_ESP32C2)
     { ETS_TG1_T0_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
 #endif
-#if defined(MCU_ESP32) || defined(MCU_ESP32S2) || defined(MCU_ESP32S3)
+#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
     { ETS_TG1_T1_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
 #endif
     { ETS_UART0_INTR_SOURCE, CPU_INUM_UART, 1 },
     { ETS_UART1_INTR_SOURCE, CPU_INUM_UART, 1 },
-#if defined(MCU_ESP32) || defined(MCU_ESP32S2) || defined(MCU_ESP32S3)
+#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
     { ETS_UART2_INTR_SOURCE, CPU_INUM_UART, 1 },
 #endif
     { ETS_GPIO_INTR_SOURCE, CPU_INUM_GPIO, 1 },
     { ETS_I2C_EXT0_INTR_SOURCE, CPU_INUM_I2C, 1 },
-#if defined(MCU_ESP32) || defined(MCU_ESP32S2) || defined(MCU_ESP32S3)
+#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
     { ETS_I2C_EXT1_INTR_SOURCE, CPU_INUM_I2C, 1 },
 #endif
-#if defined(MCU_ESP32)
+#if defined(CPU_FAM_ESP32)
     { ETS_ETH_MAC_INTR_SOURCE, CPU_INUM_ETH, 1 },
 #endif
-#if !defined(MCU_ESP32C2)
+#if !defined(CPU_FAM_ESP32C2)
     { ETS_TWAI_INTR_SOURCE, CPU_INUM_CAN, 1 },
     { ETS_TIMER2_INTR_SOURCE, CPU_INUM_FRC2, 2 },
 #endif
-#if !defined(MCU_ESP32)
+#if !defined(CPU_FAM_ESP32)
     { ETS_SYSTIMER_TARGET2_EDGE_INTR_SOURCE, CPU_INUM_SYSTIMER, 2 },
 #endif
 };
