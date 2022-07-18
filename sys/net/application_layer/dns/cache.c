@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup net_sock_dns
+ * @ingroup     net_dns_cache
  * @{
  * @file
  * @brief   DNS cache implementation
@@ -17,9 +17,11 @@
 
 #include "bitfield.h"
 #include "checksum/fletcher32.h"
-#include "net/sock/dns.h"
 #include "time_units.h"
-#include "dns_cache.h"
+#include "net/af.h"
+#include "net/dns/cache.h"
+#include "net/ipv4/addr.h"
+#include "net/ipv6/addr.h"
 #include "ztimer.h"
 
 #define ENABLE_DEBUG 0
@@ -29,29 +31,29 @@ static struct dns_cache_entry {
     uint32_t hash;
     uint32_t expires;
     union {
-#if IS_ACTIVE(SOCK_HAS_IPV4)
+#if IS_ACTIVE(CONFIG_DNS_CACHE_A)
         ipv4_addr_t v4;
 #endif
-#if IS_ACTIVE(SOCK_HAS_IPV6)
+#if IS_ACTIVE(CONFIG_DNS_CACHE_AAAA)
         ipv6_addr_t v6;
 #endif
     } addr;
 } cache[CONFIG_DNS_CACHE_SIZE];
 
-#if IS_ACTIVE(SOCK_HAS_IPV4) && IS_ACTIVE(SOCK_HAS_IPV6)
+#if IS_ACTIVE(CONFIG_DNS_CACHE_A) && IS_ACTIVE(CONFIG_DNS_CACHE_AAAA)
 BITFIELD(cache_is_v6, CONFIG_DNS_CACHE_SIZE);
 
 static inline uint8_t _get_len(unsigned idx)
 {
     return bf_isset(cache_is_v6, idx) ? 16 : 4;
 }
-#elif IS_ACTIVE(SOCK_HAS_IPV4)
+#elif IS_ACTIVE(CONFIG_DNS_CACHE_A)
 static inline uint8_t _get_len(unsigned idx)
 {
     (void)idx;
     return 4;
 }
-#elif IS_ACTIVE(SOCK_HAS_IPV6)
+#elif IS_ACTIVE(CONFIG_DNS_CACHE_AAAA)
 static inline uint8_t _get_len(unsigned idx)
 {
     (void)idx;
@@ -61,7 +63,7 @@ static inline uint8_t _get_len(unsigned idx)
 
 static void _set_len(unsigned idx, uint8_t len)
 {
-#if IS_ACTIVE(SOCK_HAS_IPV4) && IS_ACTIVE(SOCK_HAS_IPV6)
+#if IS_ACTIVE(CONFIG_DNS_CACHE_A) && IS_ACTIVE(CONFIG_DNS_CACHE_AAAA)
     if (len == 16) {
         bf_set(cache_is_v6, idx);
     } else {
@@ -94,11 +96,11 @@ static void _set_empty(unsigned idx)
 static uint8_t _addr_len(int family)
 {
     switch (family) {
-#if IS_ACTIVE(SOCK_HAS_IPV4)
+#if IS_ACTIVE(CONFIG_DNS_CACHE_A)
     case AF_INET:
         return sizeof(ipv4_addr_t);
 #endif
-#if IS_ACTIVE(SOCK_HAS_IPV6)
+#if IS_ACTIVE(CONFIG_DNS_CACHE_AAAA)
    case AF_INET6:
         return sizeof(ipv6_addr_t);
 #endif
@@ -114,7 +116,7 @@ static uint32_t _hash(const void *data, size_t len)
     return fletcher32(data, (len + 1) / 2);
 }
 
-int sock_dns_cache_query(const char *domain_name, void *addr_out, int family)
+int dns_cache_query(const char *domain_name, void *addr_out, int family)
 {
     uint32_t now = ztimer_now(ZTIMER_MSEC) / MS_PER_SEC;
     uint32_t hash = _hash(domain_name, strlen(domain_name));
@@ -153,7 +155,7 @@ static void _add_entry(uint8_t i, uint32_t hash, const void *addr_out,
     _set_len(i, addr_len);
 }
 
-void sock_dns_cache_add(const char *domain_name, const void *addr_out,
+void dns_cache_add(const char *domain_name, const void *addr_out,
                         int addr_len, uint32_t ttl)
 {
     uint32_t now = ztimer_now(ZTIMER_MSEC) / MS_PER_SEC;

@@ -1,5 +1,5 @@
 SRC :=
 
-SUBMODULE := 1
+SUBMODULES := 1
 
 include $(RIOTBASE)/Makefile.base
