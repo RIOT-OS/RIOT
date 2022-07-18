@@ -26,7 +26,7 @@
 #endif
 #include "timex.h"
 
-#ifdef MCU_ESP32
+#ifdef CPU_FAM_ESP32
 #include "soc/soc.h"
 #endif
 

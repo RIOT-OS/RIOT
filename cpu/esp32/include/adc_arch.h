@@ -103,7 +103,7 @@ int adc_set_attenuation(adc_t line, adc_atten_t atten);
  */
 int adc_line_vref_to_gpio(adc_t line, gpio_t gpio);
 
-#if defined(MCU_ESP32)
+#if defined(CPU_FAM_ESP32)
 /**
  * @brief   Output ADC reference voltage to GPIO25
  *

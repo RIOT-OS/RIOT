@@ -76,7 +76,7 @@
  * timer implementation together!
  */
 
-#if defined(MCU_ESP32)
+#if defined(CPU_FAM_ESP32)
 
 #define HW_TIMER_CORRECTION   (RTC_PLL_320M / CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ)
 #define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION << 1, 5))
@@ -106,7 +106,7 @@ struct _hw_timer_desc_t {
 
 static const struct _hw_timer_desc_t _timers_desc[] =
 {
-#if defined(MCU_ESP32)
+#if defined(CPU_FAM_ESP32)
     {
         .module = PERIPH_TIMG0_MODULE,
         .group = TIMER_GROUP_0,

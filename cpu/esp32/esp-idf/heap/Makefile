@@ -8,7 +8,7 @@ ESP32_SDK_SRC = \
   components/heap/heap_trace_standalone.c \
   components/heap/multi_heap.c \
   components/heap/multi_heap_poisoning.c \
-  components/heap/port/$(CPU)/memory_layout.c \
+  components/heap/port/$(CPU_FAM)/memory_layout.c \
   components/heap/port/memory_layout_utils.c \
   #
 

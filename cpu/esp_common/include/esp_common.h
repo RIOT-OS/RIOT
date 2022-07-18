@@ -107,10 +107,10 @@ extern "C" {
   * @brief  function name mappings for source code compatibility with ESP8266 port
   * @{
   */
-#ifdef MCU_ESP32
+#ifdef CPU_FAM_ESP32
 #define system_get_cpu_freq     ets_get_cpu_frequency
 #define system_update_cpu_freq  ets_update_cpu_frequency
-#endif /* MCU_ESP32 */
+#endif /* CPU_FAM_ESP32 */
 /** @} */
 
 /** @} */

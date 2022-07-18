@@ -1,4 +1,9 @@
-CPU_FAM = esp32
+ifneq (,$(filter esp32,$(CPU_FAM)))
+  CPU_ARCH = xtensa
+  CPU_CORE = xtensa-lx6
+else
+  $(error Unkwnown ESP32x SoC variant (family))
+endif
 
 # MCU defined features that are provided independent on board definitions
 

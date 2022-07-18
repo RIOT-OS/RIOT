@@ -124,7 +124,7 @@ static struct uart_hw_t _uarts[] = {
 #endif /* !MCU_ESP8266 */
     },
 #endif /* defined(UART1_TXD) || !defined(MCU_ESP8266) */
-#if defined(MCU_ESP32)
+#if defined(CPU_FAM_ESP32)
     {
         .regs = &UART2,
         .used = false,
@@ -137,7 +137,7 @@ static struct uart_hw_t _uarts[] = {
         .signal_rxd = U2RXD_IN_IDX,
         .int_src = ETS_UART2_INTR_SOURCE
     },
-#endif /* defined(MCU_ESP32) */
+#endif /* defined(CPU_FAM_ESP32) */
 };
 
 /* declaration of external functions */
@@ -322,7 +322,7 @@ static uint8_t IRAM _uart_rx_one_char(uart_t uart)
     /* wait until at least von byte is in RX FIFO */
     while (!_uarts[uart].regs->status.rxfifo_cnt) {}
 
-#if defined(MCU_ESP32) || defined(MCU_ESP8266)
+#if defined(CPU_FAM_ESP32) || defined(MCU_ESP8266)
     /* read the lowest byte from RX FIFO register */
     return _uarts[uart].regs->fifo.rw_byte;
 #else
@@ -429,11 +429,11 @@ static int _uart_set_baudrate(uart_t uart, uint32_t baudrate)
 #else
 
 /* TODO look for an HAL/LL API function */
-#ifdef MCU_ESP32
+#ifdef CPU_FAM_ESP32
     /* use APB_CLK */
     _uarts[uart].regs->conf0.tick_ref_always_on = 1;
 #endif
-#ifdef MCU_ESP32C3
+#ifdef CPU_FAM_ESP32C3
     _uarts[uart].regs->clk_conf.sclk_sel = 1; /* APB clock used instead of XTAL */
 #endif
     /* compute and set the integral and the decimal part */
