@@ -1,16 +1,17 @@
 # ESP32x specific flashing options
-FLASH_CHIP  = $(CPU)
-ifneq (,$(filter esp32,$(CPU)))
+FLASH_CHIP  = $(CPU_FAM)
+ifeq (esp32,$(CPU_FAM))
   FLASH_MODE ?= dout
   FLASH_FREQ  = 40m   # DO NOT CHANGE
   FLASH_SIZE ?= 4
   BOOTLOADER_POS = 0x1000
-endif
-ifneq (,$(filter esp32c3,$(CPU)))
+else ifeq (esp32c3,$(CPU_FAM))
   FLASH_MODE ?= dio
   FLASH_FREQ  = 80m   # DO NOT CHANGE
   FLASH_SIZE ?= 4
   BOOTLOADER_POS = 0x0000
+else
+  $(error Unkwnown ESP32x SoC variant (family))
 endif
 
 ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool_v3.2.py
@@ -19,16 +20,13 @@ include $(RIOTCPU)/esp_common/Makefile.include
 
 # regular Makefile
 
-ifneq (,$(filter esp32,$(CPU)))
-  TARGET_ARCH_$(CPU) ?= xtensa-$(CPU)-elf
+ifeq (xtensa,$(CPU_ARCH))
+  TARGET_ARCH ?= xtensa-$(CPU_FAM)-elf
+else ifeq (riscv_esp32,$(CPU_ARCH))
+  TARGET_ARCH ?= riscv32-esp-elf
+else
+  $(error Unkwnown ESP32x SoC architecture)
 endif
-ifneq (,$(filter esp32c3,$(CPU)))
-  TARGET_ARCH_$(CPU) ?= riscv32-esp-elf
-endif
-
-TARGET_ARCH ?= $(TARGET_ARCH_$(CPU))
-
-CPU_UC = $(shell echo '$(CPU)' | tr '[:lower:]' '[:upper:]')
 
 PSEUDOMODULES += esp_bootloader
 PSEUDOMODULES += esp_gdbstub
@@ -49,20 +47,20 @@ INCLUDES += -I$(ESP32_SDK_DIR)/components/driver/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_common/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include/soc
-INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/$(CPU)
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/include
-INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/include/$(CPU)
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/include/$(CPU_FAM)
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_system/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_system/port/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_timer/include
-INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/$(CPU)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/$(CPU_FAM)/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/platform_port/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/heap/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/log/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/newlib/platform_include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/include
-INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/$(CPU)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/$(CPU_FAM)/include
 
 ifneq (,$(filter riscv32%,$(TARGET_ARCH)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/riscv/include
@@ -70,11 +68,11 @@ endif
 
 ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/include
-  INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/$(CPU)/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/$(CPU_FAM)/include
 endif
 
 ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
-  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include/soc/$(CPU)
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include/soc/$(CPU_FAM)
 endif
 
 ifneq (,$(filter esp_idf_spi_flash,$(USEMODULE)))
@@ -103,12 +101,14 @@ ifneq (,$(filter esp_eth,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_wifi/include
 endif
 
+CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
+
 # we use ESP32 only in single core mode
 CFLAGS += -DCONFIG_ESP_SYSTEM_SINGLE_CORE_MODE
 CFLAGS += -DCONFIG_FREERTOS_UNICORE
 
 # other ESP-IDF configurations
-CFLAGS += -DCONFIG_IDF_TARGET_$(CPU_UC)
+CFLAGS += -DCONFIG_IDF_TARGET_$(call uppercase_and_underscore,$(CPU_FAM))
 CFLAGS += -DESP_PLATFORM
 CFLAGS += -DLOG_TAG_IN_BRACKETS
 
@@ -123,7 +123,7 @@ ifneq (,$(filter riscv%,$(TARGET_ARCH)))
 endif
 
 ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
-  LINKFLAGS += -L$(ESP32_SDK_DIR)/components/xtensa/$(CPU)
+  LINKFLAGS += -L$(ESP32_SDK_DIR)/components/xtensa/$(CPU_FAM)
   ARCHIVES += -lxt_hal
 endif
 
@@ -152,11 +152,11 @@ LINKFLAGS += -nostdlib -lgcc -Wl,-gc-sections
 
 # Libraries needed when using esp_wifi_any pseudomodule
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
-  LINKFLAGS += -L$(ESP32_SDK_LIB_WIFI_DIR)/$(CPU)
-  LINKFLAGS += -L$(ESP32_SDK_LIB_PHY_DIR)/$(CPU)
+  LINKFLAGS += -L$(ESP32_SDK_LIB_WIFI_DIR)/$(CPU_FAM)
+  LINKFLAGS += -L$(ESP32_SDK_LIB_PHY_DIR)/$(CPU_FAM)
   ARCHIVES += -lcoexist -lcore -lmesh -lnet80211 -lpp
   ARCHIVES += -lphy -lstdc++
-  ifneq (,$(filter esp32,$(CPU)))
+  ifneq (,$(filter esp32,$(CPU_FAM)))
     ARCHIVES += -lrtc
   endif
 endif

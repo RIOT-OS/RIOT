@@ -3,12 +3,12 @@
 # additional include pathes required by als ESP-IDF module
 INCLUDES += -I$(ESP32_SDK_DIR)/components/bootloader_support/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/bootloader_support/include_bootloader
-INCLUDES += -I$(ESP32_SDK_DIR)/components/driver/$(CPU)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/driver/$(CPU_FAM)/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/efuse/include
-INCLUDES += -I$(ESP32_SDK_DIR)/components/efuse/$(CPU)/include
-INCLUDES += -I$(ESP32_SDK_DIR)/components/efuse/$(CPU)/private_include
-INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU)
-INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU)/private_include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/efuse/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/efuse/$(CPU_FAM)/private_include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU_FAM)
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU_FAM)/private_include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_ipc/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_pm/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_system/port/public_compat
@@ -19,11 +19,11 @@ INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include
 
 ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/include
-  INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/$(CPU)/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/$(CPU_FAM)/include
 endif
 
-ifneq (,$(filter esp32c3 esp32h2 esp32s3,$(CPU)))
-  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU)/private_include
+ifneq (,$(filter esp32c3 esp32h2 esp32s3,$(CPU_FAM)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU_FAM)/private_include
 endif
 
 SRC := $(addprefix $(ESP32_SDK_DIR)/,$(ESP32_SDK_SRC))
