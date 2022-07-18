@@ -31,7 +31,7 @@ int main(void)
     ztimer_init();
 #endif
 
-#ifdef MODULE_XTIMER
+#if IS_USED(MODULE_XTIMER) && !IS_USED(MODULE_ZTIMER_XTIMER_COMPAT)
     /* auto_init is disabled, but some modules depends on this module being initialized */
     xtimer_init();
 #endif
