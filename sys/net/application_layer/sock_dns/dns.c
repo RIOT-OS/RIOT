@@ -22,10 +22,10 @@
 #include <arpa/inet.h>
 
 #include "net/dns.h"
+#include "net/dns/cache.h"
 #include "net/dns/msg.h"
 #include "net/sock/udp.h"
 #include "net/sock/dns.h"
-#include "dns_cache.h"
 
 /* min domain name length is 1, so minimum record length is 7 */
 #define DNS_MIN_REPLY_LEN   (unsigned)(sizeof(dns_hdr_t) + 7)
@@ -80,7 +80,7 @@ int sock_dns_query(const char *domain_name, void *addr_out, int family)
         return -ENOSPC;
     }
 
-    res = sock_dns_cache_query(domain_name, addr_out, family);
+    res = dns_cache_query(domain_name, addr_out, family);
     if (res) {
         return res;
     }
@@ -104,7 +104,7 @@ int sock_dns_query(const char *domain_name, void *addr_out, int family)
                 uint32_t ttl;
                 if ((res = dns_msg_parse_reply(dns_buf, res, family,
                                                addr_out, &ttl)) > 0) {
-                    sock_dns_cache_add(domain_name, addr_out, res, ttl);
+                    dns_cache_add(domain_name, addr_out, res, ttl);
                     goto out;
                 }
             }
