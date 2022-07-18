@@ -1,0 +1,28 @@
+# Copyright (c) 2022 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig KCONFIG_USEMODULE_DNS
+    bool "Configure DNS"
+    depends on USEMODULE_DNS
+    help
+        Configure DNS using Kconfig.
+
+if KCONFIG_USEMODULE_DNS
+menuconfig KCONFIG_USEMODULE_DNS_MSG
+    bool "Configure DNS message parser and composer"
+    depends on USEMODULE_DNS_MSG
+    help
+        Configure DNS message parser and composer using Kconfig.
+
+if KCONFIG_USEMODULE_DNS_MSG
+
+config DNS_MSG_LEN
+    int "Maximum DNS message length"
+    default 128
+
+endif # KCONFIG_USEMODULE_DNS_MSG
+endif # KCONFIG_USEMODULE_DNS
