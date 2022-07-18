@@ -25,4 +25,28 @@ config DNS_MSG_LEN
     default 128
 
 endif # KCONFIG_USEMODULE_DNS_MSG
+
+menuconfig KCONFIG_USEMODULE_DNS_CACHE
+    bool "Configure DNS cache"
+    depends on USEMODULE_DNS_CACHE
+    help
+        Configure DNS cache using Kconfig.
+
+if KCONFIG_USEMODULE_DNS_CACHE
+
+config DNS_CACHE_SIZE
+    int "Maximum number of DNS cache entries"
+    default 4
+
+config DNS_CACHE_A
+    bool "Handle to cache A records"
+    default y if USEMODULE_IPV4
+    default n
+
+config DNS_CACHE_AAAA
+    bool "Handle to cache AAAA records"
+    default y if USEMODULE_IPV6
+    default n
+
+endif # KCONFIG_USEMODULE_DNS_SIZE
 endif # KCONFIG_USEMODULE_DNS
