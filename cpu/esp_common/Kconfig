@@ -116,14 +116,14 @@ config MODULE_ESP_LOG_TAGGED
 config MODULE_ESP_LOG_STARTUP
     bool "Add additional startup information to the log output"
 
-endmenu
-
 config MODULE_ESP_QEMU
     bool "Simulate ESP with QEMU"
-
-endif # TEST_KCONFIG
 
 rsource "esp-xtensa/Kconfig"
 rsource "freertos/Kconfig"
 rsource "periph/Kconfig"
 rsource "vendor/xtensa/Kconfig"
+
+endmenu
+
+endif # TEST_KCONFIG
