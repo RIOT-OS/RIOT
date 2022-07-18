@@ -52,6 +52,11 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+/* Ensure that the SPIn_* symbols define SPI_DEV(n) */
+#if !defined(SPI0_CTRL) && defined(SPI1_CTRL)
+#error "SPI_DEV(1) is used but SPI_DEV(0) is not defined"
+#endif
+
 /* SPI bus descriptor structure */
 struct _spi_bus_t {
     mutex_t lock;                    /* mutex for each SPI interface */
@@ -88,6 +93,8 @@ static struct _spi_bus_t _spi[] = {
 
 _Static_assert(SPI_NUMOF == ARRAY_SIZE(_spi),
                "Size of bus descriptor table doesn't match SPI_NUMOF");
+_Static_assert(SPI_NUMOF <= SPI_NUMOF_MAX,
+               "Number of defined SPI devices is greater than the number of supported devices");
 
 void IRAM_ATTR spi_init(spi_t bus)
 {
