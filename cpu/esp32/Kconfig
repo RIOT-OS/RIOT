@@ -5,141 +5,38 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-config CPU_CORE_XTENSA_LX6
-    bool
-    select CPU_ARCH_XTENSA
-
-config CPU_ARCH_ESP32_XTENSA
-    bool
-    select HAS_ESP_HW_COUNTER
-
-config CPU_FAM_ESP32
-    bool
-    select CPU_COMMON_ESP
-    select CPU_CORE_XTENSA_LX6
-    select CPU_ARCH_ESP32_XTENSA
-    select HAS_ARCH_ESP32
-    select HAS_CPU_ESP32
-    select HAS_ESP_WIFI_ENTERPRISE
-    select HAS_PUF_SRAM
-
-    select PACKAGE_ESP32_SDK if TEST_KCONFIG
-
-    select MODULE_MALLOC_THREAD_SAFE if !MODULE_ESP_IDF_HEAP && TEST_KCONFIG
-    select MODULE_RTT_RTC if HAS_PERIPH_RTT && MODULE_PERIPH_RTC
-    select MODULE_PERIPH_RTT if HAS_PERIPH_RTT && MODULE_PM_LAYERED
-    select MODULE_PS if MODULE_SHELL
-    select MODULE_PTHREAD if MODULE_CPP
-    imply MODULE_NEWLIB_NANO
-
-## CPU Models
-config CPU_MODEL_ESP32_WROOM_32
-    bool
-    select CPU_FAM_ESP32
-
-config CPU_MODEL_ESP32_WROVER
-    bool
-    select CPU_FAM_ESP32
-    select HAS_ESP_SPI_RAM
-
-config CPU_MODEL_ESP32_WROVER_B
-    bool
-    select CPU_FAM_ESP32
-    select HAS_ESP_SPI_RAM
-
-config CPU_MODEL_ESP32_WROVER_E
-    bool
-    select CPU_FAM_ESP32
-    select HAS_ESP_SPI_RAM
-
-config CPU_MODEL_ESP32_D0WD
-    bool
-    select CPU_FAM_ESP32
-
 ## Definition of specific features
 config HAS_ARCH_ESP32
     bool
     help
-        Indicates that the current architecture is ESP32.
+        Indicates that the current architecture is any ESP32x SoC architecture.
 
 config HAS_CPU_ESP32
     bool
     help
-        Indicates that the current CPU is 'esp32'.
+        Indicates that the current CPU belongs to the ESP32x SoC series.
 
 config HAS_ESP_HW_COUNTER
     bool
     help
-        Indicates that HW counters can be used.
+        Indicates that the used ESP32x SoC supports HW counters that can be
+        used as timers.
 
 config HAS_ESP_RTC_TIMER_32K
     bool
     help
-        Indicates that an external 32.768 kHz crystal is connected to the ESP32
-        in the board.
+        Indicates that an external 32.768 kHz crystal is connected to the
+        ESP32x Soc on the board.
 
 config HAS_ESP_SPI_RAM
     bool
     help
-        Indicates that an external RAM is connected via the FSPI interface in
-        the board.
-
-## Common CPU symbols
-config CPU_CORE
-    default "xtensa-lx6" if CPU_CORE_XTENSA_LX6
-
-config CPU_FAM
-    default "esp32" if CPU_FAM_ESP32
-
-config CPU_MODEL
-    default "esp32-wroom_32" if CPU_MODEL_ESP32_WROOM_32
-    default "esp32-wrover" if CPU_MODEL_ESP32_WROVER
-    default "esp32-wrover" if CPU_MODEL_ESP32_WROVER_B
-    default "esp32-wrover" if CPU_MODEL_ESP32_WROVER_E
-    default "esp32-d0wd" if CPU_MODEL_ESP32_D0WD
+        Indicates that an external RAM is connected via the SPI interface to
+        the ESP32x SoC on the board.
 
 config CPU
-    default "esp32" if CPU_FAM_ESP32
+    default "esp32" if HAS_CPU_ESP32
 
-menu "ESP32 specific configurations"
-    depends on TEST_KCONFIG
-    depends on HAS_ARCH_ESP32
-
-    choice
-        bool "CPU clock frequency"
-        default ESP32_DEFAULT_CPU_FREQ_MHZ_80
-
-        config ESP32_DEFAULT_CPU_FREQ_MHZ_2
-            bool "2 MHz"
-        config ESP32_DEFAULT_CPU_FREQ_MHZ_40
-            bool "40 MHz"
-        config ESP32_DEFAULT_CPU_FREQ_MHZ_80
-            bool "80 MHz"
-        config ESP32_DEFAULT_CPU_FREQ_MHZ_160
-            bool "160 MHz"
-        config ESP32_DEFAULT_CPU_FREQ_MHZ_240
-            bool "240 MHz"
-    endchoice
-
-    config MODULE_ESP_SPI_RAM
-        bool "SPI RAM support"
-        depends on HAS_ESP_SPI_RAM
-        select MODULE_ESP_IDF_GPIO
-        select MODULE_ESP_IDF_HEAP
-        select MODULE_ESP_IDF_SPI_FLASH
-        select MODULE_ESP_IDF_SPI_RAM
-        help
-            Say y to use external SPI RAM connected through the FSPI interface.
-
-    config MODULE_ESP_JTAG
-        bool "Enable JTAG debugging interface"
-        depends on HAS_ESP_JTAG
-
-    rsource "bootloader/Kconfig"
-    rsource "esp-idf/Kconfig"
-    rsource "esp-idf-api/Kconfig"
-    rsource "periph/Kconfig"
-
-endmenu
+rsource "Kconfig.esp32"
 
 source "$(RIOTCPU)/esp_common/Kconfig"
