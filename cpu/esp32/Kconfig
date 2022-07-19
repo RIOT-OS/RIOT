@@ -9,13 +9,17 @@ config CPU_CORE_XTENSA_LX6
     bool
     select CPU_ARCH_XTENSA
 
+config CPU_ARCH_ESP32_XTENSA
+    bool
+    select HAS_ESP_HW_COUNTER
+
 config CPU_FAM_ESP32
     bool
     select CPU_COMMON_ESP
     select CPU_CORE_XTENSA_LX6
+    select CPU_ARCH_ESP32_XTENSA
     select HAS_ARCH_ESP32
     select HAS_CPU_ESP32
-    select HAS_ESP_HW_COUNTER
     select HAS_ESP_WIFI_ENTERPRISE
     select HAS_PUF_SRAM
 
