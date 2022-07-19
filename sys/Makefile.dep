@@ -602,8 +602,7 @@ ifneq (,$(filter sock_dns,$(USEMODULE)))
   USEMODULE += posix_headers
 endif
 
-ifneq (,$(filter sock_dns_cache,$(USEMODULE)))
-  USEMODULE += sock_dns
+ifneq (,$(filter dns_cache,$(USEMODULE)))
   USEMODULE += ztimer_msec
   USEMODULE += checksum
 endif
