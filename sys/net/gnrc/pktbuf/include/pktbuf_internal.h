@@ -28,6 +28,10 @@
 
 #include "mutex.h"
 
+#if IS_USED(MODULE_GNRC_PKTBUF_STATIC)
+#include "pktbuf_static.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,15 +44,6 @@ extern "C" {
  *          not be touched by external code
  */
 extern mutex_t gnrc_pktbuf_mutex;
-
-#if IS_USED(MODULE_GNRC_PKTBUF_STATIC) || DOXYGEN
-/**
- * @brief   The actual static buffer used when module gnrc_pktbuf_static is used
- *
- * @warning This is an internal buffer and should not be touched by external code
- */
-extern uint8_t *gnrc_pktbuf_static_buf;
-#endif
 
 /**
  * @brief   Check if the given pointer is indeed part of the packet buffer

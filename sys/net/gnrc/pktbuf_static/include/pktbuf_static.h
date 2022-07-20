@@ -22,6 +22,7 @@
 #define PKTBUF_STATIC_H
 
 #include <sys/types.h>
+#include <stdalign.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,6 +40,17 @@ typedef struct _unused {
     struct _unused *next;   /**< the next unused section */
     unsigned int size;      /**< the size of the unused section */
 } _unused_t;
+
+
+/**
+ * @brief   The actual static buffer used when module gnrc_pktbuf_static is used
+ *
+ * @warning This is an internal buffer and should not be touched by external
+ *          code
+ *
+ * @details This buffer is aligned to boundaries of `sizeof(_unused_t)`
+ */
+extern alignas(sizeof(_unused_t)) uint8_t gnrc_pktbuf_static_buf[CONFIG_GNRC_PKTBUF_SIZE];
 
 /**
  * @brief   Calculates the required space of a number of bytes including

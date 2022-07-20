@@ -44,12 +44,9 @@
 #endif
 
 #define CANARY 0x55
-
-/* The static buffer needs to be aligned to word size, so that its start
- * address can be casted to `_unused_t *` safely. Just allocating an array of
- * (word sized) uintptr_t is a trivial way to do this */
-static uintptr_t _pktbuf_buf[CONFIG_GNRC_PKTBUF_SIZE / sizeof(uintptr_t)];
-uint8_t *gnrc_pktbuf_static_buf = (uint8_t *)_pktbuf_buf;
+alignas(sizeof(_unused_t)) uint8_t gnrc_pktbuf_static_buf[CONFIG_GNRC_PKTBUF_SIZE];
+static_assert((CONFIG_GNRC_PKTBUF_SIZE % sizeof(_unused_t)) == 0,
+              "CONFIG_GNRC_PKTBUF_SIZE has to be a multiple of 8");
 static _unused_t *_first_unused;
 
 #ifdef DEVELHELP
@@ -91,11 +88,13 @@ void gnrc_pktbuf_init(void)
 {
     mutex_lock(&gnrc_pktbuf_mutex);
     if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE) {
-        memset(_pktbuf_buf, CANARY, sizeof(_pktbuf_buf));
+        memset(gnrc_pktbuf_static_buf, CANARY, sizeof(gnrc_pktbuf_static_buf));
     }
-    _first_unused = (_unused_t *)_pktbuf_buf;
+    /* Silence false -Wcast-align: gnrc_pktbuf_static_buf has qualifier
+     * `alignas(_unused_t)`, so it is guaranteed to be safe */
+    _first_unused = (_unused_t *)(uintptr_t)gnrc_pktbuf_static_buf;
     _first_unused->next = NULL;
-    _first_unused->size = sizeof(_pktbuf_buf);
+    _first_unused->size = sizeof(gnrc_pktbuf_static_buf);
     mutex_unlock(&gnrc_pktbuf_mutex);
 }
 
@@ -326,7 +325,7 @@ void gnrc_pktbuf_stats(void)
 bool gnrc_pktbuf_is_empty(void)
 {
     return ((uintptr_t)_first_unused == (uintptr_t)gnrc_pktbuf_static_buf) &&
-           (_first_unused->size == sizeof(_pktbuf_buf));
+           (_first_unused->size == sizeof(gnrc_pktbuf_static_buf));
 }
 
 bool gnrc_pktbuf_is_sane(void)
