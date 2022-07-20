@@ -59,8 +59,15 @@
 #define I2C_CLOCK_STRETCH 200
 
 /* gpio access macros */
+#if defined(CPU_FAM_ESP32)
 #define GPIO_SET(lo, hi, b) if (b < 32) { GPIO.lo =  BIT(b); } else { GPIO.hi.val =  BIT(b-32); }
 #define GPIO_GET(lo, hi, b) ((b < 32) ? GPIO.lo & BIT(b) : GPIO.hi.val & BIT(b-32))
+#elif defined(CPU_FAM_ESP32C3)
+#define GPIO_SET(lo, hi, b) GPIO.lo.val = BIT(b)
+#define GPIO_GET(lo, hi, b) GPIO.lo.val & BIT(b)
+#else
+#error "Platform implementation is missing"
+#endif
 
 #else /* MCU_ESP8266 */
 
@@ -110,6 +117,8 @@ static _i2c_bus_t _i2c_bus[I2C_NUMOF] = {};
 
 #if defined(CPU_FAM_ESP32)
 #define I2C_CLK_CAL     62      /* clock calibration offset */
+#elif defined(CPU_FAM_ESP32C3)
+#define I2C_CLK_CAL     32      /* clock calibration offset */
 #elif defined(MCU_ESP8266)
 #define I2C_CLK_CAL     47      /* clock calibration offset */
 #else

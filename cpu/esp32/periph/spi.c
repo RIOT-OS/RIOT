@@ -253,7 +253,7 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
 
         if (apb_clk / 5 < clk) {
             LOG_TAG_ERROR("spi", "APB clock rate (%"PRIu32" Hz) has to be at "
-                          "least 5 times SPI clock rate (%"PRIu32" Hz)\n",
+                          "least 5 times SPI clock rate (%d Hz)\n",
                           apb_clk, clk);
             assert(false);
         }
@@ -267,7 +267,7 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
         _spi[bus].timing.timing_miso_delay = 0;
         _spi[bus].timing.timing_dummy = 0;
 
-        DEBUG("%s bus %d: SPI clock frequency: clk=%"PRIu32" eff=%d "
+        DEBUG("%s bus %d: SPI clock frequency: clk=%d eff=%d "
               "reg=%08"PRIx32"\n",
               __func__, bus, clk, _clk, clk_reg);
     }
