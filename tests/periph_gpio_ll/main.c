@@ -407,7 +407,7 @@ static void test_gpio_ll_init(void)
         };
         is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
     }
-    printf_optional("Support for output (open drain) with initial value of "
+    printf_optional("Support for output (open source) with initial value of "
                     "HIGH: %s\n",
                     noyes[is_supported]);
 
@@ -432,7 +432,7 @@ static void test_gpio_ll_init(void)
         };
         is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
     }
-    printf_optional("Support for output (open drain with pull up) with initial "
+    printf_optional("Support for output (open source with pull up) with initial "
                     "value of HIGH: %s\n",
                     noyes[is_supported]);
 
@@ -451,7 +451,7 @@ static void test_gpio_ll_init(void)
         };
         is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
     }
-    printf_optional("Support for output (open drain with pull up) with initial "
+    printf_optional("Support for output (open source with pull up) with initial "
                     "value of LOW: %s\n",
                     noyes[is_supported]);
 
