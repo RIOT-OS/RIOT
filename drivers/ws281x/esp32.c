@@ -53,8 +53,9 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
     zero_on = freq / (NS_PER_SEC / WS281X_T_DATA_ZERO_NS);
     zero_off = total_cycles - zero_on;
 
-    DEBUG("[ws281x] esp32 freq=%d total=%d\n", freq, total_cycles);
-    DEBUG("[ws281x] esp32 cycles %d/%d/%d/%d\n", one_on, one_off, zero_on, zero_off);
+    DEBUG("[ws281x] esp32 freq=%d total=%"PRIu32"\n", freq, total_cycles);
+    DEBUG("[ws281x] esp32 cycles %"PRIu32"/%"PRIu32"/%"PRIu32"/%"PRIu32"\n",
+          one_on, one_off, zero_on, zero_off);
 
     uint32_t current_wait = 0, start = 0;
 
