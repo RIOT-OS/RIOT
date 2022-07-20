@@ -144,16 +144,22 @@ void mutex_unlock(mutex_t *mutex)
     }
 
     list_node_t *next = list_remove_head(&mutex->queue);
-
     thread_t *process = container_of((clist_node_t *)next, thread_t, rq_entry);
-
-    DEBUG("PID[%" PRIkernel_pid "] mutex_unlock(): waking up waiting thread %"
-          PRIkernel_pid "\n", thread_getpid(),  process->pid);
-    sched_set_status(process, STATUS_PENDING);
 
     if (!mutex->queue.next) {
         mutex->queue.next = MUTEX_LOCKED;
     }
+
+    if (thread_get_status(process) != STATUS_MUTEX_BLOCKED) {
+        DEBUG("PID[%" PRIkernel_pid "] mutex_unlock(): thread %" PRIkernel_pid
+              "did not wait on mutex, not waking it\n", thread_getpid(),  process->pid);
+        irq_restore(irqstate);
+        return;
+    }
+
+    DEBUG("PID[%" PRIkernel_pid "] mutex_unlock(): waking up waiting thread %"
+          PRIkernel_pid "\n", thread_getpid(),  process->pid);
+    sched_set_status(process, STATUS_PENDING);
 
     uint16_t process_priority = process->priority;
 
