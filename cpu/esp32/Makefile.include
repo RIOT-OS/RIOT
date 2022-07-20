@@ -22,7 +22,7 @@ include $(RIOTCPU)/esp_common/Makefile.include
 
 ifeq (xtensa,$(CPU_ARCH))
   TARGET_ARCH ?= xtensa-$(CPU_FAM)-elf
-else ifeq (riscv_esp32,$(CPU_ARCH))
+else ifeq (rv32,$(CPU_ARCH))
   TARGET_ARCH ?= riscv32-esp-elf
 else
   $(error Unkwnown ESP32x SoC architecture)
