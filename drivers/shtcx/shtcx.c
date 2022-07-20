@@ -62,6 +62,7 @@ int8_t shtcx_read(const shtcx_t *dev, uint16_t *rel_humidity,
     i2c_acquire(dev->params.i2c_dev);
 
     if (i2c_write_bytes(dev->params.i2c_dev, dev->params.i2c_addr, cmd, 2, 0)) {
+        i2c_release(dev->params.i2c_dev);
         return SHTCX_ERROR_BUS;
     }
     /* Receive the measurement */
@@ -72,6 +73,7 @@ int8_t shtcx_read(const shtcx_t *dev, uint16_t *rel_humidity,
      */
     if (i2c_read_bytes(dev->params.i2c_dev, dev->params.i2c_addr, received, 6,
                        0)) {
+        i2c_release(dev->params.i2c_dev);
         return SHTCX_ERROR_BUS;
     }
     i2c_release(dev->params.i2c_dev);
@@ -107,10 +109,12 @@ int8_t shtcx_id(const shtcx_t *dev, uint16_t *id)
     i2c_acquire(dev->params.i2c_dev);
     if (i2c_write_bytes(dev->params.i2c_dev, dev->params.i2c_addr, data, 2,
                         0)) {
+        i2c_release(dev->params.i2c_dev);
         return SHTCX_ERROR_BUS;
     }
     /* receive ID and check if the send and receive commands were successful */
     if (i2c_read_bytes(dev->params.i2c_dev, dev->params.i2c_addr, data, 2, 0)) {
+        i2c_release(dev->params.i2c_dev);
         return SHTCX_ERROR_BUS;
     }
     i2c_release(dev->params.i2c_dev);
@@ -128,6 +132,7 @@ int8_t shtcx_reset(const shtcx_t *const dev)
     i2c_acquire(dev->params.i2c_dev);
     if (i2c_write_bytes(dev->params.i2c_dev, dev->params.i2c_addr, data, 2,
                         0)) {
+        i2c_release(dev->params.i2c_dev);
         return SHTCX_ERROR_BUS;
     }
     i2c_release(dev->params.i2c_dev);
