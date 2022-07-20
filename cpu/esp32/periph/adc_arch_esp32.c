@@ -107,3 +107,8 @@ const gpio_t _gpio_rtcio_map[] = {
     RTCIO_GPIO(2),      /* GPIO38 SENSOR_CAPN */
     RTCIO_GPIO(3),      /* GPIO39 SENSOR_VN */
 };
+
+_Static_assert(ARRAY_SIZE(_adc_hw) == SOC_RTCIO_PIN_COUNT,
+               "size of _adc_hw does not match SOC_RTCIO_PIN_COUNT");
+_Static_assert(ARRAY_SIZE(_gpio_rtcio_map) == SOC_GPIO_PIN_COUNT,
+               "size of _gpio_rtcio_map does not match SOC_GPIO_PIN_COUNT");

@@ -65,8 +65,15 @@
 
 /* architecture specific tables */
 extern gpio_pin_usage_t _gpio_pin_usage [GPIO_PIN_NUMOF];
+
+_Static_assert(ARRAY_SIZE(_gpio_pin_usage) == SOC_GPIO_PIN_COUNT,
+               "size of _gpio_pin_usage does not match SOC_GPIO_PIN_COUNT");
+
 #if !IS_USED(MODULE_ESP_IDF_GPIO_HAL)
 extern const uint32_t _gpio_to_iomux_reg[GPIO_PIN_NUMOF];
+
+_Static_assert(ARRAY_SIZE(_gpio_to_iomux_reg) == SOC_GPIO_PIN_COUNT,
+               "size of _gpio_to_iomux_reg does not match SOC_GPIO_PIN_COUNT");
 #endif
 
 /* String representation of usage types */
