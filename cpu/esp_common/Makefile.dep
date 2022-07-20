@@ -25,7 +25,7 @@ ifeq (xtensa,$(CPU_ARCH))
   USEMODULE += xtensa
 endif
 
-ifeq (riscv_esp32,$(CPU_ARCH))
+ifeq (rv32,$(CPU_ARCH))
   USEMODULE += esp_riscv
 endif
 
