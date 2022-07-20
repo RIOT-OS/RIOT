@@ -64,14 +64,14 @@ extern int ets_printf(const char *fmt, ...);
                         printf(LOG_FORMAT(letter, format), system_get_time_ms(), tag, ##__VA_ARGS__); \
                         fflush(stdout); \
                     } \
-                } while(0)
+                } while (0)
 
 #define LOG_TAG_EARLY(level, letter, tag, format, ...) \
                 do { \
                     if (LOG_LEVEL >= level) { \
                         ets_printf(LOG_FORMAT(letter, format), system_get_time_ms(), tag, ##__VA_ARGS__); \
                     } \
-                } while(0)
+                } while (0)
 
 #else /* MODULE_ESP_LOG_TAGGED */
 
@@ -105,32 +105,32 @@ extern int ets_printf(const char *fmt, ...);
 #undef LOG_INFO
 #undef LOG_WARNING
 #undef LOG_DEBUG
-#define LOG_ERROR(format, ...)   LOG_TAG(LOG_ERROR  , E, __func__, format, ##__VA_ARGS__)
+#define LOG_ERROR(format, ...)   LOG_TAG(LOG_ERROR, E, __func__, format, ##__VA_ARGS__)
 #define LOG_WARNING(format, ...) LOG_TAG(LOG_WARNING, W, __func__, format, ##__VA_ARGS__)
-#define LOG_INFO(format, ...)    LOG_TAG(LOG_INFO   , I, __func__, format, ##__VA_ARGS__)
-#define LOG_DEBUG(format, ...)   LOG_TAG(LOG_DEBUG  , D, __func__, format, ##__VA_ARGS__)
+#define LOG_INFO(format, ...)    LOG_TAG(LOG_INFO, I, __func__, format, ##__VA_ARGS__)
+#define LOG_DEBUG(format, ...)   LOG_TAG(LOG_DEBUG, D, __func__, format, ##__VA_ARGS__)
 #endif
 
 /** Tagged LOG_* definitions */
-#define LOG_TAG_ERROR(tag, format, ...)   LOG_TAG(LOG_ERROR  , E, tag, format, ##__VA_ARGS__)
+#define LOG_TAG_ERROR(tag, format, ...)   LOG_TAG(LOG_ERROR, E, tag, format, ##__VA_ARGS__)
 #define LOG_TAG_WARNING(tag, format, ...) LOG_TAG(LOG_WARNING, W, tag, format, ##__VA_ARGS__)
-#define LOG_TAG_INFO(tag, format, ...)    LOG_TAG(LOG_INFO   , I, tag, format, ##__VA_ARGS__)
-#define LOG_TAG_DEBUG(tag, format, ...)   LOG_TAG(LOG_DEBUG  , D, tag, format, ##__VA_ARGS__)
-#define LOG_TAG_ALL(tag, format, ...)     LOG_TAG(LOG_ALL    , V, tag, format, ##__VA_ARGS__)
+#define LOG_TAG_INFO(tag, format, ...)    LOG_TAG(LOG_INFO, I, tag, format, ##__VA_ARGS__)
+#define LOG_TAG_DEBUG(tag, format, ...)   LOG_TAG(LOG_DEBUG, D, tag, format, ##__VA_ARGS__)
+#define LOG_TAG_ALL(tag, format, ...)     LOG_TAG(LOG_ALL, V, tag, format, ##__VA_ARGS__)
 
 /** definitions for source code compatibility with ESP-IDF */
-#define ESP_EARLY_LOGE(tag, format, ...) LOG_TAG_EARLY(LOG_ERROR  , E, tag, format "\n", ##__VA_ARGS__)
+#define ESP_EARLY_LOGE(tag, format, ...) LOG_TAG_EARLY(LOG_ERROR, E, tag, format "\n", ##__VA_ARGS__)
 #define ESP_EARLY_LOGW(tag, format, ...) LOG_TAG_EARLY(LOG_WARNING, W, tag, format "\n", ##__VA_ARGS__)
-#define ESP_EARLY_LOGI(tag, format, ...) LOG_TAG_EARLY(LOG_INFO   , I, tag, format "\n", ##__VA_ARGS__)
+#define ESP_EARLY_LOGI(tag, format, ...) LOG_TAG_EARLY(LOG_INFO, I, tag, format "\n", ##__VA_ARGS__)
 #define ESP_EARLY_LOGD(tag, format, ...) LOG_TAG_EARLY(LOG_DEBUG, D, tag, format "\n", ##__VA_ARGS__)
-#define ESP_EARLY_LOGV(tag, format, ...) LOG_TAG_EARLY(LOG_ALL  , V, tag, format "\n", ##__VA_ARGS__)
+#define ESP_EARLY_LOGV(tag, format, ...) LOG_TAG_EARLY(LOG_ALL, V, tag, format "\n", ##__VA_ARGS__)
 
 #ifdef MCU_ESP8266
-#define ESP_LOGE(tag, format, ...) LOG_TAG(LOG_ERROR  , E, tag, format "\n", ##__VA_ARGS__)
+#define ESP_LOGE(tag, format, ...) LOG_TAG(LOG_ERROR, E, tag, format "\n", ##__VA_ARGS__)
 #define ESP_LOGW(tag, format, ...) LOG_TAG(LOG_WARNING, W, tag, format "\n", ##__VA_ARGS__)
-#define ESP_LOGI(tag, format, ...) LOG_TAG(LOG_INFO   , I, tag, format "\n", ##__VA_ARGS__)
+#define ESP_LOGI(tag, format, ...) LOG_TAG(LOG_INFO, I, tag, format "\n", ##__VA_ARGS__)
 #define ESP_LOGD(tag, format, ...) LOG_TAG(LOG_DEBUG, D, tag, format "\n", ##__VA_ARGS__)
-#define ESP_LOGV(tag, format, ...) LOG_TAG(LOG_ALL  , V, tag, format "\n", ##__VA_ARGS__)
+#define ESP_LOGV(tag, format, ...) LOG_TAG(LOG_ALL, V, tag, format "\n", ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

@@ -91,9 +91,9 @@ static bool _gpio_pin_pd[GPIO_PIN_NUMOF] = { };
 #if defined(CPU_FAM_ESP32)
 
 #define GPIO_IN_GET(b)  (b < 32) ? GPIO.in & BIT(b) : GPIO.in1.val & BIT(b-32)
-#define GPIO_OUT_SET(b) if (b < 32) GPIO.out_w1ts = BIT(b); else GPIO.out1_w1ts.val = BIT(b-32)
-#define GPIO_OUT_CLR(b) if (b < 32) GPIO.out_w1tc = BIT(b); else GPIO.out1_w1tc.val = BIT(b-32)
-#define GPIO_OUT_XOR(b) if (b < 32) GPIO.out ^=  BIT(b); else GPIO.out1.val ^=  BIT(b-32)
+#define GPIO_OUT_SET(b) if (b < 32) { GPIO.out_w1ts = BIT(b); } else { GPIO.out1_w1ts.val = BIT(b-32); }
+#define GPIO_OUT_CLR(b) if (b < 32) { GPIO.out_w1tc = BIT(b); } else { GPIO.out1_w1tc.val = BIT(b-32); }
+#define GPIO_OUT_XOR(b) if (b < 32) { GPIO.out ^=  BIT(b); } else { GPIO.out1.val ^=  BIT(b-32); }
 #define GPIO_OUT_GET(b) (b < 32) ? (GPIO.out >> b) & 1 : (GPIO.out1.val >> (b-32)) & 1
 
 #else

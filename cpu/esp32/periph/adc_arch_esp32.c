@@ -24,7 +24,6 @@
 #include "esp_common.h"
 #include "soc/adc_channel.h"
 
-
 #define ENABLE_DEBUG 0
 #include "debug.h"
 

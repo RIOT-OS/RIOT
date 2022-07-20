@@ -37,7 +37,6 @@
 #error "ESP32x family implementation missing"
 #endif
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

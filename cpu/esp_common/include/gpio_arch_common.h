@@ -36,8 +36,7 @@ extern "C" {
 /**
  * @brief   Definition of possible GPIO usage types (for internal use only)
  */
-typedef enum
-{
+typedef enum {
     _GPIO = 0,  /**< pin used as standard GPIO */
 #ifndef MCU_ESP8266
     _ADC,       /**< pin is used as ADC input */
