@@ -28,10 +28,6 @@
 
 #include "mutex.h"
 
-#if IS_USED(MODULE_GNRC_PKTBUF_STATIC)
-#include "pktbuf_static.h"
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -56,16 +52,7 @@ extern mutex_t gnrc_pktbuf_mutex;
  *                  the packet buffer
  * @retval  false   @p ptr does not point to data in the packet buffer
  */
-static inline bool gnrc_pktbuf_contains(void *ptr)
-{
-#if IS_USED(MODULE_GNRC_PKTBUF_STATIC)
-    return ((uintptr_t)ptr >= (uintptr_t)gnrc_pktbuf_static_buf) &&
-           ((uintptr_t)ptr < (uintptr_t)gnrc_pktbuf_static_buf + CONFIG_GNRC_PKTBUF_SIZE);
-#else
-    (void)ptr;
-    return true;
-#endif
-}
+bool gnrc_pktbuf_contains(void *ptr);
 
 /**
  * @brief   Release an internal buffer

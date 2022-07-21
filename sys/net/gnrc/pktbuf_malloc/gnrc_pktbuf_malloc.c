@@ -288,4 +288,12 @@ void gnrc_pktbuf_free_internal(void *data, size_t size)
     _free(data);
 }
 
+bool gnrc_pktbuf_contains(void *ptr)
+{
+    (void)ptr;
+    /* tracking the memory areas malloced is to expensive, so this function
+     * only is useful with gnrc_pktbuf_static */
+    return true;
+}
+
 /** @} */
