@@ -315,7 +315,7 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
   endif
 
   ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
-    USEMODULE += netutils
+    USEMODULE += netutils ztimer_usec
   endif
 
   ifneq (,$(gnrc_udp_cmd,$(USEMODULE)))

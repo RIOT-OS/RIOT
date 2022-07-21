@@ -38,7 +38,7 @@
 #include "timex.h"
 #include "unaligned.h"
 #include "utlist.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #ifdef MODULE_LUID
 #include "luid.h"
@@ -60,7 +60,7 @@
 
 typedef struct {
     gnrc_netreg_entry_t netreg;
-    xtimer_t sched_timer;
+    ztimer_t sched_timer;
     msg_t sched_msg;
     ipv6_addr_t host;
     char *hostname;
@@ -110,7 +110,7 @@ static int _gnrc_icmpv6_ping(int argc, char **argv)
         msg_receive(&msg);
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV: {
-                _handle_reply(&data, msg.content.ptr, xtimer_now_usec());
+                _handle_reply(&data, msg.content.ptr, ztimer_now(ZTIMER_USEC));
                 gnrc_pktbuf_release(msg.content.ptr);
                 break;
             }
@@ -126,7 +126,7 @@ static int _gnrc_icmpv6_ping(int argc, char **argv)
         }
     } while (data.num_recv < data.count);
 finish:
-    xtimer_remove(&data.sched_timer);
+    ztimer_remove(ZTIMER_USEC, &data.sched_timer);
     res = _finish(&data);
     gnrc_netreg_unregister(GNRC_NETTYPE_ICMPV6, &data.netreg);
     while (msg_avail() > 0) {
@@ -232,7 +232,7 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
     if (res != 0) {
         _usage(cmdname);
     }
-    data->id ^= (xtimer_now_usec() & UINT16_MAX);
+    data->id ^= (ztimer_now(ZTIMER_USEC) & UINT16_MAX);
 #ifdef MODULE_LUID
     luid_custom(&data->id, sizeof(data->id), data->id);
 #endif
@@ -244,7 +244,7 @@ static void _fill_payload(uint8_t *buf, size_t len)
     uint8_t i = 0;
 
     if (len >= sizeof(uint32_t)) {
-        uint32_t now = xtimer_now_usec();
+        uint32_t now = ztimer_now(ZTIMER_USEC);
         memcpy(buf, &now, sizeof(now));
         len -= sizeof(now);
         buf += sizeof(now);
@@ -305,7 +305,7 @@ static void _pinger(_ping_data_t *data)
             }
         }
     }
-    xtimer_set_msg(&data->sched_timer, timer, &data->sched_msg,
+    ztimer_set_msg(ZTIMER_USEC, &data->sched_timer, timer, &data->sched_msg,
                    thread_getpid());
     bf_unset(data->cktab, (size_t)data->num_sent % CKTAB_SIZE);
     pkt = gnrc_icmpv6_echo_build(ICMPV6_ECHO_REQ, data->id,
