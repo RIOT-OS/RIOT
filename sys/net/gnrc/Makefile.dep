@@ -394,11 +394,6 @@ ifneq (,$(filter gnrc_udp,$(USEMODULE)))
   USEMODULE += udp
 endif
 
-ifneq (,$(filter gnrc_udp_cmd,$(USEMODULE)))
-  USEMODULE += gnrc_udp
-  USEMODULE += gnrc_pktdump
-endif
-
 ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_gnrc_tcp
   USEMODULE += gnrc_nettype_tcp

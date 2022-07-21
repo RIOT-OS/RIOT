@@ -182,8 +182,8 @@ endif
 ifneq (,$(filter skald,$(USEMODULE)))
   DIRS += net/ble/skald
 endif
-ifneq (,$(filter shell_commands,$(USEMODULE)))
-  DIRS += shell/commands
+ifneq (,$(filter shell_cmds,$(USEMODULE)))
+  DIRS += shell/cmds
 endif
 ifneq (,$(filter suit%,$(USEMODULE)))
   DIRS += suit

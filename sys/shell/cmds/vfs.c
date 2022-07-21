@@ -805,7 +805,7 @@ static inline void _print_digest(const uint8_t *digest, size_t len, const char *
     printf("  %s\n", file);
 }
 
-#if MODULE_MD5SUM
+#if MODULE_SHELL_CMD_MD5SUM
 #include "hashes/md5.h"
 static int _vfs_md5sum_cmd(int argc, char **argv)
 {
@@ -834,7 +834,7 @@ static int _vfs_md5sum_cmd(int argc, char **argv)
 SHELL_COMMAND(md5sum, "Compute and check MD5 message digest", _vfs_md5sum_cmd);
 #endif
 
-#if MODULE_SHA1SUM
+#if MODULE_SHELL_CMD_SHA1SUM
 #include "hashes/sha1.h"
 static int _vfs_sha1sum_cmd(int argc, char **argv)
 {
@@ -863,7 +863,7 @@ static int _vfs_sha1sum_cmd(int argc, char **argv)
 SHELL_COMMAND(sha1sum, "Compute and check SHA1 message digest", _vfs_sha1sum_cmd);
 #endif
 
-#if MODULE_SHA256SUM
+#if MODULE_SHELL_CMD_SHA256SUM
 #include "hashes/sha256.h"
 static int _vfs_sha256sum_cmd(int argc, char **argv)
 {
