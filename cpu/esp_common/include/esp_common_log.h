@@ -28,6 +28,7 @@ extern "C" {
 
 #include <stdio.h>
 #include <stdint.h>
+#include <inttypes.h>
 
 #include "log.h"
 
@@ -56,7 +57,7 @@ extern int ets_printf(const char *fmt, ...);
 
 #if MODULE_ESP_LOG_TAGGED
 
-#define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%d) [%s] " format LOG_RESET_COLOR
+#define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") [%s] " format LOG_RESET_COLOR
 
 #define LOG_TAG(level, letter, tag, format, ...) \
                  do { \
