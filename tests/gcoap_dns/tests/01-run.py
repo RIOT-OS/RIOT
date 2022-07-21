@@ -18,6 +18,11 @@ from testrunner.unittest import PexpectTestCase
 class TestGCoAPDNS(PexpectTestCase):
     LOGFILE = sys.stdout
 
+    def has_dns_cache(self):
+        self.spawn.sendline("has_dns_cache")
+        res = self.spawn.expect(["DNS cache does not exist", "DNS cache exists"])
+        return bool(res)
+
     def test_embedded_unittests(self):
         self.spawn.sendline("unittests")
         check_unittests(self.spawn)
@@ -162,8 +167,14 @@ class TestGCoAPDNS(PexpectTestCase):
         self.spawn.expect_exact(
             "Hostname example.org resolves to 192.0.0.1 (IPv4)"
         )
-        self.spawn.sendline("query example.org inet6")
-        self.spawn.expect_exact("Bad message")
+        if self.has_dns_cache():
+            self.spawn.sendline("query example.org inet6")
+            self.spawn.expect_exact(
+                "Hostname example.org resolves to 2001:db8::1 (IPv6)"
+            )
+        else:
+            self.spawn.sendline("query example.org inet6")
+            self.spawn.expect_exact("Bad message")
 
     def _expect_od_dump_of(self, hexbytes):
         for i in range((len(hexbytes) // 32) + 1):

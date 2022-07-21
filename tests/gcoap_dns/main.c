@@ -533,6 +533,19 @@ static int _resp(int argc, char **argv)
     return 0;
 }
 
+static int _has_dns_cache(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    if (IS_USED(MODULE_DNS_CACHE)) {
+        puts("DNS cache exists");
+    }
+    else {
+        puts("DNS cache does not exist");
+    }
+    return 0;
+}
+
 static const coap_resource_t _resources[] = {
     { "/", COAP_FETCH, _mock_dns_server, NULL },
 };
@@ -553,6 +566,7 @@ static const shell_command_t _shell_commands[] = {
     { "proxy", "Sets proxy URI for DoC queries", _proxy},
     { "query", "Sends DoC query for a hostname", _query},
     { "resp", "Set static response for mock DoC server", _resp},
+    { "has_dns_cache", "Check if DNS cache is activated", _has_dns_cache},
     { NULL, NULL, NULL }
 };
 

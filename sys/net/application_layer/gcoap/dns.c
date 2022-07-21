@@ -23,6 +23,7 @@
 #include "net/credman.h"
 #include "net/gcoap.h"
 #include "net/af.h"
+#include "net/dns/cache.h"
 #include "net/ipv4/addr.h"
 #include "net/ipv6/addr.h"
 #include "net/sock/dns.h"
@@ -52,6 +53,14 @@ typedef struct {
      * initialized.
      */
     coap_pkt_t *pkt;
+#if IS_USED(MODULE_DNS_CACHE) || defined(DOXYGEN)
+    /**
+     * @brief   The queried hostname
+     *
+     * Only required for DNS caching and thus only available with module @ref net_dns_cache
+     */
+    const char *domain_name;
+#endif
     void *dns_buf;          /**< The buffer for the DNS message exchange */
     void *addr_out;         /**< Pointer to the resulting address */
     /**
@@ -113,9 +122,14 @@ static ssize_t _send(const void *buf, size_t len, const sock_udp_ep_t *remote,
 
 int gcoap_dns_query(const char *domain_name, void *addr_out, int family)
 {
+    int res;
+
+    if ((res = dns_cache_query(domain_name, addr_out, family)) > 0) {
+        return res;
+    }
+
     static uint8_t coap_buf[CONFIG_GCOAP_DNS_PDU_BUF_SIZE];
     static uint8_t dns_buf[CONFIG_DNS_MSG_LEN];
-    int res;
     coap_pkt_t pdu;
     _req_ctx_t req_ctx = {
         .resp_wait = MUTEX_INIT,
@@ -598,6 +612,9 @@ static int _dns_query(const char *domain_name, _req_ctx_t *req_ctx)
         domain_name,
         req_ctx->family
     );
+#if IS_USED(MODULE_DNS_CACHE)
+    req_ctx->domain_name = domain_name;
+#endif
 #if IS_USED(MODULE_GCOAP_DTLS)
     req_ctx->req_tag = _req_tag++;
 #endif
@@ -609,6 +626,16 @@ static int _dns_query(const char *domain_name, _req_ctx_t *req_ctx)
         }
     }
     return res;
+}
+
+static const char *_domain_name_from_ctx(_req_ctx_t *context)
+{
+#if IS_USED(MODULE_DNS_CACHE)
+    return context->domain_name;
+#else
+    (void)context;
+    return NULL;
+#endif
 }
 
 static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
@@ -710,14 +737,20 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
     }
     switch (coap_get_content_type(pdu)) {
         case COAP_FORMAT_DNS_MESSAGE:
-        case COAP_FORMAT_NONE:
+        case COAP_FORMAT_NONE: {
+            uint32_t ttl;
+
             context->res = dns_msg_parse_reply(data, data_len, family,
-                                               context->addr_out, NULL);
-            if ((ENABLE_DEBUG) && (context->res < 0)) {
+                                               context->addr_out, &ttl);
+            if (context->res > 0) {
+                dns_cache_add(_domain_name_from_ctx(context), context->addr_out, context->res, ttl);
+            }
+            else if (ENABLE_DEBUG && (context->res < 0)) {
                 DEBUG("gcoap_dns: Unable to parse DNS reply: %d\n",
                       context->res);
             }
             break;
+        }
         default:
             context->res = -ENOMSG;
             break;
