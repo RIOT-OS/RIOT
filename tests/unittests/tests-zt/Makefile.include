@@ -1,0 +1,2 @@
+USEMODULE += ztimer_core
+USEMODULE += ztimer_msec
