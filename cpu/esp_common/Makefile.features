@@ -26,7 +26,7 @@ ifeq (xtensa,$(CPU_ARCH))
   FEATURES_PROVIDED += arch_esp_xtensa
 endif
 
-ifeq (riscv_esp32,$(CPU_ARCH))
+ifeq (rv32,$(CPU_ARCH))
   FEATURES_PROVIDED += arch_esp_riscv
 endif
 

@@ -1,6 +1,9 @@
 ifneq (,$(filter esp32,$(CPU_FAM)))
   CPU_ARCH = xtensa
   CPU_CORE = xtensa-lx6
+else ifneq (,$(filter esp32c3,$(CPU_FAM)))
+  CPU_ARCH = rv32
+  CPU_CORE = rv32imc
 else
   $(error Unkwnown ESP32x SoC variant (family))
 endif
