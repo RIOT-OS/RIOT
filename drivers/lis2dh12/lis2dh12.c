@@ -366,7 +366,7 @@ void lis2dh12_cfg_disable_event(const lis2dh12_t *dev, uint8_t event, uint8_t li
 {
     uint8_t reg = 0;
 
-    _release(dev);
+    _acquire(dev);
 
     /* read current interrupt configuration */
     if (line == LIS2DH12_INT1) {
