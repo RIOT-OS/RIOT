@@ -33,20 +33,48 @@
 #include "xtimer.h"
 #endif
 
-void event_post(event_queue_t *queue, event_t *event)
+static inline bool _post_event(void *ctx)
+{
+    event_t *event = ctx;
+
+    return !event->list_node.next;
+}
+
+static inline bool _post_event_counted(void *ctx)
+{
+    event_counted_t *event = ctx;
+
+    ++event->num_posted;
+    return event->num_posted == 1;
+}
+
+static inline void _post(event_queue_t *queue, void *event, bool counted)
 {
     assert(queue && event);
 
     unsigned state = irq_disable();
-    if (!event->list_node.next) {
-        clist_rpush(&queue->event_list, &event->list_node);
+
+    bool post = counted ? _post_event_counted(event) : _post_event(event);
+    if (post) {
+        clist_rpush(&queue->event_list, &((event_t *)event)->list_node);
     }
+
     thread_t *waiter = queue->waiter;
     irq_restore(state);
 
     if (waiter) {
         thread_flags_set(waiter, THREAD_FLAG_EVENT);
     }
+}
+
+void event_post(event_queue_t *queue, event_t *event)
+{
+    _post(queue, event, false);
+}
+
+void event_counted_post(event_queue_t *queue, event_counted_t *event)
+{
+    _post(queue, event, true);
 }
 
 void event_cancel(event_queue_t *queue, event_t *event)
@@ -60,29 +88,79 @@ void event_cancel(event_queue_t *queue, event_t *event)
     irq_restore(state);
 }
 
-event_t *event_get(event_queue_t *queue)
+void event_counted_cancel(event_queue_t *queue, event_counted_t *event,
+                          bool cancel_all)
 {
+    assert(queue);
+    assert(event);
+
     unsigned state = irq_disable();
-    event_t *result = (event_t *) clist_lpop(&queue->event_list);
+    if (cancel_all) {
+        event->num_posted = 1;
+    }
+
+    if (event->num_posted && --event->num_posted == 0) {
+        clist_remove(&queue->event_list, &event->list_node);
+    }
     irq_restore(state);
+}
+
+static event_t *_get(event_queue_t *queue)
+{
+    event_t *result = (event_t *)clist_lpop(&queue->event_list);
 
     if (result) {
         result->list_node.next = NULL;
     }
+
     return result;
 }
 
-event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
+static event_counted_t *_get_counted(event_queue_t *queue)
+{
+    clist_node_t *node = clist_lpeek(&queue->event_list);
+    event_counted_t *result = container_of(node, event_counted_t, list_node);
+
+    if (result) {
+        assert(result->num_posted);
+        if (--result->num_posted == 0) {
+            clist_lpop(&queue->event_list);
+        }
+    }
+
+    return result;
+}
+
+event_t *event_get(event_queue_t *queue)
+{
+    unsigned state = irq_disable();
+    event_t *result = _get(queue);
+    irq_restore(state);
+
+    return result;
+}
+
+event_counted_t *event_counted_get(event_queue_t *queue)
+{
+    unsigned state = irq_disable();
+    event_counted_t *result = _get_counted(queue);
+    irq_restore(state);
+
+    return result;
+}
+
+static void *_wait_multi(event_queue_t *queues, size_t n_queues, bool counted)
 {
     assert(queues && n_queues);
-    event_t *result = NULL;
+    void *result = NULL;
 
     do {
         unsigned state = irq_disable();
         for (size_t i = 0; i < n_queues; i++) {
             assert(queues[i].waiter);
-            result = container_of(clist_lpop(&queues[i].event_list),
-                                  event_t, list_node);
+            result = counted
+                   ? (void *)_get_counted(&queues[i])
+                   : (void *)_get(&queues[i]);
             if (result) {
                 break;
             }
@@ -93,8 +171,17 @@ event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
         }
     } while (result == NULL);
 
-    result->list_node.next = NULL;
     return result;
+}
+
+event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
+{
+    return _wait_multi(queues, n_queues, false);
+}
+
+event_counted_t *event_counted_wait_multi(event_queue_t *queues, size_t n_queues)
+{
+    return _wait_multi(queues, n_queues, true);
 }
 
 #if IS_USED(MODULE_XTIMER) || IS_USED(MODULE_ZTIMER)

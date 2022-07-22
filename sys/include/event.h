@@ -137,9 +137,19 @@ extern "C" {
 typedef struct event event_t;
 
 /**
+ * @brief   counted event structure forward declaration
+ */
+typedef struct event_counted event_counted_t;
+
+/**
  * @brief   event handler type definition
  */
 typedef void (*event_handler_t)(event_t *);
+
+/**
+ * @brief   counted event handler type definition
+ */
+typedef void (*event_counted_handler_t)(event_counted_t *);
 
 /**
  * @brief   event structure
@@ -147,6 +157,15 @@ typedef void (*event_handler_t)(event_t *);
 struct event {
     clist_node_t list_node;     /**< event queue list entry             */
     event_handler_t handler;    /**< pointer to event handler function  */
+};
+
+/**
+ * @brief   counted event structure
+ */
+struct event_counted {
+    clist_node_t list_node;     /**< event queue list entry             */
+    event_counted_handler_t handler; /**< pointer to event handler function */
+    unsigned num_posted;        /**< how often the event was posted     */
 };
 
 /**
@@ -342,6 +361,105 @@ event_t *event_wait_multi(event_queue_t *queues, size_t n_queues);
 static inline event_t *event_wait(event_queue_t *queue)
 {
     return event_wait_multi(queue, 1);
+}
+
+/**
+ * @brief   Queue a counted event
+ *
+ * The given event will be posted on the given @p queue. If the event is already
+ * queued when calling this function, the event counter will be incremented.
+ *
+ * @pre     queue should be initialized
+ *
+ * @param[in]   queue   event queue to queue event in
+ * @param[in]   event   event to queue in event queue
+ */
+void event_counted_post(event_queue_t *queue, event_counted_t *event);
+
+/**
+ * @brief   Cancel a queued counted event
+ *
+ * This will decrement the event counter and remove remove the queued event
+ * from an event queue if the counter reached zero or @p cancel_all is set.
+ *
+ * @note    Due to the underlying list implementation, this will run in O(n).
+ *
+ * @param[in]   queue   event queue to remove event from
+ * @param[in]   event   event to remove from queue
+ * @param[in]   cancel_all remove all instances of the event
+ */
+void event_counted_cancel(event_queue_t *queue, event_counted_t *event,
+                          bool cancel_all);
+
+/**
+ * @brief   Get next counted event from event queue, non-blocking
+ *
+ * This will decrement the event counter, if the counter reaches zero
+ * the event is removed from the queue.
+ *
+ * In order to handle an event retrieved using this function,
+ * call event->handler(event).
+ *
+ * @param[in]   queue   event queue to get event from
+ *
+ * @returns     pointer to next event
+ * @returns     NULL if no event available
+ */
+event_counted_t *event_counted_get(event_queue_t *queue);
+
+/**
+ * @brief   Get next counted event from the given event queues, blocking
+ *
+ * This function will block until an event becomes available. If more than one
+ * queue contains an event, the queue with the lowest index is chosen. Thus,
+ * a lower index in the @p queues array translates into a higher priority of
+ * the queue.
+ *
+ * In order to handle an event retrieved using this function,
+ * call event->handler(event).
+ *
+ * @warning There can only be a single waiter on a queue!
+ *
+ * @note    This function *can* be suitable for having a single thread
+ *          handling both real-time and non-real-time events. However, a real
+ *          time event can be delayed for the whole duration a single
+ *          non-real-time event takes (in addition to all other sources of
+ *          latency). Thus, the slowest to handle non-real-time event must still
+ *          execute fast enough to add an amount of latency (on top of other
+ *          sources of latency) that is acceptable to the real-time event with
+ *          the strictest requirements.
+ *
+ * @pre     0 < @p n_queues (expect blowing `assert()` otherwise)
+ * @pre     The queue must have a waiter (i.e. it should have been claimed, or
+ *          initialized using @ref event_queue_init, @ref event_queues_init)
+ *
+ * @param[in]   queues      Array of event queues to get event from
+ * @param[in]   n_queues    Number of event queues passed in @p queues
+ *
+ * @returns     pointer to next event
+ */
+event_counted_t *event_counted_wait_multi(event_queue_t *queues, size_t n_queues);
+
+/**
+ * @brief   Get next counted event from event queue, blocking
+ *
+ * This function will block until an event becomes available.
+ *
+ * In order to handle an event retrieved using this function,
+ * call event->handler(event).
+ *
+ * @warning     There can only be a single waiter on a queue!
+ *
+ * @pre     The queue must have a waiter (i.e. it should have been claimed, or
+ *          initialized using @ref event_queue_init, @ref event_queues_init)
+ *
+ * @param[in]   queue   event queue to get event from
+ *
+ * @returns     pointer to next event
+ */
+static inline event_counted_t *event_counted_wait(event_queue_t *queue)
+{
+    return event_counted_wait_multi(queue, 1);
 }
 
 #if IS_USED(MODULE_XTIMER) || defined(DOXYGEN)
