@@ -65,7 +65,6 @@ endif
 ifneq (,$(filter gnrc_dhcpv6_client_simple_pd,$(USEMODULE)))
   USEMODULE += gnrc_dhcpv6_client
   USEMODULE += dhcpv6_client_ia_pd
-  CFLAGS += -DCONFIG_GNRC_IPV6_NIB_ADV_ROUTER=0
 endif
 
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
@@ -73,7 +72,6 @@ ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
   USEMODULE += uhcpc
   USEMODULE += gnrc_sock_udp
   USEMODULE += fmt
-  CFLAGS += -DCONFIG_GNRC_IPV6_NIB_ADV_ROUTER=0
 endif
 
 ifneq (,$(filter gnrc_%,$(filter-out gnrc_lorawan gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
@@ -130,8 +128,6 @@ endif
 
 ifneq (,$(filter gnrc_ipv6_auto_subnets,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_nib_rtr_adv_pio_cb
-  CFLAGS += -DCONFIG_GNRC_IPV6_NIB_ADV_ROUTER=0
-  CFLAGS += -DCONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_LAST_RA=1
   USEMODULE += xtimer
   ifeq (,$(filter gnrc_ipv6_auto_subnets_simple,$(USEMODULE)))
     DEFAULT_MODULE += gnrc_ipv6_auto_subnets_auto_init
