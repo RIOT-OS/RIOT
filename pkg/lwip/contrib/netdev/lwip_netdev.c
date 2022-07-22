@@ -14,27 +14,29 @@
  */
 
 #include <assert.h>
-#include <sys/uio.h>
 #include <inttypes.h>
+#include <sys/uio.h>
 
+#include "architecture.h"
+#include "event.h"
+#include "kernel_defines.h"
 #include "lwip/err.h"
 #include "lwip/ethip6.h"
 #include "lwip/netif.h"
-#include "lwip/netifapi.h"
 #include "lwip/netif/compat.h"
 #include "lwip/netif/netdev.h"
+#include "lwip/netifapi.h"
 #include "lwip/opt.h"
 #include "lwip/pbuf.h"
-#include "netif/etharp.h"
-#include "netif/lowpan6.h"
-
 #include "net/eui64.h"
 #include "net/ieee802154.h"
 #include "net/ipv6/addr.h"
 #include "net/netdev.h"
 #include "net/netopt.h"
-#include "utlist.h"
+#include "netif/etharp.h"
+#include "netif/lowpan6.h"
 #include "thread.h"
+#include "utlist.h"
 
 #define ENABLE_DEBUG                0
 #include "debug.h"
@@ -42,7 +44,6 @@
 #define LWIP_NETDEV_NAME            "lwip_netdev_mux"
 #define LWIP_NETDEV_PRIO            (THREAD_PRIORITY_MAIN - 4)
 #define LWIP_NETDEV_STACKSIZE       (THREAD_STACKSIZE_DEFAULT)
-#define LWIP_NETDEV_QUEUE_LEN       (8)
 #define LWIP_NETDEV_MSG_TYPE_EVENT 0x1235
 
 #define ETHERNET_IFNAME1 'E'
@@ -52,8 +53,8 @@
 #define WPAN_IFNAME2 'P'
 
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
-static char _stack[LWIP_NETDEV_STACKSIZE];
-static msg_t _queue[LWIP_NETDEV_QUEUE_LEN];
+static WORD_ALIGNED char _stack[LWIP_NETDEV_STACKSIZE];
+static event_queue_t evq;
 static char _tmp_buf[LWIP_NETDEV_BUFLEN];
 
 #ifdef MODULE_NETDEV_ETH
@@ -64,15 +65,19 @@ static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p);
 #endif
 static void _event_cb(netdev_t *dev, netdev_event_t event);
 static void *_event_loop(void *arg);
+static void _isr(event_t *ev);
 
 err_t lwip_netdev_init(struct netif *netif)
 {
     LWIP_ASSERT("netif != NULL", (netif != NULL));
     LWIP_ASSERT("netif->state != NULL", (netif->state != NULL));
+    lwip_netif_t *compat_netif = container_of(netif, lwip_netif_t, lwip_netif);
+    compat_netif->ev_isr.handler = _isr;
     netdev_t *netdev;
     netopt_enable_t enabled = 0;
     uint16_t dev_type;
     err_t res = ERR_OK;
+    event_queue_init_detached(&evq);
 
     /* start multiplexing thread (only one needed) */
     if (_pid <= KERNEL_PID_UNDEF) {
@@ -255,22 +260,16 @@ static struct pbuf *_get_recv_pkt(netdev_t *dev)
 
 static void _event_cb(netdev_t *dev, netdev_event_t event)
 {
-    if (event == NETDEV_EVENT_ISR) {
-        assert(_pid != KERNEL_PID_UNDEF);
-        msg_t msg;
+    lwip_netif_t *compat_netif = dev->context;
+    assert(compat_netif != NULL);
+    struct netif *netif = &compat_netif->lwip_netif;
 
-        msg.type = LWIP_NETDEV_MSG_TYPE_EVENT;
-        msg.content.ptr = dev;
-
-        if (msg_send(&msg, _pid) <= 0) {
-            DEBUG("lwip_netdev: possibly lost interrupt.\n");
-        }
-    }
-    else {
-        lwip_netif_t *compat_netif = dev->context;
-        struct netif *netif = &compat_netif->lwip_netif;
-        switch (event) {
-        case NETDEV_EVENT_RX_COMPLETE: {
+    switch (event) {
+    case NETDEV_EVENT_ISR:
+        event_post(&evq, &compat_netif->ev_isr);
+        break;
+    case NETDEV_EVENT_RX_COMPLETE:
+        {
             struct pbuf *p = _get_recv_pkt(dev);
             if (p == NULL) {
                 DEBUG("lwip_netdev: error receiving packet\n");
@@ -280,35 +279,35 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
                 DEBUG("lwip_netdev: error inputing packet\n");
                 return;
             }
-            break;
         }
-        case NETDEV_EVENT_LINK_UP: {
-            /* Will wake up DHCP state machine */
-            netifapi_netif_set_link_up(netif);
-            break;
-        }
-        case NETDEV_EVENT_LINK_DOWN: {
-            netifapi_netif_set_link_down(netif);
-            break;
-        }
-        default:
-            break;
-        }
+        break;
+    case NETDEV_EVENT_LINK_UP:
+        /* Will wake up DHCP state machine */
+        netifapi_netif_set_link_up(netif);
+        break;
+    case NETDEV_EVENT_LINK_DOWN:
+        netifapi_netif_set_link_down(netif);
+        break;
+    default:
+        break;
     }
+}
+
+static void _isr(event_t *ev)
+{
+    lwip_netif_t *compat_netif = container_of(ev, lwip_netif_t, ev_isr);
+    netdev_t *dev = compat_netif->lwip_netif.state;
+    dev->driver->isr(dev);
 }
 
 static void *_event_loop(void *arg)
 {
     (void)arg;
-    msg_init_queue(_queue, LWIP_NETDEV_QUEUE_LEN);
-    while (1) {
-        msg_t msg;
-        msg_receive(&msg);
-        if (msg.type == LWIP_NETDEV_MSG_TYPE_EVENT) {
-            netdev_t *dev = msg.content.ptr;
-            dev->driver->isr(dev);
-        }
-    }
+    event_queue_claim(&evq);
+    event_loop(&evq);
+
+    /* this should never be reached */
+    assert(0);
     return NULL;
 }
 

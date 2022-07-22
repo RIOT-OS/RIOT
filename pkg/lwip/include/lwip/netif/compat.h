@@ -22,6 +22,7 @@
 
 #include "lwip/netif.h"
 #include "net/netif.h"
+#include "event.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,8 +32,9 @@ extern "C" {
  * @brief   Representation of a network interface
  */
 typedef struct {
-    netif_t common_netif;                /**< network interface descriptor */
-    struct netif lwip_netif;             /**< lwIP interface data */
+    netif_t common_netif;               /**< network interface descriptor */
+    struct netif lwip_netif;            /**< lwIP interface data */
+    event_t ev_isr;                     /**< ISR event */
 } lwip_netif_t;
 
 #ifdef __cplusplus
