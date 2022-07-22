@@ -154,3 +154,140 @@ int vfs_file_sha256(const char* file, void *digest,
 
 }
 #endif /* MODULE_HASHES */
+
+int vfs_is_dir(const char *path)
+{
+    assert(path);
+
+    int err;
+    struct stat stat;
+    if (*path != '/') {
+        /* only accept absolute paths */
+        return -EINVAL;
+    }
+    if ((err = vfs_stat(path, &stat)) < 0) {
+        return err;
+    }
+    return ((stat.st_mode & S_IFMT) == S_IFDIR);
+}
+
+/**
+ * @brief   Removes additional "/" slashes from @p path
+ *
+ * @param[in]   path    Path to be prepared
+ */
+static void _vfs_prepare_path(char *path)
+{
+    assert(path);
+    assert(*path == '/');
+
+    int path_len = strlen(path);
+    char *p_write = path; /* end of so far constructed path */
+    int len = 0;
+    const char *p_read = p_write; /* segment to be appended to the path */
+    while (p_read < path + path_len) {
+        len = 0;
+        while (*p_read && *p_read == '/') {
+            p_read++; /* skip slashes */
+        }
+        while (p_read[len] && p_read[len] != '/') {
+            len++; /* length of segment to be copied */
+        }
+        if (*p_read && p_write + len + 1 <= path + path_len) {
+            memmove(p_write + 1, p_read, len);
+            p_write = p_write + len + 1; /* advance write pointer by segment length + 1 */
+            *p_write = p_read[len]; /* either '\0' or '/' */
+        }
+        p_read += len; /* advance read pointer by segment length */
+    }
+    if (*p_write) {
+        *++p_write = '\0';
+    }
+}
+
+int vfs_unlink_recursive(const char *root, char *path_buf, size_t max_size)
+{
+    assert(root);
+    assert(path_buf);
+
+    /* This function works like a Depth-first search (DFS).
+       First, we go as deep as we can into a directory and delete contained files.
+       Then we delete the now empty directory and go to the parent directory
+       and repeat the process. */
+    int err;
+    if (*root != '/' || !strcmp(root, "/")) {
+        /* only accept absolute paths and not the FS root */
+        return -EINVAL;
+    }
+    if (strlen(root) >= max_size) {
+        return -ENOBUFS;
+    }
+    strcpy(path_buf, root);
+    _vfs_prepare_path(path_buf);
+    if (path_buf[strlen(path_buf) - 1] != '/') {
+        if ((err = vfs_is_dir(path_buf)) < 0) {
+            return err; /* early unexpected error */
+        }
+        else if (!err) {
+            /* just a file */
+            return vfs_unlink(path_buf);
+        }
+        strcat(path_buf, "/");
+    }
+    vfs_DIR dir;
+    vfs_dirent_t entry;
+    char seg[VFS_NAME_MAX + 1] = {0}; /* + 1 to append a '/' */
+    size_t seg_len, root_len, fin = strlen(path_buf);
+    while ((root_len = strlen(path_buf)) >= fin) {
+        strcat(path_buf, seg);
+        *seg = '\0';
+        if ((err = vfs_opendir(&dir, path_buf)) < 0) { /* this works with a trailing '/' */
+            return err;
+        }
+        while (vfs_readdir(&dir, &entry) > 0) {
+            if (!strcmp(entry.d_name, "..")) {
+                continue;
+            }
+            seg_len = strlen(entry.d_name);
+            root_len = strlen(path_buf);
+            if (root_len + seg_len >= max_size) {
+                vfs_closedir(&dir);
+                return -ENOBUFS;
+            }
+            strcat(path_buf, entry.d_name);
+            if ((err = vfs_is_dir(path_buf)) < 0) {
+                /* error */
+                vfs_closedir(&dir);
+                return err;
+            }
+            else if (err) {
+                /* is dir */
+                if (*seg == '\0') {
+                    strcat(seg, entry.d_name);
+                    strcat(seg, "/");
+                }
+            }
+            else {
+                /* is file */
+                if ((err = vfs_unlink(path_buf)) < 0) {
+                    vfs_closedir(&dir);
+                    return err;
+                }
+            }
+            path_buf[root_len] = '\0';
+        }
+        vfs_closedir(&dir);
+        if (*seg == '\0') {
+            /* no files and no subdirectory */
+            if ((err = vfs_rmdir(path_buf)) < 0) {
+                return err;
+            }
+            /* go one segment up */
+            char *end = &path_buf[strlen(path_buf) - 1];
+            assert(*end == '/');
+            while (*--end != '/') { }
+            *++end = '\0';
+        }
+    }
+    return 0;
+}
