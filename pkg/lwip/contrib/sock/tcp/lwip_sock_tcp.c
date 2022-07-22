@@ -85,18 +85,18 @@ int sock_tcp_listen(sock_tcp_queue_t *queue, const sock_tcp_ep_t *local,
     memset(queue->array, 0, sizeof(sock_tcp_t) * queue_len);
     mutex_unlock(&queue->mutex);
     switch (netconn_listen_with_backlog(queue->base.conn, queue->len)) {
-        case ERR_OK:
-            break;
-        case ERR_MEM:
-            return -ENOMEM;
-        case ERR_USE:
-            return -EADDRINUSE;
-        case ERR_VAL:
-            return -EINVAL;
-        default:
-            assert(false); /* should not happen since queue->base.conn is not
-                            * closed and we have a TCP conn */
-            break;
+    case ERR_OK:
+        break;
+    case ERR_MEM:
+        return -ENOMEM;
+    case ERR_USE:
+        return -EADDRINUSE;
+    case ERR_VAL:
+        return -EINVAL;
+    default:
+        assert(false); /* should not happen since queue->base.conn is not
+                        * closed and we have a TCP conn */
+        break;
     }
     return 0;
 }
@@ -215,33 +215,33 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
             return -EAGAIN;
         }
         switch (netconn_accept(queue->base.conn, &tmp)) {
-            case ERR_OK:
-                for (unsigned short i = 0; i < queue->len; i++) {
-                    sock_tcp_t *s = &queue->array[i];
-                    if (s->base.conn == NULL) {
-                        _tcp_sock_init(s, tmp, queue);
-                        queue->used++;
-                        assert(queue->used > 0);
-                        *sock = s;
-                        break;
-                    }
+        case ERR_OK:
+            for (unsigned short i = 0; i < queue->len; i++) {
+                sock_tcp_t *s = &queue->array[i];
+                if (s->base.conn == NULL) {
+                    _tcp_sock_init(s, tmp, queue);
+                    queue->used++;
+                    assert(queue->used > 0);
+                    *sock = s;
+                    break;
                 }
-                break;
-            case ERR_ABRT:
-                res = -ECONNABORTED;
-                break;
-            case ERR_MEM:
-                res = -ENOMEM;
-                break;
+            }
+            break;
+        case ERR_ABRT:
+            res = -ECONNABORTED;
+            break;
+        case ERR_MEM:
+            res = -ENOMEM;
+            break;
 #if LWIP_SO_RCVTIMEO
-            case ERR_TIMEOUT:
-                res = -ETIMEDOUT;
-                break;
+        case ERR_TIMEOUT:
+            res = -ETIMEDOUT;
+            break;
 #endif
-            default:
-                assert(false);
-                res = -1;
-                break;
+        default:
+            assert(false);
+            res = -1;
+            break;
         }
     }
     else {
@@ -307,28 +307,28 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
             err_t err;
             if ((err = netconn_recv_tcp_pbuf(sock->base.conn, &buf)) < 0) {
                 switch (err) {
-                    case ERR_ABRT:
-                        res = -ECONNABORTED;
-                        break;
-                    case ERR_CONN:
-                        res = -EADDRNOTAVAIL;
-                        break;
-                    case ERR_RST:
-                    case ERR_CLSD:
-                        res = -ECONNRESET;
-                        break;
-                    case ERR_MEM:
-                        res = -ENOMEM;
-                        break;
+                case ERR_ABRT:
+                    res = -ECONNABORTED;
+                    break;
+                case ERR_CONN:
+                    res = -EADDRNOTAVAIL;
+                    break;
+                case ERR_RST:
+                case ERR_CLSD:
+                    res = -ECONNRESET;
+                    break;
+                case ERR_MEM:
+                    res = -ENOMEM;
+                    break;
 #if LWIP_SO_RCVTIMEO
-                    case ERR_TIMEOUT:
-                        res = -ETIMEDOUT;
-                        break;
+                case ERR_TIMEOUT:
+                    res = -ETIMEDOUT;
+                    break;
 #endif
-                    default:
-                        /* no applicable error */
-                        res = -1;
-                        break;
+                default:
+                    /* no applicable error */
+                    res = -1;
+                    break;
                 }
                 break;
             }

@@ -123,50 +123,50 @@ static int _parse_iphdr(struct netbuf *buf, void **data, void **ctx,
 
     switch (data_ptr[0] >> 4) {
 #if LWIP_IPV4
-        case 4:
-            if (remote != NULL) {
-                struct ip_hdr *iphdr = (struct ip_hdr *)data_ptr;
+    case 4:
+        if (remote != NULL) {
+            struct ip_hdr *iphdr = (struct ip_hdr *)data_ptr;
 
-                assert(buf->p->len > sizeof(struct ip_hdr));
-                remote->family = AF_INET;
-                memcpy(&remote->addr, &iphdr->src, sizeof(ip4_addr_t));
-                remote->netif = _ip4_addr_to_netif(&iphdr->dest);
-            }
-            if (local != NULL) {
-                struct ip_hdr *iphdr = (struct ip_hdr *)data_ptr;
+            assert(buf->p->len > sizeof(struct ip_hdr));
+            remote->family = AF_INET;
+            memcpy(&remote->addr, &iphdr->src, sizeof(ip4_addr_t));
+            remote->netif = _ip4_addr_to_netif(&iphdr->dest);
+        }
+        if (local != NULL) {
+            struct ip_hdr *iphdr = (struct ip_hdr *)data_ptr;
 
-                assert(buf->p->len > sizeof(struct ip_hdr));
-                local->family = AF_INET;
-                memcpy(&local->addr, &iphdr->dest, sizeof(ip4_addr_t));
-            }
-            data_ptr += sizeof(struct ip_hdr);
-            data_len -= sizeof(struct ip_hdr);
-            break;
+            assert(buf->p->len > sizeof(struct ip_hdr));
+            local->family = AF_INET;
+            memcpy(&local->addr, &iphdr->dest, sizeof(ip4_addr_t));
+        }
+        data_ptr += sizeof(struct ip_hdr);
+        data_len -= sizeof(struct ip_hdr);
+        break;
 #endif
 #if LWIP_IPV6
-        case 6:
-            if (remote != NULL) {
-                struct ip6_hdr *iphdr = (struct ip6_hdr *)data_ptr;
+    case 6:
+        if (remote != NULL) {
+            struct ip6_hdr *iphdr = (struct ip6_hdr *)data_ptr;
 
-                assert(buf->p->len > sizeof(struct ip6_hdr));
-                remote->family = AF_INET6;
-                memcpy(&remote->addr, &iphdr->src, sizeof(ip6_addr_t));
-                remote->netif = _ip6_addr_to_netif(&iphdr->dest);
-            }
-            if (local != NULL) {
-                struct ip6_hdr *iphdr = (struct ip6_hdr *)data_ptr;
+            assert(buf->p->len > sizeof(struct ip6_hdr));
+            remote->family = AF_INET6;
+            memcpy(&remote->addr, &iphdr->src, sizeof(ip6_addr_t));
+            remote->netif = _ip6_addr_to_netif(&iphdr->dest);
+        }
+        if (local != NULL) {
+            struct ip6_hdr *iphdr = (struct ip6_hdr *)data_ptr;
 
-                assert(buf->p->len > sizeof(struct ip6_hdr));
-                local->family = AF_INET6;
-                memcpy(&local->addr, &iphdr->dest, sizeof(ip6_addr_t));
-            }
-            data_ptr += sizeof(struct ip6_hdr);
-            data_len -= sizeof(struct ip6_hdr);
-            break;
+            assert(buf->p->len > sizeof(struct ip6_hdr));
+            local->family = AF_INET6;
+            memcpy(&local->addr, &iphdr->dest, sizeof(ip6_addr_t));
+        }
+        data_ptr += sizeof(struct ip6_hdr);
+        data_len -= sizeof(struct ip6_hdr);
+        break;
 #endif
-        default:
-            netbuf_delete(buf);
-            return -EPROTO;
+    default:
+        netbuf_delete(buf);
+        return -EPROTO;
     }
     *data = data_ptr;
     *ctx = buf;
