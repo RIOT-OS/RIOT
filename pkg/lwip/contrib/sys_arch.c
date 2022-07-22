@@ -153,14 +153,14 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
     stop = ztimer_now(ZTIMER_MSEC);
     ztimer_remove(ZTIMER_MSEC, &timer);  /* in case timer did not time out */
     switch (m.type) {
-        case _MSG_SUCCESS:
-            *msg = m.content.ptr;
-            return stop - start;
-        case _MSG_TIMEOUT:
-            break;
-        default:    /* should not happen */
-            LWIP_ASSERT("invalid message received", false);
-            break;
+    case _MSG_SUCCESS:
+        *msg = m.content.ptr;
+        return stop - start;
+    case _MSG_TIMEOUT:
+        break;
+    default:    /* should not happen */
+        LWIP_ASSERT("invalid message received", false);
+        break;
     }
     return SYS_ARCH_TIMEOUT;
 }

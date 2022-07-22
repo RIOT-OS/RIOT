@@ -96,83 +96,82 @@ err_t lwip_netdev_init(struct netif *netif)
     netif->hostname = "riot";
 #endif /* LWIP_NETIF_HOSTNAME */
 
-    /* XXX: for now assume its Ethernet, since netdev is implemented only by ethernet drivers */
     switch (dev_type) {
 #ifdef MODULE_NETDEV_ETH
-        case NETDEV_TYPE_ETHERNET:
-            netif->name[0] = ETHERNET_IFNAME1;
-            netif->name[1] = ETHERNET_IFNAME2;
-            netif->hwaddr_len = (u8_t)netdev->driver->get(netdev, NETOPT_ADDRESS, netif->hwaddr,
-                                                          sizeof(netif->hwaddr));
-            if (netif->hwaddr_len > sizeof(netif->hwaddr)) {
-                return ERR_IF;
-            }
-            /* TODO: get from driver (currently not in netdev_eth) */
-            netif->mtu = ETHERNET_DATA_LEN;
-            netif->linkoutput = _eth_link_output;
+    case NETDEV_TYPE_ETHERNET:
+        netif->name[0] = ETHERNET_IFNAME1;
+        netif->name[1] = ETHERNET_IFNAME2;
+        netif->hwaddr_len = (u8_t)netdev->driver->get(netdev, NETOPT_ADDRESS, netif->hwaddr,
+                                                      sizeof(netif->hwaddr));
+        if (netif->hwaddr_len > sizeof(netif->hwaddr)) {
+            return ERR_IF;
+        }
+        /* TODO: get from driver (currently not in netdev_eth) */
+        netif->mtu = ETHERNET_DATA_LEN;
+        netif->linkoutput = _eth_link_output;
 #if LWIP_IPV4
-            netif->output = etharp_output;
+        netif->output = etharp_output;
 #endif
 #if LWIP_IPV6
-            netif->output_ip6 = ethip6_output;
-            netif_create_ip6_linklocal_address(netif, 1);   /* 1: hwaddr is 48-bit MAC addr */
+        netif->output_ip6 = ethip6_output;
+        netif_create_ip6_linklocal_address(netif, 1);   /* 1: hwaddr is 48-bit MAC addr */
 #endif
-            netif->flags |= NETIF_FLAG_BROADCAST;
-            netif->flags |= NETIF_FLAG_ETHARP;
-            netif->flags |= NETIF_FLAG_ETHERNET;
-            break;
+        netif->flags |= NETIF_FLAG_BROADCAST;
+        netif->flags |= NETIF_FLAG_ETHARP;
+        netif->flags |= NETIF_FLAG_ETHERNET;
+        break;
 #endif
 #ifdef MODULE_LWIP_SIXLOWPAN
-        case NETDEV_TYPE_IEEE802154:
-        {
-            u16_t val;
-            ip6_addr_t *addr;
-            netif->name[0] = WPAN_IFNAME1;
-            netif->name[1] = WPAN_IFNAME2;
-            if (netdev->driver->get(netdev, NETOPT_NID, &val,
-                                    sizeof(val)) < 0) {
-                return ERR_IF;
-            }
-            lowpan6_set_pan_id(val);
-            netif->hwaddr_len = (u8_t)netdev->driver->get(netdev, NETOPT_ADDRESS_LONG,
-                                                          netif->hwaddr, sizeof(netif->hwaddr));
-            if (netif->hwaddr_len > sizeof(netif->hwaddr)) {
-                return ERR_IF;
-            }
-            netif->linkoutput = _ieee802154_link_output;
-            res = lowpan6_if_init(netif);
-            if (res != ERR_OK) {
-                return res;
-            }
-            /* assure usage of long address as source address */
-            val = netif->hwaddr_len;
-            if (netdev->driver->set(netdev, NETOPT_SRC_LEN, &val, sizeof(val)) < 0) {
-                return ERR_IF;
-            }
-            /* netif_create_ip6_linklocal_address() does weird byte-swapping
-             * with full IIDs, so let's do it ourselves */
-            addr = ip_2_ip6(&(netif->ip6_addr[0]));
-            /* addr->addr is a uint32_t array */
-            if (l2util_ipv6_iid_from_addr(dev_type,
-                                          netif->hwaddr, netif->hwaddr_len,
-                                          (eui64_t *)&addr->addr[2]) < 0) {
-                return ERR_IF;
-            }
-            ipv6_addr_set_link_local_prefix((ipv6_addr_t *)&addr->addr[0]);
-            ip6_addr_assign_zone(addr, IP6_UNICAST, netif);
-            /* Set address state. */
-#if LWIP_IPV6_DUP_DETECT_ATTEMPTS
-            /* Will perform duplicate address detection (DAD). */
-            netif->ip6_addr_state[0] = IP6_ADDR_TENTATIVE;
-#else
-            /* Consider address valid. */
-            netif->ip6_addr_state[0] = IP6_ADDR_PREFERRED;
-#endif /* LWIP_IPV6_AUTOCONFIG */
-            break;
+    case NETDEV_TYPE_IEEE802154:
+    {
+        u16_t val;
+        ip6_addr_t *addr;
+        netif->name[0] = WPAN_IFNAME1;
+        netif->name[1] = WPAN_IFNAME2;
+        if (netdev->driver->get(netdev, NETOPT_NID, &val,
+                                sizeof(val)) < 0) {
+            return ERR_IF;
         }
+        lowpan6_set_pan_id(val);
+        netif->hwaddr_len = (u8_t)netdev->driver->get(netdev, NETOPT_ADDRESS_LONG,
+                                                      netif->hwaddr, sizeof(netif->hwaddr));
+        if (netif->hwaddr_len > sizeof(netif->hwaddr)) {
+            return ERR_IF;
+        }
+        netif->linkoutput = _ieee802154_link_output;
+        res = lowpan6_if_init(netif);
+        if (res != ERR_OK) {
+            return res;
+        }
+        /* assure usage of long address as source address */
+        val = netif->hwaddr_len;
+        if (netdev->driver->set(netdev, NETOPT_SRC_LEN, &val, sizeof(val)) < 0) {
+            return ERR_IF;
+        }
+        /* netif_create_ip6_linklocal_address() does weird byte-swapping
+         * with full IIDs, so let's do it ourselves */
+        addr = ip_2_ip6(&(netif->ip6_addr[0]));
+        /* addr->addr is a uint32_t array */
+        if (l2util_ipv6_iid_from_addr(dev_type,
+                                      netif->hwaddr, netif->hwaddr_len,
+                                      (eui64_t *)&addr->addr[2]) < 0) {
+            return ERR_IF;
+        }
+        ipv6_addr_set_link_local_prefix((ipv6_addr_t *)&addr->addr[0]);
+        ip6_addr_assign_zone(addr, IP6_UNICAST, netif);
+        /* Set address state. */
+#if LWIP_IPV6_DUP_DETECT_ATTEMPTS
+        /* Will perform duplicate address detection (DAD). */
+        netif->ip6_addr_state[0] = IP6_ADDR_TENTATIVE;
+#else
+        /* Consider address valid. */
+        netif->ip6_addr_state[0] = IP6_ADDR_PREFERRED;
+#endif /* LWIP_IPV6_AUTOCONFIG */
+        break;
+    }
 #endif
-        default:
-            return ERR_IF;  /* device type not supported yet */
+    default:
+        return ERR_IF;  /* device type not supported yet */
     }
     netif->flags |= NETIF_FLAG_UP;
     /* Set link state up if link state is unsupported, or if it is up */
@@ -271,29 +270,29 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         lwip_netif_t *compat_netif = dev->context;
         struct netif *netif = &compat_netif->lwip_netif;
         switch (event) {
-            case NETDEV_EVENT_RX_COMPLETE: {
-                struct pbuf *p = _get_recv_pkt(dev);
-                if (p == NULL) {
-                    DEBUG("lwip_netdev: error receiving packet\n");
-                    return;
-                }
-                if (netif->input(p, netif) != ERR_OK) {
-                    DEBUG("lwip_netdev: error inputing packet\n");
-                    return;
-                }
-                break;
+        case NETDEV_EVENT_RX_COMPLETE: {
+            struct pbuf *p = _get_recv_pkt(dev);
+            if (p == NULL) {
+                DEBUG("lwip_netdev: error receiving packet\n");
+                return;
             }
-            case NETDEV_EVENT_LINK_UP: {
-                /* Will wake up DHCP state machine */
-                netifapi_netif_set_link_up(netif);
-                break;
+            if (netif->input(p, netif) != ERR_OK) {
+                DEBUG("lwip_netdev: error inputing packet\n");
+                return;
             }
-            case NETDEV_EVENT_LINK_DOWN: {
-                netifapi_netif_set_link_down(netif);
-                break;
-            }
-            default:
-                break;
+            break;
+        }
+        case NETDEV_EVENT_LINK_UP: {
+            /* Will wake up DHCP state machine */
+            netifapi_netif_set_link_up(netif);
+            break;
+        }
+        case NETDEV_EVENT_LINK_DOWN: {
+            netifapi_netif_set_link_down(netif);
+            break;
+        }
+        default:
+            break;
         }
     }
 }

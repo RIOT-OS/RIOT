@@ -43,29 +43,29 @@ int netif_get_opt(netif_t *iface, netopt_t opt, uint16_t context,
     int res = -ENOTSUP;
     switch (opt) {
 #ifdef MODULE_LWIP_IPV6
-        case NETOPT_IPV6_ADDR: {
-                assert(max_len >= sizeof(ipv6_addr_t));
-                ipv6_addr_t *tgt = value;
+    case NETOPT_IPV6_ADDR: {
+            assert(max_len >= sizeof(ipv6_addr_t));
+            ipv6_addr_t *tgt = value;
 
-                res = 0;
-                for (unsigned i = 0;
-                     ((res + sizeof(ipv6_addr_t)) <= max_len) &&
-                     (i < LWIP_IPV6_NUM_ADDRESSES);
-                     i++) {
-                    if (netif_ip6_addr_state(netif, i) != IP6_ADDR_INVALID) {
-                        memcpy(tgt, &(netif_ip6_addr(netif, i)->addr), sizeof(ipv6_addr_t));
-                        res += sizeof(ipv6_addr_t);
-                        tgt++;
-                    }
+            res = 0;
+            for (unsigned i = 0;
+                 ((res + sizeof(ipv6_addr_t)) <= max_len) &&
+                 (i < LWIP_IPV6_NUM_ADDRESSES);
+                 i++) {
+                if (netif_ip6_addr_state(netif, i) != IP6_ADDR_INVALID) {
+                    memcpy(tgt, &(netif_ip6_addr(netif, i)->addr), sizeof(ipv6_addr_t));
+                    res += sizeof(ipv6_addr_t);
+                    tgt++;
                 }
             }
-            break;
+        }
+        break;
 #endif
-        default:
-            break;
+    default:
+        break;
     }
     if (res == -ENOTSUP) {
-        // Ask underlying netdev
+        /* Ask underlying netdev */
         res = dev->driver->get(dev, opt, value, max_len);
     }
     return res;
