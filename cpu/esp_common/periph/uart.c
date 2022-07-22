@@ -66,6 +66,7 @@
 #include "soc/gpio_struct.h"
 #include "soc/periph_defs.h"
 #include "soc/rtc.h"
+#include "soc/soc_caps.h"
 #include "soc/uart_reg.h"
 #include "soc/uart_struct.h"
 
@@ -106,9 +107,11 @@ static struct uart_hw_t _uarts[] = {
         .signal_txd = U0TXD_OUT_IDX,
         .signal_rxd = U0RXD_IN_IDX,
         .int_src = ETS_UART0_INTR_SOURCE
-#endif /* !MCU_ESP8266 */
+#endif /* !definedMCU_ESP8266 */
     },
-#if defined(UART1_TXD) || !defined(MCU_ESP8266)
+
+#if !defined(MCU_ESP8266)
+#if defined(UART1_TXD) && defined(UART1_RXD) && (SOC_UART_NUM > 1)
     {
         .regs = &UART1,
         .used = false,
@@ -116,15 +119,14 @@ static struct uart_hw_t _uarts[] = {
         .data = UART_DATA_BITS_8,
         .stop = UART_STOP_BITS_1,
         .parity = UART_PARITY_NONE,
-#if !defined(MCU_ESP8266)
         .mod = PERIPH_UART1_MODULE,
         .signal_txd = U1TXD_OUT_IDX,
         .signal_rxd = U1RXD_IN_IDX,
         .int_src = ETS_UART1_INTR_SOURCE
-#endif /* !MCU_ESP8266 */
     },
-#endif /* defined(UART1_TXD) || !defined(MCU_ESP8266) */
-#if defined(CPU_FAM_ESP32)
+#endif /* defined(UART1_TXD) && defined(UART1_RXD) && (SOC_UART_NUM > 1) */
+
+#if defined(UART2_TXD) && defined(UART2_RXD) && (SOC_UART_NUM > 2)
     {
         .regs = &UART2,
         .used = false,
@@ -137,7 +139,8 @@ static struct uart_hw_t _uarts[] = {
         .signal_rxd = U2RXD_IN_IDX,
         .int_src = ETS_UART2_INTR_SOURCE
     },
-#endif /* defined(CPU_FAM_ESP32) */
+#endif /* defined(UART2_TXD) && defined(UART2_RXD) && (SOC_UART_NUM > 2) */
+#endif /* !defined(MCU_ESP8266) */
 };
 
 /* declaration of external functions */
@@ -162,8 +165,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     assert(uart < UART_NUMOF);
 
     /* UART1 and UART2 have configurable pins */
-    if ((UART_NUMOF > 0 && uart == UART_DEV(1)) ||
-        (UART_NUMOF > 1 && uart == UART_DEV(2))) {
+    if ((UART_NUMOF > 1 && uart == UART_DEV(1)) ||
+        (UART_NUMOF > 2 && uart == UART_DEV(2))) {
 
         /* reset the pins when they were already used as UART pins */
         if (gpio_get_pin_usage(uart_config[uart].txd) == _UART) {
@@ -287,7 +290,11 @@ static void IRAM _uart_intr_handler(void *arg)
             DEBUG("%s uart=%d int_st=%08x\n", __func__,
                   uart, (unsigned)_uarts[uart].regs->int_st.val);
 
+#ifdef CPU_FAM_ESP32S3
+            if (_uarts[uart].used && _uarts[uart].regs->int_st.rxfifo_full_int_st) {
+#else
             if (_uarts[uart].used && _uarts[uart].regs->int_st.rxfifo_full) {
+#endif
                 /* read one byte of data */
                 uint8_t data = _uart_rx_one_char(uart);
                 /* if registered, call the RX callback function */
@@ -295,7 +302,11 @@ static void IRAM _uart_intr_handler(void *arg)
                     _uarts[uart].isr_ctx.rx_cb(_uarts[uart].isr_ctx.arg, data);
                 }
                 /* clear interrupt flag */
+#ifdef CPU_FAM_ESP32S3
+                _uarts[uart].regs->int_clr.rxfifo_full_int_clr = 1;
+#else
                 _uarts[uart].regs->int_clr.rxfifo_full = 1;
+#endif
             }
 
             /* TODO handle other types of interrupts, for the moment just clear them */
@@ -325,6 +336,9 @@ static uint8_t IRAM _uart_rx_one_char(uart_t uart)
 #if defined(CPU_FAM_ESP32) || defined(MCU_ESP8266)
     /* read the lowest byte from RX FIFO register */
     return _uarts[uart].regs->fifo.rw_byte;
+#elif defined(CPU_FAM_ESP32S3)
+    /* read the lowest byte from RX FIFO register */
+    return _uarts[uart].regs->fifo.rxfifo_rd_byte;
 #else
     /* read the lowest byte from RX FIFO register */
     return _uarts[uart].regs->ahb_fifo.rw_byte;
@@ -353,8 +367,13 @@ static void _uart_tx_one_char(uart_t uart, uint8_t data)
 
 static void _uart_intr_enable(uart_t uart)
 {
+#ifdef CPU_FAM_ESP32S3
+    _uarts[uart].regs->int_ena.rxfifo_full_int_ena = 1;
+    _uarts[uart].regs->int_clr.rxfifo_full_int_clr = 1;
+#else
     _uarts[uart].regs->int_ena.rxfifo_full = 1;
     _uarts[uart].regs->int_clr.rxfifo_full = 1;
+#endif
     _uarts[uart].used = true;
 
     DEBUG("%s %08x\n", __func__, (unsigned)_uarts[uart].regs->int_ena.val);
@@ -433,13 +452,18 @@ static int _uart_set_baudrate(uart_t uart, uint32_t baudrate)
     /* use APB_CLK */
     _uarts[uart].regs->conf0.tick_ref_always_on = 1;
 #endif
-#ifdef CPU_FAM_ESP32C3
+#if defined(CPU_FAM_ESP32C3) || defined(CPU_FAM_ESP32S3)
     _uarts[uart].regs->clk_conf.sclk_sel = 1; /* APB clock used instead of XTAL */
 #endif
     /* compute and set the integral and the decimal part */
     uint32_t clk_div = (UART_CLK_FREQ << 4) / _uarts[uart].baudrate;
+#ifdef CPU_FAM_ESP32S3
+    _uarts[uart].regs->clkdiv.clkdiv  = clk_div >> 4;
+    _uarts[uart].regs->clkdiv.clkdiv_frag = clk_div & 0xf;
+#else
     _uarts[uart].regs->clk_div.div_int  = clk_div >> 4;
     _uarts[uart].regs->clk_div.div_frag = clk_div & 0xf;
+#endif /* CPU_FAM_ESP32S3 */
 
 #endif
 
