@@ -146,7 +146,7 @@ typedef struct {
     /**
      * @brief   ISR event for the network device
      */
-    event_t event_isr;
+    event_counted_t event_isr;
 #if (GNRC_NETIF_L2ADDR_MAXLEN > 0) || DOXYGEN
     /**
      * @brief   The link-layer address currently used as the source address

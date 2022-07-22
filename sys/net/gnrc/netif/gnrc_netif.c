@@ -1648,7 +1648,7 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back);
  *
  * @param[in]   evp     pointer to the event
  */
-static void _event_handler_isr(event_t *evp)
+static void _event_handler_isr(event_counted_t *evp)
 {
     gnrc_netif_t *netif = container_of(evp, gnrc_netif_t, event_isr);
     netif->dev->driver->isr(netif->dev);
@@ -1694,11 +1694,11 @@ static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
         /* First drain the queues before blocking the thread */
         /* Events will be handled before messages */
         DEBUG("gnrc_netif: handling events\n");
-        event_t *evp;
+        event_counted_t *evp;
         /* We can not use event_loop() or event_wait() because then we would not
          * wake up when a message arrives */
         event_queue_t *evq = &netif->evq;
-        while ((evp = event_get(evq))) {
+        while ((evp = event_counted_get(evq))) {
             DEBUG("gnrc_netif: event %p\n", (void *)evp);
             if (evp->handler) {
                 evp->handler(evp);
@@ -1957,7 +1957,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
     gnrc_netif_t *netif = (gnrc_netif_t *) dev->context;
 
     if (event == NETDEV_EVENT_ISR) {
-        event_post(&netif->evq, &netif->event_isr);
+        event_counted_post(&netif->evq, &netif->event_isr);
     }
     else {
         DEBUG("gnrc_netif: event triggered -> %i\n", event);
