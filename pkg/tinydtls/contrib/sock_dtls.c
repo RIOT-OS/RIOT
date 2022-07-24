@@ -592,16 +592,16 @@ void sock_dtls_session_set_udp_ep(sock_dtls_session_t *session,
     _ep_to_session(ep, &session->dtls_session);
 }
 
-ssize_t sock_dtls_send_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
-                           const void *data, size_t len, uint32_t timeout,
-                           sock_dtls_aux_tx_t *aux)
+ssize_t sock_dtls_sendv_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
+                            const iolist_t *snips, uint32_t timeout,
+                            sock_dtls_aux_tx_t *aux)
 {
     (void)aux;
     int res;
 
     assert(sock);
     assert(remote);
-    assert(data);
+    assert(snips);
 
     /* check if session exists, if not create session first then send */
     if (!dtls_get_peer(sock->dtls_ctx, &remote->dtls_session)) {
@@ -629,7 +629,8 @@ ssize_t sock_dtls_send_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
                     timeout = _update_timeout(start, timeout);
                     is_timed_out = (res < 0) || (timeout == 0);
                 }
-            }while (!is_timed_out && (msg.type != DTLS_EVENT_CONNECTED));
+            } while (!is_timed_out && (msg.type != DTLS_EVENT_CONNECTED));
+
             if (is_timed_out &&  (msg.type != DTLS_EVENT_CONNECTED)) {
                 DEBUG("sock_dtls: handshake process timed out\n");
 
@@ -642,8 +643,19 @@ ssize_t sock_dtls_send_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
         }
     }
 
-    res = dtls_write(sock->dtls_ctx, &remote->dtls_session,
-                     (uint8_t *)data, len);
+    const unsigned snip_count = iolist_count(snips);
+    uint8_t *snip_bufs[snip_count];
+    size_t snip_len[snip_count];
+
+    for (unsigned i = 0; snips; snips = snips->iol_next) {
+        snip_bufs[i] = snips->iol_base;
+        snip_len[i] = snips->iol_len;
+        ++i;
+    }
+
+    res = dtls_writev(sock->dtls_ctx, &remote->dtls_session,
+                      snip_bufs, snip_len, snip_count);
+
 #ifdef SOCK_HAS_ASYNC
     if ((res >= 0) && (sock->async_cb != NULL)) {
         sock->async_cb(sock, SOCK_ASYNC_MSG_SENT, sock->async_cb_arg);
