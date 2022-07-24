@@ -76,7 +76,7 @@ static int _send_ack(nanocoap_sock_t *sock, coap_pkt_t *pkt)
     coap_build_hdr(&ack, COAP_TYPE_ACK, coap_get_token(pkt), tkl,
                    COAP_CODE_EMPTY, ntohs(pkt->hdr->id));
 
-    return sock_udp_send(sock, &ack, sizeof(ack), NULL);
+    return sock_udp_send(&sock->udp, &ack, sizeof(ack), NULL);
 }
 
 static bool _id_or_token_missmatch(const coap_pkt_t *pkt, unsigned id,
@@ -149,7 +149,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
             DEBUG("nanocoap: send %u bytes (%u tries left)\n",
                   (unsigned)iolist_size(&head), tries_left);
 
-            res = sock_udp_sendv(sock, &head, NULL);
+            res = sock_udp_sendv(&sock->udp, &head, NULL);
             if (res <= 0) {
                 DEBUG("nanocoap: error sending coap request, %d\n", (int)res);
                 return res;
@@ -170,7 +170,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                       _deadline_left_us(deadline));
             }
             const void *old_ctx = ctx;
-            tmp = sock_udp_recv_buf(sock, &payload, &ctx, _deadline_left_us(deadline), NULL);
+            tmp = sock_udp_recv_buf(&sock->udp, &payload, &ctx, _deadline_left_us(deadline), NULL);
             /* sock_udp_recv_buf() is supposed to return multiple packet fragments
              * when called multiple times with the same context.
              * In practise, this is not implemented and it will always return a pointer
@@ -271,7 +271,7 @@ static int _request_cb(void *arg, coap_pkt_t *pkt)
     return pkt_len;
 }
 
-ssize_t nanocoap_sock_request(sock_udp_t *sock, coap_pkt_t *pkt, size_t len)
+ssize_t nanocoap_sock_request(nanocoap_sock_t *sock, coap_pkt_t *pkt, size_t len)
 {
     struct iovec buf = {
         .iov_base = pkt->hdr,
@@ -693,13 +693,13 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
         local->port = COAP_PORT;
     }
 
-    ssize_t res = sock_udp_create(&sock, local, NULL, 0);
+    ssize_t res = sock_udp_create(&sock.udp, local, NULL, 0);
     if (res != 0) {
         return -1;
     }
 
     while (1) {
-        res = sock_udp_recv(&sock, buf, bufsize, -1, &remote);
+        res = sock_udp_recv(&sock.udp, buf, bufsize, -1, &remote);
         if (res < 0) {
             DEBUG("error receiving UDP packet %d\n", (int)res);
         }
@@ -710,7 +710,7 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
                 continue;
             }
             if ((res = coap_handle_req(&pkt, buf, bufsize, &ctx)) > 0) {
-                sock_udp_send(&sock, buf, res, &remote);
+                sock_udp_send(&sock.udp, buf, res, &remote);
             }
             else {
                 DEBUG("error handling request %d\n", (int)res);

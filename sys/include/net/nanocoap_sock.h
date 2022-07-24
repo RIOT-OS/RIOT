@@ -142,9 +142,10 @@ extern "C" {
 
 /**
  * @brief   nanocoap socket type
- *
  */
-typedef sock_udp_t nanocoap_sock_t;
+typedef struct {
+    sock_udp_t udp;                 /**< UDP socket */
+} nanocoap_sock_t;
 
 /**
  * @brief Blockwise request helper struct
@@ -185,7 +186,7 @@ static inline int nanocoap_sock_connect(nanocoap_sock_t *sock,
                                         const sock_udp_ep_t *local,
                                         const sock_udp_ep_t *remote)
 {
-    return sock_udp_create(sock, local, remote, 0);
+    return sock_udp_create(&sock->udp, local, remote, 0);
 }
 
 /**
@@ -206,7 +207,7 @@ int nanocoap_sock_url_connect(const char *url, nanocoap_sock_t *sock);
  */
 static inline void nanocoap_sock_close(nanocoap_sock_t *sock)
 {
-    sock_udp_close(sock);
+    sock_udp_close(&sock->udp);
 }
 
 /**
@@ -441,7 +442,7 @@ ssize_t nanocoap_sock_request(nanocoap_sock_t *sock, coap_pkt_t *pkt, size_t len
  * @returns     length of response on success
  * @returns     <0 on error
  */
-ssize_t nanocoap_sock_request_cb(sock_udp_t *sock, coap_pkt_t *pkt,
+ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                                  coap_request_cb_t cb, void *arg);
 
 /**
