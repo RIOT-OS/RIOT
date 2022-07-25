@@ -25,6 +25,7 @@
 #include "net/gcoap/fileserver.h"
 #include "net/gcoap.h"
 #include "vfs.h"
+#include "vfs_util.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -456,10 +457,19 @@ static ssize_t _delete_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 {
     int err;
     if (request->options.exists.if_match && request->options.if_match_len) {
-        return gcoap_fileserver_error_handler(pdu, buf, len, COAP_CODE_PRECONDITION_FAILED);
+        if (request->options.if_match != byteorder_htonl(COAPFILESERVER_DIR_DELETE_ETAG).u32) {
+            return gcoap_fileserver_error_handler(pdu, buf, len, COAP_CODE_PRECONDITION_FAILED);
+        }
+        if ((err = vfs_rmdir(request->namebuf)) < 0) {
+            return gcoap_fileserver_error_handler(pdu, buf, len, err);
+        }
     }
-    if ((err = vfs_rmdir(request->namebuf)) < 0) {
-        return gcoap_fileserver_error_handler(pdu, buf, len, err);
+    else if (IS_USED(MODULE_VFS_UTIL)) {
+        if ((err = vfs_unlink_recursive(request->namebuf,
+                                        request->namebuf,
+                                        sizeof(request->namebuf))) < 0) {
+            gcoap_fileserver_error_handler(pdu, buf, len, err);
+        }
     }
     gcoap_resp_init(pdu, buf, len, COAP_CODE_DELETED);
     return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);

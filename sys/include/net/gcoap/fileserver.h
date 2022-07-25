@@ -26,8 +26,10 @@
  * In opposite, the If-None-Match option requires a request to be processed,
  * only if the resource does not yet exist, and is most useful for file creation.
  *
- * Directories are expressed to URIs with trailing slashes and can be DELETEd
- * when empty.
+ * Directories are expressed to URIs with trailing slashes. Directories and
+ * their content are deleted as if one would do an `$rm -r`. If you only would
+ * like to delete a directory if it is empty, you must supply an If-Match option
+ * with the special value @ref COAPFILESERVER_DIR_DELETE_ETAG.
  *
  * @note The file server uses ETag for cache validation. The ETags are built
  * from the file system stat values. As clients rely on the ETag to differ when
@@ -79,6 +81,12 @@ extern "C" {
 #endif
 
 #include "net/nanocoap.h"
+
+/**
+ * @brief   Randomly generated Etag, used by a client when a directory should only be
+ *          deleted, if it is empty
+ */
+#define COAPFILESERVER_DIR_DELETE_ETAG (0x6ce88b56u)
 
 /**
  * @brief File server handler
