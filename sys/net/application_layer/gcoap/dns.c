@@ -557,7 +557,7 @@ static int _do_block(coap_pkt_t *pdu, const sock_udp_ep_t *remote,
     coap_block1_finish(&slicer);
 
     if ((len = _send(pdu->hdr, len, remote, slicer.start == 0, context, tl_type)) <= 0) {
-        printf("gcoap_dns: msg send failed: %d\n", (int)len);
+        DEBUG("gcoap_dns: msg send failed: %d\n", (int)len);
         return len;
     }
     return len;
@@ -648,12 +648,12 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
     int family = context->family;
 
     if (memo->state == GCOAP_MEMO_TIMEOUT) {
-        printf("gcoap_dns: CoAP request timed out\n");
+        DEBUG("gcoap_dns: CoAP request timed out\n");
         context->res = -ETIMEDOUT;
         goto unlock;
     }
     else if (memo->state != GCOAP_MEMO_RESP) {
-        printf("gcoap_dns: error in response\n");
+        DEBUG("gcoap_dns: error in response\n");
         context->res = -EBADMSG;
         goto unlock;
     }
@@ -695,7 +695,7 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
         memcpy(&dns_buf[block.offset], pdu->payload, pdu->payload_len);
         if (block.blknum == 0) {
             context->dns_buf_len = pdu->payload_len;
-            if (block.more && strlen(_uri) > 0) {
+            if (block.more && strlen(_uri) == 0) {
                 DEBUG("gcoap_dns: Cannot complete block-wise\n");
                 context->res = -EINVAL;
                 goto unlock;
@@ -709,6 +709,8 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
             unsigned msg_type = coap_get_type(pdu);
             int len;
 
+            pdu->payload = (uint8_t *)pdu->hdr;
+            pdu->payload_len = CONFIG_GCOAP_DNS_PDU_BUF_SIZE;
             tl_type = _req_init(pdu, &_uri_comp, msg_type == COAP_TYPE_ACK);
             block.blknum++;
             if (coap_opt_add_block2_control(pdu, &block) < 0) {
