@@ -14,6 +14,11 @@ LWIP_MODULE_MAKEFILE = $(RIOTBASE)/Makefile.base
 .PHONY: $(LWIP_MODULES)
 
 CFLAGS += -Wno-address
+# When compiled e.g. with `CFLAGS += -DIP6_DEBUG=LWIP_DBG_ON`, debug output
+# does not use the correct format specifiers and compilation fails. (All
+# instances were differently named but same sized integer types, e.g. %lx
+# for printing int when sizeof(int) == sizeof(long int).)
+CFLAGS += -Wno-format
 
 make_module = +$(QQ)"$(MAKE)" -C $(2) -f $(LWIP_MODULE_MAKEFILE) MODULE=$(1)
 
