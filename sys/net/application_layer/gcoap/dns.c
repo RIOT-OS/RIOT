@@ -557,7 +557,7 @@ static int _do_block(coap_pkt_t *pdu, const sock_udp_ep_t *remote,
     coap_block1_finish(&slicer);
 
     if ((len = _send(pdu->hdr, len, remote, slicer.start == 0, context, tl_type)) <= 0) {
-        printf("gcoap_dns: msg send failed: %d\n", (int)len);
+        DEBUG("gcoap_dns: msg send failed: %d\n", (int)len);
         return len;
     }
     return len;
@@ -648,12 +648,12 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
     int family = context->family;
 
     if (memo->state == GCOAP_MEMO_TIMEOUT) {
-        printf("gcoap_dns: CoAP request timed out\n");
+        DEBUG("gcoap_dns: CoAP request timed out\n");
         context->res = -ETIMEDOUT;
         goto unlock;
     }
     else if (memo->state != GCOAP_MEMO_RESP) {
-        printf("gcoap_dns: error in response\n");
+        DEBUG("gcoap_dns: error in response\n");
         context->res = -EBADMSG;
         goto unlock;
     }
