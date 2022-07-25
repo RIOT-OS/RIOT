@@ -31,6 +31,11 @@ int main(void)
     ztimer_init();
 #endif
 
+#if MODULE_ZTIMER64_USEC || MODULE_ZTIMER64_MSEC || MODULE_ZTIMER64_SEC
+    /* auto_init is disabled, but some modules depends on this module being initialized */
+    ztimer64_init();
+#endif
+
 #if IS_USED(MODULE_XTIMER) && !IS_USED(MODULE_ZTIMER_XTIMER_COMPAT)
     /* auto_init is disabled, but some modules depends on this module being initialized */
     xtimer_init();
