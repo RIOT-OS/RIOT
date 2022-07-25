@@ -25,6 +25,7 @@ config CPU_ARCH_NATIVE
 
     # needed modules
     select MODULE_PERIPH if TEST_KCONFIG
+    select MODULE_NATIVE_CLI_EUI_PROVIDER if MODULE_EUI_PROVIDER
 
 config CPU_CORE_NATIVE
     bool
@@ -87,6 +88,7 @@ menu "Native modules"
     depends on CPU_ARCH_NATIVE
 
 rsource "backtrace/Kconfig"
+rsource "cli_eui_provider/Kconfig"
 
 endmenu # Native modules
 

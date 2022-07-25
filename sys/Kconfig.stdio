@@ -13,8 +13,6 @@ choice STDIO_IMPLEMENTATION
     default MODULE_STDIO_NATIVE if CPU_ARCH_NATIVE
     default MODULE_STDIO_UART
 
-# TODO: add MODULE_STDIO_ETHOS
-
 config MODULE_STDIO_RTT
     bool "JLink RTT"
     select MODULE_ZTIMER
@@ -39,6 +37,13 @@ config MODULE_STDIO_UART
 config MODULE_STDIO_NATIVE
     bool "Native"
     depends on CPU_ARCH_NATIVE
+
+config MODULE_STDIO_ETHOS
+    bool "ETHOS"
+    depends on MODULE_ETHOS
+    select MODULE_STDIN
+    select MODULE_ETHOS_STDIO
+    select USE_STDOUT_BUFFERED
 
 endchoice
 

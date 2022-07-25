@@ -29,6 +29,7 @@ config BOARD_STM32F746G_DISCO
     select BOARD_HAS_LSE
 
     select HAVE_SAUL_GPIO
+    select HAVE_STM32_ETH
     select HAVE_FT5X06
 
 source "$(RIOTBOARD)/common/stm32/Kconfig"

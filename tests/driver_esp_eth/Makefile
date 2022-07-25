@@ -11,4 +11,6 @@ FEATURES_REQUIRED += periph_eth
 
 INCLUDES += -I$(APPDIR)
 
+SHOULD_RUN_KCONFIG =?
+
 include $(RIOTBASE)/Makefile.include

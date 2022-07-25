@@ -6,7 +6,6 @@
 
 menu "Drivers"
 
-rsource "netdev/Kconfig"
 rsource "saul/Kconfig"
 
 menu "Actuator Device Drivers"
