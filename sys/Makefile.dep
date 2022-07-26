@@ -713,6 +713,11 @@ ifneq (,$(filter luid,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_cpuid
 endif
 
+ifneq (,$(filter nanocoap_dtls,$(USEMODULE)))
+  USEMODULE += sock_dtls
+  USEPKG += tinydtls
+endif
+
 ifneq (,$(filter nanocoap_sock,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += sock_util

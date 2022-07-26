@@ -135,16 +135,57 @@
 #include "net/nanocoap.h"
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
+#if IS_USED(MODULE_NANOCOAP_DTLS)
+#include "net/credman.h"
+#include "net/sock/dtls.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief   nanocoap socket type
+ * @brief   Timeout for CoAP over DTLS queries in milliseconds
+ */
+#ifndef CONFIG_NANOCOAP_SOCK_DTLS_TIMEOUT_MS
+#define CONFIG_NANOCOAP_SOCK_DTLS_TIMEOUT_MS    (1000U)
+#endif
+
+/**
+ * @brief   Number of CoAP over DTLS handshake retries
+ */
+#ifndef CONFIG_NANOCOAP_SOCK_DTLS_RETRIES
+#define CONFIG_NANOCOAP_SOCK_DTLS_RETRIES       (2)
+#endif
+
+/**
+ * @brief   Credman tag used for NanoCoAP
+ *          Tag together with the credential type (PSK) needs to be unique
+ */
+#ifndef CONFIG_NANOCOAP_SOCK_DTLS_TAG
+#define CONFIG_NANOCOAP_SOCK_DTLS_TAG           (0xc0ab)
+#endif
+
+/**
+ * @brief   NanoCoAP socket types
+ */
+typedef enum {
+    COAP_SOCKET_TYPE_UDP,                   /**< transport is plain UDP */
+    COAP_SOCKET_TYPE_DTLS,                  /**< transport is DTLS      */
+} nanocoap_socket_type_t;
+
+/**
+ * @brief   NanoCoAP socket struct
  */
 typedef struct {
-    sock_udp_t udp;                 /**< UDP socket */
+    sock_udp_t udp;                         /**< UDP socket     */
+#if IS_USED(MODULE_NANOCOAP_DTLS) || defined(DOXYGEN)
+    sock_dtls_t dtls;                       /**< DTLS socket    */
+    sock_dtls_session_t dtls_session;       /**< Session object for the stored socket.
+                                                 Used for exchanging a session between
+                                                 functions. */
+    nanocoap_socket_type_t type;            /**< Socket type (UDP, DTLS) */
+#endif
 } nanocoap_sock_t;
 
 /**
@@ -186,8 +227,29 @@ static inline int nanocoap_sock_connect(nanocoap_sock_t *sock,
                                         const sock_udp_ep_t *local,
                                         const sock_udp_ep_t *remote)
 {
+#if IS_USED(MODULE_NANOCOAP_DTLS)
+    sock->type = COAP_SOCKET_TYPE_UDP;
+#endif
+
     return sock_udp_create(&sock->udp, local, remote, 0);
 }
+
+#if IS_USED(MODULE_NANOCOAP_DTLS) || DOXYGEN
+/**
+ * @brief   Create a DTLS secured CoAP client socket
+ *
+ * @param[out]  sock    CoAP UDP socket
+ * @param[in]   local   Local UDP endpoint, may be NULL
+ * @param[in]   remote  remote UDP endpoint
+ * @param[in]   tag     Tag of the PSK credential to use
+ *                      Has to be added with @ref credman_add
+ *
+ * @returns     0 on success
+ * @returns     <0 on error
+ */
+int nanocoap_sock_dtls_connect(nanocoap_sock_t *sock, sock_udp_ep_t *local,
+                               const sock_udp_ep_t *remote, credman_tag_t tag);
+#endif
 
 /**
  * @brief   Create a CoAP client socket by URL
@@ -207,6 +269,12 @@ int nanocoap_sock_url_connect(const char *url, nanocoap_sock_t *sock);
  */
 static inline void nanocoap_sock_close(nanocoap_sock_t *sock)
 {
+#if IS_USED(MODULE_NANOCOAP_DTLS)
+    if (sock->type == COAP_SOCKET_TYPE_DTLS) {
+        sock_dtls_session_destroy(&sock->dtls, &sock->dtls_session);
+        sock_dtls_close(&sock->dtls);
+    }
+#endif
     sock_udp_close(&sock->udp);
 }
 
