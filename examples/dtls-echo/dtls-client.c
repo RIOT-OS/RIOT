@@ -121,6 +121,7 @@ static int dtls_handle_read(dtls_context_t *ctx)
 
     dtls_session_init(&session);
     session.addr.port = remote.port;
+    session.addr.family = AF_INET6;
     if (remote.netif == SOCK_ADDR_ANY_NETIF) {
         session.ifindex = SOCK_ADDR_ANY_NETIF;
     }
@@ -359,6 +360,7 @@ dtls_context_t *_init_dtls(sock_udp_t *sock, sock_udp_ep_t *local,
     }
 
     /* Second: We prepare the DTLS Session by means of ctx->app */
+    dst->addr.family = AF_INET6;
     dst->addr.port = remote->port;
 
     /* NOTE: remote.addr.ipv6 and dst->addr.ipv6 are different structures. */
