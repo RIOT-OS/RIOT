@@ -200,8 +200,10 @@ extern "C" {
  * When set, 6LoWPAN compression context 0 will be automatically set for the prefix configured by
  * prefix deligation at the border router.
  */
+#if !IS_ACTIVE(CONFIG_KCONFIG_USEMODULE_GNRC_NETIF)
 #ifndef CONFIG_GNRC_NETIF_IPV6_BR_AUTO_6CTX
 #define CONFIG_GNRC_NETIF_IPV6_BR_AUTO_6CTX   1
+#endif
 #endif
 
 #ifdef __cplusplus
