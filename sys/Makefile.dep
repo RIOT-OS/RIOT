@@ -602,6 +602,15 @@ ifneq (,$(filter sock_dns,$(USEMODULE)))
   USEMODULE += posix_headers
 endif
 
+ifneq (,$(filter sock_dodtls,$(USEMODULE)))
+  USEMODULE += dns_msg
+  USEMODULE += sock_dtls
+  USEMODULE += sock_udp
+  USEMODULE += sock_util
+  USEMODULE += posix_headers
+  USEMODULE += ztimer_msec
+endif
+
 ifneq (,$(filter dns_cache,$(USEMODULE)))
   USEMODULE += ztimer_msec
   USEMODULE += checksum
