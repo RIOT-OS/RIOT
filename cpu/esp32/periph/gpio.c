@@ -23,12 +23,15 @@
 
 #include "log.h"
 #include "periph/gpio.h"    /* RIOT gpio.h */
+#if IS_USED(MODULE_GPIO_LL)
+#include "periph/gpio_ll_arch.h"
+#endif
 
+#include "esp/common_macros.h"
+#include "esp_intr_alloc.h"
 #include "hal/gpio_hal.h"
 #include "hal/gpio_types.h"
 #include "hal/rtc_io_types.h"
-#include "esp/common_macros.h"
-#include "esp_intr_alloc.h"
 #include "rom/ets_sys.h"
 #include "soc/gpio_reg.h"
 #include "soc/gpio_sig_map.h"
@@ -97,8 +100,8 @@ const char* _gpio_pin_usage_str[] =
 
 #ifdef ESP_PM_WUP_PINS
 /* for saving the pullup/pulldown settings of wakeup pins in deep sleep mode */
-static bool _gpio_pin_pu[GPIO_PIN_NUMOF] = { };
-static bool _gpio_pin_pd[GPIO_PIN_NUMOF] = { };
+bool _gpio_pin_pu[GPIO_PIN_NUMOF] = { };
+bool _gpio_pin_pd[GPIO_PIN_NUMOF] = { };
 #endif
 
 #if SOC_GPIO_PIN_COUNT > 32
@@ -197,11 +200,6 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 
     gpio_config_t cfg = { };
 
-#if SOC_RTCIO_INPUT_OUTPUT_SUPPORTED
-    /* if we come from deep sleep, the GPIO is configured as RTC IO */
-    esp_idf_rtc_gpio_deinit(pin);
-#endif
-
     cfg.pin_bit_mask = (1ULL << pin);
 
     switch (mode) {
@@ -212,17 +210,17 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
         break;
     case GPIO_IN_OD:
     case GPIO_IN_OD_PU:
-        cfg.mode = (GPIO_MODE_DEF_INPUT) | (GPIO_MODE_DEF_OUTPUT) | (GPIO_MODE_DEF_OD);
+        cfg.mode = GPIO_MODE_DEF_INPUT | GPIO_MODE_DEF_OUTPUT | GPIO_MODE_DEF_OD;
         break;
     case GPIO_IN_OUT:
-        cfg.mode = (GPIO_MODE_DEF_INPUT) | (GPIO_MODE_DEF_OUTPUT);
+        cfg.mode = GPIO_MODE_DEF_INPUT | GPIO_MODE_DEF_OUTPUT;
         break;
     case GPIO_OUT:
         cfg.mode = GPIO_MODE_DEF_OUTPUT;
         break;
     case GPIO_OD:
     case GPIO_OD_PU:
-        cfg.mode = (GPIO_MODE_DEF_OUTPUT) | (GPIO_MODE_DEF_OD);
+        cfg.mode = GPIO_MODE_DEF_OUTPUT | GPIO_MODE_DEF_OD;
         break;
     }
 
@@ -247,9 +245,8 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 #if MODULE_PERIPH_GPIO_IRQ
 
 /* interrupt enabled state is required for sleep modes */
-static bool gpio_int_enabled_table[GPIO_PIN_NUMOF] = { };
-
-static bool _isr_installed = false;
+bool gpio_int_enabled_table[GPIO_PIN_NUMOF] = { };
+bool gpio_isr_service_installed = false;
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
@@ -284,16 +281,19 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
         break;
     }
 
+    /* install GPIO ISR of ESP-IDF if not yet done */
+    if (!gpio_isr_service_installed &&
+        esp_idf_gpio_install_isr_service(ESP_INTR_FLAG_LEVEL1) != ESP_OK) {
+        return -1;
+    }
+    gpio_isr_service_installed = true;
+
+    /* set the interrupt type for the pin */
     if (esp_idf_gpio_set_intr_type(pin, type) != ESP_OK) {
         return -1;
     }
 
-    if (!_isr_installed &&
-        esp_idf_gpio_install_isr_service(ESP_INTR_FLAG_LEVEL1) != ESP_OK) {
-        return -1;
-    }
-    _isr_installed = true;
-
+    /* unmask and clear pending interrupts for the pin */
     if (esp_idf_gpio_isr_handler_add(pin, cb, arg) != ESP_OK) {
         return -1;
     }
@@ -328,7 +328,7 @@ void gpio_irq_disable(gpio_t pin)
 #if IS_USED(MODULE_ESP_IDF_GPIO_HAL)
 
 static gpio_hal_context_t _gpio_hal_ctx = {
-    .dev = GPIO_HAL_GET_HW(GPIO_PORT_0)
+    .dev = GPIO_HAL_GET_HW(0)
 };
 
 /*

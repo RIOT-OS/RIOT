@@ -13,6 +13,7 @@ config CPU_FAM_ESP32S2
     select HAS_CPU_ESP32
     select HAS_ESP_HW_COUNTER
     select HAS_ESP_WIFI_ENTERPRISE
+    select HAS_PERIPH_GPIO_LL
     select HAS_PUF_SRAM
 
     select PACKAGE_ESP32_SDK if TEST_KCONFIG
