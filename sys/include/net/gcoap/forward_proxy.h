@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 HAW Hamburg
+ * Copyright (C) 2022 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for
@@ -21,6 +22,7 @@
  * @brief       Definitions for the Gcoap forward proxy
  *
  * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
+ * @author      Martine S. Lenders <m.lenders@fu-berlin.de>
  */
 
 #ifndef NET_GCOAP_FORWARD_PROXY_H
@@ -34,6 +36,15 @@
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+/**
+ * @brief Maximum length of the URI to an upstream proxy for the forward proxy
+ *
+ * @note requires module `gcoap_forward_proxy_upstream`
+ */
+#ifndef CONFIG_GCOAP_FORWARD_PROXY_UPSTREAM_URI_MAX
+#define CONFIG_GCOAP_FORWARD_PROXY_UPSTREAM_URI_MAX (64U)
 #endif
 
 /**
@@ -82,6 +93,39 @@ void gcoap_forward_proxy_find_req_memo(gcoap_request_memo_t **memo_ptr,
  */
 ssize_t gcoap_forward_proxy_dispatch(const uint8_t *buf,
                                      size_t len, sock_udp_ep_t *remote);
+
+/**
+ * @brief   Sets an upstream proxy for this forward proxy
+ *
+ * @param[in] proxy_uri The URI for the upstream proxy for this forward proxy.
+ *                      May be NULL or empty to unset the upstream proxy.
+ *
+ * @return  >0 on success (the length of @p proxy_uri)
+ * @return  0 on success (when @p proxy_uri was 0)
+ * @return  -ENOTSUP, when module `gcoap_forward_proxy_upstream` is not used
+ * @return  -EINVAL, when @p proxy_uri is longer than CONFIG_GCOAP_FORWARD_PROXY_UPSTREAM_URI_MAX.
+ */
+int gcoap_forward_proxy_upstream_set(const char *proxy_uri);
+
+/**
+ * @brief   Check if an upstream proxy for this forward proxy is set
+ *
+ * @retval  true    An upstream proxy for this forward proxy is set
+ * @retval  false   No upstream proxy is set or module `gcoap_forward_proxy_upstream` is not used.
+ */
+bool gcoap_forward_proxy_upstream_is_set(void);
+
+/**
+ * @brief   Get the current upstream proxy for this forward proxy
+ *
+ * @param[out] proxy_uri        The URI for the upstream proxy for this forward proxy.
+ * @param[in]  proxy_uri_len    The maximum length for @p proxy_uri
+ *
+ * @return  >0 on success (the length of @p proxy_uri on return).
+ * @return  0 on success (if no current upstream proxy is set).
+ * @return  -ENOBUFS if the length of @p proxy_uri on return would be greater than @p proxy_uri_len.
+ */
+ssize_t gcoap_forward_proxy_upstream_get(char *proxy_uri, size_t proxy_uri_len);
 
 #ifdef __cplusplus
 }

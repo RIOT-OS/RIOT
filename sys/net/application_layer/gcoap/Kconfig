@@ -13,6 +13,19 @@ menuconfig KCONFIG_USEMODULE_GCOAP
 
 if KCONFIG_USEMODULE_GCOAP
 
+menuconfig KCONFIG_USEMODULE_GCOAP_FORWARD_PROXY_UPSTREAM
+    bool "Configure upstream for forward proxy"
+    depends on USEMODULE_GCOAP_FORWARD_PROXY_UPSTREAM
+    help
+        Configure upstream forward proxy of Gcoap using Kconfig.
+
+if KCONFIG_USEMODULE_GCOAP_FORWARD_PROXY_UPSTREAM
+config GCOAP_FORWARD_PROXY_UPSTREAM_URI_MAX
+    int "Maximum length of the URI to an upstream proxy for the forward proxy"
+    default 64
+    range 8 65535  # 8 == len("coap:///")
+endif # KCONFIG_USEMODULE_GCOAP_FORWARD_PROXY
+
 menuconfig KCONFIG_USEMODULE_GCOAP_DNS
     bool "Configure DNS-over-CoAPS implementation in GCoAP"
     depends on USEMODULE_GCOAP_DNS
