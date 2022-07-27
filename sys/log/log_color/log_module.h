@@ -73,19 +73,6 @@ extern "C" {
 #define LOG_RESET_ANSI_COLOR_CODE       ("\033[0m")
 
 /**
- * @brief   ANSI color escape codes array
- *
- * Internal use only
- */
-static const char * const _ansi_codes[] =
-{
-    [LOG_ERROR] = LOG_ERROR_ANSI_COLOR_CODE,
-    [LOG_WARNING] = LOG_WARNING_ANSI_COLOR_CODE,
-    [LOG_INFO] = LOG_INFO_ANSI_COLOR_CODE,
-    [LOG_DEBUG] = LOG_DEBUG_ANSI_COLOR_CODE,
-};
-
-/**
  * @brief log_write overridden function for colored output
  *
  * @param[in] level  Logging level
@@ -93,7 +80,14 @@ static const char * const _ansi_codes[] =
  */
 static inline void log_write(unsigned level, const char *format, ...)
 {
-    assert(level > 0);
+    static const char * const _ansi_codes[] =
+    {
+        [LOG_ERROR] = LOG_ERROR_ANSI_COLOR_CODE,
+        [LOG_WARNING] = LOG_WARNING_ANSI_COLOR_CODE,
+        [LOG_INFO] = LOG_INFO_ANSI_COLOR_CODE,
+        [LOG_DEBUG] = LOG_DEBUG_ANSI_COLOR_CODE,
+    };
+    assert(level > 0 && level < sizeof(_ansi_codes)/sizeof(_ansi_codes[0]));
 
     printf("%s", _ansi_codes[level]);
     va_list args;
