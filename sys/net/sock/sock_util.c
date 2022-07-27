@@ -29,8 +29,8 @@
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
 
-#if defined(MODULE_SOCK_DNS) || defined(MODULE_SOCK_DNS_MOCK)
-#include "net/sock/dns.h"
+#if defined(MODULE_DNS)
+#include "net/dns.h"
 #endif
 
 #ifdef MODULE_FMT
@@ -306,7 +306,7 @@ int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str)
         return -EINVAL;
     }
 
-    switch (sock_dns_query(host, &ep_out->addr, family)) {
+    switch (dns_query(host, &ep_out->addr, family)) {
 #ifdef SOCK_HAS_IPV4
     case 4:
         ep_out->family = AF_INET;
