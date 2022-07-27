@@ -82,7 +82,7 @@ uint32_t random_uint32(void);
 /**
  * @brief writes random bytes in the [0,0xff]-interval to memory
  */
-void random_bytes(uint8_t *buf, size_t size);
+void random_bytes(void *buf, size_t size);
 
 /**
  * @brief   generates a random number r with a <= r < b.
