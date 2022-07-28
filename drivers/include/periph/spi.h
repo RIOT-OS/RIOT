@@ -135,7 +135,7 @@ typedef gpio_t spi_cs_t;
  * Use @ref spi_get_clk to obtain this value.
  */
 #ifndef HAVE_SPI_CLK_T
-typedef uword_t spi_clk_t;
+typedef uint32_t spi_clk_t;
 #endif
 
 /**
