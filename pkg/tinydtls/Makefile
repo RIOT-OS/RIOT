@@ -1,6 +1,6 @@
 PKG_NAME=tinydtls
 PKG_URL=https://github.com/eclipse/tinydtls.git
-PKG_VERSION=bda40789a7c280f248eeca6d09ddd624cdaf5dc8
+PKG_VERSION=297fced854b652591b78113f0ba8d57ad9f934d9
 PKG_LICENSE=EPL-1.0,EDL-1.0
 
 include $(RIOTBASE)/pkg/pkg.mk
