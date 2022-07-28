@@ -30,6 +30,7 @@ config MODULE_NRF802154
     select MODULE_LUID
     select MODULE_PERIPH_TIMER
     select MODULE_IEEE802154
+    select HAVE_NON_NETDEV_INTERFACE
 
 config MODULE_NRFBLE
     bool "Bluetooth low energy radio driver"

@@ -21,6 +21,7 @@ config BOARD_MULLE
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
 
+    select HAVE_AT86RF212B
     select HAVE_LIS3DH
     select HAVE_SAUL_ADC
     select HAVE_SAUL_GPIO
