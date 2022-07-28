@@ -14,6 +14,7 @@
  * @brief       Test application for IEEE 802.15.4 Radio HAL
  *
  * @author      José I. Alamos <jose.alamos@haw-hamburg.de>
+ * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  *
  * @}
  */
@@ -329,7 +330,7 @@ static int _init(void)
 uint8_t payload[] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ornare lacinia mi elementum interdum ligula.";
 
 static int send(uint8_t *dst, size_t dst_len,
-                size_t len)
+                size_t len, bool ack_req)
 {
     uint8_t flags;
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
@@ -342,7 +343,7 @@ static int send(uint8_t *dst, size_t dst_len,
         .iol_next = NULL,
     };
 
-    flags = IEEE802154_FCF_TYPE_DATA | IEEE802154_FCF_ACK_REQ;
+    flags = IEEE802154_FCF_TYPE_DATA | (ack_req ? IEEE802154_FCF_ACK_REQ : 0);
 
     src_pan = byteorder_btols(byteorder_htons(CONFIG_IEEE802154_DEFAULT_PANID));
     dst_pan = byteorder_btols(byteorder_htons(CONFIG_IEEE802154_DEFAULT_PANID));
@@ -429,9 +430,10 @@ int txtsnd(int argc, char **argv)
     uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
     size_t len;
     size_t res;
+    bool ack_req = false;
 
-    if (argc != 3) {
-        puts("Usage: txtsnd <ext_addr> <len>");
+    if (argc != 3 && !(argc == 4 && strcmp(argv[3], "ackreq") == 0)) {
+        puts("Usage: txtsnd <long_addr> <len> [ackreq]");
         return 1;
     }
 
@@ -441,7 +443,11 @@ int txtsnd(int argc, char **argv)
         return 1;
     }
     len = atoi(argv[2]);
-    return send(addr, res, len);
+
+    if (argc == 4) {
+        ack_req = true;
+    }
+    return send(addr, res, len, ack_req);
 }
 
 static int promisc(int argc, char **argv)
