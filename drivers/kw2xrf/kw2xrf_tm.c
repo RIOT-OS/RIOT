@@ -54,7 +54,6 @@ int kw2xrf_set_test_mode(kw2xrf_t *dev, uint8_t mode)
 
     kw2xrf_abort_sequence(dev);
     disable_xcvr_test_mode(dev);
-    kw2xrf_set_channel(dev, dev->netdev.chan);
 
     switch (mode) {
         case NETOPT_RF_TESTMODE_IDLE:
