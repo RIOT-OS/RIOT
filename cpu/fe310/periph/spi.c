@@ -97,7 +97,7 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
      * div = fin / 2 / fsck - 1
      */
 
-    uint32_t source_clock = cpu_freq() / 2;
+    uint32_t source_clock = coreclk() / 2;
 
     /* bound divider from 1 to 4096 */
     if (freq > source_clock) {
@@ -110,7 +110,7 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 uint32_t spi_get_freq(spi_t bus, spi_clk_t clk)
 {
     (void)bus;
-    return cpu_freq() / (2 * (clk + 1));
+    return coreclk() / (2 * (clk + 1));
 }
 
 void spi_acquire(spi_t dev, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
