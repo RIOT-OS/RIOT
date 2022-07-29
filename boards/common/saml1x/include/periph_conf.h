@@ -94,6 +94,8 @@ static const uart_conf_t uart_config[] = {
         .gclk_src = SAM0_GCLK_MAIN,
     },
     {    /* EXT1 */
+        /* For SAML11, see boards/saml11/doc.txt
+         * to properly enable this SERCOM */
         .dev      = &SERCOM1->USART,
         .rx_pin   = GPIO_PIN(PA, 9),
         .tx_pin   = GPIO_PIN(PA, 8),
