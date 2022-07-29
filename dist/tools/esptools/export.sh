@@ -50,6 +50,22 @@ export_openocd()
 
 export_qemu()
 {
+    # determine the platform using python
+    PLATFORM_SYSTEM=$(python3 -c "import platform; print(platform.system())")
+    PLATFORM_MACHINE=$(python3 -c "import platform; print(platform.machine())")
+    PLATFORM=${PLATFORM_SYSTEM}-${PLATFORM_MACHINE}
+
+    # map different platform names to a unique OS name
+    case ${PLATFORM} in
+        linux-amd64|linux64|Linux-x86_64|FreeBSD-amd64)
+            OS=linux-amd64
+            ;;
+        *)
+            echo "error: OS architecture ${PLATFORM} not supported"
+            exit 1
+            ;;
+    esac
+
     # qemu version depends on the version of ncurses lib
     if [ "$(ldconfig -p | grep libncursesw.so.6)" != "" ]; then
         ESP32_QEMU_VERSION="esp-develop-20220203"
