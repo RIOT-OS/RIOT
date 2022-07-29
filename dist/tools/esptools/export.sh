@@ -5,17 +5,6 @@ ESP32_GCC_VERSION_DIR="8.4.0"
 
 ESP32_OPENOCD_VERSION="v0.11.0-esp32-20211220"
 
-# qemu version depends on the version of ncurses lib
-if [ "$(ldconfig -p | grep libncursesw.so.6)" != "" ]; then
-    ESP32_QEMU_VERSION="esp-develop-20220203"
-else
-    ESP32_QEMU_VERSION="esp-develop-20210220"
-fi
-
-if [ -z ${IDF_TOOLS_PATH} ]; then
-    IDF_TOOLS_PATH=${HOME}/.espressif
-fi
-
 TOOLS_PATH=${IDF_TOOLS_PATH}/tools
 
 export_arch()
@@ -61,6 +50,17 @@ export_openocd()
 
 export_qemu()
 {
+    # qemu version depends on the version of ncurses lib
+    if [ "$(ldconfig -p | grep libncursesw.so.6)" != "" ]; then
+        ESP32_QEMU_VERSION="esp-develop-20220203"
+    else
+        ESP32_QEMU_VERSION="esp-develop-20210220"
+    fi
+
+    if [ -z ${IDF_TOOLS_PATH} ]; then
+        IDF_TOOLS_PATH=${HOME}/.espressif
+    fi
+
     TOOLS_DIR=${TOOLS_PATH}/qemu-esp32/${ESP32_QEMU_VERSION}/qemu
     TOOLS_DIR_IN_PATH=`echo $PATH | grep ${TOOLS_DIR}`
 
