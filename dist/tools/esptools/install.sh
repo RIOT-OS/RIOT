@@ -52,6 +52,9 @@ case ${PLATFORM} in
     linux-i686|linux32|Linux-i686|FreeBSD-i386)
         OS=linux-i686
         ;;
+    Darwin-x86_64)
+        OS=macos
+        ;;
     *)
         echo "error: OS architecture ${PLATFORM} not supported"
         exit 1
