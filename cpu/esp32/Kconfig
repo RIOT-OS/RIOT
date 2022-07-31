@@ -47,5 +47,6 @@ config CPU
 rsource "Kconfig.esp32"
 rsource "Kconfig.esp32c3"
 rsource "Kconfig.esp32s3"
+rsource "Kconfig.esp32s2"
 
 source "$(RIOTCPU)/esp_common/Kconfig"
