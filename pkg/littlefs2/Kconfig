@@ -54,4 +54,13 @@ config LITTLEFS2_BLOCK_CYCLES
         Sets the maximum number of erase cycles before blocks are evicted as a part
         of wear leveling. -1 disables wear-leveling.
 
+config LITTLEFS2_MIN_BLOCK_SIZE_EXP
+    int "Minimum acceptable block size"
+    range -1 15
+    default -1
+    help
+        Sets the exponent of the minimum acceptable block size in bytes (2^n).
+        The actual block size may be larger due to device properties.
+        The default value (-1) sets the block size to the smalles possible value.
+
 endif # MODULE_LITTLEFS2_FS

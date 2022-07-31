@@ -58,6 +58,13 @@ extern "C" {
  * If set, it must be program size */
 #define LITTLEFS_PROG_BUFFER_SIZE   (0)
 #endif
+
+#ifndef LITTLEFS_MIN_BLOCK_SIZE_EXP
+/**
+ * The exponent of the minimum acceptable block size in bytes (2^n).
+ * The desired block size is not guaranteed to be applicable but will be respected. */
+#define LITTLEFS_MIN_BLOCK_SIZE_EXP (-1)
+#endif
 /** @} */
 
 /**
@@ -72,6 +79,7 @@ typedef struct {
      * total number of block is defined in @p config.
      * if set to 0, the total number of sectors from the mtd is used */
     uint32_t base_addr;
+    uint16_t sectors_per_block; /**< number of sectors per block */
 #if LITTLEFS_FILE_BUFFER_SIZE || DOXYGEN
     /** file buffer to use internally if LITTLEFS_FILE_BUFFER_SIZE is set */
     uint8_t file_buf[LITTLEFS_FILE_BUFFER_SIZE];

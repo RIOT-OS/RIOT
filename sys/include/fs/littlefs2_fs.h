@@ -74,6 +74,13 @@ extern "C" {
  * of wear leveling. -1 disables wear-leveling. */
 #define CONFIG_LITTLEFS2_BLOCK_CYCLES       (512)
 #endif
+
+#ifndef CONFIG_LITTLEFS2_MIN_BLOCK_SIZE_EXP
+/**
+ * The exponent of the minimum acceptable block size in bytes (2^n).
+ * The desired block size is not guaranteed to be applicable but will be respected. */
+#define CONFIG_LITTLEFS2_MIN_BLOCK_SIZE_EXP (-1)
+#endif
 /** @} */
 
 /**
@@ -88,6 +95,7 @@ typedef struct {
      * total number of block is defined in @p config.
      * if set to 0, the total number of sectors from the mtd is used */
     uint32_t base_addr;
+    uint16_t sectors_per_block; /**< number of sectors per block */
 #if CONFIG_LITTLEFS2_FILE_BUFFER_SIZE || DOXYGEN
     /** file buffer to use internally if CONFIG_LITTLEFS2_FILE_BUFFER_SIZE
      * is set */
