@@ -602,6 +602,10 @@ ifneq (,$(filter sock_dns,$(USEMODULE)))
   USEMODULE += posix_headers
 endif
 
+ifneq (,$(filter sock_dns_mock,$(USEMODULE)))
+  USEMODULE += dns
+endif
+
 ifneq (,$(filter sock_dodtls,$(USEMODULE)))
   USEMODULE += dns_msg
   USEMODULE += sock_dtls
