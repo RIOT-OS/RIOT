@@ -132,21 +132,6 @@ extern mtd_dev_t *mtd0;
 /** @} */
 #endif /* MODULE_MTD || DOXYGEN */
 
-#if MODULE_SPIFFS || DOXYGEN
-/**
- * @name    SPIFFS configuration for the system MTD device
- *
- * Configuration of the SPIFFS that can be used on the system MTD device.
- * @{
- */
-#define SPIFFS_ALIGNED_OBJECT_INDEX_TABLES 1
-#define SPIFFS_READ_ONLY 0
-#define SPIFFS_SINGLETON 0
-#define SPIFFS_HAL_CALLBACK_EXTRA 1
-#define SPIFFS_CACHE 1
-/** @} */
-#endif /* MODULE_SPIFFS || DOXYGEN */
-
 /**
   * @brief Print the board configuration in a human readable format
   */
