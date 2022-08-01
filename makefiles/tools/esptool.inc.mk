@@ -8,6 +8,12 @@ ifeq ($(CPU),esp8266)
   # Full path to the bootloader binary. In the ESP32 case this is set by the
   # esp_bootloader module.
   BOOTLOADER_BIN ?= $(RIOTCPU)/$(CPU)/bin/bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
+else
+  # ESP-IDF uses dio as flash mode for esptool.py when qout or qio mode are
+  # configured to always boot in dual SPI mode
+  ifneq (,$(filter qout qio,$(FLASH_MODE)))
+    FLASH_MODE = dio
+  endif
 endif
 
 ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool.py
