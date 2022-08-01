@@ -121,7 +121,16 @@ static int _nanocoap_get_handler(int argc, char **argv)
         }
         dst = buffer;
     } else {
+        char *filename = strrchr(url, '/');
         dst = argv[2];
+        if (_is_dir(dst) && filename) {
+            if (snprintf(buffer, sizeof(buffer), "%s%s",
+                         dst, filename + 1) >= (int)sizeof(buffer)) {
+                printf("Output file path too long\n");
+                return -ENOBUFS;
+            }
+            dst = buffer;
+        }
     }
 
     /* alternatively write the file to stdout */
