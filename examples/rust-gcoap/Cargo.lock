@@ -660,7 +660,12 @@ dependencies = [
  "coap-message-demos",
  "riot-coap-handler-demos",
  "riot-wrappers",
+ "rust_riotmodules",
 ]
+
+[[package]]
+name = "rust_riotmodules"
+version = "0.1.0"
 
 [[package]]
 name = "rustc-hash"
