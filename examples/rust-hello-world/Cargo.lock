@@ -201,9 +201,9 @@ dependencies = [
 
 [[package]]
 name = "cstr_core"
-version = "0.2.5"
+version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "644828c273c063ab0d39486ba42a5d1f3a499d35529c759e763a9c6cb8a0fb08"
+checksum = "dd98742e4fdca832d40cab219dc2e3048de17d873248f83f17df47c1bea70956"
 dependencies = [
  "cty",
  "memchr",
