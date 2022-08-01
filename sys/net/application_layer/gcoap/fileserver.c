@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "kernel_defines.h"
 #include "checksum/fletcher32.h"
 #include "net/gcoap/fileserver.h"
 #include "net/gcoap.h"
@@ -225,6 +226,7 @@ late_err:
     return coap_get_total_hdr_len(pdu);
 }
 
+#if IS_USED(MODULE_GCOAP_FILESERVER_PUT)
 static ssize_t _put_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                          struct requestdata *request)
 {
@@ -327,7 +329,9 @@ unlink_on_error:
     }
     return gcoap_fileserver_error_handler(pdu, buf, len, ret);
 }
+#endif
 
+#if IS_USED(MODULE_GCOAP_FILESERVER_DELETE)
 static ssize_t _delete_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                             struct requestdata *request)
 {
@@ -349,6 +353,7 @@ static ssize_t _delete_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     gcoap_resp_init(pdu, buf, len, COAP_CODE_DELETED);
     return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 }
+#endif
 
 static ssize_t gcoap_fileserver_file_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                                              struct requestdata *request)
@@ -356,10 +361,14 @@ static ssize_t gcoap_fileserver_file_handler(coap_pkt_t *pdu, uint8_t *buf, size
     switch (coap_get_code(pdu)) {
         case COAP_METHOD_GET:
             return _get_file(pdu, buf, len, request);
+#if IS_USED(MODULE_GCOAP_FILESERVER_PUT)
         case COAP_METHOD_PUT:
             return _put_file(pdu, buf, len, request);
+#endif
+#if IS_USED(MODULE_GCOAP_FILESERVER_DELETE)
         case COAP_METHOD_DELETE:
             return _delete_file(pdu, buf, len, request);
+#endif
         default:
             return gcoap_fileserver_error_handler(pdu, buf, len, COAP_CODE_METHOD_NOT_ALLOWED);
     }
@@ -428,6 +437,7 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     return (uintptr_t)buf - (uintptr_t)pdu->hdr;
 }
 
+#if IS_USED(MODULE_GCOAP_FILESERVER_PUT)
 static ssize_t _put_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                               struct requestdata *request)
 {
@@ -451,7 +461,9 @@ static ssize_t _put_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
     return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 }
+#endif
 
+#if IS_USED(MODULE_GCOAP_FILESERVER_DELETE)
 static ssize_t _delete_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                                  struct requestdata *request)
 {
@@ -474,6 +486,7 @@ static ssize_t _delete_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     gcoap_resp_init(pdu, buf, len, COAP_CODE_DELETED);
     return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 }
+#endif
 
 static ssize_t gcoap_fileserver_directory_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                                                   struct requestdata *request,
@@ -482,10 +495,14 @@ static ssize_t gcoap_fileserver_directory_handler(coap_pkt_t *pdu, uint8_t *buf,
     switch (coap_get_code(pdu)) {
         case COAP_METHOD_GET:
             return _get_directory(pdu, buf, len, request, root, resource_dir);
+#if IS_USED(MODULE_GCOAP_FILESERVER_PUT)
         case COAP_METHOD_PUT:
             return _put_directory(pdu, buf, len, request);
+#endif
+#if IS_USED(MODULE_GCOAP_FILESERVER_DELETE)
         case COAP_METHOD_DELETE:
             return _delete_directory(pdu, buf, len, request);
+#endif
         default:
             return gcoap_fileserver_error_handler(pdu, buf, len, COAP_CODE_METHOD_NOT_ALLOWED);
     }

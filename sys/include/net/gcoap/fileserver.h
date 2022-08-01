@@ -64,6 +64,8 @@
  *
  *   The allowed methods dictate whether it's read-only (``COAP_GET``) or
  *   read-write (``COAP_GET | COAP_PUT | COAP_DELETE``).
+ *   If you want to support ``PUT`` and `DELETE`, you need to enable the modules
+ *   ``gcoap_fileserver_put`` and ``gcoap_fileserver_delete``.
  *
  * @{
  *
