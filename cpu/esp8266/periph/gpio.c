@@ -62,7 +62,7 @@ gpio_pin_usage_t _gpio_pin_usage [GPIO_PIN_NUMOF] =
    _SPIF,   /* gpio6  SPI flash CLK */
    _SPIF,   /* gpio7  SPI flash MISO */
    _SPIF,   /* gpio8  SPI flash MOSI */
-   #if defined(FLASH_MODE_QIO) || defined(FLASH_MODE_QOUT)
+   #if defined(CONFIG_FLASHMODE_QIO) || defined(CONFIG_FLASHMODE_QOUT)
    _SPIF,   /* gpio9  SPI flash HD (qio/qout flash mode) */
    _SPIF,   /* gpio10 SPI flash WP (qio/qout flash mode) */
    #else

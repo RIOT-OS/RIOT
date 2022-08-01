@@ -183,23 +183,13 @@ extern "C" {
 #define CONFIG_ETH_DMA_TX_BUFFER_NUM            10
 
 /**
- * Serial flasher config (DO NOT CHANGE)
+ * Serial flasher config (defined by CFLAGS, only sanity check here)
  */
-#define CONFIG_ESPTOOLPY_FLASHFREQ_40M          1
-#if defined(FLASH_MODE_QIO)
-#define CONFIG_FLASHMODE_QIO                    1
-#define CONFIG_ESPTOOLPY_FLASHMODE_QIO          1
-#elif defined(FLASH_MODE_QOUT)
-#define CONFIG_FLASHMODE_QOUT                   1
-#define CONFIG_ESPTOOLPY_FLASHMODE_QOUT         1
-#elif defined(FLASH_MODE_DIO)
-#define CONFIG_FLASHMODE_DIO                    1
-#define CONFIG_ESPTOOLPY_FLASHMODE_DIO          1
-#elif defined(FLASH_MODE_DOUT)
-#define CONFIG_FLASHMODE_DOUT                   1
-#define CONFIG_ESPTOOLPY_FLASHMODE_DOUT         1
-#else
-#error "Unknown flash mode selected."
+#if !defined(CONFIG_FLASHMODE_DOUT) && \
+    !defined(CONFIG_FLASHMODE_DIO) && \
+    !defined(CONFIG_FLASHMODE_QOUT) && \
+    !defined(CONFIG_FLASHMODE_QIO)
+#error "Flash mode not configured"
 #endif
 
 /**

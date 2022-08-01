@@ -78,11 +78,22 @@ ifneq (,$(filter lwip,$(USEMODULE)))
   CFLAGS += -DTCPIP_THREAD_PRIO=5
 endif
 
-# set CFLAG for the correspondant FLASH_MODE
-CFLAGS += $(if $(findstring qout,$(FLASH_MODE)),-DFLASH_MODE_QOUT=1)
-CFLAGS += $(if $(findstring qio,$(FLASH_MODE)),-DFLASH_MODE_QIO=1)
-CFLAGS += $(if $(findstring dio,$(FLASH_MODE)),-DFLASH_MODE_DIO=1)
-CFLAGS += $(if $(findstring dout,$(FLASH_MODE)),-DFLASH_MODE_DOUT=1)
+# extend CFLAGS by the corresponding CONFIG_FLASHMODE_* defines
+ifeq (dout,$(FLASH_MODE))
+  CFLAGS += -DCONFIG_FLASHMODE_DOUT
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHMODE_DOUT
+else ifeq (dio,$(FLASH_MODE))
+  CFLAGS += -DCONFIG_FLASHMODE_DIO
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHMODE_DIO
+else ifeq (qout,$(FLASH_MODE))
+  CFLAGS += -DCONFIG_FLASHMODE_QOUT
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHMODE_QUOT
+else ifeq (qio,$(FLASH_MODE))
+  CFLAGS += -DCONFIG_FLASHMODE_QIO
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHMODE_QIO
+else
+  $(error Undefined FLASH_MODE, possible values are: dout, dio, qout and qio)
+endif
 
 ARCHIVES += -lg -lc
 

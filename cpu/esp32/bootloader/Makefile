@@ -155,6 +155,8 @@ INCLUDES = \
   -I$(ESP32_SDK_DIR)/components/spi_flash/include/spi_flash \
   #
 
+# include CFLAGS from cpu/esp_common/Makefile.include including the defines of
+# CONFIG_ESPTOOLPY_FLASHFREQ_* and CONFIG_FLASHMODE_*
 CFLAGS = -include '$(RIOTBUILD_CONFIG_HEADER_C)' \
 
 ifneq (,$(filter riscv32%,$(TARGET_ARCH)))
