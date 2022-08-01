@@ -1,14 +1,17 @@
 # ESP32x specific flashing options
 FLASH_CHIP  = $(CPU_FAM)
+
+# Serial flasher config as used by the ESP-IDF, be careful when overriding them.
+# They have to be exported to use same values in subsequent makefiles.
 ifeq (esp32,$(CPU_FAM))
-  FLASH_MODE ?= dout
-  FLASH_FREQ  = 40m   # DO NOT CHANGE
-  FLASH_SIZE ?= 4
+  export FLASH_MODE ?= dout
+  export FLASH_FREQ ?= 40m
+  export FLASH_SIZE ?= 2
   BOOTLOADER_POS = 0x1000
 else ifeq (esp32c3,$(CPU_FAM))
-  FLASH_MODE ?= dio
-  FLASH_FREQ  = 80m   # DO NOT CHANGE
-  FLASH_SIZE ?= 4
+  export FLASH_MODE ?= dio
+  export FLASH_FREQ ?= 80m
+  export FLASH_SIZE ?= 2
   BOOTLOADER_POS = 0x0000
 else
   $(error Unkwnown ESP32x SoC variant (family))
