@@ -339,4 +339,8 @@ void saul_init_devs(void)
         extern void auto_init_vl6180x(void);
         auto_init_vl6180x();
     }
+    if (IS_USED(MODULE_SERVO)) {
+        extern void auto_init_servo(void);
+        auto_init_servo();
+    }
 }
