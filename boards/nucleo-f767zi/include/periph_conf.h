@@ -211,6 +211,42 @@ static const adc_conf_t adc_config[] = {
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
+/**
+ * @name    PWM configuration
+ * @{
+ */
+/**
+ * @brief   Actual PWM configuration
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev      = TIM1,
+        .rcc_mask = RCC_APB2ENR_TIM1EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_E,  9) /* D6  CN10-4  */, .cc_chan = 0},
+                      { .pin = GPIO_PIN(PORT_E, 11) /* D5  CN10-6  */, .cc_chan = 1},
+                      { .pin = GPIO_PIN(PORT_E, 13) /* D3  CN10-10 */, .cc_chan = 2},
+                      { .pin = GPIO_PIN(PORT_E, 14) /* D38 CN10-28 */, .cc_chan = 3} },
+        .af       = GPIO_AF1,
+        .bus      = APB2
+    },
+    {
+        .dev      = TIM4,
+        .rcc_mask = RCC_APB1ENR_TIM4EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_D, 12) /* D29 CN10-21 */, .cc_chan = 0},
+                      { .pin = GPIO_PIN(PORT_D, 13) /* D28 CN10-19 */, .cc_chan = 1},
+                      { .pin = GPIO_PIN(PORT_D, 14) /* D10  CN7-16 */, .cc_chan = 2},
+                      { .pin = GPIO_PIN(PORT_D, 15) /* D9   CN7-18 */, .cc_chan = 3} },
+        .af       = GPIO_AF2,
+        .bus      = APB1
+    },
+};
+
+/**
+ * @brief   Number of PWM devices
+ */
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
