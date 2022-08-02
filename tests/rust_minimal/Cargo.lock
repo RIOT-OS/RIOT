@@ -536,7 +536,12 @@ name = "rust-minimal"
 version = "0.1.0"
 dependencies = [
  "riot-wrappers",
+ "rust_riotmodules",
 ]
+
+[[package]]
+name = "rust_riotmodules"
+version = "0.1.0"
 
 [[package]]
 name = "rustc-hash"

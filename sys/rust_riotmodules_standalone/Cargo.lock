@@ -493,7 +493,8 @@ dependencies = [
 
 [[package]]
 name = "riot-wrappers"
-version = "0.7.22"
+version = "0.7.23"
+source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#db9d163e3eddcb7154edcf25db7207e4123964ee"
 dependencies = [
  "bare-metal 1.0.0",
  "cstr_core",
