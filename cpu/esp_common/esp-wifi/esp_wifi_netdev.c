@@ -983,6 +983,8 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     dev->event_disc = 0;
     dev->connected = false;
 #endif /* MODULE_ESP_WIFI_AP */
+
+    netdev_register(&dev->netdev, NETDEV_ESP_WIFI, 0);
 }
 
 #endif /* MODULE_ESP_WIFI */
