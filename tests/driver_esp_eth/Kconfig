@@ -9,4 +9,4 @@ config APPLICATION
     bool
     default y
     depends on HAS_ARCH_ESP32
-    depends on HAS_PERIPH_ETH
+    depends on HAS_ESP_ETH
