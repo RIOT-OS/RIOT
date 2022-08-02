@@ -458,6 +458,8 @@ void esp_eth_setup(esp_eth_netdev_t* dev)
     _esp_eth_dev.link_up = false;
     _esp_eth_dev.rx_len = 0;
     _esp_eth_dev.tx_len = 0;
+
+    netdev_register(&dev->netdev, NETDEV_ESP_ETH, 0);
 }
 
 #endif /* MODULE_ESP_ETH */

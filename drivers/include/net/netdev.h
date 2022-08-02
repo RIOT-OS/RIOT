@@ -329,6 +329,8 @@ typedef enum {
     NETDEV_ENCX24J600,
     NETDEV_ATWINC15X0,
     NETDEV_KW2XRF,
+    NETDEV_ESP_ETH,
+    NETDEV_ESP_WIFI,
     /* add more if needed */
 } netdev_type_t;
 /** @} */
