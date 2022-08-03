@@ -85,7 +85,8 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
     if (freq >= 125000) {
         return SPI_FREQUENCY_FREQUENCY_K125;
     }
-    assert(0);
+    /* TODO: Maybe throw a debug message that it is lower than requested freq */
+    return SPI_FREQUENCY_FREQUENCY_K125;
 }
 
 uint32_t spi_get_freq(spi_t bus, spi_clk_t clk)
