@@ -3,7 +3,7 @@
 # uncomment and change this to limit builds, e.g.,
 #export BOARDS="samr21-xpro native"
 # and / or
-#export APPS="examples/hello-world tests/unittests"
+export APPS="tests/pkg_cryptoauthlib_internal-tests"
 
 #
 : ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
@@ -425,6 +425,17 @@ test_cache_put() {
 
 # compile one app for one board with one toolchain. delete intermediates.
 compile() {
+    for i in $(seq 1 20); do
+        echo "=========================================="
+        echo $i
+        _compile $1 $2
+        if [ $? -ne 0 ]; then
+            break
+        fi
+    done
+    return $?
+}
+_compile() {
     local appdir=$1
     local board=$(echo $2 | cut -f 1 -d':')
     local toolchain=$(echo $2 | cut -f 2 -d':')
