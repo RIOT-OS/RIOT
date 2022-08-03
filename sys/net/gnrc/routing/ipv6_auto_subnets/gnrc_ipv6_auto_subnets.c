@@ -51,6 +51,30 @@
  * so that upstream routers will no longer consider hosts in this subnet on-link,
  * but instead will use the downstream router to route to the new subnet.
  *
+ * The need for a Route Information Option
+ * ---------------------------------------
+ *
+ * All nodes that want to communicate with hosts in a downstream subnet must implement
+ * parsing of the Route Information Option. For routing RIOT nodes this is enabled by
+ * default, non-routing nodes need to enable the `gnrc_ipv6_nib_rio` module.
+ *
+ * This is because all addresses in the subnet are also within the original network, so
+ * without further information hosts would consider those addresses on-link and perform
+ * neighbor solicitation to communicate with them.
+ *
+ * E.g. if host Ⓒ  (`2001:db8:0:8:5075:35ff:fefa:30bc`) sends an ICMPv6 Echo request to
+ * Ⓑ  (`2001:db8:0:0:a7a2:12e0:48bc:7487`), it would not get a response:
+ *
+ * ![Auto-Subnets without RIO](gnrc_ipv6_auto_subnets-without_rio.svg)
+ *
+ * To solve this, the routing node Ⓐ  also sends a Router Advertisement to the <i>upstream</i>
+ * network that only contains a Route Information Option for each downstream network created
+ * by that router.
+ * This way hosts in the upstream network will prefer the route via Ⓐ  over link-local
+ * transmission as it is a stronger match than the upstream prefix:
+ *
+ * ![Auto-Subnets with RIO](gnrc_ipv6_auto_subnets-with_rio.svg)
+ *
  * Usage
  * =====
  *
