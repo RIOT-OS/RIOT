@@ -22,9 +22,10 @@
  * subnets from it by dividing it into sub-prefixes for each downstream interface.
  *
  * When using the `gnrc_ipv6_auto_subnets_simple` module, there can only be a single
- * routing node on each level of the network but an arbitrary number of leaf nodes.
+ * routing node on each level of the network but an arbitrary number of leaf nodes and
+ * downstream interfaces.
  *
- * !['Skinny Tree' Example Topology](gnrc_ipv6_auto_subnets_simple.svg)
+ * ![Example Topology with only one router on each level](gnrc_ipv6_auto_subnets_simple.svg)
  *
  * If there are multiple routing nodes on the same link, coordination between the
  * routers is required.
@@ -36,7 +37,7 @@
  * The layer 2 address of the sender then determines the order in which the prefixes
  * are assigned.
  *
- * ![Example Topology](gnrc_ipv6_auto_subnets.svg)
+ * ![Example Topology with multiple routers](gnrc_ipv6_auto_subnets.svg)
  *
  * The downstream network(s) receive the sub-prefix via Router Advertisements
  * and the process repeats until the bits of the prefix are exhausted.
