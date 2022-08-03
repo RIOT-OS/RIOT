@@ -287,7 +287,14 @@ int gcoap_cli_cmd(int argc, char **argv)
         }
 
         if (_proxied) {
-            uri_len = snprintf(proxy_uri, 64, "coap://[%s]:%s%s", argv[apos], argv[apos+1], uri);
+            if (IS_USED(MODULE_GCOAP_DTLS)) {
+                uri_len = snprintf(proxy_uri, 64, "coaps://[%s]:%s%s", argv[apos], argv[apos+1],
+                                   uri);
+            }
+            else {
+                uri_len = snprintf(proxy_uri, 64, "coap://[%s]:%s%s", argv[apos], argv[apos+1],
+                                   uri);
+            }
             uri = proxy_uri;
 
             gcoap_req_init(&pdu, &buf[0], CONFIG_GCOAP_PDU_BUF_SIZE, code_pos, NULL);
