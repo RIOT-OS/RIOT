@@ -455,7 +455,8 @@ compile() {
     should_check_kconfig_hash=0
 
     if get_supported_kconfig_board_app "${board}" "${appdir}"; then
-        should_check_kconfig_hash=1
+        # should_check_kconfig_hash=1
+        #
         # As we have some issues with occasional unrelated hash mismatches
         # we will stop the binary checks and rely only in a module/package
         # check to ensure kconfig is matching make.
