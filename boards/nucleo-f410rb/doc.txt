@@ -6,7 +6,7 @@
 ## Overview
 
 The Nucleo-F410RB is a board from ST's Nucleo family supporting a ARM Cortex-M4
-STM32F410RB microcontroller with 32Kb of SRAM and 128Kb of ROM Flash.
+STM32F410RB microcontroller with 32KiB of RAM and 128KiB of Flash.
 
 ## Hardware
 
@@ -18,8 +18,8 @@ STM32F410RB microcontroller with 32Kb of SRAM and 128Kb of ROM Flash.
 |:---------- |:----------------- |
 | Family     | ARM Cortex-M4     |
 | Vendor     | ST Microelectronics |
-| RAM        | 32Kb              |
-| Flash      | 128Kb             |
+| RAM        | 32KiB             |
+| Flash      | 128KiB            |
 | Frequency  | up to 100MHz      |
 | FPU        | yes               |
 | Timers     | 9 (2x watchdog, 1x SysTick, 4x 16-bit, 1x 32-bit [TIM2] and 1 low power timer) |

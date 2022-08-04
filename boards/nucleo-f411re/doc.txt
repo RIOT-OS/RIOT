@@ -6,7 +6,7 @@
 ## Overview
 
 The Nucleo-F411RE is a board from ST's Nucleo family supporting a ARM Cortex-M4
-STM32F411RE microcontroller with 128Kb of SRAM and 512Kb of ROM Flash.
+STM32F411RE microcontroller with 128KiB of RAM and 512KiB of Flash.
 
 ## Hardware
 
@@ -18,8 +18,8 @@ STM32F411RE microcontroller with 128Kb of SRAM and 512Kb of ROM Flash.
 |:---------- |:----------------- |
 | Family     | ARM Cortex-M4     |
 | Vendor     | ST Microelectronics |
-| RAM        | 128Kb             |
-| Flash      | 512Kb             |
+| RAM        | 128KiB            |
+| Flash      | 512KiB            |
 | Frequency  | up to 100MHz      |
 | FPU        | yes               |
 | Timers     | 11 (2x watchdog, 1 SysTick, 7x 16-bit, 1x 32-bit [TIM2]) |

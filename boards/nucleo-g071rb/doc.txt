@@ -6,8 +6,7 @@
 ## Overview
 
 The Nucleo-G071RB is a board from ST's Nucleo family supporting a ARM
-Cortex-M0+ STM32G071RB microcontroller with 36KiB of SRAM and 128KiB of ROM
-Flash.
+Cortex-M0+ STM32G071RB microcontroller with 36KiB of RAM and 128KiB of Flash.
 
 ## Flashing the Board Using ST-LINK Removable Media
 

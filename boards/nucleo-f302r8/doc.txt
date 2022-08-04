@@ -6,10 +6,9 @@
 ## Overview
 
 The [Nucleo-F302R8](http://www.st.com/en/evaluation-tools/nucleo-f302r8.html)
-is
-a board from ST's Nucleo family supporting a ARM Cortex-M4
+is a board from ST's Nucleo family supporting a ARM Cortex-M4
 [STM32F302R8](http://www.st.com/en/microcontrollers/stm32f302r8.html)
-microcontroller with 16KB of RAM and 64KB of ROM.
+microcontroller with 16KiB of RAM and 64KiB of Flash.
 
 ## Hardware
 
@@ -21,8 +20,8 @@ microcontroller with 16KB of RAM and 64KB of ROM.
 |:---------- |:--------------------- |
 | Family     | ARM Cortex-M4         |
 | Vendor     | ST Microelectronics   |
-| RAM        | 16KB                  |
-| Flash      | 64KB                  |
+| RAM        | 16KiB                 |
+| Flash      | 64KiB                 |
 | Frequency  | up to 72MHz           |
 | FPU        | yes                   |
 | Timers     | 9 (5x 16-bit, 1x 32-bit [TIM2], 2x watchdog, 1x systick) |

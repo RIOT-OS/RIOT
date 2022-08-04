@@ -6,7 +6,7 @@
 ## Overview
 
 The Nucleo-F072RB is a board from ST's Nucleo family supporting a ARM Cortex-M0
-STM32F072RB microcontroller with 16Kb of SRAM and 128Kb of ROM Flash.
+STM32F072RB microcontroller with 16KiB of RAM and 128KiB of Flash.
 
 ## Hardware
 
@@ -18,8 +18,8 @@ STM32F072RB microcontroller with 16Kb of SRAM and 128Kb of ROM Flash.
 |:---------- |:----------------- |
 | Family     | ARM Cortex-M0     |
 | Vendor     | ST Microelectronics |
-| RAM        | 16Kb              |
-| Flash      | 128Kb             |
+| RAM        | 16KiB             |
+| Flash      | 128KiB            |
 | Frequency  | up to 48MHz       |
 | FPU        | no                |
 | Timers     | 12 (2x watchdog, 1 SysTick, 8x 16-bit, 1x 32-bit) |

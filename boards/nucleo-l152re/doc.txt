@@ -13,8 +13,8 @@
 |:---------- |:----------------- |
 | Family     | ARM Cortex-M3     |
 | Vendor     | ST Microelectronics |
-| RAM        | 80Kb              |
-| Flash      | 512Kb             |
+| RAM        | 80KiB             |
+| Flash      | 512KiB            |
 | EEPROM     | 16KB              |
 | Frequency  | up to 32MHz       |
 | FPU        | no                |
