@@ -133,7 +133,7 @@ ifneq (,$(filter nimble_netif,$(USEMODULE)))
 
   # in order to fit a 251 byte COC data segment into a single mbuf buffer, the
   # used block size must be at least 297 byte (251 data + 48 overhead)
-  CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_SIZE="(MYNEWT_VAL_BLE_L2CAP_COC_MPS + 48)"
+  CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_SIZE='(MYNEWT_VAL_BLE_L2CAP_COC_MPS + 48)'
 
   # in the worst case, NimBLEs internal buffer needs to hold two full IPv6 MTUs
   # per connection (1 TX and 1 RX). But in practice this would be highly over-
@@ -156,7 +156,7 @@ else
 
     # in order to fit a 251 byte COC data segment into a single mbuf buffer, the
     # used block size must be at least 297 byte (251 data + 48 overhead)
-    CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_SIZE="(MYNEWT_VAL_BLE_L2CAP_COC_MPS + 48)"
+    CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_SIZE='(MYNEWT_VAL_BLE_L2CAP_COC_MPS + 48)'
   endif
 endif
 
