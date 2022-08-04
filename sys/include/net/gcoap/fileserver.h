@@ -16,13 +16,20 @@
  * This maps files in the local file system onto a resources in CoAP. In that,
  * it is what is called a static web server in the unconstrained web.
  *
- * As usual, GET operations are used to read files<!-- WRITESUPPORT, and PUT writes to files.
+ * As usual, GET operations are used to read files and PUT writes to files.
  * In the current implementation, PUTs are expressed as random-access, meaning
- * that files are not updated atomically -->.
+ * that files are not updated atomically, although files are created atomically.
+ * The Content-Format option is not checked in the current implementation.
+ * Conditional file modification and deletion is supported using the If-Match
+ * option. The If-Match option carries a previously received Etag or in case of
+ * zero length, requires a request to be processed only if the resource exists.
+ * In opposite, the If-None-Match option requires a request to be processed,
+ * only if the resource does not yet exist, and is most useful for file creation.
  *
- * Directories are expressed to URIs with trailing slashes<!-- WRITESUPPORT, and are always
- * created implicitly when files are PUT under them; they can be DELETEd when
- * empty -->.
+ * Directories are expressed to URIs with trailing slashes. Directories and
+ * their content are deleted as if one would do an `$rm -r`. If you only would
+ * like to delete a directory if it is empty, you must supply an If-Match option
+ * with the special value @ref COAPFILESERVER_DIR_DELETE_ETAG.
  *
  * @note The file server uses ETag for cache validation. The ETags are built
  * from the file system stat values. As clients rely on the ETag to differ when
@@ -55,8 +62,10 @@
  *   The path argument specifies under which path the folder is served via CoAP while
  *   the context argument contains the path on the local filesystem that will be served.
  *
- *   The allowed methods dictate whether it's read-only (``COAP_GET``) or (in the
- *   future<!-- WRITESUPPORT -->) read-write (``COAP_GET | COAP_PUT | COAP_DELETE``).
+ *   The allowed methods dictate whether it's read-only (``COAP_GET``) or
+ *   read-write (``COAP_GET | COAP_PUT | COAP_DELETE``).
+ *   If you want to support ``PUT`` and `DELETE`, you need to enable the modules
+ *   ``gcoap_fileserver_put`` and ``gcoap_fileserver_delete``.
  *
  * @{
  *
@@ -74,6 +83,12 @@ extern "C" {
 #endif
 
 #include "net/nanocoap.h"
+
+/**
+ * @brief   Randomly generated Etag, used by a client when a directory should only be
+ *          deleted, if it is empty
+ */
+#define COAPFILESERVER_DIR_DELETE_ETAG (0x6ce88b56u)
 
 /**
  * @brief File server handler

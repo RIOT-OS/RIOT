@@ -21,6 +21,8 @@ USEMODULE += shell_commands
 
 # enable the fileserver module
 USEMODULE += gcoap_fileserver
+USEMODULE += gcoap_fileserver_delete
+USEMODULE += gcoap_fileserver_put
 
 # select network modules
 USEMODULE += gnrc_ipv6_default

@@ -67,6 +67,8 @@ PSEUDOMODULES += fatfs_vfs_format
 PSEUDOMODULES += fmt_%
 PSEUDOMODULES += gcoap_forward_proxy
 PSEUDOMODULES += gcoap_fileserver
+PSEUDOMODULES += gcoap_fileserver_delete
+PSEUDOMODULES += gcoap_fileserver_put
 PSEUDOMODULES += gcoap_dtls
 ## Enable @ref net_gcoap_dns
 PSEUDOMODULES += gcoap_dns

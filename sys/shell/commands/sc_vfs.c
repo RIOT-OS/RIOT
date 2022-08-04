@@ -31,8 +31,10 @@
 
 #include "shell.h"
 #include "vfs.h"
-#if MODULE_VFS_UTIL
 #include "vfs_util.h"
+
+#ifndef SHELL_VFS_PATH_SIZE_MAX
+#define SHELL_VFS_PATH_SIZE_MAX 256
 #endif
 
 #define SHELL_VFS_BUFSIZE 256
@@ -62,7 +64,11 @@ static void _vfs_usage(char **argv)
     printf("%s cp <src> <dest>\n", argv[0]);
     printf("%s mv <src> <dest>\n", argv[0]);
     printf("%s mkdir <path> \n", argv[0]);
-    printf("%s rm <file>\n", argv[0]);
+    printf("%s rm"
+#if IS_USED(MODULE_VFS_UTIL)
+               " [-r]"
+#endif
+           " <path>\n", argv[0]);
     printf("%s df [path]\n", argv[0]);
     if (MOUNTPOINTS_NUMOF > 0) {
         printf("%s mount [path]\n", argv[0]);
@@ -79,7 +85,7 @@ static void _vfs_usage(char **argv)
     puts("mv: Move <src> file to <dest>");
     puts("mkdir: Create directory <path> ");
     puts("cp: Copy <src> file to <dest>");
-    puts("rm: Unlink (delete) <file>");
+    puts("rm: Unlink (delete) a file or a directory at <path>");
     puts("df: Show file system space utilization stats");
 }
 
@@ -558,10 +564,21 @@ static int _rm_handler(int argc, char **argv)
         _vfs_usage(argv);
         return 1;
     }
-    char *rm_name = argv[1];
+    bool recursive = !strcmp(argv[1], "-r");
+    if (recursive && (argc < 3 || !IS_USED(MODULE_VFS_UTIL))) {
+        _vfs_usage(argv);
+        return 1;
+    }
+    char *rm_name = recursive ? argv[2] : argv[1];
     printf("%s: unlink: %s\n", argv[0], rm_name);
-
-    int res = vfs_unlink(rm_name);
+    int res;
+    if (IS_USED(MODULE_VFS_UTIL) && recursive) {
+        char pbuf[SHELL_VFS_PATH_SIZE_MAX];
+        res = vfs_unlink_recursive(rm_name, pbuf, sizeof(pbuf));
+    }
+    else {
+        res = vfs_unlink(rm_name);
+    }
     if (res < 0) {
         char errbuf[16];
         _errno_string(res, (char *)errbuf, sizeof(errbuf));

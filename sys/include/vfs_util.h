@@ -101,6 +101,33 @@ int vfs_file_sha256(const char* file, void *digest,
                     void *work_buf, size_t work_buf_len);
 #endif
 
+/**
+ * @brief   Checks if @p path is a file or a directory.
+ *
+ * This function uses @ref vfs_stat(), so if you need @ref vfs_stat() anyway,
+ * you should not do double work and check it yourself.
+ *
+ * @param[in]   path        Path to check
+ *
+ * @return < 0 on FS error
+ * @return 0 if @p path is a file
+ * @return > 0 if @p path is a directory
+ */
+int vfs_is_dir(const char *path);
+
+/**
+ * @brief    Behaves like `rm -r @p root`.
+ *
+ * @param[in]   root        FS root directory to be deleted
+ * @param[in]   path_buf    Buffer that must be able to store the longest path
+ *                          of the file or directory being deleted
+ * @param[in]   max_size    Size of @p path_buf
+ *
+ * @return < 0 on error
+ * @return 0
+ */
+int vfs_unlink_recursive(const char *root, char *path_buf, size_t max_size);
+
 #ifdef __cplusplus
 }
 #endif

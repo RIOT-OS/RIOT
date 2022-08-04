@@ -17,6 +17,7 @@
  * @}
  */
 
+#include "kernel_defines.h"
 #include "net/gcoap.h"
 #include "net/gcoap/fileserver.h"
 #include "shell.h"
@@ -27,7 +28,16 @@ static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 /* CoAP resources. Must be sorted by path (ASCII order). */
 static const coap_resource_t _resources[] = {
-    { "/vfs", COAP_GET | COAP_MATCH_SUBTREE, gcoap_fileserver_handler, VFS_DEFAULT_DATA },
+    { "/vfs",
+      COAP_GET |
+#if IS_USED(MODULE_GCOAP_FILESERVER_PUT)
+      COAP_PUT |
+#endif
+#if IS_USED(MODULE_GCOAP_FILESERVER_DELETE)
+      COAP_DELETE |
+#endif
+      COAP_MATCH_SUBTREE,
+      gcoap_fileserver_handler, VFS_DEFAULT_DATA },
 };
 
 static gcoap_listener_t _listener = {

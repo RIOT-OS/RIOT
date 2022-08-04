@@ -656,6 +656,15 @@ ifneq (,$(filter gcoap_fileserver,$(USEMODULE)))
   USEMODULE += vfs
 endif
 
+ifneq (,$(filter gcoap_fileserver_delete,$(USEMODULE)))
+  USEMODULE += gcoap_fileserver
+  USEMODULE += vfs_util
+endif
+
+ifneq (,$(filter gcoap_fileserver_put,$(USEMODULE)))
+  USEMODULE += gcoap_fileserver
+endif
+
 ifneq (,$(filter gcoap_forward_proxy,$(USEMODULE)))
   USEMODULE += gcoap
   USEMODULE += uri_parser
