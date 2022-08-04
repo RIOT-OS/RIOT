@@ -561,6 +561,9 @@ ssize_t gcoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                     }
                     request.options.exists.if_none_match = true;
                     break;
+                case COAP_OPT_URI_HOST:
+                    /* ignore host name option */
+                    continue;
                 case COAP_OPT_URI_PATH:
                     if (strip_remaining != 0) {
                         strip_remaining -= 1;
