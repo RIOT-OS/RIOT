@@ -28,6 +28,13 @@
 #include "shell.h"
 #include "vfs_default.h"
 
+/**
+ * @brief   Default download location for ncget
+ */
+#ifndef CONFIG_NCGET_DEFAULT_DATA_DIR
+#define CONFIG_NCGET_DEFAULT_DATA_DIR VFS_DEFAULT_DATA
+#endif
+
 struct dir_list_ctx {
     char *buf;
     char *cur;
@@ -96,7 +103,7 @@ static int _nanocoap_get_handler(int argc, char **argv)
 
     if (argc < 2) {
         printf("Usage: %s <url> [destination]\n", argv[0]);
-        printf("Default destination: %s\n", VFS_DEFAULT_DATA);
+        printf("Default destination: %s\n", CONFIG_NCGET_DEFAULT_DATA_DIR);
         return -EINVAL;
     }
 
@@ -115,7 +122,7 @@ static int _nanocoap_get_handler(int argc, char **argv)
             return -EINVAL;
         }
         if (snprintf(buffer, sizeof(buffer), "%s%s",
-                     VFS_DEFAULT_DATA, dst) >= (int)sizeof(buffer)) {
+                     CONFIG_NCGET_DEFAULT_DATA_DIR, dst) >= (int)sizeof(buffer)) {
             printf("Output file path too long\n");
             return -ENOBUFS;
         }
