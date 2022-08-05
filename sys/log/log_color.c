@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    sys_log_color Colored log module
+ * @addtogroup  sys_log_color Colored log module
  * @ingroup     sys
  * @brief       This module implements a logging module with colored output
  * @{
  *
  * @file
- * @brief       log_module header
+ * @brief       log_color
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
