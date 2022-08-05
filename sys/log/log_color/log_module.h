@@ -21,5 +21,20 @@
 #ifndef LOG_MODULE_H
 #define LOG_MODULE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ *
+ * @brief log_write overridden function for colored output
+ *
+ * @param[in] level  Logging level
+ * @param[in] format String format to print
+ */
 void log_write(unsigned level, const char *format, ...);
+
+#ifdef __cplusplus
+}
+#endif
 #endif /* LOG_MODULE_H */

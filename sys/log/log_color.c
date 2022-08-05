@@ -27,10 +27,6 @@
 
 #if IS_USED(MODULE_LOG_COLOR)
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /**
  * @brief   Default ANSI color escape code for error logs
  *
@@ -80,7 +76,6 @@ static const char * const _ansi_codes[] =
     [LOG_DEBUG] = LOG_DEBUG_ANSI_COLOR_CODE,
 };
 
-
 void log_write(unsigned level, const char *format, ...)
 {
     assert(level > 0 && level < ARRAY_SIZE(_ansi_codes));
@@ -105,9 +100,5 @@ void log_write(unsigned level, const char *format, ...)
     fflush(stdout);
 #endif
 }
-
-#ifdef __cplusplus
-}
-#endif
 /**@}*/
 #endif
