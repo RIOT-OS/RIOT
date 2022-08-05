@@ -175,8 +175,6 @@ PSEUDOMODULES += l2filter_blacklist
 PSEUDOMODULES += l2filter_whitelist
 PSEUDOMODULES += libstdcpp
 PSEUDOMODULES += log
-PSEUDOMODULES += log_printfnoformat
-PSEUDOMODULES += log_color
 PSEUDOMODULES += lora
 ## @defgroup pseudomodule_libc_gettimeofday libc_gettimeofday
 ## @brief Includes implementation of gettimeofday()
