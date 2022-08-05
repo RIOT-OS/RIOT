@@ -51,6 +51,13 @@ ifeq (1, $(SUBMODULES))
                 $(patsubst $(BASE_MODULE)_%,%.c,\
                     $(filter $(BASE_MODULE)_%,$(USEMODULE)))))
 
+  # for each $(BASE_MODULE)_<name> in USEMODULE, add $(BASE_MODULE)_<name>.c to SRC
+  # unless in SUBMODULES_NO_SRC
+  SRC += $(wildcard \
+            $(filter-out $(SUBMODULES_NO_SRC),\
+                $(patsubst %,%.c,\
+                    $(filter $(BASE_MODULE)_%,$(USEMODULE)))))
+
   # remove duplicates
   SRC := $(sort $(SRC))
 endif

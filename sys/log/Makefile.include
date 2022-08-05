@@ -16,6 +16,4 @@ endif
 
 ifneq (,$(filter log_color,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/log/log_color
-  BASELIBS += log.module
-  SRC += log_color.c
 endif
