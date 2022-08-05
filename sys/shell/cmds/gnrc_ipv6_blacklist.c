@@ -62,7 +62,7 @@ static int _blacklist(int argc, char **argv)
 }
 
 SHELL_COMMAND(blacklist,
-        "blacklists an address for receival ('blacklist [add|del|help]')",
+        "manage IPv6 addresses in reception deny list ('blacklist [add|del|help]')",
         _blacklist);
 
 /** @} */

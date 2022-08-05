@@ -60,6 +60,8 @@ static int _whitelist(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(whitelist, "whitelists an address for receival ('whitelist [add|del|help]')", _whitelist);
+SHELL_COMMAND(whitelist,
+        "manage IPv6 addresses in reception allow list ('whitelist [add|del|help]')",
+        _whitelist);
 
 /** @} */
