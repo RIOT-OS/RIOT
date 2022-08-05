@@ -38,3 +38,4 @@ void log_write(unsigned level, const char *format, ...);
 }
 #endif
 #endif /* LOG_MODULE_H */
+/**@}*/
