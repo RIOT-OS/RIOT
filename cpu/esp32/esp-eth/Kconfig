@@ -9,16 +9,16 @@ config MODULE_ESP_ETH
     bool "ESP32 Ethernet device"
     depends on TEST_KCONFIG
     depends on CPU_FAM_ESP32
-    depends on HAS_PERIPH_ETH
-    select MODULE_ESP_FREERTOS
+    depends on HAS_ESP_ETH
     select MODULE_ESP_IDF_ETH
-    select MODULE_ESP_IDF_ETH_PHY
+    select MODULE_ESP_IDF_EVENT
+    select MODULE_ESP_IDF_SPI_FLASH
     select MODULE_NETDEV_ETH
     select MODULE_NETOPT
     select MODULE_ZTIMER
     select MODULE_ZTIMER_MSEC
 
-config HAVE_ESP_ETH
+config HAS_ESP_ETH
     bool
     select MODULE_ESP_ETH if MODULE_NETDEV_DEFAULT
     help

@@ -7,7 +7,6 @@ USEMODULE += test_utils_netdev_eth_minimal
 # the driver to test
 USEMODULE += esp_eth
 FEATURES_REQUIRED += arch_esp32
-FEATURES_REQUIRED += periph_eth
 
 INCLUDES += -I$(APPDIR)
 

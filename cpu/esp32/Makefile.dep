@@ -18,13 +18,13 @@ ifneq (,$(filter cpp,$(USEMODULE)))
 endif
 
 ifneq (,$(filter esp_eth,$(USEMODULE)))
+  FEATURES_REQUIRED += esp_eth
   USEMODULE += esp_idf_eth
   USEMODULE += esp_idf_event
   USEMODULE += esp_idf_gpio
   USEMODULE += esp_idf_spi_flash
   USEMODULE += netdev_eth
   USEMODULE += netopt
-  FEATURES_REQUIRED += periph_eth
   USEMODULE += ztimer_msec
 endif
 
