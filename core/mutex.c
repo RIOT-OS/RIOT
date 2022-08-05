@@ -66,6 +66,17 @@ static inline __attribute__((always_inline)) void _block(mutex_t *mutex,
         thread_add_to_list(&mutex->queue, me);
     }
 
+#ifdef MODULE_CORE_MUTEX_PRIORITY_INHERITANCE
+    thread_t *owner = thread_get(mutex->owner);
+    if ((owner) && (owner->priority > me->priority)) {
+        DEBUG("PID[%" PRIkernel_pid "] prio of %" PRIkernel_pid
+              ": %u --> %u\n",
+              thread_getpid(), mutex->owner,
+              (unsigned)owner->priority, (unsigned)me->priority);
+        sched_change_priority(owner, me->priority);
+    }
+#endif
+
     irq_restore(irq_state);
     thread_yield_higher();
     /* We were woken up by scheduler. Waker removed us from queue. */
@@ -80,6 +91,11 @@ void mutex_lock(mutex_t *mutex)
     if (mutex->queue.next == NULL) {
         /* mutex is unlocked. */
         mutex->queue.next = MUTEX_LOCKED;
+#ifdef MODULE_CORE_MUTEX_PRIORITY_INHERITANCE
+        thread_t *me = thread_get_active();
+        mutex->owner = me->pid;
+        mutex->owner_original_priority = me->priority;
+#endif
         DEBUG("PID[%" PRIkernel_pid "] mutex_lock(): early out.\n",
               thread_getpid());
         irq_restore(irq_state);
@@ -108,6 +124,11 @@ int mutex_lock_cancelable(mutex_cancel_t *mc)
     if (mutex->queue.next == NULL) {
         /* mutex is unlocked. */
         mutex->queue.next = MUTEX_LOCKED;
+#ifdef MODULE_CORE_MUTEX_PRIORITY_INHERITANCE
+        thread_t *me = thread_get_active();
+        mutex->owner = me->pid;
+        mutex->owner_original_priority = me->priority;
+#endif
         DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable() early out.\n",
               thread_getpid());
         irq_restore(irq_state);
@@ -135,6 +156,16 @@ void mutex_unlock(mutex_t *mutex)
         irq_restore(irqstate);
         return;
     }
+
+#ifdef MODULE_CORE_MUTEX_PRIORITY_INHERITANCE
+    thread_t *owner = thread_get(mutex->owner);
+    if ((owner) && (owner->priority != mutex->owner_original_priority)) {
+        DEBUG("PID[%" PRIkernel_pid "] prio %u --> %u\n",
+              owner->pid,
+              (unsigned)owner->priority, (unsigned)owner->priority);
+        sched_change_priority(owner, mutex->owner_original_priority);
+    }
+#endif
 
     if (mutex->queue.next == MUTEX_LOCKED) {
         mutex->queue.next = NULL;
