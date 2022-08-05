@@ -27,6 +27,7 @@
 #include "net/nanocoap_vfs.h"
 #include "shell.h"
 #include "vfs_default.h"
+#include "vfs_util.h"
 
 /**
  * @brief   Default download location for ncget
@@ -130,9 +131,9 @@ static int _nanocoap_get_handler(int argc, char **argv)
     } else {
         char *filename = strrchr(url, '/');
         dst = argv[2];
-        if (_is_dir(dst) && filename) {
+        if (vfs_is_dir(dst) > 0 && filename) {
             if (snprintf(buffer, sizeof(buffer), "%s%s",
-                         dst, filename + 1) >= (int)sizeof(buffer)) {
+                         dst, filename) >= (int)sizeof(buffer)) {
                 printf("Output file path too long\n");
                 return -ENOBUFS;
             }
