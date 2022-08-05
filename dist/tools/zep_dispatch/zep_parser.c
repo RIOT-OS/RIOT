@@ -13,6 +13,39 @@
 
 #define SOCKET_ZEP_V2_TYPE_HELLO   (255)
 
+const void *zep_get_payload(const void *buffer, size_t *len)
+{
+    const void *payload;
+    const zep_v2_data_hdr_t *zep = buffer;
+
+    if (*len == 0) {
+        return NULL;
+    }
+
+    if ((zep->hdr.preamble[0] != 'E') || (zep->hdr.preamble[1] != 'X')) {
+        return NULL;
+    }
+
+    if (zep->hdr.version != 2) {
+        return NULL;
+    }
+
+    switch (zep->type) {
+    case ZEP_V2_TYPE_DATA:
+        payload = (zep_v2_data_hdr_t *)zep + 1;
+        break;
+    case ZEP_V2_TYPE_ACK:
+        payload = (zep_v2_ack_hdr_t *)zep + 1;
+        break;
+    default:
+        return NULL;
+    }
+
+    *len = zep->length - IEEE802154_FCS_LEN;
+
+    return payload;
+}
+
 bool zep_parse_mac(const void *buffer, size_t len, void *out, uint8_t *out_len)
 {
     const void *payload;
