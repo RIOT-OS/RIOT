@@ -25,8 +25,6 @@
 #include "kernel_defines.h"
 #include "log.h"
 
-#if IS_USED(MODULE_LOG_COLOR)
-
 /**
  * @brief   Default ANSI color escape code for error logs
  *
@@ -101,4 +99,3 @@ void log_write(unsigned level, const char *format, ...)
 #endif
 }
 /**@}*/
-#endif
