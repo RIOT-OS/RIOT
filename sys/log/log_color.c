@@ -76,7 +76,7 @@ static const char * const _ansi_codes[] =
 
 void log_write(unsigned level, const char *format, ...)
 {
-    assert(level > 0 && level < ARRAY_SIZE(_ansi_codes));
+    assert((level > 0) && (level < ARRAY_SIZE(_ansi_codes)));
 
     printf("%s", _ansi_codes[level]);
     va_list args;
