@@ -1,14 +1,17 @@
 # ESP32x specific flashing options
 FLASH_CHIP  = $(CPU_FAM)
+
+# Serial flasher config as used by the ESP-IDF, be careful when overriding them.
+# They have to be exported to use same values in subsequent makefiles.
 ifeq (esp32,$(CPU_FAM))
-  FLASH_MODE ?= dout
-  FLASH_FREQ  = 40m   # DO NOT CHANGE
-  FLASH_SIZE ?= 4
+  export FLASH_MODE ?= dout
+  export FLASH_FREQ ?= 40m
+  export FLASH_SIZE ?= 2
   BOOTLOADER_POS = 0x1000
 else ifeq (esp32c3,$(CPU_FAM))
-  FLASH_MODE ?= dio
-  FLASH_FREQ  = 80m   # DO NOT CHANGE
-  FLASH_SIZE ?= 4
+  export FLASH_MODE ?= dio
+  export FLASH_FREQ ?= 80m
+  export FLASH_SIZE ?= 2
   BOOTLOADER_POS = 0x0000
 else
   $(error Unkwnown ESP32x SoC variant (family))
@@ -111,6 +114,19 @@ CFLAGS += -DCONFIG_FREERTOS_UNICORE
 CFLAGS += -DCONFIG_IDF_TARGET_$(call uppercase_and_underscore,$(CPU_FAM))
 CFLAGS += -DESP_PLATFORM
 CFLAGS += -DLOG_TAG_IN_BRACKETS
+
+# extend CFLAGS by the corresponding FLASH_FREQ
+ifeq (20m,$(FLASH_FREQ))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHFREQ_20M
+else ifeq (26m,$(FLASH_FREQ))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHFREQ_26M
+else ifeq (40m,$(FLASH_FREQ))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHFREQ_40M
+else ifeq (80m,$(FLASH_FREQ))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHFREQ_80M
+else ifeq (120m,$(FLASH_FREQ))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHFREQ_120M
+endif
 
 # shortcuts used by ESP-IDF
 CFLAGS += -Dasm=__asm

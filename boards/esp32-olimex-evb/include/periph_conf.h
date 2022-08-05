@@ -129,7 +129,7 @@ extern "C" {
  * as PWM channels with `PWM_DEV(0)`.
  */
 #ifndef PWM0_GPIOS
-#if FLASH_MODE_DOUT || FLASH_MODE_DIO || DOXYGEN
+#if CONFIG_FLASHMODE_DOUT || CONFIG_FLASHMODE_DIO || DOXYGEN
 #define PWM0_GPIOS { GPIO9, GPIO10 }
 #else
 #error Configuration problem: Flash mode qio or qout is used, \

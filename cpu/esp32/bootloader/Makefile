@@ -155,6 +155,8 @@ INCLUDES = \
   -I$(ESP32_SDK_DIR)/components/spi_flash/include/spi_flash \
   #
 
+# include CFLAGS from cpu/esp_common/Makefile.include including the defines of
+# CONFIG_ESPTOOLPY_FLASHFREQ_* and CONFIG_FLASHMODE_*
 CFLAGS = -include '$(RIOTBUILD_CONFIG_HEADER_C)' \
 
 ifneq (,$(filter riscv32%,$(TARGET_ARCH)))
@@ -313,9 +315,9 @@ FLASH_CHIP = $(CPU_FAM)
 ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool_v3.2.py
 # TODO: These should be exported/configurable from the app side. That would
 # require to export these values.
-FLASH_MODE ?= dout
-FLASH_FREQ ?= 40m
-FLASH_SIZE ?= 4
+FLASH_MODE ?= dio   # ESP-IDF uses dio as default flash mode for the bootloader
+FLASH_FREQ ?= 40m   # lowest frequency all ESP32x SoC support
+FLASH_SIZE ?= 2     # smallesrt size all ESP32x SoC support
 
 # We use esptool to extract a version 1 app from the bootloader.elf. This is
 # like the regular objdump binary file but it contains a 16 byte header which

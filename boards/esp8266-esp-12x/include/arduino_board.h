@@ -39,7 +39,7 @@ static const gpio_t arduino_pinmap[] = {
     GPIO3,      /* ARDUINO_PIN_1 (TxD) */
     GPIO0,      /* ARDUINO_PIN_2 */
     GPIO2,      /* ARDUINO_PIN_3 */
-    #if defined(FLASH_MODE_QIO) || defined(FLASH_MODE_QOUT)
+    #if defined(CONFIG_FLASHMODE_QIO) || defined(CONFIG_FLASHMODE_QOUT)
     GPIO9,      /* ARDUINO_PIN_4 */
     GPIO10,     /* ARDUINO_PIN_5 */
     #else

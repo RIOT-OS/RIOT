@@ -83,7 +83,7 @@ gpio_pin_usage_t _gpio_pin_usage [GPIO_PIN_NUMOF] = {
     _SPIF,        /* GPIO6 is used as direct I/O SPI SCK for Flash */
     _SPIF,        /* GPIO7 is used as direct I/O SPI MISO for Flash */
     _SPIF,        /* GPIO8 is used as direct I/O SPI MOSI for Flash */
-    #if defined(FLASH_MODE_QIO) || defined(FLASH_MODE_QOUT)
+    #if defined(CONFIG_FLASHMODE_QIO) || defined(CONFIG_FLASHMODE_QOUT)
     /* in qio and qout mode these pins are used in Flash */
     _SPIF,        /* GPIO9 is used as direct I/O SPI HD for Flash */
     _SPIF,        /* GPIO10 is used as direct I/O SPI WP for Flash */
