@@ -33,7 +33,7 @@
  * their radios powered down. Some operation modes support channel hopping to avoid
  * frequencies used by others. Common variations are:
  *
- * * nonbeacon-eanbled: devices send whenever they want; beacons are only sent
+ * * nonbeacon-enabled: devices send whenever they want; beacons are only sent
  *   when devices ask for them in order to join the network. Optionally,
  *   packets can be held until the device asks for them ("indirect
  *   transmission").
