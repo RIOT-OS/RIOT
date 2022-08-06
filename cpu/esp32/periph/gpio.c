@@ -96,6 +96,14 @@ static bool _gpio_pin_pd[GPIO_PIN_NUMOF] = { };
 #define GPIO_OUT_XOR(b) if (b < 32) { GPIO.out ^=  BIT(b); } else { GPIO.out1.val ^=  BIT(b-32); }
 #define GPIO_OUT_GET(b) (b < 32) ? (GPIO.out >> b) & 1 : (GPIO.out1.val >> (b-32)) & 1
 
+#elif defined(CPU_FAM_ESP32C3)
+
+#define GPIO_IN_GET(b)  GPIO.in.val & BIT(b)
+#define GPIO_OUT_SET(b) GPIO.out_w1ts.val = BIT(b)
+#define GPIO_OUT_CLR(b) GPIO.out_w1tc.val = BIT(b)
+#define GPIO_OUT_XOR(b) GPIO.out.val ^=  BIT(b)
+#define GPIO_OUT_GET(b) (GPIO.out.val >> b) & 1
+
 #else
 #error "Platform implementation is missing"
 #endif

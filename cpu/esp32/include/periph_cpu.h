@@ -153,6 +153,7 @@ typedef enum {
  * details, see:
  *
  * - \ref esp32_adc_channels_esp32 "ESP32"
+ * - \ref esp32_adc_channels_esp32c3 "ESP32-C3"
  *
  * #ADC_GPIOS in the board-specific peripheral configuration defines the
  * list of GPIOs that can be used as ADC channels on the board, for example:
@@ -209,6 +210,7 @@ typedef enum {
  * For the GPIO that can be used with this function, see:
  *
  * - \ref esp32_adc_channels_esp32 "ESP32"
+ * - \ref esp32_adc_channels_esp32c3 "ESP32-C3"
  *
  * @{
  */
@@ -735,6 +737,8 @@ typedef struct {
  */
 #if defined(CPU_FAM_ESP32)
 #include "periph_cpu_esp32.h"
+#elif defined(CPU_FAM_ESP32C3)
+#include "periph_cpu_esp32c3.h"
 #else
 #error "ESP32x family implementation missing"
 #endif

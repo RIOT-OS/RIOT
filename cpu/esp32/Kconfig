@@ -38,5 +38,6 @@ config CPU
     default "esp32" if HAS_CPU_ESP32
 
 rsource "Kconfig.esp32"
+rsource "Kconfig.esp32c3"
 
 source "$(RIOTCPU)/esp_common/Kconfig"
