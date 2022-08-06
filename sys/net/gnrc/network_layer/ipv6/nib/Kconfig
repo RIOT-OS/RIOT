@@ -57,7 +57,7 @@ config GNRC_IPV6_NIB_DNS
 
 config GNRC_IPV6_NIB_ADV_ROUTER
     bool "Activate router advertising at interface start-up"
-    default n if USEMODULE_GNRC_DHCPV6_CLIENT_IA_PD || USEMODULE_GNRC_UHCPC
+    default n if MODULE_DHCPV6_CLIENT_IA_PD || USEMODULE_GNRC_UHCPC
     default n if USEMODULE_GNRC_IPV6_AUTO_SUBNETS
     default y if GNRC_IPV6_NIB_ROUTER && (!GNRC_IPV6_NIB_6LR || GNRC_IPV6_NIB_6LBR)
 
