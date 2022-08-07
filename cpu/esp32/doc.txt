@@ -1235,14 +1235,24 @@ ESP_PM_WUP_UART1 | disabled                 | Light | Positive UART1 RxD signal 
 - If `ESP_PM_GPIO_HOLD` is defined, GPIOs hold their last output level
   when entering _Deep-sleep_ mode. Please note that only RTC GPIOs
   can hold their output value in _Deep-sleep_ mode.
+  When restarting after a deep sleep, the GPIOs are reset to their default
+  configuration, which is usually the input-only mode. This means that the
+  output level of the GPIOs in output mode may change for up to 150 ms until
+  the GPIOs are reconfigured by the application in output mode. If a continuous
+  output level for such GPIOs is important, external pullups/pulldowns should
+  be used for these GPIOs to pull them to a specific level during deep sleep
+  and restart instead of defining `ESP_PM_GPIO_HOLD`.
 - `ESP_PM_WUP_PINS` specifies either a single RTC GPIO or a comma separated
   list of RTC GPIOs that are used as wake-up source in _Deep-sleep_ mode.
 - `ESP_PM_WUP_LEVEL` specifies the level for the wake-up pins in _Deep-sleep_
   mode:
   - `ESP_PM_WUP_PINS_ANY_HIGH` (default) - The system is woken up when any of
      the GPIOs specified in `ESP_PM_WUP_PINS` becomes HIGH.
+  - `ESP_PM_WUP_PINS_ANY_LOW` - The system is woken up when any of
+     the GPIOs specified in `ESP_PM_WUP_PINS` becomes LOW
+     (only available with the ESP32-C3 variant).
   - `ESP_PM_WUP_PINS_ALL_LOW` - The system is woken up when all GPIOs specified
-    in `ESP_PM_WUP_PINS` become LOW.
+    in `ESP_PM_WUP_PINS` become LOW (not available with the ESP32-C3 variant).
 - `ESP_PM_WUP_UART0` and `ESP_PM_WUP_UART1` define the number of positive
   edges of the RxD signal of the respective UART that are necessary to wake
   up the system in the _Light-sleep_ mode. The value must be greater than 2,
