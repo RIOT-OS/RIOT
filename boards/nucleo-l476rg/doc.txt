@@ -3,6 +3,12 @@
 @ingroup     boards_common_nucleo64
 @brief       Support for the STM32 Nucleo-L476RG
 
+
+## Overview
+
+The Nucleo-L476RG is a board from ST's Nucleo family supporting ARM Cortex-M4
+STM32L476RG microcontroller with 128KiB or RAM and 1MiB of Flash.
+
 ### MCU
 
 
@@ -29,6 +35,8 @@
 
 ## Flashing the device
 
+### Flashing the Board Using OpenOCD
+
 The ST Nucleo-L476RG board includes an on-board ST-LINK V2 programmer. The
 easiest way to program the board is to use OpenOCD. Once you have installed
 OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
@@ -41,6 +49,19 @@ and debug via GDB by simply typing
 ```
 make BOARD=nucleo-l476rg debug
 ```
+
+### Flashing the Board Using ST-LINK Removable Media
+
+On-board ST-LINK programmer provides via composite USB device removable media.
+Copying the HEX file causes reprogramming of the board. This task
+could be performed manually; however, the cpy2remed (copy to removable
+media) PROGRAMMER script does this automatically. To program board in
+this manner, use the command:
+```
+make BOARD=nucleo-l476rg PROGRAMMER=cpy2remed flash
+```
+@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
+could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
 
 
 ## Supported Toolchains
