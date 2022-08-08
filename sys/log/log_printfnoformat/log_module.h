@@ -7,8 +7,9 @@
  */
 
 /**
- * @defgroup    sys_log_printfnoformat puts log module
+ * @defgroup    sys_log_printfnoformat log_printfnoformat: puts log module
  * @ingroup     sys
+ * @ingroup     pseudomodules
  * @brief       This module implements an example logging module
  * @{
  *

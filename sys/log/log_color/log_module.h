@@ -7,8 +7,9 @@
  */
 
 /**
- * @defgroup    sys_log_color Colored log module
+ * @defgroup    sys_log_color log_color: Colored log module
  * @ingroup     sys
+ * @ingroup     pseudomodules
  * @brief       This module implements a logging module with colored output
  * @{
  *
