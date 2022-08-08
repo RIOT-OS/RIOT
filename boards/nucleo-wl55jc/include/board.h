@@ -48,26 +48,14 @@ extern void nucleo_wl55jc_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_
  * @name    LED pin definitions and handlers
  * @{
  */
-#define LED0_PORT           GPIOB
-#define LED0_PIN            GPIO_PIN(PORT_B, 15)
-#define LED0_MASK           (1 << 15)
-#define LED0_ON             (LED0_PORT->BSRR = LED0_MASK)
-#define LED0_OFF            (LED0_PORT->BSRR = (LED0_MASK << 16))
-#define LED0_TOGGLE         (LED0_PORT->ODR  ^= LED0_MASK)
+#define LED0_PIN_NUM        15
+#define LED0_PORT_NUM       PORT_B
 
-#define LED1_PORT           GPIOB
-#define LED1_PIN            GPIO_PIN(PORT_B, 9)
-#define LED1_MASK           (1 << 9)
-#define LED1_ON             (LED0_PORT->BSRR = LED1_MASK)
-#define LED1_OFF            (LED0_PORT->BSRR = (LED1_MASK << 16))
-#define LED1_TOGGLE         (LED0_PORT->ODR  ^= LED1_MASK)
+#define LED1_PIN_NUM        9
+#define LED1_PORT_NUM       PORT_B
 
-#define LED2_PORT           GPIOB
-#define LED2_PIN            GPIO_PIN(PORT_B, 11)
-#define LED2_MASK           (1 << 11)
-#define LED2_ON             (LED0_PORT->BSRR = LED2_MASK)
-#define LED2_OFF            (LED0_PORT->BSRR = (LED2_MASK << 16))
-#define LED2_TOGGLE         (LED0_PORT->ODR  ^= LED2_MASK)
+#define LED2_PIN_NUM        11
+#define LED2_PORT_NUM       PORT_B
 /** @} */
 
 /**
@@ -96,6 +84,8 @@ extern void nucleo_wl55jc_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_
 #ifdef __cplusplus
 }
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_H */
 /** @} */

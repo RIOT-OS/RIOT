@@ -30,19 +30,11 @@ extern "C" {
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-#define LED0_PIN            GPIO_PIN(PORT_G, 13)
-#define LED1_PIN            GPIO_PIN(PORT_G, 14)
+#define LED0_PIN_NUM        13
+#define LED0_PORT_NUM       PORT_G
 
-#define LED0_MASK           (1 << 13)
-#define LED1_MASK           (1 << 14)
-
-#define LED0_ON             (GPIOG->BSRR = LED0_MASK)
-#define LED0_OFF            (GPIOG->BSRR = (LED0_MASK << 16))
-#define LED0_TOGGLE         (GPIOG->ODR  ^= LED0_MASK)
-
-#define LED1_ON             (GPIOG->BSRR = LED1_MASK)
-#define LED1_OFF            (GPIOG->BSRR = (LED1_MASK << 16))
-#define LED1_TOGGLE         (GPIOG->ODR  ^= LED1_MASK)
+#define LED1_PIN_NUM        14
+#define LED1_PORT_NUM       PORT_G
 /** @} */
 
 /**
@@ -66,6 +58,8 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_H */
 /** @} */
