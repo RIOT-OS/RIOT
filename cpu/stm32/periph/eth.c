@@ -25,6 +25,7 @@
 #include <string.h>
 
 #include "bitarithm.h"
+#include "board.h"
 #include "iolist.h"
 #include "mii.h"
 #include "mutex.h"
@@ -32,6 +33,7 @@
 #include "net/eui_provider.h"
 #include "net/netdev/eth.h"
 #include "periph/gpio.h"
+#include "periph/gpio_ll.h"
 #include "timex.h"
 
 #define ENABLE_DEBUG            0
@@ -90,6 +92,58 @@ static ztimer_t _link_status_timer;
 #endif
 
 #define MIN(a, b) (((a) <= (b)) ? (a) : (b))
+
+/**
+ * @name    GPIOs to use for tracing STM32 Ethernet state via module
+ *          `stm32_eth_tracing`
+ * @{
+ */
+#ifndef STM32_ETH_TRACING_TX_PIN_NUM
+#  if defined(LED1_PIN_NUM) || defined(DOXYGEN)
+/**
+ * @brief   pin to trace TX events
+ *
+ * This pin will be set when TX starts and cleared when the corresponding
+ */
+#    define STM32_ETH_TRACING_TX_PIN_NUM LED1_PIN_NUM
+#  else
+#    define STM32_ETH_TRACING_TX_PIN_NUM 0
+#  endif
+#endif
+
+#ifndef STM32_ETH_TRACING_TX_PORT_NUM
+#  if defined(LED1_PORT_NUM) || defined(DOXYGEN)
+/**
+ * @brief   port to trace TX events
+ */
+#    define STM32_ETH_TRACING_TX_PORT_NUM LED1_PORT_NUM
+#  else
+#    define STM32_ETH_TRACING_TX_PORT_NUM 0
+#  endif
+#endif
+
+#ifndef STM32_ETH_TRACING_RX_PIN_NUM
+#  if defined(LED2_PIN_NUM) || defined(DOXYGEN)
+/**
+ * @brief   pin to trace RX events
+ */
+#    define STM32_ETH_TRACING_RX_PIN_NUM LED2_PIN_NUM
+#  else
+#    define STM32_ETH_TRACING_RX_PIN_NUM 0
+#  endif
+#endif
+
+#ifndef STM32_ETH_TRACING_RX_PORT_NUM
+#  if defined(LED2_PORT_NUM) || defined(DOXYGEN)
+/**
+ * @brief   port to trace RX events
+ */
+#    define STM32_ETH_TRACING_RX_PORT_NUM LED2_PORT_NUM
+#  else
+#    define STM32_ETH_TRACING_RX_PORT_NUM 0
+#  endif
+#endif
+/** @} */
 
 /* Synchronization between IRQ and thread context */
 mutex_t stm32_eth_tx_completed = MUTEX_INIT_LOCKED;
@@ -431,6 +485,14 @@ static void _setup_phy(void)
 static int stm32_eth_init(netdev_t *netdev)
 {
     (void)netdev;
+    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+        gpio_ll_init(GPIO_PORT(STM32_ETH_TRACING_TX_PORT_NUM),
+                     STM32_ETH_TRACING_TX_PIN_NUM,
+                     &gpio_ll_out);
+        gpio_ll_init(GPIO_PORT(STM32_ETH_TRACING_RX_PORT_NUM),
+                     STM32_ETH_TRACING_RX_PIN_NUM,
+                     &gpio_ll_out);
+    }
     if (IS_USED(MODULE_STM32_ETH_LINK_UP)) {
         _link_status_timer.callback = _timer_cb;
         _link_status_timer.arg = netdev;
@@ -517,6 +579,10 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
         dma_iter = dma_iter->desc_next;
     }
 
+    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+        gpio_ll_set(GPIO_PORT(STM32_ETH_TRACING_TX_PORT_NUM),
+                    (1U << STM32_ETH_TRACING_TX_PIN_NUM));
+    }
     /* start TX */
     ETH->DMATPDR = 0;
     /* await completion */
@@ -524,6 +590,10 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
         DEBUG("[stm32_eth] Started to send %u B via DMA\n", bytes_to_send);
     }
     mutex_lock(&stm32_eth_tx_completed);
+    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+        gpio_ll_clear(GPIO_PORT(STM32_ETH_TRACING_TX_PORT_NUM),
+                      (1U << STM32_ETH_TRACING_TX_PIN_NUM));
+    }
     if (IS_ACTIVE(ENABLE_DEBUG_VERBOSE)) {
         DEBUG("[stm32_eth] TX completed\n");
     }
@@ -693,6 +763,11 @@ static int stm32_eth_recv(netdev_t *netdev, void *_buf, size_t max_len,
         rx_curr = rx_curr->desc_next;
     }
 
+    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+        gpio_ll_clear(GPIO_PORT(STM32_ETH_TRACING_RX_PORT_NUM),
+                      (1U << STM32_ETH_TRACING_RX_PIN_NUM));
+    }
+
     _debug_rx_descriptor_info(__LINE__);
     handle_lost_rx_irqs();
     return size;
@@ -726,6 +801,10 @@ static void stm32_eth_isr(netdev_t *netdev)
         }
     }
 
+    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+        gpio_ll_set(GPIO_PORT(STM32_ETH_TRACING_RX_PORT_NUM),
+                    (1U << STM32_ETH_TRACING_RX_PIN_NUM));
+    }
     netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
 }
 
