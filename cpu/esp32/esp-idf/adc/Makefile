@@ -8,7 +8,7 @@ ESP32_SDK_SRC = \
   components/soc/$(CPU_FAM)/adc_periph.c \
   #
 
-ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
+ifneq (,$(filter esp32c3,$(CPU_FAM)))
   ESP32_SDK_SRC += components/driver/$(CPU_FAM)/adc2_init_cal.c
   INCLUDES += -I$(ESP32_SDK_DIR)/components/driver/include/driver
 endif
