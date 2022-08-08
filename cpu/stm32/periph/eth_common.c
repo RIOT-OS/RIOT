@@ -82,6 +82,7 @@ void isr_eth(void)
         extern mutex_t stm32_eth_tx_completed;
         unsigned tmp = ETH->DMASR;
         ETH->DMASR = ETH_DMASR_NIS | ETH_DMASR_TS | ETH_DMASR_RS;
+        DEBUG("[periph_eth_common] DMASR = 0x%x\n", tmp);
 
         if ((tmp & ETH_DMASR_TS)) {
             DEBUG("isr_eth: TX completed\n");
