@@ -16,6 +16,10 @@ ifneq (,$(filter stm32_eth_%,$(USEMODULE)))
   USEMODULE += stm32_eth
 endif
 
+ifneq (,$(filter stm32_eth_tracing,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_ll
+endif
+
 ifneq (,$(filter stm32_eth_auto,$(USEMODULE)))
   USEMODULE += stm32_eth_link_up
 endif

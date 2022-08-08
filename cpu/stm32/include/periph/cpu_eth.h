@@ -156,7 +156,6 @@ typedef struct eth_dma_desc {
 void stm32_eth_common_init(void);
 #endif /* MODULE_PERIPH_ETH_COMMON */
 
-
 #ifdef __cplusplus
 }
 #endif
