@@ -115,8 +115,17 @@ static void _debug_tx_descriptor_info(unsigned line)
         DEBUG("[stm32_eth:%u] TX descriptors:\n", line);
         for (unsigned i = 0; i < ETH_TX_DESCRIPTOR_COUNT; i++) {
             uint32_t status = tx_desc[i].status;
+            char next_valid;
+            if (i < ETH_TX_DESCRIPTOR_COUNT - 1) {
+                next_valid = (tx_desc[i].desc_next == &tx_desc[i + 1])
+                        ? '1' : '0';
+            }
+            else {
+                next_valid = (tx_desc[i].desc_next == &tx_desc[0])
+                        ? '1' : '0';
+            }
             DEBUG("    %s %u: OWN=%c, ES=%c, UF=%c, EC=%c, NC=%c, FS=%c, "
-                  "LS=%c\n",
+                  "LS=%c, next valid=%c\n",
                   (tx_curr == tx_desc + i) ? "-->" : "   ",
                   i,
                   (status & TX_DESC_STAT_OWN) ? '1' : '0',
@@ -125,7 +134,8 @@ static void _debug_tx_descriptor_info(unsigned line)
                   (status & TX_DESC_STAT_EC) ? '1' : '0',
                   (status & TX_DESC_STAT_NC) ? '1' : '0',
                   (status & TX_DESC_STAT_FS) ? '1' : '0',
-                  (status & TX_DESC_STAT_LS) ? '1' : '0');
+                  (status & TX_DESC_STAT_LS) ? '1' : '0',
+                  next_valid);
         }
     }
 }
@@ -142,7 +152,17 @@ static void _debug_rx_descriptor_info(unsigned line)
         DEBUG("[stm32_eth:%u] RX descriptors:\n", line);
         for (unsigned i = 0; i < ETH_RX_DESCRIPTOR_COUNT; i++) {
             uint32_t status = rx_desc[i].status;
-            DEBUG("    %s %u: OWN=%c, FS=%c, LS=%c, ES=%c, DE=%c, FL=%" PRIu32 "\n",
+            char next_valid;
+            if (i < ETH_RX_DESCRIPTOR_COUNT - 1) {
+                next_valid = (rx_desc[i].desc_next == &rx_desc[i + 1])
+                        ? '1' : '0';
+            }
+            else {
+                next_valid = (rx_desc[i].desc_next == &rx_desc[0])
+                        ? '1' : '0';
+            }
+            DEBUG("    %s %u: OWN=%c, FS=%c, LS=%c, ES=%c, DE=%c, FL=%" PRIu32
+                  ", next valid=%c\n",
                   (rx_curr == rx_desc + i) ? "-->" : "   ",
                   i,
                   (status & RX_DESC_STAT_OWN) ? '1' : '0',
@@ -150,7 +170,8 @@ static void _debug_rx_descriptor_info(unsigned line)
                   (status & RX_DESC_STAT_LS) ? '1' : '0',
                   (status & RX_DESC_STAT_ES) ? '1' : '0',
                   (status & RX_DESC_STAT_DE) ? '1' : '0',
-                  _len_from_rx_desc_status(status));
+                  _len_from_rx_desc_status(status),
+                  next_valid);
         }
     }
 }
@@ -249,6 +270,8 @@ static void _init_dma_descriptors(void)
 
     ETH->DMARDLAR = (uintptr_t)rx_curr;
     ETH->DMATDLAR = (uintptr_t)tx_curr;
+    _debug_rx_descriptor_info(__LINE__);
+    _debug_tx_descriptor_info(__LINE__);
 }
 
 static void _reset_eth_dma(void)
@@ -475,6 +498,7 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
     /* We cannot send more chunks than allocated descriptors */
     assert(iolist_count(iolist) <= ETH_TX_DESCRIPTOR_COUNT);
 
+    _debug_tx_descriptor_info(__LINE__);
     edma_desc_t *dma_iter = tx_curr;
     for (unsigned i = 0; iolist; iolist = iolist->iol_next, i++) {
         dma_iter->control = iolist->iol_len;
@@ -505,7 +529,6 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
     }
 
     /* Error check */
-    _debug_tx_descriptor_info(__LINE__);
     int error = 0;
     while (1) {
         uint32_t status = tx_curr->status;
@@ -534,6 +557,8 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
             break;
         }
     }
+
+    _debug_tx_descriptor_info(__LINE__);
 
     netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
     if (error) {
