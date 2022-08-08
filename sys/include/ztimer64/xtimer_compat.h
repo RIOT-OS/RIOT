@@ -7,7 +7,8 @@
  */
 
 /**
- * @ingroup   sys_ztimer_util
+ * @defgroup  sys_ztimer64_xtimer_compat ztimer64_xtimer_compat: 64 Bit xtimer wrapper
+ * @ingroup   sys_ztimer64
  * @{
  * @file
  * @brief   ztimer64 xtimer wrapper interface
