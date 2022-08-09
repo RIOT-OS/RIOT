@@ -13,10 +13,11 @@ menuconfig MODULE_SX126X
     depends on HAS_PERIPH_SPI
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_GPIO_IRQ
+    select MODULE_IOLIST
+    select MODULE_NETDEV_LEGACY_API
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_SPI
     select PACKAGE_DRIVER_SX126X
-    select MODULE_IOLIST
 
 choice
     bool "Radio variant"
