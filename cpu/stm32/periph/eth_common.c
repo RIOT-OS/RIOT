@@ -81,15 +81,14 @@ void isr_eth(void)
         extern netdev_t *stm32_eth_netdev;
         extern mutex_t stm32_eth_tx_completed;
         unsigned tmp = ETH->DMASR;
+        ETH->DMASR = ETH_DMASR_NIS | ETH_DMASR_TS | ETH_DMASR_RS;
 
         if ((tmp & ETH_DMASR_TS)) {
-            ETH->DMASR = ETH_DMASR_NIS | ETH_DMASR_TS;
             DEBUG("isr_eth: TX completed\n");
             mutex_unlock(&stm32_eth_tx_completed);
         }
 
         if ((tmp & ETH_DMASR_RS)) {
-            ETH->DMASR = ETH_DMASR_NIS | ETH_DMASR_RS;
             DEBUG("isr_eth: RX completed\n");
             if (stm32_eth_netdev) {
                 netdev_trigger_event_isr(stm32_eth_netdev);
