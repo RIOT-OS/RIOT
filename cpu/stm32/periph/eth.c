@@ -242,7 +242,7 @@ static void _init_dma_descriptors(void)
     for (i = 0; i < ETH_TX_DESCRIPTOR_COUNT - 1; i++) {
         tx_desc[i].desc_next = &tx_desc[i + 1];
     }
-    tx_desc[ETH_RX_DESCRIPTOR_COUNT - 1].desc_next = &tx_desc[0];
+    tx_desc[ETH_TX_DESCRIPTOR_COUNT - 1].desc_next = &tx_desc[0];
 
     rx_curr = &rx_desc[0];
     tx_curr = &tx_desc[0];
