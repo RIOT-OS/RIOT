@@ -294,7 +294,7 @@ static void _set_legacy(at86rf215_t *dev, bool high_rate)
 
 static inline void _set_ack_timeout_legacy(at86rf215_t *dev)
 {
-    dev->ack_timeout_usec = AT86RF215_ACK_PERIOD_IN_SYMBOLS * LEGACY_QPSK_SYMBOL_TIME_US;
+    dev->ack_timeout_usec = IEEE802154_ACK_TIMEOUT_SYMS * LEGACY_QPSK_SYMBOL_TIME_US;
     DEBUG("[%s] ACK timeout: %"PRIu32" µs\n", "legacy O-QPSK", dev->ack_timeout_usec);
 }
 
