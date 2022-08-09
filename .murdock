@@ -461,29 +461,21 @@ compile() {
 
     if get_supported_kconfig_board_app "${board}" "${appdir}"; then
         should_check_kconfig_hash=1
-        # As we have some issues with occasional unrelated hash mismatches
-        # we will stop the binary checks and rely only in a module/package
-        # check to ensure kconfig is matching make.
-        # Only nightlies will check the hash...
-        # Once we figure out the problem we can check the hashes again or
-        # better yet just finish!
-        if [ ${NIGHTLY} -eq 1 ]; then
-            BOARD=${board} make -C${appdir} clean
-            CCACHE_BASEDIR="$(pwd)" BOARD=${board} TOOLCHAIN=${toolchain} RIOT_CI_BUILD=1 TEST_KCONFIG=1 \
-                            make -C${appdir} all test-input-hash -j${JOBS:-4}
-            RES=$?
-            if [ $RES -eq 0 ]; then
-                kconfig_hashes="$(cat ${BINDIR}/test-input-hash.sha1)"
-            else
-                kconfig_hashes="kconfig-build-failed"
-                echo "An error occurred while compiling using Kconfig";
-            fi
+        BOARD=${board} make -C${appdir} clean
+        CCACHE_DISABLE=1 CCACHE_BASEDIR="$(pwd)" BOARD=${board} TOOLCHAIN=${toolchain} RIOT_CI_BUILD=1 TEST_KCONFIG=1 \
+                        make -C${appdir} all test-input-hash -j${JOBS:-4}
+        RES=$?
+        if [ $RES -eq 0 ]; then
+            kconfig_hashes="$(cat ${BINDIR}/test-input-hash.sha1)"
+        else
+            kconfig_hashes="kconfig-build-failed"
+            echo "An error occurred while compiling using Kconfig";
         fi
     fi
 
     # compile without Kconfig
     BOARD=${board} make -C${appdir} clean
-    CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
+    CCACHE_DISABLE=1 CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
         make -C${appdir} all test-input-hash -j${JOBS:-4}
     RES=$?
 
