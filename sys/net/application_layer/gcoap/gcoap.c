@@ -579,6 +579,11 @@ static void _on_resp_timeout(void *arg) {
  */
 static void _cease_retransmission(gcoap_request_memo_t *memo) {
     memo->state = GCOAP_MEMO_WAIT;
+    /* there is also no response handler to wait for => expire memo */
+    if (memo->resp_handler == NULL) {
+        event_timeout_clear(&memo->resp_evt_tmout);
+        _expire_request(memo);
+    }
 }
 
 /*
