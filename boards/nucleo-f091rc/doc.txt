@@ -6,7 +6,7 @@
 ## Overview
 
 The Nucleo-F091RC is a board from ST's Nucleo family supporting a ARM Cortex-M0
-STM32F091RC microcontroller with 32Kb of RAM and 256Kb of ROM.
+STM32F091RC microcontroller with 32KiB of RAM and 256KiB of Flash.
 
 ## Hardware
 
@@ -19,8 +19,8 @@ STM32F091RC microcontroller with 32Kb of RAM and 256Kb of ROM.
 |:---------- |:----------------- |
 | Family     | ARM Cortex-M0     |
 | Vendor     | ST Microelectronics |
-| RAM        | 32Kb              |
-| Flash      | 256Kb             |
+| RAM        | 32KiB             |
+| Flash      | 256KiB            |
 | Frequency  | up to 48MHz       |
 | FPU        | no                |
 | Timers     | 12 (8x 16-bit, 1x 32-bit [TIM2], 1x Systick, 2x watchdog) |
@@ -68,6 +68,9 @@ document for the pin mapping as implemenented in `boards/nucleo-f091/include/per
 
 
 ## Flashing the device
+
+### Flashing the Board Using OpenOCD
+
 The ST Nucleo-F091RC board includes an on-board ST-LINK V2 programmer. The
 easiest way to program the board is to use OpenOCD. Once you have installed
 OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
@@ -81,6 +84,18 @@ and debug via GDB by simply typing
 make BOARD=nucleo-f091rc debug
 ```
 
+### Flashing the Board Using ST-LINK Removable Media
+
+On-board ST-LINK programmer provides via composite USB device removable media.
+Copying the HEX file causes reprogramming of the board. This task
+could be performed manually; however, the cpy2remed (copy to removable
+media) PROGRAMMER script does this automatically. To program board in
+this manner, use the command:
+```
+make BOARD=nucleo-f091rc PROGRAMMER=cpy2remed flash
+```
+@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
+could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
 
 ## Supported Toolchains
 For using the ST Nucleo-F091RC board we strongly recommend the usage of the

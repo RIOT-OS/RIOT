@@ -6,7 +6,7 @@
 ## Overview
 
 The Nucleo-F334R8 is a board from ST's Nucleo family supporting a ARM Cortex-M4
-STM32F334R8 microcontroller with 12Kb of RAM and 64Kb or ROM.
+STM32F334R8 microcontroller with 12KiB of RAM and 64KiB or Flash.
 
 ## Hardware
 
@@ -19,8 +19,8 @@ STM32F334R8 microcontroller with 12Kb of RAM and 64Kb or ROM.
 |:---------- |:----------------- |
 | Family     | ARM Cortex-M4     |
 | Vendor     | ST Microelectronics |
-| RAM        | 12Kb              |
-| Flash      | 64Kb              |
+| RAM        | 12KiB             |
+| Flash      | 64KiB             |
 | Frequency  | up to 72MHz       |
 | FPU        | yes               |
 | Timers     | 12 (8x 16-bit, 1x 32-bit [TIM2], 1x Systick, 2x watchdog) |

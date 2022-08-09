@@ -1,7 +1,13 @@
 /**
 @defgroup    boards_nucleo-wl55jc STM32 Nucleo-WL55JC
 @ingroup     boards_common_nucleo64
-@brief       Support for the STM32 Nucleo-W55JCg
+@brief       Support for the STM32 Nucleo-W55JC
+
+## Overview
+
+The Nucleo-W55JC is a board from ST's Nucleo family supporting ARM dual-core
+Cortex-M4/M0 STM ultra-low-power microcontroller with ultra-low-power LPWAN
+radio solution, 64KiB of RAM and 256KiB of Flash.
 
 ### MCU
 
@@ -31,6 +37,8 @@
 
 ## Flashing the device
 
+### Flashing the Board Using OpenOCD
+
 The ST Nucleo-wl55jc board includes an on-board ST-LINK V2 programmer. The
 easiest way to program the board is to use OpenOCD. Once you have installed
 OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
@@ -43,6 +51,19 @@ and debug via GDB by simply typing
 ```
 make BOARD=nucleo-wl55jc debug
 ```
+
+### Flashing the Board Using ST-LINK Removable Media
+
+On-board ST-LINK programmer provides via composite USB device removable media.
+Copying the HEX file causes reprogramming of the board. This task
+could be performed manually; however, the cpy2remed (copy to removable
+media) PROGRAMMER script does this automatically. To program board in
+this manner, use the command:
+```
+make BOARD=nucleo-wl55jc PROGRAMMER=cpy2remed flash
+```
+@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
+could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
 
 ## Supported Toolchains
 
