@@ -1,9 +1,12 @@
-ifneq (,$(filter esp32,$(CPU_FAM)))
+ifeq (esp32,$(CPU_FAM))
   CPU_ARCH = xtensa
   CPU_CORE = xtensa-lx6
 else ifneq (,$(filter esp32c3,$(CPU_FAM)))
   CPU_ARCH = rv32
   CPU_CORE = rv32imc
+else ifneq (,$(filter esp32s3,$(CPU_FAM)))
+  CPU_ARCH = xtensa
+  CPU_CORE = xtensa-lx7
 else
   $(error Unkwnown ESP32x SoC variant (family))
 endif
@@ -20,8 +23,11 @@ ifeq (xtensa,$(CPU_ARCH))
   FEATURES_PROVIDED += esp_hw_counter
 endif
 
-ifneq (,$(filter esp32-wrover%,$(CPU_MODEL)))
+ifneq (,$(filter esp32-wrover% esp32s3%r2 esp32s3%r8 esp32s3%r8v,$(CPU_MODEL)))
   FEATURES_PROVIDED += esp_spi_ram
+  ifneq (,$(filter esp32s3%r8 esp32s3%r8v,$(CPU_MODEL)))
+    FEATURES_PROVIDED += esp_spi_oct
+  endif
 endif
 
 # This configuration enables modules that are only available when using Kconfig
