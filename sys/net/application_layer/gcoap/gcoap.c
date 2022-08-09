@@ -487,6 +487,13 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
         }
         else {
             DEBUG("gcoap: msg not found for ID: %u\n", coap_get_id(&pdu));
+            if (coap_get_type(&pdu) == COAP_TYPE_CON) {
+                /* we might run into this if an ACK to a sender got lost
+                 * see https://datatracker.ietf.org/doc/html/rfc7252#section-5.3.2 */
+                messagelayer_emptyresponse_type = COAP_TYPE_RST;
+                DEBUG("gcoap: Answering unknown CON response with RST to "
+                      "shut up sender\n");
+            }
         }
         break;
     default:
