@@ -5,6 +5,9 @@ endif
 ifneq (,$(filter benchmark_udp,$(USEMODULE)))
   DIRS += test_utils/benchmark_udp
 endif
+ifneq (,$(filter bhp,$(USEMODULE)))
+  DIRS += bhp
+endif
 ifneq (,$(filter bluetil_%,$(USEMODULE)))
   DIRS += net/ble/bluetil
 endif
