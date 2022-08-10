@@ -817,6 +817,12 @@ static int _find_resource(gcoap_socket_type_t tl_type,
     return ret;
 }
 
+static bool _memo_ep_is_multicast(const gcoap_request_memo_t *memo)
+{
+    return memo->remote_ep.family == AF_INET6 &&
+           ipv6_addr_is_multicast((const ipv6_addr_t *)&memo->remote_ep.addr.ipv6);
+}
+
 /*
  * Finds the memo for an outstanding request within the _coap_state.open_reqs
  * array. Matches on remote endpoint and token.
@@ -852,7 +858,10 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
         } else if (coap_get_token_len(memo_pdu) == cmplen) {
             memo_pdu->token = coap_hdr_data_ptr(memo_pdu->hdr);
             if ((memcmp(coap_get_token(src_pdu), memo_pdu->token, cmplen) == 0)
-                    && sock_udp_ep_equal(&memo->remote_ep, remote)) {
+                    && (sock_udp_ep_equal(&memo->remote_ep, remote)
+                      /* Multicast addresses are not considered in matching responses */
+                      || _memo_ep_is_multicast(memo)
+                    )) {
                 *memo_ptr = memo;
                 break;
             }
