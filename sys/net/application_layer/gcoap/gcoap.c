@@ -381,6 +381,15 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
         return;
     }
 
+    if (coap_get_type(&pdu) == COAP_TYPE_RST) {
+        DEBUG("gcoap: received RST, expiring potentially existing memo\n");
+        _find_req_memo(&memo, &pdu, remote, true);
+        if (memo) {
+            event_timeout_clear(&memo->resp_evt_tmout);
+            _expire_request(memo);
+        }
+    }
+
     /* validate class and type for incoming */
     switch (coap_get_code_class(&pdu)) {
     /* incoming request or empty */
