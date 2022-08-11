@@ -39,6 +39,7 @@ extern "C" {
 #define portMUX_INITIALIZE              mutex_init
 #define portMUX_INITIALIZER_UNLOCKED    MUTEX_INIT
 
+#define portYIELD                       thread_yield_higher
 #define portYIELD_FROM_ISR              thread_yield_higher
 
 #define portENTER_CRITICAL              vTaskEnterCritical
@@ -64,6 +65,7 @@ extern "C" {
 
 #define portNUM_PROCESSORS              1
 #define xPortGetCoreID()                PRO_CPU_NUM
+#define vPortYield                      portYIELD
 
 #endif /* defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S3) */
 
