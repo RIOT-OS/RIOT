@@ -131,6 +131,14 @@ ifneq (,$(filter mtd,$(USEMODULE)))
   USEMODULE += esp_idf_spi_flash
 endif
 
+ifneq (,$(filter nimble,$(USEPKG)))
+  USEMODULE += esp_ble
+  USEMODULE += esp_ble_nimble
+  USEMODULE += nimble_host
+  USEMODULE += nimble_transport_hci_h4
+  USEMODULE += ztimer_msec
+endif
+
 ifneq (,$(filter periph_adc,$(USEMODULE)))
   USEMODULE += esp_idf_adc
 endif

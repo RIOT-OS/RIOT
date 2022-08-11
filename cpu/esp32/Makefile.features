@@ -25,6 +25,7 @@ endif
 
 ifeq (esp32,$(CPU_FAM))
   FEATURES_PROVIDED += ble_nimble
+  FEATURES_PROVIDED += ble_nimble_netif
   FEATURES_PROVIDED += esp_ble
   FEATURES_PROVIDED += esp_ble_esp32
 endif

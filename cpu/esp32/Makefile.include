@@ -86,6 +86,7 @@ ifneq (,$(filter esp_ble,$(USEMODULE)))
 endif
 
 ifneq (,$(filter esp_ble_nimble,$(USEMODULE)))
+  INCLUDES += -I$(RIOTCPU)/$(CPU)/include/esp_ble_nimble
   INCLUDES += $(NIMIBASE)/nimble/transport/common/hci_h4/include
 endif
 

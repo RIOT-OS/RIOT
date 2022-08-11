@@ -55,6 +55,7 @@ This document describes the RIOT implementation for supported variants
     2. [WiFi Network Interface](#esp32_wifi_network_interface)
     3. [WiFi SoftAP Network Interface](#esp32_wifi_ap_network_interface)
     4. [ESP-NOW Network Interface](#esp32_esp_now_network_interface)
+    4. [Bluetooth Interface](#esp32_esp_bluetooth_interface)
     5. [Other Network Devices](#esp32_other_network_devices)
 10. [Application-Specific Configurations](#esp32_application_specific_configurations)
     1. [Make Variable `CFLAGS`](#esp32_config_make_variable)
@@ -204,7 +205,7 @@ The key features of ESP32 are:
 | SPIs              | 4                                                                 | yes (2) |
 | UARTs             | 3                                                                 | yes |
 | WiFi              | IEEE 802.11 b/g/n built in                                        | yes |
-| Bluetooth         | v4.2 BR/EDR and BLE                                               | no  |
+| Bluetooth         | v4.2 BR/EDR and BLE                                               | yes |
 | Ethernet          | MAC interface with dedicated DMA and IEEE 1588 support            | yes |
 | CAN               | version 2.0                                                       | yes |
 | IR                | up to 8 channels TX/RX                                            | no |
@@ -335,7 +336,6 @@ at the moment:
 
 - Only **one core** (the PRO CPU) is used because RIOT does not support running
   multiple threads simultaneously.
-- **Bluetooth** cannot be used at the moment.
 - **Flash encryption** is not yet supported.
 
 [Back to table of contents](#esp32_toc)
@@ -1688,6 +1688,21 @@ border router for a mesh network which uses ESP-NOW.
 In this case the ESP-NOW interface must use the same channel as the AP of the
 infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
 the channel of the AP asvalue for the parameter 'ESP_NOW_CHANNEL'.
+
+[Back to table of contents](#esp32_toc)
+
+## Bluetooth Network Interface {#esp32_esp_bluetooth_interface}
+
+The following ESP32x SoC variants (families) integrate a Bluetooth Link
+Controller and a Bluetooth baseband system:
+
+- ESP32 supports Bluetooth v4.2 BR/EDR and Bluetooth LE
+- ESP32-C3, ESP32-S3 support Bluetooth 5 and Bluetooth mesh
+
+The Bluetooth interface can be used with the Bluetooth host implementation
+of the NimBLE package. Use one of the `nimble_*` modules for different
+applications to enable the Bluetooth interface and the NimBLE host
+implementation. Please refer to the NimBle package documentation for details.
 
 [Back to table of contents](#esp32_toc)
 
