@@ -95,7 +95,8 @@ QueueHandle_t xQueueCreateCountingSemaphore (const UBaseType_t uxMaxCount,
     queue = xQueueGenericCreate(uxMaxCount, queueSEMAPHORE_QUEUE_ITEM_LENGTH,
                                 queueQUEUE_TYPE_COUNTING_SEMAPHORE);
 
-    DEBUG("%s pid=%d queue=%p\n", __func__, thread_getpid(), queue);
+    DEBUG("%s pid=%d queue=%p max=%d initial=%d\n", __func__,
+          thread_getpid(), queue, uxMaxCount, uxInitialCount);
 
     if (queue != NULL) {
         queue->item_level = uxInitialCount;
@@ -509,11 +510,12 @@ UBaseType_t uxQueueMessagesWaiting( QueueHandle_t xQueue )
 BaseType_t xQueueGiveFromISR (QueueHandle_t xQueue,
                               BaseType_t * const pxHigherPriorityTaskWoken)
 {
-    /* this function only satisfies the linker and should not be called */
-    assert(0);
+    DEBUG("%s pid=%d prio=%d queue=%p woken=%p\n", __func__,
+          thread_getpid(), thread_get_priority(thread_get_active()),
+          xQueue, pxHigherPriorityTaskWoken);
 
-    DEBUG("%s\n", __func__);
-    return pdFALSE;
+    return _queue_generic_send(xQueue, NULL, queueSEND_TO_BACK,
+                               0, pxHigherPriorityTaskWoken);
 }
 
 #endif /* DOXYGEN */
