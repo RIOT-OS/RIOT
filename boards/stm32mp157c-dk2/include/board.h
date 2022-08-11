@@ -14,8 +14,6 @@
  * @brief       Board specific definitions for the STM32MP157C-DK2 board
  *
  * @author      Gilles DOFFE <gilles.doffe@savoirfairelinux.com>
- *
- * @}
  */
 
 #ifndef BOARD_H

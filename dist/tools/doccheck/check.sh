@@ -13,6 +13,7 @@
 SCRIPTDIR="$(cd "$(dirname "$0")"; pwd)"
 RIOTBASE="$(cd "${SCRIPTDIR}"/../../..; pwd)"
 EXCLUDE_PATTERN_FILE="${SCRIPTDIR}/exclude_patterns"
+GENERIC_EXCLUDE_PATTERN_FILE="${SCRIPTDIR}/generic_exclude_patterns"
 
 . "${RIOTBASE}"/dist/tools/ci/github_annotate.sh
 
@@ -28,7 +29,7 @@ else
     CRESET=
 fi
 
-DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc 2>&1 | grep -Evf "${EXCLUDE_PATTERN_FILE}")
+DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc 2>&1 | grep -Evf "${EXCLUDE_PATTERN_FILE}" -f"${GENERIC_EXCLUDE_PATTERN_FILE}")
 DOXY_ERRCODE=$?
 RESULT=0
 

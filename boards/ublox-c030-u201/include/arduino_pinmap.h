@@ -58,7 +58,7 @@ extern "C" {
 #define ARDUINO_PIN_A3          GPIO_PIN(PORT_A, 4)
 #define ARDUINO_PIN_A4          GPIO_PIN(PORT_B, 7)
 #define ARDUINO_PIN_A5          GPIO_PIN(PORT_B, 6)
-/** @ */
+/** @} */
 
 /**
  * @name    Mapping of Arduino analog pins to RIOT ADC lines

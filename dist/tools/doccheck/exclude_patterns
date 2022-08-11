@@ -1,22 +1,3 @@
-warning: Member BTN[0-9]_INT_FLANK \(macro definition\) of
-warning: Member BTN[0-9]_MASK \(macro definition\) of
-warning: Member BTN[0-9]_MODE \(macro definition\) of
-warning: Member BTN[0-9]_PIN \(macro definition\) of
-warning: Member BTN[0-9]_PORT \(macro definition\) of
-warning: Member BTN[0-9]_PRESSED \(macro definition\) of
-warning: Member BTN[0-9]_RELEASED \(macro definition\) of
-warning: Member LED[0-9]_ENABLE_PORT \(macro definition\) of
-warning: Member LED[0-9]_IS_INVERTED \(macro definition\) of
-warning: Member LED[0-9]_MASK \(macro definition\) of
-warning: Member LED[0-9]_MODE \(macro definition\) of
-warning: Member LED[0-9]_NAME \(macro definition\) of
-warning: Member LED[0-9]_OFF \(macro definition\) of
-warning: Member LED[0-9]_ON \(macro definition\) of
-warning: Member LED[0-9]_PIN \(macro definition\) of
-warning: Member LED[0-9]_PIN_NUM \(macro definition\) of
-warning: Member LED[0-9]_PORT \(macro definition\) of
-warning: Member LED[0-9]_PORT_NUM \(macro definition\) of
-warning: Member LED[0-9]_TOGGLE \(macro definition\) of
 boards/6lowpan\-clicker/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
 boards/6lowpan\-clicker/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_CHANNELS \(macro definition\) of file periph_conf\.h is not documented\.
 boards/6lowpan\-clicker/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -32,7 +13,6 @@ boards/acd52832/include/periph_conf\.h:[0-9]+: warning: Member UART_PIN_RX \(mac
 boards/acd52832/include/periph_conf\.h:[0-9]+: warning: Member UART_PIN_TX \(macro definition\) of file periph_conf\.h is not documented\.
 boards/acd52832/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/acd52832/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/adafruit\-clue/include/board\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/adafruit\-itsybitsy\-m4/include/board\.h:[0-9]+: warning: Member APA102_PARAM_CLK_PIN \(macro definition\) of file board\.h is not documented\.
 boards/adafruit\-itsybitsy\-m4/include/board\.h:[0-9]+: warning: Member APA102_PARAM_DATA_PIN \(macro definition\) of file board\.h is not documented\.
 boards/adafruit\-itsybitsy\-m4/include/board\.h:[0-9]+: warning: Member APA102_PARAM_LED_NUMOF \(macro definition\) of file board\.h is not documented\.
@@ -79,7 +59,6 @@ boards/adafruit\-itsybitsy\-nrf52/include/periph_conf\.h:[0-9]+: warning: Member
 boards/adafruit\-itsybitsy\-nrf52/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/adafruit\-itsybitsy\-nrf52/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/adafruit\-itsybitsy\-nrf52/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/adafruit\-itsybitsy\-nrf52/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/airfy\-beacon/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/airfy\-beacon/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/airfy\-beacon/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -89,7 +68,6 @@ boards/airfy\-beacon/include/periph_conf\.h:[0-9]+: warning: Member UART_PIN_TX 
 boards/airfy\-beacon/include/periph_conf\.h:[0-9]+: warning: Member adc_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/airfy\-beacon/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/airfy\-beacon/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/airfy\-beacon/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/arduino\-mkr1000/include/board\.h:[0-9]+: warning: Member ATWINC15X0_PARAM_CHIP_EN_PIN \(macro definition\) of file board\.h is not documented\.
 boards/arduino\-mkr1000/include/board\.h:[0-9]+: warning: Member ATWINC15X0_PARAM_IRQ_PIN \(macro definition\) of file board\.h is not documented\.
 boards/arduino\-mkr1000/include/board\.h:[0-9]+: warning: Member ATWINC15X0_PARAM_RESET_PIN \(macro definition\) of file board\.h is not documented\.
@@ -124,7 +102,6 @@ boards/arduino\-nano\-33\-ble/include/periph_conf\.h:[0-9]+: warning: Member UAR
 boards/arduino\-nano\-33\-ble/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/arduino\-nano\-33\-ble/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/arduino\-nano\-33\-ble/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/arduino\-nano\-33\-ble/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/arduino\-nano\-33\-iot/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
 boards/arduino\-nano\-33\-iot/include/periph_conf\.h:[0-9]+: warning: Member ADC_GAIN_FACTOR_DEFAULT \(macro definition\) of file periph_conf\.h is not documented\.
 boards/arduino\-nano\-33\-iot/include/periph_conf\.h:[0-9]+: warning: Member ADC_NEG_INPUT \(macro definition\) of file periph_conf\.h is not documented\.
@@ -161,25 +138,21 @@ boards/atmega1284p/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(mac
 boards/atmega1284p/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
 boards/atmega1284p/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/atmega1284p/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
-boards/atmega1284p/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/atmega256rfr2\-xpro/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_ADJUST_SET \(macro definition\) of file board\.h is not documented\.
 boards/atmega256rfr2\-xpro/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_ADJUST_SLEEP \(macro definition\) of file board\.h is not documented\.
 boards/atmega256rfr2\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/atmega256rfr2\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
 boards/atmega256rfr2\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
-boards/atmega256rfr2\-xpro/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/atmega328p/include/board\.h:[0-9]+: warning: Member STDIO_UART_BAUDRATE \(macro definition\) of file board\.h is not documented\.
 boards/atmega328p/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/atmega328p/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
 boards/atmega328p/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/atmega328p/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
-boards/atmega328p/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/atmega328p\-xplained\-mini/include/board\.h:[0-9]+: warning: Member STDIO_UART_BAUDRATE \(macro definition\) of file board\.h is not documented\.
 boards/atmega328p\-xplained\-mini/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/atmega328p\-xplained\-mini/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
 boards/atmega328p\-xplained\-mini/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/atmega328p\-xplained\-mini/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
-boards/atmega328p\-xplained\-mini/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/atxmega\-a1\-xplained/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
 boards/atxmega\-a1\-xplained/include/board\.h:[0-9]+: warning: Member LED_PORT_MASK \(macro definition\) of file board\.h is not documented\.
 boards/atxmega\-a1\-xplained/include/board\.h:[0-9]+: warning: Member STDIO_UART_BAUDRATE \(macro definition\) of file board\.h is not documented\.
@@ -281,7 +254,6 @@ boards/avr\-rss2/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro de
 boards/avr\-rss2/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
 boards/avr\-rss2/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
 boards/avr\-rss2/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
-boards/avr\-rss2/include/board\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/avr\-rss2/include/eui_provider_params\.h:[0-9]+: warning: Member EUI64_PROVIDER_FUNC \(macro definition\) of file eui_provider_params\.h is not documented\.
 boards/avr\-rss2/include/eui_provider_params\.h:[0-9]+: warning: Member EUI64_PROVIDER_INDEX \(macro definition\) of file eui_provider_params\.h is not documented\.
 boards/avr\-rss2/include/eui_provider_params\.h:[0-9]+: warning: Member EUI64_PROVIDER_TYPE \(macro definition\) of file eui_provider_params\.h is not documented\.
@@ -448,7 +420,6 @@ boards/cc1352\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NU
 boards/cc1352\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc1352\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/cc1352\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/cc1352\-launchpad/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/cc1352p\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/cc1352p\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/cc1352p\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
@@ -507,7 +478,6 @@ boards/common/arduino\-atmega/include/arduino_pinmap\.h:[0-9]+: warning: Member 
 boards/common/arduino\-atmega/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_A5 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/common/arduino\-atmega/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_A6 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/common/arduino\-atmega/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_A7 \(macro definition\) of file arduino_pinmap\.h is not documented\.
-boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: unbalanced grouping commands
 boards/common/arduino\-due/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_A0 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/common/arduino\-due/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_A1 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/common/arduino\-due/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_A10 \(macro definition\) of file arduino_pinmap\.h is not documented\.
@@ -714,7 +684,6 @@ boards/common/arduino\-zero/include/arduino_pinmap\.h:[0-9]+: warning: Member AR
 boards/common/arduino\-zero/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A3 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/common/arduino\-zero/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A4 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/common/arduino\-zero/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A5 \(macro definition\) of file arduino_pinmap\.h is not documented\.
-boards/common/arduino\-zero/include/arduino_pinmap\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/common/arduino\-zero/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of group boards_common_arduino_zero is not documented\.
 boards/common/arduino\-zero/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of group boards_common_arduino_zero is not documented\.
 boards/common/arduino\-zero/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of group boards_common_arduino_zero is not documented\.
@@ -750,7 +719,6 @@ boards/common/arduino\-zero/include/periph_conf\.h:[0-9]+: warning: Member spi_c
 boards/common/arduino\-zero/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/common/arduino\-zero/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/common/atmega/include/periph_conf_atmega_common\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf_atmega_common\.h is not documented\.
-boards/common/atmega/include/periph_conf_atmega_common\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/common/atxmega/include/periph_conf_common\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf_common\.h is not documented\.
 boards/common/blxxxpill/include/board_common\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board_common\.h is not documented\.
 boards/common/blxxxpill/include/board_common\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board_common\.h is not documented\.
@@ -812,7 +780,6 @@ boards/common/esp32/include/board_common\.h:[0-9]+: warning: Member SPIFFS_CACHE
 boards/common/esp32/include/board_common\.h:[0-9]+: warning: Member SPIFFS_HAL_CALLBACK_EXTRA \(macro definition\) of file board_common\.h is not documented\.
 boards/common/esp32/include/board_common\.h:[0-9]+: warning: Member SPIFFS_READ_ONLY \(macro definition\) of file board_common\.h is not documented\.
 boards/common/esp32/include/board_common\.h:[0-9]+: warning: Member SPIFFS_SINGLETON \(macro definition\) of file board_common\.h is not documented\.
-boards/common/esp32/include/periph_conf_common\.h:[0-9]+: warning: unbalanced grouping commands
 boards/common/esp8266/include/board_common\.h:[0-9]+: warning: Member SPIFFS_ALIGNED_OBJECT_INDEX_TABLES \(macro definition\) of file board_common\.h is not documented\.
 boards/common/esp8266/include/board_common\.h:[0-9]+: warning: Member SPIFFS_CACHE \(macro definition\) of file board_common\.h is not documented\.
 boards/common/esp8266/include/board_common\.h:[0-9]+: warning: Member SPIFFS_HAL_CALLBACK_EXTRA \(macro definition\) of file board_common\.h is not documented\.
@@ -882,28 +849,23 @@ boards/common/nrf51/include/board_common\.h:[0-9]+: warning: Member XTIMER_BACKO
 boards/common/nrf51/include/board_common\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of group boards_common_nrf51 is not documented\.
 boards/common/nrf51/include/cfg_clock_16_0\.h:[0-9]+: warning: Member CLOCK_HFCLK \(macro definition\) of file cfg_clock_16_0\.h is not documented\.
 boards/common/nrf51/include/cfg_clock_16_0\.h:[0-9]+: warning: Member CLOCK_LFCLK \(macro definition\) of file cfg_clock_16_0\.h is not documented\.
-boards/common/nrf51/include/cfg_clock_16_0\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/common/nrf51/include/cfg_clock_16_1\.h:[0-9]+: warning: Member CLOCK_HFCLK \(macro definition\) of file cfg_clock_16_1\.h is not documented\.
 boards/common/nrf51/include/cfg_clock_16_1\.h:[0-9]+: warning: Member CLOCK_LFCLK \(macro definition\) of file cfg_clock_16_1\.h is not documented\.
-boards/common/nrf51/include/cfg_clock_16_1\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/common/nrf51/include/cfg_rtt_default\.h:[0-9]+: warning: Member RTT_CLOCK_FREQUENCY \(macro definition\) of file cfg_rtt_default\.h is not documented\.
 boards/common/nrf51/include/cfg_rtt_default\.h:[0-9]+: warning: Member RTT_DEV \(macro definition\) of file cfg_rtt_default\.h is not documented\.
 boards/common/nrf51/include/cfg_rtt_default\.h:[0-9]+: warning: Member RTT_FREQUENCY \(macro definition\) of file cfg_rtt_default\.h is not documented\.
 boards/common/nrf51/include/cfg_rtt_default\.h:[0-9]+: warning: Member RTT_MAX_FREQUENCY \(macro definition\) of file cfg_rtt_default\.h is not documented\.
 boards/common/nrf51/include/cfg_rtt_default\.h:[0-9]+: warning: Member RTT_MAX_VALUE \(macro definition\) of file cfg_rtt_default\.h is not documented\.
 boards/common/nrf51/include/cfg_rtt_default\.h:[0-9]+: warning: Member RTT_MIN_FREQUENCY \(macro definition\) of file cfg_rtt_default\.h is not documented\.
-boards/common/nrf51/include/cfg_rtt_default\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/common/nrf51/include/cfg_timer_012\.h:[0-9]+: warning: Member TIMER_0_ISR \(macro definition\) of file cfg_timer_012\.h is not documented\.
 boards/common/nrf51/include/cfg_timer_012\.h:[0-9]+: warning: Member TIMER_1_ISR \(macro definition\) of file cfg_timer_012\.h is not documented\.
 boards/common/nrf51/include/cfg_timer_012\.h:[0-9]+: warning: Member TIMER_2_ISR \(macro definition\) of file cfg_timer_012\.h is not documented\.
 boards/common/nrf51/include/cfg_timer_012\.h:[0-9]+: warning: Member TIMER_NUMOF \(macro definition\) of file cfg_timer_012\.h is not documented\.
 boards/common/nrf51/include/cfg_timer_012\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file cfg_timer_012\.h is not documented\.
-boards/common/nrf51/include/cfg_timer_012\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/common/nrf51/include/cfg_timer_01\.h:[0-9]+: warning: Member TIMER_0_ISR \(macro definition\) of file cfg_timer_01\.h is not documented\.
 boards/common/nrf51/include/cfg_timer_01\.h:[0-9]+: warning: Member TIMER_1_ISR \(macro definition\) of file cfg_timer_01\.h is not documented\.
 boards/common/nrf51/include/cfg_timer_01\.h:[0-9]+: warning: Member TIMER_NUMOF \(macro definition\) of file cfg_timer_01\.h is not documented\.
 boards/common/nrf51/include/cfg_timer_01\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file cfg_timer_01\.h is not documented\.
-boards/common/nrf51/include/cfg_timer_01\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/common/nrf52/include/cfg_clock_32_0\.h:[0-9]+: warning: Member CLOCK_HFCLK \(macro definition\) of file cfg_clock_32_0\.h is not documented\.
 boards/common/nrf52/include/cfg_clock_32_0\.h:[0-9]+: warning: Member CLOCK_LFCLK \(macro definition\) of file cfg_clock_32_0\.h is not documented\.
 boards/common/nrf52/include/cfg_clock_32_1\.h:[0-9]+: warning: Member CLOCK_HFCLK \(macro definition\) of file cfg_clock_32_1\.h is not documented\.
@@ -954,7 +916,6 @@ boards/common/nucleo144/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUIN
 boards/common/nucleo144/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A3 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/common/nucleo144/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A4 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/common/nucleo144/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A5 \(macro definition\) of file arduino_pinmap\.h is not documented\.
-boards/common/nucleo144/include/arduino_pinmap\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/common/nucleo144/include/board\.h:[0-9]+: warning: Member PERIPH_INIT_LED0 \(macro definition\) of group boards_common_nucleo144 is not documented\.
 boards/common/nucleo32/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_A0 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/common/nucleo32/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_A1 \(macro definition\) of file arduino_pinmap\.h is not documented\.
@@ -1014,7 +975,6 @@ boards/common/nucleo64/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO
 boards/common/nucleo64/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A3 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/common/nucleo64/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A4 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/common/nucleo64/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A5 \(macro definition\) of file arduino_pinmap\.h is not documented\.
-boards/common/nucleo64/include/arduino_pinmap\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/common/nucleo64/include/board\.h:[0-9]+: warning: Member MOTOR_DRIVER_NUMOF \(macro definition\) of group boards_common_nucleo64 is not documented\.
 boards/common/nucleo64/include/board\.h:[0-9]+: warning: Member motor_driver_config\[\] \(variable\) of group boards_common_nucleo64 is not documented\.
 boards/common/particle\-mesh/include/board\.h:[0-9]+: warning: Member LED_MASK \(macro definition\) of file board\.h is not documented\.
@@ -1023,7 +983,6 @@ boards/common/particle\-mesh/include/periph_conf_common\.h:[0-9]+: warning: Memb
 boards/common/particle\-mesh/include/periph_conf_common\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf_common\.h is not documented\.
 boards/common/particle\-mesh/include/periph_conf_common\.h:[0-9]+: warning: Member pwm_config\[\] \(variable\) of file periph_conf_common\.h is not documented\.
 boards/common/particle\-mesh/include/periph_conf_common\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf_common\.h is not documented\.
-boards/common/particle\-mesh/include/periph_conf_common\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/common/particle\-mesh/include/pwm_params\.h:[0-9]+: warning: Member SAUL_PWM_NO_DIMMER \(macro definition\) of file pwm_params\.h is not documented\.
 boards/common/particle\-mesh/include/pwm_params\.h:[0-9]+: warning: Member saul_pwm_rgb_params\[\] \(variable\) of file pwm_params\.h is not documented\.
 boards/common/remote/include/board_common\.h:[0-9]+: warning: Member CCA_BACKDOOR_ENABLE \(macro definition\) of group boards_common_remote is not documented\.
@@ -1325,7 +1284,6 @@ boards/common/weact\-f4x1cx/include/periph_conf\.h:[0-9]+: warning: Member uart_
 boards/derfmega128/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/derfmega128/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
 boards/derfmega128/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
-boards/derfmega128/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/derfmega256/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/derfmega256/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
 boards/derfmega256/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
@@ -1333,7 +1291,6 @@ boards/derfmega256/include/eui_provider_params\.h:[0-9]+: warning: Member EEPROM
 boards/derfmega256/include/eui_provider_params\.h:[0-9]+: warning: Member EUI64_PROVIDER_FUNC \(macro definition\) of file eui_provider_params\.h is not documented\.
 boards/derfmega256/include/eui_provider_params\.h:[0-9]+: warning: Member EUI64_PROVIDER_INDEX \(macro definition\) of file eui_provider_params\.h is not documented\.
 boards/derfmega256/include/eui_provider_params\.h:[0-9]+: warning: Member EUI64_PROVIDER_TYPE \(macro definition\) of file eui_provider_params\.h is not documented\.
-boards/derfmega256/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/dwm1001/include/board\.h:[0-9]+: warning: Member DW1000_PARAM_CS_PIN \(macro definition\) of file board\.h is not documented\.
 boards/dwm1001/include/board\.h:[0-9]+: warning: Member DW1000_PARAM_INT_PIN \(macro definition\) of file board\.h is not documented\.
 boards/dwm1001/include/board\.h:[0-9]+: warning: Member DW1000_PARAM_SPI \(macro definition\) of file board\.h is not documented\.
@@ -1376,7 +1333,6 @@ boards/ek\-lm4f120xl/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC
 boards/ek\-lm4f120xl/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_MIN \(macro definition\) of file board\.h is not documented\.
 boards/ek\-lm4f120xl/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_TYPE \(macro definition\) of file board\.h is not documented\.
 boards/ek\-lm4f120xl/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
-boards/ek\-lm4f120xl/include/board\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/ek\-lm4f120xl/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/ek\-lm4f120xl/include/periph_conf\.h:[0-9]+: warning: Member CLK1 \(macro definition\) of file periph_conf\.h is not documented\.
 boards/ek\-lm4f120xl/include/periph_conf\.h:[0-9]+: warning: Member CLK16 \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1401,10 +1357,7 @@ boards/ek\-lm4f120xl/include/periph_conf\.h:[0-9]+: warning: Member UART_IRQ_PRI
 boards/ek\-lm4f120xl/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/ek\-lm4f120xl/include/periph_conf\.h:[0-9]+: warning: Member spi_confs\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/ek\-lm4f120xl/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/ek\-lm4f120xl/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/esp32\-ethernet\-kit\-v1_0/include/periph_conf\.h:[0-9]+: warning: Member PWM0_GPIOS \(macro definition\) of file periph_conf\.h is not documented\.
-boards/esp32\-ethernet\-kit\-v1_0/include/periph_conf\.h:[0-9]+: warning: unbalanced grouping commands
-boards/esp32\-heltec\-lora32\-v2/include/arduino_pinmap\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/esp32\-heltec\-lora32\-v2/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_DIO0 \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-heltec\-lora32\-v2/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_DIO1 \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-heltec\-lora32\-v2/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_DIO2 \(macro definition\) of file board\.h is not documented\.
@@ -1413,26 +1366,20 @@ boards/esp32\-heltec\-lora32\-v2/include/board\.h:[0-9]+: warning: Member SX127X
 boards/esp32\-heltec\-lora32\-v2/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_RESET \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-heltec\-lora32\-v2/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_SPI \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-heltec\-lora32\-v2/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_SPI_NSS \(macro definition\) of file board\.h is not documented\.
-boards/esp32\-mh\-et\-live\-minikit/include/arduino_pinmap\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/esp32\-mh\-et\-live\-minikit/include/board\.h:[0-9]+: warning: Member LED_BLUE_PIN \(macro definition\) of file board\.h is not documented\.
-boards/esp32\-olimex\-evb/include/arduino_pinmap\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/esp32\-olimex\-evb/include/board\.h:[0-9]+: warning: Member SDCARD_SPI_PARAM_CLK \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-olimex\-evb/include/board\.h:[0-9]+: warning: Member SDCARD_SPI_PARAM_CS \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-olimex\-evb/include/board\.h:[0-9]+: warning: Member SDCARD_SPI_PARAM_MISO \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-olimex\-evb/include/board\.h:[0-9]+: warning: Member SDCARD_SPI_PARAM_MOSI \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-olimex\-evb/include/board\.h:[0-9]+: warning: Member SDCARD_SPI_PARAM_POWER \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-olimex\-evb/include/board\.h:[0-9]+: warning: Member SDCARD_SPI_PARAM_SPI \(macro definition\) of file board\.h is not documented\.
-boards/esp32\-ttgo\-t\-beam/include/arduino_pinmap\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/esp32\-ttgo\-t\-beam/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_DIO0 \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-ttgo\-t\-beam/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_DIO1 \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-ttgo\-t\-beam/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_DIO2 \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-ttgo\-t\-beam/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_DIO3 \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-ttgo\-t\-beam/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_RESET \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-ttgo\-t\-beam/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_SPI_NSS \(macro definition\) of file board\.h is not documented\.
-boards/esp32\-wemos\-lolin\-d32\-pro/include/arduino_pinmap\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/esp32\-wemos\-lolin\-d32\-pro/include/board\.h:[0-9]+: warning: Member LED0_ACTIVE \(macro definition\) of file board\.h is not documented\.
-boards/esp32\-wroom\-32/include/arduino_pinmap\.h:[0-9]+: warning: end of file with unbalanced grouping commands
-boards/esp32\-wrover\-kit/include/arduino_pinmap\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member BACKLIGHT_OFF \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member BACKLIGHT_ON \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member ILI9341_PARAM_CS \(macro definition\) of file board\.h is not documented\.
@@ -1447,8 +1394,6 @@ boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member LCD_BACKLIGHT
 boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member LCD_CS \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member LCD_DC \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member LCD_RST \(macro definition\) of file board\.h is not documented\.
-boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: end of file with unbalanced grouping commands
-boards/esp8266\-olimex\-mod/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/f4vi1/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
 boards/f4vi1/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/f4vi1/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1513,7 +1458,6 @@ boards/feather\-nrf52840/include/periph_conf\.h:[0-9]+: warning: Member UART_NUM
 boards/feather\-nrf52840/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/feather\-nrf52840/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/feather\-nrf52840/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/feather\-nrf52840/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/firefly/include/board\.h:[0-9]+: warning: Member CC1200_CSN_GPIO \(macro definition\) of file board\.h is not documented\.
 boards/firefly/include/board\.h:[0-9]+: warning: Member CC1200_GPD0_GPIO \(macro definition\) of file board\.h is not documented\.
 boards/firefly/include/board\.h:[0-9]+: warning: Member CC1200_GPD2_GPIO \(macro definition\) of file board\.h is not documented\.
@@ -1684,7 +1628,6 @@ boards/hamilton/include/periph_conf\.h:[0-9]+: warning: Member pwm_chan1_config\
 boards/hamilton/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/hamilton/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/hamilton/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/hamilton/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/hifive1/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of group boards_hifive1 is not documented\.
 boards/hifive1/include/periph_conf\.h:[0-9]+: warning: Member PWM_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/hifive1/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1918,7 +1861,6 @@ boards/maple\-mini/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\]
 boards/maple\-mini/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/maple\-mini/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/maple\-mini/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/maple\-mini/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/mbed_lpc1768/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_CHANNELS \(macro definition\) of file periph_conf\.h is not documented\.
 boards/mbed_lpc1768/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_CLKDIS\(\) \(macro definition\) of file periph_conf\.h is not documented\.
 boards/mbed_lpc1768/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_CLKEN\(\) \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1953,8 +1895,6 @@ boards/mcb2388/include/periph_conf\.h:[0-9]+: warning: Member adc_config\[\] \(v
 boards/mcb2388/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/mcb2388/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/mcb2388/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/mcb2388/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
-boards/mega\-xplained/include/board\.h:[0-9]+: warning: unbalanced grouping commands
 boards/mega\-xplained/include/mega\-xplained_pinmap\.h:[0-9]+: warning: Member J1_PIN1 \(macro definition\) of file mega\-xplained_pinmap\.h is not documented\.
 boards/mega\-xplained/include/mega\-xplained_pinmap\.h:[0-9]+: warning: Member J1_PIN2 \(macro definition\) of file mega\-xplained_pinmap\.h is not documented\.
 boards/mega\-xplained/include/mega\-xplained_pinmap\.h:[0-9]+: warning: Member J1_PIN3 \(macro definition\) of file mega\-xplained_pinmap\.h is not documented\.
@@ -1988,7 +1928,6 @@ boards/mega\-xplained/include/mega\-xplained_pinmap\.h:[0-9]+: warning: Member J
 boards/mega\-xplained/include/mega\-xplained_pinmap\.h:[0-9]+: warning: Member J4_PIN7 \(macro definition\) of file mega\-xplained_pinmap\.h is not documented\.
 boards/mega\-xplained/include/mega\-xplained_pinmap\.h:[0-9]+: warning: Member J4_PIN8 \(macro definition\) of file mega\-xplained_pinmap\.h is not documented\.
 boards/mega\-xplained/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
-boards/mega\-xplained/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/microbit/include/board\.h:[0-9]+: warning: Member MAG3110_PARAM_ADDR \(macro definition\) of file board\.h is not documented\.
 boards/microbit/include/board\.h:[0-9]+: warning: Member MAG3110_PARAM_I2C \(macro definition\) of file board\.h is not documented\.
 boards/microbit/include/board\.h:[0-9]+: warning: Member MICROBIT_LED_COL1 \(macro definition\) of file board\.h is not documented\.
@@ -2073,7 +2012,6 @@ boards/msb\-430/include/periph_conf\.h:[0-9]+: warning: Member UART_RX_ISR \(mac
 boards/msb\-430/include/periph_conf\.h:[0-9]+: warning: Member UART_RX_PIN \(macro definition\) of file periph_conf\.h is not documented\.
 boards/msb\-430/include/periph_conf\.h:[0-9]+: warning: Member UART_TX_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/msb\-430/include/periph_conf\.h:[0-9]+: warning: Member UART_TX_PIN \(macro definition\) of file periph_conf\.h is not documented\.
-boards/msb\-430/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/msb\-430h/include/board\.h:[0-9]+: warning: Member F_CPU \(macro definition\) of file board\.h is not documented\.
 boards/msb\-430h/include/board\.h:[0-9]+: warning: Member F_RC_OSCILLATOR \(macro definition\) of file board\.h is not documented\.
 boards/msb\-430h/include/board\.h:[0-9]+: warning: Member MSP430_HAS_DCOR \(macro definition\) of file board\.h is not documented\.
@@ -2110,7 +2048,6 @@ boards/msb\-430h/include/periph_conf\.h:[0-9]+: warning: Member UART_RX_ISR \(ma
 boards/msb\-430h/include/periph_conf\.h:[0-9]+: warning: Member UART_RX_PIN \(macro definition\) of file periph_conf\.h is not documented\.
 boards/msb\-430h/include/periph_conf\.h:[0-9]+: warning: Member UART_TX_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/msb\-430h/include/periph_conf\.h:[0-9]+: warning: Member UART_TX_PIN \(macro definition\) of file periph_conf\.h is not documented\.
-boards/msb\-430h/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/msba2/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/msba2/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
 boards/msba2/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_PCLK \(macro definition\) of file periph_conf\.h is not documented\.
@@ -2185,7 +2122,6 @@ boards/mulle/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro defini
 boards/mulle/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
 boards/mulle/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/mulle/include/board\.h:[0-9]+: warning: Member mtd0 \(variable\) of file board\.h is not documented\.
-boards/mulle/include/board\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/mulle/include/mulle\-nvram\.h:[0-9]+: warning: Member MULLE_NVRAM_MAGIC_EXPECTED \(macro definition\) of file mulle\-nvram\.h is not documented\.
 boards/mulle/include/mulle\-nvram\.h:[0-9]+: warning: Member mulle_nvram \(variable\) of file mulle\-nvram\.h is not documented\.
 boards/mulle/include/mulle\-nvram\.h:[0-9]+: warning: Member mulle_nvram_address \(enumeration\) of file mulle\-nvram\.h is not documented\.
@@ -2257,13 +2193,11 @@ boards/nrf52832\-mdk/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro d
 boards/nrf52832\-mdk/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/nrf52832\-mdk/include/periph_conf\.h:[0-9]+: warning: Member UART_PIN_RX \(macro definition\) of file periph_conf\.h is not documented\.
 boards/nrf52832\-mdk/include/periph_conf\.h:[0-9]+: warning: Member UART_PIN_TX \(macro definition\) of file periph_conf\.h is not documented\.
-boards/nrf52832\-mdk/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/nrf52840\-mdk/include/board\.h:[0-9]+: warning: Member LED_MASK \(macro definition\) of file board\.h is not documented\.
 boards/nrf52840\-mdk/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
 boards/nrf52840\-mdk/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/nrf52840\-mdk/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/nrf52840\-mdk/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/nrf52840\-mdk/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/nrf52840\-mdk\-dongle/include/board\.h:[0-9]+: warning: Member INTERNAL_PERIPHERAL_PID \(macro definition\) of file board\.h is not documented\.
 boards/nrf52840\-mdk\-dongle/include/board\.h:[0-9]+: warning: Member INTERNAL_PERIPHERAL_VID \(macro definition\) of file board\.h is not documented\.
 boards/nrf52840\-mdk\-dongle/include/periph_conf\.h:[0-9]+: warning: Member PWM_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -2271,7 +2205,6 @@ boards/nrf52840\-mdk\-dongle/include/periph_conf\.h:[0-9]+: warning: Member UART
 boards/nrf52840\-mdk\-dongle/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/nrf52840\-mdk\-dongle/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/nrf52840\-mdk\-dongle/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/nrf52840\-mdk\-dongle/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/nrf52840dk/include/board\.h:[0-9]+: warning: Member LED_MASK \(macro definition\) of file board\.h is not documented\.
 boards/nrf52840dk/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
 boards/nrf52840dk/include/board\.h:[0-9]+: warning: Member NRF52840DK_NOR_FLAGS \(macro definition\) of file board\.h is not documented\.
@@ -2297,7 +2230,6 @@ boards/nrf52840dongle/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\
 boards/nrf52840dongle/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/nrf52840dongle/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/nrf52840dongle/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/nrf52840dongle/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/nrf52840dongle/include/pwm_params\.h:[0-9]+: warning: Member saul_pwm_rgb_params\[\] \(variable\) of file pwm_params\.h is not documented\.
 boards/nrf52dk/include/board\.h:[0-9]+: warning: Member LED_MASK \(macro definition\) of file board\.h is not documented\.
 boards/nrf52dk/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
@@ -2957,7 +2889,6 @@ boards/nucleo\-wl55jc/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_
 boards/nucleo\-wl55jc/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A3 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/nucleo\-wl55jc/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A4 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/nucleo\-wl55jc/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A5 \(macro definition\) of file arduino_pinmap\.h is not documented\.
-boards/nucleo\-wl55jc/include/arduino_pinmap\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/nucleo\-wl55jc/include/board\.h:[0-9]+: warning: Member FE_CTRL1 \(macro definition\) of file board\.h is not documented\.
 boards/nucleo\-wl55jc/include/board\.h:[0-9]+: warning: Member FE_CTRL2 \(macro definition\) of file board\.h is not documented\.
 boards/nucleo\-wl55jc/include/board\.h:[0-9]+: warning: Member FE_CTRL3 \(macro definition\) of file board\.h is not documented\.
@@ -3051,7 +2982,6 @@ boards/opencm904/include/periph_conf\.h:[0-9]+: warning: Member UART_2_ISR \(mac
 boards/opencm904/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/opencm904/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/opencm904/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/opencm904/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/openlabs\-kw41z\-mini/include/board\.h:[0-9]+: warning: Member KINETIS_FOPT \(macro definition\) of file board\.h is not documented\.
 boards/openlabs\-kw41z\-mini/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/openlabs\-kw41z\-mini/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
@@ -3098,7 +3028,6 @@ boards/openlabs\-kw41z\-mini/include/periph_conf\.h:[0-9]+: warning: Member pwm_
 boards/openlabs\-kw41z\-mini/include/periph_conf\.h:[0-9]+: warning: Member spi_clk_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/openlabs\-kw41z\-mini/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/openlabs\-kw41z\-mini/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/openlabs\-kw41z\-mini/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/openmote\-b/include/board\.h:[0-9]+: warning: Member AT86RF215_PARAM_CS \(macro definition\) of file board\.h is not documented\.
 boards/openmote\-b/include/board\.h:[0-9]+: warning: Member AT86RF215_PARAM_INT \(macro definition\) of file board\.h is not documented\.
 boards/openmote\-b/include/board\.h:[0-9]+: warning: Member AT86RF215_PARAM_RESET \(macro definition\) of file board\.h is not documented\.
@@ -3131,7 +3060,6 @@ boards/openmote\-b/include/board\.h:[0-9]+: warning: Member UPDATE_CCA \(macro d
 boards/openmote\-b/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/openmote\-b/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/openmote\-b/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
-boards/openmote\-b/include/board\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/openmote\-b/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/openmote\-b/include/periph_conf\.h:[0-9]+: warning: Member I2C_IRQ_PRIO \(macro definition\) of file periph_conf\.h is not documented\.
 boards/openmote\-b/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -3201,8 +3129,6 @@ boards/p\-nucleo\-wb55/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO
 boards/p\-nucleo\-wb55/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A3 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/p\-nucleo\-wb55/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A4 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/p\-nucleo\-wb55/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A5 \(macro definition\) of file arduino_pinmap\.h is not documented\.
-boards/p\-nucleo\-wb55/include/arduino_pinmap\.h:[0-9]+: warning: end of file with unbalanced grouping commands
-boards/p\-nucleo\-wb55/include/board\.h:[0-9]+: warning: unbalanced grouping commands
 boards/p\-nucleo\-wb55/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_EXTAHB \(macro definition\) of file periph_conf\.h is not documented\.
 boards/p\-nucleo\-wb55/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_EXTAHB_DIV \(macro definition\) of file periph_conf\.h is not documented\.
 boards/p\-nucleo\-wb55/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
@@ -3218,17 +3144,14 @@ boards/particle\-argon/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR
 boards/particle\-argon/include/periph_conf\.h:[0-9]+: warning: Member UART_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/particle\-argon/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/particle\-argon/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/particle\-argon/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/particle\-boron/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/particle\-boron/include/periph_conf\.h:[0-9]+: warning: Member UART_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/particle\-boron/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/particle\-boron/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/particle\-boron/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/particle\-xenon/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/particle\-xenon/include/periph_conf\.h:[0-9]+: warning: Member UART_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/particle\-xenon/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/particle\-xenon/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/particle\-xenon/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member KW2XRF_PARAM_CS \(macro definition\) of file board\.h is not documented\.
 boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member KW2XRF_PARAM_INT \(macro definition\) of file board\.h is not documented\.
 boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member KW2XRF_PARAM_SPI \(macro definition\) of file board\.h is not documented\.
@@ -3285,13 +3208,11 @@ boards/phynode\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macr
 boards/phynode\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
 boards/phynode\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/phynode\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
-boards/phynode\-kw41z/include/board\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/phynode\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/phynode\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member ADC_REF_SETTING \(macro definition\) of file periph_conf\.h is not documented\.
 boards/phynode\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/phynode\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member adc_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/phynode\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/pic32\-wifire/include/gpio_params\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/pic32\-wifire/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
 boards/pic32\-wifire/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_CHANNELS \(macro definition\) of file periph_conf\.h is not documented\.
 boards/pic32\-wifire/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -3340,7 +3261,6 @@ boards/pinetime/include/board\.h:[0-9]+: warning: Member POWER_PRESENCE \(macro 
 boards/pinetime/include/board\.h:[0-9]+: warning: Member VCC33 \(macro definition\) of file board\.h is not documented\.
 boards/pinetime/include/board\.h:[0-9]+: warning: Member VIBRATOR \(macro definition\) of file board\.h is not documented\.
 boards/pinetime/include/board\.h:[0-9]+: warning: Member mtd0 \(variable\) of file board\.h is not documented\.
-boards/pinetime/include/board\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/pinetime/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/pinetime/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/pinetime/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
@@ -3398,13 +3318,11 @@ boards/reel/include/board\.h:[0-9]+: warning: Member SSD1673_CS \(macro definiti
 boards/reel/include/board\.h:[0-9]+: warning: Member SSD1673_DC_INPUT \(macro definition\) of file board\.h is not documented\.
 boards/reel/include/board\.h:[0-9]+: warning: Member SSD1673_RESET \(macro definition\) of file board\.h is not documented\.
 boards/reel/include/board\.h:[0-9]+: warning: Member SSD1673_SPI \(macro definition\) of file board\.h is not documented\.
-boards/reel/include/board\.h:[0-9]+: warning: unbalanced grouping commands
 boards/reel/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/reel/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/reel/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/reel/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/reel/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/reel/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/remote\-pa/include/board\.h:[0-9]+: warning: Member RF_SWITCH_2_4_GHZ \(macro definition\) of file board\.h is not documented\.
 boards/remote\-pa/include/board\.h:[0-9]+: warning: Member RF_SWITCH_GPIO \(macro definition\) of file board\.h is not documented\.
 boards/remote\-pa/include/board\.h:[0-9]+: warning: Member RF_SWITCH_SUB_GHZ \(macro definition\) of file board\.h is not documented\.
@@ -3672,7 +3590,6 @@ boards/same54\-xpro/include/periph_conf\.h:[0-9]+: warning: Member sam_usbdev_co
 boards/same54\-xpro/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/same54\-xpro/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/same54\-xpro/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/same54\-xpro/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/saml21\-xpro/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_A1 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/saml21\-xpro/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_A2 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/saml21\-xpro/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_1 \(macro definition\) of file arduino_pinmap\.h is not documented\.
@@ -3792,7 +3709,6 @@ boards/samr30\-xpro/include/periph_conf\.h:[0-9]+: warning: Member sam_usbdev_co
 boards/samr30\-xpro/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/samr30\-xpro/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/samr30\-xpro/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/samr30\-xpro/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/samr34\-xpro/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of group boards_samr34\-xpro is not documented\.
 boards/samr34\-xpro/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_DIO0 \(macro definition\) of group boards_samr34\-xpro is not documented\.
 boards/samr34\-xpro/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_DIO1 \(macro definition\) of group boards_samr34\-xpro is not documented\.
@@ -3940,7 +3856,6 @@ boards/sensebox_samd21/include/periph_conf\.h:[0-9]+: warning: Member sam_usbdev
 boards/sensebox_samd21/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/sensebox_samd21/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/sensebox_samd21/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/sensebox_samd21/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/serpente/include/board\.h:[0-9]+: warning: Member INTERNAL_PERIPHERAL_PID \(macro definition\) of file board\.h is not documented\.
 boards/serpente/include/board\.h:[0-9]+: warning: Member INTERNAL_PERIPHERAL_VID \(macro definition\) of file board\.h is not documented\.
 boards/serpente/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
@@ -4231,7 +4146,6 @@ boards/sodaq\-autonomo/include/periph_conf\.h:[0-9]+: warning: Member pwm_config
 boards/sodaq\-autonomo/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/sodaq\-explorer/include/board\.h:[0-9]+: warning: Member RN2XX3_PARAM_PIN_RESET \(macro definition\) of file board\.h is not documented\.
 boards/sodaq\-explorer/include/board\.h:[0-9]+: warning: Member RN2XX3_PARAM_UART \(macro definition\) of file board\.h is not documented\.
-boards/sodaq\-explorer/include/board\.h:[0-9]+: warning: unbalanced grouping commands
 boards/sodaq\-explorer/include/periph_conf\.h:[0-9]+: warning: Member ADC_GAIN_FACTOR_DEFAULT \(macro definition\) of file periph_conf\.h is not documented\.
 boards/sodaq\-explorer/include/periph_conf\.h:[0-9]+: warning: Member ADC_NEG_INPUT \(macro definition\) of file periph_conf\.h is not documented\.
 boards/sodaq\-explorer/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4258,7 +4172,6 @@ boards/sodaq\-one/include/board\.h:[0-9]+: warning: Member LORA_RESET_ON \(macro
 boards/sodaq\-one/include/board\.h:[0-9]+: warning: Member LORA_RESET_PIN \(macro definition\) of file board\.h is not documented\.
 boards/sodaq\-one/include/board\.h:[0-9]+: warning: Member LORA_RESET_PORT \(macro definition\) of file board\.h is not documented\.
 boards/sodaq\-one/include/board\.h:[0-9]+: warning: Member LORA_RESET_TOGGLE \(macro definition\) of file board\.h is not documented\.
-boards/sodaq\-one/include/board\.h:[0-9]+: warning: unbalanced grouping commands
 boards/sodaq\-one/include/periph_conf\.h:[0-9]+: warning: Member ADC_GAIN_FACTOR_DEFAULT \(macro definition\) of file periph_conf\.h is not documented\.
 boards/sodaq\-one/include/periph_conf\.h:[0-9]+: warning: Member ADC_NEG_INPUT \(macro definition\) of file periph_conf\.h is not documented\.
 boards/sodaq\-one/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4364,7 +4277,6 @@ boards/sodaq\-sara\-sff/include/board\.h:[0-9]+: warning: Member SARA_TX_ENABLE_
 boards/sodaq\-sara\-sff/include/board\.h:[0-9]+: warning: Member SARA_TX_ENABLE_ON \(macro definition\) of file board\.h is not documented\.
 boards/sodaq\-sara\-sff/include/board\.h:[0-9]+: warning: Member SARA_TX_ENABLE_PIN \(macro definition\) of file board\.h is not documented\.
 boards/sodaq\-sara\-sff/include/board\.h:[0-9]+: warning: Member SARA_TX_ENABLE_PORT \(macro definition\) of file board\.h is not documented\.
-boards/sodaq\-sara\-sff/include/board\.h:[0-9]+: warning: unbalanced grouping commands
 boards/sodaq\-sara\-sff/include/periph_conf\.h:[0-9]+: warning: Member ADC_GAIN_FACTOR_DEFAULT \(macro definition\) of file periph_conf\.h is not documented\.
 boards/sodaq\-sara\-sff/include/periph_conf\.h:[0-9]+: warning: Member ADC_NEG_INPUT \(macro definition\) of file periph_conf\.h is not documented\.
 boards/sodaq\-sara\-sff/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4536,7 +4448,6 @@ boards/stm32f0discovery/include/periph_conf\.h:[0-9]+: warning: Member adc_confi
 boards/stm32f0discovery/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/stm32f0discovery/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/stm32f0discovery/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/stm32f0discovery/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/stm32f3discovery/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
 boards/stm32f3discovery/include/board\.h:[0-9]+: warning: Member LSM303DLHC_PARAM_MAG_PIN \(macro definition\) of file board\.h is not documented\.
 boards/stm32f3discovery/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4558,7 +4469,6 @@ boards/stm32f3discovery/include/periph_conf\.h:[0-9]+: warning: Member pwm_confi
 boards/stm32f3discovery/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/stm32f3discovery/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/stm32f3discovery/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/stm32f3discovery/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/stm32f429i\-disc1/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f429i\-disc1/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f429i\-disc1/include/periph_conf\.h:[0-9]+: warning: Member DMA_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4587,7 +4497,6 @@ boards/stm32f4discovery/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUIN
 boards/stm32f4discovery/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_5 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/stm32f4discovery/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_6 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/stm32f4discovery/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_7 \(macro definition\) of file arduino_pinmap\.h is not documented\.
-boards/stm32f4discovery/include/arduino_pinmap\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/stm32f4discovery/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
 boards/stm32f4discovery/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/stm32f4discovery/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4650,7 +4559,6 @@ boards/stm32l0538\-disco/include/periph_conf\.h:[0-9]+: warning: Member UART_NUM
 boards/stm32l0538\-disco/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/stm32l0538\-disco/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/stm32l0538\-disco/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/stm32l0538\-disco/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/stm32l476g\-disco/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32l476g\-disco/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32l476g\-disco/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4658,7 +4566,6 @@ boards/stm32l476g\-disco/include/periph_conf\.h:[0-9]+: warning: Member UART_0_I
 boards/stm32l476g\-disco/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32l476g\-disco/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/stm32l476g\-disco/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/stm32mp157c\-dk2/include/board\.h:[0-9]+: warning: unbalanced grouping commands
 boards/stm32mp157c\-dk2/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32mp157c\-dk2/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32mp157c\-dk2/include/periph_conf\.h:[0-9]+: warning: Member UART_0_DMA_ISR \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4734,7 +4641,6 @@ boards/telosb/include/periph_conf\.h:[0-9]+: warning: Member UART_RX_ISR \(macro
 boards/telosb/include/periph_conf\.h:[0-9]+: warning: Member UART_RX_PIN \(macro definition\) of file periph_conf\.h is not documented\.
 boards/telosb/include/periph_conf\.h:[0-9]+: warning: Member UART_TX_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/telosb/include/periph_conf\.h:[0-9]+: warning: Member UART_TX_PIN \(macro definition\) of file periph_conf\.h is not documented\.
-boards/telosb/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/thingy52/include/board\.h:[0-9]+: warning: Member LIS2DH12_PARAM_I2C \(macro definition\) of file board\.h is not documented\.
 boards/thingy52/include/board\.h:[0-9]+: warning: Member LPSXXX_PARAM_ADDR \(macro definition\) of file board\.h is not documented\.
 boards/thingy52/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4770,7 +4676,6 @@ boards/ublox\-c030\-u201/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUI
 boards/ublox\-c030\-u201/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A3 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/ublox\-c030\-u201/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A4 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/ublox\-c030\-u201/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A5 \(macro definition\) of file arduino_pinmap\.h is not documented\.
-boards/ublox\-c030\-u201/include/arduino_pinmap\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/ublox\-c030\-u201/include/board\.h:[0-9]+: warning: Member GPS_RST_PIN \(macro definition\) of group boards_ublox\-c030\-u201 is not documented\.
 boards/ublox\-c030\-u201/include/board\.h:[0-9]+: warning: Member M_GPIO2_PIN \(macro definition\) of group boards_ublox\-c030\-u201 is not documented\.
 boards/ublox\-c030\-u201/include/board\.h:[0-9]+: warning: Member M_GPIO3_PIN \(macro definition\) of group boards_ublox\-c030\-u201 is not documented\.
@@ -4932,9 +4837,7 @@ boards/waspmote\-pro/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(m
 boards/waspmote\-pro/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
 boards/waspmote\-pro/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/waspmote\-pro/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
-boards/waspmote\-pro/include/board\.h:[0-9]+: warning: unbalanced grouping commands
 boards/waspmote\-pro/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
-boards/waspmote\-pro/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/waspmote\-pro/include/waspmote_pinmap\.h:[0-9]+: warning: Member ANA0 \(macro definition\) of file waspmote_pinmap\.h is not documented\.
 boards/waspmote\-pro/include/waspmote_pinmap\.h:[0-9]+: warning: Member ANA1 \(macro definition\) of file waspmote_pinmap\.h is not documented\.
 boards/waspmote\-pro/include/waspmote_pinmap\.h:[0-9]+: warning: Member ANA2 \(macro definition\) of file waspmote_pinmap\.h is not documented\.
@@ -5016,7 +4919,6 @@ boards/yunjia\-nrf51822/include/periph_conf\.h:[0-9]+: warning: Member UART_PIN_
 boards/yunjia\-nrf51822/include/periph_conf\.h:[0-9]+: warning: Member adc_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/yunjia\-nrf51822/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/yunjia\-nrf51822/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/yunjia\-nrf51822/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/z1/include/board\-conf\.h:[0-9]+: warning: Member INFOMEM \(macro definition\) of file board\-conf\.h is not documented\.
 boards/z1/include/board\.h:[0-9]+: warning: Member CC2420_PARAM_CCA \(macro definition\) of file board\.h is not documented\.
 boards/z1/include/board\.h:[0-9]+: warning: Member CC2420_PARAM_CS \(macro definition\) of file board\.h is not documented\.
@@ -5063,13 +4965,11 @@ boards/z1/include/periph_conf\.h:[0-9]+: warning: Member UART_TX_ISR \(macro def
 boards/z1/include/periph_conf\.h:[0-9]+: warning: Member UART_TX_PIN \(macro definition\) of file periph_conf\.h is not documented\.
 boards/z1/include/periph_conf\.h:[0-9]+: warning: Member UART_TX_PORT \(macro definition\) of file periph_conf\.h is not documented\.
 boards/z1/include/periph_conf\.h:[0-9]+: warning: Member UART_USE_USCI \(macro definition\) of file periph_conf\.h is not documented\.
-boards/z1/include/periph_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 boards/zigduino/include/board\.h:[0-9]+: warning: Member PIR_MOTION_MODE \(macro definition\) of file board\.h is not documented\.
 boards/zigduino/include/board\.h:[0-9]+: warning: Member PIR_MOTION_PIN \(macro definition\) of file board\.h is not documented\.
 boards/zigduino/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/zigduino/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
 boards/zigduino/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
-boards/zigduino/include/board\.h:[0-9]+: warning: unbalanced grouping commands
 bootloaders/riotboot_serial/doc\.txt:[0-9]+: warning: Reached end of file while still inside a \(nested\) comment\. Nesting level 1 \(probable line reference: 1\)
 core/include/bitarithm\.h:[0-9]+: warning: Member BIT0 \(macro definition\) of file bitarithm\.h is not documented\.
 core/include/bitarithm\.h:[0-9]+: warning: Member BIT1 \(macro definition\) of file bitarithm\.h is not documented\.
@@ -6063,7 +5963,6 @@ cpu/kinetis/include/cpu_conf_kinetis_w\.h:[0-9]+: warning: Member FLASHPAGE_NUMO
 cpu/kinetis/include/cpu_conf_kinetis_w\.h:[0-9]+: warning: Member FLASHPAGE_SIZE \(macro definition\) of file cpu_conf_kinetis_w\.h is not documented\.
 cpu/kinetis/include/cpu_conf_kinetis_w\.h:[0-9]+: warning: Member FLASHPAGE_WRITE_BLOCK_ALIGNMENT \(macro definition\) of file cpu_conf_kinetis_w\.h is not documented\.
 cpu/kinetis/include/cpu_conf_kinetis_w\.h:[0-9]+: warning: Member FLASHPAGE_WRITE_BLOCK_SIZE \(macro definition\) of file cpu_conf_kinetis_w\.h is not documented\.
-cpu/kinetis/include/mcg\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/kinetis/include/periph_cpu\.h:[0-9]+: warning: Member HAVE_GPIO_T \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/kinetis/include/periph_cpu\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANSFER_BYTE \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/kinetis/include/periph_cpu\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANSFER_REG \(macro definition\) of file periph_cpu\.h is not documented\.
@@ -6110,7 +6009,6 @@ cpu/lpc23xx/include/periph_cpu\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANS
 cpu/lpc23xx/include/periph_cpu\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANSFER_REG \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/lpc23xx/include/periph_cpu\.h:[0-9]+: warning: Member PERIPH_SPI_NEEDS_TRANSFER_REGS \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/lpc23xx/include/periph_cpu\.h:[0-9]+: warning: Member PM_NUM_MODES \(macro definition\) of file periph_cpu\.h is not documented\.
-cpu/lpc23xx/include/periph_cpu\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 cpu/mips32r2_common/include/cpu\.h:[0-9]+: warning: Member BITARITHM_HAS_CLZ \(macro definition\) of group cpu_mips32r2_common is not documented\.
 cpu/mips_pic32mx/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_STACKSIZE_DEFAULT \(macro definition\) of group cpu_mips_pic32mx is not documented\.
 cpu/mips_pic32mx/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_STACKSIZE_IDLE \(macro definition\) of group cpu_mips_pic32mx is not documented\.
@@ -6333,7 +6231,6 @@ cpu/nrf52/include/periph_cpu\.h:[0-9]+: warning: Member SPI_MOSISEL \(macro defi
 cpu/nrf52/include/periph_cpu\.h:[0-9]+: warning: Member i2c_pin_scl\(dev\) \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/nrf52/include/periph_cpu\.h:[0-9]+: warning: Member i2c_pin_sda\(dev\) \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/nrf52/include/periph_cpu\.h:[0-9]+: warning: Member pwm_mode_t \(enumeration\) of file periph_cpu\.h is not documented\.
-cpu/nrf52/include/periph_cpu\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/nrf5x_common/include/nrfble\.h:[0-9]+: warning: Member NRFBLE_CHAN_MAX \(macro definition\) of group drivers_nrf5x_nrfble is not documented\.
 cpu/nrf5x_common/include/nrfmin\.h:[0-9]+: warning: Member NRFMIN_CHAN_DEFAULT \(macro definition\) of group drivers_nrf5x_nrfmin is not documented\.
 cpu/nrf5x_common/include/nrfmin\.h:[0-9]+: warning: Member NRFMIN_CHAN_MAX \(macro definition\) of group drivers_nrf5x_nrfmin is not documented\.
@@ -6348,7 +6245,6 @@ cpu/nrf9160/include/periph_cpu\.h:[0-9]+: warning: Member SPI_MISOSEL \(macro de
 cpu/nrf9160/include/periph_cpu\.h:[0-9]+: warning: Member SPI_MOSISEL \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/nrf9160/include/periph_cpu\.h:[0-9]+: warning: Member i2c_pin_scl\(dev\) \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/nrf9160/include/periph_cpu\.h:[0-9]+: warning: Member i2c_pin_sda\(dev\) \(macro definition\) of file periph_cpu\.h is not documented\.
-cpu/nrf9160/include/periph_cpu\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/qn908x/include/cpu_conf\.h:[0-9]+: warning: Member CPU_DEFAULT_IRQ_PRIO \(macro definition\) of file cpu_conf\.h is not documented\.
 cpu/qn908x/include/periph_cpu\.h:[0-9]+: warning: Member HAVE_GPIO_T \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/qn908x/include/periph_cpu\.h:[0-9]+: warning: Member HAVE_UART_DATA_BITS_T \(macro definition\) of file periph_cpu\.h is not documented\.
@@ -6364,7 +6260,6 @@ cpu/qn908x/include/periph_cpu\.h:[0-9]+: warning: Member gpio_t \(typedef\) of f
 cpu/qn908x/include/periph_cpu\.h:[0-9]+: warning: Member i2c_pin_scl\(dev\) \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/qn908x/include/periph_cpu\.h:[0-9]+: warning: Member i2c_pin_sda\(dev\) \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/qn908x/include/periph_cpu\.h:[0-9]+: warning: Member i2c_speed_t \(enumeration\) of file periph_cpu\.h is not documented\.
-cpu/qn908x/include/periph_cpu\.h:[0-9]+: warning: unbalanced grouping commands
 cpu/riscv_common/include/clic\.h:[0-9]+: warning: Member clic_clicint_t \(variable\) of file clic\.h is not documented\.
 cpu/riscv_common/include/context_frame\.h:[0-9]+: warning: Member a0_OFFSET \(macro definition\) of file context_frame\.h is not documented\.
 cpu/riscv_common/include/context_frame\.h:[0-9]+: warning: Member a1_OFFSET \(macro definition\) of file context_frame\.h is not documented\.
@@ -6674,7 +6569,6 @@ drivers/ads101x/include/ads101x_regs\.h:[0-9]+: warning: Member ADS101X_PGA_FSR_
 drivers/ads101x/include/ads101x_regs\.h:[0-9]+: warning: Member ADS101X_PGA_FSR_4V096 \(macro definition\) of file ads101x_regs\.h is not documented\.
 drivers/ads101x/include/ads101x_regs\.h:[0-9]+: warning: Member ADS101X_PGA_FSR_6V144 \(macro definition\) of file ads101x_regs\.h is not documented\.
 drivers/ads101x/include/ads101x_regs\.h:[0-9]+: warning: Member ADS101X_PGA_MASK \(macro definition\) of file ads101x_regs\.h is not documented\.
-drivers/ads101x/include/ads101x_regs\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/adxl345/include/adxl345_params\.h:[0-9]+: warning: Member ADXL345_PARAMS \(macro definition\) of file adxl345_params\.h is not documented\.
 drivers/adxl345/include/adxl345_params\.h:[0-9]+: warning: Member ADXL345_PARAM_ADDR \(macro definition\) of file adxl345_params\.h is not documented\.
 drivers/adxl345/include/adxl345_params\.h:[0-9]+: warning: Member ADXL345_PARAM_FULL_RES \(macro definition\) of file adxl345_params\.h is not documented\.
@@ -6759,18 +6653,15 @@ drivers/at25xxx/include/at25xxx_params\.h:[0-9]+: warning: Member AT25XXX_PARAM_
 drivers/at25xxx/include/at25xxx_params\.h:[0-9]+: warning: Member AT25XXX_PARAM_SPI \(macro definition\) of file at25xxx_params\.h is not documented\.
 drivers/at25xxx/include/at25xxx_params\.h:[0-9]+: warning: Member AT25XXX_PARAM_SPI_CLK \(macro definition\) of file at25xxx_params\.h is not documented\.
 drivers/at25xxx/include/at25xxx_params\.h:[0-9]+: warning: Member AT25XXX_PARAM_WP \(macro definition\) of file at25xxx_params\.h is not documented\.
-drivers/at25xxx/include/at25xxx_params\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/at86rf215/include/at86rf215_internal\.h:[0-9]+: warning: Member AT86RF215_CSMA_MAX_BE_DEFAULT \(macro definition\) of file at86rf215_internal\.h is not documented\.
 drivers/at86rf215/include/at86rf215_internal\.h:[0-9]+: warning: Member AT86RF215_CSMA_MIN_BE_DEFAULT \(macro definition\) of file at86rf215_internal\.h is not documented\.
 drivers/at86rf215/include/at86rf215_internal\.h:[0-9]+: warning: Member AT86RF215_CSMA_RETRIES_MAX_DEFAULT \(macro definition\) of file at86rf215_internal\.h is not documented\.
-drivers/at86rf215/include/at86rf215_netdev\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/at86rf215/include/at86rf215_params\.h:[0-9]+: warning: Member AT86RF215_PARAMS \(macro definition\) of file at86rf215_params\.h is not documented\.
 drivers/at86rf215/include/at86rf215_params\.h:[0-9]+: warning: Member AT86RF215_PARAM_CS \(macro definition\) of file at86rf215_params\.h is not documented\.
 drivers/at86rf215/include/at86rf215_params\.h:[0-9]+: warning: Member AT86RF215_PARAM_INT \(macro definition\) of file at86rf215_params\.h is not documented\.
 drivers/at86rf215/include/at86rf215_params\.h:[0-9]+: warning: Member AT86RF215_PARAM_RESET \(macro definition\) of file at86rf215_params\.h is not documented\.
 drivers/at86rf215/include/at86rf215_params\.h:[0-9]+: warning: Member AT86RF215_PARAM_SPI \(macro definition\) of file at86rf215_params\.h is not documented\.
 drivers/at86rf215/include/at86rf215_params\.h:[0-9]+: warning: Member AT86RF215_PARAM_SPI_CLK \(macro definition\) of file at86rf215_params\.h is not documented\.
-drivers/at86rf215/include/at86rf215_params\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/at86rf215/include/at86rf215_registers\.h:[0-9]+: warning: Member AT86RF215IQ_PN \(macro definition\) of file at86rf215_registers\.h is not documented\.
 drivers/at86rf215/include/at86rf215_registers\.h:[0-9]+: warning: Member AT86RF215M_PN \(macro definition\) of file at86rf215_registers\.h is not documented\.
 drivers/at86rf215/include/at86rf215_registers\.h:[0-9]+: warning: Member AT86RF215_PN \(macro definition\) of file at86rf215_registers\.h is not documented\.
@@ -6822,7 +6713,6 @@ drivers/at86rf215/include/at86rf215_registers\.h:[0-9]+: warning: Member RF_STAT
 drivers/at86rf215/include/at86rf215_registers\.h:[0-9]+: warning: Member RF_STATE_TRXOFF \(macro definition\) of file at86rf215_registers\.h is not documented\.
 drivers/at86rf215/include/at86rf215_registers\.h:[0-9]+: warning: Member RF_STATE_TX \(macro definition\) of file at86rf215_registers\.h is not documented\.
 drivers/at86rf215/include/at86rf215_registers\.h:[0-9]+: warning: Member RF_STATE_TXPREP \(macro definition\) of file at86rf215_registers\.h is not documented\.
-drivers/at86rf215/include/at86rf215_registers\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/at86rf2xx/include/at86rf2xx_aes\.h:[0-9]+: warning: Member AT86RF2XX_AES_CTRL_AES_DIR__DEC \(macro definition\) of file at86rf2xx_aes\.h is not documented\.
 drivers/at86rf2xx/include/at86rf2xx_aes\.h:[0-9]+: warning: Member AT86RF2XX_AES_CTRL_AES_DIR__ENC \(macro definition\) of file at86rf2xx_aes\.h is not documented\.
 drivers/at86rf2xx/include/at86rf2xx_aes\.h:[0-9]+: warning: Member AT86RF2XX_AES_CTRL_AES_MODE__CBC \(macro definition\) of file at86rf2xx_aes\.h is not documented\.
@@ -7035,7 +6925,6 @@ drivers/at86rf2xx/include/at86rf2xx_registers\.h:[0-9]+: warning: Member AT86RF2
 drivers/at86rf2xx/include/at86rf2xx_registers\.h:[0-9]+: warning: Member AT86RF2XX_XOSC_CTRL__XTAL_MODE_EXTERNAL \(macro definition\) of file at86rf2xx_registers\.h is not documented\.
 drivers/at86rf2xx/include/at86rf2xx_registers\.h:[0-9]+: warning: Member AT86RFA1_PARTNUM \(macro definition\) of file at86rf2xx_registers\.h is not documented\.
 drivers/at86rf2xx/include/at86rf2xx_registers\.h:[0-9]+: warning: Member AT86RFR2_PARTNUM \(macro definition\) of file at86rf2xx_registers\.h is not documented\.
-drivers/at86rf2xx/include/at86rf2xx_registers\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/ata8520e/include/ata8520e_internals\.h:[0-9]+: warning: Member ATA8520E_ATMEL_FRAME_SENT_MASK \(macro definition\) of file ata8520e_internals\.h is not documented\.
 drivers/ata8520e/include/ata8520e_internals\.h:[0-9]+: warning: Member ATA8520E_ATMEL_PA_MASK \(macro definition\) of file ata8520e_internals\.h is not documented\.
 drivers/ata8520e/include/ata8520e_internals\.h:[0-9]+: warning: Member ATA8520E_ATMEL_SYSTEM_READY_MASK \(macro definition\) of file ata8520e_internals\.h is not documented\.
@@ -7069,7 +6958,6 @@ drivers/ata8520e/include/ata8520e_internals\.h:[0-9]+: warning: Member ATA8520E_
 drivers/ata8520e/include/ata8520e_internals\.h:[0-9]+: warning: Member ATA8520E_TX_TEST_MODE \(macro definition\) of file ata8520e_internals\.h is not documented\.
 drivers/ata8520e/include/ata8520e_internals\.h:[0-9]+: warning: Member ATA8520E_WRITE_SYS_CONF \(macro definition\) of file ata8520e_internals\.h is not documented\.
 drivers/ata8520e/include/ata8520e_internals\.h:[0-9]+: warning: Member ATA8520E_WRITE_TX_BUFFER \(macro definition\) of file ata8520e_internals\.h is not documented\.
-drivers/ata8520e/include/ata8520e_internals\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/ata8520e/include/ata8520e_params\.h:[0-9]+: warning: Member ATA8520E_PARAMS \(macro definition\) of file ata8520e_params\.h is not documented\.
 drivers/ata8520e/include/ata8520e_params\.h:[0-9]+: warning: Member ATA8520E_PARAM_CS_PIN \(macro definition\) of file ata8520e_params\.h is not documented\.
 drivers/ata8520e/include/ata8520e_params\.h:[0-9]+: warning: Member ATA8520E_PARAM_INT_PIN \(macro definition\) of file ata8520e_params\.h is not documented\.
@@ -7077,7 +6965,6 @@ drivers/ata8520e/include/ata8520e_params\.h:[0-9]+: warning: Member ATA8520E_PAR
 drivers/ata8520e/include/ata8520e_params\.h:[0-9]+: warning: Member ATA8520E_PARAM_RESET_PIN \(macro definition\) of file ata8520e_params\.h is not documented\.
 drivers/ata8520e/include/ata8520e_params\.h:[0-9]+: warning: Member ATA8520E_PARAM_SPI \(macro definition\) of file ata8520e_params\.h is not documented\.
 drivers/ata8520e/include/ata8520e_params\.h:[0-9]+: warning: Member ATA8520E_PARAM_SPI_CLK \(macro definition\) of file ata8520e_params\.h is not documented\.
-drivers/ata8520e/include/ata8520e_params\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/atwinc15x0/include/atwinc15x0_params\.h:[0-9]+: warning: Member ATWINC15X0_PARAMS \(macro definition\) of file atwinc15x0_params\.h is not documented\.
 drivers/atwinc15x0/include/atwinc15x0_params\.h:[0-9]+: warning: Member ATWINC15X0_PARAM_CHIP_EN_PIN \(macro definition\) of file atwinc15x0_params\.h is not documented\.
 drivers/atwinc15x0/include/atwinc15x0_params\.h:[0-9]+: warning: Member ATWINC15X0_PARAM_IRQ_PIN \(macro definition\) of file atwinc15x0_params\.h is not documented\.
@@ -7322,7 +7209,6 @@ drivers/cc2420/include/cc2420_registers\.h:[0-9]+: warning: Member CC2420_STATUS
 drivers/cc2420/include/cc2420_registers\.h:[0-9]+: warning: Member CC2420_STATUS_TX_UNDERFLOW \(macro definition\) of file cc2420_registers\.h is not documented\.
 drivers/cc2420/include/cc2420_registers\.h:[0-9]+: warning: Member CC2420_STATUS_XOSC_STABLE \(macro definition\) of file cc2420_registers\.h is not documented\.
 drivers/cc2420/include/cc2420_registers\.h:[0-9]+: warning: Member CC2420_TXCTRL_PA_MASK \(macro definition\) of file cc2420_registers\.h is not documented\.
-drivers/cc2420/include/cc2420_registers\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/ccs811/include/ccs811_params\.h:[0-9]+: warning: Member CCS811_PARAMS \(macro definition\) of file ccs811_params\.h is not documented\.
 drivers/ccs811/include/ccs811_params\.h:[0-9]+: warning: Member CCS811_PARAM_I2C_ADDR \(macro definition\) of file ccs811_params\.h is not documented\.
 drivers/ccs811/include/ccs811_params\.h:[0-9]+: warning: Member CCS811_PARAM_I2C_DEV \(macro definition\) of file ccs811_params\.h is not documented\.
@@ -7362,7 +7248,6 @@ drivers/dac_dds/include/dac_dds_params\.h:[0-9]+: warning: Member DAC_DDS_PARAMS
 drivers/dac_dds/include/dac_dds_params\.h:[0-9]+: warning: Member DAC_DDS_PARAM_DAC \(macro definition\) of file dac_dds_params\.h is not documented\.
 drivers/dac_dds/include/dac_dds_params\.h:[0-9]+: warning: Member DAC_DDS_PARAM_TIMER \(macro definition\) of file dac_dds_params\.h is not documented\.
 drivers/dac_dds/include/dac_dds_params\.h:[0-9]+: warning: Member DAC_DDS_PARAM_TIMER_HZ \(macro definition\) of file dac_dds_params\.h is not documented\.
-drivers/dac_dds/include/dac_dds_params\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/dcf77/include/dcf77_params\.h:[0-9]+: warning: Member DCF77_PARAMS \(macro definition\) of file dcf77_params\.h is not documented\.
 drivers/dcf77/include/dcf77_params\.h:[0-9]+: warning: Member DCF77_PARAM_PIN \(macro definition\) of file dcf77_params\.h is not documented\.
 drivers/dcf77/include/dcf77_params\.h:[0-9]+: warning: Member DCF77_PARAM_PULL \(macro definition\) of file dcf77_params\.h is not documented\.
@@ -7444,7 +7329,6 @@ drivers/enc28j60/include/enc28j60_params\.h:[0-9]+: warning: Member ENC28J60_PAR
 drivers/enc28j60/include/enc28j60_params\.h:[0-9]+: warning: Member ENC28J60_PARAM_INT \(macro definition\) of file enc28j60_params\.h is not documented\.
 drivers/enc28j60/include/enc28j60_params\.h:[0-9]+: warning: Member ENC28J60_PARAM_RESET \(macro definition\) of file enc28j60_params\.h is not documented\.
 drivers/enc28j60/include/enc28j60_params\.h:[0-9]+: warning: Member ENC28J60_PARAM_SPI \(macro definition\) of file enc28j60_params\.h is not documented\.
-drivers/enc28j60/include/enc28j60_params\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/enc28j60/include/enc28j60_regs\.h:[0-9]+: warning: Member CMD_BFC \(macro definition\) of file enc28j60_regs\.h is not documented\.
 drivers/enc28j60/include/enc28j60_regs\.h:[0-9]+: warning: Member CMD_BFS \(macro definition\) of file enc28j60_regs\.h is not documented\.
 drivers/enc28j60/include/enc28j60_regs\.h:[0-9]+: warning: Member CMD_RBM \(macro definition\) of file enc28j60_regs\.h is not documented\.
@@ -7751,9 +7635,7 @@ drivers/encx24j600/include/encx24j600_defines\.h:[0-9]+: warning: Member ENC_WCR
 drivers/encx24j600/include/encx24j600_defines\.h:[0-9]+: warning: Member ENC_WGPDATA \(macro definition\) of file encx24j600_defines\.h is not documented\.
 drivers/encx24j600/include/encx24j600_defines\.h:[0-9]+: warning: Member ENC_WRXDATA \(macro definition\) of file encx24j600_defines\.h is not documented\.
 drivers/encx24j600/include/encx24j600_defines\.h:[0-9]+: warning: Member ENC_WUDADATA \(macro definition\) of file encx24j600_defines\.h is not documented\.
-drivers/encx24j600/include/encx24j600_defines\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/ethos/include/ethos_params\.h:[0-9]+: warning: Member ETHOS_PARAMS \(macro definition\) of file ethos_params\.h is not documented\.
-drivers/ethos/include/ethos_params\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/feetech/include/feetech_protocol\.h:[0-9]+: warning: Member FEETECH_START \(macro definition\) of file feetech_protocol\.h is not documented\.
 drivers/feetech/include/feetech_protocol\.h:[0-9]+: warning: Member feetech_intruction_t \(enumeration\) of file feetech_protocol\.h is not documented\.
 drivers/feetech/include/feetech_protocol\.h:[0-9]+: warning: Member scs15_baudrate_t \(enumeration\) of file feetech_protocol\.h is not documented\.
@@ -7990,7 +7872,6 @@ drivers/hmc5883l/include/hmc5883l_regs\.h:[0-9]+: warning: Member HMC5883L_REG_O
 drivers/hmc5883l/include/hmc5883l_regs\.h:[0-9]+: warning: Member HMC5883L_REG_OUT_Z_LSB \(macro definition\) of file hmc5883l_regs\.h is not documented\.
 drivers/hmc5883l/include/hmc5883l_regs\.h:[0-9]+: warning: Member HMC5883L_REG_OUT_Z_MSB \(macro definition\) of file hmc5883l_regs\.h is not documented\.
 drivers/hmc5883l/include/hmc5883l_regs\.h:[0-9]+: warning: Member HMC5883L_REG_STATUS \(macro definition\) of file hmc5883l_regs\.h is not documented\.
-drivers/hmc5883l/include/hmc5883l_regs\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/hsc/include/hsc_params\.h:[0-9]+: warning: Member HSC_PARAMS \(macro definition\) of file hsc_params\.h is not documented\.
 drivers/hsc/include/hsc_params\.h:[0-9]+: warning: Member HSC_PARAM_I2C_ADDR \(macro definition\) of file hsc_params\.h is not documented\.
 drivers/hsc/include/hsc_params\.h:[0-9]+: warning: Member HSC_PARAM_I2C_DEV \(macro definition\) of file hsc_params\.h is not documented\.
@@ -8025,7 +7906,6 @@ drivers/hts221/include/hts221_regs\.h:[0-9]+: warning: Member HTS221_REGS_T1_T0_
 drivers/hts221/include/hts221_regs\.h:[0-9]+: warning: Member HTS221_REGS_TEMP_OUT_H \(macro definition\) of file hts221_regs\.h is not documented\.
 drivers/hts221/include/hts221_regs\.h:[0-9]+: warning: Member HTS221_REGS_TEMP_OUT_L \(macro definition\) of file hts221_regs\.h is not documented\.
 drivers/hts221/include/hts221_regs\.h:[0-9]+: warning: Member HTS221_REGS_WHO_AM_I \(macro definition\) of file hts221_regs\.h is not documented\.
-drivers/ili9341/include/ili9341_disp_dev\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/ili9341/include/ili9341_params\.h:[0-9]+: warning: Member ILI9341_PARAMS \(macro definition\) of file ili9341_params\.h is not documented\.
 drivers/ili9341/include/ili9341_params\.h:[0-9]+: warning: Member ILI9341_PARAM_CS \(macro definition\) of file ili9341_params\.h is not documented\.
 drivers/ili9341/include/ili9341_params\.h:[0-9]+: warning: Member ILI9341_PARAM_DCX \(macro definition\) of file ili9341_params\.h is not documented\.
@@ -8037,7 +7917,6 @@ drivers/ili9341/include/ili9341_params\.h:[0-9]+: warning: Member ILI9341_PARAM_
 drivers/ili9341/include/ili9341_params\.h:[0-9]+: warning: Member ILI9341_PARAM_SPI \(macro definition\) of file ili9341_params\.h is not documented\.
 drivers/ili9341/include/ili9341_params\.h:[0-9]+: warning: Member ILI9341_PARAM_SPI_CLK \(macro definition\) of file ili9341_params\.h is not documented\.
 drivers/ili9341/include/ili9341_params\.h:[0-9]+: warning: Member ILI9341_PARAM_SPI_MODE \(macro definition\) of file ili9341_params\.h is not documented\.
-drivers/ili9341/include/ili9341_params\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/ina2xx/include/ina2xx_params\.h:[0-9]+: warning: Member INA2XX_PARAMS \(macro definition\) of file ina2xx_params\.h is not documented\.
 drivers/ina2xx/include/ina2xx_params\.h:[0-9]+: warning: Member INA2XX_SAULINFO \(macro definition\) of file ina2xx_params\.h is not documented\.
 drivers/include/adt7310\.h:[0-9]+: warning: Member ADT7310_CONF_CT_POL\(x\) \(macro definition\) of group drivers_adt7310 is not documented\.
@@ -8102,11 +7981,9 @@ drivers/include/at86rf215\.h:[0-9]+: warning: Member CONFIG_AT86RF215_RPC_EN \(m
 drivers/include/at86rf215\.h:[0-9]+: warning: Member at86rf215_clko_cur_t \(enumeration\) of group drivers_at86rf215 is not documented\.
 drivers/include/at86rf215\.h:[0-9]+: warning: Member at86rf215_clko_freq_t \(enumeration\) of group drivers_at86rf215 is not documented\.
 drivers/include/at86rf215\.h:[0-9]+: warning: Member at86rf215_state_t \(enumeration\) of group drivers_at86rf215 is not documented\.
-drivers/include/at86rf215\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/include/at86rf2xx\.h:[0-9]+: warning: Member AT86RF2XX_DEFAULT_CHANNEL \(macro definition\) of group drivers_at86rf2xx is not documented\.
 drivers/include/at86rf2xx\.h:[0-9]+: warning: Member AT86RF2XX_MAX_CHANNEL \(macro definition\) of group drivers_at86rf2xx is not documented\.
 drivers/include/at86rf2xx\.h:[0-9]+: warning: Member AT86RF2XX_MIN_CHANNEL \(macro definition\) of group drivers_at86rf2xx is not documented\.
-drivers/include/at86rf2xx\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/include/bh1900nux\.h:[0-9]+: warning: Member BH1900NUX_REG_ADDR \(macro definition\) of group drivers_bh1900nux is not documented\.
 drivers/include/candev_mcp2515\.h:[0-9]+: warning: Member MCP2515_FILTERS \(macro definition\) of group drivers_mcp2515 is not documented\.
 drivers/include/candev_mcp2515\.h:[0-9]+: warning: Member MCP2515_FILTERS_MB0 \(macro definition\) of group drivers_mcp2515 is not documented\.
@@ -8197,7 +8074,6 @@ drivers/include/lis3dh\.h:[0-9]+: warning: Member LIS3DH_REG_TIME_LATENCY \(macr
 drivers/include/lis3dh\.h:[0-9]+: warning: Member LIS3DH_REG_TIME_LIMIT \(macro definition\) of group drivers_lis3dh is not documented\.
 drivers/include/lis3dh\.h:[0-9]+: warning: Member LIS3DH_REG_TIME_WINDOW \(macro definition\) of group drivers_lis3dh is not documented\.
 drivers/include/lis3dh\.h:[0-9]+: warning: Member LIS3DH_REG_WHO_AM_I \(macro definition\) of group drivers_lis3dh is not documented\.
-drivers/include/lm75\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/include/lsm303dlhc\.h:[0-9]+: warning: Member LSM303DLHC_ACC_DEFAULT_ADDRESS \(macro definition\) of group drivers_lsm303dlhc is not documented\.
 drivers/include/lsm303dlhc\.h:[0-9]+: warning: Member LSM303DLHC_MAG_DEFAULT_ADDRESS \(macro definition\) of group drivers_lsm303dlhc is not documented\.
 drivers/include/mma7660\.h:[0-9]+: warning: Member MMA7660_ADDR \(macro definition\) of group drivers_mma7660 is not documented\.
@@ -8254,7 +8130,6 @@ drivers/include/sx127x\.h:[0-9]+: warning: Member SX127X_ENABLE_FIXED_HEADER_LEN
 drivers/include/sx127x\.h:[0-9]+: warning: Member SX127X_IQ_INVERTED_FLAG \(macro definition\) of group drivers_sx127x is not documented\.
 drivers/include/sx127x\.h:[0-9]+: warning: Member SX127X_LOW_DATARATE_OPTIMIZE_FLAG \(macro definition\) of group drivers_sx127x is not documented\.
 drivers/include/sx127x\.h:[0-9]+: warning: Member SX127X_RX_CONTINUOUS_FLAG \(macro definition\) of group drivers_sx127x is not documented\.
-drivers/include/tmp00x\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/include/tsl2561\.h:[0-9]+: warning: Member TSL2561_ADDR_FLOAT \(macro definition\) of group drivers_tsl2561 is not documented\.
 drivers/include/tsl2561\.h:[0-9]+: warning: Member TSL2561_ADDR_HIGH \(macro definition\) of group drivers_tsl2561 is not documented\.
 drivers/include/tsl2561\.h:[0-9]+: warning: Member TSL2561_ADDR_LOW \(macro definition\) of group drivers_tsl2561 is not documented\.
@@ -8275,7 +8150,6 @@ drivers/include/tsl4531x\.h:[0-9]+: warning: Member TSL45315_PARTNO \(macro defi
 drivers/include/tsl4531x\.h:[0-9]+: warning: Member TSL45317_ADDR \(macro definition\) of group drivers_tsl4531x is not documented\.
 drivers/include/tsl4531x\.h:[0-9]+: warning: Member TSL45317_PARTNO \(macro definition\) of group drivers_tsl4531x is not documented\.
 drivers/include/usbdev_mock\.h:[0-9]+: warning: Member usbdev_mock_ep_state_t \(enumeration\) of group drivers_usbdev_mock is not documented\.
-drivers/include/usbdev_mock\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/include/w5100\.h:[0-9]+: warning: end of file while inside a group
 drivers/io1_xplained/include/io1_xplained_internals\.h:[0-9]+: warning: Member IO1_GPIO1_PIN \(macro definition\) of file io1_xplained_internals\.h is not documented\.
 drivers/io1_xplained/include/io1_xplained_internals\.h:[0-9]+: warning: Member IO1_GPIO2_PIN \(macro definition\) of file io1_xplained_internals\.h is not documented\.
@@ -8373,7 +8247,6 @@ drivers/itg320x/include/itg320x_regs\.h:[0-9]+: warning: Member ITG320X_REG_SMPL
 drivers/itg320x/include/itg320x_regs\.h:[0-9]+: warning: Member ITG320X_REG_TEMP_OUT_H \(macro definition\) of file itg320x_regs\.h is not documented\.
 drivers/itg320x/include/itg320x_regs\.h:[0-9]+: warning: Member ITG320X_REG_TEMP_OUT_L \(macro definition\) of file itg320x_regs\.h is not documented\.
 drivers/itg320x/include/itg320x_regs\.h:[0-9]+: warning: Member ITG320X_REG_WHO_AM_I \(macro definition\) of file itg320x_regs\.h is not documented\.
-drivers/itg320x/include/itg320x_regs\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/jc42/include/jc42_internal\.h:[0-9]+: warning: Member JC42_BUS_FREE_TIME_US \(macro definition\) of file jc42_internal\.h is not documented\.
 drivers/jc42/include/jc42_internal\.h:[0-9]+: warning: Member JC42_REG_CAP \(macro definition\) of file jc42_internal\.h is not documented\.
 drivers/jc42/include/jc42_internal\.h:[0-9]+: warning: Member JC42_REG_CONFIG \(macro definition\) of file jc42_internal\.h is not documented\.
@@ -8664,7 +8537,6 @@ drivers/l3g4200d/include/l3g4200d\-regs\.h:[0-9]+: warning: Member L3G4200D_REG_
 drivers/l3g4200d/include/l3g4200d\-regs\.h:[0-9]+: warning: Member L3G4200D_REG_REF \(macro definition\) of file l3g4200d\-regs\.h is not documented\.
 drivers/l3g4200d/include/l3g4200d\-regs\.h:[0-9]+: warning: Member L3G4200D_REG_STATUS \(macro definition\) of file l3g4200d\-regs\.h is not documented\.
 drivers/l3g4200d/include/l3g4200d\-regs\.h:[0-9]+: warning: Member L3G4200D_REG_WHO_AM_I \(macro definition\) of file l3g4200d\-regs\.h is not documented\.
-drivers/l3g4200d/include/l3g4200d\-regs\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/l3g4200d/include/l3g4200d_params\.h:[0-9]+: warning: Member L3G4200D_PARAMS \(macro definition\) of file l3g4200d_params\.h is not documented\.
 drivers/l3g4200d/include/l3g4200d_params\.h:[0-9]+: warning: Member L3G4200D_PARAM_ADDR \(macro definition\) of file l3g4200d_params\.h is not documented\.
 drivers/l3g4200d/include/l3g4200d_params\.h:[0-9]+: warning: Member L3G4200D_PARAM_I2C \(macro definition\) of file l3g4200d_params\.h is not documented\.
@@ -8676,7 +8548,6 @@ drivers/l3g4200d/include/l3g4200d_params\.h:[0-9]+: warning: Member L3G4200D_SAU
 drivers/lc709203f/include/lc709203f_params\.h:[0-9]+: warning: Member LC709203F_PARAMS \(macro definition\) of file lc709203f_params\.h is not documented\.
 drivers/lc709203f/include/lc709203f_params\.h:[0-9]+: warning: Member LC709203F_PARAMS_ADDR \(macro definition\) of file lc709203f_params\.h is not documented\.
 drivers/lc709203f/include/lc709203f_params\.h:[0-9]+: warning: Member LC709203F_PARAMS_ALARM_PIN \(macro definition\) of file lc709203f_params\.h is not documented\.
-drivers/lc709203f/include/lc709203f_params\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/lis2dh12/include/lis2dh12_params\.h:[0-9]+: warning: Member LIS2DH12_PARAMS \(macro definition\) of file lis2dh12_params\.h is not documented\.
 drivers/lis2dh12/include/lis2dh12_params\.h:[0-9]+: warning: Member LIS2DH12_PARAMS_BUSCFG \(macro definition\) of file lis2dh12_params\.h is not documented\.
 drivers/lis2dh12/include/lis2dh12_params\.h:[0-9]+: warning: Member LIS2DH12_PARAM_ADDR \(macro definition\) of file lis2dh12_params\.h is not documented\.
@@ -8785,7 +8656,6 @@ drivers/lis3mdl/include/lis3mdl\-internal\.h:[0-9]+: warning: Member LIS3MDL_OUT
 drivers/lis3mdl/include/lis3mdl\-internal\.h:[0-9]+: warning: Member LIS3MDL_STATUS_REG \(macro definition\) of file lis3mdl\-internal\.h is not documented\.
 drivers/lis3mdl/include/lis3mdl\-internal\.h:[0-9]+: warning: Member LIS3MDL_TEMP_OUT_H_REG \(macro definition\) of file lis3mdl\-internal\.h is not documented\.
 drivers/lis3mdl/include/lis3mdl\-internal\.h:[0-9]+: warning: Member LIS3MDL_TEMP_OUT_L_REG \(macro definition\) of file lis3mdl\-internal\.h is not documented\.
-drivers/lis3mdl/include/lis3mdl\-internal\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/lis3mdl/include/lis3mdl_params\.h:[0-9]+: warning: Member LIS3MDL_PARAMS \(macro definition\) of file lis3mdl_params\.h is not documented\.
 drivers/lis3mdl/include/lis3mdl_params\.h:[0-9]+: warning: Member LIS3MDL_PARAM_ADDR \(macro definition\) of file lis3mdl_params\.h is not documented\.
 drivers/lis3mdl/include/lis3mdl_params\.h:[0-9]+: warning: Member LIS3MDL_PARAM_I2C \(macro definition\) of file lis3mdl_params\.h is not documented\.
@@ -8795,8 +8665,6 @@ drivers/lis3mdl/include/lis3mdl_params\.h:[0-9]+: warning: Member LIS3MDL_PARAM_
 drivers/lis3mdl/include/lis3mdl_params\.h:[0-9]+: warning: Member LIS3MDL_PARAM_XYMODE \(macro definition\) of file lis3mdl_params\.h is not documented\.
 drivers/lis3mdl/include/lis3mdl_params\.h:[0-9]+: warning: Member LIS3MDL_PARAM_ZMODE \(macro definition\) of file lis3mdl_params\.h is not documented\.
 drivers/lis3mdl/include/lis3mdl_params\.h:[0-9]+: warning: Member LIS3MDL_SAUL_INFO \(macro definition\) of file lis3mdl_params\.h is not documented\.
-drivers/lm75/include/lm75_params\.h:[0-9]+: warning: unbalanced grouping commands
-drivers/lm75/include/lm75_regs\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/lpd8808/include/lpd8808_params\.h:[0-9]+: warning: Member LPD8808_PARAMS \(macro definition\) of file lpd8808_params\.h is not documented\.
 drivers/lpd8808/include/lpd8808_params\.h:[0-9]+: warning: Member LPD8808_PARAM_LED_CNT \(macro definition\) of file lpd8808_params\.h is not documented\.
 drivers/lpd8808/include/lpd8808_params\.h:[0-9]+: warning: Member LPD8808_PARAM_PIN_CLK \(macro definition\) of file lpd8808_params\.h is not documented\.
@@ -8901,7 +8769,6 @@ drivers/lsm303dlhc/include/lsm303dlhc\-internal\.h:[0-9]+: warning: Member LSM30
 drivers/lsm303dlhc/include/lsm303dlhc\-internal\.h:[0-9]+: warning: Member LSM303DLHC_TEMP_SAMPLE_3HZ \(macro definition\) of file lsm303dlhc\-internal\.h is not documented\.
 drivers/lsm303dlhc/include/lsm303dlhc\-internal\.h:[0-9]+: warning: Member LSM303DLHC_TEMP_SAMPLE_75HZ \(macro definition\) of file lsm303dlhc\-internal\.h is not documented\.
 drivers/lsm303dlhc/include/lsm303dlhc\-internal\.h:[0-9]+: warning: Member LSM303DLHC_TEMP_SAMPLE_7_5HZ \(macro definition\) of file lsm303dlhc\-internal\.h is not documented\.
-drivers/lsm303dlhc/include/lsm303dlhc\-internal\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/lsm303dlhc/include/lsm303dlhc_params\.h:[0-9]+: warning: Member LSM303DLHC_PARAMS \(macro definition\) of file lsm303dlhc_params\.h is not documented\.
 drivers/lsm303dlhc/include/lsm303dlhc_params\.h:[0-9]+: warning: Member LSM303DLHC_PARAM_ACC_ADDR \(macro definition\) of file lsm303dlhc_params\.h is not documented\.
 drivers/lsm303dlhc/include/lsm303dlhc_params\.h:[0-9]+: warning: Member LSM303DLHC_PARAM_ACC_PIN \(macro definition\) of file lsm303dlhc_params\.h is not documented\.
@@ -9065,7 +8932,6 @@ drivers/mcp2515/include/mcp2515_params\.h:[0-9]+: warning: Member MCP2515_PARAM_
 drivers/mcp2515/include/mcp2515_params\.h:[0-9]+: warning: Member MCP2515_PARAM_SPI \(macro definition\) of file mcp2515_params\.h is not documented\.
 drivers/mcp2515/include/mcp2515_params\.h:[0-9]+: warning: Member MCP2515_PARAM_SPI_CLK \(macro definition\) of file mcp2515_params\.h is not documented\.
 drivers/mcp2515/include/mcp2515_params\.h:[0-9]+: warning: Member MCP2515_PARAM_SPI_MODE \(macro definition\) of file mcp2515_params\.h is not documented\.
-drivers/mcp2515/include/mcp2515_params\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_BFPCTRL \(macro definition\) of file mcp2515_defines\.h is not documented\.
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_BFPCTRL_B0BFE \(macro definition\) of file mcp2515_defines\.h is not documented\.
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_BFPCTRL_B0BFM \(macro definition\) of file mcp2515_defines\.h is not documented\.
@@ -9335,13 +9201,11 @@ drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_TXRTSCTRL_B1R
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_TXRTSCTRL_B1RTSM \(macro definition\) of file mcp2515_defines\.h is not documented\.
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_TXRTSCTRL_B2RTS \(macro definition\) of file mcp2515_defines\.h is not documented\.
 drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: Member MCP2515_TXRTSCTRL_B2RTSM \(macro definition\) of file mcp2515_defines\.h is not documented\.
-drivers/mcp2515/mcp2515_defines\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/mhz19/include/mhz19_internals\.h:[0-9]+: warning: Member MHZ19_BUF_SIZE \(macro definition\) of file mhz19_internals\.h is not documented\.
 drivers/mhz19/include/mhz19_internals\.h:[0-9]+: warning: Member MHZ19_TIMEOUT_CMD \(macro definition\) of file mhz19_internals\.h is not documented\.
 drivers/mhz19/include/mhz19_internals\.h:[0-9]+: warning: Member MHZ19_TIMEOUT_READ \(macro definition\) of file mhz19_internals\.h is not documented\.
 drivers/mhz19/include/mhz19_internals\.h:[0-9]+: warning: Member MHZ19_UART_BAUDRATE \(macro definition\) of file mhz19_internals\.h is not documented\.
 drivers/mhz19/include/mhz19_params\.h:[0-9]+: warning: Member MHZ19_SAUL_INFO \(macro definition\) of file mhz19_params\.h is not documented\.
-drivers/mhz19/include/mhz19_params\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/mma7660/include/mma7660_params\.h:[0-9]+: warning: Member MMA7660_PARAMS \(macro definition\) of file mma7660_params\.h is not documented\.
 drivers/mma7660/include/mma7660_params\.h:[0-9]+: warning: Member MMA7660_PARAM_ADDR \(macro definition\) of file mma7660_params\.h is not documented\.
 drivers/mma7660/include/mma7660_params\.h:[0-9]+: warning: Member MMA7660_PARAM_AMSR \(macro definition\) of file mma7660_params\.h is not documented\.
@@ -9879,7 +9743,6 @@ drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF24J40_
 drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF24J40_WAKECON_REGWAKE \(macro definition\) of file mrf24j40_registers\.h is not documented\.
 drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF24J40_WAKEUP_DELAY \(macro definition\) of file mrf24j40_registers\.h is not documented\.
 drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF25J40_BBREG2_CCAMODE1 \(macro definition\) of file mrf24j40_registers\.h is not documented\.
-drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/nrf24l01p/include/nrf24l01p_settings\.h:[0-9]+: warning: Member ALL_INT_MASK \(macro definition\) of file nrf24l01p_settings\.h is not documented\.
 drivers/nrf24l01p/include/nrf24l01p_settings\.h:[0-9]+: warning: Member CMD_FLUSH_RX \(macro definition\) of file nrf24l01p_settings\.h is not documented\.
 drivers/nrf24l01p/include/nrf24l01p_settings\.h:[0-9]+: warning: Member CMD_FLUSH_TX \(macro definition\) of file nrf24l01p_settings\.h is not documented\.
@@ -9963,12 +9826,10 @@ drivers/nrf24l01p/include/nrf24l01p_settings\.h:[0-9]+: warning: Member RX_DR \(
 drivers/nrf24l01p/include/nrf24l01p_settings\.h:[0-9]+: warning: Member RX_P_NO \(macro definition\) of file nrf24l01p_settings\.h is not documented\.
 drivers/nrf24l01p/include/nrf24l01p_settings\.h:[0-9]+: warning: Member TX_DS \(macro definition\) of file nrf24l01p_settings\.h is not documented\.
 drivers/nrf24l01p/include/nrf24l01p_settings\.h:[0-9]+: warning: Member TX_FULL \(macro definition\) of file nrf24l01p_settings\.h is not documented\.
-drivers/nrf24l01p/include/nrf24l01p_settings\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/opt3001/include/opt3001_params\.h:[0-9]+: warning: Member OPT3001_PARAMS \(macro definition\) of file opt3001_params\.h is not documented\.
 drivers/opt3001/include/opt3001_params\.h:[0-9]+: warning: Member OPT3001_PARAM_I2C_ADDR \(macro definition\) of file opt3001_params\.h is not documented\.
 drivers/opt3001/include/opt3001_params\.h:[0-9]+: warning: Member OPT3001_PARAM_I2C_DEV \(macro definition\) of file opt3001_params\.h is not documented\.
 drivers/opt3001/include/opt3001_params\.h:[0-9]+: warning: Member OPT3001_SAUL_INFO \(macro definition\) of file opt3001_params\.h is not documented\.
-drivers/opt3001/include/opt3001_regs\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/pca9633/include/pca9633_params\.h:[0-9]+: warning: Member PCA9633_PARAMS \(macro definition\) of file pca9633_params\.h is not documented\.
 drivers/pca9685/include/pca9685_params\.h:[0-9]+: warning: Member PCA9685_PARAMS \(macro definition\) of file pca9685_params\.h is not documented\.
 drivers/pca9685/include/pca9685_regs\.h:[0-9]+: warning: Member PCA9685_ALL_LED_OFF \(macro definition\) of file pca9685_regs\.h is not documented\.
@@ -10151,7 +10012,6 @@ drivers/sds011/include/sds011_internal\.h:[0-9]+: warning: Member SDS011_FRAME_S
 drivers/sds011/include/sds011_internal\.h:[0-9]+: warning: Member SDS011_FRAME_TAIL \(macro definition\) of file sds011_internal\.h is not documented\.
 drivers/sds011/include/sds011_internal\.h:[0-9]+: warning: Member SDS011_RCMDID_DATA \(macro definition\) of file sds011_internal\.h is not documented\.
 drivers/sds011/include/sds011_internal\.h:[0-9]+: warning: Member SDS011_RCMDID_REPLY \(macro definition\) of file sds011_internal\.h is not documented\.
-drivers/sds011/include/sds011_internal\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/sds011/include/sds011_params\.h:[0-9]+: warning: Member SDS011_PARAMS \(macro definition\) of file sds011_params\.h is not documented\.
 drivers/sds011/include/sds011_params\.h:[0-9]+: warning: Member SDS011_PARAM_PWR_PIN \(macro definition\) of file sds011_params\.h is not documented\.
 drivers/sds011/include/sds011_params\.h:[0-9]+: warning: Member SDS011_PARAM_PWR_PIN_AH \(macro definition\) of file sds011_params\.h is not documented\.
@@ -10471,14 +10331,12 @@ drivers/srf04/include/srf04_params\.h:[0-9]+: warning: Member SRF04_PARAM_TRIGGE
 drivers/srf08/include/srf08_params\.h:[0-9]+: warning: Member SRF08_PARAMS \(macro definition\) of file srf08_params\.h is not documented\.
 drivers/srf08/include/srf08_params\.h:[0-9]+: warning: Member SRF08_PARAM_ADDR \(macro definition\) of file srf08_params\.h is not documented\.
 drivers/srf08/include/srf08_params\.h:[0-9]+: warning: Member SRF08_PARAM_I2C \(macro definition\) of file srf08_params\.h is not documented\.
-drivers/stmpe811/include/stmpe811_constants\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/stmpe811/include/stmpe811_params\.h:[0-9]+: warning: Member STMPE811_PARAMS \(macro definition\) of file stmpe811_params\.h is not documented\.
 drivers/stmpe811/include/stmpe811_params\.h:[0-9]+: warning: Member STMPE811_PARAM_ADDR \(macro definition\) of file stmpe811_params\.h is not documented\.
 drivers/stmpe811/include/stmpe811_params\.h:[0-9]+: warning: Member STMPE811_PARAM_I2C_DEV \(macro definition\) of file stmpe811_params\.h is not documented\.
 drivers/stmpe811/include/stmpe811_params\.h:[0-9]+: warning: Member STMPE811_PARAM_INT_PIN \(macro definition\) of file stmpe811_params\.h is not documented\.
 drivers/stmpe811/include/stmpe811_params\.h:[0-9]+: warning: Member STMPE811_PARAM_XMAX \(macro definition\) of file stmpe811_params\.h is not documented\.
 drivers/stmpe811/include/stmpe811_params\.h:[0-9]+: warning: Member STMPE811_PARAM_YMAX \(macro definition\) of file stmpe811_params\.h is not documented\.
-drivers/stmpe811/include/stmpe811_touch_dev\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 drivers/sx126x/include/sx126x_params\.h:[0-9]+: warning: Member SX126X_PARAMS \(macro definition\) of file sx126x_params\.h is not documented\.
 drivers/sx126x/include/sx126x_params\.h:[0-9]+: warning: Member SX126X_PARAM_BUSY \(macro definition\) of file sx126x_params\.h is not documented\.
 drivers/sx126x/include/sx126x_params\.h:[0-9]+: warning: Member SX126X_PARAM_DIO1 \(macro definition\) of file sx126x_params\.h is not documented\.
@@ -11726,7 +11584,6 @@ drivers/vcnl40x0/include/vcnl40x0_internals\.h:[0-9]+: warning: Member VCNL40X0_
 drivers/vcnl40x0/include/vcnl40x0_internals\.h:[0-9]+: warning: Member VCNL40X0_REG_PROXIMITY_RATE \(macro definition\) of file vcnl40x0_internals\.h is not documented\.
 drivers/vcnl40x0/include/vcnl40x0_internals\.h:[0-9]+: warning: Member VCNL40X0_REG_PROXIMITY_VALUE \(macro definition\) of file vcnl40x0_internals\.h is not documented\.
 drivers/vcnl40x0/include/vcnl40x0_internals\.h:[0-9]+: warning: Member VCNL40X0_REG_PROX_TIMING \(macro definition\) of file vcnl40x0_internals\.h is not documented\.
-drivers/vcnl40x0/include/vcnl40x0_internals\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/vcnl40x0/include/vcnl40x0_params\.h:[0-9]+: warning: Member VCNL40X0_PARAMS \(macro definition\) of file vcnl40x0_params\.h is not documented\.
 drivers/vcnl40x0/include/vcnl40x0_params\.h:[0-9]+: warning: Member VCNL40X0_PARAM_AMBIENT_AVG \(macro definition\) of file vcnl40x0_params\.h is not documented\.
 drivers/vcnl40x0/include/vcnl40x0_params\.h:[0-9]+: warning: Member VCNL40X0_PARAM_AMBIENT_RATE \(macro definition\) of file vcnl40x0_params\.h is not documented\.
@@ -11739,7 +11596,6 @@ drivers/veml6070/include/veml6070_params\.h:[0-9]+: warning: Member VEML6070_PAR
 drivers/veml6070/include/veml6070_params\.h:[0-9]+: warning: Member VEML6070_PARAM_ITIME \(macro definition\) of file veml6070_params\.h is not documented\.
 drivers/veml6070/include/veml6070_params\.h:[0-9]+: warning: Member VEML6070_SAUL_INFO \(macro definition\) of file veml6070_params\.h is not documented\.
 drivers/w5100/include/w5100_params\.h:[0-9]+: warning: Member W5100_PARAMS \(macro definition\) of file w5100_params\.h is not documented\.
-drivers/w5100/include/w5100_params\.h:[0-9]+: warning: unbalanced grouping commands
 drivers/w5100/include/w5100_regs\.h:[0-9]+: warning: Member CMD_READ \(macro definition\) of file w5100_regs\.h is not documented\.
 drivers/w5100/include/w5100_regs\.h:[0-9]+: warning: Member CMD_WRITE \(macro definition\) of file w5100_regs\.h is not documented\.
 drivers/ws281x/include/ws281x_constants\.h:[0-9]+: warning: Member WS281X_T_DATA_ZERO_NS \(macro definition\) of file ws281x_constants\.h is not documented\.
@@ -11766,7 +11622,6 @@ pkg/fatfs/fatfs_diskio/mtd/include/fatfs_diskio_mtd\.h:[0-9]+: warning: Member F
 pkg/fatfs/fatfs_diskio/mtd/include/fatfs_diskio_mtd\.h:[0-9]+: warning: Member FATFS_DISKIO_FATTIME_YEAR_OFFS \(macro definition\) of group pkg_fatfs is not documented\.
 pkg/fatfs/fatfs_diskio/mtd/include/fatfs_diskio_mtd\.h:[0-9]+: warning: Member FATFS_YEAR_OFFSET \(macro definition\) of group pkg_fatfs is not documented\.
 pkg/fatfs/fatfs_diskio/mtd/include/fatfs_diskio_mtd\.h:[0-9]+: warning: Member FIXED_BLOCK_SIZE \(macro definition\) of group pkg_fatfs is not documented\.
-pkg/lua/contrib/binsearch\.h:[0-9]+: warning: unbalanced grouping commands
 pkg/lua/include/lua_run\.h:[0-9]+: warning: Member LUAR_LOAD_ALL \(macro definition\) of file lua_run\.h is not documented\.
 pkg/lua/include/lua_run\.h:[0-9]+: warning: Member LUAR_LOAD_NONE \(macro definition\) of file lua_run\.h is not documented\.
 pkg/lvgl/include/lv_conf\.h:[0-9]+: warning: Member LV_ANTIALIAS \(macro definition\) of group pkg_lvgl is not documented\.
@@ -11941,12 +11796,10 @@ pkg/lvgl/include/lv_conf\.h:[0-9]+: warning: Member lv_font_user_data_t \(typede
 pkg/lvgl/include/lv_conf\.h:[0-9]+: warning: Member lv_group_user_data_t \(typedef\) of group pkg_lvgl is not documented\.
 pkg/lvgl/include/lv_conf\.h:[0-9]+: warning: Member lv_img_decoder_user_data_t \(typedef\) of group pkg_lvgl is not documented\.
 pkg/lvgl/include/lv_conf\.h:[0-9]+: warning: Member lv_indev_drv_user_data_t \(typedef\) of group pkg_lvgl is not documented\.
-pkg/lvgl/include/lvgl_riot\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 pkg/lvgl/include/lvgl_riot_conf\.h:[0-9]+: warning: Member LV_TICK_CUSTOM \(macro definition\) of file lvgl_riot_conf\.h is not documented\.
 pkg/lvgl/include/lvgl_riot_conf\.h:[0-9]+: warning: Member LV_TICK_CUSTOM_INCLUDE \(macro definition\) of file lvgl_riot_conf\.h is not documented\.
 pkg/lvgl/include/lvgl_riot_conf\.h:[0-9]+: warning: Member LV_TICK_CUSTOM_SYS_TIME_EXPR \(macro definition\) of file lvgl_riot_conf\.h is not documented\.
 pkg/lvgl/include/lvgl_riot_conf\.h:[0-9]+: warning: Member lv_coord_t \(typedef\) of file lvgl_riot_conf\.h is not documented\.
-pkg/lvgl/include/lvgl_riot_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 pkg/lwip/include/arch/cc\.h:[0-9]+: warning: Member LWIP_PLATFORM_ASSERT\(x\) \(macro definition\) of group pkg_lwip_sys is not documented\.
 pkg/lwip/include/arch/cc\.h:[0-9]+: warning: Member LWIP_PLATFORM_DIAG\(x\) \(macro definition\) of group pkg_lwip_sys is not documented\.
 pkg/lwip/include/arch/cc\.h:[0-9]+: warning: Member PACK_STRUCT_BEGIN \(macro definition\) of group pkg_lwip_sys is not documented\.
@@ -11979,8 +11832,6 @@ pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_sem_set_invalid\(s
 pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_sem_valid\(sem\) \(macro definition\) of file sys_arch\.h is not documented\.
 pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_sem_valid\(sys_sem_t \*sem\) \(function\) of file sys_arch\.h is not documented\.
 pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_unlock_tcpip_core\(void\) \(function\) of file sys_arch\.h is not documented\.
-pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: unbalanced grouping commands
-pkg/lwip/include/lwip/sock_internal\.h:[0-9]+: warning: unbalanced grouping commands
 pkg/lwip/include/lwip_init_devs\.h:[0-9]+: warning: Member lwip_netif_init_devs\(void\) \(function\) of file lwip_init_devs\.h is not documented\.
 pkg/lwip/include/lwip_init_devs\.h:[0-9]+: warning: Member lwip_netif_setup_func_t\)\(void\) \(typedef\) of file lwip_init_devs\.h is not documented\.
 pkg/lwip/include/lwipopts\.h:[0-9]+: warning: Member LWIP_6LOWPAN \(macro definition\) of group pkg_lwip_opts is not documented\.
@@ -12097,9 +11948,7 @@ pkg/openwsn/include/openwsn_log\.h:[0-9]+: warning: Member LOG_RIOT_DEBUG\(\.\.\
 pkg/openwsn/include/openwsn_log\.h:[0-9]+: warning: Member LOG_RIOT_ERROR\(\.\.\.\) \(macro definition\) of file openwsn_log\.h is not documented\.
 pkg/openwsn/include/openwsn_log\.h:[0-9]+: warning: Member LOG_RIOT_INFO\(\.\.\.\) \(macro definition\) of file openwsn_log\.h is not documented\.
 pkg/openwsn/include/openwsn_log\.h:[0-9]+: warning: Member LOG_RIOT_WARNING\(\.\.\.\) \(macro definition\) of file openwsn_log\.h is not documented\.
-pkg/openwsn/include/openwsn_radio\.h:[0-9]+: warning: unbalanced grouping commands
 pkg/tlsf/contrib/tlsf\-malloc\-internal\.h:[0-9]+: warning: Member tlsf_malloc_gheap \(variable\) of file tlsf\-malloc\-internal\.h is not documented\.
-pkg/tlsf/contrib/tlsf\-malloc\-internal\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 pkg/uwb\-core/include/dpl/dpl_os\.h:[0-9]+: warning: Member DPL_ASSERT_CRITICAL\(\) \(macro definition\) of file dpl_os\.h is not documented\.
 pkg/uwb\-core/include/dpl/dpl_os\.h:[0-9]+: warning: Member DPL_ENTER_CRITICAL\(_sr\) \(macro definition\) of file dpl_os\.h is not documented\.
 pkg/uwb\-core/include/dpl/dpl_os\.h:[0-9]+: warning: Member DPL_EXIT_CRITICAL\(_sr\) \(macro definition\) of file dpl_os\.h is not documented\.
@@ -12156,7 +12005,6 @@ pkg/uwb\-dw1000/include/uwb_dw1000_params\.h:[0-9]+: warning: Member DW1000_SPI_
 pkg/uwb\-dw1000/include/uwb_dw1000_params\.h:[0-9]+: warning: Member DW1000_SPI_SEM \(macro definition\) of file uwb_dw1000_params\.h is not documented\.
 pkg/uwb\-dw1000/include/uwb_dw1000_params\.h:[0-9]+: warning: Member DW1000_TX_ANTENNA_DELAY \(macro definition\) of file uwb_dw1000_params\.h is not documented\.
 pkg/uwb\-dw1000/include/uwb_dw1000_params\.h:[0-9]+: warning: Member sem_spi \(variable\) of file uwb_dw1000_params\.h is not documented\.
-pkg/wakaama/include/lwm2m_client_config\.h:[0-9]+: warning: unbalanced grouping commands
 pkg/wakaama/include/lwm2m_client_connection\.h:[0-9]+: warning: Member SCHEME_COAP \(macro definition\) of file lwm2m_client_connection\.h is not documented\.
 pkg/wakaama/include/lwm2m_client_connection\.h:[0-9]+: warning: Member SCHEME_COAPS \(macro definition\) of file lwm2m_client_connection\.h is not documented\.
 sys/arduino/include/wireport\.hpp:[0-9]+: warning: Member Wire \(variable\) of file wireport\.hpp is not documented\.
@@ -12199,15 +12047,12 @@ sys/include/crypto/ciphers\.h:[0-9]+: warning: Member CIPHER_ERR_INVALID_KEY_SIZ
 sys/include/crypto/ciphers\.h:[0-9]+: warning: Member CIPHER_ERR_INVALID_LENGTH \(macro definition\) of file ciphers\.h is not documented\.
 sys/include/crypto/ciphers\.h:[0-9]+: warning: Member CIPHER_MAX_BLOCK_SIZE \(macro definition\) of file ciphers\.h is not documented\.
 sys/include/crypto/ciphers\.h:[0-9]+: warning: Member cipher_id_t \(variable\) of file ciphers\.h is not documented\.
-sys/include/crypto/helper\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 sys/include/crypto/modes/ccm\.h:[0-9]+: warning: Member CCM_ERR_INVALID_CBC_MAC \(macro definition\) of file ccm\.h is not documented\.
 sys/include/crypto/modes/ccm\.h:[0-9]+: warning: Member CCM_ERR_INVALID_DATA_LENGTH \(macro definition\) of file ccm\.h is not documented\.
 sys/include/crypto/modes/ccm\.h:[0-9]+: warning: Member CCM_ERR_INVALID_LENGTH_ENCODING \(macro definition\) of file ccm\.h is not documented\.
 sys/include/crypto/modes/ccm\.h:[0-9]+: warning: Member CCM_ERR_INVALID_MAC_LENGTH \(macro definition\) of file ccm\.h is not documented\.
 sys/include/crypto/modes/ccm\.h:[0-9]+: warning: Member CCM_ERR_INVALID_NONCE_LENGTH \(macro definition\) of file ccm\.h is not documented\.
 sys/include/div\.h:[0-9]+: warning: Member _div_mulhi64\(const uint64_t a, const uint64_t b\) \(function\) of file div\.h is not documented\.
-sys/include/ecc/golay2412\.h:[0-9]+: warning: unbalanced grouping commands
-sys/include/ecc/repetition\.h:[0-9]+: warning: unbalanced grouping commands
 sys/include/event/thread\.h:[0-9]+: warning: Member event_thread_queues\[EVENT_QUEUE_PRIO_NUMOF\] \(variable\) of file thread\.h is not documented\.
 sys/include/hashes/sha2xx_common\.h:[0-9]+: warning: Member Maj\(x, y, z\) \(macro definition\) of group sys_hashes_sha2xx_common is not documented\.
 sys/include/hashes/sha2xx_common\.h:[0-9]+: warning: Member ROTR\(x, n\) \(macro definition\) of group sys_hashes_sha2xx_common is not documented\.
@@ -12505,8 +12350,6 @@ sys/include/net/coap\.h:[0-9]+: warning: Member COAP_TYPE_ACK \(macro definition
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_TYPE_CON \(macro definition\) of group net_coap is not documented\.
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_TYPE_NON \(macro definition\) of group net_coap is not documented\.
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_TYPE_RST \(macro definition\) of group net_coap is not documented\.
-sys/include/net/dhcpv6/client\.h:[0-9]+: warning: unbalanced grouping commands
-sys/include/net/dhcpv6\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 sys/include/net/dns\.h:[0-9]+: warning: Member DNS_CLASS_IN \(macro definition\) of group net_dns is not documented\.
 sys/include/net/dns\.h:[0-9]+: warning: Member DNS_TYPE_A \(macro definition\) of group net_dns is not documented\.
 sys/include/net/dns\.h:[0-9]+: warning: Member DNS_TYPE_AAAA \(macro definition\) of group net_dns is not documented\.
@@ -12528,9 +12371,6 @@ sys/include/net/gcoap\.h:[0-9]+: warning: Member GCOAP_RESOURCE_FOUND \(macro de
 sys/include/net/gcoap\.h:[0-9]+: warning: Member GCOAP_RESOURCE_NO_PATH \(macro definition\) of group net_gcoap is not documented\.
 sys/include/net/gcoap\.h:[0-9]+: warning: Member GCOAP_RESOURCE_WRONG_METHOD \(macro definition\) of group net_gcoap is not documented\.
 sys/include/net/gcoap\.h:[0-9]+: warning: Member GCOAP_STACK_SIZE \(macro definition\) of group net_gcoap is not documented\.
-sys/include/net/gnrc/lorawan/region\.h:[0-9]+: warning: end of file with unbalanced grouping commands
-sys/include/net/gnrc/mac/timeout\.h:[0-9]+: warning: end of file with unbalanced grouping commands
-sys/include/net/gnrc/netif/internal\.h:[0-9]+: warning: unbalanced grouping commands
 sys/include/net/gnrc/rpl/p2p\.h:[0-9]+: warning: Member GNRC_RPL_P2P_DEFAULT_DIO_INTERVAL_MIN \(macro definition\) of group net_gnrc_rpl_p2p is not documented\.
 sys/include/net/gnrc/rpl/p2p\.h:[0-9]+: warning: Member GNRC_RPL_P2P_DEFAULT_DIO_REDUNDANCY_CONSTANT \(macro definition\) of group net_gnrc_rpl_p2p is not documented\.
 sys/include/net/gnrc/rpl/p2p\.h:[0-9]+: warning: Member GNRC_RPL_P2P_DEFAULT_LIFETIME \(macro definition\) of group net_gnrc_rpl_p2p is not documented\.
@@ -12608,8 +12448,6 @@ sys/include/net/ieee802154\.h:[0-9]+: warning: Member IEEE802154_MIN_FRAME_LEN \
 sys/include/net/ieee802154\.h:[0-9]+: warning: Member IEEE802154_PHY_MR_FSK_2FSK_CODED_SFD_1 \(macro definition\) of group net_ieee802154_header is not documented\.
 sys/include/net/ieee802154\.h:[0-9]+: warning: Member IEEE802154_PHY_MR_FSK_2FSK_UNCODED_SFD_0 \(macro definition\) of group net_ieee802154_header is not documented\.
 sys/include/net/ieee802154\.h:[0-9]+: warning: Member IEEE802154_PHY_MR_FSK_2FSK_UNCODED_SFD_1 \(macro definition\) of group net_ieee802154_header is not documented\.
-sys/include/net/lora\.h:[0-9]+: warning: unbalanced grouping commands
-sys/include/net/loramac\.h:[0-9]+: warning: unbalanced grouping commands
 sys/include/net/mqttsn\.h:[0-9]+: warning: Member MQTTSN_CLI_ID_MAXLEN \(macro definition\) of group net_mqttsn is not documented\.
 sys/include/net/mqttsn\.h:[0-9]+: warning: Member MQTTSN_CLI_ID_MINLEN \(macro definition\) of group net_mqttsn is not documented\.
 sys/include/net/nanocoap\.h:[0-9]+: warning: Member COAP_DELETE \(macro definition\) of group net_nanocoap is not documented\.
@@ -12634,11 +12472,9 @@ sys/include/net/sixlowpan/nd\.h:[0-9]+: warning: Member SIXLOWPAN_ND_OPT_6CTX_LE
 sys/include/net/sixlowpan/nd\.h:[0-9]+: warning: Member SIXLOWPAN_ND_OPT_6CTX_LEN_MIN \(macro definition\) of group net_sixlowpan_nd is not documented\.
 sys/include/net/sixlowpan/nd\.h:[0-9]+: warning: Member SIXLOWPAN_ND_OPT_ABR_LEN \(macro definition\) of group net_sixlowpan_nd is not documented\.
 sys/include/net/sixlowpan/nd\.h:[0-9]+: warning: Member SIXLOWPAN_ND_OPT_AR_LEN \(macro definition\) of group net_sixlowpan_nd is not documented\.
-sys/include/net/sixlowpan/nd\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 sys/include/net/sock/dns\.h:[0-9]+: warning: Member SOCK_DNS_MAX_NAME_LEN \(macro definition\) of group net_sock_dns is not documented\.
 sys/include/net/sock/dns\.h:[0-9]+: warning: Member SOCK_DNS_PORT \(macro definition\) of group net_sock_dns is not documented\.
 sys/include/net/sock/dns\.h:[0-9]+: warning: Member SOCK_DNS_RETRIES \(macro definition\) of group net_sock_dns is not documented\.
-sys/include/net/someip\.h:[0-9]+: warning: unbalanced grouping commands
 sys/include/riotboot/serial\.h:[0-9]+: warning: Member RIOTBOOT_PROBE \(macro definition\) of file serial\.h is not documented\.
 sys/include/riotboot/serial\.h:[0-9]+: warning: Member RIOTBOOT_STAT_READY \(macro definition\) of file serial\.h is not documented\.
 sys/include/riotboot/serial\.h:[0-9]+: warning: Member RIOTBOOT_STAT_WAITING \(macro definition\) of file serial\.h is not documented\.
@@ -12651,7 +12487,6 @@ sys/include/shell_commands\.h:[0-9]+: warning: Member DISK_GET_SECTOR_SIZE \(mac
 sys/include/shell_commands\.h:[0-9]+: warning: Member DISK_READ_BYTES_CMD \(macro definition\) of group sys_shell_commands is not documented\.
 sys/include/shell_commands\.h:[0-9]+: warning: Member DISK_READ_SECTOR_CMD \(macro definition\) of group sys_shell_commands is not documented\.
 sys/include/suit\.h:[0-9]+: warning: Member suit_parameter_t \(enumeration\) of group sys_suit is not documented\.
-sys/include/usb/cdc\.h:[0-9]+: warning: unbalanced grouping commands
 sys/include/usb/dfu\.h:[0-9]+: warning: Member USB_DFU_DETACH_TIMEOUT_MS \(macro definition\) of group usb_dfu is not documented\.
 sys/include/usb/dfu\.h:[0-9]+: warning: Member USB_DFU_INTERFACE \(macro definition\) of group usb_dfu is not documented\.
 sys/include/usb/hid\.h:[0-9]+: warning: Member USB_HID_DESCR_HID \(macro definition\) of group usb_hid is not documented\.
@@ -12696,24 +12531,15 @@ sys/include/xtimer/implementation\.h:[0-9]+: warning: Member _xtimer_periodic_wa
 sys/include/xtimer/implementation\.h:[0-9]+: warning: Member _xtimer_set64\(xtimer_t \*timer, uint32_t offset, uint32_t long_offset\) \(function\) of file implementation\.h is not documented\.
 sys/include/xtimer/implementation\.h:[0-9]+: warning: Member _xtimer_set_wakeup64\(xtimer_t \*timer, uint64_t offset, kernel_pid_t pid\) \(function\) of file implementation\.h is not documented\.
 sys/include/xtimer/implementation\.h:[0-9]+: warning: Member _xtimer_set_wakeup\(xtimer_t \*timer, uint32_t offset, kernel_pid_t pid\) \(function\) of file implementation\.h is not documented\.
-sys/include/xtimer/implementation\.h:[0-9]+: warning: end of file with unbalanced grouping commands
-sys/include/xtimer/tick_conversion\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 sys/include/xtimer\.h:[0-9]+: warning: Member XTIMER_SHIFT \(macro definition\) of group sys_xtimer is not documented\.
 sys/include/ztimer/config\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_TYPE_PERIPH_TIMER \(macro definition\) of file config\.h is not documented\.
-sys/net/application_layer/dhcpv6/_dhcpv6\.h:[0-9]+: warning: unbalanced grouping commands
 sys/net/gnrc/network_layer/ipv6/nib/_nib\-6ln\.h:[0-9]+: warning: Member _handle_6co\(const icmpv6_hdr_t \*icmpv6, const sixlowpan_nd_opt_6ctx_t \*sixco, _nib_abr_entry_t \*abr\) \(function\) of file _nib\-6ln\.h is not documented\.
 sys/net/gnrc/network_layer/ipv6/nib/_nib\-6ln\.h:[0-9]+: warning: Member _handle_abro\(const sixlowpan_nd_opt_abr_t \*abro\) \(function\) of file _nib\-6ln\.h is not documented\.
-sys/net/gnrc/network_layer/ipv6/nib/_nib\-arsm\.h:[0-9]+: warning: unbalanced grouping commands
-sys/net/gnrc/network_layer/ipv6/nib/_nib\-internal\.h:[0-9]+: warning: unbalanced grouping commands
-sys/net/gnrc/network_layer/ipv6/nib/_nib\-router\.h:[0-9]+: warning: unbalanced grouping commands
 sys/net/gnrc/routing/rpl/gnrc_rpl_internal/netstats\.h:[0-9]+: warning: Member GNRC_RPL_NETSTATS_MULTICAST \(macro definition\) of file netstats\.h is not documented\.
 sys/net/gnrc/routing/rpl/gnrc_rpl_internal/netstats\.h:[0-9]+: warning: Member GNRC_RPL_NETSTATS_UNICAST \(macro definition\) of file netstats\.h is not documented\.
-sys/net/gnrc/sock/include/gnrc_sock_internal\.h:[0-9]+: warning: unbalanced grouping commands
 sys/net/link_layer/eui_provider/include/eui48_provider_params\.h:[0-9]+: warning: Member eui48_conf\[\] \(variable\) of file eui48_provider_params\.h is not documented\.
 sys/net/link_layer/eui_provider/include/eui64_provider_params\.h:[0-9]+: warning: Member eui64_conf\[\] \(variable\) of file eui64_provider_params\.h is not documented\.
-sys/posix/include/fcntl\.h:[0-9]+: warning: unbalanced grouping commands
 sys/posix/include/sys/socket\.h:[0-9]+: warning: Member setsockopt\(int socket, int level, int option_name, const void \*option_value, socklen_t option_len\) \(function\) of group posix_sockets is not documented\.
-sys/posix/include/sys/statvfs\.h:[0-9]+: warning: unbalanced grouping commands
 sys/posix/pthread/include/pthread_cancellation\.h:[0-9]+: warning: Member PTHREAD_CANCEL_ASYNCHRONOUS \(macro definition\) of file pthread_cancellation\.h is not documented\.
 sys/posix/pthread/include/pthread_cancellation\.h:[0-9]+: warning: Member PTHREAD_CANCEL_DEFERRED \(macro definition\) of file pthread_cancellation\.h is not documented\.
 sys/posix/pthread/include/pthread_cancellation\.h:[0-9]+: warning: Member PTHREAD_CANCEL_DISABLE \(macro definition\) of file pthread_cancellation\.h is not documented\.
@@ -13053,8 +12879,6 @@ pkg/lvgl7/include/lv_conf\.h:[0-9]+: warning: Member lv_img_decoder_user_data_t 
 pkg/lvgl7/include/lv_conf\.h:[0-9]+: warning: Member lv_disp_drv_user_data_t \(typedef\) of group pkg_lvgl7 is not documented\.
 pkg/lvgl7/include/lv_conf\.h:[0-9]+: warning: Member lv_indev_drv_user_data_t \(typedef\) of group pkg_lvgl7 is not documented\.
 pkg/lvgl7/include/lv_conf\.h:[0-9]+: warning: Member lv_font_user_data_t \(typedef\) of group pkg_lvgl7 is not documented\.
-pkg/lvgl7/include/lvgl_riot\.h:[0-9]+: warning: end of file with unbalanced grouping commands
-pkg/lvgl7/include/lvgl_riot_conf\.h:[0-9]+: warning: end of file with unbalanced grouping commands
 pkg/lvgl7/include/lvgl_riot_conf\.h:[0-9]+: warning: Member LV_TICK_CUSTOM \(macro definition\) of file lvgl_riot_conf\.h is not documented\.
 pkg/lvgl7/include/lvgl_riot_conf\.h:[0-9]+: warning: Member LV_TICK_CUSTOM_INCLUDE \(macro definition\) of file lvgl_riot_conf\.h is not documented\.
 pkg/lvgl7/include/lvgl_riot_conf\.h:[0-9]+: warning: Member LV_TICK_CUSTOM_SYS_TIME_EXPR \(macro definition\) of file lvgl_riot_conf\.h is not documented\.
@@ -13143,3 +12967,155 @@ boards/waveshare\-nrf52840\-eval\-kit/include/board\.h:[0-9]+: warning: Member S
 boards/waveshare\-nrf52840\-eval\-kit/include/periph_conf\.h:[0-9]+: warning: Member UART_[A-Z0-9_]+ \(macro definition\) of file periph_conf\.h is not documented.
 boards/waveshare\-nrf52840\-eval\-kit/include/periph_conf\.h:[0-9]+: warning: Member [A-Z0-9_]+NUMOF \(macro definition\) of file periph_conf\.h is not documented.
 boards/waveshare\-nrf52840\-eval\-kit/include/periph_conf\.h:[0-9]+: warning: Member [a-z0-9_]+config\[\] \(variable\) of file periph_conf\.h is not documented.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member STDIO_UART_BAUDRATE \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member LED_PANIC \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CPU_ATMEGA_CLK_SCALE_INIT \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_TYPE \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_DEV \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_FREQ \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_WIDTH \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_ADJUST_SET \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_ADJUST_SLEEP \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member W5100_PARAM_CS \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member W5100_PARAM_EVT \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+core/lib/include/panic\.h:[0-9]+: warning: found documented return type for core_panic that does not return anything
+\[generated\]:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
+\[generated\]:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
+\[generated\]:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member SYS_ARCH_PROTECT\(x\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member SYS_ARCH_UNPROTECT\(x\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member SYS_ARCH_DECL_PROTECT\(x\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_sem_valid\(sem\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_sem_set_invalid\(sem\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_sem_valid\(sys_sem_t \*sem\) \(function\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_mutex_valid\(mutex\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_mutex_set_invalid\(mutex\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_mutex_valid\(sys_mutex_t \*mutex\) \(function\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member SYS_MBOX_SIZE \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_mbox_valid\(mbox\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_mbox_set_invalid\(mbox\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_mbox_valid\(sys_mbox_t \*mbox\) \(function\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_mbox_set_invalid\(sys_mbox_t \*mbox\) \(function\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member LOCK_TCPIP_CORE\(\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member UNLOCK_TCPIP_CORE\(\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_lock_tcpip_core\(void\) \(function\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_unlock_tcpip_core\(void\) \(function\) of group pkg_lwip_sys is not documented\.
+sys/posix/pthread/include/pthread_threading\.h:[0-9]+: warning: found documented return type for pthread_exit that does not return anything
+drivers/include/at86rf2xx\.h:[0-9]+: warning: found documented return type for at86rf2xx_get_addr_long that does not return anything
+drivers/include/at86rf2xx\.h:[0-9]+: warning: found documented return type for at86rf2xx_get_addr_short that does not return anything
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member STDIO_UART_BAUDRATE \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member LED_PANIC \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CPU_ATMEGA_CLK_SCALE_INIT \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_TYPE \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_DEV \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_FREQ \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_WIDTH \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_ADJUST_SET \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_ADJUST_SLEEP \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member W5100_PARAM_CS \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member W5100_PARAM_EVT \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
+sys/include/bloom\.h:[0-9]+: warning: found documented return type for bloom_add that does not return anything
+sys/include/bloom\.h:[0-9]+: warning: found documented return type for bloom_del that does not return anything
+drivers/include/cc2420\.h:[0-9]+: warning: found documented return type for cc2420_get_addr_long that does not return anything
+drivers/include/cc2420\.h:[0-9]+: warning: found documented return type for cc2420_setup that does not return anything
+cpu/cc26xx_cc13xx/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_overview' for \\ref command
+cpu/cc26xx_cc13xx/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_ccfg' for \\ref command
+cpu/cc26xx_cc13xx/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_debugging' for \\ref command
+cpu/cc26xx_cc13xx/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_openocd' for \\ref command
+cpu/cc26xx_cc13xx/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_uniflash' for \\ref command
+cpu/cc26xx_cc13xx/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_ccfg' for \\ref command
+cpu/cc26xx_cc13xx/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_uniflash' for \\ref command
+drivers/include/motor_driver\.h:[0-9]+: warning: found documented return type for motor_disable that does not return anything
+drivers/include/motor_driver\.h:[0-9]+: warning: found documented return type for motor_enable that does not return anything
+boards/esp32\-wrover\-kit/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_local_toolchain_installation' could not be resolved
+cpu/esp32/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_esp_qemu' for \\ref command
+cpu/esp32/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
+cpu/esp32/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
+cpu/esp32/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
+cpu/esp32/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_application_specific_board_configuration' could not be resolved
+cpu/esp32/doc_esp32\.txt:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
+cpu/esp32/doc_esp32c3\.txt:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
+boards/esp32c3\-devkit/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32c3_devkit_optional_hardware' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_0/doc_common\.txt:[0-9]+: warning: explicit link request to 'esp32_local_toolchain_installation' could not be resolved
+boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_overview' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_hardware' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_board_configuration' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_pinout' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_other\-resources' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_toc' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_board_configuration' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_pinout' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_toc' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_toc' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_toc' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_toc' for \\ref command
+cpu/esp32/doc_esp32s2\.txt:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
+boards/esp32s2\-devkit/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32s2_devkit_optional_hardware' for \\ref command
+cpu/esp32/doc_esp32s3\.txt:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
+boards/esp32s3\-devkit/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32s3_devkit_optional_hardware' for \\ref command
+boards/esp32\-heltec\-lora32\-v2/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_heltec_lora32_v2_optional_hardware' could not be resolved
+cpu/kinetis/include/mcg\.h:[0-9]+: warning: unable to resolve reference to 'clock_config_t' for \\ref command
+cpu/kinetis/include/mcg\.h:[0-9]+: warning: unable to resolve reference to 'clock_config_t::clkdiv1' for \\ref command
+cpu/kinetis/include/mcg\.h:[0-9]+: warning: unable to resolve reference to 'clock_config_t::clkdiv1' for \\ref command
+drivers/include/l3gxxxx\.h:[0-9]+: warning: explicit link request to 'l3gxxxx_data_interrupt' could not be resolved
+drivers/include/l3gxxxx\.h:[0-9]+: warning: explicit link request to 'l3gxxxx_event_interrupt' could not be resolved
+drivers/include/l3gxxxx\.h:[0-9]+: warning: explicit link request to 'l3gxxxx_odr_filters' could not be resolved
+drivers/include/mcp47xx\.h:[0-9]+: warning: found documented return type for mcp47xx_dac_get that does not return anything
+drivers/include/mcp47xx\.h:[0-9]+: warning: found documented return type for mcp47xx_dac_poweroff that does not return anything
+drivers/include/mcp47xx\.h:[0-9]+: warning: found documented return type for mcp47xx_dac_poweron that does not return anything
+drivers/include/mcp47xx\.h:[0-9]+: warning: found documented return type for mcp47xx_dac_set that does not return anything
+boards/esp32\-mh\-et\-live\-minikit/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_mh_et_live_minikit_optional_hardware' could not be resolved
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_sem_valid\(sys_sem_t \*sem\) \(function\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_sem_valid\(sem\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_sem_set_invalid\(sem\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_mutex_valid\(sys_mutex_t \*mutex\) \(function\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_mutex_valid\(mutex\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_mutex_set_invalid\(mutex\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_mbox_valid\(sys_mbox_t \*mbox\) \(function\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_mbox_set_invalid\(sys_mbox_t \*mbox\) \(function\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member SYS_MBOX_SIZE \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_mbox_valid\(mbox\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_mbox_set_invalid\(mbox\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_lock_tcpip_core\(void\) \(function\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_unlock_tcpip_core\(void\) \(function\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member LOCK_TCPIP_CORE\(\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member UNLOCK_TCPIP_CORE\(\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member SYS_ARCH_PROTECT\(x\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member SYS_ARCH_UNPROTECT\(x\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member SYS_ARCH_DECL_PROTECT\(x\) \(macro definition\) of group pkg_lwip_sys is not documented\.
+drivers/include/sx127x\.h:[0-9]+: warning: found documented return type for sx127x_set_state that does not return anything
+sys/include/senml\.h:[0-9]+: warning: found documented return type for senml_set_duration_ms that does not return anything
+sys/include/senml\.h:[0-9]+: warning: found documented return type for senml_set_duration_us that does not return anything
+boards/cc1312\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1312_launchpad_overview' for \\ref command
+boards/cc1312\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1312_launchpad_hardware' for \\ref command
+boards/cc1312\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1312_launchpad_pinout' for \\ref command
+boards/cc1312\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1312_launchpad_flashing' for \\ref command
+boards/cc1350\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1350_launchpad_overview' for \\ref command
+boards/cc1350\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1350_launchpad_hardware' for \\ref command
+boards/cc1350\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1350_launchpad_pinout' for \\ref command
+boards/cc1350\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1350_launchpad_flashing' for \\ref command
+boards/cc1352\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352_launchpad_overview' for \\ref command
+boards/cc1352\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352_launchpad_hardware' for \\ref command
+boards/cc1352\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352_launcpad_pinout' for \\ref command
+boards/cc1352\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352_launchpad_flashing' for \\ref command
+boards/cc1352\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352_launchpad_shell' for \\ref command
+boards/cc1352\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352_launchpad_moreinfo' for \\ref command
+boards/cc1352p\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352p_launchpad_overview' for \\ref command
+boards/cc1352p\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352p_launchpad_hardware' for \\ref command
+boards/cc1352p\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352p_launcpad_pinout' for \\ref command
+boards/cc1352p\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352p_launchpad_flashing' for \\ref command
+boards/cc2650\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc2650_launchpad_overview' for \\ref command
+boards/cc2650\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc2650_launchpad_hardware' for \\ref command
+boards/cc2650\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc2650_launchpad_pinout' for \\ref command
+boards/cc2650\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc2650_launchpad_flashing' for \\ref command
+boards/esp32\-ttgo\-t\-beam/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ttgo_t_beam_optional_hardware' for \\ref command
+boards/esp32\-ttgo\-t\-beam/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ttgo_t_beam_optional_hardware' for \\ref command
+boards/esp32\-wemos\-lolin\-d32\-pro/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_wemos_lolin_d32_pro_optional_hardware' could not be resolved
+drivers/include/xbee\.h:[0-9]+: warning: found documented return type for xbee_setup that does not return anything
+boards/nrf52840dongle/doc\.txt:[0-9]+: warning: unable to resolve reference to 'nrf52840dongle_flash' for \\ref command

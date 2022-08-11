@@ -150,4 +150,5 @@ void _snd_rtr_advs_drop_pfx(gnrc_netif_t *netif, const ipv6_addr_t *dst,
 #endif
 
 #endif /* PRIV_NIB_ROUTER_H */
-/** @} */
+/** @internal
+ * @} */

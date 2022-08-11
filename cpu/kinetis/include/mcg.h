@@ -8,7 +8,7 @@
  */
 
 /* please doxygen by hiding dangling references */
-#if defined(MODULE_PERIPH_MCG) || defined(MODULE_PERIPH_MCG_LITE)
+#if defined(MODULE_PERIPH_MCG) || defined(MODULE_PERIPH_MCG_LITE) || defined(DOXYGEN)
 /**
  * @defgroup    cpu_kinetis_mcg Kinetis MCG
  * @ingroup     cpu_kinetis

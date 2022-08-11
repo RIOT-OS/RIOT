@@ -56,7 +56,6 @@ extern "C" {
 static const  enc28j60_params_t enc28j60_params[] = {
     ENC28J60_PARAMS
 };
-/** @} */
 
 #ifdef __cplusplus
 }

@@ -748,4 +748,5 @@ int gnrc_netif_ipv6_add_prefix(gnrc_netif_t *netif,
 #endif
 
 #endif /* NET_GNRC_NETIF_INTERNAL_H */
-/** @} */
+/** @internal
+ *@} */

@@ -17,7 +17,6 @@
  * @brief   SOME/IP header and field definitions
  *
  * @author  Jannes Volkens <jannes.volkens@haw-hamburg.de>
- * @}
  */
 #ifndef NET_SOMEIP_H
 #define NET_SOMEIP_H

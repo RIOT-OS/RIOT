@@ -335,6 +335,7 @@ extern "C" {
 #define MRF24J40_GPIO_3                 (0x08)
 #define MRF24J40_GPIO_4                 (0x10)
 #define MRF24J40_GPIO_5                 (0x20)
+/** @} */
 
 /**
  * @name    Bitfield definitions for the TRISGPIO register (0x34)

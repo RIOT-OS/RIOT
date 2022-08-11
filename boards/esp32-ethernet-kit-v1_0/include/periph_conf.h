@@ -13,6 +13,7 @@
  * @file
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @author      Erik Ekman <eekman@google.com>
+ * @{
  */
 
 #ifndef PERIPH_CONF_H
@@ -39,6 +40,7 @@
 #ifndef ADC_GPIOS
 #define ADC_GPIOS   { GPIO34, GPIO35, GPIO36, GPIO39 }
 #endif
+/** @} */
 
 /**
  * @name    Declaration of GPIOs that can be used as DAC channels

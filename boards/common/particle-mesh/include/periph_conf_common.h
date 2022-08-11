@@ -69,3 +69,4 @@ static const pwm_conf_t pwm_config[] = {
 #endif
 
 #endif /* PERIPH_CONF_COMMON_H */
+/** @} */
