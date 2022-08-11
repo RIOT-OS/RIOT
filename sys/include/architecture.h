@@ -9,8 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_architecture    Platform-independent access to architecture
- *                                  details
+ * @defgroup    sys_architecture    architecture: Platform-independent details
  * @ingroup     sys
  *
  * This module provides architecture-independent access to architecture details.
