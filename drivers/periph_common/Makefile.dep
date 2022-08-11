@@ -1,2 +1,4 @@
 # Always use periph_gpio_irq_unmask, if available
-FEATURES_OPTIONAL += periph_gpio_ll_irq_unmask
+ifneq (,$(filter periph_gpio_ll%,$(USEMODULE)))
+  FEATURES_OPTIONAL += periph_gpio_ll_irq_unmask
+endif
