@@ -33,7 +33,7 @@ ifeq (,$(filter iotlab-exp,$(MAKECMDGOALS)))
                              get $(_NODES_ID_LIST_OPTION) -i $(IOTLAB_EXP_ID))
 endif
 
-ifneq (,$(findstring m3,$(IOTLAB_TYPE)))
+ifneq (,$(filter m3:% dwm1001:%,$(IOTLAB_TYPE)))
   BINARY := $(ELFFILE)
 else
   BINARY := $(HEXFILE)
