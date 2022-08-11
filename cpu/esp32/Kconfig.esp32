@@ -18,6 +18,8 @@ config CPU_FAM_ESP32
     select CPU_CORE_XTENSA_LX6
     select HAS_ARCH_ESP32
     select HAS_CPU_ESP32
+    select HAS_ESP_BLE
+    select HAS_ESP_BLE_ESP32
     select HAS_ESP_HW_COUNTER
     select HAS_ESP_WIFI_ENTERPRISE
     select HAS_PUF_SRAM

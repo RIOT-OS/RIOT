@@ -16,6 +16,17 @@ config HAS_CPU_ESP32
     help
         Indicates that the current CPU belongs to the ESP32x SoC series.
 
+config HAS_ESP_BLE
+    bool
+    help
+        Indicates that the used ESP32x SoC supports Bluetooth LE.
+
+config HAS_ESP_BLE_ESP32
+    bool
+    help
+        Indicates that the ESP32x SoC uses the SDK Bluetooth LE library
+        for the ESP32 variant.
+
 config HAS_ESP_HW_COUNTER
     bool
     help

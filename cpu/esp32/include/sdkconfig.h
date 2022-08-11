@@ -100,10 +100,16 @@
 #define CONFIG_PARTITION_TABLE_OFFSET           0x8000
 
 /**
- * Bluetooth configuration (DO NOT CHANGE)
+ * BLE driver configuration (DO NOT CHANGE)
  */
-#define CONFIG_BT_ENABLED                       0
-#define CONFIG_BT_RESERVE_DRAM                  0
+#ifdef MODULE_ESP_BLE
+#define CONFIG_ESP32_WIFI_ENABLED                       1   /* WiFi module has to be enabled */
+#define CONFIG_BT_ENABLED                               1
+#define CONFIG_BT_CONTROLLER_ONLY                       1
+#else
+#define CONFIG_BT_ENABLED                               0
+#define CONFIG_BTDM_RESERVE_DRAM                        0
+#endif
 
 /**
  * SPI RAM configuration (DO NOT CHANGE)
@@ -178,6 +184,9 @@
 #define CONFIG_ESP32_WIFI_ENABLE_WPA3_SAE       1
 #if defined(MODULE_ESP_WIFI_AP) || defined(MODULE_ESP_NOW)
 #define CONFIG_ESP_WIFI_SOFTAP_SUPPORT          1
+#endif
+#ifdef MODULE_ESP_BLE
+#define CONFIG_ESP32_WIFI_SW_COEXIST_ENABLE     1
 #endif
 #endif
 

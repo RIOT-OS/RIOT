@@ -23,6 +23,12 @@ ifeq (xtensa,$(CPU_ARCH))
   FEATURES_PROVIDED += esp_hw_counter
 endif
 
+ifeq (esp32,$(CPU_FAM))
+  FEATURES_PROVIDED += ble_nimble
+  FEATURES_PROVIDED += esp_ble
+  FEATURES_PROVIDED += esp_ble_esp32
+endif
+
 ifneq (,$(filter esp32-wrover% esp32s2%r2 esp32s3%r2 esp32s3%r8 esp32s3%r8v,$(CPU_MODEL)))
   FEATURES_PROVIDED += esp_spi_ram
   ifneq (,$(filter esp32s3%r8 esp32s3%r8v,$(CPU_MODEL)))
