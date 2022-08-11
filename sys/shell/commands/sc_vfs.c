@@ -112,6 +112,7 @@ static int _errno_string(int err, char *buf, size_t buflen)
         err = -err;
     }
     switch (err) {
+        _case_snprintf_errno_name(EBUSY);
         _case_snprintf_errno_name(EACCES);
         _case_snprintf_errno_name(ENOENT);
         _case_snprintf_errno_name(EINVAL);
@@ -185,9 +186,13 @@ static int _mount_handler(int argc, char **argv)
         return -1;
     }
 
-    uint8_t buf[16];
+    char buf[16];
     int res = vfs_mount_by_path(argv[1]);
-    _errno_string(res, (char *)buf, sizeof(buf));
+    if (res < 0) {
+        _errno_string(res, buf, sizeof(buf));
+        puts(buf);
+    }
+
     return res;
 }
 
@@ -199,10 +204,13 @@ static int _umount_handler(int argc, char **argv)
         return -1;
     }
 
-    uint8_t buf[16];
+    char buf[16];
     int res = vfs_unmount_by_path(argv[1]);
+    if (res < 0) {
+        _errno_string(res, buf, sizeof(buf));
+        puts(buf);
+    }
 
-    _errno_string(res, (char *)buf, sizeof(buf));
     return res;
 }
 
@@ -214,10 +222,17 @@ static int _remount_handler(int argc, char **argv)
         return -1;
     }
 
-    uint8_t buf[16];
+    char buf[16];
     vfs_unmount_by_path(argv[1]);
     int res = vfs_mount_by_path(argv[1]);
-    _errno_string(res, (char *)buf, sizeof(buf));
+    if (res < 0) {
+        _errno_string(res, buf, sizeof(buf));
+        puts(buf);
+    }
+
+    return res;
+}
+
     return res;
 }
 
