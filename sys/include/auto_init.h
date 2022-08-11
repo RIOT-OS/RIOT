@@ -9,7 +9,7 @@
  */
 
 /**
- * @defgroup    sys_auto_init Auto-initialization
+ * @defgroup    sys_auto_init auto_init: Auto-initialization
  * @ingroup     sys
  * @brief       Auto initialize modules
  *

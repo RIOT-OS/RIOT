@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_analog_util Analog data conversion utilities
+ * @defgroup    sys_analog_util analog_util: Analog data conversion utilities
  * @ingroup     sys
  * @brief       Utility functions for converting analog data samples
  *

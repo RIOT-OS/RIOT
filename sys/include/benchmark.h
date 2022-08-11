@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_benchmark Benchmark
+ * @defgroup    sys_benchmark benchmark
  * @ingroup     sys
  * @brief       Framework for running simple runtime benchmarks
  * @{

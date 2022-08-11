@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_bcd Binary coded decimal
+ * @defgroup    sys_bcd bcd: Binary coded decimal
  * @ingroup     sys
  * @brief       Library to de- and encode binary coded decimals
  * @{
