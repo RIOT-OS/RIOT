@@ -381,6 +381,15 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
         return;
     }
 
+    if (coap_get_type(&pdu) == COAP_TYPE_RST) {
+        DEBUG("gcoap: received RST, expiring potentially existing memo\n");
+        _find_req_memo(&memo, &pdu, remote, true);
+        if (memo) {
+            event_timeout_clear(&memo->resp_evt_tmout);
+            _expire_request(memo);
+        }
+    }
+
     /* validate class and type for incoming */
     switch (coap_get_code_class(&pdu)) {
     /* incoming request or empty */
@@ -487,6 +496,13 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
         }
         else {
             DEBUG("gcoap: msg not found for ID: %u\n", coap_get_id(&pdu));
+            if (coap_get_type(&pdu) == COAP_TYPE_CON) {
+                /* we might run into this if an ACK to a sender got lost
+                 * see https://datatracker.ietf.org/doc/html/rfc7252#section-5.3.2 */
+                messagelayer_emptyresponse_type = COAP_TYPE_RST;
+                DEBUG("gcoap: Answering unknown CON response with RST to "
+                      "shut up sender\n");
+            }
         }
         break;
     default:
@@ -572,6 +588,11 @@ static void _on_resp_timeout(void *arg) {
  */
 static void _cease_retransmission(gcoap_request_memo_t *memo) {
     memo->state = GCOAP_MEMO_WAIT;
+    /* there is also no response handler to wait for => expire memo */
+    if (memo->resp_handler == NULL) {
+        event_timeout_clear(&memo->resp_evt_tmout);
+        _expire_request(memo);
+    }
 }
 
 /*
