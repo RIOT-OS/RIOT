@@ -1,3 +1,11 @@
+This branch has been forked from [RIOT:2022.04](https://github.com/RIOT-OS/RIOT/tree/2022.04).
+
+It contains two fixes:
+- pkg/nimble: Replace double quotes with single quotes for two CFLAGS [#18376](https://github.com/RIOT-OS/RIOT/pull/18376)
+- dist/testbed-support: use '.elf' binary for dwm1001 board [#18440](https://github.com/RIOT-OS/RIOT/pull/18440)
+
+---
+
 [![Nightly CI status master][master-ci-badge]][master-ci-link]
 [![Nightly HiL CI overview][hil-ci-badge]][hil-ci-link]
 [![GitHub release][release-badge]][release-link]
