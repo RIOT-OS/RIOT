@@ -44,6 +44,9 @@ nimble_npl_riot:
 nimble_transport:
 	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/transport/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
+nimble_transport_hci_h4:
+	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/transport/common/hci_h4/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
+
 # host modules
 nimble_host:
 	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/host/src/ -f $(TDIR)/nimble.host.mk
