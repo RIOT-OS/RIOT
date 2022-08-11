@@ -89,7 +89,7 @@ config HAVE_NON_NETDEV_INTERFACE
     help
         Indicates that a non-netdev interface is exposed by selected drivers.
 
-config HAVE_IEE802154_RADIO_HAL_INTERFACE
+config HAVE_IEEE802154_RADIO_HAL_INTERFACE
     bool
     select HAVE_NON_NETDEV_INTERFACE
     help
