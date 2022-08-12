@@ -962,6 +962,10 @@ ifneq (,$(filter ecc_%,$(USEMODULE)))
   USEMODULE += ecc
 endif
 
+ifneq (,$(filter bhp_%,$(USEMODULE)))
+  USEMODULE += bhp
+endif
+
 ifneq (,$(filter dbgpin,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += dbgpin
