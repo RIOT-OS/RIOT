@@ -27,26 +27,6 @@ config CPU_COMMON_NRF5X
     select HAS_RADIO_NRFMIN
 
 ## Definition of specific features
-config HAS_BLE_NIMBLE
-    bool
-    help
-        Indicates that the NimBLE stack is supported on the current platform.
-
-config HAS_BLE_NIMBLE_NETIF
-    bool
-    help
-        Indicates that NimBLE netif is supported on the current platform.
-
-config HAS_BLE_PHY_2MBIT
-    bool
-    help
-        Indicates that the BLE radio supports the 2Mbit PHY mode
-
-config HAS_BLE_PHY_CODED
-    bool
-    help
-        Indicates that the BLE radio supports the CODED PHY mode
-
 config HAS_RADIO_NRFBLE
     bool
     select HAVE_NRF5X_RADIO
