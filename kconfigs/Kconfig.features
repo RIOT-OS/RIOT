@@ -42,6 +42,12 @@ config HAS_BACKUP_RAM
     help
         Indicates that Backup RAM is supported.
 
+config HAS_BLE_ADV_EXT
+    bool
+    help
+        Indicates the current platform supports Bluetooth 5 Advertising
+        Extension
+
 config HAS_BLE_NIMBLE
     bool
     help
