@@ -26,6 +26,7 @@ PERIPH_IGNORE_MODULES := \
   periph_i2c_sw \
   periph_init% \
   periph_mcg \
+  periph_mcg_lite \
   periph_plic \
   periph_rtc_ms \
   periph_rtc_rtt \
