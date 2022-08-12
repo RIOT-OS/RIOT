@@ -50,9 +50,9 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Use the 2nd UART for STDIO on this board
+ * @brief   Use the fist UART for STDIO on this board
  */
-#define STDIO_UART_DEV      UART_DEV(1)
+#define STDIO_UART_DEV      UART_DEV(0)
 
 /**
  * @name    xtimer configuration
