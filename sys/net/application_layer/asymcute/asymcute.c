@@ -104,17 +104,25 @@ static uint16_t _msg_id_next(asymcute_con_t *con)
     return con->last_id;
 }
 
+static uint8_t _req_type(asymcute_req_t *req)
+{
+    size_t len;
+    size_t pos = _len_get(req->data, &len);
+    return req->data[pos];
+}
+
 /* @pre con is locked */
 static asymcute_req_t *_req_preprocess(asymcute_con_t *con,
                                        size_t msg_len, size_t min_len,
-                                       const uint8_t *buf, unsigned id_pos)
+                                       const uint8_t *buf, unsigned id_pos,
+                                       uint8_t rtype)
 {
     /* verify message length */
     if (msg_len < min_len) {
         return NULL;
     }
 
-     uint16_t msg_id = (buf == NULL) ? 0 : byteorder_bebuftohs(&buf[id_pos]);
+    uint16_t msg_id = (buf == NULL) ? 0 : byteorder_bebuftohs(&buf[id_pos]);
 
     asymcute_req_t *res = NULL;
     asymcute_req_t *iter = con->pending;
@@ -126,8 +134,9 @@ static asymcute_req_t *_req_preprocess(asymcute_con_t *con,
         con->pending = iter->next;
     }
     while (iter && !res) {
-        if (iter->next && (iter->next->msg_id == msg_id)) {
-            res = iter->next;
+        asymcute_req_t *r = iter->next;
+        if (r && (r->msg_id == msg_id) && (_req_type(r) == rtype)) {
+            res = r;
             iter->next = iter->next->next;
         }
         iter = iter->next;
@@ -340,7 +349,7 @@ static void _on_keepalive_evt(void *arg)
 static void _on_connack(asymcute_con_t *con, const uint8_t *data, size_t len)
 {
     mutex_lock(&con->lock);
-    asymcute_req_t *req = _req_preprocess(con, len, MINLEN_CONNACK, NULL, 0);
+    asymcute_req_t *req = _req_preprocess(con, len, MINLEN_CONNACK, NULL, 0, MQTTSN_CONNECT);
     if (req == NULL) {
         mutex_unlock(&con->lock);
         return;
@@ -367,7 +376,7 @@ static void _on_disconnect(asymcute_con_t *con, size_t len)
 
     /* we might have triggered the DISCONNECT process ourselves, so make sure
      * the pending request is being handled */
-    asymcute_req_t *req = _req_preprocess(con, len, MINLEN_DISCONNECT, NULL, 0);
+    asymcute_req_t *req = _req_preprocess(con, len, MINLEN_DISCONNECT, NULL, 0, MQTTSN_DISCONNECT);
 
     /* put the connection back to NOTCON in any case and let the user know */
     _disconnect(con, NOTCON);
@@ -403,7 +412,8 @@ static void _on_regack(asymcute_con_t *con, const uint8_t *data, size_t len)
 {
     mutex_lock(&con->lock);
     asymcute_req_t *req = _req_preprocess(con, len, MINLEN_REGACK,
-                                          data, IDPOS_REGACK);
+                                          data, IDPOS_REGACK,
+                                          MQTTSN_REGISTER);
     if (req == NULL) {
         mutex_unlock(&con->lock);
         return;
@@ -471,7 +481,8 @@ static void _on_puback(asymcute_con_t *con, const uint8_t *data, size_t len)
 {
     mutex_lock(&con->lock);
     asymcute_req_t *req = _req_preprocess(con, len, MINLEN_PUBACK,
-                                          data, IDPOS_PUBACK);
+                                          data, IDPOS_PUBACK,
+                                          MQTTSN_PUBLISH);
     if (req == NULL) {
         mutex_unlock(&con->lock);
         return;
@@ -488,7 +499,8 @@ static void _on_suback(asymcute_con_t *con, const uint8_t *data, size_t len)
 {
     mutex_lock(&con->lock);
     asymcute_req_t *req = _req_preprocess(con, len, MINLEN_SUBACK,
-                                          data, IDPOS_SUBACK);
+                                          data, IDPOS_SUBACK,
+                                          MQTTSN_SUBSCRIBE);
     if (req == NULL) {
         mutex_unlock(&con->lock);
         return;
@@ -527,7 +539,8 @@ static void _on_unsuback(asymcute_con_t *con, const uint8_t *data, size_t len)
 {
     mutex_lock(&con->lock);
     asymcute_req_t *req = _req_preprocess(con, len, MINLEN_UNSUBACK,
-                                          data, IDPOS_UNSUBACK);
+                                          data, IDPOS_UNSUBACK,
+                                          MQTTSN_UNSUBSCRIBE);
     if (req == NULL) {
         mutex_unlock(&con->lock);
         return;
