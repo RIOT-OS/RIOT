@@ -280,7 +280,7 @@ BaseType_t IRAM_ATTR _queue_generic_send(QueueHandle_t xQueue,
         else {
             /* suspend the calling thread to wait for space in the queue */
             thread_t *me = thread_get_active();
-            sched_set_status(me, STATUS_SEND_BLOCKED);
+            sched_set_status(me, STATUS_MUTEX_BLOCKED);
             /* waiting list is sorted by priority */
             thread_add_to_list(&queue->sending, me);
 
@@ -408,7 +408,7 @@ BaseType_t IRAM_ATTR _queue_generic_recv (QueueHandle_t xQueue,
         else {
             /* suspend the calling thread to wait for an item in the queue */
             thread_t *me = thread_get_active();
-            sched_set_status(me, STATUS_RECEIVE_BLOCKED);
+            sched_set_status(me, STATUS_MUTEX_BLOCKED);
             /* waiting list is sorted by priority */
             thread_add_to_list(&queue->receiving, me);
 
