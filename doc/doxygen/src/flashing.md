@@ -342,3 +342,10 @@ Handling Multiple Boards: Simplest Approach            {#multiple-boards-simple}
 Passing `MOST_RECENT_PORT=1` as environment variable or as parameter to
 make will result in the most recently connected board being preferred over the
 default PORT for the selected board.
+
+For some boards `TTY_BOARD_FILTER` is provided, which filters TTYs e.g. by
+vendor or model to only considered TTYs that actually may belong to the selected
+board. E.g. for Nucleo boards this is `--model 'STM32 STLink'`, as they all use
+an integrated STLink as programmer. As long as only one TTY is provided from an
+STLink, this will reliably select the correct TTY for an Nucleo regardless of
+which TTY was most recently connected.
