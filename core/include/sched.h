@@ -172,6 +172,10 @@ typedef enum {
     STATUS_FLAG_BLOCKED_ALL,        /**< waiting for all flags in flag_mask       */
     STATUS_MBOX_BLOCKED,            /**< waiting for get/put on mbox              */
     STATUS_COND_BLOCKED,            /**< waiting for a condition variable         */
+#if IS_USED(MODULE_ESP_FREERTOS_COMMON)
+    STATUS_QUEUE_FULL_BLOCKED,      /**< FreeRTOS compatibility layer queue full  */
+    STATUS_QUEUE_EMPTY_BLOCKED,     /**< FreeRTOS compatibility layer queue empty */
+#endif
     STATUS_RUNNING,                 /**< currently running                        */
     STATUS_PENDING,                 /**< waiting to be scheduled to run           */
     STATUS_NUMOF                    /**< number of supported thread states        */
