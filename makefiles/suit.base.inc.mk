@@ -18,12 +18,10 @@ else
   SUIT_KEY_DIR ?= $(XDG_DATA_HOME)/RIOT/keys
 endif
 
-# Enable user to encrypt private key with a password
-ifneq (,$(SUIT_SEC_PASSWORD))
-  SUIT_TOOL_ARGS += -p $(SUIT_SEC_PASSWORD)
-endif
-
 SUIT_SEC ?= $(SUIT_KEY_DIR)/$(SUIT_KEY).pem
+
+# Multiple keys can be specified with "key0:pw0 key1:pw1 …" (pw may be empty)
+SUIT_SECS ?= $(SUIT_SEC):$(SUIT_SEC_PASSWORD)
 
 SUIT_PUB_HDR = $(BINDIR)/riotbuild/public_key.h
 SUIT_PUB_HDR_DIR = $(dir $(SUIT_PUB_HDR))
@@ -40,7 +38,21 @@ $(SUIT_SEC): | $(CLEAN)
 # key's mtime is too far back).
 $(SUIT_PUB_HDR): $(SUIT_SEC) FORCE | $(CLEAN)
 	$(Q)mkdir -p $(SUIT_PUB_HDR_DIR)
-	$(Q)$(SUIT_TOOL) pubkey $(SUIT_TOOL_ARGS) -f header -k $(SUIT_SEC) \
-	  | '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
+	$(Q)(							\
+		echo "const uint8_t public_key[][32] = {";	\
+		for i in $(SUIT_SECS); do			\
+			key=$${i%:*};				\
+			pw=$${i#*:};				\
+			if [ "$$key" = "$$pw" ]; then		\
+				unset pw;			\
+			fi;					\
+			if [ -z "$$pw" ]; then			\
+				$(SUIT_TOOL) pubkey -f header -k $$key; \
+			else					\
+				$(SUIT_TOOL) pubkey -f header -k $$key -p $$pw; \
+			fi					\
+		done;						\
+		echo "};"					\
+	) | '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
 
 suit/genkey: $(SUIT_SEC)
