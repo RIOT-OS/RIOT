@@ -256,7 +256,7 @@ Test *tests_<module>_<header>_tests(void)
     EMB_UNIT_TESTCALLER(<module>_<header>_tests, set_up, tear_down, fixtures);
     /* set up and tear down function can be NULL if omitted */
 
-    return (Test *)&<module>_<header>;
+    return (Test *)&<module>_<header>_tests;
 }
 ```
 
