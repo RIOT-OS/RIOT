@@ -11,7 +11,7 @@ USEMODULE += gnrc_ipv6_default
 USEMODULE += netdev_default
 USEMODULE += od
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 COAPS ?= 1
 

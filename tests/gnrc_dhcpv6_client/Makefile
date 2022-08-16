@@ -28,7 +28,7 @@ else
 endif
 USEMODULE += auto_init_gnrc_netif
 
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 CFLAGS += -DDHCPV6_SERVER_PORT=$(DHCPV6_SERVER_PORT)
 

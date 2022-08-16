@@ -21,7 +21,7 @@ endif
 
 USEMODULE += auto_init_loramac
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += fmt
 
 FEATURES_OPTIONAL += periph_eeprom

@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 USEMODULE += nice
 USEMODULE += ps
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 # Use a terminal that does not introduce extra characters into the stream.
 RIOT_TERMINAL ?= socat

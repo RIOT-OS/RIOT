@@ -9,7 +9,7 @@ BOARD_WHITELIST := samr21-xpro iotlab-m3
 
 # Modules to include:
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 # include and auto-initialize all available sensors
 USEMODULE += saul_default

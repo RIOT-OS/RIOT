@@ -6,7 +6,7 @@ include ../Makefile.tests_common
 USEMODULE += sx1280
 
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 USEMODULE += iolist
 

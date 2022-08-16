@@ -2,7 +2,7 @@ include ../Makefile.tests_common
 
 # Modules to include:
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 
 # allow to use a smaller packet buffer in low-PDU drivers

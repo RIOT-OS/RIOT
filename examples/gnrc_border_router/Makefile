@@ -29,7 +29,7 @@ USEMODULE += gnrc_sixlowpan_border_router_default
 USEMODULE += gnrc_icmpv6_echo
 # Add also the shell, some shell commands
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 
 # Optionally include RPL as a routing protocol. When includede gnrc_uhcpc will

@@ -80,7 +80,7 @@ endif
 USEMODULE += ps
 USEMODULE += od_string
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 # ztimer is used instead of xtimer because it's a dependency of some
 # OpenWSN modules.

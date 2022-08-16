@@ -20,7 +20,7 @@ BOARD_WHITELIST :=  \
 					#
 USEMODULE += od
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += event_thread
 USEMODULE += netdev_default

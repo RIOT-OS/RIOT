@@ -19,7 +19,7 @@ USEMODULE += posix_sleep
 USEMODULE += posix_inet
 # Add also the shell, some shell commands
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 
 # Comment this out to disable code in RIOT that does safety checking

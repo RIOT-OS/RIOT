@@ -33,7 +33,7 @@ USEMODULE += od
 USEMODULE += embunit
 # Add also the shell, some shell commands
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 
 # The test requires some setup and to be run as root

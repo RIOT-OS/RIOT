@@ -9,7 +9,7 @@ USEMODULE += netdev_test
 USEMODULE += od
 USEMODULE += ps
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += xtimer
 
 CFLAGS += -DTEST_SUITES

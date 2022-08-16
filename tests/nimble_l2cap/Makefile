@@ -7,7 +7,7 @@ include ../Makefile.tests_common
 # RIOT modules used in for this test
 USEMODULE += xtimer
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += bluetil_ad
 

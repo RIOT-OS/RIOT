@@ -1,8 +1,8 @@
 include ../Makefile.tests_common
 
-USEMODULE += heap_cmd
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmd_heap
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 
 # microbit qemu failing currently

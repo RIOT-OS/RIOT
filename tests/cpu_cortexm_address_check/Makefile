@@ -5,6 +5,6 @@ include ../Makefile.tests_common
 FEATURES_REQUIRED += cpu_check_address
 
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 include $(RIOTBASE)/Makefile.include

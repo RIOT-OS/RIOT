@@ -7,7 +7,7 @@ USEMODULE += gnrc_icmpv6_echo
 USEMODULE += gnrc_rpl
 
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 # automated test only works on native
 TEST_ON_CI_WHITELIST += native

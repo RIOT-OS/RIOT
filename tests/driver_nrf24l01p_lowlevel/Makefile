@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += ztimer_usec
 USEMODULE += nrf24l01p

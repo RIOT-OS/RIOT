@@ -18,7 +18,7 @@ USEMODULE += posix_inet
 # tinydtls needs crypto secure PRNG
 USEMODULE += prng_sha1prng
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 USEPKG += tinydtls
 

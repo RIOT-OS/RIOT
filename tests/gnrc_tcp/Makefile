@@ -34,7 +34,7 @@ USEMODULE += gnrc_pktbuf_cmd
 USEMODULE += gnrc_netif_single    # Only one interface used and it makes
                                   # shell commands easier
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += od
 
 # Export used tap device to environment

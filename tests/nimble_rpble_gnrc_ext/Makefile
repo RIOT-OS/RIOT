@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 
 # include shell support
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 
 # Enable single interface optimization.

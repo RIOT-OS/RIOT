@@ -25,7 +25,7 @@ ifeq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   USEMODULE += nanocoap_vfs
   USEMODULE += vfs_default
   # USEMODULE += vfs_auto_format
-  USEMODULE += shell_commands
+  USEMODULE += shell_cmds_default
 
   # VFS operations require more stack on the main thread
   CFLAGS += -DTHREAD_STACKSIZE_MAIN=THREAD_STACKSIZE_LARGE

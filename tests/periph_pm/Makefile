@@ -5,7 +5,7 @@ FEATURES_OPTIONAL += periph_rtc
 FEATURES_OPTIONAL += periph_gpio_irq
 
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 # avoid running Kconfig by default
 SHOULD_RUN_KCONFIG ?=

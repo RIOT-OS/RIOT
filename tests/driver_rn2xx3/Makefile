@@ -4,6 +4,6 @@ DRIVER ?= rn2483
 
 USEMODULE += $(DRIVER)
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 include $(RIOTBASE)/Makefile.include

@@ -9,7 +9,7 @@ BOARD_WHITELIST := samr21-xpro
 
 # Modules to include:
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 # Use modules for networking
 # gnrc is a meta module including all required, basic gnrc networking modules

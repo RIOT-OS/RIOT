@@ -2,7 +2,7 @@ include ../Makefile.tests_common
 
 USEMODULE += stdio_semihosting
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 
 RIOT_TERMINAL = semihosting
