@@ -49,7 +49,7 @@ typedef struct {
 #endif
 } slot_t;
 
-static const uint8_t _ad[2] = { BLE_GAP_AD_FLAGS, BLUETIL_AD_FLAGS_DEFAULT };
+static const uint8_t _ad[] = { 2, BLE_GAP_AD_FLAGS, BLUETIL_AD_FLAGS_DEFAULT };
 
 static mutex_t _lock = MUTEX_INIT;
 static slot_t _slots[NIMBLE_NETIF_MAX_CONN];
