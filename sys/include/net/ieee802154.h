@@ -115,6 +115,11 @@ extern "C" {
 #define IEEE802154_SIFS_MAX_FRAME_SIZE  (18U)
 
 /**
+ * @brief ACK Timeout period in symbols
+ */
+#define IEEE802154_ACK_TIMEOUT_SYMS     (54)
+
+/**
  * @brief value of measured power when RSSI is zero.
  *
  * This value is defined in the IEEE 802.15.4 standard

@@ -4325,6 +4325,7 @@ boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member KW2XRF_PARAM_CS
 boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member KW2XRF_PARAM_INT \(macro definition\) of file board\.h is not documented\.
 boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member KW2XRF_PARAM_SPI \(macro definition\) of file board\.h is not documented\.
 boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member KW2XRF_PARAM_SPI_CLK \(macro definition\) of file board\.h is not documented\.
+boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member KW2XRF_PARAM_RESET \(macro definition\) of file board\.h is not documented\.
 boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member KW2XRF_SHARED_SPI \(macro definition\) of file board\.h is not documented\.
 boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member LED0_MASK \(macro definition\) of file board\.h is not documented\.
 boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member LED0_OFF \(macro definition\) of file board\.h is not documented\.

@@ -21,6 +21,8 @@ menuconfig MODULE_KW2XRF
     select MODULE_NETDEV
     select MODULE_NETDEV_IEEE802154
     select MODULE_CORE_THREAD_FLAGS
+    select MODULE_IOLIST
+    select HAVE_BHP_IRQ_HANDLER
 
 config MODULE_KW2XRF_TESTMODE
     bool "Test mode"
