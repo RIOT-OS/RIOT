@@ -25,22 +25,37 @@
 #include "mrf24j40_params.h"
 #include "shell.h"
 #include "test_utils/netdev_ieee802154_minimal.h"
+#include "net/netdev/ieee802154_submac.h"
+#include "common.h"
 
-static mrf24j40_t mrf24j40[MRF24J40_NUM];
+static netdev_ieee802154_submac_t mrf24j40_netdev[MRF24J40_NUM];
+
+static ieee802154_dev_t *_reg_callback(ieee802154_dev_type_t type, void *opaque)
+{
+    if (type != IEEE802154_DEV_TYPE_MRF24J40) {
+        assert(false);
+    }
+    int *c = opaque;
+    return &mrf24j40_netdev[(*(c))++].submac.dev;
+}
 
 int netdev_ieee802154_minimal_init_devs(netdev_event_cb_t cb) {
     puts("Initializing MRF24J40 devices");
 
+    int c = 0;
+    /* This function will iterate through all kw2xrf radios */
+    ieee802154_hal_test_init_devs(_reg_callback, &c);
+
     for (unsigned i = 0; i < MRF24J40_NUM; i++) {
         printf("%d out of %d\n", i + 1, MRF24J40_NUM);
-        /* setup the specific driver */
-        mrf24j40_setup(&mrf24j40[i], &mrf24j40_params[i], i);
+        netdev_register(&mrf24j40_netdev[i].dev.netdev, NETDEV_MRF24J40, 0);
+        netdev_ieee802154_submac_init(&mrf24j40_netdev[i]);
 
         /* set the application-provided callback */
-        mrf24j40[i].netdev.netdev.event_callback = cb;
+        mrf24j40_netdev[i].dev.netdev.event_callback = cb;
 
         /* initialize the device driver */
-        int res = mrf24j40[i].netdev.netdev.driver->init(&mrf24j40[i].netdev.netdev);
+        int res = mrf24j40_netdev[i].dev.netdev.driver->init(&mrf24j40_netdev[i].dev.netdev);
         if (res != 0) {
             return -1;
         }

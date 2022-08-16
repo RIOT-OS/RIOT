@@ -21,7 +21,7 @@
  */
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "mrf24j40_internal.h"
 #include "mrf24j40_registers.h"
 #include "kernel_defines.h"
@@ -29,12 +29,12 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define SPIDEV          (dev->params.spi)
-#define CSPIN           (dev->params.cs_pin)
+#define SPIDEV          (dev->params->spi)
+#define CSPIN           (dev->params->cs_pin)
 
 static inline void getbus(mrf24j40_t *dev)
 {
-    spi_acquire(SPIDEV, CSPIN, SPI_MODE_0, dev->params.spi_clk);
+    spi_acquire(SPIDEV, CSPIN, SPI_MODE_0, dev->params->spi_clk);
 }
 
 #if IS_ACTIVE(CONFIG_MRF24J40_USE_EXT_PA_LNA)
@@ -99,7 +99,7 @@ void mrf24j40_enable_lna(mrf24j40_t *dev)
 }
 #endif /* CONFIG_MRF24J40_USE_EXT_PA_LNA */
 
-int mrf24j40_init(mrf24j40_t *dev)
+int mrf24j40_init_hw(mrf24j40_t *dev)
 {
     if (IS_ACTIVE(CONFIG_MRF24J40_TEST_SPI_CONNECTION)) {
         /* Check if MRF24J40 is available */
@@ -263,36 +263,34 @@ void mrf24j40_reset_tasks(mrf24j40_t *dev)
 
 void mrf24j40_update_tasks(mrf24j40_t *dev)
 {
-    if (dev->irq_flag) {
-        uint8_t newpending = 0;
-        uint8_t instat = 0;
+    uint8_t newpending = 0;
+    uint8_t instat = 0;
 
-        dev->irq_flag = 0;
-        instat = mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);
-        /* check if TX done */
-        if (instat & MRF24J40_INTSTAT_TXNIF) {
-            newpending |= MRF24J40_TASK_TX_DONE | MRF24J40_TASK_TX_READY;
-            /* transmit done, returning to configured idle state */
-            mrf24j40_assert_sleep(dev);
-        }
-        if (instat & MRF24J40_INTSTAT_RXIF) {
-            newpending |= MRF24J40_TASK_RX_READY;
-        }
-        /* check if RX pending */
-        dev->pending |= newpending;
+    instat = mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);
+    /* check if TX done */
+    if (instat & MRF24J40_INTSTAT_TXNIF) {
+        newpending |= MRF24J40_TASK_TX_DONE | MRF24J40_TASK_TX_READY;
+        /* transmit done, returning to configured idle state */
     }
+    if (instat & MRF24J40_INTSTAT_RXIF) {
+        newpending |= MRF24J40_TASK_RX_READY;
+    }
+    /* check if RX pending */
+    dev->pending |= newpending;
 }
 
 void mrf24j40_hardware_reset(mrf24j40_t *dev)
 {
-    /* wake up from sleep in case radio is sleeping */
-    mrf24j40_assert_awake(dev);
-
     /* trigger hardware reset */
-    gpio_clear(dev->params.reset_pin);
+    gpio_clear(dev->params->reset_pin);
     /* Datasheet - Not specified */
-    xtimer_usleep(MRF24J40_RESET_PULSE_WIDTH);
-    gpio_set(dev->params.reset_pin);
+    ztimer_sleep(ZTIMER_USEC, MRF24J40_RESET_PULSE_WIDTH);
+    gpio_set(dev->params->reset_pin);
     /* Datasheet - MRF24J40 ~2ms */
-    xtimer_usleep(MRF24J40_RESET_DELAY);
+    ztimer_sleep(ZTIMER_USEC, MRF24J40_RESET_DELAY);
+}
+
+void mrf24j40_flush_rx(mrf24j40_t *dev)
+{
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_RXFLUSH, MRF24J40_RXFLUSH_RXFLUSH);
 }

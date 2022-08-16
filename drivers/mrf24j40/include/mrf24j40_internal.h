@@ -37,7 +37,7 @@ extern "C" {
  *
  * @return 0 on success, error otherwise
  */
-int mrf24j40_init(mrf24j40_t *dev);
+int mrf24j40_init_hw(mrf24j40_t *dev);
 
 /**
  * @brief Read from a register with a  at address `addr` from device `dev`. Register with 8bit address
@@ -150,6 +150,13 @@ void mrf24j40_enable_lna(mrf24j40_t *dev);
 #else
 static inline void mrf24j40_enable_lna(mrf24j40_t *dev) { (void) dev; }
 #endif
+
+/**
+ * @brief   Flush the RX FIFO
+ *
+ * @param[in] dev       device to flush the RX FIFO
+ */
+void mrf24j40_flush_rx(mrf24j40_t *dev);
 
 #ifdef __cplusplus
 }
