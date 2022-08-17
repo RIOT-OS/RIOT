@@ -14,6 +14,7 @@ menuconfig MODULE_STM32_ETH
     depends on HAS_PERIPH_ETH
     select MODULE_PERIPH_ETH
     select MODULE_NETDEV_ETH
+    select MODULE_NETDEV_LEGACY_API
     select MODULE_IOLIST
     select MODULE_ZTIMER
     select MODULE_ZTIMER_MSEC
