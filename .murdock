@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # uncomment and change this to limit builds, e.g.,
-#export BOARDS="samr21-xpro native"
+export BOARDS="samr21-xpro native"
 # and / or
 #export APPS="examples/hello-world tests/unittests"
 
@@ -442,6 +442,7 @@ compile() {
     rm -rf ${BINDIR}
 
     print_worker
+    git merge-base HEAD master
 
     # sanity checks
     [ $# -ne 2 ] && error "$0: compile: invalid parameters (expected \$appdir \$board:\$toolchain)"
