@@ -1267,9 +1267,9 @@ static inline int ieee802154_radio_cca(ieee802154_dev_t *dev)
     if (res < 0) {
         return res;
     }
-    while (ieee802154_radio_confirm_cca(dev) == -EAGAIN) {}
+    while ((res = ieee802154_radio_confirm_cca(dev)) == -EAGAIN) {}
 
-    return 0;
+    return res;
 }
 
 /**
