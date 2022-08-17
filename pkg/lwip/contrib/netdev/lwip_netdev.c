@@ -87,7 +87,11 @@ err_t lwip_netdev_init(struct netif *netif)
         }
     }
 
-    /* initialize netdev and netif */
+    /* initialize Bottom Half Processor, netdev and netif */
+    if (IS_USED(MODULE_BHP_MSG)) {
+        bhp_msg_claim_thread(lwip_netif_get_bhp(netif), _pid);
+    }
+
     netdev = netif->state;
     lwip_netif_dev_acquire(netif);
     netdev->driver->init(netdev);
@@ -332,6 +336,9 @@ static void *_event_loop(void *arg)
             lwip_netif_dev_acquire(netif);
             dev->driver->isr(dev);
             lwip_netif_dev_release(netif);
+        }
+        else if (IS_USED(MODULE_BHP_MSG) && msg.type == BHP_MSG_BH_REQUEST) {
+            bhp_msg_handler(&msg);
         }
     }
     return NULL;

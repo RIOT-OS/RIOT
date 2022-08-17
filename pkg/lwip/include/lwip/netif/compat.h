@@ -22,6 +22,7 @@
 
 #include "lwip/netif.h"
 #include "net/netif.h"
+#include "bhp/msg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,6 +35,9 @@ typedef struct {
     netif_t common_netif;                /**< network interface descriptor */
     struct netif lwip_netif;             /**< lwIP interface data */
     rmutex_t lock;                       /**< lock for the interface */
+#if IS_USED(MODULE_BHP_MSG)
+    bhp_msg_t bhp;                       /**< IPC Bottom Half Processor */
+#endif
 } lwip_netif_t;
 
 /**
@@ -67,6 +71,26 @@ static inline void lwip_netif_dev_release(struct netif *netif)
 {
     lwip_netif_t *compat_netif = container_of(netif, lwip_netif_t, lwip_netif);
     rmutex_unlock(&compat_netif->lock);
+}
+
+/**
+ * @brief Get the IPC based Bottom Half Processor for LWIP
+ *
+ * @param[in]   netif pointer to the LWIP network interface
+ *
+ * @return      pointer to the IPC based Bottom Half Processor descriptor, if
+ *              @ref sys_bhp_msg is present.
+ * @return      NULL otherwise
+ */
+static inline bhp_msg_t *lwip_netif_get_bhp(struct netif *netif)
+{
+#if IS_USED(MODULE_BHP_MSG)
+    lwip_netif_t *compat_netif = container_of(netif, lwip_netif_t, lwip_netif);
+    return &compat_netif->bhp;
+#else
+    (void) netif;
+    return NULL;
+#endif
 }
 
 #ifdef __cplusplus
