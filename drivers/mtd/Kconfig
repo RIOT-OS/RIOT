@@ -7,14 +7,12 @@
 
 config HAVE_MTD_AT24CXXX
     bool
-    depends on MODULE_AT24CXXX
     imply MODULE_MTD_AT24CXXX if MODULE_MTD
     help
         Indicates that a at24cxxx EEPROM MTD is present
 
 config HAVE_MTD_AT25XXX
     bool
-    depends on MODULE_AT25XXX
     imply MODULE_MTD_AT25XXX if MODULE_MTD
     help
         Indicates that a at25xxx SPI-EEPROM MTD is present

@@ -40,7 +40,7 @@ endif # MODULE_STM32_ETH
 config MODULE_PERIPH_ETH
     bool
     depends on HAS_PERIPH_ETH
-    select MODULE_PERIPH_ETH_COMMON
+    select MODULE_PERIPH_ETH_COMMON if CPU_STM32
 
 config MODULE_PERIPH_ETH_COMMON
     bool

@@ -24,6 +24,7 @@ config BOARD_AVR_RSS2
     select HAVE_SAUL_GPIO
     select HAVE_BME280_I2C
     select HAVE_AT24MAC
+    select HAVE_MTD_AT24CXXX
 
 
 source "$(RIOTBOARD)/common/atmega/Kconfig"

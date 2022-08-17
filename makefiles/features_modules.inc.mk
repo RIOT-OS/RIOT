@@ -14,7 +14,10 @@ PERIPH_IGNORE_MODULES := \
   periph_clic \
   periph_common \
   periph_coretimer \
+  periph_eth \
+  periph_eth_common \
   periph_flash \
+  periph_flashpage_in_address_space \
   periph_flexcomm \
   periph_gpio_ll \
   periph_gpio_ll_irq \
@@ -26,12 +29,16 @@ PERIPH_IGNORE_MODULES := \
   periph_i2c_sw \
   periph_init% \
   periph_mcg \
+  periph_mcg_lite \
+  periph_nvm \
   periph_plic \
   periph_rtc_ms \
   periph_rtc_rtt \
   periph_rtt_hw_rtc \
   periph_rtt_hw_sys \
   periph_spi_on_qspi \
+  periph_uart_collision \
+  periph_uart_rxstart_irq \
   periph_wdog \
   #
 PERIPH_MODULES := $(filter-out $(PERIPH_IGNORE_MODULES),\

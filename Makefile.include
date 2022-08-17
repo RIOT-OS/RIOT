@@ -484,11 +484,13 @@ endif
 
 # Check if programmer is supported by the board, only if PROGRAMMERS_SUPPORTED
 # is set and if programmer is not iotlab
-ifneq (iotlab,$(PROGRAMMER))
-  ifneq (,$(PROGRAMMERS_SUPPORTED))
-    ifeq (,$(filter $(PROGRAMMER),$(PROGRAMMERS_SUPPORTED)))
-      $(info '$(PROGRAMMER)' programmer is not supported by this board. \
-              Supported programmers: '$(PROGRAMMERS_SUPPORTED)')
+ifneq ($(RIOT_CI_BUILD),1)
+  ifneq (iotlab,$(PROGRAMMER))
+    ifneq (,$(PROGRAMMERS_SUPPORTED))
+      ifeq (,$(filter $(PROGRAMMER),$(PROGRAMMERS_SUPPORTED)))
+        $(info '$(PROGRAMMER)' programmer is not supported by this board. \
+                Supported programmers: '$(PROGRAMMERS_SUPPORTED)')
+      endif
     endif
   endif
 endif
@@ -526,7 +528,6 @@ ifeq ($(RIOT_CI_BUILD),1)
     # set a dummy version number
     RIOT_VERSION_CODE ?= $(RIOT_VERSION_DUMMY_CODE)
     ifneq ($(filter $(BOARD_INSUFFICIENT_MEMORY), $(BOARD)),)
-        $(info CI-build: skipping link step)
         RIOTNOLINK:=1
     endif
     # be more quiet when building for CI
