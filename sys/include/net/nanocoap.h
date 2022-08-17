@@ -230,13 +230,6 @@ typedef struct {
     BITFIELD(opt_crit, CONFIG_NANOCOAP_NOPTS_MAX);    /**< unhandled critical option */
 #ifdef MODULE_GCOAP
     uint32_t observe_value;                           /**< observe value           */
-    /**
-     * @brief   transport the packet was received over
-     * @see     @ref gcoap_socket_type_t for values.
-     * @note    @ref gcoap_socket_type_t can not be used, as this would
-     *          cyclically include the @ref net_gcoap header.
-     */
-    uint32_t tl_type;
 #endif
 } coap_pkt_t;
 
@@ -343,6 +336,16 @@ const char *coap_request_ctx_get_path(const coap_request_ctx_t *ctx);
  * @return  Resource context of the request
  */
 void *coap_request_ctx_get_context(const coap_request_ctx_t *ctx);
+
+/**
+ * @brief   Get transport the packet was received over
+ * @see     @ref gcoap_socket_type_t for values.
+ *
+ * @param[in]   ctx The request context
+ *
+ * @return  Transport Layer type of the request
+ */
+uint32_t coap_request_ctx_get_tl_type(const coap_request_ctx_t *ctx);
 
 /**
  * @brief   Block1 helper struct
