@@ -1,0 +1,3 @@
+ifneq (,$(filter bhp_event,$(USEMODULE)))
+  USEMODULE += event
+endif
