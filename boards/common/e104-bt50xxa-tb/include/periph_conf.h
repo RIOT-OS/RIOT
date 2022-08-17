@@ -74,8 +74,8 @@ static const i2c_conf_t i2c_config[] = {
 static const uart_conf_t uart_config[] = {
     { /* Mapped to USB virtual COM port */
         .dev        = NRF_UARTE0,
-        .rx_pin     = GPIO_PIN(0,14),
-        .tx_pin     = GPIO_PIN(0,18),
+        .rx_pin     = GPIO_PIN(0, 14),
+        .tx_pin     = GPIO_PIN(0, 18),
 #ifdef MODULE_PERIPH_UART_HW_FC
         .rts_pin    = GPIO_UNDEF,
         .cts_pin    = GPIO_UNDEF,

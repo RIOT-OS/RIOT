@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 #ifndef PULSE_COUNTER_GPIO
-#define PULSE_COUNTER_GPIO GPIO_PIN(0,18)
+#define PULSE_COUNTER_GPIO GPIO_PIN(0, 18)
 #endif
 
 #ifndef PULSE_COUNTER_GPIO_FLANK

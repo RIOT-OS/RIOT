@@ -50,8 +50,8 @@ static const qdec_conf_t qdec_config[] = {
 static const uart_conf_t uart_config[] = {
     { /* Mapped to USB virtual COM port */
         .dev        = NRF_UARTE0,
-        .rx_pin     = GPIO_PIN(0,8),
-        .tx_pin     = GPIO_PIN(0,6),
+        .rx_pin     = GPIO_PIN(0, 8),
+        .tx_pin     = GPIO_PIN(0, 6),
 #ifdef MODULE_PERIPH_UART_HW_FC
         .rts_pin    = GPIO_UNDEF,
         .cts_pin    = GPIO_UNDEF,
