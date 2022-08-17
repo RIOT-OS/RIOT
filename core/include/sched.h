@@ -155,10 +155,7 @@ static inline int pid_is_valid(kernel_pid_t pid)
 typedef struct _thread thread_t;
 
 /**
- * @name Thread states supported by RIOT
- *
- *       Keep in sync with OpenOCD src/rtos/riot.c
- * @{
+ * @brief   Thread states supported by RIOT
  */
 typedef enum {
     STATUS_STOPPED,                 /**< has terminated                           */
@@ -176,7 +173,14 @@ typedef enum {
     STATUS_PENDING,                 /**< waiting to be scheduled to run           */
     STATUS_NUMOF                    /**< number of supported thread states        */
 } thread_status_t;
-/** @} */
+
+/**
+ * @brief   List of thread state names
+ *
+ * This is a look up table for @ref thread_status_t used by OpenOCD and to
+ * implement @ref thread_state_to_string
+ */
+extern const char * const * const thread_state_names;
 
 /**
  * @name Helpers to work with thread states
