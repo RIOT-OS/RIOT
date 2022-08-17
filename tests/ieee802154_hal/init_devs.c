@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <stdio.h>
 #include "assert.h"
 #include "kernel_defines.h"
 #include "net/ieee802154/radio.h"
@@ -54,6 +55,14 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
      * `auto_init`) */
     ieee802154_dev_t *radio = NULL;
     (void) radio;
+    (void) cb;
+    (void) opaque;
+
+    if (RADIOS_NUMOF == 0) {
+        puts("Radio is either not supported or not present");
+        assert(false);
+    }
+
 #ifdef MODULE_CC2538_RF
     if ((radio = cb(IEEE802154_DEV_TYPE_CC2538_RF, opaque)) ){
         cc2538_rf_hal_setup(radio);

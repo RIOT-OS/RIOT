@@ -1,25 +1,29 @@
 include ../Makefile.tests_common
 
-BOARD_WHITELIST :=  \
-					adafruit-clue \
-					adafruit-itsybitsy-nrf52 \
-					arduino-nano-33-ble \
-					cc2538dk \
-					feather-nrf52840 \
-					native \
-					nrf52840dk \
-					nrf52840dongle \
-					nrf52840-mdk \
-					omote \
-					openmote-cc2538 \
-					reel \
-					remote-pa \
-					remote-reva \
-					remote-revb \
-					pba-d-01-kw2x \
-					#
+# Due to missing Kconfig support, whitelist boards that are known to have a
+# working Kconfig dependency resolution.
+# Other boards should still work when running with CONTINUE_ON_EXPECTED_ERRORS=1
 
-DISABLE_MODULE += auto_init_at86rf2xx auto_init_nrf802154
+BOARD_WHITELIST += adafruit-clue \
+                   adafruit-itsybitsy-nrf52 \
+                   arduino-nano-33-ble \
+                   cc2538dk \
+                   feather-nrf52840 \
+                   native \
+                   nrf52840dk \
+                   nrf52840dongle \
+                   nrf52840-mdk \
+                   nucleo-l152re \
+                   nucleo-f303re \
+                   nucleo-wl55jc \
+                   omote \
+                   openmote-cc2538 \
+                   reel \
+                   remote-pa \
+                   remote-reva \
+                   remote-revb \
+                   pba-d-01-kw2x \
+                   #
 
 ifeq ($(BOARD), native)
   ZEP_PORT_BASE ?= 17754

@@ -30,10 +30,6 @@
                      SOCKET_ZEP_MAX + \
                      IS_USED(MODULE_KW2XRF)
 
-#if RADIOS_NUMOF == 0
-#error "Radio is not supported"
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
