@@ -899,6 +899,21 @@ int vfs_closedir(vfs_DIR *dirp);
 int vfs_format(vfs_mount_t *mountp);
 
 /**
+ * @brief Format a file system
+ *
+ * The file system must not be mounted in order to be formatted.
+ * Call @ref vfs_unmount_by_path first if necessary.
+ *
+ * @note This assumes mount points have been configured with @ref VFS_AUTO_MOUNT.
+ *
+ * @param[in]  path     Path of the pre-configured mount point
+ *
+ * @return 0 on success
+ * @return <0 on error
+ */
+int vfs_format_by_path(const char *path);
+
+/**
  * @brief Mount a file system
  *
  * @p mountp should have been populated in advance with a file system driver,
