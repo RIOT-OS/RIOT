@@ -56,11 +56,6 @@ extern "C" {
 #ifndef CONFIG_ESP32C3_DEFAULT_CPU_FREQ_MHZ
 #define CONFIG_ESP32C3_DEFAULT_CPU_FREQ_MHZ     80
 #endif
-
-/**
- * @brief Mapping configured ESP32-C3 default clock to CLOCK_CORECLOCK define
- */
-#define CLOCK_CORECLOCK     (1000000UL * CONFIG_ESP32C3_DEFAULT_CPU_FREQ_MHZ)
 /** @} */
 
 /**
