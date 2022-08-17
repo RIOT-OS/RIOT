@@ -87,6 +87,32 @@ static const motor_driver_config_t motor_driver_config[] = {
 #define MOTOR_DRIVER_NUMOF           ARRAY_SIZE(motor_driver_config)
 /** @} */
 
+/**
+ * @name Describe MRF24J40 radio
+ * @{
+ */
+#ifndef MRF24J40_PARAM_SPI
+#define MRF24J40_PARAM_SPI      SPI_DEV(0)
+#endif
+
+#ifndef MRF24J40_PARAM_SPI_CLK
+#define MRF24J40_PARAM_SPI_CLK  SPI_CLK_5MHZ
+#endif
+
+#ifndef MRF24J40_PARAM_CS
+#define MRF24J40_PARAM_CS       ARDUINO_PIN_10
+#endif
+
+#ifndef MRF24J40_PARAM_INT
+#define MRF24J40_PARAM_INT      ARDUINO_PIN_7
+#endif
+
+#ifndef MRF24J40_PARAM_RESET
+#define MRF24J40_PARAM_RESET    ARDUINO_PIN_5
+#endif
+
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
