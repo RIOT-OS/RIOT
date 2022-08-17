@@ -376,12 +376,20 @@ int _cca(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
-    if (ieee802154_radio_request_cca(&_radio[0]) < 0) {
-        puts("Couldn't perform CCA");
+
+    int res;
+    if (ieee802154_radio_has_irq_cca_done(&_radio[0])) {
+        if (ieee802154_radio_request_cca(&_radio[0]) < 0) {
+            puts("Couldn't perform CCA");
+            return -ENODEV;
+        }
+        mutex_lock(&lock);
+        res = ieee802154_radio_confirm_cca(&_radio[0]);
+        expect(res >= 0);
     }
-    mutex_lock(&lock);
-    int res = ieee802154_radio_confirm_cca(&_radio[0]);
-    expect(res >= 0);
+    else {
+        res = ieee802154_radio_cca(&_radio[0]);
+    }
 
     if (res > 0) {
         puts("CLEAR");
