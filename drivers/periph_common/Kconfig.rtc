@@ -24,6 +24,11 @@ config MODULE_PERIPH_RTC_MS
         Provides an interface to access the RTC time with a sub-second
         component.
 
+config PERIPH_RTC_SETTER_CALLBACK
+    bool "Support for RTC time change callback"
+    help
+        Provides a time change callback for RTC
+
 endif #MODULE_PERIPH_RTC
 
 config MODULE_PERIPH_RTC_MEM

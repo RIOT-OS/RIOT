@@ -924,6 +924,10 @@ ifneq (,$(filter suit_%,$(USEMODULE)))
   USEMODULE += suit
 endif
 
+ifneq (,$(filter sys_bus_rtc, $(USEMODULE)))
+  USEMODULE += periph_rtc_setter_callback
+endif
+
 # include ztimer dependencies
 ifneq (,$(filter ztimer ztimer_% %ztimer,$(USEMODULE)))
   include $(RIOTBASE)/sys/ztimer/Makefile.dep
