@@ -9,9 +9,10 @@ config MODULE_ETHOS
     bool "Ethernet-over-serial (ETHOS)"
     depends on TEST_KCONFIG
     depends on HAS_PERIPH_UART
-    select MODULE_PERIPH_UART
     select MODULE_IOLIST
     select MODULE_NETDEV_ETH
+    select MODULE_NETDEV_LEGACY_API
+    select MODULE_PERIPH_UART
     select MODULE_RANDOM
     select MODULE_TSRB
 

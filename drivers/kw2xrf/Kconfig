@@ -13,16 +13,15 @@ menuconfig MODULE_KW2XRF
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_GPIO_IRQ
     depends on HAS_PERIPH_SPI
+    select MODULE_CORE_THREAD_FLAGS
+    select MODULE_IEEE802154
+    select MODULE_LUID
+    select MODULE_NETDEV
+    select MODULE_NETDEV_IEEE802154
+    select MODULE_NETDEV_LEGACY_API
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_SPI
-    select MODULE_LUID
-    select MODULE_IEEE802154
-    select MODULE_NETDEV
-    select MODULE_NETDEV_IEEE802154
-    select MODULE_CORE_THREAD_FLAGS
-    select MODULE_IOLIST
-    select HAVE_BHP_IRQ_HANDLER
 
 config MODULE_KW2XRF_TESTMODE
     bool "Test mode"

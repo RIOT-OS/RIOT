@@ -188,6 +188,55 @@ typedef struct {
 } gnrc_netif_t;
 
 /**
+ * @brief   Check if the device belonging to the given netif uses the legacy
+ *          netdev API
+ *
+ * Check @ref netdev_driver_t::confirm_send for info about the old and new
+ * netdev API.
+ *
+ * netdevs using the legacy API have to depend on the (pseudo-)module
+ * netdev_legaqcy_api, netdevs using the new API have to depend on the
+ * (pseudo-)module netdev_new_api. If only one of the pseudo modules is used,
+ * this function can be constant folded. For boards mixing legacy and new API
+ * netdevs, this will check the flavor at runtime.
+ *
+ * @see netdev_driver_t::confirm_send
+ */
+static inline bool gnrc_netif_netdev_legacy_api(gnrc_netif_t *netif)
+{
+    if (!IS_USED(MODULE_NETDEV_NEW_API) && !IS_USED(MODULE_NETDEV_LEGACY_API)) {
+        /* this should only happen for external netdevs or when no netdev is
+         * used (e.g. examples/gcoap can be used without any netdev, as still
+         * CoAP requests to ::1 can be send */
+        return true;
+    }
+
+    if (!IS_USED(MODULE_NETDEV_NEW_API)) {
+        return true;
+    }
+
+    if (!IS_USED(MODULE_NETDEV_LEGACY_API)) {
+        return false;
+    }
+
+    /* both legacy and new API netdevs in use, fall back to runtime test: */
+    return (netif->dev->driver->confirm_send == NULL);
+}
+
+/**
+ * @brief   Check if the device belonging to the given netif uses the new
+ *          netdev API
+ *
+ * @see gnrc_netif_netdev_legacy_api
+ *
+ * @see netdev_driver_t::confirm_send
+ */
+static inline bool gnrc_netif_netdev_new_api(gnrc_netif_t *netif)
+{
+    return !gnrc_netif_netdev_legacy_api(netif);
+}
+
+/**
  * @see gnrc_netif_ops_t
  */
 struct gnrc_netif_ops {

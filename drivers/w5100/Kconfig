@@ -11,11 +11,12 @@ config MODULE_W5100
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_GPIO_IRQ
     depends on HAS_PERIPH_SPI
+    select MODULE_LUID
+    select MODULE_NETDEV_ETH
+    select MODULE_NETDEV_LEGACY_API
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_SPI
-    select MODULE_NETDEV_ETH
-    select MODULE_LUID
 
 config HAVE_W5100
     bool

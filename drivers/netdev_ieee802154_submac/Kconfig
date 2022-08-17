@@ -10,9 +10,10 @@ config MODULE_NETDEV_IEEE802154_SUBMAC
     depends on TEST_KCONFIG
     depends on MODULE_NETDEV
     default y if HAVE_IEEE802154_RADIO_HAL_INTERFACE
-    select MODULE_NETDEV_IEEE802154
     select MODULE_IEEE802154
     select MODULE_IEEE802154_SUBMAC
+    select MODULE_NETDEV_IEEE802154
+    select MODULE_NETDEV_LEGACY_API
     help
       This module implements the netdev API on top of the IEEE 802.15.4 radio
       HAL.
