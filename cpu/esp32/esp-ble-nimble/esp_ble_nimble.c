@@ -22,12 +22,16 @@
 #include "log.h"
 #include "esp_bt.h"
 #include "mutex.h"
+#include "od.h"
 
 #include "host/ble_hs.h"
 #include "nimble/hci_common.h"
 #include "nimble/nimble_port.h"
 #include "nimble/transport/hci_h4.h"
 #include "sysinit/sysinit.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 /* The size of an HCI command packet is defined as POOL_CMD_SIZE
  * in `./nimble/transport/src/transport.c.`. Since there is no defined
@@ -109,6 +113,11 @@ int ble_transport_to_ll_cmd_impl(void *buf)
     packet[0] = BLE_HCI_UART_H4_CMD;         /* first byte is the packet indicator */
     memcpy(packet + 1, cmd, len - 1);
 
+    if (ENABLE_DEBUG && IS_USED(MODULE_OD)) {
+        printf("CMD host to ctrl:\n");
+        od_hex_dump(packet + 1, len - 1, OD_WIDTH_DEFAULT);
+    }
+
     /* send the packet */
     rc = _ble_transport_to_ll(packet, len);
 
@@ -138,6 +147,12 @@ int ble_transport_to_ll_acl_impl(struct os_mbuf *om)
     packet[0] = BLE_HCI_UART_H4_ACL;
     len++;
 
+    if (ENABLE_DEBUG && IS_USED(MODULE_OD)) {
+        printf("ACL host to ctrl:\n");
+        od_hex_dump(packet + 1,
+                    (om->om_len < 32) ? om->om_len : 32, OD_WIDTH_DEFAULT);
+    }
+
     os_mbuf_copydata(om, 0, OS_MBUF_PKTLEN(om), &packet[1]);
     len += OS_MBUF_PKTLEN(om);
 
@@ -156,9 +171,17 @@ static int _esp_hci_h4_frame_cb(uint8_t pkt_type, void *data)
 
     switch (pkt_type) {
     case HCI_H4_ACL:
+        if (ENABLE_DEBUG && IS_USED(MODULE_OD)) {
+            printf("ACL ctrl to host:\n");
+            od_hex_dump((uint8_t *)data, 4, OD_WIDTH_DEFAULT);
+        }
         rc = ble_transport_to_hs_acl(data);
         break;
     case HCI_H4_EVT:
+        if (ENABLE_DEBUG && IS_USED(MODULE_OD)) {
+            printf("EVT ctrl to host:\n");
+            od_hex_dump((uint8_t *)data, ((uint8_t *)data)[1] + 2, OD_WIDTH_DEFAULT);
+        }
         rc = ble_transport_to_hs_evt(data);
         break;
     default:
