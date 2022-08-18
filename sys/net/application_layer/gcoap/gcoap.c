@@ -1334,7 +1334,7 @@ static ssize_t _cache_check(const uint8_t *buf, size_t len,
                     uint8_t *start = coap_find_option(&req, COAP_OPT_ETAG);
                     /* option length must always be <= COAP_ETAG_LENGTH_MAX = 8 < 12, so the length
                      * is encoded in the first byte, see also RFC 7252, section 3.1 */
-                    *start &= 0x0f;
+                    *start &= 0xf0;
                     /* first if around here should make sure we are <= 8 < 0xf, so we don't need to
                      * bitmask resp_etag_len */
                     *start |= (uint8_t)resp_etag_len;
