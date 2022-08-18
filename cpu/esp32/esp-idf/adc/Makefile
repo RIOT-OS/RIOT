@@ -8,13 +8,17 @@ ESP32_SDK_SRC = \
   components/soc/$(CPU_FAM)/adc_periph.c \
   #
 
-ifneq (,$(filter esp32c3,$(CPU_FAM)))
+ifneq (,$(filter esp32c3 esp32s2,$(CPU_FAM)))
   ESP32_SDK_SRC += components/driver/$(CPU_FAM)/adc2_init_cal.c
   INCLUDES += -I$(ESP32_SDK_DIR)/components/driver/include/driver
 endif
 
 ifneq (,$(filter esp32c3 esp32h2 esp32s3,$(CPU_FAM)))
   ESP32_SDK_SRC += components/efuse/$(CPU_FAM)/esp_efuse_rtc_calib.c
+endif
+
+ifneq (,$(filter esp32s2,$(CPU_FAM)))
+  ESP32_SDK_SRC += components/efuse/esp32s2/esp_efuse_rtc_table.c
 endif
 
 include $(RIOTBASE)/Makefile.base
