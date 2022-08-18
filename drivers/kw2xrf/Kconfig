@@ -22,6 +22,8 @@ menuconfig MODULE_KW2XRF
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_SPI
+    select MODULE_IOLIST
+    select HAVE_BHP_IRQ_HANDLER
 
 config MODULE_KW2XRF_TESTMODE
     bool "Test mode"
