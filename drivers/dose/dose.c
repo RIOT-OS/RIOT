@@ -761,6 +761,8 @@ static int _init(netdev_t *dev)
 
     state(ctx, DOSE_SIGNAL_INIT);
 
+    dev->event_callback(dev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 

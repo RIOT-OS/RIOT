@@ -229,6 +229,9 @@ static int _init(netdev_t *netdev)
 
     DEBUG("[sx127x] netdev: initialization done\n");
 
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 

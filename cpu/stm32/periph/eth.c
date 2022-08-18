@@ -460,6 +460,11 @@ static int stm32_eth_init(netdev_t *netdev)
 
     _setup_phy();
 
+    /* signal link UP if no proper link detection is enabled */
+    if (!IS_USED(MODULE_STM32_ETH_LINK_UP)) {
+        netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+    }
+
     return 0;
 }
 

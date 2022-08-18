@@ -639,6 +639,10 @@ int xbee_init(netdev_t *dev)
     }
 
     DEBUG("[xbee] init: Initialization successful\n");
+
+    /* signal link UP */
+    dev->event_callback(dev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 

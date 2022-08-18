@@ -55,6 +55,10 @@ static int _sam0_eth_init(netdev_t *netdev)
     eui48_t hwaddr;
     netdev_eui48_get(netdev, &hwaddr);
     sam0_eth_set_mac(&hwaddr);
+
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 
