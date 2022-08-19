@@ -230,7 +230,7 @@ static err_t _eth_link_output(struct netif *netif, struct pbuf *p)
     pbuf_header(p, ETH_PAD_SIZE); /* reclaim the padding word */
 #endif
     lwip_netif_dev_acquire(netif);
-    err_t res = (netdev->driver->send(netdev, iolist) > 0) ? ERR_OK : ERR_BUF;
+    err_t res = (netdev->driver->send(netdev, iolist) >= 0) ? ERR_OK : ERR_BUF;
     lwip_netif_dev_release(netif);
     return res;
 }
@@ -247,7 +247,7 @@ static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p)
     };
 
     lwip_netif_dev_acquire(netif);
-    err_t res = (netdev->driver->send(netdev, &pkt) > 0) ? ERR_OK : ERR_BUF;
+    err_t res = (netdev->driver->send(netdev, &pkt) >= 0) ? ERR_OK : ERR_BUF;
     lwip_netif_dev_release(netif);
     return res;
 }
