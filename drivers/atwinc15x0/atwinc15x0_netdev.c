@@ -588,7 +588,10 @@ static void _atwinc15x0_isr(netdev_t *netdev)
     DEBUG("%s dev=%p\n", __func__, (void *)dev);
 
     /* handle pending ATWINC15x0 module events */
-    while (m2m_wifi_handle_events(NULL) != M2M_SUCCESS) { }
+    if (m2m_wifi_handle_events(NULL) != M2M_SUCCESS) {
+        DEBUG("%s handle events failed, reset device\n", __func__);
+        _atwinc15x0_init(netdev);
+    }
 }
 
 const netdev_driver_t atwinc15x0_netdev_driver = {
