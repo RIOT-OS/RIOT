@@ -26,6 +26,7 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include <errno.h>
 #include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
@@ -161,6 +162,34 @@ ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr)
     }
 
     return ipv6_addr_from_buf(result, addr, strlen(addr));
+}
+
+int ipv6_prefix_from_str(ipv6_addr_t *result, const char *addr)
+{
+    size_t str_len;
+    int pfx_len;
+    const char *separator;
+
+    if ((result == NULL) || (addr == NULL)) {
+        return -EINVAL;
+    }
+
+    if ((separator = strrchr(addr, '/')) == NULL) {
+        return -EINVAL;
+    }
+
+    str_len = separator - addr;
+    pfx_len = strtol(separator + 1, NULL, 10);
+
+    if (pfx_len <= 0) {
+        return pfx_len;
+    }
+
+    if (ipv6_addr_from_buf(result, addr, str_len) == NULL) {
+        return -EINVAL;
+    }
+
+    return pfx_len;
 }
 
 /**

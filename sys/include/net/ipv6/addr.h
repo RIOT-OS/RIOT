@@ -738,6 +738,22 @@ char *ipv6_addr_to_str(char *result, const ipv6_addr_t *addr, uint8_t result_len
 ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr);
 
 /**
+ * @brief   Converts an IPv6 prefix string representation to a byte-represented
+ *          IPv6 address
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc5952">
+ *          RFC 5952
+ *      </a>
+ *
+ * @param[out] result    The resulting byte representation
+ * @param[in]  prefix    An IPv6 prefix string representation
+ *
+ * @return  prefix length in bits, on success
+ * @return  <0 on error
+ */
+int ipv6_prefix_from_str(ipv6_addr_t *result, const char *prefix);
+
+/**
  * @brief   Converts an IPv6 address from a buffer of characters to a
  *          byte-represented IPv6 address
  *
