@@ -142,16 +142,6 @@ typedef struct {
 } kw2xrf_t;
 
 /**
- * @brief   Setup an KW2XRF based device state
- *
- * @param[out] dev          device descriptor
- * @param[in]  params       parameters for device initialization
- * @param[in]  index        index of @p params in a global parameter struct array.
- *                          If initialized manually, pass a unique identifier instead.
- */
-void kw2xrf_setup(kw2xrf_t *dev, const kw2xrf_params_t *params, uint8_t index);
-
-/**
  * @brief   Initialize the given KW2XRF device
  * @param[out] dev          device descriptor
  * @param[in]  params       parameters for device initialization
