@@ -28,5 +28,6 @@ rsource "blacklist/Kconfig"
 rsource "ext/frag/Kconfig"
 rsource "nib/Kconfig"
 rsource "whitelist/Kconfig"
+rsource "static_addr/Kconfig"
 
 endmenu # IPv6

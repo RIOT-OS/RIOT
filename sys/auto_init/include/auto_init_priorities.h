@@ -353,6 +353,12 @@ extern "C" {
  */
 #define AUTO_INIT_PRIO_MOD_DOCK_DNS                     1550
 #endif
+#ifndef AUTO_INIT_PRIO_MOD_GNRC_IPV6_STATIC_ADDR
+/**
+ * @brief   Static network configuration priority
+ */
+#define AUTO_INIT_PRIO_MOD_GNRC_IPV6_STATIC_ADDR        1560
+#endif
 
 #ifdef __cplusplus
 }
