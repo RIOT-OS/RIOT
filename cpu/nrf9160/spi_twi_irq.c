@@ -24,11 +24,14 @@
 #include <assert.h>
 
 #include "cpu.h"
+#include "mutex.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
 
 static spi_twi_irq_cb_t _irq[TWIM_COUNT];
 static void *_irq_arg[TWIM_COUNT];
+
+static mutex_t _locks[SPIM_COUNT];
 
 #if TWIM_COUNT != SPIM_COUNT
 #error Possible configuration issue, please update this file
@@ -86,6 +89,30 @@ void spi_twi_irq_register_i2c(NRF_TWIM_Type *bus,
     _irq_arg[num] = arg;
 
     NVIC_EnableIRQ(_isr[num]);
+}
+
+void nrf5x_i2c_acquire(NRF_TWIM_Type *bus)
+{
+    size_t num = _i2c_dev2num(bus);
+    mutex_lock(&_locks[num]);
+}
+
+void nrf5x_spi_acquire(NRF_SPIM_Type *bus)
+{
+    size_t num = _spi_dev2num(bus);
+    mutex_lock(&_locks[num]);
+}
+
+void nrf5x_i2c_release(NRF_TWIM_Type *bus)
+{
+    size_t num = _i2c_dev2num(bus);
+    mutex_unlock(&_locks[num]);
+}
+
+void nrf5x_spi_release(NRF_SPIM_Type *bus)
+{
+    size_t num = _spi_dev2num(bus);
+    mutex_unlock(&_locks[num]);
 }
 
 /* Check if UART driver doesn't already use the same IRQ */
