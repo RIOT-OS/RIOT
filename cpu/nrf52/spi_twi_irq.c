@@ -140,19 +140,26 @@ void spi_twi_irq_register_i2c(NRF_TWIM_Type *bus,
 
     _irq[num] = cb;
     _irq_arg[num] = arg;
+
     NVIC_EnableIRQ(_isr[num]);
 }
 
-void nrf5x_i2c_acquire(NRF_TWIM_Type *bus)
+void nrf5x_i2c_acquire(NRF_TWIM_Type *bus,
+                       spi_twi_irq_cb_t cb, void *arg)
 {
     size_t num = _i2c_dev2num(bus);
     mutex_lock(&_locks[num]);
+    _irq[num] = cb;
+    _irq_arg[num] = arg;
 }
 
-void nrf5x_spi_acquire(NRF_SPIM_Type *bus)
+void nrf5x_spi_acquire(NRF_SPIM_Type *bus,
+                       spi_twi_irq_cb_t cb, void *arg)
 {
     size_t num = _spi_dev2num(bus);
     mutex_lock(&_locks[num]);
+    _irq[num] = cb;
+    _irq_arg[num] = arg;
 }
 
 void nrf5x_i2c_release(NRF_TWIM_Type *bus)
