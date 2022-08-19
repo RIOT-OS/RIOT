@@ -22,4 +22,9 @@ config MODULE_BHP_EVENT
     depends on MODULE_EVENT
     depends on MODULE_BHP
 
+config MODULE_BHP_MSG
+    bool "Enable message based Bottom Half Processor implementation"
+    depends on MODULE_CORE_MSG
+    depends on MODULE_BHP
+
 endmenu

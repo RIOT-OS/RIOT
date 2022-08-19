@@ -1,0 +1,7 @@
+ifneq (,$(filter bhp_event,$(USEMODULE)))
+  USEMODULE += event
+endif
+
+ifneq (,$(filter bhp_msg,$(USEMODULE)))
+  USEMODULE += core_msg
+endif
