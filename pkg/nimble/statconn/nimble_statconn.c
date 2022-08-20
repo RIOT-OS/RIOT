@@ -86,7 +86,8 @@ static void _activate(uint8_t role)
 
     if (slot && (role == ROLE_M)) {
         ble_addr_t peer;
-        peer.type = BLE_ADDR_RANDOM;
+        peer.type = ((slot->addr[0] & 0xc0) == 0xc0) ? BLE_ADDR_RANDOM
+                                                     : BLE_ADDR_PUBLIC;
         bluetil_addr_swapped_cp(slot->addr, peer.val);
         /* try to (re)open the connection */
 #if IS_USED(MODULE_NIMBLE_STATCONN_EXT)
