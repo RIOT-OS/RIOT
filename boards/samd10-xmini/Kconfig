@@ -11,6 +11,7 @@ config BOARD_SAMD10_XMINI
     bool
     default y
     select CPU_MODEL_SAMD10D14AU
+    select HAS_BOARD_TIER_1
     select HAS_PERIPH_ADC
     select HAS_PERIPH_DAC
     select HAS_PERIPH_I2C

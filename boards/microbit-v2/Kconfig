@@ -12,6 +12,7 @@ config BOARD_MICROBIT_V2
     default y
     select BOARD_COMMON_NRF52
     select CPU_MODEL_NRF52833XXAA
+    select HAS_BOARD_TIER_0
     select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM
     select HAS_PERIPH_SPI
@@ -20,6 +21,7 @@ config BOARD_MICROBIT_V2
 
     select HAVE_SAUL_GPIO
     select HAVE_LSM303AGR
+
 
 source "$(RIOTBOARD)/common/microbit/Kconfig"
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

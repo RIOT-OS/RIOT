@@ -11,3 +11,5 @@ FEATURES_PROVIDED += periph_qdec
 # Various other features (if any)
 FEATURES_PROVIDED += ethernet
 FEATURES_PROVIDED += motor_driver
+
+FEATURES_PROVIDED += board_tier_0

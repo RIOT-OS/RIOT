@@ -2,6 +2,7 @@ CPU = samd5x
 CPU_MODEL = same54p20a
 
 # Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += board_tier_1
 FEATURES_PROVIDED += periph_dac
 FEATURES_PROVIDED += periph_eth
 FEATURES_PROVIDED += periph_i2c

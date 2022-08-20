@@ -15,6 +15,7 @@ config BOARD_NUCLEO_L152RE
     select CPU_MODEL_STM32L152RE
 
     # Put defined MCU peripherals here (in alphabetical order)
+    select HAS_BOARD_TIER_1
     select HAS_PERIPH_ADC
     select HAS_PERIPH_DAC
     select HAS_PERIPH_DMA

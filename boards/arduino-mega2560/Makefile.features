@@ -1,3 +1,5 @@
 CPU = atmega2560
 
 include $(RIOTBOARD)/common/arduino-atmega/Makefile.features
+
+FEATURES_PROVIDED += board_tier_0

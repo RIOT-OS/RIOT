@@ -1,3 +1,4 @@
 CPU_MODEL = saml10e16a
 
+FEATURES_PROVIDED += board_tier_1
 include $(RIOTBOARD)/common/saml1x/Makefile.features

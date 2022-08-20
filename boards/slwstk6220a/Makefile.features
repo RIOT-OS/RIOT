@@ -2,6 +2,7 @@ CPU_FAM = ezr32wg
 CPU_MODEL = ezr32wg330f256r60
 
 # Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += board_tier_1
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_dac
 FEATURES_PROVIDED += periph_i2c
