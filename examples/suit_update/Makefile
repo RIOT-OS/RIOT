@@ -53,6 +53,8 @@ FEATURES_OPTIONAL += periph_gpio_irq
 
 # Default COAP manifest resource location when fetched through gpio trigger
 CFLAGS += -DSUIT_MANIFEST_RESOURCE=\"$(SUIT_COAP_ROOT)/$(SUIT_NOTIFY_MANIFEST)\"
+# Enable optimized defaults for faster updates
+CFLAGS += -DCONFIG_RFC_RELAXED_PARAMS=1
 
 # Enable test_utils_interactive_sync, only used when running automatic test
 DEFAULT_MODULE += test_utils_interactive_sync
