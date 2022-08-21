@@ -1,6 +1,7 @@
 PKG_NAME=tflite-micro
 PKG_URL=https://github.com/tensorflow/tflite-micro
-PKG_VERSION=1501b574b74fd7877aba30aa9d8b667f41b139c3  # sync from 2022.04.07
+# sync from 2022.04.07
+PKG_VERSION=1501b574b74fd7877aba30aa9d8b667f41b139c3
 PKG_LICENSE=Apache 2.0
 
 include $(RIOTBASE)/pkg/pkg.mk

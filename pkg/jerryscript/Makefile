@@ -1,6 +1,7 @@
 PKG_NAME=jerryscript
 PKG_URL=https://github.com/jerryscript-project/jerryscript.git
-PKG_VERSION=8ba0d1b6ee5a065a42f3b306771ad8e3c0d819bc  # 2.4.0
+# 2.4.0
+PKG_VERSION=8ba0d1b6ee5a065a42f3b306771ad8e3c0d819bc
 PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
