@@ -77,6 +77,25 @@ extern "C" {
 #endif
 
 /**
+ * @brief Index of the high priority queue
+ */
+#define GNRC_NETIF_EVQ_INDEX_PRIO_HIGH  (0)
+
+/**
+ * @brief Index of the low priority queue
+ */
+#if IS_USED(MODULE_BHP_EVENT)
+#define GNRC_NETIF_EVQ_INDEX_PRIO_LOW   (GNRC_NETIF_EVQ_INDEX_PRIO_HIGH + 1)
+#else
+#define GNRC_NETIF_EVQ_INDEX_PRIO_LOW   GNRC_NETIF_EVQ_INDEX_PRIO_HIGH
+#endif
+
+/**
+ * @brief Number of event queues
+ */
+#define GNRC_NETIF_EVQ_NUMOF            (GNRC_NETIF_EVQ_INDEX_PRIO_LOW + 1)
+
+/**
  * @brief   Per-Interface Event Message Buses
  */
 typedef enum {
@@ -142,7 +161,7 @@ typedef struct {
     /**
      * @brief   Event queue for asynchronous events
      */
-    event_queue_t evq;
+    event_queue_t evq[GNRC_NETIF_EVQ_NUMOF];
     /**
      * @brief   ISR event for the network device
      */
