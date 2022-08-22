@@ -55,17 +55,17 @@ extern "C" {
 
 #define errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY    ( -1 )
 
-#ifdef CPU_FAM_ESP32
+#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S3)
 
 #define portNUM_PROCESSORS              2
 #define xPortGetCoreID()                PRO_CPU_NUM
 
-#else /* CPU_FAM_ESP32 */
+#else /* defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S3) */
 
 #define portNUM_PROCESSORS              1
 #define xPortGetCoreID()                PRO_CPU_NUM
 
-#endif /* CPU_FAM_ESP32 */
+#endif /* defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S3) */
 
 extern void vTaskEnterCritical(portMUX_TYPE *mux);
 extern void vTaskExitCritical(portMUX_TYPE *mux);

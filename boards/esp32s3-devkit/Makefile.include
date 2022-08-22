@@ -1,0 +1,12 @@
+PSEUDOMODULES += esp32s3_devkitc_1_n8
+PSEUDOMODULES += esp32s3_devkitc_1_n8r2
+PSEUDOMODULES += esp32s3_devkitc_1_n8r8
+PSEUDOMODULES += esp32s3_devkitc_1_n16r8v
+PSEUDOMODULES += esp32s3_devkitc_1_n32r8v
+PSEUDOMODULES += esp32s3_devkitc_1u_n8
+PSEUDOMODULES += esp32s3_devkitc_1u_n8r2
+PSEUDOMODULES += esp32s3_devkitc_1u_n8r8
+PSEUDOMODULES += esp32s3_devkitm_1_n8r8
+PSEUDOMODULES += esp32s3_devkitm_1u_n8r8
+
+include $(RIOTBOARD)/common/esp32s3/Makefile.include

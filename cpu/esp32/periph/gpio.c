@@ -101,7 +101,7 @@ static bool _gpio_pin_pu[GPIO_PIN_NUMOF] = { };
 static bool _gpio_pin_pd[GPIO_PIN_NUMOF] = { };
 #endif
 
-#if defined(CPU_FAM_ESP32)
+#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S3)
 
 #define GPIO_IN_GET(b)  (b < 32) ? GPIO.in & BIT(b) : GPIO.in1.val & BIT(b-32)
 #define GPIO_OUT_SET(b) if (b < 32) { GPIO.out_w1ts = BIT(b); } else { GPIO.out1_w1ts.val = BIT(b-32); }

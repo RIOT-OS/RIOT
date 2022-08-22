@@ -228,7 +228,6 @@ LINKFLAGS += \
   -Wno-frame-address \
   -o $(ESP_SDK_BOOTLOADER_DIR)/bootloader.elf \
   -Wl,--cref \
-  -Wl,--defsym=IDF_TARGET_ESP32=0 \
   -Wl,--gc-sections \
   -fno-lto \
   -fno-rtti \

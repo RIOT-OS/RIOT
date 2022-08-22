@@ -14972,6 +14972,9 @@ cpu/esp32/include/periph_cpu_esp32\.h:[0-9]+: warning: Member GPIO[0-9]+ \(macro
 cpu/esp32/include/periph_cpu_esp32c3\.h:[0-9]+: warning: Member GPIO[0-9]+ \(macro definition\) of file periph_cpu_esp32c3\.h is not documented.
 boards/common/esp32c3/include/board_common.h:[0-9]+: warning: Member LED[0-9]_[A-Z]+ \(macro definition\) of file board_common\.h is not documented.
 boards/common/esp32c3/include/board_common.h:[0-9]+: warning: Member SPIFFS_[_A-Z]+ \(macro definition\) of file board_common\.h is not documented.
+cpu/esp32/include/periph_cpu_esp32s3\.h:[0-9]+: warning: Member GPIO[0-9]+ \(macro definition\) of file periph_cpu_esp32s3\.h is not documented.
+boards/common/esp32s3/include/board_common.h:[0-9]+: warning: Member LED[0-9]_[A-Z]+ \(macro definition\) of file board_common\.h is not documented.
+boards/common/esp32s3/include/board_common.h:[0-9]+: warning: Member SPIFFS_[_A-Z]+ \(macro definition\) of file board_common\.h is not documented.
 boards/waveshare\-nrf52840\-eval\-kit/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_[A0-9]+ \(macro definition\) of file arduino_pinmap\.h is not documented.
 boards/waveshare\-nrf52840\-eval\-kit/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_[A0-9]+ \(macro definition\) of file arduino_pinmap\.h is not documented.
 boards/waveshare\-nrf52840\-eval\-kit/include/board\.h:[0-9]+: warning: Member LED0_PIN \(macro definition\) of file board\.h is not documented.
