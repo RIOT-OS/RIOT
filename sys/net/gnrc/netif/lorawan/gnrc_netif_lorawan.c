@@ -200,7 +200,7 @@ static void _driver_cb(netdev_t *dev, netdev_event_t event)
     gnrc_lorawan_t *mac = &netif->lorawan.mac;
 
     if (event == NETDEV_EVENT_ISR) {
-        event_post(&netif->evq, &netif->event_isr);
+        event_post(&netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW], &netif->event_isr);
     }
     else {
         DEBUG("gnrc_netif: event triggered -> %i\n", event);
