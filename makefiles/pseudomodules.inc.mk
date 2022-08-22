@@ -236,6 +236,7 @@ PSEUDOMODULES += stdio_telnet
 PSEUDOMODULES += stm32_eth
 PSEUDOMODULES += stm32_eth_auto
 PSEUDOMODULES += stm32_eth_link_up
+PSEUDOMODULES += stm32_eth_tracing
 PSEUDOMODULES += stm32mp1_eng_mode
 PSEUDOMODULES += suit_transport_%
 PSEUDOMODULES += suit_storage_%

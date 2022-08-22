@@ -16,6 +16,10 @@ ifneq (,$(filter stm32_eth_%,$(USEMODULE)))
   USEMODULE += stm32_eth
 endif
 
+ifneq (,$(filter stm32_eth_tracing,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_ll
+endif
+
 ifneq (,$(filter stm32_eth_auto,$(USEMODULE)))
   USEMODULE += stm32_eth_link_up
 endif
@@ -24,7 +28,7 @@ ifneq (,$(filter stm32_eth,$(USEMODULE)))
   FEATURES_REQUIRED += periph_eth
   USEMODULE += iolist
   USEMODULE += netdev_eth
-  USEMODULE += netdev_legacy_api
+  USEMODULE += netdev_new_api
   USEMODULE += ztimer
   USEMODULE += ztimer_msec
 
