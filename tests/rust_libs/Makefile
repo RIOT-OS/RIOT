@@ -4,6 +4,7 @@ USEMODULE += shell
 USEMODULE += shell_democommands
 
 FEATURES_REQUIRED += rust_target
+CARGO_CHANNEL = stable
 
 # Currently unknown, something related to the LED_PORT definition that doesn't
 # pass C2Rust's transpilation
