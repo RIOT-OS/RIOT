@@ -70,7 +70,8 @@ static void test_gnrc_lorawan__validate_mic(void)
     /* Uplink packet */
     le_uint32_t calc_mic;
 
-    gnrc_lorawan_t mac = {0};
+    gnrc_lorawan_t mac = { 0 };
+
     memcpy(&mac.dev_addr, &dev_addr, sizeof(dev_addr));
     mac.ctx.fnwksintkey = nwkskey;
     mac.mcps.fcnt = fcnt;
@@ -89,7 +90,8 @@ static void test_gnrc_lorawan__wrong_mic(void)
     /* Uplink packet */
     le_uint32_t calc_mic;
 
-    gnrc_lorawan_t mac = {0};
+    gnrc_lorawan_t mac = { 0 };
+
     memcpy(&mac.dev_addr, &dev_addr, sizeof(dev_addr));
     mac.ctx.fnwksintkey = nwkskey;
     mac.mcps.fcnt = fcnt;

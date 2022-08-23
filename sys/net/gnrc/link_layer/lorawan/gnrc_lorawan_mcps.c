@@ -167,7 +167,7 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
 
     /* NOTE: MIC is in pkt */
     if (!gnrc_lorawan_mic_is_valid(psdu, size, mac->ctx.snwksintkey,
-        mac->mcps.fcnt, gnrc_lorawan_optneg_is_set(mac))) {
+                                   mac->mcps.fcnt, gnrc_lorawan_optneg_is_set(mac))) {
         DEBUG("gnrc_lorawan: invalid MIC\n");
         gnrc_lorawan_event_no_rx(mac);
         return;
@@ -226,17 +226,17 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
         if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && gnrc_lorawan_optneg_is_set(mac)) {
             if (_pkt.port) {
                 gnrc_lorawan_encrypt_fopts(fopts->iol_base, fopts->iol_len,
-                                    &mac->dev_addr,
-                                    gnrc_lorawan_get_afcnt_down(mac), true,
-                                    GNRC_LORAWAN_DIR_DOWNLINK,
-                                    mac->ctx.nwksenckey);
+                                           &mac->dev_addr,
+                                           gnrc_lorawan_get_afcnt_down(mac), true,
+                                           GNRC_LORAWAN_DIR_DOWNLINK,
+                                           mac->ctx.nwksenckey);
             }
             else {
                 gnrc_lorawan_encrypt_fopts(fopts->iol_base, fopts->iol_len,
-                                    &mac->dev_addr,
-                                    mac->mcps.fcnt_down, false,
-                                    GNRC_LORAWAN_DIR_DOWNLINK,
-                                    mac->ctx.nwksenckey);
+                                           &mac->dev_addr,
+                                           mac->mcps.fcnt_down, false,
+                                           GNRC_LORAWAN_DIR_DOWNLINK,
+                                           mac->ctx.nwksenckey);
             }
         }
         DEBUG("gnrc_lorawan: processing fopts\n");
@@ -331,8 +331,8 @@ size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload,
         key = mac->ctx.nwksenckey;
 
         gnrc_lorawan_encrypt_fopts(&buf.data[sizeof(lorawan_hdr_t)], fopts_length,
-                                 &mac->dev_addr, mac->mcps.fcnt, false,
-                                 GNRC_LORAWAN_DIR_UPLINK, key);
+                                   &mac->dev_addr, mac->mcps.fcnt, false,
+                                   GNRC_LORAWAN_DIR_UPLINK, key);
     }
 
     return buf.index;

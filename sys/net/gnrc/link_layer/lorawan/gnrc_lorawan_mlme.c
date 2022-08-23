@@ -340,7 +340,7 @@ static int _fopts_mlme_link_rekey_ind(lorawan_buffer_t *buf)
 {
     if (buf) {
         assert(buf->index + GNRC_LORAWAN_CID_SIZE +
-                GNCR_LORAWAN_REKEY_IND_SIZE <= buf->size);
+               GNCR_LORAWAN_REKEY_IND_SIZE <= buf->size);
 
         buf->data[buf->index++] = GNCR_LORAWAN_CID_REKEY_CONF;
         buf->data[buf->index++] = MINOR_LRWAN;
@@ -353,6 +353,7 @@ static void _mlme_rekey_check_conf(gnrc_lorawan_t *mac, uint8_t *p)
 {
     /* server version must by smaller or equal to device's LoRaWAN version */
     uint8_t server_minor = p[1];
+
     if (server_minor <= MINOR_LRWAN) {
         mac->mlme.pending_mlme_opts &= ~GNRC_LORAWAN_MLME_OPTS_REKEY_IND_REQ;
     }

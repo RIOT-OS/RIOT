@@ -46,7 +46,7 @@ extern "C" {
 #define MAJOR_MASK     0x3                              /**< Major mtype mask */
 #define MAJOR_LRWAN_R1 0x0                              /**< LoRaWAN R1 version type */
 
-#define MINOR_LRWAN    0x1                             /**< Minor LoRaWAN version of device */
+#define MINOR_LRWAN    0x1                              /**< Minor LoRaWAN version of device */
 
 #define JOIN_REQUEST_SIZE (23U)                         /**< Join Request size in bytes */
 #define MIC_SIZE (4U)                                   /**< MIC size in bytes */
