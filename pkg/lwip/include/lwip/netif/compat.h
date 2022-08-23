@@ -33,7 +33,41 @@ extern "C" {
 typedef struct {
     netif_t common_netif;                /**< network interface descriptor */
     struct netif lwip_netif;             /**< lwIP interface data */
+    rmutex_t lock;                       /**< lock for the interface */
 } lwip_netif_t;
+
+/**
+ * @brief   Init the LWIP netif network device lock.
+ *
+ * @param[in]   netif pointer to the LWIP network interface
+ */
+static inline void lwip_netif_dev_lock_init(struct netif *netif)
+{
+    lwip_netif_t *compat_netif = container_of(netif, lwip_netif_t, lwip_netif);
+    rmutex_init(&compat_netif->lock);
+}
+
+/**
+ * @brief   Acquire the LWIP netif network device.
+ *
+ * @param[out]   netif pointer to the LWIP network interface
+ */
+static inline void lwip_netif_dev_acquire(struct netif *netif)
+{
+    lwip_netif_t *compat_netif = container_of(netif, lwip_netif_t, lwip_netif);
+    rmutex_lock(&compat_netif->lock);
+}
+
+/**
+ * @brief   Release the LWIP netif network device.
+ *
+ * @param[out]   netif pointer to the LWIP network interface
+ */
+static inline void lwip_netif_dev_release(struct netif *netif)
+{
+    lwip_netif_t *compat_netif = container_of(netif, lwip_netif_t, lwip_netif);
+    rmutex_unlock(&compat_netif->lock);
+}
 
 #ifdef __cplusplus
 }
