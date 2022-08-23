@@ -59,6 +59,7 @@
 static void _atwinc15x0_wifi_cb(uint8_t event, void *msg);
 static void _atwinc15x0_eth_cb(uint8_t type, void *msg, void *ctrl);
 static int _atwinc15x0_connect(void);
+static int _atwinc15x0_init(netdev_t *netdev);
 static int _set_state(atwinc15x0_t *dev, netopt_state_t state);
 
 /**
@@ -454,6 +455,10 @@ static int _set_state(atwinc15x0_t *dev, netopt_state_t state)
         m2m_wifi_set_sleep_mode(M2M_PS_DEEP_AUTOMATIC, CONFIG_ATWINC15X0_RECV_BCAST);
         dev->state = state;
         _atwinc15x0_connect();
+        return sizeof(netopt_state_t);
+    case NETOPT_STATE_RESET:
+        _atwinc15x0_init(&dev->netdev);
+        dev->state = NETOPT_STATE_IDLE;
         return sizeof(netopt_state_t);
     default:
         break;
