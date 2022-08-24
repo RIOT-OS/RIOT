@@ -5,26 +5,6 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-config CPU_ARCH_RISCV
-    bool
-    select HAS_ARCH_32BIT
-    select HAS_ARCH_ESP
-    select HAS_ARCH_ESP_RISCV
-    help
-        RISC-V based ESP32x SoC variant is used.
-
-config CPU_ARCH
-    default "rv32" if CPU_ARCH_RISCV
-
-config CPU_CORE_RV32IMC
-    bool
-    select CPU_ARCH_RISCV
-    help
-        CPU core of the ESP32x SoC is a RISC-V core.
-
-config CPU_CORE
-    default "rv32imc" if CPU_CORE_RV32IMC
-
 config CPU_FAM_ESP32C3
     bool
     select CPU_COMMON_ESP
