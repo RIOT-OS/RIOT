@@ -79,6 +79,7 @@ static const struct intr_handle_data_t _irq_data_table[] = {
 #if !defined(CPU_FAM_ESP32)
     { ETS_SYSTIMER_TARGET2_EDGE_INTR_SOURCE, CPU_INUM_SYSTIMER, 2 },
 #endif
+    { ETS_INTERNAL_SW1_INTR_SOURCE, CPU_INUM_BLE, 2 }
 };
 
 #define IRQ_DATA_TABLE_SIZE        ARRAY_SIZE(_irq_data_table)

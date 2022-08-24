@@ -13,6 +13,10 @@ ifneq (, $(filter esp_bootloader, $(USEMODULE)))
     DIRS += bootloader
 endif
 
+ifneq (, $(filter esp_ble_nimble, $(USEMODULE)))
+    DIRS += esp-ble-nimble
+endif
+
 ifneq (, $(filter esp_eth, $(USEMODULE)))
     DIRS += esp-eth
 endif

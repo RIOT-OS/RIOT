@@ -195,6 +195,11 @@ extern void asymcute_handler_run(void);
 AUTO_INIT(asymcute_handler_run,
           AUTO_INIT_PRIO_MOD_ASYMCUTE);
 #endif
+#if IS_USED(MODULE_ESP_BLE_NIMBLE)
+extern void esp_ble_nimble_init(void);
+AUTO_INIT(esp_ble_nimble_init,
+          AUTO_INIT_PRIO_MOD_ESP_BLE_NIMBLE);
+#endif
 #if IS_USED(MODULE_NIMBLE)
 extern void nimble_riot_init(void);
 AUTO_INIT(nimble_riot_init,

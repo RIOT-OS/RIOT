@@ -209,6 +209,12 @@ extern "C" {
  */
 #define AUTO_INIT_PRIO_MOD_ASYMCUTE                     1310
 #endif
+#ifndef AUTO_INIT_PRIO_MOD_ESP_BLE_NIMBLE
+/**
+ * @brief   ESP BLE NimBLE priority
+ */
+#define AUTO_INIT_PRIO_MOD_ESP_BLE_NIMBLE               1319
+#endif
 #ifndef AUTO_INIT_PRIO_MOD_NIMBLE
 /**
  * @brief   NimBLE priority

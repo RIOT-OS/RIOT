@@ -38,7 +38,7 @@ extern "C" {
  */
 #define CPU_INUM_GPIO       2   /**< Level interrupt with low priority 1 */
 #define CPU_INUM_CAN        3   /**< Level interrupt with low priority 1 */
-#define CPU_INUM_UART       5   /**< Level interrupt with low priority 1 */
+#define CPU_INUM_UART       4   /**< Level interrupt with low priority 1 */
 #define CPU_INUM_RTT        9   /**< Level interrupt with low priority 1 */
 #define CPU_INUM_I2C        12  /**< Level interrupt with low priority 1 */
 #define CPU_INUM_WDT        13  /**< Level interrupt with low priority 1 */
@@ -47,6 +47,7 @@ extern "C" {
 #define CPU_INUM_TIMER      19  /**< Level interrupt with medium priority 2 */
 #define CPU_INUM_FRC2       20  /**< Level interrupt with medium priority 2 */
 #define CPU_INUM_SYSTIMER   20  /**< Level interrupt with medium priority 2 */
+#define CPU_INUM_BLE        21  /**< Level interrupt with medium priority 2 */
 #define CPU_INUM_CACHEERR   25  /**< Level interrupt with high priority 4 */
 /** @} */
 

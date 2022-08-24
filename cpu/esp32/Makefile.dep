@@ -17,6 +17,17 @@ ifneq (,$(filter cpp,$(USEMODULE)))
   USEMODULE += pthread
 endif
 
+ifneq (,$(filter esp_ble,$(USEMODULE)))
+  # add additional modules and packages used for any BLE interface
+  FEATURES_REQUIRED += esp_ble
+  USEMODULE += esp_idf_ble
+  USEPKG += esp32_sdk_lib_phy
+  ifeq (esp32,$(CPU_FAM))
+    FEATURES_REQUIRED += esp_ble_esp32
+    USEPKG += esp32_sdk_lib_bt_esp32
+  endif
+endif
+
 ifneq (,$(filter esp_eth,$(USEMODULE)))
   FEATURES_REQUIRED += esp_eth
   USEMODULE += esp_idf_eth
@@ -118,6 +129,14 @@ endif
 
 ifneq (,$(filter mtd,$(USEMODULE)))
   USEMODULE += esp_idf_spi_flash
+endif
+
+ifneq (,$(filter nimble,$(USEPKG)))
+  USEMODULE += esp_ble
+  USEMODULE += esp_ble_nimble
+  USEMODULE += nimble_host
+  USEMODULE += nimble_transport_hci_h4
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter periph_adc,$(USEMODULE)))

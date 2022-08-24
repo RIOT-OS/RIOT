@@ -9,6 +9,13 @@ if TEST_KCONFIG && HAS_ARCH_ESP32
 
 # define configuration menu entries that common for all ESP32x SoC variants
 
+config MODULE_ESP_BLE
+    bool "Enable Bluetooth LE interface"
+    depends on HAS_ESP_BLE
+    select MODULE_ESP_IDF_BLE
+    select PACKAGE_ESP32_SDK_LIB_PHY
+    select PACKAGE_ESP32_SDK_LIB_BT_ESP32 if HAS_ESP_BLE_ESP32
+
 config MODULE_ESP_JTAG
     bool "Enable JTAG debugging interface"
     depends on HAS_ESP_JTAG
@@ -24,6 +31,7 @@ config MODULE_ESP_SPI_RAM
         Say y to use external SPI RAM connected through the SPI interface.
 
 rsource "bootloader/Kconfig"
+rsource "esp-ble-nimble/Kconfig"
 rsource "esp-idf/Kconfig"
 rsource "esp-idf-api/Kconfig"
 rsource "periph/Kconfig"
