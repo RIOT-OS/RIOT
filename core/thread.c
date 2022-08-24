@@ -333,6 +333,10 @@ static const char *state_names[STATUS_NUMOF] = {
     [STATUS_FLAG_BLOCKED_ALL] = "bl allfl",
     [STATUS_MBOX_BLOCKED] = "bl mbox",
     [STATUS_COND_BLOCKED] = "bl cond",
+#if IS_USED(MODULE_ESP_FREERTOS_COMMON)
+    [STATUS_QUEUE_FULL_BLOCKED] = "bl qfull",
+    [STATUS_QUEUE_EMPTY_BLOCKED] = "bl qempt",
+#endif
     [STATUS_RUNNING] = "running",
     [STATUS_PENDING] = "pending",
 };
