@@ -98,7 +98,7 @@ Parameter                               | Short Description                     
 [ADC_GPIOS](#esp32_adc_channels)        | GPIOs that can be used as ADC channels                            | m
 [CAN_TX](#esp32_can_interfaces)         | GPIO used as CAN transceiver TX signal                            | o
 [CAN_RX](#esp32_can_interfaces)         | GPIO used as CAN transceiver RX signal                            | o
-[DAC_GPIOS](#esp32_adc_channels)        | GPIOs that can be used as DAC channels                            | m
+[DAC_GPIOS](#esp32_dac_channels)        | GPIOs that can be used as DAC channels                            | m
 [I2C0_SPEED](#esp32_i2c_interfaces)     | Bus speed of I2C_DEV(0)                                           | o
 [I2C0_SCL](#esp32_i2c_interfaces)       | GPIO used as SCL for I2C_DEV(0)                                   | o
 [I2C0_SDA](#esp32_i2c_interfaces)       | GPIO used as SCL for I2C_DEV(0                                    | o
@@ -168,7 +168,7 @@ either based on
 - Tensilica Xtensa 32-bit LX7 microprocessor (ESP32-S2, ESP32-S3), or
 - 32-bit RISC-V CPU (ESP32-C3, ESP32-H2).
 
-At the moment, ESP32, ESP32-S3 and ESP32-C3 variants (families) are supported by RIOT-OS.
+At the moment, ESP32, ESP32-S2, ESP32-S3 and ESP32-C3 variants (families) are supported by RIOT-OS.
 
 @note Even if the used ESP32x SoC is a dual-core version, RIOT-OS uses only
       one core.
@@ -253,6 +253,42 @@ The key features of ESP32-C3 are:
 
 </center><br>
 
+### Features of The ESP32-S2 SoC variant (family)
+
+The key features of ESP32-S2 are:
+
+<center>
+
+| MCU               | ESP32-S2                                                          | Supported by RIOT |
+| ------------------|-------------------------------------------------------------------|------------------ |
+| Vendor            | Espressif                                                         | |
+| Cores             | 1 x Tensilica Xtensa LX7                                          | 1 core |
+| FPU               | ULP - Ultra low power co-processor                                | no |
+| RAM               | 320 KiB SRAM <br> 8 KiB slow RTC SRAM <br> 8 KiB fast RTC SRAM    | yes <br> yes <br> yes |
+| ROM               | 128 KiB                                                           | yes |
+| Flash             | 512 KiB ... 32 MiB Dual/Quad/Octal SPI (external or internal)     | yes |
+| Frequency         | 240 MHz, 160 MHz, 80 MHz                                          | yes |
+| Power Consumption | 66 mA @ 240 MHz <br> 50 mA @ 160 MHz (40 mA @ 160 MHz single core) <br> 33 mA @ 80 MHz (28 mA @ 80 MHz single core) <br> 19 mA @ 40 MHz (16 mA @ 40 MHz single core) <br>240 uA in light sleep mode <br> 8 uA in deep sleep mode | yes <br> yes <br> yes <br> yes <br> yes <br> yes |
+| Timers            | 4 x 54 bit                                                        | yes |
+| ADCs              | 2 x SAR-ADC with up to 20 x 13 bit channels total                 | yes |
+| DACs              | 2 x DAC with 8 bit                                                | -   |
+| GPIOs             | 43 (22 are RTC GPIOs)                                             | yes |
+| I2Cs              | 2                                                                 | yes |
+| SPIs              | 4                                                                 | yes (2) |
+| UARTs             | 2                                                                 | yes |
+| WiFi              | IEEE 802.11 b/g/n built in                                        | yes |
+| Bluetooth         | -                                                                 | -   |
+| Ethernet          | -                                                                 | -   |
+| CAN               | version 2.0                                                       | yes |
+| IR                | up to 4 channels TX/RX                                            | no |
+| Motor PWM         | 2 devices x 6 channels                                            | no |
+| LED PWM           | 8 channels with 14 bit resolution in 1 channel group with 4 timers | yes |
+| Crypto            | Hardware acceleration of AES, SHA-2, RSA, ECC, RNG                | no |
+| Vcc               | 2.8 - 3.6 V                                                       | |
+| Documents         | [Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32-s2_datasheet_en.pdf) <br> [Technical Reference](https://www.espressif.com/sites/default/files/documentation/esp32-s2_technical_reference_manual_en.pdf) | |
+
+</center><br>
+
 ### Features of The ESP32-S3 SoC variant (family)
 
 The key features of ESP32-S3 are:
@@ -300,6 +336,10 @@ Most common modules used by ESP32x SoC boards are:
 - [ESP32-WROVER](https://www.espressif.com/sites/default/files/documentation/esp32-wrover_datasheet_en.pdf)
 - [ESP32-C3-MINI-1](https://www.espressif.com/sites/default/files/documentation/esp32-c3-mini-1_datasheet_en.pdf)
 - [ESP32-C3-WROOM-02](https://www.espressif.com/sites/default/files/documentation/esp32-c3-wroom-02_datasheet_en.pdf)
+- [ESP32-S2-MINI-1](https://www.espressif.com/sites/default/files/documentation/esp32-s2-mini-1_esp32-s2-mini-1u_datasheet_en.pdf)
+- [ESP32-S2-SOLO](https://www.espressif.com/sites/default/files/documentation/esp32-s2-solo_esp32-s2-solo-u_datasheet_en.pdf)
+- [ESP32-S2-WROOM](https://www.espressif.com/sites/default/files/documentation/esp32-s2-wroom_esp32-s2-wroom-i_datasheet_en.pdf)
+- [ESP32-S2-WROVER](https://www.espressif.com/sites/default/files/documentation/esp32-s2-wrover_esp32-s2-wrover-i_datasheet_en.pdf)
 - [ESP32-S3-MINI-1](https://www.espressif.com/sites/default/files/documentation/esp32-s3-mini-1_mini-1u_datasheet_en.pdf)
 - [ESP32-S3-WROOM-1](https://www.espressif.com/sites/default/files/documentation/esp32-s3-wroom-1_wroom-1u_datasheet_en.pdf)
 - [ESP32-S3-WROOM-2](https://www.espressif.com/sites/default/files/documentation/esp32-s3-wroom-2_datasheet_en.pdf)
@@ -429,8 +469,8 @@ toolchain (Debian/Ubuntu package names):
 The shell script `$RIOTBASE/dist/tools/esptools/install.sh` is used to
 install Espressif's precompiled versions of the following tools:
 
-- ESP32 vendor toolchain (for ESP32, ESP32-S3 and ESP32-C3)
-- OpenOCD for ESP32 (for ESP32, ESP32-S3 and ESP32-C3)
+- ESP32 vendor toolchain (for ESP32, ESP32-S2, ESP32-S3 and ESP32-C3)
+- OpenOCD for ESP32 (for ESP32, ESP32-S2, ESP32-S3 and ESP32-C3)
 - QEMU for ESP32 (only for ESP32)
 
 `$RIOTBASE` defines the root directory of the RIOT repository. The shell
@@ -440,7 +480,7 @@ script takes an argument that specifies which tools to download and install:
 $ dist/tools/esptools/install.sh
 
 install.sh <tool>
-tool = all | esp32 | esp32c3 | esp32s3 | openocd | qemu
+tool = all | esp32 | esp32c3 | esp32s2 | esp32s3 | openocd | qemu
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Thus, either all tools or only certain tools can be installed.
@@ -467,7 +507,7 @@ paths of the installed tools using again the environment variable
 $ . dist/tools/esptools/export.sh
 
 Usage: export.sh <tool>
-tool = all | esp32 | esp32c3 | esp32s3 | openocd | qemu
+tool = all | esp32 | esp32c3 | esp32s2 | esp32s3 | openocd | qemu
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 All the tools required for building a RIOT application for ESP32x SoCs should then
@@ -604,6 +644,7 @@ always use `dio` or `dout` to keep them free for other purposes:
 
 - ESP32 GPIO9 and GPIO10
 - ESP32-C3 GPIO12 and GPIO13
+- ESP32-S2 GPIO27 and GPIO28
 - ESP32-S3 GPIO27 and GPIO28
 
 For more information about these flash modes, refer the documentation of
@@ -690,6 +731,7 @@ For details, see:
 
 - \ref esp32_gpio_pins_esp32 "ESP32"
 - \ref esp32_gpio_pins_esp32c3 "ESP32-C3"
+- \ref esp32_gpio_pins_esp32s2 "ESP32-S2"
 - \ref esp32_gpio_pins_esp32s3 "ESP32-S3"
 
 [Back to table of contents](#esp32_toc)
@@ -703,6 +745,7 @@ details, see:
 
 - \ref esp32_adc_channels_esp32 "ESP32"
 - \ref esp32_adc_channels_esp32c3 "ESP32-C3"
+- \ref esp32_adc_channels_esp32s2 "ESP32-S2"
 - \ref esp32_adc_channels_esp32s3 "ESP32-S3"
 
 #ADC_GPIOS in the board-specific peripheral configuration defines the
@@ -761,6 +804,7 @@ For the GPIO that can be used with this function, see:
 
 - \ref esp32_adc_channels_esp32 "ESP32"
 - \ref esp32_adc_channels_esp32c3 "ESP32-C3"
+- \ref esp32_adc_channels_esp32s2 "ESP32-S2"
 - \ref esp32_adc_channels_esp32s3 "ESP32-S3"
 
 @note ADC2 is also used by the WiFi module. The GPIOs connected to ADC2 are
@@ -835,6 +879,7 @@ on used ESP32x SoC family, for details see:
 
 - \ref esp32_i2c_interfaces_esp32 "ESP32"
 - \ref esp32_i2c_interfaces_esp32c3 "ESP32-C3"
+- \ref esp32_i2c_interfaces_esp32s2 "ESP32-S2"
 - \ref esp32_i2c_interfaces_esp32s3 "ESP32-S3"
 
 @note
@@ -886,6 +931,7 @@ channel depends on respective ESP32x SoC family. For details, see:
 
 - \ref esp32_pwm_channels_esp32 "ESP32"
 - \ref esp32_pwm_channels_esp32c3 "ESP32-C3"
+- \ref esp32_pwm_channels_esp32s2 "ESP32-S2"
 - \ref esp32_pwm_channels_esp32s3 "ESP32-S3"
 
 Each channel group has 4 timers which can be used as clock source by the
@@ -1007,6 +1053,7 @@ on used ESP32x SoC family, for details see:
 
 - \ref esp32_spi_interfaces_esp32 "ESP32"
 - \ref esp32_spi_interfaces_esp32c3 "ESP32-C3"
+- \ref esp32_spi_interfaces_esp32s2 "ESP32-S2"
 - \ref esp32_spi_interfaces_esp32s3 "ESP32-S3"
 
 @note
@@ -1050,6 +1097,7 @@ ESP32x SoC family, for details see:
 
 - \ref esp32_timers_esp32 "ESP32"
 - \ref esp32_timers_esp32c3 "ESP32-C3"
+- \ref esp32_timers_esp32s2 "ESP32-S2"
 - \ref esp32_timers_esp32s3 "ESP32-S3"
 
 Timers are MCU built-in features and not board-specific. There is nothing to
@@ -1111,6 +1159,7 @@ on used ESP32x SoC family, for details see:
 
 - \ref esp32_uart_interfaces_esp32 "ESP32"
 - \ref esp32_uart_interfaces_esp32c3 "ESP32-C3"
+- \ref esp32_uart_interfaces_esp32s2 "ESP32-S2"
 - \ref esp32_uart_interfaces_esp32s3 "ESP32-S3"
 
 @note To ensure that the `UARTn_*` symbols define the configuration for
@@ -1906,6 +1955,7 @@ For details, see:
 
 - \ref esp32_jtag_interface_esp32 "ESP32"
 - \ref esp32_jtag_interface_esp32c3 "ESP32-C3"
+- \ref esp32_jtag_interface_esp32s2 "ESP32-S2"
 - \ref esp32_jtag_interface_esp32s3 "ESP32-S3"
 
 This JTAG interface can be used with OpenOCD and GDB for On-Chip debugging
@@ -1926,6 +1976,7 @@ that can be used without additional chips. For details, see:
 
 - \ref esp32_jtag_interface_esp32 "ESP32"
 - \ref esp32_jtag_interface_esp32c3 "ESP32-C3"
+- \ref esp32_jtag_interface_esp32s2 "ESP32-S2"
 - \ref esp32_jtag_interface_esp32s3 "ESP32-S3"
 
 To use the JTAG debugging, the precompiled version of OpenOCD for ESP32 has to
@@ -1967,7 +2018,8 @@ Detailed information on how to configure the JTAG interface of the respective
 ESP32x SoC variant (family) can be found in ESP-IDF Programming Guide:
 
 - [ESP32](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/jtag-debugging/index.html)
-- [ESP32-C3](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-guides/jtag-debugging/index.html)
+- [ESP32-S3](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/api-guides/jtag-debugging/index.html)
+- [ESP32-S2](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/api-guides/jtag-debugging/index.html)
 - [ESP32-S3](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/api-guides/jtag-debugging/index.html)
 
 [Back to table of contents](#esp32_toc)
