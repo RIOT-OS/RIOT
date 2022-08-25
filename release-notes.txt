@@ -360,12 +360,7 @@ API Changes
 * nanocoap: define and use coap_request_ctx_t for request handlers (#17957)
 * sys/shell/gnrc_netif: List netifs in registration order (#17078)
 
-Uncategorized
--------------
-* CODEOWNERS: replace cgundogan->MrKevinWeiss for kconfig (#18018)
-* Pr/release notes 2022.04 (#18007)
-
-And 64 minor changes.
+And countless minor changes.
 
 Deprecations
 ============
