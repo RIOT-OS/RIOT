@@ -18,17 +18,28 @@ business models around the free open-source software platform provided by RIOT.
 About this release
 ==================
 
-The 2022.07 release includes:
+The 2022.07 release includes many changes, some highlights of which are:
 
-## List of notable changes here ##
+### GPIO Low-level drivers
 
-GPIO_LL
+A new API, `gpio_ll`, has been introduced for highly efficient access to GPIO
+pins grouped in ports.
 
-18167
+The API is limited to internal use for the time being, but still paves the way
+towards using port multipliers like local GPIO pins, and for improved
+bit-banging implementations (e.g. around WS281x-style LEDs).
 
-SUIT
+### Improved serial port selection
 
-Rust modules
+When using multiple boards simultaneously, a new serial port selection
+algorithm can be activated by setting `MOST_RECENT_PORT=1`. Of all serial ports
+whose metadata matches the board's known properties, it selects the most
+recently connected one.
+
+### ESP support
+
+The ESP IDF (IoT Development Framework; the vendor's provided tools) has been
+upgraded to version 4.4, and many peripheral drivers are now implemented using those.
 
 
 343 pull requests, composed of 767 commits, have been merged since the
