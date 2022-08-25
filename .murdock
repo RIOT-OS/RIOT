@@ -377,7 +377,7 @@ get_app_board_toolchain_pairs() {
     do
         for toolchain in $(get_supported_toolchains $appdir $board)
         do
-            for i in $(seq 1 200)
+            for i in $(seq 1 300)
             do
                 echo $prefix $appdir $board:$toolchain
             done
