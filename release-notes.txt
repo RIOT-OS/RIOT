@@ -453,7 +453,7 @@ Bug fixes (64)
 Known issues
 ============
 
-Network related issues (59)
+Network related issues (58)
 ---------------------------
 
 * 6lo gnrc fragmentation expects driver to block on TX (#7474)
@@ -466,7 +466,6 @@ Network related issues (59)
 * at86rf2xx: Dead lock when sending while receiving (#8242)
 * at86rf2xx: lost interrupts (#5486)
 * CC2538 RF overlapping PIN usage (#8779)
-* core: "Invalid read of size 4" (#7199)
 * cpu/esp8266: Tracking open problems of esp_wifi netdev driver (#10861)
 * dist/tools/sliptty/start_network.sh: IPv6 connectivity is broken on
   PC (#14689)
@@ -714,17 +713,18 @@ Other issues (57)
   serial ports (#15814)
 * Use of multiple CAN bus on compatible boards (#14801)
 
-There are 190 known issues in this release
+There are 188 known issues in this release
 
 Fixed Issues since the last release (2022.04)
 =============================================
 
+- core: "Invalid read of size 4" (#7199)
 - Use-after-free in ccnl-core (#18480)
 - [puf_sram] Hardfault (#18468)
 - esp32: gnrc_networking crashing (#18083)
 - boards/saml11-xpro: second UART is broken (#17206)
 
-4 fixed issues since last release (2022.04)
+5 fixed issues since last release (2022.04)
 
 
 Acknowledgements
