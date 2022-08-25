@@ -89,6 +89,9 @@ endif
 ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   USEMODULE += sema
   USEMODULE += ztimer_msec
+  ifneq (,$(filter bhp,$(USEMODULE)))
+    USEMODULE += bhp_msg
+  endif
 endif
 
 ifneq (,$(filter lwip_netif,$(USEMODULE)))
