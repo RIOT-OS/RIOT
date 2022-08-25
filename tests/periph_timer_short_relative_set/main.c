@@ -92,7 +92,8 @@ int main(void)
             if (diff > TEST_MAX_DIFF) {
                 printf("ERROR: too long delay, aborted after %" PRIu32
                         " (TEST_MAX_DIFF=%lu)\n"
-                        "TEST FAILED\n",
+                        "TEST FAILED\n"
+                        "Note: This is currently expected to fail on most boards.\n",
                         diff, TEST_MAX_DIFF);
                 while(1) {}
             }
