@@ -206,7 +206,7 @@ static inline void nanocoap_sock_close(nanocoap_sock_t *sock)
 }
 
 /**
- * @brief   Simple synchronous CoAP (confirmable) get
+ * @brief   Simple synchronous CoAP (confirmable) GET
  *
  * @param[in]   sock    socket to use for the request
  * @param[in]   path    remote path
@@ -218,6 +218,40 @@ static inline void nanocoap_sock_close(nanocoap_sock_t *sock)
  */
 ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path, void *buf,
                           size_t len);
+
+/**
+ * @brief   Simple synchronous CoAP (confirmable) PUT
+ *
+ * @param[in]   sock    socket to use for the request
+ * @param[in]   path    remote path
+ * @param[in]   request buffer containing the payload
+ * @param[in]   len     length of the payload to send
+ * @param[out]  response buffer for the response, may be NULL
+ * @param[in]   len_max length of @p response
+ *
+ * @returns     length of response payload on success
+ * @returns     <0 on error
+ */
+ssize_t nanocoap_sock_put(nanocoap_sock_t *sock, const char *path,
+                          const void *request, size_t len,
+                          void *response, size_t len_max);
+
+/**
+ * @brief   Simple synchronous CoAP (confirmable) POST
+ *
+ * @param[in]   sock    socket to use for the request
+ * @param[in]   path    remote path
+ * @param[in]   request buffer containing the payload
+ * @param[in]   len     length of the payload to send
+ * @param[out]  response buffer for the response, may be NULL
+ * @param[in]   len_max length of @p response
+ *
+ * @returns     length of response payload on success
+ * @returns     <0 on error
+ */
+ssize_t nanocoap_sock_post(nanocoap_sock_t *sock, const char *path,
+                           const void *request, size_t len,
+                           void *response, size_t len_max);
 
 /**
  * @brief    Performs a blockwise coap get request on a socket.
