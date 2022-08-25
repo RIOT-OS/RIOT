@@ -713,13 +713,12 @@ There are 190 known issues in this release
 Fixed Issues since the last release (2022.04)
 =============================================
 
-- micropython: Example test fails (#18487)
 - Use-after-free in ccnl-core (#18480)
 - [puf_sram] Hardfault (#18468)
 - esp32: gnrc_networking crashing (#18083)
 - boards/saml11-xpro: second UART is broken (#17206)
 
-5 fixed issues since last release (2022.04)
+4 fixed issues since last release (2022.04)
 
 
 Acknowledgements
