@@ -431,6 +431,7 @@ static void _isr(netdev_t *netdev)
 
 static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
 {
+    int res;
     dose_t *ctx = container_of(dev, dose_t, netdev);
 
     (void)info;
@@ -446,10 +447,18 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
     }
 
     if (crb_consume_chunk(&ctx->rb, buf, len)) {
-        return len;
+        res = len;
     } else {
-        return -1;
+        res = -1;
     }
+
+    size_t dummy;
+    if (crb_get_chunk_size(&ctx->rb, &dummy)) {
+        DEBUG("dose: %u byte pkt in rx queue\n", (unsigned)dummy);
+        netdev_trigger_event_isr(&ctx->netdev);
+    }
+
+    return res;
 }
 
 static uint8_t wait_for_state(dose_t *ctx, uint8_t state)
