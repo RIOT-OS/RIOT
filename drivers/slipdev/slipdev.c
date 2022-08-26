@@ -11,6 +11,7 @@
  *
  * @file
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
 #include <assert.h>
@@ -52,27 +53,89 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
 {
     slipdev_t *dev = arg;
 
-    if (IS_USED(MODULE_SLIPDEV_STDIO)) {
-        if (dev->state == SLIPDEV_STATE_STDIN) {
+    switch (dev->state) {
+#if IS_USED(MODULE_SLIPDEV_STDIO)
+    case SLIPDEV_STATE_STDIN:
+        switch (byte) {
+        case SLIPDEV_ESC:
+            dev->state = SLIPDEV_STATE_STDIN_ESC;
+            break;
+        case SLIPDEV_END:
+            dev->state = SLIPDEV_STATE_NONE;
+            byte = 0;
+            /* fall-through */
+        default:
             isrpipe_write_one(&slipdev_stdio_isrpipe, byte);
-            goto check_end;
+            break;
         }
-        else if ((byte == SLIPDEV_STDIO_START) &&
-            (dev->config.uart == STDIO_UART_DEV) &&
-            (dev->state == SLIPDEV_STATE_NONE)) {
+        return;
+    case SLIPDEV_STATE_STDIN_ESC:
+        switch (byte) {
+        case SLIPDEV_END_ESC:
+            byte = SLIPDEV_END;
+            break;
+        case SLIPDEV_ESC_ESC:
+            byte = SLIPDEV_ESC;
+            break;
+        }
+        dev->state = SLIPDEV_STATE_STDIN;
+        isrpipe_write_one(&slipdev_stdio_isrpipe, byte);
+        return;
+#endif
+    case SLIPDEV_STATE_NONE:
+        /* is diagnostic frame? */
+        if (IS_USED(MODULE_SLIPDEV_STDIO) &&
+            (byte == SLIPDEV_STDIO_START) &&
+            (dev->config.uart == STDIO_UART_DEV)) {
             dev->state = SLIPDEV_STATE_STDIN;
             return;
         }
-    }
-    dev->state = SLIPDEV_STATE_NET;
-    tsrb_add_one(&dev->inbuf, byte);
-check_end:
-    if (byte == SLIPDEV_END) {
-        if (dev->state == SLIPDEV_STATE_NET) {
-            dev->rx_queued++;
-            netdev_trigger_event_isr(&dev->netdev);
+
+        /* ignore empty frame */
+        if (byte == SLIPDEV_END) {
+            return;
         }
+
+        /* try to create new frame */
+        if (!crb_start_chunk(&dev->rb)) {
+            return;
+        }
+        dev->state = SLIPDEV_STATE_NET;
+        /* fall-through */
+    case SLIPDEV_STATE_NET:
+        switch (byte) {
+        case SLIPDEV_ESC:
+            dev->state = SLIPDEV_STATE_NET_ESC;
+            return;
+        case SLIPDEV_END:
+            crb_end_chunk(&dev->rb, true);
+            netdev_trigger_event_isr(&dev->netdev);
+            dev->state = SLIPDEV_STATE_NONE;
+            return;
+        }
+        break;
+    /* escaped byte received */
+    case SLIPDEV_STATE_NET_ESC:
+        switch (byte) {
+        case SLIPDEV_END_ESC:
+            byte = SLIPDEV_END;
+            break;
+        case SLIPDEV_ESC_ESC:
+            byte = SLIPDEV_ESC;
+            break;
+        }
+        dev->state = SLIPDEV_STATE_NET;
+        break;
+    }
+
+    assert(dev->state == SLIPDEV_STATE_NET);
+
+    /* discard frame if byte can't be added */
+    if (!crb_add_byte(&dev->rb, byte)) {
+        DEBUG("slipdev: rx buffer full, drop frame\n");
+        crb_end_chunk(&dev->rb, false);
         dev->state = SLIPDEV_STATE_NONE;
+        return;
     }
 }
 
@@ -100,7 +163,7 @@ static int _init(netdev_t *netdev)
     DEBUG("slipdev: initializing device %p on UART %i with baudrate %" PRIu32 "\n",
           (void *)dev, dev->config.uart, dev->config.baudrate);
     /* initialize buffers */
-    tsrb_init(&dev->inbuf, dev->rxmem, sizeof(dev->rxmem));
+    crb_init(&dev->rb, dev->rxmem, sizeof(dev->rxmem));
     if (uart_init(dev->config.uart, dev->config.baudrate, _slip_rx_cb,
                   dev) != UART_OK) {
         LOG_ERROR("slipdev: error initializing UART %i with baudrate %" PRIu32 "\n",
@@ -132,41 +195,6 @@ void slipdev_write_bytes(uart_t uart, const uint8_t *data, size_t len)
                 slipdev_write_byte(uart, *data);
         }
     }
-}
-
-static unsigned _copy_byte(uint8_t *buf, uint8_t byte, bool *escaped)
-{
-    *buf = byte;
-    *escaped = false;
-    return 1U;
-}
-
-unsigned slipdev_unstuff_readbyte(uint8_t *buf, uint8_t byte, bool *escaped)
-{
-    unsigned res = 0U;
-
-    switch (byte) {
-        case SLIPDEV_ESC:
-            *escaped = true;
-            /* Intentionally falls through */
-        case SLIPDEV_END:
-            break;
-        case SLIPDEV_END_ESC:
-            if (*escaped) {
-                return _copy_byte(buf, SLIPDEV_END, escaped);
-            }
-            /* Intentionally falls through */
-            /* to default when !(*escaped) */
-        case SLIPDEV_ESC_ESC:
-            if (*escaped) {
-                return _copy_byte(buf, SLIPDEV_ESC, escaped);
-            }
-            /* Intentionally falls through */
-            /* to default when !(*escaped) */
-        default:
-            return _copy_byte(buf, byte, escaped);
-    }
-    return res;
 }
 
 static int _check_state(slipdev_t *dev)
@@ -212,64 +240,33 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     slipdev_t *dev = (slipdev_t *)netdev;
-    int res = 0;
+    size_t res = 0;
 
     (void)info;
     if (buf == NULL) {
         if (len > 0) {
             /* remove data */
-            for (; len > 0; len--) {
-                int byte = tsrb_get_one(&dev->inbuf);
-                if ((byte == (int)SLIPDEV_END) || (byte < 0)) {
-                    /* end early if end of packet or ringbuffer is reached;
-                     * len might be larger than the actual packet */
-                    break;
-                }
-            }
+            crb_consume_chunk(&dev->rb, NULL, len);
         } else {
             /* the user was warned not to use a buffer size > `INT_MAX` ;-) */
-            res = (int)tsrb_avail(&dev->inbuf);
+            crb_get_chunk_size(&dev->rb, &res);
         }
     }
     else {
-        int byte;
-        bool escaped = false;
-        uint8_t *ptr = buf;
-
-        do {
-            int tmp;
-
-            if ((byte = tsrb_get_one(&dev->inbuf)) < 0) {
-                /* something went wrong, return error */
-                return -EIO;
-            }
-
-            /* frame is larger than expected - lost end marker */
-            if ((unsigned)res >= len) {
-                while (byte != SLIPDEV_END) {
-                    /* clear out unreceived packet */
-                    byte = tsrb_get_one(&dev->inbuf);
-                }
-                return -ENOBUFS;
-            }
-
-            tmp = slipdev_unstuff_readbyte(ptr, byte, &escaped);
-            ptr += tmp;
-            res += tmp;
-        } while (byte != SLIPDEV_END);
-
-        if (++dev->rx_done != dev->rx_queued) {
-            DEBUG("slipdev: pkt still in queue");
-            netdev_trigger_event_isr(&dev->netdev);
-        }
+        crb_consume_chunk(&dev->rb, buf, len);
+        res = len;
     }
     return res;
 }
 
 static void _isr(netdev_t *netdev)
 {
+    slipdev_t *dev = (slipdev_t *)netdev;
+
     DEBUG("slipdev: handling ISR event\n");
-    if (netdev->event_callback != NULL) {
+
+    size_t len;
+    while (crb_get_chunk_size(&dev->rb, &len)) {
         DEBUG("slipdev: event handler set, issuing RX_COMPLETE event\n");
         netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
     }

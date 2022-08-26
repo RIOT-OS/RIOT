@@ -79,23 +79,6 @@ static inline void slipdev_write_byte(uart_t uart, uint8_t byte)
  */
 void slipdev_write_bytes(uart_t uart, const uint8_t *data, size_t len);
 
-/**
- * @brief   Unstuffs a (SLIP-escaped) byte.
- *
- * @param[out] buf          The buffer to write to. It must at least be able to
- *                          receive 1 byte.
- * @param[in] byte          The byte to unstuff.
- * @param[in,out] escaped   When set to `false` on in, @p byte will be read as
- *                          though it was not escaped, when set to `true` it
- *                          will be read as though it was escaped. On out it
- *                          will be `false` unless @p byte was `SLIPDEV_ESC`.
- *
- * @return  0, when @p byte did not resolve to an actual byte
- * @return  1, when @p byte resolves to an actual byte (or @p escaped was set to
- *          true on in and resolves to a byte that was previously escaped).
- */
-unsigned slipdev_unstuff_readbyte(uint8_t *buf, uint8_t byte, bool *escaped);
-
 #ifdef __cplusplus
 }
 #endif
