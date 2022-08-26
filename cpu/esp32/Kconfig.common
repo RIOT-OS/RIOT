@@ -15,6 +15,7 @@ config MODULE_ESP_BLE
     select MODULE_ESP_IDF_BLE
     select PACKAGE_ESP32_SDK_LIB_PHY
     select PACKAGE_ESP32_SDK_LIB_BT_ESP32 if HAS_ESP_BLE_ESP32
+    select PACKAGE_ESP32_SDK_LIB_BT_ESP32C3 if HAS_ESP_BLE_ESP32C3
 
 config MODULE_ESP_JTAG
     bool "Enable JTAG debugging interface"
