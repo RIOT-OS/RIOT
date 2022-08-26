@@ -5,3 +5,12 @@ endif
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += mtd_spi_nor
+endif
+
+ifneq (,$(filter vfs_default,$(USEMODULE)))
+  USEPKG += littlefs2
+  USEMODULE += mtd
+endif

@@ -118,7 +118,7 @@ static const uart_conf_t uart_config[] = {
  * @{
  */
 static const spi_conf_t spi_config[] = {
-    {
+    {   /* internal, wired to sx1276 */
         .dev      = &(SERCOM4->SPI),
         .miso_pin = GPIO_PIN(PC, 19),
         .mosi_pin = GPIO_PIN(PB, 30),
@@ -133,7 +133,23 @@ static const spi_conf_t spi_config[] = {
         .tx_trigger = SERCOM4_DMAC_ID_TX,
         .rx_trigger = SERCOM4_DMAC_ID_RX,
 #endif
-    }
+    },
+    {   /* EXT1, EXT3, NOR Flash */
+        .dev      = &(SERCOM5->SPI),
+        .miso_pin = GPIO_PIN(PB, 2),
+        .mosi_pin = GPIO_PIN(PB, 22),
+        .clk_pin  = GPIO_PIN(PB, 23),
+        .miso_mux = GPIO_MUX_D,
+        .mosi_mux = GPIO_MUX_D,
+        .clk_mux  = GPIO_MUX_D,
+        .miso_pad = SPI_PAD_MISO_0,
+        .mosi_pad = SPI_PAD_MOSI_2_SCK_3,
+        .gclk_src = SAM0_GCLK_MAIN,
+#ifdef MODULE_PERIPH_DMA
+        .tx_trigger = DMA_TRIGGER_DISABLED,
+        .rx_trigger = DMA_TRIGGER_DISABLED,
+#endif
+    },
 };
 
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
