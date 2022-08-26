@@ -1256,3 +1256,13 @@ uint32_t coap_request_ctx_get_tl_type(const coap_request_ctx_t *ctx)
     return 0;
 #endif
 }
+
+const sock_udp_ep_t *coap_request_ctx_get_remote_udp(const coap_request_ctx_t *ctx)
+{
+#ifdef MODULE_GCOAP
+    return ctx->remote;
+#else
+    (void)ctx;
+    return NULL;
+#endif
+}

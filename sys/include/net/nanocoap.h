@@ -96,6 +96,12 @@
 #include <arpa/inet.h>
 #endif
 
+#if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
+#include "net/sock/udp.h"
+#else
+typedef void sock_udp_ep_t;
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -346,6 +352,18 @@ void *coap_request_ctx_get_context(const coap_request_ctx_t *ctx);
  * @return  Transport Layer type of the request
  */
 uint32_t coap_request_ctx_get_tl_type(const coap_request_ctx_t *ctx);
+
+/**
+ * @brief   Get the remote endpoint from which the request was received
+ *
+ * @note    This is currently only implemented for GCoAP
+ *
+ * @param[in]   ctx The request context
+ *
+ * @return  Remote endpoint from which the request originated
+ * @return  NULL    The request was not received via UDP
+ */
+const sock_udp_ep_t *coap_request_ctx_get_remote_udp(const coap_request_ctx_t *ctx);
 
 /**
  * @brief   Block1 helper struct

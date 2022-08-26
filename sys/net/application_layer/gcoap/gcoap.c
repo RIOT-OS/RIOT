@@ -711,6 +711,7 @@ static size_t _handle_req(gcoap_socket_t *sock, coap_pkt_t *pdu, uint8_t *buf,
     coap_request_ctx_t ctx = {
         .resource = resource,
         .tl_type = (uint32_t)sock->type,
+        .remote = remote,
     };
 
     if (coap_get_proxy_uri(pdu, &offset) > 0) {
