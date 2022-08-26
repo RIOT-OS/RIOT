@@ -60,6 +60,7 @@ extern "C" {
 
 #define portNUM_PROCESSORS              2
 #define xPortGetCoreID()                PRO_CPU_NUM
+#define vPortYield                      portYIELD
 
 #else /* defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S3) */
 
