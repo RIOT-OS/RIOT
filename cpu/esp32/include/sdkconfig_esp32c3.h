@@ -94,6 +94,44 @@ extern "C" {
 #define CONFIG_ESP_SLEEP_POWER_DOWN_FLASH       1
 #define CONFIG_ESP_SLEEP_GPIO_RESET_WORKAROUND  1
 
+/**
+ * ESP32-C3 BLE driver configuration (DO NOT CHANGE)
+ */
+#ifdef MODULE_ESP_BLE
+#define CONFIG_BT_CTRL_ADV_DUP_FILT_MAX                 30
+#define CONFIG_BT_CTRL_BLE_ADV_REPORT_DISCARD_THRSHOLD  20
+#define CONFIG_BT_CTRL_BLE_ADV_REPORT_FLOW_CTRL_NUM     100
+#define CONFIG_BT_CTRL_BLE_ADV_REPORT_FLOW_CTRL_SUPP    1
+#define CONFIG_BT_CTRL_BLE_MAX_ACT                      10
+#define CONFIG_BT_CTRL_BLE_MAX_ACT_EFF                  10
+#define CONFIG_BT_CTRL_BLE_SCAN_DUPL                    1
+#define CONFIG_BT_CTRL_BLE_STATIC_ACL_TX_BUF_NB         0
+#define CONFIG_BT_CTRL_CE_LENGTH_TYPE_EFF               0
+#define CONFIG_BT_CTRL_CE_LENGTH_TYPE_ORIG              1
+#define CONFIG_BT_CTRL_COEX_PHY_CODED_TX_RX_TLIM_DIS    1
+#define CONFIG_BT_CTRL_COEX_PHY_CODED_TX_RX_TLIM_EFF    0
+#define CONFIG_BT_CTRL_DFT_TX_POWER_LEVEL_EFF           10
+#define CONFIG_BT_CTRL_DFT_TX_POWER_LEVEL_P3            1
+#define CONFIG_BT_CTRL_HCI_MODE_VHCI                    1
+#define CONFIG_BT_CTRL_HCI_TL                           1
+#define CONFIG_BT_CTRL_HCI_TL_EFF                       1
+#define CONFIG_BT_CTRL_HW_CCA_EFF                       0
+#define CONFIG_BT_CTRL_HW_CCA_VAL                       20
+#define CONFIG_BT_CTRL_MODE_EFF                         1
+#define CONFIG_BT_CTRL_PINNED_TO_CORE                   0
+#define CONFIG_BT_CTRL_RX_ANTENNA_INDEX_0               1
+#define CONFIG_BT_CTRL_RX_ANTENNA_INDEX_EFF             0
+#define CONFIG_BT_CTRL_SCAN_DUPL_CACHE_SIZE             100
+#define CONFIG_BT_CTRL_SCAN_DUPL_TYPE                   0
+#define CONFIG_BT_CTRL_SCAN_DUPL_TYPE_DEVICE            1
+#define CONFIG_BT_CTRL_SLEEP_CLOCK_EFF                  0
+#define CONFIG_BT_CTRL_SLEEP_MODE_EFF                   0
+#define CONFIG_BT_CTRL_TX_ANTENNA_INDEX_0               1
+#define CONFIG_BT_CTRL_TX_ANTENNA_INDEX_EFF             0
+#define CONFIG_BT_ENABLED                               1
+#define CONFIG_BT_SOC_SUPPORT_5_0                       1
+#endif
+
 #ifdef __cplusplus
 }
 #endif

@@ -161,10 +161,10 @@ endif
 
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/
 
-ifeq (,$(filter esp_ble,$(USEMODULE)))
-  LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/memory.ld
-else
+ifneq (,$(filter esp32_sdk_lib_bt_esp32,$(USEPKG)))
   LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/memory_bt.ld
+else
+  LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/memory.ld
 endif
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/sections.ld
 
@@ -216,6 +216,8 @@ ifneq (,$(filter esp_ble,$(USEMODULE)))
   ARCHIVES += -lphy -lstdc++
   ifeq (esp32,$(CPU_FAM))
     ARCHIVES += -lrtc
+  else ifeq (esp32c3,$(CPU_FAM))
+    ARCHIVES += -lbtbb
   endif
 endif
 

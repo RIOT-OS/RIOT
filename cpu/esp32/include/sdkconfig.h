@@ -108,7 +108,6 @@
 #define CONFIG_BT_CONTROLLER_ONLY                       1
 #else
 #define CONFIG_BT_ENABLED                               0
-#define CONFIG_BTDM_RESERVE_DRAM                        0
 #endif
 
 /**
