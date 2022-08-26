@@ -216,7 +216,7 @@ ifneq (,$(filter esp_ble,$(USEMODULE)))
   ARCHIVES += -lphy -lstdc++
   ifeq (esp32,$(CPU_FAM))
     ARCHIVES += -lrtc
-  else ifeq (esp32c3,$(CPU_FAM))
+  else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
     ARCHIVES += -lbtbb
   endif
 endif

@@ -25,7 +25,7 @@ ifneq (,$(filter esp_ble,$(USEMODULE)))
   ifeq (esp32,$(CPU_FAM))
     FEATURES_REQUIRED += esp_ble_esp32
     USEPKG += esp32_sdk_lib_bt_esp32
-  else ifeq (esp32c3,$(CPU_FAM))
+  else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
     FEATURES_REQUIRED += esp_ble_esp32c3
     USEPKG += esp32_sdk_lib_bt_esp32c3
   endif
