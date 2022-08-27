@@ -37,6 +37,7 @@ esp32-heltec-lora32-v2
 esp32-olimex-evb
 esp32c3-ci
 esp32c3-devkit
+esp32s3-ci
 esp32s3-devkit
 esp8266-ci
 esp8266-esp-12x
