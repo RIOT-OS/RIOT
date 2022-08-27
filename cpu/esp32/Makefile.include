@@ -14,9 +14,9 @@ else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
   export FLASH_SIZE ?= 2
   BOOTLOADER_POS = 0x0000
 else ifneq (,$(filter esp32s2,$(CPU_FAM)))
-  FLASH_MODE ?= qio
-  FLASH_FREQ ?= 80m
-  FLASH_SIZE ?= 4
+  export FLASH_MODE ?= qio
+  export FLASH_FREQ ?= 80m
+  export FLASH_SIZE ?= 4
   BOOTLOADER_POS = 0x1000
 else
   $(error Unkwnown ESP32x SoC variant (family))
