@@ -16,7 +16,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #ifndef ESP_BLE_NIMBLE_SYSCFG_SYSCFG_H
 #define ESP_BLE_NIMBLE_SYSCFG_SYSCFG_H
 
