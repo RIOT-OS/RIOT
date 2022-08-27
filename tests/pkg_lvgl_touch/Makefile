@@ -15,6 +15,8 @@ USEMODULE += lvgl_extra_theme_default
 # uncomment the following to enable growing button (needs more RAM)
 # USEMODULE += lvgl_extra_theme_default_grow
 
+USEMODULE += random
+
 # SDL requires more stack
 ifeq (native,$(BOARD))
   CFLAGS += -DTHREAD_STACKSIZE_MAIN=64*1024
