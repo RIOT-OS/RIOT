@@ -112,6 +112,12 @@ void usbus_dfu_init(usbus_t *usbus, usbus_dfu_device_t *handler, unsigned mode)
                 USB_DFU_STATE_DFU_IDLE : USB_DFU_STATE_APP_IDLE;
 
     usbus_register_event_handler(usbus, (usbus_handler_t *)handler);
+#ifdef MODULE_RIOTBOOT_USB_DFU
+    if (handler->mode == USB_DFU_PROTOCOL_DFU_MODE) {
+        /* Init ztimer for DFU mode */
+        ztimer_init();
+    }
+#endif
 }
 
 static void _init(usbus_t *usbus, usbus_handler_t *handler)

@@ -26,7 +26,6 @@
 #include "panic.h"
 #include "riotboot/slot.h"
 #include "riotboot/usb_dfu.h"
-#include "ztimer.h"
 
 #include "riotboot/bootloader_selection.h"
 
@@ -70,9 +69,6 @@ void kernel_init(void)
     if (slot != -1 && !_bootloader_alternative_mode()) {
         riotboot_slot_jump(slot);
     }
-
-    /* Init ztimer before starting DFU mode */
-    ztimer_init();
 
     /* Nothing to boot, stay in DFU mode to flash a slot */
     riotboot_usb_dfu_init(1);
