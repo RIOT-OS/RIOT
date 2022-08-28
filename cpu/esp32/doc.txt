@@ -313,7 +313,7 @@ The key features of ESP32-S3 are:
 | SPIs              | 4                                                                 | yes (2) |
 | UARTs             | 3                                                                 | yes |
 | WiFi              | IEEE 802.11 b/g/n built in                                        | yes |
-| Bluetooth         | Bluetooth LE: Bluetooth 5, Bluetooth mesh                         | no  |
+| Bluetooth         | Bluetooth 5 (LE)                                                  | yes |
 | Ethernet          | -                                                                 | -   |
 | CAN               | version 2.0                                                       | yes |
 | IR                | up to 8 channels TX/RX                                            | no |

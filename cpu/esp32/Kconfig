@@ -31,7 +31,7 @@ config HAS_ESP_BLE_ESP32C3
     bool
     help
         Indicates that the ESP32x SoC uses the SDK Bluetooth LE library
-        for the ESP32-C3 variant.
+        for the ESP32-C3 or ESP32-S3 variant.
 
 config HAS_ESP_HW_COUNTER
     bool

@@ -11,6 +11,12 @@ config CPU_FAM_ESP32S3
     select CPU_CORE_XTENSA_LX7
     select HAS_ARCH_ESP32
     select HAS_CPU_ESP32
+    select HAS_BLE_ADV_EXT
+    select HAS_BLE_NIMBLE
+    select HAS_BLE_NIMBLE_NETIF
+    select HAS_BLE_PHY_2MBIT
+    select HAS_ESP_BLE
+    select HAS_ESP_BLE_ESP32C3
     select HAS_ESP_HW_COUNTER
     select HAS_ESP_WIFI_ENTERPRISE
     select HAS_PUF_SRAM
