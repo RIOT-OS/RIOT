@@ -71,6 +71,8 @@
 #
 # reset:        triggers a hardware reset of the target board
 #
+# term-rtt:     opens a serial terminal using RTT (Real-Time Transfer)
+#
 # @author       Hauke Peteresen <hauke.petersen@fu-berlin.de>
 # @author       Joakim Nohlgård <joakim.nohlgard@eistec.se>
 
@@ -125,6 +127,10 @@
 # the file (default).
 # Valid values: elf, hex, s19, bin (see OpenOCD manual for more information)
 : ${IMAGE_TYPE:=}
+
+# default terminal frontend
+_OPENOCD_TERMPROG=${RIOTTOOLS}/pyterm/pyterm
+_OPENOCD_TERMFLAGS="-ts 9999 ${PYTERMFLAGS}"
 
 #
 # Examples of alternative debugger configurations
@@ -445,6 +451,44 @@ do_reset() {
             -c 'shutdown'"
 }
 
+do_term() {
+    test_config
+
+    # temporary file that save the OpenOCD pid
+    OPENOCD_PIDFILE=$(mktemp -t "openocd_pid.XXXXXXXXXX")
+    # will be called by trap
+    cleanup() {
+        if [ -f $OPENOCD_PIDFILE ]; then
+            OPENOCD_PID="$(cat ${OPENOCD_PIDFILE})"
+            kill ${OPENOCD_PID}
+            rm -r "${OPENOCD_PIDFILE}"
+        fi
+        exit 0
+    }
+    # cleanup after script terminates
+    trap "cleanup ${OPENOCD_PIDFILE}" EXIT INT
+
+    set -x
+    echo test
+    # start OpenOCD as RTT server for channel 0
+    sh -x -c "${OPENOCD} \
+            ${OPENOCD_ADAPTER_INIT} \
+            -f '${OPENOCD_CONFIG}' \
+            ${OPENOCD_EXTRA_INIT} \
+            -c 'tcl_port 0' \
+            -c 'telnet_port 0' \
+            -c 'gdb_port 0' \
+            -c init \
+            -c 'rtt setup '${RAM_START_ADDR}' '${RAM_LEN}' \"SEGGER RTT\"' \
+            -c 'rtt start' \
+            -c 'rtt server start 9999 0' \
+            >/dev/null & \
+            echo  \$! > $OPENOCD_PIDFILE" &
+    sleep 1
+
+    ${OPENOCD_TERMPROG:-${_OPENOCD_TERMPROG}} ${OPENOCD_TERMFLAGS:-${_OPENOCD_TERMFLAGS}}
+}
+
 #
 # parameter dispatching
 #
@@ -480,6 +524,10 @@ case "${ACTION}" in
   reset)
     echo "### Resetting Target ###"
     do_reset
+    ;;
+  term-rtt)
+    echo "### Starting RTT terminal ###"
+    do_term
     ;;
   *)
     echo "Usage: $0 {flash|debug|debug-server|reset}"

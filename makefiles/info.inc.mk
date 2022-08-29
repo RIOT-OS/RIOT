@@ -101,6 +101,7 @@ info-build:
 	@echo ''
 	@echo 'TERMPROG:  $(TERMPROG)'
 	@echo 'TERMFLAGS: $(TERMFLAGS)'
+	@echo 'TERMENV:   $(TERMENV)'
 	@echo 'PORT:      $(PORT)'
 	@echo 'PROG_DEV:  $(PROG_DEV)'
 	@echo ''
