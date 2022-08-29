@@ -62,7 +62,7 @@ config USB_MANUF_STR
 
 config USB_PRODUCT_STR
     string "Product string"
-    default "USB device"
+    default BOARD
 
 config USB_CONFIGURATION_STR
     string "Configuration string"
