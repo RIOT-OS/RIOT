@@ -9,3 +9,7 @@ ifneq (,$(findstring a1,$(shell echo $(CPU_MODEL) | cut -c8-)))
 endif
 
 include $(RIOTBASE)/Makefile.base
+
+# Workaround bug in GCC 12 that assumes I/O addresses provided by the
+# AVR libc as zero-sized.
+CFLAGS += -Wno-array-bounds

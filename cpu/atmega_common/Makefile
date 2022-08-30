@@ -5,3 +5,7 @@ MODULE = atmega_common
 DIRS = periph $(RIOTCPU)/avr8_common/
 
 include $(RIOTBASE)/Makefile.base
+
+# Workaround bug in GCC 12 that assumes I/O addresses provided by the
+# AVR libc as zero-sized.
+CFLAGS += -Wno-array-bounds
