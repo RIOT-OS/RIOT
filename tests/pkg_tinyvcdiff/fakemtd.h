@@ -65,7 +65,8 @@ typedef struct {
 #define FAKE_MTD_INIT { .mtd = { .driver = &fake_mtd_driver, \
                                  .sector_count = FAKE_MTD_SECTOR_COUNT, \
                                  .pages_per_sector = FAKE_MTD_PAGES_PER_SECTOR, \
-                                 .page_size = FAKE_MTD_PAGE_SIZE } }
+                                 .page_size = FAKE_MTD_PAGE_SIZE, \
+                                 .write_size = 1 } }
 
 #ifdef __cplusplus
 }
