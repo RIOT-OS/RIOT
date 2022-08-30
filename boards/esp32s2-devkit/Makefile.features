@@ -1,7 +1,5 @@
 # default board version if not defined
-ifeq (,$(BOARD_VERSION))
-  BOARD_VERSION += esp32s2-devkitm-1
-endif
+BOARD_VERSION ?= esp32s2-devkitm-1
 
 ifeq (esp32s2-devkitm-1,$(BOARD_VERSION))
   CPU_MODEL = esp32s2_mini_1x_n4
