@@ -23,6 +23,16 @@ PROG_DEV ?= $(PORT)
 
 export BAUD ?= 115200
 
+ifneq (,$(filter stdio_rtt,$(USEMODULE)))
+  ifeq (${PROGRAMMER},openocd)
+    RIOT_TERMINAL ?= openocd-rtt
+  else ifeq (${PROGRAMMER},jlink)
+    RIOT_TERMINAL ?= jlink
+  else ifeq (${RIOT_TERMINAL},)
+    $(warning "Warning: No RIOT_TERMINAL set, but using stdio_rtt: The default terminal is likely not to work.")
+  endif
+endif
+
 RIOT_TERMINAL ?= pyterm
 ifeq ($(RIOT_TERMINAL),pyterm)
   TERMPROG  ?= $(RIOTTOOLS)/pyterm/pyterm
