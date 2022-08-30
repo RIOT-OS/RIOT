@@ -23,6 +23,9 @@
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
 #include "net/sock/dns.h"
 #endif
+#if IS_USED(MODULE_RTT64)
+#include "rtt64.h"
+#endif
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 #include "_nib-6ln.h"
@@ -225,6 +228,15 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
         }
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
+#if IS_USED(MODULE_GNRC_IPV6_NIB_TIMESTAMP) && IS_USED(MODULE_RTT64)
+    uint64_t now = rtt64_get_counter();
+    gnrc_pktsnip_t *hdr;
+    if ((hdr = gnrc_ndp_opt_timestamp_build(now, ext_opts)) == NULL) {
+        DEBUG("ndp rtr: no space left in packet buffer\n");
+    } else {
+        ext_opts = hdr;
+    }
+#endif
     return ext_opts;
 }
 

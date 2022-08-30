@@ -377,6 +377,10 @@ ifneq (,$(filter gnrc_ipv6_nib_router,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_nib
 endif
 
+ifneq (,$(filter gnrc_ipv6_nib_timestamp,$(USEMODULE)))
+  USEMODULE += rtt64
+endif
+
 ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_gnrc_ipv6_nib
   USEMODULE += evtimer
