@@ -47,4 +47,8 @@ else ifeq ($(RIOT_TERMINAL),semihosting)
   TERMFLAGS = $(DEBUGGER_FLAGS)
   OPENOCD_DBG_EXTRA_CMD += -c 'arm semihosting enable'
   $(call target-export-variables,term cleanterm,OPENOCD_DBG_EXTRA_CMD)
+else ifeq (${RIOT_TERMINAL},openocd-rtt)
+  TERMENV = RAM_START_ADDR=${RAM_START_ADDR} RAM_LEN=${RAM_LEN}
+  TERMPROG = $(RIOTTOOLS)/openocd/openocd.sh
+  TERMFLAGS = term-rtt
 endif
