@@ -33,6 +33,9 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+/* DIV_UP is division which rounds up instead of down */
+#define SPI_DIV_UP(a, b)    (((a) + ((b) - 1)) / (b))
+
 /**
  * @brief   Array holding one pre-initialized mutex for each SPI device
  */
@@ -94,19 +97,53 @@ void spi_init_pins(spi_t bus)
     gpio_init_mux(spi_config[bus].miso_pin, OVERRIDE_DISABLE, GPIO_MUX_NONE, rxd);
 }
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+
+    /* SPI bus frequency =  CLOCK_CORECLOCK / (CPSR * (SCR + 1)), with
+     * CPSR = 2..254 and even,
+     *  SCR = 0..255 */
+
+    /* bound divider from 2 to 65024 (254 * (255 + 1)) */
+    if (freq > CLOCK_CORECLOCK / 2) {
+        freq = CLOCK_CORECLOCK / 2;
+    }
+    assert(freq >= CLOCK_CORECLOCK / 65024);
+
+    uint8_t cpsr = 2, scr = 0;
+    uint32_t divider = SPI_DIV_UP(CLOCK_CORECLOCK, freq);
+    if (divider % 2) {
+        divider++;
+    }
+    while (divider / cpsr > 256) {
+        cpsr += 2;
+    }
+    scr = divider / cpsr - 1;
+
+    return (cpsr << 8) | scr;
+}
+
+uint32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    return CLOCK_CORECLOCK / ((clk >> 8) * ((clk & 0xff) + 1));
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     assert((unsigned)bus < SPI_NUMOF);
     DEBUG("%s: bus=%u\n", __FUNCTION__, bus);
     (void)cs;
+    assert((unsigned)bus < SPI_NUMOF);
     /* lock the bus */
     mutex_lock(&locks[bus]);
     /* power on device */
     poweron(bus);
     /* configure SCR clock field, data-width and mode */
     dev(bus)->CR0 = 0;
-    dev(bus)->CPSR = (spi_clk_config[clk].cpsr);
-    dev(bus)->CR0 = ((spi_clk_config[clk].scr << 8) | mode | SSI_CR0_DSS(8));
+    dev(bus)->CPSR = clk >> 8;
+    dev(bus)->CR0 = ((clk & 0xff) << 8) | mode | SSI_CR0_DSS(8);
     /* enable SSI device */
     dev(bus)->CR1 = SSI_CR1_SSE;
 }

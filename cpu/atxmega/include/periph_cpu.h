@@ -340,20 +340,6 @@ typedef struct {
 } spi_conf_t;
 /** @} */
 
-/**
- * @brief  Available SPI clock speeds
- * @{
- */
-#define HAVE_SPI_CLK_T
-typedef enum {
-    SPI_CLK_100KHZ = 100000U,       /**< drive the SPI bus with 100KHz */
-    SPI_CLK_400KHZ = 400000U,       /**< drive the SPI bus with 400KHz */
-    SPI_CLK_1MHZ   = 1000000U,      /**< drive the SPI bus with 1MHz */
-    SPI_CLK_5MHZ   = 5000000U,      /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ  = 10000000U,     /**< drive the SPI bus with 10MHz */
-} spi_clk_t;
-/** @} */
-
 #if defined(__AVR_ATxmega64A1__)   || \
     defined(__AVR_ATxmega128A1__)  || \
     defined(__AVR_ATxmega64A1U__)  || \

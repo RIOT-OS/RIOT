@@ -59,16 +59,6 @@
  */
 static mutex_t locks[SPI_NUMOF];
 
-/**
- * @brief   Clock configuration cache
- */
-static uint32_t clocks[SPI_NUMOF];
-
-/**
- * @brief   Clock divider cache
- */
-static uint8_t dividers[SPI_NUMOF];
-
 static inline SPI_TypeDef *dev(spi_t bus)
 {
     return spi_config[bus].dev;
@@ -107,7 +97,7 @@ static uint8_t _get_clkdiv(const spi_conf_t *conf, uint32_t clock)
          * requested clock speed */
         rounded_div++;
     }
-    return rounded_div > BR_MAX ? BR_MAX : rounded_div;
+    return rounded_div;
 }
 
 void spi_init(spi_t bus)
@@ -221,6 +211,20 @@ int spi_init_with_gpio_mode(spi_t bus, const spi_gpio_mode_t* mode)
 }
 #endif
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    /* f_pclk / (1 << (BR + 1))
+     * BR = 0..7 */
+    uint8_t br = _get_clkdiv(&spi_config[bus], freq);
+    assert(br <= BR_MAX);
+    return br;
+}
+
+uint32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    return periph_apb_clk(spi_config[bus].apbbus) / (1 << (clk + 1));
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     assert((unsigned)bus < SPI_NUMOF);
@@ -234,19 +238,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     /* enable SPI device clock */
     periph_clk_en(spi_config[bus].apbbus, spi_config[bus].rccmask);
     /* enable device */
-    if (clk != clocks[bus]) {
-        dividers[bus] = _get_clkdiv(&spi_config[bus], clk);
-        clocks[bus] = clk;
-    }
-    uint8_t br = dividers[bus];
-
-    DEBUG("[spi] acquire: requested clock: %"PRIu32", resulting clock: %"PRIu32
-          " BR divider: %u\n",
-          clk,
-          periph_apb_clk(spi_config[bus].apbbus)/(1 << (br + 1)),
-          br);
-
-    uint16_t cr1_settings = ((br << BR_SHIFT) | mode | SPI_CR1_MSTR);
+    uint16_t cr1_settings = ((clk << BR_SHIFT) | mode | SPI_CR1_MSTR);
     /* Settings to add to CR2 in addition to SPI_CR2_SETTINGS */
     uint16_t cr2_extra_settings = 0;
     if (cs != SPI_HWCS_MASK) {

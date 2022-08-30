@@ -32,22 +32,21 @@
 #include "esp_common.h"
 #include "log.h"
 
-#include "cpu.h"
-#include "gpio_arch.h"
-#include "mutex.h"
-#include "periph/spi.h"
-#include "syscalls.h"
-
 #include "esp_attr.h"
 #include "esp_rom_gpio.h"
 #include "hal/spi_hal.h"
 #include "hal/spi_types.h"
 #include "soc/rtc.h"
 
-#include "esp_idf_api/periph_ctrl.h"
+#undef MHZ  /* RIOT's MHZ isn't compatible with that already defined in soc/rtc.h */
 
-#undef MHZ
-#include "macros/units.h"
+#include "cpu.h"
+#include "gpio_arch.h"
+#include "mutex.h"
+#include "periph/spi.h"
+#include "syscalls.h"
+
+#include "esp_idf_api/periph_ctrl.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -63,7 +62,7 @@ struct _spi_bus_t {
     spi_host_device_t hostid;        /* SPI hostid as used by ESP-IDF */
     const spi_signal_conn_t *periph; /* SPI peripheral descriptor */
     spi_hal_timing_conf_t timing;    /* calculated SPI timing parameters */
-    spi_clk_t clk_last;               /* SPI clock speed used last time in Hz */
+    spi_clk_t clk_last;              /* SPI clock speed used last time in Hz */
     uint8_t mode_last;               /* SPI mode used last time */
     bool pins_initialized;           /* SPI pins initialized */
 };
@@ -204,6 +203,37 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
     return SPI_OK;
 }
 
+static spi_clk_t IRAM_ATTR _spi_get_clk(uint32_t freq, uint32_t *clk_reg)
+{
+    uint32_t apb_clk = rtc_clk_apb_freq_get();
+
+    if (apb_clk / 5 < freq) {
+        LOG_TAG_ERROR("spi", "APB clock rate (%"PRIu32" Hz) has to be at "
+                      "least 5 times SPI clock rate (%"PRIu32" Hz)\n",
+                      apb_clk, freq);
+        assert(false);
+    }
+
+    /* duty cycle is measured in is 1/256th, 50% = 128 */
+    return spi_ll_master_cal_clock(apb_clk, freq, 128, clk_reg);
+}
+
+spi_clk_t IRAM_ATTR spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+    uint32_t clk_reg;
+    /* we simply use the effective frequency as returned from spi_ll_master_cal_clock */
+    return _spi_get_clk(freq, &clk_reg);
+}
+
+uint32_t IRAM_ATTR spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    uint32_t clk_reg;
+    /* we simply use the effective frequency as returned from spi_ll_master_cal_clock */
+    return _spi_get_clk(clk, &clk_reg);
+}
+
 void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     DEBUG("%s bus=%u cs=%u mode=%u clk=%u\n", __func__, bus, cs, mode, clk);
@@ -248,19 +278,8 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
 
     /* check whether timing has to be recalculated (time consuming) */
     if (clk != _spi[bus].clk_last) {
-        uint32_t apb_clk = rtc_clk_apb_freq_get();
         uint32_t clk_reg;
-
-        if (apb_clk / 5 < clk) {
-            LOG_TAG_ERROR("spi", "APB clock rate (%"PRIu32" Hz) has to be at "
-                          "least 5 times SPI clock rate (%d Hz)\n",
-                          apb_clk, clk);
-            assert(false);
-        }
-
-        /* duty cycle is measured in is 1/256th, 50% = 128 */
-        int _clk = spi_ll_master_cal_clock(apb_clk, clk,
-                                           128, &clk_reg);
+        int _clk = _spi_get_clk(clk, &clk_reg);
 
         _spi[bus].clk_last = clk;
         _spi[bus].timing.clock_reg = clk_reg;

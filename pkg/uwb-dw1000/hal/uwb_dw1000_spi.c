@@ -20,7 +20,7 @@
 #include "hal/hal_spi.h"
 #include "periph/spi.h"
 
-static uint32_t spi_clk[SPI_NUMOF] = { SPI_CLK_1MHZ };
+static uint32_t spi_clk[SPI_NUMOF];
 static uint32_t spi_mode[SPI_NUMOF] = { SPI_MODE_0 };
 
 int hal_spi_set_txrx_cb(int spi_num, hal_spi_txrx_cb txrx_cb, void *arg)
@@ -41,7 +41,7 @@ int hal_spi_init(int spi_num, void *cfg, uint8_t spi_type)
 
 int hal_spi_config(int spi_num, struct hal_spi_settings *settings)
 {
-    spi_clk[spi_num] = settings->baudrate;
+    spi_clk[spi_num] = spi_get_clk(spi_num, settings->baudrate);
     spi_mode[spi_num] = settings->data_mode;
     return 0;
 }

@@ -29,6 +29,9 @@
 #include "mutex.h"
 #include "periph/spi.h"
 
+/* DIV_UP is division which rounds up instead of down */
+#define SPI_DIV_UP(a, b)    (((a) + ((b) - 1)) / (b))
+
 /**
  * @brief   Mutex for locking the SPI device
  */
@@ -66,24 +69,45 @@ void spi_init_pins(spi_t bus)
     gpio_periph_mode(SPI_PIN_CLK, true);
 }
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+
+#ifndef SPI_USE_USCI
+    /* CLOCK_CMCLK / 2..65535 */
+    /* bound divider from 2 to 65535 */
+    if (freq > CLOCK_CMCLK / 2) {
+        freq = CLOCK_CMCLK / 2;
+    }
+#else
+    /* CLOCK_CMCLK / 1..65535 */
+    /* bound divider from 1 to 65535 */
+    if (freq > CLOCK_CMCLK) {
+        freq = CLOCK_CMCLK;
+    }
+#endif
+    assert(freq >= SPI_DIV_UP(CLOCK_CMCLK, 65535));
+    return CLOCK_CMCLK / freq;
+}
+
+uint32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    return CLOCK_CMCLK / clk;
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)bus;
     (void)cs;
     assert((unsigned)bus < SPI_NUMOF);
-    assert(clk != SPI_CLK_10MHZ);
 
     /* lock the bus */
     mutex_lock(&spi_lock);
 
-    /* calculate baudrate */
-    uint32_t br = CLOCK_CMCLK / clk;
-    /* make sure the is not smaller then 2 */
-    if (br < 2) {
-        br = 2;
-    }
-    SPI_BASE->BR0 = (uint8_t)br;
-    SPI_BASE->BR1 = (uint8_t)(br >> 8);
+    /* set baudrate */
+    SPI_BASE->BR0 = (uint8_t)clk;
+    SPI_BASE->BR1 = (uint8_t)(clk >> 8);
 
     /* configure bus mode */
 #ifndef SPI_USE_USCI

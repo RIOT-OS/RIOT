@@ -72,9 +72,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "periph_cpu.h"
-#include "periph_conf.h"
+#include "architecture.h"
+#include "macros/units.h"
 #include "periph/gpio.h"
+#include "periph_conf.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -128,6 +130,15 @@ typedef gpio_t spi_cs_t;
 #endif
 
 /**
+ * @brief   Opaque type that contains a SPI clock configuration
+ *
+ * Use @ref spi_get_clk to obtain this value.
+ */
+#ifndef HAVE_SPI_CLK_T
+typedef uint32_t spi_clk_t;
+#endif
+
+/**
  * @brief       Status codes used by the SPI driver interface
  *
  * @deprecated  Use negative errno codes instead. The enum is still provided
@@ -172,16 +183,18 @@ typedef enum {
  * The actual speed of the bus can vary to some extend, as the combination of
  * CPU clock and available prescaler values on certain platforms may not make
  * the exact values possible.
+ *
+ * @deprecated  Use numeric values instead
+ * @{
  */
-#ifndef HAVE_SPI_CLK_T
-typedef enum {
-    SPI_CLK_100KHZ = 0,     /**< drive the SPI bus with 100KHz */
-    SPI_CLK_400KHZ,         /**< drive the SPI bus with 400KHz */
-    SPI_CLK_1MHZ,           /**< drive the SPI bus with 1MHz */
-    SPI_CLK_5MHZ,           /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ           /**< drive the SPI bus with 10MHz */
-} spi_clk_t;
-#endif
+enum {
+    SPI_CLK_100KHZ  = KHZ(100), /**< drive the SPI bus with 100KHz */
+    SPI_CLK_400KHZ  = KHZ(400), /**< drive the SPI bus with 400KHz */
+    SPI_CLK_1MHZ    = MHZ(1),   /**< drive the SPI bus with 1MHz */
+    SPI_CLK_5MHZ    = MHZ(5),   /**< drive the SPI bus with 5MHz */
+    SPI_CLK_10MHZ   = MHZ(10),  /**< drive the SPI bus with 10MHz */
+};
+/** @} */
 
 /**
  * @brief   Basic initialization of the given SPI bus
@@ -334,21 +347,48 @@ int spi_init_with_gpio_mode(spi_t bus, const spi_gpio_mode_t* mode);
 #endif
 
 /**
+ * @brief   Get the @ref spi_clk_t value that best matches the given frequency in Hertz
+ *
+ * @param[in]   bus     SPI device to get a clock configuration for
+ * @param[in]   freq    Get the clock configuration best matching this frequency in Hertz
+ *
+ * @return  The opaque clock configuration that is as close to but not higher than the frequency
+ *          given in @p freq
+ */
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq);
+
+/**
+ * @brief   Get the actual frequency Hertz corresponding to the given clock config
+ *
+ * @param[in]   bus     SPI device which the clock configuration was made for
+ * @param[in]   clk     The clock configuration to get the corresponding frequency from
+ *
+ * @return  The exact frequency in Hertz matching the clock configuration
+ *
+ * @note    In most cases `spi_get_freq(spi_get_clk(x)) != x` will be true, since `spi_get_clk()`
+ *          will return only the closest match, which will rarely be an exact match.
+ */
+uint32_t spi_get_freq(spi_t bus, spi_clk_t clk);
+
+/**
  * @brief   Start a new SPI transaction
  *
  * Starting a new SPI transaction will get exclusive access to the SPI bus
  * and configure it according to the given values. If another SPI transaction
  * is active when this function is called, this function will block until the
- * other transaction is complete (spi_relase was called).
+ * other transaction is complete (@ref spi_release was called).
  *
  * @param[in]   bus     SPI device to access
  * @param[in]   cs      chip select pin/line to use, set to SPI_CS_UNDEF if chip
  *                      select should not be handled by the SPI driver
  * @param[in]   mode    mode to use for the new transaction
- * @param[in]   clk     bus clock speed to use for the transaction
+ * @param[in]   clk     opaque clock configuration obtain from @ref spi_get_clk
  *
  * @pre     All parameters are valid and supported, otherwise an assertion blows
  *          up (if assertions are enabled).
+ *
+ * @post    Exclusive access to the SPI bus is guaranteed until @ref spi_release
+ *          is called.
  */
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk);
 

@@ -87,19 +87,6 @@ typedef enum {
 #endif
 /** @} */
 
-/**
- * @brief   Override SPI clock speed selection values
- * @{
- */
-#define HAVE_SPI_CLK_T
-typedef enum {
-    SPI_CLK_100KHZ = 100000,    /**< 100KHz */
-    SPI_CLK_400KHZ = 400000,    /**< 400KHz */
-    SPI_CLK_1MHZ   = 1000000,   /**< 1MHz */
-    SPI_CLK_5MHZ   = 5000000,   /**< 5MHz */
-    SPI_CLK_10MHZ  = 0,         /**< not supported */
-} spi_clk_t;
-/** @} */
 #endif /* ndef DOXYGEN */
 
 /**

@@ -159,20 +159,6 @@ typedef enum {
     SPI_MODE_3 = (SPI_CSR_CPOL)                     /**< CPOL=1, CPHA=1 */
 } spi_mode_t;
 /** @} */
-
-/**
- * @brief   Override default SPI clock values
- * @{
- */
-#define HAVE_SPI_CLK_T
-typedef enum {
-    SPI_CLK_100KHZ = (100000),                      /**< 100KHz */
-    SPI_CLK_400KHZ = (400000),                      /**< 400KHz */
-    SPI_CLK_1MHZ   = (1000000),                     /**< 1MHz */
-    SPI_CLK_5MHZ   = (5000000),                     /**< 5MHz */
-    SPI_CLK_10MHZ  = (10000000)                     /**< 10MHz */
-} spi_clk_t;
-/** @} */
 #endif /* ndef DOXYGEN */
 
 #ifndef DOXYGEN
