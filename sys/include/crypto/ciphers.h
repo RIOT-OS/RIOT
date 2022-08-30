@@ -60,16 +60,45 @@ extern "C" {
     #define CIPHER_MAX_CONTEXT_SIZE 1
 #endif
 
-/* return codes */
-
+/**
+ * @brief   The key size is not supported or invalid
+ */
 #define CIPHER_ERR_INVALID_KEY_SIZE   -3
+
+/**
+ * @brief   The data is not a multiple of the cipher block size
+ */
 #define CIPHER_ERR_INVALID_LENGTH     -4
+
+/**
+ * @brief   The encryption failed
+ */
 #define CIPHER_ERR_ENC_FAILED         -5
+
+/**
+ * @brief   The decryption failed
+ */
 #define CIPHER_ERR_DEC_FAILED         -6
-/** Is returned by the cipher_init functions, if the corresponding algorithm
- * has not been included in the build */
+
+/**
+ * @brief   Something went wrong with the padding
+ */
+#define CIPHER_ERR_PADDING_ERROR      -7
+
+/**
+ * @brief   The output buffer is too small
+ */
+#define CIPHER_ERR_BUFFER_TOO_SMALL   -8
+
+/**
+ * @brief   Is returned by the cipher_init functions, if the corresponding algorithm
+ *          has not been included in the build
+ */
 #define CIPHER_ERR_BAD_CONTEXT_SIZE    0
-/**  Returned by cipher_init upon successful initialization of a cipher. */
+
+/**
+ * @brief   Returned by cipher_init upon successful initialization of a cipher.
+ */
 #define CIPHER_INIT_SUCCESS            1
 
 /**
