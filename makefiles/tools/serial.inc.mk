@@ -1,7 +1,11 @@
 # Select the most recently attached tty interface
 ifeq (1,$(MOST_RECENT_PORT))
+  ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
+    TTY_BOARD_FILTER ?= --model $(BOARD) --vendor 'RIOT-os\.org'
+  endif
   TTYS_FLAGS := --most-recent --format path $(TTY_BOARD_FILTER)
-  PORT ?= $(shell $(RIOTTOOLS)/usb-serial/ttys.py $(TTYS_FLAGS))
+  PORT_DETECTED := $(shell $(RIOTTOOLS)/usb-serial/ttys.py $(TTYS_FLAGS))
+  PORT ?= $(PORT_DETECTED)
 endif
 # Otherwise, use as default the most commonly used ports on Linux and OSX
 PORT_LINUX ?= /dev/ttyACM0
