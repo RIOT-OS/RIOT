@@ -280,7 +280,7 @@ ssize_t nanocoap_sock_request(sock_udp_t *sock, coap_pkt_t *pkt, size_t len)
     return nanocoap_sock_request_cb(sock, pkt, _request_cb, &buf);
 }
 
-static int _get_cb(void *arg, coap_pkt_t *pkt)
+static int _get_put_cb(void *arg, coap_pkt_t *pkt)
 {
     struct iovec *buf = arg;
 
@@ -316,7 +316,58 @@ ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path, void *buf, si
     pkt.payload = pktpos;
     pkt.payload_len = 0;
 
-    return nanocoap_sock_request_cb(sock, &pkt, _get_cb, &ctx);
+    return nanocoap_sock_request_cb(sock, &pkt, _get_put_cb, &ctx);
+}
+
+ssize_t _sock_put_post(nanocoap_sock_t *sock, const char *path, unsigned code,
+                       const void *request, size_t len,
+                       void *response, size_t max_len)
+{
+    /* buffer for CoAP header */
+    uint8_t buffer[CONFIG_NANOCOAP_BLOCK_HEADER_MAX];
+    uint8_t *pktpos = buffer;
+
+    iolist_t payload = {
+        .iol_base = (void *)request,
+        .iol_len  = len,
+    };
+
+    coap_pkt_t pkt = {
+        .hdr = (void *)buffer,
+        .snips = &payload,
+    };
+
+    struct iovec ctx = {
+        .iov_base = response,
+        .iov_len  = max_len,
+    };
+
+    pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, code, _get_id());
+    pktpos += coap_opt_put_uri_path(pktpos, 0, path);
+
+    if (len) {
+        /* set payload marker */
+        *pktpos++ = 0xFF;
+    }
+
+    pkt.payload = pktpos;
+    pkt.payload_len = 0;
+
+    return nanocoap_sock_request_cb(sock, &pkt, response ? _get_put_cb : NULL, &ctx);
+}
+
+ssize_t nanocoap_sock_put(nanocoap_sock_t *sock, const char *path,
+                          const void *request, size_t len,
+                          void *response, size_t len_max)
+{
+    return _sock_put_post(sock, path, COAP_METHOD_PUT, request, len, response, len_max);
+}
+
+ssize_t nanocoap_sock_post(nanocoap_sock_t *sock, const char *path,
+                           const void *request, size_t len,
+                           void *response, size_t len_max)
+{
+    return _sock_put_post(sock, path, COAP_METHOD_POST, request, len, response, len_max);
 }
 
 ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local,
