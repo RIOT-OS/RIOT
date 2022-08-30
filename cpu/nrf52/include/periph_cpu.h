@@ -265,6 +265,38 @@ void spi_twi_irq_register_i2c(NRF_TWIM_Type *bus,
                               spi_twi_irq_cb_t cb, void *arg);
 
 /**
+ * @brief   Acquire the shared I2C/SPI peripheral in I2C mode
+ *
+ * @param   bus bus to acquire exclusive access on
+ * @param   cb  ISR handler to call on IRQ
+ * @param   arg ISR handler argument
+ */
+void nrf5x_i2c_acquire(NRF_TWIM_Type *bus, spi_twi_irq_cb_t cb, void *arg);
+
+/**
+ * @brief   Release the shared I2C/SPI peripheral in I2C mode
+ *
+ * @param   bus bus to release exclusive access on
+ */
+void nrf5x_i2c_release(NRF_TWIM_Type *bus);
+
+/**
+ * @brief   Acquire the shared I2C/SPI peripheral in SPI mode
+ *
+ * @param   bus bus to release exclusive access on
+ * @param   cb  ISR handler to call on IRQ
+ * @param   arg ISR handler argument
+ */
+void nrf5x_spi_acquire(NRF_SPIM_Type *bus, spi_twi_irq_cb_t cb, void *arg);
+
+/**
+ * @brief   Acquire the shared I2C/SPI peripheral in SPI mode
+ *
+ * @param   bus bus to release exclusive access on
+ */
+void nrf5x_spi_release(NRF_SPIM_Type *bus);
+
+/**
  * @brief USBDEV buffers must be word aligned because of DMA restrictions
  */
 #define USBDEV_CPU_DMA_ALIGNMENT       (4)
