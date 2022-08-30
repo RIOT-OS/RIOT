@@ -96,6 +96,11 @@
 #define HW_TIMER_CORRECTION   10
 #define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION << 1, 5))
 
+#elif defined(CPU_FAM_ESP32S2)
+
+#define HW_TIMER_CORRECTION   (RTC_PLL_320M / CONFIG_ESP32S2_DEFAULT_CPU_FREQ_MHZ)
+#define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION << 1, 5))
+
 #elif defined(CPU_FAM_ESP32S3)
 
 #define HW_TIMER_CORRECTION   (RTC_PLL_320M / CONFIG_ESP32S3_DEFAULT_CPU_FREQ_MHZ)
@@ -126,7 +131,7 @@ struct _hw_timer_desc_t {
 
 static const struct _hw_timer_desc_t _timers_desc[] =
 {
-#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S3)
+#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
     {
         .module = PERIPH_TIMG0_MODULE,
         .group = TIMER_GROUP_0,
@@ -397,6 +402,11 @@ void IRAM_ATTR timer_stop(tim_t dev)
 #if defined(CPU_FAM_ESP32)
 
 #define HW_TIMER_CORRECTION   (RTC_PLL_480M / CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ)
+#define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION, 5))
+
+#elif defined(CPU_FAM_ESP32S2)
+
+#define HW_TIMER_CORRECTION   (RTC_PLL_480M / CONFIG_ESP32S2_DEFAULT_CPU_FREQ_MHZ)
 #define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION, 5))
 
 #elif defined(CPU_FAM_ESP32S3)

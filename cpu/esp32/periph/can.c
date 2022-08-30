@@ -637,7 +637,7 @@ static void _esp_can_power_down(can_t *dev)
     twai_hal_deinit(&hw);
 
     /* power down the CAN controller */
-    periph_module_disable(PERIPH_CAN_MODULE);
+    periph_module_disable(PERIPH_TWAI_MODULE);
 
     dev->powered_up = false;
 }

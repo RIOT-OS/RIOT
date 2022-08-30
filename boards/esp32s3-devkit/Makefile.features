@@ -1,7 +1,5 @@
 # default board version if not defined
-ifeq (,$(BOARD_VERSION))
-  BOARD_VERSION = esp32s3-devkitc-1-n8
-endif
+BOARD_VERSION ?= esp32s3-devkitc-1-n8
 
 ifeq (esp32s3-devkitc-1-n8,$(BOARD_VERSION))
   CPU_MODEL = esp32s3_wroom_1x_n8
