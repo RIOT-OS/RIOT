@@ -35,7 +35,7 @@ static aes128_cmac_context_t CmacContext;
 static uint8_t digest[LORAMAC_APPKEY_LEN];
 static cipher_t AesContext;
 
-typedef struct  __attribute__((packed)) {
+typedef struct __attribute__((packed)) {
     uint8_t fb;
     uint32_t u8_pad;
     uint8_t dir;
