@@ -480,7 +480,7 @@ static ssize_t _delete_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         if ((err = vfs_unlink_recursive(request->namebuf,
                                         request->namebuf,
                                         sizeof(request->namebuf))) < 0) {
-            gcoap_fileserver_error_handler(pdu, buf, len, err);
+            return gcoap_fileserver_error_handler(pdu, buf, len, err);
         }
     }
     gcoap_resp_init(pdu, buf, len, COAP_CODE_DELETED);
