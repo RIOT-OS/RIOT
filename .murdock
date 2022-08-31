@@ -39,6 +39,7 @@ esp32c3-ci
 esp32c3-devkit
 esp32s3-ci
 esp32s3-devkit
+esp32s2-ci
 esp32s2-devkit
 esp8266-ci
 esp8266-esp-12x
