@@ -16,6 +16,8 @@ bin
 /build
 # AFL findings
 fuzzing/**/findings/
+# core dumps
+core
 # Backup files
 *~
 *.orig
