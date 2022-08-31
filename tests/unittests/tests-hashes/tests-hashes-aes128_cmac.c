@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Test cases for the AES-CMAC hash implementation
+ * @brief       Test cases for the AES128-CMAC hash implementation
  *
  * @author      José Ignacio Alamos <jose.alamos@inria.cl>
  *
@@ -23,10 +23,10 @@
 
 #include "tests-hashes.h"
 #include "embUnit/embUnit.h"
-#include "hashes/cmac.h"
+#include "hashes/aes128_cmac.h"
 #include "crypto/ciphers.h"
 
-static const uint8_t CMAC_KEY[16] = {
+static const uint8_t AES128_CMAC_KEY[16] = {
     0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
     0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c
 };
@@ -78,11 +78,11 @@ static const uint8_t TEST_3_EXP[16] = {
 static int calc_and_compare_hash(const uint8_t *hash, size_t size, const uint8_t *expected)
 {
     uint8_t digest[16];
-    cmac_context_t ctx;
+    aes128_cmac_context_t ctx;
 
-    cmac_init(&ctx, CMAC_KEY, 16);
-    cmac_update(&ctx, hash, size);
-    cmac_final(&ctx, digest);
+    aes128_cmac_init(&ctx, AES128_CMAC_KEY, 16);
+    aes128_cmac_update(&ctx, hash, size);
+    aes128_cmac_final(&ctx, digest);
     return memcmp(digest, expected, 16);
 }
 
@@ -96,10 +96,12 @@ static void test_hashes_cmac(void)
 
 static void test_hashes_cmac_keysize(void)
 {
-    cmac_context_t ctx;
+    aes128_cmac_context_t ctx;
 
-    TEST_ASSERT_EQUAL_INT(cmac_init(&ctx, CMAC_KEY, 15), CIPHER_ERR_INVALID_KEY_SIZE);
-    TEST_ASSERT_EQUAL_INT(cmac_init(&ctx, CMAC_KEY, 16), CIPHER_INIT_SUCCESS);
+    TEST_ASSERT_EQUAL_INT(aes128_cmac_init(&ctx, AES128_CMAC_KEY, 15),
+                          CIPHER_ERR_INVALID_KEY_SIZE);
+    TEST_ASSERT_EQUAL_INT(aes128_cmac_init(&ctx, AES128_CMAC_KEY, 16),
+                          CIPHER_INIT_SUCCESS);
 }
 
 Test *tests_hashes_cmac_tests(void)

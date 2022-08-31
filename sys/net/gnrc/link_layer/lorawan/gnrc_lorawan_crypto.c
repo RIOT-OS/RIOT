@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "hashes/cmac.h"
+#include "hashes/aes128_cmac.h"
 #include "crypto/ciphers.h"
 
 #include "net/gnrc/lorawan.h"
@@ -31,11 +31,11 @@
 #define APP_SKEY_B0_START (0x1)
 #define NWK_SKEY_B0_START (0x2)
 
-static cmac_context_t CmacContext;
+static aes128_cmac_context_t CmacContext;
 static uint8_t digest[LORAMAC_APPKEY_LEN];
 static cipher_t AesContext;
 
-typedef struct  __attribute__((packed)) {
+typedef struct __attribute__((packed)) {
     uint8_t fb;
     uint32_t u8_pad;
     uint8_t dir;
@@ -48,9 +48,9 @@ typedef struct  __attribute__((packed)) {
 void gnrc_lorawan_calculate_join_mic(const uint8_t *buf, size_t len,
                                      const uint8_t *key, le_uint32_t *out)
 {
-    cmac_init(&CmacContext, key, LORAMAC_APPKEY_LEN);
-    cmac_update(&CmacContext, buf, len);
-    cmac_final(&CmacContext, digest);
+    aes128_cmac_init(&CmacContext, key, LORAMAC_APPKEY_LEN);
+    aes128_cmac_update(&CmacContext, buf, len);
+    aes128_cmac_final(&CmacContext, digest);
 
     memcpy(out, digest, sizeof(le_uint32_t));
 }
@@ -73,12 +73,12 @@ void gnrc_lorawan_calculate_mic(const le_uint32_t *dev_addr, uint32_t fcnt,
 
     block.len = iolist_size(frame);
 
-    cmac_init(&CmacContext, nwkskey, LORAMAC_APPKEY_LEN);
-    cmac_update(&CmacContext, &block, sizeof(block));
+    aes128_cmac_init(&CmacContext, nwkskey, LORAMAC_APPKEY_LEN);
+    aes128_cmac_update(&CmacContext, &block, sizeof(block));
     for (iolist_t *io = frame; io != NULL; io = io->iol_next) {
-        cmac_update(&CmacContext, io->iol_base, io->iol_len);
+        aes128_cmac_update(&CmacContext, io->iol_base, io->iol_len);
     }
-    cmac_final(&CmacContext, digest);
+    aes128_cmac_final(&CmacContext, digest);
 
     memcpy(out, digest, sizeof(le_uint32_t));
 }

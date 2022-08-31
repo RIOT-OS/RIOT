@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     sys_hashes_cmac
+ * @ingroup     sys_hashes_aes128_cmac
  * @{
  *
  * @file
- * @brief       AES_CMAC implementation
+ * @brief       AES128_CMAC implementation
  *
  * @author      José Ignacio Alamos <jose.alamos@inria.cl>
  *
@@ -23,7 +23,7 @@
 #include <string.h>
 
 #include "crypto/ciphers.h"
-#include "hashes/cmac.h"
+#include "hashes/aes128_cmac.h"
 
 #define MIN(a, b) a < b ? a : b
 
@@ -42,17 +42,19 @@ static void _leftshift(uint8_t *x, uint8_t *y)
     y[15] = x[15] << 1;
 }
 
-int cmac_init(cmac_context_t *ctx, const uint8_t *key, uint8_t key_size)
+int aes128_cmac_init(aes128_cmac_context_t *ctx,
+                     const uint8_t *key, uint8_t key_size)
 {
-    if (key_size != CMAC_BLOCK_SIZE) {
+    if (key_size != AES128_CMAC_BLOCK_SIZE) {
         return CIPHER_ERR_INVALID_KEY_SIZE;
     }
 
-    memset(ctx, 0, sizeof(cmac_context_t));
-    return cipher_init(&(ctx->aes_ctx), CIPHER_AES, key, key_size);
+    memset(ctx, 0, sizeof(aes128_cmac_context_t));
+    return cipher_init(&(ctx->aes128_ctx), CIPHER_AES, key, key_size);
 }
 
-void cmac_update(cmac_context_t *ctx, const void *data, size_t len)
+void aes128_cmac_update(aes128_cmac_context_t *ctx,
+                        const void *data, size_t len)
 {
     uint8_t d[16];
 
@@ -61,29 +63,29 @@ void cmac_update(cmac_context_t *ctx, const void *data, size_t len)
         if (ctx->M_n == 16) {
             ctx->M_n = 0;
             _xor128(ctx->M_last, ctx->X);
-            cipher_encrypt(&ctx->aes_ctx, ctx->X, d);
-            memcpy(ctx->X, d, CMAC_BLOCK_SIZE);
+            cipher_encrypt(&ctx->aes128_ctx, ctx->X, d);
+            memcpy(ctx->X, d, AES128_CMAC_BLOCK_SIZE);
         }
-        c = MIN(CMAC_BLOCK_SIZE - ctx->M_n, len);
+        c = MIN(AES128_CMAC_BLOCK_SIZE - ctx->M_n, len);
         memcpy(ctx->M_last + ctx->M_n, data, c);
         ctx->M_n += c;
         len -= c;
         data = (void *) (((uint8_t *) data) + c);
 
-        if (ctx->M_n < CMAC_BLOCK_SIZE) {
+        if (ctx->M_n < AES128_CMAC_BLOCK_SIZE) {
             break;
         }
     }
 }
 
-void cmac_final(cmac_context_t *ctx, void *digest)
+void aes128_cmac_final(aes128_cmac_context_t *ctx, void *digest)
 {
     /* Generate subkeys */
-    uint8_t K[CMAC_BLOCK_SIZE];
-    uint8_t L[CMAC_BLOCK_SIZE];
+    uint8_t K[AES128_CMAC_BLOCK_SIZE];
+    uint8_t L[AES128_CMAC_BLOCK_SIZE];
 
-    memset(K, 0, CMAC_BLOCK_SIZE);
-    cipher_encrypt(&ctx->aes_ctx, K, L);
+    memset(K, 0, AES128_CMAC_BLOCK_SIZE);
+    cipher_encrypt(&ctx->aes128_ctx, K, L);
 
     if (L[0] & 0x80) {
         _leftshift(L, K);
@@ -103,11 +105,11 @@ void cmac_final(cmac_context_t *ctx, void *digest)
             _leftshift(K, K);
         }
         /* Padding */
-        memset(ctx->M_last + ctx->M_n, 0, CMAC_BLOCK_SIZE - ctx->M_n);
+        memset(ctx->M_last + ctx->M_n, 0, AES128_CMAC_BLOCK_SIZE - ctx->M_n);
         ctx->M_last[ctx->M_n] = 0x80;
     }
     _xor128(K, ctx->M_last);
     _xor128(ctx->M_last, ctx->X);
-    cipher_encrypt(&ctx->aes_ctx, ctx->X, L);
-    memcpy(digest, L, CMAC_BLOCK_SIZE);
+    cipher_encrypt(&ctx->aes128_ctx, ctx->X, L);
+    memcpy(digest, L, AES128_CMAC_BLOCK_SIZE);
 }
