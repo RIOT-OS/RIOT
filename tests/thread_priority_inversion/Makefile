@@ -11,11 +11,6 @@ else
   FANCY ?= 0
 endif
 
-# KNOWN ISSUE #18534
-# Currently this is failing, causing unrelated errors to block other PRs.
-# This issue will be looked into but for now we need to just close our eyes.
-TEST_ON_CI_BLACKLIST += esp32-wroom-32
-
 include $(RIOTBASE)/Makefile.include
 
 CFLAGS += -DFANCY=$(FANCY)
