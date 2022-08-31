@@ -27,6 +27,14 @@
 #include "net/nanocoap_vfs.h"
 #include "shell.h"
 #include "vfs_default.h"
+#include "vfs_util.h"
+
+/**
+ * @brief   Default download location for ncget
+ */
+#ifndef CONFIG_NCGET_DEFAULT_DATA_DIR
+#define CONFIG_NCGET_DEFAULT_DATA_DIR VFS_DEFAULT_DATA
+#endif
 
 struct dir_list_ctx {
     char *buf;
@@ -96,7 +104,7 @@ static int _nanocoap_get_handler(int argc, char **argv)
 
     if (argc < 2) {
         printf("Usage: %s <url> [destination]\n", argv[0]);
-        printf("Default destination: %s\n", VFS_DEFAULT_DATA);
+        printf("Default destination: %s\n", CONFIG_NCGET_DEFAULT_DATA_DIR);
         return -EINVAL;
     }
 
@@ -115,7 +123,7 @@ static int _nanocoap_get_handler(int argc, char **argv)
             return -EINVAL;
         }
         if (snprintf(buffer, sizeof(buffer), "%s%s",
-                     VFS_DEFAULT_DATA, dst) >= (int)sizeof(buffer)) {
+                     CONFIG_NCGET_DEFAULT_DATA_DIR, dst) >= (int)sizeof(buffer)) {
             printf("Output file path too long\n");
             return -ENOBUFS;
         }
@@ -123,9 +131,9 @@ static int _nanocoap_get_handler(int argc, char **argv)
     } else {
         char *filename = strrchr(url, '/');
         dst = argv[2];
-        if (_is_dir(dst) && filename) {
+        if (vfs_is_dir(dst) > 0 && filename) {
             if (snprintf(buffer, sizeof(buffer), "%s%s",
-                         dst, filename + 1) >= (int)sizeof(buffer)) {
+                         dst, filename) >= (int)sizeof(buffer)) {
                 printf("Output file path too long\n");
                 return -ENOBUFS;
             }
