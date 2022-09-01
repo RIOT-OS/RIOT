@@ -143,8 +143,8 @@ export CFLAGS_DBG=""
 export DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
 export ENABLE_TEST_CACHE=${ENABLE_TEST_CACHE:-1}
 export MURDOCK_REDIS_HOST=${MURDOCK_REDIS_HOST:-127.0.0.1}
+
 NIGHTLY=${NIGHTLY:-0}
-RUN_TESTS=${RUN_TESTS:-${NIGHTLY}}
 FULL_BUILD=${FULL_BUILD:-${NIGHTLY}}
 
 # This is a work around for a bug in CCACHE which interacts very badly with
@@ -229,9 +229,16 @@ check_label() {
     return $?
 }
 
-[ "$RUN_TESTS" != "1" ] && {
-    check_label "CI: run tests" && RUN_TESTS=1
-}
+# if RUN_TESTS is unset (e.g., not passed from the outside),
+# set to 1 if NIGHTLY=1 or if the label "CI: run tests" is set,
+# otherwise set 0.
+if [ -z "$RUN_TESTS" ]; then
+    if [ "$NIGHTLY" = "1" ] || check_label "CI: run tests" ; then
+        RUN_TESTS=1
+    else
+        RUN_TESTS=0
+    fi
+fi
 
 [ "$ENABLE_TEST_CACHE" = "1" ] && {
     check_label "CI: disable test cache" && export ENABLE_TEST_CACHE=0
