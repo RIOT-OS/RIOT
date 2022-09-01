@@ -80,20 +80,24 @@ static _lock_t *__malloc_static_object = NULL;
 
 void IRAM_ATTR _lock_init(_lock_t *lock)
 {
-    assert(lock != NULL);
+    assert(lock != NULL);   /* lock must not be NULL */
+
+    /* prevent a context switch between the allocation and the initialization */
+    uint32_t state = irq_disable();
 
     mutex_t* mtx = malloc(sizeof(mutex_t));
-
     if (mtx) {
         memset(mtx, 0, sizeof(mutex_t));
         *lock = (_lock_t)mtx;
     }
     /* cppcheck-suppress memleak; mtx is stored in lock */
+
+    irq_restore(state);
 }
 
 void IRAM_ATTR _lock_init_recursive(_lock_t *lock)
 {
-    assert(lock != NULL);
+    assert(lock != NULL);   /* lock must not be NULL */
 
 #ifdef MCU_ESP8266
     /* _malloc_rmtx is static and has not to be allocated */
@@ -102,35 +106,51 @@ void IRAM_ATTR _lock_init_recursive(_lock_t *lock)
     }
 #endif
 
-    rmutex_t* rmtx = malloc(sizeof(rmutex_t));
+    /* prevent a context switch between the allocation and the initialization */
+    uint32_t state = irq_disable();
 
+    rmutex_t* rmtx = malloc(sizeof(rmutex_t));
     if (rmtx) {
         memset(rmtx, 0, sizeof(rmutex_t));
         *lock = (_lock_t)rmtx;
     }
     /* cppcheck-suppress memleak; rmtx is stored in lock */
+
+    irq_restore(state);
 }
 
 void IRAM_ATTR _lock_close(_lock_t *lock)
 {
-    assert(lock != NULL);
+    /* locking variable has to be valid and initialized */
+    assert(lock != NULL && *lock != 0);
 #ifdef MCU_ESP8266
     assert(lock != __malloc_static_object);
 #endif
 
+    /* prevent a context switch between freeing and resetting */
+    uint32_t state = irq_disable();
+
     free((void*)*lock);
     *lock = 0;
+
+    irq_restore(state);
 }
 
 void IRAM_ATTR _lock_close_recursive(_lock_t *lock)
 {
-    assert(lock != NULL);
+    /* locking variable has to be valid and initialized */
+    assert(lock != NULL && *lock != 0);
 #ifdef MCU_ESP8266
     assert(lock != __malloc_static_object);
 #endif
 
+    /* prevent a context switch between freeing and resetting */
+    uint32_t state = irq_disable();
+
     free((void*)*lock);
     *lock = 0;
+
+    irq_restore(state);
 }
 
 void IRAM_ATTR _lock_acquire(_lock_t *lock)
