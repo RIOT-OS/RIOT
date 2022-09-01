@@ -59,7 +59,7 @@ int pthread_setcancelstate(int state, int *oldstate)
 /**
  * @name Locking functions
  *
- * Following functions implement the lock mechanism for newlib.
+ * Following functions implement the locking mechanism for newlib.
  */
 
 #ifdef MCU_ESP8266
@@ -76,6 +76,18 @@ static rmutex_t _malloc_rmtx = RMUTEX_INIT;
  * the address of newlib's static variable __malloc_lock_object.
  */
 static _lock_t *__malloc_static_object = NULL;
+
+#define _lock_critical_enter()
+#define _lock_critical_exit()
+
+#else
+
+/* Operations with recursive locking variable operations have to be guarded
+ * for the ESP32x SoCs by disabling interrupts to prevent unwanted context
+ * switches. */
+#define _lock_critical_enter()  uint32_t __lock_state = irq_disable();
+#define _lock_critical_exit()   irq_restore(__lock_state);
+
 #endif
 
 void IRAM_ATTR _lock_init(_lock_t *lock)
@@ -155,24 +167,29 @@ void IRAM_ATTR _lock_close_recursive(_lock_t *lock)
 
 void IRAM_ATTR _lock_acquire(_lock_t *lock)
 {
+    assert(lock != NULL);   /* lock must not be NULL */
+    assert(!irq_is_in());   /* _lock_acquire must not be called in
+                               interrupt context */
+
     /* if scheduler is not running, we have not to lock the mutex */
     if (thread_getpid() == KERNEL_PID_UNDEF) {
         return;
     }
 
-    assert(lock != NULL);
-
-    /* if the lock data structure is still not allocated, initialize it first */
+    /* if the locking variable is not initialized, initialize it implicitly */
     if (*lock == 0) {
         _lock_init(lock);
+        assert(*lock != 0);
     }
 
-    assert(!irq_is_in());
     mutex_lock((mutex_t*)*lock);
 }
 
 void IRAM_ATTR _lock_acquire_recursive(_lock_t *lock)
 {
+    assert(lock != NULL);   /* lock must not be NULL */
+    assert(!irq_is_in());   /* _lock_acquire must not be called in
+                               interrupt context */
 #ifdef MCU_ESP8266
     /**
      * Since we don't have direct access to newlib's static variable
@@ -194,33 +211,36 @@ void IRAM_ATTR _lock_acquire_recursive(_lock_t *lock)
         return;
     }
 
-    assert(lock != NULL);
-
-    /* if the lock data structure is still not allocated, initialize it first */
+    /* if the locking variable is not initialized, initialize it implicitly */
     if (*lock == 0) {
         _lock_init_recursive(lock);
+        assert(*lock != 0);
     }
 
-    assert(!irq_is_in());
+    _lock_critical_enter();
+
     rmutex_lock((rmutex_t*)*lock);
+
+    _lock_critical_exit();
 }
 
 int IRAM_ATTR _lock_try_acquire(_lock_t *lock)
 {
+    assert(lock != NULL);   /* lock must not be NULL */
+
     /* if scheduler is not running, we have not to lock the mutex */
     if (thread_getpid() == KERNEL_PID_UNDEF) {
         return 0;
     }
 
-    assert(lock != NULL);
-
-    /* if the lock data structure is still not allocated, initialize it first */
-    if (*lock == 0) {
-        _lock_init(lock);
-    }
-
     if (irq_is_in()) {
         return 0;
+    }
+
+    /* if the locking variable is not initialized, initialize it implicitly */
+    if (*lock == 0) {
+        _lock_init(lock);
+        assert(*lock != 0);
     }
 
     return mutex_trylock((mutex_t*)*lock);
@@ -228,23 +248,30 @@ int IRAM_ATTR _lock_try_acquire(_lock_t *lock)
 
 int IRAM_ATTR _lock_try_acquire_recursive(_lock_t *lock)
 {
+    assert(lock != NULL);   /* lock must not be NULL */
+
     /* if scheduler is not running, we have not to lock the mutex */
     if (thread_getpid() == KERNEL_PID_UNDEF) {
         return 0;
-    }
-
-    assert(lock != NULL);
-
-    /* if the lock data structure is still not allocated, initialize it first */
-    if (*lock == 0) {
-        _lock_init_recursive(lock);
     }
 
     if (irq_is_in()) {
         return 0;
     }
 
-    return rmutex_trylock((rmutex_t*)*lock);
+    /* if the locking variable is not initialized, initialize it implicitly */
+    if (*lock == 0) {
+        _lock_init_recursive(lock);
+        assert(*lock != 0);
+    }
+
+    _lock_critical_enter();
+
+    int res = rmutex_trylock((rmutex_t*)*lock);
+
+    _lock_critical_exit();
+
+    return res;
 }
 
 void IRAM_ATTR _lock_release(_lock_t *lock)
@@ -254,6 +281,7 @@ void IRAM_ATTR _lock_release(_lock_t *lock)
         return;
     }
 
+    /* the locking variable has to be valid and initialized */
     assert(lock != NULL && *lock != 0);
 
     mutex_unlock((mutex_t*)*lock);
@@ -266,9 +294,14 @@ void IRAM_ATTR _lock_release_recursive(_lock_t *lock)
         return;
     }
 
+    /* the locking variable has to be valid and initialized */
     assert(lock != NULL && *lock != 0);
 
+    _lock_critical_enter();
+
     rmutex_unlock((rmutex_t*)*lock);
+
+    _lock_critical_exit();
 }
 
 #if defined(_RETARGETABLE_LOCKING)
