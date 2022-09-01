@@ -257,17 +257,6 @@ void IRAM_ATTR _lock_release_recursive(_lock_t *lock)
 static_assert(sizeof(struct __lock) >= sizeof(rmutex_t),
               "struct __lock is too small to hold a recursive mutex of type rmutex_t");
 
-/* definition of locks required by the newlib if retargetable locking is used */
-struct __lock __lock___sinit_recursive_mutex;
-struct __lock __lock___sfp_recursive_mutex;
-struct __lock __lock___atexit_recursive_mutex;
-struct __lock __lock___at_quick_exit_mutex;
-struct __lock __lock___malloc_recursive_mutex;
-struct __lock __lock___env_recursive_mutex;
-struct __lock __lock___tz_mutex;
-struct __lock __lock___dd_hash_mutex;
-struct __lock __lock___arc4random_mutex;
-
 /* map newlib's `__retarget_*` functions to the existing `_lock_*` functions */
 
 void __retarget_lock_init(_LOCK_T *lock)
