@@ -54,6 +54,18 @@
 #define LVGL_THREAD_FLAG                    (1 << 7)
 #endif
 
+#if IS_USED(MODULE_LV_DRIVERS_SDL)
+
+#ifndef LCD_SCREEN_WIDTH
+#define LCD_SCREEN_WIDTH            SDL_HOR_RES
+#endif
+
+#ifndef LCD_SCREEN_HEIGHT
+#define LCD_SCREEN_HEIGHT           SDL_VER_RES
+#endif
+
+#endif
+
 static kernel_pid_t _task_thread_pid;
 
 static lv_disp_draw_buf_t disp_buf;
@@ -79,6 +91,7 @@ static void _disp_map(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *col
     const disp_dev_area_t disp_area = {
         area->x1, area->x2, area->y1, area->y2
     };
+
     disp_dev_map(_screen_dev->display, &disp_area, (const uint16_t *)color_p);
 
     LOG_DEBUG("[lvgl] flush display\n");
@@ -141,6 +154,8 @@ void lvgl_init(screen_dev_t *screen_dev)
     sdl_init();
     /* Used when `LV_VDB_SIZE != 0` in lv_conf.h (buffered drawing) */
     disp_drv.flush_cb = sdl_display_flush;
+    disp_drv.hor_res = LCD_SCREEN_WIDTH;
+    disp_drv.ver_res = LCD_SCREEN_HEIGHT;
 #else
     disp_drv.flush_cb = _disp_map;
     /* Configure horizontal and vertical resolutions based on the
