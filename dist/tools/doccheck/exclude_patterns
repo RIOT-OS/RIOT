@@ -5955,9 +5955,7 @@ cpu/esp8266/include/cpu_conf\.h:[0-9]+: warning: Member GNRC_IPV6_STACK_SIZE \(m
 cpu/esp8266/include/cpu_conf\.h:[0-9]+: warning: Member GNRC_PKTDUMP_STACKSIZE \(macro definition\) of group cpu_esp8266_conf is not documented\.
 cpu/esp8266/include/cpu_conf\.h:[0-9]+: warning: Member TCPIP_THREAD_STACKSIZE \(macro definition\) of group cpu_esp8266_conf is not documented\.
 cpu/esp8266/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_EXTRA_STACKSIZE_PRINTF \(macro definition\) of group cpu_esp8266_conf is not documented\.
-cpu/esp8266/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_STACKSIZE_DEFAULT \(macro definition\) of group cpu_esp8266_conf is not documented\.
-cpu/esp8266/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_STACKSIZE_IDLE \(macro definition\) of group cpu_esp8266_conf is not documented\.
-cpu/esp8266/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_STACKSIZE_MAIN \(macro definition\) of group cpu_esp8266_conf is not documented\.
+cpu/esp8266/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_STACKSIZE_[A-Z]+ \(macro definition\) of group cpu_esp8266_conf is not documented\.
 cpu/esp8266/include/irq_arch\.h:[0-9]+: warning: Member ETS_SOFT_INT_HDL_MAC \(macro definition\) of file irq_arch\.h is not documented\.
 cpu/esp8266/include/irq_arch\.h:[0-9]+: warning: Member ETS_SOFT_INT_NONE \(macro definition\) of file irq_arch\.h is not documented\.
 cpu/esp8266/include/irq_arch\.h:[0-9]+: warning: Member ETS_SOFT_INT_YIELD \(macro definition\) of file irq_arch\.h is not documented\.
