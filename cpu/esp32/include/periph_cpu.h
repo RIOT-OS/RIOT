@@ -88,7 +88,7 @@ typedef unsigned int gpio_t;
  * @brief   Define a CPU specific GPIO pin generator macro
  * @{
  */
-#define GPIO_PIN(x, y)      ((x & 0) | y)
+#define GPIO_PIN(x, y)      ((x << 5) | y)
 /** @} */
 
 /**
@@ -118,7 +118,7 @@ typedef enum {
     GPIO_FALLING,   /**< emit interrupt on falling flank */
     GPIO_BOTH,      /**< emit interrupt on both flanks */
     GPIO_LOW,       /**< emit interrupt on low level */
-    GPIO_HIGH       /**< emit interrupt on low level */
+    GPIO_HIGH       /**< emit interrupt on high level */
 } gpio_flank_t;
 /** @} */
 
@@ -140,6 +140,84 @@ typedef enum {
     GPIO_IN_OD_PU   /**< input and open-drain output with pull-up */
 } gpio_mode_t;
 /** @} */
+
+/* BEGIN: GPIO LL overwrites */
+
+#if SOC_GPIO_PIN_COUNT > 32
+
+#define GPIO_PORT_NUMOF         2
+#define GPIO_PORT_0             GPIO_PORT(0)
+#define GPIO_PORT_1             GPIO_PORT(1)
+#define GPIO_PORT_0_PIN_NUMOF   (32)
+#define GPIO_PORT_1_PIN_NUMOF   (SOC_GPIO_PIN_COUNT - 32)
+#define GPIO_PORT_PIN_NUMOF(p)  ((p == GPIO_PORT_0) ? GPIO_PORT_0_PIN_NUMOF \
+                                                    : GPIO_PORT_1_PIN_NUMOF)
+#else
+
+#define GPIO_PORT_NUMOF         1
+#define GPIO_PORT_0             GPIO_PORT(0)
+#define GPIO_PORT_0_PIN_NUMOF   (SOC_GPIO_PIN_COUNT)
+#define GPIO_PORT_PIN_NUMOF(p)  ((p == GPIO_PORT_0) ? GPIO_PORT_0_PIN_NUMOF : 0)
+
+#endif
+
+#define HAVE_GPIO_PORT_T
+typedef uintptr_t gpio_port_t;
+
+#define HAVE_GPIO_SLEW_T
+typedef enum {
+    GPIO_SLEW_SLOWEST = 0,
+    GPIO_SLEW_SLOW = 0,
+    GPIO_SLEW_FAST = 0,
+    GPIO_SLEW_FASTEST = 0,
+} gpio_slew_t;
+
+#define HAVE_GPIO_PULL_STRENGTH_T
+typedef enum {
+    GPIO_PULL_WEAKEST = 0,
+    GPIO_PULL_WEAK = 0,
+    GPIO_PULL_STRONG = 0,
+    GPIO_PULL_STRONGEST = 0
+} gpio_pull_strength_t;
+
+#define HAVE_GPIO_PULL_T
+typedef enum {
+    GPIO_FLOATING = 0,
+    GPIO_PULL_UP = 1,
+    GPIO_PULL_DOWN = 2,
+    GPIO_PULL_KEEP = 0xff   /*< not supported */
+} gpio_pull_t;
+
+/**
+ * @brief   Current an output pin can drive in active and sleep modes
+ */
+#define HAVE_GPIO_DRIVE_STRENGTH_T
+typedef enum {
+    GPIO_DRIVE_WEAKEST   = 0,    /**<  5 mA */
+    GPIO_DRIVE_WEAK      = 1,    /**< 10 mA */
+    GPIO_DRIVE_STRONG    = 2,    /**< 20 mA (default) */
+    GPIO_DRIVE_STRONGEST = 3,    /**< 30 mA */
+} gpio_drive_strength_t;
+
+/*
+ * @brief   Map former enumeration values the new enumeration values for compatibility.
+ */
+#define GPIO_DRIVE_5    GPIO_DRIVE_WEAKEST      /**<  5 mA */
+#define GPIO_DRIVE_10   GPIO_DRIVE_WEAK         /**< 10 mA */
+#define GPIO_DRIVE_20   GPIO_DRIVE_STRONG       /**< 20 mA (default) */
+#define GPIO_DRIVE_30   GPIO_DRIVE_STRONGEST    /**< 30 mA */
+
+#define HAVE_GPIO_IRQ_TRIG_T
+typedef enum {
+    GPIO_TRIGGER_NONE = 0,
+    GPIO_TRIGGER_EDGE_RISING = 1,
+    GPIO_TRIGGER_EDGE_FALLING = 2,
+    GPIO_TRIGGER_EDGE_BOTH = 3,
+    GPIO_TRIGGER_LEVEL_LOW = 4,
+    GPIO_TRIGGER_LEVEL_HIGH = 5
+} gpio_irq_trig_t;
+
+/* END: GPIO LL overwrites */
 
 #endif /* ndef DOXYGEN */
 /** @} */
