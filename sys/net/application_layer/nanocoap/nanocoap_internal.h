@@ -35,8 +35,6 @@ extern "C" {
  */
 struct _coap_request_ctx {
     const coap_resource_t *resource;    /**< resource of the request */
-    void *context;                      /**< request context, needed to supply
-                                             the remote for the forward proxy */
 #if defined(MODULE_GCOAP) || DOXYGEN
     /**
      * @brief   transport the packet was received over
