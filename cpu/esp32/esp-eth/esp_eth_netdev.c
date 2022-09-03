@@ -100,19 +100,14 @@ static esp_err_t IRAM_ATTR _eth_input_callback(esp_eth_handle_t hdl,
 
     mutex_lock(&_esp_eth_dev.dev_lock);
 
-    /* Don't overwrite other events, drop packet instead.
-     * Keep the latest received packet if previous has not been read. */
-    if (_esp_eth_dev.event == SYSTEM_EVENT_MAX ||
-        _esp_eth_dev.event == SYSTEM_EVENT_ETH_RX_DONE) {
-        memcpy(_esp_eth_dev.rx_buf, buffer, len);
-        /* buffer is allocated by the `emac_esp32_rx_task` upon receipt of a
-         * MAC frame and is forwarded to the consumer who responsible for
-         * freeing the buffer. */
-        free(buffer);
-        _esp_eth_dev.rx_len = len;
-        _esp_eth_dev.event = SYSTEM_EVENT_ETH_RX_DONE;
-        netdev_trigger_event_isr(&_esp_eth_dev.netdev);
-    }
+    memcpy(_esp_eth_dev.rx_buf, buffer, len);
+    /* buffer is allocated by the `emac_esp32_rx_task` upon receipt of a
+     * MAC frame and is forwarded to the consumer who responsible for
+     * freeing the buffer. */
+    free(buffer);
+    _esp_eth_dev.rx_len = len;
+    _esp_eth_dev.event = SYSTEM_EVENT_ETH_RX_DONE;
+    netdev_trigger_event_isr(&_esp_eth_dev.netdev);
 
     mutex_unlock(&_esp_eth_dev.dev_lock);
 
