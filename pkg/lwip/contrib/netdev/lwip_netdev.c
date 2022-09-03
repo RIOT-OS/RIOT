@@ -94,8 +94,8 @@ err_t lwip_netdev_init(struct netif *netif)
 
     netdev = netif->state;
     lwip_netif_dev_acquire(netif);
-    netdev->driver->init(netdev);
     netdev->event_callback = _event_cb;
+    netdev->driver->init(netdev);
     if (netdev->driver->get(netdev, NETOPT_DEVICE_TYPE, &dev_type,
                             sizeof(dev_type)) < 0) {
         res = ERR_IF;
