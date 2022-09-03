@@ -40,7 +40,7 @@ static int _suit_handler(int argc, char **argv)
     }
 
     if (strcmp(argv[1], "fetch") == 0) {
-        suit_coap_trigger((uint8_t *)argv[2], strlen(argv[2]));
+        suit_worker_trigger(argv[2], strlen(argv[2]));
     }
     else if (strcmp(argv[1], "seq_no") == 0) {
         uint32_t seq_no = 0;
