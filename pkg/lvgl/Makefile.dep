@@ -40,6 +40,10 @@ ifneq (,$(filter lvgl_contrib_touch,$(USEMODULE)))
   USEMODULE += touch_dev
 endif
 
+ifneq (,$(filter lpm013m126,$(USEMODULE)))
+  CFLAGS += -DLVGL_UPDATE_FULL_LINES_ONLY=1
+endif
+
 # lvgl is not compatible with non 32bit platforms
 # Building lv_misc triggers the error:
 # "left shift count >= width of type [-Werror=shift-count-overflow]"
