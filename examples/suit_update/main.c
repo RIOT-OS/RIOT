@@ -211,8 +211,6 @@ int main(void)
 #endif
     /* initialize suit storage */
     suit_storage_init_all();
-    /* start suit updater thread */
-    suit_worker_run();
 
     /* start nanocoap server thread */
     thread_create(_nanocoap_server_stack, sizeof(_nanocoap_server_stack),

@@ -32,11 +32,6 @@ extern "C" {
 #endif
 
 /**
- * @brief    Start SUIT worker thread
- */
-void suit_worker_run(void);
-
-/**
  * @brief   Trigger a SUIT udate via a worker thread
  *
  * @param[in] url       url pointer containing the full coap url to the manifest

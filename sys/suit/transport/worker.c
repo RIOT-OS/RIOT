@@ -78,7 +78,7 @@ static char _stack[SUIT_WORKER_STACKSIZE];
 static char _url[CONFIG_SOCK_URLPATH_MAXLEN];
 static uint8_t _manifest_buf[SUIT_MANIFEST_BUFSIZE];
 
-static mutex_t _worker_lock = MUTEX_INIT_LOCKED;
+static mutex_t _worker_lock;
 
 int suit_handle_url(const char *url)
 {
@@ -141,33 +141,29 @@ static void *_suit_worker_thread(void *arg)
 
     LOG_INFO("suit_worker: started.\n");
 
-    while (true) {
-        mutex_lock(&_worker_lock);
-
-        if (suit_handle_url(_url) == 0) {
-            LOG_INFO("suit_worker: update successful\n");
-            if (IS_USED(MODULE_SUIT_STORAGE_FLASHWRITE)) {
-                LOG_INFO("suit_worker: rebooting...\n");
-                pm_reboot();
-            }
-        }
-        else {
-            LOG_INFO("suit_worker: update failed, hdr invalid\n ");
+    if (suit_handle_url(_url) == 0) {
+        LOG_INFO("suit_worker: update successful\n");
+        if (IS_USED(MODULE_SUIT_STORAGE_FLASHWRITE)) {
+            LOG_INFO("suit_worker: rebooting...\n");
+            pm_reboot();
         }
     }
-    return NULL;
-}
+    else {
+        LOG_INFO("suit_worker: update failed, hdr invalid\n ");
+    }
 
-void suit_worker_run(void)
-{
-    thread_create(_stack, SUIT_WORKER_STACKSIZE, SUIT_COAP_WORKER_PRIO,
-                  THREAD_CREATE_STACKTEST,
-                  _suit_worker_thread, NULL, "suit worker");
+    mutex_unlock(&_worker_lock);
+    return NULL;
 }
 
 void suit_worker_trigger(const char *url, size_t len)
 {
+    mutex_lock(&_worker_lock);
+
     memcpy(_url, url, len);
     _url[len] = '\0';
-    mutex_unlock(&_worker_lock);
+
+    thread_create(_stack, SUIT_WORKER_STACKSIZE, SUIT_COAP_WORKER_PRIO,
+                  THREAD_CREATE_STACKTEST,
+                  _suit_worker_thread, NULL, "suit worker");
 }
