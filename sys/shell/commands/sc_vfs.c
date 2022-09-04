@@ -30,6 +30,7 @@
 #include <fcntl.h>
 
 #include "shell.h"
+#include "macros/units.h"
 #include "vfs.h"
 #include "vfs_util.h"
 
@@ -137,6 +138,37 @@ static int _errno_string(int err, char *buf, size_t buflen)
 }
 #undef _case_snprintf_errno_name
 
+static void _print_size(uint64_t size)
+{
+    unsigned long len;
+    const char *unit;
+
+    if (size == 0) {
+        len = 0;
+        unit = NULL;
+    } else if ((size & (GiB(1) - 1)) == 0) {
+        len = size / GiB(1);
+        unit = "GiB";
+    }
+    else if ((size & (MiB(1) - 1)) == 0) {
+        len = size / MiB(1);
+        unit = "MiB";
+    }
+    else if ((size & (KiB(1) - 1)) == 0) {
+        len = size / KiB(1);
+        unit = "KiB";
+    } else {
+        len = size;
+        unit = NULL;
+    }
+
+    if (unit) {
+        printf("%8lu %s ", len, unit);
+    } else {
+        printf("%10lu B ", len);
+    }
+}
+
 static void _print_df(vfs_DIR *dir)
 {
     struct statvfs buf;
@@ -148,14 +180,16 @@ static void _print_df(vfs_DIR *dir)
         printf("statvfs failed: %s\n", err);
         return;
     }
-    printf("%12lu %12lu %12lu %7lu%%\n", (unsigned long)buf.f_blocks,
-        (unsigned long)(buf.f_blocks - buf.f_bfree), (unsigned long)buf.f_bavail,
-        (unsigned long)(((buf.f_blocks - buf.f_bfree) * 100) / buf.f_blocks));
+
+    _print_size(buf.f_blocks * buf.f_bsize);
+    _print_size((buf.f_blocks - buf.f_bfree) * buf.f_bsize);
+    _print_size(buf.f_bavail * buf.f_bsize);
+    printf("%7lu%%\n", (unsigned long)(((buf.f_blocks - buf.f_bfree) * 100) / buf.f_blocks));
 }
 
 static int _df_handler(int argc, char **argv)
 {
-    puts("Mountpoint              Total         Used    Available     Capacity");
+    puts("Mountpoint              Total         Used    Available     Use%");
     if (argc > 1) {
         const char *path = argv[1];
         /* Opening a directory just to statfs is somewhat odd, but it is the
