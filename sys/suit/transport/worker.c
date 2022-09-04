@@ -170,14 +170,14 @@ static void *_suit_worker_thread(void *arg)
     return NULL;
 }
 
-void suit_coap_run(void)
+void suit_worker_run(void)
 {
     thread_create(_stack, SUIT_WORKER_STACKSIZE, SUIT_COAP_WORKER_PRIO,
                   THREAD_CREATE_STACKTEST,
                   _suit_worker_thread, NULL, "suit worker");
 }
 
-void suit_coap_trigger(const uint8_t *url, size_t len)
+void suit_worker_trigger(const char *url, size_t len)
 {
     memcpy(_url, url, len);
     _url[len] = '\0';
