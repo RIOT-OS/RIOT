@@ -1,0 +1,13 @@
+/**
+@defgroup    boards_baglejs2 Bangle.js 2
+@ingroup     boards
+@brief       Support for the Bangle.js 2
+
+### General information
+
+"
+"
+
+See https://www.espruino.com/Bangle.js2
+
+ */
