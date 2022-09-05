@@ -175,7 +175,7 @@ __attribute__((used)) void _exit(int n)
 {
     LOG_INFO("#! exit %i: powering off\n", n);
     pm_off();
-    while(1);
+    while (1) {}
 }
 
 /**
@@ -603,7 +603,7 @@ int _isatty_r(struct _reent *r, int fd)
 {
     r->_errno = 0;
 
-    if(fd == STDIN_FILENO || fd == STDOUT_FILENO || fd == STDERR_FILENO) {
+    if (fd == STDIN_FILENO || fd == STDOUT_FILENO || fd == STDERR_FILENO) {
         return 1;
     }
 
