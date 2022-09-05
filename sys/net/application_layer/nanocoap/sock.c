@@ -568,7 +568,7 @@ static int _2buf(void *arg, size_t offset, uint8_t *buf, size_t len, int more)
     _buf_t *dst = arg;
 
     if (offset + len > dst->len) {
-        return -1;
+        return -ENOBUFS;
     }
 
     memcpy(dst->ptr + offset, buf, len);
