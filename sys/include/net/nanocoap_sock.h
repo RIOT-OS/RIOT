@@ -308,8 +308,9 @@ int nanocoap_get_blockwise_url(const char *url,
  * @param[in]   buf        Target buffer
  * @param[in]   len        Target buffer length
  *
+ * @returns     <0 on error
  * @returns     -EINVAL    if an invalid url is provided
- * @returns     -1         if failed to fetch the url content
+ * @returns     -ENOBUFS   if the provided buffer was too small
  * @returns     size of the response payload on success
  */
 ssize_t nanocoap_get_blockwise_url_to_buf(const char *url,
