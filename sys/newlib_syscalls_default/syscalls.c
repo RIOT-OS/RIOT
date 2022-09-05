@@ -181,9 +181,6 @@ __attribute__((used)) void _exit(int n)
 /**
  * @brief Allocate memory from the heap.
  *
- * The current heap implementation is very rudimentary, it is only able to allocate
- * memory. But it does not have any means to free memory again
- *
  * @return      pointer to the newly allocated memory on success
  * @return      pointer set to address `-1` on failure
  */
