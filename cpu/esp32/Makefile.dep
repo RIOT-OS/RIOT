@@ -126,8 +126,6 @@ ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
   # the implementations of TLSF with the exception of heap poisoning, which
   # is not configured.
   USEPKG += tlsf
-else
-  USEMODULE += malloc_thread_safe
 endif
 
 ifneq (,$(filter mtd,$(USEMODULE)))
