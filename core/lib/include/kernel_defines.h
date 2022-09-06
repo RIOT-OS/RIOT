@@ -280,6 +280,28 @@ extern "C" {
 
 /* end{code-style-ignore} */
 
+/** @brief Declare an item as deprecated
+ *
+ * On modern (C2x) compilers, this expands to the C++11 style attribute
+ * `[[deprecated(reason)]]`; otherwise to the GNUism
+ * `__((attribute(deprecated))`, or is ignored.
+ *
+ * In Doxygen, it is rendered as a deprecation; note that currently, no Doxygen
+ * commands work in the reason.
+ *
+ * Example:
+ *
+ * ```c
+ * DEPRECATED("Use foo_iniit2() instead")
+ * void foo_init(struct foo *);
+ * ```
+ * */
+#if __STDC_VERSION__ >= 202000L
+#define DEPRECATED(reason) [[deprecated(reason)]]
+#elif defined(__GNUC__)
+#define DEPRECATED(reason) __attribute__((deprecated(reason)))
+#endif
+
 #ifdef __cplusplus
 }
 #endif
