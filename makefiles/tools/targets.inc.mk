@@ -12,11 +12,6 @@ $(RIOTTOOLS)/bossa-$(BOSSA_VERSION)/bossac:
 	@$(MAKE) -C $(RIOTTOOLS)/bossa-$(BOSSA_VERSION)
 	@echo "[INFO] bossac $(BOSSA_VERSION) binary successfully built!"
 
-$(RIOTTOOLS)/pic32prog/pic32prog: $(RIOTTOOLS)/pic32prog/Makefile
-	@echo "[INFO] $(@F) binary not found - building it from source now"
-	$(MAKE) -C $(@D)
-	@echo "[INFO] $(@F) binary successfully built!"
-
 $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py: $(RIOTTOOLS)/cc2538-bsl/Makefile
 	@echo "[INFO] cc2538-bsl.py not found - fetching it from GitHub now"
 	@CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/cc2538-bsl

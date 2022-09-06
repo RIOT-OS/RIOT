@@ -10,5 +10,4 @@ config PACKAGE_UBASIC
     depends on TEST_KCONFIG
     depends on !HAS_ARCH_AVR8
     depends on !HAS_ARCH_MSP430
-    depends on !HAS_ARCH_MIPS32R2
     depends on !HAS_ARCH_RISCV

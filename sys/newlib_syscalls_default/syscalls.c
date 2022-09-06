@@ -144,8 +144,6 @@ static const struct heap heaps[NUM_HEAPS] = {
 #endif
 };
 
-/* MIPS newlib crt implements _init,_fini and _exit and manages the heap */
-#ifndef __mips__
 /**
  * @brief Initialize NewLib, called by __libc_init_array() from the startup script
  */
@@ -230,8 +228,6 @@ __attribute__((weak)) void heap_stats(void)
            heap_size, minfo.uordblks, heap_size - minfo.uordblks);
 }
 #endif /* HAVE_HEAP_STATS */
-
-#endif /*__mips__*/
 
 /**
  * @brief Get the process-ID of the current thread

@@ -39,10 +39,6 @@ jobs:
       uses: aabadie/riot-action@v1
       with:
         cmd: make -C dist/tools/edbg
-    - name: Build pic32prog standalone
-      uses: aabadie/riot-action@v1
-      with:
-        cmd: make -C dist/tools/pic32prog
     - name: Build setsid standalone
       uses: aabadie/riot-action@v1
       with:

@@ -132,12 +132,6 @@ For example, in Ubuntu the above tools can be installed with the following comma
       board support
 * Optional: GDB multiarch for debugging
 
-### Architecture: MIPS
-
-* GCC, binutils, and newlib for MIPS
-    * Alternatively: Install docker and export `BUILD_IN_DOCKER=1`
-* Check board documentation for flashing and debugging
-
 ### Architecture: native
 
 * On 64 bit systems: multilib versions for your host compilers, standard C library, and development

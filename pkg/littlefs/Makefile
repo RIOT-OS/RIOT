@@ -7,9 +7,6 @@ PKG_LICENSE=Apache-2.0
 include $(RIOTBASE)/pkg/pkg.mk
 
 CFLAGS += -Wno-format
-# GCC 4.9 bug (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=64480)
-# used by MIPS
-CFLAGS += -Wno-missing-field-initializers
 
 # Disable debug printing
 ifneq ($(DEVELHELP),1)

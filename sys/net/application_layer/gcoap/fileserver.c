@@ -103,7 +103,7 @@ static void stat_etag(struct stat *stat, uint32_t *etag)
 {
     /* Normalizing fields whose value can change without affecting the ETag */
     stat->st_nlink = 0;
-#if defined(CPU_ESP32) || defined(CPU_ESP8266) || defined(CPU_MIPS_PIC32MX) || defined(CPU_MIPS_PIC32MZ)
+#if defined(CPU_ESP32) || defined(CPU_ESP8266)
     memset(&stat->st_atime, 0, sizeof(stat->st_atime));
 #else
     memset(&stat->st_atim, 0, sizeof(stat->st_atim));

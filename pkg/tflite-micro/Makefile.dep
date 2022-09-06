@@ -14,5 +14,5 @@ USEMODULE += tflite-micro-kernels
 USEMODULE += tflite-micro-memory-planner
 USEMODULE += tflite-schema
 
-# This package doesn't work on riscv and mips
-FEATURES_BLACKLIST += arch_mips32r2 arch_riscv
+# This package doesn't work on riscv
+FEATURES_BLACKLIST += arch_riscv
