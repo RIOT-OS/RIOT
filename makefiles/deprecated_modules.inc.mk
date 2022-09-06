@@ -3,4 +3,5 @@
 DEPRECATED_MODULES += event_thread_lowest
 DEPRECATED_MODULES += gnrc_netdev_default
 DEPRECATED_MODULES += sema_deprecated
+DEPRECATED_MODULES += xtimer
 DEPRECATED_MODULES += ztimer_now64
