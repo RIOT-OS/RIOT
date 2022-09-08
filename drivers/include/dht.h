@@ -31,6 +31,7 @@
 #ifndef DHT_H
 #define DHT_H
 
+#include <errno.h>
 #include <stdint.h>
 
 #include "periph/gpio.h"
@@ -40,12 +41,14 @@ extern "C" {
 #endif
 
 /**
- * @brief   Possible return codes
+ * @brief       Possible return codes
+ *
+ * @deprecated  The functions use errno codes instead now
  */
 enum {
-    DHT_OK      =  0,       /**< all good */
-    DHT_NOCSUM  = -1,       /**< checksum error */
-    DHT_TIMEOUT = -2,       /**< communication timed out */
+    DHT_OK      =  0,           /**< all good */
+    DHT_NOCSUM  = -EIO,         /**< checksum error */
+    DHT_TIMEOUT = -ETIMEDOUT,   /**< communication timed out */
 };
 
 /**
@@ -80,8 +83,7 @@ typedef struct {
  * @param[out] dev      device descriptor of a DHT device
  * @param[in]  params   configuration parameters
  *
- * @return              0 on success
- * @return              -1 on error
+ * @retval  0           Success
  */
 int dht_init(dht_t *dev, const dht_params_t *params);
 
@@ -95,9 +97,17 @@ int dht_init(dht_t *dev, const dht_params_t *params);
  * @param[out] temp     temperature value [in °C * 10^-1]
  * @param[out] hum      relative humidity value [in percent * 10^-1]
  *
- * @retval DHT_OK       Success
- * @retval DHT_NOCSUM   Checksum error
- * @retval DHT_TIMEOUT  Reading data timed out (check wires!)
+ * @retval 0            Success
+ * @retval -ENOTSUP     The GPIO pin the DHT is connected to cannot be set up as
+ *                      interrupt source (@ref gpio_init_int failed). Try a
+ *                      different GPIO pin.
+ * @retval -ENXIO       Not a single bit of data received. Likely no DHT
+ *                      connected
+ * @retval -ETIMEDOUT   Reading canceled due to a timeout. Likely an IRQ was
+ *                      lost and therefore a bit not received.
+ * @retval -EIO         The received and the expected checksum didn't match.
+ *                      Likely an IRQ was acted upon to late and a zero bit
+ *                      was interpreted as a one bit incorrectly.
  */
 int dht_read(dht_t *dev, int16_t *temp, int16_t *hum);
 
