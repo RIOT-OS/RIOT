@@ -42,12 +42,7 @@ int main(void)
     do {
         retval = hsc_init(&dev, &hsc_params[0]);
         if (retval < 0) {
-            if (IS_USED(MODULE_NEWLIB) || IS_USED(MODULE_PICOLIBC)) {
-                printf("Initialization error with code: %s\n", strerror(-retval));
-            }
-            else {
-                puts("Initialization failed");
-            }
+            printf("Initialization error with code: %s\n", strerror(-retval));
         }
         xtimer_usleep(SLEEP_USEC);
     } while (retval);
