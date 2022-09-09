@@ -296,3 +296,4 @@ config MODULE_SHELL_CMD_VFS
     default y if MODULE_SHELL_CMDS_DEFAULT
     depends on MODULE_SHELL_CMDS
     depends on MODULE_VFS
+    select MODULE_TINY_STRERROR

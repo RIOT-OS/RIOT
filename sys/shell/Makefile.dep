@@ -281,6 +281,7 @@ ifneq (,$(filter shell_cmd_suit,$(USEMODULE)))
 endif
 ifneq (,$(filter shell_cmd_vfs,$(USEMODULE)))
   USEMODULE += vfs
+  USEMODULE += tiny_strerror
 endif
 
 ifneq (,$(filter shell_democommands,$(USEMODULE)))
