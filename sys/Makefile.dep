@@ -897,6 +897,10 @@ ifneq (,$(filter suit_%,$(USEMODULE)))
   USEMODULE += suit
 endif
 
+ifneq (,$(filter tiny_strerror_as_strerror,$(USEMODULE)))
+  USEMODULE += tiny_strerror
+endif
+
 # include ztimer dependencies
 ifneq (,$(filter ztimer ztimer_% %ztimer,$(USEMODULE)))
   include $(RIOTBASE)/sys/ztimer/Makefile.dep
