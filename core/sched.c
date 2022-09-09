@@ -23,12 +23,13 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-#include "sched.h"
-#include "clist.h"
+#include "assert.h"
 #include "bitarithm.h"
+#include "clist.h"
 #include "irq.h"
-#include "thread.h"
 #include "log.h"
+#include "sched.h"
+#include "thread.h"
 
 #ifdef MODULE_MPU_STACK_GUARD
 #include "mpu.h"
@@ -57,6 +58,8 @@
 volatile kernel_pid_t sched_active_pid = KERNEL_PID_UNDEF;
 volatile thread_t *sched_threads[KERNEL_PID_LAST + 1];
 volatile int sched_num_threads = 0;
+
+static_assert(SCHED_PRIO_LEVELS <= 32, "SCHED_PRIO_LEVELS may at most be 32");
 
 FORCE_USED_SECTION
 const uint8_t max_threads = ARRAY_SIZE(sched_threads);
@@ -92,7 +95,7 @@ static inline void _set_runqueue_bit(uint8_t priority)
 #if defined(BITARITHM_HAS_CLZ)
     runqueue_bitcache |= BIT31 >> priority;
 #else
-    runqueue_bitcache |= 1 << priority;
+    runqueue_bitcache |= 1UL << priority;
 #endif
 }
 
@@ -101,7 +104,7 @@ static inline void _clear_runqueue_bit(uint8_t priority)
 #if defined(BITARITHM_HAS_CLZ)
     runqueue_bitcache &= ~(BIT31 >> priority);
 #else
-    runqueue_bitcache &= ~(1 << priority);
+    runqueue_bitcache &= ~(1UL << priority);
 #endif
 }
 
