@@ -6,9 +6,5 @@ PKG_LICENSE=ARM Object Code and Header Files License
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-ifneq ($(BOARD),nrf52840dk)
-  $(error This package can only be used with the nRF52840dk)
-endif
-
 all:
 	:

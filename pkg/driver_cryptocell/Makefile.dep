@@ -1,1 +1,3 @@
 USEMODULE += driver_cryptocell_contrib
+
+FEATURES_REQUIRED += periph_cryptocell
