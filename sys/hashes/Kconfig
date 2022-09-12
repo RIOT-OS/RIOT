@@ -9,3 +9,5 @@ config MODULE_HASHES
     bool "Hash algorithms"
     depends on TEST_KCONFIG
     select MODULE_CRYPTO
+
+rsource "psa_riot_hashes/Kconfig"
