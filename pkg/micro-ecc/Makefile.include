@@ -9,3 +9,8 @@ ifneq (,$(filter cortex-m0%,$(CPU_CORE)))
   # package
   TOOLCHAINS_BLACKLIST += llvm
 endif
+
+ifneq (,$(filter psa_uecc_%, $(USEMODULE)))
+  DIRS += $(RIOTPKG)/micro-ecc/psa_uecc
+  INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
+endif

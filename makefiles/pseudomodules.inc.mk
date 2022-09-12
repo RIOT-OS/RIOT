@@ -191,6 +191,7 @@ PSEUDOMODULES += posix_headers
 PSEUDOMODULES += printf_float
 PSEUDOMODULES += prng
 PSEUDOMODULES += prng_%
+PSEUDOMODULES += psa_uecc_%
 PSEUDOMODULES += fortuna_reseed
 PSEUDOMODULES += random_cmd
 PSEUDOMODULES += riotboot_%
