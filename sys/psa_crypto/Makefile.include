@@ -1,0 +1,2 @@
+# include the PSA headers
+INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include

@@ -1,0 +1,14 @@
+/**
+ * @defgroup    sys_psa_crypto    PSA Cryptographic API
+ * @ingroup     sys
+ * @brief       Implements the PSA Crypto API specification.
+ * @section     Configuration
+ *
+ * The current PSA Crypto API implementation can only be built with Kconfig.
+ * The specific algorithms and implementations to be used can be configured by
+ * adding an app.config file to the application or configuring them in
+ * menuconfig.
+ * If a driver for cryptographic hardware acceleration is available for the
+ * platform, it will be used as the default backend.
+ *
+ */

@@ -1,0 +1,86 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig PSA_ASYMMETRIC
+    bool "PSA Asymmetric Crypto"
+    select PSA_KEY_CONFIG
+    select MODULE_PSA_KEY_SLOT_MGMT
+
+if PSA_ASYMMETRIC
+
+menuconfig PSA_ECC_P192_R1
+    bool "NIST P192"
+    select PSA_KEY_SIZE_192
+    select PSA_ECC
+
+if PSA_ECC_P192_R1
+
+choice PSA_ECC_P192_R1_IMPLEMENTATION
+    bool "NIST P192 Implementation"
+    default HARDWARE_ECC_P192 if HAS_PERIPH_ECC_P192
+    default MICRO_ECC_CURVE_P192
+
+config HARDWARE_ECC_P192
+    bool "Hardware Accelerated"
+    depends on HAS_PERIPH_ECC_P192
+    select PSA_ECC_P192_R1_DRIVER
+    select PERIPH_ECC_P192
+
+config MICRO_ECC_CURVE_P192
+    bool "Micro-ECC Package"
+    select PACKAGE_MICRO-ECC
+    select PSA_ECC_P192_R1_DRIVER
+    select MODULE_PSA_UECC_P192
+
+endchoice
+
+endif # PSA_ECC_P192_R1
+
+menuconfig PSA_ECC_P256
+    bool "NIST P256"
+    select PSA_KEY_SIZE_256
+    select PSA_ECC
+
+if PSA_ECC_P256
+
+choice PSA_ECC_P256_IMPLEMENTATION
+    bool "NIST P256 Implementation"
+    default HARDWARE_ECC_P256 if HAS_PERIPH_ECC_P256
+    default MICRO_ECC_CURVE_P256
+
+config HARDWARE_ECC_P256
+    bool "Hardware Accelerated"
+    depends on HAS_PERIPH_ECC_P256
+    select PSA_ECC_P256_R1_DRIVER
+    select PERIPH_ECC_P256
+
+config MICRO_ECC_CURVE_P256
+    bool "Micro-ECC Package"
+    select PACKAGE_MICRO-ECC
+    select PSA_ECC_P256_R1_DRIVER
+    select MODULE_PSA_UECC_P256
+
+endchoice
+
+endif # PSA_ECC_P256
+
+config PSA_ECC
+    bool
+    help
+        Indicates that an elliptic curve operation is being used
+
+config PSA_ECC_P256_R1_DRIVER
+    bool
+    help
+        Indicates that an ECC Curve implementation other than a secure element is present
+
+config PSA_ECC_P192_R1_DRIVER
+    bool
+    help
+        Indicates that an ECC Curve implementation other than a secure element is present
+
+endif # PSA_ASYMMETRIC

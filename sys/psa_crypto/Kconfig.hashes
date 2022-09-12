@@ -1,0 +1,116 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig PSA_HASHES
+    bool "PSA Hashes"
+    select PSA_KEY_CONFIG
+
+if PSA_HASHES
+
+menuconfig HASHES_MD5
+    bool "MD5"
+
+if HASHES_MD5
+
+choice HASHES_MD5_IMPLEMENTATION
+    bool "MD5 implementation"
+    default RIOT_HASHES_MD5
+
+config RIOT_HASHES_MD5
+    bool "RIOT Hash Module"
+    select MODULE_PSA_RIOT_HASHES_MD5
+
+endchoice
+
+endif # HASHES_MD5
+
+menuconfig HASHES_SHA1
+    bool "SHA-1"
+
+if HASHES_SHA1
+
+choice HASHES_SHA1_IMPLEMENTATION
+    bool "SHA-1 implementation"
+    default HARDWARE_HASHES_SHA1 if HAS_PERIPH_HASH_SHA1
+    default RIOT_HASHES_SHA1
+
+config HARDWARE_HASHES_SHA1
+    bool "Hardware accelerated"
+    depends on HAS_PERIPH_HASH_SHA1
+    select PERIPH_HASH_SHA1
+
+config RIOT_HASHES_SHA1
+    bool "RIOT Hash Module"
+    select MODULE_PSA_RIOT_HASHES_SHA1
+
+endchoice
+
+endif # HASHES_SHA1
+
+menuconfig HASHES_SHA224
+    bool "SHA-224"
+
+if HASHES_SHA224
+
+choice HASHES_224_IMPLEMENTATION
+    bool "SHA-224 implementation"
+    default HARDWARE_HASHES_SHA224 if HAS_PERIPH_HASH_SHA224
+    default RIOT_HASHES_SHA224
+
+config HARDWARE_HASHES_SHA224
+    bool "Hardware accelerated"
+    depends on HAS_PERIPH_HASH_SHA224
+    select PERIPH_HASH_SHA224
+
+config RIOT_HASHES_SHA224
+    bool "RIOT Hash Module"
+    select MODULE_PSA_RIOT_HASHES_SHA224
+
+endchoice
+
+endif # HASHES_SHA224
+
+menuconfig HASHES_SHA256
+    bool "SHA-256"
+
+if HASHES_SHA256
+
+choice HASHES_256_IMPLEMENTATION
+    bool "SHA-256 implementation"
+    default HARDWARE_HASHES_SHA256 if HAS_PERIPH_HASH_SHA256
+    default RIOT_HASHES_SHA256
+
+config HARDWARE_HASHES_SHA256
+    bool "Hardware accelerated"
+    depends on HAS_PERIPH_HASH_SHA256
+    select PERIPH_HASH_SHA256
+
+config RIOT_HASHES_SHA256
+    bool "RIOT Hash Module"
+    select MODULE_PSA_RIOT_HASHES_SHA256
+
+endchoice
+endif # HASHES_SHA256
+
+menuconfig HASHES_SHA512
+    bool "SHA-512"
+
+if HASHES_SHA512
+
+choice HASHES_512_IMPLEMENTATION
+    bool "SHA-512 implementation"
+    default HARDWARE_HASHES_SHA512 if HAS_PERIPH_HASH_SHA512
+
+config HARDWARE_HASHES_SHA512
+    bool "Hardware accelerated"
+    depends on HAS_PERIPH_HASH_SHA512
+    select PERIPH_HASH_SHA512
+
+endchoice
+endif # HASHES_SHA512
+
+endif # PSA_HASHES

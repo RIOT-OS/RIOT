@@ -1,0 +1,47 @@
+# Copyright (c) 2022 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig PSA_SECURE_ELEMENT
+    bool "PSA Secure Element Configuration"
+    select MODULE_PSA_KEY_SLOT_MGMT
+    select MODULE_PSA_SE_MGMT
+
+if PSA_SECURE_ELEMENT
+
+config MODULE_PSA_SE_MGMT
+    bool
+
+menuconfig PSA_SE_ATECCX08A
+    bool "Microchip Cryptoauthlib Driver"
+    select PACKAGE_CRYPTOAUTHLIB
+    help
+        When using Cryptoauthlib as a backend for elliptic curve operations,
+        please also choose the ECC symbol.
+
+if PSA_SE_ATECCX08A
+
+config PSA_SE_ATECCX08A_ECC
+    bool "Cryptoauthlib Elliptic Curve P256"
+    select PSA_KEY_SIZE_256
+    select PSA_SECURE_ELEMENT_ASYMMETRIC
+
+endif # PSA_SE_ATECCX08A
+
+config PSA_MULTIPLE_SECURE_ELEMENTS
+    bool "Use multiple secure elements"
+
+config PSA_MAX_SE_COUNT
+    int "Sets maximum number of usable SEs"
+    default 2 if PSA_MULTIPLE_SECURE_ELEMENTS
+    default 1
+
+config PSA_SECURE_ELEMENT_ASYMMETRIC
+    bool
+    help
+        Indicate that an asymmetric operation is used
+
+endif # PSA_SECURE_ELEMENT
