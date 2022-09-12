@@ -50,8 +50,10 @@ psa_status_t psa_ecc_p192r1_sign_hash(  const psa_key_attributes_t *attributes,
     (void)signature_size;
     (void)key_buffer_size;
 
-    return periph_common_ecc_sign_hash(key_buffer, PSA_BITS_TO_BYTES(
-                                           attributes->bits), hash, hash_length, signature, signature_length, hash_mode,
+    return periph_common_ecc_sign_hash(key_buffer,
+                                       PSA_BITS_TO_BYTES(attributes->bits),
+                                       hash, hash_length, signature,
+                                       signature_length, hash_mode,
                                        CRYS_ECPKI_DomainID_secp192r1);
 }
 
@@ -67,7 +69,8 @@ psa_status_t psa_ecc_p192r1_verify_hash(const psa_key_attributes_t *attributes,
     CRYS_ECPKI_HASH_OpMode_t hash_mode = MAP_PSA_HASH_TO_CRYS_HASH(PSA_ALG_GET_HASH(alg));
 
     (void)attributes;
-    return periph_common_ecc_verify_hash(key_buffer, key_buffer_size, hash, hash_length, signature,
+    return periph_common_ecc_verify_hash(key_buffer, key_buffer_size,
+                                         hash, hash_length, signature,
                                          signature_length, hash_mode,
                                          CRYS_ECPKI_DomainID_secp192r1);
 }

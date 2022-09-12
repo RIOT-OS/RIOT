@@ -119,7 +119,10 @@ psa_status_t periph_common_ecc_verify_hash(const uint8_t *pub_key,
 
     pDomain = (CRYS_ECPKI_Domain_t *)CRYS_ECPKI_GetEcDomain(domain);
 
-    /* For more security, use CRYS_ECPKI_BuildPublKeyPartlyCheck or CRYS_ECPKI_BuildPublKeyFullCheck -> Those take longer and use more memory space */
+    /**
+     * For more security, use CRYS_ECPKI_BuildPublKeyPartlyCheck or
+     * CRYS_ECPKI_BuildPublKeyFullCheck -> Those take longer and use more memory space
+     * */
     ret = CRYS_ECPKI_BuildPublKey(pDomain, (uint8_t *)pub_key, pub_key_size, &user_pub_key);
     if (ret != CRYS_OK) {
         DEBUG("CRYS_ECPKI_BuildPublKey failed with 0x%x \n", ret);
