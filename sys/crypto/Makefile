@@ -4,4 +4,9 @@ endif
 
 CFLAGS += -DRIOT_CHACHA_PRNG_DEFAULT="$(RIOT_CHACHA_PRNG_DEFAULT)"
 
+
+ifneq (,$(filter psa_riot_cipher_%,$(USEMODULE)))
+  DIRS += psa_riot_cipher
+endif
+
 include $(RIOTBASE)/Makefile.base
