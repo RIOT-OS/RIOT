@@ -22,7 +22,14 @@
 
 #include "board.h"
 #include "periph/i2c.h"
+#include "atca.h"
 #include "cryptoauthlib.h"
+
+#include "kernel_defines.h"
+
+#if IS_ACTIVE(CONFIG_PSA_SE_ATECCX08A)
+#include "psa/crypto_values.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,9 +51,16 @@ extern "C" {
  * @{
  */
 
-#ifndef ATCA_PARAM_I2C
-#define ATCA_PARAM_I2C           I2C_DEV(0)
+#ifndef ATCA_PARAM_I2C_DEV0
+#define ATCA_PARAM_I2C_DEV0      I2C_DEV(0)
 #endif
+
+#if IS_ACTIVE(CONFIG_PSA_MULTIPLE_SECURE_ELEMENTS)
+#ifndef ATCA_PARAM_I2C_DEV1
+#define ATCA_PARAM_I2C_DEV1      I2C_DEV(1)
+#endif
+#endif
+
 #ifndef ATCA_PARAM_ADDR
 #define ATCA_PARAM_ADDR          (ATCA_I2C_ADDR)
 #endif
@@ -57,24 +71,62 @@ extern "C" {
 #define ATCA_DEVTYPE            (ATECC608A)
 #endif
 
-#ifndef ATCA_PARAMS
-#define ATCA_PARAMS                {    .iface_type = ATCA_I2C_IFACE, \
-                                        .devtype = ATCA_DEVTYPE, \
-                                        .atcai2c.address = ATCA_PARAM_ADDR, \
-                                        .atcai2c.bus = ATCA_PARAM_I2C, \
-                                        .atcai2c.baud = -1, /**< Not used in RIOT */ \
-                                        .wake_delay = 1500, \
-                                        .rx_retries = ATCA_RX_RETRIES }
+#if IS_ACTIVE(CONFIG_PSA_SE_ATECCX08A)
+#define PSA_ATCA_LOCATION_DEV0  (PSA_KEY_LOCATION_SE_MIN + 1)
+#define PSA_ATCA_LOCATION_DEV1  (PSA_KEY_LOCATION_SE_MIN + 2)
+#endif
+
+#ifndef ATCA_PARAMS_DEV0
+#define ATCA_PARAMS_DEV0                {   .iface_type = ATCA_I2C_IFACE, \
+                                            .devtype = ATCA_DEVTYPE, \
+                                            .atcai2c.address = ATCA_PARAM_ADDR, \
+                                            .atcai2c.bus = ATCA_PARAM_I2C_DEV0, \
+                                            .atcai2c.baud = -1, /**< Not used in RIOT */ \
+                                            .wake_delay = 1500, \
+                                            .rx_retries = ATCA_RX_RETRIES }
+#endif
+
+#if IS_ACTIVE(CONFIG_PSA_MULTIPLE_SECURE_ELEMENTS)
+#ifndef ATCA_PARAMS_DEV1
+#define ATCA_PARAMS_DEV1                {   .iface_type = ATCA_I2C_IFACE, \
+                                            .devtype = ATCA_DEVTYPE, \
+                                            .atcai2c.address = ATCA_PARAM_ADDR, \
+                                            .atcai2c.bus = ATCA_PARAM_I2C_DEV1, \
+                                            .atcai2c.baud = -1, /**< Not used in RIOT */ \
+                                            .wake_delay = 1500, \
+                                            .rx_retries = ATCA_RX_RETRIES }
+#endif
 #endif
 
 /**@}*/
 
 /**
+ * @brief   Structure to store ATCA device configuration
+ */
+typedef struct {
+#if IS_ACTIVE(CONFIG_PSA_SE_ATECCX08A)
+    psa_key_location_t atca_loc;
+#endif
+    ATCAIfaceCfg cfg;
+} atca_params_t;
+
+/**
  * @brief   Allocation of ATCA device descriptors
  */
-static const ATCAIfaceCfg atca_params[] =
+static const atca_params_t atca_params[] =
 {
-    ATCA_PARAMS
+#if IS_ACTIVE(CONFIG_PSA_MULTIPLE_SECURE_ELEMENTS)
+    {
+        .atca_loc = PSA_ATCA_LOCATION_DEV1,
+        .cfg = ATCA_PARAMS_DEV1
+    },
+#endif
+    {
+#if IS_ACTIVE(CONFIG_PSA_SE_ATECCX08A)
+        .atca_loc = PSA_ATCA_LOCATION_DEV0,
+#endif
+        .cfg = ATCA_PARAMS_DEV0
+    }
 };
 
 #ifdef __cplusplus

@@ -23,7 +23,6 @@
  * USEPKG += cryptoauthlib
  * to your Makefile.
  *
- *
  * ### Shell
  *
  * To facilitate the device configuration the RIOT shell provides some
@@ -33,7 +32,6 @@
  * The shell handler is enabled, if cryptoauthlib is included as a package in the
  * Makefile of an application that also includes the shell (e.g. examples/default).
  *
- *
  * ### No poll mode
  *
  * After sending a command to the device, responses are usually polled to enable
@@ -41,25 +39,11 @@
  * Alternatively ATCA_NO_POLL can be enabled through CFLAGS to simply
  * wait for the max execution time of a command before reading the response.
  *
- *
  * ## Implementation status
  *
  * This implementation was partly tested with ATECC508A and ATECC608A devices.
- * We haven't tested the functions that require locking the device, yet. There's
- * a wrapper in the cryptoauthlib/contrib folder, which implements most of the
- * HAL functions.
- * Currently the functions hal_i2c_discover_devices and hal_i2c_discover_buses
+ * Currently the functions hal_i2c_release, hal_i2c_discover_devices and hal_i2c_discover_buses
  * are unimplemented, as well as hal_i2c_post_init.
- *
- * ### Wake function
- *
- * The wake function only works when a 0x00 byte is sent on an i2c interface that
- * runs with with 133kHz or less.
- * Currently RIOT sets the baudrate to the default value of 100 kHz and there's
- * no interface to change that. If the default speed ever changes to a value
- * higher than 133 kHz the wake function needs to be adapted.
- * For more information on how to send a proper wake condition we refer to the
- * data sheet of the device.
  *
  * ## Tests
  *
@@ -72,4 +56,22 @@
  * permanently. Unlocking is not possible!
  * Also there is a test for comparing the runtime of the RIOT software implementation
  * and the CryptoAuth hardware implementation for calculating a SHA-256 hash value.
+ *
+ * ## Using Cryptoauthlib as a backend for PSA Crypto
+ *
+ * To use symmetric cryptography, just specify the Cryptoauth package in `menuconfig` or add
+ * CONFIG_PSA_SECURE_ELEMENT=y
+ * CONFIG_PSA_SE_ATECCX08A=y
+ * to the `app.config.test` file of the application.
+ *
+ * When using the Elliptic Curve operations, please also add
+ * CONFIG_PSA_SE_ATECCX08A_ECC=y
+ * to `app.config.test` or choose the symbol in `menuconfig`. This is required for the correct
+ * configuration of the PSA key management.
+ *
+ * ## Troubleshooting
+ *
+ * ### Device Initialization fails
+ *
+ * Make sure the I2C bus speed is set to `I2C_SPEED_NORMAL`.
  */
