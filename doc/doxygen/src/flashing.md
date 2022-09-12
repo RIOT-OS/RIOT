@@ -24,49 +24,114 @@ make BOARD=<BOARD-TO-FLASH> PROGRAMMER=stm32flash flash
 To flash without rebuilding use `flash-only` as target instead of `flash`.
 
 
+Supported Tools                                     {#flashing-supported-tools}
+===============
 
-
-Compatibility Matrix                                  {#flashing-compatibility}
-====================
+RIOT supports plenty of flashing tools, that are below grouped into general
+flashing tools that support multiple MCU families, and specialized tools that
+only support one platform.
 
 Note that some programmers require additional configuration on a per board
-level or rely on features only available on some boards. Hence, a board `FOO` of
-MCU family `BAR` may not be supported by programmer `BAZ`, even though `BAZ` is
-listed as supported for MCU family `BAR`.
+level or rely on features only available on some boards. Hence, a given board
+may not be supported by a programmer listed as supported for the platform of
+the board due to a missing board feature, bootloader, or similar.
 
-This table will use the value to pass to `PROGRAMMER=<value>` as title, rather
-than the official spelling of the programmer.
+To ease use the programmers are given by the value to pass via
+`PROGRAMMER=<value>`, rather than the official spelling of the programmer.
 
-MCU Family     | `adafruit-nrfutil` | `avrdude` | `bmp` | `bossa` | `cc2538-bsl`| `cpy2remed` | `dfu-util` | `edbg` | `elf2uf2` | `esptool` | `goodfet` | `jlink` | `lpc2k_pgm` | `mspdebug` | `nrfutil` | `openocd` | `pic32prog` | `pyocd` | `robotis-loader` | `stm32flash` | `stm32loader` | `uf2conv` | `uniflash`
----------------|--------------------|-----------|-------|---------|-------------|-------------|------------|--------|-----------|-----------|-----------|---------|-------------|------------|-----------|-----------|-------------|---------|------------------|--------------|---------------|-----------|-----------
-ATmega         | ✗                  | ✓         | ✗     | ✗       | ✗           | ✗           | ✗          | ✗      | ✗         | ✗         | ✗         | ✗       | ✗           | ✗          | ✗         | ✗         | ✗           | ✗       | ✗                | ✗            | ✗             | ✗         | ✗
-ATXmega        | ✗                  | ✓         | ✗     | ✗       | ✗           | ✗           | ✗          | ✗      | ✗         | ✗         | ✗         | ✗       | ✗           | ✗          | ✗         | ✗         | ✗           | ✗       | ✗                | ✗            | ✗             | ✗         | ✗
-CC2538         | ✗                  | ✗         | ✗     | ✗       | ✓           | ✗           | ✗          | ✗      | ✗         | ✗         | ✗         | ✓       | ✗           | ✗          | ✗         | ✗         | ✗           | ✗       | ✗                | ✗            | ✗             | ✗         | ✗
-CC13xx / C26xx | ✗                  | ✗         | ✗     | ✗       | ✗           | ✗           | ✗          | ✗      | ✗         | ✗         | ✗         | ✓       | ✗           | ✗          | ✗         | ✓ (3)     | ✗           | ✗       | ✗                | ✗            | ✗             | ✗         | ✓
-EFM32          | ✗                  | ✗         | ✗     | ✗       | ✗           | ✗           | ✗          | ✗      | ✗         | ✗         | ✗         | ✓       | ✗           | ✗          | ✗         | ✓         | ✗           | ✗       | ✗                | ✗            | ✗             | ✗         | ✗
-ESP8266        | ✗                  | ✗         | ✗     | ✗       | ✗           | ✗           | ✗          | ✗      | ✗         | ✓         | ✗         | ✗       | ✗           | ✗          | ✗         | ✗         | ✗           | ✗       | ✗                | ✗            | ✗             | ✗         | ✗
-ESP32 (Xtensa) | ✗                  | ✗         | ✗     | ✗       | ✗           | ✗           | ✗          | ✗      | ✗         | ✓         | ✗         | ✗       | ✗           | ✗          | ✗         | ✗         | ✗           | ✗       | ✗                | ✗            | ✗             | ✗         | ✗
-ESP32 (RISC-V) | ✗                  | ✗         | ✗     | ✗       | ✗           | ✗           | ✗          | ✗      | ✗         | ✓         | ✗         | ✗       | ✗           | ✗          | ✗         | ✗         | ✗           | ✗       | ✗                | ✗            | ✗             | ✗         | ✗
-FE310          | ✗                  | ✗         | ✗     | ✗       | ✗           | ✗           | ✗          | ✗      | ✗         | ✗         | ✗         | ✓       | ✗           | ✗          | ✗         | ✓         | ✗           | ✗       | ✗                | ✗            | ✗             | ✗         | ✗
-GD32V          | ✗                  | ✗         | ✗     | ✗       | ✗           | ✗           | ✗          | ✗      | ✗         | ✗         | ✗         | ✗       | ✗           | ✗          | ✗         | ✓ (3)     | ✗           | ✗       | ✗                | ✗            | ✗             | ✗         | ✗
-Kinetis        | ✗                  | ✗         | ✗     | ✗       | ✗           | ✗           | ✗          | ✗      | ✗         | ✗         | ✗         | ✓       | ✗           | ✗          | ✗         | ✓         | ✗           | ✗       | ✗                | ✗            | ✗             | ✗         | ✗
-LPC1768        | ✗                  | ✗         | ✗     | ✗       | ✗           | ✗           | ✗          | ✗      | ✗         | ✗         | ✗         | ✓       | ✗           | ✗          | ✗         | ✓         | ✗           | ✗       | ✗                | ✗            | ✗             | ✗         | ✗
-LPC23xx        | ✗                  | ✗         | ✗     | ✗       | ✗           | ✗           | ✗          | ✗      | ✗         | ✗         | ✗         | ✗       | ✓           | ✗          | ✗         | ✗         | ✗           | ✗       | ✗                | ✗            | ✗             | ✗         | ✗
-MIPS32r2       | ✗                  | ✗         | ✗     | ✗       | ✗           | ✗           | ✗          | ✗      | ✗         | ✗         | ✗         | ✓       | ✗           | ✗          | ✗         | ✗         | ✓           | ✗       | ✗                | ✗            | ✗             | ✗         | ✗
-MSP430         | ✗                  | ✗         | ✗     | ✗       | ✗           | ✗           | ✗          | ✗      | ✗         | ✗         | ✓         | ✗       | ✗           | ✓          | ✗         | ✗         | ✗           | ✗       | ✗                | ✗            | ✗             | ✗         | ✗
-nRF51          | ✗                  | ✗         | ✗     | ✗       | ✗           | ✗           | ✗          | ✗      | ✗         | ✗         | ✗         | ✓       | ✗           | ✗          | ✗         | ✓         | ✗           | ✓       | ✗                | ✗            | ✗             | ✗         | ✗
-nRF52          | ✓ (1)              | ✗         | ✓     | ✗       | ✗           | ✗           | ✗          | ✗      | ✗         | ✗         | ✗         | ✓       | ✗           | ✗          | ✓ (1)     | ✓         | ✗           | ✓       | ✗                | ✗            | ✗             | ✓         | ✗
-RP2040         | ✗                  | ✗         | ✗     | ✗       | ✗           | ✗           | ✗          | ✗      | ✓         | ✗         | ✗         | ✓       | ✗           | ✗          | ✗         | ✓         | ✗           | ✗       | ✗                | ✗            | ✗             | ✗         | ✗
-SAM            | ✗                  | ✗         | ✗     | ✓ (1)   | ✗           | ✗           | ✗          | ✓      | ✗         | ✗         | ✗         | ✓       | ✗           | ✗          | ✗         | ✓         | ✗           | ✗       | ✗                | ✗            | ✗             | ✗         | ✗
-Stellaris      | ✗                  | ✗         | ✗     | ✗       | ✗           | ✗           | ✗          | ✗      | ✗         | ✗         | ✗         | ✓       | ✗           | ✗          | ✗         | ✓         | ✗           | ✗       | ✗                | ✗            | ✗             | ✗         | ✗
-STM32          | ✗                  | ✗         | ✓     | ✗       | ✗           | ✓           | ✓          | ✗      | ✗         | ✗         | ✗         | ✓       | ✗           | ✗          | ✗         | ✓         | ✗           | ✗       | ✓ (1)            | ✓            | ✓             | ✗         | ✗
+Compatibility Matrix of Generic Tools       {#flashing-supported-tools-generic}
+--------------------
 
+<!-- Note: Add flashers that theoretically support multiple platforms here,
+     even if RIOT does only have integration for one platform. The missing
+     integration may be added later on. -->
+
+
+MCU Family     |  `bmp` | `dfu-util` | `jlink` | `openocd` | `pyocd` | `uf2conv`
+---------------|--------|------------|---------|-----------|---------|----------
+ATmega         |  ✗     | ✗          | ✗       | ✗         | ✗       | ✗
+ATXmega        |  ✗     | ✗          | ✗       | ✗         | ✗       | ✗
+CC13xx / C26xx |  ✗     | ✗          | ✓       | ✓ (1)     | ✗       | ✗
+CC2538         |  ✗     | ✗          | ✓       | ✗         | ✗       | ✗
+EFM32          |  ✗     | ✗          | ✓       | ✓         | ✗       | ✗
+ESP8266        |  ✗     | ✗          | ✗       | ✗         | ✗       | ✗
+ESP32 (Xtensa) |  ✗     | ✗          | ✗       | ✗         | ✗       | ✗
+ESP32 (RISC-V) |  ✗     | ✗          | ✗       | ✗         | ✗       | ✗
+FE310          |  ✗     | ✗          | ✓       | ✓         | ✗       | ✗
+GD32V          |  ✗     | ✗          | ✗       | ✓ (1)     | ✗       | ✗
+Kinetis        |  ✗     | ✗          | ✓       | ✓         | ✗       | ✗
+LPC1768        |  ✗     | ✗          | ✓       | ✓         | ✗       | ✗
+LPC23xx        |  ✗     | ✗          | ✗       | ✗         | ✗       | ✗
+MIPS32r2       |  ✗     | ✗          | ✓       | ✗         | ✗       | ✗
+MSP430         |  ✗     | ✗          | ✗       | ✗         | ✗       | ✗
+nRF51          |  ✗     | ✗          | ✓       | ✓         | ✓       | ✗
+nRF52          |  ✓     | ✗          | ✓       | ✓         | ✓       | ✓
+RP2040         |  ✗     | ✗          | ✓       | ✓         | ✗       | ✗
+SAM            |  ✗     | ✗          | ✓       | ✓         | ✗       | ✗
+Stellaris      |  ✗     | ✗          | ✓       | ✓         | ✗       | ✗
+STM32          |  ✓     | ✓          | ✓       | ✓         | ✗       | ✗
 
 Remarks:
 
-1. Requires a bootloader to be flashed (rather than a bootloader in ROM)
-2. Requires specific hardware, e.g. an embedded programmer
-3. Requires a patched version of the programmer tool
+1. Requires a patched version of the programmer tool
+
+Specialized Flashing Tools Per Platform     {#flashing-supported-tools-special}
+---------------------------------------
+
+The following list only contains single-platform flashing tools. Tools that
+support multiple platforms are given in section
+\ref flashing-supported-tools-generic above.
+
+### AVR
+
+- `avrdude`
+
+### CC13xx / CC26xx
+
+- `uniflash`
+
+### CC2538
+
+- `cc2538-bsl`
+
+### ESP8266 / ESP32 (Xtensa) / ESP32 (RISC-V)
+
+- `esptool`
+
+### LPC23xx
+
+- `lpc2k_pgm`
+
+### MIPS32r2
+
+- `pic32prog`
+
+### MSP430
+
+- `mspdebug`
+- `goodfet`
+
+### nRF52
+
+- `adafruit-nrfutil` (requires Adafruit bootloader)
+- `nrfutil` (required nRF bootloader)
+
+### RP2040
+
+- `elf2uf2`
+
+### SAM
+
+- `bossa`
+- `edbg`
+
+### STM32
+
+- `stm32flash`
+- `stm32loader`
+- `cpy2remed` (requires integrated ST-Link programmer, e.g. Nucleo boards)
+- `robotis-loader` (requires robotis bootloader, only one board supported)
+
 
 Programmer Configuration                              {#flashing-configuration}
 ========================
@@ -78,12 +143,12 @@ programming.
 OpenOCD Configuration                         {#flashing-configuration-openocd}
 ---------------------
 
-### `OPENOCD_DEBUG_ADAPTER`
+### OPENOCD_DEBUG_ADAPTER
 
 `OPENOCD_DEBUG_ADAPTER` can be set via command line or as environment variable
 to use non-default flashing hardware.
 
-### `OPENOCD_RESET_USE_CONNECT_ASSERT_SRST`
+### OPENOCD_RESET_USE_CONNECT_ASSERT_SRST
 
 `OPENOCD_RESET_USE_CONNECT_ASSERT_SRST` can be set via command line or as
 environment variable to `0` to disable resetting the board via the `SRST` line.
@@ -93,19 +158,19 @@ not be possible to attach the debugger while the MCU is in deep sleeping mode.
 If this is set to `0` by the user, the user may need a carefully timed reset
 button press to be able to flash the board.
 
-### `OPENOCD_PRE_FLASH_CMDS`
+### OPENOCD_PRE_FLASH_CMDS
 
 `OPENOCD_PRE_FLASH_CMDS` can be set as environment variable to pass additional
 commands to OpenOCD prior to flashing, e.g. to disable flash write protection.
 
-### `OPENOCD_PRE_VERIFY_CMDS`
+### OPENOCD_PRE_VERIFY_CMDS
 
 `OPENOCD_PRE_VERIFY_CMDS` can be set as environment variable to pass additional
 flags to OpenOCD prior to verifying the flashed firmware. E.g. this is used
 in the `pba-d-01-kw2x` to disable the watchdog to prevent it from disrupting
 the verification process.
 
-### `OPENOCD_PRE_FLASH_CHECK_SCRIPT`
+### OPENOCD_PRE_FLASH_CHECK_SCRIPT
 
 `OPENOCD_PRE_FLASH_CHECK_SCRIPT` can be set via command line or as
 environment variable to execute a script before OpenOCD starts flashing. It is
@@ -115,12 +180,12 @@ magic value in the flash configuration field protection bits.
 The script is expected to exit with code `0` if flashing should resume, or with
 exit code `1` if flashing should be aborted.
 
-### `OPENOCD_CONFIG`
+### OPENOCD_CONFIG
 
 `OPENOCD_DEBUG_ADAPTER` can be set via command line or as environment variable
 to use non-default OpenOCD configuration file.
 
-### `OPENOCD_TRANSPORT`
+### OPENOCD_TRANSPORT
 
 `OPENOCD_TRANSPORT` can be set via command line or as environment variable to
 select a non-default transport protocol. E.g. to use JTAG rather than SWD for a
