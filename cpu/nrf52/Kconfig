@@ -69,6 +69,14 @@ config CPU_MODEL_NRF52840XXAA
     select HAS_BLE_PHY_CODED
     select HAS_RADIO_NRF802154
     select HAS_PERIPH_UART_NONBLOCKING
+    select HAS_PERIPH_HASH_SHA1
+    select HAS_PERIPH_HASH_SHA224
+    select HAS_PERIPH_HASH_SHA256
+    select HAS_PERIPH_HASH_SHA512
+    select HAS_PERIPH_HMAC_SHA256
+    select HAS_PERIPH_CIPHER_AES_128_CBC
+    select HAS_PERIPH_ECC_P192
+    select HAS_PERIPH_ECC_P256
 
 ## CPU common symbols
 config CPU_FAM
@@ -91,6 +99,58 @@ config HAS_CPU_NRF52
     bool
     help
         Indicates that the current cpu is 'nrf52'.
+
+# Hash Related Symbols
+config PERIPH_HASHES
+    bool
+    select PACKAGE_DRIVER_CRYPTOCELL
+
+config PERIPH_HASH_SHA1
+    bool
+    select MODULE_PSA_CC_HASHES_SHA1
+    select PERIPH_HASHES
+
+config PERIPH_HASH_SHA224
+    bool
+    select MODULE_PSA_CC_HASHES_SHA224
+    select PERIPH_HASHES
+
+config PERIPH_HASH_SHA256
+    bool
+    select MODULE_PSA_CC_HASHES_SHA256
+    select PERIPH_HASHES
+
+config PERIPH_HASH_SHA512
+    bool
+    select MODULE_PSA_CC_HASHES_SHA512
+    select PERIPH_HASHES
+
+config PERIPH_HMAC
+    bool
+    select PACKAGE_DRIVER_CRYPTOCELL
+    select MODULE_PSA_CC_HMAC
+
+config PERIPH_CIPHER_AES_128_CBC
+    bool
+    select PACKAGE_DRIVER_CRYPTOCELL
+    select MODULE_PSA_CC_AES_CBC
+    select PERIPH_CIPHER_AES
+
+config PERIPH_CIPHER_AES
+    bool
+    select PACKAGE_DRIVER_CRYPTOCELL
+
+# Asymmetric Crypto Related Symbols
+config PERIPH_ECC_P192
+    bool
+    select PACKAGE_DRIVER_CRYPTOCELL
+    select MODULE_PSA_CC_ECC_P192
+
+config PERIPH_ECC_P256
+    bool
+    select PACKAGE_DRIVER_CRYPTOCELL
+    select MODULE_PSA_CC_ECC_P256
+
 
 rsource "periph/Kconfig"
 rsource "vectors/Kconfig"

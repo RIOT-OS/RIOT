@@ -1,0 +1,12 @@
+INCLUDES += -I$(PKGDIRBASE)/driver_cryptocell/include
+INCLUDES += -I$(RIOTPKG)/driver_cryptocell/include
+DIRS += $(RIOTPKG)/driver_cryptocell/contrib
+
+ARCHIVES += $(PKGDIRBASE)/driver_cryptocell/lib/libnrf_cc310_0.9.12.a
+
+ifneq (,$(filter psa_cc_%, $(USEMODULE)))
+  DIRS += $(RIOTPKG)/driver_cryptocell/psa_cc
+  INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
+endif
+
+CFLAGS += -Wno-cast-align

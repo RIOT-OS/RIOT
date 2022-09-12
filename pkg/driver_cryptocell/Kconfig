@@ -1,0 +1,17 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config PACKAGE_DRIVER_CRYPTOCELL
+    bool "CryptoCell Library Package"
+    depends on CPU_MODEL_NRF52840XXAA
+    depends on TEST_KCONFIG
+    select MODULE_DRIVER_CRYPTOCELL_CONTRIB
+
+config MODULE_DRIVER_CRYPTOCELL_CONTRIB
+    bool
+
+rsource "psa_cc/Kconfig"
