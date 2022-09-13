@@ -11,7 +11,7 @@ menuconfig PSA_KEY_CONFIG
 if PSA_KEY_CONFIG
 
 config PSA_KEY_SIZE_128
-    bool
+    bool "Application uses key of size 128 Bits"
 
 config PSA_KEY_SIZE_192
     bool
