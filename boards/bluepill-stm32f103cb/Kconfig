@@ -6,9 +6,9 @@
 #
 
 config BOARD
-    default "blackpill-128kib" if BOARD_BLACKPILL_128KIB
+    default "bluepill-stm32f103cb" if BOARD_BLUEPILL_STM32F103CB
 
-config BOARD_BLACKPILL_128KIB
+config BOARD_BLUEPILL_STM32F103CB
     bool
     default y
     select BOARD_COMMON_BLXXXPILL

@@ -1,10 +1,10 @@
 BOARD_INSUFFICIENT_MEMORY := \
     airfy-beacon \
     b-l072z-lrwan1 \
-    blackpill \
-    blackpill-128kib \
-    bluepill \
-    bluepill-128kib \
+    blackpill-stm32f103c8 \
+    blackpill-stm32f103cb \
+    bluepill-stm32f103c8 \
+    bluepill-stm32f103cb \
     bluepill-stm32f030c8 \
     calliope-mini \
     cc1350-launchpad \

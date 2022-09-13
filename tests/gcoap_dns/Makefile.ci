@@ -1,8 +1,8 @@
 BOARD_INSUFFICIENT_MEMORY := \
     airfy-beacon \
-    blackpill \
+    blackpill-stm32f103c8 \
     bluepill-stm32f030c8 \
-    bluepill \
+    bluepill-stm32f103c8 \
     calliope-mini \
     i-nucleo-lrwan1 \
     im880b \

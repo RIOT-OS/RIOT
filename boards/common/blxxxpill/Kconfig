@@ -30,7 +30,7 @@ config MODULE_BOARDS_COMMON_BLXXXPILL
     bool
     depends on TEST_KCONFIG
     help
-       Common code of bluepill or blackpill boards
+       Common code of bluepill-stm32f103xx and blackpill-stm32f103xx boards
 
 
 source "$(RIOTBOARD)/common/stm32/Kconfig"

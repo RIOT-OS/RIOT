@@ -15,10 +15,10 @@ LOW_MEMORY_BOARDS += \
   atmega1284p \
   b-l072z-lrwan1 \
   bastwan \
-  blackpill \
-  blackpill-128kib \
-  bluepill \
-  bluepill-128kib \
+  blackpill-stm32f103c8 \
+  blackpill-stm32f103cb \
+  bluepill-stm32f103c8 \
+  bluepill-stm32f103cb \
   calliope-mini \
   cc1312-launchpad \
   cc1350-launchpad \

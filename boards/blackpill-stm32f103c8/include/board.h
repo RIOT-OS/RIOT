@@ -9,7 +9,7 @@
  */
 
 /**
- * @ingroup     boards_blackpill_128kib
+ * @ingroup     boards_blackpill_stm32f103c8
  * @brief       Support for the stm32f103c8 based Black pill.
  *
  * @{
@@ -36,7 +36,7 @@ extern "C" {
  * @{
  */
 #define LED0_PORT_NUM       PORT_B  /**< GPIO Port number the LED is connected to */
-#define LED0_PIN_NUM        (12)    /**< Pin number the LED is connected to */
+#define LED0_PIN_NUM        12      /**< Pin number the LED is connected to */
 /** @} */
 
 #ifdef __cplusplus
