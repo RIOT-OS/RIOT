@@ -63,7 +63,11 @@ static void busy_delay(void)
 static void record_thread_started(const char *priority)
 {
     print_str(priority);
-    print_str(" priority thread has started\n");
+    print_str(" priority thread (pid = ");
+    print_u32_dec(thread_getpid());
+    print_str(", prio = ");
+    print_u32_dec(thread_get_active()->priority);
+    print_str(") has started\n");
 }
 
 static void record_thread_working(const char *priority)
