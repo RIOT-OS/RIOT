@@ -86,8 +86,8 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime,
 
 extern void uhcp_client(uhcp_iface_t iface);
 
-static char _uhcp_client_stack[THREAD_STACKSIZE_DEFAULT +
-                               THREAD_EXTRA_STACKSIZE_PRINTF];
+static char _uhcp_client_stack[UHCP_THREAD_STACKSIZE];
+
 static msg_t _uhcp_msg_queue[4];
 
 static void* uhcp_client_thread(void *arg)

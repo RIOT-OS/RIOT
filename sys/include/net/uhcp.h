@@ -50,6 +50,11 @@ extern "C" {
 /** @brief UHCP port number (as string for e.g., getaddrinfo() service arg */
 #define UHCP_PORT_STR   "12345"
 
+/** @brief UHCP thread stacksize */
+#ifndef UHCP_THREAD_STACKSIZE
+#define UHCP_THREAD_STACKSIZE (THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF)
+#endif
+
 /** @brief Enum containing possible UHCP packet types */
 typedef enum {
     UHCP_REQ,               /**< packet is a request packet */
