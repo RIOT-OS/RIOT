@@ -31,6 +31,7 @@ extern "C" {
  * @{
  */
 #define __IO volatile
+/** @} */
 
 /**
  * @name    Power mode configuration

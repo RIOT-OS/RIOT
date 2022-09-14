@@ -61,7 +61,7 @@ extern "C" {
 #endif
 #define BACKLIGHT_ON                (NRF_P0->OUTCLR = BACKLIGHT_MASK)
 #define BACKLIGHT_OFF               (NRF_P0->OUTSET = BACKLIGHT_MASK)
-/** @ */
+/** @} */
 
 /**
  * @name LCD configuration

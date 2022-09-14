@@ -29,7 +29,8 @@ extern "C" {
 
 #define STMPE811_CHIP_ID_VALUE                      (0x0811)    /**< Chip ID */
 
-/* @name    Registers
+/**
+ * @name    Registers
  * @{
  */
 #define STMPE811_CHIP_ID                            (0x00)      /**< STMPE811 Device identification */
@@ -87,14 +88,16 @@ extern "C" {
 #define STMPE811_TEMP_TH                            (0x62)      /**< Threshold for temp controlled int */
 /** @} */
 
-/* @name    SYS_CTRL1 register bitfields
+/**
+ * @name    SYS_CTRL1 register bitfields
  * @{
  */
 #define STMPE811_SYS_CTRL1_HIBERNATE                (1 << 0)    /**< Hibernate the device*/
 #define STMPE811_SYS_CTRL1_SOFT_RESET               (1 << 1)    /**< Trigger software reset */
 /** @} */
 
-/* @name    SYS_CTRL2 register bitfields
+/**
+ * @name    SYS_CTRL2 register bitfields
  * @{
  */
 #define STMPE811_SYS_CTRL2_ADC_OFF                  (1 << 0)    /**< Disable ADC */
@@ -103,7 +106,8 @@ extern "C" {
 #define STMPE811_SYS_CTRL2_TS_OFF                   (1 << 3)    /**< Disable Temperature sensor */
 /** @} */
 
-/* @name    SPI_CFG register bitfields
+/**
+ * @name    SPI_CFG register bitfields
  * @{
  */
 #define STMPE811_SPI_CFG_SPI_CLK_MOD0               (1 << 0)    /**< SCAD/A0 pin during power-up reset */
@@ -112,7 +116,8 @@ extern "C" {
 /** @} */
 
 
-/* @name    INT_CTRL register bitfields
+/**
+ * @name    INT_CTRL register bitfields
  * @{
  */
 #define STMPE811_INT_CTRL_INT_POLARITY              (1 << 2)    /**< Configure interrupt polarity (falling or raising) */
@@ -120,7 +125,8 @@ extern "C" {
 #define STMPE811_INT_CTRL_GLOBAL_INT                (1 << 0)    /**< Enable global interrupt */
 /** @} */
 
-/* @name    INT_EN register bitfields
+/**
+ * @name    INT_EN register bitfields
  * @{
  */
 #define STMPE811_INT_EN_TOUCH_DET                   (1 << 0)    /**< Enable touch detection interrupt */
@@ -133,7 +139,8 @@ extern "C" {
 #define STMPE811_INT_EN_GPIO                        (1 << 7)    /**< Enable GPIO interrupt */
 /** @} */
 
-/* @name    ADC_CTRL1 register bitfields
+/**
+ * @name    ADC_CTRL1 register bitfields
  * @{
  */
 #define STMPE811_ADC_CTRL1_SAMPLE_TIME_POS          (4)         /**< Sample time bits shift position */
@@ -147,7 +154,8 @@ extern "C" {
 #define STMPE811_ADC_CTRL1_MOD_12B                  (1 << 3)    /**< Enable 12 bit ADC (10bit if 0) */
 /** @} */
 
-/* @name    ADC_CTRL2 register bitfields
+/**
+ * @name    ADC_CTRL2 register bitfields
  * @{
  */
 #define STMPE811_ADC_CTRL2_FREQ_1_625MHZ            (0b00)      /**< ADC clock frequency 1.625MHz */
@@ -156,7 +164,8 @@ extern "C" {
 #define STMPE811_ADC_CTRL2_FREQ_6_5_2MHZ            (0b11)      /**< ADC clock frequency 6.5MHz */
 /** @} */
 
-/* @name    TSC_CTRL register bitfields
+/**
+ * @name    TSC_CTRL register bitfields
  * @{
  */
 #define STMPE811_TSC_CTRL_EN                        (1 << 0)    /**< Enable touchscreen */
@@ -178,7 +187,8 @@ extern "C" {
 #define STMPE811_TSC_CTRL_STA                       (1 << 7)    /**< Touchscreen status (1: touch detected, 0: no touch detected), read-only */
 /** @} */
 
-/* @name    TSC_CFG register bitfields
+/**
+ * @name    TSC_CFG register bitfields
  * @{
  */
 #define STMPE811_TSC_CFG_AVE_CTRL_POS               (6)         /**< Average control bit shift position */
@@ -205,13 +215,15 @@ extern "C" {
 #define STMPE811_TSC_CFG_SETTLING_100MS             (0b111)     /**< Settling time 100ms */
 /** @} */
 
-/* @name    FIFO_CTRL_STA register bitfields
+/**
+ * @name    FIFO_CTRL_STA register bitfields
  * @{
  */
 #define STMPE811_FIFO_CTRL_STA_RESET                (1 << 0)    /**< Reset FIFO */
 /** @} */
 
-/* @name    TSC_FRACTION_Z register bitfields
+/**
+ * @name    TSC_FRACTION_Z register bitfields
  * @{
  */
 #define STMPE811_TSC_FRACTION_Z_0_8                 (0b000)     /**< Fractional part is 0, whole part is 8 */
@@ -224,7 +236,8 @@ extern "C" {
 #define STMPE811_TSC_FRACTION_Z_7_1                 (0b111)     /**< Fractional part is 7, whole part is 1 */
 /** @} */
 
-/* @name    TSC_I_DRIVE register bitfields
+/**
+ * @name    TSC_I_DRIVE register bitfields
  * @{
  */
 #define STMPE811_TSC_I_DRIVE_50MA                   (1 << 0)    /**< Enable 50mA drive current, 20mA if 0 */

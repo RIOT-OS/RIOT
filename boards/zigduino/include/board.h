@@ -46,6 +46,7 @@ extern "C" {
 
 /**
  * @name    Grove PIR Motion sensor
+ * @{
  */
 #define PIR_MOTION_PIN      GPIO_PIN(PORT_D, 4)
 #define PIR_MOTION_MODE     GPIO_IN_PU

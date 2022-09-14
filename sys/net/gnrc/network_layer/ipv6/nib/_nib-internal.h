@@ -864,4 +864,5 @@ static inline void _evtimer_add(void *ctx, int16_t type,
 #endif
 
 #endif /* PRIV_NIB_INTERNAL_H */
-/** @} */
+/** @internal
+ * @} */

@@ -36,7 +36,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name    Possible device state change commands
+ * @name    device state change commands
  * @{
  */
 enum {
@@ -46,9 +46,11 @@ enum {
     CC2420_GOTO_TXON,       /**< transmit packet without CCA */
     CC2420_GOTO_TXONCCA     /**< transmit packet using CCA */
 };
+/** @} */
 
 /**
  * @name    (Selected) device states
+ * @{
  */
 enum {
     CC2420_STATE_PD          = 0,   /**< power down */
@@ -57,6 +59,7 @@ enum {
     CC2420_STATE_RX_SEARCH   = 6,   /**< receive SFD search */
     CC2420_STATE_RX_OVERFLOW = 17   /**< receive buffer overflow */
 };
+/** @} */
 
 /**
  * @name    CC2420 SPI commands

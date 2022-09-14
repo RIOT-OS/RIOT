@@ -459,7 +459,9 @@ extern "C" {
 #ifndef CONFIG_LORAMAC_DEFAULT_MIN_RX_SYMBOLS
 #define CONFIG_LORAMAC_DEFAULT_MIN_RX_SYMBOLS   (12)
 #endif
-/** @} */
+/**
+ * @}
+ */
 
 /**
  * @brief   Default adaptive datarate ACK limit (in s)
@@ -562,6 +564,7 @@ extern "C" {
 
 /**
  * @name    LoRaMAC parameters indexes
+ * @{
  */
 
 /**
@@ -963,7 +966,6 @@ typedef enum {
     LORAMAC_TX_PWR_15,
 } loramac_tx_pwr_idx_t;
 /** @} */
-
 /**
  * @brief   A LoRaMAC network channel
  */
@@ -1029,4 +1031,6 @@ static inline uint32_t lora_time_on_air(size_t pkt_len, loramac_dr_idx_t dr, uin
 #endif
 
 #endif /* NET_LORAMAC_H */
-/** @} */
+/**
+ * @}
+ */

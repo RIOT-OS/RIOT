@@ -100,6 +100,7 @@ typedef enum {
 
 /**
  * @brief   I2C (TWI) configuration options
+ * @{
  */
 typedef struct {
     NRF_TWIM_Type *dev;         /**< TWIM hardware device */

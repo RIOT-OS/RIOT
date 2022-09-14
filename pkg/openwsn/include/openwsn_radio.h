@@ -43,8 +43,6 @@
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>, April 2019
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
- *
- * @}
  */
 
 #ifndef OPENWSN_RADIO_H

@@ -14,7 +14,6 @@
  * @brief       Default configuration for the AT86RF215 driver
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
- * @}
  */
 
 #ifndef AT86RF215_PARAMS_H

@@ -14,7 +14,6 @@
  * @brief       Netdev interface to AT86RF215 driver
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
- * @}
  */
 
 #ifndef AT86RF215_NETDEV_H

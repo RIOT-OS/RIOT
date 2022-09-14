@@ -221,13 +221,13 @@
  *              .dev = I2C_DEV(0),
  *              .addr = 0,
  *              .exp = PCF857X_EXP_PCF8574A,
- *              .int_pin = GPIO_PIN(0,1),
+ *              .int_pin = GPIO_PIN(0, 1),
  *          },
  *          {
  *              .dev = I2C_DEV(0),
  *              .addr = 0,
  *              .exp = PCF857X_EXP_PCF8575,
- *              .int_pin = GPIO_PIN(0,2),
+ *              .int_pin = GPIO_PIN(0, 2),
  *          },
  *      };
  *

@@ -76,14 +76,6 @@ static const timer_conf_t timer_config[] = {
 * rts_pin.
 * @{
 */
-/**
- * @name    UART configuration
- *
- *
- * Add a second UART configuration if using external pins.
- * @{
- */
-
 static const uart_conf_t uart_config[] = {
     {
         .regs = UART0,

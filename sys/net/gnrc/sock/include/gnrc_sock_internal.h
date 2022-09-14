@@ -156,7 +156,7 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt, uint32_t time
  */
 ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
                        const sock_ip_ep_t *remote, uint8_t nh);
-/**
+/** @internal
  * @}
  */
 

@@ -60,6 +60,7 @@ extern "C"
 #define LED3_ON             (GPIOB->PCOR = LED3_MASK)
 #define LED3_OFF            (GPIOB->PSOR = LED3_MASK)
 #define LED3_TOGGLE         (GPIOB->PTOR = LED3_MASK)
+/** @} */
 
 /**
  * @name    Button pin definitions

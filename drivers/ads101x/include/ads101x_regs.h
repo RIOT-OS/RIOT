@@ -98,6 +98,7 @@ extern "C" {
 #define ADS101X_DATAR_1600    ((1 << 7) | (0 << 6) | (0 << 5))
 #define ADS101X_DATAR_2400    ((1 << 7) | (0 << 6) | (1 << 5))
 #define ADS101X_DATAR_3300    ((1 << 7) | (1 << 6) | (0 << 5))
+/** @} */
 
 #ifdef __cplusplus
 }

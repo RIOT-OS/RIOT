@@ -130,7 +130,7 @@ extern "C" {
 #define LIS3MDL_MASK_INT_CFG_IEA          (0x04)
 #define LIS3MDL_MASK_INT_CFG_LIR          (0x02)
 #define LIS3MDL_MASK_INT_CFG_IEN          (0x01)
-/** }@ */
+/** @} */
 
 /**
  * @name    LIS3MDL masks for interrupt src register
@@ -144,6 +144,7 @@ extern "C" {
 #define LIS3MDL_MASK_INT_SRC_NTH_Z        (0x04)
 #define LIS3MDL_MASK_INT_SRC_MROI         (0x02)
 #define LIS3MDL_MASK_INT_SRC_INT          (0x01)
+/** @} */
 
 #ifdef __cplusplus
 }

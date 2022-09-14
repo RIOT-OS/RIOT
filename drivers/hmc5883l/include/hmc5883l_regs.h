@@ -73,3 +73,4 @@ extern "C"
 #endif
 
 #endif /* HMC5883L_REGS_H */
+/** @} */
