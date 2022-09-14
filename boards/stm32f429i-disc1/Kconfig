@@ -23,6 +23,7 @@ config BOARD_STM32F429I_DISC1
 
     # Put other features for this board (in alphabetical order)
     select HAS_RIOTBOOT
+    select HAS_TINYUSB_DEVICE
 
     # Clock configuration
     select BOARD_HAS_HSE

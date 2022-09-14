@@ -15,6 +15,7 @@ FEATURES_PROVIDED += periph_usbdev
 
 # Various other features (if any)
 FEATURES_PROVIDED += arduino
+FEATURES_PROVIDED += tinyusb_device
 
 # TODO: re-think concept for conflicts based on actual used peripherals...
 FEATURES_CONFLICT += periph_spi:periph_dac

@@ -12,6 +12,7 @@ FEATURES_PROVIDED += periph_usbdev
 
 # Various other features (if any)
 FEATURES_PROVIDED += highlevel_stdio
+FEATURES_PROVIDED += tinyusb_device
 
 # weact-f4x1cx boards provide a custom default Kconfig clock configuration
 KCONFIG_BOARD_CONFIG += $(RIOTBOARD)/common/weact-f4x1cx/clock.config
