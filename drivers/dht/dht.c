@@ -35,7 +35,7 @@
 #include "time_units.h"
 #include "ztimer.h"
 
-#define ENABLE_DEBUG            0
+#define ENABLE_DEBUG            1
 #include "debug.h"
 
 /* Every pulse send by the DHT longer than 40µs is interpreted as 1 */
@@ -151,8 +151,10 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
         /* send init signal to device */
         gpio_init(dev->params.pin, GPIO_OUT);
         gpio_clear(dev->params.pin);
+        DEBUG("[dht] pre-sleep: %" PRIu32 "\n", ztimer_now(ZTIMER_USEC));
         ztimer_sleep(ZTIMER_USEC, START_LOW_TIME);
         gpio_set(dev->params.pin);
+        DEBUG("[dht] post-sleep: %" PRIu32 "\n", ztimer_now(ZTIMER_USEC));
         ztimer_sleep(ZTIMER_USEC, START_HIGH_TIME);
 
         struct dht_irq_data data = {
