@@ -58,8 +58,17 @@ endif
 # tinyUSB hardware driver selection
 ifneq (,$(filter esp32s2 esp32s3,$(CPU_FAM)))
   USEMODULE += tinyusb_portable_espressif
+else ifeq (stm32,$(CPU))
+  ifneq (,$(filter f2 f4 f7 h7 l4,$(CPU_FAM)))
+    USEMODULE += tinyusb_portable_synopsys_dwc2
+  else ifneq (,$(filter f0 f1 g4 l0 wb,$(CPU_FAM)))
+    # TODO not yet working, the driver has to be ported
+    USEMODULE += tinyusb_portable_stm32_fsdev
+  else
+    $(error STM32 family not supported)
+  endif
 else
-  $(error CPU family not supported)
+  $(error CPU $(CPU) or CPU family $(CPU_FAM) not supported)
 endif
 
 # other module dependencies
