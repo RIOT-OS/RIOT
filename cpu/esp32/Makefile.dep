@@ -167,6 +167,10 @@ ifneq (,$(filter shell,$(USEMODULE)))
   USEMODULE += ps
 endif
 
+ifneq (,$(filter tinyusb_portable_espressif,$(USEMODULE)))
+  USEMODULE += esp_idf_usb
+endif
+
 ifneq (,$(filter esp_jtag,$(USEMODULE)))
   FEATURES_REQUIRED += esp_jtag
 endif
