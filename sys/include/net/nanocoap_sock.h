@@ -181,8 +181,12 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize);
  * @returns     0 on success
  * @returns     <0 on error
  */
-int nanocoap_sock_connect(nanocoap_sock_t *sock, sock_udp_ep_t *local,
-                          sock_udp_ep_t *remote);
+static inline int nanocoap_sock_connect(nanocoap_sock_t *sock,
+                                        const sock_udp_ep_t *local,
+                                        const sock_udp_ep_t *remote)
+{
+    return sock_udp_create(sock, local, remote, 0);
+}
 
 /**
  * @brief   Create a CoAP client socket by URL
@@ -362,8 +366,8 @@ ssize_t nanocoap_sock_request_cb(sock_udp_t *sock, coap_pkt_t *pkt,
  * @returns     length of response on success
  * @returns     <0 on error
  */
-ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local,
-                         sock_udp_ep_t *remote, size_t len);
+ssize_t nanocoap_request(coap_pkt_t *pkt, const sock_udp_ep_t *local,
+                         const sock_udp_ep_t *remote, size_t len);
 
 /**
  * @brief   Simple synchronous CoAP (confirmable) get
@@ -376,8 +380,8 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local,
  * @returns     length of response payload on success
  * @returns     <0 on error
  */
-ssize_t nanocoap_get(sock_udp_ep_t *remote, const char *path, void *buf,
-                     size_t len);
+ssize_t nanocoap_get(const sock_udp_ep_t *remote, const char *path,
+                     void *buf, size_t len);
 
 /**
  * @brief   Initialize block request context
@@ -392,7 +396,7 @@ ssize_t nanocoap_get(sock_udp_ep_t *remote, const char *path, void *buf,
  * @retval      <0      Error (see @ref nanocoap_sock_connect for details)
  */
 static inline int nanocoap_block_request_init(coap_block_request_t *ctx,
-                                              sock_udp_ep_t *remote,
+                                              const sock_udp_ep_t *remote,
                                               const char *path,
                                               uint8_t method,
                                               coap_blksize_t blksize)

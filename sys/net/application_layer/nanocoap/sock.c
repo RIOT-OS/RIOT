@@ -56,15 +56,6 @@ static uint16_t _get_id(void)
     return atomic_fetch_add_u16(&id, 1);
 }
 
-int nanocoap_sock_connect(nanocoap_sock_t *sock, sock_udp_ep_t *local, sock_udp_ep_t *remote)
-{
-    if (!remote->port) {
-        remote->port = COAP_PORT;
-    }
-
-    return sock_udp_create(sock, local, remote, 0);
-}
-
 static int _get_error(const coap_pkt_t *pkt)
 {
     switch (coap_get_code_class(pkt)) {
@@ -370,8 +361,8 @@ ssize_t nanocoap_sock_post(nanocoap_sock_t *sock, const char *path,
     return _sock_put_post(sock, path, COAP_METHOD_POST, request, len, response, len_max);
 }
 
-ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local,
-                         sock_udp_ep_t *remote, size_t len)
+ssize_t nanocoap_request(coap_pkt_t *pkt, const sock_udp_ep_t *local,
+                         const sock_udp_ep_t *remote, size_t len)
 {
     int res;
     nanocoap_sock_t sock;
@@ -387,7 +378,7 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local,
     return res;
 }
 
-ssize_t nanocoap_get(sock_udp_ep_t *remote, const char *path, void *buf, size_t len)
+ssize_t nanocoap_get(const sock_udp_ep_t *remote, const char *path, void *buf, size_t len)
 {
     int res;
     nanocoap_sock_t sock;
@@ -537,6 +528,10 @@ int nanocoap_sock_url_connect(const char *url, nanocoap_sock_t *sock)
     if (sock_udp_name2ep(&remote, hostport) < 0) {
         DEBUG("nanocoap: invalid URL\n");
         return -EINVAL;
+    }
+
+    if (!remote.port) {
+        remote.port = COAP_PORT;
     }
 
     return nanocoap_sock_connect(sock, NULL, &remote);
