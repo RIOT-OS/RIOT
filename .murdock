@@ -379,7 +379,7 @@ get_app_board_toolchain_pairs() {
     local prefix="$*"
 
     if [ "$boards" = makefile_broken ]; then
-        echo "$appdir makefile_broken"
+        echo "$0 error \"error: ${DWQ_WORKER}: get_supported_boards failed in $appdir\""
         return
     fi
 
