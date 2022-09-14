@@ -337,8 +337,9 @@ static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *b
 
 static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
 {
-    (void) dev;
-    (void) conf;
+    socket_zep_t *zepdev = dev->priv;
+
+    zepdev->chan = conf->channel;
     return 0;
 }
 
@@ -491,7 +492,7 @@ static void _send_ack(socket_zep_t *zepdev, const void *frame)
 }
 
 static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
-                          ieee802154_rx_info_t *info)
+                 ieee802154_rx_info_t *info)
 {
     int res;
     socket_zep_t *zepdev = dev->priv;
@@ -529,6 +530,12 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
     case ZEP_V2_TYPE_DATA: {
         zep_v2_data_hdr_t *zep = (zep_v2_data_hdr_t *)tmp;
 
+        if (zep->chan != zepdev->chan) {
+            DEBUG("socket_zep::read: wrong channel\n");
+            res = -EINVAL;
+            break;
+        }
+
         if (info) {
             info->lqi = zep->lqi_val;
             info->rssi = -IEEE802154_RADIO_RSSI_OFFSET;
@@ -536,6 +543,7 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
 
         if (_dst_not_me(zepdev, zep + 1)) {
             DEBUG("socket_zep::read: dst not me\n");
+            res = -EINVAL;
             break;
         }
 
