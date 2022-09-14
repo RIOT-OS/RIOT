@@ -39,6 +39,12 @@ psa_status_t psa_cipher_cbc_aes_128_encrypt(const psa_key_attributes_t *attribut
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_cipher_operation_t operation = psa_cipher_operation_init();
     size_t iv_length = 0;
+    size_t required_output_buf_size = PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_AES,
+                                        PSA_ALG_CBC_NO_PADDING, input_length);
+
+    if (output_size < required_output_buf_size) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
+    }
 
     operation.iv_required = 1;
     operation.default_iv_length = PSA_CIPHER_IV_LENGTH(attributes->type, alg);
@@ -53,6 +59,5 @@ psa_status_t psa_cipher_cbc_aes_128_encrypt(const psa_key_attributes_t *attribut
                             output, input, input_length, output + operation.default_iv_length,
                             output_length);
 
-    (void)output_size;
     return status;
 }
