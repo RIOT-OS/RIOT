@@ -137,6 +137,10 @@ ifneq (,$(filter periph_ptp_timer periph_ptp_speed_adjustment,$(FEATURES_USED)))
   FEATURES_REQUIRED += periph_ptp
 endif
 
+ifneq (,$(filter periph_usbdev,$(USEMODULE)))
+  USEMODULE += periph_usbdev_clk
+endif
+
 ifneq (,$(filter pn532_i2c,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
   USEMODULE += pn532

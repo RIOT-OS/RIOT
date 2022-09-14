@@ -1,0 +1,61 @@
+# Package tinyUSB has its own USB device driver. Therefore, it cannot be used
+# together with periph/usbdev for now.
+ifneq (,$(filter periph_usbdev,$(USEMODULE)))
+  $(error "Package tinyUSB is not yet compatible with periph/usdev")
+endif
+
+# tinyUSB muteces use priority inheritance
+# USEMODULE += core_mutex_priority_inheritance
+
+# tinyUSB modules always needed
+USEMODULE += tinyusb_common
+USEMODULE += tinyusb_contrib
+USEMODULE += tinyusb_hw
+
+ifeq (,$(filter tinyusb_class_%,$(USEMODULE)))
+  $(error At least one tinyusb_class_* module has to be enabled)
+endif
+
+# tinyUSB device stack has to be supported if tinyusb_device is used
+ifneq (,$(filter tinyusb_device,$(USEMODULE)))
+  FEATURES_REQUIRED += tinyusb_device
+endif
+
+# tinyUSB host stack has to be supported if tinyusb_host is used
+ifneq (,$(filter tinyusb_host,$(USEMODULE)))
+  FEATURES_REQUIRED += tinyusb_host
+endif
+
+# Following device classes work only with tinyUSB device stack
+ifneq (,$(filter tinyusb_class_audio,$(USEMODULE)))
+  FEATURES_REQUIRED += tinyusb_device
+endif
+ifneq (,$(filter tinyusb_class_bth,$(USEMODULE)))
+  FEATURES_REQUIRED += tinyusb_device
+endif
+ifneq (,$(filter tinyusb_class_dfu,$(USEMODULE)))
+  FEATURES_REQUIRED += tinyusb_device
+endif
+ifneq (,$(filter tinyusb_class_dfu_runtime,$(USEMODULE)))
+  FEATURES_REQUIRED += tinyusb_device
+endif
+ifneq (,$(filter tinyusb_class_midi,$(USEMODULE)))
+  FEATURES_REQUIRED += tinyusb_device
+endif
+ifneq (,$(filter tinyusb_class_net_ecm_rndis,$(USEMODULE)))
+  FEATURES_REQUIRED += tinyusb_device
+endif
+ifneq (,$(filter tinyusb_class_net_ncm,$(USEMODULE)))
+  FEATURES_REQUIRED += tinyusb_device
+endif
+ifneq (,$(filter tinyusb_class_usbtmc,$(USEMODULE)))
+  FEATURES_REQUIRED += tinyusb_device
+endif
+ifneq (,$(filter tinyusb_class_video,$(USEMODULE)))
+  FEATURES_REQUIRED += tinyusb_device
+endif
+
+# other module dependencies
+USEMODULE += periph_usbdev_clk
+USEMODULE += sema
+USEMODULE += ztimer_msec
