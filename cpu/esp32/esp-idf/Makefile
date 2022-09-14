@@ -48,6 +48,10 @@ ifneq (,$(filter esp_idf_spi_ram,$(USEMODULE)))
   DIRS += spi_ram
 endif
 
+ifneq (,$(filter esp_idf_usb,$(USEMODULE)))
+  DIRS += usb
+endif
+
 ifneq (,$(filter esp_idf_wifi,$(USEMODULE)))
   DIRS += wifi
 endif
