@@ -4970,7 +4970,6 @@ boards/zigduino/include/board\.h:[0-9]+: warning: Member PIR_MOTION_PIN \(macro 
 boards/zigduino/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/zigduino/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
 boards/zigduino/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
-bootloaders/riotboot_serial/doc\.txt:[0-9]+: warning: Reached end of file while still inside a \(nested\) comment\. Nesting level 1 \(probable line reference: 1\)
 core/include/bitarithm\.h:[0-9]+: warning: Member BIT0 \(macro definition\) of file bitarithm\.h is not documented\.
 core/include/bitarithm\.h:[0-9]+: warning: Member BIT1 \(macro definition\) of file bitarithm\.h is not documented\.
 core/include/bitarithm\.h:[0-9]+: warning: Member BIT10 \(macro definition\) of file bitarithm\.h is not documented\.
@@ -5802,7 +5801,6 @@ cpu/efm32/include/periph_cpu\.h:[0-9]+: warning: Member RTT_MIN_FREQUENCY \(macr
 cpu/efm32/include/periph_cpu\.h:[0-9]+: warning: Member WDT_CLOCK_HZ \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/efm32/include/periph_cpu\.h:[0-9]+: warning: Member WDT_HAS_STOP \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/efm32/include/periph_cpu\.h:[0-9]+: warning: Member gpio_t \(typedef\) of file periph_cpu\.h is not documented\.
-cpu/esp32/doc\.txt:[0-9]+: warning: Reached end of file while still inside a \(nested\) comment\. Nesting level 1 \(probable line reference: 9\)
 cpu/esp32/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_EXTRA_STACKSIZE_PRINTF \(macro definition\) of group cpu_esp32_conf is not documented\.
 cpu/esp32/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_STACKSIZE_DEFAULT \(macro definition\) of group cpu_esp32_conf is not documented\.
 cpu/esp32/include/cpu_conf\.h:[0-9]+: warning: Member THREAD_STACKSIZE_IDLE \(macro definition\) of group cpu_esp32_conf is not documented\.
@@ -8150,7 +8148,6 @@ drivers/include/tsl4531x\.h:[0-9]+: warning: Member TSL45315_PARTNO \(macro defi
 drivers/include/tsl4531x\.h:[0-9]+: warning: Member TSL45317_ADDR \(macro definition\) of group drivers_tsl4531x is not documented\.
 drivers/include/tsl4531x\.h:[0-9]+: warning: Member TSL45317_PARTNO \(macro definition\) of group drivers_tsl4531x is not documented\.
 drivers/include/usbdev_mock\.h:[0-9]+: warning: Member usbdev_mock_ep_state_t \(enumeration\) of group drivers_usbdev_mock is not documented\.
-drivers/include/w5100\.h:[0-9]+: warning: end of file while inside a group
 drivers/io1_xplained/include/io1_xplained_internals\.h:[0-9]+: warning: Member IO1_GPIO1_PIN \(macro definition\) of file io1_xplained_internals\.h is not documented\.
 drivers/io1_xplained/include/io1_xplained_internals\.h:[0-9]+: warning: Member IO1_GPIO2_PIN \(macro definition\) of file io1_xplained_internals\.h is not documented\.
 drivers/io1_xplained/include/io1_xplained_internals\.h:[0-9]+: warning: Member IO1_LED_PIN \(macro definition\) of file io1_xplained_internals\.h is not documented\.
@@ -12627,10 +12624,8 @@ boards/b\-u585i\-iot02a/include/periph_conf\.h:[0-9]+: warning: Member I2C_0_ISR
 boards/b\-u585i\-iot02a/include/periph_conf\.h:[0-9]+: warning: Member I2C_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/b\-u585i\-iot02a/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/b\-u585i\-iot02a/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-	boards/b\-u585i\-iot02a/include/periph_conf\.h
 boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member HTS221_PARAM_I2C \(macro definition\) of file board\.h is not documented\.
 boards/b\-u585i\-iot02a/include/board\.h:[0-9]+: warning: Member LPSXXX_PARAM_I2C \(macro definition\) of file board\.h is not documented\.
-	boards/b\-u585i\-iot02a/include/board\.h
 cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_SRC_MSI \(macro definition\) of file cfg_clock_default\.h is not documented\.
 cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_SRC_HSE \(macro definition\) of file cfg_clock_default\.h is not documented\.
 cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_PLL_SRC_HSI \(macro definition\) of file cfg_clock_default\.h is not documented\.
