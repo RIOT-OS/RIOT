@@ -34,7 +34,7 @@ ifeq (,$(filter iotlab-exp,$(MAKECMDGOALS)))
 endif
 
 ifneq (,$(filter m3:% dwm1001:%,$(IOTLAB_TYPE)))
-  BINARY := $(ELFFILE)
+  BINARY := $(BINFILE)
 else
   BINARY := $(HEXFILE)
 endif
@@ -59,7 +59,7 @@ iotlab-exp: $(IOTLAB_AUTH) all
     endif
 
     ifndef NODES_PARAM
-	  $(eval NODES_PARAM := "-l$(IOTLAB_NODES),archi=$(IOTLAB_TYPE)+site=$(IOTLAB_SITE),$(BINARY),$(IOTLAB_PROFILE)")
+	  $(eval NODES_PARAM := "-l$(IOTLAB_NODES),archi=$(IOTLAB_TYPE)+site=$(IOTLAB_SITE),$(IOTLAB_PROFILE)")
     endif
 
     ifeq (,$(Q))
@@ -67,6 +67,8 @@ iotlab-exp: $(IOTLAB_AUTH) all
     endif
 	$(eval NEW_ID := $(shell iotlab-experiment submit -d $(IOTLAB_DURATION) $(NODES_PARAM) -n $(IOTLAB_EXP_NAME) | grep -Eo '[[:digit:]]+'))
 	$(Q)iotlab-experiment wait -i $(NEW_ID)
+
+	$(Q)iotlab-node $(_NODES_FLASH_OPTION) $(BINARY) -i $(NEW_ID)
 
     ifdef IOTLAB_LOGGING
 	  $(Q)ssh -t $(IOTLAB_AUTHORITY) \
