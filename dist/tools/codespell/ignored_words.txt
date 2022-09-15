@@ -122,3 +122,6 @@ vas
 
 # Sur (macOS version alias) => Sure, sir
 sur
+
+# unsecure (unlocked, protection disabled) => insecure
+unsecure

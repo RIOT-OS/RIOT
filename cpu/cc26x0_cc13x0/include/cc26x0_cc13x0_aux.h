@@ -83,7 +83,7 @@ typedef struct {
     reg32_t SCEWEVSEL; /**< sensor controller engine wait event selection */
     reg32_t EVTOAONFLAGS; /**< events to AON domain flags */
     reg32_t EVTOAONPOL; /**< events to AON domain polarity */
-    reg32_t DMACTL; /**< direct memoty access control */
+    reg32_t DMACTL; /**< direct memory access control */
     reg32_t SWEVSET; /**< software event set */
     reg32_t EVSTAT0; /**< event status 0 */
     reg32_t EVSTAT1; /**< event status 1 */

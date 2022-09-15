@@ -28,7 +28,7 @@ extern "C" {
 /**
  * @def     XTSTR
  *
- * @brief   A macro to return the string respresentation of x
+ * @brief   A macro to return the string representation of x
  */
 #ifndef XTSTR
 # ifndef DOXYGEN

@@ -180,7 +180,7 @@ typedef struct {
 #define RECHARGESTAT_MAX_USED_PER_mask  0x0FFFF
 #define RECHARGESTAT_VDDR_SMPLS_mask    0xF0000
 
-#define OSCCFG_PER_E_mask               0x07 /* number of 32KHz clocks between oscillator amplitude callibrations */
+#define OSCCFG_PER_E_mask               0x07 /* number of 32KHz clocks between oscillator amplitude calibrations */
 #define OSCCFG_PER_M_mask               0xF8 /* computed as follows: PERIOD = (PER_M*16+15) * 2^(PER_E) */
 
 #define JTAGCFG_JTAG_PD_FORCE_ON        0x10
