@@ -77,7 +77,7 @@ static inline int _pin_num(gpio_t pin)
 }
 
 /**
- * @brief   Check if the given mode is some kind of input mdoe
+ * @brief   Check if the given mode is some kind of input mode
  * @param[in]   mode    Mode to check
  * @retval  1           @p mode is GPIO_IN, GPIO_IN_PD, or GPIO_IN_PU
  * @retval  0           @p mode is not an input mode

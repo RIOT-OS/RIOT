@@ -22,7 +22,7 @@
  *
  * Support static BAUD rate calculation using STDIO_UART_BAUDRATE.
  * Set STDIO_UART_BAUDRATE to the desired baud rate and pass it as a -D argument
- * at compliation time (e.g. in the boards Makefile.include file).
+ * at compilation time (e.g. in the boards Makefile.include file).
  * UART_BAUD_TOL can be set to guarantee a BAUD rate tolerance at compile time or
  * to switch to double speed transmission (U2X) to achieve a lower tolerance.
  * At runtime, this tolerance is not guaranteed to be met.
