@@ -83,7 +83,7 @@ typedef struct {
 #define MCI_RESP_136        (1ul << 11)     /**< 136 bit response */
 #define MCI_RESP_CRC        (1ul << 12)     /**< Expect valid crc */
 #define MCI_RESP_BUSY       (1ul << 13)     /**< Card may send busy */
-#define MCI_CMD_OPENDRAIN   (1ul << 14)     /**< Open drain for a braodcast command */
+#define MCI_CMD_OPENDRAIN   (1ul << 14)     /**< Open drain for a broadcast command */
 #define MCI_CMD_WRITE       (1ul << 15)     /**< To signal a data write operation */
 #define MCI_CMD_SDIO_BYTE   (1ul << 16)     /**< To signal a SDIO transfer in multi byte mode */
 #define MCI_CMD_SDIO_BLOCK  (1ul << 17)     /**< To signal a SDIO transfer in block mode */

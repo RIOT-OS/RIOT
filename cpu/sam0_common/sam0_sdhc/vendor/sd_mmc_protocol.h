@@ -124,7 +124,7 @@ typedef uint32_t sdmmc_cmd_def_t;
 #define SDMMC_RESP_CRC (1lu << 12)
 //! Card may send busy
 #define SDMMC_RESP_BUSY (1lu << 13)
-// Open drain for a braodcast command (bc)
+// Open drain for a broadcast command (bc)
 // or to enter in inactive state (MCI only)
 #define SDMMC_CMD_OPENDRAIN (1lu << 14)
 //! To signal a data write operation
