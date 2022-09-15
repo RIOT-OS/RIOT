@@ -559,6 +559,12 @@ ifneq (,$(filter asymcute,$(USEMODULE)))
   USEMODULE += event_callback
 endif
 
+ifneq (,$(filter event_periodic_callback,$(USEMODULE)))
+  USEMODULE += event_callback
+  USEMODULE += event_periodic
+  USEMODULE += event_thread
+endif
+
 ifneq (,$(filter emcute,$(USEMODULE)))
   USEMODULE += core_thread_flags
   USEMODULE += sock_udp
