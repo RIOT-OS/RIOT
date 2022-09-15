@@ -541,11 +541,11 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
  */
 ssize_t sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len);
 
-#include "sock_types.h"
-
 #ifdef __cplusplus
 }
 #endif
+
+#include "sock_types.h"
 
 #endif /* NET_SOCK_TCP_H */
 /** @} */
